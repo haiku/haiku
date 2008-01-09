@@ -126,7 +126,7 @@ ata_wait_for_drdy(ide_bus_info *bus)
 
 
 status_t
-ata_send_command(ide_device_info *device, ide_qrequest *qrequest,
+ata_send_command(ide_device_info *device, ata_request *request,
 	bool need_drdy, uint32 timeout, ata_bus_state new_state)
 {
 	ide_bus_info *bus = device->bus;
@@ -137,9 +137,9 @@ ata_send_command(ide_device_info *device, ide_qrequest *qrequest,
 
 	ASSERT(new_state == ata_state_pio); // XXX only pio for now
 
-	FLOW("ata_send_command: %d:%d, qrequest %p, request %p, tf %02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x\n",
+	FLOW("ata_send_command: %d:%d, request %p, ccb %p, tf %02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x\n",
 		device->target_id, device->is_device1, 
-		qrequest, qrequest ? qrequest->request : NULL,
+		request, request ? request->ccb : NULL,
 		device->tf.raw.r[0], device->tf.raw.r[1], device->tf.raw.r[2], 
 		device->tf.raw.r[3], device->tf.raw.r[4], device->tf.raw.r[5], 
 		device->tf.raw.r[6], device->tf.raw.r[7], device->tf.raw.r[8],
@@ -348,25 +348,25 @@ check_rw_status(ide_device_info *device, bool drqStatus)
  */
 
 void
-ata_dpc_PIO(ide_qrequest *qrequest)
+ata_dpc_PIO(ata_request *request)
 {
-	ide_device_info *device = qrequest->device;
-	uint32 timeout = qrequest->request->timeout > 0 ? 
-		qrequest->request->timeout : IDE_STD_TIMEOUT;
+	ide_device_info *device = request->device;
+	uint32 timeout = request->ccb->timeout > 0 ? 
+		request->ccb->timeout : IDE_STD_TIMEOUT;
 
 	SHOW_FLOW0(3, "");
 
-	if (check_rw_error(device, qrequest)
-		|| !check_rw_status(device, qrequest->is_write ? device->left_blocks > 0 : true)) 
+	if (check_rw_error(device, request)
+		|| !check_rw_status(device, request->is_write ? device->left_blocks > 0 : true)) 
 	{
 		// failure reported by device
 		SHOW_FLOW0( 3, "command finished unsuccessfully" );
 
-		finish_checksense(qrequest);
+		finish_checksense(request);
 		return;
 	}
 
-	if (qrequest->is_write) {
+	if (request->is_write) {
 		if (device->left_blocks == 0) {
 			// this was the end-of-transmission IRQ
 			SHOW_FLOW0(3, "write access finished");
@@ -395,7 +395,7 @@ ata_dpc_PIO(ide_qrequest *qrequest)
 		// having a too short data buffer shouldn't happen here
 		// anyway - we are prepared
 		SHOW_FLOW0(3, "Writing one block");
-		if (write_PIO_block(qrequest, 512) == B_ERROR)
+		if (write_PIO_block(request, 512) == B_ERROR)
 			goto finish_cancel_timeout;
 
 		--device->left_blocks;
@@ -407,13 +407,13 @@ ata_dpc_PIO(ide_qrequest *qrequest)
 
 		// see write
 		SHOW_FLOW0( 3, "Reading one block" );
-		if (read_PIO_block(qrequest, 512) == B_ERROR)
+		if (read_PIO_block(request, 512) == B_ERROR)
 			goto finish_cancel_timeout;
 
 		--device->left_blocks;
 
 		if (device->left_blocks == 0) {
-			// at end of transmission, wait for data request going low
+			// at end of transmission, wait for data ccb going low
 			SHOW_FLOW0( 3, "Waiting for device to finish transmission" );
 
 			if (!wait_for_drqdown(device))
@@ -430,26 +430,26 @@ finish_cancel_timeout:
 	cancel_irq_timeout(device->bus);
 
 finish:
-	finish_checksense(qrequest);
+	finish_checksense(request);
 }
 
 #endif
 /** DPC called when IRQ was fired at end of DMA transmission */
 
 void
-ata_dpc_DMA(ide_qrequest *qrequest)
+ata_dpc_DMA(ata_request *request)
 {
-	ide_device_info *device = qrequest->device;
+	ide_device_info *device = request->device;
 	bool dma_success, dev_err;
 
 	dma_success = finish_dma(device);
-	dev_err = check_rw_error(device, qrequest);
+	dev_err = check_rw_error(device, request);
 
 	if (dma_success && !dev_err) {
 		// reset error count if DMA worked
 		device->DMA_failures = 0;
-		qrequest->request->data_resid = 0;
-		finish_checksense(qrequest);
+		request->ccb->data_resid = 0;
+		finish_checksense(request);
 	} else {
 		SHOW_ERROR0( 2, "Error in DMA transmission" );
 
@@ -461,20 +461,20 @@ ata_dpc_DMA(ide_qrequest *qrequest)
 		}
 
 		// reset queue in case queuing is active
-		finish_reset_queue(qrequest);
+		finish_reset_queue(request);
 	}
 }
 
 
 // list of LBA48 opcodes
-static uint8 cmd_48[2][2] = {
+static const uint8 cmd_48[2][2] = {
 	{ IDE_CMD_READ_SECTORS_EXT, IDE_CMD_WRITE_SECTORS_EXT },
 	{ IDE_CMD_READ_DMA_EXT, IDE_CMD_WRITE_DMA_EXT }
 };
 
 
 // list of normal LBA opcodes
-static uint8 cmd_28[2][2] = {
+static const uint8 cmd_28[2][2] = {
 	{ IDE_CMD_READ_SECTORS, IDE_CMD_WRITE_SECTORS },
 	{ IDE_CMD_READ_DMA, IDE_CMD_WRITE_DMA }
 };
@@ -483,7 +483,7 @@ static uint8 cmd_28[2][2] = {
 /** create IDE read/write command */
 
 static bool
-create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest, 
+create_rw_taskfile(ide_device_info *device, ata_request *request, 
 	uint64 pos, size_t length, bool write)
 {
 	SHOW_FLOW0( 3, "" );
@@ -514,7 +514,7 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 				device->tf.lba48.lba_24_31 = (pos >> 24) & 0xff;
 				device->tf.lba48.lba_32_39 = (pos >> 32) & 0xff;
 				device->tf.lba48.lba_40_47 = (pos >> 40) & 0xff;
-				device->tf.lba48.command = cmd_48[qrequest->uses_dma][write];
+				device->tf.lba48.command = cmd_48[request->uses_dma][write];
 				return true;
 		} else {
 			// normal LBA
@@ -536,7 +536,7 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 				device->tf.lba.lba_8_15 = (pos >> 8) & 0xff;
 				device->tf.lba.lba_16_23 = (pos >> 16) & 0xff;
 				device->tf.lba.lba_24_27 = (pos >> 24) & 0xf;
-				device->tf.lba.command = cmd_28[qrequest->uses_dma][write];
+				device->tf.lba.command = cmd_28[request->uses_dma][write];
 				return true;
 		}
 	} else {
@@ -576,7 +576,7 @@ create_rw_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 		device->tf.chs.sector_number = (cylinder_offset % infoblock->current_sectors + 1) & 0xff;
 		device->tf.chs.head = cylinder_offset / infoblock->current_sectors;
 
-		device->tf.chs.command = cmd_28[qrequest->uses_dma][write];
+		device->tf.chs.command = cmd_28[request->uses_dma][write];
 		return true;
 	}
 
@@ -594,44 +594,44 @@ err:
  */
 
 void
-ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
+ata_send_rw(ide_device_info *device, ata_request *request,
 	uint64 pos, size_t length, bool write)
 {
 	ide_bus_info *bus = device->bus;
 	uint32 timeout;
 
 	// make a copy first as settings may get changed by user during execution	
-	qrequest->is_write = write;
-	qrequest->uses_dma = device->DMA_enabled;
+	request->is_write = write;
+	request->uses_dma = device->DMA_enabled;
 
-	if (qrequest->uses_dma) {
-		if (!prepare_dma(device, qrequest)) {
+	if (request->uses_dma) {
+		if (!prepare_dma(device, request)) {
 			// fall back to PIO on error
 
-			qrequest->uses_dma = false;
+			request->uses_dma = false;
 		}
 	}
 
-	if (!qrequest->uses_dma) {
-		prep_PIO_transfer(device, qrequest);
+	if (!request->uses_dma) {
+		prep_PIO_transfer(device, request);
 		device->left_blocks = length;
 	}
 
 	// compose command
-	if (!create_rw_taskfile(device, qrequest, pos, length, write))
+	if (!create_rw_taskfile(device, request, pos, length, write))
 		goto err_setup;
 
 	// if no timeout is specified, use standard
-	timeout = qrequest->request->timeout > 0 ? 
-		qrequest->request->timeout : IDE_STD_TIMEOUT;
+	timeout = request->ccb->timeout > 0 ? 
+		request->ccb->timeout : IDE_STD_TIMEOUT;
 
-	if (ata_send_command(device, qrequest, !device->is_atapi, timeout,
-			qrequest->uses_dma ? ata_state_dma : ata_state_pio) != B_OK) 
+	if (ata_send_command(device, request, !device->is_atapi, timeout,
+			request->uses_dma ? ata_state_dma : ata_state_pio) != B_OK) 
 		goto err_send;
 
-	if (qrequest->uses_dma) {
+	if (request->uses_dma) {
 
-		start_dma_wait_no_lock(device, qrequest);
+		start_dma_wait_no_lock(device, request);
 	} else {
 		// on PIO read, we start with waiting, on PIO write we can
 		// transmit data immediately; we let the service thread do
@@ -639,7 +639,7 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 		// immediately (this optimisation really pays on SMP systems
 		// only)
 		SHOW_FLOW0(3, "Ready for PIO");
-		if (qrequest->is_write) {
+		if (request->is_write) {
 			SHOW_FLOW0(3, "Scheduling write DPC");
 			scsi->schedule_dpc(bus->scsi_cookie, bus->irq_dpc, ide_dpc, bus);
 		}
@@ -649,19 +649,19 @@ ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
 
 err_setup:
 	// error during setup
-	if (qrequest->uses_dma)
-		abort_dma(device, qrequest);
+	if (request->uses_dma)
+		abort_dma(device, request);
 
-	finish_checksense(qrequest);
+	finish_checksense(request);
 	return;
 	
 err_send:
 	// error during/after send; 
-	// in this case, the device discards queued request automatically
-	if (qrequest->uses_dma)
-		abort_dma(device, qrequest);
+	// in this case, the device discards queued ccb automatically
+	if (request->uses_dma)
+		abort_dma(device, request);
 
-	finish_reset_queue(qrequest);
+	finish_reset_queue(request);
 }
 
 
@@ -670,7 +670,7 @@ err_send:
  */
 
 bool
-check_rw_error(ide_device_info *device, ide_qrequest *qrequest)
+check_rw_error(ide_device_info *device, ata_request *request)
 {
 #if 0
 	ide_bus_info *bus = device->bus;
@@ -694,7 +694,7 @@ check_rw_error(ide_device_info *device, ide_qrequest *qrequest)
 			return true;
 		}
 
-		if (qrequest->is_write) {
+		if (request->is_write) {
 			if ((error & ide_error_wp) != 0) {
 				set_sense(device, SCSIS_KEY_DATA_PROTECT, SCSIS_ASC_WRITE_PROTECTED);
 				return true;
@@ -995,7 +995,6 @@ status_t
 ata_read_infoblock(ide_device_info *device, bool isAtapi)
 {
 	ide_bus_info *bus = device->bus;
-	int status;
 
 	TRACE("ata_read_infoblock: bus %p, device %d, isAtapi %d\n", device->bus, device->is_device1, isAtapi);
 

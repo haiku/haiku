@@ -18,10 +18,10 @@
 
 /*! Emulate REQUEST SENSE */
 void
-ide_request_sense(ide_device_info *device, ide_qrequest *qrequest)
+ide_request_sense(ide_device_info *device, ata_request *request)
 {
-	scsi_ccb *request = qrequest->request;
-	scsi_cmd_request_sense *cmd = (scsi_cmd_request_sense *)request->cdb;
+	scsi_ccb *ccb = request->ccb;
+	scsi_cmd_request_sense *cmd = (scsi_cmd_request_sense *)ccb->cdb;
 	scsi_sense sense;
 	uint32 transferSize;
 
@@ -33,39 +33,39 @@ ide_request_sense(ide_device_info *device, ide_qrequest *qrequest)
 	else
 		memset(&sense, 0, sizeof(sense));
 
-	copy_sg_data(request, 0, cmd->allocation_length, &sense, sizeof(sense), false);
+	copy_sg_data(ccb, 0, cmd->allocation_length, &sense, sizeof(sense), false);
 
 	// reset sense information on read
 	device->combined_sense = 0;
 
 	transferSize = min(sizeof(sense), cmd->allocation_length);
-	transferSize = min(transferSize, request->data_length);
+	transferSize = min(transferSize, ccb->data_length);
 
-	request->data_resid = request->data_length - transferSize;
+	ccb->data_resid = ccb->data_length - transferSize;
 
 	// normally, all flags are set to "success", but for Request Sense 
 	// this would have overwritten the sense we want to read
 	device->subsys_status = SCSI_REQ_CMP;
-	request->device_status = SCSI_STATUS_GOOD;
+	ccb->device_status = SCSI_STATUS_GOOD;
 }
 
 
-/*!	Copy data between request data and buffer
-	request			- request to copy data from/to
-	offset			- offset of data in request
-	allocation_length- limit of request's data buffer according to CDB
+/*!	Copy data between ccb data and buffer
+	ccb			- ccb to copy data from/to
+	offset			- offset of data in ccb
+	allocation_length- limit of ccb's data buffer according to CDB
 	buffer			- data to copy data from/to
 	size			- number of bytes to copy
-	to_buffer		- true: copy from request to buffer
-					  false: copy from buffer to request
-	return: true, if data of request was large enough
+	to_buffer		- true: copy from ccb to buffer
+					  false: copy from buffer to ccb
+	return: true, if data of ccb was large enough
 */
 bool
-copy_sg_data(scsi_ccb *request, uint offset, uint allocationLength,
+copy_sg_data(scsi_ccb *ccb, uint offset, uint allocationLength,
 	void *buffer, int size, bool toBuffer)
 {
-	const physical_entry *sgList = request->sg_list;
-	int sgCount = request->sg_count;
+	const physical_entry *sgList = ccb->sg_list;
+	int sgCount = ccb->sg_count;
 	int requestSize;
 
 	SHOW_FLOW(3, "offset=%u, req_size_limit=%d, size=%d, sg_list=%p, sg_cnt=%d, %s buffer", 
@@ -81,8 +81,8 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocationLength,
 	if (sgCount == 0)
 		return 0;
 
-	// remaining bytes we are allowed to copy from/to request 		
-	requestSize = min(allocationLength, request->data_length) - offset;
+	// remaining bytes we are allowed to copy from/to ccb 		
+	requestSize = min(allocationLength, ccb->data_length) - offset;
 
 	// copy one S/G entry at a time
 	for (; size > 0 && requestSize > 0 && sgCount > 0; ++sgList, --sgCount) {

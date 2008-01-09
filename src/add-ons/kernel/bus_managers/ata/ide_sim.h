@@ -19,7 +19,7 @@
 extern scsi_for_sim_interface *scsi;
 extern scsi_sim_interface ide_sim_module;
 
-// set sense of current request
+// set sense of current ccb
 static inline void
 set_sense(ide_device_info *device, int sense_key, int sense_asc)
 {
@@ -54,21 +54,21 @@ decode_sense_asc_ascq(uint32 combined_sense)
 	return combined_sense & 0xffff;
 }
 
-void finish_request(ide_qrequest *qrequest, bool resubmit);
-void finish_reset_queue(ide_qrequest *qrequest);
-void finish_retry(ide_qrequest *qrequest);
-void finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
+void finish_request(ata_request *request, bool resubmit);
+void finish_reset_queue(ata_request *request);
+void finish_retry(ata_request *request);
+void finish_all_requests(ide_device_info *device, ata_request *ignore,
 		int subsys_status, bool resubmit);
-void finish_checksense(ide_qrequest *qrequest);
+void finish_checksense(ata_request *request);
 
 
-// start request by resetting sense
+// start ccb by resetting sense
 static inline void
-start_request(ide_device_info *device, ide_qrequest *qrequest)
+start_request(ide_device_info *device, ata_request *request)
 {
 	device->new_combined_sense = 0;
 	device->subsys_status = SCSI_REQ_CMP;
-	qrequest->request->device_status = SCSI_STATUS_GOOD;
+	request->ccb->device_status = SCSI_STATUS_GOOD;
 }
 
 

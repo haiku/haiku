@@ -58,10 +58,6 @@ destroy_device(ide_device_info *device)
 	device->exec_io = NULL;
 
 	cleanup_device_links(device);
-
-	if (device->qreqActive)
-		dprintf("destroy_device: Warning request still active\n");
-	free(device->qreqFree);
 	
 	free(device);
 }
@@ -121,14 +117,6 @@ create_device(ide_bus_info *bus, bool is_device1)
 
 	device->combined_sense = 0;
 
-	device->qreqActive = NULL;
-	device->qreqFree = (ide_qrequest *)malloc(sizeof(ide_qrequest));
-
-	memset(device->qreqFree, 0, sizeof(ide_qrequest));
-	device->qreqFree->running = false;
-	device->qreqFree->device = device;
-	device->qreqFree->request = NULL;
-
 	device->total_sectors = 0;
 
 	// disable interrupts
@@ -141,10 +129,6 @@ create_device(ide_bus_info *bus, bool is_device1)
 	bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_device_head);
 
 	return device;
-
-err:
-	destroy_device(device);
-	return NULL;
 }
 
 #if B_HOST_IS_LENDIAN

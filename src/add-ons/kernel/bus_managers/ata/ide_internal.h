@@ -37,20 +37,15 @@
 #define IDE_CHANNEL_ID_GENERATOR "ide/channel_id"
 // node item containing channel id (uint32)
 #define IDE_CHANNEL_ID_ITEM "ide/channel_id"
+// SIM interface
+#define IDE_SIM_MODULE_NAME "bus_managers/ide/sim/v1"
+
 
 extern device_manager_info *pnp;
 
 
 typedef struct ide_bus_info ide_bus_info;
 
-typedef void (*ide_synced_pc_func)(ide_bus_info *bus, void *arg);
-
-typedef struct ide_synced_pc {
-	struct ide_synced_pc *next;
-	ide_synced_pc_func func;
-	void *arg;
-	bool registered;
-} ide_synced_pc;
 
 // structure for device time-outs
 typedef struct ide_device_timer_info {
@@ -63,6 +58,18 @@ typedef struct ide_bus_timer_info {
 	timer te;
 	struct ide_bus_info *bus;
 } ide_bus_timer_info;
+
+// ide request 
+typedef struct ata_request {
+
+	struct ide_device_info *device;
+
+	scsi_ccb *ccb;				// basic request
+	uint8 is_write : 1;			// true for write request
+	uint8 uses_dma : 1;			// true if using dma
+	uint8 packet_irq : 1;		// true if waiting for command packet irq
+} ata_request;
+
 
 
 typedef struct ide_device_info {
@@ -87,13 +94,10 @@ typedef struct ide_device_info {
 	// pending error codes
 	uint32 combined_sense;			// emulated sense of device
 
-	struct ide_qrequest *qreqActive;
-	struct ide_qrequest *qreqFree;
-
 	struct ide_device_info *other_device;	// other device on same bus
 
 	// entry for scsi's exec_io request
-	void (*exec_io)( struct ide_device_info *device, struct ide_qrequest *qrequest );
+	void (*exec_io)( struct ide_device_info *device, struct ata_request *request );
 
 	int target_id;					// target id (currently, same as is_device1)
 
@@ -134,18 +138,6 @@ typedef enum {
 	ide_request_autosense = 2
 } ide_request_state;*/
 
-// ide request 
-typedef struct ide_qrequest {
-	struct ide_qrequest *next;
-	ide_device_info *device;
-	scsi_ccb *request;			// basic request
-
-	uint8 is_write : 1;			// true for write request
-	uint8 running : 1;			// true if "on bus"
-	uint8 uses_dma : 1;			// true if using dma
-	uint8 packet_irq : 1;		// true if waiting for command packet irq
-} ide_qrequest;
-
 
 // state of ide bus
 typedef enum {
@@ -157,7 +149,6 @@ typedef enum {
 
 
 struct ide_bus_info {
-	ide_qrequest *active_qrequest;
 
 	// controller
 	ide_controller_interface *controller;
@@ -167,7 +158,11 @@ struct ide_bus_info {
 	spinlock lock;
 	cpu_status prev_irq_state;
 
-	ata_bus_state state;		// current state of bus
+	ata_bus_state			state;		// current state of bus
+
+	struct ata_request *	qreqActive;
+	struct ata_request *	qreqFree;
+
 
 	benaphore status_report_ben; // to lock when you report XPT about bus state
 								// i.e. during requeue, resubmit or finished
@@ -178,13 +173,10 @@ struct ide_bus_info {
 
 	ide_bus_timer_info timer;	// timeout
 	scsi_dpc_cookie irq_dpc;
-	ide_synced_pc *synced_pc_list;
 
 	ide_device_info *active_device;
 	ide_device_info *devices[2];
 	ide_device_info *first_device;
-
-	ide_synced_pc disconnect_syncinfo;	// used to handle lost controller
 
 	uchar path_id;
 
@@ -213,67 +205,6 @@ struct ide_bus_info {
 	restore_interrupts( prev_irq_state ); \
 }
 
-// SIM interface
-#define IDE_SIM_MODULE_NAME "bus_managers/ide/sim/v1"
-
-
-enum {
-	ev_ide_send_command = 1,
-	ev_ide_device_start_service,
-	ev_ide_device_start_service2,
-	ev_ide_dpc_service,
-	ev_ide_dpc_continue,
-	ev_ide_irq_handle,
-	ev_ide_cancel_irq_timeout,
-	ev_ide_start_waiting,
-	ev_ide_timeout_dpc,
-	ev_ide_timeout,
-	ev_ide_reset_bus,
-	ev_ide_reset_device,
-	
-	ev_ide_scsi_io,
-	ev_ide_scsi_io_exec,
-	ev_ide_scsi_io_invalid_device,
-	ev_ide_scsi_io_bus_busy,
-	ev_ide_scsi_io_device_busy,
-	ev_ide_scsi_io_disconnected,
-	ev_ide_finish_request,
-	ev_ide_finish_norelease,
-	
-	ev_ide_scan_device_int,
-	ev_ide_scan_device_int_cant_send,
-	ev_ide_scan_device_int_keeps_busy,
-	ev_ide_scan_device_int_found
-};
-
-
-
-// get selected device
-static inline
-ide_device_info *get_current_device(ide_bus_info *bus)
-{
-	ide_task_file tf;
-
-	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, 
-		ide_mask_device_head);
-
-	return bus->devices[tf.lba.device];
-}
-
-
-// check if device has released the bus
-// return: true, if bus was released
-static inline int
-device_released_bus(ide_device_info *device)
-{
-	ide_bus_info *bus = device->bus;
-
-	bus->controller->read_command_block_regs(bus->channel_cookie,
-		&device->tf, ide_mask_sector_count);
-
-	return device->tf.queued.release;
-}
-
 
 // ata.c
 
@@ -286,18 +217,18 @@ status_t ata_wait_for_drqdown(ide_bus_info *bus);
 status_t ata_wait_for_drdy(ide_bus_info *bus);
 status_t ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *_devicePresent1, uint32 *_sigDev1);
 status_t ata_reset_device(ide_device_info *device, bool *_devicePresent);
-status_t ata_send_command(ide_device_info *device, ide_qrequest *qrequest, bool need_drdy, uint32 timeout, ata_bus_state new_state);
+status_t ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy, uint32 timeout, ata_bus_state new_state);
 
-bool check_rw_error(ide_device_info *device, ide_qrequest *qrequest);
+bool check_rw_error(ide_device_info *device, ata_request *request);
 bool check_output(ide_device_info *device, bool drdy_required, int error_mask, bool is_write);
 
-void ata_send_rw(ide_device_info *device, ide_qrequest *qrequest,
+void ata_send_rw(ide_device_info *device, ata_request *request,
 	uint64 pos, size_t length, bool write);
 
-void ata_dpc_DMA(ide_qrequest *qrequest);
-void ata_dpc_PIO(ide_qrequest *qrequest);
+void ata_dpc_DMA(ata_request *request);
+void ata_dpc_PIO(ata_request *request);
 
-void ata_exec_io(ide_device_info *device, ide_qrequest *qrequest);
+void ata_exec_io(ide_device_info *device, ata_request *request);
 
 status_t ata_read_infoblock(ide_device_info *device, bool isAtapi);
 
@@ -305,9 +236,9 @@ status_t configure_ata_device(ide_device_info *device);
 
 // atapi.c
 status_t configure_atapi_device(ide_device_info *device);
-void send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write);
-void packet_dpc(ide_qrequest *qrequest);
-void atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest);
+void send_packet(ide_device_info *device, ata_request *request, bool write);
+void packet_dpc(ata_request *request);
+void atapi_exec_io(ide_device_info *device, ata_request *request);
 
 
 // basic_prot.c
@@ -329,12 +260,12 @@ status_t configure_device(ide_device_info *device, bool isAtapi);
 
 // dma.c
 
-bool prepare_dma(ide_device_info *device, ide_qrequest *qrequest);
-void start_dma(ide_device_info *device, ide_qrequest *qrequest);
-void start_dma_wait(ide_device_info *device, ide_qrequest *qrequest);
-void start_dma_wait_no_lock(ide_device_info *device, ide_qrequest *qrequest);
+bool prepare_dma(ide_device_info *device, ata_request *request);
+void start_dma(ide_device_info *device, ata_request *request);
+void start_dma_wait(ide_device_info *device, ata_request *request);
+void start_dma_wait_no_lock(ide_device_info *device, ata_request *request);
 bool finish_dma(ide_device_info *device);
-void abort_dma(ide_device_info *device, ide_qrequest *qrequest);
+void abort_dma(ide_device_info *device, ata_request *request);
 
 bool configure_dma(ide_device_info *device);
 
@@ -343,14 +274,14 @@ bool configure_dma(ide_device_info *device);
 
 bool copy_sg_data(scsi_ccb *request, uint offset, uint req_size_limit,
 	void *buffer, int size, bool to_buffer);
-void ide_request_sense(ide_device_info *device, ide_qrequest *qrequest);
+void ide_request_sense(ide_device_info *device, ata_request *request);
 
 
 // pio.c
 
-void prep_PIO_transfer(ide_device_info *device, ide_qrequest *qrequest);
-status_t read_PIO_block(ide_qrequest *qrequest, int length);
-status_t write_PIO_block(ide_qrequest *qrequest, int length);
+void prep_PIO_transfer(ide_device_info *device, ata_request *request);
+status_t read_PIO_block(ata_request *request, int length);
+status_t write_PIO_block(ata_request *request, int length);
 
 
 
@@ -362,9 +293,6 @@ void start_waiting_nolock(ide_bus_info *bus, uint32 timeout, int new_state);
 void wait_for_sync(ide_bus_info *bus);
 void cancel_irq_timeout(ide_bus_info *bus);
 
-status_t schedule_synced_pc(ide_bus_info *bus, ide_synced_pc *pc, void *arg);
-void init_synced_pc(ide_synced_pc *pc, ide_synced_pc_func func);
-void uninit_synced_pc(ide_synced_pc *pc);
 
 void ide_dpc(void *arg);
 void access_finished(ide_bus_info *bus, ide_device_info *device);

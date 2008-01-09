@@ -50,15 +50,15 @@
 
 /*! Prepare PIO transfer */
 void
-prep_PIO_transfer(ide_device_info *device, ide_qrequest *qrequest)
+prep_PIO_transfer(ide_device_info *device, ata_request *request)
 {
 	SHOW_FLOW0(4, "");
 
-	device->left_sg_elem = qrequest->request->sg_count;
-	device->cur_sg_elem = qrequest->request->sg_list;
+	device->left_sg_elem = request->ccb->sg_count;
+	device->cur_sg_elem = request->ccb->sg_list;
 	device->cur_sg_ofs = 0;
 	device->has_odd_byte = false;
-	qrequest->request->data_resid = qrequest->request->data_length;
+	request->ccb->data_resid = request->ccb->data_length;
 }
 
 
@@ -280,22 +280,22 @@ read_discard_PIO(ide_device_info *device, int length)
 	B_ERROR - something serious went wrong, sense data was set
 */
 status_t
-write_PIO_block(ide_qrequest *qrequest, int length)
+write_PIO_block(ata_request *request, int length)
 {
-	ide_device_info *device = qrequest->device;
+	ide_device_info *device = request->device;
 	int transferred;
 	status_t err;
 
 	transferred = 0;
 	err = transfer_PIO_block(device, length, true, &transferred);
 
-	qrequest->request->data_resid -= transferred;
+	request->ccb->data_resid -= transferred;
 
 	if (err != ERR_TOO_BIG)
 		return err;
 
 	// there may be a pending odd byte - transmit that now
-	if (qrequest->device->has_odd_byte) {
+	if (request->device->has_odd_byte) {
 		uint8 buffer[2];
 
 		buffer[0] = device->odd_byte;
@@ -303,7 +303,7 @@ write_PIO_block(ide_qrequest *qrequest, int length)
 
 		device->has_odd_byte = false;
 
-		qrequest->request->data_resid -= 1;
+		request->ccb->data_resid -= 1;
 		transferred += 2;
 
 		device->bus->controller->write_pio(device->bus->channel_cookie, (uint16 *)buffer, 1, false);
@@ -318,7 +318,7 @@ write_PIO_block(ide_qrequest *qrequest, int length)
 	// Sadly, this behaviour is OK for ATAPI packets, but there is no
 	// way to tell the device that we don't have any data left;
 	// only solution is to send zero bytes, though it's BAD BAD BAD
-	write_discard_PIO(qrequest->device, length - transferred);
+	write_discard_PIO(request->device, length - transferred);
 	return ERR_TOO_BIG;
 }
 
@@ -327,23 +327,23 @@ write_PIO_block(ide_qrequest *qrequest, int length)
 	return: see write_PIO_block
 */
 status_t
-read_PIO_block(ide_qrequest *qrequest, int length)
+read_PIO_block(ata_request *request, int length)
 {
-	ide_device_info *device = qrequest->device;
+	ide_device_info *device = request->device;
 	int transferred;
 	status_t err;
 
 	transferred = 0;
-	err = transfer_PIO_block(qrequest->device, length, false, &transferred);
+	err = transfer_PIO_block(request->device, length, false, &transferred);
 
-	qrequest->request->data_resid -= transferred;
+	request->ccb->data_resid -= transferred;
 
 	// if length was odd, there's an extra byte waiting in device->odd_byte
 	if (device->has_odd_byte) {
 		// discard byte
 		device->has_odd_byte = false;
 		// adjust res_id as the extra byte didn't reach the buffer
-		++qrequest->request->data_resid;
+		++request->ccb->data_resid;
 	}
 
 	if (err != ERR_TOO_BIG)
@@ -358,6 +358,6 @@ read_PIO_block(ide_qrequest *qrequest, int length)
 		return err;
 
 	SHOW_FLOW(3, "discarding after %d bytes", transferred);
-	read_discard_PIO(qrequest->device, length - transferred);
+	read_discard_PIO(request->device, length - transferred);
 	return ERR_TOO_BIG;
 }

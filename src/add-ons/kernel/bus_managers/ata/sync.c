@@ -32,7 +32,7 @@ ide_dpc(void *arg)
 {
 #if 0
 	ide_bus_info *bus = (ide_bus_info *)arg;
-	ide_qrequest *qrequest;
+	ata_request *request;
 	ide_device_info *device;
 
 	TRACE(("\n"));
@@ -48,17 +48,17 @@ ide_dpc(void *arg)
 		// cancel timeout
 		cancel_timer(&bus->timer.te);
 
-		qrequest = bus->active_qrequest;
-		device = qrequest->device;
+		request = bus->active_qrequest;
+		device = request->device;
 
 		// not perfect but simple: we simply know who is waiting why
 		if (device->is_atapi)
-			packet_dpc(qrequest);
+			packet_dpc(request);
 		else {
-			if (qrequest->uses_dma)
-				ata_dpc_DMA(qrequest);
+			if (request->uses_dma)
+				ata_dpc_DMA(request);
 			else
-				ata_dpc_PIO(qrequest);
+				ata_dpc_PIO(request);
 		}
 	} else {
 		// no request active, so this must be a service request or
@@ -139,7 +139,9 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			if (bus->num_running_reqs == 0) {
 				IDE_UNLOCK(bus);
 				return B_UNHANDLED_INTERRUPT;
-			}
+			}mmand
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_command) != B_OK) 
+		goto err_clearint;
 
 			bus->state = ide_state_accessing;
 
@@ -154,7 +156,9 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			bus->state = ide_state_accessing;
 			bus->sync_wait_timeout = false;
 
-			IDE_UNLOCK(bus);
+			IDE_UNLOCK(bus);mmand
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_command) != B_OK) 
+		goto err_clearint;
 
 			release_sem_etc(bus->sync_wait_sem, 1, B_DO_NOT_RESCHEDULE);
 			return B_INVOKE_SCHEDULER;
@@ -199,7 +203,9 @@ cancel_irq_timeout(ide_bus_info *bus)
 
 void
 start_waiting(ide_bus_info *bus, uint32 timeout, int new_state)
-{
+{mmand
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_command) != B_OK) 
+		goto err_clearint;
 	int res;
 
 	TRACE(("timeout = %u\n", (uint)timeout));
@@ -241,21 +247,21 @@ wait_for_sync(ide_bus_info *bus)
 static void
 ide_timeout_dpc(void *arg)
 {
+/*
 	ide_bus_info *bus = (ide_bus_info *)arg;
-	ide_qrequest *qrequest;
+	ata_request *request;
 	ide_device_info *device;
 
-	qrequest = bus->active_qrequest;
-	device = qrequest->device;
+	device = request->device;
 
 	dprintf("ide: ide_timeout_dpc() bus %p, device %p\n", bus, device);
 
 	// this also resets overlapped commands
-//	reset_device(device, qrequest);
+//	reset_device(device, request);
 
 	device->subsys_status = SCSI_CMD_TIMEOUT;
 
-	if (qrequest->uses_dma) {
+	if (request->uses_dma) {
 		if (++device->DMA_failures >= MAX_DMA_FAILURES) {
 			dprintf("Disabling DMA because of too many errors\n");
 
@@ -264,7 +270,8 @@ ide_timeout_dpc(void *arg)
 	}
 
 	// let upper layer do the retry	
-	finish_checksense(qrequest);
+	finish_checksense(request);
+*/
 }
 
 
@@ -325,99 +332,6 @@ ide_timeout(timer *arg)
 
 
 
-void
-init_synced_pc(ide_synced_pc *pc, ide_synced_pc_func func)
-{
-	pc->func = func;
-	pc->registered = false;
-}
-
-
-void
-uninit_synced_pc(ide_synced_pc *pc)
-{
-	if (pc->registered)
-		panic("Tried to clean up pending synced PC\n");
-}
-
-
-/**	schedule a synced pc
- *	a synced pc gets executed as soon as the bus becomes idle
- */
-
-status_t
-schedule_synced_pc(ide_bus_info *bus, ide_synced_pc *pc, void *arg)
-{
-	//TRACE(());
-
-	IDE_LOCK(bus);
-
-	if (pc->registered) {
-		// spc cannot be registered twice
-		TRACE(("already registered\n"));
-		return B_ERROR;
-	} else if( bus->state != ata_state_idle ) {
-		// bus isn't idle - spc must be added to pending list
-		TRACE(("adding to pending list\n"));
-
-		pc->next = bus->synced_pc_list;
-		bus->synced_pc_list = pc;
-		pc->arg = arg;
-		pc->registered = true;
-
-		IDE_UNLOCK(bus);
-		return B_OK;
-	}
-
-	// we have luck - bus is idle, so grab it before
-	// releasing the lock
-
-	TRACE(("exec immediately\n"));
-
-	bus->state = ata_state_busy;
-	IDE_UNLOCK(bus);
-
-	TRACE(("go\n"));
-	pc->func(bus, arg);
-
-	TRACE(("finished\n"));
-	access_finished(bus, bus->first_device);
-
-	// meanwhile, we may have rejected SCSI commands;
-	// usually, the XPT resends them once a command
-	// has finished, but in this case XPT doesn't know
-	// about our "private" command, so we have to tell about 
-	// idle bus manually
-	TRACE(("tell SCSI bus manager about idle bus\n"));
-	scsi->cont_send_bus(bus->scsi_cookie);
-	return B_OK;
-}
-
-
-/** execute list of synced pcs */
-
-static void
-exec_synced_pcs(ide_bus_info *bus, ide_synced_pc *pc_list)
-{
-	ide_synced_pc *pc;
-
-	// noone removes items from pc_list, so we don't need lock
-	// to access entries
-	for (pc = pc_list; pc; pc = pc->next) {
-		pc->func(bus, pc->arg);
-	}
-
-	// need lock now as items can be added to pc_list again as soon
-	// as <registered> is reset
-	IDE_LOCK(bus);
-
-	for (pc = pc_list; pc; pc = pc->next) {
-		pc->registered = false;
-	}
-
-	IDE_UNLOCK(bus);
-}
-
 
 /**	finish bus access; 
  *	check if any device wants to service pending commands + execute synced_pc
@@ -428,33 +342,5 @@ access_finished(ide_bus_info *bus, ide_device_info *device)
 {
 	TRACE(("bus = %p, device = %p\n", bus, device));
 
-	while (true) {
-		ide_synced_pc *synced_pc_list;
-
-		IDE_LOCK(bus);
-
-		// normally, there is always an device; only exception is a
-		// bus without devices, not sure whether this can really happen though
-		if (device) {
-//			if (try_service(device))
-//				return;
-		}
-
-		// noone wants it, so execute pending synced_pc
-		if (bus->synced_pc_list == NULL) {
-			bus->state = ata_state_idle;
-			IDE_UNLOCK(bus);
-			return;
-		}
-
-		synced_pc_list = bus->synced_pc_list;
-		bus->synced_pc_list = NULL;
-
-		IDE_UNLOCK(bus);
-
-		exec_synced_pcs(bus, synced_pc_list);
-
-		// executed synced_pc may have generated other sync_pc, 
-		// thus the loop
-	}
+	// this would be the correct place to called synced pc
 }

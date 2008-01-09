@@ -31,7 +31,7 @@
 	return: true - device reported error
 */
 static bool
-check_packet_error(ide_device_info *device, ide_qrequest *qrequest)
+check_packet_error(ide_device_info *device, ata_request *request)
 {
 	ide_bus_info *bus = device->bus;
 	int status;
@@ -78,7 +78,7 @@ check_packet_error(ide_device_info *device, ide_qrequest *qrequest)
 		// tell SCSI layer that sense must be requested
 		// (we don't take care of auto-sense ourselve)
 		device->subsys_status = SCSI_REQ_CMP_ERR;
-		qrequest->request->device_status = SCSI_STATUS_CHECK_CONDITION;
+		request->ccb->device_status = SCSI_STATUS_CHECK_CONDITION;
 		// reset pending emulated sense - its overwritten by a real one
 		device->combined_sense = 0;
 		return true;
@@ -90,14 +90,14 @@ check_packet_error(ide_device_info *device, ide_qrequest *qrequest)
 
 /*! IRQ handler of packet transfer (executed as DPC) */
 void
-packet_dpc(ide_qrequest *qrequest)
+packet_dpc(ata_request *request)
 {
 #if 0
-	ide_device_info *device = qrequest->device;
+	ide_device_info *device = request->device;
 	ide_bus_info *bus = device->bus;
 	int status;
-	uint32 timeout = qrequest->request->timeout > 0 ? 
-		qrequest->request->timeout : IDE_STD_TIMEOUT;
+	uint32 timeout = request->ccb->timeout > 0 ? 
+		request->ccb->timeout : IDE_STD_TIMEOUT;
 
 	SHOW_FLOW0(3, "");
 
@@ -106,9 +106,9 @@ packet_dpc(ide_qrequest *qrequest)
 
 	status = bus->controller->get_altstatus(bus->channel_cookie);
 
-	if (qrequest->packet_irq) {
+	if (request->packet_irq) {
 		// device requests packet
-		qrequest->packet_irq = false;
+		request->packet_irq = false;
 
 		if (!device->tf.packet_res.cmd_or_data
 			|| device->tf.packet_res.input_or_output
@@ -132,7 +132,7 @@ packet_dpc(ide_qrequest *qrequest)
 		return;
 	}
 
-	if (qrequest->uses_dma) {
+	if (request->uses_dma) {
 		// DMA transmission finished
 		bool dma_err, dev_err;
 
@@ -142,13 +142,13 @@ packet_dpc(ide_qrequest *qrequest)
 		SHOW_FLOW0(3, "DMA done");
 
 		dma_err = !finish_dma(device);
-		dev_err = check_packet_error(device, qrequest);
+		dev_err = check_packet_error(device, request);
 
 		// what to do if both the DMA controller and the device reports an error?
 		// let's assume that the DMA controller got problems because there was a
 		// device error, so we ignore the dma error and use the device error instead
 		if (dev_err) {
-			finish_checksense(qrequest);
+			finish_checksense(request);
 			return;
 		}
 
@@ -159,8 +159,8 @@ packet_dpc(ide_qrequest *qrequest)
 			device->DMA_failures = 0;
 			// this is a lie, but there is no way to find out
 			// how much has been transmitted
-			qrequest->request->data_resid = 0;
-			finish_checksense(qrequest);
+			request->ccb->data_resid = 0;
+			finish_checksense(request);
 		} else {
 			// DMA transmission went wrong
 			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_LUN_COM_FAILURE);
@@ -171,7 +171,7 @@ packet_dpc(ide_qrequest *qrequest)
 				device->DMA_enabled = false;
 			}
 
-			finish_checksense(qrequest);
+			finish_checksense(request);
 		}
 
 		return;
@@ -191,7 +191,7 @@ packet_dpc(ide_qrequest *qrequest)
 		}
 
 		// check whether transmission direction matches
-		if ((device->tf.packet_res.input_or_output ^ qrequest->is_write) == 0) {
+		if ((device->tf.packet_res.input_or_output ^ request->is_write) == 0) {
 			SHOW_ERROR0(2, "data transmission in wrong way!?");
 
 			// TODO: hm, either the device is broken or the caller has specified
@@ -202,9 +202,9 @@ packet_dpc(ide_qrequest *qrequest)
 			// TODO: the device will abort next command with a reset condition
 			// 		perhaps we should hide that by reading sense?
 			SHOW_FLOW0(3, "Reset");
-//			reset_device(device, qrequest);
+//			reset_device(device, request);
 			
-			finish_checksense(qrequest);
+			finish_checksense(request);
 			return;
 		}
 
@@ -224,9 +224,9 @@ packet_dpc(ide_qrequest *qrequest)
 		start_waiting_nolock(device->bus, timeout, ide_state_async_waiting);
 
 		if (device->tf.packet_res.input_or_output)
-			err = read_PIO_block(qrequest, length);
+			err = read_PIO_block(request, length);
 		else
-			err = write_PIO_block(qrequest, length);
+			err = write_PIO_block(request, length);
 
 		// only report "real" errors;
 		// discarding data (ERR_TOO_BIG) can happen but is OK
@@ -241,16 +241,16 @@ packet_dpc(ide_qrequest *qrequest)
 		return;
 	} else {
 		// device has done job and doesn't want to transmit data anymore
-		// -> finish request
+		// -> finish ccb
 		SHOW_FLOW0(3, "no data");
 
-		check_packet_error(device, qrequest);
+		check_packet_error(device, request);
 
 		SHOW_FLOW(3, "finished: %d of %d left", 
-			(int)qrequest->request->data_resid,
-			(int)qrequest->request->data_length);
+			(int)request->ccb->data_resid,
+			(int)request->ccb->data_length);
 
-		finish_checksense(qrequest);
+		finish_checksense(request);
 		return;
 	}
 
@@ -259,27 +259,27 @@ packet_dpc(ide_qrequest *qrequest)
 err_cancel_timer:
 	cancel_irq_timeout(device->bus);
 err:
-	finish_checksense(qrequest);
+	finish_checksense(request);
 #endif
 }
 
 
 /*!	Create taskfile for ATAPI packet */
 static bool
-create_packet_taskfile(ide_device_info *device, ide_qrequest *qrequest,
+create_packet_taskfile(ide_device_info *device, ata_request *request,
 	bool write)
 {
-	scsi_ccb *request = qrequest->request;
+	scsi_ccb *ccb = request->ccb;
 
 	SHOW_FLOW(3, "DMA enabled=%d, uses_dma=%d, scsi_cmd=%x", 
-		device->DMA_enabled, qrequest->uses_dma, device->packet[0]);
+		device->DMA_enabled, request->uses_dma, device->packet[0]);
 
 	device->tf_param_mask = ide_mask_features | ide_mask_byte_count;
 
-	device->tf.packet.dma = qrequest->uses_dma;
+	device->tf.packet.dma = request->uses_dma;
 	device->tf.packet.ovl = 0;
-	device->tf.packet.byte_count_0_7 = request->data_length & 0xff;
-	device->tf.packet.byte_count_8_15 = request->data_length >> 8;
+	device->tf.packet.byte_count_0_7 = ccb->data_length & 0xff;
+	device->tf.packet.byte_count_8_15 = ccb->data_length >> 8;
 	device->tf.packet.command = IDE_CMD_PACKET;
 
 	return true;
@@ -288,14 +288,14 @@ create_packet_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 
 /*! Send ATAPI packet */
 void
-send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
+send_packet(ide_device_info *device, ata_request *request, bool write)
 {
 #if 0
 	ide_bus_info *bus = device->bus;
 	bool packet_irq = device->atapi.packet_irq;
 	uint8 scsi_cmd = device->packet[0];
 
-	SHOW_FLOW( 3, "qrequest=%p, command=%x", qrequest, scsi_cmd );
+	SHOW_FLOW( 3, "request=%p, command=%x", request, scsi_cmd );
 
 	/*{
 		unsigned int i;
@@ -309,47 +309,47 @@ send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 		device->packet[3], device->packet[4], device->packet[5], 
 		device->packet[6], device->packet[7], device->packet[8], 
 		device->packet[9], device->packet[10], device->packet[11],
-		qrequest->request->cdb_length);
+		request->ccb->cdb_length);
 
 	//snooze( 1000000 );
 
-	qrequest->is_write = write;
-	// if needed, mark first IRQ as being packet request IRQ
-	qrequest->packet_irq = packet_irq;
+	request->is_write = write;
+	// if needed, mark first IRQ as being packet ccb IRQ
+	request->packet_irq = packet_irq;
 
 	// only READ/WRITE commands can use DMA
 	// (the device may support it always, but IDE controllers don't
 	// report how much data is transmitted, and this information is
 	// crucial for the SCSI protocol)
 	// special offer: let READ_CD commands use DMA too
-	qrequest->uses_dma = device->DMA_enabled
+	request->uses_dma = device->DMA_enabled
 		&& (scsi_cmd == SCSI_OP_READ_6 || scsi_cmd == SCSI_OP_WRITE_6
 		|| scsi_cmd == SCSI_OP_READ_10 || scsi_cmd == SCSI_OP_WRITE_10
 		|| scsi_cmd == SCSI_OP_READ_12 || scsi_cmd == SCSI_OP_WRITE_12
 		|| scsi_cmd == SCSI_OP_READ_CD);
 
 	// try preparing DMA, if that fails, fall back to PIO	
-	if (qrequest->uses_dma) {
+	if (request->uses_dma) {
 		SHOW_FLOW0(3, "0");
-		if (!prepare_dma( device, qrequest))
-			qrequest->uses_dma = false;
+		if (!prepare_dma( device, request))
+			request->uses_dma = false;
 
-		SHOW_FLOW(3, "0->%d", qrequest->uses_dma);
+		SHOW_FLOW(3, "0->%d", request->uses_dma);
 	}
 
 	SHOW_FLOW0(3, "1");
 
-	if (!qrequest->uses_dma)
-		prep_PIO_transfer(device, qrequest);
+	if (!request->uses_dma)
+		prep_PIO_transfer(device, request);
 
 	SHOW_FLOW0(3, "2");
 
-	if (!create_packet_taskfile(device, qrequest, write))
+	if (!create_packet_taskfile(device, request, write))
 		goto err_setup;
 
 	SHOW_FLOW0(3, "3");
 
-	if (!send_command(device, qrequest, false, 
+	if (!send_command(device, request, false, 
 			device->atapi.packet_irq_timeout, 
 			device->atapi.packet_irq ? ide_state_async_waiting : ide_state_accessing))
 		goto err_setup;
@@ -407,15 +407,15 @@ send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 		goto err_packet2;
 	}
 
-	if (qrequest->uses_dma) {
+	if (request->uses_dma) {
 		SHOW_FLOW0( 3, "ready for DMA" );
 
 		// S/G table must already be setup - we hold the bus lock, so
 		// we really have to hurry up
-		start_dma_wait(device, qrequest);		
+		start_dma_wait(device, request);		
 	} else {
-		uint32 timeout = qrequest->request->timeout > 0 ? 
-			qrequest->request->timeout : IDE_STD_TIMEOUT;
+		uint32 timeout = request->ccb->timeout > 0 ? 
+			request->ccb->timeout : IDE_STD_TIMEOUT;
 
 		start_waiting(bus, timeout, ide_state_async_waiting);
 	}
@@ -430,38 +430,38 @@ err_packet:
 	device->subsys_status = SCSI_HBA_ERR;
 	
 err_setup:
-	if (qrequest->uses_dma)
-		abort_dma(device, qrequest);
+	if (request->uses_dma)
+		abort_dma(device, request);
 
-	finish_checksense(qrequest);
+	finish_checksense(request);
 #endif
 }
 
 
 /*! Execute SCSI I/O for atapi devices */
 void
-atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest)
+atapi_exec_io(ide_device_info *device, ata_request *request)
 {
-	scsi_ccb *request = qrequest->request;
+	scsi_ccb *ccb = request->ccb;
 
-	SHOW_FLOW(3, "command=%x", qrequest->request->cdb[0]);
+	SHOW_FLOW(3, "command=%x", request->ccb->cdb[0]);
 
 	// ATAPI command packets are 12 bytes long; 
 	// if the command is shorter, remaining bytes must be padded with zeros
 	memset(device->packet, 0, sizeof(device->packet));
-	memcpy(device->packet, request->cdb, request->cdb_length);
+	memcpy(device->packet, ccb->cdb, ccb->cdb_length);
 
-	if (request->cdb[0] == SCSI_OP_REQUEST_SENSE && device->combined_sense) {
+	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE && device->combined_sense) {
 		// we have a pending emulated sense - return it on REQUEST SENSE
-		ide_request_sense(device, qrequest);
-		finish_checksense(qrequest);
+		ide_request_sense(device, request);
+		finish_checksense(request);
 	} else {
-		// reset all error codes for new request
-		start_request(device, qrequest);
+		// reset all error codes for new ccb
+		start_request(device, request);
 
 		// now we have an IDE packet
-		send_packet(device, qrequest, 
-			(request->flags & SCSI_DIR_MASK) == SCSI_DIR_OUT);
+		send_packet(device, request, 
+			(ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_OUT);
 	}
 }
 

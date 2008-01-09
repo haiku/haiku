@@ -71,7 +71,7 @@ configure_dma(ide_device_info *device)
 	must be called _before_ start_dma_wait
 */
 void
-abort_dma(ide_device_info *device, ide_qrequest *qrequest)
+abort_dma(ide_device_info *device, ata_request *request)
 {
 	ide_bus_info *bus = device->bus;
 
@@ -86,14 +86,14 @@ abort_dma(ide_device_info *device, ide_qrequest *qrequest)
 	warning: doesn't set sense data on error
 */
 bool
-prepare_dma(ide_device_info *device, ide_qrequest *qrequest)
+prepare_dma(ide_device_info *device, ata_request *request)
 {
 	ide_bus_info *bus = device->bus;
-	scsi_ccb *request = qrequest->request;
+	scsi_ccb *ccb = request->ccb;
 	status_t res;
 
-	res = bus->controller->prepare_dma(bus->channel_cookie, request->sg_list,
-		request->sg_count, qrequest->is_write);
+	res = bus->controller->prepare_dma(bus->channel_cookie, ccb->sg_list,
+		ccb->sg_count, request->is_write);
 	if (res != B_OK)
 		return false;
 
@@ -103,27 +103,27 @@ prepare_dma(ide_device_info *device, ide_qrequest *qrequest)
 
 /*! Start waiting for DMA to be finished */
 void
-start_dma_wait(ide_device_info *device, ide_qrequest *qrequest)
+start_dma_wait(ide_device_info *device, ata_request *request)
 {
 #if 0
 	ide_bus_info *bus = device->bus;
 
 	bus->controller->start_dma(bus->channel_cookie);
 
-	start_waiting(bus, qrequest->request->timeout > 0 ? 
-		qrequest->request->timeout : IDE_STD_TIMEOUT, ide_state_async_waiting);
+	start_waiting(bus, request->ccb->timeout > 0 ? 
+		request->ccb->timeout : IDE_STD_TIMEOUT, ide_state_async_waiting);
 #endif
 }
 
 
 /*! Start waiting for DMA to be finished with bus lock not hold */
 void
-start_dma_wait_no_lock(ide_device_info *device, ide_qrequest *qrequest)
+start_dma_wait_no_lock(ide_device_info *device, ata_request *request)
 {
 	ide_bus_info *bus = device->bus;
 
 	IDE_LOCK(bus);
-	start_dma_wait(device, qrequest);
+	start_dma_wait(device, request);
 }
 
 
