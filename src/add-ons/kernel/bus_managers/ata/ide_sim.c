@@ -32,6 +32,10 @@
 #include <malloc.h>
 #include <stdio.h>
 
+#define FLOW dprintf
+#define TRACE dprintf
+
+
 scsi_for_sim_interface *scsi;
 fast_log_info *fast_log;
 
@@ -92,7 +96,8 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 	//ide_request_priv *priv;
 
 //	FAST_LOG3( bus->log, ev_ide_scsi_io, (uint32)request, request->target_id, request->target_lun );	
-	SHOW_FLOW(3, "%d:%d", request->target_id, request->target_lun);
+//	SHOW_FLOW(3, "%d:%d", request->target_id, request->target_lun);
+	FLOW("sim_scsi_iobus %p, %d:%d\n", bus, request->target_id, request->target_lun);
 
 	if (bus->disconnected)
 		goto err_disconnected;
@@ -151,8 +156,7 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 	return;
 
 err_inv_device:
-	SHOW_ERROR(3, "Invalid device %d:%d", 
-		request->target_id, request->target_lun);
+	FLOW("Invalid device %d:%d\n", request->target_id, request->target_lun);
 	FAST_LOG1(bus->log, ev_ide_scsi_io_invalid_device, (uint32)request);
 
 	request->subsys_status = SCSI_SEL_TIMEOUT;
@@ -160,7 +164,7 @@ err_inv_device:
 	return;
 
 err_bus_busy:
-	SHOW_FLOW0(3, "Bus busy");
+	FLOW("Bus busy\n");
 	FAST_LOG1(bus->log, ev_ide_scsi_io_bus_busy, (uint32)request);
 
 	IDE_UNLOCK(bus);
@@ -169,7 +173,7 @@ err_bus_busy:
 	return;
 
 err_device_busy:
-	SHOW_FLOW0(3, "Device busy");
+	FLOW("Device busy\n");
 	FAST_LOG1(bus->log, ev_ide_scsi_io_device_busy, (uint32)request);
 
 	IDE_UNLOCK(bus);
@@ -178,7 +182,7 @@ err_device_busy:
 	return;
 
 err_disconnected:
-	SHOW_ERROR0(3, "No controller anymore");
+	TRACE("No controller anymore\n");
 	FAST_LOG1(bus->log, ev_ide_scsi_io_disconnected, (uint32)request);
 	request->subsys_status = SCSI_NO_HBA;
 	scsi->finished(request, 1);
@@ -191,7 +195,7 @@ sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 {
 	char *controller_name;
 
-	SHOW_FLOW0(4, "");
+	FLOW("sim_path_inquiry, bus %p\n", bus);
 
 	if (bus->disconnected)
 		return SCSI_NO_HBA;
@@ -238,7 +242,7 @@ scan_bus(ide_bus_info *bus)
 	bool isAtapi;
 	int i;
 
-	dprintf("ATA: scan_bus: bus %p\n", bus);
+	TRACE("ATA: scan_bus: bus %p\n", bus);
 
 	if (bus->disconnected)
 		return;
@@ -260,13 +264,13 @@ scan_bus(ide_bus_info *bus)
 		}
 	}
 
-	dprintf("ATA: scan_bus: bus %p finished\n", bus);
+	TRACE("ATA: scan_bus: bus %p finished\n", bus);
 }
 
 static uchar
 sim_rescan_bus(ide_bus_info *bus)
 {
-	dprintf("ATA: sim_rescan_bus\n");
+	TRACE("ATA: sim_rescan_bus\n");
 	return SCSI_REQ_CMP;
 }
 
@@ -548,7 +552,7 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	bool dmaDisabled = false;
 	status_t status;
 
-	SHOW_FLOW0(3, "");
+	FLOW("ide_sim_init_bus, node %p\n", node);
 
 	// first prepare the info structure	
 	bus = (ide_bus_info *)malloc(sizeof(*bus));
@@ -691,8 +695,11 @@ err:
 static status_t
 ide_sim_uninit_bus(ide_bus_info *bus)
 {
-	device_node_handle parent = pnp->get_parent(bus->node);
+	device_node_handle parent;
 
+	FLOW("ide_sim_uninit_bus: bus %p\n", bus);
+
+	parent = pnp->get_parent(bus->node);
 	pnp->uninit_driver(parent);
 	pnp->put_device_node(parent);
 
@@ -727,6 +734,8 @@ disconnect_worker(ide_bus_info *bus, void *arg)
 static void
 ide_sim_bus_removed(device_node_handle node, ide_bus_info *bus)
 {	
+	FLOW("ide_sim_bus_removed\n");
+
 	if (bus == NULL)
 		// driver not loaded - no manual intervention needed
 		return;
@@ -746,6 +755,8 @@ ide_sim_get_restrictions(ide_bus_info *bus, uchar target_id,
 	bool *is_atapi, bool *no_autosense, uint32 *max_blocks)
 {
 	ide_device_info *device = bus->devices[target_id];
+
+	FLOW("ide_sim_get_restrictions\n");
 
 	// we declare even ATA devices as ATAPI so we have to emulate fewer
 	// commands

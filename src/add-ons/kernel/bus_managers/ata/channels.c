@@ -20,6 +20,8 @@
 
 #include <block_io.h>
 
+#define TRACE dprintf
+
 
 /** called when an IDE channel was registered by a controller driver */
 
@@ -29,7 +31,7 @@ ide_channel_added(device_node_handle parent)
 	char *controller_name = NULL;
 	uint32 channel_id;
 
-	SHOW_FLOW0(2, "");
+	TRACE("ide_channel_added, parent is %p\n", parent);
 
 	if (pnp->get_attr_string(parent, IDE_CONTROLLER_CONTROLLER_NAME_ITEM, 
 			&controller_name, true) != B_OK) {
@@ -40,7 +42,7 @@ ide_channel_added(device_node_handle parent)
 	channel_id = pnp->create_id(IDE_CHANNEL_ID_GENERATOR);
 
 	if (channel_id < 0) {
-		SHOW_ERROR(0, "Cannot register IDE controller %s - out of IDs", controller_name);
+		dprintf("Cannot register IDE controller %s - out of IDs", controller_name);
 		goto err;
 	}
 
