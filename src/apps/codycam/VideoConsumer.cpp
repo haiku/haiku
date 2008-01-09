@@ -3,7 +3,9 @@
 //	VideoConsumer.cpp
 
 
+#include "FileUploadClient.h"
 #include "FtpClient.h"
+#include "SftpClient.h"
 #include "VideoConsumer.h"
 
 #include <fcntl.h>
@@ -53,6 +55,7 @@ VideoConsumer::VideoConsumer(const char* name, BView* view, BStringView* statusL
 	fRate(1000000),
 	fImageFormat(0),
 	fTranslator(0),
+	fUploadClient(0),
 	fPassiveFtp(true)
 {
 	FUNCTION("VideoConsumer::VideoConsumer\n");
@@ -205,6 +208,7 @@ VideoConsumer::HandleMessage(int32 message, const void* data, size_t size)
 			fImageFormat = info->imageFormat;
 			fTranslator = info->translator;
 			fPassiveFtp = info->passiveFtp;
+			fUploadClient = info->uploadClient;
 			strcpy(fFileNameText, info->fileNameText);
 			strcpy(fServerText, info->serverText);
 			strcpy(fLoginText, info->loginText);
@@ -230,7 +234,7 @@ VideoConsumer::HandleMessage(int32 message, const void* data, size_t size)
 void
 VideoConsumer::BufferReceived(BBuffer* buffer)
 {
-	LOOP("VideoConsumer::Buffer #%ld received\n", buffer->ID());
+	LOOP("VideoConsumer::Buffer #%ld received, start_time %Ld\n", buffer->ID(), buffer->Header()->start_time);
 
 	if (RunState() == B_STOPPED) {
 		buffer->Recycle();
@@ -673,25 +677,37 @@ VideoConsumer::LocalSave(char* filename, BBitmap* bitmap)
 status_t
 VideoConsumer::FtpSave(char* filename)
 {
-	FtpClient ftp;
+	FileUploadClient *ftp;
+	
+	//XXX: make that cleaner
+	switch (fUploadClient) {
+		case 0:
+			ftp = new FtpClient;
+			break;
+		case 1:
+			ftp = new SftpClient;
+			break;
+		default:
+			return EINVAL;
+	}
 
-	ftp.SetPassive(fPassiveFtp);
+	ftp->SetPassive(fPassiveFtp);
 		// ftp the local file to our web site
 
 	UpdateFtpStatus("Logging in ...");
-	if (ftp.Connect((string)fServerText, (string)fLoginText, (string)fPasswordText)) {
+	if (ftp->Connect((string)fServerText, (string)fLoginText, (string)fPasswordText)) {
 		// connect to server
 		UpdateFtpStatus("Connected ...");
 
-		if (ftp.ChangeDir((string)fDirectoryText)) {
+		if (ftp->ChangeDir((string)fDirectoryText)) {
 			// cd to the desired directory
 			UpdateFtpStatus("Transmitting ...");
 
-			if (ftp.PutFile((string)filename, (string)"temp")) {
+			if (ftp->PutFile((string)filename, (string)"temp")) {
 				// send the file to the server
 				UpdateFtpStatus("Renaming ...");
 
-				if (ftp.MoveFile((string)"temp", (string)filename)) {
+				if (ftp->MoveFile((string)"temp", (string)filename)) {
 					// change to the desired name
 					uint32 time = real_time_clock();
 					char s[80];
@@ -699,6 +715,7 @@ VideoConsumer::FtpSave(char* filename)
 					strcat(s, ctime((const long*)&time));
 					s[strlen(s) - 1] = 0;
 					UpdateFtpStatus(s);
+					delete ftp;
 					return B_OK;
 				}
 				else
@@ -713,6 +730,7 @@ VideoConsumer::FtpSave(char* filename)
 	else
 		UpdateFtpStatus("Server login failed");
 
+	delete ftp;
 	return B_ERROR;
 }
 

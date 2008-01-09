@@ -595,6 +595,14 @@ VideoWindow::MessageReceived(BMessage* message)
 			message->FindInt32("be:translator", &(fFtpInfo.translator)); 
 			break;
 
+		case msg_upl_client:
+			if (control != NULL) {
+				int32 client;
+				message->FindInt32("client", &(fFtpInfo.uploadClient));
+				FTPINFO("upl client = %d\n", fFtpInfo.uploadClient);//XXX
+			}
+			break;
+
 		case msg_server:
 			if (control != NULL) {
 				strncpy(fFtpInfo.serverText, ((BTextControl*)control)->Text(), 64);
@@ -737,7 +745,18 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	aFrame.bottom -= kYBuffer;
 
 	fFtpSetupBox = new BBox(aFrame, "Ftp Setup", B_FOLLOW_ALL, B_WILL_DRAW);
-	fFtpSetupBox->SetLabel("Ftp Setup");
+	fUploadClientMenu = new BPopUpMenu("Send to...");
+	for (int i = 0; kUploadClient[i]; i++) {
+		BMessage *m = new BMessage(msg_upl_client);
+		m->AddInt32("client", i);
+		fUploadClientMenu->AddItem(new BMenuItem(kUploadClient[i], m));
+	}
+	fUploadClientMenu->SetTargetForItems(this);
+	//fUploadClientMenu->FindItem(fCaptureRateSetting->Value())->SetMarked(true);
+	fUploadClientSelector = new BMenuField(aFrame, "UploadClient", "", fUploadClientMenu);
+	fUploadClientSelector->SetDivider(0.0);
+
+	fFtpSetupBox->SetLabel(fUploadClientSelector);
 	theView->AddChild(fFtpSetupBox);
 
 	aFrame = fFtpSetupBox->Bounds();

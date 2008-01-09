@@ -20,6 +20,7 @@ typedef struct {
 	bigtime_t	rate;
 	uint32		imageFormat;
 	int32		translator;
+	int32		uploadClient;
 	bool		passiveFtp;
 	char		fileNameText[64];
 	char		serverText[64];
@@ -137,6 +138,7 @@ class VideoConsumer : public BMediaEventLooper, public BBufferConsumer {
 		bigtime_t			fRate;
 		uint32				fImageFormat;
 		int32				fTranslator;
+		int32				fUploadClient;
 		bool				fPassiveFtp;
 		char				fFileNameText[64];
 		char				fServerText[64];

@@ -41,6 +41,7 @@ enum {
 
 	msg_translate	= 'tran',
 
+	msg_upl_client	= 'ucli',
 	msg_server		= 'srvr',
 	msg_login		= 'lgin',
 	msg_password	= 'pswd',
@@ -73,6 +74,13 @@ const char* kCaptureRate[] = {
 	"Every 8 hours",
 	"Every 24 hours",
 	"Never",	
+	0
+};
+
+
+const char* kUploadClient[] = {
+	"FTP",
+	"SFTP",
 	0
 };
 
@@ -135,6 +143,8 @@ class VideoWindow : public BWindow {
 		BMenuField*				fCaptureRateSelector;
 		BMenu*					fImageFormatMenu;
 		BMenuField*				fImageFormatSelector;
+		BMenu*					fUploadClientMenu;
+		BMenuField*				fUploadClientSelector;
 		BBox*					fFtpSetupBox;
 		BTextControl*			fServerName;
 		BTextControl*			fLoginId;
