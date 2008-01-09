@@ -428,6 +428,7 @@ VideoWindow::VideoWindow (BRect frame, const char* title, window_type type, uint
 	fFtpInfo.imageFormat = 0;
 	fFtpInfo.translator = 0;
 	fFtpInfo.passiveFtp = true;
+	fFtpInfo.uploadClient = 0;
 	strcpy(fFtpInfo.fileNameText, "filename");
 	strcpy(fFtpInfo.serverText, "server");
 	strcpy(fFtpInfo.loginText, "login");
@@ -599,7 +600,7 @@ VideoWindow::MessageReceived(BMessage* message)
 			if (control != NULL) {
 				int32 client;
 				message->FindInt32("client", &(fFtpInfo.uploadClient));
-				FTPINFO("upl client = %d\n", fFtpInfo.uploadClient);//XXX
+				FTPINFO("upl client = %d\n", fFtpInfo.uploadClient);
 			}
 			break;
 
@@ -752,7 +753,7 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 		fUploadClientMenu->AddItem(new BMenuItem(kUploadClient[i], m));
 	}
 	fUploadClientMenu->SetTargetForItems(this);
-	//fUploadClientMenu->FindItem(fCaptureRateSetting->Value())->SetMarked(true);
+	fUploadClientMenu->FindItem(fUploadClientSetting->Value())->SetMarked(true);
 	fUploadClientSelector = new BMenuField(aFrame, "UploadClient", "", fUploadClientMenu);
 	fUploadClientSelector->SetDivider(0.0);
 
@@ -832,6 +833,7 @@ VideoWindow::ApplyControls()
 	fFileName->Invoke();		
 	PostMessage(fImageFormatMenu->FindMarked()->Message());
 	PostMessage(fCaptureRateMenu->FindMarked()->Message());
+	PostMessage(fUploadClientMenu->FindMarked()->Message());
 	fServerName->Invoke();
 	fLoginId->Invoke();
 	fPassword->Invoke();
@@ -861,6 +863,9 @@ VideoWindow::_SetUpSettings(const char* filename, const char* dirname)
 	fSettings->Add(fCaptureRateSetting = new EnumeratedStringValueSetting("CaptureRate",
 		"Every 5 minutes", kCaptureRate, "capture rate expected",
 		"unrecognized capture rate specified"));
+	fSettings->Add(fUploadClientSetting = new EnumeratedStringValueSetting("UploadClient",
+		"FTP", kUploadClient, "upload client name expected",
+		"unrecognized upload client specified"));
 
 	fSettings->TryReadingSettings();
 }
@@ -877,6 +882,7 @@ VideoWindow::_QuitSettings()
 	fFilenameSetting->ValueChanged(fFileName->Text());
 	fImageFormatSettings->ValueChanged(fImageFormatMenu->FindMarked()->Label());
 	fCaptureRateSetting->ValueChanged(fCaptureRateMenu->FindMarked()->Label());
+	fUploadClientSetting->ValueChanged(fUploadClientMenu->FindMarked()->Label());
 	
 	fSettings->SaveSettings();
 	delete fSettings;

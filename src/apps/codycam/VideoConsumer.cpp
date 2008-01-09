@@ -688,6 +688,7 @@ VideoConsumer::FtpSave(char* filename)
 			ftp = new SftpClient;
 			break;
 		default:
+			fprintf(stderr, "invalid upload client %d\n", fUploadClient);
 			return EINVAL;
 	}
 
