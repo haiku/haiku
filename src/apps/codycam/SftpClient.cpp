@@ -26,7 +26,7 @@ SftpClient::ChangeDir(const string& dir)
 	cmd << " " << dir.c_str() << "\n";
 	SendCommand(cmd.String());
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -46,7 +46,7 @@ SftpClient::ListDirContents(string& listing)
 	BString reply;
 	do {
 		if ((len = ReadReply(&reply)) < 0) {
-			fprintf(stderr, "read: %s\n", len);
+			fprintf(stderr, "read: %d\n", len);
 			return false;
 		}
 		fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -82,7 +82,7 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 	ssize_t len;
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %d\n", len);
+		fprintf(stderr, "read: %ld\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -90,7 +90,7 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 		return false;
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %ld\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -101,7 +101,7 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 	write(OutputPipe(), "\n", 1);
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %ld\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -109,7 +109,7 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 		return false;
 	
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %ld\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -131,7 +131,7 @@ SftpClient::PutFile(const string& local, const string& remote, ftp_mode mode)
 	BString reply;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -139,7 +139,7 @@ SftpClient::PutFile(const string& local, const string& remote, ftp_mode mode)
 		return false;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -175,7 +175,7 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 	BString reply;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -183,7 +183,7 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 		return false;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -194,7 +194,7 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 	cmd << " " << oldPath.c_str() << " " << newPath.c_str() << "\n";
 	SendCommand(cmd.String());
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -217,7 +217,7 @@ SftpClient::Chmod(const string& path, const string& mod)
 	BString reply;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
@@ -225,7 +225,7 @@ SftpClient::Chmod(const string& path, const string& mod)
 		return false;
 
 	if ((len = ReadReply(&reply)) < 0) {
-		fprintf(stderr, "read: %s\n", len);
+		fprintf(stderr, "read: %d\n", len);
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
