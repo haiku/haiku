@@ -30,6 +30,7 @@
 void
 ide_dpc(void *arg)
 {
+#if 0
 	ide_bus_info *bus = (ide_bus_info *)arg;
 	ide_qrequest *qrequest;
 	ide_device_info *device;
@@ -88,6 +89,7 @@ ide_dpc(void *arg)
 
 /*err:
 	xpt->cont_send( bus->xpt_cookie );*/
+#endif
 }
 
 
@@ -96,17 +98,10 @@ ide_dpc(void *arg)
 status_t
 ide_irq_handler(ide_bus_info *bus, uint8 status)
 {	
+	return B_UNHANDLED_INTERRUPT;
+/*
 	ide_device_info *device;
 
-	// we need to lock bus to have a solid bus state
-	// (side effect: we lock out the timeout handler and get
-	//  delayed if the IRQ happens at the same time as a command is
-	//  issued; in the latter case, we have no official way to determine
-	//  whether the command was issued before or afterwards; if it was
-	//  afterwards, the device must not be busy; if it was before,
-	//  the device is either busy because of the sent command, or it's
-	//  not busy as the command has already been finished, i.e. there
-	//  was a second IRQ which we've overlooked as we didn't acknowledge
 	//  the first IRQ)
 	IDE_LOCK(bus);
 
@@ -180,7 +175,9 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 
 			return B_UNHANDLED_INTERRUPT;
 	}
+*/
 }
+
 
 
 /**	cancel IRQ timeout
@@ -188,6 +185,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
  *	on return, bus state is set to _accessing_
  */
 
+/*
 void
 cancel_irq_timeout(ide_bus_info *bus)
 {
@@ -201,9 +199,8 @@ cancel_irq_timeout(ide_bus_info *bus)
 }
 
 
-/** start waiting for IRQ with bus lock hold
- *	new_state must be either sync_wait or async_wait
- */
+// start waiting for IRQ with bus lock hold
+//	new_state must be either sync_wait or async_wait
 
 void
 start_waiting(ide_bus_info *bus, uint32 timeout, int new_state)
@@ -226,7 +223,7 @@ start_waiting(ide_bus_info *bus, uint32 timeout, int new_state)
 }
 
 
-/** start waiting for IRQ with bus lock not hold */
+// start waiting for IRQ with bus lock not hold
 
 void
 start_waiting_nolock(ide_bus_info *bus, uint32 timeout, int new_state)
@@ -236,7 +233,7 @@ start_waiting_nolock(ide_bus_info *bus, uint32 timeout, int new_state)
 }
 
 
-/** wait for sync IRQ */
+// wait for sync IRQ 
 
 void
 wait_for_sync(ide_bus_info *bus)
@@ -244,9 +241,9 @@ wait_for_sync(ide_bus_info *bus)
 	acquire_sem(bus->sync_wait_sem);
 	cancel_timer(&bus->timer.te);
 }
+*/
 
-
-/** timeout dpc handler */
+// timeout dpc handler
 
 static void
 ide_timeout_dpc(void *arg)
@@ -280,19 +277,16 @@ ide_timeout_dpc(void *arg)
 }
 
 
-/** timeout handler, called by system timer */
+// timeout handler, called by system timer
 
 status_t
 ide_timeout(timer *arg)
 {
 	ide_bus_info *bus = ((ide_bus_timer_info *)arg)->bus;
 
-	FAST_LOG0(bus->log, ev_ide_timeout);
-
-	TRACE(("ide_timeout(): %p\n", bus));
-
 	dprintf("ide: ide_timeout() bus %p\n", bus);
 
+/*
 	// we need to lock bus to have a solid bus state
 	// (side effect: we lock out the IRQ handler)	
 	IDE_LOCK(bus);
@@ -334,7 +328,10 @@ ide_timeout(timer *arg)
 			IDE_UNLOCK(bus);
 			return B_DO_NOT_RESCHEDULE;
 	}
+*/
+	return B_DO_NOT_RESCHEDULE;
 }
+
 
 
 void
@@ -368,7 +365,7 @@ schedule_synced_pc(ide_bus_info *bus, ide_synced_pc *pc, void *arg)
 		// spc cannot be registered twice
 		TRACE(("already registered\n"));
 		return B_ERROR;
-	} else if( bus->state != ide_state_idle ) {
+	} else if( bus->state != ata_state_idle ) {
 		// bus isn't idle - spc must be added to pending list
 		TRACE(("adding to pending list\n"));
 
@@ -386,7 +383,7 @@ schedule_synced_pc(ide_bus_info *bus, ide_synced_pc *pc, void *arg)
 
 	TRACE(("exec immediately\n"));
 
-	bus->state = ide_state_accessing;
+	bus->state = ata_state_busy;
 	IDE_UNLOCK(bus);
 
 	TRACE(("go\n"));
@@ -454,7 +451,7 @@ access_finished(ide_bus_info *bus, ide_device_info *device)
 
 		// noone wants it, so execute pending synced_pc
 		if (bus->synced_pc_list == NULL) {
-			bus->state = ide_state_idle;
+			bus->state = ata_state_idle;
 			IDE_UNLOCK(bus);
 			return;
 		}

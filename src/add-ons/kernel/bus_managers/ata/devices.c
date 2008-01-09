@@ -123,13 +123,23 @@ create_device(ide_bus_info *bus, bool is_device1)
 
 	device->qreqActive = NULL;
 	device->qreqFree = (ide_qrequest *)malloc(sizeof(ide_qrequest));
+
 	memset(device->qreqFree, 0, sizeof(ide_qrequest));
 	device->qreqFree->running = false;
 	device->qreqFree->device = device;
 	device->qreqFree->request = NULL;
 
-
 	device->total_sectors = 0;
+
+	// disable interrupts
+	bus->controller->write_device_control(bus->channel_cookie, ide_devctrl_bit3 | ide_devctrl_nien);
+
+	// make sure LBA bit is set, and initialize device selection flag
+	device->tf.chs.head = 0;
+	device->tf.chs.mode = ide_mode_lba;
+	device->tf.chs.device = is_device1;
+	bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_device_head);
+
 	return device;
 
 err:

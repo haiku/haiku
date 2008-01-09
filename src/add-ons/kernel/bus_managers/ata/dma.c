@@ -60,6 +60,9 @@ configure_dma(ide_device_info *device)
 	device->DMA_enabled = device->DMA_supported = device->bus->can_DMA
 		&& get_device_dma_mode(device) != -1;
 
+	dprintf("XXX DISABLING DMA\n");
+	device->DMA_enabled = false;
+
 	return true;
 }
 
@@ -102,12 +105,14 @@ prepare_dma(ide_device_info *device, ide_qrequest *qrequest)
 void
 start_dma_wait(ide_device_info *device, ide_qrequest *qrequest)
 {
+#if 0
 	ide_bus_info *bus = device->bus;
 
 	bus->controller->start_dma(bus->channel_cookie);
 
 	start_waiting(bus, qrequest->request->timeout > 0 ? 
 		qrequest->request->timeout : IDE_STD_TIMEOUT, ide_state_async_waiting);
+#endif
 }
 
 

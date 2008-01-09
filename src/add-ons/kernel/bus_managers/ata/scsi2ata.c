@@ -205,6 +205,7 @@ err:
 static bool
 ata_test_unit_ready(ide_device_info *device, ide_qrequest *qrequest)
 {
+#if 0
 	SHOW_FLOW0(3, "");
 
 	if (!device->infoblock.RMSN_supported
@@ -229,6 +230,7 @@ ata_test_unit_ready(ide_device_info *device, ide_qrequest *qrequest)
 		;
 	}
 
+#endif
 	return true;
 }
 
@@ -237,6 +239,7 @@ ata_test_unit_ready(ide_device_info *device, ide_qrequest *qrequest)
 static bool
 ata_flush_cache(ide_device_info *device, ide_qrequest *qrequest)
 {
+#if 0
 	// we should also ask for FLUSH CACHE support, but everyone denies it
 	// (looks like they cheat to gain some performance advantage, but
 	//  that's pretty useless: everyone does it...)
@@ -254,6 +257,8 @@ ata_flush_cache(ide_device_info *device, ide_qrequest *qrequest)
 	wait_for_sync(device->bus);
 
 	return check_output(device, true, ide_error_abrt, false);
+#endif
+	return false;
 }
 
 
@@ -263,6 +268,7 @@ ata_flush_cache(ide_device_info *device, ide_qrequest *qrequest)
 static bool
 ata_load_eject(ide_device_info *device, ide_qrequest *qrequest, bool load)
 {
+#if 0
 	if (load) {
 		// ATA doesn't support loading
 		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_NOT_SUPPORTED);
@@ -278,6 +284,8 @@ ata_load_eject(ide_device_info *device, ide_qrequest *qrequest, bool load)
 	wait_for_sync(device->bus);
 
 	return check_output(device, true, ide_error_abrt | ide_error_nm, false);
+#endif
+	return false;
 }
 
 

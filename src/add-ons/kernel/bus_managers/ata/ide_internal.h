@@ -169,12 +169,12 @@ typedef struct ide_qrequest {
 
 // state of ide bus
 typedef enum {
-	ide_state_idle,				// noone is using it, but overlapped 
-								// commands may be pending
-	ide_state_accessing,		// bus is in use
-	ide_state_async_waiting,	// waiting for IRQ, to be reported via irq_dpc
-	ide_state_sync_waiting,		// waiting for IRQ, to be reported via sync_wait_sem
-} ide_bus_state;
+	ata_state_idle,				// not is using it
+	ata_state_busy,				// got bus but no command issued yet
+	ata_state_pio,				// bus is executing a PIO command
+	ata_state_dma				// bus is executing a DMA command
+} ata_bus_state;
+
 
 struct ide_bus_info {
 	ide_qrequest *active_qrequest;
@@ -187,22 +187,18 @@ struct ide_bus_info {
 	spinlock lock;
 	cpu_status prev_irq_state;
 
-	ide_bus_state state;		// current state of bus
+	ata_bus_state state;		// current state of bus
 
 	benaphore status_report_ben; // to lock when you report XPT about bus state
 								// i.e. during requeue, resubmit or finished
 
 	bool disconnected;			// true, if controller is lost
-	int num_running_reqs;		// total number of running requests
 
 	scsi_bus scsi_cookie;		// cookie for scsi bus
 
 	ide_bus_timer_info timer;	// timeout
 	scsi_dpc_cookie irq_dpc;
 	ide_synced_pc *synced_pc_list;
-
-	sem_id sync_wait_sem;		// released when sync_wait finished
-	bool sync_wait_timeout;		// true, if timeout occured
 
 	ide_device_info *active_device;
 	ide_device_info *devices[2];
@@ -302,10 +298,16 @@ device_released_bus(ide_device_info *device)
 
 // ata.c
 
-//void ata_select_device(ide_device_info *device);
 void ata_select_device(ide_bus_info *bus, int device);
+void ata_select(ide_device_info *device);
 bool ata_is_device_present(ide_bus_info *bus, int device);
-
+status_t ata_wait(ide_bus_info *bus, uint8 set, uint8 not_set, bool check_err, bigtime_t timeout);
+status_t ata_wait_for_drq(ide_bus_info *bus);
+status_t ata_wait_for_drqdown(ide_bus_info *bus);
+status_t ata_wait_for_drdy(ide_bus_info *bus);
+status_t ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *_devicePresent1, uint32 *_sigDev1);
+status_t ata_reset_device(ide_device_info *device, bool *_devicePresent);
+status_t ata_send_command(ide_device_info *device, ide_qrequest *qrequest, bool need_drdy, uint32 timeout, ata_bus_state new_state);
 
 bool check_rw_error(ide_device_info *device, ide_qrequest *qrequest);
 bool check_output(ide_device_info *device, bool drdy_required, int error_mask, bool is_write);
@@ -331,25 +333,7 @@ void atapi_exec_io(ide_device_info *device, ide_qrequest *qrequest);
 
 // basic_prot.c
 
-status_t ata_wait(ide_bus_info *bus, uint8 mask, uint8 not_mask, bool check_err, bigtime_t timeout);
-
-
-bool ide_wait(ide_device_info *device, int mask, int not_mask, bool check_err,
-	bigtime_t timeout);
-bool wait_for_drq(ide_device_info *device);
-bool wait_for_drqdown(ide_device_info *device);
-bool wait_for_drdy(ide_device_info *device);
-
 // timeout in seconds
-bool send_command(ide_device_info *device, ide_qrequest *qrequest,
-	bool need_drdy, uint32 timeout, ide_bus_state new_state);
-//bool reset_device(ide_device_info *device, ide_qrequest *ignore);
-//bool reset_bus(ide_device_info *device, ide_qrequest *ignore);
-	
-bool check_service_req(ide_device_info *device);
-
-status_t reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *devicePresent1, uint32 *sigDev1);
-
 
 // channel_mgr.c
 

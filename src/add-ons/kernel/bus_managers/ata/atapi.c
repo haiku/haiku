@@ -92,6 +92,7 @@ check_packet_error(ide_device_info *device, ide_qrequest *qrequest)
 void
 packet_dpc(ide_qrequest *qrequest)
 {
+#if 0
 	ide_device_info *device = qrequest->device;
 	ide_bus_info *bus = device->bus;
 	int status;
@@ -259,6 +260,7 @@ err_cancel_timer:
 	cancel_irq_timeout(device->bus);
 err:
 	finish_checksense(qrequest);
+#endif
 }
 
 
@@ -288,6 +290,7 @@ create_packet_taskfile(ide_device_info *device, ide_qrequest *qrequest,
 void
 send_packet(ide_device_info *device, ide_qrequest *qrequest, bool write)
 {
+#if 0
 	ide_bus_info *bus = device->bus;
 	bool packet_irq = device->atapi.packet_irq;
 	uint8 scsi_cmd = device->packet[0];
@@ -431,6 +434,7 @@ err_setup:
 		abort_dma(device, qrequest);
 
 	finish_checksense(qrequest);
+#endif
 }
 
 

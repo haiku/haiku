@@ -110,16 +110,14 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 	ACQUIRE_BEN(&bus->status_report_ben);
 	IDE_LOCK(bus);
 
-	if (bus->state != ide_state_idle)
+	if (bus->state != ata_state_idle)
 		goto err_bus_busy;
 
 	// bail out if device can't accept further requests
 	if (device->qreqFree == NULL)
 		goto err_device_busy;
 
-	bus->state = ide_state_accessing;
-
-	++bus->num_running_reqs;
+	bus->state = ata_state_busy;
 
 	IDE_UNLOCK(bus);
 	RELEASE_BEN(&bus->status_report_ben);
@@ -239,7 +237,7 @@ scan_bus(ide_bus_info *bus)
 			destroy_device(bus->devices[i]);
 	}
 
-	status = reset_bus(bus, &devicePresent[0], &deviceSignature[0], &devicePresent[1], &deviceSignature[1]);
+	status = ata_reset_bus(bus, &devicePresent[0], &deviceSignature[0], &devicePresent[1], &deviceSignature[1]);
 
 	for (i = 0; i < bus->max_devices; ++i) {
 		if (!devicePresent[i])
@@ -302,6 +300,7 @@ sim_reset_bus(ide_bus_info *bus)
 	// no, we don't do that
 	if (bus->disconnected)
 		return SCSI_NO_HBA;
+
 
 	return SCSI_REQ_INVALID;
 }
@@ -381,8 +380,6 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 
 	device->qreqFree = device->qreqActive;
 	device->qreqActive = NULL;
-
-	--bus->num_running_reqs; // XXX borked!!!
 
 	// paranoia
 	bus->active_qrequest = NULL;
@@ -514,7 +511,6 @@ void
 finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
 	int subsys_status, bool resubmit)
 {
-	int i;
 
 	if (device == NULL)
 		return;
@@ -558,7 +554,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	memset(bus, 0, sizeof(*bus));
 	bus->node = node;
 	bus->lock = 0;
-	bus->num_running_reqs = 0;
 	bus->active_qrequest = NULL;
 	bus->disconnected = false;
 
@@ -581,7 +576,7 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	init_synced_pc(&bus->disconnect_syncinfo, disconnect_worker);
 
 	bus->scsi_cookie = user_cookie;
-	bus->state = ide_state_idle;
+	bus->state = ata_state_idle;
 	bus->timer.bus = bus;
 	bus->synced_pc_list = NULL;
 
@@ -589,11 +584,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		goto err1;
 
 	bus->active_device = NULL;
-	bus->sync_wait_sem = create_sem(0, "ide_sync_wait");
-	if (bus->sync_wait_sem < 0) {
-		status = bus->sync_wait_sem;
-		goto err2;
-	}
 
 	bus->devices[0] = bus->devices[1] = NULL;
 
@@ -642,13 +632,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 
 	*cookie = bus;
 
-/*
-	// make sure LBA bit is set
-	bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_device_head);
-	tf.chs.mode = ide_mode_lba;
-	bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_device_head);
-*/
-
 	// detect devices
 	scan_bus(bus);
 	return B_OK;
@@ -656,9 +639,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 err5:
 	DELETE_BEN(&bus->status_report_ben);
 err4:
-err3:
-	delete_sem(bus->sync_wait_sem);
-err2:	
 	scsi->free_dpc(bus->irq_dpc);
 err1:
 	uninit_synced_pc(&bus->disconnect_syncinfo);
@@ -684,7 +664,6 @@ ide_sim_uninit_bus(ide_bus_info *bus)
 	pnp->put_device_node(parent);
 
 	DELETE_BEN(&bus->status_report_ben);	
-	delete_sem(bus->sync_wait_sem);
 	scsi->free_dpc(bus->irq_dpc);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
 //	fast_log->stop_log(bus->log);
