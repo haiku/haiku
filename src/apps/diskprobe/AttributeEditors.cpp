@@ -132,6 +132,28 @@ class ImageView : public TypeEditorView {
 };
 
 
+class MessageView : public TypeEditorView {
+	public:
+		MessageView(BRect rect, DataEditor& editor);
+		virtual ~MessageView();
+
+		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
+		virtual void MessageReceived(BMessage* message);
+
+		virtual void CommitChanges();
+
+		void SetTo(BMessage& message);
+
+	private:
+		BString _TypeToString(type_code type);
+		void _UpdateMessage();
+
+		DataEditor&	fEditor;
+		BTextView*	fTextView;
+};
+
+
 //-----------------
 
 
@@ -142,7 +164,7 @@ StringEditor::StringEditor(BRect rect, DataEditor &editor)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BStringView *stringView = new BStringView(BRect(5, 5, rect.right, 20),
-										B_EMPTY_STRING, "Contents:");
+		B_EMPTY_STRING, "Contents:");
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
 
@@ -151,8 +173,9 @@ StringEditor::StringEditor(BRect rect, DataEditor &editor)
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
 	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
 
-	fTextView = new BTextView(rect, B_EMPTY_STRING, rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
-						B_FOLLOW_ALL, B_WILL_DRAW);
+	fTextView = new BTextView(rect, B_EMPTY_STRING,
+		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
+		B_FOLLOW_ALL, B_WILL_DRAW);
 
 #if 0
 	char *data = (char *)malloc(info.size);
@@ -164,7 +187,8 @@ StringEditor::StringEditor(BRect rect, DataEditor &editor)
 	}
 #endif
 
-	BScrollView *scrollView = new BScrollView("scroller", fTextView, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
+	BScrollView *scrollView = new BScrollView("scroller", fTextView,
+		B_FOLLOW_ALL, B_WILL_DRAW, true, true);
 	AddChild(scrollView);
 }
 
@@ -1056,6 +1080,189 @@ ImageView::CommitChanges()
 }
 
 
+//	#pragma mark - MessageView
+
+
+MessageView::MessageView(BRect rect, DataEditor &editor)
+	: TypeEditorView(rect, "Message View", B_FOLLOW_ALL, 0),
+	fEditor(editor)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	rect = Bounds().InsetByCopy(10, 10);
+	rect.right -= B_V_SCROLL_BAR_WIDTH;
+	rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
+	fTextView = new BTextView(rect, B_EMPTY_STRING,
+		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
+		B_FOLLOW_ALL, B_WILL_DRAW);
+	fTextView->SetViewColor(ViewColor());
+	fTextView->SetLowColor(ViewColor());
+
+	BScrollView *scrollView = new BScrollView("scroller", fTextView,
+		B_FOLLOW_ALL, B_WILL_DRAW, true, true);
+	AddChild(scrollView);
+}
+
+
+MessageView::~MessageView()
+{
+}
+
+
+BString
+MessageView::_TypeToString(type_code type)
+{
+	// TODO: move this to a utility function (it's a copy from something
+	// similar in ProbeView.cpp)
+	char text[32];
+	for (int32 i = 0; i < 4; i++) {
+		text[i] = type >> (24 - 8 * i);
+		if (text[i] < ' ' || text[i] == 0x7f) {
+			snprintf(text, sizeof(text), "0x%04lx", type);
+			break;
+		} else if (i == 3)
+			text[4] = '\0';
+	}
+
+	return BString(text);
+}
+
+
+void
+MessageView::SetTo(BMessage& message)
+{
+	// TODO: when we have a real column list/tree view, redo this using
+	// it with nice editors as well.
+
+	fTextView->SetText("");
+
+	char text[512];
+	snprintf(text, sizeof(text), "what: '%.4s'\n\n", (char*)&message.what);
+	fTextView->Insert(text);
+
+	type_code type;
+	int32 count;
+	char* name;
+	for (int32 i = 0; message.GetInfo(B_ANY_TYPE, i, &name, &type, &count)
+			== B_OK; i++) {
+		snprintf(text, sizeof(text), "%s\t", _TypeToString(type).String());
+		fTextView->Insert(text);
+
+		text_run_array array;
+		array.count = 1;
+		array.runs[0].offset = 0;
+		array.runs[0].font.SetFace(B_BOLD_FACE);
+		array.runs[0].color = (rgb_color){0, 0, 0, 255};
+
+		fTextView->Insert(name, &array);
+
+		array.runs[0].font = be_plain_font;
+		fTextView->Insert("\n", &array);
+
+		for (int32 j = 0; j < count; j++) {
+			const char* data;
+			ssize_t size;
+			if (message.FindData(name, type, j, (const void**)&data, &size)
+					!= B_OK)
+				continue;
+
+			text[0] = '\0';
+
+			switch (type) {
+				case B_INT64_TYPE:
+					snprintf(text, sizeof(text), "%Ld", *(int64*)data);
+					break;
+				case B_UINT64_TYPE:
+					snprintf(text, sizeof(text), "%Lu", *(uint64*)data);
+					break;
+				case B_INT32_TYPE:
+					snprintf(text, sizeof(text), "%ld", *(int32*)data);
+					break;
+				case B_UINT32_TYPE:
+					snprintf(text, sizeof(text), "%lu", *(uint32*)data);
+					break;
+				case B_BOOL_TYPE:
+					if (*(uint8*)data)
+						strcpy(text, "true");
+					else
+						strcpy(text, "false");
+					break;
+				case B_STRING_TYPE:
+				case B_MIME_STRING_TYPE:
+				{
+					snprintf(text, sizeof(text), "%s", data);
+					break;
+				}
+			}
+
+			if (text[0]) {
+				fTextView->Insert("\t\t");
+				if (count > 1) {
+					char index[16];
+					snprintf(index, sizeof(index), "%ld.\t", j);
+					fTextView->Insert(index);
+				}
+				fTextView->Insert(text);
+				fTextView->Insert("\n");
+			}
+		}
+	}
+}
+
+
+void
+MessageView::_UpdateMessage()
+{
+	BAutolock locker(fEditor);
+
+	size_t viewSize = fEditor.ViewSize();
+	// that may need some more memory...
+	if (viewSize < fEditor.FileSize())
+		fEditor.SetViewSize(fEditor.FileSize());
+
+	const char *buffer;
+	if (fEditor.GetViewBuffer((const uint8 **)&buffer) == B_OK) {
+		BMessage message;
+		message.Unflatten(buffer);
+		SetTo(message);
+	}
+
+	// restore old view size
+	fEditor.SetViewSize(viewSize);
+}
+
+
+void
+MessageView::AttachedToWindow()
+{
+	fEditor.StartWatching(this);
+
+	_UpdateMessage();
+}
+
+
+void 
+MessageView::DetachedFromWindow()
+{
+	fEditor.StopWatching(this);
+}
+
+
+void
+MessageView::MessageReceived(BMessage* message)
+{
+	BView::MessageReceived(message);
+}
+
+
+void
+MessageView::CommitChanges()
+{
+	// we're not an editor, we're just displaying something
+}
+
+
 //	#pragma mark -
 
 
@@ -1084,10 +1291,12 @@ GetTypeEditorFor(BRect rect, DataEditor &editor)
 		case B_OFF_T_TYPE:
 		case B_POINTER_TYPE:
 			return new NumberEditor(rect, editor);
+		case B_MESSAGE_TYPE:
+			// TODO: check for archived bitmaps!!!
+			return new MessageView(rect, editor);
 		case B_MINI_ICON_TYPE:
 		case B_LARGE_ICON_TYPE:
 		case B_PNG_FORMAT:
-		case B_MESSAGE_TYPE:
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 		case B_VECTOR_ICON_TYPE:
 #endif
