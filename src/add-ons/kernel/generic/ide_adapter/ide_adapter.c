@@ -334,6 +334,18 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 
 	TRACE("PCI-IDE: init channel...\n");
 
+	if (1 /* debug */){
+		uint8 bus, device, function;
+		uint16 vendorID, deviceID;
+		pnp->get_attr_uint16(node, PCI_DEVICE_BUS_ITEM, &bus, true);
+		pnp->get_attr_uint16(node, PCI_DEVICE_DEVICE_ITEM, &device, true);
+		pnp->get_attr_uint16(node, PCI_DEVICE_FUNCTION_ITEM, &function, true);
+		pnp->get_attr_uint16(node, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, true);
+		pnp->get_attr_uint16(node, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, true);
+		TRACE("PCI-IDE: bus %3d, device %2d, function %2d: vendor %04x, device %04x\n",
+			bus, device, function, vendorID, deviceID);
+	}
+
 	// get device data
 	if (pnp->get_attr_uint16(node, IDE_ADAPTER_COMMAND_BLOCK_BASE, &command_block_base, false) != B_OK
 		|| pnp->get_attr_uint16(node, IDE_ADAPTER_CONTROL_BLOCK_BASE, &control_block_base, false) != B_OK
@@ -349,6 +361,8 @@ ide_adapter_init_channel(device_node_handle node, ide_channel ide_channel,
 		res = B_NO_MEMORY;
 		goto err;
 	}
+
+	TRACE("PCI-IDE: channel index %d\n", channel_index);
 
 	channel->node = node;
 	channel->pci = controller->pci;
