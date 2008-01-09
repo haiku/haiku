@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <image.h>
 #include <unistd.h>
 #include <signal.h>
