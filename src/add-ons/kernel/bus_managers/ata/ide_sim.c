@@ -37,41 +37,6 @@
 
 
 scsi_for_sim_interface *scsi;
-fast_log_info *fast_log;
-
-
-#ifdef USE_FAST_LOG
-static fast_log_event_type ide_events[] =
-{
-	{ ev_ide_send_command, "ev_ide_send_command " },
-	{ ev_ide_device_start_service, "ev_ide_device_start_service" },
-	{ ev_ide_device_start_service2, "ev_ide_device_start_service2" },
-	{ ev_ide_dpc_service, "ev_ide_dpc_service" },
-	{ ev_ide_dpc_continue, "ev_ide_dpc_continue" },
-	{ ev_ide_irq_handle, "ev_ide_irq_handle" },
-	{ ev_ide_cancel_irq_timeout, "ev_ide_cancel_irq_timeout" },
-	{ ev_ide_start_waiting, "ev_ide_start_waiting" },
-	{ ev_ide_timeout_dpc, "ev_ide_timeout_dpc" },
-	{ ev_ide_timeout, "ev_ide_timeout" },
-	{ ev_ide_reset_bus, "ev_ide_reset_bus" },
-	{ ev_ide_reset_device, "ev_ide_reset_device" },
-	
-	{ ev_ide_scsi_io, "ev_ide_scsi_io" },
-	{ ev_ide_scsi_io_exec, "ev_ide_scsi_io_exec" },
-	{ ev_ide_scsi_io_invalid_device, "ev_ide_scsi_io_invalid_device" },
-	{ ev_ide_scsi_io_bus_busy, "ev_ide_scsi_io_bus_busy" },
-	{ ev_ide_scsi_io_device_busy, "ev_ide_scsi_io_device_busy" },
-	{ ev_ide_scsi_io_disconnected, "ev_ide_scsi_io_disconnected" },
-	{ ev_ide_finish_request, "ev_ide_finish_request" },
-	{ ev_ide_finish_norelease, "ev_ide_finish_norelease" },
-
-	{ ev_ide_scan_device_int, "ev_ide_scan_device_int" },
-	{ ev_ide_scan_device_int_cant_send, "ev_ide_scan_device_int_cant_send" },
-	{ ev_ide_scan_device_int_keeps_busy, "ev_ide_scan_device_int_keeps_busy" },
-	{ ev_ide_scan_device_int_found, "ev_ide_scan_device_int_found" },
-	{}
-};
-#endif
 
 
 static void disconnect_worker(ide_bus_info *bus, void *arg);
@@ -85,8 +50,6 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 	ide_qrequest *qrequest;
 	//ide_request_priv *priv;
 
-//	FAST_LOG3( bus->log, ev_ide_scsi_io, (uint32)request, request->target_id, request->target_lun );	
-//	SHOW_FLOW(3, "%d:%d", request->target_id, request->target_lun);
 	FLOW("sim_scsi_iobus %p, %d:%d\n", bus, request->target_id, request->target_lun);
 
 	if (bus->disconnected)
@@ -133,8 +96,8 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 
 	bus->active_qrequest = qrequest; // XXX whats this!?!?!
 
-	FAST_LOGN(bus->log, ev_ide_scsi_io_exec, 4, (uint32)qrequest,
-		(uint32)request, bus->num_running_reqs, device->num_running_reqs);
+
+	FLOW("calling exec_io: %p, %d:%d\n", bus, request->target_id, request->target_lun);
 
 	device->exec_io(device, qrequest);
 
@@ -142,7 +105,6 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
 
 err_inv_device:
 	FLOW("Invalid device %d:%d\n", request->target_id, request->target_lun);
-	FAST_LOG1(bus->log, ev_ide_scsi_io_invalid_device, (uint32)request);
 
 	request->subsys_status = SCSI_SEL_TIMEOUT;
 	scsi->finished(request, 1);
@@ -150,7 +112,6 @@ err_inv_device:
 
 err_bus_busy:
 	FLOW("Bus busy\n");
-	FAST_LOG1(bus->log, ev_ide_scsi_io_bus_busy, (uint32)request);
 
 	IDE_UNLOCK(bus);
 	scsi->requeue(request, true);
@@ -159,7 +120,6 @@ err_bus_busy:
 
 err_device_busy:
 	FLOW("Device busy\n");
-	FAST_LOG1(bus->log, ev_ide_scsi_io_device_busy, (uint32)request);
 
 	IDE_UNLOCK(bus);
 	scsi->requeue(request, false);
@@ -168,7 +128,6 @@ err_device_busy:
 
 err_disconnected:
 	TRACE("No controller anymore\n");
-	FAST_LOG1(bus->log, ev_ide_scsi_io_disconnected, (uint32)request);
 	request->subsys_status = SCSI_NO_HBA;
 	scsi->finished(request, 1);
 	return;
@@ -369,7 +328,6 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 	ide_bus_info *bus = device->bus;
 	scsi_ccb *request;
 
-	FAST_LOG2(bus->log, ev_ide_finish_request, (uint32)qrequest, resubmit);
 	SHOW_FLOW0(3, "");
 
 	// save request first, as qrequest can be reused as soon as
@@ -481,7 +439,6 @@ finish_norelease(ide_qrequest *qrequest, bool resubmit)
 	ide_device_info *device = qrequest->device;
 	ide_bus_info *bus = device->bus;
 
-	FAST_LOG2(bus->log, ev_ide_finish_norelease, (uint32)qrequest, resubmit);
 
 	qrequest->running = false;
 
@@ -565,13 +522,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		sprintf(bus->name, "ide_bus %d", (int)channel_id);
 	}
 
-#if 0
-	bus->log = fast_log->start_log(bus->name, ide_events);
-	if (bus->log == NULL) {
-		res = B_NO_MEMORY;
-		goto err;
-	}
-#endif
 
 	init_synced_pc(&bus->disconnect_syncinfo, disconnect_worker);
 
@@ -642,10 +592,7 @@ err4:
 	scsi->free_dpc(bus->irq_dpc);
 err1:
 	uninit_synced_pc(&bus->disconnect_syncinfo);
-#ifdef USE_FAST_LOG
-	fast_log->stop_log(bus->log);
 err:
-#endif
 	free(bus);
 
 	return status;
@@ -666,7 +613,6 @@ ide_sim_uninit_bus(ide_bus_info *bus)
 	DELETE_BEN(&bus->status_report_ben);	
 	scsi->free_dpc(bus->irq_dpc);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
-//	fast_log->stop_log(bus->log);
 
 	free(bus);
 

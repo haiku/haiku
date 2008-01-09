@@ -137,14 +137,13 @@ ata_send_command(ide_device_info *device, ide_qrequest *qrequest,
 
 	ASSERT(new_state == ata_state_pio); // XXX only pio for now
 
-	FAST_LOGN(bus->log, ev_ide_send_command, 15, device->is_device1, (uint32)qrequest, 
+	FLOW("ata_send_command: %d:%d, qrequest %p, request %p, tf %02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x\n",
+		device->target_id, device->is_device1, 
+		qrequest, qrequest ? qrequest->request : NULL,
 		device->tf.raw.r[0], device->tf.raw.r[1], device->tf.raw.r[2], 
 		device->tf.raw.r[3], device->tf.raw.r[4], device->tf.raw.r[5], 
-		device->tf.raw.r[6], 
-		device->tf.raw.r[7], device->tf.raw.r[8], device->tf.raw.r[9], 
-		device->tf.raw.r[10], device->tf.raw.r[11]);
-
-	TRACE("ata_send_command: qrequest %p, request %p\n", qrequest, qrequest ? qrequest->request : NULL);
+		device->tf.raw.r[6], device->tf.raw.r[7], device->tf.raw.r[8],
+		device->tf.raw.r[9], device->tf.raw.r[10], device->tf.raw.r[11]);
 
 	// disable Interrupts for PIO transfers
 	if (new_state == ata_state_pio) {

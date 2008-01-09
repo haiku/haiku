@@ -43,7 +43,6 @@ ide_dpc(void *arg)
 	// in idle state, so we just check whether there is an active request,
 	// which means that we were async_waiting
 	if (bus->active_qrequest != NULL) {
-		FAST_LOG1(bus->log, ev_ide_dpc_continue, (uint32)bus->active_qrequest);
 		TRACE(("continue command\n"));
 
 		// cancel timeout
@@ -66,8 +65,6 @@ ide_dpc(void *arg)
 		// a spurious IRQ; access_finished will take care of testing
 		// for service requests
 		TRACE(("irq in idle mode - possible service request\n"));
-
-		FAST_LOG0(bus->log, ev_ide_dpc_service);
 
 		device = get_current_device(bus);
 		if (device == NULL) {
@@ -189,8 +186,6 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 void
 cancel_irq_timeout(ide_bus_info *bus)
 {
-	FAST_LOG0(bus->log, ev_ide_cancel_irq_timeout);
-
 	IDE_LOCK(bus);
 	bus->state = ide_state_accessing;
 	IDE_UNLOCK(bus);
@@ -206,8 +201,6 @@ void
 start_waiting(ide_bus_info *bus, uint32 timeout, int new_state)
 {
 	int res;
-
-	FAST_LOG1(bus->log, ev_ide_start_waiting, new_state);
 
 	TRACE(("timeout = %u\n", (uint)timeout));
 
@@ -256,8 +249,6 @@ ide_timeout_dpc(void *arg)
 	device = qrequest->device;
 
 	dprintf("ide: ide_timeout_dpc() bus %p, device %p\n", bus, device);
-
-	FAST_LOG1(bus->log, ev_ide_timeout_dpc, (uint32)qrequest);
 
 	// this also resets overlapped commands
 //	reset_device(device, qrequest);

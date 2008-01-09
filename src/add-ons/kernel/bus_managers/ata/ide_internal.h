@@ -17,7 +17,6 @@
 #include "ide_device_infoblock.h"
 #include <ide_types.h>
 #include <device_manager.h>
-#include <fast_log.h>
 
 #define debug_level_error 2
 #define debug_level_info 1
@@ -26,24 +25,6 @@
 #define DEBUG_MSG_PREFIX "IDE -- "
 
 #include "wrapper.h"
-
-
-//#define USE_FAST_LOG
-
-#ifdef USE_FAST_LOG
-#define FAST_LOG0( handle, event ) fast_log->log_0( handle, event )
-#define FAST_LOG1( handle, event, param ) fast_log->log_1( handle, event, param )
-#define FAST_LOG2( handle, event, param1, param2 ) fast_log->log_2( handle, event, param1, param2 )
-#define FAST_LOG3( handle, event, param1, param2, param3 ) fast_log->log_3( handle, event, param1, param2, param3 )
-#define FAST_LOGN( handle, event, num_params... ) fast_log->log_n( handle, event, num_params )
-#else
-#define FAST_LOG0( handle, event )
-#define FAST_LOG1( handle, event, param )
-#define FAST_LOG2( handle, event, param1, param2 )
-#define FAST_LOG3( handle, event, param1, param2, param3 )
-#define FAST_LOGN( handle, event, num_params... )
-#endif
-
 
 
 #define IDE_STD_TIMEOUT 10
@@ -58,7 +39,6 @@
 #define IDE_CHANNEL_ID_ITEM "ide/channel_id"
 
 extern device_manager_info *pnp;
-extern fast_log_info *fast_log;
 
 
 typedef struct ide_bus_info ide_bus_info;
@@ -215,7 +195,6 @@ struct ide_bus_info {
 	uint8 can_DMA;
 	uint8 can_CQ;
 
-	fast_log_handle log;
 	char name[32];
 };
 
