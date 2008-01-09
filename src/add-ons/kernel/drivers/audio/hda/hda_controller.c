@@ -219,7 +219,7 @@ hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc)
 	OREG32(afg->codec->ctrlr,s->off,BDPL) = s->bdl_pa;
 	OREG32(afg->codec->ctrlr,s->off,BDPU) = 0;
 	OREG16(afg->codec->ctrlr,s->off,LVI) = s->num_buffers -1;
-	OREG32(afg->codec->ctrlr,s->off,CBL) = s->num_channels * s->num_buffers;
+	OREG32(afg->codec->ctrlr,s->off,CBL) = s->sample_size * s->num_channels * s->num_buffers * s->buffer_length;	/* total cyclic buffer size in _bytes_ */
 	OREG8(afg->codec->ctrlr,s->off,CTL0) = CTL0_IOCE | CTL0_FEIE | CTL0_DEIE;
 	OREG8(afg->codec->ctrlr,s->off,CTL2) = s->id << 4;
 
@@ -227,7 +227,7 @@ hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc)
 	verb[1] = MAKE_VERB(afg->codec->addr, s->io_wid, VID_SET_CVTSTRCHN, s->id << 4);
 	rc = hda_send_verbs(afg->codec, verb, response, 2);
 
-	return rc;	
+	return rc;
 }
 
 //#pragma mark -
