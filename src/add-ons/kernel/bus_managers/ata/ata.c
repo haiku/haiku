@@ -1023,16 +1023,18 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 		goto error;
 	}
 
+	// XXX fix me
 	IDE_LOCK(bus);
-	bus->state = ata_state_idle;
+	bus->state = ata_state_busy;
 	IDE_UNLOCK(bus);
 
 	TRACE("ata_read_infoblock: success\n");
 	return B_OK;
 
 error:
+	// XXX fix me
 	IDE_LOCK(bus);
-	bus->state = ata_state_idle;
+	bus->state = ata_state_busy;
 	IDE_UNLOCK(bus);
 	return B_ERROR;
 }

@@ -191,6 +191,14 @@ scan_bus(ide_bus_info *bus)
 	if (bus->disconnected)
 		return;
 
+
+	// XXX fix me
+	IDE_LOCK(bus);
+	ASSERT(bus->state == ata_state_idle);
+	bus->state = ata_state_busy;
+	IDE_UNLOCK(bus);
+
+
 	for (i = 0; i < bus->max_devices; ++i) {
 		if (bus->devices[i])
 			destroy_device(bus->devices[i]);
@@ -219,6 +227,13 @@ scan_bus(ide_bus_info *bus)
 			destroy_device(device);
 		}
 	}
+
+	
+	// XXX fix me
+	IDE_LOCK(bus);
+	ASSERT(bus->state == ata_state_busy);
+	bus->state = ata_state_idle;
+	IDE_UNLOCK(bus);
 
 	TRACE("ATA: scan_bus: bus %p finished\n", bus);
 }
