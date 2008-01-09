@@ -20,16 +20,12 @@
 #include <TranslationUtils.h>	
 #include <Window.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-
 
 MenuBar::MenuBar()
 	: BMenuBar(BRect(40, 10, 10, 10), "menu", B_FOLLOW_TOP | B_FRAME_EVENTS,
 		B_ITEMS_IN_COLUMN, true)
 {
-	_BuildMenu();
-	UpdateMenu();
+	_BuildMenu();	
 	SetItemMargins(14.0, 2.0, 20.0, 0.0);
 }
 
@@ -81,38 +77,19 @@ MenuBar::_BuildMenu()
 
 
 void
-MenuBar::UpdateMenu()
+MenuBar::Update()
 {
 	menu_info info;
 	MenuSettings::GetInstance()->Get(info);
 
 	fAlwaysShowTriggersItem->SetMarked(info.triggers_always_shown);
 
-	key_map *keys; 
-	char* chars; 
-	get_key_map(&keys, &chars); 
-
-	bool altAsShortcut = (keys->left_command_key == 0x5d) 
-		&& (keys->right_command_key == 0x5f); 
-
-	free(chars); 
-	free(keys);
-
+	bool altAsShortcut = MenuSettings::GetInstance()->AltAsShortcut();
 	fAltAsShortcutItem->SetMarked(altAsShortcut); 
 	fControlAsShortcutItem->SetMarked(!altAsShortcut); 
-}
-
-
-void
-MenuBar::Update()
-{
-	UpdateMenu();
 
 	BFont font;
 	if (LockLooper()) {
-		menu_info info;
-		MenuSettings::GetInstance()->Get(info);
-
 		font.SetFamilyAndStyle(info.f_family, info.f_style);
 		font.SetSize(info.font_size);
 		SetFont(&font);

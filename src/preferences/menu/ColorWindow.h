@@ -27,12 +27,16 @@ class ColorWindow : public BWindow {
 		virtual void Quit();
 		virtual void MessageReceived(BMessage* message);
 
+	private:
+		void		_UpdateAndPost();
+
 	private:	
-		BColorControl*		fColorControl;
+		BColorControl*	fColorControl;
 		BButton*		fDefaultButton;
-		BButton*		fRevertButton;
-		menu_info		fRevertInfo;
-		menu_info		fInfo;
+		BButton*		fRevertButton;		
+		rgb_color		fCurrentColor;
+		rgb_color		fPreviousColor;
+		rgb_color		fDefaultColor;	
 		BMessenger		fOwner;
 };
 

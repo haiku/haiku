@@ -18,8 +18,7 @@ class MenuBar : public BMenuBar {
 		MenuBar();
 
 		virtual	void AttachedToWindow();
-
-		void UpdateMenu();
+				
 		void Update();
 		virtual void FrameResized(float width, float height);
 

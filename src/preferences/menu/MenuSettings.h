@@ -18,17 +18,28 @@ class MenuSettings {
 
 		void Get(menu_info &info) const;
 		void Set(menu_info &info);
+		
+		bool 		AltAsShortcut() const;
+		void 		SetAltAsShortcut(bool altAsShortcut);	
+		
+		rgb_color	BackgroundColor() const;		
+		rgb_color	PreviousBackgroundColor() const;
+		rgb_color	DefaultBackgroundColor() const;
+	
 
 		void Revert();
 		void ResetToDefaults();
 		bool IsDefaultable();
-
+		bool IsRevertable();
+				
 	private:
 		MenuSettings();
 		~MenuSettings();
 
 		menu_info fPreviousSettings;
-		menu_info fDefaultSettings;	
+		menu_info fDefaultSettings;
+		bool	  fPreviousAltAsShortcut;
+		bool	  fDefaultAltAsShortcut;
 };
 
 #endif	// MENU_SETTINGS_H

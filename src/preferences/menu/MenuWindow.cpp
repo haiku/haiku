@@ -20,7 +20,6 @@
 #include <Box.h>
 #include <Button.h>
 #include <MenuItem.h>
-#include <Roster.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -31,6 +30,8 @@ MenuWindow::MenuWindow(BRect rect)
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE)
 {
 	fColorWindow = NULL;
+	
+	fSettings = MenuSettings::GetInstance();
 
 	BView* topView = new BView(Bounds(), "menuView", B_FOLLOW_ALL_SIDES,
 		B_WILL_DRAW);
@@ -60,34 +61,29 @@ MenuWindow::MenuWindow(BRect rect)
 	topView->AddChild(fRevertButton);
 
 	topView->MakeFocus();
-	fMenuBar->Update();
+	
+	_UpdateAll();
 }
 
 
 void
 MenuWindow::MessageReceived(BMessage *msg)
 {
-	MenuSettings *settings = MenuSettings::GetInstance();
 	menu_info info;
 
 	switch (msg->what) {
 		case MENU_REVERT:
-			settings->Revert();
-
-			fRevertButton->SetEnabled(false);
-			fDefaultsButton->SetEnabled(settings->IsDefaultable());
-			fMenuBar->Update();
+			fSettings->Revert();
+			_UpdateAll();
 			break;
 
 		case MENU_DEFAULT:
-			settings->ResetToDefaults();
-
-			fDefaultsButton->SetEnabled(false);
-			fMenuBar->Update();
+			fSettings->ResetToDefaults();
+			_UpdateAll();
 			break;
 
 		case UPDATE_WINDOW:
-			fMenuBar->Update();
+			_UpdateAll();
 			break;
 
 		case MENU_FONT_FAMILY:
@@ -98,64 +94,39 @@ MenuWindow::MessageReceived(BMessage *msg)
 			const font_style *style;
 			msg->FindString("style", (const char **)&style);
 
-			settings->Get(info);
+			fSettings->Get(info);
 			strlcpy(info.f_family, (const char *)family, B_FONT_FAMILY_LENGTH);
 			strlcpy(info.f_style, (const char *)style, B_FONT_STYLE_LENGTH);
-			settings->Set(info);
+			fSettings->Set(info);
 
-			fRevertButton->SetEnabled(true);
-			fDefaultsButton->SetEnabled(settings->IsDefaultable());
-			fMenuBar->Update();
+			_UpdateAll();
 			break;
 		}
 
 		case MENU_FONT_SIZE:
-			settings->Get(info);
+			fSettings->Get(info);
 			msg->FindFloat("size", &info.font_size);
-			settings->Set(info);
+			fSettings->Set(info);
 
-			fRevertButton->SetEnabled(true);
-			fDefaultsButton->SetEnabled(settings->IsDefaultable());
-			fMenuBar->Update();
+			_UpdateAll();
 			break;
 
 		case ALLWAYS_TRIGGERS_MSG:
-			settings->Get(info);
+			fSettings->Get(info);
 			info.triggers_always_shown = !info.triggers_always_shown;
-			settings->Set(info);
+			fSettings->Set(info);
 
-			fRevertButton->SetEnabled(true);
-			fDefaultsButton->SetEnabled(settings->IsDefaultable());
-			fMenuBar->UpdateMenu();
-			fMenuBar->Update();
+			_UpdateAll();
 			break;
 
-		case CTL_MARKED_MSG:
-			// This might not be the same for all keyboards
-			set_modifier_key(B_LEFT_COMMAND_KEY, 0x5c);
-			set_modifier_key(B_RIGHT_COMMAND_KEY, 0x60);
-			set_modifier_key(B_LEFT_CONTROL_KEY, 0x5d);
-			set_modifier_key(B_RIGHT_OPTION_KEY, 0x5f);
-			be_roster->Broadcast(new BMessage(B_MODIFIERS_CHANGED));
-
-			fRevertButton->SetEnabled(true);
-			fDefaultsButton->SetEnabled(settings->IsDefaultable());
-			fMenuBar->Update();
+		case CTL_MARKED_MSG:			
+			fSettings->SetAltAsShortcut(false);
+			_UpdateAll();
 			break;
 
 		case ALT_MARKED_MSG:
-
-			// This might not be the same for all keyboards
-			set_modifier_key(B_LEFT_COMMAND_KEY, 0x5d);
-			set_modifier_key(B_RIGHT_COMMAND_KEY, 0x5f);
-			set_modifier_key(B_LEFT_CONTROL_KEY, 0x5c);
-			set_modifier_key(B_RIGHT_OPTION_KEY, 0x60);
-
-			be_roster->Broadcast(new BMessage(B_MODIFIERS_CHANGED));
-
-			fRevertButton->SetEnabled(true);
-			fDefaultsButton->SetEnabled(settings->IsDefaultable());
-			fMenuBar->Update();
+			fSettings->SetAltAsShortcut(true);			
+			_UpdateAll();
 			break;
 
 		case COLOR_SCHEME_OPEN_MSG:
@@ -170,16 +141,23 @@ MenuWindow::MessageReceived(BMessage *msg)
 			fColorWindow = NULL;
 			break;
 
-		case MENU_COLOR:
-			fRevertButton->SetEnabled(true);
-			fDefaultsButton->SetEnabled(settings->IsDefaultable());
-			fMenuBar->Update();
+		case MENU_COLOR:			
+			_UpdateAll();
 			break;
 
 		default:
 			BWindow::MessageReceived(msg);
 			break;
 	}
+}
+
+
+void
+MenuWindow::_UpdateAll()
+{
+	fRevertButton->SetEnabled(fSettings->IsRevertable());
+	fDefaultsButton->SetEnabled(fSettings->IsDefaultable());
+	fMenuBar->Update();
 }
 
 

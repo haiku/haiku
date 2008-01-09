@@ -10,7 +10,7 @@
 #ifndef MENU_WINDOW_H
 #define MENU_WINDOW_H
 
-
+#include "MenuSettings.h"
 #include <Menu.h>
 #include <Window.h>
 
@@ -20,16 +20,20 @@ class BButton;
 class MenuBar;
 class MenuWindow : public BWindow {
 	public:
-		MenuWindow(BRect frame);
+		MenuWindow(BRect frame);		
 		
 		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
-
+		
+	private:		
+		void _UpdateAll();
+		
 	private:	
 		ColorWindow*	fColorWindow;
 		MenuBar*		fMenuBar;
 		BButton*		fDefaultsButton;
 		BButton*		fRevertButton;
+		MenuSettings*	fSettings;
 };
 
 #endif	// MENU_WINDOW_H

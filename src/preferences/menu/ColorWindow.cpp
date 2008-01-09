@@ -9,6 +9,7 @@
 
 
 #include "ColorWindow.h"
+#include "MenuSettings.h"
 #include "msg.h"
 
 #include <Application.h>
@@ -22,9 +23,9 @@ ColorWindow::ColorWindow(BMessenger owner)
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fOwner(owner)
 {
-	// Set and collect the variables for revert
-	get_menu_info(&fInfo);
-	get_menu_info(&fRevertInfo);
+	fCurrentColor = MenuSettings::GetInstance()->BackgroundColor();
+	fPreviousColor = MenuSettings::GetInstance()->PreviousBackgroundColor();
+	fDefaultColor = MenuSettings::GetInstance()->DefaultBackgroundColor();
 
 	BView *topView = new BView(Bounds(), "topView", B_FOLLOW_ALL_SIDES, 0);
 	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -32,7 +33,7 @@ ColorWindow::ColorWindow(BMessenger owner)
 
 	fColorControl = new BColorControl(BPoint(10, 10), B_CELLS_32x8, 
 		9, "COLOR", new BMessage(MENU_COLOR), true);
-	fColorControl->SetValue(fInfo.background_color);
+	fColorControl->SetValue(fCurrentColor);
 	fColorControl->ResizeToPreferred();
 	topView->AddChild(fColorControl);
 
@@ -44,7 +45,7 @@ ColorWindow::ColorWindow(BMessenger owner)
 		new BMessage(MENU_COLOR_DEFAULT), B_FOLLOW_LEFT | B_FOLLOW_TOP, 
 		B_WILL_DRAW | B_NAVIGABLE);
 	fDefaultButton->ResizeToPreferred();
-	fDefaultButton->SetEnabled(false);
+	fDefaultButton->SetEnabled(fCurrentColor != fDefaultColor);
 	topView->AddChild(fDefaultButton);
 
 	rect.OffsetBy(fDefaultButton->Bounds().Width() + 10, 0);
@@ -52,7 +53,7 @@ ColorWindow::ColorWindow(BMessenger owner)
 		new BMessage(MENU_REVERT), B_FOLLOW_LEFT | B_FOLLOW_TOP, 
 		B_WILL_DRAW | B_NAVIGABLE);
 	fRevertButton->ResizeToPreferred();
-	fRevertButton->SetEnabled(false);
+	fRevertButton->SetEnabled(fCurrentColor != fPreviousColor);
 	topView->AddChild(fRevertButton);
 
 	ResizeTo(fColorControl->Bounds().Width() + 20, fRevertButton->Frame().bottom + 10);
@@ -68,45 +69,41 @@ ColorWindow::Quit()
 
 
 void
+ColorWindow::_UpdateAndPost()
+{
+	fDefaultButton->SetEnabled(fCurrentColor != fDefaultColor);
+	fRevertButton->SetEnabled(fCurrentColor != fPreviousColor);
+	
+	fCurrentColor = fColorControl->ValueAsColor();
+		
+	menu_info info;
+	get_menu_info(&info);
+	info.background_color = fCurrentColor;
+	set_menu_info(&info);
+	
+	be_app->PostMessage(MENU_COLOR);	
+}
+
+
+void
 ColorWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 		case MENU_REVERT:
-			fColorControl->SetValue(fRevertInfo.background_color);
-			fInfo.background_color = fColorControl->ValueAsColor();
-			set_menu_info(&fInfo);
-			be_app->PostMessage(UPDATE_WINDOW);
-			fRevertButton->SetEnabled(false);
+			fColorControl->SetValue(fPreviousColor);
+			_UpdateAndPost();
 			break;
 
-		case MENU_COLOR_DEFAULT:
-			// change to system color for system wide
-			// compatability
-			rgb_color color;
-			color.red = 216;
-			color.blue = 216;
-			color.green = 216;
-			color.alpha = 255;
-			fColorControl->SetValue(color);
-			fDefaultButton->SetEnabled(false);
-			get_menu_info(&fInfo);
-			fInfo.background_color = fColorControl->ValueAsColor();
-			set_menu_info(&fInfo);
-			be_app->PostMessage(MENU_COLOR);
+		case MENU_COLOR_DEFAULT:			
+			fColorControl->SetValue(fDefaultColor);
+			_UpdateAndPost();
 			break;
 
 		case MENU_COLOR:
-			get_menu_info(&fInfo);
-			fRevertInfo.background_color = fInfo.background_color;
-			fInfo.background_color = fColorControl->ValueAsColor();
-			set_menu_info(&fInfo);
-			be_app->PostMessage(MENU_COLOR);
-			fDefaultButton->SetEnabled(true);
-			fRevertButton->SetEnabled(true);
+			_UpdateAndPost();			
 			break;
 
 		default:
-			be_app->PostMessage(UPDATE_WINDOW);
 			BWindow::MessageReceived(msg);
 			break;
 	}
