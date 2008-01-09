@@ -64,18 +64,18 @@ const uint32 key_table[] = {
 	0x50,	// B
 	0x4e,	// C
 	0x3e,	// D
-	0x29, 	// E
-	0x3f, 	// F
-	0x40, 	// G
-	0x41, 	// H
-	0x2e, 	// I
+	0x29,	// E
+	0x3f,	// F
+	0x40,	// G
+	0x41,	// H
+	0x2e,	// I
 	0x42,	// J
-	0x43, 	// K
-	0x44, 	// L
+	0x43,	// K
+	0x44,	// L
 	0x52,	// M
-	0x51, 	// N
-	0x2f, 	// O
-	0x30, 	// P
+	0x51,	// N
+	0x2f,	// O
+	0x30,	// P
 	0x27,	// Q
 	0x2a,	// R
 	0x3d,	// S
@@ -85,12 +85,12 @@ const uint32 key_table[] = {
 	0x28,	// W
 	0x4d,	// X
 	0x2c,	// Y
-	0x4c, 	// Z
-	0x12, 	// 1
+	0x4c,	// Z
+	0x12,	// 1
 	0x13,	// 2
 	0x14,	// 3
 	0x15,	// 4
-	0x16, 	// 5
+	0x16,	// 5
 	0x17,	// 6
 	0x18,	// 7
 	0x19,	// 8
@@ -105,8 +105,8 @@ const uint32 key_table[] = {
 	0x1d,	// =
 	0x31,	// [
 	0x32,	// ]
-	0x00, 	// unmapped
-	0x33,	// \ 
+	0x00,	// unmapped
+	0x33,	// \
 	0x45,	// ;
 	0x46,	// '
 	0x11,	// `
@@ -128,7 +128,7 @@ const uint32 key_table[] = {
 	0x0d,	// F12
 	0x0e,	// PrintScreen
 	KEY_Scroll,	// Scroll Lock
-	KEY_Pause, 	// Pause (0x7f with Ctrl)
+	KEY_Pause,	// Pause (0x7f with Ctrl)
 	0x1f,	// Insert
 	0x20,	// Home
 	0x21,	// Page up
@@ -146,7 +146,7 @@ const uint32 key_table[] = {
 	0x3a,	// Pad +
 	0x5b,	// Pad Enter
 	0x58,	// Pad 1
-	0x59, 	// Pad 2
+	0x59,	// Pad 2
 	0x5a,	// Pad 3
 	0x48,	// Pad 4
 	0x49,	// Pad 5
@@ -156,7 +156,7 @@ const uint32 key_table[] = {
 	0x39,	// Pad 9
 	0x64,	// Pad 0
 	0x65,	// Pad .
-	0x69, 	// <
+	0x69,	// <
 	KEY_Menu,	// Menu
 	KEY_Power,	// Power
 	KEY_NumEqual,	// Pad =
@@ -172,30 +172,30 @@ const uint32 key_table[] = {
 	0x00,	// F22 unmapped
 	0x00,	// F23 unmapped
 	0x00,	// F24 unmapped
-	0x00, 	// Execute unmapped
-	0x00, 	// Help unmapped
-	0x00, 	// Menu unmapped
-	0x00, 	// Select unmapped
-	0x00, 	// Stop unmapped
-	0x00, 	// Again unmapped
-	0x00, 	// Undo unmapped
-	0x00, 	// Cut unmapped
-	0x00, 	// Copy unmapped
-	0x00, 	// Paste unmapped
-	0x00, 	// Find unmapped
-	0x00, 	// Mute unmapped
-	0x00, 	// Volume up unmapped
-	0x00, 	// Volume down unmapped
-	0x00, 	// CapsLock unmapped
-	0x00, 	// NumLock unmapped
-	0x00, 	// Scroll lock unmapped
-	0x70,   // Keypad . on Brazilian ABNT2
-	0x00, 	// = sign
-	0x6b,   // Ro (\\ key, japanese)
-	0x6e,   // Katakana/Hiragana, second key right to spacebar, japanese
-	0x6a,   // Yen (macron key, japanese)
-	0x6d,   // Henkan, first key right to spacebar, japanese
-	0x6c,   // Muhenkan, key left to spacebar, japanese
+	0x00,	// Execute unmapped
+	0x00,	// Help unmapped
+	0x00,	// Menu unmapped
+	0x00,	// Select unmapped
+	0x00,	// Stop unmapped
+	0x00,	// Again unmapped
+	0x00,	// Undo unmapped
+	0x00,	// Cut unmapped
+	0x00,	// Copy unmapped
+	0x00,	// Paste unmapped
+	0x00,	// Find unmapped
+	0x00,	// Mute unmapped
+	0x00,	// Volume up unmapped
+	0x00,	// Volume down unmapped
+	0x00,	// CapsLock unmapped
+	0x00,	// NumLock unmapped
+	0x00,	// Scroll lock unmapped
+	0x70,	// Keypad . on Brazilian ABNT2
+	0x00,	// = sign
+	0x6b,	// Ro (\\ key, japanese)
+	0x6e,	// Katakana/Hiragana, second key right to spacebar, japanese
+	0x6a,	// Yen (macron key, japanese)
+	0x6d,	// Henkan, first key right to spacebar, japanese
+	0x6c,	// Muhenkan, key left to spacebar, japanese
 	0x00,	// unmapped
 	0x00,	// unmapped
 	0x00,	// unmapped
@@ -291,17 +291,17 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	sem_id sem;
 	char area_name[32];
 	const char *base_name;
-	
+
 	assert (usb != NULL && dev != NULL);
 
-	if (isKeyboard) {	
+	if (isKeyboard) {
 		number = sKeyboardDeviceNumber++;
 		base_name = sKeyboardBaseName;
 	} else {
 		number = sMouseDeviceNumber++;
 		base_name = sMouseBaseName;
 	}
-	
+
 	device = malloc(sizeof(hid_device_info));
 	if (device == NULL)
 		return NULL;
@@ -487,23 +487,23 @@ set_leds(hid_device_info *device, uint8* data)
 	uint8 leds = 0;
 	int report_id = 0;
 	if (data[0] == 1)
-		leds |= (1 << 0); 
+		leds |= (1 << 0);
 	if (data[1] == 1)
-		leds |= (1 << 1); 
+		leds |= (1 << 1);
 	if (data[2] == 1)
 		leds |= (1 << 2);
-	
-	status = usb->send_request (device->dev, 
+
+	status = usb->send_request (device->dev,
 		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_CLASS,
 		USB_REQUEST_HID_SET_REPORT,
-		0x200 | report_id, device->ifno, actual, 
+		0x200 | report_id, device->ifno, actual,
 		&leds, actual, &actual);
-	DPRINTF_INFO ((MY_ID "set_leds: leds=0x%02x, status=%d, len=%d\n", 
+	DPRINTF_INFO ((MY_ID "set_leds: leds=0x%02x, status=%d, len=%d\n",
 		leds, (int) status, (int)actual));
 }
 
 
-static int 
+static int
 sign_extend(int value, int size)
 {
 	if (value & (1 << (size - 1)))
@@ -523,9 +523,9 @@ interpret_mouse_buffer(hid_device_info *device)
 	memset(&info, 0, sizeof(info));
 	for (i = 0; i < device->num_insns; i++) {
 		const report_insn *insn = &device->insns [i];
-		int32 value = 
-			(((report [insn->byte_idx + 1] << 8) | 
-			   report [insn->byte_idx]) >> insn->bit_pos) 
+		int32 value =
+			(((report [insn->byte_idx + 1] << 8) |
+				report [insn->byte_idx]) >> insn->bit_pos)
 			& ((1 << insn->num_bits) - 1);
 
 		if (insn->usage_page == USAGE_PAGE_BUTTON) {
@@ -574,7 +574,7 @@ interpret_mouse_buffer(hid_device_info *device)
 /*!
 	callback: got a report, issue next request
 */
-static void 
+static void
 usb_callback(void *cookie, status_t busStatus,
 	void *data, size_t actualLength)
 {
@@ -630,7 +630,7 @@ handle_interrupt_transfer(hid_device_info* device)
 		DPRINTF_INFO ((MY_ID "input report: %s\n", linbuf));
 #endif
 		device->timestamp = system_time();
-		
+
 		if (device->is_keyboard) {
 			interpret_kb_buffer(device);
 			memcpy(device->last_buffer, device->buffer, device->total_report_size);
@@ -690,7 +690,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 		protocol = intf->descr->interface_protocol;
 		DPRINTF_INFO ((MY_ID "interface %d: class %d, subclass %d, protocol %d\n",
 			ifno, class, subclass, protocol));
-		if (class == USB_HID_DEVICE_CLASS 
+		if (class == USB_HID_DEVICE_CLASS
 			&& subclass == USB_HID_INTERFACE_BOOT_SUBCLASS)
 			break;
 	}
@@ -704,12 +704,12 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	desc_len = sizeof (usb_hid_descriptor);
 	hid_desc = malloc (desc_len);
-	status = usb->send_request(dev, 
+	status = usb->send_request(dev,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
-		USB_HID_DESCRIPTOR_HID << 8, ifno, desc_len, 
+		USB_HID_DESCRIPTOR_HID << 8, ifno, desc_len,
 		hid_desc, desc_len, &desc_len);
-	DPRINTF_INFO ((MY_ID "get_hid_desc: status=%d, len=%d\n", 
+	DPRINTF_INFO ((MY_ID "get_hid_desc: status=%d, len=%d\n",
 		(int) status, (int)desc_len));
 	if (status != B_OK)
 		desc_len = 256;		/* XXX */
@@ -726,9 +726,9 @@ hid_device_added(const usb_device *dev, void **cookie)
 	status = usb->send_request(dev,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
-		USB_HID_DESCRIPTOR_REPORT << 8, ifno, desc_len, 
+		USB_HID_DESCRIPTOR_REPORT << 8, ifno, desc_len,
 		rep_desc, desc_len, &desc_len);
-	DPRINTF_INFO((MY_ID "get_hid_rep_desc: status=%d, len=%d\n", 
+	DPRINTF_INFO((MY_ID "get_hid_rep_desc: status=%d, len=%d\n",
 		(int) status, (int)desc_len));
 	if (status != B_OK) {
 		free(rep_desc);
@@ -744,9 +744,9 @@ hid_device_added(const usb_device *dev, void **cookie)
 	}
 
 	/* Generic Desktop : Keyboard or Mouse */
-	
+
 	if (memcmp(rep_desc, "\x05\x01\x09\x06", 4) != 0 &&
-	    memcmp(rep_desc, "\x05\x01\x09\x02", 4) != 0) {
+		memcmp(rep_desc, "\x05\x01\x09\x02", 4) != 0) {
 		DPRINTF_INFO((MY_ID "not a keyboard or a mouse %08lx\n", *(uint32*)rep_desc));
 		free(rep_desc);
 		return B_ERROR;
@@ -790,7 +790,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 		return B_NO_MEMORY;
 	}
 
-	parse_report_descriptor (items, num_items, device->insns, 
+	parse_report_descriptor (items, num_items, device->insns,
 		&device->num_insns, &device->total_report_size, &report_id);
 	free(items);
 
@@ -801,7 +801,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 		return B_NO_MEMORY;
 	}
 
-	DPRINTF_INFO ((MY_ID "%d items, %d insns, %d bytes\n", 
+	DPRINTF_INFO ((MY_ID "%d items, %d insns, %d bytes\n",
 		(int)num_items, (int)device->num_insns, (int)device->total_report_size));
 
 	/* count axes, hats and buttons */
@@ -847,7 +847,7 @@ hid_device_removed(void *cookie)
 	assert (cookie != NULL);
 
 	DPRINTF_INFO((MY_ID "device_removed(%s)\n", device->name));
-	
+
 	usb->cancel_queued_transfers (device->ept->handle);
 	remove_device_info(device);
 
@@ -864,7 +864,7 @@ hid_device_removed(void *cookie)
 }
 
 
-static status_t 
+static status_t
 hid_device_open(const char *name, uint32 flags,
 	driver_cookie **out_cookie)
 {
@@ -893,7 +893,7 @@ hid_device_open(const char *name, uint32 flags,
 }
 
 
-static status_t 
+static status_t
 hid_device_read(driver_cookie *cookie, off_t position,
 	void *buf,	size_t *num_bytes)
 {
@@ -901,7 +901,7 @@ hid_device_read(driver_cookie *cookie, off_t position,
 }
 
 
-static status_t 
+static status_t
 hid_device_write(driver_cookie *cookie, off_t position,
 	const void *buf, size_t *num_bytes)
 {
@@ -909,7 +909,7 @@ hid_device_write(driver_cookie *cookie, off_t position,
 }
 
 
-static status_t 
+static status_t
 hid_device_control(driver_cookie *cookie, uint32 op,
 		void *arg, size_t len)
 {
@@ -938,25 +938,25 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 						// call_back function
 					}
 
-		    		err = acquire_sem_etc(device->sem_cb, 1,
-		    			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
-		    			device->repeat_timer.current_delay);
-		    		if (err == B_TIMED_OUT) {
-		    			// this case is for handling key repeats, it means
-		    			// no interrupt transfer has happened
-		    			write_key(device, device->repeat_timer.key, true);
-		    			// the next timeout is reduced to the repeat_rate
-		    			device->repeat_timer.current_delay = device->repeat_rate;
-		    		} else if (err == B_OK) {
-		    			// this case is for when an actual interrupt transfer
-		    			// happened, it is the only possible reason to be here
+					err = acquire_sem_etc(device->sem_cb, 1,
+						B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
+						device->repeat_timer.current_delay);
+					if (err == B_TIMED_OUT) {
+						// this case is for handling key repeats, it means
+						// no interrupt transfer has happened
+						write_key(device, device->repeat_timer.key, true);
+						// the next timeout is reduced to the repeat_rate
+						device->repeat_timer.current_delay = device->repeat_rate;
+					} else if (err == B_OK) {
+						// this case is for when an actual interrupt transfer
+						// happened, it is the only possible reason to be here
 						device->transfer_scheduled = false;
 						err = handle_interrupt_transfer(device);
 						if (err != B_OK)
 							return err;
-		    		} else {
+					} else {
 						return err;
-		    		}
+					}
 				}
 
 				// process what is in the ring_buffer, it could be written
@@ -964,11 +964,11 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 				// we wrote the current repeat key
 				ring_buffer_user_read(device->rbuf, arg, sizeof(raw_key_info));
 				return B_OK;
-	    
+
 			case KB_SET_LEDS:
 				set_leds(device, (uint8 *)arg);
-				break; 
-		} 
+				break;
+		}
 	} else {
 		switch (op) {
 			case MS_READ:
@@ -979,11 +979,11 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 					// NOTE: this thread is now blocking until
 					// the semaphore will be released from the
 					// call_back function
-	
+
 					err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
-		    		if (err != B_OK)
+					if (err != B_OK)
 						return err;
-	
+
 					err = handle_interrupt_transfer(device);
 					if (err != B_OK)
 						return err;
@@ -992,9 +992,9 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 				ring_buffer_user_read(device->rbuf, arg, sizeof(mouse_movement));
 				return B_OK;
 
-	    	case MS_NUM_EVENTS:
-        		return (int32)(ring_buffer_readable(device->rbuf)
-        			/ sizeof(mouse_movement));
+			case MS_NUM_EVENTS:
+				return (int32)(ring_buffer_readable(device->rbuf)
+					/ sizeof(mouse_movement));
 
 			case MS_SET_CLICKSPEED:
 #ifdef __HAIKU__
@@ -1014,7 +1014,7 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 }
 
 
-static status_t 
+static status_t
 hid_device_close(driver_cookie *cookie)
 {
 	hid_device_info *device;
@@ -1044,7 +1044,7 @@ hid_device_close(driver_cookie *cookie)
 }
 
 
-static status_t 
+static status_t
 hid_device_free(driver_cookie *cookie)
 {
 	hid_device_info *device;
@@ -1070,7 +1070,7 @@ hid_device_free(driver_cookie *cookie)
 //	#pragma mark - driver API
 
 
-status_t 
+status_t
 init_hardware(void)
 {
 	DPRINTF_INFO((MY_ID "init_hardware() " __DATE__ " " __TIME__ "\n"));
@@ -1078,7 +1078,7 @@ init_hardware(void)
 }
 
 
-status_t 
+status_t
 init_driver(void)
 {
 	DPRINTF_INFO((MY_ID "init_driver() " __DATE__ " " __TIME__ "\n"));
@@ -1092,7 +1092,7 @@ init_driver(void)
 		return gDeviceListLock;
 	}
 
-	usb->register_driver(kDriverName, sSupportedDevices, 
+	usb->register_driver(kDriverName, sSupportedDevices,
 		SUPPORTED_DEVICES, NULL);
 	usb->install_notify(kDriverName, &sNotifyHooks);
 	DPRINTF_INFO((MY_ID "init_driver() OK\n"));
