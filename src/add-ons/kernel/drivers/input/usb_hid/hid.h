@@ -45,8 +45,7 @@
 struct driver_cookie;
 
 struct hid_repeat_timer {
-	struct timer timer;
-	struct hid_device_info *device;
+	bigtime_t current_delay;
 	uint32 key;
 };
 
@@ -68,7 +67,6 @@ typedef struct hid_device_info {
 	struct ring_buffer *rbuf;
 
 	bool active;
-	bool unplugged;
 	int open;
 	struct driver_cookie *open_fds;
 
@@ -76,6 +74,7 @@ typedef struct hid_device_info {
 	int usbd_status, bus_status, cmd_status;
 	int actual_length;
 	const usb_endpoint_info *ept;
+	bool transfer_scheduled;
 
 	report_insn	*insns;
 	size_t num_insns;

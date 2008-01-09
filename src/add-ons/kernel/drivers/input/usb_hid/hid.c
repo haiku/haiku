@@ -339,7 +339,7 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	device->open = 0;
 	device->open_fds = NULL;
 	device->active = true;
-	device->unplugged = false;
+	device->transfer_scheduled = false;
 	device->insns = NULL;
 	device->num_insns = 0;
 	device->flags = 0;
@@ -355,7 +355,6 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	// default values taken from the PS/2 driver
 	device->repeat_rate = 35000;
 	device->repeat_delay = 300000;
-	device->repeat_timer.device = device;
 
 	return device;
 }
@@ -365,7 +364,6 @@ void
 remove_device(hid_device_info *device)
 {
 	assert(device != NULL);
-	cancel_timer(&device->repeat_timer.timer);
 
 	if (device->rbuf != NULL) {
 		delete_ring_buffer(device->rbuf);
@@ -388,28 +386,6 @@ write_key(hid_device_info *device, uint32 key, bool down)
 	raw.timestamp = system_time();
 
 	ring_buffer_write(device->rbuf, (const uint8*)&raw, sizeof(raw_key_info));
-	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
-}
-
-
-static int32
-timer_repeat_hook(struct timer *timer)
-{
-	hid_device_info *device = ((struct hid_repeat_timer *)timer)->device;
-
-	write_key(device, device->repeat_timer.key, true);
-	return B_HANDLED_INTERRUPT;
-}
-
-
-static int32
-timer_delay_hook(struct timer *timer)
-{
-	hid_device_info *device = ((struct hid_repeat_timer *)timer)->device;
-
-	add_timer(&device->repeat_timer.timer, timer_repeat_hook, device->repeat_rate,
-		B_PERIODIC_TIMER);
-	return B_HANDLED_INTERRUPT;
 }
 
 
@@ -457,10 +433,8 @@ interpret_kb_buffer(hid_device_info *device)
 				write_key(device, key, true);
 
 				// repeat handling
-				cancel_timer(&device->repeat_timer.timer);
 				device->repeat_timer.key = key;
-				add_timer(&device->repeat_timer.timer, timer_delay_hook,
-					device->repeat_delay, B_ONE_SHOT_RELATIVE_TIMER);
+				device->repeat_timer.current_delay = device->repeat_delay;
 			}
 		} else
 			break;
@@ -492,8 +466,10 @@ interpret_kb_buffer(hid_device_info *device)
 				}
 
 				write_key(device, key, false);
+
+				// cancel the repeats if they are for this key
 				if (device->repeat_timer.key == key)
-					cancel_timer(&device->repeat_timer.timer);
+					device->repeat_timer.current_delay = B_INFINITE_TIMEOUT;
 			}
 		} else
 			break;
@@ -590,8 +566,9 @@ interpret_mouse_buffer(hid_device_info *device)
 
 	info.timestamp = device->timestamp;
 	ring_buffer_write(device->rbuf, (const uint8*)&info, sizeof(info));
-	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
+
+// #pragma mark - interrupt transfers
 
 
 /*!
@@ -602,21 +579,39 @@ usb_callback(void *cookie, status_t busStatus,
 	void *data, size_t actualLength)
 {
 	hid_device_info *device = cookie;
-	status_t status;
 
-	if (device == NULL || device->unplugged)
-		return;
-
-	acquire_sem(device->sem_lock);
 	device->actual_length = actualLength;
 	device->bus_status = busStatus;	/* B_USB_STATUS_* */
-	if (busStatus != B_OK) {
+
+	// release the notification semaphore so the input_server
+	// thread which is blocking in hid_device_control can continue
+	// to run (see you in handle_interrupt_transfer())
+	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
+}
+
+static status_t
+schedule_interrupt_transfer(hid_device_info* device)
+{
+	status_t status = usb->queue_interrupt(device->ept->handle, device->buffer,
+		device->total_report_size, usb_callback, device);
+	if (status != B_OK) {
+		/* XXX probably endpoint stall */
+		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)status));
+	}
+	return status;
+}
+
+static status_t
+handle_interrupt_transfer(hid_device_info* device)
+{
+	status_t status = device->bus_status;
+
+	if (status != B_OK) {
 		/* request failed */
-		release_sem(device->sem_lock);
-		DPRINTF_ERR((MY_ID "bus status %d\n", (int)busStatus));
-		if (busStatus == B_CANCELED) {
+		DPRINTF_ERR((MY_ID "bus status %d\n", (int)device->bus_status));
+		if (status == B_CANCELED) {
 			/* cancelled: device is unplugged */
-			return;
+			return status;
 		}
 #if 1
 		status = usb->clear_feature(device->ept->handle, USB_FEATURE_ENDPOINT_HALT);
@@ -641,18 +636,9 @@ usb_callback(void *cookie, status_t busStatus,
 			memcpy(device->last_buffer, device->buffer, device->total_report_size);
 		} else
 			interpret_mouse_buffer(device);
-		
-		release_sem(device->sem_lock);
 	}
 
-	/* issue next request */
-
-	status = usb->queue_interrupt(device->ept->handle, device->buffer,
-		device->total_report_size, usb_callback, device);
-	if (status != B_OK) {
-		/* XXX probably endpoint stall */
-		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)status));
-	}
+	return status;
 }
 
 
@@ -841,15 +827,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 
 	DPRINTF_INFO ((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)device->buffer)), *(((uint32*)device->buffer)+1), *(((uint32*)device->buffer)+2)));
 
-	/* issue interrupt transfer */
-
 	device->ept = &intf->endpoint[0];		/* interrupt IN */
-	status = usb->queue_interrupt(device->ept->handle, device->buffer,
-		device->total_report_size, usb_callback, device);
-	if (status != B_OK) {
-		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)status));
-		return B_ERROR;
-	}
 
 	/* create a port */
 
@@ -870,7 +848,6 @@ hid_device_removed(void *cookie)
 
 	DPRINTF_INFO((MY_ID "device_removed(%s)\n", device->name));
 	
-	device->unplugged = true;
 	usb->cancel_queued_transfers (device->ept->handle);
 	remove_device_info(device);
 
@@ -950,14 +927,43 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 	if (device->is_keyboard)
 		switch (op) {
 			case KB_READ:
-	    		err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
-	    		if (err != B_OK)
-					return err;
-				acquire_sem(device->sem_lock);
+				while (ring_buffer_readable(device->rbuf) == 0) {
+					if (!device->transfer_scheduled) {
+						err = schedule_interrupt_transfer(device);
+						if (err != B_OK)
+							return err;
+						device->transfer_scheduled = true;
+						// NOTE: this thread is now blocking until
+						// the semaphore will be released from the
+						// call_back function
+					}
+
+		    		err = acquire_sem_etc(device->sem_cb, 1,
+		    			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT,
+		    			device->repeat_timer.current_delay);
+		    		if (err == B_TIMED_OUT) {
+		    			// this case is for handling key repeats, it means
+		    			// no interrupt transfer has happened
+		    			write_key(device, device->repeat_timer.key, true);
+		    			// the next timeout is reduced to the repeat_rate
+		    			device->repeat_timer.current_delay = device->repeat_rate;
+		    		} else if (err == B_OK) {
+		    			// this case is for when an actual interrupt transfer
+		    			// happened, it is the only possible reason to be here
+						device->transfer_scheduled = false;
+						err = handle_interrupt_transfer(device);
+						if (err != B_OK)
+							return err;
+		    		} else {
+						return err;
+		    		}
+				}
+
+				// process what is in the ring_buffer, it could be written
+				// there because we handled an interrupt transfer or because
+				// we wrote the current repeat key
 				ring_buffer_user_read(device->rbuf, arg, sizeof(raw_key_info));
-				release_sem(device->sem_lock);
-				return err;
-				break;
+				return B_OK;
 	    
 			case KB_SET_LEDS:
 				set_leds(device, (uint8 *)arg);
@@ -966,9 +972,21 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 	else
 		switch (op) {
 			case MS_READ:
+				err = schedule_interrupt_transfer(device);
+				if (err != B_OK)
+					return err;
+				// NOTE: this thread is now blocking until
+				// the semaphore will be released from the
+				// call_back function
+
 				err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
 	    		if (err != B_OK)
 					return err;
+
+				err = handle_interrupt_transfer(device);
+				if (err != B_OK)
+					return err;
+
 				acquire_sem(device->sem_lock);
 				ring_buffer_user_read(device->rbuf, arg, sizeof(mouse_movement));
 				release_sem(device->sem_lock);
