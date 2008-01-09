@@ -245,6 +245,8 @@ FtpClient::PutFile(const string& local, const string& remote, ftp_mode mode)
 	if (rc) {
 		_GetReply(replyString, code, codeType);
 		rc = codeType <= 2;
+		// at least BeOS' ftpd forces 640 which RobinHood doesn't like...
+		Chmod(remote, "644");
 	}
 	
 	return rc;
@@ -351,6 +353,31 @@ FtpClient::MoveFile(const string& oldPath, const string& newPath)
 					}
 				}
 			}
+		}
+	}
+	return rc;
+}
+
+
+bool
+FtpClient::Chmod(const string& path, const string& mod)
+{
+	bool rc = false;
+	int code, codeType;
+	string cmd = "SITE CHMOD ", replyString;
+
+	cmd += mod;
+	cmd += " ";
+	cmd += path;
+	
+	if (path.length() == 0)
+		cmd += '/';
+printf("cmd: '%s'\n", cmd.c_str());
+	if (_SendRequest(cmd) == true) {
+		if (_GetReply(replyString, code, codeType) == true) {
+printf("reply: %d, %d\n", code, codeType);
+			if (codeType == 2)
+				rc = true;
 		}
 	}
 	return rc;

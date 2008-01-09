@@ -45,6 +45,7 @@ class FtpClient {
 		bool ChangeDir(const string& dir);
 		bool PrintWorkingDir(string& dir);
 		bool ListDirContents(string& listing);
+		bool Chmod(const string& path, const string& mod);
 
 		void SetPassive(bool on);
 	
