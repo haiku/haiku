@@ -500,15 +500,23 @@ vm_cache_resize(vm_cache *cache, off_t newSize)
 
 			if (page->cache_offset >= newPageCount) {
 				if (page->state == PAGE_STATE_BUSY) {
-					// wait for page to become unbusy
-					ConditionVariableEntry<vm_page> entry;
-					entry.Add(page);
-					mutex_unlock(&cache->lock);
-					entry.Wait();
-					mutex_lock(&cache->lock);
+					if (page->busy_writing) {
+						// We cannot wait for the page to become available
+						// as we might cause a deadlock this way
+						page->busy_writing = false;
+							// this will notify the writer to free the page
+						page = next;
+					} else {
+						// wait for page to become unbusy
+						ConditionVariableEntry<vm_page> entry;
+						entry.Add(page);
+						mutex_unlock(&cache->lock);
+						entry.Wait();
+						mutex_lock(&cache->lock);
 
-					// restart from the start of the list
-					page = cache->page_list;
+						// restart from the start of the list
+						page = cache->page_list;
+					}
 					continue;
 				}
 

@@ -100,6 +100,7 @@ struct vm_page {
 
 	uint8				is_cleared : 1;
 		// is currently only used in vm_page_allocate_page_run()
+	uint8				busy_writing : 1;
 
 	uint16				wired_count;
 	int8				usage_count;

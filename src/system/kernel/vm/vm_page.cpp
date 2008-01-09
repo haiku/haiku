@@ -835,6 +835,9 @@ write_page(vm_page *page, bool fsReenter)
 			page, page->cache_offset, status);
 	}
 #endif
+	if (status == B_OK && length == 0)
+		status = B_ERROR;
+
 	return status;
 }
 
@@ -960,6 +963,7 @@ page_writer(void* /*unused*/)
 			InterruptsSpinLocker locker(sPageLock);
 			remove_page_from_queue(&sModifiedPageQueue, page);
 			page->state = PAGE_STATE_BUSY;
+			page->busy_writing = true;
 
 			busyConditions[numPages].Publish(page, "page");
 
@@ -992,12 +996,21 @@ page_writer(void* /*unused*/)
 				// put it into the active queue
 				InterruptsSpinLocker locker(sPageLock);
 				move_page_to_active_or_inactive_queue(pages[i], true);
+				pages[i]->busy_writing = false;
 			} else {
 				// We don't have to put the PAGE_MODIFIED bit back, as it's
 				// still in the modified pages list.
-				InterruptsSpinLocker locker(sPageLock);
-				pages[i]->state = PAGE_STATE_MODIFIED;
-				enqueue_page(&sModifiedPageQueue, pages[i]);
+				{
+					InterruptsSpinLocker locker(sPageLock);
+					pages[i]->state = PAGE_STATE_MODIFIED;
+					enqueue_page(&sModifiedPageQueue, pages[i]);
+				}
+				if (!pages[i]->busy_writing) {
+					// someone has cleared the busy_writing flag which tells
+					// us our page has gone invalid
+					vm_cache_remove_page(cache, pages[i]);
+				} else
+					pages[i]->busy_writing = false;
 			}
 
 			busyConditions[i].Unpublish();
@@ -1246,6 +1259,7 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 		}
 
 		page->state = PAGE_STATE_BUSY;
+		page->busy_writing = true;
 
 		ConditionVariable<vm_page> busyCondition;
 		busyCondition.Publish(page, "page");
@@ -1272,14 +1286,25 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 		if (status == B_OK) {
 			// put it into the active/inactive queue
 			move_page_to_active_or_inactive_queue(page, dequeuedPage);
+			page->busy_writing = false;
 		} else {
 			// We don't have to put the PAGE_MODIFIED bit back, as it's still
 			// in the modified pages list.
 			if (dequeuedPage) {
 				page->state = PAGE_STATE_MODIFIED;
 				enqueue_page(&sModifiedPageQueue, page);
-			} else
-				set_page_state_nolock(page, PAGE_STATE_MODIFIED);
+			}
+
+			if (!page->busy_writing) {
+				// someone has cleared the busy_writing flag which tells
+				// us our page has gone invalid
+				vm_cache_remove_page(cache, page);
+			} else {
+				if (!dequeuedPage)
+					set_page_state_nolock(page, PAGE_STATE_MODIFIED);
+
+				page->busy_writing = false;
+			}
 		}
 
 		busyCondition.Unpublish();
@@ -1345,6 +1370,7 @@ vm_page_init(kernel_args *args)
 		new(&sPages[i].mappings) vm_page_mappings();
 		sPages[i].wired_count = 0;
 		sPages[i].usage_count = 0;
+		sPages[i].busy_writing = false;
 		sPages[i].cache = NULL;
 		#ifdef DEBUG_PAGE_QUEUE
 			sPages[i].queue = NULL;
