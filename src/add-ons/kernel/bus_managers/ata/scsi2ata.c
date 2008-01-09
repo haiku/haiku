@@ -18,6 +18,8 @@
 
 #include <string.h>
 
+#define TRACE	dprintf
+#define FLOW	dprintf
 
 /** emulate MODE SENSE 10 command */
 
@@ -202,36 +204,38 @@ err:
 
 
 /*! Emulate TEST UNIT READY */
-static bool
+static status_t
 ata_test_unit_ready(ide_device_info *device, ata_request *request)
 {
-#if 0
-	SHOW_FLOW0(3, "");
+	TRACE("ata_test_unit_ready\n");
 
 	if (!device->infoblock.RMSN_supported
 		|| device->infoblock._127_RMSN_support != 1)
-		return true;
+		return B_OK;
 
 	// ask device about status		
 	device->tf_param_mask = 0;
 	device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
-	if (!send_command(device, request, true, 15, ide_state_sync_waiting))
-		return false;
+	if (ata_send_command(device, request, true, 15, ide_state_pio) != B_OK)
+		return B_ERROR;
+
+	if (ata_pio_wait_drdy(device) != B_OK)
+		return B_ERROR;
+
 
 	// bits ide_error_mcr | ide_error_mc | ide_error_wp are also valid
 	// but not requested by TUR; ide_error_wp can safely be ignored, but
-	// we don't want to loose media change (ccb) reports
+	// we don't want to loose media change (request) reports
 	if (!check_output(device, true,
 			ide_error_nm | ide_error_abrt | ide_error_mcr | ide_error_mc,
 			false)) {
-		// SCSI spec is unclear here: we shouldn't report "media change (ccb)"
+		// SCSI spec is unclear here: we shouldn't report "media change (request)"
 		// but what to do if there is one? anyway - we report them
 		;
 	}
 
-#endif
-	return true;
+	return B_OK;
 }
 
 
@@ -389,10 +393,11 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;
 	
-	SHOW_FLOW(3, "command=%x", ccb->cdb[0]);
+	FLOW("ata_exec_io: scsi command 0x%02x\n", ccb->cdb[0]);
 		
 	// ATA devices have one LUN only
 	if (ccb->target_lun != 0) {
+		FLOW("ata_exec_io: wrong target lun\n");
 		ccb->subsys_status = SCSI_SEL_TIMEOUT;
 		finish_request(request, false);
 		return;
@@ -498,9 +503,9 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 				| (uint32)cmd->low_lba;
 			length = cmd->length != 0 ? cmd->length : 256;
 
-			SHOW_FLOW(3, "READ6/WRITE6 pos=%lx, length=%lx", pos, length);
+			FLOW("READ6/WRITE6 pos=%lx, length=%lx\n", pos, length);
 
-			ata_send_rw(device, request, pos, length, cmd->opcode == SCSI_OP_WRITE_6);
+			ata_exec_read_write(device, request, pos, length, cmd->opcode == SCSI_OP_WRITE_6);
 			return;
 		}
 
@@ -514,8 +519,10 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 			pos = B_BENDIAN_TO_HOST_INT32(cmd->lba);
 			length = B_BENDIAN_TO_HOST_INT16(cmd->length);
 
+			FLOW("READ10/WRITE10 pos=%lx, length=%lx\n", pos, length);
+
 			if (length != 0) {
-				ata_send_rw(device, request, pos, length, cmd->opcode == SCSI_OP_WRITE_10);
+				ata_exec_read_write(device, request, pos, length, cmd->opcode == SCSI_OP_WRITE_10);
 			} else {
 				// we cannot transfer zero blocks (apart from LBA48)
 				finish_request(request, false);
@@ -524,6 +531,7 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 		}
 
 		default:
+			FLOW("command not implemented\n");
 			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 	}
 

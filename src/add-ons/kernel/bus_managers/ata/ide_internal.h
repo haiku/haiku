@@ -62,14 +62,25 @@ typedef struct ide_bus_timer_info {
 // ide request 
 typedef struct ata_request {
 
-	struct ide_device_info *device;
-
-	scsi_ccb *ccb;				// basic request
-	uint8 is_write : 1;			// true for write request
-	uint8 uses_dma : 1;			// true if using dma
-	uint8 packet_irq : 1;		// true if waiting for command packet irq
+	struct ide_device_info *	device;
+	scsi_ccb *					ccb;				// basic scsi request
+	uint8 						is_write : 1;		// true for write request
+	uint8 						uses_dma : 1;		// true if using dma
+	uint8 						packet_irq : 1;		// true if waiting for command packet irq
 } ata_request;
 
+
+//void init_ata_request(ata_request *request, struct ide_device_info *device, scsi_ccb *ccb);
+
+static inline void
+init_ata_request(ata_request *request, struct ide_device_info *device, scsi_ccb *ccb)
+{
+	request->device = device;
+	request->ccb = ccb;
+	request->is_write = 0;
+	request->uses_dma = 0;
+	request->packet_irq = 0;
+}
 
 
 typedef struct ide_device_info {
@@ -118,6 +129,7 @@ typedef struct ide_device_info {
 	uint8 device_type;				// atapi device type
 
 	// pio from here on
+	bigtime_t pio_timeout;
 	int left_sg_elem;				// remaining sg elements
 	const physical_entry *cur_sg_elem;	// active sg element
 	int cur_sg_ofs;					// offset in active sg element
@@ -160,8 +172,8 @@ struct ide_bus_info {
 
 	ata_bus_state			state;		// current state of bus
 
-	struct ata_request *	qreqActive;
-	struct ata_request *	qreqFree;
+	struct ata_request *	requestActive;
+	struct ata_request *	requestFree;
 
 
 	benaphore status_report_ben; // to lock when you report XPT about bus state
@@ -218,12 +230,12 @@ status_t ata_wait_for_drdy(ide_bus_info *bus);
 status_t ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *_devicePresent1, uint32 *_sigDev1);
 status_t ata_reset_device(ide_device_info *device, bool *_devicePresent);
 status_t ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy, uint32 timeout, ata_bus_state new_state);
+status_t ata_finish_command(ide_device_info *device);
 
 bool check_rw_error(ide_device_info *device, ata_request *request);
 bool check_output(ide_device_info *device, bool drdy_required, int error_mask, bool is_write);
 
-void ata_send_rw(ide_device_info *device, ata_request *request,
-	uint64 pos, size_t length, bool write);
+void ata_exec_read_write(ide_device_info *device, ata_request *request,	uint64 pos, size_t length, bool write);
 
 void ata_dpc_DMA(ata_request *request);
 void ata_dpc_PIO(ata_request *request);

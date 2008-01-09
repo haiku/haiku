@@ -125,6 +125,17 @@ ata_wait_for_drdy(ide_bus_info *bus)
 }
 
 
+// busy wait for device beeing ready,
+// using the timeout set by the previous ata_send_command
+status_t
+ata_pio_wait_drdy(ide_device_info *device)
+{
+	ASSERT(bus->state == ata_state_pio);
+	return ata_wait(bus, ide_status_drdy, ide_status_bsy, false, device->bus->pio_timeout);
+}
+
+
+
 status_t
 ata_send_command(ide_device_info *device, ata_request *request,
 	bool need_drdy, uint32 timeout, ata_bus_state new_state)
@@ -189,6 +200,7 @@ ata_send_command(ide_device_info *device, ata_request *request,
 	ASSERT(bus->state == ata_state_busy);
 
 	bus->state = new_state;
+	bus->pio_timeout = timeout * 1000;
 
 	IDE_UNLOCK(bus);
 
@@ -203,6 +215,11 @@ err:
 	device->subsys_status = SCSI_HBA_ERR;
 	IDE_UNLOCK(bus);
 	return B_ERROR;
+}
+
+status_t
+ata_finish_command(ide_device_info *device)
+{
 }
 
 
@@ -275,7 +292,7 @@ ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *
 			dprintf("ATA: reset_bus: timeout\n");
 			goto error;
 		}
-
+timeout
 		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
 			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high | ide_mask_error) != B_OK)
 			goto error;
@@ -594,7 +611,7 @@ err:
  */
 
 void
-ata_send_rw(ide_device_info *device, ata_request *request,
+ata_exec_read_write(ide_device_info *device, ata_request *request,
 	uint64 pos, size_t length, bool write)
 {
 	ide_bus_info *bus = device->bus;

@@ -46,8 +46,6 @@ static void
 sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 {
 	ide_device_info *device;
-	ata_request *request;
-	//ide_request_priv *priv;
 
 	FLOW("sim_scsi_iobus %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
 
@@ -76,7 +74,7 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 		goto err_bus_busy;
 
 	// bail out if device can't accept further requests
-	if (bus->qreqFree == NULL)
+	if (bus->requestFree == NULL)
 		goto err_device_busy;
 
 	bus->state = ata_state_busy;
@@ -85,17 +83,15 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 	RELEASE_BEN(&bus->status_report_ben);
 
 	// as we own the bus, noone can bother us
-	request = bus->qreqFree;
-	bus->qreqFree = NULL;
-	bus->qreqActive = request;
+	ASSERT(bus->requestActive == NULL);
+	bus->requestActive = bus->requestFree;
+	bus->requestFree = NULL;
 	
-	request->device = device;
-	request->ccb = ccb;
-	request->uses_dma = false;
+	init_ata_request(bus->requestActive, device, ccb);
 
 	FLOW("calling exec_io: %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
 
-	device->exec_io(device, request);
+	device->exec_io(device, bus->requestActive);
 
 	return;
 
@@ -187,13 +183,11 @@ scan_bus(ide_bus_info *bus)
 	if (bus->disconnected)
 		return;
 
-
 	// XXX fix me
 	IDE_LOCK(bus);
 	ASSERT(bus->state == ata_state_idle);
 	bus->state = ata_state_busy;
 	IDE_UNLOCK(bus);
-
 
 	for (i = 0; i < bus->max_devices; ++i) {
 		if (bus->devices[i])
@@ -224,7 +218,6 @@ scan_bus(ide_bus_info *bus)
 		}
 	}
 
-	
 	// XXX fix me
 	IDE_LOCK(bus);
 	ASSERT(bus->state == ata_state_busy);
@@ -346,8 +339,8 @@ finish_request(ata_request *request, bool resubmit)
 	ccb = request->ccb;
 
 
-	bus->qreqFree = bus->qreqActive;
-	bus->qreqActive = NULL;
+	bus->requestFree = bus->requestActive;
+	bus->requestActive = NULL;
 
 	// release bus, handling service requests;
 	// TBD:
@@ -446,8 +439,8 @@ finish_norelease(ata_request *request, bool resubmit)
 	ide_device_info *device = request->device;
 	ide_bus_info *bus = device->bus;
 
-	bus->qreqFree = bus->qreqActive;
-	bus->qreqActive = 0;
+	bus->requestFree = bus->requestActive;
+	bus->requestActive = 0;
 
 	ACQUIRE_BEN(&bus->status_report_ben);
 
@@ -549,10 +542,10 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	bus->first_device = NULL;
 
 
-	bus->qreqActive = NULL;
-	bus->qreqFree = (ata_request *)malloc(sizeof(ata_request));
+	bus->requestActive = NULL;
+	bus->requestFree = (ata_request *)malloc(sizeof(ata_request));
 
-	memset(bus->qreqFree, 0, sizeof(ata_request));
+	memset(bus->requestFree, 0, sizeof(ata_request));
 
 	// read restrictions of controller
 
@@ -612,9 +605,9 @@ ide_sim_uninit_bus(ide_bus_info *bus)
 	DELETE_BEN(&bus->status_report_ben);	
 	scsi->free_dpc(bus->irq_dpc);
 
-	if (bus->qreqActive)
+	if (bus->requestActive)
 		dprintf("ide_sim_uninit_bus: Warning request still active\n");
-	free(bus->qreqFree);
+	free(bus->requestFree);
 
 	free(bus);
 
