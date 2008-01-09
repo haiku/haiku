@@ -706,6 +706,10 @@ VideoConsumer::FtpSave(char* filename)
 
 			if (ftp->PutFile((string)filename, (string)"temp")) {
 				// send the file to the server
+
+				ftp->Chmod((string)filename, (string)"644");
+				// make it world readable
+
 				UpdateFtpStatus("Renaming ...");
 
 				if (ftp->MoveFile((string)"temp", (string)filename)) {

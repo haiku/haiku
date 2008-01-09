@@ -245,8 +245,6 @@ FtpClient::PutFile(const string& local, const string& remote, ftp_mode mode)
 	if (rc) {
 		_GetReply(replyString, code, codeType);
 		rc = codeType <= 2;
-		// at least BeOS' ftpd forces 640 which RobinHood doesn't like...
-		Chmod(remote, "644");
 	}
 	
 	return rc;
