@@ -340,14 +340,27 @@ ViewLayer::ViewAt(const BPoint& where, BRegion* windowContentClipping)
 	if (!fVisible)
 		return NULL;
 
-	if (ScreenClipping(windowContentClipping).Contains(where))
-		return this;
+	// NOTE: if this view can draw on children, it's screen clipping
+	// excludes these children, so we need to ask those first if they
+	// contain "where", otherwise we check the screen clipping before
+	// recursing into the children
+
+	if (!(fFlags & B_DRAW_ON_CHILDREN)) {
+		if (ScreenClipping(windowContentClipping).Contains(where))
+			return this;
+	}
 
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 		ViewLayer* layer = child->ViewAt(where, windowContentClipping);
 		if (layer)
 			return layer;
 	}
+
+	if (fFlags & B_DRAW_ON_CHILDREN) {
+		if (ScreenClipping(windowContentClipping).Contains(where))
+			return this;
+	}
+
 	return NULL;
 }
 
