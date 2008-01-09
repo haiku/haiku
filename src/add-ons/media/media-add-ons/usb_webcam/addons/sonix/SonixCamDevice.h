@@ -68,8 +68,8 @@ class SonixCamDevice : public CamDevice
 	virtual bool		ValidateStartOfFrameTag(const uint8 *tag, size_t taglen);
 	virtual bool		ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t datalen);
 
-	virtual status_t	GetFrameBitmap(BBitmap **bm);
-	virtual status_t	FillFrameBuffer(BBuffer *buffer);
+	virtual status_t	GetFrameBitmap(BBitmap **bm, bigtime_t *stamp=NULL);
+	virtual status_t	FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp=NULL);
 	
 
 	void				DumpRegs();

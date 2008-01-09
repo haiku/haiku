@@ -744,10 +744,12 @@ VideoProducer::FrameGenerator()
 		/* For a buffer originating from a device, you might want to calculate
 		 * this based on the PerformanceTimeFor the time your buffer arrived at
 		 * the hardware (plus any applicable adjustments). */
+		/*
 		h->start_time = fPerformanceTimeBase +
 						(bigtime_t)
 							((fFrame - fFrameBase) *
 							(1000000 / fConnectedFormat.field_rate));
+		*/
 		h->file_pos = 0;
 		h->orig_size = 0;
 		h->data_offset = 0;
@@ -771,19 +773,24 @@ VideoProducer::FrameGenerator()
 		//NO! must be called without lock!
 		//BAutolock lock(fCamDevice->Locker());
 		
+		bigtime_t stamp;
 //#ifdef UseFillFrameBuffer
-		err = fCamDevice->FillFrameBuffer(buffer);
+		err = fCamDevice->FillFrameBuffer(buffer, &stamp);
 		if (err < B_OK) {
 			;//XXX handle error
 		}
 //#endif
 #ifdef UseGetFrameBitmap
 		BBitmap *bm;
-		err = fCamDevice->GetFrameBitmap(&bm);
+		err = fCamDevice->GetFrameBitmap(&bm, &stamp);
 		if (err >= B_OK) {
 			;//XXX handle error
 		}
 #endif
+		//PRINTF(1, ("FrameGenerator: stamp %Ld vs %Ld\n", stamp, h->start_time));
+		//XXX: that's what we should be doing, but CodyCam drops all frames as they are late. (maybe add latency ??)
+		//h->start_time = TimeSource()->PerformanceTimeFor(stamp);
+		h->start_time = TimeSource()->PerformanceTimeFor(system_time());
 
 		PRINTF(1, ("FrameGenerator: SendBuffer...\n"));
 		/* Send the buffer on down to the consumer */

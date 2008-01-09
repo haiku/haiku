@@ -108,7 +108,7 @@ CamDeframer::GetFrame(CamFrame **frame, bigtime_t *stamp)
 	if (!f)
 		return ENOENT;
 	*frame = f;
-	*stamp = 0LL;
+	*stamp = f->Stamp();
 	return B_OK;
 }
 

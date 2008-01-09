@@ -415,18 +415,17 @@ SonixCamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t da
 
 // -----------------------------------------------------------------------------
 status_t
-SonixCamDevice::GetFrameBitmap(BBitmap **bm)
+SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp=NULL)
 {
 	BBitmap *b;
 	CamFrame *f;
-	bigtime_t stamp;
 	status_t err;
 	PRINT((CH "()" CT));
 	err = fDeframer->WaitFrame(200000);
 	if (err < B_OK) { PRINT((CH ": WaitFrame: %s" CT, strerror(err))); }
 	if (err < B_OK)
 		return err;
-	err = fDeframer->GetFrame(&f, &stamp);
+	err = fDeframer->GetFrame(&f, stamp);
 	if (err < B_OK) { PRINT((CH ": GetFrame: %s" CT, strerror(err))); }
 	if (err < B_OK)
 		return err;
@@ -446,10 +445,9 @@ SonixCamDevice::GetFrameBitmap(BBitmap **bm)
 
 // -----------------------------------------------------------------------------
 status_t
-SonixCamDevice::FillFrameBuffer(BBuffer *buffer)
+SonixCamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 {
 	CamFrame *f;
-	bigtime_t stamp;
 	status_t err;
 	PRINT((CH "()" CT));
 
@@ -459,7 +457,7 @@ SonixCamDevice::FillFrameBuffer(BBuffer *buffer)
 	if (err < B_OK)
 		return err;
 
-	err = fDeframer->GetFrame(&f, &stamp);
+	err = fDeframer->GetFrame(&f, stamp);
 	if (err < B_OK) { PRINT((CH ": GetFrame: %s" CT, strerror(err))); }
 	if (err < B_OK)
 		return err;

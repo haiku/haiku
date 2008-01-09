@@ -242,14 +242,14 @@ CamDevice::WaitFrame(bigtime_t timeout)
 
 // -----------------------------------------------------------------------------
 status_t
-CamDevice::GetFrameBitmap(BBitmap **bm)
+CamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp)
 {
 	return EINVAL;
 }
 
 // -----------------------------------------------------------------------------
 status_t
-CamDevice::FillFrameBuffer(BBuffer *buffer)
+CamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 {
 	return EINVAL;
 }

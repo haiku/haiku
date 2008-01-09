@@ -66,8 +66,8 @@ class CamDevice {
 
 	// several ways to get raw frames
 	virtual status_t	WaitFrame(bigtime_t timeout);
-	virtual status_t	GetFrameBitmap(BBitmap **bm);
-	virtual status_t	FillFrameBuffer(BBuffer *buffer);
+	virtual status_t	GetFrameBitmap(BBitmap **bm, bigtime_t *stamp=NULL);
+	virtual status_t	FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp=NULL);
 
 	// locking
 	bool				Lock();

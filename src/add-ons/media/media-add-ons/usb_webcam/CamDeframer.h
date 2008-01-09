@@ -18,7 +18,14 @@ ST_FRAME
 
 
 /* should have a real Frame class someday */
-#define CamFrame BMallocIO
+class CamFrame : public BMallocIO
+{
+public:
+			CamFrame() : BMallocIO() { fStamp = system_time(); };
+virtual		~CamFrame() {};
+bigtime_t			Stamp() const { return fStamp; };
+bigtime_t			fStamp;
+};
 
 class CamDeframer : public CamFilterInterface 
 {
