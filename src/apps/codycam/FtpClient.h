@@ -7,6 +7,7 @@
 
 #include <File.h>
 #include <NetworkKit.h>
+#include "FileUploadClient.h"
 
 using std::string;
 
@@ -22,15 +23,10 @@ using std::string;
 #define xEOF    236  
 
 
-class FtpClient {
+class FtpClient : public FileUploadClient {
 	public:
 		FtpClient();
 		~FtpClient();
-
-		enum ftp_mode {
-		binary_mode,
-		ascii_mode
-		};
 
 		bool Connect(const string& server, const string& login,
 			const string& passwd);

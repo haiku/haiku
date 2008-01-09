@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 Application CodyCam :
 	CodyCam.cpp
+	FileUploadClient.cpp
 	FtpClient.cpp
 	Settings.cpp
 	SettingsHandler.cpp
