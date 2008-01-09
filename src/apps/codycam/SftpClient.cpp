@@ -167,10 +167,32 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 {
 	bool rc = false;
 	int len;
-	BString cmd("rename");
-	cmd << " " << oldPath.c_str() << " " << newPath.c_str() << "\n";
+	
+	// sftpd can't rename to an existing file...
+	BString cmd("rm");
+	cmd << " " << newPath.c_str() << "\n";
 	SendCommand(cmd.String());
 	BString reply;
+
+	if ((len = ReadReply(&reply)) < 0) {
+		fprintf(stderr, "read: %s\n", len);
+		return false;
+	}
+	fprintf(stderr, "reply: '%s'\n", reply.String());
+	if (reply.FindFirst("Removing") != 0)
+		return false;
+
+	if ((len = ReadReply(&reply)) < 0) {
+		fprintf(stderr, "read: %s\n", len);
+		return false;
+	}
+	fprintf(stderr, "reply: '%s'\n", reply.String());
+	if (reply.FindFirst("sftp>") < 0)
+		return false;
+
+	cmd = "rename";
+	cmd << " " << oldPath.c_str() << " " << newPath.c_str() << "\n";
+	SendCommand(cmd.String());
 	if ((len = ReadReply(&reply)) < 0) {
 		fprintf(stderr, "read: %s\n", len);
 		return false;
