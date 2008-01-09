@@ -99,7 +99,7 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
 		status = image_debug_lookup_user_symbol_address(thread->team, eip,
 			&baseAddress, &symbol, &image, &exactMatch);
 	}
-	
+
 	kprintf("%08lx (+%4ld) %08lx", ebp, diff, eip);
 
 	if (status == B_OK) {
@@ -138,7 +138,55 @@ print_iframe(struct iframe *frame)
 		kprintf("user esp 0x%lx", frame->user_esp);
 	}
 	kprintf("\n");
-	kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector, frame->error_code);
+	kprintf(" vector: 0x%lx, error code: 0x%lx\n", frame->vector,
+		frame->error_code);
+}
+
+
+static void
+setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
+	struct iframe_stack **_frameStack, uint32 *_oldPageDirectory)
+{
+	struct thread *thread = NULL;
+
+	if (arg != NULL) {
+		thread_id id = strtoul(arg, NULL, 0);
+		thread = thread_get_thread_struct_locked(id);
+		if (thread == NULL) {
+			kprintf("could not find thread %ld\n", id);
+			return;
+		}
+
+		if (id != thread_get_current_thread_id()) {
+			// switch to the page directory of the new thread to be
+			// able to follow the stack trace into userland
+			addr_t newPageDirectory = (addr_t)x86_next_page_directory(
+				thread_get_current_thread(), thread);
+
+			if (newPageDirectory != 0) {
+				read_cr3(*_oldPageDirectory);
+				write_cr3(newPageDirectory);
+			}
+
+			// read %ebp from the thread's stack stored by a pushad
+			*_ebp = thread->arch_info.current_stack.esp[2];
+		} else
+			thread = NULL;
+	}
+
+	if (thread == NULL) {
+		// if we don't have a thread yet, we want the current one
+		// (ebp has been set by the caller for this case already)
+		thread = thread_get_current_thread();
+	}
+
+	// We don't have a thread pointer early in the boot process
+	if (thread != NULL)
+		*_frameStack = &thread->arch_info.iframes;
+	else
+		*_frameStack = &gBootFrameStack;
+
+	*_thread = thread;
 }
 
 
@@ -149,56 +197,27 @@ stack_trace(int argc, char **argv)
 	struct iframe_stack *frameStack;
 	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
-	uint32 ebp = 0;
+	uint32 ebp = x86_read_ebp();
 	int32 i, num = 0, last = 0;
 
-	if (argc == 2) {
-		thread_id id = strtoul(argv[1], NULL, 0);
-		thread = thread_get_thread_struct_locked(id);
-		if (thread == NULL) {
-			kprintf("could not find thread %ld\n", id);
-			return 0;
-		}
-
-		if (id != thread_get_current_thread_id()) {
-			// switch to the page directory of the new thread to be
-			// able to follow the stack trace into userland
-			addr_t newPageDirectory = (addr_t)x86_next_page_directory(
-				thread_get_current_thread(), thread);
-
-			if (newPageDirectory != 0) {
-				read_cr3(oldPageDirectory);
-				write_cr3(newPageDirectory);
-			}
-
-			// read %ebp from the thread's stack stored by a pushad
-			ebp = thread->arch_info.current_stack.esp[2];
-		} else
-			thread = NULL;
-	} else if (argc > 2) {
+	if (argc > 2) {
 		kprintf("usage: %s [thread id]\n", argv[0]);
 		return 0;
 	}
 
-	if (thread == NULL) {
-		// if we don't have a thread yet, we want the current one
-		thread = thread_get_current_thread();
-		ebp = x86_read_ebp();
-	}
-
-	// We don't have a thread pointer early in the boot process
-	if (thread != NULL)
-		frameStack = &thread->arch_info.iframes;
-	else
-		frameStack = &gBootFrameStack;
+	setup_for_thread(argc == 2 ? argv[1] : NULL, &thread, &ebp, &frameStack,
+		&oldPageDirectory);
 
 	if (thread != NULL) {
-		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id, thread->name);
+		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id,
+			thread->name);
 
 		kprintf("    kernel stack: %p to %p\n", 
-			(void *)thread->kernel_stack_base, (void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
+			(void *)thread->kernel_stack_base,
+			(void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
 		if (thread->user_stack_base != 0) {
-			kprintf("      user stack: %p to %p\n", (void *)thread->user_stack_base,
+			kprintf("      user stack: %p to %p\n",
+				(void *)thread->user_stack_base,
 				(void *)(thread->user_stack_base + thread->user_stack_size));
 		}
 	}
@@ -241,6 +260,136 @@ stack_trace(int argc, char **argv)
 			kprintf("circular stack frame: %p!\n", (void *)ebp);
 			break;
 		}
+		if (ebp == 0)
+			break;
+	}
+
+	if (oldPageDirectory != 0) {
+		// switch back to the previous page directory to no cause any troubles
+		write_cr3(oldPageDirectory);
+	}
+
+	return 0;
+}
+
+
+static void
+print_call(struct thread *thread, addr_t eip, addr_t ebp, int32 argCount)
+{
+	const char *symbol, *image;
+	addr_t baseAddress;
+	bool exactMatch;
+	status_t status;
+
+	status = elf_debug_lookup_symbol_address(eip, &baseAddress, &symbol,
+		&image, &exactMatch);
+	if (status != B_OK) {
+		// try to locate the image in the images loaded into user space
+		status = image_debug_lookup_user_symbol_address(thread->team, eip,
+			&baseAddress, &symbol, &image, &exactMatch);
+	}
+
+	kprintf("%08lx %08lx", ebp, eip);
+
+	if (status == B_OK) {
+		if (symbol != NULL) {
+			kprintf("   <%s>:%s%s", image, symbol,
+				exactMatch ? "" : " (nearest)");
+		} else {
+			kprintf("   <%s@%p>:unknown + 0x%04lx", image,
+				(void *)baseAddress, eip - baseAddress);
+		}
+	} else {
+		vm_area *area = NULL;
+		if (thread->team->address_space != NULL)
+			area = vm_area_lookup(thread->team->address_space, eip);
+		if (area != NULL) {
+			kprintf("   %ld:%s@%p + %#lx", area->id, area->name,
+				(void *)area->base, eip - area->base);
+		}
+	}
+
+	int32 *arg = (int32 *)(ebp + 8);
+	kprintf("(");
+
+	for (int32 i = 0; i < argCount; i++) {
+		if (i > 0)
+			kprintf(", ");
+		kprintf("%#lx", *arg);
+		if (*arg > -0x10000 && *arg < 0x10000)
+			kprintf(" (%ld)", *arg);
+		arg++;
+	}
+
+	kprintf(")\n");
+}
+
+
+static int
+show_call(int argc, char **argv)
+{
+	struct iframe_stack *frameStack;
+	struct thread *thread = NULL;
+	addr_t oldPageDirectory = 0;
+	uint32 ebp = x86_read_ebp();
+	int32 argCount = 0;
+
+	if (argc >= 2 && argv[argc - 1][0] == '-') {
+		argCount = strtoul(argv[argc - 1] + 1, NULL, 0);
+		if (argCount < 0 || argCount > 16) {
+			kprintf("Invalid argument count \"%ld\".\n", argCount);
+			return 0;
+		}
+		argc--;
+	}
+
+	if (argc < 2 || argc > 3) {
+		kprintf("usage: %s [thread id] <call-index> [-<arg-count>]\n", argv[0]);
+		return 0;
+	}
+
+	setup_for_thread(argc == 3 ? argv[1] : NULL, &thread, &ebp, &frameStack,
+		&oldPageDirectory);
+
+	int32 callIndex = strtoul(argv[argc == 3 ? 2 : 1], NULL, 0);
+
+	if (thread != NULL)
+		kprintf("thread %ld, %s\n", thread->id, thread->name);
+
+	int32 index = 1;
+	for (; index <= callIndex; index++) {
+		bool isIFrame = false;
+		// see if the ebp matches the iframe
+		for (int32 i = 0; i < frameStack->index; i++) {
+			if (ebp == ((uint32)frameStack->frames[i] - 8)) {
+				// it's an iframe
+				isIFrame = true;
+			}
+		}
+
+		if (isIFrame) {
+			struct iframe *frame = (struct iframe *)(ebp + 8);
+
+			if (index == callIndex)
+				print_call(thread, frame->eip, ebp, argCount);
+
+ 			ebp = frame->ebp;
+		} else {
+			addr_t eip, nextEbp;
+
+			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK) {
+				kprintf("%08lx -- read fault\n", ebp);
+				break;
+			}
+
+			if (eip == 0 || ebp == 0)
+				break;
+
+			if (index == callIndex)
+				print_call(thread, eip, ebp, argCount);
+			ebp = nextEbp;
+		}
+
 		if (ebp == 0)
 			break;
 	}
@@ -316,6 +465,7 @@ arch_debug_init(kernel_args *args)
 	add_debugger_command("bt", &stack_trace, "Same as \"sc\" (as in gdb)");
 	add_debugger_command("sc", &stack_trace, "Stack crawl for current thread (or any other)");
 	add_debugger_command("iframe", &dump_iframes, "Dump iframes for the specified thread");
+	add_debugger_command("call", &show_call, "Show call with arguments");
 
 	return B_NO_ERROR;
 }
