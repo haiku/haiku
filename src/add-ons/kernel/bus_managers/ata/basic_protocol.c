@@ -87,16 +87,19 @@ reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *device
 		// wait up to 31 seconds for busy to clear, abort when error is set
 		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
 		if (status != B_OK) {
-			if (status == B_TIMED_OUT)
-				dprintf("ATA: reset_bus: timeout\n");
-			else
-				dprintf("ATA: reset_bus: error bit set\n");
+			dprintf("ATA: reset_bus: timeout\n");
 			goto error;
 		}
 
 		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
-			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
+			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high | ide_mask_error) != B_OK)
 			goto error;
+
+		if (tf.read.error != 0x01 && tf.read.error != 0x81)
+			dprintf("ATA: device 0 failed, error code is 0x%02\n", tf.read.error);
+
+		if (tf.read.error >= 0x80)
+			dprintf("ATA: device 0 indicates that device 1 failed, error code is 0x%02\n", tf.read.error);
 
 		*sigDev0 = tf.lba.sector_count;
 		*sigDev0 |= ((uint32)tf.lba.lba_0_7) << 8;
@@ -114,16 +117,16 @@ reset_bus(ide_bus_info *bus, bool *devicePresent0, uint32 *sigDev0, bool *device
 		// wait up to 31 seconds for busy to clear, abort when error is set
 		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
 		if (status != B_OK) {
-			if (status == B_TIMED_OUT)
-				dprintf("ATA: reset_bus: timeout\n");
-			else
-				dprintf("ATA: reset_bus: error bit set\n");
+			dprintf("ATA: reset_bus: timeout\n");
 			goto error;
 		}
 
 		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
-			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high) != B_OK)
+			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high | ide_mask_error) != B_OK)
 			goto error;
+
+		if (tf.read.error != 0x01)
+			dprintf("ATA: device 1 failed, error code is 0x%02\n", tf.read.error);
 
 		*sigDev1 = tf.lba.sector_count;
 		*sigDev1 |= ((uint32)tf.lba.lba_0_7) << 8;
