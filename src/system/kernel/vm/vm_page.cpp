@@ -656,17 +656,20 @@ set_page_state_nolock(vm_page *page, int pageState)
 			panic("vm_page_set_state: invalid target state %d\n", pageState);
 	}
 
-	if (pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE || pageState == PAGE_STATE_INACTIVE) {
+	if (pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE
+		|| pageState == PAGE_STATE_INACTIVE) {
 		if (sPageDeficit > 0)
 			sFreePageCondition.NotifyOne();
 
 		if (pageState != PAGE_STATE_INACTIVE && page->cache != NULL)
 			panic("to be freed page %p has cache", page);
 	}
-	if (pageState == PAGE_STATE_MODIFIED && page->cache->temporary)
-		sModifiedTemporaryPages++;
-	else if (page->state == PAGE_STATE_MODIFIED && page->cache->temporary)
-		sModifiedTemporaryPages--;
+	if (page->cache != NULL) {
+		if (pageState == PAGE_STATE_MODIFIED && page->cache->temporary)
+			sModifiedTemporaryPages++;
+		else if (page->state == PAGE_STATE_MODIFIED && page->cache->temporary)
+			sModifiedTemporaryPages--;
+	}
 
 #if TRACK_PAGE_ALLOCATIONS
 	if ((pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE)
@@ -1705,6 +1708,23 @@ vm_lookup_page(addr_t pageNumber)
 		return NULL;
 
 	return &sPages[pageNumber];
+}
+
+
+/*!	Free the page that belonged to a certain cache.
+	You can use vm_page_set_state() manually if you prefer, but only
+	if the page does not equal PAGE_STATE_MODIFIED.
+*/
+void
+vm_page_free(vm_cache *cache, vm_page *page)
+{
+	InterruptsSpinLocker _(sPageLock);
+
+	if (page->cache == NULL && page->state == PAGE_STATE_MODIFIED
+		&& cache->temporary)
+		sModifiedTemporaryPages--;
+
+	set_page_state_nolock(page, PAGE_STATE_FREE);
 }
 
 

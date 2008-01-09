@@ -152,7 +152,7 @@ delete_cache(vm_cache *cache)
 
 		TRACE(("vm_cache_release_ref: freeing page 0x%lx\n",
 			oldPage->physical_page_number));
-		vm_page_set_state(oldPage, PAGE_STATE_FREE);
+		vm_page_free(cache, oldPage);
 	}
 
 	// remove the ref to the source
@@ -514,7 +514,7 @@ vm_cache_resize(vm_cache *cache, off_t newSize)
 
 				// remove the page and put it into the free queue
 				vm_cache_remove_page(cache, page);
-				vm_page_set_state(page, PAGE_STATE_FREE);
+				vm_page_free(cache, page);
 			}
 
 			page = next;

@@ -26,6 +26,7 @@ status_t vm_page_init_post_thread(struct kernel_args *args);
 
 status_t vm_mark_page_inuse(addr_t page);
 status_t vm_mark_page_range_inuse(addr_t startPage, addr_t length);
+void vm_page_free(struct vm_cache *cache, struct vm_page *page);
 status_t vm_page_set_state(struct vm_page *page, int state);
 void vm_page_requeue(struct vm_page *page, bool tail);
 
