@@ -24,7 +24,9 @@ public:
 									partition_id selectedPartition);
 private:
 			BDiskDevice*		fDisk;
-			partition_id		fSelectedParition;
+
+			class PartitionDrawer;
+			PartitionDrawer*	fPartitionDrawer;
 };
 
 

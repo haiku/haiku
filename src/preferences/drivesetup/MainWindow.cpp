@@ -165,7 +165,6 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_PARTITION_ROW_SELECTED:
-			printf("MSG_PARTITION_ROW_SELECTED\n");
 			_AdaptToSelectedPartition();
 			break;
 

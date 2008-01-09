@@ -60,13 +60,13 @@ struct PartitionBox {
 };
 
 
-class PartitionDrawer : public BDiskDeviceVisitor {
+class DiskView::PartitionDrawer : public BDiskDeviceVisitor {
 public:
-	PartitionDrawer(BView* view, partition_id selectedPartition)
+	PartitionDrawer(BView* view)
 		: fView(view)
 		, fBoxMap()
 		, fColorIndex(0)
-		, fSelectedPartition(selectedPartition)
+		, fSelectedPartition(-1)
 	{
 	}
 
@@ -101,6 +101,11 @@ public:
 		fBoxMap.Put(partition->ID(), PartitionBox(frame, color));
 
 		return false;
+	}
+
+	void SetSelectedPartition(partition_id id)
+	{
+		fSelectedPartition = id;
 	}
 
 	void Draw(BView* view)
@@ -150,12 +155,12 @@ public:
 DiskView::DiskView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "diskview", resizeMode, B_WILL_DRAW)
 	, fDisk(NULL)
-	, fSelectedParition(-1)
+	, fPartitionDrawer(new PartitionDrawer(this))
 {
 	for (int32 i = 0; i < kMaxPartitionColors; i++) {
-		kPartitionColors[i].red = (i * 1675) & 0xff;
-		kPartitionColors[i].green = (i * 318) & 0xff;
-		kPartitionColors[i].blue = (i * 9328) & 0xff;
+		kPartitionColors[i].red = 120 + ((i * 1675) & 120);
+		kPartitionColors[i].green = 120 + ((i * 318) & 120);
+		kPartitionColors[i].blue = 120 + ((i * 9328) & 120);
 		kPartitionColors[i].alpha = 255;
 	}
 }
@@ -164,6 +169,7 @@ DiskView::DiskView(const BRect& frame, uint32 resizeMode)
 DiskView::~DiskView()
 {
 	SetDisk(NULL, -1);
+	delete fPartitionDrawer;
 }
 
 
@@ -179,25 +185,19 @@ DiskView::Draw(BRect updateRect)
 		return;
 	}
 
-	// TODO: render the partitions (use PartitionDrawer to iterate our disk)
-	SetHighColor(255, 255, 120);
-	FillRect(bounds);
-
-	PartitionDrawer drawer(this, fSelectedParition);
-	BDiskDeviceRoster roster;
-	roster.VisitEachPartition(&drawer, fDisk);
-
-	drawer.Draw(this);
+	fPartitionDrawer->Draw(this);
 }
 
 
 void
 DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)
 {
-printf("DiskView::SetDisk(%p, %ld)\n", disk, selectedPartition);
 	delete fDisk;
 	fDisk = disk;
-	fSelectedParition = selectedPartition;
+	fPartitionDrawer->SetSelectedPartition(selectedPartition);
+
+	BDiskDeviceRoster roster;
+	roster.VisitEachPartition(fPartitionDrawer, fDisk);
 
 	Invalidate();
 }
