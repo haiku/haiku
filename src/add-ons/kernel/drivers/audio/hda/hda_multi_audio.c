@@ -272,7 +272,7 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 	hda_codec* codec = (hda_codec*)cookie;
 	hda_afg* afg;
 
-	/* FIXME: Make sure we have a valid codec & afg... */
+	/* FIXME: We should simply pass the afg into here... */
 	if (!codec || codec->num_afgs == 0)
 		return ENODEV;
 
@@ -282,20 +282,20 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 		case B_MULTI_GET_DESCRIPTION:			return get_description(afg, arg);
 		case B_MULTI_GET_EVENT_INFO:			return B_ERROR;
 		case B_MULTI_SET_EVENT_INFO:			return B_ERROR;
-		case B_MULTI_GET_EVENT:					return B_ERROR;
+		case B_MULTI_GET_EVENT:				return B_ERROR;
 		case B_MULTI_GET_ENABLED_CHANNELS:		return get_enabled_channels(afg, arg);
 		case B_MULTI_SET_ENABLED_CHANNELS:		return B_OK;
 		case B_MULTI_GET_GLOBAL_FORMAT:			return get_global_format(afg, arg);
 		case B_MULTI_SET_GLOBAL_FORMAT:			return set_global_format(afg, arg);
 		case B_MULTI_GET_CHANNEL_FORMATS:		return B_ERROR;
 		case B_MULTI_SET_CHANNEL_FORMATS:		return B_ERROR;
-		case B_MULTI_GET_MIX:					return B_ERROR;
-		case B_MULTI_SET_MIX:					return B_ERROR;
+		case B_MULTI_GET_MIX:				return B_ERROR;
+		case B_MULTI_SET_MIX:				return B_ERROR;
 		case B_MULTI_LIST_MIX_CHANNELS:			return list_mix_channels(afg, arg);
 		case B_MULTI_LIST_MIX_CONTROLS:			return list_mix_controls(afg, arg);
 		case B_MULTI_LIST_MIX_CONNECTIONS:		return list_mix_connections(afg, arg);
-		case B_MULTI_GET_BUFFERS:				return get_buffers(afg, arg);
-		case B_MULTI_SET_BUFFERS:				return B_ERROR;
+		case B_MULTI_GET_BUFFERS:			return get_buffers(afg, arg);
+		case B_MULTI_SET_BUFFERS:			return B_ERROR;
 		case B_MULTI_SET_START_TIME:			return B_ERROR;
 		case B_MULTI_BUFFER_EXCHANGE:			return buffer_exchange(afg, arg);
 		case B_MULTI_BUFFER_FORCE_STOP:			return buffer_force_stop(afg);

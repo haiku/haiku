@@ -499,7 +499,14 @@ hda_hw_init(hda_controller* ctrlr)
 		if (ctrlr->codecsts & (1 << idx))
 			hda_codec_new(ctrlr, idx);
 
-	if (ctrlr->codecs[0] != NULL)
+	for (idx=0; idx < HDA_MAXCODECS; idx++) {
+		if (ctrlr->codecs[idx] && ctrlr->codecs[idx]->num_afgs) {
+			ctrlr->active_codec = ctrlr->codecs[idx];
+			break;
+		}
+	}
+
+	if (ctrlr->active_codec != NULL)
 		return B_OK;
 	else
 		rc = ENODEV;

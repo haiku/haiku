@@ -190,6 +190,7 @@ struct hda_controller_s {
 	rirb_t*		rirb;
 
 	hda_codec*		codecs[HDA_MAXCODECS];
+	hda_codec*		active_codec;
 	uint32			num_codecs;
 	
 	hda_stream*		streams[HDA_MAXSTREAMS];

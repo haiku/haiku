@@ -24,7 +24,7 @@ hda_open (const char *name, uint32 flags, void** cookie)
 		return rc;
 
 	hc->opened++;
-		
+
 	*cookie = hc;
 	return B_OK;
 }
@@ -47,9 +47,9 @@ static status_t
 hda_control (void* cookie, uint32 op, void* arg, size_t len)
 {
 	hda_controller* hc = (hda_controller*)cookie;
-	if (hc->codecs[0])
-		return multi_audio_control(hc->codecs[0], op, arg, len);
-		
+	if (hc->active_codec)
+		return multi_audio_control(hc->active_codec, op, arg, len);
+
 	return B_BAD_VALUE;
 }
 
@@ -73,10 +73,10 @@ hda_free (void* cookie)
 }
 
 device_hooks driver_hooks = {
-	hda_open, 			/* -> open entry point */
-	hda_close, 			/* -> close entry point */
-	hda_free,			/* -> free cookie */
+	hda_open, 		/* -> open entry point */
+	hda_close, 		/* -> close entry point */
+	hda_free,		/* -> free cookie */
 	hda_control, 		/* -> control entry point */
-	hda_read,			/* -> read entry point */
-	hda_write			/* -> write entry point */
+	hda_read,		/* -> read entry point */
+	hda_write		/* -> write entry point */
 };
