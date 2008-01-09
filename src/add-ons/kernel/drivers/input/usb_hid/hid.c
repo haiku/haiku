@@ -924,7 +924,7 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 	if (!device->active)
 		return B_ERROR;		/* already unplugged */
 
-	if (device->is_keyboard)
+	if (device->is_keyboard) {
 		switch (op) {
 			case KB_READ:
 				while (ring_buffer_readable(device->rbuf) == 0) {
@@ -969,36 +969,33 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 				set_leds(device, (uint8 *)arg);
 				break; 
 		} 
-	else
+	} else {
 		switch (op) {
 			case MS_READ:
-				err = schedule_interrupt_transfer(device);
-				if (err != B_OK)
-					return err;
-				// NOTE: this thread is now blocking until
-				// the semaphore will be released from the
-				// call_back function
+				while (ring_buffer_readable(device->rbuf) == 0) {
+					err = schedule_interrupt_transfer(device);
+					if (err != B_OK)
+						return err;
+					// NOTE: this thread is now blocking until
+					// the semaphore will be released from the
+					// call_back function
+	
+					err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
+		    		if (err != B_OK)
+						return err;
+	
+					err = handle_interrupt_transfer(device);
+					if (err != B_OK)
+						return err;
+				}
 
-				err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
-	    		if (err != B_OK)
-					return err;
-
-				err = handle_interrupt_transfer(device);
-				if (err != B_OK)
-					return err;
-
-				acquire_sem(device->sem_lock);
 				ring_buffer_user_read(device->rbuf, arg, sizeof(mouse_movement));
-				release_sem(device->sem_lock);
-				return err;
-				break;
+				return B_OK;
+
 	    	case MS_NUM_EVENTS:
-			{
-				int32 count;
-				get_sem_count(device->sem_cb, &count);
-        		return count;
-      			break;
-			}
+        		return (int32)(ring_buffer_readable(device->rbuf)
+        			/ sizeof(mouse_movement));
+
 			case MS_SET_CLICKSPEED:
 #ifdef __HAIKU__
 				return user_memcpy(&device->click_speed, arg, sizeof(bigtime_t));
@@ -1011,6 +1008,7 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 				/* not implemented */
 				break;
 		}
+	}
 
 	return err;
 }
