@@ -32,9 +32,10 @@
 #include <malloc.h>
 #include <stdio.h>
 
-#define FLOW dprintf
+//#define FLOW dprintf
+#define FLOW(x...)
 #define TRACE dprintf
-
+//#define TRACE(x...)
 
 scsi_for_sim_interface *scsi;
 
@@ -68,12 +69,12 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 	ata_request_start(&request, device, ccb);
 
 	if (request) {
-		FLOW("calling exec_io: %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
+		TRACE("calling exec_io: %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
 		device->exec_io(device, request);
 		return;
 	}
 
-	FLOW("Bus busy\n");
+	TRACE("Bus busy\n");
 	ACQUIRE_BEN(&bus->status_report_ben);
 	scsi->requeue(ccb, true);
 	RELEASE_BEN(&bus->status_report_ben);

@@ -163,8 +163,6 @@ ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy,
 
 	ata_select(device);
 
-	bus->active_device = device;
-
 	if (ata_wait(bus, 0, ide_status_bsy | ide_status_drq, false, 50000) != B_OK) {
 		// resetting the device here will discard current configuration,
 		// it's better when the SCSI bus manager requests an external reset.
