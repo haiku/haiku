@@ -34,7 +34,7 @@
 
 #include "utf8_functions.h"
 
-#define USE_CACHED_MENUWINDOW 0
+#define USE_CACHED_MENUWINDOW 1
 
 using std::nothrow;
 using BPrivate::BMenuWindow;

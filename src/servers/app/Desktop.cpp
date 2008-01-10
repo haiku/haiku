@@ -1172,6 +1172,9 @@ EventTarget*
 Desktop::KeyboardEventTarget()
 {
 	WindowLayer* window = _CurrentWindows().LastWindow();
+	while (window != NULL && window->IsHidden()) {
+		window = window->PreviousWindow(fCurrentWorkspace);
+	}
 	if (window != NULL && window->Feel() == kMenuWindowFeel)
 		return &window->EventTarget();
 
