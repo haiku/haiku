@@ -6,7 +6,7 @@
 
 #include "video.h"
 //#include "mmu.h"
-#include "images.h"
+//#include "images.h"
 
 #include <arch/cpu.h>
 #include <boot/stage2.h>
