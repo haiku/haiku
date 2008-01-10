@@ -52,3 +52,5 @@ SEARCH on [ FGristFiles text_menu.cpp ]
 # Tell the build system to where stage1.bin can be found, so it can be used
 # elsewhere.
 SEARCH on stage1.bin = $(SUBDIR) ;
+
+# cf pxe_ia32 Jamfile for stage1

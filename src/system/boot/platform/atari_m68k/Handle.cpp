@@ -53,7 +53,7 @@ Handle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	for (i = 0; i < bufferSize; i++) {
 		if (Bconstat(fHandle) == 0)
 			return i;
-		Bconin(fHandle, string[i]);
+		string[i] = (char)Bconin(fHandle);
 	}
 
 	return bufferSize;

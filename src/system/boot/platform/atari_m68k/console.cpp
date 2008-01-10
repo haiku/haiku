@@ -241,13 +241,10 @@ translate_color(int32 color)
 void
 console_set_color(int32 foreground, int32 background)
 {
-	// Note: Toggling the cursor doesn't seem to help. We still get cursor
-	// artifacts.
-	of_interpret("toggle-cursor"
-		" to foreground-color"
-		" to background-color"
-		" toggle-cursor",
-		2, 0, translate_color(foreground), translate_color(background));
+	char buff[] = "\033b \033c ";
+	buff[2] = (char)translate_color(foreground);
+	buff[5] = (char)translate_color(background);
+	stdin->WriteAt(NULL, 0LL, buff, 6);
 }
 
 
