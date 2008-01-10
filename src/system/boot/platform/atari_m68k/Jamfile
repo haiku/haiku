@@ -22,19 +22,19 @@ KernelMergeObject boot_platform_atari_m68k.o :
 	shell.S
 	start.c
 	debug.c
-	bios.S
+	#bios.S
 	console.cpp
-	serial.cpp
+	#serial.cpp
 	devices.cpp
 	keyboard.cpp
 	menu.cpp
 	mmu.cpp
 	cpu.cpp
-	smp.cpp
-	smp_trampoline.S
+	#smp.cpp
+	#smp_trampoline.S
 	support.S
 	video.cpp
-	apm.cpp
+	#apm.cpp
 	
 	# generic
 	text_menu.cpp
@@ -43,7 +43,7 @@ KernelMergeObject boot_platform_atari_m68k.o :
 	#decode_edid.c
 	#dump_edid.c
 
-	: -fno-pic
+	: -fpic -Wa,--pcrel
 ;
 
 SEARCH on [ FGristFiles text_menu.cpp ]
