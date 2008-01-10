@@ -71,6 +71,18 @@ struct tosbpb {
 #define Drvmap() (uint32)bios(10)
 #define Kbshift(mode) bios(11, (uint16)mode)
 
+/* handy shortcut */
+static inline int Bconputs(int16 handle, const char *string)
+{
+	int i, err;
+	for (i = 0; string[i]; i++) {
+		err = Bconout(string[i]);
+		if (err)
+			return i;
+	}
+	return i;
+}
+
 /* 
  * Atari XBIOS calls
  */

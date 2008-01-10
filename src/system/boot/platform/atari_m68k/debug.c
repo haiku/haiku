@@ -4,7 +4,6 @@
  */
 
 
-#include "serial.h"
 #include "keyboard.h"
 #include "toscalls.h"
 
@@ -19,17 +18,21 @@
 void
 panic(const char *format, ...)
 {
+	char buffer[512];
 	va_list list;
+	int length;
 
-	platform_switch_to_text_mode();
+	//platform_switch_to_text_mode();
 
-	puts("*** PANIC ***");
+	Bconputs(DEV_CONSOLE, "*** PANIC ***");
 
 	va_start(list, format);
-	vprintf(format, list);
+	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
 
-	puts("\nPress key to reboot.");
+	Bconputs(DEV_CONSOLE, buffer);
+
+	Bconputs(DEV_CONSOLE, "\nPress key to reboot.");
 
 	clear_key_buffer();
 	wait_for_key();
@@ -48,10 +51,10 @@ dprintf(const char *format, ...)
 	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
 
-	serial_puts(buffer, length);
+	Bconputs(DEV_AUX, buffer);
 
 	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
-		fprintf(stderr, "%s", buffer);
+		Bconputs(DEV_CONSOLE, buffer);
 }
 
 
