@@ -181,7 +181,7 @@ console_init(void)
 void
 console_clear_screen(void)
 {
-	stdin->WriteAt(NULL, 0LL, "\033E", 2);
+	sInput.WriteAt(NULL, 0LL, "\033E", 2);
 }
 
 
@@ -207,7 +207,7 @@ console_set_cursor(int32 x, int32 y)
 	char buff[] = "\033Y  ";
 	buff[3] += (char)x;
 	buff[2] += (char)y;
-	stdin->WriteAt(NULL, 0LL, buff, 4);
+	sInput.WriteAt(NULL, 0LL, buff, 4);
 }
 
 
@@ -245,7 +245,7 @@ console_set_color(int32 foreground, int32 background)
 	char buff[] = "\033b \033c ";
 	buff[2] = (char)translate_color(foreground);
 	buff[5] = (char)translate_color(background);
-	stdin->WriteAt(NULL, 0LL, buff, 6);
+	sInput.WriteAt(NULL, 0LL, buff, 6);
 }
 
 
