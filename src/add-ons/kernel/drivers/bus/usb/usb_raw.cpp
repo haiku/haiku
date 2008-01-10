@@ -611,6 +611,7 @@ uninit_driver()
 		for (int32 i = 1; gDeviceNames[i]; i++)
 			free(gDeviceNames[i]);
 		free(gDeviceNames);
+		gDeviceNames = NULL;
 	}
 
 	benaphore_destroy(&gDeviceListLock);
@@ -626,10 +627,14 @@ publish_devices()
 		for (int32 i = 1; gDeviceNames[i]; i++)
 			free(gDeviceNames[i]);
 		free(gDeviceNames);
+		gDeviceNames = NULL;
 	}
 
 	int32 index = 0;
 	gDeviceNames = (char **)malloc(sizeof(char *) * (gDeviceCount + 2));
+	if (!gDeviceNames)
+		return NULL;
+
 	gDeviceNames[index++] = DEVICE_NAME;
 
 	benaphore_lock(&gDeviceListLock);
