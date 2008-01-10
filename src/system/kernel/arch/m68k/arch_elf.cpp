@@ -116,12 +116,21 @@ write_16_check(addr_t P, Elf32_Word value)
 
 
 static inline bool
+write_8(addr_t P, Elf32_Word value)
+{
+	// bits 7:0
+	*(uint8 *)P = (uint8)value;
+	return true;
+}
+
+
+static inline bool
 write_8_check(addr_t P, Elf32_Word value)
 {
 	// bits 7:0
 	if ((value & 0xffffff00) && (~value & 0xffffff80))
 		return false;
-	*(Elf32_Half*)P = (Elf32_Half)value;
+	*(uint8 *)P = (uint8)value;
 	return true;
 }
 
@@ -292,14 +301,14 @@ dprintf("R_68K_GOT8 overflow\n");
 
 			case R_68K_PLT16:
 				REQUIRE_PLT;
-				if (write_16(P, (L + A - P)))
+				if (write_16_check(P, (L + A - P)))
 					break;
 dprintf("R_68K_PLT16 overflow\n");
 				return B_BAD_DATA;
 
 			case R_68K_PLT8:
 				REQUIRE_PLT;
-				if (write_8(P, (L + A - P)))
+				if (write_8_check(P, (L + A - P)))
 					break;
 dprintf("R_68K_PLT8 overflow\n");
 				return B_BAD_DATA;
@@ -311,14 +320,14 @@ dprintf("R_68K_PLT8 overflow\n");
 
 			case R_68K_PLT16O:
 				REQUIRE_PLT;
-				if (write_16(P, (L + A)))
+				if (write_16_check(P, (L + A)))
 					break;
 dprintf("R_68K_PLT16O overflow\n");
 				return B_BAD_DATA;
 
 			case R_68K_PLT8O:
 				REQUIRE_PLT;
-				if (write_8(P, (L + A)))
+				if (write_8_check(P, (L + A)))
 					break;
 dprintf("R_68K_PLT8O overflow\n");
 				return B_BAD_DATA;
