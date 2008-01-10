@@ -49,9 +49,9 @@ EditorTabView::EditorTabView(BRect frame, const char *name, button_width width,
 	fRawTab(-1)
 {
 	ContainerView()->MoveBy(-ContainerView()->Frame().left,
-						TabHeight() + 1 - ContainerView()->Frame().top);
+		TabHeight() + 1 - ContainerView()->Frame().top);
 	fNoEditorView = new BStringView(ContainerView()->Bounds(), "Type Editor",
-							"No type editor available", B_FOLLOW_NONE);
+		"No type editor available", B_FOLLOW_NONE);
 	fNoEditorView->ResizeToPreferred();
 	fNoEditorView->SetAlignment(B_ALIGN_CENTER);
 	fTypeEditorView = fNoEditorView;

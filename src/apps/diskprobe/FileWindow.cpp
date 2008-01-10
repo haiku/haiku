@@ -88,6 +88,7 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 
 	fProbeView->AddSaveMenuItems(menu, 4);
 	fProbeView->AddPrintMenuItems(menu, menu->CountItems() - 4);
+	fProbeView->AddViewAsMenuItems();
 
 	fProbeView->UpdateSizeLimits();
 }

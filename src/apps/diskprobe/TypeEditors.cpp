@@ -37,77 +37,79 @@ static const uint32 kMimeTypeItem = 'miti';
 
 class StringEditor : public TypeEditorView {
 	public:
-		StringEditor(BRect rect, DataEditor &editor);
+		StringEditor(BRect rect, DataEditor& editor);
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 
-		void UpdateText();
 		virtual void CommitChanges();
 
 	private:
-		DataEditor	&fEditor;
-		BTextView	*fTextView;
-		BString		fPreviousText;
+		void _UpdateText();
+
+		BTextView*		fTextView;
+		BString			fPreviousText;
 };
 
 
 class MimeTypeEditor : public TypeEditorView {
 	public:
-		MimeTypeEditor(BRect rect, DataEditor &editor);
+		MimeTypeEditor(BRect rect, DataEditor& editor);
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 
-		void UpdateText();
 		virtual void CommitChanges();
+		virtual bool TypeMatches();
 
 	private:
-		DataEditor		&fEditor;
-		BTextControl	*fTextControl;
+		void _UpdateText();
+
+		BTextControl*	fTextControl;
 		BString			fPreviousText;
 };
 
 
 class NumberEditor : public TypeEditorView {
 	public:
-		NumberEditor(BRect rect, DataEditor &editor);
+		NumberEditor(BRect rect, DataEditor& editor);
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 
-		void UpdateText();
 		virtual void CommitChanges();
+		virtual bool TypeMatches();
 
 	private:
-		const char *TypeLabel();
-		status_t Format(char *buffer);
-		size_t Size();
+		void _UpdateText();
+		const char* _TypeLabel();
+		status_t _Format(char* buffer);
+		size_t _Size();
 
-		DataEditor		&fEditor;
-		BTextControl	*fTextControl;
+		BTextControl*	fTextControl;
 		BString			fPreviousText;
 };
 
 
 class BooleanEditor : public TypeEditorView {
 	public:
-		BooleanEditor(BRect rect, DataEditor &editor);
+		BooleanEditor(BRect rect, DataEditor& editor);
 
 		virtual void AttachedToWindow();
 		virtual void DetachedFromWindow();
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 
-		void UpdateMenuField();
 		virtual void CommitChanges();
+		virtual bool TypeMatches();
 
 	private:
-		DataEditor	&fEditor;
-		BMenuItem	*fFalseMenuItem;
-		BMenuItem	*fTrueMenuItem;
+		void _UpdateMenuField();
+
+		BMenuItem*		fFalseMenuItem;
+		BMenuItem*		fTrueMenuItem;
 };
 
 
@@ -121,14 +123,12 @@ class ImageView : public TypeEditorView {
 		virtual void MessageReceived(BMessage *message);
 		virtual void Draw(BRect updateRect);
 
-		void UpdateImage();
-		virtual void CommitChanges();
-
 	private:
-		DataEditor	&fEditor;
-		BBitmap		*fBitmap;
-		BStringView	*fDescriptionView;
-		BSlider		*fScaleSlider;
+		void _UpdateImage();
+
+		BBitmap*		fBitmap;
+		BStringView*	fDescriptionView;
+		BSlider*		fScaleSlider;
 };
 
 
@@ -141,25 +141,56 @@ class MessageView : public TypeEditorView {
 		virtual void DetachedFromWindow();
 		virtual void MessageReceived(BMessage* message);
 
-		virtual void CommitChanges();
-
 		void SetTo(BMessage& message);
 
 	private:
 		BString _TypeToString(type_code type);
 		void _UpdateMessage();
 
-		DataEditor&	fEditor;
-		BTextView*	fTextView;
+		BTextView*		fTextView;
 };
 
 
-//-----------------
+//	#pragma mark - TypeEditorView
 
 
-StringEditor::StringEditor(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "String Editor", B_FOLLOW_ALL, 0),
+TypeEditorView::TypeEditorView(BRect rect, const char *name,
+		uint32 resizingMode, uint32 flags, DataEditor& editor)
+	: BView(rect, name, resizingMode, flags),
 	fEditor(editor)
+{
+}
+
+
+TypeEditorView::~TypeEditorView()
+{
+}
+
+
+void
+TypeEditorView::CommitChanges()
+{
+	// the default just does nothing here
+}
+
+
+bool
+TypeEditorView::TypeMatches()
+{
+	// the default is to accept anything that easily fits into memory
+
+	system_info info;
+	get_system_info(&info);
+
+	return fEditor.FileSize() / B_PAGE_SIZE < info.max_pages / 2;
+}
+
+
+//	#pragma mark - StringEditor
+
+
+StringEditor::StringEditor(BRect rect, DataEditor& editor)
+	: TypeEditorView(rect, "String Editor", B_FOLLOW_ALL, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -177,24 +208,14 @@ StringEditor::StringEditor(BRect rect, DataEditor &editor)
 		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
 		B_FOLLOW_ALL, B_WILL_DRAW);
 
-#if 0
-	char *data = (char *)malloc(info.size);
-	if (data != NULL) {
-		if (fNode.ReadAttr(attribute, info.type, 0LL, data, info.size) >= B_OK)
-			fTextView->SetText(data);
-
-		free(data);
-	}
-#endif
-
-	BScrollView *scrollView = new BScrollView("scroller", fTextView,
+	BScrollView* scrollView = new BScrollView("scroller", fTextView,
 		B_FOLLOW_ALL, B_WILL_DRAW, true, true);
 	AddChild(scrollView);
 }
 
 
 void
-StringEditor::UpdateText()
+StringEditor::_UpdateText()
 {
 	BAutolock locker(fEditor);
 
@@ -214,7 +235,7 @@ StringEditor::UpdateText()
 }
 
 
-void 
+void
 StringEditor::CommitChanges()
 {
 	if (fPreviousText != fTextView->Text()) {
@@ -229,7 +250,7 @@ StringEditor::AttachedToWindow()
 {
 	fEditor.StartWatching(this);
 
-	UpdateText();
+	_UpdateText();
 }
 
 
@@ -249,17 +270,16 @@ StringEditor::MessageReceived(BMessage *message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - MimeTypeEditor
 
 
-MimeTypeEditor::MimeTypeEditor(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "MIME Type Editor", B_FOLLOW_LEFT_RIGHT, 0),
-	fEditor(editor)
+MimeTypeEditor::MimeTypeEditor(BRect rect, DataEditor& editor)
+	: TypeEditorView(rect, "MIME Type Editor", B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING, "MIME Type:", NULL,
-							new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
+	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
+		"MIME Type:", NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
 	fTextControl->SetDivider(StringWidth(fTextControl->Label()) + 8);
 
 	float width, height;
@@ -273,11 +293,11 @@ MimeTypeEditor::MimeTypeEditor(BRect rect, DataEditor &editor)
 
 
 void
-MimeTypeEditor::UpdateText()
+MimeTypeEditor::_UpdateText()
 {
 	BAutolock locker(fEditor);
 
-	const char *mimeType;
+	const char* mimeType;
 	if (fEditor.GetViewBuffer((const uint8 **)&mimeType) == B_OK) {
 		fTextControl->SetText(mimeType);
 		fPreviousText.SetTo(mimeType);
@@ -289,9 +309,17 @@ void
 MimeTypeEditor::CommitChanges()
 {
 	if (fPreviousText != fTextControl->Text()) {
-		fEditor.Replace(0, (const uint8 *)fTextControl->Text(),
+		fEditor.Replace(0, (const uint8*)fTextControl->Text(),
 			strlen(fTextControl->Text()) + 1);
 	}
+}
+
+
+bool
+MimeTypeEditor::TypeMatches()
+{
+	// TODO: check contents?
+	return fEditor.FileSize() <= B_MIME_TYPE_LENGTH;
 }
 
 
@@ -301,7 +329,7 @@ MimeTypeEditor::AttachedToWindow()
 	fTextControl->SetTarget(this);
 	fEditor.StartWatching(this);
 
-	UpdateText();
+	_UpdateText();
 }
 
 
@@ -324,7 +352,7 @@ MimeTypeEditor::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgDataEditorUpdate:
-			UpdateText();
+			_UpdateText();
 			break;
 
 		default:
@@ -333,17 +361,16 @@ MimeTypeEditor::MessageReceived(BMessage *message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - NumberEditor
 
 
 NumberEditor::NumberEditor(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Number Editor", B_FOLLOW_LEFT_RIGHT, 0),
-	fEditor(editor)
+	: TypeEditorView(rect, "Number Editor", B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING, TypeLabel(), NULL,
-							new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
+	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
+		_TypeLabel(), NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
 	fTextControl->SetDivider(StringWidth(fTextControl->Label()) + 8);
 	fTextControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_RIGHT);
 	ResizeTo(rect.Width(), 30);
@@ -353,17 +380,17 @@ NumberEditor::NumberEditor(BRect rect, DataEditor &editor)
 
 
 void 
-NumberEditor::UpdateText()
+NumberEditor::_UpdateText()
 {
 	if (fEditor.Lock()) {
-		const char *number;
-		if (fEditor.GetViewBuffer((const uint8 **)&number) == B_OK) {
+		const char* number;
+		if (fEditor.GetViewBuffer((const uint8**)&number) == B_OK) {
 			char buffer[64];
 			char format[16];
 			switch (fEditor.Type()) {
 				case B_FLOAT_TYPE:
 				{
-					float value = *(float *)number;
+					float value = *(float*)number;
 					snprintf(buffer, sizeof(buffer), "%g", value);
 					break;
 				}
@@ -380,8 +407,8 @@ NumberEditor::UpdateText()
 				case B_INT64_TYPE:
 				case B_OFF_T_TYPE:
 				{
-					Format(format);
-					switch (Size()) {
+					_Format(format);
+					switch (_Size()) {
 						case 1:
 						{
 							int8 value = *(int8 *)number;
@@ -409,10 +436,11 @@ NumberEditor::UpdateText()
 					}
 					break;
 				}
+
 				default:
 				{
-					Format(format);
-					switch (Size()) {
+					_Format(format);
+					switch (_Size()) {
 						case 1:
 						{
 							uint8 value = *(uint8 *)number;
@@ -447,6 +475,14 @@ NumberEditor::UpdateText()
 
 		fEditor.Unlock();
 	}
+}
+
+
+bool
+NumberEditor::TypeMatches()
+{
+	return fEditor.FileSize() >= _Size();
+		// we only look at as many bytes we need to
 }
 
 
@@ -546,13 +582,13 @@ NumberEditor::CommitChanges()
 			return;
 	}
 
-	fEditor.Replace(0, buffer, Size());
+	fEditor.Replace(0, buffer, _Size());
 	fPreviousText.SetTo((char *)buffer);
 }
 
 
-const char *
-NumberEditor::TypeLabel()
+const char*
+NumberEditor::_TypeLabel()
 {
 	switch (fEditor.Type()) {
 		case B_INT8_TYPE:
@@ -590,33 +626,30 @@ NumberEditor::TypeLabel()
 
 
 size_t 
-NumberEditor::Size()
+NumberEditor::_Size()
 {
 	switch (fEditor.Type()) {
 		case B_INT8_TYPE:
-			return 1;
 		case B_UINT8_TYPE:
 			return 1;
 		case B_INT16_TYPE:
-			return 2;
 		case B_UINT16_TYPE:
 			return 2;
 		case B_SSIZE_T_TYPE:
 		case B_INT32_TYPE:
-			return 4;
 		case B_SIZE_T_TYPE:
 		case B_POINTER_TYPE:
 		case B_UINT32_TYPE:
 			return 4;
 		case B_INT64_TYPE:
 		case B_OFF_T_TYPE:
-			return 8;
 		case B_UINT64_TYPE:
 			return 8;
 		case B_FLOAT_TYPE:
 			return 4;
 		case B_DOUBLE_TYPE:
 			return 8;
+
 		default:
 			return 0;
 	}
@@ -624,7 +657,7 @@ NumberEditor::Size()
 
 
 status_t
-NumberEditor::Format(char *buffer)
+NumberEditor::_Format(char *buffer)
 {
 	switch (fEditor.Type()) {
 		case B_INT8_TYPE:
@@ -674,7 +707,7 @@ NumberEditor::AttachedToWindow()
 	fTextControl->SetTarget(this);
 	fEditor.StartWatching(this);
 
-	UpdateText();
+	_UpdateText();
 }
 
 
@@ -695,7 +728,7 @@ NumberEditor::MessageReceived(BMessage *message)
 			CommitChanges();
 			break;
 		case kMsgDataEditorUpdate:
-			UpdateText();
+			_UpdateText();
 			break;
 
 		default:
@@ -704,36 +737,49 @@ NumberEditor::MessageReceived(BMessage *message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - BooleanEditor
 
 
 BooleanEditor::BooleanEditor(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Boolean Editor", B_FOLLOW_NONE, 0),
-	fEditor(editor)
+	: TypeEditorView(rect, "Boolean Editor", B_FOLLOW_NONE, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BPopUpMenu *menu = new BPopUpMenu("bool");
 	BMessage *message;
-	menu->AddItem(fFalseMenuItem = new BMenuItem("false", new BMessage(kMsgValueChanged)));
-	menu->AddItem(fTrueMenuItem = new BMenuItem("true", message = new BMessage(kMsgValueChanged)));
+	menu->AddItem(fFalseMenuItem = new BMenuItem("false",
+		new BMessage(kMsgValueChanged)));
+	menu->AddItem(fTrueMenuItem = new BMenuItem("true",
+		message = new BMessage(kMsgValueChanged)));
 	message->AddInt8("value", 1);
 
-	BMenuField *menuField = new BMenuField(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
-						"Boolean Value:", menu, B_FOLLOW_LEFT_RIGHT);
+	BMenuField *menuField = new BMenuField(rect.InsetByCopy(5, 5),
+		B_EMPTY_STRING, "Boolean Value:", menu, B_FOLLOW_LEFT_RIGHT);
 	menuField->SetDivider(StringWidth(menuField->Label()) + 8);
 	menuField->ResizeToPreferred();
-	ResizeTo(menuField->Bounds().Width() + 10, menuField->Bounds().Height() + 10);
+	ResizeTo(menuField->Bounds().Width() + 10,
+		menuField->Bounds().Height() + 10);
 
-	UpdateMenuField();
+	_UpdateMenuField();
 
 	AddChild(menuField);
 }
 
 
-void 
-BooleanEditor::UpdateMenuField()
+bool
+BooleanEditor::TypeMatches()
 {
+	// we accept everything: we just look at the first byte, anyway
+	return true;
+}
+
+
+void 
+BooleanEditor::_UpdateMenuField()
+{
+	if (fEditor.FileSize() != 1)
+		return;
+
 	if (fEditor.Lock()) {
 		const char *buffer;
 		if (fEditor.GetViewBuffer((const uint8 **)&buffer) == B_OK)
@@ -779,7 +825,7 @@ BooleanEditor::MessageReceived(BMessage *message)
 			break;
 		}
 		case kMsgDataEditorUpdate:
-			UpdateMenuField();
+			_UpdateMenuField();
 			break;
 
 		default:
@@ -788,12 +834,11 @@ BooleanEditor::MessageReceived(BMessage *message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ImageView
 
 
 ImageView::ImageView(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Image View", B_FOLLOW_NONE, B_WILL_DRAW),
-	fEditor(editor),
+	: TypeEditorView(rect, "Image View", B_FOLLOW_NONE, B_WILL_DRAW, editor),
 	fBitmap(NULL),
 	fScaleSlider(NULL)
 {
@@ -843,7 +888,7 @@ ImageView::AttachedToWindow()
 	if (fScaleSlider != NULL)
 		fScaleSlider->SetTarget(this);
 
-	UpdateImage();
+	_UpdateImage();
 }
 
 
@@ -859,11 +904,11 @@ ImageView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgDataEditorUpdate:
-			UpdateImage();
+			_UpdateImage();
 			break;
 
 		case kMsgScaleChanged:
-			UpdateImage();
+			_UpdateImage();
 			break;
 
 		default:
@@ -884,7 +929,7 @@ ImageView::Draw(BRect updateRect)
 
 
 void
-ImageView::UpdateImage()
+ImageView::_UpdateImage()
 {
 	// ToDo: add scroller if necessary?!
 
@@ -903,7 +948,8 @@ ImageView::UpdateImage()
 		return;
 	}
 
-	if (fBitmap != NULL && (fEditor.Type() == B_MINI_ICON_TYPE || fEditor.Type() == B_LARGE_ICON_TYPE)) {
+	if (fBitmap != NULL && (fEditor.Type() == B_MINI_ICON_TYPE
+			|| fEditor.Type() == B_LARGE_ICON_TYPE)) {
 		// optimize icon update...
 		fBitmap->SetBits(data, fEditor.FileSize(), 0, B_CMAP8);
 		fEditor.SetViewSize(viewSize);
@@ -1073,19 +1119,11 @@ ImageView::UpdateImage()
 }
 
 
-void
-ImageView::CommitChanges()
-{
-	// we're not an editor, we're just displaying something
-}
-
-
 //	#pragma mark - MessageView
 
 
 MessageView::MessageView(BRect rect, DataEditor &editor)
-	: TypeEditorView(rect, "Message View", B_FOLLOW_ALL, 0),
-	fEditor(editor)
+	: TypeEditorView(rect, "Message View", B_FOLLOW_ALL, 0, editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -1256,18 +1294,11 @@ MessageView::MessageReceived(BMessage* message)
 }
 
 
-void
-MessageView::CommitChanges()
-{
-	// we're not an editor, we're just displaying something
-}
-
-
 //	#pragma mark -
 
 
-TypeEditorView *
-GetTypeEditorFor(BRect rect, DataEditor &editor)
+TypeEditorView*
+GetTypeEditorFor(BRect rect, DataEditor& editor)
 {
 	switch (editor.Type()) {
 		case B_STRING_TYPE:
@@ -1304,5 +1335,62 @@ GetTypeEditorFor(BRect rect, DataEditor &editor)
 	}
 
 	return NULL;
+}
+
+
+status_t
+GetNthTypeEditor(int32 index, const char** _name)
+{
+	static const char* kEditors[] = {
+		"Text",
+		"Number",
+		"Boolean",
+		"Message",
+		"Image"
+	};
+
+	if (index < 0 || index >= int32(sizeof(kEditors) / sizeof(kEditors[0])))
+		return B_BAD_VALUE;
+
+	*_name = kEditors[index];
+	return B_OK;
+}
+
+
+TypeEditorView*
+GetTypeEditorAt(int32 index, BRect rect, DataEditor& editor)
+{
+	TypeEditorView* view = NULL;
+
+	switch (index) {
+		case 0:
+			view = new StringEditor(rect, editor);
+			break;
+		case 1:
+			view = new NumberEditor(rect, editor);
+			break;
+		case 2:
+			view = new BooleanEditor(rect, editor);
+			break;
+		case 3:
+			view = new MessageView(rect, editor);
+			break;
+		case 4:
+			view = new ImageView(rect, editor);
+			break;
+
+		default:
+			return NULL;
+	}
+
+	if (view == NULL)
+		return NULL;
+
+	if (!view->TypeMatches()) {
+		delete view;
+		return NULL;
+	}
+
+	return view;
 }
 

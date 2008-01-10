@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef PROBE_VIEW_H
@@ -24,48 +24,54 @@ class EditorLooper;
 
 class ProbeView : public BView {
 	public:
-		ProbeView(BRect rect, entry_ref *ref, const char *attribute = NULL,
-			const BMessage *settings = NULL);
+		ProbeView(BRect rect, entry_ref* ref, const char* attribute = NULL,
+			const BMessage* settings = NULL);
 		virtual ~ProbeView();
 
 		virtual void DetachedFromWindow();
 		virtual void AttachedToWindow();
 		virtual void AllAttached();
 		virtual void WindowActivated(bool active);
-		virtual void MessageReceived(BMessage *message);
+		virtual void MessageReceived(BMessage* message);
 
-		void AddSaveMenuItems(BMenu *menu, int32 index);
-		void AddPrintMenuItems(BMenu *menu, int32 index);
+		void AddSaveMenuItems(BMenu* menu, int32 index);
+		void AddPrintMenuItems(BMenu* menu, int32 index);
+		void AddViewAsMenuItems();
 
 		void UpdateSizeLimits();
 		bool QuitRequested();
 
-		DataEditor &Editor() { return fEditor; }
+		DataEditor& Editor() { return fEditor; }
 
 	private:
-		void UpdateAttributesMenu(BMenu *menu);
-		void UpdateSelectionMenuItems(int64 start, int64 end);
-		void UpdateBookmarkMenuItems();
-		void AddBookmark(off_t position);
-		void CheckClipboard();
-		status_t PageSetup();
-		void Print();
-		status_t Save();
+		void _UpdateAttributesMenu(BMenu* menu);
+		void _UpdateSelectionMenuItems(int64 start, int64 end);
+		void _UpdateBookmarkMenuItems();
+		void _AddBookmark(off_t position);
+		void _RemoveTypeEditor();
+		void _SetTypeEditor(int32 index);
+		void _CheckClipboard();
+		status_t _PageSetup();
+		void _Print();
+		status_t _Save();
 
 		DataEditor		fEditor;
-		EditorLooper	*fEditorLooper;
-		HeaderView		*fHeaderView;
-		DataView		*fDataView;
-		BScrollView		*fScrollView;
-		BMenuItem		*fPasteMenuItem;
-		BMenuItem		*fUndoMenuItem, *fRedoMenuItem;
-		BMenuItem		*fNativeMenuItem, *fSwappedMenuItem;
-		BMenuItem		*fSaveMenuItem;
-		BMessage		*fPrintSettings;
-		BMenu			*fBookmarkMenu;
+		EditorLooper*	fEditorLooper;
+		HeaderView*		fHeaderView;
+		DataView*		fDataView;
+		BScrollView*	fScrollView;
+		BMenuItem*		fPasteMenuItem;
+		BMenuItem*		fUndoMenuItem;
+		BMenuItem*		fRedoMenuItem;
+		BMenuItem*		fNativeMenuItem;
+		BMenuItem*		fSwappedMenuItem;
+		BMenuItem*		fSaveMenuItem;
+		BMessage*		fPrintSettings;
+		BMenu*			fBookmarkMenu;
+		BView*			fTypeView;
 
-		BMenuItem		*fFindAgainMenuItem;
-		const uint8		*fLastSearch;
+		BMenuItem*		fFindAgainMenuItem;
+		const uint8*	fLastSearch;
 		size_t			fLastSearchSize;
 };
 

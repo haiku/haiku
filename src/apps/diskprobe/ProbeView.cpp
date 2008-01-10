@@ -1,12 +1,14 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "ProbeView.h"
-#include "DataView.h"
-#include "DiskProbe.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Application.h>
 #include <Window.h>
@@ -35,10 +37,9 @@
 #include <PrintJob.h>
 #include <Beep.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include "DataView.h"
+#include "DiskProbe.h"
+#include "TypeEditors.h"
 
 #ifndef __HAIKU__
 #	define DRAW_SLIDER_BAR
@@ -55,6 +56,7 @@ static const uint32 kMsgBlockSize = 'blks';
 static const uint32 kMsgAddBookmark = 'bmrk';
 static const uint32 kMsgPrint = 'prnt';
 static const uint32 kMsgPageSetup = 'pgsp';
+static const uint32 kMsgViewAs = 'vwas';
 
 static const uint32 kMsgStopFind = 'sfnd';
 
@@ -184,7 +186,20 @@ class EditorLooper : public BLooper {
 };
 
 
-//----------------------
+class TypeView : public BView {
+	public:
+		TypeView(BRect rect, const char* name, int32 index,
+			DataEditor& editor, int32 resizingMode);
+		virtual ~TypeView();
+
+		virtual void FrameResized(float width, float height);
+
+	private:
+		BView*	fTypeEditorView;
+};
+
+
+//	#pragma mark - utility functions
 
 
 static void
@@ -201,7 +216,7 @@ get_type_string(char *buffer, size_t bufferSize, type_code type)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - IconView
 
 
 IconView::IconView(BRect rect, const entry_ref *ref, bool isDevice)
@@ -285,7 +300,7 @@ IconView::UpdateIcon()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - PositionSlider
 
 
 PositionSlider::PositionSlider(BRect rect, const char *name, BMessage *message,
@@ -407,7 +422,6 @@ void
 PositionSlider::SetPosition(off_t position)
 {
 	position /= fBlockSize;
-	printf("value: %ld\n", int32(1.0 * kMaxSliderLimit * position / ((fSize - 1) / fBlockSize) + 0.5));
 	SetValue(int32(1.0 * kMaxSliderLimit * position / ((fSize - 1) / fBlockSize) + 0.5));
 }
 
@@ -441,7 +455,7 @@ PositionSlider::SetBlockSize(uint32 blockSize)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - HeaderView
 
 
 HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
@@ -466,7 +480,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 
 	BRect rect = Bounds();
 	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, "Stop",
-						new BMessage(kMsgStopFind), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
+		new BMessage(kMsgStopFind), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fStopButton->SetFont(&plainFont);
 	fStopButton->ResizeToPreferred();
 	fStopButton->MoveTo(rect.right - 4 - fStopButton->Bounds().Width(), 4);
@@ -474,7 +488,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	AddChild(fStopButton);
 
 	BStringView *stringView = new BStringView(BRect(50, 6, rect.right, 20),
-		B_EMPTY_STRING, editor.IsAttribute() ? "Attribute: " : editor.IsDevice() ? "Device: " : "File: ");
+		B_EMPTY_STRING, editor.IsAttribute()
+		? "Attribute: " : editor.IsDevice() ? "Device: " : "File: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -489,14 +504,16 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect = stringView->Frame();
 	rect.left = rect.right;
 	rect.right = fStopButton->Frame().right - 1;
-	fPathView = new BStringView(rect, B_EMPTY_STRING, string.String(), B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
+	fPathView = new BStringView(rect, B_EMPTY_STRING, string.String(),
+		B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 	fPathView->SetFont(&plainFont);
 	AddChild(fPathView);
 
 	float top = 28;
 	if (editor.IsAttribute()) {
 		top += 3;
-		stringView = new BStringView(BRect(50, top, frame.right, top + 15), B_EMPTY_STRING, "Attribute Type: ");
+		stringView = new BStringView(BRect(50, top, frame.right, top + 15),
+			B_EMPTY_STRING, "Attribute Type: ");
 		stringView->SetFont(&boldFont);
 		stringView->ResizeToPreferred();
 		AddChild(stringView);
@@ -509,7 +526,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 
 		char buffer[16];
 		get_type_string(buffer, sizeof(buffer), editor.Type());
-		fTypeControl = new BTextControl(rect, B_EMPTY_STRING, NULL, buffer, new BMessage(kMsgPositionUpdate));
+		fTypeControl = new BTextControl(rect, B_EMPTY_STRING, NULL, buffer,
+			new BMessage(kMsgPositionUpdate));
 		fTypeControl->SetDivider(0.0);
 		fTypeControl->SetFont(&plainFont);
 		fTypeControl->TextView()->SetFontAndColor(&plainFont);
@@ -521,7 +539,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	} else
 		fTypeControl = NULL;
 
-	stringView = new BStringView(BRect(50, top, frame.right, top + 15), B_EMPTY_STRING, "Block: ");
+	stringView = new BStringView(BRect(50, top, frame.right, top + 15),
+		B_EMPTY_STRING, "Block: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -531,7 +550,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect.right += 75;
 	rect.OffsetBy(0, -2);
 		// BTextControl oddities
-	fPositionControl = new BTextControl(rect, B_EMPTY_STRING, NULL, "0x0", new BMessage(kMsgPositionUpdate));
+	fPositionControl = new BTextControl(rect, B_EMPTY_STRING, NULL, "0x0",
+		new BMessage(kMsgPositionUpdate));
 	fPositionControl->SetDivider(0.0);
 	fPositionControl->SetFont(&plainFont);
 	fPositionControl->TextView()->SetFontAndColor(&plainFont);
@@ -563,8 +583,9 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
-	stringView = new BStringView(rect, B_EMPTY_STRING,
-		editor.IsAttribute() ? "Attribute Offset: " : editor.IsDevice() ? "Device Offset: " : "File Offset: ");
+	stringView = new BStringView(rect, B_EMPTY_STRING, editor.IsAttribute()
+		? "Attribute Offset: " : editor.IsDevice()
+			? "Device Offset: " : "File Offset: ");
 	stringView->SetFont(&boldFont);
 	stringView->ResizeToPreferred();
 	AddChild(stringView);
@@ -580,8 +601,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	rect.InsetBy(3, 0);
 	rect.top = top + 21;
 	rect.bottom = rect.top + 12;
-	fPositionSlider = new PositionSlider(rect, "slider", new BMessage(kMsgSliderUpdate),
-		editor.FileSize(), editor.BlockSize());
+	fPositionSlider = new PositionSlider(rect, "slider",
+		new BMessage(kMsgSliderUpdate), editor.FileSize(), editor.BlockSize());
 	fPositionSlider->SetModificationMessage(new BMessage(kMsgSliderUpdate));
 	fPositionSlider->SetBarThickness(8);
 	fPositionSlider->ResizeToPreferred();
@@ -604,13 +625,17 @@ HeaderView::AttachedToWindow()
 	fPositionSlider->SetTarget(this);
 	
 	BMessage *message;
-	Window()->AddShortcut(B_HOME, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	Window()->AddShortcut(B_HOME, B_COMMAND_KEY,
+		message = new BMessage(kMsgPositionUpdate), this);
 	message->AddInt64("block", 0);
-	Window()->AddShortcut(B_END, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	Window()->AddShortcut(B_END, B_COMMAND_KEY,
+		message = new BMessage(kMsgPositionUpdate), this);
 	message->AddInt64("block", -1);
-	Window()->AddShortcut(B_PAGE_UP, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	Window()->AddShortcut(B_PAGE_UP, B_COMMAND_KEY,
+		message = new BMessage(kMsgPositionUpdate), this);
 	message->AddInt32("delta", -1);
-	Window()->AddShortcut(B_PAGE_DOWN, B_COMMAND_KEY, message = new BMessage(kMsgPositionUpdate), this);
+	Window()->AddShortcut(B_PAGE_DOWN, B_COMMAND_KEY,
+		message = new BMessage(kMsgPositionUpdate), this);
 	message->AddInt32("delta", 1);
 }
 
@@ -699,7 +724,8 @@ HeaderView::UpdateFileSizeView()
 {
 	char buffer[64];
 	strcpy(buffer, "of ");
-	FormatValue(buffer + 3, sizeof(buffer) - 3, (fFileSize + fBlockSize - 1) / fBlockSize);
+	FormatValue(buffer + 3, sizeof(buffer) - 3,
+		(fFileSize + fBlockSize - 1) / fBlockSize);
 	fSizeView->SetText(buffer);
 }
 
@@ -770,7 +796,8 @@ HeaderView::MessageReceived(BMessage *message)
 			// If there is another message of this type in the
 			// queue, we're just ignoring the current message.
 
-			if (Looper()->MessageQueue()->FindMessage(kMsgSliderUpdate, 0) != NULL)
+			if (Looper()->MessageQueue()->FindMessage(kMsgSliderUpdate, 0)
+					!= NULL)
 				break;
 
 			// if nothing has changed, we can ignore this message as well
@@ -791,7 +818,8 @@ HeaderView::MessageReceived(BMessage *message)
 		case kMsgDataEditorFindProgress:
 		{
 			bool state;
-			if (message->FindBool("running", &state) == B_OK && fFileSize > fBlockSize) {
+			if (message->FindBool("running", &state) == B_OK
+				&& fFileSize > fBlockSize) {
 				fPositionSlider->SetEnabled(!state);
 				if (state) {
 					fPathView->ResizeBy(-fStopButton->Bounds().Width(), 0);
@@ -827,10 +855,12 @@ HeaderView::MessageReceived(BMessage *message)
 				if (position < 0)
 					position += (fFileSize - 1) / fBlockSize + 1;
 				fPosition = position * fBlockSize;
-			} else if (message->FindInt32("delta", &delta) == B_OK)
+			} else if (message->FindInt32("delta", &delta) == B_OK) {
 				fPosition += delta * off_t(fBlockSize);
-			else
-				fPosition = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
+			} else {
+				fPosition = strtoll(fPositionControl->Text(), NULL, 0)
+					* fBlockSize;
+			}
 
 			fPosition = (fPosition / fBlockSize) * fBlockSize;
 				// round to block size
@@ -879,16 +909,16 @@ HeaderView::MessageReceived(BMessage *message)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TypeMenuItem
 
 
-/**	The TypeMenuItem is a BMenuItem that displays a type string
- *	at its right border.
- *	It is used to display the attribute and type in the attributes menu.
- *	It does not mix nicely with short cuts.
- */
-
-TypeMenuItem::TypeMenuItem(const char *name, const char *type, BMessage *message)
+/*!	The TypeMenuItem is a BMenuItem that displays a type string at its
+	right border.
+	It is used to display the attribute and type in the attributes menu.
+	It does not mix nicely with short cuts.
+*/
+TypeMenuItem::TypeMenuItem(const char *name, const char *type,
+		BMessage *message)
 	: BMenuItem(name, message),
 	fType(type)
 {
@@ -927,22 +957,21 @@ TypeMenuItem::DrawContent()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - EditorLooper
 
 
-/** The purpose of this looper is to off-load the editor data
- *	loading from the main window looper.
- *	It will listen to the offset changes of the editor, let
- *	him update its data, and will then synchronously notify
- *	the target.
- *	That way, simple offset changes will not stop the main
- *	looper from operating. Therefore, all offset updates
- *	for the editor will go through this looper.
- *
- *	Also, it will run the find action in the editor.
- */
+/*!	The purpose of this looper is to off-load the editor data loading from
+	the main window looper.
 
-EditorLooper::EditorLooper(const char *name, DataEditor &editor, BMessenger target)
+	It will listen to the offset changes of the editor, let him update its
+	data, and will then synchronously notify the target.
+	That way, simple offset changes will not stop the main looper from
+	operating. Therefore, all offset updates for the editor will go through
+	this looper.
+	Also, it will run the find action in the editor.
+*/
+EditorLooper::EditorLooper(const char *name, DataEditor &editor,
+		BMessenger target)
 	: BLooper(name),
 	fEditor(editor),
 	fMessenger(target),
@@ -1012,7 +1041,8 @@ EditorLooper::MessageReceived(BMessage *message)
 
 			ssize_t dataSize;
 			const uint8 *data;
-			if (message->FindData("data", B_RAW_TYPE, (const void **)&data, &dataSize) == B_OK)
+			if (message->FindData("data", B_RAW_TYPE, (const void **)&data,
+					&dataSize) == B_OK)
 				Find(startAt, data, dataSize, caseInsensitive, progressMonitor);
 		}
 
@@ -1064,12 +1094,68 @@ EditorLooper::QuitFind()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - TypeView
 
 
-ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute, const BMessage *settings)
+TypeView::TypeView(BRect rect, const char* name, int32 index,
+		DataEditor& editor, int32 resizingMode)
+	: BView(rect, name, resizingMode, B_FRAME_EVENTS)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	fTypeEditorView = GetTypeEditorAt(index, Frame(), editor);
+	if (fTypeEditorView == NULL) {
+		AddChild(new BStringView(Bounds(), "Type Editor",
+			"Type editor not supported", B_FOLLOW_NONE));
+	} else
+		AddChild(fTypeEditorView);
+
+	if ((fTypeEditorView->ResizingMode() & (B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM))
+			!= 0) {
+		BRect rect = Bounds();
+
+		BRect frame = fTypeEditorView->Frame();
+		rect.left = frame.left;
+		rect.top = frame.top;
+		if ((fTypeEditorView->ResizingMode() & B_FOLLOW_RIGHT) == 0)
+			rect.right = frame.right;
+		if ((fTypeEditorView->ResizingMode() & B_FOLLOW_BOTTOM) == 0)
+			rect.bottom = frame.bottom;
+
+		fTypeEditorView->ResizeTo(rect.Width(), rect.Height());
+	}
+}
+
+
+TypeView::~TypeView()
+{
+}
+
+
+void 
+TypeView::FrameResized(float width, float height)
+{
+	BRect rect = Bounds();
+	BView *fTypeEditorView = fTypeEditorView;
+
+	BPoint point = fTypeEditorView->Frame().LeftTop();
+	if ((fTypeEditorView->ResizingMode() & B_FOLLOW_RIGHT) == 0)
+		point.x = (rect.Width() - fTypeEditorView->Bounds().Width()) / 2;
+	if ((fTypeEditorView->ResizingMode() & B_FOLLOW_BOTTOM) == 0)
+		point.y = (rect.Height() - fTypeEditorView->Bounds().Height()) / 2;
+
+	fTypeEditorView->MoveTo(point);
+}
+
+
+//	#pragma mark - ProbeView
+
+
+ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute,
+		const BMessage *settings)
 	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW),
 	fPrintSettings(NULL),
+	fTypeView(NULL),
 	fLastSearch(NULL)
 {
 	fEditor.SetTo(*ref, attribute);
@@ -1095,7 +1181,8 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute, const BM
 	fDataView->SetBase((base_type)baseType);
 	fDataView->SetFontSize(fontSize);
 
-	fScrollView = new BScrollView("scroller", fDataView, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
+	fScrollView = new BScrollView("scroller", fDataView, B_FOLLOW_ALL,
+		B_WILL_DRAW, true, true);
 	AddChild(fScrollView);
 
 	fDataView->UpdateScroller();
@@ -1117,7 +1204,8 @@ ProbeView::UpdateSizeLimits()
 		float width, height;
 		fDataView->GetPreferredSize(&width, &height);
 
-		BRect frame = Window()->ConvertFromScreen(ConvertToScreen(fHeaderView->Frame()));
+		BRect frame = Window()->ConvertFromScreen(ConvertToScreen(
+			fHeaderView->Frame()));
 
 		Window()->SetSizeLimits(250, width + B_V_SCROLL_BAR_WIDTH,
 			200, height + frame.bottom + 4 + B_H_SCROLL_BAR_HEIGHT);
@@ -1129,8 +1217,10 @@ ProbeView::UpdateSizeLimits()
 	BRect bounds = Window()->Bounds();
 	float minWidth, maxWidth, minHeight, maxHeight;
 	Window()->GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	if (maxWidth < bounds.Width() || maxHeight < bounds.Height())
-		Window()->ResizeTo(MIN(maxWidth, bounds.Width()), MIN(maxHeight, bounds.Height()));
+	if (maxWidth < bounds.Width() || maxHeight < bounds.Height()) {
+		Window()->ResizeTo(MIN(maxWidth, bounds.Width()), MIN(maxHeight,
+			bounds.Height()));
+	}
 #endif
 }
 
@@ -1153,7 +1243,7 @@ ProbeView::DetachedFromWindow()
 
 
 void
-ProbeView::UpdateAttributesMenu(BMenu *menu)
+ProbeView::_UpdateAttributesMenu(BMenu *menu)
 {
 	// remove old contents
 
@@ -1206,10 +1296,10 @@ ProbeView::UpdateAttributesMenu(BMenu *menu)
 
 
 void 
-ProbeView::AddSaveMenuItems(BMenu *menu, int32 index)
+ProbeView::AddSaveMenuItems(BMenu* menu, int32 index)
 {
-	menu->AddItem(fSaveMenuItem = new BMenuItem("Save", new BMessage(B_SAVE_REQUESTED),
-		'S', B_COMMAND_KEY), index);
+	menu->AddItem(fSaveMenuItem = new BMenuItem("Save",
+		new BMessage(B_SAVE_REQUESTED), 'S'), index);
 	fSaveMenuItem->SetTarget(this);
 	fSaveMenuItem->SetEnabled(false);
 	//menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS, NULL), index);
@@ -1217,22 +1307,63 @@ ProbeView::AddSaveMenuItems(BMenu *menu, int32 index)
 
 
 void 
-ProbeView::AddPrintMenuItems(BMenu *menu, int32 index)
+ProbeView::AddPrintMenuItems(BMenu* menu, int32 index)
 {
 	BMenuItem *item;
 	menu->AddItem(item = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS,
-								new BMessage(kMsgPageSetup)), index++);
+		new BMessage(kMsgPageSetup)), index++);
 	item->SetTarget(this);
 	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS,
-								new BMessage(kMsgPrint), 'P', B_COMMAND_KEY), index++);
+		new BMessage(kMsgPrint), 'P'), index++);
 	item->SetTarget(this);
+}
+
+
+void 
+ProbeView::AddViewAsMenuItems()
+{
+#if 0
+	BMenuBar* bar = Window()->KeyMenuBar();
+	if (bar == NULL)
+		return;
+
+	BMenuItem* item = bar->FindItem("View");
+	BMenu* menu = NULL;
+	if (item != NULL)
+		menu = item->Submenu();
+	else
+		menu = bar->SubmenuAt(bar->CountItems() - 1);
+
+	if (menu == NULL)
+		return;
+
+	menu->AddSeparatorItem();
+
+	BMenu* subMenu = new BMenu("View As");
+	subMenu->SetRadioMode(true);
+
+	BMessage* message = new BMessage(kMsgViewAs);
+	subMenu->AddItem(item = new BMenuItem("Raw", message));
+	item->SetMarked(true);
+
+	const char* name;
+	for (int32 i = 0; GetNthTypeEditor(i, &name) == B_OK; i++) {
+		message = new BMessage(kMsgViewAs);
+		message->AddInt32("editor index", i);
+		subMenu->AddItem(new BMenuItem(name, message));
+	}
+
+	subMenu->SetTargetForItems(this);
+	menu->AddItem(new BMenuItem(subMenu));
+#endif
 }
 
 
 void 
 ProbeView::AttachedToWindow()
 {
-	fEditorLooper = new EditorLooper(fEditor.Ref().name, fEditor, BMessenger(fDataView));
+	fEditorLooper = new EditorLooper(fEditor.Ref().name, fEditor,
+		BMessenger(fDataView));
 	fEditorLooper->Run();
 
 	fEditor.StartWatching(this);
@@ -1252,13 +1383,15 @@ ProbeView::AttachedToWindow()
 		MoveBy(0, bar->Bounds().Height());
 		ResizeBy(0, -bar->Bounds().Height());
 
-		BMenu *menu = new BMenu(fEditor.IsAttribute() ? "Attribute" : fEditor.IsDevice() ? "Device" : "File");
+		BMenu *menu = new BMenu(fEditor.IsAttribute()
+			? "Attribute" : fEditor.IsDevice() ? "Device" : "File");
 		AddSaveMenuItems(menu, 0);
 		menu->AddSeparatorItem();
 		AddPrintMenuItems(menu, menu->CountItems());
 		menu->AddSeparatorItem();
 
-		menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY));
+		menu->AddItem(new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED),
+			'W'));
 		bar->AddItem(menu);
 	}
 
@@ -1266,26 +1399,30 @@ ProbeView::AttachedToWindow()
 
 	BMenu *menu = new BMenu("Edit");
 	BMenuItem *item;
-	menu->AddItem(fUndoMenuItem = new BMenuItem("Undo", new BMessage(B_UNDO), 'Z', B_COMMAND_KEY));
+	menu->AddItem(fUndoMenuItem = new BMenuItem("Undo", new BMessage(B_UNDO),
+		'Z'));
 	fUndoMenuItem->SetEnabled(fEditor.CanUndo());
 	fUndoMenuItem->SetTarget(fDataView);
-	menu->AddItem(fRedoMenuItem = new BMenuItem("Redo", new BMessage(B_REDO), 'Z', B_COMMAND_KEY | B_SHIFT_KEY));
+	menu->AddItem(fRedoMenuItem = new BMenuItem("Redo", new BMessage(B_REDO),
+		'Z', B_SHIFT_KEY));
 	fRedoMenuItem->SetEnabled(fEditor.CanRedo());
 	fRedoMenuItem->SetTarget(fDataView);
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C', B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C'));
 	item->SetTarget(NULL, Window());
-	menu->AddItem(fPasteMenuItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V', B_COMMAND_KEY));
+	menu->AddItem(fPasteMenuItem = new BMenuItem("Paste", new BMessage(B_PASTE),
+		'V'));
 	fPasteMenuItem->SetTarget(NULL, Window());
-	CheckClipboard();
-	menu->AddItem(item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A', B_COMMAND_KEY));
+	_CheckClipboard();
+	menu->AddItem(item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL),
+		'A'));
 	item->SetTarget(NULL, Window());
 	menu->AddSeparatorItem();
-	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS, new BMessage(kMsgOpenFindWindow),
-								'F', B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Find" B_UTF8_ELLIPSIS,
+		new BMessage(kMsgOpenFindWindow), 'F'));
 	item->SetTarget(this);
-	menu->AddItem(fFindAgainMenuItem = new BMenuItem("Find Again", new BMessage(kMsgFind),
-		'G', B_COMMAND_KEY));
+	menu->AddItem(fFindAgainMenuItem = new BMenuItem("Find Again",
+		new BMessage(kMsgFind), 'G'));
 	fFindAgainMenuItem->SetEnabled(false);
 	fFindAgainMenuItem->SetTarget(this);
 	bar->AddItem(menu);
@@ -1295,30 +1432,31 @@ ProbeView::AttachedToWindow()
 	menu = new BMenu("Block");
 	BMessage *message = new BMessage(kMsgPositionUpdate);
 	message->AddInt32("delta", 1);
-	menu->AddItem(item = new BMenuItem("Next", message, B_RIGHT_ARROW, B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Next", message, B_RIGHT_ARROW));
 	item->SetTarget(fHeaderView);
 	message = new BMessage(kMsgPositionUpdate);
 	message->AddInt32("delta", -1);
-	menu->AddItem(item = new BMenuItem("Previous", message, B_LEFT_ARROW, B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Previous", message, B_LEFT_ARROW));
 	item->SetTarget(fHeaderView);
-	menu->AddItem(item = new BMenuItem("Back", new BMessage(kMsgLastPosition), 'J', B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Back", new BMessage(kMsgLastPosition),
+		'J'));
 	item->SetTarget(fHeaderView);
 
 	BMenu *subMenu = new BMenu("Selection");
 	message = new BMessage(kMsgPositionUpdate);
 	message->AddInt64("block", 0);
-	subMenu->AddItem(fNativeMenuItem = new BMenuItem("", message, 'K', B_COMMAND_KEY));
+	subMenu->AddItem(fNativeMenuItem = new BMenuItem("", message, 'K'));
 	fNativeMenuItem->SetTarget(fHeaderView);
 	message = new BMessage(*message);
-	subMenu->AddItem(fSwappedMenuItem = new BMenuItem("", message, 'L', B_COMMAND_KEY));
+	subMenu->AddItem(fSwappedMenuItem = new BMenuItem("", message, 'L'));
 	fSwappedMenuItem->SetTarget(fHeaderView);
 	menu->AddItem(new BMenuItem(subMenu));
-	UpdateSelectionMenuItems(0, 0);
+	_UpdateSelectionMenuItems(0, 0);
 	menu->AddSeparatorItem();
 
 	fBookmarkMenu = new BMenu("Bookmarks");
-	fBookmarkMenu->AddItem(item = new BMenuItem("Add", new BMessage(kMsgAddBookmark),
-		'B', B_COMMAND_KEY));
+	fBookmarkMenu->AddItem(item = new BMenuItem("Add",
+		new BMessage(kMsgAddBookmark), 'B'));
 	item->SetTarget(this);
 	menu->AddItem(new BMenuItem(fBookmarkMenu));
 	bar->AddItem(menu);
@@ -1328,15 +1466,16 @@ ProbeView::AttachedToWindow()
 
 	BDirectory directory;
 	BVolume volume;
-	if (directory.SetTo(&fEditor.AttributeRef()) == B_OK && directory.IsRootDirectory())
+	if (directory.SetTo(&fEditor.AttributeRef()) == B_OK
+		&& directory.IsRootDirectory())
 		directory.GetVolume(&volume);
 	else
 		fEditor.File().GetVolume(&volume);
 
-	if (!fEditor.IsAttribute()
-		&& volume.InitCheck() == B_OK && (volume.KnowsMime() || volume.KnowsAttr())) {
+	if (!fEditor.IsAttribute() && volume.InitCheck() == B_OK
+		&& (volume.KnowsMime() || volume.KnowsAttr())) {
 		bar->AddItem(menu = new BMenu("Attributes"));
-		UpdateAttributesMenu(menu);
+		_UpdateAttributesMenu(menu);
 	}
 
 	// "View" menu
@@ -1348,14 +1487,14 @@ ProbeView::AttachedToWindow()
 	subMenu = new BMenu("Base");
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kDecimalBase);
-	subMenu->AddItem(item = new BMenuItem("Decimal", message, 'D', B_COMMAND_KEY));
+	subMenu->AddItem(item = new BMenuItem("Decimal", message, 'D'));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kDecimalBase)
 		item->SetMarked(true);
 
 	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base_type", kHexBase);
-	subMenu->AddItem(item = new BMenuItem("Hex", message, 'H', B_COMMAND_KEY));
+	subMenu->AddItem(item = new BMenuItem("Hex", message, 'H'));
 	item->SetTarget(this);
 	if (fHeaderView->Base() == kHexBase)
 		item->SetMarked(true);
@@ -1371,8 +1510,10 @@ ProbeView::AttachedToWindow()
 	for (uint32 i = 0; i < sizeof(blockSizes) / sizeof(blockSizes[0]); i++) {
 		char buffer[32];
 		snprintf(buffer, sizeof(buffer), "%ld%s", blockSizes[i],
-			fEditor.IsDevice() && fEditor.BlockSize() == blockSizes[i] ? " (native)" : "");
-		subMenu->AddItem(item = new BMenuItem(buffer, message = new BMessage(kMsgBlockSize)));
+			fEditor.IsDevice() && fEditor.BlockSize() == blockSizes[i]
+			? " (native)" : "");
+		subMenu->AddItem(item = new BMenuItem(buffer,
+			message = new BMessage(kMsgBlockSize)));
 		message->AddInt32("block_size", blockSizes[i]);
 		if (fEditor.BlockSize() == blockSizes[i])
 			item->SetMarked(true);
@@ -1381,7 +1522,8 @@ ProbeView::AttachedToWindow()
 		// if the device has some weird block size, we'll add it here, too
 		char buffer[32];
 		snprintf(buffer, sizeof(buffer), "%ld (native)", fEditor.BlockSize());
-		subMenu->AddItem(item = new BMenuItem(buffer, message = new BMessage(kMsgBlockSize)));
+		subMenu->AddItem(item = new BMenuItem(buffer,
+			message = new BMessage(kMsgBlockSize)));
 		message->AddInt32("block_size", fEditor.BlockSize());
 		item->SetMarked(true);
 	}
@@ -1400,13 +1542,15 @@ ProbeView::AttachedToWindow()
 	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
 		char buffer[16];
 		snprintf(buffer, sizeof(buffer), "%ld", fontSizes[i]);
-		subMenu->AddItem(item = new BMenuItem(buffer, message = new BMessage(kMsgFontSize)));
+		subMenu->AddItem(item = new BMenuItem(buffer,
+			message = new BMessage(kMsgFontSize)));
 		message->AddFloat("font_size", fontSizes[i]);
 		if (fontSizes[i] == fontSize)
 			item->SetMarked(true);
 	}
 	subMenu->AddSeparatorItem();
-	subMenu->AddItem(item = new BMenuItem("Fit", message = new BMessage(kMsgFontSize)));
+	subMenu->AddItem(item = new BMenuItem("Fit",
+		message = new BMessage(kMsgFontSize)));
 	message->AddFloat("font_size", 0.0f);
 	if (fontSize == 0)
 		item->SetMarked(true);
@@ -1441,7 +1585,7 @@ ProbeView::WindowActivated(bool active)
 
 
 void
-ProbeView::UpdateSelectionMenuItems(int64 start, int64 end)
+ProbeView::_UpdateSelectionMenuItems(int64 start, int64 end)
 {
 	int64 position = 0;
 	const uint8 *data = fDataView->DataAt(start);
@@ -1489,7 +1633,7 @@ ProbeView::UpdateSelectionMenuItems(int64 start, int64 end)
 
 
 void
-ProbeView::UpdateBookmarkMenuItems()
+ProbeView::_UpdateBookmarkMenuItems()
 {
 	for (int32 i = 2; i < fBookmarkMenu->CountItems(); i++) {
 		BMenuItem *item = fBookmarkMenu->ItemAt(i);
@@ -1514,7 +1658,7 @@ ProbeView::UpdateBookmarkMenuItems()
 
 
 void 
-ProbeView::AddBookmark(off_t position)
+ProbeView::_AddBookmark(off_t position)
 {
 	int32 count = fBookmarkMenu->CountItems();
 
@@ -1560,7 +1704,50 @@ ProbeView::AddBookmark(off_t position)
 
 
 void
-ProbeView::CheckClipboard()
+ProbeView::_RemoveTypeEditor()
+{
+	if (fTypeView == NULL)
+		return;
+
+	if (Parent() != NULL)
+		Parent()->RemoveChild(fTypeView);
+	else
+		Window()->RemoveChild(fTypeView);
+
+	delete fTypeView;
+	fTypeView = NULL;
+}
+
+
+void
+ProbeView::_SetTypeEditor(int32 index)
+{
+	if (index == -1) {
+		// remove type editor, show raw editor
+		if (IsHidden())
+			Show();
+
+		_RemoveTypeEditor();
+	} else {
+		// hide raw editor, create and show type editor
+		if (!IsHidden())
+			Hide();
+
+		_RemoveTypeEditor();
+
+		fTypeView = new TypeView(Frame(), "type shell", index, fEditor,
+			B_FOLLOW_ALL);
+
+		if (Parent() != NULL)
+			Parent()->AddChild(fTypeView);
+		else
+			Window()->AddChild(fTypeView);
+	}
+}
+
+
+void
+ProbeView::_CheckClipboard()
 {
 	if (!be_clipboard->Lock())
 		return;
@@ -1582,7 +1769,7 @@ ProbeView::CheckClipboard()
 
 
 status_t
-ProbeView::PageSetup()
+ProbeView::_PageSetup()
 {
 	BPrintJob printJob(Window()->Title());
 	if (fPrintSettings != NULL)
@@ -1600,9 +1787,9 @@ ProbeView::PageSetup()
 
 
 void
-ProbeView::Print()
+ProbeView::_Print()
 {
-	if (fPrintSettings == NULL && PageSetup() != B_OK)
+	if (fPrintSettings == NULL && _PageSetup() != B_OK)
 		return;
 
 	BPrintJob printJob(Window()->Title());
@@ -1627,7 +1814,7 @@ ProbeView::Print()
 
 
 status_t
-ProbeView::Save()
+ProbeView::_Save()
 {
 	status_t status = fEditor.Save();
 	if (status == B_OK)
@@ -1665,7 +1852,7 @@ ProbeView::QuitRequested()
 	if (chosen == 1)
 		return false;
 
-	return Save() == B_OK;
+	return _Save() == B_OK;
 }
 
 
@@ -1674,7 +1861,7 @@ ProbeView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case B_SAVE_REQUESTED:
-			Save();
+			_Save();
 			break;
 
 		case B_OBSERVER_NOTICE_CHANGE: {
@@ -1688,7 +1875,7 @@ ProbeView::MessageReceived(BMessage *message)
 					int64 start, end;
 					if (message->FindInt64("start", &start) == B_OK
 						&& message->FindInt64("end", &end) == B_OK)
-						UpdateSelectionMenuItems(start, end);
+						_UpdateSelectionMenuItems(start, end);
 					break;
 				}
 				case kDataViewPreferredSize:
@@ -1710,9 +1897,9 @@ ProbeView::MessageReceived(BMessage *message)
 			// The selection menu items depend on the base type as well
 			int32 start, end;
 			fDataView->GetSelection(start, end);
-			UpdateSelectionMenuItems(start, end);
+			_UpdateSelectionMenuItems(start, end);
 
-			UpdateBookmarkMenuItems();
+			_UpdateBookmarkMenuItems();
 
 			// update the application's settings
 			BMessage update(*message);
@@ -1750,16 +1937,26 @@ ProbeView::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgViewAs:
+		{
+			int32 index;
+			if (message->FindInt32("editor index", &index) != B_OK)
+				index = -1;
+
+			_SetTypeEditor(index);
+			break;
+		}
+
 		case kMsgAddBookmark:
-			AddBookmark(fHeaderView->Position());
+			_AddBookmark(fHeaderView->Position());
 			break;
 
 		case kMsgPrint:
-			Print();
+			_Print();
 			break;
 
 		case kMsgPageSetup:
-			PageSetup();
+			_PageSetup();
 			break;
 
 		case kMsgOpenFindWindow:
@@ -1827,7 +2024,7 @@ ProbeView::MessageReceived(BMessage *message)
 						if (bar != NULL) {
 							BMenuItem *item = bar->FindItem("Attributes");
 							if (item != NULL && item->Submenu() != NULL)
-								UpdateAttributesMenu(item->Submenu());
+								_UpdateAttributesMenu(item->Submenu());
 						}
 					}
 
@@ -1844,7 +2041,7 @@ ProbeView::MessageReceived(BMessage *message)
 		}
 
 		case B_CLIPBOARD_CHANGED:
-			CheckClipboard();
+			_CheckClipboard();
 			break;
 
 		case kMsgDataEditorStateChange:
