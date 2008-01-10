@@ -6,6 +6,7 @@ UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 
 KernelAddon ide :
 	ata.c
+	ata_request.c
 	atapi.c
 	channels.c
 	devices.c
