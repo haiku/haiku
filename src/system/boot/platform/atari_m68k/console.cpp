@@ -13,6 +13,7 @@
 
 #include "Handle.h"
 #include "console.h"
+#include "keyboard.h"
 
 
 // TOS emulates a VT52
