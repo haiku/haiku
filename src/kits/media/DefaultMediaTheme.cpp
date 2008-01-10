@@ -389,8 +389,9 @@ void
 TabView::FrameResized(float width, float height)
 {
 	BRect rect = Bounds();
-	rect.InsetBySelf(1, 1);
 	rect.top += TabHeight();
+	rect.InsetBy(3.0f, 3.0f);
+		//ContainerView is inseted by 3.0 in BTabView::_InitObject()
 
 	ContainerView()->ResizeTo(rect.Width(), rect.Height());
 }
