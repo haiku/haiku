@@ -40,6 +40,9 @@
  * http://mail-index.netbsd.org/tech-userlevel/2007/04/02/0000.html
  * http://pagesperso-orange.fr/patrice.mandin/en/howto-binutils.html
  * http://www.wotsit.org/download.asp?f=atariexe&sc=252874182
+ *
+ * generated.m68k/cross-tools/bin/m68k-unknown-haiku-gcc -nostdlib -fpic -Wa,--pcrel -c -o stage1.o src/system/boot/platform/atari_m68k/stage1.S
+ * generated.m68k/cross-tools/bin/m68k-unknown-haiku-ld -o stage1.prg stage1.o -T src/system/boot/platform/atari_m68k/prg.ld
  * 
  */
 
@@ -70,7 +73,24 @@
 #define	S_IFDIR						00000040000o
 
 
+	//Pterm0
+	//move.w	#1,%d0
+	//trap	#1
+	//rts
+	
+	lea.l	str,%a0
+.loopt:
+	move.b	(%a0)+,%d0
+	beq	.strout
+	bsr	putc
+	bra	.loopt
+.strout:
+	//Pterm0
+	move.w	#1,%d0
+	trap	#1
 
+	rts
+	
 .loop:
 	move	#'.',%d0
 	bsr		putc
@@ -79,10 +99,14 @@
 
 /* prints the char in d0.b to the console */
 putc:
+	movem.l	%a0,-(%sp)
 	move.w	%d0,-(%sp)
 	move.w	#DEV_CON,-(%sp)	// DEV_CON
 	move.w	#3,-(%sp)	// Bconout
 	trap	#13
 	add.l	#6,%sp
+	movem.l	(%sp)+,%a0
 	rts
-
+str:
+	.ascii "Haiku!"
+	.byte 0
