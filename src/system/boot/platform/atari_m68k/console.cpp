@@ -251,6 +251,8 @@ console_set_color(int32 foreground, int32 background)
 int
 console_wait_for_key(void)
 {
+#if 0
+	// XXX: do this way and remove keyboard.cpp ?
 	// wait for a key
 	char buffer[3];
 	ssize_t bytesRead;
@@ -259,34 +261,27 @@ console_wait_for_key(void)
 		if (bytesRead < 0)
 			return 0;
 	} while (bytesRead == 0);
+#endif
+	union key key = wait_for_key();
 
-	// translate the ESC sequences for cursor keys
-	if (bytesRead == 3 && buffer[0] == 27 && buffer [1] == 91) {
-		switch (buffer[2]) {
-			case 65:
+	if (key.code.ascii == 0) {
+		switch (key.code.bios) {
+			case BIOS_KEY_UP:
 				return TEXT_CONSOLE_KEY_UP;
-			case 66:
+			case BIOS_KEY_DOWN:
 				return TEXT_CONSOLE_KEY_DOWN;
-			case 67:
-				return TEXT_CONSOLE_KEY_RIGHT;
-			case 68:
-				return TEXT_CONSOLE_KEY_LEFT;
-// TODO: Translate the codes for the following keys. Unfortunately my OF just
-// returns a '\0' character. :-/
-// 			TEXT_CONSOLE_KEY_PAGE_UP,
-// 			TEXT_CONSOLE_KEY_PAGE_DOWN,
-// 			TEXT_CONSOLE_KEY_HOME,
-// 			TEXT_CONSOLE_KEY_END,
-
+			case BIOS_KEY_PAGE_UP:
+				return TEXT_CONSOLE_KEY_PAGE_UP;
+			case BIOS_KEY_PAGE_DOWN:
+				return TEXT_CONSOLE_KEY_PAGE_DOWN;
+			case BIOS_KEY_HOME:
+				return TEXT_CONSOLE_KEY_HOME;
+			case BIOS_KEY_END:
+				return TEXT_CONSOLE_KEY_END;
 			default:
-				break;
+				return 0;
 		}
-	}
-
-	// put back unread chars
-	if (bytesRead > 1)
-		sInput.PutChars(buffer + 1, bytesRead - 1);
-
-	return buffer[0];
+	} else
+		return key.code.ascii;
 }
 
