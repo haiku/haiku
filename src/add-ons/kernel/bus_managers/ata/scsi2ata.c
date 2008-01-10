@@ -21,10 +21,25 @@
 #define TRACE	dprintf
 #define FLOW	dprintf
 
-/** emulate MODE SENSE 10 command */
+
+
+// set sense buffer according to device sense in ata_request
+void
+scsi_set_sense(scsi_sense *sense, const ata_request *request)
+{
+	memset(sense, 0, sizeof(*sense));
+
+	sense->error_code = SCSIS_CURR_ERROR;
+	sense->sense_key = request->senseKey;
+	sense->add_sense_length = sizeof(*sense) - 7;
+	sense->asc = request->senseAsc;
+	sense->ascq = request->senseAscq;
+	sense->sense_key_spec.raw.SKSV = 0;	// no additional info
+}
+
 
 static void
-ata_mode_sense_10(ide_device_info *device, ata_request *request)
+scsi_mode_sense_10(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;
 	scsi_cmd_mode_sense_10 *cmd = (scsi_cmd_mode_sense_10 *)ccb->cdb;
@@ -51,7 +66,7 @@ ata_mode_sense_10(ide_device_info *device, ata_request *request)
 	if ((cmd->page_code != SCSI_MODEPAGE_CONTROL && cmd->page_code != SCSI_MODEPAGE_ALL)
 		|| (cmd->page_control != SCSI_MODE_SENSE_PC_CURRENT
 			&& cmd->page_control != SCSI_MODE_SENSE_PC_SAVED)) {
-		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
+		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
 
@@ -109,7 +124,7 @@ ata_mode_select_control_page(ide_device_info *device, ata_request *request,
 	scsi_modepage_control *page)
 {
 	if (page->header.page_length != sizeof(*page) - sizeof(page->header)) {
-		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_LIST_LENGTH_ERR);
+		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_LIST_LENGTH_ERR);
 		return false;
 	}
 
@@ -121,7 +136,7 @@ ata_mode_select_control_page(ide_device_info *device, ata_request *request,
 
 /*! Emulate MODE SELECT 10 command */
 static void
-ata_mode_select_10(ide_device_info *device, ata_request *request)
+scsi_mode_select_10(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;
 	scsi_cmd_mode_select_10 *cmd = (scsi_cmd_mode_select_10 *)ccb->cdb;
@@ -132,7 +147,7 @@ ata_mode_select_10(ide_device_info *device, ata_request *request)
 	char modepage_buffer[64];	// !!! enlarge this to support longer mode pages
 
 	if (cmd->save_pages || cmd->pf != 1) {
-		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
+		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
 
@@ -183,8 +198,7 @@ ata_mode_select_10(ide_device_info *device, ata_request *request)
 				break;
 
 			default:
-				set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST,
-					SCSIS_ASC_INV_PARAM_LIST_FIELD);
+				ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_PARAM_LIST_FIELD);
 				return;
 		}
 
@@ -199,29 +213,31 @@ ata_mode_select_10(ide_device_info *device, ata_request *request)
 
 	// if we arrive here, data length was incorrect
 err:
-	set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_LIST_LENGTH_ERR);
+	ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_LIST_LENGTH_ERR);
 }
 
 
-/*! Emulate TEST UNIT READY */
-static status_t
-ata_test_unit_ready(ide_device_info *device, ata_request *request)
+static void
+scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 {
-	TRACE("ata_test_unit_ready\n");
+	TRACE("scsi_test_unit_ready\n");
 
-	if (!device->infoblock.RMSN_supported
+	if (device->infoblock.RMSN_supported == 0
 		|| device->infoblock._127_RMSN_support != 1)
-		return B_OK;
+		return;
 
 	// ask device about status		
 	device->tf_param_mask = 0;
 	device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
-	if (ata_send_command(device, request, true, 15, ide_state_pio) != B_OK)
-		return B_ERROR;
+	if (ata_send_command(request, true, 15, ata_state_pio) != B_OK) {
+		return;
+	}
+		
 
-	if (ata_pio_wait_drdy(device) != B_OK)
-		return B_ERROR;
+	if (ata_pio_wait_drdy(device) != B_OK) {
+		return;
+	}
 
 
 	// bits ide_error_mcr | ide_error_mc | ide_error_wp are also valid
@@ -234,14 +250,12 @@ ata_test_unit_ready(ide_device_info *device, ata_request *request)
 		// but what to do if there is one? anyway - we report them
 		;
 	}
-
-	return B_OK;
 }
 
 
 /*! Flush internal device cache */
 static bool
-ata_flush_cache(ide_device_info *device, ata_request *request)
+scsi_synchronize_cache(ide_device_info *device, ata_request *request)
 {
 #if 0
 	// we should also ask for FLUSH CACHE support, but everyone denies it
@@ -270,7 +284,7 @@ ata_flush_cache(ide_device_info *device, ata_request *request)
 	load = true - load medium
 */
 static bool
-ata_load_eject(ide_device_info *device, ata_request *request, bool load)
+scsi_load_eject(ide_device_info *device, ata_request *request, bool load)
 {
 #if 0
 	if (load) {
@@ -293,18 +307,15 @@ ata_load_eject(ide_device_info *device, ata_request *request, bool load)
 }
 
 
-/*! Emulate PREVENT ALLOW command */
-static bool
-ata_prevent_allow(ide_device_info *device, bool prevent)
+static void
+scsi_prevent_allow(ide_device_info *device, ata_request *request, bool prevent)
 {
-	set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_ILL_FUNCTION);
-	return false;
+	ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_ILL_FUNCTION);
 }
 
 
-/*! Emulate INQUIRY command */
 static void
-ata_inquiry(ide_device_info *device, ata_request *request)
+scsi_inquiry(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;
 	scsi_res_inquiry data;
@@ -313,7 +324,7 @@ ata_inquiry(ide_device_info *device, ata_request *request)
 	uint32 transfer_size;
 
 	if (cmd->evpd || cmd->page_code) {
-		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
+		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
 
@@ -362,9 +373,9 @@ ata_inquiry(ide_device_info *device, ata_request *request)
 }
 
 
-/*! Emulate READ CAPACITY command */
+
 static void
-read_capacity(ide_device_info *device, ata_request *request)
+scsi_read_capacity(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;
 	scsi_res_read_capacity data;
@@ -372,7 +383,7 @@ read_capacity(ide_device_info *device, ata_request *request)
 	uint32 lastBlock;
 
 	if (cmd->pmi || cmd->lba) {
-		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
+		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
 	}
 
@@ -387,6 +398,35 @@ read_capacity(ide_device_info *device, ata_request *request)
 }
 
 
+static void
+scsi_request_sense(ide_device_info *device, ata_request *request)
+{
+	scsi_ccb *ccb = request->ccb;
+	scsi_cmd_request_sense *cmd = (scsi_cmd_request_sense *)ccb->cdb;
+	scsi_sense sense;
+	uint32 transferSize;
+
+	// Copy sense data from last request into data buffer of current request.
+	// The sense data of last request is still present in the current request,
+	// as is isn't been cleared by ata_exec_io for SCSI_OP_REQUEST_SENSE.
+
+	if (request->senseKey != 0)
+		scsi_set_sense(&sense, request);
+	else
+		memset(&sense, 0, sizeof(sense));
+
+	copy_sg_data(ccb, 0, cmd->allocation_length, &sense, sizeof(sense), false);
+
+	transferSize = min(sizeof(sense), cmd->allocation_length);
+	transferSize = min(transferSize, ccb->data_length);
+
+	ccb->data_resid = ccb->data_length - transferSize;
+
+	// reset sense information on read
+	ata_request_clear_sense(request);
+}
+
+
 /*! Execute SCSI command */
 void
 ata_exec_io(ide_device_info *device, ata_request *request)
@@ -398,56 +438,58 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 	// ATA devices have one LUN only
 	if (ccb->target_lun != 0) {
 		FLOW("ata_exec_io: wrong target lun\n");
-		ccb->subsys_status = SCSI_SEL_TIMEOUT;
-		finish_request(request, false);
+		ata_request_set_status(request, SCSI_SEL_TIMEOUT);
+		ata_request_finish(request, false /* no resubmit */);
 		return;
 	}
 
-	// starting a ccb means deleting sense, so don't do it if
-	// the command wants to read it
-	if (ccb->cdb[0] != SCSI_OP_REQUEST_SENSE)	
-		start_request(device, request);
+	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE) {
+		// No initial clear sense, as this request is used
+		// by the scsi stack to request the sense data of
+		// the previous command.
+		scsi_request_sense(device, request);
+		ata_request_finish(request, false /* no resubmit */);
+		return;
+	}
+
+	ata_request_clear_sense(request);
 
 	switch (ccb->cdb[0]) {
 		case SCSI_OP_TEST_UNIT_READY:
-			ata_test_unit_ready(device, request);
+			scsi_test_unit_ready(device, request);
 			break;
-
-		case SCSI_OP_REQUEST_SENSE:
-			ide_request_sense(device, request);
-			return;
 
 		case SCSI_OP_FORMAT: /* FORMAT UNIT */
 			// we could forward ccb to disk, but modern disks cannot
 			// be formatted anyway, so we just refuse ccb
 			// (exceptions are removable media devices, but to my knowledge
 			// they don't have to be formatted as well)
-			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
+			ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 			break;
 
 		case SCSI_OP_INQUIRY: 
-			ata_inquiry(device, request);
+ 			scsi_inquiry(device, request);
 			break;
 
 		case SCSI_OP_MODE_SELECT_10:
-			ata_mode_select_10(device, request);
+			scsi_mode_select_10(device, request);
 			break;
 
 		case SCSI_OP_MODE_SENSE_10:
-			ata_mode_sense_10(device, request);
+			scsi_mode_sense_10(device, request);
 			break;
 
 		case SCSI_OP_MODE_SELECT_6:
 		case SCSI_OP_MODE_SENSE_6:
 			// we've told SCSI bus manager to emulates these commands
-			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
+			ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 			break;
 
 		case SCSI_OP_RESERVE:
 		case SCSI_OP_RELEASE:
 			// though mandatory, this doesn't make much sense in a
 			// single initiator environment; so what
-			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
+			ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 			break;
 
 		case SCSI_OP_START_STOP: {
@@ -460,34 +502,33 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 
 			if (!cmd->start)
 				// we must always flush cache if start = 0
-				ata_flush_cache(device, request);
+				scsi_synchronize_cache(device, request);
 
 			if (cmd->load_eject)
-				ata_load_eject(device, request, cmd->start);
-
+				scsi_load_eject(device, request, cmd->start);
 			break;
 		}
 
-		case SCSI_OP_PREVENT_ALLOW: {
+		case SCSI_OP_PREVENT_ALLOW:
+		{
 			scsi_cmd_prevent_allow *cmd = (scsi_cmd_prevent_allow *)ccb->cdb;
-
-			ata_prevent_allow(device, cmd->prevent);
+			scsi_prevent_allow(device, request, cmd->prevent);
 			break;
 		}
 
 		case SCSI_OP_READ_CAPACITY:
-			read_capacity(device, request);
+			scsi_read_capacity(device, request);
 			break;
 
 		case SCSI_OP_VERIFY:
 			// does anyone uses this function?
 			// effectly, it does a read-and-compare, which IDE doesn't support
-			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
+			ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 			break;
 
 		case SCSI_OP_SYNCHRONIZE_CACHE:
 			// we ignore range and immediate bit, we always immediately flush everything 
-			ata_flush_cache(device, request);
+			scsi_synchronize_cache(device, request);
 			break;
 
 		// sadly, there are two possible read/write operation codes;
@@ -523,17 +564,16 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 
 			if (length != 0) {
 				ata_exec_read_write(device, request, pos, length, cmd->opcode == SCSI_OP_WRITE_10);
+				return;
 			} else {
 				// we cannot transfer zero blocks (apart from LBA48)
-				finish_request(request, false);
+				ata_request_set_status(request, SCSI_REQ_CMP);
 			}
-			return;
 		}
 
 		default:
 			FLOW("command not implemented\n");
-			set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
+			ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 	}
-
-	finish_checksense(request);
+	ata_request_finish(request, false /* no resubmit */);
 }
