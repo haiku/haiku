@@ -34,6 +34,7 @@
 #include <ServerProtocol.h>
 #include <TokenSpace.h>
 #include <tracker_private.h>
+#include <WindowPrivate.h>
 
 #include <ctype.h>
 #include <stdio.h>
@@ -1912,7 +1913,8 @@ BWindow::IsModal() const
 {
 	return fFeel == B_MODAL_SUBSET_WINDOW_FEEL
 		|| fFeel == B_MODAL_APP_WINDOW_FEEL
-		|| fFeel == B_MODAL_ALL_WINDOW_FEEL;
+		|| fFeel == B_MODAL_ALL_WINDOW_FEEL
+		|| fFeel == kMenuWindowFeel;
 }
 
 

@@ -34,6 +34,7 @@
 
 #include "utf8_functions.h"
 
+#define USE_CACHED_MENUWINDOW 0
 
 using std::nothrow;
 using BPrivate::BMenuWindow;
@@ -1367,12 +1368,14 @@ BMenu::_Hide()
 	window->DetachMenu();
 		// we don't want to be deleted when the window is removed
 
+#if USE_CACHED_MENUWINDOW
 	if (fSuper != NULL)
 		window->Unlock();
-	else {
-		// it's our window, quit it
+	else
+#endif
 		window->Quit();
-	}	
+		// it's our window, quit it
+
 
 	// Delete the menu window used by our submenus
 	_DeleteMenuWindow();
@@ -2022,12 +2025,13 @@ BMenu::_OverSubmenu(BMenuItem *item, BPoint loc)
 BMenuWindow *
 BMenu::_MenuWindow()
 {
+#if USE_CACHED_MENUWINDOW
 	if (fCachedMenuWindow == NULL) {
 		char windowName[64];
 		snprintf(windowName, 64, "%s cached menu", Name());
 		fCachedMenuWindow = new (nothrow) BMenuWindow(windowName);
 	}
-
+#endif
 	return fCachedMenuWindow;
 }
 
@@ -2385,6 +2389,7 @@ BMenu::QuitTracking()
 		menuBar->_RestoreFocus();
 
 	fChosenItem = NULL;
+
 	fState = MENU_STATE_CLOSED;
 	_Hide();
 }
