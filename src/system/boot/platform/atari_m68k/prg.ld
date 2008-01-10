@@ -1,0 +1,60 @@
+/*OUTPUT_FORMAT("elf32-m68k", "elf32-m68k", "elf32-m68k")*/
+OUTPUT_FORMAT("binary", "binary", "binary")
+OUTPUT_ARCH(m68k)
+
+ENTRY(__text_start)
+SEARCH_DIR("libgcc");
+SECTIONS
+{
+	/*. = 0x80000000 + SIZEOF_HEADERS;*/
+	/* fool the alignment of .text */
+	/*. = 0x20 - 0x1c;*/
+
+	/* .PRG file header */
+	.prgheader : {
+	/*SHORT(0x55aa)*/
+		SHORT(0x601a)				/* MAGIC */
+		LONG(__data_start - __text_start)	/* TEXT SIZE */
+		LONG(__bss_start - __data_start)	/* DATA SIZE */
+		LONG(_end - __bss_start)		/* BSS SIZE */
+		LONG(0)					/* SYMBOL TABLE SIZE */
+		LONG(0x4841494b)			/* (reserved) 'HAIK' */
+		LONG(0x1)				/* PRGFLAGS : PF_FASTLOAD */
+		SHORT(0)				/* ABSFLAG */
+	}
+
+	__text_start = .;
+	/* ".text ." should align to 0x1c but doesn't work as expected, cf top. */
+	.text . : { 
+		*(.text .gnu.linkonce.t.*) 
+		*(.rel.text) *(.rel.gnu.linkonce.t*) 
+		*(.rela.text) *(.rela.gnu.linkonce.t*) 
+		*(.rodata) 
+		*(.rel.rodata) *(.rel.gnu.linkonce.r*)
+		*(.rela.rodata) *(.rela.gnu.linkonce.r*)
+	}
+	/* writable data  */
+	/* NO! . = ALIGN(0x1000); */
+	__data_start = .;
+	.data : {
+		*(.data .gnu.linkonce.d.*)
+		*(.rel.data) *(.rel.gnu.linkonce.d*)
+		*(.rela.data) *(.rela.gnu.linkonce.d*)
+	}
+	/* unintialized data (in same segment as writable data) */
+	__bss_start = .;
+	.bss : {
+		*(.bss)
+		*(.rel.bss)
+		*(.rela.bss)
+	}
+	/* . = ALIGN(0x1000); */
+	_end = . ;
+
+	.prgtrailer : {
+		LONG(0)					/* FIXUP OFFSET */
+		LONG(0)
+	}
+	/* Strip unnecessary stuff */
+	/DISCARD/ : { *(.comment .note .eh_frame) }
+}
