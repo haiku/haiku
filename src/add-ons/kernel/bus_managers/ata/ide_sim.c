@@ -39,13 +39,12 @@
 scsi_for_sim_interface *scsi;
 
 
-static void set_check_condition(ata_request *request);
-
 
 static void
 sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 {
 	ide_device_info *device;
+	ata_request *request;
 
 	FLOW("sim_scsi_iobus %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
 
@@ -66,62 +65,38 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 	if (ccb->target_lun > device->last_lun)
 		goto err_inv_device;
 
-	// grab the bus	
-	ACQUIRE_BEN(&bus->status_report_ben);
-	IDE_LOCK(bus);
+	ata_request_start(&request, device, ccb);
 
-	if (bus->state != ata_state_idle)
-		goto err_bus_busy;
+	if (request) {
+		FLOW("calling exec_io: %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
+		device->exec_io(device, request);
+		return;
+	}
 
-	// bail out if device can't accept further requests
-	if (bus->requestFree == NULL)
-		goto err_device_busy;
-
-	bus->state = ata_state_busy;
-
-	IDE_UNLOCK(bus);
-	RELEASE_BEN(&bus->status_report_ben);
-
-	// as we own the bus, noone can bother us
-	ASSERT(bus->requestActive == NULL);
-	bus->requestActive = bus->requestFree;
-	bus->requestFree = NULL;
-	
-	init_ata_request(bus->requestActive, device, ccb);
-
-	FLOW("calling exec_io: %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
-
-	device->exec_io(device, bus->requestActive);
-
-	return;
-
-err_inv_device:
-	FLOW("Invalid device %d:%d\n", ccb->target_id, ccb->target_lun);
-
-	ccb->subsys_status = SCSI_SEL_TIMEOUT;
-	scsi->finished(ccb, 1);
-	return;
-
-err_bus_busy:
 	FLOW("Bus busy\n");
-
-	IDE_UNLOCK(bus);
+	ACQUIRE_BEN(&bus->status_report_ben);
 	scsi->requeue(ccb, true);
 	RELEASE_BEN(&bus->status_report_ben);
 	return;
 
-err_device_busy:
-	FLOW("Device busy\n");
 
-	IDE_UNLOCK(bus);
-	scsi->requeue(ccb, false);
+err_inv_device:
+
+	FLOW("Invalid device %d:%d\n", ccb->target_id, ccb->target_lun);
+	ccb->subsys_status = SCSI_SEL_TIMEOUT;
+	ACQUIRE_BEN(&bus->status_report_ben);
+	scsi->finished(ccb, 1);
 	RELEASE_BEN(&bus->status_report_ben);
 	return;
 
+
 err_disconnected:
+
 	TRACE("No controller anymore\n");
 	ccb->subsys_status = SCSI_NO_HBA;
+	ACQUIRE_BEN(&bus->status_report_ben);
 	scsi->finished(ccb, 1);
+	RELEASE_BEN(&bus->status_report_ben);
 	return;
 }
 
@@ -200,11 +175,10 @@ scan_bus(ide_bus_info *bus)
 		if (!devicePresent[i])
 			continue;
 
-		isAtapi = deviceSignature[i] == 0xeb140101;
-
 		dprintf("ATA: scan_bus: bus %p, creating device %d, signature is 0x%08lx\n",
 			bus, i, deviceSignature[i]);
 
+		isAtapi = deviceSignature[i] == 0xeb140101;
 		device = create_device(bus, i /* isDevice1 */);
 
 		if (scan_device(device, isAtapi) != B_OK) {
@@ -230,7 +204,7 @@ scan_bus(ide_bus_info *bus)
 static uchar
 sim_rescan_bus(ide_bus_info *bus)
 {
-	TRACE("ATA: sim_rescan_bus\n");
+	TRACE("ATA: sim_rescan_bus - not implemented\n");
 	return SCSI_REQ_CMP;
 }
 
@@ -264,7 +238,7 @@ sim_reset_bus(ide_bus_info *bus)
 	if (bus->disconnected)
 		return SCSI_NO_HBA;
 
-
+	TRACE("ATA: sim_reset_bus - not implemented\n");
 	return SCSI_REQ_INVALID;
 }
 
@@ -277,212 +251,6 @@ sim_reset_device(ide_bus_info *bus, uchar target_id, uchar target_lun)
 		return SCSI_NO_HBA;
 
 	return SCSI_REQ_INVALID;
-}
-
-
-/** fill sense buffer according to device sense */
-
-void
-create_sense(ide_device_info *device, scsi_sense *sense)
-{
-	memset(sense, 0, sizeof(*sense));
-
-	sense->error_code = SCSIS_CURR_ERROR;
-	sense->sense_key = decode_sense_key(device->combined_sense);
-	sense->add_sense_length = sizeof(*sense) - 7;
-	sense->asc = decode_sense_asc(device->combined_sense);
-	sense->ascq = decode_sense_ascq(device->combined_sense);
-	sense->sense_key_spec.raw.SKSV = 0;	// no additional info
-}
-
-
-/** finish command, updating sense of device and request, and release bus */
-
-void
-finish_checksense(ata_request *request)
-{
-	SHOW_FLOW(3, "%p, subsys_status=%d, sense=%x", 
-		request->ccb,
-		request->ccb->subsys_status,
-		(int)request->device->new_combined_sense);
-
-	request->ccb->subsys_status = request->device->subsys_status;
-
-	if (request->ccb->subsys_status == SCSI_REQ_CMP) {
-		// device or emulation code completed command
-		request->device->combined_sense = request->device->new_combined_sense;
-
-		// if emulation code detected error, set CHECK CONDITION
-		if (request->device->combined_sense)
-			set_check_condition(request);
-	}
-
-	finish_request(request, false);
-}
-
-
-/**	finish request and release bus
- *	resubmit - true, if request should be resubmitted by XPT
- */
-
-void
-finish_request(ata_request *request, bool resubmit)
-{
-	ide_device_info *device = request->device;
-	ide_bus_info *bus = device->bus;
-	scsi_ccb *ccb;
-
-	SHOW_FLOW0(3, "");
-
-	// save request first, as request can be reused as soon as
-	// access_finished is called!
-	ccb = request->ccb;
-
-
-	bus->requestFree = bus->requestActive;
-	bus->requestActive = NULL;
-
-	// release bus, handling service requests;
-	// TBD:
-	// if we really handle a service request, the finished command
-	// is delayed unnecessarily, but if we tell the XPT about the finished
-	// command first, it will instantly try to pass us another 
-	// request to handle, which we will refuse as the bus is still
-	// locked; this really has to be improved
-	access_finished(bus, device);	
-
-	ACQUIRE_BEN(&bus->status_report_ben);
-
-	if (resubmit)
-		scsi->resubmit(ccb);
-	else
-		scsi->finished(ccb, 1);
-
-	RELEASE_BEN(&bus->status_report_ben);
-}
-
-
-/**	set CHECK CONDITION of device and perform auto-sense if requested.
- *	(don't move it before finish_request - we don't want to inline
- *	it as it's on the rarely used error path)
- */
-
-static void
-set_check_condition(ata_request *request)
-{
-	scsi_ccb *ccb = request->ccb;
-	ide_device_info *device = request->device;
-
-	SHOW_FLOW0(3, "");
-
-	ccb->subsys_status = SCSI_REQ_CMP_ERR;
-	ccb->device_status = SCSI_STATUS_CHECK_CONDITION;
-	
-	// copy sense only if caller requested it
-	if ((ccb->flags & SCSI_DIS_AUTOSENSE) == 0) {
-		scsi_sense sense;
-		int sense_len;
-
-		SHOW_FLOW0(3, "autosense");
-
-		// we cannot copy sense directly as sense buffer may be too small
-		create_sense(device, &sense);
-
-		sense_len = min(SCSI_MAX_SENSE_SIZE, sizeof(sense));
-
-		memcpy(ccb->sense, &sense, sense_len);
-		ccb->sense_resid = SCSI_MAX_SENSE_SIZE - sense_len;
-		ccb->subsys_status |= SCSI_AUTOSNS_VALID;
-
-		// device sense gets reset once it's read
-		device->combined_sense = 0;
-	}
-}
-
-
-void
-finish_retry(ata_request *request)
-{
-	request->device->combined_sense = 0;
-	finish_request(request, true);
-}
-
-
-/**	finish request and abort pending requests of the device
- *	(to be called when the request failed and thus messed up the queue)
- */
-
-void
-finish_reset_queue(ata_request *request)
-{
-	ide_bus_info *bus = request->device->bus;
-
-	// don't remove block_bus!!!
-	// during finish_checksense, the bus is released, so
-	// the SCSI bus manager could send us further commands
-	scsi->block_bus(bus->scsi_cookie);
-
-	finish_checksense(request);
-//	send_abort_queue(request->device); // XXX fix this
-
-	scsi->unblock_bus(bus->scsi_cookie);
-}
-
-
-/**	finish request, but don't release bus
- *	if resubmit is true, the request will be resubmitted
- */
-/*
-static void
-finish_norelease(ata_request *request, bool resubmit)
-{
-	ide_device_info *device = request->device;
-	ide_bus_info *bus = device->bus;
-
-	bus->requestFree = bus->requestActive;
-	bus->requestActive = 0;
-
-	ACQUIRE_BEN(&bus->status_report_ben);
-
-	if (resubmit)
-		scsi->resubmit(request->ccb);
-	else
-		scsi->finished(request->ccb, 1);
-
-	RELEASE_BEN(&bus->status_report_ben);
-}
-*/
-
-/**	finish all queued requests but <ignore> of the device;
- *	set resubmit, if requests are to be resubmitted by xpt
- */
-
-void
-finish_all_requests(ide_device_info *device, ata_request *ignore,
-	int subsys_status, bool resubmit)
-{
-
-	if (device == NULL)
-		return;
-
-	// we only have to block the device, but for CD changers we 
-	// have to block all LUNS of the device (and we neither know
-	// their device handle nor which exist at all), so block
-	// the entire bus instead (it won't take that long anyway)
-	scsi->block_bus(device->bus->scsi_cookie);
-
-	// XXX fix this
-/*
-	for (i = 0; i < device->queue_depth; ++i) {
-		ata_request *request = &device->qreq_array[i];
-
-		if (request->running && request != ignore) {
-			request->ccb->subsys_status = subsys_status;
-			finish_norelease(request, resubmit);
-		}
-	}
-*/
-	scsi->unblock_bus(device->bus->scsi_cookie);
 }
 
 
@@ -538,14 +306,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 			unload_driver_settings(settings);
 		}
 	}
-
-	bus->first_device = NULL;
-
-
-	bus->requestActive = NULL;
-	bus->requestFree = (ata_request *)malloc(sizeof(ata_request));
-
-	memset(bus->requestFree, 0, sizeof(ata_request));
 
 	// read restrictions of controller
 
@@ -604,10 +364,6 @@ ide_sim_uninit_bus(ide_bus_info *bus)
 
 	DELETE_BEN(&bus->status_report_ben);	
 	scsi->free_dpc(bus->irq_dpc);
-
-	if (bus->requestActive)
-		dprintf("ide_sim_uninit_bus: Warning request still active\n");
-	free(bus->requestFree);
 
 	free(bus);
 
