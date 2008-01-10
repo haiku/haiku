@@ -20,7 +20,59 @@
 #include <arch/elf.h>
 
 
-#define CHATTY 0
+//#define TRACE_ARCH_ELF
+#ifdef TRACE_ARCH_ELF
+#	define TRACE(x) dprintf x
+#	define CHATTY 1
+#else
+#	define TRACE(x) ;
+#	define CHATTY 0
+#endif
+
+
+#ifdef TRACE_ARCH_ELF
+static const char *kRelocations[] = {
+	"R_68K_NONE",
+	"R_68K_32",	/* Direct 32 bit  */
+	"R_68K_16",	/* Direct 16 bit  */
+	"R_68K_8",	/* Direct 8 bit  */
+	"R_68K_PC32",	/* PC relative 32 bit */
+	"R_68K_PC16",	/* PC relative 16 bit */
+	"R_68K_PC8",	/* PC relative 8 bit */
+	"R_68K_GOT32",	/* 32 bit PC relative GOT entry */
+	"R_68K_GOT16",	/* 16 bit PC relative GOT entry */
+	"R_68K_GOT8",	/* 8 bit PC relative GOT entry */
+	"R_68K_GOT32O",	/* 32 bit GOT offset */
+	"R_68K_GOT16O",	/* 16 bit GOT offset */
+	"R_68K_GOT8O",	/* 8 bit GOT offset */
+	"R_68K_PLT32",	/* 32 bit PC relative PLT address */
+	"R_68K_PLT16",	/* 16 bit PC relative PLT address */
+	"R_68K_PLT8",	/* 8 bit PC relative PLT address */
+	"R_68K_PLT32O",	/* 32 bit PLT offset */
+	"R_68K_PLT16O",	/* 16 bit PLT offset */
+	"R_68K_PLT8O",	/* 8 bit PLT offset */
+	"R_68K_COPY",	/* Copy symbol at runtime */
+	"R_68K_GLOB_DAT",	/* Create GOT entry */
+	"R_68K_JMP_SLOT",	/* Create PLT entry */
+	"R_68K_RELATIVE",	/* Adjust by program base */
+	/* These are GNU extensions to enable C++ vtable garbage collection.  */
+	"R_68K_GNU_VTINHERIT",	
+	"R_68K_GNU_VTENTRY",	
+#if 0
+	"R_386_NONE",
+	"R_386_32",			/* add symbol value */
+	"R_386_PC32",		/* add PC relative symbol value */
+	"R_386_GOT32",		/* add PC relative GOT offset */
+	"R_386_PLT32",		/* add PC relative PLT offset */
+	"R_386_COPY",		/* copy data from shared object */
+	"R_386_GLOB_DAT",	/* set GOT entry to data address */
+	"R_386_JMP_SLOT",	/* set GOT entry to code address */
+	"R_386_RELATIVE",	/* add load address of shared object */
+	"R_386_GOTOFF",		/* add GOT relative symbol address */
+	"R_386_GOTPC",		/* add PC relative GOT table address */
+#endif
+};
+#endif
 
 #ifdef _BOOT_MODE
 status_t
@@ -38,46 +90,14 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 
 
 static inline void
-write_word32(addr_t P, Elf32_Word value)
+write_32(addr_t P, Elf32_Word value)
 {
 	*(Elf32_Word*)P = value;
 }
 
 
 static inline void
-write_word30(addr_t P, Elf32_Word value)
-{
-	// bits 0:29
-	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0x3) | (value << 2);
-}
-
-
-static inline bool
-write_low24_check(addr_t P, Elf32_Word value)
-{
-	// bits 6:29
-	if ((value & 0x3f000000) && (~value & 0x3f800000))
-		return false;
-	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xfc000003)
-		| ((value & 0x00ffffff) << 2);
-	return true;
-}
-
-
-static inline bool
-write_low14_check(addr_t P, Elf32_Word value)
-{
-	// bits 16:29
-	if ((value & 0x3fffc000) && (~value & 0x3fffe000))
-		return false;
-	*(Elf32_Word*)P = (*(Elf32_Word*)P & 0xffff0003)
-		| ((value & 0x00003fff) << 2);
-	return true;
-}
-
-
-static inline void
-write_half16(addr_t P, Elf32_Word value)
+write_16(addr_t P, Elf32_Word value)
 {
 	// bits 16:29
 	*(Elf32_Half*)P = (Elf32_Half)value;
@@ -85,9 +105,9 @@ write_half16(addr_t P, Elf32_Word value)
 
 
 static inline bool
-write_half16_check(addr_t P, Elf32_Word value)
+write_16_check(addr_t P, Elf32_Word value)
 {
-	// bits 16:29
+	// bits 15:0
 	if ((value & 0xffff0000) && (~value & 0xffff8000))
 		return false;
 	*(Elf32_Half*)P = (Elf32_Half)value;
@@ -95,24 +115,14 @@ write_half16_check(addr_t P, Elf32_Word value)
 }
 
 
-static inline Elf32_Word
-lo(Elf32_Word value)
+static inline bool
+write_8_check(addr_t P, Elf32_Word value)
 {
-	return (value & 0xffff);
-}
-
-
-static inline Elf32_Word
-hi(Elf32_Word value)
-{
-	return ((value >> 16) & 0xffff);
-}
-
-
-static inline Elf32_Word
-ha(Elf32_Word value)
-{
-	return (((value >> 16) + (value & 0x8000 ? 1 : 0)) & 0xffff);
+	// bits 7:0
+	if ((value & 0xffffff00) && (~value & 0xffffff80))
+		return false;
+	*(Elf32_Half*)P = (Elf32_Half)value;
+	return true;
 }
 
 
@@ -159,34 +169,14 @@ arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 			ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset, ELF32_R_SYM(rel[i].r_info), rel[i].r_addend);
 #endif
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
-			case R_PPC_SECTOFF:
-			case R_PPC_SECTOFF_LO:
-			case R_PPC_SECTOFF_HI:
-			case R_PPC_SECTOFF_HA:
-				dprintf("arch_elf_relocate_rela(): Getting section relative "
-					"symbol addresses not yet supported!\n");
-				return B_ERROR;
-
-			case R_PPC_ADDR32:
-			case R_PPC_ADDR24:
-			case R_PPC_ADDR16:
-			case R_PPC_ADDR16_LO:
-			case R_PPC_ADDR16_HI:
-			case R_PPC_ADDR16_HA:
-			case R_PPC_ADDR14:
-			case R_PPC_ADDR14_BRTAKEN:
-			case R_PPC_ADDR14_BRNTAKEN:
-			case R_PPC_REL24:
-			case R_PPC_REL14:
-			case R_PPC_REL14_BRTAKEN:
-			case R_PPC_REL14_BRNTAKEN:
-			case R_PPC_GLOB_DAT:
-			case R_PPC_UADDR32:
-			case R_PPC_UADDR16:
-			case R_PPC_REL32:
-			case R_PPC_SDAREL16:
-			case R_PPC_ADDR30:
-			case R_PPC_JMP_SLOT:
+			case R_68K_32:
+			case R_68K_16:
+			case R_68K_8:
+			case R_68K_PC32:
+			case R_68K_PC16:
+			case R_68K_PC8:
+			case R_68K_GLOB_DAT:
+			case R_68K_JMP_SLOT:
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
 #ifdef _BOOT_MODE
@@ -207,193 +197,131 @@ arch_elf_relocate_rela(struct elf_image_info *image, const char *sym_prepend,
 		}
 
 		switch (ELF32_R_TYPE(rel[i].r_info)) {
-			case R_PPC_NONE:
+			case R_68K_NONE:
 				break;
 
-			case R_PPC_COPY:
+			case R_68K_COPY:
 				// TODO: Implement!
-				dprintf("arch_elf_relocate_rela(): R_PPC_COPY not yet "
+				dprintf("arch_elf_relocate_rela(): R_68K_COPY not yet "
 					"supported!\n");
 				return B_ERROR;
 
-			case R_PPC_ADDR32:
-			case R_PPC_GLOB_DAT:
-			case R_PPC_UADDR32:
-				write_word32(P, S + A);
+			case R_68K_32:
+			case R_68K_GLOB_DAT:
+				write_32(P, S + A);
 				break;
 
-			case R_PPC_ADDR24:
-				if (write_low24_check(P, (S + A) >> 2))
+			case R_68K_16:
+				if (write_16_check(P, S + A))
 					break;
-dprintf("R_PPC_ADDR24 overflow\n");
+dprintf("R_68K_16 overflow\n");
 				return B_BAD_DATA;
 
-			case R_PPC_ADDR16:
-			case R_PPC_UADDR16:
-				if (write_half16_check(P, S + A))
+			case R_68K_8:
+				if (write_8_check(P, S + A))
 					break;
-dprintf("R_PPC_ADDR16 overflow\n");
+dprintf("R_68K_8 overflow\n");
 				return B_BAD_DATA;
 
-			case R_PPC_ADDR16_LO:
-				write_half16(P, lo(S + A));
+			case R_68K_PC32:
+				write_32(P, (S + A - P));
 				break;
 
-			case R_PPC_ADDR16_HI:
-				write_half16(P, hi(S + A));
-				break;
-
-			case R_PPC_ADDR16_HA:
-				write_half16(P, ha(S + A));
-				break;
-
-			case R_PPC_ADDR14:
-			case R_PPC_ADDR14_BRTAKEN:
-			case R_PPC_ADDR14_BRNTAKEN:
-				if (write_low14_check(P, (S + A) >> 2))
+			case R_68K_PC16:
+				if (write_16_check(P, (S + A - P)))
 					break;
-dprintf("R_PPC_ADDR14 overflow\n");
+dprintf("R_68K_PC16 overflow\n");
 				return B_BAD_DATA;
 
-			case R_PPC_REL24:
-				if (write_low24_check(P, (S + A - P) >> 2))
+			case R_68K_PC8:
+				if (write_8(P, (S + A - P)))
 					break;
-dprintf("R_PPC_REL24 overflow: 0x%lx\n", (S + A - P) >> 2);
+dprintf("R_68K_PC8 overflow\n");
 				return B_BAD_DATA;
 
-			case R_PPC_REL14:
-			case R_PPC_REL14_BRTAKEN:
-			case R_PPC_REL14_BRNTAKEN:
-				if (write_low14_check(P, (S + A - P) >> 2))
-					break;
-dprintf("R_PPC_REL14 overflow\n");
-				return B_BAD_DATA;
-
-			case R_PPC_GOT16:
+			case R_68K_GOT32:
 				REQUIRE_GOT;
-				if (write_half16_check(P, G + A))
+				write_32(P, (G + A - P));
+				break;
+
+			case R_68K_GOT16:
+				REQUIRE_GOT;
+				if (write_16_check(P, (G + A - P)))
 					break;
-dprintf("R_PPC_GOT16 overflow\n");
+dprintf("R_68K_GOT16 overflow\n");
 				return B_BAD_DATA;
 
-			case R_PPC_GOT16_LO:
+			case R_68K_GOT8:
 				REQUIRE_GOT;
-				write_half16(P, lo(G + A));
-				break;
-
-			case R_PPC_GOT16_HI:
-				REQUIRE_GOT;
-				write_half16(P, hi(G + A));
-				break;
-
-			case R_PPC_GOT16_HA:
-				REQUIRE_GOT;
-				write_half16(P, ha(G + A));
-				break;
-
-			case R_PPC_JMP_SLOT:
-			{
-				// If the relative offset is small enough, we fabricate a
-				// relative branch instruction ("b <addr>").
-				addr_t jumpOffset = S - P;
-				if ((jumpOffset & 0xfc000000) != 0
-					&& (~jumpOffset & 0xfe000000) != 0) {
-					// Offset > 24 bit.
-					// TODO: Implement!
-					// See System V PPC ABI supplement, p. 5-6!
-					dprintf("arch_elf_relocate_rela(): R_PPC_JMP_SLOT: "
-						"Offsets > 24 bit currently not supported!\n");
-dprintf("jumpOffset: %p\n", (void*)jumpOffset);
-					return B_ERROR;
-				} else {
-					// Offset <= 24 bit
-					// 0:5 opcode (= 18), 6:29 address, 30 AA, 31 LK
-					// "b" instruction: opcode = 18, AA = 0, LK = 0
-					// address: 24 high-order bits of 26 bit offset
-					*(uint32*)P = 0x48000000 | ((jumpOffset) & 0x03fffffc);
-				}
-				break;
-			}
-
-			case R_PPC_RELATIVE:
-				write_word32(P, B + A);
-				break;
-
-			case R_PPC_LOCAL24PC:
-// TODO: Implement!
-// low24*
-// 				if (write_low24_check(P, ?)
-// 					break;
-// 				return B_BAD_DATA;
-				dprintf("arch_elf_relocate_rela(): R_PPC_LOCAL24PC not yet "
-					"supported!\n");
-				return B_ERROR;
-
-			case R_PPC_REL32:
-				write_word32(P, S + A - P);
-				break;
-
-			case R_PPC_PLTREL24:
-				REQUIRE_PLT;
-				if (write_low24_check(P, (L + A - P) >> 2))
+				if (write_8_check(P, (G + A - P)))
 					break;
-dprintf("R_PPC_PLTREL24 overflow\n");
+dprintf("R_68K_GOT8 overflow\n");
 				return B_BAD_DATA;
 
-			case R_PPC_PLT32:
-				REQUIRE_PLT;
-				write_word32(P, L + A);
+			case R_68K_GOT32O:
+				REQUIRE_GOT;
+				write_32(P, (G + A));
 				break;
 
-			case R_PPC_PLTREL32:
-				REQUIRE_PLT;
-				write_word32(P, L + A - P);
-				break;
-
-			case R_PPC_PLT16_LO:
-				REQUIRE_PLT;
-				write_half16(P, lo(L + A));
-				break;
-
-			case R_PPC_PLT16_HI:
-				REQUIRE_PLT;
-				write_half16(P, hi(L + A));
-				break;
-
-			case R_PPC_PLT16_HA:
-				write_half16(P, ha(L + A));
-				break;
-
-			case R_PPC_SDAREL16:
-// TODO: Implement!
-// 				if (write_half16_check(P, S + A - _SDA_BASE_))
-// 					break;
-// 				return B_BAD_DATA;
-				dprintf("arch_elf_relocate_rela(): R_PPC_SDAREL16 not yet "
-					"supported!\n");
-				return B_ERROR;
-
-			case R_PPC_SECTOFF:
-				if (write_half16_check(P, R + A))
+			case R_68K_GOT16O:
+				REQUIRE_GOT;
+				if (write_16_check(P, (G + A)))
 					break;
-dprintf("R_PPC_SECTOFF overflow\n");
+dprintf("R_68K_GOT16 overflow\n");
 				return B_BAD_DATA;
 
-			case R_PPC_SECTOFF_LO:
-				write_half16(P, lo(R + A));
+			case R_68K_GOT8O:
+				REQUIRE_GOT;
+				if (write_8_check(P, (G + A)))
+					break;
+dprintf("R_68K_GOT8 overflow\n");
+				return B_BAD_DATA;
+
+			case R_68K_JMP_SLOT:
+				write_32(P, (G + A));
 				break;
 
-			case R_PPC_SECTOFF_HI:
-				write_half16(P, hi(R + A));
+			case R_68K_RELATIVE:
+				write_32(P, B + A);
 				break;
 
-			case R_PPC_SECTOFF_HA:
-				write_half16(P, ha(R + A));
+			case R_68K_PLT32:
+				REQUIRE_PLT;
+				write_32(P, (L + A - P));
 				break;
 
-			case R_PPC_ADDR30:
-				write_word30(P, (S + A - P) >> 2);
+			case R_68K_PLT16:
+				REQUIRE_PLT;
+				if (write_16(P, (L + A - P)))
+					break;
+dprintf("R_68K_PLT16 overflow\n");
+				return B_BAD_DATA;
+
+			case R_68K_PLT8:
+				REQUIRE_PLT;
+				if (write_8(P, (L + A - P)))
+					break;
+dprintf("R_68K_PLT8 overflow\n");
+				return B_BAD_DATA;
+
+			case R_68K_PLT32O:
+				REQUIRE_PLT;
+				write_32(P, (L + A));
 				break;
+
+			case R_68K_PLT16O:
+				REQUIRE_PLT;
+				if (write_16(P, (L + A)))
+					break;
+dprintf("R_68K_PLT16O overflow\n");
+				return B_BAD_DATA;
+
+			case R_68K_PLT8O:
+				REQUIRE_PLT;
+				if (write_8(P, (L + A)))
+					break;
+dprintf("R_68K_PLT8O overflow\n");
+				return B_BAD_DATA;
 
 			default:
 				dprintf("arch_elf_relocate_rela: unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
@@ -403,4 +331,6 @@ dprintf("R_PPC_SECTOFF overflow\n");
 
 	return B_NO_ERROR;
 }
+
+
 
