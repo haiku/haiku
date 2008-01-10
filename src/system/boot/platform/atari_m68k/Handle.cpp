@@ -11,10 +11,20 @@
 #include "Handle.h"
 #include "toscalls."
 
-Handle::Handle(int handle, bool takeOwnership)
+/*
+ * (X)BIOS supports char and block devices with a separate namespace
+ * for char devs handle is {DEV_PRINTER, ... DEV_CONSOLE, ...}
+ * for block devs handle is the drive number.
+ * BlockHandle is in devices.cpp
+ * 
+ * XXX: handle network devices ? not sure how TOS net extensions do this
+ * not sure it'll ever be supported anyway.
+ * XXX: BIOSDrive/BIOSHandle : public BlockHandle ?
+ */
+
+Handle::Handle(int handle)
 	:
 	fHandle((int16)handle),
-	fOwnHandle(takeOwnership)
 {
 }
 
@@ -28,24 +38,61 @@ Handle::Handle(void)
 
 Handle::~Handle()
 {
-	//if (fOwnHandle)
-	//	of_close(fHandle);
 }
 
 
 void
-Handle::SetHandle(int handle, bool takeOwnership)
+Handle::SetHandle(int handle)
 {
-	//if (fHandle && fOwnHandle)
-	//	of_close(fHandle);
-
 	fHandle = (int16)handle;
-	fOwnHandle = takeOwnership;
 }
 
 
 ssize_t
 Handle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	return B_ERROR;
+}
+
+
+ssize_t
+Handle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	return B_ERROR;
+}
+
+
+off_t 
+Handle::Size() const
+{
+	// ToDo: fix this!
+	return 1024LL * 1024 * 1024 * 1024;
+		// 1024 GB
+}
+
+
+// #pragma mark -
+
+
+CharHandle::CharHandle(int handle)
+	: Handle(handle)
+{
+}
+
+
+CharHandle::CharHandle(void)
+	: Handle()
+{
+}
+
+
+CharHandle::~CharHandle()
+{
+}
+
+
+ssize_t
+CharHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
 
@@ -61,7 +108,79 @@ Handle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t
-Handle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+CharHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	const char *string = (const char *)buffer;
+
+	// can't seek
+	
+	//XXX: check Bcostat ?
+	for (i = 0; i < bufferSize; i++) {
+		Bconout(fHandle, string[i]);
+	}
+
+	return bufferSize;
+}
+
+
+off_t 
+CharHandle::Size() const
+{
+	// ToDo: fix this!
+	return 1024LL * 1024 * 1024 * 1024;
+		// 1024 GB
+}
+
+
+// #pragma mark -
+
+
+BlockHandle::BlockHandle(int handle)
+	: Handle(handle)
+{
+}
+
+
+BlockHandle::BlockHandle(void)
+	: Handle()
+{
+}
+
+
+BlockHandle::~BlockHandle()
+{
+}
+
+
+status_t
+BlockHandle::InitCheck() const
+{
+	uint32 map = Drvmap();
+	if (!(map & (1 << fHandle)))
+		return ENODEV;
+	//XXX: check size
+	return B_OK;
+}
+
+
+ssize_t
+BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	const char *string = (const char *)buffer;
+
+	// can't seek
+	for (i = 0; i < bufferSize; i++) {
+		if (Bconstat(fHandle) == 0)
+			return i;
+		string[i] = (char)Bconin(fHandle);
+	}
+
+	return bufferSize;
+}
+
+
+ssize_t
+BlockHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
 
@@ -75,10 +194,11 @@ Handle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 
 
 off_t 
-Handle::Size() const
+BlockHandle::Size() const
 {
 	// ToDo: fix this!
 	return 1024LL * 1024 * 1024 * 1024;
 		// 1024 GB
 }
+
 

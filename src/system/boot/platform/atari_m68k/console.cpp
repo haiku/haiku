@@ -18,7 +18,7 @@
 
 // TOS emulates a VT52
 
-class ConsoleHandle : public Handle {
+class ConsoleHandle : public CharHandle {
 	public:
 		ConsoleHandle();
 
@@ -54,7 +54,7 @@ FILE *stdin, *stdout, *stderr;
 
 
 ConsoleHandle::ConsoleHandle()
-	: Handle()
+	: CharHandle()
 {
 }
 
