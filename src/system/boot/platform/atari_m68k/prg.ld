@@ -1,4 +1,8 @@
-/*OUTPUT_FORMAT("elf32-m68k", "elf32-m68k", "elf32-m68k")*/
+/*
+ * ld script to generate a TOS .PRG
+ * *ONLY* works for PIC (PCREL) code!
+ */
+
 OUTPUT_FORMAT("binary", "binary", "binary")
 OUTPUT_ARCH(m68k)
 
