@@ -74,7 +74,7 @@ ConsoleHandle::WriteAt(void */*cookie*/, off_t /*pos*/, const void *buffer,
 	size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
-	int i;
+	size_t i;
 
 	// be nice to our audience and replace single "\n" with "\r\n"
 
