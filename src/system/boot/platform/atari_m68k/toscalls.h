@@ -76,7 +76,7 @@ static inline int Bconputs(int16 handle, const char *string)
 {
 	int i, err;
 	for (i = 0; string[i]; i++) {
-		err = Bconout(string[i]);
+		err = Bconout(handle, string[i]);
 		if (err)
 			return i;
 	}
