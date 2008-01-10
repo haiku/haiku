@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ *		Rene Gollent (anevilyak@gmail.com)
  */
 
 #include <new>
@@ -19,6 +20,7 @@
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <Messenger.h>
 #include <Path.h>
 #include <PropertyInfo.h>
 #include <Screen.h>
@@ -831,11 +833,36 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 		case B_LEFT_ARROW:
 			if (fLayout == B_ITEMS_IN_ROW)
 				_SelectNextItem(fSelected, false);
+			else {
+				// this case has to be handled a bit specially.
+				BMenuItem *item = Superitem();
+				if (item) {
+					if (dynamic_cast<BMenuBar *>(Supermenu())) {
+						// if we're at the top menu below the menu bar, pass the keypress to
+						// the menu bar so we can move to another top level menu
+						BMessenger msgr(Supermenu());
+						msgr.SendMessage(Window()->CurrentMessage());
+					} else
+						Supermenu()->_SelectItem(item, false, false);
+				}
+			}
 			break;
 
 		case B_RIGHT_ARROW:
 			if (fLayout == B_ITEMS_IN_ROW)
 				_SelectNextItem(fSelected, true);
+			else {
+				if (fSelected && fSelected->Submenu()) {
+					_SelectItem(fSelected, true, true);
+				} else if (dynamic_cast<BMenuBar *>(Supermenu())) {
+					// if we have no submenu and we're an
+					// item in the top menu below the menubar,
+					// pass the keypress to the menubar
+					// so you can use the keypress to switch menus.				
+					BMessenger msgr(Supermenu());
+					msgr.SendMessage(Window()->CurrentMessage());
+				}
+			}
 			break;
 
 		case B_ENTER:
@@ -2121,11 +2148,14 @@ BMenu::_SelectItem(BMenuItem* menuItem, bool showSubmenu, bool selectFirstItem)
 bool
 BMenu::_SelectNextItem(BMenuItem *item, bool forward)
 {
+	if (CountItems() == 0) // cannot select next item in an empty menu
+		return false;
+
 	BMenuItem *nextItem = _NextItem(item, forward);
 	if (nextItem == NULL)
 		return false;
 
-	_SelectItem(nextItem);
+	_SelectItem(nextItem, false);
 	return true;
 }
 
@@ -2133,21 +2163,34 @@ BMenu::_SelectNextItem(BMenuItem *item, bool forward)
 BMenuItem *
 BMenu::_NextItem(BMenuItem *item, bool forward) const
 {
-	if (item == NULL) {
+	/*if (item == NULL) {
 		if (forward)
 			return ItemAt(CountItems() - 1);
 
 		return ItemAt(0);
 	}
+*/
+	// go to next item, and skip over disabled items such as separators
+ 	int32 index = fItems.IndexOf(item);
+	if (index < 0)
+		index = 0;
 
-	int32 index = fItems.IndexOf(item);
-	if (forward)
-		index++;
-	else
-		index--;
+	int32 startIndex = index;
+	do {
+		if (forward)
+			index++;
+		else
+			index--;
+ 		
+		// cycle through menu items
+		if (index < 0)
+			index = CountItems() - 1;
+		else if(index >= fItems.CountItems())
+			index = 0;
+	} while (!ItemAt(index)->IsEnabled() && index != startIndex);
 
-	if (index < 0 || index >= fItems.CountItems())
-		return NULL;
+	if (index == startIndex) // we are back where we started and no item was enabled
+		return false;
 
 	return ItemAt(index);
 }
@@ -2343,6 +2386,7 @@ BMenu::QuitTracking()
 
 	fChosenItem = NULL;
 	fState = MENU_STATE_CLOSED;
+	_Hide();
 }
 
 
