@@ -283,15 +283,16 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	}
 
 	bus->scsi_cookie = user_cookie;
-	bus->state = ata_state_idle;
 	bus->timer.bus = bus;
 
 	if ((status = scsi->alloc_dpc(&bus->irq_dpc)) < B_OK)
 		goto err1;
 
+	bus->state = ata_state_idle;
 	bus->active_device = NULL;
 
-	bus->devices[0] = bus->devices[1] = NULL;
+	bus->devices[0] = NULL;
+	bus->devices[1] = NULL;
 
 	status = INIT_BEN(&bus->status_report_ben, "ide_status_report");
 	if (status < B_OK) 

@@ -25,6 +25,9 @@
 // so this is a safe bet
 #define IDE_ATAPI_BUFFER_SIZE 512
 
+#define TRACE dprintf
+#define FLOW dprintf
+
 
 /*!
 	Set sense according to error reported by device
@@ -45,7 +48,7 @@ check_packet_error(ide_device_info *device, ata_request *request)
 
 		if (bus->controller->read_command_block_regs(bus->channel_cookie,
 				&device->tf, ide_mask_error) != B_OK) {
-			device->subsys_status = SCSI_HBA_ERR;
+			ata_request_set_status(request, SCSI_HBA_ERR);
 			return true;
 		}
 
@@ -77,10 +80,14 @@ check_packet_error(ide_device_info *device, ata_request *request)
 
 		// tell SCSI layer that sense must be requested
 		// (we don't take care of auto-sense ourselve)
-		device->subsys_status = SCSI_REQ_CMP_ERR;
+	
+		// XXX broken!
+
+/*		device->subsys_status = SCSI_REQ_CMP_ERR;
 		request->ccb->device_status = SCSI_STATUS_CHECK_CONDITION;
 		// reset pending emulated sense - its overwritten by a real one
 		device->combined_sense = 0;
+*/
 		return true;
 	}
 
@@ -113,7 +120,7 @@ packet_dpc(ata_request *request)
 		if (!device->tf.packet_res.cmd_or_data
 			|| device->tf.packet_res.input_or_output
 			|| (status & ide_status_drq) == 0) {
-			device->subsys_status = SCSI_SEQUENCE_FAIL;
+			ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
 			goto err;
 		}
 
@@ -125,7 +132,7 @@ packet_dpc(ata_request *request)
 				true) != B_OK) {
 			SHOW_ERROR0( 1, "Error sending command packet" );
 
-			device->subsys_status = SCSI_HBA_ERR;
+			ata_request_set_status(request, SCSI_HBA_ERR);
 			goto err_cancel_timer;
 		}
 
@@ -186,7 +193,7 @@ packet_dpc(ata_request *request)
 		SHOW_FLOW0(3, "data transmission");
 
 		if (device->tf.packet_res.cmd_or_data) {
-			device->subsys_status = SCSI_SEQUENCE_FAIL;
+			ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
 			goto err;
 		}
 
@@ -233,7 +240,7 @@ packet_dpc(ata_request *request)
 		if (err == B_ERROR) {
 			SHOW_ERROR0(2, "Error during PIO transmission");
 
-			device->subsys_status = SCSI_HBA_ERR;
+			ata_request_set_status(request, SCSI_HBA_ERR);
 			goto err_cancel_timer;
 		}
 
@@ -376,7 +383,7 @@ send_packet(ide_device_info *device, ata_request *request, bool write)
 
 	if (!device->tf.packet_res.cmd_or_data
 		|| device->tf.packet_res.input_or_output) {
-		device->subsys_status = SCSI_SEQUENCE_FAIL;
+		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
 		goto err_setup;
 	}
 
@@ -427,7 +434,7 @@ err_packet2:
 	IDE_UNLOCK(bus);
 
 err_packet:
-	device->subsys_status = SCSI_HBA_ERR;
+	data_request_set_status(request, SCSI_HBA_ERR);
 	
 err_setup:
 	if (request->uses_dma)
@@ -442,6 +449,8 @@ err_setup:
 void
 atapi_exec_io(ide_device_info *device, ata_request *request)
 {
+	TRACE("atapi_exec_io\n");
+/*
 	scsi_ccb *ccb = request->ccb;
 
 	SHOW_FLOW(3, "command=%x", request->ccb->cdb[0]);
@@ -463,6 +472,7 @@ atapi_exec_io(ide_device_info *device, ata_request *request)
 		send_packet(device, request, 
 			(ccb->flags & SCSI_DIR_MASK) == SCSI_DIR_OUT);
 	}
+*/
 }
 
 

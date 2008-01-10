@@ -24,76 +24,12 @@
 
 #define TRACE(x...) dprintf("IDE: " x)
 
-/** cleanup links devices on one bus when <device> is deleted */
 
-static void
-cleanup_device_links(ide_device_info *device)
-{
-	ide_bus_info *bus = device->bus;
-
-	TRACE("cleanup_device_links: device %p\n", device);
-
-	bus->devices[device->is_device1] = NULL;
-
-	if (device->other_device) {
-		if (device->other_device != device) {
-			device->other_device->other_device = device->other_device;
-			bus->first_device = device->other_device;
-		} else
-			bus->first_device = NULL;
-	}
-
-	device->other_device = NULL;
-}
-
-
-/** destroy device info */
-
-void
-destroy_device(ide_device_info *device)
-{
-	TRACE("destroy_device: device %p\n", device);
-
-	// paranoia
-	device->exec_io = NULL;
-
-	cleanup_device_links(device);
-	
-	free(device);
-}
-
-
-/** setup links between the devices on one bus */
-
-static void
-setup_device_links(ide_bus_info *bus, ide_device_info *device)
-{
-	TRACE("setup_device_links: bus %p, device %p\n", bus, device);
-
-	device->bus = bus;
-	bus->devices[device->is_device1] = device;
-
-	device->other_device = device;
-
-	if (device->is_device1) {
-		if (bus->devices[0]) {
-			device->other_device = bus->devices[0];
-			bus->devices[0]->other_device = device;
-		}
-	} else {
-		if (bus->devices[1]) {
-			device->other_device = bus->devices[1];
-			bus->devices[1]->other_device = device;
-		}
-	}
-
-	if (bus->first_device == NULL)
-		bus->first_device = device;
-}
+static void setup_device_links(ide_bus_info *bus, ide_device_info *device);
+static void cleanup_device_links(ide_device_info *device);
 
 
 /** create device info */
-
 ide_device_info *
 create_device(ide_bus_info *bus, bool is_device1)
 {
@@ -115,9 +51,11 @@ create_device(ide_bus_info *bus, bool is_device1)
 	device->DMA_failures = 0;
 	device->num_failed_send = 0;
 
-	device->combined_sense = 0;
-
 	device->total_sectors = 0;
+
+	device->requestActive = NULL;
+	device->requestFree = (ata_request *)malloc(sizeof(ata_request));
+	ata_request_init(device->requestFree, device);
 
 	// disable interrupts
 	bus->controller->write_device_control(bus->channel_cookie, ide_devctrl_bit3 | ide_devctrl_nien);
@@ -129,6 +67,49 @@ create_device(ide_bus_info *bus, bool is_device1)
 	bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_device_head);
 
 	return device;
+}
+
+
+/** destroy device info */
+void
+destroy_device(ide_device_info *device)
+{
+	TRACE("destroy_device: device %p\n", device);
+
+	// paranoia
+	device->exec_io = NULL;
+
+	if (device->requestActive)
+		dprintf("destroy_device: Warning request still active\n");
+	free(device->requestFree);
+
+
+	cleanup_device_links(device);
+	
+	free(device);
+}
+
+
+/** setup links between the devices on one bus */
+static void
+setup_device_links(ide_bus_info *bus, ide_device_info *device)
+{
+	TRACE("setup_device_links: bus %p, device %p\n", bus, device);
+
+	device->bus = bus;
+	bus->devices[device->is_device1] = device;
+}
+
+
+/** cleanup links devices on one bus when <device> is deleted */
+static void
+cleanup_device_links(ide_device_info *device)
+{
+	ide_bus_info *bus = device->bus;
+
+	TRACE("cleanup_device_links: device %p\n", device);
+
+	bus->devices[device->is_device1] = NULL;
 }
 
 #if B_HOST_IS_LENDIAN
@@ -154,7 +135,7 @@ create_device(ide_bus_info *bus, bool is_device1)
 /** prepare infoblock for further use, i.e. fix endianess */
 
 static void
-prep_infoblock(ide_device_info *device)
+fix_infoblock_endian(ide_device_info *device)
 {
 	ide_device_infoblock *infoblock = &device->infoblock;
 
@@ -183,9 +164,7 @@ scan_device(ide_device_info *device, bool isAtapi)
 		return B_ERROR;
 	}
 
-	device->subsys_status = SCSI_REQ_CMP;
-
-	prep_infoblock(device);
+	fix_infoblock_endian(device);
 	return B_OK;
 }
 

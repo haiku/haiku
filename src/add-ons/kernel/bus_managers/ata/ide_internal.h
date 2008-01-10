@@ -17,6 +17,7 @@
 #include "ide_device_infoblock.h"
 #include <ide_types.h>
 #include <device_manager.h>
+#include "ata_request.h"
 
 #define debug_level_error 2
 #define debug_level_info 1
@@ -42,7 +43,7 @@
 
 
 extern device_manager_info *pnp;
-
+extern scsi_for_sim_interface *scsi;
 
 typedef struct ide_bus_info ide_bus_info;
 
@@ -59,28 +60,7 @@ typedef struct ide_bus_timer_info {
 	struct ide_bus_info *bus;
 } ide_bus_timer_info;
 
-// ide request 
-typedef struct ata_request {
 
-	struct ide_device_info *	device;
-	scsi_ccb *					ccb;				// basic scsi request
-	uint8 						is_write : 1;		// true for write request
-	uint8 						uses_dma : 1;		// true if using dma
-	uint8 						packet_irq : 1;		// true if waiting for command packet irq
-} ata_request;
-
-
-//void init_ata_request(ata_request *request, struct ide_device_info *device, scsi_ccb *ccb);
-
-static inline void
-init_ata_request(ata_request *request, struct ide_device_info *device, scsi_ccb *ccb)
-{
-	request->device = device;
-	request->ccb = ccb;
-	request->is_write = 0;
-	request->uses_dma = 0;
-	request->packet_irq = 0;
-}
 
 
 typedef struct ide_device_info {
@@ -98,14 +78,9 @@ typedef struct ide_device_info {
 	uint8 DMA_failures;				// DMA failures in a row
 	uint8 num_failed_send;			// number of consequetive send problems
 
-	// next two error codes are copied to request on finish_request & co.
-	uint8 subsys_status;			// subsystem status of current request
-	uint32 new_combined_sense;		// emulated sense of current request
 
-	// pending error codes
-	uint32 combined_sense;			// emulated sense of device
-
-	struct ide_device_info *other_device;	// other device on same bus
+	struct ata_request *	requestActive;
+	struct ata_request *	requestFree;
 
 	// entry for scsi's exec_io request
 	void (*exec_io)( struct ide_device_info *device, struct ata_request *request );
@@ -172,10 +147,6 @@ struct ide_bus_info {
 
 	ata_bus_state			state;		// current state of bus
 
-	struct ata_request *	requestActive;
-	struct ata_request *	requestFree;
-
-
 	benaphore status_report_ben; // to lock when you report XPT about bus state
 								// i.e. during requeue, resubmit or finished
 
@@ -188,7 +159,6 @@ struct ide_bus_info {
 
 	ide_device_info *active_device;
 	ide_device_info *devices[2];
-	ide_device_info *first_device;
 
 	uchar path_id;
 
@@ -227,6 +197,7 @@ status_t ata_wait(ide_bus_info *bus, uint8 set, uint8 not_set, bool check_err, b
 status_t ata_wait_for_drq(ide_bus_info *bus);
 status_t ata_wait_for_drqdown(ide_bus_info *bus);
 status_t ata_wait_for_drdy(ide_bus_info *bus);
+status_t ata_pio_wait_drdy(ide_device_info *device);
 status_t ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *_devicePresent1, uint32 *_sigDev1);
 status_t ata_reset_device(ide_device_info *device, bool *_devicePresent);
 status_t ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy, uint32 timeout, ata_bus_state new_state);
@@ -294,6 +265,12 @@ void ide_request_sense(ide_device_info *device, ata_request *request);
 void prep_PIO_transfer(ide_device_info *device, ata_request *request);
 status_t read_PIO_block(ata_request *request, int length);
 status_t write_PIO_block(ata_request *request, int length);
+
+// scsi
+
+struct scsi_sense;
+
+void scsi_set_sense(struct scsi_sense *sense, const ata_request *request);
 
 
 

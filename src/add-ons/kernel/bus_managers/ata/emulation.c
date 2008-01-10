@@ -12,42 +12,7 @@
 #include "ide_sim.h"
 
 #include <vm.h>
-
 #include <string.h>
-
-
-/*! Emulate REQUEST SENSE */
-void
-ide_request_sense(ide_device_info *device, ata_request *request)
-{
-	scsi_ccb *ccb = request->ccb;
-	scsi_cmd_request_sense *cmd = (scsi_cmd_request_sense *)ccb->cdb;
-	scsi_sense sense;
-	uint32 transferSize;
-
-	// cannot use finish_checksense here, as data is not copied into autosense buffer
-	// but into normal data buffer, SCSI result is GOOD and CAM status is REQ_CMP
-
-	if (device->combined_sense)
-		create_sense(device, &sense);
-	else
-		memset(&sense, 0, sizeof(sense));
-
-	copy_sg_data(ccb, 0, cmd->allocation_length, &sense, sizeof(sense), false);
-
-	// reset sense information on read
-	device->combined_sense = 0;
-
-	transferSize = min(sizeof(sense), cmd->allocation_length);
-	transferSize = min(transferSize, ccb->data_length);
-
-	ccb->data_resid = ccb->data_length - transferSize;
-
-	// normally, all flags are set to "success", but for Request Sense 
-	// this would have overwritten the sense we want to read
-	device->subsys_status = SCSI_REQ_CMP;
-	ccb->device_status = SCSI_STATUS_GOOD;
-}
 
 
 /*!	Copy data between ccb data and buffer

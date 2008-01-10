@@ -130,15 +130,14 @@ ata_wait_for_drdy(ide_bus_info *bus)
 status_t
 ata_pio_wait_drdy(ide_device_info *device)
 {
-	ASSERT(bus->state == ata_state_pio);
-	return ata_wait(bus, ide_status_drdy, ide_status_bsy, false, device->bus->pio_timeout);
+	ASSERT(device->bus->state == ata_state_pio);
+	return ata_wait(device->bus, ide_status_drdy, ide_status_bsy, false, device->pio_timeout);
 }
 
 
-
 status_t
-ata_send_command(ide_device_info *device, ata_request *request,
-	bool need_drdy, uint32 timeout, ata_bus_state new_state)
+ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy, 
+				 uint32 timeout, ata_bus_state new_state)
 {
 	ide_bus_info *bus = device->bus;
 
@@ -170,13 +169,13 @@ ata_send_command(ide_device_info *device, ata_request *request,
 		// resetting the device here will discard current configuration,
 		// it's better when the SCSI bus manager requests an external reset.
 		TRACE("device selection timeout\n");
-		device->subsys_status = SCSI_SEL_TIMEOUT;
+		ata_request_set_status(request, SCSI_SEL_TIMEOUT);
 		return B_ERROR;		
 	}
 
 	if (need_drdy && (bus->controller->get_altstatus(bus->channel_cookie) & ide_status_drdy) == 0) {
 		TRACE("drdy not set\n");
-		device->subsys_status = SCSI_SEQUENCE_FAIL;
+		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
 		return B_ERROR;
 	}
 
@@ -200,7 +199,8 @@ ata_send_command(ide_device_info *device, ata_request *request,
 	ASSERT(bus->state == ata_state_busy);
 
 	bus->state = new_state;
-	bus->pio_timeout = timeout * 1000;
+	if (request)
+		request->device->pio_timeout = timeout * 1000;
 
 	IDE_UNLOCK(bus);
 
@@ -212,7 +212,7 @@ err_clearint:
 	bus->controller->write_device_control(bus->channel_cookie, ide_devctrl_bit3 | ide_devctrl_nien);
 
 err:
-	device->subsys_status = SCSI_HBA_ERR;
+	ata_request_set_status(request, SCSI_HBA_ERR);
 	IDE_UNLOCK(bus);
 	return B_ERROR;
 }
@@ -220,6 +220,7 @@ err:
 status_t
 ata_finish_command(ide_device_info *device)
 {
+	return B_OK;
 }
 
 
@@ -292,7 +293,7 @@ ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *
 			dprintf("ATA: reset_bus: timeout\n");
 			goto error;
 		}
-timeout
+
 		if (controller->read_command_block_regs(channel, &tf, ide_mask_sector_count |
 			ide_mask_LBA_low | ide_mask_LBA_mid | ide_mask_LBA_high | ide_mask_error) != B_OK)
 			goto error;
@@ -339,6 +340,7 @@ ata_reset_device(ide_device_info *device, bool *_devicePresent)
 static bool
 check_rw_status(ide_device_info *device, bool drqStatus)
 {
+/*
 	ide_bus_info *bus = device->bus;
 	int status;
 
@@ -353,7 +355,7 @@ check_rw_status(ide_device_info *device, bool drqStatus)
 		device->subsys_status = SCSI_SEQUENCE_FAIL;
 		return false;
 	}
-
+*/
 	return true;
 }
 
@@ -456,6 +458,7 @@ finish:
 void
 ata_dpc_DMA(ata_request *request)
 {
+/*
 	ide_device_info *device = request->device;
 	bool dma_success, dev_err;
 
@@ -480,6 +483,7 @@ ata_dpc_DMA(ata_request *request)
 		// reset queue in case queuing is active
 		finish_reset_queue(request);
 	}
+*/
 }
 
 
@@ -578,8 +582,7 @@ create_rw_taskfile(ide_device_info *device, ata_request *request,
 		track_size = infoblock->current_heads * infoblock->current_sectors;
 
 		if (track_size == 0) {
-			set_sense(device, 
-				SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_MEDIUM_FORMAT_CORRUPTED);
+			ata_request_set_sense(request, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_MEDIUM_FORMAT_CORRUPTED);
 			return false;
 		}
 
@@ -600,7 +603,7 @@ create_rw_taskfile(ide_device_info *device, ata_request *request,
 	return true;
 
 err:
-	set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
+	ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 	return false;
 }
 
@@ -669,7 +672,7 @@ err_setup:
 	if (request->uses_dma)
 		abort_dma(device, request);
 
-	finish_checksense(request);
+	ata_request_finish(request, false);
 	return;
 	
 err_send:
@@ -678,7 +681,9 @@ err_send:
 	if (request->uses_dma)
 		abort_dma(device, request);
 
-	finish_reset_queue(request);
+//	finish_reset_queue(request);
+	ata_request_finish(request, false);
+
 }
 
 

@@ -230,7 +230,7 @@ scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 	device->tf_param_mask = 0;
 	device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
-	if (ata_send_command(request, true, 15, ata_state_pio) != B_OK) {
+	if (ata_send_command(device, request, true, 15, ata_state_pio) != B_OK) {
 		return;
 	}
 		
