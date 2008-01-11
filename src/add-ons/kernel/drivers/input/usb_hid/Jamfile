@@ -4,6 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 SubDirSysHdrs $(HAIKU_TOP) headers os drivers ;
 UsePrivateHeaders [ FDirName kernel util ] input ;
+UsePrivateHeaders kernel ;
 
 local buffer_impl = ;
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {

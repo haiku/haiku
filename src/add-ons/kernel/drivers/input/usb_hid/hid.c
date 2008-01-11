@@ -21,6 +21,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+#include <fs/devfs.h>
+#endif
 
 #define MAX_BUTTONS 16
 
@@ -878,6 +881,9 @@ hid_device_removed(void *cookie)
 		device->active = false;
 	}
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	devfs_unpublish_device(device->name, true);
+#endif
 	return B_OK;
 }
 
@@ -971,6 +977,8 @@ hid_device_control(driver_cookie *cookie, uint32 op, void *arg, size_t length)
 						err = handle_interrupt_transfer(device);
 						if (err != B_OK)
 							return err;
+					} else if (err == B_INTERRUPTED) {
+						continue;
 					} else {
 						return err;
 					}
@@ -985,22 +993,32 @@ hid_device_control(driver_cookie *cookie, uint32 op, void *arg, size_t length)
 			case KB_SET_LEDS:
 				set_leds(device, (uint8 *)arg);
 				return B_OK;
+
+			default:
+				/* not implemented */
+				return B_ERROR;
 		}
 	} else {
 		switch (op) {
 			case MS_READ:
 				while (ring_buffer_readable(device->rbuf) == 0) {
-					err = schedule_interrupt_transfer(device);
-					if (err != B_OK)
-						return err;
-					// NOTE: this thread is now blocking until
-					// the semaphore will be released from the
-					// call_back function
+					if (!device->transfer_scheduled) {
+						err = schedule_interrupt_transfer(device);
+						if (err != B_OK)
+							return err;
+						device->transfer_scheduled = true;
+						// NOTE: this thread is now blocking until
+						// the semaphore will be released from the
+						// call_back function
+					}
 
 					err = acquire_sem_etc(device->sem_cb, 1, B_CAN_INTERRUPT, 0LL);
-					if (err != B_OK)
+					if (err == B_INTERRUPTED)
+						continue;
+					else if (err != B_OK)
 						return err;
 
+					device->transfer_scheduled = false;
 					err = handle_interrupt_transfer(device);
 					if (err != B_OK)
 						return err;
