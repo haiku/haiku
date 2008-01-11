@@ -621,6 +621,30 @@ struct passwd *getpwnam(const char *name)
 }
 
 
+char *getlogin()
+{
+	struct passwd *pw;
+	pw = getpwuid(getuid());
+	if (pw)
+		return pw->pw_name;
+	errno = ENOMEM;
+	return NULL;
+}
+
+
+int getlogin_r(char *name, size_t nameSize)
+{
+	struct passwd *pw;
+	pw = getpwuid(getuid());
+	if (pw && (nameSize > 32/*PW_MAX_NAME*/)) {
+		memset(name, 0, nameSize);
+		strlcpy(name, pw->pw_name, 32/*PW_MAX_NAME*/);
+		return B_OK;
+	}
+	return ENOMEM;
+}
+
+
 void __init_pwd_stuff(void)
 //void _multiuser_init(void)
 {
