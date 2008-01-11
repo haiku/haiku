@@ -921,6 +921,9 @@ Desktop::_SetWorkspace(int32 index)
 	// show windows, and include them in the changed region - but only
 	// those that were not visible before (or whose position changed)
 
+	WindowList windows(kWorkingList);
+	BList previousRegions;
+
 	for (WindowLayer* window = _Windows(index).FirstWindow();
 			window != NULL; window = window->NextWindow(index)) {
 		BPoint position = window->Anchor(index).position;
@@ -953,6 +956,17 @@ Desktop::_SetWorkspace(int32 index)
 			BPoint offset = position - window->Frame().LeftTop();
 			MoveWindowBy(window, offset.x, offset.y);
 				// TODO: be a bit smarter than this...
+		} else {
+			// We need to remember the previous visible region of the
+			// window if they changed their order
+			BRegion* region = new (std::nothrow)
+				BRegion(window->VisibleRegion());
+			if (region != NULL) {
+				if (previousRegions.AddItem(region))
+					windows.AddWindow(window);
+				else
+					delete region;
+			}
 		}
 	}
 
@@ -969,7 +983,7 @@ Desktop::_SetWorkspace(int32 index)
 		// send B_WORKSPACE_ACTIVATED message
 		window->WorkspaceActivated(index, true);
 
-		if (window->InWorkspace(previousIndex)
+		if (window->InWorkspace(previousIndex) || window->IsHidden()
 			|| (window == fMouseEventWindow && fMouseEventWindow->IsNormal())
 			|| (!window->IsNormal() && window->HasInSubset(fMouseEventWindow))) {
 			// this window was visible before, and is already handled in the above loop
@@ -979,13 +993,32 @@ Desktop::_SetWorkspace(int32 index)
 		dirty.Include(&window->VisibleRegion());
 	}
 
+	// Catch order changes in the new workspaces window list
+	int32 i = 0;
+	for (WindowLayer* window = windows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kWorkingList), i++) {
+		BRegion* region = (BRegion*)previousRegions.ItemAt(i);
+		region->ExclusiveInclude(&window->VisibleRegion());
+		dirty.Include(region);
+		delete region;
+	}
+
 	// Set new focus to the front window, but keep focus to a floating
 	// window if still visible
 	if (!_Windows(index).HasWindow(FocusWindow()) || !FocusWindow()->IsFloating())
 		SetFocusWindow(FrontWindow());
 
-	_WindowChanged(NULL);
+	_WindowChanged(NULL);	
 	MarkDirty(dirty);
+
+#if 0
+	// Show the dirty regions of this workspace switch
+	if (GetDrawingEngine()->LockParallelAccess()) {
+		GetDrawingEngine()->FillRegion(dirty, (rgb_color){255, 0, 0});
+		GetDrawingEngine()->UnlockParallelAccess();
+		snooze(100000);
+	}
+#endif
 
 	if (previousColor != fWorkspaces[fCurrentWorkspace].Color())
 		RedrawBackground();
