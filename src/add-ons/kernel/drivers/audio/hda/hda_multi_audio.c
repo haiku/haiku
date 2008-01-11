@@ -124,6 +124,7 @@ set_global_format(hda_afg* afg, multi_format_info* data)
 static status_t
 list_mix_controls(hda_afg* afg, multi_mix_control_info * data)
 {
+	data->control_count = 0;
 	return B_OK;
 }
 
