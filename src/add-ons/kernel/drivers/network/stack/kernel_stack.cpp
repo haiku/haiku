@@ -84,7 +84,7 @@ check_args_and_address(ArgType &args, sockaddr_storage &address, void *data, siz
 	if (user_memcpy(&args, data, sizeof(ArgType)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	if (args.address_length > sizeof(sockaddr_storage))
+	if (copyAddress && args.address_length > sizeof(sockaddr_storage))
 		return B_BAD_VALUE;
 
 	if (copyAddress && user_memcpy(&address, args.address, args.address_length) < B_OK)
