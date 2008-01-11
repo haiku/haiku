@@ -51,24 +51,24 @@ emuxki_ac97_get_mix(void *card, const void *cookie, int32 type, float *values) {
 		case B_MIX_GAIN:
 			value = emuxki_codec_read(&dev->config, info->reg);
 			//PRINT(("B_MIX_GAIN value : %u\n", value));
-			if(info->type & B_MIX_STEREO) {
+			if (info->type & B_MIX_STEREO) {
 				mask = ((1 << (info->bits + 1)) - 1) << 8;
 				gain = ((value & mask) >> 8) * info->granularity;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					values[0] = info->max_gain - gain;
 				else
 					values[0] = gain - info->min_gain;
 				
 				mask = ((1 << (info->bits + 1)) - 1);
 				gain = (value & mask) * info->granularity;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					values[1] = info->max_gain - gain;
 				else
 					values[1] = gain - info->min_gain;
 			} else {
 				mask = ((1 << (info->bits + 1)) - 1);
 				gain = (value & mask) * info->granularity;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					values[0] = info->max_gain - gain;
 				else
 					values[0] = gain - info->min_gain;
@@ -108,11 +108,11 @@ emuxki_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 	switch(type) {
 		case B_MIX_GAIN:
 			value = emuxki_codec_read(&dev->config, info->reg);
-			if(info->type & B_MIX_STEREO) {
+			if (info->type & B_MIX_STEREO) {
 				mask = ((1 << (info->bits + 1)) - 1) << 8;
 				value &= ~mask;
 				
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					gain = info->max_gain - values[0];
 				else
 					gain =  values[0] - info->min_gain;
@@ -120,7 +120,7 @@ emuxki_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 				
 				mask = ((1 << (info->bits + 1)) - 1);
 				value &= ~mask;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					gain = info->max_gain - values[1];
 				else
 					gain =  values[1] - info->min_gain;
@@ -128,7 +128,7 @@ emuxki_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 			} else {
 				mask = ((1 << (info->bits + 1)) - 1);
 				value &= ~mask;
-				if(info->polarity == 1)
+				if (info->polarity == 1)
 					gain = info->max_gain - values[0];
 				else
 					gain =  values[0] - info->min_gain;
@@ -142,7 +142,7 @@ emuxki_ac97_set_mix(void *card, const void *cookie, int32 type, float *values) {
 			value = emuxki_codec_read(&dev->config, info->reg);
 			value &= ~mask;
 			value |= ((values[0] == 1.0 ? 1 : 0 ) << 15 & mask);
-			if(info->reg == AC97_SURROUND_VOLUME) {
+			if (info->reg == AC97_SURROUND_VOLUME) {
 				// there is a independent mute for each channel
 				mask = ((1 << 1) - 1) << 7;
 				value &= ~mask;
@@ -204,7 +204,7 @@ emuxki_create_group_control(multi_dev *multi, int32 *index, int32 parent,
 	multi->controls[i].mix_control.flags = B_MULTI_MIX_GROUP;
 	multi->controls[i].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
 	multi->controls[i].mix_control.string = string;
-	if(name)
+	if (name)
 		strcpy(multi->controls[i].mix_control.name, name);
 		
 	return multi->controls[i].mix_control.id;
@@ -225,8 +225,8 @@ emuxki_create_gpr_control(multi_dev *multi, int32 *index, int32 parent, int32 st
 	control.mix_control.u.gain.max_gain = gpr->max_gain;
 	control.mix_control.u.gain.granularity = gpr->granularity;
 		
-	if(gpr->type & EMU_MIX_GAIN) {
-		if(gpr->type & EMU_MIX_MUTE) {
+	if (gpr->type & EMU_MIX_GAIN) {
+		if (gpr->type & EMU_MIX_MUTE) {
 			control.mix_control.id = EMU_MULTI_CONTROL_FIRSTID + i;
 			control.mix_control.flags = B_MULTI_MIX_ENABLE;
 			control.mix_control.string = S_MUTE;
@@ -243,7 +243,7 @@ emuxki_create_gpr_control(multi_dev *multi, int32 *index, int32 parent, int32 st
 		id = control.mix_control.id;
 		i++;
 					
-		if(gpr->type & EMU_MIX_STEREO) {			
+		if (gpr->type & EMU_MIX_STEREO) {			
 			control.mix_control.id = EMU_MULTI_CONTROL_FIRSTID + i;
 			control.mix_control.master = id;
 			multi->controls[i] = control;
@@ -262,28 +262,28 @@ emuxki_create_controls_list(multi_dev *multi)
 			
 	parent = emuxki_create_group_control(multi, &index, 0, 0, "Playback");
 		
-	for(i=EMU_GPR_FIRST_MIX; i<card->gpr_count; i++) {
+	for (i=EMU_GPR_FIRST_MIX; i<card->gpr_count; i++) {
 		const emuxki_gpr *gpr = &card->gpr[i];
-		if((gpr->type & EMU_MIX_PLAYBACK) == 0)
+		if ((gpr->type & EMU_MIX_PLAYBACK) == 0)
 			continue;
 		
 		parent2 = emuxki_create_group_control(multi, &index, parent, 0, gpr->name);
 				
 		emuxki_create_gpr_control(multi, &index, parent2, 0, gpr);
-		if(gpr->type & EMU_MIX_GAIN && gpr->type & EMU_MIX_STEREO)
+		if (gpr->type & EMU_MIX_GAIN && gpr->type & EMU_MIX_STEREO)
 			i++;
 	}
 	
 	parent = emuxki_create_group_control(multi, &index, 0, 0, "Record");
 		
-	for(i=EMU_GPR_FIRST_MIX; i<card->gpr_count; i++) {
+	for (i=EMU_GPR_FIRST_MIX; i<card->gpr_count; i++) {
 		const emuxki_gpr *gpr = &card->gpr[i];
-		if((gpr->type & EMU_MIX_RECORD) == 0)
+		if ((gpr->type & EMU_MIX_RECORD) == 0)
 			continue;
 		parent2 = emuxki_create_group_control(multi, &index, parent, 0, gpr->name);
 		
 		emuxki_create_gpr_control(multi, &index, parent2, 0, gpr);
-		if(gpr->type & EMU_MIX_GAIN && gpr->type & EMU_MIX_STEREO)
+		if (gpr->type & EMU_MIX_GAIN && gpr->type & EMU_MIX_STEREO)
 			i++;
 	}
 	
@@ -293,8 +293,8 @@ emuxki_create_controls_list(multi_dev *multi)
 	
 	parent2 = emuxki_create_group_control(multi, &index, parent, 0, info->name);
 		
-	if(info->type & B_MIX_GAIN) {
-		if(info->type & B_MIX_MUTE) {
+	if (info->type & B_MIX_GAIN) {
+		if (info->type & B_MIX_MUTE) {
 			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
 			multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
@@ -322,7 +322,7 @@ emuxki_create_controls_list(multi_dev *multi)
 		id = multi->controls[index].mix_control.id;
 		index++;
 		
-		if(info->type & B_MIX_STEREO) {
+		if (info->type & B_MIX_STEREO) {
 			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
 			multi->controls[index].mix_control.master = id;
@@ -338,7 +338,7 @@ emuxki_create_controls_list(multi_dev *multi)
 			index++;
 		}
 	
-		if(info->type & B_MIX_RECORDMUX) {
+		if (info->type & B_MIX_RECORDMUX) {
 			multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 			multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX;
 			multi->controls[index].mix_control.parent = parent2;
@@ -396,19 +396,19 @@ emuxki_create_controls_list(multi_dev *multi)
 	parent = emuxki_create_group_control(multi, &index, 0, 0, "AC97 Mixer");
 	
 	count = source_info_size;
-	if(IS_AUDIGY2(&card->config))
+	if (IS_AUDIGY2(&card->config))
 		count = 1;
-	if(!IS_LIVE_5_1(&card->config) && !IS_AUDIGY(&card->config))
+	if (!IS_LIVE_5_1(&card->config) && !IS_AUDIGY(&card->config))
 		count--;
 		
-	for(i=1; i < count ; i++) {
+	for (i=1; i < count ; i++) {
 		info = &source_info[i];
 		PRINT(("name : %s\n", info->name));
 			
 		parent2 = emuxki_create_group_control(multi, &index, parent, 0, info->name);
 				
-		if(info->type & B_MIX_GAIN) {
-			if(info->type & B_MIX_MUTE) {
+		if (info->type & B_MIX_GAIN) {
+			if (info->type & B_MIX_MUTE) {
 				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 				multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
 				multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
@@ -436,7 +436,7 @@ emuxki_create_controls_list(multi_dev *multi)
 			id = multi->controls[index].mix_control.id;
 			index++;
 			
-			if(info->type & B_MIX_STEREO) {
+			if (info->type & B_MIX_STEREO) {
 				multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 				multi->controls[index].mix_control.flags = B_MULTI_MIX_GAIN;
 				multi->controls[index].mix_control.master = id;
@@ -459,7 +459,7 @@ emuxki_create_controls_list(multi_dev *multi)
 	/* AC97 20db Boost Mic */
 	info = &source_info[6];
 		
-	if(info->type & B_MIX_GAIN && info->type & B_MIX_MICBOOST) {
+	if (info->type & B_MIX_GAIN && info->type & B_MIX_MICBOOST) {
 		multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 		multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
 		multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
@@ -472,7 +472,7 @@ emuxki_create_controls_list(multi_dev *multi)
 		index++;
 	}
 	
-	if(true) {
+	if (true) {
 		multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 		multi->controls[index].mix_control.flags = B_MULTI_MIX_ENABLE;
 		multi->controls[index].mix_control.master = EMU_MULTI_CONTROL_MASTERID;
@@ -485,7 +485,7 @@ emuxki_create_controls_list(multi_dev *multi)
 		index++;	
 	}
 	
-	if(true) {
+	if (true) {
 		multi->controls[index].mix_control.id = EMU_MULTI_CONTROL_FIRSTID + index;
 		multi->controls[index].mix_control.flags = B_MULTI_MIX_MUX;
 		multi->controls[index].mix_control.parent = parent;
@@ -525,32 +525,32 @@ emuxki_get_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
+	for (i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if(id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("emuxki_get_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
 	
-		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
-			if(control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
+			if (control->get) {
 				float values[2];
 				control->get(card, control->cookie, control->type, values);
-				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
+				if (control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
 					MMVI->values[i].u.gain = values[0];
 				else
 					MMVI->values[i].u.gain = values[1];
 			}			
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
 			MMVI->values[i].u.enable = (values[0] == 1.0);
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
+		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->get) {
 			float values[1];
 			control->get(card, control->cookie, control->type, values);
 			MMVI->values[i].u.mux = (int32)values[0];
@@ -565,55 +565,55 @@ emuxki_set_mix(emuxki_dev *card, multi_mix_value_info * MMVI)
 	int32 i;
 	uint32 id;
 	multi_mixer_control *control = NULL;
-	for(i=0; i<MMVI->item_count; i++) {
+	for (i=0; i<MMVI->item_count; i++) {
 		id = MMVI->values[i].id - EMU_MULTI_CONTROL_FIRSTID;
-		if(id < 0 || id >= card->multi.control_count) {
+		if (id < 0 || id >= card->multi.control_count) {
 			PRINT(("emuxki_set_mix : invalid control id requested : %li\n", id));
 			continue;
 		}
 		control = &card->multi.controls[id];
 					
-		if(control->mix_control.flags & B_MULTI_MIX_GAIN) {
+		if (control->mix_control.flags & B_MULTI_MIX_GAIN) {
 			multi_mixer_control *control2 = NULL;
-			if(i+1<MMVI->item_count) {
+			if (i+1<MMVI->item_count) {
 				id = MMVI->values[i + 1].id - EMU_MULTI_CONTROL_FIRSTID;
-				if(id < 0 || id >= card->multi.control_count) {
+				if (id < 0 || id >= card->multi.control_count) {
 					PRINT(("emuxki_set_mix : invalid control id requested : %li\n", id));
 				} else {
 					control2 = &card->multi.controls[id];
-					if(control2->mix_control.master != control->mix_control.id)
+					if (control2->mix_control.master != control->mix_control.id)
 						control2 = NULL;
 				}
 			}
 
-			if(control->set) {
+			if (control->set) {
 				float values[2];
 				values[0] = 0.0;
 				values[1] = 0.0;
 
-				if(control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
+				if (control->mix_control.master == EMU_MULTI_CONTROL_MASTERID)
 					values[0] = MMVI->values[i].u.gain;
 				else
 					values[1] = MMVI->values[i].u.gain;
 					
-				if(control2 && control2->mix_control.master != EMU_MULTI_CONTROL_MASTERID)
+				if (control2 && control2->mix_control.master != EMU_MULTI_CONTROL_MASTERID)
 					values[1] = MMVI->values[i+1].u.gain;
 					
 				control->set(card, control->cookie, control->type, values);
 			}
 			
-			if(control2)
+			if (control2)
 				i++;		
 		}
 	
-		if(control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
+		if (control->mix_control.flags & B_MULTI_MIX_ENABLE && control->set) {
 			float values[1];
 			
 			values[0] = MMVI->values[i].u.enable ? 1.0 : 0.0;
 			control->set(card, control->cookie, control->type, values);
 		}
 		
-		if(control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
+		if (control->mix_control.flags & B_MULTI_MIX_MUX && control->set) {
 			float values[1];
 			
 			values[0] = (float)MMVI->values[i].u.mux;
@@ -630,12 +630,12 @@ emuxki_list_mix_controls(emuxki_dev *card, multi_mix_control_info * MMCI)
 	uint32 i;
 	
 	MMC = MMCI->controls;
-	if(MMCI->control_count < EMU_MULTICONTROLSNUM)
+	if (MMCI->control_count < EMU_MULTICONTROLSNUM)
 		return B_ERROR;
 			
-	if(emuxki_create_controls_list(&card->multi) < B_OK)
+	if (emuxki_create_controls_list(&card->multi) < B_OK)
 		return B_ERROR;
-	for(i=0; i<card->multi.control_count; i++) {
+	for (i=0; i<card->multi.control_count; i++) {
 		MMC[i] = card->multi.controls[i].mix_control;
 	}
 	
@@ -707,19 +707,19 @@ emuxki_create_channels_list(multi_dev *multi)
 	chans = multi->chans;
 	index = 0;
 
-	for(mode=EMU_USE_PLAY; mode!=-1; 
+	for (mode=EMU_USE_PLAY; mode!=-1; 
 		mode = (mode == EMU_USE_PLAY) ? EMU_USE_RECORD : -1) {
 		LIST_FOREACH(stream, &((emuxki_dev*)multi->card)->streams, next) {
 			if ((stream->use & mode) == 0)
 				continue;
 				
 			nchannels = stream->nmono + 2 * stream->nstereo;
-			if(nchannels == 2)
+			if (nchannels == 2)
 				designations = B_CHANNEL_STEREO_BUS;
 			else
 				designations = B_CHANNEL_SURROUND_BUS;
 			
-			for(i=0; i<nchannels; i++) {
+			for (i=0; i<nchannels; i++) {
 				chans[index].channel_id = index;
 				chans[index].kind = (mode == EMU_USE_PLAY) ? B_MULTI_OUTPUT_CHANNEL : B_MULTI_INPUT_CHANNEL;
 				chans[index].designations = designations | chan_designations[i];
@@ -728,7 +728,7 @@ emuxki_create_channels_list(multi_dev *multi)
 			}
 		}
 		
-		if(mode==EMU_USE_PLAY) {
+		if (mode==EMU_USE_PLAY) {
 			multi->output_channel_count = index;
 		} else {
 			multi->input_channel_count = index - multi->output_channel_count;
@@ -777,11 +777,13 @@ emuxki_get_description(emuxki_dev *card, multi_description *data)
 	data->interface_version = B_CURRENT_INTERFACE_VERSION;
 	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	if(IS_AUDIGY2(&card->config))
+	if (IS_AUDIGY2_VALUE(&card->config))
+		strncpy(data->friendly_name, FRIENDLY_NAME_AUDIGY2_VALUE, 32);
+	else if (IS_AUDIGY2(&card->config))
 		strncpy(data->friendly_name, FRIENDLY_NAME_AUDIGY2, 32);
-	else if(IS_AUDIGY(&card->config))
+	else if (IS_AUDIGY(&card->config))
 		strncpy(data->friendly_name, FRIENDLY_NAME_AUDIGY, 32);
-	else if(IS_LIVE_5_1(&card->config))
+	else if (IS_LIVE_5_1(&card->config))
 		strncpy(data->friendly_name, FRIENDLY_NAME_LIVE_5_1, 32);
 	else
 		strncpy(data->friendly_name, FRIENDLY_NAME_LIVE, 32);
@@ -919,14 +921,14 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 	data->return_playback_channels = pchannels + pchannels2;		/* playback_buffers[][c] */
 	data->return_playback_buffer_size = current_settings.buffer_frames;		/* frames */
 
-	for(i=0; i<current_settings.buffer_count; i++)
-		for(j=0; j<pchannels; j++)
+	for (i=0; i<current_settings.buffer_count; i++)
+		for (j=0; j<pchannels; j++)
 			emuxki_stream_get_nth_buffer(card->pstream, j, i, 
 				&data->playback_buffers[i][j].base,
 				&data->playback_buffers[i][j].stride);
 		
-	for(i=0; i<current_settings.buffer_count; i++)
-		for(j=0; j<pchannels2; j++)
+	for (i=0; i<current_settings.buffer_count; i++)
+		for (j=0; j<pchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->pstream2, j, i, 
 				&data->playback_buffers[i][pchannels + j].base,
 				&data->playback_buffers[i][pchannels + j].stride);
@@ -935,14 +937,14 @@ emuxki_get_buffers(emuxki_dev *card, multi_buffer_list *data)
 	data->return_record_channels = rchannels + rchannels2;
 	data->return_record_buffer_size = current_settings.buffer_frames;	/* frames */
 
-	for(i=0; i<current_settings.buffer_count; i++)
-		for(j=0; j<rchannels; j++)
+	for (i=0; i<current_settings.buffer_count; i++)
+		for (j=0; j<rchannels; j++)
 			emuxki_stream_get_nth_buffer(card->rstream, j, i, 
 				&data->record_buffers[i][j].base,
 				&data->record_buffers[i][j].stride);
 		
-	for(i=0; i<current_settings.buffer_count; i++)
-		for(j=0; j<rchannels2; j++)
+	for (i=0; i<current_settings.buffer_count; i++)
+		for (j=0; j<rchannels2; j++)
 			emuxki_stream_get_nth_buffer(card->rstream2, j, i, 
 				&data->record_buffers[i][rchannels + j].base,
 				&data->record_buffers[i][rchannels + j].stride);
@@ -1011,7 +1013,7 @@ emuxki_buffer_exchange(emuxki_dev *card, multi_buffer_info *data)
 		emuxki_stream_start(card->rstream2, emuxki_record_inth, card->rstream2);
 
 	
-	if(acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)
+	if (acquire_sem_etc(card->buffer_ready_sem, 1, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT, 50000)
 		== B_TIMED_OUT) {
 		LOG(("buffer_exchange timeout ff\n"));
 		LOG(("EMU_IPR = %#08x\n",emuxki_reg_read_32(&card->config, EMU_IPR)));
@@ -1025,7 +1027,7 @@ emuxki_buffer_exchange(emuxki_dev *card, multi_buffer_info *data)
 		if ((pstream->use & EMU_USE_PLAY) == 0 || 
 			(pstream->state & EMU_STATE_STARTED) == 0)
 			continue;
-		if(pstream->update_needed)	
+		if (pstream->update_needed)	
 			break;
 	}
 	
@@ -1033,13 +1035,13 @@ emuxki_buffer_exchange(emuxki_dev *card, multi_buffer_info *data)
 		if ((rstream->use & EMU_USE_RECORD) == 0 ||
 			(rstream->state & EMU_STATE_STARTED) == 0)
 			continue;
-		if(rstream->update_needed)	
+		if (rstream->update_needed)	
 			break;
 	}
 	
-	if(!pstream)
+	if (!pstream)
 		pstream = card->pstream;
-	if(!rstream)
+	if (!rstream)
 		rstream = card->rstream;
 	
 	/* do playback */
@@ -1175,7 +1177,7 @@ emuxki_open(const char *name, uint32 flags, void** cookie)
 		}
 	}
 	
-	if(card == NULL) {
+	if (card == NULL) {
 		LOG(("open() card not found %s\n", name));
 		for (ix=0; ix<num_cards; ix++) {
 			LOG(("open() card available %s\n", cards[ix].name)); 
@@ -1185,13 +1187,13 @@ emuxki_open(const char *name, uint32 flags, void** cookie)
 		
 	LOG(("open() got card\n"));
 	
-	if(card->pstream !=NULL)
+	if (card->pstream !=NULL)
 		return B_ERROR;
-	if(card->pstream2 !=NULL)
+	if (card->pstream2 !=NULL)
 		return B_ERROR;
-	if(card->rstream !=NULL)
+	if (card->rstream !=NULL)
 		return B_ERROR;
-	if(card->rstream2 !=NULL)
+	if (card->rstream2 !=NULL)
 		return B_ERROR;
 			
 	*cookie = card;
@@ -1259,7 +1261,7 @@ emuxki_free(void* cookie)
 		emuxki_stream_halt(stream);
 	}
 	
-	while(!LIST_EMPTY(&card->streams)) {
+	while (!LIST_EMPTY(&card->streams)) {
 		emuxki_stream_delete(LIST_FIRST(&card->streams));
 	}
 

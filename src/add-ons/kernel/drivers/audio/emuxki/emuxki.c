@@ -50,6 +50,7 @@
 #include <math.h>
 #include <midi_driver.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include "emuxki.h"
@@ -227,7 +228,7 @@ emuxki_mem_new(emuxki_dev *card, int ptbidx, size_t size)
 static void
 emuxki_mem_delete(emuxki_mem *mem)
 {
-	if(mem->area > B_OK)
+	if (mem->area > B_OK)
 		delete_area(mem->area);
 	free(mem);
 }
@@ -472,7 +473,7 @@ emuxki_channel_commit_fx(emuxki_channel *chan)
 	emuxki_dev   	*card = chan->voice->stream->card;
 	uint8			chano = chan->num;
 	
-	if(IS_AUDIGY(&card->config)) {
+	if (IS_AUDIGY(&card->config)) {
 		emuxki_chan_write(&card->config, chano, 0x4c, 0);
 		emuxki_chan_write(&card->config, chano, 0x4d, 0);
 		emuxki_chan_write(&card->config, chano, 0x4e, 0);
@@ -645,7 +646,7 @@ emuxki_dump_voice(emuxki_voice *voice)
 	LOG(("voice->b16 = %#u\n", voice->b16));
 	LOG(("voice->sample_rate = %#lu\n", voice->sample_rate));
 	LOG(("voice->buffer = %#08x\n", voice->buffer));
-	if(voice->buffer) {
+	if (voice->buffer) {
 		LOG(("voice->buffer->ptbidx = %#u\n", voice->buffer->ptbidx));
 		LOG(("voice->buffer->log_base = %#08x\n", voice->buffer->log_base));
 		LOG(("voice->buffer->phy_base = %#08x\n", voice->buffer->phy_base));
@@ -773,16 +774,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 		if (voice->stereo) {
 			switch(voice->stream->card->play_mode) {
 				case 2:
-					if(voice->stream->nstereo == 1) {
+					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
-					} else if((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
-						if(voice->voicenum > 1 - 1)
+						if (voice->voicenum > 1 - 1)
 							fxsend.a.dest-=2;
-					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
+					} else if (voice->stream->nstereo == 3 && voice->voicenum > 1) {
 							fxsend.a.dest = 0x0;
 							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
@@ -792,16 +793,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 				case 4:
-					if(voice->stream->nstereo == 1) {
+					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 2;
 						fxsend.b.level = maxlevel;
-					} else if((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
-					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
+					} else if (voice->stream->nstereo == 3 && voice->voicenum > 1) {
 						fxsend.a.dest = 0x0;
 						fxsend.a.level = maxlevel / 2;
 						fxsend.b.dest = 0x1;
@@ -811,7 +812,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 				case 6: // only on audigy
-					if(voice->stream->nstereo == 1) {
+					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 2;
@@ -820,16 +821,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.c.level = maxlevel / 2;
 						fxsend.d.dest = 0x5;
 						fxsend.d.level = maxlevel / 2;
-					} else if(voice->stream->nstereo == 2) {
+					} else if (voice->stream->nstereo == 2) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
-						if(voice->voicenum < 1) {
+						if (voice->voicenum < 1) {
 							fxsend.b.dest = 0x4;
 							fxsend.b.level = maxlevel / 2;
 							fxsend.c.dest = 0x5;
 							fxsend.c.level = maxlevel / 2;
 						}
-					} else if(voice->stream->nstereo == 3) {
+					} else if (voice->stream->nstereo == 3) {
 						fxsend.a.dest = voice->voicenum * 2;
 						fxsend.a.level = maxlevel;
 					} else {
@@ -843,16 +844,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 			
 			switch(voice->stream->card->play_mode) {
 				case 2:
-					if(voice->stream->nstereo == 1) {
+					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
-					} else if((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
-						if(voice->voicenum > 1 - 1)
+						if (voice->voicenum > 1 - 1)
 							fxsend.a.dest-=2;
-					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
+					} else if (voice->stream->nstereo == 3 && voice->voicenum > 1) {
 							fxsend.a.dest = 0x0;
 							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
@@ -862,16 +863,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 				case 4:
-					if(voice->stream->nstereo == 1) {
+					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 3;
 						fxsend.b.level = maxlevel;
-					} else if((voice->stream->nstereo == 2) || 
+					} else if ((voice->stream->nstereo == 2) || 
 						((voice->stream->nstereo == 3)&&(voice->voicenum < 2))) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
-					} else if(voice->stream->nstereo == 3 && voice->voicenum > 1) {
+					} else if (voice->stream->nstereo == 3 && voice->voicenum > 1) {
 						fxsend.a.dest = 0x0;
 						fxsend.a.level = maxlevel / 2;
 						fxsend.b.dest = 0x1;
@@ -881,7 +882,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 				case 6: // only on audigy
-					if(voice->stream->nstereo == 1) {
+					if (voice->stream->nstereo == 1) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum * 2 + 3;
@@ -890,16 +891,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.c.level = maxlevel / 2;
 						fxsend.d.dest = 0x5;
 						fxsend.d.level = maxlevel / 2;
-					} else if(voice->stream->nstereo == 2) {
+					} else if (voice->stream->nstereo == 2) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
-						if(voice->voicenum < 1) {
+						if (voice->voicenum < 1) {
 							fxsend.b.dest = 0x4;
 							fxsend.b.level = maxlevel / 2;
 							fxsend.c.dest = 0x5;
 							fxsend.c.level = maxlevel / 2;
 						}
-					} else if(voice->stream->nstereo == 3) {
+					} else if (voice->stream->nstereo == 3) {
 						fxsend.a.dest = voice->voicenum * 2 + 1;
 						fxsend.a.level = maxlevel;
 					} else {
@@ -913,21 +914,21 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 		} else {
 			switch(voice->stream->card->play_mode) {
 				case 2:
-					if(voice->stream->nmono == 1) {
+					if (voice->stream->nmono == 1) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 1;
 						fxsend.b.level = maxlevel;
-					} else if(voice->stream->nmono == 2) {
+					} else if (voice->stream->nmono == 2) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
-					} else if((voice->stream->nmono == 4) || 
+					} else if ((voice->stream->nmono == 4) || 
 						((voice->stream->nmono == 6)&&(voice->voicenum < 4))) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
-						if(voice->voicenum > 2 - 1)
+						if (voice->voicenum > 2 - 1)
 							fxsend.a.dest-=2;
-					} else if(voice->stream->nmono == 6 && voice->voicenum > 3) {
+					} else if (voice->stream->nmono == 6 && voice->voicenum > 3) {
 							fxsend.a.dest = 0x0;
 							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
@@ -937,7 +938,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 				case 4:
-					if(voice->stream->nmono == 1) {
+					if (voice->stream->nmono == 1) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 1;
@@ -946,16 +947,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.c.level = maxlevel;
 						fxsend.d.dest = voice->voicenum + 3;
 						fxsend.d.level = maxlevel;
-					} else if(voice->stream->nmono == 2) {
+					} else if (voice->stream->nmono == 2) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 2;
 						fxsend.b.level = maxlevel;
-					} else if((voice->stream->nmono == 4) || 
+					} else if ((voice->stream->nmono == 4) || 
 						((voice->stream->nmono == 6)&&(voice->voicenum < 4))) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
-					} else if(voice->stream->nmono == 6 && voice->voicenum > 3) {
+					} else if (voice->stream->nmono == 6 && voice->voicenum > 3) {
 							fxsend.a.dest = 0x0;
 							fxsend.a.level = maxlevel / 2;
 							fxsend.b.dest = 0x1;
@@ -965,7 +966,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 					}
 					break;
 				case 6: // only on audigy
-					if(voice->stream->nmono == 1) {
+					if (voice->stream->nmono == 1) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 1;
@@ -978,7 +979,7 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.e.level = maxlevel;
 						fxsend.f.dest = voice->voicenum + 5;
 						fxsend.f.level = maxlevel;
-					} else if(voice->stream->nmono == 2) {
+					} else if (voice->stream->nmono == 2) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
 						fxsend.b.dest = voice->voicenum + 2;
@@ -987,16 +988,16 @@ emuxki_voice_fxupdate(emuxki_voice *voice)
 						fxsend.c.level = maxlevel / 2;
 						fxsend.d.dest = 0x5;
 						fxsend.d.level = maxlevel / 2;
-					} else if(voice->stream->nmono == 4) {
+					} else if (voice->stream->nmono == 4) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
-						if(voice->voicenum < 2) {
+						if (voice->voicenum < 2) {
 							fxsend.b.dest = 0x4;
 							fxsend.b.level = maxlevel / 2;
 							fxsend.c.dest = 0x5;
 							fxsend.c.level = maxlevel / 2;
 						}
-					} else if(voice->stream->nmono == 6) {
+					} else if (voice->stream->nmono == 6) {
 						fxsend.a.dest = voice->voicenum;
 						fxsend.a.level = maxlevel;
 					} else {
@@ -1063,14 +1064,14 @@ status_t
 emuxki_voice_set_recparms(emuxki_voice *voice, emuxki_recsrc_t recsrc,
 			     	emuxki_recparams *recparams)
 {
-	if(voice->use & EMU_USE_RECORD) {
+	if (voice->use & EMU_USE_RECORD) {
 		switch(recsrc) {
 			case EMU_RECSRC_MIC:
 				break;
 			case EMU_RECSRC_ADC:
 				break;
 			case EMU_RECSRC_FX:
-				if(!recparams)
+				if (!recparams)
 					return B_ERROR;
 				voice->recparams.efx_voices[0] = recparams->efx_voices[0];
 				voice->recparams.efx_voices[1] = recparams->efx_voices[1];
@@ -1166,7 +1167,7 @@ emuxki_voice_commit_parms(emuxki_voice *voice)
 		LOG(("emuxki_voice_commit_parms idx_reg : %u\n", idx_reg));
 		
 		idx_reg = EMU_RECIDX(idx_reg);
-		while(emuxki_chan_read(&voice->stream->card->config, 0, idx_reg))
+		while (emuxki_chan_read(&voice->stream->card->config, 0, idx_reg))
 			snooze(5);
 	}
 	return B_OK;
@@ -1227,7 +1228,7 @@ emuxki_resched_timer(emuxki_dev *card)
 	if (timerate & ~EMU_TIMER_RATE_MASK)
 		timerate = 0;
 	
-	if(card->timerate > timerate) {
+	if (card->timerate > timerate) {
 		LOG(("emuxki_resched_timer written (old %u, new %u)\n", card->timerate, timerate));
 		card->timerate = timerate;
 		emuxki_reg_write_16(&card->config, EMU_TIMER, timerate);
@@ -1269,19 +1270,19 @@ emuxki_voice_adc_rate(emuxki_voice *voice)
 			return EMU_ADCCR_SAMPLERATE_16;
 			break;
 		case 12000:
-			if(IS_AUDIGY(&voice->stream->card->config))
+			if (IS_AUDIGY(&voice->stream->card->config))
 				return EMU_A_ADCCR_SAMPLERATE_12;
 			else
 				PRINT(("recording sample_rate not supported : %lu\n", voice->sample_rate));
 			break;
 		case 11000:
-			if(IS_AUDIGY(&voice->stream->card->config))
+			if (IS_AUDIGY(&voice->stream->card->config))
 				return EMU_A_ADCCR_SAMPLERATE_11;
 			else
 				return EMU_ADCCR_SAMPLERATE_11;
 			break;
 		case 8000:
-			if(IS_AUDIGY(&voice->stream->card->config))
+			if (IS_AUDIGY(&voice->stream->card->config))
 				return EMU_A_ADCCR_SAMPLERATE_8;
 			else
 				return EMU_ADCCR_SAMPLERATE_8;
@@ -1312,7 +1313,7 @@ emuxki_voice_start(emuxki_voice *voice)
 				uint32 adccr_value = 0;
 				adccr_value = emuxki_voice_adc_rate(voice);
 				LOG(("emuxki_voice_start adccr_value : %u\n", adccr_value));
-				if(voice->stereo)
+				if (voice->stereo)
 					adccr_value |= ( (IS_AUDIGY(&voice->stream->card->config) ? EMU_A_ADCCR_LCHANENABLE : EMU_ADCCR_LCHANENABLE )
 						| ( IS_AUDIGY(&voice->stream->card->config) ? EMU_A_ADCCR_RCHANENABLE : EMU_ADCCR_RCHANENABLE ));
 				else
@@ -1325,7 +1326,7 @@ emuxki_voice_start(emuxki_voice *voice)
 				}
 				break;
 			case EMU_RECSRC_FX:
-				if(IS_AUDIGY(&voice->stream->card->config)) {
+				if (IS_AUDIGY(&voice->stream->card->config)) {
 					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC1, 
 						voice->recparams.efx_voices[0]);
 					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC2, 
@@ -1366,7 +1367,7 @@ emuxki_voice_halt(emuxki_voice *voice)
 				emuxki_inte_disable(&voice->stream->card->config, EMU_INTE_ADCBUFENABLE);
 				break;
 			case EMU_RECSRC_FX:
-				if(IS_AUDIGY(&voice->stream->card->config)) {
+				if (IS_AUDIGY(&voice->stream->card->config)) {
 					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC1, 0);
 					emuxki_chan_write(&voice->stream->card->config, 0, EMU_A_FXWC2, 0);
 				} else
@@ -1442,7 +1443,7 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 		return B_OK;
 	
 	LIST_FOREACH(voice, &stream->voices, next) {
-		if(voice->buffer)
+		if (voice->buffer)
 			emuxki_mem_free(stream->card, voice->buffer->log_base);
 		emuxki_voice_delete(voice);
 	}
@@ -1452,7 +1453,7 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 	stream->b16 = b16;
 	stream->sample_rate = sample_rate;
 	
-	if(stereo && (channels % 2 == 0)) {
+	if (stereo && (channels % 2 == 0)) {
 		stream->stereo = true;
 		stream->nstereo = channels / 2;
 		stream->nmono = 0;
@@ -1467,10 +1468,10 @@ emuxki_stream_set_audioparms(emuxki_stream *stream, bool stereo, uint8 channels,
 	sample_size = stream->b16 + 1;
 	frame_size = sample_size * (stream->stereo ? 2 : 1);
 	
-	for(i=0; i<nvoices; i++) {
+	for (i=0; i<nvoices; i++) {
 		voice = emuxki_voice_new(stream, stream->use, i);
-		if(voice) {
-			if(!stream->first_voice)
+		if (voice) {
+			if (!stream->first_voice)
 				stream->first_voice = voice;
 			LIST_INSERT_HEAD((&stream->voices), voice, next);
 			if ((error = emuxki_voice_set_audioparms(voice, stream->stereo, stream->b16, stream->sample_rate)))
@@ -1497,14 +1498,14 @@ emuxki_stream_set_recparms(emuxki_stream *stream, emuxki_recsrc_t recsrc,
 	emuxki_voice *voice;
 	LOG(("emuxki_stream_set_recparms\n"));
 	
-	if(stream->use & EMU_USE_RECORD) {
+	if (stream->use & EMU_USE_RECORD) {
 		switch(recsrc) {
 			case EMU_RECSRC_MIC:
 				break;
 			case EMU_RECSRC_ADC:
 				break;
 			case EMU_RECSRC_FX:
-				if(!recparams)
+				if (!recparams)
 					return B_ERROR;
 				LIST_FOREACH(voice, &stream->voices, next) {
 					voice->recparams.efx_voices[0] = recparams->efx_voices[0];
@@ -1544,35 +1545,35 @@ emuxki_stream_get_nth_buffer(emuxki_stream *stream, uint8 chan, uint8 buf,
 	LOG(("emuxki_stream_get_nth_buffer\n"));
 	
 	sample_size = stream->b16 + 1;
-	if(buf >= stream->bufcount)
+	if (buf >= stream->bufcount)
 		return B_BAD_INDEX;
 	
-	if(stream->stereo) {
+	if (stream->stereo) {
 		i = stream->nstereo - 1;
-		if(chan/2 > i)
+		if (chan/2 > i)
 			return B_BAD_INDEX;
 		LIST_FOREACH(voice, &stream->voices, next)
-			if(i != chan/2)
+			if (i != chan/2)
 				i--;
 			else 
 				break;
-		if(voice) {
+		if (voice) {
 			*buffer = (char*)voice->buffer->log_base + (buf * stream->bufframes * sample_size * 2);
-			if(chan % 2 == 1)
+			if (chan % 2 == 1)
 				*buffer += sample_size;
 			*stride = sample_size * 2;
 		} else
 			return B_ERROR;
 	} else {
 		i = stream->nmono - 1;
-		if(chan > i)
+		if (chan > i)
 			return B_BAD_INDEX;
 		LIST_FOREACH(voice, &stream->voices, next)
-			if(i != chan)
+			if (i != chan)
 				i--;
 			else 
 				break;
-		if(voice) {
+		if (voice) {
 			*buffer = (char*)voice->buffer->log_base + (buf * stream->bufframes * sample_size);
 			*stride = sample_size;
 		} else
@@ -1660,10 +1661,10 @@ emuxki_stream_delete(emuxki_stream *stream)
 	LIST_REMOVE(stream, next);
 	unlock(status);
 	
-	while(!LIST_EMPTY(&stream->voices)) {
+	while (!LIST_EMPTY(&stream->voices)) {
 		voice = LIST_FIRST(&stream->voices);
 		LIST_REMOVE(voice, next);
-		if(voice->buffer)
+		if (voice->buffer)
 			emuxki_mem_free(stream->card, voice->buffer->log_base);
 		emuxki_voice_delete(voice);
 	}
@@ -1701,27 +1702,27 @@ emuxki_gpr_set(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 	switch(type) {
 		case EMU_MIX_MUTE:
 			gpr->mute = (values[0] == 1.0);
-			if(gpr->mute) {
-				for(i=0; i<count; i++)
+			if (gpr->mute) {
+				for (i=0; i<count; i++)
 					emuxki_write_gpr(&card->config, gpr->gpr + i, 0);
 				break;
 			}
-			for(i=0; i<count; i++) {
+			for (i=0; i<count; i++) {
 				values[i] = gpr->current[i];
 			}	
 		case EMU_MIX_GAIN:
-			for(i=0; i<count; i++) {
-				if(values[i]>gpr->max_gain || values[i]<gpr->min_gain)
+			for (i=0; i<count; i++) {
+				if (values[i]>gpr->max_gain || values[i]<gpr->min_gain)
 					return;
 				index = (int32)(values[i] / gpr->granularity);
-				if(index > sizeof(db_table)/sizeof(db_table[0]))
+				if (index > sizeof(db_table)/sizeof(db_table[0]))
 					index = sizeof(db_table)/sizeof(db_table[0]);
-				else if(index < 0)
+				else if (index < 0)
 					index = 0;
 				LOG(("emuxki_set_gpr gpr: %d \n", gpr->gpr + i));
 				LOG(("emuxki_set_gpr values[i]: %g \n", values[i]));
 				LOG(("emuxki_set_gpr index: %u \n", index));
-				if(!gpr->mute)
+				if (!gpr->mute)
 					emuxki_write_gpr(&card->config, gpr->gpr + i, db_table[index]);
 				gpr->current[i] = index * gpr->granularity;
 			}
@@ -1739,7 +1740,7 @@ emuxki_gpr_get(emuxki_dev *card, emuxki_gpr *gpr, int32 type, float *values)
 	
 	switch(type) {
 		case EMU_MIX_GAIN:
-			for(i=0; i<count; i++) {
+			for (i=0; i<count; i++) {
 				values[i] = gpr->current[i];
 			}
 			break;
@@ -1757,7 +1758,7 @@ emuxki_gpr_dump(emuxki_dev * card, uint16 count)
 	
 	LOG(("emuxki_dump_gprs\n"));
 
-	for(pc = 0; pc < count; pc++) {
+	for (pc = 0; pc < count; pc++) {
 		value = emuxki_read_gpr(&card->config, pc);
 		LOG(("dsp_gpr pc=%x, value=%x\n", pc, value));
 	}
@@ -1782,16 +1783,16 @@ emuxki_gpr_new(emuxki_dev *card, const char *name, emuxki_gpr_type type, uint16 
 	gpr->granularity = granularity;
 	gpr->mute = false;
 	(*gpr_num)++;
-	if(gpr->type & EMU_MIX_STEREO)
+	if (gpr->type & EMU_MIX_STEREO)
 		(*gpr_num)++;
 	
-	if(default_mute == 1.0) {
+	if (default_mute == 1.0) {
 		values[0] = default_mute;
 		emuxki_gpr_set(card, gpr, EMU_MIX_MUTE, values);
 	}
 	
 	values[0] = gpr->default_value;
-	if(gpr->type & EMU_MIX_STEREO)
+	if (gpr->type & EMU_MIX_STEREO)
 		values[1] = gpr->default_value;
 	emuxki_gpr_set(card, gpr, EMU_MIX_GAIN, values);
 	
@@ -1811,8 +1812,8 @@ emuxki_parameter_set(emuxki_dev *card, const void* cookie, int32 type, int32 *va
 	switch(type) {
 		case EMU_DIGITAL_MODE:
 			card->digital_enabled = *value == 1;
-			if(IS_AUDIGY(&card->config))
-				if(IS_AUDIGY2(&card->config)) {
+			if (IS_AUDIGY(&card->config))
+				if (IS_AUDIGY2(&card->config)) {
 					// this disables analog, not enough
 					emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
 						(card->digital_enabled ? 0 : EMU_A_IOCFG_GPOUT0) | 
@@ -1834,7 +1835,7 @@ emuxki_parameter_set(emuxki_dev *card, const void* cookie, int32 type, int32 *va
 			
 			break;
 		case EMU_AUDIO_MODE:
-			if(*value!=0 && *value!=1 && *value!=2) {
+			if (*value!=0 && *value!=1 && *value!=2) {
 				PRINT(("emuxki_parameter_set error value unexpected\n"));
 				return;
 			}
@@ -1901,7 +1902,7 @@ emuxki_int(void *arg)
 					//trace_hardware_regs(&card->config);
 					//TRACE(("voice pointer %p\n", voice));
 														
-					if(stream->inth)
+					if (stream->inth)
 						stream->inth(stream->inthparam);
 
 					voice->trigblk++;
@@ -1915,7 +1916,7 @@ emuxki_int(void *arg)
 		}
         
 		if (ipr & (EMU_IPR_MIDITRANSBUFE)) {
-			if(!midi_interrupt(card)) {
+			if (!midi_interrupt(card)) {
 				emuxki_inte_disable(&card->config, EMU_INTE_MIDITXENABLE);
 				TRACE(("EMU_INTE_MIDITXENABLE disabled\n"));
 			}
@@ -1941,7 +1942,7 @@ emuxki_int(void *arg)
 					//dump_voice(voice);
 					//trace_hardware_regs(&card->config);
 														
-					if(stream->inth)
+					if (stream->inth)
 						stream->inth(stream->inthparam);
 
 					voice->trigblk++;
@@ -1975,13 +1976,13 @@ emuxki_int(void *arg)
 		emuxki_reg_write_32(&card->config, EMU_IPR, ipr);
 	}
 
-	if(IS_AUDIGY2(&card->config)) {
+	if (IS_AUDIGY2(&card->config)) {
 		while ((ipr = emuxki_reg_read_32(&card->config, EMU_A2_IPR2))) {
 			emuxki_reg_write_32(&card->config, EMU_A2_IPR2, ipr);
 			break;	// avoid loop
 		}
 
-		if (card->info.revision == 4) {
+		if (!IS_AUDIGY2_VALUE(&card->config)) {
 			while ((ipr = emuxki_reg_read_32(&card->config, EMU_A2_IPR3))) {
 				emuxki_reg_write_32(&card->config, EMU_A2_IPR3, ipr);
 				break; // avoid loop
@@ -1989,7 +1990,7 @@ emuxki_int(void *arg)
 		}
 	}
 
-	if(gotone)
+	if (gotone)
 		return B_INVOKE_SCHEDULER;
 
 	TRACE(("Got unhandled interrupt\n"));
@@ -2021,6 +2022,7 @@ init_hardware(void)
 			(info.device_id == CREATIVELABS_SBLIVE_DEVICE_ID
 #if AUDIGY
 			|| info.device_id == CREATIVELABS_AUDIGY_DEVICE_ID
+			|| info.device_id == CREATIVELABS_AUDIGY2_VALUE_DEVICE_ID
 #endif
 			)) {
 			err = B_OK;
@@ -2062,10 +2064,12 @@ emuxki_setup(emuxki_dev * card)
 	card->config.nabmbar = card->info.u.h0.base_registers[0];
 	card->config.irq = card->info.u.h0.interrupt_line;
 	card->config.type = 0;
-	if(card->info.device_id == CREATIVELABS_AUDIGY_DEVICE_ID)
+	if (card->info.device_id == CREATIVELABS_AUDIGY_DEVICE_ID) {
 		card->config.type |= TYPE_AUDIGY;
-	if(IS_AUDIGY(&card->config) && (card->info.revision == 4 || card->info.revision == 8))
-		card->config.type |= TYPE_AUDIGY2;
+		if (card->info.revision == 4)
+			card->config.type |= TYPE_AUDIGY2;
+	} else if (card->info.device_id == CREATIVELABS_AUDIGY2_VALUE_DEVICE_ID)
+		card->config.type |= TYPE_AUDIGY | TYPE_AUDIGY2 | TYPE_AUDIGY2_VALUE;
 	
 	PRINT(("%s deviceid = %#04x chiprev = %x model = %x enhanced at %lx\n", card->name, card->info.device_id,
 		card->info.revision, card->info.u.h0.subsystem_id, card->config.nabmbar));
@@ -2104,7 +2108,7 @@ emuxki_setup(emuxki_dev * card)
 	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
 	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
 	
-	if(IS_AUDIGY2(&card->config)) {
+	if (IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
 			EMU_A_IOCFG_GPOUT0 | emuxki_reg_read_32(&card->config, EMU_A_IOCFG));
 	}
@@ -2167,16 +2171,16 @@ emuxki_setup(emuxki_dev * card)
 	if ((err = emuxki_init(card)))
 		return (err);
 	
-	if(IS_AUDIGY(&card->config) || IS_LIVE_5_1(&card->config)) {
+	if (IS_AUDIGY(&card->config) || IS_LIVE_5_1(&card->config)) {
 		card->play_mode = 6;	// mode 5.1
 	} else {
 		card->play_mode = 4;	// mode 4.0
 	}
 	
 	emuxki_reg_write_32(&card->config, EMU_INTE, EMU_INTE_SAMPLERATER | EMU_INTE_PCIERRENABLE);
-	if(IS_AUDIGY2(&card->config)) {
+	if (IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_A2_INTE2, 0);
-		if (card->info.revision == 4) {
+		if (!IS_AUDIGY2_VALUE(&card->config)) {
 			emuxki_reg_write_32(&card->config, EMU_A2_INTE3, 0);
 		}
 	}
@@ -2186,11 +2190,11 @@ emuxki_setup(emuxki_dev * card)
 
 	emuxki_inte_enable(&card->config, EMU_INTE_VOLINCRENABLE | EMU_INTE_VOLDECRENABLE
 		| EMU_INTE_MUTEENABLE | EMU_INTE_FXDSPENABLE);
-	if(IS_AUDIGY2(&card->config)) {
+	if (IS_AUDIGY2(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
 			EMU_HCFG_AC3ENABLE_CDSPDIF | EMU_HCFG_AC3ENABLE_GPSPDIF|
 			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
-	} else if(IS_AUDIGY(&card->config)) {
+	} else if (IS_AUDIGY(&card->config)) {
 		emuxki_reg_write_32(&card->config, EMU_HCFG, EMU_HCFG_AUDIOENABLE |
 			EMU_HCFG_JOYENABLE | EMU_HCFG_AUTOMUTE);
 	} else {
@@ -2216,7 +2220,7 @@ emuxki_dump_fx(emuxki_dev * card)
 	
 	while (pc < 512) {
 		emuxki_dsp_getop(&card->config, &pc, &op, &r, &a, &x, &y);
-		if(op!=EMU_DSP_OP_ACC3 || r!=zero || a!=zero || x!=zero || y!=zero) {
+		if (op!=EMU_DSP_OP_ACC3 || r!=zero || a!=zero || x!=zero || y!=zero) {
 			LOG(("dsp_op pc=%u, op=%x, r=%x, a=%x, x=%x, y=%x\n",
 				pc, op, r, a, x, y));
 		}
@@ -2256,7 +2260,7 @@ emuxki_initfx(emuxki_dev * card)
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
 	a_rear_gpr = emuxki_gpr_new(card, "Analog Rear", 
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
-	if(IS_AUDIGY(&card->config) || IS_LIVE_5_1(&card->config))
+	if (IS_AUDIGY(&card->config) || IS_LIVE_5_1(&card->config))
 		a_center_sub_gpr = emuxki_gpr_new(card, "Analog Center/Sub", 
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_PLAYBACK, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
 	
@@ -2283,7 +2287,7 @@ emuxki_initfx(emuxki_dev * card)
 		
 	card->gpr_count = gpr;
 			
-	if(IS_AUDIGY(&card->config)) {
+	if (IS_AUDIGY(&card->config)) {
 		/* DSP_IN_GPR(l/r) = 0 + AC97In(l/r) * P_AC97_IN_GPR(l/r) */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2516,7 +2520,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_REAR_RIGHT), EMU_DSP_GPR(a_rear_gpr->gpr+1));
 		
 		/* Analog Center/Sub = 0 + Center/Sub GPR(l/r) * A_CENTER_GPR(l/r) */
-		if(IS_LIVE_5_1(&card->config)) {
+		if (IS_LIVE_5_1(&card->config)) {
 			emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
 					  EMU_DSP_OUT_A_CENTER,
 					  EMU_DSP_CST(0),
@@ -2630,7 +2634,7 @@ emuxki_init(emuxki_dev * card)
 	emuxki_chan_write(&card->config, 0, EMU_ADCBS, EMU_RECBS_BUFSIZE_NONE);
 	emuxki_chan_write(&card->config, 0, EMU_ADCBA, 0);
 	
-	if(IS_AUDIGY(&card->config)) {
+	if (IS_AUDIGY(&card->config)) {
 		emuxki_chan_write(&card->config, 0, EMU_SPBYPASS, EMU_SPBYPASS_24_BITS);
 		emuxki_chan_write(&card->config, 0, EMU_AC97SLOT, EMU_AC97SLOT_CENTER | EMU_AC97SLOT_LFE);
 	}
@@ -2676,21 +2680,21 @@ emuxki_init(emuxki_dev * card)
 	emuxki_chan_write(&card->config, 0, EMU_SPCS1, spcs);
 	emuxki_chan_write(&card->config, 0, EMU_SPCS2, spcs);
 	
-	if(IS_AUDIGY2(&card->config)) {
+	if (IS_AUDIGY2(&card->config)) {
 		emuxki_chan_write(&card->config, 0, EMU_A2_SPDIF_SAMPLERATE, EMU_A2_SPDIF_UNKNOWN);
 		
 		emuxki_p16v_write(&card->config, 0, EMU_A2_SRCSEL, 
 			EMU_A2_SRCSEL_ENABLE_SPDIF | EMU_A2_SRCSEL_ENABLE_SRCMULTI);
 		
-		if (card->info.revision == 4) {
-			emuxki_p16v_write(&card->config, 0, EMU_A2_SRCMULTI, EMU_A2_SRCMULTI_ENABLE_INPUT);
-		} else {
+		if (IS_AUDIGY2_VALUE(&card->config)) {
 			emuxki_p16v_write(&card->config, 0, EMU_A2_P17V_I2S, EMU_A2_P17V_I2S_ENABLE);
 			emuxki_p16v_write(&card->config, 0, EMU_A2_P17V_SPDIF, EMU_A2_P17V_SPDIF_ENABLE);
 
 			emuxki_reg_write_32(&card->config, EMU_A_IOCFG, 
 				emuxki_reg_read_32(&card->config, EMU_A_IOCFG) & ~0x8);
-		}
+		} else {
+			emuxki_p16v_write(&card->config, 0, EMU_A2_SRCMULTI, EMU_A2_SRCMULTI_ENABLE_INPUT);
+		}		
 	}
 	
 	/* Let's play with sound processor */
@@ -2823,6 +2827,7 @@ init_driver(void)
 			(info.device_id == CREATIVELABS_SBLIVE_DEVICE_ID 
 #if AUDIGY
 			|| info.device_id == CREATIVELABS_AUDIGY_DEVICE_ID
+			|| info.device_id == CREATIVELABS_AUDIGY2_VALUE_DEVICE_ID
 #endif
 			)) {
 			if (num_cards == NUM_CARDS) {
@@ -2891,7 +2896,7 @@ emuxki_shutdown(emuxki_dev *card)
 	emuxki_chan_write(&card->config, 0, EMU_MICBA, 0);
 	emuxki_chan_write(&card->config, 0, EMU_FXBS, EMU_RECBS_BUFSIZE_NONE);
 	emuxki_chan_write(&card->config, 0, EMU_FXBA, 0);
-	if(IS_AUDIGY(&card->config)) {
+	if (IS_AUDIGY(&card->config)) {
 		emuxki_chan_write(&card->config, 0, EMU_A_FXWC1, 0);
 		emuxki_chan_write(&card->config, 0, EMU_A_FXWC2, 0);
 	} else {

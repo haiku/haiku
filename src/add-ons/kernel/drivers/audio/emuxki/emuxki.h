@@ -53,6 +53,7 @@
 #define CREATIVELABS_VENDOR_ID	0x1102	/* Creative Labs */
 #define CREATIVELABS_SBLIVE_DEVICE_ID	0x0002	/* Creative Labs SoundBlaster Live */
 #define CREATIVELABS_AUDIGY_DEVICE_ID	0x0004	/* Creative Labs Audigy and Audigy 2 */
+#define CREATIVELABS_AUDIGY2_VALUE_DEVICE_ID	0x0008	/* Creative Labs Audigy 2 Value */
 
 #define AUDIGY 1	// Audigy seems to work
 #ifdef __HAIKU__
@@ -68,6 +69,7 @@
 #define FRIENDLY_NAME_LIVE_5_1 FRIENDLY_NAME_LIVE" 5.1"
 #define FRIENDLY_NAME_AUDIGY FRIENDLY_NAME" Audigy"
 #define FRIENDLY_NAME_AUDIGY2 FRIENDLY_NAME_AUDIGY" 2"
+#define FRIENDLY_NAME_AUDIGY2_VALUE FRIENDLY_NAME_AUDIGY2" Value"
 #define AUTHOR "Jérôme Duval"
 
 /*

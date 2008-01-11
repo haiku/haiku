@@ -49,9 +49,11 @@ typedef struct
 
 #define TYPE_AUDIGY			0x01
 #define TYPE_AUDIGY2		0x02
-#define TYPE_LIVE_5_1		0x04
+#define TYPE_AUDIGY2_VALUE	0x04
+#define TYPE_LIVE_5_1		0x08
 
 #define IS_AUDIGY(x) ((x)->type & TYPE_AUDIGY)
 #define IS_AUDIGY2(x) ((x)->type & TYPE_AUDIGY2)
+#define IS_AUDIGY2_VALUE(x) ((x)->type & TYPE_AUDIGY2_VALUE)
 #define IS_LIVE_5_1(x) ((x)->type & TYPE_LIVE_5_1)
 #endif
