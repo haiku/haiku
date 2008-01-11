@@ -352,6 +352,9 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 	device->last_click_time = 0;
 	device->last_buttons = 0;
 
+	device->repeat_timer.current_delay = B_INFINITE_TIMEOUT;
+	device->repeat_timer.key = 0;
+
 	// default values taken from the PS/2 driver
 	device->repeat_rate = 35000;
 	device->repeat_delay = 300000;
