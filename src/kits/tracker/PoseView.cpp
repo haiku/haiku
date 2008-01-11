@@ -755,7 +755,7 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 				}
 			} else {
 				model->WriteAttrKillForegin(kAttrPoseInfo, kAttrPoseInfoForeign,
-					B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo)));
+					B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo));
 
 				if (desktop) {
 					model->WriteAttrKillForegin(kAttrExtendedPoseInfo,
