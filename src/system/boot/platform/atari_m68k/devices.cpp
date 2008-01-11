@@ -4,8 +4,6 @@
  */
 
 
-#include "toscalls.h"
-
 #include <KernelExport.h>
 #include <boot/platform.h>
 #include <boot/partitions.h>
@@ -13,6 +11,8 @@
 #include <boot/stage2.h>
 
 #include <string.h>
+
+#include "toscalls.h"
 
 //#define TRACE_DEVICES
 #ifdef TRACE_DEVICES
