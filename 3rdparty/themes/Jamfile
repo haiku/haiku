@@ -26,11 +26,11 @@ Application <3rdparty>Themes :
 	FileUtils.cpp
 	MakeScreenshot.cpp
 	ParseMessage.cpp
+	TextInputAlert.cpp
 	ThemeAddonItem.cpp
 	ThemeInterfaceView.cpp
 	ThemeItem.cpp
 	ThemeManager.cpp
-	ThemePopupTextWindow.cpp
 	ThemesAddon.cpp
 	ViewItem.cpp
 	$(addonSources)

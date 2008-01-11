@@ -22,6 +22,7 @@
 #include <MessageFilter.h>
 
 #include "UITheme.h"
+#include "TextInputAlert.h"
 
 extern status_t ScaleBitmap(const BBitmap& inBitmap, BBitmap& outBitmap);
 
@@ -193,11 +194,13 @@ ThemeInterfaceView::AllAttached()
 							((fBox->Frame().Height() - fScreenshotNone->Frame().Height()) / 2.0));
 							
 	// Theme hyperlink
+	/*
 	BStringView* hlink = new BStringView(BRect(), "theme_hyperlink", _T("More themes online"), new BMessage(skOnlineThemes), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	AddChild(hlink);
 	hlink->SetClickText(hlink->GetText(), *this);
 	hlink->ResizeToPreferred();
 	hlink->MoveTo(frame.right - hlink->Bounds().Width(), fNewBtn->Frame().top + 5);
+	*/
 	
 	// the addons list view
 	preview_frame = fBox->Frame();
@@ -247,12 +250,8 @@ ThemeInterfaceView::MessageReceived(BMessage *_msg)
 
 		case kCreateThemeBtn:
 		{
-			ThemePopupTextWindow *tw;
-			tw = new ThemePopupTextWindow(_T("New Theme Name"), _T("Name"), _T("Accept"), _T("Cancel"), 
-									new BMessage(kReallyCreateTheme), 
-									new BMessage(kReallyCreateTheme+1));
-			tw->SetTarget(this);
-			tw->Show();
+			TextInputAlert *alert = new TextInputAlert("New name", "New Theme Name", "", "Ok", "Cancel");
+			alert->Go(fPopupInvoker);
 			break;
 		}
 
