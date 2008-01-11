@@ -1,16 +1,25 @@
-#include <add-ons/pref_app/PrefPanel.h>
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Box.h>
 #include <DataIO.h>
 #include <Entry.h>
 #include <File.h>
+#include <BeBuild.h>
+#ifdef B_ZETA_VERSION
+#include <add-ons/pref_app/PrefPanel.h>
 #include <locale/Locale.h>
-#include <Resources.h>
 #include <Separator.h>
+#else
+#define _T(v) v
+#define B_PREF_APP_ENABLE_REVERT 'zPAE'
+#define B_PREF_APP_SET_DEFAULTS 'zPAD'
+#define B_PREF_APP_REVERT 'zPAR'
+#define B_PREF_APP_ADDON_REF 'zPAA'
+#endif
+#include <Resources.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
-#include <be/app/Roster.h>
+#include <Roster.h>
 
 #include <Button.h>
 #include <ListView.h>
@@ -20,6 +29,8 @@
 
 #include <Application.h>
 #include <MessageFilter.h>
+
+#include <stdio.h>
 
 #include "UITheme.h"
 #include "TextInputAlert.h"
@@ -103,7 +114,11 @@ ThemeInterfaceView::AllAttached()
 	BView::AllAttached();
 	
 	fPopupInvoker = new BInvoker(new BMessage(kReallyCreateTheme), this);
+#ifdef B_BEOS_VERSION_DANO
 	SetViewUIColor(B_UI_PANEL_BACKGROUND_COLOR);
+#else
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+#endif
 	
 	fThemeManager = new ThemeManager;
 	fThemeManager->LoadThemes();

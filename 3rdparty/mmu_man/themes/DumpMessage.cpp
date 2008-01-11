@@ -58,9 +58,8 @@ bool LookUpFieldName(const char **name, const char *field_name, BMessage *names)
 
 status_t DumpMessageToStream(BMessage *message, BDataIO &stream, int tabCount, BMessage *names)
 {
-	int32 index;
-	void *cookie = NULL;
-	const char *field_name;
+	int32 field, index;
+	char *field_name;
 	type_code field_code;
 	int32 field_count;
 	char buffer[80];
@@ -93,10 +92,10 @@ status_t DumpMessageToStream(BMessage *message, BDataIO &stream, int tabCount, B
 //	stream.Write(tabs+2, tabCount-2);
 	stream.Write(buffer, strlen(buffer));
 
-	while (message->GetNextName(&cookie, 
+	for (field = 0; message->GetInfo(B_ANY_TYPE, field, 
 				&field_name, 
 				&field_code, 
-				&field_count) == B_OK) {
+				&field_count) == B_OK; field++) {
 		if (LookUpFieldName(&easy_name, field_name, names)) {
 			stream.Write(tabs+1, tabCount);
 			stream.Write("// ", 3);
@@ -121,6 +120,7 @@ status_t DumpMessageToStream(BMessage *message, BDataIO &stream, int tabCount, B
 						DumpMessageToStream(&m, stream, tabCount, names);
 				}
 				break;
+#ifdef B_BEOS_VERSION_DANO
 			case 'FONt':
 				{
 					BFont f;
@@ -140,6 +140,54 @@ status_t DumpMessageToStream(BMessage *message, BDataIO &stream, int tabCount, B
 					stream.Write("\n", 1);
 				}
 				break;
+#else
+			case 'FONt':
+				{
+					BFont f;
+					const void *data;
+					ssize_t len;
+					if (message->FindData(field_name, index, &data, &len) >= B_OK) {
+						if (len <= (ssize_t)sizeof(f)) {
+							// Hack: only Dano has BFont : public BFlattenable
+							memcpy((void *)&f, data, len);
+							//stream << f;
+							font_family family;
+							font_style style;
+							font_height height;
+							f.GetFamilyAndStyle(&family, &style);
+							f.GetHeight(&height);
+							BString s;
+							s << "BFont(" << family;
+							s << "/" << style << "/" << f.Size();
+							s << ", shear=" << f.Shear();
+							s << ", rot=" << f.Rotation();
+							s << ", height=" << height.ascent;
+							s << "+" << height.descent;
+							s << "+" << height.leading << ")";
+							stream.Write(s.String(), s.Length());
+						} // else too big
+					}
+					stream.Write("\n", 1);
+				}
+				break;
+			case B_RGB_COLOR_TYPE:
+				{
+					rgb_color c;
+					const void *data;
+					ssize_t len;
+					if (message->FindData(field_name, index, &data, &len) >= B_OK) {
+						if (len <= (ssize_t)sizeof(c)) {
+							// Hack
+							memcpy((void *)&c, data, len);
+							sprintf(buffer, "rgb_color(%d,%d,%d,%d)", 
+								c.red, c.green, c.blue, c.alpha);
+							stream.Write(buffer, strlen(buffer));
+						} // else too big
+					}
+					stream.Write("\n", 1);
+				}
+				break;
+#endif
 			case B_BOOL_TYPE:
 				{
 					bool value;

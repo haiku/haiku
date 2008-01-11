@@ -5,6 +5,8 @@
 #include <Font.h>
 #include <String.h>
 #include <Message.h>
+#include <TypeConstants.h>
+
 #include "DumpMessage.h"
 
 #define MAX_TEXT_LINE_INPUT_SIZE 4096
@@ -192,7 +194,7 @@ status_t Parse_Msg_rgb_color(BMessage *msg, TextLineInputDataIO *st, char *name)
 	if (!has_alpha)
 		v.alpha = 255;
 	//msg->AddRGBColor(name, v);
-	msg->AddData(name, (type_code)'RGBC', &v, 4);
+	msg->AddData(name, B_RGB_COLOR_TYPE, &v, 4);
 	return B_OK;
 }
 
@@ -255,7 +257,11 @@ status_t Parse_Msg_BFont(BMessage *msg, TextLineInputDataIO *st, char *name)
 	f.SetFamilyAndStyle(ff, fs);
 	f.SetSize(size);
 	//f.PrintToStream();
+#ifdef B_BEOS_VERSION_DANO
 	msg->AddFlat(name, &f);
+#else
+	msg->AddData(name, 'FONt', (void *)&f, sizeof(f));
+#endif
 	return B_OK;
 }
 

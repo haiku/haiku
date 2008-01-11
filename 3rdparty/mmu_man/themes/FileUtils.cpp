@@ -165,7 +165,7 @@ status_t escape_find_directory(BString *dir)
 
 status_t unescape_find_directory(BString *dir)
 {
-	status_t err;
+	status_t err = B_ERROR;
 	int32 s, e;
 	BString tok;
 	BPath path;
@@ -180,7 +180,9 @@ status_t unescape_find_directory(BString *dir)
 	
 	_BORK(B_DESKTOP_DIRECTORY);
 	_BORK(B_TRASH_DIRECTORY);
+#ifdef B_BEOS_VERSION_DANO
 	_BORK(B_ROOT_DIRECTORY);
+#endif
 	
 	_BORK(B_BEOS_DIRECTORY);
 	_BORK(B_BEOS_SYSTEM_DIRECTORY);

@@ -2,10 +2,20 @@
 #include "ThemeInterfaceView.h"
 #include "ThemeManager.h"
 #include "UITheme.h"
+#include <BeBuild.h>
+#ifdef B_ZETA_VERSION
 #include <locale/Locale.h>
+#else
+#define _T(v) v
+#define B_LANGUAGE_CHANGED '_BLC'
+#define B_PREF_APP_SET_DEFAULTS 'zPAD'
+#define B_PREF_APP_REVERT 'zPAR'
+#define B_PREF_APP_ADDON_REF 'zPAA'
+#endif
 #include <Button.h>
 #include <CheckBox.h>
 #include <Font.h>
+#include <Roster.h>
 #include <View.h>
 #include <stdio.h>
 
@@ -24,10 +34,16 @@ ThemeAddonItem::ThemeAddonItem(BRect bounds, ThemeInterfaceView *iview, int32 id
 	tman = iview->GetThemeManager();
 	fAddonName = tman->AddonName(id);
 	BString tip(tman->AddonDescription(id));
+#ifdef B_BEOS_VERSION_DANO
 	SetToolTipText(tip.String());
 	SetViewUIColor(B_UI_PANEL_BACKGROUND_COLOR);
 	SetLowUIColor(B_UI_PANEL_BACKGROUND_COLOR);
 	SetHighUIColor(B_UI_PANEL_TEXT_COLOR);
+#else
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
+#endif
 	BMessage *apply = new BMessage(CB_APPLY);
 	apply->AddInt32("addon", id);
 	BMessage *save = new BMessage(CB_SAVE);
@@ -35,14 +51,18 @@ ThemeAddonItem::ThemeAddonItem(BRect bounds, ThemeInterfaceView *iview, int32 id
 	BMessage *prefs = new BMessage(BTN_PREFS);
 	prefs->AddInt32("addon", id);
 	fApplyBox = new BCheckBox(BRect(CTRL_OFF_X, CTRL_OFF_Y, CTRL_OFF_X+50, CTRL_OFF_Y+30), "apply", _T("Apply"), apply);
-	fApplyBox->SetToolTipText(_T("Use this information from themes"));
 	fApplyBox->SetValue((tman->AddonFlags(id) & Z_THEME_ADDON_DO_SET_ALL)?B_CONTROL_ON:B_CONTROL_OFF);
 	fSaveBox = new BCheckBox(BRect(CTRL_OFF_X+50+CTRL_SPACING, CTRL_OFF_Y, CTRL_OFF_X+100+CTRL_SPACING, CTRL_OFF_Y+30), "save", _T("Save"), save);
-	fSaveBox->SetToolTipText(_T("Save this information to themes"));
 	fSaveBox->SetValue((tman->AddonFlags(id) & Z_THEME_ADDON_DO_RETRIEVE)?B_CONTROL_ON:B_CONTROL_OFF);
+#ifdef B_BEOS_VERSION_DANO
+	fApplyBox->SetToolTipText(_T("Use this information from themes"));
+	fSaveBox->SetToolTipText(_T("Save this information to themes"));
+#endif
 #ifdef HAVE_PREF_BTN
 	fPrefsBtn = new BButton(BRect(CTRL_OFF_X+100+CTRL_SPACING*2, CTRL_OFF_Y, CTRL_OFF_X+150+CTRL_SPACING*2, CTRL_OFF_Y+30), "prefs", _T("Preferences"), prefs);
+#ifdef B_BEOS_VERSION_DANO
 	fPrefsBtn->SetToolTipText(_T("Run the preferences panel for this topic."));
+#endif
 #endif
 	BFont fnt;
 	GetFont(&fnt);
@@ -95,12 +115,16 @@ void ThemeAddonItem::Draw(BRect)
 void ThemeAddonItem::RelocalizeStrings()
 {
 	fApplyBox->SetLabel(_T("Apply"));
-	fApplyBox->SetToolTipText(_T("Use this information from themes"));
 	fSaveBox->SetLabel(_T("Save"));
+#ifdef B_BEOS_VERSION_DANO
+	fApplyBox->SetToolTipText(_T("Use this information from themes"));
 	fSaveBox->SetToolTipText(_T("Save this information to themes"));
+#endif
 #ifdef HAVE_PREF_BTN
 	fPrefsBtn->SetLabel(_T("Preferences"));
+#ifdef B_BEOS_VERSION_DANO
 	fPrefsBtn->SetToolTipText(_T("Run the preferences panel for this topic."));
+#endif
 #endif
 	RelayoutButtons();
 }
