@@ -16,6 +16,7 @@ SubInclude HAIKU_TOP src apps glteapot ;
 SubInclude HAIKU_TOP src apps icon-o-matic ;
 SubInclude HAIKU_TOP src apps installer ;
 SubInclude HAIKU_TOP src apps launchbox ;
+SubInclude HAIKU_TOP src apps login ;
 SubInclude HAIKU_TOP src apps magnify ;
 SubInclude HAIKU_TOP src apps mail ;
 SubInclude HAIKU_TOP src apps mandelbrot ;
