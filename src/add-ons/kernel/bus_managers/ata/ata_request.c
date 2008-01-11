@@ -120,9 +120,9 @@ ata_request_finish(ata_request *request, bool resubmit)
 			// we cannot copy sense directly as sense buffer may be too small
 			scsi_set_sense(&sense, request);
 
-			ASSERT(sizeof(*request->ccb->sense) == SCSI_MAX_SENSE_SIZE);
+			ASSERT(sizeof(request->ccb->sense) == SCSI_MAX_SENSE_SIZE);
 
-			sense_len = min(sizeof(*request->ccb->sense), sizeof(sense));
+			sense_len = min(sizeof(request->ccb->sense), sizeof(sense));
 
 			memcpy(request->ccb->sense, &sense, sense_len);
 			request->ccb->sense_resid = SCSI_MAX_SENSE_SIZE - sense_len;
@@ -131,7 +131,7 @@ ata_request_finish(ata_request *request, bool resubmit)
 			// device sense gets reset once it's read
 			ata_request_clear_sense(request);
 
-			ASSERT(request->ccb->subsys_status == SCSI_REQ_CMP_ERR);
+			ASSERT(request->ccb->subsys_status == SCSI_REQ_CMP_ERR | SCSI_AUTOSNS_VALID);
 			ASSERT(request->ccb->device_status == SCSI_STATUS_CHECK_CONDITION);
 		}
 	}
