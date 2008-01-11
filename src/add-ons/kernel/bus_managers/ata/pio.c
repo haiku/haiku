@@ -43,6 +43,7 @@
 
 #include <string.h>
 
+#define FLOW dprintf
 
 // internal error code if scatter gather table is too short
 #define ERR_TOO_BIG	(B_ERRORS_END + 1)
@@ -157,6 +158,8 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 			return B_ERROR;
 		}
 
+		ASSERT((physicalAddress & 4097) == (virtualAddress & 4097));
+
 		// if chunks starts in the middle of a page, we have even less then
 		// a page left		
 		page_left = B_PAGE_SIZE - physicalAddress % B_PAGE_SIZE;
@@ -184,7 +187,7 @@ transfer_PIO_physcont(ide_device_info *device, addr_t physicalAddress,
 
 
 /*! Transfer PIO block from/to buffer */
-static inline int
+static inline status_t
 transfer_PIO_block(ide_device_info *device, int length, bool write, int *transferred)
 {
 	// data is usually split up into multiple scatter/gather blocks
@@ -230,10 +233,8 @@ transfer_PIO_block(ide_device_info *device, int length, bool write, int *transfe
 static void
 write_discard_PIO(ide_device_info *device, int length)
 {
+	static const uint8 buffer[32] = {};
 	ide_bus_info *bus = device->bus;
-	uint8 buffer[32];
-
-	memset(buffer, 0, sizeof(buffer));
 
 	// we transmit 32 zero-bytes at once
 	// (not very efficient but easy to implement - you get what you deserve

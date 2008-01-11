@@ -208,7 +208,7 @@ status_t ata_finish_command(ide_device_info *device, ata_request *request, ata_f
 bool check_rw_error(ide_device_info *device, ata_request *request);
 bool check_output(ide_device_info *device, bool drdy_required, int error_mask, bool is_write);
 
-void ata_exec_read_write(ide_device_info *device, ata_request *request,	uint64 pos, size_t length, bool write);
+void ata_exec_read_write(ide_device_info *device, ata_request *request, uint64 address, size_t sectorCount, bool write);
 
 void ata_dpc_DMA(ata_request *request);
 void ata_dpc_PIO(ata_request *request);

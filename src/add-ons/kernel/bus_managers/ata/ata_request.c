@@ -139,7 +139,7 @@ ata_request_finish(ata_request *request, bool resubmit)
 	}
 
 	IDE_LOCK(request->device->bus);
-	ASSERT(request->device->bus->state == ata_state_busy);
+	ASSERT(request->device->bus->state != ata_state_idle);
 	ASSERT(request->device->bus->active_device == request->device);
 	ASSERT(request->device->requestActive == request);
 	ASSERT(request->device->requestFree == NULL);

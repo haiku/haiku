@@ -18,6 +18,11 @@
 #define TRACE dprintf
 #define FLOW dprintf
 
+
+static void ata_exec_dma_transfer(ata_request *request);
+static void	ata_exec_pio_transfer(ata_request *request);
+
+
 void
 ata_select_device(ide_bus_info *bus, int device)
 {
@@ -29,15 +34,9 @@ ata_select_device(ide_bus_info *bus, int device)
 	tf.chs.mode = ide_mode_lba;
 	tf.chs.device = device ? 1 : 0;
 
-//	if (ata_wait_idle(bus) != B_OK)
-//		FLOW("ata_select_device step 1 bus not idle\n");
-
 	bus->controller->write_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
 	bus->controller->get_altstatus(bus->channel_cookie); // flush posted writes
 	spin(1); // wait 400 nsec
-
-//	if (ata_wait_idle(bus) != B_OK)
-//		FLOW("ata_select_device step 2 bus not idle\n");
 
 	// for debugging only
 	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
@@ -756,7 +755,7 @@ err:
 
 void
 ata_exec_read_write(ide_device_info *device, ata_request *request,
-	uint64 pos, size_t length, bool write)
+	uint64 address, size_t sectorCount, bool write)
 {
 	ide_bus_info *bus = device->bus;
 	ata_flags flags = 0;
@@ -769,19 +768,18 @@ ata_exec_read_write(ide_device_info *device, ata_request *request,
 	if (request->uses_dma) {
 		if (!prepare_dma(device, request)) {
 			// fall back to PIO on error
-
 			request->uses_dma = false;
 		}
 	}
 
 	if (!request->uses_dma) {
 		prep_PIO_transfer(device, request);
-		device->left_blocks = length;
+		device->left_blocks = sectorCount;
 	}
 
 	// compose command
-	if (!create_rw_taskfile(device, request, pos, length, write))
-		goto err_setup;
+	if (!create_rw_taskfile(device, request, address, sectorCount, write))
+		goto error;
 
 	// if no timeout is specified, use standard
 	timeout = request->ccb->timeout > 0 ? request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
@@ -791,42 +789,80 @@ ata_exec_read_write(ide_device_info *device, ata_request *request,
 	if (request->uses_dma)
 		flags |= ATA_DMA_TRANSFER;
 	if (ata_send_command(device, request, flags, timeout) != B_OK) 
-		goto err_send;
+		goto error;
 
+	// this could be executed in a DPC to improve performance
 	if (request->uses_dma) {
-
-		start_dma_wait_no_lock(device, request);
+		ata_exec_dma_transfer(request);
 	} else {
-		// on PIO read, we start with waiting, on PIO write we can
-		// transmit data immediately; we let the service thread do
-		// the writing, so the caller can issue the next command 
-		// immediately (this optimisation really pays on SMP systems
-		// only)
-		SHOW_FLOW0(3, "Ready for PIO");
-		if (request->is_write) {
-			SHOW_FLOW0(3, "Scheduling write DPC");
-			scsi->schedule_dpc(bus->scsi_cookie, bus->irq_dpc, ide_dpc, bus);
-		}
+		ata_exec_pio_transfer(request);
+	}
+	return;
+
+error:
+	if (request->uses_dma)
+		abort_dma(device, request);
+	ata_request_finish(request, false);
+}
+
+
+static void
+ata_exec_dma_transfer(ata_request *request)
+{
+	ASSERT(0);
+}
+
+static void
+ata_exec_pio_transfer(ata_request *request)
+{
+	ide_device_info *device = request->device;
+	ide_bus_info *bus = device->bus;
+	uint32 timeout = request->ccb->timeout > 0 ? 
+		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
+
+//	FLOW("ata_exec_pio_transfer\n");
+
+	FLOW("ata_exec_pio_transfer: length %d, left_sg_elem %d, cur_sg_elem %d, cur_sg_ofs %d\n",
+		request->ccb->data_length, device->left_sg_elem, device->cur_sg_elem, device->cur_sg_ofs);
+
+	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 4000000) != B_OK) {
+		TRACE("ata_exec_pio_transfer: wait failed\n");
+		goto error;
 	}
 
+	while (device->left_blocks > 0) {
+		if (request->is_write) {
+			FLOW("writing 1 block\n");
+			if (write_PIO_block(request, 512) != B_OK)
+				goto transfer_error;
+		} else {
+			FLOW("reading 1 block\n");
+			if (read_PIO_block(request, 512) != B_OK)
+				goto transfer_error;
+		}
+		device->left_blocks--;
+		FLOW("%d blocks left\n", device->left_blocks);
+	}
+
+	if (ata_wait_for_drqdown(bus) != B_OK) {
+		TRACE("ata_exec_pio_transfer: ata_wait_for_drqdown failed\n");
+		goto error;
+	}
+
+	ata_finish_command(device, &request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, ide_error_abrt);
+	ata_request_finish(request, false /* resubmit */);
 	return;
 
-err_setup:
-	// error during setup
-	if (request->uses_dma)
-		abort_dma(device, request);
-
-	ata_request_finish(request, false);
+error:
+	TRACE("ata_exec_pio_transfer: error\n");
+	ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
+	ata_request_finish(request, false /* resubmit */);
 	return;
-	
-err_send:
-	// error during/after send; 
-	// in this case, the device discards queued ccb automatically
-	if (request->uses_dma)
-		abort_dma(device, request);
 
-//	finish_reset_queue(request);
-	ata_request_finish(request, false);
+transfer_error:
+	TRACE("ata_exec_pio_transfer: transfer error\n");
+	ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
+	ata_request_finish(request, false /* resubmit */);
 }
 
 
@@ -1079,7 +1115,7 @@ ata_identify_device(ide_device_info *device, bool isAtapi)
 		return B_ERROR;
 	}
 
-	if (ata_wait(bus, ide_status_drq, ide_status_bsy, ATA_CHECK_ERROR_BIT, 4000000) != B_OK) {
+	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 4000000) != B_OK) {
 		TRACE("ata_identify_device: wait failed\n");
 		return B_ERROR;
 	}
