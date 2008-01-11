@@ -16,6 +16,7 @@ class BScrollView;
 class BTextView;
 class BMessage;
 class BStringView;
+class BInvoker;
 
 class ThemeInterfaceView : public BView
 {

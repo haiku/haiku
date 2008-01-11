@@ -1,8 +1,10 @@
-SubDir HAIKU_TOP 3rdparty themes ;
+SubDir HAIKU_TOP 3rdparty mmu_man themes ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) 3rdparty themes addons ] ;
+SubDirC++Flags -DSINGLE_BINARY ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) 3rdparty mmu_man themes addons ] ;
 
 local addonSources ;
 addonSources = 
@@ -28,6 +30,7 @@ Application <3rdparty>Themes :
 	ParseMessage.cpp
 	TextInputAlert.cpp
 	ThemeAddonItem.cpp
+	ThemesApp.cpp
 	ThemeInterfaceView.cpp
 	ThemeItem.cpp
 	ThemeManager.cpp
