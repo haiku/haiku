@@ -66,6 +66,8 @@ class BRegion {
 
 			void				IntersectWith(const BRegion* region);
 
+			void				ExclusiveInclude(const BRegion* region);
+
  private:
 	friend class BDirectWindow;
 	friend class BPrivate::ServerLink;

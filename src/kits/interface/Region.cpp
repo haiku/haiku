@@ -414,13 +414,30 @@ BRegion::Exclude(const BRegion* region)
 
 /*!	\brief Modifies the region, so that it will contain just the area
 		in common with the given BRegion.
-	\param region the BRegion to intersect to.
+	\param region the BRegion to intersect with.
 */
 void
 BRegion::IntersectWith(const BRegion* region)
 {
 	BRegion result;
 	Support::XIntersectRegion(this, region, &result);
+
+	_AdoptRegionData(result);
+}
+
+
+// #pragma mark -
+
+
+/*!	\brief Modifies the region, so that it will contain just the area
+		which both regions do not have in common.
+	\param region the BRegion to exclusively include.
+*/
+void
+BRegion::ExclusiveInclude(const BRegion* region)
+{
+	BRegion result;
+	Support::XXorRegion(this, region, &result);
 
 	_AdoptRegionData(result);
 }
@@ -500,6 +517,7 @@ BRegion::_SetSize(long newSize)
 	fDataSize = newSize;
 	return true;
 }
+
 
 clipping_rect
 BRegion::_Convert(const BRect& rect) const
