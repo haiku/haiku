@@ -141,6 +141,9 @@ if $(HAIKU_DONT_INCLUDE_SRC) {
 } else {
 	SubInclude HAIKU_TOP src ;
 }
+if $(HAIKU_INCLUDE_3RDPARTY) {
+	SubInclude HAIKU_TOP 3rdparty ;
+}
 
 # reset subdir
 SubDir HAIKU_TOP ;
