@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <pwd.h>
 
 
 // ToDo: implement the user/group functions for real!
@@ -100,17 +101,27 @@ seteuid(uid_t uid)
 }
 
 
-char *
-getlogin(void)
+char *getlogin()
 {
-	return "baron";
+	struct passwd *pw;
+	pw = getpwuid(getuid());
+	if (pw)
+		return pw->pw_name;
+	errno = ENOMEM;
+	return NULL;
 }
 
 
-int 
-getlogin_r(char *name, size_t nameSize)
+int getlogin_r(char *name, size_t nameSize)
 {
-	strlcpy(name, "baron", nameSize);
-	return 0;
+	struct passwd *pw;
+	pw = getpwuid(getuid());
+	if (pw && (nameSize > 32/*PW_MAX_NAME*/)) {
+		memset(name, 0, nameSize);
+		strlcpy(name, pw->pw_name, 32/*PW_MAX_NAME*/);
+		return B_OK;
+	}
+	return ENOMEM;
 }
+
 

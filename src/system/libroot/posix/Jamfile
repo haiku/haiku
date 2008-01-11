@@ -3,6 +3,11 @@ SubDir HAIKU_TOP src system libroot posix ;
 UsePrivateHeaders [ FDirName syslog_daemon ] ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
+if $(HAIKU_ENABLE_MULTIUSER) = 1 {
+	PWD_BACKEND = pwd_query.c ;
+} else {
+	PWD_BACKEND = pwd.c grp.c ;
+}
 MergeObject posix_main.o :
  	assert.c
  	dlfcn.c
@@ -10,10 +15,9 @@ MergeObject posix_main.o :
  	errno.c
  	fnmatch.c
  	glob.c
- 	grp.c
  	inttypes.c
  	poll.c
- 	pwd.c
+ 	$(PWD_BACKEND)
  	syslog.cpp
  	termios.c
  	utime.c
