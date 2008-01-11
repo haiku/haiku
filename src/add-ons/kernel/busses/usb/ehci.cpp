@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku Inc. All rights reserved.
+ * Copyright 2006-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -295,11 +295,13 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	for (int32 i = 1; i < 11; i++) {
 		fInterruptEntries[i].queue_head.next_phy = firstPhysical;
 		fInterruptEntries[i].queue_head.next_log = firstLogical;
+		fInterruptEntries[i].queue_head.prev_log = NULL;
 	}
 
 	// terminate the first entry
 	firstLogical->next_phy = EHCI_QH_TERMINATE;
 	firstLogical->next_log = NULL;
+	firstLogical->prev_log = NULL;
 
 	// allocate a queue head that will always stay in the async frame list
 	fAsyncQueueHead = CreateQueueHead();
@@ -356,7 +358,7 @@ EHCI::Start()
 	uint32 frameListSize = (ReadOpReg(EHCI_USBCMD) >> EHCI_USBCMD_FLS_SHIFT)
 		& EHCI_USBCMD_FLS_MASK;
 	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_RUNSTOP
-		| EHCI_USBCMD_ASENABLE /*| EHCI_USBCMD_PSENABLE*/
+		| EHCI_USBCMD_ASENABLE | EHCI_USBCMD_PSENABLE
 		| (frameListSize << EHCI_USBCMD_FLS_SHIFT)
 		| (2 << EHCI_USBCMD_ITC_SHIFT));
 
@@ -458,7 +460,7 @@ EHCI::SubmitTransfer(Transfer *transfer)
 #endif
 
 	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
-		result = LinkInterruptQueueHead(queueHead, pipe->Interval());
+		result = LinkInterruptQueueHead(queueHead, pipe);
 	else
 		result = LinkQueueHead(queueHead);
 
@@ -1210,9 +1212,6 @@ EHCI::InitQueueHead(ehci_qh *queueHead, Pipe *pipe)
 		| EHCI_QH_CHARS_TOGGLE;
 
 	queueHead->endpoint_caps = (1 << EHCI_QH_CAPS_MULT_SHIFT);
-	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
-		queueHead->endpoint_caps |= (0xff << EHCI_QH_CAPS_ISM_SHIFT);
-
 	if (pipe->Speed() != USB_SPEED_HIGHSPEED) {
 		if (pipe->Type() & USB_OBJECT_CONTROL_PIPE)
 			queueHead->endpoint_chars |= EHCI_QH_CHARS_CONTROL;
@@ -1257,10 +1256,28 @@ EHCI::LinkQueueHead(ehci_qh *queueHead)
 
 
 status_t
-EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, uint8 interval)
+EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, Pipe *pipe)
 {
 	if (!Lock())
 		return B_ERROR;
+
+	uint8 interval = pipe->Interval();
+	if (pipe->Speed() == USB_SPEED_HIGHSPEED) {
+		// Allow interrupts to be scheduled on each possible micro frame.
+		queueHead->endpoint_caps |= (0xff << EHCI_QH_CAPS_ISM_SHIFT);
+	} else {
+		// As we do not yet support FSTNs to correctly reference low/full
+		// speed interrupt transfers, we simply put them into the 1 interval
+		// queue. This way we ensure that we reach them on every micro frame
+		// and can do the corresponding start/complete split transactions.
+		// ToDo: use FSTNs to correctly link non high speed interrupt transfers
+		interval = 1;
+
+		// For now we also force start splits to be in micro frame 0 and
+		// complete splits to be in micro frame 2, 3 and 4.
+		queueHead->endpoint_caps |= (0x01 << EHCI_QH_CAPS_ISM_SHIFT);
+		queueHead->endpoint_caps |= (0x1c << EHCI_QH_CAPS_SCM_SHIFT);
+	}
 
 	// this should not happen
 	if (interval < 1)
@@ -1273,9 +1290,11 @@ EHCI::LinkInterruptQueueHead(ehci_qh *queueHead, uint8 interval)
 		interval = 11;
 
 	ehci_qh *interruptQueue = &fInterruptEntries[interval - 1].queue_head;
-	queueHead->next_log = interruptQueue->next_log;
 	queueHead->next_phy = interruptQueue->next_phy;
+	queueHead->next_log = interruptQueue->next_log;
 	queueHead->prev_log = interruptQueue;
+	if (interruptQueue->next_log)
+		((ehci_qh *)interruptQueue->next_log)->prev_log = queueHead;
 	interruptQueue->next_log = queueHead;
 	interruptQueue->next_phy = queueHead->this_phy | EHCI_QH_TYPE_QH;
 
@@ -1292,9 +1311,14 @@ EHCI::UnlinkQueueHead(ehci_qh *queueHead, ehci_qh **freeListHead)
 
 	ehci_qh *prevHead = (ehci_qh *)queueHead->prev_log;
 	ehci_qh *nextHead = (ehci_qh *)queueHead->next_log;
-	prevHead->next_phy = queueHead->next_phy | EHCI_QH_TYPE_QH;
-	prevHead->next_log = queueHead->next_log;
-	nextHead->prev_log = queueHead->prev_log;
+	if (prevHead) {
+		prevHead->next_phy = queueHead->next_phy | EHCI_QH_TYPE_QH;
+		prevHead->next_log = queueHead->next_log;
+	}
+
+	if (nextHead)
+		nextHead->prev_log = queueHead->prev_log;
+
 	queueHead->next_phy = fAsyncQueueHead->this_phy | EHCI_QH_TYPE_QH;
 	queueHead->prev_log = NULL;
 

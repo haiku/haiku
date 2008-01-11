@@ -80,7 +80,7 @@ static	int32						CleanupThread(void *data);
 
 		status_t					LinkQueueHead(ehci_qh *queueHead);
 		status_t					LinkInterruptQueueHead(ehci_qh *queueHead,
-										uint8 interval);
+										Pipe *pipe);
 		status_t					UnlinkQueueHead(ehci_qh *queueHead,
 										ehci_qh **freeList);
 
