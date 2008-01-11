@@ -60,7 +60,7 @@ LoginApp::TryLogin(BMessage *message)
 		err = ValidateLogin(login, password);
 		if (err == B_OK) {
 			reply.AddInt32("error", B_OK);
-			message->SendReply(reply, NULL);
+			message->SendReply(&reply);
 			
 			if (password == NULL)
 				return;
@@ -70,13 +70,13 @@ LoginApp::TryLogin(BMessage *message)
 			StartUserSession(login);
 		} else {
 			reply.AddInt32("error", err);
-			message->SendReply(reply, NULL);
+			message->SendReply(&reply);
 			return;
 		}
 		
 	} else {
 		reply.AddInt32("error", EINVAL);
-		message->SendReply(reply, NULL);
+		message->SendReply(&reply);
 		return;
 	}
 }
