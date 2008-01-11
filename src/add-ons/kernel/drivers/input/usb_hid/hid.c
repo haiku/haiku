@@ -613,32 +613,38 @@ handle_interrupt_transfer(hid_device_info* device)
 			/* cancelled: device is unplugged */
 			return status;
 		}
-#if 1
+
 		status = usb->clear_feature(device->ept->handle, USB_FEATURE_ENDPOINT_HALT);
-		if (status != B_OK)
+		if (status != B_OK) {
 			DPRINTF_ERR((MY_ID "clear_feature() error %d\n", (int)status));
-#endif
-	} else {
-		/* got a report */
-#if 0
-		uint32 i;
-		char linbuf [256];
-		uint8 *buffer = device->buffer;
+			// probably the device was removed and we just didn't get the
+			// removed notification yet.
+			device->active = false;
+			return status;
+		}
 
-		for (i = 0; i < device->total_report_size; i++)
-			sprintf (&linbuf[i*3], "%02X ", buffer [i]);
-		DPRINTF_INFO ((MY_ID "input report: %s\n", linbuf));
-#endif
-		device->timestamp = system_time();
-
-		if (device->is_keyboard) {
-			interpret_kb_buffer(device);
-			memcpy(device->last_buffer, device->buffer, device->total_report_size);
-		} else
-			interpret_mouse_buffer(device);
+		return device->bus_status;
 	}
 
-	return status;
+	/* got a report */
+#if 0
+	uint32 i;
+	char linbuf [256];
+	uint8 *buffer = device->buffer;
+
+	for (i = 0; i < device->total_report_size; i++)
+		sprintf (&linbuf[i*3], "%02X ", buffer [i]);
+	DPRINTF_INFO ((MY_ID "input report: %s\n", linbuf));
+#endif
+	device->timestamp = system_time();
+
+	if (device->is_keyboard) {
+		interpret_kb_buffer(device);
+		memcpy(device->last_buffer, device->buffer, device->total_report_size);
+	} else
+		interpret_mouse_buffer(device);
+
+	return B_OK;
 }
 
 
@@ -910,8 +916,7 @@ hid_device_write(driver_cookie *cookie, off_t position,
 
 
 static status_t
-hid_device_control(driver_cookie *cookie, uint32 op,
-		void *arg, size_t len)
+hid_device_control(driver_cookie *cookie, uint32 op, void *arg, size_t length)
 {
 	status_t err = B_ERROR;
 	hid_device_info *device;
@@ -967,7 +972,7 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 
 			case KB_SET_LEDS:
 				set_leds(device, (uint8 *)arg);
-				break;
+				return B_OK;
 		}
 	} else {
 		switch (op) {
@@ -1006,11 +1011,12 @@ hid_device_control(driver_cookie *cookie, uint32 op,
 
 			default:
 				/* not implemented */
-				break;
+				return B_ERROR;
 		}
 	}
 
-	return err;
+	/* shouldn't get here */
+	return B_ERROR;
 }
 
 
@@ -1112,6 +1118,7 @@ uninit_driver(void)
 	free_device_names();
 }
 
+
 /*!
 	device names are generated dynamically
 */
@@ -1153,4 +1160,3 @@ find_device(const char *name)
 
 	return &hooks;
 }
-
