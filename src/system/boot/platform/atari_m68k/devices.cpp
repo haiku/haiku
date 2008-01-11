@@ -36,7 +36,9 @@ static const uint16 kParametersSizeVersion3 = 0x42;
 
 static const uint16 kDevicePathSignature = 0xbedd;
 
+//XXX clean this up!
 struct drive_parameters {
+	struct tosbpb bpb;
 	uint16		parameters_size;
 	uint16		flags;
 	uint32		cylinders;
@@ -45,7 +47,7 @@ struct drive_parameters {
 	uint64		sectors;
 	uint16		bytes_per_sector;
 	/* edd 2.0 */
-	real_addr	device_table;
+	//real_addr	device_table;
 	/* edd 3.0 */
 	uint16		device_path_signature;
 	uint8		device_path_size;
@@ -130,7 +132,7 @@ class BlockHandle : public Handle {
 		uint8 DriveID() const { return fHandle; }
 
 	protected:
-		bool	fLBA;
+		status_t	ReadBPB(struct tosbpb *bpb);
 		uint64	fSize;
 		uint32	fBlockSize;
 		bool	fHasParameters;
@@ -140,65 +142,6 @@ class BlockHandle : public Handle {
 
 
 static bool sBlockDevicesAdded = false;
-
-
-static void
-check_cd_boot(BlockHandle *drive)
-{
-	gKernelArgs.boot_volume.SetInt32(BOOT_METHOD, BOOT_METHOD_HARD_DISK);
-
-	if (drive->DriveID() != 0)
-		return;
-
-	struct bios_regs regs;
-	regs.eax = BIOS_BOOT_CD_GET_STATUS;
-	regs.edx = 0;
-	regs.esi = kDataSegmentScratch;
-	call_bios(0x13, &regs);
-
-	if ((regs.flags & CARRY_FLAG) != 0)
-		return;
-
-	// we obviously were booted from CD!
-
-	specification_packet *packet = (specification_packet *)kDataSegmentScratch;
-	if (packet->media_type != 0)
-		gKernelArgs.boot_volume.SetInt32(BOOT_METHOD, BOOT_METHOD_CD);
-
-#if 0
-	dprintf("got CD boot spec:\n");
-	dprintf("  size: %#x\n", packet->size);
-	dprintf("  media type: %u\n", packet->media_type);
-	dprintf("  drive_number: %u\n", packet->drive_number);
-	dprintf("  controller index: %u\n", packet->controller_index);
-	dprintf("  start emulation: %lu\n", packet->start_emulation);
-	dprintf("  device_specification: %u\n", packet->device_specification);
-#endif
-}
-
-
-static status_t
-get_ext_drive_parameters(uint8 drive, drive_parameters *targetParameters)
-{
-	drive_parameters *parameter = (drive_parameters *)kDataSegmentScratch;
-
-	memset(parameter, 0, sizeof(drive_parameters));
-	parameter->parameters_size = sizeof(drive_parameters);
-
-	struct bios_regs regs;
-	regs.eax = BIOS_GET_EXT_DRIVE_PARAMETERS;
-	regs.edx = drive;
-	regs.esi = (addr_t)parameter - kDataSegmentBase;
-	call_bios(0x13, &regs);
-
-	// filter out faulty BIOS return codes
-	if ((regs.flags & CARRY_FLAG) != 0
-		|| parameter->sectors == 0)
-		return B_ERROR;
-
-	memcpy(targetParameters, parameter, sizeof(drive_parameters));
-	return B_OK;
-}
 
 
 static status_t
@@ -225,24 +168,6 @@ get_drive_parameters(uint8 drive, drive_parameters *parameters)
 		* parameters->sectors_per_track;
 	parameters->bytes_per_sector = 512;
 
-	return B_OK;
-}
-
-
-static status_t
-get_number_of_drives(uint8 *_count)
-{
-	struct bios_regs regs;
-	regs.eax = BIOS_GET_DRIVE_PARAMETERS;
-	regs.edx = 0x80;
-	regs.es = 0;
-	regs.edi = 0;
-	call_bios(0x13, &regs);
-
-	if (regs.flags & CARRY_FLAG)
-		return B_ERROR;
-
-	*_count = regs.edx & 0xff;
 	return B_OK;
 }
 
@@ -460,17 +385,20 @@ find_unique_check_sums(NodeList *devices)
 static status_t
 add_block_devices(NodeList *devicesList, bool identifierMissing)
 {
+	int32 map;
+	uint8 driveID;
+	uint8 driveCount;
+	
 	if (sBlockDevicesAdded)
 		return B_OK;
 
-	uint8 driveCount;
-	if (get_number_of_drives(&driveCount) != B_OK)
-		return B_ERROR;
-
-	dprintf("number of drives: %d\n", driveCount);
-
-	for (int32 i = 0; i < driveCount; i++) {
-		uint8 driveID = i + 0x80;
+	map = Drvmap();
+	for (driveID = 0; driveID < 32; driveID++) {
+		bool present = map & 0x1;
+		map >>= 1;
+		if (!present)
+			continue;
+		
 		if (driveID == gBootDriveID)
 			continue;
 
@@ -486,6 +414,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 		if (drive->FillIdentifier() != B_OK)
 			identifierMissing = true;
 	}
+	dprintf("number of drives: %d\n", driveCount);
 
 	if (identifierMissing) {
 		// we cannot distinguish between all drives by identifier, we need
@@ -668,6 +597,19 @@ BlockHandle::FillIdentifier()
 	}
 
 	return B_ERROR;
+}
+
+
+status_t
+BlockHandle::ReadBPB(struct tosbpb *bpb)
+{
+	struct tosbpb *p;
+	p = Getbpb(fHandle);
+	memcpy(bpb, p, sizeof(struct tosbpb));
+	/* Getbpb is buggy so we must force a media change */
+	//XXX: docs seems to assume we should loop until it works
+	Mediach(fHandle);
+	return B_OK;
 }
 
 
