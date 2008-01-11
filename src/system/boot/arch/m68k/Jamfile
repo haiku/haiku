@@ -3,7 +3,8 @@ SubDir HAIKU_TOP src system boot arch m68k ;
 DEFINES += _BOOT_MODE ;
 
 local librootArchObjects =
-	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
+#	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
+	arch_string.S
 ;
 
 KernelMergeObject boot_arch_m68k.o :
@@ -13,3 +14,6 @@ KernelMergeObject boot_arch_m68k.o :
 
 SEARCH on [ FGristFiles arch_elf.cpp ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch $(TARGET_ARCH) ] ;
+
+SEARCH on [ FGristFiles $(librootArchObjects) ]
+    = [ FDirName $(HAIKU_TOP) src system libroot posix string arch $(TARGET_ARCH) ] ;
