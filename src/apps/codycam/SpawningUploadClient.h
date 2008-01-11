@@ -35,6 +35,7 @@ status_t		SetCommandLine(const char *command);
 ssize_t			SendCommand(const char *cmd);
 ssize_t			ReadReply(BString *to);
 virtual status_t	ParseReply();
+int				getpty(char *pty, char *tty);
 
 int				InputPipe() const { return fPty; };
 int				OutputPipe() const { return fPty; };

@@ -40,29 +40,20 @@ SpawningUploadClient::Connect(const string& server, const string& login, const s
 bool
 SpawningUploadClient::SpawnCommand()
 {
+	char ptypath[20];
+	char ttypath[20];
 	//XXX: should use a system-provided TerminalCommand class
 	BString shellcmd = "exec";
 	const char *args[] = { "/bin/sh", "-c", NULL, NULL };
-	char path[20];
-	int pty;
-	for (pty = 0; pty < 0x50; pty++) {
-		int fd;
-		sprintf(path, "/dev/pt/%c%1x", 'p' + pty / 16, pty & 0x0f);
-		printf("trying %s\n", path);
-		fd = open(path, O_RDWR);
-		if (fd < 0)
-			continue;
-		fPty = fd;
-		break;
-	}
-	if (fPty < 0)
-		return false;
-	sprintf(path, "/dev/tt/%c%1x", 'p' + pty / 16, pty & 0x0f);
-	shellcmd << " 0<" << path;
-	shellcmd << " 1>" << path;
+	int pty = getpty(ptypath, ttypath);
+	if (pty < 0)
+		return B_ERROR;
+
+	shellcmd << " 0<" << ttypath;
+	shellcmd << " 1>" << ttypath;
 	shellcmd += " 2>&1";
 	shellcmd << " ; ";
-	shellcmd << "export TTY=" << path << "; "; // BeOS hack
+	shellcmd << "export TTY=" << ttypath << "; "; // BeOS hack
 	shellcmd << "export LC_ALL=C; export LANG=C; ";
 	shellcmd << "exec ";
 	shellcmd << fCommand.c_str();
@@ -109,6 +100,32 @@ status_t
 SpawningUploadClient::ParseReply()
 {
 	return B_ERROR;
+}
+
+
+int
+SpawningUploadClient::getpty(char *pty, char *tty)
+{
+	static const char major[] = "pqrs";
+	static const char minor[] = "0123456789abcdef";
+	uint32 i, j;
+	int32 fd = -1;
+	
+	for (i = 0; i < sizeof(major); i++)
+	{
+		for (j = 0; j < sizeof(minor); j++)
+		{
+			sprintf(pty, "/dev/pt/%c%c", major[i], minor[j]);
+			sprintf(tty, "/dev/tt/%c%c", major[i], minor[j]);
+			fd = open(pty, O_RDONLY|O_NOCTTY);
+			if (fd >= 0)
+			{
+				return fd;
+			}
+		}
+	}
+	
+	return fd;
 }
 
 
