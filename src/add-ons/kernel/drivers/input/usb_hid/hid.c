@@ -281,6 +281,9 @@ static const char *sKeyboardBaseName = "input/keyboard/usb/";
 static const char *sMouseBaseName = "input/mouse/usb/";
 
 
+// #pragma mark - support functions
+
+
 hid_device_info *
 create_device(const usb_device *dev, const usb_interface_info *ii,
 	uint16 ifno, bool isKeyboard)
@@ -364,7 +367,7 @@ create_device(const usb_device *dev, const usb_interface_info *ii,
 
 
 void
-remove_device(hid_device_info *device)
+delete_device(hid_device_info *device)
 {
 	assert(device != NULL);
 
@@ -501,7 +504,7 @@ set_leds(hid_device_info *device, uint8* data)
 		USB_REQUEST_HID_SET_REPORT,
 		0x200 | report_id, device->ifno, actual,
 		&leds, actual, &actual);
-	DPRINTF_INFO ((MY_ID "set_leds: leds=0x%02x, status=%d, len=%d\n",
+	DPRINTF_INFO((MY_ID "set_leds: leds=0x%02x, status=%d, len=%d\n",
 		leds, (int) status, (int)actual));
 }
 
@@ -575,7 +578,7 @@ interpret_mouse_buffer(hid_device_info *device)
 
 
 /*!
-	callback: got a report, issue next request
+	callback: got a report, unblock input server thread in hid_device_control()
 */
 static void
 usb_callback(void *cookie, status_t busStatus,
@@ -592,6 +595,7 @@ usb_callback(void *cookie, status_t busStatus,
 	release_sem_etc(device->sem_cb, 1, B_DO_NOT_RESCHEDULE);
 }
 
+
 static status_t
 schedule_interrupt_transfer(hid_device_info* device)
 {
@@ -599,10 +603,11 @@ schedule_interrupt_transfer(hid_device_info* device)
 		device->total_report_size, usb_callback, device);
 	if (status != B_OK) {
 		/* XXX probably endpoint stall */
-		DPRINTF_ERR ((MY_ID "queue_interrupt() error %d\n", (int)status));
+		DPRINTF_ERR((MY_ID "queue_interrupt() error %d\n", (int)status));
 	}
 	return status;
 }
+
 
 static status_t
 handle_interrupt_transfer(hid_device_info* device)
@@ -614,6 +619,7 @@ handle_interrupt_transfer(hid_device_info* device)
 		DPRINTF_ERR((MY_ID "bus status %d\n", (int)device->bus_status));
 		if (status == B_CANCELED) {
 			/* cancelled: device is unplugged */
+			device->active = false;
 			return status;
 		}
 
@@ -637,7 +643,7 @@ handle_interrupt_transfer(hid_device_info* device)
 
 	for (i = 0; i < device->total_report_size; i++)
 		sprintf (&linbuf[i*3], "%02X ", buffer [i]);
-	DPRINTF_INFO ((MY_ID "input report: %s\n", linbuf));
+	DPRINTF_INFO((MY_ID "input report: %s\n", linbuf));
 #endif
 	device->timestamp = system_time();
 
@@ -672,11 +678,11 @@ hid_device_added(const usb_device *dev, void **cookie)
 	bool is_keyboard;
 
 	assert(dev != NULL && cookie != NULL);
-	DPRINTF_INFO ((MY_ID "device_added()\n"));
+	DPRINTF_INFO((MY_ID "device_added()\n"));
 
 	dev_desc = usb->get_device_descriptor(dev);
 
-	DPRINTF_INFO ((MY_ID "vendor ID 0x%04X, product ID 0x%04X\n",
+	DPRINTF_INFO((MY_ID "vendor ID 0x%04X, product ID 0x%04X\n",
 		dev_desc->vendor_id, dev_desc->product_id));
 
 	if (dev_desc->vendor_id == USB_VENDOR_WACOM)
@@ -685,7 +691,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 	/* check interface class */
 
 	if ((conf = usb->get_nth_configuration(dev, DEFAULT_CONFIGURATION)) == NULL) {
-		DPRINTF_ERR ((MY_ID "cannot get default configuration\n"));
+		DPRINTF_ERR((MY_ID "cannot get default configuration\n"));
 		return B_ERROR;
 	}
 
@@ -693,11 +699,11 @@ hid_device_added(const usb_device *dev, void **cookie)
 		/* This is C; I can use "class" :-> */
 		int class, subclass, protocol;
 
-		intf = conf->interface [ifno].active;
+		intf = conf->interface[ifno].active;
 		class = intf->descr->interface_class;
 		subclass = intf->descr->interface_subclass;
 		protocol = intf->descr->interface_protocol;
-		DPRINTF_INFO ((MY_ID "interface %d: class %d, subclass %d, protocol %d\n",
+		DPRINTF_INFO((MY_ID "interface %d: class %d, subclass %d, protocol %d\n",
 			ifno, class, subclass, protocol));
 		if (class == USB_HID_DEVICE_CLASS
 			&& subclass == USB_HID_INTERFACE_BOOT_SUBCLASS)
@@ -705,21 +711,24 @@ hid_device_added(const usb_device *dev, void **cookie)
 	}
 
 	if (ifno >= conf->interface_count) {
-		DPRINTF_INFO ((MY_ID "Boot HID interface not found\n"));
+		DPRINTF_INFO((MY_ID "Boot HID interface not found\n"));
 		return B_ERROR;
 	}
 
 	/* read HID descriptor */
 
-	desc_len = sizeof (usb_hid_descriptor);
-	hid_desc = malloc (desc_len);
+	desc_len = sizeof(usb_hid_descriptor);
+	hid_desc = malloc(desc_len);
+	if (hid_desc == NULL)
+		return B_NO_MEMORY;
+
 	status = usb->send_request(dev,
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
 		USB_HID_DESCRIPTOR_HID << 8, ifno, desc_len,
 		hid_desc, desc_len, &desc_len);
-	DPRINTF_INFO ((MY_ID "get_hid_desc: status=%d, len=%d\n",
-		(int) status, (int)desc_len));
+	DPRINTF_INFO((MY_ID "get_hid_desc: status=%d, len=%d\n",
+		(int)status, (int)desc_len));
 	if (status != B_OK)
 		desc_len = 256;		/* XXX */
 
@@ -779,9 +788,9 @@ hid_device_added(const usb_device *dev, void **cookie)
 	/* decompose report descriptor */
 
 	num_items = desc_len;	/* XXX */
-	items = malloc(sizeof (decomp_item) * num_items);
+	items = malloc(sizeof(decomp_item) * num_items);
 	if (items == NULL) {
-		remove_device(device);
+		delete_device(device);
 		free(rep_desc);
 		return B_NO_MEMORY;
 	}
@@ -792,32 +801,32 @@ hid_device_added(const usb_device *dev, void **cookie)
 	/* parse report descriptor */
 
 	device->num_insns = num_items;	/* XXX */
-	device->insns = malloc (sizeof (report_insn) * device->num_insns);
+	device->insns = malloc(sizeof (report_insn) * device->num_insns);
 	if (device->insns == NULL) {
-		remove_device(device);
+		delete_device(device);
 		free(items);
 		return B_NO_MEMORY;
 	}
 
-	parse_report_descriptor (items, num_items, device->insns,
+	parse_report_descriptor(items, num_items, device->insns,
 		&device->num_insns, &device->total_report_size, &report_id);
 	free(items);
 
 	device->insns = realloc(device->insns, sizeof (report_insn)
 		* device->num_insns);
 	if (device->insns == NULL) {
-		remove_device(device);
+		delete_device(device);
 		return B_NO_MEMORY;
 	}
 
-	DPRINTF_INFO ((MY_ID "%d items, %d insns, %d bytes\n",
+	DPRINTF_INFO((MY_ID "%d items, %d insns, %d bytes\n",
 		(int)num_items, (int)device->num_insns, (int)device->total_report_size));
 
 	/* count axes, hats and buttons */
 
 	/*count_controls (device->insns, device->num_insns,
 		&device->num_axes, &device->num_hats, &device->num_buttons);
-	DPRINTF_INFO ((MY_ID "%d axes, %d hats, %d buttons\n",
+	DPRINTF_INFO((MY_ID "%d axes, %d hats, %d buttons\n",
 		device->num_axes, device->num_hats, device->num_buttons));*/
 
 	/* get initial state */
@@ -830,11 +839,11 @@ hid_device_added(const usb_device *dev, void **cookie)
 		0x0100 | report_id, ifno, device->total_report_size,
 		device->buffer, device->total_report_size, &actual);
 	if (status != B_OK)
-		DPRINTF_ERR ((MY_ID "Get_Report failed %d\n", (int)status));
+		DPRINTF_ERR((MY_ID "Get_Report failed %d\n", (int)status));
 #endif
 	device->timestamp = system_time ();
 
-	DPRINTF_INFO ((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)device->buffer)), *(((uint32*)device->buffer)+1), *(((uint32*)device->buffer)+2)));
+	DPRINTF_INFO((MY_ID "%08lx %08lx %08lx\n", *(((uint32*)device->buffer)), *(((uint32*)device->buffer)+1), *(((uint32*)device->buffer)+2)));
 
 	device->ept = &intf->endpoint[0];		/* interrupt IN */
 
@@ -843,7 +852,7 @@ hid_device_added(const usb_device *dev, void **cookie)
 	add_device_info(device);
 
 	*cookie = device;
-	DPRINTF_INFO ((MY_ID "added %s\n", device->name));
+	DPRINTF_INFO((MY_ID "added %s\n", device->name));
 	return B_OK;
 }
 
@@ -853,17 +862,17 @@ hid_device_removed(void *cookie)
 {
 	hid_device_info *device = cookie;
 
-	assert (cookie != NULL);
+	assert(cookie != NULL);
 
 	DPRINTF_INFO((MY_ID "device_removed(%s)\n", device->name));
 
-	usb->cancel_queued_transfers (device->ept->handle);
+	usb->cancel_queued_transfers(device->ept->handle);
 	remove_device_info(device);
 
 	if (device->open == 0) {
 		if (device->insns != NULL)
 			free(device->insns);
-		remove_device(device);
+		delete_device(device);
 	} else {
 		DPRINTF_INFO((MY_ID "%s still open\n", device->name));
 		device->active = false;
@@ -882,7 +891,7 @@ hid_device_open(const char *name, uint32 flags,
 
 	assert (name != NULL);
 	assert (out_cookie != NULL);
-	DPRINTF_INFO ((MY_ID "open(%s)\n", name));
+	DPRINTF_INFO((MY_ID "open(%s)\n", name));
 
 	if ((device = search_device_info (name)) == NULL)
 		return B_ENTRY_NOT_FOUND;
@@ -897,7 +906,7 @@ hid_device_open(const char *name, uint32 flags,
 	release_sem(device->sem_lock);
 
 	*out_cookie = cookie;
-	DPRINTF_INFO ((MY_ID "device %s open (%d)\n", name, device->open));
+	DPRINTF_INFO((MY_ID "device %s open (%d)\n", name, device->open));
 	return B_OK;
 }
 
@@ -927,7 +936,7 @@ hid_device_control(driver_cookie *cookie, uint32 op, void *arg, size_t length)
 	assert (cookie != NULL);
 	device = cookie->device;
 	assert (device != NULL);
-	DPRINTF_INFO ((MY_ID "ioctl(0x%x)\n", (int)op));
+	DPRINTF_INFO((MY_ID "ioctl(0x%x)\n", (int)op));
 
 	if (!device->active)
 		return B_ERROR;		/* already unplugged */
@@ -1030,7 +1039,7 @@ hid_device_close(driver_cookie *cookie)
 
 	assert (cookie != NULL && cookie->device != NULL);
 	device = cookie->device;
-	DPRINTF_INFO ((MY_ID "close(%s)\n", device->name));
+	DPRINTF_INFO((MY_ID "close(%s)\n", device->name));
 
 	/* detach the cookie from list */
 
@@ -1068,8 +1077,8 @@ hid_device_free(driver_cookie *cookie)
 	else if (!device->active) {
 		DPRINTF_INFO((MY_ID "removed %s\n", device->name));
 		if (device->insns != NULL)
-			free (device->insns);
-		remove_device (device);
+			free(device->insns);
+		delete_device(device);
 	}
 
 	return B_OK;

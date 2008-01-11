@@ -98,14 +98,14 @@ typedef struct hid_device_info {
 
 /* hid.c */
 
-extern usb_module_info *usb;
-extern const char *my_driver_name;
-extern const char *keyboard_base_name;
-extern const char *mouse_base_name;
+extern usb_module_info*		usb;
+extern const char*			my_driver_name;
+extern const char*			keyboard_base_name;
+extern const char*			mouse_base_name;
 
-hid_device_info *create_device(const usb_device *dev, const usb_interface_info *ii,
-	uint16 ifno, bool is_keyboard);
-void remove_device(hid_device_info *device);
+hid_device_info*	create_device(const usb_device *dev,
+	const usb_interface_info *ii, uint16 ifno, bool is_keyboard);
+void delete_device(hid_device_info *device);
 
 /* devlist.c */
 
