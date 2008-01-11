@@ -9,6 +9,8 @@
 #ifndef _TOSCALLS_H
 #define _TOSCALLS_H
 
+#include <OS.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
