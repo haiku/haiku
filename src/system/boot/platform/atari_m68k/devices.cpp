@@ -12,6 +12,7 @@
 
 #include <string.h>
 
+#include "Handle.h"
 #include "toscalls.h"
 
 //#define TRACE_DEVICES
@@ -30,7 +31,7 @@ extern uint32 gBootPartitionOffset;
 #define SCRATCH_SIZE (2*4096)
 static uint8 gScratchBuffer[4096];
 
-static const uint16 kParametersSizeVersion1 = 0x1a;
+static const uint16 kParametersSizeVersion1 = sizeof(struct tosbpb);
 static const uint16 kParametersSizeVersion2 = 0x1e;
 static const uint16 kParametersSizeVersion3 = 0x42;
 
@@ -145,18 +146,24 @@ static bool sBlockDevicesAdded = false;
 
 
 static status_t
+read_bpb(uint8 drive, struct tosbpb *bpb)
+{
+	struct tosbpb *p;
+	p = Getbpb(drive);
+	memcpy(bpb, p, sizeof(struct tosbpb));
+	/* Getbpb is buggy so we must force a media change */
+	//XXX: docs seems to assume we should loop until it works
+	Mediach(drive);
+	return B_OK;
+}
+
+static status_t
 get_drive_parameters(uint8 drive, drive_parameters *parameters)
 {
-	struct bios_regs regs;
-	regs.eax = BIOS_GET_DRIVE_PARAMETERS;
-	regs.edx = drive;
-	regs.es = 0;
-	regs.edi = 0;	// guard against faulty BIOS, see Ralf Brown's interrupt list
-	call_bios(0x13, &regs);
+	status_t err;
+	err = read_bpb(drive, &parameters->bpb);
 
-	if ((regs.flags & CARRY_FLAG) != 0 || (regs.ecx & 0x3f) == 0)
-		return B_ERROR;
-
+#if 0
 	// fill drive_parameters structure with useful values
 	parameters->parameters_size = kParametersSizeVersion1;
 	parameters->flags = 0;
@@ -167,11 +174,12 @@ get_drive_parameters(uint8 drive, drive_parameters *parameters)
 	parameters->sectors = parameters->cylinders * parameters->heads
 		* parameters->sectors_per_track;
 	parameters->bytes_per_sector = 512;
-
+#endif
 	return B_OK;
 }
 
 
+#if 0
 /** parse EDD 3.0 drive path information */
 
 static status_t
@@ -250,7 +258,7 @@ fill_disk_identifier_v2(disk_identifier &disk, const drive_parameters &parameter
 
 	return B_OK;
 }
-
+#endif
 
 static off_t
 get_next_check_sum_offset(int32 index, off_t maxSize)
@@ -387,7 +395,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 {
 	int32 map;
 	uint8 driveID;
-	uint8 driveCount;
+	uint8 driveCount = 0;
 	
 	if (sBlockDevicesAdded)
 		return B_OK;
@@ -410,6 +418,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 		}
 
 		devicesList->Add(drive);
+		driveCount++;
 
 		if (drive->FillIdentifier() != B_OK)
 			identifierMissing = true;
@@ -444,6 +453,15 @@ BlockHandle::BlockHandle(int handle)
 	}
 	//XXX: check size
 
+	if (get_drive_parameters(fHandle, &fParameters) != B_OK) {
+		dprintf("getting drive parameters for: %u failed!\n", fHandle);
+		return;
+	}
+	fBlockSize = 512;
+	fSize = fParameters.sectors * fBlockSize;
+	fHasParameters = false;
+
+#if 0
 	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
 		// old style CHS support
 
@@ -476,6 +494,7 @@ BlockHandle::BlockHandle(int handle)
 		fLBA = true;
 		fHasParameters = true;
 	}
+#endif
 }
 
 
@@ -564,6 +583,7 @@ BlockHandle::Size() const
 status_t
 BlockHandle::FillIdentifier()
 {
+#if 0
 	if (HasParameters()) {
 		// try all drive_parameters versions, beginning from the most informative
 
@@ -595,22 +615,12 @@ BlockHandle::FillIdentifier()
 		fIdentifier.device.unknown.check_sums[i].offset = -1;
 		fIdentifier.device.unknown.check_sums[i].sum = 0;
 	}
+#endif
 
 	return B_ERROR;
 }
 
 
-status_t
-BlockHandle::ReadBPB(struct tosbpb *bpb)
-{
-	struct tosbpb *p;
-	p = Getbpb(fHandle);
-	memcpy(bpb, p, sizeof(struct tosbpb));
-	/* Getbpb is buggy so we must force a media change */
-	//XXX: docs seems to assume we should loop until it works
-	Mediach(fHandle);
-	return B_OK;
-}
 
 
 //	#pragma mark -
@@ -681,7 +691,9 @@ platform_register_boot_device(Node *device)
 {
 	BlockHandle *drive = (BlockHandle *)device;
 
+#if 0
 	check_cd_boot(drive);
+#endif
 
 	gKernelArgs.boot_volume.SetInt64("boot drive number", drive->DriveID());
 	gKernelArgs.boot_volume.SetData(BOOT_VOLUME_DISK_IDENTIFIER, B_RAW_TYPE,
