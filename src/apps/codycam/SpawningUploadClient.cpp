@@ -45,8 +45,8 @@ SpawningUploadClient::SpawnCommand()
 	//XXX: should use a system-provided TerminalCommand class
 	BString shellcmd = "exec";
 	const char *args[] = { "/bin/sh", "-c", NULL, NULL };
-	int pty = getpty(ptypath, ttypath);
-	if (pty < 0)
+	fPty = getpty(ptypath, ttypath);
+	if (fPty < 0)
 		return B_ERROR;
 
 	shellcmd << " 0<" << ttypath;
@@ -117,7 +117,7 @@ SpawningUploadClient::getpty(char *pty, char *tty)
 		{
 			sprintf(pty, "/dev/pt/%c%c", major[i], minor[j]);
 			sprintf(tty, "/dev/tt/%c%c", major[i], minor[j]);
-			fd = open(pty, O_RDONLY|O_NOCTTY);
+			fd = open(pty, O_RDWR|O_NOCTTY);
 			if (fd >= 0)
 			{
 				return fd;

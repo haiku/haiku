@@ -62,7 +62,6 @@ bool
 SftpClient::PrintWorkingDir(string& dir)
 {
 	bool rc = false;
-	int len;
 	SendCommand("pwd\n");
 	BString reply;
 	return rc;
