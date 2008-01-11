@@ -531,10 +531,9 @@ interpret_mouse_buffer(hid_device_info *device)
 
 	memset(&info, 0, sizeof(info));
 	for (i = 0; i < device->num_insns; i++) {
-		const report_insn *insn = &device->insns [i];
-		int32 value =
-			(((report [insn->byte_idx + 1] << 8) |
-				report [insn->byte_idx]) >> insn->bit_pos)
+		const report_insn *insn = &device->insns[i];
+		int32 value = (((report[insn->byte_idx + 1] << 8)
+			| report[insn->byte_idx]) >> insn->bit_pos)
 			& ((1 << insn->num_bits) - 1);
 
 		if (insn->usage_page == USAGE_PAGE_BUTTON) {
