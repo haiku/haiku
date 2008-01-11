@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src apps login ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+#UsePrivateHeaders shared ;
+#UsePrivateHeaders tracker ;
+#SubDirHdrs $(HAIKU_TOP) src kits tracker ;
+
+Application Login :
+	LoginApp.cpp
+	LoginWindow.cpp
+	LoginView.cpp
+	main.cpp
+	: be tracker
+	: Login.rdef
+	;
+
