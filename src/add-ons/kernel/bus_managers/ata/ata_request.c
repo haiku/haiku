@@ -46,9 +46,12 @@ void ata_request_start(ata_request **_request, struct ide_device_info *device, s
 	ASSERT(request->device == device);
 
 	request->ccb = ccb;
+/*
+	already set
 	request->is_write = 0;
 	request->uses_dma = 0;
 	request->packet_irq = 0;
+*/
 
 	// XXX the following always triggers. Why?
 	// ASSERT(request->ccb->subsys_status == SCSI_REQ_INPROG);
@@ -75,17 +78,14 @@ void
 ata_request_set_status(ata_request *request, uint8 status)
 {
 	ASSERT(status != SCSI_REQ_CMP);
-	if (!request)
-		return;
-	request->ccb->subsys_status = status;
+	if (request->ccb)
+		request->ccb->subsys_status = status;
 }
 
 
 void
 ata_request_set_sense(ata_request *request, uint8 key, uint16 asc_acq)
 {
-	if (!request)
-		return;
 	request->senseKey = key;
 	request->senseAsc = asc_acq >> 8;
 	request->senseAscq = asc_acq & 0xff;
@@ -95,15 +95,17 @@ ata_request_set_sense(ata_request *request, uint8 key, uint16 asc_acq)
 void
 ata_request_finish(ata_request *request, bool resubmit)
 {
-	scsi_ccb *ccb;
+	scsi_ccb *ccb = request->ccb;
+
+	ASSERT(ccb);
 
 	TRACE("ata_request_finish: request %p, subsys_status 0x%02x, senseKey %02x\n",
-		request, request->ccb->subsys_status, request->senseKey);
+		request, ccb->subsys_status, request->senseKey);
 
 	// when the request completed and has set sense
     // data, report this to the scsci stack by setting 
     // CHECK CONDITION status
-	if (request->ccb->subsys_status == SCSI_REQ_CMP && request->senseKey != 0) {
+	if (ccb->subsys_status == SCSI_REQ_CMP && request->senseKey != 0) {
 	
 		TRACE("ata_request_finish - setting check condition\n");
 
@@ -135,8 +137,6 @@ ata_request_finish(ata_request *request, bool resubmit)
 			ASSERT(request->ccb->device_status == SCSI_STATUS_CHECK_CONDITION);
 		}
 	}
-
-	ccb = request->ccb;
 
 	IDE_LOCK(request->device->bus);
 	ASSERT(request->device->bus->state == ata_state_busy);

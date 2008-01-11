@@ -104,7 +104,6 @@ typedef struct ide_device_info {
 	uint8 device_type;				// atapi device type
 
 	// pio from here on
-	bigtime_t pio_timeout;
 	int left_sg_elem;				// remaining sg elements
 	const physical_entry *cur_sg_elem;	// active sg element
 	int cur_sg_ofs;					// offset in active sg element
@@ -132,7 +131,8 @@ typedef enum {
 	ATA_IS_WRITE = 0x02,
 //	ATA_PIO_TRANSFER = 0x04,
 	ATA_DMA_TRANSFER = 0x08,
-	ATA_CHECK_ERROR_BIT = 0x10
+	ATA_CHECK_ERROR_BIT = 0x10,
+	ATA_WAIT_FINISH = 0x20
 } ata_flags;
 
 

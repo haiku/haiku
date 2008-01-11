@@ -230,21 +230,18 @@ scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 	device->tf_param_mask = 0;
 	device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
-	if (ata_send_command(device, request, ATA_DRDY_REQUIRED, 15) != B_OK) {
+	if (ata_send_command(device, request, ATA_DRDY_REQUIRED, 15000000) != B_OK) {
+		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
 		return;
 	}
-		
 
 	// bits ide_error_mcr | ide_error_mc | ide_error_wp are also valid
 	// but not requested by TUR; ide_error_wp can safely be ignored, but
 	// we don't want to loose media change (request) reports
-	if (!check_output(device, true,
-			ide_error_nm | ide_error_abrt | ide_error_mcr | ide_error_mc,
-			false)) {
+	ata_finish_command(device, request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, 
+		ide_error_nm | ide_error_abrt | ide_error_mcr | ide_error_mc);
 		// SCSI spec is unclear here: we shouldn't report "media change (request)"
 		// but what to do if there is one? anyway - we report them
-		;
-	}
 }
 
 
@@ -252,7 +249,6 @@ scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 static bool
 scsi_synchronize_cache(ide_device_info *device, ata_request *request)
 {
-#if 0
 	// we should also ask for FLUSH CACHE support, but everyone denies it
 	// (looks like they cheat to gain some performance advantage, but
 	//  that's pretty useless: everyone does it...)
@@ -264,14 +260,13 @@ scsi_synchronize_cache(ide_device_info *device, ata_request *request)
 		: IDE_CMD_FLUSH_CACHE;
 
 	// spec says that this may take more then 30s, how much more?
-	if (!send_command(device, request, true, 60, ide_state_sync_waiting))
+	if (ata_send_command(device, request, ATA_DRDY_REQUIRED, 60000000) != B_OK)
 		return false;
 
-	wait_for_sync(device->bus);
+	if (ata_finish_command(device, request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, ide_error_abrt) != B_OK)
+		return false;
 
-	return check_output(device, true, ide_error_abrt, false);
-#endif
-	return false;
+	return true;
 }
 
 
@@ -281,24 +276,22 @@ scsi_synchronize_cache(ide_device_info *device, ata_request *request)
 static bool
 scsi_load_eject(ide_device_info *device, ata_request *request, bool load)
 {
-#if 0
 	if (load) {
 		// ATA doesn't support loading
-		set_sense(device, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_NOT_SUPPORTED);
+		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_NOT_SUPPORTED);
 		return false;
 	}
 
 	device->tf_param_mask = 0;
 	device->tf.lba.command = IDE_CMD_MEDIA_EJECT;
 
-	if (!send_command(device, request, true, 15, ide_state_sync_waiting))
+	if (ata_send_command(device, request, ATA_DRDY_REQUIRED, 15000000) != B_OK)
 		return false;
 
-	wait_for_sync(device->bus);
+	if (ata_finish_command(device, request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, ide_error_abrt | ide_error_nm) != B_OK)
+		return false;
 
-	return check_output(device, true, ide_error_abrt | ide_error_nm, false);
-#endif
-	return false;
+	return true;
 }
 
 

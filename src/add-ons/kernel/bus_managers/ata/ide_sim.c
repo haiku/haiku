@@ -194,7 +194,7 @@ scan_bus(ide_bus_info *bus)
 
 	// XXX fix me
 	IDE_LOCK(bus);
-	ASSERT(bus->state == ata_state_busy);
+	ASSERT(bus->state != ata_state_idle);
 	bus->state = ata_state_idle;
 	IDE_UNLOCK(bus);
 

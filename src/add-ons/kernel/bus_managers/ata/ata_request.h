@@ -18,6 +18,8 @@ typedef struct ata_request {
 	uint8						senseKey;
 	uint8						senseAsc;
 	uint8						senseAscq;
+
+	bigtime_t					timeout;
 } ata_request;
 
 struct scsi_ccb;

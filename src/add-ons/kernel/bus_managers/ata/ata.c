@@ -151,7 +151,7 @@ ata_wait_idle(ide_bus_info *bus)
 	return ata_wait(bus, 0, ide_status_bsy | ide_status_drq, 0, 20000);
 }
 
-
+/*
 // busy wait for device beeing ready,
 // using the timeout set by the previous ata_send_command
 status_t
@@ -160,7 +160,7 @@ ata_pio_wait_drdy(ide_device_info *device)
 	ASSERT(device->bus->state == ata_state_pio);
 	return ata_wait(device->bus, ide_status_drdy, ide_status_bsy, 0, device->pio_timeout);
 }
-
+*/
 
 status_t
 ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags, bigtime_t timeout)
@@ -191,13 +191,13 @@ ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags,
 	if (ata_wait_idle(bus) != B_OK) {
 		// resetting the device here will discard current configuration,
 		// it's better when the SCSI bus manager requests an external reset.
-		TRACE("device selection timeout\n");
+		TRACE("ata_send_command: device selection timeout\n");
 		ata_request_set_status(request, SCSI_SEL_TIMEOUT);
-		return B_ERROR;		
+		return B_ERROR;
 	}
 
 	if ((flags & ATA_DRDY_REQUIRED) && (bus->controller->get_altstatus(bus->channel_cookie) & ide_status_drdy) == 0) {
-		TRACE("drdy not set\n");
+		TRACE("ata_send_command: drdy not set\n");
 		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
 		return B_ERROR;
 	}
@@ -223,13 +223,11 @@ ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags,
 	ASSERT(bus->state == ata_state_busy);
 
 	bus->state = (flags & ATA_DMA_TRANSFER) ? ata_state_dma : ata_state_pio;
-	if (request)
-		request->device->pio_timeout = timeout;
+	request->timeout = timeout;
 
 	IDE_UNLOCK(bus);
 
 	return B_OK;
-
 
 
 err_clearint:
@@ -251,93 +249,104 @@ err:
 status_t
 ata_finish_command(ide_device_info *device, ata_request *request, ata_flags flags, uint8 errorMask)
 {
-#if 0
 	ide_bus_info *bus = device->bus;
-	uint8 status;
+	status_t result;
+	uint8 error;
 
-	// check IRQ timeout
-	if (bus->sync_wait_timeout) {
-		bus->sync_wait_timeout = false;
-
-		device->subsys_status = SCSI_CMD_TIMEOUT;
-		return false;
+	if (flags & ATA_WAIT_FINISH) {
+		// wait for the command to finish current command (device no longer busy)
+		result = ata_wait(bus, 0, ide_status_bsy, 0, request->timeout);
+		if (result != B_OK) {
+			TRACE("ata_finish_command: timeout\n");
+			ata_request_set_status(request, SCSI_CMD_TIMEOUT);
+			return result;
+		}
 	}
 
-	status = bus->controller->get_altstatus(bus->channel_cookie);
-
-	// if device is busy, other flags are indeterminate	
-	if ((status & ide_status_bsy) != 0) {
-		device->subsys_status = SCSI_SEQUENCE_FAIL;
-		return false;
+	// read status, this also acknowledges pending interrupts
+	result = device->bus->controller->read_command_block_regs(device->bus->channel_cookie, &device->tf, ide_mask_status | ide_mask_error);
+	if (result != B_OK) {
+		TRACE("ata_finish_command: status register read failed\n");
+		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
+			return result;
+	}
+	
+	if (device->tf.read.status & ide_status_bsy) {
+		TRACE("ata_finish_command: failed! device still busy\n");
+		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
+		return B_ERROR;
+	}
+	
+	if ((flags & ATA_DRDY_REQUIRED) && (device->tf.read.status & ide_status_drdy) == 0) {
+		TRACE("ata_finish_command: failed! drdy not set\n");
+		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
+		return B_ERROR;
 	}
 
-	if (drdy_required && ((status & ide_status_drdy) == 0)) {
-		device->subsys_status = SCSI_SEQUENCE_FAIL;
-		return false;
+	if ((device->tf.read.status & ide_status_err) == 0)
+		return B_OK;
+
+	result = device->bus->controller->read_command_block_regs(device->bus->channel_cookie, &device->tf, ide_mask_error);
+	if (result != B_OK) {
+		TRACE("ata_finish_command: error register read failed\n");
+		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
+		return result;
 	}
 
-	if ((status & ide_status_err) != 0) {
-		uint8 error;
+	TRACE("ata_finish_command: command failed ERR bit is set\n");
 
-		if (bus->controller->read_command_block_regs(bus->channel_cookie,
-				&device->tf, ide_mask_error) != B_OK) {
-			device->subsys_status = SCSI_HBA_ERR;
-			return false;
-		}
+	// check only relevant error bits
+	error = device->tf.read.error & errorMask;
+	result = B_ERROR;
 
-		error = device->tf.read.error & error_mask;
-
-		if ((error & ide_error_icrc) != 0) {
-			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_LUN_COM_CRC);
-			return false;
-		}
-
-		if (is_write) {
-			if ((error & ide_error_wp) != 0) {
-				set_sense(device, SCSIS_KEY_DATA_PROTECT, SCSIS_ASC_WRITE_PROTECTED);
-				return false;
-			}
-		} else {
-			if ((error & ide_error_unc) != 0) {
-				set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_UNREC_READ_ERR);
-				return false;
-			}
-		}
-
-		if ((error & ide_error_mc) != 0) {
-			// XXX proper sense key?
-			set_sense(device, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_MEDIUM_CHANGED);
-			return false;
-		}
-
-		if ((error & ide_error_idnf) != 0) {
-			// XXX strange error code, don't really know what it means
-			set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_RANDOM_POS_ERROR);
-			return false;
-		}
-
-		if ((error & ide_error_mcr) != 0) {
-			// XXX proper sense key?
-			set_sense(device, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_REMOVAL_REQUESTED);
-			return false;
-		}
-
-		if ((error & ide_error_nm) != 0) {
-			set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_NO_MEDIUM);
-			return false;
-		}
-
-		if ((error & ide_error_abrt) != 0) {
-			set_sense(device, SCSIS_KEY_ABORTED_COMMAND, SCSIS_ASC_NO_SENSE);
-			return false;
-		}
-
-		// either there was no error bit set or it was masked out
-		set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
-		return false;
+	if (error & ide_error_icrc) {
+		ata_request_set_sense(request, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_LUN_COM_CRC);
+		return B_ERROR;
 	}
-#endif
-	return B_OK;
+
+	if (flags & ATA_IS_WRITE) {
+		if (error & ide_error_wp) {
+			ata_request_set_sense(request, SCSIS_KEY_DATA_PROTECT, SCSIS_ASC_WRITE_PROTECTED);
+			return B_ERROR;
+		}
+	} else {
+		if (error & ide_error_unc) {
+			ata_request_set_sense(request, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_UNREC_READ_ERR);
+			return B_ERROR;
+		}
+	}
+
+	if (error & ide_error_mc) {
+		// XXX proper sense key?
+		ata_request_set_sense(request, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_MEDIUM_CHANGED);
+		return B_ERROR;
+	}
+
+	if (error & ide_error_idnf) {
+		// XXX strange error code, don't really know what it means
+		ata_request_set_sense(request, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_RANDOM_POS_ERROR);
+		return B_ERROR;
+	}
+
+	if (error & ide_error_mcr) {
+		// XXX proper sense key?
+		ata_request_set_sense(request, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_REMOVAL_REQUESTED);
+		return B_ERROR;
+	}
+
+	if (error & ide_error_nm) {
+		ata_request_set_sense(request, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_NO_MEDIUM);
+		return B_ERROR;
+	}
+
+	if (error & ide_error_abrt) {
+		ata_request_set_sense(request, SCSIS_KEY_ABORTED_COMMAND, SCSIS_ASC_NO_SENSE);
+		return B_ERROR;
+	}
+
+	// either there was no error bit set or it was masked out
+	ata_request_set_sense(request, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
+	return B_ERROR;
 }
 
 
@@ -818,7 +827,6 @@ err_send:
 
 //	finish_reset_queue(request);
 	ata_request_finish(request, false);
-
 }
 
 
@@ -899,106 +907,6 @@ check_rw_error(ide_device_info *device, ata_request *request)
 }
 
 
-/** check result of ATA command
- *	drdy_required - true if drdy must be set by device
- *	error_mask - bits to be checked in error register
- *	is_write - true, if command was a write command
- */
-
-bool
-check_output(ide_device_info *device, bool drdy_required,
-	int error_mask, bool is_write)
-{
-#if 0
-	ide_bus_info *bus = device->bus;
-	uint8 status;
-
-	// check IRQ timeout
-	if (bus->sync_wait_timeout) {
-		bus->sync_wait_timeout = false;
-
-		device->subsys_status = SCSI_CMD_TIMEOUT;
-		return false;
-	}
-
-	status = bus->controller->get_altstatus(bus->channel_cookie);
-
-	// if device is busy, other flags are indeterminate	
-	if ((status & ide_status_bsy) != 0) {
-		device->subsys_status = SCSI_SEQUENCE_FAIL;
-		return false;
-	}
-
-	if (drdy_required && ((status & ide_status_drdy) == 0)) {
-		device->subsys_status = SCSI_SEQUENCE_FAIL;
-		return false;
-	}
-
-	if ((status & ide_status_err) != 0) {
-		uint8 error;
-
-		if (bus->controller->read_command_block_regs(bus->channel_cookie,
-				&device->tf, ide_mask_error) != B_OK) {
-			device->subsys_status = SCSI_HBA_ERR;
-			return false;
-		}
-
-		error = device->tf.read.error & error_mask;
-
-		if ((error & ide_error_icrc) != 0) {
-			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_LUN_COM_CRC);
-			return false;
-		}
-
-		if (is_write) {
-			if ((error & ide_error_wp) != 0) {
-				set_sense(device, SCSIS_KEY_DATA_PROTECT, SCSIS_ASC_WRITE_PROTECTED);
-				return false;
-			}
-		} else {
-			if ((error & ide_error_unc) != 0) {
-				set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_UNREC_READ_ERR);
-				return false;
-			}
-		}
-
-		if ((error & ide_error_mc) != 0) {
-			// XXX proper sense key?
-			set_sense(device, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_MEDIUM_CHANGED);
-			return false;
-		}
-
-		if ((error & ide_error_idnf) != 0) {
-			// XXX strange error code, don't really know what it means
-			set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_RANDOM_POS_ERROR);
-			return false;
-		}
-
-		if ((error & ide_error_mcr) != 0) {
-			// XXX proper sense key?
-			set_sense(device, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_REMOVAL_REQUESTED);
-			return false;
-		}
-
-		if ((error & ide_error_nm) != 0) {
-			set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_NO_MEDIUM);
-			return false;
-		}
-
-		if ((error & ide_error_abrt) != 0) {
-			set_sense(device, SCSIS_KEY_ABORTED_COMMAND, SCSIS_ASC_NO_SENSE);
-			return false;
-		}
-
-		// either there was no error bit set or it was masked out
-		set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
-		return false;
-	}
-#endif
-	return true;
-}
-
-
 /** execute SET FEATURE command
  *	set subcommand in task file before calling this
  */
@@ -1006,19 +914,22 @@ check_output(ide_device_info *device, bool drdy_required,
 static bool
 device_set_feature(ide_device_info *device, int feature)
 {
-#if 0
+	ata_request request;
+	ata_request_init(&request, device);
+
+	TRACE("device_set_feature: feature %d\n", feature);
+
 	device->tf_param_mask = ide_mask_features;
 
 	device->tf.write.features = feature;
 	device->tf.write.command = IDE_CMD_SET_FEATURES;
 
-	if (!send_command(device, NULL, ATA_DRDY_REQUIRED, 1000000))
+	if (ata_send_command(device, &request, ATA_DRDY_REQUIRED, 1000000) != B_OK)
 		return false;
 
-	wait_for_sync(device->bus);
+	if (ata_finish_command(device, &request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, ide_error_abrt) != B_OK)
+		return false;
 
-	return check_output(device, true, ide_error_abrt, false);
-#endif
 	return true;
 }
 
@@ -1026,8 +937,8 @@ device_set_feature(ide_device_info *device, int feature)
 static bool
 configure_rmsn(ide_device_info *device)
 {
-#if 0
 	ide_bus_info *bus = device->bus;
+	ata_request request;
 	int i;
 
 	if (!device->infoblock.RMSN_supported
@@ -1040,27 +951,27 @@ configure_rmsn(ide_device_info *device)
 	bus->controller->read_command_block_regs(bus->channel_cookie, &device->tf,
 		ide_mask_LBA_mid | ide_mask_LBA_high);
 
+	ata_request_init(&request, device);
+
 	for (i = 0; i < 5; ++i) {
 		// don't use TUR as it checks not ide_error_mcr | ide_error_mc | ide_error_wp
 		// but: we don't check wp as well
-		device->combined_sense = 0;
 
 		device->tf_param_mask = 0;
 		device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
-		if (!send_command(device, NULL, ATA_DRDY_REQUIRED, 15000000))
+		if (!ata_send_command(device, &request, ATA_DRDY_REQUIRED, 15000000))
 			continue;
 
-		if (check_output(device, true,
-				ide_error_nm | ide_error_abrt | ide_error_mcr | ide_error_mc,
-				true)
-			|| decode_sense_asc_ascq(device->combined_sense) == SCSIS_ASC_NO_MEDIUM)
+		if (ata_finish_command(device, &request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, 
+			ide_error_nm | ide_error_abrt | ide_error_mcr | ide_error_mc) == B_OK
+			|| ((request.senseAsc << 8) | request.senseAscq) == SCSIS_ASC_NO_MEDIUM)
 			return true;
+
+		ata_request_clear_sense(&request);
 	}
 
 	return false;
-#endif
-	return true;
 }
 
 
@@ -1151,23 +1062,26 @@ configure_ata_device(ide_device_info *device)
 status_t
 ata_identify_device(ide_device_info *device, bool isAtapi)
 {
+	ata_request request;
 	ide_bus_info *bus = device->bus;
 
 	TRACE("ata_identify_device: bus %p, device %d, isAtapi %d\n", device->bus, device->is_device1, isAtapi);
+
+	ata_request_init(&request, device);
 
 	ata_select(device);
 
 	device->tf_param_mask = 0;
 	device->tf.write.command = isAtapi ? IDE_CMD_IDENTIFY_PACKET_DEVICE : IDE_CMD_IDENTIFY_DEVICE;
 
-	if (ata_send_command(device, NULL, isAtapi ? 0 : ATA_DRDY_REQUIRED, 20000000) != B_OK) {
+	if (ata_send_command(device, &request, isAtapi ? 0 : ATA_DRDY_REQUIRED, 20000000) != B_OK) {
 		TRACE("ata_identify_device: send_command failed\n");
-		goto error;
+		return B_ERROR;
 	}
 
 	if (ata_wait(bus, ide_status_drq, ide_status_bsy, ATA_CHECK_ERROR_BIT, 4000000) != B_OK) {
 		TRACE("ata_identify_device: wait failed\n");
-		goto error;
+		return B_ERROR;
 	}
 
 	// get the infoblock		
@@ -1176,29 +1090,12 @@ ata_identify_device(ide_device_info *device, bool isAtapi)
 
 	if (ata_wait_for_drqdown(bus) != B_OK) {
 		TRACE("ata_identify_device: ata_wait_for_drqdown failed\n");
-		goto error;
+		return B_ERROR;
 	}
 
-	// clear pending interrupt
-	ata_read_status(device, NULL);
-
-	// XXX fix me
-	IDE_LOCK(bus);
-	bus->state = ata_state_busy;
-	IDE_UNLOCK(bus);
+	if (ata_finish_command(device, &request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, ide_error_abrt) != B_OK)
+		return B_ERROR;
 
 	TRACE("ata_identify_device: success\n");
 	return B_OK;
-
-error:
-
-	// clear pending interrupt
-	ata_read_status(device, NULL);
-
-
-	// XXX fix me
-	IDE_LOCK(bus);
-	bus->state = ata_state_busy;
-	IDE_UNLOCK(bus);
-	return B_ERROR;
 }
