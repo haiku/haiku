@@ -79,9 +79,15 @@ TermApp::ReadyToRun()
 	// Install a SIGCHLD signal handler, so that we will be notified, when
 	// a shell exits.
 	struct sigaction action;
+#ifdef __HAIKU__
 	action.sa_handler = (sighandler_t)_SigChildHandler;
+#else
+	action.sa_handler = (__signal_func_ptr)_SigChildHandler;
+#endif
 	sigemptyset(&action.sa_mask);
+#ifdef SA_NODEFER
 	action.sa_flags = SA_NODEFER;
+#endif
 	action.sa_userdata = this;
 	if (sigaction(SIGCHLD, &action, NULL) < 0) {
 		fprintf(stderr, "sigaction() failed: %s\n", strerror(errno));
