@@ -60,7 +60,7 @@ init_amd_syscall_registers(void* dummy, int cpuNum)
 static status_t
 initialize_commpage_syscall(void)
 {
-	void* syscallCode = &_user_syscall_int;
+	void* syscallCode = (void *)&_user_syscall_int;
 	void* syscallCodeEnd = &_user_syscall_int_end;
 
 	// check syscall
@@ -71,7 +71,7 @@ initialize_commpage_syscall(void)
 		dprintf("initialize_commpage_syscall(): sysenter/sysexit supported\n");
 
 		// the code to be used in userland
-		syscallCode = &_user_syscall_sysenter;
+		syscallCode = (void *)&_user_syscall_sysenter;
 		syscallCodeEnd = &_user_syscall_sysenter_end;
 
 		// tell all CPUs to init their sysenter/sysexit related registers
