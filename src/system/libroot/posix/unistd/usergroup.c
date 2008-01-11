@@ -51,16 +51,6 @@ getuid(void)
 }
 
 
-char *
-cuserid(char *s)
-{
-	if (s != NULL && getlogin_r(s, L_cuserid))
-		return s;
-
-	return getlogin();
-}
-
-
 int 
 setgid(gid_t gid)
 {

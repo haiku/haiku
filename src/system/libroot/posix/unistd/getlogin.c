@@ -36,3 +36,13 @@ int getlogin_r(char *name, size_t nameSize)
 	return ENOMEM;
 }
 
+
+char *
+cuserid(char *s)
+{
+	if (s != NULL && getlogin_r(s, L_cuserid))
+		return s;
+
+	return getlogin();
+}
+
