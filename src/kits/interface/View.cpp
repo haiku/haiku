@@ -4193,8 +4193,18 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flag
 	
 	STRACE(("BView::InitData: enter\n"));
 	
-	// initialize members		
-	fFlags = (resizingMode & _RESIZE_MASK_) | (flags & ~_RESIZE_MASK_);
+	// initialize members
+	if ((resizingMode & ~_RESIZE_MASK_) || (flags & _RESIZE_MASK_))
+		printf("BView::InitData(): resizing mode or flags swapped\n");
+
+	// There are applications that swap the resize mask and the flags in the
+	// BView constructor. This does not cause problems under BeOS as it just
+	// ors the two fields to one 32bit flag.
+	// For now we do the same but print the above warning message.
+	// ToDo: this should be removed at some point and the original
+	// version restored:
+	// fFlags = (resizingMode & _RESIZE_MASK_) | (flags & ~_RESIZE_MASK_);
+	fFlags = resizingMode | flags;
 
 	// handle rounding
 	frame.left = roundf(frame.left);
