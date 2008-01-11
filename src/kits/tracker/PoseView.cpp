@@ -755,12 +755,13 @@ BPoseView::SavePoseLocations(BRect *frameIfDesktop)
 				}
 			} else {
 				model->WriteAttrKillForegin(kAttrPoseInfo, kAttrPoseInfoForeign,
-					B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo));
-			
-				if (desktop)
+					B_RAW_TYPE, 0, &poseInfo, sizeof(poseInfo)));
+
+				if (desktop) {
 					model->WriteAttrKillForegin(kAttrExtendedPoseInfo,
 						kAttrExtendedPoseInfoForegin,
 						B_RAW_TYPE, 0, extendedPoseInfo, extendedPoseInfoSize);
+				}
 			}
 
 			delete [] (char *)extendedPoseInfo;
@@ -2541,6 +2542,8 @@ BPoseView::ReadPoseInfo(Model *model, PoseInfo *poseInfo)
 		}
 	} else {
 		ASSERT(model->IsNodeOpen());
+		time_t now = time(NULL);
+
 		for (int32 count = 10; count >= 0; count--) {
 			if (!model->Node())
 				break;
@@ -2558,9 +2561,9 @@ BPoseView::ReadPoseInfo(Model *model, PoseInfo *poseInfo)
 			// pose info to properly place the icon
 			if (ViewMode() == kListMode)
 				break;
-				
+
 			const StatStruct *stat = model->StatBuf();
-			if (stat->st_crtime != stat->st_mtime)
+			if (stat->st_crtime < now - 5)
 				break;
 
 			// PRINT(("retrying to read pose info for %s, %d\n", model->Name(), count));
