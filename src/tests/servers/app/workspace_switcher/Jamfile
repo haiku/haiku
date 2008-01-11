@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src tests servers app workspace_switcher ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+Application workspace_switcher :
+	workspace_switcher.cpp
+	: be
+;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : workspace_switcher
+		: tests!apps ;
+}
+
