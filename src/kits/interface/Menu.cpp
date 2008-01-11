@@ -2159,7 +2159,10 @@ BMenu::_SelectNextItem(BMenuItem *item, bool forward)
 	if (nextItem == NULL)
 		return false;
 
-	_SelectItem(nextItem, false);
+	bool openMenu = false;
+	if (dynamic_cast<BMenuBar *>(this) != NULL)
+		openMenu = true;
+	_SelectItem(nextItem, openMenu);
 	return true;
 }
 
@@ -2167,18 +2170,12 @@ BMenu::_SelectNextItem(BMenuItem *item, bool forward)
 BMenuItem *
 BMenu::_NextItem(BMenuItem *item, bool forward) const
 {
-	/*if (item == NULL) {
-		if (forward)
-			return ItemAt(CountItems() - 1);
-
-		return ItemAt(0);
-	}
-*/
 	// go to next item, and skip over disabled items such as separators
  	int32 index = fItems.IndexOf(item);
 	if (index < 0)
 		index = 0;
 
+	const int32 numItems = fItems.CountItems();
 	int32 startIndex = index;
 	do {
 		if (forward)
@@ -2188,8 +2185,8 @@ BMenu::_NextItem(BMenuItem *item, bool forward) const
  		
 		// cycle through menu items
 		if (index < 0)
-			index = CountItems() - 1;
-		else if(index >= fItems.CountItems())
+			index = numItems - 1;
+		else if (index >= numItems)
 			index = 0;
 	} while (!ItemAt(index)->IsEnabled() && index != startIndex);
 
