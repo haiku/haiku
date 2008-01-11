@@ -74,6 +74,7 @@ void
 uninit_driver (void)
 {
 	long i;
+	dprintf("IRA: %s\n", __func__);
 	for (i=0; i < num_cards; i++) {
 		free((void*)cards[i].devfs_path);
 		cards[i].devfs_path = NULL;
@@ -91,6 +92,7 @@ publish_devices(void)
 	static const char* devs[MAXCARDS+1];
 	long i;
 	
+	dprintf("IRA: %s\n", __func__);
 	for (i=0; i < num_cards; i++)
 		devs[i] = cards[i].devfs_path;
 
@@ -102,5 +104,6 @@ publish_devices(void)
 device_hooks*
 find_device(const char* name)
 {
+	dprintf("IRA: %s\n", __func__);
 	return &driver_hooks;
 }

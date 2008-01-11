@@ -22,13 +22,13 @@
 #define MAXCARDS		4
 
 /* values for the class_sub field for class_base = 0x04 (multimedia device) */
-#define PCI_hd_audio	3
+#define PCI_hd_audio		3
 
-#define HDA_MAXAFGS			15
+#define HDA_MAXAFGS		15
 #define HDA_MAXCODECS		15
 #define HDA_MAXSTREAMS		16
 #define MAX_CODEC_RESPONSES	10
-#define MAXINPUTS			32
+#define MAXINPUTS		32
 
 /* FIXME: Find out why we need so much! */
 #define DEFAULT_FRAMESPERBUF	4096
@@ -52,31 +52,33 @@ enum {
  */
 
 typedef struct hda_stream_info_s {
-	uint32		id;						/* HDA controller stream # */
-	uint32		off;					/* HDA I/O/B descriptor offset */
-	bool		running;				/* Is this stream active? */
-	spinlock	lock;					/* Write lock */
-	
-	uint32		pin_wid;				/* PIN Widget ID */
-	uint32		io_wid;					/* Input/Output Converter Widget ID */
+	uint32		id;				/* HDA controller stream # */
+	uint32		off;				/* HDA I/O/B descriptor offset */
+	bool		running;			/* Is this stream active? */
+	spinlock	lock;				/* Write lock */
+
+	uint32		pin_wid;			/* PIN Widget ID */
+	uint32		io_wid;				/* Input/Output Converter Widget ID */
 
 	uint32		samplerate;	
 	uint32		sampleformat;
-	
+
 	uint32		num_buffers;
 	uint32		num_channels;
 	uint32		buffer_length;			/* size of buffer in samples */
 	uint32		sample_size;
 	void*		buffers[STRMAXBUF];		/* Virtual addresses for buffer */
-	uint32		buffers_pa[STRMAXBUF];	/* Physical addresses for buffer */
+	uint32		buffers_pa[STRMAXBUF];		/* Physical addresses for buffer */
 	sem_id		buffer_ready_sem;
 	bigtime_t	real_time;
 	uint32		frames_count;
 	uint32		buffer_cycle;
 
+	uint32		rate, bps;			/* Samplerate & bits per sample */
+
 	area_id		buffer_area;
 	area_id		bdl_area;
-	uint32		bdl_pa;					/* BDL physical address */
+	uint32		bdl_pa;				/* BDL physical address */
 } hda_stream;
 
 /* hda_afg
@@ -96,12 +98,12 @@ struct hda_afg_s {
 
 	
 	uint32				root_nid,
-						wid_start,
-						wid_count;
+					wid_start,
+					wid_count;
 						
 	uint32				deffmts,
-						defrates,
-						defpm;
+					defrates,
+					defpm;
 
 	struct {
 		uint32			num_inputs;
@@ -124,8 +126,8 @@ struct hda_afg_s {
 			struct {
 			} mixer;
 			struct {
-				uint32			output;
-				uint32			input;
+				uint32		output;
+				uint32		input;
 				pin_dev_type	device;
 			} pin;
 		} d;

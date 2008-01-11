@@ -74,8 +74,8 @@ hda_widget_get_stream_support(hda_codec* codec, uint32 nid, uint32* fmts, uint32
 			if (resp[1] & (1<<20))		*fmts |= B_FMT_32BIT;
 		}
 
-		if (resp[0] & (1 << 1))			*fmts |= B_FMT_FLOAT;
-		if (resp[0] & (1 << 2))			/* Sort out how to handle AC3 */;
+//FIXME:		if (resp[0] & (1 << 1))			*fmts |= B_FMT_FLOAT;
+//FIXME:		if (resp[0] & (1 << 2))			/* Sort out how to handle AC3 */;
 	}
 	
 	return rc;
@@ -147,7 +147,17 @@ hda_codec_parse_afg(hda_afg* afg)
 
 			off = 0;
 			if (resp[0] & (1 << 11)) off += sprintf(buf+off, "[L-R Swap] ");
-			if (resp[0] & (1 << 10)) off += sprintf(buf+off, "[Power] ");
+			if (resp[0] & (1 << 10)) {
+				corb_t verb;
+				uint32 resp;
+
+				off += sprintf(buf+off, "[Power] ");
+
+				/* We support power; switch us on! */
+				verb = MAKE_VERB(afg->codec->addr,wid,VID_SET_POWERSTATE,0);
+				hda_send_verbs(afg->codec, &verb, &resp, 1);
+			}
+
 			if (resp[0] & (1 << 9)) off += sprintf(buf+off, "[Digital] ");
 			if (resp[0] & (1 << 7)) off += sprintf(buf+off, "[Unsol Capable] ");
 			if (resp[0] & (1 << 6)) off += sprintf(buf+off, "[Proc Widget] ");
@@ -354,20 +364,16 @@ hda_codec_afg_new(hda_codec* codec, uint32 afg_nid)
 		we cannot find any output Pin Widgets */
 	rc = ENODEV;
 
-	dprintf("%s: Scanning all %ld widgets for outputs/inputs....\n", 
-		__func__, afg->wid_count);
-
 	/* Try to locate all input/output channels */
 	for (idx=0; idx < afg->wid_count; idx++) {
 		uint32 output_wid = 0, input_wid = 0;
 		int32 iidx;
 
-		if (afg->widgets[idx].type == WT_PIN_COMPLEX && afg->widgets[idx].d.pin.output) {
-			if 	(afg->widgets[idx].d.pin.device != PIN_DEV_HP_OUT &&
-				afg->widgets[idx].d.pin.device != PIN_DEV_SPEAKER &&
-				afg->widgets[idx].d.pin.device != PIN_DEV_LINE_OUT)
-				continue;
-	
+		if (afg->playback_stream == NULL && afg->widgets[idx].type == WT_PIN_COMPLEX && afg->widgets[idx].d.pin.output) {
+			if 	(afg->widgets[idx].d.pin.device == PIN_DEV_HP_OUT ||
+				afg->widgets[idx].d.pin.device == PIN_DEV_SPEAKER ||
+				afg->widgets[idx].d.pin.device == PIN_DEV_LINE_OUT)
+			{
 			iidx = afg->widgets[idx].active_input;
 			if (iidx != -1) {
 				output_wid = hda_codec_afg_find_path(afg, afg->widgets[idx].inputs[iidx], WT_AUDIO_OUTPUT, 0);
@@ -385,7 +391,7 @@ hda_codec_afg_new(hda_codec* codec, uint32 afg_nid)
 	
 			if (output_wid) {
 				if (!afg->playback_stream) {
-					corb_t verb;
+					corb_t verb[2];
 	
 					/* Setup playback/record streams for Multi Audio API */
 					afg->playback_stream = hda_stream_new(afg->codec->ctrlr, STRM_PLAYBACK);
@@ -394,16 +400,19 @@ hda_codec_afg_new(hda_codec* codec, uint32 afg_nid)
 					afg->playback_stream->pin_wid = idx + afg->wid_start;
 					afg->playback_stream->io_wid = output_wid;
 		
-					/* FIXME: Force Pin Widget to unmute */
-					verb = MAKE_VERB(codec->addr, afg->playback_stream->pin_wid,
+					/* FIXME: Force Pin Widget to unmute; enable hp/output */
+					verb[0] = MAKE_VERB(codec->addr, afg->playback_stream->pin_wid,
 						VID_SET_AMPGAINMUTE, (1 << 15) | (1 << 13) | (1 << 12));
-					hda_send_verbs(codec, &verb, NULL, 1);
+					verb[1] = MAKE_VERB(codec->addr, afg->playback_stream->pin_wid,
+						VID_SET_PINWCTRL, (1 << 7) | (1 << 6));
+					hda_send_verbs(codec, verb, NULL, 2);
+
+					dprintf("%s: Found output PIN (%s) connected to output CONV wid:%ld\n", 
+						__func__, defdev[afg->widgets[idx].d.pin.device], output_wid);
 				}	
-	
-				dprintf("%s: Found output PIN (%s) connected to output CONV wid:%ld\n", 
-					__func__, defdev[afg->widgets[idx].d.pin.device], output_wid);
 			}
-		} 
+		   }
+		}
 
 		if (afg->widgets[idx].type == WT_AUDIO_INPUT) {
 			iidx = afg->widgets[idx].active_input;

@@ -183,37 +183,40 @@ hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc)
 
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, s->num_buffers);
-	
+
 	/* Setup BDL entries */	
 	for (idx=0; idx < s->num_buffers; idx++, bdl++) {
-		bdl->address = buffer_pa + (idx*buffer_size);
-		bdl->length = s->sample_size * s->num_channels * s->buffer_length;
+		bdl->address = s->buffers_pa[idx];
+		bdl->length = buffer_size;
 		bdl->ioc = 1;
 	}
 
 	/* Configure stream registers */
 	wfmt = s->num_channels -1;
 	switch(s->sampleformat) {
-		case B_FMT_8BIT_S:	wfmt |= (0 << 4); break;
-		case B_FMT_16BIT:	wfmt |= (1 << 4); break;
-		case B_FMT_24BIT:	wfmt |= (3 << 4); break;
-		case B_FMT_32BIT:	wfmt |= (4 << 4); break;
-		default:			dprintf("%s: Invalid sample format: 0x%lx\n", __func__, s->sampleformat); break;
+		case B_FMT_8BIT_S:	wfmt |= (0 << 4); s->bps = 8; break;
+		case B_FMT_16BIT:	wfmt |= (1 << 4); s->bps = 16; break;
+		case B_FMT_24BIT:	wfmt |= (3 << 4); s->bps = 24; break;
+		case B_FMT_32BIT:	wfmt |= (4 << 4); s->bps = 32; break;
+		default:		dprintf("%s: Invalid sample format: 0x%lx\n", __func__, s->sampleformat); break;
 	}
+
 	switch(s->samplerate) {
-		case B_SR_8000:		wfmt |= (7 << 8); break;
-		case B_SR_11025:	wfmt |= (67 << 8); break;
-		case B_SR_16000:	wfmt |= (2 << 8); break;
-		case B_SR_22050:	wfmt |= (65 << 8); break;
-		case B_SR_32000:	wfmt |= (10 << 8); break;
-		case B_SR_44100:	wfmt |= (64 << 8); break;
-		case B_SR_48000:	wfmt |= (0 << 8); break;
-		case B_SR_88200:	wfmt |= (72 << 8); break;
-		case B_SR_96000:	wfmt |= (8 << 8); break;
-		case B_SR_176400:	wfmt |= (88 << 8); break;
-		case B_SR_192000:	wfmt |= (24 << 8); break;
-		default:			dprintf("%s: Invalid sample rate: 0x%lx\n", __func__, s->samplerate); break;
+		case B_SR_8000:		wfmt |= (0 << 14) | (0 << 11) | (5 << 8); s->rate=8000; break;
+		case B_SR_11025:	wfmt |= (1 << 14) | (0 << 11) | (3 << 8); s->rate=11025; break;
+		case B_SR_16000:	wfmt |= (0 << 14) | (0 << 11) | (2 << 8); s->rate=16000; break;
+		case B_SR_22050:	wfmt |= (1 << 14) | (0 << 11) | (1 << 8); s->rate=22050; break;
+		case B_SR_32000:	wfmt |= (0 << 14) | (1 << 11) | (2 << 8); s->rate=32000; break;
+		case B_SR_44100:	wfmt |= (1 << 14) | (0 << 11) | (0 << 8); s->rate=44100; break;
+		case B_SR_48000:	wfmt |= (0 << 14) | (0 << 11) | (0 << 8); s->rate=48000; break;
+		case B_SR_88200:	wfmt |= (1 << 14) | (1 << 11) | (0 << 8); s->rate=88200; break;
+		case B_SR_96000:	wfmt |= (0 << 14) | (2 << 11) | (0 << 8); s->rate=96000; break;
+		case B_SR_176400:	wfmt |= (1 << 14) | (3 << 11) | (0 << 8); s->rate=176400; break;
+		case B_SR_192000:	wfmt |= (0 << 14) | (3 << 11) | (0 << 8); s->rate=192000; break;
+		default:		dprintf("%s: Invalid sample rate: 0x%lx\n", __func__, s->samplerate); break;
 	}
+
+	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld\n", __func__, s->id, s->rate, s->bps);
 
 	OREG16(afg->codec->ctrlr,s->off,FMT) = wfmt;
 	OREG32(afg->codec->ctrlr,s->off,BDPL) = s->bdl_pa;

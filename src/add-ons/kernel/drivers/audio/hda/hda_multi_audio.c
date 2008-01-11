@@ -173,7 +173,7 @@ get_buffers(hda_afg* afg, multi_buffer_list* data)
 
 	/* ... from here on, we can assume again that a reasonable request is being made */
 
-	data->flags = 0;
+	data->flags = B_MULTI_BUFFER_PLAYBACK;
 
 	/* Copy the requested settings into the streams */
 	afg->playback_stream->num_buffers = data->request_playback_buffers;
@@ -218,6 +218,8 @@ get_buffers(hda_afg* afg, multi_buffer_list* data)
 	return B_OK;
 }
 
+/* playback_buffer_cycle is the buffer we want to have played */
+
 static status_t
 buffer_exchange(hda_afg* afg, multi_buffer_info* data)
 {
@@ -258,7 +260,7 @@ static status_t
 buffer_force_stop(hda_afg* afg)
 {
 	hda_stream_stop(afg->codec->ctrlr, afg->playback_stream);
-	hda_stream_stop(afg->codec->ctrlr, afg->record_stream);
+	//hda_stream_stop(afg->codec->ctrlr, afg->record_stream);
 
 	delete_sem(afg->playback_stream->buffer_ready_sem);
 //	delete_sem(afg->record_stream->buffer_ready_sem);
