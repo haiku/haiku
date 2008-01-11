@@ -449,7 +449,26 @@ err_setup:
 void
 atapi_exec_io(ide_device_info *device, ata_request *request)
 {
+	scsi_ccb *ccb = request->ccb;
+
 	TRACE("atapi_exec_io\n");
+
+	if (ccb->cdb[0] == SCSI_OP_REQUEST_SENSE) {
+		// No initial clear sense, as this request is used
+		// by the scsi stack to request the sense data of
+		// the previous command.
+		scsi_request_sense(device, request);
+		ata_request_finish(request, false /* no resubmit */);
+		return;
+	}
+
+	ata_request_clear_sense(request);
+
+	FLOW("command not implemented\n");
+	ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
+	ata_request_finish(request, false /* no resubmit */);
+
+
 /*
 	scsi_ccb *ccb = request->ccb;
 

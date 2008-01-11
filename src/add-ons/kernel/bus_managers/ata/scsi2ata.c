@@ -398,7 +398,7 @@ scsi_read_capacity(ide_device_info *device, ata_request *request)
 }
 
 
-static void
+void
 scsi_request_sense(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;

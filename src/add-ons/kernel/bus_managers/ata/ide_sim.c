@@ -122,9 +122,8 @@ sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 
 	// there is no initiator for IDE, but SCSI needs it for scanning
 	info->initiator_id = 2;	
-	// there's no controller limit, so set it higher then the maximum
-	// number of queued requests, which is 32 per device * 2 devices
-	info->hba_queue_size = 65;
+	// we only support 1 request at a time
+	info->hba_queue_size = 1;
 
 	strncpy(info->sim_vid, "Haiku", SCSI_SIM_ID);
 

@@ -22,26 +22,42 @@ void
 ata_select_device(ide_bus_info *bus, int device)
 {
 	ide_task_file tf;
+
+//	FLOW("ata_select_device device %d\n", device);
+
 	tf.chs.head = 0;
 	tf.chs.mode = ide_mode_lba;
 	tf.chs.device = device ? 1 : 0;
 
+//	if (ata_wait_idle(bus) != B_OK)
+//		FLOW("ata_select_device step 1 bus not idle\n");
+
 	bus->controller->write_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
+	bus->controller->get_altstatus(bus->channel_cookie); // flush posted writes
 	spin(1); // wait 400 nsec
+
+//	if (ata_wait_idle(bus) != B_OK)
+//		FLOW("ata_select_device step 2 bus not idle\n");
+
+	// for debugging only
+	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, ide_mask_device_head);
+	if (tf.chs.device != device)
+		TRACE("ata_select_device result: device %d not selected! head 0x%x, mode 0x%x, device %d\n", device, tf.chs.head, tf.chs.mode, tf.chs.device);
 }
 
 
 void
 ata_select(ide_device_info *device)
 {
-//	ata_select_device(device->bus, device->is_device1);
-
-
 	ASSERT(device->is_device1 == device->tf.chs.device);
-	device->bus->controller->write_command_block_regs(device->bus->channel_cookie, &device->tf, ide_mask_device_head);
+	ata_select_device(device->bus, device->is_device1);
 }
 
 
+/* Detect if the device is present
+ * This is unrelyable for some controllers and
+ * may report false posives.
+ */
 bool
 ata_is_device_present(ide_bus_info *bus, int device)
 {
@@ -51,10 +67,10 @@ ata_is_device_present(ide_bus_info *bus, int device)
 
 	tf.lba.sector_count = 0xaa;
 	tf.lba.lba_0_7 = 0x55;
-
 	bus->controller->write_command_block_regs(bus->channel_cookie, &tf,
 		ide_mask_sector_count | ide_mask_LBA_low);
-	spin(1); // wait 400 nsec
+	bus->controller->get_altstatus(bus->channel_cookie); // flush posted writes
+	spin(1);
 
 	bus->controller->read_command_block_regs(bus->channel_cookie, &tf,
 		ide_mask_sector_count | ide_mask_LBA_low);
@@ -74,9 +90,10 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 		 bool check_err, bigtime_t timeout)
 {
 	bigtime_t startTime = system_time();
-	bigtime_t elapsedTime;
+	bigtime_t elapsedTime = 0;
 	uint8 status;
 
+	bus->controller->get_altstatus(bus->channel_cookie); // flush posted writes
 	spin(1); // device needs 400ns to set status
 
 	for (;;) {
@@ -85,18 +102,20 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 		if (check_err && (status & ide_status_err) != 0)
 			return B_ERROR;
 
-		if ((status & set) == set && (status & cleared) == 0)
+		if ((status & set) == set && (status & cleared) == 0) {
+			dprintf("ata_wait: set %x, cleared %x, elapsed time %lld\n", set, cleared, elapsedTime);
 			return B_OK;
+		}
 
 		elapsedTime = system_time() - startTime;
 
 		if (elapsedTime > timeout)
 			return B_TIMED_OUT;
 		
-		if (elapsedTime < 5000)
+		if (elapsedTime < 100000)
 			spin(1);
 		else
-			snooze(5000);
+			snooze(3000);
 	}
 }
 
@@ -122,6 +141,14 @@ status_t
 ata_wait_for_drdy(ide_bus_info *bus)
 {
 	return ata_wait(bus, ide_status_drdy, ide_status_bsy, false, 5000000);
+}
+
+
+// wait 20ms for device to report idle (busy and drq clear)
+status_t
+ata_wait_idle(ide_bus_info *bus)
+{
+	return ata_wait(bus, 0, ide_status_bsy | ide_status_drq, false, 20000);
 }
 
 
@@ -163,7 +190,7 @@ ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy,
 
 	ata_select(device);
 
-	if (ata_wait(bus, 0, ide_status_bsy | ide_status_drq, false, 50000) != B_OK) {
+	if (ata_wait_idle(bus) != B_OK) {
 		// resetting the device here will discard current configuration,
 		// it's better when the SCSI bus manager requests an external reset.
 		TRACE("device selection timeout\n");
@@ -181,7 +208,7 @@ ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy,
 	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,	device->tf_param_mask) != B_OK)
 		goto err;
 
-	FLOW("Writing command 0x%02x", (int)device->tf.write.command);
+	FLOW("Writing command 0x%02x\n", (int)device->tf.write.command);
 
 	IDE_LOCK(bus);
 
@@ -216,6 +243,15 @@ err:
 }
 
 status_t
+ata_read_status(ide_device_info *device, uint8 *status)
+{
+	status_t result = device->bus->controller->read_command_block_regs(device->bus->channel_cookie, &device->tf, ide_mask_status);
+	if (status)
+		*status = device->tf.read.status;
+}
+
+
+status_t
 ata_finish_command(ide_device_info *device)
 {
 	return B_OK;
@@ -237,23 +273,28 @@ ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *
 	devicePresent0 = ata_is_device_present(bus, 0);
 	devicePresent1 = ata_is_device_present(bus, 1);
 
-	dprintf("ATA: reset_bus: ata_is_device_present device 0, present %d\n", devicePresent0);
-	dprintf("ATA: reset_bus: ata_is_device_present device 1, present %d\n", devicePresent1);
+	dprintf("ATA: reset_bus: device 0: %s present\n", devicePresent0 ? "might be" : "is not");
+	dprintf("ATA: reset_bus: device 1: %s present\n", devicePresent1 ? "might be" : "is not");
+
+	// select device 0
+	ata_select_device(bus, 0);
 
 	// disable interrupts and assert SRST for at least 5 usec
 	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien | ide_devctrl_srst) != B_OK)
 		goto error;
+	controller->get_altstatus(channel); // flush posted writes
 	spin(20);
 
 	// clear SRST and wait for at least 2 ms but (we wait 150ms like everyone else does)
 	if (controller->write_device_control(channel, ide_devctrl_bit3 | ide_devctrl_nien) != B_OK)
 		goto error;
+	controller->get_altstatus(channel); // flush posted writes
 	snooze(150000);
 
 	if (devicePresent0) {
 
 		ata_select_device(bus, 0);
-		dprintf("altstatus device 0: %x\n", controller->get_altstatus(channel));
+//		dprintf("altstatus device 0: %x\n", controller->get_altstatus(channel));
 
 		// wait up to 31 seconds for busy to clear, abort when error is set
 		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
@@ -283,7 +324,7 @@ ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *
 	if (devicePresent1) {	
 		
 		ata_select_device(bus, 1);
-		dprintf("altstatus device 1: %x\n", controller->get_altstatus(channel));
+//		dprintf("altstatus device 1: %x\n", controller->get_altstatus(channel));
 
 		// wait up to 31 seconds for busy to clear, abort when error is set
 		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
@@ -1042,6 +1083,9 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 		goto error;
 	}
 
+	// clear pending interrupt
+	ata_read_status(device, NULL);
+
 	// XXX fix me
 	IDE_LOCK(bus);
 	bus->state = ata_state_busy;
@@ -1051,6 +1095,11 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 	return B_OK;
 
 error:
+
+	// clear pending interrupt
+	ata_read_status(device, NULL);
+
+
 	// XXX fix me
 	IDE_LOCK(bus);
 	bus->state = ata_state_busy;

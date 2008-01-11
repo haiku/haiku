@@ -271,6 +271,7 @@ status_t write_PIO_block(ata_request *request, int length);
 struct scsi_sense;
 
 void scsi_set_sense(struct scsi_sense *sense, const ata_request *request);
+void scsi_request_sense(ide_device_info *device, ata_request *request);
 
 
 
