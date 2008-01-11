@@ -259,13 +259,6 @@ MouseDevice::_Run()
 
 		// Send single messages for each event
 
-		if (movements.xdelta != 0 || movements.ydelta != 0) {
-			BMessage* message = _BuildMouseMessage(B_MOUSE_MOVED, movements.timestamp,
-				remappedButtons, deltaX, deltaY);
-			if (message != NULL)
-				fTarget.EnqueueMessage(message);
-		}
-
 		if (buttons != 0) {
 			bool pressedButton = (buttons & movements.buttons) > 0;
 			BMessage* message = _BuildMouseMessage(
@@ -281,6 +274,13 @@ MouseDevice::_Run()
 				fTarget.EnqueueMessage(message);
 				lastButtons = movements.buttons;
 			}
+		}
+
+		if (movements.xdelta != 0 || movements.ydelta != 0) {
+			BMessage* message = _BuildMouseMessage(B_MOUSE_MOVED,
+				movements.timestamp, remappedButtons, deltaX, deltaY);
+			if (message != NULL)
+				fTarget.EnqueueMessage(message);
 		}
 
 		if ((movements.wheel_ydelta != 0) || (movements.wheel_xdelta != 0)) {
