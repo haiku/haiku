@@ -3,13 +3,14 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include <mime/MimeSnifferAddonManager.h>
+#include "MimeSnifferAddonManager.h"
 
 #include <new>
 
 #include <Autolock.h>
-#include <MimeSnifferAddon.h>
 #include <MimeType.h>
+
+#include "MimeSnifferAddon.h"
 
 using std::nothrow;
 

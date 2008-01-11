@@ -45,17 +45,6 @@ MergeObject <libbe>storage_kit.o :
 	storage_support.cpp
 
 	# mime
-	AssociatedTypes.cpp
-	CreateAppMetaMimeThread.cpp
-	Database.cpp
-	InstalledTypes.cpp
-	MimeSnifferAddon.cpp
-	MimeSnifferAddonManager.cpp
-	MimeUpdateThread.cpp
-	SnifferRules.cpp
-	Supertype.cpp
-	SupportingApps.cpp
-	UpdateMimeInfoThread.cpp
 	database_access.cpp
 	database_support.cpp
 

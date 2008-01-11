@@ -1,25 +1,26 @@
 // MIMEManager.cpp
 
+#include "MIMEManager.h"
+
+#include <stdio.h>
+#include <string>
+
 #include <Bitmap.h>
 #include <ClassInfo.h>
 #include <Message.h>
 #include <Messenger.h>
-#include <mime/CreateAppMetaMimeThread.h>
-#include <mime/MimeSnifferAddonManager.h>
-#include <mime/UpdateMimeInfoThread.h>
 #include <Path.h>
 #include <RegistrarDefs.h>
 #include <String.h>
 #include <TypeConstants.h>
 
-#include <stdio.h>
-#include <string>
+#include "CreateAppMetaMimeThread.h"
+#include "MimeSnifferAddonManager.h"
+#include "TextSnifferAddon.h"
+#include "UpdateMimeInfoThread.h"
 
 using namespace std;
 using namespace BPrivate;
-
-#include "MIMEManager.h"
-#include "TextSnifferAddon.h"
 
 /*!
 	\class MIMEManager

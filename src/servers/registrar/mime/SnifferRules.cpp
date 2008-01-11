@@ -12,22 +12,23 @@
 	SnifferRules class implementation
 */
 
-#include "mime/SnifferRules.h"
+#include "SnifferRules.h"
+
+#include <stdio.h>
+#include <sys/stat.h>
 
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
 #include <MimeType.h>
 #include <mime/database_support.h>
-#include <mime/MimeSnifferAddonManager.h>
 #include <sniffer/Parser.h>
 #include <sniffer/Rule.h>
 #include <StorageDefs.h>
 #include <storage_support.h>
 #include <String.h>
 
-#include <stdio.h>
-#include <sys/stat.h>
+#include "MimeSnifferAddonManager.h"
 
 #define DBG(x) x
 //#define DBG(x)

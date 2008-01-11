@@ -7,7 +7,8 @@
 	AssociatedTypes class implementation
 */
 
-#include "mime/AssociatedTypes.h"
+#include "AssociatedTypes.h"
+#include "MimeSnifferAddonManager.h"
 
 #include <Directory.h>
 #include <Entry.h>
@@ -16,7 +17,6 @@
 #include <Path.h>
 #include <String.h>
 #include <mime/database_support.h>
-#include <mime/MimeSnifferAddonManager.h>
 #include <storage_support.h>
 
 #include <new>

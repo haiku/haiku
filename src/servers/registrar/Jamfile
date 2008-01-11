@@ -7,6 +7,8 @@ UsePrivateHeaders storage ;
 UsePrivateHeaders tracker ;
 UseArchHeaders $(TARGET_ARCH) ;
 
+SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
+
 Server registrar
  	:
 	AppInfoList.cpp
@@ -33,6 +35,19 @@ Server registrar
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp
+
+	# mime
+	AssociatedTypes.cpp
+	CreateAppMetaMimeThread.cpp
+	Database.cpp
+	InstalledTypes.cpp
+	MimeSnifferAddon.cpp
+	MimeSnifferAddonManager.cpp
+	MimeUpdateThread.cpp
+	SnifferRules.cpp
+	Supertype.cpp
+	SupportingApps.cpp
+	UpdateMimeInfoThread.cpp
 	:
 	be
 	$(TARGET_LIBSTDC++)

@@ -10,7 +10,7 @@
 #ifndef _MIME_UPDATE_MIME_INFO_THREAD_H
 #define _MIME_UPDATE_MIME_INFO_THREAD_H
 
-#include <mime/MimeUpdateThread.h>
+#include "MimeUpdateThread.h"
 
 namespace BPrivate {
 namespace Storage {

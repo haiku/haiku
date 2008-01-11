@@ -8,7 +8,7 @@
  */
 
 
-#include <mime/Database.h>
+#include "Database.h"
 
 #include <mime/database_access.h>
 #include <mime/database_support.h>
@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <string>
 
+#include "MessageDeliverer.h"
 
 //#define DBG(x) x
 #define DBG(x)
@@ -1374,9 +1375,9 @@ Database::_SendMonitorUpdate(BMessage &msg)
 	status_t err;
 	std::set<BMessenger>::const_iterator i;
 	for (i = fMonitorMessengers.begin(); i != fMonitorMessengers.end(); i++) {
-		status_t err = (*i).SendMessage(&msg, (BHandler*)NULL);
+		status_t err =  MessageDeliverer::Default()->DeliverMessage(&msg, *i);
 		if (err) {
-			DBG(OUT("Database::_SendMonitorUpdate(BMessage&): BMessenger::SendMessage failed, 0x%lx\n", err));
+			DBG(OUT("Database::_SendMonitorUpdate(BMessage&): DeliverMessage failed, 0x%lx\n", err));
 		}
 	}
 //	DBG(OUT("Database::_SendMonitorUpdate(BMessage&) done\n"));

@@ -8,19 +8,21 @@
 #ifndef _MIME_DATABASE_H
 #define _MIME_DATABASE_H
 
+#include <map>
+#include <set>
+#include <string>
 
 #include <Mime.h>
-#include <mime/AssociatedTypes.h>
-#include <mime/InstalledTypes.h>
-#include <mime/SnifferRules.h>
-#include <mime/SupportingApps.h>
-#include <mime/database_access.h>
 #include <Messenger.h>
 #include <StorageDefs.h>
 
-#include <string>
-#include <map>
-#include <set>
+#include <mime/database_access.h>
+
+#include "AssociatedTypes.h"
+#include "InstalledTypes.h"
+#include "SnifferRules.h"
+#include "SupportingApps.h"
+
 
 class BNode;
 class BBitmap;

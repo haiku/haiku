@@ -10,8 +10,7 @@
 #ifndef _MIME_INSTALLED_TYPES_H
 #define _MIME_INSTALLED_TYPES_H
 
-
-#include <mime/Supertype.h>
+#include "Supertype.h"
 #include <SupportDefs.h>
 
 #include <string>

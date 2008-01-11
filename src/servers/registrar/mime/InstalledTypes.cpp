@@ -9,7 +9,8 @@
  */
 
 
-#include "mime/InstalledTypes.h"
+#include "InstalledTypes.h"
+
 #include <mime/database_support.h>
 #include <storage_support.h>
 

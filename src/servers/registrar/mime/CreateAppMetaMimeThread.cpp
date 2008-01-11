@@ -8,8 +8,9 @@
  */
 
 
-#include "mime/CreateAppMetaMimeThread.h"
-#include "mime/database_support.h"
+#include "CreateAppMetaMimeThread.h"
+
+#include <stdio.h>
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>
@@ -19,8 +20,7 @@
 #include <Path.h>
 #include <String.h>
 
-#include <stdio.h>
-
+#include <mime/database_support.h>
 
 namespace BPrivate {
 namespace Storage {

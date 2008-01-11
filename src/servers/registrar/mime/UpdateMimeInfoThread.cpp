@@ -7,7 +7,7 @@
 	UpdateMimeInfoThread implementation
 */
 
-#include "mime/UpdateMimeInfoThread.h"
+#include "UpdateMimeInfoThread.h"
 
 #include <AppFileInfo.h>
 #include <Bitmap.h>

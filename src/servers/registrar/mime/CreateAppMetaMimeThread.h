@@ -10,7 +10,7 @@
 #ifndef _CREATE_APP_META_MIME_THREAD_H
 #define _CREATE_APP_META_MIME_THREAD_H
 
-#include <mime/MimeUpdateThread.h>
+#include "MimeUpdateThread.h"
 
 namespace BPrivate {
 namespace Storage {
