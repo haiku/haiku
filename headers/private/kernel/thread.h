@@ -26,9 +26,10 @@ struct thread *thread_lookat_queue(struct thread_queue *q);
 struct thread *thread_dequeue(struct thread_queue *q);
 struct thread *thread_dequeue_id(struct thread_queue *q, thread_id id);
 
-void thread_at_kernel_entry(void);
+void thread_at_kernel_entry(bigtime_t now);
 	// called when the thread enters the kernel on behalf of the thread
 void thread_at_kernel_exit(void);
+void thread_at_kernel_exit_no_signals(void);
 void thread_reset_for_exec(void);
 
 status_t thread_init(struct kernel_args *args);
@@ -68,6 +69,8 @@ status_t wait_for_thread_etc(thread_id id, uint32 flags, bigtime_t timeout,
 
 status_t select_thread(int32 object, struct select_info *info, bool kernel);
 status_t deselect_thread(int32 object, struct select_info *info, bool kernel);
+
+#define syscall_64_bit_return_value() arch_syscall_64_bit_return_value()
 
 // used in syscalls.c
 status_t _user_set_thread_priority(thread_id thread, int32 newPriority);

@@ -19,13 +19,6 @@ struct farcall {
 	uint32 *ss;
 };
 
-#define	IFRAME_TRACE_DEPTH 4
-
-struct iframe_stack {
-	struct iframe *frames[IFRAME_TRACE_DEPTH];
-	int32	index;
-};
-
 // architecture specific thread info
 struct arch_thread {
 	struct farcall current_stack;
@@ -33,9 +26,6 @@ struct arch_thread {
 
 	// 512 byte floating point save point - this must be 16 byte aligned
 	uint8 fpu_state[512];
-
-	// used to track interrupts on this thread
-	struct iframe_stack	iframes;
 } _ALIGNED(16);
 
 struct arch_team {

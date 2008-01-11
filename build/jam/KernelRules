@@ -20,6 +20,7 @@ rule SetupKernel
 		# add kernel flags for the object
 		ObjectCcFlags $(object) : $(TARGET_KERNEL_CCFLAGS) $(2) ;
 		ObjectC++Flags $(object) : $(TARGET_KERNEL_C++FLAGS) $(2) ;
+		ObjectDefines $(object) : $(TARGET_KERNEL_DEFINES) ;
 
 		# override warning flags
 		TARGET_WARNING_CCFLAGS on $(object) = $(TARGET_KERNEL_WARNING_CCFLAGS) ;

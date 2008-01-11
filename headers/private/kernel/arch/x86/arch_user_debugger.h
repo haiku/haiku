@@ -5,7 +5,7 @@
 #ifndef _KERNEL_ARCH_X86_USER_DEBUGGER_H
 #define _KERNEL_ARCH_X86_USER_DEBUGGER_H
 
-#define ARCH_INIT_USER_DEBUG i386_init_user_debug
+#define ARCH_INIT_USER_DEBUG x86_init_user_debug
 
 // number of breakpoints the CPU supports
 // Actually it supports 4, but DR3 is used to hold the struct thread*.
@@ -94,11 +94,6 @@ enum {
 	X86_BREAKPOINT_LENGTH_4	= 0x3,
 };
 
-// thread debug flags
-enum {
-	X86_THREAD_DEBUG_DR7_SET			= 0x01,
-};
-
 struct arch_breakpoint {
 	void	*address;	// NULL, if deactivated
 	uint32	type;		// one of the architecture types above
@@ -122,14 +117,13 @@ extern "C" {
 struct iframe;
 struct thread;
 
-extern void i386_init_user_debug_at_kernel_exit(struct iframe *frame);
-extern void i386_exit_user_debug_at_kernel_entry();
-extern void i386_reinit_user_debug_after_context_switch(struct thread *thread);
+extern void x86_init_user_debug_at_kernel_exit(struct iframe *frame);
+extern void x86_exit_user_debug_at_kernel_entry();
 
-extern int i386_handle_debug_exception(struct iframe *frame);
-extern int i386_handle_breakpoint_exception(struct iframe *frame);
+extern void x86_handle_debug_exception(struct iframe *frame);
+extern void x86_handle_breakpoint_exception(struct iframe *frame);
 
-extern void i386_init_user_debug();
+extern void x86_init_user_debug();
 
 #ifdef __cplusplus
 }

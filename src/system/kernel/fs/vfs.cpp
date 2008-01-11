@@ -4186,7 +4186,7 @@ static status_t
 file_select(struct file_descriptor *descriptor, uint8 event,
 	struct selectsync *sync)
 {
-	FUNCTION(("file_select(%p, %u, %lu, %p)\n", descriptor, event, ref, sync));
+	FUNCTION(("file_select(%p, %u, %p)\n", descriptor, event, sync));
 
 	struct vnode *vnode = descriptor->u.vnode;
 

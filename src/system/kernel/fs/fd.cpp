@@ -845,6 +845,8 @@ err1:
 off_t
 _user_seek(int fd, off_t pos, int seekType)
 {
+	syscall_64_bit_return_value();
+
 	struct file_descriptor *descriptor;
 
 	descriptor = get_fd(get_current_io_context(false), fd);

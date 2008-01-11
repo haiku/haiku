@@ -9,7 +9,7 @@
 #include <SupportDefs.h>
 
 
-typedef struct {
+typedef struct syscall_info {
 	void	*function;		// pointer to the syscall function
 	int		parameter_size;	// summed up parameter size
 } syscall_info;

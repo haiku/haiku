@@ -23,6 +23,8 @@
 #include <vm_types.h>
 #include <arch/user_debugger.h>
 
+#include <util/AutoLock.h>
+
 //#define TRACE_USER_DEBUGGER
 #ifdef TRACE_USER_DEBUGGER
 #	define TRACE(x) dprintf x
@@ -106,6 +108,96 @@ debugger_write(port_id port, int32 code, const void *buffer, size_t bufferSize,
 	TRACE(("debugger_write() done: %lx\n", error));
 
 	return error;
+}
+
+
+/*!	Updates the thread::flags field according to what user debugger flags are
+	set for the thread.
+	Interrupts must be disabled and the thread lock must be held.
+*/
+static void
+update_thread_user_debug_flag(struct thread* thread)
+{
+	if (atomic_get(&thread->debug_info.flags)
+			& (B_THREAD_DEBUG_STOP | B_THREAD_DEBUG_SINGLE_STEP)) {
+		atomic_or(&thread->flags, THREAD_FLAGS_DEBUG_THREAD);
+	} else
+		atomic_and(&thread->flags, ~THREAD_FLAGS_DEBUG_THREAD);
+}
+
+
+/*!	Updates the thread::flags THREAD_FLAGS_BREAKPOINTS_DEFINED bit of the
+	current thread.
+	Interrupts must be disabled and the team lock must be held.
+*/
+static void
+update_thread_breakpoints_flag()
+{
+	struct thread* thread = thread_get_current_thread();
+	struct team* team = thread->team;
+
+	if (arch_has_breakpoints(&team->debug_info.arch_info))
+		atomic_or(&thread->flags, THREAD_FLAGS_BREAKPOINTS_DEFINED);
+	else
+		atomic_and(&thread->flags, ~THREAD_FLAGS_BREAKPOINTS_DEFINED);
+}
+
+
+/*!	Updates the thread::flags THREAD_FLAGS_BREAKPOINTS_DEFINED bit of all
+	threads of the current team.
+	Interrupts must be disabled and the team lock must be held.
+*/
+static void
+update_threads_breakpoints_flag()
+{
+	InterruptsSpinLocker _(team_spinlock);
+
+	struct team* team = thread_get_current_thread()->team;
+	struct thread* thread = team->thread_list;
+
+	if (arch_has_breakpoints(&team->debug_info.arch_info)) {
+		for (; thread != NULL; thread = thread->team_next)
+			atomic_or(&thread->flags, THREAD_FLAGS_BREAKPOINTS_DEFINED);
+	} else {
+		for (; thread != NULL; thread = thread->team_next)
+			atomic_and(&thread->flags, ~THREAD_FLAGS_BREAKPOINTS_DEFINED);
+	}
+}
+
+
+/*!	Updates the thread::flags B_TEAM_DEBUG_DEBUGGER_INSTALLED bit of the
+	current thread.
+	Interrupts must be disabled and the team lock must be held.
+*/
+static void
+update_thread_debugger_installed_flag()
+{
+	struct thread* thread = thread_get_current_thread();
+	struct team* team = thread->team;
+
+	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED)
+		atomic_or(&thread->flags, THREAD_FLAGS_DEBUGGER_INSTALLED);
+	else
+		atomic_and(&thread->flags, ~THREAD_FLAGS_DEBUGGER_INSTALLED);
+}
+
+
+/*!	Updates the thread::flags THREAD_FLAGS_DEBUGGER_INSTALLED bit of all
+	threads of the given team.
+	Interrupts must be disabled and the team lock must be held.
+*/
+static void
+update_threads_debugger_installed_flag(struct team* team)
+{
+	struct thread* thread = team->thread_list;
+
+	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+		for (; thread != NULL; thread = thread->team_next)
+			atomic_or(&thread->flags, THREAD_FLAGS_DEBUGGER_INSTALLED);
+	} else {
+		for (; thread != NULL; thread = thread->team_next)
+			atomic_and(&thread->flags, ~THREAD_FLAGS_DEBUGGER_INSTALLED);
+	}
 }
 
 
@@ -379,6 +471,8 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 		threadFlags |= B_THREAD_DEBUG_STOPPED;
 	atomic_set(&thread->debug_info.flags, threadFlags);
 
+	update_thread_user_debug_flag(thread);
+
 	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
@@ -519,6 +613,8 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 		// unset the "stopped" state
 		atomic_and(&thread->debug_info.flags, ~B_THREAD_DEBUG_STOPPED);
 
+		update_thread_user_debug_flag(thread);
+
 	} else {
 		// the debugger is gone: cleanup our info completely
 		threadDebugInfo = thread->debug_info;
@@ -528,6 +624,9 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
+
+	// enable/disable single stepping
+	arch_update_thread_single_step();
 
 	if (destroyThreadInfo)
 		destroy_thread_debug_info(&threadDebugInfo);
@@ -741,6 +840,29 @@ user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 			sizeof(message), B_RELATIVE_TIMEOUT, 0);
 			// TODO: Would it be OK to wait here?
 	}
+}
+
+
+void
+user_debug_update_new_thread_flags(thread_id threadID)
+{
+	// Update thread::flags of the thread.
+
+	InterruptsLocker interruptsLocker;
+
+	SpinLocker threadLocker(thread_spinlock);
+
+	struct thread *thread = thread_get_thread_struct_locked(threadID);
+	if (!thread)
+		return;
+
+	update_thread_user_debug_flag(thread);
+
+	threadLocker.Unlock();
+
+	SpinLocker teamLocker(team_spinlock);
+	update_thread_breakpoints_flag();
+	update_thread_debugger_installed_flag();
 }
 
 
@@ -975,6 +1097,9 @@ nub_thread_cleanup(struct thread *nubThread)
 		clear_team_debug_info(&info, false);
 		destroyDebugInfo = true;
 	}
+
+	// update the thread::flags fields
+	update_threads_debugger_installed_flag(nubThread->team);
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(nubThread->team->debug_info);
 	RELEASE_TEAM_LOCK();
@@ -1476,6 +1601,9 @@ debug_nub_thread(void *)
 				if (result == B_OK)
 					result = arch_set_breakpoint(address);
 
+				if (result == B_OK)
+					update_threads_breakpoints_flag();
+
 				// prepare the reply
 				reply.set_breakpoint.error = result;
 				replySize = sizeof(reply.set_breakpoint);
@@ -1500,6 +1628,9 @@ debug_nub_thread(void *)
 				// clear the breakpoint
 				if (result == B_OK)
 					result = arch_clear_breakpoint(address);
+
+				if (result == B_OK)
+					update_threads_breakpoints_flag();
 
 				break;
 			}
@@ -1527,6 +1658,9 @@ debug_nub_thread(void *)
 				if (result == B_OK)
 					result = arch_set_watchpoint(address, type, length);
 
+				if (result == B_OK)
+					update_threads_breakpoints_flag();
+
 				// prepare the reply
 				reply.set_watchpoint.error = result;
 				replySize = sizeof(reply.set_watchpoint);
@@ -1551,6 +1685,9 @@ debug_nub_thread(void *)
 				// clear the watchpoint
 				if (result == B_OK)
 					result = arch_clear_watchpoint(address);
+
+				if (result == B_OK)
+					update_threads_breakpoints_flag();
 
 				break;
 			}
@@ -1790,7 +1927,7 @@ debug_nub_thread(void *)
 
 	Interrupts must be disabled and the team debug info lock of the team to be
 	debugged must be held. The function will release the lock, but leave
-	interrupts disabled.
+	interrupts disabled. The team lock must be held, too.
 
 	The function also clears the arch specific team and thread debug infos
 	(including among other things formerly set break/watchpoints).
@@ -1833,6 +1970,9 @@ install_team_debugger_init_debug_infos(struct team *team, team_id debuggerTeam,
 	}
 
 	RELEASE_THREAD_LOCK();
+
+	// update the thread::flags fields
+	update_threads_debugger_installed_flag(team);
 }
 
 
@@ -2218,6 +2358,8 @@ _user_debug_thread(thread_id threadID)
 		// set the flag that tells the thread to stop as soon as possible
 		atomic_or(&thread->debug_info.flags, B_THREAD_DEBUG_STOP);
 
+		update_thread_user_debug_flag(thread);
+
 		switch (thread->state) {
 			case B_THREAD_SUSPENDED:
 				// thread suspended: wake it up
@@ -2272,10 +2414,16 @@ _user_set_debugger_breakpoint(void *address, uint32 type, int32 length,
 	// that we install a break/watchpoint the debugger doesn't know about.
 
 	// set the break/watchpoint
+	status_t result;
 	if (watchpoint)
-		return arch_set_watchpoint(address, type, length);
+		result = arch_set_watchpoint(address, type, length);
 	else
-		return arch_set_breakpoint(address);
+		result = arch_set_breakpoint(address);
+
+	if (result == B_OK)
+		update_threads_breakpoints_flag();
+
+	return result;
 }
 
 
@@ -2297,8 +2445,14 @@ _user_clear_debugger_breakpoint(void *address, bool watchpoint)
 	// that we clear a break/watchpoint the debugger has just installed.
 
 	// clear the break/watchpoint
+	status_t result;
 	if (watchpoint)
-		return arch_clear_watchpoint(address);
+		result = arch_clear_watchpoint(address);
 	else
-		return arch_clear_breakpoint(address);
+		result = arch_clear_breakpoint(address);
+
+	if (result == B_OK)
+		update_threads_breakpoints_flag();
+
+	return result;
 }

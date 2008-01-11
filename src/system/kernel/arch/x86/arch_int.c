@@ -99,8 +99,6 @@ static const int kInterruptNameCount = 20;
 
 #define MAX_ARGS 16
 
-struct iframe_stack gBootFrameStack;
-
 typedef struct {
 	uint32 a, b;
 } desc_table;
@@ -108,6 +106,12 @@ static desc_table *sIDT = NULL;
 
 static uint16 sLevelTriggeredInterrupts;
 	// binary mask: 1 level, 0 edge
+
+// table with functions handling respective interrupts
+typedef void interrupt_handler_function(struct iframe* frame);
+#define INTERRUPT_HANDLER_TABLE_SIZE 256
+interrupt_handler_function* gInterruptHandlerTable[
+	INTERRUPT_HANDLER_TABLE_SIZE];
 
 
 static void
@@ -320,6 +324,17 @@ exception_name(int number, char *buffer, int32 bufferSize)
 
 
 static void
+invalid_exception(struct iframe* frame)
+{
+	struct thread* thread = thread_get_current_thread();
+	char name[32];
+	panic("unhandled trap 0x%lx (%s) at ip 0x%lx, thread 0x%lx!\n",
+		frame->vector, exception_name(frame->vector, name, sizeof(name)),
+		frame->eip, thread ? thread->id : -1);
+}
+
+
+static void
 fatal_exception(struct iframe *frame)
 {
 	char name[32];
@@ -329,9 +344,57 @@ fatal_exception(struct iframe *frame)
 
 
 static void
-unexpected_exception(struct iframe *frame, debug_exception_type type,
-	int signal)
+unexpected_exception(struct iframe* frame)
 {
+	debug_exception_type type;
+	int signal;
+
+	switch (frame->vector) {
+		case 0:		// Divide Error Exception (#DE)
+			type = B_DIVIDE_ERROR;
+			signal = SIGFPE;
+			break;
+
+		case 4:		// Overflow Exception (#OF)
+			type = B_OVERFLOW_EXCEPTION;
+			signal = SIGTRAP;
+			break;
+
+		case 5:		// BOUND Range Exceeded Exception (#BR)
+			type = B_BOUNDS_CHECK_EXCEPTION;
+			signal = SIGTRAP;
+			break;
+
+		case 6:		// Invalid Opcode Exception (#UD)
+			type = B_INVALID_OPCODE_EXCEPTION;
+			signal = SIGILL;
+			break;
+
+		case 13: 	// General Protection Exception (#GP)
+			type = B_GENERAL_PROTECTION_FAULT;
+			signal = SIGKILL;
+			break;
+
+		case 16: 	// x87 FPU Floating-Point Error (#MF)
+			type = B_FLOATING_POINT_EXCEPTION;
+			signal = SIGFPE;
+			break;
+
+		case 17: 	// Alignment Check Exception (#AC)
+			type = B_ALIGNMENT_EXCEPTION;
+			signal = SIGTRAP;
+			break;
+
+		case 19: 	// SIMD Floating-Point Exception (#XF)
+			type = B_FLOATING_POINT_EXCEPTION;
+			signal = SIGFPE;
+			break;
+
+		default:
+			invalid_exception(frame);
+			return;
+	}
+
 	if (frame->cs == USER_CODE_SEG) {
 		enable_interrupts();
 
@@ -347,231 +410,105 @@ unexpected_exception(struct iframe *frame, debug_exception_type type,
 }
 
 
-/* keep the compiler happy, this function must be called only from assembly */
-void i386_handle_trap(struct iframe frame);
+static void
+double_fault_exception(struct iframe* frame)
+{
+	// The double fault iframe contains no useful information (as
+	// per Intel's architecture spec). Thus we simply save the
+	// information from the (unhandable) exception which caused the
+	// double in our iframe. This will result even in useful stack
+	// traces. Only problem is that we trust that at least the
+	// TSS is still accessible.
+	struct tss *tss = &gCPU[smp_get_current_cpu()].arch.tss;
 
-void
-i386_handle_trap(struct iframe frame)
+	frame->cs = tss->cs;
+	frame->es = tss->es;
+	frame->ds = tss->ds;
+	frame->fs = tss->fs;
+	frame->gs = tss->gs;
+	frame->eip = tss->eip;
+	frame->ebp = tss->ebp;
+	frame->esp = tss->esp;
+	frame->eax = tss->eax;
+	frame->ebx = tss->ebx;
+	frame->ecx = tss->ecx;
+	frame->edx = tss->edx;
+	frame->esi = tss->esi;
+	frame->edi = tss->edi;
+	frame->flags = tss->eflags;
+
+	panic("double fault!\n");
+}
+
+
+static void
+page_fault_exception(struct iframe* frame)
 {
 	struct thread *thread = thread_get_current_thread();
-	int ret = B_HANDLED_INTERRUPT;
-	cpu_status state;
+	bool kernelDebugger = debug_debugger_running();
+	unsigned int cr2;
+	addr_t newip;
 
-	// all exceptions besides 3 (breakpoint), and 99 (syscall) enter this
-	// function with interrupts disabled
+	asm("movl %%cr2, %0" : "=r" (cr2));
 
-	state = disable_interrupts();
+	if (kernelDebugger) {
+		// if this thread has a fault handler, we're allowed to be here
+		if (thread && thread->fault_handler != NULL) {
+			frame->eip = thread->fault_handler;
+			return;
+		}
 
-	if (thread)
-		x86_push_iframe(&thread->arch_info.iframes, &frame);
-	else
-		x86_push_iframe(&gBootFrameStack, &frame);
-
-	if (frame.cs == USER_CODE_SEG) {
-		i386_exit_user_debug_at_kernel_entry();
-		thread_at_kernel_entry();
+		// otherwise, not really
+		panic("page fault in debugger without fault handler! Touching "
+			"address %p from eip %p\n", (void *)cr2, (void *)frame->eip);
+		return;
+	} else if ((frame->flags & 0x200) == 0) {
+		// if the interrupts were disabled, and we are not running the kernel startup
+		// the page fault was not allowed to happen and we must panic
+		panic("page fault, but interrupts were disabled. Touching address "
+			"%p from eip %p\n", (void *)cr2, (void *)frame->eip);
+		return;
+	} else if (thread != NULL && thread->page_faults_allowed < 1) {
+		panic("page fault not allowed at this place. Touching address "
+			"%p from eip %p\n", (void *)cr2, (void *)frame->eip);
+		return;
 	}
 
-	restore_interrupts(state);
+	enable_interrupts();
 
-//	if(frame.vector != 0x20)
-//		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
-
-	switch (frame.vector) {
-		// fatal exceptions
-
-		case 2:		// NMI Interrupt			
-		case 9:		// Coprocessor Segment Overrun
-		case 7:		// Device Not Available Exception (#NM)
-		case 10:	// Invalid TSS Exception (#TS)
-		case 11: 	// Segment Not Present (#NP)
-		case 12: 	// Stack Fault Exception (#SS)
-		case 18: 	// Machine-Check Exception (#MC)
-			fatal_exception(&frame);
-			break;
-
-		case 8:		// Double Fault Exception (#DF)
-		{
-			// The double fault iframe contains no useful information (as
-			// per Intel's architecture spec). Thus we simply save the
-			// information from the (unhandable) exception which caused the
-			// double in our iframe. This will result even in useful stack
-			// traces. Only problem is that we trust that at least the
-			// TSS is still accessible.
-			struct tss *tss = &gCPU[smp_get_current_cpu()].arch.tss;
-
-			frame.cs = tss->cs;
-			frame.es = tss->es;
-			frame.ds = tss->ds;
-			frame.fs = tss->fs;
-			frame.gs = tss->gs;
-			frame.eip = tss->eip;
-			frame.ebp = tss->ebp;
-			frame.esp = tss->esp;
-			frame.eax = tss->eax;
-			frame.ebx = tss->ebx;
-			frame.ecx = tss->ecx;
-			frame.edx = tss->edx;
-			frame.esi = tss->esi;
-			frame.edi = tss->edi;
-			frame.flags = tss->eflags;
-
-			panic("double fault!\n");
-
-			break;
-		}
-
-		// exceptions we can handle
-		// (most of them only when occurring in userland)
-
-		case 0:		// Divide Error Exception (#DE)
-			unexpected_exception(&frame, B_DIVIDE_ERROR, SIGFPE);
-			break;
-
-		case 1:		// Debug Exception (#DB)
-			ret = i386_handle_debug_exception(&frame);
-			break;
-
-		case 3:		// Breakpoint Exception (#BP)
-			ret = i386_handle_breakpoint_exception(&frame);
-			break;
-
-		case 4:		// Overflow Exception (#OF)
-			unexpected_exception(&frame, B_OVERFLOW_EXCEPTION, SIGTRAP);
-			break;
-
-		case 5:		// BOUND Range Exceeded Exception (#BR)
-			unexpected_exception(&frame, B_BOUNDS_CHECK_EXCEPTION, SIGTRAP);
-			break;
-
-		case 6:		// Invalid Opcode Exception (#UD)
-			unexpected_exception(&frame, B_INVALID_OPCODE_EXCEPTION, SIGILL);
-			break;
-
-		case 13: 	// General Protection Exception (#GP)
-			unexpected_exception(&frame, B_GENERAL_PROTECTION_FAULT, SIGKILL);
-			break;
-
-		case 14: 	// Page-Fault Exception (#PF)
-		{
-			bool kernelDebugger = debug_debugger_running();
-			unsigned int cr2;
-			addr_t newip;
-
-			asm("movl %%cr2, %0" : "=r" (cr2));
-
-			if (kernelDebugger) {
-				// if this thread has a fault handler, we're allowed to be here
-				if (thread && thread->fault_handler != NULL) {
-					frame.eip = thread->fault_handler;
-					break;
-				}
-
-				// otherwise, not really
-				panic("page fault in debugger without fault handler! Touching "
-					"address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
-				break;
-			} else if ((frame.flags & 0x200) == 0) {
-				// if the interrupts were disabled, and we are not running the kernel startup
-				// the page fault was not allowed to happen and we must panic
-				panic("page fault, but interrupts were disabled. Touching address "
-					"%p from eip %p\n", (void *)cr2, (void *)frame.eip);
-				break;
-			} else if (thread != NULL && thread->page_faults_allowed < 1) {
-				panic("page fault not allowed at this place. Touching address "
-					"%p from eip %p\n", (void *)cr2, (void *)frame.eip);
-			}
-
-			enable_interrupts();
-
-			ret = vm_page_fault(cr2, frame.eip,
-				(frame.error_code & 0x2) != 0,	// write access
-				(frame.error_code & 0x4) != 0,	// userland
-				&newip);
-			if (newip != 0) {
-				// the page fault handler wants us to modify the iframe to set the
-				// IP the cpu will return to to be this ip
-				frame.eip = newip;
-			}
-			break;
-		}
-
-		case 16: 	// x87 FPU Floating-Point Error (#MF)
-			unexpected_exception(&frame, B_FLOATING_POINT_EXCEPTION, SIGFPE);
-			break;
-
-		case 17: 	// Alignment Check Exception (#AC)
-			unexpected_exception(&frame, B_ALIGNMENT_EXCEPTION, SIGTRAP);
-			break;
-
-		case 19: 	// SIMD Floating-Point Exception (#XF)
-			unexpected_exception(&frame, B_FLOATING_POINT_EXCEPTION, SIGFPE);
-			break;
-
-		case 99:	// syscall
-		{
-			uint64 retcode;
-			unsigned int args[MAX_ARGS];
-
-#if 0
-{
-			int i;
-			dprintf("i386_handle_trap: syscall %d, count %d, ptr 0x%x\n", frame.eax, frame.ecx, frame.edx);
-			dprintf(" call stack:\n");
-			for(i=0; i<frame.ecx; i++)
-				dprintf("\t0x%x\n", ((unsigned int *)frame.edx)[i]);
+	vm_page_fault(cr2, frame->eip,
+		(frame->error_code & 0x2) != 0,	// write access
+		(frame->error_code & 0x4) != 0,	// userland
+		&newip);
+	if (newip != 0) {
+		// the page fault handler wants us to modify the iframe to set the
+		// IP the cpu will return to to be this ip
+		frame->eip = newip;
+	}
 }
-#endif
-			/* syscall interface works as such:
-			 *  %eax has syscall #
-			 *  %esp + 4 points to the syscall parameters
-			 */
-			if (frame.eax >= 0 && frame.eax < kSyscallCount) {
-				void *params = (void*)(frame.user_esp + 4);
-				int paramSize = kSyscallInfos[frame.eax].parameter_size;
-				if (IS_KERNEL_ADDRESS((addr_t)params)
-					|| user_memcpy(args, params, paramSize) < B_OK) {
-					retcode =  B_BAD_ADDRESS;
-				} else
-					ret = syscall_dispatcher(frame.eax, (void *)args, &retcode);
-			} else {
-				// invalid syscall number
-				retcode = EINVAL;
-			}
-			frame.eax = retcode & 0xffffffff;
-			frame.edx = retcode >> 32;
-			break;
-		}
 
-		default:
-			if (frame.vector >= ARCH_INTERRUPT_BASE) {
-				bool levelTriggered = pic_is_level_triggered(frame.vector);
 
-				// This is a workaround for spurious assertions of interrupts 7/15
-				// which seems to be an often seen problem on the PC platform
-				if (pic_is_spurious_interrupt(frame.vector - ARCH_INTERRUPT_BASE)) {
-					TRACE(("got spurious interrupt at vector %ld\n", frame.vector));
-					break;
-				}
+static void
+hardware_interrupt(struct iframe* frame)
+{
+	bool levelTriggered = pic_is_level_triggered(frame->vector);
+	int ret;
 
-				if (!levelTriggered)
-					pic_end_of_interrupt(frame.vector);
-
-				ret = int_io_interrupt_handler(frame.vector - ARCH_INTERRUPT_BASE,
-					levelTriggered);
-
-				if (levelTriggered)
-					pic_end_of_interrupt(frame.vector);
-			} else {
-				char name[32];
-				panic("i386_handle_trap: unhandled trap 0x%lx (%s) at ip 0x%lx, "
-					"thread 0x%lx!\n", frame.vector,
-					exception_name(frame.vector, name, sizeof(name)), frame.eip,
-					thread ? thread->id : -1);
-				ret = B_HANDLED_INTERRUPT;
-			}
-			break;
+	// This is a workaround for spurious assertions of interrupts 7/15
+	// which seems to be an often seen problem on the PC platform
+	if (pic_is_spurious_interrupt(frame->vector - ARCH_INTERRUPT_BASE)) {
+		TRACE(("got spurious interrupt at vector %ld\n", frame->vector));
+		return;
 	}
+
+	if (!levelTriggered)
+		pic_end_of_interrupt(frame->vector);
+
+	ret = int_io_interrupt_handler(frame->vector - ARCH_INTERRUPT_BASE,
+		levelTriggered);
+
+	if (levelTriggered)
+		pic_end_of_interrupt(frame->vector);
 
 	if (ret == B_INVOKE_SCHEDULER) {
 		cpu_status state = disable_interrupts();
@@ -582,29 +519,15 @@ i386_handle_trap(struct iframe frame)
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(state);
 	}
-
-	if (frame.cs == USER_CODE_SEG) {
-		enable_interrupts();
-			// interrupts are not enabled at this point if we came from
-			// a hardware interrupt
-		thread_at_kernel_exit();
-		i386_init_user_debug_at_kernel_exit(&frame);
-	}
-
-//	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
-
-	disable_interrupts();
-
-	if (thread)
-		x86_pop_iframe(&thread->arch_info.iframes);
-	else
-		x86_pop_iframe(&gBootFrameStack);
 }
 
 
 status_t
 arch_int_init(kernel_args *args)
 {
+	int i;
+	interrupt_handler_function** table;
+
 	// set the global sIDT variable
 	sIDT = (desc_table *)args->arch_args.vir_idt;
 
@@ -649,6 +572,7 @@ arch_int_init(kernel_args *args)
 	set_intr_gate(46,  &trap46);
 	set_intr_gate(47,  &trap47);
 
+	set_system_gate(98, &trap98);	// for performance testing only
 	set_system_gate(99, &trap99);
 
 	set_intr_gate(251, &trap251);
@@ -656,6 +580,35 @@ arch_int_init(kernel_args *args)
 	set_intr_gate(253, &trap253);
 	set_intr_gate(254, &trap254);
 	set_intr_gate(255, &trap255);
+
+	// init interrupt handler table
+	table = gInterruptHandlerTable;
+
+	// defaults
+	for (i = 0; i < ARCH_INTERRUPT_BASE; i++)
+		table[i] = invalid_exception;
+	for (i = ARCH_INTERRUPT_BASE; i < INTERRUPT_HANDLER_TABLE_SIZE; i++)
+		table[i] = hardware_interrupt;
+
+	table[0] = unexpected_exception;	// Divide Error Exception (#DE)
+	table[1] = x86_handle_debug_exception; // Debug Exception (#DB)
+	table[2] = fatal_exception;			// NMI Interrupt
+	table[3] = x86_handle_breakpoint_exception; // Breakpoint Exception (#BP)
+	table[4] = unexpected_exception;	// Overflow Exception (#OF)
+	table[5] = unexpected_exception;	// BOUND Range Exceeded Exception (#BR)
+	table[6] = unexpected_exception;	// Invalid Opcode Exception (#UD)
+	table[7] = fatal_exception;			// Device Not Available Exception (#NM)
+	table[8] = double_fault_exception;	// Double Fault Exception (#DF)
+	table[9] = fatal_exception;			// Coprocessor Segment Overrun
+	table[10] = fatal_exception;		// Invalid TSS Exception (#TS)
+	table[11] = fatal_exception;		// Segment Not Present (#NP)
+	table[12] = fatal_exception;		// Stack Fault Exception (#SS)
+	table[13] = unexpected_exception;	// General Protection Exception (#GP)
+	table[14] = page_fault_exception;	// Page-Fault Exception (#PF)
+	table[16] = unexpected_exception;	// x87 FPU Floating-Point Error (#MF)
+	table[17] = unexpected_exception;	// Alignment Check Exception (#AC)
+	table[18] = fatal_exception;		// Machine-Check Exception (#MC)
+	table[19] = unexpected_exception;	// SIMD Floating-Point Exception (#XF)
 
 	return B_OK;
 }

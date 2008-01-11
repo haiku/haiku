@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include <boot_device.h>
+#include <commpage.h>
 #include <smp.h>
 #include <tls.h>
 #include <vm.h>
@@ -21,7 +22,6 @@
 #include <arch_system_info.h>
 #include <arch/x86/selector.h>
 #include <boot/kernel_args.h>
-#include <arch/x86/commpage.h>
 
 #include "interrupts.h"
 
@@ -75,6 +75,16 @@ segment_descriptor *gGDT = NULL;
 static uint32 sDoubleFaultStack[10240];
 
 static x86_cpu_module_info *sCpuModule;
+
+
+extern void	memcpy_generic(void* dest, const void* source, size_t count);
+extern int	memcpy_generic_end;
+
+x86_optimized_functions gOptimizedFunctions = {
+	.memcpy		= memcpy_generic,
+	.memcpy_end	= &memcpy_generic_end
+};
+
 
 /**	Disable CPU caches, and invalidate them. */
 
@@ -516,9 +526,6 @@ arch_cpu_init_post_vm(kernel_args *args)
 	// setup SSE2/3 support
 	init_sse();
 
-	// initialize the commpage support
-	commpage_init();
-
 	return B_OK;
 }
 
@@ -544,6 +551,24 @@ arch_cpu_init_post_modules(kernel_args *args)
 	// initialize MTRRs if available
 	if (x86_count_mtrrs() > 0)
 		call_all_cpus(&init_mtrrs, NULL);
+
+	// get optimized functions from the CPU module
+	if (sCpuModule != NULL && sCpuModule->get_optimized_functions != NULL) {
+		x86_optimized_functions functions;
+		memset(&functions, 0, sizeof(functions));
+
+		sCpuModule->get_optimized_functions(&functions);
+
+		if (functions.memcpy != NULL) {
+			gOptimizedFunctions.memcpy = functions.memcpy;
+			gOptimizedFunctions.memcpy_end = functions.memcpy_end;
+		}
+	}
+
+	// put the optimized functions into the commpage
+	fill_commpage_entry(COMMPAGE_ENTRY_X86_MEMCPY, gOptimizedFunctions.memcpy,
+		(addr_t)gOptimizedFunctions.memcpy_end
+			- (addr_t)gOptimizedFunctions.memcpy);
 
 	return B_OK;
 }

@@ -54,6 +54,28 @@ static status_t deliver_signal(struct thread *thread, uint signal,
 	uint32 flags);
 
 
+/*!	Updates the thread::flags field according to what signals are pending.
+	Interrupts must be disabled and the thread lock must be held.
+*/
+static void
+update_thread_signals_flag(struct thread* thread)
+{
+	if (atomic_get(&thread->sig_pending) & ~atomic_get(&thread->sig_block_mask))
+		atomic_or(&thread->flags, THREAD_FLAGS_SIGNALS_PENDING);
+	else
+		atomic_and(&thread->flags, ~THREAD_FLAGS_SIGNALS_PENDING);
+}
+
+
+static void
+update_current_thread_signals_flag()
+{
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	update_thread_signals_flag(thread_get_current_thread());
+}
+
+
 static bool
 notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
 	bool deadly)
@@ -246,12 +268,16 @@ handle_signals(struct thread *thread)
 				(handler->sa_mask | SIGNAL_TO_MASK(signal)) & BLOCKABLE_SIGNALS);
 		}
 
+		update_current_thread_signals_flag();
+
 		return reschedule;
 	}
 
 	// only restart if SA_RESTART was set on at least one handler
 	if (restart)
 		arch_check_syscall_restart(thread);
+
+	update_current_thread_signals_flag();
 
 	return reschedule;
 }
@@ -358,6 +384,9 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 			}
 			break;
 	}
+
+	update_thread_signals_flag(thread);
+
 	return B_OK;
 }
 
@@ -482,6 +511,8 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 			default:
 				return B_BAD_VALUE;
 		}
+
+		update_current_thread_signals_flag();
 	}
 
 	if (oldSet != NULL)
@@ -631,6 +662,8 @@ sigsuspend(const sigset_t *mask)
 		state = disable_interrupts();
 		GRAB_THREAD_LOCK();
 
+		update_thread_signals_flag(thread);
+
 		scheduler_reschedule();
 
 		RELEASE_THREAD_LOCK();
@@ -642,6 +675,8 @@ sigsuspend(const sigset_t *mask)
 
 	// restore the original block mask
 	atomic_set(&thread->sig_block_mask, oldMask);
+
+	update_current_thread_signals_flag();
 
 	// we're not supposed to actually succeed
 	// ToDo: could this get us into trouble with SA_RESTART handlers?
@@ -668,6 +703,8 @@ sigpending(sigset_t *set)
 bigtime_t
 _user_set_alarm(bigtime_t time, uint32 mode)
 {
+	syscall_64_bit_return_value();
+
 	return set_alarm(time, mode);
 }
 

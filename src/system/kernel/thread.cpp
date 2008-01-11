@@ -220,6 +220,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	else
 		strcpy(thread->name, "unnamed thread");
 
+	thread->flags = 0;
 	thread->id = threadID >= 0 ? threadID : allocate_thread_id();
 	thread->team = NULL;
 	thread->cpu = cpu;
@@ -408,6 +409,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		return status;
 	}
 
+	thread->kernel_stack_top = thread->kernel_stack_base + KERNEL_STACK_SIZE;
+
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
@@ -500,6 +503,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 			status = thread->user_stack_area;
 			kill_thread(thread->id);
 		}
+
+		user_debug_update_new_thread_flags(thread->id);
 
 		// copy the user entry over to the args field in the thread struct
 		// the function this will call will immediately switch the thread into
@@ -1058,6 +1063,7 @@ _dump_thread_info(struct thread *thread)
 		strerror(thread->kernel_errno));
 	kprintf("kernel_time:        %Ld\n", thread->kernel_time);
 	kprintf("user_time:          %Ld\n", thread->user_time);
+	kprintf("flags:              0x%lx\n", thread->flags);
 	kprintf("architecture dependant section:\n");
 	arch_thread_dump_info(&thread->arch_info);
 }
@@ -1458,26 +1464,20 @@ thread_get_thread_struct_locked(thread_id id)
 	Called in the interrupt handler code when a thread enters
 	the kernel for any reason.
 	Only tracks time for now.
+	Interrupts are disabled.
 */
 void
-thread_at_kernel_entry(void)
+thread_at_kernel_entry(bigtime_t now)
 {
 	struct thread *thread = thread_get_current_thread();
-	cpu_status state;
-	bigtime_t now;
 
-	TRACE(("thread_atkernel_entry: entry thread %ld\n", thread->id));
-
-	state = disable_interrupts();
+	TRACE(("thread_at_kernel_entry: entry thread %ld\n", thread->id));
 
 	// track user time
-	now = system_time();
 	thread->user_time += now - thread->last_time;
 	thread->last_time = now;
 
 	thread->in_kernel = true;
-
-	restore_interrupts(state);
 }
 
 
@@ -1492,7 +1492,7 @@ thread_at_kernel_exit(void)
 	cpu_status state;
 	bigtime_t now;
 
-	TRACE(("thread_atkernel_exit: exit thread %ld\n", thread->id));
+	TRACE(("thread_at_kernel_exit: exit thread %ld\n", thread->id));
 
 	if (handle_signals(thread)) {
 		state = disable_interrupts();
@@ -1513,6 +1513,26 @@ thread_at_kernel_exit(void)
 	thread->last_time = now;
 
 	restore_interrupts(state);
+}
+
+
+/*!	The quick version of thread_kernel_exit(), in case no signals are pending
+	and no debugging shall be done.
+	Interrupts are disabled in this case.
+*/
+void
+thread_at_kernel_exit_no_signals(void)
+{
+	struct thread *thread = thread_get_current_thread();
+
+	TRACE(("thread_at_kernel_exit_no_signals: exit thread %ld\n", thread->id));
+
+	thread->in_kernel = false;
+
+	// track kernel time
+	bigtime_t now = system_time();
+	thread->kernel_time += now - thread->last_time;
+	thread->last_time = now;
 }
 
 

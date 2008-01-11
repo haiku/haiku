@@ -11,6 +11,7 @@ UsePrivateHeaders kernel [ FDirName kernel arch $(TARGET_ARCH) ]
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
 KernelStaticLibrary libx86 :
+	arch_commpage.cpp
 	arch_cpu.c
 	arch_debug.cpp
 	arch_debug_console.c
@@ -20,6 +21,7 @@ KernelStaticLibrary libx86 :
 #	arch_selector.c
 	arch_real_time_clock.c
 	arch_smp.c
+	arch_string.S
 	arch_thread.c
 	arch_timer.c
 	arch_vm.cpp
@@ -31,7 +33,6 @@ KernelStaticLibrary libx86 :
 	apm.cpp
 	bios.cpp
 	cpuid.S
-	commpage.c
 	syscall.S
 
 	generic_vm_physical_page_mapper.cpp
@@ -39,6 +40,10 @@ KernelStaticLibrary libx86 :
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 ;
 
+CreateAsmStructOffsetsHeader asm_offsets.h : asm_offsets.cpp ;
+
 # We need to specify the dependency on the generated syscalls file explicitly.
 Includes [ FGristFiles arch_x86.S arch_interrupts.S ]
 	: <syscalls>syscall_numbers.h ;
+Includes [ FGristFiles arch_interrupts.S ]
+	: <syscalls>syscall_table.h ;

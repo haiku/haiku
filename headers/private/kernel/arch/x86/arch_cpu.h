@@ -9,14 +9,21 @@
 #define _KERNEL_ARCH_x86_CPU_H
 
 
+#ifndef _ASSEMBLER
+
 #include <module.h>
 #include <arch/x86/descriptors.h>
+
+#endif	// !_ASSEMBLER
 
 
 // MSR registers (possibly Intel specific)
 #define IA32_MSR_APIC_BASE				0x1b
 
 #define IA32_MSR_MTRR_CAPABILITIES		0xfe
+#define IA32_MSR_SYSENTER_CS			0x174
+#define IA32_MSR_SYSENTER_ESP			0x175
+#define IA32_MSR_SYSENTER_EIP			0x176
 #define IA32_MSR_MTRR_DEFAULT_TYPE		0x2ff
 #define IA32_MSR_MTRR_PHYSICAL_BASE_0	0x200
 #define IA32_MSR_MTRR_PHYSICAL_MASK_0	0x201
@@ -81,6 +88,20 @@
 #define IA32_MTR_WRITE_PROTECTED	5
 #define IA32_MTR_WRITE_BACK			6
 
+
+// iframe types
+#define IFRAME_TYPE_SYSCALL	0x1
+#define IFRAME_TYPE_OTHER	0x2
+#define IFRAME_TYPE_MASK	0xf
+
+
+#ifndef _ASSEMBLER
+
+typedef struct x86_optimized_functions {
+	void 	(*memcpy)(void* dest, const void* source, size_t count);
+	void*	memcpy_end;
+} x86_optimized_functions;
+
 typedef struct x86_cpu_module_info {
 	module_info	info;
 	uint32		(*count_mtrrs)(void);
@@ -89,6 +110,8 @@ typedef struct x86_cpu_module_info {
 	void		(*set_mtrr)(uint32 index, uint64 base, uint64 length, uint8 type);
 	status_t	(*get_mtrr)(uint32 index, uint64 *_base, uint64 *_length,
 					uint8 *_type);
+
+	void		(*get_optimized_functions)(x86_optimized_functions* functions);
 } x86_cpu_module_info;
 
 
@@ -110,6 +133,7 @@ struct tss {
 };
 
 struct iframe {
+	uint32 type;	// iframe type
 	uint32 gs;
 	uint32 fs;
 	uint32 es;
@@ -277,5 +301,6 @@ extern segment_descriptor *gGDT;
 }	// extern "C" {
 #endif
 
+#endif	// !_ASSEMBLER
 
 #endif	/* _KERNEL_ARCH_x86_CPU_H */

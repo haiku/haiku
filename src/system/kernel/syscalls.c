@@ -158,6 +158,8 @@ _user_is_computer_on(void)
 static inline int64
 _user_restore_signal_frame()
 {
+	syscall_64_bit_return_value();
+
 	return arch_restore_signal_frame();
 }
 

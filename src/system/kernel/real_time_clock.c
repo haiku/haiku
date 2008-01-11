@@ -9,9 +9,11 @@
 #include <KernelExport.h>
 
 #include <arch/real_time_clock.h>
+#include <commpage.h>
 #include <real_time_clock.h>
 #include <real_time_data.h>
 #include <syscalls.h>
+#include <thread.h>
 
 #include <stdlib.h>
 
@@ -90,27 +92,8 @@ rtc_debug(int argc, char **argv)
 status_t
 rtc_init(kernel_args *args)
 {
-	void *clonedRealTimeData;
-
-	area_id area = create_area("real time data", (void **)&sRealTimeData,
-		B_ANY_KERNEL_ADDRESS, PAGE_ALIGN(sizeof(struct real_time_data)),
-		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK) {
-		panic("rtc_init: error creating real time data area\n");
-		return area;
-	}
-
-	// On some systems like x86, a page cannot be read-only in userland and
-	// writable in the kernel. Therefore, we clone the real time data area
-	// here for user access; it doesn't hurt on other platforms, too.
-	// The area is used to share time critical information, such as the system
-	// time conversion factor which can change at any time.
-
-	if (clone_area("real time data userland", &clonedRealTimeData,
-			B_ANY_KERNEL_ADDRESS, B_READ_AREA, area) < B_OK) {
-		dprintf("rtc_init: error creating real time data userland area\n");
-		// we don't panic because it's not kernel critical
-	}
+	sRealTimeData = (struct real_time_data*)allocate_commpage_entry(
+		COMMPAGE_ENTRY_REAL_TIME_DATA, sizeof(struct real_time_data));
 
 	arch_rtc_init(args, sRealTimeData);
 	rtc_hw_to_system();
@@ -242,6 +225,8 @@ _kern_get_timezone(time_t *_timezoneOffset, bool *_daylightSavingTime)
 bigtime_t
 _user_system_time(void)
 {
+	syscall_64_bit_return_value();
+
 	return system_time();
 }
 

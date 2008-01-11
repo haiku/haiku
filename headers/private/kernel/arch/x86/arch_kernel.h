@@ -5,7 +5,9 @@
 #ifndef _KERNEL_ARCH_x86_KERNEL_H
 #define _KERNEL_ARCH_x86_KERNEL_H
 
-#include <arch/cpu.h>
+#ifndef _ASSEMBLER
+#	include <arch/cpu.h>
+#endif
 
 // memory layout
 #define KERNEL_BASE 0x80000000

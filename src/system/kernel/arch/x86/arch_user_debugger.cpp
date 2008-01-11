@@ -512,6 +512,21 @@ arch_destroy_thread_debug_info(struct arch_thread_debug_info *info)
 
 
 void
+arch_update_thread_single_step()
+{
+	if (struct iframe* frame = i386_get_user_iframe()) {
+		struct thread* thread = thread_get_current_thread();
+	
+		// set/clear TF in EFLAGS depending on if single stepping is desired
+		if (thread->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP)
+			frame->flags |= (1 << X86_EFLAGS_TF);
+		else
+			frame->flags &= ~(1 << X86_EFLAGS_TF);
+	}
+}
+
+
+void
 arch_set_debug_cpu_state(const struct debug_cpu_state *cpuState)
 {
 	if (struct iframe *frame = i386_get_user_iframe()) {
@@ -613,6 +628,15 @@ arch_clear_watchpoint(void *address)
 }
 
 
+bool
+arch_has_breakpoints(struct arch_team_debug_info *info)
+{
+	// Reading info->dr7 is atomically, so we don't need to lock. The caller
+	// has to ensure, that the info doesn't go away.
+	return (info->dr7 != X86_BREAKPOINTS_DISABLED_DR7);
+}
+
+
 #if KERNEL_BREAKPOINTS
 
 status_t
@@ -683,14 +707,18 @@ arch_clear_kernel_watchpoint(void *address)
 
 
 /**
- *	Interrupts are enabled.
+ *	Interrupts are disabled.
  */
 void
-i386_init_user_debug_at_kernel_exit(struct iframe *frame)
+x86_init_user_debug_at_kernel_exit(struct iframe *frame)
 {
 	struct thread *thread = thread_get_current_thread();
 
-	cpu_status state = disable_interrupts();
+#if !KERNEL_BREAKPOINTS
+	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_DEFINED))
+		return;
+#endif
+
 	GRAB_THREAD_LOCK();
 	GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
 
@@ -698,37 +726,31 @@ i386_init_user_debug_at_kernel_exit(struct iframe *frame)
 
 	// install the breakpoints
 	install_breakpoints(teamInfo);
-	thread->debug_info.arch_info.flags |= X86_THREAD_DEBUG_DR7_SET;
 
-	// set/clear TF in EFLAGS depending on if single stepping is desired
-	if (thread->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP)
-		frame->flags |= (1 << X86_EFLAGS_TF);
-	else
-		frame->flags &= ~(1 << X86_EFLAGS_TF);
-		// ToDo: Move into a function called from thread_hit_debug_event().
-		// No need to have that here in the code executed for ever kernel->user
-		// mode switch.
+	atomic_or(&thread->flags, THREAD_FLAGS_BREAKPOINTS_INSTALLED);
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
 	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
 }
 
 
 /**
- *	Interrupts may be enabled.
+ *	Interrupts are disabled.
  */
 void
-i386_exit_user_debug_at_kernel_entry()
+x86_exit_user_debug_at_kernel_entry()
 {
 	struct thread *thread = thread_get_current_thread();
 
-	cpu_status state = disable_interrupts();
+#if !KERNEL_BREAKPOINTS
+	if (!(thread->flags & THREAD_FLAGS_BREAKPOINTS_INSTALLED))
+		return;
+#endif
+
 	GRAB_THREAD_LOCK();
 
 	// disable breakpoints
 	disable_breakpoints();
-	thread->debug_info.arch_info.flags &= ~X86_THREAD_DEBUG_DR7_SET;
 
 #if KERNEL_BREAKPOINTS
 	struct team* kernelTeam = team_get_kernel_team();
@@ -737,49 +759,17 @@ i386_exit_user_debug_at_kernel_entry()
 	RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
 #endif
 
+	atomic_and(&thread->flags, ~THREAD_FLAGS_BREAKPOINTS_INSTALLED);
+
 	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-}
-
-
-/**
- *	Interrupts are disabled and the thread lock is being held.
- */
-void
-i386_reinit_user_debug_after_context_switch(struct thread *thread)
-{
-	// This function deals with a race condition: We set up the debugging
-	// registers in i386_init_user_debug_at_kernel_exit() when a userland
-	// thread is going to leave the kernel. Afterwards the thread might be
-	// preempted, though, since interrupts are enabled.
-	// X86_THREAD_DEBUG_DR7_SET indicates, when this happens.
-// TODO: We should fix this by disabling interrupts before
-// i386_init_user_debug_at_kernel_exit() is called and keep them disabled
-// until returning from the interrupt.
-
-	if (thread->debug_info.arch_info.flags & X86_THREAD_DEBUG_DR7_SET) {
-		GRAB_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
-
-		install_breakpoints(thread->team->debug_info.arch_info);
-
-		RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
-#if KERNEL_BREAKPOINTS
-	} else {
-		// we're still in the kernel
-		struct team* kernelTeam = team_get_kernel_team();
-		GRAB_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
-		install_breakpoints(kernelTeam->debug_info.arch_info);
-		RELEASE_TEAM_DEBUG_INFO_LOCK(kernelTeam->debug_info);
-#endif
-	}
 }
 
 
 /**
  *	Interrupts are disabled and will be enabled by the function.
  */
-int
-i386_handle_debug_exception(struct iframe *frame)
+void
+x86_handle_debug_exception(struct iframe *frame)
 {
 	// get debug status and control registers
 	uint32 dr6, dr7;
@@ -791,7 +781,7 @@ i386_handle_debug_exception(struct iframe *frame)
 	if (frame->cs != USER_CODE_SEG) {
 		panic("debug exception in kernel mode: dr6: 0x%lx, dr7: 0x%lx", dr6,
 			dr7);
-		return B_HANDLED_INTERRUPT;
+		return;
 	}
 
 	// check, which exception condition applies
@@ -849,34 +839,30 @@ i386_handle_debug_exception(struct iframe *frame)
 
 		enable_interrupts();
 	}
-
-	return B_HANDLED_INTERRUPT;
 }
 
 
 /**
  *	Interrupts are disabled and will be enabled by the function.
  */
-int
-i386_handle_breakpoint_exception(struct iframe *frame)
+void
+x86_handle_breakpoint_exception(struct iframe *frame)
 {
 	TRACE(("i386_handle_breakpoint_exception()\n"));
 
 	if (frame->cs != USER_CODE_SEG) {
 		panic("breakpoint exception in kernel mode");
-		return B_HANDLED_INTERRUPT;
+		return;
 	}
 
 	enable_interrupts();
 
 	user_debug_breakpoint_hit(true);
-
-	return B_HANDLED_INTERRUPT;
 }
 
 
 void
-i386_init_user_debug()
+x86_init_user_debug()
 {
 	// get debug settings
 	if (void *handle = load_driver_settings("kernel")) {

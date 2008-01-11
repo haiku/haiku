@@ -4,6 +4,7 @@
  */
 
 
+#include <commpage.h>
 #include <libroot_private.h>
 #include <real_time_data.h>
 #include <syscalls.h>
@@ -16,26 +17,16 @@
 #include <syslog.h>
 
 
-static struct real_time_data sRealTimeDefaults;
 static struct real_time_data *sRealTimeData;
 
 
 void
 __init_time(void)
 {
-	bool setDefaults = false;
-	area_id dataArea; 
-	area_info info;
+	sRealTimeData = (struct real_time_data*)
+		USER_COMMPAGE_TABLE[COMMPAGE_ENTRY_REAL_TIME_DATA];
 
-	dataArea = find_area("real time data userland");
-	if (dataArea < 0 || get_area_info(dataArea, &info) < B_OK) {
-		syslog(LOG_ERR, "error finding real time data area: %s\n", strerror(dataArea));
-		sRealTimeData = &sRealTimeDefaults;
-		setDefaults = true;
-	} else
-		sRealTimeData = (struct real_time_data *)info.address;
-
-	__arch_init_time(sRealTimeData, setDefaults);
+	__arch_init_time(sRealTimeData, false);
 }
 
 

@@ -145,7 +145,7 @@ print_iframe(struct iframe *frame)
 
 static void
 setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
-	struct iframe_stack **_frameStack, uint32 *_oldPageDirectory)
+	uint32 *_oldPageDirectory)
 {
 	struct thread *thread = NULL;
 
@@ -180,13 +180,53 @@ setup_for_thread(char *arg, struct thread **_thread, uint32 *_ebp,
 		thread = thread_get_current_thread();
 	}
 
-	// We don't have a thread pointer early in the boot process
-	if (thread != NULL)
-		*_frameStack = &thread->arch_info.iframes;
-	else
-		*_frameStack = &gBootFrameStack;
-
 	*_thread = thread;
+}
+
+
+static bool
+is_kernel_stack_address(struct thread* thread, addr_t address)
+{
+	// We don't have a thread pointer in the early boot process, but then we are
+	// on the kernel stack for sure.
+	if (thread == NULL)
+		return IS_KERNEL_ADDRESS(address);
+
+	return address >= thread->kernel_stack_base
+		&& address < thread->kernel_stack_base + KERNEL_STACK_SIZE;
+}
+
+
+static bool
+is_iframe(struct thread* thread, addr_t frame)
+{
+	return is_kernel_stack_address(thread, frame)
+		&& (*(addr_t*)frame & ~IFRAME_TYPE_MASK) == 0;
+}
+
+
+static struct iframe *
+find_previous_iframe(struct thread *thread, addr_t frame)
+{
+	// iterate backwards through the stack frames, until we hit an iframe
+	while (is_kernel_stack_address(thread, frame)) {
+		if (is_iframe(thread, frame))
+			return (struct iframe*)frame;
+
+		frame = *(addr_t*)frame;
+	}
+
+	return NULL;
+}
+
+
+static struct iframe*
+get_previous_iframe(struct thread* thread, struct iframe* frame)
+{
+	if (frame == NULL)
+		return NULL;
+
+	return find_previous_iframe(thread, frame->ebp);
 }
 
 
@@ -194,7 +234,6 @@ static int
 stack_trace(int argc, char **argv)
 {
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
-	struct iframe_stack *frameStack;
 	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
 	uint32 ebp = x86_read_ebp();
@@ -205,7 +244,7 @@ stack_trace(int argc, char **argv)
 		return 0;
 	}
 
-	setup_for_thread(argc == 2 ? argv[1] : NULL, &thread, &ebp, &frameStack,
+	setup_for_thread(argc == 2 ? argv[1] : NULL, &thread, &ebp,
 		&oldPageDirectory);
 
 	if (thread != NULL) {
@@ -224,18 +263,14 @@ stack_trace(int argc, char **argv)
 
 	kprintf("frame            caller     <image>:function + offset\n");
 
-	for (;;) {
-		bool isIFrame = false;
-		// see if the ebp matches the iframe
-		for (i = 0; i < frameStack->index; i++) {
-			if (ebp == ((uint32)frameStack->frames[i] - 8)) {
-				// it's an iframe
-				isIFrame = true;
-			}
-		}
+	bool onKernelStack = true;
 
-		if (isIFrame) {
-			struct iframe *frame = (struct iframe *)(ebp + 8);
+	for (;;) {
+		onKernelStack = onKernelStack
+			&& is_kernel_stack_address(thread, ebp);
+
+		if (onKernelStack && is_iframe(thread, ebp)) {
+			struct iframe *frame = (struct iframe *)ebp;
 
 			print_iframe(frame);
 			print_stack_frame(thread, frame->eip, ebp, frame->ebp);
@@ -328,7 +363,6 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, int32 argCount)
 static int
 show_call(int argc, char **argv)
 {
-	struct iframe_stack *frameStack;
 	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
 	uint32 ebp = x86_read_ebp();
@@ -348,7 +382,7 @@ show_call(int argc, char **argv)
 		return 0;
 	}
 
-	setup_for_thread(argc == 3 ? argv[1] : NULL, &thread, &ebp, &frameStack,
+	setup_for_thread(argc == 3 ? argv[1] : NULL, &thread, &ebp,
 		&oldPageDirectory);
 
 	int32 callIndex = strtoul(argv[argc == 3 ? 2 : 1], NULL, 0);
@@ -356,19 +390,14 @@ show_call(int argc, char **argv)
 	if (thread != NULL)
 		kprintf("thread %ld, %s\n", thread->id, thread->name);
 
-	int32 index = 1;
-	for (; index <= callIndex; index++) {
-		bool isIFrame = false;
-		// see if the ebp matches the iframe
-		for (int32 i = 0; i < frameStack->index; i++) {
-			if (ebp == ((uint32)frameStack->frames[i] - 8)) {
-				// it's an iframe
-				isIFrame = true;
-			}
-		}
+	bool onKernelStack = true;
 
-		if (isIFrame) {
-			struct iframe *frame = (struct iframe *)(ebp + 8);
+	for (int32 index = 1; index <= callIndex; index++) {
+		onKernelStack = onKernelStack
+			&& is_kernel_stack_address(thread, ebp);
+
+		if (onKernelStack && is_iframe(thread, ebp)) {
+			struct iframe *frame = (struct iframe *)ebp;
 
 			if (index == callIndex)
 				print_call(thread, frame->eip, ebp, argCount);
@@ -406,7 +435,6 @@ show_call(int argc, char **argv)
 static int
 dump_iframes(int argc, char **argv)
 {
-	struct iframe_stack *frameStack;
 	struct thread *thread = NULL;
 	int32 i;
 
@@ -424,17 +452,13 @@ dump_iframes(int argc, char **argv)
 		return 0;
 	}
 
-	// We don't have a thread pointer early in the boot process
-	if (thread != NULL)
-		frameStack = &thread->arch_info.iframes;
-	else
-		frameStack = &gBootFrameStack;
-
 	if (thread != NULL)
 		kprintf("iframes for thread 0x%lx \"%s\"\n", thread->id, thread->name);
 
-	for (i = 0; i < frameStack->index; i++) {
-		print_iframe(frameStack->frames[i]);
+	struct iframe* frame = find_previous_iframe(thread, x86_read_ebp());
+	while (frame != NULL) {
+		print_iframe(frame);
+		frame = get_previous_iframe(thread, frame);
 	}
 
 	return 0;

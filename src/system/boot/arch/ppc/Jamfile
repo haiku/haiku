@@ -1,17 +1,14 @@
 SubDir HAIKU_TOP src system boot arch ppc ;
 
-{
-	local defines =
-		_BOOT_MODE
-	;
+DEFINES += _BOOT_MODE ;
 
-	defines = [ FDefines $(defines) ] ;
-	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
-	SubDirC++Flags $(defines) -Wall -Wno-multichar -fno-rtti ;
-}
+local librootArchObjects =
+	<src!system!libroot!posix!string!arch!$(TARGET_ARCH)>arch_string.o
+;
 
 KernelMergeObject boot_arch_ppc.o :
 	arch_elf.cpp
+	$(librootArchObjects)
 ;
 
 SEARCH on [ FGristFiles arch_elf.cpp ]

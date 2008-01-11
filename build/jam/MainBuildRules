@@ -212,6 +212,118 @@ actions Ld
 	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" "$(NEEDLIBS)" $(LINKLIBS)
 }
 
+rule CreateAsmStructOffsetsHeader header : source
+{
+	# CreateAsmStructOffsetsHeader header : source
+	#
+	# Grist will be added to both header and source.
+
+	header = [ FGristFiles $(header) ] ;
+	source = [ FGristFiles $(source) ] ;
+
+	# find out which headers, defines, etc. to use
+	local headers ;
+	local sysHeaders ;
+	local defines ;
+	local flags ;
+	local includesSeparator ;
+	local localIncludesOption ;
+	local systemIncludesOption ;
+	
+	on $(header) { # use on $(1) variable values
+		if ! $(PLATFORM) in $(SUPPORTED_PLATFORMS) {
+			return ;
+		}
+
+		# headers and defines
+		headers = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+		sysHeaders = $(SUBDIRSYSHDRS) $(SYSHDRS) ;
+		defines = $(DEFINES) ;
+
+		if $(PLATFORM) = host {
+			sysHeaders += $(HOST_HDRS) ;
+			defines += $(HOST_DEFINES) ;
+	
+			if $(USES_BE_API) {
+				sysHeaders += $(HOST_BE_API_HEADERS) ;
+			}
+	
+		} else {
+			sysHeaders += $(TARGET_HDRS) ;
+			defines += $(TARGET_DEFINES) ;
+		}
+
+		# optimization flags
+		if $(DEBUG) = 0 {
+			flags += $(OPTIM) ;
+		} else {
+			flags += -O0 ;
+		}
+	
+		if $(PLATFORM) = host {
+			# warning flags
+			if $(WARNINGS) != 0 {
+				flags += $(HOST_WARNING_C++FLAGS) ;
+			}
+	
+			# debug and other flags
+			flags += $(HOST_C++FLAGS) $(HOST_DEBUG_$(DEBUG)_C++FLAGS)
+				$(SUBDIRC++FLAGS) $(C++FLAGS) ;
+		
+			if $(USES_BE_API) {
+				flags += $(HOST_BE_API_C++FLAGS) ;
+			}
+	
+			C++ on $(header) = $(HOST_C++) ;
+		
+			includesSeparator = $(HOST_INCLUDES_SEPARATOR) ;
+			localIncludesOption = $(HOST_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(HOST_SYSTEM_INCLUDES_OPTION) ;
+
+		} else {
+			# warning flags
+			if $(WARNINGS) != 0 {
+				flags += $(TARGET_WARNING_C++FLAGS) ;
+			}
+	
+			# debug and other flags
+			flags += $(TARGET_C++FLAGS) $(TARGET_DEBUG_$(DEBUG)_C++FLAGS)
+				$(SUBDIRC++FLAGS) $(C++FLAGS) ;
+	
+			C++ on $(header) = $(TARGET_C++) ;
+
+			includesSeparator = $(TARGET_INCLUDES_SEPARATOR) ;
+			localIncludesOption = $(TARGET_LOCAL_INCLUDES_OPTION) ;
+			systemIncludesOption = $(TARGET_SYSTEM_INCLUDES_OPTION) ;
+		}
+	}
+
+	# locate object, search for source, and set on target variables
+
+	Depends $(header) : $(source) ;
+	SEARCH on $(source) += $(SEARCH_SOURCE) ;
+	MakeLocateArch $(header) ;
+	LocalClean clean : $(header) ;
+
+	HDRRULE on $(source) = HdrRule ;
+	HDRSCAN on $(source) = $(HDRPATTERN) ;
+	HDRSEARCH on $(source) = $(headers) $(sysHeaders) $(STDHDRS) ;
+	HDRGRIST on $(source) = $(HDRGRIST) ;
+
+	C++FLAGS on $(header) = $(flags) ;
+	CCHDRS on $(header) = [ FIncludes $(headers) : $(localIncludesOption) ]
+		$(includesSeparator)
+		[ FSysIncludes $(sysHeaders) : $(systemIncludesOption) ] ;
+	CCDEFS on $(header) = [ FDefines $(defines) ] ;
+
+	CreateAsmStructOffsetsHeader1 $(header) : $(source) ;
+}
+
+actions CreateAsmStructOffsetsHeader1
+{
+ 	$(C++) -S "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o - \
+		| grep "#define" | sed -e 's/\$//' > "$(1)"
+}
 
 rule MergeObjectFromObjects
 {

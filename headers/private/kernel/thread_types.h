@@ -7,6 +7,7 @@
 #ifndef _KERNEL_THREAD_TYPES_H
 #define _KERNEL_THREAD_TYPES_H
 
+#ifndef _ASSEMBLER
 
 #include <cbuf.h>
 #include <smp.h>
@@ -182,6 +183,9 @@ struct team {
 typedef int32 (*thread_entry_func)(thread_func, void *);
 
 struct thread {
+	int32			flags;			// summary of events relevant in interrupt
+									// handlers (signals pending, user debugging
+									// enabled, etc.)
 	struct thread	*all_next;
 	struct thread	*team_next;
 	struct thread	*queue_next;	/* i.e. run queue, release queue, etc. */
@@ -246,6 +250,7 @@ struct thread {
 	// stack
 	area_id			kernel_stack_area;
 	addr_t			kernel_stack_base;
+	addr_t			kernel_stack_top;
 	area_id			user_stack_area;
 	addr_t			user_stack_base;
 	size_t			user_stack_size;
@@ -267,5 +272,18 @@ struct thread_queue {
 	struct thread *head;
 	struct thread *tail;
 };
+
+
+#endif	// !_ASSEMBLER
+
+
+// bits for the thread::flags field
+#define	THREAD_FLAGS_SIGNALS_PENDING		0x01
+#define	THREAD_FLAGS_DEBUG_THREAD			0x02
+#define	THREAD_FLAGS_DEBUGGER_INSTALLED		0x04
+#define	THREAD_FLAGS_BREAKPOINTS_DEFINED	0x08
+#define	THREAD_FLAGS_BREAKPOINTS_INSTALLED	0x10
+#define	THREAD_FLAGS_64_BIT_SYSCALL_RETURN	0x20
+
 
 #endif	/* _KERNEL_THREAD_TYPES_H */

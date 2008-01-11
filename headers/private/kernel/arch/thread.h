@@ -46,6 +46,9 @@ void arch_check_syscall_restart(struct thread *t);
 void arch_store_fork_frame(struct arch_fork_arg *arg);
 void arch_restore_fork_frame(struct arch_fork_arg *arg);
 
+#define arch_syscall_64_bit_return_value()
+	// overridden by architectures that need special handling
+
 #ifdef __cplusplus
 }
 #endif

@@ -9,11 +9,21 @@
 .text
 
 /* user space half of the syscall mechanism, to be copied into the commpage */
+
+// int 99 fallback
 FUNCTION(_user_syscall_int):
 	int	$99
 	ret
 SYM(_user_syscall_int_end):
 
 
+// Intel sysenter/sysexit
+FUNCTION(_user_syscall_sysenter):
+	// sysexit forces us to trash edx (-> eip) and ecx (-> esp), but they are
+	// scratch registers anyway. We use ecx right away to store esp.
+	movl	%esp, %ecx
+	sysenter
+	ret
+SYM(_user_syscall_sysenter_end):
 
 

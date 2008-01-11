@@ -14,6 +14,7 @@
 #include <arch/platform.h>
 #include <boot_item.h>
 #include <cbuf.h>
+#include <commpage.h>
 #include <condition_variable.h>
 #include <cpu.h>
 #include <debug.h>
@@ -120,6 +121,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		debug_init_post_vm(&sKernelArgs);
 		int_init_post_vm(&sKernelArgs);
 		cpu_init_post_vm(&sKernelArgs);
+		commpage_init();
 		TRACE("init system info\n");
 		system_info_init(&sKernelArgs);
 

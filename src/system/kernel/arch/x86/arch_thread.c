@@ -54,27 +54,36 @@ arch_thread_init(struct kernel_args *args)
 	else
 		i386_fnsave(sInitialState.fpu_state);
 
-	// let the asm function know the offset to the interrupt stack within struct thread
-	// I know no better ( = static) way to tell the asm function the offset
-	i386_stack_init(&((struct thread *)0)->arch_info.interrupt_stack);
-
 	return B_OK;
 }
 
 
-void
-x86_push_iframe(struct iframe_stack *stack, struct iframe *frame)
+static struct iframe *
+find_previous_iframe(addr_t frame)
 {
-	ASSERT(stack->index < IFRAME_TRACE_DEPTH);
-	stack->frames[stack->index++] = frame;
+	struct thread *thread = thread_get_current_thread();
+
+	// iterate backwards through the stack frames, until we hit an iframe
+	while (frame >= thread->kernel_stack_base
+		&& frame < thread->kernel_stack_base + KERNEL_STACK_SIZE) {
+		addr_t previousFrame = *(addr_t*)frame;
+		if ((previousFrame & ~IFRAME_TYPE_MASK) == 0)
+			return (struct iframe*)frame;
+
+		frame = previousFrame;
+	}
+
+	return NULL;
 }
 
 
-void
-x86_pop_iframe(struct iframe_stack *stack)
+static struct iframe*
+get_previous_iframe(struct iframe* frame)
 {
-	ASSERT(stack->index > 0);
-	stack->index--;
+	if (frame == NULL)
+		return NULL;
+
+	return find_previous_iframe(frame->ebp);
 }
 
 
@@ -84,14 +93,10 @@ x86_pop_iframe(struct iframe_stack *stack)
 	sure that such iframe exists; ie. from syscalls, but usually not
 	from standard kernel threads.
 */
-static struct iframe *
+static struct iframe*
 get_current_iframe(void)
 {
-	struct thread *thread = thread_get_current_thread();
-
-	ASSERT(thread->arch_info.iframes.index >= 0);
-	return thread->arch_info.iframes.frames[
-		thread->arch_info.iframes.index - 1];
+	return find_previous_iframe(x86_read_ebp());
 }
 
 
@@ -105,13 +110,12 @@ get_current_iframe(void)
 struct iframe *
 i386_get_user_iframe(void)
 {
-	struct thread *thread = thread_get_current_thread();
-	int i;
+	struct iframe* frame = get_current_iframe();
 
-	for (i = thread->arch_info.iframes.index - 1; i >= 0; i--) {
-		struct iframe *frame = thread->arch_info.iframes.frames[i];
+	while (frame != NULL) {
 		if (frame->cs == USER_CODE_SEG)
 			return frame;
+		frame = get_previous_iframe(frame);
 	}
 
 	return NULL;
@@ -320,11 +324,6 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	if ((newPageDirectory % B_PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", newPageDirectory);
 
-	// reinit debugging; necessary, if the thread was preempted after
-	// initializing debugging before returning to userland
-	if (to->team->address_space != NULL)
-		i386_reinit_user_debug_after_context_switch(to);
-
 	gX86SwapFPUFunc(from->arch_info.fpu_state, to->arch_info.fpu_state);
 	i386_context_switch(&from->arch_info, &to->arch_info, newPageDirectory);
 }
@@ -372,10 +371,6 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
 		return B_BAD_ADDRESS;
 
 	disable_interrupts();
-
-	// When entering the userspace, the iframe stack needs to be empty. After
-	// an exec() it'll still contain the iframe from the syscall, though.
-	t->arch_info.iframes.index = 0;
 
 	i386_set_tss_and_kstack(t->kernel_stack_base + KERNEL_STACK_SIZE);
 
@@ -569,4 +564,12 @@ arch_restore_fork_frame(struct arch_fork_arg *arg)
 	set_tls_context(thread);
 
 	i386_restore_frame_from_syscall(arg->iframe);
+}
+
+
+void
+arch_syscall_64_bit_return_value()
+{
+	struct thread* thread = thread_get_current_thread();
+	atomic_or(&thread->flags, THREAD_FLAGS_64_BIT_SYSCALL_RETURN);
 }

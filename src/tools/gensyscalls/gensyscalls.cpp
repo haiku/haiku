@@ -371,8 +371,16 @@ public:
 		if (!file.is_open())
 			throw IOException(string("Failed to open `") + filename + "'.");
 
+		// output syscall count macro
+		file << "#define SYSCALL_COUNT " << fSyscallCount << endl;
+		file << endl;
+
+		// assembler guard
+		file << "#ifndef _ASSEMBLER" << endl;
+		file << endl;
+
 		// output syscall count
-		file << "const int kSyscallCount = " << fSyscallCount << ";" << endl;
+		file << "const int kSyscallCount = SYSCALL_COUNT;" << endl;
 		file << endl;
 
 		// syscall infos array preamble
@@ -394,6 +402,9 @@ public:
 
 		// syscall infos array end
 		file << "};" << endl;
+
+		// assembler guard end
+		file << "#endif	// _ASSEMBLER" << endl;
 	}
 
 	void _WriteSTraceFile(const char *filename)

@@ -14,7 +14,7 @@
  * branch to the syscall vector in the commpage
  */
 
-#include <arch/x86/commpage.h>
+#include <commpage.h>
 
 #define _SYSCALL(name, n) \
 .globl name; \
@@ -22,7 +22,7 @@
 .align 8; \
 name: \
 	movl	$n,%eax; \
-	jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_SYSCALL * 4)
+	jmp	*(USER_COMMPAGE_ADDR + COMMPAGE_ENTRY_X86_SYSCALL * 4)
 
 #define SYSCALL0(name, n) _SYSCALL(name, n)
 #define SYSCALL1(name, n) _SYSCALL(name, n)
