@@ -1,0 +1,40 @@
+SubDir HAIKU_TOP 3rdparty themes ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) 3rdparty themes addons ] ;
+
+local addonSources ;
+addonSources = 
+	BackgroundsAddon.cpp
+	BeIDEAddon.cpp
+	DanoWindowDecorAddon.cpp
+	DeskbarAddon.cpp
+	EddieAddon.cpp
+	PeAddon.cpp
+	ScreensaverAddon.cpp
+	SoundplayColorAddon.cpp
+	SoundsAddon.cpp
+	TerminalAddon.cpp
+	UISettingsAddon.cpp
+	WinampSkinAddon.cpp
+;
+
+Application <3rdparty>Themes :
+	CompareMessages.cpp
+	DumpMessage.cpp
+	FileUtils.cpp
+	MakeScreenshot.cpp
+	ParseMessage.cpp
+	ThemeAddonItem.cpp
+	ThemeInterfaceView.cpp
+	ThemeItem.cpp
+	ThemeManager.cpp
+	ThemePopupTextWindow.cpp
+	ThemesAddon.cpp
+	ViewItem.cpp
+	$(addonSources)
+	: be media translation $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)
+	: Themes.rdef
+;
+
