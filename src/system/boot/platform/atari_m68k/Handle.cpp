@@ -14,7 +14,10 @@
 /*
  * (X)BIOS supports char and block devices with a separate namespace
  * for char devs handle is {DEV_PRINTER, ... DEV_CONSOLE, ...}
- * for block devs handle is the drive number.
+ * for block devs handle is either:
+ * 		 - the partition number {0=A:, 2=C:...} in logical mode.
+ * 		 - the drive number {0=A:, 1=B:, 2=ACSI-0, 10=SCSI-0, ...} 
+ *			in phys mode (RW_NOTRANSLATE).
  * BlockHandle is in devices.cpp
  * 
  * XXX: handle network devices ? not sure how TOS net extensions do this
