@@ -234,7 +234,7 @@ private:
 			// private methods called by BWindow
 			int				State(BMenuItem** _item = NULL) const;
 			void			InvokeItem(BMenuItem* item, bool now = false);
-			void			QuitTracking();
+			void			QuitTracking(bool onlyThis = true);
 
 	static	menu_info		sMenuInfo;
 	static	bool			sAltAsCommandKey;

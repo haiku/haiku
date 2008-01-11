@@ -868,8 +868,10 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 
 		case B_ENTER:
 		case B_SPACE:
-			if (fSelected)
+			if (fSelected) {
 				InvokeItem(fSelected);
+				QuitTracking(false);			
+			}
 			break;
 
 		case B_ESCAPE:
@@ -1974,6 +1976,8 @@ BMenu::InvokeItem(BMenuItem *item, bool now)
 		return;
 
 	// Do the "selected" animation
+	// TODO: Doesn't work. This is supposed to highlight
+	// and dehighlight the item, works on beos but not on haiku.
 	if (!item->Submenu() && LockLooper()) {
 		snooze(50000);
 		item->Select(true);
@@ -2379,15 +2383,19 @@ BMenu::_CustomTrackingWantsToQuit()
 
 
 void
-BMenu::QuitTracking()
+BMenu::QuitTracking(bool onlyThis)
 {
 	_SelectItem(NULL);
 	if (BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this))
 		menuBar->_RestoreFocus();
 
 	fChosenItem = NULL;
-
 	fState = MENU_STATE_CLOSED;
+
+	// Close the whole menu hierarchy
+	if (!onlyThis && _IsStickyMode())
+		_SetStickyMode(false);	
+
 	_Hide();
 }
 
