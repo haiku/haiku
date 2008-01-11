@@ -230,15 +230,10 @@ scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 	device->tf_param_mask = 0;
 	device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
-	if (ata_send_command(device, request, true, 15, ata_state_pio) != B_OK) {
+	if (ata_send_command(device, request, ATA_DRDY_REQUIRED, 15) != B_OK) {
 		return;
 	}
 		
-
-	if (ata_pio_wait_drdy(device) != B_OK) {
-		return;
-	}
-
 
 	// bits ide_error_mcr | ide_error_mc | ide_error_wp are also valid
 	// but not requested by TUR; ide_error_wp can safely be ignored, but

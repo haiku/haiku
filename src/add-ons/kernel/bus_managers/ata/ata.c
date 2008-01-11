@@ -82,12 +82,12 @@ ata_is_device_present(ide_bus_info *bus, int device)
 /**	busy-wait for device
  *	set       - bits of status register that must be set
  *	cleared   - bits of status register that must be cleared
- *	check_err - abort if error bit is set
+ *	flags     - 0 or ATA_CHECK_ERROR_BIT abort if error bit is set
  *	timeout   - waiting timeout
  */
 status_t
 ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
-		 bool check_err, bigtime_t timeout)
+		 ata_flags flags, bigtime_t timeout)
 {
 	bigtime_t startTime = system_time();
 	bigtime_t elapsedTime = 0;
@@ -99,7 +99,7 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 	for (;;) {
 		status = bus->controller->get_altstatus(bus->channel_cookie);
 
-		if (check_err && (status & ide_status_err) != 0)
+		if ((flags & ATA_CHECK_ERROR_BIT) && (status & ide_status_err) != 0)
 			return B_ERROR;
 
 		if ((status & set) == set && (status & cleared) == 0) {
@@ -112,7 +112,7 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 		if (elapsedTime > timeout)
 			return B_TIMED_OUT;
 		
-		if (elapsedTime < 100000)
+		if (elapsedTime < 150000)
 			spin(1);
 		else
 			snooze(3000);
@@ -124,7 +124,7 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 status_t
 ata_wait_for_drq(ide_bus_info *bus)
 {
-	return ata_wait(bus, ide_status_drq, 0, true, 10000000);
+	return ata_wait(bus, ide_status_drq, 0, ATA_CHECK_ERROR_BIT, 10000000);
 }
 
 
@@ -132,7 +132,7 @@ ata_wait_for_drq(ide_bus_info *bus)
 status_t
 ata_wait_for_drqdown(ide_bus_info *bus)
 {
-	return ata_wait(bus, 0, ide_status_drq, true, 1000000);
+	return ata_wait(bus, 0, ide_status_drq, ATA_CHECK_ERROR_BIT, 1000000);
 }
 
 
@@ -140,7 +140,7 @@ ata_wait_for_drqdown(ide_bus_info *bus)
 status_t
 ata_wait_for_drdy(ide_bus_info *bus)
 {
-	return ata_wait(bus, ide_status_drdy, ide_status_bsy, false, 5000000);
+	return ata_wait(bus, ide_status_drdy, ide_status_bsy, 0, 5000000);
 }
 
 
@@ -148,7 +148,7 @@ ata_wait_for_drdy(ide_bus_info *bus)
 status_t
 ata_wait_idle(ide_bus_info *bus)
 {
-	return ata_wait(bus, 0, ide_status_bsy | ide_status_drq, false, 20000);
+	return ata_wait(bus, 0, ide_status_bsy | ide_status_drq, 0, 20000);
 }
 
 
@@ -158,21 +158,19 @@ status_t
 ata_pio_wait_drdy(ide_device_info *device)
 {
 	ASSERT(device->bus->state == ata_state_pio);
-	return ata_wait(device->bus, ide_status_drdy, ide_status_bsy, false, device->pio_timeout);
+	return ata_wait(device->bus, ide_status_drdy, ide_status_bsy, 0, device->pio_timeout);
 }
 
 
 status_t
-ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy, 
-				 uint32 timeout, ata_bus_state new_state)
+ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags, bigtime_t timeout)
 {
 	ide_bus_info *bus = device->bus;
 
 	ASSERT((device->tf_param_mask & ide_mask_command) == 0);
-	ASSERT(new_state == ata_state_pio || new_state == ata_state_dma);
 	ASSERT(bus->state == ata_state_busy);
 
-	ASSERT(new_state == ata_state_pio); // XXX only pio for now
+	ASSERT((flags & ATA_DMA_TRANSFER) == 0); // XXX only pio for now
 
 	FLOW("ata_send_command: %d:%d, request %p, ccb %p, tf %02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x\n",
 		device->target_id, device->is_device1, 
@@ -183,7 +181,7 @@ ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy,
 		device->tf.raw.r[9], device->tf.raw.r[10], device->tf.raw.r[11]);
 
 	// disable Interrupts for PIO transfers
-	if (new_state == ata_state_pio) {
+	if ((flags & ATA_DMA_TRANSFER) == 0) {
 		if (bus->controller->write_device_control(bus->channel_cookie, ide_devctrl_bit3 | ide_devctrl_nien) != B_OK)
 			goto err;
 	}
@@ -198,7 +196,7 @@ ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy,
 		return B_ERROR;		
 	}
 
-	if (need_drdy && (bus->controller->get_altstatus(bus->channel_cookie) & ide_status_drdy) == 0) {
+	if ((flags & ATA_DRDY_REQUIRED) && (bus->controller->get_altstatus(bus->channel_cookie) & ide_status_drdy) == 0) {
 		TRACE("drdy not set\n");
 		ata_request_set_status(request, SCSI_SEQUENCE_FAIL);
 		return B_ERROR;
@@ -212,7 +210,8 @@ ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy,
 
 	IDE_LOCK(bus);
 
-	if (new_state == ata_state_dma) {
+	if (flags & ATA_DMA_TRANSFER) {
+		// enable interrupt
 		if (bus->controller->write_device_control(bus->channel_cookie,	ide_devctrl_bit3) != B_OK)
 			goto err_clearint;
 	}
@@ -223,9 +222,9 @@ ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy,
 
 	ASSERT(bus->state == ata_state_busy);
 
-	bus->state = new_state;
+	bus->state = (flags & ATA_DMA_TRANSFER) ? ata_state_dma : ata_state_pio;
 	if (request)
-		request->device->pio_timeout = timeout * 1000;
+		request->device->pio_timeout = timeout;
 
 	IDE_UNLOCK(bus);
 
@@ -242,19 +241,113 @@ err:
 	return B_ERROR;
 }
 
+
+/** check result of ATA command
+ *	drdy_required - true if drdy must be set by device
+ *	error_mask - bits to be checked in error register
+ *	is_write - true, if command was a write command
+ */
+
+status_t
+ata_finish_command(ide_device_info *device, ata_request *request, ata_flags flags, uint8 errorMask)
+{
+#if 0
+	ide_bus_info *bus = device->bus;
+	uint8 status;
+
+	// check IRQ timeout
+	if (bus->sync_wait_timeout) {
+		bus->sync_wait_timeout = false;
+
+		device->subsys_status = SCSI_CMD_TIMEOUT;
+		return false;
+	}
+
+	status = bus->controller->get_altstatus(bus->channel_cookie);
+
+	// if device is busy, other flags are indeterminate	
+	if ((status & ide_status_bsy) != 0) {
+		device->subsys_status = SCSI_SEQUENCE_FAIL;
+		return false;
+	}
+
+	if (drdy_required && ((status & ide_status_drdy) == 0)) {
+		device->subsys_status = SCSI_SEQUENCE_FAIL;
+		return false;
+	}
+
+	if ((status & ide_status_err) != 0) {
+		uint8 error;
+
+		if (bus->controller->read_command_block_regs(bus->channel_cookie,
+				&device->tf, ide_mask_error) != B_OK) {
+			device->subsys_status = SCSI_HBA_ERR;
+			return false;
+		}
+
+		error = device->tf.read.error & error_mask;
+
+		if ((error & ide_error_icrc) != 0) {
+			set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_LUN_COM_CRC);
+			return false;
+		}
+
+		if (is_write) {
+			if ((error & ide_error_wp) != 0) {
+				set_sense(device, SCSIS_KEY_DATA_PROTECT, SCSIS_ASC_WRITE_PROTECTED);
+				return false;
+			}
+		} else {
+			if ((error & ide_error_unc) != 0) {
+				set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_UNREC_READ_ERR);
+				return false;
+			}
+		}
+
+		if ((error & ide_error_mc) != 0) {
+			// XXX proper sense key?
+			set_sense(device, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_MEDIUM_CHANGED);
+			return false;
+		}
+
+		if ((error & ide_error_idnf) != 0) {
+			// XXX strange error code, don't really know what it means
+			set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_RANDOM_POS_ERROR);
+			return false;
+		}
+
+		if ((error & ide_error_mcr) != 0) {
+			// XXX proper sense key?
+			set_sense(device, SCSIS_KEY_UNIT_ATTENTION, SCSIS_ASC_REMOVAL_REQUESTED);
+			return false;
+		}
+
+		if ((error & ide_error_nm) != 0) {
+			set_sense(device, SCSIS_KEY_MEDIUM_ERROR, SCSIS_ASC_NO_MEDIUM);
+			return false;
+		}
+
+		if ((error & ide_error_abrt) != 0) {
+			set_sense(device, SCSIS_KEY_ABORTED_COMMAND, SCSIS_ASC_NO_SENSE);
+			return false;
+		}
+
+		// either there was no error bit set or it was masked out
+		set_sense(device, SCSIS_KEY_HARDWARE_ERROR, SCSIS_ASC_INTERNAL_FAILURE);
+		return false;
+	}
+#endif
+	return B_OK;
+}
+
+
 status_t
 ata_read_status(ide_device_info *device, uint8 *status)
 {
 	status_t result = device->bus->controller->read_command_block_regs(device->bus->channel_cookie, &device->tf, ide_mask_status);
 	if (status)
 		*status = device->tf.read.status;
-}
-
-
-status_t
-ata_finish_command(ide_device_info *device)
-{
-	return B_OK;
+	return result;
 }
 
 
@@ -296,8 +389,8 @@ ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *
 		ata_select_device(bus, 0);
 //		dprintf("altstatus device 0: %x\n", controller->get_altstatus(channel));
 
-		// wait up to 31 seconds for busy to clear, abort when error is set
-		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
+		// wait up to 31 seconds for busy to clear
+		status = ata_wait(bus, 0, ide_status_bsy, 0, 31000000);
 		if (status != B_OK) {
 			dprintf("ATA: reset_bus: timeout\n");
 			goto error;
@@ -326,8 +419,8 @@ ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *
 		ata_select_device(bus, 1);
 //		dprintf("altstatus device 1: %x\n", controller->get_altstatus(channel));
 
-		// wait up to 31 seconds for busy to clear, abort when error is set
-		status = ata_wait(bus, 0, ide_status_bsy, false, 31000000);
+		// wait up to 31 seconds for busy to clear
+		status = ata_wait(bus, 0, ide_status_bsy, 0, 31000000);
 		if (status != B_OK) {
 			dprintf("ATA: reset_bus: timeout\n");
 			goto error;
@@ -410,7 +503,7 @@ ata_dpc_PIO(ata_request *request)
 {
 	ide_device_info *device = request->device;
 	uint32 timeout = request->ccb->timeout > 0 ? 
-		request->ccb->timeout : IDE_STD_TIMEOUT;
+		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
 
 	SHOW_FLOW0(3, "");
 
@@ -657,7 +750,8 @@ ata_exec_read_write(ide_device_info *device, ata_request *request,
 	uint64 pos, size_t length, bool write)
 {
 	ide_bus_info *bus = device->bus;
-	uint32 timeout;
+	ata_flags flags = 0;
+	bigtime_t timeout;
 
 	// make a copy first as settings may get changed by user during execution	
 	request->is_write = write;
@@ -681,11 +775,13 @@ ata_exec_read_write(ide_device_info *device, ata_request *request,
 		goto err_setup;
 
 	// if no timeout is specified, use standard
-	timeout = request->ccb->timeout > 0 ? 
-		request->ccb->timeout : IDE_STD_TIMEOUT;
+	timeout = request->ccb->timeout > 0 ? request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
 
-	if (ata_send_command(device, request, !device->is_atapi, timeout,
-			request->uses_dma ? ata_state_dma : ata_state_pio) != B_OK) 
+	if (device->is_atapi)
+		flags |= ATA_DRDY_REQUIRED;
+	if (request->uses_dma)
+		flags |= ATA_DMA_TRANSFER;
+	if (ata_send_command(device, request, flags, timeout) != B_OK) 
 		goto err_send;
 
 	if (request->uses_dma) {
@@ -916,7 +1012,7 @@ device_set_feature(ide_device_info *device, int feature)
 	device->tf.write.features = feature;
 	device->tf.write.command = IDE_CMD_SET_FEATURES;
 
-	if (!send_command(device, NULL, true, 1, ata_state_sync_waiting))
+	if (!send_command(device, NULL, ATA_DRDY_REQUIRED, 1000000))
 		return false;
 
 	wait_for_sync(device->bus);
@@ -952,7 +1048,7 @@ configure_rmsn(ide_device_info *device)
 		device->tf_param_mask = 0;
 		device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
-		if (!send_command(device, NULL, true, 15, ata_state_sync_waiting))
+		if (!send_command(device, NULL, ATA_DRDY_REQUIRED, 15000000))
 			continue;
 
 		if (check_output(device, true,
@@ -1053,24 +1149,24 @@ configure_ata_device(ide_device_info *device)
 
 
 status_t
-ata_read_infoblock(ide_device_info *device, bool isAtapi)
+ata_identify_device(ide_device_info *device, bool isAtapi)
 {
 	ide_bus_info *bus = device->bus;
 
-	TRACE("ata_read_infoblock: bus %p, device %d, isAtapi %d\n", device->bus, device->is_device1, isAtapi);
+	TRACE("ata_identify_device: bus %p, device %d, isAtapi %d\n", device->bus, device->is_device1, isAtapi);
 
 	ata_select(device);
 
 	device->tf_param_mask = 0;
-	device->tf.write.command = isAtapi ? IDE_CMD_IDENTIFY_PACKET_DEVICE	: IDE_CMD_IDENTIFY_DEVICE;
+	device->tf.write.command = isAtapi ? IDE_CMD_IDENTIFY_PACKET_DEVICE : IDE_CMD_IDENTIFY_DEVICE;
 
-	if (ata_send_command(device, NULL, isAtapi ? false : true, 20, ata_state_pio) != B_OK) {
-		TRACE("ata_read_infoblock: send_command failed\n");
+	if (ata_send_command(device, NULL, isAtapi ? 0 : ATA_DRDY_REQUIRED, 20000000) != B_OK) {
+		TRACE("ata_identify_device: send_command failed\n");
 		goto error;
 	}
 
-	if (ata_wait(bus, ide_status_drq, ide_status_bsy, true, 4000000) != B_OK) {
-		TRACE("ata_read_infoblock: wait failed\n");
+	if (ata_wait(bus, ide_status_drq, ide_status_bsy, ATA_CHECK_ERROR_BIT, 4000000) != B_OK) {
+		TRACE("ata_identify_device: wait failed\n");
 		goto error;
 	}
 
@@ -1079,7 +1175,7 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 		sizeof(device->infoblock) / sizeof(uint16), false);
 
 	if (ata_wait_for_drqdown(bus) != B_OK) {
-		TRACE("ata_read_infoblock: ata_wait_for_drqdown failed\n");
+		TRACE("ata_identify_device: ata_wait_for_drqdown failed\n");
 		goto error;
 	}
 
@@ -1091,7 +1187,7 @@ ata_read_infoblock(ide_device_info *device, bool isAtapi)
 	bus->state = ata_state_busy;
 	IDE_UNLOCK(bus);
 
-	TRACE("ata_read_infoblock: success\n");
+	TRACE("ata_identify_device: success\n");
 	return B_OK;
 
 error:

@@ -28,7 +28,7 @@
 #include "wrapper.h"
 
 
-#define IDE_STD_TIMEOUT 10
+#define IDE_STD_TIMEOUT 10000000
 #define IDE_RELEASE_TIMEOUT 10000000
 
 // number of timeouts before we disable DMA automatically
@@ -118,14 +118,6 @@ typedef struct ide_device_info {
 } ide_device_info;
 
 
-/*// state as stored in sim_state of scsi_ccb
-typedef enum {
-	ide_request_normal = 0,			// this must be zero as this is initial value
-	ide_request_start_autosense = 1,
-	ide_request_autosense = 2
-} ide_request_state;*/
-
-
 // state of ide bus
 typedef enum {
 	ata_state_idle,				// not is using it
@@ -133,6 +125,15 @@ typedef enum {
 	ata_state_pio,				// bus is executing a PIO command
 	ata_state_dma				// bus is executing a DMA command
 } ata_bus_state;
+
+
+typedef enum {
+	ATA_DRDY_REQUIRED = 0x01,
+	ATA_IS_WRITE = 0x02,
+//	ATA_PIO_TRANSFER = 0x04,
+	ATA_DMA_TRANSFER = 0x08,
+	ATA_CHECK_ERROR_BIT = 0x10
+} ata_flags;
 
 
 struct ide_bus_info {
@@ -193,15 +194,16 @@ struct ide_bus_info {
 void ata_select_device(ide_bus_info *bus, int device);
 void ata_select(ide_device_info *device);
 bool ata_is_device_present(ide_bus_info *bus, int device);
-status_t ata_wait(ide_bus_info *bus, uint8 set, uint8 not_set, bool check_err, bigtime_t timeout);
+status_t ata_wait(ide_bus_info *bus, uint8 set, uint8 not_set, ata_flags flags, bigtime_t timeout);
 status_t ata_wait_for_drq(ide_bus_info *bus);
 status_t ata_wait_for_drqdown(ide_bus_info *bus);
 status_t ata_wait_for_drdy(ide_bus_info *bus);
 status_t ata_pio_wait_drdy(ide_device_info *device);
 status_t ata_reset_bus(ide_bus_info *bus, bool *_devicePresent0, uint32 *_sigDev0, bool *_devicePresent1, uint32 *_sigDev1);
 status_t ata_reset_device(ide_device_info *device, bool *_devicePresent);
-status_t ata_send_command(ide_device_info *device, ata_request *request, bool need_drdy, uint32 timeout, ata_bus_state new_state);
-status_t ata_finish_command(ide_device_info *device);
+status_t ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags, bigtime_t timeout);
+status_t ata_finish_command(ide_device_info *device, ata_request *request, ata_flags flags, uint8 errorMask);
+
 
 bool check_rw_error(ide_device_info *device, ata_request *request);
 bool check_output(ide_device_info *device, bool drdy_required, int error_mask, bool is_write);
@@ -213,7 +215,7 @@ void ata_dpc_PIO(ata_request *request);
 
 void ata_exec_io(ide_device_info *device, ata_request *request);
 
-status_t ata_read_infoblock(ide_device_info *device, bool isAtapi);
+status_t ata_identify_device(ide_device_info *device, bool isAtapi);
 
 status_t configure_ata_device(ide_device_info *device);
 
@@ -278,11 +280,6 @@ void scsi_request_sense(ide_device_info *device, ata_request *request);
 // sync.c
 
 // timeout in seconds (according to CAM)
-void start_waiting(ide_bus_info *bus, uint32 timeout, int new_state);
-void start_waiting_nolock(ide_bus_info *bus, uint32 timeout, int new_state);
-void wait_for_sync(ide_bus_info *bus);
-void cancel_irq_timeout(ide_bus_info *bus);
-
 
 void ide_dpc(void *arg);
 void access_finished(ide_bus_info *bus, ide_device_info *device);

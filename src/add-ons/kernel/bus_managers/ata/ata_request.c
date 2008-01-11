@@ -131,7 +131,7 @@ ata_request_finish(ata_request *request, bool resubmit)
 			// device sense gets reset once it's read
 			ata_request_clear_sense(request);
 
-			ASSERT(request->ccb->subsys_status == SCSI_REQ_CMP_ERR | SCSI_AUTOSNS_VALID);
+			ASSERT(request->ccb->subsys_status == (SCSI_REQ_CMP_ERR | SCSI_AUTOSNS_VALID));
 			ASSERT(request->ccb->device_status == SCSI_STATUS_CHECK_CONDITION);
 		}
 	}

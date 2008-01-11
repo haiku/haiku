@@ -159,7 +159,7 @@ scan_device(ide_device_info *device, bool isAtapi)
 {
 	dprintf("ATA: scan_device\n");
 
-	if (ata_read_infoblock(device, isAtapi) != B_OK) {
+	if (ata_identify_device(device, isAtapi) != B_OK) {
 		dprintf("ATA: couldn't read infoblock for device %p\n", device);
 		return B_ERROR;
 	}

@@ -356,7 +356,7 @@ send_packet(ide_device_info *device, ata_request *request, bool write)
 
 	SHOW_FLOW0(3, "3");
 
-	if (!send_command(device, request, false, 
+	if (!send_command(device, request, DRDY_NOT_REQUIRED, 
 			device->atapi.packet_irq_timeout, 
 			device->atapi.packet_irq ? ide_state_async_waiting : ide_state_accessing))
 		goto err_setup;
