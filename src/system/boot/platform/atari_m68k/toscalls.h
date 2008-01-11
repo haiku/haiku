@@ -67,7 +67,7 @@ struct tosbpb {
 #define Tickcal() bios(6)
 #define Getbpb(dev) (struct tosbpb *)bios(7, (uint16)dev)
 #define Bcostat(dev) bios(8, (uint16)dev)
-//#define Mediach() bios(9, )
+#define Mediach(dev) bios(9, (int16)dev)
 #define Drvmap() (uint32)bios(10)
 #define Kbshift(mode) bios(11, (uint16)mode)
 
