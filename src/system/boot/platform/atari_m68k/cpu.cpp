@@ -52,7 +52,7 @@ spin(bigtime_t microseconds)
 	bigtime_t time = system_time();
 	if (gCpuHasLPSTOP) {
 		while ((system_time() - time) < microseconds)
-			asm volatile ("lpstop;");
+			asm volatile ("nop;");//asm volatile ("lpstop;");
 	} else {
 		while ((system_time() - time) < microseconds)
 			asm volatile ("nop;");
