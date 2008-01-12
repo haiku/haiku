@@ -20,6 +20,7 @@
 
 #include "ThemesAddon.h"
 #include "UITheme.h"
+#include "Utils.h"
 
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_eddie
@@ -87,18 +88,18 @@ status_t EddieThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	if (err)
 		return err;
 	
-	if (uisettings.FindRGBColor(B_UI_DOCUMENT_BACKGROUND_COLOR, &col) >= B_OK) {
+	if (FindRGBColor(uisettings, B_UI_DOCUMENT_BACKGROUND_COLOR, 0, &col) >= B_OK) {
 		sprintf(buffer, "%02x%02x%02x", col.red, col.green, col.blue);
 		text << "BackgroundColor " << buffer << "\n";
 	}
-	if (uisettings.FindRGBColor(B_UI_DOCUMENT_TEXT_COLOR, &col) >= B_OK) {
+	if (FindRGBColor(uisettings, B_UI_DOCUMENT_TEXT_COLOR, 0, &col) >= B_OK) {
 		sprintf(buffer, "%02x%02x%02x", col.red, col.green, col.blue);
 		text << "TextColor " << buffer << "\n";
 	}
-	if (uisettings.FindRGBColor("be:c:DocSBg", &col) >= B_OK) {
+	if (FindRGBColor(uisettings, "be:c:DocSBg", 0, &col) >= B_OK) {
 		sprintf(buffer, "%02x%02x%02x", col.red, col.green, col.blue);
 		text << "SelectionColor " << buffer << "\n";
-	} else if (uisettings.FindRGBColor(B_UI_MENU_SELECTED_BACKGROUND_COLOR, &col) >= B_OK) {
+	} else if (FindRGBColor(uisettings, B_UI_MENU_SELECTED_BACKGROUND_COLOR, 0, &col) >= B_OK) {
 		sprintf(buffer, "%02x%02x%02x", col.red, col.green, col.blue);
 		text << "SelectionColor " << buffer << "\n";
 	}
@@ -133,9 +134,9 @@ status_t EddieThemesAddon::ApplyDefaultTheme(uint32 flags)
 	rgb_color bg = {255, 255, 255, 255};
 	rgb_color fg = {0, 0, 0, 255};
 	rgb_color selbg = {180, 200, 240, 255};
-	uisettings.AddRGBColor(B_UI_DOCUMENT_BACKGROUND_COLOR, bg);
-	uisettings.AddRGBColor(B_UI_DOCUMENT_TEXT_COLOR, fg);
-	uisettings.AddRGBColor("be:c:DocSBg", selbg);
+	AddRGBColor(uisettings, B_UI_DOCUMENT_BACKGROUND_COLOR, bg);
+	AddRGBColor(uisettings, B_UI_DOCUMENT_TEXT_COLOR, fg);
+	AddRGBColor(uisettings, "be:c:DocSBg", selbg);
 	theme.AddMessage(Z_THEME_UI_SETTINGS, &uisettings);
 	return ApplyTheme(theme, flags);
 }

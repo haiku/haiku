@@ -197,7 +197,11 @@ ThemeInterfaceView::AllAttached()
 	preview_frame.OffsetTo(10.0, 20.0);
 	fScreenshotPane = new BView(preview_frame, "screenshot", B_FOLLOW_ALL, B_WILL_DRAW);
 	fBox->AddChild(fScreenshotPane);
+#ifdef B_BEOS_VERSION_DANO
 	fScreenshotPane->SetViewUIColor(B_UI_PANEL_BACKGROUND_COLOR);
+#else
+	fScreenshotPane->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+#endif
 	
 	fScreenshotNone = new BStringView(BRect(), "sshotnone", _T("No Theme selected"), (uint32) 0, B_FOLLOW_ALL);
 	fScreenshotNone->SetFontSize(20.0);

@@ -20,6 +20,7 @@
 
 #include "ThemesAddon.h"
 #include "UITheme.h"
+#include "Utils.h"
 
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_beide
@@ -112,9 +113,9 @@ status_t BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	if (beideSettings.ReadAttr("AppEditorPrefs", 'rPWM', 0LL, &bp, 
 								sizeof(struct beide_editor_pref)) < B_OK)
 		return B_ERROR;
-	if (uisettings.FindRGBColor(B_UI_DOCUMENT_BACKGROUND_COLOR, &col) >= B_OK)
+	if (FindRGBColor(uisettings, B_UI_DOCUMENT_BACKGROUND_COLOR, 0, &col) >= B_OK)
 		bp.bg = col;
-	if (uisettings.FindRGBColor(B_UI_MENU_SELECTED_BACKGROUND_COLOR, &col) >= B_OK)
+	if (FindRGBColor(uisettings, B_UI_MENU_SELECTED_BACKGROUND_COLOR, 0, &col) >= B_OK)
 		bp.selbg = col;
 	
 	if (true/* || flags & UI_THEME_SETTINGS_SAVE*/) {
@@ -138,14 +139,14 @@ status_t BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 					click.AddSpecifier("View", "listview");
 					click.AddSpecifier("Window", "Environment Preferences");
 					click.AddPoint("be:view_where", BPoint(58.0,103.0));
-					err = msgr.SendMessage(click);
+					err = msgr.SendMessage(&click);
 					
 					msg.AddSpecifier("View", "Background");
 					msg.AddSpecifier("View", "colorsview");
 					msg.AddSpecifier("Window", "Environment Preferences");
 					msg.AddPoint("_drop_point_", BPoint(0,0));
 					msg.AddData("RGBColor", B_RGB_COLOR_TYPE, &bp.bg, 4);
-					err = msgr.SendMessage(msg);
+					err = msgr.SendMessage(&msg);
 					
 					msg.MakeEmpty();
 					msg.AddSpecifier("View", "Hilite");
@@ -153,12 +154,12 @@ status_t BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 					msg.AddSpecifier("Window", "Environment Preferences");
 					msg.AddPoint("_drop_point_", BPoint(0,0));
 					msg.AddData("RGBColor", B_RGB_COLOR_TYPE, &bp.selbg, 4);
-					err = msgr.SendMessage(msg);
+					err = msgr.SendMessage(&msg);
 					
 					msg.MakeEmpty();
 					msg.what = 'SSav';
 					msg.AddSpecifier("Window", "Environment Preferences");
-					err = msgr.SendMessage(msg);
+					err = msgr.SendMessage(&msg);
 				}
 			}
 		}
@@ -178,8 +179,8 @@ status_t BeIDEThemesAddon::ApplyDefaultTheme(uint32 flags)
 	BMessage uisettings;
 	rgb_color bg = {255, 255, 255, 255};
 	rgb_color selbg = {216, 216, 216, 255};
-	uisettings.AddRGBColor(B_UI_DOCUMENT_BACKGROUND_COLOR, bg);
-	uisettings.AddRGBColor(B_UI_MENU_SELECTED_BACKGROUND_COLOR, selbg);
+	AddRGBColor(uisettings, B_UI_DOCUMENT_BACKGROUND_COLOR, bg);
+	AddRGBColor(uisettings, B_UI_MENU_SELECTED_BACKGROUND_COLOR, selbg);
 	theme.AddMessage(Z_THEME_UI_SETTINGS, &uisettings);
 	return ApplyTheme(theme, flags);
 }

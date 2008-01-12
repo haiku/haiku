@@ -2,6 +2,9 @@
  * ui_settings ThemesAddon class
  */
 
+#include <BeBuild.h>
+#ifdef B_BEOS_VERSION_DANO
+
 #include <Alert.h>
 #include <Application.h>
 #include <InterfaceDefs.h>
@@ -200,3 +203,5 @@ ThemesAddon *instanciate_themes_addon()
 {
 	return (ThemesAddon *) new UISettingsThemesAddon;
 }
+
+#endif /* B_BEOS_VERSION_DANO */

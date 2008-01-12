@@ -2,6 +2,9 @@
  * window_decor ThemesAddon class
  */
 
+#include <BeBuild.h>
+#ifdef B_BEOS_VERSION_DANO
+
 #include <Alert.h>
 #include <Application.h>
 #include <Directory.h>
@@ -155,3 +158,5 @@ ThemesAddon *instanciate_themes_addon()
 {
 	return (ThemesAddon *) new DecorThemesAddon;
 }
+
+#endif /* B_BEOS_VERSION_DANO */

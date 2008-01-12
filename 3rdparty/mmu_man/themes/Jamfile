@@ -10,22 +10,22 @@ local addonSources ;
 addonSources = 
 	BackgroundsAddon.cpp
 	BeIDEAddon.cpp
+	DanoUISettingsAddon.cpp
 	DanoWindowDecorAddon.cpp
 	DeskbarAddon.cpp
 	EddieAddon.cpp
+	HaikuUISettingsAddon.cpp
 	PeAddon.cpp
 	ScreensaverAddon.cpp
 	SoundplayColorAddon.cpp
 	SoundsAddon.cpp
 	TerminalAddon.cpp
-	UISettingsAddon.cpp
 	WinampSkinAddon.cpp
 ;
 
 Application <3rdparty>Themes :
 	CompareMessages.cpp
 	DumpMessage.cpp
-	FileUtils.cpp
 	MakeScreenshot.cpp
 	ParseMessage.cpp
 	TextInputAlert.cpp
@@ -35,6 +35,7 @@ Application <3rdparty>Themes :
 	ThemeItem.cpp
 	ThemeManager.cpp
 	ThemesAddon.cpp
+	Utils.cpp
 	ViewItem.cpp
 	$(addonSources)
 	: be media translation $(TARGET_NETAPI_LIB) $(TARGET_LIBSTDC++)

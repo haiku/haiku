@@ -20,7 +20,7 @@
 
 #include "ThemesAddon.h"
 #include "UITheme.h"
-#include "FileUtils.h"
+#include "Utils.h"
 
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_terminal
@@ -158,7 +158,7 @@ status_t TerminalThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BFont tFont;
 	tp.p.font_size = 12;
 	strcpy(tp.p.font, "Courier10 BT/Roman");
-	if (termpref.FindFlat(TP_FONT, &tFont) == B_OK) {
+	if (FindFont(termpref, TP_FONT, 0, &tFont) == B_OK) {
 		font_family ff;
 		font_style fs;
 		tFont.GetFamilyAndStyle(&ff, &fs);
@@ -170,17 +170,17 @@ status_t TerminalThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	tp.p.cursor_blink_rate = 1000000;
 	tp.p.refresh_rate = 0;
 	
-	if (termpref.FindRGBColor(TP_BG, &tp.p.bg) != B_OK)
+	if (FindRGBColor(termpref, TP_BG, 0, &tp.p.bg) != B_OK)
 		tp.p.bg = make_color(255,255,255,255);
-	if (termpref.FindRGBColor(TP_FG, &tp.p.fg) != B_OK)
+	if (FindRGBColor(termpref, TP_FG, 0, &tp.p.fg) != B_OK)
 		tp.p.fg = make_color(0,0,0,255);
-	if (termpref.FindRGBColor(TP_CURBG, &tp.p.curbg) != B_OK)
+	if (FindRGBColor(termpref, TP_CURBG, 0, &tp.p.curbg) != B_OK)
 		tp.p.curbg = make_color(255,255,255,255);
-	if (termpref.FindRGBColor(TP_CURFG, &tp.p.curfg) != B_OK)
+	if (FindRGBColor(termpref, TP_CURFG, 0, &tp.p.curfg) != B_OK)
 		tp.p.curfg = make_color(0,0,0,255);
-	if (termpref.FindRGBColor(TP_SELBG, &tp.p.selbg) != B_OK)
+	if (FindRGBColor(termpref, TP_SELBG, 0, &tp.p.selbg) != B_OK)
 		tp.p.selbg = make_color(0,0,0,255);
-	if (termpref.FindRGBColor(TP_SELFG, &tp.p.selfg) != B_OK)
+	if (FindRGBColor(termpref, TP_SELFG, 0, &tp.p.selfg) != B_OK)
 		tp.p.selfg = make_color(255,255,255,255);
 	
 	if (termpref.FindInt32(TP_ENCODING, (int32 *)&tp.p.encoding) != B_OK)
@@ -218,7 +218,7 @@ status_t TerminalThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 					//msg.AddData("", 'UBYT', &(tp.p), sizeof(struct tpref));
 					msg.AddData("", 'UBYT', &(tp), sizeof(struct termprefs));
 					msg.AddSpecifier("Window", 0L);
-					err = msgr.SendMessage(msg);
+					err = msgr.SendMessage(&msg);
 				}
 			}
 		}
@@ -263,13 +263,13 @@ status_t TerminalThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	strncpy(fs, str.String(), sizeof(fs));
 	tFont.SetFamilyAndStyle(ff, fs);
 	tFont.SetSize(tp.p.font_size);
-	termpref.AddFlat(TP_FONT, &tFont);
-	termpref.AddRGBColor(TP_BG, tp.p.bg);
-	termpref.AddRGBColor(TP_FG, tp.p.fg);
-	termpref.AddRGBColor(TP_CURBG, tp.p.curbg);
-	termpref.AddRGBColor(TP_CURFG, tp.p.curfg);
-	termpref.AddRGBColor(TP_SELBG, tp.p.selbg);
-	termpref.AddRGBColor(TP_SELFG, tp.p.selfg);
+	AddFont(termpref, TP_FONT, &tFont);
+	AddRGBColor(termpref, TP_BG, tp.p.bg);
+	AddRGBColor(termpref, TP_FG, tp.p.fg);
+	AddRGBColor(termpref, TP_CURBG, tp.p.curbg);
+	AddRGBColor(termpref, TP_CURFG, tp.p.curfg);
+	AddRGBColor(termpref, TP_SELBG, tp.p.selbg);
+	AddRGBColor(termpref, TP_SELFG, tp.p.selfg);
 	termpref.AddInt32(TP_ENCODING, tp.p.encoding);
 
 	err = SetMyMessage(theme, termpref);
@@ -280,12 +280,12 @@ status_t TerminalThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage termpref;
-	termpref.AddRGBColor("term:c:bg",make_color(255,255,255,0));
-	termpref.AddRGBColor("term:c:fg",make_color(0,0,0,0));
-	termpref.AddRGBColor("term:c:curbg",make_color(0,0,0,0));
-	termpref.AddRGBColor("term:c:curfg",make_color(255,255,255,0));
-	termpref.AddRGBColor("term:c:selbg",make_color(0,0,0,0));
-	termpref.AddRGBColor("term:c:selfg",make_color(255,255,255,0));
+	AddRGBColor(termpref, "term:c:bg",make_color(255,255,255,0));
+	AddRGBColor(termpref, "term:c:fg",make_color(0,0,0,0));
+	AddRGBColor(termpref, "term:c:curbg",make_color(0,0,0,0));
+	AddRGBColor(termpref, "term:c:curfg",make_color(255,255,255,0));
+	AddRGBColor(termpref, "term:c:selbg",make_color(0,0,0,0));
+	AddRGBColor(termpref, "term:c:selfg",make_color(255,255,255,0));
 	theme.AddMessage(Z_THEME_TERMINAL_SETTINGS, &termpref);
 	return ApplyTheme(theme, flags);
 }

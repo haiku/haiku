@@ -17,6 +17,7 @@
 
 #include "ThemesAddon.h"
 #include "UITheme.h"
+#include "Utils.h"
 
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_sounds
@@ -105,8 +106,8 @@ status_t SoundsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BPath path;
 	const char *p;
 	float gain;
-	void *cookie = NULL;
-	const char *field_name;
+	int32 index;
+	char *field_name;
 	type_code field_code;
 	int32 field_count;
 	BMessage msg;
@@ -117,10 +118,10 @@ status_t SoundsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 		return err;
 
 	bmfs.RewindRefs(BMediaFiles::B_SOUNDS);
-	while (sounds.GetNextName(&cookie, 
-							&field_name, 
+	for (index = 0; sounds.GetInfo(B_ANY_TYPE, index,  
+							GET_INFO_NAME_PTR(&field_name), 
 							&field_code, 
-							&field_count) == B_OK) {
+							&field_count) == B_OK; index++) {
 		if (field_code != B_MESSAGE_TYPE)
 			continue;
 		if (sounds.FindMessage(field_name, &msg) < B_OK)

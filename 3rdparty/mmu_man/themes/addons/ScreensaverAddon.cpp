@@ -10,6 +10,8 @@
 #include <Messenger.h>
 #include <Path.h>
 #include <Roster.h>
+#include <String.h>
+#include <File.h>
 
 #include <string.h>
 #include <unistd.h>

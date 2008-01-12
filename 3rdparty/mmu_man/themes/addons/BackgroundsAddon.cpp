@@ -21,6 +21,7 @@
 
 #include "ThemesAddon.h"
 #include "UITheme.h"
+#include "Utils.h"
 
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_backgrounds
@@ -136,7 +137,7 @@ status_t BackgroundThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	// should work as the rest of the fields (grouping)
 	for (int i = 0; i < count_workspaces(); i++) {
 		//ssize_t sz = 4;
-		if (backgrounds.FindRGBColor(B__DESKTOP_COLOR, i, &col) != B_OK && i == 0)
+		if (FindRGBColor(backgrounds, B__DESKTOP_COLOR, i, &col) != B_OK && i == 0)
 		//if (backgrounds.FindData(B__DESKTOP_COLOR, (type_code)'RGBC', i, (const void **)&c, &sz) != B_OK && i == 0)
 			break; // if no color at all, don't set them
 		bs.SetDesktopColor(col, i, true);
@@ -224,7 +225,7 @@ status_t BackgroundThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	//printf("ws col cnt %d\n", last_change);
 	for (i = 0; i <= last_change; i++) {
 		col = bs.DesktopColor(i);
-		backgrounds.AddRGBColor(B__DESKTOP_COLOR, col);
+		AddRGBColor(backgrounds, B__DESKTOP_COLOR, col);
 		//backgrounds->AddData(B__DESKTOP_COLOR, (type_code)'RGBC', &col, 4);
 	}
 
@@ -242,7 +243,7 @@ status_t BackgroundThemesAddon::ApplyDefaultTheme(uint32 flags)
 	BMessage backgrounds;
 	rgb_color col = {51,102,152,255}; // Be Blues... ;)
 	backgrounds.AddBool(B_BACKGROUND_ERASE_TEXT, true);
-	backgrounds.AddRGBColor(B__DESKTOP_COLOR, col);
+	AddRGBColor(backgrounds, B__DESKTOP_COLOR, col);
 	theme.AddMessage(A_MSGNAME, &backgrounds);
 	return ApplyTheme(theme, flags);
 }

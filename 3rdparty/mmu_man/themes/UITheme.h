@@ -40,4 +40,31 @@
 #define Z_THEMES_FOLDER_NAME "UIThemes"
 #define Z_THEME_FILE_NAME "Theme"
 
+/* some field names not always defined */
+#ifndef B_BEOS_VERSION_DANO
+#define B_UI_PANEL_BACKGROUND_COLOR "be:c:PanBg"
+#define B_UI_PANEL_TEXT_COLOR "be:c:PanTx"
+#define B_UI_PANEL_LINK_COLOR "be:c:PanLn"
+#define B_UI_DOCUMENT_BACKGROUND_COLOR "be:c:DocBg"
+#define B_UI_DOCUMENT_TEXT_COLOR "be:c:DocTx"
+#define B_UI_DOCUMENT_LINK_COLOR "be:c:DocLn"
+#define B_UI_CONTROL_BACKGROUND_COLOR "be:c:CtlBg"
+#define B_UI_CONTROL_TEXT_COLOR "be:c:CtlTx"
+#define B_UI_CONTROL_BORDER_COLOR "be:c:CtlBr"
+#define B_UI_CONTROL_HIGHLIGHT_COLOR "be:c:CtlHg"
+#define B_UI_NAVIGATION_BASE_COLOR "be:c:NavBs"
+#define B_UI_NAVIGATION_PULSE_COLOR "be:c:NavPl"
+#define B_UI_SHINE_COLOR "be:c:Shine"
+#define B_UI_SHADOW_COLOR "be:c:Shadow"
+#define B_UI_TOOLTIP_BACKGROUND_COLOR "be:c:TipBg"
+#define B_UI_TOOLTIP_TEXT_COLOR "be:c:TipTx"
+#define B_UI_MENU_BACKGROUND_COLOR "be:c:MenBg"
+#define B_UI_MENU_SELECTED_BACKGROUND_COLOR "be:c:MenSBg"
+#define B_UI_MENU_ITEM_TEXT_COLOR "be:c:MenTx"
+#define B_UI_MENU_SELECTED_ITEM_TEXT_COLOR "be:c:MenSTx"
+#define B_UI_MENU_SELECTED_BORDER_COLOR "be:c:MenSBr"
+#define B_UI_SUCCESS_COLOR "be:c:Success"
+#define B_UI_FAILURE_COLOR "be:c:Failure"
+#endif
+
 #endif /* _Z_UI_THEME_H */

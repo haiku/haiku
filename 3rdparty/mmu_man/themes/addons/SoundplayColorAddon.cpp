@@ -15,6 +15,7 @@
 
 #include "ThemesAddon.h"
 #include "UITheme.h"
+#include "Utils.h"
 
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_soundplay
@@ -80,7 +81,7 @@ status_t SoundplayThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	if (err)
 		return err;
 	
-	if (uisettings.FindRGBColor(B_UI_PANEL_BACKGROUND_COLOR, &panelcol) < B_OK)
+	if (FindRGBColor(uisettings, B_UI_PANEL_BACKGROUND_COLOR, 0, &panelcol) < B_OK)
 		panelcol = make_color(216,216,216,255);
 	
 	BMessenger msgr("application/x-vnd.marcone-soundplay");
@@ -93,7 +94,7 @@ status_t SoundplayThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 			wincnt = 1;
 	}
 	BMessage msg(B_PASTE);
-	msg.AddRGBColor("RGBColor", panelcol);
+	AddRGBColor(msg, "RGBColor", panelcol);
 	msg.AddPoint("_drop_point_", BPoint(0,0));
 	// send to every window (the Playlist window needs it too)
 	for (int32 i = 0; i < wincnt; i++) {
@@ -116,7 +117,7 @@ status_t SoundplayThemesAddon::ApplyDefaultTheme(uint32 flags)
 	BMessage theme;
 	BMessage uisettings;
 	rgb_color bg = {216, 216, 216, 255};
-	uisettings.AddRGBColor(B_UI_PANEL_BACKGROUND_COLOR, bg);
+	AddRGBColor(uisettings, B_UI_PANEL_BACKGROUND_COLOR, bg);
 	theme.AddMessage(Z_THEME_UI_SETTINGS, &uisettings);
 	return ApplyTheme(theme, flags);
 }

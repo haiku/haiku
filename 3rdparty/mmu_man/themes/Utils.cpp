@@ -1,4 +1,4 @@
-#include "FileUtils.h"
+#include "Utils.h"
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
@@ -272,3 +272,66 @@ int testhook()
 	return 0;
 	return 1;
 }
+
+status_t
+FindRGBColor(BMessage &message, const char *name, int32 index, rgb_color *c)
+{
+#ifdef B_BEOS_VERSION_DANO
+	return message.FindRGBColor(name, index, c);
+#else
+	const void *data;
+	ssize_t len;
+	status_t err;
+	err = message.FindData(name, index, &data, &len);
+	if (err < B_OK)
+		return err;
+	if (len > (ssize_t)sizeof(*c))
+		return E2BIG;
+	// Hack
+	memcpy((void *)c, data, len);
+	return B_OK;
+#endif
+}
+
+
+status_t
+AddRGBColor(BMessage &message, const char *name, rgb_color a_color, type_code type)
+{
+#ifdef B_BEOS_VERSION_DANO
+	return message.AddRGBColor(name, a_color, type);
+#else
+	return message.AddData(name, type, &a_color, sizeof(a_color));
+#endif
+}
+
+
+status_t
+FindFont(BMessage &message, const char *name, int32 index, BFont *f)
+{
+#ifdef B_BEOS_VERSION_DANO
+	return message.FindFlat(name, index, f);
+#else
+	const void *data;
+	ssize_t len;
+	status_t err = message.FindData(name, index, &data, &len);
+	if (err < B_OK)
+		return err;
+	if (len > (ssize_t)sizeof(*f))
+		return E2BIG;
+	// Hack: only Dano has BFont : public BFlattenable
+	memcpy((void *)f, data, len);
+	return B_OK;
+#endif
+}
+
+
+status_t
+AddFont(BMessage &message, const char *name, BFont *f, int32 count = 1)
+{
+#ifdef B_BEOS_VERSION_DANO
+	return message.AddFlat(name, f, count);
+#else
+	return message.AddData(name, 'FONt', (void *)&f, sizeof(f), true, count);
+#endif
+}
+

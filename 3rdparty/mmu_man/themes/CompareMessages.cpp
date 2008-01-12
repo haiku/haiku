@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <Message.h>
+#include "Utils.h"
 
 /* returns true if == */
 bool CompareMessages(BMessage &a, BMessage &b)
@@ -16,7 +17,7 @@ bool CompareMessages(BMessage &a, BMessage &b)
 	
 	if (a.what != b.what)
 		return false;
-	for (index = 0; a.GetInfo(B_ANY_TYPE, index, &name, &code, &count) == B_OK; i++) {
+	for (index = 0; a.GetInfo(B_ANY_TYPE, index, GET_INFO_NAME_PTR(&name), &code, &count) == B_OK; i++) {
 		for (i = 0; i < count; i++) {
 			if (a.FindData(name, code, i, &adata, &asize) != B_OK)
 				return false;
@@ -29,7 +30,7 @@ bool CompareMessages(BMessage &a, BMessage &b)
 		}
 	}
 	/* cross compare */
-	for (index = 0; b.GetInfo(B_ANY_TYPE, index, &name, &code, &count) == B_OK; i++) {
+	for (index = 0; b.GetInfo(B_ANY_TYPE, index, GET_INFO_NAME_PTR(&name), &code, &count) == B_OK; i++) {
 		type_code acode;
 		int32 acount;
 		if (a.GetInfo(name, &acode, &acount) < B_OK)
