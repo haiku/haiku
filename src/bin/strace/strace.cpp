@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <signal.h>
 
 #include <map>
 #include <string>
@@ -76,6 +77,7 @@ static const char *kUsage =
 "                   ID.\n"
 "  -o <file>      - directs output into the specified file.\n"
 "  -S             - prints output to serial debug line.\n"
+"  -g             - turns off signal tracing.\n"
 ;
 
 // terminal color escape sequences
@@ -83,7 +85,40 @@ static const char *kUsage =
 static const char *kTerminalTextNormal	= "\33[0m";
 static const char *kTerminalTextRed		= "\33[31m";
 static const char *kTerminalTextMagenta	= "\33[35m";
+static const char *kTerminalTextBlue	= "\33[34m";
 
+static const char *kSignalName[] = {
+	/*  0 */ "SIG0",
+	/*  1 */ "SIGHUP",
+	/*  2 */ "SIGINT",
+	/*  3 */ "SIGQUIT",
+	/*  4 */ "SIGILL",
+	/*  5 */ "SIGCHLD",
+	/*  6 */ "SIGABRT",
+	/*  7 */ "SIGPIPE",
+	/*  8 */ "SIGFPE",
+	/*  9 */ "SIGKILL",
+	/* 10 */ "SIGSTOP",
+	/* 11 */ "SIGSEGV",
+	/* 12 */ "SIGCONT",
+	/* 13 */ "SIGTSTP",
+	/* 14 */ "SIGALRM",
+	/* 15 */ "SIGTERM",
+	/* 16 */ "SIGTTIN",
+	/* 17 */ "SIGTTOU",
+	/* 18 */ "SIGUSR1",
+	/* 19 */ "SIGUSR2",
+	/* 20 */ "SIGWINCH",
+	/* 21 */ "SIGKILLTHR",
+	/* 22 */ "SIGTRAP",
+	/* 23 */ "SIGPOLL",
+	/* 24 */ "SIGPROF",
+	/* 25 */ "SIGSYS", 
+	/* 26 */ "SIGURG",
+	/* 27 */ "SIGVTALRM",
+	/* 28 */ "SIGXCPU",
+	/* 29 */ "SIGXFSZ",
+};
 
 // command line args
 static int sArgc;
@@ -362,7 +397,7 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 	// print syscall name
 	if (colorize) {
 		print_to_string(&string, &length, "[%6ld] %s%s%s(",
-			message.origin.thread, kTerminalTextRed, syscall->Name().c_str(),
+			message.origin.thread, kTerminalTextBlue, syscall->Name().c_str(),
 			kTerminalTextNormal);
 	} else {
 		print_to_string(&string, &length, "[%6ld] %s(",
@@ -432,6 +467,45 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 		_kern_debug_output(buffer);
 }
 
+static
+const char *
+signal_name(int signal)
+{
+	if (signal >= 0 && signal < NSIG)
+		return kSignalName[signal];
+
+	static char buffer[32];
+	sprintf(buffer, "%d", signal);
+	return buffer;
+}
+
+// print_signal
+static
+void
+print_signal(FILE *outputFile, debug_signal_received &message,
+	bool colorize)
+{
+	char buffer[4096], *string = buffer;
+	int32 length = (int32)sizeof(buffer);
+	int signalNumber = message.signal;
+
+	// print signal name
+	if (colorize) {
+		print_to_string(&string, &length, "[%6ld] --- %s%s (%s) %s---\n",
+			message.origin.thread, kTerminalTextRed, signal_name(signalNumber),
+			strsignal(signalNumber), kTerminalTextNormal);
+	} else {
+		print_to_string(&string, &length, "[%6ld] --- %s (%s) ---\n",
+			message.origin.thread, signal_name(signalNumber),
+			strsignal(signalNumber));
+	}
+
+	// output either to file or serial debug line
+	if (outputFile != NULL)
+		fwrite(buffer, sizeof(buffer) - length, 1, outputFile);
+	else
+		_kern_debug_output(buffer);
+}
 
 // main
 int
@@ -452,6 +526,7 @@ main(int argc, const char *const *argv)
 	bool printReturnValues = true;
 	bool traceChildThreads = false;
 	bool traceTeam = false;
+	bool traceSignal = true;
 	bool serialOutput = false;
 	FILE *outputFile = stdout;
 
@@ -503,6 +578,8 @@ main(int argc, const char *const *argv)
 				traceChildThreads = true;
 			} else if (strcmp(arg, "-T") == 0) {
 				traceTeam = true;
+			} else if (strcmp(arg, "-g") == 0) {
+				traceSignal = false;
 			} else if (strcmp(arg, "-S") == 0) {
 				serialOutput = true;
 				outputFile = NULL;
@@ -596,7 +673,8 @@ main(int argc, const char *const *argv)
 	}
 
 	// set team debugging flags
-	int32 teamDebugFlags = (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0);
+	int32 teamDebugFlags = (traceTeam ? B_TEAM_DEBUG_POST_SYSCALL : 0)
+		| (traceSignal ? B_TEAM_DEBUG_SIGNALS : 0);
 	set_team_debugging_flags(nubPort, teamDebugFlags);
 
 	// set thread debugging flags
@@ -636,9 +714,17 @@ main(int argc, const char *const *argv)
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			{
 				print_syscall(outputFile, message.post_syscall, memoryReader,
-					      printArguments, contentsFlags, printReturnValues,
-					      colorize, decimalFormat);
+					printArguments, contentsFlags, printReturnValues,
+					colorize, decimalFormat);
+				break;
+			}
 
+			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
+			{
+				if (traceSignal) {
+					print_signal(outputFile, message.signal_received,
+						colorize);
+				}
 				break;
 			}
 
@@ -648,7 +734,6 @@ main(int argc, const char *const *argv)
 			case B_DEBUGGER_MESSAGE_WATCHPOINT_HIT:
 			case B_DEBUGGER_MESSAGE_SINGLE_STEP:
 			case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
-			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 			case B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED:
 			case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 			case B_DEBUGGER_MESSAGE_THREAD_CREATED:
