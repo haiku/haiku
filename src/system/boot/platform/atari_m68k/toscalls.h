@@ -148,17 +148,17 @@ extern status_t toserror(int32 err);
 
 typedef struct tos_cookie {
 	uint32 cookie;
-	enum {
+	union {
 		int32 ivalue;
 		void *pvalue;
-	}
+	};
 } tos_cookie;
 
 #define COOKIE_JAR (*((const tos_cookie **)0x5A0))
 
-static inline tos_cookie *tos_find_cookie(uint32 what)
+static inline const tos_cookie *tos_find_cookie(uint32 what)
 {
-	struct c = COOKIE_JAR;
+	const tos_cookie *c = COOKIE_JAR;
 	while (c && (c->cookie)) {
 		if (c->cookie == what)
 			return c;
