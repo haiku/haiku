@@ -99,8 +99,9 @@ ata_request_finish(ata_request *request, bool resubmit)
 
 	ASSERT(ccb);
 
-	TRACE("ata_request_finish: request %p, subsys_status 0x%02x, senseKey %02x\n",
-		request, ccb->subsys_status, request->senseKey);
+	if (ccb->subsys_status != SCSI_REQ_CMP || request->senseKey)
+		TRACE("ata_request_finish: request %p, subsys_status 0x%02x, senseKey %02x\n",
+			request, ccb->subsys_status, request->senseKey);
 
 	// when the request completed and has set sense
     // data, report this to the scsci stack by setting 

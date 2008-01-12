@@ -819,8 +819,8 @@ ata_exec_pio_transfer(ata_request *request)
 	uint32 timeout = request->ccb->timeout > 0 ? 
 		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
 
-	FLOW("ata_exec_pio_transfer: length %d, left_blocks %d, left_sg_elem %d, cur_sg_ofs %d\n",
-		request->ccb->data_length, device->left_blocks, device->left_sg_elem, device->cur_sg_ofs);
+//	FLOW("ata_exec_pio_transfer: length %d, left_blocks %d, left_sg_elem %d, cur_sg_ofs %d\n",
+//		request->ccb->data_length, device->left_blocks, device->left_sg_elem, device->cur_sg_ofs);
 
 
 	while (device->left_blocks > 0) {

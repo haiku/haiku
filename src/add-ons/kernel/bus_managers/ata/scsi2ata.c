@@ -249,6 +249,8 @@ scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 static bool
 scsi_synchronize_cache(ide_device_info *device, ata_request *request)
 {
+	TRACE("scsi_synchronize_cache\n");
+
 	// we should also ask for FLUSH CACHE support, but everyone denies it
 	// (looks like they cheat to gain some performance advantage, but
 	//  that's pretty useless: everyone does it...)
@@ -276,6 +278,8 @@ scsi_synchronize_cache(ide_device_info *device, ata_request *request)
 static bool
 scsi_load_eject(ide_device_info *device, ata_request *request, bool load)
 {
+	TRACE("scsi_load_eject\n");
+
 	if (load) {
 		// ATA doesn't support loading
 		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_PARAM_NOT_SUPPORTED);
@@ -370,6 +374,8 @@ scsi_read_capacity(ide_device_info *device, ata_request *request)
 	scsi_cmd_read_capacity *cmd = (scsi_cmd_read_capacity *)ccb->cdb;
 	uint32 lastBlock;
 
+	TRACE("scsi_read_capacity\n");
+
 	if (cmd->pmi || cmd->lba) {
 		ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_CDB_FIELD);
 		return;
@@ -393,6 +399,8 @@ scsi_request_sense(ide_device_info *device, ata_request *request)
 	scsi_cmd_request_sense *cmd = (scsi_cmd_request_sense *)ccb->cdb;
 	scsi_sense sense;
 	uint32 transferSize;
+
+	TRACE("scsi_request_sense\n");
 
 	// Copy sense data from last request into data buffer of current request.
 	// The sense data of last request is still present in the current request,
