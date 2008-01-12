@@ -17,7 +17,6 @@
 #include <fcntl.h>
 #include <image.h>
 #include <string.h>
-#include <PCI.h>
 
 #include "debug.h"
 #include "ice1712.h"
@@ -25,7 +24,6 @@
 #include "io.h"
 #include "midi_driver.h"
 #include "multi.h"
-#include "multi_audio.h"
 #include "util.h"
 
 
@@ -57,7 +55,8 @@ char *names[NUM_CARDS*20+1];
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-#define MODULE_TEST_PATH "audio/hmulti/ice1712"
+#define HMULTI_AUDIO_DEV_PATH "audio/hmulti/ice1712"
+//#define HMULTI_AUDIO_DEV_PATH "audio/multi/ice1712"
 
 //------------------------------------------------------
 //------------------------------------------------------
@@ -139,7 +138,6 @@ ice1712_setup(ice1712 *ice)
 {
 	int result, i;
 	long result_l = 0;
-	uint8 eeprom_data[32];
 	uint8 reg8 = 0;
 
 	ice->irq			= ice->info.u.h0.interrupt_line;
@@ -154,51 +152,74 @@ ice1712_setup(ice1712 *ice)
 	write_ccs_uint8(ice, CCS_CONTROL_STATUS, 0x01);
 	snooze(200000);
 
-	result = read_eeprom(ice, eeprom_data);
+	result = read_eeprom(ice, ice->eeprom_data);
 
-	TRACE_ICE(("EEprom -> "));
+/*	TRACE_ICE(("EEprom -> "));
 	for (i = 0; i < 32; i++)
 		TRACE_ICE(("%x, ", eeprom_data[i]));
-	TRACE_ICE(("<- EEprom\n"));
+	TRACE_ICE(("<- EEprom\n"));*/
 
 	write_ccs_uint8(ice, CCS_SERR_SHADOW, 0x01);
 
 	//Write all configurations register from EEProm
-
-	//Write enable SVID
-//	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x42, 2, 0x86);
-	//Change SVID
-	ice->info.device_id = eeprom_data[1] << 8 | eeprom_data[0];
-	ice->info.vendor_id = eeprom_data[3] << 8 | eeprom_data[2];
+	ice->info.device_id = ice->eeprom_data[E2PROM_MAP_SUBVENDOR_HIGH] << 8 | ice->eeprom_data[E2PROM_MAP_SUBVENDOR_LOW];
+	ice->info.vendor_id = ice->eeprom_data[E2PROM_MAP_SUBDEVICE_HIGH] << 8 | ice->eeprom_data[E2PROM_MAP_SUBDEVICE_LOW];
 	ice->product = ice->info.vendor_id << 16 | ice->info.device_id;
-//	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x2C, 4, ice->product);
-
-	//Write Disable SVID
-//	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x42, 2, 0x06);
-
 	TRACE_ICE(("Product ID : 0x%x\n", ice->product));
 
-	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x60, 1, eeprom_data[6]);
-	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x61, 1, eeprom_data[7]);
-	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x62, 1, eeprom_data[8]);
-	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x63, 1, eeprom_data[9]);
+	write_cci_uint8(ice, CCI_GPIO_WRITE_MASK,			ice->eeprom_data[E2PROM_MAP_GPIOMASK]);
+	write_cci_uint8(ice, CCI_GPIO_DATA,					ice->eeprom_data[E2PROM_MAP_GPIOSTATE]);
+	write_cci_uint8(ice, CCI_GPIO_DIRECTION_CONTROL,	ice->eeprom_data[E2PROM_MAP_GPIODIR]);
 
-	write_cci_uint8(ice, CCI_GPIO_WRITE_MASK,			eeprom_data[10]);
-	write_cci_uint8(ice, CCI_GPIO_DATA,					eeprom_data[11]);
-	write_cci_uint8(ice, CCI_GPIO_DIRECTION_CONTROL,	eeprom_data[12]);
-	write_cci_uint8(ice, CCI_CONS_POWER_DOWN,			eeprom_data[13]);
-	write_cci_uint8(ice, CCI_MULTI_POWER_DOWN,			eeprom_data[14]);
+	TRACE_ICE(("CCI_GPIO_WRITE_MASK : 0x%x\n",			ice->eeprom_data[E2PROM_MAP_GPIOMASK]));
+	TRACE_ICE(("CCI_GPIO_DATA : 0x%x\n",				ice->eeprom_data[E2PROM_MAP_GPIOSTATE]));
+	TRACE_ICE(("CCI_GPIO_DIRECTION_CONTROL : 0x%x\n",	ice->eeprom_data[E2PROM_MAP_GPIODIR]));
 
-	ice->nb_MPU401 = ((eeprom_data[6] & 0x20) >> 5) + 1;
-	ice->nb_ADC = (((eeprom_data[6] & 0x0C) >> 2) + 1 ) * 2;
-	ice->nb_DAC = ((eeprom_data[6] & 0x03) + 1) * 2;
-	ice->spdif_config = eeprom_data[9] & 0x03;
 
+	//Write Configuration in the PCI configuration Register
+	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x60, 1, ice->eeprom_data[E2PROM_MAP_CONFIG]);
+	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x61, 1, ice->eeprom_data[E2PROM_MAP_ACL]);
+	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x62, 1, ice->eeprom_data[E2PROM_MAP_I2S]);
+	(pci->write_pci_config)(ice->info.bus, ice->info.device, ice->info.function, 0x63, 1, ice->eeprom_data[E2PROM_MAP_SPDIF]);
+
+	TRACE_ICE(("E2PROM_MAP_CONFIG : 0x%x\n",			ice->eeprom_data[E2PROM_MAP_CONFIG]));
+	reg8 = ice->eeprom_data[E2PROM_MAP_CONFIG];
+	//Bits signification for E2PROM_MAP_CONFIG Byte
+	//
+	// 8   7   6   5   4   3   2   1   0
+	//           |-D-|-C-|---B---|---A---
+	//
+	// D : MPU401 number minus 1
+	// C : AC'97
+	// B : Stereo ADC number minus 1 (=> 1 to 4)
+	// A : Stereo DAC number minus 1 (=> 1 to 4)
+
+	ice->nb_DAC = ((reg8 & 0x03) + 1) * 2;
+	reg8 >>= 2;
+	ice->nb_ADC = ((reg8 & 0x03) + 1) * 2;
+	reg8 >>= 2;
+
+	if ((reg8 & 0x01) != 0) {//Consumer AC'97 Exist
+		TRACE_ICE(("Consumer AC'97 does exist\n"));
+		//For now do nothing
+/*		write_ccs_uint8(ice, CCS_CONS_AC97_COMMAND_STATUS, 0x40);
+		snooze(10000);
+		write_ccs_uint8(ice, CCS_CONS_AC97_COMMAND_STATUS, 0x00);
+		snooze(20000);
+*/	} else {
+		TRACE_ICE(("Consumer AC'97 does NOT exist\n"));
+	}
+	reg8 >>= 1;
+	ice->nb_MPU401 = (reg8 & 0x1) + 1;
+	
 	for (i = 0; i < ice->nb_MPU401; i++) {
 		sprintf(ice->midi_interf[i].name, "midi/ice1712/%ld/%d", ice - cards + 1, i + 1);
 		names[num_names++] = ice->midi_interf[i].name;
 	}
-	
+
+	TRACE_ICE(("E2PROM_MAP_SPDIF : 0x%x\n",			ice->eeprom_data[E2PROM_MAP_SPDIF]));
+	ice->spdif_config	= ice->eeprom_data[E2PROM_MAP_SPDIF];
+
 	switch (ice->product)
 	{
 		case ICE1712_SUBDEVICE_DELTA66 :
@@ -223,20 +244,10 @@ ice1712_setup(ice1712 *ice)
 			break;
 	}
 
-	sprintf(ice->name, "%s/%ld", MODULE_TEST_PATH, ice - cards + 1);
+	sprintf(ice->name, "%s/%ld", HMULTI_AUDIO_DEV_PATH, ice - cards + 1);
 	names[num_names++] = ice->name;
 	names[num_names] = NULL;
-	
-	if ((eeprom_data[6] & 0x10) == 0) {//Consumer AC'97 Exist
-		TRACE_ICE(("Consumer AC'97 does exist\n"));
-		write_ccs_uint8(ice, CCS_CONS_AC97_COMMAND_STATUS, 0x40);
-		snooze(10000);
-		write_ccs_uint8(ice, CCS_CONS_AC97_COMMAND_STATUS, 0x00);
-		snooze(20000);
-	} else {
-		TRACE_ICE(("Consumer AC'97 does NOT exist\n"));
-	}
-	
+
 	ice->buffer_ready_sem = create_sem(0, "Buffer Exchange");
 	
 //	TRACE_ICE(("installing interrupt : %0x\n", ice->irq));
@@ -275,10 +286,21 @@ ice1712_setup(ice1712 *ice)
 	//Deselect CS
 	write_cci_uint8(ice, CCI_GPIO_DATA, ice->gpio_cs_mask);
 
-	//Just to route input to output
-//	write_mt_uint16(ice, MT_ROUTING_CONTROL_PSDOUT,	0x0101);
-//	write_mt_uint32(ice, MT_CAPTURED_DATA,	0x0000);
+	//Just to route all input to all output
+//	write_mt_uint16(ice, MT_ROUTING_CONTROL_PSDOUT,	0xAAAA);
+//	write_mt_uint32(ice, MT_CAPTURED_DATA,	0x76543210);
 
+	//Just to route SPDIF Input to DAC 0
+//	write_mt_uint16(ice, MT_ROUTING_CONTROL_PSDOUT,	0xAAAF);
+//	write_mt_uint32(ice, MT_CAPTURED_DATA,	0x76543280);
+
+	//Mute all input
+/*	for (i = 0; i < 20; i++)
+	{
+		write_mt_uint8(ice, MT_VOLUME_CONTROL_CHANNEL_INDEX, i);
+		write_mt_uint16(ice, MT_VOLUME_CONTROL_CHANNEL_INDEX, 0x7F7F);
+	}
+*/
 	//Unmask Interrupt
 	write_ccs_uint8(ice, CCS_CONTROL_STATUS, 0x41);
 

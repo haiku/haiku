@@ -438,6 +438,7 @@ cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data, uint8 chip_select)
 	
 	// drop clock and Data
 	tmp &= ~(ice->digital_codec.clock | ice->digital_codec.data_out);
+
 	tmp |= ice->gpio_cs_mask;
 	write_gpio(ice, tmp);
 	snooze(CS84xx_DELAY);

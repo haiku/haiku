@@ -17,8 +17,8 @@
 
 #include <string.h>
 
-#define AUTORIZED_RATE (B_SR_96000 | B_SR_88200 | B_SR_48000 | B_SR_44100)
-#define AUTORIZED_SAMPLE_SIZE (B_FMT_24BIT)
+#define AUTORIZED_RATE (B_SR_SAME_AS_INPUT | B_SR_IS_GLOBAL | B_SR_96000 | B_SR_88200 | B_SR_48000 | B_SR_44100)
+#define AUTORIZED_SAMPLE_SIZE (B_FMT_32BIT)
 
 static void 
 start_DMA(ice1712 *card)
@@ -30,7 +30,7 @@ start_DMA(ice1712 *card)
 	write_mt_uint32(card, MT_PROF_PB_DMA_BASE_ADDRESS,		(uint32)card->phys_addr_pb);
 	write_mt_uint16(card, MT_PROF_PB_DMA_COUNT_ADDRESS,		(size * SWAPPING_BUFFERS) - 1);
 	//We want interrupt only from playback
-	write_mt_uint16(card, MT_PROF_PB_DMA_TERM_COUNT,		size - 1/*0*/);
+	write_mt_uint16(card, MT_PROF_PB_DMA_TERM_COUNT,		size - 1);
 	TRACE_ICE(("SIZE DMA PLAYBACK %#x\n", size));
 
 	size = card->input_buffer_size * MAX_ADC;
@@ -38,7 +38,7 @@ start_DMA(ice1712 *card)
 	write_mt_uint32(card, MT_PROF_REC_DMA_BASE_ADDRESS,		(uint32)card->phys_addr_rec);
 	write_mt_uint16(card, MT_PROF_REC_DMA_COUNT_ADDRESS,	(size * SWAPPING_BUFFERS) - 1);
 	//We do not want any interrupt from the record
-	write_mt_uint16(card, MT_PROF_REC_DMA_TERM_COUNT,		/*size - 1*/0);
+	write_mt_uint16(card, MT_PROF_REC_DMA_TERM_COUNT,		0);
 	TRACE_ICE(("SIZE DMA RECORD %#x\n", size));
 
 	//Enable output AND Input from Analog CODEC
@@ -75,7 +75,7 @@ start_DMA(ice1712 *card)
 		case ICE1712_SUBDEVICE_AUDIOPHILE_2496 :
 			spdif_write(card, CS84xx_SERIAL_INPUT_FORMAT_REG, 0x85);
 			spdif_write(card, CS84xx_SERIAL_OUTPUT_FORMAT_REG, 0x85);
-			spdif_write(card, CS84xx_SERIAL_OUTPUT_FORMAT_REG, 0x41);
+//			spdif_write(card, CS84xx_SERIAL_OUTPUT_FORMAT_REG, 0x41);
 			break;
 		case ICE1712_SUBDEVICE_DELTA410 :
 			break;
@@ -91,10 +91,9 @@ start_DMA(ice1712 *card)
 			break;
 	}
 
-	card->buffer = 0;
+	card->buffer = 1;
 	write_mt_uint8(card, MT_PROF_PB_CONTROL, 5);
 }
-
 
 status_t 
 ice1712_get_description(ice1712 *card, multi_description *data)
@@ -136,13 +135,14 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			break;
 	}
 			
-	strncpy(data->vendor_info, "Jerome Leveque", 32);
+	strncpy(data->vendor_info, "J. H Leveque", 32);
 	
 	data->output_channel_count		= card->total_output_channels;
 	data->input_channel_count		= card->total_input_channels;
 	data->output_bus_channel_count	= 0;
 	data->input_bus_channel_count	= 0;
 	data->aux_bus_channel_count		= 0;
+
 
 	TRACE_ICE(("request_channel_count = %d\n", data->request_channel_count));
 	if (data->request_channel_count >= (card->total_output_channels + card->total_input_channels)) {
@@ -151,7 +151,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_OUTPUT_CHANNEL;
 			data->channels[chan].designations = B_CHANNEL_STEREO_BUS | \
-									(i & 1) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT;
+									((i & 1) == 0) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT;
 			data->channels[chan].connectors = 0;
 			chan++;
 		}
@@ -175,7 +175,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 			data->channels[chan].channel_id = chan;
 			data->channels[chan].kind = B_MULTI_INPUT_CHANNEL;
 			data->channels[chan].designations = B_CHANNEL_STEREO_BUS | \
-									(i & 1) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT;
+									((i & 1) == 0) ? B_CHANNEL_LEFT : B_CHANNEL_RIGHT;
 			data->channels[chan].connectors = 0;
 			chan++;
 		}
@@ -217,7 +217,7 @@ ice1712_get_description(ice1712 *card, multi_description *data)
 	data->max_cvsr_rate = 96000;
 
 	data->output_formats = data->input_formats = AUTORIZED_SAMPLE_SIZE;
-	data->lock_sources = B_MULTI_LOCK_INTERNAL /*| B_MULTI_LOCK_SPDIF*/;
+	data->lock_sources = B_MULTI_LOCK_INTERNAL | B_MULTI_LOCK_SPDIF;
 	data->timecode_sources = 0;
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK | B_MULTI_INTERFACE_RECORD;
 	data->start_latency = 0;
@@ -261,6 +261,8 @@ ice1712_set_enabled_channels(ice1712 *card, multi_channel_enable *data)
 		write_mt_uint8(card, MT_SAMPLING_RATE_SELECT, 0x10);
 	else
 		write_mt_uint8(card, MT_SAMPLING_RATE_SELECT, card->sampling_rate);
+
+	card->lock_source = data->lock_source;
 
 	return B_OK;
 }
@@ -310,7 +312,8 @@ ice1712_set_global_format(ice1712 *card, multi_format_info *data)
 	TRACE_ICE(("Input Sampling Rate = %#x\n", data->input.rate));
 	TRACE_ICE(("Output Sampling Rate = %#x\n", data->output.rate));
 
-	if (data->input.rate == data->output.rate) {
+	if ((data->input.rate == data->output.rate) &&
+		(card->lock_source == B_MULTI_LOCK_INTERNAL)) {
 		switch (data->input.rate)
 		{
 			case B_SR_96000 :
@@ -335,14 +338,14 @@ ice1712_set_global_format(ice1712 *card, multi_format_info *data)
 
 
 status_t 
-ice1712_get_mix(ice1712 *card, multi_mix_value_info *MMVI)
+ice1712_get_mix(ice1712 *card, multi_mix_value_info *data)
 {//Not Implemented
 	return B_ERROR;
 }
 
 
 status_t 
-ice1712_set_mix(ice1712 *card, multi_mix_value_info *MMVI)
+ice1712_set_mix(ice1712 *card, multi_mix_value_info *data)
 {//Not Implemented
 	return B_ERROR;
 }
@@ -355,10 +358,70 @@ ice1712_list_mix_channels(ice1712 *card, multi_mix_channel_info *data)
 }
 
 
-status_t 
-ice1712_list_mix_controls(ice1712 *card, multi_mix_control_info *MMCI)
-{//Not Implemented
-	return B_ERROR;
+#define MULTI_AUDIO_BASE_ID 1024
+#define MULTI_AUDIO_MASTER_ID 0
+
+#ifndef B_MULTI_MIX_GROUP
+#define B_MULTI_MIX_GROUP 10
+#endif
+
+#ifndef S_null
+#define S_null 10
+#endif
+
+#ifndef S_STEREO_MIX
+#define S_STEREO_MIX 10
+#endif
+
+static int32
+create_group_control(multi_mix_control *multi, int32 idx, int32 parent, int32 string, const char* name)
+{
+	multi->id = MULTI_AUDIO_BASE_ID + idx;
+	multi->master = parent;
+	multi->flags = B_MULTI_MIX_GROUP;
+	multi->master = MULTI_AUDIO_MASTER_ID;
+//	multi->string = string;
+
+	if (name != NULL)
+		strcpy(multi->name, name);
+	
+	return multi->id;
+}
+
+static int32
+create_slider_control(multi_mix_control *multi, int32 idx, int32 parent, int32 string, const char* name)
+{
+	multi->id = MULTI_AUDIO_BASE_ID + idx;
+	multi->master = parent;
+	multi->flags = B_MULTI_MIX_GAIN;
+	multi->master = MULTI_AUDIO_MASTER_ID + 1;
+//	multi->string = string;
+
+	multi->u.gain.min_gain		= -144.0;
+	multi->u.gain.max_gain		= 0.0;
+	multi->u.gain.granularity	= 1.5;
+
+	if (name != NULL)
+		strcpy(multi->name, name);
+	
+	return multi->id;
+}
+
+
+status_t
+ice1712_list_mix_controls(ice1712 *card, multi_mix_control_info *data)
+{
+	int32 parent;
+
+	TRACE_ICE(("count = %d\n", data->control_count));
+	parent = create_group_control	(data->controls + 0, 0, 0, S_null, "Playback");
+	create_slider_control			(data->controls + 1, 1, parent, S_STEREO_MIX, "Master Output");
+
+	parent = create_group_control	(data->controls + 2, 2, 0, S_null, "Record");
+	create_slider_control			(data->controls + 3, 3, parent, S_STEREO_MIX, "Master Input");
+	data->control_count = 4;
+
+	return B_OK;
 }
 
 
@@ -382,13 +445,13 @@ ice1712_get_buffers(ice1712 *card, multi_buffer_list *data)
 	TRACE_ICE(("request_record_channels = %#x\n",		data->request_record_channels));
 	TRACE_ICE(("request_record_buffer_size = %#x\n",	data->request_record_buffer_size));
 
-	// MIN_BUFFER_FRAMES <= requested value are <= MAX_BUFFER_FRAMES
+	// MIN_BUFFER_FRAMES <= requested value <= MAX_BUFFER_FRAMES
 	card->output_buffer_size =	data->request_playback_buffer_size <= MAX_BUFFER_FRAMES ?	\
 								data->request_playback_buffer_size >= MIN_BUFFER_FRAMES ?	\
 								data->request_playback_buffer_size : MIN_BUFFER_FRAMES		\
 								: MAX_BUFFER_FRAMES;
 
-	// MIN_BUFFER_FRAMES <= requested value are <= MAX_BUFFER_FRAMES
+	// MIN_BUFFER_FRAMES <= requested value <= MAX_BUFFER_FRAMES
 	card->input_buffer_size =	data->request_record_buffer_size <= MAX_BUFFER_FRAMES ?	\
 								data->request_record_buffer_size >= MIN_BUFFER_FRAMES ?	\
 								data->request_record_buffer_size : MIN_BUFFER_FRAMES	\
@@ -490,6 +553,7 @@ ice1712_get_buffers(ice1712 *card, multi_buffer_list *data)
 
 	data->return_record_buffers = SWAPPING_BUFFERS;
 	data->return_record_channels = card->total_input_channels;
+	data->return_record_channels = chan_i;
 	data->return_record_buffer_size = card->input_buffer_size;
 	
 	TRACE_ICE(("return_record_buffers = %#x\n",			data->return_record_buffers));
@@ -521,12 +585,12 @@ ice1712_buffer_exchange(ice1712 *card, multi_buffer_info *data)
 			// do playback
 			data->played_real_time		= card->played_time;
 			data->played_frames_count	+= card->output_buffer_size;
-			data->playback_buffer_cycle	= (card->buffer - 1) & 0x1;	//Buffer TO fill
+			data->playback_buffer_cycle	= (card->buffer/* - 1*/) & 0x1;	//Buffer TO fill
 
 			// do record
 			data->recorded_real_time	= card->played_time;
 			data->recorded_frames_count	+= card->input_buffer_size;
-			data->record_buffer_cycle	= (card->buffer - 1) & 0x1;	//Buffer filled
+			data->record_buffer_cycle	= (card->buffer/* - 1*/) & 0x1;	//Buffer filled
 
 			data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
 
@@ -552,12 +616,16 @@ ice1712_buffer_exchange(ice1712 *card, multi_buffer_info *data)
 		case B_TIMED_OUT :
 			TRACE_ICE(("B_TIMED_OUT\n"));
 			start_DMA(card);
+
 			cpu_status  = lock();
 
-			data->record_buffer_cycle = 0;
-			data->playback_buffer_cycle = 1;
-			data->played_frames_count += card->output_buffer_size;
-			data->recorded_frames_count += card->input_buffer_size;
+			data->played_real_time		= card->played_time;
+			data->playback_buffer_cycle	= 0;
+			data->played_frames_count	+= card->output_buffer_size;
+
+			data->recorded_real_time	= card->played_time;
+			data->record_buffer_cycle	= 0;
+			data->recorded_frames_count	+= card->input_buffer_size;
 			data->flags = B_MULTI_BUFFER_PLAYBACK | B_MULTI_BUFFER_RECORD;
 
 			unlock(cpu_status);
@@ -568,12 +636,20 @@ ice1712_buffer_exchange(ice1712 *card, multi_buffer_info *data)
 			break;
 	}
 
+/*	if ((card->buffer % 500) == 0)
+	{
+		uint8 reg8, reg8_dir;
+		reg8 = read_gpio(card);
+		reg8_dir = read_cci_uint8(card, CCI_GPIO_DIRECTION_CONTROL);
+		TRACE_ICE(("B_NO_ERROR buffer = %d : GPIO = %d (%d)\n", card->buffer, reg8, reg8_dir));
+	}
+*/
 	return B_OK;
 }
 
 status_t ice1712_buffer_force_stop(ice1712 *card)
 {
-//	write_mt_uint8(card, MT_PROF_PB_CONTROL, 0);
+	write_mt_uint8(card, MT_PROF_PB_CONTROL, 0);
 	return B_OK;
 }
 

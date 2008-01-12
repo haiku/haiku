@@ -13,6 +13,7 @@
 #define _ICE1712_H_
 
 #include <PCI.h>
+#include "hmulti_audio.h"
 
 #define DRIVER_NAME "ice1712"
 #define VERSION "0.3"
@@ -87,6 +88,8 @@ typedef struct _ice1712_
 	uint32 DMA_Path;	//PCI_18
 	uint32 Multi_Track;	//PCI_1C
 
+	uint8 eeprom_data[32];
+
 	int8 nb_ADC; //Mono Channel
 	int8 nb_DAC; //Mono Channel
 	_spdif_config_ spdif_config;
@@ -117,6 +120,7 @@ typedef struct _ice1712_
 	sem_id buffer_ready_sem;
 	
 	uint8 sampling_rate; //in the format of the register
+	uint32 lock_source;
 
 } ice1712;
 
@@ -124,7 +128,7 @@ extern int32 num_cards;
 extern ice1712 cards[NUM_CARDS];
 
 //???????
-#define GPIO_SPDIF_STATUS				0x02	//Status 
+#define GPIO_SPDIF_STATUS				0x02	//Status
 #define GPIO_SPDIF_CCLK					0x04	//data Clock
 #define GPIO_SPDIF_DOUT					0x08	//data output
 
@@ -212,5 +216,27 @@ extern ice1712 cards[NUM_CARDS];
 			break;
 	}
 */
+
+//This map come from ALSA sound drivers
+#define E2PROM_MAP_SUBVENDOR_LOW	0x00
+#define E2PROM_MAP_SUBVENDOR_HIGH	0x01
+#define E2PROM_MAP_SUBDEVICE_LOW	0x02
+#define E2PROM_MAP_SUBDEVICE_HIGH	0x03
+#define E2PROM_MAP_SIZE				0x04
+#define E2PROM_MAP_VERSION			0x05
+#define E2PROM_MAP_CONFIG			0x06
+#define E2PROM_MAP_ACL				0x07
+#define E2PROM_MAP_I2S				0x08
+#define E2PROM_MAP_SPDIF			0x09
+#define E2PROM_MAP_GPIOMASK			0x0A
+#define E2PROM_MAP_GPIOSTATE		0x0B
+#define E2PROM_MAP_GPIODIR			0x0C
+#define E2PROM_MAP_AC97MAIN			0x0D
+#define E2PROM_MAP_AC97PCM			0x0F
+#define E2PROM_MAP_AC97REC			0x11
+#define E2PROM_MAP_AC97REC_SOURCE	0x13
+#define E2PROM_MAP_DAC_ID			0x14
+#define E2PROM_MAP_ADC_ID			0x18
+#define E2PROM_MAP_EXTRA			0x1C
 
 #endif
