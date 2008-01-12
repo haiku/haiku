@@ -853,7 +853,7 @@ ata_exec_pio_transfer(ata_request *request)
 		goto error;
 	}
 
-	ata_finish_command(device, &request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, ide_error_abrt);
+	ata_finish_command(device, request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, ide_error_abrt);
 	ata_request_finish(request, false /* resubmit */);
 	return;
 
