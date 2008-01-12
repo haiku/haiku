@@ -101,7 +101,7 @@ TraceEntry::Initialized()
 
 
 void*
-TraceEntry::operator new(size_t size) throw()
+TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 {
 #if ENABLE_TRACING
 	if (sBuffer == NULL)
@@ -143,17 +143,19 @@ int
 dump_tracing(int argc, char** argv)
 {
 	int32 count = 30;
+	if (argc == 2)
+		count = strtol(argv[1], NULL, 0);
+
 	int32 start = sEntries - count;
 
-	if (argc == 2) {
-		count = strtol(argv[1], NULL, 0);
-	} else if (argc == 3) {
+	if (argc == 3) {
 		start = strtol(argv[1], NULL, 0);
 		count = strtol(argv[2], NULL, 0);
 	} else if (argc > 3) {
 		kprintf("usage: %s [start] [count]\n", argv[0]);
 		return 0;
 	}
+	// TODO: add pattern matching mechanism for the class name
 
 	if (start < 0)
 		start = 0;
@@ -173,6 +175,7 @@ dump_tracing(int argc, char** argv)
 			kprintf("** uninitialized entry **\n");
 	}
 
+	kprintf("%ld of %ld entries.\n", count, sEntries);
 	return 0;
 }
 

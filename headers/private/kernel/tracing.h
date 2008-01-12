@@ -3,6 +3,7 @@
 
 
 #include <SupportDefs.h>
+#include <KernelExport.h>
 
 
 #define ENABLE_TRACING 0
@@ -29,7 +30,29 @@ class TraceEntry : trace_entry {
 
 		void Initialized();
 
-		void* operator new(size_t size);
+		void* operator new(size_t size, const std::nothrow_t&) throw();
+};
+
+class AbstractTraceEntry : public TraceEntry {
+	public:
+		AbstractTraceEntry()
+			:
+			fThread(find_thread(NULL)),
+			fTime(system_time())
+		{
+		}
+
+		virtual void Dump()
+		{
+			kprintf("[%6ld] %Ld: ", fThread, fTime);
+		}
+
+		thread_id Thread() const { return fThread; }
+		bigtime_t Time() const { return fTime; }
+
+	protected:
+		thread_id	fThread;
+		bigtime_t	fTime;
 };
 
 #endif	// __cplusplus
