@@ -27,7 +27,11 @@ system(const char *command)
 	}
 
 	status_t returnValue;
-	status_t error = wait_for_thread(thread, &returnValue);
+	status_t error;
+	do {
+		error = wait_for_thread(thread, &returnValue);
+	} while (error == B_INTERRUPTED);
+	
 	if (error != B_OK) {
 		errno = error;
 		return -1;
