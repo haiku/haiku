@@ -72,10 +72,10 @@ platform_start_kernel(void)
 		// or I don't see something important...
 	addr_t stackTop = gKernelArgs.cpu_kstack[0].start + gKernelArgs.cpu_kstack[0].size;
 
-	smp_init_other_cpus();
-	serial_cleanup();
+	//smp_init_other_cpus();
+	//serial_cleanup();
 	mmu_init_for_kernel();
-	smp_boot_other_cpus();
+	//smp_boot_other_cpus();
 
 	dprintf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
@@ -96,8 +96,9 @@ platform_start_kernel(void)
 void
 platform_exit(void)
 {
-	// reset the system using the keyboard controller
-	out8(0xfe, 0x64);
+	// Terminate
+	// XXX: Puntaes() instead ?
+	Pterm0();
 }
 
 
@@ -126,7 +127,7 @@ _start(void)
 	// reading the keyboard doesn't seem to work in graphics mode (maybe a bochs problem)
 	sBootOptions = check_for_boot_keys();
 	//if (sBootOptions & BOOT_OPTION_DEBUG_OUTPUT)
-		serial_enable();
+		//serial_enable();
 
 	//apm_init();
 	//smp_init();
