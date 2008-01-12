@@ -19,6 +19,7 @@ typedef struct {
 	int			fpu_type;
 	int			mmu_type;
 	int			platform;
+	bool			has_lpstop; //XXX: use bit flags
 	// architecture specific
 	uint64		cpu_frequency;
 	uint64		bus_frequency;
