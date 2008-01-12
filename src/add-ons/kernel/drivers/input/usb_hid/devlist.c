@@ -48,9 +48,11 @@ remove_device_info(hid_device_info *device)
 
 	acquire_sem(gDeviceListLock);
 
-	if (sDeviceList == device)
+	if (sDeviceList == device) {
 		sDeviceList = device->next;
-	else {
+		--sDeviceCount;
+		gDeviceListChanged = true;
+	} else {
 		hid_device_info *previous;
 		for (previous = sDeviceList; previous != NULL; previous = previous->next) {
 			if (previous->next == device) {

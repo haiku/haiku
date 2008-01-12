@@ -21,10 +21,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#include <fs/devfs.h>
-#endif
-
 #define MAX_BUTTONS 16
 
 static status_t hid_device_added(const usb_device *dev, void **cookie);
@@ -876,13 +872,13 @@ hid_device_removed(void *cookie)
 			free(device->insns);
 		delete_device(device);
 	} else {
+		// If the input_server has opened us this will always be the case.
+		// We unpublish our node in the devfs which will notify the mouse
+		// add-on to unregister and release us.
 		DPRINTF_INFO((MY_ID "%s still open\n", device->name));
 		device->active = false;
 	}
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-	devfs_unpublish_device(device->name, true);
-#endif
 	return B_OK;
 }
 
