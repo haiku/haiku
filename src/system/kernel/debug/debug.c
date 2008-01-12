@@ -18,6 +18,7 @@
 #include <kernel.h>
 #include <smp.h>
 #include <thread.h>
+#include <tracing.h>
 #include <vm.h>
 
 #include <arch/debug_console.h>
@@ -722,6 +723,7 @@ debug_init_post_vm(kernel_args *args)
 
 	frame_buffer_console_init(args);
 	arch_debug_console_init_settings(args);
+	tracing_init();
 
 	// get debug settings
 	handle = load_driver_settings("kernel");
