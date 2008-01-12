@@ -931,6 +931,9 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 		goto err2;
 	}
 
+	// remove any fds that have the CLOEXEC flag set (emulating BeOS behaviour)
+	vfs_exec_io_context(team->io_context);
+
 	// create an address space for this team
 	status = vm_create_address_space(team->id, USER_BASE, USER_SIZE, false,
 		&team->address_space);

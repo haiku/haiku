@@ -3501,7 +3501,7 @@ vfs_unlock_vnode_if_locked(struct file_descriptor *descriptor)
 
 
 /*!	Closes all file descriptors of the specified I/O context that
-	don't have the O_CLOEXEC flag set.
+	have the O_CLOEXEC flag set.
 */
 void
 vfs_exec_io_context(void *_context)
@@ -3591,7 +3591,7 @@ vfs_new_io_context(void *_parentContext)
 		for (i = 0; i < tableSize; i++) {
 			struct file_descriptor *descriptor = parentContext->fds[i];
 
-			if (descriptor != NULL && !fd_close_on_exec(parentContext, i)) {
+			if (descriptor != NULL) {
 				context->fds[i] = descriptor;
 				context->num_used_fds++;
 				atomic_add(&descriptor->ref_count, 1);
