@@ -157,7 +157,7 @@ switch $(HAIKU_CPU) {
 	case m68k :
 	{
 		HAIKU_DEFINES += __M68K__ ;
-		HAIKU_BOOT_PLATFORM = atari ;
+		HAIKU_BOOT_PLATFORM = atari_m68k ;
 	}
 	case * :
 		Exit "Currently unsupported target CPU:" $(HAIKU_CPU) ;
