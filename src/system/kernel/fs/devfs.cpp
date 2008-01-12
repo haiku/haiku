@@ -2560,7 +2560,6 @@ devfs_unpublish_device(const char *path, bool disconnect)
 	if (status == B_OK && disconnect)
 		vfs_disconnect_vnode(sDeviceFileSystem->id, node->id);
 
-	remove_vnode(sDeviceFileSystem->id, node->id);
 	put_vnode(sDeviceFileSystem->id, node->id);
 	return status;
 }
