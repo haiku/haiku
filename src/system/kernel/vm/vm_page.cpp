@@ -1016,6 +1016,9 @@ page_writer(void* /*unused*/)
 			busyConditions[i].Unpublish();
 
 			mutex_unlock(&cache->lock);
+			// TODO: we need to release the cache references after all
+			// pages are made unbusy again - otherwise releasing a vnode
+			// could deadlock.
 			if (cache->store->ops->release_ref != NULL)
 				cache->store->ops->release_ref(cache->store);
 			vm_cache_release_ref(cache);
