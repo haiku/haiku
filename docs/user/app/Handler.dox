@@ -239,8 +239,9 @@ ShowImageApp::MessageReceived(BMessage *message)
 	base class. Eventually, it will reach the default implementation, which
 	will reply with a \c B_MESSAGE_NOT_UNDERSTOOD constant. 
 	
-	\warning Do not delete or otherwise cripple the \a message argument. It
-		does not belong to you.
+	\attention If you want to keep or manipulate the \a message, have a look
+		at the \link BLooper::DetachMessage() DetachMessage() \endlink method
+		to get ownership of the message.
 	
 	\param message The message that needs to be handled.
 */
@@ -461,6 +462,12 @@ ShowImageApp::MessageReceived(BMessage *message)
 	Handlers can function as state machines, which emit messages to observers
 	when the state changes. Use the following methods to subscribe to these
 	notifications.
+	
+	Note that there is a semantic difference between the two StartWatching()
+	methods. The overloaded method that accepts a BHandler, expects as
+	argument an \a observer that watches <em>this handler</em>. The method that
+	accepts a BMessenger, expects a \a target that emits the state changes
+	<em>to this handler</em>.
 */
 
 
@@ -469,12 +476,23 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 /*!
 	\fn status_t BHandler::StartWatching(BMessenger target, uint32 what)
-	\brief Subscribe a \a target to watch a specific state change.
+	\brief Subscribe this handler to watch a specific state change of a
+		\a target.
 	
-	Use this method to subscribe messengers. This means that also observers
-	from other teams can be subscribed.
+	Use this method to subscribe messengers to watch state changes in <em>this
+	handler</em>. This means that also observers  from other teams can be
+	subscribed.
 	
-	\param target The messenger to which notifications need to be send.
+\code
+	// Handler B watches Handler A
+	BHandler A, B;
+	BMessenger messengerA(&A)
+	
+	B.StartWatching(messengerA, kNetworkConnection);
+\endcode
+	
+	\param target The messenger from which the notifications would be
+		received.
 	\param what The state that needs to be watched.
 	\return During the call of this method, a notification will be transmitted
 		using the \a target. If this works, then this method will return
@@ -485,20 +503,21 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 /*!
 	\fn status_t BHandler::StartWatchingAll(BMessenger target)
-	\brief Subscribe a \a target to all events.
+	\brief Subscribe this handler to watch a \a target for all events.
 	
 	This method performs the same task as StartWatching(BMessenger, uint32),
-	but it will subscribe the target to all the state changes this handler
-	knows.
+	but it will subscribe to all the state changes the \a target knows. 
+	
 	\see StartWatching(BMessenger, uint32), StopWatchingAll(BMessenger)
 */
 
 
 /*!
 	\fn status_t BHandler::StopWatching(BMessenger target, uint32 what)
-	\brief Unsubscribe an observer from watching a specific state.
+	\brief Unsubscribe this handler from watching a specific state.
 	
-	This method will unsubscribe the \a target from watching a specific event.
+	This method will unsubscribe this handler from watching a specific event
+	in a \a target.
 	
 	\see StartWatching(BMessenger, uint32)
 */
@@ -506,7 +525,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 /*!
 	\fn status_t BHandler::StopWatchingAll(BMessenger target)
-	\brief Unsubscribe an observer from watching all states.
+	\brief Unsubscribe this handler from watching all states.
 	
 	This method will unsubscribe the \a target from watching all state changes.
 	
@@ -515,32 +534,42 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 
 /*!
-	\fn status_t BHandler::StartWatching(BHandler* handler, uint32 what)
-	\brief Subscribe another \a handler to watch a specific state change.
+	\fn status_t BHandler::StartWatching(BHandler* observer, uint32 what)
+	\brief Subscribe an \a observer for a specific state change of this handler.
 	
-	Use this method to subscribe handlers. Since pointers to handlers can only
+	Use this method to subscribe observers to watch this handler. State changes
+	of this handler that match the \a what argment, will be sent.
+
+\code
+	// Handler B wants to observe Handler A
+	BHandler A, B;
+	
+	A.StartWatching(&B, kNetworkConnection);
+\endcode
+
+	Since pointers to handlers can only
 	exist in the local namespace, have a look at
 	StartWatching(BMessenger, uint32) for inter-team watching. 
 	
-	\param handler The handler to which notifications need to be send.
+	\param observer The observer for this handler.
 	\param what The state that needs to be watched.
 	\return During the call of this method, a notification will be transmitted
-		using the \a handler. If this works, then this method will return
+		using the \a observer. If this works, then this method will return
 		\c B_OK.
 	
-	\see StartWatchingAll(BHandler), StopWatching(BHandler, uint32)	
+	\see StartWatchingAll(BHandler*), StopWatching(BHandler*, uint32)	
 */
 
 
 /*!
-	\fn status_t BHandler::StartWatchingAll(BHandler* handler)
-	\brief Subscribe another \a handler to watch all state changes.
-	
+	\fn status_t BHandler::StartWatchingAll(BHandler* observer)
+	\brief  Subscribe an \a observer for a all state changes.
 	
 	This method performs the same task as StartWatching(BHandler, uint32),
-	but it will subscribe the target to all the state changes this handler
-	knows.
-	\see StartWatching(BHandler, uint32), StopWatchingAll(BHandler)	
+	but it will subscribe the \a observer to all the state changes this handler
+	tracks.
+	
+	\see StartWatching(BHandler*, uint32), StopWatchingAll(BHandler*)	
 */
 
 
@@ -550,7 +579,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 
 	This method will unsubscribe the \a handler from watching a specific event.
 
-	\see StartWatching(BHandler, uint32)
+	\see StartWatching(BHandler*, uint32)
 */
 
 
@@ -560,7 +589,7 @@ ShowImageApp::MessageReceived(BMessage *message)
 	
 	This method will unsubscribe the \a handler from watching all state changes.
 	
-	\see StartWatchingAll(BHandler)
+	\see StartWatchingAll(BHandler*)
 */
 
 
