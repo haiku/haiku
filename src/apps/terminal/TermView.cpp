@@ -47,15 +47,15 @@
 extern int function_keycode_table[];
 extern char *function_key_char_table[];
 
-const static rgb_color kTermColorTable[16] = {
-	{  0,   0,   0, 0},
-	{255,   0,   0, 0},
-	{  0, 255,   0, 0},
-	{255, 255,   0, 0},
-	{  0,   0, 255, 0},
-	{255,   0, 255, 0},
-	{  0, 255, 255, 0},
-	{255, 255, 255, 0},
+const static rgb_color kTermColorTable[8] = {
+	{ 40,  40,  40, 0},	// black
+	{204,   0,   0, 0},	// red
+	{ 78, 154,   6, 0},	// green
+	{218, 168,   0, 0},	// yellow
+	{ 51, 102, 152, 0},	// blue
+	{115,  68, 123, 0},	// magenta
+	{  6, 152, 154, 0},	// cyan
+	{245, 245, 245, 0},	// white
 };
 
 
