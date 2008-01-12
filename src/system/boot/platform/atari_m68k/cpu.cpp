@@ -8,6 +8,7 @@
 
 
 #include "cpu.h"
+#include "toscalls.h"
 
 #include <OS.h>
 #include <boot/platform.h>
@@ -28,16 +29,23 @@
 #	define TRACE(x) ;
 #endif
 
-bool gCpuHasLPSTOP = false;
-
 static status_t
 check_cpu_features()
 {
-#warning M68K: check for LPSTOP
-	if (false)
-		gCpuHasLPSTOP = true;
+#warning M68K: TODO: probe ourselves, we shouldn't trust the TOS!
 
-#warning M68K: check for >= 020
+	const tos_cookie *c = tos_find_cookie('_CPU');
+	if (!c) {
+		panic("can't get a cookie (_CPU)! Mum, I'm hungry!");
+		return EINVAL;
+	}
+
+#warning M68K: check for 020 + mmu
+	if (c->ivalue < 30/*20*/)
+		return EINVAL;
+	
+	gKernelArgs.arch_args.has_lpstop = (c->ivalue >= 60)?true:false;
+#warning M68K: add cpu type to kern args
 
 	return B_OK;
 }
@@ -50,13 +58,8 @@ extern "C" void
 spin(bigtime_t microseconds)
 {
 	bigtime_t time = system_time();
-	if (gCpuHasLPSTOP) {
-		while ((system_time() - time) < microseconds)
-			asm volatile ("nop;");//asm volatile ("lpstop;");
-	} else {
-		while ((system_time() - time) < microseconds)
-			asm volatile ("nop;");
-	}
+	while ((system_time() - time) < microseconds)
+		asm volatile ("nop;");
 }
 
 
