@@ -110,10 +110,14 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 		if (elapsedTime > timeout)
 			return B_TIMED_OUT;
 		
-		if (elapsedTime < 4000)
+		// The device may be ready almost immediatelly. If it isn't,
+		// poll often during the first 20ms, otherwise poll lazyly.
+		if (elapsedTime < 500)
 			spin(1);
+		else if (elapsedTime < 20000)
+			snooze(1000);
 		else
-			snooze(4000);
+			snooze(50000);
 	}
 }
 
@@ -149,16 +153,6 @@ ata_wait_idle(ide_bus_info *bus)
 	return ata_wait(bus, 0, ide_status_bsy | ide_status_drq, 0, 20000);
 }
 
-/*
-// busy wait for device beeing ready,
-// using the timeout set by the previous ata_send_command
-status_t
-ata_pio_wait_drdy(ide_device_info *device)
-{
-	ASSERT(device->bus->state == ata_state_pio);
-	return ata_wait(device->bus, ide_status_drdy, ide_status_bsy, 0, device->pio_timeout);
-}
-*/
 
 status_t
 ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags, bigtime_t timeout)
@@ -170,6 +164,7 @@ ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags,
 
 	ASSERT((flags & ATA_DMA_TRANSFER) == 0); // XXX only pio for now
 
+/*
 	FLOW("ata_send_command: %d:%d, request %p, ccb %p, tf %02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x,%02x\n",
 		device->target_id, device->is_device1, 
 		request, request ? request->ccb : NULL,
@@ -177,6 +172,7 @@ ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags,
 		device->tf.raw.r[3], device->tf.raw.r[4], device->tf.raw.r[5], 
 		device->tf.raw.r[6], device->tf.raw.r[7], device->tf.raw.r[8],
 		device->tf.raw.r[9], device->tf.raw.r[10], device->tf.raw.r[11]);
+*/
 
 	// disable Interrupts for PIO transfers
 	if ((flags & ATA_DMA_TRANSFER) == 0) {
