@@ -380,8 +380,8 @@ Journal::_ReplayRunArray(int32 *_start)
 	CachedBlock cached(fVolume);
 	for (int32 index = 0; index < array->CountRuns(); index++) {
 		const block_run &run = array->RunAt(index);
-		INFORM(("replay block run %lu:%u:%u in log at %Ld!\n",
-			run.AllocationGroup(), run.Start(), run.Length(), blockNumber));
+		INFORM(("replay block run %u:%u:%u in log at %Ld!\n",
+			(int)run.AllocationGroup(), run.Start(), run.Length(), blockNumber));
 
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
