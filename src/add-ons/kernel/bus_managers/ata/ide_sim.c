@@ -69,12 +69,12 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 	ata_request_start(&request, device, ccb);
 
 	if (request) {
-		TRACE("calling exec_io: %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
+		FLOW("calling exec_io: %p, %d:%d\n", bus, ccb->target_id, ccb->target_lun);
 		device->exec_io(device, request);
 		return;
 	}
 
-	TRACE("Bus busy\n");
+	TRACE("Bus busy %d:%d\n", ccb->target_id, ccb->target_lun);
 	ACQUIRE_BEN(&bus->status_report_ben);
 	scsi->requeue(ccb, true);
 	RELEASE_BEN(&bus->status_report_ben);
@@ -82,7 +82,6 @@ sim_scsi_io(ide_bus_info *bus, scsi_ccb *ccb)
 
 
 err_inv_device:
-
 	FLOW("Invalid device %d:%d\n", ccb->target_id, ccb->target_lun);
 	ccb->subsys_status = SCSI_SEL_TIMEOUT;
 	ACQUIRE_BEN(&bus->status_report_ben);
@@ -92,8 +91,7 @@ err_inv_device:
 
 
 err_disconnected:
-
-	TRACE("No controller anymore\n");
+	TRACE("No controller anymore %d:%d\n", ccb->target_id, ccb->target_lun);
 	ccb->subsys_status = SCSI_NO_HBA;
 	ACQUIRE_BEN(&bus->status_report_ben);
 	scsi->finished(ccb, 1);

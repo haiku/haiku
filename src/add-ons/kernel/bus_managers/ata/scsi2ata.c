@@ -421,7 +421,7 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;
 	
-	FLOW("ata_exec_io: scsi command 0x%02x\n", ccb->cdb[0]);
+	//FLOW("ata_exec_io: scsi command 0x%02x\n", ccb->cdb[0]);
 		
 	// ATA devices have one LUN only
 	if (ccb->target_lun != 0) {
@@ -532,7 +532,7 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 				| (uint32)cmd->low_lba;
 			length = cmd->length != 0 ? cmd->length : 256;
 
-			FLOW("READ6/WRITE6 pos=%lx, length=%lx\n", pos, length);
+			//FLOW("READ6/WRITE6 pos=%lx, length=%lx\n", pos, length);
 
 			ata_exec_read_write(device, request, pos, length, cmd->opcode == SCSI_OP_WRITE_6);
 			return;
@@ -548,7 +548,7 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 			pos = B_BENDIAN_TO_HOST_INT32(cmd->lba);
 			length = B_BENDIAN_TO_HOST_INT16(cmd->length);
 
-			FLOW("READ10/WRITE10 pos=%lx, length=%lx\n", pos, length);
+			//FLOW("READ10/WRITE10 pos=%lx, length=%lx\n", pos, length);
 
 			if (length != 0) {
 				ata_exec_read_write(device, request, pos, length, cmd->opcode == SCSI_OP_WRITE_10);

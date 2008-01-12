@@ -102,7 +102,6 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 			return B_ERROR;
 
 		if ((status & set) == set && (status & cleared) == 0) {
-			dprintf("ata_wait: set %x, cleared %x, elapsed time %lld\n", set, cleared, elapsedTime);
 			return B_OK;
 		}
 
@@ -111,10 +110,10 @@ ata_wait(ide_bus_info *bus, uint8 set, uint8 cleared,
 		if (elapsedTime > timeout)
 			return B_TIMED_OUT;
 		
-		if (elapsedTime < 150000)
+		if (elapsedTime < 4000)
 			spin(1);
 		else
-			snooze(3000);
+			snooze(4000);
 	}
 }
 
@@ -167,7 +166,7 @@ ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags,
 	ide_bus_info *bus = device->bus;
 
 	ASSERT((device->tf_param_mask & ide_mask_command) == 0);
-	ASSERT(bus->state == ata_state_busy);
+//	ASSERT(bus->state == ata_state_busy); // XXX fix this
 
 	ASSERT((flags & ATA_DMA_TRANSFER) == 0); // XXX only pio for now
 
@@ -205,7 +204,7 @@ ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags,
 	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,	device->tf_param_mask) != B_OK)
 		goto err;
 
-	FLOW("Writing command 0x%02x\n", (int)device->tf.write.command);
+//	FLOW("Writing command 0x%02x\n", (int)device->tf.write.command);
 
 	IDE_LOCK(bus);
 
@@ -219,7 +218,7 @@ ata_send_command(ide_device_info *device, ata_request *request, ata_flags flags,
 	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, ide_mask_command) != B_OK) 
 		goto err_clearint;
 
-	ASSERT(bus->state == ata_state_busy);
+//	ASSERT(bus->state == ata_state_busy); XXX fix this
 
 	bus->state = (flags & ATA_DMA_TRANSFER) ? ata_state_dma : ata_state_pio;
 	request->timeout = timeout;
@@ -820,10 +819,8 @@ ata_exec_pio_transfer(ata_request *request)
 	uint32 timeout = request->ccb->timeout > 0 ? 
 		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
 
-//	FLOW("ata_exec_pio_transfer\n");
-
-	FLOW("ata_exec_pio_transfer: length %d, left_sg_elem %d, cur_sg_elem %d, cur_sg_ofs %d\n",
-		request->ccb->data_length, device->left_sg_elem, device->cur_sg_elem, device->cur_sg_ofs);
+//	FLOW("ata_exec_pio_transfer: length %d, left_sg_elem %d, cur_sg_elem %d, cur_sg_ofs %d\n",
+//		request->ccb->data_length, device->left_sg_elem, device->cur_sg_elem, device->cur_sg_ofs);
 
 	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 4000000) != B_OK) {
 		TRACE("ata_exec_pio_transfer: wait failed\n");
@@ -832,16 +829,16 @@ ata_exec_pio_transfer(ata_request *request)
 
 	while (device->left_blocks > 0) {
 		if (request->is_write) {
-			FLOW("writing 1 block\n");
+//			FLOW("writing 1 block\n");
 			if (write_PIO_block(request, 512) != B_OK)
 				goto transfer_error;
 		} else {
-			FLOW("reading 1 block\n");
+//			FLOW("reading 1 block\n");
 			if (read_PIO_block(request, 512) != B_OK)
 				goto transfer_error;
 		}
 		device->left_blocks--;
-		FLOW("%d blocks left\n", device->left_blocks);
+//		FLOW("%d blocks left\n", device->left_blocks);
 	}
 
 	if (ata_wait_for_drqdown(bus) != B_OK) {
