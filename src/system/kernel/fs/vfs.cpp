@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1371,7 +1371,9 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 
 		context->io_mutex.holder = thread_get_current_thread_id();
 
-		if (context->cwd != NULL && context->cwd->mount == mount) {
+		if (context->cwd != NULL && context->cwd->mount == mount
+			&& (vnodeToDisconnect == NULL
+				|| vnodeToDisconnect == context->cwd)) {
 			put_vnode(context->cwd);
 				// Note: We're only accessing the pointer, not the vnode itself
 				// in the lines below.
@@ -3360,6 +3362,7 @@ vfs_disconnect_vnode(dev_t mountID, ino_t vnodeID)
 		return status;
 
 	disconnect_mount_or_vnode_fds(vnode->mount, vnode);
+	put_vnode(vnode);
 	return B_OK;
 }
 
