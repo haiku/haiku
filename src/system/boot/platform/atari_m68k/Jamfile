@@ -32,7 +32,7 @@ KernelMergeObject boot_platform_atari_m68k.o :
 	cpu.cpp
 	#smp.cpp
 	#smp_trampoline.S
-	support.S
+#	support.S
 	video.cpp
 	#apm.cpp
 	

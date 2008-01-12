@@ -7,7 +7,6 @@
 
 
 #include "mmu.h"
-#include "bios.h"
 
 #include <boot/platform.h>
 #include <boot/stdio.h>

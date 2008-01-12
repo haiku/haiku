@@ -142,6 +142,31 @@ extern int32 gemdos(uint16 nr, ...);
 
 extern status_t toserror(int32 err);
 
+/*
+ * Cookie Jar access
+ */
+
+typedef struct tos_cookie {
+	uint32 cookie;
+	enum {
+		int32 ivalue;
+		void *pvalue;
+	}
+} tos_cookie;
+
+#define COOKIE_JAR (*((const tos_cookie **)0x5A0))
+
+static inline tos_cookie *tos_find_cookie(uint32 what)
+{
+	struct c = COOKIE_JAR;
+	while (c && (c->cookie)) {
+		if (c->cookie == what)
+			return c;
+		c++;
+	}
+	return NULL;
+}
+
 #endif /* __ASSEMBLER__ */
 
 #ifdef __cplusplus
