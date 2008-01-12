@@ -87,8 +87,13 @@ fi
 
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
-	launch beos/system/Tracker
-	launch beos/system/Deskbar
+	if [ -e /etc/users ]; then
+		launch beos/system/Login
+		# nothing more
+	else
+		launch beos/system/Tracker
+		launch beos/system/Deskbar
+	fi
 	launch beos/apps/Terminal
 else
 	launch beos/bin/consoled
