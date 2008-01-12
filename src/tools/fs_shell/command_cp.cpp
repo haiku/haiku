@@ -883,14 +883,35 @@ static fssh_status_t
 copy_file_contents(const char *source, File *sourceFile, const char *target,
 	File *targetFile)
 {
+	fssh_off_t chunkSize = (sourceFile->Stat().fssh_st_size / 20) / sCopyBufferSize * sCopyBufferSize;
+	if (chunkSize == 0)
+		chunkSize = 1;
+
+	bool progress = sourceFile->Stat().fssh_st_size > 1024 * 1024;
+	if (progress) {
+		printf("%s ", strrchr(target, '/') ? strrchr(target, '/') + 1 : target);
+		fflush(stdout);
+	}
+
+	fssh_off_t total = 0;
 	fssh_ssize_t bytesRead;
 	while ((bytesRead = sourceFile->Read(sCopyBuffer, sCopyBufferSize)) > 0) {
 		fssh_ssize_t bytesWritten = targetFile->Write(sCopyBuffer, bytesRead);
+		if (progress && (total % chunkSize) == 0) {
+			putchar('.');
+			fflush(stdout);
+		}
 		if (bytesWritten < 0) {
 			fprintf(stderr, "Error while writing to file `%s': %s\n",
 				target, fssh_strerror(bytesWritten));
 			return bytesWritten;
 		}
+		if (bytesWritten != bytesRead) {
+			fprintf(stderr, "Could not write all data to file \"%s\".\n",
+				target);
+			return FSSH_B_IO_ERROR;
+		}
+		total += bytesWritten;
 	}
 
 	if (bytesRead < 0) {
@@ -898,6 +919,9 @@ copy_file_contents(const char *source, File *sourceFile, const char *target,
 			source, fssh_strerror(bytesRead));
 		return bytesRead;
 	}
+
+	if (progress)
+		putchar('\n');
 
 	return FSSH_B_OK;
 }
