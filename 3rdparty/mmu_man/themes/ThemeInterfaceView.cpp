@@ -700,7 +700,11 @@ void ThemeInterfaceView::SetScreenshot(BBitmap *shot)
 	if (shot)
 	{
 		BBitmap scaled(fScreenshotPane->Bounds(), B_RGB32);
-		if( B_OK == ScaleBitmap(*shot, scaled) )
+		status_t err = ENOSYS;
+#ifdef B_ZETA_VERSION
+		err = ScaleBitmap(*shot, scaled);
+#endif
+		if( err == B_OK )
 		{
 			fScreenshotPane->SetViewBitmap(&scaled);
 		}

@@ -39,7 +39,10 @@ status_t MakeScreenshot(BBitmap **here)
 		scaledBmp = new BBitmap(scaledBounds, B_BITMAP_ACCEPTS_VIEWS, B_RGB32/*shot->ColorSpace()*/);
 		err = scaledBmp->InitCheck();
 		if (!err) {
+			err = ENOSYS;
+#ifdef B_ZETA_VERSION
 			err = ScaleBitmap(*shot, *scaledBmp);
+#endif
 			if (err) {
 				// filtered scaling didn't work, do it manually
 				BView *v = new BView(scaledBounds, "scaleview", B_FOLLOW_NONE, 0);
