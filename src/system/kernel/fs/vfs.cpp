@@ -2379,12 +2379,12 @@ dump_mounts(int argc, char **argv)
 	struct hash_iterator iterator;
 	struct fs_mount *mount;
 
-	kprintf("address     id root       covers     fs_name\n");
+	kprintf("address     id root       covers     cookie     fs_name\n");
 
 	hash_open(sMountsTable, &iterator);
 	while ((mount = (struct fs_mount *)hash_next(sMountsTable, &iterator)) != NULL) {
-		kprintf("%p%4ld %p %p %s\n", mount, mount->id, mount->root_vnode,
-			mount->covers_vnode, mount->fs_name);
+		kprintf("%p%4ld %p %p %p %s\n", mount, mount->id, mount->root_vnode,
+			mount->covers_vnode, mount->cookie, mount->fs_name);
 	}
 
 	hash_close(sMountsTable, &iterator, false);
@@ -2446,17 +2446,18 @@ dump_vnodes(int argc, char **argv)
 	struct hash_iterator iterator;
 	struct vnode *vnode;
 
-	kprintf("address    dev     inode  ref cache      locking    flags\n");
+	kprintf("address    dev     inode  ref cache      fs-node    locking    "
+		"flags\n");
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
 		if (device != -1 && vnode->device != device)
 			continue;
 
-		kprintf("%p%4ld%10Ld%5ld %p %p %s%s%s\n", vnode, vnode->device, vnode->id,
-			vnode->ref_count, vnode->cache, vnode->advisory_locking,
-			vnode->remove ? "r" : "-", vnode->busy ? "b" : "-",
-			vnode->unpublished ? "u" : "-");
+		kprintf("%p%4ld%10Ld%5ld %p %p %p %s%s%s\n", vnode, vnode->device,
+			vnode->id, vnode->ref_count, vnode->cache, vnode->private_node,
+			vnode->advisory_locking, vnode->remove ? "r" : "-",
+			vnode->busy ? "b" : "-", vnode->unpublished ? "u" : "-");
 	}
 
 	hash_close(sVnodeTable, &iterator, false);
