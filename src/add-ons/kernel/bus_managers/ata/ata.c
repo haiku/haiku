@@ -783,7 +783,7 @@ ata_exec_read_write(ide_device_info *device, ata_request *request,
 	// if no timeout is specified, use standard
 	timeout = request->ccb->timeout > 0 ? request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
 
-	if (device->is_atapi)
+	if (!device->is_atapi)
 		flags |= ATA_DRDY_REQUIRED;
 	if (request->uses_dma)
 		flags |= ATA_DMA_TRANSFER;
@@ -819,15 +819,17 @@ ata_exec_pio_transfer(ata_request *request)
 	uint32 timeout = request->ccb->timeout > 0 ? 
 		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
 
-//	FLOW("ata_exec_pio_transfer: length %d, left_sg_elem %d, cur_sg_elem %d, cur_sg_ofs %d\n",
-//		request->ccb->data_length, device->left_sg_elem, device->cur_sg_elem, device->cur_sg_ofs);
+	FLOW("ata_exec_pio_transfer: length %d, left_blocks %d, left_sg_elem %d, cur_sg_ofs %d\n",
+		request->ccb->data_length, device->left_blocks, device->left_sg_elem, device->cur_sg_ofs);
 
-	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 4000000) != B_OK) {
-		TRACE("ata_exec_pio_transfer: wait failed\n");
-		goto error;
-	}
 
 	while (device->left_blocks > 0) {
+
+		if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 4000000) != B_OK) {
+			TRACE("ata_exec_pio_transfer: wait failed\n");
+			goto error;
+		}
+
 		if (request->is_write) {
 //			FLOW("writing 1 block\n");
 			if (write_PIO_block(request, 512) != B_OK)
@@ -838,6 +840,11 @@ ata_exec_pio_transfer(ata_request *request)
 				goto transfer_error;
 		}
 		device->left_blocks--;
+
+		// wait 1 pio cycle
+		if (device->left_blocks)
+			bus->controller->get_altstatus(bus->channel_cookie);
+			
 //		FLOW("%d blocks left\n", device->left_blocks);
 	}
 
