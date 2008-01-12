@@ -793,10 +793,10 @@ ShowImageView::AlignBitmap()
 
 		// always align in the center
 		if (width > bitmapWidth)
-			rect.OffsetBy((width - bitmapWidth) / 2.0, 0);
+			rect.OffsetBy(floorf((width - bitmapWidth) / 2.0), 0);
 
 		if (height > bitmapHeight)
-			rect.OffsetBy(0, (height - bitmapHeight) / 2.0);
+			rect.OffsetBy(0, floorf((height - bitmapHeight) / 2.0));
 	}
 	rect.OffsetBy(PEN_SIZE, PEN_SIZE);
 	return rect;
