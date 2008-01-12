@@ -15,6 +15,7 @@ addonSources =
 	DeskbarAddon.cpp
 	EddieAddon.cpp
 	HaikuUISettingsAddon.cpp
+	HaikuWindowDecorAddon.cpp
 	PeAddon.cpp
 	ScreensaverAddon.cpp
 	SoundplayColorAddon.cpp

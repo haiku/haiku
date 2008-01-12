@@ -2,6 +2,8 @@
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
+#include <BeBuild.h>
+
 #include <malloc.h>
 #include <stdio.h>
 
@@ -34,7 +36,8 @@ extern status_t _get_nth_font_folder_(long, font_folder_info **);
 
 status_t find_font_file(entry_ref *to, font_family family, font_style style, float size)
 {
-	status_t err;
+	status_t err = ENOENT;
+#ifdef B_BEOS_VERSION_DANO
 	long i, fontcount, foldercount;
 	font_file_info *ffi;
 	font_folder_info *fdi;
@@ -67,6 +70,7 @@ status_t find_font_file(entry_ref *to, font_family family, font_style style, flo
 		printf("find_font_file: found\n.");
 		return ent.GetRef(to);
 	}
+#endif
 	return ENOENT;
 }
 

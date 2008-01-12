@@ -3,8 +3,7 @@
  */
 
 #include <BeBuild.h>
-//#ifdef B_BEOS_VERSION_DANO
-#if 0
+#ifdef B_HAIKU_VERSION_1
 
 #include <Alert.h>
 #include <Application.h>
@@ -23,6 +22,14 @@
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_ui_settings
 #endif
+
+//XXX: FIXME
+ThemesAddon *instanciate_themes_addon()
+{
+	return NULL;
+}
+
+#if 0 // DANO...
 
 //#define A_NAME "UI Settings"
 #define A_NAME "System Colors and Fonts"
@@ -204,5 +211,7 @@ ThemesAddon *instanciate_themes_addon()
 {
 	return (ThemesAddon *) new UISettingsThemesAddon;
 }
+
+#endif
 
 #endif /* B_BEOS_VERSION_DANO */

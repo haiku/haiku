@@ -3,8 +3,7 @@
  */
 
 #include <BeBuild.h>
-//#ifdef B_BEOS_VERSION_DANO
-#if 0
+#ifdef B_HAIKU_VERSION_1
 
 #include <Alert.h>
 #include <Application.h>
@@ -27,6 +26,14 @@
 #ifdef SINGLE_BINARY
 #define instanciate_themes_addon instanciate_themes_addon_window_decor
 #endif
+
+//XXX: FIXME
+ThemesAddon *instanciate_themes_addon()
+{
+	return NULL;
+}
+
+#if 0 // DANO...
 
 #define A_NAME "Window Decor"
 #define A_MSGNAME Z_THEME_WINDOW_DECORATIONS
@@ -159,5 +166,7 @@ ThemesAddon *instanciate_themes_addon()
 {
 	return (ThemesAddon *) new DecorThemesAddon;
 }
+
+#endif
 
 #endif /* B_BEOS_VERSION_DANO */
