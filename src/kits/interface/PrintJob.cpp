@@ -797,9 +797,11 @@ BPrintJob::_LoadDefaultSettings()
 	BMessage *reply = new BMessage;
     
 	printServer.SendMessage(&message, reply);
-    
-	_HandlePrintSetup(reply);
-    
+
+	// Only override our settings if we don't have any settings yet
+	if (fSetupMessage == NULL)
+		_HandlePrintSetup(reply);
+
 	delete fDefaultSetupMessage;  	
 	fDefaultSetupMessage = reply;
 }
