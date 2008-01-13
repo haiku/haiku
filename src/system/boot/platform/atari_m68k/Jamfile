@@ -26,6 +26,7 @@ KernelMergeObject boot_platform_atari_m68k.o :
 	#bios.S
 	console.cpp
 	#serial.cpp
+	Handle.cpp
 	devices.cpp
 	keyboard.cpp
 	menu.cpp

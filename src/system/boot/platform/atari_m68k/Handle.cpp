@@ -9,7 +9,7 @@
 #include <util/kernel_cpp.h>
 
 #include "Handle.h"
-#include "toscalls."
+#include "toscalls.h"
 
 /*
  * (X)BIOS supports char and block devices with a separate namespace
@@ -27,7 +27,7 @@
 
 Handle::Handle(int handle)
 	:
-	fHandle((int16)handle),
+	fHandle((int16)handle)
 {
 }
 
@@ -97,7 +97,8 @@ CharHandle::~CharHandle()
 ssize_t
 CharHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
-	const char *string = (const char *)buffer;
+	char *string = (char *)buffer;
+	int i;
 
 	// can't seek
 	for (i = 0; i < bufferSize; i++) {
@@ -114,6 +115,7 @@ ssize_t
 CharHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
+	int i;
 
 	// can't seek
 	
@@ -125,12 +127,4 @@ CharHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSi
 	return bufferSize;
 }
 
-
-off_t 
-CharHandle::Size() const
-{
-	// ToDo: fix this!
-	return 1024LL * 1024 * 1024 * 1024;
-		// 1024 GB
-}
 
