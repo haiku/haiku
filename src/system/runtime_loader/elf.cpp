@@ -1458,6 +1458,11 @@ unload_library(image_id imageID, bool addOn)
 	if (status == B_OK) {
 		while ((image = sDisposableImages.head) != NULL) {
 			// call image fini here...
+			if (gRuntimeLoader.call_atexit_hooks_for_range) {
+				gRuntimeLoader.call_atexit_hooks_for_range(
+					image->regions[0].start, image->regions[0].size);
+			}
+
 			if (image->term_routine)
 				((init_term_function)image->term_routine)(image->id);
 

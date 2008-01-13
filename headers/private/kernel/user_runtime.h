@@ -41,6 +41,8 @@ struct rld_export {
 
 	status_t (*reinit_after_fork)();
 
+	void (*call_atexit_hooks_for_range)(addr_t start, addr_t size);
+
 	const struct user_space_program_args *program_args;
 };
 

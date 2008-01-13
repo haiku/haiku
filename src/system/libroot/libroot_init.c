@@ -13,6 +13,8 @@
 
 
 void initialize_before(image_id imageID);
+void _call_atexit_hooks_for_range(addr_t start, addr_t size);
+void __init_exit_stack_lock();
 
 struct rld_export *__gRuntimeLoader = NULL;
 	// This little bugger is set to something meaningful by the runtime loader
@@ -48,6 +50,10 @@ initialize_before(image_id imageID)
 	__libc_argc = __gRuntimeLoader->program_args->arg_count;
 	__libc_argv = __gRuntimeLoader->program_args->args;
 
+	__gRuntimeLoader->call_atexit_hooks_for_range
+		= _call_atexit_hooks_for_range;
+
+	__init_exit_stack_lock();
 	__init_time();
 	__init_fork();
 	__init_heap();
