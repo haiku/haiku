@@ -167,6 +167,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	if (virtualAddress < KERNEL_BASE)
 		panic("map_page: asked to map invalid page %p!\n", (void *)virtualAddress);
+#if 0
 
 	if (virtualAddress >= sMaxVirtualAddress) {
 		// we need to add a new page table
@@ -191,7 +192,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	pageTable[tableEntry] = physicalAddress | flags;
 
 	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
-
+#endif
 	TRACE(("map_page: done\n"));
 }
 
