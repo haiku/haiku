@@ -1460,7 +1460,7 @@ unload_library(image_id imageID, bool addOn)
 			// call image fini here...
 			if (gRuntimeLoader.call_atexit_hooks_for_range) {
 				gRuntimeLoader.call_atexit_hooks_for_range(
-					image->regions[0].start, image->regions[0].size);
+					image->regions[0].vmstart, image->regions[0].vmsize);
 			}
 
 			if (image->term_routine)

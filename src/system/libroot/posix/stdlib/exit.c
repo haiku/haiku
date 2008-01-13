@@ -46,8 +46,10 @@ _exit_stack_lock()
 {
 	thread_id self = find_thread(NULL);
 	if (self != sExitStackInfo.lock_owner) {
-		if (atomic_add(&sExitStackInfo.lock_count, 1) > 0)
-			acquire_sem(sExitStackInfo.lock);
+		if (atomic_add(&sExitStackInfo.lock_count, 1) > 0) {
+			while (acquire_sem(sExitStackInfo.lock) != B_OK)
+				;
+		}
 		sExitStackInfo.lock_owner = self;
 	}
 	sExitStackInfo.recursion_count++;
@@ -75,7 +77,7 @@ _call_atexit_hooks_for_range(addr_t start, addr_t size)
 	int32 insertIndex = -1;
 
 	_exit_stack_lock();
-	for (index = sExitStackInfo.stack_size - 1; index > 0; index--) {
+	for (index = sExitStackInfo.stack_size - 1; index >= 0; index--) {
 		addr_t function = (addr_t)sExitStackInfo.exit_stack[index];
 		if (function >= start && function < start + size) {
 			(*sExitStackInfo.exit_stack[index])();
