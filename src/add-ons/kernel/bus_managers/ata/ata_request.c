@@ -78,7 +78,7 @@ void
 ata_request_set_status(ata_request *request, uint8 status)
 {
 	ASSERT(status != SCSI_REQ_CMP);
-	if (request->ccb)
+	if (request && request->ccb)
 		request->ccb->subsys_status = status;
 }
 
@@ -86,9 +86,11 @@ ata_request_set_status(ata_request *request, uint8 status)
 void
 ata_request_set_sense(ata_request *request, uint8 key, uint16 asc_acq)
 {
-	request->senseKey = key;
-	request->senseAsc = asc_acq >> 8;
-	request->senseAscq = asc_acq & 0xff;
+	if (request) {
+		request->senseKey = key;
+		request->senseAsc = asc_acq >> 8;
+		request->senseAscq = asc_acq & 0xff;
+	}
 }
 
 
