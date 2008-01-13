@@ -69,7 +69,12 @@ floppy_start:
 	// load at base + this code.
 	move.l		#ATARI_ZBEOS_BASE+512,%a2
 	bsr			load_sectors
-	
+	tst.l		%d0
+	beq			floppy_done
+	lea			failure_string,%a0
+	jsr			puts
+	bra			spin
+flopy_done:
 	jmp			#ATARI_ZBEOS_BASE+512
 
 /**	Loads %d2 sectors from floppy disk, starting at head XXX %dh, sector %cx.
@@ -91,12 +96,16 @@ load_sectors:
 
 floppy_end:
 //	.org	FAILURE_STRING
+failure_string:
 	.string " Loading failed! Press key to reboot.\r\n"
+	
 //	.org	DOT_STRING
 	.string	"."
 
-//	.org	0x01fe
-	.word	0xaa55
+//shell_end:
+//	.skip	0x01fe - tmp_floppy_end
+////	.org	0x01fe
+//	.word	0xaa55
 		// this bumps the "start" label to offset 0x0200 as
 		// expected by the BFS boot loader, and also marks
 		// this block as valid boot block for the BIOS
@@ -112,8 +121,8 @@ prg_start:
 	// all done
 	lea			unimpl,%a0
 	jsr			puts
-prg_spin:
-	bra			prg_spin
+spin:
+	bra			spin
 
 super_done:
 	
@@ -168,3 +177,13 @@ str:
 	.string "Haiku!"
 unimpl:
 	.string "Unimplemented."
+
+shell_end:
+	.skip	0x01fe - tmp_floppy_end
+//	.org	0x01fe
+	.word	0xaa55-1	// will be replaced by the one calculated by the build.
+				// we make sure we PCs don't try to execute it.
+		// this bumps the "start" label to offset 0x0200 as
+		// expected by the BFS boot loader, and also marks
+		// this block as valid boot block for the BIOS
+		// XXX: actually TOS wants a real checksum here so sum is 0x1234!
