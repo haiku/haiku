@@ -21,6 +21,7 @@ UsePrivateHeaders [ FDirName storage ] ;
 KernelMergeObject boot_platform_atari_m68k.o :
 	shell.S
 	start.c
+	toscalls.S
 	debug.c
 	#bios.S
 	console.cpp

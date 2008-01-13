@@ -46,7 +46,7 @@
 	cmp.w		#SUP_SUPER,%d0
 	beq			floppy_start
 	bra			prg_start
-	bra			bootsect_start
+	//bra			bootsect_start
 	rts
 floppy_start:
 
