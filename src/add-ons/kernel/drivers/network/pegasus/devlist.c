@@ -48,9 +48,11 @@ remove_device_info(pegasus_dev *device)
 
 	acquire_sem(gDeviceListLock);
 
-	if (sDeviceList == device)
+	if (sDeviceList == device) {
 		sDeviceList = device->next;
-	else {
+		--sDeviceCount;
+		gDeviceListChanged = true;
+	} else {
 		pegasus_dev *previous;
 		for (previous = sDeviceList; previous != NULL; previous = previous->next) {
 			if (previous->next == device) {
