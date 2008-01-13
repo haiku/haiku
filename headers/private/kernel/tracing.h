@@ -5,6 +5,8 @@
 #include <SupportDefs.h>
 #include <KernelExport.h>
 
+#include <stdio.h>
+
 
 #define ENABLE_TRACING 0
 #define MAX_TRACE_SIZE 1024 * 1024
@@ -23,7 +25,7 @@ class TraceEntry : trace_entry {
 		TraceEntry();
 		virtual ~TraceEntry();
 
-		virtual void Dump();
+		virtual void Dump(char* buffer, size_t bufferSize);
 
 		size_t Size() const { return size; }
 		uint16 Flags() const { return flags; }
@@ -42,9 +44,15 @@ class AbstractTraceEntry : public TraceEntry {
 		{
 		}
 
-		virtual void Dump()
+		virtual void Dump(char* buffer, size_t bufferSize)
 		{
-			kprintf("[%6ld] %Ld: ", fThread, fTime);
+			int length = snprintf(buffer, bufferSize, "[%6ld] %Ld: ",
+				fThread, fTime);
+			AddDump(buffer + length, bufferSize - length);
+		}
+
+		virtual void AddDump(char* buffer, size_t bufferSize)
+		{
 		}
 
 		thread_id Thread() const { return fThread; }
@@ -58,8 +66,14 @@ class AbstractTraceEntry : public TraceEntry {
 #endif	// __cplusplus
 
 #ifdef __cplusplus
-extern "C"
+extern "C" {
 #endif
+
+uint8* alloc_tracing_buffer(size_t size);
 status_t tracing_init(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* KERNEL_UTIL_TRACING_H */

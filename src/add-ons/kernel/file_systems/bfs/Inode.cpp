@@ -36,12 +36,11 @@ class Create : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void Dump()
+		virtual void AddDump(char *buffer, size_t size)
 		{
-			AbstractTraceEntry::Dump();
-			kprintf("CREATE %Ld (%p), parent %Ld (%p), \"%s\", mode %lx, "
-				"omode %x, type %lx\n", fID, fInode, fParentID, fParent,
-				fName, fMode, fOpenMode, fType);
+			snprintf(buffer, size, "CREATE %Ld (%p), parent %Ld (%p), \"%s\", "
+				"mode %lx, omode %x, type %lx\n", fID, fInode, fParentID,
+				fParent, fName, fMode, fOpenMode, fType);
 		}
 
 	private:
@@ -67,10 +66,10 @@ class Remove : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void Dump()
+		virtual void AddDump(char *buffer, size_t size)
 		{
-			AbstractTraceEntry::Dump();
-			kprintf("REMOVE %Ld (%p), \"%s\"\n", fID, fInode, fName);
+			snprintf(buffer, size, "REMOVE %Ld (%p), \"%s\"\n", fID, fInode,
+				fName);
 		}
 
 	private:
@@ -91,11 +90,10 @@ class Resize : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void Dump()
+		virtual void AddDump(char *buffer, size_t size)
 		{
-			AbstractTraceEntry::Dump();
-			kprintf("RESIZE %Ld (%p), %Ld -> %Ld\n", fID, fInode, fOldSize,
-				fNewSize);
+			snprintf(buffer, size, "RESIZE %Ld (%p), %Ld -> %Ld\n", fID, fInode,
+				fOldSize, fNewSize);
 		}
 
 	private:

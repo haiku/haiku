@@ -48,11 +48,10 @@ class Allocate : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void Dump()
+		virtual void AddDump(char *buffer, size_t size)
 		{
-			AbstractTraceEntry::Dump();
-			kprintf("alloc %lu.%u.%u\n", fRun.AllocationGroup(), fRun.Start(),
-				fRun.Length());
+			snprintf(buffer, size, "alloc %lu.%u.%u", fRun.AllocationGroup(),
+				fRun.Start(), fRun.Length());
 		}
 
 	private:
@@ -68,11 +67,10 @@ class Free : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void Dump()
+		virtual void AddDump(char *buffer, size_t size)
 		{
-			AbstractTraceEntry::Dump();
-			kprintf("free %lu.%u.%u\n", fRun.AllocationGroup(), fRun.Start(),
-				fRun.Length());
+			snprintf(buffer, size, "free %lu.%u.%u\n", fRun.AllocationGroup(),
+				fRun.Start(), fRun.Length());
 		}
 
 	private:

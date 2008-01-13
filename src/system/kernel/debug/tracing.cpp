@@ -9,7 +9,8 @@
 
 enum {
 	WRAP_ENTRY			= 0x01,
-	ENTRY_INITIALIZED	= 0x02
+	ENTRY_INITIALIZED	= 0x02,
+	BUFFER_ENTRY		= 0x04
 };
 
 static const size_t kBufferSize = MAX_TRACE_SIZE / 4 - 1;
@@ -36,9 +37,9 @@ next_entry(trace_entry* entry)
 
 
 static void
-make_space(size_t size)
+make_space(size_t needed)
 {
-	if (sBufferEnd + size / 4 > sBuffer + kBufferSize - 1) {
+	if (sBufferEnd + needed / 4 > sBuffer + kBufferSize - 1) {
 		sBufferEnd->size = 0;
 		sBufferEnd->flags = WRAP_ENTRY;
 		sBufferEnd = sBuffer;
@@ -48,62 +49,26 @@ make_space(size_t size)
 	if (diff < 0)
 		sBufferEnd = sBuffer;
 	else
-		size -= diff;
+		needed -= diff;
 
 	while (true) {
-		uint16 skip = sBufferStart->size;
+		uint16 freed = sBufferStart->size;
 		sBufferStart = next_entry(sBufferStart);
 		if (sBufferStart == NULL)
-			sBufferStart = sBuffer;
+			sBufferStart = sBufferEnd;
 		sEntries--;
 
-		if (size <= skip)
+		if (needed <= freed)
 			break;
 
-		size -= skip;
+		needed -= freed;
 	}
 }
 
 
-#endif	// ENABLE_TRACING
-
-
-//	#pragma mark -
-
-
-TraceEntry::TraceEntry()
+trace_entry*
+allocate_entry(size_t size)
 {
-}
-
-
-TraceEntry::~TraceEntry()
-{
-}
-
-
-void
-TraceEntry::Dump()
-{
-#if ENABLE_TRACING
-	// to be overloaded by subclasses
-	kprintf("ENTRY %p\n", this);
-#endif
-}
-
-
-void
-TraceEntry::Initialized()
-{
-#if ENABLE_TRACING
-	flags |= ENTRY_INITIALIZED;
-#endif
-}
-
-
-void*
-TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
-{
-#if ENABLE_TRACING
 	if (sBuffer == NULL)
 		return NULL;
 
@@ -127,7 +92,50 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 	sBufferEnd += size >> 2;
 	sEntries++;
 	return entry;
-#else	// !ENABLE_TRACING
+}
+
+
+#endif	// ENABLE_TRACING
+
+
+//	#pragma mark -
+
+
+TraceEntry::TraceEntry()
+{
+}
+
+
+TraceEntry::~TraceEntry()
+{
+}
+
+
+void
+TraceEntry::Dump(char* buffer, size_t bufferSize)
+{
+#if ENABLE_TRACING
+	// to be overloaded by subclasses
+	snprintf(buffer, bufferSize, "ENTRY %p", this);
+#endif
+}
+
+
+void
+TraceEntry::Initialized()
+{
+#if ENABLE_TRACING
+	flags |= ENTRY_INITIALIZED;
+#endif
+}
+
+
+void*
+TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
+{
+#if ENABLE_TRACING
+	return allocate_entry(size);
+#else
 	return NULL;
 #endif
 }
@@ -142,6 +150,10 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 int
 dump_tracing(int argc, char** argv)
 {
+	const char *pattern = NULL;
+	if (argv[argc - 1][0] == '#')
+		pattern = argv[--argc] + 1;
+
 	int32 count = 30;
 	if (argc == 2)
 		count = strtol(argv[1], NULL, 0);
@@ -152,7 +164,7 @@ dump_tracing(int argc, char** argv)
 		start = strtol(argv[1], NULL, 0);
 		count = strtol(argv[2], NULL, 0);
 	} else if (argc > 3) {
-		kprintf("usage: %s [start] [count]\n", argv[0]);
+		kprintf("usage: %s [start] [count] [#pattern]\n", argv[0]);
 		return 0;
 	}
 	// TODO: add pattern matching mechanism for the class name
@@ -168,11 +180,26 @@ dump_tracing(int argc, char** argv)
 			continue;
 		if (index > start + count)
 			break;
+		if ((entry->flags & BUFFER_ENTRY) != 0) {
+			// skip buffer entries
+			index--;
+			continue;
+		}
 
-		if ((current->flags & ENTRY_INITIALIZED) != 0)
-			((TraceEntry*)current)->Dump();
-		else
-			kprintf("** uninitialized entry **\n");
+		if ((current->flags & ENTRY_INITIALIZED) != 0) {
+			char buffer[256];
+			buffer[0] = '\0';
+			((TraceEntry*)current)->Dump(buffer, sizeof(buffer));
+
+			if (pattern != NULL && strstr(buffer, pattern) == NULL)
+				continue;
+
+			if (pattern != NULL)
+				kprintf("%5ld. %s\n", index, buffer);
+			else
+				kprintf("%s\n", buffer);
+		} else
+			kprintf("%5ld. ** uninitialized entry **\n", index);
 	}
 
 	kprintf("%ld of %ld entries.\n", count, sEntries);
@@ -181,6 +208,21 @@ dump_tracing(int argc, char** argv)
 
 
 #endif	// ENABLE_TRACING
+
+extern "C" uint8*
+alloc_tracing_buffer(size_t size)
+{
+#if	ENABLE_TRACING
+	trace_entry* entry = allocate_entry(size + sizeof(trace_entry));
+	if (entry == NULL)
+		return NULL;
+
+	entry->flags = BUFFER_ENTRY;
+	return (uint8*)(entry + 1);
+#else
+	return NULL;
+#endif
+}
 
 
 extern "C" status_t
