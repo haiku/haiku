@@ -75,7 +75,7 @@ floppy_start:
 	jsr			puts
 	bra			spin
 flopy_done:
-	jmp			#ATARI_ZBEOS_BASE+512
+	bra			#ATARI_ZBEOS_BASE+512
 
 /**	Loads %d2 sectors from floppy disk, starting at head XXX %dh, sector %cx.
  *	The data is loaded to %a2.
