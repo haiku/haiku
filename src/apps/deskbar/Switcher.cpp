@@ -251,7 +251,7 @@ IsVisibleInCurrentWorkspace(const window_info *windowInfo)
 	 front visible window (the first on the list), going down through all
 	 the other visible windows, then all the hidden or non workspace
 	 visible window at the end.
-  
+
 	 layer > 2 : normal visible window.
 	 layer == 2 : reserved for the desktop window (visible also).
 	 layer < 2 : hidden (0) and non workspace visible window (1)

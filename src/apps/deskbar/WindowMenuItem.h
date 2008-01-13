@@ -107,7 +107,7 @@ class TWindowMenuItem : public BMenuItem {
 // from interface_defs.h
 struct window_info {
 	team_id		team;
-    int32   	id;	  		  /* window's token */
+	int32   	id;	  		  /* window's token */
 
 	int32		thread;
 	int32		client_token;
@@ -115,8 +115,8 @@ struct window_info {
 	uint32		workspaces;
 
 	int32		layer;
-    uint32	  	w_type;    	  /* B_TITLED_WINDOW, etc. */
-    uint32      flags;	  	  /* B_WILL_FLOAT, etc. */
+	uint32	  	w_type;		/* B_TITLED_WINDOW, etc. */
+	uint32		flags;	  	  /* B_WILL_FLOAT, etc. */
 	int32		window_left;
 	int32		window_top;
 	int32		window_right;
