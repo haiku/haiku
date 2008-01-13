@@ -33,7 +33,7 @@
 	// when the drive reading fails for some reason, it will
 	// retry this many times until it will report a failure
 
-.text
+//.text
 
 /* main entry point, both from the floppy boot and .prg */
 	bra			real_entry
@@ -49,7 +49,7 @@ real_entry:
 
 	// first, determine if .prg (user) or bootsect (super)
 	// Super()
-	move.l		SUP_INQUIRE,-(%sp)
+	move.l		#SUP_INQUIRE,-(%sp)
 	move.w		#0x20,%d0
 	trap		#1
 	addq.l		#6,%sp
@@ -65,17 +65,19 @@ floppy_start:
 	move.l		#ATARI_ZBEOS_STACK_BASE,%sp
 	//XXX: check for enough RAM
 	// load the rest
-	move.w		#sNumSectors,%d2
+	move.w		sNumSectors,%d2
 	// load at base + this code.
 	move.l		#ATARI_ZBEOS_BASE+512,%a2
 	bsr			load_sectors
 	tst.l		%d0
 	beq			floppy_done
 	lea			failure_string,%a0
-	jsr			puts
+	bsr			puts
 	bra			spin
-flopy_done:
-	bra			#ATARI_ZBEOS_BASE+512
+floppy_done:
+	jmp			ATARI_ZBEOS_BASE+512
+
+	//rts
 
 /**	Loads %d2 sectors from floppy disk, starting at head XXX %dh, sector %cx.
  *	The data is loaded to %a2.
@@ -88,7 +90,7 @@ load_sectors:
 	move.w		#1,-(%sp)	// 2nd sector
 	move.w		%d2,-(%sp)
 	move.l		%a2,-(%sp)
-	move.w		RW_READ+RW_NOTRANSLATE,-(%sp)
+	move.w		#RW_READ+RW_NOTRANSLATE,-(%sp)
 	move.w		#4,-(%sp)
 	trap		#13
 	add.l		#14,%sp
@@ -113,7 +115,7 @@ failure_string:
 prg_start:
 	// .prg:
 	// we need to switch to supervisor mode anyway
-	move.l		SUP_SET,-(%sp)
+	move.l		#SUP_SET,-(%sp)
 	move.w		#0x20,%d0
 	trap		#1
 	addq.l		#6,%sp
@@ -125,8 +127,8 @@ spin:
 	bra			spin
 
 super_done:
-	
-	jsr			_start
+	// XXX: copy the rest !
+	jmp			ATARI_ZBEOS_BASE+512
 
 saved_super_stack:
 	.long	0
@@ -179,7 +181,7 @@ unimpl:
 	.string "Unimplemented."
 
 shell_end:
-	.skip	0x01fe - tmp_floppy_end
+	.fill	0x01fe - tmp_floppy_end, 1, 0x55
 //	.org	0x01fe
 	.word	0xaa55-1	// will be replaced by the one calculated by the build.
 				// we make sure we PCs don't try to execute it.
@@ -187,3 +189,4 @@ shell_end:
 		// expected by the BFS boot loader, and also marks
 		// this block as valid boot block for the BIOS
 		// XXX: actually TOS wants a real checksum here so sum is 0x1234!
+tmp_floppy_end:
