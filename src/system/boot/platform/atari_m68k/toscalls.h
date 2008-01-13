@@ -9,11 +9,11 @@
 #ifndef _TOSCALLS_H
 #define _TOSCALLS_H
 
-#include <OS.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* those are used by asm code too */
 
 #define DEV_PRINTER	0
 #define DEV_AUX	1
@@ -43,6 +43,8 @@ extern "C" {
 #define SUP_INQUIRE		1
 
 #ifndef __ASSEMBLER__
+
+#include <OS.h>
 
 /* 
  * Atari BIOS calls
