@@ -114,13 +114,13 @@ PackageView::AttachedToWindow()
 	fOpenPanel->SetTarget(BMessenger(this));
 	fInstallTypes->SetTargetForItems(this);
 
-  if (fInfo.InitCheck() == B_OK) {
-    // If the package is valid, we can set up the default group and all
-    // other things. If not, then the application will close just after
-    // attaching the view to the window
-	  _GroupChanged(0);
+	if (fInfo.InitCheck() == B_OK) {
+		// If the package is valid, we can set up the default group and all
+		// other things. If not, then the application will close just after
+		// attaching the view to the window
+		_GroupChanged(0);
 
-	  fStatusWindow = new PackageStatus(T("Installation progress"));
+		fStatusWindow = new PackageStatus(T("Installation progress"));
 
 		// Show the splash screen, if present
 		BMallocIO *image = fInfo.GetSplashScreen();
@@ -130,18 +130,18 @@ PackageView::AttachedToWindow()
 		}
 	
 		// Show the disclaimer/info text popup, if present
-  	BString disclaimer = fInfo.GetDisclaimer();
-  	if (disclaimer.Length() != 0) {
-	  	PackageTextViewer *text = new PackageTextViewer(disclaimer.String());
-  		int32 selection = text->Go();
-		  // The user didn't accept our disclaimer, this means we cannot continue.
-	  	if (selection == 0) {
+		BString disclaimer = fInfo.GetDisclaimer();
+		if (disclaimer.Length() != 0) {
+	  		PackageTextViewer *text = new PackageTextViewer(disclaimer.String());
+			int32 selection = text->Go();
+			// The user didn't accept our disclaimer, this means we cannot continue.
+	  		if (selection == 0) {
 				BWindow *parent = Window();
 				if (parent && parent->Lock())
 					parent->Quit();
-  		}
-	  }
-  }
+  			}
+		}
+	}
 }
 
 

@@ -37,7 +37,7 @@ info_prepare(const char *filename, BFile *file, BMessage *info)
 		return B_ERROR;
 
 	status_t ret = info->Unflatten(file);
-  if (ret != B_OK || info->what != P_PACKAGE_INFO)
+	if (ret != B_OK || info->what != P_PACKAGE_INFO)
 		return B_ERROR;
 
 	return B_OK;
