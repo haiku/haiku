@@ -997,6 +997,10 @@ init_driver()
 	}
 	
 	devices = malloc(sizeof(char *) * (devices_count+1));
+	if (!devices) {
+		put_module(FIREWIRE_MODULE_NAME);
+		return ENOMEM;
+	}
 	for (i=0; i<devices_count; i++) {
 		devices[i] = strdup(fwname);
 		snprintf(devices[i], FWNAMEMAX, fwname, i);
@@ -1016,6 +1020,7 @@ uninit_driver()
 		free(devices[i]);
 	}
 	free(devices);
+	devices = NULL;
 
 	put_module(FIREWIRE_MODULE_NAME);
 }
