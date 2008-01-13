@@ -37,6 +37,11 @@ extern "C" {
 #define RW_NORETRY		0x04
 #define RW_NOTRANSLATE	0x08
 
+#define SUP_USER		0
+#define SUP_SUPER		1
+#define SUP_SET			0
+#define SUP_INQUIRE		1
+
 #ifndef __ASSEMBLER__
 
 /* 
@@ -129,9 +134,8 @@ extern int32 xbios(uint16 nr, ...);
 
 extern int32 gemdos(uint16 nr, ...);
 
-#define SUP_USER		0
-#define SUP_SUPER		1
-
+#undef SUP_SET
+#undef SUP_INQUIRE
 #define SUP_SET			(void *)0
 #define SUP_INQUIRE		(void *)1
 
