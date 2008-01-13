@@ -65,6 +65,14 @@ check_cpu_features()
 	return B_OK;
 }
 
+#warning M68K: move and implement system_time()
+static bigtime_t gSystemTimeCounter = 0; //HACK
+extern "C" bigtime_t
+system_time(void)
+{
+	return gSystemTimeCounter++;
+}
+
 
 //	#pragma mark -
 
