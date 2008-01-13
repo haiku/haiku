@@ -77,6 +77,53 @@ class Free : public AbstractTraceEntry {
 		block_run	fRun;
 };
 
+
+static uint32
+checksum(const uint8 *data, size_t size)
+{
+	const uint32 *data4 = (const uint32 *)data;
+	uint32 sum = 0;
+	while (size >= 4) {
+		sum += *data4;
+		data4++;
+		size -= 4;
+	}
+	return sum;
+}
+
+
+class Block : public AbstractTraceEntry {
+	public:
+		Block(const char *label, off_t blockNumber, const uint8 *data,
+				size_t size)
+			:
+			fBlock(blockNumber),
+			fData(data)
+		{
+			strlcpy(fLabel, label, sizeof(fLabel));
+			fSum = checksum(data, size);
+			memcpy(fBytes, data, min_c(size, sizeof(fBytes)));
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			uint32 length = snprintf(buffer, size, "%s: block %Ld (%p), sum %lu,"
+				" bytes ", fLabel, fBlock, fData, fSum);
+			for (uint32 i = 0; length < size - 1 && i < sizeof(fBytes); i++) {
+				length += snprintf(buffer + length, size - length, "%02x",
+					fBytes[i]);
+			}
+		}
+
+	private:
+		off_t		fBlock;
+		const uint8	*fData;
+		uint32		fSum;
+		char		fLabel[12];
+		uint8		fBytes[32];
+};
+
 }	// namespace BFSBlockTracing
 
 #	define T(x) new(std::nothrow) BFSBlockTracing::x;
@@ -109,6 +156,7 @@ class AllocationBlock : public CachedBlock {
 
 		uint32 NumBlockBits() const { return fNumBits; }
 		uint32 &Block(int32 index) { return ((uint32 *)fBlock)[index]; }
+		uint8 *Block() const { return (uint8 *)fBlock; }
 
 	private:
 		uint32	fNumBits;
@@ -375,6 +423,7 @@ AllocationGroup::Free(Transaction &transaction, uint16 start, int32 length)
 		if (cached.SetToWritable(transaction, *this, block) < B_OK)
 			RETURN_ERROR(B_IO_ERROR);
 
+		T(Block("free-1", block, cached.Block(), volume->BlockSize()));
 		uint16 freeLength = length;
 		if (uint32(start + length) > cached.NumBlockBits())
 			freeLength = cached.NumBlockBits() - start;
@@ -383,6 +432,7 @@ AllocationGroup::Free(Transaction &transaction, uint16 start, int32 length)
 
 		length -= freeLength;
 		start = 0;
+		T(Block("free-2", block, cached.Block(), volume->BlockSize()));
 		block++;
 	}
 	return B_OK;
@@ -632,6 +682,8 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 			if (cached.SetTo(fGroups[group], block) < B_OK)
 				RETURN_ERROR(B_ERROR);
 
+			T(Block("alloc-in", block, cached.Block(), fVolume->BlockSize()));
+
 			// find a block large enough to hold the allocation
 			for (uint32 bit = start % cached.NumBlockBits();
 					bit < cached.NumBlockBits(); bit++) {
@@ -680,6 +732,8 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
 					// fixed anyway.
 
 				T(Allocate(run));
+				T(Block("alloc-out", block, cached.Block(),
+					fVolume->BlockSize()));
 				return B_OK;
 			}
 
