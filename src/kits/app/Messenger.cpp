@@ -245,10 +245,14 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 //	#pragma mark - Message sending
 
 // SendMessage
-/*! \brief Delivers a BMessage synchronously to the messenger's target.
+/*! \brief Delivers a BMessage synchronously to the messenger's target,
+		   without waiting for a reply.
 
-	The method does not wait for a reply. The message is sent asynchronously.
-
+	If the target's message port is full, the method waits indefinitely, until
+	space becomes available in the port. After delivery the method returns
+	immediately. It does not wait until the target processes the message or
+	even sends a reply.
+	
 	\param command The what field of the message to deliver.
 	\param replyTo The handler to which a reply to the message shall be sent.
 		   May be \c NULL.
@@ -265,12 +269,16 @@ BMessenger::SendMessage(uint32 command, BHandler *replyTo) const
 }
 
 // SendMessage
-/*! \brief Delivers a BMessage synchronously to the messenger's target.
+/*! \brief Delivers a BMessage synchronously to the messenger's target,
+		   without waiting for a reply.
 
 	A copy of the supplied message is sent and the caller retains ownership
 	of \a message.
 
-	The method does not wait for a reply. The message is sent asynchronously.
+	If the target's message port is full, the method waits until space becomes
+	available in the port or the specified timeout occurs (whichever happens
+	first). After delivery the method returns immediately. It does not wait
+	until the target processes the message or even sends a reply.
 
 	\param message The message to be sent.
 	\param replyTo The handler to which a reply to the message shall be sent.
@@ -300,12 +308,16 @@ DBG(OUT("BMessenger::SendMessage2() done: %lx\n", error));
 }
 
 // SendMessage
-/*! \brief Delivers a BMessage synchronously to the messenger's target.
+/*! \brief Delivers a BMessage synchronously to the messenger's target,
+		   without waiting for a reply.
 
 	A copy of the supplied message is sent and the caller retains ownership
 	of \a message.
 
-	The method does not wait for a reply. The message is sent asynchronously.
+	If the target's message port is full, the method waits until space becomes
+	available in the port or the specified timeout occurs (whichever happens
+	first). After delivery the method returns immediately. It does not wait
+	until the target processes the message or even sends a reply.
 
 	\param message The message to be sent.
 	\param replyTo A messenger specifying the target for a reply to \a message.
