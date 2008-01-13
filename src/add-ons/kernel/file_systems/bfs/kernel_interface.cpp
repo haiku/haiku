@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -2131,12 +2131,12 @@ bfs_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
-#ifdef DEBUG
+#ifdef BFS_DEBUGGER_COMMANDS
 			add_debugger_commands();
 #endif
 			return B_OK;
 		case B_MODULE_UNINIT:
-#ifdef DEBUG
+#ifdef BFS_DEBUGGER_COMMANDS
 			remove_debugger_commands();
 #endif
 			return B_OK;

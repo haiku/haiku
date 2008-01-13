@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * Some code is based on work previously done by Marcus Overhagen.
  *
  * This file may be used under the terms of the MIT License.
@@ -238,13 +238,16 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 }
 
 
-//	#pragma mark -
+//	#pragma mark - debugger commands
+
+
+#ifdef BFS_DEBUGGER_COMMANDS
 
 
 static int
-debug_inode(int argc, char **argv)
+dump_inode(int argc, char **argv)
 {
-	if (argc < 2) {
+	if (argc != 2) {
 		kprintf("usage: bfsinode <ptr-to-inode>\n");
 		return 0;
 	}
@@ -256,16 +259,40 @@ debug_inode(int argc, char **argv)
 }
 
 
+static int
+dump_volume(int argc, char **argv)
+{
+	if (argc != 2) {
+		kprintf("usage: bfs <ptr-to-volume>\n");
+		return 0;
+	}
+
+	Volume *volume = (Volume *)parse_expression(argv[1]);
+
+	kprintf("root node: %p\n", volume->RootNode());
+	kprintf("indices node: %p\n", volume->IndicesNode());
+
+	dump_super_block(&volume->SuperBlock());
+
+	return B_OK;
+}
+
+
 void
 remove_debugger_commands()
 {
-	remove_debugger_command("bfsinode", debug_inode);
+	remove_debugger_command("bfsinode", dump_inode);
+	remove_debugger_command("bfs", dump_volume);
 }
 
 
 void
 add_debugger_commands()
 {
-	add_debugger_command("bfsinode", debug_inode, "dump an Inode object");
+	add_debugger_command("bfsinode", dump_inode, "dump an Inode object");
+	add_debugger_command("bfs", dump_volume, "dump a BFS volume");
 }
+
+
+#endif	// BFS_DEBUGGER_COMMANDS
 

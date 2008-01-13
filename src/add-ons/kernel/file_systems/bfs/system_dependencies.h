@@ -19,6 +19,8 @@
 #include <ByteOrder.h>
 
 #ifndef _BOOT_MODE
+#	include <tracing.h>
+
 #	include <driver_settings.h>
 #	include <fs_attr.h>
 #	include <fs_cache.h>

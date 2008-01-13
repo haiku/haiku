@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -35,6 +35,56 @@
 // The current implementation is only slightly optimized and could probably
 // be improved a lot. Furthermore, the allocation policies used here should
 // have some real world tests.
+
+#if defined(BFS_TRACING) && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
+namespace BFSBlockTracing {
+
+class Allocate : public AbstractTraceEntry {
+	public:
+		Allocate(block_run run)
+			:
+			fRun(run)
+		{
+			Initialized();
+		}
+
+		virtual void Dump()
+		{
+			AbstractTraceEntry::Dump();
+			kprintf("alloc %lu.%u.%u\n", fRun.AllocationGroup(), fRun.Start(),
+				fRun.Length());
+		}
+
+	private:
+		block_run	fRun;
+};
+
+class Free : public AbstractTraceEntry {
+	public:
+		Free(block_run run)
+			:
+			fRun(run)
+		{
+			Initialized();
+		}
+
+		virtual void Dump()
+		{
+			AbstractTraceEntry::Dump();
+			kprintf("free %lu.%u.%u\n", fRun.AllocationGroup(), fRun.Start(),
+				fRun.Length());
+		}
+
+	private:
+		block_run	fRun;
+};
+
+}	// namespace BFSBlockTracing
+
+#	define T(x) new(std::nothrow) BFSBlockTracing::x;
+#else
+#	define T(x) ;
+#endif
 
 
 struct check_cookie {
@@ -533,8 +583,8 @@ BlockAllocator::_Initialize(BlockAllocator *allocator)
 
 
 status_t
-BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group, uint16 start,
-	uint16 maximum, uint16 minimum, block_run &run)
+BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group,
+	uint16 start, uint16 maximum, uint16 minimum, block_run &run)
 {
 	if (maximum == 0)
 		return B_BAD_VALUE;
@@ -631,6 +681,7 @@ BlockAllocator::AllocateBlocks(Transaction &transaction, int32 group, uint16 sta
 					// If the value is not correct at mount time, it will be
 					// fixed anyway.
 
+				T(Allocate(run));
 				return B_OK;
 			}
 
@@ -728,6 +779,7 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 	uint16 length = run.Length();
 
 	FUNCTION_START(("group = %ld, start = %u, length = %u\n", group, start, length));
+	T(Free(run));
 
 	// doesn't use Volume::IsValidBlockRun() here because it can check better
 	// against the group size (the last group may have a different length)

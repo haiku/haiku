@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -11,6 +11,106 @@
 #include "BPlusTree.h"
 #include "Index.h"
 
+
+#if defined(BFS_TRACING) && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
+namespace BFSInodeTracing {
+
+class Create : public AbstractTraceEntry {
+	public:
+		Create(Inode* inode, Inode* parent, const char* name, int32 mode,
+				int openMode, uint32 type)
+			:
+			fInode(inode),
+			fID(inode->ID()),
+			fParent(parent),
+			fParentID(parent != NULL ? parent->ID() : 0),
+			fMode(mode),
+			fOpenMode(openMode),
+			fType(type)
+		{
+			if (name != NULL)
+				strlcpy(fName, name, sizeof(fName));
+			else
+				fName[0] = '\0';
+
+			Initialized();
+		}
+
+		virtual void Dump()
+		{
+			AbstractTraceEntry::Dump();
+			kprintf("CREATE %Ld (%p), parent %Ld (%p), \"%s\", mode %lx, "
+				"omode %x, type %lx\n", fID, fInode, fParentID, fParent,
+				fName, fMode, fOpenMode, fType);
+		}
+
+	private:
+		Inode*	fInode;
+		ino_t	fID;
+		Inode*	fParent;
+		ino_t	fParentID;
+		char	fName[32];
+		int32	fMode;
+		int		fOpenMode;
+		uint32	fType;
+
+};
+
+class Remove : public AbstractTraceEntry {
+	public:
+		Remove(Inode* inode, const char* name)
+			:
+			fInode(inode),
+			fID(inode->ID())
+		{
+			strlcpy(fName, name, sizeof(fName));
+			Initialized();
+		}
+
+		virtual void Dump()
+		{
+			AbstractTraceEntry::Dump();
+			kprintf("REMOVE %Ld (%p), \"%s\"\n", fID, fInode, fName);
+		}
+
+	private:
+		Inode*	fInode;
+		ino_t	fID;
+		char	fName[32];
+};
+
+class Resize : public AbstractTraceEntry {
+	public:
+		Resize(Inode* inode, off_t oldSize, off_t newSize)
+			:
+			fInode(inode),
+			fID(inode->ID()),
+			fOldSize(oldSize),
+			fNewSize(newSize)
+		{
+			Initialized();
+		}
+
+		virtual void Dump()
+		{
+			AbstractTraceEntry::Dump();
+			kprintf("RESIZE %Ld (%p), %Ld -> %Ld\n", fID, fInode, fOldSize,
+				fNewSize);
+		}
+
+	private:
+		Inode*	fInode;
+		ino_t	fID;
+		off_t	fOldSize;
+		off_t	fNewSize;
+};
+
+}	// namespace BFSInodeTracing
+
+#	define T(x) new(std::nothrow) BFSInodeTracing::x;
+#else
+#	define T(x) ;
+#endif
 
 class InodeAllocator {
 	public:
@@ -1943,6 +2043,8 @@ Inode::SetFileSize(Transaction &transaction, off_t size)
 	if (size == oldSize)
 		return B_OK;
 
+	T(Resize(this, oldSize, size));
+
 	// should the data stream grow or shrink?
 	status_t status;
 	if (size > oldSize) {
@@ -2165,6 +2267,8 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 		return B_ENTRY_NOT_FOUND;
 	}
 
+	T(Remove(inode, name));
+
 	// Inode::IsContainer() is true also for indices (furthermore, the S_IFDIR
 	// bit is set for indices in BFS, not for attribute directories) - but you
 	// should really be able to do whatever you want with your indices
@@ -2325,6 +2429,8 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	status = allocator.New(&parentRun, mode, run, &inode);
 	if (status < B_OK)
 		return status;
+
+	T(Create(inode, parent, name, mode, openMode, type));
 
 	// Initialize the parts of the bfs_inode structure that
 	// InodeAllocator::New() hasn't touched yet

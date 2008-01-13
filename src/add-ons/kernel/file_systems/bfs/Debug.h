@@ -97,7 +97,8 @@
 	extern void dump_bplustree_node(const bplustree_node *node,
 					const bplustree_header *header = NULL, Volume *volume = NULL);
 	extern void dump_block(const char *buffer, int size);
-
+#endif
+#ifdef BFS_DEBUGGER_COMMANDS
 	extern void remove_debugger_commands();
 	extern void add_debugger_commands();
 #endif
