@@ -88,7 +88,7 @@
 	so ATAPI devices can be used like standard SCSI devices. Further, the
 	SCSI bus manager can emulate auto-sense by executing a REQUEST SENSE 
 	if <subsys_status> is SCSI_REQ_CMP_ERR and <device_status> is 
-	SCSI_DEVICE_CHECK_CONDITION when a request is finished. This emulation
+	SCSI_STATUS_CHECK_CONDITION when a request is finished. This emulation
 	may be enhanced/generalized in the future.
 */
 
@@ -449,7 +449,7 @@ typedef struct scsi_sim_interface {
 											// needs some commands emulated
 		bool				*no_autosense,	// set to true if there is no autosense;
 											// the SCSI bus manager will request sense on
-											// SCSI_REQ_CMP_ERR/SCSI_DEVICE_CHECK_CONDITION
+											// SCSI_REQ_CMP_ERR/SCSI_STATUS_CHECK_CONDITION
 		uint32 				*max_blocks );	// maximum number of blocks per transfer if > 0;
 											// used for buggy devices that cannot handle
 											// large transfers (read: ATAPI ZIP drives)
