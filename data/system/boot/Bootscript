@@ -93,6 +93,9 @@ if [ "$SAFEMODE" != "yes" ]; then
 	else
 		launch beos/system/Tracker
 		launch beos/system/Deskbar
+
+		# install ProcessController in the deskbar
+		(sleep 7; /boot/beos/apps/ProcessController -deskbar) &
 	fi
 	launch beos/apps/Terminal
 else
