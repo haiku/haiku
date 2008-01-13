@@ -600,7 +600,7 @@ VideoWindow::MessageReceived(BMessage* message)
 			if (control != NULL) {
 				int32 client;
 				message->FindInt32("client", &(fFtpInfo.uploadClient));
-				FTPINFO("upl client = %d\n", fFtpInfo.uploadClient);
+				FTPINFO("upl client = %ld\n", fFtpInfo.uploadClient);
 			}
 			break;
 
