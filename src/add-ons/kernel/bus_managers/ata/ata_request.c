@@ -9,7 +9,7 @@
 void
 ata_request_init(ata_request *request, struct ide_device_info *device)
 {
-	memset(request, 0, sizeof(request));
+	memset(request, 0, sizeof(*request));
 	request->device = device;
 }
 
