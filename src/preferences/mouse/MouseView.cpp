@@ -99,10 +99,10 @@ MouseView::MouseView(BRect rect, const MouseSettings &settings)
 	//fMouseBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "mouse_bmap");
 	//fMouseDownBitmap = BTranslationUtils::GetBitmap(B_PNG_FORMAT, "pressed_mouse_bmap");
 
-  	if (fMouseDownBitmap != NULL)
-  		fMouseDownBounds = fMouseDownBitmap->Bounds();
-  	else
-  		fMouseDownBounds.Set(0, 0, 55, 29);
+	if (fMouseDownBitmap != NULL)
+		fMouseDownBounds = fMouseDownBitmap->Bounds();
+	else
+		fMouseDownBounds.Set(0, 0, 55, 29);
 }
 
 

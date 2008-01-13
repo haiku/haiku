@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Mouse",
-    long_info  = "Mouse ©2002-2007 Haiku"
+	long_info  = "Mouse ©2002-2007 Haiku"
 };
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
