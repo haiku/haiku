@@ -13,7 +13,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "VirtualMemory",
-    long_info  = "VirtualMemory ©2005-2007 Haiku"
+	long_info  = "VirtualMemory ©2005-2007 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

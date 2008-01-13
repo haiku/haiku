@@ -13,7 +13,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Keymap",
-    long_info  = "Keymap ©2004-2006 Haiku"
+	long_info  = "Keymap ©2004-2006 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

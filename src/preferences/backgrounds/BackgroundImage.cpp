@@ -313,8 +313,8 @@ BackgroundImage::Show(BackgroundImageInfo *info, BView *view)
 		followFlags, tile);
 	view->Invalidate();
 
-	/*if(fShowingBitmap != info) {
-		if(fShowingBitmap)
+	/*if (fShowingBitmap != info) {
+		if (fShowingBitmap)
 			fShowingBitmap->UnloadBitmap(fCacheMode);
 		fShowingBitmap = info;
 	}*/
@@ -484,8 +484,8 @@ BackgroundImage::Refresh(BackgroundImage *oldBackgroundImage,
 void
 BackgroundImage::ChangeImageSet(BPoseView *poseView)
 {
-	if(fRandomChange) {
-		if(fImageSetCount > 1) {
+	if (fRandomChange) {
+		if (fImageSetCount > 1) {
 			uint32 oldShowingImageSet = fShowingImageSet;
 			while(oldShowingImageSet == fShowingImageSet)
 				fShowingImageSet = random()%fImageSetCount;
@@ -493,7 +493,7 @@ BackgroundImage::ChangeImageSet(BPoseView *poseView)
 			fShowingImageSet = 0;
 	} else {
 		fShowingImageSet++;
-		if(fShowingImageSet > fImageSetCount - 1)
+		if (fShowingImageSet > fImageSetCount - 1)
 			fShowingImageSet = 0;
 	}
 

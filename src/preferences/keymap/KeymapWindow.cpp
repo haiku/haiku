@@ -92,7 +92,7 @@ KeymapWindow::KeymapWindow()
 	
 	entry_ref ref;
 	get_ref_for_path(path.Path(), &ref);
-		
+	
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), &ref, 
 		B_FILE_NODE, false, NULL);
 	fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), &ref, 
@@ -156,7 +156,7 @@ KeymapWindow::AddMenuBar()
 	menubar->AddItem( menu );
 	
 	// Create the Font menu
-	fFontMenu = new BMenu( "Font" );
+	fFontMenu = new BMenu("Font");
 	fFontMenu->SetRadioMode(true);
 	int32 numFamilies = count_font_families(); 
 	font_family family, current_family;
@@ -164,16 +164,16 @@ KeymapWindow::AddMenuBar()
 	uint32 flags;
 	
 	be_plain_font->GetFamilyAndStyle(&current_family, &current_style);
-		
+	
 	for (int32 i = 0; i < numFamilies; i++ )
-		if ( get_font_family(i, &family, &flags) == B_OK ) {
+		if (get_font_family(i, &family, &flags) == B_OK) {
 			BMenuItem *item = 
 				new BMenuItem(family, new BMessage( MENU_FONT_CHANGED));
 			fFontMenu->AddItem(item);
-			if(strcmp(family, current_family) == 0)
+			if (strcmp(family, current_family) == 0)
 				item->SetMarked(true);
 		}
-	menubar->AddItem( fFontMenu );
+	menubar->AddItem(fFontMenu);
 	
 	return menubar;
 }
@@ -207,13 +207,13 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	fUserListView = new BListView( bounds, "userList" );
 	// '(Current)'
 	KeymapListItem *currentKeymapItem = (KeymapListItem*)fUserListView->FirstItem();
-	if( currentKeymapItem != NULL )
+	if (currentKeymapItem != NULL)
 		fUserListView->AddItem( currentKeymapItem );
 	// Saved keymaps
 	mapsBox->AddChild( new BScrollView( "userScrollList", fUserListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true ));
 	fUserListView->SetSelectionMessage( new BMessage( USER_MAP_SELECTED ));
-		
+	
 	FillSystemMaps();
 	
 	FillUserMaps();
@@ -245,7 +245,7 @@ KeymapWindow::MessageReceived( BMessage* message )
 			fMapView->Invalidate();
 			fSystemListView->DeselectAll();
 			fUserListView->DeselectAll();
-		}	
+		}
 			break;
 		case B_SAVE_REQUESTED:
 		{
@@ -261,7 +261,7 @@ KeymapWindow::MessageReceived( BMessage* message )
 				
 				FillUserMaps();
 			}
-		}	
+		}
 			break;
 		case MENU_FILE_OPEN:
 			fOpenPanel->Show();
@@ -285,7 +285,7 @@ KeymapWindow::MessageReceived( BMessage* message )
 			if (item) {
 				fMapView->SetFontFamily(item->Label());
 				fMapView->Invalidate();
-			}	
+			}
 		}
 			break;
 		case SYSTEM_MAP_SELECTED:
@@ -302,13 +302,13 @@ KeymapWindow::MessageReceived( BMessage* message )
 		}
 			break;
 		case USER_MAP_SELECTED:
-		{	
+		{
 			KeymapListItem *keymapListItem = 
 				(KeymapListItem*)fUserListView->ItemAt(fUserListView->CurrentSelection());
 			if (keymapListItem) {
 				fCurrentMap.Load(keymapListItem->KeymapEntry());
 				fMapView->Invalidate();
-					
+				
 				// Deselect item in other BListView
 				fSystemListView->DeselectAll();
 			}
@@ -319,7 +319,7 @@ KeymapWindow::MessageReceived( BMessage* message )
 			break;
 		case REVERT:	// do nothing, just like the original
 			break;
-		default:	
+		default:
 			BWindow::MessageReceived( message );
 			break;
 	}
@@ -362,7 +362,7 @@ KeymapWindow::FillSystemMaps()
 	
 	path.Append("Keymap");
 	
-	BDirectory directory;		
+	BDirectory directory;
 	entry_ref ref;
 	
 	if (directory.SetTo(path.Path()) == B_OK)
@@ -387,7 +387,7 @@ KeymapWindow::FillUserMaps()
 
 	entry_ref ref;
 	get_ref_for_path(path.Path(), &ref);
-			
+	
 	fUserListView->AddItem(new KeymapListItem(ref, "(Current)"));
 
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
@@ -422,7 +422,7 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 	// TODO: Properly handle font sensitivity in drawing the keys.
 	// This at least prevents the app from looking horrible until the font sensitivity for this app
 	// can be done the Right Way.
-	if(fCurrentFont.Size() > 14)
+	if (fCurrentFont.Size() > 14)
 		fCurrentFont.SetSize(14);
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -894,7 +894,7 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 	
 	for (uint32 j = 0; j<128; j++)
 		fKeysVertical[j] = false;
-		
+	
 	fKeysVertical[0x5e] = true;
 	
 	fActiveDeadKey = 0;
@@ -1061,7 +1061,7 @@ MapView::DrawLocks()
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
 	DrawString("num", BPoint(lightRect.left-2, 65), &delta);
-		
+	
 	lightRect.OffsetBy(26,0);
 	SetHighColor(80,80,80);
 	StrokeLine(lightRect.LeftBottom(), lightRect.RightBottom());
@@ -1147,13 +1147,13 @@ MapView::DrawKey(uint32 keyCode)
 			SetHighColor(255,255,255);
 			StrokeRect(r);
 			
-			rgb_color color6 = {96,96,96};	
+			rgb_color color6 = {96,96,96};
 			AddLine(r.LeftBottom(), r.RightBottom(), color6);
-			rgb_color color5 = {160,160,160};	
+			rgb_color color5 = {160,160,160};
 			AddLine(r.LeftBottom(), r.LeftBottom(), color5);
 			rgb_color color7 = {64,64,64};
 			AddLine(r.RightBottom(), BPoint(r.right, r.bottom-1), color7);
-			AddLine(BPoint(r.right, r.bottom-1), BPoint(r.right, r.top-1), color6);	
+			AddLine(BPoint(r.right, r.bottom-1), BPoint(r.right, r.top-1), color6);
 			AddLine(BPoint(r.right, r.top-1), r.RightTop(), color5);
 			rgb_color color8 = {255,255,255};
 			AddLine(BPoint(r.left+1, r.bottom-1), BPoint(r.left+2, r.bottom-1), color8);
@@ -1166,16 +1166,16 @@ MapView::DrawKey(uint32 keyCode)
 		r.InsetBySelf(1,1);
 		r.bottom -= 1;
 		BRect fillRect = r;
-			
+		
 		if (!vertical) {
 			int32 w1 = 4;
 			int32 w2 = 3;
-			if(fKeysRect[keyCode].Width() > 20) {
+			if (fKeysRect[keyCode].Width() > 20) {
 				w1 = 6;
 				w2 = 6;
 			}
 			
-			fillRect.right = fillRect.left + w1;	
+			fillRect.right = fillRect.left + w1;
 			SetHighColor(152,152,152);
 			FillRect(fillRect);
 			fillRect.left += w1;
@@ -1276,7 +1276,7 @@ MapView::DrawKey(uint32 keyCode)
 			SetDrawingMode(B_OP_OVER);
 		}
 		delete str;
-	}	
+	}
 }
 
 
@@ -1329,7 +1329,7 @@ MapView::MessageReceived(BMessage *msg)
 			if ((msg->FindData("states", B_UINT8_TYPE, (const void **)&states, &size)!=B_OK)
 				|| (msg->FindInt32("modifiers", (int32 *)&info.modifiers)!=B_OK))
 				break;
-				
+			
 			if (fOldKeyInfo.modifiers != info.modifiers) {
 				fOldKeyInfo.modifiers = info.modifiers;
 				for (int8 i=0; i<16; i++) 
@@ -1337,7 +1337,7 @@ MapView::MessageReceived(BMessage *msg)
 				InvalidateKeys();
 				DrawLocks();
 			} else {
-								
+				
 				int32 keyCode = -1;
 				for (int8 i=0; i<16; i++)
 					if (fOldKeyInfo.key_states[i] != states[i]) {
@@ -1348,7 +1348,6 @@ MapView::MessageReceived(BMessage *msg)
 								keyCode = i*8 + j;
 								DrawKey(keyCode);
 							}
-													
 					}
 				
 				if (keyCode<0) 
@@ -1361,10 +1360,10 @@ MapView::MessageReceived(BMessage *msg)
 									i = 16;
 									break;
 								}
-							}			
+							}
 					}
 				
-										
+				
 				if (Window()->IsActive()
 					&& msg->what == B_KEY_DOWN) {
 					fTextView->MakeFocus();
@@ -1377,7 +1376,7 @@ MapView::MessageReceived(BMessage *msg)
 						}
 						fActiveDeadKey = 0;
 						InvalidateKeys();
-					} else {		
+					} else {
 						fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, fActiveDeadKey, &str, &numBytes);
 						fActiveDeadKey = fCurrentMap->IsDeadKey(keyCode, fOldKeyInfo.modifiers);
 						if (fActiveDeadKey)
@@ -1387,7 +1386,7 @@ MapView::MessageReceived(BMessage *msg)
 						}
 					}
 					delete str;
-				}										
+				}
 			}
 			break;
 		}
@@ -1417,7 +1416,7 @@ MapView::MouseDown(BPoint point)
 {
 	uint32 buttons;
 	GetMouse(&point, &buttons);
-	if(buttons & B_PRIMARY_MOUSE_BUTTON) {
+	if (buttons & B_PRIMARY_MOUSE_BUTTON) {
 		fCurrentMouseKey = 0;
 		for (int32 i=0; i<128; i++) {
 			if (fKeysRect[i].IsValid() && fKeysRect[i].Contains(point)) {

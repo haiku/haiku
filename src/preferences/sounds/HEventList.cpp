@@ -64,7 +64,7 @@ HEventList::SetType(const char* type)
 	
 	BString name;
 	entry_ref ref;
-	while(mfiles.GetNextRef(&name,&ref) == B_OK) {
+	while (mfiles.GetNextRef(&name,&ref) == B_OK) {
 		BPath path(&ref);
 		AddItem(new HEventItem(name.String(), path.Path()));
 	}
@@ -77,7 +77,7 @@ void
 HEventList::RemoveAll()
 {
 	BListItem *item;
-	while((item = RemoveItem((int32)0))!=NULL)
+	while ((item = RemoveItem((int32)0))!=NULL)
 		delete item;
 	MakeEmpty();
 }
@@ -92,17 +92,16 @@ HEventList::SelectionChanged()
 	BListView::SelectionChanged();
 	
 	int32 sel = CurrentSelection();
-	if(sel >= 0)
-	{
+	if (sel >= 0) {
 		HEventItem *item = cast_as(ItemAt(sel),HEventItem);
-		if(!item)
+		if (!item)
 			return;
 		
 		entry_ref ref;
 		BMediaFiles().GetRefFor(fType, item->Name(), &ref);
 		
 		BPath path(&ref);
-		if((path.InitCheck()==B_OK) || (ref.name == NULL) || (strcmp(ref.name, "")==0)) {
+		if ((path.InitCheck()==B_OK) || (ref.name == NULL) || (strcmp(ref.name, "")==0)) {
 			item->SetPath(path.Path());
 			InvalidateItem(sel);
 		} else {
@@ -126,9 +125,9 @@ void
 HEventList::SetPath(const char* path)
 {
 	int32 sel = CurrentSelection();
-	if(sel >= 0) {
+	if (sel >= 0) {
 		HEventItem *item = cast_as(ItemAt(sel),HEventItem);
-		if(!item)
+		if (!item)
 			return;
 		
 		entry_ref ref;

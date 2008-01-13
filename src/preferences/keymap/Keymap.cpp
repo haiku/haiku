@@ -21,34 +21,34 @@
 #include <input_globals.h>
 
 static void 
-print_key( char *chars, int32 offset ) 
+print_key(char *chars, int32 offset) 
 {
 	int size = chars[offset++];
 	
-	switch( size ) {
+	switch(size) {
 	case 0:
 		// Not mapped 
-		printf( "N/A" ); 
+		printf("N/A"); 
 		break; 
 	
 	case 1:
 		// 1-byte UTF-8/ASCII character 
-		printf( "%c", chars[offset] ); 
+		printf("%c", chars[offset]); 
 		break; 
 	
 	default:
 		// 2-, 3-, or 4-byte UTF-8 character 
 		{ 
 			char *str = new char[size + 1]; 
-			strncpy( str, &(chars[offset]), size );
+			strncpy(str, &(chars[offset]), size);
 			str[size] = 0; 
-			printf( "%s", str ); 
+			printf("%s", str); 
 			delete [] str; 
 		} 
 		break; 
 	} 
 	
-	printf( "\t" ); 
+	printf("\t"); 
 }
 
 
@@ -57,19 +57,19 @@ Keymap::DumpKeymap()
 {
 	// Print a chart of the normal, shift, option, and option+shift 
 	// keys. 
-	printf( "Key #\tNormal\tShift\tCaps\tC+S\tOption\tO+S\tO+C\tO+C+S\tControl\n" ); 
-	for( int idx = 0; idx < 128; idx++ ) { 
-		printf( " 0x%x\t", idx ); 
-		print_key( fChars, fKeys.normal_map[idx] ); 
-		print_key( fChars, fKeys.shift_map[idx] ); 
-		print_key( fChars, fKeys.caps_map[idx] ); 
-		print_key( fChars, fKeys.caps_shift_map[idx] ); 
-		print_key( fChars, fKeys.option_map[idx] ); 
-		print_key( fChars, fKeys.option_shift_map[idx] ); 
-		print_key( fChars, fKeys.option_caps_map[idx] ); 
-		print_key( fChars, fKeys.option_caps_shift_map[idx] ); 
-		print_key( fChars, fKeys.control_map[idx] ); 
-		printf( "\n" ); 
+	printf("Key #\tNormal\tShift\tCaps\tC+S\tOption\tO+S\tO+C\tO+C+S\tControl\n"); 
+	for (int idx = 0; idx < 128; idx++) { 
+		printf(" 0x%x\t", idx ); 
+		print_key(fChars, fKeys.normal_map[idx]); 
+		print_key(fChars, fKeys.shift_map[idx]); 
+		print_key(fChars, fKeys.caps_map[idx]); 
+		print_key(fChars, fKeys.caps_shift_map[idx]); 
+		print_key(fChars, fKeys.option_map[idx]); 
+		print_key(fChars, fKeys.option_shift_map[idx]); 
+		print_key(fChars, fKeys.option_caps_map[idx]); 
+		print_key(fChars, fKeys.option_caps_shift_map[idx]); 
+		print_key(fChars, fKeys.control_map[idx]); 
+		printf("\n"); 
 	} 
 
 }
@@ -371,7 +371,7 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** c
 		if (strncmp(&(fChars[offset+1]), &(fChars[dead_key[i]+1]), *numBytes ) == 0) {
 			*numBytes = fChars[dead_key[i+1]];
 		
-			switch( *numBytes ) {
+			switch(*numBytes) {
 				case 0:
 					// Not mapped
 					*chars = NULL; 

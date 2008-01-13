@@ -24,8 +24,8 @@
 class Devices : public BApplication
 {
 	public:
-    	Devices();
-	    virtual void MessageReceived(BMessage *message);
+		Devices();
+		virtual void MessageReceived(BMessage *message);
 	    
 	private:
 		
@@ -47,20 +47,21 @@ void Devices::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{
-	    default:
-    	    BApplication::MessageReceived(message); // pass it along ... 
-        	break;
-    }
+		default:
+			BApplication::MessageReceived(message); // pass it along ... 
+			break;
+	}
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
 
 // Devices Main
-int main(void)
+int
+main(void)
 {
-   Devices theApp;
-   theApp.Run();
-   return 0;
+	Devices theApp;
+	theApp.Run();
+	return 0;
 }
 // end ------------------------------------------------------------------------------------------------------ //
 

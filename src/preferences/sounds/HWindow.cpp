@@ -182,16 +182,16 @@ HWindow::MessageReceived(BMessage *message)
 			BMenu *menu = menufield->Menu();
 			
 			int32 sel = fEventList->CurrentSelection();
-			if(sel >= 0) {
+			if (sel >= 0) {
 				HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
 				BPath path(item->Path());
-				if(path.InitCheck() != B_OK) {
+				if (path.InitCheck() != B_OK) {
 					BMenuItem *item = menu->FindItem("<none>");
-					if(item)
+					if (item)
 						item->SetMarked(true);
 				} else{
 					BMenuItem *item = menu->FindItem(path.Leaf());
-					if(item)
+					if (item)
 						item->SetMarked(true);
 				}
 			}
@@ -203,7 +203,7 @@ HWindow::MessageReceived(BMessage *message)
 		{
 			entry_ref ref;
 			int32 sel = fEventList->CurrentSelection();
-			if(message->FindRef("refs", &ref) == B_OK && sel >= 0) {
+			if (message->FindRef("refs", &ref) == B_OK && sel >= 0) {
 				BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 				BMenu *menu = menufield->Menu();
 				// check audio file
@@ -225,12 +225,12 @@ HWindow::MessageReceived(BMessage *message)
 				BPath path(&ref);
 				msg->AddRef("refs", &ref);
 				BMenuItem *menuitem = menu->FindItem(path.Leaf());
-				if(!menuitem)
+				if (!menuitem)
 					menu->AddItem(menuitem = new BMenuItem(path.Leaf(), msg), 0);
 				// refresh item
 				fEventList->SetPath(BPath(&ref).Path());
 				// check file menu
-				if(menuitem)
+				if (menuitem)
 					menuitem->SetMarked(true);
 			}
 			break;
@@ -238,11 +238,11 @@ HWindow::MessageReceived(BMessage *message)
 	case M_PLAY_MESSAGE:
 		{
 			int32 sel = fEventList->CurrentSelection();
-			if(sel >= 0)
+			if (sel >= 0)
 			{
 				HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
 				const char* path = item->Path();
-				if(path)
+				if (path)
 				{
 					entry_ref ref;
 					::get_ref_for_path(path, &ref);
@@ -255,9 +255,9 @@ HWindow::MessageReceived(BMessage *message)
 		}
 	case M_STOP_MESSAGE:
 		{
-			if(!fPlayer)
+			if (!fPlayer)
 				break;
-			if(fPlayer->IsPlaying())
+			if (fPlayer->IsPlaying())
 			{
 				fPlayer->StopPlaying();
 				delete fPlayer;
@@ -271,15 +271,15 @@ HWindow::MessageReceived(BMessage *message)
 			BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 			BMenu *menu = menufield->Menu();
 			
-			if(message->FindString("path", &path) == B_OK) {
+			if (message->FindString("path", &path) == B_OK) {
 				BPath path(path);
-				if(path.InitCheck() != B_OK) {
+				if (path.InitCheck() != B_OK) {
 					BMenuItem *item = menu->FindItem("<none>");
-					if(item)
+					if (item)
 						item->SetMarked(true);
 				} else {
 					BMenuItem *item = menu->FindItem(path.Leaf());
-					if(item)
+					if (item)
 						item->SetMarked(true);
 				}
 			}
@@ -288,7 +288,7 @@ HWindow::MessageReceived(BMessage *message)
 	case M_ITEM_MESSAGE:
 		{
 			entry_ref ref;
-			if(message->FindRef("refs", &ref) == B_OK) {
+			if (message->FindRef("refs", &ref) == B_OK) {
 				fEventList->SetPath(BPath(&ref).Path());
 			}
 			break;
@@ -314,13 +314,13 @@ HWindow::SetupMenuField()
 	int32 count = fEventList->CountItems();
 	for(int32 i = 0; i < count; i++) {
 		HEventItem *item = cast_as(fEventList->ItemAt(i), HEventItem);
-		if(!item)
+		if (!item)
 			continue;
 		
 		BPath path(item->Path());
-		if(path.InitCheck() != B_OK)
+		if (path.InitCheck() != B_OK)
 			continue;
-		if(menu->FindItem(path.Leaf()))
+		if (menu->FindItem(path.Leaf()))
 			continue;
 		
 		BMessage *msg = new BMessage(M_ITEM_MESSAGE);
@@ -408,10 +408,10 @@ HWindow::Pulse()
 	BButton *button = cast_as(FindView("play"), BButton);
 	BButton *stop = cast_as(FindView("stop"), BButton);
 	
-	if(!menufield)
+	if (!menufield)
 		return;
 
-	if(sel >=0) {
+	if (sel >=0) {
 		menufield->SetEnabled(true);
 
 		HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
@@ -424,8 +424,8 @@ HWindow::Pulse()
 		menufield->SetEnabled(false);
 		button->SetEnabled(false);
 	}
-	if(fPlayer) {
-		if(fPlayer->IsPlaying())
+	if (fPlayer) {
+		if (fPlayer->IsPlaying())
 			stop->SetEnabled(true);
 		else
 			stop->SetEnabled(false);
@@ -440,7 +440,7 @@ HWindow::Pulse()
 void
 HWindow::DispatchMessage(BMessage *message, BHandler *handler)
 {
-	if(message->what == B_PULSE)
+	if (message->what == B_PULSE)
 		Pulse();
 	BWindow::DispatchMessage(message, handler);
 }

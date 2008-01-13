@@ -30,9 +30,9 @@ const uint32 ML_DEFAULTOUTPUT_CHANGE = 'doch';
 class BarView : public BView
 {
 	public:
-    	BarView(BRect frame);
-    	virtual	void	Draw(BRect updateRect);
-    	bool	fDisplay;
+		BarView(BRect frame);
+		virtual	void	Draw(BRect updateRect);
+		bool	fDisplay;
 };
 
 class SettingsItem : public BMenuItem
@@ -58,18 +58,18 @@ class Settings2Item : public BMenuItem
 class SettingsView : public BView
 {
 	public:
-    	SettingsView(BRect frame, bool isVideo);
-    	void AddNodes(BList &list, bool isInput);
-    	void SetDefault(dormant_node_info &info, bool isInput, int32 outputID = -1);
-    	BCheckBox 		*fRealtimeCheckBox;
-    	BCheckBox 		*fVolumeCheckBox;
-    	BMenu 			*fMenu1;
-    	BMenu 			*fMenu2;
-    	BMenu			*fMenu3;
-    	BStringView		*fRestartView;
+		SettingsView(BRect frame, bool isVideo);
+		void AddNodes(BList &list, bool isInput);
+		void SetDefault(dormant_node_info &info, bool isInput, int32 outputID = -1);
+		BCheckBox 		*fRealtimeCheckBox;
+		BCheckBox 		*fVolumeCheckBox;
+		BMenu 			*fMenu1;
+		BMenu 			*fMenu2;
+		BMenu			*fMenu3;
+		BStringView		*fRestartView;
 
-    private:
-    	bool			fIsVideo;
+	private:
+		bool			fIsVideo;
 };	
 
 #endif

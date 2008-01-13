@@ -32,8 +32,8 @@ class ScreenSaverApp : public BApplication {
 ScreenSaverApp::ScreenSaverApp()
 	: BApplication("application/x-vnd.Haiku-ScreenSaver") 
 {
-  	fScreenSaverWindow = new ScreenSaverWindow();
-  	fScreenSaverWindow->Show();
+	fScreenSaverWindow = new ScreenSaverWindow();
+	fScreenSaverWindow->Show();
 }
 
 

@@ -23,10 +23,10 @@
 class DevicesInfo
 {
 	public:
-    	DevicesInfo(struct device_info *info, 
-    		struct device_configuration *current, 
-    		struct possible_device_configurations *possible);
-	    ~DevicesInfo();
+		DevicesInfo(struct device_info *info, 
+		struct device_configuration *current, 
+		struct possible_device_configurations *possible);
+		~DevicesInfo();
 		struct device_info * GetInfo() { return fInfo;}
 		char * GetDeviceName() const { return fDeviceName; }
 		char * GetCardName() const { return fCardName; }

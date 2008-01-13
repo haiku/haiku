@@ -86,26 +86,26 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 	BRect iconFrame(frame);
 	iconFrame.Set(iconFrame.left, iconFrame.top+1, iconFrame.left+15, iconFrame.top+16);
 	uint32 index = 0;
-	if(OutlineLevel()==0 || (fIsDefaultInput && fIsDefaultOutput)) {
-		if(fIsDefaultInput && fIsVideo)
+	if (OutlineLevel()==0 || (fIsDefaultInput && fIsDefaultOutput)) {
+		if (fIsDefaultInput && fIsVideo)
 			index = 4;
-		else if(fIsDefaultInput && !fIsVideo)
+		else if (fIsDefaultInput && !fIsVideo)
 			index = 2;
 		owner->SetDrawingMode(B_OP_OVER);
 		owner->DrawBitmap(static_cast<BBitmap*>(fIcons->ItemAt(index)), iconFrame);
 		owner->SetDrawingMode(B_OP_COPY);
 	}
 	iconFrame.OffsetBy(16, 0);
-	if(fIsDefaultInput || fIsDefaultOutput || fIsAudioMixer) {
-		if(fIsAudioMixer)
+	if (fIsDefaultInput || fIsDefaultOutput || fIsAudioMixer) {
+		if (fIsAudioMixer)
 			index = 1;
-		else if(fIsDefaultOutput) {
-			if(fIsVideo)
+		else if (fIsDefaultOutput) {
+			if (fIsVideo)
 				index = 5;
 			else
 				index = 3;
 		} else {
-			if(fIsVideo)
+			if (fIsVideo)
 				index = 4;
 			else
 				index = 2;
@@ -131,7 +131,7 @@ MediaListItem::DrawItem(BView *owner, BRect frame, bool complete)
 void 
 MediaListItem::SetDefault(bool isDefault, bool isInput)
 {
-	if(isInput)
+	if (isInput)
 		fIsDefaultInput = isDefault;
 	else
 		fIsDefaultOutput = isDefault;
@@ -159,11 +159,11 @@ MediaListItem::Compare(const void *firstArg, const void *secondArg)
 {
 	const MediaListItem *item1 = *static_cast<const MediaListItem * const *>(firstArg);
 	const MediaListItem *item2 = *static_cast<const MediaListItem * const *>(secondArg);
-	if(item1->fIsVideo != item2->fIsVideo)
+	if (item1->fIsVideo != item2->fIsVideo)
 		return item1->fIsVideo ? 1 : -1;
-	if(item1->OutlineLevel()!=item2->OutlineLevel())
+	if (item1->OutlineLevel()!=item2->OutlineLevel())
 		return item1->OutlineLevel()>item2->OutlineLevel() ? 1 : -1;
-	if(item1->fIsAudioMixer!=item2->fIsAudioMixer)
+	if (item1->fIsAudioMixer!=item2->fIsAudioMixer)
 		return item2->fIsAudioMixer ? 1 : -1;
 	return strcmp(item1->fLabel, item2->fLabel);
 }

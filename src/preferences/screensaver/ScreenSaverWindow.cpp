@@ -488,7 +488,7 @@ ModulesView::_OpenSaver()
 {
 	// create new screen saver preview & config
 
-   	BView* view = fPreviewView->AddPreview();
+	BView* view = fPreviewView->AddPreview();
 	fCurrentName = fSettings.ModuleName();
 	fSaverRunner = new ScreenSaverRunner(Window(), view, true, fSettings);
 	BScreenSaver* saver = _ScreenSaver();
@@ -890,7 +890,7 @@ ScreenSaverWindow::MessageReceived(BMessage *msg)
 		default:
 			BWindow::MessageReceived(msg);
 			break;
-  	}
+	}
 }
 
 

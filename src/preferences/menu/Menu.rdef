@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Menu",
-    long_info  = "Menu ©2002-2007 Haiku"
+	long_info  = "Menu ©2002-2007 Haiku"
 };
 
 resource(1, "BEOS:FILE_TYPES") message;

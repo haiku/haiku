@@ -179,8 +179,8 @@ bool
 MainWindow::QuitRequested()
 {
 	// TODO: ask about any unsaved changes
-   	be_app->PostMessage(B_QUIT_REQUESTED);
-   	Hide();
+	be_app->PostMessage(B_QUIT_REQUESTED);
+	Hide();
 	return false;
 }
 

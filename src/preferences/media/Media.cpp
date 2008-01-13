@@ -46,7 +46,7 @@ Media::Media()
 						rect.bottom = d;
 					}
 				}
-			}		
+			}
 		}
 	}
 
@@ -81,10 +81,10 @@ Media::MessageReceived(BMessage *message)
 			fWindow->PostMessage(message);
 			break;
 
-	    default:
-    	    BApplication::MessageReceived(message);
-        	break;
-    }
+		default:
+			BApplication::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -98,6 +98,6 @@ main(int, char**)
 	if (app.InitCheck() == B_OK)
 		app.Run();
 
-   return 0;
+	return 0;
 }
 

@@ -32,7 +32,7 @@
 class MediaWindow : public BWindow
 {
 	public:
-    	MediaWindow(BRect frame);
+	MediaWindow(BRect frame);
 	    ~MediaWindow();
 	    virtual bool QuitRequested();
 	    virtual void MessageReceived(BMessage *message);
@@ -49,14 +49,14 @@ class MediaWindow : public BWindow
 		
 		BBox *					fBox;
 		BListView*				fListView;
-		BStringView*			fTitleView;
+		BStringView*				fTitleView;
 		BView*					fContentView;
-		SettingsView*			fAudioView;
-		SettingsView*			fVideoView;
+		SettingsView*				fAudioView;
+		SettingsView*				fVideoView;
 		BarView*				fBar;
 	    	    
-	    media_node*				fCurrentNode;
-	    BParameterWeb*			fParamWeb;
+		media_node*				fCurrentNode;
+		BParameterWeb*				fParamWeb;
 		
 		BList					fAudioInputs;
 		BList					fAudioOutputs;

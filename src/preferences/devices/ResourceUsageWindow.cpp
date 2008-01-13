@@ -52,12 +52,12 @@ IRQDMAItem::~IRQDMAItem()
 /***********************************************************
  * DrawItem
  ***********************************************************/
-void 	
+void
 IRQDMAItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 {
 	rgb_color kBlack = { 0,0,0,0 };
 	rgb_color kHighlight = { 156,154,156,0 };
-		
+	
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
@@ -122,12 +122,12 @@ RangeItem::~RangeItem()
 /***********************************************************
  * DrawItem
  ***********************************************************/
-void 	
+void
 RangeItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 {
 	rgb_color kBlack = { 0,0,0,0 };
 	rgb_color kHighlight = { 156,154,156,0 };
-		
+	
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
@@ -208,12 +208,12 @@ void ResourceUsageWindow::InitWindow(BList &list)
 	BRect rtab = Bounds();
 	BRect rlist = Bounds();
 	rtab.top += 10;
-    rlist.top += 10;
-    rlist.left += 12;
-    rlist.right -= 15 + B_V_SCROLL_BAR_WIDTH;
-    rlist.bottom -= 47;
-    
-    // Create the TabView and Tabs
+	rlist.top += 10;
+	rlist.left += 12;
+	rlist.right -= 15 + B_V_SCROLL_BAR_WIDTH;
+	rlist.bottom -= 47;
+
+	// Create the TabView and Tabs
 	BTabView *tabView = new BTabView(rtab,"resource_usage_tabview");
 	tabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
@@ -229,7 +229,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 	BListView *memoryListView = new BListView(rlist, "memoryListView", B_SINGLE_SELECTION_LIST, 
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
-						
+	
 	BScrollView *IRQScrollView = new BScrollView("scroll_list1", IRQListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
 		0, false, true, B_FANCY_BORDER);
 	BScrollView *DMAScrollView = new BScrollView("scroll_list2", DMAListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
@@ -251,18 +251,18 @@ void ResourceUsageWindow::InitWindow(BList &list)
 	tab = new BTab();
 	tabView->AddTab(memoryScrollView, tab);
 	tab->SetLabel("Memory Range");
-					
+	
 	{
 		uint32 mask = 1;
 		
 		for (int i=0;i<16;mask<<=1,i++) {
 			bool first = true;
-				
+			
 			for (int32 j=0; j<list.CountItems(); j++) {
 				DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
 				struct device_configuration *current = deviceInfo->GetCurrent();
 				resource_descriptor r;
-						
+				
 				int32 num = count_resource_descriptors_of_type(current, B_IRQ_RESOURCE);
 				
 				for (int32 k=0;k<num;k++) {
@@ -270,7 +270,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 							&r, sizeof(resource_descriptor));
 					
 					if (mask & r.d.m.mask) {
-						IRQListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetCardName()));					
+						IRQListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetCardName()));
 						first = false;
 					}
 				}
@@ -287,12 +287,12 @@ void ResourceUsageWindow::InitWindow(BList &list)
 		
 		for (int i=0;i<8;mask<<=1,i++) {
 			bool first = true;
-				
+			
 			for (int32 j=0; j<list.CountItems(); j++) {
 				DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
 				struct device_configuration *current = deviceInfo->GetCurrent();
 				resource_descriptor r;
-						
+				
 				int32 num = count_resource_descriptors_of_type(current, B_DMA_RESOURCE);
 				
 				for (int32 k=0;k<num;k++) {
@@ -300,7 +300,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 							&r, sizeof(resource_descriptor));
 					
 					if (mask & r.d.m.mask) {
-						DMAListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetCardName()));					
+						DMAListView->AddItem(new IRQDMAItem(first ? i : -1, deviceInfo->GetCardName()));
 						first = false;
 					}
 				}
@@ -317,7 +317,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 			DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
 			struct device_configuration *current = deviceInfo->GetCurrent();
 			resource_descriptor r;
-					
+			
 			int32 num = count_resource_descriptors_of_type(current, B_IO_PORT_RESOURCE);
 			
 			for (int32 k=0;k<num;k++) {
@@ -337,7 +337,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 			DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
 			struct device_configuration *current = deviceInfo->GetCurrent();
 			resource_descriptor r;
-					
+			
 			int32 num = count_resource_descriptors_of_type(current, B_MEMORY_RESOURCE);
 			
 			for (int32 k=0;k<num;k++) {

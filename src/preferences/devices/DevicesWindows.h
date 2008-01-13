@@ -35,10 +35,10 @@ void CenterWindowOnScreen(BWindow* w);
 
 class ResourceUsageWindow : public BWindow {
 	public:
-    	ResourceUsageWindow(BRect frame, BList &);
-	    ~ResourceUsageWindow();
-	    virtual void MessageReceived(BMessage *message);
-	    
+		ResourceUsageWindow(BRect frame, BList &);
+		~ResourceUsageWindow();
+		virtual void MessageReceived(BMessage *message);
+
 	private:
 		void InitWindow(BList &);
 };
@@ -46,19 +46,19 @@ class ResourceUsageWindow : public BWindow {
 
 class ModemWindow : public BWindow {
 	public:
-    	ModemWindow(BRect frame, BMessenger);
-	    ~ModemWindow();
-	    virtual void MessageReceived(BMessage *message);
+		ModemWindow(BRect frame, BMessenger);
+		~ModemWindow();
+		virtual void MessageReceived(BMessage *message);
 	private:
 		void InitWindow(void);
-	    BMessenger fMessenger;
+		BMessenger fMessenger;
 };
 
 class ConfigurationWindow : public BWindow {
 	public:
 		ConfigurationWindow(BRect frame, DeviceItem *item);
-	    ~ConfigurationWindow();
-    	virtual bool QuitRequested();
+		~ConfigurationWindow();
+		virtual bool QuitRequested();
 	    virtual void MessageReceived(BMessage *message);
 	private:
 		void InitWindow(void);
@@ -74,9 +74,9 @@ class ConfigurationWindow : public BWindow {
 
 class DevicesWindow : public BWindow {
 	public:
-    	DevicesWindow(BRect frame);
-	    ~DevicesWindow();
-    	virtual bool QuitRequested();
+		DevicesWindow(BRect frame);
+		~DevicesWindow();
+		virtual bool QuitRequested();
 	    virtual void MessageReceived(BMessage *message);
 	private:
 		void InitWindow(void);
@@ -89,19 +89,19 @@ class DevicesWindow : public BWindow {
 		ResourceUsageWindow*	ptrResourceUsageWindow;
 		ModemWindow* 			ptrModemWindow;
 		
-        BStringView      *stvDeviceName;
-        BStringView      *stvCurrentState;
-        BMenuBar		 *menubar;        
-        
-	    BList			fList;
-	    
-	    BListItem        *systemMenu, *isaMenu, *pciMenu, *jumperedMenu;
-	    BOutlineListView *outline;
-	    BStringView *stvIRQ;
+		BStringView      *stvDeviceName;
+		BStringView      *stvCurrentState;
+		BMenuBar		 *menubar;        
+
+		BList			fList;
+
+		BListItem        *systemMenu, *isaMenu, *pciMenu, *jumperedMenu;
+		BOutlineListView *outline;
+		BStringView *stvIRQ;
 		BStringView *stvDMA;
 		BStringView *stvIORanges;
 		BStringView *stvMemoryRanges;
-		BButton *btnConfigure;		
+		BButton *btnConfigure;
 };
 
 #endif

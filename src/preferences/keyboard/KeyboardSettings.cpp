@@ -36,12 +36,12 @@ KeyboardSettings::KeyboardSettings()
 	fCorner.y = 100;
 	
 	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	if(status == B_OK) {
+	if (status == B_OK) {
 		status = path.Append(kb_settings_file);
-		if(status == B_OK) {
+		if (status == B_OK) {
 			status = file.SetTo(path.Path(), B_READ_ONLY);
 			if (status == B_OK) {
-				if(file.ReadAt(sizeof(kb_settings), &fCorner, sizeof(fCorner)) != sizeof(fCorner)) {
+				if (file.ReadAt(sizeof(kb_settings), &fCorner, sizeof(fCorner)) != sizeof(fCorner)) {
 					fCorner.x = 150;
 					fCorner.y = 100;
 				}

@@ -202,7 +202,7 @@ DeviceItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 	owner->MovePenTo(point);
 	owner->DrawString(fName);
 	
-	if(fInfo) {
+	if (fInfo) {
 		point += BPoint(222, 0);
 		BString string = "enabled";
 		if (!(fInfo->GetInfo()->flags & B_DEVICE_INFO_ENABLED))

@@ -104,7 +104,7 @@ status_t get_possible_configurations_for(uint64 id,
 
 
 status_t count_resource_descriptors_of_type(
-    struct device_configuration *c, resource_type type)
+	struct device_configuration *c, resource_type type)
 {
 	struct cm_ioctl_data params;
 

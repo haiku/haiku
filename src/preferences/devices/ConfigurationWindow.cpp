@@ -66,12 +66,12 @@ RangeConfItem::~RangeConfItem()
 /***********************************************************
  * DrawItem
  ***********************************************************/
-void 	
+void
 RangeConfItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 {
 	rgb_color kBlack = { 0,0,0,0 };
 	rgb_color kHighlight = { 156,154,156,0 };
-		
+	
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
@@ -83,7 +83,6 @@ RangeConfItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 		owner->SetLowColor(color);
 		owner->FillRect(itemRect);
 		owner->SetHighColor(kBlack);
-		
 	} else {
 		owner->SetLowColor(owner->ViewColor());
 	}
@@ -98,8 +97,8 @@ RangeConfItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 	owner->MovePenTo(point);
 	
 	char string[20];
-		
-	if (fLowAddress >= 0) {	
+	
+	if (fLowAddress >= 0) {
 		sprintf(string, "0x%04lx", fLowAddress);
 		owner->DrawString(string);
 	}
@@ -111,8 +110,8 @@ RangeConfItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 	point += BPoint(15, 0);
 	owner->MovePenTo(point);
 	owner->SetFont(be_plain_font);
-		
-	if (fHighAddress >= 0) {	
+	
+	if (fHighAddress >= 0) {
 		sprintf(string, "0x%04lx", fHighAddress);
 		owner->DrawString(string);
 	}
@@ -141,10 +140,10 @@ RangeConfItem::Compare(const void *firstArg, const void *secondArg)
 ConfigurationWindow::ConfigurationWindow(BRect frame, DeviceItem *item) 
 	: BWindow (frame, item->GetInfo()->GetCardName(), B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL , 
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE|B_NOT_RESIZABLE),
-	fItem(item)	
+	fItem(item)
 {
 	CenterWindowOnScreen(this);
-	fItem->SetWindow(this);	
+	fItem->SetWindow(this);
 	InitWindow();
 	
 	Show();
@@ -173,12 +172,12 @@ ConfigurationWindow::InitWindow(void)
 	BRect rtab = Bounds();
 	BRect rlist = Bounds();
 	rtab.top += 10;
-    rlist.top += 11;
-    rlist.left += 13;
-    rlist.right -= 13;
-    rlist.bottom -= 44;
-    
-    // Create the TabView and Tabs
+	rlist.top += 11;
+	rlist.left += 13;
+	rlist.right -= 13;
+	rlist.bottom -= 44;
+ 
+	// Create the TabView and Tabs
 	BTabView *tabView = new BTabView(rtab,"resource_usage_tabview");
 	tabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
@@ -188,8 +187,8 @@ ConfigurationWindow::InitWindow(void)
 	// Create the Views
 	BBox *resources = new BBox(rlist, "resources", 
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
-		
-		
+	
+	
 	BMenuItem *menuItem;
 	fConfigurationMenu = new BPopUpMenu("<empty>");
 	fConfigurationMenu->AddItem(menuItem = new BMenuItem("Current Configuration", 
@@ -263,12 +262,12 @@ ConfigurationWindow::InitWindow(void)
 	fDMAMenu[0]->Superitem()->SetLabel("");
 	fDMAMenu[1]->Superitem()->SetLabel("");
 	fDMAMenu[2]->Superitem()->SetLabel("");
-		
+	
 	BRect boxRect = resources->Bounds();
 	boxRect.top = 74;
-    boxRect.left += 13;
-    boxRect.right -= 11;
-    boxRect.bottom = boxRect.top + 141;
+	boxRect.left += 13;
+	boxRect.right -= 11;
+	boxRect.bottom = boxRect.top + 141;
 	BBox *ioPortBox = new BBox(boxRect, "ioPort", 
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	ioPortBox->SetLabel(new BStringView(BRect(0,0,150,15), "ioPortLabel", " IO Port Ranges "));
@@ -348,7 +347,7 @@ ConfigurationWindow::InitWindow(void)
 		for (int32 i=0;i<num;i++) {
 			get_nth_resource_descriptor_of_type(current, i, B_IO_PORT_RESOURCE,
 					&r, sizeof(resource_descriptor));
-				
+			
 				ioListView->AddItem(new RangeConfItem(r.d.r.minbase, 
 					r.d.r.minbase + r.d.r.len - 1));
 		}
@@ -363,7 +362,7 @@ ConfigurationWindow::InitWindow(void)
 		for (int32 i=0;i<num;i++) {
 			get_nth_resource_descriptor_of_type(current, i, B_MEMORY_RESOURCE,
 					&r, sizeof(resource_descriptor));
-				
+			
 				memoryListView->AddItem(new RangeConfItem(r.d.r.minbase, 
 					r.d.r.minbase + r.d.r.len - 1));
 		}
@@ -374,7 +373,7 @@ ConfigurationWindow::InitWindow(void)
 	
 	BBox *info = new BBox(rlist, "info", 
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW, B_NO_BORDER);
-		
+	
 	bool isISAPnP = false;
 	BString compatibleIDString;
 	
@@ -384,14 +383,14 @@ ConfigurationWindow::InitWindow(void)
 				&& (((id >> 16) & 0xff) == 'n') 
 				&& (((id >> 8) & 0xff) == 'P')) {
 				isISAPnP = true;
-				
+			
 				char string[255];
 				sprintf(string, "Compatible ID #%ld:", 
 						devicesInfo->GetInfo()->id[3]);
 				compatibleIDString = string;
 			}
 	} 
-		
+	
 	BRect labelRect(1, 10, 132, 30);
 	BStringView *label = new BStringView(labelRect, "Card Name", "Card Name:");
 	label->SetAlignment(B_ALIGN_RIGHT);
@@ -429,7 +428,7 @@ ConfigurationWindow::InitWindow(void)
 		label = new BStringView(labelRect, "Compatible ID#", compatibleIDString.String());
 		label->SetAlignment(B_ALIGN_RIGHT);
 		info->AddChild(label);
-	}	
+	}
 	labelRect.OffsetBy(0, 18);
 	label = new BStringView(labelRect, "Current State", "Current State:");
 	label->SetAlignment(B_ALIGN_RIGHT);
@@ -469,7 +468,7 @@ ConfigurationWindow::InitWindow(void)
 	BString logicalString;
 	
 	switch (devicesInfo->GetInfo()->bus) {
-		case B_ISA_BUS:	
+		case B_ISA_BUS:
 			{
 				char string[255];
 				if (isISAPnP) {
@@ -483,7 +482,7 @@ ConfigurationWindow::InitWindow(void)
 						(uint8)(id >> 28) & 0xf,
 						(uint8)((id >> 24) & 0xf));
 					vendor = string;
-										
+					
 					sprintf(string, "%08lx", devicesInfo->GetInfo()->id[2]);
 					cardID = string;
 					
@@ -509,7 +508,7 @@ ConfigurationWindow::InitWindow(void)
 						(uint8)(id >> 16) & 0xf,
 						(uint8)(id >> 20) & 0xf,
 						(uint8)((id >> 24) & 0xff));
-					vendor = string;			
+					vendor = string;
 					
 					cardID = "0";
 				} 
@@ -537,7 +536,7 @@ ConfigurationWindow::InitWindow(void)
 							break;
 					}
 				}
-			}						
+			}
 			break;
 		case B_PCMCIA_BUS:					vendor = "XX"; break;
 		default:							vendor = "<Unknown>"; break;
@@ -590,7 +589,7 @@ ConfigurationWindow::InitWindow(void)
 	label = new BStringView(labelRect, "Resource Conflicts", resourceConflicts.String());
 	info->AddChild(label);
 	
-							
+	
 	BTab *tab = new BTab();
 	tabView->AddTab(resources, tab);
 	tab->SetLabel("Resources");
@@ -624,7 +623,7 @@ bool
 ConfigurationWindow::QuitRequested()
 {
 	fItem->SetWindow(NULL);
-    return true;
+	return true;
 }
 // ---------------------------------------------------------------------------------------------------------- //
 

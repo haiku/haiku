@@ -69,25 +69,25 @@ DevicesWindow::DevicesWindow(BRect frame) : BWindow (frame, "Devices", B_TITLED_
 	CenterWindowOnScreen(this);
 	
 	// Load User Settings
-    BPath path;
-    find_directory(B_USER_SETTINGS_DIRECTORY,&path);
-    path.Append("Devices_Settings",true);
-    BFile file(path.Path(),B_READ_ONLY);
-    BMessage msg;
-    msg.Unflatten(&file);
-    LoadSettings (&msg);
-    
-    status_t error;
+	BPath path;
+	find_directory(B_USER_SETTINGS_DIRECTORY,&path);
+	path.Append("Devices_Settings",true);
+	BFile file(path.Path(),B_READ_ONLY);
+	BMessage msg;
+	msg.Unflatten(&file);
+	LoadSettings (&msg);
+	
+	status_t error;
 
 	if ((error = init_cm_wrapper()) < 0) {
 		printf("Error initializing configuration manager (%s)\n", strerror(error));
 		exit(1);
 	}
-    
-    InitDevices(B_ISA_BUS);
-    InitDevices(B_PCI_BUS);
-    
-    for (int32 i=fList.CountItems()-1; i>=0; i--) {
+	
+	InitDevices(B_ISA_BUS);
+	InitDevices(B_PCI_BUS);
+	
+	for (int32 i=fList.CountItems()-1; i>=0; i--) {
 		DevicesInfo *deviceInfo = (DevicesInfo *) fList.ItemAt(i);
 		struct device_info *info = deviceInfo->GetInfo();
 		BListItem *item = systemMenu;
@@ -253,7 +253,7 @@ bool DevicesWindow::QuitRequested()
 {
 	SaveSettings();
 	be_app->PostMessage(B_QUIT_REQUESTED);
-    return true;
+	return true;
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -277,12 +277,12 @@ void DevicesWindow::SaveSettings(void)
 	BMessage msg;
 	msg.AddRect("windowframe",Frame());
 	
-    BPath path;
-    status_t result = find_directory(B_USER_SETTINGS_DIRECTORY,&path);
-    if (result == B_OK)
-    {
+	BPath path;
+	status_t result = find_directory(B_USER_SETTINGS_DIRECTORY,&path);
+	if (result == B_OK)
+	{
 	    path.Append("Devices_Settings",true);
-    	BFile file(path.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+		BFile file(path.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
 	    msg.Flatten(&file);
 	}    
 }

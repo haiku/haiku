@@ -39,7 +39,7 @@ BarView::Draw(BRect updateRect)
 {
 	BRect r = Bounds();
 	
-	if(fDisplay) {
+	if (fDisplay) {
 		// Display the 3D Look Divider Bar
 		SetHighColor(140,140,140,0);
 		StrokeLine(BPoint(r.left,r.top),BPoint(r.right,r.top));
@@ -84,7 +84,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	defaultsBox->AddChild(menuField2);
 	menuField2->SetDivider(divider);
 	
-	if(!fIsVideo) {
+	if (!fIsVideo) {
 		defaultRect.OffsetBy(186, 0);
 		defaultRect.right -= 30;
 		fMenu3 = new BPopUpMenu("<none>");
@@ -121,7 +121,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	
 	uint32 flags;
 	BMediaRoster::Roster()->GetRealtimeFlags(&flags);
-	if(flags & (fIsVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO))
+	if (flags & (fIsVideo ? B_MEDIA_REALTIME_VIDEO : B_MEDIA_REALTIME_AUDIO))
 		fRealtimeCheckBox->SetValue(B_CONTROL_ON);
 		
 	rect2.top += 26;
@@ -145,7 +145,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 		"Restart Media Services", new BMessage(ML_RESTART_MEDIA_SERVER));
 	AddChild(restartButton);
 	
-	if(!fIsVideo) {
+	if (!fIsVideo) {
 		rect.right = rect.left - 10;
 		rect.top += 4;
 		rect.left = frame.left + 33;
@@ -156,7 +156,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 			"Show Volume Control on Deskbar", new BMessage(ML_SHOW_VOLUME_CONTROL));
 		AddChild(fVolumeCheckBox);
 		
-		if(BDeskbar().HasItem("MediaReplicant"))
+		if (BDeskbar().HasItem("MediaReplicant"))
 			fVolumeCheckBox->SetValue(B_CONTROL_ON);	
 	}
 }
@@ -186,7 +186,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 		
 	for (int32 i = 0; i < menu->CountItems(); i++) {
 		SettingsItem *item = static_cast<SettingsItem *>(menu->ItemAt(i));
-		if(item->fInfo && item->fInfo->addon == info.addon && item->fInfo->flavor_id == info.flavor_id) {
+		if (item->fInfo && item->fInfo->addon == info.addon && item->fInfo->flavor_id == info.flavor_id) {
 			item->SetMarked(true);
 			break;
 		}
@@ -215,7 +215,7 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 					media_input *input = new media_input();
 					memcpy(input, &inputs[i], sizeof(*input));
 					fMenu3->AddItem(item = new Settings2Item(&info, input, new BMessage(message)));
-					if(inputs[i].destination.id == outputID)
+					if (inputs[i].destination.id == outputID)
 						item->SetMarked(true);
 				}
 			}

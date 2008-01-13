@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Keyboard",
-    long_info  = "Keyboard ©2004-2007 Haiku"
+	long_info  = "Keyboard ©2004-2007 Haiku"
 };
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU

@@ -13,7 +13,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Appearance",
-    long_info  = "Appearance ©2002-2007 Haiku"
+	long_info  = "Appearance ©2002-2007 Haiku"
 };
 
 resource app_flags B_SINGLE_LAUNCH;

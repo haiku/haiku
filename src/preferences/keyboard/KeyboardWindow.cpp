@@ -23,7 +23,7 @@
 KeyboardWindow::KeyboardWindow()
 	: BWindow(BRect(0, 0, 200, 200), "Keyboard", B_TITLED_WINDOW,
  		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
-{	
+{
 	MoveTo(fSettings.WindowCorner());
 
 	// center window if it would be off-screen
@@ -50,7 +50,7 @@ KeyboardWindow::KeyboardWindow()
 		button->SetEnabled(fSettings.IsDefaultable());
 
 #ifdef DEBUG
-	fSettings.Dump();	
+	fSettings.Dump();
 #endif
 
 	Show();
@@ -63,7 +63,7 @@ KeyboardWindow::QuitRequested()
 	fSettings.SetWindowCorner(Frame().LeftTop());
 
 #ifdef DEBUG
-	fSettings.Dump();	
+	fSettings.Dump();
 #endif
 
 	be_app->PostMessage(B_QUIT_REQUESTED);
@@ -105,11 +105,11 @@ KeyboardWindow::MessageReceived(BMessage* message)
 			
 			slider = (BSlider *)FindView("key_repeat_rate");
 			if (slider !=NULL) 
-				slider->SetValue(fSettings.KeyboardRepeatRate());	    		
+				slider->SetValue(fSettings.KeyboardRepeatRate());
 
 			slider = (BSlider *)FindView("delay_until_key_repeat");
 			if (slider !=NULL) 
-				slider->SetValue(fSettings.KeyboardRepeatDelay());	    		
+				slider->SetValue(fSettings.KeyboardRepeatDelay());
 
 			button = (BButton *)FindView("keyboard_defaults");
 			if (button !=NULL)
@@ -119,7 +119,7 @@ KeyboardWindow::MessageReceived(BMessage* message)
 	  		if (button !=NULL) 
 	  			button->SetEnabled(false);
 			break;
-  		}
+		}
 		case SLIDER_REPEAT_RATE:
 		{
 			int32 rate;
@@ -133,7 +133,7 @@ KeyboardWindow::MessageReceived(BMessage* message)
 
 			button = (BButton *)FindView("keyboard_revert");
 	  		if (button !=NULL) 
-  				button->SetEnabled(true);
+				button->SetEnabled(true);
 			break;
 		}
 		case SLIDER_DELAY_RATE:
@@ -165,10 +165,10 @@ KeyboardWindow::MessageReceived(BMessage* message)
 				button->SetEnabled(fSettings.IsDefaultable());
 
 			button = (BButton *)FindView("keyboard_revert");
-  			if (button !=NULL) 
-  				button->SetEnabled(true);
+			if (button !=NULL) 
+				button->SetEnabled(true);
 			break;
-  		}
+		}
 
 		default:
 			BWindow::MessageReceived(message);
