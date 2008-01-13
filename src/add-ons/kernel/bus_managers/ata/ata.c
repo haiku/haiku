@@ -21,6 +21,8 @@
 
 static void ata_exec_dma_transfer(ata_request *request);
 static void	ata_exec_pio_transfer(ata_request *request);
+status_t ata_wait_idle(ide_bus_info *bus);
+status_t ata_read_status(ide_device_info *device, uint8 *status);
 
 
 void
@@ -812,7 +814,7 @@ ata_exec_pio_transfer(ata_request *request)
 {
 	ide_device_info *device = request->device;
 	ide_bus_info *bus = device->bus;
-	uint32 timeout = request->ccb->timeout > 0 ? 
+	bigtime_t timeout = request->ccb->timeout > 0 ? 
 		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
 
 //	FLOW("ata_exec_pio_transfer: length %d, left_blocks %d, left_sg_elem %d, cur_sg_ofs %d\n",
@@ -821,7 +823,7 @@ ata_exec_pio_transfer(ata_request *request)
 
 	while (device->left_blocks > 0) {
 
-		if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 4000000) != B_OK) {
+		if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, timeout) != B_OK) {
 			TRACE("ata_exec_pio_transfer: wait failed\n");
 			goto error;
 		}
