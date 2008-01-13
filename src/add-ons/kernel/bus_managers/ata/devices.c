@@ -157,15 +157,19 @@ fix_infoblock_endian(ide_device_info *device)
 status_t
 scan_device(ide_device_info *device, bool isAtapi)
 {
+	status_t result;
 	dprintf("ATA: scan_device\n");
 
-	if (ata_identify_device(device, isAtapi) != B_OK) {
-		isAtapi = !isAtapi;
-		dprintf("ATA: scan_device: retrying identify for different device type (atapi=%d)\n", isAtapi);
-		if (ata_identify_device(device, isAtapi) != B_OK) {
-			dprintf("ATA: couldn't read infoblock for device %p\n", device);
-			return B_ERROR;
-		}
+retry:
+	result = ata_identify_device(device, isAtapi);
+	if (result != B_OK && !isAtapi) {
+		dprintf("ATA: scan_device: possibly ATAPI, retrying identify\n");
+		isAtapi = true;
+		goto retry;
+	}
+	if (result != B_OK) {
+		dprintf("ATA: couldn't read infoblock for device %p\n", device);
+		return B_ERROR;
 	}
 
 	fix_infoblock_endian(device);

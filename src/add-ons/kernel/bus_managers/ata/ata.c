@@ -1115,7 +1115,7 @@ ata_identify_device(ide_device_info *device, bool isAtapi)
 		return B_ERROR;
 	}
 
-	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 4000000) != B_OK) {
+	if (ata_wait(bus, ide_status_drq, ide_status_bsy, 0, 500000) != B_OK) {
 		TRACE("ata_identify_device: wait failed\n");
 		return B_ERROR;
 	}
