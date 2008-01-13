@@ -134,6 +134,8 @@ struct driver_entry {
 	int32			*api_version;
 	device_hooks	*(*find_device)(const char *);
 	const char		**(*publish_devices)(void);
+	status_t		(*uninit_driver)(void);
+	status_t		(*uninit_hardware)(void);
 };
 
 
@@ -256,13 +258,18 @@ load_driver(driver_entry *driver)
 		goto error2;
 	}
 
+	// resolve and cache those for the driver unload code
+	if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
+		(void **)&driver->uninit_driver) != B_OK)
+		driver->uninit_driver = NULL;
+	if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
+		(void **)&driver->uninit_hardware) != B_OK)
+		driver->uninit_hardware = NULL;
+
 	// The driver has successfully been initialized, now we can
 	// finally publish its device entries
 
 	// we keep the driver loaded if it exports at least a single interface
-	// ToDo: we could/should always unload drivers until they will be used for real
-	// ToDo: this function is probably better kept in devfs, so that it could remember
-	//	the driver stuff (and even keep it loaded if there is enough memory)
 	devicePaths = driver->publish_devices();
 	if (devicePaths == NULL) {
 		dprintf("%s: publish_devices() returned NULL.\n", name);
@@ -279,7 +286,7 @@ load_driver(driver_entry *driver)
 			exported++;
 	}
 
-	// we're all done, driver will be kept loaded (for now, see above comment)
+	// we're all done, driver will be kept loaded
 	if (exported > 0) {
 		driver->image = image;
 		return B_OK;
@@ -288,20 +295,12 @@ load_driver(driver_entry *driver)
 	status = B_ERROR;	// whatever...
 
 error3:
-	{
-		status_t (*uninit_driver)(void);
-		if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
-				(void **)&uninit_driver) == B_OK)
-			uninit_driver();
-	}
+	if (driver->uninit_driver)
+		driver->uninit_driver();
 
 error2:
-	{
-		status_t (*uninit_hardware)(void);
-		if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
-				(void **)&uninit_hardware) == B_OK)
-			uninit_hardware();
-	}
+	if (driver->uninit_hardware)
+		driver->uninit_hardware();
 
 error1:
 	if (driver->image < 0) {
@@ -313,7 +312,27 @@ error1:
 }
 
 
-static  status_t
+static status_t
+unload_driver(driver_entry *driver)
+{
+	if (driver->image < 0) {
+		// driver is not currently loaded
+		return B_NO_INIT;
+	}
+
+	if (driver->uninit_driver)
+		driver->uninit_driver();
+
+	if (driver->uninit_hardware)
+		driver->uninit_hardware();
+
+	unload_kernel_add_on(driver->image);
+	driver->image = -1;
+	return B_OK;
+}
+
+
+static status_t
 add_driver(const char *path, image_id image)
 {
 	// see if we already know this driver
@@ -360,6 +379,12 @@ add_driver(const char *path, image_id image)
 	driver->node = stat.st_ino;
 	driver->image = image;
 	driver->last_modified = stat.st_mtime;
+
+	driver->api_version = NULL;
+	driver->find_device = NULL;
+	driver->publish_devices = NULL;
+	driver->uninit_driver = NULL;
+	driver->uninit_hardware = NULL;
 
 	hash_insert(sDeviceFileSystem->driver_hash, driver);
 
@@ -1059,7 +1084,7 @@ republish_driver(driver_entry *driver)
 		if (hooks == NULL)
 			continue;
 
-		dprintf("devfs: publishing new device \"%s\"\n", devicePaths[0]);
+		TRACE(("devfs: publishing new device \"%s\"\n", devicePaths[0]));
 		if (publish_device(sDeviceFileSystem, devicePaths[0], NULL, NULL,
 			driver, hooks, *driver->api_version) == B_OK)
 			exported++;
@@ -1068,7 +1093,7 @@ republish_driver(driver_entry *driver)
 	// what's left in currentNodes was present but is not anymore -> unpublish
 	node_path_entry *entry = currentNodes.Head();
 	while (entry) {
-		dprintf("devfs: unpublishing no more present \"%s\"\n", entry->path);
+		TRACE(("devfs: unpublishing no more present \"%s\"\n", entry->path));
 		devfs_unpublish_device(entry->path, true);
 		node_path_entry *next = currentNodes.GetNext(entry);
 		currentNodes.Remove(entry);
@@ -1077,8 +1102,8 @@ republish_driver(driver_entry *driver)
 	}
 
 	if (exported == 0) {
-		dprintf("devfs: driver \"%s\" does not publish any more nodes and could be unloaded\n", driver->path);
-		// ToDo: here we could unload the driver if it doesn't publish anything
+		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is unloaded\n", driver->path));
+		unload_driver(driver);
 	}
 
 	return B_OK;
