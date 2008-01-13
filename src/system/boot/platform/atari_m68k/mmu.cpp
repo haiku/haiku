@@ -117,6 +117,7 @@ static void
 add_page_table(addr_t base)
 {
 	TRACE(("add_page_table(base = %p)\n", (void *)base));
+#if 0
 
 	// Get new page table and clear it out
 	uint32 *pageTable = get_next_page_table();
@@ -130,6 +131,7 @@ add_page_table(addr_t base)
 
 	// put the new page table into the page directory
 	sPageDirectory[base/(4*1024*1024)] = (uint32)pageTable | kDefaultPageTableFlags;
+#endif
 }
 
 
@@ -140,6 +142,7 @@ unmap_page(addr_t virtualAddress)
 
 	if (virtualAddress < KERNEL_BASE)
 		panic("unmap_page: asked to unmap invalid page %p!\n", (void *)virtualAddress);
+#if 0
 
 	// unmap the page from the correct page table
 	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
@@ -147,6 +150,7 @@ unmap_page(addr_t virtualAddress)
 	pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
 
 	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
+#endif
 }
 
 
@@ -213,6 +217,7 @@ sort_addr_range(addr_range *range, int count)
 }
 
 
+#if 0
 static uint32
 get_memory_map(extended_memory **_extendedMemory)
 {
@@ -246,6 +251,7 @@ get_memory_map(extended_memory **_extendedMemory)
 
 	return count;
 }
+#endif
 
 
 static void
@@ -253,6 +259,7 @@ init_page_directory(void)
 {
 	TRACE(("init_page_directory\n"));
 
+#if 0
 	// allocate a new pgdir
 	sPageDirectory = (uint32 *)get_next_physical_page();
 	gKernelArgs.arch_args.phys_pgdir = (uint32)sPageDirectory;
@@ -292,6 +299,7 @@ init_page_directory(void)
 		"movl %%eax, %%cr3;" : : "m" (sPageDirectory) : "eax");
 	// Important.  Make sure supervisor threads can fault on read only pages...
 	asm("movl %%eax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
+#endif
 }
 
 
@@ -396,6 +404,7 @@ extern "C" void
 mmu_init_for_kernel(void)
 {
 	TRACE(("mmu_init_for_kernel\n"));
+#if 0
 	// set up a new idt
 	{
 		struct gdt_idt_descr idtDescriptor;
@@ -509,6 +518,7 @@ mmu_init_for_kernel(void)
 		}
 	}
 #endif
+#endif
 }
 
 
@@ -523,6 +533,7 @@ mmu_init(void)
 		// remember the start of the allocated physical pages
 
 	init_page_directory();
+#if 0
 
 	// Map the page directory into kernel space at 0xffc00000-0xffffffff
 	// this enables a mmu trick where the 4 MB region that this pgdir entry
@@ -604,6 +615,7 @@ mmu_init(void)
 	}
 
 	gKernelArgs.arch_args.page_hole = 0xffc00000;
+#endif
 }
 
 
