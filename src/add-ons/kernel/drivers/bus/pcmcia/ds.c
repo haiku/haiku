@@ -22,6 +22,7 @@
 #define copy_from_user memcpy 
 #define copy_to_user memcpy
 #define CardServices gPcmciaCs->_CardServices
+#define get_handle gPcmciaDs->get_handle
 
 const char sockname[] = "bus/pcmcia/sock/%ld";
 static char ** devices;
@@ -50,7 +51,7 @@ ds_open(const char *name, uint32 flags, void **_cookie)
 		return B_BAD_VALUE;
 	}
 	
-	if (gPcmciaDs->get_handle(socket, (client_handle_t *)_cookie) != B_OK) {
+	if (get_handle(socket, (client_handle_t *)_cookie) != B_OK) {
 		return ENODEV;
 	}
 	
@@ -365,7 +366,7 @@ init_driver()
 	}
 	
 	devices_count = 0;
-	while (gPcmciaDs->get_handle(devices_count, &handle)==B_OK) {
+	while (get_handle(devices_count, &handle)==B_OK) {
 		devices_count++;
 	}
 	
@@ -376,6 +377,11 @@ init_driver()
 	}
 	
 	devices = malloc(sizeof(char *) * (devices_count+1));
+	if (!devices) {
+		put_module(CS_CLIENT_MODULE_NAME);
+		put_module(DS_MODULE_NAME);
+		return ENOMEM;
+	}
 	for (i=0; i<devices_count; i++) {
 		devices[i] = strdup(sockname);
 		sprintf(devices[i], sockname, i);
@@ -394,6 +400,7 @@ uninit_driver()
 		free (devices[i]);
 	}
 	free(devices);
+	devices = NULL;
 
 	put_module(DS_MODULE_NAME);
 	put_module(CS_CLIENT_MODULE_NAME);
