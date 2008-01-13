@@ -35,7 +35,6 @@ periph_compose_device_name(device_node_handle node, const char *prefix)
 	// IDE devices have a different naming scheme
 
 	if (pnp->get_attr_uint32(node, "ide/channel_id", &channel, true) == B_OK
-		&& pnp->get_attr_uint8(node, "ide_adapter/is_primary", &isPrimary, true) == B_OK
 		&& pnp->get_attr_uint8(node, SCSI_DEVICE_TYPE_ITEM, &type, true) == B_OK) {
 		// this is actually an IDE device, so we ignore the prefix
 
