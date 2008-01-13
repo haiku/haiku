@@ -83,7 +83,7 @@ load_sectors:
 	move.w		#1,-(%sp)	// 2nd sector
 	move.w		%d2,-(%sp)
 	move.l		%a2,-(%sp)
-	move.w		RW_,-(%sp)
+	move.w		RW_READ+RW_NOTRANSLATE,-(%sp)
 	move.w		#4,-(%sp)
 	trap		#13
 	add.l		#14,%sp
