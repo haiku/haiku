@@ -25,19 +25,20 @@
 
 class KernelMemoryBarMenuItem : public BMenuItem {
 	public:
-						KernelMemoryBarMenuItem(system_info& systemInfo);
+		KernelMemoryBarMenuItem(system_info& systemInfo);
 		virtual	void	DrawContent();
 		virtual	void	GetContentSize(float* _width, float* _height);
+
 		void			DrawBar(bool force);
 		void			UpdateSituation(float commitedMemory, float totalWriteMemory);
 
 	private:
-		float			fTotalWriteMemory;
-		float			fPhsysicalMemory;
-		float			fCommitedMemory;
-		double			fLastSum;
-		float			fGrenze1;
-		float			fGrenze2;
+		float	fTotalWriteMemory;
+		float	fPhsysicalMemory;
+		float	fCommitedMemory;
+		double	fLastSum;
+		float	fGrenze1;
+		float	fGrenze2;
 };
 
 #endif // _KERNEL_MEMORY_BAR_MENU_ITEM_H_

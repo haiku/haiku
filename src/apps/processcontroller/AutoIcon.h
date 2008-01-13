@@ -28,18 +28,34 @@ class BBitmap;
 class AutoIcon {
 	public:
 		AutoIcon(const char* signature)
-			: fSignature (signature), fbits (0), fBitmap (0) {}
+			:
+			fSignature(signature),
+			fbits(0),
+			fBitmap(0)
+		{
+		}
+
 		AutoIcon(const uchar* bits)
-			: fSignature (0), fbits (bits), fBitmap (0) {}
+			:
+			fSignature(0),
+			fbits(bits),
+			fBitmap(0)
+		{
+		}
+
 		~AutoIcon();
 
-	  	operator BBitmap*() { return bitmap(); }
-		BBitmap* bitmap();
+	  	operator BBitmap*()
+	  	{
+	  		return Bitmap();
+	  	}
+
+		BBitmap* Bitmap();
 
 	private:
 		const char*		fSignature;
 		const uchar*	fbits;
-		BBitmap	*		fBitmap;
+		BBitmap*		fBitmap;
 };
 
 #endif // _AUTO_ICON_H_

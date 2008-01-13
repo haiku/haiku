@@ -35,8 +35,7 @@
 float gMemoryTextWidth;
 
 
-MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos,
-		system_info& systemInfo)
+MemoryBarMenu::MemoryBarMenu(const char* name, info_pack* infos, system_info& systemInfo)
 	: BMenu(name),
 	fFirstShow(true)
 {
@@ -94,7 +93,7 @@ MemoryBarMenu::Pulse()
 	int lastRecycle = 0;
 	int firstRecycle = 0;
 	int	k;
-	MemoryBarMenuItem *item;
+	MemoryBarMenuItem* item;
 	int	total = 0;
 	for (k = 1; (item = (MemoryBarMenuItem*)ItemAt(k)) != NULL; k++) {
 		int m = item->UpdateSituation(commitedMemory);

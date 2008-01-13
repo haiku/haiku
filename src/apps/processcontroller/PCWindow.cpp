@@ -36,7 +36,7 @@ PCWindow::PCWindow()
 	: BWindow(BRect(100, 150, 131, 181), "ProcessController", B_TITLED_WINDOW,
 		B_NOT_H_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
-	GebsPreferences preferences(kPreferencesFileName);
+	Preferences preferences(kPreferencesFileName);
 	preferences.SaveInt32(kCurrentVersion, kVersionName);
 	preferences.LoadWindowPosition(this, kPosPrefName);
 
@@ -70,11 +70,10 @@ PCWindow::~PCWindow()
 bool
 PCWindow::QuitRequested()
 {
-	GebsPreferences tPreferences(kPreferencesFileName);
+	Preferences tPreferences(kPreferencesFileName);
 	tPreferences.SaveInt32(kCurrentVersion, kVersionName);
 	tPreferences.SaveWindowPosition(this, kPosPrefName);
 
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
-

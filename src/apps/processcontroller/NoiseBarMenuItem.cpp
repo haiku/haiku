@@ -46,17 +46,19 @@ NoiseBarMenuItem::DrawContent()
 void
 NoiseBarMenuItem::DrawBar(bool force)
 {
-	bool selected = IsSelected ();
+	bool selected = IsSelected();
 	BRect frame = Frame();
-	BMenu* menu = Menu ();
+	BMenu* menu = Menu();
 	frame.right -= 24;
-	frame.left = frame.right-kBarWidth;
+	frame.left = frame.right - kBarWidth;
 	frame.top += 5;
-	frame.bottom = frame.top+8;
+	frame.bottom = frame.top + 8;
 	if (fBusyWaiting < 0)
 		return;
+
 	if (fGrenze1 < 0)
 		force = true;
+
 	if (force) {
 		if (selected)
 			menu->SetHighColor(gFrameColorSelected);
@@ -64,6 +66,7 @@ NoiseBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(gFrameColor);
 		menu->StrokeRect(frame);
 	}
+
 	frame.InsetBy(1, 1);
 	BRect r = frame;
 	float grenze1 = frame.left+(frame.right-frame.left)*fBusyWaiting;
@@ -119,5 +122,5 @@ NoiseBarMenuItem::GetContentSize(float* width, float* height)
 	BMenuItem::GetContentSize(width, height);
 	if (*height < 16)
 		*height = 16;
-	*width += 20+kBarWidth;
+	*width += 20 + kBarWidth;
 }

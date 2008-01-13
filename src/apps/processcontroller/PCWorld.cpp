@@ -76,7 +76,7 @@ PCApplication::~PCApplication()
 void
 PCApplication::ReadyToRun()
 {
-	GebsPreferences preferences(kPreferencesFileName);
+	Preferences preferences(kPreferencesFileName);
 	int32 version = 0;
 	preferences.ReadInt32(version, kVersionName);
 	if (version != kCurrentVersion) {

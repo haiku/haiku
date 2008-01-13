@@ -57,13 +57,15 @@ ThreadBarMenuItem::DrawBar(bool force)
 	BRect frame = Frame();
 	BMenu* menu = Menu();
 	frame.right -= 24;
-	frame.left = frame.right-kBarWidth;
+	frame.left = frame.right - kBarWidth;
 	frame.top += 3;
-	frame.bottom = frame.top+8;
+	frame.bottom = frame.top + 8;
 	if (fKernel < 0)
 		return;
+
 	if (fGrenze1 < 0)
 		force = true;
+
 	if (force) {
 		if (selected)
 			menu->SetHighColor(gFrameColorSelected);
@@ -71,17 +73,20 @@ ThreadBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(gFrameColor);
 		menu->StrokeRect(frame);
 	}
+
 	frame.InsetBy(1, 1);
 	BRect r = frame;
-	float grenze1 = frame.left+(frame.right-frame.left)*fKernel;
-	float grenze2 = frame.left+(frame.right-frame.left)*(fKernel+fUser);
+	float grenze1 = frame.left + (frame.right - frame.left) * fKernel;
+	float grenze2 = frame.left + (frame.right - frame.left) * (fKernel + fUser);
 	if (grenze1 > frame.right)
 		grenze1 = frame.right;
 	if (grenze2 > frame.right)
 		grenze2 = frame.right;
 	r.right = grenze1;
+
 	if (!force)
 		r.left = fGrenze1;
+
 	if (r.left < r.right) {
 		if (selected)
 			menu->SetHighColor(gKernelColorSelected);
@@ -89,6 +94,7 @@ ThreadBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(gKernelColor);
 		menu->FillRect(r);
 	}
+
 	r.left = grenze1;
 	r.right = grenze2;
 	if (!force) {
@@ -127,7 +133,7 @@ ThreadBarMenuItem::GetContentSize(float* width, float* height)
 	BMenuItem::GetContentSize(width, height);
 //	if (*height < 16)
 //		*height = 16;
-	*width += 10+kBarWidth;
+	*width += 10 + kBarWidth;
 }
 
 
@@ -135,11 +141,11 @@ void
 ThreadBarMenuItem::Highlight(bool on)
 {
 	if (on) {
-		PriorityMenu * popup = (PriorityMenu *) Submenu ();
+		PriorityMenu* popup = (PriorityMenu*)Submenu();
 		if (popup)
-			popup->Update (fThreadInfo.priority);
+			popup->Update(fThreadInfo.priority);
 	}
-	BMenuItem::Highlight (on);
+	BMenuItem::Highlight(on);
 }
 
 
@@ -149,8 +155,8 @@ ThreadBarMenuItem::BarUpdate()
 	thread_info info;
 	if (get_thread_info(fThreadID, &info) == B_OK) {
 		bigtime_t now = system_time();
-		fKernel = double(info.kernel_time-fThreadInfo.kernel_time)/double(now-fLastTime);
-		fUser = double(info.user_time-fThreadInfo.user_time)/double(now-fLastTime);
+		fKernel = double(info.kernel_time - fThreadInfo.kernel_time) / double(now - fLastTime);
+		fUser = double(info.user_time - fThreadInfo.user_time) / double(now - fLastTime);
 		if (fThreadID <= gCPUcount) {
 			fUser += fKernel;
 			fKernel = 0;
@@ -159,7 +165,7 @@ ThreadBarMenuItem::BarUpdate()
 		fThreadInfo.kernel_time = info.kernel_time;
 		fLastTime = now;
 		if (IsSelected ()) {
-			PriorityMenu * popup = (PriorityMenu *) Submenu ();
+			PriorityMenu* popup = (PriorityMenu*)Submenu();
 			if (popup && info.priority != fThreadInfo.priority)
 				popup->Update (info.priority);
 		}
@@ -167,4 +173,3 @@ ThreadBarMenuItem::BarUpdate()
 	} else
 		fKernel = -1;
 }
-

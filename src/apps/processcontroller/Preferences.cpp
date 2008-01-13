@@ -21,6 +21,10 @@
 #include "Preferences.h"
 #include "Utilities.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #include <Alert.h>
 #include <Directory.h>
 #include <File.h>
@@ -29,12 +33,8 @@
 #include <Mime.h>
 #include <Path.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-
-GebsPreferences::GebsPreferences(const char* name, const char* signature, bool doSave)
+Preferences::Preferences(const char* name, const char* signature, bool doSave)
 	: BMessage('Pref'), BLocker("Preferences", true),
 	fSavePreferences(doSave)
 {
@@ -61,7 +61,7 @@ GebsPreferences::GebsPreferences(const char* name, const char* signature, bool d
 }
 
 
-GebsPreferences::GebsPreferences(const entry_ref &ref, const char* signature, bool doSave)
+Preferences::Preferences(const entry_ref &ref, const char* signature, bool doSave)
 	: BMessage('Pref'), BLocker("Preferences", true),
 	fSavePreferences(doSave)
 {
@@ -82,7 +82,7 @@ GebsPreferences::GebsPreferences(const entry_ref &ref, const char* signature, bo
 }
 
 
-GebsPreferences::~GebsPreferences()
+Preferences::~Preferences()
 {
 	if (fSavePreferences) {
 		BFile file;
@@ -101,7 +101,7 @@ GebsPreferences::~GebsPreferences()
 			Flatten(&file);
 			if (fSignature) {
 				file.WriteAttr("BEOS:TYPE", B_MIME_STRING_TYPE, 0, fSignature,
-					strlen(fSignature)+1);
+					strlen(fSignature) + 1);
 			}
 		} else {
 			// implement saving somewhere else!
@@ -119,7 +119,7 @@ GebsPreferences::~GebsPreferences()
 
 
 status_t
-GebsPreferences::MakeEmpty()
+Preferences::MakeEmpty()
 {
 	Lock();
 	status_t status = BMessage::MakeEmpty();
@@ -129,7 +129,7 @@ GebsPreferences::MakeEmpty()
 
 
 void
-GebsPreferences::SaveWindowPosition(BWindow* window, const char* name)
+Preferences::SaveWindowPosition(BWindow* window, const char* name)
 {
 	Lock();
 
@@ -144,7 +144,7 @@ GebsPreferences::SaveWindowPosition(BWindow* window, const char* name)
 
 
 void
-GebsPreferences::LoadWindowPosition(BWindow* window, const char* name)
+Preferences::LoadWindowPosition(BWindow* window, const char* name)
 {
 	Lock();
 
@@ -159,7 +159,7 @@ GebsPreferences::LoadWindowPosition(BWindow* window, const char* name)
 
 
 void
-GebsPreferences::SaveWindowFrame(BWindow* window, const char* name)
+Preferences::SaveWindowFrame(BWindow* window, const char* name)
 {
 	Lock();
 
@@ -174,7 +174,7 @@ GebsPreferences::SaveWindowFrame(BWindow* window, const char* name)
 
 
 void
-GebsPreferences::LoadWindowFrame(BWindow* window, const char* name)
+Preferences::LoadWindowFrame(BWindow* window, const char* name)
 {
 	Lock();
 
@@ -190,7 +190,7 @@ GebsPreferences::LoadWindowFrame(BWindow* window, const char* name)
 
 
 void
-GebsPreferences::SaveInt32(int32 value, const char* name)
+Preferences::SaveInt32(int32 value, const char* name)
 {
 	Lock();
 
@@ -204,7 +204,7 @@ GebsPreferences::SaveInt32(int32 value, const char* name)
 
 
 bool
-GebsPreferences::ReadInt32(int32 &val, const char* name)
+Preferences::ReadInt32(int32 &val, const char* name)
 {
 	Lock();
 	int32 readVal;
@@ -217,7 +217,7 @@ GebsPreferences::ReadInt32(int32 &val, const char* name)
 
 
 void
-GebsPreferences::SaveFloat(float val, const char* name)
+Preferences::SaveFloat(float val, const char* name)
 {
 	Lock();
 	if (HasFloat(name))
@@ -229,11 +229,11 @@ GebsPreferences::SaveFloat(float val, const char* name)
 
 
 bool
-GebsPreferences::ReadFloat(float &val, const char* name)
+Preferences::ReadFloat(float &val, const char* name)
 {
 	Lock();
 	float readVal;
-	bool found = FindFloat(name, &readVal)==B_OK;
+	bool found = FindFloat(name, &readVal) == B_OK;
 	if (found)
 		val = readVal;
 	Unlock();
@@ -242,7 +242,7 @@ GebsPreferences::ReadFloat(float &val, const char* name)
 
 
 void
-GebsPreferences::SaveRect(BRect &rect, const char* name)
+Preferences::SaveRect(BRect& rect, const char* name)
 {
 	Lock();
 	if (HasRect(name))
@@ -254,11 +254,11 @@ GebsPreferences::SaveRect(BRect &rect, const char* name)
 
 
 BRect &
-GebsPreferences::ReadRect(BRect &rect, const char* name)
+Preferences::ReadRect(BRect& rect, const char* name)
 {
 	Lock();
 	BRect loaded;
-	if (FindRect(name, &loaded)==B_OK)
+	if (FindRect(name, &loaded) == B_OK)
 		rect = loaded;
 	Unlock();
 	return rect;
@@ -266,7 +266,7 @@ GebsPreferences::ReadRect(BRect &rect, const char* name)
 
 
 void
-GebsPreferences::SaveString(BString &string, const char* name)
+Preferences::SaveString(BString &string, const char* name)
 {
 	Lock();
 	if (HasString(name))
@@ -278,7 +278,7 @@ GebsPreferences::SaveString(BString &string, const char* name)
 
 
 void
-GebsPreferences::SaveString(const char* string, const char* name)
+Preferences::SaveString(const char* string, const char* name)
 {
 	Lock();
 	if (HasString(name))
@@ -290,7 +290,7 @@ GebsPreferences::SaveString(const char* string, const char* name)
 
 
 bool
-GebsPreferences::ReadString(BString &string, const char* name)
+Preferences::ReadString(BString &string, const char* name)
 {
 	Lock();
 	bool loaded = FindString(name, &string) == B_OK;

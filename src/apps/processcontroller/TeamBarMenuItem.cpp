@@ -17,6 +17,7 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
 */
 
+
 #include "TeamBarMenuItem.h"
 
 #include "Colors.h"
@@ -30,8 +31,8 @@
 #define B_USAGE_SELF 0
 
 
-TeamBarMenuItem::TeamBarMenuItem(BMenu *menu, BMessage *kill_team, team_id team,
-		BBitmap* icon, bool deleteIcon)
+TeamBarMenuItem::TeamBarMenuItem(BMenu* menu, BMessage* kill_team, team_id team,
+	BBitmap* icon, bool deleteIcon)
 	: BMenuItem(menu, kill_team),
 	fTeamID(team),
 	fIcon(icon),
@@ -44,8 +45,8 @@ TeamBarMenuItem::TeamBarMenuItem(BMenu *menu, BMessage *kill_team, team_id team,
 void
 TeamBarMenuItem::Init()
 {
-	team_info tminfo;
-	get_team_info(fTeamID, &tminfo);
+	team_info teamInfo;
+	get_team_info(fTeamID, &teamInfo);
 	get_team_usage_info(fTeamID, B_USAGE_SELF, &fTeamUsageInfo);
 	if (fTeamID == B_SYSTEM_TEAM) {
 		thread_info	thinfos;
@@ -139,8 +140,8 @@ TeamBarMenuItem::DrawBar(bool force)
 
 	frame.InsetBy(1, 1);
 	BRect r = frame;
-	float grenze1 = frame.left+(frame.right-frame.left)*fKernel/gCPUcount;
-	float grenze2 = frame.left+(frame.right-frame.left)*(fKernel+fUser)/gCPUcount;
+	float grenze1 = frame.left + (frame.right - frame.left) * fKernel / gCPUcount;
+	float grenze2 = frame.left + (frame.right - frame.left) * (fKernel + fUser) / gCPUcount;
 	if (grenze1 > frame.right)
 		grenze1 = frame.right;
 	if (grenze2 > frame.right)
@@ -199,7 +200,7 @@ TeamBarMenuItem::GetContentSize(float* width, float* height)
 	BMenuItem::GetContentSize(width, height);
 	if (*height < 16)
 		*height = 16;
-	*width += 40+kBarWidth;
+	*width += 40 + kBarWidth;
 }
 
 
@@ -219,8 +220,12 @@ TeamBarMenuItem::BarUpdate()
 			usage.user_time = idle;
 			idle -= fTeamUsageInfo.user_time;
 		}
-		fKernel = double(usage.kernel_time-fTeamUsageInfo.kernel_time-idle)/double(now-fLastTime);
-		fUser = double(usage.user_time-fTeamUsageInfo.user_time)/double(now-fLastTime);
+
+		fKernel = double(usage.kernel_time - fTeamUsageInfo.kernel_time - idle)
+			/ double(now - fLastTime);
+
+		fUser = double(usage.user_time - fTeamUsageInfo.user_time) / double(now - fLastTime);
+
 		if (fKernel < 0)
 			fKernel = 0;
 		fLastTime = now;
@@ -237,11 +242,13 @@ TeamBarMenuItem::Reset(char* name, team_id team, BBitmap* icon, bool deleteIcon)
 	SetLabel(name);
 	fTeamID = team;
 	Init();
+
 	if (fDeleteIcon)
 		delete fIcon;
+
 	fDeleteIcon = deleteIcon;
 	fIcon = icon;
 	Message()->ReplaceInt32("team", team);
-	((ThreadBarMenu*) Submenu())->Reset(team);
+	((ThreadBarMenu*)Submenu())->Reset(team);
 	BarUpdate();
 }

@@ -34,13 +34,13 @@ AutoIcon::~AutoIcon()
 
 
 BBitmap*
-AutoIcon::bitmap()
+AutoIcon::Bitmap()
 {
 	if (fBitmap == NULL) {
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		fBitmap = new BBitmap (BRect (0, 0, 15, 15), B_RGBA32);
+		fBitmap = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
 #else
-		fBitmap = new BBitmap (BRect (0, 0, 15, 15), B_CMAP8);
+		fBitmap = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
 #endif
 		if (fSignature) {
 			entry_ref ref;
@@ -48,9 +48,9 @@ AutoIcon::bitmap()
 			if (BNodeInfo::GetTrackerIcon(&ref, fBitmap, B_MINI_ICON) != B_OK)
 				fBitmap->SetBits(k_app_mini, 256, 0, B_CMAP8);
 		}
+
 		if (fbits)
-			fBitmap->SetBits (fbits, 256, 0, B_CMAP8);
+			fBitmap->SetBits(fbits, 256, 0, B_CMAP8);
 	}
 	return fBitmap;
 }
-

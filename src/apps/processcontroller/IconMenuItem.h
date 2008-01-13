@@ -21,38 +21,40 @@
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
 
 */
-
 #ifndef _ICON_MENU_ITEM_H_
 #define _ICON_MENU_ITEM_H_
 
 #include <MenuItem.h>
 
+
 class BBitmap;
 
-//---------------------------------------------------------------
 
 class IconMenuItem : public BMenuItem {
+	public:
+		IconMenuItem(BBitmap*, const char* title,
+			BMessage*, bool drawText = true, bool purge = false);
 
-public:
-						IconMenuItem(BBitmap*, const char* title,
-									  BMessage*, bool drawText = true, bool purge = false);
-						IconMenuItem(BBitmap*, BMenu*,
-									  bool drawText = true, bool purge = false);
-						IconMenuItem(const char* mime, const char* title, BMessage*,
-									  bool drawText = true);
-virtual					~IconMenuItem();
-virtual	void			DrawContent();
-virtual	void			Highlight(bool isHighlighted);
-virtual	void			GetContentSize(float* width, float* height);
-static	int				MinHeight();
+		IconMenuItem(BBitmap*, BMenu*, bool drawText = true,
+			bool purge = false);
 
-private:
-		void			DefaultIcon(const char* mime);
-		void			DrawIcon();
+		IconMenuItem(const char* mime, const char* title, BMessage*,
+			bool drawText = true);
 
-		BBitmap*		fIcon;
-		bool			fDrawText;
-		bool			fPurge;
+		virtual ~IconMenuItem();
+		virtual	void DrawContent();
+		virtual	void Highlight(bool isHighlighted);
+		virtual	void GetContentSize(float* width, float* height);
+
+		static	int	MinHeight();
+
+	private:
+		void DefaultIcon(const char* mime);
+		void DrawIcon();
+
+		BBitmap*	fIcon;
+		bool		fDrawText;
+		bool		fPurge;
 };
 
 bool	before_dano();

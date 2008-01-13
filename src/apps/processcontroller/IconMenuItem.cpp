@@ -29,44 +29,47 @@
 #include <Roster.h>
 #include <parsedate.h>
 
-// --------------------------------------------------------------
 
 IconMenuItem::IconMenuItem(BBitmap* icon, const char* title,
-							 BMessage* msg, bool drawText, bool purge)
-			:BMenuItem(title, msg), fIcon(icon), fDrawText(drawText), fPurge(purge)
-
+	BMessage* msg, bool drawText, bool purge)
+	: BMenuItem(title, msg),
+	fIcon(icon),
+	fDrawText(drawText),
+	fPurge(purge)
 {
 	if (!fIcon)
 		DefaultIcon(NULL);
 }
 
-// --------------------------------------------------------------
 
 IconMenuItem::IconMenuItem(BBitmap* icon, BMenu* menu, bool drawText, bool purge)
-			  :BMenuItem(menu), fIcon(icon), fDrawText(drawText), fPurge(purge)
+	: BMenuItem(menu),
+	fIcon(icon),
+	fDrawText(drawText),
+	fPurge(purge)
 
 {
 	if (!fIcon)
 		DefaultIcon(NULL);
 }
 
-// --------------------------------------------------------------
 
 IconMenuItem::IconMenuItem(const char* mime, const char* title, BMessage* msg, bool drawText)
-			  :BMenuItem(title, msg), fIcon(NULL), fDrawText(drawText)
-
+	: BMenuItem(title, msg),
+	fIcon(NULL),
+	fDrawText(drawText)
 {
 	DefaultIcon(mime);
 }
 
-// --------------------------------------------------------------
+
 IconMenuItem::~IconMenuItem()
 {
 	if (fPurge && fIcon)
 		delete fIcon;
 }
 
-// --------------------------------------------------------------
+
 void IconMenuItem::DrawContent()
 {
 	BPoint	loc;
@@ -80,15 +83,17 @@ void IconMenuItem::DrawContent()
 	}
 }
 
-// --------------------------------------------------------------
-void IconMenuItem::Highlight(bool hilited)
+
+void
+IconMenuItem::Highlight(bool hilited)
 {
 	BMenuItem::Highlight(hilited);
 	DrawIcon();
 }
 
-// --------------------------------------------------------------
-void IconMenuItem::DrawIcon()
+
+void
+IconMenuItem::DrawIcon()
 {
 	// TODO: exact code duplication with TeamBarMenuItem::DrawIcon()
 	if (!fIcon)
@@ -112,8 +117,9 @@ void IconMenuItem::DrawIcon()
 	menu->SetDrawingMode(B_OP_COPY);
 }
 
-// --------------------------------------------------------------
-void IconMenuItem::GetContentSize(float* width, float* height)
+
+void
+IconMenuItem::GetContentSize(float* width, float* height)
 {
 	BMenuItem::GetContentSize(width, height);
 	int	limit = IconMenuItem::MinHeight();
@@ -125,25 +131,26 @@ void IconMenuItem::GetContentSize(float* width, float* height)
 		*width = 16;
 }
 
-// --------------------------------------------------------------
-void IconMenuItem::DefaultIcon(const char* mime)
+
+void
+IconMenuItem::DefaultIcon(const char* mime)
 {
-	BRect	r(0, 0, 15, 15);
-	fIcon = new BBitmap(r, B_COLOR_8_BIT);
+	BRect rect(0, 0, 15, 15);
+	fIcon = new BBitmap(rect, B_COLOR_8_BIT);
 	if (mime) {
-		BMimeType	mimeType(mime);
-		if (mimeType.GetIcon(fIcon, B_MINI_ICON)!=B_OK)
+		BMimeType mimeType(mime);
+		if (mimeType.GetIcon(fIcon, B_MINI_ICON) != B_OK)
 			fDrawText = true;
 	} else {
-		app_info 	info;
+		app_info info;
 		be_app->GetAppInfo(&info);
-		if (BNodeInfo::GetTrackerIcon(&info.ref, fIcon, B_MINI_ICON)!=B_OK)
+		if (BNodeInfo::GetTrackerIcon(&info.ref, fIcon, B_MINI_ICON) != B_OK)
 			fDrawText = true;
 	}
 	fPurge = true;
 }
 
-// --------------------------------------------------------------
+
 int IconMenuItem::MinHeight()
 {
 	static int	minheight = -1;
@@ -152,17 +159,18 @@ int IconMenuItem::MinHeight()
 	return minheight;
 }
 
-// --------------------------------------------------------------
-bool before_dano()
+
+bool
+before_dano()
 {
-	static	int old_version = -1;
-	if (old_version < 0)
-	{
+	static int old_version = -1;
+	if (old_version < 0) {
 		system_info sys_info;
 		get_system_info(&sys_info);
-		time_t	kernelTime = parsedate(sys_info.kernel_build_date, time(NULL));
-		struct tm  *	date = gmtime(&kernelTime);
+		time_t kernelTime = parsedate(sys_info.kernel_build_date, time(NULL));
+		struct tm* date = gmtime(&kernelTime);
 		old_version = (date->tm_year < 101 || date->tm_year == 101 && date->tm_mon < 10);
 	}
+
 	return old_version;
 }

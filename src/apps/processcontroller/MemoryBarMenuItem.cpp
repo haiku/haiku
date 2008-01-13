@@ -244,20 +244,20 @@ MemoryBarMenuItem::UpdateSituation(int commitedMemory)
 void
 MemoryBarMenuItem::BarUpdate()
 {
-	area_info ainfo;
+	area_info areaInfo;
 	int32 cookie = 0;
 	size_t lram_size = 0;
 	size_t lwram_size = 0;
 	bool exists = false;
 
-	while (get_next_area_info(fTeamID, &cookie, &ainfo) == B_OK) {
+	while (get_next_area_info(fTeamID, &cookie, &areaInfo) == B_OK) {
 		exists = true;
-		lram_size += ainfo.ram_size;
+		lram_size += areaInfo.ram_size;
 
 		// TODO: this won't work this way anymore under Haiku!
-//		int zone = (int (ainfo.address) & 0xf0000000) >> 24;
-		if ((ainfo.protection & B_WRITE_AREA) != 0)
-			lwram_size += ainfo.ram_size;
+//		int zone = (int (areaInfo.address) & 0xf0000000) >> 24;
+		if ((areaInfo.protection & B_WRITE_AREA) != 0)
+			lwram_size += areaInfo.ram_size;
 //			&& (zone & 0xf0) != 0xA0			// Exclude media buffers
 //			&& (fTeamID != gAppServerTeamID || zone != 0x90))	// Exclude app_server side of bitmaps
 	}
@@ -287,4 +287,3 @@ MemoryBarMenuItem::Reset(char* name, team_id team, BBitmap* icon,
 	fIcon = icon;
 	Init();
 }
-

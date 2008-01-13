@@ -28,7 +28,7 @@
 
 class QuitMenu : public BMenu {
 	public:
-						QuitMenu(const char* title, info_pack* infos, int infosCount);
+		QuitMenu(const char* title, info_pack* infos, int infosCount);
 		virtual	void	AttachedToWindow();
 		virtual void	DetachedFromWindow();
 		virtual void	MessageReceived(BMessage *msg);

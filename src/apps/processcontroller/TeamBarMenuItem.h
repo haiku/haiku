@@ -27,8 +27,9 @@ class BBitmap;
 
 class TeamBarMenuItem : public BMenuItem {
 	public:
-						TeamBarMenuItem(BMenu *menu, BMessage *kill_team,
-							team_id team, BBitmap* icon, bool deleteIcon);
+		TeamBarMenuItem(BMenu* menu, BMessage* kill_team, team_id team,
+			BBitmap* icon, bool deleteIcon);
+
 		virtual			~TeamBarMenuItem();
 
 		virtual	void	DrawContent();

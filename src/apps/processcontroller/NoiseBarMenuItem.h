@@ -27,21 +27,36 @@
 
 #include <MenuItem.h>
 
-//---------------------------------------------------------------
 
 class NoiseBarMenuItem : public BMenuItem {
+	public:
+		NoiseBarMenuItem();
 
-public:
-						NoiseBarMenuItem();
-virtual	void			DrawContent();
-virtual	void			GetContentSize(float* width, float* height);
-		void			DrawBar(bool force);
-		double			fBusyWaiting;
-		double			fLost;
+		virtual	void DrawContent();
+		virtual	void GetContentSize(float* width, float* height);
 
-private:
-		float			fGrenze1;
-		float			fGrenze2;
+		void DrawBar(bool force);
+		
+		double BusyWaiting() const
+		{
+			return fBusyWaiting;
+		}
+
+		void SetBusyWaiting(double busyWaiting)
+		{
+			fBusyWaiting = busyWaiting;
+		}	
+
+		void SetLost(double lost)
+		{
+			fLost = lost;
+		}
+
+	private:
+		double	fBusyWaiting;
+		double	fLost;
+		float	fGrenze1;
+		float	fGrenze2;
 };
 
 #endif // _NOISE_BAR_MENU_ITEM_H_

@@ -417,7 +417,7 @@ ProcessController::AttachedToWindow()
 	else
 		SetViewColor(kBlack);
 
-	GebsPreferences tPreferences(kPreferencesFileName, NULL, false);
+	Preferences tPreferences(kPreferencesFileName, NULL, false);
 	DefaultColors();
 
 	system_info info;

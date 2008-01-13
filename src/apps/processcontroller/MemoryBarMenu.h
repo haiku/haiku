@@ -16,8 +16,8 @@
 	License along with this library; if not, write to the Free Software 
 	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
 */
-#ifndef _MEMORY_BAR_MENU_H_
-#define _MEMORY_BAR_MENU_H_
+#ifndef MEMORY_BAR_MENU_H
+#define MEMORY_BAR_MENU_H
 
 
 #include "Utilities.h"
@@ -27,16 +27,17 @@
 
 class MemoryBarMenuItem;
 
+
 typedef struct {
 	MemoryBarMenuItem*	item;
 	int					index;
 } MRecycleItem;
 
+
 class MemoryBarMenu : public BMenu {
 	public:
-						MemoryBarMenu(const char* name, info_pack* infos,
-							system_info& systemInfo);
-		virtual			~MemoryBarMenu();
+		MemoryBarMenu(const char* name, info_pack* infos, system_info& systemInfo);
+		virtual	~MemoryBarMenu();
 
 		virtual	void	Draw(BRect updateRect);
 		virtual	void	Pulse();
@@ -52,4 +53,4 @@ class MemoryBarMenu : public BMenu {
 
 extern float gMemoryTextWidth;
 
-#endif // _MEMORY_BAR_MENU_H_
+#endif // MEMORY_BAR_MENU_H

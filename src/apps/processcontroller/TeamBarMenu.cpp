@@ -103,7 +103,7 @@ TeamBarMenu::Pulse()
 				k -= lastRecycle;
 				lastRecycle = 0;
 			}
-			total += item->fUser+item->fKernel;
+			total += item->fUser + item->fKernel;
 		}
 	}
 
@@ -126,7 +126,7 @@ TeamBarMenu::Pulse()
 					j++;
 			if (j == fTeamCount) {
 				fTeamCount +=  10;
-				fTeamList = (team_id*)realloc(fTeamList, sizeof(team_id)*fTeamCount);
+				fTeamList = (team_id*)realloc(fTeamList, sizeof(team_id) * fTeamCount);
 			}
 			fTeamList[j] = infos.team_info.team;
 			if (!get_team_name_and_icon(infos, true)) {
@@ -165,16 +165,19 @@ TeamBarMenu::Pulse()
 	
 	// Delete the items that haven't been recycled.
 	if (firstRecycle < lastRecycle)
-		RemoveItems(IndexOf(fRecycleList[firstRecycle].item), lastRecycle-firstRecycle, true);
+		RemoveItems(IndexOf(fRecycleList[firstRecycle].item), lastRecycle - firstRecycle, true);
 
 	total /= gCPUcount;
-	total = 1-total;
+	total = 1 - total;
 
 	fLastTotalTime = system_time();
 	NoiseBarMenuItem* noiseItem;
 	if ((noiseItem = (NoiseBarMenuItem*)ItemAt(0)) != NULL) {
-		noiseItem->fBusyWaiting = 0;
-		noiseItem->fLost = (total >= 0 ? total : 0);
+		noiseItem->SetBusyWaiting(0);
+		if (total >= 0)
+			noiseItem->SetLost(total);
+		else
+			noiseItem->SetLost(0);
 		noiseItem->DrawBar(false);
 	}
 	
