@@ -3577,7 +3577,7 @@ vfs_new_io_context(void *_parentContext)
 		return NULL;
 	}
 
-	// Copy all parent files which don't have the O_CLOEXEC flag set
+	// Copy all parent file descriptors
 
 	if (parentContext) {
 		size_t i;
