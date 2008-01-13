@@ -20,7 +20,7 @@
  */
 
 
-
+#include "atari_memory_map.h"
 #include "toscalls.h"
 
 // 1 enabled verbose output
@@ -36,6 +36,16 @@
 .text
 
 /* main entry point, both from the floppy boot and .prg */
+	bra			real_entry
+
+sNumSectors:
+	// this location will contain the length of the boot loader as
+	// written by the "makeflop" command in 512 byte blocks
+	// 0x180 is the allowed maximum, as the zipped TAR with the
+	// kernel and the boot module might start at offset 192 kB
+	.word	0x0180
+
+real_entry:
 
 	// first, determine if .prg (user) or bootsect (super)
 	// Super()
@@ -49,6 +59,35 @@
 	//bra			bootsect_start
 	rts
 floppy_start:
+	// no interrupt
+	and.w		#0x0700,%sr
+	// setup stack
+	move.l		#ATARI_ZBEOS_STACK_BASE,%sp
+	//XXX: check for enough RAM
+	// load the rest
+	move.w		#sNumSectors,%d2
+	// load at base + this code.
+	move.l		#ATARI_ZBEOS_BASE+512,%a2
+	bsr			load_sectors
+	
+	jmp			#ATARI_ZBEOS_BASE+512
+
+/**	Loads %d2 sectors from floppy disk, starting at head XXX %dh, sector %cx.
+ *	The data is loaded to %a2.
+ */
+
+load_sectors:
+	
+	// Rwabs
+	move.w		#0,-(%sp)	// A:
+	move.w		#1,-(%sp)	// 2nd sector
+	move.w		%d2,-(%sp)
+	move.l		%a2,-(%sp)
+	move.w		RW_,-(%sp)
+	move.w		#4,-(%sp)
+	trap		#13
+	add.l		#14,%sp
+	rts
 
 floppy_end:
 //	.org	FAILURE_STRING
@@ -71,7 +110,10 @@ prg_start:
 	addq.l		#6,%sp
 	move.l		%d0,saved_super_stack
 	// all done
-
+	lea			unimpl,%a0
+	jsr			puts
+prg_spin:
+	bra			prg_spin
 
 super_done:
 	
@@ -93,6 +135,7 @@ GLOBAL(gBootPartitionOffset):
 
 	
 	lea.l	str,%a0
+puts:
 .loopt:
 	move.b	(%a0)+,%d0
 	beq	.strout
@@ -122,5 +165,6 @@ putc:
 	movem.l	(%sp)+,%a0
 	rts
 str:
-	.ascii "Haiku!"
-	.byte 0
+	.string "Haiku!"
+unimpl:
+	.string "Unimplemented."
