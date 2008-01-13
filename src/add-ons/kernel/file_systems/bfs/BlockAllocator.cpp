@@ -69,7 +69,7 @@ class Free : public AbstractTraceEntry {
 
 		virtual void AddDump(char *buffer, size_t size)
 		{
-			snprintf(buffer, size, "free %lu.%u.%u\n", fRun.AllocationGroup(),
+			snprintf(buffer, size, "free %lu.%u.%u", fRun.AllocationGroup(),
 				fRun.Start(), fRun.Length());
 		}
 

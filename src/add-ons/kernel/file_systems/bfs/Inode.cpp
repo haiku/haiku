@@ -39,7 +39,7 @@ class Create : public AbstractTraceEntry {
 		virtual void AddDump(char *buffer, size_t size)
 		{
 			snprintf(buffer, size, "CREATE %Ld (%p), parent %Ld (%p), \"%s\", "
-				"mode %lx, omode %x, type %lx\n", fID, fInode, fParentID,
+				"mode %lx, omode %x, type %lx", fID, fInode, fParentID,
 				fParent, fName, fMode, fOpenMode, fType);
 		}
 
@@ -92,7 +92,7 @@ class Resize : public AbstractTraceEntry {
 
 		virtual void AddDump(char *buffer, size_t size)
 		{
-			snprintf(buffer, size, "RESIZE %Ld (%p), %Ld -> %Ld\n", fID, fInode,
+			snprintf(buffer, size, "RESIZE %Ld (%p), %Ld -> %Ld", fID, fInode,
 				fOldSize, fNewSize);
 		}
 
@@ -115,11 +115,14 @@ class InodeAllocator {
 		InodeAllocator(Transaction &transaction);
 		~InodeAllocator();
 
-		status_t New(block_run *parentRun, mode_t mode, block_run &run, Inode **_inode);
+		status_t New(block_run *parentRun, mode_t mode, block_run &run,
+			Inode **_inode);
 		status_t CreateTree();
 		status_t Keep();
 
 	private:
+		static void _TransactionListener(int32 id, int32 event, void *_inode);
+
 		Transaction *fTransaction;
 		block_run fRun;
 		Inode *fInode;
@@ -224,10 +227,25 @@ InodeAllocator::Keep()
 	if (!fInode->IsSymLink() && volume->ID() >= 0)
 		status = publish_vnode(volume->ID(), fInode->ID(), fInode);
 
+	if (status == B_OK) {
+		cache_add_transaction_listener(volume->BlockCache(), fTransaction->ID(),
+			&_TransactionListener, fInode);
+	}
+
 	fTransaction = NULL;
 	fInode = NULL;
 
 	return status;
+}
+
+
+/*static*/ void
+InodeAllocator::_TransactionListener(int32 id, int32 event, void *_inode)
+{
+	Inode *inode = (Inode *)_inode;
+
+	if (event == TRANSACTION_ABORTED)
+		panic("transaction %d aborted, inode %p still around!\n", (int)id, inode);
 }
 
 

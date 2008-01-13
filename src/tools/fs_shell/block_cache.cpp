@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -45,6 +45,12 @@ namespace FSShell {
 
 static const int32_t kMaxBlockCount = 1024;
 
+struct cache_hook : DoublyLinkedListLinkImpl<cache_hook> {
+	fssh_transaction_notification_hook	hook;
+	void								*data;
+};
+
+typedef DoublyLinkedList<cache_hook> HookList; 
 
 struct cache_transaction {
 	cache_transaction();
@@ -57,6 +63,7 @@ struct cache_transaction {
 	block_list		blocks;
 	fssh_transaction_notification_hook notification_hook;
 	void			*notification_data;
+	HookList		listeners;
 	bool			open;
 	bool			has_sub_transaction;
 };
@@ -99,6 +106,24 @@ transaction_hash(void *_transaction, const void *_id, uint32_t range)
 		return transaction->id % range;
 
 	return (uint32_t)*id % range;
+}
+
+
+/*!	Notifies all listeners of this transaction, and removes them
+	afterwards.
+*/
+static void
+notify_transaction_listeners(cache_transaction *transaction, int32_t event)
+{
+	HookList::Iterator iterator = transaction->listeners.GetIterator();
+	while (iterator.HasNext()) {
+		cache_hook *hook = iterator.Next();
+
+		hook->hook(transaction->id, event, hook->data);
+
+		iterator.Remove();
+		delete hook;
+	}
 }
 
 
@@ -570,7 +595,7 @@ write_cached_block(block_cache *cache, cached_block *block,
 
 			if (previous->notification_hook != NULL) {
 				previous->notification_hook(previous->id,
-					previous->notification_data);
+					FSSH_TRANSACTION_WRITTEN, previous->notification_data);
 			}
 
 			if (deleteTransaction) {
@@ -678,6 +703,8 @@ fssh_cache_end_transaction(void *_cache, int32_t id,
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
 
+	notify_transaction_listeners(transaction, FSSH_TRANSACTION_ENDED);
+
 	// iterate through all blocks and free the unchanged original contents
 
 	cached_block *block = transaction->first_block, *next;
@@ -726,6 +753,8 @@ fssh_cache_abort_transaction(void *_cache, int32_t id)
 		fssh_panic("cache_abort_transaction(): invalid transaction ID\n");
 		return FSSH_B_BAD_VALUE;
 	}
+
+	notify_transaction_listeners(transaction, FSSH_TRANSACTION_ABORTED);
 
 	// iterate through all blocks and restore their original contents
 
@@ -787,6 +816,8 @@ fssh_cache_detach_sub_transaction(void *_cache, int32_t id,
 
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
+
+	notify_transaction_listeners(transaction, FSSH_TRANSACTION_ENDED);
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -852,6 +883,8 @@ fssh_cache_abort_sub_transaction(void *_cache, int32_t id)
 	if (!transaction->has_sub_transaction)
 		return FSSH_B_BAD_VALUE;
 
+	notify_transaction_listeners(transaction, FSSH_TRANSACTION_ABORTED);
+
 	// revert all changes back to the version of the parent
 
 	cached_block *block = transaction->first_block, *next;
@@ -896,6 +929,8 @@ fssh_cache_start_sub_transaction(void *_cache, int32_t id)
 		return FSSH_B_BAD_VALUE;
 	}
 
+	notify_transaction_listeners(transaction, FSSH_TRANSACTION_ENDED);
+
 	// move all changed blocks up to the parent
 
 	cached_block *block = transaction->first_block, *next;
@@ -920,6 +955,62 @@ fssh_cache_start_sub_transaction(void *_cache, int32_t id)
 	transaction->sub_num_blocks = 0;
 
 	return FSSH_B_OK;
+}
+
+
+/*!	Adds a transaction listener that gets notified when the transaction
+	is ended or aborted.
+	The listener gets automatically removed in this case.
+*/
+fssh_status_t
+fssh_cache_add_transaction_listener(void *_cache, int32_t id,
+	fssh_transaction_notification_hook hookFunction, void *data)
+{
+	block_cache *cache = (block_cache *)_cache;
+
+	cache_hook *hook = new(std::nothrow) cache_hook;
+	if (hook == NULL)
+		return FSSH_B_NO_MEMORY;
+
+	BenaphoreLocker locker(&cache->lock);
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL) {
+		delete hook;
+		return FSSH_B_BAD_VALUE;
+	}
+
+	hook->hook = hookFunction;
+	hook->data = data;
+
+	transaction->listeners.Add(hook);
+	return FSSH_B_OK;
+}
+
+
+fssh_status_t
+fssh_cache_remove_transaction_listener(void *_cache, int32_t id,
+	fssh_transaction_notification_hook hookFunction, void *data)
+{
+	block_cache *cache = (block_cache *)_cache;
+
+	BenaphoreLocker locker(&cache->lock);
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL)
+		return FSSH_B_BAD_VALUE;
+
+	HookList::Iterator iterator = transaction->listeners.GetIterator();
+	while (iterator.HasNext()) {
+		cache_hook *hook = iterator.Next();
+		if (hook->data == data && hook->hook == hookFunction) {
+			iterator.Remove();
+			delete hook;
+			return FSSH_B_OK;
+		}
+	}
+
+	return FSSH_B_ENTRY_NOT_FOUND;
 }
 
 

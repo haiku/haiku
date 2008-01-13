@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,6 +12,7 @@
 #include <block_cache.h>
 #include <lock.h>
 #include <vm_low_memory.h>
+#include <tracing.h>
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
@@ -41,10 +42,63 @@
 
 #define DEBUG_BLOCK_CACHE
 //#define DEBUG_CHANGED
+//#define TRANSACTION_TRACING
 
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
 #define FATAL(x) panic x
+
+#ifdef TRANSACTION_TRACING
+namespace TransactionTracing {
+
+class Start : public AbstractTraceEntry {
+	public:
+		Start(cache_transaction *transaction)
+			:
+			fTransaction(transaction)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+		}
+
+	private:
+		cache_transaction	*fTransaction;
+};
+
+class Cancel : public AbstractTraceEntry {
+	public:
+		Cancel(cache_transaction *transaction)
+			:
+			fTransaction(transaction)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+		}
+
+	private:
+		cache_transaction	*fTransaction;
+};
+
+}	// namespace TransactionTracing
+
+#	define T(x) new(std::nothrow) TransactionTracing::x;
+#else
+#	define T(x) ;
+#endif
+
+
+struct cache_hook : DoublyLinkedListLinkImpl<cache_hook> {
+	transaction_notification_hook	hook;
+	void							*data;
+};
+
+typedef DoublyLinkedList<cache_hook> HookList; 
 
 struct cache_transaction {
 	cache_transaction();
@@ -57,6 +111,7 @@ struct cache_transaction {
 	block_list		blocks;
 	transaction_notification_hook notification_hook;
 	void			*notification_data;
+	HookList		listeners;
 	bool			open;
 	bool			has_sub_transaction;
 };
@@ -105,6 +160,24 @@ transaction_hash(void *_transaction, const void *_id, uint32 range)
 		return transaction->id % range;
 
 	return (uint32)*id % range;
+}
+
+
+/*!	Notifies all listeners of this transaction, and removes them
+	afterwards.
+*/
+static void
+notify_transaction_listeners(cache_transaction *transaction, int32 event)
+{
+	HookList::Iterator iterator = transaction->listeners.GetIterator();
+	while (iterator.HasNext()) {
+		cache_hook *hook = iterator.Next();
+
+		hook->hook(transaction->id, event, hook->data);
+
+		iterator.Remove();
+		delete hook;
+	}
 }
 
 
@@ -712,7 +785,7 @@ write_cached_block(block_cache *cache, cached_block *block,
 			TRACE(("cache transaction %ld finished!\n", previous->id));
 
 			if (previous->notification_hook != NULL) {
-				previous->notification_hook(previous->id,
+				previous->notification_hook(previous->id, TRANSACTION_WRITTEN,
 					previous->notification_data);
 			}
 
@@ -900,6 +973,8 @@ cache_end_transaction(void *_cache, int32 id,
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
 
+	notify_transaction_listeners(transaction, TRANSACTION_ENDED);
+
 	// iterate through all blocks and free the unchanged original contents
 
 	cached_block *block = transaction->first_block, *next;
@@ -948,6 +1023,8 @@ cache_abort_transaction(void *_cache, int32 id)
 		panic("cache_abort_transaction(): invalid transaction ID\n");
 		return B_BAD_VALUE;
 	}
+
+	notify_transaction_listeners(transaction, TRANSACTION_ABORTED);
 
 	// iterate through all blocks and restore their original contents
 
@@ -1009,6 +1086,8 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
+
+	notify_transaction_listeners(transaction, TRANSACTION_ENDED);
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -1074,6 +1153,8 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 	if (!transaction->has_sub_transaction)
 		return B_BAD_VALUE;
 
+	notify_transaction_listeners(transaction, TRANSACTION_ABORTED);
+
 	// revert all changes back to the version of the parent
 
 	cached_block *block = transaction->first_block, *next;
@@ -1118,6 +1199,8 @@ cache_start_sub_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 	}
 
+	notify_transaction_listeners(transaction, TRANSACTION_ENDED);
+
 	// move all changed blocks up to the parent
 
 	cached_block *block = transaction->first_block, *next;
@@ -1142,6 +1225,62 @@ cache_start_sub_transaction(void *_cache, int32 id)
 	transaction->sub_num_blocks = 0;
 
 	return B_OK;
+}
+
+
+/*!	Adds a transaction listener that gets notified when the transaction
+	is ended or aborted.
+	The listener gets automatically removed in this case.
+*/
+status_t
+cache_add_transaction_listener(void *_cache, int32 id,
+	transaction_notification_hook hookFunction, void *data)
+{
+	block_cache *cache = (block_cache *)_cache;
+
+	cache_hook *hook = new(std::nothrow) cache_hook;
+	if (hook == NULL)
+		return B_NO_MEMORY;
+
+	BenaphoreLocker locker(&cache->lock);
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL) {
+		delete hook;
+		return B_BAD_VALUE;
+	}
+
+	hook->hook = hookFunction;
+	hook->data = data;
+
+	transaction->listeners.Add(hook);
+	return B_OK;
+}
+
+
+status_t
+cache_remove_transaction_listener(void *_cache, int32 id,
+	transaction_notification_hook hookFunction, void *data)
+{
+	block_cache *cache = (block_cache *)_cache;
+
+	BenaphoreLocker locker(&cache->lock);
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL)
+		return B_BAD_VALUE;
+
+	HookList::Iterator iterator = transaction->listeners.GetIterator();
+	while (iterator.HasNext()) {
+		cache_hook *hook = iterator.Next();
+		if (hook->data == data && hook->hook == hookFunction) {
+			iterator.Remove();
+			delete hook;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 

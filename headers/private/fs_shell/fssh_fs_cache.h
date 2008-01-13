@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_FS_CACHE_H
@@ -11,7 +11,14 @@
 #include "fssh_fs_interface.h"
 
 
-typedef void (*fssh_transaction_notification_hook)(int32_t id, void *data);
+enum {
+	FSSH_TRANSACTION_WRITTEN,
+	FSSH_TRANSACTION_ABORTED,
+	FSSH_TRANSACTION_ENDED
+};
+
+typedef void (*fssh_transaction_notification_hook)(int32_t id, int32_t event,
+	void *data);
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +38,12 @@ extern fssh_status_t	fssh_cache_abort_sub_transaction(void *_cache,
 							int32_t id);
 extern fssh_status_t	fssh_cache_start_sub_transaction(void *_cache,
 							int32_t id);
+extern fssh_status_t	fssh_cache_add_transaction_listener(void *_cache,
+							int32_t id, fssh_transaction_notification_hook hook,
+							void *data);
+extern fssh_status_t	fssh_cache_remove_transaction_listener(void *_cache,
+							int32_t id, fssh_transaction_notification_hook hook,
+							void *data);
 extern fssh_status_t	fssh_cache_next_block_in_transaction(void *_cache,
 							int32_t id, uint32_t *_cookie,
 							fssh_off_t *_blockNumber, void **_data,

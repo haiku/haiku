@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_CACHE_H
@@ -11,7 +11,14 @@
 #include <fs_interface.h>
 
 
-typedef void (*transaction_notification_hook)(int32 id, void *data);
+enum {
+	TRANSACTION_WRITTEN,
+	TRANSACTION_ABORTED,
+	TRANSACTION_ENDED
+};
+
+typedef void (*transaction_notification_hook)(int32 id, int32 event,
+	void *data);
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,6 +34,10 @@ extern int32 cache_detach_sub_transaction(void *_cache, int32 id,
 					transaction_notification_hook hook, void *data);
 extern status_t cache_abort_sub_transaction(void *_cache, int32 id);
 extern status_t cache_start_sub_transaction(void *_cache, int32 id);
+extern status_t cache_add_transaction_listener(void *_cache, int32 id,
+					transaction_notification_hook hook, void *data);
+extern status_t cache_remove_transaction_listener(void *_cache, int32 id,
+					transaction_notification_hook hook, void *data);
 extern status_t cache_next_block_in_transaction(void *_cache, int32 id,
 					uint32 *_cookie, off_t *_blockNumber, void **_data,
 					void **_unchangedData);

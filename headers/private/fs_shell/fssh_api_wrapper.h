@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_API_WRAPPER_H
@@ -787,6 +787,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // #pragma mark - fssh_fs_cache.h
 
+#define TRANSACTION_WRITTEN				FSSH_TRANSACTION_WRITTEN
+#define TRANSACTION_ABORTED				FSSH_TRANSACTION_ABORTED
+#define TRANSACTION_ENDED				FSSH_TRANSACTION_ENDED
+
 #define transaction_notification_hook	fssh_transaction_notification_hook
 
 /* transactions */
@@ -797,6 +801,8 @@
 #define cache_detach_sub_transaction	fssh_cache_detach_sub_transaction
 #define cache_abort_sub_transaction		fssh_cache_abort_sub_transaction
 #define cache_start_sub_transaction		fssh_cache_start_sub_transaction
+#define cache_add_transaction_listener	fssh_cache_add_transaction_listener
+#define cache_remove_transaction_listener fssh_cache_remove_transaction_listener
 #define cache_next_block_in_transaction	fssh_cache_next_block_in_transaction
 #define cache_blocks_in_transaction		fssh_cache_blocks_in_transaction
 #define cache_blocks_in_sub_transaction	fssh_cache_blocks_in_sub_transaction

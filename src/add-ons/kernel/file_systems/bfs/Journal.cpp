@@ -451,9 +451,12 @@ Journal::ReplayLog()
 	able to update the log start pointer.
 */
 void
-Journal::_blockNotify(int32 transactionID, void *arg)
+Journal::_BlockNotify(int32 transactionID, int32 event, void *arg)
 {
 	LogEntry *logEntry = (LogEntry *)arg;
+
+	if (event != TRANSACTION_WRITTEN)
+		return;
 
 	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry, transactionID));
 
@@ -495,7 +498,7 @@ Journal::_blockNotify(int32 transactionID, void *arg)
 
 		status_t status = journal->fVolume->WriteSuperBlock();
 		if (status != B_OK) {
-			FATAL(("blockNotify: could not write back super block: %s\n",
+			FATAL(("_BlockNotify: could not write back super block: %s\n",
 				strerror(status)));
 		}
 	}
@@ -656,7 +659,7 @@ Journal::_WriteTransactionToLog()
 	fUsed += logEntry->Length();
 	fEntriesLock.Unlock();
 
-	cache_end_transaction(fVolume->BlockCache(), fTransactionID, _blockNotify,
+	cache_end_transaction(fVolume->BlockCache(), fTransactionID, _BlockNotify,
 		logEntry);
 
 	// If the log goes to the next round (the log is written as a

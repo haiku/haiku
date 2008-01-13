@@ -59,7 +59,7 @@ class Journal {
 		status_t _CheckRunArray(const run_array *array);
 		status_t _ReplayRunArray(int32 *start);
 		status_t _TransactionDone(bool success);
-		static void _blockNotify(int32 transactionID, void *arg);
+		static void _BlockNotify(int32 transactionID, int32 event, void *arg);
 
 		Volume			*fVolume;
 		RecursiveLock	fLock;
