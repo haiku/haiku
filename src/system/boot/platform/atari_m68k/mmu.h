@@ -22,6 +22,12 @@ extern addr_t mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint3
 extern void *mmu_allocate(void *virtualAddress, size_t size);
 extern void mmu_free(void *virtualAddress, size_t size);
 
+struct boot_mmu_ops {
+		// len=0 to disable
+	status_t (*set_tt)(int which, addr_t pa, size_t len, uint32 perms);
+	
+};
+
 #ifdef __cplusplus
 }
 #endif

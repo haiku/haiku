@@ -129,6 +129,12 @@ extern int32 xbios(uint16 nr, ...);
 
 extern int32 gemdos(uint16 nr, ...);
 
+#define SUP_USER		0
+#define SUP_SUPER		1
+
+#define SUP_SET			(void *)0
+#define SUP_INQUIRE		(void *)1
+
 // official names
 #define Pterm0() gemdos(0)
 #define Cconin() gemdos(1)
@@ -165,6 +171,33 @@ static inline const tos_cookie *tos_find_cookie(uint32 what)
 		c++;
 	}
 	return NULL;
+}
+
+/*
+ * OSHEADER access
+ */
+
+typedef struct tos_osheader {
+	uint16 os_entry;
+	uint16 os_version;
+	void *reseth;
+	struct tos_osheader *os_beg;
+	void *os_end;
+	void *os_rsv1;
+	void *os_magic;
+	uint32 os_date;
+	uint32 os_conf;
+	//uint32/16? os_dosdate;
+	// ... more stuff we don't care about
+} tos_osheader;
+
+#define tos_sysbase ((const struct tos_osheader **)0x4F2)
+
+static inline const struct tos_osheader *tos_get_osheader()
+{
+	if (!(*tos_sysbase))
+		return NULL;
+	return (*tos_sysbase)->os_beg;
 }
 
 #endif /* __ASSEMBLER__ */

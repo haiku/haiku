@@ -73,6 +73,12 @@
 #define	S_IFDIR						00000040000o
 
 
+// NOTE: normal programs (.prg) run as user mode, 
+// while boot sector is chained in supervisor mode.
+// this means using Super(SUP_INQUIRE) we can know 
+// from the same entry point if we were run from boot code or prg.
+
+
 	//Pterm0
 	//move.w	#1,%d0
 	//trap	#1

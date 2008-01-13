@@ -48,36 +48,6 @@
 #	define TRACE(x) ;
 #endif
 
-struct gdt_idt_descr {
-	uint16 limit;
-	uint32 *base;
-} _PACKED;
-
-// memory structure returned by int 0x15, ax 0xe820
-struct extended_memory {
-	uint64 base_addr;
-	uint64 length;
-	uint32 type;
-};
-
-#ifdef _PXE_ENV
-
-static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
-static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
-
-// working page directory and page table
-static uint32 *sPageDirectory = 0;
-
-static addr_t sNextPhysicalAddress = 0x112000;
-static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
-static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
-
-static addr_t sNextPageTableAddress = 0x7d000;
-static const uint32 kPageTableRegionEnd = 0x8b000;
-	// we need to reserve 2 pages for the SMP trampoline code
-
-#else
-
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
 static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
 
@@ -91,9 +61,6 @@ static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
 static addr_t sNextPageTableAddress = 0x90000;
 static const uint32 kPageTableRegionEnd = 0x9e000;
 	// we need to reserve 2 pages for the SMP trampoline code
-
-#endif
-
 
 static addr_t
 get_next_virtual_address(size_t size)

@@ -29,12 +29,15 @@
 #	define TRACE(x) ;
 #endif
 
+#warning M68K: add set_vbr()
+
 static status_t
 check_cpu_features()
 {
 #warning M68K: TODO: probe ourselves, we shouldn't trust the TOS!
 
-	const tos_cookie *c = tos_find_cookie('_CPU');
+	const tos_cookie *c;
+	c = tos_find_cookie('_CPU');
 	if (!c) {
 		panic("can't get a cookie (_CPU)! Mum, I'm hungry!");
 		return EINVAL;
@@ -46,6 +49,18 @@ check_cpu_features()
 	
 	gKernelArgs.arch_args.has_lpstop = (c->ivalue >= 60)?true:false;
 #warning M68K: add cpu type to kern args
+
+	c = tos_find_cookie('_FPU');
+	if (!c) {
+		panic("can't get a cookie (_FPU)! Mum, I'm hungry!");
+		return EINVAL;
+	}
+
+#warning M68K: check for fpu in detail
+	if (c->ivalue < 2 || c->ivalue > 7) {
+		panic("bad fpu");
+		return EINVAL;
+	}
 
 	return B_OK;
 }
