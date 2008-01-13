@@ -7,6 +7,14 @@
 
 #if ENABLE_TRACING
 
+//#define TRACE_TRACING
+#ifdef TRACE_TRACING
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 enum {
 	WRAP_ENTRY			= 0x01,
 	ENTRY_INITIALIZED	= 0x02,
@@ -45,24 +53,34 @@ make_space(size_t needed)
 		sBufferEnd = sBuffer;
 	}
 
-	int32 diff = sBufferStart - sBufferEnd;
-	if (diff < 0)
+	int32 space = (sBufferStart - sBufferEnd) * 4;
+	TRACE(("make_space(%lu), left %ld\n", needed, space));
+	if (space < 0)
 		sBufferEnd = sBuffer;
+	else if ((size_t)space < needed)
+		needed -= space;
 	else
-		needed -= diff;
+		return;
 
 	while (true) {
+		TraceEntry* removed = (TraceEntry*)sBufferStart;
 		uint16 freed = sBufferStart->size;
+		TRACE(("  skip start %p, %u bytes\n", sBufferStart, freed));
+
 		sBufferStart = next_entry(sBufferStart);
 		if (sBufferStart == NULL)
 			sBufferStart = sBufferEnd;
+
 		sEntries--;
+		removed->~TraceEntry();
 
 		if (needed <= freed)
 			break;
 
 		needed -= freed;
 	}
+
+	TRACE(("  out: start %p, entries %ld\n", sBufferStart, sEntries));
 }
 
 
@@ -76,9 +94,13 @@ allocate_entry(size_t size)
 
 	size = (size + 3) & ~3;
 
+	TRACE(("allocate_entry(%lu), start %p, end %p, buffer %p\n", size,
+		sBufferStart, sBufferEnd, sBuffer));
+
 	if (sBufferStart < sBufferEnd || sEntries == 0) {
 		// the buffer ahead of us is still empty
 		uint32 space = (sBuffer + kBufferSize - sBufferEnd) * 4;
+		TRACE(("  free after end %p: %lu\n", sBufferEnd, space));
 		if (space < size)
 			make_space(size);
 	} else {
@@ -91,6 +113,8 @@ allocate_entry(size_t size)
 	entry->flags = 0;
 	sBufferEnd += size >> 2;
 	sEntries++;
+	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry, sBufferEnd,
+		sBufferStart, sEntries));
 	return entry;
 }
 
@@ -167,12 +191,14 @@ dump_tracing(int argc, char** argv)
 		kprintf("usage: %s [start] [count] [#pattern]\n", argv[0]);
 		return 0;
 	}
-	// TODO: add pattern matching mechanism for the class name
 
 	if (start < 0)
 		start = 0;
+	if (start + count > sEntries)
+		count = sEntries - start;
 
 	int32 index = 0;
+	int32 dumped = 0;
 
 	for (trace_entry* current = sBufferStart; current != NULL;
 			current = next_entry(current), index++) {
@@ -180,7 +206,7 @@ dump_tracing(int argc, char** argv)
 			continue;
 		if (index > start + count)
 			break;
-		if ((entry->flags & BUFFER_ENTRY) != 0) {
+		if ((current->flags & BUFFER_ENTRY) != 0) {
 			// skip buffer entries
 			index--;
 			continue;
@@ -194,6 +220,8 @@ dump_tracing(int argc, char** argv)
 			if (pattern != NULL && strstr(buffer, pattern) == NULL)
 				continue;
 
+			dumped++;
+
 			if (pattern != NULL)
 				kprintf("%5ld. %s\n", index, buffer);
 			else
@@ -202,7 +230,8 @@ dump_tracing(int argc, char** argv)
 			kprintf("%5ld. ** uninitialized entry **\n", index);
 	}
 
-	kprintf("%ld of %ld entries.\n", count, sEntries);
+	kprintf("%ld entries of entries %ld to %ld (total %ld).\n", dumped,
+		start + 1, start + count, sEntries);
 	return 0;
 }
 
@@ -232,10 +261,8 @@ tracing_init(void)
 	area_id area = create_area("tracing log", (void**)&sBuffer,
 		B_ANY_KERNEL_ADDRESS, MAX_TRACE_SIZE, B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < B_OK) {
-		panic("OH");
+	if (area < B_OK)
 		return area;
-	}
 
 	sBufferStart = sBuffer;
 	sBufferEnd = sBuffer;
