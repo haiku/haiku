@@ -250,7 +250,7 @@ ata_finish_command(ide_device_info *device, ata_request *request, ata_flags flag
 	uint8 error;
 
 	if (flags & ATA_WAIT_FINISH) {
-		// wait for the command to finish current command (device no longer busy)
+		// wait for the device to finish current command (device no longer busy)
 		result = ata_wait(bus, 0, ide_status_bsy, 0, request->timeout);
 		if (result != B_OK) {
 			TRACE("ata_finish_command: timeout\n");
@@ -508,7 +508,7 @@ ata_dpc_PIO(ata_request *request)
 {
 	ide_device_info *device = request->device;
 	uint32 timeout = request->ccb->timeout > 0 ? 
-		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
+		request->ccb->timeout * 1000000 : IDE_STD_TIMEOUT;
 
 	SHOW_FLOW0(3, "");
 
@@ -779,7 +779,7 @@ ata_exec_read_write(ide_device_info *device, ata_request *request,
 		goto error;
 
 	// if no timeout is specified, use standard
-	timeout = request->ccb->timeout > 0 ? request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
+	timeout = request->ccb->timeout > 0 ? request->ccb->timeout * 1000000 : IDE_STD_TIMEOUT;
 
 	if (!device->is_atapi)
 		flags |= ATA_DRDY_REQUIRED;
@@ -815,7 +815,7 @@ ata_exec_pio_transfer(ata_request *request)
 	ide_device_info *device = request->device;
 	ide_bus_info *bus = device->bus;
 	bigtime_t timeout = request->ccb->timeout > 0 ? 
-		request->ccb->timeout * 1000 : IDE_STD_TIMEOUT;
+		request->ccb->timeout * 1000000 : IDE_STD_TIMEOUT;
 
 //	FLOW("ata_exec_pio_transfer: length %d, left_blocks %d, left_sg_elem %d, cur_sg_ofs %d\n",
 //		request->ccb->data_length, device->left_blocks, device->left_sg_elem, device->cur_sg_ofs);

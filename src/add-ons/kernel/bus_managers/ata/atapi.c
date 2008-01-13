@@ -104,7 +104,7 @@ packet_dpc(ata_request *request)
 	ide_bus_info *bus = device->bus;
 	int status;
 	uint32 timeout = request->ccb->timeout > 0 ? 
-		request->ccb->timeout : IDE_STD_TIMEOUT;
+		request->ccb->timeout * 1000000 : IDE_STD_TIMEOUT;
 
 	SHOW_FLOW0(3, "");
 
@@ -422,7 +422,7 @@ send_packet(ide_device_info *device, ata_request *request, bool write)
 		start_dma_wait(device, request);		
 	} else {
 		uint32 timeout = request->ccb->timeout > 0 ? 
-			request->ccb->timeout : IDE_STD_TIMEOUT;
+			request->ccb->timeout * 1000000 : IDE_STD_TIMEOUT;
 
 		start_waiting(bus, timeout, ide_state_async_waiting);
 	}
