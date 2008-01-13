@@ -39,7 +39,7 @@ HApp::AboutRequested()
 			    "	Oliver Ruiz Dorantes\n"
 			    "	Jérôme DUVAL.\n"
 			    "  Original work from Atsushi Takamatsu.\n"
-			    "Copyright " B_UTF8_COPYRIGHT "2003-2006 Haiku","OK"))->Go();
+			    "Copyright " B_UTF8_COPYRIGHT "2003-2006 Haiku", "OK"))->Go();
 }
 
 

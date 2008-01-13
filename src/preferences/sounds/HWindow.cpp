@@ -39,18 +39,18 @@
 /***********************************************************
  * Constructor
  ***********************************************************/
-HWindow::HWindow(BRect rect ,const char* name)
-	:_inherited(rect,name,B_TITLED_WINDOW,0)
-	,fFilePanel(NULL)
-	,fPlayer(NULL)
+HWindow::HWindow(BRect rect, const char* name)
+	:_inherited(rect, name, B_TITLED_WINDOW, 0),
+	fFilePanel(NULL),
+	fPlayer(NULL)
 {
 	InitGUI();
-	float min_width,min_height,max_width,max_height;
-	GetSizeLimits(&min_width,&max_width,&min_height,&max_height);
+	float min_width, min_height, max_width, max_height;
+	GetSizeLimits(&min_width, &max_width, &min_height, &max_height);
 	min_width = 300;
 	min_height = 200;
-	SetSizeLimits(min_width,max_width,min_height,max_height);
-		
+	SetSizeLimits(min_width, max_width, min_height, max_height);
+
 	fFilePanel = new BFilePanel();
 	fFilePanel->SetTarget(this);
 	
@@ -74,7 +74,7 @@ HWindow::InitGUI()
 {
 	BRect rect = Bounds();
 	rect.bottom -= 106;
-	BView *listView = new BView(rect,"",B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED);
+	BView *listView = new BView(rect, "", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED);
 	listView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(listView);
 
@@ -89,7 +89,7 @@ HWindow::InitGUI()
 	stringView->SetFont(be_bold_font);
 	stringView->ResizeToPreferred();
 	listView->AddChild(stringView);
-		
+	
 	rect.left += 13;
 	rect.right -= B_V_SCROLL_BAR_WIDTH + 13;
 	rect.top += 28;
@@ -107,11 +107,11 @@ HWindow::InitGUI()
 
 	rect = Bounds();
 	rect.top = rect.bottom - 105;
-	BView *view = new BView(rect,"", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED);
+	BView *view = new BView(rect, "", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 	rect = view->Bounds().InsetBySelf(12, 12);
-	BBox *box = new BBox(rect,"",B_FOLLOW_ALL);
+	BBox *box = new BBox(rect, "", B_FOLLOW_ALL);
 	view->AddChild(box);
 	rect = box->Bounds();
 	rect.top += 10;
@@ -123,8 +123,8 @@ HWindow::InitGUI()
 	menu->SetLabelFromMarked(true);
 	menu->AddSeparatorItem();
 	
-	menu->AddItem(new BMenuItem("<none>",new BMessage(M_NONE_MESSAGE)));
-	menu->AddItem(new BMenuItem("Other…",new BMessage(M_OTHER_MESSAGE)));
+	menu->AddItem(new BMenuItem("<none>", new BMessage(M_NONE_MESSAGE)));
+	menu->AddItem(new BMenuItem("Other…", new BMessage(M_OTHER_MESSAGE)));
 	BMenuField *menuField = new BMenuField(rect
 										,"filemenu"
 										,"Sound File:"
@@ -178,18 +178,18 @@ HWindow::MessageReceived(BMessage *message)
 	switch(message->what) {
 	case M_OTHER_MESSAGE:
 		{
-			BMenuField *menufield = cast_as(FindView("filemenu"),BMenuField);
+			BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 			BMenu *menu = menufield->Menu();
 			
 			int32 sel = fEventList->CurrentSelection();
 			if(sel >= 0) {
-				HEventItem *item = cast_as(fEventList->ItemAt(sel),HEventItem);
+				HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
 				BPath path(item->Path());
 				if(path.InitCheck() != B_OK) {
 					BMenuItem *item = menu->FindItem("<none>");
 					if(item)
 						item->SetMarked(true);
-				} else{	
+				} else{
 					BMenuItem *item = menu->FindItem(path.Leaf());
 					if(item)
 						item->SetMarked(true);
@@ -203,8 +203,8 @@ HWindow::MessageReceived(BMessage *message)
 		{
 			entry_ref ref;
 			int32 sel = fEventList->CurrentSelection();
-			if(message->FindRef("refs",&ref) == B_OK && sel >= 0) {
-				BMenuField *menufield = cast_as(FindView("filemenu"),BMenuField);
+			if(message->FindRef("refs", &ref) == B_OK && sel >= 0) {
+				BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 				BMenu *menu = menufield->Menu();
 				// check audio file
 				BNode node(&ref);
@@ -216,20 +216,20 @@ HWindow::MessageReceived(BMessage *message)
 				mtype.GetSupertype(&superType);
 				if (superType.Type() == NULL || strcmp(superType.Type(), "audio") != 0) {
 					beep();
-					(new BAlert("","This is not a audio file.","OK",NULL,NULL,
-							B_WIDTH_AS_USUAL,B_STOP_ALERT))->Go();
+					(new BAlert("", "This is not a audio file.", "OK", NULL, NULL,
+							B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 					break;
 				}
 				// add file item
 				BMessage *msg = new BMessage(M_ITEM_MESSAGE);
 				BPath path(&ref);
-				msg->AddRef("refs",&ref);
+				msg->AddRef("refs", &ref);
 				BMenuItem *menuitem = menu->FindItem(path.Leaf());
 				if(!menuitem)
-					menu->AddItem(menuitem = new BMenuItem(path.Leaf(),msg),0);
+					menu->AddItem(menuitem = new BMenuItem(path.Leaf(), msg), 0);
 				// refresh item
 				fEventList->SetPath(BPath(&ref).Path());
-				// check file menu	
+				// check file menu
 				if(menuitem)
 					menuitem->SetMarked(true);
 			}
@@ -240,14 +240,14 @@ HWindow::MessageReceived(BMessage *message)
 			int32 sel = fEventList->CurrentSelection();
 			if(sel >= 0)
 			{
-				HEventItem *item = cast_as(fEventList->ItemAt(sel),HEventItem);
+				HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
 				const char* path = item->Path();
 				if(path)
 				{
 					entry_ref ref;
-					::get_ref_for_path(path,&ref);
+					::get_ref_for_path(path, &ref);
 					delete fPlayer;
-					fPlayer = new BFileGameSound(&ref,false);
+					fPlayer = new BFileGameSound(&ref, false);
 					fPlayer->StartPlaying();
 				}
 			}
@@ -268,16 +268,16 @@ HWindow::MessageReceived(BMessage *message)
 	case M_EVENT_CHANGED:
 		{
 			const char* path;
-			BMenuField *menufield = cast_as(FindView("filemenu"),BMenuField);
+			BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 			BMenu *menu = menufield->Menu();
 			
-			if(message->FindString("path",&path) == B_OK) {
+			if(message->FindString("path", &path) == B_OK) {
 				BPath path(path);
 				if(path.InitCheck() != B_OK) {
 					BMenuItem *item = menu->FindItem("<none>");
 					if(item)
 						item->SetMarked(true);
-				} else {	
+				} else {
 					BMenuItem *item = menu->FindItem(path.Leaf());
 					if(item)
 						item->SetMarked(true);
@@ -288,7 +288,7 @@ HWindow::MessageReceived(BMessage *message)
 	case M_ITEM_MESSAGE:
 		{
 			entry_ref ref;
-			if(message->FindRef("refs",&ref) == B_OK) {
+			if(message->FindRef("refs", &ref) == B_OK) {
 				fEventList->SetPath(BPath(&ref).Path());
 			}
 			break;
@@ -309,14 +309,14 @@ HWindow::MessageReceived(BMessage *message)
 void
 HWindow::SetupMenuField()
 {
-	BMenuField *menufield = cast_as(FindView("filemenu"),BMenuField);
+	BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
 	BMenu *menu = menufield->Menu();
 	int32 count = fEventList->CountItems();
 	for(int32 i = 0; i < count; i++) {
 		HEventItem *item = cast_as(fEventList->ItemAt(i), HEventItem);
 		if(!item)
 			continue;
-			
+		
 		BPath path(item->Path());
 		if(path.InitCheck() != B_OK)
 			continue;
@@ -325,9 +325,9 @@ HWindow::SetupMenuField()
 		
 		BMessage *msg = new BMessage(M_ITEM_MESSAGE);
 		entry_ref ref;
-		::get_ref_for_path(path.Path(),&ref);
-		msg->AddRef("refs",&ref);
-		menu->AddItem(new BMenuItem(path.Leaf(),msg),0);			
+		::get_ref_for_path(path.Path(), &ref);
+		msg->AddRef("refs", &ref);
+		menu->AddItem(new BMenuItem(path.Leaf(), msg), 0);
 	}
 	
 	BPath path("/boot/beos/etc/sounds");
@@ -335,63 +335,63 @@ HWindow::SetupMenuField()
 	BDirectory dir( path.Path() );
 	BEntry entry;
 	BPath item_path;
-   	while( err == B_OK ){
-		err = dir.GetNextEntry( (BEntry*)&entry, TRUE );			
-		if( entry.InitCheck() != B_NO_ERROR ){
+	while (err == B_OK){
+		err = dir.GetNextEntry((BEntry *)&entry, true);
+		if (entry.InitCheck() != B_NO_ERROR) {
 			break;
 		}
 		entry.GetPath(&item_path);
 		
-		if( menu->FindItem(item_path.Leaf()) )
+		if (menu->FindItem(item_path.Leaf()))
 			continue;
-			
+		
 		BMessage *msg = new BMessage(M_ITEM_MESSAGE);
 		entry_ref ref;
-		::get_ref_for_path(item_path.Path(),&ref);
-		msg->AddRef("refs",&ref);
-		menu->AddItem(new BMenuItem(item_path.Leaf(),msg),0);		
+		::get_ref_for_path(item_path.Path(), &ref);
+		msg->AddRef("refs", &ref);
+		menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
 	}
 	
 	path.SetTo("/boot/home/config/sounds");
 	dir.SetTo(path.Path());
 	err = B_OK;
-	while( err == B_OK ){
-		err = dir.GetNextEntry( (BEntry*)&entry, TRUE );			
-		if( entry.InitCheck() != B_NO_ERROR ){
+	while (err == B_OK) {
+		err = dir.GetNextEntry((BEntry *)&entry, true);
+		if (entry.InitCheck() != B_NO_ERROR) {
 			break;
 		}
 		entry.GetPath(&item_path);
 		
-		if( menu->FindItem(item_path.Leaf()) )
+		if (menu->FindItem(item_path.Leaf()))
 			continue;
-			
+		
 		BMessage *msg = new BMessage(M_ITEM_MESSAGE);
 		entry_ref ref;
 		
-		::get_ref_for_path(item_path.Path(),&ref);
-		msg->AddRef("refs",&ref);
-		menu->AddItem(new BMenuItem(item_path.Leaf(),msg),0);		
+		::get_ref_for_path(item_path.Path(), &ref);
+		msg->AddRef("refs", &ref);
+		menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
 	}
 	
 	path.SetTo("/boot/home/media");
 	dir.SetTo(path.Path());
 	err = B_OK;
-	while( err == B_OK ){
-		err = dir.GetNextEntry( (BEntry*)&entry, TRUE );			
-		if( entry.InitCheck() != B_NO_ERROR ){
+	while (err == B_OK) {
+		err = dir.GetNextEntry((BEntry *)&entry, true);
+		if (entry.InitCheck() != B_NO_ERROR) {
 			break;
 		}
 		entry.GetPath(&item_path);
 		
-		if( menu->FindItem(item_path.Leaf()) )
+		if (menu->FindItem(item_path.Leaf()))
 			continue;
-			
+		
 		BMessage *msg = new BMessage(M_ITEM_MESSAGE);
 		entry_ref ref;
 		
-		::get_ref_for_path(item_path.Path(),&ref);
-		msg->AddRef("refs",&ref);
-		menu->AddItem(new BMenuItem(item_path.Leaf(),msg),0);		
+		::get_ref_for_path(item_path.Path(), &ref);
+		msg->AddRef("refs", &ref);
+		menu->AddItem(new BMenuItem(item_path.Leaf(), msg), 0);
 	}
 
 }
@@ -404,9 +404,9 @@ void
 HWindow::Pulse()
 {
 	int32 sel = fEventList->CurrentSelection();
-	BMenuField *menufield = cast_as(FindView("filemenu"),BMenuField);
-	BButton *button = cast_as(FindView("play"),BButton);
-	BButton *stop = cast_as(FindView("stop"),BButton);
+	BMenuField *menufield = cast_as(FindView("filemenu"), BMenuField);
+	BButton *button = cast_as(FindView("play"), BButton);
+	BButton *stop = cast_as(FindView("stop"), BButton);
 	
 	if(!menufield)
 		return;
@@ -414,7 +414,7 @@ HWindow::Pulse()
 	if(sel >=0) {
 		menufield->SetEnabled(true);
 
-		HEventItem *item = cast_as(fEventList->ItemAt(sel),HEventItem);
+		HEventItem *item = cast_as(fEventList->ItemAt(sel), HEventItem);
 		const char* path = item->Path();
 		if (path && strcmp(path, ""))
 			button->SetEnabled(true);
@@ -438,11 +438,11 @@ HWindow::Pulse()
  * DispatchMessage
  ***********************************************************/
 void
-HWindow::DispatchMessage(BMessage *message,BHandler *handler)
+HWindow::DispatchMessage(BMessage *message, BHandler *handler)
 {
 	if(message->what == B_PULSE)
 		Pulse();
-	BWindow::DispatchMessage(message,handler);
+	BWindow::DispatchMessage(message, handler);
 }
 
 /***********************************************************

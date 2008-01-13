@@ -97,8 +97,8 @@ HEventList::SelectionChanged()
 		HEventItem *item = cast_as(ItemAt(sel),HEventItem);
 		if(!item)
 			return;
-			
-		entry_ref ref;	
+		
+		entry_ref ref;
 		BMediaFiles().GetRefFor(fType, item->Name(), &ref);
 		
 		BPath path(&ref);
@@ -117,7 +117,7 @@ HEventList::SelectionChanged()
 		msg.AddString("path",item->Path());
 		Window()->PostMessage(&msg);
 	}
-}	
+}
 
 /***********************************************************
  * SetPath
@@ -137,6 +137,6 @@ HEventList::SetPath(const char* path)
 		BMediaFiles().SetRefFor(fType, item->Name(), ref);
 		
 		item->SetPath(path);
-		InvalidateItem(sel);			
+		InvalidateItem(sel);
 	}
 }

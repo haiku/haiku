@@ -15,7 +15,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Sounds",
-    long_info  = "Sounds ©2003-2007 Haiku"
+	long_info  = "Sounds ©2003-2007 Haiku"
 };
 
 resource file_types message;

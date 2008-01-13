@@ -61,11 +61,11 @@ HEventItem::Remove(const char *type)
 /***********************************************************
  * DrawItem
  ***********************************************************/
-void 	
+void
 HEventItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 {
 	rgb_color kBlack = { 0,0,0,0 };
-		
+	
 	if (IsSelected() || complete) {
 		rgb_color color;
 		if (IsSelected())
@@ -77,7 +77,6 @@ HEventItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 		owner->SetLowColor(color);
 		owner->FillRect(itemRect);
 		owner->SetHighColor(kBlack);
-		
 	} 
 	else {
 		owner->SetLowColor(owner->ViewColor());
