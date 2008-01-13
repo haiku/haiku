@@ -55,15 +55,14 @@ void remove_device_info (my_device_info *my_dev)
 {
 	assert (my_dev != NULL);
 	acquire_sem (my_device_list_lock);
-	if (my_device_list == my_dev)
+	if (my_device_list == my_dev) {
 		my_device_list = my_dev->next;
-	else
-	{
+		--my_device_count;
+		my_device_list_changed = true;		
+	} else {
 		my_device_info *d;
-		for (d = my_device_list; d != NULL; d = d->next)
-		{
-			if (d->next == my_dev)
-			{
+		for (d = my_device_list; d != NULL; d = d->next) {
+			if (d->next == my_dev) {
 				d->next = my_dev->next;
 				--my_device_count;
 				my_device_list_changed = true;
@@ -80,8 +79,7 @@ my_device_info *search_device_info (const char* name)
 	my_device_info *my_dev;
 
 	acquire_sem (my_device_list_lock);
-	for (my_dev = my_device_list; my_dev != NULL; my_dev = my_dev->next)
-	{
+	for (my_dev = my_device_list; my_dev != NULL; my_dev = my_dev->next) {
 		if (strcmp(my_dev->name, name) == 0)
 			break;
 	}
@@ -104,8 +102,7 @@ void alloc_device_names (void)
 
 void free_device_names (void)
 {
-	if (my_device_names != NULL)
-	{
+	if (my_device_names != NULL) {
 		int i;
 		for (i = 0; my_device_names [i] != NULL; i++)
 			free (my_device_names [i]);
@@ -121,8 +118,7 @@ void rebuild_device_names (void)
 
 	assert (my_device_names != NULL);
 	acquire_sem (my_device_list_lock);
-	for (i = 0, my_dev = my_device_list; my_dev != NULL; my_dev = my_dev->next)
-	{
+	for (i = 0, my_dev = my_device_list; my_dev != NULL; my_dev = my_dev->next) {
 		my_device_names [i++] = strdup(my_dev->name);
 		DPRINTF_INFO ((MY_ID "publishing %s\n", my_dev->name));
 	}

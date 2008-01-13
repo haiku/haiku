@@ -540,9 +540,9 @@ uninit_driver (void)
 	DPRINTF_INFO ((MY_ID "uninit_driver()\n"));
 	usb->uninstall_notify (usb_midi_driver_name);
 	
-	delete_sem (my_device_list_lock);
-	put_module (B_USB_MODULE_NAME);
-	free_device_names ();
+	delete_sem(my_device_list_lock);
+	put_module(B_USB_MODULE_NAME);
+	free_device_names();
 }
 
 /*
