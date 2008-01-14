@@ -67,6 +67,8 @@ static struct debugger_command *sCommands;
 static jmp_buf sInvokeCommandEnv;
 static bool sInvokeCommandDirectly = false;
 
+static const char* sCurrentKernelDebuggerMessage;
+
 #define SYSLOG_BUFFER_SIZE 65536
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
@@ -563,6 +565,18 @@ cmd_continue(int argc, char **argv)
 }
 
 
+static int
+cmd_dump_kdl_message(int argc, char **argv)
+{
+	if (sCurrentKernelDebuggerMessage) {
+		kputs(sCurrentKernelDebuggerMessage);
+		kputchar('\n');
+	}
+
+	return 0;
+}
+
+
 static status_t
 syslog_sender(void *data)
 {
@@ -806,6 +820,8 @@ debug_init_post_vm(kernel_args *args)
 	add_debugger_command("exit", &cmd_continue, "Same as \"continue\"");
 	add_debugger_command("es", &cmd_continue, "Same as \"continue\"");
 	add_debugger_command("continue", &cmd_continue, "Leave kernel debugger");
+	add_debugger_command("message", &cmd_dump_kdl_message,
+		"Reprint the message printed when entering KDL");
 
 	frame_buffer_console_init(args);
 	arch_debug_console_init_settings(args);
@@ -993,6 +1009,8 @@ kernel_debugger(const char *message)
 
 	if (message)
 		kprintf("PANIC: %s\n", message);
+
+	sCurrentKernelDebuggerMessage = message;
 
 	kernel_debugger_loop();
 
