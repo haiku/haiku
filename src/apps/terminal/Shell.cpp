@@ -277,7 +277,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 	
 	/*
 	 * Get a pseudo-tty. We do this by cycling through files in the
-	 * directory. The operationg system will not allow us to open a master
+	 * directory. The operating system will not allow us to open a master
 	 * which is already in use, so we simply go until the open succeeds.
 	 */
 	char ttyName[B_PATH_NAME_LENGTH];
@@ -488,17 +488,15 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		 * Exec failed.
 		 */
 		sleep(1);
-		/*const char *spawnAlertMessage = "alert --stop "
+		const char *spawnAlertMessage = "alert --stop "
 						"'Cannot execute \"%s\":\n"
 						"\t%s' "
 						"'Use Default Shell' 'Abort'";
 		char errorMessage[256];
-		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, commandLine, strerror(errno));
+		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, *argv, strerror(errno));
 
-		// TODO: I'm not sure that system should return the return value of alert.
-		// At least, it's not doing that right now.
 		int returnValue = system(errorMessage);
-		if (returnValue == 0)*/
+		if (returnValue == 0)
 			execl("/bin/sh", "/bin/sh", "-login", NULL);
 
 		exit(1);
