@@ -21,6 +21,7 @@
 #include <string.h>
 
 
+//XXX: x86
 /** The (physical) memory layout of the boot loader is currently as follows:
  *	  0x0500 - 0x10000	protected mode stack
  *	  0x0500 - 0x09000	real mode stack
@@ -41,7 +42,36 @@
  *	the kernel itself (see kMaxKernelSize).
  */
 
-//#define TRACE_MMU
+// notes m68k:
+/** The (physical) memory layout of the boot loader is currently as follows:
+ *	  0x0800 - 0x10000	supervisor mode stack (1) XXX: more ? x86 starts at 500
+ *	 0x10000 - ?		code (up to ~500 kB)
+ *	unused (TT0 instead):
+ *	 0x90000			1st temporary page table (identity maps 0-4 MB)
+ *	 0x91000			2nd (4-8 MB)
+ *
+ *	 0x92000 - 0x92000	further page tables
+ *	0x100000			page directory
+ *	     ...			boot loader heap (32 kB)
+ *	     ...			free physical memory
+ *	[0xa00000]			end of chip RAM for TT (falcon has more till ROM)
+ *	[0xe00000 - 0xf00000	TOS ROM]
+ *	[0xf00000 - 0x1000000	I/O]
+ XXX: where is the video buffer ?
+ *
+ *	The first 16 MB (2) are identity mapped (0x0 - 0x1000000); paging 
+ *	is turned on. The kernel is mapped at 0x80000000, all other stuff 
+ *	mapped by the loader (kernel args, modules, driver settings, ...) 
+ *	comes after 0x81000000 which means that there is currently only 
+ *	1 MB reserved for the kernel itself (see kMaxKernelSize).
+ *	
+ *	(1) no need for user stack, we are already in supervisor mode in the
+ *	loader.
+ *	(2) maps the whole regular ST space; transparent translation registers 
+ *	have larger granularity anyway;
+ */
+
+#define TRACE_MMU
 #ifdef TRACE_MMU
 #	define TRACE(x) dprintf x
 #else
@@ -60,7 +90,12 @@ static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
 
 static addr_t sNextPageTableAddress = 0x90000;
 static const uint32 kPageTableRegionEnd = 0x9e000;
-	// we need to reserve 2 pages for the SMP trampoline code
+	// we need to reserve 2 pages for the SMP trampoline code XXX:no
+
+extern struct boot_mmu_ops k030MMUOps;
+extern struct boot_mmu_ops k040MMUOps;
+//extern struct boot_mmu_ops k060MMUOps;
+static struct boot_mmu_ops *gMMUOps;
 
 static addr_t
 get_next_virtual_address(size_t size)
@@ -260,6 +295,8 @@ init_page_directory(void)
 {
 	TRACE(("init_page_directory\n"));
 
+	gMMUOps->load_rp();
+	gMMUOps->enable_paging();
 #if 0
 	// allocate a new pgdir
 	sPageDirectory = (uint32 *)get_next_physical_page();
@@ -405,6 +442,13 @@ extern "C" void
 mmu_init_for_kernel(void)
 {
 	TRACE(("mmu_init_for_kernel\n"));
+
+
+
+
+	// remove identity mapping of ST space
+	gMMUOps->set_tt(0, NULL, 0, 0);
+
 #if 0
 	// set up a new idt
 	{

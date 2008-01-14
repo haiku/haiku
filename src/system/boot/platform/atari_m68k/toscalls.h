@@ -13,6 +13,14 @@
 extern "C" {
 #endif
 
+#ifndef __ASSEMBLER__
+#include <OS.h>
+#endif
+
+/* 
+ * Atari BIOS calls
+ */
+
 /* those are used by asm code too */
 
 #define DEV_PRINTER	0
@@ -37,18 +45,7 @@ extern "C" {
 #define RW_NORETRY		0x04
 #define RW_NOTRANSLATE	0x08
 
-#define SUP_USER		0
-#define SUP_SUPER		1
-#define SUP_SET			0
-#define SUP_INQUIRE		1
-
 #ifndef __ASSEMBLER__
-
-#include <OS.h>
-
-/* 
- * Atari BIOS calls
- */
 
 extern int32 bios(uint16 nr, ...);
 
@@ -92,11 +89,11 @@ static inline int Bconputs(int16 handle, const char *string)
 	return i;
 }
 
+#endif /* __ASSEMBLER__ */
+
 /* 
  * Atari XBIOS calls
  */
-
-extern int32 xbios(uint16 nr, ...);
 
 #define IM_DISABLE	0
 #define IM_RELATIVE	1
@@ -106,6 +103,20 @@ extern int32 xbios(uint16 nr, ...);
 #define NVM_READ	0
 #define NVM_WRITE	1
 #define NVM_RESET	2
+// unofficial
+#define NVM_R_SEC	0
+#define NVM_R_MIN	2
+#define NVM_R_HOUR	4
+#define NVM_R_MDAY	7
+#define NVM_R_MON	8	/*+- 1*/
+#define NVM_R_YEAR	9
+#define NVM_R_VIDEO	29
+
+
+#ifndef __ASSEMBLER__
+
+extern int32 xbios(uint16 nr, ...);
+
 
 #define Initmous(mode, param, vec) xbios(0, (int16)mode, (void *)param, (void *)vec)
 #define Physbase() (void *)xbios(2)
@@ -130,22 +141,35 @@ extern int32 xbios(uint16 nr, ...);
 #define Locksnd() xbios(128)
 #define Unlocksnd() xbios(129)
 
+#endif /* __ASSEMBLER__ */
+
 /* 
  * Atari GEMDOS calls
  */
 
+#define SUP_USER		0
+#define SUP_SUPER		1
+
+
+#ifdef __ASSEMBLER__
+#define SUP_SET			0
+#define SUP_INQUIRE		1
+#else
+
 extern int32 gemdos(uint16 nr, ...);
 
-#undef SUP_SET
-#undef SUP_INQUIRE
 #define SUP_SET			(void *)0
 #define SUP_INQUIRE		(void *)1
 
 // official names
 #define Pterm0() gemdos(0)
 #define Cconin() gemdos(1)
-#define Super(a) gemdos(0x20, (uint32)a)
+#define Super(s) gemdos(0x20, (uint32)s)
 #define Pterm(retcode) gemdos(76, (int16)retcode)
+
+#endif /* __ASSEMBLER__ */
+
+#ifdef __ASSEMBLER__
 
 /*
  * error mapping
@@ -207,6 +231,58 @@ static inline const struct tos_osheader *tos_get_osheader()
 }
 
 #endif /* __ASSEMBLER__ */
+
+/*
+ * XHDI
+ */
+
+/*
+ * ARAnyM Native Features
+ */
+
+#define NF_COOKIE	0x5f5f4e46L	//'__NF'
+#define NF_MAGIC	0x20021021L
+
+typedef struct {
+	long magic;
+	long (*nfGetID) (const char *);
+	long (*nfCall) (long ID, ...);
+} NatFeatCookie;
+
+extern NatFeatCookie *gNatFeatCookie;
+
+static inline NatFeatCookie *nat_features(void)
+{
+	if (gNatFeatCookie == (void *)-1 || !gNatFeatCookie)
+		return NULL;
+	gNatFeatCookie = tos_find_cookie(NF_COOKIE);
+	if (!gNatFeatCookie || gNatFeatCookie->magic != NF_MAGIC) {
+		gNatFeatCookie = (void *)-1;
+		return NULL;
+	}
+	return c;
+}
+
+
+/* XHDI NatFeat */
+
+#define NF_XHDI "XHDI"
+
+#define nfxhdi(code, a...) \
+{ \
+	gNatFeatCookie->nfCall((uint32)
+	if (gNatFeatCookie == NULL) {
+		c = tos_find_cookie(NF_COOKIE);
+	if (!c || c->magic != NF_MAGIC)
+		return NULL;
+	return c;
+} 
+
+
+#define NFXHversion() nfxhdi(0)
+
+#endif /* __ASSEMBLER__ */
+
 
 #ifdef __cplusplus
 }
