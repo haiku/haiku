@@ -141,11 +141,61 @@ kputs(const char *s)
 }
 
 
+static void
+insert_char_into_line(char* buffer, int32& position, int32& length, char c)
+{
+	// make room for the new char in the buffer by moving the subsequent ones
+	if (position < length)
+		memmove(buffer + position + 1, buffer + position, length - position);
+
+	buffer[position++] = c;
+	length++;
+
+	// print the char
+	kputchar(c);
+
+	// print the rest of the line again, if necessary
+	if (position < length) {
+		for (int32 i = position; i < length; i++)
+			kputchar(buffer[i]);
+
+		// reposition the cursor
+		kprintf("\x1b[%ldD", length - position);
+	}
+}
+
+
+static void
+remove_char_from_line(char* buffer, int32& position, int32& length)
+{
+	if (position == length)
+		return;
+
+	length--;
+
+	if (position < length) {
+		// move the subsequent chars
+		memmove(buffer + position, buffer + position + 1, length - position);
+
+		// print the rest of the line again, if necessary
+		for (int32 i = position; i < length; i++)
+			kputchar(buffer[i]);
+	}
+
+	// visually clear the last char
+	kputchar(' ');
+
+	// reposition the cursor
+	kprintf("\x1b[%ldD", length - position + 1);
+}
+
+
 static int
 read_line(char *buffer, int32 maxLength)
 {
 	int32 currentHistoryLine = sCurrentLine;
 	int32 position = 0;
+	int32 length = 0;
 	bool done = false;
 	char c;
 
@@ -161,16 +211,27 @@ read_line(char *buffer, int32 maxLength)
 		switch (c) {
 			case '\n':
 			case '\r':
-				buffer[position++] = '\0';
+				buffer[length++] = '\0';
 				kputchar('\n');
 				done = true;
 				break;
 			case 8: // backspace
 				if (position > 0) {
 					kputs("\x1b[1D"); // move to the left one
-					kputchar(' ');
-					kputs("\x1b[1D"); // move to the left one
 					position--;
+					remove_char_from_line(buffer, position, length);
+				}
+				break;
+			case 0x1f & 'K':	// CTRL-K -- clear line after current position
+				if (position < length) {
+					// clear chars
+					for (int32 i = position; i < length; i++)
+						kputchar(' ');
+
+					// reposition cursor
+					kprintf("\x1b[%ldD", length - position);
+
+					length = position;
 				}
 				break;
 			case 27: // escape sequence
@@ -181,14 +242,14 @@ read_line(char *buffer, int32 maxLength)
 				}
 				c = readChar();
 				switch (c) {
-					case 'C': // right arrow acts like space
-						buffer[position++] = ' ';
-						kputchar(' ');
+					case 'C': // right arrow
+						if (position < length) {
+							kputs("\x1b[1C"); // move to the right one
+							position++;
+						}
 						break;
-					case 'D': // left arrow acts like backspace
+					case 'D': // left arrow
 						if (position > 0) {
-							kputs("\x1b[1D"); // move to the left one
-							kputchar(' ');
 							kputs("\x1b[1D"); // move to the left one
 							position--;
 						}
@@ -198,7 +259,7 @@ read_line(char *buffer, int32 maxLength)
 					{
 						int32 historyLine = 0;
 
-						if (c == 65) {
+						if (c == 'A') {
 							// up arrow
 							historyLine = currentHistoryLine - 1;
 							if (historyLine < 0)
@@ -223,9 +284,36 @@ read_line(char *buffer, int32 maxLength)
 							kprintf("\x1b[%ldD", position); // move to beginning of line
 
 						strcpy(buffer, sLineBuffer[historyLine]);
-						position = strlen(buffer);
+						length = position = strlen(buffer);
 						kprintf("%s\x1b[K", buffer); // print the line and clear the rest
 						currentHistoryLine = historyLine;
+						break;
+					}
+					case 'H': // home
+					{
+						if (position > 0) {
+							kprintf("\x1b[%ldD", position);
+							position = 0;
+						}
+						break;
+					}
+					case 'F': // end
+					{
+						if (position < length) {
+							kprintf("\x1b[%ldC", length - position);
+							position = length;
+						}
+						break;
+					}
+					case '3':	// if "3~", it's DEL
+					{
+						c = readChar();
+						if (c != '~')
+							break;
+
+						if (position < length)
+							remove_char_from_line(buffer, position, length);
+
 						break;
 					}
 					default:
@@ -249,22 +337,20 @@ read_line(char *buffer, int32 maxLength)
 				}
 				/* supposed to fall through */
 			default:
-				if (isprint(c)) {
-					buffer[position++] = c;
-					kputchar(c);
-				}
+				if (isprint(c))
+					insert_char_into_line(buffer, position, length, c);
 				break;
 		}
 
-		if (position >= maxLength - 2) {
-			buffer[position++] = '\0';
+		if (length >= maxLength - 2) {
+			buffer[length++] = '\0';
 			kputchar('\n');
 			done = true;
 			break;
 		}
 	}
 
-	return position;
+	return length;
 }
 
 
