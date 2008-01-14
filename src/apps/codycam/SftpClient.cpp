@@ -93,7 +93,7 @@ SftpClient::Connect(const string& server, const string& login, const string& pas
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
-	if (reply.FindFirst("password:") < 0)
+	if (reply.FindFirst(/*[pP]*/"assword:") < 0)
 		return false;
 	
 	write(OutputPipe(), passwd.c_str(), strlen(passwd.c_str()));
@@ -170,6 +170,7 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 	// sftpd can't rename to an existing file...
 	BString cmd("rm");
 	cmd << " " << newPath.c_str() << "\n";
+	fprintf(stderr, "CMD: '%s'\n", cmd.String());
 	SendCommand(cmd.String());
 	BString reply;
 
@@ -178,8 +179,9 @@ SftpClient::MoveFile(const string& oldPath, const string& newPath)
 		return false;
 	}
 	fprintf(stderr, "reply: '%s'\n", reply.String());
-	if (reply.FindFirst("Removing") != 0)
-		return false;
+	// we don't care if it worked or not.
+	//if (reply.FindFirst("Removing") != 0 && reply.FindFirst("Couldn't") )
+	//	return false;
 
 	if ((len = ReadReply(&reply)) < 0) {
 		fprintf(stderr, "read: %d\n", len);
