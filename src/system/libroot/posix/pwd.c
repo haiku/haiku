@@ -133,3 +133,7 @@ getpwuid_r(uid_t uid, struct passwd *passwd, char *buffer,
 	return 0;
 }
 
+void __init_pwd_backend(void)
+{
+}
+

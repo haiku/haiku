@@ -58,6 +58,7 @@ initialize_before(image_id imageID)
 	__init_fork();
 	__init_heap();
 	__init_env(__gRuntimeLoader->program_args);
+	__init_pwd_backend();
 }
 
 

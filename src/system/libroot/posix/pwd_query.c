@@ -620,9 +620,7 @@ struct passwd *getpwnam(const char *name)
 	
 }
 
-
-void __init_pwd_stuff(void)
-//void _multiuser_init(void)
+void __init_pwd_backend(void)
 {
 	/* dev_t for the boot volume */
 	boot_device = dev_for_path("/boot");
@@ -630,12 +628,12 @@ void __init_pwd_stuff(void)
 	pw_tls_id = tls_allocate();
 }
 
-void __fini_pwd_stuff(void)
-//void _multiuser_fini(void)
+/*
+void __fini_pwd_backend(void)
 {
 	
 }
-
+*/
 
 #endif /* REAL_MULTIUSER */
 
