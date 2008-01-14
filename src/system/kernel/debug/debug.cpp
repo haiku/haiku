@@ -36,7 +36,7 @@
 #include <syslog.h>
 
 
-int kgets(char *buffer, int length);
+extern "C" int kgets(char *buffer, int length);
 
 typedef struct debugger_command {
 	struct debugger_command *next;
