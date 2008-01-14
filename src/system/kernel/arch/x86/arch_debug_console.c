@@ -50,18 +50,18 @@ enum keycodes {
 	RIGHT_SHIFT		= 54,
 
 	LEFT_CONTROL	= 29,
-	RIGHT_CONTROL	= 157,
 
 	LEFT_ALT		= 56,
-	RIGHT_ALT		= 184,
 
 	CURSOR_LEFT		= 75,
 	CURSOR_RIGHT	= 77,
 	CURSOR_UP		= 72,
 	CURSOR_DOWN		= 80,
+	CURSOR_HOME		= 71,
+	CURSOR_END		= 79,
 
-	BREAK			= 198,
-	DELETE			= 201,
+	BREAK			= 198,	// TODO: >= 128 can't be valid
+	DELETE			= 83,
 	F12				= 88,
 };
 
@@ -99,6 +99,7 @@ static bool sBochsOutput = false;
 
 static spinlock sSerialOutputSpinlock = 0;
 
+
 static void
 put_char(const char c)
 {
@@ -126,7 +127,7 @@ put_char(const char c)
 static int32
 debug_keyboard_interrupt(void *data)
 {
-	static bool controlPressed;
+	static bool controlPressed = false;
 	static bool altPressed;
 	uint8 key;
 
@@ -201,8 +202,11 @@ arch_debug_blue_screen_getchar(void)
 	/* polling the keyboard, similar to code in keyboard
 	 * driver, but without using an interrupt
 	 */
-	static bool shift = false;
+	static bool shiftPressed = false;
+	static bool controlPressed = false;
+	static bool altPressed = false;
 	static uint8 special = 0;
+	static uint8 special2 = 0;
 	uint8 key, ascii = 0;
 
 	if (special & 0x80) {
@@ -212,6 +216,11 @@ arch_debug_blue_screen_getchar(void)
 	if (special != 0) {
 		key = special;
 		special = 0;
+		return key;
+	}
+	if (special2 != 0) {
+		key = special2;
+		special2 = 0;
 		return key;
 	}
 
@@ -234,14 +243,32 @@ arch_debug_blue_screen_getchar(void)
 
 		if (key & 0x80) {
 			// key up
-			if (key == (0x80 | LEFT_SHIFT) || key == (0x80 | RIGHT_SHIFT))
-				shift = false;
+			switch (key & ~0x80) {
+				case LEFT_SHIFT:
+				case RIGHT_SHIFT:
+					shiftPressed = false;
+					break;
+				case LEFT_CONTROL:
+					controlPressed = false;
+					break;
+				case LEFT_ALT:
+					altPressed = false;
+					break;
+			}
 		} else {
 			// key down
 			switch (key) {
 				case LEFT_SHIFT:
 				case RIGHT_SHIFT:
-					shift = true;
+					shiftPressed = true;
+					break;
+
+				case LEFT_CONTROL:
+					controlPressed = true;
+					break;
+
+				case LEFT_ALT:
+					altPressed = true;
 					break;
 
 				// start escape sequence for cursor movement
@@ -257,9 +284,30 @@ arch_debug_blue_screen_getchar(void)
 				case CURSOR_LEFT:
 					special = 0x80 | 'D';
 					return '\x1b';
+				case CURSOR_HOME:
+					special = 0x80 | 'H';
+					return '\x1b';
+				case CURSOR_END:
+					special = 0x80 | 'F';
+					return '\x1b';
+
+				case DELETE:
+					if (controlPressed && altPressed)
+						arch_cpu_shutdown(true);
+
+					special = 0x80 | '3';
+					special2 = '~';
+					return '\x1b';
 
 				default:
-					return shift ? kShiftedKeymap[key] : kUnshiftedKeymap[key];
+					if (controlPressed) {
+						char c = kShiftedKeymap[key];
+						if (c >= 'A' && c <= 'Z')
+							return 0x1f & c;
+					}
+
+					return shiftPressed
+						? kShiftedKeymap[key] : kUnshiftedKeymap[key];
 			}
 		}
 	}
