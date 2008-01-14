@@ -1,8 +1,15 @@
+/*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include <tracing.h>
 
-#include <util/AutoLock.h>
-
 #include <stdlib.h>
+
+#include <util/AutoLock.h>
 
 
 #if ENABLE_TRACING
@@ -179,10 +186,10 @@ dump_tracing(int argc, char** argv)
 		pattern = argv[--argc] + 1;
 
 	int32 count = 30;
-	if (argc == 2)
-		count = strtol(argv[1], NULL, 0);
-
 	int32 start = sEntries - count;
+
+	if (argc == 2)
+		start = strtol(argv[1], NULL, 0);
 
 	if (argc == 3) {
 		start = strtol(argv[1], NULL, 0);
@@ -237,6 +244,7 @@ dump_tracing(int argc, char** argv)
 
 
 #endif	// ENABLE_TRACING
+
 
 extern "C" uint8*
 alloc_tracing_buffer(size_t size)
