@@ -503,14 +503,14 @@ syslog_sender(void *data)
 				acquire_spinlock(&sSpinlock);
 
 				length = ring_buffer_readable(sSyslogBuffer);
-				if (length > SYSLOG_MAX_MESSAGE_LENGTH)
+				if (length > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
 					length = SYSLOG_MAX_MESSAGE_LENGTH;
 
 				length = ring_buffer_read(sSyslogBuffer,
 					(uint8 *)sSyslogMessage->message, length);
 				if (sSyslogDropped) {
 					// add drop marker
-					if (length < SYSLOG_MAX_MESSAGE_LENGTH - 6)
+					if (length < (int32)SYSLOG_MAX_MESSAGE_LENGTH - 6)
 						strlcat(sSyslogMessage->message, "<DROP>", SYSLOG_MAX_MESSAGE_LENGTH);
 					else if (length > 7)
 						strcpy(sSyslogMessage->message + length - 7, "<DROP>");
@@ -558,7 +558,7 @@ syslog_write(const char *text, int32 length)
 	if (sSyslogBuffer == NULL)
 		return;
 
-	if (ring_buffer_writable(sSyslogBuffer) < length) {
+	if ((int32)ring_buffer_writable(sSyslogBuffer) < length) {
 		// truncate data
 		length = ring_buffer_writable(sSyslogBuffer);
 
@@ -610,7 +610,7 @@ syslog_init(struct kernel_args *args)
 	if (!sSyslogOutputEnabled)
 		return B_OK;
 
-	sSyslogMessage = malloc(SYSLOG_MESSAGE_BUFFER_SIZE);
+	sSyslogMessage = (syslog_message*)malloc(SYSLOG_MESSAGE_BUFFER_SIZE);
 	if (sSyslogMessage == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
@@ -630,7 +630,7 @@ syslog_init(struct kernel_args *args)
 	//strcpy(sSyslogMessage->ident, "KERNEL");
 
 	if (args->debug_output != NULL)
-		syslog_write(args->debug_output, args->debug_size);
+		syslog_write((const char*)args->debug_output, args->debug_size);
 
 	return B_OK;
 

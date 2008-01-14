@@ -5,6 +5,9 @@
 #ifndef _KERNEL_GDB_H
 #define _KERNEL_GDB_H
 
-extern int cmd_gdb(int, char **);
+#ifdef __cplusplus
+extern "C"
+#endif
+int cmd_gdb(int, char **);
 
 #endif
