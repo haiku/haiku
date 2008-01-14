@@ -36,7 +36,11 @@
 #include <syslog.h>
 
 
+static const char* const kKDLPrompt = "kdebug> ";
+
 extern "C" int kgets(char *buffer, int length);
+static int invoke_command(struct debugger_command *command, int argc,
+	char** argv);
 
 typedef struct debugger_command {
 	struct debugger_command *next;
@@ -93,11 +97,27 @@ static char *sArguments[MAX_ARGS] = { NULL, };
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
 
+static debugger_command*
+next_command(debugger_command* command, const char* prefix, int prefixLen)
+{
+	if (command == NULL)
+		command = sCommands;
+	else
+		command = command->next;
+
+	while (command != NULL && !strncmp(prefix, command->name, prefixLen) == 0)
+		command = command->next;
+
+	return command;
+}
+
+
 static debugger_command *
-find_command(char *name, bool partialMatch)
+find_command(const char *name, bool partialMatch, bool& ambiguous)
 {
 	debugger_command *command;
-	int length;
+
+	ambiguous = false;
 
 	// search command by full name
 
@@ -109,13 +129,13 @@ find_command(char *name, bool partialMatch)
 	// if it couldn't be found, search for a partial match
 
 	if (partialMatch) {
-		length = strlen(name);
-		if (length == 0)
-			return NULL;
-
-		for (command = sCommands; command != NULL; command = command->next) {
-			if (strncmp(name, command->name, length) == 0)
+		int length = strlen(name);
+		command = next_command(NULL, name, length);
+		if (command != NULL) {
+			if (next_command(command, name, length) == NULL)
 				return command;
+
+			ambiguous = true;
 		}
 	}
 
@@ -144,26 +164,35 @@ kputs(const char *s)
 
 
 static void
+insert_chars_into_line(char* buffer, int32& position, int32& length,
+	const char* chars, int32 charCount)
+{
+	// move the following chars to make room for the ones to insert
+	if (position < length) {
+		memmove(buffer + position + charCount, buffer + position,
+			length - position);
+	}
+
+	// insert chars
+	memcpy(buffer + position, chars, charCount);
+	int32 oldPosition = position;
+	position += charCount;
+	length += charCount;
+
+	// print the new chars (and the following ones)
+	kprintf("%.*s", (int)(length - oldPosition),
+		buffer + oldPosition);
+
+	// reposition cursor, if necessary
+	if (position < length)
+		kprintf("\x1b[%ldD", length - position);
+}
+
+
+static void
 insert_char_into_line(char* buffer, int32& position, int32& length, char c)
 {
-	// make room for the new char in the buffer by moving the subsequent ones
-	if (position < length)
-		memmove(buffer + position + 1, buffer + position, length - position);
-
-	buffer[position++] = c;
-	length++;
-
-	// print the char
-	kputchar(c);
-
-	// print the rest of the line again, if necessary
-	if (position < length) {
-		for (int32 i = position; i < length; i++)
-			kputchar(buffer[i]);
-
-		// reposition the cursor
-		kprintf("\x1b[%ldD", length - position);
-	}
+	insert_chars_into_line(buffer, position, length, &c, 1);
 }
 
 
@@ -192,8 +221,156 @@ remove_char_from_line(char* buffer, int32& position, int32& length)
 }
 
 
+class LineEditingHelper {
+public:
+	virtual	~LineEditingHelper() {}
+
+	virtual	void TabCompletion(char* buffer, int32 capacity, int32& position,
+		int32& length) = 0;
+};
+
+
+class CommandLineEditingHelper : public LineEditingHelper {
+public:
+	CommandLineEditingHelper()
+	{
+	}
+
+	virtual	~CommandLineEditingHelper() {}
+
+	virtual	void TabCompletion(char* buffer, int32 capacity, int32& position,
+		int32& length)
+	{
+		// find the first space
+		char tmpChar = buffer[position];
+		buffer[position] = '\0';
+		char* firstSpace = strchr(buffer, ' ');
+		buffer[position] = tmpChar;
+
+		bool reprintLine = false;
+
+		if (firstSpace != NULL) {
+			// a complete command -- print its help
+
+			// get the command
+			tmpChar = *firstSpace;
+			*firstSpace = '\0';
+			bool ambiguous;
+			debugger_command* command = find_command(buffer, true, ambiguous);
+			*firstSpace = tmpChar;
+
+			if (command != NULL) {
+				kputchar('\n');
+
+				char* args[3] = { NULL, "--help", NULL };
+				invoke_command(command, 2, args);
+			} else {
+				if (ambiguous)
+					kprintf("\nambiguous command\n");
+				else
+					kprintf("\nno such command\n");
+			}
+
+			reprintLine = true;
+		} else {
+			// a partial command -- look for completions
+
+			// check for possible completions
+			int32 count = 0;
+			int32 longestName = 0;
+			debugger_command* command = NULL;
+			int32 longestCommonPrefix = 0;
+			const char* previousCommandName = NULL;
+			while ((command = next_command(command, buffer, position))
+					!= NULL) {
+				count++;
+				int32 nameLength = strlen(command->name);
+				longestName = max_c(longestName, nameLength);
+
+				// updated the length of the longest common prefix of the
+				// commands
+				if (count == 1) {
+					longestCommonPrefix = longestName;
+				} else {
+					longestCommonPrefix = min_c(longestCommonPrefix,
+						nameLength);
+
+					for (int32 i = position; i < longestCommonPrefix; i++) {
+						if (previousCommandName[i] != command->name[i]) {
+							longestCommonPrefix = i;
+							break;
+						}
+					}
+				}
+
+				previousCommandName = command->name;
+			}
+
+			if (count == 0) {
+				// no possible completions
+				kprintf("\nno completions\n");
+				reprintLine = true;
+			} else if (count == 1) {
+				// exactly one completion
+				command = next_command(NULL, buffer, position);
+
+				// check for sufficient space in the buffer
+				int32 neededSpace = longestName - position + 1;
+					// remainder of the name plus one space
+				// also consider the terminating null char
+				if (length + neededSpace + 1 >= capacity)
+					return;
+
+				insert_chars_into_line(buffer, position, length,
+					command->name + position, longestName - position);
+				insert_char_into_line(buffer, position, length, ' ');
+			} else if (longestCommonPrefix > position) {
+				// multiple possible completions with longer common prefix
+				// -- insert the remainder of the common prefix
+				
+				// check for sufficient space in the buffer
+				int32 neededSpace = longestCommonPrefix - position;
+				// also consider the terminating null char
+				if (length + neededSpace + 1 >= capacity)
+					return;
+
+				insert_chars_into_line(buffer, position, length,
+					previousCommandName + position, neededSpace);
+			} else {
+				// multiple possible completions without longer common prefix
+				// -- print them all
+				kprintf("\n");
+				reprintLine = true;
+
+				int columns = 80 / (longestName + 2);
+				debugger_command* command = NULL;
+				int column = 0;
+				while ((command = next_command(command, buffer, position))
+						!= NULL) {
+					// spacing
+					if (column > 0 && column % columns == 0)
+						kputchar('\n');
+					column++;
+
+					kprintf("  %-*s", (int)longestName, command->name);
+				}
+				kputchar('\n');
+			}
+		}
+
+		// reprint the editing line, if necessary
+		if (reprintLine) {
+			kprintf("%s%.*s", kKDLPrompt, (int)length, buffer);
+			if (position < length)
+				kprintf("\x1b[%ldD", length - position);
+		}
+	}
+};
+
+
 static int
-read_line(char *buffer, int32 maxLength)
+read_line(char *buffer, int32 maxLength,
+	LineEditingHelper* editingHelper = NULL)
 {
 	int32 currentHistoryLine = sCurrentLine;
 	int32 position = 0;
@@ -217,6 +394,14 @@ read_line(char *buffer, int32 maxLength)
 				kputchar('\n');
 				done = true;
 				break;
+			case '\t':
+			{
+				if (editingHelper != NULL) {
+					editingHelper->TabCompletion(buffer, maxLength,
+						position, length);
+				}
+				break;
+			}
 			case 8: // backspace
 				if (position > 0) {
 					kputs("\x1b[1D"); // move to the left one
@@ -471,8 +656,9 @@ kernel_debugger_loop(void)
 		struct debugger_command *cmd = NULL;
 		int argc;
 
-		kprintf("kdebug> ");
-		read_line(sLineBuffer[sCurrentLine], LINE_BUFFER_SIZE);
+		CommandLineEditingHelper editingHelper;
+		kprintf(kKDLPrompt);
+		read_line(sLineBuffer[sCurrentLine], LINE_BUFFER_SIZE, &editingHelper);
 		parse_line(sLineBuffer[sCurrentLine], sArguments, &argc, MAX_ARGS);
 
 		// We support calling last executed command again if
@@ -482,12 +668,20 @@ kernel_debugger_loop(void)
 
 		sDebuggerOnCPU = smp_get_current_cpu();
 
+		bool ambiguous;
 		if (argc > 0)
-			cmd = find_command(sArguments[0], true);
+			cmd = find_command(sArguments[0], true, ambiguous);
 
-		if (cmd == NULL)
-			kprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
-		else {
+		if (cmd == NULL) {
+			if (ambiguous) {
+				kprintf("Ambiguous command. Use tab completion to get a list "
+					"of matching commands. Enter \"help\" to get a list of "
+					"all supported commands.\n");
+			} else {
+				kprintf("Unknown command. Enter \"help\" to get a list of all "
+					"supported commands.\n");
+			}
+		} else {
 			int rc = invoke_command(cmd, argc, sArguments);
 
 			if (rc == B_KDEBUG_QUIT)
@@ -528,9 +722,10 @@ cmd_help(int argc, char **argv)
 	debugger_command *command, *specified = NULL;
 	const char *start = NULL;
 	int32 startLength = 0;
+	bool ambiguous;
 
 	if (argc > 1) {
-		specified = find_command(argv[1], false);
+		specified = find_command(argv[1], false, ambiguous);
 		if (specified == NULL) {
 			start = argv[1];
 			startLength = strlen(start);
@@ -1011,6 +1206,28 @@ kernel_debugger(const char *message)
 		kprintf("PANIC: %s\n", message);
 
 	sCurrentKernelDebuggerMessage = message;
+
+	// bubble sort the commands
+	debugger_command* stopCommand = NULL;
+	while (stopCommand != sCommands) {
+		debugger_command** command = &sCommands;
+		while (true) {
+			debugger_command* nextCommand = (*command)->next;
+			if (nextCommand == stopCommand) {
+				stopCommand = *command;
+				break;
+			}
+
+			if (strcmp((*command)->name, nextCommand->name) > 0) {
+				debugger_command* tmpCommand = nextCommand->next;
+				(*command)->next = nextCommand->next;
+				nextCommand->next = *command;
+				*command = nextCommand;
+			}
+
+			command = &(*command)->next;
+		}
+	}
 
 	kernel_debugger_loop();
 
