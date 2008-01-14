@@ -42,6 +42,8 @@
 
 char words[MAX_CACHED_WORDS][MAX_LETTERS+1];
 
+#ifndef __HAIKU__
+
 /* design ripped off from http://www.latms.berkeley.k12.ca.us/perl/node30.html :) */
 static char hungman[] = \
 "  ____      \n" \
@@ -50,6 +52,9 @@ static char hungman[] = \
 "  |  %c%c%c    \n" \
 "  |  %c %c    \n" \
 "  |         \n";
+
+#else
+
 /* some colors */
 static char hungman_ansi[] = \
 "  ____      \n" \
@@ -58,6 +63,8 @@ static char hungman_ansi[] = \
 "  |  \033[35m%c%c%c\033[0m    \n" \
 "  |  \033[35m%c %c\033[0m    \n" \
 "  |         \n";
+
+#endif
 
 // for gets, 
 #define BIGBUFFSZ 128
@@ -101,7 +108,9 @@ char *(*bsod_saved_kgets)(char *, char *, int);
 #  define HUNGMAN hungman_ansi
 #endif /* !_KERNEL_MODE */
 
-status_t init_words(char *from)
+
+status_t
+init_words(char *from)
 {
 	int fd;
 	size_t sz, got;
@@ -154,7 +163,9 @@ status_t init_words(char *from)
 	return B_OK;
 }
 
-void print_hangman(int fails)
+
+void
+print_hangman(int fails)
 {
 	PRINTF(HUNGMAN, 
 		(fails > 0)?'O':' ',
@@ -165,7 +176,9 @@ void print_hangman(int fails)
 		(fails > 5)?'\\':' ');
 }
 
-void display_word(int current, uint32 tried_letters)
+
+void
+display_word(int current, uint32 tried_letters)
 {
 	int i = 0;
 	PRINTF("word> ");
@@ -176,7 +189,8 @@ void display_word(int current, uint32 tried_letters)
 	PRINTF("\n");
 }
 
-int play_hangman(void)
+int
+play_hangman(void)
 {
 	int current;
 	int score = 0;
@@ -248,13 +262,15 @@ int play_hangman(void)
 	return score;
 }
 
+
 #ifdef _KERNEL_MODE /* driver parts */
 
 
 #ifndef __HAIKU__ /* BeOS intimacy revealed */
 //char *bsod_wrapper_gets(char *p, int len)
 //char *bsod_wrapper_gets(int len, char *p)
-char *bsod_wrapper_gets(char *prompt, char *p, int len)
+char *
+bsod_wrapper_gets(char *prompt, char *p, int len)
 {
 	/* fall back to the normal gets() */
 	bsod_kgets = bsod_saved_kgets;
@@ -268,9 +284,17 @@ char *bsod_wrapper_gets(char *prompt, char *p, int len)
 
 #endif
 
-int kdlhangman(int argc, char **argv)
+
+int
+kdlhangman(int argc, char **argv)
 {
 	int score;
+
+	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
+		PRINTF("%s\n", KCMD_HELP);
+		return 0;
+	}
+
 	score = play_hangman();
 PRINTF("score %d\n", score);
 	if (score > (MAX_CACHED_WORDS - MAX_FAILS_BEFORE_BSOD)) {
@@ -290,6 +314,7 @@ PRINTF("score %d\n", score);
 	return B_KDEBUG_QUIT;
 }
 
+
 #  ifdef AS_DRIVER
 
 typedef struct {
@@ -298,11 +323,16 @@ typedef struct {
 
 const char * device_names[]={DEV_ENTRY, NULL};
 
-status_t init_hardware(void) {
+
+status_t
+init_hardware(void) {
 	return B_OK;
 }
 
-status_t init_driver(void) {
+
+status_t
+init_driver(void)
+{
 	status_t err;
 	
 	err = init_words(FORTUNE_FILE);
@@ -315,15 +345,24 @@ status_t init_driver(void) {
 	return B_OK;
 }
 
-void uninit_driver(void) {
+
+void
+uninit_driver(void)
+{
 	remove_debugger_command("kdlhangman", kdlhangman);
 }
 
-const char **publish_devices() {
+
+const char **
+publish_devices()
+{
 	return device_names;
 }
 
-status_t khangman_open(const char *name, uint32 flags, cookie_t **cookie) {
+
+status_t
+khangman_open(const char *name, uint32 flags, cookie_t **cookie)
+{
 	(void)name; (void)flags;
 	*cookie = (void*)malloc(sizeof(cookie_t));
 	if (*cookie == NULL) {
@@ -336,22 +375,34 @@ err0:
 	return B_ERROR;
 }
 
-status_t khangman_close(void *cookie) {
+
+status_t
+khangman_close(void *cookie)
+{
 	(void)cookie;
 	return B_OK;
 }
 
-status_t khangman_free(cookie_t *cookie) {
+
+status_t
+khangman_free(cookie_t *cookie)
+{
 	free(cookie);
 	return B_OK;
 }
 
-status_t khangman_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes) {
+
+status_t
+khangman_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes)
+{
 	*numbytes = 0;
 	return B_NOT_ALLOWED;
 }
 
-status_t khangman_write(void *cookie, off_t position, const void *data, size_t *numbytes) {
+
+status_t
+khangman_write(void *cookie, off_t position, const void *data, size_t *numbytes)
+{
 	(void)cookie; (void)position; (void)data; (void)numbytes;
 	//*numbytes = 0;
 	/* here we get to kdlhangman */
@@ -362,6 +413,7 @@ status_t khangman_write(void *cookie, off_t position, const void *data, size_t *
 	
 	return B_OK;
 }
+
 
 device_hooks khangman_hooks={
 	(device_open_hook)khangman_open,
@@ -376,14 +428,22 @@ device_hooks khangman_hooks={
 	NULL
 };
 
-device_hooks *find_device(const char *name) {
+
+device_hooks *
+find_device(const char *name)
+{
 	(void)name;
 	return &khangman_hooks;
 }
 
+
 #  else /* as module */
+
+
 status_t std_ops(int32 op, ...);
-status_t std_ops(int32 op, ...)
+
+status_t
+std_ops(int32 op, ...)
 {
 	status_t err;
 
@@ -403,6 +463,7 @@ status_t std_ops(int32 op, ...)
 	return B_ERROR;
 }
 
+
 static module_info minfo = {
 	"debugger/hangman/v1",
 	B_KEEP_LOADED,
@@ -415,7 +476,8 @@ module_info *modules[] = { &minfo, NULL };
 
 #else
 
-void kdl_trip(void)
+void
+kdl_trip(void)
 {
 	int fd;
 	fd = open("/dev/misc/hangman", O_WRONLY);
@@ -428,7 +490,9 @@ void kdl_trip(void)
 	close(fd);
 }
 
-int main(int argc, char *argv)
+
+int
+main(int argc, char *argv)
 {
 	int score; /* how many correct guesses ? */
 	/* init */
@@ -437,7 +501,7 @@ int main(int argc, char *argv)
 		return 1;
 	}
 	score = play_hangman();
-PRINTF("score %d\n", score);
+	PRINTF("score %d\n", score);
 	if (score > (MAX_CACHED_WORDS - MAX_FAILS_BEFORE_BSOD)) {
 		PRINTF("Congrats !\n");
 	}
@@ -447,7 +511,6 @@ PRINTF("score %d\n", score);
 	}
 	return 0;
 }
-
 
 
 #endif
