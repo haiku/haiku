@@ -133,6 +133,12 @@ extern float	roundf(float value);
 #endif
 #endif
 
+#if defined(HAIKU_TARGET_PLATFORM_BONE) || defined(HAIKU_TARGET_PLATFORM_DANO)
+#	define IF_NAMESIZE IFNAMSIZ
+#	define ifc_value ifc_val
+#	define IFF_AUTO_CONFIGURED 0
+#endif
+
 #ifndef INT64_MAX
 #include <limits.h>
 #define INT64_MAX LONGLONG_MAX
