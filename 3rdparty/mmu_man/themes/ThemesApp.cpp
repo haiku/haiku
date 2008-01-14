@@ -25,7 +25,7 @@ void
 ThemesApp::ReadyToRun()
 {
 	BScreen s;
-	BRect frame(0, 0, 500, 300);
+	BRect frame(0, 0, 550, 300);
 	frame.OffsetBySelf(s.Frame().Width()/2 - frame.Width()/2, 
 						s.Frame().Height()/2 - frame.Height()/2);
 	BWindow *w = new BWindow(frame, "Themes", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_QUIT_ON_WINDOW_CLOSE);

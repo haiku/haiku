@@ -286,7 +286,7 @@ FindRGBColor(BMessage &message, const char *name, int32 index, rgb_color *c)
 	const void *data;
 	ssize_t len;
 	status_t err;
-	err = message.FindData(name, index, &data, &len);
+	err = message.FindData(name, B_RGB_COLOR_TYPE, index, &data, &len);
 	if (err < B_OK)
 		return err;
 	if (len > (ssize_t)sizeof(*c))
@@ -317,7 +317,8 @@ FindFont(BMessage &message, const char *name, int32 index, BFont *f)
 #else
 	const void *data;
 	ssize_t len;
-	status_t err = message.FindData(name, index, &data, &len);
+	status_t err = message.FindData(name, 'FONt', index, &data, &len);
+#define DERR(e) { PRINT(("%s: err: %s\n", __FUNCTION__, strerror(e))); }
 	if (err < B_OK)
 		return err;
 	if (len > (ssize_t)sizeof(*f))

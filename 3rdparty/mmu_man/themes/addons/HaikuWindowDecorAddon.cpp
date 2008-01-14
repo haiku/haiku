@@ -16,6 +16,7 @@
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
+#include <Debug.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -27,13 +28,36 @@
 #define instanciate_themes_addon instanciate_themes_addon_window_decor
 #endif
 
-//XXX: FIXME
-ThemesAddon *instanciate_themes_addon()
-{
-	return NULL;
-}
+#define DERR(e) { PRINT(("%s: err: %s\n", __FUNCTION__, strerror(e))); }
 
-#if 0 // DANO...
+namespace BPrivate {
+int32 count_decorators(void);
+int32 get_decorator(void);
+status_t get_decorator_name(const int32 &index, BString &name);
+status_t get_decorator_preview(const int32 &index, BBitmap *bitmap);
+status_t set_decorator(const int32 &index);
+} 
+
+using namespace BPrivate;
+
+status_t set_decorator(const char *name)
+{
+	BString n;
+	status_t err;
+	int i = count_decorators() - 1;
+	for (; i > -1; i--) {
+		err = get_decorator_name(i, n);
+		DERR(err);
+		if (err < B_OK)
+			continue;
+		if (n == name) {
+			err = set_decorator(i);
+			DERR(err);
+			return err;
+		}
+	}
+	return ENOENT;
+}
 
 #define A_NAME "Window Decor"
 #define A_MSGNAME Z_THEME_WINDOW_DECORATIONS
@@ -75,16 +99,11 @@ status_t	DecorThemesAddon::RunPreferencesPanel()
 	status_t err;
 	entry_ref ref;
 	BEntry ent;
-	err = ent.SetTo("/system/add-ons/Preferences/Appearance");
+	err = ent.SetTo("/boot/beos/references/Appearance");
 	if (!err) {
 		err = ent.GetRef(&ref);
 		if (!err) {
 			err = be_roster->Launch(&ref);
-			if (err) {
-				BMessage msg(B_REFS_RECEIVED);
-				msg.AddRef("refs", &ref);
-				be_app_messenger.SendMessage(&msg);
-			}
 		}
 	}
 	return err;
@@ -107,9 +126,13 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 
 	(void)flags;
 	err = MyMessage(theme, window_decor);
+	DERR(err);
 	if (err)
 		return err;
-	
+
+	if (window_decor.FindString("window:decor", &decorName) == B_OK)
+		set_decorator(decorName.String());
+#if 0
 #ifdef B_BEOS_VERSION_DANO
 	if (window_decor.FindString("window:decor", &decorName) == B_OK)
 		set_window_decor(decorName.String(), 
@@ -119,6 +142,7 @@ extern void __set_window_decor(int32 theme);
 	int32 decorNr = 0;
 	if (window_decor.FindInt32("window:R5:decor", &decorNr) == B_OK)
 		__set_window_decor(decorNr);
+#endif
 #endif
 	// XXX: add colors à la WindowShade ?
 	
@@ -134,11 +158,20 @@ status_t DecorThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	
 	(void)flags;
 	err = MyMessage(theme, window_decor);
+	DERR(err);
 	if (err)
 		window_decor.MakeEmpty();
-	
+
+	err = get_decorator_name(get_decorator(), decorName);
+	DERR(err);
+	if (err == B_OK) {
+		window_decor.AddString("window:decor", decorName.String());
+		window_decor.AddMessage("window:decor_globals", &globals);
+	}
+#if 0
 #ifdef B_BEOS_VERSION_DANO
 	err = get_window_decor(&decorName, &globals);
+	DERR(err);
 	if (err == B_OK) {
 		window_decor.AddString("window:decor", decorName.String());
 		window_decor.AddMessage("window:decor_globals", &globals);
@@ -146,8 +179,10 @@ status_t DecorThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 #else
 	window_decor.AddInt32("window:R5:decor", 0);
 #endif
+#endif
 	
 	err = SetMyMessage(theme, window_decor);
+	DERR(err);
 	return err;
 }
 
@@ -166,7 +201,5 @@ ThemesAddon *instanciate_themes_addon()
 {
 	return (ThemesAddon *) new DecorThemesAddon;
 }
-
-#endif
 
 #endif /* B_BEOS_VERSION_DANO */

@@ -2,6 +2,7 @@ SubDir HAIKU_TOP 3rdparty mmu_man themes ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+#SubDirC++Flags -DSINGLE_BINARY -DDEBUG=1 ;
 SubDirC++Flags -DSINGLE_BINARY ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) 3rdparty mmu_man themes addons ] ;

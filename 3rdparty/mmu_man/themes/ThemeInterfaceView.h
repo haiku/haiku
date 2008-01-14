@@ -16,7 +16,7 @@ class BScrollView;
 class BTextView;
 class BMessage;
 class BStringView;
-class BInvoker;
+class MyInvoker;
 
 class ThemeInterfaceView : public BView
 {
@@ -49,12 +49,14 @@ class ThemeInterfaceView : public BView
 		status_t			AError(const char *func, status_t err);
 
 	private:
-
+		static int32		_ThemeListPopulatorTh(void *arg);
+		void				_ThemeListPopulator();
+		
 		ThemeManager*		fThemeManager;
 		bool				fScreenshotPaneHidden;
 		bool				fHasScreenshot;
 		
-		BInvoker*			fPopupInvoker;
+		MyInvoker*			fPopupInvoker;
 		BScrollView*		fThemeListSV;
 		BListView*			fThemeList;
 		BButton*			fApplyBtn;

@@ -77,6 +77,49 @@ filter_result refs_filter(BMessage *message, BHandler **handler, BMessageFilter 
 }
 
 // ------------------------------------------------------------------------------
+class MyInvoker : public BInvoker {
+	public:
+		MyInvoker(BMessage* message, const BHandler* handler, const BLooper* looper = NULL);
+		virtual ~MyInvoker();
+		virtual status_t Invoke(BMessage* message = NULL);
+		void SetOwner(TextInputAlert *alert);
+	private:
+		TextInputAlert *fOwner;
+};
+
+
+MyInvoker::MyInvoker(BMessage* message, const BHandler* handler, const BLooper* looper = NULL)
+	: BInvoker(message, handler, looper)
+{
+}
+
+
+MyInvoker::~MyInvoker()
+{
+}
+
+
+status_t
+MyInvoker::Invoke(BMessage* message)
+{
+	BMessage *out = Message();
+	if (out) {
+		if (out->ReplaceString("text", fOwner->TextControl()->TextView()->Text()) == B_OK || 
+			out->AddString("text", fOwner->TextControl()->TextView()->Text()) == B_OK)
+			return BInvoker::Invoke();
+	}
+	return EINVAL;
+}
+
+
+void
+MyInvoker::SetOwner(TextInputAlert *alert)
+{
+	fOwner = alert;
+}
+
+
+// ------------------------------------------------------------------------------
 //extern "C" BView *get_pref_view(const BRect& Bounds)
 extern "C" BView *themes_pref(const BRect& Bounds)
 {
@@ -113,7 +156,7 @@ ThemeInterfaceView::AllAttached()
 {
 	BView::AllAttached();
 	
-	fPopupInvoker = new BInvoker(new BMessage(kReallyCreateTheme), this);
+	fPopupInvoker = new MyInvoker(new BMessage(kReallyCreateTheme), this);
 #ifdef B_BEOS_VERSION_DANO
 	SetViewUIColor(B_UI_PANEL_BACKGROUND_COLOR);
 #else
@@ -121,7 +164,6 @@ ThemeInterfaceView::AllAttached()
 #endif
 	
 	fThemeManager = new ThemeManager;
-	fThemeManager->LoadThemes();
 
 	BRect frame = Bounds();
 	frame.InsetBy(10.0, 10.0);
@@ -233,8 +275,8 @@ ThemeInterfaceView::AllAttached()
 	fAddonList->SetTarget(this);	
 	fAddonListSV->Hide();
 
-	PopulateThemeList();
 	PopulateAddonList();
+	PopulateThemeList();
 }
 
 // ------------------------------------------------------------------------------
@@ -269,7 +311,8 @@ ThemeInterfaceView::MessageReceived(BMessage *_msg)
 
 		case kCreateThemeBtn:
 		{
-			TextInputAlert *alert = new TextInputAlert("New name", "New Theme Name", "", "Ok", "Cancel");
+			TextInputAlert *alert = new TextInputAlert("New name", "New Theme Name", "My Theme", "Ok");
+			fPopupInvoker->SetOwner(alert);
 			alert->Go(fPopupInvoker);
 			break;
 		}
@@ -427,22 +470,60 @@ bool ThemeInterfaceView::IsScreenshotPaneHidden()
 // ------------------------------------------------------------------------------
 void ThemeInterfaceView::PopulateThemeList()
 {
+	int i;
+	BControl *c;
+	for (i = 0; ChildAt(i); i++) {
+		c = dynamic_cast<BControl *>(ChildAt(i));
+		if (c)
+			c->SetEnabled(false);
+	}
+	thread_id tid = spawn_thread(_ThemeListPopulatorTh, "", B_LOW_PRIORITY, this);
+	resume_thread(tid);
+}
+
+// ------------------------------------------------------------------------------
+int32 ThemeInterfaceView::_ThemeListPopulatorTh(void *arg)
+{
+	ThemeInterfaceView *_this = (ThemeInterfaceView *)arg;
+	_this->_ThemeListPopulator();
+	return 0;
+}
+
+// ------------------------------------------------------------------------------
+void ThemeInterfaceView::_ThemeListPopulator()
+{
 	status_t err;
 	int32 i, count;
 	BString name;
 	ThemeItem *ti;
 	bool isro;
+
 	ThemeManager* tman = GetThemeManager();
+	tman->LoadThemes();
+
 	count = tman->CountThemes();
+	LockLooper();
 	fThemeList->MakeEmpty();
+	UnlockLooper();
 	for (i = 0; i < count; i++) {
 		err = tman->ThemeName(i, name);
 		isro = tman->ThemeIsReadOnly(i);
 		if (err)
 			continue;
 		ti = new ThemeItem(i, name.String(), isro);
+		LockLooper();
 		fThemeList->AddItem(ti);
+		UnlockLooper();
 	}
+
+	BControl *c;
+	LockLooper();
+	for (i = 0; ChildAt(i); i++) {
+		c = dynamic_cast<BControl *>(ChildAt(i));
+		if (c)
+			c->SetEnabled(true);
+	}
+	UnlockLooper();
 }
 
 // ------------------------------------------------------------------------------

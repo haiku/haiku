@@ -30,8 +30,10 @@
 
 extern status_t MakeScreenshot(BBitmap **here);
 
+// addons used in the prefs in Zeta (some were disabled)
+//#define ZETA_ADDONS
 
-#define DEBUG_TM
+//#define DEBUG_TM
 #ifdef DEBUG_TM
 #define FENTRY PRINT(("ThemeManager::%s()\n", __FUNCTION__))
 #else
@@ -161,48 +163,43 @@ status_t ThemeManager::LoadAddons()
 		//if (err)	return err;
 	}
 #else
+
+#define ADDA(a) \
+	if (ta) { \
+		fAddonList.AddItem((void *)ta); \
+		PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName())); \
+	}
+
+
 	ta = instanciate_themes_addon_backgrounds();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 	ta = instanciate_themes_addon_beide();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 	ta = instanciate_themes_addon_deskbar();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
-#if 0
+	ADDA(ta);
+#ifndef ZETA_ADDONS
 	ta = instanciate_themes_addon_eddie();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 #endif
 	ta = instanciate_themes_addon_pe();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 	ta = instanciate_themes_addon_screensaver();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
-#if 0
+	ADDA(ta);
+#ifndef ZETA_ADDONS
 	ta = instanciate_themes_addon_soundplay();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 #endif
 	ta = instanciate_themes_addon_sounds();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
 	ta = instanciate_themes_addon_terminal();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 	ta = instanciate_themes_addon_ui_settings();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
-#if 0
+	ADDA(ta);
+#ifndef ZETA_ADDONS
 	ta = instanciate_themes_addon_winamp_skin();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 #endif
 	ta = instanciate_themes_addon_window_decor();
-	fAddonList.AddItem((void *)ta);
-	PRINT(("ThemeManager: Added addon %ld '%s', msgname '%s'\n", ta->ImageId(), ta->Name(), ta->MessageName()));
+	ADDA(ta);
 #endif
 	//if (err)	return err;
 	fAddonCount = fAddonList.CountItems();

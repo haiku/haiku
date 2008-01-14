@@ -113,14 +113,17 @@ status_t ThemesAddon::MyMessage(BMessage &theme, BMessage &mine)
 {
 	FENTRY;
 	BMessage msg;
-	status_t err;
+	status_t err = B_NAME_NOT_FOUND;
 	if (!MessageName())
-		return B_NAME_NOT_FOUND;
+		goto error;
 	err = theme.FindMessage(MessageName(), &msg);
 	if (err)
-		return err;
+		goto error;
 	mine = msg;
+	
 	return B_OK;
+error:
+	return err;
 }
 
 status_t ThemesAddon::SetMyMessage(BMessage &theme, BMessage &mine)

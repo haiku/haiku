@@ -2,6 +2,7 @@
 #define TEXT_INPUT_ALERT_H
 
 #include <Alert.h>
+#include <TextControl.h>
 
 class TextInputAlert : public BAlert {
 	public:
@@ -14,7 +15,14 @@ class TextInputAlert : public BAlert {
 						button_width widthStyle = B_WIDTH_AS_USUAL,
 						alert_type type = B_INFO_ALERT);
 		virtual ~TextInputAlert();
+		virtual void Show();
+
+		const char *Text() const { return fText->Text(); };
+		BTextControl *TextControl() const { return fText; };
+
 		
+	private:
+		BTextControl *fText;
 };
 
 #endif /* TEXT_INPUT_ALERT_H */
