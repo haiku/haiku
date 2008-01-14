@@ -596,7 +596,7 @@ BColorControl::MouseDown(BPoint point)
 
 	SetTracking(true);
 	MakeFocus();
-	SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	SetMouseEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY|B_LOCK_WINDOW_FOCUS);
 }
 
 
