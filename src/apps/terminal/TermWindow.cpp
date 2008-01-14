@@ -11,7 +11,6 @@
 
 #include "Arguments.h"
 #include "Coding.h"
-#include "ColorWindow.h"
 #include "MenuUtil.h"
 #include "FindWindow.h"
 #include "PrefWindow.h"
