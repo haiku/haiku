@@ -19,6 +19,14 @@
  *	the entry function of the embedded ELF part of the loader.
  */
 
+/*
+ * generate boot floppy:
+ * cd src/system/boot/platform/atari_m68k/ ; make fixup_tos_floppy_chksum; cd -
+ * dd if=generated/objects/haiku/m68k/release/system/boot/zbeos of=~/floppy.img bs=512 count=20 conv=notrunc
+ * src/system/boot/platform/atari_m68k/fixup_tos_floppy_chksum ~/floppy.img
+ * generate .prg:
+ * generated.m68k/cross-tools/bin/m68k-unknown-haiku-ld -o haiku.prg -T src/system/boot/platform/atari_m68k/prg.ld generated/objects/haiku/m68k/release/system/boot/boot_loader_atari_m68k
+ */
 
 #include "atari_memory_map.h"
 #include "toscalls.h"
@@ -34,9 +42,36 @@
 	// retry this many times until it will report a failure
 
 //.text
-
+_bs_entry:
 /* main entry point, both from the floppy boot and .prg */
-	bra			real_entry
+	//bra.s	skip_fat_skim
+	bra.s	real_entry
+	//bra.s	_bs_entry
+//FAT lookalike to avoid nasty things from happening
+// http://alive.atari.org/alive10/btmania.php
+	.ascii	"Haiku0"
+	.byte	0xbe, 0x50, 0x38 // id
+	//LE
+	.byte	0x00, 0x02	//BPS
+	.byte	0x02		//SPC
+	//.byte	0x00		//???
+	.byte	0x00, 0x02	//RES - number of reserved sectors
+	.byte	0x00//0x02	//NFATS
+	.byte	0x00/*70*/, 0x00	//NDIRS
+	.byte	0x00, 0x02		//NSECTS
+	.byte	0xf8			//MEDIA
+	.byte	0x05, 0x00		//SPF
+	.byte	0x09, 0x00		//SPT
+	.byte	0x02, 0x00		//NSIDES
+	.byte	0x00, 0x00		//NHID
+	// we're done
+
+skip_fat_skim:
+//	lea		str,%a0
+//	bsr		puts
+//	bra skip_fat_skim
+	//rts
+//	bra			real_entry
 
 sNumSectors:
 	// this location will contain the length of the boot loader as
@@ -46,6 +81,10 @@ sNumSectors:
 	.word	0x0180
 
 real_entry:
+
+	//Pterm0
+	//move.w	#1,%d0
+	//trap	#1
 
 	// first, determine if .prg (user) or bootsect (super)
 	// Super()
@@ -59,6 +98,9 @@ real_entry:
 	//bra			bootsect_start
 	rts
 floppy_start:
+	lea		str,%a0
+	bsr		puts
+	bra floppy_start
 	// no interrupt
 	and.w		#0x0700,%sr
 	// setup stack
@@ -122,7 +164,7 @@ prg_start:
 	move.l		%d0,saved_super_stack
 	// all done
 	lea			unimpl,%a0
-	jsr			puts
+	bsr			puts
 spin:
 	bra			spin
 
@@ -181,12 +223,12 @@ unimpl:
 	.string "Unimplemented."
 
 shell_end:
-	.fill	0x01fe - tmp_floppy_end, 1, 0x55
-//	.org	0x01fe
+	//.fill	(0x01fe - shell_end), 1, 0x55
+	.org	0x01fe
 	.word	0xaa55-1	// will be replaced by the one calculated by the build.
 				// we make sure we PCs don't try to execute it.
 		// this bumps the "start" label to offset 0x0200 as
 		// expected by the BFS boot loader, and also marks
 		// this block as valid boot block for the BIOS
 		// XXX: actually TOS wants a real checksum here so sum is 0x1234!
-tmp_floppy_end:
+

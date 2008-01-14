@@ -17,13 +17,17 @@ int main(int argc, char **argv)
 		perror("read");
 		return 1;
 	}
-	for (sum = 0, i = 0; i < (512-2); i++) {
-		sum += p[i];
+	for (sum = 0, i = 0; i < (512-2)/2; i++) {
+		uint16_t v;
+		v = *p++ << 8;
+		v += *p++;
+		sum += v;
 	}
-	sum = 0x1234 - sum;
+	sum = 0x1234 - sum + 1;
+	//sum = 0xaa55;
 	// big endian
-	p[512-2] = (uint8_t)(sum >> 8);
-	p[512-1] = (uint8_t)sum;
+	*p++ = (uint8_t)(sum >> 8);
+	*p++ = (uint8_t)sum;
 	//lseek(fd, 0LL, SEEK_SET);
 	write(fd, &sector[512-2], 2);
 	return 0;
