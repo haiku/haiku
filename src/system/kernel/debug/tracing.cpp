@@ -201,7 +201,7 @@ dump_tracing(int argc, char** argv)
 
 	if (start < 0)
 		start = 0;
-	if (start + count > sEntries)
+	if (uint32(start + count) > sEntries)
 		count = sEntries - start;
 
 	int32 index = 0;
@@ -229,10 +229,7 @@ dump_tracing(int argc, char** argv)
 
 			dumped++;
 
-			if (pattern != NULL)
-				kprintf("%5ld. %s\n", index, buffer);
-			else
-				kprintf("%s\n", buffer);
+			kprintf("%5ld. %s\n", index, buffer);
 		} else
 			kprintf("%5ld. ** uninitialized entry **\n", index);
 	}
@@ -249,6 +246,9 @@ dump_tracing(int argc, char** argv)
 extern "C" uint8*
 alloc_tracing_buffer(size_t size)
 {
+	if (size == 0)
+		return NULL;
+
 #if	ENABLE_TRACING
 	trace_entry* entry = allocate_entry(size + sizeof(trace_entry));
 	if (entry == NULL)
