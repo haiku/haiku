@@ -48,50 +48,6 @@
 // system, like out of memory situations - should only panic for debugging.
 #define FATAL(x) panic x
 
-#ifdef TRANSACTION_TRACING
-namespace TransactionTracing {
-
-class Start : public AbstractTraceEntry {
-	public:
-		Start(cache_transaction *transaction)
-			:
-			fTransaction(transaction)
-		{
-			Initialized();
-		}
-
-		virtual void AddDump(char *buffer, size_t size)
-		{
-		}
-
-	private:
-		cache_transaction	*fTransaction;
-};
-
-class Cancel : public AbstractTraceEntry {
-	public:
-		Cancel(cache_transaction *transaction)
-			:
-			fTransaction(transaction)
-		{
-			Initialized();
-		}
-
-		virtual void AddDump(char *buffer, size_t size)
-		{
-		}
-
-	private:
-		cache_transaction	*fTransaction;
-};
-
-}	// namespace TransactionTracing
-
-#	define T(x) new(std::nothrow) TransactionTracing::x;
-#else
-#	define T(x) ;
-#endif
-
 
 struct cache_hook : DoublyLinkedListLinkImpl<cache_hook> {
 	transaction_notification_hook	hook;
@@ -115,6 +71,121 @@ struct cache_transaction {
 	bool			open;
 	bool			has_sub_transaction;
 };
+
+#ifdef TRANSACTION_TRACING
+namespace TransactionTracing {
+
+class Start : public AbstractTraceEntry {
+	public:
+		Start(block_cache *cache, cache_transaction *transaction)
+			:
+			fCache(cache),
+			fTransaction(transaction),
+			fID(transaction->id),
+			fSub(transaction->has_sub_transaction),
+			fNumBlocks(transaction->num_blocks),
+			fSubNumBlocks(transaction->sub_num_blocks)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "cache %p, start transaction %p (id %ld)%s"
+				", %ld/%ld blocks", fCache, fTransaction, fID,
+				fSub ? " sub" : "", fNumBlocks, fSubNumBlocks);
+		}
+
+	private:
+		block_cache			*fCache;
+		cache_transaction	*fTransaction;
+		int32				fID;
+		bool				fSub;
+		int32				fNumBlocks;
+		int32				fSubNumBlocks;
+};
+
+class Detach : public AbstractTraceEntry {
+	public:
+		Detach(block_cache *cache, cache_transaction *transaction,
+				cache_transaction *newTransaction)
+			:
+			fCache(cache),
+			fTransaction(transaction),
+			fID(transaction->id),
+			fSub(transaction->has_sub_transaction),
+			fNewTransaction(newTransaction),
+			fNewID(newTransaction->id)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "cache %p, detach transaction %p (id %ld)"
+				"from transaction %p (id %ld)%s",
+				fCache, fNewTransaction, fNewID, fTransaction, fID,
+				fSub ? " sub" : "");
+		}
+
+	private:
+		block_cache			*fCache;
+		cache_transaction	*fTransaction;
+		int32				fID;
+		bool				fSub;
+		cache_transaction	*fNewTransaction;
+		int32				fNewID;
+};
+
+class Abort : public AbstractTraceEntry {
+	public:
+		Abort(block_cache *cache, cache_transaction *transaction)
+			:
+			fCache(cache),
+			fTransaction(transaction),
+			fID(transaction->id),
+			fNumBlocks(0)
+		{
+			bool isSub = transaction->has_sub_transaction;
+			fNumBlocks = isSub ? transaction->sub_num_blocks
+				: transaction->num_blocks;
+			fBlocks = (off_t *)alloc_tracing_buffer(fNumBlocks * sizeof(off_t));
+			if (fBlocks != NULL) {
+				cached_block *block = transaction->first_block;
+				for (int32 i = 0; block != NULL && i < fNumBlocks;
+						block = block->transaction_next) {
+					fBlocks[i++] = block->block_number;
+				}
+			} else
+				fNumBlocks = 0;
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			int length = snprintf(buffer, size, "cache %p, abort transaction "
+				"%p (id %ld), blocks", fCache, fTransaction, fID);
+			for (int32 i = 0; i < fNumBlocks && (size_t)length < size; i++) {
+				length += snprintf(buffer + length, size - length, " %Ld",
+					fBlocks[i]);
+			}
+		}
+
+	private:
+		block_cache			*fCache;
+		cache_transaction	*fTransaction;
+		int32				fID;
+		off_t				*fBlocks;
+		int32				fNumBlocks;
+};
+
+}	// namespace TransactionTracing
+
+#	define T(x) new(std::nothrow) TransactionTracing::x;
+#else
+#	define T(x) ;
+#endif
+
 
 static status_t write_cached_block(block_cache *cache, cached_block *block,
 	bool deleteTransaction = true);
@@ -804,8 +875,8 @@ write_cached_block(block_cache *cache, cached_block *block,
 static int
 dump_cache(int argc, char **argv)
 {
-	if (argc < 2) {
-		kprintf("usage: %s [-b] <address>\n", argv[0]);
+	if (argc < 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [-b] <address> [block-number]\n", argv[0]);
 		return 0;
 	}
 
@@ -816,9 +887,49 @@ dump_cache(int argc, char **argv)
 		i++;
 	}
 
-	block_cache *cache = (struct block_cache *)strtoul(argv[i], NULL, 0);
+	block_cache *cache = (struct block_cache *)parse_expression(argv[i]);
 	if (cache == NULL) {
 		kprintf("invalid cache address\n");
+		return 0;
+	}
+
+	off_t blockNumber = -1;
+	if (i + 1 < argc) {
+		blockNumber = strtoll(argv[i + 1], NULL, 0);
+		cached_block *block = (cached_block *)hash_lookup(cache->hash,
+			&blockNumber);
+		if (cache != NULL) {
+			kprintf("BLOCK %p\n", block);
+			kprintf(" current data:  %p\n", block->current_data);
+			kprintf(" original data: %p\n", block->original_data);
+			kprintf(" parent data:   %p\n", block->parent_data);
+			kprintf(" ref_count:     %ld\n", block->ref_count);
+			kprintf(" accessed:      %ld\n", block->accessed);
+			kprintf(" flags:        ");
+			if (block->is_writing)
+				kprintf(" is-writing");
+			if (block->is_dirty)
+				kprintf(" is-dirty");
+			if (block->unused)
+				kprintf(" unused");
+			if (block->unmapped)
+				kprintf(" unmapped");
+			kprintf("\n");
+			if (block->transaction != NULL) {
+				kprintf(" transaction:   %p (%ld)\n", block->transaction,
+					block->transaction->id);
+				if (block->transaction_next != NULL) {
+					kprintf(" next in transaction: %Ld\n",
+						block->transaction_next->block_number);
+				}
+			}
+			if (block->previous_transaction != NULL) {
+				kprintf(" previous transaction: %p (%ld)\n",
+					block->previous_transaction,
+					block->previous_transaction->id);
+			}
+		} else
+			kprintf("block %Ld not found\n", blockNumber);
 		return 0;
 	}
 
@@ -914,6 +1025,7 @@ cache_start_transaction(void *_cache)
 	cache->last_transaction = transaction;
 
 	TRACE(("cache_start_transaction(): id %ld started\n", transaction->id));
+	T(Start(cache, transaction));
 
 	hash_insert(cache->transaction_hash, transaction);
 
@@ -1024,6 +1136,7 @@ cache_abort_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 	}
 
+	T(Abort(cache, transaction));
 	notify_transaction_listeners(transaction, TRANSACTION_ABORTED);
 
 	// iterate through all blocks and restore their original contents
@@ -1083,6 +1196,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 		return B_NO_MEMORY;
 
 	newTransaction->id = atomic_add(&cache->next_transaction_id, 1);
+	T(Detach(cache, transaction, newTransaction));
 
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
@@ -1153,6 +1267,7 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 	if (!transaction->has_sub_transaction)
 		return B_BAD_VALUE;
 
+	T(Abort(cache, transaction));
 	notify_transaction_listeners(transaction, TRANSACTION_ABORTED);
 
 	// revert all changes back to the version of the parent
@@ -1223,6 +1338,7 @@ cache_start_sub_transaction(void *_cache, int32 id)
 	// all subsequent changes will go into the sub transaction
 	transaction->has_sub_transaction = true;
 	transaction->sub_num_blocks = 0;
+	T(Start(cache, transaction));
 
 	return B_OK;
 }
