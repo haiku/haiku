@@ -19,10 +19,13 @@ public:
 
 	// BView interface
 	virtual	void				Draw(BRect updateRect);	
+	virtual	void				FrameResized(float width, float height);
 
 			void				SetDisk(BDiskDevice* disk,
 									partition_id selectedPartition);
 private:
+			void				_UpdateLayout();
+
 			BDiskDevice*		fDisk;
 
 			class PartitionDrawer;

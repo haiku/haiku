@@ -7,7 +7,6 @@
  */
 #include "DiskView.h"
 
-#include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
 #include <HashMap.h>
 
@@ -122,11 +121,22 @@ public:
 				frame.InsetBy(1, 1);
 				fView->StrokeRect(frame);
 				frame.InsetBy(1, 1);
+			} else {
+				fView->SetHighColor(tint_color(box.color, B_DARKEN_2_TINT));
+				frame.InsetBy(-1, -1);
+				fView->StrokeRect(frame);
+				frame.InsetBy(1, 1);
 			}
 	
 			fView->SetHighColor(box.color);
 			fView->FillRect(frame);
 		}
+	}
+
+	void Unset()
+	{
+		fColorIndex = 0;
+		fBoxMap.Clear();
 	}
 
  private:
@@ -153,14 +163,15 @@ public:
 
 
 DiskView::DiskView(const BRect& frame, uint32 resizeMode)
-	: Inherited(frame, "diskview", resizeMode, B_WILL_DRAW)
+	: Inherited(frame, "diskview", resizeMode,
+		B_WILL_DRAW | B_FRAME_EVENTS)
 	, fDisk(NULL)
 	, fPartitionDrawer(new PartitionDrawer(this))
 {
 	for (int32 i = 0; i < kMaxPartitionColors; i++) {
-		kPartitionColors[i].red = 120 + ((i * 1675) & 120);
-		kPartitionColors[i].green = 120 + ((i * 318) & 120);
-		kPartitionColors[i].blue = 120 + ((i * 9328) & 120);
+		kPartitionColors[i].red = 90 + ((i * 1675) & 160);
+		kPartitionColors[i].green = 90 + ((i * 318) & 160);
+		kPartitionColors[i].blue = 90 + ((i * 9328) & 160);
 		kPartitionColors[i].alpha = 255;
 	}
 }
@@ -190,14 +201,32 @@ DiskView::Draw(BRect updateRect)
 
 
 void
+DiskView::FrameResized(float width, float height)
+{
+	_UpdateLayout();
+}
+
+
+void
 DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)
 {
-	delete fDisk;
 	fDisk = disk;
 	fPartitionDrawer->SetSelectedPartition(selectedPartition);
+	_UpdateLayout();
+}
 
-	BDiskDeviceRoster roster;
-	roster.VisitEachPartition(fPartitionDrawer, fDisk);
+
+// #pragma mark -
+
+
+void
+DiskView::_UpdateLayout()
+{
+	fPartitionDrawer->Unset();
+
+	if (fDisk)
+		fDisk->VisitEachDescendant(fPartitionDrawer);
 
 	Invalidate();
 }
+

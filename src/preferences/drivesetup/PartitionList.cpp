@@ -68,6 +68,8 @@ PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 	AddColumn(new BStringColumn("Volume Name", 130, 50, 500, B_TRUNCATE_MIDDLE), kVolumeNameColumn);
 	AddColumn(new BStringColumn("Mounted At", 100, 50, 500, B_TRUNCATE_MIDDLE), kMountedAtColumn);
 	AddColumn(new BStringColumn("Size", 100, 50, 500, B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
+
+	SetSortingEnabled(false);
 }
 
 
@@ -75,7 +77,8 @@ PartitionListRow*
 PartitionListView::FindRow(partition_id id, PartitionListRow* parent)
 {
 	for (int32 i = 0; i < CountRows(parent); i++) {
-		PartitionListRow* item = dynamic_cast<PartitionListRow*>(RowAt(i, parent));
+		PartitionListRow* item
+			= dynamic_cast<PartitionListRow*>(RowAt(i, parent));
 		if (item != NULL && item->ID() == id)
 			return item;
 		if (CountRows(item) > 0) {
@@ -95,29 +98,42 @@ PartitionListView::AddPartition(BPartition* partition)
 {
 	PartitionListRow* partitionrow = FindRow(partition->ID());
 	
-	// Forget about it if this partition is already in the listview
+	// forget about it if this partition is already in the listview
 	if (partitionrow != NULL) {
 		return partitionrow;
 	}
 	
-	// Create the row for this partition
+	// create the row for this partition
 	partitionrow = new PartitionListRow(partition);
+	PartitionListRow* parent = NULL;
 
-	// If this partition has a parent...
+	// see if this partition has a parent, or should have
+	// a parent (add it in this case)
 	if (partition->Parent() != NULL) {
 		// check if it is in the listview
-		PartitionListRow* parent = FindRow(partition->Parent()->ID());
+		parent = FindRow(partition->Parent()->ID());
 		// If parent of this partition is not yet in the list
 		if (parent == NULL) {
 			// add it
 			parent = AddPartition(partition->Parent());
 		}
-		// Now it is ok to add this partition under its parent
-		AddRow(partitionrow, parent);
-	} else {
-		// If this partition has no parent, add it in the 'root'
-		AddRow(partitionrow);
 	}
+
+	// find a proper insertion index based on the id
+	int32 index = 0;
+	int32 count = CountRows(parent);
+	for (; index < count; index++) {
+		PartitionListRow* item
+			= dynamic_cast<PartitionListRow*>(RowAt(index, parent));
+		if (item && item->ID() > partition->ID())
+			break;
+	}
+
+	// add the row, parent may be NULL (add at top level)
+	AddRow(partitionrow, index, parent);
+
+	// make sure the row is initially expanded
+	ExpandOrCollapse(partitionrow, true);
 	
 	return partitionrow;
 }
