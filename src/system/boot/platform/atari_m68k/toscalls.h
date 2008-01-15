@@ -56,8 +56,8 @@ extern "C" {
 		trap	%[trapn]\n			\
 		add.l	#4,%%sp \n "			\
 	: "=r"(retvalue)	/* output */		\
-	: [trapn]"i"(trapnr),[calln]"i"(callnr), 	\
-	  "r"(_p1)			/* input */	\
+	: "r"(_p1),			/* input */	\
+	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
 	: TOS_CLOBBER_LIST /* clobbered regs */		\
 	);						\
 	retvalue;					\
@@ -75,8 +75,8 @@ extern "C" {
 		trap	%[trapn]\n			\
 		add.l	#6,%%sp \n "			\
 	: "=r"(retvalue)	/* output */		\
-	: [trapn]"i"(trapnr),[calln]"i"(callnr),	\
-	  "r"(_p1)			/* input */	\
+	: "r"(_p1),			/* input */	\
+	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
 	: TOS_CLOBBER_LIST /* clobbered regs */		\
 	);						\
 	retvalue;					\
@@ -96,8 +96,8 @@ extern "C" {
 		trap	%[trapn]\n			\
 		add.l	#6,%%sp \n "			\
 	: "=r"(retvalue)	/* output */		\
-	: [trapn]"i"(trapnr),[calln]"i"(callnr),	\
-	  "r"(_p1), "r"(_p2)		/* input */	\
+	: "r"(_p1), "r"(_p2),		/* input */	\
+	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
 	: TOS_CLOBBER_LIST /* clobbered regs */		\
 	);						\
 	retvalue;					\
@@ -123,12 +123,12 @@ extern "C" {
 		move.w	%1,-(%%sp) \n			\
 		move.w	%[calln],-(%%sp)\n		\
 		trap	%[trapn]\n			\
-		add.l	#6,%%sp \n "			\
+		add.l	#18,%%sp \n "			\
 	: "=r"(retvalue)	/* output */		\
-	: [trapn]"i"(trapnr),[calln]"i"(callnr),	\
-	  "r"(_p1), "r"(_p2),				\
+	: "r"(_p1), "r"(_p2),				\
 	  "r"(_p3), "r"(_p4),				\
-	  "r"(_p5), "r"(_p6)		  /* input */	\
+	  "r"(_p5), "r"(_p6),		/* input */	\
+	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
 	: TOS_CLOBBER_LIST /* clobbered regs */		\
 	);						\
 	retvalue;					\
