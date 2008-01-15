@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BLOCK_CACHE_PRIVATE_H
@@ -125,13 +125,17 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 
 	block_range *GetFreeRange();
 	block_range *GetRange(void *address);
-	void RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX, int32 count = LONG_MAX);
+	void RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX,
+		int32 count = LONG_MAX);
 	void FreeBlock(cached_block *block);
 	cached_block *NewBlock(off_t blockNumber);
 	void Free(void *address);
 	void *Allocate();
 
 	static void LowMemoryHandler(void *data, int32 level);
+
+private:
+	cached_block *_GetUnusedBlock();
 };
 
 

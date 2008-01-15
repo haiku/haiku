@@ -463,24 +463,51 @@ block_cache::FreeBlock(cached_block *block)
 }
 
 
+cached_block *
+block_cache::_GetUnusedBlock()
+{
+	TRACE(("block_cache: get unused block\n"));
+
+	for (block_list::Iterator iterator = unused_blocks.GetIterator();
+			cached_block *block = iterator.Next();) {
+		// this can only happen if no transactions are used
+		if (block->is_dirty)
+			write_cached_block(this, block, false);
+
+		// remove block from lists
+		iterator.Remove();
+		hash_remove(hash, block);
+		return block;
+	}
+
+	return NULL;
+}
+
+
 /*! Allocates a new block for \a blockNumber, ready for use */
 cached_block *
 block_cache::NewBlock(off_t blockNumber)
 {
 	cached_block *block = new(nothrow) cached_block;
+	if (block != NULL) {
+		block_range *range = GetFreeRange();
+		if (range == NULL) {
+			delete block;
+			block = NULL;
+		} else
+			range->Allocate(this, block);
+	}
 	if (block == NULL) {
-		FATAL(("could not allocate block!\n"));
-		return NULL;
-	}
+		dprintf("block allocation failed, unused list is %sempty.\n",
+			unused_blocks.IsEmpty() ? "" : "not ");
 
-	block_range *range = GetFreeRange();
-	if (range == NULL) {
-		FATAL(("could not get range!\n"));
-		delete block;
-		return NULL;
+		// allocation failed, try to reuse an unused block
+		block = _GetUnusedBlock();
+		if (block == NULL) {
+			FATAL(("could not allocate block!\n"));
+			return NULL;
+		}
 	}
-
-	range->Allocate(this, block);
 
 	block->block_number = blockNumber;
 	block->ref_count = 0;
@@ -504,9 +531,8 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 {
 	TRACE(("block_cache: remove up to %ld unused blocks\n", count));
 
-	for (block_list::Iterator it = unused_blocks.GetIterator();
-		 cached_block *block = it.Next();) {
-
+	for (block_list::Iterator iterator = unused_blocks.GetIterator();
+			cached_block *block = iterator.Next();) {
 		if (maxAccessed < block->accessed)
 			continue;
 
@@ -518,7 +544,7 @@ block_cache::RemoveUnusedBlocks(int32 maxAccessed, int32 count)
 			write_cached_block(this, block, false);
 
 		// remove block from lists
-		it.Remove();
+		iterator.Remove();
 		hash_remove(hash, block);
 
 		FreeBlock(block);
@@ -946,27 +972,37 @@ dump_cache(int argc, char **argv)
 
 	if (showBlocks) {
 		kprintf(" blocks:\n");
-		kprintf("address  block no. current  original parent    refs access flags transact prev. trans\n");
+		kprintf("address  block no. current  original parent    refs access "
+			"flags transact prev. trans\n");
 	}
 
+	uint32 referenced = 0;
 	uint32 count = 0;
+	uint32 dirty = 0;
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
 	cached_block *block;
 	while ((block = (cached_block *)hash_next(cache->hash, &iterator)) != NULL) {
 		if (showBlocks) {
-			kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c %08lx %08lx\n",
-				(addr_t)block, block->block_number, (addr_t)block->current_data,
-				(addr_t)block->original_data, (addr_t)block->parent_data,
-				block->ref_count, block->accessed, block->busy ? 'B' : '-',
-				block->is_writing ? 'W' : '-', block->is_dirty ? 'B' : '-',
-				block->unused ? 'U' : '-', block->unmapped ? 'M' : '-',
-				(addr_t)block->transaction, (addr_t)block->previous_transaction);
+			kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c %08lx "
+				"%08lx\n", (addr_t)block, block->block_number,
+				(addr_t)block->current_data, (addr_t)block->original_data,
+				(addr_t)block->parent_data, block->ref_count, block->accessed,
+				block->busy ? 'B' : '-', block->is_writing ? 'W' : '-',
+				block->is_dirty ? 'B' : '-', block->unused ? 'U' : '-',
+				block->unmapped ? 'M' : '-', (addr_t)block->transaction,
+				(addr_t)block->previous_transaction);
 		}
+
+		if (block->is_dirty)
+			dirty++;
+		if (block->ref_count)
+			referenced++;
 		count++;
 	}
 
-	kprintf(" %ld blocks.\n", count);
+	kprintf(" %ld blocks total, %ld dirty, %ld referenced.\n", count, dirty,
+		referenced);
 
 	hash_close(cache->hash, &iterator, false);
 	return 0;
