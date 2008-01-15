@@ -15,7 +15,8 @@ extern "C" {
 
 #ifndef __ASSEMBLER__
 #include <OS.h>
-#endif
+#endif /* __ASSEMBLER__ */
+
 
 /* 
  * Atari BIOS calls
@@ -169,7 +170,7 @@ extern int32 gemdos(uint16 nr, ...);
 
 #endif /* __ASSEMBLER__ */
 
-#ifdef __ASSEMBLER__
+#ifndef __ASSEMBLER__
 
 /*
  * error mapping
@@ -243,6 +244,8 @@ static inline const struct tos_osheader *tos_get_osheader()
 #define NF_COOKIE	0x5f5f4e46L	//'__NF'
 #define NF_MAGIC	0x20021021L
 
+#ifndef __ASSEMBLER__
+
 typedef struct {
 	long magic;
 	long (*nfGetID) (const char *);
@@ -253,14 +256,18 @@ extern NatFeatCookie *gNatFeatCookie;
 
 static inline NatFeatCookie *nat_features(void)
 {
+	const struct tos_cookie *c;
 	if (gNatFeatCookie == (void *)-1 || !gNatFeatCookie)
 		return NULL;
-	gNatFeatCookie = tos_find_cookie(NF_COOKIE);
-	if (!gNatFeatCookie || gNatFeatCookie->magic != NF_MAGIC) {
-		gNatFeatCookie = (void *)-1;
-		return NULL;
+	c = tos_find_cookie(NF_COOKIE);
+	if (c) {
+		gNatFeatCookie = (NatFeatCookie *)c->pvalue;
+		if (gNatFeatCookie && gNatFeatCookie->magic == NF_MAGIC) {
+			return gNatFeatCookie;
+		}
 	}
-	return c;
+	gNatFeatCookie = (NatFeatCookie *)-1;
+	return NULL;
 }
 
 
@@ -269,20 +276,14 @@ static inline NatFeatCookie *nat_features(void)
 #define NF_XHDI "XHDI"
 
 #define nfxhdi(code, a...) \
-{ \
-	gNatFeatCookie->nfCall((uint32)
-	if (gNatFeatCookie == NULL) {
-		c = tos_find_cookie(NF_COOKIE);
-	if (!c || c->magic != NF_MAGIC)
-		return NULL;
-	return c;
-} 
+({ \
+	gNatFeatCookie->nfCall((uint32)code, a##...); \
+}) 
 
 
 #define NFXHversion() nfxhdi(0)
 
 #endif /* __ASSEMBLER__ */
-
 
 #ifdef __cplusplus
 }

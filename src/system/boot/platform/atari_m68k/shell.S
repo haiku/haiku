@@ -81,30 +81,57 @@ sNumSectors:
 	.word	0x0180
 
 real_entry:
+	lea		h1,%a0
+	bsr		puts
+	move.l		#0x1234aa55,%d0
+	bsr		putx
+
+
+			//_membot
+	move.l		#0x432,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+
+			//_memtop
+	move.l		#0x436,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+
+			//_v_bas_ad
+	move.l		#0x44e,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+
 
 	//Pterm0
-	//move.w	#1,%d0
+	//move.w	#0,-(%sp)
 	//trap	#1
 
 	// first, determine if .prg (user) or bootsect (super)
 	// Super()
 	move.l		#SUP_INQUIRE,-(%sp)
-	move.w		#0x20,%d0
+	move.w		#0x20,-(%sp)
 	trap		#1
 	addq.l		#6,%sp
-	cmp.w		#SUP_SUPER,%d0
-	beq			floppy_start
+
+	bsr		putx
+
+	cmp.l		#SUP_USER,%d0
+	bne			floppy_start
+	lea		h2,%a0
+	bsr		puts
+
 	bra			prg_start
 	//bra			bootsect_start
 	rts
 floppy_start:
+	lea		h3,%a0
+	bsr		puts
 	lea		str,%a0
 	bsr		puts
-	bra floppy_start
+	//bra floppy_start
 	// no interrupt
-	and.w		#0x0700,%sr
-	// setup stack
-	move.l		#ATARI_ZBEOS_STACK_BASE,%sp
+	or.w		#0x0700,%sr
 	//XXX: check for enough RAM
 	// load the rest
 	move.w		sNumSectors,%d2
@@ -117,7 +144,14 @@ floppy_start:
 	bsr			puts
 	bra			spin
 floppy_done:
-	jmp			ATARI_ZBEOS_BASE+512
+	lea		h4,%a0
+	bsr		puts
+	// setup stack
+	move.l		#ATARI_ZBEOS_STACK_BASE,%sp
+	lea		h5,%a0
+	bsr		puts
+	//jmp			ATARI_ZBEOS_BASE+512
+	jmp		_start
 
 	//rts
 
@@ -136,12 +170,13 @@ load_sectors:
 	move.w		#4,-(%sp)
 	trap		#13
 	add.l		#14,%sp
+	bsr	putx
 	rts
 
 floppy_end:
 //	.org	FAILURE_STRING
 failure_string:
-	.string " Loading failed! Press key to reboot.\r\n"
+//	.string " Loading failed! Press key to reboot.\r\n"
 	
 //	.org	DOT_STRING
 	.string	"."
@@ -155,22 +190,49 @@ failure_string:
 		// this block as valid boot block for the BIOS
 
 prg_start:
+	lea		h4,%a0
+	bsr		puts
+#if 0
 	// .prg:
 	// we need to switch to supervisor mode anyway
 	move.l		#SUP_SET,-(%sp)
-	move.w		#0x20,%d0
+	move.w		#0x20,-(%sp)
 	trap		#1
 	addq.l		#6,%sp
 	move.l		%d0,saved_super_stack
+
+	lea		h5,%a0
+	bsr		puts
+	//Pterm0
+	move.w	#0,-(%sp)
+	trap	#1
+
+	// copy the rest of the prg
+	move.l		sNumSectors,%d0
+	sub.l		#1,%d0
+	lea		_bs_entry,%a0
+	move.l		#ATARI_ZBEOS_BASE,%a1
+
+nextsect:
+	move.l		#512/4-1,%d1
+copysect_loop:
+	move.l		(%a0)+,(%a1)+
+	dbf		%d1,copysect_loop
+	dbf		%d0,nextsect
+#endif
+
+	lea		str,%a0
+	bsr		puts
 	// all done
+spin:
 	lea			unimpl,%a0
 	bsr			puts
-spin:
 	bra			spin
 
 super_done:
 	// XXX: copy the rest !
-	jmp			ATARI_ZBEOS_BASE+512
+	//jmp			ATARI_ZBEOS_BASE+512
+	jmp			_start
 
 saved_super_stack:
 	.long	0
@@ -186,6 +248,33 @@ GLOBAL(gBootPartitionOffset):
 
 
 
+putx:
+	movem.l	%d0-%d2/%a0-%a2,-(%sp)
+	move.l	#8-1,%d2
+	move.l	%d0,%d1
+putxloop:
+	move.l	%d1,%d0
+	lsl.l	#4,%d1
+	//swap	%d0
+	//lsr.l	#8,%d0
+	//lsr.l	#4,%d0
+	rol.l	#4,%d0
+	and.l	#0x0f,%d0
+	cmp.b	#9,%d0
+	ble	putx0
+	add.b	#'a'-'0'-10,%d0
+	//bra	putxdisp
+putx0:
+	add.b	#'0',%d0
+putxdisp:
+	bsr	putc
+	dbf	%d2,putxloop
+	move.b	#'\r',%d0
+	bsr	putc
+	move.b	#'\n',%d0
+	bsr	putc
+	movem.l	(%sp)+,%d0-%d2/%a0-%a2
+	rts
 	
 	lea.l	str,%a0
 puts:
@@ -195,10 +284,10 @@ puts:
 	bsr	putc
 	bra	.loopt
 .strout:
-	//Pterm0
-	move.w	#1,%d0
-	trap	#1
-
+	move.b	#'\r',%d0
+	bsr	putc
+	move.b	#'\n',%d0
+	bsr	putc
 	rts
 	
 .loop:
@@ -207,20 +296,33 @@ puts:
 	bra		.loop
 	rts
 
+
 /* prints the char in d0.b to the console */
 putc:
-	movem.l	%a0,-(%sp)
+	movem.l	%d0-%d2/%a0-%a2,-(%sp)
 	move.w	%d0,-(%sp)
 	move.w	#DEV_CON,-(%sp)	// DEV_CON
 	move.w	#3,-(%sp)	// Bconout
 	trap	#13
 	add.l	#6,%sp
-	movem.l	(%sp)+,%a0
+	movem.l	(%sp)+,%d0-%d2/%a0-%a2
 	rts
+
 str:
 	.string "Haiku!"
+h1:
+	.string "H1"
+h2:
+	.string "H2"
+h3:
+	.string "H3"
+h4:
+	.string "H4"
+h5:
+	.string "H5"
 unimpl:
 	.string "Unimplemented."
+
 
 shell_end:
 	//.fill	(0x01fe - shell_end), 1, 0x55

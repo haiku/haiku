@@ -108,6 +108,12 @@ void
 _start(void)
 {
 	stage2_args args;
+	Bconout(DEV_CON, 'h');
+	Bconout(DEV_CON, 'A');
+	Bconout(DEV_CON, 'I');
+	Bconout(DEV_CON, 'K');
+	Bconout(DEV_CON, 'U');
+
 
 	//asm("cld");			// Ain't nothing but a GCC thang.
 	//asm("fninit");		// initialize floating point unit

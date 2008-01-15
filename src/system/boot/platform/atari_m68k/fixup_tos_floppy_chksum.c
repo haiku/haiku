@@ -23,7 +23,7 @@ int main(int argc, char **argv)
 		v += *p++;
 		sum += v;
 	}
-	sum = 0x1234 - sum + 1;
+	sum = 0x1234 - sum /*+ 1*/;
 	//sum = 0xaa55;
 	// big endian
 	*p++ = (uint8_t)(sum >> 8);
