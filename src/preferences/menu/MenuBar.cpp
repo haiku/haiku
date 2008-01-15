@@ -22,7 +22,7 @@
 
 
 MenuBar::MenuBar()
-	: BMenuBar(BRect(40, 10, 10, 10), "menu", B_FOLLOW_TOP | B_FRAME_EVENTS,
+	: BMenuBar(BRect(40, 10, 10, 10), "menu", 0,
 		B_ITEMS_IN_COLUMN, true)
 {
 	_BuildMenu();	
