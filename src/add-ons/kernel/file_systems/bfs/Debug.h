@@ -74,7 +74,8 @@
 	#define FUNCTION_START(x) ;
 	#define D(x) ;
 	#ifndef ASSERT
-	#	define ASSERT(x) ;
+	#	define ASSERT(x) { if (!(x)) DEBUGGER(("bfs: assert failed: " #x "\n")); }
+//	#	define ASSERT(x) ;
 	#endif
 #endif
 

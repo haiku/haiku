@@ -1,6 +1,5 @@
-/* BlockAllocator - block bitmap handling and allocation policies
- *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef BLOCK_ALLOCATOR_H
@@ -46,6 +45,10 @@ class BlockAllocator {
 
 		size_t BitmapSize() const;
 
+#ifdef BFS_DEBUGGER_COMMANDS
+		void Dump();
+#endif
+
 	private:
 		bool _IsValidCheckControl(check_control *control);
 		bool _CheckBitmapIsUsedAt(off_t block) const;
@@ -62,5 +65,9 @@ class BlockAllocator {
 		uint32			*fCheckBitmap;
 		check_cookie	*fCheckCookie;
 };
+
+#ifdef BFS_DEBUGGER_COMMANDS
+int dump_block_allocator(int argc, char **argv);
+#endif
 
 #endif	/* BLOCK_ALLOCATOR_H */

@@ -7,6 +7,7 @@
 
 
 #include "Debug.h"
+#include "BlockAllocator.h"
 #include "BPlusTree.h"
 #include "Inode.h"
 
@@ -247,7 +248,7 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 static int
 dump_inode(int argc, char **argv)
 {
-	if (argc != 2) {
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: bfsinode <ptr-to-inode>\n");
 		return 0;
 	}
@@ -262,7 +263,7 @@ dump_inode(int argc, char **argv)
 static int
 dump_volume(int argc, char **argv)
 {
-	if (argc != 2) {
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: bfs <ptr-to-volume>\n");
 		return 0;
 	}
@@ -281,7 +282,8 @@ dump_volume(int argc, char **argv)
 void
 remove_debugger_commands()
 {
-	remove_debugger_command("bfsinode", dump_inode);
+	remove_debugger_command("bfs_inode", dump_inode);
+	remove_debugger_command("bfs_allocator", dump_block_allocator);
 	remove_debugger_command("bfs", dump_volume);
 }
 
@@ -289,7 +291,9 @@ remove_debugger_commands()
 void
 add_debugger_commands()
 {
-	add_debugger_command("bfsinode", dump_inode, "dump an Inode object");
+	add_debugger_command("bfs_inode", dump_inode, "dump an Inode object");
+	add_debugger_command("bfs_allocator", dump_block_allocator,
+		"dump a BFS block allocator.");
 	add_debugger_command("bfs", dump_volume, "dump a BFS volume");
 }
 
