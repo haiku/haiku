@@ -41,8 +41,8 @@ main()
 
 	sender.StartMessage('tst3', 100000);
 	sender.Attach(&port, 100000);
-	if (sender.EndMessage() != B_OK) {
-		fprintf(stderr, "attaching huge message (100000 bytes) failed!\n");
+	if (sender.EndMessage() == B_OK) {
+		fprintf(stderr, "attaching huge message succeded (it shouldn't)!\n");
 		return -1;
 	}
 
