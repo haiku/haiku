@@ -1492,7 +1492,7 @@ BMenu::_Track(int *action, long start)
 			// TODO: on vmware, looks like the second system_time() could return
 			// a value smaller than the first call. Bug in VMWare or haiku ?
 			if (newPollTime <= pollTime)
-				newPollTime = pollTime + 100000;
+				newPollTime = pollTime + 5000;
 #endif
 			//printf("newPollTime - pollTime: %lld\n", newPollTime - pollTime);
 			// mouseSpeed in px per ms
