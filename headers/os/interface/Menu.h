@@ -181,7 +181,7 @@ private:
 			BMenuItem*		_Track(int* action, long start = -1);
 
 			void			_UpdateStateOpenSelect(BMenuItem* item,
-								bigtime_t& openTime, bigtime_t& closeTime);
+								bigtime_t& openTime, const int32 &mouseSpeed);
 			void			_UpdateStateClose(BMenuItem* item, const BPoint& where,
 								const uint32& buttons);
 

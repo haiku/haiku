@@ -1384,7 +1384,9 @@ BMenu::_Hide()
 }
 
 
-const bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
+const static bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
+const static int32 kMouseMotionThreshold = 15; 
+	// TODO: Same as above. Actually, we could get rid of the kHysteresis
 
 
 BMenuItem *
@@ -1406,6 +1408,8 @@ BMenu::_Track(int *action, long start)
 		UnlockLooper();	
 	}
 
+	int32 mouseSpeed = 0;
+	bigtime_t pollTime = system_time();
 	bool releasedOnce = buttons == 0;
 	while (fState != MENU_STATE_CLOSED) {
 		if (_CustomTrackingWantsToQuit())
@@ -1423,7 +1427,7 @@ BMenu::_Track(int *action, long start)
 	
 		item = _HitTestItems(location, B_ORIGIN);
 		if (item != NULL) {
-			_UpdateStateOpenSelect(item, openTime, closeTime);
+			_UpdateStateOpenSelect(item, openTime, mouseSpeed);
 			if (!releasedOnce)
 				releasedOnce = true;
 		
@@ -1477,16 +1481,33 @@ BMenu::_Track(int *action, long start)
 
 			BPoint newLocation;
 			uint32 newButtons;
+			
+			bigtime_t newPollTime = system_time();
 			if (LockLooper()) {	
 				GetMouse(&newLocation, &newButtons, true);
-				UnlockLooper();
+				UnlockLooper();		
 			}
+			
+#if 1
+			// TODO: on vmware, looks like the second system_time() could return
+			// a value smaller than the first call. Bug in VMWare or haiku ?
+			if (newPollTime <= pollTime)
+				newPollTime = pollTime + 100000;
+#endif
+			//printf("newPollTime - pollTime: %lld\n", newPollTime - pollTime);
+			// mouseSpeed in px per ms
+			// (actually point_distance returns the square of the distance,
+			// so it's more px^2 per ms)
+			mouseSpeed = (int32)(point_distance(newLocation, location) * 1000 / (newPollTime - pollTime));
+			pollTime = newPollTime;
+
+			//printf("mouseSpeed = %ld\n", mouseSpeed);
 
 			if (newLocation != location || newButtons != buttons) {
 				if (!releasedOnce && newButtons == 0 && buttons != 0)
 					releasedOnce = true;				
 				location = newLocation;
-				buttons = newButtons;
+				buttons = newButtons;				
 			}
 		
 			if (releasedOnce)
@@ -1511,21 +1532,24 @@ BMenu::_Track(int *action, long start)
 
 void
 BMenu::_UpdateStateOpenSelect(BMenuItem* item, bigtime_t& openTime,
-	bigtime_t& closeTime)
+	const int32 &mouseSpeed)
 {
 	if (fState == MENU_STATE_CLOSED)
 		return;
 
-	if (item != fSelected && system_time() > closeTime + kHysteresis) {
-		_SelectItem(item, false);
-		openTime = system_time();
+	if (item != fSelected) {
+		if (mouseSpeed < kMouseMotionThreshold) {		
+			_SelectItem(item, false);
+			openTime = system_time();
+		} else {
+			//printf("Mouse moving too fast (%ld), ignoring...\n", mouseSpeed);		
+		}
 	} else if (system_time() > kHysteresis + openTime && item->Submenu() != NULL
 		&& item->Submenu()->Window() == NULL) {
 		// Open the submenu if it's not opened yet, but only if
 		// the mouse pointer stayed over there for some time
 		// (hysteresis)
 		_SelectItem(item);
-		closeTime = system_time();
 	}
 	if (fState != MENU_STATE_TRACKING)
 		fState = MENU_STATE_TRACKING;
