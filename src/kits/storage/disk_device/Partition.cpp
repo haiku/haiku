@@ -351,7 +351,7 @@ BPartition::GetPath(BPath* path) const
 // GetVolume
 /*!	\brief Returns a BVolume for the partition.
 
-	The can succeed only, if the partition is mounted.
+	This can only succeed, if the partition is mounted.
 
 	\param volume Pointer to a pre-allocated BVolume, to be initialized to
 		   represent the volume.
