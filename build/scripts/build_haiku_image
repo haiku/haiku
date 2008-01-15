@@ -184,19 +184,29 @@ if [ -n "${sourceDirsToCopy}" ]; then
 	$mkdir -p ${sourcesDest}
 fi
 
+# When building in the root of the source directory, sourceDir is "." and
+# the source directory are not prefixed, which breaks the sed expressions
+# used below. We work around, by adjusting the strings to match and insert.
+sourcePathPrefix=$sourceDir
+destPathPrefix=$sourcesDest
+if [ $sourcePathPrefix = "." ]; then
+	sourcePathPrefix=""
+	destPathPrefix="${sourcesDest}/"
+fi
+
 for sourcesDir in ${sourceDirsToCopy}; do
 	echo "  sources dir:  ${sourcesDir}"
 
 	# create all subdirectories
 	subDirs=$(find ${sourcesDir} -type d | grep -v '.svn' |
-		sed -e "s@^${sourceDir}@${sourcesDest}@")
+		sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
 	$mkdir -p ${subDirs}
-	
+
 	# get all files and copy each one individually
 	sourceFiles=$(find $sourcesDir -type f | grep -v '.svn')
 	for sourceFile in $sourceFiles; do
 		destSourceFile=$(echo $sourceFile |
-			sed -e "s@^${sourceDir}@${sourcesDest}@")
+			sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
 		$cp ${sPrefix}$sourceFile $destSourceFile
 	done
 done
