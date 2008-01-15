@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,7 @@
 
 #include <elf.h>
 #include <lock.h>
+#include <sem.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vm_page.h>
@@ -74,13 +75,22 @@ compute_state(void)
 	sLastMeasurement = system_time();
 
 	uint32 freePages = vm_page_num_free_pages();
+
+	if (freePages > kNoteLimit) {
+		// TODO: work-around for a missing general low resource handler
+		if (sem_used_sems() * 6 > sem_max_sems() * 5)
+			return B_LOW_MEMORY_WARNING;
+		if (sem_used_sems() * 3 > sem_max_sems() * 2)
+			return B_LOW_MEMORY_NOTE;
+	}
+
 	if (freePages >= kNoteLimit)
 		return B_NO_LOW_MEMORY;
 
 	// specify low memory level
 	if (freePages < kCriticalLimit)
 		return B_LOW_MEMORY_CRITICAL;
-	else if (freePages < kWarnLimit)
+	if (freePages < kWarnLimit)
 		return B_LOW_MEMORY_WARNING;
 
 	return B_LOW_MEMORY_NOTE;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -67,7 +67,7 @@ struct sem_entry {
 	} u;
 };
 
-static const int32 kMaxSemaphores = 65536;
+static const int32 kMaxSemaphores = 131072;
 static int32 sMaxSems = 4096;
 	// Final value is computed based on the amount of available memory
 static int32 sUsedSems = 0;
@@ -350,7 +350,8 @@ sem_init(kernel_args *args)
 	// compute maximal number of semaphores depending on the available memory
 	// 128 MB -> 16384 semaphores, 448 kB fixed array size
 	// 256 MB -> 32768, 896 kB
-	// 512 MB and more -> 1.75 MB
+	// 512 MB -> 65536, 1.75 MB
+	// 1024 MB and more -> 131072, 3.5 MB
 	i = vm_page_num_pages() / 2;
 	while (sMaxSems < i && sMaxSems < kMaxSemaphores)
 		sMaxSems <<= 1;
@@ -399,6 +400,9 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	if (sSemsActive == false)
 		return B_NO_MORE_SEMS;
 
+#if 0
+	// TODO: the code below might cause unwanted deadlocks,
+	// we need an asynchronously running low resource handler.
 	if (sUsedSems == sMaxSems) {
 		// The vnode cache may have collected lots of semaphores.
 		// Freeing some unused vnodes should improve our situation.
@@ -410,6 +414,7 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 		// try again with more enthusiasm
 		vfs_free_unused_vnodes(B_LOW_MEMORY_CRITICAL);
 	}
+#endif
 	if (sUsedSems == sMaxSems)
 		return B_NO_MORE_SEMS;
 

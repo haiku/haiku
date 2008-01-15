@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -3468,6 +3468,8 @@ vm_init(kernel_args *args)
 		heapSize /= 4;
 	else if (sAvailableMemory < 200 * 1024 * 1024)
 		heapSize /= 2;
+	else if (sAvailableMemory >= 1024 * 1024 * 1024)
+		heapSize *= 2;
 
 	// map in the new heap and initialize it
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
