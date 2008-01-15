@@ -15,8 +15,102 @@ extern "C" {
 
 #ifndef __ASSEMBLER__
 #include <OS.h>
+
+/* TOS calls use 16 bit param alignment, so we must generate the calls ourselves.
+ * We then use asm macros, one for each possible arg type and count.
+ * cf. how mint does it in sys/mint/arch/asm_misc.h
+ */
+//#if __GNUC__ >= 3
+#define TOS_CLOBBER_LIST "d1", "d2", "a0", "a1", "a2"
+//#else
+//#error fixme
+//#endif
+
+/* void (no) arg */
+#define toscallV(trapnr, callnr)			\
+({							\
+	register int32 retvalue __asm__("d0");		\
+							\
+	__asm__ volatile				\
+	("/* toscall(" #trapnr ", " #callnr ") */\n	\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#2,%%sp\n"			\
+	: "=r"(retvalue)	/* output */		\
+	: [trapn]"i"(trapnr),[calln]"i"(callnr) 	\
+					/* input */	\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
+
+#define toscallW(trapnr, callnr, p1)			\
+({							\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);			\
+							\
+	__asm__ volatile				\
+	("/* toscall(" #trapnr ", " #callnr ") */\n	\
+		move.w	%1,-(%%sp) \n			\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#4,%%sp \n "			\
+	: "=r"(retvalue)	/* output */		\
+	: [trapn]"i"(trapnr),[calln]"i"(callnr), 	\
+	  "r"(_p1)			/* input */	\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
+
+#define toscallL(trapnr, callnr, p1)			\
+({							\
+	register int32 retvalue __asm__("d0");		\
+	int32 _p1 = (int32)(p1);			\
+							\
+	__asm__ volatile				\
+	(/*"; toscall(" #trapnr ", " #callnr ")"*/"\n	\
+		move.l	%1,-(%%sp) \n			\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#6,%%sp \n "			\
+	: "=r"(retvalue)	/* output */		\
+	: [trapn]"i"(trapnr),[calln]"i"(callnr),	\
+	  "r"(_p1)			/* input */	\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
+#define toscallWW(trapnr, callnr, p1, p2)		\
+({							\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);			\
+	int16 _p2 = (int16)(p2);			\
+							\
+	__asm__ volatile				\
+	(/*"; toscall(" #trapnr ", " #callnr ")"*/"\n	\
+		move.w	%2,-(%%sp) \n			\
+		move.w	%1,-(%%sp) \n			\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#6,%%sp \n "			\
+	: "=r"(retvalue)	/* output */		\
+	: [trapn]"i"(trapnr),[calln]"i"(callnr),	\
+	  "r"(_p1), "r"(_p2)		/* input */	\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
+
+
+/* pointer versions */
+#define toscallP(trapnr, callnr, a) toscallL(trapnr, callnr, (int32)a)
+
 #endif /* __ASSEMBLER__ */
 
+#define BIOS_TRAP	13
+#define XBIOS_TRAP	14
+#define GEMDOS_TRAP	1
 
 /* 
  * Atari BIOS calls
@@ -48,7 +142,7 @@ extern "C" {
 
 #ifndef __ASSEMBLER__
 
-extern int32 bios(uint16 nr, ...);
+//extern int32 bios(uint16 nr, ...);
 
 // cf. http://www.fortunecity.com/skyscraper/apple/308/html/bios.htm
 
@@ -65,18 +159,18 @@ struct tosbpb {
 };
 
 
-//#define Getmpb() bios(0)
-#define Bconstat(dev) bios(1, (uint16)dev)
-#define Bconin(dev) bios(2, (uint16)dev)
-#define Bconout(dev, chr) bios(3, (uint16)dev, (uint16)chr)
-#define Rwabs(mode, buf, count, recno, dev, lrecno) bios(4, (int16)mode, (void *)buf, (int16)count, (int16)recno, (uint16)dev, (int32)lrecno)
-//#define Setexc() bios(5, )
-#define Tickcal() bios(6)
-#define Getbpb(dev) (struct tosbpb *)bios(7, (uint16)dev)
-#define Bcostat(dev) bios(8, (uint16)dev)
-#define Mediach(dev) bios(9, (int16)dev)
-#define Drvmap() (uint32)bios(10)
-#define Kbshift(mode) bios(11, (uint16)mode)
+//#define Getmpb() toscallV(BIOS_TRAP, 0)
+#define Bconstat(dev) toscallW(BIOS_TRAP, 1, (uint16)dev)
+#define Bconin(dev) toscallW(BIOS_TRAP, 2, (uint16)dev)
+#define Bconout(dev, chr) toscallWW(BIOS_TRAP, 3, (uint16)dev, (uint16)chr)
+#define Rwabs(mode, buf, count, recno, dev, lrecno) toscallWPWWWL(BIOS_TRAP, 4, (int16)mode, (void *)buf, (int16)count, (int16)recno, (uint16)dev, (int32)lrecno)
+//#define Setexc() toscallV(BIOS_TRAP, 5, )
+#define Tickcal() toscallV(BIOS_TRAP, 6)
+#define Getbpb(dev) (struct tosbpb *)toscallW(BIOS_TRAP, 7, (uint16)dev)
+#define Bcostat(dev) toscallW(BIOS_TRAP, 8, (uint16)dev)
+#define Mediach(dev) toscallW(BIOS_TRAP, 9, (int16)dev)
+#define Drvmap() (uint32)toscallV(BIOS_TRAP, 10)
+#define Kbshift(mode) toscallW(BIOS_TRAP, 11, (uint16)mode)
 
 /* handy shortcut */
 static inline int Bconputs(int16 handle, const char *string)
@@ -116,31 +210,31 @@ static inline int Bconputs(int16 handle, const char *string)
 
 #ifndef __ASSEMBLER__
 
-extern int32 xbios(uint16 nr, ...);
+//extern int32 xbios(uint16 nr, ...);
 
 
-#define Initmous(mode, param, vec) xbios(0, (int16)mode, (void *)param, (void *)vec)
-#define Physbase() (void *)xbios(2)
-#define Logbase() (void *)xbios(3)
-//#define Getrez() xbios(4)
-#define Setscreen(log, phys, mode) xbios(5, (void *)log, (void *)phys, (int16)mode)
-#define VsetScreen(log, phys, mode, modecode) xbios(5, (void *)log, (void *)phys, (int16)mode)
-//#define Mfpint() xbios(13, )
-#define Rsconf(speed, flow, ucr, rsr, tsr, scr) xbios(15, (int16)speed, (int16)flow, (int16)ucr, (int16)rsr, (int16)tsr, (int16)scr)
-//#define Keytbl(unshift, shift, caps) (KEYTAB *)xbios(16, (char *)unshift, (char *)shift, (char *)caps)
-#define Random() xbios(17)
-#define Gettime() (uint32)xbios(23)
-#define Jdisint(intno) xbios(26, (int16)intno)
-#define Jenabint(intno) xbios(27, (int16)intno)
-#define Supexec(func) xbios(38, (void *)func)
-//#define Puntaes() xbios(39)
-#define DMAread(sect, count, buf, dev) xbios(42, (int32)sect, (int16)count, (void *)buf, (int16)dev)
-#define DMAwrite(sect, count, buf, dev) xbios(43, (int32)sect, (int16)count, (void *)buf, (int16)dev)
-#define NVMaccess(op, start, count, buffer) xbios(46, (int16)op, (int16)start, (int16)count, (char *)buffer)
-#define VsetMode(mode) xbios(88, (int16)mode)
-#define VgetMonitor() xbios(89)
-#define Locksnd() xbios(128)
-#define Unlocksnd() xbios(129)
+#define Initmous(mode, param, vec) toscallWPP(XBIOS_TRAP, 0, (int16)mode, (void *)param, (void *)vec)
+#define Physbase() (void *)toscallV(XBIOS_TRAP, 2)
+#define Logbase() (void *)toscallV(XBIOS_TRAP, 3)
+//#define Getrez() toscallV(XBIOS_TRAP, 4)
+#define Setscreen(log, phys, mode) toscallPPW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode)
+#define VsetScreen(log, phys, mode, modecode) toscallPPW(XBIOS_TRAP, 5, (void *)log, (void *)phys, (int16)mode)
+//#define Mfpint() toscallV(XBIOS_TRAP, 13, )
+#define Rsconf(speed, flow, ucr, rsr, tsr, scr) toscallWWWWWW(XBIOS_TRAP, 15, (int16)speed, (int16)flow, (int16)ucr, (int16)rsr, (int16)tsr, (int16)scr)
+//#define Keytbl(unshift, shift, caps) (KEYTAB *)toscallPPP(XBIOS_TRAP, 16, (char *)unshift, (char *)shift, (char *)caps)
+#define Random() toscallV(XBIOS_TRAP, 17)
+#define Gettime() (uint32)toscallV(XBIOS_TRAP, 23)
+#define Jdisint(intno) toscallW(XBIOS_TRAP, 26, (int16)intno)
+#define Jenabint(intno) toscallW(XBIOS_TRAP, 27, (int16)intno)
+#define Supexec(func) toscallP(XBIOS_TRAP, 38, (void *)func)
+//#define Puntaes() toscallV(XBIOS_TRAP, 39)
+#define DMAread(sect, count, buf, dev) toscallLWPW(XBIOS_TRAP, 42, (int32)sect, (int16)count, (void *)buf, (int16)dev)
+#define DMAwrite(sect, count, buf, dev) toscallWPLW(XBIOS_TRAP, 43, (int32)sect, (int16)count, (void *)buf, (int16)dev)
+#define NVMaccess(op, start, count, buffer) toscallWWWP(XBIOS_TRAP, 46, (int16)op, (int16)start, (int16)count, (char *)buffer)
+#define VsetMode(mode) toscallW(XBIOS_TRAP, 88, (int16)mode)
+#define VgetMonitor() toscallV(XBIOS_TRAP, 89)
+#define Locksnd() toscallV(XBIOS_TRAP, 128)
+#define Unlocksnd() toscallV(XBIOS_TRAP, 129)
 
 #endif /* __ASSEMBLER__ */
 
@@ -157,16 +251,16 @@ extern int32 xbios(uint16 nr, ...);
 #define SUP_INQUIRE		1
 #else
 
-extern int32 gemdos(uint16 nr, ...);
+//extern int32 gemdos(uint16 nr, ...);
 
 #define SUP_SET			(void *)0
 #define SUP_INQUIRE		(void *)1
 
 // official names
-#define Pterm0() gemdos(0)
-#define Cconin() gemdos(1)
-#define Super(s) gemdos(0x20, (uint32)s)
-#define Pterm(retcode) gemdos(76, (int16)retcode)
+#define Pterm0() toscallV(GEMDOS_TRAP, 0)
+#define Cconin() toscallV(GEMDOS_TRAP, 1)
+#define Super(s) toscallP(GEMDOS_TRAP, 0x20, s)
+#define Pterm(retcode) toscallW(GEMDOS_TRAP, 76, (int16)retcode)
 
 #endif /* __ASSEMBLER__ */
 
