@@ -85,7 +85,7 @@ unzipFile()
 
 		attrrmrf $unzipDir
 	else
-		$unzip -q -d ${tPrefix}$targetUnzipDir ${sPrefix}$zipFile
+		$unzip -q -o -d ${tPrefix}$targetUnzipDir ${sPrefix}$zipFile
 	fi
 }
 
