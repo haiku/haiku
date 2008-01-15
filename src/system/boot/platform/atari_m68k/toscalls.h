@@ -81,6 +81,7 @@ extern "C" {
 	);						\
 	retvalue;					\
 })
+
 #define toscallWW(trapnr, callnr, p1, p2)		\
 ({							\
 	register int32 retvalue __asm__("d0");		\
@@ -102,9 +103,44 @@ extern "C" {
 	retvalue;					\
 })
 
+#define toscallWLWWWL(trapnr, callnr, p1, p2, p3, p4, p5, p6)	\
+({							\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);			\
+	int32 _p2 = (int32)(p2);			\
+	int16 _p3 = (int16)(p3);			\
+	int16 _p4 = (int16)(p4);			\
+	int16 _p5 = (int16)(p5);			\
+	int32 _p6 = (int32)(p6);			\
+							\
+	__asm__ volatile				\
+	(/*"; toscall(" #trapnr ", " #callnr ")"*/"\n	\
+		move.l	%6,-(%%sp) \n			\
+		move.w	%5,-(%%sp) \n			\
+		move.w	%4,-(%%sp) \n			\
+		move.w	%3,-(%%sp) \n			\
+		move.l	%2,-(%%sp) \n			\
+		move.w	%1,-(%%sp) \n			\
+		move.w	%[calln],-(%%sp)\n		\
+		trap	%[trapn]\n			\
+		add.l	#6,%%sp \n "			\
+	: "=r"(retvalue)	/* output */		\
+	: [trapn]"i"(trapnr),[calln]"i"(callnr),	\
+	  "r"(_p1), "r"(_p2),				\
+	  "r"(_p3), "r"(_p4),				\
+	  "r"(_p5), "r"(_p6)		  /* input */	\
+	: TOS_CLOBBER_LIST /* clobbered regs */		\
+	);						\
+	retvalue;					\
+})
 
 /* pointer versions */
 #define toscallP(trapnr, callnr, a) toscallL(trapnr, callnr, (int32)a)
+#define toscallWPWWWL(trapnr, callnr, p1, p2, p3, p4, p5, p6) \
+	toscallWLWWWL(trapnr, callnr, p1, (int32)p2, p3, p4, p5, p6)
+
+
+
 
 #endif /* __ASSEMBLER__ */
 
