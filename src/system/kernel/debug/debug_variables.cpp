@@ -10,6 +10,7 @@
 #include <KernelExport.h>
 
 #include <debug.h>
+#include <util/DoublyLinkedList.h>
 
 
 static const int kVariableCount				= 64;
@@ -42,10 +43,14 @@ struct Variable {
 	}
 };
 
-static Variable sVariables[kVariableCount];
-static Variable sTemporaryVariables[kTemporaryVariableCount];
+struct TemporaryVariable : Variable,
+		DoublyLinkedListLinkImpl<TemporaryVariable> {
+};
 
-static bool sTemporaryVariablesObsolete = false;
+static Variable sVariables[kVariableCount];
+static TemporaryVariable sTemporaryVariables[kTemporaryVariableCount];
+
+static DoublyLinkedList<TemporaryVariable> sTemporaryVariablesLRUQueue;
 
 
 static inline bool
@@ -55,32 +60,89 @@ is_temporary_variable(const char* variableName)
 }
 
 
+static void
+dequeue_temporary_variable(TemporaryVariable* variable)
+{
+	// dequeue if queued
+	if (variable->GetDoublyLinkedListLink()->previous != NULL
+		|| sTemporaryVariablesLRUQueue.Head() == variable) {
+		sTemporaryVariablesLRUQueue.Remove(variable);
+	}
+}
+
+
+static void
+unset_variable(Variable* variable)
+{
+	if (is_temporary_variable(variable->name))
+		dequeue_temporary_variable(static_cast<TemporaryVariable*>(variable));
+
+	variable->Uninit();
+}
+
+
+static void
+touch_variable(Variable* _variable)
+{
+	if (!is_temporary_variable(_variable->name))
+		return;
+
+	TemporaryVariable* variable = static_cast<TemporaryVariable*>(_variable);
+
+	// move to the end of the queue
+	dequeue_temporary_variable(variable);
+	sTemporaryVariablesLRUQueue.Add(variable);
+}
+
+
+static Variable*
+free_temporary_variable_slot()
+{
+	TemporaryVariable* variable = sTemporaryVariablesLRUQueue.RemoveHead();
+	if (variable)
+		variable->Uninit();
+
+	return variable;
+}
+
+
 static Variable*
 get_variable(const char* variableName, bool create)
 {
 	Variable* variables;
 	int variableCount;
 
-	// get the variable domain (persistent or temporary)
-	if (is_temporary_variable(variableName)) {
-		variables = sTemporaryVariables;
-		variableCount = kTemporaryVariableCount;
-	} else {
-		variables = sVariables;
-		variableCount = kVariableCount;
-	}
-
+	// find the variable in the respective array and a free slot, we can
+	// use, if it doesn't exist yet
 	Variable* freeSlot = NULL;
 
-	for (int i = 0; i < variableCount; i++) {
-		Variable* variable = variables + i;
+	if (is_temporary_variable(variableName)) {
+		// temporary variable
+		for (int i = 0; i < kTemporaryVariableCount; i++) {
+			TemporaryVariable* variable = sTemporaryVariables + i;
+	
+			if (!variable->IsUsed()) {
+				if (freeSlot == NULL)
+					freeSlot = variable;
+			} else if (variable->HasName(variableName))
+				return variable;
+		}
 
-		if (!variable->IsUsed()) {
-			if (freeSlot == NULL)
-				freeSlot = variable;
-		} else if (variable->HasName(variableName))
-			return variable;
+		if (create && freeSlot == NULL)
+			freeSlot = free_temporary_variable_slot();
+	} else {
+		// persistent variable
+		for (int i = 0; i < kVariableCount; i++) {
+			Variable* variable = sVariables + i;
+	
+			if (!variable->IsUsed()) {
+				if (freeSlot == NULL)
+					freeSlot = variable;
+			} else if (variable->HasName(variableName))
+				return variable;
+		}
 	}
+
 
 	if (create && freeSlot != NULL) {
 		freeSlot->Init(variableName);
@@ -106,10 +168,24 @@ cmd_unset_variable(int argc, char **argv)
 
 	const char* variable = argv[1];
 
-	if (is_temporary_variable(variable))
-		kprintf("You cannot remove temporary variables.\n");
-	else if (!remove_debug_variable(variable))
+	if (!unset_debug_variable(variable))
 		kprintf("Did not find variable %s.\n", variable);
+
+	return 0;
+}
+
+
+static int
+cmd_unset_all_variables(int argc, char **argv)
+{
+	static const char* usage = "usage: %s\n"
+		"Unsets all variables.\n";
+	if (argc == 2 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
+	unset_all_debug_variables();
 
 	return 0;
 }
@@ -160,14 +236,9 @@ is_debug_variable_defined(const char* variableName)
 bool
 set_debug_variable(const char* variableName, uint64 value)
 {
-	if (sTemporaryVariablesObsolete && is_temporary_variable(variableName)
-		&& strcmp(variableName, kCommandReturnValueVariable) != 0) {
-		remove_all_temporary_debug_variables();
-	}
-
-
 	if (Variable* variable = get_variable(variableName, true)) {
 		variable->value = value;
+		touch_variable(variable);
 		return true;
 	}
 
@@ -178,23 +249,20 @@ set_debug_variable(const char* variableName, uint64 value)
 uint64
 get_debug_variable(const char* variableName, uint64 defaultValue)
 {
-	if (Variable* variable = get_variable(variableName, false))
+	if (Variable* variable = get_variable(variableName, false)) {
+		touch_variable(variable);
 		return variable->value;
+	}
 
 	return defaultValue;
 }
 
 
 bool
-remove_debug_variable(const char* variableName)
+unset_debug_variable(const char* variableName)
 {
-	// We don't allow explicit removal of inidividual temporary variables.
-	// This speeds up removing them all.
-	if (is_temporary_variable(variableName))
-		return false;
-
 	if (Variable* variable = get_variable(variableName, false)) {
-		variable->Uninit();
+		unset_variable(variable);
 		return true;
 	}
 
@@ -203,42 +271,31 @@ remove_debug_variable(const char* variableName)
 
 
 void
-remove_all_temporary_debug_variables()
+unset_all_debug_variables()
 {
-	for (int i = 0; i < kTemporaryVariableCount; i++) {
-		Variable& variable = sTemporaryVariables[i];
-		if (!variable.IsUsed())
-			break;
-
-		variable.Uninit();
+	// persistent variables
+	for (int i = 0; i < kVariableCount; i++) {
+		Variable& variable = sVariables[i];
+		if (variable.IsUsed())
+			unset_variable(&variable);
 	}
 
-	// always keep the return value variable defined
-	set_debug_variable(kCommandReturnValueVariable, 0);
-
-	sTemporaryVariablesObsolete = false;
-}
-
-
-/*!	Schedules all temporary variables for removal.
-	They will be removed, the next time set_debug_variable() is invoked
-	for a temporary variable other than the command return value variable.
-*/
-void
-mark_temporary_debug_variables_obsolete()
-{
-	sTemporaryVariablesObsolete = true;
+	// temporary variables
+	for (int i = 0; i < kTemporaryVariableCount; i++) {
+		Variable& variable = sTemporaryVariables[i];
+		if (variable.IsUsed())
+			unset_variable(&variable);
+	}
 }
 
 
 void
 debug_variables_init()
 {
-	// always keep the return value variable defined
-	set_debug_variable(kCommandReturnValueVariable, 0);
-
 	add_debugger_command("unset", &cmd_unset_variable,
 		"Unsets the given variable");
+	add_debugger_command("unset_all", &cmd_unset_all_variables,
+		"Unsets all variables");
 	add_debugger_command("vars", &cmd_variables,
 		"Lists all defined variables with their values");
 }

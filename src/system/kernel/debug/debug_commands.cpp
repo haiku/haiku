@@ -94,10 +94,6 @@ in_command_invocation(void)
 int
 invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 {
-	// remove the temporary variables of the previously executed command, if
-	// this command sets a temporary variable
-	mark_temporary_debug_variables_obsolete();
-
 	struct thread* thread = thread_get_current_thread();
 	addr_t oldFaultHandler = thread->fault_handler;
 

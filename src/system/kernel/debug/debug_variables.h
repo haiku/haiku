@@ -14,8 +14,6 @@
 extern "C" {
 #endif
 
-void	mark_temporary_debug_variables_obsolete();
-
 void	debug_variables_init();
 
 #ifdef __cplusplus
