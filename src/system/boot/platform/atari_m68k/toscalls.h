@@ -209,17 +209,25 @@ struct tosbpb {
 #define Kbshift(mode) toscallW(BIOS_TRAP, 11, (uint16)mode)
 
 /* handy shortcut */
-static inline int Bconputs(int16 handle, const char *string)
+static inline int Bconput(int16 handle, const char *string)
 {
 	int i, err;
 	for (i = 0; string[i]; i++) {
+		if (string[i] == '\n')
+			Bconout(handle, '\r');
 		err = Bconout(handle, string[i]);
 		if (err < 0)
 			break;
 	}
+	return i;
+}
+
+static inline int Bconputs(int16 handle, const char *string)
+{
+	int err = Bconput(handle, string);
 	Bconout(handle, '\r');
 	Bconout(handle, '\n');
-	return i;
+	return err;
 }
 
 #endif /* __ASSEMBLER__ */
@@ -310,6 +318,7 @@ static inline int Bconputs(int16 handle, const char *string)
  */
 
 extern status_t toserror(int32 err);
+extern void dump_tos_cookies(void);
 
 /*
  * Cookie Jar access

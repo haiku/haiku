@@ -43,7 +43,7 @@ clear_bss(void)
 
 static void
 call_ctors(void)
-{ 
+{
 	void (**f)(void);
 
 	for (f = &__ctor_list; f < &__ctor_end; f++) {		
@@ -108,11 +108,6 @@ void
 _start(void)
 {
 	stage2_args args;
-	Bconout(DEV_CON, 'h');
-	Bconout(DEV_CON, 'A');
-	Bconout(DEV_CON, 'I');
-	Bconout(DEV_CON, 'K');
-	Bconout(DEV_CON, 'U');
 
 
 	//asm("cld");			// Ain't nothing but a GCC thang.
@@ -127,7 +122,7 @@ _start(void)
 	//serial_init();
 	console_init();
 	cpu_init();
-	mmu_init();
+	//mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key
 	spin(750000);

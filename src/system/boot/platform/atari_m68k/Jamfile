@@ -18,8 +18,13 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 #SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons accelerants common ] ;
 
-KernelMergeObject boot_platform_atari_m68k.o :
+KernelMergeObject boot_platform_atari_m68k_shell.o :
 	shell.S
+	: -Wa,--pcrel
+;
+
+KernelMergeObject boot_platform_atari_m68k_other.o :
+#	shell.S
 	start.c
 	toscalls.S
 	debug.c
@@ -45,7 +50,13 @@ KernelMergeObject boot_platform_atari_m68k.o :
 	#decode_edid.c
 	#dump_edid.c
 
-	: -fpic -Wa,--pcrel
+	: -fno-pic #-Wa,--pcrel
+;
+
+KernelMergeObject boot_platform_atari_m68k.o :
+	: :
+	boot_platform_atari_m68k_shell.o
+	boot_platform_atari_m68k_other.o
 ;
 
 SEARCH on [ FGristFiles text_menu.cpp ]

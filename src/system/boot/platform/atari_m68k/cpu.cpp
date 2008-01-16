@@ -31,17 +31,20 @@
 
 #warning M68K: add set_vbr()
 
+
 static status_t
 check_cpu_features()
 {
 #warning M68K: TODO: probe ourselves, we shouldn't trust the TOS!
 
 	const tos_cookie *c;
+
 	c = tos_find_cookie('_CPU');
 	if (!c) {
 		panic("can't get a cookie (_CPU)! Mum, I'm hungry!");
 		return EINVAL;
 	}
+	dump_tos_cookies();
 
 #warning M68K: check for 020 + mmu
 	if (c->ivalue < 30/*20*/)

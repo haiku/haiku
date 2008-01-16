@@ -24,7 +24,7 @@ panic(const char *format, ...)
 
 	//platform_switch_to_text_mode();
 
-	Bconputs(DEV_CONSOLE, "*** PANIC ***");
+	Bconputs(DEV_CONSOLE, "\n*** PANIC ***");
 
 	va_start(list, format);
 	length = vsnprintf(buffer, sizeof(buffer), format, list);
@@ -51,10 +51,10 @@ dprintf(const char *format, ...)
 	length = vsnprintf(buffer, sizeof(buffer), format, list);
 	va_end(list);
 
-	Bconputs(DEV_AUX, buffer);
+	Bconput(DEV_AUX, buffer);
 
-	if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
-		Bconputs(DEV_CONSOLE, buffer);
+	//if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
+		Bconput(DEV_CONSOLE, buffer);
 }
 
 
@@ -145,3 +145,26 @@ status_t toserror(int32 err)
 		return B_ERROR;
 	}
 }
+
+
+void dump_tos_cookie(uint32 cookie)
+{
+	const tos_cookie *c;
+	c = tos_find_cookie(cookie);
+	if (!c)
+		dprintf("%4.4s: nil\n", &cookie);
+	else
+		dprintf("%4.4s: 0x%08lx, %d\n", &cookie, c->ivalue, c->ivalue);
+}
+void dump_tos_cookies(void)
+{
+	static const uint32 clist[] = { '_CPU', '_FPU', '_VDO', '_FDC', 
+					'_SND', '_MCH', '_SWI', '_FRB',
+					'_FLK', '_NET', '_IDT', '_AKP',
+					'FSMC', 'SAM\0', 'MiNT', NULL };
+	int i;
+	dprintf("Cookies:\n");
+	for (i = 0; clist[i]; i++)
+		dump_tos_cookie(clist[i]);
+}
+
