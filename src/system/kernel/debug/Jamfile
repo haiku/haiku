@@ -5,6 +5,9 @@ UsePrivateHeaders [ FDirName kernel debug ] syslog_daemon ;
 KernelMergeObject kernel_debug.o :
 	blue_screen.cpp
 	debug.cpp
+	debug_commands.cpp
+	debug_parser.cpp
+	debug_variables.cpp
 	frame_buffer_console.cpp
 	gdb.c
 	tracing.cpp

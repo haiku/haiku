@@ -28,26 +28,20 @@
 #include <syslog_daemon.h>
 
 #include <ctype.h>
-#include <setjmp.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
 
+#include "debug_commands.h"
+#include "debug_variables.h"
+
 
 static const char* const kKDLPrompt = "kdebug> ";
 
 extern "C" int kgets(char *buffer, int length);
-static int invoke_command(struct debugger_command *command, int argc,
-	char** argv);
 
-typedef struct debugger_command {
-	struct debugger_command *next;
-	int (*func)(int, char **);
-	const char *name;
-	const char *description;
-} debugger_command;
 
 int dbg_register_file[B_MAX_CPU_COUNT][14];
 	/* XXXmpetit -- must be made generic */
@@ -65,11 +59,6 @@ static sem_id sSyslogNotify = -1;
 static struct syslog_message *sSyslogMessage;
 static struct ring_buffer *sSyslogBuffer;
 static bool sSyslogDropped = false;
-
-static struct debugger_command *sCommands;
-
-static jmp_buf sInvokeCommandEnv;
-static bool sInvokeCommandDirectly = false;
 
 static const char* sCurrentKernelDebuggerMessage;
 
@@ -95,52 +84,6 @@ static int32 sCurrentLine = 0;
 static char *sArguments[MAX_ARGS] = { NULL, };
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
-
-
-static debugger_command*
-next_command(debugger_command* command, const char* prefix, int prefixLen)
-{
-	if (command == NULL)
-		command = sCommands;
-	else
-		command = command->next;
-
-	while (command != NULL && !strncmp(prefix, command->name, prefixLen) == 0)
-		command = command->next;
-
-	return command;
-}
-
-
-static debugger_command *
-find_command(const char *name, bool partialMatch, bool& ambiguous)
-{
-	debugger_command *command;
-
-	ambiguous = false;
-
-	// search command by full name
-
-	for (command = sCommands; command != NULL; command = command->next) {
-		if (strcmp(name, command->name) == 0)
-			return command;
-	}
-
-	// if it couldn't be found, search for a partial match
-
-	if (partialMatch) {
-		int length = strlen(name);
-		command = next_command(NULL, name, length);
-		if (command != NULL) {
-			if (next_command(command, name, length) == NULL)
-				return command;
-
-			ambiguous = true;
-		}
-	}
-
-	return NULL;
-}
 
 
 static void
@@ -256,14 +199,14 @@ public:
 			tmpChar = *firstSpace;
 			*firstSpace = '\0';
 			bool ambiguous;
-			debugger_command* command = find_command(buffer, true, ambiguous);
+			debugger_command* command = find_debugger_command(buffer, true, ambiguous);
 			*firstSpace = tmpChar;
 
 			if (command != NULL) {
 				kputchar('\n');
 
 				char* args[3] = { NULL, "--help", NULL };
-				invoke_command(command, 2, args);
+				invoke_debugger_command(command, 2, args);
 			} else {
 				if (ambiguous)
 					kprintf("\nambiguous command\n");
@@ -281,7 +224,7 @@ public:
 			debugger_command* command = NULL;
 			int32 longestCommonPrefix = 0;
 			const char* previousCommandName = NULL;
-			while ((command = next_command(command, buffer, position))
+			while ((command = next_debugger_command(command, buffer, position))
 					!= NULL) {
 				count++;
 				int32 nameLength = strlen(command->name);
@@ -312,7 +255,7 @@ public:
 				reprintLine = true;
 			} else if (count == 1) {
 				// exactly one completion
-				command = next_command(NULL, buffer, position);
+				command = next_debugger_command(NULL, buffer, position);
 
 				// check for sufficient space in the buffer
 				int32 neededSpace = longestName - position + 1;
@@ -345,7 +288,7 @@ public:
 				int columns = 80 / (longestName + 2);
 				debugger_command* command = NULL;
 				int column = 0;
-				while ((command = next_command(command, buffer, position))
+				while ((command = next_debugger_command(command, buffer, position))
 						!= NULL) {
 					// spacing
 					if (column > 0 && column % columns == 0)
@@ -548,101 +491,6 @@ kgets(char *buffer, int length)
 }
 
 
-static int
-parse_line(const char *buffer, char **argv, int *_argc, int32 maxArgs)
-{
-	char *string = sParseLine;
-	int32 index = 0;
-
-	strcpy(string, buffer);
-
-	for (; index < maxArgs && string[0]; index++) {
-		char quoted;
-		char c;
-
-		// skip white space
-		while ((c = string[0]) != '\0' && isspace(c)) {
-			string++;
-		}
-		if (!c)
-			break;
-
-		if (c == '\'' || c == '"') {
-			argv[index] = ++string;
-			quoted = c;
-		} else {
-			argv[index] = string;
-			quoted = 0;
-		}
-
-		// find end of string
-
-		while (string[0]
-			&& ((quoted && string[0] != quoted)
-				|| (!quoted && !isspace(string[0])))) {
-			if (string[0] == '\\') {
-				// filter out backslashes
-				strcpy(string, string + 1);
-				string++;
-			}
-			string++;
-		}
-
-		if (string[0]) {
-			// terminate string
-			string[0] = '\0';
-			string++;
-		}
-    }
-
-	return *_argc = index;
-}
-
-
-/*!	This function is a safe gate through which debugger commands are invoked.
-	It sets a fault handler before invoking the command, so that an invalid
-	memory access will not result in another KDL session on top of this one
-	(and "cont" not to work anymore). We use setjmp() + longjmp() to "unwind"
-	the stack after catching a fault.
- */
-static int
-invoke_command(struct debugger_command *command, int argc, char** argv)
-{
-	struct thread* thread = thread_get_current_thread();
-	addr_t oldFaultHandler = thread->fault_handler;
-
-	// replace argv[0] with the actual command name
-	argv[0] = (char *)command->name;
-
-	// Invoking the command directly might be useful when debugging debugger
-	// commands.
-	if (sInvokeCommandDirectly)
-		return command->func(argc, argv);
-
-	if (setjmp(sInvokeCommandEnv) == 0) {
-		int result;
-		thread->fault_handler = (addr_t)&&error;
-		// Fake goto to trick the compiler not to optimize the code at the label
-		// away.
-		if (!thread)
-			goto error;
-
-		result = command->func(argc, argv);
-		thread->fault_handler = oldFaultHandler;
-		return result;
-
-error:
-		longjmp(sInvokeCommandEnv, 1);
-			// jump into the else branch
-	} else {
-		kprintf("\n[*** READ/WRITE FAULT ***]\n");
-	}
-
-	thread->fault_handler = oldFaultHandler;
-	return 0;
-}
-
-
 static void
 kernel_debugger_loop(void)
 {
@@ -652,44 +500,43 @@ kernel_debugger_loop(void)
 	kprintf("Welcome to Kernel Debugging Land...\n");
 	kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
 
-	for (;;) {
-		struct debugger_command *cmd = NULL;
-		int argc;
+	int32 continuableLine = -1;
+		// Index of the previous command line, if the command returned
+		// B_KDEBUG_CONT, i.e. asked to be repeatable, -1 otherwise.
 
+	for (;;) {
 		CommandLineEditingHelper editingHelper;
 		kprintf(kKDLPrompt);
-		read_line(sLineBuffer[sCurrentLine], LINE_BUFFER_SIZE, &editingHelper);
-		parse_line(sLineBuffer[sCurrentLine], sArguments, &argc, MAX_ARGS);
+		char* line = sLineBuffer[sCurrentLine];
+		read_line(line, LINE_BUFFER_SIZE, &editingHelper);
 
-		// We support calling last executed command again if
-		// B_KDEDUG_CONT was returned last time, so cmd != NULL
-		if (argc <= 0 && cmd == NULL)
-			continue;
+		// check, if the line is empty or whitespace only
+		bool whiteSpaceOnly = true;
+		for (int i = 0 ; line[i] != '\0'; i++) {
+			if (!isspace(line[i])) {
+				whiteSpaceOnly = false;
+				break;
+			}
+		}
+
+		if (whiteSpaceOnly) {
+			if (continuableLine < 0)
+				continue;
+
+			// the previous command can be repeated
+			sCurrentLine = continuableLine;
+			line = sLineBuffer[sCurrentLine];
+		}
 
 		sDebuggerOnCPU = smp_get_current_cpu();
 
-		bool ambiguous;
-		if (argc > 0)
-			cmd = find_command(sArguments[0], true, ambiguous);
+		int rc = evaluate_debug_command(line);
 
-		if (cmd == NULL) {
-			if (ambiguous) {
-				kprintf("Ambiguous command. Use tab completion to get a list "
-					"of matching commands. Enter \"help\" to get a list of "
-					"all supported commands.\n");
-			} else {
-				kprintf("Unknown command. Enter \"help\" to get a list of all "
-					"supported commands.\n");
-			}
-		} else {
-			int rc = invoke_command(cmd, argc, sArguments);
+		if (rc == B_KDEBUG_QUIT)
+			break;	// okay, exit now.
 
-			if (rc == B_KDEBUG_QUIT)
-				break;	// okay, exit now.
-
-			if (rc != B_KDEBUG_CONT)
-				cmd = NULL;		// forget last command executed...
-		}
+		// If the command is continuable, remember the current line index.
+		continuableLine = (rc == B_KDEBUG_CONT ? sCurrentLine : -1);
 
 		if (++sCurrentLine >= HISTORY_SIZE)
 			sCurrentLine = 0;
@@ -725,7 +572,7 @@ cmd_help(int argc, char **argv)
 	bool ambiguous;
 
 	if (argc > 1) {
-		specified = find_command(argv[1], false, ambiguous);
+		specified = find_debugger_command(argv[1], false, ambiguous);
 		if (specified == NULL) {
 			start = argv[1];
 			startLength = strlen(start);
@@ -740,7 +587,8 @@ cmd_help(int argc, char **argv)
 	else
 		kprintf("debugger commands:\n");
 
-	for (command = sCommands; command != NULL; command = command->next) {
+	for (command = get_debugger_commands(); command != NULL;
+			command = command->next) {
 		if (specified && command->func != specified->func)
 			continue;
 		if (start != NULL && strncmp(start, command->name, startLength))
@@ -766,6 +614,25 @@ cmd_dump_kdl_message(int argc, char **argv)
 	if (sCurrentKernelDebuggerMessage) {
 		kputs(sCurrentKernelDebuggerMessage);
 		kputchar('\n');
+	}
+
+	return 0;
+}
+
+static int
+cmd_expr(int argc, char **argv)
+{
+	static const char* usage = "usage: expr <expression>\n"
+		"Evaluates the given expression and prints the result.\n";
+	if (argc != 2 || strcmp(argv[1], "--help") == 0) {
+		kprintf(usage);
+		return 0;
+	}
+
+	uint64 result;
+	if (evaluate_debug_expression(argv[1], &result, false)) {
+		kprintf("%llu (0x%llx)\n", result, result);
+		set_debug_variable("_", result);
 	}
 
 	return 0;
@@ -1017,7 +884,10 @@ debug_init_post_vm(kernel_args *args)
 	add_debugger_command("continue", &cmd_continue, "Leave kernel debugger");
 	add_debugger_command("message", &cmd_dump_kdl_message,
 		"Reprint the message printed when entering KDL");
+	add_debugger_command("expr", &cmd_expr,
+		"Evaluates the given expression and prints the result");
 
+	debug_variables_init();
 	frame_buffer_console_init(args);
 	arch_debug_console_init_settings(args);
 	tracing_init();
@@ -1089,75 +959,11 @@ debug_init_post_modules(struct kernel_args *args)
 //	#pragma mark - public API
 
 
-int
-add_debugger_command(char *name, int (*func)(int, char **), char *desc)
-{
-	cpu_status state;
-	struct debugger_command *cmd;
-
-	cmd = (struct debugger_command *)malloc(sizeof(struct debugger_command));
-	if (cmd == NULL)
-		return ENOMEM;
-
-	cmd->func = func;
-	cmd->name = name;
-	cmd->description = desc;
-
-	state = disable_interrupts();
-	acquire_spinlock(&sSpinlock);
-
-	cmd->next = sCommands;
-	sCommands = cmd;
-
-	release_spinlock(&sSpinlock);
-	restore_interrupts(state);
-
-	return B_NO_ERROR;
-}
-
-
-int
-remove_debugger_command(char * name, int (*func)(int, char **))
-{
-	struct debugger_command *cmd = sCommands;
-	struct debugger_command *prev = NULL;
-	cpu_status state;
-
-	state = disable_interrupts();
-	acquire_spinlock(&sSpinlock);
-
-	while (cmd) {
-		if (!strcmp(cmd->name, name) && cmd->func == func)
-			break;
-
-		prev = cmd;
-		cmd = cmd->next;
-	}
-
-	if (cmd) {
-		if (cmd == sCommands)
-			sCommands = cmd->next;
-		else
-			prev->next = cmd->next;
-	}
-
-	release_spinlock(&sSpinlock);
-	restore_interrupts(state);
-
-	if (cmd) {
-		free(cmd);
-		return B_NO_ERROR;
-	}
-
-	return B_NAME_NOT_FOUND;
-}
-
-
 uint32
 parse_expression(const char *expression)
 {
-	// TODO: Implement expression parser (cf. BeBook).
-	return strtoul(expression, NULL, 0);
+	uint64 result;
+	return (evaluate_debug_expression(expression, &result, true) ? result : 0);
 }
 
 
@@ -1207,27 +1013,8 @@ kernel_debugger(const char *message)
 
 	sCurrentKernelDebuggerMessage = message;
 
-	// bubble sort the commands
-	debugger_command* stopCommand = NULL;
-	while (stopCommand != sCommands) {
-		debugger_command** command = &sCommands;
-		while (true) {
-			debugger_command* nextCommand = (*command)->next;
-			if (nextCommand == stopCommand) {
-				stopCommand = *command;
-				break;
-			}
-
-			if (strcmp((*command)->name, nextCommand->name) > 0) {
-				debugger_command* tmpCommand = nextCommand->next;
-				(*command)->next = nextCommand->next;
-				nextCommand->next = *command;
-				*command = nextCommand;
-			}
-
-			command = &(*command)->next;
-		}
-	}
+	// sort the commands
+	sort_debugger_commands();
 
 	kernel_debugger_loop();
 

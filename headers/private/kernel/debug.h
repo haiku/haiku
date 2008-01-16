@@ -59,7 +59,18 @@ extern void debug_stop_screen_debug_output(void);
 extern void dprintf_no_syslog(const char *format, ...)
 				__attribute__ ((format (__printf__, 1, 2)));
 
-extern void _user_debug_output(const char *userString);
+extern bool		is_debug_variable_defined(const char* variableName);
+extern bool		set_debug_variable(const char* variableName, uint64 value);
+extern uint64	get_debug_variable(const char* variableName,
+					uint64 defaultValue);
+extern bool		remove_debug_variable(const char* variableName);
+extern void		remove_all_temporary_debug_variables();
+
+extern bool		evaluate_debug_expression(const char* expression,
+					uint64* result, bool silent);
+extern int		evaluate_debug_command(const char* command);
+
+extern void		_user_debug_output(const char *userString);
 
 #ifdef __cplusplus
 }
