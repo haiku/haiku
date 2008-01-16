@@ -204,9 +204,7 @@ public:
 
 			if (command != NULL) {
 				kputchar('\n');
-
-				char* args[3] = { NULL, "--help", NULL };
-				invoke_debugger_command(command, 2, args);
+				print_debugger_command_usage(command->name);
 			} else {
 				if (ambiguous)
 					kprintf("\nambiguous command\n");
@@ -558,13 +556,6 @@ kernel_debugger_loop(void)
 static int
 cmd_reboot(int argc, char **argv)
 {
-	static const char* usage = "usage: %s\n"
-		"Reboots the system.\n";
-	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
-		kprintf(usage, argv[0]);
-		return 0;
-	}
-
 	arch_cpu_shutdown(true);
 	return 0;
 		// I'll be really suprised if this line ever runs! ;-)
@@ -574,13 +565,6 @@ cmd_reboot(int argc, char **argv)
 static int
 cmd_shutdown(int argc, char **argv)
 {
-	static const char* usage = "usage: %s\n"
-		"Shuts down the system.\n";
-	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
-		kprintf(usage, argv[0]);
-		return 0;
-	}
-
 	arch_cpu_shutdown(false);
 	return 0;
 }
@@ -589,13 +573,6 @@ cmd_shutdown(int argc, char **argv)
 static int
 cmd_help(int argc, char **argv)
 {
-	static const char* usage = "usage: %s [name]\n"
-		"Lists all debugger commands or those starting with \"name\".\n";
-	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
-		kprintf(usage, argv[0]);
-		return 0;
-	}
-
 	debugger_command *command, *specified = NULL;
 	const char *start = NULL;
 	int32 startLength = 0;
@@ -634,13 +611,6 @@ cmd_help(int argc, char **argv)
 static int
 cmd_continue(int argc, char **argv)
 {
-	static const char* usage = "usage: %s\n"
-		"Leaves kernel debugger.\n";
-	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
-		kprintf(usage, argv[0]);
-		return 0;
-	}
-
 	return B_KDEBUG_QUIT;
 }
 
@@ -648,13 +618,6 @@ cmd_continue(int argc, char **argv)
 static int
 cmd_dump_kdl_message(int argc, char **argv)
 {
-	static const char* usage = "usage: %s\n"
-		"Reprints the message printed when entering KDL.\n";
-	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
-		kprintf(usage, argv[0]);
-		return 0;
-	}
-
 	if (sCurrentKernelDebuggerMessage) {
 		kputs(sCurrentKernelDebuggerMessage);
 		kputchar('\n');
@@ -666,10 +629,8 @@ cmd_dump_kdl_message(int argc, char **argv)
 static int
 cmd_expr(int argc, char **argv)
 {
-	static const char* usage = "usage: %s <expression>\n"
-		"Evaluates the given expression and prints the result.\n";
-	if (argc != 2 || strcmp(argv[1], "--help") == 0) {
-		kprintf(usage, argv[0]);
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -917,19 +878,31 @@ debug_init(kernel_args *args)
 status_t
 debug_init_post_vm(kernel_args *args)
 {
-	void *handle;
-
-	add_debugger_command("help", &cmd_help, "List all debugger commands");
-	add_debugger_command("reboot", &cmd_reboot, "Reboot the system");
-	add_debugger_command("shutdown", &cmd_shutdown, "Shut down the system");
-	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
-	add_debugger_command("exit", &cmd_continue, "Same as \"continue\"");
-	add_debugger_command("es", &cmd_continue, "Same as \"continue\"");
-	add_debugger_command("continue", &cmd_continue, "Leave kernel debugger");
-	add_debugger_command("message", &cmd_dump_kdl_message,
-		"Reprint the message printed when entering KDL");
-	add_debugger_command("expr", &cmd_expr,
-		"Evaluates the given expression and prints the result");
+	add_debugger_command_etc("help", &cmd_help, "List all debugger commands",
+		"usage: %s [name]\n"
+		"Lists all debugger commands or those starting with \"name\".\n", 0);
+	add_debugger_command_etc("reboot", &cmd_reboot, "Reboot the system",
+		"usage: %s\n"
+		"Reboots the system.\n", 0);
+	add_debugger_command_etc("shutdown", &cmd_shutdown, "Shut down the system",
+		"usage: %s\n"
+		"Shuts down the system.\n", 0);
+	add_debugger_command_etc("gdb", &cmd_gdb, "Connect to remote gdb",
+		"usage: %s\n"
+		"Connects to a remote gdb connected to the serial port.\n", 0);
+	add_debugger_command_etc("continue", &cmd_continue, "Leave kernel debugger",
+		"usage: %s\n"
+		"Leaves kernel debugger.\n", 0);
+	add_debugger_command_alias("exit", "continue", "Same as \"continue\"");
+	add_debugger_command_alias("es", "continue", "Same as \"continue\"");
+	add_debugger_command_etc("message", &cmd_dump_kdl_message,
+		"Reprint the message printed when entering KDL",
+		"usage: %s\n"
+		"Reprints the message printed when entering KDL.\n", 0);
+	add_debugger_command_etc("expr", &cmd_expr,
+		"Evaluates the given expression and prints the result",
+		"usage: %s <expression>\n"
+		"Evaluates the given expression and prints the result.\n", 0);
 
 	debug_variables_init();
 	frame_buffer_console_init(args);
@@ -937,7 +910,7 @@ debug_init_post_vm(kernel_args *args)
 	tracing_init();
 
 	// get debug settings
-	handle = load_driver_settings("kernel");
+	void *handle = load_driver_settings("kernel");
 	if (handle != NULL) {
 		sSerialDebugEnabled = get_driver_boolean_parameter(handle,
 			"serial_debug_output", sSerialDebugEnabled, sSerialDebugEnabled);

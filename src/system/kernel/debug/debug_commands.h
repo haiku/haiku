@@ -10,10 +10,12 @@
 
 
 struct debugger_command {
-	struct debugger_command *next;
-	int (*func)(int, char **);
-	const char *name;
-	const char *description;
+	struct debugger_command* next;
+	int				(*func)(int, char **);
+	const char*		name;
+	const char*		description;
+	const char*		usage;
+	uint32			flags;
 };
 
 #ifdef __cplusplus

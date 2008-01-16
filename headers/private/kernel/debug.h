@@ -70,6 +70,13 @@ extern bool		evaluate_debug_expression(const char* expression,
 					uint64* result, bool silent);
 extern int		evaluate_debug_command(const char* command);
 
+extern status_t	add_debugger_command_etc(const char* name,
+					debugger_command_hook func, const char* description,
+					const char* usage, uint32 flags);
+extern status_t	add_debugger_command_alias(const char* newName,
+					const char* oldName, const char* description);
+extern bool		print_debugger_command_usage(const char* command);
+
 extern void		_user_debug_output(const char *userString);
 
 #ifdef __cplusplus

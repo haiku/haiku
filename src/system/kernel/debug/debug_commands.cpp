@@ -17,6 +17,7 @@
 #include <debug.h>
 #include <lock.h>
 #include <thread.h>
+#include <util/AutoLock.h>
 
 #include "debug_variables.h"
 
@@ -94,6 +95,14 @@ in_command_invocation(void)
 int
 invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 {
+	// intercept invocations with "--help" and directly print the usage text
+	// If we know the command's usage text, intercept "--help" invocations
+	// and print it directly.
+	if (argc == 2 && strcmp(argv[1], "--help") == 0 && command->usage != NULL) {
+		kprintf(command->usage, command->name);
+		return 0;
+	}
+
 	struct thread* thread = thread_get_current_thread();
 	addr_t oldFaultHandler = thread->fault_handler;
 
@@ -168,33 +177,79 @@ sort_debugger_commands()
 }
 
 
+status_t
+add_debugger_command_etc(const char* name, debugger_command_hook func,
+	const char* description, const char* usage, uint32 flags)
+{
+	struct debugger_command *cmd;
+
+	cmd = (struct debugger_command*)malloc(sizeof(struct debugger_command));
+	if (cmd == NULL)
+		return B_NO_MEMORY;
+
+	cmd->func = func;
+	cmd->name = name;
+	cmd->description = description;
+	cmd->usage = usage;
+	cmd->flags = flags;
+
+	InterruptsSpinLocker _(sSpinlock);
+
+	cmd->next = sCommands;
+	sCommands = cmd;
+
+	return B_OK;
+}
+
+
+status_t
+add_debugger_command_alias(const char* newName, const char* oldName,
+	const char* description)
+{
+	// get the old command
+	bool ambiguous;
+	debugger_command* command = find_debugger_command(oldName, false,
+		ambiguous);
+	if (command == NULL)
+		return B_NAME_NOT_FOUND;
+
+	// register new command
+	return add_debugger_command_etc(newName, command->func,
+		description != NULL ? description : command->description,
+		command->usage, command->flags);
+}
+
+
+bool
+print_debugger_command_usage(const char* commandName)
+{
+	// get the command
+	bool ambiguous;
+	debugger_command* command = find_debugger_command(commandName, true,
+		ambiguous);
+	if (command == NULL)
+		return false;
+
+	// directly print the usage text, if we know it, otherwise invoke the
+	// command with "--help"
+	if (command->usage != NULL) {
+		kprintf(command->usage, command->name);
+	} else {
+		char* args[3] = { NULL, "--help", NULL };
+		invoke_debugger_command(command, 2, args);
+	}
+
+	return true;
+}
+
+
 //	#pragma mark - public API
 
 
 int
 add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 {
-	cpu_status state;
-	struct debugger_command *cmd;
-
-	cmd = (struct debugger_command *)malloc(sizeof(struct debugger_command));
-	if (cmd == NULL)
-		return ENOMEM;
-
-	cmd->func = func;
-	cmd->name = name;
-	cmd->description = desc;
-
-	state = disable_interrupts();
-	acquire_spinlock(&sSpinlock);
-
-	cmd->next = sCommands;
-	sCommands = cmd;
-
-	release_spinlock(&sSpinlock);
-	restore_interrupts(state);
-
-	return B_NO_ERROR;
+	return add_debugger_command_etc(name, func, desc, NULL, 0);
 }
 
 
