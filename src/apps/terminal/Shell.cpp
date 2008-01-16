@@ -55,10 +55,6 @@
 #endif
 
 
-/* default shell command and options. */
-const char *kDefaultShellCommand = { "/bin/sh" "-login" };
-
-
 /*
  * Set environment variable.
  */
@@ -273,6 +269,13 @@ receive_handshake_message(handshake_t& handshake)
 status_t
 Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
 {
+	const char *kDefaultShellCommand[] = { "/bin/sh", "--login" };
+	
+	if (argv == NULL || argc == 0) {
+		argv = kDefaultShellCommand;
+		argc = 2;	
+	}
+
 	signal(SIGTTOU, SIG_IGN);
 	
 	/*
@@ -480,9 +483,9 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		setenv("TERM", "beterm", true);
 		setenv("TTY", ttyName, true);
 		setenv("TTYPE", encoding, true);
-		setenv("SHELL", *argv, true);
+		setenv("SHELL", argv[0], true);
 
-		execve(*argv, (char * const *)argv, environ);
+		execve(argv[0], (char * const *)argv, environ);
 
 		/*
 		 * Exec failed.
@@ -493,11 +496,12 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 						"\t%s' "
 						"'Use Default Shell' 'Abort'";
 		char errorMessage[256];
-		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, *argv, strerror(errno));
+		snprintf(errorMessage, sizeof(errorMessage), spawnAlertMessage, argv[0], strerror(errno));
 
 		int returnValue = system(errorMessage);
 		if (returnValue == 0)
-			execl("/bin/sh", "/bin/sh", "-login", NULL);
+			execl(kDefaultShellCommand[0], kDefaultShellCommand[0],
+				kDefaultShellCommand[1], NULL);
 
 		exit(1);
 	}
