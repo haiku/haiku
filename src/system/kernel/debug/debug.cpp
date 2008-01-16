@@ -589,8 +589,8 @@ cmd_shutdown(int argc, char **argv)
 static int
 cmd_help(int argc, char **argv)
 {
-	static const char* usage = "usage: %s\n"
-		"Lists all debugger commands.\n";
+	static const char* usage = "usage: %s [name]\n"
+		"Lists all debugger commands or those starting with \"name\".\n";
 	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
 		kprintf(usage, argv[0]);
 		return 0;

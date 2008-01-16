@@ -626,9 +626,9 @@ ExpressionParser::_ParseCommand(int& returnCode)
 	if (command == NULL) {
 		if (ambiguous) {
 			snprintf(sTempBuffer, sizeof(sTempBuffer),
-				"Ambiguous command \"%s\". Use tab "
-				"completion to get a list of matching commands. Enter \"help\" "
-				"to get a list of all supported commands.\n", token.string);
+				"Ambiguous command \"%s\". Use tab completion or enter "
+				"\"help %s\" get a list of matching commands.\n", token.string,
+				token.string);
 		} else {
 			snprintf(sTempBuffer, sizeof(sTempBuffer),
 				"Unknown command \"%s\". Enter \"help\" to get a list of "

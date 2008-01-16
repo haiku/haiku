@@ -2442,15 +2442,13 @@ dump_vnode(int argc, char **argv)
 static int
 dump_vnodes(int argc, char **argv)
 {
-	if (argc > 2 || !strcmp(argv[1], "--help")) {
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: %s [device]\n", argv[0]);
 		return 0;
 	}
 
 	// restrict dumped nodes to a certain device if requested
-	dev_t device = -1;
-	if (argc > 1)
-		device = parse_expression(argv[1]);
+	dev_t device = parse_expression(argv[1]);
 
 	struct hash_iterator iterator;
 	struct vnode *vnode;
@@ -2460,7 +2458,7 @@ dump_vnodes(int argc, char **argv)
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
-		if (device != -1 && vnode->device != device)
+		if (vnode->device != device)
 			continue;
 
 		kprintf("%p%4ld%10Ld%5ld %p %p %p %s%s%s\n", vnode, vnode->device,
