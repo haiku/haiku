@@ -202,7 +202,13 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 	Unlock();
 
 	// block this thread now
-	acquire_sem(fExitSemaphore);
+	while (true) {
+		status_t err = acquire_sem_etc(fExitSemaphore, 1,
+			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 50000);
+		if (err != B_TIMED_OUT && err != B_INTERRUPTED)
+			break;
+		fWindow->UpdateIfNeeded();	
+	}
 
 	if (!Lock())
 		return GO_CANCELED;
