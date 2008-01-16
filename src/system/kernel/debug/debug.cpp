@@ -497,6 +497,15 @@ kernel_debugger_loop(void)
 	int32 previousCPU = sDebuggerOnCPU;
 	sDebuggerOnCPU = smp_get_current_cpu();
 
+	// set a few temporary debug variables
+	if (struct thread* thread = thread_get_current_thread()) {
+		set_debug_variable("_thread", (uint64)(addr_t)thread);
+		set_debug_variable("_threadID", thread->id);
+		set_debug_variable("_team", (uint64)(addr_t)thread->team);
+		set_debug_variable("_teamID", thread->team->id);
+		set_debug_variable("_cpu", sDebuggerOnCPU);
+	}
+
 	kprintf("Welcome to Kernel Debugging Land...\n");
 	kprintf("Running on CPU %ld\n", sDebuggerOnCPU);
 
@@ -549,6 +558,13 @@ kernel_debugger_loop(void)
 static int
 cmd_reboot(int argc, char **argv)
 {
+	static const char* usage = "usage: %s\n"
+		"Reboots the system.\n";
+	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	arch_cpu_shutdown(true);
 	return 0;
 		// I'll be really suprised if this line ever runs! ;-)
@@ -558,6 +574,13 @@ cmd_reboot(int argc, char **argv)
 static int
 cmd_shutdown(int argc, char **argv)
 {
+	static const char* usage = "usage: %s\n"
+		"Shuts down the system.\n";
+	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	arch_cpu_shutdown(false);
 	return 0;
 }
@@ -566,6 +589,13 @@ cmd_shutdown(int argc, char **argv)
 static int
 cmd_help(int argc, char **argv)
 {
+	static const char* usage = "usage: %s\n"
+		"Lists all debugger commands.\n";
+	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	debugger_command *command, *specified = NULL;
 	const char *start = NULL;
 	int32 startLength = 0;
@@ -604,6 +634,13 @@ cmd_help(int argc, char **argv)
 static int
 cmd_continue(int argc, char **argv)
 {
+	static const char* usage = "usage: %s\n"
+		"Leaves kernel debugger.\n";
+	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	return B_KDEBUG_QUIT;
 }
 
@@ -611,6 +648,13 @@ cmd_continue(int argc, char **argv)
 static int
 cmd_dump_kdl_message(int argc, char **argv)
 {
+	static const char* usage = "usage: %s\n"
+		"Reprints the message printed when entering KDL.\n";
+	if (argc > 1 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	if (sCurrentKernelDebuggerMessage) {
 		kputs(sCurrentKernelDebuggerMessage);
 		kputchar('\n');
@@ -622,10 +666,10 @@ cmd_dump_kdl_message(int argc, char **argv)
 static int
 cmd_expr(int argc, char **argv)
 {
-	static const char* usage = "usage: expr <expression>\n"
+	static const char* usage = "usage: %s <expression>\n"
 		"Evaluates the given expression and prints the result.\n";
 	if (argc != 2 || strcmp(argv[1], "--help") == 0) {
-		kprintf(usage);
+		kprintf(usage, argv[0]);
 		return 0;
 	}
 

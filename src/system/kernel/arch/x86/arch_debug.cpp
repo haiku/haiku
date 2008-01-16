@@ -233,16 +233,21 @@ get_previous_iframe(struct thread* thread, struct iframe* frame)
 static int
 stack_trace(int argc, char **argv)
 {
+	static const char* usage = "usage: %s [ <thread id> ]\n"
+		"Prints a stack trace for the current, respectively the specified\n"
+		"thread.\n"
+		"  <thread id>  -  The ID of the thread for which to print the stack\n"
+		"                  trace.\n";
+	if (argc > 2 || argc == 2 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
 	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
 	uint32 ebp = x86_read_ebp();
 	int32 i, num = 0, last = 0;
-
-	if (argc > 2) {
-		kprintf("usage: %s [thread id]\n", argv[0]);
-		return 0;
-	}
 
 	setup_for_thread(argc == 2 ? argv[1] : NULL, &thread, &ebp,
 		&oldPageDirectory);
@@ -363,6 +368,18 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, int32 argCount)
 static int
 show_call(int argc, char **argv)
 {
+	static const char* usage
+		= "usage: %s [ <thread id> ] <call index> [ -<arg count> ]\n"
+		"Prints a function call with parameters of the current, respectively\n"
+		"the specified thread.\n"
+		"  <thread id>   -  The ID of the thread for which to print the call.\n"
+		"  <call index>  -  The index of the call in the stack trace.\n"
+		"  <arg count>   -  The number of call arguments to print.\n";
+	if (argc == 2 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
 	uint32 ebp = x86_read_ebp();
@@ -378,7 +395,7 @@ show_call(int argc, char **argv)
 	}
 
 	if (argc < 2 || argc > 3) {
-		kprintf("usage: %s [thread id] <call-index> [-<arg-count>]\n", argv[0]);
+		kprintf(usage, argv[0]);
 		return 0;
 	}
 
@@ -424,7 +441,7 @@ show_call(int argc, char **argv)
 	}
 
 	if (oldPageDirectory != 0) {
-		// switch back to the previous page directory to no cause any troubles
+		// switch back to the previous page directory to not cause any troubles
 		write_cr3(oldPageDirectory);
 	}
 
@@ -435,6 +452,16 @@ show_call(int argc, char **argv)
 static int
 dump_iframes(int argc, char **argv)
 {
+	static const char* usage = "usage: %s [ <thread id> ]\n"
+		"Prints the iframe stack for the current, respectively the specified\n"
+		"thread.\n"
+		"  <thread id>  -  The ID of the thread for which to print the iframe\n"
+		"                  stack.\n";
+	if (argc == 2 && strcmp(argv[1], "--help") == 0) {
+		kprintf(usage, argv[0]);
+		return 0;
+	}
+
 	struct thread *thread = NULL;
 	int32 i;
 
@@ -448,7 +475,7 @@ dump_iframes(int argc, char **argv)
 			return 0;
 		}
 	} else if (argc > 2) {
-		kprintf("usage: %s [thread id]\n", argv[0]);
+		kprintf(usage, argv[0]);
 		return 0;
 	}
 
