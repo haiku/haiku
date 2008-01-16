@@ -88,7 +88,7 @@ status_t SoundplayThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BMessage command(B_COUNT_PROPERTIES);
 	BMessage answer;
 	command.AddSpecifier("Window");
-	err = msgr.SendMessage(&command, &answer,2E6,2E6);
+	err = msgr.SendMessage(&command, &answer,2000000LL,2000000LL);
 	if(B_OK == err) {
 		if (answer.FindInt32("result", &wincnt) != B_OK)
 			wincnt = 1;
@@ -100,7 +100,7 @@ status_t SoundplayThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	for (int32 i = 0; i < wincnt; i++) {
 		BMessage wmsg(msg);
 		wmsg.AddSpecifier("Window", i);
-		msgr.SendMessage(&wmsg, (BHandler *)NULL, 2E6);
+		msgr.SendMessage(&wmsg, (BHandler *)NULL, 2000000LL);
 	}
 	
 	return B_OK;

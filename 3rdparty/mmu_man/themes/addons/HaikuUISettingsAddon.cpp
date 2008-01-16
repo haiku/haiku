@@ -137,9 +137,6 @@ status_t	UISettingsThemesAddon::RunPreferencesPanel()
 
 status_t UISettingsThemesAddon::AddNames(BMessage &names)
 {
-	const char *str, *value;
-	type_code code;
-	int32 i;
 	FENTRY;
 	
 	names.AddString(Z_THEME_UI_SETTINGS, "UI Settings");
@@ -266,10 +263,10 @@ status_t UISettingsThemesAddon::ApplyDefaultTheme(uint32 flags)
 	BMessage theme;
 	BMessage uisettings;
 	BFont fnt;
-	status_t err;
 	FENTRY;
 	
 	/*
+	status_t err;
 	err = get_default_settings(&uisettings);
 	if (err)
 		return err;

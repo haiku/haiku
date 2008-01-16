@@ -88,7 +88,7 @@ class MyInvoker : public BInvoker {
 };
 
 
-MyInvoker::MyInvoker(BMessage* message, const BHandler* handler, const BLooper* looper = NULL)
+MyInvoker::MyInvoker(BMessage* message, const BHandler* handler, const BLooper* looper)
 	: BInvoker(message, handler, looper)
 {
 }

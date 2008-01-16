@@ -36,8 +36,8 @@ extern status_t _get_nth_font_folder_(long, font_folder_info **);
 
 status_t find_font_file(entry_ref *to, font_family family, font_style style, float size)
 {
-	status_t err = ENOENT;
 #ifdef B_BEOS_VERSION_DANO
+	status_t err = ENOENT;
 	long i, fontcount, foldercount;
 	font_file_info *ffi;
 	font_folder_info *fdi;
@@ -331,7 +331,7 @@ FindFont(BMessage &message, const char *name, int32 index, BFont *f)
 
 
 status_t
-AddFont(BMessage &message, const char *name, BFont *f, int32 count = 1)
+AddFont(BMessage &message, const char *name, BFont *f, int32 count)
 {
 #ifdef B_BEOS_VERSION_DANO
 	return message.AddFlat(name, f, count);
