@@ -13,16 +13,16 @@
 #include <Drivers.h>
 #include <Errors.h>
 #include <OS.h>
-#include <malloc.h>
 #include <fcntl.h>
 #include <image.h>
+#include <malloc.h>
+#include <midi_driver.h>
 #include <string.h>
 
 #include "debug.h"
 #include "ice1712.h"
 #include "ice1712_reg.h"
 #include "io.h"
-#include "midi_driver.h"
 #include "multi.h"
 #include "util.h"
 
@@ -137,7 +137,7 @@ static status_t
 ice1712_setup(ice1712 *ice)
 {
 	int result, i;
-	long result_l = 0;
+	status_t status = B_OK;
 	uint8 reg8 = 0;
 
 	ice->irq			= ice->info.u.h0.interrupt_line;
@@ -249,10 +249,13 @@ ice1712_setup(ice1712 *ice)
 	names[num_names] = NULL;
 
 	ice->buffer_ready_sem = create_sem(0, "Buffer Exchange");
+	if (ice->buffer_ready_sem < B_OK) {
+		return ice->buffer_ready_sem;
+	}
 	
 //	TRACE_ICE(("installing interrupt : %0x\n", ice->irq));
-	result_l = install_io_interrupt_handler(ice->irq, ice_1712_int, ice, 0);
-	if (result_l == B_OK)
+	status = install_io_interrupt_handler(ice->irq, ice_1712_int, ice, 0);
+	if (status == B_OK)
 		TRACE_ICE(("Install Interrupt Handler == B_OK\n"));
 	else
 		TRACE_ICE(("Install Interrupt Handler != B_OK\n"));
@@ -260,10 +263,21 @@ ice1712_setup(ice1712 *ice)
 	ice->mem_id_pb = alloc_mem(&ice->phys_addr_pb, &ice->log_addr_pb, 
 								PLAYBACK_BUFFER_TOTAL_SIZE,
 								"playback buffer");
+	if (ice->mem_id_pb < B_OK) {
+		remove_io_interrupt_handler(ice->irq, ice_1712_int, ice);
+		delete_sem(ice->buffer_ready_sem);
+		return ice->mem_id_pb;
+	}
 
 	ice->mem_id_rec = alloc_mem(&ice->phys_addr_rec, &ice->log_addr_rec, 
 								RECORD_BUFFER_TOTAL_SIZE,
 								"record buffer");
+	if (ice->mem_id_rec < B_OK) {
+		remove_io_interrupt_handler(ice->irq, ice_1712_int, ice);
+		delete_sem(ice->buffer_ready_sem);
+		delete_area(ice->mem_id_pb);
+		return(ice->mem_id_rec);
+	}
 
 	memset(ice->log_addr_pb, 0, PLAYBACK_BUFFER_TOTAL_SIZE);
 	memset(ice->log_addr_rec, 0, RECORD_BUFFER_TOTAL_SIZE);
@@ -336,24 +350,19 @@ init_driver(void)
 		return ENOSYS;
 	}
 
-	while ((*pci->get_nth_pci_info)(i, &cards[num_cards].info) == B_OK)
-	{//TODO check other Vendor_ID and DEVICE_ID
-		if ((cards[num_cards].info.vendor_id == ICE1712_VENDOR_ID) && 
-			(cards[num_cards].info.device_id == ICE1712_DEVICE_ID))
-		{
-			if (num_cards == NUM_CARDS)
-			{
+	while ((*pci->get_nth_pci_info)(i, &cards[num_cards].info) == B_OK) {
+		//TODO check other Vendor_ID and DEVICE_ID
+		if ((cards[num_cards].info.vendor_id == ICE1712_VENDOR_ID)
+			&& (cards[num_cards].info.device_id == ICE1712_DEVICE_ID)) {
+			if (num_cards == NUM_CARDS) {
 				TRACE_ICE(("Too many ice1712 cards installed!\n"));
 				break;
 			}
 
-			if (ice1712_setup(&cards[num_cards]) != B_OK)
+			if (ice1712_setup(&cards[num_cards]) != B_OK) {
 			//Vendor_ID and Device_ID has been modified
-			{
 				TRACE_ICE(("Setup of ice1712 %d failed\n", num_cards + 1));
-			}
-			else
-			{
+			} else {
 				num_cards++;
 			}
 		}
@@ -366,7 +375,7 @@ init_driver(void)
 		put_module(B_PCI_MODULE_NAME);
 		put_module(B_MPU_401_MODULE_NAME);
 		return ENODEV;
-	}	
+	}
 	return B_OK;
 }
 
@@ -374,10 +383,12 @@ init_driver(void)
 static void 
 ice_1712_shutdown(ice1712 *ice)
 {
-	long result_l;
+	status_t result;
 
-	result_l = remove_io_interrupt_handler(ice->irq, ice_1712_int, ice);
-	if (result_l == B_OK)
+	delete_sem(ice->buffer_ready_sem);
+
+	result = remove_io_interrupt_handler(ice->irq, ice_1712_int, ice);
+	if (result == B_OK)
 		TRACE_ICE(("remove Interrupt result == B_OK\n"));
 	else
 		TRACE_ICE(("remove Interrupt result != B_OK\n"));
@@ -426,8 +437,24 @@ publish_devices(void)
 
 static status_t 
 ice_1712_open(const char *name, uint32 flags, void **cookie)
-{//Not Implemented (partialy only)
+{
+	int ix;
+	ice1712 *card = NULL;
 	TRACE_ICE(("===open()===\n"));
+
+	for (ix=0; ix<num_cards; ix++) {
+		if (!strcmp(cards[ix].name, name)) {
+			card = &cards[ix];
+		}
+	}
+	
+	if (card == NULL) {
+		TRACE_ICE(("open() card not found %s\n", name));
+		for (ix=0; ix<num_cards; ix++) {
+			TRACE_ICE(("open() card available %s\n", cards[ix].name)); 
+		}
+		return B_ERROR;
+	}
 	*cookie = cards;
 	return B_OK;
 }
@@ -437,7 +464,7 @@ static status_t
 ice_1712_close(void *cookie)
 {
 	TRACE_ICE(("===close()===\n"));
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -445,7 +472,7 @@ static status_t
 ice_1712_free(void *cookie)
 {
 	TRACE_ICE(("===free()===\n"));
-	return B_ERROR;
+	return B_OK;
 }
 
 

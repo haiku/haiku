@@ -95,6 +95,7 @@ start_DMA(ice1712 *card)
 	write_mt_uint8(card, MT_PROF_PB_CONTROL, 5);
 }
 
+
 status_t 
 ice1712_get_description(ice1712 *card, multi_description *data)
 {
@@ -312,18 +313,18 @@ ice1712_set_global_format(ice1712 *card, multi_format_info *data)
 	TRACE_ICE(("Input Sampling Rate = %#x\n", data->input.rate));
 	TRACE_ICE(("Output Sampling Rate = %#x\n", data->output.rate));
 
-	if ((data->input.rate == data->output.rate) &&
-		(card->lock_source == B_MULTI_LOCK_INTERNAL)) {
+	if ((data->input.rate == data->output.rate)
+		&& (card->lock_source == B_MULTI_LOCK_INTERNAL)) {
 		switch (data->input.rate)
 		{
 			case B_SR_96000 :
 				card->sampling_rate = 0x07;
 				break;
-			case B_SR_48000 :
-				card->sampling_rate = 0x00;
-				break;
 			case B_SR_88200 :
 				card->sampling_rate = 0x0B;
+				break;
+			case B_SR_48000 :
+				card->sampling_rate = 0x00;
 				break;
 			case B_SR_44100 :
 				card->sampling_rate = 0x08;

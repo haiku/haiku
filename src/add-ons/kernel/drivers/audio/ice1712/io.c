@@ -268,8 +268,7 @@ int16 read_eeprom(ice1712 *ice, uint8 eeprom[32])
 	int i;
 	int16 tmp;
 
-	for (i = 0; i < 6; i++)
-	{
+	for (i = 0; i < 6; i++) {
 		tmp = read_i2c(ice, I2C_EEPROM_ADDRESS_READ, i);
 		if (tmp >= 0)
 			eeprom[i] = (uint8)tmp;
@@ -278,8 +277,7 @@ int16 read_eeprom(ice1712 *ice, uint8 eeprom[32])
 	}
 	if (eeprom[4] > 32)
 		return -1;
-	for (i = 6; i < eeprom[4]; i++)
-	{
+	for (i = 6; i < eeprom[4]; i++) {
 		tmp = read_i2c(ice, I2C_EEPROM_ADDRESS_READ, i);
 		if (tmp >= 0)
 			eeprom[i] = (uint8)tmp;
@@ -366,8 +364,7 @@ ak45xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data, uint8 chip_select)
 	write_gpio(ice, tmp);
 	snooze(AK45xx_DELAY);
 
-	for (i = 0; i < AK45xx_BITS_TO_WRITE; i++)
-	{
+	for (i = 0; i < AK45xx_BITS_TO_WRITE; i++) {
 		// drop clock and data bits
 		tmp &= ~(ice->analog_codec.clock | ice->analog_codec.data_out);
 
@@ -415,8 +412,7 @@ cs84xx_write_gpio(ice1712 *ice, uint8 reg_addr, uint8 data, uint8 chip_select)
 	write_gpio(ice, tmp);
 	snooze(CS84xx_DELAY);
 
-	for (i = 0; i < CS84xx_BITS_TO_WRITE; i++)
-	{
+	for (i = 0; i < CS84xx_BITS_TO_WRITE; i++) {
 		// drop clock and data bits
 		tmp &= ~(ice->digital_codec.clock | ice->digital_codec.data_out);
 
