@@ -1003,7 +1003,7 @@ debug_init_post_modules(struct kernel_args *args)
 //	#pragma mark - public API
 
 
-uint32
+uint64
 parse_expression(const char *expression)
 {
 	uint64 result;

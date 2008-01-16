@@ -190,7 +190,7 @@ extern void			panic(const char *format, ...);
 #endif
 
 extern void			kernel_debugger(const char *message);	/* enter kernel debugger */
-extern uint32		parse_expression(const char *string);	/* utility for debugger cmds */
+extern uint64		parse_expression(const char *string);	/* utility for debugger cmds */
 
 /* special return codes for kernel debugger */
 #define  B_KDEBUG_CONT   2
