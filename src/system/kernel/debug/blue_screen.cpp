@@ -48,6 +48,7 @@ struct screen_info {
 	bool	reverse_attr;
 	int32	in_command_rows;
 	bool	paging;
+	bool	boot_debug_output;
 	bool	ignore_output;
 
 	// state machine
@@ -112,7 +113,8 @@ next_line(void)
  		scroll_up();
 #else
 
-		if (sScreen.paging && sScreen.in_command_rows > 1) {
+		if (sScreen.paging
+			&& (sScreen.in_command_rows > 1 || sScreen.boot_debug_output)) {
 			// We're in the debugger, and a command is being executed
 			const char *text = "Press key to continue, Q to quit";
 			int32 length = strlen(text);
@@ -124,7 +126,7 @@ next_line(void)
 
 			for (int32 i = 0; i < length; i++) {
 				sModule->put_glyph(sScreen.columns - length + i, sScreen.y,
-					text[i], 0xf0);
+					text[i], sScreen.boot_debug_output ? 0x6f : 0xf0);
 			}
 
 			char c = blue_screen_getchar();
@@ -168,7 +170,6 @@ erase_line(erase_line_mode mode)
 			sModule->fill_glyph(sScreen.x, sScreen.y, sScreen.columns
 				- sScreen.x, 1, ' ', sScreen.attr);
 			break;
-//		default:
 	}
 }
 
@@ -208,7 +209,7 @@ set_vt100_attributes(int32 *args, int32 argCount)
 	for (int32 i = 0; i < argCount; i++) {
 		switch (args[i]) {
 			case 0: // reset
-				sScreen.attr = 0x0f;
+				sScreen.attr = sScreen.boot_debug_output ? 0xf0 : 0x0f;
 				sScreen.bright_attr = true;
 				sScreen.reverse_attr = false;
 				break;
@@ -569,6 +570,9 @@ blue_screen_enter(bool debugOutput)
 {
 	sScreen.attr = debugOutput ? 0xf0 : 0x0f;
 		// black on white for KDL, white on black for debug output
+	sScreen.boot_debug_output = debugOutput;
+	sScreen.ignore_output = false;
+
 	sScreen.x = sScreen.y = 0;
 	sScreen.state = CONSOLE_STATE_NORMAL;
 
@@ -595,7 +599,8 @@ blue_screen_getchar(void)
 void
 blue_screen_putchar(char c)
 {
-	if (sScreen.ignore_output && in_command_invocation())
+	if (sScreen.ignore_output
+		&& (in_command_invocation() || sScreen.boot_debug_output))
 		return;
 
 	sScreen.ignore_output = false;
@@ -610,7 +615,8 @@ blue_screen_putchar(char c)
 void
 blue_screen_puts(const char *text)
 {
-	if (sScreen.ignore_output && in_command_invocation())
+	if (sScreen.ignore_output
+		&& (in_command_invocation() || sScreen.boot_debug_output))
 		return;
 
 	sScreen.ignore_output = false;
