@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007 Haiku Inc. All rights reserved.
+ * Copyright 2006-2008 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@unet.nl>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #include "PartitionList.h"
 #include "Support.h"

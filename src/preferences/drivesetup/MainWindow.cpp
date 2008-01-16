@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Copyright 2002-2008 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,6 +9,7 @@
  */
 #include "MainWindow.h"
 #include "DiskView.h"
+#include "InitParamsPanel.h"
 #include "PartitionList.h"
 #include "Support.h"
 
@@ -578,10 +579,13 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	}
 
 
-// TODO: check and allow BFS only, since our parameter string
-// construction only handles BFS at the moment
-//	if (BString("") != diskSystem) {
-//	}
+	// allow BFS only, since our parameter string
+	// construction only handles BFS at the moment
+	if (diskSystemName != "Be File System") {
+		_DisplayPartitionError("Don't know how to construct parameters "
+			"for this file system.");
+		return;
+	}
 
 	status_t ret = disk->PrepareModifications();
 	if (ret != B_OK) {
@@ -593,9 +597,10 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 	// TODO: use partition initialization editor
 	// (partition->GetInitializationParameterEditor())
 
-	BString name = "BFS Init Test";
+	BString name = "Haiku";
 	BString parameters;
-	parameters << "block_size " << 2048 << "\n";
+	InitParamsPanel* panel = new InitParamsPanel(this);
+	panel->Go(name, parameters);
 
 	bool supportsName = diskSystem.SupportsContentName();
 	BString validatedName(name);

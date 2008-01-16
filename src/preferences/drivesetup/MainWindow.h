@@ -1,6 +1,10 @@
 /*
- * Copyright 2002-2007 Haiku Inc. All rights reserved.
+ * Copyright 2002-2008 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Ithamar R. Adema <ithamar@unet.nl>
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef MAIN_WINDOW_H
 #define MAIN_WINDOW_H

@@ -1,3 +1,10 @@
+/*
+ * Copyright 2008 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 #ifndef INIT_PARAMS_PANEL_H
 #define INIT_PARAMS_PANEL_H
 
