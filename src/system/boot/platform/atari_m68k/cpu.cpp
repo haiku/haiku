@@ -38,19 +38,22 @@ check_cpu_features()
 #warning M68K: TODO: probe ourselves, we shouldn't trust the TOS!
 
 	const tos_cookie *c;
+	uint16 cpu_type, fpu_type, fpu_emul;
 
 	c = tos_find_cookie('_CPU');
 	if (!c) {
 		panic("can't get a cookie (_CPU)! Mum, I'm hungry!");
 		return EINVAL;
 	}
+	cpu_type = (uint16) c->ivalue;
+
 	dump_tos_cookies();
 
 #warning M68K: check for 020 + mmu
-	if (c->ivalue < 30/*20*/)
+	if (cpu_type < 30/*20*/)
 		return EINVAL;
 	
-	gKernelArgs.arch_args.has_lpstop = (c->ivalue >= 60)?true:false;
+	gKernelArgs.arch_args.has_lpstop = (cpu_type >= 60)?true:false;
 #warning M68K: add cpu type to kern args
 
 	c = tos_find_cookie('_FPU');
@@ -58,9 +61,11 @@ check_cpu_features()
 		panic("can't get a cookie (_FPU)! Mum, I'm hungry!");
 		return EINVAL;
 	}
+	fpu_type = (uint16)(c->ivalue >> 16);
+	fpu_emul = (uint16)(c->ivalue);
 
 #warning M68K: check for fpu in detail
-	if (c->ivalue < 2 || c->ivalue > 7) {
+	if (fpu_type < 2 || fpu_type > 9) {
 		panic("bad fpu");
 		return EINVAL;
 	}
