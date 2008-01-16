@@ -269,7 +269,7 @@ TermWindow::MessageReceived(BMessage *message)
 			be_app->GetAppInfo(&info);
 			
 			// try launching two different ways to work around possible problems
-			if (be_roster->Launch(&info.ref)!=B_OK)
+			if (be_roster->Launch(&info.ref) != B_OK)
 				be_roster->Launch(TERM_SIGNATURE);
 			break;
 		}
@@ -664,7 +664,7 @@ void
 TermWindow::_RemoveTab(int32 index)
 {
 	if (fTabView->CountTabs() > 1)			
-		delete fTabView->RemoveTab(fTabView->Selection());
+		delete fTabView->RemoveTab(index);
 	else
 		PostMessage(B_QUIT_REQUESTED);
 }
@@ -735,11 +735,20 @@ CustomTermView::CustomTermView(int32 rows, int32 columns, int32 argc, const char
 void
 CustomTermView::NotifyQuit(int32 reason)
 {
-	if (Window()) {
+	BWindow *window = Window();
+	if (window == NULL)
+		window = be_app->WindowAt(0);
+
+	// TODO: If we got this from a view in a tab not currently selected,
+	// Window() will be NULL, as the view is detached.
+	// So we send the message to the first application window
+	// This isn't so cool, but for now, a Terminal app has only one
+	// window.
+	if (window != NULL) {
 		BMessage message(kCloseView);
 		message.AddPointer("termView", this);
-		message.AddInt32("reason", reason);
-		Window()->PostMessage(&message);
+		message.AddInt32("reason", reason);	
+		window->PostMessage(&message);
 	}
 }
 

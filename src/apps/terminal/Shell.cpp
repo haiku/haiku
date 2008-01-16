@@ -311,7 +311,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 	}
 
 	if (master < 0) {
-    		printf("didn't find any available pseudo ttys.");
+    		fprintf(stderr, "didn't find any available pseudo ttys.");
     		return B_ERROR;
 	}
 
@@ -490,6 +490,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 		/*
 		 * Exec failed.
 		 */
+		
 		sleep(1);
 		const char *spawnAlertMessage = "alert --stop "
 						"'Cannot execute \"%s\":\n"
