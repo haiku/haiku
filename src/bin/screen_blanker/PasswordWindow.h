@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -16,7 +16,8 @@
 
 const static int32 kMsgUnlock = 'ULMS';
 
-class PasswordWindow : public BWindow{
+
+class PasswordWindow : public BWindow {
 	public:
 		PasswordWindow();
 
