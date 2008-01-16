@@ -85,8 +85,10 @@ translation_format outputFormats[] = {
 
 // Main functions of translator :)
 static status_t Copy(BPositionIO *in, BPositionIO *out);
-static status_t Compress(BPositionIO *in, BPositionIO *out);
-static status_t Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension);
+static status_t Compress(BPositionIO *in, BPositionIO *out,
+	const jmp_buf* longJumpBuffer);
+static status_t Decompress(BPositionIO *in, BPositionIO *out,
+	BMessage* ioExtension, const jmp_buf* longJumpBuffer);
 static status_t Error(j_common_ptr cinfo, status_t error = B_ERROR);
 
 
@@ -1101,9 +1103,6 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 	return B_OK;
 }
 
-static jmp_buf sLongJumpBuffer;
-jmp_buf* gLongJumpBuffer = &sLongJumpBuffer;
-
 /*!	Arguably the most important method in the add-on */
 status_t
 Translate(BPositionIO *inSource, const translator_info *inInfo,
@@ -1120,7 +1119,8 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 	// this place. If this happens, it is as if the setjmp() call is called
 	// a second time, but this time the return value will be 1. The first
 	// invokation will return 0.
-	int jmpRet = setjmp(sLongJumpBuffer);
+	jmp_buf longJumpBuffer;
+	int jmpRet = setjmp(longJumpBuffer);
 	if (jmpRet == 1)
 		return B_ERROR;
 
@@ -1130,10 +1130,11 @@ Translate(BPositionIO *inSource, const translator_info *inInfo,
 			return Copy(inSource, outDestination);
 		} else if (inInfo->type == B_TRANSLATOR_BITMAP
 				&& outType == JPEG_FORMAT) {
-			return Compress(inSource, outDestination);
+			return Compress(inSource, outDestination, &longJumpBuffer);
 		} else if (inInfo->type == JPEG_FORMAT
 				&& outType == B_TRANSLATOR_BITMAP) {
-			return Decompress(inSource, outDestination, ioExtension);
+			return Decompress(inSource, outDestination, ioExtension,
+				&longJumpBuffer);
 		}
 	} catch (...) {
 		fprintf(stderr, "libjpeg encoutered a critical error "
@@ -1180,7 +1181,7 @@ Copy(BPositionIO *in, BPositionIO *out)
 
 /*!	Encode into the native format */
 static status_t
-Compress(BPositionIO *in, BPositionIO *out)
+Compress(BPositionIO *in, BPositionIO *out, const jmp_buf* longJumpBuffer)
 {
 	// Load Settings
 	jpeg_settings settings;
@@ -1298,7 +1299,7 @@ Compress(BPositionIO *in, BPositionIO *out)
 	// Set basic things needed for jpeg writing
 	struct jpeg_compress_struct cinfo;
 	struct jpeg_error_mgr jerr;
-	cinfo.err = be_jpeg_std_error(&jerr, &settings);
+	cinfo.err = be_jpeg_std_error(&jerr, &settings, longJumpBuffer);
 	jpeg_create_compress(&cinfo);
 	be_jpeg_stdio_dest(&cinfo, out);
 
@@ -1393,7 +1394,8 @@ Compress(BPositionIO *in, BPositionIO *out)
 
 /*!	Decode the native format */
 static status_t
-Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
+Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension,
+	const jmp_buf* longJumpBuffer)
 {
 	// Load Settings
 	jpeg_settings settings;
@@ -1402,7 +1404,7 @@ Decompress(BPositionIO *in, BPositionIO *out, BMessage* ioExtension)
 	// Set basic things needed for jpeg reading
 	struct jpeg_decompress_struct cinfo;
 	struct jpeg_error_mgr jerr;
-	cinfo.err = be_jpeg_std_error(&jerr, &settings);
+	cinfo.err = be_jpeg_std_error(&jerr, &settings, longJumpBuffer);
 	jpeg_create_decompress(&cinfo);
 	be_jpeg_stdio_src(&cinfo, in);
 

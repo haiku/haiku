@@ -25,6 +25,8 @@
 #endif
 #include "jmorecfg.h"		/* seldom changed options */
 
+#include <setjmp.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -713,6 +715,8 @@ struct jpeg_error_mgr {
   const char * const * addon_message_table; /* Non-library errors */
   int first_addon_message;	/* code for first string in addon table */
   int last_addon_message;	/* code for last string in addon table */
+
+  jmp_buf long_jump_buffer;
 };
 
 

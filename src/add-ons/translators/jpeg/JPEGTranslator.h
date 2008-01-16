@@ -213,8 +213,8 @@ EXTERN(void) be_jpeg_stdio_dest(j_compress_ptr cinfo, BPositionIO *outfile);	// 
 //	modified to use settings
 //	(so user can decide to show dialog-boxes or not)
 //---------------------------------------------------
-EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings * settings); // from "be_jerror.cpp"
-
-extern jmp_buf* gLongJumpBuffer;
+EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err,
+	jpeg_settings * settings, const jmp_buf* longJumpBuffer);
+	// implemented in "be_jerror.cpp"
 
 #endif // _JPEGTRANSLATOR_H_

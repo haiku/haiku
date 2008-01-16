@@ -69,10 +69,14 @@ be_error_exit (j_common_ptr cinfo)
 
 	fprintf(stderr, "JPEG Library Error: %s\n", buffer);
 
+	jmp_buf longJumpBuffer;
+	memcpy(&longJumpBuffer, &(cinfo->err->long_jump_buffer), sizeof(jmp_buf));
+
 	/* Let the memory manager delete any temp files before we die */
 	jpeg_destroy(cinfo);
 
-	longjmp(*gLongJumpBuffer, 0);
+	// jump back directly to the high level function's "breakpoint"
+	longjmp(longJumpBuffer, 0);
 }
 
 
@@ -86,6 +90,8 @@ be_output_message (j_common_ptr cinfo)
 
 	/* Create the message */
 	(*cinfo->err->format_message) (cinfo, buffer);
+
+	cinfo->err->num_warnings++;
 
 	/* If it's compressing or decompressing and user turned messages on */
 	if (!cinfo->is_decompressor || cinfo->err->ShowReadWarnings) {
@@ -103,7 +109,8 @@ be_output_message (j_common_ptr cinfo)
  */
 
 GLOBAL(struct jpeg_error_mgr *)
-be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings *settings)
+be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings *settings,
+	const jmp_buf* longJumpBuffer)
 {
 	jpeg_std_error(err);
 
@@ -111,6 +118,7 @@ be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings *settings)
 	err->output_message = be_output_message;
 
 	err->ShowReadWarnings = settings->ShowReadWarningBox;
+	memcpy(&(err->long_jump_buffer), longJumpBuffer, sizeof(jmp_buf));
 
 	return err;
 }
