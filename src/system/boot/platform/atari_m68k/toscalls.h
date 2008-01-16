@@ -214,9 +214,11 @@ static inline int Bconputs(int16 handle, const char *string)
 	int i, err;
 	for (i = 0; string[i]; i++) {
 		err = Bconout(handle, string[i]);
-		if (err)
-			return i;
+		if (err < 0)
+			break;
 	}
+	Bconout(handle, '\r');
+	Bconout(handle, '\n');
 	return i;
 }
 
@@ -400,6 +402,23 @@ static inline NatFeatCookie *nat_features(void)
 	return NULL;
 }
 
+static inline int32 nat_feat_getid(const char *name)
+{
+	NatFeatCookie *c = nat_features();
+	if (!c)
+		return 0;
+	return c->nfGetID(name);
+}
+
+#define nat_feat_call(id, code, a...) \
+({						\
+	int32 ret;				\
+	NatFeatCookie *c = nat_features();	\
+	if (!c)					\
+		return -1;			\
+	ret = c->nfCall(id | code, a##...);	\
+	ret;					\
+})
 
 /* XHDI NatFeat */
 
