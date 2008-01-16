@@ -104,7 +104,12 @@ cmd_unset_variable(int argc, char **argv)
 		return 0;
 	}
 
-	remove_debug_variable(argv[2]);
+	const char* variable = argv[1];
+
+	if (is_temporary_variable(variable))
+		kprintf("You cannot remove temporary variables.\n");
+	else if (!remove_debug_variable(variable))
+		kprintf("Did not find variable %s.\n", variable);
 
 	return 0;
 }
@@ -203,7 +208,7 @@ remove_all_temporary_debug_variables()
 	for (int i = 0; i < kTemporaryVariableCount; i++) {
 		Variable& variable = sTemporaryVariables[i];
 		if (!variable.IsUsed())
-			return;
+			break;
 
 		variable.Uninit();
 	}
