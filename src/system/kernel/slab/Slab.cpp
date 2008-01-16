@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -39,6 +40,7 @@
 #define TRACE_CACHE(cache, format, bananas...) do { } while (0)
 #endif
 
+#define CACHE_ALIGN_ON_SIZE	(30 << 1)
 
 static const int kMagazineCapacity = 32;
 static const size_t kCacheColorPeriod = 8;
@@ -273,10 +275,15 @@ area_allocate_pages(object_cache *cache, void **pages, uint32 flags)
 	if (cache->flags & CACHE_UNLOCKED_PAGES)
 		lock = B_NO_LOCK;
 
+	uint32 addressSpec = B_ANY_KERNEL_ADDRESS;
+	if ((cache->flags & CACHE_ALIGN_ON_SIZE) != 0
+		&& cache->slab_size != B_PAGE_SIZE)
+		addressSpec = B_ANY_KERNEL_BLOCK_ADDRESS;
+
 	// if we are allocating, it is because we need the pages immediatly
 	// so we lock them. when moving the slab to the empty list we should
 	// unlock them, and lock them again when getting one from the empty list.
-	area_id areaId = create_area(cache->name, pages, B_ANY_KERNEL_ADDRESS,
+	area_id areaId = create_area(cache->name, pages, addressSpec,
 		cache->slab_size, lock, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (areaId < 0)
 		return areaId;
@@ -523,13 +530,17 @@ create_small_object_cache(const char *name, size_t object_size,
 
 	SmallObjectCache *cache = new (buffer) SmallObjectCache();
 
-	if (object_cache_init(cache, name, object_size, alignment, maximum, flags,
-		cookie, constructor, destructor, reclaimer) < B_OK) {
+	if (object_cache_init(cache, name, object_size, alignment, maximum,
+			flags | CACHE_ALIGN_ON_SIZE, cookie, constructor, destructor,
+			reclaimer) < B_OK) {
 		delete_cache(cache);
 		return NULL;
 	}
 
-	cache->slab_size = B_PAGE_SIZE;
+	if ((flags & CACHE_LARGE_SLAB) != 0)
+		cache->slab_size = max_c(16 * B_PAGE_SIZE, 1024 * object_size);
+	else
+		cache->slab_size = B_PAGE_SIZE;
 
 	return cache;
 }
@@ -553,7 +564,10 @@ create_hashed_object_cache(const char *name, size_t object_size,
 		return NULL;
 	}
 
-	cache->slab_size = max_c(16 * B_PAGE_SIZE, 8 * object_size);
+	if ((flags & CACHE_LARGE_SLAB) != 0)
+		cache->slab_size = max_c(256 * B_PAGE_SIZE, 128 * object_size);
+	else
+		cache->slab_size = max_c(16 * B_PAGE_SIZE, 8 * object_size);
 	cache->lower_boundary = __fls0(cache->object_size);
 
 	return cache;
