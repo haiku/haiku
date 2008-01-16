@@ -1101,21 +1101,44 @@ Identify(BPositionIO *inSource, const translation_format *inFormat,
 	return B_OK;
 }
 
+static jmp_buf sLongJumpBuffer;
+jmp_buf* gLongJumpBuffer = &sLongJumpBuffer;
+
 /*!	Arguably the most important method in the add-on */
 status_t
 Translate(BPositionIO *inSource, const translator_info *inInfo,
 	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
 {
 	// If no specific type was requested, convert to the interchange format
-	if (outType == 0) outType = B_TRANSLATOR_BITMAP;
-	
-	// What action to take, based on the findings of Identify()
-	if (outType == inInfo->type) {
-		return Copy(inSource, outDestination);
-	} else if (inInfo->type == B_TRANSLATOR_BITMAP && outType == JPEG_FORMAT) {
-		return Compress(inSource, outDestination);
-	} else if (inInfo->type == JPEG_FORMAT && outType == B_TRANSLATOR_BITMAP) {
-		return Decompress(inSource, outDestination, ioExtension);
+	if (outType == 0)
+		outType = B_TRANSLATOR_BITMAP;
+
+	// Setup a "breakpoint" since throwing exceptions does not seem to work
+	// at all in an add-on. (?)
+	// In the be_jerror.cpp we implement a handler for critical library errors
+	// (be_error_exit()) and there we use the longjmp() function to return to
+	// this place. If this happens, it is as if the setjmp() call is called
+	// a second time, but this time the return value will be 1. The first
+	// invokation will return 0.
+	int jmpRet = setjmp(sLongJumpBuffer);
+	if (jmpRet == 1)
+		return B_ERROR;
+
+	try {
+		// What action to take, based on the findings of Identify()
+		if (outType == inInfo->type) {
+			return Copy(inSource, outDestination);
+		} else if (inInfo->type == B_TRANSLATOR_BITMAP
+				&& outType == JPEG_FORMAT) {
+			return Compress(inSource, outDestination);
+		} else if (inInfo->type == JPEG_FORMAT
+				&& outType == B_TRANSLATOR_BITMAP) {
+			return Decompress(inSource, outDestination, ioExtension);
+		}
+	} catch (...) {
+		fprintf(stderr, "libjpeg encoutered a critical error "
+			"(caught C++ exception).\n");
+		return B_ERROR;
 	}
 
 	return B_NO_TRANSLATOR;

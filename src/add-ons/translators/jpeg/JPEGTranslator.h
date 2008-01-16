@@ -42,6 +42,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <TranslationKit.h>
 #include <TranslatorAddOn.h>
 
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -214,5 +215,6 @@ EXTERN(void) be_jpeg_stdio_dest(j_compress_ptr cinfo, BPositionIO *outfile);	// 
 //---------------------------------------------------
 EXTERN(struct jpeg_error_mgr *) be_jpeg_std_error (struct jpeg_error_mgr * err, jpeg_settings * settings); // from "be_jerror.cpp"
 
+extern jmp_buf* gLongJumpBuffer;
 
 #endif // _JPEGTRANSLATOR_H_
