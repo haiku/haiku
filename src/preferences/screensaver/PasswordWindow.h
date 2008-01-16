@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,24 +12,30 @@
 
 #include "ScreenSaverSettings.h"
 
+
 #include <Window.h>
+
 
 class BRadioButton;
 class BTextControl;
 
+
 class PasswordWindow : public BWindow {
 	public:
-		PasswordWindow(ScreenSaverSettings &settings);
+						PasswordWindow(ScreenSaverSettings &settings);
 
-		virtual void MessageReceived(BMessage *message);
+		virtual void	MessageReceived(BMessage *message);
 
-		void Update();
+		void			Update();
 
 	private:
-		void _Setup();
+		void			_Setup();
 
-		BRadioButton *fUseNetwork, *fUseCustom;
-		BTextControl *fPasswordControl, *fConfirmControl;
+		BRadioButton	*fUseCustom;
+		BRadioButton	*fUseNetwork;
+		BTextControl	*fConfirmControl;
+		BTextControl	*fPasswordControl;
+		
 		ScreenSaverSettings &fSettings;
 };
 
