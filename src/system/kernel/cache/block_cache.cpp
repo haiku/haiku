@@ -195,6 +195,7 @@ static status_t write_cached_block(block_cache *cache, cached_block *block,
 static DoublyLinkedList<block_cache> sCaches;
 static mutex sCachesLock;
 #endif
+static object_cache *sBlockCache;
 
 
 //	#pragma mark - private transaction
@@ -311,7 +312,6 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
-	ranges_hash(NULL),
 	read_only(readOnly)
 {
 #ifdef DEBUG_BLOCK_CACHE
@@ -319,6 +319,11 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	sCaches.Add(this);
 	mutex_unlock(&sCachesLock);
 #endif
+
+	buffer_cache = create_object_cache_etc("block cache buffers", blockSize,
+		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
+	if (buffer_cache == NULL)
+		return;
 
 	hash = hash_init(32, 0, &cached_block::Compare, &cached_block::Hash);
 	if (hash == NULL)
@@ -329,17 +334,8 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	if (transaction_hash == NULL)
 		return;
 
-	ranges_hash = hash_init(16, 0, &block_range::Compare, &block_range::Hash);
-	if (ranges_hash == NULL)
-		return;
-
 	if (benaphore_init(&lock, "block cache") < B_OK)
 		return;
-
-	chunk_size = max_c(blockSize, B_PAGE_SIZE);
-	chunks_per_range = kBlockRangeSize / chunk_size;
-	range_mask = (1UL << chunks_per_range) - 1;
-	chunk_mask = (1UL << (chunk_size / blockSize)) - 1;
 
 	register_low_memory_handler(&block_cache::LowMemoryHandler, this, 0);
 }
@@ -357,9 +353,10 @@ block_cache::~block_cache()
 
 	benaphore_destroy(&lock);
 
-	hash_uninit(ranges_hash);
 	hash_uninit(transaction_hash);
 	hash_uninit(hash);
+
+	delete_object_cache(buffer_cache);
 }
 
 
@@ -369,83 +366,31 @@ block_cache::InitCheck()
 	if (lock.sem < B_OK)
 		return lock.sem;
 
-	if (hash == NULL || transaction_hash == NULL || ranges_hash == NULL)
+	if (buffer_cache == NULL || hash == NULL || transaction_hash == NULL)
 		return B_NO_MEMORY;
 
 	return B_OK;
 }
 
 
-block_range *
-block_cache::GetFreeRange()
-{
-	if (!free_ranges.IsEmpty())
-		return free_ranges.First();
-
-	// we need to allocate a new range
-	block_range *range;
-	if (block_range::New(this, &range) != B_OK) {
-		RemoveUnusedBlocks(2, 50);
-
-		if (!free_ranges.IsEmpty())
-			return free_ranges.First();
-
-		RemoveUnusedBlocks(LONG_MAX, 50);
-
-		if (!free_ranges.IsEmpty())
-			return free_ranges.First();
-
-		// TODO: We also need to free ranges from other caches to get a free one
-		// (if not, an active volume might have stolen all free ranges already)
-		return NULL;
-	}
-
-	return range;
-}
-
-
-block_range *
-block_cache::GetRange(void *address)
-{
-	return (block_range *)hash_lookup(ranges_hash, address);
-}
-
-
 void
-block_cache::Free(void *address)
+block_cache::Free(void *buffer)
 {
-	if (address == NULL)
-		return;
-
-	block_range *range = GetRange(address);
-	if (range == NULL)
-		panic("no range for address %p\n", address);
-
-	ASSERT(range != NULL);
-	range->Free(this, address);
-
-	if (range->Unused(this))
-		block_range::Delete(this, range);
+	object_cache_free(buffer_cache, buffer);
 }
 
 
 void *
 block_cache::Allocate()
 {
-	block_range *range = GetFreeRange();
-	if (range == NULL)
-		return NULL;
-
-	return range->Allocate(this);
+	return object_cache_alloc(buffer_cache, 0);
 }
 
 
 void
 block_cache::FreeBlock(cached_block *block)
 {
-	block_range *range = GetRange(block->current_data);
-	ASSERT(range != NULL);
-	range->Free(this, block);
+	Free(block->current_data);
 
 	if (block->original_data != NULL || block->parent_data != NULL) {
 		panic("block_cache::FreeBlock(): %p, %p\n", block->original_data,
@@ -456,10 +401,7 @@ block_cache::FreeBlock(cached_block *block)
 	Free(block->compare);
 #endif
 
-	if (range->Unused(this))
-		block_range::Delete(this, range);
-
-	delete block;
+	object_cache_free(sBlockCache, block);
 }
 
 
@@ -477,6 +419,14 @@ block_cache::_GetUnusedBlock()
 		// remove block from lists
 		iterator.Remove();
 		hash_remove(hash, block);
+
+		// TODO: see if parent/compare data is handled correctly here!
+		if (block->parent_data != NULL
+			&& block->parent_data != block->original_data)
+			Free(block->parent_data);
+		if (block->original_data != NULL)
+			Free(block->original_data);
+
 		return block;
 	}
 
@@ -488,15 +438,7 @@ block_cache::_GetUnusedBlock()
 cached_block *
 block_cache::NewBlock(off_t blockNumber)
 {
-	cached_block *block = new(nothrow) cached_block;
-	if (block != NULL) {
-		block_range *range = GetFreeRange();
-		if (range == NULL) {
-			delete block;
-			block = NULL;
-		} else
-			range->Allocate(this, block);
-	}
+	cached_block *block = (cached_block *)object_cache_alloc(sBlockCache, 0);
 	if (block == NULL) {
 		dprintf("block allocation failed, unused list is %sempty.\n",
 			unused_blocks.IsEmpty() ? "" : "not ");
@@ -507,6 +449,12 @@ block_cache::NewBlock(off_t blockNumber)
 			FATAL(("could not allocate block!\n"));
 			return NULL;
 		}
+	}
+
+	block->current_data = Allocate();
+	if (block->current_data == NULL) {
+		object_cache_free(sBlockCache, block);
+		return NULL;
 	}
 
 	block->block_number = blockNumber;
@@ -701,23 +649,6 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 
 		hash_insert(cache->hash, block);
 		*_allocated = true;
-	} else {
-		// TODO: currently, the data is always mapped in
-/*
-		if (block->ref_count == 0 && block->current_data != NULL) {
-			// see if the old block can be resurrected
-			block->current_data = cache->allocator->Acquire(block->current_data);
-		}
-
-		if (block->current_data == NULL) {
-			// there is no block yet, but we need one
-			block->current_data = cache->allocator->Get();
-			if (block->current_data == NULL)
-				return NULL;
-
-			*_allocated = true;
-		}
-*/
 	}
 
 	if (*_allocated && readBlock) {
@@ -938,8 +869,6 @@ dump_cache(int argc, char **argv)
 				kprintf(" is-dirty");
 			if (block->unused)
 				kprintf(" unused");
-			if (block->unmapped)
-				kprintf(" unmapped");
 			kprintf("\n");
 			if (block->transaction != NULL) {
 				kprintf(" transaction:   %p (%ld)\n", block->transaction,
@@ -965,10 +894,6 @@ dump_cache(int argc, char **argv)
 	kprintf(" max_blocks: %Ld\n", cache->max_blocks);
 	kprintf(" block_size: %lu\n", cache->block_size);
 	kprintf(" next_transaction_id: %ld\n", cache->next_transaction_id);
-	kprintf(" chunks_per_range: %lu\n", cache->chunks_per_range);
-	kprintf(" chunks_size: %lu\n", cache->chunk_size);
-	kprintf(" range_mask: %lu\n", cache->range_mask);
-	kprintf(" chunks_mask: %lu\n", cache->chunk_mask);
 
 	if (showBlocks) {
 		kprintf(" blocks:\n");
@@ -984,13 +909,13 @@ dump_cache(int argc, char **argv)
 	cached_block *block;
 	while ((block = (cached_block *)hash_next(cache->hash, &iterator)) != NULL) {
 		if (showBlocks) {
-			kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c%c %08lx "
+			kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c %08lx "
 				"%08lx\n", (addr_t)block, block->block_number,
 				(addr_t)block->current_data, (addr_t)block->original_data,
 				(addr_t)block->parent_data, block->ref_count, block->accessed,
 				block->busy ? 'B' : '-', block->is_writing ? 'W' : '-',
 				block->is_dirty ? 'B' : '-', block->unused ? 'U' : '-',
-				block->unmapped ? 'M' : '-', (addr_t)block->transaction,
+				(addr_t)block->transaction,
 				(addr_t)block->previous_transaction);
 		}
 
@@ -1026,6 +951,11 @@ dump_caches(int argc, char **argv)
 extern "C" status_t
 block_cache_init(void)
 {
+	sBlockCache = create_object_cache_etc("cached blocks", sizeof(cached_block),
+		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
+	if (sBlockCache == NULL)
+		return B_ERROR;
+
 #ifdef DEBUG_BLOCK_CACHE
 	mutex_init(&sCachesLock, "block caches");
 	new (&sCaches) DoublyLinkedList<block_cache>;
@@ -1035,7 +965,7 @@ block_cache_init(void)
 	add_debugger_command("block_cache", &dump_cache, "dumps a specific block cache");
 #endif
 
-	return init_block_allocator();
+	return B_OK;
 }
 
 
@@ -1498,7 +1428,6 @@ cache_blocks_in_sub_transaction(void *_cache, int32 id)
 
 
 //	#pragma mark - public block cache API
-//	public interface
 
 
 extern "C" void

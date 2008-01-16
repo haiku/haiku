@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src system kernel cache ;
 
 KernelMergeObject kernel_cache.o :
-	block_allocator.cpp
 	block_cache.cpp
 	file_cache.cpp
 	file_map.cpp
