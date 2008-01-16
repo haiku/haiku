@@ -965,23 +965,24 @@ ServerPicture::ImportData(BPrivate::LinkReceiver &link)
 	int32 size = 0;
 	link.Read<int32>(&size);
 
+	if (size >= 65536) {
+		//TODO: Pass via an area.
+		// Ideally the Link** api would allow to write partial messages,
+		// so that a big picture could be written in chunks of 4096 bytes
+		// or so
+		return B_ERROR;
+	}
+
 	off_t oldPosition = fData->Position();
 	fData->Seek(0, SEEK_SET);
 
-	ssize_t toWrite = size;
-	// TODO: For some reason, this doesn't work. Bug in LinkReceiver ?
-	/*char buffer[BUFFER_SIZE];
-	while (toWrite > 0) {
-		ssize_t read = link.Read(buffer, toWrite > BUFFER_SIZE ? BUFFER_SIZE : toWrite);
-		if (read < B_OK)
-			return (status_t)read;		
-		fData->Write(buffer, read);
-		toWrite -= read;
-	}*/
-
-	char buffer[toWrite];
-	link.Read(buffer, toWrite);
-	fData->Write(buffer, toWrite);
+	// TODO: Oh yeah... 65kb on the stack...
+	char buffer[size];
+	status_t read = link.Read(buffer, size);
+	if (read < B_OK)
+		return (status_t)read;		
+	
+	fData->Write(buffer, size);	
 
 	fData->Seek(oldPosition, SEEK_SET);
 	
@@ -1011,16 +1012,23 @@ ServerPicture::ExportData(BPrivate::PortLink &link)
 	off_t size = 0;
 	fData->GetSize(&size);
 	link.Attach<int32>((int32)size);
-
-	ssize_t toWrite = size;
-	char buffer[BUFFER_SIZE];
-	while (toWrite > 0) {
-		ssize_t read = fData->Read(buffer, toWrite > BUFFER_SIZE ? BUFFER_SIZE : toWrite);
-		if (read < B_OK)
-			return (status_t)read;		
-		link.Attach(buffer, read);
-		toWrite -= read;
+	if (size >= 65536) {
+		//TODO: Pass via an area
+		link.CancelMessage();
+		link.StartMessage(B_ERROR);
+		return B_ERROR;
 	}
+	// TODO: Oh yeah... 65kb on the stack...
+	char buffer[size];
+	ssize_t read = fData->Read(buffer, size);
+	if (read < B_OK)
+		return (status_t)read;		
+	if (link.Attach(buffer, read) < B_OK) {
+		//
+		link.CancelMessage();
+		link.StartMessage(B_ERROR);	
+	};
+
 	
 	fData->Seek(oldPosition, SEEK_SET);
 
