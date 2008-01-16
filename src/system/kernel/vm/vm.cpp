@@ -955,9 +955,19 @@ find_and_insert_area_slot(vm_address_space *addressSpace, addr_t start,
 		if (status == B_OK || status == B_BAD_VALUE)
 			return status;
 
-		// there was no reserved area, and the slot doesn't seem to be used already
+		// There was no reserved area, and the slot doesn't seem to be used
+		// already
 		// ToDo: this could be further optimized.
 	}
+
+	size_t alignment = B_PAGE_SIZE;
+	if (addressSpec == B_ANY_KERNEL_BLOCK_ADDRESS) {
+		// align the memory to the next power of two of the size
+		while (alignment < size)
+			alignment <<= 1;
+	}
+
+	start = ROUNDUP(start, alignment);
 
 	// walk up to the spot where we should start searching
 second_chance:
@@ -981,9 +991,10 @@ second_chance:
 			// find a hole big enough for a new area
 			if (!last) {
 				// see if we can build it at the beginning of the virtual map
-				if (!next || (next->base >= addressSpace->base + size)) {
+				if (!next || (next->base >= ROUNDUP(addressSpace->base,
+						alignment) + size)) {
 					foundSpot = true;
-					area->base = addressSpace->base;
+					area->base = ROUNDUP(addressSpace->base, alignment);
 					break;
 				}
 				last = next;
@@ -991,7 +1002,8 @@ second_chance:
 			}
 			// keep walking
 			while (next) {
-				if (next->base >= last->base + last->size + size) {
+				if (next->base >= ROUNDUP(last->base + last->size, alignment)
+						+ size) {
 					// we found a spot (it'll be filled up below)
 					break;
 				}
@@ -999,23 +1011,26 @@ second_chance:
 				next = next->address_space_next;
 			}
 
-			if ((addressSpace->base + (addressSpace->size - 1))
-					>= (last->base + last->size + (size - 1))) {
+			if ((addressSpace->base + (addressSpace->size - 1)) >= (ROUNDUP(
+					last->base + last->size, alignment) + (size - 1))) {
 				// got a spot
 				foundSpot = true;
-				area->base = last->base + last->size;
+				area->base = ROUNDUP(last->base + last->size, alignment);
 				break;
 			} else {
-				// we didn't find a free spot - if there were any reserved areas with
-				// the RESERVED_AVOID_BASE flag set, we can now test those for free
-				// space
+				// We didn't find a free spot - if there were any reserved areas
+				// with the RESERVED_AVOID_BASE flag set, we can now test those
+				// for free space
 				// ToDo: it would make sense to start with the biggest of them
 				next = addressSpace->areas;
 				last = NULL;
-				for (last = NULL; next; next = next->address_space_next, last = next) {
+				for (last = NULL; next; next = next->address_space_next,
+						last = next) {
 					// ToDo: take free space after the reserved area into account!
-					if (next->size == size) {
-						// the reserved area is entirely covered, and thus, removed
+					if (next->base == ROUNDUP(next->base, alignment)
+						&& next->size == size) {
+						// The reserved area is entirely covered, and thus,
+						// removed
 						if (last)
 							last->address_space_next = next->address_space_next;
 						else
@@ -1026,9 +1041,11 @@ second_chance:
 						free(next);
 						break;
 					}
-					if (next->size >= size) {
-						// the new area will be placed at the end of the reserved
-						// area, and the reserved area will be resized to make space
+					if (next->size - (ROUNDUP(next->base, alignment)
+							- next->base) >= size) {
+						// The new area will be placed at the end of the
+						// reserved area, and the reserved area will be resized
+						// to make space
 						foundSpot = true;
 						next->size -= size;
 						last = next;
