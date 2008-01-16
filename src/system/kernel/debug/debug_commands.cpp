@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -27,6 +27,7 @@ static struct debugger_command *sCommands;
 
 static jmp_buf sInvokeCommandEnv;
 static bool sInvokeCommandDirectly = false;
+static bool sInCommand = false;
 
 
 debugger_command*
@@ -75,6 +76,15 @@ find_debugger_command(const char *name, bool partialMatch, bool& ambiguous)
 }
 
 
+/*!	Returns wether or not a debugger command is currently being invoked.
+*/
+bool
+in_command_invocation(void)
+{
+	return sInCommand;
+}
+
+
 /*!	This function is a safe gate through which debugger commands are invoked.
 	It sets a fault handler before invoking the command, so that an invalid
 	memory access will not result in another KDL session on top of this one
@@ -99,6 +109,8 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 	if (sInvokeCommandDirectly)
 		return command->func(argc, argv);
 
+	sInCommand = true;
+
 	if (setjmp(sInvokeCommandEnv) == 0) {
 		int result;
 		thread->fault_handler = (addr_t)&&error;
@@ -108,7 +120,9 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 			goto error;
 
 		result = command->func(argc, argv);
+
 		thread->fault_handler = oldFaultHandler;
+		sInCommand = false;
 		return result;
 
 error:
@@ -119,6 +133,7 @@ error:
 	}
 
 	thread->fault_handler = oldFaultHandler;
+	sInCommand = false;
 	return 0;
 }
 

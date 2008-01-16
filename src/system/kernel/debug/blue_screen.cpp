@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +13,8 @@
 
 #include <string.h>
 #include <stdio.h>
+
+#include "debug_commands.h"
 
 
 #define USE_SCROLLING 0
@@ -44,6 +46,9 @@ struct screen_info {
 	uint8	attr;
 	bool	bright_attr;
 	bool	reverse_attr;
+	int32	in_command_rows;
+	bool	paging;
+	bool	ignore_output;
 
 	// state machine
 	console_state state;
@@ -79,8 +84,9 @@ move_cursor(int32 x, int32 y)
 
 #if USE_SCROLLING
 
-/** scroll from the cursor line up to the top of the scroll region up one line */
-
+/*!	Scroll from the cursor line up to the top of the scroll region up one
+	line.
+*/
 static void
 scroll_up(void)
 {
@@ -96,18 +102,51 @@ scroll_up(void)
 static void
 next_line(void)
 {
+	if (in_command_invocation())
+		sScreen.in_command_rows++;
+	else
+		sScreen.in_command_rows = 0;
+
 	if (sScreen.y == sScreen.rows - 1) {
 #if USE_SCROLLING
  		scroll_up();
 #else
+
+		if (sScreen.paging && sScreen.in_command_rows > 1) {
+			// We're in the debugger, and a command is being executed
+			const char *text = "Press key to continue, Q to quit";
+			int32 length = strlen(text);
+			if (sScreen.x + length > sScreen.columns) {
+				// make sure we don't overwrite too much
+				text = "P";
+				length = 1;
+			}
+
+			for (int32 i = 0; i < length; i++) {
+				sModule->put_glyph(sScreen.columns - length + i, sScreen.y,
+					text[i], 0xf0);
+			}
+
+			char c = blue_screen_getchar();
+			if (c == 'q')
+				sScreen.ignore_output = true;
+
+			// remove on screen text again
+			sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,
+				1, ' ', sScreen.attr);
+		}
 		sScreen.y = 0;
+		sModule->fill_glyph(0, 0, sScreen.columns, 2, ' ', sScreen.attr);
 #endif
 	} else if (sScreen.y < sScreen.rows - 1) {
 		sScreen.y++;
 	}
 
 #if NO_CLEAR
-	sModule->fill_glyph(0, (sScreen.y + 2) % sScreen.rows, sScreen.columns, 1, ' ', sScreen.attr);
+	if (sScreen.y + 2 < sScreen.rows) {
+		sModule->fill_glyph(0, (sScreen.y + 2) % sScreen.rows, sScreen.columns,
+			1, ' ', sScreen.attr);
+	}
 #endif
 	sScreen.x = 0;
 }
@@ -118,14 +157,16 @@ erase_line(erase_line_mode mode)
 {
 	switch (mode) {
 		case LINE_ERASE_WHOLE:
-			sModule->fill_glyph(0, sScreen.y, sScreen.columns, 1, ' ', sScreen.attr);
+			sModule->fill_glyph(0, sScreen.y, sScreen.columns, 1, ' ',
+				sScreen.attr);
 			break;
 		case LINE_ERASE_LEFT:
-			sModule->fill_glyph(0, sScreen.y, sScreen.x + 1, 1, ' ', sScreen.attr);
+			sModule->fill_glyph(0, sScreen.y, sScreen.x + 1, 1, ' ',
+				sScreen.attr);
 			break;
 		case LINE_ERASE_RIGHT:
-			sModule->fill_glyph(sScreen.x, sScreen.y, sScreen.columns - sScreen.x,
-				1, ' ', sScreen.attr);
+			sModule->fill_glyph(sScreen.x, sScreen.y, sScreen.columns
+				- sScreen.x, 1, ' ', sScreen.attr);
 			break;
 //		default:
 	}
@@ -186,7 +227,8 @@ set_vt100_attributes(int32 *args, int32 argCount)
 				break;
 			case 7: // reverse
 				sScreen.reverse_attr = true;
-				sScreen.attr = ((sScreen.attr & BMASK) >> 4) | ((sScreen.attr & FMASK) << 4);
+				sScreen.attr = ((sScreen.attr & BMASK) >> 4)
+					| ((sScreen.attr & FMASK) << 4);
 				if (sScreen.bright_attr)
 					sScreen.attr |= 0x08;
 				break;
@@ -194,14 +236,20 @@ set_vt100_attributes(int32 *args, int32 argCount)
 				break;
 
 			/* foreground colors */
-			case 30: sScreen.attr = (sScreen.attr & ~FMASK) | 0 | (sScreen.bright_attr ? 0x08 : 0); break; // black
-			case 31: sScreen.attr = (sScreen.attr & ~FMASK) | 4 | (sScreen.bright_attr ? 0x08 : 0); break; // red
-			case 32: sScreen.attr = (sScreen.attr & ~FMASK) | 2 | (sScreen.bright_attr ? 0x08 : 0); break; // green
-			case 33: sScreen.attr = (sScreen.attr & ~FMASK) | 6 | (sScreen.bright_attr ? 0x08 : 0); break; // yellow
-			case 34: sScreen.attr = (sScreen.attr & ~FMASK) | 1 | (sScreen.bright_attr ? 0x08 : 0); break; // blue
-			case 35: sScreen.attr = (sScreen.attr & ~FMASK) | 5 | (sScreen.bright_attr ? 0x08 : 0); break; // magenta
-			case 36: sScreen.attr = (sScreen.attr & ~FMASK) | 3 | (sScreen.bright_attr ? 0x08 : 0); break; // cyan
-			case 37: sScreen.attr = (sScreen.attr & ~FMASK) | 7 | (sScreen.bright_attr ? 0x08 : 0); break; // white
+			case 30: // black
+			case 31: // red
+			case 32: // green
+			case 33: // yellow
+			case 34: // blue
+			case 35: // magenta
+			case 36: // cyan
+			case 37: // white
+			{
+				const uint8 colors[] = {0, 4, 2, 6, 1, 5, 3, 7};
+				sScreen.attr = (sScreen.attr & ~FMASK) | colors[args[i] - 30]
+					| (sScreen.bright_attr ? 0x08 : 0);
+				break;
+			}
 
 			/* background colors */
 			case 40: sScreen.attr = (sScreen.attr & ~BMASK) | (0 << 4); break; // black
@@ -415,7 +463,8 @@ parse_character(char c)
 					break;
 				default:
 					sScreen.args[sScreen.arg_count] = 0;
-					process_vt100_command(c, false, sScreen.args, sScreen.arg_count + 1);
+					process_vt100_command(c, false, sScreen.args,
+						sScreen.arg_count + 1);
 					sScreen.state = CONSOLE_STATE_NORMAL;
 			}
 			break;
@@ -427,10 +476,12 @@ parse_character(char c)
 					sScreen.state = CONSOLE_STATE_PARSING_ARG;
 					break;
 				case '?':
-					// private DEC mode parameter follows - we ignore those anyway
+					// private DEC mode parameter follows - we ignore those
+					// anyway
 					break;
 				default:
-					process_vt100_command(c, true, sScreen.args, sScreen.arg_count + 1);
+					process_vt100_command(c, true, sScreen.args,
+						sScreen.arg_count + 1);
 					sScreen.state = CONSOLE_STATE_NORMAL;
 			}
 			break;
@@ -446,7 +497,8 @@ parse_character(char c)
 					sScreen.state = CONSOLE_STATE_PARSING_ARG;
 					break;
 				default:
-					process_vt100_command(c, true, sScreen.args, sScreen.arg_count + 1);
+					process_vt100_command(c, true, sScreen.args,
+						sScreen.arg_count + 1);
 					sScreen.state = CONSOLE_STATE_NORMAL;
 			}
 			break;
@@ -461,10 +513,33 @@ parse_character(char c)
 					sScreen.state = CONSOLE_STATE_NEW_ARG;
 					break;
 				default:
-					process_vt100_command(c, true, sScreen.args, sScreen.arg_count + 1);
+					process_vt100_command(c, true, sScreen.args,
+						sScreen.arg_count + 1);
 					sScreen.state = CONSOLE_STATE_NORMAL;
 			}
 	}
+}
+
+
+static int
+set_paging(int argc, char **argv)
+{
+	if (argc > 1 && !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [on|off]\n", argv[0]);
+		return 0;
+	}
+
+	if (argc == 1)
+		sScreen.paging = !sScreen.paging;
+	else if (!strcmp(argv[1], "on"))
+		sScreen.paging = true;
+	else if (!strcmp(argv[1], "off"))
+		sScreen.paging = false;
+	else
+		sScreen.paging = parse_expression(argv[1]) != 0;
+
+	kprintf("paging is turned %s now.\n", sScreen.paging ? "on" : "off");
+	return 0;
 }
 
 
@@ -482,6 +557,9 @@ blue_screen_init(void)
 		return B_ERROR;
 
 	sModule = &gFrameBufferConsoleModule;
+	sScreen.paging = true;
+
+	add_debugger_command("paging", set_paging, "Enable or disable paging");
 	return B_OK;
 }
 
@@ -517,6 +595,10 @@ blue_screen_getchar(void)
 void
 blue_screen_putchar(char c)
 {
+	if (sScreen.ignore_output && in_command_invocation())
+		return;
+
+	sScreen.ignore_output = false;
 	hide_cursor();
 
 	parse_character(c);
@@ -528,6 +610,10 @@ blue_screen_putchar(char c)
 void
 blue_screen_puts(const char *text)
 {
+	if (sScreen.ignore_output && in_command_invocation())
+		return;
+
+	sScreen.ignore_output = false;
 	hide_cursor();
 
 	while (text[0] != '\0') {

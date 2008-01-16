@@ -24,6 +24,8 @@ debugger_command* next_debugger_command(debugger_command* command,
 	const char* prefix, int prefixLen);
 debugger_command* find_debugger_command(const char* name, bool partialMatch,
 	bool& ambiguous);
+bool in_command_invocation(void);
+
 int invoke_debugger_command(struct debugger_command *command, int argc,
 	char** argv);
 
