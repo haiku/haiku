@@ -28,7 +28,7 @@
 	term		:= sum
 	sum			:= product ( ( "+" | "-" ) product )*
 	product		:= unary ( ( "*" | "/" | "%" ) unary )*
-	unary		:= [ "-" ] atom
+	unary		:= atom | ( ( "-" | "*" [ "{" expression "}" ] ) unary )
 	atom		:= variable | ( "(" expression ")" ) | ( "[" command "]" )
 	variable	:= identifier
 	identifier	:= ( "_" | "a" - "z" | "A" - "Z" )
@@ -84,6 +84,8 @@ enum {
 	TOKEN_CLOSING_PARENTHESIS	= ')',
 	TOKEN_OPENING_BRACKET		= '[',
 	TOKEN_CLOSING_BRACKET		= ']',
+	TOKEN_OPENING_BRACE			= '{',
+	TOKEN_CLOSING_BRACE			= '}',
 
 	TOKEN_STRING				= '"',
 	TOKEN_UNKNOWN				= '?',
@@ -227,6 +229,11 @@ public:
 		return (fCommandMode ? _NextTokenCommand() : _NextTokenExpression());
 	}
 
+	const Token& CurrentToken() const
+	{
+		return fCurrentToken;
+	}
+
 	void RewindToken()
 	{
 		fReuseToken = true;
@@ -298,6 +305,8 @@ public:
 				case ')':
 				case '[':
 				case ']':
+				case '{':
+				case '}':
 				{
 					int32 length = fCurrentChar - begin;
 					fCurrentToken.SetTo(begin, length, _CurrentPos() - length,
@@ -409,6 +418,8 @@ public:
 			case '"':
 				return true;
 
+			case '{':
+			case '}':
 			case '=':
 			case '+':
 			case '-':
@@ -775,13 +786,59 @@ ExpressionParser::_ParseProduct()
 uint64
 ExpressionParser::_ParseUnary()
 {
-	const Token& token = fTokenizer.NextToken();
-	if (token.type == TOKEN_END_OF_LINE)
-		parse_exception("unexpected end of expression", token.position);
-
-	switch (token.type) {
+	switch (fTokenizer.NextToken().type) {
 		case TOKEN_MINUS:
 			return -_ParseUnary();
+
+		case TOKEN_STAR:
+		{
+			int32 starPosition = fTokenizer.CurrentToken().position;
+
+			// optional "{ ... }" specifying the size to read
+			uint64 size = 4;
+			if (fTokenizer.NextToken().type == TOKEN_OPENING_BRACE) {
+				int32 position = fTokenizer.CurrentToken().position;
+				size = _ParseExpression();
+
+				if (size != 1 && size != 2 && size != 4 && size != 8) {
+					snprintf(sTempBuffer, sizeof(sTempBuffer),
+						"invalid size (%llu) for unary * operator", size);
+					parse_exception(sTempBuffer, position);
+				}
+
+				_EatToken(TOKEN_CLOSING_BRACE);
+			} else
+				fTokenizer.RewindToken();
+
+			const void* address = (const void*)(addr_t)_ParseUnary();
+
+			// read bytes from address into a tempory buffer
+			uint64 buffer;
+			if (user_memcpy(&buffer, address, size) != B_OK) {
+				snprintf(sTempBuffer, sizeof(sTempBuffer),
+					"failed to dereference address %p", address);
+				parse_exception(sTempBuffer, starPosition);
+			}
+
+			// convert the value to uint64
+			uint64 value = 0;
+			switch (size) {
+				case 1:
+					value = *(uint8*)&buffer;
+					break;
+				case 2:
+					value = *(uint16*)&buffer;
+					break;
+				case 4:
+					value = *(uint32*)&buffer;
+					break;
+				case 8:
+					value = buffer;
+					break;
+			}
+
+			return value;
+		}
 
 		default:
 			fTokenizer.RewindToken();
