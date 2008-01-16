@@ -2320,6 +2320,11 @@ _dump_mount(struct fs_mount *mount)
 	kprintf(" lock:          %ld\n", mount->rlock.sem);
 	kprintf(" flags:        %s%s\n", mount->unmounting ? " unmounting" : "",
 		mount->owns_file_device ? " owns_file_device" : "");
+
+	set_debug_variable("_cookie", (addr_t)mount->cookie);
+	set_debug_variable("_root", (addr_t)mount->root_vnode);
+	set_debug_variable("_covers", (addr_t)mount->covers_vnode);
+	set_debug_variable("_partition", (addr_t)mount->partition);
 }
 
 
@@ -2339,33 +2344,32 @@ _dump_vnode(struct vnode *vnode)
 	kprintf(" advisory_lock: %p\n", vnode->advisory_locking);
 
 	_dump_advisory_locking(vnode->advisory_locking);
+
+	set_debug_variable("_node", (addr_t)vnode->private_node);
+	set_debug_variable("_mount", (addr_t)vnode->mount);
+	set_debug_variable("_covered_by", (addr_t)vnode->covered_by);
+	set_debug_variable("_adv_lock", (addr_t)vnode->advisory_locking);
 }
 
 
 static int
 dump_mount(int argc, char **argv)
 {
-	if (argc != 2) {
-		kprintf("usage: mount [id/address]\n");
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [id|address]\n", argv[0]);
 		return 0;
 	}
 
+	uint32 id = parse_expression(argv[1]);
 	struct fs_mount *mount = NULL;
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		mount = (fs_mount *)strtoul(argv[1], NULL, 16);
-		if (IS_USER_ADDRESS(mount)) {
-			kprintf("invalid fs_mount address\n");
-			return 0;
-		}
-	} else {
-		dev_t id = atoll(argv[1]);
-		mount = (fs_mount *)hash_lookup(sMountsTable, (void *)&id);
-		if (mount == NULL) {
+	mount = (fs_mount *)hash_lookup(sMountsTable, (void *)&id);
+	if (mount == NULL) {
+		if (IS_USER_ADDRESS(id)) {
 			kprintf("fs_mount not found\n");
 			return 0;
 		}
+		mount = (fs_mount *)id;
 	}
 
 	_dump_mount(mount);
@@ -2376,10 +2380,15 @@ dump_mount(int argc, char **argv)
 static int
 dump_mounts(int argc, char **argv)
 {
-	struct hash_iterator iterator;
-	struct fs_mount *mount;
+	if (argc != 1) {
+		kprintf("usage: %s\n", argv[0]);
+		return 0;
+	}
 
 	kprintf("address     id root       covers     cookie     fs_name\n");
+
+	struct hash_iterator iterator;
+	struct fs_mount *mount;
 
 	hash_open(sMountsTable, &iterator);
 	while ((mount = (struct fs_mount *)hash_next(sMountsTable, &iterator)) != NULL) {
@@ -2395,16 +2404,16 @@ dump_mounts(int argc, char **argv)
 static int
 dump_vnode(int argc, char **argv)
 {
-	if (argc < 2) {
-		kprintf("usage: vnode [id/device id/address]\n");
+	if (argc < 2 || argc > 3 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <device> <id>\n"
+			"   or: %s <address>\n", argv[0], argv[0]);
 		return 0;
 	}
 
 	struct vnode *vnode = NULL;
 
-	// if the argument looks like a hex number, treat it as such
-	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		vnode = (struct vnode *)strtoul(argv[1], NULL, 16);
+	if (argc == 2) {
+		vnode = (struct vnode *)parse_expression(argv[1]);
 		if (IS_USER_ADDRESS(vnode)) {
 			kprintf("invalid vnode address\n");
 			return 0;
@@ -2414,17 +2423,12 @@ dump_vnode(int argc, char **argv)
 	}
 
 	struct hash_iterator iterator;
-	dev_t device = -1;
-	ino_t id;
-	if (argc > 2) {
-		device = atoi(argv[1]);
-		id = atoll(argv[2]);
-	} else
-		id = atoll(argv[1]);
+	dev_t device = parse_expression(argv[1]);
+	ino_t id = atoll(argv[2]);
 
 	hash_open(sVnodeTable, &iterator);
 	while ((vnode = (struct vnode *)hash_next(sVnodeTable, &iterator)) != NULL) {
-		if (vnode->id != id || device != -1 && vnode->device != device)
+		if (vnode->id != id || vnode->device != device)
 			continue;
 
 		_dump_vnode(vnode);
@@ -2438,10 +2442,15 @@ dump_vnode(int argc, char **argv)
 static int
 dump_vnodes(int argc, char **argv)
 {
+	if (argc > 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [device]\n", argv[0]);
+		return 0;
+	}
+
 	// restrict dumped nodes to a certain device if requested
 	dev_t device = -1;
 	if (argc > 1)
-		device = atoi(argv[1]);
+		device = parse_expression(argv[1]);
 
 	struct hash_iterator iterator;
 	struct vnode *vnode;
@@ -2471,6 +2480,11 @@ dump_vnode_caches(int argc, char **argv)
 	struct hash_iterator iterator;
 	struct vnode *vnode;
 	
+	if (argc > 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [device]\n", argv[0]);
+		return 0;
+	}
+
 	// restrict dumped nodes to a certain device if requested
 	dev_t device = -1;
 	if (argc > 1)
@@ -2505,15 +2519,15 @@ dump_vnode_caches(int argc, char **argv)
 int
 dump_io_context(int argc, char **argv)
 {
-	if (argc > 2) {
-		kprintf("usage: io_context [team id/address]\n");
+	if (argc > 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [team-id|address]\n", argv[0]);
 		return 0;
 	}
 
 	struct io_context *context = NULL;
 
 	if (argc > 1) {
-		uint32 num = strtoul(argv[1], NULL, 0);
+		uint32 num = parse_expression(argv[1]);
 		if (IS_KERNEL_ADDRESS(num))
 			context = (struct io_context *)num;
 		else {
@@ -2549,6 +2563,8 @@ dump_io_context(int argc, char **argv)
 	kprintf(" used monitors:\t%lu\n", context->num_monitors);
 	kprintf(" max monitors:\t%lu\n", context->max_monitors);
 
+	set_debug_variable("_cwd", (addr_t)context->cwd);
+
 	return 0;
 }
 
@@ -2556,7 +2572,13 @@ dump_io_context(int argc, char **argv)
 int
 dump_vnode_usage(int argc, char **argv)
 {
-	kprintf("Unused vnodes: %ld (max unused %ld)\n", sUnusedVnodes, kMaxUnusedVnodes);
+	if (argc != 1) {
+		kprintf("usage: %s\n", argv[0]);
+		return 0;
+	}
+
+	kprintf("Unused vnodes: %ld (max unused %ld)\n", sUnusedVnodes,
+		kMaxUnusedVnodes);
 
 	struct hash_iterator iterator;
 	hash_open(sVnodeTable, &iterator);
