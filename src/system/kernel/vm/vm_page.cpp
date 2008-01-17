@@ -461,6 +461,7 @@ dump_page(int argc, char **argv)
 	kprintf("state:           %s\n", page_state_to_string(page->state));
 	kprintf("wired_count:     %d\n", page->wired_count);
 	kprintf("usage_count:     %d\n", page->usage_count);
+	kprintf("busy_writing:    %d\n", page->busy_writing);
 	#ifdef DEBUG_PAGE_QUEUE
 		kprintf("queue:           %p\n", page->queue);
 	#endif
@@ -924,7 +925,10 @@ page_writer(void* /*unused*/)
 
 		const uint32 kNumPages = 32;
 		ConditionVariable<vm_page> busyConditions[kNumPages];
-		vm_page *pages[kNumPages];
+		union {
+			vm_page *pages[kNumPages];
+			vm_cache *caches[kNumPages];
+		} u;
 		uint32 numPages = 0;
 
 		// TODO: once the I/O scheduler is there, we should write
@@ -972,7 +976,7 @@ page_writer(void* /*unused*/)
 			//dprintf("write page %p, cache %p (%ld)\n", page, page->cache, page->cache->ref_count);
 			vm_clear_map_flags(page, PAGE_MODIFIED);
 			vm_cache_acquire_ref(cache);
-			pages[numPages++] = page;
+			u.pages[numPages++] = page;
 		}
 
 		if (numPages == 0)
@@ -983,42 +987,47 @@ page_writer(void* /*unused*/)
 		// TODO: put this as requests into the I/O scheduler
 		status_t writeStatus[kNumPages];
 		for (uint32 i = 0; i < numPages; i++) {
-			writeStatus[i] = write_page(pages[i], false);
+			writeStatus[i] = write_page(u.pages[i], false);
 		}
 
 		// mark pages depending on whether they could be written or not
 
 		for (uint32 i = 0; i < numPages; i++) {
-			vm_cache *cache = pages[i]->cache;
+			vm_cache *cache = u.pages[i]->cache;
 			mutex_lock(&cache->lock);
 
 			if (writeStatus[i] == B_OK) {
 				// put it into the active queue
 				InterruptsSpinLocker locker(sPageLock);
-				move_page_to_active_or_inactive_queue(pages[i], true);
-				pages[i]->busy_writing = false;
+				move_page_to_active_or_inactive_queue(u.pages[i], true);
+				u.pages[i]->busy_writing = false;
 			} else {
 				// We don't have to put the PAGE_MODIFIED bit back, as it's
 				// still in the modified pages list.
 				{
 					InterruptsSpinLocker locker(sPageLock);
-					pages[i]->state = PAGE_STATE_MODIFIED;
-					enqueue_page(&sModifiedPageQueue, pages[i]);
+					u.pages[i]->state = PAGE_STATE_MODIFIED;
+					enqueue_page(&sModifiedPageQueue, u.pages[i]);
 				}
-				if (!pages[i]->busy_writing) {
+				if (!u.pages[i]->busy_writing) {
 					// someone has cleared the busy_writing flag which tells
 					// us our page has gone invalid
-					vm_cache_remove_page(cache, pages[i]);
+					vm_cache_remove_page(cache, u.pages[i]);
 				} else
-					pages[i]->busy_writing = false;
+					u.pages[i]->busy_writing = false;
 			}
 
 			busyConditions[i].Unpublish();
 
+			u.caches[i] = cache;
 			mutex_unlock(&cache->lock);
-			// TODO: we need to release the cache references after all
-			// pages are made unbusy again - otherwise releasing a vnode
-			// could deadlock.
+		}
+
+		for (uint32 i = 0; i < numPages; i++) {
+			vm_cache *cache = u.caches[i];
+
+			// We release the cache references after all pages were made
+			// unbusy again - otherwise releasing a vnode could deadlock.
 			if (cache->store->ops->release_ref != NULL)
 				cache->store->ops->release_ref(cache->store);
 			vm_cache_release_ref(cache);
