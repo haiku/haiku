@@ -376,7 +376,8 @@ block_cache::InitCheck()
 void
 block_cache::Free(void *buffer)
 {
-	object_cache_free(buffer_cache, buffer);
+	if (buffer != NULL)
+		object_cache_free(buffer_cache, buffer);
 }
 
 
