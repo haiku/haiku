@@ -119,7 +119,7 @@ xhdierror(int32 err)
 		if (ide & (1 << 1)) {	// track 0 not found
 			return B_DEV_FORMAT_ERROR;
 		} else if (ide & (1 << 0)) {	// DAM not found
-			return B_DEV_FORMAT_ERROR,;
+			return B_DEV_FORMAT_ERROR;
 		} else if (ide & (1 << 4)) {	// ID field not found
 			return B_DEV_ID_ERROR;
 		} else if (ide & (1 << 7)) {	// bad block mark
@@ -160,11 +160,11 @@ xhdierror(int32 err)
 	return toserror(err);
 }
 
-void
+static void
 dump_tos_cookie(const struct tos_cookie *c)
 {
 	if (c)
-		dprintf("%4.4s: 0x%08lx, %d\n", &c->cookie, c->ivalue, c->ivalue);
+		dprintf("%4.4s: 0x%08lx, %ld\n", (const char *)&c->cookie, c->ivalue, c->ivalue);
 }
 
 
@@ -182,7 +182,14 @@ dump_tos_cookies(void)
 status_t
 init_xhdi(void)
 {
-	
+	struct tos_cookie *c;
+	c = tos_find_cookie(XHDI_COOKIE);
+	if (!c)
+		return ENOENT;
+	if (((uint32 *)c->pvalue)[-1] != XHDI_MAGIC)
+		return EINVAL;
+	gXHDIEntryPoint = c->pvalue;
+	return B_OK;
 }
 
 

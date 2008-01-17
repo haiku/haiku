@@ -366,6 +366,8 @@ static inline int Bconputs(int16 handle, const char *string)
 /* pointer to the XHDI dispatch function */
 extern void *gXHDIEntryPoint;
 
+extern status_t init_xhdi(void);
+
 /* void (no) arg */
 #define xhdicallV(callnr)						\
 ({												\
@@ -541,11 +543,10 @@ static inline int32 nat_feat_getid(const char *name)
 
 #define nat_feat_call(id, code, a...) \
 ({						\
-	int32 ret;				\
+	int32 ret = -1;				\
 	NatFeatCookie *c = nat_features();	\
-	if (!c)					\
-		return -1;			\
-	ret = c->nfCall(id | code, a##...);	\
+	if (c)					\
+		ret = c->nfCall(id | code, a);	\
 	ret;					\
 })
 

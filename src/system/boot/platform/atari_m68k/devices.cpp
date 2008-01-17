@@ -125,8 +125,13 @@ class BlockHandle : public Handle {
 		bool HasParameters() const { return fHasParameters; }
 		const drive_parameters &Parameters() const { return fParameters; }
 
+		virtual status_t FillIdentifier();
+
 		disk_identifier &Identifier() { return fIdentifier; }
 		uint8 DriveID() const { return fHandle; }
+		status_t InitCheck() const { return fSize > 0 ? B_OK : B_ERROR; };
+
+
 		
 		virtual ssize_t ReadBlocks(void *buffer, off_t first, int32 count);
 
@@ -478,13 +483,6 @@ BlockHandle::~BlockHandle()
 }
 
 
-status_t 
-BlockHandle::InitCheck() const
-{
-	return fSize > 0 ? B_OK : B_ERROR;
-}
-
-
 ssize_t 
 BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
@@ -500,9 +498,9 @@ BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 	// read partial block
 	if (offset) {
-		ret = Rwabs(RW_READ | RW_NOTRANSLATE, gScratchBuffer, fBlockSize/256, -1, fHandle, pos * fBlockSize/256);
+		ret = ReadBlocks(gScratchBuffer, pos, 1);
 		if (ret < 0)
-			return toserror(ret);
+			return ret;
 		totalBytesRead += fBlockSize - offset;
 		memcpy(buffer, gScratchBuffer + offset, totalBytesRead);
 		
@@ -552,11 +550,11 @@ BlockHandle::ReadBlocks(void *buffer, off_t first, int32 count)
 }
 
 
-/*status_t
+status_t
 BlockHandle::FillIdentifier()
 {
 	return B_NOT_ALLOWED;
-}*/
+}
 
 //	#pragma mark -
 
@@ -628,69 +626,6 @@ BIOSDrive::BIOSDrive(int handle)
 
 BIOSDrive::~BIOSDrive()
 {
-}
-
-
-ssize_t 
-BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
-{
-	int32 ret;
-	int sectorsPerBlocks = (fBlockSize / 256);
-	uint32 offset = pos % fBlockSize;
-	pos /= fBlockSize;
-
-	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
-	int32 totalBytesRead = 0;
-
-	//TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %u\n",
-	//	blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
-
-	// read partial block
-	if (offset) {
-		ret = Rwabs(RW_READ | RW_NOTRANSLATE, gScratchBuffer, fBlockSize/256, -1, fHandle, pos * fBlockSize/256);
-		if (ret < 0)
-			return toserror(ret);
-		totalBytesRead += fBlockSize - offset;
-		memcpy(buffer, gScratchBuffer + offset, totalBytesRead);
-		
-	}
-
-	uint32 scratchSize = SCRATCH_SIZE / fBlockSize;
-
-	while (blocksLeft > 0) {
-		uint32 blocksRead = blocksLeft;
-		if (blocksRead > scratchSize)
-			blocksRead = scratchSize;
-
-		int32 ret;
-		// XXX: check for AHDI 3.0 before using long recno!!!
-		ret = Rwabs(RW_READ | RW_NOTRANSLATE, gScratchBuffer, blocksRead * sectorsPerBlocks, -1, fHandle, pos * sectorsPerBlocks);
-		if (ret < 0)
-			return toserror(ret);
-
-		uint32 bytesRead = fBlockSize * blocksRead - offset;
-		// copy no more than bufferSize bytes
-		if (bytesRead > bufferSize)
-			bytesRead = bufferSize;
-
-		memcpy(buffer, (void *)(gScratchBuffer + offset), bytesRead);
-		pos += blocksRead;
-		offset = 0;
-		blocksLeft -= blocksRead;
-		bufferSize -= bytesRead;
-		buffer = (void *)((addr_t)buffer + bytesRead);
-		totalBytesRead += bytesRead;
-	}
-
-	return totalBytesRead;
-}
-
-
-ssize_t 
-BIOSDrive::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
-{
-	// we don't have to know how to write
-	return B_NOT_ALLOWED;
 }
 
 
@@ -837,7 +772,6 @@ XHDIDrive::FillIdentifier()
 		fIdentifier.device.unknown.check_sums[i].offset = -1;
 		fIdentifier.device.unknown.check_sums[i].sum = 0;
 	}
-#endif
 
 	return B_ERROR;
 }

@@ -108,14 +108,17 @@ void
 _start(void)
 {
 	stage2_args args;
+	Bconout(DEV_CON, 'H');
 
 
 	//asm("cld");			// Ain't nothing but a GCC thang.
 	//asm("fninit");		// initialize floating point unit
 
 	clear_bss();
+	Bconout(DEV_CON, 'A');
 	call_ctors();
 		// call C++ constructors before doing anything else
+	Bconout(DEV_CON, 'I');
 
 	args.heap_size = HEAP_SIZE;
 	
@@ -124,7 +127,9 @@ _start(void)
 
 	//serial_init();
 	console_init();
+	Bconout(DEV_CON, 'K');
 	cpu_init();
+	Bconout(DEV_CON, 'U');
 	//mmu_init();
 
 	// wait a bit to give the user the opportunity to press a key

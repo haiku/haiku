@@ -81,22 +81,6 @@ real_entry:
 	bsr		putx
 #endif
 
-#if 0
-			//_membot
-	//move.l		#0x432,%a0
-	//move.l		(%a0),%d0
-	//bsr		putx
-
-			//_memtop
-	//move.l		#0x436,%a0
-	//move.l		(%a0),%d0
-	//bsr		putx
-
-			//_v_bas_ad
-	move.l		#0x44e,%a0
-	move.l		(%a0),%d0
-	bsr		putx
-#endif
 
 	// first, determine if .prg (user) or bootsect (super)
 	// Super()
@@ -125,9 +109,12 @@ floppy_start:
 	lea		str,%a0
 	bsr		puts
 	//bra floppy_start
+
 	// no interrupt
 	or.w		#0x0700,%sr
+
 	//XXX: check for enough RAM
+
 	// load the rest
 	move.w		sNumSectors,%d2
 	// load at base + this code.
@@ -220,8 +207,24 @@ prg_start:
 	addq.l		#6,%sp
 	move.l		%d0,saved_super_stack
 	
+#if 1
+			//_membot
+	move.l		#0x432,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+
+			//_memtop
+	move.l		#0x436,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+
+			//_v_bas_ad
+	move.l		#0x44e,%a0
+	move.l		(%a0),%d0
+	bsr		putx
+#endif
 	// disable interrupts
-	or.w		#0x0700,%sr
+	//or.w		#0x0700,%sr
 	
 	lea		h5,%a0
 	bsr		puts
