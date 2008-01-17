@@ -262,6 +262,48 @@ alloc_tracing_buffer(size_t size)
 }
 
 
+uint8*
+alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user)
+{
+	uint8* buffer = alloc_tracing_buffer(size);
+	if (buffer == NULL)
+		return NULL;
+
+	if (user) {
+		if (user_memcpy(buffer, source, size) != B_OK)
+			return NULL;
+	} else
+		memcpy(buffer, source, size);
+
+	return buffer;
+}
+
+
+char*
+alloc_tracing_buffer_strcpy(const char* source, size_t maxSize, bool user)
+{
+	if (maxSize == 0)
+		return NULL;
+
+	// there's no user_strnlen(), so always allocate the full buffer size
+	// in this case
+	if (!user)
+		maxSize = strnlen(source, maxSize - 1) + 1;
+
+	char* buffer = (char*)alloc_tracing_buffer(maxSize);
+	if (buffer == NULL)
+		return NULL;
+
+	if (user) {
+		if (user_strlcpy(buffer, source, maxSize) < B_OK)
+			return NULL;
+	} else
+		strlcpy(buffer, source, maxSize);
+
+	return buffer;
+}
+
+
 extern "C" status_t
 tracing_init(void)
 {

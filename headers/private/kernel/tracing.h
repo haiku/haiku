@@ -70,6 +70,9 @@ extern "C" {
 #endif
 
 uint8* alloc_tracing_buffer(size_t size);
+uint8* alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user);
+char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
+			bool user);
 status_t tracing_init(void);
 
 #ifdef __cplusplus
