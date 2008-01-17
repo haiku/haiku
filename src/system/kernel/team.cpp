@@ -30,6 +30,7 @@
 #include <syscalls.h>
 #include <team.h>
 #include <tls.h>
+#include <tracing.h>
 #include <user_runtime.h>
 #include <vfs.h>
 #include <vm.h>
@@ -43,6 +44,8 @@
 #else
 #	define TRACE(x) ;
 #endif
+
+//#define TEAM_TRACING
 
 
 struct team_key {
@@ -79,6 +82,99 @@ static int32 sMaxTeams = 2048;
 static int32 sUsedTeams = 1;
 
 spinlock team_spinlock = 0;
+
+
+// #pragma mark - Tracing
+
+
+#ifdef TEAM_TRACING
+namespace TeamTracing {
+
+class TeamForked : public AbstractTraceEntry {
+	public:
+		TeamForked(thread_id forkedThread)
+			:
+			fForkedThread(forkedThread)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "team forked, new thread %ld",
+				fForkedThread);
+		}
+
+	private:
+		thread_id			fForkedThread;
+};
+
+
+class ExecTeam : public AbstractTraceEntry {
+	public:
+		ExecTeam(const char* path, int32 argCount, const char* const* args,
+				int32 envCount, const char* const* env)
+			:
+			fArgCount(argCount),
+			fArgs(NULL)
+		{
+			fPath = alloc_tracing_buffer_strcpy(path, B_PATH_NAME_LENGTH,
+				false);
+
+			// determine the buffer size we need for the args
+			size_t argBufferSize = 0;
+			for (int32 i = 0; i < argCount; i++)
+				argBufferSize += strlen(args[i]) + 1;
+
+			// allocate a buffer
+			fArgs = (char*)alloc_tracing_buffer(argBufferSize);
+			if (fArgs) {
+				char* buffer = fArgs;
+				for (int32 i = 0; i < argCount; i++) {
+					size_t argSize = strlen(args[i]) + 1;
+					memcpy(buffer, args[i], argSize);
+					buffer += argSize;
+				}
+			}
+
+			// ignore env for the time being
+			(void)envCount;
+			(void)env;
+
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "team exec, \"%p\", args:", fPath);
+			size_t printedChars = strlen(buffer);
+			buffer += printedChars;
+			size -= printedChars;
+
+			char* args = fArgs;
+			for (int32 i = 0; size > 0 && i < fArgCount; i++) {
+				snprintf(buffer, size, " \"%s\"", args);
+
+				printedChars = strlen(buffer);
+				buffer += printedChars;
+				size -= printedChars;
+				args += strlen(args) + 1;
+			}			
+		}
+
+	private:
+		char*	fPath;
+		int32	fArgCount;
+		char*	fArgs;
+};
+
+}	// namespace TeamTracing
+
+#	define T(x) new(std::nothrow) TeamTracing::x;
+#else
+#	define T(x) ;
+#endif
+
 
 
 //	#pragma mark - Private functions
@@ -1042,6 +1138,8 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
 		args[0], argCount, envCount, team->id));
 
+	T(ExecTeam(path, argCount, args, envCount, env));
+
 	// switching the kernel at run time is probably not a good idea :)
 	if (team == team_get_kernel_team())
 		return B_NOT_ALLOWED;
@@ -1162,8 +1260,8 @@ fork_team_thread_start(void *_args)
 static thread_id
 fork_team(void)
 {
-	struct team *parentTeam = thread_get_current_thread()->team, *team;
 	struct thread *parentThread = thread_get_current_thread();
+	struct team *parentTeam = parentThread->team, *team;
 	struct process_group *group = NULL;
 	struct fork_arg *forkArgs;
 	struct area_info info;
@@ -1256,6 +1354,8 @@ fork_team(void)
 
 	// notify the debugger
 	user_debug_team_created(team->id);
+
+	T(TeamForked(threadID));
 
 	resume_thread(threadID);
 	return threadID;
