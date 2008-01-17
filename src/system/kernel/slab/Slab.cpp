@@ -947,8 +947,10 @@ slab *
 HashedObjectCache::ObjectSlab(void *object) const
 {
 	Link *link = hash_table.Lookup(object);
-	if (link == NULL)
-		panic("object cache: requested object missing from hash table");
+	if (link == NULL) {
+		panic("object cache: requested object %p missing from hash table",
+			object);
+	}
 	return link->parent;
 }
 
