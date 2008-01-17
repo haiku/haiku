@@ -879,29 +879,29 @@ status_t
 debug_init_post_vm(kernel_args *args)
 {
 	add_debugger_command_etc("help", &cmd_help, "List all debugger commands",
-		"usage: %s [name]\n"
+		"[name]\n"
 		"Lists all debugger commands or those starting with \"name\".\n", 0);
 	add_debugger_command_etc("reboot", &cmd_reboot, "Reboot the system",
-		"usage: %s\n"
+		"\n"
 		"Reboots the system.\n", 0);
 	add_debugger_command_etc("shutdown", &cmd_shutdown, "Shut down the system",
-		"usage: %s\n"
+		"\n"
 		"Shuts down the system.\n", 0);
 	add_debugger_command_etc("gdb", &cmd_gdb, "Connect to remote gdb",
-		"usage: %s\n"
+		"\n"
 		"Connects to a remote gdb connected to the serial port.\n", 0);
 	add_debugger_command_etc("continue", &cmd_continue, "Leave kernel debugger",
-		"usage: %s\n"
+		"\n"
 		"Leaves kernel debugger.\n", 0);
 	add_debugger_command_alias("exit", "continue", "Same as \"continue\"");
 	add_debugger_command_alias("es", "continue", "Same as \"continue\"");
 	add_debugger_command_etc("message", &cmd_dump_kdl_message,
 		"Reprint the message printed when entering KDL",
-		"usage: %s\n"
+		"\n"
 		"Reprints the message printed when entering KDL.\n", 0);
 	add_debugger_command_etc("expr", &cmd_expr,
 		"Evaluates the given expression and prints the result",
-		"usage: %s <expression>\n"
+		"<expression>\n"
 		"Evaluates the given expression and prints the result.\n", 0);
 
 	debug_variables_init();
