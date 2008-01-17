@@ -135,6 +135,21 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 	memset((void *)fHcca, 0, sizeof(ohci_hcca));
 
+	// Allocate hash tables
+	fHashGenericTable = (ohci_general_td **)
+		malloc(sizeof(ohci_general_td *) * OHCI_HASH_SIZE);
+	if (fHashGenericTable == NULL) {
+		TRACE_ERROR(("usb_ohci: unable to allocate hash generic table\n"));
+		return;
+	}
+	fHashIsochronousTable = (ohci_isochronous_td **)
+		malloc(sizeof(ohci_isochronous_td *) * OHCI_HASH_SIZE);
+	if (fHashIsochronousTable == NULL) {
+		free(fHashGenericTable);
+		TRACE_ERROR(("usb_ohci: unable to allocate hash isochronous table\n"));
+		return;
+	}
+
 	// Set Up Host controller
 	// Dummy endpoints
 	fDummyControl = _AllocateEndpoint();
@@ -317,6 +332,10 @@ OHCI::~OHCI()
 		delete_area(fHccaArea);
 	if (fRegisterArea > 0)
 		delete_area(fRegisterArea);
+	if (fHashGenericTable)
+		free(fHashGenericTable);
+	if (fHashIsochronousTable)
+		free(fHashIsochronousTable);
 	if (fDummyControl)
 		_FreeEndpoint(fDummyControl);
 	if (fDummyBulk)
@@ -437,12 +456,40 @@ OHCI::_FinishTransfer()
 
 		// Pull out the done list and reverse its order
 		// for both general and isochronous descriptors
-		addr_t done_list = fHcca->done_head & ~OHCI_DONE_INTERRUPTS;
-		addr_t logical = _LogicalAddress(done_list);
-		if (_IsIsochronous(logical)) {
-			ohci_general_td *descriptor = (ohci_general_td *)logical;
-		} else {
-			ohci_isochronous_td *descriptor = (ohci_isochronous_td *)logical;
+		ohci_general_td *descriptor, *top;
+		ohci_isochronous_td *isoDescriptor, *isoTop;
+		uint32 done_list = fHcca->done_head & ~OHCI_DONE_INTERRUPTS;
+		for ( top = NULL, isoTop = NULL ; done_list != 0; ) {
+			if ((descriptor = _FindDescriptorInHash(done_list))) {
+				done_list = descriptor->next_physical_descriptor;
+				descriptor->next_logical_descriptor = (void *)top;
+				top = descriptor;
+				continue;
+			}
+			if ((isoDescriptor = _FindIsoDescriptorInHash(done_list))) {
+				done_list = isoDescriptor->next_physical_descriptor;
+				isoDescriptor->next_logical_descriptor = (void *)isoTop;
+				isoTop = isoDescriptor;
+				continue;
+			}
+			// TODO: Should I panic here? :)
+			TRACE_ERROR(("usb_ohci: address 0x%08lx not found!\n",done_list));
+			break;
+		}
+
+		// Process the list
+		for (isoDescriptor = isoTop; isoDescriptor != NULL; isoDescriptor 
+			= (ohci_isochronous_td *)isoDescriptor->next_logical_descriptor) {
+			// TODO: Process isochronous descriptors
+		}
+		for (descriptor = top; descriptor != NULL; descriptor
+			= (ohci_general_td *)descriptor->next_logical_descriptor) {
+			// TODO: Process general descriptors
+			if (OHCI_TD_GET_CONDITION_CODE(descriptor->flags) == OHCI_NO_ERROR) {
+				if (descriptor->is_last) {
+					// Trasfer completed
+				}
+			}
 		}
 
 		// Acknowledge the interrupt
@@ -453,23 +500,47 @@ OHCI::_FinishTransfer()
 }
 
 
-addr_t
-OHCI::_LogicalAddress(addr_t physical)
+void
+OHCI::_AddDescriptorToHash(ohci_general_td *descriptor)
 {
-	// How do I implement it ?
-	// 1 - Hash function like others (*BSD, Linux)
-	// 2 - Adding a method to our slab allocator (
-	//		offset from the base are the same for phys and logic)
-	return 0;
+	// TODO
 }
 
 
-bool
-OHCI::_IsIsochronous(addr_t logical)
+void
+OHCI::_RemoveDescriptorFromHash(ohci_general_td *descriptor)
 {
-	// I have NO IDEA how to implement this.
-	// BSD uses two hash table.
-	return false;
+	// TODO
+}
+
+
+ohci_general_td*
+OHCI::_FindDescriptorInHash(uint32 physicalAddress)
+{
+	// TODO
+	return NULL;
+}
+
+
+void
+OHCI::_AddIsoDescriptorToHash(ohci_isochronous_td *descriptor)
+{
+	// TODO
+}
+
+
+void
+OHCI::_RemoveIsoDescriptorFromHash(ohci_isochronous_td *descriptor)
+{
+	// TODO
+}
+
+
+ohci_isochronous_td*
+OHCI::_FindIsoDescriptorInHash(uint32 physicalAddress)
+{
+	// TODO
+	return NULL;
 }
 
 

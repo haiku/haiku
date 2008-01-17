@@ -143,16 +143,16 @@ static	int32						_FinishThread(void *data);
 		void						_AddDescriptorToHash(
 										ohci_general_td *descriptor);
 		void						_RemoveDescriptorFromHash(
-										addr_t physicalAddress);
+										ohci_general_td *descriptor);
 		ohci_general_td				*_FindDescriptorInHash(
-										addr_t physicalAddress);
+										uint32 physicalAddress);
 
 		void						_AddIsoDescriptorToHash(
 										ohci_isochronous_td *descriptor);
 		void						_RemoveIsoDescriptorFromHash(
-										addr_t physicalAddress);
+										ohci_isochronous_td *descriptor);
 		ohci_isochronous_td			*_FindIsoDescriptorInHash(
-										addr_t physicalAddress);
+										uint32 physicalAddress);
 
 
 		// Register functions
@@ -182,6 +182,10 @@ static	pci_module_info				*sPCIModule;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
+
+		// Hash table
+		ohci_general_td				**fHashGenericTable;
+		ohci_isochronous_td			**fHashIsochronousTable;
 
 		// Root Hub
 		OHCIRootHub 				*fRootHub;

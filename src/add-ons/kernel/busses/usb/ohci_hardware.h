@@ -344,6 +344,7 @@ typedef struct ohci_general_td
 	addr_t	physical_address;			// Physical address of this descriptor
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
+	void	*next_done_descriprtor;		// Used for collision in the hash table
 	size_t	buffer_size;				// Size of the buffer
 	void	*endpoint;					// Necessary when there is an error
 	void	*transfer;					// Pointer to the transfer
@@ -384,6 +385,8 @@ typedef struct ohci_isochronous_td
 	uint16		offset[OHCI_ITD_NOFFSET];	// Buffer offsets
 	// Software part
 	addr_t		physical_address;			// Physical address of this descriptor
+	void		*next_logical_descriptor;	// Logical pointer next descriptor
+	void		*next_done_descriptor;		// Used for collision in the hash table
 };
 
 #define	OHCI_ITD_GET_STARTING_FRAME(x)			((x) & 0x0000ffff)
