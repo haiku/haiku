@@ -59,6 +59,8 @@ enum keycodes {
 	CURSOR_DOWN		= 80,
 	CURSOR_HOME		= 71,
 	CURSOR_END		= 79,
+	PAGE_UP			= 73,
+	PAGE_DOWN		= 81,
 
 	BREAK			= 198,	// TODO: >= 128 can't be valid
 	DELETE			= 83,
@@ -290,6 +292,15 @@ arch_debug_blue_screen_getchar(void)
 				case CURSOR_END:
 					special = 0x80 | 'F';
 					return '\x1b';
+				case PAGE_UP:
+					special = 0x80 | '5';
+					special2 = '~';
+					return '\x1b';
+				case PAGE_DOWN:
+					special = 0x80 | '6';
+					special2 = '~';
+					return '\x1b';
+
 
 				case DELETE:
 					if (controlPressed && altPressed)
