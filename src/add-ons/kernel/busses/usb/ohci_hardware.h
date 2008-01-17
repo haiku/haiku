@@ -335,16 +335,19 @@ typedef struct ohci_endpoint_descriptor
 
 typedef struct ohci_general_td
 {
-	// Hardware part
+	// Hardware part 16 bytes
 	uint32	flags;						// Flags field
 	uint32	buffer_physical;			// Physical buffer pointer
 	uint32 	next_physical_descriptor;	// Physical pointer next descriptor
 	uint32 	last_physical_byte_address;	// Physical pointer to buffer end
 	// Software part
-	addr_t	physical_address;			// Physical pointer to this address
+	addr_t	physical_address;			// Physical address of this descriptor
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
 	size_t	buffer_size;				// Size of the buffer
+	void	*endpoint;					// Necessary when there is an error
+	void	*transfer;					// Pointer to the transfer
+	bool	is_last;					// Last descriptor of the transfer
 };
 
 #define	OHCI_BUFFER_ROUNDING			0x00040000
@@ -373,11 +376,14 @@ typedef struct ohci_general_td
 #define OHCI_ITD_NOFFSET 8
 typedef struct ohci_isochronous_td
 {
+	// Hardware part 32 byte
 	uint32		flags;
 	uint32		buffer_page_byte_0;			// Physical page number of byte 0
 	uint32		next_physical_descriptor;	// Next isochronous transfer descriptor
 	uint32		last_byte_address;			// Physical buffer end
 	uint16		offset[OHCI_ITD_NOFFSET];	// Buffer offsets
+	// Software part
+	addr_t		physical_address;			// Physical address of this descriptor
 };
 
 #define	OHCI_ITD_GET_STARTING_FRAME(x)			((x) & 0x0000ffff)

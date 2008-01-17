@@ -48,6 +48,17 @@ typedef struct hcd_soft_itransfer
 
 #define	OHCI_NUMBER_OF_ENDPOINTS	(2 * OHCI_NUMBER_OF_INTERRUPTS - 1)
 
+// Note: the controller returns only the physical
+// address of the first processed descriptor of
+// an heterogeneous list (isochronous + generic). Unfortunately
+// we don't have a way to know whether the descriptor is
+// generic or isochronous, either way to translate the address back to
+// kernel address. The physical address is used as the hash value.
+// (Kindly borrowed from *BSD)
+
+#define OHCI_HASH_SIZE 128
+#define HASH(x) (((x) >> 4) % OHCI_HASH_SIZE)
+
 
 class OHCI : public BusManager
 {
@@ -128,9 +139,21 @@ static	int32						_FinishThread(void *data);
 										iovec *vector,
 										size_t vectorCount);
 
-		// OHCI needs this function
-		addr_t						_LogicalAddress(addr_t physical);
-		bool						_IsIsochronous(addr_t logical);
+		// Hash tables related methods
+		void						_AddDescriptorToHash(
+										ohci_general_td *descriptor);
+		void						_RemoveDescriptorFromHash(
+										addr_t physicalAddress);
+		ohci_general_td				*_FindDescriptorInHash(
+										addr_t physicalAddress);
+
+		void						_AddIsoDescriptorToHash(
+										ohci_isochronous_td *descriptor);
+		void						_RemoveIsoDescriptorFromHash(
+										addr_t physicalAddress);
+		ohci_isochronous_td			*_FindIsoDescriptorInHash(
+										addr_t physicalAddress);
+
 
 		// Register functions
 inline	void						_WriteReg(uint32 reg, uint32 value);
