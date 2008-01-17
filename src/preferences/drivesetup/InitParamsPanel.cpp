@@ -88,7 +88,8 @@ InitParamsPanel::InitParamsPanel(BWindow* window)
 	blocksizeMenu->AddItem(new BMenuItem("1024 (Mostly small files)", message));
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "2048");
-	blocksizeMenu->AddItem(new BMenuItem("2048 (Recommended)", message));
+	BMenuItem* defaultItem = new BMenuItem("2048 (Recommended)", message);
+	blocksizeMenu->AddItem(defaultItem);
 	message = new BMessage(MSG_BLOCK_SIZE);
 	message->AddString("size", "4096");
 	blocksizeMenu->AddItem(new BMenuItem("4096", message));
@@ -97,6 +98,7 @@ InitParamsPanel::InitParamsPanel(BWindow* window)
 	blocksizeMenu->AddItem(new BMenuItem("8192 (Mostly large files)", message));
 
 	fBlockSizeMF = new BMenuField("Blocksize", blocksizeMenu, NULL);
+	defaultItem->SetMarked(true);
 
 	BButton* okButton = new BButton("Initialize", new BMessage(MSG_OK));
 	BButton* cancelButton = new BButton("Cancel", new BMessage(MSG_CANCEL));
@@ -201,7 +203,7 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 	Show();
 	Unlock();
 
-	// block this thread now
+	// block this thread now, but keep the window repainting
 	while (true) {
 		status_t err = acquire_sem_etc(fExitSemaphore, 1,
 			B_CAN_INTERRUPT | B_RELATIVE_TIMEOUT, 50000);
@@ -226,8 +228,12 @@ InitParamsPanel::Go(BString& name, BString& parameters)
 		}
 	}
 
+	int32 value = fReturnValue;
+
 	Quit();
-	return fReturnValue;
+		// NOTE: this object is toast now!
+
+	return value;
 }
 
 
