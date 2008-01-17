@@ -404,8 +404,12 @@ read_line(char *buffer, int32 maxLength,
 
 						// clear the history again if we're in the current line again
 						// (the buffer we get just is the current line buffer)
-						if (historyLine == sCurrentLine)
+						if (historyLine == sCurrentLine) {
 							sLineBuffer[historyLine][0] = '\0';
+						} else if (sLineBuffer[historyLine][0] == '\0') {
+							// empty history lines are unused -- so bail out
+							break;
+						}
 
 						// swap the current line with something from the history
 						if (position > 0)
@@ -415,6 +419,46 @@ read_line(char *buffer, int32 maxLength,
 						length = position = strlen(buffer);
 						kprintf("%s\x1b[K", buffer); // print the line and clear the rest
 						currentHistoryLine = historyLine;
+						break;
+					}
+					case '5':	// if "5~", it's PAGE UP
+					case '6':	// if "6~", it's PAGE DOWN
+					{
+						if (readChar() != '~')
+							break;
+
+						// PAGE UP: search backward, PAGE DOWN: forward
+						int32 searchDirection = (c == '5' ? -1 : 1);
+
+						bool found = false;
+						int32 historyLine = currentHistoryLine;
+						do {
+							historyLine = (historyLine + searchDirection
+								+ HISTORY_SIZE) % HISTORY_SIZE;
+							if (historyLine == sCurrentLine)
+								break;
+
+							if (strncmp(sLineBuffer[historyLine], buffer,
+									position) == 0) {
+								found = true;
+							}
+						} while (!found);
+
+						// bail out, if we've found nothing or hit an empty
+						// (i.e. unused) history line
+						if (!found || strlen(sLineBuffer[historyLine]) == 0)
+							break;
+
+						// found a suitable line -- replace the current buffer
+						// content with it
+						strcpy(buffer, sLineBuffer[historyLine]);
+						length = strlen(buffer);
+						kprintf("%s\x1b[K", buffer + position);
+							// print the line and clear the rest
+						kprintf("\x1b[%ldD", length - position);
+							// reposition cursor
+						currentHistoryLine = historyLine;
+
 						break;
 					}
 					case 'H': // home
@@ -435,8 +479,7 @@ read_line(char *buffer, int32 maxLength,
 					}
 					case '3':	// if "3~", it's DEL
 					{
-						c = readChar();
-						if (c != '~')
+						if (readChar() != '~')
 							break;
 
 						if (position < length)
