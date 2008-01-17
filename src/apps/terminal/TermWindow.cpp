@@ -39,14 +39,6 @@
 #include <string.h>
 #include <time.h>
 
-//
-// help and GPL URL
-//
-//#define URL_PREFIX  "file:///boot/home/config/settings/MuTerminal/help/"
-//#define INDEX_FILE  "/index.html"
-//#define GPL_FILE  "/gpl.html"
-//#define CHLP_FILE   "file:///boot/beos/documentation/Shell%20Tools/index.html"
-
 
 const static float kViewOffset = 3;
 const static uint32 kNewTab = 'NTab';
@@ -199,25 +191,16 @@ TermWindow::_SetupMenu()
 
 
 void
-TermWindow::_GetPreferredFonts(BFont &fullFont, BFont &halfFont)
+TermWindow::_GetPreferredFont(BFont &font)
 {
 	const char *family = PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY);
 
-	halfFont.SetFamilyAndStyle(family, NULL);
+	font.SetFamilyAndStyle(family, NULL);
 	float size = PrefHandler::Default()->getFloat(PREF_HALF_FONT_SIZE);
 	if (size < 6.0f)
 		size = 6.0f;
-	halfFont.SetSize(size);
-	halfFont.SetSpacing(B_FIXED_SPACING);
-
-	family = PrefHandler::Default()->getString(PREF_FULL_FONT_FAMILY);
-
-	fullFont.SetFamilyAndStyle(family, NULL);
-	size = PrefHandler::Default()->getFloat(PREF_FULL_FONT_SIZE);
-	if (size < 6.0f)
-		size = 6.0f;
-	fullFont.SetSize(size);
-	fullFont.SetSpacing(B_FIXED_SPACING);
+	font.SetSize(size);
+	font.SetSpacing(B_FIXED_SPACING);
 }
 
 
@@ -380,9 +363,9 @@ TermWindow::MessageReceived(BMessage *message)
 		case MSG_HALF_SIZE_CHANGED:
 		case MSG_FULL_SIZE_CHANGED: 
 		{
-			BFont halfFont, fullFont;
-			_GetPreferredFonts(fullFont, halfFont);			
-			_ActiveTermView()->SetTermFont (&halfFont, &fullFont);
+			BFont font;
+			_GetPreferredFont(font);			
+			_ActiveTermView()->SetTermFont(&font);
 			BRect rect = _ActiveTermView()->SetTermSize(0, 0, 0);
 			
 			int width, height;
@@ -393,12 +376,13 @@ TermWindow::MessageReceived(BMessage *message)
 				minimumHeight += fMenubar->Bounds().Height();
 			if (fTabView && fTabView->CountTabs() > 1)
 				minimumHeight += fTabView->TabHeight();
-			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
+			
+			SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
 							minimumHeight + MIN_ROWS * height, 
 							minimumHeight + MAX_ROWS * height);
 			
-			ResizeTo(rect.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
-				rect.Height()+fMenubar->Bounds().Height() + kViewOffset * 2);
+			ResizeTo(rect.Width() + B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
+				rect.Height() +fMenubar->Bounds().Height() + kViewOffset * 2);
 			
 			_ActiveTermView()->Invalidate();
 			break;
@@ -406,31 +390,31 @@ TermWindow::MessageReceived(BMessage *message)
 		case EIGHTYTWENTYFOUR:
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "24");
-		   	PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage(MSG_COLS_CHANGED);
 			break;
 	
 		case EIGHTYTWENTYFIVE:
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "25");
-		   	PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage(MSG_COLS_CHANGED);
 			break;		
 	
 		case EIGHTYFORTY:
 			PrefHandler::Default()->setString(PREF_COLS, "80");
 			PrefHandler::Default()->setString(PREF_ROWS, "40");
-		   	PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage(MSG_COLS_CHANGED);
 			break;	
 		
 		case ONETHREETWOTWENTYFOUR:
 			PrefHandler::Default()->setString(PREF_COLS, "132");
 			PrefHandler::Default()->setString(PREF_ROWS, "24");
-		   	PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage(MSG_COLS_CHANGED);
 			break;	
 		
 		case ONETHREETWOTWENTYFIVE:
 			PrefHandler::Default()->setString(PREF_COLS, "132");
 			PrefHandler::Default()->setString(PREF_ROWS, "25");
-		   	PostMessage (MSG_COLS_CHANGED);
+		   	PostMessage(MSG_COLS_CHANGED);
 			break;	
 		
 		case FULLSCREEN:
@@ -461,7 +445,7 @@ TermWindow::MessageReceived(BMessage *message)
 			break;	
 		
 		case MSG_FONT_CHANGED:
-	    		PostMessage(MSG_HALF_FONT_CHANGED);
+	    	PostMessage(MSG_HALF_FONT_CHANGED);
 			break;
 
 		case MSG_COLOR_CHANGED:
@@ -622,9 +606,9 @@ TermWindow::_AddTab(Arguments *args)
 		
 		view->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 		
-		BFont fullFont, halfFont;
-		_GetPreferredFonts(fullFont, halfFont);	
-		view->SetTermFont(&halfFont, &fullFont);
+		BFont font;
+		_GetPreferredFont(font);	
+		view->SetTermFont(&font);
 		
 		_SetTermColors(view);
 		
@@ -637,7 +621,7 @@ TermWindow::_AddTab(Arguments *args)
 				minimumHeight += fMenubar->Bounds().Height();
 			if (fTabView && fTabView->CountTabs() > 1)
 				minimumHeight += fTabView->TabHeight();
-			SetSizeLimits (MIN_COLS * width, MAX_COLS * width,
+			SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
 							minimumHeight + MIN_ROWS * height, 
 							minimumHeight + MAX_ROWS * height);
 		}

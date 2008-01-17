@@ -106,7 +106,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 	switch (msg->what) { 
 		case MSG_HALF_FONT_CHANGED:
-			PrefHandler::Default()->setString (PREF_HALF_FONT_FAMILY,
+			PrefHandler::Default()->setString(PREF_HALF_FONT_FAMILY,
 				fFont->Menu()->FindMarked()->Label());
 			modified = true;
 			break;
@@ -135,10 +135,7 @@ AppearancePrefView::MessageReceived(BMessage *msg)
 
 	if (modified) {
 		fAppearancePrefViewMessenger.SendMessage(msg);
-			// send message to fTermWindow
-		
-		// send the MSG_PREF_MODIFIED message
-		// to fPrefWindow
+			
 		BMessenger messenger(this);
 		messenger.SendMessage(MSG_PREF_MODIFIED);
 	}
@@ -156,10 +153,13 @@ AppearancePrefView::_MakeFontMenu(uint32 command, const char *defaultFontName)
 		uint32 flags;
 
 		if (get_font_family(i, &family, &flags) == B_OK) {
-			menu->AddItem(new BMenuItem(family, new BMessage(command)));
-			if (!strcmp(defaultFontName, family)) {
-				BMenuItem* item = menu->ItemAt(i);
-				item->SetMarked(true);
+			BFont font;
+			font.SetFamilyAndStyle(family, NULL);
+			if (font.IsFixed()) {
+				BMenuItem *item = new BMenuItem(family, new BMessage(command));
+				menu->AddItem(item);
+				if (!strcmp(defaultFontName, family))
+					item->SetMarked(true);
 			}
 		}
 	}

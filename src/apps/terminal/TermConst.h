@@ -66,9 +66,7 @@ const uint32 M_GET_DEVICE_NUM	= 'Mgdn';
 const ulong PSET__COLS		= 'pcol';
 const ulong PSET__ROWS		= 'prow';
 const ulong PSET__HFONT		= 'phfn';
-const ulong PSET__FFONT		= 'pffn';
 const ulong PSET__HFONT_SIZE	= 'phfs';
-const ulong PSET__FFONT_SIZE	= 'pffs';
 const ulong PSET_FORE_COLOR	= 'pfcl';
 const ulong PSET_BACK_COLOR	= 'pbcl';
 const ulong PSET__CODING	= 'pcod';
@@ -89,10 +87,6 @@ const uint32 MSG_CHECK_CHILDREN		= 'ckch';
 const char* const PREF_HALF_FONT_FAMILY = "Half Font Famly";
 const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
 const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
-
-const char* const PREF_FULL_FONT_FAMILY = "Full Font Famly";
-const char* const PREF_FULL_FONT_STYLE = "Full Font Style";
-const char* const PREF_FULL_FONT_SIZE = "Full Font Size";
 
 const char* const PREF_TEXT_FORE_COLOR = "Text Foreground Color";
 const char* const PREF_TEXT_BACK_COLOR = "Text Background Color";

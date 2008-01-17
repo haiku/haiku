@@ -52,10 +52,6 @@ SmartTabView::MouseDown(BPoint point)
 				popUpMenu->AddItem(new BMenuItem("Close Tab", message));
 				popUpMenu->SetAsyncAutoDestruct(true);
 				popUpMenu->SetTargetForItems(BMessenger(this));
-
-				// TODO: I thought I'd get a "sticky" menu with this call...
-				// Bug in our implementation or I just have to use the "other"
-				// Go() method?	
 				popUpMenu->Go(ConvertToScreen(point), true, true, true);
 								
 				handled = true;		

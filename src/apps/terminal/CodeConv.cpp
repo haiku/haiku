@@ -38,6 +38,7 @@ extern char gUTF8WidthTable[]; // defined in UTF8WidthTbl.c
 int32
 CodeConv::UTF8GetFontWidth(const char *string)
 {
+	return 1;
 	ushort unicode = UTF8toUnicode(string);
 	uchar width = gUTF8WidthTable[unicode >> 3];
 	ushort offset = unicode & 0x07;

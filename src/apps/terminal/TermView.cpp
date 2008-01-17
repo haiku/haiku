@@ -243,7 +243,7 @@ TermView::TermView(BMessage *archive)
 status_t
 TermView::_InitObject(int32 argc, const char **argv)
 {
-	SetTermFont(be_fixed_font, be_fixed_font);
+	SetTermFont(be_fixed_font);
 
 	fTextBuffer = new (std::nothrow) TermBuffer(fTermRows, fTermColumns, fScrBufSize);
 	if (fTextBuffer == NULL)
@@ -406,19 +406,17 @@ TermView::SetEncoding(int encoding)
 }
 
 
-//! Sets half and full fonts for terminal
+//! Sets font for terminal
 void
-TermView::SetTermFont(const BFont *halfFont, const BFont *fullFont)
+TermView::SetTermFont(const BFont *font)
 {
 	char buf[4];
 	int halfWidth = 0;
 
-	fHalfFont = halfFont;
-	fFullFont = fullFont;
-
+	fHalfFont = font;
+	
 	_FixFontAttributes(fHalfFont);
-	_FixFontAttributes(fFullFont);
-
+	
 	// calculate half font's max width
 	// Not Bounding, check only A-Z(For case of fHalfFont is KanjiFont. )
 	for (int c = 0x20 ; c <= 0x7e; c++){
@@ -428,30 +426,27 @@ TermView::SetTermFont(const BFont *halfFont, const BFont *fullFont)
 			halfWidth = tmpWidth;
 	}
 
-	// How to calculate FullWidth ?
 	fFontWidth = halfWidth;
 
-	// Second, Calc Font Height
-	font_height fh, hh;
+	font_height hh;
 	fHalfFont.GetHeight(&hh);
-	fFullFont.GetHeight(&fh);
-
-	int font_ascent =(int)((fh.ascent > hh.ascent) ? fh.ascent : hh.ascent);
-	int font_descent =(int)((fh.descent > hh.descent) ? fh.descent : hh.descent);
-	int font_leading =(int)((fh.leading > hh.leading) ? fh.leading : hh.leading);
-
+	
+	int font_ascent = (int)hh.ascent;
+	int font_descent =(int)hh.descent;
+	int font_leading =(int)hh.leading;
+	
 	if (font_leading == 0)
 		font_leading = 1;
 
 	if (fTop)
 		fTop = fTop / fFontHeight;
-
+		
+	fFontAscent = font_ascent;
 	fFontHeight = font_ascent + font_descent + font_leading + 1;
 
 	fTop = fTop * fFontHeight;
 
-	fFontAscent = font_ascent;
-	fCursorHeight = font_ascent + font_descent + font_leading + 1;
+	fCursorHeight = fFontHeight;
 }
 
 
@@ -572,8 +567,9 @@ TermView::Clear()
 
 //! Print one character
 void
-TermView::PutChar(uchar *string, ushort attr, int width)
+TermView::PutChar(uchar *string, ushort attr)
 {
+	int width = CodeConv::UTF8GetFontWidth((char*)string);	
 	if (width == FULL_WIDTH)
 		attr |= A_WIDTH;
 
@@ -1082,11 +1078,7 @@ TermView::_DrawLines(int x1, int y1, ushort attr, uchar *buf,
 	int forecolor, backcolor;
 	rgb_color rgb_fore = fTextForeColor, rgb_back = fTextBackColor, rgb_tmp;
 
-	// Set Font.
-	if (IS_WIDTH(attr))
-		inView->SetFont(&fFullFont);
-	else
-		inView->SetFont(&fHalfFont);
+	inView->SetFont(&fHalfFont);
 
 	// Set pen point
 	x2 = x1 + fFontWidth * width;
@@ -1300,42 +1292,39 @@ TermView::Draw(BRect updateRect)
 		return;
 	}
 
-	int x1, x2, y1, y2;
-	int i, j, k, count;
-	ushort attr;
-	uchar buf[256];
-	int m_flag;
-	BRect eraseRect;
+	int x1 =(int)updateRect.left / fFontWidth;
+	int x2 =(int)updateRect.right / fFontWidth;
 
-	x1 =(int)updateRect.left / fFontWidth;
-	x2 =(int)updateRect.right / fFontWidth;
-
-	y1 =(int)updateRect.top / fFontHeight;
-	y2 =(int)updateRect.bottom / fFontHeight;
+	int y1 =(int)updateRect.top / fFontHeight;
+	int y2 =(int)updateRect.bottom / fFontHeight;
 
 	Window()->BeginViewTransaction();
 
-	for (j = y1; j <= y2; j++) {
+	for (int j = y1; j <= y2; j++) {
 		// If(x1, y1) Buffer is in string full width character,
 		// alignment start position.
 
-		k = x1;
+		int k = x1;
+		uchar buf[256];
+	
+		ushort attr;
 		if (fTextBuffer->GetChar(j, k, buf, &attr) == IN_STRING)
 			k--;
 
 		if (k < 0)
 			k = 0;
 
-		for (i = k; i <= x2;) {
-			count = fTextBuffer->GetString(j, i, x2, buf, &attr);
-			m_flag = _CheckSelectedRegion(CurPos(i, j));
+		for (int i = k; i <= x2;) {
+			int count = fTextBuffer->GetString(j, i, x2, buf, &attr);
+			bool insideSelection = _CheckSelectedRegion(CurPos(i, j));
 
 			if (count < 0) {
-				if (m_flag) {
+				if (insideSelection) {
+					BRect eraseRect;
 					eraseRect.Set(fFontWidth * i,
 						fFontHeight * j,
-						fFontWidth *(i - count) -1,
-						fFontHeight *(j + 1) -1);
+						fFontWidth * (i - count) -1,
+						fFontHeight * (j + 1) -1);
 
 					SetHighColor(fSelectBackColor);
 					FillRect(eraseRect);
@@ -1345,7 +1334,7 @@ TermView::Draw(BRect updateRect)
 			}
 
 			_DrawLines(fFontWidth * i, fFontHeight * j,
-				attr, buf, count, m_flag, false, this);
+				attr, buf, count, insideSelection, false, this);
 			i += count;
 			if (i >= fTermColumns)
 				break;

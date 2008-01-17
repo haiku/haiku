@@ -40,7 +40,7 @@ public:
 
 	const char *TerminalName() const;
 
-	void	SetTermFont(const BFont *halfFont, const BFont *fullFont);
+	void	SetTermFont(const BFont *font);
 	void	GetFontSize(int *width, int *height);
 	BRect	SetTermSize(int rows, int cols, bool resize);
 
@@ -65,7 +65,7 @@ public:
 	void	Clear();	
 	
 	// Output Charactor
-	void	PutChar(uchar *string, ushort attr, int width);
+	void	PutChar(uchar *string, ushort attr);
 	void	PutCR(void);
 	void	PutLF(void);
 	void	PutNL(int num);
@@ -198,7 +198,6 @@ private:
 
 	// Font and Width
 	BFont fHalfFont;
-	BFont fFullFont;
 	int fFontWidth;
 	int fFontHeight;
 	int fFontAscent;

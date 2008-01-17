@@ -36,8 +36,6 @@ static const pref_defaults kTermDefaults[] = {
 
 	{ PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
 	{ PREF_HALF_FONT_SIZE,		"12" },
-	{ PREF_FULL_FONT_FAMILY,	"Haru Tohaba" },
-	{ PREF_FULL_FONT_SIZE,		"12" },
 
 	{ PREF_TEXT_FORE_COLOR,		"  0,   0,   0" },
 	{ PREF_TEXT_BACK_COLOR,		"255, 255, 255" },
@@ -75,7 +73,6 @@ PrefHandler::PrefHandler()
 	OpenText(path.Path());
 
 	_ConfirmFont(PREF_HALF_FONT_FAMILY, be_fixed_font);
-	_ConfirmFont(PREF_FULL_FONT_FAMILY, be_fixed_font);
 }
 
 
@@ -388,11 +385,8 @@ PrefHandler::_LoadFromFile(const char* path)
 	setInt32(PREF_COLS, prefs.cols);
 	setInt32(PREF_ROWS, prefs.rows);
 	setInt32(PREF_HALF_FONT_SIZE, prefs.font_size);
-	setInt32(PREF_FULL_FONT_SIZE, prefs.font_size);
 	char *font_family = strtok(prefs.font, "/");
 	char *font_style = strtok(NULL, "");
-	setString(PREF_FULL_FONT_FAMILY, font_family);
-	setString(PREF_FULL_FONT_STYLE, font_style);
 	setString(PREF_HALF_FONT_FAMILY, font_family);
 	setString(PREF_HALF_FONT_STYLE, font_style);
 	setRGB(PREF_TEXT_BACK_COLOR, prefs.bg);

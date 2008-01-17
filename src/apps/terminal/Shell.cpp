@@ -526,7 +526,7 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 				break;
 
 			case PTY_NG:
-				printf("%s\n", handshake.msg);
+				fprintf(stderr, "%s\n", handshake.msg);
 				done = -1;
 				break;
 

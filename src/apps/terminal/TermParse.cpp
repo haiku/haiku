@@ -349,8 +349,7 @@ TermParse::EscParse()
 			case CASE_PRINT:
 				cbuf[0] = c;
 				cbuf[1] = '\0';
-				width = HALF_WIDTH;
-				fView->PutChar(cbuf, attr, width);
+				fView->PutChar(cbuf, attr);
 				break;
 
 			case CASE_PRINT_GR:
@@ -363,7 +362,6 @@ TermParse::EscParse()
 							*ptr++ = curess;
 							*ptr++ = c;
 							*ptr = 0;
-							width = 1;
 							curess = 0;
 							break;
 
@@ -372,7 +370,6 @@ TermParse::EscParse()
 							*ptr++ = c;
 							GetReaderBuf(*ptr++);
 							*ptr = 0;
-							width = 2;
 							curess = 0;
 							break;
 
@@ -380,14 +377,12 @@ TermParse::EscParse()
 							*ptr++ = c;
 							GetReaderBuf(*ptr++);
 							*ptr = 0;
-							width = 2;
 							break;
 					}
 				} else {
 					/* ISO-8859-1...10 and MacRoman */
 					*ptr++ = c;
 					*ptr = 0;
-					width = 1;
 				}
 
 				if (now_coding != B_JIS_CONVERSION)
@@ -395,7 +390,7 @@ TermParse::EscParse()
 				else
 					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, B_EUC_CONVERSION);
 
-				fView->PutChar(dstbuf, attr, width);
+				fView->PutChar(dstbuf, attr);
 				break;
 
 			case CASE_PRINT_CS96:
@@ -403,9 +398,8 @@ TermParse::EscParse()
 				GetReaderBuf(cbuf[1]);
 				cbuf[1] |= 0x80;
 				cbuf[2] = 0;
-				width = 2;
 				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, B_EUC_CONVERSION);
-				fView->PutChar(dstbuf, attr, width);
+				fView->PutChar(dstbuf, attr);
 				break;
 
 			case CASE_LF:
@@ -420,8 +414,7 @@ TermParse::EscParse()
 				cbuf[0] = (uchar)c;
 				cbuf[1] = '\0';
 				CodeConv::ConvertToInternal((char*)cbuf, 1, (char*)dstbuf, now_coding);
-				width = 1;
-				fView->PutChar(dstbuf, attr, width);
+				fView->PutChar(dstbuf, attr);
 				break;
 
 			case CASE_SJIS_INSTRING:
@@ -429,8 +422,7 @@ TermParse::EscParse()
 				GetReaderBuf(cbuf[1]);
 				cbuf[2] = '\0';
 				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, now_coding);
-				width = 2;
-				fView->PutChar(dstbuf, attr, width);
+				fView->PutChar(dstbuf, attr);
 				break;
 
 			case CASE_UTF8_2BYTE:
@@ -440,8 +432,8 @@ TermParse::EscParse()
 					break;
 				cbuf[1] = (uchar)c;
 				cbuf[2] = '\0';
-				width = CodeConv::UTF8GetFontWidth((char*)cbuf);
-				fView->PutChar(cbuf, attr, width);
+				
+				fView->PutChar(cbuf, attr);
 				break;
 
 			case CASE_UTF8_3BYTE:
@@ -456,8 +448,7 @@ TermParse::EscParse()
 					break;
 				cbuf[2] = c;
 				cbuf[3] = '\0';
-				width = CodeConv::UTF8GetFontWidth((char*)cbuf);
-				fView->PutChar(cbuf, attr, width);
+				fView->PutChar(cbuf, attr);
 				break;
 
 			case CASE_MBCS:
