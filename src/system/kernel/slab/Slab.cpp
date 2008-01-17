@@ -709,6 +709,9 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 void
 object_cache_free(object_cache *cache, void *object)
 {
+	if (object == NULL)
+		return;
+
 	// flags are read only.
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
 		if (object_depot_store(&cache->depot, object))
