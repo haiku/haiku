@@ -205,6 +205,8 @@ void
 console_set_cursor(int32 x, int32 y)
 {
 	char buff[] = "\033Y  ";
+	x = MIN(79,MAX(0,x));
+	y = MIN(24,MAX(0,y));
 	buff[3] += (char)x;
 	buff[2] += (char)y;
 	sInput.WriteAt(NULL, 0LL, buff, 4);
