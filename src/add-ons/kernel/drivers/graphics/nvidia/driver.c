@@ -155,7 +155,11 @@ static uint16 nvidia_device_list[] = {
 	0x0112, /* Nvidia GeForce2 Go */
 	0x0113, /* Nvidia Quadro2 MXR/EX/Go */
 	0x0140, /* Nvidia GeForce FX 6600 GT */
+#if 0
+	// TODO: investigate! Other cards might be affected, see tickets #1530
+	//	and #1712.
 	0x0141, /* Nvidia GeForce FX 6600 */
+#endif
 	0x0142, /* Nvidia GeForce FX 6600LE */
 	0x0143, /* Nvidia GeForce 6600 VE */
 	0x0144, /* Nvidia GeForce FX 6600 Go */
@@ -322,12 +326,15 @@ static uint16 nvidia_device_list[] = {
 	0x03d0, /* Nvidia GeForce 6100 nForce 430 */
 	0x03d1, /* Nvidia GeForce 6100 nForce 405 */
 	0x03d2, /* Nvidia GeForce 6100 nForce 400 */
+#if 0
+	// TODO: these cards are not yet supported
 	0x0400, /* Nvidia GeForce 8600 GTS */
 	0x0402, /* Nvidia GeForce 8600 GT */
 	0x0407, /* Nvidia GeForce 8600M GT */
 	0x0421, /* Nvidia GeForce 8500 GT */
 	0x0422, /* Nvidia GeForce 8400 GS */
 	0x0423, /* Nvidia GeForce 8300 GS */
+#endif
 	0
 };
 
