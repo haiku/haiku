@@ -73,8 +73,8 @@ class PrivateConditionVariable
 	: protected HashTableLink<PrivateConditionVariable> {
 public:
 	static	void				ListAll();
-			void				Dump();
-
+			void				Dump() const;
+			const void*			Object() const	{ return fObject; }
 protected:
 			void				Publish(const void* object,
 									const char* objectType);

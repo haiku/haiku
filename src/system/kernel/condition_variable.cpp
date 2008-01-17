@@ -51,15 +51,13 @@ list_condition_variables(int argc, char** argv)
 static int
 dump_condition_variable(int argc, char** argv)
 {
-	if (argc < 2 || strlen(argv[1]) < 2
-		|| argv[1][0] != '0'
-		|| argv[1][1] != 'x') {
-		kprintf("%s: invalid argument, pass address\n", argv[0]);
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
-	addr_t address = strtoul(argv[1], NULL, 0);
-	if (address == NULL)
+	addr_t address = parse_expression(argv[1]);
+	if (address == 0)
 		return 0;
 
 	PrivateConditionVariable* variable = sConditionVariableHash.Lookup(
@@ -77,9 +75,13 @@ dump_condition_variable(int argc, char** argv)
 		}
 	}
 
-	if (variable != NULL)
+	if (variable != NULL) {
 		variable->Dump();
-	else
+
+		set_debug_variable("_cvar", (addr_t)variable);
+		set_debug_variable("_object", (addr_t)variable->Object());
+
+	} else
 		kprintf("no condition variable at or with key %p\n", (void*)address);
 
 	return 0;
@@ -250,7 +252,7 @@ PrivateConditionVariable::ListAll()
 
 
 void
-PrivateConditionVariable::Dump()
+PrivateConditionVariable::Dump() const
 {
 	kprintf("condition variable %p\n", this);
 	kprintf("  object:  %p (%s)\n", fObject, fObjectType);
@@ -429,9 +431,15 @@ condition_variable_init()
 			strerror(error));
 	}
 
-	add_debugger_command("cvar", &dump_condition_variable,
-		"Dump condition_variable");
-	add_debugger_command("cvars", &list_condition_variables,
-		"List condition variables");
+	add_debugger_command_etc("cvar", &dump_condition_variable,
+		"Dump condition variable info",
+		"<address>\n"
+		"Prints info for the specified condition variable.\n"
+		"  <address>  - Address of the condition variable or the object it is\n"
+		"               associated with.\n", 0);
+	add_debugger_command_etc("cvars", &list_condition_variables,
+		"List condition variables",
+		"\n"
+		"Lists all existing condition variables\n", 0);
 }
 
