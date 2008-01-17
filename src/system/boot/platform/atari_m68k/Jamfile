@@ -26,7 +26,7 @@ KernelMergeObject boot_platform_atari_m68k_shell.o :
 KernelMergeObject boot_platform_atari_m68k_other.o :
 #	shell.S
 	start.c
-	toscalls.S
+	toscalls.c
 	debug.c
 	#bios.S
 	console.cpp
