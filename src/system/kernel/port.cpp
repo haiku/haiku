@@ -125,6 +125,12 @@ _dump_port_info(struct port_entry *port)
  	get_sem_count(port->write_sem, &count);
 	kprintf(" write_sem count: %ld\n", count);
 	kprintf(" total count:     %ld\n", port->total_count);
+
+	set_debug_variable("_port", (addr_t)port);
+	set_debug_variable("_portID", port->id);
+	set_debug_variable("_owner", port->owner);
+	set_debug_variable("_readSem", port->read_sem);
+	set_debug_variable("_writeSem", port->write_sem);
 }
 
 

@@ -166,11 +166,26 @@ dump_sem(struct sem_entry *sem)
 			kprintf("\n");
 		} else
 			kprintf(" -\n");
+
+		set_debug_variable("_sem", (addr_t)sem);
+		set_debug_variable("_semID", sem->id);
+		set_debug_variable("_owner", sem->u.used.owner);
+
 #ifdef DEBUG_LAST_ACQUIRER
 		kprintf("last acquired by: %ld, count: %ld\n", sem->u.used.last_acquirer,
 			sem->u.used.last_acquire_count);
 		kprintf("last released by: %ld, count: %ld\n", sem->u.used.last_releaser,
 			sem->u.used.last_release_count);
+
+		if (sem->u.used.last_acquirer != 0)
+			set_debug_variable("_acquirer", sem->u.used.last_acquirer);
+		else
+			unset_debug_variable("_acquirer");
+
+		if (sem->u.used.last_releaser != 0)
+			set_debug_variable("_releaser", sem->u.used.last_releaser);
+		else
+			unset_debug_variable("_releaser");
 #endif
 	} else {
 		kprintf("next:    %p\n", sem->u.unused.next);
