@@ -187,7 +187,7 @@ dump_sem_info(int argc, char **argv)
 	int32 i;
 
 	if (argc < 2) {
-		kprintf("sem: not enough arguments\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -370,8 +370,27 @@ sem_init(kernel_args *args)
 	}
 
 	// add debugger commands
-	add_debugger_command("sems", &dump_sem_list, "Dump a list of all active semaphores");
-	add_debugger_command("sem", &dump_sem_info, "Dump info about a particular semaphore");
+	add_debugger_command_etc("sems", &dump_sem_list,
+		"Dump a list of all active semaphores (for team, with name, etc.)",
+		"[ ([ \"team\" | \"owner\" ] <team>) | (\"name\" <name>) ]"
+#ifdef DEBUG_LAST_ACQUIRER
+			" | (\"last\" <last acquirer>)"
+#endif
+		"\n"
+		"Prints a list of all active semaphores meeting the given\n"
+		"requirement. If no argument is given, all sems are listed.\n"
+		"  <team>             - The team owning the semaphores.\n"
+		"  <name>             - Part of the name of the semaphores.\n"
+#ifdef DEBUG_LAST_ACQUIRER
+		"  <last acquirer>    - The thread that last acquired the semaphore.\n"
+#endif
+		, 0);
+	add_debugger_command_etc("sem", &dump_sem_info,
+		"Dump info about a particular semaphore",
+		"<sem>\n"
+		"Prints info about the specified semaphore.\n"
+		"  <sem>  - pointer to the semaphore structure, semaphore ID, or name\n"
+		"           of the semaphore to print info for.\n", 0);
 
 	TRACE(("sem_init: exit\n"));
 

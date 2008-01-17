@@ -136,7 +136,7 @@ dump_port_info(int argc, char **argv)
 	int i;
 
 	if (argc < 2) {
-		kprintf("usage: port [id|name|sem|address]\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -331,8 +331,21 @@ port_init(kernel_args *args)
 		sPorts[i].id = -1;
 
 	// add debugger commands
-	add_debugger_command("ports", &dump_port_list, "Dump a list of all active ports");
-	add_debugger_command("port", &dump_port_info, "Dump info about a particular port");
+	add_debugger_command_etc("ports", &dump_port_list,
+		"Dump a list of all active ports (for team, with name, etc.)",
+		"[ ([ \"team\" | \"owner\" ] <team>) | (\"name\" <name>) ]\n"
+		"Prints a list of all active ports meeting the given\n"
+		"requirement. If no argument is given, all ports are listed.\n"
+		"  <team>             - The team owning the ports.\n"
+		"  <name>             - Part of the name of the ports.\n", 0);
+	add_debugger_command_etc("port", &dump_port_info,
+		"Dump info about a particular port",
+		"([ \"address\" ] <address>) | ([ \"name\" ] <name>) "
+			"| (\"sem\" <sem>)\n"
+		"Prints info about the specified port.\n"
+		"  <address>  - Pointer to the port structure.\n"
+		"  <name>     - Name of the port.\n"
+		"  <sem>      - ID of the port's read or write semaphore.\n", 0);
 
 	sPortsActive = true;
 	return B_OK;
