@@ -361,7 +361,7 @@ BPartition::GetPath(BPath* path) const
 status_t
 BPartition::GetVolume(BVolume* volume) const
 {
-	if (volume)
+	if (!volume)
 		return B_BAD_VALUE;
 
 	return volume->SetTo(_PartitionData()->volume);
