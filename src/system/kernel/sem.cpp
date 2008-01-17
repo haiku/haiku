@@ -422,7 +422,7 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 		name = "unnamed semaphore";
 
 	nameLength = strlen(name) + 1;
-	nameLength = min(nameLength, B_OS_NAME_LENGTH);
+	nameLength = min_c(nameLength, B_OS_NAME_LENGTH);
 	tempName = (char *)malloc(nameLength);
 	if (tempName == NULL)
 		return B_NO_MEMORY;
@@ -604,7 +604,7 @@ remove_thread_from_sem(struct thread *thread, struct sem_entry *sem,
 	// now see if more threads need to be woken up
 	while (sem->u.used.count > 0
 		   && thread_lookat_queue(&sem->u.used.queue) != NULL) {
-		int32 delta = min(thread->sem.count, sem->u.used.count);
+		int32 delta = min_c(thread->sem.count, sem->u.used.count);
 
 		thread->sem.count -= delta;
 		if (thread->sem.count <= 0) {
@@ -863,7 +863,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		thread->sem.flags = flags;
 		thread->sem.blocking = id;
 		thread->sem.acquire_count = count;
-		thread->sem.count = min(-sSems[slot].u.used.count, count);
+		thread->sem.count = min_c(-sSems[slot].u.used.count, count);
 			// store the count we need to restore upon release
 		thread->sem.acquire_status = B_NO_ERROR;
 		thread_enqueue(thread, &sSems[slot].u.used.queue);
@@ -1025,7 +1025,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		if (sSems[slot].u.used.count < 0) {
 			struct thread *thread = thread_lookat_queue(&sSems[slot].u.used.queue);
 
-			delta = min(count, thread->sem.count);
+			delta = min_c(count, thread->sem.count);
 			thread->sem.count -= delta;
 			if (thread->sem.count <= 0) {
 				// release this thread

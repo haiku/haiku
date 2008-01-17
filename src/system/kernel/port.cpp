@@ -840,7 +840,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	}
 
 	// determine tail & get the length of the message
-	msg = list_get_first_item(&sPorts[slot].msg_queue);
+	msg = (port_msg*)list_get_first_item(&sPorts[slot].msg_queue);
 	if (msg == NULL) {
 		if (status == B_OK)
 			panic("port %ld: no messages found\n", sPorts[slot].id);
@@ -970,7 +970,7 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 		return B_BAD_PORT_ID;
 	}
 
-	msg = list_get_first_item(&sPorts[slot].msg_queue);
+	msg = (port_msg*)list_get_first_item(&sPorts[slot].msg_queue);
 	if (msg == NULL) {
 		if (status == B_OK)
 			panic("port %ld: no messages found", sPorts[slot].id);
@@ -993,7 +993,7 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	restore_interrupts(state);
 
 	// check output buffer size
-	size = min(bufferSize, msg->size);
+	size = min_c(bufferSize, msg->size);
 
 	// copy message
 	if (_msgCode != NULL)
@@ -1367,7 +1367,7 @@ _user_writev_port_etc(port_id port, int32 messageCode, const iovec *userVecs,
 		return B_BAD_ADDRESS;
 
 	if (userVecs && vecCount != 0) {
-		vecs = malloc(sizeof(iovec) * vecCount);
+		vecs = (iovec*)malloc(sizeof(iovec) * vecCount);
 		if (vecs == NULL)
 			return B_NO_MEMORY;
 

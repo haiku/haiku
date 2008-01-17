@@ -29,10 +29,10 @@ KernelMergeObject kernel_core.o :
 	main.c
 	module.cpp
 	Notifications.cpp
-	port.c
+	port.cpp
 	real_time_clock.c
 	scheduler.cpp
-	sem.c
+	sem.cpp
 	shutdown.c
 	signal.cpp
 	system_info.c
