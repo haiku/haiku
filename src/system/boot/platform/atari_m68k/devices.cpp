@@ -31,7 +31,7 @@ extern uint32 gBootPartitionOffset;
 #define SCRATCH_SIZE (2*4096)
 static uint8 gScratchBuffer[4096];
 
-static const uint16 kParametersSizeVersion1 = sizeof(struct tosbpb);
+static const uint16 kParametersSizeVersion1 = sizeof(struct tos_bpb);
 static const uint16 kParametersSizeVersion2 = 0x1e;
 static const uint16 kParametersSizeVersion3 = 0x42;
 
@@ -39,7 +39,7 @@ static const uint16 kDevicePathSignature = 0xbedd;
 
 //XXX clean this up!
 struct drive_parameters {
-	struct tosbpb bpb;
+	struct tos_bpb bpb;
 	uint16		parameters_size;
 	uint16		flags;
 	uint32		cylinders;
@@ -115,25 +115,22 @@ class BlockHandle : public Handle {
 		BlockHandle(int handle);
 		virtual ~BlockHandle();
 
-		status_t InitCheck() const;
-
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
-		virtual off_t Size() const;
+		virtual off_t Size() const { return fSize; };
 
 		uint32 BlockSize() const { return fBlockSize; }
-
-		status_t FillIdentifier();
 
 		bool HasParameters() const { return fHasParameters; }
 		const drive_parameters &Parameters() const { return fParameters; }
 
 		disk_identifier &Identifier() { return fIdentifier; }
 		uint8 DriveID() const { return fHandle; }
+		
+		virtual ssize_t ReadBlocks(void *buffer, off_t first, int32 count);
 
 	protected:
-		status_t	ReadBPB(struct tosbpb *bpb);
 		uint64	fSize;
 		uint32	fBlockSize;
 		bool	fHasParameters;
@@ -142,15 +139,44 @@ class BlockHandle : public Handle {
 };
 
 
+class BIOSDrive : public BlockHandle {
+	public:
+		BIOSDrive(int handle);
+		virtual ~BIOSDrive();
+
+		status_t FillIdentifier();
+
+		virtual ssize_t ReadBlocks(void *buffer, off_t first, int32 count);
+
+	protected:
+		status_t	ReadBPB(struct tos_bpb *bpb);
+};
+
+
+class XHDIDrive : public BlockHandle {
+	public:
+		XHDIDrive(int handle/*, uint16 major, uint16 minor ??*/);
+		virtual ~XHDIDrive();
+
+		status_t FillIdentifier();
+
+		virtual ssize_t ReadBlocks(void *buffer, off_t first, int32 count);
+
+	protected:
+		uint16 fMajor;
+		uint16 fMinor;
+};
+
+
 static bool sBlockDevicesAdded = false;
 
 
 static status_t
-read_bpb(uint8 drive, struct tosbpb *bpb)
+read_bpb(uint8 drive, struct tos_bpb *bpb)
 {
-	struct tosbpb *p;
+	struct tos_bpb *p;
 	p = Getbpb(drive);
-	memcpy(bpb, p, sizeof(struct tosbpb));
+	memcpy(bpb, p, sizeof(struct tos_bpb));
 	/* Getbpb is buggy so we must force a media change */
 	//XXX: docs seems to assume we should loop until it works
 	Mediach(drive);
@@ -401,6 +427,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 		return B_OK;
 
 	map = Drvmap();
+	dprintf("Drvmap(): 0x%08lx\n", map);
 	for (driveID = 0; driveID < 32; driveID++) {
 		bool present = map & 0x1;
 		map >>= 1;
@@ -443,7 +470,108 @@ BlockHandle::BlockHandle(int handle)
 	: Handle(handle)
 {
 	TRACE(("drive ID %u\n", fHandle));
+}
 
+
+BlockHandle::~BlockHandle()
+{
+}
+
+
+status_t 
+BlockHandle::InitCheck() const
+{
+	return fSize > 0 ? B_OK : B_ERROR;
+}
+
+
+ssize_t 
+BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+{
+	ssize_t ret;
+	uint32 offset = pos % fBlockSize;
+	pos /= fBlockSize;
+
+	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
+	int32 totalBytesRead = 0;
+
+	//TRACE(("BIOS reads %lu bytes from %Ld (offset = %lu), drive %u\n",
+	//	blocksLeft * fBlockSize, pos * fBlockSize, offset, fDriveID));
+
+	// read partial block
+	if (offset) {
+		ret = Rwabs(RW_READ | RW_NOTRANSLATE, gScratchBuffer, fBlockSize/256, -1, fHandle, pos * fBlockSize/256);
+		if (ret < 0)
+			return toserror(ret);
+		totalBytesRead += fBlockSize - offset;
+		memcpy(buffer, gScratchBuffer + offset, totalBytesRead);
+		
+	}
+
+	uint32 scratchSize = SCRATCH_SIZE / fBlockSize;
+
+	while (blocksLeft > 0) {
+		uint32 blocksRead = blocksLeft;
+		if (blocksRead > scratchSize)
+			blocksRead = scratchSize;
+
+		ret = ReadBlocks(gScratchBuffer, pos, blocksRead);
+		if (ret < 0)
+			return ret;
+
+		uint32 bytesRead = fBlockSize * blocksRead - offset;
+		// copy no more than bufferSize bytes
+		if (bytesRead > bufferSize)
+			bytesRead = bufferSize;
+
+		memcpy(buffer, (void *)(gScratchBuffer + offset), bytesRead);
+		pos += blocksRead;
+		offset = 0;
+		blocksLeft -= blocksRead;
+		bufferSize -= bytesRead;
+		buffer = (void *)((addr_t)buffer + bytesRead);
+		totalBytesRead += bytesRead;
+	}
+
+	return totalBytesRead;
+}
+
+
+ssize_t 
+BlockHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+{
+	// we don't have to know how to write
+	return B_NOT_ALLOWED;
+}
+
+
+ssize_t
+BlockHandle::ReadBlocks(void *buffer, off_t first, int32 count)
+{
+	return B_NOT_ALLOWED;
+}
+
+
+/*status_t
+BlockHandle::FillIdentifier()
+{
+	return B_NOT_ALLOWED;
+}*/
+
+//	#pragma mark -
+
+/*
+ * BIOS based disk access.
+ * Only for fallback from missing XHDI.
+ * XXX: This is broken!
+ * XXX: check for physical drives in PUN_INFO
+ * XXX: at least try to use MetaDOS calls instead.
+ */
+
+
+BIOSDrive::BIOSDrive(int handle)
+	: BlockHandle(handle)
+{
 	/* first check if the drive exists */
 	/* note floppy B can be reported present anyway... */
 	uint32 map = Drvmap();
@@ -498,20 +626,13 @@ BlockHandle::BlockHandle(int handle)
 }
 
 
-BlockHandle::~BlockHandle()
+BIOSDrive::~BIOSDrive()
 {
-}
-
-
-status_t 
-BlockHandle::InitCheck() const
-{
-	return fSize > 0 ? B_OK : B_ERROR;
 }
 
 
 ssize_t 
-BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
+BIOSDrive::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
 	int32 ret;
 	int sectorsPerBlocks = (fBlockSize / 256);
@@ -566,22 +687,15 @@ BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t 
-BlockHandle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
+BIOSDrive::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 {
 	// we don't have to know how to write
 	return B_NOT_ALLOWED;
 }
 
 
-off_t 
-BlockHandle::Size() const
-{
-	return fSize;
-}
-
-
 status_t
-BlockHandle::FillIdentifier()
+BIOSDrive::FillIdentifier()
 {
 #if 0
 	if (HasParameters()) {
@@ -618,6 +732,127 @@ BlockHandle::FillIdentifier()
 #endif
 
 	return B_ERROR;
+}
+
+
+ssize_t
+BIOSDrive::ReadBlocks(void *buffer, off_t first, int32 count)
+{
+	int sectorsPerBlocks = (fBlockSize / 256);
+	int32 ret;
+	// XXX: check for AHDI 3.0 before using long recno!!!
+	ret = Rwabs(RW_READ | RW_NOTRANSLATE, buffer, sectorsPerBlocks, -1, fHandle, first * sectorsPerBlocks);
+	if (ret < 0)
+		return toserror(ret);
+	return ret;
+}
+
+
+//	#pragma mark -
+
+/*
+ * XHDI based devices
+ */
+
+
+XHDIDrive::XHDIDrive(int handle)
+	: BlockHandle(handle)
+{
+	/* first check if the drive exists */
+	/* note floppy B can be reported present anyway... */
+	uint32 map = Drvmap();
+	if (!(map & (1 << fHandle))) {
+		fSize = 0LL;
+		return;
+	}
+	//XXX: check size
+
+	if (get_drive_parameters(fHandle, &fParameters) != B_OK) {
+		dprintf("getting drive parameters for: %u failed!\n", fHandle);
+		return;
+	}
+	fBlockSize = 512;
+	fSize = fParameters.sectors * fBlockSize;
+	fHasParameters = false;
+
+#if 0
+	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
+		// old style CHS support
+
+		if (get_drive_parameters(driveID, &fParameters) != B_OK) {
+			dprintf("getting drive parameters for: %u failed!\n", fDriveID);
+			return;
+		}
+
+		TRACE(("  cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
+			fParameters.bytes_per_sector));
+		TRACE(("  total sectors: %Ld\n", fParameters.sectors));
+
+		fBlockSize = 512;
+		fSize = fParameters.sectors * fBlockSize;
+		fLBA = false;
+		fHasParameters = false;
+	} else {
+		TRACE(("size: %x\n", fParameters.parameters_size));
+		TRACE(("drive_path_signature: %x\n", fParameters.device_path_signature));
+		TRACE(("host bus: \"%s\", interface: \"%s\"\n", fParameters.host_bus,
+			fParameters.interface_type));
+		TRACE(("cylinders: %lu, heads: %lu, sectors: %lu, bytes_per_sector: %u\n",
+			fParameters.cylinders, fParameters.heads, fParameters.sectors_per_track,
+			fParameters.bytes_per_sector));
+		TRACE(("total sectors: %Ld\n", fParameters.sectors));
+
+		fBlockSize = fParameters.bytes_per_sector;
+		fSize = fParameters.sectors * fBlockSize;
+		fLBA = true;
+		fHasParameters = true;
+	}
+#endif
+}
+
+
+XHDIDrive::~XHDIDrive()
+{
+}
+
+
+status_t
+XHDIDrive::FillIdentifier()
+{
+
+	fIdentifier.bus_type = UNKNOWN_BUS;
+	fIdentifier.device_type = UNKNOWN_DEVICE;
+	fIdentifier.device.unknown.size = Size();
+#if 0
+	// cf. http://toshyp.atari.org/010008.htm#XHDI-Terminologie
+	if (fMajor >= 8 && fMajor <= 15) { // scsi
+		fIdentifier.device_type = SCSI_DEVICE;
+		fIdentifier.device.scsi.logical_unit = fMinor;
+		//XXX: where am I supposed to put the ID ???
+	}
+#endif
+
+	for (int32 i = 0; i < NUM_DISK_CHECK_SUMS; i++) {
+		fIdentifier.device.unknown.check_sums[i].offset = -1;
+		fIdentifier.device.unknown.check_sums[i].sum = 0;
+	}
+#endif
+
+	return B_ERROR;
+}
+
+
+ssize_t
+XHDIDrive::ReadBlocks(void *buffer, off_t first, int32 count)
+{
+	int sectorsPerBlocks = (fBlockSize / 256);
+	int32 ret;
+	uint16 flags = RW_READ;
+	//ret = XHReadWrite(fMajor, fMinor, flags, buffer, (uint32)first, (uint16)count, buffer);
+	if (ret < 0)
+		return toserror(ret);
+	return ret;
 }
 
 

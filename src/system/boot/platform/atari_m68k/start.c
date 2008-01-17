@@ -118,6 +118,9 @@ _start(void)
 		// call C++ constructors before doing anything else
 
 	args.heap_size = HEAP_SIZE;
+	
+	// so we can dprintf
+	init_nat_features();
 
 	//serial_init();
 	console_init();

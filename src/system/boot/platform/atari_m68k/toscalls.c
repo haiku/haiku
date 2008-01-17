@@ -12,6 +12,9 @@
 
 #include <Errors.h>
 
+void *gXHDIEntryPoint = NULL;
+NatFeatCookie *gNatFeatCookie = NULL;
+int32 gDebugPrintfNatFeatID = 0;
 
 /*! Maps TOS error codes to native errors
  */
@@ -103,6 +106,60 @@ toserror(int32 err)
 }
 
 
+/*! Maps XHDI error codes to native errors
+ * cf. http://toshyp.atari.org/010008.htm#XHDI_20error_20codes
+ */
+status_t
+xhdierror(int32 err)
+{
+	if (err <= -456) {
+		int ide = -(err + 456);
+		// ide status reg
+		// guessed mapping
+		if (ide & (1 << 1)) {	// track 0 not found
+			return B_DEV_FORMAT_ERROR;
+		} else if (ide & (1 << 0)) {	// DAM not found
+			return B_DEV_FORMAT_ERROR,;
+		} else if (ide & (1 << 4)) {	// ID field not found
+			return B_DEV_ID_ERROR;
+		} else if (ide & (1 << 7)) {	// bad block mark
+			return B_DEV_FORMAT_ERROR;
+		} else if (ide & (1 << 6)) {	// uncorrectable error
+			return B_DEV_UNREADABLE;
+		} else if (ide & (1 << 2)) {	// command aborted
+			return EINTR;
+		} else if (ide & (1 << 5)) {	// media change
+			return B_DEV_MEDIA_CHANGED;
+		} else if (ide & (1 << 3)) {	// media change requested
+			return B_DEV_MEDIA_CHANGE_REQUESTED;
+		}
+		return B_ERROR;
+	} else if (err <= -200) {
+		/* SCSI errors */
+		int scsi = -(err + 200);
+		//XXX:
+		switch (scsi) {
+		case 0x06:
+			return B_DEV_FORMAT_ERROR;
+		case 0x10:
+			return B_DEV_FORMAT_ERROR;
+		case 0x11:
+			return B_DEV_UNREADABLE;
+		case 0x12:
+			return B_DEV_ID_ERROR;
+		case 0x13:
+			return B_DEV_FORMAT_ERROR;
+		case 0x20:
+			return EINTR;
+		case 0x28:
+			return B_DEV_FORMAT_ERROR;
+		case 0x5a:
+			return B_DEV_FORMAT_ERROR;
+		}
+	}
+	return toserror(err);
+}
+
 void
 dump_tos_cookie(const struct tos_cookie *c)
 {
@@ -121,3 +178,28 @@ dump_tos_cookies(void)
 	}
 }
 
+
+status_t
+init_xhdi(void)
+{
+	
+}
+
+
+status_t
+init_nat_features(void)
+{
+	if (nat_features()) {
+		// find debugprintf id
+		gDebugPrintfNatFeatID = nat_feat_getid("DEBUGPRINTF");
+		//
+	}
+	return nat_features() ? B_OK : ENOENT;
+}
+
+void
+nat_feat_debugprintf(const char *str)
+{
+	if (gDebugPrintfNatFeatID)
+		nat_feat_call(gDebugPrintfNatFeatID, 0, str);
+}

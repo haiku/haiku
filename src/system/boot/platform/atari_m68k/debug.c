@@ -53,6 +53,9 @@ dprintf(const char *format, ...)
 
 	Bconput(DEV_AUX, buffer);
 
+	// send to the emulator's stdout if available
+	nat_feat_debugprintf(buffer);
+
 	//if (platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT)
 		Bconput(DEV_CONSOLE, buffer);
 }

@@ -27,40 +27,40 @@ extern "C" {
 //#endif
 
 /* void (no) arg */
-#define toscallV(trapnr, callnr)			\
-({							\
+#define toscallV(trapnr, callnr)				\
+({												\
 	register int32 retvalue __asm__("d0");		\
-							\
-	__asm__ volatile				\
-	("/* toscall(" #trapnr ", " #callnr ") */\n	\
-		move.w	%[calln],-(%%sp)\n		\
-		trap	%[trapn]\n			\
-		add.l	#2,%%sp\n"			\
-	: "=r"(retvalue)	/* output */		\
+												\
+	__asm__ volatile							\
+	("/* toscall(" #trapnr ", " #callnr ") */\n"	\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	trap	%[trapn]\n"						\
+	"	add.l	#2,%%sp\n"						\
+	: "=r"(retvalue)	/* output */			\
 	: [trapn]"i"(trapnr),[calln]"i"(callnr) 	\
-					/* input */	\
+									/* input */	\
 	: TOS_CLOBBER_LIST /* clobbered regs */		\
-	);						\
-	retvalue;					\
+	);											\
+	retvalue;									\
 })
 
 #define toscallW(trapnr, callnr, p1)			\
-({							\
+({												\
 	register int32 retvalue __asm__("d0");		\
-	int16 _p1 = (int16)(p1);			\
-							\
-	__asm__ volatile				\
-	("/* toscall(" #trapnr ", " #callnr ") */\n	\
-		move.w	%1,-(%%sp) \n			\
-		move.w	%[calln],-(%%sp)\n		\
-		trap	%[trapn]\n			\
-		add.l	#4,%%sp \n "			\
-	: "=r"(retvalue)	/* output */		\
-	: "r"(_p1),			/* input */	\
+	int16 _p1 = (int16)(p1);					\
+												\
+	__asm__ volatile							\
+	("/* toscall(" #trapnr ", " #callnr ") */\n"	\
+	"	move.w	%1,-(%%sp) \n"					\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	trap	%[trapn]\n"						\
+	"	add.l	#4,%%sp \n"						\
+	: "=r"(retvalue)			/* output */	\
+	: "r"(_p1),						/* input */	\
 	  [trapn]"i"(trapnr),[calln]"i"(callnr)		\
 	: TOS_CLOBBER_LIST /* clobbered regs */		\
-	);						\
-	retvalue;					\
+	);											\
+	retvalue;									\
 })
 
 #define toscallL(trapnr, callnr, p1)			\
@@ -182,7 +182,7 @@ extern "C" {
 
 // cf. http://www.fortunecity.com/skyscraper/apple/308/html/bios.htm
 
-struct tosbpb {
+struct tos_bpb {
 	int16 recsiz;
 	int16 clsiz;
 	int16 clsizb;
@@ -194,6 +194,18 @@ struct tosbpb {
 	int16 bflags;
 };
 
+struct tos_pun_info {
+	int16 puns;
+	uint8 pun[16];
+	int32 part_start[16]; // unsigned ??
+	uint32 p_cookie;
+	struct tos_pun_info *p_cooptr; // points to itself
+	uint16 p_version;
+	uint16 p_max_sector;
+	int32 reserved[16];
+};
+#define PUN_INFO ((struct tos_pun_info *)0x516L)
+
 
 //#define Getmpb() toscallV(BIOS_TRAP, 0)
 #define Bconstat(dev) toscallW(BIOS_TRAP, 1, (uint16)dev)
@@ -202,7 +214,7 @@ struct tosbpb {
 #define Rwabs(mode, buf, count, recno, dev, lrecno) toscallWPWWWL(BIOS_TRAP, 4, (int16)mode, (void *)buf, (int16)count, (int16)recno, (uint16)dev, (int32)lrecno)
 //#define Setexc() toscallV(BIOS_TRAP, 5, )
 #define Tickcal() toscallV(BIOS_TRAP, 6)
-#define Getbpb(dev) (struct tosbpb *)toscallW(BIOS_TRAP, 7, (uint16)dev)
+#define Getbpb(dev) (struct tos_bpb *)toscallW(BIOS_TRAP, 7, (uint16)dev)
 #define Bcostat(dev) toscallW(BIOS_TRAP, 8, (uint16)dev)
 #define Mediach(dev) toscallW(BIOS_TRAP, 9, (int16)dev)
 #define Drvmap() (uint32)toscallV(BIOS_TRAP, 10)
@@ -312,12 +324,119 @@ static inline int Bconputs(int16 handle, const char *string)
 
 #ifndef __ASSEMBLER__
 
+/* 
+ * MetaDOS XBIOS calls
+ */
+
+//#define _DISABLE	0
+
+#ifndef __ASSEMBLER__
+
+#define Metainit(buf) toscallP(XBIOS_TRAP, 48, (void *)buf)
+#define Metaopen(drive, p) toscall>P(XBIOS_TRAP, 48, (void *)buf)
+#define Metaclose(drive) toscallW(XBIOS_TRAP, 50, (int16)drive)
+#define Metagettoc(drive, flag, p) toscallW(XBIOS_TRAP, 62, (int16)drive, (int16)flag, (void *)p)
+#define Metadiscinfo(drive, p) toscallWP(XBIOS_TRAP, 63, (int16)drive, (void *)p)
+#define Metaioctl(drive, magic, op, buf) toscallWLWP(XBIOS_TRAP, 55, (int16)drive, (int32)magic, (int16)op, )
+//#define Meta(drive) toscallW(XBIOS_TRAP, 50, (int16)drive)
+//#define Meta(drive) toscallW(XBIOS_TRAP, 50, (int16)drive)
+//#define Meta(drive) toscallW(XBIOS_TRAP, 50, (int16)drive)
+
+#endif /* __ASSEMBLER__ */
+
+/*
+ * XHDI support
+ * see http://toshyp.atari.org/010008.htm
+ */
+
+#define XHDI_COOKIE 'XHDI'
+#define XHDI_MAGIC 0x27011992
+#define XHDI_CLOBBER_LIST /* only d0 */
+
+#define XH_TARGET_STOPPABLE		0x00000001L
+#define XH_TARGET_REMOVABLE		0x00000002L
+#define XH_TARGET_LOCKABLE		0x00000004L
+#define XH_TARGET_EJECTABLE		0x00000008L
+#define XH_TARGET_LOCKED		0x20000000L
+#define XH_TARGET_STOPPED		0x40000000L
+#define XH_TARGET_RESERVED		0x80000000L
+
+#ifndef __ASSEMBLER__
+
+/* pointer to the XHDI dispatch function */
+extern void *gXHDIEntryPoint;
+
+/* void (no) arg */
+#define xhdicallV(callnr)						\
+({												\
+	register int32 retvalue __asm__("d0");		\
+												\
+	__asm__ volatile							\
+	("/* xhdicall(" #callnr ") */\n"			\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	call	(%[entry])\n"						\
+	"	add.l	#2,%%sp\n"						\
+	: "=r"(retvalue)	/* output */			\
+	:							/* input */		\
+	  [entry]"a"(gXHDIEntryPoint),				\
+	  [calln]"i"(callnr)						\
+	: XHDI_CLOBBER_LIST /* clobbered regs */	\
+	);											\
+	retvalue;									\
+})
+
+#define xhdicallW(callnr, p1)					\
+({												\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);					\
+												\
+	__asm__ volatile							\
+	("/* xhdicall(" #callnr ") */\n"			\
+	"	move.w	%1,-(%%sp) \n"					\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	call	(%[entry])\n"						\
+	"	add.l	#4,%%sp \n"						\
+	: "=r"(retvalue)	/* output */			\
+	: "r"(_p1),			/* input */				\
+	  [entry]"a"(gXHDIEntryPoint),				\
+	  [calln]"i"(callnr)						\
+	: XHDI_CLOBBER_LIST /* clobbered regs */	\
+	);											\
+	retvalue;									\
+})
+
+
+#define XHGetVersion() (uint16)xhdicallV(0)
+#define XHInqTarget(major, minor, bsize, flags, pname) xhdicallWWPPP(1, (uint16)major, (uint16)minor, (uint32 *)bsize, (uint32 *)flags, (char *)pname)
+//XHReserve 2
+//#define XHLock() 3
+//#define XHStop() 4
+#define XHEject(major, minor, doeject, key) xhdicallWWWW(5, (uint16)major, (uint16)minor, (uint16)doeject, (uint16)key)
+#define XHDrvMap() xhdicallV(6)
+//#define XHInqDev(dev,) xhdicall(7,)
+//XHInqDriver 8
+//XHNewCookie 9
+#define XHReadWrite(major, minor, rwflags, recno, count, buf) xhdicalWWWLWP(10, (uint16)major, (uint16)minor, (uint16)rwflags, (uint32)recno, (uint16)count, (void *)buf)
+#define XHInqTarget2(major, minor, bsize, flags, pname, pnlen) xhdicallWWPPPW(11, (uint16)major, (uint16)minor, (uint32 *)bsize, (uint32 *)flags, (char *)pname, (uint16)pnlen)
+//XHInqDev2 12
+//XHDriverSpecial 13
+#define XHGetCapacity(major, minor, blocks, blocksize) xhdicall(14, (uint16)major, (uint16)minor, (uint32 *)blocks, (uint32 *)blocksize)
+//#define XHMediumChanged() 15
+//XHMiNTInfo 16
+//XHDosLimits 17
+//XHLastAccess 18
+//SHReaccess 19
+
+#endif /* __ASSEMBLER__ */
+
+
 /*
  * error mapping
  * in debug.c
  */
 
 extern status_t toserror(int32 err);
+extern status_t xhdierror(int32 err);
 extern void dump_tos_cookies(void);
 
 /*
@@ -375,10 +494,6 @@ static inline const struct tos_osheader *tos_get_osheader()
 #endif /* __ASSEMBLER__ */
 
 /*
- * XHDI
- */
-
-/*
  * ARAnyM Native Features
  */
 
@@ -388,18 +503,21 @@ static inline const struct tos_osheader *tos_get_osheader()
 #ifndef __ASSEMBLER__
 
 typedef struct {
-	long magic;
-	long (*nfGetID) (const char *);
-	long (*nfCall) (long ID, ...);
+	uint32 magic;
+	int32 (*nfGetID) (const char *);
+	int32 (*nfCall) (int32 ID, ...);
 } NatFeatCookie;
 
 extern NatFeatCookie *gNatFeatCookie;
+extern int32 gDebugPrintfNatFeatID;
 
 static inline NatFeatCookie *nat_features(void)
 {
 	const struct tos_cookie *c;
-	if (gNatFeatCookie == (void *)-1 || !gNatFeatCookie)
+	if (gNatFeatCookie == (void *)-1)
 		return NULL;
+	if (gNatFeatCookie)
+		return gNatFeatCookie;
 	c = tos_find_cookie(NF_COOKIE);
 	if (c) {
 		gNatFeatCookie = (NatFeatCookie *)c->pvalue;
@@ -410,6 +528,8 @@ static inline NatFeatCookie *nat_features(void)
 	gNatFeatCookie = (NatFeatCookie *)-1;
 	return NULL;
 }
+
+extern status_t init_nat_features(void);
 
 static inline int32 nat_feat_getid(const char *name)
 {
@@ -429,17 +549,7 @@ static inline int32 nat_feat_getid(const char *name)
 	ret;					\
 })
 
-/* XHDI NatFeat */
-
-#define NF_XHDI "XHDI"
-
-#define nfxhdi(code, a...) \
-({ \
-	gNatFeatCookie->nfCall((uint32)code, a##...); \
-}) 
-
-
-#define NFXHversion() nfxhdi(0)
+extern void nat_feat_debugprintf(const char *str);
 
 #endif /* __ASSEMBLER__ */
 
