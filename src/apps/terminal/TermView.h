@@ -183,8 +183,8 @@ private:
 	void _SelectLine(BPoint where, int mod);
 
 	// point and text offset conversion.
-	CurPos _BPointToCurPos(const BPoint &p);
-	BPoint _CurPosToBPoint(const CurPos &pos);
+	CurPos _ConvertToTerminal(const BPoint &p);
+	BPoint _ConvertFromTerminal(const CurPos &pos);
 
 	bool _CheckSelectedRegion(const CurPos &pos);
 	

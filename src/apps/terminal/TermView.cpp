@@ -1790,7 +1790,7 @@ TermView::MouseDown(BPoint where)
 		Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 
 		if (_HasSelection()) {
-			CurPos inPos = _BPointToCurPos(where);
+			CurPos inPos = _ConvertToTerminal(where);
 			if (_CheckSelectedRegion(inPos)) {
 				if (mod & B_CONTROL_KEY) {
 					BPoint p;
@@ -1826,7 +1826,7 @@ TermView::MouseDown(BPoint where)
 		fClickPoint = where;
 	    
 		if (mod & B_SHIFT_KEY)
-			_AddSelectRegion(_BPointToCurPos(where));
+			_AddSelectRegion(_ConvertToTerminal(where));
 		else
 			_DeSelect();
 	   
@@ -1863,8 +1863,8 @@ TermView::MouseMoved(BPoint where, uint32 transit, const BMessage *message)
 	if (!fMouseTracking)
 		return;
 	
-	CurPos startPos = _BPointToCurPos(fClickPoint);
-	CurPos endPos = _BPointToCurPos(where);
+	CurPos startPos = _ConvertToTerminal(fClickPoint);
+	CurPos endPos = _ConvertToTerminal(where);
 	if (endPos.y < 0)
 		return;
 
@@ -2082,7 +2082,7 @@ TermView::_SelectWord(BPoint where, int mod)
 	CurPos start, end, pos;
 	bool flag;
 	
-	pos = _BPointToCurPos(where);
+	pos = _ConvertToTerminal(where);
 	flag = fTextBuffer->FindWord(pos, &start, &end);
 	fTextBuffer->Select(start, end);
 
@@ -2105,7 +2105,7 @@ TermView::_SelectWord(BPoint where, int mod)
 void
 TermView::_SelectLine(BPoint where, int mod)
 {
-	CurPos pos = _BPointToCurPos(where);
+	CurPos pos = _ConvertToTerminal(where);
 	
 	if (mod & B_SHIFT_KEY) {
 		
@@ -2126,7 +2126,7 @@ TermView::_SelectLine(BPoint where, int mod)
 
 // Convert View visible area corrdination to cursor position.
 CurPos
-TermView::_BPointToCurPos(const BPoint &p)
+TermView::_ConvertToTerminal(const BPoint &p)
 {
 	return CurPos(p.x / fFontWidth, p.y / fFontHeight);
 }
@@ -2134,7 +2134,7 @@ TermView::_BPointToCurPos(const BPoint &p)
 
 // Convert cursor position to view coordination.
 BPoint
-TermView::_CurPosToBPoint(const CurPos &pos)
+TermView::_ConvertFromTerminal(const CurPos &pos)
 {
 	return BPoint(fFontWidth * pos.x, pos.y * fFontHeight + fTop);
 }
@@ -2323,8 +2323,8 @@ TermView::InitiateDrag()
 	BMessage message(B_MIME_DATA);
 	message.AddData("text/plain", B_MIME_TYPE, copyStr.String(), copyStr.Length());
 
-	BPoint start = _CurPosToBPoint(fSelStart);
-	BPoint end = _CurPosToBPoint(fSelEnd);
+	BPoint start = _ConvertFromTerminal(fSelStart);
+	BPoint end = _ConvertFromTerminal(fSelEnd);
 	
 	BRect rect;	
 	if (fSelStart.y == fSelEnd.y) {
