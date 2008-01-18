@@ -74,10 +74,9 @@ class HandleSignals : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "signal handle:  0x%lx",
-				fSignals);
+			out.Print("signal handle:  0x%lx", fSignals);
 		}
 
 	private:
@@ -96,10 +95,10 @@ class SendSignal : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "signal send: target: %ld, signal: %lu "
-				"(%s), flags: 0x%lx", fTarget, fSignal,
+			out.Print("signal send: target: %ld, signal: %lu (%s), "
+				"flags: 0x%lx", fTarget, fSignal,
 				(fSignal < NSIG ? sigstr[fSignal] : "invalid"), fFlags);
 		}
 
@@ -122,10 +121,10 @@ class SigAction : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "signal action: thread: %ld, signal: %lu "
-				"(%s), action: {handler: %p, flags: 0x%x, mask: 0x%lx}",
+			out.Print("signal action: thread: %ld, signal: %lu (%s), "
+				"action: {handler: %p, flags: 0x%x, mask: 0x%lx}",
 				fThread, fSignal,
 				(fSignal < NSIG ? sigstr[fSignal] : "invalid"),
 				fAction.sa_handler, fAction.sa_flags, fAction.sa_mask);
@@ -149,7 +148,7 @@ class SigProcMask : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
 			const char* how = "invalid";
 			switch (fHow) {
@@ -164,8 +163,8 @@ class SigProcMask : public AbstractTraceEntry {
 					break;
 			}
 
-			snprintf(buffer, size, "signal proc mask: %s 0x%lx, "
-				"old mask: 0x%lx", how, fMask, fOldMask);
+			out.Print("signal proc mask: %s 0x%lx, old mask: 0x%lx", how, fMask,
+				fOldMask);
 		}
 
 	private:
