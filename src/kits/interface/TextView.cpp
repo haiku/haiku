@@ -2166,8 +2166,16 @@ BTextView::SetMaxBytes(int32 max)
 	const int32 textLength = fText->Length();
 	fMaxBytes = max;
 
-	if (fMaxBytes < textLength)
-		Delete(fMaxBytes, textLength);
+	if (fMaxBytes < textLength) {
+		int32 offset = fMaxBytes;
+		// Delete the text after fMaxBytes, but
+		// respect multibyte characters boundaries.
+		const int32 previousInitial = _PreviousInitialByte(offset);
+		if (_NextInitialByte(previousInitial) != offset)
+			offset = previousInitial;			
+		
+		Delete(offset, textLength);
+	}
 }
 
 
@@ -3013,7 +3021,7 @@ BTextView::_HandlePageKey(uint32 inPageKey)
 */
 void
 BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
-{
+{		
 	// TODO: block input if not editable (Andrew)
 	if (fUndo) {
 		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
@@ -3042,18 +3050,16 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 			offset++;
 
 		if (start != offset)
-			InsertText(Text() + start, offset - start, fSelStart, NULL);
+			_DoInsertText(Text() + start, offset - start, fSelStart, NULL, NULL);
 
-		InsertText(bytes, numBytes, fSelStart, NULL);
-		numBytes += offset - start;
+		_DoInsertText(bytes, numBytes, fSelStart, NULL, NULL);
 
 	} else
-		InsertText(bytes, numBytes, fSelStart, NULL);
+		_DoInsertText(bytes, numBytes, fSelStart, NULL, NULL);
 	
-	fClickOffset = fSelEnd = fSelStart = fSelStart + numBytes;
+	fClickOffset = fSelEnd;
 
-	if (Window())
-		_Refresh(saveStart, fSelEnd, erase, true);
+	ScrollToOffset(fClickOffset);
 }
 
 
@@ -3473,6 +3479,9 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 {
 	_CancelInputMethod();
 	
+	if (TextLength() + inLength > MaxBytes())
+		return;
+		
 	// Don't do any check, the public methods will have adjusted
 	// eventual bogus values...
 
