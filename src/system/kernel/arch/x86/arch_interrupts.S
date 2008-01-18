@@ -18,6 +18,9 @@
 #include "syscall_table.h"
 
 
+//#define SYSCALL_TRACING
+	// also define this macro in syscalls.cpp
+
 #define FUNCTION(x) .global x; .type x,@function; x
 
 #define UPDATE_THREAD_USER_TIME_COMMON()					\
@@ -130,6 +133,31 @@
 	movl	%edx, %esi;				/* syscall info pointer */			\
 	movl	%dr3, %edi;				/* thread pointer */				\
 	movl	$0, THREAD_fault_handler(%edi)
+
+#ifdef SYSCALL_TRACING
+#	define TRACE_PRE_SYSCALL()	\
+		movl	%esp, %eax;						/* syscall parameters */	\
+		push	%eax;														\
+		movl	IFRAME_orig_eax(%ebp), %eax;	/* syscall number */		\
+		push	%eax;														\
+		call	trace_pre_syscall;											\
+		addl	$8, %esp;
+
+#	define TRACE_POST_SYSCALL()	\
+		testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi);	\
+		jnz		1f;															\
+		xor		%edx, %edx;													\
+1:																			\
+		push	%edx;							/* syscall return value */	\
+		push	%eax;														\
+		movl	IFRAME_orig_eax(%ebp), %eax;	/* syscall number */		\
+		push	%eax;														\
+		call	trace_post_syscall;											\
+		addl	$12, %esp
+#else
+#	define TRACE_PRE_SYSCALL()
+#	define TRACE_POST_SYSCALL()
+#endif
 
 
 .text
@@ -308,6 +336,7 @@ trap99:
 	COPY_SYSCALL_PARAMETERS()
 
 	// pre syscall debugging
+	TRACE_PRE_SYSCALL()
 	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
 	jnz		do_pre_syscall_debug
   pre_syscall_debug_done:
@@ -319,6 +348,8 @@ trap99:
 	// value)
 	movl	%edx, IFRAME_edx(%ebp)
 	movl	%eax, IFRAME_eax(%ebp)
+
+	TRACE_POST_SYSCALL()
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
@@ -365,7 +396,7 @@ trap99:
 	movl	IFRAME_orig_eax(%ebp), %eax		// syscall number
 	push	%eax
 	call	user_debug_post_syscall
-	addl	$8, %esp
+	addl	$24, %esp
   1:
 
   bad_syscall_number:
@@ -454,6 +485,7 @@ FUNCTION(x86_sysenter):
 	COPY_SYSCALL_PARAMETERS()
 
 	// pre syscall debugging
+	TRACE_PRE_SYSCALL()
 	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
 	jnz		do_pre_syscall_debug
 		// if debugging is enabled, we take the slow syscall exit
@@ -465,6 +497,8 @@ FUNCTION(x86_sysenter):
 	// value)
 	movl	%edx, IFRAME_edx(%ebp)
 	movl	%eax, IFRAME_eax(%ebp)
+
+	TRACE_POST_SYSCALL()
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \

@@ -9,8 +9,9 @@
 #include <ksyscalls.h>
 #include <syscalls.h>
 #include <generic_syscall.h>
-#include <int.h>
 #include <debug.h>
+#include <int.h>
+#include <elf.h>
 #include <vfs.h>
 #include <vm.h>
 #include <thread.h>
@@ -25,9 +26,10 @@
 #include <kimage.h>
 #include <ksignal.h>
 #include <real_time_clock.h>
-#include <system_info.h>
-#include <user_atomic.h>
 #include <safemode.h>
+#include <system_info.h>
+#include <tracing.h>
+#include <user_atomic.h>
 #include <arch/system_info.h>
 #include <messaging.h>
 #include <frame_buffer_console.h>
@@ -35,6 +37,9 @@
 
 #include <malloc.h>
 #include <string.h>
+
+
+//#define SYSCALL_TRACING
 
 
 typedef struct generic_syscall generic_syscall;
@@ -59,7 +64,8 @@ find_generic_syscall(const char *subsystem)
 
 	ASSERT_LOCKED_MUTEX(&sGenericSyscallLock);
 
-	while ((syscall = list_get_next_item(&sGenericSyscalls, syscall)) != NULL) {
+	while ((syscall = (generic_syscall*)list_get_next_item(&sGenericSyscalls,
+			syscall)) != NULL) {
 		if (!strcmp(syscall->subsystem, subsystem))
 			return syscall;
 	}
@@ -193,7 +199,7 @@ syscall_dispatcher(uint32 call_num, void *args, uint64 *call_ret)
 		#include "syscall_dispatcher.h"
 
 		default:
-			*call_ret = -1;
+			*call_ret = (uint64)B_BAD_VALUE;
 	}
 
 	user_debug_post_syscall(call_num, args, *call_ret, startTime);
@@ -289,6 +295,134 @@ unregister_generic_syscall(const char *subsystem, uint32 version)
 	mutex_unlock(&sGenericSyscallLock);
 	return status;
 }
+
+
+// #pragma mark - syscall tracing
+
+
+#ifdef SYSCALL_TRACING
+
+namespace SyscallTracing {
+
+
+static const char*
+get_syscall_name(uint32 syscall)
+{
+	addr_t baseAddress;
+	const char* symbolName;
+	const char* imageName;
+	bool exactMatch;
+
+	if (syscall >= (uint32)kSyscallCount)
+		return "<invalid syscall number>";
+
+	if (elf_debug_lookup_symbol_address(
+			(addr_t)kSyscallInfos[syscall].function,
+			&baseAddress, &symbolName, &imageName,
+			&exactMatch) != B_OK) {
+		return "<lookup failed>";
+	}
+
+	return symbolName;
+}
+
+
+class PreSyscall : public AbstractTraceEntry {
+	public:
+		PreSyscall(uint32 syscall, const void* parameters)
+			:
+			fSyscall(syscall),
+			fParameters(NULL)
+		{
+			if (syscall < (uint32)kSyscallCount) {
+				fParameters = alloc_tracing_buffer_memcpy(parameters,
+					kSyscallInfos[syscall].parameter_size, false);
+			}
+
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "syscall pre:  %s(",
+				get_syscall_name(fSyscall));
+
+			size_t bytesPrinted = strlen(buffer);
+			buffer += bytesPrinted;
+			size -= bytesPrinted;
+
+			if (fParameters != NULL) {
+				uint32* params = (uint32*)fParameters;
+				int32 paramSize = kSyscallInfos[fSyscall].parameter_size;
+				bool first = true;
+				while (paramSize >= 4 && size > 0) {
+					if (first) {
+						snprintf(buffer, size, "0x%lx", *params);
+						first = false;
+					} else
+						snprintf(buffer, size, ", 0x%lx", *params);
+
+					bytesPrinted = strlen(buffer);
+					buffer += bytesPrinted;
+					size -= bytesPrinted;
+					params++;
+					paramSize -= 4;
+				}
+			}
+
+			strlcat(buffer, ")", size);
+		}
+
+	private:
+		uint32	fSyscall;
+		void*	fParameters;
+};
+
+
+class PostSyscall : public AbstractTraceEntry {
+	public:
+		PostSyscall(uint32 syscall, uint64 returnValue)
+			:
+			fSyscall(syscall),
+			fReturnValue(returnValue)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "syscall post: %s() -> 0x%llx",
+				get_syscall_name(fSyscall), fReturnValue);
+		}
+
+	private:
+		uint32	fSyscall;
+		uint64	fReturnValue;
+};
+
+}	// namespace TeamTracing
+
+
+extern "C" void trace_pre_syscall(uint32 syscallNumber, const void* parameters);
+
+void
+trace_pre_syscall(uint32 syscallNumber, const void* parameters)
+{
+	new(std::nothrow) SyscallTracing::PreSyscall(syscallNumber, parameters);
+}
+
+
+extern "C" void trace_post_syscall(int syscallNumber, uint64 returnValue);
+
+void
+trace_post_syscall(int syscallNumber, uint64 returnValue)
+{
+	new(std::nothrow) SyscallTracing::PostSyscall(syscallNumber, returnValue);
+}
+
+
+#endif	// SYSCALL_TRACING
+
 
 /*
  * kSyscallCount and kSyscallInfos here
