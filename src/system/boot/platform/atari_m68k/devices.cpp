@@ -15,7 +15,7 @@
 #include "Handle.h"
 #include "toscalls.h"
 
-//#define TRACE_DEVICES
+#define TRACE_DEVICES
 #ifdef TRACE_DEVICES
 #	define TRACE(x) dprintf x
 #else
@@ -435,6 +435,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 		uint16 major;
 		uint16 minor;
 		uint32 blocksize;
+		uint32 blocksize2;
 		uint32 blocks;
 		uint32 devflags;
 		uint32 lastacc;
@@ -470,6 +471,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 
 				product[0] = '\0';
 				blocksize = 0;
+				blocksize2 = 0;
 #if 0
 				err = XHLastAccess(major, minor, &lastacc);
 				if (err < 0) {
@@ -484,11 +486,16 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 					dprintf("XHInqTarget(%d,%d) error %d\n", major, minor, err);
 					continue;
 				}
-				err = XHGetCapacity(major, minor, &blocks, &blocksize);
+				err = XHGetCapacity(major, minor, &blocks, &blocksize2);
 				if (err < 0) {
 					//dprintf("XHGetCapacity(%d,%d) error %d\n", major, minor, err);
 					continue;
 				}
+
+				if (blocksize == 0) {
+					dprintf("XHDI: blocksize for (%d,%d) is 0!\n", major, minor);
+				}
+				//dprintf("XHDI: (%d,%d) blocksize1 %ld blocksize2 %ld\n", major, minor, blocksize, blocksize2);
 
 				dprintf("XHDI(%d,%d): blksize %d, blocks %d, flags 0x%08lx, '%s'\n", major, minor, blocksize, blocks, devflags, product);
 				driveID = (uint8)major;
@@ -557,7 +564,7 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 BlockHandle::BlockHandle(int handle)
 	: Handle(handle)
 {
-	TRACE(("drive ID %u\n", fHandle));
+	TRACE(("BlockHandle::%s(): drive ID %u\n", __FUNCTION__, fHandle));
 }
 
 
@@ -572,6 +579,7 @@ BlockHandle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 	ssize_t ret;
 	uint32 offset = pos % fBlockSize;
 	pos /= fBlockSize;
+	TRACE(("BlockHandle::%s: (%d) %Ld, %d\n", __FUNCTION__, fHandle, pos, bufferSize));
 
 	uint32 blocksLeft = (bufferSize + offset + fBlockSize - 1) / fBlockSize;
 	int32 totalBytesRead = 0;
@@ -653,6 +661,8 @@ BlockHandle::FillIdentifier()
 BIOSDrive::BIOSDrive(int handle)
 	: BlockHandle(handle)
 {
+	TRACE(("BIOSDrive::%s(%d)\n", __FUNCTION__, fHandle));
+
 	/* first check if the drive exists */
 	/* note floppy B can be reported present anyway... */
 	uint32 map = Drvmap();
@@ -715,6 +725,7 @@ BIOSDrive::~BIOSDrive()
 status_t
 BIOSDrive::FillIdentifier()
 {
+	TRACE(("BIOSDrive::%s: (%d)\n", __FUNCTION__, fHandle));
 #if 0
 	if (HasParameters()) {
 		// try all drive_parameters versions, beginning from the most informative
@@ -758,6 +769,7 @@ BIOSDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 {
 	int sectorsPerBlocks = (fBlockSize / 256);
 	int32 ret;
+	TRACE(("BIOSDrive::%s(%Ld,%ld) (%d)\n", __FUNCTION__, first, count, fHandle));
 	// XXX: check for AHDI 3.0 before using long recno!!!
 	ret = Rwabs(RW_READ | RW_NOTRANSLATE, buffer, sectorsPerBlocks, -1, fHandle, first * sectorsPerBlocks);
 	if (ret < 0)
@@ -780,18 +792,24 @@ XHDIDrive::XHDIDrive(int handle, uint16 major, uint16 minor)
 	int32 err;
 	uint32 devflags;
 	uint32 blocks;
+	uint32 blocksize;
 	char product[33];
 
 	fMajor = major;
 	fMinor = minor;
+	TRACE(("XHDIDrive::%s(%d, %d,%d)\n", __FUNCTION__, handle, fMajor, fMinor));
+
 	product[32] = '\0';
 	err = XHInqTarget(major, minor, &fBlockSize, &devflags, product);
 	if (err < 0)
 		return;
 	//XXX: check size
-	err = XHGetCapacity(major, minor, &blocks, &fBlockSize);
+	err = XHGetCapacity(major, minor, &blocks, &blocksize);
 	if (err < 0)
 		return;
+	
+	if (fBlockSize == 0)
+		fBlockSize = 512;
 	
 	fSize = blocks * fBlockSize;
 	fHasParameters = false;
@@ -849,6 +867,7 @@ XHDIDrive::~XHDIDrive()
 status_t
 XHDIDrive::FillIdentifier()
 {
+	TRACE(("XHDIDrive::%s: (%d,%d)\n", __FUNCTION__, fMajor, fMinor));
 
 	fIdentifier.bus_type = UNKNOWN_BUS;
 	fIdentifier.device_type = UNKNOWN_DEVICE;
@@ -877,9 +896,19 @@ XHDIDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 	int sectorsPerBlocks = (fBlockSize / 256);
 	int32 ret;
 	uint16 flags = RW_READ;
-	//ret = XHReadWrite(fMajor, fMinor, flags, buffer, (uint32)first, (uint16)count, buffer);
+	TRACE(("XHDIDrive::%s(%Ld, %d) (%d,%d)\n", __FUNCTION__, first, count, fMajor, fMinor));
+	ret = XHReadWrite(fMajor, fMinor, flags, (uint32)first, (uint16)count, buffer);
 	if (ret < 0)
 		return toserror(ret);
+	//TRACE(("XHReadWrite: %ld\n", ret));
+	/*
+	uint8 *b = (uint8 *)buffer;
+	int i = 0;
+	for (i = 0; i < 512; i+=8) {
+		TRACE(("[%ld] %02x %02x %02x %02x %02x %02x %02x %02x\n", i, b[i], b[i+1], b[i+2], b[i+3], b[i+4], b[i+5], b[i+6], b[i+7]));
+		//break;
+	}
+	*/
 	return ret;
 }
 

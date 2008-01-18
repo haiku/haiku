@@ -369,6 +369,8 @@ extern void *gXHDIEntryPoint;
 
 extern status_t init_xhdi(void);
 
+/* movem should not needed, but just to be safe. */
+
 /* void (no) arg */
 #define xhdicallV(callnr)						\
 ({												\
@@ -376,9 +378,11 @@ extern status_t init_xhdi(void);
 												\
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
+	"	movem.l	%%d3-%%d7/%%a3-%%a6,-(%%sp)\n"		\
 	"	move.w	%[calln],-(%%sp)\n"				\
 	"	jbsr	(%[entry])\n"						\
 	"	add.l	#2,%%sp\n"						\
+	"	movem.l	(%%sp)+,%%d3-%%d7/%%a3-%%a6\n"		\
 	: "=r"(retvalue)	/* output */			\
 	:							/* input */		\
 	  [entry]"a"(gXHDIEntryPoint),				\
@@ -395,10 +399,12 @@ extern status_t init_xhdi(void);
 												\
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
+	"	movem.l	%%d3-%%d7/%%a3-%%a6,-(%%sp)\n"		\
 	"	move.w	%1,-(%%sp) \n"					\
 	"	move.w	%[calln],-(%%sp)\n"				\
 	"	jbsr	(%[entry])\n"						\
 	"	add.l	#4,%%sp \n"						\
+	"	movem.l	(%%sp)+,%%d3-%%d7/%%a3-%%a6\n"		\
 	: "=r"(retvalue)	/* output */			\
 	: "r"(_p1),			/* input */				\
 	  [entry]"a"(gXHDIEntryPoint),				\
@@ -417,12 +423,14 @@ extern status_t init_xhdi(void);
 												\
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
+	"	movem.l	%%d3-%%d7/%%a3-%%a6,-(%%sp)\n"		\
 	"	move.l	%3,-(%%sp) \n"					\
 	"	move.w	%2,-(%%sp) \n"					\
 	"	move.w	%1,-(%%sp) \n"					\
 	"	move.w	%[calln],-(%%sp)\n"				\
 	"	jbsr	(%[entry])\n"						\
 	"	add.l	#10,%%sp \n"						\
+	"	movem.l	(%%sp)+,%%d3-%%d7/%%a3-%%a6\n"		\
 	: "=r"(retvalue)	/* output */			\
 	: "r"(_p1), "r"(_p2),				\
 	  "r"(_p3),			/* input */	\
@@ -443,6 +451,7 @@ extern status_t init_xhdi(void);
 												\
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
+	"	movem.l	%%d3-%%d7/%%a3-%%a6,-(%%sp)\n"		\
 	"	move.l	%4,-(%%sp) \n"					\
 	"	move.l	%3,-(%%sp) \n"					\
 	"	move.w	%2,-(%%sp) \n"					\
@@ -450,6 +459,7 @@ extern status_t init_xhdi(void);
 	"	move.w	%[calln],-(%%sp)\n"				\
 	"	jbsr	(%[entry])\n"						\
 	"	add.l	#14,%%sp \n"						\
+	"	movem.l	(%%sp)+,%%d3-%%d7/%%a3-%%a6\n"		\
 	: "=r"(retvalue)	/* output */			\
 	: "r"(_p1), "r"(_p2),				\
 	  "r"(_p3), "r"(_p4),	/* input */	\
@@ -471,6 +481,7 @@ extern status_t init_xhdi(void);
 												\
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
+	"	movem.l	%%d3-%%d7/%%a3-%%a6,-(%%sp)\n"		\
 	"	move.l	%5,-(%%sp) \n"					\
 	"	move.l	%4,-(%%sp) \n"					\
 	"	move.l	%3,-(%%sp) \n"					\
@@ -479,6 +490,7 @@ extern status_t init_xhdi(void);
 	"	move.w	%[calln],-(%%sp)\n"				\
 	"	jbsr	(%[entry])\n"						\
 	"	add.l	#18,%%sp \n"						\
+	"	movem.l	(%%sp)+,%%d3-%%d7/%%a3-%%a6\n"		\
 	: "=r"(retvalue)	/* output */			\
 	: "r"(_p1), "r"(_p2),				\
 	  "r"(_p3), "r"(_p4),				\
@@ -501,6 +513,7 @@ extern status_t init_xhdi(void);
 												\
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
+	"	movem.l	%%d3-%%d7/%%a3-%%a6,-(%%sp)\n"		\
 	"	move.l	%5,-(%%sp) \n"					\
 	"	move.l	%4,-(%%sp) \n"					\
 	"	move.l	%3,-(%%sp) \n"					\
@@ -509,6 +522,7 @@ extern status_t init_xhdi(void);
 	"	move.w	%[calln],-(%%sp)\n"				\
 	"	jbsr	(%[entry])\n"						\
 	"	add.l	#20,%%sp \n"						\
+	"	movem.l	(%%sp)+,%%d3-%%d7/%%a3-%%a6\n"		\
 	: "=r"(retvalue)	/* output */			\
 	: "r"(_p1), "r"(_p2),				\
 	  "r"(_p3), "r"(_p4),				\
@@ -532,6 +546,7 @@ extern status_t init_xhdi(void);
 												\
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
+	"	movem.l	%%d3-%%d7/%%a3-%%a6,-(%%sp)\n"		\
 	"	move.l	%6,-(%%sp) \n"					\
 	"	move.w	%5,-(%%sp) \n"					\
 	"	move.l	%4,-(%%sp) \n"					\
@@ -541,6 +556,7 @@ extern status_t init_xhdi(void);
 	"	move.w	%[calln],-(%%sp)\n"				\
 	"	jbsr	(%[entry])\n"						\
 	"	add.l	#18,%%sp \n"						\
+	"	movem.l	(%%sp)+,%%d3-%%d7/%%a3-%%a6\n"		\
 	: "=r"(retvalue)	/* output */			\
 	: "r"(_p1), "r"(_p2),				\
 	  "r"(_p3), "r"(_p4),				\
@@ -553,18 +569,20 @@ extern status_t init_xhdi(void);
 })
 
 #define xhdicallWWP(callnr, p1, p2, p3) \
-	xhdicallWWL(callnr, p1, p2, (int32)p3)
+	xhdicallWWL(callnr, p1, p2, (int32)(p3))
 #define xhdicallWWPP(callnr, p1, p2, p3, p4) \
-	xhdicallWWLL(callnr, p1, p2, (int32)p3, (int32)p4)
+	xhdicallWWLL(callnr, p1, p2, (int32)(p3), (int32)(p4))
 #define xhdicallWWPPP(callnr, p1, p2, p3, p4, p5) \
-	xhdicallWWLLL(callnr, p1, p2, (int32)p3, (int32)p4, (int32)p5)
+	xhdicallWWLLL(callnr, p1, p2, (int32)(p3), (int32)(p4), (int32)(p5))
 #define xhdicallWPPPP(callnr, p1, p2, p3, p4, p5) \
-	xhdicallWLLLL(callnr, p1, (uint32)p2, (int32)p3, (int32)p4, (int32)p5)
+	xhdicallWLLLL(callnr, p1, (uint32)(p2), (int32)(p3), (int32)(p4), (int32)(p5))
+#define xhdicallWWWLWP(callnr, p1, p2, p3, p4, p5, p6) \
+	xhdicallWWWLWL(callnr, p1, p2, p3, (uint32)(p4), p5, (uint32)(p6))
 #define xhdicallWWWPWP(callnr, p1, p2, p3, p4, p5, p6) \
-	xhdicallWWWLWL(callnr, p1, p2, p3, (int32)p4, p5, (uint32)p6)
+	xhdicallWWWLWL(callnr, p1, p2, p3, (int32)(p4), p5, (uint32)(p6))
 
 #define XHGetVersion() (uint16)xhdicallV(0)
-#define XHInqTarget(major, minor, bsize, flags, pname) xhdicallWWPPP(1, (uint16)major, (uint16)minor, (uint32 *)bsize, (uint32 *)flags, (char *)pname)
+#define XHInqTarget(major, minor, blocksize, flags, pname) xhdicallWWPPP(1, (uint16)major, (uint16)minor, (uint32 *)(blocksize), (uint32 *)flags, (char *)pname)
 //XHReserve 2
 //#define XHLock() 3
 //#define XHStop() 4
@@ -573,7 +591,7 @@ extern status_t init_xhdi(void);
 #define XHInqDev(dev,major,minor,startsect,bpb) xhdicallWPPPP(7,dev,(uint16 *)major,(uint16 *)minor,(uint32 *)startsect,(struct tos_bpb *)bpb)
 //XHInqDriver 8
 //XHNewCookie 9
-#define XHReadWrite(major, minor, rwflags, recno, count, buf) xhdicalWWWLWP(10, (uint16)major, (uint16)minor, (uint16)rwflags, (uint32)recno, (uint16)count, (void *)buf)
+#define XHReadWrite(major, minor, rwflags, recno, count, buf) xhdicallWWWLWP(10, (uint16)major, (uint16)minor, (uint16)rwflags, (uint32)recno, (uint16)count, (void *)buf)
 #define XHInqTarget2(major, minor, bsize, flags, pname, pnlen) xhdicallWWPPPW(11, (uint16)major, (uint16)minor, (uint32 *)bsize, (uint32 *)flags, (char *)pname, (uint16)pnlen)
 //XHInqDev2 12
 //XHDriverSpecial 13
