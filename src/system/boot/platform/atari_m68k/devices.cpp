@@ -899,7 +899,7 @@ XHDIDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 	TRACE(("XHDIDrive::%s(%Ld, %d) (%d,%d)\n", __FUNCTION__, first, count, fMajor, fMinor));
 	ret = XHReadWrite(fMajor, fMinor, flags, (uint32)first, (uint16)count, buffer);
 	if (ret < 0)
-		return toserror(ret);
+		return xhdierror(ret);
 	//TRACE(("XHReadWrite: %ld\n", ret));
 	/*
 	uint8 *b = (uint8 *)buffer;
