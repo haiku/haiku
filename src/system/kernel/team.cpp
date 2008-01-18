@@ -168,6 +168,113 @@ class ExecTeam : public AbstractTraceEntry {
 		char*	fArgs;
 };
 
+
+static const char*
+job_control_state_name(job_control_state state)
+{
+	switch (state) {
+		case JOB_CONTROL_STATE_NONE:
+			return "none";
+		case JOB_CONTROL_STATE_STOPPED:
+			return "stopped";
+		case JOB_CONTROL_STATE_CONTINUED:
+			return "continued";
+		case JOB_CONTROL_STATE_DEAD:
+			return "dead";
+		default:
+			return "invalid";
+	}
+}
+
+
+class SetJobControlState : public AbstractTraceEntry {
+	public:
+		SetJobControlState(team_id team, job_control_state newState, int signal)
+			:
+			fTeam(team),
+			fNewState(newState),
+			fSignal(signal)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "team set job control state, team %ld, "
+				"new state: %s, signal: %d",
+				fTeam, job_control_state_name(fNewState), fSignal);
+		}
+
+	private:
+		team_id				fTeam;
+		job_control_state	fNewState;
+		int					fSignal;
+};
+
+
+class WaitForChild : public AbstractTraceEntry {
+	public:
+		WaitForChild(pid_t child, uint32 flags)
+			:
+			fChild(child),
+			fFlags(flags)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "team wait for child, child: %ld, "
+				"flags: 0x%lx", fChild, fFlags);
+		}
+
+	private:
+		pid_t	fChild;
+		uint32	fFlags;
+};
+
+
+class WaitForChildDone : public AbstractTraceEntry {
+	public:
+		WaitForChildDone(const job_control_entry& entry)
+			:
+			fState(entry.state),
+			fTeam(entry.thread),
+			fStatus(entry.status),
+			fReason(entry.reason),
+			fSignal(entry.signal)
+		{
+			Initialized();
+		}
+
+		WaitForChildDone(status_t error)
+			:
+			fTeam(error)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			if (fTeam >= 0) {
+				snprintf(buffer, size, "team wait for child done, team: %ld, "
+					"state: %s, status: 0x%lx, reason: 0x%x, signal: %d\n",
+					fTeam, job_control_state_name(fState), fStatus, fReason,
+					fSignal);
+			} else {
+				snprintf(buffer, size, "team wait for child failed, error: "
+					"0x%lx, ", fTeam);
+			}
+		}
+
+	private:
+		job_control_state	fState;
+		team_id				fTeam;
+		status_t			fStatus;
+		uint16				fReason;
+		uint16				fSignal;
+};
+
 }	// namespace TeamTracing
 
 #	define T(x) new(std::nothrow) TeamTracing::x;
@@ -1461,6 +1568,8 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 
 	TRACE(("wait_for_child(child = %ld, flags = %ld)\n", child, flags));
 
+	T(WaitForChild(child, flags));
+
 	if (child == 0) {
 		// wait for all children in the process group of the calling team
 		child = -team->group_id;
@@ -1544,12 +1653,16 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 			break;
 		}
 
-		if (status != B_WOULD_BLOCK || (flags & WNOHANG) != 0)
+		if (status != B_WOULD_BLOCK || (flags & WNOHANG) != 0) {
+			T(WaitForChildDone(status));
 			return status;
+		}
 
 		status = deadWaitEntry.Wait(B_CAN_INTERRUPT);
-		if (status == B_INTERRUPTED)
+		if (status == B_INTERRUPTED) {
+			T(WaitForChildDone(status));
 			return status;
+		}
 
 		// If SA_NOCLDWAIT is set or SIGCHLD is ignored, we shall wait until
 		// all our children are dead and fail with ECHILD. We check the
@@ -1596,6 +1709,8 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 		if (get_job_control_entry(team, child, flags) == NULL)
 			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(SIGCHLD));
 	}
+
+	T(WaitForChildDone(foundEntry));
 
 	return foundEntry.thread;
 }
@@ -2167,6 +2282,8 @@ team_set_job_control_state(struct team* team, job_control_state newState,
 	job_control_entry* entry = team->job_control_entry;
 	if (entry->state == newState || entry->state == JOB_CONTROL_STATE_DEAD)
 		return;
+
+	T(SetJobControlState(team->id, newState, signal));
 
 	// remove from the old list
 	switch (entry->state) {
