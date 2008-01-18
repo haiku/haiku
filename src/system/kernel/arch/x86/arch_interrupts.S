@@ -378,7 +378,7 @@ trap99:
   1:
     movl	THREAD_flags(%edi), %eax
 	movl	%eax, %edx
-    orl		$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, %edx
+    andl	$~THREAD_FLAGS_64_BIT_SYSCALL_RETURN, %edx
     lock
     cmpxchgl	%edx, THREAD_flags(%edi)
     jnz		1b
