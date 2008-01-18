@@ -351,7 +351,8 @@ static inline int Bconputs(int16 handle, const char *string)
 
 #define XHDI_COOKIE 'XHDI'
 #define XHDI_MAGIC 0x27011992
-#define XHDI_CLOBBER_LIST /* only d0 */
+//#define XHDI_CLOBBER_LIST "" /* only d0 */
+#define XHDI_CLOBBER_LIST "d1", "d2", "a0", "a1", "a2"
 
 #define XH_TARGET_STOPPABLE		0x00000001L
 #define XH_TARGET_REMOVABLE		0x00000002L
@@ -376,7 +377,7 @@ extern status_t init_xhdi(void);
 	__asm__ volatile							\
 	("/* xhdicall(" #callnr ") */\n"			\
 	"	move.w	%[calln],-(%%sp)\n"				\
-	"	call	(%[entry])\n"						\
+	"	jbsr	(%[entry])\n"						\
 	"	add.l	#2,%%sp\n"						\
 	: "=r"(retvalue)	/* output */			\
 	:							/* input */		\
@@ -396,7 +397,7 @@ extern status_t init_xhdi(void);
 	("/* xhdicall(" #callnr ") */\n"			\
 	"	move.w	%1,-(%%sp) \n"					\
 	"	move.w	%[calln],-(%%sp)\n"				\
-	"	call	(%[entry])\n"						\
+	"	jbsr	(%[entry])\n"						\
 	"	add.l	#4,%%sp \n"						\
 	: "=r"(retvalue)	/* output */			\
 	: "r"(_p1),			/* input */				\
@@ -407,6 +408,160 @@ extern status_t init_xhdi(void);
 	retvalue;									\
 })
 
+#define xhdicallWWL(callnr, p1, p2, p3)					\
+({												\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);					\
+	int16 _p2 = (int16)(p2);					\
+	int32 _p3 = (int32)(p3);					\
+												\
+	__asm__ volatile							\
+	("/* xhdicall(" #callnr ") */\n"			\
+	"	move.l	%3,-(%%sp) \n"					\
+	"	move.w	%2,-(%%sp) \n"					\
+	"	move.w	%1,-(%%sp) \n"					\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	jbsr	(%[entry])\n"						\
+	"	add.l	#10,%%sp \n"						\
+	: "=r"(retvalue)	/* output */			\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3),			/* input */	\
+	  [entry]"a"(gXHDIEntryPoint),				\
+	  [calln]"i"(callnr)						\
+	: XHDI_CLOBBER_LIST /* clobbered regs */	\
+	);											\
+	retvalue;									\
+})
+
+#define xhdicallWWLL(callnr, p1, p2, p3, p4)					\
+({												\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);					\
+	int16 _p2 = (int16)(p2);					\
+	int32 _p3 = (int32)(p3);					\
+	int32 _p4 = (int32)(p4);					\
+												\
+	__asm__ volatile							\
+	("/* xhdicall(" #callnr ") */\n"			\
+	"	move.l	%4,-(%%sp) \n"					\
+	"	move.l	%3,-(%%sp) \n"					\
+	"	move.w	%2,-(%%sp) \n"					\
+	"	move.w	%1,-(%%sp) \n"					\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	jbsr	(%[entry])\n"						\
+	"	add.l	#14,%%sp \n"						\
+	: "=r"(retvalue)	/* output */			\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3), "r"(_p4),	/* input */	\
+	  [entry]"a"(gXHDIEntryPoint),				\
+	  [calln]"i"(callnr)						\
+	: XHDI_CLOBBER_LIST /* clobbered regs */	\
+	);											\
+	retvalue;									\
+})
+
+#define xhdicallWWLLL(callnr, p1, p2, p3, p4, p5)					\
+({												\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);					\
+	int16 _p2 = (int16)(p2);					\
+	int32 _p3 = (int32)(p3);					\
+	int32 _p4 = (int32)(p4);					\
+	int32 _p5 = (int32)(p5);					\
+												\
+	__asm__ volatile							\
+	("/* xhdicall(" #callnr ") */\n"			\
+	"	move.l	%5,-(%%sp) \n"					\
+	"	move.l	%4,-(%%sp) \n"					\
+	"	move.l	%3,-(%%sp) \n"					\
+	"	move.w	%2,-(%%sp) \n"					\
+	"	move.w	%1,-(%%sp) \n"					\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	jbsr	(%[entry])\n"						\
+	"	add.l	#18,%%sp \n"						\
+	: "=r"(retvalue)	/* output */			\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3), "r"(_p4),				\
+	  "r"(_p5),			/* input */	\
+	  [entry]"a"(gXHDIEntryPoint),				\
+	  [calln]"i"(callnr)						\
+	: XHDI_CLOBBER_LIST /* clobbered regs */	\
+	);											\
+	retvalue;									\
+})
+
+#define xhdicallWLLLL(callnr, p1, p2, p3, p4, p5)					\
+({												\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);					\
+	int32 _p2 = (int32)(p2);					\
+	int32 _p3 = (int32)(p3);					\
+	int32 _p4 = (int32)(p4);					\
+	int32 _p5 = (int32)(p5);					\
+												\
+	__asm__ volatile							\
+	("/* xhdicall(" #callnr ") */\n"			\
+	"	move.l	%5,-(%%sp) \n"					\
+	"	move.l	%4,-(%%sp) \n"					\
+	"	move.l	%3,-(%%sp) \n"					\
+	"	move.l	%2,-(%%sp) \n"					\
+	"	move.w	%1,-(%%sp) \n"					\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	jbsr	(%[entry])\n"						\
+	"	add.l	#20,%%sp \n"						\
+	: "=r"(retvalue)	/* output */			\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3), "r"(_p4),				\
+	  "r"(_p5),			/* input */	\
+	  [entry]"a"(gXHDIEntryPoint),				\
+	  [calln]"i"(callnr)						\
+	: XHDI_CLOBBER_LIST /* clobbered regs */	\
+	);											\
+	retvalue;									\
+})
+
+#define xhdicallWWWLWL(callnr, p1, p2, p3, p4, p5, p6)					\
+({												\
+	register int32 retvalue __asm__("d0");		\
+	int16 _p1 = (int16)(p1);					\
+	int16 _p2 = (int16)(p2);					\
+	int16 _p3 = (int16)(p3);					\
+	int32 _p4 = (int32)(p4);					\
+	int16 _p5 = (int16)(p5);					\
+	int32 _p6 = (int32)(p6);					\
+												\
+	__asm__ volatile							\
+	("/* xhdicall(" #callnr ") */\n"			\
+	"	move.l	%6,-(%%sp) \n"					\
+	"	move.w	%5,-(%%sp) \n"					\
+	"	move.l	%4,-(%%sp) \n"					\
+	"	move.w	%3,-(%%sp) \n"					\
+	"	move.w	%2,-(%%sp) \n"					\
+	"	move.w	%1,-(%%sp) \n"					\
+	"	move.w	%[calln],-(%%sp)\n"				\
+	"	jbsr	(%[entry])\n"						\
+	"	add.l	#18,%%sp \n"						\
+	: "=r"(retvalue)	/* output */			\
+	: "r"(_p1), "r"(_p2),				\
+	  "r"(_p3), "r"(_p4),				\
+	  "r"(_p5), "r"(_p6),		/* input */	\
+	  [entry]"a"(gXHDIEntryPoint),				\
+	  [calln]"i"(callnr)						\
+	: XHDI_CLOBBER_LIST /* clobbered regs */	\
+	);											\
+	retvalue;									\
+})
+
+#define xhdicallWWP(callnr, p1, p2, p3) \
+	xhdicallWWL(callnr, p1, p2, (int32)p3)
+#define xhdicallWWPP(callnr, p1, p2, p3, p4) \
+	xhdicallWWLL(callnr, p1, p2, (int32)p3, (int32)p4)
+#define xhdicallWWPPP(callnr, p1, p2, p3, p4, p5) \
+	xhdicallWWLLL(callnr, p1, p2, (int32)p3, (int32)p4, (int32)p5)
+#define xhdicallWPPPP(callnr, p1, p2, p3, p4, p5) \
+	xhdicallWLLLL(callnr, p1, (uint32)p2, (int32)p3, (int32)p4, (int32)p5)
+#define xhdicallWWWPWP(callnr, p1, p2, p3, p4, p5, p6) \
+	xhdicallWWWLWL(callnr, p1, p2, p3, (int32)p4, p5, (uint32)p6)
 
 #define XHGetVersion() (uint16)xhdicallV(0)
 #define XHInqTarget(major, minor, bsize, flags, pname) xhdicallWWPPP(1, (uint16)major, (uint16)minor, (uint32 *)bsize, (uint32 *)flags, (char *)pname)
@@ -415,18 +570,18 @@ extern status_t init_xhdi(void);
 //#define XHStop() 4
 #define XHEject(major, minor, doeject, key) xhdicallWWWW(5, (uint16)major, (uint16)minor, (uint16)doeject, (uint16)key)
 #define XHDrvMap() xhdicallV(6)
-//#define XHInqDev(dev,) xhdicall(7,)
+#define XHInqDev(dev,major,minor,startsect,bpb) xhdicallWPPPP(7,dev,(uint16 *)major,(uint16 *)minor,(uint32 *)startsect,(struct tos_bpb *)bpb)
 //XHInqDriver 8
 //XHNewCookie 9
 #define XHReadWrite(major, minor, rwflags, recno, count, buf) xhdicalWWWLWP(10, (uint16)major, (uint16)minor, (uint16)rwflags, (uint32)recno, (uint16)count, (void *)buf)
 #define XHInqTarget2(major, minor, bsize, flags, pname, pnlen) xhdicallWWPPPW(11, (uint16)major, (uint16)minor, (uint32 *)bsize, (uint32 *)flags, (char *)pname, (uint16)pnlen)
 //XHInqDev2 12
 //XHDriverSpecial 13
-#define XHGetCapacity(major, minor, blocks, blocksize) xhdicall(14, (uint16)major, (uint16)minor, (uint32 *)blocks, (uint32 *)blocksize)
+#define XHGetCapacity(major, minor, blocks, blocksize) xhdicallWWPP(14, (uint16)major, (uint16)minor, (uint32 *)blocks, (uint32 *)blocksize)
 //#define XHMediumChanged() 15
 //XHMiNTInfo 16
 //XHDosLimits 17
-//XHLastAccess 18
+#define XHLastAccess(major, minor, ms) xhdicallWWP(18, major, minor, (uint32 *)ms)
 //SHReaccess 19
 
 #endif /* __ASSEMBLER__ */

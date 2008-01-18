@@ -13,6 +13,8 @@
 #include <Errors.h>
 
 void *gXHDIEntryPoint = NULL;
+uint32 gXHDIVersion = 0;
+
 NatFeatCookie *gNatFeatCookie = NULL;
 int32 gDebugPrintfNatFeatID = 0;
 
@@ -182,13 +184,18 @@ dump_tos_cookies(void)
 status_t
 init_xhdi(void)
 {
-	struct tos_cookie *c;
+	const struct tos_cookie *c;
+
+	if (gXHDIEntryPoint)
+		return B_OK;
+	
 	c = tos_find_cookie(XHDI_COOKIE);
 	if (!c)
 		return ENOENT;
 	if (((uint32 *)c->pvalue)[-1] != XHDI_MAGIC)
 		return EINVAL;
 	gXHDIEntryPoint = c->pvalue;
+	gXHDIVersion = XHGetVersion();
 	return B_OK;
 }
 

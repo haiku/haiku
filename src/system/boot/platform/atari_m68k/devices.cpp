@@ -160,7 +160,7 @@ class BIOSDrive : public BlockHandle {
 
 class XHDIDrive : public BlockHandle {
 	public:
-		XHDIDrive(int handle/*, uint16 major, uint16 minor ??*/);
+		XHDIDrive(int handle, uint16 major, uint16 minor);
 		virtual ~XHDIDrive();
 
 		status_t FillIdentifier();
@@ -431,29 +431,112 @@ add_block_devices(NodeList *devicesList, bool identifierMissing)
 	if (sBlockDevicesAdded)
 		return B_OK;
 
-	map = Drvmap();
-	dprintf("Drvmap(): 0x%08lx\n", map);
-	for (driveID = 0; driveID < 32; driveID++) {
-		bool present = map & 0x1;
-		map >>= 1;
-		if (!present)
-			continue;
-		
-		if (driveID == gBootDriveID)
-			continue;
+	if (init_xhdi() >= B_OK) {
+		uint16 major;
+		uint16 minor;
+		uint32 blocksize;
+		uint32 blocks;
+		uint32 devflags;
+		uint32 lastacc;
+		char product[33];
+		int32 err;
 
-		BlockHandle *drive = new(nothrow) BlockHandle(driveID);
-		if (drive->InitCheck() != B_OK) {
-			dprintf("could not add drive %u\n", driveID);
-			delete drive;
-			continue;
+		map = XHDrvMap();
+		dprintf("XDrvMap() 0x%08lx\n", map);
+		// sadly XDrvmap() has the same issues as XBIOS, it only lists known partitions.
+		// so we just iterate on each major and try to see if there is something.
+		for (driveID = 0; driveID < 32; driveID++) {
+			uint32 startsect;
+			err = XHInqDev(driveID, &major, &minor, &startsect, NULL);
+			if (err < 0) {
+				;//dprintf("XHInqDev(%d) error %d\n", driveID, err);
+			} else {
+				dprintf("XHInqDev(%d): (%d,%d):%d\n", driveID, major, minor, startsect);
+			}
 		}
 
-		devicesList->Add(drive);
-		driveCount++;
+		product[32] = '\0';
+		for (major = 0; major < 256; major++) {
+			if (major == 64) // we don't want floppies
+				continue;
+			if (major > 23) // extensions and non-standard stuff... skip for speed.
+				break;
 
-		if (drive->FillIdentifier() != B_OK)
-			identifierMissing = true;
+			for (minor = 0; minor < 255; minor++) {
+				if (minor && (major < 8 || major >15))
+					break; // minor only used for the SCSI LUN AFAIK.
+				if (minor > 15) // are more used at all ?
+					break;
+
+				product[0] = '\0';
+				blocksize = 0;
+#if 0
+				err = XHLastAccess(major, minor, &lastacc);
+				if (err < 0) {
+					;//dprintf("XHLastAccess(%d,%d) error %d\n", major, minor, err);
+				} else
+					dprintf("XHLastAccess(%d,%d): %ld\n", major, minor, lastacc);
+//continue;
+#endif
+				// we can pass NULL pointers but just to play safe we don't.
+				err = XHInqTarget(major, minor, &blocksize, &devflags, product);
+				if (err < 0) {
+					dprintf("XHInqTarget(%d,%d) error %d\n", major, minor, err);
+					continue;
+				}
+				err = XHGetCapacity(major, minor, &blocks, &blocksize);
+				if (err < 0) {
+					//dprintf("XHGetCapacity(%d,%d) error %d\n", major, minor, err);
+					continue;
+				}
+
+				dprintf("XHDI(%d,%d): blksize %d, blocks %d, flags 0x%08lx, '%s'\n", major, minor, blocksize, blocks, devflags, product);
+				driveID = (uint8)major;
+
+				//if (driveID == gBootDriveID)
+				//	continue;
+//continue;
+
+				BlockHandle *drive = new(nothrow) XHDIDrive(driveID, major, minor);
+				if (drive->InitCheck() != B_OK) {
+					dprintf("could not add drive (%d,%d)\n", major, minor);
+					delete drive;
+					continue;
+				}
+
+				devicesList->Add(drive);
+				driveCount++;
+
+				if (drive->FillIdentifier() != B_OK)
+					identifierMissing = true;
+			}
+		}
+	}
+	if (!driveCount) { // try to fallback to BIOS XXX: use MetaDOS
+		map = Drvmap();
+		dprintf("Drvmap(): 0x%08lx\n", map);
+		for (driveID = 0; driveID < 32; driveID++) {
+			bool present = map & 0x1;
+			map >>= 1;
+			if (!present)
+				continue;
+
+			if (driveID == gBootDriveID)
+				continue;
+
+			BlockHandle *drive = new(nothrow) BlockHandle(driveID);
+			if (drive->InitCheck() != B_OK) {
+				dprintf("could not add drive %u\n", driveID);
+				delete drive;
+				continue;
+			}
+
+			devicesList->Add(drive);
+			driveCount++;
+
+			if (drive->FillIdentifier() != B_OK)
+				identifierMissing = true;
+		}
 	}
 	dprintf("number of drives: %d\n", driveCount);
 
@@ -690,18 +773,29 @@ BIOSDrive::ReadBlocks(void *buffer, off_t first, int32 count)
  */
 
 
-XHDIDrive::XHDIDrive(int handle)
+XHDIDrive::XHDIDrive(int handle, uint16 major, uint16 minor)
 	: BlockHandle(handle)
 {
 	/* first check if the drive exists */
-	/* note floppy B can be reported present anyway... */
-	uint32 map = Drvmap();
-	if (!(map & (1 << fHandle))) {
-		fSize = 0LL;
-		return;
-	}
-	//XXX: check size
+	int32 err;
+	uint32 devflags;
+	uint32 blocks;
+	char product[33];
 
+	fMajor = major;
+	fMinor = minor;
+	product[32] = '\0';
+	err = XHInqTarget(major, minor, &fBlockSize, &devflags, product);
+	if (err < 0)
+		return;
+	//XXX: check size
+	err = XHGetCapacity(major, minor, &blocks, &fBlockSize);
+	if (err < 0)
+		return;
+	
+	fSize = blocks * fBlockSize;
+	fHasParameters = false;
+#if 0
 	if (get_drive_parameters(fHandle, &fParameters) != B_OK) {
 		dprintf("getting drive parameters for: %u failed!\n", fHandle);
 		return;
@@ -709,7 +803,7 @@ XHDIDrive::XHDIDrive(int handle)
 	fBlockSize = 512;
 	fSize = fParameters.sectors * fBlockSize;
 	fHasParameters = false;
-
+#endif
 #if 0
 	if (get_ext_drive_parameters(driveID, &fParameters) != B_OK) {
 		// old style CHS support
@@ -799,7 +893,9 @@ status_t
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
 	TRACE(("boot drive ID: %x\n", gBootDriveID));
+	init_xhdi();
 
+	//XXX: FIXME
 	BlockHandle *drive = new(nothrow) BlockHandle(gBootDriveID);
 	if (drive->InitCheck() != B_OK) {
 		dprintf("no boot drive!\n");
@@ -851,6 +947,7 @@ platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 status_t
 platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
+	init_xhdi();
 	return add_block_devices(devicesList, false);
 }
 
