@@ -353,10 +353,10 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	fScrTop = 0;
 	fScrBot = fTermRows - 1;
 
-	BRect rect(0, 0, fTermColumns * fFontWidth, fTermRows * fFontHeight);
+	BRect rect(0, 0, fTermColumns * fFontWidth - 1, fTermRows * fFontHeight - 1);
 
 	if (resize)
-		ResizeTo(fTermColumns * fFontWidth - 1, fTermRows * fFontHeight -1);
+		ResizeTo(rect.Width(), rect.Height());
 
 	return rect;
 }
