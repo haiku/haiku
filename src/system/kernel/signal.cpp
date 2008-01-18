@@ -21,6 +21,7 @@
 #include <sem.h>
 #include <team.h>
 #include <thread.h>
+#include <tracing.h>
 #include <user_debugger.h>
 #include <util/AutoLock.h>
 
@@ -32,6 +33,7 @@
 #	define TRACE(x) ;
 #endif
 
+//#define SIGNAL_TRACING
 
 #define BLOCKABLE_SIGNALS		(~(KILL_SIGNALS | SIGNAL_TO_MASK(SIGSTOP)))
 #define STOP_SIGNALS \
@@ -52,6 +54,136 @@ const char * const sigstr[NSIG] = {
 
 static status_t deliver_signal(struct thread *thread, uint signal,
 	uint32 flags);
+
+
+
+// #pragma mark - signal tracing
+
+
+#ifdef SIGNAL_TRACING
+
+namespace SignalTracing {
+
+
+class HandleSignals : public AbstractTraceEntry {
+	public:
+		HandleSignals(uint32 signals)
+			:
+			fSignals(signals)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "signal handle:  0x%lx",
+				fSignals);
+		}
+
+	private:
+		uint32		fSignals;
+};
+
+
+class SendSignal : public AbstractTraceEntry {
+	public:
+		SendSignal(pid_t target, uint32 signal, uint32 flags)
+			:
+			fTarget(target),
+			fSignal(signal),
+			fFlags(flags)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "signal send: target: %ld, signal: %lu "
+				"(%s), flags: 0x%lx", fTarget, fSignal,
+				(fSignal < NSIG ? sigstr[fSignal] : "invalid"), fFlags);
+		}
+
+	private:
+		pid_t	fTarget;
+		uint32	fSignal;
+		uint32	fFlags;
+};
+
+
+class SigAction : public AbstractTraceEntry {
+	public:
+		SigAction(struct thread* thread, uint32 signal,
+			const struct sigaction* act)
+			:
+			fThread(thread->id),
+			fSignal(signal),
+			fAction(*act)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "signal action: thread: %ld, signal: %lu "
+				"(%s), action: {handler: %p, flags: 0x%x, mask: 0x%lx}",
+				fThread, fSignal,
+				(fSignal < NSIG ? sigstr[fSignal] : "invalid"),
+				fAction.sa_handler, fAction.sa_flags, fAction.sa_mask);
+		}
+
+	private:
+		thread_id			fThread;
+		uint32				fSignal;
+		struct sigaction	fAction;
+};
+
+
+class SigProcMask : public AbstractTraceEntry {
+	public:
+		SigProcMask(int how, sigset_t mask)
+			:
+			fHow(how),
+			fMask(mask),
+			fOldMask(thread_get_current_thread()->sig_block_mask)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			const char* how = "invalid";
+			switch (fHow) {
+				case SIG_BLOCK:
+					how = "block";
+					break;
+				case SIG_UNBLOCK:
+					how = "unblock";
+					break;
+				case SIG_SETMASK:
+					how = "set";
+					break;
+			}
+
+			snprintf(buffer, size, "signal proc mask: %s 0x%lx, "
+				"old mask: 0x%lx", how, fMask, fOldMask);
+		}
+
+	private:
+		int			fHow;
+		sigset_t	fMask;
+		sigset_t	fOldMask;
+};
+
+}	// namespace SignalTracing
+
+#	define T(x)	new(std::nothrow) SignalTracing::x
+
+#else
+#	define T(x)
+#endif	// SIGNAL_TRACING
+
+
+// #pragma mark - 
 
 
 /*!	Updates the thread::flags field according to what signals are pending.
@@ -120,6 +252,8 @@ handle_signals(struct thread *thread)
 
 	if (signalMask == 0)
 		return 0;
+
+	T(HandleSignals(signalMask));
 
 	for (i = 0; i < NSIG; i++) {
 		bool debugSignal;
@@ -401,6 +535,8 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 	if (signal < 0 || signal > MAX_SIGNO)
 		return B_BAD_VALUE;
 
+	T(SendSignal(id, signal, flags));
+
 	if ((flags & SIGNAL_FLAG_TEAMS_LOCKED) == 0)
 		state = disable_interrupts();
 	
@@ -498,6 +634,8 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
 	if (set != NULL) {
+		T(SigProcMask(how, *set));
+
 		switch (how) {
 			case SIG_BLOCK:
 				atomic_or(&thread->sig_block_mask, *set & BLOCKABLE_SIGNALS);
@@ -555,6 +693,8 @@ sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
 		}
 
 		if (act) {
+			T(SigAction(thread, signal, act));
+
 			// set new sigaction structure
 			memcpy(&thread->sig_action[signal - 1], act,
 				sizeof(struct sigaction));
