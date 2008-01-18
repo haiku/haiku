@@ -329,15 +329,15 @@ list_interface(int socket, const char* name)
 	// Print statistics
 
 	if (ioctl(socket, SIOCGIFSTATS, &request, sizeof(struct ifreq)) == 0) {
-		printf("\tReceive: %ld packets, %ld errors, %Ld bytes, %ld mcasts, %ld dropped\n",
+		printf("\tReceive: %d packets, %d errors, %Ld bytes, %d mcasts, %d dropped\n",
 			request.ifr_stats.receive.packets, request.ifr_stats.receive.errors,
 			request.ifr_stats.receive.bytes, request.ifr_stats.receive.multicast_packets,
 			request.ifr_stats.receive.dropped);
-		printf("\tTransmit: %ld packets, %ld errors, %Ld bytes, %ld mcasts, %ld dropped\n",
+		printf("\tTransmit: %d packets, %d errors, %Ld bytes, %d mcasts, %d dropped\n",
 			request.ifr_stats.send.packets, request.ifr_stats.send.errors,
 			request.ifr_stats.send.bytes, request.ifr_stats.send.multicast_packets,
 			request.ifr_stats.send.dropped);
-		printf("\tCollisions: %ld\n", request.ifr_stats.collisions);
+		printf("\tCollisions: %d\n", request.ifr_stats.collisions);
 	}
 
 	putchar('\n');
