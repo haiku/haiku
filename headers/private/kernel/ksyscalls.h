@@ -9,13 +9,30 @@
 #include <SupportDefs.h>
 
 
+#define MAX_SYSCALL_PARAMETERS	16
+
+
 typedef struct syscall_info {
 	void	*function;		// pointer to the syscall function
 	int		parameter_size;	// summed up parameter size
 } syscall_info;
 
+typedef struct syscall_parameter_info {
+	int			offset;
+	int			size;
+	int			used_size;
+	type_code	type;
+} syscall_parameter_info;
+
+typedef struct syscall_parameters_info {
+	int						parameter_count;
+	syscall_parameter_info	parameters[MAX_SYSCALL_PARAMETERS];
+} syscall_parameters_info;
+
+
 extern const int kSyscallCount;
 extern const syscall_info kSyscallInfos[];
+extern const syscall_parameters_info kSyscallParametersInfos[];
 
 
 #ifdef __cplusplus

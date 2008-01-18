@@ -1,4 +1,7 @@
-// gensyscalls.cpp
+/*
+ * Copyright 2004-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 // Don't include arch_gensyscalls.h. It's only needed when creating the
 // syscall vector.
@@ -402,6 +405,35 @@ public:
 
 		// syscall infos array end
 		file << "};" << endl;
+		file << endl;
+
+		// syscall parameters infos array preamble
+		file << "const syscall_parameters_info kSyscallParametersInfos[] = {"
+			<< endl;
+
+		// the syscall parameters infos
+		for (int i = 0; i < fSyscallCount; i++) {
+			const Syscall* syscall = fSyscallVector->SyscallAt(i);
+			int paramCount = syscall->CountParameters();
+
+			file << "\t{" << endl;
+			file << "\t\t" << paramCount << "," << endl;
+			file << "\t\t{" << endl;
+
+			for (int k = 0; k < paramCount; k++) {
+				const Parameter* parameter = syscall->ParameterAt(k);
+				file << "\t\t\t{ " << parameter->Offset() << ", "
+					<< parameter->Size() << ", "
+					<< parameter->UsedSize() << ", "
+					<< _GetTypeCode(parameter) << " }," << endl;
+			}
+
+			file << "\t\t}" << endl;
+			file << "\t}," << endl;
+		}
+
+		// syscall parameters infos array end
+		file << "};" << endl;
 
 		// assembler guard end
 		file << "#endif	// _ASSEMBLER" << endl;
@@ -484,6 +516,75 @@ public:
 			return string(type) + "*";
 		// function pointer type
 		return string(type, parenthesis - type) + "*" + parenthesis;
+	}
+
+	static string _GetTypeCode(const Type* type)
+	{
+		const char* typeName = type->TypeName();
+		if (strchr(typeName, '*')) {
+			// pointer type
+			// check, if it is a string constant ("const char *" or
+			// "char const *")
+			if (_GetTypeCodeTokenize(typeName) == "const"
+					&& _GetTypeCodeTokenize(typeName) == "char"
+					&& _GetTypeCodeTokenize(typeName) == "*"
+					&& _GetTypeCodeTokenize(typeName) == ""
+				|| _GetTypeCodeTokenize(typeName) == "char"
+					&& _GetTypeCodeTokenize(typeName) == "const"
+					&& _GetTypeCodeTokenize(typeName) == "*"
+					&& _GetTypeCodeTokenize(typeName) == "") {
+				return "B_STRING_TYPE";
+			}
+
+			// not a string constant
+			return "B_POINTER_TYPE";
+		} else {
+			// non-pointer type
+			switch (type->Size()) {
+				case 1:
+					return "B_INT8_TYPE";
+				case 2:
+					return "B_INT16_TYPE";
+				case 4:
+					return "B_INT32_TYPE";
+				case 8:
+					return "B_INT64_TYPE";
+				default:
+					return "B_RAW_TYPE";
+			}
+		}
+	}
+
+	static string _GetTypeCodeTokenize(const char*& type)
+	{
+		// skip whitespace
+		while (*type != '\0' && isspace(*type))
+			type++;
+
+		switch (*type) {
+			case '\0':
+				return "";
+
+			case '*':
+			case '(':
+			case ')':
+			case '&':
+				return string(type++, 1);
+
+			default:
+			{
+				if (*type != '_' && !isalpha(*type)) {
+					// probably invalid, just return something
+					return string(type++, 1);
+				}
+
+				// an identifier
+				const char* start = type;
+				while (*type == '_' || isalnum(*type))
+					type++;
+				return string(start, type - start);
+			}
+		}
 	}
 
 private:
