@@ -3033,8 +3033,7 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 	}
 
 	bool erase = fSelStart != fText->Length();
-	int32 saveStart = fSelStart;
-
+	
 	if (fSelStart != fSelEnd) {
 		Highlight(fSelStart, fSelEnd);
 		DeleteText(fSelStart, fSelEnd);
