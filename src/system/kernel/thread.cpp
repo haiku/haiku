@@ -1281,6 +1281,9 @@ thread_exit(void)
 				RELEASE_THREAD_LOCK();
 
 			team_remove_team(team, &freeGroup);
+
+			send_signal_etc(parentID, SIGCHLD,
+				SIGNAL_FLAG_TEAMS_LOCKED | B_DO_NOT_RESCHEDULE);
 		} else {
 			// The thread is not the main thread. We store a thread death
 			// entry for it, unless someone is already waiting it.
@@ -1327,7 +1330,6 @@ thread_exit(void)
 		if (death != NULL)
 			delete death;
 
-		send_signal_etc(parentID, SIGCHLD, B_DO_NOT_RESCHEDULE);
 		cachedDeathSem = -1;
 	}
 
