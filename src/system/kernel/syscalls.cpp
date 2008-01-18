@@ -363,14 +363,9 @@ class PreSyscall : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "syscall pre:  %s(",
-				get_syscall_name(fSyscall));
-
-			size_t bytesPrinted = strlen(buffer);
-			buffer += bytesPrinted;
-			size -= bytesPrinted;
+			out.Print("syscall pre:  %s(", get_syscall_name(fSyscall));
 
 			if (fParameters != NULL) {
 				int32 stringIndex = 0;
@@ -400,7 +395,7 @@ class PreSyscall : public AbstractTraceEntry {
 							break;
 						case B_STRING_TYPE:
 							if (stringIndex < MAX_PARAM_STRINGS) {
-								snprintf(buffer, size, "%s\"%s\"",
+								out.Print("%s\"%s\"",
 									(i == 0 ? "" : ", "),
 									fParameterStrings[stringIndex++]);
 								printValue = false;
@@ -409,18 +404,12 @@ class PreSyscall : public AbstractTraceEntry {
 							break;
 					}
 
-					if (printValue) {
-						snprintf(buffer, size, "%s0x%llx", (i == 0 ? "" : ", "),
-							value);
-					}
-
-					bytesPrinted = strlen(buffer);
-					buffer += bytesPrinted;
-					size -= bytesPrinted;
+					if (printValue)
+						out.Print("%s0x%llx", (i == 0 ? "" : ", "), value);
 				}
 			}
 
-			strlcat(buffer, ")", size);
+			out.Print(")");
 		}
 
 	private:
@@ -442,9 +431,9 @@ class PostSyscall : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "syscall post: %s() -> 0x%llx",
+			out.Print("syscall post: %s() -> 0x%llx",
 				get_syscall_name(fSyscall), fReturnValue);
 		}
 
@@ -453,7 +442,7 @@ class PostSyscall : public AbstractTraceEntry {
 		uint64	fReturnValue;
 };
 
-}	// namespace TeamTracing
+}	// namespace SyscallTracing
 
 
 extern "C" void trace_pre_syscall(uint32 syscallNumber, const void* parameters);
