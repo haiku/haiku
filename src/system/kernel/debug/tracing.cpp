@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 
+#include <debug.h>
 #include <util/AutoLock.h>
 
 
@@ -80,9 +81,10 @@ make_space(size_t needed)
 		if (sBufferStart == NULL)
 			sBufferStart = sBufferEnd;
 
-		sEntries--;
-		if (!(removed->flags & BUFFER_ENTRY))
+		if (!(removed->flags & BUFFER_ENTRY)) {
 			((TraceEntry*)removed)->~TraceEntry();
+			sEntries--;
+		}
 
 		if (needed <= freed)
 			break;
@@ -94,8 +96,8 @@ make_space(size_t needed)
 }
 
 
-trace_entry*
-allocate_entry(size_t size)
+static trace_entry*
+allocate_entry(size_t size, uint16 flags)
 {
 	if (sBuffer == NULL)
 		return NULL;
@@ -120,11 +122,15 @@ allocate_entry(size_t size)
 
 	trace_entry* entry = sBufferEnd;
 	entry->size = size;
-	entry->flags = 0;
+	entry->flags = flags;
 	sBufferEnd += size >> 2;
-	sEntries++;
+
+	if (!(flags & BUFFER_ENTRY))
+		sEntries++;
+
 	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry, sBufferEnd,
 		sBufferStart, sEntries));
+
 	return entry;
 }
 
@@ -168,7 +174,7 @@ void*
 TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 {
 #if ENABLE_TRACING
-	return allocate_entry(size);
+	return allocate_entry(size, 0);
 #else
 	return NULL;
 #endif
@@ -188,39 +194,55 @@ dump_tracing(int argc, char** argv)
 	if (argv[argc - 1][0] == '#')
 		pattern = argv[--argc] + 1;
 
+	// Note: start and index are Pascal-like indices (i.e. in [1, sEntries]).
 	int32 count = 30;
-	int32 start = sEntries - count;
+	int32 start = 0;	// special index: print the last count entries
+	int32 cont = 0;
 
-	if (argc == 2)
-		start = strtol(argv[1], NULL, 0);
+	if (argc == 2) {
+		if (strcmp(argv[1], "forward") == 0)
+			cont = 1;
+		else if (strcmp(argv[1], "backward") == 0)
+			cont = -1;
+		else
+			start = parse_expression(argv[1]);
+	}
 
 	if (argc == 3) {
-		start = strtol(argv[1], NULL, 0);
-		count = strtol(argv[2], NULL, 0);
+		start = parse_expression(argv[1]);
+		count = parse_expression(argv[2]);
 	} else if (argc > 3) {
 		kprintf("usage: %s [start] [count] [#pattern]\n", argv[0]);
 		return 0;
 	}
 
-	if (start < 0)
-		start = 0;
-	if (uint32(start + count) > sEntries)
-		count = sEntries - start;
+	if (cont != 0) {
+		start = get_debug_variable("_tracingStart", start);
+		count = get_debug_variable("_tracingCount", count);
+		start = max_c(1, start + count * cont);
+	}
 
-	int32 index = 0;
+	if ((uint32)count > sEntries)
+		count = sEntries;
+	if (start <= 0)
+		start = max_c(1, sEntries - count + 1);
+	if (uint32(start + count) > sEntries)
+		count = sEntries - start + 1;
+
+	int32 index = 1;
 	int32 dumped = 0;
 
 	for (trace_entry* current = sBufferStart; current != NULL;
 			current = next_entry(current), index++) {
-		if (index < start)
-			continue;
-		if (index > start + count)
-			break;
 		if ((current->flags & BUFFER_ENTRY) != 0) {
 			// skip buffer entries
 			index--;
 			continue;
 		}
+		if (index < start)
+			continue;
+		if (index >= start + count)
+			break;
 
 		if ((current->flags & ENTRY_INITIALIZED) != 0) {
 			char buffer[256];
@@ -230,16 +252,20 @@ dump_tracing(int argc, char** argv)
 			if (pattern != NULL && strstr(buffer, pattern) == NULL)
 				continue;
 
-			dumped++;
-
 			kprintf("%5ld. %s\n", index, buffer);
 		} else
 			kprintf("%5ld. ** uninitialized entry **\n", index);
+
+		dumped++;
 	}
 
-	kprintf("%ld entries of entries %ld to %ld (total %ld).\n", dumped,
-		start + 1, start + count, sEntries);
-	return 0;
+	kprintf("entries %ld to %ld (%ld of %ld).\n", start, start + count - 1,
+		dumped, sEntries);
+
+	set_debug_variable("_tracingStart", start);
+	set_debug_variable("_tracingCount", count);
+
+	return cont != 0 ? B_KDEBUG_CONT : 0;
 }
 
 
@@ -253,11 +279,11 @@ alloc_tracing_buffer(size_t size)
 		return NULL;
 
 #if	ENABLE_TRACING
-	trace_entry* entry = allocate_entry(size + sizeof(trace_entry));
+	trace_entry* entry = allocate_entry(size + sizeof(trace_entry),
+		BUFFER_ENTRY);
 	if (entry == NULL)
 		return NULL;
 
-	entry->flags = BUFFER_ENTRY;
 	return (uint8*)(entry + 1);
 #else
 	return NULL;
@@ -320,8 +346,22 @@ tracing_init(void)
 	sBufferStart = sBuffer;
 	sBufferEnd = sBuffer;
 
-	add_debugger_command("traced", &dump_tracing,
-		"Dump recorded trace entries");
+	add_debugger_command_etc("traced", &dump_tracing,
+		"Dump recorded trace entries",
+		"(\"forward\" | \"backward\") | ([ <start> [ <count> ] ] "
+			"[ #<pattern> ])\n"
+		"Prints recorded trace entries. If \"backward\" or \"forward\" is\n"
+		"specified, the command continues where the previous invocation left\n"
+		"off, i.e. printing the previous respectively next entries (as many\n"
+		"as printed before). In this case the command is continuable, that is\n"
+		"afterwards entering an empty line in the debugger will reinvoke it.\n"
+		"  <start>    - The index of the first entry to print. The index of\n"
+		"               the first recorded entry is 1. If 0 is specified, the\n"
+		"               last <count> recorded entries are printed. Defaults \n"
+		"               to 0.\n"
+		"  <count>    - The number of entries to be printed. Defaults to 30.\n"
+		"  <pattern>  - If specified only entries containing this string are\n"
+		"               printed.\n", 0);
 #endif	// ENABLE_TRACING
 	return B_OK;
 }
