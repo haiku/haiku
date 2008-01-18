@@ -70,7 +70,9 @@ make_space(size_t needed)
 		return;
 
 	while (true) {
-		TraceEntry* removed = (TraceEntry*)sBufferStart;
+		// TODO: If the entry is not ENTRY_INITIALIZED yet, we must not
+		// discard it, or the owner might overwrite memory we're allocating.
+		trace_entry* removed = sBufferStart;
 		uint16 freed = sBufferStart->size;
 		TRACE(("  skip start %p, %u bytes\n", sBufferStart, freed));
 
@@ -79,7 +81,8 @@ make_space(size_t needed)
 			sBufferStart = sBufferEnd;
 
 		sEntries--;
-		removed->~TraceEntry();
+		if (!(removed->flags & BUFFER_ENTRY))
+			((TraceEntry*)removed)->~TraceEntry();
 
 		if (needed <= freed)
 			break;
