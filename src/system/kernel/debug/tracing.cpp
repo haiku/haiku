@@ -32,8 +32,8 @@ enum {
 static const size_t kBufferSize = MAX_TRACE_SIZE / 4 - 1;
 
 static trace_entry* sBuffer;
-static trace_entry* sBufferStart;
-static trace_entry* sBufferEnd;
+static trace_entry* sFirstEntry;
+static trace_entry* sAfterLastEntry;
 static uint32 sEntries;
 static uint32 sWritten;
 static spinlock sLock;
@@ -46,7 +46,7 @@ next_entry(trace_entry* entry)
 	if ((entry->flags & WRAP_ENTRY) != 0)
 		entry = sBuffer;
 
-	if (entry == sBufferEnd)
+	if (entry == sAfterLastEntry)
 		return NULL;
 
 	return entry;
@@ -56,16 +56,16 @@ next_entry(trace_entry* entry)
 static void
 make_space(size_t needed)
 {
-	if (sBufferEnd + needed / 4 > sBuffer + kBufferSize - 1) {
-		sBufferEnd->size = 0;
-		sBufferEnd->flags = WRAP_ENTRY;
-		sBufferEnd = sBuffer;
+	if (sAfterLastEntry + needed / 4 > sBuffer + kBufferSize - 1) {
+		sAfterLastEntry->size = 0;
+		sAfterLastEntry->flags = WRAP_ENTRY;
+		sAfterLastEntry = sBuffer;
 	}
 
-	int32 space = (sBufferStart - sBufferEnd) * 4;
+	int32 space = (sFirstEntry - sAfterLastEntry) * 4;
 	TRACE(("make_space(%lu), left %ld\n", needed, space));
 	if (space < 0)
-		sBufferEnd = sBuffer;
+		sAfterLastEntry = sBuffer;
 	else if ((size_t)space < needed)
 		needed -= space;
 	else
@@ -74,13 +74,13 @@ make_space(size_t needed)
 	while (true) {
 		// TODO: If the entry is not ENTRY_INITIALIZED yet, we must not
 		// discard it, or the owner might overwrite memory we're allocating.
-		trace_entry* removed = sBufferStart;
-		uint16 freed = sBufferStart->size;
-		TRACE(("  skip start %p, %u bytes\n", sBufferStart, freed));
+		trace_entry* removed = sFirstEntry;
+		uint16 freed = sFirstEntry->size;
+		TRACE(("  skip start %p, %u bytes\n", sFirstEntry, freed));
 
-		sBufferStart = next_entry(sBufferStart);
-		if (sBufferStart == NULL)
-			sBufferStart = sBufferEnd;
+		sFirstEntry = next_entry(sFirstEntry);
+		if (sFirstEntry == NULL)
+			sFirstEntry = sAfterLastEntry;
 
 		if (!(removed->flags & BUFFER_ENTRY)) {
 			((TraceEntry*)removed)->~TraceEntry();
@@ -93,7 +93,7 @@ make_space(size_t needed)
 		needed -= freed;
 	}
 
-	TRACE(("  out: start %p, entries %ld\n", sBufferStart, sEntries));
+	TRACE(("  out: start %p, entries %ld\n", sFirstEntry, sEntries));
 }
 
 
@@ -108,12 +108,12 @@ allocate_entry(size_t size, uint16 flags)
 	size = (size + 3) & ~3;
 
 	TRACE(("allocate_entry(%lu), start %p, end %p, buffer %p\n", size,
-		sBufferStart, sBufferEnd, sBuffer));
+		sFirstEntry, sAfterLastEntry, sBuffer));
 
-	if (sBufferStart < sBufferEnd || sEntries == 0) {
+	if (sFirstEntry < sAfterLastEntry || sEntries == 0) {
 		// the buffer ahead of us is still empty
-		uint32 space = (sBuffer + kBufferSize - sBufferEnd) * 4;
-		TRACE(("  free after end %p: %lu\n", sBufferEnd, space));
+		uint32 space = (sBuffer + kBufferSize - sAfterLastEntry) * 4;
+		TRACE(("  free after end %p: %lu\n", sAfterLastEntry, space));
 		if (space < size)
 			make_space(size);
 	} else {
@@ -121,16 +121,16 @@ allocate_entry(size_t size, uint16 flags)
 		make_space(size);
 	}
 
-	trace_entry* entry = sBufferEnd;
+	trace_entry* entry = sAfterLastEntry;
 	entry->size = size;
 	entry->flags = flags;
-	sBufferEnd += size >> 2;
+	sAfterLastEntry += size >> 2;
 
 	if (!(flags & BUFFER_ENTRY))
 		sEntries++;
 
-	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry, sBufferEnd,
-		sBufferStart, sEntries));
+	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry, sAfterLastEntry,
+		sFirstEntry, sEntries));
 
 	return entry;
 }
@@ -234,7 +234,7 @@ dump_tracing(int argc, char** argv)
 	int32 index = 1;
 	int32 dumped = 0;
 
-	for (trace_entry* current = sBufferStart; current != NULL;
+	for (trace_entry* current = sFirstEntry; current != NULL;
 			current = next_entry(current), index++) {
 		if ((current->flags & BUFFER_ENTRY) != 0) {
 			// skip buffer entries
@@ -345,8 +345,8 @@ tracing_init(void)
 	if (area < B_OK)
 		return area;
 
-	sBufferStart = sBuffer;
-	sBufferEnd = sBuffer;
+	sFirstEntry = sBuffer;
+	sAfterLastEntry = sBuffer;
 
 	add_debugger_command_etc("traced", &dump_tracing,
 		"Dump recorded trace entries",
