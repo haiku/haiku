@@ -622,7 +622,7 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHand
 	addr_t oldFaultHandler = *faultHandler;
 
 	// this check is to trick the gcc4 compiler and have it keep the error label
-	if (to == NULL)
+	if (to == NULL && size > 0)
 		goto error;
 
 	*faultHandler = (addr_t)&&error;
