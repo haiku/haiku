@@ -65,7 +65,6 @@ struct block_cache {
 	cache_transaction *last_transaction;
 	hash_table	*transaction_hash;
 
-	block_list	unmapped_blocks;
 	block_list	unused_blocks;
 
 	bool		read_only;

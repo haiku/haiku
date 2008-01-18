@@ -42,8 +42,6 @@ class Journal {
 
 		status_t ReplayLog();
 
-		status_t LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks);
-
 		Transaction *CurrentTransaction() const { return fOwner; }
 
 		status_t FlushLogAndBlocks();
@@ -136,18 +134,28 @@ class Transaction {
 		}
 
 		status_t
-		WriteBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks = 1)
+		WriteBlocks(off_t blockNumber, const uint8 *buffer,
+			size_t numBlocks = 1)
 		{
 			if (fJournal == NULL)
 				return B_NO_INIT;
 
-			// ToDo: implement this properly!
-			// Currently only used in BlockAllocator::StopChecking(), 
-			// so chkbfs won't work correctly
-#if 0
-			return fJournal->LogBlocks(blockNumber, buffer, numBlocks);
-#endif
-			return B_ERROR;
+			void *cache = GetVolume()->BlockCache();
+			size_t blockSize = GetVolume()->BlockSize();
+
+			for (size_t i = 0; i < numBlocks; i++) {
+				void *block = block_cache_get_empty(cache, blockNumber + i,
+					ID());
+				if (block == NULL)
+					return B_ERROR;
+
+				memcpy(block, buffer, blockSize);
+				buffer += blockSize;
+
+				block_cache_put(cache, blockNumber + i);
+			}
+
+			return B_OK;
 		}
 
 		Volume	*GetVolume()

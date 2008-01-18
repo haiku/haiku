@@ -58,6 +58,7 @@ struct cache_transaction {
 	cache_transaction *next;
 	int32_t			id;
 	int32_t			num_blocks;
+	int32_t			main_num_blocks;
 	int32_t			sub_num_blocks;
 	cached_block	*first_block;
 	block_list		blocks;
@@ -78,6 +79,7 @@ static fssh_status_t write_cached_block(block_cache *cache, cached_block *block,
 cache_transaction::cache_transaction()
 {
 	num_blocks = 0;
+	main_num_blocks = 0;
 	sub_num_blocks = 0;
 	first_block = NULL;
 	notification_hook = NULL;
@@ -246,11 +248,10 @@ void
 block_cache::FreeBlock(cached_block *block)
 {
 	Free(block->current_data);
-	block->current_data = NULL;
 
 	if (block->original_data != NULL || block->parent_data != NULL) {
-		fssh_panic("block_cache::FreeBlock(): %p, %p\n", block->original_data,
-			block->parent_data);
+		fssh_panic("block_cache::FreeBlock(): %Ld, original %p, parent %p\n",
+			block->block_number, block->original_data, block->parent_data);
 	}
 
 #ifdef DEBUG_CHANGED
@@ -415,23 +416,6 @@ get_cached_block(block_cache *cache, fssh_off_t blockNumber, bool *_allocated,
 
 		hash_insert(cache->hash, block);
 		*_allocated = true;
-	} else {
-		// TODO: currently, the data is always mapped in
-/*
-		if (block->ref_count == 0 && block->current_data != NULL) {
-			// see if the old block can be resurrected
-			block->current_data = cache->allocator->Acquire(block->current_data);
-		}
-
-		if (block->current_data == NULL) {
-			// there is no block yet, but we need one
-			block->current_data = cache->allocator->Get();
-			if (block->current_data == NULL)
-				return NULL;
-
-			*_allocated = true;
-		}
-*/
 	}
 
 	if (*_allocated && readBlock) {
@@ -471,7 +455,7 @@ static void *
 get_writable_cached_block(block_cache *cache, fssh_off_t blockNumber, fssh_off_t base,
 	fssh_off_t length, int32_t transactionID, bool cleared)
 {
-	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %ld)\n",
+	TRACE(("get_writable_cached_block(blockNumber = %Ld, transaction = %d)\n",
 		blockNumber, transactionID));
 
 	if (blockNumber < 0 || blockNumber >= cache->max_blocks) {
@@ -496,16 +480,18 @@ get_writable_cached_block(block_cache *cache, fssh_off_t blockNumber, fssh_off_t
 		return block->current_data;
 	}
 
-	if (block->transaction != NULL && block->transaction->id != transactionID) {
+	cache_transaction *transaction = block->transaction;
+
+	if (transaction != NULL && transaction->id != transactionID) {
 		// ToDo: we have to wait here until the other transaction is done.
 		//	Maybe we should even panic, since we can't prevent any deadlocks.
-		fssh_panic("get_writable_cached_block(): asked to get busy writable block (transaction %d)\n", (int)block->transaction->id);
+		fssh_panic("get_writable_cached_block(): asked to get busy writable block (transaction %d)\n", (int)transaction->id);
 		put_cached_block(cache, block);
 		return NULL;
 	}
-	if (block->transaction == NULL && transactionID != -1) {
+	if (transaction == NULL && transactionID != -1) {
 		// get new transaction
-		cache_transaction *transaction = lookup_transaction(cache, transactionID);
+		transaction = lookup_transaction(cache, transactionID);
 		if (transaction == NULL) {
 			fssh_panic("get_writable_cached_block(): invalid transaction %d!\n",
 				(int)transactionID);
@@ -525,6 +511,9 @@ get_writable_cached_block(block_cache *cache, fssh_off_t blockNumber, fssh_off_t
 		transaction->first_block = block;
 		transaction->num_blocks++;
 	}
+
+	bool wasUnchanged = block->original_data == NULL
+		|| block->previous_transaction != NULL;
 
 	if (!(allocated && cleared) && block->original_data == NULL) {
 		// we already have data, so we need to preserve it
@@ -548,8 +537,10 @@ get_writable_cached_block(block_cache *cache, fssh_off_t blockNumber, fssh_off_t
 		}
 
 		fssh_memcpy(block->parent_data, block->current_data, cache->block_size);
-		block->transaction->sub_num_blocks++;
-	}
+		transaction->sub_num_blocks++;
+	} else if (transaction != NULL && transaction->has_sub_transaction
+		&& block->parent_data == NULL && wasUnchanged)
+		transaction->sub_num_blocks++;
 
 	if (cleared)
 		fssh_memset(block->current_data, 0, cache->block_size);
@@ -588,6 +579,13 @@ write_cached_block(block_cache *cache, cached_block *block,
 	if (previous != NULL) {
 		previous->blocks.Remove(block);
 		block->previous_transaction = NULL;
+
+		if (block->original_data != NULL && block->transaction == NULL) {
+			// This block is not part of a transaction, so it does not need
+			// its original pointer anymore.
+			cache->Free(block->original_data);
+			block->original_data = NULL;
+		}
 
 		// Has the previous transation been finished with that write?
 		if (--previous->num_blocks == 0) {
@@ -643,7 +641,7 @@ fssh_cache_start_transaction(void *_cache)
 	transaction->id = fssh_atomic_add(&cache->next_transaction_id, 1);
 	cache->last_transaction = transaction;
 
-	TRACE(("cache_start_transaction(): id %ld started\n", transaction->id));
+	TRACE(("cache_start_transaction(): id %d started\n", transaction->id));
 
 	hash_insert(cache->transaction_hash, transaction);
 
@@ -657,6 +655,8 @@ fssh_cache_sync_transaction(void *_cache, int32_t id)
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
 	fssh_status_t status = FSSH_B_ENTRY_NOT_FOUND;
+
+	TRACE(("cache_sync_transaction(id %d)\n", id));
 
 	hash_iterator iterator;
 	hash_open(cache->transaction_hash, &iterator);
@@ -692,7 +692,7 @@ fssh_cache_end_transaction(void *_cache, int32_t id,
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
 
-	TRACE(("cache_end_transaction(id = %ld)\n", id));
+	TRACE(("cache_end_transaction(id = %d)\n", id));
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -785,8 +785,7 @@ fssh_cache_abort_transaction(void *_cache, int32_t id)
 }
 
 
-/*!
-	Acknowledges the current parent transaction, and starts a new transaction
+/*!	Acknowledges the current parent transaction, and starts a new transaction
 	from its sub transaction.
 	The new transaction also gets a new transaction ID.
 */
@@ -797,7 +796,7 @@ fssh_cache_detach_sub_transaction(void *_cache, int32_t id,
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
 
-	TRACE(("cache_detach_sub_transaction(id = %ld)\n", id));
+	TRACE(("cache_detach_sub_transaction(id = %d)\n", id));
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -837,8 +836,8 @@ fssh_cache_detach_sub_transaction(void *_cache, int32_t id,
 			cache->Free(block->original_data);
 			block->original_data = NULL;
 		}
-		if (block->parent_data != NULL
-			&& block->parent_data != block->current_data) {
+		if (block->parent_data == NULL
+			|| block->parent_data != block->current_data) {
 			// we need to move this block over to the new transaction
 			block->original_data = block->parent_data;
 			if (last == NULL)
@@ -846,24 +845,32 @@ fssh_cache_detach_sub_transaction(void *_cache, int32_t id,
 			else
 				last->transaction_next = block;
 
+			block->transaction = newTransaction;
 			last = block;
-		}
-		block->parent_data = NULL;
+		} else
+			block->transaction = NULL;
 
-		// move the block to the previous transaction list
-		transaction->blocks.Add(block);
+		if (block->parent_data != NULL) {
+			// move the block to the previous transaction list
+			transaction->blocks.Add(block);
+			block->parent_data = NULL;
+		}
 
 		block->previous_transaction = transaction;
 		block->transaction_next = NULL;
-		block->transaction = newTransaction;
 	}
 
+	newTransaction->num_blocks = transaction->sub_num_blocks;
+
 	transaction->open = false;
+	transaction->has_sub_transaction = false;
+	transaction->num_blocks = transaction->main_num_blocks;
+	transaction->sub_num_blocks = 0;
 
 	hash_insert(cache->transaction_hash, newTransaction);
 	cache->last_transaction = newTransaction;
 
-	return FSSH_B_OK;
+	return newTransaction->id;
 }
 
 
@@ -902,7 +909,8 @@ fssh_cache_abort_sub_transaction(void *_cache, int32_t id)
 			// the block has been changed and must be restored
 			TRACE(("cache_abort_sub_transaction(id = %ld): restored contents of block %Ld\n",
 				transaction->id, block->block_number));
-			fssh_memcpy(block->current_data, block->parent_data, cache->block_size);
+			fssh_memcpy(block->current_data, block->parent_data,
+				cache->block_size);
 			cache->Free(block->parent_data);
 		}
 
@@ -911,6 +919,8 @@ fssh_cache_abort_sub_transaction(void *_cache, int32_t id)
 
 	// all subsequent changes will go into the main transaction
 	transaction->has_sub_transaction = false;
+	transaction->sub_num_blocks = 0;
+
 	return FSSH_B_OK;
 }
 
@@ -921,7 +931,7 @@ fssh_cache_start_sub_transaction(void *_cache, int32_t id)
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
 
-	TRACE(("cache_start_sub_transaction(id = %ld)\n", id));
+	TRACE(("cache_start_sub_transaction(id = %d)\n", id));
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -952,6 +962,7 @@ fssh_cache_start_sub_transaction(void *_cache, int32_t id)
 
 	// all subsequent changes will go into the sub transaction
 	transaction->has_sub_transaction = true;
+	transaction->main_num_blocks = transaction->num_blocks;
 	transaction->sub_num_blocks = 0;
 
 	return FSSH_B_OK;
@@ -1015,8 +1026,9 @@ fssh_cache_remove_transaction_listener(void *_cache, int32_t id,
 
 
 fssh_status_t
-fssh_cache_next_block_in_transaction(void *_cache, int32_t id, uint32_t *_cookie,
-	fssh_off_t *_blockNumber, void **_data, void **_unchangedData)
+fssh_cache_next_block_in_transaction(void *_cache, int32_t id, bool mainOnly,
+	long *_cookie, fssh_off_t *_blockNumber, void **_data,
+	void **_unchangedData)
 {
 	cached_block *block = (cached_block *)*_cookie;
 	block_cache *cache = (block_cache *)_cache;
@@ -1024,7 +1036,7 @@ fssh_cache_next_block_in_transaction(void *_cache, int32_t id, uint32_t *_cookie
 	BenaphoreLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
-	if (transaction == NULL)
+	if (transaction == NULL || !transaction->open)
 		return FSSH_B_BAD_VALUE;
 
 	if (block == NULL)
@@ -1032,13 +1044,19 @@ fssh_cache_next_block_in_transaction(void *_cache, int32_t id, uint32_t *_cookie
 	else
 		block = block->transaction_next;
 
+	if (mainOnly && transaction->has_sub_transaction) {
+		// find next block that the parent changed
+		while (block != NULL && block->parent_data == NULL)
+			block = block->transaction_next;
+	}
+
 	if (block == NULL)
 		return FSSH_B_ENTRY_NOT_FOUND;
 
 	if (_blockNumber)
 		*_blockNumber = block->block_number;
 	if (_data)
-		*_data = block->current_data;
+		*_data = mainOnly ? block->parent_data : block->current_data;
 	if (_unchangedData)
 		*_unchangedData = block->original_data;
 
@@ -1058,6 +1076,20 @@ fssh_cache_blocks_in_transaction(void *_cache, int32_t id)
 		return FSSH_B_BAD_VALUE;
 
 	return transaction->num_blocks;
+}
+
+
+int32_t
+fssh_cache_blocks_in_main_transaction(void *_cache, int32_t id)
+{
+	block_cache *cache = (block_cache *)_cache;
+	BenaphoreLocker locker(&cache->lock);
+
+	cache_transaction *transaction = lookup_transaction(cache, id);
+	if (transaction == NULL)
+		return FSSH_B_BAD_VALUE;
+
+	return transaction->main_num_blocks;
 }
 
 
@@ -1228,7 +1260,8 @@ fssh_block_cache_get_writable_etc(void *_cache, fssh_off_t blockNumber, fssh_off
 
 
 void *
-fssh_block_cache_get_writable(void *_cache, fssh_off_t blockNumber, int32_t transaction)
+fssh_block_cache_get_writable(void *_cache, fssh_off_t blockNumber,
+	int32_t transaction)
 {
 	return fssh_block_cache_get_writable_etc(_cache, blockNumber,
 		blockNumber, 1, transaction);
@@ -1236,7 +1269,8 @@ fssh_block_cache_get_writable(void *_cache, fssh_off_t blockNumber, int32_t tran
 
 
 void *
-fssh_block_cache_get_empty(void *_cache, fssh_off_t blockNumber, int32_t transaction)
+fssh_block_cache_get_empty(void *_cache, fssh_off_t blockNumber,
+	int32_t transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);
@@ -1247,12 +1281,13 @@ fssh_block_cache_get_empty(void *_cache, fssh_off_t blockNumber, int32_t transac
 		fssh_panic("tried to get empty writable block on a read-only cache!");
 
 	return get_writable_cached_block((block_cache *)_cache, blockNumber,
-				blockNumber, 1, transaction, true);
+		blockNumber, 1, transaction, true);
 }
 
 
 const void *
-fssh_block_cache_get_etc(void *_cache, fssh_off_t blockNumber, fssh_off_t base, fssh_off_t length)
+fssh_block_cache_get_etc(void *_cache, fssh_off_t blockNumber, fssh_off_t base,
+	fssh_off_t length)
 {
 	block_cache *cache = (block_cache *)_cache;
 	BenaphoreLocker locker(&cache->lock);

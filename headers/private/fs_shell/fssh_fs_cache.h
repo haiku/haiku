@@ -45,10 +45,12 @@ extern fssh_status_t	fssh_cache_remove_transaction_listener(void *_cache,
 							int32_t id, fssh_transaction_notification_hook hook,
 							void *data);
 extern fssh_status_t	fssh_cache_next_block_in_transaction(void *_cache,
-							int32_t id, uint32_t *_cookie,
+							int32_t id, bool mainOnly, long *_cookie,
 							fssh_off_t *_blockNumber, void **_data,
 							void **_unchangedData);
 extern int32_t			fssh_cache_blocks_in_transaction(void *_cache,
+							int32_t id);
+extern int32_t			fssh_cache_blocks_in_main_transaction(void *_cache,
 							int32_t id);
 extern int32_t			fssh_cache_blocks_in_sub_transaction(void *_cache,
 							int32_t id);

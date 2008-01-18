@@ -925,7 +925,8 @@ BlockAllocator::StartChecking(check_control *control)
 
 	// initialize bitmap
 	memset(fCheckBitmap, 0, size);
-	for (int32 block = fVolume->Log().Start() + fVolume->Log().Length(); block-- > 0;) {
+	for (int32 block = fVolume->Log().Start() + fVolume->Log().Length();
+			block-- > 0;) {
 		_SetCheckBitmapAt(block);
 	}
 
@@ -979,7 +980,8 @@ BlockAllocator::StopChecking(check_control *control)
 			}
 		}
 
-		control->stats.freed = fVolume->UsedBlocks() - usedBlocks + control->stats.missing;
+		control->stats.freed = fVolume->UsedBlocks() - usedBlocks
+			+ control->stats.missing;
 		if (control->stats.freed < 0)
 			control->stats.freed = 0;
 

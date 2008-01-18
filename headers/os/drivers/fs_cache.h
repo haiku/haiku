@@ -39,9 +39,10 @@ extern status_t cache_add_transaction_listener(void *_cache, int32 id,
 extern status_t cache_remove_transaction_listener(void *_cache, int32 id,
 					transaction_notification_hook hook, void *data);
 extern status_t cache_next_block_in_transaction(void *_cache, int32 id,
-					uint32 *_cookie, off_t *_blockNumber, void **_data,
-					void **_unchangedData);
+					bool mainOnly, long *_cookie, off_t *_blockNumber,
+					void **_data, void **_unchangedData);
 extern int32 cache_blocks_in_transaction(void *_cache, int32 id);
+extern int32 cache_blocks_in_main_transaction(void *_cache, int32 id);
 extern int32 cache_blocks_in_sub_transaction(void *_cache, int32 id);
 
 /* block cache */

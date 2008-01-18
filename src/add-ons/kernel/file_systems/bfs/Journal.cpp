@@ -296,13 +296,11 @@ Journal::Journal(Volume *volume)
 	fLock("bfs journal"),
 	fOwner(NULL),
 	fLogSize(volume->Log().Length()),
-	fMaxTransactionSize(fLogSize / 4 - 5),
+	fMaxTransactionSize(fLogSize / 2 - 5),
 	fUsed(0),
 	fUnwrittenTransactions(0),
 	fHasSubtransaction(false)
 {
-	if (fMaxTransactionSize > fLogSize / 2)
-		fMaxTransactionSize = fLogSize / 2 - 5;
 }
 
 
@@ -505,13 +503,37 @@ Journal::_BlockNotify(int32 transactionID, int32 event, void *arg)
 }
 
 
+/*!	Writes the blocks that are part of current transaction into the log,
+	and ends the current transaction.
+	If the current transaction is too large to fit into the log, it will
+	try to detach an existing sub-transaction.
+*/
 status_t
 Journal::_WriteTransactionToLog()
 {
 	// ToDo: in case of a failure, we need a backup plan like writing all
-	//	changed blocks back to disk immediately
+	//	changed blocks back to disk immediately (hello disk corruption!)
 
-	fUnwrittenTransactions = 0;
+	bool detached = false;
+
+	if (_TransactionSize() > fLogSize) {
+		// The current transaction won't fit into the log anymore, try to
+		// detach the current sub-transaction
+		if (_HasSubTransaction() && cache_blocks_in_main_transaction(
+				fVolume->BlockCache(), fTransactionID) < (int32)fLogSize) {
+			detached = true;
+		} else {
+			// TODO: what are our options here?
+			// a) abort the transaction - bad, because all changes are lost
+			// b) carry out the changes, but don't use the log - even worse,
+			//    as it potentially creates a corrupted disk.
+			panic("transaction too large (%ld blocks, %ld main, log size %ld)!\n",
+				(long)_TransactionSize(), cache_blocks_in_main_transaction(
+				fVolume->BlockCache(), fTransactionID), (long)fLogSize);
+			return B_BUFFER_OVERFLOW;
+		}
+	}
+
 	fHasSubtransaction = false;
 
 	int32 blockShift = fVolume->BlockShift();
@@ -524,10 +546,11 @@ Journal::_WriteTransactionToLog()
 
 	RunArrays runArrays(this);
 
-	uint32 cookie = 0;
 	off_t blockNumber;
+	long cookie = 0;
 	while (cache_next_block_in_transaction(fVolume->BlockCache(),
-			fTransactionID, &cookie, &blockNumber, NULL, NULL) == B_OK) {
+			fTransactionID, detached, &cookie, &blockNumber, NULL,
+			NULL) == B_OK) {
 		status = runArrays.Insert(blockNumber);
 		if (status < B_OK) {
 			FATAL(("filling log entry failed!"));
@@ -537,7 +560,15 @@ Journal::_WriteTransactionToLog()
 
 	if (runArrays.Length() == 0) {
 		// nothing has changed during this transaction
-		cache_end_transaction(fVolume->BlockCache(), fTransactionID, NULL, NULL);
+		if (detached) {
+			fTransactionID = cache_detach_sub_transaction(fVolume->BlockCache(),
+				fTransactionID, NULL, NULL);
+			fUnwrittenTransactions = 1;
+		} else {
+			cache_end_transaction(fVolume->BlockCache(), fTransactionID, NULL,
+				NULL);
+			fUnwrittenTransactions = 0;
+		}
 		return B_OK;
 	}
 
@@ -595,17 +626,12 @@ Journal::_WriteTransactionToLog()
 				}
 
 				// make blocks available in the cache
-				const void *data;
-				if (j == 0) {
-					data = block_cache_get_etc(fVolume->BlockCache(),
-						blockNumber, blockNumber, run.Length());
-				} else {
-					data = block_cache_get(fVolume->BlockCache(),
-						blockNumber + j);
-				}
-
-				if (data == NULL)
+				const void *data = block_cache_get(fVolume->BlockCache(),
+					blockNumber + j);
+				if (data == NULL) {
+					free(vecs);
 					return B_IO_ERROR;
+				}
 
 				add_to_iovec(vecs, index, maxVecs, data, fVolume->BlockSize());
 				count++;
@@ -630,6 +656,8 @@ Journal::_WriteTransactionToLog()
 			}
 		}
 	}
+
+	free(vecs);
 
 	LogEntry *logEntry = new LogEntry(this, fVolume->LogEnd(),
 		runArrays.Length());
@@ -659,8 +687,15 @@ Journal::_WriteTransactionToLog()
 	fUsed += logEntry->Length();
 	fEntriesLock.Unlock();
 
-	cache_end_transaction(fVolume->BlockCache(), fTransactionID, _BlockNotify,
-		logEntry);
+	if (detached) {
+		fTransactionID = cache_detach_sub_transaction(fVolume->BlockCache(),
+			fTransactionID, _BlockNotify, logEntry);
+		fUnwrittenTransactions = 1;
+	} else {
+		cache_end_transaction(fVolume->BlockCache(), fTransactionID,
+			_BlockNotify, logEntry);
+		fUnwrittenTransactions = 0;
+	}
 
 	// If the log goes to the next round (the log is written as a
 	// circular buffer), all blocks will be flushed out which is
@@ -784,6 +819,11 @@ Journal::_TransactionDone(bool success)
 		return B_OK;
 	}
 
+	// If necessary, flush the log, so that we have enough space for this
+	// transaction
+	if (_TransactionSize() > FreeLogBlocks())
+		cache_sync_transaction(fVolume->BlockCache(), fTransactionID);
+
 	// Up to a maximum size, we will just batch several
 	// transactions together to improve speed
 	if (_TransactionSize() < fMaxTransactionSize) {
@@ -792,51 +832,6 @@ Journal::_TransactionDone(bool success)
 	}
 
 	return _WriteTransactionToLog();
-}
-
-
-status_t
-Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
-{
-	panic("LogBlocks() called!\n");
-#if 0
-	// ToDo: that's for now - we should change the log file size here
-	if (TransactionSize() + numBlocks + 1 > fLogSize)
-		return B_DEVICE_FULL;
-
-	int32 blockSize = fVolume->BlockSize();
-
-	for (;numBlocks-- > 0; blockNumber++, buffer += blockSize) {
-		if (fArray.Find(blockNumber) >= 0) {
-			// The block is already in the log, so just update its data
-			// Note, this is only necessary if this method is called with a buffer
-			// different from the cached block buffer - which is unlikely but
-			// we'll make sure this way (costs one cache lookup, though).
-			// ToDo:
-/*			status_t status = cached_write(fVolume->Device(), blockNumber, buffer, 1, blockSize);
-			if (status < B_OK)
-				return status;
-*/
-			continue;
-		}
-
-		// Insert the block into the transaction's array, and write the changes
-		// back into the locked cache buffer
-		fArray.Insert(blockNumber);
-
-		// ToDo:
-/*		status_t status = cached_write_locked(fVolume->Device(), blockNumber, buffer, 1, blockSize);
-		if (status < B_OK)
-			return status;
-*/	}
-
-	// ToDo:
-	// If necessary, flush the log, so that we have enough space for this transaction
-/*	if (TransactionSize() > FreeLogBlocks())
-		force_cache_flush(fVolume->Device(), true);
-*/
-#endif
-	return B_OK;
 }
 
 

@@ -805,6 +805,7 @@
 #define cache_remove_transaction_listener fssh_cache_remove_transaction_listener
 #define cache_next_block_in_transaction	fssh_cache_next_block_in_transaction
 #define cache_blocks_in_transaction		fssh_cache_blocks_in_transaction
+#define cache_blocks_in_main_transaction fssh_cache_blocks_in_main_transaction
 #define cache_blocks_in_sub_transaction	fssh_cache_blocks_in_sub_transaction
 
 /* block cache */
