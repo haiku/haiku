@@ -337,6 +337,27 @@ class PreSyscall : public AbstractTraceEntry {
 			if (syscall < (uint32)kSyscallCount) {
 				fParameters = alloc_tracing_buffer_memcpy(parameters,
 					kSyscallInfos[syscall].parameter_size, false);
+
+				// copy string parameters, if any
+				if (fParameters != NULL) {
+					int32 stringIndex = 0;
+					const syscall_parameters_info& paramsInfo
+						= kSyscallParametersInfos[fSyscall];
+					for (int i = 0; i < paramsInfo.parameter_count; i++) {
+						const syscall_parameter_info& paramInfo
+							= paramsInfo.parameters[i];
+						if (paramInfo.type != B_STRING_TYPE)
+							continue;
+
+						const uint8* data
+							= (uint8*)fParameters + paramInfo.offset;
+						if (stringIndex < MAX_PARAM_STRINGS) {
+							fParameterStrings[stringIndex++]
+								= alloc_tracing_buffer_strcpy(
+									*(const char**)data, 64, true);
+						}
+					}
+				}
 			}
 
 			Initialized();
@@ -352,21 +373,50 @@ class PreSyscall : public AbstractTraceEntry {
 			size -= bytesPrinted;
 
 			if (fParameters != NULL) {
-				uint32* params = (uint32*)fParameters;
-				int32 paramSize = kSyscallInfos[fSyscall].parameter_size;
-				bool first = true;
-				while (paramSize >= 4 && size > 0) {
-					if (first) {
-						snprintf(buffer, size, "0x%lx", *params);
-						first = false;
-					} else
-						snprintf(buffer, size, ", 0x%lx", *params);
+				int32 stringIndex = 0;
+				const syscall_parameters_info& paramsInfo
+					= kSyscallParametersInfos[fSyscall];
+				for (int i = 0; i < paramsInfo.parameter_count; i++) {
+					const syscall_parameter_info& paramInfo
+						= paramsInfo.parameters[i];
+					const uint8* data = (uint8*)fParameters + paramInfo.offset;
+					uint64 value = 0;
+					bool printValue = true;
+					switch (paramInfo.type) {
+						case B_INT8_TYPE:
+							value = *(uint8*)data;
+							break;
+						case B_INT16_TYPE:
+							value = *(uint16*)data;
+							break;
+						case B_INT32_TYPE:
+							value = *(uint32*)data;
+							break;
+						case B_INT64_TYPE:
+							value = *(uint64*)data;
+							break;
+						case B_POINTER_TYPE:
+							value = (uint64)*(void**)data;
+							break;
+						case B_STRING_TYPE:
+							if (stringIndex < MAX_PARAM_STRINGS) {
+								snprintf(buffer, size, "%s\"%s\"",
+									(i == 0 ? "" : ", "),
+									fParameterStrings[stringIndex++]);
+								printValue = false;
+							} else
+								value = (uint64)*(void**)data;
+							break;
+					}
+
+					if (printValue) {
+						snprintf(buffer, size, "%s0x%llx", (i == 0 ? "" : ", "),
+							value);
+					}
 
 					bytesPrinted = strlen(buffer);
 					buffer += bytesPrinted;
 					size -= bytesPrinted;
-					params++;
-					paramSize -= 4;
 				}
 			}
 
@@ -374,8 +424,11 @@ class PreSyscall : public AbstractTraceEntry {
 		}
 
 	private:
-		uint32	fSyscall;
-		void*	fParameters;
+		enum { MAX_PARAM_STRINGS = 3 };
+
+		uint32		fSyscall;
+		void*		fParameters;
+		const char*	fParameterStrings[MAX_PARAM_STRINGS];
 };
 
 
