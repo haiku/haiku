@@ -35,6 +35,7 @@ static trace_entry* sBuffer;
 static trace_entry* sBufferStart;
 static trace_entry* sBufferEnd;
 static uint32 sEntries;
+static uint32 sWritten;
 static spinlock sLock;
 
 
@@ -166,6 +167,7 @@ TraceEntry::Initialized()
 {
 #if ENABLE_TRACING
 	flags |= ENTRY_INITIALIZED;
+	sWritten++;
 #endif
 }
 
@@ -259,8 +261,8 @@ dump_tracing(int argc, char** argv)
 		dumped++;
 	}
 
-	kprintf("entries %ld to %ld (%ld of %ld).\n", start, start + count - 1,
-		dumped, sEntries);
+	kprintf("entries %ld to %ld (%ld of %ld). %ld entries written\n", start,
+		start + count - 1, dumped, sEntries, sWritten);
 
 	set_debug_variable("_tracingStart", start);
 	set_debug_variable("_tracingCount", count);
@@ -275,7 +277,7 @@ dump_tracing(int argc, char** argv)
 extern "C" uint8*
 alloc_tracing_buffer(size_t size)
 {
-	if (size == 0)
+	if (size == 0 || size >= 65532)
 		return NULL;
 
 #if	ENABLE_TRACING
