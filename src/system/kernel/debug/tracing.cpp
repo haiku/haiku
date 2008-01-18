@@ -10,6 +10,7 @@
 #include <stdlib.h>
 
 #include <debug.h>
+#include <kernel.h>
 #include <util/AutoLock.h>
 
 
@@ -296,6 +297,9 @@ alloc_tracing_buffer(size_t size)
 uint8*
 alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user)
 {
+	if (user && !IS_USER_ADDRESS(source))
+		return NULL;
+
 	uint8* buffer = alloc_tracing_buffer(size);
 	if (buffer == NULL)
 		return NULL;
@@ -313,12 +317,20 @@ alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user)
 char*
 alloc_tracing_buffer_strcpy(const char* source, size_t maxSize, bool user)
 {
-	if (maxSize == 0)
+	if (source == NULL || maxSize == 0)
 		return NULL;
 
-	// there's no user_strnlen(), so always allocate the full buffer size
-	// in this case
-	if (!user)
+	if (user && !IS_USER_ADDRESS(source))
+		return NULL;
+
+	// limit maxSize to the actual source string len
+	if (user) {
+		ssize_t size = user_strlcpy(NULL, source, 0);
+			// there's no user_strnlen()
+		if (size < 0)
+			return 0;
+		maxSize = min_c(maxSize, (size_t)size + 1);
+	} else
 		maxSize = strnlen(source, maxSize - 1) + 1;
 
 	char* buffer = (char*)alloc_tracing_buffer(maxSize);
