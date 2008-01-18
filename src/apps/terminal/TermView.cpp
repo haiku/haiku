@@ -231,9 +231,9 @@ TermView::TermView(BMessage *archive)
 	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
 	if (archive->FindInt32("columns", (int32 *)&fTermColumns) < B_OK)
-		fTermColumns = 80;
+		fTermColumns = COLUMNS_DEFAULT;
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
-		fTermRows = 25;
+		fTermRows = ROWS_DEFAULT;
 	
 	// TODO: Retrieve arguments, colors, history size, etc. from archive
 	_InitObject(0, NULL);
@@ -243,8 +243,6 @@ TermView::TermView(BMessage *archive)
 status_t
 TermView::_InitObject(int32 argc, const char **argv)
 {
-	SetTermFont(be_fixed_font);
-
 	fTextBuffer = new (std::nothrow) TermBuffer(fTermRows, fTermColumns, fScrBufSize);
 	if (fTextBuffer == NULL)
 		return B_NO_MEMORY;
@@ -253,19 +251,20 @@ TermView::_InitObject(int32 argc, const char **argv)
 	if (fShell == NULL)
 		return B_NO_MEMORY;
 	
+	SetTermFont(be_fixed_font);
+	SetTermSize(fTermRows, fTermColumns, false);
+	//SetIMAware(false);
+	
 	status_t status = fShell->Open(fTermRows, fTermColumns,
 					longname2shortname(id2longname(fEncoding)), argc, argv);
 	
 	if (status < B_OK)
 		return status;
-
+		
 	status = _AttachShell(fShell);
 	if (status < B_OK)
 		return status;
-
-	SetTermSize(fTermRows, fTermColumns, false);
-	//SetIMAware(false);
-	
+		
 	return B_OK;
 }
 
@@ -314,9 +313,9 @@ void
 TermView::GetPreferredSize(float *width, float *height)
 {
 	if (width)
-		*width = fTermColumns * fFontWidth;
+		*width = fTermColumns * fFontWidth - 1;
 	if (height)
-		*height = fTermRows * fFontHeight;
+		*height = fTermRows * fFontHeight - 1;
 }
 
 
@@ -549,7 +548,6 @@ TermView::Clear()
 	
 	if (LockLooper()) {
 		SetHighColor(fTextBackColor);
-		
 		FillRect(Bounds());
 		SetHighColor(fTextForeColor);
 		UnlockLooper();

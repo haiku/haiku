@@ -366,10 +366,9 @@ TermWindow::MessageReceived(BMessage *message)
 			BFont font;
 			_GetPreferredFont(font);			
 			_ActiveTermView()->SetTermFont(&font);
-			BRect rect = _ActiveTermView()->SetTermSize(0, 0, 0);
-			
-			int width, height;
-			_ActiveTermView()->GetFontSize(&width, &height);
+				
+			int fontWidth, fontHeight;
+			_ActiveTermView()->GetFontSize(&fontWidth, &fontHeight);
 			
 			float minimumHeight = 0;
 			if (fMenubar)
@@ -377,12 +376,15 @@ TermWindow::MessageReceived(BMessage *message)
 			if (fTabView && fTabView->CountTabs() > 1)
 				minimumHeight += fTabView->TabHeight();
 			
-			SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
-							minimumHeight + MIN_ROWS * height, 
-							minimumHeight + MAX_ROWS * height);
+			SetSizeLimits(MIN_COLS * fontWidth, MAX_COLS * fontWidth,
+							minimumHeight + MIN_ROWS * fontHeight, 
+							minimumHeight + MAX_ROWS * fontHeight);
 			
-			ResizeTo(rect.Width() + B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
-				rect.Height() +fMenubar->Bounds().Height() + kViewOffset * 2);
+			float width, height;
+			_ActiveTermView()->GetPreferredSize(&width, &height);
+			width += B_V_SCROLL_BAR_WIDTH + kViewOffset * 2;
+			height += fMenubar->Bounds().Height() + kViewOffset * 2;
+			ResizeTo(width, height);
 			
 			_ActiveTermView()->Invalidate();
 			break;
