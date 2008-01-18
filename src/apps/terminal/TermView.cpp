@@ -565,7 +565,7 @@ TermView::Clear()
 
 //! Print one character
 void
-TermView::PutChar(uchar *string, ushort attr)
+TermView::Insert(uchar *string, ushort attr)
 {
 	int width = CodeConv::UTF8GetFontWidth((char*)string);	
 	if (width == FULL_WIDTH)
@@ -597,7 +597,7 @@ TermView::PutChar(uchar *string, ushort attr)
 
 //! Print a CR and move the cursor
 void
-TermView::PutCR()
+TermView::InsertCR()
 {
 	UpdateLine();
 	fTextBuffer->WriteCR(fCurPos);
@@ -607,7 +607,7 @@ TermView::PutCR()
 
 //! Print a LF and move the cursor
 void
-TermView::PutLF()
+TermView::InsertLF()
 {
 	UpdateLine();
 
@@ -629,7 +629,7 @@ TermView::PutLF()
 
 //! Print a NL and move the cursor
 void
-TermView::PutNL(int num)
+TermView::InsertNewLine(int num)
 {
 	ScrollRegion(fCurPos.y, -1, SCRDOWN, num);
 }
@@ -858,8 +858,8 @@ TermView::MoveCurRight(int num)
 	if (fCurPos.x + num >= fTermColumns) {
 		// Wrap around
 		fCurPos.x = 0;
-		PutCR();
-		PutLF();
+		InsertCR();
+		InsertLF();
 	} else
 		fCurPos.x += num;
 }
@@ -2181,15 +2181,6 @@ TermView::GetFrameSize(float *width, float *height)
 	}
 	
 	*height = fTop + fTermRows * fFontHeight;
-}
-
-
-// Sets terninal rows and cols.
-void
-TermView::GetFontInfo(int *width, int *height)
-{
-	 *width = fFontWidth;
-	 *height = fFontHeight;
 }
 
 

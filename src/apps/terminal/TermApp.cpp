@@ -32,7 +32,7 @@
 
 
 static bool sUsageRequested = false;
-static bool sGeometryRequested = false;
+//static bool sGeometryRequested = false;
 
 
 const ulong MSG_ACTIVATE_TERM = 'msat';

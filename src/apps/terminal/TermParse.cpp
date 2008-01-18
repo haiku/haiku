@@ -349,7 +349,7 @@ TermParse::EscParse()
 			case CASE_PRINT:
 				cbuf[0] = c;
 				cbuf[1] = '\0';
-				fView->PutChar(cbuf, attr);
+				fView->Insert(cbuf, attr);
 				break;
 
 			case CASE_PRINT_GR:
@@ -390,7 +390,7 @@ TermParse::EscParse()
 				else
 					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, B_EUC_CONVERSION);
 
-				fView->PutChar(dstbuf, attr);
+				fView->Insert(dstbuf, attr);
 				break;
 
 			case CASE_PRINT_CS96:
@@ -399,22 +399,22 @@ TermParse::EscParse()
 				cbuf[1] |= 0x80;
 				cbuf[2] = 0;
 				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, B_EUC_CONVERSION);
-				fView->PutChar(dstbuf, attr);
+				fView->Insert(dstbuf, attr);
 				break;
 
 			case CASE_LF:
-				fView->PutLF();
+				fView->InsertLF();
 				break;
 
 			case CASE_CR:
-				fView->PutCR();
+				fView->InsertCR();
 				break;
 
 			case CASE_SJIS_KANA:
 				cbuf[0] = (uchar)c;
 				cbuf[1] = '\0';
 				CodeConv::ConvertToInternal((char*)cbuf, 1, (char*)dstbuf, now_coding);
-				fView->PutChar(dstbuf, attr);
+				fView->Insert(dstbuf, attr);
 				break;
 
 			case CASE_SJIS_INSTRING:
@@ -422,7 +422,7 @@ TermParse::EscParse()
 				GetReaderBuf(cbuf[1]);
 				cbuf[2] = '\0';
 				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, now_coding);
-				fView->PutChar(dstbuf, attr);
+				fView->Insert(dstbuf, attr);
 				break;
 
 			case CASE_UTF8_2BYTE:
@@ -433,7 +433,7 @@ TermParse::EscParse()
 				cbuf[1] = (uchar)c;
 				cbuf[2] = '\0';
 				
-				fView->PutChar(cbuf, attr);
+				fView->Insert(cbuf, attr);
 				break;
 
 			case CASE_UTF8_3BYTE:
@@ -448,7 +448,7 @@ TermParse::EscParse()
 					break;
 				cbuf[2] = c;
 				cbuf[3] = '\0';
-				fView->PutChar(cbuf, attr);
+				fView->Insert(cbuf, attr);
 				break;
 
 			case CASE_MBCS:
@@ -622,7 +622,7 @@ TermParse::EscParse()
 				/* IL */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->PutNL(row);
+				fView->InsertNewLine(row);
 				parsestate = groundtable;
 				break;
 

@@ -65,10 +65,10 @@ public:
 	void	Clear();	
 	
 	// Output Charactor
-	void	PutChar(uchar *string, ushort attr);
-	void	PutCR(void);
-	void	PutLF(void);
-	void	PutNL(int num);
+	void	Insert(uchar *string, ushort attr);
+	void	InsertCR();
+	void	InsertLF();
+	void	InsertNewLine(int num);
 	void	SetInsertMode(int flag);
 	void	InsertSpace(int num);
 	
@@ -111,7 +111,6 @@ public:
 	void	ScrollScreen();
 	void	ScrollScreenDraw();
 	void	GetFrameSize(float *width, float *height);
-	void	GetFontInfo(int *, int*);
 	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
 	void	GetSelection(BString &str);
 
@@ -141,7 +140,6 @@ protected:
 
 private:
 	status_t _InitObject(int32 argc, const char **argv);
-	status_t _InitMouseThread();
 
 	status_t _AttachShell(Shell *shell);
 	void _DetachShell();
@@ -166,10 +164,8 @@ private:
 	//  void _DoIMChange (BMessage* message);
 	//  void _DoIMLocation (BMessage* message);
 	//  void _DoIMConfirm (void);
-	void _ConfirmString(const char *, int32);
-	int32 _GetCharFromUTF8String(const char *, char *);
-	int32 _GetWidthFromUTF8String(const char *);
-
+	//	void _ConfirmString(const char *, int32);
+	
 	// Mouse select
 	void _Select(CurPos start, CurPos end);
 	void _AddSelectRegion(CurPos);
@@ -192,6 +188,7 @@ private:
 
 	static void _FixFontAttributes(BFont &font);
 	
+private:
 	Shell *fShell;
 
 	BMessageRunner *fWinchRunner;
@@ -205,10 +202,10 @@ private:
 
 	// Flags
 
-	// Update flag (Set on PutChar).
+	// Update flag (Set on Insert).
 	bool fUpdateFlag;
 
-	// Terminal insertmode flag (use PutChar).
+	// Terminal insertmode flag (use Insert).
 	bool fInsertModeFlag;
 
 	// Scroll count, range.
@@ -242,12 +239,10 @@ private:
 	int fTop;
 
 	// Object pointer.
-
 	TermBuffer	*fTextBuffer;
 	BScrollBar	*fScrollBar;
 
 	// Color and Attribute.
-
 	rgb_color fTextForeColor, fTextBackColor;
 	rgb_color fCursorForeColor, fCursorBackColor;
 	rgb_color fSelectForeColor, fSelectBackColor;
