@@ -212,7 +212,7 @@ dump_tracing(int argc, char** argv)
 		start = parse_expression(argv[1]);
 		count = parse_expression(argv[2]);
 	} else if (argc > 3) {
-		kprintf("usage: %s [start] [count] [#pattern]\n", argv[0]);
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
