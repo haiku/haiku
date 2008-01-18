@@ -7,6 +7,7 @@
 
 #include <tracing.h>
 
+#include <stdarg.h>
 #include <stdlib.h>
 
 #include <debug.h>
@@ -140,6 +141,30 @@ allocate_entry(size_t size, uint16 flags)
 #endif	// ENABLE_TRACING
 
 
+// #pragma mark -
+
+
+TraceOutput::TraceOutput(char* buffer, size_t bufferSize)
+	: fBuffer(buffer),
+	  fCapacity(bufferSize),
+	  fSize(0)
+{
+}
+
+
+void
+TraceOutput::Print(const char* format,...)
+{
+	if (IsFull())
+		return;
+
+	va_list args;
+	va_start(args, format);
+	fSize += vsnprintf(fBuffer + fSize, fCapacity - fSize, format, args);
+	va_end(args);
+}
+
+
 //	#pragma mark -
 
 
@@ -157,8 +182,8 @@ void
 TraceEntry::Dump(char* buffer, size_t bufferSize)
 {
 #if ENABLE_TRACING
-	// to be overloaded by subclasses
-	snprintf(buffer, bufferSize, "ENTRY %p", this);
+	// to be overridden by subclasses
+	kprintf(buffer, bufferSize, "ENTRY %p", this);
 #endif
 }
 
@@ -181,6 +206,37 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 #else
 	return NULL;
 #endif
+}
+
+
+//	#pragma mark -
+
+
+AbstractTraceEntry::~AbstractTraceEntry()
+{
+}
+
+
+void
+AbstractTraceEntry::Dump(char* buffer, size_t bufferSize)
+{
+	int length = snprintf(buffer, bufferSize, "[%6ld] %Ld: ",
+		fThread, fTime);
+	AddDump(buffer + length, bufferSize - length);
+}
+
+
+void
+AbstractTraceEntry::AddDump(char* buffer, size_t bufferSize)
+{
+	TraceOutput out(buffer, bufferSize);
+	AddDump(out);
+}
+
+
+void
+AbstractTraceEntry::AddDump(TraceOutput& out)
+{
 }
 
 

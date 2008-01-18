@@ -20,6 +20,19 @@ struct trace_entry {
 
 #include <new>
 
+class TraceOutput {
+	public:
+		TraceOutput(char* buffer, size_t bufferSize);
+
+		void Print(const char* format,...);
+		bool IsFull() const	{ return fSize >= fCapacity; }
+
+	private:
+		char*	fBuffer;
+		size_t	fCapacity;
+		size_t	fSize;
+};
+
 class TraceEntry : trace_entry {
 	public:
 		TraceEntry();
@@ -44,16 +57,12 @@ class AbstractTraceEntry : public TraceEntry {
 		{
 		}
 
-		virtual void Dump(char* buffer, size_t bufferSize)
-		{
-			int length = snprintf(buffer, bufferSize, "[%6ld] %Ld: ",
-				fThread, fTime);
-			AddDump(buffer + length, bufferSize - length);
-		}
+		virtual ~AbstractTraceEntry();
 
-		virtual void AddDump(char* buffer, size_t bufferSize)
-		{
-		}
+		virtual void Dump(char* buffer, size_t bufferSize);
+
+		virtual void AddDump(char* buffer, size_t bufferSize);
+		virtual void AddDump(TraceOutput& out);
 
 		thread_id Thread() const { return fThread; }
 		bigtime_t Time() const { return fTime; }
