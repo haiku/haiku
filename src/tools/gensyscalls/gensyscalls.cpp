@@ -396,7 +396,7 @@ public:
 				paramSize = parameter->Offset() + parameter->UsedSize();
 
 			// output the info for the syscall
-			file << "\t{ " << syscall->KernelName() << ", "
+			file << "\t{ (void *)" << syscall->KernelName() << ", "
 				<< paramSize << " }," << endl;
 		}
 
