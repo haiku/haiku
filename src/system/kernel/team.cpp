@@ -45,8 +45,6 @@
 #	define TRACE(x) ;
 #endif
 
-//#define TEAM_TRACING
-
 
 struct team_key {
 	team_id id;

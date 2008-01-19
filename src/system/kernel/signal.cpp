@@ -33,7 +33,6 @@
 #	define TRACE(x) ;
 #endif
 
-//#define SIGNAL_TRACING
 
 #define BLOCKABLE_SIGNALS		(~(KILL_SIGNALS | SIGNAL_TO_MASK(SIGSTOP)))
 #define STOP_SIGNALS \

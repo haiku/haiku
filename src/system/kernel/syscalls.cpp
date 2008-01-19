@@ -39,9 +39,6 @@
 #include <string.h>
 
 
-//#define SYSCALL_TRACING
-
-
 typedef struct generic_syscall generic_syscall;
 
 struct generic_syscall {

@@ -12,14 +12,12 @@
 #include <arch/x86/descriptors.h>
 #include <commpage.h>
 #include <thread_types.h>
+#include <tracing_config.h>
 
 #include "asm_offsets.h"
 #include "syscall_numbers.h"
 #include "syscall_table.h"
 
-
-//#define SYSCALL_TRACING
-	// also define this macro in syscalls.cpp
 
 #define FUNCTION(x) .global x; .type x,@function; x
 

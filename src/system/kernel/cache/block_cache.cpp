@@ -42,7 +42,6 @@
 
 #define DEBUG_BLOCK_CACHE
 //#define DEBUG_CHANGED
-//#define TRANSACTION_TRACING
 
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
@@ -73,7 +72,7 @@ struct cache_transaction {
 	bool			has_sub_transaction;
 };
 
-#ifdef TRANSACTION_TRACING
+#ifdef BLOCK_CACHE_TRANSACTION_TRACING
 namespace TransactionTracing {
 
 class Action : public AbstractTraceEntry {
