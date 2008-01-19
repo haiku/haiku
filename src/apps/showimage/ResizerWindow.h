@@ -23,7 +23,7 @@ class BTextControl;
 
 
 class ResizerWindow : public BWindow {
-   public:			
+	public:			
 						ResizerWindow(BMessenger target, int32 width, int32 height );
 
 		virtual void	MessageReceived(BMessage* msg);
@@ -39,7 +39,7 @@ class ResizerWindow : public BWindow {
 				// provides the new size of the image in two "int32" fields "width" and "height"
 		};
 
-   private:
+	private:
 		enum {
 			kResolutionMsg = 'Rszr',
 			kWidthModifiedMsg,
@@ -52,15 +52,15 @@ class ResizerWindow : public BWindow {
 		void AddSeparatorLine(BView* parent, BRect& rect);
 		void LeftAlign(BControl* control);
 
-   		BTextControl*	fWidth;
-   		BTextControl*	fHeight;
-   		BCheckBox*		fAspectRatio;
-   		BButton*		fApply;
-   		// the original size of the image use for aspect ratio calculation
-   		// to avoid rounding errors
-   		int32           fOriginalWidth;
-   		int32           fOriginalHeight;
-   		BMessenger		fTarget;
+		BTextControl*	fWidth;
+		BTextControl*	fHeight;
+		BCheckBox*		fAspectRatio;
+		BButton*		fApply;
+		// the original size of the image use for aspect ratio calculation
+		// to avoid rounding errors
+		int32           fOriginalWidth;
+		int32           fOriginalHeight;
+		BMessenger		fTarget;
 };
 
 #endif	// _RESIZER_WINDOW_H

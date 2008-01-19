@@ -104,7 +104,7 @@ BackgroundImage::_NotifyTracker(BDirectory& directory, bool desktop)
 			if (reply.FindMessenger("result", &trackerWindow) != B_OK)
 				continue;
 
-          		// found a window with poses, ask for its path
+			// found a window with poses, ask for its path
 			msg.MakeEmpty();
 			msg.what = B_GET_PROPERTY;
 			msg.AddSpecifier("Path");
@@ -114,7 +114,7 @@ BackgroundImage::_NotifyTracker(BDirectory& directory, bool desktop)
 			reply.MakeEmpty();
 			tracker.SendMessage(&msg, &reply);
 
-          		// go on with the next if this din't have a path
+			// go on with the next if this din't have a path
 			if (reply.what == B_MESSAGE_NOT_UNDERSTOOD)
 				continue;
 

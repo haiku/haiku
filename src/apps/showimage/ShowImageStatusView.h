@@ -42,7 +42,7 @@ public:
 	void SetText(BString &text);
 	
 private:
-    BString fText;
+	BString fText;
 };
 
 #endif /* _ShowImageStatusView_h */

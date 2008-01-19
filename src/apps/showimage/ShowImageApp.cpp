@@ -179,9 +179,9 @@ ShowImageApp::RefsReceived(BMessage *message)
 
 	entry_ref ref;
 	for (int32 i = 0; i < count; i++) {
-   		if (message->FindRef("refs", i, &ref) == B_OK)
-   			Open(&ref);
-   	}
+		if (message->FindRef("refs", i, &ref) == B_OK)
+			Open(&ref);
+	}
 }
 
 
