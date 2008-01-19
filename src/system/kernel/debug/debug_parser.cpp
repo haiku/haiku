@@ -251,7 +251,7 @@ public:
 				fCurrentChar++;
 				while (*fCurrentChar != 0
 					&& (isdigit(*fCurrentChar)
-						|| strchr("abcdeABCDE", *fCurrentChar))) {
+						|| strchr("abcdefABCDEF", *fCurrentChar))) {
 					fCurrentChar++;
 				}
 
