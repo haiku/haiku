@@ -26,7 +26,11 @@ image_id load_kernel_add_on(const char *path);
 status_t unload_kernel_add_on(image_id id);
 
 status_t elf_debug_lookup_symbol_address(addr_t address, addr_t *_baseAddress,
-			const char **_symbolName, const char **_imageName, bool *_exactMatch);
+			const char **_symbolName, const char **_imageName,
+			bool *_exactMatch);
+status_t elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
+			addr_t *_baseAddress, const char **_symbolName,
+			const char **_imageName, bool *_exactMatch);
 status_t elf_init(struct kernel_args *args);
 
 #ifdef __cplusplus

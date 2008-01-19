@@ -75,6 +75,32 @@ error:
 }
 
 
+static status_t
+lookup_symbol(struct thread* thread, addr_t address, addr_t *_baseAddress,
+	const char **_symbolName, const char **_imageName, bool *_exactMatch)
+{
+	status_t status = B_ENTRY_NOT_FOUND;
+
+	if (IS_KERNEL_ADDRESS(address)) {
+		// a kernel symbol
+		status = elf_debug_lookup_symbol_address(address, _baseAddress,
+			_symbolName, _imageName, _exactMatch);
+	} else if (thread != NULL && thread->team != NULL) {
+		// try a lookup using the userland runtime loader structures
+		status = elf_debug_lookup_user_symbol_address(thread->team, address,
+			_baseAddress, _symbolName, _imageName, _exactMatch);
+
+		if (status != B_OK) {
+			// try to locate the image in the images loaded into user space
+			status = image_debug_lookup_user_symbol_address(thread->team,
+				address, _baseAddress, _symbolName, _imageName, _exactMatch);
+		}
+	}
+
+	return status;
+}
+
+
 static void
 print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
 {
@@ -90,13 +116,8 @@ print_stack_frame(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp)
 	if (diff & 0x80000000)
 		diff = 0;
 
-	status = elf_debug_lookup_symbol_address(eip, &baseAddress, &symbol,
-		&image, &exactMatch);
-	if (status != B_OK) {
-		// try to locate the image in the images loaded into user space
-		status = image_debug_lookup_user_symbol_address(thread->team, eip,
-			&baseAddress, &symbol, &image, &exactMatch);
-	}
+	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
+		&exactMatch);
 
 	kprintf("%08lx (+%4ld) %08lx", ebp, diff, eip);
 
@@ -322,13 +343,8 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, int32 argCount)
 	bool exactMatch;
 	status_t status;
 
-	status = elf_debug_lookup_symbol_address(eip, &baseAddress, &symbol,
-		&image, &exactMatch);
-	if (status != B_OK) {
-		// try to locate the image in the images loaded into user space
-		status = image_debug_lookup_user_symbol_address(thread->team, eip,
-			&baseAddress, &symbol, &image, &exactMatch);
-	}
+	status = lookup_symbol(thread, eip, &baseAddress, &symbol, &image,
+		&exactMatch);
 
 	kprintf("%08lx %08lx", ebp, eip);
 

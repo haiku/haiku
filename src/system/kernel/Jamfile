@@ -11,6 +11,7 @@ SubDir HAIKU_TOP src system kernel ;
 }
 
 UsePrivateHeaders shared ;
+UsePrivateHeaders runtime_loader ;
 
 AddResources kernel_$(TARGET_ARCH) : kernel.rdef ;
 

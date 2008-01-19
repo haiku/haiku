@@ -19,14 +19,17 @@
 #include <ctype.h>
 
 #include <debug.h>
+#include <kernel.h>
 #include <kimage.h>
 #include <syscalls.h>
 #include <team.h>
 #include <thread.h>
+#include <runtime_loader.h>
 #include <util/khash.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_address_space.h>
+#include <vm_types.h>
 
 #include <arch/cpu.h>
 #include <arch/elf.h>
@@ -861,6 +864,207 @@ error1:
 }
 
 
+//	#pragma mark - userland symbol lookup
+
+
+class UserSymbolLookup {
+public:
+	static UserSymbolLookup& Default()
+	{
+		return sLookup;
+	}
+
+	status_t Init(struct team* team)
+	{
+		// find the runtime loader debug area
+		vm_area* area = team->address_space->areas;
+		while (area != NULL) {
+			if (strcmp(area->name, RUNTIME_LOADER_DEBUG_AREA_NAME) == 0)
+				break;
+			area = area->address_space_next;
+		}
+
+		if (area == NULL)
+			return B_ERROR;
+
+		// copy the runtime loader data structure
+		if (!_Read((runtime_loader_debug_area*)area->base, fDebugArea))
+			return B_BAD_ADDRESS;
+
+		return B_OK;
+	}
+
+	status_t LookupSymbolAddress(addr_t address, addr_t *_baseAddress,
+		const char **_symbolName, const char **_imageName, bool *_exactMatch)
+	{
+		// Note, that this function doesn't find all symbols that we would like
+		// to find. E.g. static functions do not appear in the symbol table
+		// as function symbols, but as sections without name and size. The .symtab
+		// section together with the .strtab section, which apparently differ from
+		// the tables referred to by the .dynamic section, also contain proper names
+		// and sizes for those symbols. Therefore, to get completely satisfying
+		// results, we would need to read those tables from the shared object.
+	
+		// get the image for the address
+		image_t image;
+		status_t error = _FindImageAtAddress(address, image);
+		if (error != B_OK)
+			return error;
+
+		strlcpy(fImageName, image.name, sizeof(fImageName));
+
+		// symbol hash table size
+		uint32 hashTabSize;
+		if (!_Read(image.symhash, hashTabSize))
+			return B_BAD_ADDRESS;
+
+		// remote pointers to hash buckets and chains
+		const uint32* hashBuckets = image.symhash + 2;
+		const uint32* hashChains = image.symhash + 2 + hashTabSize;
+
+		const elf_region_t& textRegion = image.regions[0];
+
+		// search the image for the symbol
+		Elf32_Sym symbolFound;
+		addr_t deltaFound = INT_MAX;
+		bool exactMatch = false;
+	
+		for (uint32 i = 0; i < hashTabSize; i++) {
+			uint32 bucket;
+			if (!_Read(&hashBuckets[i], bucket))
+				return B_BAD_ADDRESS;
+
+			for (uint32 j = bucket; j != STN_UNDEF;
+					_Read(&hashChains[j], j) ? 0 : j = STN_UNDEF) {
+	
+				Elf32_Sym symbol;
+				if (!_Read(image.syms + j, symbol))
+					continue;
+	
+				// The symbol table contains not only symbols referring to functions
+				// and data symbols within the shared object, but also referenced
+				// symbols of other shared objects, as well as section and file
+				// references. We ignore everything but function and data symbols
+				// that have an st_value != 0 (0 seems to be an indication for a
+				// symbol defined elsewhere -- couldn't verify that in the specs
+				// though).
+				if ((ELF32_ST_TYPE(symbol.st_info) != STT_FUNC
+						&& ELF32_ST_TYPE(symbol.st_info) != STT_OBJECT)
+					|| symbol.st_value == 0
+					|| symbol.st_value + symbol.st_size + textRegion.delta
+						> textRegion.vmstart + textRegion.size) {
+					continue;
+				}
+	
+				// skip symbols starting after the given address
+				addr_t symbolAddress = symbol.st_value + textRegion.delta;
+				if (symbolAddress > address)
+					continue;
+				addr_t symbolDelta = address - symbolAddress;
+	
+				if (symbolDelta < deltaFound) {
+					deltaFound = symbolDelta;
+					symbolFound = symbol;
+	
+					if (symbolDelta >= 0 && symbolDelta < symbol.st_size) {
+						// exact match
+						exactMatch = true;
+						break;
+					}
+				}
+			}
+		}
+	
+		if (_imageName)
+			*_imageName = fImageName;
+	
+		if (_symbolName) {
+			*_symbolName = NULL;
+
+			if (deltaFound < INT_MAX) {
+				if (_ReadString(image, symbolFound.st_name, fSymbolName,
+						sizeof(fSymbolName))) {
+					*_symbolName = fSymbolName;
+				} else {
+					// we can't get its name, so forget the symbol
+					deltaFound = INT_MAX;
+				}
+			}
+		}
+	
+		if (_baseAddress) {
+			if (deltaFound < INT_MAX)
+				*_baseAddress = symbolFound.st_value + textRegion.delta;
+			else
+				*_baseAddress = textRegion.vmstart;
+		}
+	
+		if (_exactMatch)
+			*_exactMatch = exactMatch;
+	
+		return B_OK;
+	}
+
+
+	status_t _FindImageAtAddress(addr_t address, image_t& image)
+	{
+		image_queue_t imageQueue;
+		if (!_Read(fDebugArea.loaded_images, imageQueue))
+			return B_BAD_ADDRESS;
+
+		image_t* imageAddress = imageQueue.head;
+		while (imageAddress != NULL) {
+			if (!_Read(imageAddress, image))
+				return B_BAD_ADDRESS;
+
+			if (image.regions[0].vmstart <= address
+				&& address < image.regions[0].vmstart + image.regions[0].size) {
+				return B_OK;
+			}
+
+			imageAddress = image.next;
+		}
+	
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	bool _ReadString(const image_t& image, uint32 offset, char* buffer,
+		size_t bufferSize)
+	{
+		const char* address = image.strtab + offset;
+
+		if (!IS_USER_ADDRESS(address))
+			return false;
+
+		return user_strlcpy(buffer, address, bufferSize) >= 0;
+	}
+
+	template<typename T> bool _Read(const T* address, T& data);
+		// gcc 2.95.3 doesn't like it defined in-place
+
+private:
+	runtime_loader_debug_area	fDebugArea;
+	char						fImageName[B_OS_NAME_LENGTH];
+	char						fSymbolName[256];
+	static UserSymbolLookup		sLookup;
+};
+
+
+template<typename T>
+bool
+UserSymbolLookup::_Read(const T* address, T& data)
+{
+	if (!IS_USER_ADDRESS(address))
+		return false;
+
+	return user_memcpy(&data, address, sizeof(T)) == B_OK;
+}
+
+
+UserSymbolLookup UserSymbolLookup::sLookup;
+	// doesn't need construction, but has an Init() method
+
+
 //	#pragma mark - public kernel API
 
 
@@ -1028,6 +1232,21 @@ symbol_found:
 	//mutex_unlock(&sImageMutex);
 
 	return status;
+}
+
+
+status_t
+elf_debug_lookup_user_symbol_address(struct team* team, addr_t address,
+	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
+	bool *_exactMatch)
+{
+	UserSymbolLookup& lookup = UserSymbolLookup::Default();
+	status_t error = lookup.Init(team);
+	if (error != B_OK)
+		return error;
+
+	return lookup.LookupSymbolAddress(address, _baseAddress, _symbolName,
+		_imageName, _exactMatch);
 }
 
 
