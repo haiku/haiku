@@ -673,6 +673,8 @@ Journal::_WriteTransactionToLog()
 				block_cache_put(fVolume->BlockCache(), blockNumber + j);
 			}
 		}
+
+		logStart = logPosition % fLogSize;
 	}
 
 	free(vecs);
