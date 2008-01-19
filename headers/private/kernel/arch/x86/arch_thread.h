@@ -24,7 +24,7 @@ void i386_end_return_from_signal();
 
 // override empty macro
 #undef arch_syscall_64_bit_return_value
-void arch_syscall_64_bit_return_value();
+void arch_syscall_64_bit_return_value(void);
 
 
 static
