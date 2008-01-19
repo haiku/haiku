@@ -1,8 +1,9 @@
-/* Utility - some helper classes
- *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
+
+//!	Some helper classes
 
 
 #include "Utility.h"
@@ -10,9 +11,9 @@
 
 
 bool
-sorted_array::FindInternal(off_t value, int32 &index) const
+sorted_array::_FindInternal(off_t value, int32 &index) const
 {
-	int32 min = 0, max = count-1;
+	int32 min = 0, max = count - 1;
 	off_t cmp;
 	while (min <= max) {
 		index = (min + max) / 2;
@@ -37,16 +38,16 @@ sorted_array::Insert(off_t value)
 	// the insertion point
 	int32 i;
 	if (count > 8 ) {
-		if (!FindInternal(value,i)
-			&& values[i] <= value)
+		if (!_FindInternal(value, i) && values[i] <= value)
 			i++;
 	} else {
-		for (i = 0;i < count; i++)
+		for (i = 0; i < count; i++) {
 			if (values[i] > value)
 				break;
+		}
 	}
 
-	memmove(&values[i+1],&values[i],(count - i) * sizeof(off_t));
+	memmove(&values[i + 1], &values[i], (count - i) * sizeof(off_t));
 	values[i] = value;
 	count++;
 }
@@ -59,7 +60,7 @@ sorted_array::Remove(off_t value)
 	if (index == -1)
 		return false;
 
-	memmove(&values[index],&values[index + 1],(count - index) * sizeof(off_t));
+	memmove(&values[index], &values[index + 1], (count - index) * sizeof(off_t));
 	count--;
 
 	return true;

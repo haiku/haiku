@@ -1,6 +1,5 @@
-/* Utility - some helper classes
- *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef UTILITY_H
@@ -10,8 +9,8 @@
 #include "system_dependencies.h"
 
 
-// Simple array, used for the duplicate handling in the B+Tree,
-// and for the log entries.
+// Simple array, used for the duplicate handling in the B+Tree
+// TODO: this is not endian safe!!!
 
 struct sorted_array {
 	public:
@@ -23,7 +22,7 @@ struct sorted_array {
 		bool Remove(off_t value);
 
 	private:
-		bool FindInternal(off_t value,int32 &index) const;
+		bool _FindInternal(off_t value, int32 &index) const;
 };
 
 
@@ -31,7 +30,7 @@ inline int32
 sorted_array::Find(off_t value) const
 {
 	int32 i;
-	return FindInternal(value,i) ? i : -1;
+	return _FindInternal(value, i) ? i : -1;
 }
 
 #endif	/* UTILITY_H */

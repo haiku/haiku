@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -13,11 +13,11 @@
 
 struct run_array {
 	int32		count;
-	union {
-		int32	max_runs;
-		int32	block_count;
-	};
+	int32		max_runs;
 	block_run	runs[0];
+
+	void Init(int32 blockSize);
+	void Insert(block_run &run);
 
 	int32 CountRuns() const { return BFS_ENDIAN_TO_HOST_INT32(count); }
 	int32 MaxRuns() const { return BFS_ENDIAN_TO_HOST_INT32(max_runs) - 1; }
@@ -26,6 +26,10 @@ struct run_array {
 
 	static int32 MaxRuns(int32 blockSize)
 		{ return (blockSize - sizeof(run_array)) / sizeof(block_run); }
+
+private:
+	static int _Compare(block_run &a, block_run &b);
+	int32 _FindInsertionIndex(block_run &run);
 };
 
 class RunArrays {
@@ -41,7 +45,6 @@ class RunArrays {
 		int32 CountArrays() const { return fArrays.CountItems(); }
 
 		int32 MaxArrayLength();
-		void PrepareForWriting();
 
 	private:
 		status_t _AddArray();
@@ -95,7 +98,7 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, const void *address,
 }
 
 
-//	#pragma mark -
+//	#pragma mark - LogEntry
 
 
 LogEntry::LogEntry(Journal *journal, uint32 start, uint32 length)
@@ -112,7 +115,88 @@ LogEntry::~LogEntry()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - run_array
+
+
+/*!	The run_array's size equals the block size of the BFS volume, so we
+	cannot use a (non-overridden) new.
+	This makes a freshly allocated run_array ready to run.
+*/
+void
+run_array::Init(int32 blockSize)
+{
+	memset(this, 0, blockSize);
+	count = 0;
+	max_runs = HOST_ENDIAN_TO_BFS_INT32(MaxRuns(blockSize));
+}
+
+
+/*!	Inserts the block_run into the array. You will have to make sure the
+	array is large enough to contain the entry before calling this function.
+*/
+void
+run_array::Insert(block_run &run)
+{
+	int32 index = _FindInsertionIndex(run);
+	if (index == -1) {
+		// add to the end
+		runs[CountRuns()] = run;
+	} else {
+		// insert at index
+		memmove(&runs[index + 1], &runs[index],
+			(CountRuns() - index) * sizeof(off_t));
+		runs[index] = run;
+	}
+
+	count = HOST_ENDIAN_TO_BFS_INT32(CountRuns() + 1);
+}
+
+
+/*static*/ int
+run_array::_Compare(block_run &a, block_run &b)
+{
+	int cmp = a.AllocationGroup() - b.AllocationGroup();
+	if (cmp == 0)
+		return a.Start() - b.Start();
+
+	return cmp;
+}
+
+
+int32
+run_array::_FindInsertionIndex(block_run &run)
+{
+	int32 min = 0, max = CountRuns() - 1;
+	int32 i = 0;
+	if (max >= 8) {
+		while (min <= max) {
+			i = (min + max) / 2;
+
+			int cmp = _Compare(runs[i], run);
+			if (cmp < 0)
+				min = i + 1;
+			else if (cmp > 0)
+				max = i - 1;
+			else
+				return -1;
+		}
+
+		if (_Compare(runs[i], run) < 0)
+			i++;
+	} else {
+		for (; i <= max; i++) {
+			if (_Compare(runs[i], run) > 0)
+				break;
+		}
+		if (i == count)
+			return -1;
+	}
+
+	return i;
+}
+
+
+//	#pragma mark - RunArrays
 
 
 RunArrays::RunArrays(Journal *journal)
@@ -166,44 +250,11 @@ RunArrays::_AddRun(block_run &run)
 
 	// Be's BFS log replay routine can only deal with block_runs of size 1
 	// A pity, isn't it? Too sad we have to be compatible.
-#if 0
-	// search for an existing adjacent block_run
-	// ToDo: this could be improved by sorting and a binary search
-
-	for (int32 i = 0; i < CountArrays(); i++) {
-		run_array *array = ArrayAt(i);
-
-		for (int32 j = 0; j < array->CountRuns(); j++) {
-			block_run &arrayRun = array->runs[j];
-			if (run.AllocationGroup() != arrayRun.AllocationGroup())
-				continue;
-	
-			if (run.Start() == arrayRun.Start() + arrayRun.Length()) {
-				// matches the end
-				arrayRun.length = HOST_ENDIAN_TO_BFS_INT16(arrayRun.Length() + 1);
-				array->block_count++;
-				fLength++;
-				return true;
-			} else if (run.start + 1 == arrayRun.start) {
-				// matches the start
-				arrayRun.start = run.start;
-				arrayRun.length = HOST_ENDIAN_TO_BFS_INT16(arrayRun.Length() + 1);
-				array->block_count++;
-				fLength++;
-				return true;
-			}
-		}
-	}
-#endif
-
-	// no entry found, add new to the last array
 
 	if (fLastArray == NULL || fLastArray->CountRuns() == fLastArray->MaxRuns())
 		return false;
 
-	fLastArray->runs[fLastArray->CountRuns()] = run;
-	fLastArray->count = HOST_ENDIAN_TO_BFS_INT16(fLastArray->CountRuns() + 1);
-	fLastArray->block_count++;
+	fLastArray->Insert(run);
 	fLength++;
 	return true;
 }
@@ -213,6 +264,7 @@ status_t
 RunArrays::_AddArray()
 {
 	int32 blockSize = fJournal->GetVolume()->BlockSize();
+
 	run_array *array = (run_array *)malloc(blockSize);
 	if (array == NULL)
 		return B_NO_MEMORY;
@@ -222,11 +274,8 @@ RunArrays::_AddArray()
 		return B_NO_MEMORY;
 	}
 
-	memset(array, 0, blockSize);
-	array->block_count = 1;
+	array->Init(blockSize);
 	fLastArray = array;
-	fLength++;
-
 	return B_OK;
 }
 
@@ -247,15 +296,8 @@ RunArrays::Insert(off_t blockNumber)
 
 	if (!_AddRun(run)) {
 		// array is full
-		if (_AddArray() != B_OK)
+		if (_AddArray() != B_OK || !_AddRun(run))
 			return B_NO_MEMORY;
-
-		// insert entry manually, because _AddRun() would search the
-		// all arrays again for a free spot
-		fLastArray->runs[0] = run;
-		fLastArray->count = HOST_ENDIAN_TO_BFS_INT16(1);
-		fLastArray->block_count++;
-		fLength++;
 	}
 
 	return B_OK;
@@ -267,27 +309,15 @@ RunArrays::MaxArrayLength()
 {
 	int32 max = 0;
 	for (int32 i = 0; i < CountArrays(); i++) {
-		if (ArrayAt(i)->block_count > max)
-			max = ArrayAt(i)->block_count;
+		if (ArrayAt(i)->CountRuns() > max)
+			max = ArrayAt(i)->CountRuns();
 	}
 
 	return max;
 }
 
 
-void
-RunArrays::PrepareForWriting()
-{
-	int32 blockSize = fJournal->GetVolume()->BlockSize();
-
-	for (int32 i = 0; i < CountArrays(); i++) {
-		ArrayAt(i)->max_runs = HOST_ENDIAN_TO_BFS_INT32(
-			run_array::MaxRuns(blockSize));
-	}
-}
-
-
-//	#pragma mark -
+//	#pragma mark - Journal
 
 
 Journal::Journal(Volume *volume)
@@ -313,6 +343,8 @@ Journal::~Journal()
 status_t
 Journal::InitCheck()
 {
+	// TODO: this logic won't work whenever the size of the pending transaction
+	//	equals the size of the log (happens with the original BFS only)
 	if (fVolume->LogStart() != fVolume->LogEnd()) {
 		if (fVolume->SuperBlock().flags != SUPER_BLOCK_DISK_DIRTY)
 			FATAL(("log_start and log_end differ, but disk is marked clean - trying to replay log...\n"));
@@ -472,11 +504,11 @@ Journal::_BlockNotify(int32 transactionID, int32 event, void *arg)
 			int32 length = next->Start() - logEntry->Start();
 				// log entries inbetween could have been already released, so
 				// we can't just use LogEntry::Length() here
-			superBlock.log_start = (superBlock.log_start + length)
-				% journal->fLogSize;
+			superBlock.log_start = superBlock.log_start + length;
 		} else
 			superBlock.log_start = journal->fVolume->LogEnd();
 
+		superBlock.log_start %= journal->fLogSize;
 		update = true;
 	}
 
@@ -538,8 +570,8 @@ Journal::_WriteTransactionToLog()
 
 	int32 blockShift = fVolume->BlockShift();
 	off_t logOffset = fVolume->ToBlock(fVolume->Log()) << blockShift;
-	off_t logStart = fVolume->LogEnd();
-	off_t logPosition = logStart % fLogSize;
+	off_t logStart = fVolume->LogEnd() % fLogSize;
+	off_t logPosition = logStart;
 	status_t status;
 
 	// create run_array structures for all changed blocks
@@ -572,31 +604,16 @@ Journal::_WriteTransactionToLog()
 		return B_OK;
 	}
 
-	// Make sure there is enough space in the log.
-	// If that fails for whatever reason, panic!
-	// ToDo:
-/*	force_cache_flush(fVolume->Device(), false);
-	int32 tries = fLogSize / 2 + 1;
-	while (TransactionSize() > FreeLogBlocks() && tries-- > 0)
-		force_cache_flush(fVolume->Device(), true);
-
-	if (tries <= 0) {
-		fVolume->Panic();
-		return B_BAD_DATA;
-	}
-*/
-
 	// Write log entries to disk
 
-	int32 maxVecs = runArrays.MaxArrayLength();
+	int32 maxVecs = runArrays.MaxArrayLength() + 1;
+		// one extra for the index block
 
 	iovec *vecs = (iovec *)malloc(sizeof(iovec) * maxVecs);
 	if (vecs == NULL) {
 		// ToDo: write back log entries directly?
 		return B_NO_MEMORY;
 	}
-
-	runArrays.PrepareForWriting();
 
 	for (int32 k = 0; k < runArrays.CountArrays(); k++) {
 		run_array *array = runArrays.ArrayAt(k);
@@ -613,12 +630,13 @@ Journal::_WriteTransactionToLog()
 
 			for (int32 j = 0; j < run.Length(); j++) {
 				if (count >= wrap) {
-					// we need to write back the first half of the entry directly
-					logPosition = logStart + count;
+					// We need to write back the first half of the entry
+					// directly as the log wraps around
 					if (writev_pos(fVolume->Device(), logOffset
 						+ (logStart << blockShift), vecs, index) < 0)
 						FATAL(("could not write log area!\n"));
 
+					logPosition = logStart + count;
 					logStart = 0;
 					wrap = fLogSize;
 					count = 0;
@@ -638,7 +656,7 @@ Journal::_WriteTransactionToLog()
 			}
 		}
 
-		// write back log entry
+		// write back the rest of the log entry
 		if (count > 0) {
 			logPosition = logStart + count;
 			if (writev_pos(fVolume->Device(), logOffset
@@ -696,13 +714,6 @@ Journal::_WriteTransactionToLog()
 			_BlockNotify, logEntry);
 		fUnwrittenTransactions = 0;
 	}
-
-	// If the log goes to the next round (the log is written as a
-	// circular buffer), all blocks will be flushed out which is
-	// possible because we don't have any locked blocks at this
-	// point.
-	if (logPosition < logStart)
-		fVolume->FlushDevice();
 
 	return status;
 }
@@ -835,7 +846,7 @@ Journal::_TransactionDone(bool success)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - Transaction
 
 
 status_t 
