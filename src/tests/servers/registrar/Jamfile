@@ -66,6 +66,7 @@ UsePrivateHeaders storage ;
 UsePrivateHeaders tracker ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers registrar ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers registrar mime ] ;
 
 Server haiku_registrar
  	:
@@ -93,6 +94,19 @@ Server haiku_registrar
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp
+
+	# mime
+	AssociatedTypes.cpp
+	CreateAppMetaMimeThread.cpp
+	Database.cpp
+	InstalledTypes.cpp
+	MimeSnifferAddon.cpp
+	MimeSnifferAddonManager.cpp
+	MimeUpdateThread.cpp
+	SnifferRules.cpp
+	Supertype.cpp
+	SupportingApps.cpp
+	UpdateMimeInfoThread.cpp
 
 	R5Compatibility.cpp
 	:
