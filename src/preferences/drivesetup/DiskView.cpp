@@ -6,9 +6,12 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 #include "DiskView.h"
+#include "MainWindow.h"
 
 #include <DiskDeviceVisitor.h>
+#include <GroupLayout.h>
 #include <HashMap.h>
+#include <String.h>
 
 using BPrivate::HashMap;
 using BPrivate::HashKey32;
@@ -16,145 +19,225 @@ using BPrivate::HashKey32;
 
 static const pattern	kStripes		= { { 0xc7, 0x8f, 0x1f, 0x3e,
 											  0x7c, 0xf8, 0xf1, 0xe3 } };
-static const rgb_color	kInvalidColor	= { 0, 0, 0, 0 };
-static const rgb_color	kStripesHigh	= { 112, 112, 112, 255 };
-static const rgb_color	kStripesLow		= { 104, 104, 104, 255 };
 
-static const int32		kMaxPartitionColors = 256;
-static rgb_color		kPartitionColors[kMaxPartitionColors];
+static const float		kLayoutInset	= 6;
 
-
-struct PartitionBox {
-	PartitionBox()
-		: frame(0, 0, -1, -1)
-		, color(kInvalidColor)
+class PartitionView : public BView {
+public:
+	PartitionView(const char* name, float weight, int32 level, partition_id id)
+		: BView(name, B_WILL_DRAW | B_SUPPORTS_LAYOUT | B_FULL_UPDATE_ON_RESIZE)
+		, fID(id)
+		, fWeight(weight)
+		, fSelected(false)
+		, fMouseOver(false)
+		, fGroupLayout(new BGroupLayout(B_HORIZONTAL, kLayoutInset))
 	{
+		SetLayout(fGroupLayout);
+
+		SetViewColor(B_TRANSPARENT_COLOR);
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		base = tint_color(base, B_LIGHTEN_2_TINT);
+		base = tint_color(base, 1 + 0.13 * level);
+		SetLowColor(base);
+		SetHighColor(tint_color(base, B_DARKEN_1_TINT));
+
+		BFont font;
+		GetFont(&font);
+		font.SetSize(ceilf(font.Size() * 0.85));
+		font.SetRotation(90.0);
+		SetFont(&font);
+
+		fGroupLayout->SetInsets(kLayoutInset, kLayoutInset + font.Size(),
+			kLayoutInset, kLayoutInset);
+
+		SetExplicitMinSize(BSize(font.Size() + 6, 30));
 	}
 
-	PartitionBox(const BRect& frame, const rgb_color& color)
-		: frame(frame)
-		, color(color)
+	virtual void MouseDown(BPoint where)
 	{
+		BMessage message(MSG_SELECTED_PARTITION_ID);
+		message.AddInt32("partition_id", fID);
+		Window()->PostMessage(&message);
 	}
 
-	PartitionBox(const PartitionBox& other)
-		: frame(other.frame)
-		, color(other.color)
+	virtual void MouseMoved(BPoint where, uint32 transit, const BMessage*)
 	{
+		uint32 buttons;
+		if (Window()->CurrentMessage()->FindInt32("buttons",
+				(int32*)&buttons) < B_OK)
+			buttons = 0;
+
+		_SetMouseOver(buttons == 0
+			&& (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW));
 	}
 
-	~PartitionBox()
+	virtual void Draw(BRect updateRect)
 	{
+		if (fMouseOver) {
+			float tint = (B_NO_TINT + B_LIGHTEN_1_TINT) / 2.0;
+			SetHighColor(tint_color(HighColor(), tint));
+			SetLowColor(tint_color(LowColor(), tint));
+		}
+
+		BRect b(Bounds());
+		if (fSelected) {
+			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+			StrokeRect(b, B_SOLID_HIGH);
+			b.InsetBy(1, 1);
+		}
+		StrokeRect(b, B_SOLID_HIGH);
+		b.InsetBy(1, 1);
+
+		FillRect(b, B_SOLID_LOW);
+		if (!fSelected)
+			b.InsetBy(1, 1);
+
+		float width;
+		BFont font;
+		GetFont(&font);
+
+		font_height fh;
+		font.GetHeight(&fh);
+
+		// draw the partition label, but only if we have no child partition
+		// views
+		BPoint textOffset;
+		if (CountChildren() > 0) {
+			font.SetRotation(0.0);
+			SetFont(&font);
+			width = b.Width();
+			textOffset = b.LeftTop();
+			textOffset.x += 3;
+			textOffset.y += ceilf(fh.ascent);
+		} else {
+			width = b.Height();
+			textOffset = b.LeftBottom();
+			textOffset.x += ceilf(fh.ascent);
+		}
+
+		BString name(Name());
+		font.TruncateString(&name, B_TRUNCATE_END, width);
+
+		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
+		DrawString(name.String(), textOffset);
 	}
 
-	PartitionBox& operator=(const PartitionBox& other)
+	float Weight() const
 	{
-		frame = other.frame;
-		color = other.color;
-		return *this;
+		return fWeight;
 	}
 
-	BRect		frame;
-	rgb_color	color;
+	BGroupLayout* GroupLayout() const
+	{
+		return fGroupLayout;
+	}
+
+	void SetSelected(bool selected)
+	{
+		if (fSelected == selected)
+			return;
+
+		fSelected = selected;
+		Invalidate();
+	}
+
+private:
+	void _SetMouseOver(bool mouseOver)
+	{
+		if (fMouseOver == mouseOver)
+			return;
+		fMouseOver = mouseOver;
+		Invalidate();
+	}
+
+private:
+	partition_id	fID;
+	float			fWeight;
+	bool			fSelected;
+	bool			fMouseOver;
+	BGroupLayout*	fGroupLayout;
 };
 
 
-class DiskView::PartitionDrawer : public BDiskDeviceVisitor {
+class DiskView::PartitionLayout : public BDiskDeviceVisitor {
 public:
-	PartitionDrawer(BView* view)
+	PartitionLayout(BView* view)
 		: fView(view)
-		, fBoxMap()
-		, fColorIndex(0)
+		, fViewMap()
 		, fSelectedPartition(-1)
 	{
 	}
 
 	virtual bool Visit(BDiskDevice* device)
 	{
-		fBoxMap.Put(device->ID(), PartitionBox(fView->Bounds(), _NextColor()));
+		PartitionView* view = new PartitionView("Device", 1.0, 0, device->ID());
+		fViewMap.Put(device->ID(), view);
+		fView->GetLayout()->AddView(view);
 		return false;
 	}
 
 	virtual bool Visit(BPartition* partition, int32 level)
 	{
-		if (!partition->Parent() || !fBoxMap.ContainsKey(partition->Parent()->ID()))
+		if (!partition->Parent() || !fViewMap.ContainsKey(partition->Parent()->ID()))
 			return false;
 
-		PartitionBox parent = fBoxMap.Get(partition->Parent()->ID());
-		BRect frame = parent.frame;
-		// calculate frame within parent frame
-		off_t offset = partition->Offset();
+		// calculate size factor within parent frame
+// TODO: support gaps view these offsets:
+//		off_t offset = partition->Offset();
+//		off_t parentOffset = partition->Parent()->Offset();
 		off_t size = partition->Size();
-		off_t parentOffset = partition->Parent()->Offset();
 		off_t parentSize = partition->Parent()->Size();
-		float width = frame.Width() * size / parentSize;
-		frame.left = roundf(frame.left + frame.Width()
-			* (offset - parentOffset) / parentSize);
-		frame.right = frame.left + width;
+		double scale = (double)size / parentSize;
 
-		frame.InsetBy(4, 4);
-		if (frame.right < frame.left)
-			frame.right = frame.left;
+		BString name = partition->ContentName();
+		if (name.Length() == 0) {
+			if (partition->CountChildren() > 0)
+				name << partition->Type();
+			else
+				name << "Partition " << partition->ID();
+		}
+		partition_id id = partition->ID();
+		PartitionView* view = new PartitionView(name.String(), scale, level, id);
+		view->SetSelected(id == fSelectedPartition);
+		PartitionView* parent = fViewMap.Get(partition->Parent()->ID());
+		BGroupLayout* layout = parent->GroupLayout();
+		layout->AddView(view, scale);
 
-		rgb_color color = _NextColor();
-		fBoxMap.Put(partition->ID(), PartitionBox(frame, color));
+		fViewMap.Put(partition->ID(), view);
 
 		return false;
 	}
 
 	void SetSelectedPartition(partition_id id)
 	{
-		fSelectedPartition = id;
-	}
+		if (fSelectedPartition == id)
+			return;
 
-	void Draw(BView* view)
-	{
-		PartitionBoxMap::Iterator iterator = fBoxMap.GetIterator();
-		while (iterator.HasNext()) {
-			PartitionBoxMap::Entry entry = iterator.Next();
-			PartitionBox box = entry.value;
-			BRect frame = box.frame;
-			if (entry.key == fSelectedPartition) {
-				fView->SetHighColor(80, 80, 80);
-				frame.InsetBy(-2, -2);
-				fView->StrokeRect(frame);
-				frame.InsetBy(1, 1);
-				fView->StrokeRect(frame);
-				frame.InsetBy(1, 1);
-			} else {
-				fView->SetHighColor(tint_color(box.color, B_DARKEN_2_TINT));
-				frame.InsetBy(-1, -1);
-				fView->StrokeRect(frame);
-				frame.InsetBy(1, 1);
-			}
-	
-			fView->SetHighColor(box.color);
-			fView->FillRect(frame);
+		if (fViewMap.ContainsKey(fSelectedPartition)) {
+			PartitionView* view = fViewMap.Get(fSelectedPartition);
+			view->SetSelected(false);
+		}
+
+		fSelectedPartition = id;
+
+		if (fViewMap.ContainsKey(fSelectedPartition)) {
+			PartitionView* view = fViewMap.Get(fSelectedPartition);
+			view->SetSelected(true);
 		}
 	}
 
 	void Unset()
 	{
-		fColorIndex = 0;
-		fBoxMap.Clear();
+		fViewMap.Clear();
 	}
 
  private:
 
-	rgb_color _NextColor()
-	{
-		fColorIndex++;
-		if (fColorIndex > kMaxPartitionColors)
-			fColorIndex = 0;
-		return kPartitionColors[fColorIndex];
-	}
-
 	typedef	HashKey32<partition_id>					PartitionKey;
-	typedef HashMap<PartitionKey, PartitionBox >	PartitionBoxMap;
+	typedef HashMap<PartitionKey, PartitionView* >	PartitionViewMap;
 
 	BView*				fView;
-	PartitionBoxMap		fBoxMap;
-	int32				fColorIndex;
+	PartitionViewMap	fViewMap;
 	partition_id		fSelectedPartition;
 };
 
@@ -165,22 +248,58 @@ public:
 DiskView::DiskView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "diskview", resizeMode,
 		B_WILL_DRAW | B_FRAME_EVENTS)
+	, fDiskCount(0)
 	, fDisk(NULL)
-	, fPartitionDrawer(new PartitionDrawer(this))
+	, fPartitionLayout(new PartitionLayout(this))
 {
-	for (int32 i = 0; i < kMaxPartitionColors; i++) {
-		kPartitionColors[i].red = 90 + ((i * 1675) & 160);
-		kPartitionColors[i].green = 90 + ((i * 318) & 160);
-		kPartitionColors[i].blue = 90 + ((i * 9328) & 160);
-		kPartitionColors[i].alpha = 255;
-	}
+	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL, kLayoutInset);
+	layout->SetInsets(2, 2, 2, 2);
+	SetLayout(layout);
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+	SetLowColor(tint_color(base, (B_DARKEN_2_TINT + B_DARKEN_1_TINT) / 2));
+
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+	PartitionView* view;
+	float scale = 1.0;
+	view = new PartitionView("Disk", scale, 0, -1);
+	layout->AddView(view, scale);
+
+	layout = view->GroupLayout();
+
+	scale = 0.3;
+	view = new PartitionView("Primary", scale, 1, -1);
+	layout->AddView(view, scale);
+	scale = 0.7;
+	view = new PartitionView("Extended", scale, 1, -1);
+	layout->AddView(view, scale);
+
+	layout = view->GroupLayout();
+
+	scale = 0.2;
+	view = new PartitionView("Logical", scale, 2, -1);
+	layout->AddView(view, scale);
+
+	scale = 0.5;
+	view = new PartitionView("Logical", scale, 2, -1);
+	layout->AddView(view, scale);
+
+	scale = 0.005;
+	view = new PartitionView("Logical", scale, 2, -1);
+	layout->AddView(view, scale);
+
+	scale = 0.295;
+	view = new PartitionView("Logical", scale, 2, -1);
+	layout->AddView(view, scale);
+#endif
 }
 
 
 DiskView::~DiskView()
 {
 	SetDisk(NULL, -1);
-	delete fPartitionDrawer;
+	delete fPartitionLayout;
 }
 
 
@@ -189,30 +308,56 @@ DiskView::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
 
-	if (!fDisk) {
-		SetHighColor(kStripesHigh);
-		SetLowColor(kStripesLow);
-		FillRect(bounds, kStripes);
+	if (fDisk)
 		return;
-	}
 
-	fPartitionDrawer->Draw(this);
+	FillRect(bounds, kStripes);
+
+	const char* helpfulMessage;
+	if (fDiskCount == 0)
+		helpfulMessage = "No disk devices have been recognized.";
+	else
+		helpfulMessage = "Select a partition from the list below.";
+
+	float width = StringWidth(helpfulMessage);
+	font_height fh;
+	GetFontHeight(&fh);
+	BRect messageBounds(bounds);
+	messageBounds.InsetBy((bounds.Width() - width - fh.ascent * 2) / 2.0,
+		(bounds.Height() - (fh.ascent + fh.descent) * 2) / 2.0);
+
+	FillRoundRect(messageBounds, 4, 4, B_SOLID_LOW);
+	SetHighColor(tint_color(HighColor(), B_DARKEN_4_TINT));
+	BPoint textOffset;
+	textOffset.x = messageBounds.left + fh.ascent;
+	textOffset.y = (messageBounds.top + messageBounds.bottom
+		- fh.ascent - fh.descent) / 2 + fh.ascent;
+	DrawString(helpfulMessage, textOffset);
 }
 
 
 void
 DiskView::FrameResized(float width, float height)
 {
-	_UpdateLayout();
+//	DoLayout();
 }
 
 
 void
+DiskView::SetDiskCount(int32 count)
+{
+	fDiskCount = count;
+}
+
+void
 DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)
 {
-	fDisk = disk;
-	fPartitionDrawer->SetSelectedPartition(selectedPartition);
-	_UpdateLayout();
+	fPartitionLayout->SetSelectedPartition(selectedPartition);
+
+	if (fDisk != disk) {
+		fDisk = disk;
+		_UpdateLayout();
+	}
 }
 
 
@@ -222,10 +367,15 @@ DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)
 void
 DiskView::_UpdateLayout()
 {
-	fPartitionDrawer->Unset();
+	while (BView* view = ChildAt(0)) {
+		view->RemoveSelf();
+		delete view;
+	}
+
+	fPartitionLayout->Unset();
 
 	if (fDisk)
-		fDisk->VisitEachDescendant(fPartitionDrawer);
+		fDisk->VisitEachDescendant(fPartitionLayout);
 
 	Invalidate();
 }

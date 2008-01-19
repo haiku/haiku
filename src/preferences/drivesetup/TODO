@@ -1,0 +1,7 @@
+* Create an icon.
+
+* The offsets of partitions should be used to detect free space on container partition types (disks and extended partitions). Items for these free spaces should be placed into the partition list and disk view, so that they can be selected. Only if such a space item is selected should the Partition->Create menu be enabled. If the space is on a disk, the "Primary" and "Extended" items could be enabled. If the space is on an extended partition, the "Logical" item could be enabled. Maybe the Disk Device API allows to query for the ability to create either partition type on the parent device, depending on the partitioning system in use, so that DriveSetup remains neutral towards the partitioning system.
+
+* When the Partition->Create menu items are invoked on free space items, DriveSetup would show a simple panel asking for the size of the to be created partition.
+
+* Support of more advanced options, partiticularily the option to resize (shrink) existing partitions to free up space.

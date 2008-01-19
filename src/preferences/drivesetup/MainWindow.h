@@ -22,6 +22,11 @@ class DiskView;
 class PartitionListView;
 
 
+enum {
+	MSG_SELECTED_PARTITION_ID	= 'spid'
+};
+
+
 class MainWindow : public BWindow {
 public:
 								MainWindow(BRect frame);
@@ -40,6 +45,8 @@ private:
 			void				_ScanFileSystems();
 
 			void				_AdaptToSelectedPartition();
+			void				_SetToDiskAndPartition(partition_id disk,
+									partition_id partition);
 			void				_EnabledDisableMenuItems(BDiskDevice* disk,
 									partition_id selectedPartition);
 
@@ -78,6 +85,7 @@ private:
 			BMenuItem*			fCreatePrimaryMI;
 			BMenuItem*			fCreateExtendedMI;
 			BMenuItem*			fCreateLogicalMI;
+			BMenuItem*			fDeleteMI;
 			BMenuItem*			fMountMI;
 			BMenuItem*			fUnmountMI;
 			BMenuItem*			fMountAllMI;

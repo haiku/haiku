@@ -21,15 +21,17 @@ public:
 	virtual	void				Draw(BRect updateRect);	
 	virtual	void				FrameResized(float width, float height);
 
+			void				SetDiskCount(int32 count);
 			void				SetDisk(BDiskDevice* disk,
 									partition_id selectedPartition);
 private:
 			void				_UpdateLayout();
 
+			int32				fDiskCount;
 			BDiskDevice*		fDisk;
 
-			class PartitionDrawer;
-			PartitionDrawer*	fPartitionDrawer;
+			class PartitionLayout;
+			PartitionLayout*	fPartitionLayout;
 };
 
 

@@ -32,9 +32,11 @@
 
 class ListPopulatorVisitor : public BDiskDeviceVisitor {
 public:
-	ListPopulatorVisitor(PartitionListView* list)
+	ListPopulatorVisitor(PartitionListView* list, int32& diskCount)
 		: fPartitionList(list)
+		, fDiskCount(diskCount)
 	{
+		fDiskCount = 0;
 		// start with an empty list
 		int32 rows = fPartitionList->CountRows();
 		for (int32 i = rows - 1; i >= 0; i--) {
@@ -46,6 +48,7 @@ public:
 
 	virtual bool Visit(BDiskDevice* device)
 	{
+		fDiskCount++;
 		fPartitionList->AddPartition(device);
 		return false; // Don't stop yet!
 	}
@@ -57,7 +60,8 @@ public:
 	}
 
 private:
-	PartitionListView* fPartitionList;
+	PartitionListView*	fPartitionList;
+	int32&				fDiskCount;
 };
 
 
@@ -92,6 +96,7 @@ enum {
 	MSG_CREATE_EXTENDED			= 'crex',
 	MSG_CREATE_LOGICAL			= 'crlg',
 	MSG_INITIALIZE				= 'init',
+	MSG_DELETE					= 'delt',
 	MSG_EJECT					= 'ejct',
 	MSG_SURFACE_TEST			= 'sfct',
 	MSG_RESCAN					= 'rscn',
@@ -108,9 +113,9 @@ MainWindow::MainWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
 
 	// create all the menu items
-	fFormatMI = new BMenuItem("Format", new BMessage(MSG_FORMAT));
+	fFormatMI = new BMenuItem("Format (not implemented)", new BMessage(MSG_FORMAT));
 	fEjectMI = new BMenuItem("Eject", new BMessage(MSG_EJECT), 'E');
-	fSurfaceTestMI = new BMenuItem("Surface Test",
+	fSurfaceTestMI = new BMenuItem("Surface Test (not implemented)",
 		new BMessage(MSG_SURFACE_TEST));
 	fRescanMI = new BMenuItem("Rescan", new BMessage(MSG_RESCAN));
 
@@ -120,6 +125,10 @@ MainWindow::MainWindow(BRect frame)
 		new BMessage(MSG_CREATE_EXTENDED));
 	fCreateLogicalMI = new BMenuItem("Logical",
 		new BMessage(MSG_CREATE_LOGICAL));
+
+	fDeleteMI = new BMenuItem("Delete (not implemented)",
+		new BMessage(MSG_DELETE));
+fDeleteMI->SetEnabled(false);
 
 	fMountMI = new BMenuItem("Mount", new BMessage(MSG_MOUNT), 'M');
 	fUnmountMI = new BMenuItem("Unmount", new BMessage(MSG_UNMOUNT), 'U');
@@ -139,7 +148,7 @@ MainWindow::MainWindow(BRect frame)
 
 	// Parition menu
 	fPartitionMenu = new BMenu("Partition");
-		fCreateMenu = new BMenu("Create");
+		fCreateMenu = new BMenu("Create (not implemented)");
 			fCreateMenu->AddItem(fCreatePrimaryMI);
 			fCreateMenu->AddItem(fCreateExtendedMI);
 			fCreateMenu->AddItem(fCreateLogicalMI);
@@ -147,6 +156,8 @@ MainWindow::MainWindow(BRect frame)
 
 		fInitMenu = new BMenu("Initialize");
 		fPartitionMenu->AddItem(fInitMenu);
+
+		fPartitionMenu->AddItem(fDeleteMI);
 
 		fPartitionMenu->AddSeparatorItem();
 
@@ -231,6 +242,10 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_DELETE:
+			printf("MSG_DELETE\n");
+			break;
+
 		case MSG_EJECT:
 			// TODO: completely untested, especially interesting
 			// if partition list behaves when partitions disappear
@@ -248,8 +263,21 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 
 		case MSG_PARTITION_ROW_SELECTED:
+			// selection of partitions via list view
 			_AdaptToSelectedPartition();
 			break;
+		case MSG_SELECTED_PARTITION_ID: {
+			// selection of partitions via disk view
+			partition_id id;
+			if (message->FindInt32("partition_id", &id) == B_OK) {
+				if (BRow* row = fListView->FindRow(id)) {
+					fListView->DeselectAll();
+					fListView->AddToSelection(row);
+					_AdaptToSelectedPartition();
+				}
+			}
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);
@@ -312,8 +340,10 @@ MainWindow::RestoreSettings(BMessage* archive)
 void
 MainWindow::_ScanDrives()
 {
-	ListPopulatorVisitor driveVisitor(fListView);
+	int32 diskCount = 0;
+	ListPopulatorVisitor driveVisitor(fListView, diskCount);
 	fDDRoster.VisitEachPartition(&driveVisitor);
+	fDiskView->SetDiskCount(diskCount);
 }
 
 
@@ -343,40 +373,50 @@ MainWindow::_ScanFileSystems()
 void
 MainWindow::_AdaptToSelectedPartition()
 {
-	delete fCurrentDisk;
-	fCurrentDisk = NULL;
-	fCurrentPartitionID = -1;
+	partition_id disk = -1;
+	partition_id partition = -1;
 
 	BRow* _selectedRow = fListView->CurrentSelection();
-	if (!_selectedRow) {
-		fDiskView->SetDisk(NULL, -1);
-		_EnabledDisableMenuItems(NULL, -1);
-		return;
+	if (_selectedRow) {
+		// go up to top level row
+		BRow* _topLevelRow = _selectedRow;
+		BRow* parent = NULL;
+		while (fListView->FindParent(_topLevelRow, &parent, NULL))
+			_topLevelRow = parent;
+	
+		PartitionListRow* topLevelRow
+			= dynamic_cast<PartitionListRow*>(_topLevelRow);
+		PartitionListRow* selectedRow
+			= dynamic_cast<PartitionListRow*>(_selectedRow);
+	
+		if (topLevelRow)
+			disk = topLevelRow->ID();
+		if (selectedRow)
+			partition = selectedRow->ID();
 	}
 
-	// recurse to top level row
-	BRow* _topLevelRow = _selectedRow;
-	BRow* parent = NULL;
-	while (fListView->FindParent(_topLevelRow, &parent, NULL))
-		_topLevelRow = parent;
+	_SetToDiskAndPartition(disk, partition);
+}
 
-	PartitionListRow* topLevelRow
-		= dynamic_cast<PartitionListRow*>(_topLevelRow);
-	PartitionListRow* selectedRow
-		= dynamic_cast<PartitionListRow*>(_selectedRow);
 
-	if (!topLevelRow || !selectedRow)
-		return;
-
-	fCurrentDisk = new BDiskDevice();
-	status_t ret = fCurrentDisk->SetTo(topLevelRow->ID());
-	if (ret < B_OK) {
-		printf("error switching disks: %s\n", strerror(ret));
+void
+MainWindow::_SetToDiskAndPartition(partition_id disk, partition_id partition)
+{
+	if (!fCurrentDisk || fCurrentDisk->ID() != disk) {
 		delete fCurrentDisk;
 		fCurrentDisk = NULL;
-		return;
+		if (disk >= 0) {
+			BDiskDevice* newDisk = new BDiskDevice();
+			status_t ret = newDisk->SetTo(disk);
+			if (ret < B_OK) {
+				printf("error switching disks: %s\n", strerror(ret));
+				delete newDisk;
+			} else
+				fCurrentDisk = newDisk;
+		}
 	}
-	fCurrentPartitionID = selectedRow->ID();
+
+	fCurrentPartitionID = partition;
 
 	fDiskView->SetDisk(fCurrentDisk, fCurrentPartitionID);
 	_EnabledDisableMenuItems(fCurrentDisk, fCurrentPartitionID);
@@ -395,21 +435,25 @@ MainWindow::_EnabledDisableMenuItems(BDiskDevice* disk,
 		fPartitionMenu->SetEnabled(false);
 	} else {
 //		fFormatMI->SetEnabled(true);
+fFormatMI->SetEnabled(false);
 		fEjectMI->SetEnabled(disk->IsRemovableMedia());
 //		fSurfaceTestMI->SetEnabled(true);
+fSurfaceTestMI->SetEnabled(false);
 
 		fPartitionMenu->SetEnabled(true);
-fCreatePrimaryMI->SetEnabled(false);
-fCreateExtendedMI->SetEnabled(false);
-fCreateLogicalMI->SetEnabled(false);
+		// fCreateMenu->SetEnabled(/*empty space selected*/);
+fCreateMenu->SetEnabled(false);
 
 		BPartition* partition = disk->FindDescendant(selectedPartition);
 		if (partition) {
 			fInitMenu->SetEnabled(!partition->IsMounted());
+//			fDeleteMI->SetEnabled(!partition->IsMounted());
+fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(!partition->IsMounted());
 			fUnmountMI->SetEnabled(partition->IsMounted());
 		} else {
 			fInitMenu->SetEnabled(false);
+			fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(false);
 			fUnmountMI->SetEnabled(false);
 		}
