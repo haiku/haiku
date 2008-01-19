@@ -11,9 +11,12 @@
  */
 FUNCTION(__swap_int16):
 		moveq.l	#0,%d0
-		move.b	(5,%a7),%d0
+		/* 32-bit aligned stack! */
+		move.l	(4,%a7),%d1
+		move.b	%d1,%d0
+		lsr.w	#8,%d1
 		lsl.w	#8,%d0
-		move.b	(4,%a7),%d0
+		move.b	%d1,%d0
 		rts
 
 
@@ -22,11 +25,11 @@ FUNCTION(__swap_int16):
 FUNCTION(__swap_int32):
 /*		moveq.l	#0,%d0*/
 		move.b	(7,%a7),%d0
-		lsl.w	#8,%d0
+		lsl.l	#8,%d0
 		move.b	(6,%a7),%d0
-		lsl.w	#8,%d0
+		lsl.l	#8,%d0
 		move.b	(5,%a7),%d0
-		lsl.w	#8,%d0
+		lsl.l	#8,%d0
 		move.b	(4,%a7),%d0
 		rts
 
@@ -35,22 +38,21 @@ FUNCTION(__swap_int32):
  */
 FUNCTION(__swap_int64):
 /*		moveq.l	#0,%d0*/
-		move.b	(7,%a7),%d0
-		lsl.w	#8,%d0
-		move.b	(6,%a7),%d0
-		lsl.w	#8,%d0
-		move.b	(5,%a7),%d0
-		lsl.w	#8,%d0
-		move.b	(4,%a7),%d0
-		move.l	%d0,(%a0)
+		move.b	(7,%a7),%d1
+		lsl.l	#8,%d1
+		move.b	(6,%a7),%d1
+		lsl.l	#8,%d1
+		move.b	(5,%a7),%d1
+		lsl.l	#8,%d1
+		move.b	(4,%a7),%d1
+		/**/
 		move.b	(11,%a7),%d0
-		lsl.w	#8,%d0
+		lsl.l	#8,%d0
 		move.b	(10,%a7),%d0
-		lsl.w	#8,%d0
+		lsl.l	#8,%d0
 		move.b	(9,%a7),%d0
-		lsl.w	#8,%d0
+		lsl.l	#8,%d0
 		move.b	(8,%a7),%d0
-		move.l	%d0,(4,%a0)
 		rts
 
 
