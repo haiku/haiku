@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  *
  * Roughly based on 'btlib' written by Marcus J. Ranum - it shares
@@ -109,8 +109,8 @@ CachedNode::SetTo(off_t offset, bool check)
 	if (InternalSetTo(NULL, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
 		if (!fTree->fHeader->CheckNode(fNode)) {
-			FATAL(("invalid node (%p) read from offset %Ld, inode at %Ld\n",
-				fNode, offset, fTree->fStream->ID()));
+			FATAL(("invalid node [%p] read from offset %Ld (block %Ld), inode "
+				"at %Ld\n", fNode, offset, fBlockNumber, fTree->fStream->ID()));
 			return NULL;
 		}
 	}
@@ -139,8 +139,8 @@ CachedNode::SetToWritable(Transaction &transaction, off_t offset, bool check)
 	if (InternalSetTo(&transaction, offset) != NULL && check) {
 		// sanity checks (links, all_key_count)
 		if (!fTree->fHeader->CheckNode(fNode)) {
-			FATAL(("invalid node [%p] read from offset %Ld, inode at %Ld\n",
-				fNode, offset, fTree->fStream->ID()));
+			FATAL(("invalid node [%p] read from offset %Ld (block %Ld), inode "
+				"at %Ld\n", fNode, offset, fBlockNumber, fTree->fStream->ID()));
 			return NULL;
 		}
 	}
@@ -250,6 +250,9 @@ CachedNode::Free(Transaction &transaction, off_t offset)
 	if (header == NULL)
 		return B_IO_ERROR;
 
+#if 0
+	// TODO: temporarily disabled because CheckNode() doesn't like this...
+	// 		Also, it's such an edge case that it's almost useless, anyway.
 	// if the node is the last one in the tree, we shrink
 	// the tree and file size by one node
 	off_t lastOffset = header->MaximumSize() - fTree->fNodeSize;
@@ -261,6 +264,7 @@ CachedNode::Free(Transaction &transaction, off_t offset)
 		header->maximum_size = HOST_ENDIAN_TO_BFS_INT64(lastOffset);
 		return B_OK;
 	}
+#endif
 
 	// add the node to the free nodes list
 	fNode->left_link = header->free_node_pointer;
@@ -1670,7 +1674,8 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
 #endif
 		if (node->IsLeaf()) {
 			// first round, check for duplicate entries
-			status_t status = _FindKey(node, key, keyLength, &nodeAndKey.keyIndex);
+			status_t status = _FindKey(node, key, keyLength,
+				&nodeAndKey.keyIndex);
 			if (status < B_OK)
 				RETURN_ERROR(status);
 

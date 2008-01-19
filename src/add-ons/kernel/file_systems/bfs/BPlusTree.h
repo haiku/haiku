@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef B_PLUS_TREE_H
@@ -30,8 +30,10 @@ struct bplustree_header {
 	uint32 Magic() const { return BFS_ENDIAN_TO_HOST_INT32(magic); }
 	uint32 NodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(node_size); }
 	uint32 DataType() const { return BFS_ENDIAN_TO_HOST_INT32(data_type); }
-	off_t RootNode() const { return BFS_ENDIAN_TO_HOST_INT64(root_node_pointer); }
-	off_t FreeNode() const { return BFS_ENDIAN_TO_HOST_INT64(free_node_pointer); }
+	off_t RootNode() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(root_node_pointer); }
+	off_t FreeNode() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(free_node_pointer); }
 	off_t MaximumSize() const { return BFS_ENDIAN_TO_HOST_INT64(maximum_size); }
 	uint32 MaxNumberOfLevels() const
 		{ return BFS_ENDIAN_TO_HOST_INT32(max_number_of_levels); }
@@ -67,9 +69,11 @@ struct bplustree_node {
 
 	off_t LeftLink() const { return BFS_ENDIAN_TO_HOST_INT64(left_link); }
 	off_t RightLink() const { return BFS_ENDIAN_TO_HOST_INT64(right_link); }
-	off_t OverflowLink() const { return BFS_ENDIAN_TO_HOST_INT64(overflow_link); }
+	off_t OverflowLink() const
+		{ return BFS_ENDIAN_TO_HOST_INT64(overflow_link); }
 	uint16 NumKeys() const { return BFS_ENDIAN_TO_HOST_INT16(all_key_count); }
-	uint16 AllKeyLength() const { return BFS_ENDIAN_TO_HOST_INT16(all_key_length); }
+	uint16 AllKeyLength() const
+		{ return BFS_ENDIAN_TO_HOST_INT16(all_key_length); }
 
 	inline uint16 *KeyLengths() const;
 	inline off_t *Values() const;
@@ -87,7 +91,8 @@ struct bplustree_node {
 	inline duplicate_array *DuplicateArray() const;
 
 	static inline uint8 LinkType(off_t link);
-	static inline off_t MakeLink(uint8 type, off_t link, uint32 fragmentIndex = 0);
+	static inline off_t MakeLink(uint8 type, off_t link,
+		uint32 fragmentIndex = 0);
 	static inline bool IsDuplicate(off_t link);
 	static inline off_t FragmentOffset(off_t link);
 	static inline uint32 FragmentIndex(off_t link);
@@ -403,14 +408,16 @@ inline status_t
 TreeIterator::GetNextEntry(void *key, uint16 *keyLength, uint16 maxLength,
 	off_t *value, uint16 *duplicate)
 {
-	return Traverse(BPLUSTREE_FORWARD, key, keyLength, maxLength, value, duplicate);
+	return Traverse(BPLUSTREE_FORWARD, key, keyLength, maxLength, value,
+		duplicate);
 }
 
 inline status_t
 TreeIterator::GetPreviousEntry(void *key, uint16 *keyLength, uint16 maxLength,
 	off_t *value, uint16 *duplicate)
 {
-	return Traverse(BPLUSTREE_BACKWARD, key, keyLength, maxLength, value, duplicate);
+	return Traverse(BPLUSTREE_BACKWARD, key, keyLength, maxLength, value,
+		duplicate);
 }
 
 
@@ -424,14 +431,16 @@ bplustree_header::CheckNode(bplustree_node *node) const
 	return IsValidLink(node->LeftLink())
 		&& IsValidLink(node->RightLink())
 		&& IsValidLink(node->OverflowLink())
-		&& (int8 *)node->Values() + node->NumKeys() * sizeof(off_t) <= (int8 *)node + NodeSize();
+		&& (int8 *)node->Values() + node->NumKeys() * sizeof(off_t)
+				<= (int8 *)node + NodeSize();
 }
 
 
 inline bool
 bplustree_header::IsValidLink(off_t link) const
 {
-	return link == BPLUSTREE_NULL || (link > 0 && link <= MaximumSize() - NodeSize());
+	return link == BPLUSTREE_NULL
+		|| (link > 0 && link <= MaximumSize() - NodeSize());
 }
 
 
