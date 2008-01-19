@@ -104,19 +104,14 @@ class Block : public AbstractTraceEntry {
 		{
 			strlcpy(fLabel, label, sizeof(fLabel));
 			fSum = checksum(data, size);
-			memcpy(fBytes, data, min_c(size, sizeof(fBytes)));
 			Initialized();
 		}
 
 		virtual void AddDump(char *buffer, size_t size)
 		{
 			uint32 length = snprintf(buffer, size, "%s: block %Ld (%p), sum %lu,"
-				" s/l %lu/%lu, bytes ", fLabel, fBlock, fData, fSum, fStart,
+				" s/l %lu/%lu", fLabel, fBlock, fData, fSum, fStart,
 				fLength);
-			for (uint32 i = 0; length < size - 1 && i < sizeof(fBytes); i++) {
-				length += snprintf(buffer + length, size - length, "%02x",
-					fBytes[i]);
-			}
 		}
 
 	private:
@@ -126,7 +121,6 @@ class Block : public AbstractTraceEntry {
 		uint32		fLength;
 		uint32		fSum;
 		char		fLabel[12];
-		uint8		fBytes[32];
 };
 
 }	// namespace BFSBlockTracing

@@ -78,6 +78,28 @@ class Remove : public AbstractTraceEntry {
 		char	fName[32];
 };
 
+class Action : public AbstractTraceEntry {
+	public:
+		Action(const char* action, Inode* inode)
+			:
+			fInode(inode),
+			fID(inode->ID())
+		{
+			strlcpy(fAction, action, sizeof(fAction));
+			Initialized();
+		}
+
+		virtual void AddDump(char *buffer, size_t size)
+		{
+			snprintf(buffer, size, "%s %Ld (%p)\n", fAction, fID, fInode);
+		}
+
+	private:
+		Inode*	fInode;
+		ino_t	fID;
+		char	fAction[16];
+};
+
 class Resize : public AbstractTraceEntry {
 	public:
 		Resize(Inode* inode, off_t oldSize, off_t newSize)
@@ -2116,6 +2138,8 @@ Inode::NeedsTrimming()
 status_t
 Inode::TrimPreallocation(Transaction &transaction)
 {
+	T(Action("TRIM", this));
+
 	status_t status = _ShrinkStream(transaction, Size());
 	if (status < B_OK)
 		return status;
