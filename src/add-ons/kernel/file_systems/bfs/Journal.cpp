@@ -559,9 +559,9 @@ Journal::_WriteTransactionToLog()
 			// a) abort the transaction - bad, because all changes are lost
 			// b) carry out the changes, but don't use the log - even worse,
 			//    as it potentially creates a corrupted disk.
-			panic("transaction too large (%ld blocks, %ld main, log size %ld)!\n",
-				(long)_TransactionSize(), cache_blocks_in_main_transaction(
-				fVolume->BlockCache(), fTransactionID), (long)fLogSize);
+			dprintf("transaction too large (%d blocks, %d main, log size %d)!\n",
+				(int)_TransactionSize(), (int)cache_blocks_in_main_transaction(
+				fVolume->BlockCache(), fTransactionID), (int)fLogSize);
 			return B_BUFFER_OVERFLOW;
 		}
 	}

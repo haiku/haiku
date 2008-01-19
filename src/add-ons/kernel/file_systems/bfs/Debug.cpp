@@ -256,7 +256,7 @@ dump_inode(int argc, char **argv)
 	Inode *inode = (Inode *)parse_expression(argv[1]);
 	dump_inode(&inode->Node());
 
-	return B_OK;
+	return 0;
 }
 
 
@@ -275,7 +275,46 @@ dump_volume(int argc, char **argv)
 
 	dump_super_block(&volume->SuperBlock());
 
-	return B_OK;
+	return 0;
+}
+
+
+static int
+dump_bplustree_node(int argc, char **argv)
+{
+	if (argc < 2 || argc > 4 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-node> [ptr-to-header] [ptr-to-volume]\n",
+			argv[0]);
+		return 0;
+	}
+
+	bplustree_node *node = (bplustree_node *)parse_expression(argv[1]);
+	bplustree_header *header = NULL;
+	Volume *volume = NULL;
+
+	if (argc > 2)
+		header = (bplustree_header *)parse_expression(argv[2]);
+	if (argc > 3)
+		volume = (Volume *)parse_expression(argv[3]);
+
+	dump_bplustree_node(node, header, volume);
+
+	return 0;
+}
+
+
+static int
+dump_bplustree_header(int argc, char **argv)
+{
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-header>\n", argv[0]);
+		return 0;
+	}
+
+	bplustree_header *header = (bplustree_header *)parse_expression(argv[1]);
+	dump_bplustree_header(header);
+
+	return 0;
 }
 
 
@@ -284,6 +323,8 @@ remove_debugger_commands()
 {
 	remove_debugger_command("bfs_inode", dump_inode);
 	remove_debugger_command("bfs_allocator", dump_block_allocator);
+	remove_debugger_command("bfs_btree_header", dump_bplustree_header);
+	remove_debugger_command("bfs_btree_node", dump_bplustree_node);
 	remove_debugger_command("bfs", dump_volume);
 }
 
@@ -293,7 +334,11 @@ add_debugger_commands()
 {
 	add_debugger_command("bfs_inode", dump_inode, "dump an Inode object");
 	add_debugger_command("bfs_allocator", dump_block_allocator,
-		"dump a BFS block allocator.");
+		"dump a BFS block allocator");
+	add_debugger_command("bfs_btree_header", dump_bplustree_header,
+		"dump a BFS B+tree header");
+	add_debugger_command("bfs_btree_node", dump_bplustree_node,
+		"dump a BFS B+tree node");
 	add_debugger_command("bfs", dump_volume, "dump a BFS volume");
 }
 
