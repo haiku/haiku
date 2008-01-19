@@ -140,7 +140,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 #	s_fdim.c s_fdimf.c # s_fdiml.S
 #	s_fabs.S s_fabsf.S # s_fabsl.S
 #	s_isnan.c s_isnanf.S
-#	s_rint.c s_rintf.c # s_rintl.c
+	s_rint.c s_rintf.c # s_rintl.c
 #	t_sqrt.c
 #	w_sqrt.c w_sqrtf.c # w_sqrtl.c
 ;
