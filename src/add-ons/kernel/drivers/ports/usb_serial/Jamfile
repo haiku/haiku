@@ -2,17 +2,17 @@ SubDir HAIKU_TOP src add-ons kernel drivers ports usb_serial ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-local defines = [ FDefines B_USB_USE_V2_MODULE ] ;
-
-SubDirCcFlags $(defines) ;
+SubDirC++Flags -fno-rtti ;
 
 KernelAddon usb_serial :
-	driver.c
-	tracing.c
-	acm.c
-	prolific.c
-	ftdi.c
-	klsi.c
+	Driver.cpp
+	SerialDevice.cpp
+	Tracing.cpp
+
+	ACM.cpp
+	FTDI.cpp
+	KLSI.cpp
+	Prolific.cpp
 ;
 
 AddResources usb_serial : usb_serial.rdef ;

@@ -19,7 +19,7 @@
 
 /*
  * Added to BeOS USB Serial Driver project by Siarzhuk Zharski
- *  
+ *
  * $Source: /cvsroot/sis4be/usb_serial/uftdireg.h,v $
  * $Author: zharik $
  * $Revision: 1.1 $
@@ -28,17 +28,17 @@
  */
 
 /* Vendor Request Interface */
-#define FTDI_SIO_RESET 		0 /* Reset the port */
-#define FTDI_SIO_MODEM_CTRL 	1 /* Set the modem control register */
+#define FTDI_SIO_RESET			0 /* Reset the port */
+#define FTDI_SIO_MODEM_CTRL		1 /* Set the modem control register */
 #define FTDI_SIO_SET_FLOW_CTRL	2 /* Set flow control register */
 #define FTDI_SIO_SET_BAUD_RATE	3 /* Set baud rate */
-#define FTDI_SIO_SET_DATA	4 /* Set the data characteristics of the port */
-#define FTDI_SIO_GET_STATUS	5 /* Retrieve current value of status reg */
+#define FTDI_SIO_SET_DATA		4 /* Set the data characteristics of the port */
+#define FTDI_SIO_GET_STATUS		5 /* Retrieve current value of status reg */
 #define FTDI_SIO_SET_EVENT_CHAR	6 /* Set the event character */
 #define FTDI_SIO_SET_ERROR_CHAR	7 /* Set the error character */
 
 /* Port Identifier Table */
-#define FTDI_PIT_DEFAULT 	0 /* SIOA */
+#define FTDI_PIT_DEFAULT	0 /* SIOA */
 #define FTDI_PIT_SIOA		1 /* SIOA */
 #define FTDI_PIT_SIOB		2 /* SIOB */
 #define FTDI_PIT_PARALLEL	3 /* Parallel */
@@ -74,9 +74,9 @@ enum uftdi_type {
  *
  */
 /* FTDI_SIO_RESET */
-#define FTDI_SIO_RESET_SIO 0
-#define FTDI_SIO_RESET_PURGE_RX 1
-#define FTDI_SIO_RESET_PURGE_TX 2
+#define FTDI_SIO_RESET_SIO		0
+#define FTDI_SIO_RESET_PURGE_RX	1
+#define FTDI_SIO_RESET_PURGE_TX	2
 
 
 /*
@@ -142,16 +142,16 @@ enum {
  *
  */
 /* FTDI_SIO_SET_DATA */
-#define FTDI_SIO_SET_DATA_BITS(n) (n)
-#define FTDI_SIO_SET_DATA_PARITY_NONE (0x0 << 8)
-#define FTDI_SIO_SET_DATA_PARITY_ODD (0x1 << 8)
-#define FTDI_SIO_SET_DATA_PARITY_EVEN (0x2 << 8)
-#define FTDI_SIO_SET_DATA_PARITY_MARK (0x3 << 8)
-#define FTDI_SIO_SET_DATA_PARITY_SPACE (0x4 << 8)
-#define FTDI_SIO_SET_DATA_STOP_BITS_1 (0x0 << 11)
-#define FTDI_SIO_SET_DATA_STOP_BITS_15 (0x1 << 11)
-#define FTDI_SIO_SET_DATA_STOP_BITS_2 (0x2 << 11)
-#define FTDI_SIO_SET_BREAK (0x1 << 14)
+#define FTDI_SIO_SET_DATA_BITS(n)		(n)
+#define FTDI_SIO_SET_DATA_PARITY_NONE	(0x0 << 8)
+#define FTDI_SIO_SET_DATA_PARITY_ODD	(0x1 << 8)
+#define FTDI_SIO_SET_DATA_PARITY_EVEN	(0x2 << 8)
+#define FTDI_SIO_SET_DATA_PARITY_MARK	(0x3 << 8)
+#define FTDI_SIO_SET_DATA_PARITY_SPACE	(0x4 << 8)
+#define FTDI_SIO_SET_DATA_STOP_BITS_1	(0x0 << 11)
+#define FTDI_SIO_SET_DATA_STOP_BITS_15	(0x1 << 11)
+#define FTDI_SIO_SET_DATA_STOP_BITS_2	(0x2 << 11)
+#define FTDI_SIO_SET_BREAK				(0x1 << 14)
 
 
 /*
@@ -183,12 +183,12 @@ enum {
  * B10..15 Reserved
  */
 /* FTDI_SIO_MODEM_CTRL */
-#define FTDI_SIO_SET_DTR_MASK 0x1
-#define FTDI_SIO_SET_DTR_HIGH (1 | ( FTDI_SIO_SET_DTR_MASK  << 8))
-#define FTDI_SIO_SET_DTR_LOW  (0 | ( FTDI_SIO_SET_DTR_MASK  << 8))
-#define FTDI_SIO_SET_RTS_MASK 0x2
-#define FTDI_SIO_SET_RTS_HIGH (2 | ( FTDI_SIO_SET_RTS_MASK << 8))
-#define FTDI_SIO_SET_RTS_LOW (0 | ( FTDI_SIO_SET_RTS_MASK << 8))
+#define FTDI_SIO_SET_DTR_MASK	0x1
+#define FTDI_SIO_SET_DTR_HIGH	(1 | ( FTDI_SIO_SET_DTR_MASK  << 8))
+#define FTDI_SIO_SET_DTR_LOW	(0 | ( FTDI_SIO_SET_DTR_MASK  << 8))
+#define FTDI_SIO_SET_RTS_MASK	0x2
+#define FTDI_SIO_SET_RTS_HIGH	(2 | ( FTDI_SIO_SET_RTS_MASK << 8))
+#define FTDI_SIO_SET_RTS_LOW	(0 | ( FTDI_SIO_SET_RTS_MASK << 8))
 
 
 /*
@@ -216,10 +216,10 @@ enum {
  * XOFF character and the lValue field contains the XON character.
  */
 /* FTDI_SIO_SET_FLOW_CTRL */
-#define FTDI_SIO_DISABLE_FLOW_CTRL 0x0
-#define FTDI_SIO_RTS_CTS_HS 0x1
-#define FTDI_SIO_DTR_DSR_HS 0x2
-#define FTDI_SIO_XON_XOFF_HS 0x4
+#define FTDI_SIO_DISABLE_FLOW_CTRL	0x0
+#define FTDI_SIO_RTS_CTS_HS			0x1
+#define FTDI_SIO_DTR_DSR_HS			0x2
+#define FTDI_SIO_XON_XOFF_HS		0x4
 
 
 /*
@@ -295,10 +295,10 @@ enum {
  * FTDI_SIO_GET_MODEM_STATUS
  * Retrieve the current value of the modem status register.
  */
-#define FTDI_SIO_CTS_MASK 0x10
-#define FTDI_SIO_DSR_MASK 0x20
-#define FTDI_SIO_RI_MASK  0x40
-#define FTDI_SIO_RLSD_MASK 0x80
+#define FTDI_SIO_CTS_MASK	0x10
+#define FTDI_SIO_DSR_MASK	0x20
+#define FTDI_SIO_RI_MASK	0x40
+#define FTDI_SIO_RLSD_MASK	0x80
 
 
 
@@ -350,9 +350,9 @@ enum {
  * B2..7	Length of message - (not including Byte 0)
  *
  */
-#define FTDI_PORT_MASK 0x0f
-#define FTDI_MSR_MASK 0xf0
-#define FTDI_GET_MSR(p) (((p)[0]) & FTDI_MSR_MASK)
-#define FTDI_GET_LSR(p) ((p)[1])
-#define FTDI_LSR_MASK (~0x60) /* interesting bits */
-#define FTDI_OUT_TAG(len, port) (((len) << 2) | (port))
+#define FTDI_PORT_MASK			0x0f
+#define FTDI_MSR_MASK			0xf0
+#define FTDI_GET_MSR(p)			(((p)[0]) & FTDI_MSR_MASK)
+#define FTDI_GET_LSR(p)			((p)[1])
+#define FTDI_LSR_MASK			(~0x60) /* interesting bits */
+#define FTDI_OUT_TAG(len, port)	(((len) << 2) | (port))
