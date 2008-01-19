@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix glibc arch m68k ;
 
+SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc arch $(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
 	$(TARGET_ARCH) ;
 SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch generic ;
@@ -27,7 +28,7 @@ SubDirAsFlags -DMOTOROLA_SYNTAX ;
 local genericSources =
 	branred.c
 	cmp.c dbl2mpn.c divrem.c
-	doasin.c dosincos.c
+	dosincos.c
 	halfulp.c
 	mpa.c mpatan.c mpatan2.c mpexp.c mplog.c mpn2dbl.c
 	mpn2flt.c mpn2ldbl.c mpsqrt.c mptan.c
@@ -36,9 +37,7 @@ local genericSources =
 	slowexp.c
 	slowpow.c
 
-	e_acos.c e_acosf.c # e_acosl.c
 	e_acosh.c e_acoshf.c # e_acoshl.c
-	e_asin.c e_asinf.c # e_asinl.c
 	e_atan2.c e_atan2f.c # e_atan2l.c
 	e_atanh.c e_atanhf.c # e_atanhl.c
 	e_cosh.c e_coshf.c # e_coshl.c
@@ -65,6 +64,7 @@ local genericSources =
 	s_atan.c s_atanf.c # s_atanl.c
 	s_cbrt.c s_cbrtf.c # s_cbrtl.c
 	s_ceil.c s_ceilf.c # s_ceill.c
+	s_copysign.c s_copysignf.c # s_copysignl.c
 	s_cos.c s_cosf.c
 	s_erf.c s_erff.c # s_erfl.c
 	s_expm1f.c s_expm1.c
@@ -125,6 +125,7 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 
 	add_n.S
 	addmul_1.S
+	doasin.c
 	feholdexcpt.c fraiseexcpt.c fesetenv.c fesetround.c ftestexcept.c
 #	ldbl2mpn.c
 	lshift.S rshift.S
@@ -132,9 +133,10 @@ MergeObject posix_gnu_arch_$(TARGET_ARCH)_other.o :
 #	strlen.S
 	sub_n.S
 	submul_1.S
-#
-#	e_sqrt.c e_sqrtf.c # e_sqrtl.c
-#	s_copysign.S s_copysignf.S # s_copysignl.S
+
+	e_acos.c e_acosf.c # e_acosl.c
+	e_asin.c e_asinf.c # e_asinl.c
+	e_sqrt.c e_sqrtf.c # e_sqrtl.c
 #	s_fdim.c s_fdimf.c # s_fdiml.S
 #	s_fabs.S s_fabsf.S # s_fabsl.S
 #	s_isnan.c s_isnanf.S
