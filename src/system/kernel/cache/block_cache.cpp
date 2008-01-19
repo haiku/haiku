@@ -76,9 +76,9 @@ struct cache_transaction {
 #ifdef TRANSACTION_TRACING
 namespace TransactionTracing {
 
-class StartEnd : public AbstractTraceEntry {
+class Action : public AbstractTraceEntry {
 	public:
-		StartEnd(const char *label, block_cache *cache,
+		Action(const char *label, block_cache *cache,
 				cache_transaction *transaction)
 			:
 			fCache(cache),
@@ -849,19 +849,46 @@ write_cached_block(block_cache *cache, cached_block *block,
 
 
 #ifdef DEBUG_BLOCK_CACHE
+static void
+dump_block(cached_block *block)
+{
+	kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c  %08lx "
+		"%08lx\n", (addr_t)block, block->block_number,
+		(addr_t)block->current_data, (addr_t)block->original_data,
+		(addr_t)block->parent_data, block->ref_count, block->accessed,
+		block->busy ? 'B' : '-', block->is_writing ? 'W' : '-',
+		block->is_dirty ? 'B' : '-', block->unused ? 'U' : '-',
+		(addr_t)block->transaction,
+		(addr_t)block->previous_transaction);
+}
+
+
 static int
 dump_cache(int argc, char **argv)
 {
-	if (argc < 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s [-b] <address> [block-number]\n", argv[0]);
-		return 0;
-	}
-
+	bool showTransactions = false;
 	bool showBlocks = false;
 	int32 i = 1;
-	if (!strcmp(argv[1], "-b")) {
-		showBlocks = true;
+	while (argv[i] != NULL && argv[i][0] == '-') {
+		for (char *arg = &argv[i][1]; arg[0]; arg++) {
+			switch (arg[0]) {
+				case 'b':
+					showBlocks = true;
+					break;
+				case 't':
+					showTransactions = true;
+					break;
+				default:
+					print_debugger_command_usage(argv[0]);
+					return 0;
+			}
+		}
 		i++;
+	}
+
+	if (i >= argc) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
 	}
 
 	block_cache *cache = (struct block_cache *)parse_expression(argv[i]);
@@ -915,6 +942,23 @@ dump_cache(int argc, char **argv)
 	kprintf(" block_size: %lu\n", cache->block_size);
 	kprintf(" next_transaction_id: %ld\n", cache->next_transaction_id);
 
+	if (showTransactions) {
+		kprintf(" transactions:\n");
+		kprintf("address       id state  blocks  main   sub\n");
+
+		hash_iterator iterator;
+		hash_open(cache->transaction_hash, &iterator);
+
+		cache_transaction *transaction;
+		while ((transaction = (cache_transaction *)hash_next(
+				cache->transaction_hash, &iterator)) != NULL) {
+			kprintf("%p %5ld %-7s %5ld %5ld %5ld\n", transaction,
+				transaction->id, transaction->open ? "open" : "closed",
+				transaction->num_blocks, transaction->main_num_blocks,
+				transaction->sub_num_blocks);
+		}
+	}
+
 	if (showBlocks) {
 		kprintf(" blocks:\n");
 		kprintf("address  block no. current  original parent    refs access "
@@ -928,16 +972,8 @@ dump_cache(int argc, char **argv)
 	hash_open(cache->hash, &iterator);
 	cached_block *block;
 	while ((block = (cached_block *)hash_next(cache->hash, &iterator)) != NULL) {
-		if (showBlocks) {
-			kprintf("%08lx %9Ld %08lx %08lx %08lx %5ld %6ld %c%c%c%c %08lx "
-				"%08lx\n", (addr_t)block, block->block_number,
-				(addr_t)block->current_data, (addr_t)block->original_data,
-				(addr_t)block->parent_data, block->ref_count, block->accessed,
-				block->busy ? 'B' : '-', block->is_writing ? 'W' : '-',
-				block->is_dirty ? 'B' : '-', block->unused ? 'U' : '-',
-				(addr_t)block->transaction,
-				(addr_t)block->previous_transaction);
-		}
+		if (showBlocks)
+			dump_block(block);
 
 		if (block->is_dirty)
 			dirty++;
@@ -950,6 +986,69 @@ dump_cache(int argc, char **argv)
 		referenced);
 
 	hash_close(cache->hash, &iterator, false);
+	return 0;
+}
+
+
+static int
+dump_transaction(int argc, char **argv)
+{
+	bool showBlocks = false;
+	int i = 1;
+	if (argc > 1 && !strcmp(argv[1], "-b")) {
+		showBlocks = true;
+		i++;
+	}
+
+	if (argc - i < 1 || argc - i > 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	cache_transaction *transaction = NULL;
+
+	if (argc - i == 1) {
+		transaction = (cache_transaction *)parse_expression(argv[i]);
+	} else {
+		block_cache *cache = (block_cache *)parse_expression(argv[i]);
+		int32 id = parse_expression(argv[i + 1]);
+		transaction = lookup_transaction(cache, id);
+		if (transaction == NULL) {
+			kprintf("No transaction with ID %ld found.\n", id);
+			return 0;
+		}
+	}
+
+	kprintf("TRANSACTION %p\n", transaction);
+
+	kprintf(" id:             %ld\n", transaction->id);
+	kprintf(" num block:      %ld\n", transaction->num_blocks);
+	kprintf(" main num block: %ld\n", transaction->main_num_blocks);
+	kprintf(" sub num block:  %ld\n", transaction->sub_num_blocks);
+	kprintf(" has sub:        %d\n", transaction->has_sub_transaction);
+	kprintf(" state:          %s\n", transaction->open ? "open" : "closed");
+
+	if (!showBlocks)
+		return 0;
+
+	kprintf(" blocks:\n");
+	kprintf("address  block no. current  original parent    refs access "
+		"flags transact prev. trans\n");
+
+	cached_block *block = transaction->first_block;
+	while (block != NULL) {
+		dump_block(block);
+		block = block->transaction_next;
+	}
+
+	kprintf("--\n");
+
+	block_list::Iterator iterator = transaction->blocks.GetIterator();
+	while (iterator.HasNext()) {
+		block = iterator.Next();
+		dump_block(block);
+	}
+
 	return 0;
 }
 
@@ -981,8 +1080,17 @@ block_cache_init(void)
 	new (&sCaches) DoublyLinkedList<block_cache>;
 		// manually call constructor
 
-	add_debugger_command("block_caches", &dump_caches, "dumps all block caches");
-	add_debugger_command("block_cache", &dump_cache, "dumps a specific block cache");
+	add_debugger_command_etc("block_caches", &dump_caches,
+		"dumps all block caches", "\n", 0);
+	add_debugger_command_etc("block_cache", &dump_cache,
+		"dumps a specific block cache",
+		"[-bt] <cache-address> [block-number]\n"
+		"  -t lists the transactions\n"
+		"  -b lists all blocks\n", 0);
+	add_debugger_command_etc("transaction", &dump_transaction,
+		"dumps a specific transaction", "[-b] ((<cache> <id>) | <transaction>)\n"
+		"Either use a block cache pointer and an ID or a pointer to the transaction.\n"
+		"  -b lists all blocks that are part of this transaction\n", 0);
 #endif
 
 	return B_OK;
@@ -1011,7 +1119,7 @@ cache_start_transaction(void *_cache)
 	cache->last_transaction = transaction;
 
 	TRACE(("cache_start_transaction(): id %ld started\n", transaction->id));
-	T(StartEnd("start", cache, transaction));
+	T(Action("start", cache, transaction));
 
 	hash_insert(cache->transaction_hash, transaction);
 
@@ -1038,6 +1146,7 @@ cache_sync_transaction(void *_cache, int32 id)
 
 		if (transaction->id <= id && !transaction->open) {
 			// write back all of their remaining dirty blocks
+			T(Action("sync", cache, transaction));
 			while (transaction->num_blocks > 0) {
 				status = write_cached_block(cache, transaction->blocks.Head(),
 					false);
@@ -1070,7 +1179,7 @@ cache_end_transaction(void *_cache, int32 id,
 		return B_BAD_VALUE;
 	}
 
-	T(StartEnd("end", cache, transaction));
+	T(Action("end", cache, transaction));
 
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
@@ -1338,7 +1447,7 @@ cache_start_sub_transaction(void *_cache, int32 id)
 	transaction->has_sub_transaction = true;
 	transaction->main_num_blocks = transaction->num_blocks;
 	transaction->sub_num_blocks = 0;
-	T(StartEnd("start-sub", cache, transaction));
+	T(Action("start-sub", cache, transaction));
 
 	return B_OK;
 }
