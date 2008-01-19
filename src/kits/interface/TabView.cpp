@@ -27,11 +27,27 @@
 //                  managing groups of BTab objects.
 //------------------------------------------------------------------------------
 
-#include <TabView.h>
-#include <Message.h>
 #include <List.h>
+#include <Message.h>
+#include <PropertyInfo.h>
 #include <Rect.h>
+#include <TabView.h>
 //#include <Errors.h>
+
+#include <string.h>
+
+
+static property_info sPropertyList[] = {
+	{
+		"Selection",
+		{ B_GET_PROPERTY, B_SET_PROPERTY },
+		{ B_DIRECT_SPECIFIER },
+		NULL, 0,
+		{ B_INT32_TYPE }
+	},
+	{}
+};
+
 
 
 BTab::BTab(BView *tabView)
@@ -491,6 +507,36 @@ BTabView::DetachedFromWindow()
 void
 BTabView::MessageReceived(BMessage *message)
 {
+	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
+		BMessage reply(B_REPLY);
+		bool handled = false;
+
+		BMessage specifier;
+		int32 index;
+		int32 form;
+		const char *property;
+		if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
+			if (strcmp(property, "Selection") == 0) {
+				if (message->what == B_GET_PROPERTY) {
+					reply.AddInt32("result", fSelection);
+					handled = true;
+				} else {
+					// B_GET_PROPERTY
+					int32 selection;
+					if (message->FindInt32("data", &selection) == B_OK) {
+						Select(selection);
+						reply.AddInt32("error", B_OK);
+						handled = true;
+					}
+				}
+			}
+		}
+		
+		if (handled) {
+			message->SendReply(&reply);
+			return;
+		}
+	}
 	BView::MessageReceived(message);
 }
 
@@ -642,7 +688,7 @@ BTabView::SetFocusTab(int32 tab, bool focused)
 		tab = 0;
 
 	if(tab < 0)
-		tab = CountTabs() -1;
+		tab = CountTabs() - 1;
 
 	if (focused) {
 		if (tab == fFocus)
@@ -850,13 +896,24 @@ BHandler *
 BTabView::ResolveSpecifier(BMessage *message, int32 index,
 	BMessage *specifier, int32 what, const char *property)
 {
-	return BView::ResolveSpecifier(message, index, specifier, what, property);
+	BPropertyInfo propInfo(sPropertyList);
+
+	if (propInfo.FindMatch(message, 0, specifier, what, property) >= B_OK)
+		return this;
+
+	return BView::ResolveSpecifier(message, index, specifier, what,
+		property);
 }
 
 
 status_t
 BTabView::GetSupportedSuites(BMessage *message)
 {
+	message->AddString("suites", "suite/vnd.Be-tab-view");
+
+	BPropertyInfo propInfo(sPropertyList);
+	message->AddFlat("messages", &propInfo);
+
 	return BView::GetSupportedSuites(message);
 }
 
