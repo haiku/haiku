@@ -36,9 +36,9 @@ class Create : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "CREATE %Ld (%p), parent %Ld (%p), \"%s\", "
+			out.Print("CREATE %Ld (%p), parent %Ld (%p), \"%s\", "
 				"mode %lx, omode %x, type %lx", fID, fInode, fParentID,
 				fParent, fName, fMode, fOpenMode, fType);
 		}
@@ -66,10 +66,9 @@ class Remove : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "REMOVE %Ld (%p), \"%s\"", fID, fInode,
-				fName);
+			out.Print("REMOVE %Ld (%p), \"%s\"", fID, fInode, fName);
 		}
 
 	private:
@@ -89,9 +88,9 @@ class Action : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "%s %Ld (%p)\n", fAction, fID, fInode);
+			out.Print("%s %Ld (%p)\n", fAction, fID, fInode);
 		}
 
 	private:
@@ -112,9 +111,9 @@ class Resize : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "RESIZE %Ld (%p), %Ld -> %Ld", fID, fInode,
+			out.Print("RESIZE %Ld (%p), %Ld -> %Ld", fID, fInode,
 				fOldSize, fNewSize);
 		}
 

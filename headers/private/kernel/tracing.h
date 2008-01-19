@@ -23,6 +23,7 @@ class TraceOutput {
 	public:
 		TraceOutput(char* buffer, size_t bufferSize);
 
+		void Clear();
 		void Print(const char* format,...);
 		bool IsFull() const	{ return fSize >= fCapacity; }
 
@@ -37,7 +38,7 @@ class TraceEntry : trace_entry {
 		TraceEntry();
 		virtual ~TraceEntry();
 
-		virtual void Dump(char* buffer, size_t bufferSize);
+		virtual void Dump(TraceOutput& out);
 
 		size_t Size() const { return size; }
 		uint16 Flags() const { return flags; }
@@ -58,9 +59,8 @@ class AbstractTraceEntry : public TraceEntry {
 
 		virtual ~AbstractTraceEntry();
 
-		virtual void Dump(char* buffer, size_t bufferSize);
+		virtual void Dump(TraceOutput& out);
 
-		virtual void AddDump(char* buffer, size_t bufferSize);
 		virtual void AddDump(TraceOutput& out);
 
 		thread_id Thread() const { return fThread; }

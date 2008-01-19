@@ -146,9 +146,18 @@ allocate_entry(size_t size, uint16 flags)
 
 TraceOutput::TraceOutput(char* buffer, size_t bufferSize)
 	: fBuffer(buffer),
-	  fCapacity(bufferSize),
-	  fSize(0)
+	  fCapacity(bufferSize)
 {
+	Clear();
+}
+
+
+void
+TraceOutput::Clear()
+{
+	if (fCapacity > 0)
+		fBuffer[0] = '\0';
+	fSize = 0;
 }
 
 
@@ -179,11 +188,11 @@ TraceEntry::~TraceEntry()
 
 
 void
-TraceEntry::Dump(char* buffer, size_t bufferSize)
+TraceEntry::Dump(TraceOutput& out)
 {
 #if ENABLE_TRACING
 	// to be overridden by subclasses
-	kprintf(buffer, bufferSize, "ENTRY %p", this);
+	out.Print("ENTRY %p", this);
 #endif
 }
 
@@ -218,18 +227,9 @@ AbstractTraceEntry::~AbstractTraceEntry()
 
 
 void
-AbstractTraceEntry::Dump(char* buffer, size_t bufferSize)
+AbstractTraceEntry::Dump(TraceOutput& out)
 {
-	int length = snprintf(buffer, bufferSize, "[%6ld] %Ld: ",
-		fThread, fTime);
-	AddDump(buffer + length, bufferSize - length);
-}
-
-
-void
-AbstractTraceEntry::AddDump(char* buffer, size_t bufferSize)
-{
-	TraceOutput out(buffer, bufferSize);
+	out.Print("[%6ld] %Ld: ", fThread, fTime);
 	AddDump(out);
 }
 
@@ -305,8 +305,9 @@ dump_tracing(int argc, char** argv)
 
 		if ((current->flags & ENTRY_INITIALIZED) != 0) {
 			char buffer[256];
-			buffer[0] = '\0';
-			((TraceEntry*)current)->Dump(buffer, sizeof(buffer));
+			TraceOutput out(buffer, sizeof(buffer));
+			
+			((TraceEntry*)current)->Dump(out);
 
 			if (pattern != NULL && strstr(buffer, pattern) == NULL)
 				continue;

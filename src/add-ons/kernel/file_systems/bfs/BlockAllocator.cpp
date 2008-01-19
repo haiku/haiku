@@ -48,9 +48,9 @@ class Allocate : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "alloc %lu.%u.%u", fRun.AllocationGroup(),
+			out.Print("alloc %lu.%u.%u", fRun.AllocationGroup(),
 				fRun.Start(), fRun.Length());
 		}
 
@@ -67,9 +67,9 @@ class Free : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "free %lu.%u.%u", fRun.AllocationGroup(),
+			out.Print("free %lu.%u.%u", fRun.AllocationGroup(),
 				fRun.Start(), fRun.Length());
 		}
 
@@ -107,11 +107,10 @@ class Block : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			uint32 length = snprintf(buffer, size, "%s: block %Ld (%p), sum %lu,"
-				" s/l %lu/%lu", fLabel, fBlock, fData, fSum, fStart,
-				fLength);
+			out.Print("%s: block %Ld (%p), sum %lu, s/l %lu/%lu", fLabel,
+				fBlock, fData, fSum, fStart, fLength);
 		}
 
 	private:

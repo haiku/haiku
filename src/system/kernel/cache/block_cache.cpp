@@ -91,9 +91,9 @@ class Action : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "cache %p, %s transaction %p (id %ld)%s"
+			out.Print("cache %p, %s transaction %p (id %ld)%s"
 				", %ld/%ld blocks", fCache, fLabel, fTransaction, fID,
 				fSub ? " sub" : "", fNumBlocks, fSubNumBlocks);
 		}
@@ -123,9 +123,9 @@ class Detach : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "cache %p, detach transaction %p (id %ld)"
+			out.Print("cache %p, detach transaction %p (id %ld)"
 				"from transaction %p (id %ld)%s",
 				fCache, fNewTransaction, fNewID, fTransaction, fID,
 				fSub ? " sub" : "");
@@ -164,14 +164,12 @@ class Abort : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			int length = snprintf(buffer, size, "cache %p, abort transaction "
+			out.Print("cache %p, abort transaction "
 				"%p (id %ld), blocks", fCache, fTransaction, fID);
-			for (int32 i = 0; i < fNumBlocks && (size_t)length < size; i++) {
-				length += snprintf(buffer + length, size - length, " %Ld",
-					fBlocks[i]);
-			}
+			for (int32 i = 0; i < fNumBlocks && !out.IsFull(); i++)
+				out.Print(" %Ld", fBlocks[i]);
 		}
 
 	private:

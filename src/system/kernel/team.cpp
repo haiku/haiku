@@ -97,10 +97,9 @@ class TeamForked : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "team forked, new thread %ld",
-				fForkedThread);
+			out.Print("team forked, new thread %ld", fForkedThread);
 		}
 
 	private:
@@ -142,20 +141,13 @@ class ExecTeam : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "team exec, \"%p\", args:", fPath);
-			size_t printedChars = strlen(buffer);
-			buffer += printedChars;
-			size -= printedChars;
+			out.Print("team exec, \"%p\", args:", fPath);
 
 			char* args = fArgs;
-			for (int32 i = 0; size > 0 && i < fArgCount; i++) {
-				snprintf(buffer, size, " \"%s\"", args);
-
-				printedChars = strlen(buffer);
-				buffer += printedChars;
-				size -= printedChars;
+			for (int32 i = 0; !out.IsFull() && i < fArgCount; i++) {
+				out.Print(" \"%s\"", args);
 				args += strlen(args) + 1;
 			}			
 		}
@@ -196,9 +188,9 @@ class SetJobControlState : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "team set job control state, team %ld, "
+			out.Print("team set job control state, team %ld, "
 				"new state: %s, signal: %d",
 				fTeam, job_control_state_name(fNewState), fSignal);
 		}
@@ -220,9 +212,9 @@ class WaitForChild : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
-			snprintf(buffer, size, "team wait for child, child: %ld, "
+			out.Print("team wait for child, child: %ld, "
 				"flags: 0x%lx", fChild, fFlags);
 		}
 
@@ -252,15 +244,15 @@ class WaitForChildDone : public AbstractTraceEntry {
 			Initialized();
 		}
 
-		virtual void AddDump(char *buffer, size_t size)
+		virtual void AddDump(TraceOutput& out)
 		{
 			if (fTeam >= 0) {
-				snprintf(buffer, size, "team wait for child done, team: %ld, "
+				out.Print("team wait for child done, team: %ld, "
 					"state: %s, status: 0x%lx, reason: 0x%x, signal: %d\n",
 					fTeam, job_control_state_name(fState), fStatus, fReason,
 					fSignal);
 			} else {
-				snprintf(buffer, size, "team wait for child failed, error: "
+				out.Print("team wait for child failed, error: "
 					"0x%lx, ", fTeam);
 			}
 		}
