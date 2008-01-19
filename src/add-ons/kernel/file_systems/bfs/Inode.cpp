@@ -68,7 +68,7 @@ class Remove : public AbstractTraceEntry {
 
 		virtual void AddDump(char *buffer, size_t size)
 		{
-			snprintf(buffer, size, "REMOVE %Ld (%p), \"%s\"\n", fID, fInode,
+			snprintf(buffer, size, "REMOVE %Ld (%p), \"%s\"", fID, fInode,
 				fName);
 		}
 
@@ -1979,8 +1979,10 @@ Inode::_FreeStreamArray(Transaction &transaction, block_run *array,
 		// determine the block_run to be freed
 		if (newOffset > size && offset < size) {
 			// free partial block_run (and update the original block_run)
-			run.start = array[i].start
-				+ ((size - offset) >> fVolume->BlockShift()) + 1;
+			run.start = HOST_ENDIAN_TO_BFS_INT16(array[i].Start()
+				+ ((size + fVolume->BlockSize() - 1 - offset)
+					>> fVolume->BlockShift()));
+				// round to next block
 			array[i].length = HOST_ENDIAN_TO_BFS_INT16(run.Start()
 				- array[i].Start());
 			run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length()
