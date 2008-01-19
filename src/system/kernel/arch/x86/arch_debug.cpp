@@ -29,8 +29,6 @@ struct stack_frame {
 
 #define NUM_PREVIOUS_LOCATIONS 32
 
-extern struct iframe_stack gBootFrameStack;
-
 
 static bool
 already_visited(uint32 *visited, int32 *_last, int32 *_num, uint32 ebp)
@@ -200,8 +198,11 @@ is_kernel_stack_address(struct thread* thread, addr_t address)
 static bool
 is_iframe(struct thread* thread, addr_t frame)
 {
-	return is_kernel_stack_address(thread, frame)
-		&& (*(addr_t*)frame & ~IFRAME_TYPE_MASK) == 0;
+	if (!is_kernel_stack_address(thread, frame))
+		return false;
+
+	addr_t previousFrame = *(addr_t*)frame;
+	return ((previousFrame & ~IFRAME_TYPE_MASK) == 0 && previousFrame != 0);
 }
 
 

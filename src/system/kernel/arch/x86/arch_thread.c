@@ -67,8 +67,11 @@ find_previous_iframe(addr_t frame)
 	while (frame >= thread->kernel_stack_base
 		&& frame < thread->kernel_stack_base + KERNEL_STACK_SIZE) {
 		addr_t previousFrame = *(addr_t*)frame;
-		if ((previousFrame & ~IFRAME_TYPE_MASK) == 0)
+		if ((previousFrame & ~IFRAME_TYPE_MASK) == 0) {
+			if (previousFrame == 0)
+				return NULL;
 			return (struct iframe*)frame;
+		}
 
 		frame = previousFrame;
 	}
