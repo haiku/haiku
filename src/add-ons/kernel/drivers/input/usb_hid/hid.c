@@ -1,9 +1,11 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Jérôme Duval
+ *		Michael Lotz
+ *		Stephan Aßmus <superstippi@gmx.de>
  *
  * Some portions of code are copyrighted by
  * USB Joystick driver for BeOS R5
