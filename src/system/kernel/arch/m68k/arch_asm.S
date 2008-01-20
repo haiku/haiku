@@ -12,9 +12,10 @@
 
 .text
 
-// ToDo: fixme
+// ToDo: fixme -- platform dependant ?
 FUNCTION(reboot):
 	reset
+	rts
 
 
 /* void arch_int_enable_interrupts(void) */
@@ -64,6 +65,7 @@ arch_int_are_interrupts_enabled_no:
 
 // ToDo: fixme
 FUNCTION(dbg_save_registers):
+#warning M68K: implement dbx_save_registers!
 	rts
 
 
@@ -76,60 +78,19 @@ FUNCTION(get_time_base):
 	rts
 
 
+#warning M68K: checkme
 // void m68k_context_switch(addr_t *old_sp, addr_t new_sp);
 FUNCTION(m68k_context_switch):
-
-	// regs to push on the stack: f13-f31, r13-r31, cr, r2, lr
-
-	// push the old regs we need to save on the stack
-	// f31-13
-	stfdu		%f31, -8(%r1)
-	stfdu		%f30, -8(%r1)
-	stfdu		%f29, -8(%r1)
-	stfdu		%f28, -8(%r1)
-	stfdu		%f27, -8(%r1)
-	stfdu		%f26, -8(%r1)
-	stfdu		%f25, -8(%r1)
-	stfdu		%f24, -8(%r1)
-	stfdu		%f23, -8(%r1)
-	stfdu		%f22, -8(%r1)
-	stfdu		%f21, -8(%r1)
-	stfdu		%f20, -8(%r1)
-	stfdu		%f19, -8(%r1)
-	stfdu		%f18, -8(%r1)
-	stfdu		%f17, -8(%r1)
-	stfdu		%f16, -8(%r1)
-	stfdu		%f15, -8(%r1)
-	stfdu		%f14, -8(%r1)
-	stfdu		%f13, -8(%r1)
-
-	// r31-13, r2
-	stwu		%r31, -4(%r1)
-	stwu		%r30, -4(%r1)
-	stwu		%r29, -4(%r1)
-	stwu		%r28, -4(%r1)
-	stwu		%r27, -4(%r1)
-	stwu		%r26, -4(%r1)
-	stwu		%r25, -4(%r1)
-	stwu		%r24, -4(%r1)
-	stwu		%r23, -4(%r1)
-	stwu		%r22, -4(%r1)
-	stwu		%r21, -4(%r1)
-	stwu		%r20, -4(%r1)
-	stwu		%r19, -4(%r1)
-	stwu		%r18, -4(%r1)
-	stwu		%r17, -4(%r1)
-	stwu		%r16, -4(%r1)
-	stwu		%r15, -4(%r1)
-	stwu		%r14, -4(%r1)
-	stwu		%r13, -4(%r1)
-	stwu		%r2, -4(%r1)
-
-	// CR and LR
-	mfcr		%r0
-	stwu		%r0, -4(%r1)
-	mflr		%r0
-	stwu		%r0, -4(%r1)
+	// save fp ?
+	//move.w		%sr,-(%sp)
+	movem.l		%d0-%d7/%a0-%a7,-(%sp)
+	fpmovem		%fp0-%fp7,-(%sp)
+	fpsave		-(%sp)
+	
+	fprestore	(%sp)+
+	fpmovem		(%sp)+,%fp0-%fp7
+	movem.l		(%sp)+,%d0-%d7/%a0-%a7
+	//move.w		(%sp)+,%sr
 
 	// save the old stack pointer
 	stwu		%r1, 0(%r3)
