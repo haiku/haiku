@@ -27,6 +27,10 @@ class TraceOutput {
 		void Print(const char* format,...);
 		bool IsFull() const	{ return fSize >= fCapacity; }
 
+		char* Buffer() const	{ return fBuffer; }
+		size_t Capacity() const	{ return fCapacity; }
+		size_t Size() const		{ return fSize; }
+
 	private:
 		char*	fBuffer;
 		size_t	fCapacity;

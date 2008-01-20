@@ -240,6 +240,208 @@ AbstractTraceEntry::AddDump(TraceOutput& out)
 }
 
 
+//	#pragma mark - trace filters
+
+
+class LazyTraceOutput : public TraceOutput {
+public:
+	LazyTraceOutput(char* buffer, size_t bufferSize)
+		: TraceOutput(buffer, bufferSize)
+	{
+	}
+
+	const char* DumpEntry(const TraceEntry* entry)
+	{
+		if (Size() == 0) {
+			const_cast<TraceEntry*>(entry)->Dump(*this);
+				// Dump() should probably be const
+		}
+
+		return Buffer();
+	}
+};
+
+
+class TraceFilter {
+public:
+	virtual ~TraceFilter()
+	{
+	}
+
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		return false;
+	}
+
+public:
+	union {
+		thread_id	fThread;
+		const char*	fString;
+		struct {
+			TraceFilter*	first;
+			TraceFilter*	second;
+		} fSubFilters;
+	};
+};
+
+
+class ThreadTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* _entry, LazyTraceOutput& out)
+	{
+		const AbstractTraceEntry* entry
+			= dynamic_cast<const AbstractTraceEntry*>(_entry);
+		return (entry != NULL && entry->Thread() == fThread);
+	}
+};
+
+
+class PatternTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		return strstr(out.DumpEntry(entry), fString) != NULL;
+	}
+};
+
+
+class NotTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		return !fSubFilters.first->Filter(entry, out);
+	}
+};
+
+
+class AndTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		return fSubFilters.first->Filter(entry, out)
+			&& fSubFilters.second->Filter(entry, out);
+	}
+};
+
+
+class OrTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		return fSubFilters.first->Filter(entry, out)
+			|| fSubFilters.second->Filter(entry, out);
+	}
+};
+
+
+class TraceFilterParser {
+public:
+	static TraceFilterParser* Default()
+	{
+		return &sParser;
+	}
+
+	bool Parse(int argc, const char* const* argv)
+	{
+		fTokens = argv;
+		fTokenCount = argc;
+		fTokenIndex = 0;
+		fFilterCount = 0;
+
+		TraceFilter* filter = _ParseExpression();
+		return fTokenIndex == fTokenCount && filter != NULL;
+	}
+
+	bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		return fFilters[0].Filter(entry, out);
+	}
+
+private:
+	TraceFilter* _ParseExpression()
+	{
+		const char* token = _NextToken();
+		if (!token) {
+			// unexpected end of expression
+			return NULL;
+		}
+
+		if (fFilterCount == MAX_FILTERS) {
+			// too many filters
+			return NULL;
+		}
+
+		if (token[0] == '#') {
+			TraceFilter* filter = new(&fFilters[fFilterCount++])
+				PatternTraceFilter;
+			filter->fString = token + 1;
+			return filter;
+		} else if (strcmp(token, "not") == 0) {
+			TraceFilter* filter = new(&fFilters[fFilterCount++]) NotTraceFilter;
+			if ((filter->fSubFilters.first = _ParseExpression()) != NULL)
+				return filter;
+			return NULL;
+		} else if (strcmp(token, "and") == 0) {
+			TraceFilter* filter = new(&fFilters[fFilterCount++]) AndTraceFilter;
+			if ((filter->fSubFilters.first = _ParseExpression()) != NULL
+				&& (filter->fSubFilters.second = _ParseExpression()) != NULL) {
+				return filter;
+			}
+			return NULL;
+		} else if (strcmp(token, "or") == 0) {
+			TraceFilter* filter = new(&fFilters[fFilterCount++]) OrTraceFilter;
+			if ((filter->fSubFilters.first = _ParseExpression()) != NULL
+				&& (filter->fSubFilters.second = _ParseExpression()) != NULL) {
+				return filter;
+			}
+			return NULL;
+		} else if (strcmp(token, "thread") == 0) {
+			const char* arg = _NextToken();
+			if (arg == NULL) {
+				// unexpected end of expression
+				return NULL;
+			}
+
+			TraceFilter* filter = new(&fFilters[fFilterCount++])
+				ThreadTraceFilter;
+			filter->fThread = strtol(arg, NULL, 0);
+			return filter;
+		} else {
+			// invalid token
+			return NULL;
+		}
+	}
+
+	const char* _CurrentToken() const
+	{
+		if (fTokenIndex >= 1 && fTokenIndex <= fTokenCount)
+			return fTokens[fTokenIndex - 1];
+		return NULL;
+	}
+
+	const char* _NextToken()
+	{
+		if (fTokenIndex >= fTokenCount)
+			return NULL;
+		return fTokens[fTokenIndex++];
+	}
+
+private:
+	enum { MAX_FILTERS = 32 };
+
+	const char* const*			fTokens;
+	int							fTokenCount;
+	int							fTokenIndex;
+	TraceFilter					fFilters[MAX_FILTERS];
+	int							fFilterCount;
+
+	static TraceFilterParser	sParser;
+};
+
+
+TraceFilterParser TraceFilterParser::sParser;
+
+
 //	#pragma mark -
 
 
@@ -249,36 +451,73 @@ AbstractTraceEntry::AddDump(TraceOutput& out)
 int
 dump_tracing(int argc, char** argv)
 {
-	const char *pattern = NULL;
-	if (argv[argc - 1][0] == '#')
-		pattern = argv[--argc] + 1;
+	int argi = 1;
 
 	// Note: start and index are Pascal-like indices (i.e. in [1, sEntries]).
 	int32 count = 30;
 	int32 start = 0;	// special index: print the last count entries
 	int32 cont = 0;
 
-	if (argc == 2) {
-		if (strcmp(argv[1], "forward") == 0)
+	bool hasFilter = false;
+
+	if (argi < argc) {
+		if (strcmp(argv[argi], "forward") == 0) {
 			cont = 1;
-		else if (strcmp(argv[1], "backward") == 0)
+			argi++;
+		} else if (strcmp(argv[argi], "backward") == 0) {
 			cont = -1;
-		else
-			start = parse_expression(argv[1]);
+			argi++;
+		}
 	}
 
-	if (argc == 3) {
-		start = parse_expression(argv[1]);
-		count = parse_expression(argv[2]);
-	} else if (argc > 3) {
+	if (cont != 0 && argi < argc) {
 		print_debugger_command_usage(argv[0]);
 		return 0;
+	}
+
+	// start
+	if (argi < argc) {
+		if (strcmp(argv[argi], "filter") == 0) {
+			hasFilter = true;
+			argi++;
+		} else if (argv[argi][0] == '#') {
+			hasFilter = true;
+		} else {
+			start = parse_expression(argv[argi]);
+			argi++;
+		}
+	}
+
+	// count
+	if (!hasFilter && argi < argc) {
+		if (strcmp(argv[argi], "filter") == 0) {
+			hasFilter = true;
+			argi++;
+		} else if (argv[argi][0] == '#') {
+			hasFilter = true;
+		} else {
+			count = parse_expression(argv[argi]);
+			argi++;
+		}
+	}
+
+	// filter specification
+	if (argi < argc) {
+		hasFilter = true;
+		if (strcmp(argv[argi], "filter") == 0)
+			argi++;
+
+		if (!TraceFilterParser::Default()->Parse(argc - argi, argv + argi)) {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
 	}
 
 	if (cont != 0) {
 		start = get_debug_variable("_tracingStart", start);
 		count = get_debug_variable("_tracingCount", count);
 		start = max_c(1, start + count * cont);
+		hasFilter = get_debug_variable("_tracingFilter", count);
 	}
 
 	if ((uint32)count > sEntries)
@@ -305,14 +544,13 @@ dump_tracing(int argc, char** argv)
 
 		if ((current->flags & ENTRY_INITIALIZED) != 0) {
 			char buffer[256];
-			TraceOutput out(buffer, sizeof(buffer));
+			LazyTraceOutput out(buffer, sizeof(buffer));
 			
-			((TraceEntry*)current)->Dump(out);
-
-			if (pattern != NULL && strstr(buffer, pattern) == NULL)
+			TraceEntry* entry = (TraceEntry*)current;
+			if (hasFilter && !TraceFilterParser::Default()->Filter(entry, out))
 				continue;
 
-			kprintf("%5ld. %s\n", index, buffer);
+			kprintf("%5ld. %s\n", index, out.DumpEntry(entry));
 		} else
 			kprintf("%5ld. ** uninitialized entry **\n", index);
 
@@ -324,6 +562,7 @@ dump_tracing(int argc, char** argv)
 
 	set_debug_variable("_tracingStart", start);
 	set_debug_variable("_tracingCount", count);
+	set_debug_variable("_tracingFilter", hasFilter);
 
 	return cont != 0 ? B_KDEBUG_CONT : 0;
 }
@@ -420,7 +659,7 @@ tracing_init(void)
 	add_debugger_command_etc("traced", &dump_tracing,
 		"Dump recorded trace entries",
 		"(\"forward\" | \"backward\") | ([ <start> [ <count> ] ] "
-			"[ #<pattern> ])\n"
+			"[ #<pattern> | (\"filter\" <filter>) ])\n"
 		"Prints recorded trace entries. If \"backward\" or \"forward\" is\n"
 		"specified, the command continues where the previous invocation left\n"
 		"off, i.e. printing the previous respectively next entries (as many\n"
@@ -432,7 +671,14 @@ tracing_init(void)
 		"               to 0.\n"
 		"  <count>    - The number of entries to be printed. Defaults to 30.\n"
 		"  <pattern>  - If specified only entries containing this string are\n"
-		"               printed.\n", 0);
+		"               printed.\n"
+		"  <filter>   - If specified only entries matching this filter\n"
+		"               expression are printed. The expression can consist of\n"
+		"               prefix operators \"not\", \"and\", \"or\", filters of\n"
+		"               the kind \"'thread' <thread>\" (matching entries\n"
+		"               with the given thread ID), or filter of the kind\n"
+		"               \"#<pattern>\" (matching entries containing the given\n"
+		"               string.\n", 0);
 #endif	// ENABLE_TRACING
 	return B_OK;
 }
