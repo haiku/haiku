@@ -420,6 +420,23 @@ put_page_table_entry_in_pgtable(page_table_entry *entry,
 }
 
 
+static void
+put_page_indirect_entry_in_pgtable(page_indirect_entry *entry,
+	addr_t physicalAddress, uint32 attributes, bool globalPage)
+{
+	page_indirect_entry page;
+	init_page_table_entry(&page);
+
+	page.addr = TA_TO_PIEA(physicalAddress);
+	page.type = DT_INDIRECT;
+
+	// there are no protection bits in indirect descriptor usually.
+
+	// put it in the page table
+	update_page_table_entry(entry, &page);
+}
+
+
 static size_t
 map_max_pages_need(vm_translation_map */*map*/, addr_t start, addr_t end)
 {
@@ -654,58 +671,53 @@ query_tmap_interrupt(vm_translation_map *map, addr_t va, addr_t *_physical,
 {
 	page_root_entry *pr = map->arch_data->rtdir_virt;
 	page_directory_entry *pd;
+	page_indirect_entry *pi;
 	page_table_entry *pt;
 	addr_t physicalPageTable;
 	int32 cpu = smp_get_current_cpu();
 	int32 index;
-	int level
-
-	*_physical = 0;
-
-	for (level = 0; level < 4; level++) {
+	status_t err = B_ERROR;	// no pagetable here
 	
-		index = VADDR_TO_PDENT(va);
-		if (pd[index].type != 0) {
-			// no pagetable here
-			return B_ERROR;
-		}
+	if (sQueryPage == NULL)
+		return err; // not yet initialized !?
 
-		// map page table entry using our per CPU mapping page
-
-		physicalPageTable = ADDR_REVERSE_SHIFT(pd[index].addr);
-		pt = (page_table_entry *)(sQueryPage/* + cpu * SIZ_DIRTBL*/);
-		index = VADDR_TO_PDENT((addr_t)pt);
-		if (pd[index].present == 0) {
-			// no page table here
-			return B_ERROR;
-		}
-
-		index = VADDR_TO_PTENT((addr_t)pt);
-		put_page_table_entry_in_pgtable(&sQueryPageTable[index], physicalPageTable,
-			B_KERNEL_READ_AREA, false);
+	index = VADDR_TO_PRENT(va);
+	if (pr && pr[index].type == DT_ROOT) {
+		put_page_table_entry_in_pgtable(&sQueryDesc, PRE_TO_TA(pr[index]), B_KERNEL_READ_AREA, false);
 		invalidate_TLB(pt);
-
-		index = VADDR_TO_PTENT(va);
-
-		switch (level) {
-			case 0: // root table
-			case 1: // directory table
-			case 2: // page table
-				if (.type == DT_INDIRECT) {
-					continue;
-				}
-				// FALLTHROUGH
-			case 3: // indirect desc
-		}
+		pd = (page_directory_entry *)sQueryPage;
+		index = VADDR_TO_PDENT(va);
+		
+		if (pd && pd[index].type == DT_DIR) {
+			put_page_table_entry_in_pgtable(&sQueryDesc, PDE_TO_TA(pd[index]), B_KERNEL_READ_AREA, false);
+			invalidate_TLB(pt);
+			pt = (page_table_entry *)sQueryPage;
+			index = VADDR_TO_PTENT(va);
+			
+			if (pt && pt[index].type == DT_INDIRECT) {
+				pi = pt;
+				put_page_table_entry_in_pgtable(&sQueryDesc, PIE_TO_TA(pi[index]), B_KERNEL_READ_AREA, false);
+				invalidate_TLB(pt);
+				pt = (page_table_entry *)sQueryPage;
+				index = 0; // single descriptor
+			}
+		
+			if (pt /*&& pt[index].type == DT_PAGE*/) {
+				*_physical = PTE_TO_PA(pt[index]);
+				// we should only be passed page va, but just in case.
+				*_physical += va % B_PAGE_SIZE;
+				*_flags |= ((pt[index].write_protect ? 0 : B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
+						| (pt[index].dirty ? PAGE_MODIFIED : 0)
+						| (pt[index].accessed ? PAGE_ACCESSED : 0)
+						| ((pt[index].type == DT_PAGE) ? PAGE_PRESENT : 0);
+				err = B_OK;
+			}
 	}
-	*_physical = ADDR_REVERSE_SHIFT(pt[index].addr);
 
-	*_flags |= ((pt[index].rw ? B_KERNEL_WRITE_AREA : 0) | B_KERNEL_READ_AREA)
-		| (pt[index].dirty ? PAGE_MODIFIED : 0)
-		| (pt[index].accessed ? PAGE_ACCESSED : 0)
-		| (pt[index].present ? PAGE_PRESENT : 0);
+	// unmap the pg table from the indirect desc.
+	sQueryDesc.type = DT_INVALID;
 
-	return B_OK;
+	return err;
 }
 
 
@@ -1240,6 +1252,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	void *temp;
 	status_t error;
 	area_id area;
+	void *queryPage;
 
 	TRACE(("vm_translation_map_init_post_area: entry\n"));
 
@@ -1271,7 +1284,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	// Note we don't support SMP which makes things simpler.
 
 	area = vm_create_null_area(vm_kernel_address_space_id(),
-		"interrupt query pages", (void **)&sQueryPage, B_ANY_ADDRESS,
+		"interrupt query pages", (void **)&queryPage, B_ANY_ADDRESS,
 		B_PAGE_SIZE);
 	if (area < B_OK)
 		return area;
@@ -1281,33 +1294,61 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 	{
 		page_directory_entry *pageDirEntry;
 		page_indirect_entry *pageTableEntry;
-		addr_t physicalPageTable;
+		addr_t physicalPageDir, physicalPageTable;
+		addr_t physicalIndirectDesc;
 		int32 index;
 
-		sQueryPageTable = (page_indirect_entry *)(sQueryPage);
+		// first get pa for the indirect descriptor
+		
+		index = VADDR_TO_PRENT((addr_t)&sQueryDesc);
+		physicalPageDir = PRE_TO_PA(sKernelVirtualPageRoot[index]);
 
-		index = VADDR_TO_PRENT((addr_t)sQueryPageTable);
-		physicalPageTable = ADDR_REVERSE_SHIFT(sKernelVirtualPageRoot[index].addr);
+		get_physical_page_tmap(physicalPageDir,
+			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_NO_WAIT);
 
-		get_physical_page_tmap(physicalPageTable,
-			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_NO_WAIT);
-
-		sQueryPageTable = (page_table_entry *)(sQueryPages);
-
-		index = VADDR_TO_PDENT((addr_t)sQueryPageTable);
-		physicalPageTable = ADDR_REVERSE_SHIFT(sKernelVirtualPageRoot[index].addr);
+		index = VADDR_TO_PDENT((addr_t)&sQueryDesc);
+		physicalPageTable = PDE_TO_PA(pageDirEntry[index]);
 
 		get_physical_page_tmap(physicalPageTable,
 			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_NO_WAIT);
 
-		index = VADDR_TO_PTENT((addr_t)sQueryPageTable);
-		put_page_table_entry_in_pgtable(&pageTableEntry[index], physicalPageTable,
+		index = VADDR_TO_PTENT((addr_t)&sQueryDesc);
+
+		// pa of the page
+		physicalIndirectDesc = PTE_TO_PA(pageTableEntry[index]);
+		// add offset
+		physicalIndirectDesc += ((addr_t)&sQueryDesc) % B_PAGE_SIZE;
+
+		put_physical_page_tmap((addr_t)pageTableEntry);
+		put_physical_page_tmap((addr_t)pageDirEntry);
+		
+		// then the va for the page table for the query page.
+		
+		//sQueryPageTable = (page_indirect_entry *)(queryPage);
+
+		index = VADDR_TO_PRENT((addr_t)queryPage);
+		physicalPageDir = PRE_TO_PA(sKernelVirtualPageRoot[index]);
+
+		get_physical_page_tmap(physicalPageDir,
+			(addr_t *)&pageDirEntry, PHYSICAL_PAGE_NO_WAIT);
+
+		index = VADDR_TO_PDENT((addr_t)queryPage);
+		physicalPageTable = PDE_TO_PA(pageDirEntry[index]);
+
+		get_physical_page_tmap(physicalPageTable,
+			(addr_t *)&pageTableEntry, PHYSICAL_PAGE_NO_WAIT);
+
+		index = VADDR_TO_PTENT((addr_t)queryPage);
+		
+		put_page_indirect_entry_in_pgtable(&pageTableEntry[index], physicalIndirectDesc,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, false);
 
 		put_physical_page_tmap((addr_t)pageTableEntry);
 		put_physical_page_tmap((addr_t)pageDirEntry);
 		//invalidate_TLB(sQueryPageTable);
 	}
+	// qmery_tmap_interrupt checks for the NULL, now it can use it
+	sQueryPage = queryPage;
 
 	TRACE(("vm_translation_map_init_post_area: done\n"));
 	return B_OK;
