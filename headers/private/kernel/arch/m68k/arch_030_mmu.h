@@ -10,13 +10,7 @@
 #include <string.h>
 
 #include <arch_cpu.h>
-
-enum descriptor_types {
-	DT_INVALID = 0,			// invalid entry
-	DT_PAGE,				// page descriptor
-	DT_VALID_4,				// short page table descriptor
-	DT_VALID_8,				// long page table descriptor
-};
+#include <arch_mmu.h>
 
 // global pages only available on 040/060
 //#define MMU_HAS_GLOBAL_PAGES

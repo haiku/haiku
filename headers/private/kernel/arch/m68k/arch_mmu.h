@@ -116,9 +116,9 @@ struct long_page_table_entry {
 };
 #endif
 
-
+/* ppc
 extern void m68k_get_page_table(page_table_entry_group **_pageTable, size_t *_size);
 extern void m68k_set_page_table(page_table_entry_group *pageTable, size_t size);
-
+*/
 
 #endif	/* _KERNEL_ARCH_M68K_MMU_H */
