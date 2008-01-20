@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -508,14 +508,7 @@ WindowLayer::SetTopLayer(ViewLayer* topLayer)
 ViewLayer*
 WindowLayer::ViewAt(const BPoint& where)
 {
-	ViewLayer* view = NULL;
-
-	if (!fContentRegionValid)
-		_UpdateContentRegion();
-
-	view = fTopLayer->ViewAt(where, &fContentRegion);
-
-	return view;
+	return fTopLayer->ViewAt(where);
 }
 
 
@@ -930,6 +923,17 @@ void
 WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	bool isLatestMouseMoved)
 {
+#if 0
+	if (fDecorator != NULL && fTopLayer != NULL) {
+		DrawingEngine* engine = fDecorator->GetDrawingEngine();
+		engine->LockParallelAccess();
+		engine->ConstrainClippingRegion(&VisibleRegion());
+
+		fTopLayer->MarkAt(engine, where);
+		engine->UnlockParallelAccess();
+	}
+#endif
+
 	ViewLayer* view = ViewAt(where);
 	if (view != NULL)
 		*_viewToken = view->Token();

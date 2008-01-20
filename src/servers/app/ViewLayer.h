@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -101,8 +101,7 @@ class ViewLayer {
 			uint32			CountChildren(bool deep = false) const;
 			void			CollectTokensForChildren(BList* tokenMap) const;
 
-			ViewLayer*		ViewAt(const BPoint& where,
-								   BRegion* windowContentClipping);
+			ViewLayer*		ViewAt(const BPoint& where);
 
 			// coordinate conversion
 			void			ConvertToParent(BPoint* point) const;
@@ -232,6 +231,10 @@ class ViewLayer {
 
 			// debugging
 			void			PrintToStream() const;
+#if 0
+			bool			MarkAt(DrawingEngine* engine, const BPoint& where,
+								int32 level = 0);
+#endif
 
 	protected:
 			void			_MoveScreenClipping(int32 x, int32 y,

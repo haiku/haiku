@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -143,8 +143,8 @@ IntRect
 ViewLayer::Bounds() const
 {
 	IntRect bounds(fScrollingOffset.x, fScrollingOffset.y,
-				   fScrollingOffset.x + fFrame.Width(),
-				   fScrollingOffset.y + fFrame.Height());
+		fScrollingOffset.x + fFrame.Width(),
+		fScrollingOffset.y + fFrame.Height());
 	return bounds;
 }
 
@@ -171,8 +171,10 @@ ViewLayer::AttachedToWindow(WindowLayer* window)
 		fIsDesktopBackground = true;
 
 	// insert view into local token space
-	if (fWindow != NULL)
-		fWindow->ServerWindow()->App()->ViewTokens().SetToken(fToken, B_HANDLER_TOKEN, this);
+	if (fWindow != NULL) {
+		fWindow->ServerWindow()->App()->ViewTokens().SetToken(fToken,
+			B_HANDLER_TOKEN, this);
+	}
 
 	// attach child views as well
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
@@ -244,7 +246,8 @@ bool
 ViewLayer::RemoveChild(ViewLayer* layer)
 {
 	if (layer->fParent != this) {
-		printf("ViewLayer::RemoveChild(%p - %s) - ViewLayer is not child of this (%p) layer!\n", layer, layer ? layer->Name() : NULL, this);
+		printf("ViewLayer::RemoveChild(%p - %s) - ViewLayer is not child of "
+			"this (%p) layer!\n", layer, layer ? layer->Name() : NULL, this);
 		return false;
 	}
 
@@ -334,34 +337,65 @@ ViewLayer::CollectTokensForChildren(BList* tokenMap) const
 }
 
 
+#if 0
+bool
+ViewLayer::MarkAt(DrawingEngine* engine, const BPoint& where, int32 level)
+{
+	BRect rect(fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
+
+	if (Parent() != NULL) {
+		Parent()->ConvertToScreen(&rect);
+		if (!rect.Contains(where))
+			return false;
+
+		engine->StrokeRect(rect, (rgb_color){level * 30, level * 30, level * 30});
+	}
+
+
+	bool found = false;
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		found |= child->MarkAt(engine, where, level + 1);
+	}
+
+	if (!found) {
+		rgb_color color = {0};
+		switch (level % 2) {
+			case 0: color.green = rand() % 256; break;
+			case 1: color.blue = rand() % 256; break;
+		}
+
+		rect.InsetBy(1, 1);
+		//engine->FillRegion(fLocalClipping, (rgb_color){255, 255, 0, 10});
+		engine->StrokeRect(rect, color);
+		rect.InsetBy(1, 1);
+		engine->StrokeRect(rect, color);
+	}
+
+	return true;
+}
+#endif
+
+
 ViewLayer*
-ViewLayer::ViewAt(const BPoint& where, BRegion* windowContentClipping)
+ViewLayer::ViewAt(const BPoint& where)
 {
 	if (!fVisible)
 		return NULL;
 
-	// NOTE: if this view can draw on children, it's screen clipping
-	// excludes these children, so we need to ask those first if they
-	// contain "where", otherwise we check the screen clipping before
-	// recursing into the children
+	IntRect frame = Frame();
+	if (Parent() != NULL)
+		Parent()->ConvertToScreen(&frame);
 
-	if (!(fFlags & B_DRAW_ON_CHILDREN)) {
-		if (ScreenClipping(windowContentClipping).Contains(where))
-			return this;
-	}
+	if (!frame.Contains(where))
+		return NULL;
 
 	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
-		ViewLayer* layer = child->ViewAt(where, windowContentClipping);
-		if (layer)
+		ViewLayer* layer = child->ViewAt(where);
+		if (layer != NULL)
 			return layer;
 	}
 
-	if (fFlags & B_DRAW_ON_CHILDREN) {
-		if (ScreenClipping(windowContentClipping).Contains(where))
-			return this;
-	}
-
-	return NULL;
+	return this;
 }
 
 
@@ -540,7 +574,7 @@ ViewLayer::ConvertToParent(BRect* rect) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	rect->OffsetBy(fFrame.left - fScrollingOffset.x,
-				   fFrame.top - fScrollingOffset.y);
+		fFrame.top - fScrollingOffset.y);
 }
 
 
@@ -549,7 +583,7 @@ ViewLayer::ConvertToParent(IntRect* rect) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	rect->OffsetBy(fFrame.left - fScrollingOffset.x,
-				   fFrame.top - fScrollingOffset.y);
+		fFrame.top - fScrollingOffset.y);
 }
 
 
@@ -558,7 +592,7 @@ ViewLayer::ConvertToParent(BRegion* region) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	region->OffsetBy(fFrame.left - fScrollingOffset.x,
-					 fFrame.top - fScrollingOffset.y);
+		fFrame.top - fScrollingOffset.y);
 }
 
 
@@ -585,7 +619,7 @@ ViewLayer::ConvertFromParent(BRect* rect) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
-				   fScrollingOffset.y - fFrame.top);
+		fScrollingOffset.y - fFrame.top);
 }
 
 
@@ -594,7 +628,7 @@ ViewLayer::ConvertFromParent(IntRect* rect) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
-				   fScrollingOffset.y - fFrame.top);
+		fScrollingOffset.y - fFrame.top);
 }
 
 
@@ -603,7 +637,7 @@ ViewLayer::ConvertFromParent(BRegion* region) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	region->OffsetBy(fScrollingOffset.x - fFrame.left,
-					 fScrollingOffset.y - fFrame.top);
+		fScrollingOffset.y - fFrame.top);
 }
 
 //! converts a point from local to screen coordinate system 
@@ -964,7 +998,7 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 		int32 heightDiff = (int32)(newFrame.Height() - fFrame.Height());
 
 		MoveBy(newFrame.left - fFrame.left,
-			   newFrame.top - fFrame.top, dirtyRegion);
+			newFrame.top - fFrame.top, dirtyRegion);
 
 		ResizeBy(widthDiff, heightDiff, dirtyRegion);
 	} else {
@@ -1308,7 +1342,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	if (deep) {
 		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 			child->Draw(drawingEngine, effectiveClipping,
-						windowContentClipping, deep);
+				windowContentClipping, deep);
 		}
 	}
 }
@@ -1418,9 +1452,8 @@ ViewLayer::MarkBackgroundDirty()
 
 
 void
-ViewLayer::AddTokensForLayersInRegion(BMessage* message,
-									  BRegion& region,
-									  BRegion* windowContentClipping)
+ViewLayer::AddTokensForLayersInRegion(BMessage* message, BRegion& region,
+	BRegion* windowContentClipping)
 {
 	if (!fVisible)
 		return;
@@ -1428,16 +1461,16 @@ ViewLayer::AddTokensForLayersInRegion(BMessage* message,
 	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
 		message->AddInt32("_token", fToken);
 
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
 		child->AddTokensForLayersInRegion(message, region,
-										  windowContentClipping);
+			windowContentClipping);
+	}
 }
 
 
 void
-ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
-									  BRegion& region,
-									  BRegion* windowContentClipping)
+ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link, BRegion& region,
+	BRegion* windowContentClipping)
 {
 	if (!fVisible)
 		return;
@@ -1450,9 +1483,9 @@ ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link,
 	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
 		link.Attach<int32>(fToken);
 
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
-		child->AddTokensForLayersInRegion(link, region,
-										  windowContentClipping);
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		child->AddTokensForLayersInRegion(link, region, windowContentClipping);
+	}
 }
 
 
@@ -1541,8 +1574,8 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 		// the parent, the local clipping does not account for this
 		IntRect clippedBounds = Bounds();
 		ConvertToVisibleInTopView(&clippedBounds);
-		if (clippedBounds.Width() < fScreenClipping.Frame().Width() ||
-			clippedBounds.Height() < fScreenClipping.Frame().Height()) {
+		if (clippedBounds.Width() < fScreenClipping.Frame().Width()
+			|| clippedBounds.Height() < fScreenClipping.Frame().Height()) {
 			BRegion* temp = fWindow->GetRegion();
 			if (temp) {
 				temp->Set((clipping_rect)clippedBounds);
