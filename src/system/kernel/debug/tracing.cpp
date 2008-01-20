@@ -19,7 +19,7 @@
 
 //#define TRACE_TRACING
 #ifdef TRACE_TRACING
-#	define TRACE(x) dprintf x
+#	define TRACE(x) dprintf_no_syslog x
 #else
 #	define TRACE(x) ;
 #endif
@@ -55,54 +55,98 @@ next_entry(trace_entry* entry)
 }
 
 
-static void
+static bool
+free_first_entry()
+{
+	TRACE(("  skip start %p, %u bytes\n", sFirstEntry, sFirstEntry->size));
+
+	trace_entry* newFirst = next_entry(sFirstEntry);
+
+	if (sFirstEntry->flags & BUFFER_ENTRY) {
+		// a buffer entry -- just skip it
+	} else if (sFirstEntry->flags & ENTRY_INITIALIZED) {
+		// fully initialized TraceEntry -- destroy it
+		((TraceEntry*)sFirstEntry)->~TraceEntry();
+		sEntries--;
+	} else {
+		// Not fully initialized TraceEntry. We can't free it, since
+		// then it's constructor might still write into the memory and
+		// overwrite data of the entry we're going to allocate.
+		// We can't do anything until this entry can be discarded.
+		return false;
+	}
+
+	if (newFirst == NULL) {
+		// everything is freed -- that practically this can't happen, if
+		// the buffer is large enough to hold three max-sized entries
+		sFirstEntry = sAfterLastEntry = sBuffer;
+		TRACE(("free_first_entry(): all entries freed!\n"));
+	} else
+		sFirstEntry = newFirst;
+
+	return true;
+}
+
+
+static bool
 make_space(size_t needed)
 {
-	if (sAfterLastEntry + needed / 4 > sBuffer + kBufferSize - 1) {
+	// we need space for sAfterLastEntry, too (in case we need to wrap around
+	// later)
+	needed += 4;
+
+	// If there's not enough space (free or occupied) after sAfterLastEntry,
+	// we free all entries in that region and wrap around.
+	if (sAfterLastEntry + needed / 4 > sBuffer + kBufferSize) {
+		TRACE(("make_space(%lu), wrapping around: after last: %p\n", needed,
+			sAfterLastEntry));
+
+		// Free all entries after sAfterLastEntry and one more at the beginning
+		// of the buffer.
+		do {
+			if (!free_first_entry())
+				return false;
+		} while (sFirstEntry > sAfterLastEntry);
+
+		// just in case free_first_entry() freed the very last existing entry
+		if (sAfterLastEntry == sBuffer)
+			return true;
+
+		// mark as wrap entry and actually wrap around
 		sAfterLastEntry->size = 0;
 		sAfterLastEntry->flags = WRAP_ENTRY;
 		sAfterLastEntry = sBuffer;
 	}
 
-	int32 space = (sFirstEntry - sAfterLastEntry) * 4;
-	TRACE(("make_space(%lu), left %ld\n", needed, space));
-	if (space < 0)
-		sAfterLastEntry = sBuffer;
-	else if ((size_t)space < needed)
-		needed -= space;
-	else
-		return;
+	if (sFirstEntry <= sAfterLastEntry) {
+		// buffer is empty or the space after sAfterLastEntry is unoccupied
+		return true;
+	}
 
-	while (true) {
-		// TODO: If the entry is not ENTRY_INITIALIZED yet, we must not
-		// discard it, or the owner might overwrite memory we're allocating.
-		trace_entry* removed = sFirstEntry;
-		uint16 freed = sFirstEntry->size;
-		TRACE(("  skip start %p, %u bytes\n", sFirstEntry, freed));
+	// free the first entries, until there's enough space
+	size_t space = (sFirstEntry - sAfterLastEntry) * 4;
 
-		sFirstEntry = next_entry(sFirstEntry);
-		if (sFirstEntry == NULL)
-			sFirstEntry = sAfterLastEntry;
+	if (space < needed) {
+		TRACE(("make_space(%lu), left %ld\n", needed, space));
+	}
 
-		if (!(removed->flags & BUFFER_ENTRY)) {
-			((TraceEntry*)removed)->~TraceEntry();
-			sEntries--;
-		}
+	while (space < needed) {
+		space += sFirstEntry->size;
 
-		if (needed <= freed)
-			break;
-
-		needed -= freed;
+		if (!free_first_entry())
+			return false;
 	}
 
 	TRACE(("  out: start %p, entries %ld\n", sFirstEntry, sEntries));
+
+	return true;
 }
 
 
 static trace_entry*
 allocate_entry(size_t size, uint16 flags)
 {
-	if (sBuffer == NULL)
+	if (sBuffer == NULL || size == 0 || size >= 65532)
 		return NULL;
 
 	InterruptsSpinLocker _(sLock);
@@ -112,16 +156,8 @@ allocate_entry(size_t size, uint16 flags)
 	TRACE(("allocate_entry(%lu), start %p, end %p, buffer %p\n", size,
 		sFirstEntry, sAfterLastEntry, sBuffer));
 
-	if (sFirstEntry < sAfterLastEntry || sEntries == 0) {
-		// the buffer ahead of us is still empty
-		uint32 space = (sBuffer + kBufferSize - sAfterLastEntry) * 4;
-		TRACE(("  free after end %p: %lu\n", sAfterLastEntry, space));
-		if (space < size)
-			make_space(size);
-	} else {
-		// we need to overwrite existing entries
-		make_space(size);
-	}
+	if (!make_space(size))
+		return NULL;
 
 	trace_entry* entry = sAfterLastEntry;
 	entry->size = size;
@@ -131,8 +167,8 @@ allocate_entry(size_t size, uint16 flags)
 	if (!(flags & BUFFER_ENTRY))
 		sEntries++;
 
-	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry, sAfterLastEntry,
-		sFirstEntry, sEntries));
+	TRACE(("  entry: %p, end %p, start %p, entries %ld\n", entry,
+		sAfterLastEntry, sFirstEntry, sEntries));
 
 	return entry;
 }
@@ -574,9 +610,6 @@ dump_tracing(int argc, char** argv)
 extern "C" uint8*
 alloc_tracing_buffer(size_t size)
 {
-	if (size == 0 || size >= 65532)
-		return NULL;
-
 #if	ENABLE_TRACING
 	trace_entry* entry = allocate_entry(size + sizeof(trace_entry),
 		BUFFER_ENTRY);
