@@ -421,6 +421,7 @@ AboutView::AboutView(const BRect &rect)
 		"Santiago Lema\n"
 		"Oscar Lesta\n"
 		"Jerome Leveque\n"
+		"Christof Lutteroth\n",
 		"Graham MacDonald\n"
 		"Jan Matějek\n"
 		"Brian Matzon\n"
