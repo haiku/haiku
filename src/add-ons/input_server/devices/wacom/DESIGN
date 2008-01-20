@@ -1,0 +1,30 @@
+Overview:
+
+The actual input_server addon is the MasterServerDevice. It watches for device entries (dis)appearing in /dev/input/wacom/. For each appearing entry, it then asks the PointingDeviceFactory to obtain a PointingDevice. The factory constructs a DeviceReader, which interfaces with the usb driver/device. The MasterServerDevice puts the PointingDevice obtained into a list and manages it from there. All PointingDevices in the list are Start()ed and Stop()ped according to the input_server requests. A PointingDevice has access to its parent MasterServerDevice and can use global functionality like the acceleration table and other useful information. The baseclass PointingDevice doesn't do anything useful. In another version of the driver code, there are two types of devices supported in subclasses, USB Mice and Wacom tablets. For USB Mice, there is a subclass MouseDevice, which has child objects for interpreting data from Generic Mice, Logitec Optical Mice and IBM Optical Scrollpoint Mice. This (Haiku) version of the driver however only supports Wacom tablets.
+
+
+-------------------------
+
+DeviceReader:
+A class to interface with the wacom kernel driver. Each object has a BFile which it uses to read packets from the usb device. The kernel driver puts 8 bytes of informative data in front of each buffer. If requested to read more than 8 bytes of data, an interrupt transfer will be queued, otherwise just the informative data is returned. The DeviceReader can therefor be used to obtain information about vendor id, product id as well as max packet size. When using DeviceReader::ReadData(), the object skips the 8 bytes in front of the buffer that the driver reads and returns just the actual data from the interrupt transfer.
+
+MasterServerDevice:
+This class implements the actual input_server add-on (device). It maintains a list of PointingDevice objects, which it starts and stops according to general input_server requests. The devices are added or removed according to the contents of the /dev/input/wacom folder, which is scanned at first Start() hook call and is afterwards node monitored.
+
+PointingDevice:
+This class implements a simple interface for the MasterServerDevice and encapsulates a single physical pointing device object. The actual functionality is implemented in derived classes, which at the moment are USB Wacom tablets (TabletDevice). A pointing device has a reference to the MasterServerDevice so that certain values can be shared across all PointingDevice objects, like for example the acceleration table or double click speed. The two most important methods are Start() and Stop().
+
+PointingDeviceFactory:
+This class encapsulates the creation of PointingDevice objects, in that it constructs a DeviceReader object for a given path (ie. "/dev/input/wacom/0"), and has some knowledge of which objects to create for certain vendor/product ids that it obtains from the DeviceReader. It is only used by MasterServerDevice.
+
+
+--------
+
+MouseDevice: (not present in Haiku version of the driver)
+
+This class implements a Mouse by subclassing from PointingDevice. It owns a DeviceReader and Mouse object, which knows how to interprete data read from the DeviceReader. Different mouse products are implemented in subclasses of Mouse, most importantly there is a GenericMouse class. MouseDevice implements Start() and Stop() to run a thread which constantly reads from the DeviceReader and enqueues input event messages using the reference to the MasterServerDevice.
+
+TabletDevice:
+
+This class is very similar to MouseDevice, the only difference being, that it supports all kinds of Wacom tablets. It needs to be refactored somewhat so that different kinds of tablets are implemented in small Tablet objects, which interprete the raw usb data differently. It would then be absolutely similar in design to the MouseDevice branch of classes.
+

@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons input_server devices wacom ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders input ;
+
+Addon <input>wacom : 
+	DeviceReader.cpp
+	MasterServerDevice.cpp
+	PointingDevice.cpp
+	PointingDeviceFactory.cpp
+	TabletDevice.cpp
+	: be input_server ;
+
+Package haiku-inputkit-cvs :
+        <input>tablet :
+        boot home config add-ons input_server devices ;
