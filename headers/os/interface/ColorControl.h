@@ -87,16 +87,26 @@ class BColorControl : public BControl {
 								float size, bool useOffscreen,
 								BMessage* archive = NULL);
 		void				_LayoutView();
-		void				_UpdateOffscreen(BRect update);
+		void				_InitOffscreen();
 		void				_DrawColorArea(BView* target, BRect update);
+		void				_DrawSelectors(BView* target);		
 		void				_ColorRamp(BRect rect, BView* target,
 								rgb_color baseColor, int16 flag,
-								bool focused);
-
+								bool focused, BRect update);
+		BPoint				_SelectorPosition(const BRect& rampRect, uint8 shade) const;
+		BRect				_PaletteSelectorFrame(uint8 colorIndex) const;		
+		BRect				_RampFrame(uint8 rampIndex) const;
+		
 	private:
+		BRect				fPaletteFrame;
+		int16				fSelectedPaletteColorIndex;
+		int16				fPreviousSelectedPaletteColorIndex;
+				
 		float				fCellSize;
 		int32				fRows;
 		int32				fColumns;
+		bool				fPaletteMode;
+		bool				_unused[3];
 
 		BTextControl*		fRedText;
 		BTextControl*		fGreenText;
@@ -105,8 +115,8 @@ class BColorControl : public BControl {
 		BBitmap*			fBitmap;
 		BView*				fOffscreenView;
 
-		int32				fFocusedComponent;
-		uint32				_reserved[8];
+		int32				fFocusedComponent;	
+		uint32				_reserved[2];	
 };
 
 inline void
