@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -336,12 +336,11 @@ ho_next(struct irs_ho *this) {
 	if (init(this) == -1)
 		return (NULL);
 
+	if (pvt->index > 0)
+		return (NULL);
 	if (!pvt->fp)
 		ho_rewind(this);
 	if (!pvt->fp) {
-		if (pvt->index > 0)
-			return (NULL);
-
 		strcpy(pvt->hostbuf, "localhost");
 		pvt->host_aliases[0] = NULL;
 		pvt->h_addr_ptrs[0] = (char *)pvt->host_addr;
