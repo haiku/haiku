@@ -5,6 +5,8 @@
 #ifndef ARCH_M68K_VM_H
 #define ARCH_M68K_VM_H
 
+#include <vm_translation_map.h>
+
 /* This many pages will be read/written on I/O if possible */
 
 #define NUM_IO_PAGES	4
