@@ -11,8 +11,9 @@ struct real_time_data;
 
 enum m68k_platform_type {
 	M68K_PLATFORM_AMIGA = 0,
-	M68K_PLATFORM_APPLE,
-	M68K_PLATFORM_ATARI		/* Falcon */
+	M68K_PLATFORM_ATARI,		/* Falcon */
+	M68K_PLATFORM_MAC,
+	M68K_PLATFORM_NEXT
 };
 
 namespace BPrivate {
@@ -31,12 +32,16 @@ public:
 	virtual status_t InitPostVM(struct kernel_args *kernelArgs) = 0;
 	virtual status_t InitRTC(struct kernel_args *kernelArgs,
 		struct real_time_data *data) = 0;
+	virtual status_t InitTimer(struct kernel_args *kernelArgs) = 0;
 
 	virtual char SerialDebugGetChar() = 0;
 	virtual void SerialDebugPutChar(char c) = 0;
 
 	virtual	void SetHardwareRTC(uint32 seconds) = 0;
 	virtual	uint32 GetHardwareRTC() = 0;
+
+	virtual void SetHardwareTimer(bigtime_t timeout) = 0;
+	virtual void ClearHardwareTimer(void) = 0;
 
 	virtual	void ShutDown(bool reboot) = 0;
 
