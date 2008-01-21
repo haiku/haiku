@@ -100,7 +100,7 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 	// and print it directly.
 	if (argc == 2 && strcmp(argv[1], "--help") == 0 && command->usage != NULL) {
 		kprintf("usage: %s ", command->name);
-		kprintf(command->usage);
+		kputs(command->usage);
 		return 0;
 	}
 
@@ -235,7 +235,7 @@ print_debugger_command_usage(const char* commandName)
 	// command with "--help"
 	if (command->usage != NULL) {
 		kprintf("usage: %s ", command->name);
-		kprintf(command->usage);
+		kputs(command->usage);
 	} else {
 		char* args[3] = { NULL, "--help", NULL };
 		invoke_debugger_command(command, 2, args);

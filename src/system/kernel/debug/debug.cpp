@@ -96,7 +96,7 @@ kputchar(char c)
 }
 
 
-static void
+void
 kputs(const char *s)
 {
 	if (sSerialDebugEnabled)
