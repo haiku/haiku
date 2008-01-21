@@ -6025,20 +6025,19 @@ fs_sync(dev_t device)
 	if (status < B_OK)
 		return status;
 
-	mutex_lock(&sMountMutex);
-
-	if (FS_MOUNT_CALL(mount, sync))
-		status = FS_MOUNT_CALL(mount, sync)(mount->cookie);
-
-	mutex_unlock(&sMountMutex);
+	// First, synchronize all file caches
 
 	struct vnode *previousVnode = NULL;
 	while (true) {
 		// synchronize access to vnode list
 		recursive_lock_lock(&mount->rlock);
 
-		struct vnode *vnode = (struct vnode *)list_get_next_item(&mount->vnodes,
-			previousVnode);
+		struct vnode *vnode = previousVnode;
+		do {
+			// TODO: we could track writes (and writable mapped vnodes)
+			//	and have a simple flag that we could test for here
+			vnode = (struct vnode *)list_get_next_item(&mount->vnodes, vnode);
+		} while (vnode != NULL && vnode->cache == NULL);
 
 		ino_t id = -1;
 		if (vnode != NULL)
@@ -6055,20 +6054,30 @@ fs_sync(dev_t device)
 			if (previousVnode != NULL)
 				put_vnode(previousVnode);
 
-			if (FS_CALL(vnode, fsync) != NULL)
-				FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
+			if (vnode->cache != NULL)
+				vm_cache_write_modified(vnode->cache, false);
 
 			// the next vnode might change until we lock the vnode list again,
 			// but this vnode won't go away since we keep a reference to it.
 			previousVnode = vnode;
 		} else {
-			dprintf("syncing of mount %ld stopped due to vnode %Ld.\n", mount->id, id);
+			dprintf("syncing of mount %ld stopped due to vnode %Ld.\n",
+				mount->id, id);
 			break;
 		}
 	}
 
 	if (previousVnode != NULL)
 		put_vnode(previousVnode);
+
+	// And then, let the file systems do their synchronizing work
+
+	mutex_lock(&sMountMutex);
+
+	if (FS_MOUNT_CALL(mount, sync))
+		status = FS_MOUNT_CALL(mount, sync)(mount->cookie);
+
+	mutex_unlock(&sMountMutex);
 
 	put_mount(mount);
 	return status;
