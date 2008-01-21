@@ -75,13 +75,11 @@ static int64 sMessageRepeatLastTime = 0;
 static int32 sMessageRepeatCount = 0;
 
 #define LINE_BUFFER_SIZE 1024
-#define MAX_ARGS 16
 #define HISTORY_SIZE 16
 
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
 static char sParseLine[LINE_BUFFER_SIZE];
 static int32 sCurrentLine = 0;
-static char *sArguments[MAX_ARGS] = { NULL, };
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
