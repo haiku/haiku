@@ -74,6 +74,8 @@ struct termprefs {
 #define TP_SELFG "term:c:selfg"
 #define TP_ENCODING "term:encoding"
 
+static const char *kHaikuTerminalAppSig = "application/x-vnd.Haiku-Terminal";
+static const char *kBeOSTerminalAppSig = "application/x-vnd.Be-SHEL";
 
 class TerminalThemesAddon : public ThemesAddon {
 public:
@@ -208,7 +210,7 @@ status_t TerminalThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 		count = teamList.CountItems();
 		for (i = 0; i < count; i++) {
 			if (be_roster->GetRunningAppInfo((team_id)(teamList.ItemAt(i)), &ainfo) == B_OK) {
-				if (!strcmp(ainfo.signature, "application/x-vnd.Be-SHEL")) {
+				if (!strcmp(ainfo.signature, kBeOSTerminalAppSig) || !strcmp(ainfo.signature, kHaikuTerminalAppSig)) {
 					err = B_OK;
 					BMessage msg('pref');
 					BMessenger msgr(NULL, ainfo.team);
