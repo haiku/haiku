@@ -40,6 +40,8 @@
 #	define ASSERT_PRINT(x, format...)	do { } while(0)
 #endif
 
+#define B_KDEBUG_DONT_PARSE_ARGUMENTS	(0x01)
+
 extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 
 #ifdef __cplusplus

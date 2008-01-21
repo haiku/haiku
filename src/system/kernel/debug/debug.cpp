@@ -943,7 +943,8 @@ debug_init_post_vm(kernel_args *args)
 	add_debugger_command_etc("expr", &cmd_expr,
 		"Evaluates the given expression and prints the result",
 		"<expression>\n"
-		"Evaluates the given expression and prints the result.\n", 0);
+		"Evaluates the given expression and prints the result.\n",
+		B_KDEBUG_DONT_PARSE_ARGUMENTS);
 
 	debug_variables_init();
 	frame_buffer_console_init(args);

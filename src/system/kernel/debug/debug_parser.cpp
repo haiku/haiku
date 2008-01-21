@@ -208,6 +208,11 @@ public:
 		fCommandMode = commandMode;
 	}
 
+	const char* String() const
+	{
+		return fString;
+	}
+
 	const Token& NextToken()
 	{
 		if (fCurrentToken.type == TOKEN_END_OF_LINE)
@@ -316,12 +321,14 @@ public:
 
 				case '"':
 				{
+					fCurrentChar--;
 					_QuotedString();
 					break;
 				}
 			
 				default:
 				{
+					fCurrentChar--;
 					_UnquotedString();
 					break;
 				}
@@ -465,8 +472,9 @@ class ExpressionParser {
 			uint64				_ParseExpression();
 			uint64				_ParseCommand(int& returnCode);
 			bool				_ParseArgument(int& argc, char** argv);
+			void				_GetUnparsedArgument(int& argc, char** argv);
 			void				_AddArgument(int& argc, char** argv,
-									const char* argument);
+									const char* argument, int32 length = -1);
 			uint64				_ParseSum();
 			uint64				_ParseProduct();
 			uint64				_ParsePower();
@@ -645,10 +653,14 @@ ExpressionParser::_ParseCommand(int& returnCode)
 	argv[argc++] = (char*)command->name;
 
 	// get the arguments
-	while (fTokenizer.NextToken().type != TOKEN_END_OF_LINE) {
-		fTokenizer.RewindToken();
-		if (!_ParseArgument(argc, argv))
-			break;
+	if ((command->flags & B_KDEBUG_DONT_PARSE_ARGUMENTS) != 0) {
+		_GetUnparsedArgument(argc, argv);
+	} else {
+		while (fTokenizer.NextToken().type != TOKEN_END_OF_LINE) {
+			fTokenizer.RewindToken();
+			if (!_ParseArgument(argc, argv))
+				break;
+		}
 	}
 
 	// invoke the command
@@ -713,14 +725,62 @@ ExpressionParser::_ParseArgument(int& argc, char** argv)
 
 
 void
-ExpressionParser::_AddArgument(int& argc, char** argv, const char* argument)
+ExpressionParser::_GetUnparsedArgument(int& argc, char** argv)
+{
+	int32 startPosition = fTokenizer.NextToken().position;
+	fTokenizer.RewindToken();
+
+	// match parentheses and brackets, but otherwise skip all tokens
+	int32 parentheses = 0;
+	int32 brackets = 0;
+	bool done = false;
+	while (!done) {
+		const Token& token = fTokenizer.NextToken();
+		switch (token.type) {
+			case TOKEN_OPENING_PARENTHESIS:
+				parentheses++;
+				break;
+			case TOKEN_OPENING_BRACKET:
+				brackets++;
+				break;
+			case TOKEN_CLOSING_PARENTHESIS:
+				if (parentheses > 0)
+					parentheses--;
+				else
+					done = true;
+				break;
+			case TOKEN_CLOSING_BRACKET:
+				if (brackets > 0)
+					brackets--;
+				else
+					done = true;
+				break;
+			case TOKEN_END_OF_LINE:
+				done = true;
+				break;
+		}
+	}
+
+	int32 endPosition = fTokenizer.CurrentToken().position;
+	fTokenizer.RewindToken();
+
+	_AddArgument(argc, argv, fTokenizer.String() + startPosition,
+		endPosition - startPosition);
+}
+
+
+void
+ExpressionParser::_AddArgument(int& argc, char** argv, const char* argument,
+	int32 length)
 {
 	if (argc == kMaxArgumentCount)
 		parse_exception("too many arguments for command", 0);
 
-	size_t length = strlen(argument) + 1;
+	if (length < 0)
+		length = strlen(argument);
+	length++;
 	char* buffer = (char*)allocate_temp_storage(length);
-	memcpy(buffer, argument, length);
+	strlcpy(buffer, argument, length);
 
 	argv[argc++] = buffer;
 }
