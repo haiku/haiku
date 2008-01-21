@@ -33,7 +33,7 @@ public:
 		double		scale;
 		long		iter;
 
-						TShowBit(BRect r, long flags);
+						TShowBit(BRect r, uint32 resizeMask, uint32 flags);
 virtual					~TShowBit();
 virtual		void		Draw(BRect);
 virtual		void		MouseDown(BPoint where);

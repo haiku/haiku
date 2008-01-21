@@ -134,8 +134,8 @@ void	TShowBit::set_palette(long code)
 
 /*------------------------------------------------------------*/
 
-TShowBit::TShowBit(BRect r, long flags) :
-	BView(r, "", flags, B_WILL_DRAW | B_PULSE_NEEDED)
+TShowBit::TShowBit(BRect r, uint32 resizeMask, uint32 flags) :
+	BView(r, "", resizeMask, flags | B_WILL_DRAW | B_PULSE_NEEDED)
 {
 	BRect	bitmap_r;
 	char	*bits;

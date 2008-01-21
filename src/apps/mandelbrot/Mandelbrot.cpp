@@ -81,7 +81,7 @@ TMainWindow::TMainWindow(BRect bound, char* name, window_type type, long flags)
 	float barHeight = menuBar->Bounds().Height();
 
 	fView = new TShowBit(BRect(0, barHeight + 1, 188 - B_V_SCROLL_BAR_WIDTH,
-		188 - B_H_SCROLL_BAR_HEIGHT), B_FOLLOW_ALL | B_WILL_DRAW);
+		188 - B_H_SCROLL_BAR_HEIGHT), B_FOLLOW_ALL, B_WILL_DRAW);
 	BScrollView	*scrollView = new BScrollView("scroll view", fView,
 		B_FOLLOW_ALL, B_WILL_DRAW, true, true, B_NO_BORDER);
 	AddChild(scrollView);
