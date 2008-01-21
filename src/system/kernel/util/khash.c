@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Copyright 2002-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -72,63 +72,10 @@ next_element(hash_table *table, void *element)
 }
 
 
-struct hash_table *
-hash_init(uint32 table_size, int next_ptr_offset,
-	int compare_func(void *e, const void *key),
-	uint32 hash_func(void *e, const void *key, uint32 range))
+static status_t
+hash_grow(struct hash_table *table)
 {
-	struct hash_table *t;
-	unsigned int i;
-
-	table_size = get_prime_table_size(table_size);
-
-	if (compare_func == NULL || hash_func == NULL) {
-		dprintf("hash_init() called with NULL function pointer\n");
-		return NULL;
-	}
-
-	t = (struct hash_table *)malloc(sizeof(struct hash_table));
-	if (t == NULL)
-		return NULL;
-
-	t->table = (struct hash_element **)malloc(sizeof(void *) * table_size);
-	if (t->table == NULL) {
-		free(t);
-		return NULL;
-	}
-
-	for (i = 0; i < table_size; i++)
-		t->table[i] = NULL;
-
-	t->table_size = table_size;
-	t->next_ptr_offset = next_ptr_offset;
-	t->flags = 0;
-	t->num_elements = 0;
-	t->compare_func = compare_func;
-	t->hash_func = hash_func;
-
-	TRACE(("hash_init: created table %p, next_ptr_offset %d, compare_func %p, hash_func %p\n",
-		t, next_ptr_offset, compare_func, hash_func));
-
-	return t;
-}
-
-
-int
-hash_uninit(struct hash_table *table)
-{
-	ASSERT(table->num_elements == 0);
-
-	free(table->table);
-	free(table);
-
-	return 0;
-}
-
-
-status_t
-hash_grow(struct hash_table *table, uint32 newSize)
-{
+	uint32 newSize = get_prime_table_size(table->num_elements);
 	struct hash_element **newTable;
 	uint32 index;
 	void *start;
@@ -138,12 +85,10 @@ hash_grow(struct hash_table *table, uint32 newSize)
 		return B_OK;
 
 	newTable = (struct hash_element **)malloc(sizeof(void *) * newSize);
-
 	if (newTable == NULL)
 		return B_NO_MEMORY;
 
-	for (index = 0; index < newSize; index++)
-		newTable[index] = NULL;
+	memset(newTable, 0, sizeof(void *) * newSize);
 
 	// rehash all the entries and add them to the new table
 	for (index = 0; index < table->table_size; index++) {
@@ -168,6 +113,63 @@ hash_grow(struct hash_table *table, uint32 newSize)
 }
 
 
+//	#pragma mark - kernel private API
+
+
+struct hash_table *
+hash_init(uint32 tableSize, int nextPointerOffset,
+	int compareFunc(void *e, const void *key),
+	uint32 hashFunc(void *e, const void *key, uint32 range))
+{
+	struct hash_table *t;
+	uint32 i;
+
+	tableSize = get_prime_table_size(tableSize);
+
+	if (compareFunc == NULL || hashFunc == NULL) {
+		dprintf("hash_init() called with NULL function pointer\n");
+		return NULL;
+	}
+
+	t = (struct hash_table *)malloc(sizeof(struct hash_table));
+	if (t == NULL)
+		return NULL;
+
+	t->table = (struct hash_element **)malloc(sizeof(void *) * tableSize);
+	if (t->table == NULL) {
+		free(t);
+		return NULL;
+	}
+
+	for (i = 0; i < tableSize; i++)
+		t->table[i] = NULL;
+
+	t->table_size = tableSize;
+	t->next_ptr_offset = nextPointerOffset;
+	t->flags = 0;
+	t->num_elements = 0;
+	t->compare_func = compareFunc;
+	t->hash_func = hashFunc;
+
+	TRACE(("hash_init: created table %p, next_ptr_offset %d, compare_func %p, hash_func %p\n",
+		t, nextPointerOffset, compareFunc, hashFunc));
+
+	return t;
+}
+
+
+int
+hash_uninit(struct hash_table *table)
+{
+	ASSERT(table->num_elements == 0);
+
+	free(table->table);
+	free(table);
+
+	return 0;
+}
+
+
 status_t
 hash_insert(struct hash_table *table, void *element)
 {
@@ -181,11 +183,27 @@ hash_insert(struct hash_table *table, void *element)
 	table->table[hash] = (struct hash_element *)element;
 	table->num_elements++;
 
-	// ToDo: resize hash table if it's grown too much!
-	/*if ((uint32)table->num_elements > table->table_size * 4) {
-		dprintf("hash_insert: table has grown too much: %d in %d\n", table->num_elements, (int)table->table_size);
-		hash_grow(table, (uint32)table->num_elements);
-	}*/
+	return B_OK;
+}
+
+
+status_t
+hash_insert_grow(struct hash_table *table, void *element)
+{
+	uint32 hash;
+
+	ASSERT(table != NULL && element != NULL);
+	TRACE(("hash_insert_grow: table %p, element %p\n", table, element));
+
+	hash = table->hash_func(element, NULL, table->table_size);
+	PUT_IN_NEXT(table, element, table->table[hash]);
+	table->table[hash] = (struct hash_element *)element;
+	table->num_elements++;
+
+	if ((uint32)table->num_elements > table->table_size) {
+		//dprintf("hash_insert: table has grown too much: %d in %d\n", table->num_elements, (int)table->table_size);
+		hash_grow(table);
+	}
 
 	return B_OK;
 }

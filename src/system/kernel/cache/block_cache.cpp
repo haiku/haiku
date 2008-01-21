@@ -327,7 +327,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	if (buffer_cache == NULL)
 		return;
 
-	hash = hash_init(32, 0, &cached_block::Compare, &cached_block::Hash);
+	hash = hash_init(1024, 0, &cached_block::Compare, &cached_block::Hash);
 	if (hash == NULL)
 		return;
 
@@ -650,7 +650,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 		if (block == NULL)
 			return NULL;
 
-		hash_insert(cache->hash, block);
+		hash_insert_grow(cache->hash, block);
 		*_allocated = true;
 	}
 
@@ -1118,7 +1118,7 @@ cache_start_transaction(void *_cache)
 	TRACE(("cache_start_transaction(): id %ld started\n", transaction->id));
 	T(Action("start", cache, transaction));
 
-	hash_insert(cache->transaction_hash, transaction);
+	hash_insert_grow(cache->transaction_hash, transaction);
 
 	return transaction->id;
 }
@@ -1347,7 +1347,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	transaction->num_blocks = transaction->main_num_blocks;
 	transaction->sub_num_blocks = 0;
 
-	hash_insert(cache->transaction_hash, newTransaction);
+	hash_insert_grow(cache->transaction_hash, newTransaction);
 	cache->last_transaction = newTransaction;
 
 	return newTransaction->id;

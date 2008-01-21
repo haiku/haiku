@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Copyright 2002-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -28,8 +28,8 @@ struct hash_table *hash_init(uint32 table_size, int next_ptr_offset,
 	int compare_func(void *element, const void *key),
 	uint32 hash_func(void *element, const void *key, uint32 range));
 int hash_uninit(struct hash_table *table);
-status_t hash_grow(struct hash_table *table, uint32 newSize);
 status_t hash_insert(struct hash_table *table, void *_element);
+status_t hash_insert_grow(struct hash_table *table, void *_element);
 status_t hash_remove(struct hash_table *table, void *_element);
 void hash_remove_current(struct hash_table *table, struct hash_iterator *iterator);
 void *hash_remove_first(struct hash_table *table, uint32 *_cookie);
