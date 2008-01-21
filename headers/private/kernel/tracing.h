@@ -11,8 +11,9 @@
 
 
 struct trace_entry {
-	uint16  size;
-	uint16  flags;
+	uint32	size			: 14;		// actual size is *4
+	uint32	previous_size	: 14;		// actual size is *4
+	uint32	flags			: 4;
 };
 
 #ifdef __cplusplus
@@ -37,7 +38,7 @@ class TraceOutput {
 		size_t	fSize;
 };
 
-class TraceEntry : trace_entry {
+class TraceEntry : public trace_entry {
 	public:
 		TraceEntry();
 		virtual ~TraceEntry();

@@ -31,7 +31,7 @@ enum {
 	BUFFER_ENTRY		= 0x04
 };
 
-static const size_t kBufferSize = MAX_TRACE_SIZE / 4 - 1;
+static const size_t kBufferSize = MAX_TRACE_SIZE / 4;
 
 static trace_entry* sBuffer;
 static trace_entry* sFirstEntry;
@@ -44,7 +44,7 @@ static spinlock sLock;
 static trace_entry*
 next_entry(trace_entry* entry)
 {
-	entry += entry->size >> 2;
+	entry += entry->size;
 	if ((entry->flags & WRAP_ENTRY) != 0)
 		entry = sBuffer;
 
@@ -55,10 +55,25 @@ next_entry(trace_entry* entry)
 }
 
 
+static trace_entry*
+previous_entry(trace_entry* entry)
+{
+	if (entry == sFirstEntry)
+		return NULL;
+
+	if (entry == sBuffer) {
+		// beginning of buffer -- previous entry is a wrap entry
+		entry = sBuffer + kBufferSize - entry->previous_size;
+	}
+
+	return entry - entry->previous_size;
+}
+
+
 static bool
 free_first_entry()
 {
-	TRACE(("  skip start %p, %u bytes\n", sFirstEntry, sFirstEntry->size));
+	TRACE(("  skip start %p, %lu*4 bytes\n", sFirstEntry, sFirstEntry->size));
 
 	trace_entry* newFirst = next_entry(sFirstEntry);
 
@@ -88,34 +103,41 @@ free_first_entry()
 }
 
 
+/*!	Makes sure we have needed * 4 bytes of memory at sAfterLastEntry.
+	Returns \c false, if unable to free that much.
+*/
 static bool
 make_space(size_t needed)
 {
 	// we need space for sAfterLastEntry, too (in case we need to wrap around
 	// later)
-	needed += 4;
+	needed++;
 
 	// If there's not enough space (free or occupied) after sAfterLastEntry,
 	// we free all entries in that region and wrap around.
-	if (sAfterLastEntry + needed / 4 > sBuffer + kBufferSize) {
+	if (sAfterLastEntry + needed > sBuffer + kBufferSize) {
 		TRACE(("make_space(%lu), wrapping around: after last: %p\n", needed,
 			sAfterLastEntry));
 
 		// Free all entries after sAfterLastEntry and one more at the beginning
 		// of the buffer.
-		do {
+		while (sFirstEntry > sAfterLastEntry) {
 			if (!free_first_entry())
 				return false;
-		} while (sFirstEntry > sAfterLastEntry);
+		}
+		if (sAfterLastEntry != sBuffer && !free_first_entry())
+			return false;
 
 		// just in case free_first_entry() freed the very last existing entry
 		if (sAfterLastEntry == sBuffer)
 			return true;
 
 		// mark as wrap entry and actually wrap around
-		sAfterLastEntry->size = 0;
-		sAfterLastEntry->flags = WRAP_ENTRY;
+		trace_entry* wrapEntry = sAfterLastEntry;
+		wrapEntry->size = 0;
+		wrapEntry->flags = WRAP_ENTRY;
 		sAfterLastEntry = sBuffer;
+		sAfterLastEntry->previous_size = sBuffer + kBufferSize - wrapEntry;
 	}
 
 	if (sFirstEntry <= sAfterLastEntry) {
@@ -124,7 +146,7 @@ make_space(size_t needed)
 	}
 
 	// free the first entries, until there's enough space
-	size_t space = (sFirstEntry - sAfterLastEntry) * 4;
+	size_t space = sFirstEntry - sAfterLastEntry;
 
 	if (space < needed) {
 		TRACE(("make_space(%lu), left %ld\n", needed, space));
@@ -151,9 +173,10 @@ allocate_entry(size_t size, uint16 flags)
 
 	InterruptsSpinLocker _(sLock);
 
-	size = (size + 3) & ~3;
+	size = (size + 3) >> 2;
+		// 4 byte aligned, don't store the lower 2 bits
 
-	TRACE(("allocate_entry(%lu), start %p, end %p, buffer %p\n", size,
+	TRACE(("allocate_entry(%lu), start %p, end %p, buffer %p\n", size * 4,
 		sFirstEntry, sAfterLastEntry, sBuffer));
 
 	if (!make_space(size))
@@ -162,7 +185,8 @@ allocate_entry(size_t size, uint16 flags)
 	trace_entry* entry = sAfterLastEntry;
 	entry->size = size;
 	entry->flags = flags;
-	sAfterLastEntry += size >> 2;
+	sAfterLastEntry += size;
+	sAfterLastEntry->previous_size = size;
 
 	if (!(flags & BUFFER_ENTRY))
 		sEntries++;
@@ -484,14 +508,132 @@ TraceFilterParser TraceFilterParser::sParser;
 #if ENABLE_TRACING
 
 
+class TraceEntryIterator {
+public:
+	TraceEntryIterator(bool startFront)
+		:
+		fEntry(NULL),
+		fIndex(startFront ? 0 : sEntries + 1)
+	{
+	}
+
+	int32 Index() const
+	{
+		return fIndex;
+	}
+
+	TraceEntry* Current() const
+	{
+		return (TraceEntry*)fEntry;
+	}
+
+	TraceEntry* Next()
+	{
+		if (fIndex == 0) {
+			fEntry = _NextNonBufferEntry(sFirstEntry);
+			fIndex = 1;
+		} else if (fEntry != NULL) {
+			fEntry = _NextNonBufferEntry(next_entry(fEntry));
+			fIndex++;
+		}
+
+		return Current();
+	}
+
+	TraceEntry* Previous()
+	{
+		if (fIndex == (int32)sEntries + 1)
+			fEntry = sAfterLastEntry;
+
+		if (fEntry != NULL) {
+			fEntry = _PreviousNonBufferEntry(previous_entry(fEntry));
+			fIndex--;
+		}
+
+		return Current();
+	}
+
+	TraceEntry* MoveTo(int32 index)
+	{
+		if (index == fIndex)
+			return Current();
+
+		if (index <= 0 || index > (int32)sEntries) {
+			fIndex = (index <= 0 ? 0 : sEntries + 1);
+			fEntry = NULL;
+			return NULL;
+		}
+
+		// get the shortest iteration path
+		int32 distance = index - fIndex;
+		int32 direction = distance < 0 ? -1 : 1;
+		distance *= direction;
+
+		if (index < distance) {
+			distance = index;
+			direction = 1;
+			fEntry = NULL;
+			fIndex = 0;
+		}
+		if ((int32)sEntries + 1 - fIndex < distance) {
+			distance = sEntries + 1 - fIndex;
+			direction = -1;
+			fEntry = NULL;
+			fIndex = sEntries + 1;
+		}
+
+		// iterate to the index
+		if (direction < 0) {
+			while (fIndex != index)
+				Previous();
+		} else {
+			while (fIndex != index)
+				Next();
+		}
+
+		return Current();
+	}
+
+private:
+	trace_entry* _NextNonBufferEntry(trace_entry* entry)
+	{
+		while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
+			entry = next_entry(entry);
+
+		return entry;
+	}
+
+	trace_entry* _PreviousNonBufferEntry(trace_entry* entry)
+	{
+		while (entry != NULL && (entry->flags & BUFFER_ENTRY) != 0)
+			entry = previous_entry(entry);
+
+		return entry;
+	}
+
+private:
+	trace_entry*	fEntry;
+	int32			fIndex;
+};
+
+
 int
 dump_tracing(int argc, char** argv)
 {
 	int argi = 1;
 
+	// variables in which we store our state to be continuable
+	static int32 _previousCount = 0;
+	static bool _previousHasFilter = false;
+	static int32 _previousMaxToCheck = 0;
+	static int32 _previousFirstChecked = 1;
+	static int32 _previousLastChecked = -1;
+	static uint32 _previousWritten = 0;
+
 	// Note: start and index are Pascal-like indices (i.e. in [1, sEntries]).
-	int32 count = 30;
 	int32 start = 0;	// special index: print the last count entries
+	int32 count = 0;
+	int32 maxToCheck = 0;
 	int32 cont = 0;
 
 	bool hasFilter = false;
@@ -506,33 +648,29 @@ dump_tracing(int argc, char** argv)
 		}
 	}
 
-	if (cont != 0 && argi < argc) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
-
-	// start
-	if (argi < argc) {
-		if (strcmp(argv[argi], "filter") == 0) {
-			hasFilter = true;
-			argi++;
-		} else if (argv[argi][0] == '#') {
-			hasFilter = true;
-		} else {
-			start = parse_expression(argv[argi]);
-			argi++;
+	if (cont != 0) {
+		if (argi < argc) {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+		if (sWritten == 0 || sWritten != _previousWritten) {
+			kprintf("Can't continue iteration. \"%s\" has not been invoked "
+				"before, or there were new entries written since the last "
+				"invocation.\n", argv[0]);
+			return 0;
 		}
 	}
 
-	// count
-	if (!hasFilter && argi < argc) {
+	// get start, count, maxToCheck
+	int32* params[3] = { &start, &count, &maxToCheck };
+	for (int i = 0; i < 3 && !hasFilter && argi < argc; i++) {
 		if (strcmp(argv[argi], "filter") == 0) {
 			hasFilter = true;
 			argi++;
 		} else if (argv[argi][0] == '#') {
 			hasFilter = true;
 		} else {
-			count = parse_expression(argv[argi]);
+			*params[i] = parse_expression(argv[argi]);
 			argi++;
 		}
 	}
@@ -549,56 +687,126 @@ dump_tracing(int argc, char** argv)
 		}
 	}
 
+	int32 direction;
+	int32 firstToCheck;
+	int32 lastToCheck;
+
 	if (cont != 0) {
-		start = get_debug_variable("_tracingStart", start);
-		count = get_debug_variable("_tracingCount", count);
-		start = max_c(1, start + count * cont);
-		hasFilter = get_debug_variable("_tracingFilter", count);
+		// get values from the previous iteration
+		direction = cont;
+		count = _previousCount;
+		maxToCheck = _previousMaxToCheck;
+		hasFilter = _previousHasFilter;
+
+		if (direction < 0)
+			start = _previousFirstChecked - 1;
+		else
+			start = _previousLastChecked + 1;
+	} else {
+		// defaults for count and maxToCheck
+		if (count == 0)
+			count = 30;
+		if (maxToCheck == 0 || !hasFilter)
+			maxToCheck = count;
+		else if (maxToCheck < 0)
+			maxToCheck = sEntries;
+
+		// determine iteration direction
+		direction = (start <= 0 || count < 0 ? -1 : 1);
+
+		// validate count and maxToCheck
+		if (count < 0)
+			count = -count;
+		if (maxToCheck < 0)
+			maxToCheck = -maxToCheck;
+		if (maxToCheck > (int32)sEntries)
+			maxToCheck = sEntries;
+		if (count > maxToCheck)
+			count = maxToCheck;
+
+		// validate start
+		if (start <= 0 || start > (int32)sEntries)
+			start = max_c(1, sEntries);
 	}
 
-	if ((uint32)count > sEntries)
-		count = sEntries;
-	if (start <= 0)
-		start = max_c(1, sEntries - count + 1);
-	if (uint32(start + count) > sEntries)
-		count = sEntries - start + 1;
+	if (direction < 0) {
+		firstToCheck = max_c(1, start - maxToCheck + 1);
+		lastToCheck = start;
+	} else {
+		firstToCheck = start;
+		lastToCheck = min_c((int32)sEntries, start + maxToCheck - 1);
+	}
 
-	int32 index = 1;
+	TraceEntryIterator iterator(true);
+
+	char buffer[256];
+	LazyTraceOutput out(buffer, sizeof(buffer));
+
+	if (direction < 0 && hasFilter && lastToCheck - firstToCheck >= count) {
+		// iteration direction is backwards
+
+		// From the last entry to check iterate backwards to check filter
+		// matches.
+		int32 matching = 0;
+
+		// move to the entry after the last entry to check
+		iterator.MoveTo(lastToCheck + 1);
+
+		// iterate backwards
+		while (iterator.Index() > firstToCheck) {
+			TraceEntry* entry = iterator.Previous();
+			if ((entry->flags & ENTRY_INITIALIZED) != 0) {
+				out.Clear();
+				if (TraceFilterParser::Default()->Filter(entry, out)) {
+					matching++;
+					if (matching >= count)
+						break;
+				}
+			}
+		}
+
+		firstToCheck = iterator.Index();
+
+		// iterate to the previous entry, so that the next loop starts at the
+		// right one
+		iterator.Previous();
+	}
+
 	int32 dumped = 0;
 
-	for (trace_entry* current = sFirstEntry; current != NULL;
-			current = next_entry(current), index++) {
-		if ((current->flags & BUFFER_ENTRY) != 0) {
-			// skip buffer entries
-			index--;
+	while (TraceEntry* entry = iterator.Next()) {
+		int32 index = iterator.Index();
+		if (index < firstToCheck)
 			continue;
-		}
-		if (index < start)
-			continue;
-		if (index >= start + count)
+		if (index > lastToCheck || dumped >= count) {
+			if (direction > 0)
+				lastToCheck = index - 1;
 			break;
+		}
 
-		if ((current->flags & ENTRY_INITIALIZED) != 0) {
-			char buffer[256];
-			LazyTraceOutput out(buffer, sizeof(buffer));
-			
-			TraceEntry* entry = (TraceEntry*)current;
+		if ((entry->flags & ENTRY_INITIALIZED) != 0) {
+			out.Clear();
 			if (hasFilter && !TraceFilterParser::Default()->Filter(entry, out))
 				continue;
 
 			kprintf("%5ld. %s\n", index, out.DumpEntry(entry));
-		} else
+		} else if (!hasFilter)
 			kprintf("%5ld. ** uninitialized entry **\n", index);
 
 		dumped++;
 	}
 
-	kprintf("entries %ld to %ld (%ld of %ld). %ld entries written\n", start,
-		start + count - 1, dumped, sEntries, sWritten);
+	kprintf("printed %ld entries within range %ld to %ld (%ld of %ld total, "
+		"%ld ever)\n", dumped, firstToCheck, lastToCheck,
+		lastToCheck - firstToCheck + 1, sEntries, sWritten);
 
-	set_debug_variable("_tracingStart", start);
-	set_debug_variable("_tracingCount", count);
-	set_debug_variable("_tracingFilter", hasFilter);
+	// store iteration state
+	_previousCount = count;
+	_previousMaxToCheck = maxToCheck;
+	_previousHasFilter = hasFilter;
+	_previousFirstChecked = firstToCheck;
+	_previousLastChecked = lastToCheck;
+	_previousWritten = sWritten;
 
 	return cont != 0 ? B_KDEBUG_CONT : 0;
 }
@@ -691,18 +899,33 @@ tracing_init(void)
 
 	add_debugger_command_etc("traced", &dump_tracing,
 		"Dump recorded trace entries",
-		"(\"forward\" | \"backward\") | ([ <start> [ <count> ] ] "
+		"(\"forward\" | \"backward\") | ([ <start> [ <count> [ <range> ] ] ] "
 			"[ #<pattern> | (\"filter\" <filter>) ])\n"
 		"Prints recorded trace entries. If \"backward\" or \"forward\" is\n"
 		"specified, the command continues where the previous invocation left\n"
 		"off, i.e. printing the previous respectively next entries (as many\n"
 		"as printed before). In this case the command is continuable, that is\n"
 		"afterwards entering an empty line in the debugger will reinvoke it.\n"
-		"  <start>    - The index of the first entry to print. The index of\n"
-		"               the first recorded entry is 1. If 0 is specified, the\n"
-		"               last <count> recorded entries are printed. Defaults \n"
+		"  <start>    - The base index of the entries to print. Depending on\n"
+		"               whether the iteration direction is forward or\n"
+		"               backward this will be the first or last entry printed\n"
+		"               (potentially, if a filter is specified). The index of\n"
+		"               the first entry in the trace buffer is 1. If 0 is\n"
+		"               specified, the last <count> recorded entries are\n"
+		"               printed (iteration direction is backward). Defaults \n"
 		"               to 0.\n"
 		"  <count>    - The number of entries to be printed. Defaults to 30.\n"
+		"               If negative, the -<count> entries before and\n"
+		"               including <start> will be printed.\n"
+		"  <range>    - Only relevant if a filter is specified. Specifies the\n"
+		"               number of entries to be filtered -- depending on the\n"
+		"               iteration direction the entries before or after\n"
+		"               <start>. If more than <count> entries match the\n"
+		"               filter, only the first (forward) or last (backward)\n"
+		"               <count> matching entries will be printed. If 0 is\n"
+		"               specified <range> will be set to <count>. If -1,\n"
+		"               <range> will be set to the number of recorded\n"
+		"               entries.\n"
 		"  <pattern>  - If specified only entries containing this string are\n"
 		"               printed.\n"
 		"  <filter>   - If specified only entries matching this filter\n"
