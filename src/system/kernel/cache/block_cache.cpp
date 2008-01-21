@@ -275,6 +275,20 @@ lookup_transaction(block_cache *cache, int32 id)
 //	#pragma mark - cached_block
 
 
+int
+compare_blocks(const void *_blockA, const void *_blockB)
+{
+	cached_block *blockA = (cached_block *)_blockA;
+	cached_block *blockB = (cached_block *)_blockB;
+
+	off_t diff = blockA->block_number - blockB->block_number;
+	if (diff > 0)
+		return 1;
+
+	return diff < 0 ? -1 : 0;	
+}
+
+
 /* static */
 int
 cached_block::Compare(void *_cacheEntry, const void *_block)
@@ -1145,8 +1159,33 @@ cache_sync_transaction(void *_cache, int32 id)
 			// write back all of their remaining dirty blocks
 			T(Action("sync", cache, transaction));
 			while (transaction->num_blocks > 0) {
-				status = write_cached_block(cache, transaction->blocks.Head(),
-					false);
+				// sort blocks to speed up writing them back
+				// TODO: ideally, this should be handled by the I/O scheduler
+				block_list::Iterator iterator = transaction->blocks.GetIterator();
+				uint32 maxCount = transaction->num_blocks;
+				cached_block *buffer[16];
+				cached_block **blocks = (cached_block **)malloc(maxCount
+					* sizeof(void *));
+				if (blocks == NULL) {
+					maxCount = 16;
+					blocks = buffer;
+				}
+
+				uint32 count = 0;
+				for (; count < maxCount && iterator.HasNext(); count++) {
+					blocks[count] = iterator.Next();
+				}
+				qsort(blocks, count, sizeof(void *), &compare_blocks);
+
+				for (uint32 i = 0; i < count; i++) {
+					status = write_cached_block(cache, blocks[i], false);
+					if (status != B_OK)
+						break;
+				}
+
+				if (blocks != buffer)
+					free(blocks);
+
 				if (status != B_OK)
 					return status;
 			}
