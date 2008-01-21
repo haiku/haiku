@@ -1,4 +1,7 @@
 
+#undef NDEBUG
+
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +25,8 @@ static const char *kUsage =
 	"  segv2                - strcmp() using a 0x1 pointer\n"
 	"  div                  - executes a division by zero\n"
 	"  debugger             - invokes debugger()\n"
+	"  assert               - failed assert(), which should invoke the "
+	"                         debugger\n"
 	"\n"
 	"[x86 specific]\n"
 	"  int3                 - executes the int3 (breakpoint) instruction\n"
@@ -76,6 +81,15 @@ crash_debugger()
 	return 0;
 }
 
+
+static int
+crash_assert()
+{
+	assert(0 > 1);
+	return 0;
+}
+
+
 #if __INTEL__
 
 static int
@@ -109,6 +123,8 @@ get_crash_function(const char* mode)
 		return (crash_function_t*)crash_div;
 	} else if (strcmp(mode, "debugger") == 0) {
 		return crash_debugger;
+	} else if (strcmp(mode, "assert") == 0) {
+		return crash_assert;
 #if __INTEL__
 	} else if (strcmp(mode, "int3") == 0) {
 		return crash_int3;
