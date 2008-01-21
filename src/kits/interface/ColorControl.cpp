@@ -64,6 +64,9 @@ void
 BColorControl::_InitData(color_control_layout layout, float size,
 	bool useOffscreen, BMessage* archive)
 {
+	fPaletteMode = BScreen(B_MAIN_SCREEN_ID).ColorSpace() == B_CMAP8;
+		//TODO: we don't support workspace and colorspace changing for now 
+		//		so we take the main_screen colorspace at startup
 	fColumns = layout;
 	fRows = 256 / fColumns;
 	fCellSize = ceil(max_c(kMinCellSize, size));
@@ -140,7 +143,7 @@ BColorControl::_InitData(color_control_layout layout, float size,
 		BRect bounds = fPaletteFrame;
 		bounds.InsetBy(-2.0f, -2.0f); 
 		
-		fBitmap = new BBitmap(bounds, /*BScreen(Window()).ColorSpace()*/B_RGB32, true, false);
+		fBitmap = new BBitmap(bounds, B_RGB32, true, false);			
 		fOffscreenView = new BView(bounds, "off_view", 0, 0);
 
 		fBitmap->Lock();
@@ -156,11 +159,17 @@ BColorControl::_InitData(color_control_layout layout, float size,
 void
 BColorControl::_LayoutView()
 {
-	fPaletteFrame.Set(2.0f, 2.0f,
-		float(fColumns) * fCellSize + 2.0,
-		float(fRows) * fCellSize + 2.0 - 1.0);
-		//1 pixel adjust so that the inner space 
-		//has exactly rows*cellsize pixels in height
+	if (fPaletteMode){
+		fPaletteFrame.Set(2.0f, 2.0f,
+			float(fColumns) * fCellSize + 2.0,
+			float(fRows) * fCellSize + 2.0);
+	} else {		
+		fPaletteFrame.Set(2.0f, 2.0f,
+			float(fColumns) * fCellSize + 2.0,
+			float(fRows) * fCellSize + 2.0 - 1.0);
+			//1 pixel adjust so that the inner space 
+			//has exactly rows*cellsize pixels in height
+	}
 	
 	BRect rect = fPaletteFrame.InsetByCopy(-2.0,-2.0);	//bevel
 	
@@ -341,8 +350,6 @@ BColorControl::SetEnabled(bool enabled)
 void
 BColorControl::AttachedToWindow()
 {
-	fPaletteMode = BScreen(Window()).ColorSpace() == B_CMAP8;
-	
 	if (Parent())
 		SetViewColor(Parent()->ViewColor());
 	else
@@ -551,9 +558,9 @@ BColorControl::_SelectorPosition(const BRect& rampRect, uint8 shade) const
 BRect
 BColorControl::_RampFrame(uint8 rampIndex) const
 {
-	float rampHeight = fPaletteFrame.Height() / 4;	
+	float rampHeight = float(fRows) * fCellSize / 4.0f;	
 			
-	return BRect(fPaletteFrame.left,
+	return BRect( fPaletteFrame.left,
 		fPaletteFrame.top + float(rampIndex) * rampHeight,
 		fPaletteFrame.right,
 		fPaletteFrame.top + float(rampIndex + 1) * rampHeight);

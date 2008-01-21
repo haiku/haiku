@@ -216,7 +216,7 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	rightbox->AddChild(fIconLabelOutline);
 
 	rect.top += fIconLabelOutline->Bounds().Height() + 15;
-	fPicker = new BColorControl(BPoint(10, rect.top), B_CELLS_32x8, 5.0, "Picker",
+	fPicker = new BColorControl(BPoint(10, rect.top), B_CELLS_32x8, 7.0, "Picker",
 		new BMessage(kMsgUpdateColor));
 	rightbox->AddChild(fPicker);
 
