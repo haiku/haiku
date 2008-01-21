@@ -408,7 +408,7 @@ public:
 		file << endl;
 
 		// syscall parameters infos array preamble
-		file << "const syscall_parameters_info kSyscallParametersInfos[] = {"
+		file << "const extended_syscall_info kExtendedSyscallInfos[] = {"
 			<< endl;
 
 		// the syscall parameters infos
@@ -417,7 +417,8 @@ public:
 			int paramCount = syscall->CountParameters();
 
 			file << "\t{" << endl;
-			file << "\t\t" << paramCount << "," << endl;
+			file << "\t\t\"" << syscall->Name() << "\", " << paramCount << ","
+				<< endl;
 			file << "\t\t{" << endl;
 
 			for (int k = 0; k < paramCount; k++) {

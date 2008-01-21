@@ -305,22 +305,10 @@ namespace SyscallTracing {
 static const char*
 get_syscall_name(uint32 syscall)
 {
-	addr_t baseAddress;
-	const char* symbolName;
-	const char* imageName;
-	bool exactMatch;
-
 	if (syscall >= (uint32)kSyscallCount)
 		return "<invalid syscall number>";
 
-	if (elf_debug_lookup_symbol_address(
-			(addr_t)kSyscallInfos[syscall].function,
-			&baseAddress, &symbolName, &imageName,
-			&exactMatch) != B_OK) {
-		return "<lookup failed>";
-	}
-
-	return symbolName;
+	return kExtendedSyscallInfos[syscall].name;
 }
 
 
@@ -338,11 +326,11 @@ class PreSyscall : public AbstractTraceEntry {
 				// copy string parameters, if any
 				if (fParameters != NULL) {
 					int32 stringIndex = 0;
-					const syscall_parameters_info& paramsInfo
-						= kSyscallParametersInfos[fSyscall];
-					for (int i = 0; i < paramsInfo.parameter_count; i++) {
+					const extended_syscall_info& syscallInfo
+						= kExtendedSyscallInfos[fSyscall];
+					for (int i = 0; i < syscallInfo.parameter_count; i++) {
 						const syscall_parameter_info& paramInfo
-							= paramsInfo.parameters[i];
+							= syscallInfo.parameters[i];
 						if (paramInfo.type != B_STRING_TYPE)
 							continue;
 
@@ -366,11 +354,11 @@ class PreSyscall : public AbstractTraceEntry {
 
 			if (fParameters != NULL) {
 				int32 stringIndex = 0;
-				const syscall_parameters_info& paramsInfo
-					= kSyscallParametersInfos[fSyscall];
-				for (int i = 0; i < paramsInfo.parameter_count; i++) {
+				const extended_syscall_info& syscallInfo
+					= kExtendedSyscallInfos[fSyscall];
+				for (int i = 0; i < syscallInfo.parameter_count; i++) {
 					const syscall_parameter_info& paramInfo
-						= paramsInfo.parameters[i];
+						= syscallInfo.parameters[i];
 					const uint8* data = (uint8*)fParameters + paramInfo.offset;
 					uint64 value = 0;
 					bool printValue = true;

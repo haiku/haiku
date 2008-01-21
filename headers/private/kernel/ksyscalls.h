@@ -24,15 +24,16 @@ typedef struct syscall_parameter_info {
 	type_code	type;
 } syscall_parameter_info;
 
-typedef struct syscall_parameters_info {
+typedef struct extended_syscall_info {
+	const char*				name;
 	int						parameter_count;
 	syscall_parameter_info	parameters[MAX_SYSCALL_PARAMETERS];
-} syscall_parameters_info;
+} extended_syscall_info;
 
 
 extern const int kSyscallCount;
 extern const syscall_info kSyscallInfos[];
-extern const syscall_parameters_info kSyscallParametersInfos[];
+extern const extended_syscall_info kExtendedSyscallInfos[];
 
 
 #ifdef __cplusplus
