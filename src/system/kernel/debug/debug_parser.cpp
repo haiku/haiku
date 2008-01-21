@@ -42,7 +42,7 @@
 static const int kMaxTokenLength = 128;
 static const int kJumpBufferCount = 10;
 
-static const int kMaxArgumentCount = 16;
+static const int kMaxArgumentCount = 64;
 static const size_t kTemporaryStorageSize = 10240;
 
 static jmp_buf sJumpBuffers[kJumpBufferCount];
