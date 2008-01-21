@@ -1596,8 +1596,21 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 void
 ViewLayer::InvalidateScreenClipping()
 {
-	if (!fScreenClippingValid)
-		return;
+// TODO: appearantly, we are calling ScreenClipping() on
+// views who's parents don't have a valid screen clipping yet,
+// this messes up the logic that for any given view with
+// fScreenClippingValid == false, all children have
+// fScreenClippingValid == false too. If this could be made the
+// case, we could save some performance here with the commented
+// out check, since InvalidateScreenClipping() might be called
+// frequently.
+// TODO: investigate, if InvalidateScreenClipping() could be
+// called in "deep" and "non-deep" mode, ie. see if there are
+// any cases where the children would still have valid screen
+// clipping, even though the parent's screen clipping becomes
+// invalid.
+//	if (!fScreenClippingValid)
+//		return;
 
 	fScreenClippingValid = false;
 	// invalidate the childrens screen clipping as well
