@@ -12,6 +12,8 @@
 
 #include <debug.h>
 #include <kernel.h>
+#include <team.h>
+#include <thread.h>
 #include <util/AutoLock.h>
 
 
@@ -282,6 +284,14 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 //	#pragma mark -
 
 
+AbstractTraceEntry::AbstractTraceEntry()
+	:
+	fThread(thread_get_current_thread_id()),
+	fTeam(team_get_current_team_id()),
+	fTime(system_time())
+{
+}
+
 AbstractTraceEntry::~AbstractTraceEntry()
 {
 }
@@ -290,7 +300,10 @@ AbstractTraceEntry::~AbstractTraceEntry()
 void
 AbstractTraceEntry::Dump(TraceOutput& out)
 {
-	out.Print("[%6ld] %Ld: ", fThread, fTime);
+	if (sPrintTeamID)
+		out.Print("[%6ld:%6ld] %Ld: ", fThread, fTeam, fTime);
+	else
+		out.Print("[%6ld] %Ld: ", fThread, fTime);
 	AddDump(out);
 }
 
@@ -299,6 +312,9 @@ void
 AbstractTraceEntry::AddDump(TraceOutput& out)
 {
 }
+
+
+bool AbstractTraceEntry::sPrintTeamID = false;
 
 
 //	#pragma mark - trace filters
@@ -337,6 +353,7 @@ public:
 public:
 	union {
 		thread_id	fThread;
+		team_id		fTeam;
 		const char*	fString;
 		struct {
 			TraceFilter*	first;
@@ -353,6 +370,17 @@ public:
 		const AbstractTraceEntry* entry
 			= dynamic_cast<const AbstractTraceEntry*>(_entry);
 		return (entry != NULL && entry->Thread() == fThread);
+	}
+};
+
+
+class TeamTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* _entry, LazyTraceOutput& out)
+	{
+		const AbstractTraceEntry* entry
+			= dynamic_cast<const AbstractTraceEntry*>(_entry);
+		return (entry != NULL && entry->Team() == fTeam);
 	}
 };
 
@@ -466,6 +494,17 @@ private:
 			TraceFilter* filter = new(&fFilters[fFilterCount++])
 				ThreadTraceFilter;
 			filter->fThread = strtol(arg, NULL, 0);
+			return filter;
+		} else if (strcmp(token, "team") == 0) {
+			const char* arg = _NextToken();
+			if (arg == NULL) {
+				// unexpected end of expression
+				return NULL;
+			}
+
+			TraceFilter* filter = new(&fFilters[fFilterCount++])
+				TeamTraceFilter;
+			filter->fTeam = strtol(arg, NULL, 0);
 			return filter;
 		} else {
 			// invalid token
@@ -647,6 +686,14 @@ dump_tracing(int argc, char** argv)
 	int32 cont = 0;
 
 	bool hasFilter = false;
+
+	AbstractTraceEntry::sPrintTeamID = false;
+	if (argi < argc) {
+		if (strcmp(argv[argi], "printteam") == 0) {
+			AbstractTraceEntry::sPrintTeamID = true;
+			argi++;
+		}
+	}
 
 	if (argi < argc) {
 		if (strcmp(argv[argi], "forward") == 0) {
@@ -936,13 +983,15 @@ tracing_init(void)
 
 	add_debugger_command_etc("traced", &dump_tracing,
 		"Dump recorded trace entries",
-		"(\"forward\" | \"backward\") | ([ <start> [ <count> [ <range> ] ] ] "
-			"[ #<pattern> | (\"filter\" <filter>) ])\n"
+		"[ \"printteam\" ] (\"forward\" | \"backward\") "
+			"| ([ <start> [ <count> [ <range> ] ] ] "
+				"[ #<pattern> | (\"filter\" <filter>) ])\n"
 		"Prints recorded trace entries. If \"backward\" or \"forward\" is\n"
 		"specified, the command continues where the previous invocation left\n"
 		"off, i.e. printing the previous respectively next entries (as many\n"
 		"as printed before). In this case the command is continuable, that is\n"
 		"afterwards entering an empty line in the debugger will reinvoke it.\n"
+		"\"printteam\" enables printing the items' team ID.\n"
 		"  <start>    - The base index of the entries to print. Depending on\n"
 		"               whether the iteration direction is forward or\n"
 		"               backward this will be the first or last entry printed\n"
@@ -967,11 +1016,12 @@ tracing_init(void)
 		"               printed.\n"
 		"  <filter>   - If specified only entries matching this filter\n"
 		"               expression are printed. The expression can consist of\n"
-		"               prefix operators \"not\", \"and\", \"or\", filters of\n"
-		"               the kind \"'thread' <thread>\" (matching entries\n"
-		"               with the given thread ID), or filter of the kind\n"
+		"               prefix operators \"not\", \"and\", \"or\", and\n"
+		"               filters \"'thread' <thread>\" (matching entries\n"
+		"               with the given thread ID), \"'team' <team>\"\n"
+						"(matching entries with the given team ID), and\n"
 		"               \"#<pattern>\" (matching entries containing the given\n"
-		"               string.\n", 0);
+		"               string).\n", 0);
 #endif	// ENABLE_TRACING
 	return B_OK;
 }

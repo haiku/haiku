@@ -55,13 +55,7 @@ class TraceEntry : public trace_entry {
 
 class AbstractTraceEntry : public TraceEntry {
 	public:
-		AbstractTraceEntry()
-			:
-			fThread(find_thread(NULL)),
-			fTime(system_time())
-		{
-		}
-
+		AbstractTraceEntry();
 		virtual ~AbstractTraceEntry();
 
 		virtual void Dump(TraceOutput& out);
@@ -69,10 +63,15 @@ class AbstractTraceEntry : public TraceEntry {
 		virtual void AddDump(TraceOutput& out);
 
 		thread_id Thread() const { return fThread; }
+		thread_id Team() const { return fTeam; }
 		bigtime_t Time() const { return fTime; }
+
+	public:
+		static bool	sPrintTeamID;
 
 	protected:
 		thread_id	fThread;
+		team_id		fTeam;
 		bigtime_t	fTime;
 };
 
