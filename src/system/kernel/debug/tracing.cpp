@@ -700,6 +700,7 @@ dump_tracing(int argc, char** argv)
 	static int32 _previousMaxToCheck = 0;
 	static int32 _previousFirstChecked = 1;
 	static int32 _previousLastChecked = -1;
+	static int32 _previousDirection = 1;
 	static uint32 _previousWritten = 0;
 	static uint32 _previousEntries = 0;
 	static TraceEntryIterator iterator;
@@ -729,7 +730,8 @@ dump_tracing(int argc, char** argv)
 			cont = -1;
 			argi++;
 		}
-	}
+	} else
+		cont = _previousDirection;
 
 	if (cont != 0) {
 		if (argi < argc) {
@@ -915,6 +917,7 @@ dump_tracing(int argc, char** argv)
 	_previousHasFilter = hasFilter;
 	_previousFirstChecked = firstToCheck;
 	_previousLastChecked = lastToCheck;
+	_previousDirection = direction;
 	_previousWritten = sWritten;
 	_previousEntries = sEntries;
 
@@ -1017,6 +1020,8 @@ tracing_init(void)
 		"off, i.e. printing the previous respectively next entries (as many\n"
 		"as printed before). In this case the command is continuable, that is\n"
 		"afterwards entering an empty line in the debugger will reinvoke it.\n"
+		"If no arguments are given, the command continues in the direction\n"
+		"of the last invocation.\n"
 		"\"printteam\" enables printing the items' team ID.\n"
 		"  <start>    - The base index of the entries to print. Depending on\n"
 		"               whether the iteration direction is forward or\n"
