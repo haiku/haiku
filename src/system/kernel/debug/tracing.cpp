@@ -28,7 +28,8 @@
 enum {
 	WRAP_ENTRY			= 0x01,
 	ENTRY_INITIALIZED	= 0x02,
-	BUFFER_ENTRY		= 0x04
+	BUFFER_ENTRY		= 0x04,
+	FILTER_MATCH		= 0x08
 };
 
 static const size_t kBufferSize = MAX_TRACE_SIZE / 4;
@@ -510,11 +511,17 @@ TraceFilterParser TraceFilterParser::sParser;
 
 class TraceEntryIterator {
 public:
-	TraceEntryIterator(bool startFront)
+	TraceEntryIterator()
 		:
-		fEntry(NULL),
-		fIndex(startFront ? 0 : sEntries + 1)
+ 		fEntry(NULL),
+		fIndex(0)
 	{
+	}
+
+	void Reset()
+	{
+		fEntry = NULL;
+		fIndex = 0;
 	}
 
 	int32 Index() const
@@ -629,6 +636,9 @@ dump_tracing(int argc, char** argv)
 	static int32 _previousFirstChecked = 1;
 	static int32 _previousLastChecked = -1;
 	static uint32 _previousWritten = 0;
+	static uint32 _previousEntries = 0;
+	static TraceEntryIterator iterator;
+
 
 	// Note: start and index are Pascal-like indices (i.e. in [1, sEntries]).
 	int32 start = 0;	// special index: print the last count entries
@@ -653,7 +663,8 @@ dump_tracing(int argc, char** argv)
 			print_debugger_command_usage(argv[0]);
 			return 0;
 		}
-		if (sWritten == 0 || sWritten != _previousWritten) {
+		if (sWritten == 0 || sWritten != _previousWritten
+			|| sEntries != _previousEntries) {
 			kprintf("Can't continue iteration. \"%s\" has not been invoked "
 				"before, or there were new entries written since the last "
 				"invocation.\n", argv[0]);
@@ -737,13 +748,22 @@ dump_tracing(int argc, char** argv)
 		lastToCheck = min_c((int32)sEntries, start + maxToCheck - 1);
 	}
 
-	TraceEntryIterator iterator(true);
+	// reset the iterator, if something changed in the meantime
+	if (sWritten == 0 || sWritten != _previousWritten
+		|| sEntries != _previousEntries) {
+		iterator.Reset();
+	}
 
 	char buffer[256];
 	LazyTraceOutput out(buffer, sizeof(buffer));
 
+	bool markedMatching = false;
+	int32 firstToDump = firstToCheck;
+	int32 lastToDump = lastToCheck;
+
 	if (direction < 0 && hasFilter && lastToCheck - firstToCheck >= count) {
 		// iteration direction is backwards
+		markedMatching = true;
 
 		// From the last entry to check iterate backwards to check filter
 		// matches.
@@ -753,15 +773,23 @@ dump_tracing(int argc, char** argv)
 		iterator.MoveTo(lastToCheck + 1);
 
 		// iterate backwards
+		firstToDump = -1;
+		lastToDump = -1;
 		while (iterator.Index() > firstToCheck) {
 			TraceEntry* entry = iterator.Previous();
 			if ((entry->flags & ENTRY_INITIALIZED) != 0) {
 				out.Clear();
 				if (TraceFilterParser::Default()->Filter(entry, out)) {
+					entry->flags |= FILTER_MATCH;
+					if (lastToDump == -1)
+						lastToDump = iterator.Index();
+					firstToDump = iterator.Index();
+
 					matching++;
 					if (matching >= count)
 						break;
-				}
+				} else
+					entry->flags &= ~FILTER_MATCH;
 			}
 		}
 
@@ -772,13 +800,18 @@ dump_tracing(int argc, char** argv)
 		iterator.Previous();
 	}
 
+	// set the iterator to the entry before the first one to dump
+	iterator.MoveTo(firstToDump - 1);
+
+	// dump the entries matching the filter in the range
+	// [firstToDump, lastToDump]
 	int32 dumped = 0;
 
 	while (TraceEntry* entry = iterator.Next()) {
 		int32 index = iterator.Index();
-		if (index < firstToCheck)
+		if (index < firstToDump)
 			continue;
-		if (index > lastToCheck || dumped >= count) {
+		if (index > lastToDump || dumped >= count) {
 			if (direction > 0)
 				lastToCheck = index - 1;
 			break;
@@ -786,8 +819,11 @@ dump_tracing(int argc, char** argv)
 
 		if ((entry->flags & ENTRY_INITIALIZED) != 0) {
 			out.Clear();
-			if (hasFilter && !TraceFilterParser::Default()->Filter(entry, out))
+			if (hasFilter &&  (markedMatching
+					? (entry->flags & FILTER_MATCH) == 0
+					: !TraceFilterParser::Default()->Filter(entry, out))) {
 				continue;
+			}
 
 			kprintf("%5ld. %s\n", index, out.DumpEntry(entry));
 		} else if (!hasFilter)
@@ -807,6 +843,7 @@ dump_tracing(int argc, char** argv)
 	_previousFirstChecked = firstToCheck;
 	_previousLastChecked = lastToCheck;
 	_previousWritten = sWritten;
+	_previousEntries = sEntries;
 
 	return cont != 0 ? B_KDEBUG_CONT : 0;
 }
