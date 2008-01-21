@@ -317,6 +317,32 @@ AbstractTraceEntry::AddDump(TraceOutput& out)
 bool AbstractTraceEntry::sPrintTeamID = false;
 
 
+//	#pragma mark -
+
+
+#if ENABLE_TRACING
+
+class UserTraceEntry : public AbstractTraceEntry {
+	public:
+		UserTraceEntry(const char* message)
+		{
+			fMessage = alloc_tracing_buffer_strcpy(message, 256, true);
+
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("user: %s", fMessage);
+		}
+
+	private:
+		char*	fMessage;
+};
+
+#endif	// ENABLE_TRACING
+
+
 //	#pragma mark - trace filters
 
 
@@ -1024,5 +1050,14 @@ tracing_init(void)
 		"               string).\n", 0);
 #endif	// ENABLE_TRACING
 	return B_OK;
+}
+
+
+void
+_user_ktrace_output(const char *message)
+{
+#if	ENABLE_TRACING
+	new(nothrow) UserTraceEntry(message);
+#endif	// ENABLE_TRACING
 }
 

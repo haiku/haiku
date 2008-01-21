@@ -87,6 +87,8 @@ char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
 			bool user);
 status_t tracing_init(void);
 
+void _user_ktrace_output(const char *message);
+
 #ifdef __cplusplus
 }
 #endif

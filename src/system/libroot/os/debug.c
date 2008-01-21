@@ -289,3 +289,23 @@ debug_vprintf(const char *format, va_list args)
 }
 
 
+void
+ktrace_printf(const char *format, ...)
+{
+	va_list list;
+	va_start(list, format);
+
+	ktrace_vprintf(format, list);
+
+	va_end(list);
+}
+
+
+void
+ktrace_vprintf(const char *format, va_list args)
+{
+	char buffer[1024];
+	vsnprintf(buffer, sizeof(buffer), format, args);
+
+	_kern_ktrace_output(buffer);
+}

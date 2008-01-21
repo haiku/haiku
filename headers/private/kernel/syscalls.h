@@ -300,6 +300,7 @@ extern status_t		_kern_get_system_info(system_info *info, size_t size);
 
 /* Debug output */
 extern void			_kern_debug_output(const char *message);
+extern void			_kern_ktrace_output(const char *message);
 extern status_t		_kern_frame_buffer_update(addr_t baseAddress, int32 width,
 						int32 height, int32 depth, int32 bytesPerRow);
 
