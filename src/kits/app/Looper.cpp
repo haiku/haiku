@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -461,7 +461,7 @@ BLooper::Quit()
 
 		// As with sem in _Lock(), we need to cache this here in case the looper
 		// disappears before we get to the wait_for_thread() below
-		thread_id tid = Thread();
+		thread_id thread = Thread();
 
 		// We need to unlock here. Otherwise the looper thread can't
 		// dispatch the _QUIT_ message we're going to post.
@@ -471,21 +471,12 @@ BLooper::Quit()
 		// our own, the rest of the message queue has to get processed.  So
 		// we put this in the queue, and when it shows up, we'll call Quit()
 		// from our own thread.
-		// A little testing with BMessageFilter shows _QUIT_ is being used here.
-		// I got suspicious when my test QuitRequested() wasn't getting called
-		// when Quit() was invoked from another thread.  Makes a nice proof that
-		// this is how it's handled, too.
-
-		while (PostMessage(_QUIT_) == B_WOULD_BLOCK) {
-			// There's a slight chance that PostMessage() will return B_WOULD_BLOCK
-			// because the port is full, so we'll wait a bit and re-post until
-			// we won't block.
-			snooze(25000);
-		}
+		// QuitRequested() will not be called in this case.
+		PostMessage(_QUIT_);
 
 		// We have to wait until the looper is done processing any remaining messages.
-		int32 temp;
-		while (wait_for_thread(tid, &temp) == B_INTERRUPTED)
+		status_t status;
+		while (wait_for_thread(thread, &status) == B_INTERRUPTED)
 			;
 	}
 
@@ -547,7 +538,9 @@ BLooper::IsLocked() const
 		return false;
 	}
 
-	return find_thread(NULL) == fOwner;
+	uint32 stack;
+	return ((uint32)&stack & ~(B_PAGE_SIZE - 1)) == fCachedStack
+		|| find_thread(NULL) == fOwner;
 }
 
 
