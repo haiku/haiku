@@ -1,18 +1,20 @@
 /*
- * Copyright 2006, Philippe Houdoin. All rights reserved.
+ * Copyright 2006-2008, Philippe Houdoin. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
+
 
 #include "GLDispatcher.h"
 #include "GLRenderer.h"
 
-BGLRenderer::BGLRenderer(BGLView *view, ulong bgl_options, BGLDispatcher *dispatcher)
+
+BGLRenderer::BGLRenderer(BGLView *view, ulong glOptions,
+		BGLDispatcher *dispatcher)
 	: fRefCount(1),
 	fView(view),
-	fOptions(bgl_options),
+	fOptions(glOptions),
 	fDispatcher(dispatcher)
 {
-
 }
 
 
@@ -40,15 +42,12 @@ BGLRenderer::Release()
 void 
 BGLRenderer::LockGL()
 {
-	fView->LockLooper();
 }
 
 
 void 
 BGLRenderer::UnlockGL()
 {
-	if (fView->Looper()->IsLocked())
-		fView->UnlockLooper();
 }
 
 

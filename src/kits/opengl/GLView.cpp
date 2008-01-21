@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
+ * Copyright 2006-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Philippe Houdoin, philippe.houdoin@free.fr
  *		Stefano Ceccherini, burton666@libero.it
  */
+
 /*
  * Mesa 3-D graphics library
  * Version:  6.1
@@ -32,11 +33,12 @@
  */
 
 
+#include <GLView.h>
+
 #include <assert.h>
 #include <stdio.h>
 
 #include <DirectWindow.h>
-#include <GLView.h>
 #include <GLRenderer.h>
 
 #include "GLRendererRoster.h"
@@ -51,7 +53,8 @@ struct glview_direct_info {
 };
 
 
-BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode, ulong options)
+BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode,
+		ulong options)
    : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
 	m_clip_info(NULL),	
 	fRenderer(NULL)
@@ -73,6 +76,7 @@ BGLView::LockGL()
 {
 	// TODO: acquire the OpenGL API lock it on this glview
 
+	LockLooper();
 	if (fRenderer)
 		fRenderer->LockGL();
 }
@@ -83,6 +87,7 @@ BGLView::UnlockGL()
 {
 	if (fRenderer)
 		fRenderer->UnlockGL();
+	UnlockLooper();
 
 	// TODO: release the GL API lock to others glviews
 }
@@ -139,10 +144,10 @@ BGLView::CopyPixelsIn(BBitmap *source, BPoint dest)
 }
 
 
-/* Mesa's GLenum is not ulong but uint, so we can't use GLenum
-   without breaking this method signature.
-   Instead, we have to use the effective BeOS's SGI OpenGL GLenum type:
-   unsigned long.
+/*!	Mesa's GLenum is not ulong but uint, so we can't use GLenum
+	without breaking this method signature.
+	Instead, we have to use the effective BeOS's SGI OpenGL GLenum type:
+	unsigned long.
  */
 void
 BGLView::ErrorCallback(unsigned long errorCode) 
@@ -175,14 +180,15 @@ BGLView::AttachedToWindow()
 	BView::AttachedToWindow();
 
 	m_bounds = Bounds();
-	for (BView *v = this; v; v = v->Parent())
-		v->ConvertToParent(&m_bounds);
-	
+	for (BView *view = this; view != NULL; view = view->Parent())
+		view->ConvertToParent(&m_bounds);
+
 	fRenderer = fRoster->GetRenderer();
-	if (fRenderer) {
-		// Jackburton: The following code was commented because it doesn't look good in "direct" mode:
-		// when the window is moved, the app_server doesn't paint the view's background, and 
-		// the stuff behind the window itself shows up. 
+	if (fRenderer != NULL) {
+		// Jackburton: The following code was commented because it doesn't look
+		// good in "direct" mode:
+		// when the window is moved, the app_server doesn't paint the view's
+		// background, and the stuff behind the window itself shows up. 
 		// Setting the view color to black, instead, looks a bit more elegant.
 #if 0
 		// Don't paint white window background when resized
@@ -194,8 +200,10 @@ BGLView::AttachedToWindow()
 		glViewport(0, 0, Bounds().IntegerWidth(), Bounds().IntegerHeight());
 
 		if (m_clip_info) {
-			fRenderer->DirectConnected(((glview_direct_info *)m_clip_info)->direct_info);
-			fRenderer->EnableDirectMode(((glview_direct_info *)m_clip_info)->enable_direct_mode);
+			fRenderer->DirectConnected(
+				((glview_direct_info *)m_clip_info)->direct_info);
+			fRenderer->EnableDirectMode(
+				((glview_direct_info *)m_clip_info)->enable_direct_mode);
 		}
 
 		return;
@@ -203,7 +211,8 @@ BGLView::AttachedToWindow()
 	
 	fprintf(stderr, "no renderer found! \n");
 
-	// No Renderer, no rendering. Setup a minimal "No Renderer" string drawing context
+	// No Renderer, no rendering. Setup a minimal "No Renderer" string drawing
+	// context
 	SetFont(be_bold_font);
 	// SetFontSize(16);
 }
