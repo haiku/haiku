@@ -261,13 +261,13 @@ AutoMounter::_UnmountAndEjectVolume(BMessage *message)
 	if (status < B_OK)
 		snprintf(name, sizeof(name), "device:%ld", device);
 
-	BDirectory mountPoint;
-	if (status == B_OK)
-		status = volume.GetRootDirectory(&mountPoint);
-
 	BPath path;
-	if (status == B_OK)
-		status = path.SetTo(&mountPoint, ".");
+	if (status == B_OK) {
+		BDirectory mountPoint;
+		status = volume.GetRootDirectory(&mountPoint);
+		if (status == B_OK)
+			status = path.SetTo(&mountPoint, ".");
+	}
 
 	if (status == B_OK) {
 		status = fs_unmount_volume(path.Path(), 0);
