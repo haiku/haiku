@@ -300,7 +300,6 @@ TermParse::EscParse()
 	int nparam = 1;
 
 	int row, col;
-	int width;
 
 	/* default coding system is UTF8 */
 	int *groundtable = utf8_groundtable;

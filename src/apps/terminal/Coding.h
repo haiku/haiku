@@ -39,10 +39,10 @@
 
 status_t	get_nth_encoding(int i, int *id);
 
-int 		longname2id(const char *longname);
-const char *	longname2shortname(const char *longname);
-const char *	id2longname(int op);
-const char 	id2shortcut(int op);
+int 			EncodingID(const char *longname);
+const char *	EncodingAsShortString(int id);
+const char *	EncodingAsString(int id);
+const char 		id2shortcut(int id);
 
 
 #endif /* _CODING_H_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc.
+ * Copyright 2007-2008, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -7,11 +7,9 @@
 
 
 #include "AppearPrefView.h"
-#include "MenuUtil.h"
 #include "PrefHandler.h"
 #include "PrefWindow.h"
 #include "PrefView.h"
-#include "Shell.h"
 #include "TermConst.h"
 
 #include <Alert.h>
@@ -33,13 +31,11 @@ PrefWindow::PrefWindow(BMessenger messenger)
 	fDirty(false),
 	fPrefDlgMessenger(messenger)
 {
-	BRect rect;
-	
 	BView *top = new BView(Bounds(), "topview", B_FOLLOW_NONE, B_WILL_DRAW);
 	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(top);
 	
-	rect = top->Bounds();
+	BRect rect = top->Bounds();
 	rect.bottom *= .75;
 	AppearancePrefView *prefView= new AppearancePrefView(rect, "Appearance", 
 		fPrefDlgMessenger);
@@ -68,8 +64,8 @@ PrefWindow::PrefWindow(BMessenger messenger)
 		fRevertButton->Bounds().Height());
 	top->AddChild(fRevertButton);
 
-	AddShortcut((ulong)'Q', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
-	AddShortcut((ulong)'W', (ulong)B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	AddShortcut('Q', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
 	Show();
 }

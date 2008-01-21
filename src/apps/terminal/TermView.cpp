@@ -256,7 +256,8 @@ TermView::_InitObject(int32 argc, const char **argv)
 	//SetIMAware(false);
 	
 	status_t status = fShell->Open(fTermRows, fTermColumns,
-					longname2shortname(id2longname(fEncoding)), argc, argv);
+								EncodingAsShortString(fEncoding),
+								argc, argv);
 	
 	if (status < B_OK)
 		return status;

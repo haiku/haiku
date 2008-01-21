@@ -115,7 +115,7 @@ void
 TermWindow::MenusBeginning()
 {
 	// Syncronize Encode Menu Pop-up menu and Preference.
-	BMenuItem *item = fEncodingmenu->FindItem(id2longname(_ActiveTermView()->Encoding()));
+	BMenuItem *item = fEncodingmenu->FindItem(EncodingAsString(_ActiveTermView()->Encoding()));
 	if (item != NULL)
 		item->SetMarked(true);
 	BWindow::MenusBeginning();
@@ -606,7 +606,7 @@ TermWindow::_AddTab(Arguments *args)
 		// TODO: shouldn't this be done in BScrollView itself ? At least BScrollBar does that.	
 		scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -13);
 		
-		view->SetEncoding(longname2id(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
+		view->SetEncoding(EncodingID(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 		
 		BFont font;
 		_GetPreferredFont(font);	

@@ -40,15 +40,10 @@
 #include <String.h>
 
 
-////////////////////////////////////////////////////////////////////////////
-// PrefView ()
-//	Constructor.
-////////////////////////////////////////////////////////////////////////////
 PrefView::PrefView(BRect frame, const char *name)
 	:BView(frame, name, B_FOLLOW_ALL_SIDES, B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fLabel.SetTo(name);
 }
 
 
@@ -60,12 +55,6 @@ PrefView::~PrefView()
 {
 }
 
-
-const char *
-PrefView::ViewLabel() const
-{
-	return fLabel.String();
-}
 
 
 ////////////////////////////////////////////////////////////////////////////
@@ -99,14 +88,12 @@ PrefView::MessageReceived(BMessage* msg)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// SetupBColorControl
-// Make BColorControl.
-//////////////////////////////////////////////////////////////////////////////
 BColorControl *
-PrefView::SetupBColorControl(BPoint point, color_control_layout layout, float cellSize, ulong message)
+PrefView::SetupColorControl(BPoint point, color_control_layout layout,
+							float cellSize, ulong message)
 {
-	BColorControl *control = new BColorControl(point, layout, cellSize, "", new BMessage(message));
+	BColorControl *control = new BColorControl(point, layout, cellSize,
+												"", new BMessage(message));
 	AddChild(control);
 	return control;
 }

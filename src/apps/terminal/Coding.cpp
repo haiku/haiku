@@ -25,7 +25,7 @@ const static etable kEncodingTable[] =
 	{"ISO-8859-8", "8859-8", '8', B_ISO8_CONVERSION},
 	{"ISO-8859-9", "8859-9", '9', B_ISO9_CONVERSION},
 	{"ISO-8859-10", "8859-10", '0', B_ISO10_CONVERSION},
-	{"MacRoman", "MacRoman",'M',  B_MAC_ROMAN_CONVERSION},
+	{"MacRoman", "MacRoman", 'M',  B_MAC_ROMAN_CONVERSION},
 	{"JIS", "JIS", 'J', B_JIS_CONVERSION},
 	{"Shift-JIS", "SJIS", 'S', B_SJIS_CONVERSION},
 	{"EUC-jp", "EUCJ", 'E', B_EUC_CONVERSION},
@@ -60,7 +60,7 @@ get_nth_encoding(int i, int *id)
 
 
 int
-longname2id(const char *longname)
+EncodingID(const char *longname)
 {
 	int id = M_UTF8;
 	const etable *s = kEncodingTable;
@@ -76,25 +76,21 @@ longname2id(const char *longname)
 
 
 const char *
-longname2shortname(const char *longname)
+EncodingAsShortString(int id)
 {
-	const char *shortName = NULL;
-
 	const etable *p = kEncodingTable;
 	while (p->name) {
-		if (!strcmp(p->name, longname)) {
-			shortName = p->shortname;
-			break;
-		}
+		if (id == p->id)
+			return p->shortname;
 		p++;
 	}
-	
-	return shortName;
+
+	return kEncodingTable[0].shortname;
 }
 
 
 const char *
-id2longname(int id)
+EncodingAsString(int id)
 {
 	const etable *p = kEncodingTable;
 	while (p->name) {

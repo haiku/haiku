@@ -77,21 +77,14 @@ const ulong MSG_TEXT_MODIFIED		= 'tcmm';
 const ulong MSG_PREF_MODIFIED		= 'mpmo';
 
 
-extern PrefHandler *gTermPref;
+class PrefView : public BView {
+public:
+				PrefView(BRect frame, const char *name);
+  		virtual ~PrefView();
+  		virtual bool	CanApply();
+  		virtual void	MessageReceived(BMessage *msg);
 
-class PrefView : public BView
-{
-	public:
-		PrefView (BRect frame, const char *name);
-  		virtual       ~PrefView();
-  		const char *  ViewLabel (void) const;
-  		virtual bool  CanApply ();
-  		virtual void	MessageReceived (BMessage *msg);
-
-  		BColorControl* SetupBColorControl	(BPoint p, color_control_layout layout, float cell_size, ulong msg);
-
-  	private:
-  		BString fLabel;
+  		BColorControl* SetupColorControl(BPoint p, color_control_layout layout, float cell_size, ulong msg);
 
 };
 

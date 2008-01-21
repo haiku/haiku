@@ -60,7 +60,7 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	fColorField->SetDivider(StringWidth(fColorField->Label()) + 8.0);
 	AddChild(fColorField);
 
-  	fColorControl = SetupBColorControl(BPoint(r.left, r.bottom + 10),
+  	fColorControl = SetupColorControl(BPoint(r.left, r.bottom + 10),
   		B_CELLS_32x8, 6, MSG_COLOR_CHANGED);
   	fColorControl->SetValue(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR));
 }

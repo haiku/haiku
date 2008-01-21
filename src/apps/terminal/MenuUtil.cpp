@@ -49,9 +49,9 @@ MakeEncodingMenu(BMenu *eMenu, bool flag)
 		BMessage *msg = new BMessage(MENU_ENCODING);
 		msg->AddInt32("op", (int32)encoding);
 		if (flag)
-			eMenu->AddItem(new BMenuItem(id2longname(encoding), msg, id2shortcut(encoding)));
+			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding), msg, id2shortcut(encoding)));
 		else 
-			eMenu->AddItem(new BMenuItem(id2longname(encoding), msg));
+			eMenu->AddItem(new BMenuItem(EncodingAsString(encoding), msg));
 		
 		i++;
 	}
