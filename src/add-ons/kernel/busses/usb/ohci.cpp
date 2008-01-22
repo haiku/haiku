@@ -1255,7 +1255,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 			head = fDummyIsochronous;
 			break;
 		case USB_OBJECT_INTERRUPT_PIPE:
-			head = _FindInterruptEndpoint((static_cast<InterruptPipe*>(pipe))->Interval());
+			head = _FindInterruptEndpoint(pipe->Interval());
 			break;
 		default: 
 			TRACE_ERROR(("usb_ohci: unknown type of pipe. Wrong value!\n"));
