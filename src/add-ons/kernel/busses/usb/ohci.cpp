@@ -516,7 +516,7 @@ OHCI::_FinishTransfer()
 
 				// Free all descriptors of this transfer
 				next = (ohci_general_td *)current->next_done_descriptor;
-				_FreeDescriptorChain(transfer->top);
+				_FreeDescriptorChain(transfer->first_descriptor);
 
 				// Restart the endpoint
 				// TODO: what if there are other transfer to this endpoint?
@@ -713,8 +713,8 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 	_WriteDescriptorChain(setupDescriptor, &vector, 1);
 
 	status_t  result;
+	ohci_general_td *dataDescriptor = NULL;
 	if (transfer->VectorCount() > 0) {
-		ohci_general_td *dataDescriptor = NULL;
 		ohci_general_td *lastDescriptor = NULL;
 		result = _CreateDescriptorChain(&dataDescriptor,
 			&lastDescriptor,
@@ -747,8 +747,8 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 	// 3. Tell the controller to process the control list
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_CONTROL_LIST_FILLED);
 
-	result = _AddPendingTransfer(transfer, setupDescriptor, statusDescriptor,
-		directionIn);
+	result = _AddPendingTransfer(transfer, endpoint, setupDescriptor,
+		dataDescriptor,	directionIn);
 	if (result < B_OK) {
 		TRACE_ERROR(("usb_ohci: failed to add pending transfer\n"));
 		_FreeDescriptorChain(setupDescriptor);
@@ -760,11 +760,44 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 
 
 status_t
-OHCI::_AddPendingTransfer(Transfer *transfer, ohci_general_td *first,
-	ohci_general_td *last, bool direction)
+OHCI::_AddPendingTransfer(Transfer *transfer, ohci_endpoint_descriptor *endpoint,
+	ohci_general_td *firstDescriptor, ohci_general_td *dataDescriptor, bool directionIn)
 {
-	// TODO
-	return B_ERROR;
+	if (!transfer || !endpoint || !firstDescriptor)
+		return B_BAD_VALUE;
+
+	transfer_data *data = new(std::nothrow) transfer_data;
+	if (!data)
+		return B_NO_MEMORY;
+
+	status_t result = transfer->InitKernelAccess();
+	if (result < B_OK) {
+		delete data;
+		return result;
+	}
+
+	data->transfer = transfer;
+	data->endpoint = endpoint;
+	data->first_descriptor = firstDescriptor;
+	data->data_descriptor = dataDescriptor;
+	data->incoming = directionIn;
+	data->canceled = false;
+	data->link = NULL;
+
+	if (!Lock()) {
+		delete data;
+		return B_ERROR;
+	}
+
+	if (fLastTransfer)
+		fLastTransfer->link = data;
+	else 
+		fFirstTransfer = data;
+
+	fLastTransfer = data;
+	Unlock();
+
+	return B_OK;
 }
 
 

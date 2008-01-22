@@ -21,7 +21,8 @@ class OHCIRootHub;
 typedef struct transfer_data_s {
 	Transfer					*transfer;
 	ohci_endpoint_descriptor	*endpoint;
-	ohci_general_td				*top;
+	ohci_general_td				*first_descriptor;
+	ohci_general_td				*data_descriptor;
 	bool						incoming;
 	bool						canceled;
 	transfer_data_s				*link;
@@ -95,8 +96,9 @@ static	int32						_InterruptHandler(void *data);
 
 		// Transfer functions
 		status_t					_AddPendingTransfer(Transfer *transfer,
+										ohci_endpoint_descriptor *endpoint,
 										ohci_general_td *first,
-										ohci_general_td *last,
+										ohci_general_td *data,
 										bool directionIn);
 		status_t					_UnlinkTransfer(transfer_data *transfer);
 
