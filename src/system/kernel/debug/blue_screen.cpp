@@ -103,46 +103,52 @@ scroll_up(void)
 static void
 next_line(void)
 {
+#if USE_SCROLLING
+	// TODO: scrolling is usually too slow; we could probably just remove it
+	if (sScreen.y == sScreen.rows - 1)
+ 		scroll_up();
+ 	else
+ 		sScreen.y++;
+#else
 	if (in_command_invocation())
 		sScreen.in_command_rows++;
 	else
 		sScreen.in_command_rows = 0;
 
-	if (sScreen.y == sScreen.rows - 1) {
-#if USE_SCROLLING
- 		scroll_up();
-#else
-
-		if (sScreen.paging
-			&& (sScreen.in_command_rows > 1 || sScreen.boot_debug_output)) {
-			// We're in the debugger, and a command is being executed
-			const char *text = "Press key to continue, Q to quit";
-			int32 length = strlen(text);
-			if (sScreen.x + length > sScreen.columns) {
-				// make sure we don't overwrite too much
-				text = "P";
-				length = 1;
-			}
-
-			for (int32 i = 0; i < length; i++) {
-				sModule->put_glyph(sScreen.columns - length + i, sScreen.y,
-					text[i], sScreen.boot_debug_output ? 0x6f : 0xf0);
-			}
-
-			char c = blue_screen_getchar();
-			if (c == 'q')
-				sScreen.ignore_output = true;
-
-			// remove on screen text again
-			sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,
-				1, ' ', sScreen.attr);
+	if (sScreen.paging && ((sScreen.in_command_rows > 0
+			&& ((sScreen.in_command_rows + 3) % sScreen.rows) == 0)
+		|| (sScreen.boot_debug_output && sScreen.y == sScreen.rows - 1))) {
+		// Use the paging mechanism: either, we're in the debugger, and a
+		// command is being executed, or we're currently showing boot debug
+		// output
+		const char *text = "Press key to continue, Q to quit";
+		int32 length = strlen(text);
+		if (sScreen.x + length > sScreen.columns) {
+			// make sure we don't overwrite too much
+			text = "P";
+			length = 1;
 		}
+
+		for (int32 i = 0; i < length; i++) {
+			// yellow on black (or reverse, during boot)
+			sModule->put_glyph(sScreen.columns - length + i, sScreen.y,
+				text[i], sScreen.boot_debug_output ? 0x6f : 0xf6);
+		}
+
+		char c = blue_screen_getchar();
+		if (c == 'q')
+			sScreen.ignore_output = true;
+
+		// remove on screen text again
+		sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,
+			1, ' ', sScreen.attr);
+	}
+	if (sScreen.y == sScreen.rows - 1) {
 		sScreen.y = 0;
 		sModule->fill_glyph(0, 0, sScreen.columns, 2, ' ', sScreen.attr);
-#endif
-	} else if (sScreen.y < sScreen.rows - 1) {
+	} else
 		sScreen.y++;
-	}
+#endif
 
 #if NO_CLEAR
 	if (sScreen.y + 2 < sScreen.rows) {
