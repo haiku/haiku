@@ -820,6 +820,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 			}
 		}
 	} else {
+		// click was inside the window contents
 		if (ViewLayer* view = ViewAt(where)) {
 			if (HasModal())
 				return;
@@ -834,9 +835,14 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 					&& desktopSettings.MouseMode() == B_NORMAL_MOUSE)
 					fDesktop->ActivateWindow(this);
 
-				// eat the click if we don't accept first click
-				if ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) == 0
-					|| (Flags() & B_AVOID_FOCUS) != 0)
+				// Eat the click if we don't accept first click
+				// (B_AVOID_FOCUS never gets the focus, so they always accept
+				// the first click)
+				// TODO: the latter is unlike BeOS - if we really wanted to
+				// imitate this behaviour, we would need to check if we're
+				// the front window instead of the focus window
+				if ((Flags() & (B_WILL_ACCEPT_FIRST_CLICK
+						| B_AVOID_FOCUS)) == 0)
 					return;
 			}
 
