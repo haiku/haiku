@@ -754,8 +754,10 @@ UHCI::AddPendingTransfer(Transfer *transfer, Queue *queue,
 		return B_NO_MEMORY;
 
 	status_t result = transfer->InitKernelAccess();
-	if (result < B_OK)
+	if (result < B_OK) {
+		delete data;
 		return result;
+	}
 
 	data->transfer = transfer;
 	data->queue = queue;
@@ -795,8 +797,10 @@ UHCI::AddPendingIsochronousTransfer(Transfer *transfer, uhci_td **isoRequest,
 		return B_NO_MEMORY;
 
 	status_t result = transfer->InitKernelAccess();
-	if (result < B_OK)
+	if (result < B_OK) {
+		delete data;
 		return result;
+	}
 
 	data->transfer = transfer;
 	data->descriptors = isoRequest;

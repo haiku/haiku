@@ -847,8 +847,10 @@ EHCI::AddPendingTransfer(Transfer *transfer, ehci_qh *queueHead,
 		return B_NO_MEMORY;
 
 	status_t result = transfer->InitKernelAccess();
-	if (result < B_OK)
+	if (result < B_OK) {
+		delete data;
 		return result;
+	}
 
 	data->transfer = transfer;
 	data->queue_head = queueHead;
