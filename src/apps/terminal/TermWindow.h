@@ -35,7 +35,6 @@
 #include <String.h>
 #include <Window.h>
 
-
 class Arguments;
 class BFont;
 class BMenu;
@@ -44,6 +43,7 @@ class FindWindow;
 class PrefWindow;
 class TermView;
 class SmartTabView;
+
 
 class TermWindow : public BWindow {
 public:
@@ -72,6 +72,7 @@ private:
 	
 	SmartTabView	*fTabView;
 	TermView		*fTermView;
+	
 	BMenuBar		*fMenubar;
 	BMenu			*fFilemenu;
 	BMenu			*fEditmenu;

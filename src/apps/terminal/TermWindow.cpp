@@ -43,6 +43,7 @@
 const static float kViewOffset = 3;
 const static uint32 kNewTab = 'NTab';
 const static uint32 kCloseView = 'ClVw';
+const static int32 kMaxTabs = 6;
 
 
 class CustomTermView : public TermView {
@@ -93,10 +94,6 @@ TermWindow::~TermWindow()
 }
 
 
-//	#pragma mark - public methods
-
-
-/** Initialize Window object. */
 void
 TermWindow::_InitWindow()
 {
@@ -232,7 +229,8 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case kNewTab:
-			_AddTab(NULL);
+			if (fTabView->CountTabs() < kMaxTabs)
+				_AddTab(NULL);
 			break;
 
 		case kCloseView:
@@ -614,27 +612,26 @@ TermWindow::_AddTab(Arguments *args)
 		
 		_SetTermColors(view);
 		
-		if (fTabView->CountTabs() >= 1) {
-			int width, height;
-			view->GetFontSize(&width, &height);
+		int width, height;
+		view->GetFontSize(&width, &height);
 
-			float minimumHeight = 0;
-			if (fMenubar)
-				minimumHeight += fMenubar->Bounds().Height();
-			if (fTabView && fTabView->CountTabs() > 1)
-				minimumHeight += fTabView->TabHeight();
-			SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
-							minimumHeight + MIN_ROWS * height, 
-							minimumHeight + MAX_ROWS * height);
-		}
+		float minimumHeight = 0;
+		if (fMenubar)
+			minimumHeight += fMenubar->Bounds().Height();
+		if (fTabView && fTabView->CountTabs() > 1)
+			minimumHeight += fTabView->TabHeight();
+		SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
+						minimumHeight + MIN_ROWS * height, 
+						minimumHeight + MAX_ROWS * height);
 
 		// If it's the first time we're called, setup the window
 		if (fTabView->CountTabs() == 1) {
-			float fWidth, fHeight;
-			view->GetPreferredSize(&fWidth, &fHeight);
+			float viewWidth, viewHeight;
+			view->GetPreferredSize(&viewWidth, &viewHeight);
 			
 			// Resize Window
-			ResizeTo(fWidth + B_V_SCROLL_BAR_WIDTH, fHeight + fMenubar->Bounds().Height());
+			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
+					viewHeight + fMenubar->Bounds().Height());
 	
 			// TODO: If I don't do this, the view won't show up.
 			// Bug in BTabView or in my code ?
@@ -645,6 +642,7 @@ TermWindow::_AddTab(Arguments *args)
 		// TODO: Should cleanup, I guess
 	}
 }	
+	
 	
 void
 TermWindow::_RemoveTab(int32 index)
