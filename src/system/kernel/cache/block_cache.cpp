@@ -6,6 +6,12 @@
 
 #include "block_cache_private.h"
 
+#include <unistd.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+
 #include <KernelExport.h>
 #include <fs_cache.h>
 
@@ -17,11 +23,6 @@
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
-
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
 
 
 // TODO: this is a naive but growing implementation to test the API:
@@ -192,10 +193,10 @@ static status_t write_cached_block(block_cache *cache, cached_block *block,
 	bool deleteTransaction = true);
 
 
-#ifdef DEBUG_BLOCK_CACHE
 static DoublyLinkedList<block_cache> sCaches;
 static mutex sCachesLock;
-#endif
+static DoublyLinkedListLink<block_cache> sMarkCache;
+	// TODO: this only works if the link is the first entry of block_cache
 static object_cache *sBlockCache;
 
 
@@ -278,8 +279,8 @@ lookup_transaction(block_cache *cache, int32 id)
 int
 compare_blocks(const void *_blockA, const void *_blockB)
 {
-	cached_block *blockA = (cached_block *)_blockA;
-	cached_block *blockB = (cached_block *)_blockB;
+	cached_block *blockA = *(cached_block **)_blockA;
+	cached_block *blockB = *(cached_block **)_blockB;
 
 	off_t diff = blockA->block_number - blockB->block_number;
 	if (diff > 0)
@@ -289,8 +290,7 @@ compare_blocks(const void *_blockA, const void *_blockB)
 }
 
 
-/* static */
-int
+/*static*/ int
 cached_block::Compare(void *_cacheEntry, const void *_block)
 {
 	cached_block *cacheEntry = (cached_block *)_cacheEntry;
@@ -301,8 +301,7 @@ cached_block::Compare(void *_cacheEntry, const void *_block)
 
 
 
-/* static */
-uint32
+/*static*/ uint32
 cached_block::Hash(void *_cacheEntry, const void *_block, uint32 range)
 {
 	cached_block *cacheEntry = (cached_block *)_cacheEntry;
@@ -328,25 +327,25 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
+	num_dirty_blocks(0),
 	read_only(readOnly)
 {
-#ifdef DEBUG_BLOCK_CACHE
 	mutex_lock(&sCachesLock);
 	sCaches.Add(this);
 	mutex_unlock(&sCachesLock);
-#endif
 
 	buffer_cache = create_object_cache_etc("block cache buffers", blockSize,
 		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
 	if (buffer_cache == NULL)
 		return;
 
-	hash = hash_init(1024, 0, &cached_block::Compare, &cached_block::Hash);
+	hash = hash_init(1024, offsetof(cached_block, next), &cached_block::Compare,
+		&cached_block::Hash);
 	if (hash == NULL)
 		return;
 
-	transaction_hash = hash_init(16, 0, &transaction_compare,
-		&::transaction_hash);
+	transaction_hash = hash_init(16, offsetof(cache_transaction, next),
+		&transaction_compare, &::transaction_hash);
 	if (transaction_hash == NULL)
 		return;
 
@@ -359,11 +358,9 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 
 block_cache::~block_cache()
 {
-#ifdef DEBUG_BLOCK_CACHE
 	mutex_lock(&sCachesLock);
 	sCaches.Remove(this);
 	mutex_unlock(&sCachesLock);
-#endif
 
 	unregister_low_memory_handler(&block_cache::LowMemoryHandler, this);
 
@@ -726,6 +723,9 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 		if (cleared)
 			memset(block->current_data, 0, cache->block_size);
 
+		if (!block->is_dirty)
+			cache->num_dirty_blocks++;
+
 		block->is_dirty = true;
 			// mark the block as dirty
 
@@ -824,6 +824,9 @@ write_cached_block(block_cache *cache, cached_block *block,
 			strerror(errno)));
 		return B_IO_ERROR;
 	}
+
+	if (cache->num_dirty_blocks > 0)
+		cache->num_dirty_blocks--;
 
 	if (data == block->current_data)
 		block->is_dirty = false;
@@ -1070,12 +1073,99 @@ dump_caches(int argc, char **argv)
 	kprintf("Block caches:\n");
 	DoublyLinkedList<block_cache>::Iterator i = sCaches.GetIterator();
 	while (i.HasNext()) {
-		kprintf("  %p\n", i.Next());
+		block_cache *cache = i.Next();
+		if (cache == (block_cache *)&sMarkCache)
+			continue;
+
+		kprintf("  %p\n", cache);
 	}
 
 	return 0;
 }
 #endif	// DEBUG_BLOCK_CACHE
+
+
+static block_cache *
+get_next_block_cache(block_cache *last)
+{
+	MutexLocker _(sCachesLock);
+	block_cache *cache;
+	if (last != NULL) {
+		cache = sCaches.GetNext((block_cache *)&sMarkCache);
+		sCaches.Remove((block_cache *)&sMarkCache);
+	} else
+		cache = sCaches.Head();
+
+	if (cache != NULL)
+		sCaches.Insert(sCaches.GetNext(cache), (block_cache *)&sMarkCache);
+
+	return cache;
+}
+
+
+static status_t
+block_writer(void *)
+{
+	while (true) {
+		// write 64 blocks of each block_cache every two seconds
+		// TODO: change this once we have an I/O scheduler
+		snooze(2000000LL);
+
+		block_cache *cache = NULL;
+		while ((cache = get_next_block_cache(cache)) != NULL) {
+			BenaphoreLocker locker(&cache->lock);
+			const uint32 kMaxCount = 64;
+			cached_block *blocks[kMaxCount];
+			uint32 count = 0;
+
+			if (cache->num_dirty_blocks) {
+				// This cache is not using transactions, we'll scan the blocks
+				// directly
+				hash_iterator iterator;
+				hash_open(cache->hash, &iterator);
+
+				cached_block *block;
+				while (count < kMaxCount
+					&& (block = (cached_block *)hash_next(cache->hash,
+							&iterator)) != NULL) {
+					if (block->is_dirty)
+						blocks[count++] = block;
+				}
+
+				hash_close(cache->hash, &iterator, false);			
+			} else {
+				hash_iterator iterator;
+				hash_open(cache->transaction_hash, &iterator);
+
+				cache_transaction *transaction;
+				while ((transaction = (cache_transaction *)hash_next(
+						cache->transaction_hash, &iterator)) != NULL
+					&& count < kMaxCount) {
+					if (transaction->open)
+						continue;
+
+					// sort blocks to speed up writing them back
+					// TODO: ideally, this should be handled by the I/O scheduler
+					block_list::Iterator iterator
+						= transaction->blocks.GetIterator();
+
+					for (; count < kMaxCount && iterator.HasNext(); count++) {
+						blocks[count] = iterator.Next();
+					}
+				}
+
+				hash_close(cache->transaction_hash, &iterator, false);			
+			}
+
+			qsort(blocks, count, sizeof(void *), &compare_blocks);
+
+			for (uint32 i = 0; i < count; i++) {
+				if (write_cached_block(cache, blocks[i], true) != B_OK)
+					break;
+			}
+		}
+	}
+}
 
 
 extern "C" status_t
@@ -1086,11 +1176,16 @@ block_cache_init(void)
 	if (sBlockCache == NULL)
 		return B_ERROR;
 
-#ifdef DEBUG_BLOCK_CACHE
 	mutex_init(&sCachesLock, "block caches");
 	new (&sCaches) DoublyLinkedList<block_cache>;
 		// manually call constructor
 
+	thread_id thread = spawn_kernel_thread(&block_writer, "block writer",
+		B_LOW_PRIORITY, NULL);
+	if (thread >= B_OK)
+		send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+
+#ifdef DEBUG_BLOCK_CACHE
 	add_debugger_command_etc("block_caches", &dump_caches,
 		"dumps all block caches", "\n", 0);
 	add_debugger_command_etc("block_cache", &dump_cache,
@@ -1726,6 +1821,9 @@ block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
 			&blockNumber);
 		if (block == NULL)
 			continue;
+
+		// TODO: sort blocks!
+
 		if (block->previous_transaction != NULL
 			|| (block->transaction == NULL && block->is_dirty)) {
 			status_t status = write_cached_block(cache, block);

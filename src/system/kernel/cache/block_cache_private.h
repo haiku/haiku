@@ -64,6 +64,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	object_cache *buffer_cache;
 	block_list	unused_blocks;
 
+	uint32		num_dirty_blocks;
 	bool		read_only;
 
 	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
