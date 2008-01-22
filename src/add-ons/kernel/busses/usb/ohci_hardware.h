@@ -344,9 +344,8 @@ typedef struct ohci_general_td
 	addr_t	physical_address;			// Physical address of this descriptor
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
-	void	*next_done_descriprtor;		// Used for collision in the hash table
+	void	*next_done_descriptor;		// Used for the done descriptor list
 	size_t	buffer_size;				// Size of the buffer
-	void	*endpoint;					// Necessary when there is an error
 	void	*transfer;					// Pointer to the transfer
 	bool	is_last;					// Last descriptor of the transfer
 };

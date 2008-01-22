@@ -71,7 +71,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fDummyBulk(NULL),
 		fDummyIsochronous(NULL),
 		fFirstTransfer(NULL),
-		fFinishTransfer(NULL),
+		fLastTransfer(NULL),
 		fFinishThread(-1),
 		fStopFinishThread(false),
 		fRootHub(NULL),
@@ -456,20 +456,20 @@ OHCI::_FinishTransfer()
 
 		// Pull out the done list and reverse its order
 		// for both general and isochronous descriptors
-		ohci_general_td *descriptor, *top;
-		ohci_isochronous_td *isoDescriptor, *isoTop;
+		ohci_general_td *current, *top;
+		ohci_isochronous_td *isoCurrent, *isoTop;
 		uint32 done_list = fHcca->done_head & ~OHCI_DONE_INTERRUPTS;
 		for ( top = NULL, isoTop = NULL ; done_list != 0; ) {
-			if ((descriptor = _FindDescriptorInHash(done_list))) {
-				done_list = descriptor->next_physical_descriptor;
-				descriptor->next_logical_descriptor = (void *)top;
-				top = descriptor;
+			if ((current = _FindDescriptorInHash(done_list))) {
+				done_list = current->next_physical_descriptor;
+				current->next_done_descriptor = (void *)top;
+				top = current;
 				continue;
 			}
-			if ((isoDescriptor = _FindIsoDescriptorInHash(done_list))) {
-				done_list = isoDescriptor->next_physical_descriptor;
-				isoDescriptor->next_logical_descriptor = (void *)isoTop;
-				isoTop = isoDescriptor;
+			if ((isoCurrent = _FindIsoDescriptorInHash(done_list))) {
+				done_list = isoCurrent->next_physical_descriptor;
+				isoCurrent->next_done_descriptor = (void *)isoTop;
+				isoTop = isoCurrent;
 				continue;
 			}
 			// TODO: Should I panic here? :)
@@ -477,26 +477,98 @@ OHCI::_FinishTransfer()
 			break;
 		}
 
-		// Process the list
-		for (isoDescriptor = isoTop; isoDescriptor != NULL; isoDescriptor 
-			= (ohci_isochronous_td *)isoDescriptor->next_logical_descriptor) {
-			// TODO: Process isochronous descriptors
-		}
-		for (descriptor = top; descriptor != NULL; descriptor
-			= (ohci_general_td *)descriptor->next_logical_descriptor) {
-			// TODO: Process general descriptors
-			if (OHCI_TD_GET_CONDITION_CODE(descriptor->flags) == OHCI_NO_ERROR) {
-				if (descriptor->is_last) {
-					// Trasfer completed
-				}
-			}
-		}
-
 		// Acknowledge the interrupt
+		// TODO: Move the acknowledgement in the interrupt handler. The done_head
+		// value can be passed through a shared variable.
 		fHcca->done_head = 0;
 		_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_WRITEBACK_DONE_HEAD);
 
+		// Process isochronous list first
+		for (isoCurrent = isoTop; isoCurrent != NULL; isoCurrent
+			= (ohci_isochronous_td *)isoCurrent->next_done_descriptor) {
+			// TODO: Process isochronous descriptors
+		}
+		// Now process the general list
+		for (current = top; current != NULL; ) {
+			ohci_general_td *next = (ohci_general_td *)current->next_done_descriptor;
+			// TODO: Handle cancelled and timeout
+			uint32 conditionCode = OHCI_TD_GET_CONDITION_CODE(current->flags);
+			if (conditionCode != OHCI_NO_ERROR) {
+				// Endpoint is halted
+				// 1. Unlink the transfer
+				// 2. Free all descriptors of the transfer
+				// 3. Notify the caller.
+				// 4. Restart the endpoint
+				// NOTE: There can(should) not be more than one
+				// invalid descriptor from the same transfer in the
+				// done list, as the controller halt the endpoint right
+				// away if a descriptor fails. This means that, if we reversed
+				// the order of the done list (which we did), there is
+				// not reason to look for more failed descriptors in the
+				// done list from the same transfer, as *BSD code does.
+				TRACE(("usb_ohci: transfer failed! ohci error code: %d\n",
+					conditionCode));
+
+				// Unlink the transfer
+				// TODO: check the return value
+				transfer_data *transfer = (transfer_data *)current->transfer;
+				_UnlinkTransfer(transfer);
+
+				// Free all descriptors of this transfer
+				next = (ohci_general_td *)current->next_done_descriptor;
+				_FreeDescriptorChain(transfer->top);
+
+				// Restart the endpoint
+				// TODO: what if there are other transfer to this endpoint?
+				ohci_endpoint_descriptor *endpoint
+					= (ohci_endpoint_descriptor *)transfer->endpoint;
+				endpoint->head_physical_descriptor = 0;
+
+				// Notify the caller
+				transfer->transfer->Finished(B_CANCELED, 0);
+				delete transfer->transfer;
+				delete transfer;
+				continue;
+			}
+
+			if (current->is_last) {
+				// TODO: Trasfer completed
+			}
+
+			current = next;
+		}
 	}
+}
+
+
+status_t
+OHCI::_UnlinkTransfer(transfer_data *transfer)
+{
+	if (Lock()) {
+		if (transfer == fFirstTransfer) {
+			// It was the first element
+			fFirstTransfer = fFirstTransfer->link;
+			if (transfer == fLastTransfer)
+				// Also the only one
+				fLastTransfer = NULL;
+		} else {
+			transfer_data *data = fFirstTransfer->link;
+			transfer_data *previous = fFirstTransfer;
+			while (data != NULL) {
+				if (data == transfer) {
+					previous->link = data->link;
+					if (data == fLastTransfer)
+						fLastTransfer = previous;
+					break;
+				}
+				previous = data;
+				data = data->link;
+			}
+		}
+		Unlock();
+		return B_OK;
+	}
+	return B_ERROR;
 }
 
 
@@ -720,9 +792,17 @@ OHCI::_CreateDescriptorChain(ohci_general_td **_firstDescriptor,
 
 
 void
-OHCI::_FreeDescriptorChain(ohci_general_td *top)
+OHCI::_FreeDescriptorChain(ohci_general_td *topDescriptor)
 {
-	// TODO
+	ohci_general_td *current = topDescriptor;
+	ohci_general_td *next = NULL;
+
+	while (current) {
+		next = (ohci_general_td *)current->next_logical_descriptor;
+		_FreeGeneralDescriptor(current);
+		current = next;
+	}
+
 }
 
 

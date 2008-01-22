@@ -19,11 +19,12 @@ struct pci_module_info;
 class OHCIRootHub;
 
 typedef struct transfer_data_s {
-	Transfer		*transfer;
-	ohci_general_td	*top;
-	bool			incoming;
-	bool			canceled;
-	transfer_data_s	*link;
+	Transfer					*transfer;
+	ohci_endpoint_descriptor	*endpoint;
+	ohci_general_td				*top;
+	bool						incoming;
+	bool						canceled;
+	transfer_data_s				*link;
 } transfer_data;
 
 // --------------------------------------
@@ -97,6 +98,7 @@ static	int32						_InterruptHandler(void *data);
 										ohci_general_td *first,
 										ohci_general_td *last,
 										bool directionIn);
+		status_t					_UnlinkTransfer(transfer_data *transfer);
 
 static	int32						_FinishThread(void *data);
 		void						_FinishTransfer();
@@ -178,7 +180,7 @@ static	pci_module_info				*sPCIModule;
 
 		// Maintain a linked list of transfer
 		transfer_data				*fFirstTransfer;
-		transfer_data				*fFinishTransfer;
+		transfer_data				*fLastTransfer;
 		sem_id						fFinishTransfersSem;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
