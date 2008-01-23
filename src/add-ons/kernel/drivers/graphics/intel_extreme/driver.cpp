@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,15 +11,15 @@
 #include "device.h"
 #include "lock.h"
 
-#include <OS.h>
-#include <KernelExport.h>
-#include <SupportDefs.h>
-#include <PCI.h>
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <malloc.h>
+
+#include <AGP.h>
+#include <KernelExport.h>
+#include <OS.h>
+#include <PCI.h>
+#include <SupportDefs.h>
 
 #define TRACE_DRIVER
 #ifdef TRACE_DRIVER
@@ -59,6 +59,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 char *gDeviceNames[MAX_CARDS + 1];
 intel_info *gDeviceInfo[MAX_CARDS];
 pci_module_info *gPCI;
+agp_module_info *gAGP;
 lock gLock;
 
 
@@ -125,7 +126,7 @@ init_driver(void)
 {
 	TRACE((DEVICE_NAME ": init_driver()\n"));
 
-	status_t status = get_module(B_PCI_MODULE_NAME,(module_info **)&gPCI);
+	status_t status = get_module(B_PCI_MODULE_NAME, (module_info **)&gPCI);
 	if (status != B_OK) {
 		TRACE((DEVICE_NAME ": pci module unavailable\n"));
 		return status;
@@ -136,6 +137,8 @@ init_driver(void)
 		put_module(B_PCI_MODULE_NAME);
 		return status;
 	}
+
+	get_module(B_AGP_MODULE_NAME, (module_info **)&gAGP);
 
 	// find devices
 
@@ -211,6 +214,8 @@ uninit_driver(void)
 		free(name);
 	}
 
+	if (gAGP != NULL)
+		put_module(B_AGP_MODULE_NAME);
 	put_module(B_PCI_MODULE_NAME);
 }
 
