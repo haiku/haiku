@@ -3719,7 +3719,9 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 #endif
 
 				dprintf("stack trace:\n");
-				while (status == B_OK && frame.return_address != NULL) {
+				int32 maxFrames = 50;
+				while (status == B_OK && --maxFrames >= 0
+						&& frame.return_address != NULL) {
 					dprintf("  %p", frame.return_address);
 					area = vm_area_lookup(addressSpace,
 						(addr_t)frame.return_address);
