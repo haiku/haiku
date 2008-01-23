@@ -587,7 +587,7 @@ TeamDebugHandler::_LookupSymbolAddress(
 	// lookup the symbol
 	void *baseAddress;
 	char symbolName[1024];
-	char imageName[B_OS_NAME_LENGTH];
+	char imageName[B_PATH_NAME_LENGTH];
 	bool exactMatch;
 	bool lookupSucceeded = false;
 	if (lookupContext) {

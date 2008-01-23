@@ -344,8 +344,8 @@ debug_lookup_symbol_address(debug_symbol_lookup_context *lookupContext,
 	}
 
 	if (imageName) {
-		if (imageNameSize > B_OS_NAME_LENGTH)
-			imageNameSize = B_OS_NAME_LENGTH;
+		if (imageNameSize > B_PATH_NAME_LENGTH)
+			imageNameSize = B_PATH_NAME_LENGTH;
 		strlcpy(imageName, _imageName, imageNameSize);
 	}
 
