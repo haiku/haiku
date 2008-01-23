@@ -607,7 +607,7 @@ TeamDebugHandler::_LookupSymbolAddress(
 
 		} else {
 			// no symbol: image relative address
-			snprintf(buffer, bufferSize, "(%s + %#lx)", symbolName,
+			snprintf(buffer, bufferSize, "(%s + %#lx)", imageName,
 				(addr_t)address - (addr_t)baseAddress);
 		}
 
