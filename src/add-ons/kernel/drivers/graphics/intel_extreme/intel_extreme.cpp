@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,16 +8,18 @@
 
 
 #include "intel_extreme.h"
+
+#include "AreaKeeper.h"
 #include "driver.h"
 #include "utility.h"
-
-#include <driver_settings.h>
-#include <util/kernel_cpp.h>
 
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+
+#include <driver_settings.h>
+#include <util/kernel_cpp.h>
 
 
 #define TRACE_DEVICE
@@ -26,67 +28,6 @@
 #else
 #	define TRACE(x) ;
 #endif
-
-
-class AreaKeeper {
-	public:
-		AreaKeeper();
-		~AreaKeeper();
-
-		area_id Create(const char *name, void **_virtualAddress, uint32 spec,
-			size_t size, uint32 lock, uint32 protection);
-		area_id Map(const char *name, void *physicalAddress, size_t numBytes,
-			uint32 spec, uint32 protection, void **_virtualAddress);
-
-		status_t InitCheck() { return fArea < B_OK ? (status_t)fArea : B_OK; }
-		void Detach();
-
-	private:
-		area_id	fArea;
-};
-
-
-AreaKeeper::AreaKeeper()
-	:
-	fArea(-1)
-{
-}
-
-
-AreaKeeper::~AreaKeeper()
-{
-	if (fArea >= B_OK)
-		delete_area(fArea);
-}
-
-
-area_id
-AreaKeeper::Create(const char *name, void **_virtualAddress, uint32 spec,
-	size_t size, uint32 lock, uint32 protection)
-{
-	fArea = create_area(name, _virtualAddress, spec, size, lock, protection);
-	return fArea;
-}
-
-
-area_id
-AreaKeeper::Map(const char *name, void *physicalAddress, size_t numBytes,
-	uint32 spec, uint32 protection, void **_virtualAddress)
-{
-	fArea = map_physical_memory(name, physicalAddress, numBytes, spec, protection,
-		_virtualAddress);
-	return fArea;
-}
-
-
-void
-AreaKeeper::Detach()
-{
-	fArea = -1;
-}
-
-
-//	#pragma mark -
 
 
 static void
@@ -147,7 +88,6 @@ determine_stolen_memory_size(intel_info &info)
 	size_t memorySize = 1 << 20; // 1 MB
 	size_t gttSize = 0;
 
-	// TODO: check if the GTT is really part of the stolen memory
 	if (info.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
 		switch (memoryConfig & i965_GTT_MASK) {
 			case i965_GTT_128K:
@@ -236,7 +176,7 @@ determine_stolen_memory_size(intel_info &info)
 static void
 set_gtt_entry(intel_info &info, uint32 offset, uint8 *physicalAddress)
 {
-	write32(info.gtt_base + (offset >> 10),
+	write32(info.gtt_base + (offset >> GTT_PAGE_SHIFT),
 		(uint32)physicalAddress | GTT_ENTRY_VALID);
 }
 
@@ -247,7 +187,8 @@ release_vblank_sem(intel_info &info)
 	int32 count;
 	if (get_sem_count(info.shared_info->vblank_sem, &count) == B_OK
 		&& count < 0) {
-		release_sem_etc(info.shared_info->vblank_sem, -count, B_DO_NOT_RESCHEDULE);
+		release_sem_etc(info.shared_info->vblank_sem, -count,
+			B_DO_NOT_RESCHEDULE);
 		return B_INVOKE_SCHEDULER;
 	}
 

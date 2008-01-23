@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -79,10 +79,9 @@ AreaCloner::Keep()
 //	#pragma mark -
 
 
-/** This is the common accelerant_info initializer. It is called by
- *	both, the first accelerant and all clones.
- */
-
+/*! This is the common accelerant_info initializer. It is called by
+	both, the first accelerant and all clones.
+*/
 static status_t
 init_common(int device, bool isClone)
 {
@@ -102,16 +101,16 @@ init_common(int device, bool isClone)
 	intel_get_private_data data;
 	data.magic = INTEL_PRIVATE_DATA_MAGIC;
 
-	if (ioctl(device, INTEL_GET_PRIVATE_DATA, &data, sizeof(intel_get_private_data)) != 0) {
+	if (ioctl(device, INTEL_GET_PRIVATE_DATA, &data,
+			sizeof(intel_get_private_data)) != 0) {
 		free(gInfo);
 		return B_ERROR;
 	}
 
 	AreaCloner sharedCloner;
 	gInfo->shared_info_area = sharedCloner.Clone("intel extreme shared info",
-								(void **)&gInfo->shared_info, B_ANY_ADDRESS,
-								B_READ_AREA | B_WRITE_AREA,
-								data.shared_info_area);
+		(void **)&gInfo->shared_info, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		data.shared_info_area);
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
@@ -120,9 +119,8 @@ init_common(int device, bool isClone)
 
 	AreaCloner regsCloner;
 	gInfo->regs_area = regsCloner.Clone("intel extreme regs",
-							(void **)&gInfo->regs, B_ANY_ADDRESS,
-							B_READ_AREA | B_WRITE_AREA,
-							gInfo->shared_info->registers_area);
+		(void **)&gInfo->regs, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA,
+		gInfo->shared_info->registers_area);
 	status = regsCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
@@ -142,15 +140,22 @@ init_common(int device, bool isClone)
 	if (gInfo->shared_info->hardware_cursor_enabled)
 		gInfo->cursor_memory = (uint8 *)gInfo->overlay_registers + 2 * B_PAGE_SIZE;
 
+	if (gInfo->shared_info->device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+		// allocate some extra memory for the 3D context
+		intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE, gInfo->context_handle,
+			gInfo->context_offset);
+	}
+
 	return B_OK;
 }
 
 
-/** Clean up data common to both primary and cloned accelerant */
-
+/*! Clean up data common to both primary and cloned accelerant */
 static void
 uninit_common(void)
 {
+	intel_free_memory(gInfo->context_handle);
+
 	delete_area(gInfo->regs_area);
 	delete_area(gInfo->shared_info_area);
 
@@ -167,8 +172,7 @@ uninit_common(void)
 //	#pragma mark - public accelerant functions
 
 
-/** Init primary accelerant */
-
+/*! Init primary accelerant */
 status_t
 intel_init_accelerant(int device)
 {
@@ -267,10 +271,9 @@ err1:
 }
 
 
-/** This function is called for both, the primary accelerant and all of
- *	its clones.
- */
-
+/*! This function is called for both, the primary accelerant and all of
+	its clones.
+*/
 void
 intel_uninit_accelerant(void)
 {
@@ -299,7 +302,8 @@ intel_get_accelerant_device_info(accelerant_device_info *info)
 
 	info->version = B_ACCELERANT_VERSION;
 	strcpy(info->name,
-		(gInfo->shared_info->device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_7xx
+		(gInfo->shared_info->device_type & INTEL_TYPE_FAMILY_MASK)
+			== INTEL_TYPE_7xx
 		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");

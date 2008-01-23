@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,9 +20,9 @@
 #define read8(address)   		(*((volatile uint8 *)(address)))
 #define read16(address)  		(*((volatile uint16 *)(address)))
 #define read32(address) 		(*((volatile uint32 *)(address)))
-#define write8(address,data)  	(*((volatile uint8 *)(address))  = data)
-#define write16(address,data) 	(*((volatile uint16 *)(address)) = (data))
-#define write32(address,data) 	(*((volatile uint32 *)(address)) = (data))
+#define write8(address, data)  	(*((volatile uint8 *)(address)) = (data))
+#define write16(address, data) 	(*((volatile uint16 *)(address)) = (data))
+#define write32(address, data) 	(*((volatile uint32 *)(address)) = (data))
 
 
 extern char *gDeviceNames[];

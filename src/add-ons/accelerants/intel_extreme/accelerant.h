@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -19,6 +19,8 @@ struct overlay {
 	overlay_buffer	buffer;
 	uint32			buffer_handle;
 	uint32			buffer_offset;
+	uint32			state_handle;
+	uint32			state_offset;
 };
 
 struct overlay_frame {
@@ -53,6 +55,11 @@ struct accelerant_info {
 
 	edid1_info		edid_info;
 	bool			has_edid;
+
+	// limited 3D support for overlay on i965
+	uint32			context_handle;
+	uint32			context_offset;
+	bool			context_set;
 
 	int				device;
 	uint8			head_mode;

@@ -15,6 +15,7 @@ Addon intel_extreme.accelerant :
 	memory.cpp
 	mode.cpp
 	overlay.cpp
+	overlay_3d_i965.cpp
 	: be libaccelerantscommon.a
 ;
 

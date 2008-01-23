@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -300,7 +300,13 @@ intel_overlay_count(const display_mode *mode)
 const uint32 *
 intel_overlay_supported_spaces(const display_mode *mode)
 {
-	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32, B_YCbCr422, 0};
+	static const uint32 kSupportedSpaces[] = {B_RGB15, B_RGB16, B_RGB32,
+		B_YCbCr422, 0};
+	static const uint32 kSupportedi965Spaces[] = {B_YCbCr422, 0};
+	intel_shared_info &sharedInfo = *gInfo->shared_info;
+
+	if (sharedInfo.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965))
+		return kSupportedi965Spaces;
 
 	return kSupportedSpaces;
 }
@@ -323,6 +329,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	TRACE(("intel_allocate_overlay_buffer(width %u, height %u, colorSpace %lu)\n",
 		width, height, colorSpace));
 
+	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	uint32 bytesPerPixel;
 
 	switch (colorSpace) {
@@ -363,11 +370,25 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 		return NULL;
 	}
 
-	buffer->buffer = gInfo->shared_info->graphics_memory + overlay->buffer_offset;
-	buffer->buffer_dma = gInfo->shared_info->physical_graphics_memory + overlay->buffer_offset;
+	if (sharedInfo.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+		status = intel_allocate_memory(INTEL_i965_OVERLAY_STATE_SIZE,
+			overlay->state_handle, overlay->state_offset);
+		if (status < B_OK) {
+			intel_free_memory(overlay->buffer_handle);
+			free(overlay);
+			return NULL;
+		}
+	} else
+		overlay->state_handle = 0;
 
-	TRACE(("allocated overlay buffer: handle=%x, offset=%x, address=%x, physical address=%x\n", 
-		overlay->buffer_handle, overlay->buffer_offset, buffer->buffer, buffer->buffer_dma));
+	buffer->buffer = gInfo->shared_info->graphics_memory
+		+ overlay->buffer_offset;
+	buffer->buffer_dma = gInfo->shared_info->physical_graphics_memory
+		+ overlay->buffer_offset;
+
+	TRACE(("allocated overlay buffer: handle=%x, offset=%x, address=%x, "
+		"physical address=%x\n", overlay->buffer_handle, overlay->buffer_offset,
+		buffer->buffer, buffer->buffer_dma));
 
 	return buffer;
 }
@@ -386,6 +407,7 @@ intel_release_overlay_buffer(const overlay_buffer *buffer)
 		hide_overlay();
 
 	intel_free_memory(overlay->buffer_handle);
+	intel_free_memory(overlay->state_handle);
 	free(overlay);
 
 	return B_OK;
@@ -393,8 +415,8 @@ intel_release_overlay_buffer(const overlay_buffer *buffer)
 
 
 status_t
-intel_get_overlay_constraints(const display_mode *mode, const overlay_buffer *buffer,
-	overlay_constraints *constraints)
+intel_get_overlay_constraints(const display_mode *mode,
+	const overlay_buffer *buffer, overlay_constraints *constraints)
 {
 	TRACE(("intel_get_overlay_constraints(buffer %p)\n", buffer));
 

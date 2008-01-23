@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -179,6 +179,7 @@ struct intel_free_graphics_memory {
 #define G33_GTT_2M						(2 << 8)
 #define GTT_ENTRY_VALID					0x01
 #define GTT_ENTRY_LOCAL_MEMORY			0x02
+#define GTT_PAGE_SHIFT					12
 
 // interrupts
 #define INTEL_INTERRUPT_ENABLED			0x020a0
