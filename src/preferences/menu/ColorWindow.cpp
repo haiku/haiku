@@ -71,11 +71,11 @@ ColorWindow::Quit()
 void
 ColorWindow::_UpdateAndPost()
 {
+	fCurrentColor = fColorControl->ValueAsColor();
+	
 	fDefaultButton->SetEnabled(fCurrentColor != fDefaultColor);
 	fRevertButton->SetEnabled(fCurrentColor != fPreviousColor);
-	
-	fCurrentColor = fColorControl->ValueAsColor();
-		
+			
 	menu_info info;
 	get_menu_info(&info);
 	info.background_color = fCurrentColor;
