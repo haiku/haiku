@@ -606,7 +606,7 @@ status_t
 UHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
-		return CancelQueuedIsochronousTransfers(pipe);
+		return CancelQueuedIsochronousTransfers(pipe, force);
 
 	if (!Lock())
 		return B_ERROR;
@@ -642,7 +642,7 @@ UHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 
 
 status_t
-UHCI::CancelQueuedIsochronousTransfers(Pipe *pipe)
+UHCI::CancelQueuedIsochronousTransfers(Pipe *pipe, bool force)
 {
 	isochronous_transfer_data *current = fFirstIsochronousTransfer;
 
@@ -656,6 +656,9 @@ UHCI::CancelQueuedIsochronousTransfers(Pipe *pipe)
 			// the transfer. The FinishIsochronousThread will do the rest.
 			for (int32 i = 0; i < packetCount; i++)
 				current->descriptors[i]->status &= ~TD_STATUS_ACTIVE;
+
+			// TODO: Use the force paramater in order to avoid calling
+			// invalid callbacks
 			current->is_active = false;
 		}
 
