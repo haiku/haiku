@@ -94,7 +94,6 @@ struct direct_window_data {
 	sem_id	sem_ack;
 	area_id	area;
 	bool	started;
-	int	next_buffer_state;
 	direct_buffer_info *buffer_info;
 };
 
@@ -105,7 +104,6 @@ direct_window_data::direct_window_data()
 	sem_ack(-1),
 	area(-1),
 	started(false),
-	next_buffer_state(0),
 	buffer_info(NULL)
 {
 	area = create_area("direct area", (void **)&buffer_info,
@@ -3045,19 +3043,18 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 			&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START))
 		return;
 	
-	// If the direct connection is stopped, only continue if a start notification is received.
-	// But save the "reason" of the call (B_BUFFER_RESIZED, B_CLIPPING_MODIFIED, etc)
+	// Don't issue a DirectConnected() notification
+	// if the connection is stopped, and we are called
+	// with bufferState == B_DIRECT_MODIFY.
 	if ((fDirectWindowData->buffer_info->buffer_state & B_DIRECT_MODE_MASK) == B_DIRECT_STOP
 		&& (bufferState & B_DIRECT_MODE_MASK) != B_DIRECT_START) {
-		fDirectWindowData->next_buffer_state |= bufferState & ~B_DIRECT_MODE_MASK;
 		return;		
 	}
 
 	fDirectWindowData->started = true;
 
-	fDirectWindowData->buffer_info->buffer_state =
-		(direct_buffer_state)(bufferState | fDirectWindowData->next_buffer_state);
-	fDirectWindowData->next_buffer_state = 0;
+	if (bufferState != -1)
+		fDirectWindowData->buffer_info->buffer_state = (direct_buffer_state)bufferState;
 		
 	if (driverState != -1)
 		fDirectWindowData->buffer_info->driver_state = (direct_driver_state)driverState;
