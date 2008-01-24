@@ -56,8 +56,15 @@ struct glview_direct_info {
 BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode,
 		ulong options)
    : BView(rect, name, B_FOLLOW_ALL_SIDES, mode | B_WILL_DRAW | B_FRAME_EVENTS), //  | B_FULL_UPDATE_ON_RESIZE)
-	m_clip_info(NULL),	
-	fRenderer(NULL)
+	fGc(NULL),
+	fOptions(options),
+	fDitherCount(0),
+	fDrawLock("BGLView draw lock"),
+	fDisplayLock("BGLView display lock"),
+	fClipInfo(NULL),	
+	fRenderer(NULL),
+	fRoster(NULL),
+	fDitherMap(NULL)	
 {
 	fRoster = new GLRendererRoster(this, options);
 }
@@ -65,7 +72,7 @@ BGLView::BGLView(BRect rect, char *name, ulong resizingMode, ulong mode,
 
 BGLView::~BGLView()
 {
-	delete (glview_direct_info *)m_clip_info;
+	delete (glview_direct_info *)fClipInfo;
 	if (fRenderer)
 		fRenderer->Release();
 }
@@ -104,9 +111,9 @@ void
 BGLView::SwapBuffers(bool vSync)
 {
 	if (fRenderer) {
-		lock_draw();
+		_LockDraw();
 		fRenderer->SwapBuffers(vSync);
-		unlock_draw();
+		_UnlockDraw();
 	}
 }
 
@@ -163,9 +170,9 @@ void
 BGLView::Draw(BRect updateRect)
 {
 	if (fRenderer) {
-		lock_draw();	
+		_LockDraw();	
 		fRenderer->Draw(updateRect);
-		unlock_draw();
+		_UnlockDraw();
 		return;	
 	}
 	// TODO: auto-size and center the string
@@ -179,9 +186,9 @@ BGLView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	m_bounds = Bounds();
+	fBounds = Bounds();
 	for (BView *view = this; view != NULL; view = view->Parent())
-		view->ConvertToParent(&m_bounds);
+		view->ConvertToParent(&fBounds);
 
 	fRenderer = fRoster->GetRenderer();
 	if (fRenderer != NULL) {
@@ -199,11 +206,11 @@ BGLView::AttachedToWindow()
 		// Set default OpenGL viewport:
 		glViewport(0, 0, Bounds().IntegerWidth(), Bounds().IntegerHeight());
 
-		if (m_clip_info) {
+		if (fClipInfo) {
 			fRenderer->DirectConnected(
-				((glview_direct_info *)m_clip_info)->direct_info);
+				((glview_direct_info *)fClipInfo)->direct_info);
 			fRenderer->EnableDirectMode(
-				((glview_direct_info *)m_clip_info)->enable_direct_mode);
+				((glview_direct_info *)fClipInfo)->enable_direct_mode);
 		}
 
 		return;
@@ -246,9 +253,9 @@ BGLView::AllDetached()
 void
 BGLView::FrameResized(float width, float height)
 {
-	m_bounds = Bounds();
+	fBounds = Bounds();
 	for (BView *v = this; v; v = v->Parent())
-		v->ConvertToParent(&m_bounds);
+		v->ConvertToParent(&fBounds);
 
 	if (fRenderer)
 		fRenderer->FrameResized(width, height);
@@ -318,17 +325,17 @@ BGLView::GetSupportedSuites(BMessage *data)
 void
 BGLView::DirectConnected(direct_buffer_info *info)
 {
-	if (!m_clip_info/* && m_direct_connection_disabled*/) {
-		m_clip_info = new glview_direct_info();
+	if (!fClipInfo/* && m_direct_connection_disabled*/) {
+		fClipInfo = new glview_direct_info();
 	}
 
-	glview_direct_info *glviewDirectInfo = (glview_direct_info *)m_clip_info;
+	glview_direct_info *glviewDirectInfo = (glview_direct_info *)fClipInfo;
 	direct_buffer_info *localInfo = glviewDirectInfo->direct_info;
 	
 	switch(info->buffer_state & B_DIRECT_MODE_MASK) { 
 		case B_DIRECT_START:
 			glviewDirectInfo->direct_connected = true;
-			unlock_draw();
+			_UnlockDraw();
 		case B_DIRECT_MODIFY:
 		{
 			localInfo->buffer_state = info->buffer_state;
@@ -348,7 +355,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 			BRegion region;
 			for (uint32 c = 0; c < info->clip_list_count; c++)
 				region.Include(info->clip_list[c]);
-			BRegion boundsRegion = m_bounds.OffsetByCopy(info->window_bounds.left, info->window_bounds.top);
+			BRegion boundsRegion = fBounds.OffsetByCopy(info->window_bounds.left, info->window_bounds.top);
 			localInfo->window_bounds = boundsRegion.RectAtInt(0); // window_bounds are now view bounds
 			region.IntersectWith(&boundsRegion);
 				
@@ -362,7 +369,7 @@ BGLView::DirectConnected(direct_buffer_info *info)
 		}		
 		case B_DIRECT_STOP: 
 			glviewDirectInfo->direct_connected = false;
-			lock_draw();
+			_LockDraw();
 			break; 
 	} 
 	
@@ -376,34 +383,34 @@ BGLView::EnableDirectMode(bool enabled)
 {
 	if (fRenderer)
 		fRenderer->EnableDirectMode(enabled);
-	if (!m_clip_info) {
-                m_clip_info = new glview_direct_info();
-        }
-	((glview_direct_info *)m_clip_info)->enable_direct_mode = enabled;
+	if (!fClipInfo) {
+                fClipInfo = new glview_direct_info();
+	}
+	((glview_direct_info *)fClipInfo)->enable_direct_mode = enabled;
 }
 
 
 void
-BGLView::lock_draw()
+BGLView::_LockDraw()
 {
-	glview_direct_info *info = (glview_direct_info *)m_clip_info;
+	glview_direct_info *info = (glview_direct_info *)fClipInfo;
 
 	if (!info || !info->enable_direct_mode)
 		return;
 
-	m_drawLock.Lock();
+	fDrawLock.Lock();
 }
 
 
 void
-BGLView::unlock_draw()
+BGLView::_UnlockDraw()
 {
-	glview_direct_info *info = (glview_direct_info *)m_clip_info;
+	glview_direct_info *info = (glview_direct_info *)fClipInfo;
 
 	if (!info || !info->enable_direct_mode)
 		return;
 	
-	m_drawLock.Unlock();
+	fDrawLock.Unlock();
 }
 
 
