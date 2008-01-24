@@ -183,37 +183,59 @@ scheduler_reschedule(void)
 			nextThread = nextThread->queue_next;
 		}
 	} else {
-		// select next thread from the run queue
-		while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
+		while (nextThread) {
+			// select next thread from the run queue
+			while (nextThread && nextThread->priority > B_IDLE_PRIORITY) {
 #if 0
-			if (oldThread == nextThread && nextThread->was_yielded) {
-				// ignore threads that called thread_yield() once
-				nextThread->was_yielded = false;
-				prevThread = nextThread;
-				nextThread = nextThread->queue_next;
-			}
+				if (oldThread == nextThread && nextThread->was_yielded) {
+					// ignore threads that called thread_yield() once
+					nextThread->was_yielded = false;
+					prevThread = nextThread;
+					nextThread = nextThread->queue_next;
+				}
 #endif
 
-			// always extract real time threads
-			if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
-				break;
+				// always extract real time threads
+				if (nextThread->priority >= B_FIRST_REAL_TIME_PRIORITY)
+					break;
 
-			// never skip last non-idle normal thread
-			if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
-				break;
+				// never skip last non-idle normal thread
+				if (nextThread->queue_next && nextThread->queue_next->priority == B_IDLE_PRIORITY)
+					break;
 
-			// skip normal threads sometimes (roughly 20%)
-			if (_rand() > 0x1a00)
-				break;
+				// skip normal threads sometimes (roughly 20%)
+				if (_rand() > 0x1a00)
+					break;
 
-			// skip until next lower priority
-			int32 priority = nextThread->priority;
-			do {
+				// skip until next lower priority
+				int32 priority = nextThread->priority;
+				do {
+					prevThread = nextThread;
+					nextThread = nextThread->queue_next;
+				} while (nextThread->queue_next != NULL
+					&& priority == nextThread->queue_next->priority
+					&& nextThread->queue_next->priority > B_IDLE_PRIORITY);
+			}
+
+			if (nextThread->cpu
+				&& nextThread->cpu->cpu_num != oldThread->cpu->cpu_num) {
+				// ToDo: This thread is still running on another CPU. The
+				// thread just missed a semaphore, put itself into the notify
+				// queue but was not yet rescheduled. During this time frame
+				// release_sem_etc() was called for said semaphore and put the
+				// thread into the run queue to notify it.
+				// Therefore it is now _still_ running on one CPU and _already_
+				// part of the run queue again. We have to skip this thread
+				// here because otherwise we would overwrite the thread->cpu
+				// pointer with the current CPU which would make both CPUs
+				// "think" they are the same one and kill off the scheduler
+				// logic in here as well as all calls to smp_get_current_cpu().
 				prevThread = nextThread;
 				nextThread = nextThread->queue_next;
-			} while (nextThread->queue_next != NULL
-				&& priority == nextThread->queue_next->priority
-				&& nextThread->queue_next->priority > B_IDLE_PRIORITY);
+				continue;
+			}
+
+			break;
 		}
 	}
 
