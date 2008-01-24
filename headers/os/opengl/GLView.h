@@ -115,6 +115,61 @@ private:
 		void	_UnlockDraw();
 };
 
+
+class BGLScreen : public BWindowScreen {
+public:
+				BGLScreen(char *name,
+					ulong screenMode, ulong options,
+					status_t *error, bool debug=false);
+				~BGLScreen();
+
+			void	LockGL();
+			void	UnlockGL();
+			void	SwapBuffers();
+	// Mesa's GLenum is uint where Be's ones was ulong!
+	virtual	void	ErrorCallback(unsigned long errorCode);
+	
+	virtual void	ScreenConnected(bool connected);
+	virtual void	FrameResized(float width, float height);
+virtual status_t	Perform(perform_code code, void *arg);
+
+virtual status_t	Archive(BMessage *data, bool deep = true) const;
+	virtual void	MessageReceived(BMessage *message);
+	
+	virtual void	Show();
+	virtual void	Hide();
+
+virtual BHandler*	ResolveSpecifier(BMessage *message,
+								int32 index,
+								BMessage *specifier,
+								int32 form,
+								const char *property);
+virtual status_t	GetSupportedSuites(BMessage *data);
+
+private:
+
+	virtual void	_ReservedGLScreen1();
+	virtual void	_ReservedGLScreen2();
+	virtual void	_ReservedGLScreen3();
+	virtual void	_ReservedGLScreen4();
+	virtual void	_ReservedGLScreen5();
+	virtual void	_ReservedGLScreen6();
+	virtual void	_ReservedGLScreen7();
+	virtual void	_ReservedGLScreen8(); 
+
+					BGLScreen(const BGLScreen &);
+					BGLScreen	&operator=(const BGLScreen &);
+
+		void *		fGc;
+		long		fOptions;
+		BLocker		fDrawLock;
+		
+		int32		fColorSpace;
+		uint32		fScreenMode;
+		
+		uint64      _reserved[7];
+};
+
 #endif // __cplusplus
 		
 #endif // BGLVIEW_H
