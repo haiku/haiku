@@ -132,6 +132,8 @@ extern const char * color_space_name(color_space space);
 #include "swrast/s_spantemp.h"
 
 
+// TODO: Rename this to "instantiate_gl_renderer" to
+// be consistent with BArchivable api ?
 extern "C" _EXPORT BGLRenderer *
 	instanciate_gl_renderer(BGLView *view, ulong options, BGLDispatcher *dispatcher)
 {
