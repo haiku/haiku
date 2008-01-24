@@ -906,6 +906,9 @@ EHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	}
 
 	Unlock();
+
+	// notify the finisher so it can clean up the canceled transfers
+	release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
 	return B_OK;
 }
 
