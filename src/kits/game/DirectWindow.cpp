@@ -536,9 +536,9 @@ BDirectWindow::_DisposeData()
 	
 	if (fInitStatus & DW_STATUS_THREAD_STARTED) {
 		fDaemonKiller = true;
-		// Release this sem, otherwise the Direct daemon thread
+		// delete this sem, otherwise the Direct daemon thread
 		// will wait forever on it
-		release_sem(fDisableSem);
+		delete_sem(fDisableSem);
 		status_t retVal;
 		wait_for_thread(fDirectDaemonId, &retVal);
 	}
