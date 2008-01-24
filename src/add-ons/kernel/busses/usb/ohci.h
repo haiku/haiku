@@ -100,14 +100,16 @@ static	int32						_InterruptHandler(void *data);
 										ohci_general_td *first,
 										ohci_general_td *data,
 										bool directionIn);
+		status_t					_CancelQueuedIsochronousTransfers(
+										Pipe *pipe, bool force);
 		status_t					_UnlinkTransfer(transfer_data *transfer);
 
 static	int32						_FinishThread(void *data);
 		void						_FinishTransfer();
 
 		status_t					_SubmitControlRequest(Transfer *transfer);
-		status_t					_SubmitIsochronousTransfer(
-										Transfer *transfer);
+		status_t					_SubmitBulkTransfer(Transfer *transfer);
+		status_t					_SubmitPeriodicTransfer(Transfer *transfer);
 
 		// Endpoint related methods
 		ohci_endpoint_descriptor	*_AllocateEndpoint();
@@ -115,6 +117,8 @@ static	int32						_FinishThread(void *data);
 										ohci_endpoint_descriptor *endpoint);
 		status_t					_InsertEndpointForPipe(Pipe *pipe);
 		status_t					_RemoveEndpointForPipe(Pipe *pipe);
+		void						_RemoveTransferFromEndpoint(
+										transfer_data *transfer);
 		ohci_endpoint_descriptor	*_FindInterruptEndpoint(uint8 interval);
 
 		// Transfer descriptor related methods

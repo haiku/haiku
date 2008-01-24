@@ -454,90 +454,126 @@ OHCI::_FinishTransfer()
 		if (semCount > 0)
 			acquire_sem_etc(fFinishTransfersSem, semCount, B_RELATIVE_TIMEOUT, 0);
 
-		// Pull out the done list and reverse its order
-		// for both general and isochronous descriptors
-		ohci_general_td *current, *top;
-		ohci_isochronous_td *isoCurrent, *isoTop;
 		uint32 done_list = fHcca->done_head & ~OHCI_DONE_INTERRUPTS;
-		for ( top = NULL, isoTop = NULL ; done_list != 0; ) {
-			if ((current = _FindDescriptorInHash(done_list))) {
-				done_list = current->next_physical_descriptor;
-				current->next_done_descriptor = (void *)top;
-				top = current;
-				continue;
+		// If done_head is zero, there are not processed descriptors
+		// in the done list and we have been woken up by CancelQueuedTransfers
+		// or CancelQueuedIsochronousTransfers in order to do some clean up
+		// and back to sleep.
+		if (done_list) {
+			// Pull out the done list and reverse its order
+			// for both general and isochronous descriptors
+			ohci_general_td *current, *top;
+			ohci_isochronous_td *isoCurrent, *isoTop;
+			for ( top = NULL, isoTop = NULL ; done_list != 0; ) {
+				if ((current = _FindDescriptorInHash(done_list))) {
+					done_list = current->next_physical_descriptor;
+					current->next_done_descriptor = (void *)top;
+					top = current;
+					continue;
+				}
+				if ((isoCurrent = _FindIsoDescriptorInHash(done_list))) {
+					done_list = isoCurrent->next_physical_descriptor;
+					isoCurrent->next_done_descriptor = (void *)isoTop;
+					isoTop = isoCurrent;
+					continue;
+				}
+				// TODO: Should I panic here? :)
+				TRACE_ERROR(("usb_ohci: address 0x%08lx not found!\n",
+					done_list));
+				break;
 			}
-			if ((isoCurrent = _FindIsoDescriptorInHash(done_list))) {
-				done_list = isoCurrent->next_physical_descriptor;
-				isoCurrent->next_done_descriptor = (void *)isoTop;
-				isoTop = isoCurrent;
-				continue;
+
+			// Acknowledge the interrupt
+			// TODO: Move the acknowledgement in the interrupt handler. 
+			// The done_head value can be passed through a shared variable.
+			fHcca->done_head = 0;
+			_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_WRITEBACK_DONE_HEAD);
+
+			// Process isochronous list first
+			for (isoCurrent = isoTop; isoCurrent != NULL; isoCurrent
+				= (ohci_isochronous_td *)isoCurrent->next_done_descriptor) {
+				// TODO: Process isochronous descriptors
 			}
-			// TODO: Should I panic here? :)
-			TRACE_ERROR(("usb_ohci: address 0x%08lx not found!\n",done_list));
-			break;
-		}
 
-		// Acknowledge the interrupt
-		// TODO: Move the acknowledgement in the interrupt handler. The done_head
-		// value can be passed through a shared variable.
-		fHcca->done_head = 0;
-		_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_WRITEBACK_DONE_HEAD);
+			// Now process the general list
+			for (current = top; current != NULL; ) {
+				ohci_general_td *next
+					= (ohci_general_td *)current->next_done_descriptor;
 
-		// Process isochronous list first
-		for (isoCurrent = isoTop; isoCurrent != NULL; isoCurrent
-			= (ohci_isochronous_td *)isoCurrent->next_done_descriptor) {
-			// TODO: Process isochronous descriptors
-		}
-		// Now process the general list
-		for (current = top; current != NULL; ) {
-			ohci_general_td *next = (ohci_general_td *)current->next_done_descriptor;
-			// TODO: Handle cancelled and timeout
-			uint32 conditionCode = OHCI_TD_GET_CONDITION_CODE(current->flags);
-			if (conditionCode != OHCI_NO_ERROR) {
-				// Endpoint is halted
-				// 1. Unlink the transfer
-				// 2. Free all descriptors of the transfer
-				// 3. Notify the caller.
-				// 4. Restart the endpoint
-				// NOTE: There can(should) not be more than one
-				// invalid descriptor from the same transfer in the
-				// done list, as the controller halt the endpoint right
-				// away if a descriptor fails. This means that, if we reversed
-				// the order of the done list (which we did), there is
-				// not reason to look for more failed descriptors in the
-				// done list from the same transfer, as *BSD code does.
-				TRACE(("usb_ohci: transfer failed! ohci error code: %d\n",
-					conditionCode));
-
-				// Unlink the transfer
-				// TODO: check the return value
 				transfer_data *transfer = (transfer_data *)current->transfer;
-				_UnlinkTransfer(transfer);
+				if (transfer->canceled) {
+					// Clear canceled transfer later on
+					current = next;
+					continue;
+				}
 
-				// Free all descriptors of this transfer
-				next = (ohci_general_td *)current->next_done_descriptor;
-				_FreeDescriptorChain(transfer->first_descriptor);
+				bool transferDone = false;
+				status_t callbackStatus = B_OK;
+				uint32 conditionCode = OHCI_TD_GET_CONDITION_CODE(current->flags);
+				if (conditionCode != OHCI_NO_ERROR) {
+					// Endpoint is halted: unlink all descriptors belonging to
+					// the failed transfer from the endpoint and restart the
+					// endpoint.
+					// NOTE: There can(should) not be more than one
+					// invalid descriptor from the same transfer in the
+					// done list, as the controller halt the endpoint right
+					// away if a descriptor fails. This means that, if we reversed
+					// the order of the done list (which we did), there is
+					// not reason to look for more failed descriptors in the
+					// done list from the same transfer, as *BSD code does.
+					TRACE(("usb_ohci: transfer failed! ohci error code: %d\n",
+						conditionCode));
 
-				// Restart the endpoint
-				// TODO: what if there are other transfer to this endpoint?
-				ohci_endpoint_descriptor *endpoint
-					= (ohci_endpoint_descriptor *)transfer->endpoint;
-				endpoint->head_physical_descriptor = 0;
+					_RemoveTransferFromEndpoint(transfer);
 
-				// Notify the caller
-				transfer->transfer->Finished(B_CANCELED, 0);
-				delete transfer->transfer;
-				delete transfer;
-				continue;
+					// TODO: Fix the following with the appropriate error
+					callbackStatus = B_DEV_MULTIPLE_ERRORS;
+					transferDone = true;
+					continue;
+				} else if (current->is_last)
+					transferDone = true;
+
+				if (transferDone) {
+					size_t actualLength = 0;
+					if (callbackStatus == B_OK) {
+						// TODO
+					}
+					_UnlinkTransfer(transfer);
+					transfer->transfer->Finished(callbackStatus, actualLength);
+					// Update next before current gets deleted
+					next = (ohci_general_td *)current->next_done_descriptor;
+					_FreeDescriptorChain(transfer->first_descriptor);
+
+					delete transfer->transfer;
+					delete transfer;
+
+				}
+				current = next;
 			}
 
-			if (current->is_last) {
-				// TODO: Trasfer completed
-			}
+		}
 
+		// Quick look for canceled transfer before
+		// we go back to sleep
+		transfer_data *current = fFirstTransfer;
+		while (current) {
+			transfer_data *next = current->link;
+			if (current->canceled) {
+				_UnlinkTransfer(current);
+				_FreeDescriptorChain(current->first_descriptor);
+				delete current->transfer;
+				delete current;
+			}
 			current = next;
 		}
 	}
+}
+
+
+void
+OHCI::_RemoveTransferFromEndpoint(transfer_data *transfer)
+{
+	// TODO
 }
 
 
@@ -660,14 +696,14 @@ OHCI::SubmitTransfer(Transfer *transfer)
 		return _SubmitControlRequest(transfer);
 	}
 
-	if ((type & USB_OBJECT_INTERRUPT_PIPE) || (type & USB_OBJECT_BULK_PIPE)) {
-		// TODO
-		return B_OK;
+	if ((type & USB_OBJECT_BULK_PIPE)) {
+		TRACE(("usb_ohci: submitting bulk transfer\n"));
+		return _SubmitBulkTransfer(transfer);
 	}
 
-	if ((type & USB_OBJECT_ISO_PIPE)) {
-		TRACE(("usb_ohci: submitting isochronous transfer\n"));
-		return _SubmitIsochronousTransfer(transfer);
+	if (((type & USB_OBJECT_ISO_PIPE) || (type & USB_OBJECT_INTERRUPT_PIPE))) {
+		TRACE(("usb_ohci: submitting periodic transfer\n"));
+		return _SubmitPeriodicTransfer(transfer);
 	}
 
 	TRACE_ERROR(("usb_ohci: tried to submit transfer for unknown pipe"
@@ -760,6 +796,14 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 
 
 status_t
+OHCI::_SubmitBulkTransfer(Transfer *transfer)
+{
+	// TODO
+	return B_ERROR;
+}
+
+
+status_t
 OHCI::_AddPendingTransfer(Transfer *transfer, ohci_endpoint_descriptor *endpoint,
 	ohci_general_td *firstDescriptor, ohci_general_td *dataDescriptor, bool directionIn)
 {
@@ -802,7 +846,7 @@ OHCI::_AddPendingTransfer(Transfer *transfer, ohci_endpoint_descriptor *endpoint
 
 
 status_t
-OHCI::_SubmitIsochronousTransfer(Transfer *transfer)
+OHCI::_SubmitPeriodicTransfer(Transfer *transfer)
 {
 	return B_ERROR;
 }
@@ -835,7 +879,6 @@ OHCI::_FreeDescriptorChain(ohci_general_td *topDescriptor)
 		_FreeGeneralDescriptor(current);
 		current = next;
 	}
-
 }
 
 
@@ -1001,12 +1044,12 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 	TRACE(("usb_ohci::%s(%ud, )\n", __FUNCTION__, index));
 	if (index >= fPortCount)
 		return B_BAD_INDEX;
-	
+
 	status->status = status->change = 0;
 	uint32 portStatus = _ReadReg(OHCI_RH_PORT_STATUS(index));
-	
+
 	TRACE(("usb_ohci: RootHub::GetPortStatus: Port %i Value 0x%lx\n", OHCI_RH_PORT_STATUS(index), portStatus));
-	
+
 	// status
 	if (portStatus & OHCI_RH_PORTSTATUS_CCS)
 		status->status |= PORT_STATUS_CONNECTION;
@@ -1022,8 +1065,7 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 		status->status |= PORT_STATUS_OVER_CURRENT;
 	if (portStatus & OHCI_RH_PORTSTATUS_PPS)
 		status->status |= PORT_STATUS_POWER;
-	
-	
+
 	// change
 	if (portStatus & OHCI_RH_PORTSTATUS_CSC)
 		status->change |= PORT_STATUS_CONNECTION;
@@ -1035,7 +1077,7 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 		status->change |= PORT_STATUS_OVER_CURRENT;
 	if (portStatus & OHCI_RH_PORTSTATUS_PRSC)
 		status->change |= PORT_STATUS_RESET;
-	
+
 	return B_OK;
 }
 
@@ -1199,7 +1241,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 	uint32 flags = 0;
 	flags |= OHCI_ENDPOINT_SKIP;
 
-	// Set up flag field for the endpoint
+	// Set up device and endpoint address
 	flags |= OHCI_ENDPOINT_SET_DEVICE_ADDRESS(pipe->DeviceAddress())
 		| OHCI_ENDPOINT_SET_ENDPOINT_NUMBER(pipe->EndpointAddress());
 
@@ -1251,7 +1293,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 			break;
 		case USB_OBJECT_ISO_PIPE:
 			// Set the isochronous bit format
-			endpoint->flags = OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
+			endpoint->flags |= OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
 			head = fDummyIsochronous;
 			break;
 		case USB_OBJECT_INTERRUPT_PIPE:
@@ -1306,5 +1348,50 @@ OHCI::_ReadReg(uint32 reg)
 status_t
 OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
+	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
+		return _CancelQueuedIsochronousTransfers(pipe, force);
+
+	if (!Lock())
+		return B_ERROR;
+
+	transfer_data *current = fFirstTransfer;
+	while (current) {
+		if (current->transfer->TransferPipe() == pipe) {
+			// Check if the skip bit is already set
+			if (!(current->endpoint->flags & OHCI_ENDPOINT_SKIP)) {
+				current->endpoint->flags |= OHCI_ENDPOINT_SKIP;
+				// In case the controller is processing
+				// this endpoint, wait for it to finish
+				snooze(1000);
+			}
+			// Clear the endpoint
+			current->endpoint->head_physical_descriptor = NULL;
+			current->endpoint->tail_physical_descriptor = NULL;
+			current->endpoint->head_logical_descriptor = NULL;
+			current->endpoint->tail_logical_descriptor = NULL;
+
+			if (!force) {
+				// If the transfer is canceled by force, the one causing the
+				// cancel is probably not the one who initiated the transfer
+				// and the callback is likely not safe anymore
+				current->transfer->Finished(B_CANCELED, 0);
+			}
+			current->canceled = true;
+		}
+		current = current->link;
+	}
+
+	Unlock();
+
+	// notify the finisher so it can clean up the canceled transfers
+	release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
+	return B_OK;
+}
+
+
+status_t
+OHCI::_CancelQueuedIsochronousTransfers(Pipe *pipe, bool force)
+{
+	// TODO
 	return B_ERROR;
 }

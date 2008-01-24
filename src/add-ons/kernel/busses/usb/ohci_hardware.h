@@ -346,7 +346,7 @@ typedef struct ohci_general_td
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
 	void	*next_done_descriptor;		// Used for the done descriptor list
 	size_t	buffer_size;				// Size of the buffer
-	void	*transfer;					// Pointer to the transfer
+	void	*transfer;					// Pointer to the transfer_data
 	bool	is_last;					// Last descriptor of the transfer
 };
 
