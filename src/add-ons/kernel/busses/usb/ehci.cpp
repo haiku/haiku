@@ -170,7 +170,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 				TRACE(("usb_ehci: the host controller is bios owned\n"));
 			}
 
-			TRACE(("usb_ehci: claiming ownership of the host controller\n"));
+			dprintf("usb_ehci: claiming ownership of the host controller\n");
 			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 				fPCIInfo->function, extendedCapPointer, 4, EHCI_LEGSUP_OSOWNED);
 
@@ -189,7 +189,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 				TRACE_ERROR(("usb_ehci: bios won't give up control over the host controller\n"));
 				return;
 			} else if (legacySupport & EHCI_LEGSUP_OSOWNED) {
-				TRACE(("usb_ehci: successfully took ownership of the host controller\n"));
+				dprintf("usb_ehci: successfully took ownership of the host controller\n");
 			}
 		} else {
 			TRACE(("usb_ehci: extended capability is not a legacy support register\n"));
@@ -689,7 +689,7 @@ EHCI::ResetPort(uint8 index)
 	uint32 portStatus = ReadOpReg(portRegister) & EHCI_PORTSC_DATAMASK;
 
 	if (portStatus & EHCI_PORTSC_DMINUS) {
-		TRACE(("usb_ehci: lowspeed device connected, giving up port ownership\n"));
+		dprintf("usb_ehci: lowspeed device connected, giving up port ownership\n");
 		// there is a lowspeed device connected.
 		// we give the ownership to a companion controller.
 		WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTOWNER);
@@ -713,7 +713,7 @@ EHCI::ResetPort(uint8 index)
 	}
 
 	if ((portStatus & EHCI_PORTSC_ENABLE) == 0) {
-		TRACE(("usb_ehci: fullspeed device connected, giving up port ownership\n"));
+		dprintf("usb_ehci: fullspeed device connected, giving up port ownership\n");
 		// the port was not enabled, this means that no high speed device is
 		// attached to this port. we give up ownership to a companion controler
 		WriteOpReg(portRegister, portStatus | EHCI_PORTSC_PORTOWNER);
