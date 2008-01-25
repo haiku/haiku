@@ -19,7 +19,7 @@ enum direct_buffer_state {
 	B_DIRECT_STOP		= 1,
 	B_DIRECT_MODIFY		= 2,
 	
-	B_CLIPPING_MODIFIED 	= 16,
+	B_CLIPPING_MODIFIED = 16,
 	B_BUFFER_RESIZED 	= 32,
 	B_BUFFER_MOVED 		= 64,
 	B_BUFFER_RESET	 	= 128
@@ -27,23 +27,25 @@ enum direct_buffer_state {
 
 
 enum direct_driver_state {
-	B_DRIVER_CHANGED	= 1,
-	B_MODE_CHANGED		= 2
+	B_DRIVER_CHANGED	= 0x0001,
+	B_MODE_CHANGED		= 0x0002
 };
 
 
 typedef struct {
 	direct_buffer_state	buffer_state;
 	direct_driver_state	driver_state;
-	void			*bits;
-	void			*pci_bits;
-	int32			bytes_per_row;
-	uint32			bits_per_pixel;
-	color_space		pixel_format;
+	void				*bits;
+	void				*pci_bits;
+	int32				bytes_per_row;
+	uint32				bits_per_pixel;
+	color_space			pixel_format;
 	buffer_layout		layout;
 	buffer_orientation	orientation;
-	uint32			_reserved[11];
-	uint32			clip_list_count;
+	uint32				_reserved[9];
+	uint32				_dd_type_;
+	uint32				_dd_token_;
+	uint32				clip_list_count;
 	clipping_rect		window_bounds;
 	clipping_rect		clip_bounds;
 	clipping_rect		clip_list[1];
