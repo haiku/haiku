@@ -630,7 +630,6 @@ remove_thread_from_sem(struct thread *thread, struct sem_entry *sem,
 		return B_ENTRY_NOT_FOUND;
 
 	sem->u.used.count += thread->sem.acquire_count;
-	thread->state = thread->next_state = B_THREAD_READY;
 	thread->sem.acquire_status = acquireStatus;
 	thread_enqueue(thread, queue);
 
