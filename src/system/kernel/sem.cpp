@@ -320,7 +320,12 @@ sem_timeout(timer *data)
 	GRAB_THREAD_LOCK();
 	// put the threads in the run q here to make sure we dont deadlock in sem_interrupt_thread
 	while ((thread = thread_dequeue(&wakeupQueue)) != NULL) {
-		scheduler_enqueue_in_run_queue(thread);
+		if (thread->state == B_THREAD_RUNNING)
+			thread->next_state = B_THREAD_READY;
+		else {
+			thread->state = thread->next_state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(thread);
+		}
 	}
 	RELEASE_THREAD_LOCK();
 
@@ -610,7 +615,12 @@ sem_interrupt_thread(struct thread *thread)
 	RELEASE_SEM_LOCK(sSems[slot]);
 
 	while ((thread = thread_dequeue(&wakeupQueue)) != NULL) {
-		scheduler_enqueue_in_run_queue(thread);
+		if (thread->state == B_THREAD_RUNNING)
+			thread->next_state = B_THREAD_READY;
+		else {
+			thread->state = thread->next_state = B_THREAD_READY;
+			scheduler_enqueue_in_run_queue(thread);
+		}
 	}
 
 	return B_NO_ERROR;
@@ -643,7 +653,6 @@ remove_thread_from_sem(struct thread *thread, struct sem_entry *sem,
 		thread->sem.count -= delta;
 		if (thread->sem.count <= 0) {
 			thread = thread_dequeue(&sem->u.used.queue);
-			thread->state = thread->next_state = B_THREAD_READY;
 			thread_enqueue(thread, queue);
 		}
 		sem->u.used.count -= delta;
@@ -763,7 +772,6 @@ delete_sem(sem_id id)
 
 	// free any threads waiting for this semaphore
 	while ((thread = thread_dequeue(&sSems[slot].u.used.queue)) != NULL) {
-		thread->state = B_THREAD_READY;
 		thread->sem.acquire_status = B_BAD_SEM_ID;
 		thread->sem.count = 0;
 		thread_enqueue(thread, &releaseQueue);
@@ -785,7 +793,12 @@ delete_sem(sem_id id)
 	if (releasedThreads > 0) {
 		GRAB_THREAD_LOCK();
 		while ((thread = thread_dequeue(&releaseQueue)) != NULL) {
-			scheduler_enqueue_in_run_queue(thread);
+			if (thread->state == B_THREAD_RUNNING)
+				thread->next_state = B_THREAD_READY;
+			else {
+				thread->state = thread->next_state = B_THREAD_READY;			
+				scheduler_enqueue_in_run_queue(thread);
+			}
 		}
 		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
@@ -943,7 +956,12 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 			}
 			RELEASE_SEM_LOCK(sSems[slot]);
 			while ((thread = thread_dequeue(&wakeupQueue)) != NULL) {
-				scheduler_enqueue_in_run_queue(thread);
+				if (thread->state == B_THREAD_RUNNING)
+					thread->next_state = B_THREAD_READY;
+				else {
+					thread->state = thread->next_state = B_THREAD_READY;
+					scheduler_enqueue_in_run_queue(thread);
+				}
 			}
 			// fall through and reschedule since another thread with a higher priority may have been woken up
 		}
@@ -1093,7 +1111,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 			if (thread->state == B_THREAD_RUNNING)
 				thread->next_state = B_THREAD_READY;
 			else {
-				thread->state = B_THREAD_READY;
+				thread->state = thread->next_state = B_THREAD_READY;
 				scheduler_enqueue_in_run_queue(thread);
 			}
 		}
