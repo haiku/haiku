@@ -432,6 +432,10 @@ interpret_kb_buffer(hid_device_info *device)
 					key = KEY_Break;
 				else if (key == 0xe && modifiers & 1)
 					key = KEY_SysRq;
+#if HAIKU_TARGET_PLATFORM_HAIKU
+				else if (key == 0x0d) // ToDo: remove again
+					panic("keyboard requested halt.\n");
+#endif
 				else if (key == 0) {
 					// unmapped key
 					key = 0x200000 + ((uint8*)device->buffer)[i];
