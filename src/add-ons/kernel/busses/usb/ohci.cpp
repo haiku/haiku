@@ -536,7 +536,14 @@ OHCI::_FinishTransfer()
 				if (transferDone) {
 					size_t actualLength = 0;
 					if (callbackStatus == B_OK) {
-						// TODO
+						if (transfer->data_descriptor && transfer->incoming) {
+							// Read data out
+						} else {
+							// How much was transfer?
+						}
+						if (transfer->transfer->IsFragmented()) {
+							// TODO
+						}
 					}
 					_UnlinkTransfer(transfer);
 					transfer->transfer->Finished(callbackStatus, actualLength);
@@ -567,6 +574,47 @@ OHCI::_FinishTransfer()
 			current = next;
 		}
 	}
+}
+
+
+status_t
+OHCI::_AppendChainDescriptorsToEndpoint(ohci_endpoint_descriptor *endpoint,
+	ohci_general_td *first, ohci_general_td *last)
+{
+	endpoint->flags |= OHCI_ENDPOINT_SKIP;
+	snooze(1000);
+
+	// TODO: Lock on endpoint
+	ohci_general_td *head = (ohci_general_td *)endpoint->head_logical_descriptor;
+	if (head) {
+		// There is at least one descriptor to this endpoint
+		ohci_general_td *tail = (ohci_general_td *)endpoint->tail_logical_descriptor;
+		if (tail) {
+			// There is more than one descriptor
+			tail->next_logical_descriptor = first;
+			tail->next_physical_descriptor = first->physical_address;
+		} else {
+			// There is only one descriptor to this endpoint
+			head->next_logical_descriptor = first;
+			head->next_physical_descriptor = first->physical_address;
+		}
+		endpoint->tail_logical_descriptor = last;
+		endpoint->tail_physical_descriptor = last->physical_address;
+	} else {
+		// Endpoint is empty
+		endpoint->head_logical_descriptor = first;
+		endpoint->head_physical_descriptor = first->physical_address;
+		// Update tail only if we are appending more than one descriptor
+		// otherwise the controller won't process the descriptor as
+		// head will be the same as tail.
+		if (first != last) {
+			endpoint->tail_logical_descriptor = last;
+			endpoint->tail_physical_descriptor = last->physical_address;
+		}
+	}
+
+	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
+	return B_OK;
 }
 
 
@@ -773,16 +821,9 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 		_LinkDescriptors(setupDescriptor, statusDescriptor);
 	}
 
-	// 1. Insert the chain descriptors to the endpoint
+	// Append Transfer
 	ohci_endpoint_descriptor *endpoint
 		= (ohci_endpoint_descriptor *)transfer->TransferPipe()->ControllerCookie();
-	endpoint->tail_physical_descriptor = statusDescriptor->physical_address;
-	endpoint->head_physical_descriptor = setupDescriptor->physical_address;
-	// 2. Clear the Skip bit in the enpoint
-	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
-	// 3. Tell the controller to process the control list
-	_WriteReg(OHCI_COMMAND_STATUS, OHCI_CONTROL_LIST_FILLED);
-
 	result = _AddPendingTransfer(transfer, endpoint, setupDescriptor,
 		dataDescriptor,	directionIn);
 	if (result < B_OK) {
@@ -791,6 +832,17 @@ OHCI::_SubmitControlRequest(Transfer *transfer)
 		return result;
 	}
 
+	// Append descriptors chain to the endpoint
+	result = _AppendChainDescriptorsToEndpoint(endpoint, setupDescriptor,
+		statusDescriptor);
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ohci: failed to append chain descriptors to endpoint\n"));
+		// TODO: Remove transfer_data from list
+		_FreeDescriptorChain(setupDescriptor);
+	}
+
+	// Tell the controller to process the control list
+	_WriteReg(OHCI_COMMAND_STATUS, OHCI_CONTROL_LIST_FILLED);
 	return B_OK;
 }
 
