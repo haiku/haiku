@@ -1,5 +1,5 @@
 /* 
- * Copyright 2003-2007, Haiku Inc.
+ * Copyright 2003-2008, Haiku Inc.
  * Authors:
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  *		Carwyn Jones <turok2@currantbun.com>
@@ -15,7 +15,7 @@
 #include <DirectWindowPrivate.h>
 #include <ServerProtocol.h>
 
-//#define DEBUG 1
+//#define DEBUG 3
 
 #if DEBUG
 	#include <string.h>
@@ -76,13 +76,76 @@ print_direct_driver_state(const direct_driver_state &state)
 
 
 static void
+print_direct_buffer_layout(const buffer_layout &layout)
+{	
+	char string[64];
+	if (layout == B_BUFFER_NONINTERLEAVED)
+		strcpy(string, "B_BUFFER_NONINTERLEAVED");	
+	else
+		strcpy(string, "unknown");
+	
+	printf("layout: %s\n", string);
+}
+
+
+static void
+print_direct_buffer_orientation(const buffer_orientation &orientation)
+{	
+	char string[64];
+	switch (orientation) {
+		case B_BUFFER_TOP_TO_BOTTOM:
+			strcpy(string, "B_BUFFER_TOP_TO_BOTTOM");
+			break;
+		case B_BUFFER_BOTTOM_TO_TOP:
+			strcpy(string, "B_BUFFER_BOTTOM_TO_TOP");
+			break;
+		default:
+			strcpy(string, "unknown");
+			break;
+	}
+	
+	printf("orientation: %s\n", string);
+}
+
+
+static void
 print_direct_buffer_info(const direct_buffer_info &info)
 {
 	print_direct_buffer_state(info.buffer_state);
 	print_direct_driver_state(info.driver_state);
+	
+#if DEBUG > 1
+	printf("bits: %p\n", info.bits);
+	printf("pci_bits: %p\n", info.pci_bits);
+	printf("bytes_per_row: %ld\n", info.bytes_per_row);
+	printf("bits_per_pixel: %lu\n", info.bits_per_pixel);
+	printf("pixel_format: %d\n", info.pixel_format);
+	print_direct_buffer_layout(info.layout);
+	print_direct_buffer_orientation(info.orientation);
+
+#if DEBUG > 2	
+	printf("CLIPPING INFO:\n");
+	printf("clipping_rects count: %ld\n", info.clip_list_count);
+		
+	printf("- window_bounds:\n");
+	BRegion region;
+	region.Set(info.window_bounds);
+	region.PrintToStream();
+		
+	region.MakeEmpty();
+	for (uint32 i = 0; i < info.clip_list_count; i++)
+		region.Include(info.clip_list[i]);
+		
+	printf("- clip_list:\n");
+	region.PrintToStream();
+#endif
+#endif
+
+	printf("\n\n");
 }
 
 #endif
+
 
 BDirectWindow::BDirectWindow(BRect frame, const char *title, window_type type,
 	uint32 flags, uint32 workspace)
@@ -494,7 +557,7 @@ BDirectWindow::_InitData()
 	fDirectLockCount = 0;
 	fDirectLockOwner = -1;
 	fDirectLockStack = NULL;
-	fDirectSem = create_sem(1, "direct sem");
+	fDirectSem = create_sem(0, "direct sem");
 	if (fDirectSem > 0)
 		fInitStatus |= DW_STATUS_SEM_CREATED;
 #endif		
@@ -503,7 +566,7 @@ BDirectWindow::_InitData()
 	fDisableSem = syncData.disable_sem;
 	fDisableSemAck = syncData.disable_sem_ack;
 
-	fClonedClippingArea = clone_area("Clone direct area", (void**)&fBufferDesc,
+	fClonedClippingArea = clone_area("cloned direct area", (void**)&fBufferDesc,
 		B_ANY_ADDRESS, B_READ_AREA, fSourceClippingArea);		
 
 	if (fClonedClippingArea > 0) {			
