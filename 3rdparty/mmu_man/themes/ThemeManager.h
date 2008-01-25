@@ -6,20 +6,10 @@
 #include <Message.h>
 #include <String.h>
 
+#include "UITheme.h"
+
 /* backup of current settings when applying a theme */
 #define THEME_ID_BACKUP -1
-
-/* flags */
-
-		// try to apply settings to running applications
-#define UI_THEME_SETTINGS_APPLY		0x00000001
-		// save settings to native storage
-#define UI_THEME_SETTINGS_SAVE		0x00000002
-		// attempt to do both
-#define UI_THEME_SETTINGS_SET_ALL	(UI_THEME_SETTINGS_APPLY|UI_THEME_SETTINGS_SAVE)
-		// do read settings from native storage
-#define UI_THEME_SETTINGS_RETRIEVE	0x00000004
-
 
 namespace Z {
 namespace ThemeManager {

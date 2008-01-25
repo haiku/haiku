@@ -37,6 +37,19 @@
 		// allow this addon to save things to themes
 #define Z_THEME_ADDON_DO_RETRIEVE	0x00000004
 
+// Theme Manager flags
+		// try to apply settings to running applications
+#define UI_THEME_SETTINGS_APPLY		0x00000001
+		// save settings to native storage
+#define UI_THEME_SETTINGS_SAVE		0x00000002
+		// attempt to do both
+#define UI_THEME_SETTINGS_SET_ALL	(UI_THEME_SETTINGS_APPLY|UI_THEME_SETTINGS_SAVE)
+		// do read settings from native storage
+#define UI_THEME_SETTINGS_RETRIEVE	0x00000004
+
+
+
+
 #define Z_THEMES_FOLDER_NAME "UIThemes"
 #define Z_THEME_FILE_NAME "Theme"
 
