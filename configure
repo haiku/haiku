@@ -43,6 +43,7 @@ options:
                               default -- any other distro (default value).
   --help                      Prints out this help.
   --include-gpl-addons        Include GPL licensed add-ons.
+  --include-3rdparty          Include 3rdparty/ in the build system.
   --enable-multiuser          Enable experimental multiuser support.
   --target=TARGET             Select build target platform. [default=${target}]
                               valid targets=r5,bone,dano,haiku
@@ -219,6 +220,7 @@ haikuCxxHeadersDir=
 hostGCCVersion=`gcc -dumpversion`
 bochs_debug=0
 include_gpl_addons=0
+include_3rdparty=0
 enable_multiuser=0
 distroCompatibility=default
 target=haiku
@@ -265,6 +267,7 @@ while [ $# -gt 0 ] ; do
 		--cross-tools-prefix) assertparam "$1" $#; crossToolsPrefix=$2; shift 2;;
 		--help | -h)	usage; exit 0;;
 		--include-gpl-addons)	include_gpl_addons=1; shift 1;;
+		--include-3rdparty)	include_3rdparty=1; shift 1;;
 		--enable-multiuser)	enable_multiuser=1; shift 1;;
 		--distro-compatibility)
 						assertparam "$1" $#; distroCompatibility=$2;
@@ -355,6 +358,7 @@ HOST_PLATFORM				?= "${buildPlatform}" ;
 
 BOCHS_DEBUG_HACK			?= "${bochs_debug}" ;
 INCLUDE_GPL_ADDONS			?= "${include_gpl_addons}" ;
+HAIKU_INCLUDE_3RDPARTY			?= "${include_3rdparty}" ;
 HAIKU_ENABLE_MULTIUSER			?= "${enable_multiuser}" ;
 HAIKU_DISTRO_COMPATIBILITY	?= "${distroCompatibility}" ;
 HAIKU_USE_GCC_PIPE			?= "${use_gcc_pipe}" ;
