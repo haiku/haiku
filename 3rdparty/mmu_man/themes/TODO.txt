@@ -1,11 +1,15 @@
 TODOs for Theme manager:
 * style cleanup (-> Haiku style)
+* enable theme comments again (tooltip on listitem ?).
 * make ParseMessage more robust
 * forbid quitting while themes are loading!
+* implement BackupFiles() methods to add required files to a zip.
 * fix TerminalAddon: get theme from haiku
+* Save as resource/BMessage ? (for editing)
 * ideas for addons:
 	- ~/config/settings/Tracker/DefaultFolderTemplate/ (default background ??)
 	- Desktop icon size ?
+	- Desktop shelf ? (dangerous)
 	- dircolors (cf. http://linux.die.net/man/5/dir_colors )
 	- icons (/etc/icons ? svg/hvif, setmime...)
 	- mouse cursors (needs app_server fixes ??)
