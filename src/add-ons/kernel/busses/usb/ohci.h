@@ -115,6 +115,8 @@ static	int32						_FinishThread(void *data);
 										ohci_endpoint_descriptor *endpoint,
 										ohci_general_td *first,
 										ohci_general_td *last);
+		void						_RemoveTransferFromEndpoint(
+										transfer_data *);
 
 		// Endpoint related methods
 		ohci_endpoint_descriptor	*_AllocateEndpoint();
@@ -122,8 +124,6 @@ static	int32						_FinishThread(void *data);
 										ohci_endpoint_descriptor *endpoint);
 		status_t					_InsertEndpointForPipe(Pipe *pipe);
 		status_t					_RemoveEndpointForPipe(Pipe *pipe);
-		void						_RemoveTransferFromEndpoint(
-										transfer_data *transfer);
 		ohci_endpoint_descriptor	*_FindInterruptEndpoint(uint8 interval);
 
 		// Transfer descriptor related methods

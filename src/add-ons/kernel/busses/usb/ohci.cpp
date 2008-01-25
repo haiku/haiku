@@ -524,7 +524,9 @@ OHCI::_FinishTransfer()
 					TRACE(("usb_ohci: transfer failed! ohci error code: %d\n",
 						conditionCode));
 
-					_RemoveTransferFromEndpoint(transfer);
+					// Remove remaining descriptors from the same transfer
+					if (!current->is_last)
+						_RemoveTransferFromEndpoint(transfer);
 
 					// TODO: Fix the following with the appropriate error
 					callbackStatus = B_DEV_MULTIPLE_ERRORS;
@@ -586,32 +588,24 @@ OHCI::_AppendChainDescriptorsToEndpoint(ohci_endpoint_descriptor *endpoint,
 
 	// TODO: Lock on endpoint
 	ohci_general_td *head = (ohci_general_td *)endpoint->head_logical_descriptor;
-	if (head) {
-		// There is at least one descriptor to this endpoint
-		ohci_general_td *tail = (ohci_general_td *)endpoint->tail_logical_descriptor;
-		if (tail) {
-			// There is more than one descriptor
-			tail->next_logical_descriptor = first;
-			tail->next_physical_descriptor = first->physical_address;
-		} else {
-			// There is only one descriptor to this endpoint
-			head->next_logical_descriptor = first;
-			head->next_physical_descriptor = first->physical_address;
-		}
-		endpoint->tail_logical_descriptor = last;
-		endpoint->tail_physical_descriptor = last->physical_address;
+	ohci_general_td *tail = (ohci_general_td *)endpoint->tail_logical_descriptor;
+	if (head != tail) {
+		// Find the last real descriptor
+		ohci_general_td *current = head;
+		while (current->next_logical_descriptor != tail)
+			current = (ohci_general_td *)current->next_logical_descriptor;
+		// Append to current
+		current->next_logical_descriptor = first;
+		current->next_physical_descriptor = first->physical_address;
 	} else {
-		// Endpoint is empty
+		// Endpoint has only the dummy descriptor
 		endpoint->head_logical_descriptor = first;
 		endpoint->head_physical_descriptor = first->physical_address;
-		// Update tail only if we are appending more than one descriptor
-		// otherwise the controller won't process the descriptor as
-		// head will be the same as tail.
-		if (first != last) {
-			endpoint->tail_logical_descriptor = last;
-			endpoint->tail_physical_descriptor = last->physical_address;
-		}
 	}
+
+	// Make the last descriptor point to the dummy
+	last->next_logical_descriptor = tail;
+	last->next_physical_descriptor = tail->physical_address;
 
 	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
 	return B_OK;
@@ -621,7 +615,17 @@ OHCI::_AppendChainDescriptorsToEndpoint(ohci_endpoint_descriptor *endpoint,
 void
 OHCI::_RemoveTransferFromEndpoint(transfer_data *transfer)
 {
-	// TODO
+	// TODO: Add lock for endpoint
+	ohci_endpoint_descriptor *endpoint = transfer->endpoint;
+	ohci_general_td *next = (ohci_general_td *)endpoint->head_logical_descriptor;
+
+	// Find the first descriptor of a different transfer.
+	// Worst scenario we get the dummy descriptor
+	while ((transfer_data *)next->transfer == transfer)
+		next = (ohci_general_td *)next->next_logical_descriptor;
+	// Update head
+	endpoint->head_logical_descriptor = next;
+	endpoint->head_physical_descriptor = next->physical_address;
 }
 
 
@@ -1357,6 +1361,22 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 			return B_ERROR;
 	}
 
+	// Create (necessary) dummy descriptor
+	if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
+		// TODO
+	} else {
+		ohci_general_td *dummy = _CreateGeneralDescriptor(0);
+		dummy->next_logical_descriptor = NULL;
+		dummy->next_physical_descriptor = NULL;
+		endpoint->head_logical_descriptor
+			= endpoint->tail_logical_descriptor 
+			= dummy;
+		endpoint->head_physical_descriptor
+			= endpoint->tail_physical_descriptor
+			= dummy->physical_address;
+	}
+
+	// TODO: Change lock lo LockEndpoint()
 	Lock();
 	pipe->SetControllerCookie((void *)endpoint);
 	endpoint->next_logical_endpoint = head->next_logical_endpoint;
