@@ -99,7 +99,9 @@ status_t WinampSkinThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BString name;
 	status_t err;
 	
-	(void)flags;
+	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
+		return B_OK;
+	
 	err = MyMessage(theme, skin);
 	if (err)
 		return err;

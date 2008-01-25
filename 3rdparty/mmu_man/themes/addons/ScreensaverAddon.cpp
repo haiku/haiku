@@ -104,7 +104,9 @@ status_t ScreensaverThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BMessage settings;
 	BMessage modsettings;
 	
-	(void)flags;
+	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
+		return B_OK;
+	
 	err = MyMessage(theme, screensaver);
 	if (err)
 		return err;

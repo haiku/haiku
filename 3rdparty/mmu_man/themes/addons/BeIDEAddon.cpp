@@ -99,7 +99,6 @@ status_t BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BPath beideSPath;
 	rgb_color col;
 	
-	(void)flags;
 	err = theme.FindMessage(Z_THEME_UI_SETTINGS, &uisettings);
 	if (err)
 		return err;
@@ -118,11 +117,11 @@ status_t BeIDEThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	if (FindRGBColor(uisettings, B_UI_MENU_SELECTED_BACKGROUND_COLOR, 0, &col) >= B_OK)
 		bp.selbg = col;
 	
-	if (true/* || flags & UI_THEME_SETTINGS_SAVE*/) {
+	if (flags & UI_THEME_SETTINGS_SAVE && AddonFlags() & Z_THEME_ADDON_DO_SAVE) {
 		err = beideSettings.WriteAttr("AppEditorPrefs", 'rPWM', 0LL, &bp, 
 									sizeof(struct beide_editor_pref));
 	}
-	if (true/* || flags & UI_THEME_SETTINGS_APPLY*/) {
+	if (flags & UI_THEME_SETTINGS_APPLY && AddonFlags() & Z_THEME_ADDON_DO_APPLY) {
 		BList teamList;
 		app_info ainfo;
 		int32 count, i;

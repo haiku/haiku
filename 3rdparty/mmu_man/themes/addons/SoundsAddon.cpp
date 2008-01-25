@@ -112,7 +112,9 @@ status_t SoundsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	int32 field_count;
 	BMessage msg;
 
-	(void)flags;
+	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
+		return B_OK;
+	
 	err = MyMessage(theme, sounds);
 	if (err)
 		return err;

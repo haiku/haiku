@@ -110,12 +110,12 @@ status_t EddieThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BFile EddieSettings(EddieSPath.Path(), B_WRITE_ONLY|B_OPEN_AT_END);
 	if (EddieSettings.InitCheck() < B_OK)
 		return EddieSettings.InitCheck();
-	if (true/* || flags & UI_THEME_SETTINGS_SAVE*/) {
+	if (flags & UI_THEME_SETTINGS_SAVE && AddonFlags() & Z_THEME_ADDON_DO_SAVE) {
 		if (EddieSettings.Write(text.String(), strlen(text.String())) < B_OK)
 			return B_ERROR;
 	}
 	
-	if (true/* || flags & UI_THEME_SETTINGS_APPLY*/) {
+	if (flags & UI_THEME_SETTINGS_APPLY && AddonFlags() & Z_THEME_ADDON_DO_APPLY) {
 		
 	}
 	return B_OK;

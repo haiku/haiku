@@ -99,7 +99,9 @@ status_t DeskbarThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	bool expanded = true;
 	BDeskbar db;
 	
-	(void)flags;
+	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
+		return B_OK;
+	
 	err = MyMessage(theme, deskbar);
 	if (err)
 		return err;

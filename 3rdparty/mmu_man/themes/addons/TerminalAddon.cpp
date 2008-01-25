@@ -258,7 +258,6 @@ status_t TerminalThemesAddon::ApplyThemeR5(BMessage &theme, uint32 flags)
 	status_t err;
 	struct termprefs tp;
 	
-	(void)flags;
 	err = MyMessage(theme, termpref);
 	if (err)
 		return err;
@@ -303,7 +302,7 @@ status_t TerminalThemesAddon::ApplyThemeR5(BMessage &theme, uint32 flags)
 	if (termpref.FindInt32(TP_ENCODING, (int32 *)&tp.p.encoding) != B_OK)
 		tp.p.encoding = 0; // UTF-8
 	
-	if (flags & UI_THEME_SETTINGS_SAVE) {
+	if (flags & UI_THEME_SETTINGS_SAVE && AddonFlags() & Z_THEME_ADDON_DO_SAVE) {
 		BPath pTermPref;
 		if (find_directory(B_USER_SETTINGS_DIRECTORY, &pTermPref) < B_OK)
 			return EINVAL;
@@ -317,7 +316,8 @@ status_t TerminalThemesAddon::ApplyThemeR5(BMessage &theme, uint32 flags)
 		if (ni.InitCheck() == B_OK)
 			ni.SetType("application/x-vnd.Be-pref");
 	}
-	if (flags & UI_THEME_SETTINGS_APPLY) {
+
+	if (flags & UI_THEME_SETTINGS_APPLY && AddonFlags() & Z_THEME_ADDON_DO_APPLY) {
 		BList teamList;
 		app_info ainfo;
 		int32 count, i;
@@ -404,7 +404,6 @@ status_t TerminalThemesAddon::ApplyThemeHaiku(BMessage &theme, uint32 flags)
 	rgb_color color;
 	BString s;
 
-	(void)flags;
 	err = MyMessage(theme, termpref);
 	if (err)
 		return err;
@@ -479,7 +478,7 @@ status_t TerminalThemesAddon::ApplyThemeHaiku(BMessage &theme, uint32 flags)
 	s << color.red << ", " << color.green << ", " << color.blue;
 	lines.AddString(PREF_SELECT_FORE_COLOR, s.String());
 	
-/* XXX: handle PREF_IM_FORE_COLOR PREF_IM_BACK_COLOR PREF_IM_SELECT_COLOR */
+	/* XXX: handle PREF_IM_FORE_COLOR PREF_IM_BACK_COLOR PREF_IM_SELECT_COLOR */
 
 	
 	if (termpref.FindInt32(TP_ENCODING, &ival) != B_OK)
@@ -489,11 +488,11 @@ status_t TerminalThemesAddon::ApplyThemeHaiku(BMessage &theme, uint32 flags)
 	//XXX: shouldn't really be touched...
 	//lines.AddString(, s.String());
 	
-	
-	if (flags & UI_THEME_SETTINGS_SAVE) {
+	if (flags & UI_THEME_SETTINGS_SAVE && AddonFlags() & Z_THEME_ADDON_DO_SAVE) {
 		SaveHaikuTerminalSettings(lines);
 	}
-	if (flags & UI_THEME_SETTINGS_APPLY) {
+
+	if (flags & UI_THEME_SETTINGS_APPLY && AddonFlags() & Z_THEME_ADDON_DO_APPLY) {
 		BList teamList;
 		app_info ainfo;
 		int32 count, i;

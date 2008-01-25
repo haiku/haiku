@@ -118,11 +118,19 @@ status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BMessage uisettings;
 	BFont fnt;
 	status_t err;
+	uint32 uiflags = 0;
 
 	(void)flags;
 	err = MyMessage(theme, uisettings);
 	if (err)
 		return err;
+
+	if (flags & UI_THEME_SETTINGS_SAVE && AddonFlags() & Z_THEME_ADDON_DO_SAVE)
+		uiflags |= B_SAVE_UI_SETTINGS;
+	if (flags & UI_THEME_SETTINGS_APPLY && AddonFlags() & Z_THEME_ADDON_DO_APPLY)
+		uiflags |= B_APPLY_UI_SETTINGS;
+	if (!uiflags)
+		return B_OK;
 
 	// hack for legacy fonts
 	err = uisettings.FindFlat("be:f:be_plain_font", &fnt);
@@ -139,10 +147,8 @@ status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	uisettings.RemoveName("be:f:be_fixed_font");
  	if (err == B_OK)
 		BFont::SetStandardFont(B_FIXED_FONT, &fnt);
-
 	
-	update_ui_settings(uisettings);
-	
+	update_ui_settings(uisettings, uiflags);
 	
 	return B_OK;
 }

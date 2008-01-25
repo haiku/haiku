@@ -124,7 +124,9 @@ status_t BackgroundThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	ssize_t flatSize;
 	char *pAttr;
 
-	(void)flags;
+	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
+		return B_OK;
+
 	err = MyMessage(theme, backgrounds);
 	if (err)
 		return err;

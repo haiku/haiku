@@ -83,7 +83,6 @@ status_t PeThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BString text;
 	char buffer[10];
 	
-	(void)flags;
 	err = theme.FindMessage(Z_THEME_UI_SETTINGS, &uisettings);
 	if (err)
 		return err;
@@ -110,12 +109,13 @@ status_t PeThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BFile PeSettings(PeSPath.Path(), B_WRITE_ONLY|B_OPEN_AT_END);
 	if (PeSettings.InitCheck() < B_OK)
 		return PeSettings.InitCheck();
-	if (true/* || flags & UI_THEME_SETTINGS_SAVE*/) {
+	
+	if (flags & UI_THEME_SETTINGS_SAVE && AddonFlags() & Z_THEME_ADDON_DO_SAVE) {
 		if (PeSettings.Write(text.String(), strlen(text.String())) < B_OK)
 			return B_ERROR;
 	}
 	
-	if (true/* || flags & UI_THEME_SETTINGS_APPLY*/) {
+	if (flags & UI_THEME_SETTINGS_APPLY && AddonFlags() & Z_THEME_ADDON_DO_APPLY) {
 		
 	}
 	return B_OK;

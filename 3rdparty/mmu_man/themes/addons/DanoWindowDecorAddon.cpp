@@ -97,7 +97,9 @@ status_t DecorThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	BString decorName;
 	status_t err;
 
-	(void)flags;
+	if (!(flags & UI_THEME_SETTINGS_SET_ALL) || !(AddonFlags() & Z_THEME_ADDON_DO_SET_ALL))
+		return B_OK;
+	
 	err = MyMessage(theme, window_decor);
 	if (err)
 		return err;
