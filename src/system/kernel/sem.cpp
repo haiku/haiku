@@ -1065,7 +1065,6 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 				// release this thread
 				thread = thread_dequeue(&sSems[slot].u.used.queue);
 				thread_enqueue(thread, &releaseQueue);
-				thread->state = B_THREAD_READY;
 				thread->sem.count = 0;
 			}
 		} else if (flags & B_RELEASE_IF_WAITING_ONLY)
@@ -1091,7 +1090,12 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 			thread->next_priority = thread->priority >= B_FIRST_REAL_TIME_PRIORITY ?
 				thread->priority : thread->priority + 1;
 #endif
-			scheduler_enqueue_in_run_queue(thread);
+			if (thread->state == B_THREAD_RUNNING)
+				thread->next_state = B_THREAD_READY;
+			else {
+				thread->state = B_THREAD_READY;
+				scheduler_enqueue_in_run_queue(thread);
+			}
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0)
 			scheduler_reschedule();

@@ -219,17 +219,9 @@ scheduler_reschedule(void)
 
 			if (nextThread->cpu
 				&& nextThread->cpu->cpu_num != oldThread->cpu->cpu_num) {
-				// ToDo: This thread is still running on another CPU. The
-				// thread just missed a semaphore, put itself into the notify
-				// queue but was not yet rescheduled. During this time frame
-				// release_sem_etc() was called for said semaphore and put the
-				// thread into the run queue to notify it.
-				// Therefore it is now _still_ running on one CPU and _already_
-				// part of the run queue again. We have to skip this thread
-				// here because otherwise we would overwrite the thread->cpu
-				// pointer with the current CPU which would make both CPUs
-				// "think" they are the same one and kill off the scheduler
-				// logic in here as well as all calls to smp_get_current_cpu().
+				panic("thread in run queue that's still running on another CPU!\n");
+				// ToDo: remove this check completely when we're sure that this
+				// cannot happen anymore.
 				prevThread = nextThread;
 				nextThread = nextThread->queue_next;
 				continue;
