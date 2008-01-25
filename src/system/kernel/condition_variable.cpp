@@ -365,10 +365,8 @@ PrivateConditionVariable::_Notify(bool all, status_t result)
 
 		// wake up the thread
 		thread->condition_variable_entry = NULL;
-		if (thread->state == B_THREAD_WAITING) {
-			thread->state = B_THREAD_READY;
+		if (thread->state == B_THREAD_WAITING)
 			scheduler_enqueue_in_run_queue(thread);
-		}
 
 		if (!all)
 			break;
@@ -412,7 +410,6 @@ condition_variable_interrupt_thread(struct thread* thread)
 
 	// wake up the thread
 	thread->condition_variable_entry = NULL;
-	thread->state = B_THREAD_READY;
 	scheduler_enqueue_in_run_queue(thread);
 
 	return B_OK;

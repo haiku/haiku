@@ -301,11 +301,8 @@ notify_loading_app(status_t result, bool suspend)
 		GRAB_THREAD_LOCK();
 
 		// wake up the waiting thread
-		if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
-			loadingInfo->thread->state = B_THREAD_READY;
-			loadingInfo->thread->next_state = B_THREAD_READY;
+		if (loadingInfo->thread->state == B_THREAD_SUSPENDED)
 			scheduler_enqueue_in_run_queue(loadingInfo->thread);
-		}
 
 		// suspend ourselves, if desired
 		if (suspend) {

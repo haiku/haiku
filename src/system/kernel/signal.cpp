@@ -462,10 +462,8 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 
 	if (thread->team == team_get_kernel_team()) {
 		// Signals to kernel threads will only wake them up
-		if (thread->state == B_THREAD_SUSPENDED) {
-			thread->state = thread->next_state = B_THREAD_READY;
+		if (thread->state == B_THREAD_SUSPENDED)
 			scheduler_enqueue_in_run_queue(thread);
-		}
 		return B_OK;
 	}
 
@@ -479,29 +477,25 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 
 			mainThread->sig_pending |= SIGNAL_TO_MASK(SIGKILLTHR);
 			// Wake up main thread
-			if (mainThread->state == B_THREAD_SUSPENDED) {
-				mainThread->state = mainThread->next_state = B_THREAD_READY;
+			if (mainThread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(mainThread);
-			} else if (mainThread->state == B_THREAD_WAITING)
+			else if (mainThread->state == B_THREAD_WAITING)
 				signal_interrupt_thread(mainThread);
 
 			// Supposed to fall through
 		}
 		case SIGKILLTHR:
 			// Wake up suspended threads and interrupt waiting ones
-			if (thread->state == B_THREAD_SUSPENDED) {
-				thread->state = thread->next_state = B_THREAD_READY;
+			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
-			} else if (thread->state == B_THREAD_WAITING)
+			else if (thread->state == B_THREAD_WAITING)
 				signal_interrupt_thread(thread);
 			break;
 
 		case SIGCONT:
 			// Wake up thread if it was suspended
-			if (thread->state == B_THREAD_SUSPENDED) {
-				thread->state = thread->next_state = B_THREAD_READY;
+			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
-			}
 
 			atomic_and(&thread->sig_pending, ~STOP_SIGNALS);
 				// remove any pending stop signals

@@ -1159,10 +1159,8 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 		mainThread = thread_get_thread_struct_locked(thread);
 		if (mainThread) {
 			// resume the team's main thread
-			if (mainThread->state == B_THREAD_SUSPENDED) {
-				mainThread->state = mainThread->next_state = B_THREAD_READY;
+			if (mainThread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(mainThread);
-			}
 
 			// Now suspend ourselves until loading is finished.
 			// We will be woken either by the thread, when it finished or
@@ -2159,11 +2157,8 @@ team_delete_team(struct team *team)
 		GRAB_THREAD_LOCK();
 
 		// wake up the waiting thread
-		if (loadingInfo->thread->state == B_THREAD_SUSPENDED) {
-			loadingInfo->thread->state = B_THREAD_READY;
-			loadingInfo->thread->next_state = B_THREAD_READY;
+		if (loadingInfo->thread->state == B_THREAD_SUSPENDED)
 			scheduler_enqueue_in_run_queue(loadingInfo->thread);
-		}
 
 		RELEASE_THREAD_LOCK();
 	}

@@ -937,7 +937,6 @@ make_thread_resumed(int argc, char **argv)
 			continue;
 
 		if (thread->state == B_THREAD_SUSPENDED) {
-			thread->state = thread->next_state = B_THREAD_READY;
 			scheduler_enqueue_in_run_queue(thread);
 			kprintf("thread %ld resumed\n", thread->id);
 		}

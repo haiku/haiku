@@ -2363,7 +2363,6 @@ _user_debug_thread(thread_id threadID)
 		switch (thread->state) {
 			case B_THREAD_SUSPENDED:
 				// thread suspended: wake it up
-				thread->state = thread->next_state = B_THREAD_READY;
 				scheduler_enqueue_in_run_queue(thread);
 				break;
 

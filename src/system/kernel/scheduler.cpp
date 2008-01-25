@@ -74,8 +74,17 @@ dump_run_queue(int argc, char **argv)
 void
 scheduler_enqueue_in_run_queue(struct thread *thread)
 {
-	struct thread *curr, *prev;
+	if (thread->state == B_THREAD_RUNNING) {
+		// The thread is currently running (on another CPU) and we cannot
+		// insert it into the run queue. Set the next state to ready so the
+		// thread is inserted into the run queue on the next reschedule.
+		thread->next_state = B_THREAD_READY;
+		return;
+	}
 
+	thread->state = thread->next_state = B_THREAD_READY;
+
+	struct thread *curr, *prev;
 	for (curr = sRunQueue, prev = NULL; curr
 			&& curr->priority >= thread->next_priority;
 			curr = curr->queue_next) {
@@ -153,6 +162,7 @@ scheduler_reschedule(void)
 
 	TRACE(("reschedule(): cpu %d, cur_thread = 0x%lx\n", smp_get_current_cpu(), thread_get_current_thread()->id));
 
+	oldThread->state = oldThread->next_state;
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
@@ -171,7 +181,6 @@ scheduler_reschedule(void)
 			TRACE(("not enqueueing thread 0x%lx into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));
 			break;
 	}
-	oldThread->state = oldThread->next_state;
 
 	nextThread = sRunQueue;
 	prevThread = NULL;

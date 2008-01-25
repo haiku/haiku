@@ -319,14 +319,9 @@ sem_timeout(timer *data)
 
 	GRAB_THREAD_LOCK();
 	// put the threads in the run q here to make sure we dont deadlock in sem_interrupt_thread
-	while ((thread = thread_dequeue(&wakeupQueue)) != NULL) {
-		if (thread->state == B_THREAD_RUNNING)
-			thread->next_state = B_THREAD_READY;
-		else {
-			thread->state = thread->next_state = B_THREAD_READY;
-			scheduler_enqueue_in_run_queue(thread);
-		}
-	}
+	while ((thread = thread_dequeue(&wakeupQueue)) != NULL)
+		scheduler_enqueue_in_run_queue(thread);
+
 	RELEASE_THREAD_LOCK();
 
 	restore_interrupts(state);
@@ -614,14 +609,8 @@ sem_interrupt_thread(struct thread *thread)
 
 	RELEASE_SEM_LOCK(sSems[slot]);
 
-	while ((thread = thread_dequeue(&wakeupQueue)) != NULL) {
-		if (thread->state == B_THREAD_RUNNING)
-			thread->next_state = B_THREAD_READY;
-		else {
-			thread->state = thread->next_state = B_THREAD_READY;
-			scheduler_enqueue_in_run_queue(thread);
-		}
-	}
+	while ((thread = thread_dequeue(&wakeupQueue)) != NULL)
+		scheduler_enqueue_in_run_queue(thread);
 
 	return B_NO_ERROR;
 }
@@ -792,14 +781,9 @@ delete_sem(sem_id id)
 
 	if (releasedThreads > 0) {
 		GRAB_THREAD_LOCK();
-		while ((thread = thread_dequeue(&releaseQueue)) != NULL) {
-			if (thread->state == B_THREAD_RUNNING)
-				thread->next_state = B_THREAD_READY;
-			else {
-				thread->state = thread->next_state = B_THREAD_READY;			
-				scheduler_enqueue_in_run_queue(thread);
-			}
-		}
+		while ((thread = thread_dequeue(&releaseQueue)) != NULL)	
+			scheduler_enqueue_in_run_queue(thread);
+
 		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 	}
@@ -955,14 +939,9 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 					B_INTERRUPTED, true);
 			}
 			RELEASE_SEM_LOCK(sSems[slot]);
-			while ((thread = thread_dequeue(&wakeupQueue)) != NULL) {
-				if (thread->state == B_THREAD_RUNNING)
-					thread->next_state = B_THREAD_READY;
-				else {
-					thread->state = thread->next_state = B_THREAD_READY;
-					scheduler_enqueue_in_run_queue(thread);
-				}
-			}
+			while ((thread = thread_dequeue(&wakeupQueue)) != NULL)
+				scheduler_enqueue_in_run_queue(thread);
+
 			// fall through and reschedule since another thread with a higher priority may have been woken up
 		}
 		scheduler_reschedule();
@@ -1108,12 +1087,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 			thread->next_priority = thread->priority >= B_FIRST_REAL_TIME_PRIORITY ?
 				thread->priority : thread->priority + 1;
 #endif
-			if (thread->state == B_THREAD_RUNNING)
-				thread->next_state = B_THREAD_READY;
-			else {
-				thread->state = thread->next_state = B_THREAD_READY;
-				scheduler_enqueue_in_run_queue(thread);
-			}
+			scheduler_enqueue_in_run_queue(thread);
 		}
 		if ((flags & B_DO_NOT_RESCHEDULE) == 0)
 			scheduler_reschedule();
