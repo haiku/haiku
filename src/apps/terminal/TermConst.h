@@ -84,7 +84,7 @@ const uint32 SAVE_AS_DEFAULT 		= 'sadf';
 const uint32 MSG_CHECK_CHILDREN		= 'ckch';
 
 // Preference Read/Write Keys
-const char* const PREF_HALF_FONT_FAMILY = "Half Font Famly";
+const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";
 const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
 const char* const PREF_HALF_FONT_SIZE = "Half Font Size";
 
