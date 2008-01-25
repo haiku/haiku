@@ -15,9 +15,9 @@
 
 
 #undef TRACE
+
 //#define TRACE_ENGINE
 #ifdef TRACE_ENGINE
-extern "C" void _sPrintf(const char *format, ...);
 #	define TRACE(x) _sPrintf x
 #else
 #	define TRACE(x) ;
@@ -95,8 +95,15 @@ QueueCommands::PutOverlayFlip(uint32 mode, bool updateCoefficients)
 	MakeSpace(2);
 
 	Write(COMMAND_OVERLAY_FLIP | mode);
-	Write((uint32)gInfo->shared_info->physical_overlay_registers
-		| (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0));
+
+	uint32 registers;
+	if (gInfo->shared_info->overlay_offset != 0) {
+		// G33 does not need a physical address for the overlay registers
+		registers = gInfo->shared_info->overlay_offset;
+	} else
+		registers = (uint32)gInfo->shared_info->physical_overlay_registers;
+
+	Write(registers | (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0));
 }
 
 
@@ -104,6 +111,7 @@ void
 QueueCommands::MakeSpace(uint32 size)
 {
 	ASSERT((size & 1) == 0);
+
 	size *= sizeof(uint32);
 	bigtime_t start = system_time();
 
@@ -119,7 +127,7 @@ QueueCommands::MakeSpace(uint32 size)
 
 		if (fRingBuffer.space_left < size) {
 			if (system_time() > start + 1000000LL) {
-				TRACE(("intel_extreme: engine stalled\n"));
+				TRACE(("intel_extreme: engine stalled, head %lx\n", head));
 				break;
 			}
 			spin(10);
@@ -246,7 +254,7 @@ intel_wait_engine_idle(void)
 
 		if (system_time() > start + 1000000LL) {
 			// the engine seems to be locked up!
-			TRACE(("intel_extreme: engine locked up!\n"));
+			TRACE(("intel_extreme: engine locked up, head %lx!\n", head));
 			break;
 		}
 
