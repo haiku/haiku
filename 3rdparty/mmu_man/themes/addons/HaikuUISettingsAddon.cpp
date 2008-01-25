@@ -10,6 +10,7 @@
 #include <InterfaceDefs.h>
 #include <Entry.h>
 #include <Font.h>
+#include <Menu.h>
 #include <Message.h>
 #include <Roster.h>
 #include <Debug.h>
@@ -180,7 +181,9 @@ status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 {
 	BMessage uisettings;
 	BFont fnt;
+	struct menu_info menuInfo;
 	status_t err;
+	status_t gmierr = ENOENT;
 	int i;
 	FENTRY;
 
@@ -194,7 +197,7 @@ status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 	font_style style;
 	
 	err = FindFont(uisettings, "be:f:be_plain_font", 0, &fnt);
-	uisettings.RemoveName("be:f:be_plain_font");
+	//uisettings.RemoveName("be:f:be_plain_font");
 	DERR(err);
 	if (err == B_OK) {
 		fnt.GetFamilyAndStyle(&family, &style);
@@ -203,7 +206,7 @@ status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 
 	err = FindFont(uisettings, "be:f:be_bold_font", 0, &fnt);
 	DERR(err);
-	uisettings.RemoveName("be:f:be_bold_font");
+	//uisettings.RemoveName("be:f:be_bold_font");
 	if (err == B_OK) {
 		fnt.GetFamilyAndStyle(&family, &style);
 		_set_system_font_("bold", family, style, fnt.Size());
@@ -211,21 +214,50 @@ status_t UISettingsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 
 	err = FindFont(uisettings, "be:f:be_fixed_font", 0, &fnt);
 	DERR(err);
-	uisettings.RemoveName("be:f:be_fixed_font");
+	//uisettings.RemoveName("be:f:be_fixed_font");
 	if (err == B_OK) {
 		fnt.GetFamilyAndStyle(&family, &style);
 		_set_system_font_("fixed", family, style, fnt.Size());
 	}
 
+	err = FindFont(uisettings, "be:f:Tip", 0, &fnt);
+	DERR(err);
+	//uisettings.RemoveName("be:f:Tip");
+	if (err == B_OK) {
+		fnt.GetFamilyAndStyle(&family, &style);
+		// not implemented yet in Haiku
+		//_set_system_font_("tip", family, style, fnt.Size());
+		//_set_system_font_("tooltip", family, style, fnt.Size());
+	}
+
+	gmierr = get_menu_info(&menuInfo);
+
 	for (i = 0; gUIColorMap[i].name; i++) {
 		rgb_color c;
 		if (FindRGBColor(uisettings, gUIColorMap[i].name, 0, &c) == B_OK) {
 			set_ui_color(gUIColorMap[i].id, c);
-			fprintf(stderr, "set_ui_color(%d, #%02x%02x%02x)\n", 
-				gUIColorMap[i].id, c.red, c.green, c.blue);
+			PRINT(("set_ui_color(%d, #%02x%02x%02x)\n", 
+				gUIColorMap[i].id, c.red, c.green, c.blue));
+			if (gUIColorMap[i].id == B_MENU_BACKGROUND_COLOR)
+				menuInfo.background_color = c;
 		}
 	}
 	
+	if (gmierr >= B_OK) {
+		bool bval;
+		int32 ival;
+		if (uisettings.FindBool("be:MenTrig", &bval) >= B_OK)
+			menuInfo.triggers_always_shown = bval;
+		if (uisettings.FindInt32("be:MenSep", &ival) >= B_OK)
+			menuInfo.separator = ival;
+		err = FindFont(uisettings, "be:f:MenTx", 0, &fnt);
+		DERR(err);
+		if (err == B_OK) {
+			fnt.GetFamilyAndStyle(&menuInfo.f_family, &menuInfo.f_style);
+			menuInfo.font_size = fnt.Size();
+		}
+		set_menu_info(&menuInfo);
+	}
 	
 	return B_OK;
 }
@@ -235,6 +267,7 @@ status_t UISettingsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	BMessage uisettings;
 	BMessage names;
 	BFont fnt;
+	menu_info menuInfo;
 	status_t err;
 	int i;
 	FENTRY;
@@ -253,6 +286,18 @@ status_t UISettingsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	AddFont(uisettings, "be:f:be_plain_font", (BFont *)be_plain_font);
 	AddFont(uisettings, "be:f:be_bold_font", (BFont *)be_bold_font);
 	AddFont(uisettings, "be:f:be_fixed_font", (BFont *)be_fixed_font);
+	// XXX: FIXME
+	//AddFont(uisettings, "be:f:Tip", (BFont *)be_tip_font);
+
+	// menu stuff
+	err = get_menu_info(&menuInfo);
+	if (err >= B_OK) {
+		uisettings.AddBool("be:MenTrig", menuInfo.triggers_always_shown);
+		uisettings.AddInt32("be:MenSep", menuInfo.separator);
+		fnt.SetFamilyAndStyle(menuInfo.f_family, menuInfo.f_style);
+		fnt.SetSize(menuInfo.font_size);
+		AddFont(uisettings, "be:f:MenTx", &fnt);
+	}
 
 	err = SetMyMessage(theme, uisettings);
 	return err;
@@ -262,7 +307,7 @@ status_t UISettingsThemesAddon::ApplyDefaultTheme(uint32 flags)
 {
 	BMessage theme;
 	BMessage uisettings;
-	BFont fnt;
+	rgb_color color;
 	FENTRY;
 	
 	/*
@@ -293,6 +338,20 @@ status_t UISettingsThemesAddon::ApplyDefaultTheme(uint32 flags)
 	f.SetFamilyAndStyle(family, style);
 	f.SetSize(size);
 	AddFont(uisettings, "be:f:be_plain_font", &f);
+	
+	// menu stuff
+	sprintf(family,"%s","Bitstream Vera Sans");
+	sprintf(style,"%s","Roman");
+	f.SetFamilyAndStyle(family, style);
+	f.SetSize(12.0);
+	AddFont(uisettings, "be:f:MenTx", &f);
+	color.red = 216;
+	color.blue = 216;
+	color.green = 216;
+	color.alpha = 255;
+	AddRGBColor(uisettings, "be:c:MenBg", color);
+	uisettings.AddBool("be:MenTrig", false);
+	uisettings.AddInt32("be:MenSep", 0);
 	
 	theme.AddMessage(A_MSGNAME, &uisettings);
 	return ApplyTheme(theme, flags);

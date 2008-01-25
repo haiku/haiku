@@ -2,9 +2,14 @@ TODOs for Theme manager:
 * style cleanup (-> Haiku style)
 * make ParseMessage more robust
 * forbid quitting while themes are loading!
+* fix TerminalAddon: get theme from haiku
 * ideas for addons:
 	- ~/config/settings/Tracker/DefaultFolderTemplate/ (default background ??)
+	- Desktop icon size ?
 	- dircolors (cf. http://linux.die.net/man/5/dir_colors )
 	- icons (/etc/icons ? svg/hvif, setmime...)
 	- mouse cursors (needs app_server fixes ??)
+	- Pulse colors (-> sample code)
+	- BeIDE/Pe/Eddie full colors (map to singe namespace)
+
 
