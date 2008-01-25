@@ -9,6 +9,18 @@
 /* backup of current settings when applying a theme */
 #define THEME_ID_BACKUP -1
 
+/* flags */
+
+		// try to apply settings to running applications
+#define UI_THEME_SETTINGS_APPLY		0x00000001
+		// save settings to native storage
+#define UI_THEME_SETTINGS_SAVE		0x00000002
+		// attempt to do both
+#define UI_THEME_SETTINGS_SET_ALL	(UI_THEME_SETTINGS_APPLY|UI_THEME_SETTINGS_SAVE)
+		// do read settings from native storage
+#define UI_THEME_SETTINGS_RETRIEVE	0x00000004
+
+
 namespace Z {
 namespace ThemeManager {
 	class ThemeManager;
@@ -64,13 +76,13 @@ status_t	CurrentTheme(BMessage &copyto);
 	
 	/* Theme manipulation */
 	
-status_t	ApplyTheme(int32 id, uint32 flags=0L);
-int32		MakeTheme(uint32 flags=0L);
-status_t	UpdateTheme(int32 id, uint32 flags=0L);
+status_t	ApplyTheme(int32 id, uint32 flags=UI_THEME_SETTINGS_SET_ALL);
+int32		MakeTheme(uint32 flags=UI_THEME_SETTINGS_RETRIEVE);
+status_t	UpdateTheme(int32 id, uint32 flags=UI_THEME_SETTINGS_RETRIEVE);
 status_t	DeleteTheme(int32 id);
 int32		SelectedTheme();
 
-status_t	ApplyDefaultTheme(uint32 flags=0L);
+status_t	ApplyDefaultTheme(uint32 flags=UI_THEME_SETTINGS_SET_ALL);
 
 status_t	BackupCurrent();
 status_t	RestoreCurrent();
