@@ -313,8 +313,12 @@ dump_team_info(int argc, char **argv)
 	team_id id = -1;
 	bool found = false;
 
-	if (argc != 2) {
-		kprintf("usage: team [id/address/name]\n");
+	if (argc < 2) {
+		struct thread* thread = thread_get_current_thread();
+		if (thread != NULL && thread->team != NULL)
+			_dump_team_info(thread->team);
+		else
+			kprintf("No current team!\n");
 		return 0;
 	}
 
@@ -1838,8 +1842,17 @@ team_init(kernel_args *args)
 	// stick it in the team hash
 	hash_insert(sTeamHash, sKernelTeam);
 
-	add_debugger_command("team", &dump_team_info, "list info about a particular team");
-	add_debugger_command("teams", &dump_teams, "list all teams");
+	add_debugger_command_etc("team", &dump_team_info,
+		"Dump info about a particular team",
+		"[ <id> | <address> | <name> ]\n"
+		"Prints information about the specified team. If no argument is given\n"
+		"the current team is selected.\n"
+		"  <id>       - The ID of the team.\n"
+		"  <address>  - The address of the team structure.\n"
+		"  <name>     - The team's name.\n", 0);
+	add_debugger_command_etc("teams", &dump_teams, "List all teams",
+		"\n"
+		"Prints a list of all existing teams.\n", 0);
 	return 0;
 }
 
