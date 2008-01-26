@@ -601,18 +601,21 @@ sem_interrupt_thread(struct thread *thread)
 	}
 
 	clear_thread_queue(&wakeupQueue);
-	if (remove_thread_from_sem(thread, &sSems[slot], &wakeupQueue,
-			B_INTERRUPTED, true) != B_OK) {
-		panic("sem_interrupt_thread: thread %ld not found in sem %ld's wait "
-			"queue\n", thread->id, thread->sem.blocking);
-	}
+	status_t result = remove_thread_from_sem(thread, &sSems[slot],
+		&wakeupQueue, B_INTERRUPTED, true);
 
 	RELEASE_SEM_LOCK(sSems[slot]);
+
+	if (result != B_OK) {
+		// The thread is not in the wait queue anymore. Probably it just timed
+		// out before we locked the sem.
+		return result;
+	}
 
 	while ((thread = thread_dequeue(&wakeupQueue)) != NULL)
 		scheduler_enqueue_in_run_queue(thread);
 
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
