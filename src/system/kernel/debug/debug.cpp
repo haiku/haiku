@@ -576,8 +576,6 @@ kernel_debugger_loop(void)
 			line = sLineBuffer[sCurrentLine];
 		}
 
-		sDebuggerOnCPU = smp_get_current_cpu();
-
 		int rc = evaluate_debug_command(line);
 
 		if (rc == B_KDEBUG_QUIT)
@@ -1043,23 +1041,43 @@ panic(const char *format, ...)
 void
 kernel_debugger(const char *message)
 {
-	static vint32 inDebugger;
+	static vint32 inDebugger = 0;
 	cpu_status state;
 	bool dprintfState;
 
 	state = disable_interrupts();
-	atomic_add(&inDebugger, 1);
+	while (atomic_add(&inDebugger, 1) > 0) {
+		// The debugger is already running, find out where...
+		if (sDebuggerOnCPU != smp_get_current_cpu()) {
+			// Some other CPU must have entered the debugger and tried to halt
+			// us. Process ICIs to ensure we get the halt request. Then we are
+			// blocking there until everyone leaves the debugger and we can
+			// try to enter it again.
+			atomic_add(&inDebugger, -1);
+			smp_intercpu_int_handler();
+		} else {
+			// We are re-entering the debugger on the same CPU.
+			break;
+		}
+	}
 
 	arch_debug_save_registers(&dbg_register_file[smp_get_current_cpu()][0]);
 	dprintfState = set_dprintf_enabled(true);
 
-	if (sDebuggerOnCPU != smp_get_current_cpu()) {
-		// First entry, halt all of the other cpus
+	if (sDebuggerOnCPU != smp_get_current_cpu() && smp_get_num_cpus() > 1) {
+		// First entry on a MP system, send a halt request to all of the other
+		// CPUs but don't block here if they currently can't process it.
+		// Should they try to enter the debugger they will be cought in the
+		// loop above.
+		// ToDo: investigate why we sometimes hang here with SMP_MSG_FLAG_SYNC
+		// and readd that flag and remove the spin below when it's fixed.
+		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0,
+			(void *)&inDebugger, 0);
 
-		// XXX need to flush current smp mailbox to make sure this goes
-		// through. Otherwise it'll hang
-		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, (void *)&inDebugger,
-			SMP_MSG_FLAG_SYNC);
+		// Delay a bit to give other CPUs the chance to process the halt
+		// request. Otherwise we could get debug output of other CPUs mixed
+		// into our own when enabling debug output below.
+		spin(50000);
 	}
 
 	if (sBlueScreenOutput) {
