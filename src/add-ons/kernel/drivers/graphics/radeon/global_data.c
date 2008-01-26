@@ -1,9 +1,7 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
 
-
 	Part of Radeon kernel driver
-		
 	Global variables
 */
 
@@ -16,4 +14,4 @@ int debug_level_error = 4;
 
 radeon_devices *devices;
 pci_module_info *pci_bus;
-agp_module_info *agp_bus;
+agp_gart_module_info *sAGP;

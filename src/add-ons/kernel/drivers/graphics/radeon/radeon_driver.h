@@ -176,7 +176,7 @@ typedef struct {
 
 
 extern pci_module_info *pci_bus;
-extern agp_module_info *agp_bus;
+extern agp_gart_module_info *sAGP;
 extern radeon_devices *devices;
 
 

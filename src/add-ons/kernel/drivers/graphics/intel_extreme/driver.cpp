@@ -59,7 +59,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 char *gDeviceNames[MAX_CARDS + 1];
 intel_info *gDeviceInfo[MAX_CARDS];
 pci_module_info *gPCI;
-agp_module_info *gGART;
+agp_gart_module_info *gGART;
 lock gLock;
 
 
@@ -138,7 +138,7 @@ init_driver(void)
 		return status;
 	}
 
-	get_module(B_AGP_MODULE_NAME, (module_info **)&gGART);
+	get_module(B_AGP_GART_MODULE_NAME, (module_info **)&gGART);
 
 	// find devices
 
@@ -193,7 +193,7 @@ init_driver(void)
 	if (found == 0) {
 		uninit_lock(&gLock);
 		if (gGART != NULL)
-			put_module(B_AGP_MODULE_NAME);
+			put_module(B_AGP_GART_MODULE_NAME);
 		put_module(B_PCI_MODULE_NAME);
 		return ENODEV;
 	}
@@ -217,7 +217,7 @@ uninit_driver(void)
 	}
 
 	if (gGART != NULL)
-		put_module(B_AGP_MODULE_NAME);
+		put_module(B_AGP_GART_MODULE_NAME);
 	put_module(B_PCI_MODULE_NAME);
 }
 

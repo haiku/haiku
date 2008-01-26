@@ -1,14 +1,11 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
 
-
 	Part of Radeon kernel driver
-		
+
 	AGP fix. Some motherboard BIOSes enable FastWrite even
 	though the graphics card doesn't support it. Here, we'll
 	fix that (hopefully it is generic enough).
-
-	updated to use AGP_BUS mananager
 */
 
 
@@ -17,8 +14,10 @@
 static void agp_list_info(agp_info ai);
 static void agp_list_active(uint32 cmd);
 
-// fix invalid AGP settings
-void Radeon_Set_AGP( device_info *di, bool enable_agp )
+
+//! fix invalid AGP settings
+void
+Radeon_Set_AGP(device_info *di, bool enable_agp)
 {
 	uint8 agp_index = 0;
 	agp_info nth_agp_info;
@@ -26,34 +25,29 @@ void Radeon_Set_AGP( device_info *di, bool enable_agp )
 	uint32 agp_cmd;
 
 	/* abort if no agp busmanager found */
-	if (!agp_bus)
-	{
+	if (!sAGP) {
 		SHOW_INFO0(1, "Busmanager not installed.\nWarning Card May hang if AGP Fastwrites are Enabled." );
 		return;
 	}
 
 	/* contact driver and get a pointer to the registers and shared data */
 	/* get nth AGP device info */
-	while((*agp_bus->get_nth_agp_info)(agp_index, &nth_agp_info) == B_NO_ERROR) {
-	
+	while (sAGP->get_nth_agp_info(agp_index, &nth_agp_info) == B_OK) {
 		/* see if we are this one */
-		if ((nth_agp_info.device_id == di->pcii.device_id) &&
-			(nth_agp_info.vendor_id == di->pcii.vendor_id) &&
-			(nth_agp_info.bus		== di->pcii.bus) &&
-			(nth_agp_info.device	== di->pcii.device) &&
-			(nth_agp_info.function	== di->pcii.function))
-		{
+		if (nth_agp_info.device_id == di->pcii.device_id
+			&& nth_agp_info.vendor_id == di->pcii.vendor_id
+			&& nth_agp_info.bus == di->pcii.bus
+			&& nth_agp_info.device == di->pcii.device
+			&& nth_agp_info.function == di->pcii.function) {
 			SHOW_INFO0(1, "Found AGP capable device" );
 			found = true;
 
 			/* remember our info */
 			di->agpi = nth_agp_info;
-		
+
 			/* log capabilities */
 			agp_list_info(nth_agp_info);
-
 			break;
-
 		}
 
 		agp_index++;
@@ -69,37 +63,33 @@ void Radeon_Set_AGP( device_info *di, bool enable_agp )
 	}
 
 	if (di->settings.force_pci | !enable_agp) {
-
 		SHOW_INFO0(1, "Disabling AGP mode...");
 
 		/* we want zero agp features enabled */
-		agp_cmd = 0;
-
-		/* write the stuff */
-		(*agp_bus->enable_agp)(&agp_cmd);
+		agp_cmd = sAGP->set_agp_mode(0);
 	} else {
 		/* activate AGP mode */
 		SHOW_INFO0(1, "Activating AGP mode...");
 		agp_cmd = 0xfffffff7;
 
 		/* set agp 3 speed bit is agp is v3 */
-		if (nth_agp_info.interface.agp_stat & AGP_rate_rev) agp_cmd |= AGP_rate_rev;
+		if ((nth_agp_info.interface.status & AGP_3_MODE) != 0)
+			agp_cmd |= AGP_3_MODE;
 
 		/* we want to perma disable fastwrites as they're evil, evil i say */
-		agp_cmd &= ~AGP_FW;
+		agp_cmd &= ~AGP_FAST_WRITE;
 
-		/* write the stuff */
-		(*agp_bus->enable_agp)(&agp_cmd);
+		agp_cmd = sAGP->set_agp_mode(agp_cmd);
 	}
 
 	/* list mode now activated,
 	 * make sure we have the correct speed scheme for logging */
-	agp_list_active(nth_agp_info.interface.agp_cmd | 
-		(nth_agp_info.interface.agp_stat & AGP_rate_rev));
-
+	agp_list_active(agp_cmd | (nth_agp_info.interface.status & AGP_3_MODE));
 }
 
-static void agp_list_info(agp_info ai)
+
+static void
+agp_list_info(agp_info ai)
 {
 	/*
 		list device
@@ -118,46 +108,47 @@ static void agp_list_info(agp_info ai)
 		list capabilities
 	*/
 	SHOW_INFO(4, "This device supports AGP specification %ld.%ld;",
-		((ai.interface.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
-		((ai.interface.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift));
+		((ai.interface.capability_id & AGP_REV_MAJOR) >> AGP_REV_MAJOR_SHIFT),
+		((ai.interface.capability_id & AGP_REV_MINOR) >> AGP_REV_MINOR_SHIFT));
 
 	/* the AGP devices determine AGP speed scheme version used on power-up/reset */
-	if (!(ai.interface.agp_stat & AGP_rate_rev))
-	{
+	if ((ai.interface.status & AGP_3_MODE) == 0) {
 		/* AGP 2.0 scheme applies */
-		if (ai.interface.agp_stat & AGP_2_1x)
+		if (ai.interface.status & AGP_2_1x)
 			SHOW_INFO0(4, "AGP 2.0 1x mode is available");
-		if (ai.interface.agp_stat & AGP_2_2x)
+		if (ai.interface.status & AGP_2_2x)
 			SHOW_INFO0(4, "AGP 2.0 2x mode is available");
-		if (ai.interface.agp_stat & AGP_2_4x)
+		if (ai.interface.status & AGP_2_4x)
 			SHOW_INFO0(41, "AGP 2.0 4x mode is available");
-	}
-	else
-	{
+	} else {
 		/* AGP 3.0 scheme applies */
-		if (ai.interface.agp_stat & AGP_3_4x)
+		if (ai.interface.status & AGP_3_4x)
 			SHOW_INFO0(4, "AGP 3.0 4x mode is available");
-		if (ai.interface.agp_stat & AGP_3_8x)
+		if (ai.interface.status & AGP_3_8x)
 			SHOW_INFO0(4, "AGP 3.0 8x mode is available");
 	}
 	
-	if (ai.interface.agp_stat & AGP_FW) SHOW_INFO0(4, "Fastwrite transfers are supported");
-	if (ai.interface.agp_stat & AGP_SBA) SHOW_INFO0(4, "Sideband adressing is supported");
-	
+	if (ai.interface.status & AGP_FAST_WRITE)
+		SHOW_INFO0(4, "Fast write transfers are supported");
+	if (ai.interface.status & AGP_SBA)
+		SHOW_INFO0(4, "Sideband adressing is supported");
+
 	SHOW_INFO(1, "%ld queued AGP requests can be handled.",
-		((ai.interface.agp_stat & AGP_RQ) >> AGP_RQ_shift) + 1);
+		((ai.interface.status & AGP_REQUEST) >> AGP_REQUEST_SHIFT) + 1);
 
 	/*
 		list current settings,
 		make sure we have the correct speed scheme for logging
 	 */
-	agp_list_active(ai.interface.agp_cmd | (ai.interface.agp_stat & AGP_rate_rev));
+	agp_list_active(ai.interface.command | (ai.interface.status & AGP_3_MODE));
 }
 
-static void agp_list_active(uint32 cmd)
+
+static void
+agp_list_active(uint32 cmd)
 {
 	SHOW_INFO0(4, "listing settings now in use:");
-	if (!(cmd & AGP_rate_rev)) {
+	if ((cmd & AGP_3_MODE) == 0) {
 		/* AGP 2.0 scheme applies */
 		if (cmd & AGP_2_1x)
 			SHOW_INFO0(2,"AGP 2.0 1x mode is set");
@@ -173,17 +164,18 @@ static void agp_list_active(uint32 cmd)
 			SHOW_INFO0(2,"AGP 3.0 8x mode is set");
 	}
 	
-	if (cmd & AGP_FW) {
-		SHOW_INFO0(2, "Fastwrite transfers are enabled");
+	if (cmd & AGP_FAST_WRITE) {
+		SHOW_INFO0(2, "Fast write transfers are enabled");
 	} else {
-		SHOW_INFO0(2, "Fastwrite transfers are disabled");
+		SHOW_INFO0(2, "Fast write transfers are disabled");
 	}
-	if (cmd & AGP_SBA) SHOW_INFO0(4, "Sideband adressing is enabled");
-	
+	if (cmd & AGP_SBA)
+		SHOW_INFO0(4, "Sideband adressing is enabled");
+
 	SHOW_INFO(4, "Max. AGP queued request depth is set to %ld",
-		(((cmd & AGP_RQ) >> AGP_RQ_shift) + 1));
-	
-	if (cmd & AGP_enable)
+		(((cmd & AGP_REQUEST) >> AGP_REQUEST_SHIFT) + 1));
+
+	if (cmd & AGP_ENABLE)
 		SHOW_INFO0(2, "The AGP interface is enabled.");
 	else
 		SHOW_INFO0(2, "The AGP interface is disabled.");

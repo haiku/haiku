@@ -81,7 +81,7 @@ static int32 eng_interrupt(void *data);
 static DeviceData		*pd;
 static isa_module_info	*isa_bus = NULL;
 static pci_module_info	*pci_bus = NULL;
-static agp_module_info	*agp_bus = NULL;
+static agp_gart_module_info *agp_bus = NULL;
 static device_hooks graphics_device_hooks = {
 	open_hook,
 	close_hook,
@@ -102,6 +102,7 @@ static uint16 via_device_list[] = {
 	0x3108, /* K8M800 Unichrome Pro (unknown chiptype) */
 	0x3122, /* CLE266 Unichrome Pro (CLE3122) */
 	0x3205, /* KM400 Unichrome (VT3205) */
+//	0x3344, /* P4M800 Pro (VT3344) */
 	0x7205, /* KM400 Unichrome (VT7205) */
 	0
 };
@@ -279,13 +280,13 @@ init_driver(void) {
 	}
 
 	/* get a handle for the agp bus if it exists */
-	get_module(B_AGP_MODULE_NAME, (module_info **)&agp_bus);
+	get_module(B_AGP_GART_MODULE_NAME, (module_info **)&agp_bus);
 
 	/* driver private data */
 	pd = (DeviceData *)calloc(1, sizeof(DeviceData));
 	if (!pd) {
 		if (agp_bus)
-			put_module(B_AGP_MODULE_NAME);
+			put_module(B_AGP_GART_MODULE_NAME);
 		put_module(B_ISA_MODULE_NAME);
 		put_module(B_PCI_MODULE_NAME);
 		return B_ERROR;
@@ -328,7 +329,7 @@ void uninit_driver(void) {
 
 	/* put the agp module away if it's there */
 	if (agp_bus) 
-		put_module(B_AGP_MODULE_NAME);
+		put_module(B_AGP_GART_MODULE_NAME);
 }
 
 static status_t map_device(device_info *di)
@@ -900,7 +901,7 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			if (nca->magic == VIA_PRIVATE_DATA_MAGIC) {
 				if (agp_bus) {
 					nca->agp_bus = true;
-					(*agp_bus->enable_agp)(&(nca->cmd));
+					nca->cmd = agp_bus->set_agp_mode(nca->cmd);
 				} else {
 					nca->agp_bus = false;
 					nca->cmd = 0;

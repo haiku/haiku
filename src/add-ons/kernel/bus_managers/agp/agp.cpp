@@ -1,538 +1,1149 @@
 /*
-	written by Rudolf Cornelissen 7/2004-4/2006
-*/
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2006, Rudolf Cornelissen. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+// TODO: rethink the AGP interface for more than one bridge/device!
+//	(should be done with the new driver API then)
 
 /*
 	Notes:
-	-currently we just setup all found devices with AGP interface to the same highest common mode,
-	we don't distinquish different AGP buses.
+	- currently we just setup all found devices with AGP interface to the same
+	highest common mode, we don't distinquish different AGP busses.
+	TODO: it might be a better idea to just setup one instead.
 
-	-no aperture and GART support, just enabling AGP transfer mode. Aperture and GART support are
-	probably easiest to setup for AGP3, as this version of the standard defines all registers needed
-	so we can probably program in the same universal way as we are doing right now. AGP2 requires
-	specific 'drivers' for each chipset outthere, as the registers are implemented in a lot of
-	different ways here.
-	Aperture and GART support is only usefull, once we setup hardware 3D acceleration.
+	- AGP3 defines 'asynchronous request size' and 'calibration cycle' fields
+	in the status and command registers. Currently programming zero's which will
+	make it work, although further optimisation is possible.
 
-	-AGP3 defines 'asynchronous request size' and 'calibration cycle' fields in the status and command
-	registers. Currently programming zero's which will make it work, although further optimisation
-	is possible.
-
-	-AGP3.5 also defines isochronous transfers which are not implemented here: the hardware keeps them
-	disabled by default.
+	- AGP3.5 also defines isochronous transfers which are not implemented here:
+	the hardware keeps them disabled by default.
 */
 
-#include <malloc.h>
-#include <driver_settings.h>
-#include <stdlib.h> // for strtoXX
-#include "agp.h"
 
-typedef struct {
-	sem_id	sem;
-	int32	ben;
-} benaphore;
+#include <AGP.h>
 
-#define INIT_BEN(x)		x.sem = create_sem(0, "AGP "#x" benaphore");  x.ben = 0;
-#define AQUIRE_BEN(x)	if((atomic_add(&(x.ben), 1)) >= 1) acquire_sem(x.sem);
-#define RELEASE_BEN(x)	if((atomic_add(&(x.ben), -1)) > 1) release_sem(x.sem);
-#define	DELETE_BEN(x)	delete_sem(x.sem);
+#include <stdlib.h>
+
+#include <KernelExport.h>
+#include <PCI.h>
+
+#include <util/OpenHashTable.h>
+#ifdef __HAIKU__
+#	include <kernel/lock.h>
+#	include <vm_page.h>
+#	include <vm_types.h>
+#endif
+
+#include <lock.h>
+
+#ifndef __HAIKU__
+#	define PCI_capabilities_ptr		0x34
+#	define PCI_status_capabilities	0x0010
+#	define PCI_cap_id_agp			0x02
+#	define B_NOT_SUPPORTED			B_ERROR
+#endif
+
+#define TRACE_AGP
+#ifdef TRACE_AGP
+#	define TRACE(x...) dprintf("\33[36mAGP:\33[0m " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
 
 #define MAX_DEVICES	  8
 
+#define AGP_ID(address) (address)
+#define AGP_STATUS(address) (address + 4)
+#define AGP_COMMAND(address) (address + 8)
+
+#define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
+
 /* read and write to PCI config space */
-#define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
-#define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
+#define get_pci_config(info, offset, size) \
+	(sPCI->read_pci_config((info).bus, (info).device, (info).function, \
+		(offset), (size)))
+#define set_pci_config(info, offset, size, value) \
+	(sPCI->write_pci_config((info).bus, (info).device, (info).function, \
+		(offset), (size), (value)))
 
-/* these structures are private to the module */
-typedef struct device_info device_info;
+#define RESERVED_APERTURE			0x80000000
+#define ALLOCATED_APERTURE			0x40000000
+#define BIND_APERTURE				0x20000000
+#define APERTURE_PUBLIC_FLAGS_MASK	0x0000ffff
 
-struct device_info {
-	uint8		agp_adress;				/* location of AGP interface in PCI capabilities list */
-	agp_info	agpi;					/* agp info for this device */
-	pci_info	pcii;					/* pci info for this device */
+struct aperture_memory : HashTableLink<aperture_memory> {
+	aperture_memory *next;
+	addr_t		base;
+	size_t		size;
+	uint32		flags;
+#ifdef __HAIKU__
+	union {
+		vm_page	**pages;
+		vm_page *page;
+	};
+#else
+	area_id		area;
+#endif
 };
 
-typedef struct {
-	long		count;							/* number of devices actually found */
-	benaphore	kernel;							/* for serializing access */
-	device_info	di[MAX_DEVICES];				/* device specific stuff */
-} DeviceData;
+class Aperture;
 
-typedef struct settings { //see comments in agp.settings
-	uint32 max_speed;
-	bool   block_agp;
-	bool   block_sba;
-	bool   block_fw;
-} settings;
+class MemoryHashDefinition {
+public:
+	typedef addr_t KeyType;
+	typedef aperture_memory ValueType;
 
-/* prototypes for our private functions */
-static bool has_AGP_interface(pci_info *pcii, uint8 *adress);
-static status_t probe_devices(void);
-static void read_settings(void);
-static void check_settings(uint32 *command);
-static void check_capabilities(uint32 agp_stat, uint32 *command);
+	MemoryHashDefinition(aperture_info &info) : fInfo(info) {}
 
+	size_t HashKey(const KeyType &base) const
+		{ return (base - fInfo.base) / B_PAGE_SIZE; }
+	size_t Hash(aperture_memory *memory) const
+		{ return (memory->base - fInfo.base) / B_PAGE_SIZE; }
+	bool Compare(const KeyType &base, aperture_memory *memory) const
+		{ return base == memory->base; }
+	HashTableLink<aperture_memory> *GetLink(aperture_memory *memory) const
+		{ return memory; }
 
-static DeviceData		*pd;
-static pci_module_info	*pci_bus;
-
-static settings current_settings = { //see comments in agp.settings
-	0,          // max_speed
-	false,		// block_agp
-	false,      // block_sba
-	true,       // block_fw
+private:
+	aperture_info	&fInfo;
 };
 
+typedef OpenHashTable<MemoryHashDefinition> MemoryHashTable;
 
-status_t init(void)
+struct agp_device_info {
+	uint8		address;	/* location of AGP interface in PCI capabilities */
+	agp_info	info;
+};
+
+class Aperture : public HashTableLink<Aperture> {
+public:
+	Aperture(agp_gart_bus_module_info *module, void *aperture);
+	~Aperture();
+
+	status_t InitCheck() const { return fLock.sem >= B_OK ? B_OK : fLock.sem; }
+
+	void DeleteMemory(aperture_memory *memory);
+	aperture_memory *CreateMemory(size_t size, size_t alignment, uint32 flags);
+
+	status_t AllocateMemory(aperture_memory *memory, uint32 flags);
+
+	status_t UnbindMemory(aperture_memory *memory);
+	status_t BindMemory(aperture_memory *memory, addr_t base, size_t size,
+		bool physical);
+
+	status_t GetInfo(aperture_info *info);
+
+	aperture_memory *GetMemory(addr_t base) { return fHashTable.Lookup(base); }
+
+	addr_t Base() const { return fInfo.base; }
+	addr_t Size() const { return fInfo.size; }
+	int32 ID() const { return fID; }
+	struct lock &Lock() { return fLock; }
+
+private:
+	void _Free(aperture_memory *memory);
+
+	void _Remove(aperture_memory *memory);
+	status_t _Insert(aperture_memory *memory, size_t size, size_t alignment,
+		uint32 flags);
+
+	struct lock					fLock;
+	agp_gart_bus_module_info	*fModule;
+	int32						fID;
+	aperture_info				fInfo;
+	MemoryHashTable				fHashTable;
+	aperture_memory				*fFirstMemory;
+	void						*fPrivateAperture;
+};
+
+class ApertureHashDefinition {
+public:
+	typedef int32 KeyType;
+	typedef Aperture ValueType;
+
+	size_t HashKey(const KeyType &id) const
+		{ return id; }
+	size_t Hash(Aperture *aperture) const
+		{ return aperture->ID(); }
+	bool Compare(const KeyType &id, Aperture *aperture) const
+		{ return id == aperture->ID(); }
+	HashTableLink<Aperture> *GetLink(Aperture *aperture) const
+		{ return aperture; }
+};
+
+typedef OpenHashTable<ApertureHashDefinition> ApertureHashTable;
+
+
+static agp_device_info sDeviceInfos[MAX_DEVICES];
+static uint32 sDeviceCount;
+static pci_module_info *sPCI;
+static int32 sAcquired;
+static ApertureHashTable sApertureHashTable;
+static int32 sNextApertureID;
+static struct lock sLock;
+
+
+//	#pragma mark - private support functions
+
+
+/*!	Makes sure that all bits lower than the maximum supported rate is set. */
+static uint32
+fix_rate_support(uint32 command)
 {
-	/* get a handle for the pci bus */
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
-		return B_ERROR;
+	if ((command & AGP_3_MODE) != 0) {
+		if ((command & AGP_3_8x) != 0)
+			command |= AGP_3_4x;
 
-	/* private data */
-	pd = (DeviceData *)calloc(1, sizeof(DeviceData));
-	if (!pd)
-	{
-		put_module(B_PCI_MODULE_NAME);
-		return B_ERROR;
-	}
-	/* initialize the benaphore */
-	INIT_BEN(pd->kernel);
-
-	/* find all of our supported devices, if any */
-	if (probe_devices() != B_OK)
-	{
-		/* free the driver data */
-		DELETE_BEN(pd->kernel);
-		free(pd);
-		pd = NULL;
-
-		put_module(B_PCI_MODULE_NAME);
-		return B_ERROR;
+		command &= ~AGP_RATE_MASK | AGP_3_8x | AGP_3_4x;
+		command |= AGP_SBA;
+			// SBA is required for AGP3
+	} else {
+		/* AGP 2.0 scheme applies */
+		if ((command & AGP_2_4x) != 0)
+			command |= AGP_2_2x;
+		if ((command & AGP_2_2x) != 0)
+			command |= AGP_2_1x;
 	}
 
-	/* parse settings file if there */
-	read_settings();
+	return command;
+}
+
+
+/*!	Makes sure that only the highest rate bit is set. */
+static uint32
+fix_rate_command(uint32 command)
+{
+	if ((command & AGP_3_MODE) != 0) {
+		if ((command & AGP_3_8x) != 0)
+			command &= ~AGP_3_4x;
+	} else {
+		/* AGP 2.0 scheme applies */
+		if ((command & AGP_2_4x) != 0)
+			command &= ~(AGP_2_2x | AGP_2_1x);
+		if ((command & AGP_2_2x) != 0)
+			command &= ~AGP_2_1x;
+	}
+
+	return command;
+}
+
+
+/*!	Checks the capabilities of the device, and removes everything from
+	\a command that the device does not support.
+*/
+static void
+check_capabilities(agp_device_info &deviceInfo, uint32 &command)
+{
+	uint32 agpStatus = deviceInfo.info.interface.status;
+	if (deviceInfo.info.class_base == PCI_bridge) {
+		// make sure the AGP rate support mask is correct
+		// (ie. has the lower bits set)
+		agpStatus = fix_rate_support(agpStatus);
+	}
+
+	// block non-supported AGP modes
+	command &= (agpStatus & (AGP_3_MODE | AGP_RATE_MASK))
+		| ~(AGP_3_MODE | AGP_RATE_MASK);
+
+	// If no AGP mode is supported at all, nothing remains:
+	// devices exist that have the AGP style connector with AGP style registers,
+	// but not the features!
+	// (confirmed Matrox Millenium II AGP for instance)
+	if ((agpStatus & AGP_RATE_MASK) == 0)
+		command = 0;
+
+	// block side band adressing if not supported
+	if ((agpStatus & AGP_SBA) == 0)
+		command &= ~AGP_SBA;
+
+	// block fast writes if not supported
+	if ((agpStatus & AGP_FAST_WRITE) == 0)
+		command &= ~AGP_FAST_WRITE;
+
+	// adjust maximum request depth to least depth supported
+	// note: this is writable only in the graphics card
+	uint8 requestDepth = ((agpStatus & AGP_REQUEST) >> AGP_REQUEST_SHIFT);
+	if (requestDepth < ((command & AGP_REQUEST) >> AGP_REQUEST_SHIFT)) {
+		command &= ~AGP_REQUEST;
+		command |= (requestDepth << AGP_REQUEST_SHIFT);
+	}
+}
+
+
+/*!	Checks the PCI capabilities if the device is an AGP device
+*/
+static bool
+is_agp_device(pci_info &info, uint8 *_address)
+{
+	// Check if device implements a list of capabilities
+	if ((get_pci_config(info, PCI_status, 2) & PCI_status_capabilities) == 0)
+		return false;
+
+	// Get pointer to PCI capabilities list
+	// (AGP devices only, no need to take cardbus into account)
+	uint8 address = get_pci_config(info, PCI_capabilities_ptr, 1);
+
+	while (true) {
+		uint8 id = get_pci_config(info, address, 1);
+		uint8 next = get_pci_config(info, address + 1, 1) & ~0x3;
+
+		if (id == PCI_cap_id_agp) {
+			// is an AGP device
+			if (_address != NULL)
+				*_address = address;
+			return true;
+		}
+		if (next == 0) {
+			// end of list
+			break;
+		}
+
+		address = next;
+	}
+
+	return false;
+}
+
+
+static status_t
+get_next_agp_device(uint32 *_cookie, pci_info &info, agp_device_info &device)
+{
+	uint32 index = *_cookie;
+
+	// find devices
+
+	for (; sPCI->get_nth_pci_info(index, &info) == B_OK; index++) {
+		// is it a bridge or a graphics card?
+		if ((info.class_base != PCI_bridge || info.class_sub != PCI_host)
+			&& info.class_base != PCI_display)
+			continue;
+
+		if (is_agp_device(info, &device.address)) {
+			device.info.vendor_id = info.vendor_id;
+			device.info.device_id = info.device_id;
+			device.info.bus = info.bus;
+			device.info.device = info.device;
+			device.info.function = info.function;
+			device.info.class_sub = info.class_sub;
+			device.info.class_base = info.class_base;
+
+			/* get the contents of the AGP registers from this device */
+			device.info.interface.capability_id = get_pci_config(info,
+				AGP_ID(device.address), 4);
+			device.info.interface.status = get_pci_config(info,
+				AGP_STATUS(device.address), 4);
+			device.info.interface.command = get_pci_config(info,
+				AGP_COMMAND(device.address), 4);
+
+			*_cookie = index + 1;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static void
+set_agp_command(agp_device_info &deviceInfo, uint32 command)
+{
+	set_pci_config(deviceInfo.info, AGP_COMMAND(deviceInfo.address), 4, command);
+	deviceInfo.info.interface.command = get_pci_config(deviceInfo.info,
+		AGP_COMMAND(deviceInfo.address), 4);
+}
+
+
+static void
+set_pci_mode()
+{
+	// First program all graphics cards
+
+	for (uint32 index = 0; index < sDeviceCount; index++) {
+		agp_device_info &deviceInfo = sDeviceInfos[index];
+		if (deviceInfo.info.class_base != PCI_display)
+			continue;
+
+		set_agp_command(deviceInfo, 0);
+	}
+
+	// Then program all bridges - it's the other around for AGP mode
+
+	for (uint32 index = 0; index < sDeviceCount; index++) {
+		agp_device_info &deviceInfo = sDeviceInfos[index];
+		if (deviceInfo.info.class_base != PCI_bridge)
+			continue;
+
+		set_agp_command(deviceInfo, 0);
+	}
+
+	// Wait 10mS for the bridges to recover (failsafe!)
+	// Note: some SiS bridge chipsets apparantly require 5mS to recover
+	// or the master (graphics card) cannot be initialized correctly!
+	snooze(10000);
+}
+
+
+Aperture *
+get_aperture(aperture_id id)
+{
+	Autolock _(sLock);
+	return sApertureHashTable.Lookup(id);
+}
+
+
+//	#pragma mark - Aperture
+
+
+Aperture::Aperture(agp_gart_bus_module_info *module, void *aperture)
+	:
+	fModule(module),
+	fHashTable(fInfo),
+	fPrivateAperture(aperture)
+{
+	fModule->get_aperture_info(fPrivateAperture, &fInfo);
+	fID = atomic_add(&sNextApertureID, 1);
+	init_lock(&fLock, "aperture");
+}
+
+
+Aperture::~Aperture()
+{
+	fModule->delete_aperture(fPrivateAperture);
+	put_module(fModule->info.name);
+}
+
+
+status_t
+Aperture::GetInfo(aperture_info *info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	*info = fInfo;
+	return B_OK;
+}
+
+
+void
+Aperture::DeleteMemory(aperture_memory *memory)
+{
+	UnbindMemory(memory);
+	_Free(memory);
+	_Remove(memory);
+	fHashTable.Remove(memory);
+	delete memory;
+}
+
+
+aperture_memory *
+Aperture::CreateMemory(size_t size, size_t alignment, uint32 flags)
+{
+	aperture_memory *memory = new(std::nothrow) aperture_memory;
+	if (memory == NULL)
+		return NULL;
+
+	status_t status = _Insert(memory, size, alignment, flags);
+	if (status < B_OK) {
+		// did not find a free space large for this memory object
+		delete memory;
+		return NULL;
+	}
+
+	memory->flags = flags;
+#ifdef __HAIKU__
+	memory->pages = NULL;
+#else
+	memory->area = -1;
+#endif
+
+	fHashTable.Insert(memory);
+	return memory;
+}
+
+
+status_t
+Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
+{
+	// We don't need to allocate stolen memory - it's
+	// already there for us to use
+	addr_t reservedEnd = fInfo.base + fInfo.reserved_size;
+	size_t size = memory->size;
+	if (reservedEnd > memory->base) {
+		if (reservedEnd >= memory->base + memory->size)
+			return B_OK;
+
+		memset((void *)memory->base, 0, reservedEnd - memory->base);
+			// TODO: this requires the aperture to be mapped!
+		size -= reservedEnd - memory->base;
+	}
+
+#ifdef __HAIKU__
+	uint32 count = size / B_PAGE_SIZE;
+
+	if ((flags & B_APERTURE_NEED_PHYSICAL) != 0) {
+		memory->page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, count);
+		if (memory->page == NULL)
+			return B_NO_MEMORY;
+	} else {
+		// Allocate table to hold the pages
+		memory->pages = (vm_page **)malloc(count * sizeof(vm_page *));
+		if (memory->pages == NULL)
+			return B_NO_MEMORY;
+
+		for (uint32 i = 0; i < count; i++) {
+			memory->pages[i] = vm_page_allocate_page(PAGE_STATE_CLEAR, false);
+			if (memory->pages[i] == NULL) {
+				// Free pages we already allocated
+				while (i-- > 0) {
+					vm_page_set_state(memory->pages[i], PAGE_STATE_CLEAR);
+				}
+				free(memory->pages);
+				memory->pages = NULL;
+				return B_NO_MEMORY;
+			}
+		}
+	}
+#else
+	void *address;
+	memory->area = create_area("GART memory", &address, B_ANY_KERNEL_ADDRESS,
+		size, B_FULL_LOCK | ((flags & B_APERTURE_NEED_PHYSICAL) != 0
+			? B_CONTIGUOUS : 0), 0);
+	if (memory->area < B_OK)
+		return B_NO_MEMORY;
+#endif
+
+	memory->flags |= ALLOCATED_APERTURE;
+	return B_OK;
+}
+
+
+status_t
+Aperture::UnbindMemory(aperture_memory *memory)
+{
+	if ((memory->flags & BIND_APERTURE) == 0)
+		return B_BAD_VALUE;
+
+	addr_t start = memory->base - Base();
+
+	for (addr_t offset = 0; offset < memory->size; offset += B_PAGE_SIZE) {
+		status_t status = fModule->unbind_page(fPrivateAperture, start + offset);
+		if (status < B_OK)
+			return status;
+	}
+
+	memory->flags &= ~BIND_APERTURE;
+	return B_OK;
+}
+
+
+status_t
+Aperture::BindMemory(aperture_memory *memory, addr_t base, size_t size,
+	bool physical)
+{
+	addr_t start = memory->base - Base();
+
+	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
+		status_t status;
+		addr_t address;
+
+		if (!physical) {
+			physical_entry entry;
+			address = (addr_t)entry.address;
+			status = get_memory_map((void *)(base + offset), B_PAGE_SIZE,
+				&entry, 1);
+			if (status < B_OK)
+				return status;
+		} else
+			address = base + offset;
+
+		status = fModule->bind_page(fPrivateAperture, start + offset, address);
+		if (status < B_OK)
+			return status;
+	}
+
+	memory->flags |= BIND_APERTURE;
+	return B_OK;
+}
+
+
+void
+Aperture::_Free(aperture_memory *memory)
+{
+	if ((memory->flags & ALLOCATED_APERTURE) == 0)
+		return;
+
+#ifdef __HAIKU__
+	// Remove the stolen area from the allocation
+	size_t size = memory->size;
+	addr_t reservedEnd = fInfo.base + fInfo.reserved_size;
+	if (memory->base < reservedEnd)
+		size -= reservedEnd - memory->base;
+
+	// Free previously allocated pages and page table
+	uint32 count = size / B_PAGE_SIZE;
+
+	if ((memory->flags & B_APERTURE_NEED_PHYSICAL) != 0) {
+		vm_page *page = memory->page;
+		for (uint32 i = 0; i < count; i++, page++) {
+			vm_page_set_state(page, PAGE_STATE_FREE);
+		}
+	} else {
+		for (uint32 i = 0; i < count; i++) {
+			vm_page_set_state(memory->pages[i], PAGE_STATE_FREE);
+		}
+	}
+
+	free(memory->pages);
+	memory->pages = NULL;
+#else
+	delete_area(memory->area);
+	memory->area = -1;
+#endif
+
+	memory->flags &= ~ALLOCATED_APERTURE;
+}
+
+
+void
+Aperture::_Remove(aperture_memory *memory)
+{
+	aperture_memory *current = fFirstMemory, *last = NULL;
+
+	while (current != NULL) {
+		if (memory == current) {
+			if (last != NULL) {
+				last->next = current->next;
+			} else {
+				fFirstMemory = current->next;
+			}
+			break;
+		}
+
+		last = current;
+		current = current->next;
+	}
+}
+
+
+status_t
+Aperture::_Insert(aperture_memory *memory, size_t size, size_t alignment,
+	uint32 flags)
+{
+	aperture_memory *last = NULL;
+	aperture_memory *next;
+	bool foundSpot = false;
+
+	// do some sanity checking
+	if (size == 0 || size > fInfo.size)
+		return B_BAD_VALUE;
+
+	addr_t start = fInfo.base;
+	if ((flags & (B_APERTURE_NON_RESERVED | B_APERTURE_NEED_PHYSICAL)) != 0)
+		start += fInfo.reserved_size;
+
+	start = ROUNDUP(start, alignment);
+	if (start > fInfo.base - 1 + fInfo.size || start < fInfo.base)
+		return B_NO_MEMORY;
+
+	// walk up to the spot where we should start searching
+
+	next = fFirstMemory;
+	while (next) {
+		if (next->base >= start + size) {
+			// we have a winner
+			break;
+		}
+		last = next;
+		next = next->next;
+	}
+
+	// find a big enough hole
+	if (last == NULL) {
+		// see if we can build it at the beginning of the virtual map
+		if (next == NULL || (next->base >= ROUNDUP(start, alignment) + size)) {
+			memory->base = ROUNDUP(start, alignment);
+			foundSpot = true;
+		} else {
+			last = next;
+			next = next->next;
+		}
+	}
+
+	if (!foundSpot) {
+		// keep walking
+		while (next != NULL) {
+			if (next->base >= ROUNDUP(last->base + last->size, alignment) + size) {
+				// we found a spot (it'll be filled up below)
+				break;
+			}
+			last = next;
+			next = next->next;
+		}
+
+		if ((fInfo.base + (fInfo.size - 1)) >= (ROUNDUP(last->base + last->size,
+				alignment) + (size - 1))) {
+			// got a spot
+			foundSpot = true;
+			memory->base = ROUNDUP(last->base + last->size, alignment);
+		}
+
+		if (!foundSpot)
+			return B_NO_MEMORY;
+	}
+
+	memory->size = size;
+	if (last) {
+		memory->next = last->next;
+		last->next = memory;
+	} else {
+		memory->next = fFirstMemory;
+		fFirstMemory = memory;
+	}
 
 	return B_OK;
 }
 
-static status_t probe_devices(void)
+
+//	#pragma mark - AGP module interface
+
+
+status_t
+get_nth_agp_info(uint32 index, agp_info *info)
 {
-	uint32 pci_index = 0;
-	long count = 0;
-	device_info *di = pd->di;
-	pci_info *pcii;
-	uint8 adress;
+	TRACE("get_nth_agp_info(index %lu)\n", index);
 
-	/* while there are more pci devices */
-	while ((count < MAX_DEVICES) && ((*pci_bus->get_nth_pci_info)(pci_index, &(di->pcii)) == B_NO_ERROR))
-	{
-		/* if the device is a hostbridge or a graphicscard */
-		if (((di->pcii.class_base == PCI_bridge) && (di->pcii.class_sub == PCI_host)) ||
-			 (di->pcii.class_base == PCI_display))
-		{
-			pcii = &(di->pcii);
+	if (index >= sDeviceCount)
+		return B_BAD_VALUE;
 
-			/* if the device has an AGP interface */
-			if (has_AGP_interface(pcii, &adress))
-			{
-				/* fill out the agp_info struct */
-				pd->di[count].agpi.vendor_id = di->pcii.vendor_id;
-				pd->di[count].agpi.device_id = di->pcii.device_id;
-				pd->di[count].agpi.bus = di->pcii.bus;
-				pd->di[count].agpi.device = di->pcii.device;
-				pd->di[count].agpi.function = di->pcii.function;
-				pd->di[count].agpi.class_sub = di->pcii.class_sub;
-				pd->di[count].agpi.class_base = di->pcii.class_base;
-				/* get the contents of the AGP registers from this device */
-				pd->di[count].agpi.interface.agp_cap_id = get_pci(adress, 4);
-				pd->di[count].agpi.interface.agp_stat = get_pci(adress + 4, 4);
-				pd->di[count].agpi.interface.agp_cmd = get_pci(adress + 8, 4);
+	// refresh from the contents of the AGP registers from this device
+	sDeviceInfos[index].info.interface.status = get_pci_config(
+		sDeviceInfos[index].info, AGP_STATUS(sDeviceInfos[index].address), 4);
+	sDeviceInfos[index].info.interface.command = get_pci_config(
+		sDeviceInfos[index].info, AGP_COMMAND(sDeviceInfos[index].address), 4);
 
-				/* remember the AGP interface location in this device */
-				pd->di[count].agp_adress = adress;
+	*info = sDeviceInfos[index].info;
+	return B_OK;
+}
 
-				/* set OK status */
-				pd->di[count].agpi.status = B_OK;
 
-				/* inc pointer to device info */
-				di++;
-				/* inc count */
-				count++;
-				/* break out of these while loops */
-				goto next_device;
-			}
-		}
-next_device:
-		/* next pci_info struct, please */
-		pci_index++;
-	}
-
-	/* note actual number of AGP devices found */
-	pd->count = count;
-	TRACE("agp_man: found %d AGP capable device(s)\n", (uint16)count);
-
-	/* if we didn't find any devices no AGP bus exists */
-	if (!count) return B_ERROR;
-
-	/* check if all devices are set to a compatible mode (all AGP1/2 or all AGP3 style rates scheme) */
-	if (count > 1)
-	{
-		for (count = 1; count < pd->count; count++)
-		{
-			if ((pd->di[count - 1].agpi.interface.agp_stat & AGP_rate_rev) !=
-				(pd->di[count].agpi.interface.agp_stat & AGP_rate_rev))
-			{
-				TRACE("agp_man: compatibility problem detected, aborting\n");
-				return B_ERROR;
-			}
-		}
-	}
+status_t
+acquire_agp(void)
+{
+	if (atomic_or(&sAcquired, 1) == 1)
+		return B_BUSY;
 
 	return B_OK;
 }
 
-static void read_settings(void)
+
+void
+release_agp(void)
 {
-	void *settings_handle;
-
-	settings_handle  = load_driver_settings ("agp.settings");
-	if (settings_handle != NULL) {
-		const char *item;
-		char       *end;
-		uint32      value;
-
-		item = get_driver_parameter (settings_handle, "max_speed", "0", "0");
-		value = strtoul (item, &end, 0);
-		if (*end == '\0') current_settings.max_speed = value;
-
-		current_settings.block_agp = get_driver_boolean_parameter (settings_handle, "block_agp", false, false);
-		current_settings.block_sba = get_driver_boolean_parameter (settings_handle, "block_sba", false, false);
-		current_settings.block_fw = get_driver_boolean_parameter (settings_handle, "block_fw", false, false);
-
-		unload_driver_settings (settings_handle);
-	}
+	atomic_and(&sAcquired, 0);
 }
 
-void uninit(void)
-{
-	/* free the driver data */
-	DELETE_BEN(pd->kernel);
-	free(pd);
-	pd = NULL;
 
-	/* put the pci module away */
+uint32
+set_agp_mode(uint32 command)
+{
+	TRACE("set_agp_mode(command %lx)\n", command);
+
+	if ((command & AGP_ENABLE) == 0) {
+		set_pci_mode();
+		return 0;
+	}
+
+	// Make sure we accept all modes lower than requested one and we
+	// reset reserved bits
+	command = fix_rate_support(command);
+
+	// iterate through our device list to find the common capabilities supported
+	for (uint32 index = 0; index < sDeviceCount; index++) {
+		agp_device_info &deviceInfo = sDeviceInfos[index];
+
+		// Refresh from the contents of the AGP capability registers
+		// (note: some graphics driver may have been tweaking, like nvidia)
+		deviceInfo.info.interface.status = get_pci_config(deviceInfo.info,
+			AGP_STATUS(deviceInfo.address), 4);
+
+		check_capabilities(deviceInfo, command);
+	}
+
+	command = fix_rate_command(command);
+
+	// The order of programming differs for enabling/disabling AGP mode
+	// (see AGP specification)
+
+	// First program all bridges (master)
+
+	for (uint32 index = 0; index < sDeviceCount; index++) {
+		agp_device_info &deviceInfo = sDeviceInfos[index];
+		if (deviceInfo.info.class_base != PCI_bridge)
+			continue;
+
+		set_agp_command(deviceInfo, command);
+	}
+
+	// Wait 10mS for the bridges to recover (failsafe, see set_pci_mode()!)
+	snooze(10000);
+
+	// Then all graphics cards (target)
+
+	for (uint32 index = 0; index < sDeviceCount; index++) {
+		agp_device_info &deviceInfo = sDeviceInfos[index];
+		if (deviceInfo.info.class_base != PCI_display)
+			continue;
+
+		set_agp_command(deviceInfo, command);
+	}
+
+	return command;
+}
+
+
+//	#pragma mark - GART module interface
+
+
+static aperture_id
+map_aperture(uint8 bus, uint8 device, uint8 function, size_t size,
+	addr_t *_apertureBase)
+{
+	void *iterator = open_module_list("busses/agp_gart");
+	status_t status = B_ENTRY_NOT_FOUND;
+	Aperture *aperture = NULL;
+
+	Autolock _(sLock);
+
+	while (true) {
+		char name[256];
+		size_t nameLength = sizeof(name);
+		if (read_next_module_name(iterator, name, &nameLength) != B_OK)
+			break;
+
+		agp_gart_bus_module_info *module;
+		if (get_module(name, (module_info **)&module) == B_OK) {
+			void *privateAperture;
+			status = module->create_aperture(bus, device, function, size,
+				&privateAperture);
+			if (status < B_OK) {
+				put_module(name);
+				continue;
+			}
+
+			aperture = new(std::nothrow) Aperture(module, privateAperture);
+			status = aperture->InitCheck();
+			if (status == B_OK) {
+				if (_apertureBase != NULL)
+					*_apertureBase = aperture->Base();
+
+				sApertureHashTable.Insert(aperture);
+			} else {
+				delete aperture;
+				aperture = NULL;
+			}
+			break;
+		}
+	}
+
+	close_module_list(iterator);
+	return aperture != NULL ? aperture->ID() : status;
+}
+
+
+static aperture_id
+map_custom_aperture(gart_bus_module_info *module, addr_t *_apertureBase)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+unmap_aperture(aperture_id id)
+{
+	Autolock _(sLock);
+	Aperture *aperture = sApertureHashTable.Lookup(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	sApertureHashTable.Remove(aperture);
+	delete aperture;
+	return B_OK;
+}
+
+
+static status_t
+get_aperture_info(aperture_id id, aperture_info *info)
+{
+	Aperture *aperture = get_aperture(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	Autolock _(aperture->Lock());	
+	return aperture->GetInfo(info);
+}
+
+
+static status_t
+allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
+	addr_t *_apertureBase, addr_t *_physicalBase)
+{
+	if ((flags & ~APERTURE_PUBLIC_FLAGS_MASK) != 0 || _apertureBase == NULL)
+		return B_BAD_VALUE;
+
+	Aperture *aperture = get_aperture(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	Autolock _(aperture->Lock());
+
+	size = ROUNDUP(size, B_PAGE_SIZE);
+
+	aperture_memory *memory = aperture->CreateMemory(size, alignment, flags);
+	if (memory == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = aperture->AllocateMemory(memory, flags);
+	if (status == B_OK)
+		status = aperture->BindMemory(memory, memory->base, memory->size, false);
+	if (status < B_OK) {
+		aperture->DeleteMemory(memory);
+		return status;
+	}
+
+	if (_physicalBase != NULL && (flags & B_APERTURE_NEED_PHYSICAL) != 0) {
+#ifdef __HAIKU__
+		*_physicalBase = memory->page->physical_page_number * B_PAGE_SIZE;
+#else
+		physical_entry entry;
+		status = get_memory_map((void *)memory->base, B_PAGE_SIZE, &entry, 1);
+		if (status < B_OK) {
+			aperture->DeleteMemory(memory);
+			return status;
+		}
+
+		*_physicalBase = (addr_t)entry.address;
+#endif
+	}
+
+	*_apertureBase = memory->base;
+	return B_OK;
+}
+
+
+static status_t
+deallocate_memory(aperture_id id, addr_t base)
+{
+	Aperture *aperture = get_aperture(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	Autolock _(aperture->Lock());
+	aperture_memory *memory = aperture->GetMemory(base);
+	if (memory == NULL)
+		return B_BAD_VALUE;
+
+	aperture->DeleteMemory(memory);
+	return B_OK;
+}
+
+
+static status_t
+reserve_aperture(aperture_id id, size_t size, addr_t *_apertureBase)
+{
+	Aperture *aperture = get_aperture(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	return B_ERROR;
+}
+
+
+static status_t
+unreserve_aperture(aperture_id id, addr_t apertureBase)
+{
+	Aperture *aperture = get_aperture(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	return B_ERROR;
+}
+
+
+static status_t
+bind_aperture(aperture_id id, area_id area, addr_t base, size_t size,
+	size_t alignment, bool physical, addr_t reservedBase, addr_t *_apertureBase)
+{
+	Aperture *aperture = get_aperture(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	if (size == 0 || size > aperture->Size()
+		|| (area < 0 && (base & (B_PAGE_SIZE - 1)) != 0)
+		|| (area < 0 && base == 0))
+		return B_BAD_VALUE;
+
+	size = ROUNDUP(size, B_PAGE_SIZE);
+
+	if (area >= 0) {
+		// get base and size from area
+		area_info info;
+		status_t status = get_area_info(area, &info);
+		if (status < B_OK)
+			return status;
+
+		base = (addr_t)info.address;
+		size = info.size;
+		physical = false;
+	}
+
+	Autolock _(aperture->Lock());
+	aperture_memory *memory = NULL;
+	if (reservedBase != 0) {
+		// use reserved aperture to bind the pages
+		memory = aperture->GetMemory(reservedBase);
+		if (memory == NULL)
+			return B_BAD_VALUE;
+	} else {
+		// create new memory object
+		memory = aperture->CreateMemory(size, alignment, 0);
+		if (memory == NULL)
+			return B_NO_MEMORY;
+	}
+
+	// just bind the physical pages backing the memory into the GART
+
+	status_t status = aperture->BindMemory(memory, base, size, physical);
+	if (status < B_OK) {
+		if (reservedBase < 0)
+			aperture->DeleteMemory(memory);
+
+		return status;
+	}
+
+	if (_apertureBase != NULL)
+		*_apertureBase = memory->base;
+
+	return B_OK;
+}
+
+
+static status_t
+unbind_aperture(aperture_id id, addr_t base)
+{
+	Aperture *aperture = get_aperture(id);
+	if (aperture == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	Autolock _(aperture->Lock());
+	aperture_memory *memory = aperture->GetMemory(base);
+	if (memory == NULL || (memory->flags & BIND_APERTURE) == 0)
+		return B_BAD_VALUE;
+
+	if ((memory->flags & ALLOCATED_APERTURE) != 0)
+		panic("unbind memory %lx (%p) allocated by agp_gart.", base, memory);
+
+	status_t status = aperture->UnbindMemory(memory);
+	if (status < B_OK)
+		return status;
+
+	if ((memory->flags & RESERVED_APERTURE) == 0)
+		aperture->DeleteMemory(memory);
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+static status_t
+agp_init(void)
+{
+	TRACE("bus manager init\n");
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&sPCI) != B_OK)
+		return B_ERROR;
+
+	uint32 cookie = 0;
+	sDeviceCount = 0;
+	pci_info info;
+	while (get_next_agp_device(&cookie, info, sDeviceInfos[sDeviceCount])
+			== B_OK) {
+		sDeviceCount++;
+	}
+
+	TRACE("found %ld AGP devices\n", sDeviceCount);
+
+	// Since there can be custom aperture modules (for memory management only),
+	// we always succeed if we could get the resources we need.
+
+	new(&sApertureHashTable) ApertureHashTable();
+	return init_lock(&sLock, "agp_gart");
+}
+
+
+void
+agp_uninit(void)
+{
+	TRACE("bus manager uninit\n");
+
+	ApertureHashTable::Iterator iterator = sApertureHashTable.GetIterator();
+	while (iterator.HasNext()) {
+		Aperture *aperture = iterator.Next();
+		sApertureHashTable.Remove(aperture);
+		delete aperture;
+	}
+
 	put_module(B_PCI_MODULE_NAME);
 }
 
-static bool has_AGP_interface(pci_info *pcii, uint8 *adress)
+
+static int32
+agp_std_ops(int32 op, ...)
 {
-	bool has_AGP = false;
-
-	/* check if device implements a list of capabilities */
-	/* (PCI config space 'devctrl' register) */
-	if (get_pci(PCI_status, 2) & 0x0010)
-	{
-		uint32 item;
-		uint8 item_adress;
-
-		/* get pointer to PCI capabilities list */
-		item_adress = get_pci(0x34, 1);
-		/* read first item from list */
-		item = get_pci(item_adress, 4);
-		while ((item & AGP_next_ptr) && ((item & AGP_id_mask) != AGP_id))
-		{
-			/* read next item from list */
-			item_adress = ((item & AGP_next_ptr) >> AGP_next_ptr_shift);
-			item = get_pci(item_adress, 4);
-		}
-		if ((item & AGP_id_mask) == AGP_id)
-		{
-			/* we found the AGP interface! */
-			has_AGP = true;
-			/* return the adress if the interface */
-			*adress = item_adress;
-		}
+	switch (op) {
+		case B_MODULE_INIT:
+			return agp_init();
+		case B_MODULE_UNINIT:
+			agp_uninit();
+			return B_OK;
 	}
-	return has_AGP;
+
+	return B_BAD_VALUE;
 }
 
-long get_nth_agp_info (long index, agp_info *info)
-{
-	pci_info *pcii;
 
-	TRACE("agp_man: get_nth_agp_info called with index %d\n", (uint16)index);
-
-	/* check if we have a device here */
-	if (index >= pd->count) return B_ERROR;
-
-	/* refresh from the contents of the AGP registers from this device */
-	/* (note: also get agp_stat as some graphicsdriver may have been tweaking, like nvidia) */
-	pcii = &(pd->di[index].pcii);
-	pd->di[index].agpi.interface.agp_stat = get_pci(pd->di[index].agp_adress + 4, 4);
-	pd->di[index].agpi.interface.agp_cmd = get_pci(pd->di[index].agp_adress + 8, 4);
-
-	/* return requested info */
-	*info = pd->di[index].agpi;
-
-	return B_NO_ERROR;
-}
-
-void enable_agp (uint32 *command)
-{
-	long count;
-	pci_info *pcii;
-
-	TRACE("agp_man: enable_agp called\n");
-
-	/* validate the given command: */
-	/* if we should set PCI mode, reset all options */
-	if (!(*command & AGP_enable)) *command = 0x00000000;
-	/* make sure we accept all modes lower than requested one and we reset reserved bits */
-	if (!(*command & AGP_rate_rev))
+static struct agp_gart_module_info sAGPModuleInfo = {
 	{
-		/* AGP 2.0 scheme applies */
-		if (*command & AGP_2_4x) *command |= AGP_2_2x;
-		if (*command & AGP_2_2x) *command |= AGP_2_1x;
-	}
-	else
-	{
-		/* AGP 3.0 scheme applies */
-		if (*command & AGP_3_8x) *command |= AGP_3_4x;
-		*command &= ~0x00000004;
-		/* SBA is required for AGP3 */
-		*command |= AGP_SBA;
-	}
-	/* reset all other reserved and currently unused bits */
-	*command &= ~0x00fffce0;
-	/* block features if requested by user in agp.settings file */
-	check_settings(command);
-
-	/* iterate through our device list to find the common capabilities supported */
-	for (count = 0; count < pd->count; count++)
-	{
-		pcii = &(pd->di[count].pcii);
-
-		/* refresh from the contents of the AGP capability registers */
-		/* (note: some graphicsdriver may have been tweaking, like nvidia) */
-		pd->di[count].agpi.interface.agp_stat = get_pci(pd->di[count].agp_adress + 4, 4);
-
-		check_capabilities(pd->di[count].agpi.interface.agp_stat, command);
-	}
-
-	/* select only the highest remaining possible mode-bits */
-	if (!(*command & AGP_rate_rev))
-	{
-		/* AGP 2.0 scheme applies */
-		if (*command & AGP_2_4x) *command &= ~(AGP_2_2x | AGP_2_1x);
-		if (*command & AGP_2_2x) *command &= ~AGP_2_1x;
-	}
-	else
-	{
-		/* AGP 3.0 scheme applies */
-		if (*command & AGP_3_8x) *command &= ~AGP_3_4x;
-	}
-
-	/* note:
-	 * we are not setting the enable AGP bits ourselves, as the user should have specified that
-	 * in 'command' if we should be enabling AGP mode here (otherwise we set PCI mode). */
-	/* note also:
-	 * the AGP standard defines that this bit may be written to the AGPCMD
-	 * registers simultanously with the other bits if a single 32bit write
-	 * to each register is used. */
-
-	/* the order of programming differs for enabling/disabling AGP mode (see AGP specification) */
-	if (*command & AGP_enable)
-	{
-		/* first program all bridges */
-		for (count = 0; count < pd->count; count++)
 		{
-			if (pd->di[count].agpi.class_base == PCI_bridge)
-			{
-				pcii = &(pd->di[count].pcii);
-				/* program bridge, making sure not-implemented bits are written as zeros */
-				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~(AGP_rate_rev | AGP_RQ)));
-				/* update our agp_cmd info with read back setting from register just programmed */
-				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
-			}
-		}
+			B_AGP_GART_MODULE_NAME,
+			B_KEEP_LOADED,		// Keep loaded, even if no driver requires it
+			agp_std_ops
+		},
+		NULL 					// the rescan function
+	},
+	get_nth_agp_info,
+	acquire_agp,
+	release_agp,
+	set_agp_mode,
 
-		/* wait 10mS for the bridges to recover (failsafe!) */
-		/* note:
-		 * some SiS bridge chipsets apparantly require 5mS to recover or the
-		 * master (graphics card) cannot be initialized correctly! */
-		snooze(10000);
+	map_aperture,
+	map_custom_aperture,
+	unmap_aperture,
+	get_aperture_info,
+	allocate_memory,
+	deallocate_memory,
+	reserve_aperture,
+	unreserve_aperture,
+	bind_aperture,
+	unbind_aperture,
+};
 
-		/* _now_ program all graphicscards */
-		for (count = 0; count < pd->count; count++)
-		{
-			if (pd->di[count].agpi.class_base == PCI_display)
-			{
-				pci_info *pcii = &(pd->di[count].pcii);
-				/* program graphicscard, making sure not-implemented bits are written as zeros */
-				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~AGP_rate_rev));
-				/* update our agp_cmd info with read back setting from register just programmed */
-				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
-			}
-		}
-	}
-	else
-	{
-		/* first program all graphicscards */
-		for (count = 0; count < pd->count; count++)
-		{
-			if (pd->di[count].agpi.class_base == PCI_display)
-			{
-				pci_info *pcii = &(pd->di[count].pcii);
-				/* program graphicscard, making sure not-implemented bits are written as zeros */
-				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~AGP_rate_rev));
-				/* update our agp_cmd info with read back setting from register just programmed */
-				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
-			}
-		}
-
-		/* _now_ program all bridges */
-		for (count = 0; count < pd->count; count++)
-		{
-			if (pd->di[count].agpi.class_base == PCI_bridge)
-			{
-				pcii = &(pd->di[count].pcii);
-				/* program bridge, making sure not-implemented bits are written as zeros */
-				set_pci(pd->di[count].agp_adress + 8, 4, (*command & ~(AGP_rate_rev | AGP_RQ)));
-				/* update our agp_cmd info with read back setting from register just programmed */
-				pd->di[count].agpi.interface.agp_cmd = get_pci(pd->di[count].agp_adress + 8, 4);
-			}
-		}
-
-		/* wait 10mS for the bridges to recover (failsafe!) */
-		/* note:
-		 * some SiS bridge chipsets apparantly require 5mS to recover or the
-		 * master (graphics card) cannot be initialized correctly! */
-		snooze(10000);
-	}
-}
-
-static void check_settings(uint32 *command)
-{
-	if (current_settings.block_agp)
-	{
-		TRACE("agp_man: blocking all agp modes (agp.settings)\n");
-		*command = 0x00000000;
-		return;
-	}
-	if (current_settings.max_speed != 0)
-	{
-		if (!(*command & AGP_rate_rev))
-		{
-			/* AGP 2.0 scheme applies */
-			switch (current_settings.max_speed)
-			{
-			case 8:
-				TRACE("agp_man: max AGP 8x speed allowed, using max 4x (agp.settings)\n");
-				break;
-			case 4:
-				TRACE("agp_man: max AGP 4x speed allowed (agp.settings)\n");
-				break;
-			case 2:
-				TRACE("agp_man: max AGP 2x speed allowed (agp.settings)\n");
-				*command &= ~AGP_2_4x;
-				break;
-			case 1:
-				TRACE("agp_man: max AGP 1x speed allowed (agp.settings)\n");
-				*command &= ~(AGP_2_4x | AGP_2_2x);
-				break;
-			default:
-				TRACE("agp_man: illegal max AGP speed requested, ignoring (agp.settings)\n");
-				break;
-			}
-		}
-		else
-		{
-			/* AGP 3.0 scheme applies */
-			switch (current_settings.max_speed)
-			{
-			case 8:
-				TRACE("agp_man: max AGP 8x speed allowed (agp.settings)\n");
-				break;
-			case 4:
-				TRACE("agp_man: max AGP 4x speed allowed (agp.settings)\n");
-				*command &= ~AGP_3_8x;
-				break;
-			case 2:
-				TRACE("agp_man: max AGP 2x speed allowed, forcing PCI mode (agp.settings)\n");
-				*command = 0x00000000;
-				return;
-				break;
-			case 1:
-				TRACE("agp_man: max AGP 1x speed allowed, forcing PCI mode (agp.settings)\n");
-				*command = 0x00000000;
-				return;
-				break;
-			default:
-				TRACE("agp_man: illegal max AGP speed requested, ignoring (agp.settings)\n");
-				break;
-			}
-		}
-	}
-	if (current_settings.block_sba)
-	{
-		if (!(*command & AGP_rate_rev))
-		{
-			TRACE("agp_man: blocking SBA (agp.settings)\n");
-			*command &= ~AGP_SBA;
-		}
-		else
-		{
-			TRACE("agp_man: SBA is required for AGP3, not blocking (agp.settings)\n");
-		}
-	}
-	if (current_settings.block_fw)
-	{
-		TRACE("agp_man: blocking FW (agp.settings)\n");
-		*command &= ~AGP_FW;
-	}
-}
-
-static void check_capabilities(uint32 agp_stat, uint32 *command)
-{
-	uint8 rq_depth_card, rq_depth_cmd;
-
-	/* block non-supported AGP modes */
-	if (!(agp_stat & AGP_rate_rev))
-	{
-		/* AGP 2.0 scheme applies */
-		if (!(agp_stat & AGP_2_4x)) *command &= ~AGP_2_4x;
-		if (!(agp_stat & AGP_2_2x)) *command &= ~AGP_2_2x;
-		if (!(agp_stat & AGP_2_1x)) *command &= ~AGP_2_1x;
-	}
-	else
-	{
-		/* AGP 3.0 scheme applies */
-		if (!(agp_stat & AGP_3_8x)) *command &= ~AGP_3_8x;
-		if (!(agp_stat & AGP_3_4x)) *command &= ~AGP_3_4x;
-	}
-	/* if no AGP mode is supported at all, nothing remains:
-	 * devices exist that have the AGP style 
-	 * connector with AGP style registers, but not the features!
-	 * (confirmed Matrox Millenium II AGP for instance) */
-	if (!(agp_stat & AGP_rates)) *command = 0x00000000;
-
-	/* block sideband adressing if not supported */
-	if (!(agp_stat & AGP_SBA)) *command &= ~AGP_SBA;
-
-	/* block fast writes if not supported */
-	if (!(agp_stat & AGP_FW)) *command &= ~AGP_FW;
-
-	/* adjust maximum request depth to least depth supported */
-	/* note:
-	 * this is writable only in the graphics card */
-	rq_depth_card = ((agp_stat & AGP_RQ) >> AGP_RQ_shift);
-	rq_depth_cmd = ((*command & AGP_RQ) >> AGP_RQ_shift);
-	if (rq_depth_card < rq_depth_cmd)
-	{
-		*command &= ~AGP_RQ;
-		*command |= (rq_depth_card << AGP_RQ_shift);
-	}
-}
+module_info *modules[] = {
+	(module_info *)&sAGPModuleInfo,
+	NULL
+};

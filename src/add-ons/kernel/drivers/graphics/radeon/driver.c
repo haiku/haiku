@@ -1,9 +1,7 @@
 /*
 	Copyright (c) 2002, Thomas Kurschel
-	
 
 	Part of Radeon kernel driver
-		
 	DevFS interface
 */
 
@@ -24,12 +22,12 @@
 int32	api_version = 2;
 
 
-static status_t open_hook( const char *name, uint32 flags, void **cookie );
-static status_t close_hook( void *dev );
-static status_t free_hook( void *dev );
-static status_t read_hook( void *dev, off_t pos, void *buf, size_t *len );
-static status_t write_hook( void *dev, off_t pos, const void *buf, size_t *len );
-static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len );
+static status_t open_hook(const char *name, uint32 flags, void **cookie);
+static status_t close_hook(void *dev);
+static status_t free_hook(void *dev);
+static status_t read_hook(void *dev, off_t pos, void *buf, size_t *len);
+static status_t write_hook(void *dev, off_t pos, const void *buf, size_t *len);
+static status_t control_hook(void *dev, uint32 msg, void *buf, size_t len);
 
 
 static device_hooks graphics_device_hooks = {
@@ -61,10 +59,10 @@ radeon_settings def_settings = { // see comments in radeon.settings
 
 radeon_settings current_settings;
 
-static void GetDriverSettings(void)
+static void
+GetDriverSettings(void)
 {
-
-	void *settings_handle  = NULL;
+	void *settings_handle = NULL;
 
 	SHOW_FLOW0( 1, "" );
 	
@@ -129,118 +127,125 @@ static void GetDriverSettings(void)
 	}
 }
 
-// public function: check whether there is *any* supported hardware
-status_t init_hardware( void )
+
+//	#pragma mark - driver API
+
+
+status_t
+init_hardware(void)
 {
-	SHOW_INFO0( 0, RADEON_DRIVER_VERSION );
-	if( Radeon_CardDetect() == B_OK )
+	SHOW_INFO0(0, RADEON_DRIVER_VERSION);
+	if (Radeon_CardDetect() == B_OK)
 		return B_OK;
-	else
-		return B_ERROR;
+
+	return B_ERROR;
 }
 
 
-// public function: init driver
-status_t init_driver( void )
+status_t
+init_driver(void)
 {
-	SHOW_FLOW0( 3, "" );
-		
-	if( get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK )
+	SHOW_FLOW0(3, "");
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci_bus) != B_OK)
 		return B_ERROR;
 
 	/* get a handle for the agp bus if it exists */
-	get_module(B_AGP_MODULE_NAME, (module_info **)&agp_bus);
+	get_module(B_AGP_GART_MODULE_NAME, (module_info **)&sAGP);
 
 	/* driver private data */
-	devices = (radeon_devices *)calloc( 1, sizeof( radeon_devices ));
-	if( devices == NULL ) {
+	devices = (radeon_devices *)calloc(1, sizeof(radeon_devices));
+	if (devices == NULL) {
 		put_module(B_PCI_MODULE_NAME);
-		if (agp_bus != NULL)
-			put_module(B_AGP_MODULE_NAME);
+		if (sAGP != NULL)
+			put_module(B_AGP_GART_MODULE_NAME);
 		return B_ERROR;
 	}
-	
-	(void)INIT_BEN( devices->kernel, "Radeon Kernel" );
-	
+
+	(void)INIT_BEN(devices->kernel, "Radeon Kernel");
+
 	GetDriverSettings();
 	Radeon_ProbeDevices();
 	return B_OK;
 }
 
 
-// public function: uninit driver
-void uninit_driver( void )
+void
+uninit_driver(void)
 {
-	SHOW_FLOW0( 3, "" );
-	DELETE_BEN( devices->kernel );
-	
-	free( devices );
+	SHOW_FLOW0(3, "");
+	DELETE_BEN(devices->kernel);
+
+	free(devices);
 	devices = NULL;
 
-	put_module( B_PCI_MODULE_NAME );
-	/* put the agp module away if it's there */
-	if (agp_bus) 
-		put_module(B_AGP_MODULE_NAME);
+	put_module(B_PCI_MODULE_NAME);
+	if (sAGP) 
+		put_module(B_AGP_GART_MODULE_NAME);
 }
 
 
-// public function: return list of device names
-const char **publish_devices( void ) 
+const char **
+publish_devices(void)
 {
 	return (const char **)devices->device_names;
 }
 
 
-// public function: find hooks for specific device given its name
-device_hooks *find_device( const char *name )
+device_hooks *
+find_device(const char *name)
 {
 	uint32 index;
-	
+
 	// probably, we could always return standard hooks 
-	for( index = 0; devices->device_names[index]; ++index ) {
-		if( strcmp( name, devices->device_names[index] ) == 0 )
+	for (index = 0; devices->device_names[index]; ++index) {
+		if (strcmp(name, devices->device_names[index]) == 0)
 			return &graphics_device_hooks;
 	}
-	
+
 	return NULL;
 }
 
 
-// public function: open device
-static status_t open_hook( const char *name, uint32 flags, void **cookie ) 
+//	#pragma mark - device API
+
+
+static status_t
+open_hook(const char *name, uint32 flags, void **cookie)
 {
 	int32 index = 0;
 	device_info *di;
-	status_t	result = B_OK;
+	status_t result = B_OK;
 
 	SHOW_FLOW( 3, "name=%s, flags=%ld, cookie=0x%08lx", name, flags, (uint32)cookie );
 
 	// find device info
-	while( devices->device_names[index] && 
-		strcmp(name, devices->device_names[index] ) != 0 ) 
+	while (devices->device_names[index]
+		&& strcmp(name, devices->device_names[index]) != 0) {
 		index++;
+	}
 
-	di = &(devices->di[index/2]);
+	di = &(devices->di[index / 2]);
 
-	ACQUIRE_BEN( devices->kernel );
+	ACQUIRE_BEN(devices->kernel);
 
-	if( !di->is_open )
-		result = Radeon_FirstOpen( di );
+	if (!di->is_open)
+		result = Radeon_FirstOpen(di);
 
-	if( result == B_OK ) {
+	if (result == B_OK) {
 		di->is_open++;
 		*cookie = di;
 	}
-		
-	RELEASE_BEN( devices->kernel );
 
-	SHOW_FLOW( 3, "returning 0x%08lx", result );
+	RELEASE_BEN(devices->kernel);
+
+	SHOW_FLOW(3, "returning 0x%08lx", result);
 	return result;
 }
 
 
-// public function: read from device (denied)
-static status_t read_hook( void *dev, off_t pos, void *buf, size_t *len )
+static status_t
+read_hook(void *dev, off_t pos, void *buf, size_t *len)
 {
 	*len = 0;
 	return B_NOT_ALLOWED;
@@ -248,22 +253,23 @@ static status_t read_hook( void *dev, off_t pos, void *buf, size_t *len )
 
 
 // public function: write to device (denied)
-static status_t write_hook( void *dev, off_t pos, const void *buf, size_t *len )
+static status_t
+write_hook(void *dev, off_t pos, const void *buf, size_t *len)
 {
 	*len = 0;
 	return B_NOT_ALLOWED;
 }
 
 
-// public function: close device (ignored, wait for free_hook instead)
-static status_t close_hook( void *dev )
+static status_t
+close_hook(void *dev)
 {
 	return B_NO_ERROR;
 }
 
 
-// public function: free device
-static status_t free_hook( void *dev )
+static status_t
+free_hook(void *dev)
 {
 	device_info *di = (device_info *)dev;
 
@@ -289,8 +295,8 @@ static status_t free_hook( void *dev )
 }
 
 
-// public function: ioctl
-static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
+static status_t
+control_hook(void *dev, uint32 msg, void *buf, size_t len)
 {
 	device_info *di = (device_info *)dev;
 	status_t result = B_DEV_INVALID_IOCTL;
