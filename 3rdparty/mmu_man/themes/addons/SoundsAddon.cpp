@@ -143,8 +143,10 @@ status_t SoundsThemesAddon::ApplyTheme(BMessage &theme, uint32 flags)
 			continue;
 		if (msg.FindFloat("sounds:volume", &gain) < B_OK)
 			continue;
+#if defined(__HAIKU__) || defined(B_BEOS_VERSION_DANO)
 		if (bmfs.SetAudioGainFor(BMediaFiles::B_SOUNDS, field_name, gain) < B_OK)
 			continue;
+#endif
 	}
 
 	return B_OK;
@@ -175,8 +177,10 @@ status_t SoundsThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 		//printf("\t%s: %s\n", item.String(), path.Path());
 		if (path.Path()) {
 			msg.AddString("sounds:file", path.Path());
+#if defined(__HAIKU__) || defined(B_BEOS_VERSION_DANO)
 			if (bmfs.GetAudioGainFor(BMediaFiles::B_SOUNDS, item.String(), &gain) >= B_OK)
 				msg.AddFloat("sounds:volume", gain);
+#endif
 		}
 		sounds.AddMessage(item.String(), &msg);
 	}

@@ -3,7 +3,7 @@
  */
 
 #include <BeBuild.h>
-#ifdef B_BEOS_VERSION_DANO
+#if defined(B_BEOS_VERSION) && !defined(__HAIKU__)
 
 #include <Alert.h>
 #include <Application.h>
@@ -161,4 +161,4 @@ ThemesAddon *instanciate_themes_addon()
 	return (ThemesAddon *) new DecorThemesAddon;
 }
 
-#endif /* B_BEOS_VERSION_DANO */
+#endif /* B_BEOS_VERSION && !__HAIKU__ */

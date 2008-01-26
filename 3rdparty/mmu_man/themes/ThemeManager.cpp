@@ -192,8 +192,10 @@ status_t ThemeManager::LoadAddons()
 	ta = instanciate_themes_addon_sounds();
 	ta = instanciate_themes_addon_terminal();
 	ADDA(ta);
+#if defined(__HAIKU__) || defined(B_BEOS_VERSION_DANO)
 	ta = instanciate_themes_addon_ui_settings();
 	ADDA(ta);
+#endif
 #ifndef ZETA_ADDONS
 	ta = instanciate_themes_addon_winamp_skin();
 	ADDA(ta);

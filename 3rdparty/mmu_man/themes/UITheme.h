@@ -47,11 +47,10 @@
 		// do read settings from native storage
 #define UI_THEME_SETTINGS_RETRIEVE	0x00000004
 
-
-
-
 #define Z_THEMES_FOLDER_NAME "UIThemes"
 #define Z_THEME_FILE_NAME "Theme"
+
+/* compatibility stuff ahead */
 
 /* some field names not always defined */
 #ifndef B_BEOS_VERSION_DANO
@@ -81,5 +80,22 @@
 // broadcasted on update
 #define B_UI_SETTINGS_CHANGED '_UIC'
 #endif
+
+#ifndef __HAIKU__
+#ifndef B_BEOS_VERSION_DANO
+// R5 compatibility
+#define B_PANEL_TEXT_COLOR B_MENU_ITEM_TEXT_COLOR
+inline rgb_color make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha=255)
+{
+	rgb_color c;
+	c.red = red;
+	c.green = green;
+	c.blue = blue;
+	c.alpha = alpha;
+	return c;
+}
+#endif
+#endif
+
 
 #endif /* _Z_UI_THEME_H */

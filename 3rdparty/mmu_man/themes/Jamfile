@@ -11,8 +11,8 @@ local addonSources ;
 addonSources = 
 	BackgroundsAddon.cpp
 	BeIDEAddon.cpp
+	BeOSWindowDecorAddon.cpp
 	DanoUISettingsAddon.cpp
-	DanoWindowDecorAddon.cpp
 	DeskbarAddon.cpp
 	EddieAddon.cpp
 	HaikuUISettingsAddon.cpp
