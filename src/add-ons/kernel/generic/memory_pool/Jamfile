@@ -1,6 +1,0 @@
-SubDir HAIKU_TOP src add-ons kernel generic memory_pool ;
-
-# KernelAddon memory_pool : kernel generic :
-#	memory_pool.c
-# ;
-
