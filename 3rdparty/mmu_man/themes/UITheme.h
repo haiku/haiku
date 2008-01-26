@@ -78,6 +78,8 @@
 #define B_UI_MENU_SELECTED_BORDER_COLOR "be:c:MenSBr"
 #define B_UI_SUCCESS_COLOR "be:c:Success"
 #define B_UI_FAILURE_COLOR "be:c:Failure"
+// broadcasted on update
+#define B_UI_SETTINGS_CHANGED '_UIC'
 #endif
 
 #endif /* _Z_UI_THEME_H */

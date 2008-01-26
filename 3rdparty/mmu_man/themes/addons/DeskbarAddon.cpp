@@ -126,6 +126,9 @@ status_t DeskbarThemesAddon::MakeTheme(BMessage &theme, uint32 flags)
 	bool expanded;
 	BDeskbar db;
 
+	deskbar.RemoveName("db:location");
+	deskbar.RemoveName("db:expanded");
+
 	loc = db.Location(&expanded);
 	deskbar.AddInt32("db:location", (int32)loc);
 	deskbar.AddBool("db:expanded", expanded);

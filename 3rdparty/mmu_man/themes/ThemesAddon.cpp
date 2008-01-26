@@ -190,6 +190,10 @@ status_t ThemesAddon::CompareToCurrent(BMessage &theme)
 	BMessage current, a, b;
 	BackupCurrent(current);
 	status_t err;
+	
+	if (!MessageName())
+		return B_OK;
+	
 	err = theme.FindMessage(MessageName(), &a);
 	if (err)
 		return err;
