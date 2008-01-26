@@ -904,8 +904,10 @@ XHDIDrive::ReadBlocks(void *buffer, off_t first, int32 count)
 	/*
 	uint8 *b = (uint8 *)buffer;
 	int i = 0;
-	for (i = 0; i < 512; i+=8) {
-		TRACE(("[%ld] %02x %02x %02x %02x %02x %02x %02x %02x\n", i, b[i], b[i+1], b[i+2], b[i+3], b[i+4], b[i+5], b[i+6], b[i+7]));
+	for (i = 0; i < 512; i+=16) {
+		TRACE(("[%8Ld+%3ld] %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n", 
+			first, i, b[i], b[i+1], b[i+2], b[i+3], b[i+4], b[i+5], b[i+6], b[i+7], 
+			b[i+8], b[i+9], b[i+10], b[i+11], b[i+12], b[i+13], b[i+14], b[i+15]));
 		//break;
 	}
 	*/

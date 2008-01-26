@@ -146,7 +146,7 @@ floppy_done:
 
 load_sectors:
 	
-#if 1
+#if 0
 	/* it seems to skip 9 every 9 sectors, buggy side handling ? */
 	// Rwabs
 	//move.l		#1,-(%sp)
@@ -228,18 +228,27 @@ prg_start:
 	
 	lea		h5,%a0
 	bsr		puts
+	lea		_bs_entry,%a0
+	move.l		%a0,%d0
+	bsr		putx
 
 	// copy the rest of the prg
-	move.l		sNumSectors,%d0
-	sub.l		#1,%d0
+
+	// load counter
+	clr.l		%d0
+	move.w		sNumSectors,%d0
+	sub.w		#1,%d0
+	// load addresses
 	lea		_bs_entry,%a0
 	move.l		#ATARI_ZBEOS_BASE,%a1
+
 
 nextsect:
 	move.l		#512/4-1,%d1
 copysect_loop:
 	move.l		(%a0)+,(%a1)+
 	dbf		%d1,copysect_loop
+	bsr		putx
 	dbf		%d0,nextsect
 
 	lea		msg_j1,%a0
