@@ -305,7 +305,7 @@ intel_overlay_supported_spaces(const display_mode *mode)
 	static const uint32 kSupportedi965Spaces[] = {B_YCbCr422, 0};
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 
-	if (sharedInfo.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965))
+	if (sharedInfo.device_type == INTEL_TYPE_965)
 		return kSupportedi965Spaces;
 
 	return kSupportedSpaces;
@@ -370,7 +370,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 		return NULL;
 	}
 
-	if (sharedInfo.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+	if (sharedInfo.device_type == INTEL_TYPE_965) {
 		status = intel_allocate_memory(INTEL_i965_OVERLAY_STATE_SIZE,
 			overlay->state_handle, overlay->state_offset);
 		if (status < B_OK) {

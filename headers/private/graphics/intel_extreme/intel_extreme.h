@@ -20,17 +20,17 @@
 
 #define VENDOR_ID_INTEL			0x8086
 
-#define INTEL_TYPE_FAMILY_MASK	0x0f
-#define INTEL_TYPE_GROUP_MASK	0xf0
-#define INTEL_TYPE_7xx			0x01
-#define INTEL_TYPE_8xx			0x02
-#define INTEL_TYPE_9xx			0x04
-#define INTEL_TYPE_83x			0x10
-#define INTEL_TYPE_85x			0x20
-#define INTEL_TYPE_91x			0x10
-#define INTEL_TYPE_945			0x20
-#define INTEL_TYPE_965			0x40
-#define INTEL_TYPE_G33			0x80
+#define INTEL_TYPE_FAMILY_MASK	0xf000
+#define INTEL_TYPE_GROUP_MASK	0x0fff
+#define INTEL_TYPE_7xx			0x1000
+#define INTEL_TYPE_8xx			0x2000
+#define INTEL_TYPE_9xx			0x4000
+#define INTEL_TYPE_83x			(INTEL_TYPE_8xx | 0x0001)
+#define INTEL_TYPE_85x			(INTEL_TYPE_8xx | 0x0002)
+#define INTEL_TYPE_91x			(INTEL_TYPE_9xx | 0x0010)
+#define INTEL_TYPE_945			(INTEL_TYPE_9xx | 0x0020)
+#define INTEL_TYPE_965			(INTEL_TYPE_9xx | 0x0030)
+#define INTEL_TYPE_G33			(INTEL_TYPE_9xx | 0x0040)
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -140,8 +140,9 @@ struct intel_free_graphics_memory {
 
 // PCI bridge memory management
 #define INTEL_GRAPHICS_MEMORY_CONTROL	0x52
-#define MEMORY_MASK						0x01
-#define STOLEN_MEMORY_MASK				0x70
+#define MEMORY_CONTROL_ENABLED			0x0004
+#define MEMORY_MASK						0x0001
+#define STOLEN_MEMORY_MASK				0x0070
 #define i965_GTT_MASK					0x000e
 #define G33_GTT_MASK					0x0300
 
@@ -166,8 +167,10 @@ struct intel_free_graphics_memory {
 
 // graphics page translation table
 #define INTEL_PAGE_TABLE_CONTROL		0x02020
+#define PAGE_TABLE_ENABLED				0x00000001
 #define INTEL_PAGE_TABLE_ERROR			0x02024
 #define INTEL_HARDWARE_STATUS_PAGE		0x02080
+#define i915_GTT_BASE					0x1c
 #define i830_GTT_BASE					0x10000	// (- 0x2ffff)
 #define i830_GTT_SIZE					0x20000
 #define i965_GTT_BASE					0x80000	// (- 0xfffff)

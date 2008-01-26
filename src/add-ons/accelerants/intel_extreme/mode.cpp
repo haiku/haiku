@@ -88,7 +88,7 @@ set_i2c_signals(void* cookie, int clock, int data)
 	uint32 ioRegister = (uint32)cookie;
 	uint32 value;
 
-	if (gInfo->shared_info->device_type == (INTEL_TYPE_8xx | INTEL_TYPE_83x)) {
+	if (gInfo->shared_info->device_type == INTEL_TYPE_83x) {
 		// on these chips, the reserved values are fixed
 		value = 0;
 	} else {
@@ -130,7 +130,7 @@ set_frame_buffer_base()
 		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
 	}
 
-	if (sharedInfo.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+	if (sharedInfo.device_type == INTEL_TYPE_965) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -442,7 +442,7 @@ if (first) {
 	write32(INTEL_VGA_DISPLAY_CONTROL, VGA_DISPLAY_DISABLED);
 	read32(INTEL_VGA_DISPLAY_CONTROL);
 
-	if (gInfo->shared_info->device_type != (INTEL_TYPE_8xx | INTEL_TYPE_85x)) {
+	if (gInfo->shared_info->device_type != INTEL_TYPE_85x) {
 	}
 
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
@@ -465,7 +465,7 @@ if (first) {
 
 			pll |= DISPLAY_PLL_MODE_ANALOG;
 
-			if ((gInfo->shared_info->device_type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_965)
+			if (gInfo->shared_info->device_type == INTEL_TYPE_965)
 				pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
 		} else {
 			if (!divisors.post2_high)

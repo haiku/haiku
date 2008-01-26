@@ -12,6 +12,8 @@
 #include <KernelExport.h>
 #include <OS.h>
 
+#include <util/kernel_cpp.h>
+
 
 class AreaKeeper {
 	public:

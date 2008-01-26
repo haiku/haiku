@@ -88,7 +88,7 @@ determine_stolen_memory_size(intel_info &info)
 	size_t memorySize = 1 << 20; // 1 MB
 	size_t gttSize = 0;
 
-	if (info.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+	if (info.device_type == INTEL_TYPE_965) {
 		switch (memoryConfig & i965_GTT_MASK) {
 			case i965_GTT_128K:
 				gttSize = 128 << 10;
@@ -100,7 +100,7 @@ determine_stolen_memory_size(intel_info &info)
 				gttSize = 512 << 10;
 				break;
 		}
-	} else if (info.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_G33)) {
+	} else if (info.device_type == INTEL_TYPE_G33) {
 		switch (memoryConfig & G33_GTT_MASK) {
 			case G33_GTT_1M:
 				gttSize = 1 << 20;
@@ -113,13 +113,13 @@ determine_stolen_memory_size(intel_info &info)
 		// older models have the GTT as large as their frame buffer mapping
 		// TODO: check if the i9xx version works with the i8xx chips as well
 		size_t frameBufferSize = 0;
-		if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_8xx) {
-			if ((info.device_type & INTEL_TYPE_83x) != 0
+		if ((info.device_type & INTEL_TYPE_8xx) != 0) {
+			if (info.device_type == INTEL_TYPE_83x
 				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
 				frameBufferSize = 64 << 20;
 			else
 				frameBufferSize = 128 << 20;
-		} else if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
+		} else if ((info.device_type & INTEL_TYPE_9xx) != 0)
 			frameBufferSize = info.pci->u.h0.base_register_sizes[2];
 
 		gttSize = frameBufferSize / 1024;
@@ -127,7 +127,7 @@ determine_stolen_memory_size(intel_info &info)
 
 	// TODO: test with different models!
 
-	if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_83x)) {
+	if (info.device_type == INTEL_TYPE_83x) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
@@ -139,8 +139,8 @@ determine_stolen_memory_size(intel_info &info)
 				memorySize *= 8;
 				break;
 		}
-	} else if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_85x)
-		|| (info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
+	} else if (info.device_type == INTEL_TYPE_85x
+		|| (info.device_type & INTEL_TYPE_9xx) != 0) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -293,7 +293,7 @@ intel_extreme_init(intel_info &info)
 
 	int fbIndex = 0;
 	int mmioIndex = 1;
-	if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
+	if ((info.device_type & INTEL_TYPE_9xx) != 0) {
 		// for some reason Intel saw the need to change the order of the mappings
 		// with the introduction of the i9xx family
 		mmioIndex = 0;
@@ -376,7 +376,7 @@ intel_extreme_init(intel_info &info)
 	info.gtt_area = -1;
 
 	if ((info.device_type & INTEL_TYPE_9xx) != 0) {
-		if ((info.device_type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_965) {
+		if (info.device_type == INTEL_TYPE_965) {
 			info.gtt_base = info.registers + i965_GTT_BASE;
 			info.gtt_size = i965_GTT_SIZE;
 		} else {
@@ -468,7 +468,7 @@ intel_extreme_init(intel_info &info)
 
 	// setup overlay registers
 
-	if (info.device_type == (INTEL_TYPE_9xx | INTEL_TYPE_G33)) {
+	if (info.device_type == INTEL_TYPE_G33) {
 		if (mem_alloc(info.memory_manager, B_PAGE_SIZE, &info,
 				&info.overlay_handle, &info.overlay_offset) == B_OK) {
 			info.overlay_registers = (overlay_registers *)(info.graphics_memory

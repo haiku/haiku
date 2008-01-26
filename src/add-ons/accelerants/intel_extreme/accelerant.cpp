@@ -140,7 +140,7 @@ init_common(int device, bool isClone)
 	if (gInfo->shared_info->hardware_cursor_enabled)
 		gInfo->cursor_memory = (uint8 *)gInfo->overlay_registers + 2 * B_PAGE_SIZE;
 
-	if (gInfo->shared_info->device_type == (INTEL_TYPE_9xx | INTEL_TYPE_965)) {
+	if (gInfo->shared_info->device_type == INTEL_TYPE_965) {
 		// allocate some extra memory for the 3D context
 		intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE, gInfo->context_handle,
 			gInfo->context_offset);
@@ -302,8 +302,7 @@ intel_get_accelerant_device_info(accelerant_device_info *info)
 
 	info->version = B_ACCELERANT_VERSION;
 	strcpy(info->name,
-		(gInfo->shared_info->device_type & INTEL_TYPE_FAMILY_MASK)
-			== INTEL_TYPE_7xx
+		(gInfo->shared_info->device_type & INTEL_TYPE_7xx) != 0
 		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");
