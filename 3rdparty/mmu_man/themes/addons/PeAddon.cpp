@@ -23,7 +23,7 @@
 #include "Utils.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_pe
+#define instantiate_themes_addon instantiate_themes_addon_pe
 #endif
 
 #define A_NAME "Pe Colors"
@@ -142,7 +142,7 @@ status_t PeThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new PeThemesAddon;
 }

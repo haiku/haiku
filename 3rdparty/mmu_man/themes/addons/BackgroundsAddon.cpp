@@ -24,7 +24,7 @@
 #include "Utils.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_backgrounds
+#define instantiate_themes_addon instantiate_themes_addon_backgrounds
 #endif
 
 #define A_NAME "Backgrounds"
@@ -263,7 +263,7 @@ status_t BackgroundThemesAddon::BackupFiles(BMessage &theme, BDirectory &folder)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new BackgroundThemesAddon;
 }

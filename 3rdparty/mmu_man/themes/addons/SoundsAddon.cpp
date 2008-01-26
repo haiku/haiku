@@ -20,7 +20,7 @@
 #include "Utils.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_sounds
+#define instantiate_themes_addon instantiate_themes_addon_sounds
 #endif
 
 #define A_NAME "Sounds"
@@ -201,7 +201,7 @@ status_t SoundsThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new SoundsThemesAddon;
 }

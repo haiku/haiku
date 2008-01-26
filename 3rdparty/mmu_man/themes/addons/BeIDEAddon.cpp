@@ -23,7 +23,7 @@
 #include "Utils.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_beide
+#define instantiate_themes_addon instantiate_themes_addon_beide
 #endif
 
 #define A_NAME "BeIDE Colors"
@@ -185,7 +185,7 @@ status_t BeIDEThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new BeIDEThemesAddon;
 }

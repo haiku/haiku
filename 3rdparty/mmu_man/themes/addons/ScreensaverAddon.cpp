@@ -20,7 +20,7 @@
 #include "UITheme.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_screensaver
+#define instantiate_themes_addon instantiate_themes_addon_screensaver
 #endif
 
 #define A_NAME "Screensaver"
@@ -178,7 +178,7 @@ status_t ScreensaverThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new ScreensaverThemesAddon;
 }

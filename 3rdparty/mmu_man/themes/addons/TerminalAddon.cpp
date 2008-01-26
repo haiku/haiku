@@ -26,7 +26,7 @@
 #include "Utils.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_terminal
+#define instantiate_themes_addon instantiate_themes_addon_terminal
 #endif
 
 #define A_NAME "Terminal"
@@ -682,7 +682,7 @@ status_t TerminalThemesAddon::SaveHaikuTerminalSettings(BMessage &from)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new TerminalThemesAddon;
 }

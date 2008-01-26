@@ -24,7 +24,7 @@
 #include "UITheme.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_winamp_skin
+#define instantiate_themes_addon instantiate_themes_addon_winamp_skin
 #endif
 
 #define A_NAME "Winamp Skin"
@@ -421,7 +421,7 @@ status_t WinampSkinThemesAddon::StripPath(BString *path)
 
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new WinampSkinThemesAddon;
 }

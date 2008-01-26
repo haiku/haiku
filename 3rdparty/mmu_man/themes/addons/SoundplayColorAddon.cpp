@@ -18,7 +18,7 @@
 #include "Utils.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_soundplay
+#define instantiate_themes_addon instantiate_themes_addon_soundplay
 #endif
 
 #define A_NAME "SoundPlay Color"
@@ -128,7 +128,7 @@ status_t SoundplayThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new SoundplayThemesAddon;
 }

@@ -16,7 +16,7 @@
 #include "UITheme.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_deskbar
+#define instantiate_themes_addon instantiate_themes_addon_deskbar
 #endif
 
 #define A_NAME "Deskbar"
@@ -150,7 +150,7 @@ status_t DeskbarThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new DeskbarThemesAddon;
 }

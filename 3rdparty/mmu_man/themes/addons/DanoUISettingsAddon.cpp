@@ -20,7 +20,7 @@
 #include "UITheme.h"
 
 #ifdef SINGLE_BINARY
-#define instanciate_themes_addon instanciate_themes_addon_ui_settings
+#define instantiate_themes_addon instantiate_themes_addon_ui_settings
 #endif
 
 //#define A_NAME "UI Settings"
@@ -205,7 +205,7 @@ status_t UISettingsThemesAddon::ApplyDefaultTheme(uint32 flags)
 }
 
 
-ThemesAddon *instanciate_themes_addon()
+ThemesAddon *instantiate_themes_addon()
 {
 	return (ThemesAddon *) new UISettingsThemesAddon;
 }

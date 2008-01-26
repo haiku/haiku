@@ -95,7 +95,7 @@ status_t ThemeManager::LoadAddons()
 	int32 i;
 	status_t err;
 	image_id img;
-	ThemesAddon *(*instanciate_func)();
+	ThemesAddon *(*instantiate_func)();
 #endif
 	
 #ifndef SINGLE_BINARY
@@ -125,14 +125,14 @@ status_t ThemeManager::LoadAddons()
 				fprintf(stderr, "ThemeManager: load_add_on 0x%08lx\n", img);
 			if (img < B_OK)
 				continue;
-			err = get_image_symbol(img, "instanciate_themes_addon", 
-							B_SYMBOL_TYPE_TEXT, (void **)&instanciate_func);
+			err = get_image_symbol(img, "instantiate_themes_addon", 
+							B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func);
 			if (err)
 				fprintf(stderr, "ThemeManager: get_image_symbol 0x%08lx\n", err);
 			if (err)	continue;
-			ta = instanciate_func();
+			ta = instantiate_func();
 			if (!ta)
-				fprintf(stderr, "ThemeManager: instanciate_themes_addon returned NULL\n");
+				fprintf(stderr, "ThemeManager: instantiate_themes_addon returned NULL\n");
 			if (!ta)
 				continue;
 			ta->SetImageId(img);
@@ -171,36 +171,36 @@ status_t ThemeManager::LoadAddons()
 	}
 
 
-	ta = instanciate_themes_addon_backgrounds();
+	ta = instantiate_themes_addon_backgrounds();
 	ADDA(ta);
-	ta = instanciate_themes_addon_beide();
+	ta = instantiate_themes_addon_beide();
 	ADDA(ta);
-	ta = instanciate_themes_addon_deskbar();
-	ADDA(ta);
-#ifndef ZETA_ADDONS
-	ta = instanciate_themes_addon_eddie();
-	ADDA(ta);
-#endif
-	ta = instanciate_themes_addon_pe();
-	ADDA(ta);
-	ta = instanciate_themes_addon_screensaver();
+	ta = instantiate_themes_addon_deskbar();
 	ADDA(ta);
 #ifndef ZETA_ADDONS
-	ta = instanciate_themes_addon_soundplay();
+	ta = instantiate_themes_addon_eddie();
 	ADDA(ta);
 #endif
-	ta = instanciate_themes_addon_sounds();
-	ta = instanciate_themes_addon_terminal();
+	ta = instantiate_themes_addon_pe();
+	ADDA(ta);
+	ta = instantiate_themes_addon_screensaver();
+	ADDA(ta);
+#ifndef ZETA_ADDONS
+	ta = instantiate_themes_addon_soundplay();
+	ADDA(ta);
+#endif
+	ta = instantiate_themes_addon_sounds();
+	ta = instantiate_themes_addon_terminal();
 	ADDA(ta);
 #if defined(__HAIKU__) || defined(B_BEOS_VERSION_DANO)
-	ta = instanciate_themes_addon_ui_settings();
+	ta = instantiate_themes_addon_ui_settings();
 	ADDA(ta);
 #endif
 #ifndef ZETA_ADDONS
-	ta = instanciate_themes_addon_winamp_skin();
+	ta = instantiate_themes_addon_winamp_skin();
 	ADDA(ta);
 #endif
-	ta = instanciate_themes_addon_window_decor();
+	ta = instantiate_themes_addon_window_decor();
 	ADDA(ta);
 #endif
 	//if (err)	return err;

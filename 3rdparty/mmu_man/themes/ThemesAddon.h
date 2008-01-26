@@ -73,21 +73,21 @@ friend class Z::ThemeManager::ThemeManager;
 } // ns ThemeManager
 } // ns Z
 
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon();
 
 #ifdef SINGLE_BINARY
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_backgrounds();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_beide();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_deskbar();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_eddie();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_pe();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_screensaver();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_soundplay();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_sounds();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_terminal();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_ui_settings();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_winamp_skin();
-extern "C" Z::ThemeManager::ThemesAddon *instanciate_themes_addon_window_decor();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_backgrounds();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_beide();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_deskbar();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_eddie();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_pe();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_screensaver();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_soundplay();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_sounds();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_terminal();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_ui_settings();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_winamp_skin();
+extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_window_decor();
 #endif
 
 /* in B_*_ADDONS_DIRECTORY */
