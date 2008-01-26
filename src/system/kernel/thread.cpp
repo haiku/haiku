@@ -1943,8 +1943,10 @@ thread_init(kernel_args *args)
 
 	// set up some debugger commands
 	add_debugger_command_etc("threads", &dump_thread_list, "List all threads",
-		"\n"
-		"Prints a list of all existing threads.\n", 0);
+		"[ <team> ]\n"
+		"Prints a list of all existing threads, or, if a team ID is given,\n"
+		"all threads of the specified team.\n"
+		"  <team>  - The ID of the team whose threads shall be listed.\n", 0);
 	add_debugger_command_etc("ready", &dump_thread_list,
 		"List all ready threads",
 		"\n"
