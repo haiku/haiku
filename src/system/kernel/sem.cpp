@@ -938,8 +938,10 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 					B_INTERRUPTED, true);
 			}
 			RELEASE_SEM_LOCK(sSems[slot]);
-			while ((thread = thread_dequeue(&wakeupQueue)) != NULL)
-				scheduler_enqueue_in_run_queue(thread);
+
+			struct thread *wakeupThread;
+			while ((wakeupThread = thread_dequeue(&wakeupQueue)) != NULL)
+				scheduler_enqueue_in_run_queue(wakeupThread);
 
 			// fall through and reschedule since another thread with a higher priority may have been woken up
 		}
