@@ -735,6 +735,16 @@ create_process_session(pid_t id)
 }
 
 
+static void
+set_team_name(struct team* team, const char* name)
+{
+	if (const char* lastSlash = strrchr(name, '/'))
+		name = lastSlash + 1;
+
+	strlcpy(team->name, name, B_OS_NAME_LENGTH);
+}
+
+
 static struct team *
 create_team_struct(const char *name, bool kernel)
 {
@@ -745,7 +755,7 @@ create_team_struct(const char *name, bool kernel)
 
 	team->next = team->siblings_next = team->children = team->parent = NULL;
 	team->id = allocate_thread_id();
-	strlcpy(team->name, name, B_OS_NAME_LENGTH);
+	set_team_name(team, name);
 	team->args[0] = '\0';
 	team->num_threads = 0;
 	team->io_context = NULL;
@@ -1296,7 +1306,7 @@ exec_team(const char *path, int32 argCount, char * const *args,
 
 	// rename the team
 
-	strlcpy(team->name, path, B_OS_NAME_LENGTH);
+	set_team_name(team, path);
 
 	// cut the path from the team name and rename the main thread, too
 	threadName = strrchr(path, '/');
