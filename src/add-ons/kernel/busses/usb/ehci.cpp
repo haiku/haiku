@@ -166,20 +166,19 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		uint32 legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
 			fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
 		if ((legacySupport & EHCI_LEGSUP_CAPID_MASK) == EHCI_LEGSUP_CAPID) {
-			if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
-				TRACE(("usb_ehci: the host controller is bios owned\n"));
-			}
+			if (legacySupport & EHCI_LEGSUP_BIOSOWNED)
+				dprintf("usb_ehci: the host controller is bios owned\n");
 
 			dprintf("usb_ehci: claiming ownership of the host controller\n");
 			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-				fPCIInfo->function, extendedCapPointer, 4, EHCI_LEGSUP_OSOWNED);
+				fPCIInfo->function, extendedCapPointer + 3, 1, 1);
 
 			for (int32 i = 0; i < 10; i++) {
 				legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
 					fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
 
 				if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
-					TRACE(("usb_ehci: controller is still bios owned, waiting\n"));
+					dprintf("usb_ehci: controller is still bios owned, waiting\n");
 					snooze(50000);
 				} else
 					break;
