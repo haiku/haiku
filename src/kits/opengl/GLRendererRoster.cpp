@@ -132,12 +132,12 @@ GLRendererRoster::CreateRenderer(const entry_ref& ref)
 	if (image < B_OK)
 		return image;
 
-	BGLRenderer *(*instanc)(BGLView *view, ulong options, BGLDispatcher *dispatcher);
+	BGLRenderer *(*instantiate_renderer)(BGLView *view, ulong options, BGLDispatcher *dispatcher);
 
-	status = get_image_symbol(image, "instanciate_gl_renderer",
-		B_SYMBOL_TYPE_TEXT, (void**)&instanc);
+	status = get_image_symbol(image, "instantiate_gl_renderer",
+		B_SYMBOL_TYPE_TEXT, (void**)&instantiate_renderer);
 	if (status == B_OK) {
-		BGLRenderer *renderer = instanc(fView, fOptions, new BGLDispatcher());
+		BGLRenderer *renderer = instantiate_renderer(fView, fOptions, new BGLDispatcher());
 		if (!renderer) {
 			unload_add_on(image);
 			return B_UNSUPPORTED;
