@@ -814,7 +814,7 @@ make_thread_unreal(int argc, char **argv)
 	int32 id = -1;
 
 	if (argc > 2) {
-		kprintf("usage: unreal [id]\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -847,7 +847,7 @@ set_thread_prio(int argc, char **argv)
 	int32 prio;
 
 	if (argc > 3 || argc < 2) {
-		kprintf("usage: priority <priority> [thread-id]\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -887,7 +887,7 @@ make_thread_suspended(int argc, char **argv)
 	int32 id;
 
 	if (argc > 2) {
-		kprintf("usage: suspend [thread-id]\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -922,7 +922,7 @@ make_thread_resumed(int argc, char **argv)
 	int32 id;
 
 	if (argc != 2) {
-		kprintf("usage: resume <thread-id>\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -957,7 +957,7 @@ drop_into_debugger(int argc, char **argv)
 	int32 id;
 
 	if (argc > 2) {
-		kprintf("usage: drop [thread-id]\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -1078,7 +1078,7 @@ dump_thread_info(int argc, char **argv)
 	bool found = false;
 
 	if (argc > 2) {
-		kprintf("usage: thread [id/address/name]\n");
+		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
@@ -1942,17 +1942,64 @@ thread_init(kernel_args *args)
 	sDeathStackSem = create_sem(sNumDeathStacks, "death stack availability");
 
 	// set up some debugger commands
-	add_debugger_command("threads", &dump_thread_list, "list all threads");
-	add_debugger_command("ready", &dump_thread_list, "list all ready threads");
-	add_debugger_command("running", &dump_thread_list, "list all running threads");
-	add_debugger_command("waiting", &dump_thread_list, "list all waiting threads (optionally for a specific semaphore)");
-	add_debugger_command("realtime", &dump_thread_list, "list all realtime threads");
-	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
-	add_debugger_command("unreal", &make_thread_unreal, "set realtime priority threads to normal priority");
-	add_debugger_command("suspend", &make_thread_suspended, "suspend a thread");
-	add_debugger_command("resume", &make_thread_resumed, "resume a thread");
-	add_debugger_command("drop", &drop_into_debugger, "drop a thread into the user-debugger");
-	add_debugger_command("priority", &set_thread_prio, "set a thread priority");
+	add_debugger_command_etc("threads", &dump_thread_list, "List all threads",
+		"\n"
+		"Prints a list of all existing threads.\n", 0);
+	add_debugger_command_etc("ready", &dump_thread_list,
+		"List all ready threads",
+		"\n"
+		"Prints a list of all threads in ready state.\n", 0);
+	add_debugger_command_etc("running", &dump_thread_list,
+		"List all running threads",
+		"\n"
+		"Prints a list of all threads in running state.\n", 0);
+	add_debugger_command_etc("waiting", &dump_thread_list,
+		"List all waiting threads (optionally for a specific semaphore)",
+		"[ <sem> ]\n"
+		"Prints a list of all threads in waiting state. If a semaphore is\n"
+		"specified, only the threads waiting on that semaphore are listed.\n"
+		"  <sem>  - ID of the semaphore.\n", 0);
+	add_debugger_command_etc("realtime", &dump_thread_list,
+		"List all realtime threads",
+		"\n"
+		"Prints a list of all threads with realtime priority.\n", 0);
+	add_debugger_command_etc("thread", &dump_thread_info,
+		"Dump info about a particular thread",
+		"[ <id> | <address> | <name> ]\n"
+		"Prints information about the specified thread. If no argument is\n"
+		"given the current thread is selected.\n"
+		"  <id>       - The ID of the thread.\n"
+		"  <address>  - The address of the thread structure.\n"
+		"  <name>     - The thread's name.\n", 0);
+	add_debugger_command_etc("unreal", &make_thread_unreal,
+		"Set realtime priority threads to normal priority",
+		"[ <id> ]\n"
+		"Sets the priority of all realtime threads or, if given, the one\n"
+		"with the specified ID to \"normal\" priority.\n"
+		"  <id>  - The ID of the thread.\n", 0);
+	add_debugger_command_etc("suspend", &make_thread_suspended,
+		"Suspend a thread",
+		"[ <id> ]\n"
+		"Suspends the thread with the given ID. If no ID argument is given\n"
+		"the current thread is selected.\n"
+		"  <id>  - The ID of the thread.\n", 0);
+	add_debugger_command_etc("resume", &make_thread_resumed, "Resume a thread",
+		"<id>\n"
+		"Resumes the specified thread, if it is currently suspended.\n"
+		"  <id>  - The ID of the thread.\n", 0);
+	add_debugger_command_etc("drop", &drop_into_debugger,
+		"Drop a thread into the userland debugger",
+		"<id>\n"
+		"Drops the specified (userland) thread into the userland debugger\n"
+		"after leaving the kernel debugger.\n"
+		"  <id>  - The ID of the thread.\n", 0);
+	add_debugger_command_etc("priority", &set_thread_prio,
+		"Set a thread's priority",
+		"<priority> [ <id> ]\n"
+		"Sets the priority of the thread with the specified ID to the given\n"
+		"priority. If no thread ID is given, the current thread is selected.\n"
+		"  <priority>  - The thread's new priority (0 - 120)\n"
+		"  <id>        - The ID of the thread.\n", 0);
 
 	return B_OK;
 }
