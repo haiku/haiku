@@ -25,11 +25,19 @@ class PartitionListRow : public BRow {
 	typedef BRow Inherited;
 public:
 								PartitionListRow(BPartition* partition);
+								PartitionListRow(partition_id id,
+									off_t offset, off_t size);
 	
 			partition_id		ID() const
 									{ return fPartitionID; }
+			off_t				Offset() const
+									{ return fOffset; }
+			off_t				Size() const
+									{ return fSize; }
 private:
 			partition_id		fPartitionID;
+			off_t				fOffset;
+			off_t				fSize;
 };
 
 
@@ -42,6 +50,12 @@ public:
 			PartitionListRow*	FindRow(partition_id id,
 									PartitionListRow* parent = NULL);
 			PartitionListRow*	AddPartition(BPartition* partition);
+			PartitionListRow*	AddSpace(partition_id parent,
+									partition_id id, off_t offset, off_t size);
+
+private:
+			int32				_InsertIndexForOffset(PartitionListRow* parent,
+									off_t offset) const;
 };
 
 

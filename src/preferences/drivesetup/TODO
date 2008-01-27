@@ -2,6 +2,9 @@
 
 * The offsets of partitions should be used to detect free space on container partition types (disks and extended partitions). Items for these free spaces should be placed into the partition list and disk view, so that they can be selected. Only if such a space item is selected should the Partition->Create menu be enabled. If the space is on a disk, the "Primary" and "Extended" items could be enabled. If the space is on an extended partition, the "Logical" item could be enabled. Maybe the Disk Device API allows to query for the ability to create either partition type on the parent device, depending on the partitioning system in use, so that DriveSetup remains neutral towards the partitioning system.
 
-* When the Partition->Create menu items are invoked on free space items, DriveSetup would show a simple panel asking for the size of the to be created partition.
+* When the Partition->Create menu items are invoked on free space items, DriveSetup would show a simple panel asking for the size of the to be created partition. The panel could display a slider as the main means to change the size, with the slider already at the maximum position. Below the slider, there could be one text field with a popup for the unit, or three text fields, one for bytes, one for megabytes and one for gigabytes.
 
 * Support of more advanced options, partiticularily the option to resize (shrink) existing partitions to free up space.
+
+* Possibly support the option to do virtual changes to the disk at a higher level. Ie, write back any changes until the user invokes a command to that effect. The drawback is that warnings become more complicated and less direct. For example, if you delete a partition, there is no warning really necessary at this point, but when you later write the changes to disk, there should be a summary of warnings for all partitions you deleted, because only at this point, they really deleted. The indirection could be confusing. On the other hand, future support to resize partitions could take a long time to execute. Then it is nice to setup a list of jobs and execute them without having to sit in front of the machine.
+
