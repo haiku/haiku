@@ -65,7 +65,8 @@ check_cpu_features()
 	fpu_emul = (uint16)(c->ivalue);
 
 #warning M68K: check for fpu in detail
-	if (fpu_type < 2 || fpu_type > 9) {
+	// CT060 seems to use 16...
+	if (fpu_type < 2 || fpu_type > 16) {
 		panic("bad fpu");
 		return EINVAL;
 	}

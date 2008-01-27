@@ -235,9 +235,15 @@ translate_color(int32 color)
 		e:	ff	ff	55		// yellow
 		f:	ff	ff	ff		// white
 	*/
-	if (color >= 0 && color < 16)
-		return color;
-	return 0;
+	// cf. http://www.fortunecity.com/skyscraper/apple/308/html/chap4.htm
+	static const char cmap[] = { 
+		15, 4, 2, 6, 1, 5, 3, 7, 
+		8, 12, 10, 14, 9, 13, 11, 0 };
+	
+	if (color < 0 && color >= 16)
+		return 0;
+	return cmap[color];
+	//return color;
 }
 
 
@@ -245,8 +251,8 @@ void
 console_set_color(int32 foreground, int32 background)
 {
 	char buff[] = "\033b \033c ";
-	buff[2] = (char)translate_color(foreground);
-	buff[5] = (char)translate_color(background);
+	buff[2] += (char)translate_color(foreground);
+	buff[5] += (char)translate_color(background);
 	sInput.WriteAt(NULL, 0LL, buff, 6);
 }
 
