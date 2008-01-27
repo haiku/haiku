@@ -886,7 +886,7 @@ printf("audio format changed, new buffer duration %Ld\n", bufferDuration);
 
 		// TODO: fix performance time update (in case no audio)
 		if (fTimeSourceLock.Lock()) {
-			audioLatency = fSoundOutput->Latency();
+			audioLatency = fSoundOutput ? fSoundOutput->Latency() : 0;
 			fTimeSourceSysTime = system_time() + audioLatency - bufferDuration;
 			fTimeSourcePerfTime = buffer->startTime;
 			fTimeSourceLock.Unlock();
@@ -895,7 +895,8 @@ printf("audio format changed, new buffer duration %Ld\n", bufferDuration);
 //			fTimeSourcePerfTime);
 
 		if (fSoundOutput) {
-			fSoundOutput->Play(buffer->buffer, buffer->sizeUsed);
+			if (fSoundOutput->InitCheck() >= B_OK)
+				fSoundOutput->Play(buffer->buffer, buffer->sizeUsed);
 			_UpdatePosition(buffer->startTime);
 		}
 
@@ -1048,6 +1049,7 @@ printf("video decode start\n");
 			fTimeSourceLock.Unlock();
 		} else {
 			// puhh...
+			return;
 		}
 
 #if 0
@@ -1220,7 +1222,8 @@ Controller::_UpdatePosition(bigtime_t position, bool isVideoPosition, bool force
 		return;
 
 	// prefer audio position over video position
-	if (isVideoPosition && fAudioSupplier)
+	if (isVideoPosition && (fAudioSupplier && fSoundOutput
+		&& fSoundOutput->InitCheck() >= B_OK))
 		return;
 
 //	BAutolock _(fTimeSourceLock);
