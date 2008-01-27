@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src preferences drivesetup ;
+SubDir HAIKU_TOP src apps drivesetup ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
