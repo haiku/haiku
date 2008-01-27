@@ -15,6 +15,7 @@
 class BBox;
 class BButton;
 class BFilePanel;
+class BMediaFile;
 class BMenuField;
 class BSlider;
 class BStringView;
