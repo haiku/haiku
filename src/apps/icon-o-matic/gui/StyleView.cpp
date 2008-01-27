@@ -80,7 +80,7 @@ StyleView::StyleView(BRect frame)
 	frame.bottom = frame.top + 15;
 
 	fStyleType = new BMenuField(frame, "style type", "Style Type",
-								menu, true);
+		menu, true);
 	AddChild(fStyleType);
 
 	float width;
@@ -109,9 +109,7 @@ StyleView::StyleView(BRect frame)
 
 #if __HAIKU__
 	fGradientType = new BMenuField("Gradient Type", menu, NULL);
-
-	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR),
-										   this);
+	fGradientControl = new GradientControl(new BMessage(MSG_SET_COLOR), this);
 
 	layout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(3), 0, 0, 4);
 	layout->AddItem(BSpaceLayoutItem::CreateHorizontalStrut(3), 0, 1, 1, 3);
@@ -130,7 +128,7 @@ StyleView::StyleView(BRect frame)
 #else // !__HAIKU__
 	frame.OffsetBy(0, fStyleType->Frame().Height() + 6);
 	fGradientType = new BMenuField(frame, "gradient type", "Gradient Type",
-								   menu, true);
+		menu, true);
 	AddChild(fGradientType);
 
 	fGradientType->MenuBar()->GetPreferredSize(&width, &height);
