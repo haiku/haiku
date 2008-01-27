@@ -108,7 +108,7 @@ class Tokenizer {
 		if (fReuseToken) {
 			fReuseToken = false;
 //printf("next token (recycled): '%s'\n", fCurrentToken.string.String());
-		return fCurrentToken;
+			return fCurrentToken;
 		}
 
 		while (*fCurrentChar != 0 && isspace(*fCurrentChar))
