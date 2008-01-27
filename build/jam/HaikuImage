@@ -47,12 +47,12 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bison bzip2 cal cat
 ;
 
 	
-BEOS_APPS = AboutSystem CodyCam DeskCalc DiskProbe CDPlayer Expander
+BEOS_APPS = AboutSystem CodyCam DeskCalc DiskProbe DriveSetup CDPlayer Expander
 	Icon-O-Matic Installer LaunchBox Magnify Mail MediaPlayer MidiPlayer
 	NetworkStatus PackageInstaller People PowerStatus ProcessController
 	ShowImage SoundRecorder StyledEdit Terminal TV Workspaces
 ;
-BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail DriveSetup
+BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
 	ScreenSaver Sounds Time VirtualMemory
 ;
@@ -209,6 +209,8 @@ AddSymlinkToHaikuImage home config be Applications
 					: /boot/beos/apps/DeskCalc : DeskCalc ;
 AddSymlinkToHaikuImage home config be Applications
 					: /boot/beos/apps/DiskProbe : DiskProbe ;
+AddSymlinkToHaikuImage home config be Applications
+					: /boot/beos/apps/DriveSetup : DriveSetup ;
 AddSymlinkToHaikuImage home config be Applications
 					: /boot/beos/apps/Icon-O-Matic : Icon-O-Matic ;
 AddSymlinkToHaikuImage home config be Applications

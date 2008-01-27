@@ -4,7 +4,6 @@ SubInclude HAIKU_TOP src preferences appearance ;
 SubInclude HAIKU_TOP src preferences backgrounds ;
 SubInclude HAIKU_TOP src preferences datatranslations ;
 SubInclude HAIKU_TOP src preferences devices ;
-SubInclude HAIKU_TOP src preferences drivesetup ;
 SubInclude HAIKU_TOP src preferences dun ;
 SubInclude HAIKU_TOP src preferences filetypes ;
 SubInclude HAIKU_TOP src preferences fonts ;

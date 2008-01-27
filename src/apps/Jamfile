@@ -10,6 +10,7 @@ SubInclude HAIKU_TOP src apps cortex ;
 SubInclude HAIKU_TOP src apps deskbar ;
 SubInclude HAIKU_TOP src apps deskcalc ;
 SubInclude HAIKU_TOP src apps diskprobe ;
+SubInclude HAIKU_TOP src apps drivesetup ;
 SubInclude HAIKU_TOP src apps expander ;
 SubInclude HAIKU_TOP src apps fontdemo ;
 SubInclude HAIKU_TOP src apps glteapot ;
