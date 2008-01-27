@@ -35,7 +35,6 @@ KernelStaticLibrary libm68k :
 	arch_elf.cpp
 	arch_exceptions.S
 	arch_int.cpp
-	arch_mmu.cpp
 	arch_platform.cpp
 	arch_real_time_clock.cpp
 	arch_smp.c

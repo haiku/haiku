@@ -277,6 +277,7 @@ static char *sM68KPlatformBuffer[sizeof(M68KAtari)];
 status_t
 arch_platform_init(struct kernel_args *kernelArgs)
 {
+#warning M68K: switch platform from kernel args
 	// only Atari supported for now
 	if (true)
 		sM68KPlatform = new(sM68KPlatformBuffer) M68KAtari;

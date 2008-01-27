@@ -181,10 +181,11 @@ arch_thread_switch_kstack_and_call(struct thread *t, addr_t newKstack,
 void
 arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 {
+#warning M68K: WRITEME
     // set the new kernel stack in the EAR register.
 	// this is used in the exception handler code to decide what kernel stack to 
 	// switch to if the exception had happened when the processor was in user mode  
-	asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KERNEL_STACK_SIZE - 8));
+	//asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KERNEL_STACK_SIZE - 8));
 
     // switch the asids if we need to
 	if (t_to->team->address_space != NULL) {

@@ -94,11 +94,13 @@ print_iframe(struct iframe *frame)
 			  frame->pc, frame->ccr);*/
 			kprintf("   pc 0x%08lx        sr 0x%04x\n",
 				frame->pc, frame->sr);
+#if 0
 	dprintf("r0-r3:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->d0, frame->d1, frame->d2, frame->d3);
 	dprintf("r4-r7:   0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->d4, frame->d5, frame->d6, frame->d7);
 	dprintf("r8-r11:  0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->a0, frame->a1, frame->a2, frame->a3);
 	dprintf("r12-r15: 0x%08lx 0x%08lx 0x%08lx 0x%08lx\n", frame->a4, frame->a5, frame->a6, frame->a7);
 	dprintf("      pc 0x%08lx         sr 0x%08lx\n", frame->pc, frame->sr);
+#endif
 }
 
 

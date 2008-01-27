@@ -26,6 +26,7 @@
 #	define TRACE(x) ;
 #endif
 
+#warning M68K: WRITEME
 
 status_t 
 arch_vm_init(kernel_args *args)
@@ -57,6 +58,7 @@ arch_vm_init_post_area(kernel_args *args)
 status_t
 arch_vm_init_end(kernel_args *args)
 {
+#if 0
 	TRACE(("arch_vm_init_end(): %lu virtual ranges to keep:\n",
 		args->arch_args.num_virtual_ranges_to_keep));
 	
@@ -85,6 +87,7 @@ arch_vm_init_end(kernel_args *args)
 	// Throw away any address space mappings we've inherited from the boot
 	// loader and have not yet turned into an area.
 	vm_free_unused_boot_loader_range(0, 0xffffffff - B_PAGE_SIZE + 1);
+#endif
 
 	return B_OK;
 }
