@@ -73,9 +73,12 @@ SoundOutput::Format() const
 bigtime_t
 SoundOutput::Latency()
 {
+	bigtime_t latency = 0;
+	if (InitCheck() >= B_OK)
+		latency += fSoundPlayer->Latency();
 	// Because of buffering, latency of SoundOutput is
 	// slightly higher then the BSoundPlayer latency.
-	return fSoundPlayer->Latency() + min_c(1000, fBufferDuration / 4);
+	return latency + min_c(1000, fBufferDuration / 4);
 }
 
 
@@ -99,10 +102,12 @@ SoundOutput::Play(const void *data, size_t size)
 	ASSERT(size > 0 && size <= fBufferSize);
 	acquire_sem(fBufferWriteable);
 	memcpy(fBuffer, data, size);
+
 	size_t fillsize = fBufferSize - size;
 	if (fillsize)
 		memset(fBuffer + size, 0, fillsize);
 	release_sem(fBufferReadable);
+
 	if (!fIsPlaying) {
 		fSoundPlayer->SetHasData(true);
 		fSoundPlayer->Start();
