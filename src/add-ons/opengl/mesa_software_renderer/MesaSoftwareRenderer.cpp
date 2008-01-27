@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku. All rights reserved.
+ * Copyright 2006-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -132,14 +132,16 @@ extern const char * color_space_name(color_space space);
 #include "swrast/s_spantemp.h"
 
 
-extern "C" _EXPORT BGLRenderer *
-	instantiate_gl_renderer(BGLView *view, ulong options, BGLDispatcher *dispatcher)
+extern "C" _EXPORT BGLRenderer*
+instantiate_gl_renderer(BGLView* view, ulong options,
+	BGLDispatcher* dispatcher)
 {
 	return new MesaSoftwareRenderer(view, options, dispatcher);
 }
 
 
-MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDispatcher *dispatcher)
+MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView* view, ulong options,
+		BGLDispatcher* dispatcher)
 	: BGLRenderer(view, options, dispatcher),
 	fBitmap(NULL),
 	fDirectModeEnabled(false),
@@ -177,8 +179,9 @@ MesaSoftwareRenderer::MesaSoftwareRenderer(BGLView *view, ulong options, BGLDisp
 	//fOptions = options | BGL_INDIRECT;
 	struct dd_function_table functions;
 
-	fVisual = _mesa_create_visual(rgbFlag, dblFlag, stereoFlag, red, green, blue, alpha,
-		index, depth, stencil, accum, accum, accum, alpha ? accum : 0, 1);
+	fVisual = _mesa_create_visual(rgbFlag, dblFlag, stereoFlag, red, green,
+		blue, alpha, index, depth, stencil, accum, accum, accum,
+		alpha ? accum : 0, 1);
 
 	// Initialize device driver function table
 	_mesa_init_driver_functions(&functions);
@@ -337,8 +340,9 @@ void
 MesaSoftwareRenderer::SwapBuffers(bool VSync)
 {
 	CALLED();
-	
-	
+
+	// TODO: support VSync	
+
 	if (fBitmap) {
 		if (fVisual->doubleBufferMode)
 			_mesa_notifySwapBuffers(fContext);
@@ -353,9 +357,10 @@ MesaSoftwareRenderer::SwapBuffers(bool VSync)
 			for (uint32 i = 0; i < fInfo->clip_list_count; i++) {
 				clipping_rect *clip = &fInfo->clip_list[i];
 				int32 height = clip->bottom - clip->top + 1;
-				int32 bytesWidth = (clip->right - clip->left + 1) * bytesPerPixel;
-				uint8 *p = (uint8 *)fInfo->bits + clip->top * fInfo->bytes_per_row
-					+ clip->left * bytesPerPixel;
+				int32 bytesWidth
+					= (clip->right - clip->left + 1) * bytesPerPixel;
+				uint8 *p = (uint8 *)fInfo->bits + clip->top
+					* fInfo->bytes_per_row + clip->left * bytesPerPixel;
 				uint8 *b = (uint8 *)fBitmap->Bits()
 					+ (clip->top - fInfo->window_bounds.top) * bytesPerRow
 					+ (clip->left - fInfo->window_bounds.left) * bytesPerPixel;
@@ -409,7 +414,8 @@ MesaSoftwareRenderer::CopyPixelsOut(BPoint location, BBitmap *bitmap)
 		s = (uint32 *)(ps + y * fBitmap->BytesPerRow());
 		s += (uint32) sr.left;
 
-		d = (uint32 *)(pd + (y + (uint32)(dr.top - sr.top)) * bitmap->BytesPerRow());
+		d = (uint32 *)(pd + (y + (uint32)(dr.top - sr.top))
+			* bitmap->BytesPerRow());
 		d += (uint32) dr.left;
 
 		memcpy(d, s, dr.IntegerWidth() * 4);
@@ -446,7 +452,8 @@ MesaSoftwareRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
 		s = (uint32 *)(ps + y * bitmap->BytesPerRow());
 		s += (uint32) sr.left;
 
-		d = (uint32 *)(pd + (y + (uint32)(dr.top - sr.top)) * fBitmap->BytesPerRow());
+		d = (uint32 *)(pd + (y + (uint32)(dr.top - sr.top))
+			* fBitmap->BytesPerRow());
 		d += (uint32) dr.left;
 
 		memcpy(d, s, dr.IntegerWidth() * 4);
@@ -456,11 +463,28 @@ MesaSoftwareRenderer::CopyPixelsIn(BBitmap *bitmap, BPoint location)
 
 
 void
-MesaSoftwareRenderer::Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w, GLsizei h)
+MesaSoftwareRenderer::EnableDirectMode(bool enabled)
 {
-	CALLED();
-	/* poll for window size change and realloc software Z/stencil/etc if needed */
-	_mesa_ResizeBuffersMESA();
+	fDirectModeEnabled = enabled;
+}
+
+
+void
+MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
+{
+	fInfo = info;
+}
+
+
+// #pragma mark - static
+
+
+void
+MesaSoftwareRenderer::Error(GLcontext *ctx)
+{
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+	if (mr && mr->GLView())
+		mr->GLView()->ErrorCallback((unsigned long) ctx->ErrorValue);
 }
 
 
@@ -474,23 +498,30 @@ MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 			if (!buffer[0]) {
 				// Let's build an renderer string
 				// TODO: add SVN revision
-				strncat(buffer, "Haiku's Mesa " MESA_VERSION_STRING " Software Renderer", sizeof(buffer));
+				strncat(buffer, "Haiku's Mesa " MESA_VERSION_STRING
+					" Software Renderer", sizeof(buffer));
 
 				// Append any CPU-specific information.
 #ifdef USE_X86_ASM
 				if (_mesa_x86_cpu_features)
 					strncat(buffer, ", optimized for x86", sizeof(buffer));
 #ifdef USE_MMX_ASM
-				if (cpu_has_mmx)
-					strncat(buffer, (cpu_has_mmxext) ? "/MMX+" : "/MMX", sizeof(buffer));
+				if (cpu_has_mmx) {
+					strncat(buffer, (cpu_has_mmxext) ? "/MMX+" : "/MMX",
+						sizeof(buffer));
+				}
 #endif
 #ifdef USE_3DNOW_ASM
-				if (cpu_has_3dnow)
-					strncat(buffer, (cpu_has_3dnowext) ? "/3DNow!+" : "/3DNow!", sizeof(buffer));
+				if (cpu_has_3dnow) {
+					strncat(buffer, (cpu_has_3dnowext) ? "/3DNow!+" : "/3DNow!",
+						sizeof(buffer));
+				}
 #endif
 #ifdef USE_SSE_ASM
-				if (cpu_has_xmm)
-					strncat(buffer, (cpu_has_xmm2) ? "/SSE2" : "/SSE", sizeof(buffer));
+				if (cpu_has_xmm) {
+					strncat(buffer, (cpu_has_xmm2) ? "/SSE2" : "/SSE",
+						sizeof(buffer));
+				}
 #endif
 
 #elif defined(USE_SPARC_ASM)
@@ -499,8 +530,11 @@ MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 
 #elif defined(USE_PPC_ASM)
 
-				if (_mesa_ppc_cpu_features)
-					strncat(buffer, (cpu_has_64) ? ", optimized for PowerPC 64" : ", optimized for PowerPC", sizeof(buffer));
+				if (_mesa_ppc_cpu_features) {
+					strncat(buffer, (cpu_has_64) ? ", optimized for "
+						"PowerPC 64" : ", optimized for PowerPC",
+						sizeof(buffer));
+				}
 
 #ifdef USE_VMX_ASM
 				if (cpu_has_vmx)
@@ -522,11 +556,26 @@ MesaSoftwareRenderer::GetString(GLcontext *ctx, GLenum name)
 
 
 void
-MesaSoftwareRenderer::Error(GLcontext *ctx)
+MesaSoftwareRenderer::Viewport(GLcontext *ctx, GLint x, GLint y, GLsizei w,
+	GLsizei h)
 {
-	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
-	if (mr && mr->GLView())
-		mr->GLView()->ErrorCallback((unsigned long) ctx->ErrorValue);
+	CALLED();
+	// poll for window size change and realloc software Z/stencil/etc if needed
+	_mesa_ResizeBuffersMESA();
+}
+
+
+void
+MesaSoftwareRenderer::UpdateState(GLcontext *ctx, GLuint new_state)
+{
+	if (!ctx)
+		return;
+
+	CALLED();
+	_swrast_InvalidateState(ctx, new_state);
+	_swsetup_InvalidateState(ctx, new_state);
+	_vbo_InvalidateState(ctx, new_state);
+	_tnl_InvalidateState(ctx, new_state);
 }
 
 
@@ -587,7 +636,8 @@ MesaSoftwareRenderer::ClearFront(GLcontext *ctx)
 	int y = ctx->DrawBuffer->_Ymin;
 	uint32 width = ctx->DrawBuffer->_Xmax - x;
 	uint32 height = ctx->DrawBuffer->_Ymax - y;
-	GLboolean all = (width == ctx->DrawBuffer->Width && height == ctx->DrawBuffer->Height);
+	GLboolean all = (width == ctx->DrawBuffer->Width
+		&& height == ctx->DrawBuffer->Height);
 
 	if (all) {
 		const int numPixels = mr->fWidth * mr->fHeight;
@@ -611,40 +661,14 @@ MesaSoftwareRenderer::ClearFront(GLcontext *ctx)
 }
 
 
-void
-MesaSoftwareRenderer::UpdateState(GLcontext *ctx, GLuint new_state)
-{
-	if (!ctx)
-		return;
-
-	CALLED();
-	_swrast_InvalidateState(ctx, new_state);
-	_swsetup_InvalidateState(ctx, new_state);
-	_vbo_InvalidateState(ctx, new_state);
-	_tnl_InvalidateState(ctx, new_state);
-}
-
-
 GLboolean
-MesaSoftwareRenderer::RenderbufferStorage(GLcontext *ctx, struct gl_renderbuffer *render,
-	GLenum internalFormat, GLuint width, GLuint height)
+MesaSoftwareRenderer::RenderbufferStorage(GLcontext* ctx,
+	struct gl_renderbuffer* render, GLenum internalFormat,
+	GLuint width, GLuint height)
 {
 	render->Width = width;
 	render->Height = height;
 	return GL_TRUE;
 }
 
-
-void
-MesaSoftwareRenderer::EnableDirectMode(bool enabled)
-{
-	fDirectModeEnabled = enabled;
-}
-
-
-void
-MesaSoftwareRenderer::DirectConnected(direct_buffer_info *info)
-{
-	fInfo = info;
-}
 
