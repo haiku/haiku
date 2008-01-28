@@ -221,7 +221,7 @@ dump_images_list(int argc, char **argv)
 	} else
 		team = thread_get_current_thread()->team;
 
-	kprintf("Registered images of team 0x%lx\n", team->id);
+	kprintf("Registered images of team %ld\n", team->id);
 	kprintf("    ID text       size    data       size    name\n");
 
 	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
