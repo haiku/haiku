@@ -80,7 +80,7 @@ struct aperture_memory : HashTableLink<aperture_memory> {
 	addr_t		base;
 	size_t		size;
 	uint32		flags;
-#ifdef __HAIKU__
+#if defined(__HAIKU__) && !defined(GART_TEST)
 	union {
 		vm_page	**pages;
 		vm_page *page;
@@ -145,8 +145,8 @@ public:
 	struct lock &Lock() { return fLock; }
 
 private:
+	bool _AdaptToReserved(addr_t &base, size_t &size, int32 *_offset = NULL);
 	void _Free(aperture_memory *memory);
-
 	void _Remove(aperture_memory *memory);
 	status_t _Insert(aperture_memory *memory, size_t size, size_t alignment,
 		uint32 flags);
@@ -402,6 +402,7 @@ Aperture::Aperture(agp_gart_bus_module_info *module, void *aperture)
 	:
 	fModule(module),
 	fHashTable(fInfo),
+	fFirstMemory(NULL),
 	fPrivateAperture(aperture)
 {
 	fModule->get_aperture_info(fPrivateAperture, &fInfo);
@@ -412,6 +413,10 @@ Aperture::Aperture(agp_gart_bus_module_info *module, void *aperture)
 
 Aperture::~Aperture()
 {
+	while (fFirstMemory != NULL) {
+		DeleteMemory(fFirstMemory);
+	}
+
 	fModule->delete_aperture(fPrivateAperture);
 	put_module(fModule->info.name);
 }
@@ -431,6 +436,8 @@ Aperture::GetInfo(aperture_info *info)
 void
 Aperture::DeleteMemory(aperture_memory *memory)
 {
+	TRACE("delete memory %p\n", memory);
+
 	UnbindMemory(memory);
 	_Free(memory);
 	_Remove(memory);
@@ -453,8 +460,11 @@ Aperture::CreateMemory(size_t size, size_t alignment, uint32 flags)
 		return NULL;
 	}
 
+	TRACE("create memory %p, base %lx, size %lx, flags %lx\n", memory,
+		memory->base, memory->size, flags);
+
 	memory->flags = flags;
-#ifdef __HAIKU__
+#if defined(__HAIKU__) && !defined(GART_TEST)
 	memory->pages = NULL;
 #else
 	memory->area = -1;
@@ -465,23 +475,45 @@ Aperture::CreateMemory(size_t size, size_t alignment, uint32 flags)
 }
 
 
+bool
+Aperture::_AdaptToReserved(addr_t &base, size_t &size, int32 *_offset)
+{
+	addr_t reservedEnd = fInfo.base + fInfo.reserved_size;
+	if (reservedEnd <= base)
+		return false;
+
+	if (reservedEnd >= base + size) {
+		size = 0;
+		return true;
+	}
+
+	if (_offset != NULL)
+		*_offset = reservedEnd - base;
+
+	size -= reservedEnd - base;
+	base = reservedEnd;
+	return true;
+}
+
+
 status_t
 Aperture::AllocateMemory(aperture_memory *memory, uint32 flags)
 {
-	// We don't need to allocate stolen memory - it's
+	// We don't need to allocate reserved memory - it's
 	// already there for us to use
-	addr_t reservedEnd = fInfo.base + fInfo.reserved_size;
+	addr_t base = memory->base;
 	size_t size = memory->size;
-	if (reservedEnd > memory->base) {
-		if (reservedEnd >= memory->base + memory->size)
+	if (_AdaptToReserved(base, size)) {
+		if (size == 0) {
+			TRACE("allocation is made of reserved memory\n");
 			return B_OK;
+		}
 
-		memset((void *)memory->base, 0, reservedEnd - memory->base);
-			// TODO: this requires the aperture to be mapped!
-		size -= reservedEnd - memory->base;
+		memset((void *)memory->base, 0, memory->size - size);
 	}
+	TRACE("allocate %ld bytes out of %ld\n", size, memory->size);
 
-#ifdef __HAIKU__
+#if defined(__HAIKU__) && !defined(GART_TEST)
 	uint32 count = size / B_PAGE_SIZE;
 
 	if ((flags & B_APERTURE_NEED_PHYSICAL) != 0) {
@@ -527,7 +559,15 @@ Aperture::UnbindMemory(aperture_memory *memory)
 	if ((memory->flags & BIND_APERTURE) == 0)
 		return B_BAD_VALUE;
 
-	addr_t start = memory->base - Base();
+	// We must not unbind reserved memory
+	addr_t base = memory->base;
+	size_t size = memory->size;
+	if (_AdaptToReserved(base, size) && size == 0) {
+		memory->flags &= ~BIND_APERTURE;
+		return B_OK;
+	}
+
+	addr_t start = base - Base();
 
 	for (addr_t offset = 0; offset < memory->size; offset += B_PAGE_SIZE) {
 		status_t status = fModule->unbind_page(fPrivateAperture, start + offset);
@@ -536,36 +576,54 @@ Aperture::UnbindMemory(aperture_memory *memory)
 	}
 
 	memory->flags &= ~BIND_APERTURE;
+	fModule->flush_tlbs(fPrivateAperture);
 	return B_OK;
 }
 
 
 status_t
-Aperture::BindMemory(aperture_memory *memory, addr_t base, size_t size,
+Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size,
 	bool physical)
 {
-	addr_t start = memory->base - Base();
+	// We don't need to bind reserved memory
+	addr_t base = memory->base;
+	int32 offset;
+	if (_AdaptToReserved(base, size, &offset)) {
+		if (size == 0) {
+			TRACE("reserved memory already bound\n");
+			memory->flags |= BIND_APERTURE;
+			return B_OK;
+		}
+
+		address += offset;
+	}
+
+	addr_t start = base - Base();
+	TRACE("bind %ld bytes at %lx\n", size, base);
 
 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
 		status_t status;
-		addr_t address;
+		addr_t physicalAddress;
 
 		if (!physical) {
 			physical_entry entry;
-			address = (addr_t)entry.address;
-			status = get_memory_map((void *)(base + offset), B_PAGE_SIZE,
+			status = get_memory_map((void *)(address + offset), B_PAGE_SIZE,
 				&entry, 1);
 			if (status < B_OK)
 				return status;
-		} else
-			address = base + offset;
 
-		status = fModule->bind_page(fPrivateAperture, start + offset, address);
+			physicalAddress = (addr_t)entry.address;
+		} else
+			physicalAddress = address + offset;
+
+		status = fModule->bind_page(fPrivateAperture, start + offset,
+			physicalAddress);
 		if (status < B_OK)
 			return status;
 	}
 
 	memory->flags |= BIND_APERTURE;
+	fModule->flush_tlbs(fPrivateAperture);
 	return B_OK;
 }
 
@@ -576,7 +634,7 @@ Aperture::_Free(aperture_memory *memory)
 	if ((memory->flags & ALLOCATED_APERTURE) == 0)
 		return;
 
-#ifdef __HAIKU__
+#if defined(__HAIKU__) && !defined(GART_TEST)
 	// Remove the stolen area from the allocation
 	size_t size = memory->size;
 	addr_t reservedEnd = fInfo.base + fInfo.reserved_size;
@@ -641,6 +699,9 @@ Aperture::_Insert(aperture_memory *memory, size_t size, size_t alignment,
 	if (size == 0 || size > fInfo.size)
 		return B_BAD_VALUE;
 
+	if (alignment < B_PAGE_SIZE)
+		alignment = B_PAGE_SIZE;
+
 	addr_t start = fInfo.base;
 	if ((flags & (B_APERTURE_NON_RESERVED | B_APERTURE_NEED_PHYSICAL)) != 0)
 		start += fInfo.reserved_size;
@@ -689,6 +750,8 @@ Aperture::_Insert(aperture_memory *memory, size_t size, size_t alignment,
 			// got a spot
 			foundSpot = true;
 			memory->base = ROUNDUP(last->base + last->size, alignment);
+			if (memory->base < start)
+				memory->base = start;
 		}
 
 		if (!foundSpot)
@@ -898,9 +961,9 @@ allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 	if (aperture == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	Autolock _(aperture->Lock());
-
 	size = ROUNDUP(size, B_PAGE_SIZE);
+
+	Autolock _(aperture->Lock());
 
 	aperture_memory *memory = aperture->CreateMemory(size, alignment, flags);
 	if (memory == NULL)
@@ -915,7 +978,7 @@ allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 	}
 
 	if (_physicalBase != NULL && (flags & B_APERTURE_NEED_PHYSICAL) != 0) {
-#ifdef __HAIKU__
+#if defined(__HAIKU__) && !defined(GART_TEST)
 		*_physicalBase = memory->page->physical_page_number * B_PAGE_SIZE;
 #else
 		physical_entry entry;
@@ -981,12 +1044,14 @@ bind_aperture(aperture_id id, area_id area, addr_t base, size_t size,
 	if (aperture == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	if (size == 0 || size > aperture->Size()
-		|| (area < 0 && (base & (B_PAGE_SIZE - 1)) != 0)
-		|| (area < 0 && base == 0))
-		return B_BAD_VALUE;
+	if (area < 0) {
+		if (size == 0 || size > aperture->Size()
+			|| (base & (B_PAGE_SIZE - 1)) != 0
+			|| base == 0)
+			return B_BAD_VALUE;
 
-	size = ROUNDUP(size, B_PAGE_SIZE);
+		size = ROUNDUP(size, B_PAGE_SIZE);
+	}
 
 	if (area >= 0) {
 		// get base and size from area
@@ -1009,7 +1074,8 @@ bind_aperture(aperture_id id, area_id area, addr_t base, size_t size,
 			return B_BAD_VALUE;
 	} else {
 		// create new memory object
-		memory = aperture->CreateMemory(size, alignment, 0);
+		memory = aperture->CreateMemory(size, alignment,
+			B_APERTURE_NON_RESERVED);
 		if (memory == NULL)
 			return B_NO_MEMORY;
 	}
