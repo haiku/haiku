@@ -9,5 +9,5 @@ UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
 UsePrivateHeaders graphics kernel ;
 
 KernelAddon agp_gart :
-	agp.cpp
+	agp_gart.cpp
 	;
