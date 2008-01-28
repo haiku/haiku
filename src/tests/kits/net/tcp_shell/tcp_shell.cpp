@@ -313,8 +313,8 @@ socket_delete(net_socket *_socket)
 
 
 int
-socket_accept(net_socket *socket, struct sockaddr *address, socklen_t *_addressLength,
-	net_socket **_acceptedSocket)
+socket_accept(net_socket *socket, struct sockaddr *address,
+	socklen_t *_addressLength, net_socket **_acceptedSocket)
 {
 	net_socket *accepted;
 	status_t status = socket->first_info->accept(socket->first_protocol,
@@ -323,7 +323,8 @@ socket_accept(net_socket *socket, struct sockaddr *address, socklen_t *_addressL
 		return status;
 
 	if (address && *_addressLength > 0) {
-		memcpy(address, &accepted->peer, min_c(*_addressLength, accepted->peer.ss_len));
+		memcpy(address, &accepted->peer, min_c(*_addressLength,
+			accepted->peer.ss_len));
 		*_addressLength = accepted->peer.ss_len;
 	}
 
@@ -693,8 +694,9 @@ void
 close_protocol(net_protocol* protocol)
 {
 	gTCPModule->close(protocol);
-	gTCPModule->free(protocol);
-	gTCPModule->uninit_protocol(protocol);
+	if (gTCPModule->free(protocol) == B_OK)
+		gTCPModule->uninit_protocol(protocol);
+		//socket_delete(protocol->socket);
 }
 
 
@@ -1113,7 +1115,8 @@ receiving_thread(void* _data)
 
 				sSimultaneousConnect = false;
 			}
-			if (sRandomReorder > 0.0 || sReorderList.find(sPacketNumber) != sReorderList.end()
+			if ((sRandomReorder > 0.0
+					|| sReorderList.find(sPacketNumber) != sReorderList.end())
 				&& reorderBuffer == NULL
 				&& (1.0 * rand() / RAND_MAX) > sRandomReorder) {
 				reorderBuffer = buffer;
@@ -1142,8 +1145,8 @@ server_thread(void*)
 		net_socket* connectionSocket;
 		sockaddr_in address;
 		socklen_t size = sizeof(struct sockaddr_in);
-		status_t status = socket_accept(gServerSocket, (struct sockaddr *)&address,
-			&size, &connectionSocket);
+		status_t status = socket_accept(gServerSocket,
+			(struct sockaddr *)&address, &size, &connectionSocket);
 		if (status < B_OK) {
 			fprintf(stderr, "SERVER: accepting failed: %s\n", strerror(status));
 			break;
@@ -1153,11 +1156,16 @@ server_thread(void*)
 
 		char buffer[1024];
 		ssize_t bytesRead;
-		while ((bytesRead = socket_recv(connectionSocket, buffer, sizeof(buffer), 0)) >= 0) {
+		while ((bytesRead = socket_recv(connectionSocket, buffer,
+				sizeof(buffer), 0)) > 0) {
 			printf("server: received %ld bytes\n", bytesRead);
 		}
-		printf("server: receiving failed: %s\n", strerror(bytesRead));
+		if (bytesRead < 0)
+			printf("server: receiving failed: %s\n", strerror(bytesRead));
+		else
+			printf("server: peer closed connection.\n");
 
+		snooze(1000000);
 		close_protocol(connectionSocket->first_protocol);
 	}
 
@@ -1556,9 +1564,6 @@ main(int argc, char** argv)
 
 	setup_server();
 
-	gDebugOutputEnabled = false;
-		// debug output defaults to off after start
-
 	while (true) {
 		printf("> ");
 		fflush(stdout);
@@ -1603,6 +1608,8 @@ main(int argc, char** argv)
 
 	close_protocol(client);
 	close_protocol(server);
+
+	snooze(2000000);
 
 	cleanup_context(sClientContext);
 	cleanup_context(sServerContext);
