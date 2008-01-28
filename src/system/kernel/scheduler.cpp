@@ -160,17 +160,17 @@ scheduler_reschedule(void)
 	struct thread *oldThread = thread_get_current_thread();
 	struct thread *nextThread, *prevThread;
 
-	TRACE(("reschedule(): cpu %d, cur_thread = 0x%lx\n", smp_get_current_cpu(), thread_get_current_thread()->id));
+	TRACE(("reschedule(): cpu %d, cur_thread = %ld\n", smp_get_current_cpu(), thread_get_current_thread()->id));
 
 	oldThread->state = oldThread->next_state;
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
-			TRACE(("enqueueing thread 0x%lx into run q. pri = %ld\n", oldThread->id, oldThread->priority));
+			TRACE(("enqueueing thread %ld into run q. pri = %ld\n", oldThread->id, oldThread->priority));
 			scheduler_enqueue_in_run_queue(oldThread);
 			break;
 		case B_THREAD_SUSPENDED:
-			TRACE(("reschedule(): suspending thread 0x%lx\n", oldThread->id));
+			TRACE(("reschedule(): suspending thread %ld\n", oldThread->id));
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
 			// This will hopefully be eliminated once the slab
@@ -178,7 +178,7 @@ scheduler_reschedule(void)
 			thread_enqueue(oldThread, &dead_q);
 			break;
 		default:
-			TRACE(("not enqueueing thread 0x%lx into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));
+			TRACE(("not enqueueing thread %ld into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));
 			break;
 	}
 

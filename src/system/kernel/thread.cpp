@@ -251,7 +251,7 @@ create_thread_struct(struct thread *inthread, const char *name,
 	list_init(&thread->exit.waiters);
 	thread->select_infos = NULL;
 
-	sprintf(temp, "thread_%lx_retcode_sem", thread->id);
+	sprintf(temp, "thread_%ld_retcode_sem", thread->id);
 	thread->exit.sem = create_sem(0, temp);
 	if (thread->exit.sem < B_OK)
 		goto err1;
@@ -392,7 +392,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	// init debug structure
 	clear_thread_debug_info(&thread->debug_info, false);
 
-	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_kstack", name, thread->id);
+	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_kstack", name, thread->id);
 	thread->kernel_stack_area = create_area(stack_name,
 		(void **)&thread->kernel_stack_base, B_ANY_KERNEL_ADDRESS,
 		KERNEL_STACK_SIZE, B_FULL_LOCK,
@@ -491,7 +491,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		thread->user_stack_base = USER_STACK_REGION;
 		thread->user_stack_size = USER_STACK_SIZE;
 
-		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_stack", name, thread->id);
+		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_stack", name, thread->id);
 		thread->user_stack_area = create_area_etc(team, stack_name,
 				(void **)&thread->user_stack_base, B_BASE_ADDRESS,
 				thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
