@@ -214,7 +214,7 @@ dump_sem_info(int argc, char **argv)
 	} else if (num > 0) {
 		uint32 slot = num % sMaxSems;
 		if (sSems[slot].id != (int)num) {
-			kprintf("sem 0x%lx (%ld) doesn't exist!\n", num, num);
+			kprintf("sem %ld (%#lx) doesn't exist!\n", num, num);
 			return 0;
 		}
 
