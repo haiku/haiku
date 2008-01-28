@@ -38,7 +38,6 @@ typedef int socklen_t;
 #	define B_CURRENT_TEAM	0
 #endif
 
-
 #ifndef SYMLOOP_MAX
 #	define SYMLOOP_MAX	(16)
 #endif
@@ -128,9 +127,10 @@ extern float	roundf(float value);
 #endif
 
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-#ifndef B_VECTOR_ICON_TYPE
-#define B_VECTOR_ICON_TYPE 'VICN'
-#endif
+#	ifndef B_VECTOR_ICON_TYPE
+#		define B_VECTOR_ICON_TYPE 'VICN'
+#	endif
+#	define B_NOT_SUPPORTED				(B_ERROR)
 #endif
 
 #if defined(HAIKU_TARGET_PLATFORM_BONE) || defined(HAIKU_TARGET_PLATFORM_DANO)
@@ -140,8 +140,8 @@ extern float	roundf(float value);
 #endif
 
 #ifndef INT64_MAX
-#include <limits.h>
-#define INT64_MAX LONGLONG_MAX
+#	include <limits.h>
+#	define INT64_MAX LONGLONG_MAX
 #endif
 
 #define	B_MPEG_2_AUDIO_LAYER_1 (enum mpeg_id)0x201
