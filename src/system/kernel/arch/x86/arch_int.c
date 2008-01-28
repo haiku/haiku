@@ -328,7 +328,7 @@ invalid_exception(struct iframe* frame)
 {
 	struct thread* thread = thread_get_current_thread();
 	char name[32];
-	panic("unhandled trap 0x%lx (%s) at ip 0x%lx, thread 0x%lx!\n",
+	panic("unhandled trap 0x%lx (%s) at ip 0x%lx, thread %ld!\n",
 		frame->vector, exception_name(frame->vector, name, sizeof(name)),
 		frame->eip, thread ? thread->id : -1);
 }

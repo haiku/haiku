@@ -275,7 +275,7 @@ stack_trace(int argc, char **argv)
 		&oldPageDirectory);
 
 	if (thread != NULL) {
-		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id,
+		kprintf("stack trace for thread %ld \"%s\"\n", thread->id,
 			thread->name);
 
 		kprintf("    kernel stack: %p to %p\n", 
@@ -497,7 +497,7 @@ dump_iframes(int argc, char **argv)
 	}
 
 	if (thread != NULL)
-		kprintf("iframes for thread 0x%lx \"%s\"\n", thread->id, thread->name);
+		kprintf("iframes for thread %ld \"%s\"\n", thread->id, thread->name);
 
 	struct iframe* frame = find_previous_iframe(thread, x86_read_ebp());
 	while (frame != NULL) {
