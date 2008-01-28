@@ -1,0 +1,20 @@
+SubDir HAIKU_TOP src tests add-ons kernel bus_managers agp_gart ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders [ FDirName graphics intel_extreme ] ;
+UseHeaders $(HAIKU_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders graphics kernel ;
+
+SubDirCcFlags [ FDefines GART_TEST=1 ] ;
+
+SimpleTest gart_tester :
+	gart_tester.cpp
+	agp_gart.cpp
+
+	: be libkernelland_emu.so
+;
+
+SEARCH on [ FGristFiles 
+		agp_gart.cpp
+	] = [ FDirName $(HAIKU_TOP) src add-ons kernel bus_managers agp_gart ] ;
