@@ -110,11 +110,11 @@ public:
 	status_t PutModule(const char *path);
 
 	status_t GetNextLoadedModuleName(uint32 *cookie, char *buffer,
-									 size_t *bufferSize);
+		size_t *bufferSize);
 
 	module_name_list *OpenModuleList(const char *prefix);
 	status_t ReadNextModuleName(module_name_list *list, char *buffer,
-								size_t *bufferSize);
+		size_t *bufferSize);
 	status_t CloseModuleList(module_name_list *list);
 
 	status_t AddBuiltInModule(module_info *info);
@@ -124,7 +124,8 @@ public:
 
 private:
 	void _FindModules(BDirectory &dir, const char *moduleDir,
-					  module_name_list *list);
+		module_name_list *list);
+	void _FindBuiltInModules(const char *prefix, module_name_list *list);
 
 	status_t _GetAddOn(const char *path, ModuleAddOn **addon);
 	void _PutAddOn(ModuleAddOn *addon);
@@ -451,7 +452,7 @@ ModuleManager::PutModule(const char *path)
 // GetNextLoadedModuleName
 status_t
 ModuleManager::GetNextLoadedModuleName(uint32 *cookie, char *buffer,
-									   size_t *bufferSize)
+	size_t *bufferSize)
 {
 	status_t error = (cookie && buffer && bufferSize ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -478,6 +479,8 @@ ModuleManager::OpenModuleList(const char *prefix)
 	module_name_list *list = NULL;
 	if (prefix) {
 		list = new module_name_list;
+		_FindBuiltInModules(prefix, list);
+
 		for (int32 i = 0; gModuleDirs[i]; i++) {
 			BPath path;
 			BDirectory dir;
@@ -486,6 +489,7 @@ ModuleManager::OpenModuleList(const char *prefix)
 				_FindModules(dir, gModuleDirs[i], list);
 			}
 		}
+
 		list->it = list->names.begin();
 	}
 	return list;
@@ -494,7 +498,7 @@ ModuleManager::OpenModuleList(const char *prefix)
 // ReadNextModuleName
 status_t
 ModuleManager::ReadNextModuleName(module_name_list *list, char *buffer,
-								  size_t *bufferSize)
+	size_t *bufferSize)
 {
 	status_t error = (list && buffer && bufferSize ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
@@ -530,6 +534,7 @@ ModuleManager::AddBuiltInModule(module_info *info)
 {
 	BAutolock _lock(fModules);
 
+	TRACE(("add module %p, \"%s\"\n", info, info->name));
 	return fModules.AddModule(new Module(NULL, info)) ? B_OK : B_ERROR;
 }
 
@@ -596,7 +601,21 @@ ModuleManager::_FindModules(BDirectory &dir, const char *moduleDir,
 	}
 }
 
-// _GetAddOn
+
+void
+ModuleManager::_FindBuiltInModules(const char *prefix, module_name_list *list)
+{
+	uint32 count = fModules.CountModules();
+	uint32 prefixLength = strlen(prefix);
+
+	for (uint32 i = 0; i < count; i++) {
+		Module *module = fModules.ModuleAt(i);
+		if (!strncmp(module->Info()->name, prefix, prefixLength))
+			list->names.insert(module->Info()->name);
+	}
+}
+
+
 status_t
 ModuleManager::_GetAddOn(const char *name, ModuleAddOn **_addon)
 {
