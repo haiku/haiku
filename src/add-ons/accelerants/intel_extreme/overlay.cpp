@@ -18,6 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AGP.h>
+
 
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
@@ -42,8 +44,7 @@ struct phase_coefficient {
 };
 
 
-/*!
-	Splits the coefficient floating point value into the 3 components
+/*!	Splits the coefficient floating point value into the 3 components
 	sign, mantissa, and exponent.
 */
 static bool
@@ -179,8 +180,8 @@ update_coefficients(int32 taps, double filterCutOff, bool horizontal, bool isY,
 
 
 static void
-set_color_key(uint8 red, uint8 green, uint8 blue,
-	uint8 redMask, uint8 greenMask, uint8 blueMask)
+set_color_key(uint8 red, uint8 green, uint8 blue, uint8 redMask,
+	uint8 greenMask, uint8 blueMask)
 {
 	overlay_registers *registers = gInfo->overlay_registers;
 
@@ -224,7 +225,8 @@ set_color_key(const overlay_window *window)
 static void
 update_overlay(bool updateCoefficients)
 {
-	if (!gInfo->shared_info->overlay_active)
+	if (!gInfo->shared_info->overlay_active
+		|| gInfo->shared_info->device_type == INTEL_TYPE_965)
 		return;
 
 	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
@@ -245,7 +247,8 @@ update_overlay(bool updateCoefficients)
 static void
 show_overlay(void)
 {
-	if (gInfo->shared_info->overlay_active)
+	if (gInfo->shared_info->overlay_active
+		|| gInfo->shared_info->device_type == INTEL_TYPE_965)
 		return;
 
 	gInfo->shared_info->overlay_active = true;
@@ -260,7 +263,8 @@ show_overlay(void)
 static void
 hide_overlay(void)
 {
-	if (!gInfo->shared_info->overlay_active)
+	if (!gInfo->shared_info->overlay_active
+		|| gInfo->shared_info->device_type == INTEL_TYPE_965)
 		return;
 
 	overlay_registers *registers = gInfo->overlay_registers;
@@ -364,7 +368,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->bytes_per_row = (width * bytesPerPixel + 0x3f) & ~0x3f;
 
 	status_t status = intel_allocate_memory(buffer->bytes_per_row * height,
-		overlay->buffer_handle, overlay->buffer_offset);
+		0, overlay->buffer_base);
 	if (status < B_OK) {
 		free(overlay);
 		return NULL;
@@ -372,18 +376,22 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 
 	if (sharedInfo.device_type == INTEL_TYPE_965) {
 		status = intel_allocate_memory(INTEL_i965_OVERLAY_STATE_SIZE,
-			overlay->state_handle, overlay->state_offset);
+			B_APERTURE_NON_RESERVED, overlay->state_base);
 		if (status < B_OK) {
-			intel_free_memory(overlay->buffer_handle);
+			intel_free_memory(overlay->buffer_base);
 			free(overlay);
 			return NULL;
 		}
-	} else
-		overlay->state_handle = 0;
 
-	buffer->buffer = gInfo->shared_info->graphics_memory
-		+ overlay->buffer_offset;
-	buffer->buffer_dma = gInfo->shared_info->physical_graphics_memory
+		overlay->state_offset = overlay->state_base
+			- (addr_t)gInfo->shared_info->graphics_memory;
+	}
+
+	overlay->buffer_offset = overlay->buffer_base
+		- (addr_t)gInfo->shared_info->graphics_memory;
+
+	buffer->buffer = (uint8 *)overlay->buffer_base;
+	buffer->buffer_dma = (uint8 *)gInfo->shared_info->physical_graphics_memory
 		+ overlay->buffer_offset;
 
 	TRACE(("allocated overlay buffer: handle=%x, offset=%x, address=%x, "
@@ -406,8 +414,9 @@ intel_release_overlay_buffer(const overlay_buffer *buffer)
 	if (gInfo->current_overlay == overlay)
 		hide_overlay();
 
-	intel_free_memory(overlay->buffer_handle);
-	intel_free_memory(overlay->state_handle);
+	intel_free_memory(overlay->buffer_base);
+	if (gInfo->shared_info->device_type == INTEL_TYPE_965)
+		intel_free_memory(overlay->state_base);
 	free(overlay);
 
 	return B_OK;

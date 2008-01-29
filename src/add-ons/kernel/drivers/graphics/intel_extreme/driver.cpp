@@ -132,13 +132,19 @@ init_driver(void)
 		return status;
 	}
 
-	status = init_lock(&gLock, "intel extreme ksync");
-	if (status < B_OK) {
+	status = get_module(B_AGP_GART_MODULE_NAME, (module_info **)&gGART);
+	if (status != B_OK) {
+		TRACE((DEVICE_NAME ": AGP GART module unavailable\n"));
 		put_module(B_PCI_MODULE_NAME);
 		return status;
 	}
 
-	get_module(B_AGP_GART_MODULE_NAME, (module_info **)&gGART);
+	status = init_lock(&gLock, "intel extreme ksync");
+	if (status < B_OK) {
+		put_module(B_AGP_GART_MODULE_NAME);
+		put_module(B_PCI_MODULE_NAME);
+		return status;
+	}
 
 	// find devices
 
@@ -185,6 +191,7 @@ init_driver(void)
 
 		dprintf(DEVICE_NAME ": (%ld) %s, revision = 0x%x\n", found,
 			kSupportedDevices[type].name, info->revision);
+
 		found++;
 	}
 
@@ -192,8 +199,7 @@ init_driver(void)
 
 	if (found == 0) {
 		uninit_lock(&gLock);
-		if (gGART != NULL)
-			put_module(B_AGP_GART_MODULE_NAME);
+		put_module(B_AGP_GART_MODULE_NAME);
 		put_module(B_PCI_MODULE_NAME);
 		return ENODEV;
 	}
@@ -216,8 +222,7 @@ uninit_driver(void)
 		free(name);
 	}
 
-	if (gGART != NULL)
-		put_module(B_AGP_GART_MODULE_NAME);
+	put_module(B_AGP_GART_MODULE_NAME);
 	put_module(B_PCI_MODULE_NAME);
 }
 

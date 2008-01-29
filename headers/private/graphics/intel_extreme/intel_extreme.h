@@ -11,8 +11,6 @@
 
 #include "lock.h"
 
-#include <memory_manager.h>
-
 #include <Accelerant.h>
 #include <Drivers.h>
 #include <PCI.h>
@@ -46,7 +44,6 @@ struct pll_info {
 struct ring_buffer {
 	struct lock		lock;
 	uint32			register_base;
-	uint32			handle;
 	uint32			offset;
 	uint32			size;
 	uint32			position;
@@ -66,13 +63,13 @@ struct intel_shared_info {
 	uint32			dpms_mode;
 
 	area_id			registers_area;			// area of memory mapped registers
-	uint8			*physical_status_page;
-	uint8			*physical_cursor_memory;
-	area_id			graphics_memory_area;
+	uint8			*status_page;
+	addr_t			physical_status_page;
 	uint8			*graphics_memory;
-	uint8			*physical_graphics_memory;
+	addr_t			physical_graphics_memory;
 	uint32			graphics_memory_size;
 
+	addr_t			frame_buffer;
 	uint32			frame_buffer_offset;
 
 	struct lock		accelerant_lock;
@@ -84,12 +81,14 @@ struct intel_shared_info {
 	int32			overlay_channel_used;
 	bool			overlay_active;
 	uint32			overlay_token;
-	uint8*			physical_overlay_registers;
+	addr_t			physical_overlay_registers;
 	uint32			overlay_offset;
 
 	bool			hardware_cursor_enabled;
 	sem_id			vblank_sem;
 
+	uint8			*cursor_memory;
+	addr_t			physical_cursor_memory;
 	uint32			cursor_buffer_offset;
 	uint32			cursor_format;
 	bool			cursor_visible;
@@ -125,14 +124,15 @@ struct intel_get_private_data {
 struct intel_allocate_graphics_memory {
 	uint32	magic;
 	uint32	size;
-	uint32	buffer_offset;
-	uint32	handle;
+	uint32	alignment;
+	uint32	flags;
+	uint32	buffer_base;
 };
 
 // free graphics memory
 struct intel_free_graphics_memory {
 	uint32 	magic;
-	uint32	handle;
+	uint32	buffer_base;
 };
 
 //----------------------------------------------------------
@@ -539,6 +539,13 @@ struct overlay_registers {
 // i965 overlay support is currently realized using its 3D hardware
 #define INTEL_i965_OVERLAY_STATE_SIZE	36864
 #define INTEL_i965_3D_CONTEXT_SIZE		32768
+
+inline bool
+intel_uses_physical_overlay(intel_shared_info &info)
+{
+	return info.device_type != INTEL_TYPE_G33;
+}
+
 
 struct hardware_status {
 	uint32	interrupt_status_register;

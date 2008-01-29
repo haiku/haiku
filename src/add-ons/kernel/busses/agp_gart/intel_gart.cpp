@@ -127,30 +127,28 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				break;
 		}
 	} else {
-#if 0
 		// older models have the GTT as large as their frame buffer mapping
 		// TODO: check if the i9xx version works with the i8xx chips as well
 		size_t frameBufferSize = 0;
-		if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_8xx) {
-			if ((info.device_type & INTEL_TYPE_83x) != 0
+		if ((info.type & INTEL_TYPE_8xx) != 0) {
+			if (info.type == INTEL_TYPE_83x
 				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
 				frameBufferSize = 64 << 20;
 			else
 				frameBufferSize = 128 << 20;
-		} else if ((info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
-			frameBufferSize = info.pci->u.h0.base_register_sizes[2];
+		} else if ((info.type & INTEL_TYPE_9xx) != 0)
+			frameBufferSize = info.display.u.h0.base_register_sizes[2];
 
 		gttSize = frameBufferSize / 1024;
-#endif
 	}
 
-#if 0
 	// TODO: test with different models!
 
-	if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_83x)) {
+	if (info.type == INTEL_TYPE_83x) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
+				dprintf("intel_gart: getting local memory size not implemented.\n");
 				break;
 			case i830_STOLEN_512K:
 				memorySize >>= 1;
@@ -159,10 +157,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				memorySize *= 8;
 				break;
 		}
-	} else if (info.device_type == (INTEL_TYPE_8xx | INTEL_TYPE_85x)
-		|| (info.device_type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx)
-#endif
-	{
+	} else if (info.type == INTEL_TYPE_85x
+		|| (info.type & INTEL_TYPE_9xx) != 0) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -191,7 +187,9 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		}
 	}
 
-	stolenSize = memorySize - gttSize - 4096;
+	// TODO: this is probably wrong after all (taken from X driver)
+	// the stolen memory does not host the GTT!
+	stolenSize = memorySize /*- gttSize - 4096*/;
 }
 
 
@@ -272,7 +270,11 @@ dprintf("GTT base %lx, size %lu, entries %lu, stolen %lu\n", info.gtt_physical_b
 	info.aperture_physical_base = info.display.u.h0.base_registers[fbIndex];
 	info.aperture_stolen_size = stolenSize;
 	if (info.aperture_size == 0)
-		info.aperture_size = info.display.u.h0.base_register_sizes[0];
+		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
+
+	dprintf("intel_gart: detected %ld MB of stolen memory, aperture size %ld "
+		"MB, GTT size %ld KB\n", stolenSize >> 20, info.aperture_size >> 20,
+		gttSize >> 10);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",

@@ -97,11 +97,11 @@ QueueCommands::PutOverlayFlip(uint32 mode, bool updateCoefficients)
 	Write(COMMAND_OVERLAY_FLIP | mode);
 
 	uint32 registers;
-	if (gInfo->shared_info->overlay_offset != 0) {
-		// G33 does not need a physical address for the overlay registers
+	// G33 does not need a physical address for the overlay registers
+	if (intel_uses_physical_overlay(*gInfo->shared_info))
+		registers = gInfo->shared_info->physical_overlay_registers;
+	else
 		registers = gInfo->shared_info->overlay_offset;
-	} else
-		registers = (uint32)gInfo->shared_info->physical_overlay_registers;
 
 	Write(registers | (updateCoefficients ? OVERLAY_UPDATE_COEFFICIENTS : 0));
 }

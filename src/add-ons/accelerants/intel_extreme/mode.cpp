@@ -417,16 +417,17 @@ if (first) {
 
 	// free old and allocate new frame buffer in graphics memory
 
-	intel_free_memory(gInfo->frame_buffer_handle);
+	intel_free_memory(sharedInfo.frame_buffer);
 
-	uint32 offset;
-	if (intel_allocate_memory(bytesPerRow * target.virtual_height,
-			gInfo->frame_buffer_handle, offset) < B_OK) {
+	uint32 base;
+	if (intel_allocate_memory(bytesPerRow * target.virtual_height, 0,
+			base) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way back
 		if (intel_allocate_memory(sharedInfo.current_mode.virtual_height
-				* sharedInfo.bytes_per_row, gInfo->frame_buffer_handle,
-				offset) == B_OK) {
-			sharedInfo.frame_buffer_offset = offset;
+				* sharedInfo.bytes_per_row, 0, base) == B_OK) {
+			sharedInfo.frame_buffer = base;
+			sharedInfo.frame_buffer_offset = base
+				- (addr_t)sharedInfo.graphics_memory;
 			set_frame_buffer_base();
 		}
 
@@ -434,9 +435,9 @@ if (first) {
 	}
 
 	// clear frame buffer before using it
-	memset(sharedInfo.graphics_memory + offset, 0,
-		bytesPerRow * target.virtual_height);
-	sharedInfo.frame_buffer_offset = offset;
+	memset((uint8 *)base, 0, bytesPerRow * target.virtual_height);
+	sharedInfo.frame_buffer = base;
+	sharedInfo.frame_buffer_offset = base - (addr_t)sharedInfo.graphics_memory;
 
 	// make sure VGA display is disabled
 	write32(INTEL_VGA_DISPLAY_CONTROL, VGA_DISPLAY_DISABLED);
@@ -673,7 +674,8 @@ intel_get_frame_buffer_config(frame_buffer_config *config)
 	uint32 offset = gInfo->shared_info->frame_buffer_offset;
 
 	config->frame_buffer = gInfo->shared_info->graphics_memory + offset;
-	config->frame_buffer_dma = gInfo->shared_info->physical_graphics_memory + offset;
+	config->frame_buffer_dma
+		= (uint8 *)gInfo->shared_info->physical_graphics_memory + offset;
 	config->bytes_per_row = gInfo->shared_info->bytes_per_row;
 
 	return B_OK;

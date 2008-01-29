@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -222,8 +222,9 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 			if (allocMemory.magic != INTEL_PRIVATE_DATA_MAGIC)
 				return B_BAD_VALUE;
 
-			status_t status = mem_alloc(info->memory_manager, allocMemory.size, info,
-				&allocMemory.handle, &allocMemory.buffer_offset);
+			status_t status = intel_allocate_memory(*info, allocMemory.size,
+				allocMemory.alignment, allocMemory.flags,
+				(addr_t *)&allocMemory.buffer_base);
 			if (status == B_OK) {
 				// copy result
 #ifdef __HAIKU__
@@ -231,7 +232,8 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 						sizeof(intel_allocate_graphics_memory)) < B_OK)
 					return B_BAD_ADDRESS;
 #else
-				memcpy(buffer, &allocMemory, sizeof(intel_allocate_graphics_memory));
+				memcpy(buffer, &allocMemory,
+					sizeof(intel_allocate_graphics_memory));
 #endif
 			}
 			return status;
@@ -249,7 +251,7 @@ device_ioctl(void *data, uint32 op, void *buffer, size_t bufferLength)
 #endif
 
 			if (freeMemory.magic == INTEL_PRIVATE_DATA_MAGIC)
-				return mem_free(info->memory_manager, freeMemory.handle, info);
+				return intel_free_memory(*info, freeMemory.buffer_base);
 			break;
 		}
 

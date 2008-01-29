@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <syslog.h>
 
+#include <AGP.h>
+
 
 #define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
@@ -133,17 +135,17 @@ init_common(int device, bool isClone)
 	// The overlay registers, hardware status, and cursor memory share
 	// a single area with the shared_info
 
-	gInfo->overlay_registers = (struct overlay_registers *)((uint8 *)gInfo->shared_info
-		+ ROUND_TO_PAGE_SIZE(sizeof(intel_shared_info)));
-	gInfo->status = (hardware_status *)((uint8 *)gInfo->overlay_registers + B_PAGE_SIZE);
-
-	if (gInfo->shared_info->hardware_cursor_enabled)
-		gInfo->cursor_memory = (uint8 *)gInfo->overlay_registers + 2 * B_PAGE_SIZE;
+	gInfo->overlay_registers = (struct overlay_registers *)
+		(gInfo->shared_info->graphics_memory
+		+ gInfo->shared_info->overlay_offset);
 
 	if (gInfo->shared_info->device_type == INTEL_TYPE_965) {
 		// allocate some extra memory for the 3D context
-		intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE, gInfo->context_handle,
-			gInfo->context_offset);
+		if (intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE,
+				B_APERTURE_NON_RESERVED, gInfo->context_base) == B_OK) {
+			gInfo->context_offset = gInfo->context_base
+				- (addr_t)gInfo->shared_info->graphics_memory;
+		}
 	}
 
 	return B_OK;
@@ -154,7 +156,7 @@ init_common(int device, bool isClone)
 static void
 uninit_common(void)
 {
-	intel_free_memory(gInfo->context_handle);
+	intel_free_memory(gInfo->context_base);
 
 	delete_area(gInfo->regs_area);
 	delete_area(gInfo->shared_info_area);

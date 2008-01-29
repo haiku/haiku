@@ -17,9 +17,9 @@
 
 struct overlay {
 	overlay_buffer	buffer;
-	uint32			buffer_handle;
+	addr_t			buffer_base;
 	uint32			buffer_offset;
-	uint32			state_handle;
+	addr_t			state_base;
 	uint32			state_offset;
 };
 
@@ -40,8 +40,6 @@ struct accelerant_info {
 	display_mode	*mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
-	uint32			frame_buffer_handle;
-
 	struct overlay_registers *overlay_registers;
 	overlay			*current_overlay;
 	overlay_view	last_overlay_view;
@@ -50,14 +48,11 @@ struct accelerant_info {
 	uint32			last_vertical_overlay_scale;
 	uint32			overlay_position_buffer_offset;
 
-	hardware_status	*status;
-	uint8			*cursor_memory;
-
 	edid1_info		edid_info;
 	bool			has_edid;
 
 	// limited 3D support for overlay on i965
-	uint32			context_handle;
+	addr_t			context_base;
 	uint32			context_offset;
 	bool			context_set;
 
@@ -101,7 +96,7 @@ extern void set_frame_buffer_base(void);
 extern status_t create_mode_list(void);
 
 // memory.cpp
-extern void intel_free_memory(uint32 handle);
-extern status_t intel_allocate_memory(size_t size, uint32& handle, uint32& offset);
+extern void intel_free_memory(uint32 base);
+extern status_t intel_allocate_memory(size_t size, uint32 flags, uint32 &base);
 
 #endif	/* INTEL_EXTREME_ACCELERANT_H */

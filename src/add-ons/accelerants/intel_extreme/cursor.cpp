@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,7 +33,7 @@ intel_set_cursor_shape(uint16 width, uint16 height, uint16 hotX, uint16 hotY,
 	// transparent, for 0x3 it inverts the background, so only the first
 	// two palette entries will be used (since we're using the 2 color mode).
 
-	uint8 *data = gInfo->cursor_memory;
+	uint8 *data = gInfo->shared_info->cursor_memory;
 	uint8 byteWidth = (width + 7) / 8;
 
 	for (int32 y = 0; y < height; y++) {
