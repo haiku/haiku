@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -499,12 +499,8 @@ EventDispatcher::SendFakeMouseMoved(EventTarget& target, int32 viewToken)
 	moved.AddPoint("screen_where", fLastCursorPosition);
 	moved.AddInt32("buttons", fLastButtons);
 
-	if (fDraggingMessage) {
-/*		moved.AddInt32("_msg_data", );
-		moved.AddInt32("_msg_base_", );
-		moved.AddInt32("_msg_what_", fDragMessage->what);*/
+	if (fDraggingMessage)
 		moved.AddMessage("be:drag_message", &fDragMessage);
-	}
 
 	if (fPreviousMouseTarget != NULL
 		&& fPreviousMouseTarget != &target) {
@@ -562,6 +558,12 @@ EventDispatcher::SetDragMessage(BMessage& message,
 	ETRACE(("EventDispatcher::SetDragMessage()\n"));
 
 	BAutolock _(this);
+
+	if (fLastButtons == 0) {
+		// mouse buttons has already been released or was never pressed
+		gBitmapManager->DeleteBitmap(bitmap);
+		return;
+	}
 
 	if (fDragBitmap != bitmap) {
 		if (fDragBitmap)
@@ -739,15 +741,12 @@ EventDispatcher::_EventLoop()
 				if (event->FindPoint("where", &where) == B_OK)
 					fLastCursorPosition = where;
 
-				if (fDraggingMessage) {
-/*					event->AddInt32("_msg_data", );
-					event->AddInt32("_msg_base_", );
-					event->AddInt32("_msg_what_", fDragMessage->what);*/
+				if (fDraggingMessage)
 					event->AddMessage("be:drag_message", &fDragMessage);
-				}
 
 				if (!HasCursorThread()) {
-					// there is no cursor thread, we need to move the cursor ourselves
+					// There is no cursor thread, we need to move the cursor
+					// ourselves
 					BAutolock _(fCursorLock);
 
 					if (fHWInterface != NULL) {
@@ -761,8 +760,8 @@ EventDispatcher::_EventLoop()
 				if (fNextLatestMouseMoved == NULL)
 					fNextLatestMouseMoved = fStream->PeekLatestMouseMoved();
 				else if (fNextLatestMouseMoved != event) {
-					// Drop older mouse moved messages if the server is lagging too
-					// much (if the message is older than 100 msecs)
+					// Drop older mouse moved messages if the server is lagging
+					// too much (if the message is older than 100 msecs)
 					bigtime_t eventTime;
 					if (event->FindInt64("when", &eventTime) == B_OK) {
 						if (system_time() - eventTime > 100000)
@@ -790,7 +789,8 @@ EventDispatcher::_EventLoop()
 						fNextLatestMouseMoved) == B_SKIP_MESSAGE) {
 					// this is a work-around if the wrong B_MOUSE_UP
 					// event is filtered out
-					if (event->what == B_MOUSE_UP && event->FindInt32("buttons") == 0) {
+					if (event->what == B_MOUSE_UP
+						&& event->FindInt32("buttons") == 0) {
 						fSuspendFocus = false;
 						_RemoveTemporaryListeners();
 					}
@@ -803,7 +803,7 @@ EventDispatcher::_EventLoop()
 				else
 					fLastButtons = 0;
 
-				// the "where" field will be filled in by the receiver
+				// The "where" field will be filled in by the receiver
 				// (it's supposed to be expressed in local window coordinates)
 				event->RemoveName("where");
 				event->AddPoint("screen_where", fLastCursorPosition);
@@ -811,7 +811,7 @@ EventDispatcher::_EventLoop()
 				if (event->what == B_MOUSE_MOVED
 					&& fPreviousMouseTarget != NULL
 					&& mouseTarget != fPreviousMouseTarget) {
-					// target has changed, we need to notify the previous target
+					// Target has changed, we need to notify the previous target
 					// that the mouse has exited its views
 					addedTokens = _AddTokens(event, fPreviousMouseTarget,
 						B_POINTER_EVENTS);
@@ -836,12 +836,14 @@ EventDispatcher::_EventLoop()
 					if (addedTokens && !noPointerHistoryFocus)
 						_SetFeedFocus(event);
 					else if (noPointerHistoryFocus) {
-						// no tokens were added or the focus shouldn't get a mouse moved
+						// No tokens were added or the focus shouldn't get a
+						// mouse moved
 						break;
 					}
 
-					_SendMessage(current->Messenger(), event, event->what == B_MOUSE_MOVED
-						? kMouseMovedImportance : kStandardImportance);
+					_SendMessage(current->Messenger(), event,
+						event->what == B_MOUSE_MOVED
+							? kMouseMovedImportance : kStandardImportance);
 				}
 				break;
 			}
@@ -860,7 +862,8 @@ EventDispatcher::_EventLoop()
 
 				keyboardEvent = true;
 
-				if (fFocus != NULL && _AddTokens(event, fFocus, B_KEYBOARD_EVENTS)) {
+				if (fFocus != NULL && _AddTokens(event, fFocus,
+						B_KEYBOARD_EVENTS)) {
 					// if tokens were added, we need to explicetly suspend
 					// focus in the event - if not, the event is simply not
 					// forwarded to the target
@@ -881,8 +884,10 @@ EventDispatcher::_EventLoop()
 				else
 					current = fFocus;
 
-				if (current != NULL && (!fSuspendFocus || addedTokens))
-					_SendMessage(current->Messenger(), event, kStandardImportance);
+				if (current != NULL && (!fSuspendFocus || addedTokens)) {
+					_SendMessage(current->Messenger(), event,
+						kStandardImportance);
+				}
 				break;
 		}
 
@@ -902,18 +907,21 @@ EventDispatcher::_EventLoop()
 			for (int32 i = fTargets.CountItems(); i-- > 0;) {
 				EventTarget* target = fTargets.ItemAt(i);
 
-				// we already sent the event to the all focus and last focus tokens
+				// We already sent the event to the all focus and last focus
+				// tokens
 				if (current == target || previous == target)
 					continue;
 
-				// don't send the message if there are no tokens for this event
+				// Don't send the message if there are no tokens for this event
 				if (!_AddTokens(event, target,
 						keyboardEvent ? B_KEYBOARD_EVENTS : B_POINTER_EVENTS,
-						event->what == B_MOUSE_MOVED ? fNextLatestMouseMoved : NULL))
+						event->what == B_MOUSE_MOVED
+							? fNextLatestMouseMoved : NULL))
 					continue;
 
-				if (!_SendMessage(target->Messenger(), event, event->what == B_MOUSE_MOVED
-						? kMouseMovedImportance : kListenerImportance)) {
+				if (!_SendMessage(target->Messenger(), event,
+						event->what == B_MOUSE_MOVED
+							? kMouseMovedImportance : kListenerImportance)) {
 					// the target doesn't seem to exist anymore, let's remove it
 					fTargets.RemoveItemAt(i);
 				}
