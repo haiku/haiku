@@ -699,6 +699,8 @@ int
 rl_read_init_file (filename)
      const char *filename;
 {
+  int result;
+
   /* Default the filename. */
   if (filename == 0)
     {
@@ -717,7 +719,11 @@ rl_read_init_file (filename)
     return 0;
   filename = "~/_inputrc";
 #endif
-  return (_rl_read_init_file (filename, 0));
+  result = (_rl_read_init_file (filename, 0));
+  if (result != 0 && filename == DEFAULT_INPUTRC)
+    result = (_rl_read_init_file ("/etc/inputrc", 0));
+
+  return result;
 }
 
 static int
