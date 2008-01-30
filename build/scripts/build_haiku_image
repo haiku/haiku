@@ -77,15 +77,15 @@ unzipFile()
 
 	if [ $isImage ]; then
 		unzipDir=$tmpDir/unzip
-		attrrmrf $unzipDir
-		mkdir -p $unzipDir
+		attrrmrf "$unzipDir"
+		mkdir -p "$unzipDir"
 
-		$unzip -q -d $unzipDir $zipFile
-		$cp -r ${sPrefix}$unzipDir/. ${tPrefix}$targetUnzipDir
+		$unzip -q -d "$unzipDir" "$zipFile"
+		$cp -r "${sPrefix}$unzipDir/." "${tPrefix}$targetUnzipDir"
 
-		attrrmrf $unzipDir
+		attrrmrf "$unzipDir"
 	else
-		$unzip -q -o -d ${tPrefix}$targetUnzipDir ${sPrefix}$zipFile
+		$unzip -q -o -d "${tPrefix}$targetUnzipDir" "${sPrefix}$zipFile"
 	fi
 }
 
