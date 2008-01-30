@@ -39,6 +39,7 @@ SharedLibrary libmail.so :
 	NodeMessage.cpp
 	numailkit.cpp
 	ProtocolConfigView.cpp
+	regex.c
 	RemoteStorageProtocol.cpp
 	StatusWindow.cpp
 	StringList.cpp
