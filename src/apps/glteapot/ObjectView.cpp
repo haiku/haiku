@@ -98,8 +98,8 @@ simonThread(void* cookie)
 {
 	ObjectView* ov = (ObjectView*)cookie;
 
-    int noPause = 0;
-    while (acquire_sem_etc(ov->quittingSem,1,B_TIMEOUT,0) == B_NO_ERROR) {
+	int noPause = 0;
+	while (acquire_sem_etc(ov->quittingSem, 1, B_TIMEOUT, 0) == B_NO_ERROR) {
 		if (ov->SpinIt()) {
 			ov->DrawFrame(noPause);
 			release_sem(ov->quittingSem);
@@ -373,7 +373,8 @@ ObjectView::ObjectAtPoint(BPoint p)
 	float f[3];
 	f[1] = f[2] = 0;
 	for (int i = 0; i < fObjects.CountItems(); i++) {
-		f[0] = (255 - i) / 255.0;
+		// to take into account 16 bits colorspaces, only use the 5 highest bits of the red channel
+		f[0] = (255 - (i << 3)) / 255.0;
 		((GLObject*)fObjects.ItemAt(i))->Draw(true, f);
 	}
 	glReadBuffer(GL_BACK);
@@ -381,7 +382,7 @@ ObjectView::ObjectAtPoint(BPoint p)
 	glReadPixels((GLint)p.x, (GLint)(Bounds().bottom - p.y), 1, 1,
 		GL_RGB, GL_UNSIGNED_BYTE, pixel);
 	int objNum = pixel[0];
-	objNum = 255 - objNum;
+	objNum = (255 - objNum) >> 3;
 
 	EnforceState();
 	UnlockGL();
