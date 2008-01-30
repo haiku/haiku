@@ -143,8 +143,8 @@ ExpressionTextView::SetExpression(const char* expression)
 void
 ExpressionTextView::BackSpace()
 {
-	if (Window())
-		Window()->PostMessage(B_UNDO, this);
+	const char bytes[1] = { B_BACKSPACE };
+	KeyDown(bytes, 1);
 }
 
 
