@@ -1395,8 +1395,7 @@ BMenu::_Track(int *action, long start)
 	// TODO: cleanup
 	BMenuItem *item = NULL;
 	bigtime_t openTime = system_time();
-	bigtime_t closeTime = 0;
-
+	
 	fState = MENU_STATE_TRACKING;
 	if (fSuper != NULL)
 		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
@@ -1457,10 +1456,12 @@ BMenu::_Track(int *action, long start)
 			UnlockLooper();
 			break;			
 		} else {
-			// Mouse pointer outside menu
-
-			if (system_time() > closeTime + kHysteresis
-				&& fState != MENU_STATE_TRACKING_SUBMENU) {
+			// Mouse pointer outside menu:
+			// If there's no other submenu opened,
+			// deselect the current selected item
+			if (fSelected != NULL
+				&& (fSelected->Submenu() == NULL
+					|| fSelected->Submenu()->Window() == NULL)) {
 				_SelectItem(NULL);
 				fState = MENU_STATE_TRACKING;
 			}
@@ -1494,14 +1495,11 @@ BMenu::_Track(int *action, long start)
 			if (newPollTime <= pollTime)
 				newPollTime = pollTime + 5000;
 #endif
-			//printf("newPollTime - pollTime: %lld\n", newPollTime - pollTime);
 			// mouseSpeed in px per ms
 			// (actually point_distance returns the square of the distance,
 			// so it's more px^2 per ms)
 			mouseSpeed = (int32)(point_distance(newLocation, location) * 1000 / (newPollTime - pollTime));
 			pollTime = newPollTime;
-
-			//printf("mouseSpeed = %ld\n", mouseSpeed);
 
 			if (newLocation != location || newButtons != buttons) {
 				if (!releasedOnce && newButtons == 0 && buttons != 0)
