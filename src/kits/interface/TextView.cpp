@@ -1,11 +1,11 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Hiroshi Lockheimer (BTextView is based on his STEEngine)
  *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 /*!	BTextView displays and manages styled text. */
@@ -3912,16 +3912,16 @@ BTextView::_TrackDrag(BPoint where)
 void
 BTextView::_InitiateDrag()
 {
-	BMessage *dragMessage = new BMessage(B_MIME_DATA);
+	BMessage dragMessage(B_MIME_DATA);
 	BBitmap *dragBitmap = NULL;
 	BPoint bitmapPoint;
 	BHandler *dragHandler = NULL;
 
-	GetDragParameters(dragMessage, &dragBitmap, &bitmapPoint, &dragHandler);
+	GetDragParameters(&dragMessage, &dragBitmap, &bitmapPoint, &dragHandler);
 	SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 
 	if (dragBitmap != NULL)
-		DragMessage(dragMessage, dragBitmap, bitmapPoint, dragHandler);
+		DragMessage(&dragMessage, dragBitmap, bitmapPoint, dragHandler);
 	else {
 		BRegion region;
 		GetTextRegion(fSelStart, fSelEnd, &region);
@@ -3930,7 +3930,7 @@ BTextView::_InitiateDrag()
 		if (!bounds.Contains(dragRect))
 			dragRect = bounds & dragRect;
 
-		DragMessage(dragMessage, dragRect, dragHandler);
+		DragMessage(&dragMessage, dragRect, dragHandler);
 	}
 
 	BMessenger messenger(this);
