@@ -1,81 +1,166 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <unistd.h>
-#include <string.h>
+
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <fcntl.h>
+#include <string.h>
 #include <sys/stat.h>
-#include <errno.h>
+#include <unistd.h>
 
 #include <OS.h>
 
+
 #define FORTUNES "/etc/fortunes"
 
-int
-main(void)
+
+static int
+choose_file(const char *path)
 {
+	struct dirent *dirent;
+	int count = 0;
+	int chosen;
+
+	DIR *dir = opendir(path);
+	if (dir == NULL)
+		return -1;
+
+	// count directory entries
+
+	while ((dirent = readdir(dir)) != NULL) {
+		if (dirent->d_name[0] == '.')
+			continue;
+
+		count++;
+	}
+
+	// choose and open entry
+
+	chosen = rand() % count;
+	count = 0;
+	rewinddir(dir);
+
+	while ((dirent = readdir(dir)) != NULL) {
+		if (dirent->d_name[0] == '.')
+			continue;
+
+		if (chosen <= count) {
+			char name[PATH_MAX];
+			int fd;
+
+			// build full path
+			strlcpy(name, path, sizeof(name));
+			strlcat(name, "/", sizeof(name));
+			strlcat(name, dirent->d_name, sizeof(name));
+
+			fd = open(name, O_RDONLY);
+			if (fd >= 0) {
+				closedir(dir);
+				return fd;
+			}
+		}
+		count++;
+	}
+
+	closedir(dir);
+	return -1;
+}
+
+
+int
+main(int argc, char **argv)
+{
+	char *file = FORTUNES;
 	int fd;
-	int rc;
-	char *buf;
-	unsigned i;
-	unsigned found;
+	char *buffer;
+	unsigned start, i;
+	unsigned count;
 	struct stat stat;
 
-	fd = open(FORTUNES, O_RDONLY, 0);
+	srand(system_time() % INT_MAX);
+
+	if (argc > 1) {
+		// if there are arguments, choose one randomly
+		file = argv[1 + (rand() % (argc - 1))];
+	}
+
+	fd = open(file, O_RDONLY, 0);
 	if (fd < 0) {
-		printf("Couldn't open %s: %s\n", FORTUNES, strerror(errno));
-		return -1;
+		fprintf(stderr, "Couldn't open %s: %s\n", file, strerror(errno));
+		return 1;
 	}
 
-	rc = fstat(fd, &stat);
-	if (rc < 0) {
-		printf("stat() failed: %s\n", strerror(errno));
-		return -1;
+	if (fstat(fd, &stat) < 0) {
+		fprintf(stderr, "stat() failed: %s\n", strerror(errno));
+		return 1;
 	}
 
-	buf = malloc(stat.st_size + 1);
-	rc = read(fd, buf, stat.st_size);
-	if (rc < 0) {
-		printf("Could not read from fortune file: %s\n", strerror(errno));
-		return -1;
-	}
+	if (S_ISDIR(stat.st_mode)) {
+		close(fd);
 
-	buf[stat.st_size] = 0;
-	close(fd);
+		fd = choose_file(file);
+		if (fd < 0) {
+			fprintf(stderr, "Could not find any fortune file.\n");
+			return 1;
+		}
 
-	found = 0;
-	for (i = 0; i < stat.st_size; i++) {
-		if (!strncmp(buf + i, "#@#", 3))
-			found += 1;
-	}
-
-	if (found > 0)
-		found = 1 + ((system_time() + 3) % found);
-	else {
-		printf("Out of cookies...\n");
-		return -1;
-	}
-
-	for (i = 0; i < stat.st_size; i++) {
-		if (!strncmp(buf + i, "#@#", 3))
-			found -= 1;
-
-		if (found == 0) {
-			unsigned j;
-
-			for (j = i + 1; j < stat.st_size; j++) {
-				if (!strncmp(buf + j, "#@#", 3))
-					buf[j] = 0;
-			}
-
-			printf("%s\n", buf + i + 3);
-			break;
+		if (fstat(fd, &stat) < 0) {
+			fprintf(stderr, "stat() failed: %s\n", strerror(errno));
+			return 1;
 		}
 	}
 
+	buffer = malloc(stat.st_size + 1);
+	if (buffer == NULL) {
+		fprintf(stderr, "Not enough memory.\n");
+		return 1;
+	}
+
+	if (read(fd, buffer, stat.st_size) < 0) {
+		fprintf(stderr, "Could not read from fortune file: %s\n",
+			strerror(errno));
+		return -1;
+	}
+
+	buffer[stat.st_size] = '\0';
+	close(fd);
+
+	// count fortunes
+
+	count = 0;
+	for (i = 0; i < stat.st_size - 2; i++) {
+		if (!strncmp(buffer + i, "\n%\n", 3)) {
+			count++;
+			i += 3;
+		}
+	}
+
+	if (!count) {
+		printf("Out of cookies...\n");
+		return 0;
+	}
+
+	count = rand() % count;
+	start = 0;
+
+	// find beginning & end
+	for (i = 0; i < stat.st_size - 2; i++) {
+		if (!strncmp(buffer + i, "\n%\n", 3)) {
+			if (count-- <= 0) {
+				buffer[i] = '\0';
+				break;
+			}
+
+			i += 3;
+			start = i;
+		}
+	}
+
+	puts(buffer + start);
 	return 0;
 }
