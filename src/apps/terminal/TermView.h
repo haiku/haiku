@@ -40,7 +40,9 @@ public:
 
 	const char *TerminalName() const;
 	
+	void	GetTermFont(BFont *font) const;
 	void	SetTermFont(const BFont *font);
+	
 	void	GetFontSize(int *width, int *height);
 	BRect	SetTermSize(int rows, int cols, bool resize);
 

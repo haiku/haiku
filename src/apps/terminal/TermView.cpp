@@ -406,6 +406,14 @@ TermView::SetEncoding(int encoding)
 }
 
 
+void
+TermView::GetTermFont(BFont *font) const
+{
+	if (font != NULL)
+		*font = fHalfFont;
+}
+
+
 //! Sets font for terminal
 void
 TermView::SetTermFont(const BFont *font)

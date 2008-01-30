@@ -69,6 +69,7 @@ private:
 	TermView*		_ActiveTermView();
 	int32			_IndexOfTermView(TermView* termView) const;
 	void			_CheckChildren();
+	void			_ResizeView(TermView *view);
 	
 	SmartTabView	*fTabView;
 	TermView		*fTermView;

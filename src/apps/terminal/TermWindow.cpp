@@ -41,9 +41,13 @@
 
 
 const static float kViewOffset = 3;
+const static int32 kMaxTabs = 6;
+
+// messages constants
 const static uint32 kNewTab = 'NTab';
 const static uint32 kCloseView = 'ClVw';
-const static int32 kMaxTabs = 6;
+const static uint32 kIncreaseFontSize = 'InFs';
+const static uint32 kDecreaseFontSize = 'DcFs';
 
 
 class CustomTermView : public TermView {
@@ -100,6 +104,9 @@ TermWindow::_InitWindow()
 	// make menu bar
 	_SetupMenu();
 
+	AddShortcut('+', B_COMMAND_KEY, new BMessage(kIncreaseFontSize));
+	AddShortcut('-', B_COMMAND_KEY, new BMessage(kDecreaseFontSize));
+	
 	BRect textFrame = Bounds();
 	textFrame.top = fMenubar->Bounds().bottom + 1.0;
 
@@ -220,6 +227,10 @@ TermWindow::MessageReceived(BMessage *message)
 			_ActiveTermView()->SelectAll();
 			break;
 		
+		case B_ABOUT_REQUESTED:
+			be_app->PostMessage(B_ABOUT_REQUESTED);
+			break;
+	
 		case MENU_CLEAR_ALL:
 			_ActiveTermView()->Clear();
 			break;	
@@ -227,22 +238,6 @@ TermWindow::MessageReceived(BMessage *message)
 		case MENU_SWITCH_TERM:
 			be_app->PostMessage(MENU_SWITCH_TERM);
 			break;
-
-		case kNewTab:
-			if (fTabView->CountTabs() < kMaxTabs)
-				_AddTab(NULL);
-			break;
-
-		case kCloseView:
-		{
-			TermView* termView;
-			if (message->FindPointer("termView", (void**)&termView) == B_OK) {
-				int32 index = _IndexOfTermView(termView);
-				if (index >= 0)
-					_RemoveTab(index);
-			}
-			break;
-		}
 
 		case MENU_NEW_TERM: 
 		{
@@ -364,27 +359,9 @@ TermWindow::MessageReceived(BMessage *message)
 			BFont font;
 			_GetPreferredFont(font);			
 			_ActiveTermView()->SetTermFont(&font);
-				
-			int fontWidth, fontHeight;
-			_ActiveTermView()->GetFontSize(&fontWidth, &fontHeight);
 			
-			float minimumHeight = 0;
-			if (fMenubar)
-				minimumHeight += fMenubar->Bounds().Height();
-			if (fTabView && fTabView->CountTabs() > 1)
-				minimumHeight += fTabView->TabHeight();
+			_ResizeView(_ActiveTermView());
 			
-			SetSizeLimits(MIN_COLS * fontWidth, MAX_COLS * fontWidth,
-							minimumHeight + MIN_ROWS * fontHeight, 
-							minimumHeight + MAX_ROWS * fontHeight);
-			
-			float width, height;
-			_ActiveTermView()->GetPreferredSize(&width, &height);
-			width += B_V_SCROLL_BAR_WIDTH + kViewOffset * 2;
-			height += fMenubar->Bounds().Height() + kViewOffset * 2;
-			ResizeTo(width, height);
-			
-			_ActiveTermView()->Invalidate();
 			break;
 		}
 		case EIGHTYTWENTYFOUR:
@@ -472,10 +449,49 @@ TermWindow::MessageReceived(BMessage *message)
 			_CheckChildren();
 			break;
 
-		case B_ABOUT_REQUESTED:
-			be_app->PostMessage(B_ABOUT_REQUESTED);
+		case kNewTab:
+			if (fTabView->CountTabs() < kMaxTabs)
+				_AddTab(NULL);
 			break;
-	
+
+		case kCloseView:
+		{
+			TermView* termView;
+			if (message->FindPointer("termView", (void**)&termView) == B_OK) {
+				int32 index = _IndexOfTermView(termView);
+				if (index >= 0)
+					_RemoveTab(index);
+			}
+			break;
+		}
+		
+		case kIncreaseFontSize:		
+		case kDecreaseFontSize:
+		{
+			message->PrintToStream();
+			TermView *view = _ActiveTermView();
+			BFont font;
+			view->GetTermFont(&font);
+			
+			float size = font.Size();
+			if (message->what == kIncreaseFontSize)
+				size += 1;
+			else
+				size -= 1;
+			
+			// limit the font size
+			if (size < 8)
+				size = 8;
+			else if (size > 20)
+				size = 20;
+				
+			font.SetSize(size);	
+			view->SetTermFont(&font);
+			
+			_ResizeView(view);
+			break;
+		}
+			
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -683,6 +699,32 @@ TermWindow::_IndexOfTermView(TermView* termView) const
 	}
 
 	return -1;
+}
+
+
+void
+TermWindow::_ResizeView(TermView *view)
+{
+	int fontWidth, fontHeight;
+	view->GetFontSize(&fontWidth, &fontHeight);
+			
+	float minimumHeight = 0;
+	if (fMenubar)
+		minimumHeight += fMenubar->Bounds().Height();
+	if (fTabView && fTabView->CountTabs() > 1)
+		minimumHeight += fTabView->TabHeight();
+	
+	SetSizeLimits(MIN_COLS * fontWidth, MAX_COLS * fontWidth,
+					minimumHeight + MIN_ROWS * fontHeight, 
+					minimumHeight + MAX_ROWS * fontHeight);
+	
+	float width, height;
+	view->GetPreferredSize(&width, &height);
+	width += B_V_SCROLL_BAR_WIDTH + kViewOffset * 2;
+	height += fMenubar->Bounds().Height() + kViewOffset * 2;
+	ResizeTo(width, height);
+	
+	view->Invalidate();
 }
 
 
