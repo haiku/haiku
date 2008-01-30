@@ -42,7 +42,11 @@ Prefs::Prefs()
 		fatalerror = true;
 		return;
 	}
-
+	// While normal window position is under user control, size is not.
+	// Width is fixed and height must be dynamically computed each time, 
+	// as number of CPUs could change since boot.
+	ComputeNormalWindowSize();
+	
 	r = GetMiniWindowRect();
 	if (!GetRect("mini_window_rect", &mini_window_rect, &r)) {
 		fatalerror = true;
@@ -121,8 +125,8 @@ Prefs::~Prefs()
 }
 
 
-BRect
-Prefs::GetNormalWindowRect()
+float
+Prefs::GetNormalWindowHeight()
 {
 	system_info sys_info;
 	get_system_info(&sys_info);
@@ -131,8 +135,23 @@ Prefs::GetNormalWindowRect()
 	if (PULSEVIEW_MIN_HEIGHT > height)
 		height = PULSEVIEW_MIN_HEIGHT;
 
+	return height;
+}
+
+
+void
+Prefs::ComputeNormalWindowSize()
+{
+	normal_window_rect.right = normal_window_rect.left + PULSEVIEW_WIDTH;
+	normal_window_rect.bottom = normal_window_rect.top + GetNormalWindowHeight();
+}
+
+
+BRect
+Prefs::GetNormalWindowRect()
+{
 	// Dock the window in the lower right hand corner just like the original
-	BRect r(0, 0, PULSEVIEW_WIDTH, height);
+	BRect r(0, 0, PULSEVIEW_WIDTH, GetNormalWindowHeight());
 	BRect screen_rect = BScreen(B_MAIN_SCREEN_ID).Frame();
 	r.OffsetTo(screen_rect.right - r.Width() - 5, screen_rect.bottom - r.Height() - 5);
 	return r;

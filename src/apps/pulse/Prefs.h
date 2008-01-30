@@ -38,6 +38,8 @@ class Prefs {
 		bool PutBool(char *name, bool *value);
 		bool PutRect(char *name, BRect *value);
 		
+		float GetNormalWindowHeight();
+		void ComputeNormalWindowSize();
 		BRect GetNormalWindowRect();
 		BRect GetMiniWindowRect();
 };
