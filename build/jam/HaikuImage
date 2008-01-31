@@ -475,11 +475,11 @@ if $(HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE) {
 # Vision
 if [ IsOptionalHaikuImagePackageAdded Vision ] {
 	InstallOptionalHaikuImagePackage Vision
-		: http://vision.sourceforge.net/Vision-0.9.7-SF-01052007.zip
+		: http://vision.sf.net/Vision-0.9.7-H-26012008.zip
 		: apps
 	;
 	AddSymlinkToHaikuImage home config be Applications
-		: /boot/apps/Vision-0.9.7-SF-01052007/Vision ;
+		: /boot/apps/Vision-0.9.7-H-26012008/Vision ;
 }
 
 # WonderBrush
