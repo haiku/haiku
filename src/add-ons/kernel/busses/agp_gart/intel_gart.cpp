@@ -187,9 +187,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		}
 	}
 
-	// TODO: this is probably wrong after all (taken from X driver)
-	// the stolen memory does not host the GTT!
-	stolenSize = memorySize /*- gttSize - 4096*/;
+	stolenSize = memorySize - 4096;
 }
 
 
