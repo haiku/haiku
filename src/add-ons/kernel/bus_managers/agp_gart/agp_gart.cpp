@@ -387,7 +387,7 @@ set_pci_mode()
 
 
 status_t
-get_area_base_and_size(area_id area, addr_t base, size_t size)
+get_area_base_and_size(area_id area, addr_t &base, size_t &size)
 {
 	area_info info;
 	status_t status = get_area_info(area, &info);
