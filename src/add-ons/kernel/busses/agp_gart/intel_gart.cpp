@@ -14,7 +14,7 @@
 #include <PCI.h>
 
 
-#define TRACE_INTEL
+//#define TRACE_INTEL
 #ifdef TRACE_INTEL
 #	define TRACE(x...) dprintf("\33[33magp-intel:\33[0m " x)
 #else

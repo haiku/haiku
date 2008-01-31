@@ -603,6 +603,7 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 	if ((memory->flags & ALLOCATED_APERTURE) != 0) {
 		// We allocated this memory, get the base and size from there
 #ifdef __HAIKU__
+		size = memory->size;
 		physical = true;
 #else
 		status_t status = get_area_base_and_size(memory->area, address, size);
