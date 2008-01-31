@@ -190,7 +190,6 @@ intel_init_accelerant(int device)
 	init_lock(&info.engine_lock, "intel extreme engine");
 
 	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
-	setup_ring_buffer(info.secondary_ring_buffer, "intel secondary ring buffer");
 
 	// determine head depending on what's already enabled from the BIOS
 	// TODO: it would be nicer to retrieve this data via DDC - else the
@@ -291,7 +290,6 @@ intel_uninit_accelerant(void)
 	uninit_lock(&info.engine_lock);
 
 	uninit_ring_buffer(info.primary_ring_buffer);
-	uninit_ring_buffer(info.secondary_ring_buffer);
 
 	uninit_common();
 }

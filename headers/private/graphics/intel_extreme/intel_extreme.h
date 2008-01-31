@@ -76,7 +76,6 @@ struct intel_shared_info {
 	struct lock		engine_lock;
 
 	ring_buffer		primary_ring_buffer;
-	ring_buffer		secondary_ring_buffer;
 
 	int32			overlay_channel_used;
 	bool			overlay_active;
@@ -200,7 +199,7 @@ struct intel_free_graphics_memory {
 #define RING_BUFFER_HEAD				0x4
 #define RING_BUFFER_START				0x8
 #define RING_BUFFER_CONTROL				0xc
-#define INTEL_RING_BUFFER_SIZE_MASK		0x000ff800
+#define INTEL_RING_BUFFER_SIZE_MASK		0x001ff000
 #define INTEL_RING_BUFFER_HEAD_MASK		0x001ffffc
 #define INTEL_RING_BUFFER_ENABLED		1
 

@@ -156,9 +156,9 @@ init_interrupt_handler(intel_info &info)
 
 
 status_t
-intel_free_memory(intel_info &info, addr_t offset)
+intel_free_memory(intel_info &info, addr_t base)
 {
-	return gGART->deallocate_memory(info.aperture, info.aperture_base + offset);
+	return gGART->free_memory(info.aperture, base);
 }
 
 
@@ -231,19 +231,11 @@ intel_extreme_init(intel_info &info)
 	// write combining...
 
 	ring_buffer &primary = info.shared_info->primary_ring_buffer;
-	if (intel_allocate_memory(info, 4 * B_PAGE_SIZE, 0, 0,
+	if (intel_allocate_memory(info, 16 * B_PAGE_SIZE, 0, 0,
 			(addr_t *)&primary.base) == B_OK) {
 		primary.register_base = INTEL_PRIMARY_RING_BUFFER;
-		primary.size = 4 * B_PAGE_SIZE;
+		primary.size = 16 * B_PAGE_SIZE;
 		primary.offset = (addr_t)primary.base - info.aperture_base;
-	}
-
-	ring_buffer &secondary = info.shared_info->secondary_ring_buffer;
-	if (intel_allocate_memory(info, B_PAGE_SIZE, 0, 0,
-			(addr_t *)&secondary.base) == B_OK) {
-		secondary.register_base = INTEL_SECONDARY_RING_BUFFER_0;
-		secondary.size = B_PAGE_SIZE;
-		secondary.offset = (addr_t)secondary.base - info.aperture_base;
 	}
 
 	// Fix some problems on certain chips (taken from X driver)
@@ -293,7 +285,9 @@ intel_extreme_init(intel_info &info)
 
 	// setup overlay registers
 
-	if (intel_allocate_memory(info, B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL,
+	if (intel_allocate_memory(info, B_PAGE_SIZE, 0,
+			intel_uses_physical_overlay(*info.shared_info)
+				? B_APERTURE_NEED_PHYSICAL : 0,
 			(addr_t *)&info.overlay_registers,
 			&info.shared_info->physical_overlay_registers) == B_OK) {
 		info.shared_info->overlay_offset = (addr_t)info.overlay_registers

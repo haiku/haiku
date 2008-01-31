@@ -229,7 +229,7 @@ update_overlay(bool updateCoefficients)
 		|| gInfo->shared_info->device_type == INTEL_TYPE_965)
 		return;
 
-	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
+	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 	queue.PutFlush();
 	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	queue.PutOverlayFlip(COMMAND_OVERLAY_CONTINUE, updateCoefficients);
@@ -238,9 +238,9 @@ update_overlay(bool updateCoefficients)
 	queue.PutWaitFor(COMMAND_WAIT_FOR_OVERLAY_FLIP);
 	queue.PutFlush();
 
-//	TRACE(("update overlay: UPDATE: %lx, TEST: %lx, STATUS: %lx, EXTENDED_STATUS: %lx\n",
-//		read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
-//		read32(INTEL_OVERLAY_EXTENDED_STATUS)));
+	TRACE(("update overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), ERR: %lx\n",
+		read32(INTEL_OVERLAY_UPDATE), read32(INtEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
+		*(((uint32 *)gInfo->overlay_registers) + 0x68/4), read32(0x30168), read32(0x2024)));
 }
 
 
@@ -254,9 +254,13 @@ show_overlay(void)
 	gInfo->shared_info->overlay_active = true;
 	gInfo->overlay_registers->overlay_enabled = true;
 
-	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
+	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 	queue.PutOverlayFlip(COMMAND_OVERLAY_ON, true);
 	queue.PutFlush();
+
+	TRACE(("show overlay: UP: %lx, TST: %lx, ST: %lx, CMD: %lx (%lx), ERR: %lx\n",
+		read32(INTEL_OVERLAY_UPDATE), read32(INTEL_OVERLAY_TEST), read32(INTEL_OVERLAY_STATUS),
+		*(((uint32 *)gInfo->overlay_registers) + 0x68/4), read32(0x30168), read32(0x2024)));
 }
 
 
@@ -272,7 +276,7 @@ hide_overlay(void)
 	gInfo->shared_info->overlay_active = false;
 	registers->overlay_enabled = false;
 
-	QueueCommands queue(gInfo->shared_info->secondary_ring_buffer);
+	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
 
 	// flush pending commands
 	queue.PutFlush();
@@ -297,6 +301,7 @@ uint32
 intel_overlay_count(const display_mode *mode)
 {
 	// TODO: make this depending on the amount of RAM and the screen mode
+	// (and we could even have more than one when using 3D as well)
 	return 1;
 }
 
@@ -360,12 +365,16 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	// TODO: locking!
 
 	// alloc graphics mem
-	overlay_buffer *buffer = &overlay->buffer;
 
+	int32 alignment = 0x3f;
+	if (sharedInfo.device_type == INTEL_TYPE_965)
+		alignment = 0xff;
+
+	overlay_buffer *buffer = &overlay->buffer;
 	buffer->space = colorSpace;
 	buffer->width = width;
 	buffer->height = height;
-	buffer->bytes_per_row = (width * bytesPerPixel + 0x3f) & ~0x3f;
+	buffer->bytes_per_row = (width * bytesPerPixel + alignment) & ~alignment;
 
 	status_t status = intel_allocate_memory(buffer->bytes_per_row * height,
 		0, overlay->buffer_base);
@@ -394,8 +403,8 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	buffer->buffer_dma = (uint8 *)gInfo->shared_info->physical_graphics_memory
 		+ overlay->buffer_offset;
 
-	TRACE(("allocated overlay buffer: handle=%x, offset=%x, address=%x, "
-		"physical address=%x\n", overlay->buffer_handle, overlay->buffer_offset,
+	TRACE(("allocated overlay buffer: base=%x, offset=%x, address=%x, "
+		"physical address=%x\n", overlay->buffer_base, overlay->buffer_offset,
 		buffer->buffer, buffer->buffer_dma));
 
 	return buffer;
@@ -604,8 +613,13 @@ intel_configure_overlay(overlay_token overlayToken, const overlay_buffer *buffer
 		// result will be wrong, too.
 		registers->source_width_rgb = right - left;
 		registers->source_height_rgb = bottom - top;
-		registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + (view->width << 1)
-			+ 0x1f) >> 5) - (overlay->buffer_offset >> 5) - 1) << 2;
+		if ((gInfo->shared_info->device_type & INTEL_TYPE_8xx) != 0) {
+			registers->source_bytes_per_row_rgb = (((overlay->buffer_offset + (view->width << 1)
+				+ 0x1f) >> 5) - (overlay->buffer_offset >> 5) - 1) << 2;
+		} else {
+			registers->source_bytes_per_row_rgb = ((((overlay->buffer_offset + (view->width << 1)
+				+ 0x3f) >> 6) - (overlay->buffer_offset >> 6) << 1) - 1) << 2;
+		}
 
 		// horizontal scaling
 		registers->scale_rgb.horizontal_downscale_factor = horizontalScale >> 12;
