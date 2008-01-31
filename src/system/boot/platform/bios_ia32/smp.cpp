@@ -565,6 +565,13 @@ dprintf("wait for delivery\n");
 			while ((apic_read(APIC_INTR_COMMAND_1) & APIC_DELIVERY_STATUS) != 0)
 				asm volatile ("pause;");
 		}
+
+		// Wait for the trampoline code to clear the final stack location.
+		// This serves as a notification for us that it has loaded the address
+		// and it is safe for us to overwrite it to trampoline the next CPU.
+		tempStack++;
+		while (*tempStack != 0)
+			spin(1000);
 	}
 
 	TRACE(("done trampolining\n"));
