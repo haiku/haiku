@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the Haiku License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -10,6 +10,8 @@
 
 
 #include <KernelExport.h>
+#include <module.h>
+
 
 #define KDEBUG 1
 
@@ -18,7 +20,7 @@
  * The kernel debug level. 
  * Level 1 is usual asserts, > 1 should be used for very expensive runtime checks
  */
-#define KDEBUG 1
+#	define KDEBUG 1
 #endif
 
 #define ASSERT_ALWAYS(x) \
@@ -41,6 +43,13 @@
 #endif
 
 #define B_KDEBUG_DONT_PARSE_ARGUMENTS	(0x01)
+
+struct debugger_module_info {
+	module_info info;
+
+	void (*enter_debugger)(void);
+	void (*exit_debugger)(void);
+};
 
 extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 

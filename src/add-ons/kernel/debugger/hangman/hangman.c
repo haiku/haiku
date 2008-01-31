@@ -1,8 +1,10 @@
 #ifdef _KERNEL_MODE
-#include <Drivers.h>
-#include <KernelExport.h>
-#include <module.h>
+#	include <Drivers.h>
+#	include <KernelExport.h>
+#	include <module.h>
+#	include <debug.h>
 #endif
+
 #include <OS.h>
 #include <image.h>
 #include <ctype.h>
@@ -440,37 +442,44 @@ find_device(const char *name)
 #  else /* as module */
 
 
-status_t std_ops(int32 op, ...);
-
-status_t
+static status_t
 std_ops(int32 op, ...)
 {
 	status_t err;
 
 	switch (op) {
-	case B_MODULE_INIT:
-		err = init_words(FORTUNE_FILE);
-		if (err < B_OK) {
-			dprintf("hangman: error reading fortune file: %s\n", strerror(err));
-			return B_ERROR;
-		}
-		add_debugger_command("kdlhangman", kdlhangman, KCMD_HELP);
-		return B_OK;
-	case B_MODULE_UNINIT:
-		remove_debugger_command("kdlhangman", kdlhangman);
-		return B_ERROR;
+		case B_MODULE_INIT:
+			err = init_words(FORTUNE_FILE);
+			if (err < B_OK) {
+				dprintf("hangman: error reading fortune file: %s\n",
+					strerror(err));
+				return B_ERROR;
+			}
+			add_debugger_command("kdlhangman", kdlhangman, KCMD_HELP);
+			return B_OK;
+		case B_MODULE_UNINIT:
+			remove_debugger_command("kdlhangman", kdlhangman);
+			return B_OK;
 	}
+
 	return B_ERROR;
 }
 
 
-static module_info minfo = {
-	"debugger/hangman/v1",
-	B_KEEP_LOADED,
-	&std_ops
+static struct debugger_module_info sModuleInfo = {
+	{
+		"debugger/hangman/v1",
+		B_KEEP_LOADED,
+		&std_ops
+	},
+	NULL,
+	NULL
 };
 
-module_info *modules[] = { &minfo, NULL };
+module_info *modules[] = { 
+	(module_info *)&sModuleInfo,
+	NULL
+};
 
 #  endif /* AS_DRIVER */
 

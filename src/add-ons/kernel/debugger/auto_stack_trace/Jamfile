@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel debugger auto_stack_trace ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon <kdebug>auto_stack_trace :
+	auto_stack_trace.cpp
+	;

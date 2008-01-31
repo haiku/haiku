@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -73,6 +73,10 @@ static void check_pending_repeats(void *data, int iter);
 static int64 sMessageRepeatFirstTime = 0;
 static int64 sMessageRepeatLastTime = 0;
 static int32 sMessageRepeatCount = 0;
+
+static debugger_module_info *sDebuggerModules[8];
+static const uint32 kMaxDebuggerModules = sizeof(sDebuggerModules)
+	/ sizeof(sDebuggerModules[0]);
 
 #define LINE_BUFFER_SIZE 1024
 #define HISTORY_SIZE 16
@@ -850,6 +854,23 @@ err1:
 }
 
 
+void
+call_modules_hook(bool enter)
+{
+	uint32 index = 0;
+	while (index < kMaxDebuggerModules && sDebuggerModules[index] != NULL) {
+		debugger_module_info *module = sDebuggerModules[index];
+
+		if (enter && module->enter_debugger != NULL)
+			module->enter_debugger();
+		else if (!enter && module->exit_debugger != NULL)
+			module->exit_debugger();
+
+		index++;
+	}
+}
+
+
 //	#pragma mark - private kernel API
 
 
@@ -995,17 +1016,19 @@ debug_init_post_modules(struct kernel_args *args)
 
 	// load kernel debugger addons
 	cookie = open_module_list("debugger");
-	while (true) {
+	uint32 count = 0;
+	while (count < kMaxDebuggerModules) {
 		char name[B_FILE_NAME_LENGTH];
 		size_t nameLength = sizeof(name);
-		module_info *module;
 
 		if (read_next_module_name(cookie, name, &nameLength) != B_OK)
 			break;
-		if (get_module(name, &module) == B_OK)
-			dprintf("kernel debugger extention \"%s\": loaded\n", name);
-		else
-			dprintf("kernel debugger extention \"%s\": failed to load\n", name);
+
+		if (get_module(name, (module_info **)&sDebuggerModules[count]) == B_OK) {
+			dprintf("kernel debugger extension \"%s\": loaded\n", name);
+			count++;
+		} else
+			dprintf("kernel debugger extension \"%s\": failed to load\n", name);
 	}
 	close_module_list(cookie);
 
@@ -1093,8 +1116,11 @@ kernel_debugger(const char *message)
 	// sort the commands
 	sort_debugger_commands();
 
+	call_modules_hook(true);
+
 	kernel_debugger_loop();
 
+	call_modules_hook(false);
 	set_dprintf_enabled(dprintfState);
 
 	sBlueScreenEnabled = false;
