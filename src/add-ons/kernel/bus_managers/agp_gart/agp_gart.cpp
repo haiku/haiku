@@ -132,8 +132,7 @@ public:
 	status_t AllocateMemory(aperture_memory *memory, uint32 flags);
 
 	status_t UnbindMemory(aperture_memory *memory);
-	status_t BindMemory(aperture_memory *memory, addr_t base, size_t size,
-		bool physical);
+	status_t BindMemory(aperture_memory *memory, addr_t base, size_t size);
 
 	status_t GetInfo(aperture_info *info);
 
@@ -387,6 +386,20 @@ set_pci_mode()
 }
 
 
+status_t
+get_area_base_and_size(area_id area, addr_t base, size_t size)
+{
+	area_info info;
+	status_t status = get_area_info(area, &info);
+	if (status < B_OK)
+		return status;
+
+	base = (addr_t)info.address;
+	size = info.size;
+	return B_OK;
+}
+
+
 Aperture *
 get_aperture(aperture_id id)
 {
@@ -568,6 +581,7 @@ Aperture::UnbindMemory(aperture_memory *memory)
 	}
 
 	addr_t start = base - Base();
+	TRACE("unbind %ld bytes at %lx\n", size, start);
 
 	for (addr_t offset = 0; offset < memory->size; offset += B_PAGE_SIZE) {
 		status_t status = fModule->unbind_page(fPrivateAperture, start + offset);
@@ -582,9 +596,21 @@ Aperture::UnbindMemory(aperture_memory *memory)
 
 
 status_t
-Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size,
-	bool physical)
+Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 {
+	bool physical = false;
+
+	if ((memory->flags & ALLOCATED_APERTURE) != 0) {
+		// We allocated this memory, get the base and size from there
+#ifdef __HAIKU__
+		physical = true;
+#else
+		status_t status = get_area_base_and_size(memory->area, address, size);
+		if (status < B_OK)
+			return status;
+#endif
+	}
+
 	// We don't need to bind reserved memory
 	addr_t base = memory->base;
 	int32 offset;
@@ -613,8 +639,18 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size,
 				return status;
 
 			physicalAddress = (addr_t)entry.address;
-		} else
-			physicalAddress = address + offset;
+		} else {
+#ifdef __HAIKU__
+			uint32 index = offset >> PAGE_SHIFT;
+			vm_page *page;
+			if ((memory->flags & B_APERTURE_NEED_PHYSICAL) != 0)
+				page = memory->page + index;
+			else
+				page = memory->pages[index];
+
+			physicalAddress = page->physical_page_number << PAGE_SHIFT;
+#endif
+		}
 
 		status = fModule->bind_page(fPrivateAperture, start + offset,
 			physicalAddress);
@@ -971,7 +1007,7 @@ allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 
 	status_t status = aperture->AllocateMemory(memory, flags);
 	if (status == B_OK)
-		status = aperture->BindMemory(memory, memory->base, memory->size, false);
+		status = aperture->BindMemory(memory, 0, 0);
 	if (status < B_OK) {
 		aperture->DeleteMemory(memory);
 		return status;
@@ -998,7 +1034,7 @@ allocate_memory(aperture_id id, size_t size, size_t alignment, uint32 flags,
 
 
 static status_t
-deallocate_memory(aperture_id id, addr_t base)
+free_memory(aperture_id id, addr_t base)
 {
 	Aperture *aperture = get_aperture(id);
 	if (aperture == NULL)
@@ -1038,7 +1074,7 @@ unreserve_aperture(aperture_id id, addr_t apertureBase)
 
 static status_t
 bind_aperture(aperture_id id, area_id area, addr_t base, size_t size,
-	size_t alignment, bool physical, addr_t reservedBase, addr_t *_apertureBase)
+	size_t alignment, addr_t reservedBase, addr_t *_apertureBase)
 {
 	Aperture *aperture = get_aperture(id);
 	if (aperture == NULL)
@@ -1054,15 +1090,9 @@ bind_aperture(aperture_id id, area_id area, addr_t base, size_t size,
 	}
 
 	if (area >= 0) {
-		// get base and size from area
-		area_info info;
-		status_t status = get_area_info(area, &info);
+		status_t status = get_area_base_and_size(area, base, size);
 		if (status < B_OK)
 			return status;
-
-		base = (addr_t)info.address;
-		size = info.size;
-		physical = false;
 	}
 
 	Autolock _(aperture->Lock());
@@ -1082,7 +1112,7 @@ bind_aperture(aperture_id id, area_id area, addr_t base, size_t size,
 
 	// just bind the physical pages backing the memory into the GART
 
-	status_t status = aperture->BindMemory(memory, base, size, physical);
+	status_t status = aperture->BindMemory(memory, base, size);
 	if (status < B_OK) {
 		if (reservedBase < 0)
 			aperture->DeleteMemory(memory);
@@ -1202,7 +1232,7 @@ static struct agp_gart_module_info sAGPModuleInfo = {
 	unmap_aperture,
 	get_aperture_info,
 	allocate_memory,
-	deallocate_memory,
+	free_memory,
 	reserve_aperture,
 	unreserve_aperture,
 	bind_aperture,

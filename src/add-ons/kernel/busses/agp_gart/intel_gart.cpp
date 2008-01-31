@@ -222,8 +222,9 @@ intel_map(intel_info &info)
 
 	info.gtt_entries = gttSize / 4096;
 	info.gtt_stolen_entries = stolenSize / 4096;
-dprintf("GTT base %lx, size %lu, entries %lu, stolen %lu\n", info.gtt_physical_base,
-	gttSize, info.gtt_entries, stolenSize);
+
+	TRACE("GTT base %lx, size %lu, entries %lu, stolen %lu\n", info.gtt_physical_base,
+		gttSize, info.gtt_entries, stolenSize);
 
 	int fbIndex = 0;
 	int mmioIndex = 1;
@@ -379,7 +380,9 @@ intel_set_aperture_size(void *aperture, size_t size)
 static status_t
 intel_bind_page(void *aperture, uint32 offset, addr_t physicalAddress)
 {
-	set_gtt_entry(sInfo, offset << GTT_PAGE_SHIFT, physicalAddress);
+	TRACE("bind_page(offset %lx, physical %lx)\n", offset, physicalAddress);
+
+	set_gtt_entry(sInfo, offset, physicalAddress);
 	return B_OK;
 }
 
@@ -387,8 +390,10 @@ intel_bind_page(void *aperture, uint32 offset, addr_t physicalAddress)
 static status_t
 intel_unbind_page(void *aperture, uint32 offset)
 {
+	TRACE("unbind_page(offset %lx)\n", offset);
+
 	if (sInfo.scratch_page != 0)
-		set_gtt_entry(sInfo, offset << GTT_PAGE_SHIFT, sInfo.scratch_page);
+		set_gtt_entry(sInfo, offset, sInfo.scratch_page);
 
 	return B_OK;
 }

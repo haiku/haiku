@@ -60,13 +60,13 @@ typedef struct agp_gart_module_info {
 	status_t	(*allocate_memory)(aperture_id id, size_t size,
 					size_t alignment, uint32 flags, addr_t *_apertureBase,
 					addr_t *_physicalBase);
-	status_t	(*deallocate_memory)(aperture_id id, addr_t apertureBase);
+	status_t	(*free_memory)(aperture_id id, addr_t apertureBase);
 	status_t	(*reserve_aperture)(aperture_id id, size_t size,
 					addr_t *_apertureBase);
 	status_t	(*unreserve_aperture)(aperture_id id, addr_t apertureBase);
 	status_t	(*bind_aperture)(aperture_id id, area_id area, addr_t base,
-					size_t size, size_t alignment, bool physical,
-					addr_t reservedBase, addr_t *_apertureBase);
+					size_t size, size_t alignment, addr_t reservedBase,
+					addr_t *_apertureBase);
 	status_t	(*unbind_aperture)(aperture_id id, addr_t apertureBase);
 } agp_gart_module_info;
 
