@@ -13,6 +13,8 @@
 #define Z_THEME_LOCATION	"z:theme:location"
 		// identifies a module this theme has info for.
 #define Z_THEME_MODULE_TAG	"z:theme:moduletag"
+		// if the theme is imported, where from
+#define Z_THEME_IMPORTER	"z:theme:importer"
 
 // the names of the global BMessages
 #define Z_THEME_INFO_MESSAGE "z:theme:infos"

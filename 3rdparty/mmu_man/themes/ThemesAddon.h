@@ -1,3 +1,5 @@
+#ifndef _THEMES_ADDON_H
+#define _THEMES_ADDON_H
 /*
  * ThemesAddon class header
  */
@@ -95,3 +97,4 @@ extern "C" Z::ThemeManager::ThemesAddon *instantiate_themes_addon_window_decor()
 
 using namespace Z::ThemeManager;
 
+#endif /* _THEMES_ADDON_H */

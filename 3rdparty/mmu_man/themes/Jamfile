@@ -26,6 +26,7 @@ addonSources =
 ;
 
 Application <3rdparty>Themes :
+	BeThemeImporter.cpp
 	CompareMessages.cpp
 	DumpMessage.cpp
 	MakeScreenshot.cpp
@@ -33,6 +34,7 @@ Application <3rdparty>Themes :
 	TextInputAlert.cpp
 	ThemeAddonItem.cpp
 	ThemesApp.cpp
+	ThemeImporter.cpp
 	ThemeInterfaceView.cpp
 	ThemeItem.cpp
 	ThemeManager.cpp

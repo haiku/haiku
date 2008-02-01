@@ -494,6 +494,7 @@ void ThemeInterfaceView::_ThemeListPopulator()
 {
 	status_t err;
 	int32 i, count;
+	int32 importer;
 	BString name;
 	ThemeItem *ti;
 	bool isro;
@@ -502,9 +503,12 @@ void ThemeInterfaceView::_ThemeListPopulator()
 	tman->LoadThemes();
 
 	count = tman->CountThemes();
+	
 	LockLooper();
 	fThemeList->MakeEmpty();
 	UnlockLooper();
+	
+	// native themes
 	for (i = 0; i < count; i++) {
 		err = tman->ThemeName(i, name);
 		isro = tman->ThemeIsReadOnly(i);
@@ -516,6 +520,36 @@ void ThemeInterfaceView::_ThemeListPopulator()
 		UnlockLooper();
 	}
 
+	// for each importer
+	for (importer = 0; importer < tman->CountThemeImporters(); importer++) {
+		err = tman->ImportThemesFor(importer);
+		if (err < 0)
+			continue;
+		PRINT(("Imports for %s: %d\n", tman->ThemeImporterAt(importer), (tman->CountThemes() - count)));
+		if (tman->CountThemes() == count)
+			continue; // nothing found
+		// separator item
+		name = "Imported (";
+		name << tman->ThemeImporterAt(importer) << ")";
+		BStringItem *si = new BStringItem(name.String());
+		si->SetEnabled(false);
+		LockLooper();
+		fThemeList->AddItem(si);
+		UnlockLooper();
+		// add new themes
+		count = tman->CountThemes();
+		for (; i < count; i++) {
+			err = tman->ThemeName(i, name);
+			isro = true;//tman->ThemeIsReadOnly(i);
+			if (err)
+				continue;
+			ti = new ThemeItem(i, name.String(), isro);
+			LockLooper();
+			fThemeList->AddItem(ti);
+			UnlockLooper();
+		}
+	}
+	// enable controls again
 	BControl *c;
 	LockLooper();
 	for (i = 0; ChildAt(i); i++) {

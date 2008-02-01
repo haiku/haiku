@@ -91,6 +91,11 @@ status_t	PackageTheme(BMessage &theme);
 			/* load from disk (zip / folder) */
 status_t	LoadTheme(const char *path, BMessage **to=NULL);
 	
+	/* Theme importation */
+int32		CountThemeImporters();
+const char	*ThemeImporterAt(int32 index);
+status_t	ImportThemesFor(int32 index, const char *path=NULL);
+	
 	/* Theme properties */
 	
 bool		ThemeHasInfoFor(int32 id, BString &module);
@@ -123,6 +128,7 @@ private:
 	int32		fAddonCount;
 	BList		fThemeList;
 	BMessage	fNames; /* pretty names for fields */
+	BList		fThemeImporters;
 };
 
 } // ns ThemeManager

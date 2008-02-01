@@ -21,9 +21,11 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "UITheme.h"
 #include "ThemeManager.h"
 #include "ThemesAddon.h"
-#include "UITheme.h"
+#include "ThemeImporter.h"
+#include "BeThemeImporter.h"
 
 #include "ParseMessage.h"
 #include "DumpMessage.h"
@@ -54,6 +56,8 @@ ThemeManager::ThemeManager()
 	AddNames(fNames);
 	LoadSettings();
 
+	// XXX: add more
+	fThemeImporters.AddItem(new BeThemeImporter());
 	
 	// XXX test
 /*
@@ -952,6 +956,48 @@ status_t ThemeManager::LoadTheme(const char *path, BMessage **to)
 	return err;
 }
 
+int32 ThemeManager::CountThemeImporters()
+{
+	FENTRY;
+	return fThemeImporters.CountItems();
+}
+
+const char * ThemeManager::ThemeImporterAt(int32 index)
+{
+	FENTRY;
+	ThemeImporter *importer;
+	importer = static_cast<ThemeImporter *>(fThemeImporters.ItemAt(index));
+	if (!importer)
+		return NULL;
+	return importer->Name();
+}
+
+status_t ThemeManager::ImportThemesFor(int32 index, const char *path)
+{
+	FENTRY;
+	status_t err;
+	int32 count;
+	BString m;
+	int32 i;
+	ThemeImporter *importer;
+	BMessage msg;
+	BMessage *theme;
+	
+	importer = static_cast<ThemeImporter *>(fThemeImporters.ItemAt(index));
+	if (!importer)
+		return ENOENT;
+
+	err = importer->FetchThemes();
+	if (err < 0)
+		return err;
+	while ((importer->ImportNextTheme(&theme)) >= 0) {
+		AddTheme(theme);
+	}
+	importer->EndImports();
+	
+	return B_OK;
+}
+
 bool ThemeManager::ThemeHasInfoFor(int32 id, BString &module)
 {
 	FENTRY;
@@ -1025,8 +1071,16 @@ bool ThemeManager::ThemeIsReadOnly(int32 id)
 	FENTRY;
 	status_t err;
 	BString s;
+	BMessage *theme;
 	
 	if (id < 0)
+		return true;
+	
+	theme = (BMessage *)fThemeList.ItemAt(id);
+	if (!theme)
+		return true;
+	// imported themes are always RO for now
+	if (theme->FindString(Z_THEME_IMPORTER, &s) >= B_OK)
 		return true;
 	
 	err = ThemeLocation(id, s);
