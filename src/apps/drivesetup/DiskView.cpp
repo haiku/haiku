@@ -11,6 +11,7 @@
 #include <DiskDeviceVisitor.h>
 #include <GroupLayout.h>
 #include <HashMap.h>
+#include <LayoutItem.h>
 #include <PartitioningInfo.h>
 #include <String.h>
 
@@ -225,7 +226,7 @@ public:
 		view->SetSelected(id == fSelectedPartition);
 		PartitionView* parent = fViewMap.Get(partition->Parent()->ID());
 		BGroupLayout* layout = parent->GroupLayout();
-		layout->AddView(view, scale);
+		layout->AddView(_FindInsertIndex(view, layout), view, scale);
 
 		fViewMap.Put(partition->ID(), view);
 		_AddSpaces(partition, view);
@@ -269,22 +270,29 @@ public:
 				info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
 				i++) {
 				double scale = (double)size / parentSize;
-				PartitionView* view = new PartitionView("Empty", scale,
+				PartitionView* view = new PartitionView("<empty>", scale,
 					offset, parentView->Level() + 1, -2);
 
 				BGroupLayout* layout = parentView->GroupLayout();
-				int32 count = parentView->CountChildren();
-				int32 insertIndex = 0;
-				for (int32 j = 0; j < count; j++) {
-					PartitionView* sibling = dynamic_cast<PartitionView*>(
-						parentView->ChildAt(j));
-					if (sibling && sibling->Offset() > offset)
-						break;
-					insertIndex++;
-				}
-				layout->AddView(view, scale);
+				layout->AddView(_FindInsertIndex(view, layout), view, scale);
 			}
 		}
+	}
+	int32 _FindInsertIndex(PartitionView* view, BGroupLayout* layout) const
+	{
+		int32 insertIndex = 0;
+		int32 count = layout->CountItems();
+		for (int32 i = 0; i < count; i++) {
+			BLayoutItem* item = layout->ItemAt(i);
+			if (!item)
+				break;
+			PartitionView* sibling
+				= dynamic_cast<PartitionView*>(item->View());
+			if (sibling && sibling->Offset() > view->Offset())
+				break;
+			insertIndex++;
+		}
+		return insertIndex;
 	}
 
 	typedef	HashKey32<partition_id>					PartitionKey;
@@ -421,8 +429,17 @@ DiskView::_UpdateLayout()
 
 	fPartitionLayout->Unset();
 
-	if (fDisk)
+	if (fDisk) {
+		// we need to prepare the disk for modifications, otherwise
+		// we cannot get information about available spaces on the
+		// device or any of its child partitions
+		// TODO: cancelling modifications here is of course undesired
+		// once we hold off the real modifications until an explicit
+		// command to write them to disk...
+fDisk->PrepareModifications();
 		fDisk->VisitEachDescendant(fPartitionLayout);
+fDisk->CancelModifications();
+	}
 
 	Invalidate();
 }

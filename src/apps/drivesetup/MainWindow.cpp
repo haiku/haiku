@@ -50,6 +50,10 @@ public:
 	virtual bool Visit(BDiskDevice* device)
 	{
 		fDiskCount++;
+		// if we don't prepare the device for modifications,
+		// we cannot get information about available empty
+		// regions on the device or child partitions
+device->PrepareModifications();
 		_AddPartition(device);
 		return false; // Don't stop yet!
 	}
@@ -68,7 +72,8 @@ private:
 
 		// add any available space on it
 		BPartitioningInfo info;
-		if (partition->GetPartitioningInfo(&info) >= B_OK) {
+		status_t ret = partition->GetPartitioningInfo(&info);
+		if (ret >= B_OK) {
 			off_t offset;
 			off_t size;
 			for (int32 i = 0;
@@ -76,6 +81,9 @@ private:
 				i++) {
 				fPartitionList->AddSpace(partition->ID(), offset, size);
 			}
+		} else {
+			fprintf(stderr, "failed to get partitioning info: %s\n",
+				strerror(ret));
 		}
 	}
 
