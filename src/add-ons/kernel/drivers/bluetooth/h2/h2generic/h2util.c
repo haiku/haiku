@@ -5,22 +5,23 @@
  *
  */
 
+#include <malloc.h>
+
 #include "h2upper.h"
 #include "h2util.h"
 #include "h2transactions.h"
 
-#define BT_DEBUG_THIS_MODULE
-#include "btDebug.h"
+#include <bluetooth/HCI/btHCI_acl.h>
+#include <bluetooth/HCI/btHCI_command.h>
+#include <bluetooth/HCI/btHCI_event.h>
 
-#include <btHCITransport.h>
-#include <btHCI_acl.h>
-#include <btHCI_command.h>
-#include <btHCI_event.h>
+#define BT_DEBUG_THIS_MODULE
+#include <btDebug.h>
+
 
 void*
 nb_get_whole_buffer(net_buffer* nbuf)
 {
-
     void*       conPointer;
     status_t    err;
     
@@ -52,7 +53,7 @@ nb_get_whole_buffer(net_buffer* nbuf)
     return conPointer;
     
 free:
-    free(nbuf->COOKIEFIELD);
+    free((void*) nbuf->COOKIEFIELD);
 fail:
     return NULL;
 }
@@ -99,9 +100,11 @@ get_expected_size(net_buffer* nbuf)
             return header->elen;
             }                    
         default:
-        
-        break;
+
+		break;        
     }
+    
+    return B_ERROR;
 }
 
 #if 0

@@ -5,16 +5,19 @@
  *
  */
 
+
+#include <string.h>
+
+#include <bluetooth/bluetooth.h>
+#include <bluetooth/HCI/btHCI_transport.h>
+
 #include "h2upper.h"
 #include "h2transactions.h"
+#include "snet_buffer.h"
 
 #define BT_DEBUG_THIS_MODULE
-#include "btDebug.h"
+#include <btDebug.h>
 
-#include <btHCITransport.h>
-#include <bluetooth.h>
-
-#include "snet_buffer.h"
 
 /* TODO: split for commands and comunication(ACL&SCO) */
 void 
@@ -84,7 +87,7 @@ status_t
 post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
 {
     
-    status_t err;
+    status_t err = B_OK;
     port_id port;
             
     if (hci == NULL) {
@@ -92,20 +95,19 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
         err = B_ERROR;
 
 	    // ERROR but we will try to send if its a event!
-	    if (type != BT_EVENT) {
-	    	err = B_ERROR;
-	   	} else {
-			snet_buffer* snbuf = (snet_buffer*)buf;
+	    if (type == BT_EVENT) {
+
+			snet_buffer* snbuf = (snet_buffer*) buf;
 			
 	        flowf("HCI not present, Posting to userland\n");
 			port = find_port(BT_USERLAND_PORT_NAME);
 	        if (port != B_NAME_NOT_FOUND) {
 	            
 	           
-	           err = write_port_etc(port, PACK_HEADER_PORT(bdev->num,type), 
+	           err = write_port_etc(port, PACK_PORTCODE(type,bdev->hdev, -1),
 	                                snb_get(snbuf), snb_size(snbuf), B_TIMEOUT, 1*1000*1000);
 	           if (err != B_OK) 	            
-	                debugf("Error posting userland %s\n",strerror(err));
+	                debugf("Error posting userland %s\n", strerror(err));
 
 	        }
 	        else {

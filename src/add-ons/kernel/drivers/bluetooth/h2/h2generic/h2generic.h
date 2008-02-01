@@ -12,7 +12,8 @@
 #include <USB.h>
 
 #include <util/list.h>
-#include <btHCI.h>
+#include <bluetooth/HCI/btHCI.h>
+#include <bluetooth/HCI/btHCI_module.h>
 
 #include <net/net_buffer.h>
 
@@ -37,9 +38,9 @@
 // Expecting nobody is gonna have 16 USB-BT dongles connected in their system
 #define MAX_BT_GENERIC_USB_DEVICES	16
 
-extern usb_module_info *usb;
-extern bt_hci_module_info *hci;
-extern struct net_buffer_module_info *nb;
+extern usb_module_info* usb;
+extern bt_hci_module_info* hci;
+extern struct net_buffer_module_info* nb;
 
 #define MAX_COMMAND_WINDOW 1
 #define MAX_ACL_OUT_WINDOW 4

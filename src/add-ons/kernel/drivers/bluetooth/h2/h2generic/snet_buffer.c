@@ -7,6 +7,8 @@
 
 #include "snet_buffer.h"
 
+#include <malloc.h>
+#include <string.h>
 
 struct snet_buffer {
 	struct list_link link;

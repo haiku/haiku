@@ -18,8 +18,9 @@
 #include <net/net_buffer.h>
 #include "snet_buffer.h"
 
-#include <bluetooth_util.h>
-#include <btHCI.h>
+#include <bluetooth/bluetooth_util.h>
+#include <bluetooth/HCI/btHCI.h>
+#include <bluetooth/HCI/btHCI_module.h>
 
 #define BT_DEBUG_THIS_MODULE
 #include <btDebug.h>
@@ -34,7 +35,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 /* Modules */
 static char* usb_name = B_USB_MODULE_NAME;
-static char* hci_name = B_BT_HCI_MODULE_NAME;
+static char* hci_name = BT_HCI_MODULE_NAME;
 
 usb_module_info *usb = NULL;
 bt_hci_module_info *hci = NULL;
@@ -149,7 +150,6 @@ exit:
 static void
 kill_device(bt_usb_dev* dev)
 {
-	uint16 i;
 	debugf("remove_device(%p)\n", dev);
 		
 	delete_sem(dev->lock);
@@ -217,9 +217,9 @@ device_added(const usb_device* dev, void** cookie)
     
     status_t 	err = B_ERROR;
 	bt_usb_dev* new_bt_dev = spawn_device(dev);
-    int e, i;	
+    int e;	
 
-	debugf("device_added(%ld, %p)\n", dev, new_bt_dev);
+	debugf("device_added(%p, %p)\n", dev, new_bt_dev);
 
 	if (new_bt_dev == NULL) {
 		flowf("Couldn't allocate device record.\n");
@@ -339,7 +339,7 @@ bail:
 	kill_device(new_bt_dev);
 bail_no_mem:	
 	*cookie = NULL;
-done:
+
 	return err;
 }
 
@@ -361,7 +361,7 @@ device_removed(void* cookie)
 	// TODO: Consider some other place
 	// TX
 	for (i = 0; i < BT_DRIVER_TXCOVERAGE; i++) {
-		if (i = BT_COMMAND)
+		if (i == BT_COMMAND)
 			while ((item = list_remove_head_item(&bdev->nbuffersTx[i])) != NULL) {
 				snb_free(item);			
 			}
@@ -514,7 +514,7 @@ device_close(void *cookie)
 	if (bdev == NULL)
 		panic("bad cookie");
 		
-	debugf("device_close() called on %s\n", DEVICE_PATH, bdev->hdev );
+	debugf("device_close() called on %ld\n", bdev->hdev );
 
 	
 	if (!TEST_AND_CLEAR(&bdev->state, RUNNING) ) {
@@ -581,13 +581,13 @@ static status_t
 device_control(void *cookie, uint32 msg, void *params, size_t size)
 {
 	status_t 	err = B_ERROR;
-	bt_usb_dev*	dev = (bt_usb_dev*)cookie;
+	bt_usb_dev*	bdev = (bt_usb_dev*)cookie;
 	snet_buffer* snbuf;
 	TOUCH(size);
 
 	debugf("ioctl() opcode %ld size %ld.\n", msg, size);
 	
-	if (dev == NULL) {
+	if (bdev == NULL) {
 		flowf("Bad cookie\n");
 		return B_BAD_VALUE;
 	}
@@ -597,7 +597,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 		return B_BAD_VALUE;
 	}
 	
-	acquire_sem(dev->lock);
+	acquire_sem(bdev->lock);
 		
 	switch (msg) {
 		case ISSUE_BT_COMMAND:
@@ -616,12 +616,12 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 		    snbuf = snb_create(size);
 		    snb_put(snbuf, params, size);
 			
-			err = send_command(dev->hdev, snbuf);
+			err = submit_tx_command(bdev, snbuf);
 		    		
 		break;
 		
-		case ISSUE_STATICS:
-		    memcpy(params, &dev->stat, sizeof(bt_hci_statistics));
+		case GET_STATICS:
+		    memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
 		    err = B_OK;
 		break;		
 		
@@ -631,7 +631,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 		break;
 	}
 	
-	release_sem(dev->lock);
+	release_sem(bdev->lock);
 	return err;
 }
 
@@ -640,7 +640,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 static status_t
 device_read(void *cookie, off_t pos, void *buf, size_t *count)
 {
-	debugf("Reading... pos = %ld || count = %ld\n", pos, *count);
+	debugf("Reading... count = %ld\n", *count);
 		
 	*count = 0;
 	return B_OK;

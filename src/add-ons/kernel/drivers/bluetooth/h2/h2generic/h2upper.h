@@ -12,10 +12,9 @@
 
 #include "h2generic.h"
 
-#define PACK_HEADER_PORT(x,y)   (x<<24|y<<16)
-
 status_t    post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf);
 status_t    send_packet(hci_id hid, bt_packet_t type, net_buffer* nbuf);
+status_t    send_command(hci_id hid, snet_buffer* snbuf);
 
 void        sched_tx_processing(bt_usb_dev* bdev);
 

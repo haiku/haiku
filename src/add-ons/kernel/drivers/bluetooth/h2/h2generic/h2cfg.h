@@ -27,7 +27,6 @@
 
 #define BT_SURVIVE_WITHOUT_HCI
 #define BT_SURVIVE_WITHOUT_NET_BUFFERS
-//#define BT_IOCTLS_PASS_SIZE
 
 
 #endif

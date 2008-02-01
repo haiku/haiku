@@ -12,7 +12,7 @@
 
 #include "h2generic.h"
 
-/* net buffer utils for ACL, to be reviwed */
+/* net buffer utils for ACL, to be reviewed */
 #define DEVICEFIELD type
 #define SET_DEVICE(nbuf,hid) (nbuf->DEVICEFIELD=(nbuf->DEVICEFIELD&0xFFF0)|(hid&0xF))
 #define GET_DEVICE(nbuf) fetch_device(NULL,(nbuf->DEVICEFIELD&0x0F))

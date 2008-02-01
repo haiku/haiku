@@ -10,38 +10,52 @@
 #include "h2upper.h"
 #include "h2util.h"
 
-#include <btHCI.h>
-#include <btHCI_event.h>
-#include <btHCI_acl.h>
+#include <bluetooth/HCI/btHCI.h>
+#include <bluetooth/HCI/btHCI_event.h>
+#include <bluetooth/HCI/btHCI_acl.h>
 
 #include <ByteOrder.h>
 
-#define BT_DEBUG_THIS_MODULE
-#include "btDebug.h"
+#include <string.h>
 
-#if 0
-#pragma mark --- RX Complete ---
+#define BT_DEBUG_THIS_MODULE
+#include <btDebug.h>
+
+
+/* Forward declaration */
+
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+void acl_tx_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
+void acl_rx_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
+void command_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
+void event_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
+#else
+/*  TODO: propagate this definitions */
+void acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len);
+void acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len);
+void command_complete(void* cookie, status_t status, void* data, size_t actual_len);
+void event_complete(void* cookie, status_t status, void* data, size_t actual_len);
 #endif
 
 
-status_t 
+static status_t 
 assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 {
     
-    net_buffer*		nbuf;
-    snet_buffer*	snbuf;
+    net_buffer*		nbuf = NULL;
+    snet_buffer*	snbuf = NULL;
     
-    size_t      currentPacketLen;
-    size_t      expectedPacketLen;
+    size_t      currentPacketLen = 0;
+    size_t      expectedPacketLen = 0;
 
     bdev->stat.bytesRX += count;
 	
-    while (count) {  
+	if (type == BT_EVENT)
+		snbuf = bdev->eventRx;
+	else
+	    nbuf = bdev->nbufferRx[type]; 			
 
-		if (type == BT_EVENT)
-	        snbuf = bdev->eventRx;
-		else
-	        nbuf = bdev->nbufferRx[type]; 			
+    while (count) {  
 
 		debugf("count %d %p %p\n",count, nbuf, nb);		
 
@@ -141,11 +155,19 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
         /* in case in the pipe there is info about the next buffer ... */
 		count -= currentPacketLen; 
 		data  += currentPacketLen;
-    }		
+    }
+    
+    return B_OK;
 }
 
+
+#if 0
+#pragma mark --- RX Complete ---
+#endif
+
+
 void
-event_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
+event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 {
     
     bt_usb_dev* bdev = cookie;    
@@ -180,7 +202,7 @@ resubmit:
 }
 
 void
-acl_rx_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
+acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 {
     bt_usb_dev* bdev = cookie;    
     status_t    err;
@@ -200,12 +222,12 @@ resubmit:
 
 	err = usb->queue_bulk(bdev->bulk_in_ep->handle, data, 
 	                      max(HCI_MAX_FRAME_SIZE,bdev->max_packet_size_bulk_in), 
-	                      acl_rx_complete, bdev);
+	                      acl_rx_complete, (void*) bdev);
 
     if (err != B_OK )   {
         reuse_room(&bdev->aclRoom, data);
         bdev->stat.rejectedRX++;
-        debugf("RX acl resubmittion failed %s\n",strerror(err));
+        debugf("RX acl resubmittion failed %s\n", strerror(err));
     }
     else {
         bdev->stat.acceptedRX++;    
@@ -228,14 +250,14 @@ submit_rx_event(bt_usb_dev* bdev)
 
     err = usb->queue_interrupt(bdev->intr_in_ep->handle, 
                                    buf, size , 
-				                   event_complete, bdev);
+				                   event_complete, (void*) bdev);
     if (err != B_OK )   {
         reuse_room(&bdev->eventRoom, buf);
         bdev->stat.rejectedRX++;
     }
     else {
         bdev->stat.acceptedRX++;
-        debugf("Accepted RX Event\n",bdev->stat.acceptedRX);
+        debugf("Accepted RX Event %d\n", bdev->stat.acceptedRX);
     }
         
     return err;
@@ -282,14 +304,18 @@ submit_rx_sco(bt_usb_dev* bdev)
 #pragma mark --- TX Complete ---
 #endif
 
+#ifndef HAIKU
 void
-command_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
+command_complete(void* cookie, status_t status, void* data, size_t actual_len)
+#else
+void
+command_complete(void* cookie, uint32 status, void* data, size_t actual_len)
+#endif
 {
     snet_buffer* snbuf = (snet_buffer*) cookie;
     bt_usb_dev* bdev = snb_cookie(snbuf);  
-    status_t    err;
 
-    debugf("%d %02x:%02x:%02x:\n", actual_len, ((uint8*)data)[0],((uint8*)data)[1],((uint8*)data)[2]);
+    debugf("%ld %02x:%02x:%02x:\n", actual_len, ((uint8*)data)[0],((uint8*)data)[1],((uint8*)data)[2]);
 
     if (status != B_OK) {
                 
@@ -310,13 +336,18 @@ command_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
 #endif    
 }
 
+
 void
-aclTxComplete(void* cookie, uint32 status, void* data, uint32 actual_len)
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+acl_tx_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
+#else
+acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
+#endif
+
 {
 
     net_buffer* nbuf = (net_buffer*) cookie;
     bt_usb_dev* bdev = GET_DEVICE(nbuf);    
-    status_t    err;
 
     if (status != B_OK) {
                 
@@ -357,7 +388,7 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 	err = usb->queue_request(bdev->dev, bRequestType, bRequest,
 		                     value, wIndex, wLength, 
 		                     snb_get(snbuf), wLength //???
-		                     ,command_complete, snbuf);
+		                     ,command_complete, (void*) snbuf);
 	
 	if (err != B_OK )   {
         bdev->stat.rejectedTX++;
@@ -379,7 +410,7 @@ submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
     
     err = usb->queue_bulk(bdev->bulk_out_ep->handle, 
                           nb_get_whole_buffer(nbuf), nbuf->size,    
-				          aclTxComplete, nbuf);
+				          acl_tx_complete, (void*) nbuf);
 				          
 	if (err != B_OK )   {
         bdev->stat.rejectedTX++;
