@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src add-ons kernel drivers bluetooth h2 h2generic ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders net kernel bluetooth ;
+
+KernelAddon h2generic :
+	h2generic.c
+	h2transactions.c
+	h2upper.c
+	h2util.c
+	snet_buffer.c
+	;
+
+Package haiku-h2generic-cvs :
+	h2generic :
+	boot home config add-ons kernel drivers bin ;
+PackageDriverSymLink haiku-hda-cvs : bluetooth h2 h2generic ;

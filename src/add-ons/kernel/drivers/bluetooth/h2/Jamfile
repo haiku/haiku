@@ -1,0 +1,3 @@
+SubDir HAIKU_TOP src add-ons kernel drivers bluetooth h2 ; 
+
+SubInclude HAIKU_TOP src add-ons kernel drivers bluetooth h2 h2generic ;
