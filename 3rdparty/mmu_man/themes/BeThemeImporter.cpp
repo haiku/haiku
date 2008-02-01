@@ -22,9 +22,9 @@
 #include "BeThemeImporter.h"
 
 
-#define DEBUG_BTI
-#ifdef DEBUG_BTI
-#define FENTRY PRINT(("BeThemeImporter[%s]::%s()\n", Name(), __FUNCTION__))
+#define DEBUG_TI
+#ifdef DEBUG_TI
+#define FENTRY PRINT(("ThemeImporter[%s]::%s()\n", Name(), __FUNCTION__))
 #else
 #define FENTRY
 #endif

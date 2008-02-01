@@ -2,6 +2,7 @@
 #include <Bitmap.h>
 #include <Box.h>
 #include <DataIO.h>
+#include <Debug.h>
 #include <Entry.h>
 #include <File.h>
 #include <BeBuild.h>
