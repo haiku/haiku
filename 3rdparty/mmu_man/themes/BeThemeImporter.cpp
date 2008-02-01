@@ -87,7 +87,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 		return err;
 	err = settingsDir.SetTo(&dir, "Settings");
 	if (err < 0)
-		return err;
+		return B_ERROR;
 	PRINT(("BeThemeImporter: importing from '%s'\n", path.Path()));
 		
 	BMessage global(Z_THEME_MESSAGE_WHAT);
@@ -105,7 +105,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 
 	err = file.SetTo(&settingsDir, "Description", B_READ_ONLY);
 	if (err < B_OK)
-		return err;
+		return B_ERROR;
 	BString str;
 	char *buff;
 	buff = str.LockBuffer(1024);
@@ -120,7 +120,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 	
 	err = file.SetTo(&settingsDir, "Deskbar", B_READ_ONLY);
 	if (err < B_OK)
-		return err;
+		return B_ERROR;
 	str = "";
 	buff = str.LockBuffer(1024);
 	memset(buff, 0, 1024);
@@ -151,7 +151,7 @@ status_t BeThemeImporter::ImportNextTheme(BMessage **theme)
 	
 	err = file.SetTo(&settingsDir, "WorkSpaces", B_READ_ONLY);
 	if (err < B_OK)
-		return err;
+		return B_ERROR;
 	buff = str.LockBuffer(1024);
 	memset(buff, 0, 1024);
 	file.Read(buff, 1024);

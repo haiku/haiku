@@ -990,8 +990,9 @@ status_t ThemeManager::ImportThemesFor(int32 index, const char *path)
 	err = importer->FetchThemes();
 	if (err < 0)
 		return err;
-	while ((importer->ImportNextTheme(&theme)) >= 0) {
-		AddTheme(theme);
+	while ((err = importer->ImportNextTheme(&theme)) != ENOENT) {
+		if (err >= 0)
+			AddTheme(theme);
 	}
 	importer->EndImports();
 	
