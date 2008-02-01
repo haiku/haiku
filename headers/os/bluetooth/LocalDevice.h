@@ -11,7 +11,13 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/DeviceClass.h>
 
+#include <bluetooth/HCI/btHCI.h>
+
+#include <Messenger.h>
+#include <Message.h>
+
 #include <String.h>
+
 
 namespace Bluetooth {
 
@@ -22,7 +28,9 @@ class LocalDevice {
     public:
         /* Possible throwing */
         static   LocalDevice* GetLocalDevice();
-        static   LocalDevice* GetLocalDevice(uint8 dev);
+        static   uint32       GetLocalDeviceCount();
+        
+        static   LocalDevice* GetLocalDevice(hci_id hid);
         static   LocalDevice* GetLocalDevice(bdaddr_t bdaddr);
         
                  DiscoveryAgent* GetDiscoveryAgent();
@@ -35,13 +43,22 @@ class LocalDevice {
                  void GetProperty(const char* property, uint32* value);
                  
                  int GetDiscoverable();
-                 BString GetBluetoothAddress();
-				 /*                     
+                 bdaddr_t GetBluetoothAddress();
+		 /*                     
                  ServiceRecord getRecord(Connection notifier);
                  void updateRecord(ServiceRecord srvRecord);
-				 */                 
+		 */                 
     private:
-        LocalDevice();
+        LocalDevice(hci_id hid);
+        
+        static   status_t 		SRetrieveBluetoothMessenger(void);           
+                 status_t 		RetrieveBluetoothMessenger(void);
+        static   LocalDevice*   RequestLocalDeviceID(BMessage* request);
+        
+        static BMessenger*      sfMessenger;
+               BMessenger*      fMessenger;
+
+		hci_id		hid;
 };
     
 }
