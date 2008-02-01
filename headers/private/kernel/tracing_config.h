@@ -10,7 +10,7 @@
 
 // tracing buffer size (in bytes)
 #ifndef MAX_TRACE_SIZE
-#	define MAX_TRACE_SIZE 1024 * 1024
+#	define MAX_TRACE_SIZE (1024 * 1024)
 #endif
 
 
@@ -20,5 +20,6 @@
 //#define SIGNAL_TRACING
 //#define SYSCALL_TRACING
 //#define TEAM_TRACING
+//#define BMESSAGE_TRACING
 
 #endif	// KERNEL_TRACING_CONFIG_H

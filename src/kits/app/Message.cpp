@@ -32,9 +32,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <tracing_config.h>
+	// kernel tracing configuration
 
 #define DEBUG_FUNCTION_ENTER	//debug_printf("thread: 0x%x; this: 0x%08x; header: 0x%08x; fields: 0x%08x; data: 0x%08x; line: %04ld; func: %s\n", find_thread(NULL), this, fHeader, fFields, fData, __LINE__, __PRETTY_FUNCTION__);
 #define DEBUG_FUNCTION_ENTER2	//debug_printf("thread: 0x%x;                                                                             line: %04ld: func: %s\n", find_thread(NULL), __LINE__, __PRETTY_FUNCTION__);
+
+
+#ifdef BMESSAGE_TRACING
+#	define KTRACE(format...)	ktrace_printf(format)
+#else
+#	define KTRACE(format...)
+#endif
 
 
 const char *B_SPECIFIER_ENTRY = "specifiers";
@@ -1911,6 +1920,10 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	header->flags |= MESSAGE_FLAG_WAS_DELIVERED;
 
 	if (direct != NULL) {
+		KTRACE("BMessage send direct: port: %ld, token: %ld, "
+			"message: '%c%c%c%c'", port, token,
+			char(what >> 24), char(what >> 16), char(what >> 8), (char)what);
+
 		// this is a local message transmission
 		direct->AddMessage(copy);
 
@@ -1921,6 +1934,10 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 
 		direct->Release();
 	} else {
+		KTRACE("BMessage send remote: team: %ld, port: %ld, token: %ld, "
+			"message: '%c%c%c%c'", portOwner, port, token,
+			char(what >> 24), char(what >> 16), char(what >> 8), (char)what);
+
 		do {
 			result = write_port_etc(port, kPortMessageCode, (void *)buffer, size,
 				B_RELATIVE_TIMEOUT, timeout);
