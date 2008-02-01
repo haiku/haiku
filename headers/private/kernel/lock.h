@@ -96,7 +96,7 @@ static inline status_t
 benaphore_unlock(benaphore *ben)
 {
 #ifdef KDEBUG
-	release_sem(ben->sem);
+	return release_sem(ben->sem);
 #else
 	if (atomic_add(&ben->count, 1) < 0)
 		return release_sem(ben->sem);
