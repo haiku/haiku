@@ -2,15 +2,33 @@
 # If existent it is included by the build system, but it is ignored by svn.
 # This file documents a few examples, what can be done.
 
+
 # Adjusting Build Variables
+
+# The following variables can be configured per subdirectory (or subtree) or
+# even per object file:
+#
+#	CCFLAGS C++FLAGS DEBUG DEFINES HDRS LINKFLAGS OPTIM OPTIMIZE SYSHDRS
+#	WARNINGS
+#	HOST_WARNING_CCFLAGS HOST_WARNING_C++FLAGS
+#	TARGET_WARNING_CCFLAGS TARGET_WARNING_C++FLAGS
+#	PLATFORM SUPPORTED_PLATFORMS
+#
+# The following examples would work analogously for any of these variables.
 
 # Turn off warnings in directory src/system/kernel. As fourth (scope) parameter
 # "local" is specified, which means, that this setting applies only to the
 # given directory, but not any of its subdirectories.
 SetConfigVar WARNINGS : HAIKU_TOP src system kernel : 0 : local ;
 
+# Set the debug level for directory src/system/boot/loader and recursively all
+# of its subdirectories (scope is "global") to 1. All affected generated files
+# will be put into another subtree of the "generated" directory, which allows
+# for fast switching between normal and debug builds.
+SetConfigVar DEBUG : HAIKU_TOP src system boot loader : 1 : global ;
+
 # Add "RUN_WITHOUT_REGISTRAR" to the DEFINES for the directory src/kits and
-# all its subdirectories (scope is "global").
+# all of its subdirectories.
 AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
 	: global ;
 
@@ -18,7 +36,8 @@ AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
 # the object file must be specified) to 1. It is worth mentioning, that the
 # executable the object file is linked into (gdb), will still be placed in
 # generated/objects/.../release/... Only when setting DEBUG for the executable,
-# too, it will be placed in .../debug_1/...
+# too, it will be placed in .../debug_1/.... Apart from that, the DEBUG variable
+# has no effect on executables or other shared objects.
 DEBUG on <src!bin!gdb!gdb!>haiku-nat.o = 1 ;
 
 
