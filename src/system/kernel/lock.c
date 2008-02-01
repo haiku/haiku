@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -202,7 +202,11 @@ benaphore_init(benaphore *ben, const char *name)
 		return B_BAD_VALUE;
 
 	ben->count = 1;
+#ifdef KDEBUG
+	ben->sem = create_sem(1, name);
+#else
 	ben->sem = create_sem(0, name);
+#endif
 	if (ben->sem >= B_OK)
 		return B_OK;
 

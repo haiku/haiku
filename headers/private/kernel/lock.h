@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -81,20 +81,28 @@ benaphore_lock_etc(benaphore *ben, uint32 flags, bigtime_t timeout)
 static inline status_t
 benaphore_lock(benaphore *ben)
 {
+#ifdef KDEBUG
+	return acquire_sem(ben->sem);
+#else
 	if (atomic_add(&ben->count, -1) <= 0)
 		return acquire_sem(ben->sem);
 
 	return B_OK;
+#endif
 }
 
 
 static inline status_t
 benaphore_unlock(benaphore *ben)
 {
+#ifdef KDEBUG
+	release_sem(ben->sem);
+#else
 	if (atomic_add(&ben->count, 1) < 0)
 		return release_sem(ben->sem);
 
 	return B_OK;
+#endif
 }
 
 extern status_t rw_lock_init(rw_lock *lock, const char *name);
