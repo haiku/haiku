@@ -38,6 +38,8 @@
 #include <malloc.h>
 #include <string.h>
 
+#include "syscall_numbers.h"
+
 
 typedef struct generic_syscall generic_syscall;
 
@@ -324,7 +326,7 @@ class PreSyscall : public AbstractTraceEntry {
 					kSyscallInfos[syscall].parameter_size, false);
 
 				// copy string parameters, if any
-				if (fParameters != NULL) {
+				if (fParameters != NULL && syscall != SYSCALL_KTRACE_OUTPUT) {
 					int32 stringIndex = 0;
 					const extended_syscall_info& syscallInfo
 						= kExtendedSyscallInfos[fSyscall];
@@ -379,7 +381,8 @@ class PreSyscall : public AbstractTraceEntry {
 							value = (uint64)*(void**)data;
 							break;
 						case B_STRING_TYPE:
-							if (stringIndex < MAX_PARAM_STRINGS) {
+							if (stringIndex < MAX_PARAM_STRINGS
+								&& fSyscall != SYSCALL_KTRACE_OUTPUT) {
 								out.Print("%s\"%s\"",
 									(i == 0 ? "" : ", "),
 									fParameterStrings[stringIndex++]);
