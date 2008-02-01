@@ -24,9 +24,10 @@ init_hardware(void)
 				return B_OK;
 			}
 		}
+
+		put_module(B_PCI_MODULE_NAME);
 	}
 
-	put_module(B_PCI_MODULE_NAME);
 	pci = NULL;
 
 	return ENODEV;
