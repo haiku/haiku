@@ -716,7 +716,7 @@ dump_tracing(int argc, char** argv)
 
 	AbstractTraceEntry::sPrintTeamID = false;
 	if (argi < argc) {
-		if (strcmp(argv[argi], "printteam") == 0) {
+		if (strcmp(argv[argi], "--printteam") == 0) {
 			AbstractTraceEntry::sPrintTeamID = true;
 			argi++;
 		}
@@ -1012,7 +1012,7 @@ tracing_init(void)
 
 	add_debugger_command_etc("traced", &dump_tracing,
 		"Dump recorded trace entries",
-		"[ \"printteam\" ] (\"forward\" | \"backward\") "
+		"[ \"--printteam\" ] (\"forward\" | \"backward\") "
 			"| ([ <start> [ <count> [ <range> ] ] ] "
 				"[ #<pattern> | (\"filter\" <filter>) ])\n"
 		"Prints recorded trace entries. If \"backward\" or \"forward\" is\n"
@@ -1022,7 +1022,7 @@ tracing_init(void)
 		"afterwards entering an empty line in the debugger will reinvoke it.\n"
 		"If no arguments are given, the command continues in the direction\n"
 		"of the last invocation.\n"
-		"\"printteam\" enables printing the items' team ID.\n"
+		"\"--printteam\" enables printing the items' team ID.\n"
 		"  <start>    - The base index of the entries to print. Depending on\n"
 		"               whether the iteration direction is forward or\n"
 		"               backward this will be the first or last entry printed\n"
