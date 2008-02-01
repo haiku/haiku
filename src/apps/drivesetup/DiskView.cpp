@@ -11,6 +11,7 @@
 #include <DiskDeviceVisitor.h>
 #include <GroupLayout.h>
 #include <HashMap.h>
+#include <PartitioningInfo.h>
 #include <String.h>
 
 using BPrivate::HashMap;
@@ -24,10 +25,13 @@ static const float		kLayoutInset	= 6;
 
 class PartitionView : public BView {
 public:
-	PartitionView(const char* name, float weight, int32 level, partition_id id)
+	PartitionView(const char* name, float weight, off_t offset,
+			int32 level, partition_id id)
 		: BView(name, B_WILL_DRAW | B_SUPPORTS_LAYOUT | B_FULL_UPDATE_ON_RESIZE)
 		, fID(id)
 		, fWeight(weight)
+		, fOffset(offset)
+		, fLevel(level)
 		, fSelected(false)
 		, fMouseOver(false)
 		, fGroupLayout(new BGroupLayout(B_HORIZONTAL, kLayoutInset))
@@ -37,7 +41,7 @@ public:
 		SetViewColor(B_TRANSPARENT_COLOR);
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 		base = tint_color(base, B_LIGHTEN_2_TINT);
-		base = tint_color(base, 1 + 0.13 * level);
+		base = tint_color(base, 1 + 0.13 * (level - 1));
 		SetLowColor(base);
 		SetHighColor(tint_color(base, B_DARKEN_1_TINT));
 
@@ -84,11 +88,16 @@ public:
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			StrokeRect(b, B_SOLID_HIGH);
 			b.InsetBy(1, 1);
+			StrokeRect(b, B_SOLID_HIGH);
+			b.InsetBy(1, 1);
+		} else if (fLevel > 0) {
+			StrokeRect(b, B_SOLID_HIGH);
+			b.InsetBy(1, 1);
 		}
-		StrokeRect(b, B_SOLID_HIGH);
-		b.InsetBy(1, 1);
 
 		FillRect(b, B_SOLID_LOW);
+
+		// prevent the text from moving when border width changes
 		if (!fSelected)
 			b.InsetBy(1, 1);
 
@@ -127,6 +136,16 @@ public:
 		return fWeight;
 	}
 
+	off_t Offset() const
+	{
+		return fOffset;
+	}
+
+	int32 Level() const
+	{
+		return fLevel;
+	}
+
 	BGroupLayout* GroupLayout() const
 	{
 		return fGroupLayout;
@@ -153,6 +172,8 @@ private:
 private:
 	partition_id	fID;
 	float			fWeight;
+	off_t			fOffset;
+	int32			fLevel;
 	bool			fSelected;
 	bool			fMouseOver;
 	BGroupLayout*	fGroupLayout;
@@ -170,20 +191,22 @@ public:
 
 	virtual bool Visit(BDiskDevice* device)
 	{
-		PartitionView* view = new PartitionView("Device", 1.0, 0, device->ID());
+		PartitionView* view = new PartitionView("Device", 1.0,
+			device->Offset(), 0, device->ID());
 		fViewMap.Put(device->ID(), view);
 		fView->GetLayout()->AddView(view);
+		_AddSpaces(device, view);
 		return false;
 	}
 
 	virtual bool Visit(BPartition* partition, int32 level)
 	{
-		if (!partition->Parent() || !fViewMap.ContainsKey(partition->Parent()->ID()))
+		if (!partition->Parent()
+			|| !fViewMap.ContainsKey(partition->Parent()->ID()))
 			return false;
 
 		// calculate size factor within parent frame
-// TODO: support gaps view these offsets:
-//		off_t offset = partition->Offset();
+		off_t offset = partition->Offset();
 //		off_t parentOffset = partition->Parent()->Offset();
 		off_t size = partition->Size();
 		off_t parentSize = partition->Parent()->Size();
@@ -197,13 +220,15 @@ public:
 				name << "Partition " << partition->ID();
 		}
 		partition_id id = partition->ID();
-		PartitionView* view = new PartitionView(name.String(), scale, level, id);
+		PartitionView* view = new PartitionView(name.String(), scale, offset,
+			level, id);
 		view->SetSelected(id == fSelectedPartition);
 		PartitionView* parent = fViewMap.Get(partition->Parent()->ID());
 		BGroupLayout* layout = parent->GroupLayout();
 		layout->AddView(view, scale);
 
 		fViewMap.Put(partition->ID(), view);
+		_AddSpaces(partition, view);
 
 		return false;
 	}
@@ -232,6 +257,35 @@ public:
 	}
 
  private:
+	void _AddSpaces(BPartition* partition, PartitionView* parentView) const
+	{
+		// add any available space on the partition
+		BPartitioningInfo info;
+		if (partition->GetPartitioningInfo(&info) >= B_OK) {
+			off_t parentSize = partition->Size();
+			off_t offset;
+			off_t size;
+			for (int32 i = 0;
+				info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
+				i++) {
+				double scale = (double)size / parentSize;
+				PartitionView* view = new PartitionView("Empty", scale,
+					offset, parentView->Level() + 1, -2);
+
+				BGroupLayout* layout = parentView->GroupLayout();
+				int32 count = parentView->CountChildren();
+				int32 insertIndex = 0;
+				for (int32 j = 0; j < count; j++) {
+					PartitionView* sibling = dynamic_cast<PartitionView*>(
+						parentView->ChildAt(j));
+					if (sibling && sibling->Offset() > offset)
+						break;
+					insertIndex++;
+				}
+				layout->AddView(view, scale);
+			}
+		}
+	}
 
 	typedef	HashKey32<partition_id>					PartitionKey;
 	typedef HashMap<PartitionKey, PartitionView* >	PartitionViewMap;
@@ -247,15 +301,15 @@ public:
 
 DiskView::DiskView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "diskview", resizeMode,
-		B_WILL_DRAW | B_FRAME_EVENTS)
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 	, fDiskCount(0)
 	, fDisk(NULL)
 	, fPartitionLayout(new PartitionLayout(this))
 {
 	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL, kLayoutInset);
-	layout->SetInsets(2, 2, 2, 2);
 	SetLayout(layout);
 
+	SetViewColor(B_TRANSPARENT_COLOR);
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	SetHighColor(tint_color(base, B_DARKEN_2_TINT));
 	SetLowColor(tint_color(base, (B_DARKEN_2_TINT + B_DARKEN_1_TINT) / 2));
@@ -333,13 +387,6 @@ DiskView::Draw(BRect updateRect)
 	textOffset.y = (messageBounds.top + messageBounds.bottom
 		- fh.ascent - fh.descent) / 2 + fh.ascent;
 	DrawString(helpfulMessage, textOffset);
-}
-
-
-void
-DiskView::FrameResized(float width, float height)
-{
-//	DoLayout();
 }
 
 

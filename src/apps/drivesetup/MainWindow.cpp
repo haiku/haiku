@@ -20,6 +20,7 @@
 #include <DiskSystem.h>
 #include <DiskDevice.h>
 #include <Partition.h>
+#include <PartitioningInfo.h>
 #include <Path.h>
 
 #include <ColumnListView.h>
@@ -49,17 +50,35 @@ public:
 	virtual bool Visit(BDiskDevice* device)
 	{
 		fDiskCount++;
-		fPartitionList->AddPartition(device);
+		_AddPartition(device);
 		return false; // Don't stop yet!
 	}
 
 	virtual bool Visit(BPartition* partition, int32 level)
 	{
-		fPartitionList->AddPartition(partition);
+		_AddPartition(partition);
 		return false; // Don't stop yet!
 	}
 
 private:
+	void _AddPartition(BPartition* partition) const
+	{
+		// add the partition itself
+		fPartitionList->AddPartition(partition);
+
+		// add any available space on it
+		BPartitioningInfo info;
+		if (partition->GetPartitioningInfo(&info) >= B_OK) {
+			off_t offset;
+			off_t size;
+			for (int32 i = 0;
+				info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
+				i++) {
+				fPartitionList->AddSpace(partition->ID(), offset, size);
+			}
+		}
+	}
+
 	PartitionListView*	fPartitionList;
 	int32&				fDiskCount;
 };
@@ -402,8 +421,9 @@ MainWindow::_AdaptToSelectedPartition()
 void
 MainWindow::_SetToDiskAndPartition(partition_id disk, partition_id partition)
 {
+	BDiskDevice* oldDisk = NULL;
 	if (!fCurrentDisk || fCurrentDisk->ID() != disk) {
-		delete fCurrentDisk;
+		oldDisk = fCurrentDisk;
 		fCurrentDisk = NULL;
 		if (disk >= 0) {
 			BDiskDevice* newDisk = new BDiskDevice();
@@ -420,6 +440,8 @@ MainWindow::_SetToDiskAndPartition(partition_id disk, partition_id partition)
 
 	fDiskView->SetDisk(fCurrentDisk, fCurrentPartitionID);
 	_EnabledDisableMenuItems(fCurrentDisk, fCurrentPartitionID);
+
+	delete oldDisk;
 }
 
 

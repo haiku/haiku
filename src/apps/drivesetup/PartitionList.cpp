@@ -28,6 +28,7 @@ enum {
 PartitionListRow::PartitionListRow(BPartition* partition)
 	: Inherited()
 	, fPartitionID(partition->ID())
+	, fParentID(partition->Parent() ? partition->Parent()->ID() : -1)
 	, fOffset(partition->Offset())
 	, fSize(partition->Size())
 {
@@ -57,9 +58,11 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 }
 
 
-PartitionListRow::PartitionListRow(partition_id id, off_t offset, off_t size)
+PartitionListRow::PartitionListRow(partition_id parentID, off_t offset,
+		off_t size)
 	: Inherited()
-	, fPartitionID(id)
+	, fPartitionID(-2)
+	, fParentID(parentID)
 	, fOffset(offset)
 	, fSize(size)
 {
@@ -156,22 +159,16 @@ PartitionListView::AddPartition(BPartition* partition)
 
 
 PartitionListRow*
-PartitionListView::AddSpace(partition_id parentID, partition_id id,
-	off_t offset, off_t size)
+PartitionListView::AddSpace(partition_id parentID, off_t offset, off_t size)
 {
-	PartitionListRow* partitionrow = FindRow(id);
-	
-	// forget about it if this item is already in the listview
-	if (partitionrow != NULL)
-		return partitionrow;
-
 	// the parent should already be in the listview
 	PartitionListRow* parent = FindRow(parentID);
 	if (!parent)
 		return NULL;
 	
 	// create the row for this partition
-	partitionrow = new PartitionListRow(id, offset, size);
+	PartitionListRow* partitionrow = new PartitionListRow(parentID,
+		offset, size);
 
 	// find a proper insertion index based on the on-disk offset
 	int32 index = _InsertIndexForOffset(parent, offset);

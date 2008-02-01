@@ -19,7 +19,6 @@ public:
 
 	// BView interface
 	virtual	void				Draw(BRect updateRect);	
-	virtual	void				FrameResized(float width, float height);
 
 			void				SetDiskCount(int32 count);
 			void				SetDisk(BDiskDevice* disk,
