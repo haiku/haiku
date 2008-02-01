@@ -52,7 +52,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
         case B_BT_INQUIRY_DEVICE_MSG:
             
             /* TODO: Extract info from BMessage to create a 
-               proper RemoteDevice, ¿¿¿message should be passed from Agent??? */
+               proper RemoteDevice, message should be passed from Agent??? */
                
             /* - Instance to be stored/Registered in the Agent? */            
             //DeviceDiscovered( RemoteDevice(BString("00:00:00:00:00:00")), DeviceClass(0));
