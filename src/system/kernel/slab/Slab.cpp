@@ -153,7 +153,7 @@ struct depot_magazine {
 
 
 struct depot_cpu_store {
-	benaphore lock;
+	recursive_lock lock;
 	struct depot_magazine *loaded, *previous;
 };
 
@@ -443,8 +443,9 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 
 	cache->flags = flags;
 
+	// TODO: depot destruction is obviously broken
 	// no gain in using the depot in single cpu setups
-	if (smp_get_num_cpus() == 1)
+	//if (smp_get_num_cpus() == 1)
 		cache->flags |= CACHE_NO_DEPOT;
 
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
@@ -645,7 +646,6 @@ delete_object_cache(object_cache *cache)
 void *
 object_cache_alloc(object_cache *cache, uint32 flags)
 {
-	// flags are read only.
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
 		void *object = object_depot_obtain(&cache->depot);
 		if (object)
@@ -724,7 +724,6 @@ object_cache_free(object_cache *cache, void *object)
 	if (object == NULL)
 		return;
 
-	// flags are read only.
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
 		if (object_depot_store(&cache->depot, object))
 			return;
@@ -1121,7 +1120,7 @@ object_depot_init(object_depot *depot, uint32 flags,
 	}
 
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
-		benaphore_boot_init(&depot->stores[i].lock, "cpu store", flags);
+		recursive_lock_boot_init(&depot->stores[i].lock, "cpu store", flags);
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
 
@@ -1139,7 +1138,7 @@ object_depot_init_locks(object_depot *depot)
 		return status;
 
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
-		status = benaphore_init(&depot->stores[i].lock, "cpu store");
+		status = recursive_lock_init(&depot->stores[i].lock, "cpu store");
 		if (status < B_OK)
 			return status;
 	}
@@ -1154,7 +1153,7 @@ object_depot_destroy(object_depot *depot)
 	object_depot_make_empty(depot);
 
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
-		benaphore_destroy(&depot->stores[i].lock);
+		recursive_lock_destroy(&depot->stores[i].lock);
 	}
 
 	internal_free(depot->stores);
@@ -1166,7 +1165,7 @@ object_depot_destroy(object_depot *depot)
 static void *
 object_depot_obtain_from_store(object_depot *depot, depot_cpu_store *store)
 {
-	BenaphoreLocker _(store->lock);
+	RecursiveLocker _(store->lock);
 
 	// To better understand both the Alloc() and Free() logic refer to
 	// Bonwick's ``Magazines and Vmem'' [in 2001 USENIX proceedings]
@@ -1195,7 +1194,7 @@ static int
 object_depot_return_to_store(object_depot *depot, depot_cpu_store *store,
 	void *object)
 {
-	BenaphoreLocker _(store->lock);
+	RecursiveLocker _(store->lock);
 
 	// We try to add the object to the loaded magazine if we have one
 	// and it's not full, or to the previous one if it is empty. If
@@ -1236,7 +1235,7 @@ object_depot_make_empty(object_depot *depot)
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
 		depot_cpu_store *store = &depot->stores[i];
 
-		BenaphoreLocker _(store->lock);
+		RecursiveLocker _(store->lock);
 
 		if (depot->stores[i].loaded)
 			empty_magazine(depot, depot->stores[i].loaded);
