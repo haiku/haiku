@@ -43,7 +43,6 @@
 #	define PCI_capabilities_ptr		0x34
 #	define PCI_status_capabilities	0x0010
 #	define PCI_cap_id_agp			0x02
-#	define B_NOT_SUPPORTED			B_ERROR
 #endif
 
 #define TRACE_AGP
@@ -629,8 +628,8 @@ Aperture::BindMemory(aperture_memory *memory, addr_t address, size_t size)
 	TRACE("bind %ld bytes at %lx\n", size, base);
 
 	for (addr_t offset = 0; offset < size; offset += B_PAGE_SIZE) {
+		addr_t physicalAddress = 0;
 		status_t status;
-		addr_t physicalAddress;
 
 		if (!physical) {
 			physical_entry entry;

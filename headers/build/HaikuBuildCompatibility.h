@@ -24,6 +24,14 @@
 typedef unsigned long haiku_build_addr_t;
 #define addr_t haiku_build_addr_t
 
+struct sockaddr_storage {
+	uint8	ss_len;			/* total length */
+	uint8	ss_family;		/* address family */
+	uint8	__ss_pad1[6];	/* align to quad */
+	uint64	__ss_pad2;		/* force alignment to 64 bit */
+	uint8	__ss_pad3[112];	/* pad to a total of 128 bytes */
+};
+
 typedef int socklen_t;
 
 #ifndef DEFFILEMODE
@@ -131,6 +139,8 @@ extern float	roundf(float value);
 #		define B_VECTOR_ICON_TYPE 'VICN'
 #	endif
 #	define B_NOT_SUPPORTED				(B_ERROR)
+#	define B_KERNEL_READ_AREA			0
+#	define B_KERNEL_WRITE_AREA			0
 #endif
 
 #if defined(HAIKU_TARGET_PLATFORM_BONE) || defined(HAIKU_TARGET_PLATFORM_DANO)
