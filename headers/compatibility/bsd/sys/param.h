@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BSD_SYS_PARAM_H_
@@ -25,6 +25,10 @@
 
 #ifndef howmany
 #	define howmany(x, y) (((x) + ((y) - 1)) / (y))
+#endif
+
+#ifndef MAXLOGNAME
+#	define MAXLOGNAME 32
 #endif
 
 #endif	/* _BSD_SYS_PARAM_H_ */

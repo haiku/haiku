@@ -14,5 +14,6 @@ SharedLibrary libbsd.so :
 	signal.c
 	stringlist.c
 	unvis.c
+	usershell.c
 	vis.c
 ;

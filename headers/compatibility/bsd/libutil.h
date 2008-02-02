@@ -52,15 +52,13 @@ typedef struct _property {
 	char *value;
 } *properties;
 
-#ifdef _SYS_PARAM_H_
 /* for pidfile.c */
 struct pidfh {
 	int	pf_fd;
 	char	pf_path[MAXPATHLEN + 1];
-	__dev_t	pf_dev;
+	dev_t	pf_dev;
 	ino_t	pf_ino;
 };
-#endif
 
 /* Avoid pulling in all the include files for no need */
 struct termios;
@@ -120,12 +118,10 @@ const char *pw_tempname(void);
 int	pw_tmp(int _mfd);
 #endif
 
-#ifdef _SYS_PARAM_H_
 struct pidfh *pidfile_open(const char *path, mode_t mode, pid_t *pidptr);
 int pidfile_write(struct pidfh *pfh);
 int pidfile_close(struct pidfh *pfh);
 int pidfile_remove(struct pidfh *pfh);
-#endif
 
 __END_DECLS
 
