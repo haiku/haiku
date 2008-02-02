@@ -1,8 +1,9 @@
-/* Operations on file descriptors
- *
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
+
+//! Operations on file descriptors
 
 #include <fd.h>
 
@@ -611,8 +612,16 @@ common_close(int fd, bool kernel)
 }
 
 
-//	#pragma mark -
-//	User syscalls
+status_t
+user_fd_kernel_ioctl(int fd, ulong op, void *buffer, size_t length)
+{
+	TRACE(("user_fd_kernel_ioctl: fd %d\n", fd));
+
+	return fd_ioctl(false, fd, op, buffer, length);
+}
+
+
+//	#pragma mark - User syscalls
 
 
 ssize_t
@@ -636,8 +645,11 @@ _user_read(int fd, off_t pos, void *buffer, size_t length)
 		return B_FILE_ERROR;
 	}
 
-	if (pos == -1)
+	bool movePosition = false;
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_read) {
 		bytesRead = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
@@ -647,7 +659,8 @@ _user_read(int fd, off_t pos, void *buffer, size_t length)
 			else
 				bytesRead = (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			if (movePosition)
+				descriptor->pos = pos + length;
 		}
 	} else
 		bytesRead = B_BAD_VALUE;
@@ -661,6 +674,7 @@ ssize_t
 _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 {
 	struct file_descriptor *descriptor;
+	bool movePosition = false;
 	ssize_t bytesRead = 0;
 	status_t status;
 	iovec *vecs;
@@ -696,8 +710,10 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 		goto err2;
 	}
 
-	if (pos == -1)
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_read) {
 		for (i = 0; i < count; i++) {
@@ -719,7 +735,8 @@ _user_readv(int fd, off_t pos, const iovec *userVecs, size_t count)
 		bytesRead = B_BAD_VALUE;
 
 	status = bytesRead;
-	descriptor->pos = pos;
+	if (movePosition)
+		descriptor->pos = pos;
 
 err2:
 	free(vecs);
@@ -749,8 +766,11 @@ _user_write(int fd, off_t pos, const void *buffer, size_t length)
 		return B_FILE_ERROR;
 	}
 
-	if (pos == -1)
+	bool movePosition = false;
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_write) {
 		bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
@@ -760,7 +780,8 @@ _user_write(int fd, off_t pos, const void *buffer, size_t length)
 			else
 				bytesWritten = (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			if (movePosition)
+				descriptor->pos = pos + length;
 		}
 	} else
 		bytesWritten = B_BAD_VALUE;
@@ -774,6 +795,7 @@ ssize_t
 _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 {
 	struct file_descriptor *descriptor;
+	bool movePosition = false;
 	ssize_t bytesWritten = 0;
 	status_t status;
 	iovec *vecs;
@@ -809,8 +831,10 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 		goto err2;
 	}
 
-	if (pos == -1)
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_write) {
 		for (i = 0; i < count; i++) {
@@ -832,7 +856,8 @@ _user_writev(int fd, off_t pos, const iovec *userVecs, size_t count)
 		bytesWritten = B_BAD_VALUE;
 
 	status = bytesWritten;
-	descriptor->pos = pos;
+	if (movePosition)
+		descriptor->pos = pos;
 
 err2:
 	free(vecs);
@@ -951,8 +976,7 @@ _user_dup2(int ofd, int nfd)
 }
 
 
-//	#pragma mark -
-//	Kernel calls
+//	#pragma mark - Kernel calls
 
 
 ssize_t
@@ -972,8 +996,11 @@ _kern_read(int fd, off_t pos, void *buffer, size_t length)
 		return B_FILE_ERROR;
 	}
 
-	if (pos == -1)
+	bool movePosition = false;
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_read) {
 		bytesRead = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
@@ -983,7 +1010,8 @@ _kern_read(int fd, off_t pos, void *buffer, size_t length)
 			else
 				bytesRead = (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			if (movePosition)
+				descriptor->pos = pos + length;
 		}
 	} else
 		bytesRead = B_BAD_VALUE;
@@ -997,6 +1025,7 @@ ssize_t
 _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 {
 	struct file_descriptor *descriptor;
+	bool movePosition = false;
 	ssize_t bytesRead = 0;
 	status_t status;
 	uint32 i;
@@ -1012,13 +1041,16 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 		return B_FILE_ERROR;
 	}
 
-	if (pos == -1)
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_read) {
 		for (i = 0; i < count; i++) {
 			size_t length = vecs[i].iov_len;
-			status = descriptor->ops->fd_read(descriptor, pos, vecs[i].iov_base, &length);
+			status = descriptor->ops->fd_read(descriptor, pos, vecs[i].iov_base,
+				&length);
 			if (status < B_OK) {
 				bytesRead = status;
 				break;
@@ -1034,7 +1066,9 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 	} else
 		bytesRead = B_BAD_VALUE;
 
-	descriptor->pos = pos;
+	if (movePosition)
+		descriptor->pos = pos;
+
 	put_fd(descriptor);
 	return bytesRead;
 }
@@ -1057,18 +1091,23 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t length)
 		return B_FILE_ERROR;
 	}
 
-	if (pos == -1)
+	bool movePosition = false;
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_write) {
-		bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
+		bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer,
+			&length);
 		if (bytesWritten >= B_OK) {
 			if (length > SSIZE_MAX)
 				bytesWritten = SSIZE_MAX;
 			else
 				bytesWritten = (ssize_t)length;
 
-			descriptor->pos = pos + length;
+			if (movePosition)
+				descriptor->pos = pos + length;
 		}
 	} else
 		bytesWritten = B_BAD_VALUE;
@@ -1082,6 +1121,7 @@ ssize_t
 _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 {
 	struct file_descriptor *descriptor;
+	bool movePosition = false;
 	ssize_t bytesWritten = 0;
 	status_t status;
 	uint32 i;
@@ -1097,13 +1137,16 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 		return B_FILE_ERROR;
 	}
 
-	if (pos == -1)
+	if (pos == -1) {
 		pos = descriptor->pos;
+		movePosition = true;
+	}
 
 	if (descriptor->ops->fd_write) {
 		for (i = 0; i < count; i++) {
 			size_t length = vecs[i].iov_len;
-			status = descriptor->ops->fd_write(descriptor, pos, vecs[i].iov_base, &length);
+			status = descriptor->ops->fd_write(descriptor, pos,
+				vecs[i].iov_base, &length);
 			if (status < B_OK) {
 				bytesWritten = status;
 				break;
@@ -1119,7 +1162,9 @@ _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 	} else
 		bytesWritten = B_BAD_VALUE;
 
-	descriptor->pos = pos;
+	if (movePosition)
+		descriptor->pos = pos;
+
 	put_fd(descriptor);
 	return bytesWritten;
 }
@@ -1150,15 +1195,6 @@ _kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 	TRACE(("kern_ioctl: fd %d\n", fd));
 
 	return fd_ioctl(true, fd, op, buffer, length);
-}
-
-
-status_t
-user_fd_kernel_ioctl(int fd, ulong op, void *buffer, size_t length)
-{
-	TRACE(("user_fd_kernel_ioctl: fd %d\n", fd));
-
-	return fd_ioctl(false, fd, op, buffer, length);
 }
 
 

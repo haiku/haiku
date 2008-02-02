@@ -1,11 +1,12 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
-/*!
-	\file File.cpp
-	BFile implementation.
-*/
+/*
+ * Copyright 2002-2008, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -22,11 +23,6 @@ extern mode_t __gUmask;
 	// declared in sys/umask.c
 
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
-
-// constructor
 //! Creates an uninitialized BFile.
 BFile::BFile()
 	 : BNode(),
@@ -35,7 +31,7 @@ BFile::BFile()
 {
 }
 
-// copy constructor
+
 //! Creates a copy of the supplied BFile.
 /*! If \a file is uninitialized, the newly constructed BFile will be, too.
 	\param file the BFile object to be copied
@@ -48,7 +44,7 @@ BFile::BFile(const BFile &file)
 	*this = file;
 }
 
-// constructor
+
 /*! \brief Creates a BFile and initializes it to the file referred to by
 		   the supplied entry_ref and according to the specified open mode.
 	\param ref the entry_ref referring to the file
@@ -63,7 +59,7 @@ BFile::BFile(const entry_ref *ref, uint32 openMode)
 	SetTo(ref, openMode);
 }
 
-// constructor
+
 /*! \brief Creates a BFile and initializes it to the file referred to by
 		   the supplied BEntry and according to the specified open mode.
 	\param entry the BEntry referring to the file
@@ -78,7 +74,7 @@ BFile::BFile(const BEntry *entry, uint32 openMode)
 	SetTo(entry, openMode);
 }
 
-// constructor
+
 /*! \brief Creates a BFile and initializes it to the file referred to by
 		   the supplied path name and according to the specified open mode.
 	\param path the file's path name 
@@ -93,7 +89,7 @@ BFile::BFile(const char *path, uint32 openMode)
 	SetTo(path, openMode);
 }
 
-// constructor
+
 /*! \brief Creates a BFile and initializes it to the file referred to by
 		   the supplied path name relative to the specified BDirectory and
 		   according to the specified open mode.
@@ -111,9 +107,9 @@ BFile::BFile(const BDirectory *dir, const char *path, uint32 openMode)
 	SetTo(dir, path, openMode);
 }
 
-// destructor
-//! Frees all allocated resources.
-/*!	If the file is properly initialized, the file's file descriptor is closed.
+
+/*! \brief Frees all allocated resources.
+	If the file is properly initialized, the file's file descriptor is closed.
 */
 BFile::~BFile()
 {
@@ -125,7 +121,7 @@ BFile::~BFile()
 	close_fd();
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BFile to the file referred to by the
 		   supplied entry_ref and according to the specified open mode.
 	\param ref the entry_ref referring to the file
@@ -175,7 +171,7 @@ BFile::SetTo(const entry_ref *ref, uint32 openMode)
 	return fCStatus;
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BFile to the file referred to by the
 		   supplied BEntry and according to the specified open mode.
 	\param entry the BEntry referring to the file
@@ -218,7 +214,7 @@ BFile::SetTo(const BEntry *entry, uint32 openMode)
 	return fCStatus;
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BFile to the file referred to by the
 		   supplied path name and according to the specified open mode.
 	\param path the file's path name 
@@ -256,7 +252,7 @@ BFile::SetTo(const char *path, uint32 openMode)
 	return fCStatus;
 }
 
-// SetTo
+
 /*! \brief Re-initializes the BFile to the file referred to by the
 		   supplied path name relative to the specified BDirectory and
 		   according to the specified open mode.
@@ -298,9 +294,9 @@ BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
 	return fCStatus;
 }
 
-// IsReadable
-//! Returns whether the file is readable.
-/*!	\return
+
+/*! \brief Returns whether the file is readable.
+	\return
 	- \c true, if the BFile has been initialized properly and the file has
 	  been been opened for reading,
 	- \c false, otherwise.
@@ -308,14 +304,13 @@ BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
 bool
 BFile::IsReadable() const
 {
-	return (InitCheck() == B_OK
-			&& ((fMode & O_RWMASK) == O_RDONLY
-				|| (fMode & O_RWMASK) == O_RDWR));
+	return InitCheck() == B_OK
+		&& ((fMode & O_RWMASK) == O_RDONLY || (fMode & O_RWMASK) == O_RDWR);
 }
 
-// IsWritable
-//!	Returns whether the file is writable.
-/*!	\return
+
+/*!	\brief Returns whether the file is writable.
+	\return
 	- \c true, if the BFile has been initialized properly and the file has
 	  been opened for writing,
 	- \c false, otherwise.
@@ -323,14 +318,13 @@ BFile::IsReadable() const
 bool
 BFile::IsWritable() const
 {
-	return (InitCheck() == B_OK
-			&& ((fMode & O_RWMASK) == O_WRONLY
-				|| (fMode & O_RWMASK) == O_RDWR));
+	return InitCheck() == B_OK
+		&& ((fMode & O_RWMASK) == O_WRONLY || (fMode & O_RWMASK) == O_RDWR);
 }
 
-// Read
-//!	Reads a number of bytes from the file into a buffer.
-/*!	\param buffer the buffer the data from the file shall be written to
+
+/*!	\brief Reads a number of bytes from the file into a buffer.
+	\param buffer the buffer the data from the file shall be written to
 	\param size the number of bytes that shall be read
 	\return the number of bytes actually read or an error code
 */
@@ -342,7 +336,7 @@ BFile::Read(void *buffer, size_t size)
 	return _kern_read(get_fd(), -1, buffer, size);
 }
 
-// ReadAt
+
 /*!	\brief Reads a number of bytes from a certain position within the file
 		   into a buffer.
 	\param location the position (in bytes) within the file from which the
@@ -359,18 +353,12 @@ BFile::ReadAt(off_t location, void *buffer, size_t size)
 	if (location < 0)
 		return B_BAD_VALUE;
 	
-	// ReadAt() is not supposed to move the current position on the file.
-	// Tested on BeOS R5 and Zeta.
-	off_t curPos = Position(); // Cache current position.
-	ssize_t result = _kern_read(get_fd(), location, buffer, size);
-	Seek(curPos, SEEK_SET); // Resets file position.
-	
-	return result;
+	return _kern_read(get_fd(), location, buffer, size);
 }
 
-// Write
-//!	Writes a number of bytes from a buffer into the file.
-/*!	\param buffer the buffer containing the data to be written to the file
+
+/*!	\brief Writes a number of bytes from a buffer into the file.
+	\param buffer the buffer containing the data to be written to the file
 	\param size the number of bytes that shall be written
 	\return the number of bytes actually written or an error code
 */
@@ -382,7 +370,7 @@ BFile::Write(const void *buffer, size_t size)
 	return _kern_write(get_fd(), -1, buffer, size);
 }
 
-// WriteAt
+
 /*!	\brief Writes a number of bytes from a buffer at a certain position
 		   into the file.
 	\param location the position (in bytes) within the file at which the data
@@ -399,17 +387,12 @@ BFile::WriteAt(off_t location, const void *buffer, size_t size)
 	if (location < 0)
 		return B_BAD_VALUE;
 
-	// WriteAt() is not supposed to move the current position on the file.
-	off_t curPos = Position(); // Cache current position.
-	ssize_t result = _kern_write(get_fd(), location, buffer, size);
-	Seek(curPos, SEEK_SET); // Resets file position.
-
-	return result;
+	return _kern_write(get_fd(), location, buffer, size);
 }
 
-// Seek
-//!	Seeks to another read/write position within the file.
-/*!	It is allowed to seek past the end of the file. A subsequent call to
+
+/*!	\brief Seeks to another read/write position within the file.
+	It is allowed to seek past the end of the file. A subsequent call to
 	Write() will pad the file with undefined data. Seeking before the
 	beginning of the file will fail and the behavior of subsequent Read()
 	or Write() invocations will be undefined.
@@ -432,9 +415,9 @@ BFile::Seek(off_t offset, uint32 seekMode)
 	return _kern_seek(get_fd(), offset, seekMode);
 }
 
-// Position
-//!	Returns the current read/write position within the file.
-/*!	\return
+
+/*!	\brief Returns the current read/write position within the file.
+	\return
 	- the current read/write position relative to the beginning of the file
 	- \c B_ERROR, after a Seek() before the beginning of the file
 	- \c B_FILE_ERROR, if the file has not been initialized
@@ -447,9 +430,9 @@ BFile::Position() const
 	return _kern_seek(get_fd(), 0, SEEK_CUR);
 }
 
-// SetSize
-//!	Sets the size of the file.
-/*!	If the file is shorter than \a size bytes it will be padded with
+
+/*!	\brief Sets the size of the file.
+	If the file is shorter than \a size bytes it will be padded with
 	unspecified data to the requested size. If it is larger, it will be
 	truncated.
 	Note: There's no problem with setting the size of a BFile opened in
@@ -473,16 +456,16 @@ BFile::SetSize(off_t size)
 	return set_stat(statData, B_STAT_SIZE);
 }
 
-// GetSize TODO: doxygen comment
+
 status_t
 BFile::GetSize(off_t* size) const
 {
 	return BStatable::GetSize(size);
 }
 
-// =
-//!	Assigns another BFile to this BFile.
-/*!	If the other BFile is uninitialized, this one will be too. Otherwise it
+
+/*!	\brief Assigns another BFile to this BFile.
+	If the other BFile is uninitialized, this one will be too. Otherwise it
 	will refer to the same file using the same mode, unless an error occurs.
 	\param file the original BFile
 	\return a reference to this BFile
@@ -517,7 +500,6 @@ void BFile::_PhiloFile5() {}
 void BFile::_PhiloFile6() {}
 
 
-// get_fd
 /*!	Returns the file descriptor.
 	To be used instead of accessing the BNode's private \c fFd member directly.
 	\return the file descriptor, or -1, if not properly initialized.
@@ -528,7 +510,7 @@ BFile::get_fd() const
 	return fFd;
 }
 
-// close_fd
+
 /*!	Overrides BNode::close_fd() solely for R5 binary compatibility.
 */
 void
@@ -536,9 +518,4 @@ BFile::close_fd()
 {
 	BNode::close_fd();
 }
-
-
-#ifdef USE_OPENBEOS_NAMESPACE
-};		// namespace OpenBeOS
-#endif
 
