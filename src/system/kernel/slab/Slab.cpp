@@ -1,10 +1,8 @@
 /*
  * Copyright 2008, Axel Dörfler. All Rights Reserved.
  * Copyright 2007, Hugo Santos. All Rights Reserved.
- * Distributed under the terms of the MIT License.
  *
- * Authors:
- *      Hugo Santos, hugosantos@gmail.com
+ * Distributed under the terms of the MIT License.
  */
 
 
@@ -250,6 +248,20 @@ internal_free(void *_buffer)
 		return;
 
 	block_free(buffer);
+}
+
+
+static status_t
+recursive_lock_boot_init(recursive_lock *lock, const char *name, uint32 flags)
+{
+	if (flags & CACHE_DURING_BOOT) {
+		lock->sem = -1;
+		lock->holder = 1;
+		lock->recursion = 0;
+		return B_OK;
+	}
+
+	return recursive_lock_init(lock, name);
 }
 
 
@@ -1021,7 +1033,7 @@ push_magazine(depot_magazine *magazine, void *object)
 static bool
 exchange_with_full(object_depot *depot, depot_magazine* &magazine)
 {
-	BenaphoreLocker _(depot->lock);
+	RecursiveLocker _(depot->lock);
 
 	if (depot->full == NULL)
 		return false;
@@ -1038,7 +1050,7 @@ exchange_with_full(object_depot *depot, depot_magazine* &magazine)
 static bool
 exchange_with_empty(object_depot *depot, depot_magazine* &magazine)
 {
-	BenaphoreLocker _(depot->lock);
+	RecursiveLocker _(depot->lock);
 
 	if (depot->empty == NULL) {
 		depot->empty = alloc_magazine();
@@ -1097,14 +1109,14 @@ object_depot_init(object_depot *depot, uint32 flags,
 	depot->empty = NULL;
 	depot->full_count = depot->empty_count = 0;
 
-	status_t status = benaphore_boot_init(&depot->lock, "depot", flags);
+	status_t status = recursive_lock_boot_init(&depot->lock, "depot", flags);
 	if (status < B_OK)
 		return status;
 
 	depot->stores = (depot_cpu_store *)internal_alloc(sizeof(depot_cpu_store)
 		* smp_get_num_cpus(), flags);
 	if (depot->stores == NULL) {
-		benaphore_destroy(&depot->lock);
+		recursive_lock_destroy(&depot->lock);
 		return B_NO_MEMORY;
 	}
 
@@ -1122,7 +1134,7 @@ object_depot_init(object_depot *depot, uint32 flags,
 status_t
 object_depot_init_locks(object_depot *depot)
 {
-	status_t status = benaphore_init(&depot->lock, "depot");
+	status_t status = recursive_lock_init(&depot->lock, "depot");
 	if (status < B_OK)
 		return status;
 
@@ -1147,7 +1159,7 @@ object_depot_destroy(object_depot *depot)
 
 	internal_free(depot->stores);
 
-	benaphore_destroy(&depot->lock);
+	recursive_lock_destroy(&depot->lock);
 }
 
 
@@ -1233,7 +1245,7 @@ object_depot_make_empty(object_depot *depot)
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
 
-	BenaphoreLocker _(depot->lock);
+	RecursiveLocker _(depot->lock);
 
 	while (depot->full)
 		empty_magazine(depot, _pop(depot->full));
