@@ -361,8 +361,9 @@ BFile::ReadAt(off_t location, void *buffer, size_t size)
 	
 	// ReadAt() is not supposed to move the current position on the file.
 	// Tested on BeOS R5 and Zeta.
+	off_t curPos = Position(); // Cache current position.
 	ssize_t result = _kern_read(get_fd(), location, buffer, size);
-	Seek(-result, SEEK_CUR); // Resets file position.
+	Seek(curPos, SEEK_SET); // Resets file position.
 	
 	return result;
 }
