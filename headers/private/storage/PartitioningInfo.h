@@ -28,6 +28,7 @@ public:
 									off_t* offset, off_t*size) const;
 			int32				CountPartitionableSpaces() const;
 
+			void				PrintToStream() const;
 private:
 			status_t			_InsertSpaces(int32 index, int32 count);
 			void				_RemoveSpaces(int32 index, int32 count);
