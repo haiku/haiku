@@ -41,6 +41,7 @@ typedef struct fd_set {
 #define FD_SET(fd, set) ((set)->bits[_FD_BITSINDEX(fd)] |= _FD_BIT(fd))
 #define FD_CLR(fd, set) ((set)->bits[_FD_BITSINDEX(fd)] &= ~_FD_BIT(fd))
 #define FD_ISSET(fd, set) ((set)->bits[_FD_BITSINDEX(fd)] & _FD_BIT(fd))
+#define FD_COPY(source, target) (*(target) = *(source))
 
 #endif	/* FD_SET */
 

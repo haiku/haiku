@@ -25,12 +25,13 @@
 /* These are various BeOS implementation limits */
 
 #define ARG_MAX			 		(32768)
-#define ATEXIT_MAX			 	(32)	 /* XXXdbg */
+#define ATEXIT_MAX			 	(32)
 #define CHILD_MAX				(1024)
 #define IOV_MAX					(1024)
 #define FILESIZEBITS			(64)
+#define LINE_MAX				(2048)
 #define LINK_MAX				(1)
-#define LOGIN_NAME_MAX			(32)	 /* XXXdbg */
+#define LOGIN_NAME_MAX			(32)
 #define MAX_CANON		   		(255)
 #define MAX_INPUT				(255)
 #define NAME_MAX				(256)
@@ -47,7 +48,7 @@
 #define _POSIX_ARG_MAX	  		(32768)
 #define _POSIX_CHILD_MAX		(1024)
 #define _POSIX_LINK_MAX	 		(1)
-#define _POSIX_LOGIN_NAME_MAX	(9)		/* XXXdbg */
+#define _POSIX_LOGIN_NAME_MAX	(9)
 #define _POSIX_MAX_CANON		(255)
 #define _POSIX_MAX_INPUT		(255)
 #define _POSIX_NAME_MAX	 		(255) 
@@ -59,5 +60,7 @@
 #define _POSIX_STREAM_MAX   	(8)
 #define _POSIX_TTY_NAME_MAX		(256)
 #define _POSIX_TZNAME_MAX   	(3)
+
+#define _POSIX2_LINE_MAX		(2048)
 
 #endif /* _LIBC_LIMITS_H_ */

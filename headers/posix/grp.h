@@ -1,8 +1,9 @@
+/*
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _GRP_H_
 #define _GRP_H_
-/* 
-** Distributed under the terms of the Haiku License.
-*/
 
 
 #include <sys/types.h>
@@ -11,7 +12,7 @@
 struct group {
 	char	*gr_name;
 	char	*gr_passwd;
-	int		gr_gid;
+	gid_t	gr_gid;
 	char	**gr_mem;
 };
 
