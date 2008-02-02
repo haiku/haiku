@@ -398,7 +398,13 @@ BFile::WriteAt(off_t location, const void *buffer, size_t size)
 		return InitCheck();
 	if (location < 0)
 		return B_BAD_VALUE;
-	return _kern_write(get_fd(), location, buffer, size);
+
+	// WriteAt() is not supposed to move the current position on the file.
+	off_t curPos = Position(); // Cache current position.
+	ssize_t result = _kern_write(get_fd(), location, buffer, size);
+	Seek(curPos, SEEK_SET); // Resets file position.
+
+	return result;
 }
 
 // Seek
