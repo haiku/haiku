@@ -39,10 +39,6 @@ extern int __irqvec_end;
 extern"C" void m68k_exception_tail(void);
 
 
-// the exception contexts for all CPUs
-static m68k_cpu_exception_context sCPUExceptionContexts[SMP_MAX_CPUS];
-
-
 // An iframe stack used in the early boot process when we don't have
 // threads yet.
 struct iframe_stack gBootFrameStack;
@@ -82,13 +78,13 @@ print_iframe(struct iframe *frame)
 {
 	dprintf("iframe at %p:\n", frame);
 	dprintf("   d0 0x%08lx    d1 0x%08lx    d2 0x%08lx    d3 0x%08lx\n",
-				frame->d0, frame->d1, frame->d2, frame->d3);
+				frame->d[0], frame->d[1], frame->d[2], frame->d[3]);
 			kprintf("   d4 0x%08lx    d5 0x%08lx    d6 0x%08lx    d7 0x%08lx\n",
-				frame->d4, frame->d5, frame->d6, frame->d7);
+				frame->d[4], frame->d[5], frame->d[6], frame->d[7]);
 			kprintf("   a0 0x%08lx    a1 0x%08lx    a2 0x%08lx    a3 0x%08lx\n",
-				frame->a0, frame->a1, frame->a2, frame->a3);
-			kprintf("   a4 0x%08lx    a5 0x%08lx    a6 0x%08lx    a7 0x%08lx (sp)\n",
-				frame->d4, frame->d5, frame->d6, frame->d7);
+				frame->a[0], frame->a[1], frame->a[2], frame->a[3]);
+			kprintf("   a4 0x%08lx    a5 0x%08lx    a6 0x%08lx    "/*"a7 0x%08lx (sp)"*/"\n",
+				frame->a[4], frame->a[5], frame->a[6]/*, frame->a[7]*/);
 
 			/*kprintf("   pc 0x%08lx   ccr 0x%02x\n",
 			  frame->pc, frame->ccr);*/

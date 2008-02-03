@@ -12,65 +12,201 @@
 
 #define PAGE_SIZE 4096
 
-#warning M68K: check for missing regs/movem
-struct iframe {
-	/* XXX: order depends on movem */
-	uint32 d0;
-	uint32 d1;
-	uint32 d2;
-	uint32 d3;
-	uint32 d4;
-	uint32 d5;
-	uint32 d6;
-	uint32 d7;
-	uint32 a0;
-	uint32 a1;
-	uint32 a2;
-	uint32 a3;
-	uint32 a4;
-	uint32 a5;
-	uint32 a6;
-	uint32 a7;
-	/* 030 ex frame: */
-	uint16 sr; /* contains ccr */
-	uint32 pc;
-	uint16 vector; /* [12:15] frame type */
-	/* other stuff depending on frame type... do we really need that ? */
+/* 68k has many different possible stack frames, differentiated by a 4 bit number, 
+ * but they also depend on the cpu type.
+ * cf. mint/sys/arch/check_exc.h
+ */
+
+/* definitions for special status word */
+
+// 020 as well
+struct mc68030_ssw {
+	uint16 fc:1;
+	uint16 fb:1;
+	uint16 rc:1;
+	uint16 rb:1;
+	uint16 :3;
+	uint16 df:1;
+	uint16 rm:1;
+	uint16 rw:1;
+	uint16 size:2;
+	uint16 :1;
+	uint16 as:3;
+} _PACKED;
+
+struct mc68040_ssw {
+	uint16 cp:1;
+	uint16 cu:1;
+	uint16 ct:1;
+	uint16 cm:1;
+	uint16 ma:1;
+	uint16 atc:1;
+	uint16 lk:1;
+	uint16 rw:1;
+	uint16 :1;
+	uint16 size:2;
+	uint16 tt:2;
+	uint16 tm:3;
+} _PACKED;
+
+struct mc68060_fslw {
+	uint32 :4;
+	uint32 ma:1;
+	uint32 :1;
+	uint32 lk:1;
+	uint32 rw:2; //XXX ??
+	uint32 size:2;
+	uint32 tt:2;
+	uint32 tm:2;
+	uint32 io:1;
+	uint32 pbe:1;
+	uint32 sbe:1;
+	uint32 pta:1;
+	uint32 ptb:1;
+	uint32 il:1;
+	uint32 pf:1;
+	uint32 sb:1;
+	uint32 wp:1;
+	uint32 twe:1;
+	uint32 re:1;
+	uint32 we:1;
+	uint32 ttr:1;
+	uint32 bpe:1;
+	uint32 :1;
+	uint32 see:1;
+} _PACKED;
+
+/* raw exception frames */
+
+struct mc680x0_type_0_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+};
+
+struct mc680x0_type_1_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+};
+
+struct mc680x0_type_2_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+	addr_t instruction_address;
+};
+
+struct mc680x0_type_3_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+	addr_t effective_address;
+};
+
+struct mc68040_type_7_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+	addr_t effective_address;
+	struct mc68040_ssw ssw;
+	// write-back status
+	uint16 wb3s;
+	uint16 wb2s;
+	uint16 wb1s;
+	addr_t fault_address;
+	addr_t wb3a;
+	uint32 wb3d;
+	addr_t wb2a;
+	uint32 wb2d;
+	addr_t wb1a;
+	uint32 wb1d; // also pd0
+	uint32 pd1;
+	uint32 pd2;
+	uint32 pd3;
+};
+
+struct mc680x0_type_9_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+	addr_t instruction_address;
+	uint16 intregs[4];
+};
+
+struct mc68030_type_a_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+	uint16 intreg1;
+	struct mc68030_ssw ssw;
+	uint16 instpipe_c;
+	uint16 instpipe_b;
+	addr_t fault_address;
+	uint16 intregs2[2];
+	uint32 dataout;
+	uint16 intregs3[2];
+};
+
+struct mc68030_type_b_frame {
+	uint16 sr;
+	addr_t pc;
+	uint16 type:4;
+	uint16 vector:12;
+	uint16 intreg1;
+	struct mc68030_ssw ssw;
+	uint16 instpipe_c;
+	uint16 instpipe_b;
+	addr_t fault_address;
+	uint16 intregs2[2];
+	uint32 dataout;
+	uint16 intregs3[4];
+	uint32 stbaddr;
+	uint16 intregs4[2];
+	uint32 datain;
+	uint16 intregs5[3];
+	uint16 intinfo;
+	uint16 intregs6[18];
+};
+
+//XXX: add 060 frames
+
+struct mc680x0_frame {
 	union {
 		struct {
-			uint32 inst;
-		} format2 _PACKED;
-		struct {
-			uint32 inst;
-			uint16 intregs[4];
-		} format9 _PACKED;
-		struct {
-			uint16 intregs[1];
-			uint16 ssw;
-			uint16 instpipe_c;
-			uint16 instpipe_b;
-			uint32 faultaddr;
-			uint16 intregs2[2];
-			uint32 dataout;
-			uint16 intregs3[2];
-		} formata _PACKED;
-		struct {
-			uint16 intregs[1];
-			uint16 ssw;
-			uint16 instpipe_c;
-			uint16 instpipe_b;
-			uint32 faultaddr;
-			uint16 intregs2[2];
-			uint32 dataout;
-			uint16 intregs3[4];
-			uint32 stbaddr;
-			uint16 intregs4[2];
-			uint32 datain;
-			uint16 intregs5[3];
-			uint16 intinfo;
-			uint16 intregs6[18];
-		} formatb _PACKED;
+			uint16 sr;
+			addr_t pc;
+			uint16 type:4;
+			uint16 vector:12;
+		};
+		struct mc680x0_type_0_frame type_0;
+		struct mc680x0_type_1_frame type_1;
+		struct mc680x0_type_2_frame type_2;
+		struct mc68040_type_7_frame type_7;
+		struct mc680x0_type_9_frame type_9;
+		struct mc68030_type_a_frame type_a;
+		struct mc68030_type_b_frame type_b;
+		// XXX: add 060 frames
 	};
+};
+
+#warning M68K: check for missing regs/movem
+struct iframe {
+	// XXX: fp_frame ?
+	/* data and address registers */
+	// XXX: order depends on movem
+	uint32 d[8];
+	uint32 a[7];
+	/* cpu exception frame, including sr, pc, format and vector */
+	struct mc680x0_frame cpu;
+
 /*	uint32 vector;
 	uint32 srr0;
 	uint32 srr1;
