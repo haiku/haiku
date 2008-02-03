@@ -9,6 +9,7 @@ SubDirCcFlags $(defines) ;
 
 StaticLibrary libutil.a :
 	fparseln.c
+	pidfile.c
 	realhostname.c
 	trimdomain.c
 ;

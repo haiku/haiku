@@ -172,7 +172,7 @@ pidfile_write(struct pidfh *pfh)
 		return (-1);
 	}
 
-	snprintf(pidstr, sizeof(pidstr), "%u", getpid());
+	snprintf(pidstr, sizeof(pidstr), "%lu", getpid());
 	if (pwrite(fd, pidstr, strlen(pidstr), 0) != (ssize_t)strlen(pidstr)) {
 		error = errno;
 		_pidfile_remove(pfh, 0);

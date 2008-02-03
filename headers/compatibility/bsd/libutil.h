@@ -40,7 +40,6 @@
 #define	_LIBUTIL_H_
 
 #include <stdint.h>
-#include <sys/param.h>
 #include <sys/types.h>
 
 #define PROPERTY_MAX_NAME	64
@@ -53,6 +52,7 @@ typedef struct _property {
 	char *value;
 } *properties;
 
+#ifdef _SYS_PARAM_H
 /* for pidfile.c */
 struct pidfh {
 	int	pf_fd;
@@ -60,6 +60,7 @@ struct pidfh {
 	dev_t	pf_dev;
 	ino_t	pf_ino;
 };
+#endif
 
 /* Avoid pulling in all the include files for no need */
 struct termios;
@@ -119,10 +120,12 @@ const char *pw_tempname(void);
 int	pw_tmp(int _mfd);
 #endif
 
+#ifdef _SYS_PARAM_H
 struct pidfh *pidfile_open(const char *path, mode_t mode, pid_t *pidptr);
 int pidfile_write(struct pidfh *pfh);
 int pidfile_close(struct pidfh *pfh);
 int pidfile_remove(struct pidfh *pfh);
+#endif
 
 __END_DECLS
 

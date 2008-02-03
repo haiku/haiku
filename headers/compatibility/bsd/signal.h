@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BSD_SIGNAL_H_
@@ -7,6 +7,9 @@
 
 
 #include_next <signal.h>
+
+
+#define	sigmask(sig) (1 << ((sig) - 1))
 
 
 #ifdef __cplusplus
