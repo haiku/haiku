@@ -325,34 +325,34 @@ DiskView::DiskView(const BRect& frame, uint32 resizeMode)
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	PartitionView* view;
 	float scale = 1.0;
-	view = new PartitionView("Disk", scale, 0, -1);
+	view = new PartitionView("Disk", scale, 0, 0, -1);
 	layout->AddView(view, scale);
 
 	layout = view->GroupLayout();
 
 	scale = 0.3;
-	view = new PartitionView("Primary", scale, 1, -1);
+	view = new PartitionView("Primary", scale, 1, 50, -1);
 	layout->AddView(view, scale);
 	scale = 0.7;
-	view = new PartitionView("Extended", scale, 1, -1);
+	view = new PartitionView("Extended", scale, 1, 100, -1);
 	layout->AddView(view, scale);
 
 	layout = view->GroupLayout();
 
 	scale = 0.2;
-	view = new PartitionView("Logical", scale, 2, -1);
+	view = new PartitionView("Logical", scale, 2, 200, -1);
 	layout->AddView(view, scale);
 
 	scale = 0.5;
-	view = new PartitionView("Logical", scale, 2, -1);
+	view = new PartitionView("Logical", scale, 2, 250, -1);
 	layout->AddView(view, scale);
 
 	scale = 0.005;
-	view = new PartitionView("Logical", scale, 2, -1);
+	view = new PartitionView("Logical", scale, 2, 290, -1);
 	layout->AddView(view, scale);
 
 	scale = 0.295;
-	view = new PartitionView("Logical", scale, 2, -1);
+	view = new PartitionView("Logical", scale, 2, 420, -1);
 	layout->AddView(view, scale);
 #endif
 }
