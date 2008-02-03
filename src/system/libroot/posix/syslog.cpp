@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -162,18 +162,53 @@ send_syslog_message(syslog_context *context, int priority, const char *text,
 }
 
 
-//	#pragma mark - public Be API
+//	#pragma mark - POSIX API
+
+
+void
+closelog(void)
+{
+	closelog_thread();
+}
+
+
+void
+openlog(const char *ident, int options, int facility)
+{
+	openlog_thread(ident, options, facility);
+}
+
+
+int
+setlogmask(int priorityMask)
+{
+	return setlogmask_thread(priorityMask);
+}
+
+
+void
+syslog(int priority, const char *message, ...)
+{
+	va_list args;
+
+	va_start(args, message);
+	send_syslog_message(get_context(), priority, message, args);
+	va_end(args);
+}
+
+
+//	#pragma mark - Be extensions
 // ToDo: it would probably be better to export these symbols as weak symbols only
 
 
-void 
+void
 closelog_team(void)
 {
 	// nothing to do here...
 }
 
 
-void 
+void
 openlog_team(const char *ident, int options, int facility)
 {
 	if (ident != NULL)
@@ -184,7 +219,7 @@ openlog_team(const char *ident, int options, int facility)
 }
 
 
-int 
+int
 setlogmask_team(int priorityMask)
 {
 	int oldMask = sTeamContext.mask;
@@ -196,18 +231,18 @@ setlogmask_team(int priorityMask)
 }
 
 
-void 
+void
 log_team(int priority, const char *message, ...)
 {
 	va_list args;
-	
+
 	va_start(args, message);
 	send_syslog_message(&sTeamContext, priority, message, args);
 	va_end(args);
 }
 
 
-void 
+void
 closelog_thread(void)
 {
 	if (sThreadContextSlot < 0)
@@ -218,7 +253,7 @@ closelog_thread(void)
 }
 
 
-void 
+void
 openlog_thread(const char *ident, int options, int facility)
 {
 	syslog_context *context = get_context();
@@ -231,7 +266,7 @@ openlog_thread(const char *ident, int options, int facility)
 }
 
 
-int 
+int
 setlogmask_thread(int priorityMask)
 {
 	syslog_context *context = get_context();
@@ -244,49 +279,23 @@ setlogmask_thread(int priorityMask)
 }
 
 
-void 
+void
 log_thread(int priority, const char *message, ...)
 {
 	va_list args;
-	
+
 	va_start(args, message);
 	send_syslog_message(get_context(), priority, message, args);
 	va_end(args);
 }
 
 
-//	#pragma mark - POSIX API
+//	#pragma mark - BSD extensions
 
 
-void 
-closelog(void)
+void
+vsyslog(int priority, const char *message, va_list args)
 {
-	closelog_thread();
-}
-
-
-void 
-openlog(const char *ident, int options, int facility)
-{
-	openlog_thread(ident, options, facility);
-}
-
-
-int 
-setlogmask(int priorityMask)
-{
-	return setlogmask_thread(priorityMask);
-}
-
-
-void 
-syslog(int priority, const char *message, ...)
-{
-	va_list args;
-	
-	va_start(args, message);
 	send_syslog_message(get_context(), priority, message, args);
-	va_end(args);
 }
-
 

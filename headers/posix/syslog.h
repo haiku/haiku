@@ -6,6 +6,9 @@
 #define _SYSLOG_H_
 
 
+#include <stdarg.h>
+
+
 /* options for openlog() */
 
 #define LOG_PID			(1 << 12)	/* log the process (thread/team) ID with each message */
@@ -79,6 +82,9 @@ extern void	closelog_thread(void);
 extern void	openlog_thread(const char *ident, int logopt, int facility);
 extern void log_thread(int priority, const char *message, ...);
 extern int	setlogmask_thread(int priorityMask);
+
+/* BSD extensions */
+extern void	vsyslog(int priority, const char *message, va_list args);
 
 #ifdef __cplusplus
 }
