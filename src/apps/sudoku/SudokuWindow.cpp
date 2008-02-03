@@ -41,7 +41,7 @@ const uint32 kMsgStoreState = 'stst';
 const uint32 kMsgRestoreState = 'rest';
 const uint32 kMsgNew = 'new ';
 const uint32 kMsgStartAgain = 'stag';
-const uint32 kMsgExportAsText = 'extx';
+const uint32 kMsgExportAs = 'expt';
 
 
 class GenerateSudoku {
@@ -134,9 +134,10 @@ GenerateSudoku::_GenerateThread(void* _self)
 
 SudokuWindow::SudokuWindow()
 	: BWindow(BRect(100, 100, 500, 520), "Sudoku", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS),
+		B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
 	fGenerator(NULL),
-	fStoredState(NULL)
+	fStoredState(NULL),
+	fExportFormat(kExportAsText)
 {
 	BMessage settings;
 	_LoadSettings(settings);
@@ -201,8 +202,20 @@ SudokuWindow::SudokuWindow()
 
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Export As Text" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgExportAsText)));
+	subMenu = new BMenu("Export As" B_UTF8_ELLIPSIS);
+	BMessage *msg;
+	msg = new BMessage(kMsgExportAs);
+	msg->AddInt32("as", kExportAsText);
+	subMenu->AddItem(new BMenuItem("Text", msg));
+	msg = new BMessage(kMsgExportAs);
+	msg->AddInt32("as", kExportAsHTML);
+	subMenu->AddItem(new BMenuItem("HTML", msg));
+	/*
+	msg = new BMessage(kMsgExportAs);
+	msg->AddInt32("as", kExportAsBitmap);
+	subMenu->AddItem(new BMenuItem("Bitmap" B_UTF8_ELLIPSIS, msg));
+	*/
+	menu->AddItem(subMenu);
 
 	menu->AddSeparatorItem();
 
@@ -437,8 +450,16 @@ SudokuWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kMsgExportAsText:
+		case kMsgExportAs:
+		{
+			if (message->FindInt32("as", (int32 *)&fExportFormat) < B_OK)
+				fExportFormat = kExportAsText;
 			fSavePanel->Show();
+			break;
+		}
+
+		case B_COPY:
+			fSudokuView->CopyToClipboard();
 			break;
 
 		case B_SAVE_REQUESTED:
@@ -454,7 +475,7 @@ SudokuWindow::MessageReceived(BMessage* message)
 			
 			entry_ref ref;
 			if (entry.GetRef(&ref) == B_OK)
-				fSudokuView->SaveTo(ref, true);
+				fSudokuView->SaveTo(ref, fExportFormat);
 			break;
 		}
 

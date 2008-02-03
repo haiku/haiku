@@ -19,6 +19,13 @@ enum {
 };
 
 
+enum {
+	kExportAsText,
+	kExportAsHTML,
+	kExportAsBitmap,
+	kExportAsPicture
+};
+
 class SudokuView : public BView {
 public:
 	SudokuView(BRect frame, const char* name, const BMessage& settings,
@@ -31,7 +38,10 @@ public:
 	status_t SetTo(const char* data);
 	status_t SetTo(SudokuField* field);
 
-	status_t SaveTo(entry_ref& ref, bool asText);
+	status_t SaveTo(entry_ref& ref, uint32 as=kExportAsText);
+	status_t SaveTo(BDataIO &to, uint32 as=kExportAsText);
+	
+	status_t CopyToClipboard();
 
 	void ClearChanged();
 	void ClearAll();

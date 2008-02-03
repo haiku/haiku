@@ -190,21 +190,37 @@ SudokuView::SetTo(SudokuField* field)
 
 
 status_t
-SudokuView::SaveTo(entry_ref& ref, bool asText)
+SudokuView::SaveTo(entry_ref& ref, uint32 as)
 {
 	BFile file;
+
 	status_t status = file.SetTo(&ref, B_WRITE_ONLY | B_CREATE_FILE
 		| B_ERASE_FILE);
 	if (status < B_OK)
 		return status;
 
-	if (asText) {
-		char line[1024];
-		strcpy(line, "# Written by Sudoku\n\n");
-		file.Write(line, strlen(line));
+	status = SaveTo(file, as);
+	
+	return status;
+}
 
-		uint32 i = 0;
 
+status_t
+SudokuView::SaveTo(BDataIO &stream, uint32 as)
+{
+	BString text;
+	//BFile *file;
+	char *line;
+	uint32 i = 0;
+	status_t status = EINVAL;
+
+	switch (as) {
+	case kExportAsText:
+		text = "# Written by Sudoku\n\n";
+		stream.Write(text.String(), text.Length());
+
+		line = text.LockBuffer(1024);
+		memset(line, 0, 1024);
 		for (uint32 y = 0; y < fField->Size(); y++) {
 			for (uint32 x = 0; x < fField->Size(); x++) {
 				if (x != 0 && x % fBlockSize == 0)
@@ -213,11 +229,73 @@ SudokuView::SaveTo(entry_ref& ref, bool asText)
 			}
 			line[i++] = '\n';
 		}
+		text.UnlockBuffer();
 
-		file.Write(line, i);
-	} else {
+		stream.Write(text.String(), text.Length());
+		return B_OK;
+	case kExportAsHTML:
+	{
+		text = "<html>\n<head>\n<!-- Written by Sudoku -->\n"
+			"<style type=\"text/css\">\n"
+			"table.sudoku { border: 1px solid black; width=\"300px\"; height=\"300px\"; }\n"
+			"td.sudoku_initial { background: #f0f0f0; }\n"
+			"td.sudoku_filled { background: #f0f0f0; color: blue; }\n"
+			"td.sudoku_empty { background: #f0f0f0; }\n"
+			"</style>\n"
+			"</head>\n<body>\n\n"
+			"<table " /*"border=\"1\""*/ " class=\"sudoku\">";
+		stream.Write(text.String(), text.Length());
+
+		//XXX: make border larger on %3
+		
+		text = "";
+		BString divider;
+		divider << (int)(100.0 / fField->Size()) << "%";
+		for (uint32 y = 0; y < fField->Size(); y++) {
+			text << "<tr height=\"" << divider << "\">\n";
+			for (uint32 x = 0; x < fField->Size(); x++) {
+				char buff[2];
+				_SetText(buff, fField->ValueAt(x, y));
+				if (fField->ValueAt(x, y) == 0) {
+					text << "<td width=\"" << divider << "\" class=\"sudoku_empty\">\n";
+					text << "&nbsp;";
+				} else if (fField->FlagsAt(x, y) & kInitialValue) {
+					text << "<td width=\"" << divider << "\" class=\"sudoku_initial\">\n";
+					text << "<font color=\"#000000\">";
+					text << buff;
+					text << "</font>";
+				} else {
+					text << "<td width=\"" << divider << "\" class=\"sudoku_filled\">\n";
+					text << "<font color=\"#0000ff\">";
+					text << buff;
+					text << "</font>";
+				}
+				text << "</td>\n";
+			}
+			text << "</tr>\n";
+		}
+		text << "</table>\n\n";
+
+		stream.Write(text.String(), text.Length());
+		text = "</body></html>\n";
+		stream.Write(text.String(), text.Length());
+		return B_OK;
+	}
+	case kExportAsBitmap:
+	case kExportAsPicture:
+	default:
+		return EINVAL;
 	}
 	
+	return status;
+}
+
+
+status_t
+SudokuView::CopyToClipboard()
+{
+	status_t status = EINVAL;
+	BMessage data;
 	return status;
 }
 

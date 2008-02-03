@@ -42,6 +42,7 @@ private:
 	BMenuItem*		fUndoItem;
 	BMenuItem*		fRedoItem;
 	BMessage*		fStoredState;
+	uint32			fExportFormat;
 };
 
 #endif	// SUDOKU_WINDOW_H
