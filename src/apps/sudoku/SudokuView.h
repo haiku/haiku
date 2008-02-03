@@ -31,9 +31,14 @@ class SudokuView : public BView {
 public:
 	SudokuView(BRect frame, const char* name, const BMessage& settings,
 		uint32 resizingMode);
+	SudokuView(BMessage* archive);
 	virtual ~SudokuView();
 
-	status_t SaveState(BMessage& state);
+	virtual status_t Archive(BMessage* into, bool deep = true) const;
+	static BArchivable* Instantiate(BMessage* archive);
+	void InitObject(const BMessage* archive);
+
+	status_t SaveState(BMessage& state) const;
 
 	status_t SetTo(entry_ref& ref);
 	status_t SetTo(const char* data);

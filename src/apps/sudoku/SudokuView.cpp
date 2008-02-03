@@ -19,6 +19,7 @@
 #include <Bitmap.h>
 #include <Clipboard.h>
 #include <DataIO.h>
+#include <Dragger.h>
 #include <File.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -30,22 +31,84 @@ const uint32 kMsgCheckSolved = 'chks';
 
 const uint32 kStrongLineSize = 2;
 
+extern const char* kSignature;
+
 
 SudokuView::SudokuView(BRect frame, const char* name,
 		const BMessage& settings, uint32 resizingMode)
 	: BView(frame, name, resizingMode,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS),
-	fField(NULL),
-	fShowHintX(~0UL),
-	fLastHintValue(~0UL),
-	fLastField(~0UL),
-	fKeyboardX(0),
-	fKeyboardY(0),
-	fShowKeyboardFocus(false),
-	fEditable(true)
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
+	InitObject(&settings);
+
+	BRect rect(Bounds());
+	rect.top = rect.bottom - 7;
+	rect.left = rect.right - 7;
+	BDragger *dw = new BDragger(rect, this);
+	AddChild(dw);
+}
+
+
+SudokuView::SudokuView(BMessage* archive)
+	: BView(archive)
+{
+	InitObject(archive);
+}
+
+
+SudokuView::~SudokuView()
+{
+	delete fField;
+}
+
+
+status_t
+SudokuView::Archive(BMessage* into, bool deep = true) const
+{
+	status_t status;
+
+	status = BView::Archive(into, deep);
+	if (status < B_OK)
+		return status;
+
+	status = into->AddString("add_on", kSignature);
+	if (status < B_OK)
+		return status;
+
+	status = into->AddRect("bounds", Bounds());
+	if (status < B_OK)
+		return status;
+
+	status = SaveState(*into);
+	if (status < B_OK)
+		return status;
+	return B_OK;
+}
+
+
+BArchivable*
+SudokuView::Instantiate(BMessage* archive)
+{
+	if (!validate_instantiation(archive, "SudokuView"))
+		return NULL;
+	return new SudokuView(archive);
+}
+
+
+void
+SudokuView::InitObject(const BMessage* archive)
+{
+	fField = NULL;
+	fShowHintX = ~0UL;
+	fLastHintValue = ~0UL;
+	fLastField = ~0UL;
+	fKeyboardX = 0;
+	fKeyboardY = 0;
+	fShowKeyboardFocus = false;
+	fEditable = true;
+
 	BMessage field;
-	if (settings.FindMessage("field", &field) == B_OK) {
+	if (archive->FindMessage("field", &field) == B_OK) {
 		fField = new SudokuField(&field);
 		if (fField->InitCheck() != B_OK) {
 			delete fField;
@@ -58,9 +121,9 @@ SudokuView::SudokuView(BRect frame, const char* name,
 
 	fBlockSize = fField->BlockSize();
 
-	if (settings.FindInt32("hint flags", (int32*)&fHintFlags) != B_OK)
+	if (archive->FindInt32("hint flags", (int32*)&fHintFlags) != B_OK)
 		fHintFlags = kMarkInvalid;
-	if (settings.FindBool("show cursor", &fShowCursor) != B_OK)
+	if (archive->FindBool("show cursor", &fShowCursor) != B_OK)
 		fShowCursor = false;
 
 	SetViewColor(B_TRANSPARENT_COLOR);
@@ -72,14 +135,8 @@ SudokuView::SudokuView(BRect frame, const char* name,
 }
 
 
-SudokuView::~SudokuView()
-{
-	delete fField;
-}
-
-
 status_t
-SudokuView::SaveState(BMessage& state)
+SudokuView::SaveState(BMessage& state) const
 {
 	BMessage field;
 	status_t status = fField->Archive(&field, true);
