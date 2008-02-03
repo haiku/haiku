@@ -3056,7 +3056,7 @@ BTextView::_HandleAlphaKey(const char *bytes, int32 numBytes)
 	} else
 		_DoInsertText(bytes, numBytes, fSelStart, NULL, NULL);
 	
-	fSelStart = fSelEnd = fClickOffset = fSelStart + numBytes;
+	fClickOffset = fSelEnd;
 
 	ScrollToOffset(fClickOffset);
 }
@@ -3481,12 +3481,9 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 	if (TextLength() + inLength > MaxBytes())
 		return;
 	
-	if (fSelStart != fSelEnd
-		&& fSelStart != 0
-		&& fSelEnd != 0) {
-	
+	if (fSelStart != fSelEnd)
 		Select(fSelStart, fSelStart);
-	}	
+		
 	// Don't do any check, the public methods will have adjusted
 	// eventual bogus values...
 
@@ -3496,6 +3493,11 @@ BTextView::_DoInsertText(const char *inText, int32 inLength, int32 inOffset,
 
 	// copy data into buffer
 	InsertText(inText, inLength, inOffset, inRuns);
+
+	// offset the caret/selection 	 
+	//int32 saveStart = fSelStart; 	 
+	fSelStart += inLength; 	 
+	fSelEnd += inLength;
 	
 	// recalc line breaks and draw the text
 	_Refresh(inOffset, textLength, true, false);
