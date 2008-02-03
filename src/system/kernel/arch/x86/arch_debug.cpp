@@ -336,7 +336,8 @@ stack_trace(int argc, char **argv)
 
 
 static void
-print_call(struct thread *thread, addr_t eip, addr_t ebp, int32 argCount)
+print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
+	int32 argCount)
 {
 	const char *symbol, *image;
 	addr_t baseAddress;
@@ -366,7 +367,7 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, int32 argCount)
 		}
 	}
 
-	int32 *arg = (int32 *)(ebp + 8);
+	int32 *arg = (int32 *)(nextEbp + 8);
 	kprintf("(");
 
 	for (int32 i = 0; i < argCount; i++) {
@@ -399,7 +400,7 @@ show_call(int argc, char **argv)
 
 	struct thread *thread = NULL;
 	addr_t oldPageDirectory = 0;
-	uint32 ebp = x86_read_ebp();
+	addr_t ebp = x86_read_ebp();
 	int32 argCount = 0;
 
 	if (argc >= 2 && argv[argc - 1][0] == '-') {
@@ -426,7 +427,7 @@ show_call(int argc, char **argv)
 
 	bool onKernelStack = true;
 
-	for (int32 index = 1; index <= callIndex; index++) {
+	for (int32 index = 0; index <= callIndex; index++) {
 		onKernelStack = onKernelStack
 			&& is_kernel_stack_address(thread, ebp);
 
@@ -434,7 +435,7 @@ show_call(int argc, char **argv)
 			struct iframe *frame = (struct iframe *)ebp;
 
 			if (index == callIndex)
-				print_call(thread, frame->eip, ebp, argCount);
+				print_call(thread, frame->eip, ebp, frame->ebp, argCount);
 
  			ebp = frame->ebp;
 		} else {
@@ -449,7 +450,8 @@ show_call(int argc, char **argv)
 				break;
 
 			if (index == callIndex)
-				print_call(thread, eip, ebp, argCount);
+				print_call(thread, eip, ebp, nextEbp, argCount);
+
 			ebp = nextEbp;
 		}
 
