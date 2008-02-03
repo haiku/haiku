@@ -9,6 +9,7 @@
 
 #include <arch/debug.h>
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <debug.h>
@@ -376,10 +377,17 @@ print_call(struct thread *thread, addr_t eip, addr_t ebp, addr_t nextEbp,
 		kprintf("%#lx", *arg);
 		if (*arg > -0x10000 && *arg < 0x10000)
 			kprintf(" (%ld)", *arg);
+
+		char name[8];
+		snprintf(name, sizeof(name), "_arg%ld", i + 1);
+		set_debug_variable(name, *(uint32 *)arg);
+
 		arg++;
 	}
 
 	kprintf(")\n");
+
+	set_debug_variable("_frame", nextEbp);
 }
 
 
