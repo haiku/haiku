@@ -28,7 +28,8 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bison bzip2 cal cat
 	cp copyattr $(X86_ONLY)CortexAddOnHost
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	driveinfo dstcheck du echo eject env error expand expr
-	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp funzip fwcontrol
+	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp ftpd
+	funzip fwcontrol
 	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident
 	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
 	keymap kill less lessecho lesskey link listarea listattr listdev listimage
