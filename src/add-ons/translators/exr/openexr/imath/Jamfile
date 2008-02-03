@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons translators exr openexr imath ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) half ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) iex ] ;
+
+StaticLibrary libimath.a :
+ImathBox.cpp
+ImathColorAlgo.cpp
+ImathFun.cpp
+ImathMatrixAlgo.cpp
+ImathRandom.cpp
+ImathShear.cpp
+ImathVec.cpp
+;

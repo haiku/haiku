@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons translators exr openexr iex ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
+
+StaticLibrary libiex.a :
+IexBaseExc.cpp
+IexThrowErrnoExc.cpp
+;
+

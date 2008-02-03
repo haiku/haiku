@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons translators exr openexr half ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
+
+StaticLibrary libhalf.a :
+eLut.cpp
+half.cpp
+toFloat.cpp
+;
