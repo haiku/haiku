@@ -39,8 +39,8 @@ public:
 	status_t SetTo(const char* data);
 	status_t SetTo(SudokuField* field);
 
-	status_t SaveTo(entry_ref& ref, uint32 as=kExportAsText);
-	status_t SaveTo(BDataIO &to, uint32 as=kExportAsText);
+	status_t SaveTo(entry_ref& ref, uint32 as = kExportAsText);
+	status_t SaveTo(BDataIO &to, uint32 as = kExportAsText);
 	
 	status_t CopyToClipboard();
 

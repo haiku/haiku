@@ -217,6 +217,9 @@ SudokuWindow::SudokuWindow()
 	*/
 	menu->AddItem(subMenu);
 
+	menu->AddItem(item = new BMenuItem("Copy",
+		new BMessage(B_COPY), 'C'));
+
 	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new BMenuItem("About Sudoku" B_UTF8_ELLIPSIS,

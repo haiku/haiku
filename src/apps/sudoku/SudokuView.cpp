@@ -16,10 +16,13 @@
 
 #include <Application.h>
 #include <Beep.h>
+#include <Bitmap.h>
+#include <Clipboard.h>
 #include <DataIO.h>
 #include <File.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <Picture.h>
 #include <String.h>
 
 
@@ -222,128 +225,154 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 		nodeInfo.SetTo(file);
 
 	switch (as) {
-	case kExportAsText:
-		text = "# Written by Sudoku\n\n";
-		stream.Write(text.String(), text.Length());
+		case kExportAsText:
+			text = "# Written by Sudoku\n\n";
+			stream.Write(text.String(), text.Length());
 
-		line = text.LockBuffer(1024);
-		memset(line, 0, 1024);
-		for (uint32 y = 0; y < fField->Size(); y++) {
-			for (uint32 x = 0; x < fField->Size(); x++) {
-				if (x != 0 && x % fBlockSize == 0)
-					line[i++] = ' ';
-				_SetText(&line[i++], fField->ValueAt(x, y));
+			line = text.LockBuffer(1024);
+			memset(line, 0, 1024);
+			for (uint32 y = 0; y < fField->Size(); y++) {
+				for (uint32 x = 0; x < fField->Size(); x++) {
+					if (x != 0 && x % fBlockSize == 0)
+						line[i++] = ' ';
+					_SetText(&line[i++], fField->ValueAt(x, y));
+				}
+				line[i++] = '\n';
 			}
-			line[i++] = '\n';
-		}
-		text.UnlockBuffer();
+			text.UnlockBuffer();
 
-		stream.Write(text.String(), text.Length());
-		if (file)
-			nodeInfo.SetType("text/plain");
-		return B_OK;
-	case kExportAsHTML:
-	{
-		bool netPositiveFriendly = false;
-		text = "<html>\n<head>\n<!-- Written by Sudoku -->\n"
-			"<style type=\"text/css\">\n"
-			/*
-			"table.sudoku { background: #000000; border:0; cellpadding: 10px; cellspacing: 1px; width: 300px; height: 300px; }\n"
-			"td.sudoku { background: #ffffff; border: 0; text-align: center; }\n"
-			"td.sudoku_initial {  }\n"
-			"td.sudoku_filled { color: blue; }\n"
-			"td.sudoku_empty {  }\n"
-			*/
-			"table.sudoku { background: #000000; border:0; border-collapse: collapse; cellpadding: 10px; cellspacing: 10px; width: 300px; height: 300px; }\n"
-			"td.sudoku { background: #ffffff; border-color: black; border-left: none ; border-top: none ; /*border: none;*/ text-align: center; }\n"
-			"td.sudoku_initial {  }\n"
-			"td.sudoku_filled { color: blue; }\n"
-			"td.sudoku_empty {  }\n"
-			// border styles: right bottom (none, solid or large)
+			stream.Write(text.String(), text.Length());
+			if (file)
+				nodeInfo.SetType("text/plain");
+			return B_OK;
+		case kExportAsHTML:
+		{
+			bool netPositiveFriendly = false;
+			text = "<html>\n<head>\n<!-- Written by Sudoku -->\n"
+				"<style type=\"text/css\">\n"
+				"table.sudoku { background: #000000; border:0; border-collapse: collapse; cellpadding: 10px; cellspacing: 10px; width: 300px; height: 300px; }\n"
+				"td.sudoku { background: #ffffff; border-color: black; border-left: none ; border-top: none ; /*border: none;*/ text-align: center; }\n"
+				"td.sudoku_initial {  }\n"
+				"td.sudoku_filled { color: blue; }\n"
+				"td.sudoku_empty {  }\n"
+				// border styles: right bottom (none, solid or large)
 #define BS_N "none"
 #define BS_S "solid 1px black"
 #define BS_L "solid 3px black"
-			"td.sudoku_nn { border-right: " BS_N "; border-bottom: " BS_N "; }\n"
-			"td.sudoku_sn { border-right: " BS_S "; border-bottom: " BS_N "; }\n"
-			"td.sudoku_ns { border-right: " BS_N "; border-bottom: " BS_S "; }\n"
-			"td.sudoku_ss { border-right: " BS_S "; border-bottom: " BS_S "; }\n"
-			"td.sudoku_nl { border-right: " BS_N "; border-bottom: " BS_L "; }\n"
-			"td.sudoku_sl { border-right: " BS_S "; border-bottom: " BS_L "; }\n"
-			"td.sudoku_ln { border-right: " BS_L "; border-bottom: " BS_N "; }\n"
-			"td.sudoku_ls { border-right: " BS_L "; border-bottom: " BS_S "; }\n"
-			"td.sudoku_ll { border-right: " BS_L "; border-bottom: " BS_L "; }\n"
-			"</style>\n"
-			"</head>\n<body>\n\n";
-		/*if (file)*/
-		stream.Write(text.String(), text.Length());
+				"td.sudoku_nn { border-right: " BS_N "; border-bottom: " BS_N "; }\n"
+				"td.sudoku_sn { border-right: " BS_S "; border-bottom: " BS_N "; }\n"
+				"td.sudoku_ns { border-right: " BS_N "; border-bottom: " BS_S "; }\n"
+				"td.sudoku_ss { border-right: " BS_S "; border-bottom: " BS_S "; }\n"
+				"td.sudoku_nl { border-right: " BS_N "; border-bottom: " BS_L "; }\n"
+				"td.sudoku_sl { border-right: " BS_S "; border-bottom: " BS_L "; }\n"
+				"td.sudoku_ln { border-right: " BS_L "; border-bottom: " BS_N "; }\n"
+				"td.sudoku_ls { border-right: " BS_L "; border-bottom: " BS_S "; }\n"
+				"td.sudoku_ll { border-right: " BS_L "; border-bottom: " BS_L "; }\n"
+				"</style>\n"
+				"</head>\n<body>\n\n";
+			stream.Write(text.String(), text.Length());
 
-		text = "<table";
-		if (netPositiveFriendly)
+			text = "<table";
+			if (netPositiveFriendly)
 			text << " border=\"1\"";
-		text << " class=\"sudoku\">";
-		stream.Write(text.String(), text.Length());
+			text << " class=\"sudoku\">";
+			stream.Write(text.String(), text.Length());
 
-		//XXX: make border larger on %3
-		
-		text = "";
-		BString divider;
-		divider << (int)(100.0 / fField->Size()) << "%";
-		for (uint32 y = 0; y < fField->Size(); y++) {
-			text << "<tr height=\"" << divider << "\">\n";
-			for (uint32 x = 0; x < fField->Size(); x++) {
-				char buff[2];
-				_SetText(buff, fField->ValueAt(x, y));
-				
-				char border_right = 's';
-				char border_bottom = 's';
-				if ((x+1) % fField->BlockSize() == 0)
-					border_right = 'l';
-				if ((y+1) % fField->BlockSize() == 0)
-					border_bottom = 'l';
-				if (x == fField->Size() - 1)
-					border_right = 'n';
-				if (y == fField->Size() - 1)
-					border_bottom = 'n';
-				
-				if (fField->ValueAt(x, y) == 0) {
-					text << "<td width=\"" << divider << "\" ";
-					text << "class=\"sudoku sudoku_empty sudoku_" << border_right << border_bottom << "\">\n";
-					text << "&nbsp;";
-				} else if (fField->FlagsAt(x, y) & kInitialValue) {
-					text << "<td width=\"" << divider << "\" ";
-					text << "class=\"sudoku sudoku_initial sudoku_" << border_right << border_bottom << "\">\n";
-					if (netPositiveFriendly)
-						text << "<font color=\"#000000\">";
-					text << buff;
-					if (netPositiveFriendly)
-						text << "</font>";
-				} else {
-					text << "<td width=\"" << divider << "\" ";
-					text << "class=\"sudoku sudoku_filled sudoku_" << border_right << border_bottom << "\">\n";
-					if (netPositiveFriendly)
-						text << "<font color=\"#0000ff\">";
-					text << buff;
-					if (netPositiveFriendly)
-						text << "</font>";
+			text = "";
+			BString divider;
+			divider << (int)(100.0 / fField->Size()) << "%";
+			for (uint32 y = 0; y < fField->Size(); y++) {
+				text << "<tr height=\"" << divider << "\">\n";
+				for (uint32 x = 0; x < fField->Size(); x++) {
+					char buff[2];
+					_SetText(buff, fField->ValueAt(x, y));
+
+					char border_right = 's';
+					char border_bottom = 's';
+					if ((x+1) % fField->BlockSize() == 0)
+						border_right = 'l';
+					if ((y+1) % fField->BlockSize() == 0)
+						border_bottom = 'l';
+					if (x == fField->Size() - 1)
+						border_right = 'n';
+					if (y == fField->Size() - 1)
+						border_bottom = 'n';
+
+					if (fField->ValueAt(x, y) == 0) {
+						text << "<td width=\"" << divider << "\" ";
+						text << "class=\"sudoku sudoku_empty sudoku_" << border_right << border_bottom << "\">\n";
+						text << "&nbsp;";
+					} else if (fField->FlagsAt(x, y) & kInitialValue) {
+						text << "<td width=\"" << divider << "\" ";
+						text << "class=\"sudoku sudoku_initial sudoku_" << border_right << border_bottom << "\">\n";
+						if (netPositiveFriendly)
+							text << "<font color=\"#000000\">";
+						text << buff;
+						if (netPositiveFriendly)
+							text << "</font>";
+					} else {
+						text << "<td width=\"" << divider << "\" ";
+						text << "class=\"sudoku sudoku_filled sudoku_" << border_right << border_bottom << "\">\n";
+						if (netPositiveFriendly)
+							text << "<font color=\"#0000ff\">";
+						text << buff;
+						if (netPositiveFriendly)
+							text << "</font>";
+					}
+					text << "</td>\n";
 				}
-				text << "</td>\n";
+				text << "</tr>\n";
 			}
-			text << "</tr>\n";
-		}
-		text << "</table>\n\n";
+			text << "</table>\n\n";
 
-		stream.Write(text.String(), text.Length());
-		text = "</body></html>\n";
-		/*if (file)*/
-		stream.Write(text.String(), text.Length());
-		if (file)
-			nodeInfo.SetType("text/html");
-		return B_OK;
-	}
-	case kExportAsBitmap:
-	case kExportAsPicture:
-	default:
-		return EINVAL;
+			stream.Write(text.String(), text.Length());
+			text = "</body></html>\n";
+			stream.Write(text.String(), text.Length());
+			if (file)
+				nodeInfo.SetType("text/html");
+			return B_OK;
+		}
+		case kExportAsBitmap:
+		{
+			BMallocIO mio;
+			status = SaveTo(mio, kExportAsPicture);
+			if (status < B_OK)
+				return status;
+			mio.Seek(0LL, SEEK_SET);
+			BPicture picture;
+			status = picture.Unflatten(&mio);
+			if (status < B_OK)
+				return status;
+			BBitmap *bitmap = new BBitmap(Bounds(), B_BITMAP_ACCEPTS_VIEWS, B_RGB32);
+			BView *view = new BView(Bounds(), "bitmap", B_FOLLOW_NONE, B_WILL_DRAW);
+			bitmap->AddChild(view);
+			if (bitmap->Lock()) {
+				view->DrawPicture(&picture);
+				view->Sync();
+				view->RemoveSelf();
+				delete view;
+				bitmap->Unlock();
+			}
+			BMessage msg(B_OK);
+			status = bitmap->Archive(&msg);
+			if (status >= B_OK) {
+				status = msg.Flatten(&stream);
+			}
+			delete bitmap;
+			return status;
+		}
+		case kExportAsPicture:
+		{
+			BPicture picture;
+			BeginPicture(&picture);
+			Draw(Bounds());
+			if (EndPicture()) {
+				status = picture.Flatten(&stream);
+			}
+			return status;
+		}
+		default:
+			return EINVAL;
 	}
 	
 	return status;
@@ -354,7 +383,49 @@ status_t
 SudokuView::CopyToClipboard()
 {
 	status_t status = EINVAL;
-	BMessage data;
+	BMessage *clip;
+	if (be_clipboard->Lock()) {
+		BMallocIO mio;
+		be_clipboard->Clear();
+		clip = be_clipboard->Data();
+		if (clip) {
+			// first as bitmap as we need to archive to the message
+			if (SaveTo(mio, kExportAsBitmap) >= B_OK) {
+				mio.Seek(0LL, SEEK_SET);
+				// ShowImage wants this... nasty
+				clip->Unflatten(&mio);
+				// ArtPaint uses that
+				clip->AddData("image/bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
+				// Becasso uses that ?
+				clip->AddData("image/x-be-bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
+				// Gobe Productive uses that...
+				// QuickRes as well, with a rect field.
+				clip->AddData("image/x-vnd.Be-bitmap", B_MESSAGE_TYPE, mio.Buffer(), mio.BufferLength());
+			}
+			mio.Seek(0LL, SEEK_SET);
+			mio.SetSize(0LL);
+			
+			if (SaveTo(mio, kExportAsHTML) >= B_OK)
+				clip->AddData("text/html", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
+			mio.Seek(0LL, SEEK_SET);
+			mio.SetSize(0LL);
+			
+			if (SaveTo(mio, kExportAsText) >= B_OK)
+				clip->AddData("text/plain", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
+			mio.Seek(0LL, SEEK_SET);
+			mio.SetSize(0LL);
+
+			// flattened BPicture, anyone handles that ?
+			if (SaveTo(mio, kExportAsPicture) >= B_OK) {
+				clip->AddData("text/x-vnd.Be-picture", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
+				
+			}
+			mio.SetSize(0LL);
+
+			be_clipboard->Commit();
+		}
+		be_clipboard->Unlock();
+	}
 	return status;
 }
 
