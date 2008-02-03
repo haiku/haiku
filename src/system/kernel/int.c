@@ -40,6 +40,7 @@ struct io_vector {
 	struct io_handler	handler_list;
 	spinlock			vector_lock;
 	int32				enable_count;
+	bool				no_lock_vector;
 #ifdef DEBUG_INT
 	int64				handled_count;
 	int64				unhandled_count;
@@ -124,6 +125,7 @@ int_init_post_vm(kernel_args *args)
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
 		io_vectors[i].vector_lock = 0;			/* initialize spinlock */
 		io_vectors[i].enable_count = 0;
+		io_vectors[i].no_lock_vector = false;
 		#ifdef DEBUG_INT
 			io_vectors[i].handled_count = 0;
 			io_vectors[i].unhandled_count = 0;
@@ -188,6 +190,16 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 		if (io_vectors[vector].enable_count++ == 0)
 			arch_int_enable_io_interrupt(vector);
 	}
+
+	// If B_NO_LOCK_VECTOR is specified this is a vector that is not supposed
+	// to have multiple handlers and does not require locking of the vector
+	// when entering the handler. For example this is used by internally
+	// registered interrupt handlers like for handling local APIC interrupts
+	// that may run concurently on multiple CPUs. Locking with a spinlock
+	// would in that case defeat the purpose as it would serialize calling the
+	// handlers in parallel on different CPUs.
+	if (flags & B_NO_LOCK_VECTOR)
+		io_vectors[vector].no_lock_vector = true;
 
 	release_spinlock(&io_vectors[vector].vector_lock);
 	restore_interrupts(state);
@@ -254,12 +266,14 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	struct io_handler *io;
 	bool invokeScheduler = false, handled = false;
 
-	acquire_spinlock(&io_vectors[vector].vector_lock);
+	if (!io_vectors[vector].no_lock_vector)
+		acquire_spinlock(&io_vectors[vector].vector_lock);
 
 	// The list can be empty at this place
 	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list) {
 		dprintf("unhandled io interrupt %d\n", vector);
-		release_spinlock(&io_vectors[vector].vector_lock);
+		if (!io_vectors[vector].no_lock_vector)
+			release_spinlock(&io_vectors[vector].vector_lock);
 		return B_UNHANDLED_INTERRUPT;
 	}
 
@@ -306,7 +320,8 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 	}
 #endif
 
-	release_spinlock(&io_vectors[vector].vector_lock);
+	if (!io_vectors[vector].no_lock_vector)
+		release_spinlock(&io_vectors[vector].vector_lock);
 
 	if (levelTriggered)
 		return status;

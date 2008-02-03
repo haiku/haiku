@@ -197,10 +197,10 @@ arch_smp_init(kernel_args *args)
 		arch_smp_per_cpu_init(args, 0);
 
 		// I/O interrupts start at ARCH_INTERRUPT_BASE, so all interrupts are shifted
-		install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE, &i386_timer_interrupt, NULL, 0);
-		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, 0);
-		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, 0);
-		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, 0);
+		install_io_interrupt_handler(0xfb - ARCH_INTERRUPT_BASE, &i386_timer_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xfd - ARCH_INTERRUPT_BASE, &i386_ici_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xfe - ARCH_INTERRUPT_BASE, &i386_smp_error_interrupt, NULL, B_NO_LOCK_VECTOR);
+		install_io_interrupt_handler(0xff - ARCH_INTERRUPT_BASE, &i386_spurious_interrupt, NULL, B_NO_LOCK_VECTOR);
 	}
 	return B_OK;
 }

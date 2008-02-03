@@ -397,7 +397,7 @@ process_pending_ici(int32 currentCPU)
 
 		while (*haltValue != 0)
 			PAUSE();
-		
+
 		restore_interrupts(state);
 	}
 

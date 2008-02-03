@@ -1089,18 +1089,10 @@ kernel_debugger(const char *message)
 
 	if (sDebuggerOnCPU != smp_get_current_cpu() && smp_get_num_cpus() > 1) {
 		// First entry on a MP system, send a halt request to all of the other
-		// CPUs but don't block here if they currently can't process it.
-		// Should they try to enter the debugger they will be cought in the
-		// loop above.
-		// ToDo: investigate why we sometimes hang here with SMP_MSG_FLAG_SYNC
-		// and readd that flag and remove the spin below when it's fixed.
+		// CPUs. Should they try to enter the debugger they will be cought in
+		// the loop above.
 		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0,
-			(void *)&inDebugger, 0);
-
-		// Delay a bit to give other CPUs the chance to process the halt
-		// request. Otherwise we could get debug output of other CPUs mixed
-		// into our own when enabling debug output below.
-		spin(50000);
+			(void *)&inDebugger, SMP_MSG_FLAG_SYNC);
 	}
 
 	if (sBlueScreenOutput) {

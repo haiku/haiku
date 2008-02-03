@@ -47,6 +47,7 @@ typedef int32 (*interrupt_handler)(void *data);
 
 /* Flags that can be passed to install_io_interrupt_handler() */
 #define B_NO_ENABLE_COUNTER		1
+#define B_NO_LOCK_VECTOR		2
 
 extern status_t		install_io_interrupt_handler(long interrupt_number,
 						interrupt_handler handler, void *data, ulong flags);
