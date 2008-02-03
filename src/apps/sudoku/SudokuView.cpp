@@ -245,15 +245,35 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 		bool netPositiveFriendly = false;
 		text = "<html>\n<head>\n<!-- Written by Sudoku -->\n"
 			"<style type=\"text/css\">\n"
+			/*
 			"table.sudoku { background: #000000; border:0; cellpadding: 10px; cellspacing: 1px; width: 300px; height: 300px; }\n"
 			"td.sudoku { background: #ffffff; border: 0; text-align: center; }\n"
 			"td.sudoku_initial {  }\n"
 			"td.sudoku_filled { color: blue; }\n"
 			"td.sudoku_empty {  }\n"
+			*/
+			"table.sudoku { background: #000000; border:0; border-collapse: collapse; cellpadding: 10px; cellspacing: 10px; width: 300px; height: 300px; }\n"
+			"td.sudoku { background: #ffffff; border-color: black; border-left: none ; border-top: none ; /*border: none;*/ text-align: center; }\n"
+			"td.sudoku_initial {  }\n"
+			"td.sudoku_filled { color: blue; }\n"
+			"td.sudoku_empty {  }\n"
+			// border styles: right bottom (none, solid or large)
+#define BS_N "none"
+#define BS_S "solid 1px black"
+#define BS_L "solid 3px black"
+			"td.sudoku_nn { border-right: " BS_N "; border-bottom: " BS_N "; }\n"
+			"td.sudoku_sn { border-right: " BS_S "; border-bottom: " BS_N "; }\n"
+			"td.sudoku_ns { border-right: " BS_N "; border-bottom: " BS_S "; }\n"
+			"td.sudoku_ss { border-right: " BS_S "; border-bottom: " BS_S "; }\n"
+			"td.sudoku_nl { border-right: " BS_N "; border-bottom: " BS_L "; }\n"
+			"td.sudoku_sl { border-right: " BS_S "; border-bottom: " BS_L "; }\n"
+			"td.sudoku_ln { border-right: " BS_L "; border-bottom: " BS_N "; }\n"
+			"td.sudoku_ls { border-right: " BS_L "; border-bottom: " BS_S "; }\n"
+			"td.sudoku_ll { border-right: " BS_L "; border-bottom: " BS_L "; }\n"
 			"</style>\n"
 			"</head>\n<body>\n\n";
-		if (file)
-			stream.Write(text.String(), text.Length());
+		/*if (file)*/
+		stream.Write(text.String(), text.Length());
 
 		text = "<table";
 		if (netPositiveFriendly)
@@ -271,18 +291,33 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 			for (uint32 x = 0; x < fField->Size(); x++) {
 				char buff[2];
 				_SetText(buff, fField->ValueAt(x, y));
+				
+				char border_right = 's';
+				char border_bottom = 's';
+				if ((x+1) % fField->BlockSize() == 0)
+					border_right = 'l';
+				if ((y+1) % fField->BlockSize() == 0)
+					border_bottom = 'l';
+				if (x == fField->Size() - 1)
+					border_right = 'n';
+				if (y == fField->Size() - 1)
+					border_bottom = 'n';
+				
 				if (fField->ValueAt(x, y) == 0) {
-					text << "<td width=\"" << divider << "\" class=\"sudoku sudoku_empty\">\n";
+					text << "<td width=\"" << divider << "\" ";
+					text << "class=\"sudoku sudoku_empty sudoku_" << border_right << border_bottom << "\">\n";
 					text << "&nbsp;";
 				} else if (fField->FlagsAt(x, y) & kInitialValue) {
-					text << "<td width=\"" << divider << "\" class=\"sudoku sudoku_initial\">\n";
+					text << "<td width=\"" << divider << "\" ";
+					text << "class=\"sudoku sudoku_initial sudoku_" << border_right << border_bottom << "\">\n";
 					if (netPositiveFriendly)
 						text << "<font color=\"#000000\">";
 					text << buff;
 					if (netPositiveFriendly)
 						text << "</font>";
 				} else {
-					text << "<td width=\"" << divider << "\" class=\"sudoku sudoku_filled\">\n";
+					text << "<td width=\"" << divider << "\" ";
+					text << "class=\"sudoku sudoku_filled sudoku_" << border_right << border_bottom << "\">\n";
 					if (netPositiveFriendly)
 						text << "<font color=\"#0000ff\">";
 					text << buff;
@@ -297,8 +332,8 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 
 		stream.Write(text.String(), text.Length());
 		text = "</body></html>\n";
-		if (file)
-			stream.Write(text.String(), text.Length());
+		/*if (file)*/
+		stream.Write(text.String(), text.Length());
 		if (file)
 			nodeInfo.SetType("text/html");
 		return B_OK;
