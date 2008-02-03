@@ -9,12 +9,15 @@
 #include <DiskDevice.h>
 #include <View.h>
 
+#include "Support.h"
+
 
 class DiskView : public BView {
 	typedef BView Inherited;
 public:
 								DiskView(const BRect& frame,
-									uint32 resizeMode);
+									uint32 resizeMode,
+									SpaceIDMap& spaceIDMap);
 	virtual						~DiskView();
 
 	// BView interface
@@ -28,6 +31,7 @@ private:
 
 			int32				fDiskCount;
 			BDiskDevice*		fDisk;
+			SpaceIDMap&			fSpaceIDMap;
 
 			class PartitionLayout;
 			PartitionLayout*	fPartitionLayout;

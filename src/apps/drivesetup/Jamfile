@@ -12,9 +12,8 @@ Preference DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 
-	: be libcolumnlistview.a
-	:
-	DriveSetup.rdef
+	: be libcolumnlistview.a libshared.a
+	: DriveSetup.rdef
 ;
 
 if ( $(TARGET_PLATFORM) = libbe_test ) {

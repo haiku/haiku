@@ -10,6 +10,7 @@
 #include "Support.h"
 
 #include <Partition.h>
+#include <String.h>
 
 
 const char*
@@ -66,4 +67,44 @@ dump_partition_info(const BPartition* partition)
 	printf("\tContentType(): %s\n", partition->ContentType());
 	printf("\tID(): %lx\n\n", partition->ID());
 }
+
+
+bool
+is_valid_partitionable_space(size_t size)
+{
+	// TODO: remove this again, the DiskDeviceAPI should
+	// not even show these spaces to begin with
+	return size >= 8 * 1024 * 1024;
+}
+
+
+// #pragma mark -SpaceIDMap
+
+SpaceIDMap::SpaceIDMap()
+	: HashMap<HashString, partition_id>()
+	, fNextSpaceID(-2)
+{
+}
+
+
+SpaceIDMap::~SpaceIDMap()
+{
+}
+
+
+partition_id
+SpaceIDMap::SpaceIDFor(partition_id parentID, off_t spaceOffset)
+{
+	BString key;
+	key << parentID << ':' << (uint64)spaceOffset;
+
+	if (ContainsKey(key.String()))
+		return Get(key.String());
+
+	partition_id newID = fNextSpaceID--;
+	Put(key.String(), newID);
+
+	return newID;
+}
+
 

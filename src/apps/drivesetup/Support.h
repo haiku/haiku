@@ -6,7 +6,9 @@
 #define SUPPORT_H
 
 
-#include <SupportDefs.h>
+#include <DiskDeviceDefs.h>
+#include <HashMap.h>
+#include <HashString.h>
 
 
 class BPartition;
@@ -15,6 +17,21 @@ class BPartition;
 const char* string_for_size(off_t size, char *string);
 
 void dump_partition_info(const BPartition* partition);
+
+bool is_valid_partitionable_space(size_t size);
+
+
+class SpaceIDMap : public HashMap<HashString, partition_id> {
+public:
+								SpaceIDMap();
+	virtual						~SpaceIDMap();
+
+			partition_id		SpaceIDFor(partition_id parentID,
+									off_t spaceOffset);
+
+private:
+			partition_id		fNextSpaceID;
+};
 
 
 #endif // SUPPORT_H

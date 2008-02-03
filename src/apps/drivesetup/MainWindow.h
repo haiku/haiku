@@ -13,6 +13,8 @@
 #include <DiskDeviceRoster.h>
 #include <Window.h>
 
+#include "Support.h"
+
 
 class BDiskDevice;
 class BPartition;
@@ -45,10 +47,12 @@ private:
 			void				_ScanFileSystems();
 
 			void				_AdaptToSelectedPartition();
-			void				_SetToDiskAndPartition(partition_id disk,
-									partition_id partition);
+			void				_SetToDiskAndPartition(partition_id diskID,
+									partition_id partitionID,
+									partition_id parentID);
 			void				_EnabledDisableMenuItems(BDiskDevice* disk,
-									partition_id selectedPartition);
+									partition_id selectedPartition,
+									partition_id parentID);
 
 			void				_DisplayPartitionError(BString message,
 									const BPartition* partition = NULL,
@@ -72,6 +76,8 @@ private:
 			PartitionListView*	fListView;
 			DiskView*			fDiskView;
 
+			SpaceIDMap			fSpaceIDMap;
+
 			BMenu*				fDiskMenu;
 			BMenu*				fPartitionMenu;
 			BMenu*				fInitMenu;
@@ -82,9 +88,6 @@ private:
 			BMenuItem*			fSurfaceTestMI;
 			BMenuItem*			fRescanMI;
 
-			BMenuItem*			fCreatePrimaryMI;
-			BMenuItem*			fCreateExtendedMI;
-			BMenuItem*			fCreateLogicalMI;
 			BMenuItem*			fDeleteMI;
 			BMenuItem*			fMountMI;
 			BMenuItem*			fUnmountMI;

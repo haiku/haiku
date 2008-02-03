@@ -183,10 +183,11 @@ private:
 
 class DiskView::PartitionLayout : public BDiskDeviceVisitor {
 public:
-	PartitionLayout(BView* view)
+	PartitionLayout(BView* view, SpaceIDMap& spaceIDMap)
 		: fView(view)
 		, fViewMap()
 		, fSelectedPartition(-1)
+		, fSpaceIDMap(spaceIDMap)
 	{
 	}
 
@@ -258,7 +259,7 @@ public:
 	}
 
  private:
-	void _AddSpaces(BPartition* partition, PartitionView* parentView) const
+	void _AddSpaces(BPartition* partition, PartitionView* parentView)
 	{
 		// add any available space on the partition
 		BPartitioningInfo info;
@@ -269,10 +270,17 @@ public:
 			for (int32 i = 0;
 				info.GetPartitionableSpaceAt(i, &offset, &size) >= B_OK;
 				i++) {
+				// TODO: remove again once Disk Device API is fixed
+				if (!is_valid_partitionable_space(size))
+					continue;
+				// 
 				double scale = (double)size / parentSize;
+				partition_id id
+					= fSpaceIDMap.SpaceIDFor(partition->ID(), offset);
 				PartitionView* view = new PartitionView("<empty>", scale,
-					offset, parentView->Level() + 1, -2);
+					offset, parentView->Level() + 1, id);
 
+				fViewMap.Put(id, view);
 				BGroupLayout* layout = parentView->GroupLayout();
 				layout->AddView(_FindInsertIndex(view, layout), view, scale);
 			}
@@ -301,18 +309,21 @@ public:
 	BView*				fView;
 	PartitionViewMap	fViewMap;
 	partition_id		fSelectedPartition;
+	SpaceIDMap&			fSpaceIDMap;
 };
 
 
 // #pragma mark -
 
 
-DiskView::DiskView(const BRect& frame, uint32 resizeMode)
+DiskView::DiskView(const BRect& frame, uint32 resizeMode,
+		SpaceIDMap& spaceIDMap)
 	: Inherited(frame, "diskview", resizeMode,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 	, fDiskCount(0)
 	, fDisk(NULL)
-	, fPartitionLayout(new PartitionLayout(this))
+	, fSpaceIDMap(spaceIDMap)
+	, fPartitionLayout(new PartitionLayout(this, fSpaceIDMap))
 {
 	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL, kLayoutInset);
 	SetLayout(layout);
@@ -407,12 +418,12 @@ DiskView::SetDiskCount(int32 count)
 void
 DiskView::SetDisk(BDiskDevice* disk, partition_id selectedPartition)
 {
-	fPartitionLayout->SetSelectedPartition(selectedPartition);
-
 	if (fDisk != disk) {
 		fDisk = disk;
 		_UpdateLayout();
 	}
+
+	fPartitionLayout->SetSelectedPartition(selectedPartition);
 }
 
 
