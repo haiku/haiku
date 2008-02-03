@@ -16,9 +16,11 @@
 
 #include <Application.h>
 #include <Beep.h>
+#include <DataIO.h>
 #include <File.h>
 #include <NodeInfo.h>
 #include <Path.h>
+#include <String.h>
 
 
 const uint32 kMsgCheckSolved = 'chks';

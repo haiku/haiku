@@ -9,6 +9,7 @@
 #include <View.h>
 #include <ObjectList.h>
 
+class BDataIO;
 class SudokuField;
 struct entry_ref;
 
