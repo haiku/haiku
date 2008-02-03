@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All rights reserved.
+ * Copyright 2004-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SYSCALLS_H
@@ -151,6 +151,7 @@ extern int			_kern_open_parent_dir(int fd, char *name,
 						size_t nameLength);
 extern status_t		_kern_fcntl(int fd, int op, uint32 argument);
 extern status_t		_kern_fsync(int fd);
+extern status_t		_kern_flock(int fd, int op);
 extern off_t		_kern_seek(int fd, off_t pos, int seekType);
 extern status_t		_kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 extern status_t		_kern_create_dir(int fd, const char *path, int perms);

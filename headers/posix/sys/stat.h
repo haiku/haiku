@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SYS_STAT_H_
@@ -84,6 +84,11 @@ struct stat {
 #define S_IROTH 00004       /* read permission: other */
 #define S_IWOTH 00002       /* write permission: other */
 #define S_IXOTH 00001       /* execute permission: other */
+
+/* BSD extensions */
+#define S_IREAD		S_IRUSR
+#define S_IWRITE	S_IWUSR
+#define S_IEXEC		S_IXUSR
 
 #define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO)
 #define ALLPERMS    (S_ISUID | S_ISGID | S_ISTXT | S_IRWXU | S_IRWXG | S_IRWXO)

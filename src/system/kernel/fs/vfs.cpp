@@ -15,6 +15,7 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/file.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -128,6 +129,7 @@ struct advisory_locking {
 struct advisory_lock {
 	list_link		link;
 	team_id			team;
+	pid_t			session;
 	off_t			offset;
 	off_t			length;
 	bool			shared;
@@ -1088,7 +1090,6 @@ err1:
 
 /*!	Retrieves the first lock that has been set by the current team.
 */
-
 static status_t
 get_advisory_lock(struct vnode *vnode, struct flock *flock)
 {
@@ -1128,15 +1129,18 @@ release_advisory_lock(struct vnode *vnode, struct flock *flock)
 		return flock != NULL ? B_BAD_VALUE : B_OK;
 
 	team_id team = team_get_current_team_id();
+	pid_t session = thread_get_current_thread()->team->session_id;
 
 	// find matching lock entry
 
 	status_t status = B_BAD_VALUE;
 	struct advisory_lock *lock = NULL;
-	while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
-		if (lock->team == team && (flock == NULL || (flock != NULL
-			&& lock->offset == flock->l_start
-			&& lock->length == flock->l_len))) {
+	while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks,
+			lock)) != NULL) {
+		if (lock->team == team && (flock == NULL
+				|| (flock != NULL && lock->offset == flock->l_start
+					&& lock->length == flock->l_len))
+			|| lock->session == session) {
 			// we found our lock, free it
 			list_remove_item(&locking->locks, lock);
 			free(lock);
@@ -1176,14 +1180,26 @@ release_advisory_lock(struct vnode *vnode, struct flock *flock)
 }
 
 
+/*!	Acquires an advisory lock for the \a vnode. If \a wait is \c true, it
+	will wait for the lock to become available, if there are any collisions
+	(it will return B_PERMISSION_DENIED in this case if \a wait is \c false).
+
+	If \a session is -1, POSIX semantics are used for this lock. Otherwise,
+	BSD flock() semantics are used, that is, all children can unlock the file
+	in question (we even allow parents to remove the lock, though, but that
+	seems to be in line to what the BSD's are doing).
+*/
 static status_t
-acquire_advisory_lock(struct vnode *vnode, struct flock *flock, bool wait)
+acquire_advisory_lock(struct vnode *vnode, pid_t session, struct flock *flock,
+	bool wait)
 {
 	FUNCTION(("acquire_advisory_lock(vnode = %p, flock = %p, wait = %s)\n",
 		vnode, flock, wait ? "yes" : "no"));
 
 	bool shared = flock->l_type == F_RDLCK;
 	status_t status = B_OK;
+
+	// TODO: do deadlock detection!
 
 restart:
 	// if this vnode has an advisory_locking structure attached,
@@ -1194,7 +1210,8 @@ restart:
 	if (locking != NULL) {
 		// test for collisions
 		struct advisory_lock *lock = NULL;
-		while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
+		while ((lock = (struct advisory_lock *)list_get_next_item(
+				&locking->locks, lock)) != NULL) {
 			if (lock->offset <= flock->l_start + flock->l_len
 				&& lock->offset + lock->length > flock->l_start) {
 				// locks do overlap
@@ -1214,9 +1231,10 @@ restart:
 
 	if (waitForLock >= B_OK) {
 		if (!wait)
-			status = B_PERMISSION_DENIED;
+			status = session != -1 ? B_WOULD_BLOCK : B_PERMISSION_DENIED;
 		else {
-			status = switch_sem_etc(locking->lock, waitForLock, 1, B_CAN_INTERRUPT, 0);
+			status = switch_sem_etc(locking->lock, waitForLock, 1,
+				B_CAN_INTERRUPT, 0);
 			if (status == B_OK) {
 				// see if we're still colliding
 				goto restart;
@@ -1240,7 +1258,8 @@ restart:
 			// we own the locking object, so it can't go away
 	}
 
-	struct advisory_lock *lock = (struct advisory_lock *)malloc(sizeof(struct advisory_lock));
+	struct advisory_lock *lock = (struct advisory_lock *)malloc(
+		sizeof(struct advisory_lock));
 	if (lock == NULL) {
 		if (waitForLock >= B_OK)
 			release_sem_etc(waitForLock, 1, B_RELEASE_ALL);
@@ -1249,6 +1268,7 @@ restart:
 	}
 
 	lock->team = team_get_current_team_id();
+	lock->session = session;
 	// values must already be normalized when getting here
 	lock->offset = flock->l_start;
 	lock->length = flock->l_len;
@@ -1261,6 +1281,10 @@ restart:
 }
 
 
+/*!	Normalizes the \a flock structure to make it easier to compare the
+	structure with others. The l_start and l_len fields are set to absolute
+	values according to the l_whence field.
+*/
 static status_t
 normalize_flock(struct file_descriptor *descriptor, struct flock *flock)
 {
@@ -1279,7 +1303,8 @@ normalize_flock(struct file_descriptor *descriptor, struct flock *flock)
 			if (FS_CALL(vnode, read_stat) == NULL)
 				return EOPNOTSUPP;
 
-			status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+			status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
+				vnode->private_node, &stat);
 			if (status < B_OK)
 				return status;
 
@@ -4512,7 +4537,6 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
 	struct flock flock;
-	status_t status;
 
 	FUNCTION(("common_fcntl(fd = %d, op = %d, argument = %lx, %s)\n",
 		fd, op, argument, kernel ? "kernel" : "user"));
@@ -4521,11 +4545,19 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
+	status_t status = B_OK;
+
 	if (op == F_SETLK || op == F_SETLKW || op == F_GETLK) {
 		if (descriptor->type != FDTYPE_FILE)
-			return B_BAD_VALUE;
-		if (user_memcpy(&flock, (struct flock *)argument, sizeof(struct flock)) < B_OK)
-			return B_BAD_ADDRESS;
+			status = B_BAD_VALUE;
+		else if (user_memcpy(&flock, (struct flock *)argument,
+				sizeof(struct flock)) < B_OK)
+			status = B_BAD_ADDRESS;
+
+		if (status != B_OK) {
+			put_fd(descriptor);
+			return status;
+		}
 	}
 
 	switch (op) {
@@ -4564,8 +4596,8 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 					vnode->private_node, descriptor->cookie, (int)argument);
 				if (status == B_OK) {
 					// update this descriptor's open_mode field
-					descriptor->open_mode = (descriptor->open_mode & ~(O_APPEND | O_NONBLOCK))
-						| argument;
+					descriptor->open_mode = (descriptor->open_mode
+						& ~(O_APPEND | O_NONBLOCK)) | argument;
 				}
 			} else
 				status = EOPNOTSUPP;
@@ -4595,7 +4627,8 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 			status = get_advisory_lock(descriptor->u.vnode, &flock);
 			if (status == B_OK) {
 				// copy back flock structure
-				status = user_memcpy((struct flock *)argument, &flock, sizeof(struct flock));
+				status = user_memcpy((struct flock *)argument, &flock,
+					sizeof(struct flock));
 			}
 			break;
 
@@ -4609,11 +4642,15 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 				status = release_advisory_lock(descriptor->u.vnode, &flock);
 			else {
 				// the open mode must match the lock type
-				if ((descriptor->open_mode & O_RWMASK) == O_RDONLY && flock.l_type == F_WRLCK
-					|| (descriptor->open_mode & O_RWMASK) == O_WRONLY && flock.l_type == F_RDLCK)
+				if ((descriptor->open_mode & O_RWMASK) == O_RDONLY
+						&& flock.l_type == F_WRLCK
+					|| (descriptor->open_mode & O_RWMASK) == O_WRONLY
+						&& flock.l_type == F_RDLCK)
 					status = B_FILE_ERROR;
-				else
-					status = acquire_advisory_lock(descriptor->u.vnode, &flock, op == F_SETLKW);
+				else {
+					status = acquire_advisory_lock(descriptor->u.vnode, -1,
+						&flock, op == F_SETLKW);
+				}
 			}
 			break;
 
@@ -7284,6 +7321,43 @@ status_t
 _user_fsync(int fd)
 {
 	return common_sync(fd, false);
+}
+
+
+status_t 
+_user_flock(int fd, int op)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+	struct flock flock;
+	status_t status;
+
+	FUNCTION(("_user_fcntl(fd = %d, op = %d)\n", fd, op));
+
+	descriptor = get_fd_and_vnode(fd, &vnode, false);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	if (descriptor->type != FDTYPE_FILE) {
+		put_fd(descriptor);
+		return B_BAD_VALUE;
+	}
+
+	flock.l_start = 0;
+	flock.l_len = OFF_MAX;
+	flock.l_whence = 0;
+	flock.l_type = (op & LOCK_SH) != 0 ? F_RDLCK : F_WRLCK;
+
+	if ((op & LOCK_UN) != 0)
+		status = release_advisory_lock(descriptor->u.vnode, &flock);
+	else {
+		status = acquire_advisory_lock(descriptor->u.vnode,
+			thread_get_current_thread()->team->session_id, &flock,
+			(op & LOCK_NB) == 0);
+	}
+
+	put_fd(descriptor);
+	return status;
 }
 
 

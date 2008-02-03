@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FCNTL_H
@@ -74,15 +74,6 @@ struct flock {
 	pid_t	l_pid;
 };
 
-/* for use with flock() - TODO: this should be moved to sys/file.h *if* we'll support flock() one day */
-#define	LOCK_SH		0x01	/* shared file lock */
-#define	LOCK_EX		0x02	/* exclusive file lock */
-#define	LOCK_NB		0x04	/* don't block when locking */
-#define	LOCK_UN		0x08	/* unlock file */
-
-#define S_IREAD		0x0100  /* owner may read */
-#define S_IWRITE	0x0080	/* owner may write */
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -99,4 +90,4 @@ extern int	fcntl(int fd, int op, ...);
 }
 #endif
 
-#endif /* _FCNTL_H */
+#endif	/* _FCNTL_H */

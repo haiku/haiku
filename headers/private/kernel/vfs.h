@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -145,6 +145,7 @@ int _user_open_dir(int fd, const char *path);
 int _user_open_parent_dir(int fd, char *name, size_t nameLength);
 status_t _user_fcntl(int fd, int op, uint32 argument);
 status_t _user_fsync(int fd);
+status_t _user_flock(int fd, int op);
 status_t _user_read_stat(int fd, const char *path, bool traverseLink,
 			struct stat *stat, size_t statSize);
 status_t _user_write_stat(int fd, const char *path, bool traverseLink,
