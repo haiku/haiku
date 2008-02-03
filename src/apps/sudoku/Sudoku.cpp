@@ -92,7 +92,7 @@ Sudoku::AboutRequested()
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	srand(system_time());
+	srand(system_time() % INT_MAX);
 
 	Sudoku sudoku;
 	sudoku.Run();
