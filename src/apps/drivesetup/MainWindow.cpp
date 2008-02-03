@@ -29,6 +29,8 @@
 #include <MenuBar.h>
 #include <Menu.h>
 #include <Screen.h>
+#include <Volume.h>
+#include <VolumeRoster.h>
 
 
 class ListPopulatorVisitor : public BDiskDeviceVisitor {
@@ -81,9 +83,6 @@ private:
 				i++) {
 				fPartitionList->AddSpace(partition->ID(), offset, size);
 			}
-		} else {
-			fprintf(stderr, "failed to get partitioning info: %s\n",
-				strerror(ret));
 		}
 	}
 
@@ -480,7 +479,18 @@ fCreateMenu->SetEnabled(false);
 //			fDeleteMI->SetEnabled(!partition->IsMounted());
 fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(!partition->IsMounted());
-			fUnmountMI->SetEnabled(partition->IsMounted());
+
+			if (partition->IsMounted()) {
+				// see if this partition is the boot volume
+				BVolume volume; 
+				BVolume bootVolume; 
+				if (BVolumeRoster().GetBootVolume(&bootVolume) == B_OK
+					&& partition->GetVolume(&volume) == B_OK) { 
+					fUnmountMI->SetEnabled(volume != bootVolume);
+				} else {
+					fUnmountMI->SetEnabled(true);
+				}
+			}
 		} else {
 			fInitMenu->SetEnabled(false);
 			fDeleteMI->SetEnabled(false);

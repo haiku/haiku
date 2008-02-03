@@ -4,23 +4,61 @@
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@unet.nl>
+ *		James Urquhart
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 #ifndef PARTITIONLIST_H
 #define PARTITIONLIST_H
 
 
-class PartitionListRow;
-class PartitionListView;
-
-
 #include <ColumnListView.h>
+#include <ColumnTypes.h>
 #include <Partition.h>
 
 
 class BPartition;
 
 
+// A field type displaying both a bitmap and a string so that the
+// tree display looks nicer (both text and bitmap are indented)
+class BBitmapStringField : public BStringField {
+	typedef BStringField Inherited;
+public:
+								BBitmapStringField(BBitmap* bitmap,
+									const char* string);
+	virtual						~BBitmapStringField();
+
+			void				SetBitmap(BBitmap* bitmap);
+			const BBitmap*		Bitmap() const
+									{ return fBitmap; }
+
+private:
+			BBitmap*			fBitmap;
+};
+
+
+// BColumn for PartitionListView which knows how to render
+// a BBitmapStringField
+class PartitionColumn : public BTitledColumn {
+	typedef BTitledColumn Inherited;
+public:
+								PartitionColumn(const char* title,
+									float width, float minWidth,
+									float maxWidth, uint32 truncateMode,
+									alignment align = B_ALIGN_LEFT);
+
+	virtual	void				DrawField(BField* field, BRect rect,
+									BView* parent);
+
+	virtual	bool				AcceptsField(const BField* field) const;
+
+private:
+			uint32				fTruncateMode;
+	static	float				fTextMargin;
+};
+
+
+// BRow for the PartitionListView
 class PartitionListRow : public BRow {
 	typedef BRow Inherited;
 public:
@@ -30,6 +68,8 @@ public:
 	
 			partition_id		ID() const
 									{ return fPartitionID; }
+			partition_id		ParentID() const
+									{ return fParentID; }
 			off_t				Offset() const
 									{ return fOffset; }
 			off_t				Size() const

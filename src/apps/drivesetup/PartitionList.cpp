@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ithamar R. Adema <ithamar@unet.nl>
+ *		James Urquhart
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 #include "PartitionList.h"
@@ -13,10 +14,132 @@
 #include <Path.h>
 
 
+// #pragma mark - BBitmapStringField
+
+
+BBitmapStringField::BBitmapStringField(BBitmap* bitmap, const char* string)
+	: Inherited(string)
+	, fBitmap(bitmap)
+{
+}
+
+
+BBitmapStringField::~BBitmapStringField()
+{
+	delete fBitmap;
+}
+
+
+void
+BBitmapStringField::SetBitmap(BBitmap* bitmap)
+{
+	delete fBitmap;
+	fBitmap = bitmap;
+	// TODO: cause a redraw?
+}
+
+
+// #pragma mark - PartitionColumn
+
+
+float PartitionColumn::fTextMargin = 0.0;
+
+
+PartitionColumn::PartitionColumn(const char* title, float width, float minWidth,
+		float maxWidth, uint32 truncateMode, alignment align)
+	: Inherited(title, width, minWidth, maxWidth, align),
+	fTruncateMode(truncateMode)
+{
+	SetWantsEvents(true);
+}
+
+
+void
+PartitionColumn::DrawField(BField* field, BRect rect, BView* parent)
+{
+	if (fTextMargin == 0.0) {
+		// we are the first column to draw something and need to
+		// init the text margin
+		BFont font;
+		parent->GetFont(&font);
+		fTextMargin = ceilf(font.Size() * 0.8);
+	}
+
+	BBitmapStringField* bitmapField
+		= dynamic_cast<BBitmapStringField*>(field);
+	BStringField* stringField = dynamic_cast<BStringField*>(field);
+
+	if (bitmapField) {
+		const BBitmap* bitmap = bitmapField->Bitmap();
+
+		// figure out the placement
+		float x = 0.0;
+		BRect r = bitmap ? bitmap->Bounds() : BRect(0, 0, 15, 15);
+		float y = rect.top + ((rect.Height() - r.Height()) / 2);
+		float width = 0.0;
+
+		switch (Alignment()) {
+			default:
+			case B_ALIGN_LEFT:
+			case B_ALIGN_CENTER:
+				x = rect.left + fTextMargin;
+				width = rect.right - (x + r.Width()) - (2 * fTextMargin);
+				r.Set(x + r.Width(), rect.top, rect.right - width, rect.bottom);
+				break;
+
+			case B_ALIGN_RIGHT:
+				x = rect.right - fTextMargin - r.Width();
+				width = (x - rect.left - (2 * fTextMargin));
+				r.Set(rect.left, rect.top, rect.left + width, rect.bottom);
+				break;
+		}
+
+		if (width != bitmapField->Width()) {
+			BString truncatedString(bitmapField->String());
+			parent->TruncateString(&truncatedString, fTruncateMode, width + 2);
+			bitmapField->SetClippedString(truncatedString.String());
+			bitmapField->SetWidth(width);
+		}
+
+		// draw the bitmap
+		if (bitmap) {
+			parent->SetDrawingMode(B_OP_ALPHA);
+			parent->DrawBitmap(bitmap, BPoint(x, y));
+			parent->SetDrawingMode(B_OP_OVER);
+		}
+
+		// draw the string
+		DrawString(bitmapField->ClippedString(), parent, r);
+
+	} else if (stringField) {
+
+		float width = rect.Width() - (2 * fTextMargin);
+	
+		if (width != stringField->Width()) {
+			BString truncatedString(stringField->String());
+
+			parent->TruncateString(&truncatedString, fTruncateMode, width + 2);
+			stringField->SetClippedString(truncatedString.String());
+			stringField->SetWidth(width);
+		}
+
+		DrawString(stringField->ClippedString(), parent, rect);
+	}
+}
+
+bool 
+PartitionColumn::AcceptsField(const BField* field) const
+{
+	return dynamic_cast<const BStringField*>(field) != NULL;
+}
+
+
+// #pragma mark - PartitionListRow
+
+
 static const char* kUnavailableString = "";
 
 enum {
-//	kBitmapColumn,
 	kDeviceColumn,
 	kFilesystemColumn,
 	kVolumeNameColumn,
@@ -32,11 +155,20 @@ PartitionListRow::PartitionListRow(BPartition* partition)
 	, fOffset(partition->Offset())
 	, fSize(partition->Size())
 {
-//	SetField(new BBitmapField(NULL), kBitmapColumn);
-
 	BPath path;
 	partition->GetPath(&path);
-	SetField(new BStringField(path.Path()), kDeviceColumn);
+
+	BBitmap* icon = NULL;
+	if (partition->IsDevice()) {
+		icon_size size = B_MINI_ICON;
+		icon = new BBitmap(BRect(0, 0, size - 1, size - 1), B_RGBA32);
+		if (partition->GetIcon(icon, size) != B_OK) {
+			delete icon;
+			icon = NULL;
+		}
+	}
+
+	SetField(new BBitmapStringField(icon, path.Path()), kDeviceColumn);
 
 	if (partition->ContainsFileSystem()) {
 		SetField(new BStringField(partition->ContentType()), kFilesystemColumn);
@@ -66,11 +198,10 @@ PartitionListRow::PartitionListRow(partition_id parentID, off_t offset,
 	, fOffset(offset)
 	, fSize(size)
 {
-//	SetField(new BBitmapField(NULL), kBitmapColumn);
+	// TODO: design icon for spaces on partitions
+	SetField(new BBitmapStringField(NULL, "-"), kDeviceColumn);
 
-	SetField(new BStringField("-"), kDeviceColumn);
-
-	SetField(new BStringField("Empty"), kFilesystemColumn);
+	SetField(new BStringField("<empty>"), kFilesystemColumn);
 	SetField(new BStringField(kUnavailableString), kVolumeNameColumn);
 	
 	SetField(new BStringField(kUnavailableString), kMountedAtColumn);
@@ -83,18 +214,16 @@ PartitionListRow::PartitionListRow(partition_id parentID, off_t offset,
 PartitionListView::PartitionListView(const BRect& frame, uint32 resizeMode)
 	: Inherited(frame, "storagelist", resizeMode, 0, B_NO_BORDER, true)
 {
-//	AddColumn(new BBitmapColumn("", 20, 20, 100, B_ALIGN_CENTER),
-//		kBitmapColumn);
-	AddColumn(new BStringColumn("Device", 150, 50, 500, B_TRUNCATE_MIDDLE),
-		kDeviceColumn);
-	AddColumn(new BStringColumn("Filesystem", 100, 50, 500, B_TRUNCATE_MIDDLE),
-		kFilesystemColumn);
-	AddColumn(new BStringColumn("Volume Name", 130, 50, 500, B_TRUNCATE_MIDDLE),
-		kVolumeNameColumn);
-	AddColumn(new BStringColumn("Mounted At", 100, 50, 500, B_TRUNCATE_MIDDLE),
-		kMountedAtColumn);
-	AddColumn(new BStringColumn("Size", 100, 50, 500, B_TRUNCATE_END,
-		B_ALIGN_RIGHT), kSizeColumn);
+	AddColumn(new PartitionColumn("Device", 150, 50, 500,
+		B_TRUNCATE_MIDDLE), kDeviceColumn);
+	AddColumn(new PartitionColumn("Filesystem", 100, 50, 500,
+		B_TRUNCATE_MIDDLE), kFilesystemColumn);
+	AddColumn(new PartitionColumn("Volume Name", 130, 50, 500,
+		B_TRUNCATE_MIDDLE), kVolumeNameColumn);
+	AddColumn(new PartitionColumn("Mounted At", 100, 50, 500,
+		B_TRUNCATE_MIDDLE), kMountedAtColumn);
+	AddColumn(new PartitionColumn("Size", 100, 50, 500,
+		B_TRUNCATE_END, B_ALIGN_RIGHT), kSizeColumn);
 
 	SetSortingEnabled(false);
 }
