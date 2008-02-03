@@ -19,7 +19,7 @@ using std::nothrow;
 
 // constructor
 ExtendedPartitionAddOn::ExtendedPartitionAddOn()
-	: BDiskSystemAddOn(kPartitionTypeIntel, 0)
+	: BDiskSystemAddOn(kPartitionTypeIntelExtended, 0)
 {
 }
 
