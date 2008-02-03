@@ -17,6 +17,7 @@
 #include <Application.h>
 #include <Beep.h>
 #include <File.h>
+#include <NodeInfo.h>
 #include <Path.h>
 
 
@@ -209,10 +210,14 @@ status_t
 SudokuView::SaveTo(BDataIO &stream, uint32 as)
 {
 	BString text;
-	//BFile *file;
+	BFile *file = dynamic_cast<BFile *>(&stream);
 	char *line;
 	uint32 i = 0;
 	status_t status = EINVAL;
+	BNodeInfo nodeInfo;
+
+	if (file)
+		nodeInfo.SetTo(file);
 
 	switch (as) {
 	case kExportAsText:
@@ -232,18 +237,28 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 		text.UnlockBuffer();
 
 		stream.Write(text.String(), text.Length());
+		if (file)
+			nodeInfo.SetType("text/plain");
 		return B_OK;
 	case kExportAsHTML:
 	{
+		bool netPositiveFriendly = false;
 		text = "<html>\n<head>\n<!-- Written by Sudoku -->\n"
 			"<style type=\"text/css\">\n"
-			"table.sudoku { border: 1px solid black; width=\"300px\"; height=\"300px\"; }\n"
-			"td.sudoku_initial { background: #f0f0f0; }\n"
-			"td.sudoku_filled { background: #f0f0f0; color: blue; }\n"
-			"td.sudoku_empty { background: #f0f0f0; }\n"
+			"table.sudoku { background: #000000; border:0; cellpadding: 10px; cellspacing: 1px; width: 300px; height: 300px; }\n"
+			"td.sudoku { background: #ffffff; border: 0; text-align: center; }\n"
+			"td.sudoku_initial {  }\n"
+			"td.sudoku_filled { color: blue; }\n"
+			"td.sudoku_empty {  }\n"
 			"</style>\n"
-			"</head>\n<body>\n\n"
-			"<table " /*"border=\"1\""*/ " class=\"sudoku\">";
+			"</head>\n<body>\n\n";
+		if (file)
+			stream.Write(text.String(), text.Length());
+
+		text = "<table";
+		if (netPositiveFriendly)
+			text << " border=\"1\"";
+		text << " class=\"sudoku\">";
 		stream.Write(text.String(), text.Length());
 
 		//XXX: make border larger on %3
@@ -257,18 +272,22 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 				char buff[2];
 				_SetText(buff, fField->ValueAt(x, y));
 				if (fField->ValueAt(x, y) == 0) {
-					text << "<td width=\"" << divider << "\" class=\"sudoku_empty\">\n";
+					text << "<td width=\"" << divider << "\" class=\"sudoku sudoku_empty\">\n";
 					text << "&nbsp;";
 				} else if (fField->FlagsAt(x, y) & kInitialValue) {
-					text << "<td width=\"" << divider << "\" class=\"sudoku_initial\">\n";
-					text << "<font color=\"#000000\">";
+					text << "<td width=\"" << divider << "\" class=\"sudoku sudoku_initial\">\n";
+					if (netPositiveFriendly)
+						text << "<font color=\"#000000\">";
 					text << buff;
-					text << "</font>";
+					if (netPositiveFriendly)
+						text << "</font>";
 				} else {
-					text << "<td width=\"" << divider << "\" class=\"sudoku_filled\">\n";
-					text << "<font color=\"#0000ff\">";
+					text << "<td width=\"" << divider << "\" class=\"sudoku sudoku_filled\">\n";
+					if (netPositiveFriendly)
+						text << "<font color=\"#0000ff\">";
 					text << buff;
-					text << "</font>";
+					if (netPositiveFriendly)
+						text << "</font>";
 				}
 				text << "</td>\n";
 			}
@@ -278,7 +297,10 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 
 		stream.Write(text.String(), text.Length());
 		text = "</body></html>\n";
-		stream.Write(text.String(), text.Length());
+		if (file)
+			stream.Write(text.String(), text.Length());
+		if (file)
+			nodeInfo.SetType("text/html");
 		return B_OK;
 	}
 	case kExportAsBitmap:
