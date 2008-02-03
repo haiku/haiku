@@ -902,7 +902,7 @@ make_thread_suspended(int argc, char **argv)
 		if (thread->id != id)
 			continue;
 
-		thread->state = thread->next_state = B_THREAD_SUSPENDED;
+		thread->next_state = B_THREAD_SUSPENDED;
 		kprintf("thread %ld suspended\n", id);
 		break;
 	}
