@@ -342,7 +342,7 @@ TermParse::EscParse()
 			}
 			parsestate = groundtable;
 			now_coding = fView->Encoding();
-    		}
+    	}
 
 		switch (parsestate[c]) {
 			case CASE_PRINT:

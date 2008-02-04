@@ -144,6 +144,7 @@ void
 Shell::Close()
 {
 	delete fTermParse;
+	fTermParse = NULL;
 	
 	if (fFd >= 0) {
 		close(fFd);

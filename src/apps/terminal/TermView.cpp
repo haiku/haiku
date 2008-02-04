@@ -1081,19 +1081,17 @@ void
 TermView::_DrawLines(int x1, int y1, ushort attr, uchar *buf,
 	int width, int mouse, int cursor, BView *inView)
 {
-	int x2, y2;
-	int forecolor, backcolor;
-	rgb_color rgb_fore = fTextForeColor, rgb_back = fTextBackColor, rgb_tmp;
+	rgb_color rgb_fore = fTextForeColor, rgb_back = fTextBackColor;
 
 	inView->SetFont(&fHalfFont);
 
 	// Set pen point
-	x2 = x1 + fFontWidth * width;
-	y2 = y1 + fFontHeight;
+	int x2 = x1 + fFontWidth * width;
+	int y2 = y1 + fFontHeight;
 
 	// color attribute
-	forecolor = IS_FORECOLOR(attr);
-	backcolor = IS_BACKCOLOR(attr);
+	int forecolor = IS_FORECOLOR(attr);
+	int backcolor = IS_BACKCOLOR(attr);
 
 	if (IS_FORESET(attr))
 		rgb_fore = kTermColorTable[forecolor];
@@ -1105,13 +1103,13 @@ TermView::_DrawLines(int x1, int y1, ushort attr, uchar *buf,
 	if (cursor) {
 		rgb_fore = fCursorForeColor;
 		rgb_back = fCursorBackColor;
-	} else if (mouse){
+	} else if (mouse) {
 		rgb_fore = fSelectForeColor;
 		rgb_back = fSelectBackColor;
 	} else {
 		// Reverse attribute(If selected area, don't reverse color).
 		if (IS_INVERSE(attr)) {
-			rgb_tmp = rgb_fore;
+			rgb_color rgb_tmp = rgb_fore;
 			rgb_fore = rgb_back;
 			rgb_back = rgb_tmp;
 		}
@@ -1131,7 +1129,7 @@ TermView::_DrawLines(int x1, int y1, ushort attr, uchar *buf,
 	// bold attribute.
 	if (IS_BOLD(attr)) {
 		inView->MovePenTo(x1 + 1, y1 + fFontAscent);
-
+		
 		inView->SetDrawingMode(B_OP_OVER);
 		inView->DrawString((char *)buf);
 		inView->SetDrawingMode(B_OP_COPY);
@@ -1154,7 +1152,7 @@ TermView::_ResizeScrBarRange()
 		return;
 
 	float viewheight = fTermRows * fFontHeight;
-	float start_pos = fTop -(fScrBufSize - fTermRows *2) * fFontHeight;
+	float start_pos = fTop -(fScrBufSize - fTermRows * 2) * fFontHeight;
 
 	if (start_pos > 0) {
 		fScrollBar->SetRange(start_pos, viewheight + fTop - fFontHeight);
@@ -1263,7 +1261,6 @@ TermView::UpdateLine()
 void
 TermView::AttachedToWindow()
 {
-	SetFont(&fHalfFont);
 	MakeFocus(true);
 	if (fScrollBar)
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);

@@ -46,7 +46,7 @@ class PrefWindow : public BWindow
 		BRect _CenteredRect(BRect rect);
 
 	private:
-		PrefHandler		*fPrefTemp;
+		PrefHandler		*fPreviousPref;
 		BFilePanel		*fSavePanel;
 	
 		BButton			*fSaveAsFileButton,

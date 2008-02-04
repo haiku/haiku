@@ -26,7 +26,7 @@ PrefWindow::PrefWindow(BMessenger messenger)
 	: BWindow(_CenteredRect(BRect(0, 0, 350, 215)), "Terminal Settings",
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_NOT_RESIZABLE|B_NOT_ZOOMABLE),
-	fPrefTemp(new PrefHandler(PrefHandler::Default())),
+	fPreviousPref(new PrefHandler(PrefHandler::Default())),
 	fSavePanel(NULL),
 	fDirty(false),
 	fPrefDlgMessenger(messenger)
@@ -37,8 +37,8 @@ PrefWindow::PrefWindow(BMessenger messenger)
 	
 	BRect rect = top->Bounds();
 	rect.bottom *= .75;
-	AppearancePrefView *prefView= new AppearancePrefView(rect, "Appearance", 
-		fPrefDlgMessenger);
+	AppearancePrefView *prefView 
+		= new AppearancePrefView(rect, "Appearance", fPrefDlgMessenger);
 	top->AddChild(prefView);
 	
 	fSaveAsFileButton = new BButton(BRect(0, 0, 1, 1), "savebutton", "Save to File" B_UTF8_ELLIPSIS, 
@@ -80,7 +80,7 @@ void
 PrefWindow::Quit()
 {
 	fPrefDlgMessenger.SendMessage(MSG_PREF_CLOSED);
-	delete fPrefTemp;
+	delete fPreviousPref;
 	delete fSavePanel;
 	BWindow::Quit();
 }
@@ -140,8 +140,8 @@ PrefWindow::_SaveRequested(BMessage *msg)
 void
 PrefWindow::_Save()
 {
-	delete fPrefTemp;
-	fPrefTemp = new PrefHandler(PrefHandler::Default());
+	delete fPreviousPref;
+	fPreviousPref = new PrefHandler(PrefHandler::Default());
 
 	BPath path;
 	if (PrefHandler::GetDefaultPath(path) == B_OK) {
@@ -154,13 +154,15 @@ PrefWindow::_Save()
 void
 PrefWindow::_Revert()
 {
-	PrefHandler::SetDefault(new PrefHandler(fPrefTemp));
+	if (fDirty) {
+		PrefHandler::SetDefault(new PrefHandler(fPreviousPref));
 
-	fPrefDlgMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
-	fPrefDlgMessenger.SendMessage(MSG_COLOR_CHANGED);
-	fPrefDlgMessenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
+		fPrefDlgMessenger.SendMessage(MSG_HALF_FONT_CHANGED);
+		fPrefDlgMessenger.SendMessage(MSG_COLOR_CHANGED);
+		fPrefDlgMessenger.SendMessage(MSG_INPUT_METHOD_CHANGED);
 
-	fDirty = false;
+		fDirty = false;
+	}
 }
 
 

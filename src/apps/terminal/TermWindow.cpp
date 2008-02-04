@@ -40,7 +40,6 @@
 #include <time.h>
 
 
-const static float kViewOffset = 3;
 const static int32 kMaxTabs = 6;
 
 // messages constants
@@ -131,7 +130,7 @@ TermWindow::_SetupMenu()
 {
 	PrefHandler menuText;
 	
-	LoadLocaleFile (&menuText);
+	LoadLocaleFile(&menuText);
 	
 	// Menu bar object.
 	fMenubar = new BMenuBar(Bounds(), "mbar");
@@ -172,13 +171,8 @@ TermWindow::_SetupMenu()
 	// Make Help Menu.
 	fHelpmenu = new BMenu("Settings");
 	fWindowSizeMenu = new BMenu("Window Size");
-	fWindowSizeMenu->AddItem(new BMenuItem("80x24", new BMessage(EIGHTYTWENTYFOUR)));
-	fWindowSizeMenu->AddItem(new BMenuItem("80x25", new BMessage(EIGHTYTWENTYFIVE)));  
-	fWindowSizeMenu->AddItem(new BMenuItem("80x40", new BMessage(EIGHTYFORTY))); 
-	fWindowSizeMenu->AddItem(new BMenuItem("132x24", new BMessage(ONETHREETWOTWENTYFOUR))); 
-	fWindowSizeMenu->AddItem(new BMenuItem("132x25", new BMessage(ONETHREETWOTWENTYFIVE))); 
-	fWindowSizeMenu->AddItem(new BMenuItem("Fullscreen", new BMessage(FULLSCREEN), B_ENTER)); 
-
+	_BuildWindowSizeMenu(fWindowSizeMenu);
+	
 	fEncodingmenu = new BMenu("Font Encoding");
 	fEncodingmenu->SetRadioMode(true);
 	MakeEncodingMenu(fEncodingmenu, true);
@@ -249,6 +243,7 @@ TermWindow::MessageReceived(BMessage *message)
 				be_roster->Launch(TERM_SIGNATURE);
 			break;
 		}
+		
 		case MENU_PREF_OPEN:
 			if (!fPrefWindow)
 				fPrefWindow = new PrefWindow(this);
@@ -336,15 +331,17 @@ TermWindow::MessageReceived(BMessage *message)
 				_ActiveTermView()->SetEncoding(encodingId);
 			break;
 		
-		// Message from Preference panel.
-		case MSG_ROWS_CHANGED:
 		case MSG_COLS_CHANGED:
 		{
-			BRect rect = _ActiveTermView()->SetTermSize(PrefHandler::Default()->getInt32 (PREF_ROWS),
-										PrefHandler::Default()->getInt32 (PREF_COLS), 0);
+			int32 columns, rows;
+			message->FindInt32("columns", &columns);
+			message->FindInt32("rows", &rows);
+			PrefHandler::Default()->setInt32(PREF_COLS, columns);
+			PrefHandler::Default()->setInt32(PREF_ROWS, rows);
+		   	
+			_ActiveTermView()->SetTermSize(rows, columns, 0);
 		
-			ResizeTo (rect.Width()+ B_V_SCROLL_BAR_WIDTH + kViewOffset * 2,
-				rect.Height()+fMenubar->Bounds().Height() + kViewOffset *2);
+			_ResizeView(_ActiveTermView());
 		
 			BPath path;
 			if (PrefHandler::GetDefaultPath(path) == B_OK)
@@ -364,35 +361,6 @@ TermWindow::MessageReceived(BMessage *message)
 			
 			break;
 		}
-		case EIGHTYTWENTYFOUR:
-			PrefHandler::Default()->setString(PREF_COLS, "80");
-			PrefHandler::Default()->setString(PREF_ROWS, "24");
-		   	PostMessage(MSG_COLS_CHANGED);
-			break;
-	
-		case EIGHTYTWENTYFIVE:
-			PrefHandler::Default()->setString(PREF_COLS, "80");
-			PrefHandler::Default()->setString(PREF_ROWS, "25");
-		   	PostMessage(MSG_COLS_CHANGED);
-			break;		
-	
-		case EIGHTYFORTY:
-			PrefHandler::Default()->setString(PREF_COLS, "80");
-			PrefHandler::Default()->setString(PREF_ROWS, "40");
-		   	PostMessage(MSG_COLS_CHANGED);
-			break;	
-		
-		case ONETHREETWOTWENTYFOUR:
-			PrefHandler::Default()->setString(PREF_COLS, "132");
-			PrefHandler::Default()->setString(PREF_ROWS, "24");
-		   	PostMessage(MSG_COLS_CHANGED);
-			break;	
-		
-		case ONETHREETWOTWENTYFIVE:
-			PrefHandler::Default()->setString(PREF_COLS, "132");
-			PrefHandler::Default()->setString(PREF_ROWS, "25");
-		   	PostMessage(MSG_COLS_CHANGED);
-			break;	
 		
 		case FULLSCREEN:
 			if (!fSavedFrame.IsValid()) { // go fullscreen
@@ -480,8 +448,8 @@ TermWindow::MessageReceived(BMessage *message)
 				size -= 1;
 			
 			// limit the font size
-			if (size < 8)
-				size = 8;
+			if (size < 6)
+				size = 6;
 			else if (size > 20)
 				size = 20;
 				
@@ -503,14 +471,6 @@ void
 TermWindow::WindowActivated(bool activated)
 {
 	BWindow::WindowActivated(activated);
-}
-
-
-bool
-TermWindow::QuitRequested()
-{
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return BWindow::QuitRequested();
 }
 
 
@@ -648,10 +608,6 @@ TermWindow::_AddTab(Arguments *args)
 			// Resize Window
 			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
 					viewHeight + fMenubar->Bounds().Height());
-	
-			// TODO: If I don't do this, the view won't show up.
-			// Bug in BTabView or in my code ?
-			fTabView->Select(0);
 		}
 	} catch (...) {
 		// most probably out of memory. That's bad.
@@ -703,32 +659,6 @@ TermWindow::_IndexOfTermView(TermView* termView) const
 
 
 void
-TermWindow::_ResizeView(TermView *view)
-{
-	int fontWidth, fontHeight;
-	view->GetFontSize(&fontWidth, &fontHeight);
-			
-	float minimumHeight = 0;
-	if (fMenubar)
-		minimumHeight += fMenubar->Bounds().Height();
-	if (fTabView && fTabView->CountTabs() > 1)
-		minimumHeight += fTabView->TabHeight();
-	
-	SetSizeLimits(MIN_COLS * fontWidth, MAX_COLS * fontWidth,
-					minimumHeight + MIN_ROWS * fontHeight, 
-					minimumHeight + MAX_ROWS * fontHeight);
-	
-	float width, height;
-	view->GetPreferredSize(&width, &height);
-	width += B_V_SCROLL_BAR_WIDTH + kViewOffset * 2;
-	height += fMenubar->Bounds().Height() + kViewOffset * 2;
-	ResizeTo(width, height);
-	
-	view->Invalidate();
-}
-
-
-void
 TermWindow::_CheckChildren()
 {
 	// There seems to be no separate list of sessions, so we have to iterate
@@ -748,6 +678,59 @@ TermWindow::_CheckChildren()
 	}
 }
 
+
+void
+TermWindow::_ResizeView(TermView *view)
+{
+	int fontWidth, fontHeight;
+	view->GetFontSize(&fontWidth, &fontHeight);
+			
+	float minimumHeight = 0;
+	if (fMenubar)
+		minimumHeight += fMenubar->Bounds().Height();
+	if (fTabView && fTabView->CountTabs() > 1)
+		minimumHeight += fTabView->TabHeight();
+	
+	SetSizeLimits(MIN_COLS * fontWidth, MAX_COLS * fontWidth,
+					minimumHeight + MIN_ROWS * fontHeight, 
+					minimumHeight + MAX_ROWS * fontHeight);
+	
+	float width, height;
+	view->GetPreferredSize(&width, &height);
+	width += B_V_SCROLL_BAR_WIDTH;
+	height += fMenubar->Bounds().Height();
+	ResizeTo(width, height);
+	
+	view->Invalidate();
+}
+
+
+void
+TermWindow::_BuildWindowSizeMenu(BMenu *menu)
+{
+	const int32 windowSizes[5][2] = {
+		{ 80, 24 },
+		{ 80, 25 },
+		{ 80, 40 },
+		{ 132, 24 },
+		{ 132, 25 }	
+	};
+	
+	const int32 sizeNum = sizeof(windowSizes) / sizeof(windowSizes[0]);
+	for (int32 i = 0; i < sizeNum; i++) {
+		char label[32];
+		int32 columns = windowSizes[i][0];
+		int32 rows = windowSizes[i][1];
+		snprintf(label, sizeof(label), "%ldx%ld", columns, rows);
+		BMessage *message = new BMessage(MSG_COLS_CHANGED);
+		message->AddInt32("columns", columns);
+		message->AddInt32("rows", rows);
+		menu->AddItem(new BMenuItem(label, message));
+	}
+	
+	menu->AddItem(new BMenuItem("Fullscreen",
+					new BMessage(FULLSCREEN), B_ENTER)); 
+}
 
 
 // CustomTermView

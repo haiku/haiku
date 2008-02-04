@@ -106,7 +106,8 @@ SmartTabView::Select(int32 index)
 	BTabView::Select(index);
 	BView *view = ViewForTab(index);
 	if (view != NULL) {
-		view->ResizeTo(ContainerView()->Bounds().Width(), ContainerView()->Bounds().Height());
+		view->ResizeTo(ContainerView()->Bounds().Width(),
+						ContainerView()->Bounds().Height());
 	}
 }
 
@@ -121,8 +122,7 @@ SmartTabView::RemoveAndDeleteTab(int32 index)
 		else if (index < CountTabs())
 			Select(index + 1);
 	}	
-	BTab *tab = RemoveTab(index);		
-	delete tab;	
+	delete RemoveTab(index);
 }
 
 
@@ -132,11 +132,20 @@ SmartTabView::AddTab(BView *target, BTab *tab)
 	if (target == NULL)
 		return;
 
+	BTabView::AddTab(target, tab);
+	
 	if (CountTabs() == 1) {
+		// Call select on the tab, since
+		// we're resizing the contained view
+		// inside that function
+		Select(0);
+	} else if (CountTabs() == 2) {
+		// Need to resize the view, since we're
+		// switching from "normal" to tabbed mode
 		ContainerView()->ResizeBy(0, -TabHeight());
 		ContainerView()->MoveBy(0, TabHeight());	
+		Window()->ResizeBy(0, TabHeight());
 	}
-	BTabView::AddTab(target, tab);
 	
 	Invalidate(TabFrame(CountTabs() - 1).InsetByCopy(-2, -2));
 }
@@ -145,12 +154,13 @@ SmartTabView::AddTab(BView *target, BTab *tab)
 BTab *
 SmartTabView::RemoveTab(int32 index)
 {
-	BTab *tab = BTabView::RemoveTab(index);
-	if (CountTabs() == 1) {
+	if (CountTabs() == 2) {
+		// see above
+		Window()->ResizeBy(0, -TabHeight());
 		ContainerView()->MoveBy(0, -TabHeight());		
 		ContainerView()->ResizeBy(0, TabHeight());	
 	}
-	return tab;
+	return BTabView::RemoveTab(index);
 }
 
 
@@ -175,5 +185,3 @@ SmartTabView::_ClickedTabIndex(const BPoint &point)
 
 	return -1;
 }
-
-

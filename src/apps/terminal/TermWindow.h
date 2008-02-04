@@ -54,8 +54,6 @@ protected:
 	virtual void	MessageReceived(BMessage *message);
 	virtual void	WindowActivated(bool);
 	virtual void	MenusBeginning();
-	virtual bool	QuitRequested();
-
 
 private:
 	void			_SetTermColors(TermView *termView);
@@ -70,6 +68,7 @@ private:
 	int32			_IndexOfTermView(TermView* termView) const;
 	void			_CheckChildren();
 	void			_ResizeView(TermView *view);
+	void			_BuildWindowSizeMenu(BMenu *menu);
 	
 	SmartTabView	*fTabView;
 	TermView		*fTermView;
