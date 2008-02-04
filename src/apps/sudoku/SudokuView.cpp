@@ -581,6 +581,11 @@ SudokuView::FrameResized(float /*width*/, float /*height*/)
 	fHintFont.GetHeight(&fontHeight);
 	fHintBaseline = ceilf(fontHeight.ascent) / 2
 		+ (fHintHeight - ceilf(fontHeight.descent)) / 2;
+	
+	// fix the dragger's position
+	BView *dragger = FindView("_dragger_");
+	if (dragger)
+		dragger->MoveTo(Bounds().right - 7, Bounds().bottom - 7);
 }
 
 
