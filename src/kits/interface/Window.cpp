@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,12 @@
  *		Stephan Aßmus, <superstippi@gmx.de>
  */
 
+
+#include <Window.h>
+
+#include <ctype.h>
+#include <math.h>
+#include <stdio.h>
 
 #include <Application.h>
 #include <Autolock.h>
@@ -20,13 +26,12 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <String.h>
-#include <Window.h>
 
-#include <input_globals.h>
 #include <AppMisc.h>
-#include <ApplicationPrivate.h>
 #include <AppServerLink.h>
+#include <ApplicationPrivate.h>
 #include <DirectMessageTarget.h>
+#include <input_globals.h>
 #include <InputServerTypes.h>
 #include <MenuPrivate.h>
 #include <MessagePrivate.h>
@@ -35,10 +40,6 @@
 #include <TokenSpace.h>
 #include <tracker_private.h>
 #include <WindowPrivate.h>
-
-#include <ctype.h>
-#include <stdio.h>
-#include <math.h>
 
 
 //#define DEBUG_WIN
@@ -69,7 +70,8 @@ struct BWindow::unpack_cookie {
 class BWindow::Shortcut {
 	public:
 		Shortcut(uint32 key, uint32 modifiers, BMenuItem* item);
-		Shortcut(uint32 key, uint32 modifiers, BMessage* message, BHandler* target);
+		Shortcut(uint32 key, uint32 modifiers, BMessage* message,
+			BHandler* target);
 		~Shortcut();
 
 		bool Matches(uint32 key, uint32 modifiers) const;
@@ -2480,15 +2482,8 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fPulseRate = 500000;
 	fPulseRunner = NULL;
 
-	// TODO:  see if you can use 'fViewsNeedPulse'
-
 	fIsFilePanel = false;
 
-	// TODO: see WHEN is this used!
-	fMaskActivated = false;
-
-	// TODO: see WHEN is this used!
-	fWaitingForMenu = false;
 	fMenuSem = -1;
 
 	fMinimized = false;
@@ -3213,11 +3208,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 		modifiers = 0;
 
 	// handle BMenuBar key
-	if (key == B_ESCAPE && (modifiers & B_COMMAND_KEY) != 0
-		&& fKeyMenuBar) {
-		// TODO: ask Marc about 'fWaitingForMenu' member!
-
-		// fWaitingForMenu = true;
+	if (key == B_ESCAPE && (modifiers & B_COMMAND_KEY) != 0 && fKeyMenuBar) {
 		fKeyMenuBar->StartMenuBar(0, true, false, NULL);
 		return true;
 	}
@@ -3513,10 +3504,16 @@ BWindow::IsFilePanel() const
 }
 
 
-//------------------------------------------------------------------------------
-// Virtual reserved Functions
+//	#pragma mark - C++ binary compatibility kludge
 
-void BWindow::_ReservedWindow1() {}
+
+extern "C" void
+_ReservedWindow1__7BWindow()
+{
+	// SetLayout()
+}
+
+
 void BWindow::_ReservedWindow2() {}
 void BWindow::_ReservedWindow3() {}
 void BWindow::_ReservedWindow4() {}
@@ -3524,90 +3521,4 @@ void BWindow::_ReservedWindow5() {}
 void BWindow::_ReservedWindow6() {}
 void BWindow::_ReservedWindow7() {}
 void BWindow::_ReservedWindow8() {}
-
-void
-BWindow::PrintToStream() const
-{
-	printf("BWindow '%s' data:\
-		Title			= %s\
-		Token			= %ld\
-		InTransaction 	= %s\
-		Active 			= %s\
-		fShowLevel		= %d\
-		Flags			= %lx\
-		send_port		= %ld\
-		receive_port	= %ld\
-		fTopView name	= %s\
-		focus view name	= %s\
-		lastMouseMoved	= %s\
-		fLink			= %p\
-		KeyMenuBar name	= %s\
-		DefaultButton	= %s\
-		# of shortcuts	= %ld",
-		Name(), fTitle,
-		_get_object_token_(this),		
-		fInTransaction == true ? "yes" : "no",
-		fActive == true ? "yes" : "no",
-		fShowLevel,
-		fFlags,
-		fLink->SenderPort(),
-		fLink->ReceiverPort(),
-		fTopView != NULL ? fTopView->Name() : "NULL",
-		fFocus != NULL ? fFocus->Name() : "NULL",
-		fLastMouseMovedView != NULL ? fLastMouseMovedView->Name() : "NULL",
-		fLink,
-		fKeyMenuBar != NULL ? fKeyMenuBar->Name() : "NULL",
-		fDefaultButton != NULL ? fDefaultButton->Name() : "NULL",
-		fShortcuts.CountItems());
-/*
-	for( int32 i=0; i<accelList.CountItems(); i++){
-		_BCmdKey	*key = (_BCmdKey*)accelList.ItemAt(i);
-		printf("\tShortCut %ld: char %s\n\t\t message: \n", i, (key->key > 127)?"ASCII":"UNICODE");
-		key->message->PrintToStream();
-	}
-*/	
-	printf("\
-		topViewToken	= %ld\
-		isFilePanel		= %s\
-		MaskActivated	= %s\
-		pulseRate		= %lld\
-		waitingForMenu	= %s\
-		minimized		= %s\
-		Menu semaphore	= %ld\
-		maxZoomHeight	= %f\
-		maxZoomWidth	= %f\
-		minWindHeight	= %f\
-		minWindWidth	= %f\
-		maxWindHeight	= %f\
-		maxWindWidth	= %f\
-		frame			= ( %f, %f, %f, %f )\
-		look			= %d\
-		feel			= %d\
-		lastViewToken	= %ld\
-		pulseRunner		= %s\n",
-		fTopViewToken,
-		fIsFilePanel==true?"Yes":"No",
-		fMaskActivated==true?"Yes":"No",
-		fPulseRate,
-		fWaitingForMenu==true?"Yes":"No",
-		fMinimized==true?"Yes":"No",
-		fMenuSem,
-		fMaxZoomHeight,
-		fMaxZoomWidth,
-		fMinHeight,
-		fMinWidth,
-		fMaxHeight,
-		fMaxWidth,
-		fFrame.left, fFrame.top, fFrame.right, fFrame.bottom, 
-		(int16)fLook,
-		(int16)fFeel,
-		fLastViewToken,
-		fPulseRunner != NULL ? "In place" : "NULL");
-}
-
-/*
-TODO list:
-	*) test arguments for SetWindowAligment
-	*) call hook functions: MenusBeginning, MenusEnded. Add menu activation code.
-*/
 

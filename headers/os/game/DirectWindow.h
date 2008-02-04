@@ -1,9 +1,9 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *	Stefano Ceccherini <stefano.ceccherini@gmail.com>
+ *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
  */
 #ifndef	_DIRECT_WINDOW_H
 #define	_DIRECT_WINDOW_H
@@ -55,24 +55,26 @@ typedef struct {
 class BDirectWindow : public BWindow {
 	public:
 		BDirectWindow(BRect frame, const char *title, window_type type, 
-						uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE);
-       		BDirectWindow(BRect frame, const char *title, window_look look,
-						window_feel feel, uint32 flags,
-						uint32 workspace = B_CURRENT_WORKSPACE);
+			uint32 flags, uint32 workspace = B_CURRENT_WORKSPACE);
+		BDirectWindow(BRect frame, const char *title, window_look look,
+			window_feel feel, uint32 flags,
+			uint32 workspace = B_CURRENT_WORKSPACE);
 		virtual ~BDirectWindow();
-	
-		static	BArchivable*	Instantiate(BMessage *data);
+
+		static	BArchivable* Instantiate(BMessage *data);
 		virtual	status_t	Archive(BMessage *data, bool deep = true) const;
 
-		virtual void        	Quit();
+		virtual void		Quit();
 		virtual	void		DispatchMessage(BMessage *message, BHandler *handler);
 		virtual	void		MessageReceived(BMessage *message);
 		virtual	void		FrameMoved(BPoint newPosition);
-		virtual void		WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces);
+		virtual void		WorkspacesChanged(uint32 oldWorkspaces,
+								uint32 newWorkspaces);
 		virtual void		WorkspaceActivated(int32 workspaceIndex, bool state);
 		virtual	void		FrameResized(float newWidth, float newHeight);
 		virtual void		Minimize(bool minimize);
-		virtual void		Zoom(BPoint recPosition, float recWidth, float recHeight);
+		virtual void		Zoom(BPoint recPosition, float recWidth,
+								float recHeight);
 		virtual void		ScreenChanged(BRect screenFrame, color_space depth);
 		virtual	void		MenusBeginning();
 		virtual	void		MenusEnded();
@@ -89,30 +91,28 @@ class BDirectWindow : public BWindow {
 		virtual	void		task_looper();
 		virtual BMessage*	ConvertToMessage(void *raw, int32 code);
 
-
 	public:	
-		virtual void        	DirectConnected(direct_buffer_info *info);
-		status_t		GetClippingRegion(BRegion *region, BPoint *origin = NULL) const;
-		status_t		SetFullScreen(bool enable);
-		bool			IsFullScreen() const;
-		
+		virtual void		DirectConnected(direct_buffer_info *info);
+		status_t			GetClippingRegion(BRegion *region,
+								BPoint *origin = NULL) const;
+		status_t			SetFullScreen(bool enable);
+		bool				IsFullScreen() const;
+
 		static	bool		SupportsWindowMode(screen_id id = B_MAIN_SCREEN_ID);
 
-
 	private:
-
 		typedef BWindow	inherited;
 
-		virtual void        	_ReservedDirectWindow1();
-		virtual void        	_ReservedDirectWindow2();
-		virtual void        	_ReservedDirectWindow3();
-		virtual void        	_ReservedDirectWindow4();
-		
-		BDirectWindow();
-		BDirectWindow(BDirectWindow &);
-		BDirectWindow &operator=(BDirectWindow &);
+		virtual void		_ReservedDirectWindow1();
+		virtual void		_ReservedDirectWindow2();
+		virtual void		_ReservedDirectWindow3();
+		virtual void		_ReservedDirectWindow4();
 
-		static	int32		_daemon_thread(void *arg);
+		BDirectWindow();
+		BDirectWindow(BDirectWindow& other);
+		BDirectWindow& operator=(BDirectWindow& other);
+
+		static	int32	_daemon_thread(void* arg);
 		int32			_DirectDaemon();
 		bool			_LockDirect() const;
 		void			_UnlockDirect() const;
@@ -125,27 +125,27 @@ class BDirectWindow : public BWindow {
 		bool			fIsFullScreen;
 		bool			_unused;
 		bool			fInDirectConnect;
-		
+
 		int32			fDirectLock;				
 		sem_id			fDirectSem;
 		uint32			fDirectLockCount;
 		thread_id		fDirectLockOwner;
-		char			*fDirectLockStack;
-		
+		char*			fDirectLockStack;
+
 		sem_id			fDisableSem;
 		sem_id			fDisableSemAck;
-		
+
 		uint32			fInitStatus;
 		uint32			fInfoAreaSize;
-		
+
 		uint32			_reserved[2];
-		
+
 		area_id			fClonedClippingArea;
 		area_id			fSourceClippingArea;
 		thread_id		fDirectDaemonId;
-		direct_buffer_info	*fBufferDesc;
-		
+		direct_buffer_info* fBufferDesc;
+
 		uint32			_more_reserved_[17];
 };
 
-#endif
+#endif	// _DIRECT_WINDOW_H
