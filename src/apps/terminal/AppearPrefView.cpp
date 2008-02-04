@@ -49,7 +49,7 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 
 	r.OffsetBy(r.Width() + 10, 0);
 	menu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
-		atoi(PrefHandler::Default()->getString(PREF_HALF_FONT_SIZE)));
+		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
 	fFontSize = new BMenuField(r, "size", "Size:", menu, B_WILL_DRAW);
 	fFontSize->SetDivider(sizeDividerSize);
 	AddChild(fFontSize);
