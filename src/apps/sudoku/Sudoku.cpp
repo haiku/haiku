@@ -4,6 +4,8 @@
  */
 
 
+#include "Sudoku.h"
+
 #include "SudokuWindow.h"
 
 #include <stdlib.h>
@@ -11,23 +13,6 @@
 #include <Alert.h>
 #include <Application.h>
 #include <TextView.h>
-
-
-class Sudoku : public BApplication {
-public:
-	Sudoku();
-	virtual ~Sudoku();
-
-	virtual void ReadyToRun();
-
-	virtual void RefsReceived(BMessage *message);
-	virtual void MessageReceived(BMessage *message);
-
-	virtual void AboutRequested();
-
-private:
-	SudokuWindow* fWindow;
-};
 
 
 const char* kSignature = "application/x-vnd.Haiku-Sudoku";
@@ -68,6 +53,13 @@ Sudoku::MessageReceived(BMessage* message)
 
 void
 Sudoku::AboutRequested()
+{
+	Sudoku::DisplayAbout();
+}
+
+
+void
+Sudoku::DisplayAbout()
 {
 	BAlert *alert = new BAlert("about", "Sudoku\n"
 		"\twritten by Axel Dörfler\n"

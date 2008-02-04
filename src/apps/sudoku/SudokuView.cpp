@@ -6,6 +6,7 @@
 
 #include "SudokuView.h"
 
+#include "Sudoku.h"
 #include "SudokuField.h"
 #include "SudokuSolver.h"
 
@@ -1021,6 +1022,10 @@ SudokuView::MessageReceived(BMessage* message)
 				beep();
 			break;
 		}
+
+		case B_ABOUT_REQUESTED:
+			Sudoku::DisplayAbout();
+			break;
 
 		default:
 			BView::MessageReceived(message);
