@@ -469,25 +469,24 @@ memalign(size_t alignment, size_t size)
 		if (size < (heap_base_ptr - heap_base) / 10) { // but don't try too hard
 			int first = -1;
 			page = heap_alloc_table;
-			for (i = 0; i < (heap_base_ptr-heap_base)/B_PAGE_SIZE; i++) {
+			for (i = 0; i < (heap_base_ptr - heap_base) / B_PAGE_SIZE; i++) {
 				if (page[i].in_use) {
 					first = -1;
 					continue;
 				}
 				if (first > 0) {
-					if ((1 + i - first)*B_PAGE_SIZE > size)
+					if ((1 + i - first) * B_PAGE_SIZE > size)
 						break;
-				}
-				first = i;
+				} else
+					first = i;
 			}
 			if (first > -1)
 				address = (void *)(heap_base + first * B_PAGE_SIZE);
-				
 		}
 		if (address == NULL)
 			address = raw_alloc(size, bin_index);
 		page = &heap_alloc_table[((unsigned int)address - heap_base) / B_PAGE_SIZE];
-		for (i = 0; i < (size+B_PAGE_SIZE-1)/B_PAGE_SIZE; i++) {
+		for (i = 0; i < (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE; i++) {
 			page[i].in_use = 1;
 			page[i].cleaning = 0;
 			page[i].bin_index = bin_count;
@@ -640,7 +639,7 @@ free(void *address)
 		//	free this allocation anymore... (tracking them would
 		//	require some extra stuff)
 
-		for (i = 1; i <= (heap_base_ptr-heap_base)/B_PAGE_SIZE; i++) {
+		for (i = 1; i <= (heap_base_ptr - heap_base) / B_PAGE_SIZE; i++) {
 			if (!page[i].in_use)
 				break;
 			if (page[i].bin_index != bin_count)
