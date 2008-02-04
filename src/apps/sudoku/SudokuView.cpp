@@ -64,7 +64,7 @@ SudokuView::~SudokuView()
 
 
 status_t
-SudokuView::Archive(BMessage* into, bool deep = true) const
+SudokuView::Archive(BMessage* into, bool deep) const
 {
 	status_t status;
 
