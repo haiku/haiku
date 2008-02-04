@@ -20,9 +20,18 @@ struct trace_entry {
 
 #include <new>
 
+
+// trace output flags
+#define TRACE_OUTPUT_TEAM_ID	0x01
+	// print the team ID
+#define TRACE_OUTPUT_DIFF_TIME	0x02
+	// print the difference time to the previously printed entry instead of the
+	// absolute time
+
+
 class TraceOutput {
 	public:
-		TraceOutput(char* buffer, size_t bufferSize);
+		TraceOutput(char* buffer, size_t bufferSize, uint32 flags);
 
 		void Clear();
 		void Print(const char* format,...);
@@ -32,10 +41,17 @@ class TraceOutput {
 		size_t Capacity() const	{ return fCapacity; }
 		size_t Size() const		{ return fSize; }
 
+		uint32 Flags() const	{ return fFlags; }
+
+		void SetLastEntryTime(bigtime_t time);
+		bigtime_t LastEntryTime() const;
+
 	private:
-		char*	fBuffer;
-		size_t	fCapacity;
-		size_t	fSize;
+		char*		fBuffer;
+		size_t		fCapacity;
+		size_t		fSize;
+		uint32		fFlags;
+		bigtime_t	fLastEntryTime;
 };
 
 class TraceEntry : public trace_entry {
@@ -65,9 +81,6 @@ class AbstractTraceEntry : public TraceEntry {
 		thread_id Thread() const { return fThread; }
 		thread_id Team() const { return fTeam; }
 		bigtime_t Time() const { return fTime; }
-
-	public:
-		static bool	sPrintTeamID;
 
 	protected:
 		thread_id	fThread;

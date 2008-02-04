@@ -207,9 +207,10 @@ allocate_entry(size_t size, uint16 flags)
 // #pragma mark -
 
 
-TraceOutput::TraceOutput(char* buffer, size_t bufferSize)
+TraceOutput::TraceOutput(char* buffer, size_t bufferSize, uint32 flags)
 	: fBuffer(buffer),
-	  fCapacity(bufferSize)
+	  fCapacity(bufferSize),
+	  fFlags(flags)
 {
 	Clear();
 }
@@ -234,6 +235,20 @@ TraceOutput::Print(const char* format,...)
 	va_start(args, format);
 	fSize += vsnprintf(fBuffer + fSize, fCapacity - fSize, format, args);
 	va_end(args);
+}
+
+
+void
+TraceOutput::SetLastEntryTime(bigtime_t time)
+{
+	fLastEntryTime = time;
+}
+
+
+bigtime_t
+TraceOutput::LastEntryTime() const
+{
+	return fLastEntryTime;
 }
 
 
@@ -300,11 +315,18 @@ AbstractTraceEntry::~AbstractTraceEntry()
 void
 AbstractTraceEntry::Dump(TraceOutput& out)
 {
-	if (sPrintTeamID)
-		out.Print("[%6ld:%6ld] %Ld: ", fThread, fTeam, fTime);
+	bigtime_t time = (out.Flags() & TRACE_OUTPUT_DIFF_TIME)
+		? fTime - out.LastEntryTime()
+		: fTime;
+
+	if (out.Flags() & TRACE_OUTPUT_TEAM_ID)
+		out.Print("[%6ld:%6ld] %10Ld: ", fThread, fTeam, time);
 	else
-		out.Print("[%6ld] %Ld: ", fThread, fTime);
+		out.Print("[%6ld] %10Ld: ", fThread, time);
+
 	AddDump(out);
+
+	out.SetLastEntryTime(fTime);
 }
 
 
@@ -312,9 +334,6 @@ void
 AbstractTraceEntry::AddDump(TraceOutput& out)
 {
 }
-
-
-bool AbstractTraceEntry::sPrintTeamID = false;
 
 
 //	#pragma mark -
@@ -348,8 +367,8 @@ class UserTraceEntry : public AbstractTraceEntry {
 
 class LazyTraceOutput : public TraceOutput {
 public:
-	LazyTraceOutput(char* buffer, size_t bufferSize)
-		: TraceOutput(buffer, bufferSize)
+	LazyTraceOutput(char* buffer, size_t bufferSize, uint32 flags)
+		: TraceOutput(buffer, bufferSize, flags)
 	{
 	}
 
@@ -703,6 +722,7 @@ dump_tracing(int argc, char** argv)
 	static int32 _previousDirection = 1;
 	static uint32 _previousWritten = 0;
 	static uint32 _previousEntries = 0;
+	static uint32 _previousOutputFlags = 0;
 	static TraceEntryIterator iterator;
 
 
@@ -714,12 +734,16 @@ dump_tracing(int argc, char** argv)
 
 	bool hasFilter = false;
 
-	AbstractTraceEntry::sPrintTeamID = false;
-	if (argi < argc) {
+	uint32 outputFlags = 0;
+	while (argi < argc) {
 		if (strcmp(argv[argi], "--printteam") == 0) {
-			AbstractTraceEntry::sPrintTeamID = true;
+			outputFlags |= TRACE_OUTPUT_TEAM_ID;
 			argi++;
-		}
+		} else if (strcmp(argv[argi], "--difftime") == 0) {
+			outputFlags |= TRACE_OUTPUT_DIFF_TIME;
+			argi++;
+		} else
+			break;
 	}
 
 	if (argi < argc) {
@@ -783,6 +807,7 @@ dump_tracing(int argc, char** argv)
 		count = _previousCount;
 		maxToCheck = _previousMaxToCheck;
 		hasFilter = _previousHasFilter;
+		outputFlags = _previousOutputFlags;
 
 		if (direction < 0)
 			start = _previousFirstChecked - 1;
@@ -830,7 +855,7 @@ dump_tracing(int argc, char** argv)
 	}
 
 	char buffer[256];
-	LazyTraceOutput out(buffer, sizeof(buffer));
+	LazyTraceOutput out(buffer, sizeof(buffer), outputFlags);
 
 	bool markedMatching = false;
 	int32 firstToDump = firstToCheck;
@@ -874,6 +899,8 @@ dump_tracing(int argc, char** argv)
 		// right one
 		iterator.Previous();
 	}
+
+	out.SetLastEntryTime(0);
 
 	// set the iterator to the entry before the first one to dump
 	iterator.MoveTo(firstToDump - 1);
@@ -920,6 +947,7 @@ dump_tracing(int argc, char** argv)
 	_previousDirection = direction;
 	_previousWritten = sWritten;
 	_previousEntries = sEntries;
+	_previousOutputFlags = outputFlags;
 
 	return cont != 0 ? B_KDEBUG_CONT : 0;
 }
@@ -1012,7 +1040,7 @@ tracing_init(void)
 
 	add_debugger_command_etc("traced", &dump_tracing,
 		"Dump recorded trace entries",
-		"[ \"--printteam\" ] (\"forward\" | \"backward\") "
+		"[ \"--printteam\" ] [ \"--difftime\" ] (\"forward\" | \"backward\") "
 			"| ([ <start> [ <count> [ <range> ] ] ] "
 				"[ #<pattern> | (\"filter\" <filter>) ])\n"
 		"Prints recorded trace entries. If \"backward\" or \"forward\" is\n"
@@ -1022,7 +1050,8 @@ tracing_init(void)
 		"afterwards entering an empty line in the debugger will reinvoke it.\n"
 		"If no arguments are given, the command continues in the direction\n"
 		"of the last invocation.\n"
-		"\"--printteam\" enables printing the items' team ID.\n"
+		"\"--printteam\" enables printing the entries' team IDs.\n"
+		"\"--difftime\"  print difference times for all but the first entry.\n"
 		"  <start>    - The base index of the entries to print. Depending on\n"
 		"               whether the iteration direction is forward or\n"
 		"               backward this will be the first or last entry printed\n"
