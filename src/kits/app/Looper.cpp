@@ -829,6 +829,7 @@ BLooper::_PostMessage(BMessage *msg, BHandler *handler,
 
 	status_t status;
 	BMessenger messenger(handler, this, &status);
+	listLocker.Unlock();
 	if (status == B_OK)
 		status = messenger.SendMessage(msg, replyTo, 0);
 
