@@ -698,7 +698,8 @@ TermWindow::_ResizeView(TermView *view)
 	float width, height;
 	view->GetPreferredSize(&width, &height);
 	width += B_V_SCROLL_BAR_WIDTH;
-	height += fMenubar->Bounds().Height();
+	height += fMenubar->Bounds().Height() + 2;
+
 	ResizeTo(width, height);
 	
 	view->Invalidate();

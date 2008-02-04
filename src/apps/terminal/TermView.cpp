@@ -314,9 +314,9 @@ void
 TermView::GetPreferredSize(float *width, float *height)
 {
 	if (width)
-		*width = fTermColumns * fFontWidth - 1;
+		*width = fTermColumns * fFontWidth;
 	if (height)
-		*height = fTermRows * fFontHeight - 1;
+		*height = fTermRows * fFontHeight;
 }
 
 
@@ -353,7 +353,7 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	fScrTop = 0;
 	fScrBot = fTermRows - 1;
 
-	BRect rect(0, 0, fTermColumns * fFontWidth - 1, fTermRows * fFontHeight - 1);
+	BRect rect(0, 0, fTermColumns * fFontWidth, fTermRows * fFontHeight);
 
 	if (resize)
 		ResizeTo(rect.Width(), rect.Height());
