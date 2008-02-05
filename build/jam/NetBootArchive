@@ -20,7 +20,7 @@ BEOS_NETWORK_DATALINK_PROTOCOLS = ethernet_frame <module>arp loopback_frame
 BEOS_NETWORK_PROTOCOLS = ipv4 tcp udp icmp ;
 
 BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
-	$(X86_ONLY)rtl8139 rtl8169 sis900
+	$(X86_ONLY)ipro100 $(X86_ONLY)rtl8139 rtl8169 sis900
 	$(X86_ONLY)marvell_yukon $(X86_ONLY)via_rhine wb840 net_stack vlance
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
