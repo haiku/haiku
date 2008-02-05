@@ -47,6 +47,11 @@ trampoline_32:
 	movl   %eax,%cr3        # set the page dir
 	
 	popl   %eax             # get the final stack location
+
+	// Clear the final stack location to notify the startup code that
+	// we loaded the address and it is now safe to be overwritten.
+	pushl  $0x00000000
+
 	movl   %eax,%esp
 
 	// load an address for an indirect jump
