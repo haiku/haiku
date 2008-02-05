@@ -1698,27 +1698,25 @@ BWindow::UpdateIfNeeded()
 	_DequeueAll();
 
 	BMessageQueue *queue = MessageQueue();
-	queue->Lock();
 
 	// First process and remove any _UPDATE_ message in the queue
 	// With the current design, there can only be one at a time
 
-	BMessage *msg;
-	for (int32 i = 0; (msg = queue->FindMessage(i)) != NULL; i++) {
-		if (msg->what == _UPDATE_) {
-			BWindow::DispatchMessage(msg, this);
-				// we need to make sure that no overridden method is called 
-				// here; for BWindow::DispatchMessage() we now exactly what
-				// will happen
-			queue->RemoveMessage(msg);
-			delete msg;
+	while (true) {
+		queue->Lock();
+
+		BMessage *message = queue->FindMessage(_UPDATE_, 0);
+		queue->RemoveMessage(message);
+
+		queue->Unlock();
+
+		if (message == NULL)
 			break;
-				// NOTE: "i" would have to be decreased if there were
-				// multiple _UPDATE_ messages and we would not break!
-		}
+
+		BWindow::DispatchMessage(message, this);
+		delete message;
 	}
 
-	queue->Unlock();
 	Unlock();
 }
 
