@@ -499,6 +499,10 @@ BTimeSource::DirectAddMe(const media_node &node)
 		ERROR("BTimeSource::DirectAddMe out of slave node slots\n");
 		return;
 	}
+	if (fNodeID == node.node) {
+		ERROR("BTimeSource::DirectAddMe should not add itself to slave nodes\n");
+		return;
+	}
 	for (int i = 0; i < SLAVE_NODES_COUNT; i++) {
 		if (fSlaveNodes->node_id[i] == 0) {
 			fSlaveNodes->node_id[i] = node.node;
