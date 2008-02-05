@@ -1,3 +1,7 @@
+/*
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <BeOSBuildCompatibility.h>
 
@@ -22,8 +26,26 @@
 #include "fs_descriptors.h"
 #include "NodeRef.h"
 
+#if defined(HAIKU_HOST_PLATFORM_FREEBSD)
+#	include "fs_freebsd.h"
+#endif
+
+
 using namespace std;
 using namespace BPrivate;
+
+
+#if defined(HAIKU_HOST_PLATFORM_FREEBSD)
+#	define haiku_host_platform_read		haiku_freebsd_read
+#	define haiku_host_platform_write	haiku_freebsd_write
+#	define haiku_host_platform_readv	haiku_freebsd_readv
+#	define haiku_host_platform_writev	haiku_freebsd_writev
+#else
+#	define haiku_host_platform_read		read
+#	define haiku_host_platform_write	write
+#	define haiku_host_platform_readv	readv
+#	define haiku_host_platform_writev	writev
+#endif
 
 
 static status_t get_path(dev_t device, ino_t node, const char *name,
@@ -583,7 +605,8 @@ _kern_read(int fd, off_t pos, void *buffer, size_t bufferSize)
 	}
 	
 	// read
-	ssize_t bytesRead = read(descriptor->fd, buffer, bufferSize);
+	ssize_t bytesRead = haiku_host_platform_read(descriptor->fd, buffer,
+		bufferSize);
 	if (bytesRead < 0)
 		return errno;
 
@@ -608,7 +631,8 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t bufferSize)
 	}
 	
 	// read
-	ssize_t bytesWritten = write(descriptor->fd, buffer, bufferSize);
+	ssize_t bytesWritten = haiku_host_platform_write(descriptor->fd, buffer,
+		bufferSize);
 	if (bytesWritten < 0)
 		return errno;
 
@@ -932,7 +956,7 @@ read_pos(int fd, off_t pos, void *buffer, size_t bufferSize)
 		return errno;
 	
 	// read
-	ssize_t bytesRead = read(fd, buffer, bufferSize);
+	ssize_t bytesRead = haiku_host_platform_read(fd, buffer, bufferSize);
 	if (bytesRead < 0) {
 		errno = bytesRead;
 		return -1;
@@ -949,9 +973,9 @@ write_pos(int fd, off_t pos, const void *buffer, size_t bufferSize)
 	off_t result = lseek(fd, pos, SEEK_SET);
 	if (result < 0)
 		return errno;
-	
+
 	// read
-	ssize_t bytesWritten = write(fd, buffer, bufferSize);
+	ssize_t bytesWritten = haiku_host_platform_write(fd, buffer, bufferSize);
 	if (bytesWritten < 0) {
 		errno = bytesWritten;
 		return -1;
@@ -970,7 +994,7 @@ readv_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 		return errno;
 	
 	// read
-	ssize_t bytesRead = readv(fd, vec, count);
+	ssize_t bytesRead = haiku_host_platform_readv(fd, vec, count);
 	if (bytesRead < 0) {
 		errno = bytesRead;
 		return -1;
@@ -989,7 +1013,7 @@ writev_pos(int fd, off_t pos, const struct iovec *vec, size_t count)
 		return errno;
 	
 	// read
-	ssize_t bytesWritten = writev(fd, vec, count);
+	ssize_t bytesWritten = haiku_host_platform_writev(fd, vec, count);
 	if (bytesWritten < 0) {
 		errno = bytesWritten;
 		return -1;

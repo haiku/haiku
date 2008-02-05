@@ -22,6 +22,9 @@
 #	if defined(HAIKU_HOST_PLATFORM_FREEBSD) \
 		|| defined(HAIKU_HOST_PLATFORM_DARWIN)
 #		include <sys/ioctl.h>
+#		include <sys/stat.h>
+#		include <sys/disk.h>
+#		include <sys/disklabel.h>
 #	else
 		// the (POSIX) correct place of definition for ioctl()
 #		include <stropts.h>
@@ -195,9 +198,56 @@ fssh_ioctl(int fd, unsigned long op, ...)
 				} else
 					error = errno;
 
+			#elif HAIKU_HOST_PLATFORM_FREEBSD
+			{
+				// FreeBSD has not block devices
+
+				struct stat status;
+
+				if (fstat(fd, &status) == 0) {
+					struct disklabel disklabel;
+					off_t mediaSize;
+
+					memset(&disklabel,0,sizeof disklabel);
+
+					// Ignore errors, this way we can use memory devices (md%d)
+					ioctl(fd, DIOCGSECTORSIZE, &disklabel.d_secsize);
+					ioctl(fd, DIOCGFWSECTORS, &disklabel.d_nsectors);
+					ioctl(fd, DIOCGFWHEADS, &disklabel.d_ntracks);
+					ioctl(fd, DIOCGMEDIASIZE, &mediaSize);
+
+					if (disklabel.d_nsectors == 0) {
+						// Seems to be a md device, then ioctls returns lots of
+						// zeroes and hardcode some defaults
+						disklabel.d_nsectors = 64;
+						disklabel.d_ntracks = 16;	
+					}
+
+					disklabel.d_secperunit = mediaSize / disklabel.d_secsize;
+					disklabel.d_ncylinders = mediaSize / disklabel.d_secsize
+												/ disklabel.d_nsectors
+												/ disklabel.d_ntracks;
+
+					geometry->head_count = disklabel.d_ntracks;
+					geometry->cylinder_count = disklabel.d_ncylinders;
+					geometry->sectors_per_track = disklabel.d_nsectors;
+
+					geometry->bytes_per_sector = disklabel.d_secsize;
+					// FreeBSD supports device_type flag as disklabel.d_type,
+					// for now we harcod it to B_DISK.
+					geometry->device_type = FSSH_B_DISK;
+					geometry->removable = disklabel.d_flags & D_REMOVABLE > 0;
+					// read_only?
+					geometry->read_only = false;
+					// FreeBSD does not support write_once flag.
+					geometry->write_once = false;
+					error = B_OK;
+				} else
+					error = errno;
+			}
 			#else
 				// Not implemented for this platform, i.e. we won't be able to
-				// deal with block devices.
+				// deal with disk devices.
 			#endif
 
 			break;
@@ -245,7 +295,11 @@ fssh_ioctl(int fd, unsigned long op, ...)
 fssh_ssize_t
 fssh_read(int fd, void *buffer, fssh_size_t count)
 {
-	return read(fd, buffer, count);
+	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
+		return read(fd, buffer, count);
+	#else
+		return read_pos(fd, lseek(fd, 0, SEEK_CUR), buffer, count);
+	#endif
 }
 
 
@@ -259,7 +313,11 @@ fssh_read_pos(int fd, fssh_off_t pos, void *buffer, fssh_size_t count)
 fssh_ssize_t
 fssh_write(int fd, const void *buffer, fssh_size_t count)
 {
-	return write(fd, buffer, count);
+	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
+		return write(fd, buffer, count);
+	#else
+		return write_pos(fd, lseek(fd, 0, SEEK_CUR), buffer, count);
+	#endif
 }
 
 

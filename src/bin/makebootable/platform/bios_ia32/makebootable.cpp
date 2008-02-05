@@ -19,7 +19,7 @@
 #include <Resources.h>
 #include <TypeConstants.h>
 
-// Linux support
+// Linux and FreeBSD support
 #ifdef HAIKU_HOST_PLATFORM_LINUX
 #	include <ctype.h>
 #	include <linux/hdreg.h>
@@ -27,7 +27,15 @@
 
 #	include "PartitionMap.h"
 #	include "PartitionMapParser.h"
-#endif	// HAIKU_HOST_PLATFORM_LINUX
+#elif HAIKU_HOST_PLATFORM_FREEBSD
+#	include <ctype.h>
+#	include <sys/disklabel.h>
+#	include <sys/disk.h>
+#	include <sys/ioctl.h>
+
+#	include "PartitionMap.h"
+#	include "PartitionMapParser.h"
+#endif
 
 
 static const char *kCommandName = "makebootable";
@@ -272,13 +280,98 @@ main(int argc, const char *const *argv)
 			noPartition = true;
 		} else if (S_ISCHR(st.st_mode)) {
 			// character special: a device or partition under BeOS
-			#ifndef __BEOS__
+			// or under FreeBSD
+			#if !defined(__BEOS__) && !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 
 				fprintf(stderr, "Error: Character special devices not "
 					"supported on this platform.\n");
 				exit(1);
 
 			#endif
+
+			#ifdef HAIKU_HOST_PLATFORM_FREEBSD
+
+				// chop off the trailing number
+				int fileNameLen = strlen(fileName);
+				int baseNameLen = -1;
+				for (int k = fileNameLen - 1; k >= 0; k--) {
+					if (!isdigit(fileName[k])) {
+						baseNameLen = k + 1;
+						break;
+					}
+				}
+				
+				// Remove de 's' from 'ad2s2' slice device (partition for DOS
+				// users) to get 'ad2' base device
+				baseNameLen--;
+
+				if (baseNameLen < 0) {
+					// only digits?
+					fprintf(stderr, "Error: Failed to get base device name.\n");
+					exit(1);
+				}
+
+				if (baseNameLen < fileNameLen) {
+					// get base device name and partition index
+					char baseDeviceName[B_PATH_NAME_LENGTH];
+					int partitionIndex = atoi(fileName + baseNameLen + 1);
+						// Don't forget the 's' of slice :)
+					memcpy(baseDeviceName, fileName, baseNameLen);
+					baseDeviceName[baseNameLen] = '\0';
+
+					// open base device
+					int baseFD = open(baseDeviceName, O_RDONLY);
+					if (baseFD < 0) {
+						fprintf(stderr, "Error: Failed to open \"%s\": %s\n",
+							baseDeviceName, strerror(errno));
+						exit(1);
+					}
+
+					// get device size
+					int64 deviceSize;
+					if (ioctl(baseFD, DIOCGMEDIASIZE, &deviceSize) == -1) {
+						fprintf(stderr, "Error: Failed to get device geometry "
+							"for \"%s\": %s\n", baseDeviceName,
+							strerror(errno));
+						exit(1);
+					}
+
+					// parse the partition map
+					PartitionMapParser parser(baseFD, 0, deviceSize);
+					PartitionMap map;
+					error = parser.Parse(NULL, &map);
+					if (error != B_OK) {
+						fprintf(stderr, "Error: Parsing partition table on "
+							"device \"%s\" failed: %s\n", baseDeviceName,
+							strerror(error));
+						exit(1);
+					}
+
+					close(baseFD);
+
+					// check the partition we are supposed to write at
+					Partition *partition = map.PartitionAt(partitionIndex - 1);
+					if (!partition || partition->IsEmpty()) {
+						fprintf(stderr, "Error: Invalid partition index %d.\n",
+							partitionIndex);
+						exit(1);
+					}
+
+					if (partition->IsExtended()) {
+						fprintf(stderr, "Error: Partition %d is an extended "
+							"partition.\n", partitionIndex);
+						exit(1);
+					}
+
+					partitionOffset = partition->Offset();
+
+				} else {
+					// The given device is the base device. We'll write at
+					// offset 0.
+				}
+
+			#endif // HAIKU_HOST_PLATFORM_FREEBSD
+
 		} else if (S_ISBLK(st.st_mode)) {
 			// block device: a device or partition under Linux
 			#ifdef HAIKU_HOST_PLATFORM_LINUX
