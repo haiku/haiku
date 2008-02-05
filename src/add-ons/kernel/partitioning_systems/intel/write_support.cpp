@@ -2027,8 +2027,10 @@ ep_create_child(int fd, partition_id partitionID, off_t offset, off_t size,
 	update_disk_device_job_progress(job, 0.0);
 	partition_data *child = create_child_partition(partition->id, index,
 		*childID);
-	if (!child)
+	if (!child) {
+		delete logical;
 		return B_ERROR;
+	}
 
 	PartitionType ptype;
 	ptype.SetType(type);
