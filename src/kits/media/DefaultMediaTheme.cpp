@@ -67,7 +67,7 @@ class GroupView : public BView {
 
 class TabView : public BTabView {
 	public:
-		TabView(BRect frame, const char *name, button_width width = B_WIDTH_AS_USUAL,
+		TabView(BRect frame, const char *name, button_width width = B_WIDTH_FROM_LABEL,
 			uint32 resizingMode = B_FOLLOW_ALL, uint32 flags = B_FULL_UPDATE_ON_RESIZE
 				| B_WILL_DRAW | B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_NAVIGABLE);
 
