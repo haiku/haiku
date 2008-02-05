@@ -6,14 +6,15 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Jérôme Duval (korli@users.berlios.de)
  */
+#include <TabView.h>
+
+#include <string.h>
+
 #include <List.h>
 #include <Message.h>
 #include <PropertyInfo.h>
 #include <Rect.h>
-#include <TabView.h>
-//#include <Errors.h>
-
-#include <string.h>
+#include <String.h>
 
 
 static property_info sPropertyList[] = {
@@ -204,24 +205,39 @@ BTab::DrawFocusMark(BView *owner, BRect frame)
 	owner->SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 	// TODO: remove offset
 	float offset = frame.Height() / 2.0;
-	owner->StrokeLine(BPoint((frame.left + frame.right - width + offset) / 2.0, frame.bottom - 3),
-					  BPoint((frame.left + frame.right + width + offset) / 2.0, frame.bottom - 3));
+	owner->StrokeLine(BPoint((frame.left + frame.right - width + offset) / 2.0,
+			frame.bottom - 3),
+		BPoint((frame.left + frame.right + width + offset) / 2.0,
+			frame.bottom - 3));
 }
 
 
 void
 BTab::DrawLabel(BView *owner, BRect frame)
 {
-	const char *label = Label();
-	if (label == NULL)
+	if (Label() == NULL)
 		return;
 
+	BString label = Label();
+	float frameWidth = frame.Width();
+	float width = owner->StringWidth(label.String());
+	font_height fh;
+
+	if (width > frameWidth) {
+		BFont font;
+		owner->GetFont(&font);
+		font.TruncateString(&label, B_TRUNCATE_END, frameWidth);
+		width = frameWidth;
+		font.GetHeight(&fh);
+	} else {
+		owner->GetFontHeight(&fh);
+	}
+
 	owner->SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
-	float width = owner->StringWidth(label);
-	// TODO: remove offset
-	float offset = frame.Height() / 2.0;
-	owner->DrawString(label, BPoint((frame.left + frame.right - width + offset) / 2.0,
-									frame.bottom - 4.0f - 2.0f));
+	owner->DrawString(label.String(),
+		BPoint((frame.left + frame.right - width) / 2.0,
+ 			(frame.top + frame.bottom - fh.ascent - fh.descent) / 2.0
+ 			+ fh.ascent));
 }
 
 
@@ -237,7 +253,11 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 
 	owner->SetHighColor(darkenmax);
 	owner->SetLowColor(no_tint);
-	DrawLabel(owner, frame);
+	// NOTE: "frame" goes from the beginning of the left slope to the beginning
+	// of the right slope - "lableFrame" is the frame between both slopes
+	BRect lableFrame = frame;
+	lableFrame.left = lableFrame.left + frame.Height() / 2.0;
+	DrawLabel(owner, lableFrame);
 
 	owner->SetDrawingMode(B_OP_OVER);
 
@@ -248,37 +268,39 @@ BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 	if (position != B_TAB_ANY) {
 		// full height left side
 		owner->AddLine(BPoint(frame.left, frame.bottom),
-					   BPoint(frame.left + slopeWidth, frame.top), darken3);
+			BPoint(frame.left + slopeWidth, frame.top), darken3);
 		owner->AddLine(BPoint(frame.left, frame.bottom + 1),
-					   BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
+			BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
 	} else {
 		// upper half of left side
-		owner->AddLine(BPoint(frame.left + slopeWidth / 2, frame.bottom - slopeWidth),
-					   BPoint(frame.left + slopeWidth, frame.top), darken3);
-		owner->AddLine(BPoint(frame.left + slopeWidth / 2 + 2, frame.bottom - slopeWidth - 1),
-					   BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
+		owner->AddLine(BPoint(frame.left + slopeWidth / 2,
+				frame.bottom - slopeWidth),
+			BPoint(frame.left + slopeWidth, frame.top), darken3);
+		owner->AddLine(BPoint(frame.left + slopeWidth / 2 + 2,
+				frame.bottom - slopeWidth - 1),
+			BPoint(frame.left + slopeWidth, frame.top + 1), lightenmax);
 	}
 
 	// lines along the top
 	owner->AddLine(BPoint(frame.left + slopeWidth, frame.top),
-				   BPoint(frame.right, frame.top), darken3);
+		BPoint(frame.right, frame.top), darken3);
 	owner->AddLine(BPoint(frame.left + slopeWidth, frame.top + 1),
-				   BPoint(frame.right, frame.top + 1), lightenmax);
+		BPoint(frame.right, frame.top + 1), lightenmax);
 
 	if (full) { 
 		// full height right side
 		owner->AddLine(BPoint(frame.right, frame.top),
-					   BPoint(frame.right + slopeWidth + 2, frame.bottom), darken2);
+			BPoint(frame.right + slopeWidth + 2, frame.bottom), darken2);
 		owner->AddLine(BPoint(frame.right, frame.top + 1),
-					   BPoint(frame.right + slopeWidth + 1, frame.bottom), darken4);
+			BPoint(frame.right + slopeWidth + 1, frame.bottom), darken4);
 	} else {
 		// upper half of right side
 		owner->AddLine(BPoint(frame.right, frame.top),
-					   BPoint(frame.right + slopeWidth / 2 + 1,
-					   		  frame.bottom - slopeWidth), darken2);
+			BPoint(frame.right + slopeWidth / 2 + 1,
+				frame.bottom - slopeWidth), darken2);
 		owner->AddLine(BPoint(frame.right, frame.top + 1),
-					   BPoint(frame.right + slopeWidth / 2,
-					   		  frame.bottom - slopeWidth), darken4);
+			BPoint(frame.right + slopeWidth / 2,
+				frame.bottom - slopeWidth), darken4);
 	}
 
 	owner->EndLineArray();
