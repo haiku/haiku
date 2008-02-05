@@ -45,6 +45,19 @@ const struct supported_device {
 	uint32		type;
 	const char	*name;
 } kSupportedDevices[] = {
+//	{0x3577, INTEL_TYPE_83x, "i830GM"},
+//	{0x2562, INTEL_TYPE_83x, "i845G"},
+
+	{0x2570, 0x2572, INTEL_TYPE_85x, "i865G"},
+//	{0x3582, INTEL_TYPE_85x, "i855G"},
+
+//	{0x2792, INTEL_TYPE_91x, "i910"},
+//	{0x258a, INTEL_TYPE_91x, "i915"},
+//	{0x2582, INTEL_TYPE_91x, "i915G"},
+//	{0x2592, INTEL_TYPE_91x, "i915GM"},
+//	{0x2772, INTEL_TYPE_945, "i945G"},
+//	{0x27a2, INTEL_TYPE_945, "i945GM"},
+//	{0x29a2, INTEL_TYPE_965, "i965G"},
 	{0x29b0, 0x29b2, INTEL_TYPE_G33, "G33"},
 	{0x29c0, 0x29c2, INTEL_TYPE_G33, "Q35"},
 	{0x29d0, 0x29d2, INTEL_TYPE_G33, "Q33"},
