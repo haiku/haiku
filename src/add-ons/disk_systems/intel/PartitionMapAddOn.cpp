@@ -245,6 +245,66 @@ PartitionMapHandle::SupportedChildOperations(const BMutablePartition* child,
 }
 
 
+// GetNextSupportedType
+status_t
+PartitionMapHandle::GetNextSupportedType(const BMutablePartition* child,
+	int32* cookie, BString* type)
+{
+	// TODO: What are we supposed to do with the child?
+
+	// we support creating two types, primary and extended
+	if (*cookie < 0 || *cookie > 1)
+		return B_ENTRY_NOT_FOUND;
+
+	// check if there are any spaces at all
+	// TODO: check if the spaces have enough size at all
+	BPartitioningInfo info;
+	status_t ret = GetPartitioningInfo(&info);
+	if (ret < B_OK)
+		return ret;
+
+	if (info.CountPartitionableSpaces() == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	// adjust the cookie here already so that we don't have
+	// to worry about it when returning early below
+	*cookie = *cookie + 1;
+
+	if (*cookie == 1) {
+		// On first iteration, check if we can create more primary
+		// partitions. If this is not possible, we cannot create
+		// any extended partitions either.
+		for (int32 i = 0; i < 4; i++) {
+			PrimaryPartition* primary = fPartitionMap.PrimaryPartitionAt(i);
+			if (primary->IsEmpty()) {
+				*type = kPartitionTypeIntelPrimary;
+				return B_OK;
+			}
+		}
+	} else if (*cookie == 2) {
+		// On second iteration, check if we can create more primary
+		// partitions. Also check if there already is an extended
+		// partition, only if there is at least one empty and no
+		// extended partition, we can create an extended partition.
+		bool foundExtended = false;
+		bool foundEmpty = false;
+		for (int32 i = 0; i < 4; i++) {
+			PrimaryPartition* primary = fPartitionMap.PrimaryPartitionAt(i);
+			if (primary->IsEmpty())
+				foundEmpty = true;
+			else if (primary->IsExtended())
+				foundExtended = true;
+		}
+		if (foundEmpty && !foundExtended) {
+			*type = kPartitionTypeIntelExtended;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 // GetPartitioningInfo
 status_t
 PartitionMapHandle::GetPartitioningInfo(BPartitioningInfo* info)

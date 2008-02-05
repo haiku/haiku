@@ -46,6 +46,10 @@ public:
 									const BMutablePartition* child,
 									uint32 mask);
 
+	virtual	status_t			GetNextSupportedType(
+									const BMutablePartition* child,
+									int32* cookie, BString* type);
+
 	virtual	status_t			GetPartitioningInfo(BPartitioningInfo* info);
 
 	virtual	status_t			GetChildCreationParameterEditor(
