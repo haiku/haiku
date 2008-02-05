@@ -640,8 +640,10 @@ BPartition::FindDescendant(partition_id id) const
 status_t
 BPartition::GetPartitioningInfo(BPartitioningInfo* info) const
 {
-	if (!fDelegate || !info)
+	if (!info)
 		return B_BAD_VALUE;
+	if (!fDelegate)
+		return B_NO_INIT;
 
 	return fDelegate->GetPartitioningInfo(info);
 }
@@ -686,7 +688,7 @@ status_t
 BPartition::Defragment() const
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->Defragment();
 }
@@ -715,7 +717,7 @@ status_t
 BPartition::Repair(bool checkOnly) const
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->Repair(checkOnly);
 }
@@ -748,7 +750,7 @@ BPartition::ValidateResize(off_t* size) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	status_t error = parent->fDelegate->ValidateResizeChild(fDelegate, size);
 	if (error != B_OK)
@@ -775,7 +777,7 @@ BPartition::Resize(off_t size)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	status_t error;
 	off_t contentSize = size;
@@ -850,7 +852,7 @@ BPartition::ValidateMove(off_t* offset) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	status_t error = parent->fDelegate->ValidateMoveChild(fDelegate, offset);
 	if (error != B_OK)
@@ -876,7 +878,7 @@ BPartition::Move(off_t offset)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	status_t error = parent->fDelegate->MoveChild(fDelegate, offset);
 	if (error != B_OK)
@@ -911,7 +913,7 @@ BPartition::ValidateSetName(BString* name) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return parent->fDelegate->ValidateSetName(fDelegate, name);
 }
@@ -923,7 +925,7 @@ BPartition::SetName(const char* name)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return parent->fDelegate->SetName(fDelegate, name);
 }
@@ -944,7 +946,7 @@ status_t
 BPartition::ValidateSetContentName(BString* name) const
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->ValidateSetContentName(name);
 }
@@ -955,7 +957,7 @@ status_t
 BPartition::SetContentName(const char* name)
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->SetContentName(name);
 }
@@ -980,7 +982,7 @@ BPartition::ValidateSetType(const char* type) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return parent->fDelegate->ValidateSetType(fDelegate, type);
 }
@@ -992,7 +994,7 @@ BPartition::SetType(const char* type)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return parent->fDelegate->SetType(fDelegate, type);
 }
@@ -1017,7 +1019,7 @@ BPartition::GetParameterEditor(BDiskDeviceParameterEditor** editor)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return parent->fDelegate->GetParameterEditor(fDelegate, editor);
 }
@@ -1029,7 +1031,7 @@ BPartition::SetParameters(const char* parameters)
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return parent->fDelegate->SetParameters(fDelegate, parameters);
 }
@@ -1050,7 +1052,7 @@ status_t
 BPartition::GetContentParameterEditor(BDiskDeviceParameterEditor** editor)
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->GetContentParameterEditor(editor);
 }
@@ -1061,7 +1063,7 @@ status_t
 BPartition::SetContentParameters(const char* parameters)
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->SetContentParameters(parameters);
 }
@@ -1073,7 +1075,7 @@ BPartition::GetNextSupportedType(int32 *cookie, BString* type) const
 {
 	BPartition* parent = Parent();
 	if (!parent || !fDelegate)
-		return false;
+		return B_NO_INIT;
 
 	return parent->fDelegate->GetNextSupportedChildType(fDelegate, cookie,
 		type);
@@ -1085,7 +1087,7 @@ status_t
 BPartition::GetNextSupportedChildType(int32 *cookie, BString* type) const
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->GetNextSupportedChildType(NULL, cookie, type);
 }
@@ -1117,7 +1119,7 @@ BPartition::GetInitializationParameterEditor(const char* diskSystem,
 	BDiskDeviceParameterEditor** editor) const
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->GetInitializationParameterEditor(diskSystem, editor);
 }
@@ -1129,7 +1131,7 @@ BPartition::ValidateInitialize(const char* diskSystem, BString* name,
 	const char* parameters)
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->ValidateInitialize(diskSystem, name, parameters);
 }
@@ -1141,7 +1143,7 @@ BPartition::Initialize(const char* diskSystem, const char* name,
 	const char* parameters)
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->Initialize(diskSystem, name, parameters);
 }
@@ -1152,7 +1154,7 @@ status_t
 BPartition::Uninitialize()
 {
 	// TODO: Implement!
-	return B_BAD_VALUE;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -1170,7 +1172,7 @@ BPartition::GetChildCreationParameterEditor(const char* type,
 	BDiskDeviceParameterEditor** editor) const
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->GetChildCreationParameterEditor(type, editor);
 }
@@ -1182,7 +1184,7 @@ BPartition::ValidateCreateChild(off_t* offset, off_t* size, const char* type,
 	BString* name, const char* parameters) const
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->ValidateCreateChild(offset, size, type, name, parameters);
 }
@@ -1194,7 +1196,7 @@ BPartition::CreateChild(off_t offset, off_t size, const char* type,
 	const char* name, const char* parameters, BPartition** child)
 {
 	if (!fDelegate)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	return fDelegate->CreateChild(offset, size, type, name, parameters, child);
 }
@@ -1217,8 +1219,10 @@ BPartition::CanDeleteChild(int32 index) const
 status_t
 BPartition::DeleteChild(int32 index)
 {
+	if (!fDelegate)
+		return B_NO_INIT;
 	BPartition* child = ChildAt(index);
-	if (!fDelegate || !child || child->Parent() != this)
+	if (!child || child->Parent() != this)
 		return B_BAD_VALUE;
 
 	return fDelegate->DeleteChild(child->fDelegate);
@@ -1525,7 +1529,7 @@ status_t
 BPartition::_CreateDelegates()
 {
 	if (fDelegate || !fPartitionData)
-		return B_BAD_VALUE;
+		return B_NO_INIT;
 
 	// create and init delegate
 	fDelegate = new(nothrow) Delegate(this);
