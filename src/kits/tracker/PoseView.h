@@ -456,6 +456,7 @@ class BPoseView : public BView {
 			// find poses that need placing and place them in a new spot
 		void PlacePose(BPose *, BRect &);
 			// find a new place for a pose, starting at fHintLocation and place it
+		status_t GetDeskbarFrame(BRect* frame);
 		bool SlotOccupied(BRect poseRect, BRect viewBounds) const;
 		void NextSlot(BPose *, BRect &poseRect, BRect viewBounds);
 		void TrySettingPoseLocation(BNode *node, BPoint point);
@@ -658,6 +659,9 @@ class BPoseView : public BView {
 		static bigtime_t sLastKeyTime;
 		static char sMatchString[B_FILE_NAME_LENGTH];
 			// used for typeahead - should be replaced by a typeahead state
+
+		bigtime_t fLastDeskbarFrameCheckTime;
+		BRect fDeskbarFrame;
 
 		// TODO: Get rid of this.
 		static _BWidthBuffer_ *sWidthBuffer;

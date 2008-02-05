@@ -215,7 +215,9 @@ BPoseView::BPoseView(Model *model, BRect bounds, uint32 viewMode, uint32 resizeM
 	fShouldAutoScroll(true),
 	fIsDesktopWindow(false),
 	fIsWatchingDateFormatChange(false),
-	fHasPosesInClipboard(false)
+	fHasPosesInClipboard(false),
+	fLastDeskbarFrameCheckTime(LONGLONG_MIN),
+	fDeskbarFrame(0, 0, -1, -1)
 {
 	fViewState->SetViewMode(viewMode);
 	fShowSelectionWhenInactive = TrackerSettings().ShowSelectionWhenInactive();
@@ -3122,7 +3124,7 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 
 	BRect deskbarFrame;
 	bool checkDeskbarFrame = false;
-	if (IsDesktopWindow() && get_deskbar_frame(&deskbarFrame) == B_OK) {
+	if (IsDesktopWindow() && GetDeskbarFrame(&deskbarFrame) == B_OK) {
 		checkDeskbarFrame = true;
 		deskbarFrame.InsetBy(-10, -10);
 	}
@@ -3140,6 +3142,23 @@ BPoseView::PlacePose(BPose *pose, BRect &viewBounds)
 
 	pose->SetLocation(rect.LeftTop() + deltaFromBounds);
 	pose->SetSaveLocation();
+}
+
+
+status_t
+BPoseView::GetDeskbarFrame(BRect* frame)
+{
+	// only really check the Deskbar frame every half a second,
+	// use a cached value otherwise
+	status_t ret = B_OK;
+	bigtime_t now = system_time();
+	if (fLastDeskbarFrameCheckTime + 500000 < now) {
+		// it's time to check the Deskbar frame again
+		ret = get_deskbar_frame(&fDeskbarFrame);
+		fLastDeskbarFrameCheckTime = now;
+	}
+	*frame = fDeskbarFrame;
+	return ret;
 }
 
 
