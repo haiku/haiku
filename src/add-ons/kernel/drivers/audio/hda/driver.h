@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ithamar Adema, ithamar AT unet DOT nl
+ */
 #ifndef _HDA_H_
 #define _HDA_H_
 
@@ -158,7 +165,7 @@ struct hda_codec_s {
 	hda_afg*	afgs[HDA_MAXAFGS];
 	uint32		num_afgs;
 	
-	struct hda_controller_s* ctrlr;
+	struct hda_controller_s* controller;
 };
 
 /* hda_controller
@@ -170,7 +177,7 @@ struct hda_codec_s {
  */
 
 struct hda_controller_s {
-	pci_info	pcii;
+	struct pci_info	pci_info;
 	vuint32		opened;
 	const char*	devfs_path;
 	
@@ -199,30 +206,30 @@ struct hda_controller_s {
 };
 
 /* driver.c */
-extern device_hooks driver_hooks;
-extern pci_module_info* pci;
-extern hda_controller cards[MAXCARDS];
-extern uint32 num_cards;
+extern device_hooks gDriverHooks;
+extern pci_module_info* gPci;
+extern hda_controller gCards[MAXCARDS];
+extern uint32 gNumCards;
 
 /* hda_codec.c */
-hda_codec* hda_codec_new(hda_controller* ctrlr, uint32 cad);
+hda_codec* hda_codec_new(hda_controller* controller, uint32 cad);
 void hda_codec_delete(hda_codec*);
 
 /* hda_multi_audio.c */
 status_t multi_audio_control(void* cookie, uint32 op, void* arg, size_t len);
 
 /* hda_controller.c: Basic controller support */
-status_t hda_hw_init(hda_controller* ctrlr);
-void hda_hw_stop(hda_controller* ctrlr);
-void hda_hw_uninit(hda_controller* ctrlr);
+status_t hda_hw_init(hda_controller* controller);
+void hda_hw_stop(hda_controller* controller);
+void hda_hw_uninit(hda_controller* controller);
 status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, int count);
 
 /* hda_controller.c: Stream support */
-hda_stream* hda_stream_new(hda_controller* ctrlr, int type);
+hda_stream* hda_stream_new(hda_controller* controller, int type);
 void hda_stream_delete(hda_stream* s);
 status_t hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc);
-status_t hda_stream_start(hda_controller* ctrlr, hda_stream* s);
-status_t hda_stream_stop(hda_controller* ctrlr, hda_stream* s);
-status_t hda_stream_check_intr(hda_controller* ctrlr, hda_stream* s);
+status_t hda_stream_start(hda_controller* controller, hda_stream* s);
+status_t hda_stream_stop(hda_controller* controller, hda_stream* s);
+status_t hda_stream_check_intr(hda_controller* controller, hda_stream* s);
 
 #endif /* _HDA_H_ */

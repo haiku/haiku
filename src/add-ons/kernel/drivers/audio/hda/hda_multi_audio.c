@@ -1,7 +1,17 @@
+/*
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ithamar Adema, ithamar AT unet DOT nl
+ */
+
+
 #include "multi_audio.h"
 #include "driver.h"
 
-multi_channel_info chans[] = {
+
+static multi_channel_info sChannels[] = {
 	{  0, B_MULTI_OUTPUT_CHANNEL, 	B_CHANNEL_LEFT | B_CHANNEL_STEREO_BUS, 0 },
 	{  1, B_MULTI_OUTPUT_CHANNEL, 	B_CHANNEL_RIGHT | B_CHANNEL_STEREO_BUS, 0 },
 	{  2, B_MULTI_INPUT_CHANNEL, 	B_CHANNEL_LEFT | B_CHANNEL_STEREO_BUS, 0 },
@@ -12,10 +22,11 @@ multi_channel_info chans[] = {
 	{  7, B_MULTI_INPUT_BUS, 		B_CHANNEL_RIGHT | B_CHANNEL_STEREO_BUS, B_CHANNEL_MINI_JACK_STEREO },
 };
 
+
 static int32
 format2size(uint32 format)
 {
-	switch(format) {
+	switch (format) {
 		case B_FMT_8BIT_S:
 		case B_FMT_16BIT:
 			return 2;
@@ -27,11 +38,12 @@ format2size(uint32 format)
 
 		case B_FMT_FLOAT:
 			return 8;
-			
+
 		default:
 			return -1;
 	}
 }
+
 
 static status_t
 get_description(hda_afg* afg, multi_description* data)
@@ -39,8 +51,8 @@ get_description(hda_afg* afg, multi_description* data)
 	data->interface_version = B_CURRENT_INTERFACE_VERSION;
 	data->interface_minimum = B_CURRENT_INTERFACE_VERSION;
 
-	strcpy(data->friendly_name,"HD Audio");
-	strcpy(data->vendor_info,"Haiku");
+	strcpy(data->friendly_name, "HD Audio");
+	strcpy(data->vendor_info, "Haiku");
 
 	data->output_channel_count = 2;
 	data->input_channel_count = 2;
@@ -48,10 +60,12 @@ get_description(hda_afg* afg, multi_description* data)
 	data->input_bus_channel_count = 2;
 	data->aux_bus_channel_count = 0;
 
-	dprintf("%s: request_channel_count: %ld\n", __func__, data->request_channel_count);
+	dprintf("%s: request_channel_count: %ld\n", __func__,
+		data->request_channel_count);
 
-	if (data->request_channel_count >= (int)(sizeof(chans) / sizeof(chans[0]))) {
-		memcpy(data->channels,&chans,sizeof(chans));
+	if (data->request_channel_count >= (int)(sizeof(sChannels)
+			/ sizeof(sChannels[0]))) {
+		memcpy(data->channels, &sChannels, sizeof(sChannels));
 	}
 
 	/* determine output/input rates */	
@@ -74,10 +88,11 @@ get_description(hda_afg* afg, multi_description* data)
 	data->interface_flags = B_MULTI_INTERFACE_PLAYBACK /* | B_MULTI_INTERFACE_RECORD */;
 	data->start_latency = 30000;
 
-	strcpy(data->control_panel,"");
+	strcpy(data->control_panel, "");
 
 	return B_OK;
 }
+
 
 static status_t
 get_enabled_channels(hda_afg* afg, multi_channel_enable* data)
@@ -90,6 +105,7 @@ get_enabled_channels(hda_afg* afg, multi_channel_enable* data)
 
 	return B_OK;
 }
+
 
 static status_t
 get_global_format(hda_afg* afg, multi_format_info* data)
@@ -107,6 +123,7 @@ get_global_format(hda_afg* afg, multi_format_info* data)
 	return B_OK;
 }
 
+
 static status_t
 set_global_format(hda_afg* afg, multi_format_info* data)
 {
@@ -121,12 +138,14 @@ set_global_format(hda_afg* afg, multi_format_info* data)
 	return B_OK;
 }
 
+
 static status_t
 list_mix_controls(hda_afg* afg, multi_mix_control_info * data)
 {
 	data->control_count = 0;
 	return B_OK;
 }
+
 
 static status_t
 list_mix_connections(hda_afg* afg, multi_mix_connection_info * data)
@@ -135,11 +154,13 @@ list_mix_connections(hda_afg* afg, multi_mix_connection_info * data)
 	return B_OK;
 }
 
+
 static status_t
 list_mix_channels(hda_afg* afg, multi_mix_channel_info *data)
 {
 	return B_OK;
 }
+
 
 static status_t
 get_buffers(hda_afg* afg, multi_buffer_list* data)
@@ -196,23 +217,30 @@ get_buffers(hda_afg* afg, multi_buffer_list* data)
 	/* Setup data structure for multi_audio API... */
 	data->return_playback_buffers = data->request_playback_buffers;
 	data->return_playback_channels = data->request_playback_channels;
-	data->return_playback_buffer_size = data->request_playback_buffer_size;		/* frames */
+	data->return_playback_buffer_size = data->request_playback_buffer_size;	
+		/* frames */
 
-	for (bidx=0; bidx < data->return_playback_buffers; bidx++) {
-		for (cidx=0; cidx < data->return_playback_channels; cidx++) {
-			data->playback_buffers[bidx][cidx].base = afg->playback_stream->buffers[bidx] + (playback_sample_size * cidx);
-			data->playback_buffers[bidx][cidx].stride = playback_sample_size * data->return_playback_channels;
+	for (bidx = 0; bidx < data->return_playback_buffers; bidx++) {
+		for (cidx = 0; cidx < data->return_playback_channels; cidx++) {
+			data->playback_buffers[bidx][cidx].base
+				= afg->playback_stream->buffers[bidx]
+					+ (playback_sample_size * cidx);
+			data->playback_buffers[bidx][cidx].stride
+				= playback_sample_size * data->return_playback_channels;
 		}
 	}
 
 	data->return_record_buffers = data->request_record_buffers;
 	data->return_record_channels = data->request_record_channels;
-	data->return_record_buffer_size = data->request_record_buffer_size;			/* frames */
+	data->return_record_buffer_size = data->request_record_buffer_size;
+		/* frames */
 
-	for (bidx=0; bidx < data->return_record_buffers; bidx++) {
-		for (cidx=0; cidx < data->return_record_channels; cidx++) {
-			data->record_buffers[bidx][cidx].base = afg->record_stream->buffers[bidx] + (record_sample_size * cidx);
-			data->record_buffers[bidx][cidx].stride = record_sample_size * data->return_record_channels;
+	for (bidx = 0; bidx < data->return_record_buffers; bidx++) {
+		for (cidx = 0; cidx < data->return_record_channels; cidx++) {
+			data->record_buffers[bidx][cidx].base
+				= afg->record_stream->buffers[bidx] + (record_sample_size * cidx);
+			data->record_buffers[bidx][cidx].stride
+				= record_sample_size * data->return_record_channels;
 		}
 	}
 
@@ -229,7 +257,7 @@ buffer_exchange(hda_afg* afg, multi_buffer_info* data)
 	status_t rc;
 
 	if (!afg->playback_stream->running)
-		hda_stream_start(afg->codec->ctrlr, afg->playback_stream);
+		hda_stream_start(afg->codec->controller, afg->playback_stream);
 
 	/* do playback */
 	rc=acquire_sem(afg->playback_stream->buffer_ready_sem);
@@ -260,8 +288,8 @@ buffer_exchange(hda_afg* afg, multi_buffer_info* data)
 static status_t
 buffer_force_stop(hda_afg* afg)
 {
-	hda_stream_stop(afg->codec->ctrlr, afg->playback_stream);
-	//hda_stream_stop(afg->codec->ctrlr, afg->record_stream);
+	hda_stream_stop(afg->codec->controller, afg->playback_stream);
+	//hda_stream_stop(afg->codec->controller, afg->record_stream);
 
 	delete_sem(afg->playback_stream->buffer_ready_sem);
 //	delete_sem(afg->record_stream->buffer_ready_sem);
@@ -281,27 +309,44 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 
 	afg = codec->afgs[0];
 
-	switch(op) {
-		case B_MULTI_GET_DESCRIPTION:			return get_description(afg, arg);
-		case B_MULTI_GET_EVENT_INFO:			return B_ERROR;
-		case B_MULTI_SET_EVENT_INFO:			return B_ERROR;
-		case B_MULTI_GET_EVENT:				return B_ERROR;
-		case B_MULTI_GET_ENABLED_CHANNELS:		return get_enabled_channels(afg, arg);
-		case B_MULTI_SET_ENABLED_CHANNELS:		return B_OK;
-		case B_MULTI_GET_GLOBAL_FORMAT:			return get_global_format(afg, arg);
-		case B_MULTI_SET_GLOBAL_FORMAT:			return set_global_format(afg, arg);
-		case B_MULTI_GET_CHANNEL_FORMATS:		return B_ERROR;
-		case B_MULTI_SET_CHANNEL_FORMATS:		return B_ERROR;
-		case B_MULTI_GET_MIX:				return B_ERROR;
-		case B_MULTI_SET_MIX:				return B_ERROR;
-		case B_MULTI_LIST_MIX_CHANNELS:			return list_mix_channels(afg, arg);
-		case B_MULTI_LIST_MIX_CONTROLS:			return list_mix_controls(afg, arg);
-		case B_MULTI_LIST_MIX_CONNECTIONS:		return list_mix_connections(afg, arg);
-		case B_MULTI_GET_BUFFERS:			return get_buffers(afg, arg);
-		case B_MULTI_SET_BUFFERS:			return B_ERROR;
-		case B_MULTI_SET_START_TIME:			return B_ERROR;
-		case B_MULTI_BUFFER_EXCHANGE:			return buffer_exchange(afg, arg);
-		case B_MULTI_BUFFER_FORCE_STOP:			return buffer_force_stop(afg);
+	switch (op) {
+		case B_MULTI_GET_DESCRIPTION:
+			return get_description(afg, arg);
+
+		case B_MULTI_GET_ENABLED_CHANNELS:
+			return get_enabled_channels(afg, arg);
+		case B_MULTI_SET_ENABLED_CHANNELS:
+			return B_OK;
+
+		case B_MULTI_GET_GLOBAL_FORMAT:
+			return get_global_format(afg, arg);
+		case B_MULTI_SET_GLOBAL_FORMAT:
+			return set_global_format(afg, arg);
+
+		case B_MULTI_LIST_MIX_CHANNELS:
+			return list_mix_channels(afg, arg);
+		case B_MULTI_LIST_MIX_CONTROLS:
+			return list_mix_controls(afg, arg);
+		case B_MULTI_LIST_MIX_CONNECTIONS:
+			return list_mix_connections(afg, arg);
+		case B_MULTI_GET_BUFFERS:
+			return get_buffers(afg, arg);
+
+		case B_MULTI_BUFFER_EXCHANGE:
+			return buffer_exchange(afg, arg);
+		case B_MULTI_BUFFER_FORCE_STOP:
+			return buffer_force_stop(afg);
+
+		case B_MULTI_GET_EVENT_INFO:
+		case B_MULTI_SET_EVENT_INFO:
+		case B_MULTI_GET_EVENT:
+		case B_MULTI_GET_CHANNEL_FORMATS:
+		case B_MULTI_SET_CHANNEL_FORMATS:
+		case B_MULTI_GET_MIX:
+		case B_MULTI_SET_MIX:
+		case B_MULTI_SET_BUFFERS:
+		case B_MULTI_SET_START_TIME:
+			return B_ERROR;
 	}
 
 	return B_BAD_VALUE;

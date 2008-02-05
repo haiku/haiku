@@ -1,110 +1,114 @@
+/*
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ithamar Adema, ithamar AT unet DOT nl
+ */
+
+
 #include "driver.h"
 
-hda_controller cards[MAXCARDS];
-uint32 num_cards;
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-pci_module_info* pci;
+hda_controller gCards[MAXCARDS];
+uint32 gNumCards;
+pci_module_info* gPci;
 
-const char** publish_devices(void); /* Just to silence compiler */
 
 status_t
 init_hardware(void)
 {
-	pci_info pcii;
-	status_t rc;
+	pci_info info;
 	long i;
 
-	if ((rc=get_module(B_PCI_MODULE_NAME, (module_info**)&pci)) == B_OK) {
-		for (i=0; pci->get_nth_pci_info(i,&pcii) == B_OK; i++) {
-			if (pcii.class_base == PCI_multimedia && pcii.class_sub == PCI_hd_audio) {
-				put_module(B_PCI_MODULE_NAME);
-				pci = NULL;
-				return B_OK;
-			}
-		}
+	if (get_module(B_PCI_MODULE_NAME, (module_info**)&gPci) != B_OK)
+		return ENODEV;
 
-		put_module(B_PCI_MODULE_NAME);
+	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK; i++) {
+		if (info.class_base == PCI_multimedia
+			&& info.class_sub == PCI_hd_audio) {
+			put_module(B_PCI_MODULE_NAME);
+			return B_OK;
+		}
 	}
 
-	pci = NULL;
-
+	put_module(B_PCI_MODULE_NAME);
 	return ENODEV;
 }
 
+
 status_t
-init_driver (void)
+init_driver(void)
 {
 	char path[B_PATH_NAME_LENGTH];
-	pci_info pcii;
-	status_t rc;
+	pci_info info;
 	long i;
 
-	num_cards = 0;
+	if (get_module(B_PCI_MODULE_NAME, (module_info**)&gPci) != B_OK)
+		return ENODEV;
 
-	if ((rc=get_module(B_PCI_MODULE_NAME, (module_info**)&pci)) == B_OK) {
-		for (i=0; pci->get_nth_pci_info(i,&pcii) == B_OK; i++) {
-			if (pcii.class_base == PCI_multimedia && pcii.class_sub == PCI_hd_audio) {
-				cards[num_cards].pcii = pcii;
-				cards[num_cards].opened = 0;
-				sprintf(path, DEVFS_PATH_FORMAT, num_cards);
-				cards[num_cards++].devfs_path = strdup(path);
-				
-				dprintf("HDA: Detected controller @ PCI:%d:%d:%d, IRQ:%d, type %04x/%04x\n",
-					pcii.bus, pcii.device, pcii.function,
-					pcii.u.h0.interrupt_line,
-					pcii.vendor_id, pcii.device_id);
-			}
+	gNumCards = 0;
+
+	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK; i++) {
+		if (info.class_base == PCI_multimedia
+			&& info.class_sub == PCI_hd_audio) {
+			gCards[gNumCards].pci_info = info;
+			gCards[gNumCards].opened = 0;
+			sprintf(path, DEVFS_PATH_FORMAT, gNumCards);
+			gCards[gNumCards++].devfs_path = strdup(path);
+
+			dprintf("HDA: Detected controller @ PCI:%d:%d:%d, IRQ:%d, type %04x/%04x\n",
+				info.bus, info.device, info.function,
+				info.u.h0.interrupt_line,
+				info.vendor_id, info.device_id);
 		}
-	} else {
-		return rc;
 	}
 
-	if (num_cards == 0) {
+	if (gNumCards == 0) {
 		put_module(B_PCI_MODULE_NAME);
-		pci = NULL;
-		
 		return ENODEV;
 	}
 
 	return B_OK;
 }
 
+
 void
-uninit_driver (void)
+uninit_driver(void)
 {
 	long i;
 	dprintf("IRA: %s\n", __func__);
-	for (i=0; i < num_cards; i++) {
-		free((void*)cards[i].devfs_path);
-		cards[i].devfs_path = NULL;
+
+	for (i = 0; i < gNumCards; i++) {
+		free((void*)gCards[i].devfs_path);
+		gCards[i].devfs_path = NULL;
 	}
 	
-	if (pci != NULL) {
-		put_module(B_PCI_MODULE_NAME);
-		pci = NULL;
-	}
+	put_module(B_PCI_MODULE_NAME);
 }
+
 
 const char**
 publish_devices(void)
 {
 	static const char* devs[MAXCARDS+1];
 	long i;
-	
+
 	dprintf("IRA: %s\n", __func__);
-	for (i=0; i < num_cards; i++)
-		devs[i] = cards[i].devfs_path;
+	for (i = 0; i < gNumCards; i++)
+		devs[i] = gCards[i].devfs_path;
 
 	devs[i] = NULL;
 
 	return devs;
 }
 
+
 device_hooks*
 find_device(const char* name)
 {
 	dprintf("IRA: %s\n", __func__);
-	return &driver_hooks;
+	return &gDriverHooks;
 }

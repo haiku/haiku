@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ithamar Adema, ithamar AT unet DOT nl
+ */
 #ifndef HDA_CODEC_H
 #define HDA_CODEC_H
 

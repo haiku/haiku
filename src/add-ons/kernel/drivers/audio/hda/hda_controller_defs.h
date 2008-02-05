@@ -1,16 +1,26 @@
+/*
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ithamar Adema, ithamar AT unet DOT nl
+ */
 #ifndef HDAC_REGS_H
 #define HDAC_REGS_H
 
 #include <SupportDefs.h>
 
 /* Accessors for HDA controller registers */
-#define REG32(ctrlr,reg)	(*(vuint32*)((ctrlr)->regs + HDAC_##reg))
-#define REG16(ctrlr,reg)	(*(vuint16*)((ctrlr)->regs + HDAC_##reg))
-#define REG8(ctrlr,reg)		(*((ctrlr)->regs + HDAC_##reg))
+#define REG32(controller, reg)	(*(vuint32*)((controller)->regs + HDAC_##reg))
+#define REG16(controller, reg)	(*(vuint16*)((controller)->regs + HDAC_##reg))
+#define REG8(controller, reg)	(*((controller)->regs + HDAC_##reg))
 
-#define OREG32(ctrlr,s,reg)	(*(vuint32*)((ctrlr)->regs + HDAC_SDBASE + (s) + HDAC_SD_##reg))
-#define OREG16(ctrlr,s,reg)	(*(vuint16*)((ctrlr)->regs + HDAC_SDBASE + (s) + HDAC_SD_##reg))
-#define OREG8(ctrlr,s,reg)	(*((ctrlr)->regs           + HDAC_SDBASE + (s) + HDAC_SD_##reg))
+#define OREG32(controller, stream, reg) \
+	(*(vuint32*)((controller)->regs + HDAC_SDBASE + (stream) + HDAC_SD_##reg))
+#define OREG16(controller, stream, reg) \
+	(*(vuint16*)((controller)->regs + HDAC_SDBASE + (stream) + HDAC_SD_##reg))
+#define OREG8(controller, stream, reg) \
+	(*((controller)->regs + HDAC_SDBASE + (stream) + HDAC_SD_##reg))
 
 /* Register definitions */
 #define HDAC_GCAP			0x00		/* 16bits */
