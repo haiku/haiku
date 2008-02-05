@@ -25,7 +25,7 @@ BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
-	config_manager $(X86_ONLY)agp
+	config_manager agp_gart
 ;
 BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda fat googlefs iso9660 nfs ;
 
@@ -33,6 +33,8 @@ BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda fat googlefs iso9660 nfs ;
 # modules
 AddFilesToNetBootArchive beos system add-ons kernel bus_managers
 	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToNetBootArchive beos system add-ons kernel busses agp_gart
+	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToNetBootArchive beos system add-ons kernel busses ide
 	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
 AddFilesToNetBootArchive beos system add-ons kernel console : vga_text ;

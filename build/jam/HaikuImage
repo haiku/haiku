@@ -135,7 +135,7 @@ BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda fat googlefs iso9660 nfs ;
 AddFilesToHaikuImage beos system add-ons kernel bus_managers
 	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
 AddFilesToHaikuImage beos system add-ons kernel busses agp_gart
-	: <agp_gart>intel ;
+	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToHaikuImage beos system add-ons kernel busses ide
 	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata ;
 AddFilesToHaikuImage beos system add-ons kernel busses scsi
