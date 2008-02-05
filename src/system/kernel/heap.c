@@ -497,6 +497,11 @@ memalign(size_t alignment, size_t size)
 			address = bins[bin_index].free_list;
 			bins[bin_index].free_list = (void *)(*(unsigned int *)bins[bin_index].free_list);
 			bins[bin_index].free_count--;
+#if PARANOID_KFREE
+			// Ensure that the 0xdeadbeef is cleared so we do not walk this
+			// freelist if the user does not clear/use these bytes.
+			((uint32 *)address)[1] = 0;
+#endif
 		} else {
 			if (bins[bin_index].raw_count == 0) {
 				bins[bin_index].raw_list = raw_alloc(bins[bin_index].grow_size, bin_index);
@@ -599,19 +604,6 @@ free(void *address)
 		if (bin->element_size <= B_PAGE_SIZE && (addr_t)address % bin->element_size != 0)
 			panic("kfree: passed invalid pointer %p! Supposed to be in bin for esize 0x%lx\n", address, bin->element_size);
 
-#if PARANOID_KFREE
-		// mark the free space as freed
-		{
-			uint32 deadbeef = 0xdeadbeef;
-			uint8 *dead = (uint8 *)address;
-			uint32 i;
-
-			// the first 4 bytes are overwritten with the next free list pointer later
-			for (i = 4; i < bin->element_size; i++)
-				dead[i] = ((uint8 *)&deadbeef)[i % 4];
-		}
-#endif
-
 		for (i = 0; i < bin->element_size / B_PAGE_SIZE; i++) {
 			if (page[i].bin_index != page[0].bin_index)
 				panic("free(): not all pages in allocation match bin_index\n");
@@ -619,13 +611,27 @@ free(void *address)
 		}
 
 #if PARANOID_KFREE
-		// walk the free list on this bin to make sure this address doesn't exist already
-		{
+		if (((uint32 *)address)[1] == 0xdeadbeef) {
+			// This block looks like it was freed already, walk the free list
+			// on this bin to make sure this address doesn't exist.
 			unsigned int *temp;
 			for (temp = bin->free_list; temp != NULL; temp = (unsigned int *)*temp) {
 				if (temp == (unsigned int *)address)
 					panic("free(): address %p already exists in bin free list\n", address);
 			}
+		}
+
+		// mark the free space as freed
+		{
+			uint32 i;
+			uint32 *dead = (uint32 *)address;
+
+			if (bin->element_size % 4 != 0)
+				panic("free(): didn't expect a bin element size that is not a multiple of 4\n");
+
+			// the first 4 bytes are overwritten with the next free list pointer later
+			for (i = 1; i < bin->element_size / 4; i++)
+				dead[i] = 0xdeadbeef;
 		}
 #endif
 
