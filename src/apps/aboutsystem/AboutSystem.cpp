@@ -409,6 +409,7 @@ AboutView::AboutView(const BRect &rect)
 		"Erik Jaesler\n"
 		"Carwyn Jones\n"
 		"Vasilis Kaoutsis\n"
+		"James Kim\n"
 		"Euan Kirkhope\n"
 		"Jan Klötzke\n"
 		"Marcin Konicki\n"
@@ -558,6 +559,12 @@ AboutView::AboutView(const BRect &rect)
 	// VIM copyrights
 	AddCopyrightEntry("Vi IMproved", 
 		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.");
+
+	// lp_solve copyrights
+	// TODO: Fix!
+	AddCopyrightEntry("lp_solve", 
+		"Copyright " B_UTF8_COPYRIGHT
+		" ??? (http://lpsolve.sourceforge.net/).");
 
 	// Build a list of installed applications and show their 
 	// long version info. Well-behaved apps usually give
