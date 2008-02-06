@@ -85,6 +85,9 @@ typedef struct bt_hci_device {
 #define GET_HCI_ID              (1<<3)
 
 #define PACK_PORTCODE(type,hid,data)   ((type&0xFF)<<24|(hid&0xFF)<<16|(data&0xFFFF))
+#define GET_PORTCODE_TYPE(code)        ((code&0xFF000000)>>24)
+#define GET_PORTCODE_HID(code)         ((code&0x00FF0000)>>16)
+#define GET_PORTCODE_DATA(code)        ((code&0x0000FFFF))
 
 /* Port drivers can use to send information (1 for all for 
    at moment refer to ioctl GET_NOTIFICATION_PORT)*/
