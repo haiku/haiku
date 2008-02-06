@@ -122,6 +122,7 @@ BEOS_ADD_ONS_DRIVERS_MIDI = emuxki ;
 BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
 	$(X86_ONLY)rtl8139 rtl8169 sis900 $(X86_ONLY)via_rhine wb840 net_stack
 	$(X86_ONLY)ipro100 $(X86_ONLY)nforce #vlance
+	$(X86_ONLY)marvell_yukon
 	$(GPL_ONLY)bcm440x $(GPL_ONLY)bcm570x
 ;
 #BEOS_ADD_ONS_DRIVERS_ACPI = $(X86_ONLY)acpi_button ;
@@ -487,7 +488,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 
 	# library symlinks
 	local lib ;
-	for lib in $(BEOS_SYSTEM_LIBS) $(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) {
+	for lib in $(BEOS_SYSTEM_LIBS) 
+		$(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) libglut.so {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
 	}
 }
