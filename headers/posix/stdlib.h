@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STDLIB_H_
@@ -66,6 +66,11 @@ extern int		system(const char *command);
 extern char		*mktemp(char *name);
 extern int		mkstemp(char *templat);
 
+extern char		*ecvt(double value, int digits, int *_decimalPoint, int *_sign);
+extern char		*fcvt(double value, int precision, int *_decimalPoint,
+					int *_sign);
+extern char		*gcvt(double value, int digits, char *buffer);
+
 /* environment variables */
 extern char		**environ;
 extern char		*getenv(const char *name);
@@ -131,11 +136,16 @@ typedef int (*_compare_function)(const void *, const void *);
 
 extern void		*bsearch(const void *key, const void *base, size_t numElements,
 					size_t sizeOfElement, _compare_function);
-extern int		heapsort(void *base, size_t numElements, size_t sizeOfElement, _compare_function);
-extern int		mergesort(void *base, size_t numElements, size_t sizeOfElement, _compare_function);
-extern void		qsort(void *base, size_t numElements, size_t sizeOfElement, _compare_function);
-extern int		radixsort(u_char const **base, int numElements, u_char const *table, u_int endByte);
-extern int		sradixsort(u_char const **base, int numElements, u_char const *table, u_int endByte);
+extern int		heapsort(void *base, size_t numElements, size_t sizeOfElement,
+					_compare_function);
+extern int		mergesort(void *base, size_t numElements, size_t sizeOfElement,
+					_compare_function);
+extern void		qsort(void *base, size_t numElements, size_t sizeOfElement,
+					_compare_function);
+extern int		radixsort(u_char const **base, int numElements,
+					u_char const *table, u_int endByte);
+extern int		sradixsort(u_char const **base, int numElements,
+					u_char const *table, u_int endByte);
 
 /* misc math functions */
 extern int		abs(int number);
