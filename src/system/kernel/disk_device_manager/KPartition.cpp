@@ -131,6 +131,7 @@ bool
 KPartition::PrepareForRemoval()
 {
 	bool result = RemoveAllChildren();
+	UninitializeContents();
 	UnpublishDevice();
 	if (ParentDiskSystem())
 		ParentDiskSystem()->FreeCookie(this);
