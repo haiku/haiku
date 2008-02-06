@@ -87,7 +87,7 @@ BEOS_ADD_ONS_ACCELERANTS = $(X86_ONLY)radeon.accelerant $(X86_ONLY)nvidia.accele
 BEOS_ADD_ONS_TRANSLATORS = BMPTranslator GIFTranslator JPEGTranslator
 	JPEG2000Translator TIFFTranslator PNGTranslator PPMTranslator 
 	RTF-Translator SGITranslator STXTTranslator TGATranslator
-	WonderBrushTranslator
+	WonderBrushTranslator RAWTranslator
 ;
 BEOS_ADD_ONS_MEDIA = mixer.media_addon 
 	hmulti_audio.media_addon tone_producer_demo.media_addon
