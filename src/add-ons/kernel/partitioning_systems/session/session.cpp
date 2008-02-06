@@ -52,7 +52,7 @@ identify_partition(int fd, partition_data *partition, void **cookie)
 		Disc *disc = new Disc(fd);
 		if (disc && disc->InitCheck() == B_OK) {
 			*cookie = static_cast<void*>(disc);
-			result = 0.5;		
+			result = 0.7;		
 		} 	
 	}
 	PRINT(("returning %ld\n", int32(result * 10000)));
