@@ -35,6 +35,7 @@ typedef struct {
 	// size * slots follow
 } dpc_queue;
 
+#define DPC_QUEUE_SIZE 64
 
 static int32
 dpc_thread(void *arg)
@@ -74,18 +75,21 @@ dpc_thread(void *arg)
 
 // ---- Public API
 
-static void *
-new_dpc_queue(const char *name, long priority, int queue_size)
+static status_t
+new_dpc_queue(void **handle, const char *name, int32 priority)
 {
 	char str[64];
 	dpc_queue *queue;
 	
-	queue = malloc(sizeof(dpc_queue) + queue_size * sizeof(dpc_slot));
+	if (!handle)
+		return B_BAD_VALUE;
+
+	queue = malloc(sizeof(dpc_queue) + DPC_QUEUE_SIZE * sizeof(dpc_slot));
 	if (!queue)
-		return NULL;
+		return B_NO_MEMORY;
 	
 	queue->head = queue->tail = 0;
-	queue->size = queue_size;
+	queue->size = DPC_QUEUE_SIZE;
 	queue->count = 0;
 	queue->lock = 0;	// Init the spinlock
 
@@ -100,8 +104,9 @@ new_dpc_queue(const char *name, long priority, int queue_size)
 
 	queue->wakeup_sem = create_sem(0, str);
 	if (queue->wakeup_sem < B_OK) {
+		status_t status = queue->wakeup_sem;
 		free(queue);
-		return NULL;
+		return status;
 	}
 	set_sem_owner(queue->wakeup_sem, B_SYSTEM_TEAM);
 	
@@ -109,13 +114,16 @@ new_dpc_queue(const char *name, long priority, int queue_size)
 	// the queued/deferred procedure calls
 	queue->thread = spawn_kernel_thread(dpc_thread, name, priority, queue);
 	if (queue->thread < 0) {
+		status_t status = queue->thread;
 		delete_sem(queue->wakeup_sem);
 		free(queue);
-		return NULL;
+		return status;
 	}
 	resume_thread(queue->thread);
 
-	return queue;
+	*handle = queue;
+
+	return B_OK;
 }
 
 

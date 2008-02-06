@@ -110,7 +110,10 @@ acpi_std_ops(int32 op,...)
 			}
 #endif
 
-			gDPChandle = gDPC->new_dpc_queue("acpi_task", B_NORMAL_PRIORITY, 10);
+			if (gDPC->new_dpc_queue(&gDPChandle, "acpi_task", B_NORMAL_PRIORITY) != B_OK) {
+				ERROR("AcpiInitializeSubsystem failed (new_dpc_queue() failed!)\n");
+				goto err;
+			}
 
 #ifdef ACPI_DEBUG_OUTPUT
 			AcpiDbgLevel = ACPI_DEBUG_ALL | ACPI_LV_VERBOSE;

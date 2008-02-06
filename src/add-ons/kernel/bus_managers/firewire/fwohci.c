@@ -764,7 +764,7 @@ fwohci_init(struct fwohci_softc *sc)
 	TASK_INIT(&sc->fwohci_task_busreset, 2, fwohci_task_busreset, sc);
 	TASK_INIT(&sc->fwohci_task_sid, 1, fwohci_task_sid, sc);
 	TASK_INIT(&sc->fwohci_task_dma, 0, fwohci_task_dma, sc);*/
-	sc->fc.taskqueue = gDpc->new_dpc_queue("fw_taskq", FW_TASKQ_PRI, FW_TASKQ_SIZE);
+	gDpc->new_dpc_queue(&sc->fc.taskqueue, "fw_taskq", FW_TASKQ_PRI);
 
 	fw_init(&sc->fc);
 	fwohci_reset(sc);
