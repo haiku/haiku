@@ -477,8 +477,6 @@ BTimeSource::AddMe(BMediaNode *node)
 		cmd.node = node->Node();
 		SendToPort(fControlPort, TIMESOURCE_ADD_SLAVE_NODE, &cmd, sizeof(cmd));
 	} else {
-		if (this == dynamic_cast<BTimeSource *>(node))
-			debugger("fuck you!");
 		DirectAddMe(node->Node());
 	}
 	return B_OK;
