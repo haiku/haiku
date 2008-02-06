@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -125,6 +125,7 @@ enum {
 struct driver_entry {
 	driver_entry	*next;
 	const char		*path;
+	const char		*name;
 	dev_t			device;
 	ino_t			node;
 	time_t			last_modified;
@@ -163,12 +164,12 @@ static uint32
 driver_entry_hash(void *_driver, const void *_key, uint32 range)
 {
 	driver_entry *driver = (driver_entry *)_driver;
-	const ino_t *key = (const ino_t *)_key;
+	const char *key = (const char *)_key;
 
 	if (driver != NULL)
-		return driver->node % range;
+		return hash_hash_string(driver->name) % range;
 
-	return (uint64)*key % range;
+	return hash_hash_string(key) % range;
 }
 
 
@@ -176,12 +177,9 @@ static int
 driver_entry_compare(void *_driver, const void *_key)
 {
 	driver_entry *driver = (driver_entry *)_driver;
-	const ino_t *key = (const ino_t *)_key;
+	const char *key = (const char *)_key;
 
-	if (driver->node == *key)
-		return 0;
-
-	return -1;
+	return strcmp(driver->name, key);
 }
 
 
@@ -202,13 +200,6 @@ load_driver(driver_entry *driver)
 			return image;
 	}
 
-	// for prettier debug output
-	const char *name = strrchr(driver->path, '/');
-	if (name == NULL)
-		name = driver->path;
-	else
-		name++;
-
 	// For a valid device driver the following exports are required
 
 	driver->api_version = &sDefaultApiVersion;
@@ -219,23 +210,24 @@ load_driver(driver_entry *driver)
 #error Add checks here for new vs old api version!
 #endif
 		if (*driver->api_version > B_CUR_DRIVER_API_VERSION) {
-			dprintf("%s: api_version %ld not handled\n", name, *driver->api_version);
+			dprintf("%s: api_version %ld not handled\n", driver->name,
+				*driver->api_version);
 			status = B_BAD_VALUE;
 			goto error1;
 		}
 		if (*driver->api_version < 1) {
-			dprintf("%s: api_version invalid\n", name);
+			dprintf("%s: api_version invalid\n", driver->name);
 			status = B_BAD_VALUE;
 			goto error1;
 		}
 	} else
-		dprintf("%s: api_version missing\n", name);
+		dprintf("%s: api_version missing\n", driver->name);
 
 	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT,
 				(void **)&driver->publish_devices) != B_OK
 		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT,
 				(void **)&driver->find_device) != B_OK) {
-		dprintf("%s: mandatory driver symbol(s) missing!\n", name);
+		dprintf("%s: mandatory driver symbol(s) missing!\n", driver->name);
 		status = B_BAD_VALUE;
 		goto error1;
 	}
@@ -245,7 +237,8 @@ load_driver(driver_entry *driver)
 	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
 			(void **)&init_hardware) == B_OK
 		&& (status = init_hardware()) != B_OK) {
-		dprintf("%s: init_hardware() failed: %s\n", name, strerror(status));
+		dprintf("%s: init_hardware() failed: %s\n", driver->name,
+			strerror(status));
 		status = ENXIO;
 		goto error1;
 	}
@@ -253,7 +246,8 @@ load_driver(driver_entry *driver)
 	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
 			(void **)&init_driver) == B_OK
 		&& (status = init_driver()) != B_OK) {
-		dprintf("%s: init_driver() failed: %s\n", name, strerror(status));
+		dprintf("%s: init_driver() failed: %s\n", driver->name,
+			strerror(status));
 		status = ENXIO;
 		goto error2;
 	}
@@ -272,7 +266,7 @@ load_driver(driver_entry *driver)
 	// we keep the driver loaded if it exports at least a single interface
 	devicePaths = driver->publish_devices();
 	if (devicePaths == NULL) {
-		dprintf("%s: publish_devices() returned NULL.\n", name);
+		dprintf("%s: publish_devices() returned NULL.\n", driver->name);
 		status = ENXIO;
 		goto error3;
 	}
@@ -332,6 +326,17 @@ unload_driver(driver_entry *driver)
 }
 
 
+static const char *
+get_leaf(const char *path)
+{
+	const char *name = strrchr(path, '/');
+	if (name == NULL)
+		return path;
+
+	return name + 1;
+}
+
+
 static status_t
 add_driver(const char *path, image_id image)
 {
@@ -339,12 +344,11 @@ add_driver(const char *path, image_id image)
 
 	struct stat stat;
 	if (image >= 0) {
-		// TODO: Unfortunately only the node ID is the key for the hash table.
 		// The image ID should be a small number and hopefully the boot FS
 		// doesn't use small negative values -- if it is inode based, we should
 		// be relatively safe.
 		stat.st_dev = -1;
-		stat.st_ino = -image;
+		stat.st_ino = -1;
 	} else {
 		if (::stat(path, &stat) != 0)
 			return errno;
@@ -353,10 +357,11 @@ add_driver(const char *path, image_id image)
 	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
 	driver_entry *driver = (driver_entry *)hash_lookup(
-		sDeviceFileSystem->driver_hash, &stat.st_ino);
+		sDeviceFileSystem->driver_hash, get_leaf(path));
 	if (driver != NULL) {
 		// we know this driver
-		// ToDo: test for changes here? Although node monitoring should be enough.
+		// TODO: test for changes here and/or via node monitoring and reload
+		//	the driver if necessary
 		if (driver->image < B_OK)
 			return driver->image;
 
@@ -375,6 +380,7 @@ add_driver(const char *path, image_id image)
 		return B_NO_MEMORY;
 	}
 
+	driver->name = get_leaf(driver->path);
 	driver->device = stat.st_dev;
 	driver->node = stat.st_ino;
 	driver->image = image;
