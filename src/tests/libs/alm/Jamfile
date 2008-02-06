@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src tests libs alm ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UseLibraryHeaders lp_solve linprog alm ;
+
+Application table_test :
+	TableTest.cpp
+	:
+	be liblpsolve55.so liblinprog.so libalm.so
+;
+
+Application test1 :
+	Test1.cpp
+	:
+	be liblpsolve55.so be liblinprog.so libalm.so
+;
+
+Application test2 :
+	Test2.cpp
+	:
+	be liblpsolve55.so be liblinprog.so libalm.so
+;
+

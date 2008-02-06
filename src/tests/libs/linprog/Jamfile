@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tests libs linprog ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UseLibraryHeaders lp_solve linprog ;
+
+SimpleTest linprog :
+	Program.cpp
+	:
+	be liblpsolve55.so liblinprog.so
+;
