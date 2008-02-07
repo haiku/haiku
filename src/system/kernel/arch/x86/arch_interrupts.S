@@ -350,7 +350,8 @@ trap99:
 	TRACE_POST_SYSCALL()
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
-			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
+			| THREAD_FLAGS_64_BIT_SYSCALL_RETURN) \
 			, THREAD_flags(%edi)
 	jnz		post_syscall_work
 
@@ -370,9 +371,10 @@ trap99:
 	jmp		pre_syscall_debug_done
 
   post_syscall_work_sysenter:
+  post_syscall_work:
 	// if the 64 bit return value bit is set, we have to clear it
 	testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi)
-	jz		post_syscall_work
+	jz		2f
   1:
     movl	THREAD_flags(%edi), %eax
 	movl	%eax, %edx
@@ -380,8 +382,8 @@ trap99:
     lock
     cmpxchgl	%edx, THREAD_flags(%edi)
     jnz		1b
+  2:
 
-  post_syscall_work:
 	// post syscall debugging
 	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
 	jz		1f
