@@ -10,7 +10,7 @@
 #include <stdio.h>
 
 #include "TermConst.h"
-#include "TermView.h"
+	// for the Terminal's signature
 
 class App : public BApplication {
 public:

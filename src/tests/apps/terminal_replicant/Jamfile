@@ -9,4 +9,4 @@ Application RepliTerminal :
 	: be 
 	;
 
-SEARCH on [ FGristFiles	TermView.h ] = [ FDirName $(HAIKU_TOP) src apps terminal ] ;
+
