@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -338,6 +338,8 @@ net_protocol_module_info sICMPModule = {
 		0,
 		icmp_std_ops
 	},
+	NET_PROTOCOL_ATOMIC_MESSAGES,
+
 	icmp_init_protocol,
 	icmp_uninit_protocol,
 	icmp_open,

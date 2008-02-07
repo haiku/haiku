@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -421,6 +421,9 @@ dump_endpoint(int argc, char *argv[])
 net_protocol *
 tcp_init_protocol(net_socket *socket)
 {
+	socket->send.buffer_size = 32768;
+		// override net_socket default
+
 	TCPEndpoint *protocol = new (std::nothrow) TCPEndpoint(socket);
 	if (protocol == NULL)
 		return NULL;
@@ -775,6 +778,8 @@ net_protocol_module_info sTCPModule = {
 		0,
 		tcp_std_ops
 	},
+	0,
+
 	tcp_init_protocol,
 	tcp_uninit_protocol,
 	tcp_open,

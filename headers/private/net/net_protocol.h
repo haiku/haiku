@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_PROTOCOL_H
@@ -22,8 +22,12 @@ typedef struct net_protocol {
 	net_socket						*socket;
 } net_protocol;
 
+// net_protocol_module_info::flags field
+#define NET_PROTOCOL_ATOMIC_MESSAGES 0x01
+
 struct net_protocol_module_info {
 	module_info info;
+	uint32		flags;
 
 	net_protocol *(*init_protocol)(net_socket *socket);
 	status_t	(*uninit_protocol)(net_protocol *self);

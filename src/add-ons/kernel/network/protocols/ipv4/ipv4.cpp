@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1698,6 +1698,8 @@ net_protocol_module_info gIPv4Module = {
 		0,
 		ipv4_std_ops
 	},
+	NET_PROTOCOL_ATOMIC_MESSAGES,
+
 	ipv4_init_protocol,
 	ipv4_uninit_protocol,
 	ipv4_open,

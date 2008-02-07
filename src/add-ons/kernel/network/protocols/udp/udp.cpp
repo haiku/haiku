@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1230,6 +1230,8 @@ net_protocol_module_info sUDPModule = {
 		0,
 		udp_std_ops
 	},
+	NET_PROTOCOL_ATOMIC_MESSAGES,
+
 	udp_init_protocol,
 	udp_uninit_protocol,
 	udp_open,
