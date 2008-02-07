@@ -155,7 +155,7 @@ private:
 	inline void _Redraw(int, int, int, int);
 	
 	void _DoPrint(BRect updateRect);
-	void _ResizeScrBarRange (void);
+	void _ResizeScrBarRange(void);
 	void _DoFileDrop(entry_ref &ref);
 
 	void _WritePTY(const uchar *text, int num_byteses);
