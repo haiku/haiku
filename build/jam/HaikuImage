@@ -492,6 +492,9 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 		$(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) libglut.so {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
 	}
+
+	# cc and c++ wrapper scripts
+	AddFilesToHaikuImage beos bin : cc c++ ;
 }
 
 # Vision

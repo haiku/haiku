@@ -1,0 +1,2 @@
+#!/bin/sh
+exec $BE_C_COMPILER $BE_DEFAULT_C_FLAGS $*
