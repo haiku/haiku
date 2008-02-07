@@ -508,8 +508,6 @@ arch_restore_signal_frame(void)
 
 	TRACE(("### arch_restore_signal_frame: exit\n"));
 
-	frame->orig_eax = -1;	/* disable syscall checks */
-
 	return (int64)frame->eax | ((int64)frame->edx << 32);
 }
 
