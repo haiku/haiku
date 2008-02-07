@@ -418,7 +418,8 @@ class PostSyscall : public AbstractTraceEntry {
 		{
 			Initialized();
 #if 0
-			if (returnValue != (returnValue & 0xffffffff)
+			if (syscall < (uint32)kSyscallCount
+				&&  returnValue != (returnValue & 0xffffffff)
 				&& kExtendedSyscallInfos[syscall].return_type.size <= 4) {
 				panic("syscall return value 64 bit although it should be 32 "
 					"bit");
