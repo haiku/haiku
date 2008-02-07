@@ -290,4 +290,41 @@ struct hci_ev_sychronous_connection_changed {
 	uint16	  tx_packet_length;
 } __attribute__ ((packed));
 
+// TODO: Define remaining Bluetooth 2.1 events structures
+#define HCI_EVENT_EXTENDED_INQUIRY_RESULT			0x2F
+
+#define HCI_EVENT_ENCRYPTION_KEY_REFERSH_COMPLETE	0x30
+
+#define HCI_EVENT_IO_CAPABILITY_REQUEST				0x31
+
+#define HCI_EVENT_IO_CAPABILITY_RESPONSE			0x32
+
+#define HCI_EVENT_USER_CONFIRMATION_REQUEST			0x33
+
+#define HCI_EVENT_USER_PASSKEY_REQUEST				0x34
+
+#define HCI_EVENT_OOB_DATA_REQUEST					0x35
+
+#define HCI_EVENT_SIMPLE_PAIRING_COMPLETE			0x36
+
+#define HCI_EVENT_LINK_SUPERVISION_TIMEOUT_CHANGED	0x38
+
+#define HCI_EVENT_ENHANCED_FLUSH_COMPLETE			0x39
+
+#define HCI_EVENT_KEYPRESS_NOTIFICATION				0x3C
+
+#define HCI_EVENT_REMOTE_HOST_SUPPORTED_FEATURES_NOTIFICATION	0x3D
+
+
+
+
+/* HAIKU Internal Events, not produced by the transport devices but 
+ * by some entity of the Haiku Bluetooth Stack. 
+ * The MSB 0xE is chosen for this purpose
+ */
+ 
+#define HCI_HAIKU_EVENT_SERVER_QUITTING				0xE0  
+#define HCI_HAIKU_EVENT_DEVICE_REMOVED				0xE1
+
+
 #endif
