@@ -3412,7 +3412,6 @@ BView::_AddChild(BView *child, BView *before)
 		return false;
 
 	if (child->fParent != NULL) {
-printf("BView::_AddChild(): child %p already has parent %p\n", child , child->fParent);
 		debugger("AddChild failed - the view already has a parent.");
 		return false;
 	}
@@ -4196,7 +4195,7 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flag
 	
 	// initialize members
 	if ((resizingMode & ~_RESIZE_MASK_) || (flags & _RESIZE_MASK_))
-		printf("BView::InitData(): resizing mode or flags swapped\n");
+		printf("%s BView::InitData(): resizing mode or flags swapped\n", name);
 
 	// There are applications that swap the resize mask and the flags in the
 	// BView constructor. This does not cause problems under BeOS as it just
