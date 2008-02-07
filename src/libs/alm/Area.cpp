@@ -15,6 +15,7 @@
 
 #include <algorithm>	// for max
 
+using namespace std;
 
 BSize Area::kMaxSize(INT_MAX, INT_MAX);
 BSize Area::kMinSize(0, 0);
