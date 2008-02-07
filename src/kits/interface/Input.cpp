@@ -1,30 +1,14 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		Input.cpp
-//	Author:			Marc Flerackers (mflerackers@androme.be)
-//	Description:	Functions and class to manage input devices.
-//------------------------------------------------------------------------------
+/*
+ * Copyright (c) 2001-2008, Haiku, Inc.
+ * Distributed under the terms of the MIT license.
+ * 
+ * Author:			Marc Flerackers (mflerackers@androme.be)
+ * Description:		Functions and class to manage input devices.
+ */
+
 #include <stdlib.h>
 #include <string.h>
+#include <new>
 
 #include <Input.h>
 #include <List.h>
@@ -50,15 +34,17 @@ find_input_device(const char *name)
 	if (err != B_OK)
 		return NULL;
 
-	BInputDevice *dev = new BInputDevice;
-
+	BInputDevice *dev = new (std::nothrow) BInputDevice;
+	if (dev == NULL)
+		return NULL;
+		
 	const char *device;
 	int32 type;
 
 	reply.FindString("device", &device);
 	reply.FindInt32("type", &type);
 	
-	dev->set_name_and_type(device, (input_device_type)type);
+	dev->_SetNameAndType(device, (input_device_type)type);
 
 	return dev;
 }
@@ -84,11 +70,11 @@ get_input_devices(BList *list)
 	while (reply.FindString("device", i, &name) == B_OK) {
 		reply.FindInt32("type", i++, &type);
 
-		BInputDevice *dev = new BInputDevice;
-
-		dev->set_name_and_type(name, (input_device_type)type);
-
-		list->AddItem(dev);
+		BInputDevice *dev = new (std::nothrow) BInputDevice;
+		if (dev != NULL) {
+			dev->_SetNameAndType(name, (input_device_type)type);
+			list->AddItem(dev);
+		}
 	}
 
 	return err;
@@ -244,17 +230,18 @@ BInputDevice::Control(input_device_type type, uint32 code,
 
 
 BInputDevice::BInputDevice()
+	:
+	fName(NULL),
+	fType(B_UNDEFINED_DEVICE)
 {
-	fName = NULL;
-	fType = B_UNDEFINED_DEVICE;
 }
 
 
 void
-BInputDevice::set_name_and_type(const char *name, input_device_type type)
+BInputDevice::_SetNameAndType(const char *name, input_device_type type)
 {
 	if (fName) {
-		free (fName);
+		free(fName);
 		fName = NULL;
 	}
 
@@ -268,9 +255,12 @@ BInputDevice::set_name_and_type(const char *name, input_device_type type)
 status_t
 _control_input_server_(BMessage *command, BMessage *reply)
 {
-	if (!sInputServer)
-		sInputServer = new BMessenger;
-
+	if (!sInputServer) {
+		sInputServer = new (std::nothrow) BMessenger;
+		if (!sInputServer)
+			return B_NO_MEMORY;
+	}
+	
 	if (!sInputServer->IsValid())
 		*sInputServer = BMessenger("application/x-vnd.Be-input_server", -1, NULL);
 		
