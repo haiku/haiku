@@ -16,10 +16,11 @@
 
 // macros that enable tracing for individual components
 
+//#define BMESSAGE_TRACING
 //#define BLOCK_CACHE_TRANSACTION_TRACING
+//#define RUNTIME_LOADER_TRACING
 //#define SIGNAL_TRACING
 //#define SYSCALL_TRACING
 //#define TEAM_TRACING
-//#define BMESSAGE_TRACING
 
 #endif	// KERNEL_TRACING_CONFIG_H

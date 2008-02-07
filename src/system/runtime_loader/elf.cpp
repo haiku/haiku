@@ -13,17 +13,18 @@
 
 #include <OS.h>
 
-#include <elf32.h>
-#include <user_runtime.h>
-#include <syscalls.h>
-#include <vm_types.h>
-#include <arch/cpu.h>
-#include <sem.h>
-#include <runtime_loader.h>
-
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <arch/cpu.h>
+#include <elf32.h>
+#include <runtime_loader.h>
+#include <sem.h>
+#include <syscalls.h>
+#include <tracing_config.h>
+#include <user_runtime.h>
+#include <vm_types.h>
 
 
 //#define TRACE_RLD
@@ -110,6 +111,28 @@ dprintf(const char *format, ...)
 #else
 #	define FATAL(x...) printf("runtime_loader: " x);
 #endif
+
+
+#ifdef RUNTIME_LOADER_TRACING
+
+void
+ktrace_printf(const char *format, ...)
+{
+	va_list list;
+	va_start(list, format);
+
+	char buffer[1024];
+	vsnprintf(buffer, sizeof(buffer), format, list);
+	_kern_ktrace_output(buffer);
+
+	va_end(list);
+}
+
+#define KTRACE(x...)	ktrace_printf(x)
+
+#else
+#	define KTRACE(x...)
+#endif	// RUNTIME_LOADER_TRACING
 
 
 static void
@@ -955,9 +978,14 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		if (found) {
 			atomic_add(&found->ref_count, 1);
 			*_image = found;
+			KTRACE("rld: load_container(\"%s\", type: %d, rpath: \"%s\") "
+				"already loaded", name, type, rpath);
 			return B_OK;
 		}
 	}
+
+	KTRACE("rld: load_container(\"%s\", type: %d, rpath: \"%s\")", name, type,
+		rpath);
 
 	strlcpy(path, name, sizeof(path));
 
@@ -965,6 +993,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	fd = open_executable(path, type, rpath);
 	if (fd < 0) {
 		FATAL("cannot open file %s\n", path);
+		KTRACE("rld: load_container(\"%s\"): failed to open file", name);
 		return fd;
 	}
 
@@ -1000,6 +1029,8 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		if (found) {
 			atomic_add(&found->ref_count, 1);
 			*_image = found;
+			KTRACE("rld: load_container(\"%s\"): already loaded after all",
+				name);
 			return B_OK;
 		}
 	}
@@ -1080,6 +1111,9 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	sLoadedImageCount++;
 
 	*_image = image;
+
+	KTRACE("rld: load_container(\"%s\"): done: id: %ld", name, image->id);
+
 	return B_OK;
 
 err3:
@@ -1088,6 +1122,10 @@ err2:
 	delete_image_struct(image);
 err1:
 	_kern_close(fd);
+
+	KTRACE("rld: load_container(\"%s\"): failed: %s", name,
+		strerror(status));
+
 	return status;
 }
 
@@ -1124,9 +1162,14 @@ load_dependencies(image_t *image)
 	if (image->num_needed == 0)
 		return B_OK;
 
+	KTRACE("rld: load_dependencies(\"%s\", id: %ld)", image->name,
+		image->id);
+
 	image->needed = (image_t**)malloc(image->num_needed * sizeof(image_t *));
 	if (image->needed == NULL) {
 		FATAL("failed to allocate needed struct\n");
+		KTRACE("rld: load_dependencies(\"%s\", id: %ld) failed: no memory",
+			image->name, image->id);
 		return B_NO_MEMORY;
 	}
 
@@ -1153,8 +1196,12 @@ load_dependencies(image_t *image)
 					}
 
 					// Collect all missing libraries in case we report back
-					if (!reportErrors)
+					if (!reportErrors) {
+						KTRACE("rld: load_dependencies(\"%s\", id: %ld) "
+							"failed: %s", image->name, image->id,
+							strerror(status));
 						return status;
+					}
 				}
 
 				j += 1;
@@ -1167,13 +1214,22 @@ load_dependencies(image_t *image)
 		}
 	}
 
-	if (status < B_OK)
+	if (status < B_OK) {
+		KTRACE("rld: load_dependencies(\"%s\", id: %ld) "
+			"failed: %s", image->name, image->id,
+			strerror(status));
 		return status;
+	}
 
 	if (j != image->num_needed) {
 		FATAL("Internal error at load_dependencies()");
+		KTRACE("rld: load_dependencies(\"%s\", id: %ld) "
+			"failed: internal error", image->name, image->id);
 		return B_ERROR;
 	}
+
+	KTRACE("rld: load_dependencies(\"%s\", id: %ld) done", image->name,
+		image->id);
 
 	return B_OK;
 }
@@ -1297,6 +1353,8 @@ load_program(char const *path, void **_entry)
 	status_t status;
 	image_t *image;
 
+	KTRACE("rld: load_program(\"%s\")", path);
+
 	rld_lock();
 		// for now, just do stupid simple global locking
 
@@ -1348,9 +1406,15 @@ load_program(char const *path, void **_entry)
 	*_entry = (void *)(sProgramImage->entry_point);
 
 	rld_unlock();
+
+	KTRACE("rld: load_program(\"%s\") done: entry: %p, id: %ld", path,
+		*_entry, sProgramImage->id);
+
 	return sProgramImage->id;
 
 err:
+	KTRACE("rld: load_program(\"%s\") failed: %s", path, strerror(status));
+
 	delete_image(sProgramImage);
 
 	if (report_errors()) {
@@ -1383,6 +1447,8 @@ load_library(char const *path, uint32 flags, bool addOn)
 	// ToDo: implement flags
 	(void)flags;
 
+	KTRACE("rld: load_library(\"%s\", 0x%lx, %d)", path, flags, addOn);
+
 	rld_lock();
 		// for now, just do stupid simple global locking
 
@@ -1393,6 +1459,8 @@ load_library(char const *path, uint32 flags, bool addOn)
 		if (image) {
 			atomic_add(&image->ref_count, 1);
 			rld_unlock();
+			KTRACE("rld: load_library(\"%s\"): already loaded: %ld", path,
+				image->id);
 			return image->id;
 		}
 	}
@@ -1400,6 +1468,8 @@ load_library(char const *path, uint32 flags, bool addOn)
 	status = load_container(path, type, NULL, &image);
 	if (status < B_OK) {
 		rld_unlock();
+		KTRACE("rld: load_library(\"%s\") failed to load container: %s", path,
+			strerror(status));
 		return status;
 	}
 
@@ -1417,9 +1487,14 @@ load_library(char const *path, uint32 flags, bool addOn)
 	init_dependencies(image, true);
 
 	rld_unlock();
+
+	KTRACE("rld: load_library(\"%s\") done: id: %ld", path, image->id);
+
 	return image->id;
 
 err:
+	KTRACE("rld: load_library(\"%s\") failed: %s", path, strerror(status));
+
 	dequeue_image(&sLoadedImages, image);
 	sLoadedImageCount--;
 	delete_image(image);
