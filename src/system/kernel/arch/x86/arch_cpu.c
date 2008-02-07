@@ -66,7 +66,8 @@ extern void reboot(void);
 void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
 bool gHasSSE = false;
 
-static vint32 sWaitAllCPUs;
+static uint32 sCpuRendezvous;
+static uint32 sCpuRendezvous2;
 
 segment_descriptor *gGDT = NULL;
 
@@ -114,9 +115,7 @@ set_mtrr(void *_parameter, int cpu)
 	struct set_mtrr_parameter *parameter = (struct set_mtrr_parameter *)_parameter;
 
 	// wait until all CPUs have arrived here
-	atomic_add(&sWaitAllCPUs, 1);
-	while (sWaitAllCPUs != smp_get_num_cpus())
-		asm volatile ("pause;");
+	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
 
 	disable_caches();
 
@@ -126,9 +125,7 @@ set_mtrr(void *_parameter, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	atomic_add(&sWaitAllCPUs, -1);
-	while (sWaitAllCPUs != 0)
-		asm volatile ("pause;");
+	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
 }
 
 
@@ -136,9 +133,7 @@ static void
 init_mtrrs(void *_unused, int cpu)
 {
 	// wait until all CPUs have arrived here
-	atomic_add(&sWaitAllCPUs, 1);
-	while (sWaitAllCPUs != smp_get_num_cpus())
-		asm volatile ("pause;");
+	smp_cpu_rendezvous(&sCpuRendezvous, cpu);
 
 	disable_caches();
 
@@ -147,9 +142,7 @@ init_mtrrs(void *_unused, int cpu)
 	enable_caches();
 
 	// wait until all CPUs have arrived here
-	atomic_add(&sWaitAllCPUs, -1);
-	while (sWaitAllCPUs != 0)
-		asm volatile ("pause;");
+	smp_cpu_rendezvous(&sCpuRendezvous2, cpu);
 }
 
 
@@ -174,6 +167,7 @@ x86_set_mtrr(uint32 index, uint64 base, uint64 length, uint8 type)
 	parameter.length = length;
 	parameter.type = type;
 
+	sCpuRendezvous = sCpuRendezvous2 = 0;
 	call_all_cpus(&set_mtrr, &parameter);
 }
 
@@ -549,8 +543,10 @@ arch_cpu_init_post_modules(kernel_args *args)
 	close_module_list(cookie);
 
 	// initialize MTRRs if available
-	if (x86_count_mtrrs() > 0)
+	if (x86_count_mtrrs() > 0) {
+		sCpuRendezvous = sCpuRendezvous2 = 0;
 		call_all_cpus(&init_mtrrs, NULL);
+	}
 
 	// get optimized functions from the CPU module
 	if (sCpuModule != NULL && sCpuModule->get_optimized_functions != NULL) {
