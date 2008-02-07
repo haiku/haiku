@@ -1,6 +1,7 @@
 #include <Application.h>
 #include <Archivable.h>
 #include <Box.h>
+#include <Dragger.h>
 #include <Message.h>
 #include <Path.h>
 #include <Shelf.h>
@@ -45,8 +46,8 @@ App::App()
 
 // Window
 Window::Window()
-	:BWindow(BRect(20, 20, 300, 300), "RepliTerminal",
-			B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_QUIT_ON_WINDOW_CLOSE)
+	:BWindow(BRect(100, 100, 400, 360), "RepliTerminal",
+			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS|B_QUIT_ON_WINDOW_CLOSE)
 {
 	AttachTermView();
 }

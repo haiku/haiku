@@ -267,7 +267,7 @@ TermView::_InitObject(int32 argc, const char **argv)
 		return status;
 	
 	// We need this
-	SetFlags(Flags() | B_WILL_DRAW);
+	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
 	
 	SetLowColor(fTextBackColor);
 	SetViewColor(fTextBackColor);

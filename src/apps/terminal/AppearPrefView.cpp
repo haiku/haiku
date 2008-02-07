@@ -43,20 +43,20 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 
 	BMenu *menu = _MakeFontMenu(MSG_HALF_FONT_CHANGED,
 		PrefHandler::Default()->getString(PREF_HALF_FONT_FAMILY));
-	fFont = new BMenuField(r, "font", "Font:", menu, B_WILL_DRAW);
+	fFont = new BMenuField(r, "font", "Font:", menu);
 	fFont->SetDivider(fontDividerSize);
 	AddChild(fFont);
 
 	r.OffsetBy(r.Width() + 10, 0);
 	menu = _MakeSizeMenu(MSG_HALF_SIZE_CHANGED,
 		PrefHandler::Default()->getInt32(PREF_HALF_FONT_SIZE));
-	fFontSize = new BMenuField(r, "size", "Size:", menu, B_WILL_DRAW);
+	fFontSize = new BMenuField(r, "size", "Size:", menu);
 	fFontSize->SetDivider(sizeDividerSize);
 	AddChild(fFontSize);
 
 	r.OffsetBy(-r.Width() - 10,r.Height() + 25);
 	fColorField = new BMenuField(r, "color", "Change:",
-		MakeMenu(MSG_COLOR_FIELD_CHANGED, color_tbl, color_tbl[0]), B_WILL_DRAW);
+		MakeMenu(MSG_COLOR_FIELD_CHANGED, color_tbl, color_tbl[0]));
 	fColorField->SetDivider(StringWidth(fColorField->Label()) + 8.0);
 	AddChild(fColorField);
 
