@@ -417,6 +417,13 @@ class PostSyscall : public AbstractTraceEntry {
 			fReturnValue(returnValue)
 		{
 			Initialized();
+#if 0
+			if (returnValue != (returnValue & 0xffffffff)
+				&& kExtendedSyscallInfos[syscall].return_type.size <= 4) {
+				panic("syscall return value 64 bit although it should be 32 "
+					"bit");
+			}
+#endif
 		}
 
 		virtual void AddDump(TraceOutput& out)
