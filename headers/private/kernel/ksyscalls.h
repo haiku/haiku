@@ -24,10 +24,17 @@ typedef struct syscall_parameter_info {
 	type_code	type;
 } syscall_parameter_info;
 
+typedef struct syscall_return_type_info {
+	int			size;
+	int			used_size;
+	type_code	type;
+} syscall_return_type_info;
+
 typedef struct extended_syscall_info {
-	const char*				name;
-	int						parameter_count;
-	syscall_parameter_info	parameters[MAX_SYSCALL_PARAMETERS];
+	const char*					name;
+	int							parameter_count;
+	syscall_return_type_info	return_type;
+	syscall_parameter_info		parameters[MAX_SYSCALL_PARAMETERS];
 } extended_syscall_info;
 
 

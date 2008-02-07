@@ -419,6 +419,14 @@ public:
 			file << "\t{" << endl;
 			file << "\t\t\"" << syscall->Name() << "\", " << paramCount << ","
 				<< endl;
+
+			// return type
+			Type* returnType = syscall->ReturnType();
+			file << "\t\t{ " << returnType->Size() << ", "
+				<< returnType->UsedSize() << ", "
+				<< _GetTypeCode(returnType) << " }," << endl;
+
+			// parameters
 			file << "\t\t{" << endl;
 
 			for (int k = 0; k < paramCount; k++) {
