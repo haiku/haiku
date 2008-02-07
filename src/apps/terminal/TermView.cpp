@@ -235,6 +235,9 @@ TermView::TermView(BMessage *archive)
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
 		fTermRows = ROWS_DEFAULT;
 	
+	// We need this
+	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
+	
 	// TODO: Retrieve arguments, colors, history size, etc. from archive
 	_InitObject(0, NULL);
 }
@@ -266,8 +269,6 @@ TermView::_InitObject(int32 argc, const char **argv)
 	if (status < B_OK)
 		return status;
 	
-	// We need this
-	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
 	
 	SetLowColor(fTextBackColor);
 	SetViewColor(fTextBackColor);
@@ -364,6 +365,9 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	if (resize)
 		ResizeTo(rect.Width(), rect.Height());
 
+	if (fScrollBar != NULL)
+		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
+	
 	return rect;
 }
 
@@ -424,7 +428,6 @@ TermView::GetTermFont(BFont *font) const
 void
 TermView::SetTermFont(const BFont *font)
 {
-	char buf[4];
 	int halfWidth = 0;
 
 	fHalfFont = font;
@@ -434,6 +437,7 @@ TermView::SetTermFont(const BFont *font)
 	// calculate half font's max width
 	// Not Bounding, check only A-Z(For case of fHalfFont is KanjiFont. )
 	for (int c = 0x20 ; c <= 0x7e; c++){
+		char buf[4];
 		sprintf(buf, "%c", c);
 		int tmpWidth = (int)fHalfFont.StringWidth(buf);
 		if (tmpWidth > halfWidth)
