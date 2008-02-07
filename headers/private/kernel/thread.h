@@ -34,7 +34,7 @@ void thread_reset_for_exec(void);
 
 status_t thread_init(struct kernel_args *args);
 status_t thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum);
-void thread_yield(void);
+void thread_yield(bool force);
 void thread_exit(void);
 
 int32 thread_max_threads(void);

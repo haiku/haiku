@@ -959,7 +959,7 @@ page_writer(void* /*unused*/)
 				if (cache->store->ops->acquire_unreferenced_ref(cache->store)
 						!= B_OK) {
 					cacheLocker.Unlock();
-					thread_yield();
+					thread_yield(true);
 					continue;
 				}
 			}

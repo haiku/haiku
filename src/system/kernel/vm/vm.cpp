@@ -718,7 +718,7 @@ MultiAddressSpaceLocker::AddAreaCacheAndLock(area_id areaID,
 			memcpy(fItems, originalItems, fCount * sizeof(lock_item));
 
 		if (yield)
-			thread_yield();
+			thread_yield(true);
 	}
 }
 
@@ -3941,7 +3941,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			// with his only consumer (cacheRef); since its pages are moved
 			// upwards, too, we try this cache again
 			mutex_unlock(&cache->lock);
-			thread_yield();
+			thread_yield(true);
 			mutex_lock(&cache->lock);
 			if (cache->busy) {
 				// The cache became busy, which means, it is about to be

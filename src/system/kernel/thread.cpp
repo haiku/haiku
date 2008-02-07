@@ -1622,29 +1622,45 @@ peek_next_thread_id(void)
 }
 
 
+/*!	Yield the CPU to other threads.
+	If \a force is \c true, the thread will almost guaranteedly be unscheduled.
+	If \c false, it will continue to run, if there's no other thread in ready
+	state, and if it has a higher priority than the other ready threads, it
+	still has a good chance to continue.
+*/
 void
-thread_yield(void)
+thread_yield(bool force)
 {
-	// snooze for roughly 3 thread quantums
-	snooze_etc(9000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT);
+	if (force) {
+		// snooze for roughly 3 thread quantums
+		snooze_etc(9000, B_SYSTEM_TIMEBASE, B_RELATIVE_TIMEOUT | B_CAN_INTERRUPT);
 #if 0
-	cpu_status state;
+		cpu_status state;
 
-	struct thread *thread = thread_get_current_thread();
-	if (thread == NULL)
-		return;
+		struct thread *thread = thread_get_current_thread();
+		if (thread == NULL)
+			return;
 
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
+		state = disable_interrupts();
+		GRAB_THREAD_LOCK();
 
-	// mark the thread as yielded, so it will not be scheduled next
-	//thread->was_yielded = true;
-	thread->next_priority = B_LOWEST_ACTIVE_PRIORITY;
-	scheduler_reschedule();
+		// mark the thread as yielded, so it will not be scheduled next
+		//thread->was_yielded = true;
+		thread->next_priority = B_LOWEST_ACTIVE_PRIORITY;
+		scheduler_reschedule();
 
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
 #endif
+	} else {
+		struct thread *thread = thread_get_current_thread();
+		if (thread == NULL)
+			return;
+
+		// Don't force the thread off the CPU, just reschedule.
+		InterruptsSpinLocker _(thread_spinlock);
+		scheduler_reschedule();
+	}
 }
 
 
@@ -2463,7 +2479,7 @@ _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 void
 _user_thread_yield(void)
 {
-	thread_yield();
+	thread_yield(true);
 }
 
 
