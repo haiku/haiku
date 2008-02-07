@@ -265,7 +265,13 @@ TermView::_InitObject(int32 argc, const char **argv)
 	status = _AttachShell(fShell);
 	if (status < B_OK)
 		return status;
-		
+	
+	// We need this
+	SetFlags(Flags() | B_WILL_DRAW);
+	
+	SetLowColor(fTextBackColor);
+	SetViewColor(fTextBackColor);
+	
 	return B_OK;
 }
 
