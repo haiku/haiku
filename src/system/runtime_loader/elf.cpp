@@ -997,29 +997,10 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		return fd;
 	}
 
-	// If the path is not absolute, we prepend the CWD to make it one.
-	if (path[0] != '/') {
-		char relativePath[PATH_MAX];
-		if (!strncmp(path, "./", 2))
-			strcpy(relativePath, path + 2);
-		else
-			strcpy(relativePath, path);
-
-		// get the CWD
-		status = _kern_getcwd(path, sizeof(path));
-		if (status < B_OK) {
-			FATAL("_kern_getcwd() failed\n");
-			goto err1;
-		}
-
-		if (strlcat(path, "/", sizeof(path)) >= sizeof(path)
-			|| strlcat(path, relativePath, sizeof(path)) >= sizeof(path)) {
-			status = B_NAME_TOO_LONG;
-			FATAL("Absolute path of image %s is too "
-				"long!\n", relativePath);
-			goto err1;
-		}
-	}
+	// normalize the image path
+	status = _kern_normalize_path(path, true, path);
+	if (status != B_OK)
+		goto err1;
 
 	// Test again if this image has been registered already - this time,
 	// we can check the full path, not just its name as noted.
