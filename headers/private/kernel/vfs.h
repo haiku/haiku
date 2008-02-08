@@ -137,6 +137,8 @@ status_t _user_get_next_fd_info(team_id team, uint32 *cookie, struct fd_info *in
 			size_t infoSize);
 status_t _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 			char *userPath, size_t pathLength);
+status_t _user_normalize_path(const char* userPath, bool traverseLink,
+			char* buffer);
 int _user_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, int perms);
 int _user_open(int fd, const char *path, int openMode, int perms);
 int _user_open_dir_node_ref(dev_t device, ino_t inode);

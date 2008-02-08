@@ -143,6 +143,8 @@ extern dev_t		_kern_next_device(int32 *_cookie);
 extern status_t		_kern_sync(void);
 extern status_t		_kern_entry_ref_to_path(dev_t device, ino_t inode,
 						const char *leaf, char *userPath, size_t pathLength);
+extern status_t		_kern_normalize_path(const char* userPath,
+						bool traverseLink, char* buffer);
 extern int			_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int openMode, int perms);
 extern int			_kern_open(int fd, const char *path, int openMode, int perms);
 extern int			_kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name);
