@@ -35,18 +35,18 @@ THE SOFTWARE.
 #include <Directory.h>
 #include <Message.h>
 
-// int transport_features; symbol name
+#define B_TRANSPORT_LIST_PORTS_SYMBOL	"list_transport_ports"
 #define B_TRANSPORT_FEATURES_SYMBOL	"transport_features"
 
 // Bit values for 'transport_features'
 enum {
-	B_TRANSPORT_SUPPORTS_PROBE	= 1,
-	B_TRANSPORT_SUPPORTS_SHARING	= 2,
+	B_TRANSPORT_IS_HOTPLUG	= 1,
+	B_TRANSPORT_IS_NETWORK	= 2,
 };
 
 // to be implemented by the transport add-on
 extern "C" BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg);
-extern "C" status_t install_transport_probe(void);
+extern "C" status_t list_transport_ports(BMessage* msg);
 
 #endif
 

@@ -17,6 +17,8 @@
 static property_info prop_list[] = {
 	{ "Name", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
 		"Get name of transport" }, 
+	{ "Ports", { B_GET_PROPERTY }, { B_DIRECT_SPECIFIER },
+		"Get currently available ports/devices" },
 	{ 0 } // terminate list 
 };
 
@@ -33,8 +35,16 @@ void Transport::HandleScriptingCommand(BMessage* msg)
 		switch(msg->what) {
 			case B_GET_PROPERTY:
 				if (propName == "Name")
-					result = fName;
-				else { // If unknown scripting request, let superclas handle it
+					result = Name();
+				else if (propName == "Ports") {
+					// Need to duplicate messaging code, as our result is a complex
+					// bmessage, not a string :(
+					BMessage reply(B_REPLY);
+					rc = ListAvailablePorts(&reply);
+					reply.AddInt32("error", rc);
+					msg->SendReply(&reply);
+					break;
+				} else { // If unknown scripting request, let superclas handle it
 					Inherited::MessageReceived(msg);
 					break;
 				}

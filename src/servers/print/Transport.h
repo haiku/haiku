@@ -24,7 +24,9 @@ public:
 	Transport(const BPath& path);
 	~Transport();
 
-	const BString& Name() const { return fName; }
+	BString Name() const { return fPath.Leaf(); }
+
+	status_t ListAvailablePorts(BMessage* msg);
 
 	static status_t Scan(directory_which which);
 
@@ -42,7 +44,7 @@ public:
 								int32 form, const char* prop);
 	
 private:
-	BString fName;
+	BPath fPath;
 	long fImageID;
 	int fFeatures;
 

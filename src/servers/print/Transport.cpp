@@ -112,7 +112,7 @@ status_t Transport::Scan(directory_which which)
 // ---------------------------------------------------------------
 Transport::Transport(const BPath& path)
 	: BHandler(B_EMPTY_STRING),
-	fName(path.Leaf()),
+	fPath(path),
 	fImageID(-1),
 	fFeatures(0)
 {
@@ -130,9 +130,8 @@ Transport::Transport(const BPath& path)
 	} else {
 		fFeatures = *transport_features_ptr;
 
-		if (*transport_features_ptr & B_TRANSPORT_SUPPORTS_PROBE) {
-			// Transport supports probing, so it needs to stay loaded...
-			printf("IRA: Transport %s supports probing!\n", path.Path());
+		if (*transport_features_ptr & B_TRANSPORT_IS_HOTPLUG) {
+			// We are hotpluggable; so keep us loaded!
 			fImageID = id;
 		}
 		else // No extended Transport support; so no need to keep loaded
@@ -146,6 +145,33 @@ Transport::Transport(const BPath& path)
 Transport::~Transport()
 {
 	sTransports.RemoveItem(this);
+}
+
+// ---------------------------------------------------------------
+status_t Transport::ListAvailablePorts(BMessage* msg)
+{
+	status_t (*list_ports)(BMessage*);
+	image_id id = fImageID;
+	status_t rc = B_OK;
+
+	// Load image if not loaded yet
+	if (id == -1 && (id=load_add_on(fPath.Path())) < 0)
+		return id;
+
+	// Get pointer to addon function
+	if ((rc=get_image_symbol(id, B_TRANSPORT_LIST_PORTS_SYMBOL, 
+			B_SYMBOL_TYPE_TEXT, (void**)&list_ports)) != B_OK)
+		goto done;
+
+	// run addon...
+	rc = (*list_ports)(msg);
+
+done:
+	// clean up if needed
+	if (fImageID != id)
+		unload_add_on(id);
+
+	return rc;
 }
 
 // ---------------------------------------------------------------
