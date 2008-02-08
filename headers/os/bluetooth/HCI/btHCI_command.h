@@ -20,9 +20,9 @@ struct hci_command_header {
 
 
 /* Command opcode pack/unpack */
-#define hci_opcode_pack(ogf, ocf)	(uint16)((ocf & 0x03ff)|(ogf << 10))
-#define hci_opcode_ogf(op)		(op >> 10)
-#define hci_opcode_ocf(op)		(op & 0x03ff)
+#define PACK_OPCODE(ogf, ocf)	(uint16)((ocf & 0x03ff)|(ogf << 10))
+#define GET_OPCODE_OGF(op)		(op >> 10)
+#define GET_OPCODE_OCF(op)		(op & 0x03ff)
 
 
 /* - Informational Parameters Command definition - */
