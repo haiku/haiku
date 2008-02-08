@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai. 
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -228,6 +228,9 @@ TermView::TermView(BMessage *archive)
 	fMouseTracking(false),
 	fIMflag(false)	
 {
+	// We need this
+	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
+	
 	if (archive->FindInt32("encoding", (int32 *)&fEncoding) < B_OK)
 		fEncoding = M_UTF8;
 	if (archive->FindInt32("columns", (int32 *)&fTermColumns) < B_OK)
@@ -235,11 +238,19 @@ TermView::TermView(BMessage *archive)
 	if (archive->FindInt32("rows", (int32 *)&fTermRows) < B_OK)
 		fTermRows = ROWS_DEFAULT;
 	
-	// We need this
-	SetFlags(Flags() | B_WILL_DRAW | B_PULSE_NEEDED);
+	int32 argc = 0;
+	if (archive->HasInt32("argc"))
+		archive->FindInt32("argc", &argc);
+		
+	const char **argv = new const char*[argc];	
+	for (int32 i = 0; i < argc; i++) {
+		archive->FindString("argv", i, (const char **)&argv[i]);
+	}
 	
-	// TODO: Retrieve arguments, colors, history size, etc. from archive
-	_InitObject(0, NULL);
+	// TODO: Retrieve colors, history size, etc. from archive
+	_InitObject(argc, argv);
+	
+	delete[] argv;
 }
 
 
@@ -364,9 +375,6 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 
 	if (resize)
 		ResizeTo(rect.Width(), rect.Height());
-
-	if (fScrollBar != NULL)
-		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
 	
 	return rect;
 }
@@ -1285,6 +1293,10 @@ TermView::AttachedToWindow()
 	BMessage message(kUpdateSigWinch);
 	fWinchRunner = new (std::nothrow) BMessageRunner(BMessenger(this), &message, 500000);
 
+	// TODO: Since we can also be a replicant, messing
+	// with the window, which is not ours, is not nice:
+	// Switch to using a BMessageRunner for the
+	// blinking caret too.
 	Window()->SetPulseRate(1000000);
 }
 
@@ -1593,6 +1605,9 @@ TermView::FrameResized(float width, float height)
 	fTermColumns = cols;
 
 	fFrameResized = true;
+	
+	if (fScrollBar != NULL)
+		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
 }
 
 
