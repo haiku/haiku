@@ -7,6 +7,7 @@
  */
 #include "PrintServerApp.h"
 
+#include "Transport.h"
 #include "Printer.h"
 
 	// BeOS API
@@ -26,6 +27,10 @@ static property_info prop_list[] = {
 		"Delete a specific printer" },
 	{ "Printers", { B_COUNT_PROPERTIES }, { B_DIRECT_SPECIFIER },
 		"Return the number of available printers" },
+	{ "Transport", { B_GET_PROPERTY }, { B_INDEX_SPECIFIER, B_NAME_SPECIFIER, B_REVERSE_INDEX_SPECIFIER },
+		"Retrieve a specific transport" },
+	{ "Transports", { B_COUNT_PROPERTIES }, { B_DIRECT_SPECIFIER },
+		"Return the number of available transports" },
 	{ "UseConfigWindow", { B_GET_PROPERTY, B_SET_PROPERTY }, { B_DIRECT_SPECIFIER },
 		"Show configuration window" },
 	{ 0 } // terminate list 
@@ -110,6 +115,11 @@ PrintServerApp::HandleScriptingCommand(BMessage* msg)
 					reply.AddInt32("result", Printer::CountPrinters());
 					reply.AddInt32("error", B_OK);
 					msg->SendReply(&reply);
+				} else if (propName == "Transports") {
+					BMessage reply(B_REPLY);
+					reply.AddInt32("result", Transport::CountTransports());
+					reply.AddInt32("error", B_OK);
+					msg->SendReply(&reply);
 				}
 				break;
 		}
@@ -147,13 +157,44 @@ Printer* PrintServerApp::GetPrinterFromSpecifier(BMessage* msg)
 	return NULL;
 }
 
+Transport* PrintServerApp::GetTransportFromSpecifier(BMessage* msg)
+{
+	switch(msg->what) {
+		case B_NAME_SPECIFIER: {
+			BString name;
+			if (msg->FindString("name", &name) == B_OK) {
+				return Transport::Find(name);
+			}
+			break;
+		}
+		
+		case B_INDEX_SPECIFIER: {
+			int32 idx;
+			if (msg->FindInt32("index", &idx) == B_OK) {
+				return Transport::At(idx);
+			}
+			break;
+		}
+
+		case B_REVERSE_INDEX_SPECIFIER: {
+			int32 idx;
+			if (msg->FindInt32("index", &idx) == B_OK) {
+				return Transport::At(Transport::CountTransports() - idx);
+			}
+			break;
+		}
+	}
+	
+	return NULL;
+}
+
 BHandler*
 PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 								int32 form, const char* prop)
 {
 	BPropertyInfo prop_info(prop_list);
 	BHandler* rc = NULL;
-		
+
 	int32 idx;
 	switch( idx=prop_info.FindMatch(msg,0,spec,form,prop) ) {
 		case B_ERROR:
@@ -162,6 +203,17 @@ PrintServerApp::ResolveSpecifier(BMessage* msg, int32 index, BMessage* spec,
 			// GET Printer [arg]
 		case 1:
 			if ((rc=GetPrinterFromSpecifier(spec)) == NULL) {		
+				BMessage reply(B_REPLY);
+				reply.AddInt32("error", B_BAD_INDEX);
+				msg->SendReply(&reply);
+			}
+			else
+				msg->PopSpecifier();
+			break;
+
+			// GET Transport [arg]
+		case 5:
+			if ((rc=GetTransportFromSpecifier(spec)) == NULL) {
 				BMessage reply(B_REPLY);
 				reply.AddInt32("error", B_BAD_INDEX);
 				msg->SendReply(&reply);

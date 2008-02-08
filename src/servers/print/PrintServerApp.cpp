@@ -11,6 +11,7 @@
 #include "BeUtils.h"
 #include "Printer.h"
 #include "pr_server.h"
+#include "Transport.h"
 
 // BeOS API
 #include <Alert.h>
@@ -90,6 +91,11 @@ PrintServerApp::PrintServerApp(status_t* err)
 		
 	fHasReferences = create_sem(1, "has_references");
 	
+	// Build list of transport addons
+	Transport::Scan(B_USER_ADDONS_DIRECTORY);
+	Transport::Scan(B_COMMON_ADDONS_DIRECTORY);
+	Transport::Scan(B_BEOS_ADDONS_DIRECTORY);
+
 	SetupPrinterList();
 	RetrieveDefaultPrinter();
 	

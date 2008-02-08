@@ -7,6 +7,7 @@ SubInclude HAIKU_TOP src servers print shared ;
 SubDir HAIKU_TOP src servers print ;
 
 UsePrivateHeaders shared interface print ;
+UsePrivateHeaders print ;
 
 AddResources
 	print_server
@@ -22,6 +23,8 @@ Server
 	PrintServerApp.Scripting.cpp
 	Printer.Scripting.cpp
 	Printer.cpp
+	Transport.Scripting.cpp
+	Transport.cpp
 	ResourceManager.cpp
 	Settings.cpp
 	ConfigWindow.cpp

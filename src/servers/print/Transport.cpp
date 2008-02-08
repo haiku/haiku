@@ -1,0 +1,174 @@
+/*
+ * Copyright 2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ithamar R. Adema
+ */
+
+#include "Transport.h"
+
+// BeOS API
+#include <PrintTransportAddOn.h>
+#include <Application.h>
+#include <image.h>
+#include <Entry.h>
+
+// ---------------------------------------------------------------
+BObjectList<Transport> Transport::sTransports;
+
+// ---------------------------------------------------------------
+// Find [static]
+//
+// Searches the static object list for a transport object with the
+// specified name.
+//
+// Parameters:
+//    name - Printer definition name we're looking for.
+//
+// Returns:
+//    Pointer to Transport object, or NULL if not found.
+// ---------------------------------------------------------------
+Transport* Transport::Find(const BString& name)
+{
+		// Look in list to find printer definition
+	for (int32 idx=0; idx < sTransports.CountItems(); idx++) {
+		if (name == sTransports.ItemAt(idx)->Name()) {
+			return sTransports.ItemAt(idx);
+		}
+	}
+	
+		// None found, so return NULL
+	return NULL;
+}
+
+// ---------------------------------------------------------------
+Transport* Transport::At(int32 idx)
+{
+	return sTransports.ItemAt(idx);
+}
+
+// ---------------------------------------------------------------
+void Transport::Remove(Transport* transport)
+{
+	sTransports.RemoveItem(transport);
+}
+
+// ---------------------------------------------------------------
+int32 Transport::CountTransports()
+{
+	return sTransports.CountItems();
+}
+
+// ---------------------------------------------------------------
+status_t Transport::Scan(directory_which which)
+{
+	BDirectory dir;
+	status_t rc;
+	BPath path;
+
+	// Try to find specified transport addon directory
+	if ((rc=find_directory(which,&path)) != B_OK)
+		return rc;
+
+	if ((rc=path.Append("Print/transport")) != B_OK)
+		return rc;
+
+	if ((rc=dir.SetTo(path.Path())) != B_OK)
+		return rc;
+
+	// Walk over all entries in directory
+	BEntry entry;
+	while(dir.GetNextEntry(&entry) == B_OK) {
+		if (!entry.IsFile())
+			continue;
+
+		if (entry.GetPath(&path) != B_OK)
+			continue;
+
+		// If we have loaded the transport from a previous scanned directory,
+		// ignore this one.
+		if (Transport::Find(path.Leaf()) != NULL)
+			continue;
+
+		be_app->AddHandler(new Transport(path));
+	}
+
+	return B_OK;
+
+}
+
+// ---------------------------------------------------------------
+// Transport [constructor]
+//
+// Initializes the transport object with data read from the
+// attributes attached to the printer definition node.
+//
+// Parameters:
+//    node - Printer definition node for this printer.
+//
+// Returns:
+//    none.
+// ---------------------------------------------------------------
+Transport::Transport(const BPath& path)
+	: BHandler(B_EMPTY_STRING),
+	fName(path.Leaf()),
+	fImageID(-1),
+	fFeatures(0)
+{
+	// Load transport addon
+	image_id id = ::load_add_on(path.Path());
+	if (id < B_OK)
+		return;
+
+	// Find transport_features symbol, to determine if we need to keep 
+	// this transport loaded
+	int* transport_features_ptr;
+	if (get_image_symbol(id, B_TRANSPORT_FEATURES_SYMBOL, 
+			B_SYMBOL_TYPE_DATA, (void**)&transport_features_ptr) != B_OK) {
+		unload_add_on(id);
+	} else {
+		fFeatures = *transport_features_ptr;
+
+		if (*transport_features_ptr & B_TRANSPORT_SUPPORTS_PROBE) {
+			// Transport supports probing, so it needs to stay loaded...
+			printf("IRA: Transport %s supports probing!\n", path.Path());
+			fImageID = id;
+		}
+		else // No extended Transport support; so no need to keep loaded
+			::unload_add_on(id);
+	}
+
+	sTransports.AddItem(this);
+}
+
+// ---------------------------------------------------------------
+Transport::~Transport()
+{
+	sTransports.RemoveItem(this);
+}
+
+// ---------------------------------------------------------------
+// MessageReceived
+//
+// Handle scripting messages.
+//
+// Parameters:
+//    msg - message.
+// ---------------------------------------------------------------
+void Transport::MessageReceived(BMessage* msg)
+{
+	switch(msg->what) {
+		case B_GET_PROPERTY:
+		case B_SET_PROPERTY:
+		case B_CREATE_PROPERTY:
+		case B_DELETE_PROPERTY:
+		case B_COUNT_PROPERTIES:
+		case B_EXECUTE_PROPERTY:
+			HandleScriptingCommand(msg);
+			break;
+		
+		default:
+			Inherited::MessageReceived(msg);
+	}
+}

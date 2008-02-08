@@ -19,6 +19,7 @@
 #include "Settings.h"
 
 class Printer;
+class Transport;
 
 // The global BLocker for synchronisation.
 extern BLocker *gLock;
@@ -43,6 +44,7 @@ class PrintServerApp : public BApplication, public FolderListener {
 		status_t GetSupportedSuites(BMessage *msg);
 		void HandleScriptingCommand(BMessage *msg);
 		Printer *GetPrinterFromSpecifier(BMessage *msg);
+		Transport *GetTransportFromSpecifier(BMessage *msg);
 		BHandler *ResolveSpecifier(BMessage *msg, int32 index, BMessage *spec,
 			int32 form, const char *prop);
 	private:
