@@ -13,7 +13,7 @@
 #define HCI_EVENT_HDR_SIZE   2
 
 struct hci_event_header {
-	uint8 	evt;
+	uint8 	ecode;
 	uint8 	elen;
 } __attribute__ ((packed));
 
