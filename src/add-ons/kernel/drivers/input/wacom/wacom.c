@@ -18,6 +18,7 @@
 #include <OS.h>
 #include <USB3.h>
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 #define DEBUG_DRIVER 0
 
