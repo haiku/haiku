@@ -4,6 +4,10 @@ SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) half ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) iex ] ;
 
+if $(HAIKU_LIBSTDC++) = libstdc++.r4.so {
+        SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
+}
+
 StaticLibrary libimath.a :
 ImathBox.cpp
 ImathColorAlgo.cpp

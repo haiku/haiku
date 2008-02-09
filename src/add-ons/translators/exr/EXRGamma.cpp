@@ -8,6 +8,8 @@
 #include "ImathFun.h"
 #include "ImathMath.h"
 
+#include <algorithm>
+
 using namespace std;
 using Imath::clamp;
 

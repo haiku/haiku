@@ -20,7 +20,7 @@ Translator EXRTranslator :
 	TranslatorSettings.cpp
 	TranslatorWindow.cpp
 
-	: be translation libilmimf.so
+	: be translation libilmimf.so $(TARGET_LIBSTDC++)
 	: true
 ;
 

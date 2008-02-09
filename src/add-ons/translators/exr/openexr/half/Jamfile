@@ -2,6 +2,10 @@ SubDir HAIKU_TOP src add-ons translators exr openexr half ;
 
 SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 
+if $(HAIKU_LIBSTDC++) = libstdc++.r4.so {
+	SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
+}
+
 StaticLibrary libhalf.a :
 eLut.cpp
 half.cpp

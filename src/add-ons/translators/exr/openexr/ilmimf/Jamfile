@@ -7,6 +7,10 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ilmthread ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) imath ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) config ] ;
 
+if $(HAIKU_LIBSTDC++) = libstdc++.r4.so {
+	SubDirC++Flags -Dios_base=ios -ftemplate-depth-24 ;
+}
+
 UseLibraryHeaders zlib ;
 
 #StaticLibrary libilmimf.a :
