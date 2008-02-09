@@ -657,7 +657,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 			}
 			break;
 		}
-		case B_RGB15: {
+		case B_RGB15: 
+		case B_RGBA15: {
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x * 2;
 			int32 left = x;
@@ -774,7 +775,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 			break;
 
 		default:
-			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported front buffer format!\n");
+			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported front buffer format! (0x%lx)\n", frontBuffer->ColorSpace());
 			break;
 	}
 }
