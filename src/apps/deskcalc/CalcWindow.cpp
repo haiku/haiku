@@ -21,7 +21,7 @@
 #include "CalcView.h"
 
 
-static const char* kWindowTitle		= "Desk Calculator";
+static const char* kWindowTitle		= "DeskCalc";
 
 
 CalcWindow::CalcWindow(BRect frame)

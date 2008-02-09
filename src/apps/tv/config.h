@@ -28,7 +28,7 @@
 #include <InterfaceDefs.h>
 #include <time.h>
 
-#define NAME		"TV-O-Rama"
+#define NAME		"TV"
 #define REVISION	"unknown"
 #define VERSION		"1.1"
 #define BUILD 		__DATE__ " "__TIME__

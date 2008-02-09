@@ -564,7 +564,7 @@ main(int argc, char** argv)
 
 //	BRect frame(10.0, 30.0, 790.0, 590.0);
 	BRect frame(10.0, 30.0, 330.0, 220.0);
-	show_window(frame, "Bitmap Drawing");
+	show_window(frame, "BitmapDrawing");
 
 	app->Run();
 

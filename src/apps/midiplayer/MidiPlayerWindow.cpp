@@ -35,7 +35,7 @@
 //------------------------------------------------------------------------------
 
 MidiPlayerWindow::MidiPlayerWindow()
-	: BWindow(BRect(0, 0, 1, 1), "MIDI Player", B_TITLED_WINDOW, 
+	: BWindow(BRect(0, 0, 1, 1), "MidiPlayer", B_TITLED_WINDOW, 
 	          B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	playing = false;

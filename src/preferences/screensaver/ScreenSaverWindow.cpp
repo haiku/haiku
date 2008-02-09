@@ -574,7 +574,7 @@ ModulesView::_OpenSaver()
 
 
 ScreenSaverWindow::ScreenSaverWindow() 
-	: BWindow(BRect(50, 50, 496, 375), "Screen Saver",
+	: BWindow(BRect(50, 50, 496, 375), "ScreenSaver",
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS /*| B_NOT_ZOOMABLE | B_NOT_RESIZABLE*/)
 {
 	fSettings.Load();

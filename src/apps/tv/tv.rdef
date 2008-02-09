@@ -2,7 +2,7 @@
  * Icon-O-Matic.rdef
  */
 
-resource app_signature "application/x-vnd.MarcusOverhagen.TV-O-Rama";
+resource app_signature "application/x-vnd.MarcusOverhagen.TV";
 
 resource app_version {
 	major  = 1,
@@ -15,8 +15,8 @@ resource app_version {
 
 	internal = 0,
 
-	short_info = "TV-O-Rama",
-	long_info = "TV-O-Rama ©2005-2007 Marcus Overhagen"
+	short_info = "TV",
+	long_info = "TV ©2005-2007 Marcus Overhagen"
 };
 
 resource app_flags B_SINGLE_LAUNCH;
