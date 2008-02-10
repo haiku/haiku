@@ -29,7 +29,8 @@ FontDemoView::FontDemoView(BRect rect)
 	fOutLineLevel(0),
 	fDrawingMode(B_OP_COPY),
 	fBoundingBoxes(false),
-	fDrawShapes(false)
+	fDrawShapes(false),
+	fShapes(NULL)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetString("Haiku, inc.");
