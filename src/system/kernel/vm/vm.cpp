@@ -25,7 +25,7 @@
 #include <vm_cache.h>
 #include <vm_low_memory.h>
 #include <file_cache.h>
-#include <memheap.h>
+#include <heap.h>
 #include <condition_variable.h>
 #include <debug.h>
 #include <console.h>
@@ -3480,16 +3480,8 @@ vm_init(kernel_args *args)
 	vm_page_init_num_pages(args);
 	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
 
-	// reduce the heap size if we have not so much RAM
-	size_t heapSize = HEAP_SIZE;
-	if (sAvailableMemory < 100 * 1024 * 1024)
-		heapSize /= 4;
-	else if (sAvailableMemory < 200 * 1024 * 1024)
-		heapSize /= 2;
-	else if (sAvailableMemory >= 1024 * 1024 * 1024)
-		heapSize *= 2;
-
 	// map in the new heap and initialize it
+	size_t heapSize = INITIAL_HEAP_SIZE;
 	addr_t heapBase = vm_allocate_early(args, heapSize, heapSize,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	TRACE(("heap at 0x%lx\n", heapBase));
@@ -3607,8 +3599,7 @@ vm_init_post_sem(kernel_args *args)
 	mutex_init(&sMappingLock, "page mappings");
 
 	slab_init_post_sem();
-
-	return heap_init_post_sem(args);
+	return heap_init_post_sem();
 }
 
 
@@ -3618,8 +3609,7 @@ vm_init_post_thread(kernel_args *args)
 	vm_page_init_post_thread(args);
 	vm_daemon_init();
 	vm_low_memory_init_post_thread();
-
-	return heap_init_post_thread(args);
+	return heap_init_post_thread();
 }
 
 

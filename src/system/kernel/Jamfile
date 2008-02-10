@@ -21,7 +21,7 @@ KernelMergeObject kernel_core.o :
 	condition_variable.cpp
 	cpu.c
 	elf.cpp
-	heap.c
+	heap.cpp
 	image.c
 	int.c
 	kernel_daemon.c

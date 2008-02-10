@@ -5,17 +5,16 @@
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-#ifndef _KERNEL_MEMHEAP_H
-#define _KERNEL_MEMHEAP_H
-
+#ifndef _KERNEL_HEAP_H
+#define _KERNEL_HEAP_H
 
 #include <OS.h>
 
-struct kernel_args;
+// allocate 16MB initial heap for the kernel
+#define INITIAL_HEAP_SIZE	16 * 1024 * 1024
+// grow by another 8MB each time the heap runs out of memory
+#define HEAP_GROW_SIZE		8 * 1024 * 1024
 
-
-#define HEAP_SIZE	0x02000000
-	// 32 MB heap for the kernel (!)
 
 
 #ifdef __cplusplus
@@ -25,8 +24,8 @@ extern "C" {
 void *memalign(size_t alignment, size_t size);
 
 status_t heap_init(addr_t heapBase, size_t heapSize);
-status_t heap_init_post_sem(struct kernel_args *args);
-status_t heap_init_post_thread(struct kernel_args *args);
+status_t heap_init_post_sem();
+status_t heap_init_post_thread();
 
 #ifdef __cplusplus
 }
