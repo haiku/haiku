@@ -12,7 +12,7 @@
 #include <vm_priv.h>
 #include <smp.h>
 #include <util/queue.h>
-#include <memheap.h>
+#include <heap.h>
 #include <arch_system_info.h>
 #include <arch/vm_translation_map.h>
 
