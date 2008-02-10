@@ -426,8 +426,9 @@ BMidiStore::Run()
 			if (fLooping) {
 				resetTime = true;
 				fCurrentEvent = 0;
-			} else
-				break;
+				continue;
+			}
+			break;
 		}
 
 		if (firstEvent) {
