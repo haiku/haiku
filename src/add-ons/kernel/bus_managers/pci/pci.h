@@ -10,6 +10,10 @@
 
 #include <PCI.h>
 
+#ifdef __cplusplus
+  #include <VectorMap.h>
+#endif
+
 #include "pci_controller.h"
 
 
@@ -77,7 +81,7 @@ class PCI {
 		status_t			WritePciConfig(int domain, uint8 bus, uint8 device, uint8 function,
 										   uint8 offset, uint8 size, uint32 value);
 
-		status_t			GetVirtBus(uint8 virt_bus, int *domain, uint8 *bus);
+		status_t			ResolveVirtualBus(uint8 virtualBus, int *domain, uint8 *bus);
 		
 	private:
 
@@ -104,7 +108,7 @@ class PCI {
 		
 		domain_data *		GetDomainData(int domain);
 		
-		status_t			AddVirtBus(int domain, uint8 bus, uint8 *virt_bus);
+		status_t			CreateVirtualBus(int domain, uint8 bus, uint8 *virtualBus);
 
 	private:
 		PCIBus *			fRootBus;
@@ -114,6 +118,9 @@ class PCI {
 		domain_data			fDomainData[MAX_PCI_DOMAINS];
 		int					fDomainCount;
 		bool				fBusEnumeration;
+
+		VectorMap<uint8, uint16> fVirtualBusMap;
+		int					fNextVirtualBus;
 };
 
 #endif // __cplusplus
@@ -128,8 +135,10 @@ void		pci_uninit(void);
 
 long		pci_get_nth_pci_info(long index, pci_info *outInfo);
 
-uint32		pci_read_config(uint8 virt_bus, uint8 device, uint8 function, uint8 offset, uint8 size);
-void		pci_write_config(uint8 virt_bus, uint8 device, uint8 function, uint8 offset, uint8 size, uint32 value);
+uint32		pci_read_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset, uint8 size);
+void		pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset, uint8 size, uint32 value);
+
+void		__pci_resolve_virtual_bus(uint8 virtualBus, int *domain, uint8 *bus);
 
 #ifdef __cplusplus
 }

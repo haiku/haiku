@@ -41,13 +41,13 @@ pci_get_nth_pci_info(long index, pci_info *outInfo)
 
 
 uint32
-pci_read_config(uint8 virt_bus, uint8 device, uint8 function, uint8 offset, uint8 size)
+pci_read_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset, uint8 size)
 {
 	uint8 bus;
 	int domain;
 	uint32 value;
 	
-	if (sPCI->GetVirtBus(virt_bus, &domain, &bus) != B_OK)
+	if (sPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
 		return 0xffffffff;
 		
 	if (sPCI->ReadPciConfig(domain, bus, device, function, offset, size, &value) != B_OK)
@@ -58,12 +58,12 @@ pci_read_config(uint8 virt_bus, uint8 device, uint8 function, uint8 offset, uint
 
 
 void
-pci_write_config(uint8 virt_bus, uint8 device, uint8 function, uint8 offset, uint8 size, uint32 value)
+pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset, uint8 size, uint32 value)
 {
 	uint8 bus;
 	int domain;
 	
-	if (sPCI->GetVirtBus(virt_bus, &domain, &bus) != B_OK)
+	if (sPCI->ResolveVirtualBus(virtualBus, &domain, &bus) != B_OK)
 		return;
 		
 	sPCI->WritePciConfig(domain, bus, device, function, offset, size, value);
@@ -313,6 +313,8 @@ PCI::PCI()
  :	fRootBus(0)
  ,	fDomainCount(0)
  ,	fBusEnumeration(false)
+ ,	fVirtualBusMap()
+ ,	fNextVirtualBus(0)
 {
 	#if defined(__POWERPC__) || defined(__M68K__)
 		fBusEnumeration = true;
@@ -360,30 +362,71 @@ PCI::~PCI()
 
 
 status_t
-PCI::AddVirtBus(int domain, uint8 bus, uint8 *virt_bus)
+PCI::CreateVirtualBus(int domain, uint8 bus, uint8 *virtualBus)
 {
-	if (MAX_PCI_DOMAINS != 8)
-		panic("PCI::AddVirtBus only 8 controllers supported");
-		
-	if (domain > 7)
-		panic("PCI::AddVirtBus domain %d too large", domain);
+#if defined(__INTEL__)
 
-	if (bus > 31)
-		panic("PCI::AddVirtBus bus %d too large", bus);
-		
-	*virt_bus = (domain << 5) | bus;
+	// IA32 doesn't use domains
+	if (domain)
+		panic("PCI::CreateVirtualBus domain != 0");
+	*virtualBus = bus;
 	return B_OK;
+
+#else
+
+	if (fNextVirtualBus > 0xff)
+		panic("PCI::CreateVirtualBus: virtual bus number space exhausted");
+	if (unsigned(domain) > 0xff)
+		panic("PCI::CreateVirtualBus: domain %d too large", domain);
+
+	uint16 value = domain << 8 | bus;
+
+	// XXX iterate through entries 0 to fNextVirtualBus
+	// XXX and check if value is already present, return 
+	// XXX key if found instead of inserting a new one
+
+	*virtualBus = fNextVirtualBus++;
+
+	dprintf("CreateVirtualBus domain %d, bus %d => virtualBus %d\n", domain, bus, *virtualBus);
+	
+	return fVirtualBusMap.Insert(*virtualBus, value);
+
+#endif
 }
 
 
 status_t
-PCI::GetVirtBus(uint8 virt_bus, int *domain, uint8 *bus)
+PCI::ResolveVirtualBus(uint8 virtualBus, int *domain, uint8 *bus)
 {
-	// XXX if you modify this, also change pci_info.cpp print_info_basic() !!
-	*domain = virt_bus >> 5;
-	*bus = virt_bus & 0x1f;
+#if defined(__INTEL__)
+
+	// IA32 doesn't use domains
+	*bus = virtualBus;
+	*domain = 0;
 	return B_OK;
+
+#else
+
+	if (virtualBus >= fNextVirtualBus)
+		return B_ERROR;
+
+	uint16 value = fVirtualBusMap.Get(virtualBus);
+	*domain = value >> 8;
+	*bus = value & 0xff;
+	return B_OK;
+
+#endif
 }
+
+
+// used by pci_info.cpp print_info_basic()
+void
+__pci_resolve_virtual_bus(uint8 virtualBus, int *domain, uint8 *bus)
+{
+	if (sPCI->ResolveVirtualBus(virtualBus, domain, bus) < B_OK)
+		panic("ResolveVirtualBus failed");
+}
+
 
 status_t
 PCI::AddController(pci_controller *controller, void *controller_cookie)
@@ -745,16 +788,16 @@ PCI::GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size, uin
 void
 PCI::ReadPciBasicInfo(PCIDev *dev)
 {
-	uint8 virt_bus;
+	uint8 virtualBus;
 	
-	if (AddVirtBus(dev->domain, dev->bus, &virt_bus) != B_OK) {
-		dprintf("PCI: AddVirtBus failed, domain %u, bus %u\n", dev->domain, dev->bus);
+	if (CreateVirtualBus(dev->domain, dev->bus, &virtualBus) != B_OK) {
+		dprintf("PCI: CreateVirtualBus failed, domain %u, bus %u\n", dev->domain, dev->bus);
 		return;
 	}
 	
 	dev->info.vendor_id = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_vendor_id, 2);
 	dev->info.device_id = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_device_id, 2);
-	dev->info.bus = virt_bus;
+	dev->info.bus = virtualBus;
 	dev->info.device = dev->dev;
 	dev->info.function = dev->func;
 	dev->info.revision = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_revision, 1);
