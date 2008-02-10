@@ -24,6 +24,7 @@ public:
 			App(void);
 			~App(void);
 	void	MessageReceived(BMessage *msg);
+	void	ArgvReceived(int32 argc, char** argv);
 	void	RefsReceived(BMessage *msg);
 	void	ReadyToRun(void);
 	bool	QuitRequested(void);
