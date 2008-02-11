@@ -108,3 +108,22 @@ BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg)
 	delete transport;
 	return NULL;
 }
+
+status_t list_transport_ports(BMessage* msg)
+{
+	BDirectory dir("/dev/parallel");
+	status_t rc;
+
+	if ((rc=dir.InitCheck()) != B_OK)
+		return rc;
+
+	if ((rc=dir.Rewind()) != B_OK)
+		return rc;
+
+	entry_ref ref;
+	while(dir.GetNextRef(&ref) == B_OK)
+		msg->AddString("port_id", ref.name);
+
+	return B_OK;
+}
+

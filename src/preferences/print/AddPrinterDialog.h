@@ -41,6 +41,7 @@ class AddPrinterDialog : public BWindow
 		void HandleChangedTransport(BMessage *msg);
 			
 		void BuildGUI(int stage);
+		void FillTransportMenu(BMenu *menu);
 		void FillMenu(BMenu *menu, const char *path, uint32 what);
 		void AddPortSubMenu(BMenu *menu, const char *transport, const char *port);
 		void Update();

@@ -26,6 +26,7 @@
 #include <Application.h>
 #include <StorageKit.h>
 
+#include <stdio.h>
 
 AddPrinterDialog::AddPrinterDialog(BWindow *parent)
 	: Inherited(BRect(78.0, 71.0, 400, 300), "Add Printer",
@@ -218,7 +219,7 @@ AddPrinterDialog::BuildGUI(int stage)
 	panel->AddChild(transportMenuField);
 	transportMenuField->GetPreferredSize(&w, &h);
 	transportMenuField->ResizeTo(r.Width(), h);
-	FillMenu(fTransport, "Print/transport", kTransportSelectedMsg);
+	FillTransportMenu(fTransport);
 		
 	r.OffsetBy(0, transportMenuField->Bounds().Height() + kVMargin);
 	
@@ -325,7 +326,6 @@ static directory_which gAddonDirs[] = {
 	#endif
 };
 
-
 void
 AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what)
 {
@@ -363,71 +363,76 @@ AddPrinterDialog::FillMenu(BMenu* menu, const char* path, uint32 what)
 			if (entry.GetPath(&path) != B_OK)
 				continue;
 
-			bool addMenuItem = true;
-				// some hard coded special cases for transport add-ons
-			if (menu == fTransport) {
-				const char* transport = path.Leaf();
-					// Network not implemented yet!
-				if (strcmp(transport, "Network") == 0)
-					continue;
-
-				addMenuItem = false;
-
-				if (strcmp(transport, "Serial Port") == 0) {
-					AddPortSubMenu(menu, transport, "/dev/ports");					
-				} else if (strcmp(transport, "Parallel Port") == 0) {
-					AddPortSubMenu(menu, transport, "/dev/parallel");
-				} else if (strcmp(transport, "USB Port") == 0) {
-					AddPortSubMenu(menu, transport, "/dev/printer/usb");
-				} else {
-					addMenuItem = true;
-				}
-			} 
-
-			if (addMenuItem) {
-				BMessage* msg = new BMessage(what);
-				msg->AddString("name", path.Leaf());
-				menu->AddItem(new BMenuItem(path.Leaf(), msg));
-			}
+			BMessage* msg = new BMessage(what);
+			msg->AddString("name", path.Leaf());
+			menu->AddItem(new BMenuItem(path.Leaf(), msg));
 		}
 	}
 }
 
-
-void
-AddPrinterDialog::AddPortSubMenu(BMenu* menu, const char* transport, const char* port)
+void AddPrinterDialog::FillTransportMenu(BMenu* menu)
 {
-	BEntry entry(port);
-	BDirectory dir(&entry);
-	if (dir.InitCheck() != B_OK)
+	BMessenger msgr;
+	if (GetPrinterServerMessenger(msgr) != B_OK)
 		return;
 
-	BMenu* subMenu = NULL;
-	BPath path;
-	while (dir.GetNextEntry(&entry) == B_OK) {
-		if (entry.GetPath(&path) != B_OK)
+	for (long idx=0; ; idx++) {
+		BMessage reply, msg(B_GET_PROPERTY);
+		msg.AddSpecifier("Transport", idx);
+		if (msgr.SendMessage(&msg,&reply) != B_OK)
+			break;
+
+		BMessenger transport;
+		if (reply.FindMessenger("result", &transport) != B_OK)
+			break;
+
+		// Got messenger to transport now
+		msg.MakeEmpty();
+		msg.what = B_GET_PROPERTY;
+		msg.AddSpecifier("Name");
+		if (transport.SendMessage(&msg,&reply) != B_OK)
 			continue;
 
-		// lazily create sub menu 
-		if (subMenu == NULL) {
-			subMenu = new BMenu(transport);
-			menu->AddItem(subMenu);
-			subMenu->SetRadioMode(true);
-			int32 index = menu->IndexOf(subMenu);
-			BMenuItem* item = menu->ItemAt(index);
-			if (item != NULL) 
-				item->SetMessage(new BMessage(kTransportSelectedMsg));
+		BString transportName;
+		if (reply.FindString("result",&transportName) != B_OK)
+			continue;
+
+		// Now get ports...
+		BString portId, portName;
+		status_t err;
+		msg.MakeEmpty();
+		msg.what = B_GET_PROPERTY;
+		msg.AddSpecifier("Ports");
+		if (transport.SendMessage(&msg,&reply) != B_OK ||
+			reply.FindString("port_id", &portId) != B_OK) {
+			// Can't find ports; so just show transport item, no menu
+			BMessage* menuMsg = new BMessage(kTransportSelectedMsg);
+			menuMsg->AddString("name", transportName);
+			menu->AddItem(new BMenuItem(transportName.String(), menuMsg));
+			continue;
 		}
 
-		// setup menu item for port
-		BMessage* msg = new BMessage(kTransportSelectedMsg);
-		msg->AddString("name", transport);
-		msg->AddString("path", path.Leaf());
-		BMenuItem* item = new BMenuItem(path.Leaf(), msg);
-		subMenu->AddItem(item);		
+		// We have at least one port; so create submenu
+		BMenu* transportMenu = new BMenu(transportName.String());
+		menu->AddItem(transportMenu);
+		transportMenu->SetRadioMode(true);
+		menu->ItemAt(menu->IndexOf(transportMenu))->
+			SetMessage(new BMessage(kTransportSelectedMsg));
+
+		for (int32 pidx=0; reply.FindString("port_id", pidx, &portId) == B_OK; pidx++) {
+			reply.FindString("port_name", pidx, &portName);
+
+			if (!portName.Length())
+				portName = portId;
+
+			// Create menu item in submenu for port
+			BMessage* portMsg = new BMessage(kTransportSelectedMsg);
+			portMsg->AddString("name", transportName);
+			portMsg->AddString("path", portId);
+			transportMenu->AddItem(new BMenuItem(portName.String(), portMsg));
+		}
 	}
 }
-
 
 void
 AddPrinterDialog::Update()
