@@ -11,7 +11,7 @@
 #include <ISA.h>
 #include <bus_manager.h>
 #include <string.h>
-#include <memheap.h>
+#include <heap.h>
 #include <KernelExport.h>
 
 
