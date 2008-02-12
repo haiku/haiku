@@ -17,7 +17,6 @@
 
 #include <net/net_buffer.h>
 
-#include "h2cfg.h"
 #include "snet_buffer.h"
 
 /* USB definitions for the generic device*/
@@ -25,11 +24,11 @@
 #define UDSUBCLASS_RF		0x01
 #define UDPROTO_BLUETOOTH	0x01
 
-#define TRANSPORT_NAME	"h2"
-#define DEVICE_NAME "generic"
-#define DEVICE_PATH "bus/bluetooth/" TRANSPORT_NAME "/" DEVICE_NAME
+#define BLUETOOTH_DEVICE_TRANSPORT	"h2"
+#define BLUETOOTH_DEVICE_NAME "generic"
+#include "h2cfg.h"
 
-#define ID DEVICE_NAME ": " /* prefix for debug messages */
+//#define ID DEVICE_NAME ": " /* prefix for debug messages */
 
 #define USB_TYPE_CLASS			(0x01 << 5)  /// Check if it is in some other header
 #define USB_TYPE_VENDOR			(0x02 << 5)

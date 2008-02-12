@@ -96,14 +96,14 @@ spawn_device(const usb_device* usb_dev)
 	memset(new_bt_dev, 0, sizeof(bt_usb_dev) );
 
 	/* We will need this sem for some flow control */
-	new_bt_dev->cmd_complete = create_sem(1, ID "cmd_complete");
+	new_bt_dev->cmd_complete = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "cmd_complete");
 	if (new_bt_dev->cmd_complete < 0) {
 		err = new_bt_dev->cmd_complete;
 		goto bail0;
 	}
 
 	/* and this for something else */
-	new_bt_dev->lock = create_sem(1, ID "lock");
+	new_bt_dev->lock = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "lock");
 	if (new_bt_dev->lock < 0) {
 		err = new_bt_dev->lock;
 		goto bail1;
@@ -114,7 +114,7 @@ spawn_device(const usb_device* usb_dev)
 	for (i = 0; i < MAX_BT_GENERIC_USB_DEVICES; i++) {
 		if (bt_usb_devices[i] == NULL) {
 			bt_usb_devices[i] = new_bt_dev;
-			sprintf(new_bt_dev->name, "%s/%ld", DEVICE_PATH, i);
+			sprintf(new_bt_dev->name, "%s/%ld", BLUETOOTH_DEVICE_PATH, i);
 			new_bt_dev->num = i;
 			debugf("added device %p %ld %s\n", bt_usb_devices[i] ,new_bt_dev->num,new_bt_dev->name);	
 			break;
@@ -556,7 +556,7 @@ device_free (void *cookie)
 	status_t err = B_OK;
 	bt_usb_dev* dev = (bt_usb_dev*)cookie;
 	
-	debugf("device_free() called on \"%s %ld\"\n",DEVICE_PATH, dev->num);
+	debugf("device_free() called on %s \n",BLUETOOTH_DEVICE_PATH);
 		
 
 	if (--dev->open_count == 0) {
@@ -693,7 +693,7 @@ init_driver(void)
 	debugf("nb module at %p\n", nb);
 
 	// GENERAL INITS
-	dev_table_sem = create_sem(1, ID "dev_table_lock");
+	dev_table_sem = create_sem(1, BLUETOOTH_DEVICE_DEVFS_NAME "dev_table_lock");
 	if (dev_table_sem < 0) {
 		goto err;
 	}
@@ -704,8 +704,8 @@ init_driver(void)
 	
 	/* After here device_added and publish devices hooks are called 
 	   be carefull USB devs */
-	usb->register_driver(DEVICE_NAME, supported_devices, 1, NULL);
-	usb->install_notify(DEVICE_NAME, &notify_hooks);
+	usb->register_driver(BLUETOOTH_DEVICE_DEVFS_NAME, supported_devices, 1, NULL);
+	usb->install_notify(BLUETOOTH_DEVICE_DEVFS_NAME, &notify_hooks);
 
 	return B_OK;
 	
@@ -740,8 +740,7 @@ uninit_driver(void)
 
 	}
 	
-	usb->uninstall_notify(DEVICE_NAME);
-	usb->register_driver(DEVICE_NAME, supported_devices, 1, NULL);
+	usb->uninstall_notify(BLUETOOTH_DEVICE_DEVFS_NAME);
 	
 	/* Releasing modules */
 	put_module(usb_name);
