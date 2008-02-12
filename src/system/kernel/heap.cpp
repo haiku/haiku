@@ -16,6 +16,9 @@
 #include <malloc.h>
 #include <signal.h>
 #include <string.h>
+#include <team.h>
+#include <thread.h>
+#include <tracing.h>
 #include <vm.h>
 
 //#define TRACE_HEAP
@@ -31,6 +34,16 @@
 #define PARANOID_KFREE 1
 // validate sanity of the heap after each operation (slow!)
 #define PARANOID_VALIDATION 0
+// store size, thread and team info at the end of each allocation block
+#define KERNEL_HEAP_LEAK_CHECK 0
+
+#if KERNEL_HEAP_LEAK_CHECK
+typedef struct heap_leak_check_info_s {
+	size_t		size;
+	thread_id	thread;
+	team_id		team;
+} heap_leak_check_info;
+#endif
 
 typedef struct heap_page_s {
 	uint16			index;
@@ -72,6 +85,83 @@ static heap_allocator *sHeapList = NULL;
 static heap_allocator *sLastGrowRequest = NULL;
 static sem_id sHeapGrowSem = -1;
 static sem_id sHeapGrownNotify = -1;
+
+
+// #pragma mark - Tracing
+
+#ifdef KERNEL_HEAP_TRACING
+namespace KernelHeapTracing {
+
+class Allocate : public AbstractTraceEntry {
+	public:
+		Allocate(addr_t address, size_t size)
+			:	fAddress(address),
+				fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput &out)
+		{
+			out.Print("heap allocate: 0x%08lx (%lu bytes)", fAddress, fSize);
+		}
+
+	private:
+		addr_t	fAddress;
+		size_t	fSize;
+};
+
+
+class Reallocate : public AbstractTraceEntry {
+	public:
+		Reallocate(addr_t oldAddress, addr_t newAddress, size_t newSize)
+			:	fOldAddress(oldAddress),
+				fNewAddress(newAddress),
+				fNewSize(newSize)
+		{
+			Initialized();
+		};
+
+		virtual void AddDump(TraceOutput &out)
+		{
+			out.Print("heap reallocate: 0x%08lx -> 0x%08lx (%lu bytes)",
+				fOldAddress, fNewAddress, fNewSize);
+		}
+
+	private:
+		addr_t	fOldAddress;
+		addr_t	fNewAddress;
+		size_t	fNewSize;
+};
+
+
+class Free : public AbstractTraceEntry {
+	public:
+		Free(addr_t address)
+			:	fAddress(address)
+		{
+			Initialized();
+		};
+
+		virtual void AddDump(TraceOutput &out)
+		{
+			out.Print("heap free: 0x%08lx", fAddress);
+		}
+
+	private:
+		addr_t	fAddress;
+};
+
+
+} // namespace KernelHeapTracing
+
+#	define T(x)	if (!kernel_startup) new(std::nothrow) KernelHeapTracing::x;
+#else
+#	define T(x)	;
+#endif
+
+
+// #pragma mark - Debug functions
 
 
 static void
@@ -127,6 +217,104 @@ dump_heap_list(int argc, char **argv)
 
 	return 0;
 }
+
+
+#if KERNEL_HEAP_LEAK_CHECK
+static int
+dump_allocations(int argc, char **argv)
+{
+	team_id team = -1;
+	thread_id thread = -1;
+	if (argc == 3) {
+		if (strcmp(argv[1], "team") == 0)
+			team = strtoul(argv[2], NULL, 0);
+		else if (strcmp(argv[1], "thread") == 0)
+			thread = strtoul(argv[2], NULL, 0);
+		else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	} else if (argc != 1) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	size_t totalSize = 0;
+	uint32 totalCount = 0;
+	heap_allocator *heap = sHeapList;
+	while (heap) {
+		// go through all the pages
+		heap_leak_check_info *info = NULL;
+		for (uint32 i = 0; i < heap->page_count; i++) {
+			heap_page *page = &heap->page_table[i];
+			if (!page->in_use)
+				continue;
+
+			addr_t base = heap->base + i * B_PAGE_SIZE;
+			if (page->bin_index < heap->bin_count) {
+				// page is used by a small allocation bin
+				uint32 elementCount = page->empty_index;
+				size_t elementSize = heap->bins[page->bin_index].element_size;
+				for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
+					// walk the free list to see if this element is in use
+					bool elementInUse = true;
+					for (addr_t *temp = page->free_list; temp != NULL; temp = (addr_t *)*temp) {
+						if ((addr_t)temp == base) {
+							elementInUse = false;
+							break;
+						}
+					}
+
+					if (!elementInUse)
+						continue;
+
+					info = (heap_leak_check_info *)(base + elementSize
+						- sizeof(heap_leak_check_info));
+
+					if ((team == -1 && thread == -1)
+						|| (team == -1 && info->thread == thread)
+						|| (thread == -1 && info->team == team)) {
+						// interesting...
+						dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
+							info->team, info->thread, base, info->size);
+						totalSize += info->size;
+						totalCount++;
+					}
+				}
+			} else {
+				// page is used by a big allocation, find the page count
+				uint32 pageCount = 1;
+				while (i + pageCount < heap->page_count
+					&& heap->page_table[i + pageCount].in_use
+					&& heap->page_table[i + pageCount].bin_index == heap->bin_count
+					&& heap->page_table[i + pageCount].allocation_id == page->allocation_id)
+					pageCount++;
+
+				info = (heap_leak_check_info *)(base + pageCount * B_PAGE_SIZE
+					- sizeof(heap_leak_check_info));
+
+				if ((team == -1 && thread == -1)
+					|| (team == -1 && info->thread == thread)
+					|| (thread == -1 && info->team == team)) {
+					// interesting...
+					dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
+						info->team, info->thread, base, info->size);
+					totalSize += info->size;
+					totalCount++;
+				}
+
+				// skip the allocated pages
+				i += pageCount - 1;
+			}
+		}
+
+		heap = heap->next;
+	}
+
+	dprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
+	return 0;
+}
+#endif // KERNEL_HEAP_LEAK_CHECK
 
 
 #if PARANOID_VALIDATION
@@ -238,7 +426,10 @@ heap_validate_heap(heap_allocator *heap)
 
 	mutex_unlock(&heap->lock);
 }
-#endif
+#endif // PARANOID_VALIDATION
+
+
+// #pragma mark - Heap functions
 
 
 heap_allocator *
@@ -371,6 +562,13 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 			page->next = page->prev = NULL;
 		}
 
+#if KERNEL_HEAP_LEAK_CHECK
+		heap_leak_check_info *info = (heap_leak_check_info *)((addr_t)address
+			+ bin->element_size - sizeof(heap_leak_check_info));
+		info->size = size - sizeof(heap_leak_check_info);
+		info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
+		info->team = (kernel_startup ? 0 : team_get_current_team_id());
+#endif
 		return address;
 	}
 
@@ -399,6 +597,15 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 			// by design there are no other pages in the bins page list
 			bin->page_list = page;
 		}
+
+#if KERNEL_HEAP_LEAK_CHECK
+		heap_leak_check_info *info = (heap_leak_check_info *)(heap->base
+			+ page->index * B_PAGE_SIZE + bin->element_size
+			- sizeof(heap_leak_check_info));
+		info->size = size - sizeof(heap_leak_check_info);
+		info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
+		info->team = (kernel_startup ? 0 : team_get_current_team_id());
+#endif
 
 		// we return the first slot in this page
 		return (void *)(heap->base + page->index * B_PAGE_SIZE);
@@ -441,6 +648,13 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		page->allocation_id = allocationID;
 	}
 
+#if KERNEL_HEAP_LEAK_CHECK
+	heap_leak_check_info *info = (heap_leak_check_info *)(heap->base
+		+ (first + pageCount) * B_PAGE_SIZE - sizeof(heap_leak_check_info));
+	info->size = size - sizeof(heap_leak_check_info);
+	info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
+	info->team = (kernel_startup ? 0 : team_get_current_team_id());
+#endif
 	return (void *)(heap->base + first * B_PAGE_SIZE);
 }
 
@@ -468,6 +682,10 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 
 	mutex_lock(&heap->lock);
 
+#if KERNEL_HEAP_LEAK_CHECK
+	size += sizeof(heap_leak_check_info);
+#endif
+
 	// ToDo: that code "aligns" the buffer because the bins are always
 	//	aligned on their bin size
 	if (size < alignment)
@@ -491,6 +709,11 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 			|| heap->free_pages->next->next == NULL);
 	}
 
+#if KERNEL_HEAP_LEAK_CHECK
+	size -= sizeof(heap_leak_check_info);
+#endif
+
+	T(Allocate((addr_t)address, size));
 	mutex_unlock(&heap->lock);
 	if (address == NULL)
 		return address;
@@ -619,6 +842,7 @@ heap_free(heap_allocator *heap, void *address)
 		}
 	}
 
+	T(Free((addr_t)address));
 	mutex_unlock(&heap->lock);
 	return B_OK;
 }
@@ -670,14 +894,32 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 
 	mutex_unlock(&heap->lock);
 
+#if KERNEL_HEAP_LEAK_CHECK
+	newSize += sizeof(heap_leak_check_info);
+#endif
+
 	// does the new allocation simply fit in the old allocation?
 	if (newSize > minSize && newSize <= maxSize) {
+#if KERNEL_HEAP_LEAK_CHECK
+		// update the size info (the info is at the end so stays where it is)
+		heap_leak_check_info *info = (heap_leak_check_info *)((addr_t)address + maxSize);
+		info->size = newSize - sizeof(heap_leak_check_info);
+		newSize -= sizeof(heap_leak_check_info);
+#endif
+
+		T(Reallocate((addr_t)address, (addr_t)address, newSize));
 		*newAddress = address;
 		return B_OK;
 	}
 
+#if KERNEL_HEAP_LEAK_CHECK
+	// new leak check info will be created with the malloc below
+	newSize -= sizeof(heap_leak_check_info);
+#endif
+
 	// if not, allocate a new chunk of memory
 	*newAddress = malloc(newSize);
+	T(Reallocate((addr_t)address, (addr_t)*newAddress, newSize));
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
 		return B_OK;
@@ -749,7 +991,15 @@ heap_init(addr_t base, size_t size)
 	sHeapList = heap_attach(base, size, false);
 
 	// set up some debug commands
-	add_debugger_command("heap", &dump_heap_list, "dump stats about the kernel heap(s)");
+	add_debugger_command("heap", &dump_heap_list, "Dump stats about the kernel heap(s)");
+#if KERNEL_HEAP_LEAK_CHECK
+	add_debugger_command_etc("allocations", &dump_allocations,
+		"Dump current allocations", "[(\"team\" | \"thread\") <id>]\n"
+		"If no parameters are given, all current alloactions are dumped.\n"
+		"If either \"team\" or \"thread\" is specified as the first argument,\n"
+		"only allocations matching the team or thread id given in the second\n"
+		"argument are printed.\n", 0);
+#endif
 	return B_OK;
 }
 
@@ -794,7 +1044,7 @@ heap_init_post_thread()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - Public API
 
 
 void *
