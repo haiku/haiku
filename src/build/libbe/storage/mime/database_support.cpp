@@ -29,11 +29,13 @@
 #define DBG(x)
 #define OUT printf
 
+#ifndef HAIKU_HOST_PLATFORM_HAIKU
 // icon types (which really ought to be publicly or semi-publicly declared somewhere...)
 enum {
 	B_MINI_ICON_TYPE	= 'MICN',
 	B_LARGE_ICON_TYPE	= 'ICON',
 };
+#endif
 
 namespace BPrivate {
 namespace Storage {
