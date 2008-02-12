@@ -24,6 +24,7 @@ struct snet_buffer {
 
 };
 
+
 snet_buffer*
 snb_create(uint16 size)
 {
@@ -64,11 +65,13 @@ snb_pull(snet_buffer* snb, uint16 size)
 
 }
 
+
 inline void
 snb_reset(snet_buffer* snb)
 {
     snb->puttingSize = snb->pullingSize = 0;
 }
+
 
 void
 snb_free(snet_buffer* snb)
@@ -85,12 +88,14 @@ snb_free(snet_buffer* snb)
 
 }
 
+
 inline void*
 snb_get(snet_buffer* snb)
 {
     /* TODO: pointer checking */
     return snb->buffer;
 }
+
 
 inline uint16
 snb_size(snet_buffer* snb)
@@ -99,12 +104,14 @@ snb_size(snet_buffer* snb)
     return snb->expectedSize;
 }
 
+
 inline void*
 snb_cookie(snet_buffer* snb)
 {
     /* TODO: pointer checking */
     return snb->cookie;
 }
+
 
 inline void
 snb_set_cookie(snet_buffer* snb, void* cookie)
@@ -113,17 +120,20 @@ snb_set_cookie(snet_buffer* snb, void* cookie)
     snb->cookie = cookie;
 }
 
+
 /* Return true if we canot "put" more data in the buffer */
 inline bool     snb_completed(snet_buffer* snb)
 {
     return (snb != NULL && (snb->expectedSize == snb->puttingSize));
 }
 
+
 /* Return true if we cannot pull more more data from the buffer */
 inline bool      snb_finished(snet_buffer* snb)
 {
     return (snb != NULL && (snb->expectedSize == snb->pullingSize));
 }
+
 
 inline bool      snb_remaining_to_put(snet_buffer* snb)
 {
@@ -135,6 +145,7 @@ inline bool      snb_remaining_to_pull(snet_buffer* snb)
 {
     return (snb != NULL && (snb->expectedSize - snb->pullingSize));
 }
+
 
 /* ISSUE1: Number of packets in the worst case(we always need a bigger 
    buffer than before) increases, never decreases:
@@ -168,6 +179,7 @@ snb_attempt_reuse(snet_buffer* snb, uint16 size)
 
 }
 
+
 void
 snb_park(struct list* l, snet_buffer* snb)
 {
@@ -178,6 +190,7 @@ snb_park(struct list* l, snet_buffer* snb)
 			list_insert_item_before(l, item, snb);
 	}
 }
+
 
 snet_buffer*
 snb_fetch(struct list* l, uint16 size)
