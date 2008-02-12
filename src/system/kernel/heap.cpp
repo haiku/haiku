@@ -721,7 +721,8 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 #if PARANOID_KFREE
 	// make sure 0xdeadbeef is cleared if we do not overwrite the memory
 	// and the user does not clear it
-	((uint32 *)address)[1] = 0xcccccccc;
+	if (((uint32 *)address)[1] == 0xdeadbeef)
+		((uint32 *)address)[1] = 0xcccccccc;
 #endif
 
 #if PARANOID_KMALLOC
