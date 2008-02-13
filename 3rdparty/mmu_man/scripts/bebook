@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ -z "$1" ]; then
+echo "usage:"
+echo "$0 search_term"
+exit 0
+fi
+
+$(query -a '(BEOS:APP_SIG=="application/x-vnd.STertois.BeHappy")' | head -1) &
+sleep 1
+LASTWIN=$(hey BeHappy count Window | grep result | cut -d ' ' -f 7)
+let LASTWIN="$LASTWIN - 1"
+hey BeHappy set Book of Window $LASTWIN to "Be Book" > /dev/null
+hey BeHappy set Topic of Window $LASTWIN to "$1" > /dev/null
