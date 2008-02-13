@@ -30,7 +30,6 @@ void acl_rx_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
 void command_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
 void event_complete(void* cookie, uint32 status, void* data, uint32 actual_len);
 #else
-/*  TODO: propagate this definitions */
 void acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len);
 void command_complete(void* cookie, status_t status, void* data, size_t actual_len);
@@ -167,7 +166,11 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
 
 void
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+event_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
+#else
 event_complete(void* cookie, status_t status, void* data, size_t actual_len)
+#endif
 {
     
     bt_usb_dev* bdev = cookie;    
@@ -201,8 +204,13 @@ resubmit:
     
 }
 
+
 void
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+acl_rx_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
+#else
 acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
+#endif
 {
     bt_usb_dev* bdev = cookie;    
     status_t    err;
@@ -234,9 +242,11 @@ resubmit:
     }				                
 }
 
+
 #if 0
 #pragma mark --- RX ---
 #endif
+
 
 status_t
 submit_rx_event(bt_usb_dev* bdev)
@@ -304,12 +314,11 @@ submit_rx_sco(bt_usb_dev* bdev)
 #pragma mark --- TX Complete ---
 #endif
 
-#ifndef HAIKU
 void
-command_complete(void* cookie, status_t status, void* data, size_t actual_len)
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+command_complete(void* cookie, uint32 status, void* data, uint32 actual_len)
 #else
-void
-command_complete(void* cookie, uint32 status, void* data, size_t actual_len)
+command_complete(void* cookie, status_t status, void* data, size_t actual_len)
 #endif
 {
     snet_buffer* snbuf = (snet_buffer*) cookie;
