@@ -1333,6 +1333,7 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		volume->Allocator().StopChecking(NULL);
 	}
 
+	free(cookie);
 	return B_OK;
 }
 
