@@ -85,15 +85,17 @@ main(int argc, char **argv)
 			// try to open it as an URI
 			BString mimeType = "application/x-vnd.Be.URL.";
 			BString arg(*argv);
-			if (arg.FindFirst("://") >= 0)
-				mimeType.Append(arg, arg.FindFirst("://"));
-			else
-				mimeType.Append(arg, arg.FindFirst(":"));
+			mimeType.Append(arg, arg.FindFirst(":"));
 
-			char *args[2] = { *argv, NULL };
-			status = be_roster->Launch(openWith ? openWith : mimeType.String(), 1, args);
-			if (status == B_OK)
-				continue;
+			// the protocol should be alphanum
+			// we just check if it's registered
+			// if not there is likely no supporting app anyway
+			if (BMimeType::IsValid(mimeType.String())) {
+				char *args[2] = { *argv, NULL };
+				status = be_roster->Launch(openWith ? openWith : mimeType.String(), 1, args);
+				if (status == B_OK)
+					continue;
+			}
 
 			// maybe it's "file:line" or "file:line:col"
 			int line = 0, col = 0, i;
@@ -109,7 +111,7 @@ main(int argc, char **argv)
 
 				status = entry.SetTo(arg.String());
 				if (status == B_OK && entry.Exists())
-					status = open_file(openWith, entry, line - 1, col - 1);
+					status = open_file(openWith, entry, line);
 				if (status == B_OK)
 					continue;
 
@@ -121,7 +123,7 @@ main(int argc, char **argv)
 
 				status = entry.SetTo(arg.String());
 				if (status == B_OK && entry.Exists())
-					status = open_file(openWith, entry, line - 1, col - 1);
+					status = open_file(openWith, entry, line, col);
 			}
 		} else
 			status = B_ENTRY_NOT_FOUND;
