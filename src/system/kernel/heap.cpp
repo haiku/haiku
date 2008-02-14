@@ -225,18 +225,18 @@ dump_allocations(int argc, char **argv)
 {
 	team_id team = -1;
 	thread_id thread = -1;
-	if (argc == 3) {
-		if (strcmp(argv[1], "team") == 0)
-			team = strtoul(argv[2], NULL, 0);
-		else if (strcmp(argv[1], "thread") == 0)
-			thread = strtoul(argv[2], NULL, 0);
+	bool statsOnly = false;
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "team") == 0)
+			team = strtoul(argv[++i], NULL, 0);
+		else if (strcmp(argv[i], "thread") == 0)
+			thread = strtoul(argv[++i], NULL, 0);
+		else if (strcmp(argv[i], "stats") == 0)
+			statsOnly = true;
 		else {
 			print_debugger_command_usage(argv[0]);
 			return 0;
 		}
-	} else if (argc != 1) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
 	}
 
 	size_t totalSize = 0;
@@ -275,8 +275,11 @@ dump_allocations(int argc, char **argv)
 						|| (team == -1 && info->thread == thread)
 						|| (thread == -1 && info->team == team)) {
 						// interesting...
-						dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
-							info->team, info->thread, base, info->size);
+						if (!statsOnly) {
+							dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
+								info->team, info->thread, base, info->size);
+						}
+
 						totalSize += info->size;
 						totalCount++;
 					}
@@ -297,8 +300,11 @@ dump_allocations(int argc, char **argv)
 					|| (team == -1 && info->thread == thread)
 					|| (thread == -1 && info->team == team)) {
 					// interesting...
-					dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
-						info->team, info->thread, base, info->size);
+					if (!statsOnly) {
+						dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
+							info->team, info->thread, base, info->size);
+					}
+
 					totalSize += info->size;
 					totalCount++;
 				}
@@ -439,7 +445,7 @@ heap_attach(addr_t base, size_t size, bool postSem)
 	base += sizeof(heap_allocator);
 	size -= sizeof(heap_allocator);
 
-	size_t binSizes[] = { 16, 32, 64, 96, 128, 192, 256, 384, 512, 1024, 2048, B_PAGE_SIZE };
+	size_t binSizes[] = { 8, 16, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 1024, 2048, B_PAGE_SIZE };
 	uint32 binCount = sizeof(binSizes) / sizeof(binSizes[0]);
 	heap->bin_count = binCount;
 	heap->bins = (heap_bin *)base;
@@ -995,11 +1001,13 @@ heap_init(addr_t base, size_t size)
 	add_debugger_command("heap", &dump_heap_list, "Dump stats about the kernel heap(s)");
 #if KERNEL_HEAP_LEAK_CHECK
 	add_debugger_command_etc("allocations", &dump_allocations,
-		"Dump current allocations", "[(\"team\" | \"thread\") <id>]\n"
+		"Dump current allocations", "[(\"team\" | \"thread\") <id>] [\"stats\"]\n"
 		"If no parameters are given, all current alloactions are dumped.\n"
 		"If either \"team\" or \"thread\" is specified as the first argument,\n"
 		"only allocations matching the team or thread id given in the second\n"
-		"argument are printed.\n", 0);
+		"argument are printed.\n"
+		"If the optional argument \"stats\" is specified, only the allocation\n"
+		"counts and no individual allocations are printed\n", 0);
 #endif
 	return B_OK;
 }
