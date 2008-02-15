@@ -9,6 +9,7 @@
 
 #include <Entry.h>
 #include <List.h>
+#include <MimeType.h>
 #include <Roster.h>
 #include <String.h>
 
