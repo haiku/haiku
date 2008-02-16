@@ -48,5 +48,6 @@
 #define ALIGN(x)		((((unsigned)x) + ALIGN_BYTES) & ~ALIGN_BYTES)
 
 #define roundup2(x, y)	(((x) + ((y) - 1)) & (~((y) - 1)))
+#define rounddown(x, y)  (((x) / (y)) * (y))
 
 #endif	/* _FBSD_COMPAT_SYS_PARAM_H_ */

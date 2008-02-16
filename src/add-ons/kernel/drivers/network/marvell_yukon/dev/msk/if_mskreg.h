@@ -93,7 +93,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*$FreeBSD: src/sys/dev/msk/if_mskreg.h,v 1.6 2007/06/12 10:50:32 yongari Exp $*/
+/*$FreeBSD: src/sys/dev/msk/if_mskreg.h,v 1.11 2007/12/05 09:41:58 remko Exp $*/
 
 /*
  * SysKonnect PCI vendor ID
@@ -130,11 +130,13 @@
 #define DEVICEID_MRVL_8035	0x4350
 #define DEVICEID_MRVL_8036	0x4351
 #define DEVICEID_MRVL_8038	0x4352
+#define DEVICEID_MRVL_8039	0X4353
 #define DEVICEID_MRVL_4360	0x4360
 #define DEVICEID_MRVL_4361	0x4361
 #define DEVICEID_MRVL_4362	0x4362
 #define DEVICEID_MRVL_4363	0x4363
 #define DEVICEID_MRVL_4364	0x4364
+#define DEVICEID_MRVL_436A	0x436A
 
 /*
  * D-Link gigabit ethernet device ID
@@ -836,8 +838,8 @@
 #define CHIP_REV_YU_EC_A2	1 /* Chip Rev. for Yukon-EC A2 */
 #define CHIP_REV_YU_EC_A3	2 /* Chip Rev. for Yukon-EC A3 */
 
-#define	CHIP_REV_YU_EC_U_A0	0
-#define	CHIP_REV_YU_EC_U_A1	1
+#define	CHIP_REV_YU_EC_U_A0	1
+#define	CHIP_REV_YU_EC_U_A1	2
 
 /*	B2_Y2_CLK_GATE	 8 bit	Clock Gating (Yukon-2 only) */
 #define Y2_STATUS_LNK2_INAC	BIT_7	/* Status Link 2 inactiv (0 = activ) */
@@ -1082,8 +1084,9 @@
 /* Threshold values for Yukon-EC Ultra */
 #define	MSK_ECU_ULPP	0x0080	/* Upper Pause Threshold (multiples of 8) */
 #define	MSK_ECU_LLPP	0x0060	/* Lower Pause Threshold (multiples of 8) */
-#define	MSK_ECU_AE_THR	0x0180  /* Almost Empty Threshold */
+#define	MSK_ECU_AE_THR	0x0070  /* Almost Empty Threshold */
 #define	MSK_ECU_TXFF_LEV	0x01a0	/* Tx BMU FIFO Level */
+#define	MSK_ECU_JUMBO_WM	0x01
 
 #define MSK_BMU_RX_WM		0x600	/* BMU Rx Watermark */
 #define MSK_BMU_TX_WM		0x600	/* BMU Tx Watermark */
@@ -1863,6 +1866,8 @@
 #define	TX_STFW_ENA	BIT_30	/* Enable Store & Forward (Yukon-EC Ultra) */
 #define TX_VLAN_TAG_ON	BIT_25	/* enable  VLAN tagging */
 #define TX_VLAN_TAG_OFF	BIT_24	/* disable VLAN tagging */
+#define	TX_JUMBO_ENA	BIT_23	/* Enable Jumbo Mode (Yukon-EC Ultra) */
+#define	TX_JUMBO_DIS	BIT_22	/* Disable Jumbo Mode (Yukon-EC Ultra) */
 #define GMF_WSP_TST_ON	BIT_18	/* Write Shadow Pointer Test On */
 #define GMF_WSP_TST_OFF	BIT_17	/* Write Shadow Pointer Test Off */
 #define GMF_WSP_STEP	BIT_16	/* Write Shadow Pointer Step/Increment */
@@ -2019,35 +2024,6 @@
 
 /* GPHY address (bits 15..11 of SMI control reg) */
 #define PHY_ADDR_MARV	0
-
-/*-RMV- DWORD 1: Deviations */
-#define HWF_WA_DEV_4200		0x10200000UL	/*-RMV- 4.200 (D3 Blue Screen)*/
-#define HWF_WA_DEV_4185CS	0x10100000UL	/*-RMV- 4.185 (ECU 100 CS cal)*/
-#define HWF_WA_DEV_4185		0x10080000UL	/*-RMV- 4.185 (ECU Tx h check)*/
-#define HWF_WA_DEV_4167		0x10040000UL	/*-RMV- 4.167 (Rx OvSize Hang)*/
-#define HWF_WA_DEV_4152		0x10020000UL	/*-RMV- 4.152 (RSS issue) */
-#define HWF_WA_DEV_4115		0x10010000UL	/*-RMV- 4.115 (Rx MAC FIFO) */
-#define HWF_WA_DEV_4109		0x10008000UL	/*-RMV- 4.109 (BIU hang) */
-#define HWF_WA_DEV_483		0x10004000UL	/*-RMV- 4.83 (Rx TCP wrong) */
-#define HWF_WA_DEV_479		0x10002000UL	/*-RMV- 4.79 (Rx BMU hang II) */
-#define HWF_WA_DEV_472		0x10001000UL	/*-RMV- 4.72 (GPHY2 MDC clk) */
-#define HWF_WA_DEV_463		0x10000800UL	/*-RMV- 4.63 (Rx BMU hang I) */
-#define HWF_WA_DEV_427		0x10000400UL	/*-RMV- 4.27 (Tx Done Rep) */
-#define HWF_WA_DEV_42		0x10000200UL	/*-RMV- 4.2 (pref unit burst) */
-#define HWF_WA_DEV_46		0x10000100UL	/*-RMV- 4.6 (CPU crash II) */
-#define HWF_WA_DEV_43_418	0x10000080UL	/*-RMV- 4.3 & 4.18 (PCI unexp */
-/*-RMV- compl&Stat BMU deadl) */
-#define HWF_WA_DEV_420		0x10000040UL	/*-RMV- 4.20 (Status BMU ov) */
-#define HWF_WA_DEV_423		0x10000020UL	/*-RMV- 4.23 (TCP Segm Hang) */
-#define HWF_WA_DEV_424		0x10000010UL	/*-RMV- 4.24 (MAC reg overwr) */
-#define HWF_WA_DEV_425		0x10000008UL	/*-RMV- 4.25 (Magic packet */
-/*-RMV- with odd offset) */
-#define HWF_WA_DEV_428		0x10000004UL	/*-RMV- 4.28 (Poll-U &BigEndi)*/
-#define HWF_WA_FIFO_FLUSH_YLA0	0x10000002UL	/*-RMV- dis Rx GMAC FIFO Flush*/
-
-#define HW_FEATURE(sc, f)	\
-	(((((sc)->msk_hw_feature & 0x30000000) >> 28) & ((f) & 0x0fffffff)) != 0)
-
 
 #define MSK_ADDR_LO(x)	((uint64_t) (x) & 0xffffffffUL)
 #define MSK_ADDR_HI(x)	((uint64_t) (x) >> 32)
@@ -2331,9 +2307,7 @@ struct msk_softc {
 	uint32_t		msk_intrmask;
 	uint32_t		msk_intrhwemask;
 	int			msk_suspended;
-	int			msk_hw_feature;
 	int			msk_clock;
-	int			msk_marvell_phy;
 	int			msk_msi;
 	struct msk_if_softc	*msk_if[2];
 	device_t		msk_devs[2];
