@@ -1165,7 +1165,6 @@ publish_devices(void)
 			rebuild_device_names();
 		gDeviceListChanged = false;
 	}
-	assert(gDeviceNames != NULL);
 	return (const char **)gDeviceNames;
 }
 
