@@ -566,6 +566,10 @@ AboutView::AboutView(const BRect &rect)
 		"Copyright " B_UTF8_COPYRIGHT
 		" ??? (http://lpsolve.sourceforge.net/).");
 
+	// OpenEXR copyrights
+	AddCopyrightEntry("OpenEXR", 
+		"Copyright " B_UTF8_COPYRIGHT " 2002-2005, Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.");
+
 	// Build a list of installed applications and show their 
 	// long version info. Well-behaved apps usually give
 	// copyright info there.
