@@ -1,0 +1,27 @@
+SubDir HAIKU_TOP src add-ons translators pcx ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+# Include code from shared translator directory
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+
+Translator PCXTranslator :
+	# PCXTranslator classes
+	main.cpp
+	PCXTranslator.cpp
+	ConfigView.cpp
+	PCX.cpp
+
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+
+	: be translation
+	: true
+;
+
+Package haiku-translationkit-cvs :
+	PCXTranslator
+	: boot home config add-ons Translators
+	;
