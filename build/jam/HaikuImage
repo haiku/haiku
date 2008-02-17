@@ -364,6 +364,10 @@ SEARCH on <bison>m4sugar.m4
 	= [ FDirName $(HAIKU_TOP) src bin bison data m4sugar ] ;
 AddFilesToHaikuImage beos etc m4sugar : <bison>m4sugar.m4 ;
 
+local bisonFiles = "yacc.c" "c.m4" "c++.m4" ;
+SEARCH on $(bisonFiles) = [ FDirName $(HAIKU_TOP) src bin bison data ] ;
+AddFilesToHaikuImage beos etc : $(bisonFiles) ;
+
 # boot loader
 AddFilesToHaikuImage beos system : zbeos ;
 
