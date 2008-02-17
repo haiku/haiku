@@ -344,7 +344,6 @@ fssh_write(int fd, const void *buffer, fssh_size_t count)
 }
 
 
-#include <stdio.h>
 fssh_ssize_t
 fssh_write_pos(int fd, fssh_off_t pos, const void *buffer, fssh_size_t count)
 {

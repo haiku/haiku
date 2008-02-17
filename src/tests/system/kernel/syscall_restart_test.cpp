@@ -670,7 +670,7 @@ int
 main()
 {
 	Test* tests[] = {
-/*		new SnoozeTest,
+		new SnoozeTest,
 		new ReadTest,
 		new WriteTest,
 		new AcquireSwitchSemTest(false),
@@ -678,7 +678,7 @@ main()
 		new AcquireSwitchSemEtcTest(false),
 		new AcquireSwitchSemEtcTest(true),
 		new AcceptTest,
-*/		new ReceiveTest,
+		new ReceiveTest,
 		NULL
 	};
 
