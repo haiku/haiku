@@ -2934,8 +2934,10 @@ TMailWindow::_GetQueryPath(BPath* queryPath) const
 void
 TMailWindow::_RebuildQueryMenu(bool firstTime)
 {
-	while (BMenuItem* item = fQueryMenu->ItemAt(0L))
+	while (fQueryMenu->ItemAt(0)) {
+		BMenuItem* item = fQueryMenu->RemoveItem((int32)0);
 		delete item;
+	}
 
 	fQueryMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE("Edit Queries...","???..."),
 		new BMessage(M_EDIT_QUERIES), 'E', B_SHIFT_KEY));
