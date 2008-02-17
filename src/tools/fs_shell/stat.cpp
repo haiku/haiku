@@ -36,7 +36,7 @@ FSShell::unrestricted_stat(const char *path, struct fssh_stat *fsshStat)
 	// Use the _kern_read_stat() defined in libroot on BeOS incompatible
 	// systems. Required for support for opening symlinks.
 #if __BEOS__
-	if (stat(path, &st) < 0)
+	if (::stat(path, &st) < 0)
 		return -1;
 #else
 	status_t error = _kern_read_stat(-1, path, true, &st, sizeof(st));
