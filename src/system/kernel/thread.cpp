@@ -30,6 +30,7 @@
 #include <ksignal.h>
 #include <smp.h>
 #include <syscalls.h>
+#include <syscall_restart.h>
 #include <team.h>
 #include <tls.h>
 #include <user_runtime.h>
@@ -1490,26 +1491,20 @@ void
 thread_at_kernel_exit(void)
 {
 	struct thread *thread = thread_get_current_thread();
-	cpu_status state;
-	bigtime_t now;
 
 	TRACE(("thread_at_kernel_exit: exit thread %ld\n", thread->id));
 
-	if (handle_signals(thread)) {
-		state = disable_interrupts();
-		GRAB_THREAD_LOCK();
-
-		// was: smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
+	while (handle_signals(thread)) {
+		InterruptsSpinLocker _(thread_spinlock);
 		scheduler_reschedule();
+	}
 
-		RELEASE_THREAD_LOCK();
-	} else
-		state = disable_interrupts();
+	cpu_status state = disable_interrupts();
 
 	thread->in_kernel = false;
 
 	// track kernel time
-	now = system_time();
+	bigtime_t now = system_time();
 	thread->kernel_time += now - thread->last_time;
 	thread->last_time = now;
 
@@ -2472,7 +2467,12 @@ _user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName,
 status_t
 _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 {
-	return snooze_etc(timeout, timebase, flags | B_CAN_INTERRUPT);
+	// NOTE: We only know the system timebase at the moment.
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
+	status_t error = snooze_etc(timeout, timebase, flags | B_CAN_INTERRUPT);
+
+	return syscall_restart_handle_timeout_post(error, timeout);
 }
 
 
@@ -2554,10 +2554,11 @@ _user_wait_for_thread(thread_id id, status_t *userReturnCode)
 	status = wait_for_thread_etc(id, B_CAN_INTERRUPT, 0, &returnCode);
 
 	if (status == B_OK && userReturnCode != NULL
-		&& user_memcpy(userReturnCode, &returnCode, sizeof(status_t)) < B_OK)
+		&& user_memcpy(userReturnCode, &returnCode, sizeof(status_t)) < B_OK) {
 		return B_BAD_ADDRESS;
+	}
 
-	return status;
+	return syscall_restart_handle_post(status);
 }
 
 

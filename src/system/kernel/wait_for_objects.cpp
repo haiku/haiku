@@ -1,6 +1,6 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,7 @@
 #include <port.h>
 #include <sem.h>
 #include <syscalls.h>
+#include <syscall_restart.h>
 #include <thread.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -219,7 +220,7 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// wait for something to happen
 	status = acquire_sem_etc(sync->sem, 1,
-		B_CAN_INTERRUPT | (timeout != -1 ? B_RELATIVE_TIMEOUT : 0), timeout);
+		B_CAN_INTERRUPT | (timeout != -1 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// restore the old signal mask
 	if (sigMask != NULL)
@@ -324,7 +325,7 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 	locker.Unlock();
 
 	status = acquire_sem_etc(sync->sem, 1,
-		B_CAN_INTERRUPT | (timeout != -1 ? B_RELATIVE_TIMEOUT : 0), timeout);
+		B_CAN_INTERRUPT | (timeout != -1 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// deselect file descriptors
 
@@ -641,6 +642,9 @@ ssize_t
 _kern_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	bigtime_t timeout, const sigset_t *sigMask)
 {
+	if (timeout >= 0)
+		timeout += system_time();
+
 	return common_select(numFDs, readSet, writeSet, errorSet, timeout,
 		sigMask, true);
 }
@@ -649,6 +653,9 @@ _kern_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 ssize_t
 _kern_poll(struct pollfd *fds, int numFDs, bigtime_t timeout)
 {
+	if (timeout >= 0)
+		timeout += system_time();
+
 	return common_poll(fds, numFDs, timeout, true);
 }
 
@@ -672,6 +679,8 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 	uint32 bytes = _howmany(numFDs, NFDBITS) * sizeof(fd_mask);
 	sigset_t sigMask;
 	int result;
+
+	syscall_restart_handle_timeout_pre(timeout);
 
 	if (numFDs < 0)
 		return B_BAD_VALUE;
@@ -733,8 +742,10 @@ _user_select(int numFDs, fd_set *userReadSet, fd_set *userWriteSet,
 			|| (writeSet != NULL
 				&& user_memcpy(userWriteSet, writeSet, bytes) < B_OK)
 			|| (errorSet != NULL
-				&& user_memcpy(userErrorSet, errorSet, bytes) < B_OK)))
+				&& user_memcpy(userErrorSet, errorSet, bytes) < B_OK))) {
 		result = B_BAD_ADDRESS;
+	} else
+		syscall_restart_handle_timeout_post(result, timeout);
 
 err:
 	free(readSet);
@@ -751,6 +762,8 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	struct pollfd *fds;
 	size_t bytes;
 	int result;
+
+	syscall_restart_handle_timeout_pre(timeout);
 
 	if (numFDs < 0)
 		return B_BAD_VALUE;
@@ -774,6 +787,8 @@ _user_poll(struct pollfd *userfds, int numFDs, bigtime_t timeout)
 	// copy back results
 	if (result >= B_OK && user_memcpy(userfds, fds, bytes) < B_OK)
 		result = B_BAD_ADDRESS;
+	else
+		syscall_restart_handle_timeout_post(result, timeout);
 
 err:
 	free(fds);
@@ -786,6 +801,8 @@ ssize_t
 _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 	bigtime_t timeout)
 {
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
 	if (numInfos < 0)
 		return B_BAD_VALUE;
 
@@ -804,8 +821,10 @@ _user_wait_for_objects(object_wait_info* userInfos, int numInfos, uint32 flags,
 		result = common_wait_for_objects(infos, numInfos, flags, timeout,
 			false);
 
-		if (user_memcpy(userInfos, infos, bytes) != B_OK)
+		if (result >= 0 && user_memcpy(userInfos, infos, bytes) != B_OK)
 			result = B_BAD_ADDRESS;
+		else
+			syscall_restart_handle_timeout_post(result, timeout);
 	} else
 		result = B_BAD_ADDRESS;
 

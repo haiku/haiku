@@ -8,22 +8,23 @@
 
 /*!	Ports for IPC */
 
+#include <port.h>
+
+#include <ctype.h>
+#include <iovec.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <OS.h>
 
-#include <port.h>
-#include <kernel.h>
-#include <sem.h>
-#include <team.h>
-#include <util/list.h>
 #include <arch/int.h>
 #include <cbuf.h>
+#include <kernel.h>
+#include <sem.h>
+#include <syscall_restart.h>
+#include <team.h>
+#include <util/list.h>
 #include <wait_for_objects.h>
-
-#include <iovec.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
 
 
 //#define TRACE_PORTS
@@ -1281,7 +1282,8 @@ _user_get_port_info(port_id id, struct port_info *userInfo)
 	status = get_port_info(id, &info);
 
 	// copy back to user space
-	if (status == B_OK && user_memcpy(userInfo, &info, sizeof(struct port_info)) < B_OK)
+	if (status == B_OK
+		&& user_memcpy(userInfo, &info, sizeof(struct port_info)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return status;
@@ -1289,7 +1291,8 @@ _user_get_port_info(port_id id, struct port_info *userInfo)
 
 
 status_t
-_user_get_next_port_info(team_id team, int32 *userCookie, struct port_info *userInfo)
+_user_get_next_port_info(team_id team, int32 *userCookie,
+	struct port_info *userInfo)
 {
 	struct port_info info;
 	status_t status;
@@ -1305,7 +1308,8 @@ _user_get_next_port_info(team_id team, int32 *userCookie, struct port_info *user
 
 	// copy back to user space
 	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
-		|| (status == B_OK && user_memcpy(userInfo, &info, sizeof(struct port_info)) < B_OK))
+		|| (status == B_OK && user_memcpy(userInfo, &info,
+				sizeof(struct port_info)) < B_OK))
 		return B_BAD_ADDRESS;
 
 	return status;
@@ -1315,7 +1319,12 @@ _user_get_next_port_info(team_id team, int32 *userCookie, struct port_info *user
 ssize_t
 _user_port_buffer_size_etc(port_id port, uint32 flags, bigtime_t timeout)
 {
-	return port_buffer_size_etc(port, flags | B_CAN_INTERRUPT, timeout);
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
+	status_t status = port_buffer_size_etc(port, flags | B_CAN_INTERRUPT,
+		timeout);
+
+	return syscall_restart_handle_timeout_post(status, timeout);
 }
 
 
@@ -1340,6 +1349,8 @@ _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 	int32 messageCode;
 	ssize_t	bytesRead;
 
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
 	if (userBuffer == NULL && bufferSize != 0)
 		return B_BAD_VALUE;
 	if ((userCode != NULL && !IS_USER_ADDRESS(userCode))
@@ -1353,7 +1364,7 @@ _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 		&& user_memcpy(userCode, &messageCode, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return bytesRead;
+	return syscall_restart_handle_timeout_post(bytesRead, timeout);
 }
 
 
@@ -1363,13 +1374,17 @@ _user_write_port_etc(port_id port, int32 messageCode, const void *userBuffer,
 {
 	iovec vec = { (void *)userBuffer, bufferSize };
 
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
 	if (userBuffer == NULL && bufferSize != 0)
 		return B_BAD_VALUE;
 	if (userBuffer != NULL && !IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
-	return writev_port_etc(port, messageCode, &vec, 1, bufferSize, 
-				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
+	status_t status = writev_port_etc(port, messageCode, &vec, 1, bufferSize,
+		flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
+
+	return syscall_restart_handle_timeout_post(status, timeout);
 }
 
 
@@ -1377,14 +1392,14 @@ status_t
 _user_writev_port_etc(port_id port, int32 messageCode, const iovec *userVecs,
 	size_t vecCount, size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
-	iovec *vecs = NULL;
-	status_t status;
+	syscall_restart_handle_timeout_pre(flags, timeout);
 
 	if (userVecs == NULL && bufferSize != 0)
 		return B_BAD_VALUE;
 	if (userVecs != NULL && !IS_USER_ADDRESS(userVecs))
 		return B_BAD_ADDRESS;
 
+	iovec *vecs = NULL;
 	if (userVecs && vecCount != 0) {
 		vecs = (iovec*)malloc(sizeof(iovec) * vecCount);
 		if (vecs == NULL)
@@ -1395,9 +1410,11 @@ _user_writev_port_etc(port_id port, int32 messageCode, const iovec *userVecs,
 			return B_BAD_ADDRESS;
 		}
 	}
-	status = writev_port_etc(port, messageCode, vecs, vecCount, bufferSize, 
-				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
+
+	status_t status = writev_port_etc(port, messageCode, vecs, vecCount,
+		bufferSize, flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT,
+		timeout);
 
 	free(vecs);
-	return status;
+	return syscall_restart_handle_timeout_post(status, timeout);
 }

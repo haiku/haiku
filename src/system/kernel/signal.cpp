@@ -235,10 +235,6 @@ handle_signals(struct thread *thread)
 {
 	uint32 signalMask = atomic_get(&thread->sig_pending)
 		& ~atomic_get(&thread->sig_block_mask);
-	struct sigaction *handler;
-	bool reschedule = false;
-	bool restart = false;
-	int32 i;
 
 	// If SIGKILL[THR] are pending, we ignore other signals.
 	// Otherwise check, if the thread shall stop for debugging.
@@ -251,9 +247,13 @@ handle_signals(struct thread *thread)
 	if (signalMask == 0)
 		return 0;
 
+	bool restart = (atomic_and(&thread->flags,
+			~THREAD_FLAGS_DONT_RESTART_SYSCALL)
+		& THREAD_FLAGS_DONT_RESTART_SYSCALL) == 0;
+
 	T(HandleSignals(signalMask));
 
-	for (i = 0; i < NSIG; i++) {
+	for (int32 i = 0; i < NSIG; i++) {
 		bool debugSignal;
 		int32 signal = i + 1;
 
@@ -275,12 +275,9 @@ handle_signals(struct thread *thread)
 		//		handlers to work only when the respective thread is stopped.
 		//		Then sigaction() could be used instead and we could get rid of
 		//		sigaction_etc().
-		handler = &thread->sig_action[i];
+		struct sigaction* handler = &thread->sig_action[i];
 
 		TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[signal]));
-
-		if ((handler->sa_flags & SA_RESTART) != 0)
-			restart = true;
 
 		if (handler->sa_handler == SIG_IGN) {
 			// signal is to be ignored
@@ -290,8 +287,7 @@ handle_signals(struct thread *thread)
 			if (debugSignal)
 				notify_debugger(thread, signal, handler, false);
 			continue;
-		}
-		if (handler->sa_handler == SIG_DFL) {
+		} else if (handler->sa_handler == SIG_DFL) {
 			// default signal behaviour
 			switch (signal) {
 				case SIGCHLD:
@@ -330,7 +326,6 @@ handle_signals(struct thread *thread)
 						continue;
 
 					thread->next_state = B_THREAD_SUSPENDED;
-					reschedule = true;
 
 					// notify threads waiting for team state changes
 					if (thread == thread->team->main_thread) {
@@ -348,7 +343,8 @@ handle_signals(struct thread *thread)
 						if ((parentHandler.sa_flags & SA_NOCLDSTOP) == 0)
 							deliver_signal(parentThread, SIGCHLD, 0);
 					}
-					continue;
+
+					return true;
 
 				case SIGQUIT:
 				case SIGILL:
@@ -383,13 +379,18 @@ handle_signals(struct thread *thread)
 			}
 		}
 
+		// User defined signal handler
+
 		// notify the debugger
 		if (debugSignal && !notify_debugger(thread, signal, handler, false))
 			continue;
 
-		// User defined signal handler
+		if (!restart || (handler->sa_flags & SA_RESTART) == 0)
+			atomic_and(&thread->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+
 		TRACE(("### Setting up custom signal handler frame...\n"));
-		arch_setup_signal_frame(thread, handler, signal, atomic_get(&thread->sig_block_mask));
+		arch_setup_signal_frame(thread, handler, signal,
+			atomic_get(&thread->sig_block_mask));
 
 		if (handler->sa_flags & SA_ONESHOT)
 			handler->sa_handler = SIG_DFL;
@@ -402,16 +403,17 @@ handle_signals(struct thread *thread)
 
 		update_current_thread_signals_flag();
 
-		return reschedule;
+		return false;
 	}
 
-	// only restart if SA_RESTART was set on at least one handler
-	if (restart)
-		arch_check_syscall_restart(thread);
+	// clear syscall restart thread flag, if we're not supposed to restart the
+	// syscall
+	if (!restart)
+		atomic_and(&thread->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
 
 	update_current_thread_signals_flag();
 
-	return reschedule;
+	return false;
 }
 
 
@@ -781,25 +783,18 @@ sigsuspend(const sigset_t *mask)
 {
 	struct thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
-	cpu_status state;
 
-	// set the new block mask and suspend ourselves - we cannot use
-	// SIGSTOP for this, as signals are only handled upon kernel exit
+	// Set the new block mask and interuptably block wait for a condition
+	// variable no one will ever notify.
 
 	atomic_set(&thread->sig_block_mask, *mask);
 
+	ConditionVariable<sigset_t> conditionVar;
+	conditionVar.Publish(mask, "sigsuspend");
+
 	while (true) {
-		thread->next_state = B_THREAD_SUSPENDED;
-
-		state = disable_interrupts();
-		GRAB_THREAD_LOCK();
-
-		update_thread_signals_flag(thread);
-
-		scheduler_reschedule();
-
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
+		ConditionVariableEntry<sigset_t> entry;
+		entry.Wait(mask, B_CAN_INTERRUPT);
 
 		if (has_signals_pending(thread))
 			break;
@@ -811,7 +806,6 @@ sigsuspend(const sigset_t *mask)
 	update_current_thread_signals_flag();
 
 	// we're not supposed to actually succeed
-	// ToDo: could this get us into trouble with SA_RESTART handlers?
 	return B_INTERRUPTED;
 }
 

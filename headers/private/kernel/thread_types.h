@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc.
+ * Copyright 2004-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -205,6 +205,10 @@ struct thread {
 	size_t			signal_stack_size;
 	bool			signal_stack_enabled;
 
+	struct {
+		uint8		parameters[32];
+	} syscall_restart;
+
 	bool			in_kernel;
 	bool			was_yielded;
 
@@ -278,12 +282,16 @@ struct thread_queue {
 
 
 // bits for the thread::flags field
-#define	THREAD_FLAGS_SIGNALS_PENDING		0x01
-#define	THREAD_FLAGS_DEBUG_THREAD			0x02
-#define	THREAD_FLAGS_DEBUGGER_INSTALLED		0x04
-#define	THREAD_FLAGS_BREAKPOINTS_DEFINED	0x08
-#define	THREAD_FLAGS_BREAKPOINTS_INSTALLED	0x10
-#define	THREAD_FLAGS_64_BIT_SYSCALL_RETURN	0x20
+#define	THREAD_FLAGS_SIGNALS_PENDING		0x0001
+#define	THREAD_FLAGS_DEBUG_THREAD			0x0002
+#define	THREAD_FLAGS_DEBUGGER_INSTALLED		0x0004
+#define	THREAD_FLAGS_BREAKPOINTS_DEFINED	0x0008
+#define	THREAD_FLAGS_BREAKPOINTS_INSTALLED	0x0010
+#define	THREAD_FLAGS_64_BIT_SYSCALL_RETURN	0x0020
+#define	THREAD_FLAGS_RESTART_SYSCALL		0x0040
+#define	THREAD_FLAGS_DONT_RESTART_SYSCALL	0x0080
+#define	THREAD_FLAGS_SYSCALL_RESTARTED		0x0100
+#define	THREAD_FLAGS_IOCTL_SYSCALL			0x0200
 
 
 #endif	/* _KERNEL_THREAD_TYPES_H */

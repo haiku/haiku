@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, The Haiku Team. All rights reserved.
+ * Copyright 2002-2008, The Haiku Team. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -304,6 +304,12 @@ trap99:
 	// push error, vector, orig_edx, orig_eax, and other registers
 	PUSH_IFRAME_BOTTOM_SYSCALL()
 
+	call	handle_syscall
+
+	POP_IFRAME_AND_RETURN()
+
+
+handle_syscall:
 	// save %eax, the number of the syscall
 	movl	%eax, %esi
 
@@ -312,7 +318,7 @@ trap99:
 	movl	%eax,%ds
 	movl	%eax,%es
 
-	movl	%esp, %ebp				// frame pointer is the iframe
+	lea		4(%esp), %ebp			// stack frame pointer is the iframe
 	movl	%dr3, %edi				// thread pointer
 
 	// disable breakpoints, if installed
@@ -351,15 +357,19 @@ trap99:
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
-			| THREAD_FLAGS_64_BIT_SYSCALL_RETURN) \
+			| THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
+			| THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_SYSCALL_RESTARTED) \
 			, THREAD_flags(%edi)
 	jnz		post_syscall_work
 
 	cli								// disable interrupts
 
-	// update the thread's kernel time and return
+	// update the thread's kernel time
 	UPDATE_THREAD_KERNEL_TIME()
-	POP_IFRAME_AND_RETURN()
+
+	lea		-4(%ebp), %esp			// remove all parameters from the stack
+
+	ret
 
   do_pre_syscall_debug:
 	movl	%esp, %eax				// syscall parameters
@@ -370,15 +380,16 @@ trap99:
 	addl	$8, %esp
 	jmp		pre_syscall_debug_done
 
-  post_syscall_work_sysenter:
   post_syscall_work:
-	// if the 64 bit return value bit is set, we have to clear it
-	testl	$THREAD_FLAGS_64_BIT_SYSCALL_RETURN, THREAD_flags(%edi)
+	// clear the 64 bit return value and syscall restarted bits
+	testl	$(THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
+				| THREAD_FLAGS_SYSCALL_RESTARTED), THREAD_flags(%edi)
 	jz		2f
   1:
     movl	THREAD_flags(%edi), %eax
 	movl	%eax, %edx
-    andl	$~THREAD_FLAGS_64_BIT_SYSCALL_RETURN, %edx
+    andl	$~(THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
+				| THREAD_FLAGS_SYSCALL_RESTARTED), %edx
     lock
     cmpxchgl	%edx, THREAD_flags(%edi)
     jnz		1b
@@ -410,6 +421,15 @@ trap99:
 	call	thread_at_kernel_exit_no_signals
   kernel_exit_work_done:
 
+	// syscall restart
+	// TODO: this only needs to be done for syscalls!
+	testl	$THREAD_FLAGS_RESTART_SYSCALL, THREAD_flags(%edi)
+	jz		1f
+	push	%ebp
+	call	x86_restart_syscall
+	addl	$4, %esp
+  1:
+
 	// install breakpoints, if defined
 	testl	$THREAD_FLAGS_BREAKPOINTS_DEFINED, THREAD_flags(%edi)
 	jz		1f
@@ -417,7 +437,7 @@ trap99:
 	call	x86_init_user_debug_at_kernel_exit
   1:
 	POP_IFRAME_AND_RETURN()
-	
+
   kernel_exit_handle_signals:
 	// make sure interrupts are enabled (they are, when coming from a syscall
 	// but otherwise they might be disabled)
@@ -455,62 +475,7 @@ FUNCTION(x86_sysenter):
 
 	PUSH_IFRAME_BOTTOM_SYSCALL()
 
-	// save %eax, the number of the syscall
-	movl	%eax, %esi
-
-	movl	$KERNEL_DATA_SEG,%eax
-	cld
-	movl	%eax,%ds
-	movl	%eax,%es
-
-	movl	%esp, %ebp				// frame pointer is the iframe
-	movl	%dr3, %edi				// thread pointer
-
-	// disable breakpoints, if installed
-	cli								// disable interrupts
-	DISABLE_BREAKPOINTS()
-
-	// update the thread's user time
-	UPDATE_THREAD_USER_TIME_PUSH_TIME()
-		// leave the time on the stack (needed for post syscall debugging)
-
-	sti								// enable interrupts
-
-	cmp		$SYSCALL_COUNT, %esi	// check syscall number
-	jae		bad_syscall_number
-	movl	$kSyscallInfos, %eax	// get syscall info
-	lea		(%eax, %esi, SYSCALL_INFO_sizeof), %edx
-
-	// copy parameters onto this stack
-	COPY_SYSCALL_PARAMETERS()
-
-	// pre syscall debugging
-	TRACE_PRE_SYSCALL()
-	testl	$THREAD_FLAGS_DEBUGGER_INSTALLED, THREAD_flags(%edi)
-	jnz		do_pre_syscall_debug
-		// if debugging is enabled, we take the slow syscall exit
-
-	// call the syscall function
-	call	*SYSCALL_INFO_function(%esi)
-
-	// overwrite the values of %eax and %edx on the stack (the syscall return
-	// value)
-	movl	%edx, IFRAME_edx(%ebp)
-	movl	%eax, IFRAME_eax(%ebp)
-
-	TRACE_POST_SYSCALL()
-
-	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
-			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
-			| THREAD_FLAGS_64_BIT_SYSCALL_RETURN) \
-			, THREAD_flags(%edi)
-	jnz		post_syscall_work_sysenter
-		// if any special work has to be done, we take the slow syscall exit
-
-	cli								// disable interrupts
-
-	// update the thread's kernel time
-	UPDATE_THREAD_KERNEL_TIME()
+	call	handle_syscall
 
 	// pop the bottom of the iframe
 	lea		4(%ebp), %esp	// skip iframe type

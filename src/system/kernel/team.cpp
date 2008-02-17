@@ -27,6 +27,7 @@
 #include <port.h>
 #include <sem.h>
 #include <syscall_process_info.h>
+#include <syscall_restart.h>
 #include <syscalls.h>
 #include <team.h>
 #include <tls.h>
@@ -2762,12 +2763,18 @@ _user_wait_for_child(thread_id child, uint32 flags, int32 *_userReason, status_t
 
 	if (deadChild >= B_OK) {
 		// copy result data on successful completion
-		if ((_userReason != NULL && user_memcpy(_userReason, &reason, sizeof(int32)) < B_OK)
-			|| (_userReturnCode != NULL && user_memcpy(_userReturnCode, &returnCode, sizeof(status_t)) < B_OK))
+		if ((_userReason != NULL
+				&& user_memcpy(_userReason, &reason, sizeof(int32)) < B_OK)
+			|| (_userReturnCode != NULL
+				&& user_memcpy(_userReturnCode, &returnCode, sizeof(status_t))
+					< B_OK)) {
 			return B_BAD_ADDRESS;
+		}
+
+		return deadChild;
 	}
 
-	return deadChild;
+	return syscall_restart_handle_post(deadChild);
 }
 
 
@@ -2992,9 +2999,10 @@ _user_wait_for_team(team_id id, status_t *_userReturnCode)
 	if (status >= B_OK && _userReturnCode != NULL) {
 		if (user_memcpy(_userReturnCode, &returnCode, sizeof(returnCode)) < B_OK)
 			return B_BAD_ADDRESS;
+		return B_OK;
 	}
 
-	return status;
+	return syscall_restart_handle_post(status);
 }
 
 

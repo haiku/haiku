@@ -22,7 +22,7 @@ KernelStaticLibrary libx86 :
 	arch_real_time_clock.c
 	arch_smp.c
 	arch_string.S
-	arch_thread.c
+	arch_thread.cpp
 	arch_timer.c
 	arch_vm.cpp
 	arch_vm_translation_map.cpp

@@ -1,11 +1,10 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-
 
 #include <arch/thread.h>
 
@@ -16,6 +15,7 @@
 #include <int.h>
 #include <thread.h>
 #include <tls.h>
+#include <tracing.h>
 #include <vm_address_space.h>
 #include <vm_types.h>
 
@@ -30,9 +30,35 @@
 #endif
 
 
+#ifdef SYSCALL_TRACING
+
+namespace SyscallTracing {
+
+class RestartSyscall : public AbstractTraceEntry {
+	public:
+		RestartSyscall()
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("syscall restart");
+		}
+};
+
+}
+
+#	define TSYSCALL(x)	new(std::nothrow) SyscallTracing::x
+
+#else
+#	define TSYSCALL(x)
+#endif	// SYSCALL_TRACING
+
+
 // from arch_interrupts.S
-extern void	i386_stack_init(struct farcall *interrupt_stack_offset);
-extern void i386_restore_frame_from_syscall(struct iframe frame);
+extern "C" void i386_stack_init(struct farcall *interrupt_stack_offset);
+extern "C" void i386_restore_frame_from_syscall(struct iframe frame);
 
 // from arch_cpu.c
 extern void (*gX86SwapFPUFunc)(void *oldState, const void *newState);
@@ -125,7 +151,7 @@ i386_get_user_iframe(void)
 }
 
 
-inline void *
+void *
 x86_next_page_directory(struct thread *from, struct thread *to)
 {
 	if (from->team->address_space != NULL && to->team->address_space != NULL) {
@@ -165,14 +191,21 @@ set_tls_context(struct thread *thread)
 }
 
 
-static inline void
-restart_syscall(struct iframe *frame)
+void
+x86_restart_syscall(struct iframe* frame)
 {
+	struct thread* thread = thread_get_current_thread();
+
+	atomic_and(&thread->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+	atomic_or(&thread->flags, THREAD_FLAGS_SYSCALL_RESTARTED);
+
 	frame->eax = frame->orig_eax;
 	frame->edx = frame->orig_edx;
 	frame->eip -= 2;
-		// undos the "int $99" syscall interrupt
-		// (so that it'll be called again)
+		// undoes the "int $99"/"sysenter"/"syscall" instruction
+		// (so that it'll be executed again)
+
+	TSYSCALL(RestartSyscall());
 }
 
 
@@ -403,25 +436,27 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 	int signal, int signalMask)
 {
 	struct iframe *frame = get_current_iframe();
-	uint32 *userStack = (uint32 *)frame->user_esp;
 	uint32 *signalCode;
 	uint32 *userRegs;
 	struct vregs regs;
 	uint32 buffer[6];
 	status_t status;
 
-	if (frame->orig_eax >= 0) {
-		// we're coming from a syscall
-		if ((status_t)frame->eax == EINTR
-			&& (action->sa_flags & SA_RESTART) != 0) {
-			TRACE(("### restarting syscall %d after signal %d\n",
-				frame->orig_eax, sig));
-			restart_syscall(frame);
-		}
-	}
-
 	// start stuffing stuff on the user stack
-	userStack = get_signal_stack(thread, frame, signal);
+	uint32* userStack = get_signal_stack(thread, frame, signal);
+
+	// copy syscall restart info onto the user stack
+	userStack -= (sizeof(thread->syscall_restart.parameters) + 12 + 3) / 4;
+	uint32 threadFlags = atomic_and(&thread->flags,
+		~(THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
+	if (user_memcpy(userStack, &threadFlags, 4) < B_OK
+		|| user_memcpy(userStack + 1, &frame->orig_eax, 4) < B_OK
+		|| user_memcpy(userStack + 2, &frame->orig_edx, 4) < B_OK)
+		return B_BAD_ADDRESS;
+	status = user_memcpy(userStack + 3, thread->syscall_restart.parameters,
+		sizeof(thread->syscall_restart.parameters));
+	if (status < B_OK)
+		return status;
 
 	// store the saved regs onto the user stack
 	regs.eip = frame->eip;
@@ -436,7 +471,7 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 	regs._reserved_2[2] = frame->ebp;
 	i386_fnsave((void *)(&regs.xregs));
 	
-	userStack -= ROUNDUP((sizeof(struct vregs) + 3) / 4, 4);
+	userStack -= (sizeof(struct vregs) + 3) / 4;
 	userRegs = userStack;
 	status = user_memcpy(userRegs, &regs, sizeof(regs));
 	if (status < B_OK)
@@ -481,15 +516,35 @@ arch_restore_signal_frame(void)
 	struct iframe *frame = get_current_iframe();
 	int32 signalMask;
 	uint32 *userStack;
+	struct vregs* regsPointer;
 	struct vregs regs;
 
 	TRACE(("### arch_restore_signal_frame: entry\n"));
 
 	userStack = (uint32 *)frame->user_esp;
-	if (user_memcpy(&signalMask, &userStack[0], sizeof(int32)) < B_OK
-		|| user_memcpy(&regs, (struct vregs *)userStack[1],
-				sizeof(vregs)) < B_OK)
+	if (user_memcpy(&signalMask, &userStack[0], 4) < B_OK
+		|| user_memcpy(&regsPointer, &userStack[1], 4) < B_OK
+		|| user_memcpy(&regs, regsPointer, sizeof(vregs)) < B_OK) {
 		return B_BAD_ADDRESS;
+	}
+
+	uint32* syscallRestartInfo
+		= (uint32*)regsPointer + (sizeof(struct vregs) + 3) / 4;
+	uint32 threadFlags;
+	if (user_memcpy(&threadFlags, syscallRestartInfo, 4) < B_OK
+		|| user_memcpy(&frame->orig_eax, syscallRestartInfo + 1, 4) < B_OK
+		|| user_memcpy(&frame->orig_edx, syscallRestartInfo + 2, 4) < B_OK
+		|| user_memcpy(thread->syscall_restart.parameters,
+			syscallRestartInfo + 3,
+			sizeof(thread->syscall_restart.parameters)) < B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	// set restart/64bit return value flags from previous syscall
+	atomic_and(&thread->flags,
+		~(THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
+	atomic_or(&thread->flags, threadFlags
+		& (THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
 
 	atomic_set(&thread->sig_block_mask, signalMask);
 
@@ -509,20 +564,6 @@ arch_restore_signal_frame(void)
 	TRACE(("### arch_restore_signal_frame: exit\n"));
 
 	return (int64)frame->eax | ((int64)frame->edx << 32);
-}
-
-
-void
-arch_check_syscall_restart(struct thread *thread)
-{
-	struct iframe *frame = get_current_iframe();
-	if (frame == NULL) {
-		// this thread is obviously new; we didn't come from an interrupt
-		return;
-	}
-
-	if ((status_t)frame->orig_eax >= 0 && (status_t)frame->eax == EINTR)
-		restart_syscall(frame);
 }
 
 
@@ -569,7 +610,7 @@ arch_restore_fork_frame(struct arch_fork_arg *arg)
 
 
 void
-arch_syscall_64_bit_return_value()
+arch_syscall_64_bit_return_value(void)
 {
 	struct thread* thread = thread_get_current_thread();
 	atomic_or(&thread->flags, THREAD_FLAGS_64_BIT_SYSCALL_RETURN);

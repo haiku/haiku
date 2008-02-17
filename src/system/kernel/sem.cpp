@@ -25,6 +25,7 @@
 #include <vm_low_memory.h>
 #include <vm_page.h>
 #include <boot/kernel_args.h>
+#include <syscall_restart.h>
 #include <wait_for_objects.h>
 
 #include <string.h>
@@ -886,6 +887,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 				&& (thread->sig_pending & KILL_SIGNALS))) {
 			sSems[slot].u.used.count += count;
 			status = B_INTERRUPTED;
+				// the other semaphore will be released later
 			goto err;
 		}
 
@@ -919,8 +921,10 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 
 		RELEASE_SEM_LOCK(sSems[slot]);
 
-		if (semToBeReleased >= B_OK)
+		if (semToBeReleased >= B_OK) {
 			release_sem_etc(semToBeReleased, 1, B_DO_NOT_RESCHEDULE);
+			semToBeReleased = -1;
+		}
 
 		GRAB_THREAD_LOCK();
 		// check again to see if a signal is pending.
@@ -982,6 +986,13 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 err:
 	RELEASE_SEM_LOCK(sSems[slot]);
 	restore_interrupts(state);
+
+	if (status == B_INTERRUPTED && semToBeReleased >= B_OK) {
+		// depending on when we were interrupted, we need to still
+		// release the semaphore to always leave in a consistent
+		// state
+		release_sem_etc(semToBeReleased, 1, B_DO_NOT_RESCHEDULE);
+	}
 
 #if 0
 	if (status == B_NOT_ALLOWED)
@@ -1298,28 +1309,52 @@ _user_delete_sem(sem_id id)
 status_t
 _user_acquire_sem(sem_id id)
 {
-	return switch_sem_etc(-1, id, 1, B_CAN_INTERRUPT | B_CHECK_PERMISSION, 0);
+	status_t error = switch_sem_etc(-1, id, 1,
+		B_CAN_INTERRUPT | B_CHECK_PERMISSION, 0);
+
+	return syscall_restart_handle_post(error);
 }
 
 
 status_t
 _user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
-	return switch_sem_etc(-1, id, count, flags | B_CAN_INTERRUPT | B_CHECK_PERMISSION, timeout);
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
+	status_t error = switch_sem_etc(-1, id, count,
+		flags | B_CAN_INTERRUPT | B_CHECK_PERMISSION, timeout);
+
+	return syscall_restart_handle_timeout_post(error, timeout);
 }
 
 
 status_t
 _user_switch_sem(sem_id releaseSem, sem_id id)
 {
-	return switch_sem_etc(releaseSem, id, 1, B_CAN_INTERRUPT | B_CHECK_PERMISSION, 0);
+	status_t error = switch_sem_etc(releaseSem, id, 1,
+		B_CAN_INTERRUPT | B_CHECK_PERMISSION, 0);
+
+	if (releaseSem < 0)
+		return syscall_restart_handle_post(error);
+
+	return error;
 }
 
 
 status_t
-_user_switch_sem_etc(sem_id releaseSem, sem_id id, int32 count, uint32 flags, bigtime_t timeout)
+_user_switch_sem_etc(sem_id releaseSem, sem_id id, int32 count, uint32 flags,
+	bigtime_t timeout)
 {
-	return switch_sem_etc(releaseSem, id, count, flags | B_CAN_INTERRUPT | B_CHECK_PERMISSION, timeout);
+	if (releaseSem < 0)
+		syscall_restart_handle_timeout_pre(flags, timeout);
+
+	status_t error = switch_sem_etc(releaseSem, id, count,
+		flags | B_CAN_INTERRUPT | B_CHECK_PERMISSION, timeout);
+
+	if (releaseSem < 0)
+		return syscall_restart_handle_timeout_post(error, timeout);
+
+	return error;
 }
 
 

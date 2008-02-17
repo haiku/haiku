@@ -35,6 +35,7 @@
 #include <KPath.h>
 #include <lock.h>
 #include <syscalls.h>
+#include <syscall_restart.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_cache.h>
@@ -4565,7 +4566,8 @@ dir_remove(int fd, char *path, bool kernel)
 
 
 static status_t
-common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer, size_t length)
+common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
+	size_t length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
@@ -7467,7 +7469,11 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 status_t 
 _user_fcntl(int fd, int op, uint32 argument)
 {
-	return common_fcntl(fd, op, argument, false);
+	status_t status = common_fcntl(fd, op, argument, false);
+	if (op == F_SETLKW)
+		syscall_restart_handle_post(status);
+
+	return status;
 }
 
 
@@ -7509,6 +7515,8 @@ _user_flock(int fd, int op)
 			thread_get_current_thread()->team->session_id, &flock,
 			(op & LOCK_NB) == 0);
 	}
+
+	syscall_restart_handle_post(status);
 
 	put_fd(descriptor);
 	return status;

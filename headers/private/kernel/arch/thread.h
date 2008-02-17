@@ -41,7 +41,6 @@ bool arch_on_signal_stack(struct thread *thread);
 status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa,
 	int signal, int signalMask);
 int64 arch_restore_signal_frame(void);
-void arch_check_syscall_restart(struct thread *t);
 
 void arch_store_fork_frame(struct arch_fork_arg *arg);
 void arch_restore_fork_frame(struct arch_fork_arg *arg);
