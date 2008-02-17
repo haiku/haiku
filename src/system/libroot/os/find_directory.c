@@ -60,24 +60,24 @@ static const char *os_dirs[] = {
 
 static const char *common_dirs[] = {
 	COMMON "",								// B_COMMON_DIRECTORY
-	COMMON "/config",						// B_COMMON_SYSTEM_DIRECTORY
-	COMMON "/config/add-ons",
-	COMMON "/config/boot",
-	COMMON "/config/fonts",
-	COMMON "/config/lib",
-	COMMON "/config/servers",
-	COMMON "/config/bin",
-	COMMON "/config/etc",
-	COMMON "/config/documentation",
-	COMMON "/config/settings",
+	COMMON "",								// B_COMMON_SYSTEM_DIRECTORY
+	COMMON "/add-ons",
+	COMMON "/boot",
+	COMMON "/fonts",
+	COMMON "/lib",
+	COMMON "/servers",
+	COMMON "/bin",
+	COMMON "/etc",
+	COMMON "/documentation",
+	COMMON "/settings",
 	"develop",								// B_COMMON_DEVELOP_DIRECTORY
 	"var/log",								// B_COMMON_LOG_DIRECTORY
 	"var/spool",							// B_COMMON_SPOOL_DIRECTORY
 	"var/tmp",								// B_COMMON_TEMP_DIRECTORY
 	"var",									// B_COMMON_VAR_DIRECTORY
-	COMMON "/config/add-ons/Translators",
-	COMMON "/config/add-ons/media",
-	COMMON "/config/sounds",
+	COMMON "/add-ons/Translators",
+	COMMON "/add-ons/media",
+	COMMON "/sounds",
 };
 
 /* User directories */
