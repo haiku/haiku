@@ -341,6 +341,25 @@ AbstractTraceEntry::AddDump(TraceOutput& out)
 
 #if ENABLE_TRACING
 
+class KernelTraceEntry : public AbstractTraceEntry {
+	public:
+		KernelTraceEntry(const char* message)
+		{
+			fMessage = alloc_tracing_buffer_strcpy(message, 256, false);
+
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("kern: %s", fMessage);
+		}
+
+	private:
+		char*	fMessage;
+};
+
+
 class UserTraceEntry : public AbstractTraceEntry {
 	public:
 		UserTraceEntry(const char* message)
@@ -1084,6 +1103,23 @@ tracing_init(void)
 		"               string).\n", 0);
 #endif	// ENABLE_TRACING
 	return B_OK;
+}
+
+
+void
+ktrace_printf(const char *format, ...)
+{
+#if	ENABLE_TRACING
+	va_list list;
+	va_start(list, format);
+
+	char buffer[256];
+	vsnprintf(buffer, sizeof(buffer), format, list);
+
+	va_end(list);
+
+	new(nothrow) KernelTraceEntry(buffer);
+#endif	// ENABLE_TRACING
 }
 
 
