@@ -481,7 +481,7 @@ arch_setup_signal_frame(struct thread *thread, struct sigaction *action,
 	userStack -= ((uint32)i386_end_return_from_signal + 3
 		- (uint32)i386_return_from_signal) / 4;
 	signalCode = userStack;
-	status = user_memcpy(signalCode, i386_return_from_signal,
+	status = user_memcpy(signalCode, (const void *)&i386_return_from_signal,
 		((uint32)i386_end_return_from_signal
 			- (uint32)i386_return_from_signal));
 	if (status < B_OK)
