@@ -59,18 +59,20 @@ search_path_for_type(image_type type)
 
 	switch (type) {
 		case B_APP_IMAGE:
-			return "/bin:"
-				"/boot/apps:"
-				"/boot/preferences:"
-				"/boot/beos/apps:"
-				"/boot/beos/preferences:"
-				"/boot/develop/tools/gnupro/bin";
+			return "/boot/common/bin"
+				":/bin"
+				":/boot/apps"
+				":/boot/preferences"
+				":/boot/beos/apps"
+				":/boot/beos/preferences"
+				":/boot/develop/tools/gnupro/bin";
 
 		case B_LIBRARY_IMAGE:
-			return "%A/lib:/boot/beos/system/lib";
+			return "%A/lib:/boot/common/lib:/boot/beos/system/lib";
 
 		case B_ADD_ON_IMAGE:
 			return "%A/add-ons"
+				":/boot/common/add-ons"
 				":/boot/beos/system/add-ons";
 
 		default:
