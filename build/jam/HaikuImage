@@ -588,10 +588,7 @@ AddTargetVariableToScript $(script) : <build>makebootable ;
 AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
 AddTargetVariableToScript $(script) : <build>unzip ;
-#AddTargetVariableToScript $(script) : $(HAIKU_IMAGE) : imagePath ;
-	# causes a cyclic dependency
-AddVariableToScript $(script) : imagePath
-	: [ FDirName $(HAIKU_IMAGE_DIR) $(HAIKU_IMAGE_NAME) ] ;
+AddTargetVariableToScript $(script) : <build>vmdkheader ;
 AddVariableToScript $(script) : sourceDirsToCopy
 	: $(HAIKU_INSTALL_SOURCE_DIRS) ;
 
@@ -607,12 +604,10 @@ CreateHaikuImageCopyFilesScript $(HAIKU_IMAGE_COPY_FILES_SCRIPT) ;
 CreateHaikuImageUnzipFilesScript $(HAIKU_IMAGE_UNZIP_FILES_SCRIPT) ;
 
 # Convenience wrapper rule around BuildHaikuImage.
-rule _BuildHaikuImage
+rule _BuildHaikuImage image : isImage : isVMwareImage
 {
-	# _BuildHaikuImage <image target> : <isImage> ;
+	# _BuildHaikuImage <image target> : <isImage> : <isVMwareImage> ;
 	#
-	local image = $(1) ;
-	local isImage = $(2) ;
 
 	# build the image
 	# HAIKU_IMAGE_EARLY_USER_SCRIPTS, HAIKU_IMAGE_LATE_USER_SCRIPTS can be
@@ -625,6 +620,7 @@ rule _BuildHaikuImage
 		$(HAIKU_IMAGE_UNZIP_FILES_SCRIPT)
 		$(HAIKU_IMAGE_LATE_USER_SCRIPTS)
 		: $(isImage)
+		: $(isVMwareImage)
 	;
 
 	# remove the scripts we have generated
@@ -641,18 +637,17 @@ _BuildHaikuImage $(HAIKU_IMAGE) : true ;
 NotFile haiku-image ;
 Depends haiku-image : $(HAIKU_IMAGE) ;
 
+
 # install Haiku into a directory
 NotFile install-haiku ;
 _BuildHaikuImage install-haiku : 0 ;
 
 
-#pragma mark - Build The VMWare Image
-
+# build the VMware image
 HAIKU_VMWARE_IMAGE_NAME ?= haiku.vmdk ;
 HAIKU_VMWARE_IMAGE ?= $(HAIKU_VMWARE_IMAGE_NAME) ;
 MakeLocate $(HAIKU_VMWARE_IMAGE) : $(HAIKU_IMAGE_DIR) ;
 
-BuildVMWareImage $(HAIKU_VMWARE_IMAGE) : $(HAIKU_IMAGE)
-	: $(HAIKU_IMAGE_SIZE) ;
+_BuildHaikuImage $(HAIKU_VMWARE_IMAGE) : true : true ;
 NotFile haiku-vmware-image ;
 Depends haiku-vmware-image : $(HAIKU_VMWARE_IMAGE) ;

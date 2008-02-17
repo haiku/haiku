@@ -624,14 +624,20 @@ rule CreateHaikuImageUnzipFilesScript script
 	CreateContainerUnzipFilesScript $(HAIKU_IMAGE_CONTAINER_NAME) : $(script) ;
 }
 
-rule BuildHaikuImage haikuImage : scripts : isImage
+rule BuildHaikuImage haikuImage : scripts : isImage : isVMwareImage
 {
-	# BuildHaikuImage <haiku image> : <scripts> : <is image> ;
+	# BuildHaikuImage <haiku image> : <scripts> : <is image> : <isVMwareImage> ;
 
 	if $(isImage) = 1 || $(isImage) = true {
 		IS_IMAGE on $(haikuImage) = 1 ;
 	} else {
 		IS_IMAGE on $(haikuImage) = "" ;
+	}
+
+	if $(isVMwareImage) = 1 || $(isVMwareImage) = true {
+		IS_VMWARE_IMAGE on $(haikuImage) = 1 ;
+	} else {
+		IS_VMWARE_IMAGE on $(haikuImage) = "" ;
 	}
 
 	local mainScript = build_haiku_image ;
@@ -643,7 +649,9 @@ rule BuildHaikuImage haikuImage : scripts : isImage
 
 actions BuildHaikuImage1
 {
+	export imagePath="$(1)"
 	export isImage="$(IS_IMAGE)"
+	export isVMwareImage="$(IS_VMWARE_IMAGE)"
 	$(2[1]) $(2[2-])
 }
 

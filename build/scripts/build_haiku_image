@@ -12,6 +12,7 @@
 # sourceDirsToCopy
 # updateOnly
 # dontClearImage
+# isVMwareImage
 # 
 # bfsShell
 # copyattr
@@ -20,6 +21,7 @@
 # resattr
 # rc
 # unzip
+# vmdkheader
 #
 if [ $# -gt 0 ]; then
 	. $1
@@ -93,15 +95,30 @@ unzipFile()
 # create the image and mount it
 if [ $isImage ]; then
 	echo
+
+	imageOffsetFlags=
+	if [ $isVMwareImage ]; then
+		imageOffsetFlags="--start-offset 65536"
+	fi
+
 	if [ ! $updateOnly ]; then
 		echo "Creating image ..."
-		if [ ! -e $imagePath -o ! "$dontClearImage" ]; then
-			dd if=/dev/zero of=$imagePath bs=1048576 count=$imageSize
+
+		ddFlags=		
+		if [ $isVMwareImage ]; then
+			rm -f $imagePath
+			$vmdkheader -h 64k -i${imageSize}M $imagePath || exit 1
+			ddFlags="conv=notrunc oflag=append"
+			dontClearImage=
 		fi
-		$bfsShell --initialize $imagePath Haiku
-		$makebootable $imagePath
+
+		if [ ! -e $imagePath -o ! "$dontClearImage" ]; then
+			dd if=/dev/zero of=$imagePath bs=1048576 count=$imageSize $ddFlags
+		fi
+		$bfsShell --initialize $imageOffsetFlags $imagePath Haiku
+		$makebootable $imageOffsetFlags $imagePath
 	fi
-	$bfsShell -n $imagePath > /dev/null &
+	$bfsShell -n $imageOffsetFlags $imagePath > /dev/null &
 	sleep 1
 fi
 
