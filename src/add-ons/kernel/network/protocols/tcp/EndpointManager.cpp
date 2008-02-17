@@ -405,6 +405,9 @@ EndpointManager::ReplyWithReset(tcp_segment_header &segment,
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) == 0) {
 		outSegment.flags |= TCP_FLAG_ACKNOWLEDGE;
 		outSegment.acknowledge = segment.sequence + buffer->size;
+		// TODO: Confirm:
+		if ((segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH)) != 0)
+			outSegment.acknowledge++;
 	} else
 		outSegment.sequence = segment.acknowledge;
 

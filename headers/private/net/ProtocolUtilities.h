@@ -348,6 +348,11 @@ DECL_DATAGRAM_SOCKET(inline bigtime_t)::_SocketTimeout(uint32 flags) const
 	else if (timeout != 0 && timeout != B_INFINITE_TIMEOUT)
 		timeout += system_time();
 
+	if (ModuleBundle::Stack()->is_restarted_syscall())
+		timeout = ModuleBundle::Stack()->restore_syscall_restart_timeout();
+	else
+		ModuleBundle::Stack()->store_syscall_restart_timeout(timeout);
+
 	return timeout;
 }
 

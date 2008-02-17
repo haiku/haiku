@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -10,16 +10,17 @@
 
 #include <net_stack_driver.h>
 
-#include <sys/ioctl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
 
+#include <driver_settings.h>
 #include <Drivers.h>
 #include <KernelExport.h>
-#include <driver_settings.h>
 
-#include <kernel.h> // IS_KERNEL_ADDRESS
-#include <fs/fd.h>	// user_fd_kernel_ioctl
+#include <fs/fd.h>
+#include <kernel.h>
+#include <syscall_restart.h>
 
 #include <net_socket.h>
 
@@ -96,8 +97,9 @@ check_args_and_address(ArgType &args, sockaddr_storage &address, void *data, siz
 
 
 static status_t
-check_message_args(message_args &args, msghdr &header, sockaddr_storage &address,
-					void *data, size_t length, sockaddr **originalAddress)
+check_message_args(message_args &args, msghdr &header,
+	sockaddr_storage &address, void *data, size_t length,
+	sockaddr **originalAddress)
 {
 	if (length < sizeof(message_args))
 		return B_BAD_VALUE;
@@ -132,6 +134,7 @@ check_message_args(message_args &args, msghdr &header, sockaddr_storage &address
 
 	return B_OK;
 }
+
 
 template<typename ArgType> status_t
 check_args(ArgType &args, void *data, size_t length)
@@ -205,9 +208,9 @@ resolve_cookie(int kernel, int socket, net_stack_cookie **cookie)
 {
 	if (kernel)
 		return ioctl(socket, NET_STACK_GET_COOKIE, cookie, sizeof(*cookie));
-	else
-		return user_fd_kernel_ioctl(socket, NET_STACK_GET_COOKIE, cookie,
-			sizeof(*cookie));
+
+	return user_fd_kernel_ioctl(socket, NET_STACK_GET_COOKIE, cookie,
+		sizeof(*cookie));
 }
 
 
@@ -251,7 +254,8 @@ net_stack_open(const char *name, uint32 flags, void **_cookie)
 		}
 	}
 
-	net_stack_cookie *cookie = (net_stack_cookie *)malloc(sizeof(net_stack_cookie));
+	net_stack_cookie *cookie = (net_stack_cookie *)malloc(
+		sizeof(net_stack_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
@@ -363,7 +367,10 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (status < B_OK)
 					return status;
 
-				return sSocket->connect(cookie->socket, args.address, args.address_length);
+				status = sSocket->connect(cookie->socket, args.address,
+					args.address_length);
+
+				return syscall_restart_ioctl_handle_post(status);
 			}
 
 			case NET_STACK_BIND:
@@ -387,7 +394,8 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				sockaddr_storage address;
 				accept_args args;
 
-				status = check_args_and_address(args, address, data, length, false);
+				status = check_args_and_address(args, address, data, length,
+					false);
 				if (status < B_OK)
 					return status;
 
@@ -399,8 +407,9 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 
 				status = sSocket->accept(cookie->socket, args.address,
 					&args.address_length, &acceptCookie->socket);
+
 				if (status < B_OK)
-					return status;
+					return syscall_restart_ioctl_handle_post(status);
 
 				return return_address(args, data);
 			}
@@ -415,13 +424,15 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				msghdr header;
 
 				status = check_message_args(args, header, address, data,
-											length, NULL);
+					length, NULL);
 				if (status < B_OK)
 					return status;
 
-				return sSocket->send(cookie->socket,
-						args.header ? &header : NULL,
-						args.data, args.length, args.flags);
+				ssize_t bytesSent = sSocket->send(cookie->socket,
+					args.header ? &header : NULL,
+					args.data, args.length, args.flags);
+
+				return syscall_restart_ioctl_handle_post(bytesSent);
 			}
 
 			case NET_STACK_RECEIVE:
@@ -432,25 +443,25 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				msghdr header;
 
 				status = check_message_args(args, header, address, data,
-											length, &originalAddress);
+					length, &originalAddress);
 				if (status < B_OK)
 					return status;
 
 				ssize_t bytesRead = sSocket->receive(cookie->socket,
-						args.header ? &header : NULL, args.data,
-						args.length, args.flags);
+					args.header ? &header : NULL, args.data,
+					args.length, args.flags);
 				if (bytesRead < B_OK)
-					return bytesRead;
+					return syscall_restart_ioctl_handle_post(bytesRead);
 
 				if (args.header != NULL) {
 					if (header.msg_name != NULL) {
 						if (user_memcpy(originalAddress, header.msg_name,
-										header.msg_namelen) < B_OK)
+								header.msg_namelen) < B_OK)
 							return B_BAD_ADDRESS;
 					}
 
 					if (user_memcpy(&args.header->msg_flags, &header.msg_flags,
-									sizeof(int)) < B_OK)
+							sizeof(int)) < B_OK)
 						return B_BAD_ADDRESS;
 				}
 
@@ -468,13 +479,14 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (args.length > (int)sizeof(valueBuffer))
 					return ENOBUFS;
 
-				status = sSocket->getsockopt(cookie->socket, args.level, args.option,
-					valueBuffer, &args.length);
+				status = sSocket->getsockopt(cookie->socket, args.level,
+					args.option, valueBuffer, &args.length);
 				if (status < B_OK)
 					return status;
 
 				if (user_memcpy(args.value, valueBuffer, args.length) < B_OK
-					|| user_memcpy(&((sockopt_args *)data)->length, &args.length, sizeof(int)) < B_OK)
+					|| user_memcpy(&((sockopt_args *)data)->length,
+						&args.length, sizeof(int)) < B_OK)
 					return B_BAD_ADDRESS;
 
 				return B_OK;
@@ -493,15 +505,16 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (user_memcpy(valueBuffer, args.value, args.length) < B_OK)
 					return B_BAD_ADDRESS;
 
-				return sSocket->setsockopt(cookie->socket, args.level, args.option,
-					valueBuffer, args.length);
+				return sSocket->setsockopt(cookie->socket, args.level,
+					args.option, valueBuffer, args.length);
 			}
 
 			case NET_STACK_GETSOCKNAME:
 			{
 				sockaddr_storage address;
 				sockaddr_args args;
-				status = check_args_and_address(args, address, data, length, false);
+				status = check_args_and_address(args, address, data, length,
+					false);
 				if (status < B_OK)
 					return status;
 
@@ -517,7 +530,8 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 			{
 				sockaddr_storage address;
 				sockaddr_args args;
-				status = check_args_and_address(args, address, data, length, false);
+				status = check_args_and_address(args, address, data, length,
+					false);
 				if (status < B_OK)
 					return status;
 
@@ -532,16 +546,16 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 			case FIONBIO:
 			{
 				int value = (int)data;
-				return sSocket->setsockopt(cookie->socket, SOL_SOCKET, SO_NONBLOCK,
-					&value, sizeof(int));
+				return sSocket->setsockopt(cookie->socket, SOL_SOCKET,
+					SO_NONBLOCK, &value, sizeof(int));
 			}
 
 			case B_SET_BLOCKING_IO:
 			case B_SET_NONBLOCKING_IO:
 			{
 				int value = op == B_SET_NONBLOCKING_IO;
-				return sSocket->setsockopt(cookie->socket, SOL_SOCKET, SO_NONBLOCK,
-					&value, sizeof(int));
+				return sSocket->setsockopt(cookie->socket, SOL_SOCKET,
+					SO_NONBLOCK, &value, sizeof(int));
 			}
 
 			default:

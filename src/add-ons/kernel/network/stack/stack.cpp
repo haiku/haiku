@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -932,6 +932,10 @@ net_stack_module_info gNetStackModule = {
 	set_timer,
 	cancel_timer,
 	is_timer_active,
+
+	is_restarted_syscall,
+	store_syscall_restart_timeout,
+	restore_syscall_restart_timeout,
 };
 
 static module_info sNetStarterModule = {

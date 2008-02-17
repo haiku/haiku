@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -100,5 +100,10 @@ bool		cancel_timer(struct net_timer *timer);
 bool		is_timer_active(net_timer *timer);
 status_t	init_timers(void);
 void		uninit_timers(void);
+
+// syscall restart
+bool		is_restarted_syscall(void);
+void		store_syscall_restart_timeout(bigtime_t timeout);
+bigtime_t	restore_syscall_restart_timeout(void);
 
 #endif	// NET_UTILITY_H

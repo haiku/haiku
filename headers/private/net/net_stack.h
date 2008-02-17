@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_STACK_H
@@ -44,8 +44,9 @@ struct net_timer {
 	bigtime_t		due;
 };
 
-typedef int32 (*net_deframe_func)(struct net_device *device, struct net_buffer *buffer);
-typedef status_t (*net_receive_func)(void *cookie, struct net_device *,
+typedef int32 (*net_deframe_func)(struct net_device *device,
+	struct net_buffer *buffer);
+typedef status_t (*net_receive_func)(void *cookie, struct net_device *device,
 	struct net_buffer *buffer);
 
 enum {
@@ -132,6 +133,11 @@ struct net_stack_module_info {
 	void (*set_timer)(struct net_timer *timer, bigtime_t delay);
 	bool (*cancel_timer)(struct net_timer *timer);
 	bool (*is_timer_active)(struct net_timer *timer);
+
+	// syscall restart
+	bool (*is_restarted_syscall)(void);
+	void (*store_syscall_restart_timeout)(bigtime_t timeout);
+	bigtime_t (*restore_syscall_restart_timeout)(void);
 };
 
 #endif	// NET_STACK_H

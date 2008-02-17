@@ -170,6 +170,9 @@ state_needs_finish(int32 state)
 }
 
 
+//	#pragma mark -
+
+
 WaitList::WaitList(const char *name)
 {
 	fCondition = 0;
@@ -224,6 +227,9 @@ WaitList::Signal()
 }
 
 
+//	#pragma mark -
+
+
 TCPEndpoint::TCPEndpoint(net_socket *socket)
 	:
 	ProtocolSocket(socket),
@@ -255,8 +261,7 @@ TCPEndpoint::TCPEndpoint(net_socket *socket)
 	fCongestionWindow(0),
 	fSlowStartThreshold(0),
 	fState(CLOSED),
-	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP),
-	fError(B_OK)
+	fFlags(FLAG_OPTION_WINDOW_SCALE | FLAG_OPTION_TIMESTAMP)
 {
 	//gStackModule->init_timer(&fTimer, _TimeWait, this);
 
@@ -394,13 +399,23 @@ TCPEndpoint::Connect(const sockaddr *address)
 
 	MutexLocker locker(fLock);
 
+	if (gStackModule->is_restarted_syscall()) {
+		bigtime_t timeout = gStackModule->restore_syscall_restart_timeout();
+		status_t status = _WaitForEstablished(locker, timeout);
+		TRACE("  Connect(): Connection complete: %s (timeout was %llu)",
+			strerror(status), timeout);
+		return posix_error(status);
+	}
+
 	// Can only call connect() from CLOSED or LISTEN states
 	// otherwise endpoint is considered already connected
 	if (fState == LISTEN) {
 		// this socket is about to connect; remove pending connections in the backlog
 		gSocketModule->set_max_backlog(socket, 0);
-	} else if (fState != CLOSED)
+	} else if (fState == ESTABLISHED) {
 		return EISCONN;
+	} else if (fState != CLOSED)
+		return EINPROGRESS;
 
 	status_t status = _PrepareSendPath(address);
 	if (status < B_OK)
@@ -432,7 +447,10 @@ TCPEndpoint::Connect(const sockaddr *address)
 		return EINPROGRESS;
 	}
 
-	status = _WaitForEstablished(locker, absolute_timeout(timeout));
+	bigtime_t absoluteTimeout = absolute_timeout(timeout);
+	gStackModule->store_syscall_restart_timeout(absoluteTimeout);
+
+	status = _WaitForEstablished(locker, absoluteTimeout);
 	TRACE("  Connect(): Connection complete: %s (timeout was %llu)",
 		strerror(status), timeout);
 	return posix_error(status);
@@ -448,6 +466,10 @@ TCPEndpoint::Accept(struct net_socket **_acceptedSocket)
 
 	status_t status;
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+	if (gStackModule->is_restarted_syscall())
+		timeout = gStackModule->restore_syscall_restart_timeout();
+	else
+		gStackModule->store_syscall_restart_timeout(timeout);
 
 	do {
 		locker.Unlock();
@@ -567,6 +589,10 @@ TCPEndpoint::SendData(net_buffer *buffer)
 			return ENOBUFS;
 
 		bigtime_t timeout = absolute_timeout(socket->send.timeout);
+		if (gStackModule->is_restarted_syscall())
+			timeout = gStackModule->restore_syscall_restart_timeout();
+		else
+			gStackModule->store_syscall_restart_timeout(timeout);
 
 		while (fSendQueue.Free() < buffer->size) {
 			status_t status = fSendList.Wait(lock, timeout);
@@ -632,6 +658,10 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		return ENOTCONN;
 
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
+	if (gStackModule->is_restarted_syscall())
+		timeout = gStackModule->restore_syscall_restart_timeout();
+	else
+		gStackModule->store_syscall_restart_timeout(timeout);
 
 	if (fState == SYNCHRONIZE_SENT || fState == SYNCHRONIZE_RECEIVED) {
 		if (flags & MSG_DONTWAIT)
@@ -913,11 +943,27 @@ TCPEndpoint::DumpInternalState() const
 }
 
 
+void
+TCPEndpoint::_HandleReset(status_t error)
+{
+	gStackModule->cancel_timer(&fRetransmitTimer);
+
+	socket->error = error;
+	fState = CLOSED;
+
+	fSendList.Signal();
+	_NotifyReader();
+
+	gSocketModule->notify(socket, B_SELECT_WRITE, error);
+	gSocketModule->notify(socket, B_SELECT_ERROR, error);
+}
+
+
 int32
 TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment,
 	net_buffer *buffer)
 {
-	TRACE("SynchronizeSentReceive()");
+	TRACE("_SynchronizeSentReceive()");
 
 	if ((segment.flags & TCP_FLAG_ACKNOWLEDGE) != 0
 		&& (fInitialSendSequence >= segment.acknowledge
@@ -925,8 +971,7 @@ TCPEndpoint::_SynchronizeSentReceive(tcp_segment_header &segment,
 		return DROP | RESET;
 
 	if (segment.flags & TCP_FLAG_RESET) {
-		fError = ECONNREFUSED;
-		fState = CLOSED;
+		_HandleReset(ECONNREFUSED);
 		return DROP;
 	}
 
@@ -1040,8 +1085,10 @@ TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 				fReceiveWindow)) {
 			TRACE("  Receive(): segment out of window, next: %lu wnd: %lu",
 				(uint32)fReceiveNext, fReceiveWindow);
-			if (segment.flags & TCP_FLAG_RESET)
+			if (segment.flags & TCP_FLAG_RESET) {
+				// TODO: this doesn't look right - review!
 				return DROP;
+			}
 			return DROP | IMMEDIATE_ACKNOWLEDGE;
 		}
 	}
@@ -1079,7 +1126,7 @@ TCPEndpoint::_CurrentFlags()
 			return TCP_FLAG_ACKNOWLEDGE;
 
 		default:
-			return B_ERROR;
+			return 0;
 	}
 }
 
@@ -1400,16 +1447,16 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 		if (fLastAcknowledgeSent <= segment.sequence
 			&& tcp_sequence(segment.sequence) < (fLastAcknowledgeSent
 				+ fReceiveWindow)) {
+			status_t error;
 			if (fState == SYNCHRONIZE_RECEIVED)
-				fError = ECONNREFUSED;
+				error = ECONNREFUSED;
 			else if (fState == CLOSING || fState == TIME_WAIT
 				|| fState == WAIT_FOR_FINISH_ACKNOWLEDGE)
-				fError = ENOTCONN;
+				error = ENOTCONN;
 			else
-				fError = ECONNRESET;
+				error = ECONNRESET;
 
-			_NotifyReader();
-			fState = CLOSED;
+			_HandleReset(error);
 		}
 
 		return DROP;
@@ -1635,6 +1682,9 @@ status_t
 TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 {
 	while (fState != ESTABLISHED) {
+		if (socket->error != B_OK)
+			return socket->error;
+
 		status_t status = fSendList.Wait(locker, timeout);
 		if (status < B_OK)
 			return status;
@@ -1752,7 +1802,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header &segment)
 		if (segment.options & TCP_HAS_TIMESTAMPS)
 			_UpdateSRTT(tcp_diff_timestamp(segment.timestamp_reply));
 		else {
-			// TODO Fallback to RFC 793 type estimation
+			// TODO: Fallback to RFC 793 type estimation
 		}
 
 		if (is_writable(fState)) {

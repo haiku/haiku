@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,7 @@
 #include "utility.h"
 
 #include <net_buffer.h>
+#include <syscall_restart.h>
 #include <util/AutoLock.h>
 
 #include <ByteOrder.h>
@@ -568,5 +569,32 @@ uninit_timers(void)
 
 	status_t status;
 	wait_for_thread(sTimerThread, &status);
+}
+
+
+//	#pragma mark - Syscall restart
+
+
+bool
+is_restarted_syscall(void)
+{
+	return syscall_restart_ioctl_is_restarted();
+}
+
+
+void
+store_syscall_restart_timeout(bigtime_t timeout)
+{
+	struct thread* thread = thread_get_current_thread();
+	if ((thread->flags & THREAD_FLAGS_IOCTL_SYSCALL) != 0)
+		*(bigtime_t*)thread->syscall_restart.parameters = timeout;
+}
+
+
+bigtime_t
+restore_syscall_restart_timeout(void)
+{
+	struct thread* thread = thread_get_current_thread();
+	return *(bigtime_t*)thread->syscall_restart.parameters;
 }
 
