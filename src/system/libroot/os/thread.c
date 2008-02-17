@@ -113,6 +113,8 @@ _thread_do_exit_notification(void)
 
 		node = next;
 	}
+
+	tls_set(TLS_ON_EXIT_THREAD_SLOT, NULL);
 }
 
 
