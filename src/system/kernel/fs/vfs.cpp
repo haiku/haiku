@@ -34,6 +34,7 @@
 #include <khash.h>
 #include <KPath.h>
 #include <lock.h>
+#include <syscall_restart.h>
 #include <syscalls.h>
 #include <vfs.h>
 #include <vm.h>
@@ -1940,7 +1941,7 @@ vnode_and_path_to_dir_vnode(struct vnode* vnode, char *path,
 		return B_BAD_VALUE;
 	if (*path == '\0')
 		return B_ENTRY_NOT_FOUND;
-	if (vnode == NULL)
+	if (vnode == NULL || path[0] == '/')
 		return path_to_dir_vnode(path, _vnode, filename, kernel);
 
 	status_t status = get_dir_path_and_leaf(path, filename);
