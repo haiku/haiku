@@ -1698,7 +1698,9 @@ AudioMixer::UpdateParameterWeb()
 	group->MakeDiscreteParameter(PARAM_ETC(80), B_MEDIA_RAW_AUDIO, "Refuse output format changes", B_ENABLE);
 	group->MakeDiscreteParameter(PARAM_ETC(90), B_MEDIA_RAW_AUDIO, "Refuse input format changes", B_ENABLE);
 
+	top = web->MakeGroup("Info"); // top level group
 	group = top->MakeGroup("");
+	
 	group->MakeNullParameter(PARAM_ETC(1001), B_MEDIA_RAW_AUDIO, "Info:", B_GENERIC);
 	group->MakeNullParameter(PARAM_ETC(1002), B_MEDIA_RAW_AUDIO, "Haiku audio mixer", B_GENERIC);
 	group->MakeNullParameter(PARAM_ETC(1003), B_MEDIA_RAW_AUDIO, "Version: " VERSION_STRING , B_GENERIC);
