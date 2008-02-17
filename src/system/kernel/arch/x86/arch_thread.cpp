@@ -395,7 +395,7 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
 	// function returns, as well as the arguments of the entry function
 	stackTop -= codeSize;
 
-	if (user_memcpy((void *)stackTop, x86_userspace_thread_exit, codeSize) < B_OK)
+	if (user_memcpy((void *)stackTop, (const void *)&x86_userspace_thread_exit, codeSize) < B_OK)
 		return B_BAD_ADDRESS;
 
 	args[0] = stackTop;
