@@ -760,7 +760,7 @@ Inode::WaitForRequest(ReadRequest &request)
 	// unpublish the condition variable
 	conditionVariable.Unpublish();
 
-	return status != B_OK;
+	return status;
 }
 
 
