@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -82,8 +82,8 @@ search_path_for_type(image_type type)
 
 
 static int
-try_open_executable(const char *dir, int dirLength, const char *name, char *path,
-	size_t pathLength)
+try_open_executable(const char *dir, int dirLength, const char *name,
+	const char *programPath, char *path, size_t pathLength)
 {
 	size_t nameLength = strlen(name);
 	struct stat stat;
@@ -93,18 +93,19 @@ try_open_executable(const char *dir, int dirLength, const char *name, char *path
 	if (dirLength > 0) {
 		char *buffer = path;
 
+		if (programPath == NULL)
+			programPath = gProgramArgs->program_path;
+
 		if (dirLength >= 2 && strncmp(dir, "%A", 2) == 0) {
 			// Replace %A with current app folder path (of course,
 			// this must be the first part of the path)
-			// ToDo: Maybe using first image info is better suited than
-			// gProgamArgs->program_path here?
-			char *lastSlash = strrchr(gProgramArgs->program_path, '/');
+			char *lastSlash = strrchr(programPath, '/');
 			int bytesCopied;
 
 			// copy what's left (when the application name is removed)
 			if (lastSlash != NULL) {
-				strlcpy(buffer, gProgramArgs->program_path,
-					min((int)pathLength, lastSlash + 1 - gProgramArgs->program_path));
+				strlcpy(buffer, programPath,
+					min((int)pathLength, lastSlash + 1 - programPath));
 			} else
 				strlcpy(buffer, ".", pathLength);
 
@@ -160,7 +161,8 @@ try_open_executable(const char *dir, int dirLength, const char *name, char *path
 
 static int
 search_executable_in_path_list(const char *name, const char *pathList,
-	int pathListLen, char *pathBuffer, size_t pathBufferLength)
+	int pathListLen, const char *programPath, char *pathBuffer,
+	size_t pathBufferLength)
 {
 	const char *pathListEnd = pathList + pathListLen;
 	status_t status = B_ENTRY_NOT_FOUND;
@@ -176,8 +178,8 @@ search_executable_in_path_list(const char *name, const char *pathList,
 		while (pathEnd < pathListEnd && *pathEnd != ':')
 			pathEnd++;
 
-		fd = try_open_executable(pathList, pathEnd - pathList, name, pathBuffer,
-			pathBufferLength);
+		fd = try_open_executable(pathList, pathEnd - pathList, name,
+			programPath, pathBuffer, pathBufferLength);
 		if (fd >= 0) {
 			// see if it's a dir
 			struct stat stat;
@@ -199,7 +201,8 @@ search_executable_in_path_list(const char *name, const char *pathList,
 
 
 int
-open_executable(char *name, image_type type, const char *rpath)
+open_executable(char *name, image_type type, const char *rpath,
+	const char *programPath)
 {
 	const char *paths;
 	char buffer[PATH_MAX];
@@ -214,7 +217,7 @@ open_executable(char *name, image_type type, const char *rpath)
 		// Even though ELF specs don't say this, we give shared libraries
 		// another chance and look them up in the usual search paths - at
 		// least that seems to be what BeOS does, and since it doesn't hurt...
-		paths = strrchr(name, '/');
+		paths = strrchr(name, '/') + 1;
 		memmove(name, paths, strlen(paths) + 1);
 	}
 
@@ -229,11 +232,11 @@ open_executable(char *name, image_type type, const char *rpath)
 			// If there is no ';', we set only secondList to simplify things.
 		if (firstList) {
 			fd = search_executable_in_path_list(name, firstList,
-				semicolon - firstList, buffer, sizeof(buffer));
+				semicolon - firstList, programPath, buffer, sizeof(buffer));
 		}
 		if (fd < 0) {
 			fd = search_executable_in_path_list(name, secondList,
-				strlen(secondList), buffer, sizeof(buffer));
+				strlen(secondList), programPath, buffer, sizeof(buffer));
 		}
 	}
 
@@ -242,13 +245,13 @@ open_executable(char *name, image_type type, const char *rpath)
 		paths = search_path_for_type(type);
 		if (paths) {
 			fd = search_executable_in_path_list(name, paths, strlen(paths),
-				buffer, sizeof(buffer));
+				programPath, buffer, sizeof(buffer));
 		}
 	}
 
 	if (fd >= 0) {
 		// we found it, copy path!
-		TRACE(("runtime_loader: open_container(%s): found at %s\n", name, buffer));
+		TRACE(("runtime_loader: open_executable(%s): found at %s\n", name, buffer));
 		strlcpy(name, buffer, PATH_MAX);
 	}
 
@@ -278,7 +281,7 @@ test_executable(const char *name, uid_t user, gid_t group, char *invoker)
 
 	strlcpy(path, name, sizeof(path));
 
-	fd = open_executable(path, B_APP_IMAGE, NULL);
+	fd = open_executable(path, B_APP_IMAGE, NULL, NULL);
 	if (fd < B_OK)
 		return fd;
 

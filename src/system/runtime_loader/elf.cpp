@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -263,8 +263,21 @@ find_loaded_image_by_id(image_id id)
 }
 
 
+static const char *
+get_program_path()
+{
+	for (image_t *image = sLoadedImages.head; image; image = image->next) {
+		if (image->type == B_APP_IMAGE)
+			return image->path;
+	}
+
+	return NULL;
+}
+
+
 static status_t
-parse_elf_header(struct Elf32_Ehdr *eheader, int32 *_pheaderSize, int32 *_sheaderSize)
+parse_elf_header(struct Elf32_Ehdr *eheader, int32 *_pheaderSize,
+	int32 *_sheaderSize)
 {
 	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
@@ -990,7 +1003,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 	strlcpy(path, name, sizeof(path));
 
 	// Try to load explicit image path first
-	fd = open_executable(path, type, rpath);
+	fd = open_executable(path, type, rpath, get_program_path());
 	if (fd < 0) {
 		FATAL("cannot open file %s\n", path);
 		KTRACE("rld: load_container(\"%s\"): failed to open file", name);

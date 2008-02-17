@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Manuel J. Petit. All rights reserved.
@@ -23,7 +23,8 @@ extern "C" {
 #endif
 
 int runtime_loader(void *arg);
-int open_executable(char *name, image_type type, const char *rpath);
+int open_executable(char *name, image_type type, const char *rpath,
+	const char *programPath);
 status_t test_executable(const char *path, uid_t user, gid_t group,
 	char *starter);
 
