@@ -161,15 +161,12 @@ read_boot_code_data(const char* programPath)
 
 // write_boot_code_part
 static void
-write_boot_code_part(const char *fileName, int fd, const uint8 *bootCodeData,
-	int offset, int size, bool dryRun)
+write_boot_code_part(const char *fileName, int fd, off_t imageOffset,
+	const uint8 *bootCodeData, int offset, int size, bool dryRun)
 {
-	printf("writing %d bytes at offset %d%s\n", size, offset,
-		(dryRun ? " (dry run)" : ""));
-
 	if (!dryRun) {
-		ssize_t bytesWritten = write_pos(fd, offset, bootCodeData + offset,
-			size);
+		ssize_t bytesWritten = write_pos(fd, imageOffset + offset,
+			bootCodeData + offset, size);
 		if (bytesWritten != size) {
 			fprintf(stderr, "Error: Failed to write to \"%s\": %s\n", fileName,
 				strerror(bytesWritten < 0 ? errno : B_ERROR));
@@ -192,6 +189,7 @@ main(int argc, const char *const *argv)
 	const char **files = new const char*[argc];
 	int fileCount = 0;
 	bool dryRun = false;
+	off_t startOffset = 0;
 
 	// parse arguments
 	for (int argi = 1; argi < argc;) {
@@ -206,6 +204,10 @@ main(int argc, const char *const *argv)
 				// ignore
 			} else if (strcmp(arg, "-full") == 0) {
 				// ignore
+			} else if (strcmp(arg, "--start-offset") == 0) {
+				if (argi >= argc)
+					print_usage_and_exit(true);
+				startOffset = strtoll(argv[argi++], NULL, 0);
 			} else if (strcmp(arg, "-safe") == 0) {
 				fprintf(stderr, "Error: Sorry, BeOS R3 isn't supported!\n");
 				exit(1);
@@ -498,10 +500,11 @@ main(int argc, const char *const *argv)
 		printf("Writing boot code to \"%s\" (partition offset: %lld bytes) "
 			"...\n", fileName, partitionOffset);
 
-		write_boot_code_part(fileName, fd, bootCodeData, 0,
+		write_boot_code_part(fileName, fd, startOffset, bootCodeData, 0,
 			kFirstBootCodePartSize, dryRun);
-		write_boot_code_part(fileName, fd, bootCodeData,
-			kSecondBootcodePartOffset, kSecondBootcodePartSize, dryRun);
+		write_boot_code_part(fileName, fd, startOffset, bootCodeData,
+			kSecondBootcodePartOffset, kSecondBootcodePartSize,
+			dryRun);
 
 		close(fd);
 	}
