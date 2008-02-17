@@ -687,6 +687,21 @@ cmd_expr(int argc, char **argv)
 }
 
 
+static int
+cmd_error(int argc, char **argv)
+{
+	if (argc != 2) {
+		print_debugger_command_usage(argv[0]);
+		return 0;
+	}
+
+	int32 error = parse_expression(argv[1]);
+	kprintf("error 0x%lx: %s\n", error, strerror(error));
+
+	return 0;
+}
+
+
 static status_t
 syslog_sender(void *data)
 {
@@ -964,6 +979,12 @@ debug_init_post_vm(kernel_args *args)
 		"<expression>\n"
 		"Evaluates the given expression and prints the result.\n",
 		B_KDEBUG_DONT_PARSE_ARGUMENTS);
+	add_debugger_command_etc("error", &cmd_error,
+		"Prints a human-readable description for an error code",
+		"<error>\n"
+		"Prints a human-readable description for the given numeric error\n"
+		"code.\n"
+		"  <error>  - The numeric error code.\n", 0);
 
 	debug_variables_init();
 	frame_buffer_console_init(args);
