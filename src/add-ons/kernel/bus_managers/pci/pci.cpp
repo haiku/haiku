@@ -381,13 +381,17 @@ PCI::CreateVirtualBus(int domain, uint8 bus, uint8 *virtualBus)
 
 	uint16 value = domain << 8 | bus;
 
-	// XXX iterate through entries 0 to fNextVirtualBus
-	// XXX and check if value is already present, return 
-	// XXX key if found instead of inserting a new one
+	for (VirtualBusMap::Iterator it = fVirtualBusMap.Begin(); it != fVirtualBusMap.End(); ++it) {
+		if (it->Value() == value) {
+			*virtualBus = it->Key();
+			FLOW("PCI::CreateVirtualBus: domain %d, bus %d already in map => virtualBus %d\n", domain, bus, *virtualBus);
+			return B_OK;
+		}
+	}
 
 	*virtualBus = fNextVirtualBus++;
 
-	dprintf("CreateVirtualBus domain %d, bus %d => virtualBus %d\n", domain, bus, *virtualBus);
+	FLOW("PCI::CreateVirtualBus: domain %d, bus %d => virtualBus %d\n", domain, bus, *virtualBus);
 	
 	return fVirtualBusMap.Insert(*virtualBus, value);
 

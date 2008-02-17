@@ -119,7 +119,9 @@ class PCI {
 		int					fDomainCount;
 		bool				fBusEnumeration;
 
-		VectorMap<uint8, uint16> fVirtualBusMap;
+		typedef VectorMap<uint8, uint16> VirtualBusMap;
+
+		VirtualBusMap		fVirtualBusMap;
 		int					fNextVirtualBus;
 };
 
