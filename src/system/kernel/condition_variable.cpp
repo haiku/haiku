@@ -156,8 +156,16 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 		entry = entry->fThreadNext;
 	}
 
-	// all entries are unnotified -- wait
+	// When interruptable, check pending signals first
 	struct thread* thread = thread_get_current_thread();
+	if (((flags & B_CAN_INTERRUPT)
+			&& (thread->sig_pending & ~thread->sig_block_mask) != 0)
+		|| ((flags & B_KILL_CAN_INTERRUPT)
+			&& (thread->sig_pending & KILL_SIGNALS))) {
+		return B_INTERRUPTED;
+	}
+
+	// wait
 	thread->next_state = B_THREAD_WAITING;
 	thread->condition_variable_entry = firstEntry;
 	thread->sem.blocking = -1;
