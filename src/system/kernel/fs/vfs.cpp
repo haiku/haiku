@@ -34,7 +34,6 @@
 #include <khash.h>
 #include <KPath.h>
 #include <lock.h>
-#include <syscall_restart.h>
 #include <syscalls.h>
 #include <vfs.h>
 #include <vm.h>
