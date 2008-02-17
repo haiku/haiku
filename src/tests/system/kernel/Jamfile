@@ -32,6 +32,8 @@ SimpleTest port_wakeup_test_9 : port_wakeup_test_9.cpp ;
 SimpleTest select_check : select_check.cpp ;
 SimpleTest select_close_test : select_close_test.cpp ;
 
+SimpleTest syscall_restart_test : syscall_restart_test.cpp : network ;
+
 SetSupportedPlatformsForTarget syscall_time
 	: $(HAIKU_BEOS_COMPATIBLE_PLATFORMS) ;
 SimpleTest syscall_time : syscall_time.cpp ;
