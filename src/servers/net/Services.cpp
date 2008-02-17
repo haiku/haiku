@@ -521,6 +521,9 @@ Services::_LaunchService(struct service& service, int socket)
 			exit(1);
 
 		// we'll never trespass here
+	} else {
+		// the server does not need the socket anymore
+		close(socket);
 	}
 
 	// TODO: make sure child started successfully...
