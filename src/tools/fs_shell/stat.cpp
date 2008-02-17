@@ -12,6 +12,8 @@
 #include <sys/stat.h>
 
 #include "fssh_errno.h"
+#include "partition_support.h"
+#include "stat_priv.h"
 #include "stat_util.h"
 
 
@@ -27,14 +29,7 @@ using FSShell::to_platform_mode;
 
 
 int
-fssh_mkdir(const char *path, fssh_mode_t mode)
-{
-	return mkdir(path, to_platform_mode(mode));
-}
-
-
-int
-fssh_stat(const char *path, struct fssh_stat *fsshStat)
+FSShell::unrestricted_stat(const char *path, struct fssh_stat *fsshStat)
 {
 	struct stat st;
 
@@ -58,7 +53,7 @@ fssh_stat(const char *path, struct fssh_stat *fsshStat)
 
 
 int
-fssh_fstat(int fd, struct fssh_stat *fsshStat)
+FSShell::unrestricted_fstat(int fd, struct fssh_stat *fsshStat)
 {
 	struct stat st;
 
@@ -82,7 +77,7 @@ fssh_fstat(int fd, struct fssh_stat *fsshStat)
 
 
 int
-fssh_lstat(const char *path, struct fssh_stat *fsshStat)
+FSShell::unrestricted_lstat(const char *path, struct fssh_stat *fsshStat)
 {
 	struct stat st;
 
@@ -101,5 +96,49 @@ fssh_lstat(const char *path, struct fssh_stat *fsshStat)
 
 	from_platform_stat(&st, fsshStat);
 	
+	return 0;
+}
+
+// #pragma mark -
+
+int
+fssh_mkdir(const char *path, fssh_mode_t mode)
+{
+	return mkdir(path, to_platform_mode(mode));
+}
+
+
+int
+fssh_stat(const char *path, struct fssh_stat *fsshStat)
+{
+	if (FSShell::unrestricted_stat(path, fsshStat) < 0)
+		return -1;
+
+	FSShell::restricted_file_restrict_stat(fsshStat);
+
+	return 0;
+}
+
+
+int
+fssh_fstat(int fd, struct fssh_stat *fsshStat)
+{
+	if (FSShell::unrestricted_fstat(fd, fsshStat) < 0)
+		return -1;
+	
+	FSShell::restricted_file_restrict_stat(fsshStat);
+
+	return 0;
+}
+
+
+int
+fssh_lstat(const char *path, struct fssh_stat *fsshStat)
+{
+	if (FSShell::unrestricted_lstat(path, fsshStat) < 0)
+		return -1;
+	
+	FSShell::restricted_file_restrict_stat(fsshStat);
+
 	return 0;
 }

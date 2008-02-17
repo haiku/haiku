@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -9,6 +9,7 @@
 #include <stdarg.h>
 
 #include "fssh_errno.h"
+#include "partition_support.h"
 #include "stat_util.h"
 
 
@@ -37,19 +38,23 @@ fssh_open(const char *pathname, int oflags, ...)
 
 	// Use the _kern_open() defined in libroot on BeOS incompatible systems.
 	// Required for proper attribute emulation support.
+	int fd;
 	#if __BEOS__
-		return open(pathname, to_platform_open_mode(oflags),
+		fd = open(pathname, to_platform_open_mode(oflags),
 			to_platform_mode(mode));
 	#else
-		int fd = _kern_open(-1, pathname, to_platform_open_mode(oflags),
+		fd = _kern_open(-1, pathname, to_platform_open_mode(oflags),
 			to_platform_mode(mode));
 		if (fd < 0) {
 			fssh_set_errno(fd);
-			return -1;
+			fd = -1;
 		}
 
-		return fd;
 	#endif
+
+	restricted_file_opened(fd);
+
+	return fd;
 }
 
 

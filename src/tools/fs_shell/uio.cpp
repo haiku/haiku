@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,6 +11,8 @@
 
 #include <errno.h>
 #include <sys/uio.h>
+
+#include "partition_support.h"
 
 
 static const fssh_size_t kMaxIOVecs = 1024;
@@ -41,6 +43,11 @@ fssh_readv(int fd, const struct fssh_iovec *vector, fssh_size_t count)
 	if (!prepare_iovecs(vector, count, systemVecs))
 		return -1;
 
+	fssh_off_t pos = -1;
+	fssh_size_t length = 0;
+	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
+		return -1;
+
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 		return readv(fd, systemVecs, count);
 	#else
@@ -57,6 +64,10 @@ fssh_readv_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
 	if (!prepare_iovecs(vec, count, systemVecs))
 		return -1;
 
+	fssh_size_t length = 0;
+	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
+		return -1;
+
 	return readv_pos(fd, pos, systemVecs, count);
 }
 
@@ -66,6 +77,11 @@ fssh_writev(int fd, const struct fssh_iovec *vector, fssh_size_t count)
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vector, count, systemVecs))
+		return -1;
+
+	fssh_off_t pos = -1;
+	fssh_size_t length = 0;
+	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
 		return -1;
 
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
@@ -82,6 +98,10 @@ fssh_writev_pos(int fd, fssh_off_t pos, const struct fssh_iovec *vec,
 {
 	struct iovec systemVecs[kMaxIOVecs];
 	if (!prepare_iovecs(vec, count, systemVecs))
+		return -1;
+
+	fssh_size_t length = 0;
+	if (FSShell::restricted_file_restrict_io(fd, pos, length) < 0)
 		return -1;
 
 	return writev_pos(fd, pos, systemVecs, count);

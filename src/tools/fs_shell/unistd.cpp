@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -15,6 +15,7 @@
 
 #include "fssh_drivers.h"
 #include "fssh_errno.h"
+#include "partition_support.h"
 
 #ifdef __BEOS__
 #	include <Drivers.h>
@@ -86,22 +87,28 @@ fssh_dup(int fd)
 {
 	// Use the _kern_dup() defined in libroot on BeOS incompatible systems.
 	// Required for proper attribute emulation support.
+	int newFD;
 	#if __BEOS__
-		return dup(fd);
+		newFD = dup(fd);
 	#else
-		int result = _kern_dup(fd);
-		if (result < 0) {
-			fssh_set_errno(result);
-			return -1;
+		newFD = _kern_dup(fd);
+		if (newFD < 0) {
+			fssh_set_errno(newFD);
+			newFD = -1;
 		}
-		return result;
 	#endif
+
+	FSShell::restricted_file_duped(fd, newFD);
+
+	return newFD;
 }
 
 
 int
 fssh_close(int fd)
 {
+	FSShell::restricted_file_closed(fd);
+
 	// Use the _kern_close() defined in libroot on BeOS incompatible systems.
 	// Required for proper attribute emulation support.
 	#if __BEOS__
@@ -296,9 +303,16 @@ fssh_ssize_t
 fssh_read(int fd, void *buffer, fssh_size_t count)
 {
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
+		fssh_off_t pos = -1;
+		if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
+			return -1;
 		return read(fd, buffer, count);
 	#else
-		return read_pos(fd, lseek(fd, 0, SEEK_CUR), buffer, count);
+		fssh_ssize_t bytesRead = read_pos(fd, fssh_lseek(fd, 0, FSSH_SEEK_CUR),
+			buffer, count);
+		if (bytesRead > 0)
+			fssh_lseek(fd, bytesRead, FSSH_SEEK_CUR);
+		return bytesRead;
 	#endif
 }
 
@@ -306,6 +320,8 @@ fssh_read(int fd, void *buffer, fssh_size_t count)
 fssh_ssize_t
 fssh_read_pos(int fd, fssh_off_t pos, void *buffer, fssh_size_t count)
 {
+	if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
+		return -1;
 	return read_pos(fd, pos, buffer, count);
 }
 
@@ -314,18 +330,31 @@ fssh_ssize_t
 fssh_write(int fd, const void *buffer, fssh_size_t count)
 {
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
+		fssh_off_t pos = -1;
+		if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
+			return -1;
 		return write(fd, buffer, count);
 	#else
-		return write_pos(fd, lseek(fd, 0, SEEK_CUR), buffer, count);
+		fssh_ssize_t written = write_pos(fd, fssh_lseek(fd, 0, FSSH_SEEK_CUR),
+			buffer, count);
+		if (written > 0)
+			fssh_lseek(fd, written, FSSH_SEEK_CUR);
+		return written;
 	#endif
 }
 
 
+#include <stdio.h>
 fssh_ssize_t
 fssh_write_pos(int fd, fssh_off_t pos, const void *buffer, fssh_size_t count)
 {
+	if (FSShell::restricted_file_restrict_io(fd, pos, count) < 0)
+		return -1;
 	return write_pos(fd, pos, buffer, count);
 }
+
+
+// fssh_lseek() -- implemented in partition_support.cpp
 
 
 fssh_gid_t

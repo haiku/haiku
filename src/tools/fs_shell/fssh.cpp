@@ -27,6 +27,7 @@
 #include "fssh_string.h"
 #include "fssh_type_constants.h"
 #include "module.h"
+#include "partition_support.h"
 #include "path_util.h"
 #include "syscalls.h"
 #include "vfs.h"
@@ -1159,8 +1160,11 @@ static void
 print_usage(bool error)
 {
 	fprintf((error ? stderr : stdout),
-		"Usage: %s [-n] <device>\n"
-		"       %s --initialize [-n] <device> <volume name> "
+		"Usage: %s [ --start-offset <startOffset>]\n"
+		"          [ --end-offset <endOffset>] [-n] <device>\n"
+		"       %s [ --start-offset <startOffset>]\n"
+		"          [ --end-offset <endOffset>]\n"
+		"          --initialize [-n] <device> <volume name> "
 			"[ <init parameters> ]\n",
 		sArgv[0], sArgv[0]
 	);
@@ -1193,6 +1197,8 @@ main(int argc, const char* const* argv)
 	const char* device = NULL;
 	const char* volumeName = NULL;
 	const char* initParameters = NULL;
+	fssh_off_t startOffset = 0;
+	fssh_off_t endOffset = -1;
 
 	// eat options
 	int argi = 1;
@@ -1204,6 +1210,14 @@ main(int argc, const char* const* argv)
 			initialize = true;
 		} else if (strcmp(arg, "-n") == 0) {
 			interactive = false;
+		} else if (strcmp(arg, "--start-offset") == 0) {
+			if (argi >= argc)
+				print_usage_and_exit(true);
+			startOffset = atoll(argv[argi++]);
+		} else if (strcmp(arg, "--end-offset") == 0) {
+			if (argi >= argc)
+				print_usage_and_exit(true);
+			endOffset = atoll(argv[argi++]);
 		} else {
 			print_usage_and_exit(true);
 		}
@@ -1246,6 +1260,11 @@ main(int argc, const char* const* argv)
 			fssh_strerror(error));
 		return error;
 	}
+
+	// restrict access if requested
+	if (startOffset != 0 || endOffset != -1)
+		add_file_restriction(device, startOffset, endOffset);
+
 
 	// start the action
 	int result;

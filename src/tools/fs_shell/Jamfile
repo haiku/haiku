@@ -47,6 +47,7 @@ BuildPlatformStaticLibrary <build>fs_shell.a :
 	lock.cpp
 	module.cpp
 	node_monitor.cpp
+	partition_support.cpp
 	path_util.cpp
 	rootfs.cpp
 	sem.cpp
