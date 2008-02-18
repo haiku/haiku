@@ -301,9 +301,10 @@ BMenuField::MouseDown(BPoint where)
 
 	BRect bounds = fMenuBar->ConvertFromParent(Bounds());
 
-	fMenuBar->StartMenuBar(0, false, true, &bounds);
+	fMenuBar->StartMenuBar(-1, false, true, &bounds);
 
-	fMenuTaskID = spawn_thread((thread_func)_thread_entry, "_m_task_", B_NORMAL_PRIORITY, this);
+	fMenuTaskID = spawn_thread((thread_func)_thread_entry,
+			 	"_m_task_", B_NORMAL_PRIORITY, this);
 	if (fMenuTaskID >= 0)
 		resume_thread(fMenuTaskID);
 }
