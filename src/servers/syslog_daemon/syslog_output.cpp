@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,8 +21,8 @@
 static const char *kFacilities[] = {
 	"KERN", "USER", "MAIL", "DAEMON",
 	"AUTH", "SYSLOGD", "LPR", "NEWS",
-	"UUCP", "CRON", "AUTHPRIV",
-	"", "", "", "", "",
+	"UUCP", "CRON", "AUTHPRIV", "FTP",
+	"", "", "", "",
 	"LOCAL0", "LOCAL1", "LOCAL2", "LOCAL3",
 	"LOCAL4", "LOCAL5", "LOCAL6", "LOCAL7",
 	NULL
