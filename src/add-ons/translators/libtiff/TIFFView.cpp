@@ -80,6 +80,7 @@ TIFFView::TIFFView(const BRect &frame, const char *name,
 	fSettings = settings;
 
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
 
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
@@ -99,6 +100,9 @@ TIFFView::TIFFView(const BRect &frame, const char *name,
 
 	fCompressionMF = new BMenuField(BRect(20, 50, 215, 70), "compression",
 									"Use Compression:", menu, true);
+	fCompressionMF->ResizeToPreferred();
+	fCompressionMF->SetDivider(
+		fCompressionMF->StringWidth(fCompressionMF->Label()) + 7);
 	AddChild(fCompressionMF);
 
 }

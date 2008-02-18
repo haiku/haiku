@@ -50,7 +50,8 @@ TIFFView::TIFFView(const BRect &frame, const char *name,
 	uint32 resize, uint32 flags)
 	:	BView(frame, name, resize, flags)
 {
-	SetViewColor(220,220,220,0);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
 }
 
 // ---------------------------------------------------------------

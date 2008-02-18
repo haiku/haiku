@@ -436,7 +436,8 @@ public:
 				uint32 flags) :
 			BView(frame, name, resize, flags)
 			{
-				SetViewColor(220,220,220,0);
+				SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+				SetLowColor(ViewColor());
 				mMenu = new BPopUpMenu("Color Space");
 				mMenu->AddItem(new BMenuItem("None", CSMessage(B_NO_COLOR_SPACE)));
 				mMenu->AddItem(new BMenuItem("RGB 8:8:8 32 bits", CSMessage(B_RGB32)));
@@ -458,6 +459,7 @@ public:
 				mMenu->AddItem(new BMenuItem("RGBA 5:5:5:1 16 bits big-endian", CSMessage(B_RGBA15_BIG)));
 				mMenu->AddItem(new BMenuItem("RGB 5:6:5 16 bits big-endian", CSMessage(B_RGB16)));
 				mField = new BMenuField(BRect(10,110,190,130), "Color Space Field", "Input Color Space", mMenu);
+				mField->SetDivider(mField->StringWidth(mField->Label()) + 7);
 				mField->SetViewColor(ViewColor());
 				AddChild(mField);
 				SelectColorSpace(g_settings.out_space);

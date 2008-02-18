@@ -78,6 +78,7 @@ SGIView::SGIView(const BRect &frame, const char *name,
 		fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
 
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 

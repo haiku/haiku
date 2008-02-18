@@ -44,6 +44,7 @@ WonderBrushView::WonderBrushView(const BRect &frame, const char *name,
 		fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
 
 	// figure out where the text ends
 	font_height fh;

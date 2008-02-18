@@ -53,6 +53,7 @@ TGAView::TGAView(const BRect &frame, const char *name,
 	fSettings = settings;
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ViewColor());
 	
 	BMessage *pmsg;
 	int32 val;
