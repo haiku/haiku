@@ -177,14 +177,11 @@ PathHandler::PathHandler(const char* path, uint32 flags, BMessenger target)
 		return;
 
 	BLooper* looper;
-	if (be_app != NULL) {
-		looper = be_app;
-	} else {
-		// TODO: only have a single global looper!
-		looper = new BLooper("PathMonitor looper");
-		looper->Run();
-		fOwnsLooper = true;
-	}
+	// TODO: only have a single global looper!
+	// TODO: Use BLooper::LooperForThread(find_looper(NULL)) ?
+	looper = new BLooper("PathMonitor looper");
+	looper->Run();
+	fOwnsLooper = true;
 
 	looper->Lock();
 	looper->AddHandler(this);
@@ -492,6 +489,7 @@ PathHandler::MessageReceived(BMessage* message)
 
 			if (fOwnsLooper)
 				looper->Quit();
+
 			return;
 		}
 
