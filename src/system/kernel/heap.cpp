@@ -83,6 +83,8 @@ typedef struct heap_allocator_s {
 
 static heap_allocator *sHeapList = NULL;
 static heap_allocator *sLastGrowRequest = NULL;
+static heap_allocator *sGrowHeap = NULL;
+static thread_id sHeapGrowThread = -1;
 static sem_id sHeapGrowSem = -1;
 static sem_id sHeapGrownNotify = -1;
 
@@ -209,6 +211,26 @@ dump_allocator(heap_allocator *heap)
 static int
 dump_heap_list(int argc, char **argv)
 {
+	if (argc == 2) {
+		if (strcmp(argv[1], "grow") == 0) {
+			// only dump dedicated grow heap info
+			dprintf("dedicated grow heap:\n");
+			dump_allocator(sGrowHeap);
+		} else if (strcmp(argv[1], "stats") == 0) {
+			uint32 heapCount = 0;
+			heap_allocator *heap = sHeapList;
+			while (heap) {
+				heapCount++;
+				heap = heap->next;
+			}
+
+			dprintf("current heap count: %ld\n", heapCount);
+		} else
+			print_debugger_command_usage(argv[0]);
+
+		return 0;
+	}
+
 	heap_allocator *heap = sHeapList;
 	while (heap) {
 		dump_allocator(heap);
@@ -707,7 +729,7 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size,
 
 	TRACE(("memalign(): asked to allocate %lu bytes, returning pointer %p\n", size, address));
 
-	if (heap->next == NULL) {
+	if (heap->next == NULL && shouldGrow) {
 		// suggest growing if we are the last heap and we have
 		// less than three free pages left
 		*shouldGrow = (heap->free_pages == NULL
@@ -998,7 +1020,11 @@ heap_init(addr_t base, size_t size)
 	sHeapList = heap_attach(base, size, false);
 
 	// set up some debug commands
-	add_debugger_command("heap", &dump_heap_list, "Dump stats about the kernel heap(s)");
+	add_debugger_command_etc("heap", &dump_heap_list,
+		"Dump infos about the kernel heap(s)", "[(\"grow\" | \"stats\")]\n"
+		"Dump infos about the kernel heap(s). If \"grow\" is specified, only\n"
+		"infos about the dedicated grow heap are printed. If \"stats\" is\n"
+		"given as the argument, currently only the heap count is printed\n", 0);
 #if KERNEL_HEAP_LEAK_CHECK
 	add_debugger_command_etc("allocations", &dump_allocations,
 		"Dump current allocations", "[(\"team\" | \"thread\") <id>] [\"stats\"]\n"
@@ -1041,14 +1067,31 @@ heap_init_post_sem()
 status_t
 heap_init_post_thread()
 {
-	thread_id thread = spawn_kernel_thread(heap_grow_thread, "heap grower",
-		B_URGENT_PRIORITY, NULL);
-	if (thread < 0) {
-		panic("heap_init_post_thread(): cannot create heap grow thread\n");
+	void *dedicated = NULL;
+	area_id area = create_area("heap dedicated grow", &dedicated,
+		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (area < 0) {
+		panic("heap_init_post_thread(): cannot allocate dedicated grow memory\n");
+		return area;
+	}
+
+	sGrowHeap = heap_attach((addr_t)dedicated, HEAP_DEDICATED_GROW_SIZE, true);
+	if (sGrowHeap == NULL) {
+		panic("heap_init_post_thread(): failed to attach dedicated grow heap\n");
+		delete_area(area);
 		return B_ERROR;
 	}
 
-	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	sHeapGrowThread = spawn_kernel_thread(heap_grow_thread, "heap grower",
+		B_URGENT_PRIORITY, NULL);
+	if (sHeapGrowThread < 0) {
+		panic("heap_init_post_thread(): cannot create heap grow thread\n");
+		delete_area(area);
+		return sHeapGrowThread;
+	}
+
+	send_signal_etc(sHeapGrowThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 	return B_OK;
 }
 
@@ -1070,6 +1113,17 @@ memalign(size_t alignment, size_t size)
 		return NULL;
 	}
 
+	if (thread_get_current_thread_id() == sHeapGrowThread) {
+		// this is the grower thread, allocate from our dedicated memory
+		void *result = heap_memalign(sGrowHeap, alignment, size, NULL);
+		if (result == NULL) {
+			panic("heap: grow thread ran out of dedicated memory!\n");
+			return NULL;
+		}
+
+		return result;
+	}
+
 	heap_allocator *heap = sHeapList;
 	while (heap) {
 		bool shouldGrow = false;
@@ -1078,9 +1132,8 @@ memalign(size_t alignment, size_t size)
 			// the last heap will or has run out of memory, notify the grower
 			sLastGrowRequest = heap;
 			if (result == NULL) {
-				// urgent request, do the request and wait for at max 250ms
-				release_sem(sHeapGrowSem);
-				acquire_sem_etc(sHeapGrownNotify, 1, B_RELATIVE_TIMEOUT, 250000);
+				// urgent request, do the request and wait
+				switch_sem(sHeapGrowSem, sHeapGrownNotify);
 			} else {
 				// not so urgent, just notify the grower
 				release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
@@ -1130,6 +1183,10 @@ free(void *address)
 
 		heap = heap->next;
 	}
+
+	// maybe it was allocated from the dedicated grow heap
+	if (heap_free(sGrowHeap, address) == B_OK)
+		return;
 
 	panic("free(): free failed for address %p\n", address);
 }

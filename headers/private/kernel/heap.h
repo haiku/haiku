@@ -11,10 +11,11 @@
 #include <OS.h>
 
 // allocate 16MB initial heap for the kernel
-#define INITIAL_HEAP_SIZE	16 * 1024 * 1024
+#define INITIAL_HEAP_SIZE			16 * 1024 * 1024
 // grow by another 8MB each time the heap runs out of memory
-#define HEAP_GROW_SIZE		8 * 1024 * 1024
-
+#define HEAP_GROW_SIZE				8 * 1024 * 1024
+// allocate a dedicated 2MB area for dynamic growing
+#define HEAP_DEDICATED_GROW_SIZE	2 * 1024 * 1024
 
 
 #ifdef __cplusplus
