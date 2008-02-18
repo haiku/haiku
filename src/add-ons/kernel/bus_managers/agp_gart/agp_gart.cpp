@@ -243,6 +243,9 @@ check_capabilities(agp_device_info &deviceInfo, uint32 &command)
 		agpStatus = fix_rate_support(agpStatus);
 	}
 
+	TRACE("device %u.%u.%u has AGP capabilities %lx\n", deviceInfo.info.bus,
+		deviceInfo.info.device, deviceInfo.info.function, agpStatus);
+
 	// block non-supported AGP modes
 	command &= (agpStatus & (AGP_3_MODE | AGP_RATE_MASK))
 		| ~(AGP_3_MODE | AGP_RATE_MASK);
@@ -358,6 +361,8 @@ set_agp_command(agp_device_info &deviceInfo, uint32 command)
 static void
 set_pci_mode()
 {
+	TRACE("set PCI mode on all AGP capable devices.\n");
+
 	// First program all graphics cards
 
 	for (uint32 index = 0; index < sDeviceCount; index++) {
@@ -873,6 +878,7 @@ set_agp_mode(uint32 command)
 	}
 
 	command = fix_rate_command(command);
+	TRACE("set AGP command %lx on all capable devices.\n", command);
 
 	// The order of programming differs for enabling/disabling AGP mode
 	// (see AGP specification)
