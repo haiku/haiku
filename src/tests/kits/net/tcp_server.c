@@ -18,7 +18,7 @@
 
 #define MYPORT 1234		// the port users will be connecting to
 #define BACKLOG 10		// how many pending connections queue will hold
-#define MAXDATASIZE	100
+#define MAXDATASIZE	1065537
 
 
 static void
@@ -95,9 +95,19 @@ main(int argc, char *argv[])
 			if (!fork()) {
 				while (1) {
 					// child's child process
-					if (fgets(buf, MAXDATASIZE-1, stdin) == NULL) {
+					if (fgets(buf, MAXDATASIZE, stdin) == NULL) {
 						perror("fgets");
 						exit(1);
+					}
+
+					if (!strcmp(buf, "full\n")) {
+						int i;
+puts("HY");
+						for (i = 0; i < MAXDATASIZE - 2; i++) {
+							buf[i] = 'a' + (i % 26);
+						}
+						buf[MAXDATASIZE - 2] = '\n';
+						buf[MAXDATASIZE - 1] = '\0';
 					}
 
 					if (send(new_fd, buf, strlen(buf), 0) == -1) {
@@ -109,7 +119,7 @@ main(int argc, char *argv[])
 				ssize_t numBytes;
 				while (1) {
 					// child process
-					if ((numBytes = recv(new_fd, buf, MAXDATASIZE-1, 0)) == -1) {
+					if ((numBytes = recv(new_fd, buf, MAXDATASIZE, 0)) == -1) {
 						perror("recv");
 						exit(1);
 					}
