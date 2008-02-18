@@ -464,7 +464,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 		GetMouse(&where, &buttons);
 		window->Unlock();
 	}
-	
+
 	while (fState != MENU_STATE_CLOSED) {
 		bigtime_t snoozeAmount = 40000;
 		if (Window() == NULL || !window->Lock())
@@ -472,29 +472,19 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 
 		BMenuItem *menuItem = _HitTestItems(where, B_ORIGIN);
 		if (menuItem != NULL) {
-			// Select item if:
-			// - no previous selection
-			// - nonsticky mode and different selection,
-			// - clicked in sticky mode
-			if (fSelected == NULL
-				|| (menuItem != fSelected)
-				|| (buttons != 0 && _IsStickyMode())) {
-				if (menuItem->Submenu() != NULL) {
-					if (menuItem->Submenu()->Window() == NULL) {
-						// open the menu if it's not opened yet
-						_SelectItem(menuItem);
-						if (_IsStickyMode())
-							_SetStickyMode(false);
-					} else {
-						// Menu was already opened, close it and bail
-						_SelectItem(NULL);
-						fState = MENU_STATE_CLOSED;
-						fChosenItem = NULL;
-					}
+			if (menuItem->Submenu() != NULL && menuItem != fSelected) {
+				if (menuItem->Submenu()->Window() == NULL) {
+					// open the menu if it's not opened yet
+					_SelectItem(menuItem);
 				} else {
-					// No submenu, just select the item
-					_SelectItem(menuItem);					
+					// Menu was already opened, close it and bail
+					_SelectItem(NULL);
+					fState = MENU_STATE_CLOSED;
+					fChosenItem = NULL;
 				}
+			} else {
+				// No submenu, just select the item
+				_SelectItem(menuItem);					
 			}
 		} else if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
 			// call _Track() from the selected sub-menu when the mouse cursor
@@ -550,9 +540,12 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 				window->Unlock();
 			}
 
-			if ((buttons != 0 && _IsStickyMode() && menuItem == NULL))
-				fState = MENU_STATE_CLOSED;
-			else if (buttons == 0 && !_IsStickyMode()) {
+			if (buttons != 0 && _IsStickyMode()) {
+				if (menuItem == NULL)
+					fState = MENU_STATE_CLOSED;
+				else
+					_SetStickyMode(false);
+			} else if (buttons == 0 && !_IsStickyMode()) {
 				if ((fSelected != NULL && fSelected->Submenu() == NULL)
 					|| menuItem == NULL) {
 					fChosenItem = fSelected;
@@ -562,7 +555,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			}		
 		}
 	}
-
+	 
 	if (window->Lock()) {
 		if (fSelected != NULL)
 			_SelectItem(NULL);	
@@ -582,6 +575,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 		*action = fState;
 
 	return fChosenItem;
+
 }
 
 
