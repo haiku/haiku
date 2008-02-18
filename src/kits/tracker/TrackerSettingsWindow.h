@@ -63,6 +63,7 @@ class TrackerSettingsWindow : public BWindow {
 		void _HandlePressedDefaultsButton();
 		void _HandlePressedRevertButton();
 		void _HandleChangedSettingsView();
+		void _UpdateButtons();
 
 		BListView *fSettingsTypeListView;
 		BBox *fSettingsContainerBox;

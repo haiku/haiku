@@ -53,7 +53,15 @@ static const uint32 kSpaceBarSwitchColor = 'SBsc';
 static const float kItemExtraSpacing = 2.0f;
 static const float kIndentSpacing = 12.0f;
 
+//TODO: defaults should be set in one place only (TrackerSettings.cpp) while
+//		being accessible from here.
+//      What about adding DefaultValue(), IsDefault() etc... methods to xxxValueSetting ?
+static const uint8 kSpaceBarAlpha = 192;
+static const rgb_color kDefaultUsedSpaceColor = {0, 203, 0, kSpaceBarAlpha};
+static const rgb_color kDefaultFreeSpaceColor = {255, 255, 255, kSpaceBarAlpha};
+static const rgb_color kDefaultWarningSpaceColor = {203, 0, 0, kSpaceBarAlpha};
 
+		
 static void
 send_bool_notices(uint32 what, const char *name, bool value)
 {
@@ -1145,15 +1153,19 @@ SpaceBarSettingsView::MessageReceived(BMessage *message)
 
 		case kSpaceBarColorChanged:
 		{
+			rgb_color color = fColorControl->ValueAsColor();				
+			color.alpha = kSpaceBarAlpha;
+				//alpha is ignored by BColorControl but is checked in equalities
+				
 			switch (fCurrentColor) {
 				case 0:
-					settings.SetUsedSpaceColor(fColorControl->ValueAsColor());
+					settings.SetUsedSpaceColor(color);
 					break;
 				case 1:
-					settings.SetFreeSpaceColor(fColorControl->ValueAsColor());
+					settings.SetFreeSpaceColor(color);
 					break;
 				case 2:
-					settings.SetWarningSpaceColor(fColorControl->ValueAsColor());
+					settings.SetWarningSpaceColor(color);
 					break;
 			}
 
@@ -1183,12 +1195,12 @@ SpaceBarSettingsView::SetDefaults()
 		send_bool_notices(kShowVolumeSpaceBar, "ShowVolumeSpaceBar", false);
 	}
 
-	if (settings.UsedSpaceColor() != Color(0, 203, 0, 192)
-		|| settings.FreeSpaceColor() != Color(255, 255, 255, 192)
-		|| settings.WarningSpaceColor() != Color(203, 0, 0, 192)) {
-		settings.SetUsedSpaceColor(Color(0, 203, 0, 192));
-		settings.SetFreeSpaceColor(Color(255, 255, 255, 192));
-		settings.SetWarningSpaceColor(Color(203, 0, 0, 192));
+	if (settings.UsedSpaceColor() != kDefaultUsedSpaceColor
+		|| settings.FreeSpaceColor() != kDefaultFreeSpaceColor
+		|| settings.WarningSpaceColor() != kDefaultWarningSpaceColor) {
+		settings.SetUsedSpaceColor(kDefaultUsedSpaceColor);
+		settings.SetFreeSpaceColor(kDefaultFreeSpaceColor);
+		settings.SetWarningSpaceColor(kDefaultWarningSpaceColor);
 		tracker->SendNotices(kSpaceBarColorChanged);
 	}
 
@@ -1202,9 +1214,9 @@ SpaceBarSettingsView::IsDefaultable() const
 	TrackerSettings settings;
 
 	return settings.ShowVolumeSpaceBar() != false
-		|| settings.UsedSpaceColor() != Color(0, 203, 0, 192)
-		|| settings.FreeSpaceColor() != Color(255, 255, 255, 192)
-		|| settings.WarningSpaceColor() != Color(203, 0, 0, 192);
+		|| settings.UsedSpaceColor() != kDefaultUsedSpaceColor
+		|| settings.FreeSpaceColor() != kDefaultFreeSpaceColor
+		|| settings.WarningSpaceColor() != kDefaultWarningSpaceColor;
 }
 
 
@@ -1273,7 +1285,7 @@ SpaceBarSettingsView::IsRevertable() const
 {
 	TrackerSettings settings;
 
-	return fSpaceBarShow != (fSpaceBarShowCheckBox->Value() == B_CONTROL_ON)
+	return fSpaceBarShow != settings.ShowVolumeSpaceBar()
 		|| fUsedSpaceColor != settings.UsedSpaceColor()
 		|| fFreeSpaceColor != settings.FreeSpaceColor()
 		|| fWarningSpaceColor != settings.WarningSpaceColor();

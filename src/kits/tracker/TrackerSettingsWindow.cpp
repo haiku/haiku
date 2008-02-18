@@ -203,6 +203,8 @@ TrackerSettingsWindow::Show()
 
 		fSettingsTypeListView->Invalidate();
 
+		_UpdateButtons();
+
 		Unlock();
 	}
 	_inherited::Show();
@@ -239,6 +241,16 @@ TrackerSettingsWindow::_SettingsFrame()
 void
 TrackerSettingsWindow::_HandleChangedContents()
 {
+	fSettingsTypeListView->Invalidate();	
+	_UpdateButtons();
+
+	TrackerSettings().SaveSettings(false);
+}
+
+
+void
+TrackerSettingsWindow::_UpdateButtons()
+{
 	int32 itemCount = fSettingsTypeListView->CountItems();
 
 	bool defaultable = false;
@@ -248,12 +260,9 @@ TrackerSettingsWindow::_HandleChangedContents()
 		defaultable |= _ViewAt(i)->IsDefaultable();
 		revertable |= _ViewAt(i)->IsRevertable();
 	}
-
-	fSettingsTypeListView->Invalidate();
+	
 	fDefaultsButton->SetEnabled(defaultable);
 	fRevertButton->SetEnabled(revertable);
-
-	TrackerSettings().SaveSettings(false);
 }
 
 

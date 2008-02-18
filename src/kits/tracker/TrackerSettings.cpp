@@ -107,19 +107,12 @@ rgb_color ValueToColor(int32 value)
 	color.green = static_cast<uchar>((value >> 8L) & 0xff);
 	color.blue = static_cast<uchar>(value & 0xff);
 
-	// zero alpha is invalid
-	if (color.alpha == 0)
-		color.alpha = 192;
-
 	return color;	
 }
 
+
 int32 ColorToValue(rgb_color color)
 {
-	// zero alpha is invalid
-	if (color.alpha == 0)
-		color.alpha = 192;
-
 	return	color.alpha << 24L
 			| color.red << 16L
 			| color.green << 8L
@@ -174,7 +167,7 @@ TTrackerState::LoadSettingsIfNeeded()
 	Add(fMountSharedVolumesOntoDesktop =
 		new BooleanValueSetting("MountSharedVolumesOntoDesktop", true));
 	Add(fIntegrateNonBootBeOSDesktops = new BooleanValueSetting
-		("IntegrateNonBootBeOSDesktops", true));
+		("IntegrateNonBootBeOSDesktops", false));
 	Add(fIntegrateAllNonBootDesktops = new BooleanValueSetting
 		("IntegrateAllNonBootDesktops", false));
 	Add(fEjectWhenUnmounting = new BooleanValueSetting("EjectWhenUnmounting", true));
@@ -343,8 +336,6 @@ TrackerSettings::UsedSpaceColor()
 void
 TrackerSettings::SetUsedSpaceColor(rgb_color color)
 {
-	if (color.alpha == 0)
-		color.alpha = 192;
 	gTrackerState.fUsedSpaceColor->ValueChanged(ColorToValue(color));
 }
 
@@ -359,8 +350,6 @@ TrackerSettings::FreeSpaceColor()
 void
 TrackerSettings::SetFreeSpaceColor(rgb_color color)
 {
-	if (color.alpha == 0)
-		color.alpha = 192;
 	gTrackerState.fFreeSpaceColor->ValueChanged(ColorToValue(color));
 }
 
@@ -375,8 +364,6 @@ TrackerSettings::WarningSpaceColor()
 void
 TrackerSettings::SetWarningSpaceColor(rgb_color color)
 {
-	if (color.alpha == 0)
-		color.alpha = 192;
 	gTrackerState.fWarningSpaceColor->ValueChanged(ColorToValue(color));
 }
 
