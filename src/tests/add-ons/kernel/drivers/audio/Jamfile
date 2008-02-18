@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src tests add-ons kernel drivers audio ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
+UsePrivateHeaders [ FDirName media ] ;
+
+SubDirCcFlags [ FDefines HAIKU_MULTI_AUDIO=1 ] ;
+
+SimpleTest multi_audio_test :
+	multi_audio_test.cpp
+	argv.c
+
+	: libroot.so
+;
+
+SEARCH on [ FGristFiles
+		argv.c
+	] = [ FDirName $(HAIKU_TOP) src tests add-ons kernel file_systems fs_shell ] ;
