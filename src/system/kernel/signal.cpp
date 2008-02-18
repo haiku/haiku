@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  *
  * Distributed under the terms of the MIT License.
  */
 
-/* POSIX signals handling routines */
+/*! POSIX signals handling routines */
 
 #include <stddef.h>
 #include <string.h>
@@ -617,7 +617,8 @@ has_signals_pending(void *_thread)
 	if (thread == NULL)
 		thread = thread_get_current_thread();
 
-	return atomic_get(&thread->sig_pending) & ~atomic_get(&thread->sig_block_mask);
+	return atomic_get(&thread->sig_pending)
+		& ~atomic_get(&thread->sig_block_mask);
 }
 
 
@@ -654,12 +655,9 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 }
 
 
-/**	\brief sigaction() for the specified thread.
- *
- *	A \a threadID is < 0 specifies the current thread.
- *
- */
-
+/*!	\brief sigaction() for the specified thread.
+	A \a threadID is < 0 specifies the current thread.
+*/
 int
 sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
 	struct sigaction *oldAction)
@@ -721,8 +719,7 @@ sigaction(int signal, const struct sigaction *act, struct sigaction *oldAction)
 }
 
 
-/** Triggers a SIGALRM to the thread that issued the timer and reschedules */
-
+/*! Triggers a SIGALRM to the thread that issued the timer and reschedules */
 static int32
 alarm_event(timer *t)
 {
@@ -731,7 +728,8 @@ alarm_event(timer *t)
 	// set_alarm().
 	// Since thread->alarm is this timer structure, we can just
 	// cast it back - ugly but it works for now
-	struct thread *thread = (struct thread *)((uint8 *)t - offsetof(struct thread, alarm));
+	struct thread *thread = (struct thread *)((uint8 *)t
+		- offsetof(struct thread, alarm));
 		// ToDo: investigate adding one user parameter to the timer structure to fix this hack
 
 	TRACE(("alarm_event: thread = %p\n", thread));
@@ -741,12 +739,11 @@ alarm_event(timer *t)
 }
 
 
-/** Sets the alarm timer for the current thread. The timer fires at the
- *	specified time in the future, periodically or just once, as determined
- *	by \a mode.
- *	\return the time left until a previous set alarm would have fired.
- */
-
+/*!	Sets the alarm timer for the current thread. The timer fires at the
+	specified time in the future, periodically or just once, as determined
+	by \a mode.
+	\return the time left until a previous set alarm would have fired.
+*/
 bigtime_t
 set_alarm(bigtime_t time, uint32 mode)
 {
@@ -774,10 +771,9 @@ set_alarm(bigtime_t time, uint32 mode)
 }
 
 
-/**	Replace the current signal block mask and wait for any event to happen.
- *	Before returning, the original signal block mask is reinstantiated.
- */
-
+/*!	Replace the current signal block mask and wait for any event to happen.
+	Before returning, the original signal block mask is reinstantiated.
+*/
 int
 sigsuspend(const sigset_t *mask)
 {
@@ -787,7 +783,7 @@ sigsuspend(const sigset_t *mask)
 	// Set the new block mask and interuptably block wait for a condition
 	// variable no one will ever notify.
 
-	atomic_set(&thread->sig_block_mask, *mask);
+	atomic_set(&thread->sig_block_mask, *mask & BLOCKABLE_SIGNALS);
 
 	ConditionVariable<sigset_t> conditionVar;
 	conditionVar.Publish(mask, "sigsuspend");
