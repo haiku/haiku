@@ -796,6 +796,8 @@ sigsuspend(const sigset_t *mask)
 			break;
 	}
 
+	conditionVar.Unpublish();
+
 	// restore the original block mask
 	atomic_set(&thread->sig_block_mask, oldMask);
 
