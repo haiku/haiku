@@ -477,7 +477,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			// - nonsticky mode and different selection,
 			// - clicked in sticky mode
 			if (fSelected == NULL
-				|| (!_IsStickyMode() && menuItem != fSelected)
+				|| (menuItem != fSelected)
 				|| (buttons != 0 && _IsStickyMode())) {
 				if (menuItem->Submenu() != NULL) {
 					if (menuItem->Submenu()->Window() == NULL) {
