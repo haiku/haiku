@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src add-ons translators libtiff ;
+SubDir HAIKU_TOP src add-ons translators tiff ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
