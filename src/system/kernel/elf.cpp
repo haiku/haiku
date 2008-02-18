@@ -1668,7 +1668,9 @@ load_kernel_add_on(const char *path)
 		load_elf_symbol_table(fd, image);
 
 	free(programHeaders);
+	mutex_lock(&sImageMutex);
 	register_elf_image(image);
+	mutex_unlock(&sImageMutex);
 
 done:
 	_kern_close(fd);
