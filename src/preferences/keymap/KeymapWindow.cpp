@@ -93,6 +93,11 @@ KeymapWindow::KeymapWindow()
 	entry_ref ref;
 	get_ref_for_path(path.Path(), &ref);
 	
+	BDirectory userKeymapsDir(&ref);
+	if (userKeymapsDir.InitCheck() != B_OK) {
+		create_directory(path.Path(), 0777);
+	}
+	
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), &ref, 
 		B_FILE_NODE, false, NULL);
 	fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), &ref, 

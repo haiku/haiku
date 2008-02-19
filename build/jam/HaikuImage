@@ -358,7 +358,6 @@ AddSymlinkToHaikuImage home config settings
 	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
 
 AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
-AddDirectoryToHaikuImage home config settings Keymap ;
 
 # bison files
 SEARCH on <bison>m4sugar.m4
