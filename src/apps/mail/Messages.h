@@ -100,6 +100,7 @@ enum MENUS {
 	M_SIG_MENU,
 	M_FIND,
 	M_FIND_AGAIN,
+	M_ACCOUNTS,
 
 	// queries
 	M_EDIT_QUERIES,

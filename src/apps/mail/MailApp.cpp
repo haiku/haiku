@@ -374,6 +374,10 @@ TMailApp::MessageReceived(BMessage *msg)
 			break;
 		}
 
+		case M_ACCOUNTS:
+			be_roster->Launch("application/x-vnd.Haiku-Mail");
+			break;
+
 		case M_EDIT_SIGNATURE:
 			if (fSigWindow)
 				fSigWindow->Activate(true);

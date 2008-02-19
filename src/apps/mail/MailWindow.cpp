@@ -354,6 +354,10 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		new BMessage(M_PREFS),','));
 	item->SetTarget(be_app);
 	menu_bar->AddItem(menu);
+	menu->AddItem(item = new BMenuItem(
+		MDR_DIALECT_CHOICE ("Accounts","Accounts") B_UTF8_ELLIPSIS,
+		new BMessage(M_ACCOUNTS),'-'));
+	item->SetTarget(be_app);
 
 	//	
 	// View Menu
