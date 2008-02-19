@@ -130,6 +130,7 @@ struct driver_entry {
 	ino_t			node;
 	time_t			last_modified;
 	image_id		image;
+	uint32			devices_published;
 
 	// driver image information
 	int32			*api_version;
@@ -781,6 +782,11 @@ unpublish_node(struct devfs *fs, devfs_vnode *node, mode_t type)
 
 	status = remove_vnode(fs->id, node->id);
 
+	if (status == B_OK && S_ISCHR(node->stream.type)
+		&& node->stream.u.dev.driver != NULL) {
+		node->stream.u.dev.driver->devices_published--;
+	}
+
 out:
 	recursive_lock_unlock(&fs->lock);
 	return status;
@@ -1007,6 +1013,9 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 	node->stream.u.dev.driver = driver;
 	node->stream.u.dev.ops = ops;
 
+	if (driver != NULL)
+		driver->devices_published++;
+
 	// every raw disk gets an I/O scheduler object attached
 	// ToDo: the driver should ask for a scheduler (ie. using its devfs node attributes)
 	if (isDisk && !strcmp(node->name, "raw")) {
@@ -1015,41 +1024,49 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 			return B_NO_MEMORY;
 	}
 
-	return status;
+	return B_OK;
 }
 
 
+/*!	Collects all published devices of a driver, compares them to what the
+	driver would publish now, and then publishes/unpublishes the devices
+	as needed.
+	If the driver does not publish any devices anymore, it is unloaded.
+*/
 static status_t
 republish_driver(driver_entry *driver)
 {
-	if (driver->image < 0)
-		return B_NO_INIT;
+	if (driver->image < 0) {
+		// The driver is not yet loaded - go through the normal load procedure
+		return load_driver(driver);
+	}
 
 	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
-	// build the list of currently present devices by iterating through all
-	// present nodes
+	// build the list of currently present devices of this driver
+	// by iterating through all present nodes
 	struct hash_iterator i;
 	hash_open(sDeviceFileSystem->vnode_hash, &i);
 
-	devfs_vnode *vnode = (devfs_vnode *)hash_next(
-		sDeviceFileSystem->vnode_hash, &i);
-
 	DoublyLinkedList<node_path_entry> currentNodes;
-	while (vnode) {
-		if (S_ISCHR(vnode->stream.type)) {
-			if (vnode->stream.u.dev.driver == driver) {
-				node_path_entry *path = new(std::nothrow) node_path_entry;
-				if (!path) {
-					while ((path = currentNodes.RemoveHead()))
-						delete path;
-					hash_close(sDeviceFileSystem->vnode_hash, &i, false);
-					return B_NO_MEMORY;
-				}
+	while (true) {
+		devfs_vnode *vnode = (devfs_vnode *)hash_next(
+			sDeviceFileSystem->vnode_hash, &i);
+		if (vnode == NULL)
+			break;
 
-				get_device_name(vnode, path->path, sizeof(path->path));
-				currentNodes.Add(path);
+		if (S_ISCHR(vnode->stream.type)
+			&& vnode->stream.u.dev.driver == driver) {
+			node_path_entry *path = new(std::nothrow) node_path_entry;
+			if (!path) {
+				while ((path = currentNodes.RemoveHead()))
+					delete path;
+				hash_close(sDeviceFileSystem->vnode_hash, &i, false);
+				return B_NO_MEMORY;
 			}
+
+			get_device_name(vnode, path->path, sizeof(path->path));
+			currentNodes.Add(path);
 		}
 
 		vnode = (devfs_vnode *)hash_next(sDeviceFileSystem->vnode_hash, &i);
@@ -1058,15 +1075,9 @@ republish_driver(driver_entry *driver)
 
 	// now ask the driver for it's currently published devices
 	const char **devicePaths = driver->publish_devices();
-	if (devicePaths == NULL) {
-		node_path_entry *entry = NULL;
-		while ((entry = currentNodes.RemoveHead()))
-			delete entry;
-		return B_ERROR;
-	}
 
 	int32 exported = 0;
-	for (; devicePaths[0]; devicePaths++) {
+	for (; devicePaths != NULL && devicePaths[0]; devicePaths++) {
 		bool present = false;
 		node_path_entry *entry = currentNodes.Head();
 		while (entry) {
@@ -2620,33 +2631,11 @@ devfs_rescan_driver(const char *driverName)
 
 	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
-	// iterate over the drivers and search a matching driverName
-	struct hash_iterator i;
-	hash_open(sDeviceFileSystem->driver_hash, &i);
+	driver_entry *driver = (driver_entry *)hash_lookup(
+		sDeviceFileSystem->driver_hash, driverName);
+	if (driver == NULL)
+		return B_ENTRY_NOT_FOUND;
 
-	driver_entry *driver = (driver_entry *)hash_next(
-		sDeviceFileSystem->driver_hash, &i);
-	while (driver) {
-		const char *name = strrchr(driver->path, '/');
-		if (name == NULL)
-			name = driver->path;
-		else
-			name++;
-
-		if (!strcmp(name, driverName)) {
-			hash_close(sDeviceFileSystem->driver_hash, &i, false);
-			if (driver->image < 0) {
-				// The driver is not yet loaded
-				return load_driver(driver);
-			} else {
-				// The driver is loaded, just republish its entries
-				return republish_driver(driver);
-			}
-		}
-
-		driver = (driver_entry *)hash_next(sDeviceFileSystem->driver_hash, &i);
-	}
-
-	hash_close(sDeviceFileSystem->driver_hash, &i, false);
-	return B_ENTRY_NOT_FOUND;
+	// Republish the driver's entries
+	return republish_driver(driver);
 }
