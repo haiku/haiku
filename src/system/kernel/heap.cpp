@@ -931,7 +931,8 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	if (newSize > minSize && newSize <= maxSize) {
 #if KERNEL_HEAP_LEAK_CHECK
 		// update the size info (the info is at the end so stays where it is)
-		heap_leak_check_info *info = (heap_leak_check_info *)((addr_t)address + maxSize);
+		heap_leak_check_info *info = (heap_leak_check_info *)((addr_t)address
+			+ maxSize - sizeof(heap_leak_check_info));
 		info->size = newSize - sizeof(heap_leak_check_info);
 		newSize -= sizeof(heap_leak_check_info);
 #endif
