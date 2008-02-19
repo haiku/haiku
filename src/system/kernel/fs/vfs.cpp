@@ -121,19 +121,21 @@ struct fs_mount {
 	bool			owns_file_device;
 };
 
-struct advisory_locking {
-	sem_id			lock;
-	sem_id			wait_sem;
-	struct list		locks;
-};
-
-struct advisory_lock {
+struct advisory_lock : public DoublyLinkedListLinkImpl<advisory_lock> {
 	list_link		link;
 	team_id			team;
 	pid_t			session;
-	off_t			offset;
-	off_t			length;
+	off_t			start;
+	off_t			end;
 	bool			shared;
+};
+
+typedef DoublyLinkedList<advisory_lock> LockList;
+
+struct advisory_locking {
+	sem_id			lock;
+	sem_id			wait_sem;
+	LockList		locks;
 };
 
 static mutex sFileSystemsMutex;
@@ -1047,8 +1049,7 @@ create_advisory_locking(struct vnode *vnode)
 	if (vnode == NULL)
 		return B_FILE_ERROR;
 
-	struct advisory_locking *locking = (struct advisory_locking *)malloc(
-		sizeof(struct advisory_locking));
+	struct advisory_locking *locking = new(std::nothrow) advisory_locking;
 	if (locking == NULL)
 		return B_NO_MEMORY;
 
@@ -1066,13 +1067,11 @@ create_advisory_locking(struct vnode *vnode)
 		goto err2;
 	}
 
-	list_init(&locking->locks);
-
 	// We need to set the locking structure atomically - someone
 	// else might set one at the same time
 	do {
-		if (atomic_test_and_set((vint32 *)&vnode->advisory_locking, (addr_t)locking,
-				NULL) == NULL)
+		if (atomic_test_and_set((vint32 *)&vnode->advisory_locking,
+				(addr_t)locking, NULL) == NULL)
 			return B_OK;
 	} while (get_advisory_locking(vnode) == NULL);
 
@@ -1084,7 +1083,7 @@ create_advisory_locking(struct vnode *vnode)
 err2:
 	delete_sem(locking->wait_sem);
 err1:
-	free(locking);
+	delete locking;
 	return status;
 }
 
@@ -1102,11 +1101,13 @@ get_advisory_lock(struct vnode *vnode, struct flock *flock)
 	team_id team = team_get_current_team_id();
 	status_t status = B_BAD_VALUE;
 
-	struct advisory_lock *lock = NULL;
-	while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
+	LockList::Iterator iterator = locking->locks.GetIterator();
+	while (iterator.HasNext()) {
+		struct advisory_lock *lock = iterator.Next();
+
 		if (lock->team == team) {
-			flock->l_start = lock->offset;
-			flock->l_len = lock->length;
+			flock->l_start = lock->start;
+			flock->l_len = lock->end - lock->start + 1;
 			status = B_OK;
 			break;
 		}
@@ -1114,6 +1115,20 @@ get_advisory_lock(struct vnode *vnode, struct flock *flock)
 
 	put_advisory_locking(locking);
 	return status;
+}
+
+
+/*! Returns \c true when either \a flock is \c NULL or the \a flock intersects
+	with the advisory_lock \a lock.
+*/
+static bool
+advisory_lock_intersects(struct advisory_lock *lock, struct flock *flock)
+{
+	if (flock == NULL)
+		return true;
+
+	return lock->start <= flock->l_start - 1 + flock->l_len
+		&& lock->end >= flock->l_start;
 }
 
 
@@ -1127,49 +1142,87 @@ release_advisory_lock(struct vnode *vnode, struct flock *flock)
 
 	struct advisory_locking *locking = get_advisory_locking(vnode);
 	if (locking == NULL)
-		return flock != NULL ? B_BAD_VALUE : B_OK;
+		return B_OK;
 
+	// TODO: use the thread ID instead??
 	team_id team = team_get_current_team_id();
 	pid_t session = thread_get_current_thread()->team->session_id;
 
-	// find matching lock entry
+	// find matching lock entries
 
-	status_t status = B_BAD_VALUE;
-	struct advisory_lock *lock = NULL;
-	while ((lock = (struct advisory_lock *)list_get_next_item(&locking->locks,
-			lock)) != NULL) {
-		if (lock->team == team && (flock == NULL
-				|| (flock != NULL && lock->offset == flock->l_start
-					&& lock->length == flock->l_len))
-			|| lock->session == session) {
-			// we found our lock, free it
-			list_remove_item(&locking->locks, lock);
+	LockList::Iterator iterator = locking->locks.GetIterator();
+	while (iterator.HasNext()) {
+		struct advisory_lock *lock = iterator.Next();
+		bool removeLock = false;
+
+		if (lock->session == session)
+			removeLock = true;
+		else if (lock->team == team && advisory_lock_intersects(lock, flock)) {
+			bool endsBeyond = false;
+			bool startsBefore = false;
+			if (flock != NULL) {
+				startsBefore = lock->start < flock->l_start;
+				endsBeyond = lock->end > flock->l_start - 1 + flock->l_len;
+			}
+
+			if (!startsBefore && !endsBeyond) {
+				// lock is completely contained in flock
+				removeLock = true;
+			} else if (startsBefore && !endsBeyond) {
+				// cut the end of the lock
+				lock->end = flock->l_start - 1;
+			} else if (!startsBefore && endsBeyond) {
+				// cut the start of the lock
+				lock->start = flock->l_start + flock->l_len;
+			} else {
+				// divide the lock into two locks
+				struct advisory_lock *secondLock = new advisory_lock;
+				if (secondLock == NULL) {
+					// TODO: we should probably revert the locks we already
+					// changed... (ie. allocate upfront)
+					put_advisory_locking(locking);
+					return B_NO_MEMORY;
+				}
+
+				lock->end = flock->l_start - 1;
+
+				secondLock->team = lock->team;
+				secondLock->session = lock->session;
+				// values must already be normalized when getting here
+				secondLock->start = flock->l_start + flock->l_len;
+				secondLock->end = lock->end;
+				secondLock->shared = lock->shared;
+
+				locking->locks.Add(secondLock);
+			}
+		}
+
+		if (removeLock) {
+			// this lock is no longer used
+			iterator.Remove();
 			free(lock);
-			status = B_OK;
-			break;
 		}
 	}
 
-	bool removeLocking = list_is_empty(&locking->locks);
+	bool removeLocking = locking->locks.IsEmpty();
 	release_sem_etc(locking->wait_sem, 1, B_RELEASE_ALL);
 
 	put_advisory_locking(locking);
 
-	if (status < B_OK)
-		return status;
-
 	if (removeLocking) {
-		// we can remove the whole advisory locking structure; it's no longer used
+		// We can remove the whole advisory locking structure; it's no
+		// longer used
 		locking = get_advisory_locking(vnode);
 		if (locking != NULL) {
 			// the locking could have been changed in the mean time
-			if (list_is_empty(&locking->locks)) {
+			if (locking->locks.IsEmpty()) {
 				vnode->advisory_locking = NULL;
 
-				// we've detached the locking from the vnode, so we can safely delete it
+				// we've detached the locking from the vnode, so we can
+				// safely delete it
 				delete_sem(locking->lock);
 				delete_sem(locking->wait_sem);
-				free(locking);
+				delete locking;
 			} else {
 				// the locking is in use again
 				release_sem_etc(locking->lock, 1, B_DO_NOT_RESCHEDULE);
@@ -1206,15 +1259,17 @@ restart:
 	// if this vnode has an advisory_locking structure attached,
 	// lock that one and search for any colliding file lock
 	struct advisory_locking *locking = get_advisory_locking(vnode);
+	team_id team = team_get_current_team_id();
 	sem_id waitForLock = -1;
 
 	if (locking != NULL) {
 		// test for collisions
-		struct advisory_lock *lock = NULL;
-		while ((lock = (struct advisory_lock *)list_get_next_item(
-				&locking->locks, lock)) != NULL) {
-			if (lock->offset <= flock->l_start + flock->l_len
-				&& lock->offset + lock->length > flock->l_start) {
+		LockList::Iterator iterator = locking->locks.GetIterator();
+		while (iterator.HasNext()) {
+			struct advisory_lock *lock = iterator.Next();
+
+			// TODO: locks from the same team might be joinable!
+			if (lock->team != team && advisory_lock_intersects(lock, flock)) {
 				// locks do overlap
 				if (!shared || !lock->shared) {
 					// we need to wait
@@ -1271,11 +1326,11 @@ restart:
 	lock->team = team_get_current_team_id();
 	lock->session = session;
 	// values must already be normalized when getting here
-	lock->offset = flock->l_start;
-	lock->length = flock->l_len;
+	lock->start = flock->l_start;
+	lock->end = flock->l_start - 1 + flock->l_len;
 	lock->shared = shared;
 
-	list_add_item(&locking->locks, lock);
+	locking->locks.Add(lock);
 	put_advisory_locking(locking);
 
 	return status;
@@ -2367,12 +2422,14 @@ _dump_advisory_locking(advisory_locking *locking)
 	kprintf("   lock:        %ld", locking->lock);
 	kprintf("   wait_sem:    %ld", locking->wait_sem);
 
-	struct advisory_lock *lock = NULL;
 	int32 index = 0;
-	while ((lock = (advisory_lock *)list_get_next_item(&locking->locks, lock)) != NULL) {
-		kprintf("   [%2ld] team:   %ld\n", index, lock->team);
-		kprintf("        offset: %Ld\n", lock->offset);
-		kprintf("        length: %Ld\n", lock->length);
+	LockList::Iterator iterator = locking->locks.GetIterator();
+	while (iterator.HasNext()) {
+		struct advisory_lock *lock = iterator.Next();
+
+		kprintf("   [%2ld] team:   %ld\n", index++, lock->team);
+		kprintf("        start:  %Ld\n", lock->start);
+		kprintf("        end:    %Ld\n", lock->end);
 		kprintf("        shared? %s\n", lock->shared ? "yes" : "no");
 	}
 }
