@@ -5,6 +5,8 @@
 #ifndef MASTER_SERVER_DEVICE_H
 #define MASTER_SERVER_DEVICE_H
 
+#include <stdio.h>
+
 #include <add-ons/input_server/InputServerDevice.h>
 #include <List.h>
 #include <Locker.h>
@@ -35,12 +37,6 @@ class MasterServerDevice : public BInputServerDevice {
 			const float*	AccelerationTable() const
 								{ return fAccelerationTable; }		
 
-							// debugging
-	inline	BString&		LogString()
-								{ return fLogString; }
-			void			LogDataBytes(uchar* data, int bytes);
-			void			DumpLogString(const char* path);
-
 private:
 			void			_SearchDevices();
 
@@ -63,9 +59,6 @@ private:
 			BList			fDevices;
 	volatile bool			fActive;
 
-			// debugging
-			BString			fLogString;
-
 			// global stuff for all mice objects
 			int32			fSpeed;
 			int32			fAcceleration;
@@ -76,5 +69,26 @@ private:
 			thread_id		fPS2DisablerThread;
 			BLocker			fDeviceLock;
 };
+
+#ifndef DEBUG
+#	define DEBUG 0
+#endif
+
+#if DEBUG
+#	undef PRINT
+	inline void _iprint(const char* fmt, ...) {
+		FILE* log = fopen("/var/log/wacom.log", "a");
+		va_list ap;
+		va_start(ap, fmt);
+		vfprintf(log, fmt, ap);
+		va_end(ap);
+		fflush(log);
+		fclose(log);
+       }
+#	define PRINT(x)	_iprint x
+#else
+#	define PRINT(x)
+#endif
+
 
 #endif	// MASTER_SERVER_DEVICE_H

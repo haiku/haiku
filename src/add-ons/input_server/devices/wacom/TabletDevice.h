@@ -25,16 +25,12 @@ class TabletDevice : public PointingDevice {
 	virtual	status_t			Start();
 	virtual	status_t			Stop();
 
-	inline	int					DataBytes() const
-									{ return fDataBytes; }
-
-			status_t			DetectDevice(uint16 productID);
+			status_t			DetectDevice(const DeviceReader* reader);
 
 			void				SetDevice(float maxX, float maxY,
-									uint32 mode = DEVICE_INTUOS,
-									int dataBytes = 10);
+									uint32 mode = DEVICE_INTUOS);
 
-			void				ReadData(uchar* data,
+			void				ReadData(const uchar* data,
 									bool& hasContact,
 									uint32& mode,
 									uint32& buttons,

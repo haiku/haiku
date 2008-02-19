@@ -31,8 +31,6 @@
 #define JITTER_Y .0007
 #define ACCELERATION_KICK_IN 2.3
 
-#define DEBUG 0
-
 // constructor
 TabletDevice::TabletDevice(MasterServerDevice* parent, DeviceReader* reader)
 	: PointingDevice(parent, reader),
@@ -40,7 +38,6 @@ TabletDevice::TabletDevice(MasterServerDevice* parent, DeviceReader* reader)
 	  fDeviceMode(DEVICE_UNKOWN),
 	  fMaxX(1.0),
 	  fMaxY(1.0),
-	  fDataBytes(10),
 	  fPosX(0.5),
 	  fPosY(0.5),
 	  fFakeMouseX(0.5),
@@ -69,7 +66,7 @@ TabletDevice::InitCheck()
 {
 	status_t status = PointingDevice::InitCheck();
 	if (status >= B_OK)
-		status = DetectDevice(fReader->ProductID());
+		status = DetectDevice(fReader);
 	return status;
 }
 
@@ -110,35 +107,35 @@ TabletDevice::Stop()
 
 // DetectDevice
 status_t
-TabletDevice::DetectDevice(uint16 product)
+TabletDevice::DetectDevice(const DeviceReader* reader)
 {
 	status_t status = B_OK;
-	switch (product) {
+	switch (reader->ProductID()) {
 		case 0x00:
-			SetDevice(5040.0, 3780.0, DEVICE_PENPARTNER, 7);
+			SetDevice(5040.0, 3780.0, DEVICE_PENPARTNER);
 			break;
 		case 0x03:
-			SetDevice(2048.0, 15360.0, DEVICE_PL500, 8);
+			SetDevice(2048.0, 15360.0, DEVICE_PL500);
 			break;
 		case 0x10:
 		case 0x11:
 		case 0x13:
-			SetDevice(10206.0, 7422.0, DEVICE_GRAPHIRE, 8);
+			SetDevice(10206.0, 7422.0, DEVICE_GRAPHIRE);
 			break;
 		case 0x12:	// Graphire 3 4x5
-			SetDevice(13918.0, 10206.0, DEVICE_GRAPHIRE, 8);
+			SetDevice(13918.0, 10206.0, DEVICE_GRAPHIRE);
 			break;
 		case 0x14:	// Graphire 3 6x8
-			SetDevice(16704.0, 12064.0, DEVICE_GRAPHIRE, 8);
+			SetDevice(16704.0, 12064.0, DEVICE_GRAPHIRE);
 			break;
 		case 0x15:	// Graphire 4 4x5 (tested)
-			SetDevice(10208.0, 7024.0, DEVICE_GRAPHIRE, 8);
+			SetDevice(10208.0, 7024.0, DEVICE_GRAPHIRE);
 			break;
 		case 0x16:	// Graphire 4 6x8 (tested)
-			SetDevice(16704.0, 12064.0, DEVICE_GRAPHIRE, 8);
+			SetDevice(16704.0, 12064.0, DEVICE_GRAPHIRE);
 			break;
 		case 0x20:
-			SetDevice(12700.0, 10600.0);
+			SetDevice(12700.0, 10600.0, DEVICE_INTUOS);
 			break;
 		case 0x21:
 			SetDevice(20320.0, 16240.0);
@@ -153,25 +150,25 @@ TabletDevice::DetectDevice(uint16 product)
 			SetDevice(45720.0, 31680.0);
 			break;
 		case 0x30:
-			SetDevice(5408.0, 4056.0, DEVICE_PL500, 8);
+			SetDevice(5408.0, 4056.0, DEVICE_PL500);
 			break;
 		case 0x31:
-			SetDevice(6144.0, 4608.0, DEVICE_PL500, 8);
+			SetDevice(6144.0, 4608.0, DEVICE_PL500);
 			break;
 		case 0x32:
-			SetDevice(6126.0, 4604.0, DEVICE_PL500, 8);
+			SetDevice(6126.0, 4604.0, DEVICE_PL500);
 			break;
 		case 0x33:
-			SetDevice(6260.0, 5016.0, DEVICE_PL500, 8);
+			SetDevice(6260.0, 5016.0, DEVICE_PL500);
 			break;
 		case 0x34:
-			SetDevice(6144.0, 4608.0, DEVICE_PL500, 8);
+			SetDevice(6144.0, 4608.0, DEVICE_PL500);
 			break;
 		case 0x35:
-			SetDevice(7220.0, 5780.0, DEVICE_PL500, 8);
+			SetDevice(7220.0, 5780.0, DEVICE_PL500);
 			break;
 		case 0x3F:
-			SetDevice(87200.0, 65600.0, DEVICE_CINTIQ, 10);
+			SetDevice(87200.0, 65600.0, DEVICE_CINTIQ);
 			break;
 		case 0x41:
 			SetDevice(12700.0, 10600.0);
@@ -192,30 +189,30 @@ TabletDevice::DetectDevice(uint16 product)
 			SetDevice(20320.0, 16240.0);
 			break;
 		case 0x60:
-			SetDevice(5104.0, 3712.0, DEVICE_GRAPHIRE, 8);
+			SetDevice(5104.0, 3712.0, DEVICE_GRAPHIRE);
 			break;
 		case 0x61: // PenStation
-//			SetDevice(3403.0, 2475.0, DEVICE_GRAPHIRE, 8); // this version was untested
-			SetDevice(3248.0, 2320.0, DEVICE_PENSTATION, 8); // this version came from "beer"
+//			SetDevice(3403.0, 2475.0, DEVICE_GRAPHIRE); // this version was untested
+			SetDevice(3248.0, 2320.0, DEVICE_PENSTATION); // this version came from "beer"
 			break;
 		case 0x62: // Volito
-			SetDevice(5040.0, 3712.0, DEVICE_VOLITO, 8);
+			SetDevice(5040.0, 3712.0, DEVICE_VOLITO);
 			break;
 		case 0x64:	// PenPartner.1
-//			SetDevice(3450.0, 2100.0, DEVICE_PENSTATION, 8);
-			SetDevice(3248.0, 2320.0, DEVICE_PENSTATION, 8);
+//			SetDevice(3450.0, 2100.0, DEVICE_PENSTATION);
+			SetDevice(3248.0, 2320.0, DEVICE_PENSTATION);
 			break;
 		case 0xB0:
-			SetDevice(25400.0, 20320.0, DEVICE_INTUOS3, 10);
+			SetDevice(25400.0, 20320.0, DEVICE_INTUOS3);
 			break;
 		case 0xB1:
 			// tested:
-			SetDevice(20320.0, 15230.0, DEVICE_INTUOS3, 10);
+			SetDevice(20320.0, 15230.0, DEVICE_INTUOS3);
 			// Frans:
-//			SetDevice(40640.0, 30480.0, DEVICE_INTUOS3, 10);
+//			SetDevice(40640.0, 30480.0, DEVICE_INTUOS3);
 			break;
 		case 0xB2:
-			SetDevice(60960.0, 45720.0, DEVICE_INTUOS3, 10);
+			SetDevice(60960.0, 45720.0, DEVICE_INTUOS3);
 			break;
 		default:
 			status = B_BAD_VALUE;
@@ -226,19 +223,18 @@ TabletDevice::DetectDevice(uint16 product)
 
 // SetDevice
 void
-TabletDevice::SetDevice(float maxX, float maxY, uint32 mode,  int dataBytes)
+TabletDevice::SetDevice(float maxX, float maxY, uint32 mode)
 {
 	fDeviceMode = mode;
 	fMaxX = maxX;
 	fMaxY = maxY;
-	fDataBytes = dataBytes;
 	fJitterX = JITTER_X;
 	fJitterY = JITTER_Y;
 }
 
 // ReadData
 void
-TabletDevice::ReadData(uchar* data, bool& hasContact, uint32& mode,
+TabletDevice::ReadData(const uchar* data, bool& hasContact, uint32& mode,
 	uint32& buttons, float& x, float& y, float& pressure,
 	int32& clicks, int32& eraser, float& wheelX, float& wheelY,
 	float& tiltX, float& tiltY) const
@@ -513,7 +509,9 @@ event->AddFloat("tablet y", tabletY);
 			} else if (what == B_MOUSE_UP)
 				event->AddInt32("clicks", 0);
 
-			fParent->EnqueueMessage(event);
+			status_t ret = fParent->EnqueueMessage(event);
+			if (ret < B_OK)
+				PRINT(("EnqueueMessage(): %s\n", strerror(ret)));
 	
 			// apply values to members
 			fPosX = x;
@@ -555,54 +553,59 @@ TabletDevice::poll_usb_device(void* arg)
 	TabletDevice* tabletDevice = (TabletDevice*)arg;
 	DeviceReader* reader = tabletDevice->fReader;
 
-	if (reader && reader->InitCheck() >= B_OK) {
+	if (!reader || reader->InitCheck() < B_OK)
+		return B_BAD_VALUE;
 
-		int dataBytes = tabletDevice->DataBytes();
-		uchar* data = new uchar[max_c(12, dataBytes)];
+	int dataBytes = reader->MaxPacketSize();
+	if (dataBytes > 128)
+		return B_BAD_VALUE;
 
-		while (tabletDevice->IsActive()) {
+	uchar data[max_c(12, dataBytes)];
 
-			status_t ret = reader->ReadData(data, dataBytes);
+	while (tabletDevice->IsActive()) {
 
-			if (ret == dataBytes) {
-				// data we read from the wacom device
-				uint32 mode;
-				bool hasContact = false;
-				uint32 buttons = 0;
-				float x = 0.0;
-				float y = 0.0;
-				float pressure = 0.0;
-				int32 clicks = 0;
-				int32 eraser = 0;
-				float wheelX = 0.0;
-				float wheelY = 0.0;
-				float tiltX = 0.0;
-				float tiltY = 0.0;
-				// let the device extract all information from the data
-				tabletDevice->ReadData(data, hasContact, mode, buttons,
-									   x, y, pressure, clicks, eraser,
-									   wheelX, wheelY, tiltX, tiltY);
-				if (hasContact) {
-					// apply the changes to the device
-					tabletDevice->SetStatus(mode, buttons, x, y, pressure,
-											clicks, modifiers(), eraser,
-											wheelX, wheelY, tiltX, tiltY, data);
-				}
-				tabletDevice->SetContact(hasContact);
-			} else {
-				if (ret < B_OK) {
-					if (ret == B_TIMED_OUT)
-						snooze(SNOOZE_AMOUNT);
-					else if (ret == B_INTERRUPTED)
-						snooze(SNOOZE_AMOUNT);
-					else {
-						delete[] data;
-						return ret;
-					}
+		status_t ret = reader->ReadData(data, dataBytes);
+
+		if (ret == dataBytes) {
+			// data we read from the wacom device
+			uint32 mode;
+			bool hasContact = false;
+			uint32 buttons = 0;
+			float x = 0.0;
+			float y = 0.0;
+			float pressure = 0.0;
+			int32 clicks = 0;
+			int32 eraser = 0;
+			float wheelX = 0.0;
+			float wheelY = 0.0;
+			float tiltX = 0.0;
+			float tiltY = 0.0;
+			// let the device extract all information from the data
+			tabletDevice->ReadData(data, hasContact, mode, buttons,
+								   x, y, pressure, clicks, eraser,
+								   wheelX, wheelY, tiltX, tiltY);
+			if (hasContact) {
+				// apply the changes to the device
+				tabletDevice->SetStatus(mode, buttons, x, y, pressure,
+										clicks, modifiers(), eraser,
+										wheelX, wheelY, tiltX, tiltY, data);
+			} else
+				PRINT(("device has no contact\n"));
+			tabletDevice->SetContact(hasContact);
+		} else {
+			PRINT(("failed to read %ld bytes, read: %ld or %s\n",
+				dataBytes, ret, strerror(ret)));
+
+			if (ret < B_OK) {
+				if (ret == B_TIMED_OUT)
+					snooze(SNOOZE_AMOUNT);
+				else if (ret == B_INTERRUPTED)
+					snooze(SNOOZE_AMOUNT);
+				else {
+					return ret;
 				}
 			}
 		}
-		delete[] data;
 	}
 
 	return B_OK;

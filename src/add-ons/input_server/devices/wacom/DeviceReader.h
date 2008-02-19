@@ -45,8 +45,10 @@ class DeviceReader {
 			size_t				MaxPacketSize() const;
 
 			// trigger an interrupt transfer and write the data in the buffer
-			// it should be save to call this function with size != MaxPacketSize
-			status_t			ReadData(uint8* data, size_t size) const;
+			// it should be save to call this function with
+			// size != MaxPacketSize, remaining bytes will be zero'd out
+			ssize_t				ReadData(uint8* data,
+									const size_t size) const;
 
  protected:
 			void				_Unset();

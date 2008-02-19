@@ -25,14 +25,8 @@
 
 #define DEFAULT_CLICK_SPEED 250000
 
-#define DEBUG 0
-
 static const char* kWatchFolder			= "input/wacom/usb";
 static const char* kDeviceFolder		= "/dev/input/wacom/usb";
-
-#if DEBUG
-static const char* kLogFilePath			= "/tmp/wacom.log";
-#endif
 
 //static const char* kPS2MouseThreadName	= "PS/2 Mouse";
 
@@ -50,7 +44,6 @@ MasterServerDevice::MasterServerDevice()
 	: BInputServerDevice(),
 	  fDevices(1),
 	  fActive(false),
-	  fLogString(""),
 	  fDblClickSpeed(DEFAULT_CLICK_SPEED),
 	  fPS2DisablerThread(B_ERROR),
 	  fDeviceLock("device list lock")
@@ -96,10 +89,7 @@ MasterServerDevice::SystemShuttingDown()
 
 	_StopAll();
 
-#if DEBUG
-	fLogString << "---------------------------------\n\n";
-	DumpLogString(kLogFilePath);
-#endif
+	PRINT(("---------------------------------\n\n"));
 
 	return (BInputServerDevice::SystemShuttingDown());
 }
@@ -170,30 +160,6 @@ MasterServerDevice::Control(const char* device, void* cookie, uint32 code, BMess
 	return B_OK;
 }
 
-// LogDataBytes
-void
-MasterServerDevice::LogDataBytes(uchar* data, int bytes)
-{
-	for (int32 i = 0; i < bytes; i += 2)
-		fLogString << (uint32)data[i] << " " << (uint32)data[i + 1] << "  ";
-	fLogString << "\n";
-}
-
-// DumpLogString
-void
-MasterServerDevice::DumpLogString(const char* path)
-{
-	if (fLogString.Length() > 0) {
-		BFile logFile(path, B_WRITE_ONLY | B_CREATE_FILE);
-		if (logFile.InitCheck() >= B_OK) {
-			logFile.Seek(0, SEEK_END);
-			logFile.Write(fLogString.String(), fLogString.Length());
-			fLogString.SetTo("");
-		}
-		logFile.Unset();
-	}
-}
-
 // #pragma mark -
 
 // _SearchDevices
@@ -208,12 +174,8 @@ MasterServerDevice::_SearchDevices()
 			// entry of that device still exists
 			entry_ref ref;
 			while (dir.GetNextRef(&ref) >= B_OK) {
+				PRINT(("examining devfs entry '%s'\n", ref.name));
 				// don't add the control device
-	
-#if DEBUG
-	fLogString << "examining devfs entry '" << ref.name << "'\n";
-#endif
-	
 				if (strcmp(ref.name, "control") != 0) {
 					BPath path(&ref);
 					if (path.InitCheck() >= B_OK) {
@@ -221,24 +183,11 @@ MasterServerDevice::_SearchDevices()
 						_AddDevice(path.Path());
 					}
 				}
-	
-#if DEBUG
-	fLogString << "\n";
-#endif
-	
 			}
-		} else {
+		} else
+			PRINT(("folder '%s' not found\n", kDeviceFolder));
 	
-#if DEBUG
-	fLogString << "folder '" << kDeviceFolder <<"' not found\n";
-#endif
-	
-		}
-	
-#if DEBUG
-	fLogString << "done examing devfs\n";
-	DumpLogString("kLogFilePath");
-#endif
+		PRINT(("done examing devfs\n"));
 		_UnlockDevices();
 	}
 }
@@ -265,27 +214,17 @@ MasterServerDevice::_AddDevice(const char* path)
 		// add it to our list
 		if (device && device->InitCheck() >= B_OK
 			&& fDevices.AddItem((void*)device)) {
-	
-#if DEBUG
-	fLogString << "pointing device added (" << path << ")\n";
-//	DumpLogString("kLogFilePath");
-#endif
-	
+			PRINT(("pointing device added (%s)\n", path));
 			// start device polling only if we're started
 			if (fActive)
 				device->Start();
 		} else {
 	
-#if DEBUG
-	fLogString << "pointing device not added (" << path << ")\n";
-	if (device) {
-		char temp[256];
-		sprintf(temp, "  vendor: %0*x, product: %0*x\n", 4, device->VendorID(),
-			4, device->ProductID());
-		fLogString << temp;
-	}
-//	DumpLogString("kLogFilePath");
-#endif
+			PRINT(("pointing device not added (%s)\n", path));
+			if (device) {
+				PRINT(("  vendor: %0*x, product: %0*x\n", 4, device->VendorID(),
+					4, device->ProductID()));
+			}
 	
 			delete device;
 		}
@@ -348,9 +287,7 @@ MasterServerDevice::_HandleNodeMonitor(BMessage* message)
 					// remove the device if the devfs entry was not found
 					if (!found) {
 
-#if DEBUG
-fLogString << "removing device '" << pointingDevice->DevicePath() << "'\n";
-#endif
+						PRINT(("removing device '%s'\n", pointingDevice->DevicePath()));
 
 						if (_LockDevices()) {
 							if (fDevices.RemoveItem((void*)pointingDevice))

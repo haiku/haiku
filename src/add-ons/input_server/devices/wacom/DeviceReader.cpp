@@ -9,6 +9,11 @@
 
 #include <File.h>
 
+#include "MasterServerDevice.h"
+
+
+static ssize_t kHeaderSize = 8;
+
 
 // constructor
 DeviceReader::DeviceReader()
@@ -39,9 +44,9 @@ DeviceReader::SetTo(const char* path)
 		if (ret >= B_OK) {
 			// read 8 bytes from the file and initialize
 			// the rest of the object variables
-			uint8 buffer[8];
-			ret = fDeviceFile->Read(buffer, 8);
-			if (ret == 8) {
+			uint8 buffer[kHeaderSize];
+			ret = fDeviceFile->Read(buffer, kHeaderSize);
+			if (ret == kHeaderSize) {
 				ret = B_OK;
 				uint16* ids = (uint16*)buffer;
 				fVendorID = ids[0];
@@ -99,33 +104,43 @@ DeviceReader::MaxPacketSize() const
 }
 
 // ReadData
-status_t
-DeviceReader::ReadData(uint8* data, size_t size) const
+ssize_t
+DeviceReader::ReadData(uint8* data, const size_t size) const
 {
-	status_t ret = B_NO_INIT;
-	if (fDeviceFile) {
-		ret = fDeviceFile->InitCheck();
-		if (ret >= B_OK) {
-			uint8* buffer = new uint8[fMaxPackedSize + 8];
-			ret = fDeviceFile->Read(buffer, fMaxPackedSize + 8);
-			if (ret == (ssize_t)(fMaxPackedSize + 8)) {
-				// make sure we don't copy too many bytes
-				size_t length = min_c(size, fMaxPackedSize);
-				memcpy(data, buffer + 8, length);
-				// zero out any remaining bytes
-				if (size > fMaxPackedSize)
-					memset(data + length, 0, size - fMaxPackedSize);
-				// operation could be considered successful
-				ret = length;
-			} else if (ret == 8 || ret == B_TIMED_OUT) {
-				// it's ok if the operation timed out
-				memset(data, 0, size);
-				ret = B_OK;
-			}
-			delete[] buffer;
-		}
+	if (!fDeviceFile || fMaxPackedSize <= 0 || fMaxPackedSize > 128)
+		return B_NO_INIT;
+	status_t ret = fDeviceFile->InitCheck();
+	if (ret < B_OK)
+		return (ssize_t)ret;
+
+	ssize_t requested = fMaxPackedSize + kHeaderSize;
+	uint8 buffer[requested];
+	ssize_t read = fDeviceFile->Read(buffer, requested);
+	if (read > kHeaderSize) {
+		// make sure we don't copy too many bytes
+		size_t bytesToCopy = min_c(size, read - (size_t)kHeaderSize);
+PRINT(("requested: %ld, read: %ld, user wants: %lu, copy bytes: %ld\n",
+	requested, read, size, bytesToCopy));
+		memcpy(data, buffer + kHeaderSize, bytesToCopy);
+		// zero out any remaining bytes
+		if (size > bytesToCopy)
+			memset(data + bytesToCopy, 0, size - bytesToCopy);
+		// operation could be considered successful
+//		read = bytesToCopy;
+//		if (read != (ssize_t)size)
+//			PRINT(("user wanted: %lu, returning: %ld\n", size, read));
+		read = size;
+			// pretend we could read as many bytes as requested
+	} else if (read == kHeaderSize || (status_t)read == B_TIMED_OUT) {
+		// it's ok if the operation timed out
+		memset(data, 0, size);
+		read = (size_t)B_OK;
+	} else {
+		PRINT(("requested: %ld, read: %ld, user wants: %lu\n",
+			requested, read, size));
 	}
-	return ret;
+
+	return read;
 }
 
 // _Unset
