@@ -21,7 +21,6 @@
 
 int main(int argc, char **argv)
 {
-	status_t ret;
 	team_info teaminfo;
 	thread_info thinfo;
 	uint32 teamcookie = 0;
@@ -36,7 +35,7 @@ int main(int argc, char **argv)
 	puts("");
 	puts(PS_HEADER);
 	puts(PS_SEP);
-	while ((ret = get_next_team_info(&teamcookie, &teaminfo)) >= B_OK) {
+	while (get_next_team_info(&teamcookie, &teaminfo) >= B_OK) {
 		if (string_to_match) {
 			char *p;
 			p = teaminfo.args;
@@ -50,15 +49,18 @@ int main(int argc, char **argv)
 		}
 		printf("%s (team %ld) (uid %d) (gid %d)\n", teaminfo.args, teaminfo.team, teaminfo.uid, teaminfo.gid);
 		thcookie = 0;
-		while ((ret = get_next_thread_info(teaminfo.team, &thcookie, &thinfo)) >= B_OK) {
+		while (get_next_thread_info(teaminfo.team, &thcookie, &thinfo) >= B_OK) {
 			if (thinfo.state < B_THREAD_RUNNING || thinfo.state >B_THREAD_WAITING)
 				thstate = "???";
 			else
 				thstate = states[thinfo.state-1];
 			printf("%7ld %20s  %3s %3ld %7lli %7lli ", thinfo.thread, thinfo.name, thstate, thinfo.priority, thinfo.user_time/1000, thinfo.kernel_time/1000);
 			if (thinfo.state == B_THREAD_WAITING) {
-				get_sem_info(thinfo.sem, &sinfo);
-				printf("%s(%ld)\n", sinfo.name, sinfo.sem);
+				status_t err = get_sem_info(thinfo.sem, &sinfo);
+				if (!err)
+					printf("%s(%ld)\n", sinfo.name, sinfo.sem);
+				else
+					printf("%s(%ld)\n", strerror(err), thinfo.sem);
 			} else
 				puts("");
 		}
