@@ -60,10 +60,6 @@ DeviceManager InputServer::gDeviceManager;
 
 KeymapMethod InputServer::gKeymapMethod;
 
-#if DEBUG == 2
-FILE *InputServer::sLogFile = NULL;
-#endif
-
 
 extern "C" _EXPORT BView* instantiate_deskbar_item();
 
@@ -147,11 +143,6 @@ InputServer::InputServer()
 	fAppServerPort(-1),
 	fCursorArea(-1)
 {
-#if DEBUG == 2
-	if (sLogFile == NULL)
-		sLogFile = fopen("/var/log/input_server.log", "a");
-#endif
-
 	CALLED();
 	gInputServer = this;
 
@@ -225,10 +216,6 @@ InputServer::~InputServer()
 	fAddOnManager->Quit();
 
 	_ReleaseInput(NULL);
-
-#if DEBUG == 2
-	fclose(sLogFile);
-#endif
 }
 
 

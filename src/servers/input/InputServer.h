@@ -42,7 +42,8 @@ class BottomlineWindow;
 
 class InputDeviceListItem {
 	public:
-		InputDeviceListItem(BInputServerDevice& serverDevice, input_device_ref& device);
+		InputDeviceListItem(BInputServerDevice& serverDevice,
+			input_device_ref& device);
 
 		void Start();
 		void Stop();
@@ -75,7 +76,8 @@ class _BDeviceAddOn_ {
 
 class _BMethodAddOn_ {
 	public:
-		_BMethodAddOn_(BInputServerMethod *method, const char* name, const uchar* icon);
+		_BMethodAddOn_(BInputServerMethod *method, const char* name,
+			const uchar* icon);
 		~_BMethodAddOn_();
 
 		status_t SetName(const char* name);
@@ -236,10 +238,6 @@ class InputServer : public BApplication {
 		uint32*			fCursorBuffer;
 #endif
 
-#if DEBUG == 2
-	public:
-		static FILE *sLogFile;
-#endif
 };
 
 extern InputServer* gInputServer;
@@ -247,8 +245,17 @@ extern InputServer* gInputServer;
 #if DEBUG >= 1
 #	if DEBUG == 2
 #		undef PRINT
-        inline void _iprint(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
-                fputs(buf, InputServer::sLogFile); fflush(InputServer::sLogFile); }
+		inline void _iprint(const char *fmt, ...) {
+			FILE* log = fopen("/var/log/input_server.log", "a");
+			char buf[1024];
+			va_list ap;
+			va_start(ap, fmt);
+			vsprintf(buf, fmt, ap);
+			va_end(ap);
+			fputs(buf, log);
+			fflush(log);
+			fclose(log);
+        }
 #		define PRINT(x)	_iprint x
 #	else
 #		undef PRINT
