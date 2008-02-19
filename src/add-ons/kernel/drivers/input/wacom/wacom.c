@@ -33,23 +33,23 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 typedef struct wacom_device wacom_device;
 
 struct wacom_device {
-	wacom_device*					next;
+	wacom_device*		next;
 
-	int								open;
-	int								number;
+	int					open;
+	int					number;
 
-	usb_device						dev;
+	usb_device			dev;
 
-	usb_pipe						pipe;
-	char*							data;
-	size_t							max_packet_size;
-	size_t							length;
+	usb_pipe			pipe;
+	char*				data;
+	size_t				max_packet_size;
+	size_t				length;
 
-	uint16							vendor;
-	uint16							product;
+	uint16				vendor;
+	uint16				product;
 
-	sem_id							notify_lock;
-	uint32							status;
+	sem_id				notify_lock;
+	uint32				status;
 };
 
 // handy strings for referring to ourself
@@ -98,14 +98,14 @@ put_number(int num)
 // #pragma mark - Device addition and removal
 //
 // add_device() and remove_device() are used to create and tear down
-// device instances.  They are driver by the callbacks device_added()
+// device instances.  They are used from the callbacks device_added()
 // and device_removed() which are invoked by the USB bus manager.
 
 // add_device
 static wacom_device* 
 add_device(usb_device dev)
 {
-	wacom_device *md = NULL;
+	wacom_device *device = NULL;
 	int num, ifc, alt;
 	const usb_interface_info *ii;
 	status_t st;
@@ -162,24 +162,23 @@ add_device(usb_device dev)
 
 fail:
 	put_number(num);
-	if (md) {
-		if (md->data)
-			free(md->data);
-		free(md);
+	if (device) {
+		free(device->data);
+		free(device);
 	}
 	return NULL;
 
 got_one:
-	if ((md = (wacom_device *) malloc(sizeof(wacom_device))) == NULL)
+	if ((device = (wacom_device *) malloc(sizeof(wacom_device))) == NULL)
 		goto fail;
 	
-	md->dev = dev;
-	md->number = num;
-	md->open = 1;
-	md->notify_lock = -1;
-	md->data = NULL;
+	device->dev = dev;
+	device->number = num;
+	device->open = 1;
+	device->notify_lock = -1;
+	device->data = NULL;
 
-	if (setConfiguration) {
+//	if (setConfiguration) {
 		// the configuration has to be set yet (was not the current one)
 		DPRINTF_INFO((ID "add_device() - setting configuration...\n"));
 		if ((st = usb->set_configuration(dev, conf)) != B_OK) {
@@ -217,70 +216,70 @@ got_one:
 			if (st < B_OK)
 				dprintf(ID "add_device() - control transfer 2 failed: %ld\n", st);
 		}
-	}
+//	}
 
 	// configure the rest of the wacom_device
-	md->pipe = ii->endpoint[0].handle;
-//DPRINTF_INFO((ID "add_device() - pipe id = %ld\n", md->pipe));
-	md->length = 0;
-	md->max_packet_size = ii->endpoint[0].descr->max_packet_size;
-	md->data = (char*)malloc(md->max_packet_size);
-	if (md->data == NULL)
+	device->pipe = ii->endpoint[0].handle;
+//DPRINTF_INFO((ID "add_device() - pipe id = %ld\n", device->pipe));
+	device->length = 0;
+	device->max_packet_size = ii->endpoint[0].descr->max_packet_size;
+	device->data = (char*)malloc(device->max_packet_size);
+	if (device->data == NULL)
 		goto fail;
-//DPRINTF_INFO((ID "add_device() - max packet length = %ld\n", md->max_packet_size));
-	md->status = 0;//B_USB_STATUS_SUCCESS;
-	md->vendor = udd->vendor_id;
-	md->product = udd->product_id;
+//DPRINTF_INFO((ID "add_device() - max packet length = %ld\n", device->max_packet_size));
+	device->status = 0;//B_USB_STATUS_SUCCESS;
+	device->vendor = udd->vendor_id;
+	device->product = udd->product_id;
 
-	DPRINTF_INFO((ID "add_device() - added %p (/dev/%s%d)\n", md, kBasePublishPath, num));
+	DPRINTF_INFO((ID "add_device() - added %p (/dev/%s%d)\n", device, kBasePublishPath, num));
 	
 	// add it to the list of devices so it will be published, etc
 	acquire_sem(sDeviceListLock);
-	md->next = sDeviceList;
-	sDeviceList = md;
+	device->next = sDeviceList;
+	sDeviceList = device;
 	sDeviceCount++;
 	release_sem(sDeviceListLock);
 	
-	return md;
+	return device;
 }
 
 // remove_device
 static void 
-remove_device(wacom_device *md)
+remove_device(wacom_device *device)
 {
-	put_number(md->number);
+	put_number(device->number);
 
-	usb->cancel_queued_transfers(md->pipe);
+	usb->cancel_queued_transfers(device->pipe);
 
-	delete_sem(md->notify_lock);
-	if (md->data)
-		free(md->data);
-	free(md);
+	delete_sem(device->notify_lock);
+	if (device->data)
+		free(device->data);
+	free(device);
 }
 
 // device_added
 static status_t 
 device_added(usb_device dev, void** cookie)
 {
-	wacom_device* md;
+	wacom_device* device;
 
 	DPRINTF_INFO((ID "device_added(%ld,...)\n", dev));
 
 	// first see, if this device is already added
 	acquire_sem(sDeviceListLock);
-	for (md = sDeviceList; md; md = md->next) {
-		DPRINTF_ERR((ID "device_added() - old device: %ld\n", md->dev));
-		if (md->dev == dev) {
+	for (device = sDeviceList; device; device = device->next) {
+		DPRINTF_ERR((ID "device_added() - old device: %ld\n", device->dev));
+		if (device->dev == dev) {
 			DPRINTF_ERR((ID "device_added() - already added - done!\n"));
-			*cookie = (void*)md;
+			*cookie = (void*)device;
 			release_sem(sDeviceListLock);
 			return B_OK;
 		}
 	}
 	release_sem(sDeviceListLock);
 
-	if ((md = add_device(dev)) != NULL) {
-		*cookie = (void*)md;
+	if ((device = add_device(dev)) != NULL) {
+		*cookie = (void*)device;
 		DPRINTF_INFO((ID "device_added() - done!\n"));
 		return B_OK;
 	} else
@@ -293,22 +292,22 @@ device_added(usb_device dev, void** cookie)
 static status_t 
 device_removed(void *cookie)
 {
-	wacom_device *md = (wacom_device *) cookie;
+	wacom_device *device = (wacom_device *) cookie;
 
-	DPRINTF_INFO((ID "device_removed(%p)\n", md));
+	DPRINTF_INFO((ID "device_removed(%p)\n", device));
 
-	if (md) {
+	if (device) {
 		
 		acquire_sem(sDeviceListLock);
 	
 		// remove it from the list of devices
-		if (md == sDeviceList) {
-			sDeviceList = md->next;
+		if (device == sDeviceList) {
+			sDeviceList = device->next;
 		} else {
 			wacom_device *n;
 			for (n = sDeviceList; n; n = n->next) {
-				if (n->next == md) {
-					n->next = md->next;
+				if (n->next == device) {
+					n->next = device->next;
 					break;
 				}
 			}
@@ -318,15 +317,15 @@ device_removed(void *cookie)
 		// tear it down if it's not open -- 
 		// otherwise the last device_free() will handle it
 		
-		md->open--;
+		device->open--;
 
-		DPRINTF_ERR((ID "device_removed() open: %d\n", md->open));
+		DPRINTF_ERR((ID "device_removed() open: %d\n", device->open));
 
-		if (md->open == 0) {
-			remove_device(md);
+		if (device->open == 0) {
+			remove_device(device);
 		} else {
 			dprintf(ID "device /dev/%s%d still open -- marked for removal\n",
-					 kBasePublishPath, md->number);
+					 kBasePublishPath, device->number);
 		}
 		
 		release_sem(sDeviceListLock);
@@ -343,7 +342,7 @@ device_removed(void *cookie)
 static status_t
 device_open(const char *dname, uint32 flags, void **cookie)
 {	
-	wacom_device *md;
+	wacom_device *device;
 	int n;
 	status_t ret = B_ERROR;
 
@@ -359,17 +358,17 @@ device_open(const char *dname, uint32 flags, void **cookie)
 	DPRINTF_INFO((ID "device_open(\"%s\",%d,...)\n", dname, flags));
 
 	acquire_sem(sDeviceListLock);
-	for (md = sDeviceList; md; md = md->next) {
-		if (md->number == n) {
-//			if (md->open <= 1) {
-				md->open++;
-				*cookie = md;	
-				DPRINTF_ERR((ID "device_open() open: %d\n", md->open));
+	for (device = sDeviceList; device; device = device->next) {
+		if (device->number == n) {
+//			if (device->open <= 1) {
+				device->open++;
+				*cookie = device;	
+				DPRINTF_ERR((ID "device_open() open: %d\n", device->open));
 
-				if (md->notify_lock < 0) {
-					if ((md->notify_lock = create_sem(0, "notify_lock")) < 0) {
-						ret = md->notify_lock;
-						md->open--;
+				if (device->notify_lock < 0) {
+					if ((device->notify_lock = create_sem(0, "notify_lock")) < 0) {
+						ret = device->notify_lock;
+						device->open--;
 						*cookie = NULL;
 						dprintf(ID "device_open() -> create_sem() returns %ld\n", ret);
 					} else {
@@ -394,8 +393,8 @@ static status_t
 device_close (void *cookie)
 {
 #if DEBUG_DRIVER
-	wacom_device *md = (wacom_device*) cookie;
-	DPRINTF_ERR((ID "device_close() name = \"%s%d\"\n", kBasePublishPath, md->number));
+	wacom_device *device = (wacom_device*) cookie;
+	DPRINTF_ERR((ID "device_close() name = \"%s%d\"\n", kBasePublishPath, device->number));
 #endif
 	return B_OK;
 }
@@ -404,18 +403,18 @@ device_close (void *cookie)
 static status_t
 device_free(void *cookie)
 {
-	wacom_device *md = (wacom_device *)cookie;
+	wacom_device *device = (wacom_device *)cookie;
 	
-	DPRINTF_INFO((ID "device_free() name = \"%s%d\"\n", kBasePublishPath, md->number));
+	DPRINTF_INFO((ID "device_free() name = \"%s%d\"\n", kBasePublishPath, device->number));
 	
 	acquire_sem(sDeviceListLock);
 
-	md->open--;
+	device->open--;
 
-	DPRINTF_INFO((ID "device_free() open: %ld\n", md->open));
+	DPRINTF_INFO((ID "device_free() open: %ld\n", device->open));
 
-	if (md->open == 0) {
-		remove_device(md);
+	if (device->open == 0) {
+		remove_device(device);
 	}
 	release_sem(sDeviceListLock);
 
@@ -425,24 +424,24 @@ device_free(void *cookie)
 // device_interupt_callback
 static void
 device_interupt_callback(void* cookie, uint32 status,
-						 void* data, uint32 actual_len)
+						 void* data, uint32 actualLength)
 {
-	wacom_device* md = (wacom_device*)cookie;
-	uint32 length = min_c(actual_len, md->max_packet_size);
+	wacom_device* device = (wacom_device*)cookie;
+	uint32 length = min_c(actualLength, device->max_packet_size);
 
 	DPRINTF_INFO((ID "device_interupt_callback(%p) name = \"%s%d\" -> "
-		"status: %ld, length: %ld\n", cookie, kBasePublishPath, md->number,
-		status, actual_len));
+		"status: %ld, length: %ld\n", cookie, kBasePublishPath, device->number,
+		status, actualLength));
 
-	md->status = status;
-	if (md->notify_lock >= 0) {
+	device->status = status;
+	if (device->notify_lock >= 0) {
 		if (status == 0/*B_USB_STATUS_SUCCESS*/) {
-			memcpy(md->data, data, length);
-			md->length = length;
+			memcpy(device->data, data, length);
+			device->length = length;
 		} else {
-			md->length = 0;
+			device->length = 0;
 		}
-		release_sem(md->notify_lock);
+		release_sem(device->notify_lock);
 	}
 
 	DPRINTF_INFO((ID "device_interupt_callback() - done\n"));
@@ -450,32 +449,32 @@ device_interupt_callback(void* cookie, uint32 status,
 
 // read_header
 static void
-read_header(const wacom_device* md, void* buffer)
+read_header(const wacom_device* device, void* buffer)
 {
 	uint16* ids = (uint16*)buffer;
 	uint32* size = (uint32*)buffer;
 
-	ids[0] = md->vendor;
-	ids[1] = md->product;
-	size[1] = md->max_packet_size;
+	ids[0] = device->vendor;
+	ids[1] = device->product;
+	size[1] = device->max_packet_size;
 }
 
 // device_read
 static status_t
 device_read(void* cookie, off_t pos, void* buf, size_t* count)
 {
-	wacom_device* md = (wacom_device*) cookie;
+	wacom_device* device = (wacom_device*) cookie;
 	status_t ret = B_BAD_VALUE;
 	uint8* buffer = (uint8*)buf;
 	uint32 dataLength;
 
-	if (!md)
+	if (!device)
 		return ret;
 
-	ret = md->notify_lock;
+	ret = device->notify_lock;
 
 	DPRINTF_INFO((ID "device_read(%p,%Ld,0x%x,%d) name = \"%s%d\"\n",
-			 cookie, pos, buf, *count, kBasePublishPath, md->number));
+			 cookie, pos, buf, *count, kBasePublishPath, device->number));
 
 	if (ret >= B_OK) {
 		// what the client "reads" is decided depending on how much bytes are provided
@@ -484,53 +483,53 @@ device_read(void* cookie, off_t pos, void* buf, size_t* count)
 		// is scheduled, and an error report is returned as appropriate
 		if (*count > 8) {
 			// queue the interrupt transfer
-			ret = usb->queue_interrupt(md->pipe, md->data, md->max_packet_size,
-				device_interupt_callback, md);
+			ret = usb->queue_interrupt(device->pipe, device->data, device->max_packet_size,
+				device_interupt_callback, device);
 			if (ret >= B_OK) {
 				// we will block here until the interrupt transfer has been done
-				ret = acquire_sem_etc(md->notify_lock, 1, B_RELATIVE_TIMEOUT, 500 * 1000);
+				ret = acquire_sem_etc(device->notify_lock, 1, B_RELATIVE_TIMEOUT, 500 * 1000);
 				// handle time out
 				if (ret < B_OK) {
-//					usb->cancel_queued_transfers(md->pipe);
+//					usb->cancel_queued_transfers(device->pipe);
 					if (ret == B_TIMED_OUT) {
 						// a time_out is ok, since it only means that the device
 						// had nothing to report (ie mouse/pen was not moved) within
 						// the given time interval
 						DPRINTF_INFO((ID "device_read(%p) name = \"%s%d\" -> "
-							"B_TIMED_OUT\n", cookie, kBasePublishPath, md->number));
+							"B_TIMED_OUT\n", cookie, kBasePublishPath, device->number));
 						*count = 8;
-						read_header(md, buffer);
+						read_header(device, buffer);
 						ret = B_OK;
 					} else {
 						// any other error trying to acquire the semaphore
 						*count = 0;
 					}
 				} else {
-					if (md->status == 0/*B_USBD_SUCCESS*/) {
+					if (device->status == 0/*B_USBD_SUCCESS*/) {
 						DPRINTF_INFO((ID "interrupt transfer - success\n"));
 						// copy the data from the buffer
-						dataLength = min_c(md->length, *count - 8);
+						dataLength = min_c(device->length, *count - 8);
 						*count = dataLength + 8;
-						read_header(md, buffer);
-						memcpy(buffer + 8, md->data, dataLength);
+						read_header(device, buffer);
+						memcpy(buffer + 8, device->data, dataLength);
 					} else {
 						// an error happened during the interrupt transfer
 						*count = 0;
-						dprintf(ID "interrupt transfer - failure: %ld\n", md->status);
+						dprintf(ID "interrupt transfer - failure: %ld\n", device->status);
 						ret = B_ERROR;
 					}
 				}
 			} else {
 				*count = 0;
 				dprintf(ID "device_read(%p) name = \"%s%d\" -> error queuing interrupt: %ld\n",
-						 cookie, kBasePublishPath, md->number, ret);
+						 cookie, kBasePublishPath, device->number, ret);
 			}
 		} else if (*count == 8) {
-			read_header(md, buffer);
+			read_header(device, buffer);
 			ret = B_OK;
 		} else {
 			dprintf(ID "device_read(%p) name = \"%s%d\" -> buffer size must be at least 8 bytes!\n",
-						 cookie, kBasePublishPath, md->number);
+						 cookie, kBasePublishPath, device->number);
 			*count = 0;
 			ret = B_BAD_VALUE;
 		}
@@ -634,7 +633,7 @@ uninit_driver(void)
 const char**
 publish_devices()
 {
-	wacom_device *md;
+	wacom_device *device;
 	int i;
 	
 	DPRINTF_INFO((ID "publish_devices()\n"));
@@ -648,9 +647,9 @@ publish_devices()
 	acquire_sem(sDeviceListLock);	
 	sDeviceNames = (char **) malloc(sizeof(char*) * (sDeviceCount + 2));
 	if (sDeviceNames) {
-		for (i = 0, md = sDeviceList; md; md = md->next) {
+		for (i = 0, device = sDeviceList; device; device = device->next) {
 			if ((sDeviceNames[i] = (char *) malloc(strlen(kBasePublishPath) + 4))) {
-				sprintf(sDeviceNames[i],"%s%d",kBasePublishPath,md->number);
+				sprintf(sDeviceNames[i],"%s%d",kBasePublishPath,device->number);
 				DPRINTF_INFO((ID "publishing: \"/dev/%s\"\n",sDeviceNames[i]));
 				i++;
 			}
