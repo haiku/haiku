@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src tests system kernel ;
 UsePrivateHeaders kernel ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
+SimpleTest advisory_locking_test : advisory_locking_test.cpp ;
+
 SimpleTest cow_bug113_test : cow_bug113_test.cpp ;
 
 SimpleTest fibo_load_image : fibo_load_image.cpp ;
