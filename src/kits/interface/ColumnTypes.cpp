@@ -596,9 +596,20 @@ BBitmapColumn::DrawField(BField* field, BRect rect, BView* parent)
 				x = rect.right - kTEXT_MARGIN - r.Width();
 				break;
 		}
-		parent->SetDrawingMode(B_OP_ALPHA);
+		// setup drawing mode according to bitmap color space,
+		// restore previous mode after drawing
+		drawing_mode oldMode = parent->DrawingMode();
+		if (bitmap->ColorSpace() == B_RGBA32
+			|| bitmap->ColorSpace() == B_RGBA32_BIG) {
+			parent->SetDrawingMode(B_OP_ALPHA);
+			parent->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		} else {
+			parent->SetDrawingMode(B_OP_OVER);
+		}
+
 		parent->DrawBitmap(bitmap, BPoint(x, y));
-		parent->SetDrawingMode(B_OP_OVER);
+
+		parent->SetDrawingMode(oldMode);
 	}
 }
 
