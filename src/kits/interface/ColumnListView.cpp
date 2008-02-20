@@ -1514,79 +1514,51 @@ void BColumnListView::SaveState(BMessage *msg)
 {
 	msg->MakeEmpty();
 
-	// Damn compiler issuing l43m incorrect warnings.
-	int i;
-	for (i = 0; ;i++)
-	{
-		BColumn *col = (BColumn*) fColumns.ItemAt(i);
-		if(!col)
-			break;
+	for (int32 i = 0; BColumn *col = (BColumn*)fColumns.ItemAt(i); i++) {
 		msg->AddInt32("ID",col->fFieldID);
-		msg->AddFloat("width",col->fWidth);
-		msg->AddBool("visible",col->fVisible);
+		msg->AddFloat("width", col->fWidth);
+		msg->AddBool("visible", col->fVisible);
 	}
 
-	msg->AddBool("sortingenabled",fSortingEnabled);
+	msg->AddBool("sortingenabled", fSortingEnabled);
 
-	if(fSortingEnabled)
-	{
-		for (i = 0; ;i++)
-		{
-			BColumn *col = (BColumn*) fSortColumns.ItemAt(i);
-			if(!col)
-				break;
-			msg->AddInt32("sortID",col->fFieldID);
-			msg->AddBool("sortascending",col->fSortAscending);
+	if (fSortingEnabled) {
+		for (int32 i = 0; BColumn *col = (BColumn*)fSortColumns.ItemAt(i);
+				i++) {
+			msg->AddInt32("sortID", col->fFieldID);
+			msg->AddBool("sortascending", col->fSortAscending);
 		}
 	}
 }
 
 void BColumnListView::LoadState(BMessage *msg)
 {
-	for(int i=0;;i++)
-	{
-		int32 ID;
-		if(B_OK!=msg->FindInt32("ID",i,&ID))
-			break;
-		for(int j=0;;j++)
-		{
-			BColumn *col = (BColumn*) fColumns.ItemAt(j);
-			if(!col)
-				break;
-			if(col->fFieldID==ID)
-			{
+	int32 id;
+	for (int i = 0; msg->FindInt32("ID", i, &id) == B_OK; i++) {
+		for (int j = 0; BColumn* column = (BColumn*)fColumns.ItemAt(j); j++) {
+			if (column->fFieldID == id) {
 				// move this column to position 'i' and set its attributes
-				MoveColumn(col,i);
-				float f;
-				if(B_OK==msg->FindFloat("width",i,&f))
-					col->SetWidth(f);
-				bool b;
-				if(B_OK==msg->FindBool("visible",i,&b))
-					col->SetVisible(b);
+				MoveColumn(column, i);
+				float width;
+				if (msg->FindFloat("width", i, &width) == B_OK)
+					column->SetWidth(width);
+				bool visible;
+				if (msg->FindBool("visible", i, &visible) == B_OK)
+					column->SetVisible(visible);
 			}
 		}
 	}
 	bool b;
-	if(B_OK==msg->FindBool("sortingenabled",&b))
-	{
+	if (msg->FindBool("sortingenabled", &b) == B_OK) {
 		SetSortingEnabled(b);
-		// Damn compiler issuing l43m incorrect warnings.
-		for(int k=0;;k++)
-		{
-			int32 ID;
-			if(B_OK!=msg->FindInt32("sortID", k, &ID))
-				break;
-			for(int j=0;;j++)
-			{
-				BColumn *col = (BColumn*) fColumns.ItemAt(j);
-				if(!col)
-					break;
-				if(col->fFieldID==ID)
-				{
+		for (int k = 0; msg->FindInt32("sortID", k, &id) == B_OK; k++) {
+			for (int j = 0; BColumn* column = (BColumn*)fColumns.ItemAt(j);
+					j++) {
+				if (column->fFieldID == id) {
 					// add this column to the sort list
-					bool val;
-					if(B_OK==msg->FindBool("sortascending", k, &val))
-						SetSortColumn(col, true, val);
+					bool value;
+					if (msg->FindBool("sortascending", k, &value) == B_OK)
+						SetSortColumn(column, true, value);
 				}
 			}
 		}
@@ -2616,7 +2588,7 @@ void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColu
 	
 				if (fFocusRow == row) {
 					if(!fEditMode) {
-						SetHighColor(fMasterView->Color(B_COLOR_SELECTION_TEXT));
+						fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_SELECTION_TEXT));
 						fDrawBufferView->StrokeRect(BRect(-1, sourceRect.top, 10000.0, sourceRect.bottom - 1));
 					}
 				}
