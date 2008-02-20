@@ -28,6 +28,8 @@ static const uint32 kMsgClose = 'clse';
 static const uint32 kMsgField = 'fild';
 static const uint32 kMsgInfo = 'info';
 static const uint32 kMsgMode = 'mode';
+static const uint32	kMsgChange = 'chng';
+
 
 class EthernetSettingsView : public BView {
 	public:

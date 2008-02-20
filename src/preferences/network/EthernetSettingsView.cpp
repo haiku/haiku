@@ -56,6 +56,16 @@
 #include "AutoDeleter.h"
 
 
+static void
+SetupTextControl(BTextControl *control)
+{
+	// TODO: Disallow characters, etc.
+	// Would be nice to have a real
+	// formatted input control
+	control->SetModificationMessage(new BMessage(kMsgChange));
+}
+
+
 bool
 EthernetSettingsView::_PrepareRequest(struct ifreq& request, const char* name)
 {
@@ -116,6 +126,11 @@ EthernetSettingsView::AttachedToWindow()
 {
 	fApplyButton->SetTarget(this);
 	fRevertButton->SetTarget(this);
+	fIPTextControl->SetTarget(this);
+	fNetMaskTextControl->SetTarget(this);
+	fGatewayTextControl->SetTarget(this);
+	fPrimaryDNSTextControl->SetTarget(this);
+	fSecondaryDNSTextControl->SetTarget(this);
 	fDeviceMenuField->Menu()->SetTargetForItems(this); 
 	fTypeMenuField->Menu()->SetTargetForItems(this); 
 	
@@ -175,11 +190,13 @@ EthernetSettingsView::EthernetSettingsView(BRect frame)
 	fIPTextControl = new BTextControl(frame, "ip", "IP Address:", "", NULL);
 	fIPTextControl->MoveTo(fTypeMenuField->Frame().LeftBottom() + spacing);
 	fIPTextControl->ResizeToPreferred();
+	SetupTextControl(fIPTextControl);
 	AddChild(fIPTextControl);
 
 	fNetMaskTextControl = new BTextControl(frame, "mask", "Netmask:", "", NULL);
 	fNetMaskTextControl->MoveTo(
 		fIPTextControl->Frame().LeftBottom() + spacing);
+	SetupTextControl(fNetMaskTextControl);
 	AddChild(fNetMaskTextControl);
 	fNetMaskTextControl->ResizeToPreferred();
 
@@ -187,6 +204,7 @@ EthernetSettingsView::EthernetSettingsView(BRect frame)
 		NULL);
 	fGatewayTextControl->MoveTo(
 		fNetMaskTextControl->Frame().LeftBottom() + spacing);
+	SetupTextControl(fGatewayTextControl);
 	AddChild(fGatewayTextControl);
 	fGatewayTextControl->ResizeToPreferred();
 	
@@ -194,6 +212,7 @@ EthernetSettingsView::EthernetSettingsView(BRect frame)
 		NULL);
 	fPrimaryDNSTextControl->MoveTo(
 		fGatewayTextControl->Frame().LeftBottom() + spacing);
+	SetupTextControl(fPrimaryDNSTextControl);
 	AddChild(fPrimaryDNSTextControl);
 	fPrimaryDNSTextControl->ResizeToPreferred();
 	
@@ -201,6 +220,7 @@ EthernetSettingsView::EthernetSettingsView(BRect frame)
 		NULL);
 	fSecondaryDNSTextControl->MoveTo(
 		fPrimaryDNSTextControl->Frame().LeftBottom() + spacing);
+	SetupTextControl(fSecondaryDNSTextControl);
 	AddChild(fSecondaryDNSTextControl);
 	fSecondaryDNSTextControl->ResizeToPreferred();
 
@@ -209,6 +229,7 @@ EthernetSettingsView::EthernetSettingsView(BRect frame)
 	fRevertButton->ResizeToPreferred();
 	fRevertButton->MoveTo(
 		fSecondaryDNSTextControl->Frame().LeftBottom() + spacing);
+	fRevertButton->SetEnabled(false);
 	AddChild(fRevertButton);
 
 	fApplyButton = new BButton(frame, "apply", "Apply", new BMessage(kMsgApply));
@@ -330,6 +351,9 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 		fPrimaryDNSTextControl->Text()));
 	fCurrentSettings->fNameservers.AddItem(new BString(
 		fSecondaryDNSTextControl->Text()));
+	
+	fApplyButton->SetEnabled(false);
+	fRevertButton->SetEnabled(true);	
 }
 
 
@@ -437,6 +461,8 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 		case kMsgMode:
 			if (BMenuItem* item = fTypeMenuField->Menu()->FindMarked())
 				_EnableTextControls(strcmp(item->Label(), "DHCP") != 0);
+			fApplyButton->SetEnabled(true);
+			fRevertButton->SetEnabled(true);
 			break;
 		case kMsgInfo: {
 		 	const char* name;
@@ -453,9 +479,13 @@ EthernetSettingsView::MessageReceived(BMessage* message)
 		}
 		case kMsgRevert:
 			_ShowConfiguration(fCurrentSettings);
+			fRevertButton->SetEnabled(false);
 			break;
 		case kMsgApply:
 			_SaveConfiguration();
+			break;
+		case kMsgChange:
+			fApplyButton->SetEnabled(true);
 			break;
 		default:
 			BView::MessageReceived(message);

@@ -31,6 +31,8 @@
 #include <unistd.h>
 
 Settings::Settings(const char *name)
+	:
+	fAuto(true)
 {
 	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	fName = name;
