@@ -11,7 +11,7 @@
 #include <bluetooth/HCI/btHCI.h>
 
 #include <net/net_buffer.h>
-
+#include <Drivers.h>
 
 typedef enum { ANCILLYANT = 1, 
                RUNNING, 
@@ -78,11 +78,16 @@ typedef struct bt_hci_device {
 #define BT_WILL_NEED_A_RESET	(1<<2)
 #define BT_DIGIANSWER			(1<<4)
 
-/* IOCTLS */
-#define ISSUE_BT_COMMAND 		(1<<0)
-#define GET_STATICS			    (1<<1)
-#define GET_NOTIFICATION_PORT	(1<<2)
-#define GET_HCI_ID              (1<<3)
+/* Mandatory IOCTLS to be */
+
+#define BT_IOCTLS_OFFSET 3000
+
+enum {
+	ISSUE_BT_COMMAND = B_DEVICE_OP_CODES_END + BT_IOCTLS_OFFSET ,
+	GET_STATICS,
+	GET_NOTIFICATION_PORT, 
+    GET_HCI_ID
+};
 
 #define PACK_PORTCODE(type,hid,data)   ((type&0xFF)<<24|(hid&0xFF)<<16|(data&0xFFFF))
 #define GET_PORTCODE_TYPE(code)        ((code&0xFF000000)>>24)
