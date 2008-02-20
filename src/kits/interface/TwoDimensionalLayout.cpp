@@ -46,6 +46,7 @@
 
 // TODO: Check for memory leaks!
 
+//#define DEBUG_LAYOUT
 
 // CompoundLayouter
 class BTwoDimensionalLayout::CompoundLayouter {
@@ -342,8 +343,10 @@ BTwoDimensionalLayout::LayoutView()
 
 	// layout the horizontal/vertical elements
 	BSize size = SubtractInsets(View()->Frame().Size());
+#ifdef DEBUG_LAYOUT
 printf("BTwoDimensionalLayout::LayoutView(%p): size: (%.1f, %.1f)\n",
 View(), size.width, size.height);
+#endif
 
 	fLocalLayouter->Layout(size);
 
@@ -360,8 +363,10 @@ View(), size.width, size.height);
 			frame.right += fLeftInset;
 			frame.bottom += fTopInset;
 {
+#ifdef DEBUG_LAYOUT
 printf("  frame for item %2d (view: %p): ", i, item->View());
 frame.PrintToStream();
+#endif
 //BSize min(item->MinSize());
 //BSize max(item->MaxSize());
 //printf("    min: (%.1f, %.1f), max: (%.1f, %.1f)\n", min.width, min.height,
