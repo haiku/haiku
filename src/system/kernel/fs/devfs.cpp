@@ -7,33 +7,35 @@
  */
 
 
-#include "IOScheduler.h"
-
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <pnp_devfs.h>
-#include <NodeMonitor.h>
-
-#include <boot_device.h>
-#include <kdevice_manager.h>
-#include <KPath.h>
-#include <vfs.h>
-#include <debug.h>
-#include <util/khash.h>
-#include <util/AutoLock.h>
-#include <elf.h>
-#include <lock.h>
-#include <vm.h>
-#include <arch/cpu.h>
-#include <boot/kernel_args.h>
-
 #include <devfs.h>
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
+
+#include <Drivers.h>
+#include <KernelExport.h>
+#include <NodeMonitor.h>
+#include <pnp_devfs.h>
+
+#include <arch/cpu.h>
+#include <boot/kernel_args.h>
+#include <boot_device.h>
+#include <debug.h>
+#include <elf.h>
+#include <kdevice_manager.h>
+#include <KPath.h>
+#include <lock.h>
+#include <node_monitor.h>
+#include <Notifications.h>
+#include <util/AutoLock.h>
+#include <util/khash.h>
+#include <vfs.h>
+#include <vm.h>
+
+#include "IOScheduler.h"
 
 
 //#define TRACE_DEVFS
@@ -131,6 +133,8 @@ struct driver_entry {
 	time_t			last_modified;
 	image_id		image;
 	uint32			devices_published;
+	uint32			devices_used;
+	bool			binary_updated;
 
 	// driver image information
 	int32			*api_version;
@@ -140,14 +144,24 @@ struct driver_entry {
 	status_t		(*uninit_hardware)(void);
 };
 
-
 struct node_path_entry : DoublyLinkedListLinkImpl<node_path_entry> {
 	char			path[B_PATH_NAME_LENGTH];
+};
+
+class DriverWatcher : public NotificationListener {
+	public:
+		DriverWatcher();
+		virtual ~DriverWatcher();
+
+		virtual void EventOccured(NotificationService& service,
+			const KMessage* event);
 };
 
 
 static void get_device_name(struct devfs_vnode *vnode, char *buffer,
 	size_t size);
+static status_t unpublish_node(struct devfs *fs, devfs_vnode *node,
+	mode_t type);
 static status_t publish_device(struct devfs *fs, const char *path,
 	device_node_info *deviceNode, pnp_devfs_driver_info *info,
 	driver_entry *driver, device_hooks *ops, int32 apiVersion);
@@ -156,6 +170,7 @@ static status_t publish_device(struct devfs *fs, const char *path,
 /* the one and only allowed devfs instance */
 static struct devfs *sDeviceFileSystem = NULL;
 static int32 sDefaultApiVersion = 1;
+static DriverWatcher sDriverWatcher;
 
 
 //	#pragma mark - driver private
@@ -211,24 +226,25 @@ load_driver(driver_entry *driver)
 #error Add checks here for new vs old api version!
 #endif
 		if (*driver->api_version > B_CUR_DRIVER_API_VERSION) {
-			dprintf("%s: api_version %ld not handled\n", driver->name,
+			dprintf("devfs: \"%s\" api_version %ld not handled\n", driver->name,
 				*driver->api_version);
 			status = B_BAD_VALUE;
 			goto error1;
 		}
 		if (*driver->api_version < 1) {
-			dprintf("%s: api_version invalid\n", driver->name);
+			dprintf("devfs: \"%s\" api_version invalid\n", driver->name);
 			status = B_BAD_VALUE;
 			goto error1;
 		}
 	} else
-		dprintf("%s: api_version missing\n", driver->name);
+		dprintf("devfs: \"%s\" api_version missing\n", driver->name);
 
 	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT,
 				(void **)&driver->publish_devices) != B_OK
 		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT,
 				(void **)&driver->find_device) != B_OK) {
-		dprintf("%s: mandatory driver symbol(s) missing!\n", driver->name);
+		dprintf("devfs: \"%s\" mandatory driver symbol(s) missing!\n",
+			driver->name);
 		status = B_BAD_VALUE;
 		goto error1;
 	}
@@ -238,8 +254,8 @@ load_driver(driver_entry *driver)
 	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
 			(void **)&init_hardware) == B_OK
 		&& (status = init_hardware()) != B_OK) {
-		dprintf("%s: init_hardware() failed: %s\n", driver->name,
-			strerror(status));
+		TRACE(("%s: init_hardware() failed: %s\n", driver->name,
+			strerror(status)));
 		status = ENXIO;
 		goto error1;
 	}
@@ -247,8 +263,8 @@ load_driver(driver_entry *driver)
 	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
 			(void **)&init_driver) == B_OK
 		&& (status = init_driver()) != B_OK) {
-		dprintf("%s: init_driver() failed: %s\n", driver->name,
-			strerror(status));
+		TRACE(("%s: init_driver() failed: %s\n", driver->name,
+			strerror(status)));
 		status = ENXIO;
 		goto error2;
 	}
@@ -267,7 +283,7 @@ load_driver(driver_entry *driver)
 	// we keep the driver loaded if it exports at least a single interface
 	devicePaths = driver->publish_devices();
 	if (devicePaths == NULL) {
-		dprintf("%s: publish_devices() returned NULL.\n", driver->name);
+		TRACE(("%s: publish_devices() returned NULL.\n", driver->name));
 		status = ENXIO;
 		goto error3;
 	}
@@ -327,6 +343,133 @@ unload_driver(driver_entry *driver)
 }
 
 
+/*!	Collects all devices belonging to the \a driver and unpublishs them.
+*/
+static void
+unpublish_driver(driver_entry *driver)
+{
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	// Iterate through all nodes until all devices of this driver have
+	// been unpublished
+
+	while (driver->devices_published > 0) {
+		struct hash_iterator i;
+		hash_open(sDeviceFileSystem->vnode_hash, &i);
+
+		while (true) {
+			devfs_vnode *vnode = (devfs_vnode *)hash_next(
+				sDeviceFileSystem->vnode_hash, &i);
+			if (vnode == NULL)
+				break;
+
+			if (S_ISCHR(vnode->stream.type)
+				&& vnode->stream.u.dev.driver == driver)
+				unpublish_node(sDeviceFileSystem, vnode, S_IFCHR);
+		}
+
+		hash_close(sDeviceFileSystem->vnode_hash, &i, false);
+	}
+}
+
+
+/*!	Collects all published devices of a driver, compares them to what the
+	driver would publish now, and then publishes/unpublishes the devices
+	as needed.
+	If the driver does not publish any devices anymore, it is unloaded.
+*/
+static status_t
+republish_driver(driver_entry *driver)
+{
+	if (driver->image < 0) {
+		// The driver is not yet loaded - go through the normal load procedure
+		return load_driver(driver);
+	}
+
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	// build the list of currently present devices of this driver
+	// by iterating through all present nodes
+	struct hash_iterator i;
+	hash_open(sDeviceFileSystem->vnode_hash, &i);
+
+	DoublyLinkedList<node_path_entry> currentNodes;
+	while (true) {
+		devfs_vnode *vnode = (devfs_vnode *)hash_next(
+			sDeviceFileSystem->vnode_hash, &i);
+		if (vnode == NULL)
+			break;
+
+		if (S_ISCHR(vnode->stream.type)
+			&& vnode->stream.u.dev.driver == driver) {
+			node_path_entry *path = new(std::nothrow) node_path_entry;
+			if (!path) {
+				while ((path = currentNodes.RemoveHead()))
+					delete path;
+				hash_close(sDeviceFileSystem->vnode_hash, &i, false);
+				return B_NO_MEMORY;
+			}
+
+			get_device_name(vnode, path->path, sizeof(path->path));
+			currentNodes.Add(path);
+		}
+	}
+	hash_close(sDeviceFileSystem->vnode_hash, &i, false);
+
+	// now ask the driver for it's currently published devices
+	const char **devicePaths = driver->publish_devices();
+
+	int32 exported = 0;
+	for (; devicePaths != NULL && devicePaths[0]; devicePaths++) {
+		bool present = false;
+		node_path_entry *entry = currentNodes.Head();
+		while (entry) {
+			if (strncmp(entry->path, devicePaths[0], B_PATH_NAME_LENGTH) == 0) {
+				// this device was present before and still is -> no republish
+				currentNodes.Remove(entry);
+				delete entry;
+				exported++;
+				present = true;
+				break;
+			}
+
+			entry = currentNodes.GetNext(entry);
+		}
+
+		if (present)
+			continue;
+
+		// the device was not present before -> publish it now
+		device_hooks *hooks = driver->find_device(devicePaths[0]);
+		if (hooks == NULL)
+			continue;
+
+		TRACE(("devfs: publishing new device \"%s\"\n", devicePaths[0]));
+		if (publish_device(sDeviceFileSystem, devicePaths[0], NULL, NULL,
+			driver, hooks, *driver->api_version) == B_OK)
+			exported++;
+	}
+
+	// what's left in currentNodes was present but is not anymore -> unpublish
+	node_path_entry *entry = currentNodes.Head();
+	while (entry) {
+		TRACE(("devfs: unpublishing no more present \"%s\"\n", entry->path));
+		devfs_unpublish_device(entry->path, true);
+		node_path_entry *next = currentNodes.GetNext(entry);
+		currentNodes.Remove(entry);
+		delete entry;
+		entry = next;
+	}
+
+	if (exported == 0) {
+		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is unloaded\n", driver->path));
+		unload_driver(driver);
+	}
+
+	return B_OK;
+}
+
+
 static const char *
 get_leaf(const char *path)
 {
@@ -335,6 +478,25 @@ get_leaf(const char *path)
 		return path;
 
 	return name + 1;
+}
+
+
+static driver_entry *
+find_driver(dev_t device, ino_t node)
+{
+	hash_iterator iterator;
+	hash_open(sDeviceFileSystem->driver_hash, &iterator);
+	driver_entry *driver;
+	while (true) {
+		driver = (driver_entry *)hash_next(sDeviceFileSystem->driver_hash,
+			&iterator);
+		if (driver == NULL
+			|| driver->device == device && driver->node == node)
+			break;
+	}
+
+	hash_close(sDeviceFileSystem->driver_hash, &iterator, false);
+	return driver;
 }
 
 
@@ -361,6 +523,8 @@ add_driver(const char *path, image_id image)
 		sDeviceFileSystem->driver_hash, get_leaf(path));
 	if (driver != NULL) {
 		// we know this driver
+		// TODO: check if this driver is a different one and has precendence
+		// (ie. common supersedes system).
 		// TODO: test for changes here and/or via node monitoring and reload
 		//	the driver if necessary
 		if (driver->image < B_OK)
@@ -386,6 +550,9 @@ add_driver(const char *path, image_id image)
 	driver->node = stat.st_ino;
 	driver->image = image;
 	driver->last_modified = stat.st_mtime;
+	driver->devices_published = 0;
+	driver->devices_used = 0;
+	driver->binary_updated = false;
 
 	driver->api_version = NULL;
 	driver->find_device = NULL;
@@ -394,6 +561,8 @@ add_driver(const char *path, image_id image)
 	driver->uninit_hardware = NULL;
 
 	hash_insert(sDeviceFileSystem->driver_hash, driver);
+	if (stat.st_dev > 0)
+		add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_STAT, sDriverWatcher);
 
 	// Even if loading the driver fails - its entry will stay with us
 	// so that we don't have to go through it again
@@ -443,6 +612,51 @@ scan_for_drivers(devfs_vnode *dir)
 
 	dir->stream.u.dir.scanned = scan_mode();
 	return B_OK;
+}
+
+
+//	#pragma mark - DriverWatcher
+
+
+DriverWatcher::DriverWatcher()
+{
+}
+
+
+DriverWatcher::~DriverWatcher()
+{
+}
+
+
+void
+DriverWatcher::EventOccured(NotificationService& service,
+	const KMessage* event)
+{
+	if (event->GetInt32("opcode", -1) != B_STAT_CHANGED
+		|| (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
+		return;
+
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	driver_entry *driver = find_driver(event->GetInt32("device", -1),
+		event->GetInt64("node", 0));
+	if (driver == NULL)
+		return;
+
+	if (driver->devices_used == 0) {
+		// reload driver
+		dprintf("devfs: reload driver \"%s\"\n", driver->name);
+		//unpublish_driver(driver);
+			// TODO: even though we would need to unpublish the driver, this
+			// doesn't work right now from here (dead lock in the node monitor
+			// notifications)
+		unload_driver(driver);
+		load_driver(driver);
+	} else {
+		// driver is in use right now, only mark it to be updated when possible
+		dprintf("devfs: changed driver \"%s\" is still in use\n", driver->name);
+		driver->binary_updated = true;
+	}
 }
 
 
@@ -1028,105 +1242,6 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 }
 
 
-/*!	Collects all published devices of a driver, compares them to what the
-	driver would publish now, and then publishes/unpublishes the devices
-	as needed.
-	If the driver does not publish any devices anymore, it is unloaded.
-*/
-static status_t
-republish_driver(driver_entry *driver)
-{
-	if (driver->image < 0) {
-		// The driver is not yet loaded - go through the normal load procedure
-		return load_driver(driver);
-	}
-
-	RecursiveLocker locker(&sDeviceFileSystem->lock);
-
-	// build the list of currently present devices of this driver
-	// by iterating through all present nodes
-	struct hash_iterator i;
-	hash_open(sDeviceFileSystem->vnode_hash, &i);
-
-	DoublyLinkedList<node_path_entry> currentNodes;
-	while (true) {
-		devfs_vnode *vnode = (devfs_vnode *)hash_next(
-			sDeviceFileSystem->vnode_hash, &i);
-		if (vnode == NULL)
-			break;
-
-		if (S_ISCHR(vnode->stream.type)
-			&& vnode->stream.u.dev.driver == driver) {
-			node_path_entry *path = new(std::nothrow) node_path_entry;
-			if (!path) {
-				while ((path = currentNodes.RemoveHead()))
-					delete path;
-				hash_close(sDeviceFileSystem->vnode_hash, &i, false);
-				return B_NO_MEMORY;
-			}
-
-			get_device_name(vnode, path->path, sizeof(path->path));
-			currentNodes.Add(path);
-		}
-
-		vnode = (devfs_vnode *)hash_next(sDeviceFileSystem->vnode_hash, &i);
-	}
-	hash_close(sDeviceFileSystem->vnode_hash, &i, false);
-
-	// now ask the driver for it's currently published devices
-	const char **devicePaths = driver->publish_devices();
-
-	int32 exported = 0;
-	for (; devicePaths != NULL && devicePaths[0]; devicePaths++) {
-		bool present = false;
-		node_path_entry *entry = currentNodes.Head();
-		while (entry) {
-			if (strncmp(entry->path, devicePaths[0], B_PATH_NAME_LENGTH) == 0) {
-				// this device was present before and still is -> no republish
-				currentNodes.Remove(entry);
-				delete entry;
-				exported++;
-				present = true;
-				break;
-			}
-
-			entry = currentNodes.GetNext(entry);
-		}
-
-		if (present)
-			continue;
-
-		// the device was not present before -> publish it now
-		device_hooks *hooks = driver->find_device(devicePaths[0]);
-		if (hooks == NULL)
-			continue;
-
-		TRACE(("devfs: publishing new device \"%s\"\n", devicePaths[0]));
-		if (publish_device(sDeviceFileSystem, devicePaths[0], NULL, NULL,
-			driver, hooks, *driver->api_version) == B_OK)
-			exported++;
-	}
-
-	// what's left in currentNodes was present but is not anymore -> unpublish
-	node_path_entry *entry = currentNodes.Head();
-	while (entry) {
-		TRACE(("devfs: unpublishing no more present \"%s\"\n", entry->path));
-		devfs_unpublish_device(entry->path, true);
-		node_path_entry *next = currentNodes.GetNext(entry);
-		currentNodes.Remove(entry);
-		delete entry;
-		entry = next;
-	}
-
-	if (exported == 0) {
-		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is unloaded\n", driver->path));
-		unload_driver(driver);
-	}
-
-	return B_OK;
-}
-
-
 /** Construct complete device name (as used for device_open()).
  *	This is safe to use only when the device is in use (and therefore
  *	cannot be unpublished during the iteration).
@@ -1200,7 +1315,7 @@ devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
 	TRACE(("devfs_mount: entry\n"));
 
 	if (sDeviceFileSystem) {
-		dprintf("double mount of devfs attempted\n");
+		TRACE(("double mount of devfs attempted\n"));
 		err = B_ERROR;
 		goto err;
 	}
@@ -1232,6 +1347,8 @@ devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
 		err = B_NO_MEMORY;
 		goto err3;
 	}
+
+	new(&sDriverWatcher) DriverWatcher;
 
 	// create a vnode
 	vnode = devfs_create_vnode(fs, NULL, "");
@@ -1384,22 +1501,19 @@ static status_t
 devfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
 {
 	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *vnode;
 
 	TRACE(("devfs_get_vnode: asking for vnode id = %Ld, vnode = %p, r %d\n", id, _vnode, reenter));
 
-	if (!reenter)
-		recursive_lock_lock(&fs->lock);
+	RecursiveLocker _(fs->lock);
 
-	vnode = (devfs_vnode *)hash_lookup(fs->vnode_hash, &id);
-
-	if (!reenter)
-		recursive_lock_unlock(&fs->lock);
-
-	TRACE(("devfs_get_vnode: looked it up at %p\n", *_vnode));
-
+	struct devfs_vnode *vnode = (devfs_vnode *)hash_lookup(fs->vnode_hash, &id);
 	if (vnode == NULL)
 		return B_ENTRY_NOT_FOUND;
+
+	if (S_ISCHR(vnode->stream.type) && vnode->stream.u.dev.driver != NULL)
+		vnode->stream.u.dev.driver->devices_used++;
+
+	TRACE(("devfs_get_vnode: looked it up at %p\n", *_vnode));
 
 	*_vnode = vnode;
 	return B_OK;
@@ -1409,11 +1523,15 @@ devfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
 static status_t
 devfs_put_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 {
-#ifdef TRACE_DEVFS
+	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_v;
 
 	TRACE(("devfs_put_vnode: entry on vnode %p, id = %Ld, reenter %d\n", vnode, vnode->id, reenter));
-#endif
+
+	RecursiveLocker _(fs->lock);
+
+	if (S_ISCHR(vnode->stream.type) && vnode->stream.u.dev.driver != NULL)
+		vnode->stream.u.dev.driver->devices_used++;
 
 	return B_OK;
 }

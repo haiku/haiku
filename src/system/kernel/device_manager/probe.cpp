@@ -1,14 +1,12 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002-2004, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Device Manager
 	Probing for consumers.
-
 	Here is all the core logic how consumers are found for one node.
 */
 
@@ -17,14 +15,17 @@
 
 #include <boot_device.h>
 #include <elf.h>
-#include <kmodule.h>
-#include <fs/KPath.h>
 #include <fs/devfs.h>
+#include <fs/KPath.h>
+#include <fs/node_monitor.h>
+#include <kmodule.h>
+#include <Notifications.h>
 #include <util/Stack.h>
 #include <util/kernel_cpp.h>
 
 #include <image.h>
 #include <KernelExport.h>
+#include <NodeMonitor.h>
 
 #include <stdlib.h>
 #include <dirent.h>
@@ -68,19 +69,22 @@ const char *pnp_registration_dirs[2] = {
 static const char *kModulePaths[] = {
 	COMMON_MODULES_DIR,
 	"/boot/beos/system/add-ons/kernel",//SYSTEM_MODULES_DIR,
-	"/boot",	// ToDo: this is for the bootfs boot - to be removed
 	NULL
 };
 
 
 class DirectoryIterator {
 	public:
-		DirectoryIterator(const char *path, const char *subPath = NULL, bool recursive = false);
-		DirectoryIterator(const char **paths, const char *subPath = NULL, bool recursive = false);
+		DirectoryIterator(const char *path, const char *subPath = NULL,
+			bool recursive = false);
+		DirectoryIterator(const char **paths, const char *subPath = NULL,
+			bool recursive = false);
 		~DirectoryIterator();
 
-		void SetTo(const char *path, const char *subPath = NULL, bool recursive = false);
-		void SetTo(const char **paths, const char *subPath = NULL, bool recursive = false);
+		void SetTo(const char *path, const char *subPath = NULL,
+			bool recursive = false);
+		void SetTo(const char **paths, const char *subPath = NULL,
+			bool recursive = false);
 
 		status_t GetNext(KPath &path, struct stat &stat);
 		const char *CurrentName() const { return fCurrentName; }
@@ -97,7 +101,22 @@ class DirectoryIterator {
 };
 
 
-DirectoryIterator::DirectoryIterator(const char *path, const char *subPath, bool recursive)
+class DirectoryWatcher : public NotificationListener {
+	public:
+		DirectoryWatcher();
+		virtual ~DirectoryWatcher();
+
+		virtual void EventOccured(NotificationService& service,
+			const KMessage* event);
+};
+
+
+static DirectoryWatcher sDirectoryWatcher;
+static bool sWatching;
+
+
+DirectoryIterator::DirectoryIterator(const char *path, const char *subPath,
+		bool recursive)
 	:
 	fDirectory(NULL),
 	fBasePath(NULL),
@@ -107,7 +126,8 @@ DirectoryIterator::DirectoryIterator(const char *path, const char *subPath, bool
 }
 
 
-DirectoryIterator::DirectoryIterator(const char **paths, const char *subPath, bool recursive)
+DirectoryIterator::DirectoryIterator(const char **paths, const char *subPath,
+		bool recursive)
 	:
 	fDirectory(NULL),
 	fBasePath(NULL)
@@ -226,7 +246,52 @@ DirectoryIterator::AddPath(const char *basePath, const char *subPath)
 //	#pragma mark -
 
 
-struct path_entry *
+DirectoryWatcher::DirectoryWatcher()
+{
+}
+
+
+DirectoryWatcher::~DirectoryWatcher()
+{
+}
+
+
+void
+DirectoryWatcher::EventOccured(NotificationService& service,
+	const KMessage* event)
+{
+	int32 opcode = event->GetInt32("opcode", -1);
+/*
+	if (opcode == B_ENTRY_CREATED)
+		devfs_publish_directory();
+*/
+	dprintf("DRIVER DIRECTORY EVENT: %ld\n", opcode);
+	dprintf("  device %ld\n", event->GetInt32("device", -1));
+	dprintf("  node %Ld\n", event->GetInt64("node", -1));
+	dprintf("  name %s\n", event->GetString("name", "<none>"));
+}
+
+
+//	#pragma mark -
+
+
+static void
+start_watching(const char *base, const char *sub)
+{
+	KPath path(base);
+	path.Append(sub);
+
+	// TODO: create missing directories?
+	struct stat stat;
+	if (::stat(path.Path(), &stat) != 0)
+		return;
+
+	add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
+		sDirectoryWatcher);
+}
+
+
+static struct path_entry *
 new_path_entry(const char *path, dev_t device, ino_t node)
 {
 	path_entry *entry = (path_entry *)malloc(sizeof(path_entry));
@@ -246,7 +311,7 @@ new_path_entry(const char *path, dev_t device, ino_t node)
 }
 
 
-struct path_entry *
+static struct path_entry *
 copy_path_entry(path_entry *entry)
 {
 	path_entry *newEntry = (path_entry *)malloc(sizeof(struct path_entry));
@@ -264,7 +329,7 @@ copy_path_entry(path_entry *entry)
 }
 
 
-void
+static void
 free_module_entry(module_entry *entry)
 {
 	if (entry->name != NULL && entry->driver != NULL)
@@ -275,7 +340,7 @@ free_module_entry(module_entry *entry)
 }
 
 
-struct module_entry *
+static struct module_entry *
 new_module_entry(const char *name, driver_module_info *driver)
 {
 	module_entry *entry = (module_entry *)malloc(sizeof(module_entry));
@@ -331,7 +396,8 @@ add_device_node(struct list *list, device_node_info *node)
 
 
 static status_t
-get_next_device_node(struct list *list, uint32 *_cookie, device_node_info **_node)
+get_next_device_node(struct list *list, uint32 *_cookie,
+	device_node_info **_node)
 {
 	node_entry *entry = (node_entry *)list_get_next_item(list, (void *)*_cookie);
 	if (entry == NULL)
@@ -355,11 +421,10 @@ remove_device_nodes(struct list *list)
 }
 
 
-/** notify a consumer that a device he might handle is added
- *	fileName - file name of consumer
- *	(moved to end of file to avoid inlining)
- */
-
+/*!	Notify a consumer that a device he might handle is added
+	fileName - file name of consumer
+	(moved to end of file to avoid inlining)
+*/
 static status_t
 notify_probe_by_file(device_node_info *node, const char *fileName)
 {
@@ -387,7 +452,9 @@ notify_probe_by_file(device_node_info *node, const char *fileName)
 		TRACE(("notify_probe_by_file trying %s %s %s\n", module_name, bus, module_name + (strlen(module_name) - suffix_length + 1)));
 		if (strlen(module_name) > suffix_length
 			&& !strncmp(module_name + (strlen(module_name) - suffix_length + 1), bus, strlen(bus))
-			&& !strncmp(module_name + (strlen(module_name) - sizeof(device_suffix) + 1), device_suffix, sizeof(device_suffix))) {
+			&& !strncmp(module_name + (strlen(module_name)
+					- sizeof(device_suffix) + 1), device_suffix,
+				sizeof(device_suffix))) {
 			// found the module
 			res = dm_register_child_device(node, module_name, true);
 			break;
@@ -401,15 +468,14 @@ err:
 }
 
 
-/**	compose all possible names of Specific drivers; as there are
- *	multiple names which only differ in length, the most specific
- *	driver name gets stored in <path>, whereas <term_array> is a
- *	list of lengths of individual driver names with index 0
- *	containing the length of the shortest and num_parts-1 the
- *	length of the longest name; <buffer> is a supplied buffer of
- *	MAX_PATH+1 size
- */
-
+/*!	Compose all possible names of Specific drivers; as there are
+	multiple names which only differ in length, the most specific
+	driver name gets stored in <path>, whereas <term_array> is a
+	list of lengths of individual driver names with index 0
+	containing the length of the shortest and num_parts-1 the
+	length of the longest name; <buffer> is a supplied buffer of
+	MAX_PATH+1 size
+*/
 static status_t
 compose_driver_names(device_node_info *node, const char *dir,
 	const char *filename_pattern, int num_parts, 
@@ -454,12 +520,11 @@ err:
 }
 
 
-/**	notify all drivers under <directory>. If <tell_all> is true, notify all,
- *	if false, stop once a drivers notification function returned B_OK 
- *	buffer - scratch buffer of size B_PATH_NAME_LENGTH + 1 ; destroyed on exit
- *	return: B_NAME_NOT_FOUND, if tell_all is false and no driver returned B_OK
- */
-
+/*!	Notify all drivers under <directory>. If <tell_all> is true, notify all,
+	if false, stop once a drivers notification function returned B_OK 
+	buffer - scratch buffer of size B_PATH_NAME_LENGTH + 1 ; destroyed on exit
+	return: B_NAME_NOT_FOUND, if tell_all is false and no driver returned B_OK
+*/
 static status_t
 try_drivers(device_node_info *node, char *directory, 
 	bool tell_all, char *buffer)
@@ -511,12 +576,11 @@ try_drivers(device_node_info *node, char *directory,
 }
 
 
-/**	find normal child of node that are stored under <dir>; first, we
- *	look for a specific driver; if none could be found, find a generic
- *	one path, buffer - used as scratch buffer (all of size B_PATH_NAME_LENGTH + 1)
- *	return: B_NAME_NOT_FOUND if no consumer could be found
- */
-
+/*!	Find normal child of node that are stored under <dir>; first, we
+	look for a specific driver; if none could be found, find a generic
+	one path, buffer - used as scratch buffer (all of size B_PATH_NAME_LENGTH + 1)
+	return: B_NAME_NOT_FOUND if no consumer could be found
+*/
 static status_t
 find_normal_child(device_node_info *node, const char *dir,
 	const char *filename_pattern, int num_parts,
@@ -584,16 +648,15 @@ find_normal_child(device_node_info *node, const char *dir,
 }
 
 
-/**	pre-process dynamic child name pattern.
- *	split into directory and pattern and count split positions;
- *	further, remove quotes from directory
- *	pattern		- pattern of consumer name
- *	buffer		- buffer to store results in 
- *				  (returned strings all point to <buffer>!)
- *	filename_pattern - pattern of file name
- *	*num_parts	- number of split positions
- */
-
+/*!	Pre-process dynamic child name pattern.
+	split into directory and pattern and count split positions;
+	further, remove quotes from directory
+	pattern		- pattern of consumer name
+	buffer		- buffer to store results in 
+				  (returned strings all point to <buffer>!)
+	filename_pattern - pattern of file name
+	*num_parts	- number of split positions
+*/
 static status_t
 preprocess_child_names(const char *pattern, char *buffer,
 	char **filename_pattern, int *const num_parts)
@@ -660,11 +723,10 @@ preprocess_child_names(const char *pattern, char *buffer,
 }
 
 
-/**	find consumers for one given pattern
- *	has_normal_drivers - in: true - don't search for specific driver
- *		out: true - specific driver was found
- */
-
+/*!	Find consumers for one given pattern
+	has_normal_drivers - in: true - don't search for specific driver
+		out: true - specific driver was found
+*/
 static status_t
 register_dynamic_child_device(device_node_info *node, const char *bus,
 	const char *pattern, bool *has_normal_driver)
@@ -738,14 +800,13 @@ find_node_ref_in_list(struct list *list, dev_t device, ino_t node)
 }
 
 
-/**	Iterates over the given list and tries to load all drivers and modules
- *	in that list.
- *	The list is emptied and freed during the traversal.
- *
- *	ToDo: Old style drivers will be initialized as well, new style driver
- *	handling is not yet done.
- */
+/*!	Iterates over the given list and tries to load all drivers and modules
+	in that list.
+	The list is emptied and freed during the traversal.
 
+	ToDo: Old style drivers will be initialized as well, new style driver
+	handling is not yet done.
+*/
 static status_t
 try_drivers(struct list &list, bool tryBusDrivers)
 {
@@ -960,7 +1021,8 @@ get_loaded_modules(struct list *modules, const char *bus, const char *device)
 
 
 static status_t
-get_nodes_for_device_type(device_node_info *node, struct list *list, const char *type)
+get_nodes_for_device_type(device_node_info *node, struct list *list,
+	const char *type)
 {
 	bool matches = false;
 
@@ -977,8 +1039,9 @@ get_nodes_for_device_type(device_node_info *node, struct list *list, const char 
 	if (!matches) {
 		// we also accept any dump busses
 		uint8 onDemand = false;
-		pnp_get_attr_uint8(node, B_DRIVER_FIND_DEVICES_ON_DEMAND, &onDemand, false);
-		
+		pnp_get_attr_uint8(node, B_DRIVER_FIND_DEVICES_ON_DEMAND, &onDemand,
+			false);
+
 		if (onDemand)
 			matches = true;
 	}
@@ -1009,12 +1072,12 @@ get_nodes_for_device_type(device_node_info *node, struct list *list, const char 
 //	device manager private API
 
 
-/** Register the device of a child for the \a node that might accept it.
- *	childName - module name of child/consumer
- */
-
+/*!	Register the device of a child for the \a node that might accept it.
+	childName - module name of child/consumer
+*/
 status_t
-dm_register_child_device(device_node_info *node, const char *childName, bool checkSupport)
+dm_register_child_device(device_node_info *node, const char *childName,
+	bool checkSupport)
 {
 	driver_module_info *child;
 	status_t status;
@@ -1057,11 +1120,10 @@ err:
 }
 
 
-/** find and notify dynamic consumers that device was added
- *	errors returned by consumers aren't reported, only problems
- *	like malformed consumer patterns
- */
-
+/*!	Find and notify dynamic consumers that device was added
+	errors returned by consumers aren't reported, only problems
+	like malformed consumer patterns
+*/
 status_t
 dm_register_dynamic_child_devices(device_node_info *node)
 {
@@ -1143,11 +1205,10 @@ err:
 }
 
 
-/**	Register all fixed child devices of of the given \a node; in contrast
- *	to dynamic child devices, errors reported by fixed child devices are
- *	not ignored but returned, and regarded critical.
- */
-
+/*!	Register all fixed child devices of of the given \a node; in contrast
+	to dynamic child devices, errors reported by fixed child devices are
+	not ignored but returned, and regarded critical.
+*/
 status_t
 dm_register_fixed_child_devices(device_node_info *node)
 {
@@ -1236,9 +1297,13 @@ probe_for_driver_modules(const char *type)
 
 	while (iterator.GetNext(path, stat) == B_OK) {
 		if (S_ISDIR(stat.st_mode)) {
+			add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
+				sDirectoryWatcher);
+
 			// We need to make sure that drivers in ie. "audio/raw/" can
 			// be found as well - therefore, we must make sure that "audio"
 			// exists on /dev.
+
 			size_t length = strlen("drivers/dev");
 			if (strncmp(type, "drivers/dev", length))
 				continue;
@@ -1274,7 +1339,8 @@ probe_for_driver_modules(const char *type)
 		dprintf("bus: %s\n", path.Leaf());
 
 		while (busIterator.GetNext(path, stat) == B_OK) {
-			path_entry *entry = find_node_ref_in_list(&drivers, stat.st_dev, stat.st_ino);
+			path_entry *entry = find_node_ref_in_list(&drivers, stat.st_dev,
+				stat.st_ino);
 			if (entry == NULL)
 				continue;
 
@@ -1310,7 +1376,20 @@ probe_for_device_type(const char *type)
 	TRACE(("probe_for_device_type(type = %s)\n", type));
 
 	char deviceType[64];
-	snprintf(deviceType, sizeof(deviceType), "drivers/dev%s%s", type[0] ? "/" : "", type);
+	snprintf(deviceType, sizeof(deviceType), "drivers/dev%s%s",
+		type[0] ? "/" : "", type);
+
+	if (!sWatching && gBootDevice > 0) {
+		// We're probing the actual boot volume for the first time,
+		// let's watch its driver directories for changes
+
+		new(&sDirectoryWatcher) DirectoryWatcher;
+		for (uint32 i = 0; kModulePaths[i] != NULL; i++) {
+			start_watching(kModulePaths[i], "drivers/dev");
+			start_watching(kModulePaths[i], "drivers/bin");
+		}
+		sWatching = true;
+	}
 
 	return probe_for_driver_modules(deviceType);
 }
