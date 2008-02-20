@@ -633,6 +633,17 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 		}
 
+		// ToDo: Remove this again. It is a message sent by the
+		// invalidate_on_exit kernel debugger add-on to trigger a redraw
+		// after exiting a kernel debugger session.
+		case 'KDLE':
+		{
+			BRegion dirty;
+			dirty.Include(fVirtualScreen.Frame());
+			MarkDirty(dirty);
+			break;
+		}
+
 		default:
 			printf("Desktop %d:%s received unexpected code %ld\n", 0, "baron", code);
 
