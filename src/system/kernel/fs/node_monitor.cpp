@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -109,6 +109,8 @@ class NodeMonitorService : public NotificationService {
 		status_t RemoveListener(const KMessage *eventSpecifier,
 			NotificationListener &listener);
 
+		status_t AddListener(io_context *context, dev_t device, ino_t node,
+			uint32 flags, NotificationListener &notificationListener);
 		status_t RemoveListener(io_context *context, dev_t device, ino_t node,
 			NotificationListener &notificationListener);
 
@@ -130,8 +132,6 @@ class NodeMonitorService : public NotificationService {
 		status_t _AddMonitorListener(io_context *context,
 			node_monitor* monitor, uint32 flags,
 			NotificationListener& notificationListener);
-		status_t _AddListener(io_context *context, dev_t device, ino_t node,
-			uint32 flags, NotificationListener &notificationListener);
 		status_t _UpdateListener(io_context *context, dev_t device, ino_t node,
 			uint32 flags, bool addFlags,
 			NotificationListener &notificationListener);
@@ -376,7 +376,7 @@ NodeMonitorService::_AddMonitorListener(io_context *context,
 
 
 status_t
-NodeMonitorService::_AddListener(io_context *context, dev_t device, ino_t node,
+NodeMonitorService::AddListener(io_context *context, dev_t device, ino_t node,
 	uint32 flags, NotificationListener& notificationListener)
 {
 	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
@@ -775,7 +775,7 @@ NodeMonitorService::AddListener(const KMessage* eventSpecifier,
 	ino_t node = eventSpecifier->GetInt64("node", -1);
 	uint32 flags = eventSpecifier->GetInt32("flags", 0);
 
-	return _AddListener(context, device, node, flags, listener);
+	return AddListener(context, device, node, flags, listener);
 }
 
 
@@ -941,6 +941,23 @@ notify_mount(dev_t device, dev_t parentDevice, ino_t parentDirectory)
 {
 	return sNodeMonitorService.NotifyMount(device, parentDevice,
 		parentDirectory);
+}
+
+
+status_t
+remove_node_listener(dev_t device, dev_t node, NotificationListener& listener)
+{
+	return sNodeMonitorService.RemoveListener(get_current_io_context(true),
+		device, node, listener);
+}
+
+
+status_t
+add_node_listener(dev_t device, dev_t node, uint32 flags,
+	NotificationListener& listener)
+{
+	return sNodeMonitorService.AddListener(get_current_io_context(true),
+		device, node, flags, listener);
 }
 
 

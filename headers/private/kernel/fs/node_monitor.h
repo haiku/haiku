@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_NODE_MONITOR_H
@@ -12,6 +12,16 @@
 struct io_context;
 
 #ifdef __cplusplus
+
+// C++ only part
+
+class NotificationListener;
+
+extern status_t remove_node_listener(dev_t device, dev_t node,
+	NotificationListener& listener);
+extern status_t add_node_listener(dev_t device, dev_t node, uint32 flags,
+	NotificationListener& listener);
+
 extern "C" {
 #endif
 
