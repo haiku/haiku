@@ -146,6 +146,7 @@ MainWindow::MainWindow(BRect frame)
 	: BWindow(frame, "DriveSetup", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
 	, fCurrentDisk(NULL)
+	, fCurrentPartitionID(-1)
 	, fSpaceIDMap()
 {
 	BMenuBar* menuBar = new BMenuBar(Bounds(), "root menu");
@@ -179,7 +180,7 @@ fDeleteMI->SetEnabled(false);
 
 	// Parition menu
 	fPartitionMenu = new BMenu("Partition");
-		fCreateMenu = new BMenu("Create");
+		fCreateMenu = new BMenu("Create (not implemented)");
 		fPartitionMenu->AddItem(fCreateMenu);
 
 		fInitMenu = new BMenu("Initialize");
@@ -224,8 +225,6 @@ fDeleteMI->SetEnabled(false);
 
 	// visit all disks in the system and show their contents
 	_ScanDrives();
-
-	_EnabledDisableMenuItems(NULL, -1, -1);
 }
 
 
@@ -368,6 +367,17 @@ MainWindow::_ScanDrives()
 	ListPopulatorVisitor driveVisitor(fListView, diskCount, fSpaceIDMap);
 	fDDRoster.VisitEachPartition(&driveVisitor);
 	fDiskView->SetDiskCount(diskCount);
+
+	// restore selection
+	PartitionListRow* previousSelection
+		= fListView->FindRow(fCurrentPartitionID);
+	if (previousSelection) {
+		fListView->AddToSelection(previousSelection);
+		_EnabledDisableMenuItems(fCurrentDisk, fCurrentPartitionID,
+			previousSelection->ParentID());
+	} else {
+		_EnabledDisableMenuItems(NULL, -1, -1);
+	}
 }
 
 
@@ -483,6 +493,7 @@ fSurfaceTestMI->SetEnabled(false);
 			parentPartition = disk->FindDescendant(parentID);
 
 		if (parentPartition) {
+disk->PrepareModifications();
 			fCreateMenu->SetEnabled(true);
 			BString supportedChildType;
 			int32 cookie = 0;
@@ -500,6 +511,7 @@ fSurfaceTestMI->SetEnabled(false);
 			if (fCreateMenu->CountItems() == 0)
 				fprintf(stderr, "Failed to get supported child types: %s\n",
 					strerror(ret));
+disk->CancelModifications();
 		} else {
 			fCreateMenu->SetEnabled(false);
 		}
@@ -512,17 +524,18 @@ fSurfaceTestMI->SetEnabled(false);
 fDeleteMI->SetEnabled(false);
 			fMountMI->SetEnabled(!partition->IsMounted());
 
+			bool unMountable = false;
 			if (partition->IsMounted()) {
 				// see if this partition is the boot volume
 				BVolume volume; 
 				BVolume bootVolume; 
 				if (BVolumeRoster().GetBootVolume(&bootVolume) == B_OK
 					&& partition->GetVolume(&volume) == B_OK) { 
-					fUnmountMI->SetEnabled(volume != bootVolume);
-				} else {
-					fUnmountMI->SetEnabled(true);
-				}
+					unMountable = volume != bootVolume;
+				} else
+					unMountable = true;
 			}
+			fUnmountMI->SetEnabled(unMountable);
 		} else {
 			fInitMenu->SetEnabled(false);
 			fDeleteMI->SetEnabled(false);
