@@ -637,12 +637,7 @@ void
 BWindow::BeginViewTransaction()
 {
 	if (Lock()) {
-		if (fInTransaction) {
-			Unlock();
-			return;
-		}
 		fInTransaction = true;
-
 		Unlock();
 	}
 }
@@ -652,13 +647,9 @@ void
 BWindow::EndViewTransaction()
 {
 	if (Lock()) {
-		if (!fInTransaction) {
-			Unlock();
-			return;
-		}
-		fLink->Flush();
+		if (fInTransaction)
+			fLink->Flush();
 		fInTransaction = false;		
-
 		Unlock();
 	}
 }
