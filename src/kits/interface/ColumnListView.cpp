@@ -154,15 +154,7 @@ static const unsigned char kDownSortArrow8x8Invert[] = {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
-/*
-static const rgb_color kTitleColor = {215, 215, 215, 255};
-static const rgb_color kTitleTextColor = { 0, 0, 0, 255 };
-static const rgb_color kDefaultBackgroundColor = {236, 236, 236, 255};
-static const rgb_color kRowDividerColor = {148, 148, 148, 255};
-static const rgb_color kDefaultSelectionColor = {255, 255, 255, 255};
-static const rgb_color kDefaultEditColor = {180, 180, 180, 180};
-static const rgb_color kNonFocusSelectionColor = {220, 220, 220, 255};
-*/
+static const float kTintedLineTint = 0.7 * B_NO_TINT + 0.3 * B_DARKEN_1_TINT;
 
 static const float kTitleHeight = 17.0;
 static const float kLatchWidth = 15.0;
@@ -173,9 +165,9 @@ static const rgb_color kColor[B_COLOR_TOTAL] =
     {236, 236, 236, 255},           // B_COLOR_BACKGROUND
     {  0,   0,   0, 255},           // B_COLOR_TEXT
     {148, 148, 148, 255},           // B_COLOR_ROW_DIVIDER
-    {255, 255, 255, 255},           // B_COLOR_SELECTION
+    {190, 190, 190, 255},           // B_COLOR_SELECTION
     {  0,   0,   0, 255},           // B_COLOR_SELECTION_TEXT
-    {220, 220, 220, 255},           // B_COLOR_NON_FOCUS_SELECTION
+    {200, 200, 200, 255},           // B_COLOR_NON_FOCUS_SELECTION
     {180, 180, 180, 180},           // B_COLOR_EDIT_BACKGROUND
     {  0,   0,   0, 255},           // B_COLOR_EDIT_TEXT
     {215, 215, 215, 255},           // B_COLOR_HEADER_BACKGROUND
@@ -1573,8 +1565,7 @@ void BColumnListView::SetEditMode(bool state)
 
 void BColumnListView::Refresh()
 {
-	if(LockLooper())
-	{
+	if (LockLooper()) {
 		Invalidate();
 		fOutlineView->FixScrollBar (true);
 		fOutlineView->Invalidate();
@@ -1780,13 +1771,10 @@ void TitleView::MoveColumn(BColumn *column, int32 index)
 {
 	fColumns->RemoveItem((void*) column);
 	
-	if (-1 == index)
-	{
+	if (-1 == index) {
 		// Re-add the column at the end of the list.
 		fColumns->AddItem((void*) column);
-	}
-	else
-	{ 
+	} else { 
 		fColumns->AddItem((void*) column, index);
 	}
 }
@@ -2513,148 +2501,138 @@ void OutlineView::RecursiveDeleteRows(BRowContainer* List, bool IsOwner)
 
 void OutlineView::RedrawColumn(BColumn *column, float leftEdge, bool isFirstColumn)
 {
-	if (column) {
-		font_height fh;
-		GetFontHeight(&fh);
-		float line = 0.0;
-		for (RecursiveOutlineIterator iterator(&fRows); iterator.CurrentRow();
-			line += iterator.CurrentRow()->Height() + 1, iterator.GoToNext()) {
-			BRow *row = iterator.CurrentRow();
-			float rowHeight = row->Height();
-			if (line > fVisibleRect.bottom)
-				break;
-	
-			if (line + rowHeight >= fVisibleRect.top) {
-				BRect sourceRect(0, 0, column->Width(), rowHeight);
-				BRect destRect(leftEdge, line, leftEdge + column->Width(), line + rowHeight);
-	
-	#if DOUBLE_BUFFERED_COLUMN_RESIZE
-				fDrawBuffer->Lock();
-				if (row->fNextSelected != 0) {
-					if(fEditMode) {
-						fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_EDIT_BACKGROUND));
-						fDrawBufferView->SetLowColor(fMasterView->Color(B_COLOR_EDIT_BACKGROUND));
-					} else {
-						fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_SELECTION));
-						fDrawBufferView->SetLowColor(fMasterView->Color(B_COLOR_SELECTION));
-					}
+	// TODO: Remove code duplication (private function which takes a view
+	// pointer, pass "this" in non-double buffered mode)!
+	// Watch out for sourceRect versus destRect though!
+	if (!column)
+		return;
+
+	font_height fh;
+	GetFontHeight(&fh);
+	float line = 0.0;
+	bool tintedLine = true;
+	for (RecursiveOutlineIterator iterator(&fRows); iterator.CurrentRow();
+		line += iterator.CurrentRow()->Height() + 1, iterator.GoToNext()) {
+		BRow *row = iterator.CurrentRow();
+		float rowHeight = row->Height();
+		if (line > fVisibleRect.bottom)
+			break;
+		tintedLine = !tintedLine;
+
+		if (line + rowHeight >= fVisibleRect.top) {
+			BRect sourceRect(0, 0, column->Width(), rowHeight);
+			BRect destRect(leftEdge, line, leftEdge + column->Width(), line + rowHeight);
+
+			rgb_color highColor;
+			rgb_color lowColor;
+			if (row->fNextSelected != 0) {
+				if (fEditMode) {
+					highColor = fMasterView->Color(B_COLOR_EDIT_BACKGROUND);
+					lowColor = fMasterView->Color(B_COLOR_EDIT_BACKGROUND);
 				} else {
-					fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_BACKGROUND));
-					fDrawBufferView->SetLowColor(fMasterView->Color(B_COLOR_BACKGROUND));
+					highColor = fMasterView->Color(B_COLOR_SELECTION);
+					lowColor = fMasterView->Color(B_COLOR_SELECTION);
 				}
-				BFont	font;
-				GetFont(&font);
-				fDrawBufferView->SetFont(&font);
-				fDrawBufferView->FillRect(sourceRect);
-	
-				if (isFirstColumn) {
-					// If this is the first column, double buffer drawing the latch too.
-					destRect.left += iterator.CurrentLevel() * kOutlineLevelIndent
-						- fMasterView->LatchWidth();
-					sourceRect.left += iterator.CurrentLevel() * kOutlineLevelIndent
-						- fMasterView->LatchWidth();
-	
-					LatchType pos = B_NO_LATCH;
-					if (row->HasLatch())
-						pos = row->fIsExpanded ? B_OPEN_LATCH : B_CLOSED_LATCH;					
-	
-					BRect latchRect(sourceRect);
-					latchRect.right = latchRect.left + fMasterView->LatchWidth();
-					fMasterView->DrawLatch(fDrawBufferView, latchRect, pos, row);
-				}
-	
-				BField *field = row->GetField(column->fFieldID);
-				if (field) {
-					BRect fieldRect(sourceRect);
-					if (isFirstColumn)
-						fieldRect.left += fMasterView->LatchWidth();
-	
-		#if CONSTRAIN_CLIPPING_REGION
-					BRegion clipRegion;
-					clipRegion.Set(fieldRect);
-					fDrawBufferView->ConstrainClippingRegion(&clipRegion);
-					fDrawBufferView->PushState();
-		#endif
-					fDrawBufferView->SetHighColor(fMasterView->Color(row->fNextSelected ?  B_COLOR_SELECTION_TEXT : B_COLOR_TEXT));
-					float baseline = floor(fieldRect.top + fh.ascent
-											+ (fieldRect.Height()+1-(fh.ascent+fh.descent))/2);
-					fDrawBufferView->MovePenTo(fieldRect.left + 8, baseline);
-					column->DrawField(field, fieldRect, fDrawBufferView);
-		#if CONSTRAIN_CLIPPING_REGION
-					fDrawBufferView->PopState();
-					fDrawBufferView->ConstrainClippingRegion(NULL);
-		#endif
-				}
-	
-				if (fFocusRow == row) {
-					if(!fEditMode) {
-						fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_SELECTION_TEXT));
-						fDrawBufferView->StrokeRect(BRect(-1, sourceRect.top, 10000.0, sourceRect.bottom - 1));
-					}
-				}
-	
-				fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
-		//		StrokeLine(BPoint(0, line + rowHeight - 2), BPoint(Bounds().Width(), line + rowHeight - 2));
-		//		StrokeLine(BPoint(0, line + rowHeight - 1), BPoint(Bounds().Width(), line + rowHeight - 1));
-				fDrawBufferView->StrokeLine(BPoint(0, rowHeight), BPoint(Bounds().right, rowHeight));
-	
-				fDrawBufferView->Sync();
-				fDrawBuffer->Unlock();
-				SetDrawingMode(B_OP_OVER);
-				DrawBitmap(fDrawBuffer, sourceRect, destRect);
-	
-	#else
-	
-				if (row->fNextSelected != 0) {
-					if(fEditMode) {
-						SetHighColor(fMasterView->Color(B_COLOR_EDIT_BACKGROUND));
-						SetLowColor(fMasterView->Color(B_COLOR_EDIT_BACKGROUND));
-					}
-					else {
-						SetHighColor(fMasterView->Color(B_COLOR_SELECTION));
-						SetLowColor(fMasterView->Color(B_COLOR_SELECTION));
-					}
-				} else {
-					SetHighColor(fMasterView->Color(B_COLOR_BACKGROUND));
-					SetLowColor(fMasterView->Color(B_COLOR_BACKGROUND));
-				}
-	
-				FillRect(destRect);
-	
-				BField *field = row->GetField(column->fFieldID);
-				if (field) {
-		#if CONSTRAIN_CLIPPING_REGION
-					BRegion clipRegion;
-					clipRegion.Set(destRect);
-					ConstrainClippingRegion(&clipRegion);
-					PushState();
-		#endif
-					SetHighColor(fColorList[row->fNextSelected ?  B_COLOR_SELECTION_TEXT : B_COLOR_TEXT]);
-					float baseline = floor(destRect.top + fh.ascent
-											+ (destRect.Height()+1-(fh.ascent+fh.descent))/2);
-					MovePenTo(destRect.left + 8, baseline);
-					column->DrawField(field, destRect, this);
-		#if CONSTRAIN_CLIPPING_REGION
-					PopState();
-					ConstrainClippingRegion(NULL);
-		#endif
-				}
-	
-				if (fFocusRow == row) {
-					if(!fEditMode) {
-						SetHighColor(fColorList[B_COLOR_SELECTION_TEXT]);
-						StrokeRect(BRect(0, destRect.top, 10000.0, destRect.bottom - 1));
-					}
-				}
-	
-				rgb_color color = HighColor();
-				SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
-		//		StrokeLine(BPoint(0, line + rowHeight - 2), BPoint(Bounds().Width(), line + rowHeight - 2));
-		//		StrokeLine(BPoint(0, line + rowHeight - 1), BPoint(Bounds().Width(), line + rowHeight - 1));
-				StrokeLine(BPoint(0, line + rowHeight), BPoint(Bounds().right, line + rowHeight));
-				SetHighColor(color);
+			} else {
+				highColor = fMasterView->Color(B_COLOR_BACKGROUND);
+				lowColor = fMasterView->Color(B_COLOR_BACKGROUND);
+			}
+			if (tintedLine)
+				lowColor = tint_color(lowColor, kTintedLineTint);
+
+
+#if DOUBLE_BUFFERED_COLUMN_RESIZE
+			fDrawBuffer->Lock();
+
+			fDrawBufferView->SetHighColor(highColor);
+			fDrawBufferView->SetLowColor(lowColor);
+
+			BFont font;
+			GetFont(&font);
+			fDrawBufferView->SetFont(&font);
+			fDrawBufferView->FillRect(sourceRect, B_SOLID_LOW);
+
+			if (isFirstColumn) {
+				// If this is the first column, double buffer drawing the latch too.
+				destRect.left += iterator.CurrentLevel() * kOutlineLevelIndent
+					- fMasterView->LatchWidth();
+				sourceRect.left += iterator.CurrentLevel() * kOutlineLevelIndent
+					- fMasterView->LatchWidth();
+
+				LatchType pos = B_NO_LATCH;
+				if (row->HasLatch())
+					pos = row->fIsExpanded ? B_OPEN_LATCH : B_CLOSED_LATCH;					
+
+				BRect latchRect(sourceRect);
+				latchRect.right = latchRect.left + fMasterView->LatchWidth();
+				fMasterView->DrawLatch(fDrawBufferView, latchRect, pos, row);
+			}
+
+			BField *field = row->GetField(column->fFieldID);
+			if (field) {
+				BRect fieldRect(sourceRect);
+				if (isFirstColumn)
+					fieldRect.left += fMasterView->LatchWidth();
+
+	#if CONSTRAIN_CLIPPING_REGION
+				BRegion clipRegion;
+				clipRegion.Set(fieldRect);
+				fDrawBufferView->ConstrainClippingRegion(&clipRegion);
+				fDrawBufferView->PushState();
+	#endif
+				fDrawBufferView->SetHighColor(fMasterView->Color(row->fNextSelected ?  B_COLOR_SELECTION_TEXT : B_COLOR_TEXT));
+				float baseline = floor(fieldRect.top + fh.ascent
+										+ (fieldRect.Height()+1-(fh.ascent+fh.descent))/2);
+				fDrawBufferView->MovePenTo(fieldRect.left + 8, baseline);
+				column->DrawField(field, fieldRect, fDrawBufferView);
+	#if CONSTRAIN_CLIPPING_REGION
+				fDrawBufferView->PopState();
+				fDrawBufferView->ConstrainClippingRegion(NULL);
 	#endif
 			}
+
+			if (fFocusRow == row && !fEditMode && fMasterView->IsFocus()
+				&& Window()->IsActive()) {
+				fDrawBufferView->SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
+				fDrawBufferView->StrokeRect(BRect(-1, sourceRect.top, 10000.0, sourceRect.bottom));
+			}
+
+			fDrawBufferView->Sync();
+			fDrawBuffer->Unlock();
+			SetDrawingMode(B_OP_COPY);
+			DrawBitmap(fDrawBuffer, sourceRect, destRect);
+
+#else
+
+			SetHighColor(highColor);
+			SetLowColor(lowColor);
+			FillRect(destRect, B_SOLID_LOW);
+
+			BField *field = row->GetField(column->fFieldID);
+			if (field) {
+	#if CONSTRAIN_CLIPPING_REGION
+				BRegion clipRegion;
+				clipRegion.Set(destRect);
+				ConstrainClippingRegion(&clipRegion);
+				PushState();
+	#endif
+				SetHighColor(fColorList[row->fNextSelected ?  B_COLOR_SELECTION_TEXT : B_COLOR_TEXT]);
+				float baseline = floor(destRect.top + fh.ascent
+										+ (destRect.Height()+1-(fh.ascent+fh.descent))/2);
+				MovePenTo(destRect.left + 8, baseline);
+				column->DrawField(field, destRect, this);
+	#if CONSTRAIN_CLIPPING_REGION
+				PopState();
+				ConstrainClippingRegion(NULL);
+	#endif
+			}
+
+			if (fFocusRow == row && !fEditMode && fMasterView->IsFocus()
+				&& Window()->IsActive()) {
+				SetHighColor(fColorList[B_COLOR_ROW_DIVIDER]);
+				StrokeRect(BRect(0, destRect.top, 10000.0, destRect.bottom));
+			}
+#endif
 		}
 	}
 }
@@ -2670,18 +2648,37 @@ void OutlineView::Draw(BRect invalidBounds)
 	GetFontHeight(&fh);
 	
 	float line = 0.0;
+	bool tintedLine = true;
 	int32 numColumns = fColumns->CountItems();
 	for (RecursiveOutlineIterator iterator(&fRows); iterator.CurrentRow();
 		iterator.GoToNext()) {
 		BRow *row = iterator.CurrentRow();
 		if (line > invalidBounds.bottom)
 			break;
-		
+
+		tintedLine = !tintedLine;
 		float rowHeight = row->Height();
 		
 		if (line > invalidBounds.top - rowHeight) {
 			bool isFirstColumn = true;
 			float fieldLeftEdge = MAX(kLeftMargin, fMasterView->LatchWidth());
+
+			// setup background color
+			rgb_color lowColor;
+			if (row->fNextSelected != 0) {
+				if (Window()->IsActive()) {
+					if (fEditMode)
+						lowColor = fMasterView->Color(B_COLOR_EDIT_BACKGROUND);
+					else
+						lowColor = fMasterView->Color(B_COLOR_SELECTION);
+				}
+				else
+					lowColor = fMasterView->Color(B_COLOR_NON_FOCUS_SELECTION);
+			} else
+				lowColor = fMasterView->Color(B_COLOR_BACKGROUND);
+			if (tintedLine)
+				lowColor = tint_color(lowColor, kTintedLineTint);
+
 			for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
 				BColumn *column = (BColumn*) fColumns->ItemAt(columnIndex);
 				if (!column->IsVisible())
@@ -2698,17 +2695,7 @@ void OutlineView::Draw(BRect invalidBounds)
 						// This happens when a column is indented past the
 						// beginning of the next column.
 
-					if (row->fNextSelected != 0) {
-						if (Window()->IsActive()) {
-							if(fEditMode)
-								SetHighColor(fMasterView->Color(B_COLOR_EDIT_BACKGROUND));
-							else
-								SetHighColor(fMasterView->Color(B_COLOR_SELECTION));
-						}
-						else
-							SetHighColor(fMasterView->Color(B_COLOR_NON_FOCUS_SELECTION));
-					} else
-						SetHighColor(fMasterView->Color(B_COLOR_BACKGROUND));
+					SetHighColor(lowColor);
 
 					BRect destRect(fullRect);
 					if (isFirstColumn) {
@@ -2721,7 +2708,6 @@ void OutlineView::Draw(BRect invalidBounds)
 							clippedFirstColumn = true;
 						}
 
-			
 						FillRect(BRect(0, line, MAX(kLeftMargin, fMasterView->LatchWidth()), line + row->Height()));
 					}
 
@@ -2760,21 +2746,10 @@ void OutlineView::Draw(BRect invalidBounds)
 									row);
 							}
 						}
-	
-						if (row->fNextSelected != 0) {
-							if (Window()->IsActive()) {
-								if(fEditMode)  
-									SetLowColor(fMasterView->Color(B_COLOR_EDIT_BACKGROUND));
-								else
-									SetLowColor(fMasterView->Color(B_COLOR_SELECTION));
-							}
-							else
-								SetLowColor(fMasterView->Color(B_COLOR_NON_FOCUS_SELECTION));
-						} else
-							SetLowColor(fMasterView->Color(B_COLOR_BACKGROUND));
 
 						SetHighColor(fMasterView->HighColor());
 							// The master view just holds the high color for us.
+						SetLowColor(lowColor);
 
 						BField *field = row->GetField(column->fFieldID);
 						if (field) {
@@ -2802,39 +2777,23 @@ void OutlineView::Draw(BRect invalidBounds)
 			}
 	
 			if (fieldLeftEdge <= invalidBounds.right) {
-				if (row->fNextSelected != 0) {
-					if (Window()->IsActive()) {
-						if(fEditMode)
-							SetHighColor(fMasterView->Color(B_COLOR_EDIT_BACKGROUND));
-						else
-							SetHighColor(fMasterView->Color(B_COLOR_SELECTION));
-					}
-					else
-						SetHighColor(fMasterView->Color(B_COLOR_NON_FOCUS_SELECTION));
-				} else
-					SetHighColor(fMasterView->Color(B_COLOR_BACKGROUND));
-
+				SetHighColor(lowColor);
 				FillRect(BRect(fieldLeftEdge, line, invalidBounds.right,
 					line + rowHeight));
 			}
 		}
-	
-		if (fFocusRow == row && fMasterView->IsFocus() && Window()->IsActive()) {
-			if(!fEditMode) {
-				SetHighColor(fMasterView->Color(B_COLOR_SELECTION_TEXT));
-				StrokeRect(BRect(0, line, 10000.0, line + rowHeight - 1));
-			}
+
+		// indicate the keyboard focus row
+		if (fFocusRow == row && !fEditMode && fMasterView->IsFocus() && Window()->IsActive()) {
+			SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
+			StrokeRect(BRect(0, line, 10000.0, line + rowHeight));
 		}
-		rgb_color color = HighColor();
-		SetHighColor(fMasterView->Color(B_COLOR_ROW_DIVIDER));
-//		StrokeLine(BPoint(0, line + rowHeight - 2), BPoint(Bounds().Width(), line + rowHeight - 2));
-//		StrokeLine(BPoint(0, line + rowHeight - 1), BPoint(Bounds().Width(), line + rowHeight - 1));
-		StrokeLine(BPoint(invalidBounds.left, line + rowHeight), BPoint(invalidBounds.right, line + rowHeight));
-		SetHighColor(color);
+
 		line += rowHeight + 1;
 	}
 
 	if (line <= invalidBounds.bottom) {
+		// fill background below last item
 		SetHighColor(fMasterView->Color(B_COLOR_BACKGROUND));
 		FillRect(BRect(invalidBounds.left, line, invalidBounds.right, invalidBounds.bottom));
 	}
@@ -3036,24 +2995,24 @@ void OutlineView::MouseDown(BPoint position)
 
 void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage */*message*/)
 {
-	if(!fMouseDown) {
+	if (!fMouseDown) {
 		// Update fCurrentField
 		bool handle_field = false;
 		BField *new_field = 0;
 		BRow *new_row = 0;
 		BColumn *new_column = 0;
 		BRect new_rect(0,0,0,0);
-		if(position.y >=0 ) {
+		if (position.y >=0 ) {
 			float top;
 			int32 indent;
 			BRow *row = FindRow(position.y, &indent, &top);
-			if(row && position.x >=0 ) {
+			if (row && position.x >=0 ) {
 				float x=0;
-				for(int32 c=0;c<fMasterView->CountColumns();c++) {
+				for (int32 c=0;c<fMasterView->CountColumns();c++) {
 					new_column = fMasterView->ColumnAt(c);
 					if (!new_column->IsVisible())
 						continue;
-					if((MAX(kLeftMargin, fMasterView->LatchWidth())+x)+new_column->Width() > position.x) {
+					if ((MAX(kLeftMargin, fMasterView->LatchWidth())+x)+new_column->Width() > position.x) {
 						if(new_column->WantsEvents()) {
 							new_field = row->GetField(c);
 							new_row = row;
@@ -3070,9 +3029,9 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 		}
 
 		// Handle mouse moved
-		if(handle_field) {
-			if(new_field != fCurrentField) {
-				if(fCurrentField) {
+		if (handle_field) {
+			if (new_field != fCurrentField) {
+				if (fCurrentField) {
 					fCurrentColumn->MouseMoved(fMasterView, fCurrentRow, 
 						fCurrentField, fFieldRect, position, 0, fCurrentCode = B_EXITED_VIEW);
 				}
@@ -3091,7 +3050,7 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 				}
 			}
 		} else {
-			if(fCurrentField) {
+			if (fCurrentField) {
 				fCurrentColumn->MouseMoved(fMasterView, fCurrentRow, 
 						fCurrentField, fFieldRect, position, 0, fCurrentCode = B_EXITED_VIEW);
 				fCurrentField = 0;
@@ -3100,11 +3059,10 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 			}
 		}
 	} else {
-		if(fCurrentField) {
-			if(fFieldRect.Contains(position)) {
-				if (   fCurrentCode == B_OUTSIDE_VIEW	
-					|| fCurrentCode == B_EXITED_VIEW	
-				) {	
+		if (fCurrentField) {
+			if (fFieldRect.Contains(position)) {
+				if (fCurrentCode == B_OUTSIDE_VIEW	
+					|| fCurrentCode == B_EXITED_VIEW) {	
 					fCurrentColumn->MouseMoved(fMasterView, fCurrentRow, 
 						fCurrentField, fFieldRect, position, 1, fCurrentCode = B_ENTERED_VIEW);							
 				} else {
@@ -3112,9 +3070,8 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 						fCurrentField, fFieldRect, position, 1, fCurrentCode = B_INSIDE_VIEW);							
 				}
 			} else {
-				if (   fCurrentCode == B_INSIDE_VIEW
-					|| fCurrentCode == B_ENTERED_VIEW
-				) {
+				if (fCurrentCode == B_INSIDE_VIEW
+					|| fCurrentCode == B_ENTERED_VIEW) {
 					fCurrentColumn->MouseMoved(fMasterView, fCurrentRow, 
 						fCurrentField, fFieldRect, position, 1, fCurrentCode = B_EXITED_VIEW);							
 				} else {
@@ -3125,7 +3082,7 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 		}
 	}
 
-	if(!fEditMode) {
+	if (!fEditMode) {
 
 		switch (fCurrentState) {
 			case LATCH_CLICKED:
@@ -3182,8 +3139,7 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 						BRow *target = FindRow(position.y, &indent, &top);
 						if(target==fRollOverRow)
 							break;
-						if(fRollOverRow)
-						{
+						if (fRollOverRow) {
 							BRect rect;
 							FindRect(fRollOverRow, &rect);
 							Invalidate(rect);
@@ -3202,8 +3158,7 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 						PopState();
 #endif
 					} else {
-						if(fRollOverRow)
-						{
+						if (fRollOverRow) {
 							BRect rect;
 							FindRect(fRollOverRow, &rect);
 							Invalidate(rect);
@@ -3218,12 +3173,12 @@ void OutlineView::MouseMoved(BPoint position, uint32 /*transit*/, const BMessage
 
 void OutlineView::MouseUp(BPoint position)
 {
-	if(fCurrentField) {
+	if (fCurrentField) {
 		fCurrentColumn->MouseUp(fMasterView,fCurrentRow,fCurrentField);
 		fMouseDown = false;
 	}
 
-	if(!fEditMode) {
+	if (!fEditMode) {
 		switch (fCurrentState) {
 			case LATCH_CLICKED:
 				if (fLatchRect.Contains(position))
@@ -3254,7 +3209,7 @@ void OutlineView::MouseUp(BPoint position)
 				}
 		}
 	}
-} // end of MouseUp()
+}
 
 void OutlineView::MessageReceived(BMessage *message)
 {
@@ -3453,8 +3408,7 @@ void OutlineView::RemoveRow(BRow *row)
 		if (parentRow) {
 			if (parentRow->fIsExpanded)
 				fItemsHeight -= subTreeHeight + 1;
-		}
-		else {
+		} else {
 			fItemsHeight -= subTreeHeight + 1;
 		}
 		FixScrollBar(false);
@@ -3791,10 +3745,8 @@ bool OutlineView::FindRect(const BRow *row, BRect *out_rect)
 void OutlineView::ScrollTo(const BRow* Row)
 {
 	BRect rect;
-	if( true == FindRect(Row, &rect) )
-	{
+	if (FindRect(Row, &rect))
 		ScrollTo(BPoint(rect.left, rect.top));
-	}
 }
 
 
@@ -3834,12 +3786,11 @@ BRow* OutlineView::FocusRow() const
 
 void OutlineView::SetFocusRow(BRow* Row, bool Select)
 {
-	if (Row)
-	{
-		if(Select)
+	if (Row) {
+		if (Select)
 			AddToSelection(Row);
 			
-		if(fFocusRow == Row)
+		if (fFocusRow == Row)
 			return;
 			
 		Invalidate(fFocusRowRect); // invalidate previous
