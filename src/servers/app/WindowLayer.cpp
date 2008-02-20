@@ -111,6 +111,7 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fPendingUpdateSession(&fUpdateSessions[1]),
 	fUpdateRequested(false),
 	fInUpdate(false),
+	fUpdatesEnabled(true),
 
 	// windows start hidden
 	fHidden(true),
@@ -701,17 +702,22 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 	}
 }
 
+// DisableUpdateRequests
+void
+WindowLayer::DisableUpdateRequests()
+{
+	fUpdatesEnabled = false;
+}
+
+
 // EnableUpdateRequests
 void
 WindowLayer::EnableUpdateRequests()
 {
-//	fUpdateRequestsEnabled = true;
-/*	if (fCumulativeRegion.CountRects() > 0) {
-		GetRootLayer()->MarkForRedraw(fCumulativeRegion);
-		GetRootLayer()->TriggerRedraw();
-	}*/
+	fUpdatesEnabled = true;
+	if (!fUpdateRequested && fPendingUpdateSession->IsUsed())
+		_SendUpdateMessage();
 }
-
 
 // #pragma mark -
 
@@ -1814,6 +1820,9 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 void
 WindowLayer::_SendUpdateMessage()
 {
+	if (!fUpdatesEnabled)
+		return;
+
 	BMessage message(_UPDATE_);
 	ServerWindow()->SendMessageToClient(&message);
 

@@ -705,16 +705,14 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 		{
 			STRACE(("ServerWindow %s: Message AS_ENABLE_UPDATES unimplemented\n",
 				Title()));
-// TODO: AS_ENABLE_UPDATES
-			//fWindowLayer->EnableUpdateRequests();
+			fWindowLayer->EnableUpdateRequests();
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
 			STRACE(("ServerWindow %s: Message AS_DISABLE_UPDATES unimplemented\n",
 				Title()));
-// TODO: AS_DISABLE_UPDATES
-			//fWindowLayer->DisableUpdateRequests();
+			fWindowLayer->DisableUpdateRequests();
 			break;
 		}
 		case AS_NEEDS_UPDATE:

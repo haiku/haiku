@@ -104,8 +104,8 @@ class WindowLayer {
 			// shortcut for invalidating just one view
 			void				InvalidateView(ViewLayer* view, BRegion& layerRegion);
 
-			void				EnableUpdateRequests();
 			void				DisableUpdateRequests();
+			void				EnableUpdateRequests();
 
 			void				BeginUpdate(BPrivate::PortLink& link);
 			void				EndUpdate();
@@ -335,6 +335,7 @@ class WindowLayer {
 			// and consistent update session
 			bool				fUpdateRequested : 1;
 			bool				fInUpdate : 1;
+			bool				fUpdatesEnabled : 1;
 
 			bool				fHidden : 1;
 			bool				fMinimized : 1;
