@@ -34,11 +34,15 @@ define("VNCPORTBASE", 5900);
 define("SESSION_TIMEOUT", "10m");
 
 // path to qemu binary
-define("QEMU_BIN", "/usr/bin/qemu");
+//define("QEMU_BIN", "/usr/bin/qemu");
+define("QEMU_BIN", "/usr/local/bin/qemu");
 // default arguments: no network, emulate tablet, readonly image file.
-define("QEMU_ARGS","-net none -usbdevice tablet -snapshot");
+define("QEMU_ARGS","-net none -usbdevice wacom-tablet -k en-us -snapshot");
+//define("QEMU_ARGS","-net none -usbdevice wacom-tablet -k fr -snapshot");
 // absolute path to the image.
-define("QEMU_IMAGE_PATH","/home/revol/haiku/trunk/generated/haiku.image");
+define("QEMU_IMAGE_PATH","/home/revol/haiku/trunk/generated.x86/haiku.image");
+// qemu 0.8.2 needs "", qemu 0.9.1 needs ":"
+define("QEMU_VNC_PREFIX", ":");
 
 // name of session and pid files in /tmp
 define("QEMU_SESSFILE_TMPL", "qemu-haiku-session-");
@@ -153,7 +157,7 @@ function start_qemu()
 		return $idx;
 	}
 	$pidfile = make_qemu_pidfile_name($idx);
-	$cmd = QEMU_BIN . " " . QEMU_ARGS . " -vnc " . vnc_display() . " -pidfile " . $pidfile . " " . QEMU_IMAGE_PATH;
+	$cmd = QEMU_BIN . " " . QEMU_ARGS . " -vnc " . QEMU_VNC_PREFIX . vnc_display() . " -pidfile " . $pidfile . " " . QEMU_IMAGE_PATH;
 
 	if (file_exists($pidfile))
 		unlink($pidfile);
