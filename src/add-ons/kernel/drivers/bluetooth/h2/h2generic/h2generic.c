@@ -494,6 +494,7 @@ device_open(const char *name, uint32 flags, void **cookie)
 	*cookie = bdev;	
 	release_sem(bdev->lock);	
 
+	flowf(" successful\n");
 	return B_OK;
 
 unrun:
@@ -624,6 +625,12 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 		    memcpy(params, &bdev->stat, sizeof(bt_hci_statistics));
 		    err = B_OK;
 		break;		
+
+		case GET_HCI_ID:
+		    *(hci_id*)params = bdev->hdev;
+		    err = bdev->hdev + 15;
+		break;		
+
 		
 	default:
 		debugf("Invalid opcode %ld.\n", msg);
