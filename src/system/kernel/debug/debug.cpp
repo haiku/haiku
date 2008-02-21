@@ -91,20 +91,30 @@ static int32 sCurrentLine = 0;
 static void
 kputchar(char c)
 {
+	uint32 i;
+
 	if (sSerialDebugEnabled)
 		arch_debug_serial_putchar(c);
 	if (sBlueScreenEnabled || sDebugScreenEnabled)
 		blue_screen_putchar(c);
+	for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+			sDebuggerModules[i]->debugger_puts(&c, sizeof(c));
 }
 
 
 void
 kputs(const char *s)
 {
+	uint32 i;
+
 	if (sSerialDebugEnabled)
 		arch_debug_serial_puts(s);
 	if (sBlueScreenEnabled || sDebugScreenEnabled)
 		blue_screen_puts(s);
+	for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+			sDebuggerModules[i]->debugger_puts(s, strlen(s));
 }
 
 
@@ -1159,6 +1169,7 @@ flush_pending_repeats(void)
 {
 	if (sMessageRepeatCount > 0) {
 		int32 length;
+		uint32 i;
 
 		if (sMessageRepeatCount > 1) {
 			static char temp[40];
@@ -1171,6 +1182,9 @@ flush_pending_repeats(void)
 				syslog_write(temp, length);
 			if (sBlueScreenEnabled || sDebugScreenEnabled)
 				blue_screen_puts(temp);
+			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+					sDebuggerModules[i]->debugger_puts(temp, length);
 		} else {
 			// if we only have one repeat just reprint the last buffer
 			if (sSerialDebugEnabled)
@@ -1179,6 +1193,9 @@ flush_pending_repeats(void)
 				syslog_write(sLastOutputBuffer, strlen(sLastOutputBuffer));
 			if (sBlueScreenEnabled || sDebugScreenEnabled)
 				blue_screen_puts(sLastOutputBuffer);
+			for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+				if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+					sDebuggerModules[i]->debugger_puts(sLastOutputBuffer, strlen(sLastOutputBuffer));
 		}
 
 		sMessageRepeatFirstTime = 0;
@@ -1211,6 +1228,7 @@ dprintf_args(const char *format, va_list args, bool syslogOutput)
 {
 	cpu_status state;
 	int32 length;
+	uint32 i;
 
 	// ToDo: maybe add a non-interrupt buffer and path that only
 	//	needs to acquire a semaphore instead of needing to disable
@@ -1239,6 +1257,9 @@ dprintf_args(const char *format, va_list args, bool syslogOutput)
 			syslog_write(sOutputBuffer, length);
 		if (sBlueScreenEnabled || sDebugScreenEnabled)
 			blue_screen_puts(sOutputBuffer);
+		for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+				sDebuggerModules[i]->debugger_puts(sOutputBuffer, length);
 
 		memcpy(sLastOutputBuffer, sOutputBuffer, length);
 		sLastOutputBuffer[length] = 0;
