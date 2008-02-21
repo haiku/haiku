@@ -63,4 +63,8 @@ class LocalDevice {
     
 }
 
+#ifndef _BT_USE_EXPLICIT_NAMESPACE
+using Bluetooth::LocalDevice;
+#endif
+
 #endif
