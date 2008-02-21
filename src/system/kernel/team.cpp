@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1774,7 +1774,8 @@ update_orphaned_process_group(process_group* group, pid_t dyingProcess)
 	struct team* team = group->teams;
 	while (team != NULL) {
 		struct team* parent = team->parent;
-		if (team->id != dyingProcess && parent->id != dyingProcess
+		if (team->id != dyingProcess && parent != NULL
+			&& parent->id != dyingProcess
 			&& parent->group_id != group->id
 			&& parent->session_id == group->session->id) {
 			return false;
