@@ -67,16 +67,21 @@ getpgid(pid_t process)
 int 
 setpgid(pid_t process, pid_t group)
 {
-	status_t status = _kern_setpgid(process, group);
+	pid_t result = _kern_setpgid(process, group);
+	if (result >= 0)
+		return 0;
 
-	RETURN_AND_SET_ERRNO(status);
+	RETURN_AND_SET_ERRNO(result);
 }
 
 
 pid_t
 setpgrp(void)
 {
-	return setpgid(0, 0);	
+	// setpgrp() never fails -- setpgid() fails when the process is a session
+	// leader, though.
+	pid_t result = _kern_setpgid(0, 0);
+	return result >= 0 ? result : getpgrp();
 }
 
 
