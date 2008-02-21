@@ -49,6 +49,11 @@ struct debugger_module_info {
 
 	void (*enter_debugger)(void);
 	void (*exit_debugger)(void);
+
+	// io hooks
+	int (*debugger_puts)(const char *str, int32 length);
+	int (*debugger_getchar)(void);
+	// TODO: add hooks for tunnelling gdb ?
 };
 
 extern int dbg_register_file[B_MAX_CPU_COUNT][14];

@@ -71,7 +71,9 @@ static struct debugger_module_info sModuleInfo = {
 	},
 
 	NULL,
-	exit_debugger
+	exit_debugger,
+	NULL,
+	NULL
 };
 
 module_info *modules[] = { 

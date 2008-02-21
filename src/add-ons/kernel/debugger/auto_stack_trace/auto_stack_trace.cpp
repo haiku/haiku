@@ -31,6 +31,8 @@ static struct debugger_module_info sModuleInfo = {
 		&std_ops
 	},
 	enter_debugger,
+	NULL,
+	NULL,
 	NULL
 };
 
