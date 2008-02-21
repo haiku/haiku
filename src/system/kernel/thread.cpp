@@ -1323,6 +1323,14 @@ thread_exit(void)
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
+		// TODO: Deleting the process group is actually a problem. According to
+		// the POSIX standard the process should become a zombie and live on
+		// until it is reaped. Hence the process group would continue to exist
+		// for that time as well. That is moving processes to it (setpgid())
+		// should work. This can actually happen e.g. when executing something
+		// like "echo foobar | wc" in the shell. The built-in "echo" could
+		// exit() even before setpgid() has been invoked for the "wc" child.
+		// Cf. bug #1799.
 		team_delete_process_group(freeGroup);
 		team_delete_team(team);
 
