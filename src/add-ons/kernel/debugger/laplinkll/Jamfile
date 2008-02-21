@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel debugger laplinkll ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon <kdebug>laplinkll :
+	laplinkll.c
+	;

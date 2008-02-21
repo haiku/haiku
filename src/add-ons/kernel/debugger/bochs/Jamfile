@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel debugger bochs ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon <kdebug>bochs :
+	bochs.cpp
+	;
