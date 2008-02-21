@@ -26,5 +26,5 @@ Application ResEdit :
 	ResourceRoster.cpp
 	ResView.cpp
 	ResWindow.cpp
-	: be tracker translation
+	: be tracker translation libcolumnlistview.a
 ;

@@ -17,6 +17,7 @@ main(void)
 	return 0;
 }
 
+
 App::App(void)
   :	BApplication("application/x-vnd.Haiku-ResEdit"),
   	fWindowCount(0)
@@ -36,19 +37,8 @@ App::~App(void)
 void
 App::ReadyToRun(void)
 {
-/*
-	if (fWindowCount < 1) {
-		ResWindow *win = new ResWindow(BRect(50,100,600,400));
-		win->Show();
-	}
-*/
-	if (fWindowCount < 1) {
-		BEntry entry("/boot/develop/projects/ResEdit/CapitalBe.rsrc");
-		entry_ref ref;
-		entry.GetRef(&ref);
-		ResWindow *win = new ResWindow(BRect(50,100,600,400),&ref);
-		win->Show();
-	}
+	if (fWindowCount < 1)
+		new ResWindow(BRect(50, 100, 600, 400));
 }
 
 
@@ -82,27 +72,23 @@ App::MessageReceived(BMessage *msg)
 void
 App::ArgvReceived(int32 argc, char** argv)
 {
-	int i;
-	for (i = 1; i < argc; i++) {
+	for (int32 i = 1; i < argc; i++) {
 		BEntry entry(argv[i]);
 		entry_ref ref;
 		if (entry.GetRef(&ref) < B_OK)
 			continue;
-		ResWindow *win = new ResWindow(BRect(50,100,600,400),&ref);
-		win->Show();
+		new ResWindow(BRect(50, 100, 600, 400), &ref);
 	}
 }
+
 
 void
 App::RefsReceived(BMessage *msg)
 {
 	entry_ref ref;
-	int32 i=0;
-	while (msg->FindRef("refs",i,&ref) == B_OK) {
-		ResWindow *win = new ResWindow(BRect(50,100,600,400),&ref);
-		win->Show();
-		i++;
-	}
+	int32 i = 0;
+	while (msg->FindRef("refs", i++, &ref) == B_OK)
+		new ResWindow(BRect(50, 100, 600, 400), &ref);
 }
 
 

@@ -14,10 +14,13 @@ ResWindow::ResWindow(const BRect &rect, const entry_ref *ref)
 {
 	be_app->PostMessage(M_REGISTER_WINDOW);
 	
-	ResView *child = new ResView(Bounds(), "resview", B_FOLLOW_ALL, B_WILL_DRAW, ref);
+	ResView *child = new ResView(Bounds(), "resview", B_FOLLOW_ALL,
+		B_WILL_DRAW, ref);
 	AddChild(child);
 	
 	SetTitle(child->Filename());
+
+	Show();
 }
 
 
