@@ -1424,13 +1424,14 @@ BMenu::_Track(int *action, long start)
 			continue;
 		}
 	
+		// The order of the checks is important
+		// to be able to handle overlapping menus:
+		// first we check if mouse is inside a submenu,
+		// then if the menu is inside this menu,
+		// then if it's over a super menu. 
+		bool overSub = _OverSubmenu(fSelected, screenLocation);
 		item = _HitTestItems(location, B_ORIGIN);
-		if (item != NULL) {
-			_UpdateStateOpenSelect(item, openTime, mouseSpeed);
-			if (!releasedOnce)
-				releasedOnce = true;
-		
-		} else if (_OverSubmenu(fSelected, screenLocation)) {
+		if (overSub) {
 			// Since the submenu has its own looper,
 			// we can unlock ours. Doing so also make sure
 			// that our window gets any update message to
@@ -1450,11 +1451,15 @@ BMenu::_Track(int *action, long start)
 				fState = MENU_STATE_CLOSED;			
 			}
 			if (!LockLooper())
-				break;
+				break;			
+		} else if (item != NULL) {
+			_UpdateStateOpenSelect(item, openTime, mouseSpeed);
+			if (!releasedOnce)
+				releasedOnce = true;		
 		} else if (_OverSuper(screenLocation)) {
 			fState = MENU_STATE_TRACKING;			
 			UnlockLooper();
-			break;			
+			break;
 		} else {
 			// Mouse pointer outside menu:
 			// If there's no other submenu opened,
@@ -1489,12 +1494,6 @@ BMenu::_Track(int *action, long start)
 				UnlockLooper();		
 			}
 			
-#if 1
-			// TODO: on vmware, looks like the second system_time() could return
-			// a value smaller than the first call. Bug in VMWare or haiku ?
-			if (newPollTime <= pollTime)
-				newPollTime = pollTime + 5000;
-#endif
 			// mouseSpeed in px per ms
 			// (actually point_distance returns the square of the distance,
 			// so it's more px^2 per ms)
@@ -2040,7 +2039,7 @@ BMenu::_OverSubmenu(BMenuItem *item, BPoint loc)
 	if (subMenu == NULL || subMenu->Window() == NULL)
 		return false;
 
-	// we assume that loc is in screen coords
+	// we assume that loc is in screen coords {
 	if (subMenu->Window()->Frame().Contains(loc))
 		return true;
 
