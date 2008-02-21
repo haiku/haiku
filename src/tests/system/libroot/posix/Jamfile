@@ -14,6 +14,8 @@ SimpleTest signal_test
 	: signal_test.cpp
 ;
 
+SimpleTest setpgid_test : setpgid_test.cpp ;
+
 SimpleTest setjmp_test
 	: setjmp_test.c
 ;
