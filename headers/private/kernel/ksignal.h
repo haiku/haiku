@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_SIGNAL_H
@@ -15,8 +15,9 @@
 #define SIGNAL_TO_MASK(signal)	(1LL << (signal - 1))
 
 // additional send_signal_etc() flag
-#define SIGNAL_FLAG_TEAMS_LOCKED	(0x10000)
+#define SIGNAL_FLAG_TEAMS_LOCKED			(0x10000)
 	// interrupts are disabled and team lock is held
+#define SIGNAL_FLAG_DONT_RESTART_SYSCALL	(0x20000)
 
 
 #ifdef __cplusplus

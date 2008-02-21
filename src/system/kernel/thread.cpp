@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -2345,7 +2345,10 @@ resume_thread(thread_id id)
 	if (id <= 0)
 		return B_BAD_VALUE;
 
-	return send_signal(id, SIGCONT);
+	return send_signal_etc(id, SIGCONT, SIGNAL_FLAG_DONT_RESTART_SYSCALL);
+		// This retains compatibility to BeOS which documents the
+		// combination of suspend_thread() and resume_thread() to
+		// interrupt threads waiting on semaphores.
 }
 
 

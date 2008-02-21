@@ -499,6 +499,9 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 			if (thread->state == B_THREAD_SUSPENDED)
 				scheduler_enqueue_in_run_queue(thread);
 
+			if ((flags & SIGNAL_FLAG_DONT_RESTART_SYSCALL) != 0)
+				atomic_or(&thread->flags, THREAD_FLAGS_DONT_RESTART_SYSCALL);
+
 			atomic_and(&thread->sig_pending, ~STOP_SIGNALS);
 				// remove any pending stop signals
 			break;
