@@ -4,13 +4,23 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders net kernel bluetooth ;
 
+local r5_src =  ;
+if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os bluetooth ] : true ;
+	r5_src = list.c ;
+}
+
 KernelAddon h2generic :
 	h2generic.c
 	h2transactions.c
 	h2upper.c
 	h2util.c
 	snet_buffer.c
+	$(r5_src)
 	;
+	
+SEARCH on [ FGristFiles $(r5_src)
+        ] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 
 Package haiku-h2generic-cvs :
 	h2generic :
