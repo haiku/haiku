@@ -87,7 +87,7 @@ StaticLibrary libfetish.a :
 	imaxtostr.c
 	inet_ntop.c
 	isapipe.c
-	lchown.c
+#	lchown.c
 	linebuffer.c
 	localcharset.c
 	long-options.c

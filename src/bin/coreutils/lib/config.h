@@ -722,7 +722,7 @@
 /* #undef HAVE_LCHMOD */
 
 /* Define to 1 if you have the `lchown' function. */
-/* #undef HAVE_LCHOWN */
+#define HAVE_LCHOWN 1
 
 /* Define to 1 if you have the `dgc' library (-ldgc). */
 /* #undef HAVE_LIBDGC */
