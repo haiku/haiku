@@ -65,6 +65,21 @@ compute_user_iovec_length(iovec *userVec, uint32 count)
 }
 
 
+static void
+delete_children(struct list *list)
+{
+	while (true) {
+		net_socket_private *child
+			= (net_socket_private *)list_remove_head_item(list);
+		if (child == NULL)
+			break;
+
+		child->parent = NULL;
+		socket_delete(child);
+	}
+}
+
+
 static status_t
 create_socket(int family, int type, int protocol, net_socket_private **_socket)
 {
@@ -363,6 +378,10 @@ socket_delete(net_socket *_socket)
 	benaphore_lock(&sSocketLock);
 	list_remove_item(&sSocketList, socket);
 	benaphore_unlock(&sSocketLock);
+
+	// also delete all children of this socket
+	delete_children(&socket->pending_children);
+	delete_children(&socket->connected_children);
 
 	put_domain_protocols(socket);
 	benaphore_destroy(&socket->lock);
