@@ -41,6 +41,8 @@ enum team_state {
 	TEAM_STATE_DEATH	// being killed
 };
 
+#define	TEAM_FLAG_EXEC_DONE	0x01
+
 typedef enum job_control_state {
 	JOB_CONTROL_STATE_NONE,
 	JOB_CONTROL_STATE_STOPPED,
@@ -155,7 +157,7 @@ struct team {
 	char			args[64];		// contents for the team_info::args field
 	int				num_threads;	// number of threads in this team
 	int				state;			// current team state, see above
-	int				pending_signals;
+	int32			flags;
 	void			*io_context;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
 	struct list		dead_threads;

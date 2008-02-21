@@ -295,7 +295,7 @@ _dump_team_info(struct team *team)
 	kprintf("children:    %p\n", team->children);
 	kprintf("num_threads: %d\n", team->num_threads);
 	kprintf("state:       %d\n", team->state);
-	kprintf("pending_signals: %#x\n", team->pending_signals);
+	kprintf("flags:       0x%lx\n", team->flags);
 	kprintf("io_context:  %p\n", team->io_context);
 	if (team->address_space)
 		kprintf("address_space: %p\n", team->address_space);
@@ -607,6 +607,13 @@ reparent_children(struct team *team)
 
 
 static bool
+is_session_leader(struct team *team)
+{
+	return team->session_id == team->id;
+}
+
+
+static bool
 is_process_group_leader(struct team *team)
 {
 	return team->group_id == team->id;
@@ -769,7 +776,7 @@ create_team_struct(const char *name, bool kernel)
 	team->main_thread = NULL;
 	team->loading_info = NULL;
 	team->state = TEAM_STATE_BIRTH;
-	team->pending_signals = 0;
+	team->flags = 0;
 	team->death_sem = -1;
 
 	team->dead_threads_kernel_time = 0;
@@ -1320,6 +1327,8 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	else
 		threadName = path;
 	rename_thread(thread_get_current_thread_id(), threadName);
+
+	atomic_or(&team->flags, TEAM_FLAG_EXEC_DONE);
 
 	status = team_create_thread_start(teamArgs);
 		// this one usually doesn't return...
@@ -2805,7 +2814,6 @@ _user_setpgid(pid_t processID, pid_t groupID)
 	struct thread *thread = thread_get_current_thread();
 	struct team *currentTeam = thread->team;
 	struct team *team;
-	team_id teamID = -1;
 
 	if (groupID < 0)
 		return B_BAD_VALUE;
@@ -2813,102 +2821,114 @@ _user_setpgid(pid_t processID, pid_t groupID)
 	if (processID == 0)
 		processID = currentTeam->id;
 
-	if (processID == currentTeam->id) {
-		// we set our own group
-		teamID = currentTeam->id;
-
-		// we must not change our process group ID if we're a group leader
-		if (is_process_group_leader(currentTeam)) {
-			// if the group ID was not specified, we just return the
-			// process ID as we already are a process group leader
-			if (groupID == 0 || groupID == processID)
-				return processID;
-
-			return B_NOT_ALLOWED;
-		}
-	} else {
-		InterruptsSpinLocker _(thread_spinlock);
-
-		thread = thread_get_thread_struct_locked(processID);
-
-		// the thread must be the team's main thread, as that
-		// determines its process ID
-		if (thread == NULL || thread != thread->team->main_thread)
-			return B_BAD_THREAD_ID;
-
-		// check if the thread is in a child team of the calling team and
-		// if it's already a process group leader and in the same session
-		if (thread->team->parent != currentTeam
-			|| is_process_group_leader(thread->team)
-			|| thread->team->session_id != currentTeam->session_id) {
-			return B_NOT_ALLOWED;
-		}
-
-		// TODO: According to the standard, the call is also supposed to fail
-		// on a child, when the child already has executed exec*().
-
-		teamID = thread->team->id;
-	}
-
-	// if the group ID is not specified, a new group should be created
+	// if the group ID is not specified, use the target process' ID
 	if (groupID == 0)
 		groupID = processID;
 
+	if (processID == currentTeam->id) {
+		// we set our own group
+
+		// we must not change our process group ID if we're a session leader
+		if (is_session_leader(currentTeam))
+			return B_NOT_ALLOWED;
+	} else {
+		// another team is the target of the call -- check it out
+		InterruptsSpinLocker _(team_spinlock);
+
+		team = team_get_team_struct_locked(processID);
+		if (team == NULL)
+			return ESRCH;
+
+		// The team must be a child of the calling team and in the same session.
+		// (If that's the case it isn't a session leader either.)
+		if (team->parent != currentTeam
+			|| team->session_id != currentTeam->session_id) {
+			return B_NOT_ALLOWED;
+		}
+
+		if (team->group_id == groupID)
+			return groupID;
+
+		// The call is also supposed to fail on a child, when the child already
+		// has executed exec*() [EACCES].
+		if ((team->flags & TEAM_FLAG_EXEC_DONE) != 0)
+			return EACCES;
+	}
+
 	struct process_group *group = NULL;
 	if (groupID == processID) {
-		// We need to create a new process group for this team
+		// A new process group might be needed.
 		group = create_process_group(groupID);
 		if (group == NULL)
 			return B_NO_MEMORY;
 
-		// The team has a parent in the same session, but in another process
-		// group, so the new group won't be orphaned.
-		group->orphaned = false;
+		// Assume orphaned. We consider the situation of the team's parent
+		// below.
+		group->orphaned = true;
 	}
 
 	status_t status = B_OK;
 	struct process_group *freeGroup = NULL;
+	struct process_group *freeGroup2 = NULL;
 
 	InterruptsSpinLocker locker(team_spinlock);
 
-	team = team_get_team_struct_locked(teamID);
+	team = team_get_team_struct_locked(processID);
 	if (team != NULL) {
-		if (processID == groupID) {
-			// we created a new process group, let us insert it into the team's
-			// session
-			insert_group_into_session(team->group->session, group);
-			remove_team_from_group(team, &freeGroup);
-			insert_team_into_group(group, team);
+		// check the conditions again -- they might have changed in the meantime
+		if (is_session_leader(team)
+			|| team->session_id != currentTeam->session_id) {
+			status = B_NOT_ALLOWED;
+		} else if (team != currentTeam
+				&& (team->flags & TEAM_FLAG_EXEC_DONE) != 0) {
+			status = EACCES;
+		} else if (team->group_id == groupID) {
+			// the team is already in the desired process group
+			freeGroup = group;
 		} else {
-			// check if this team can have the group ID; there must be one
-			// matching process ID in the team's session
-
-			struct process_group *targetGroup =
-				team_get_process_group_locked(team->group->session, groupID);
+			// Check if a process group with the requested ID already exists.
+			struct process_group *targetGroup
+				= team_get_process_group_locked(team->group->session, groupID);
 			if (targetGroup != NULL) {
+				// In case of processID == groupID we have to free the
+				// allocated group.
+				freeGroup2 = group;
+			} else if (processID == groupID) {
+				// We created a new process group, let us insert it into the
+				// team's session.
+				insert_group_into_session(team->group->session, group);
+				targetGroup = group;
+			}
+
+			if (targetGroup != NULL) {
+				// we got a group, let's move the team there
 				process_group* oldGroup = team->group;
-				if (targetGroup != oldGroup) {
-					// we got a group, let's move the team there
-					remove_team_from_group(team, &freeGroup);
-					insert_team_into_group(targetGroup, team);
 
-					// Update the "orphaned" flag of all potentially affected
-					// groups.
+				remove_team_from_group(team, &freeGroup);
+				insert_team_into_group(targetGroup, team);
 
-					// the team's old group
-					if (oldGroup->teams != NULL) {
-						oldGroup->orphaned = false;
-						update_orphaned_process_group(oldGroup, -1);
-					}
+				// Update the "orphaned" flag of all potentially affected
+				// groups.
 
-					// children's groups
-					struct team* child = team->children;
-					while (child != NULL) {
-						child->group->orphaned = false;
-						update_orphaned_process_group(child->group, -1);
+				// the team's old group
+				if (oldGroup->teams != NULL) {
+					oldGroup->orphaned = false;
+					update_orphaned_process_group(oldGroup, -1);
+				}
 
-						child = child->siblings_next;
-					}
+				// the team's new group
+				struct team* parent = team->parent;
+				targetGroup->orphaned &= parent == NULL
+					|| parent->group == targetGroup
+					|| team->parent->session_id != team->session_id;
+
+				// children's groups
+				struct team* child = team->children;
+				while (child != NULL) {
+					child->group->orphaned = false;
+					update_orphaned_process_group(child->group, -1);
+
+					child = child->siblings_next;
 				}
 			} else
 				status = B_NOT_ALLOWED;
@@ -2926,12 +2946,13 @@ _user_setpgid(pid_t processID, pid_t groupID)
 
 	locker.Unlock();
 
-	if (status != B_OK && group != NULL) {
+	if (status != B_OK) {
 		// in case of error, the group hasn't been added into the hash
 		team_delete_process_group(group);
 	}
 
 	team_delete_process_group(freeGroup);
+	team_delete_process_group(freeGroup2);
 
 	return status == B_OK ? groupID : status;
 }
