@@ -30,34 +30,78 @@
 #include "setup.h"
 #include "timer.h"
 
-int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-pci_module_info *gPci;
+#define VENDOR_ID_REALTEK	0x10ec
+
+
+static const uint32 kSupportedDevices[] = {
+	0x8167,
+	0x8168,
+	0x8169,
+};
+
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 char* gDevNameList[MAX_CARDS + 1];
 pci_info *gDevList[MAX_CARDS];
+pci_module_info *gPci;
+
+static device_hooks sDeviceHooks = {
+	rtl8169_open,
+	rtl8169_close,
+	rtl8169_free,
+	rtl8169_control,
+	rtl8169_read,
+	rtl8169_write,
+};
+
+
+static status_t
+get_next_supported_pci_info(int32 *_cookie, pci_info *info)
+{
+	int32 index = *_cookie;
+	uint32 i;
+
+	// find devices
+
+	for (; gPci->get_nth_pci_info(index, info) == B_OK; index++) {
+		// check vendor
+		if (info->vendor_id != VENDOR_ID_REALTEK)
+			continue;
+
+		// check device
+		for (i = 0; i < sizeof(kSupportedDevices)
+				/ sizeof(kSupportedDevices[0]); i++) {
+			if (info->device_id == kSupportedDevices[i]) {
+				*_cookie = index + 1;
+				return B_OK;
+			}
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+//	#pragma mark -
+
 
 status_t
 init_hardware(void)
 {
-	pci_module_info *pci;
+	uint32 cookie = 0;
+	status_t result;
 	pci_info info;
-	status_t res;
-	int i;
 
 	TRACE("init_hardware()\n");
 
-	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci) < B_OK)
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&gPci) < B_OK)
 		return B_ERROR;
-	for (res = B_ERROR, i = 0; pci->get_nth_pci_info(i, &info) == B_OK; i++) {
-		if (info.vendor_id == 0x10ec && (info.device_id == 0x8169 || info.device_id == 0x8167)) {
-			res = B_OK;
-			break;
-		}
-	}
+
+	result = get_next_supported_pci_info(&cookie, &info);
 	put_module(B_PCI_MODULE_NAME);
 
-	return res;
+	return result;
 }
 
 
@@ -65,8 +109,8 @@ status_t
 init_driver(void)
 {
 	struct pci_info *item;
-	int index;
-	int cards;
+	uint32 index = 0;
+	int cards = 0;
 	
 #ifdef DEBUG	
 	set_dprintf_enabled(true);
@@ -84,21 +128,21 @@ init_driver(void)
 		free(item);
 		return B_ERROR;
 	}
-	
-	for (cards = 0, index = 0; gPci->get_nth_pci_info(index++, item) == B_OK; ) {
-		if (item->vendor_id == 0x10ec && (item->device_id == 0x8169 || item->device_id == 0x8167)) {
-			char name[64];
-			sprintf(name, "net/rtl8169/%d", cards);
-			gDevList[cards] = item;
-			gDevNameList[cards] = strdup(name);
-			gDevNameList[cards + 1] = NULL;
-			cards++;
-			item = (pci_info *)malloc(sizeof(pci_info));
-			if (!item)
-				goto err_outofmem;
-			if (cards == MAX_CARDS)
-				break;
-		}
+
+	while (get_next_supported_pci_info(&index, item) == B_OK) {
+		char name[64];
+		sprintf(name, "net/rtl8169/%d", cards);
+		gDevList[cards] = item;
+		gDevNameList[cards] = strdup(name);
+		gDevNameList[cards + 1] = NULL;
+		cards++;
+
+		item = (pci_info *)malloc(sizeof(pci_info));
+		if (!item)
+			goto err_outofmem;
+
+		if (cards == MAX_CARDS)
+			break;
 	}
 	
 	TRACE("found %d cards\n", cards);
@@ -133,27 +177,16 @@ uninit_driver(void)
 	int32 i;
 
 	TRACE("uninit_driver()\n");
-	
+
 	terminate_timer();
 
 	for (i = 0; gDevNameList[i] != NULL; i++) {
 		free(gDevList[i]);
 		free(gDevNameList[i]);
 	}
-	
+
 	put_module(B_PCI_MODULE_NAME);
 }
-
-
-device_hooks
-gDeviceHooks = {
-	rtl8169_open,
-	rtl8169_close,
-	rtl8169_free,
-	rtl8169_control,
-	rtl8169_read,
-	rtl8169_write,
-};
 
 
 const char**
@@ -166,5 +199,5 @@ publish_devices()
 device_hooks*
 find_device(const char* name)
 {
-	return &gDeviceHooks;
+	return &sDeviceHooks;
 }
