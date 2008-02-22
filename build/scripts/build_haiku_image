@@ -10,6 +10,7 @@
 # imageSize
 # addBuildCompatibilityLibDir
 # sourceDirsToCopy
+# headerDirsToCopy
 # updateOnly
 # dontClearImage
 # isVMwareImage
@@ -212,7 +213,7 @@ if [ $sourcePathPrefix = "." ]; then
 fi
 
 for sourcesDir in ${sourceDirsToCopy}; do
-	echo "  sources dir:  ${sourcesDir}"
+	echo "  sources dir: ${sourcesDir}"
 
 	# create all subdirectories
 	subDirs=$(find ${sourcesDir} -type d | grep -v '.svn' |
@@ -225,6 +226,43 @@ for sourcesDir in ${sourceDirsToCopy}; do
 		destSourceFile=$(echo $sourceFile |
 			sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
 		$cp ${sPrefix}$sourceFile $destSourceFile
+	done
+done
+
+
+# install headers
+
+headersDest=${tPrefix}develop
+
+# create headers directory
+if [ -n "${headerDirsToCopy}" ]; then
+	echo "Installing Haiku Headers ..."
+
+	$mkdir -p ${headersDest}
+fi
+
+# See above (sourceDirs)
+sourcePathPrefix=$sourceDir
+destPathPrefix=$headersDest
+if [ $sourcePathPrefix = "." ]; then
+	sourcePathPrefix=""
+	destPathPrefix="${headersDest}/"
+fi
+
+for headersDir in ${headerDirsToCopy}; do
+	echo "  header dir: ${headersDir}"
+
+	# create all subdirectories
+	subDirs=$(find ${headersDir} -type d | grep -v '.svn' |
+		sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
+	$mkdir -p ${subDirs}
+
+	# get all files and copy each one individually
+	headerFiles=$(find $headersDir -type f | grep -v '.svn')
+	for headerFile in $headerFiles; do
+		destHeaderFile=$(echo $headerFile |
+			sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
+		$cp ${sPrefix}$headerFile $destHeaderFile
 	done
 done
 

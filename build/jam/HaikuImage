@@ -501,6 +501,14 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 
 	# cc and c++ wrapper scripts
 	AddFilesToHaikuImage beos bin : cc c++ ;
+
+	# headers
+	AddHeaderDirectoryToHaikuImage gnu ;
+	AddHeaderDirectoryToHaikuImage os ;
+	AddHeaderDirectoryToHaikuImage posix ;
+
+	# make be -> os symlink for now
+	AddSymlinkToHaikuImage develop headers : /boot/develop/headers/os : be ;
 }
 
 # Vision
@@ -596,6 +604,8 @@ AddTargetVariableToScript $(script) : <build>unzip ;
 AddTargetVariableToScript $(script) : <build>vmdkheader ;
 AddVariableToScript $(script) : sourceDirsToCopy
 	: $(HAIKU_INSTALL_SOURCE_DIRS) ;
+AddVariableToScript $(script) : headerDirsToCopy
+	: $(HAIKU_INSTALL_HEADER_DIRS) ;
 
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;

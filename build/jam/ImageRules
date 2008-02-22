@@ -58,7 +58,7 @@ rule AddVariableToScript script : variable : value
 	value = $(value[2-]) ;
 	while $(value) {
 		VARIABLE_DEFS on $(script)
-			+= "echo $(variable)+=\\\" $(value[1])\\\" >> " ;
+			+= "echo $(variable)=\\\" \\\$$(variable) $(value[1])\\\" >> " ;
 		value = $(value[2-]) ;
 	}
 
@@ -543,6 +543,17 @@ rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
 	# requested.
 	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
 		HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
+	}
+}
+
+rule AddHeaderDirectoryToHaikuImage dirTokens : alwaysUpdate
+{
+	# AddHeaderDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
+
+	# If the image shall only be updated, we update sources only, if explicitely
+	# requested.
+	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
+		HAIKU_INSTALL_HEADER_DIRS += [ FDirName $(HAIKU_TOP) headers $(dirTokens) ] ;
 	}
 }
 
