@@ -139,6 +139,14 @@ ObjectView::ObjectView(BRect r, char *name, ulong resizingMode, ulong options)
 	fLastYXRatio(1),
 	fYxRatio(1)
 {	
+	fTrackingInfo.isTracking = false;
+	fTrackingInfo.pickedObject = NULL;
+	fTrackingInfo.buttons = 0;
+	fTrackingInfo.lastX = 0.0f;
+	fTrackingInfo.lastY = 0.0f;
+	fTrackingInfo.lastDx = 0.0f;
+	fTrackingInfo.lastDy = 0.0f;
+		
 	fLastObjectDistance = fObjectDistance = depthOfView/8;
 	quittingSem = create_sem(1,"quitting sem");
 	drawEvent = create_sem(0,"draw event");
@@ -392,102 +400,108 @@ ObjectView::ObjectAtPoint(BPoint p)
 
 
 void
-ObjectView::MouseDown(BPoint p)
+ObjectView::MouseDown(BPoint point)
 {
-	BPoint op = p, np = p;
-	BRect bounds = Bounds();
-	float lastDx = 0,lastDy = 0;
-	GLObject* o = NULL;
-	uint32 mods;
+	GLObject* object = NULL;	
 
-	BMessage *m = Window()->CurrentMessage();
-	uint32 buttons = m->FindInt32("buttons");
-	o = ((GLObject*)fObjects.ItemAt(ObjectAtPoint(p)));
+	BMessage *msg = Window()->CurrentMessage();
+	uint32 buttons = msg->FindInt32("buttons");
+	object = ((GLObject*)fObjects.ItemAt(ObjectAtPoint(point)));
 
-	long locks = 0;
-	
-	while (Window()->IsLocked()) {
-		locks++;
-		Window()->Unlock();
-	}
-
-	if (buttons == B_SECONDARY_MOUSE_BUTTON) {
-		if (o) {
-			while (buttons) {
-				lastDx = np.x - op.x;
-				lastDy = np.y - op.y;
-				
-				if (lastDx || lastDy) {
-					float xinc = (lastDx * 2 * displayScale / bounds.Width());
-					float yinc = (-lastDy * 2 * displayScale / bounds.Height());
-					float zinc = 0;
-					
-					if (fPersp) {
-						zinc = yinc * (o->z / displayScale);
-						xinc *= -(o->z * 4 / zRatio);
-						yinc *= -(o->z * 4 / zRatio);
-					}
-					o->x += xinc;
-					mods = modifiers();
-					if (mods & B_SHIFT_KEY)
-						o->z += zinc;
-					else
-			  			o->y += yinc;
-					op = np;
-					fForceRedraw = true;
-					setEvent(drawEvent);
-				}
-
-				snooze(25000);
-
-				Window()->Lock();
-				GetMouse(&np, &buttons, true);
-				Window()->Unlock();
-			}
+	if (object != NULL){
+		if (buttons == B_PRIMARY_MOUSE_BUTTON || buttons == B_SECONDARY_MOUSE_BUTTON) {
+			fTrackingInfo.pickedObject = object;
+			fTrackingInfo.buttons = buttons;
+			fTrackingInfo.isTracking = true;				
+			fTrackingInfo.lastX = point.x;
+			fTrackingInfo.lastY = point.y;	
+			fTrackingInfo.lastDx = 0.0f;
+			fTrackingInfo.lastDy = 0.0f;	
+			fTrackingInfo.pickedObject->spinX = 0.0f;
+			fTrackingInfo.pickedObject->spinY = 0.0f;		
+			
+			SetMouseEventMask(B_POINTER_EVENTS,
+						B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);	
+		} else {				
+			ConvertToScreen(&point);			
+			object->MenuInvoked(point);		
 		}
-	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-		float llx = 0, lly = 0;
-		lastDx = lastDy = 0;
+	}	
+}
+
+
+void
+ObjectView::MouseUp(BPoint point)
+{
+	if (fTrackingInfo.isTracking) {
 		
-		if (o) {
-			o->spinX = 0;
-			o->spinY = 0;
-			while (buttons) {
-				llx = lastDx;
-				lly = lastDy;
-				lastDx = np.x - op.x;
-				lastDy = np.y - op.y;
+		//spin the teapot on release, TODO: use a marching sum and divide by time
+		if (fTrackingInfo.buttons == B_PRIMARY_MOUSE_BUTTON 
+			&& fTrackingInfo.pickedObject != NULL 
+			&& (fabs(fTrackingInfo.lastDx) > 1.0f 
+				|| fabs(fTrackingInfo.lastDy) > 1.0f) ) {	
+												
+			fTrackingInfo.pickedObject->spinX = 0.5f * fTrackingInfo.lastDy;
+			fTrackingInfo.pickedObject->spinY = 0.5f * fTrackingInfo.lastDx;		
+						
+			setEvent(drawEvent);				
+		}
+		
+		//stop tracking
+		fTrackingInfo.isTracking = false;
+		fTrackingInfo.buttons = 0;
+		fTrackingInfo.pickedObject = NULL;
+		fTrackingInfo.lastX = 0.0f;
+		fTrackingInfo.lastY = 0.0f;
+		fTrackingInfo.lastDx = 0.0f;
+		fTrackingInfo.lastDy = 0.0f;
+	}	
+}
+
+
+void
+ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
+{
+	if (fTrackingInfo.isTracking && fTrackingInfo.pickedObject != NULL) {
+		
+		float dx = point.x - fTrackingInfo.lastX;
+		float dy = point.y - fTrackingInfo.lastY;
+		fTrackingInfo.lastX = point.x;
+		fTrackingInfo.lastY = point.y;
 				
-				if (lastDx || lastDy) {
-					o->rotY += lastDx;
-					o->rotX += lastDy;
-					op = np;
-					setEvent(drawEvent);
-				}
-
-				snooze(25000);
-
-				Window()->Lock();
-				GetMouse(&np, &buttons, true);
-				Window()->Unlock();
+		if (fTrackingInfo.buttons == B_PRIMARY_MOUSE_BUTTON) {
+								
+			fTrackingInfo.pickedObject->spinX = 0;
+			fTrackingInfo.pickedObject->spinY = 0;
+			fTrackingInfo.pickedObject->rotY += dx;
+			fTrackingInfo.pickedObject->rotX += dy;
+			fTrackingInfo.lastDx = dx;
+			fTrackingInfo.lastDy = dy;			
+			
+			setEvent(drawEvent);	
+			
+		} else if (fTrackingInfo.buttons == B_SECONDARY_MOUSE_BUTTON) {			
+			
+			float xinc = (dx * 2 * displayScale / Bounds().Width());
+			float yinc = (-dy * 2 * displayScale / Bounds().Height());
+			float zinc = 0;
+			
+			if (fPersp) {
+				zinc = yinc * (fTrackingInfo.pickedObject->z / displayScale);
+				xinc *= -(fTrackingInfo.pickedObject->z * 4 / zRatio);
+				yinc *= -(fTrackingInfo.pickedObject->z * 4 / zRatio);
 			}
-			o->spinY = lastDx + llx;
-			o->spinX = lastDy + lly;
-		}
-	} else {
-		if (o) {
-			BPoint point = p;
-			Window()->Lock();
-			ConvertToScreen(&point);
-			Window()->Unlock();
-			o->MenuInvoked(point);
-		}
-	}
-
-	while (locks--)
-		Window()->Lock();
-	
-	setEvent(drawEvent);
+			
+			fTrackingInfo.pickedObject->x += xinc;			
+			if (modifiers() & B_SHIFT_KEY)
+				fTrackingInfo.pickedObject->z += zinc;
+			else
+	  			fTrackingInfo.pickedObject->y += yinc;
+			
+			fForceRedraw = true;
+			setEvent(drawEvent);									
+		} 
+	}	
 }
 
 

@@ -33,6 +33,17 @@ enum lights {
 #define HISTSIZE 10
 
 class ResScroll;
+class GLObject;
+
+struct TrackingInfo {
+	float			lastX;
+	float			lastY;
+	float			lastDx;
+	float			lastDy;	
+	bool			isTracking;
+	GLObject		*pickedObject;
+	uint32			buttons;
+};
 
 class ObjectView : public BGLView {
 	public:
@@ -41,6 +52,9 @@ class ObjectView : public BGLView {
 						~ObjectView();
 
 		virtual	void	MouseDown(BPoint p);
+		virtual	void	MouseUp(BPoint p);
+		virtual	void	MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
+		
 		virtual	void	MessageReceived(BMessage* msg);
 		virtual	void	AttachedToWindow();
 		virtual	void	DetachedFromWindow();
@@ -69,6 +83,7 @@ class ObjectView : public BGLView {
 		bool			fLastFog, fFog, fForceRedraw;
 		float			fLastYXRatio, fYxRatio, fFpsHistory[HISTSIZE];
 		float			fObjectDistance,fLastObjectDistance;
+		TrackingInfo	fTrackingInfo;		
 };
 
 #endif // OBJECT_VIEW_H
