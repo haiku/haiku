@@ -59,7 +59,7 @@ static int sDevice;
 static multi_channel_info sChannelInfo[MAX_CHANNELS];
 static multi_description sDescription;
 static uint32 sRate = B_SR_48000;
-static uint32 sFormat = B_FMT_32BIT;//B_FMT_FLOAT;//B_FMT_16BIT;
+static uint32 sFormat = B_FMT_32BIT;
 static uint32 sEnabledChannels = ~0;
 
 
@@ -169,6 +169,21 @@ do_rate(int argc, char** argv)
 static void
 do_format(int argc, char** argv)
 {
+	int32 i = -1;
+	if (argc == 2)
+		i = strtoll(argv[1], NULL, 0);
+
+	if (i < 1 || i > (int32)(sizeof(kFormats) / sizeof(kFormats[0]))) {
+		if (argc == 2)
+			fprintf(stderr, "Invalid format: %ld\n", i);
+
+		for (uint32 i = 0; i < sizeof(kFormats) / sizeof(kFormats[0]); i++) {
+			printf("[%ld] %s\n", i + 1, kFormats[i].name);
+		}
+	} else {
+		sFormat = kFormats[i - 1].type;
+	}
+
 	printf("Current sample format is %s (0x%lx)\n", get_format_name(sFormat),
 		sFormat);
 }
@@ -215,6 +230,9 @@ do_desc(int argc, char** argv)
 static void
 do_channels(int argc, char** argv)
 {
+	if (argc == 2)
+		sEnabledChannels = strtoul(argv[1], NULL, 0);
+
 	uint32 enabled = ((1 << channel_count()) - 1) & sEnabledChannels;
 
 	printf("%ld channels:\n  ", channel_count());
@@ -223,40 +241,16 @@ do_channels(int argc, char** argv)
 		enabled >>= 1;
 	}
 	putchar('\n');
-
-/*
-	sEnabledChannels = enabled;
-
-	multi_channel_enable channelEnable;
-	uint32 enabled;
-
-	channelEnable.info_size = sizeof(multi_channel_enable);
-	channelEnable.enable_bits = (uchar*)&enabled;
-
-	if (ioctl(sDevice, B_MULTI_GET_ENABLED_CHANNELS, &channelEnable,
-			sizeof(channelEnable)) < B_OK) {
-		fprintf(stderr, "Failed on B_MULTI_GET_ENABLED_CHANNELS: %s\n",
-			strerror(errno));
-		return;
-	}
-
-
-	multi_channel_enable channelEnable;
-	uint32 enabled = ((1 << channel_count()) - 1) & sEnabledChannels;
-
-	channelEnable.lock_source = B_MULTI_LOCK_INTERNAL;
-	if (ioctl(sDevice, B_MULTI_SET_ENABLED_CHANNELS, &channelEnable,
-			sizeof(multi_channel_enable)) < B_OK) {
-		fprintf(stderr, "Setting enabled channels failed: %s\n",
-			strerror(errno));
-	}
-*/
 }
 
 
 static void
 do_play(int argc, char** argv)
 {
+	uint32 playMask = 0xffffffff;
+	if (argc == 2)
+		playMask = strtoul(argv[1], NULL, 0);
+
 	multi_channel_enable channelEnable;
 	uint32 enabled = ((1 << channel_count()) - 1) & sEnabledChannels;
 
@@ -322,30 +316,28 @@ do_play(int argc, char** argv)
 	printf("playback: buffer count %ld, channels %ld, buffer size %ld\n",
 		bufferList.return_playback_buffers, bufferList.return_playback_channels,
 		bufferList.return_playback_buffer_size);
+	for (int32 channel = 0; channel < bufferList.return_playback_channels;
+			channel++) {
+		printf("  Channel %ld\n", channel);
+		for (int32 i = 0; i < bufferList.return_playback_buffers; i++) {
+			printf("    [%ld] buffer %p, stride %ld\n", i,
+				bufferList.playback_buffers[i][channel].base,
+				bufferList.playback_buffers[i][channel].stride);
+		}
+	}
+
 	printf("record: buffer count %ld, channels %ld, buffer size %ld\n",
 		bufferList.return_record_buffers, bufferList.return_record_channels,
 		bufferList.return_record_buffer_size);
-
-	// fill buffers with data
-
-	for (int32 i = 0; i < bufferList.return_playback_buffers; i++) {
-		size_t stride = bufferList.playback_buffers[i][0].stride;
-		for (int32 channel = 0; channel < sDescription.output_channel_count;
-				channel++) {
-			char* dest = bufferList.playback_buffers[i][channel].base;
-			for (uint32 frame = 0;
-					frame < bufferList.return_playback_buffer_size; frame++) {
-				set_frame(dest, formatInfo.output.format, sin(frame / 1000.0));
-				dest += stride;
-			}
-		}
-	}
 
 	multi_buffer_info bufferInfo;
 	memset(&bufferInfo, 0, sizeof(multi_buffer_info));
 	bufferInfo.info_size = sizeof(multi_buffer_info);
 
 	bigtime_t startTime = system_time();
+	uint32 exchanged = 0;
+	uint32 cycle = ~0;
+	uint32 x = 0;
 	while (true) {
 		if (system_time() - startTime > 1000000LL)
 			break;
@@ -355,9 +347,36 @@ do_play(int argc, char** argv)
 			printf("Getting buffers failed: %s\n", strerror(errno));
 		}
 
-		bufferInfo.playback_buffer_cycle = (bufferInfo.playback_buffer_cycle + 1)
-			% bufferList.request_playback_buffers;
+		// fill buffer with data
+
+		// Note: hmulti-audio drivers may actually return more than once
+		// per buffer...
+		if (cycle == bufferInfo.playback_buffer_cycle
+			&& bufferList.return_playback_buffers != 1)
+			continue;
+
+		cycle = bufferInfo.playback_buffer_cycle;
+
+		size_t stride = bufferList.playback_buffers[cycle][0].stride;
+		for (int32 channel = 0; channel < bufferList.return_playback_channels;
+				channel++) {
+			if (((1 << channel) & playMask) == 0)
+				continue;
+
+			char* dest = bufferList.playback_buffers[cycle][channel].base;
+			for (uint32 frame = 0;
+					frame < bufferList.return_playback_buffer_size; frame++) {
+				set_frame(dest, formatInfo.output.format, sin((x + frame) / 32.0));
+				dest += stride;
+			}
+		}
+
+		x += bufferList.return_playback_buffer_size;
+		exchanged++;
 	}
+
+	printf("%ld buffers exchanged while playing (%lu frames played (%lu)).\n",
+		exchanged, x, bufferInfo.played_frames_count);
 
 	// clear buffers
 
