@@ -28,7 +28,7 @@ static status_t
 std_ops(int32 op, ...)
 {
 	void *handle;
-	bool load = true;//false;
+	bool load = false;
 
 	switch (op) {
 	case B_MODULE_INIT:

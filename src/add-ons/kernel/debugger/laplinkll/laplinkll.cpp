@@ -43,23 +43,25 @@ enum {
 	st_error
 };
 
+static isa_module_info *sISAModule;
+
 #pragma mark // raw access
 
 static inline uint8 read_status(uint32 port)
 {
 	uint8 val;
-	val = read_io_8(port+1);
+	val = sISAModule->read_io_8(port+1);
 	return val;
 }
 
 static inline void write_control(uint32 port, uint8 val)
 {
-	write_io_8(port+2, val);
+	sISAModule->write_io_8(port+2, val);
 }
 
 static inline void write_data(uint32 port, uint8 val)
 {
-	write_io_8(port, val);
+	sISAModule->write_io_8(port, val);
 }
 
 #pragma mark // framing
@@ -381,7 +383,7 @@ static char *laplink_in_ptr;
 static size_t laplink_in_avail;
 static char laplink_out_buf[BUFFSZ];
 
-
+//XXX: cleanup
 static status_t debug_init_laplink(void *kernel_settings)
 {
 	(void)kernel_settings;
@@ -415,7 +417,7 @@ static int debug_write_laplink(int f, const char *buf, int count)
 	tries = 5;
 	do {
 		len = count;
-		err = ll_send_frame(&llst, buf, &len);
+		err = ll_send_frame(&llst, (const uint8 *)buf, &len);
 	} while (err && tries--);
 	if (err)
 		return 0;
@@ -428,7 +430,7 @@ static int debug_read_laplink(void)
 	while (laplink_in_avail < 1) {
 		laplink_in_avail = BUFFSZ;
 		laplink_in_ptr = laplink_in_buf;
-		err = ll_wait_frame(&llst, laplink_in_buf, &laplink_in_avail);
+		err = ll_wait_frame(&llst, (uint8 *)laplink_in_buf, &laplink_in_avail);
 		if (err)
 			laplink_in_avail = 0;
 	}
@@ -437,13 +439,55 @@ static int debug_read_laplink(void)
 }
 
 
-kdebug_io_handler laplink_debug_io = {
-	"laplink",
-	debug_init_laplink,
-	debug_write_laplink,
-	debug_read_laplink,
+static int
+debugger_puts(const char *s, int32 length)
+{
+	return debug_write_laplink(0, s, (int)length);
+}
+
+
+static status_t
+std_ops(int32 op, ...)
+{
+	void *handle;
+	bool load = true;//false;
+
+	switch (op) {
+	case B_MODULE_INIT:
+		handle = load_driver_settings("kernel");
+		if (handle) {
+			load = get_driver_boolean_parameter(handle,
+				"laplinkll_debug_output", load, true);
+			unload_driver_settings(handle);
+		}
+		if (load) {
+			if (get_module(B_ISA_MODULE_NAME, (module_info **)&sISAModule) < B_OK)
+				return B_ERROR;
+			debug_init_laplink(NULL);
+		}
+		return load ? B_OK : B_ERROR;
+	case B_MODULE_UNINIT:
+		put_module(B_ISA_MODULE_NAME);
+		return B_OK;
+	}
+	return B_BAD_VALUE;
+}
+
+
+static struct debugger_module_info sModuleInfo = {
+	{
+		"debugger/laplinkll/v1",
+		0,
+		&std_ops
+	},
 	NULL,
 	NULL,
+	debugger_puts,
+	NULL
+};
+
+module_info *modules[] = { 
+	(module_info *)&sModuleInfo,
 	NULL
 };
 
