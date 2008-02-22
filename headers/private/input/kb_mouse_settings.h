@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KB_MOUSE_SETTINGS_H
@@ -15,7 +15,7 @@ typedef struct {
 } kb_settings;
 
 #define kb_default_key_repeat_delay 500000
-#define kb_default_key_repeat_rate	200
+#define kb_default_key_repeat_rate	250
 
 #define kb_settings_file "Keyboard_settings"
 
