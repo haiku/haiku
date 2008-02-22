@@ -2,24 +2,15 @@ SubDir HAIKU_TOP src add-ons translators png ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UseLibraryHeaders zlib ;
-UseLibraryHeaders png ;
-
-# Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+UseLibraryHeaders png zlib ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 Translator PNGTranslator : 
-	# shared classes
-	BaseTranslator.cpp
-	TranslatorSettings.cpp
-	TranslatorWindow.cpp	
-
-	# PNGTranslator classes
 	PNGMain.cpp
 	PNGTranslator.cpp
 	PNGView.cpp
 
-	: be translation libpng.a z
+	: be translation libpng.a z libtranslatorsutils.a
 	: true
 ;
 

@@ -5,8 +5,7 @@ SubDirSysHdrs [ FDirName $(SUBDIR) openexr iex ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) openexr ilmimf ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) openexr imath ] ;
 
-# Include code from shared translator directory
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 Translator EXRTranslator :
 	main.cpp
@@ -14,13 +13,7 @@ Translator EXRTranslator :
 	EXRGamma.cpp
 	EXRTranslator.cpp
 	IStreamWrapper.cpp
-
-	# shared classes
-	BaseTranslator.cpp
-	TranslatorSettings.cpp
-	TranslatorWindow.cpp
-
-	: be translation libilmimf.so $(TARGET_LIBSTDC++)
+	: be translation libilmimf.so $(TARGET_LIBSTDC++) libtranslatorsutils.a
 	: true
 ;
 

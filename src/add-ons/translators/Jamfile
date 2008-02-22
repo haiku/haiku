@@ -13,6 +13,7 @@ SubInclude HAIKU_TOP src add-ons translators ppm ;
 SubInclude HAIKU_TOP src add-ons translators raw ;
 SubInclude HAIKU_TOP src add-ons translators rtf ;
 SubInclude HAIKU_TOP src add-ons translators sgi ;
+SubInclude HAIKU_TOP src add-ons translators shared ;
 SubInclude HAIKU_TOP src add-ons translators stxt ;
 SubInclude HAIKU_TOP src add-ons translators tga ;
 SubInclude HAIKU_TOP src add-ons translators tiff ;

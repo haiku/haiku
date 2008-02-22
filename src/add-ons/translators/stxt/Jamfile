@@ -6,21 +6,13 @@ UsePrivateHeaders textencoding ;
 UseHeaders [ FDirName $(HAIKU_TOP) src servers registrar ] ;
 	# for the text identification
 
-# Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 Translator STXTTranslator :
-	# shared classes
-	BaseTranslator.cpp
-	TranslatorSettings.cpp
-	TranslatorWindow.cpp
-
-	# STXTTranslator classes
 	STXTMain.cpp
 	STXTTranslator.cpp
 	STXTView.cpp
-
-	: be translation libtextencoding.so
+	: be translation libtextencoding.so libtranslatorsutils.a
 	: true
 ;
 

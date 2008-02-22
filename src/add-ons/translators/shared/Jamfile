@@ -1,0 +1,10 @@
+SubDir HAIKU_TOP src add-ons translators shared ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary libtranslatorsutils.a :
+	BaseTranslator.cpp
+	StreamBuffer.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+	;

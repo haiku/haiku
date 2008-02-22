@@ -2,22 +2,15 @@ SubDir HAIKU_TOP src add-ons translators sgi ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 Translator SGITranslator :
-	# shared classes
-	BaseTranslator.cpp
-	TranslatorSettings.cpp
-	TranslatorWindow.cpp
-
-	# SGITranslator classes
 	SGIImage.cpp
 	SGIMain.cpp
 	SGITranslator.cpp
 	SGIView.cpp
 
-	: be translation
+	: be translation libtranslatorsutils.a
 	: true
 ;
 

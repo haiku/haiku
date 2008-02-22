@@ -4,8 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders zlib ;
 
-# Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 local tiff_files =
 	# libtiff
@@ -50,17 +49,12 @@ ObjectCcFlags [ FGristFiles $(tiff_files:S=$(SUFOBJ)) ] : -w ;
 Translator TIFFTranslator : 
 	[ FGristFiles $(tiff_files:S=$(SUFOBJ)) ]
 
-	# shared classes
-	BaseTranslator.cpp
-	TranslatorSettings.cpp
-	TranslatorWindow.cpp
-
 	# TIFFTranslator classes
 	TIFFMain.cpp
 	TIFFTranslator.cpp
 	TIFFView.cpp
 
-	: be translation z
+	: be translation z libtranslatorsutils.a
 	: true
 ;
 

@@ -2,22 +2,13 @@ SubDir HAIKU_TOP src add-ons translators tga ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# Include BaseTranslator code from shared directory
-SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons translators shared ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) shared ] ;
 
 Translator TGATranslator :
-	# shared classes
-	BaseTranslator.cpp
-	TranslatorSettings.cpp
-	TranslatorWindow.cpp
-	StreamBuffer.cpp
-
-	# TGATranslator classes
 	TGAMain.cpp
 	TGATranslator.cpp
 	TGAView.cpp
-
-	: be translation
+	: be translation libtranslatorsutils.a
 	: true
 ;
 
