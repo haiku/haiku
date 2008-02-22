@@ -4,6 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "StreamBuffer.h"
 #include "PCX.h"
 #include "PCXTranslator.h"
 
@@ -69,7 +70,7 @@ pcx_header::SwapFromHost()
 
 
 static status_t
-convert_data_to_bits(pcx_header &header, BPositionIO &source,
+convert_data_to_bits(pcx_header &header, StreamBuffer &source,
 	BPositionIO &target)
 {
 	uint16 bitsPerPixel = header.bitsPerPixel;
@@ -224,8 +225,12 @@ PCX::identify(BMessage *settings, BPositionIO &stream, uint8 &type, int32 &bitsP
 status_t
 PCX::convert_pcx_to_bits(BMessage *settings, BPositionIO &source, BPositionIO &target)
 {
+	StreamBuffer sourceBuf(&source, 2048);
+	if (sourceBuf.InitCheck() != B_OK)
+		return B_IO_ERROR;
+		
 	pcx_header header;
-	if (source.Read(&header, sizeof(pcx_header)) != (ssize_t)sizeof(pcx_header))
+	if (sourceBuf.Read(&header, sizeof(pcx_header)) != (ssize_t)sizeof(pcx_header))
 		return B_BAD_VALUE;
 
 	header.SwapToHost();
@@ -253,5 +258,5 @@ PCX::convert_pcx_to_bits(BMessage *settings, BPositionIO &source, BPositionIO &t
 	swap_data(B_UINT32_TYPE, &bitsHeader, sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN);
 	target.Write(&bitsHeader, sizeof(TranslatorBitmap));
 
-	return convert_data_to_bits(header, source, target);
+	return convert_data_to_bits(header, sourceBuf, target);
 }

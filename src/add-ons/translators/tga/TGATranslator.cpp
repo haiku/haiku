@@ -1640,7 +1640,7 @@ TGATranslator::translate_from_tganmrle_to_bits(BPositionIO *inSource,
 	memset(bitsRowData, 0xff, bitsRowBytes);
 	uint8 *pbitspixel = bitsRowData;
 	uint8 packethead;
-	StreamBuffer sbuf(inSource, TGA_STREAM_BUFFER_SIZE, true);
+	StreamBuffer sbuf(inSource, TGA_STREAM_BUFFER_SIZE);
 	ssize_t rd = 0;
 	if (sbuf.InitCheck() == B_OK)
 		rd = sbuf.Read(&packethead, 1);
@@ -1945,7 +1945,7 @@ TGATranslator::translate_from_tgamrle_to_bits(BPositionIO *inSource,
 	memset(bitsRowData, 0xff, bitsRowBytes);
 	uint8 *pbitspixel = bitsRowData;
 	uint8 packethead;
-	StreamBuffer sbuf(inSource, TGA_STREAM_BUFFER_SIZE, true);
+	StreamBuffer sbuf(inSource, TGA_STREAM_BUFFER_SIZE);
 	ssize_t rd = 0;
 	if (sbuf.InitCheck() == B_OK)
 		rd = sbuf.Read(&packethead, 1);

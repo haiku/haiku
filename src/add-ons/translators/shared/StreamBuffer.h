@@ -1,34 +1,11 @@
-/*****************************************************************************/
-// StreamBuffer
-// Written by Michael Wilber, Haiku Translation Kit Team
-//
-// StreamBuffer.h
-//
-// This class is for buffering data from a BPositionIO object in order to
-// improve performance for cases when small amounts of data are frequently
-// read from a BPositionIO object.
-//
-//
-// Copyright (c) 2003 Haiku, Inc.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a
-// copy of this software and associated documentation files (the "Software"),
-// to deal in the Software without restriction, including without limitation
-// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-// and/or sell copies of the Software, and to permit persons to whom the 
-// Software is furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included 
-// in all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
-/*****************************************************************************/
+/*
+ * Copyright 2003-2008, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ * 
+ * Authors :
+ *		Michael Wilber
+ *		Jérôme Duval
+ */
 
 #ifndef STREAM_BUFFER_H
 #define STREAM_BUFFER_H
@@ -39,32 +16,37 @@
 
 class StreamBuffer {
 public:
-	StreamBuffer(BPositionIO *pstream, size_t nbuffersize, bool binitialread);
+	StreamBuffer(BPositionIO *stream, size_t bufferSize, bool toRead = true);
 	~StreamBuffer();
 	
 	status_t InitCheck();
 		// Determines whether the constructor failed or not
 	
-	ssize_t Read(uint8 *pinto, size_t nbytes);
+	ssize_t Read(void *buffer, size_t size);
 		// copy nbytes from the stream into pinto
 		
+	void Write(void *buffer, size_t size);
+		// copy nbytes from the stream into pinto
+	
 	bool Seek(off_t position);
 		// seek the stream to the given position
 	
 private:
-	ssize_t ReadStream();
+	ssize_t _ReadStream();
 		// Load the stream buffer from the stream
 
-	BPositionIO *fpStream;
+	BPositionIO *fStream;
 		// stream object this object is buffering
-	uint8 *fpBuffer;
+	uint8 *fBuffer;
 		// buffered data from fpStream
-	size_t fnBufferSize;
+	size_t fBufferSize;
 		// number of bytes of memory allocated for fpBuffer
-	size_t fnLen;
+	size_t fLen;
 		// number of bytes of actual data in fpBuffer
-	size_t fnPos;
+	size_t fPos;
 		// current position in the buffer
+	bool fToRead;
+		// whether the stream is to be read.
 };
 
 #endif
