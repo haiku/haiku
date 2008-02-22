@@ -17,6 +17,7 @@ WebCamMediaAddOn::WebCamMediaAddOn(image_id imid)
 	fRoster(NULL)
 {
 	PRINT((CH "()" CT));
+	fInternalIDCounter = 0;
 	/* Customize these parameters to match those of your node */
 	fMediaFormat.type = B_MEDIA_RAW_VIDEO;
 	fMediaFormat.u.raw_video = media_raw_video_format::wildcard;
@@ -92,7 +93,7 @@ WebCamMediaAddOn::GetFlavorAt(int32 n, const flavor_info **out_info)
 	if (cam && cam->FlavorInfo())
 		*out_info = cam->FlavorInfo();
 	fRoster->Unlock();
-	PRINT((CH ": returning flavor for %d" CT, n));
+	PRINT((CH ": returning flavor for %d, internal_id %d" CT, n, (*out_info)->internal_id));
 	return B_OK;
 }
 
