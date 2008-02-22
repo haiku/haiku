@@ -12,6 +12,7 @@
 #include <arch_cpu.h>
 #include <debug.h>
 #include <kernel.h>
+#include <ksignal.h>
 #include <int.h>
 #include <thread.h>
 #include <tls.h>
@@ -546,7 +547,11 @@ arch_restore_signal_frame(void)
 	atomic_or(&thread->flags, threadFlags
 		& (THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_64_BIT_SYSCALL_RETURN));
 
+	// TODO: Verify that just restoring the old signal mask is right! Bash for
+	// instance changes the procmask in a signal handler. Those changes are
+	// lost the way we do it.
 	atomic_set(&thread->sig_block_mask, signalMask);
+	update_current_thread_signals_flag();
 
 	frame->eip = regs.eip;
 	frame->flags = regs.eflags;

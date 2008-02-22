@@ -29,6 +29,8 @@ extern bool is_kill_signal_pending(void);
 extern int has_signals_pending(void *_thread);
 extern bool is_signal_blocked(int signal);
 
+extern void update_current_thread_signals_flag();
+
 extern int sigaction_etc(thread_id threadID, int signal,
 	const struct sigaction *newAction, struct sigaction *oldAction);
 

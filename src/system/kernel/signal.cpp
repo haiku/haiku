@@ -197,7 +197,7 @@ update_thread_signals_flag(struct thread* thread)
 }
 
 
-static void
+void
 update_current_thread_signals_flag()
 {
 	InterruptsSpinLocker locker(thread_spinlock);
