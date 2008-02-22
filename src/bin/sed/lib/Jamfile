@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src bin sed lib ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 SubDirCcFlags -DHAVE_CONFIG_H -w ;
 SubDirSysHdrs $(SUBDIR) ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;

@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src bin sed sed ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 SubDirCcFlags -I ../lib -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' -w ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
