@@ -1025,7 +1025,8 @@ _dump_thread_info(struct thread *thread)
 		kprintf("(%d)\n", thread->cpu->cpu_num);
 	else
 		kprintf("\n");
-	kprintf("sig_pending:        %#lx\n", thread->sig_pending);
+	kprintf("sig_pending:        %#lx (blocked: %#lx)\n", thread->sig_pending,
+		thread->sig_block_mask);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
 	kprintf("  sem.blocking:     %ld\n", thread->sem.blocking);
 	kprintf("  sem.count:        %ld\n", thread->sem.count);
