@@ -162,6 +162,12 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 			&& (thread->sig_pending & ~thread->sig_block_mask) != 0)
 		|| ((flags & B_KILL_CAN_INTERRUPT)
 			&& (thread->sig_pending & KILL_SIGNALS))) {
+		// remove all of the thread's entries from their variables
+		entry = firstEntry;
+		while (entry) {
+			entry->_Remove();
+			entry = entry->fThreadNext;
+		}
 		return B_INTERRUPTED;
 	}
 
