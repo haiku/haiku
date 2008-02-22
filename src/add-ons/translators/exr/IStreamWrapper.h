@@ -8,6 +8,8 @@
 #include <DataIO.h>
 #include <ImfIO.h>
 
+#include "StreamBuffer.h"
+
 using namespace Imf;
 
 class IStreamWrapper : public IStream {
@@ -20,7 +22,7 @@ class IStreamWrapper : public IStream {
 		virtual void        seekg(Int64 pos);
 		
 	private:
-		BPositionIO *fStream;
+		StreamBuffer fStream;
 };
 
 #endif	/* ISTREAM_WRAPPER_H */

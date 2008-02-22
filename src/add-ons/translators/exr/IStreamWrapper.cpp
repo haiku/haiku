@@ -8,7 +8,7 @@
 
 IStreamWrapper::IStreamWrapper(const char *filename, BPositionIO *stream)
 	: IStream(filename),
-	fStream(stream)
+	fStream(stream, 2048)
 {
 }
 
@@ -21,7 +21,7 @@ IStreamWrapper::~IStreamWrapper()
 bool
 IStreamWrapper::read(char c[/*n*/], int n)
 {
-	int actual = fStream->Read(c, n);
+	int actual = fStream.Read(c, n);
 	if (actual < B_OK) {
 		
 	}
@@ -32,12 +32,12 @@ IStreamWrapper::read(char c[/*n*/], int n)
 Int64
 IStreamWrapper::tellg()
 {
-	return fStream->Position();
+	return fStream.Position();
 }
 
 
 void
 IStreamWrapper::seekg(Int64 pos)
 {
-	fStream->Seek(pos, SEEK_SET);
+	fStream.Seek(pos);
 }

@@ -31,6 +31,8 @@ public:
 	bool Seek(off_t position);
 		// seek the stream to the given position
 	
+	off_t Position();
+		// return the actual position
 private:
 	ssize_t _ReadStream();
 		// Load the stream buffer from the stream

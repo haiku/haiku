@@ -202,6 +202,33 @@ StreamBuffer::Seek(off_t position)
 	return false;
 }
 
+
+// ---------------------------------------------------------------
+// Position
+//
+// Returns the current position in the stream.
+//
+// Preconditions: fBuffer must be allocated and fBufferSize
+// must be valid
+//
+// Parameters:	
+//
+// Postconditions:
+//
+// Returns: the position
+// ---------------------------------------------------------------
+off_t
+StreamBuffer::Position()
+{
+	off_t position = fStream->Position();
+	if (fToRead)
+		position -= fPos;
+	else
+		position += fLen;
+	return position;
+}
+
+
 // ---------------------------------------------------------------
 // _ReadStream
 //
