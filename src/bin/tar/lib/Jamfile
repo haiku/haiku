@@ -10,54 +10,90 @@ SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 
 
 StaticLibrary libtar.a : 
-	addext.c
-#	alloca.c
 	argmatch.c
+	argp-eexst.c
+	argp-fmtstream.c
+	argp-help.c
+	argp-parse.c
+	argp-pin.c
+	argp-pvh.c
+	argp-xinl.c
 	backupfile.c
 	basename.c
+	chdir-long.c
 	chown.c
+	close-stream.c
+	closeout.c
 	dirname.c
+	dup-safer.c
 	error.c
 	exclude.c
 	exitfail.c
+	fd-safer.c
 	fileblocks.c
+	fnmatch.c
+	fpending.c
 	ftruncate.c
 	full-write.c
 	getdate.c
 	getline.c
-	getndelim2.c
 	getopt.c
 	getopt1.c
+	gettime.c
 	hash.c
 	human.c
+	imaxtostr.c
 	lchown.c
 	malloc.c
+	mbscasecmp.c
+	mempcpy.c
+	memrchr.c
 	memset.c
+	mkdtemp.c
 	mktime.c
 	modechange.c
 	obstack.c
+	offtostr.c
+	open-safer.c
+	openat.c
+	openat-die.c
+	openat-proc.c
+	paxerror.c
+	paxexit.c
+	paxnames.c
 	prepargs.c
 	quote.c
 	quotearg.c
 	realloc.c
 	rmdir.c
+	rpmatch.c
+	rtapelib.c
 	safe-read.c
 	safe-write.c
 	save-cwd.c
 	savedir.c
+	stdopen.c
 	stpcpy.c
 	strcasecmp.c
 	stripslash.c
 	strncasecmp.c
+	strndup.c
 	strtol.c
 	strtoul.c
 	strtoull.c
+	tempname.c
 	time_r.c
+	umaxtostr.c
+	unlinkdir.c
 	utime.c
+	utimens.c
+	version-etc.c
+	version-etc-fsf.c
 	waitpid.c
+	xalloc-die.c
 	xgetcwd.c
 	xmalloc.c
-	xstrdup.c
+	xstrndup.c
 	xstrtol.c
 	xstrtoul.c
 	xstrtoumax.c

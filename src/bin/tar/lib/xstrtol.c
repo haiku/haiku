@@ -1,7 +1,7 @@
 /* A more useful interface to strtol.
 
-   Copyright (C) 1995, 1996, 1998, 1999, 2000, 2001, 2003 Free
-   Software Foundation, Inc.
+   Copyright (C) 1995, 1996, 1998, 1999, 2000, 2001, 2003, 2004, 2005,
+   2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,13 +15,9 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Jim Meyering. */
-
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
 
 #ifndef __strtol
 # define __strtol strtol
@@ -31,51 +27,22 @@
 # define STRTOL_T_MAXIMUM LONG_MAX
 #endif
 
+#include <config.h>
+
+#include "xstrtol.h"
+
 /* Some pre-ANSI implementations (e.g. SunOS 4)
    need stderr defined if assertion checking is enabled.  */
 #include <stdio.h>
 
 #include <assert.h>
 #include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
-
-#include <limits.h>
-
-/* The extra casts work around common compiler bugs.  */
-#define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
-#define TYPE_MINIMUM(t) ((t) (TYPE_SIGNED (t) \
-			      ? ~ (t) 0 << (sizeof (t) * CHAR_BIT - 1) \
-			      : (t) 0))
-#define TYPE_MAXIMUM(t) ((t) (~ (t) 0 - TYPE_MINIMUM (t)))
-
-#ifndef STRTOL_T_MINIMUM
-# define STRTOL_T_MINIMUM TYPE_MINIMUM (__strtol_t)
-# define STRTOL_T_MAXIMUM TYPE_MAXIMUM (__strtol_t)
-#endif
-
-#if defined (STDC_HEADERS) || (!defined (isascii) && !defined (HAVE_ISASCII))
-# define IN_CTYPE_DOMAIN(c) 1
-#else
-# define IN_CTYPE_DOMAIN(c) isascii(c)
-#endif
-
-#define ISSPACE(c) (IN_CTYPE_DOMAIN (c) && isspace (c))
-
-#include "xstrtol.h"
-
-#if !HAVE_DECL_STRTOIMAX && !defined strtoimax
-intmax_t strtoimax ();
-#endif
-
-#if !HAVE_DECL_STRTOUMAX && !defined strtoumax
-uintmax_t strtoumax ();
-#endif
+#include "intprops.h"
 
 static strtol_error
 bkm_scale (__strtol_t *x, int scale_factor)
@@ -121,9 +88,10 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
   if (! TYPE_SIGNED (__strtol_t))
     {
       const char *q = s;
-      while (ISSPACE ((unsigned char) *q))
-	++q;
-      if (*q == '-')
+      unsigned char ch = *q;
+      while (isspace (ch))
+	ch = *++q;
+      if (ch == '-')
 	return LONGINT_INVALID;
     }
 
@@ -259,37 +227,3 @@ __xstrtol (const char *s, char **ptr, int strtol_base,
   *val = tmp;
   return err;
 }
-
-#ifdef TESTING_XSTRTO
-
-# include <stdio.h>
-# include "error.h"
-
-char *program_name;
-
-int
-main (int argc, char **argv)
-{
-  strtol_error s_err;
-  int i;
-
-  program_name = argv[0];
-  for (i=1; i<argc; i++)
-    {
-      char *p;
-      __strtol_t val;
-
-      s_err = __xstrtol (argv[i], &p, 0, &val, "bckmw");
-      if (s_err == LONGINT_OK)
-	{
-	  printf ("%s->%lu (%s)\n", argv[i], val, p);
-	}
-      else
-	{
-	  STRTOL_FATAL_ERROR (argv[i], "arg", s_err);
-	}
-    }
-  exit (0);
-}
-
-#endif /* TESTING_XSTRTO */

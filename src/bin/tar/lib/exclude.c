@@ -1,7 +1,7 @@
 /* exclude.c -- exclude file names
 
-   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003 Free
-   Software Foundation, Inc.
+   Copyright (C) 1992, 1993, 1994, 1997, 1999, 2000, 2001, 2002, 2003,
+   2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,21 +16,16 @@
    You should have received a copy of the GNU General Public License
    along with this program; see the file COPYING.
    If not, write to the Free Software Foundation,
-   59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert <eggert@twinsun.com>  */
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <stdbool.h>
 
 #include <ctype.h>
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,37 +33,28 @@ extern int errno;
 
 #include "exclude.h"
 #include "fnmatch.h"
-#include "unlocked-io.h"
 #include "xalloc.h"
+#include "verify.h"
 
-#if STDC_HEADERS || (! defined isascii && ! HAVE_ISASCII)
-# define IN_CTYPE_DOMAIN(c) true
-#else
-# define IN_CTYPE_DOMAIN(c) isascii (c)
+#if USE_UNLOCKED_IO
+# include "unlocked-io.h"
 #endif
-
-static inline bool
-is_space (unsigned char c)
-{
-  return IN_CTYPE_DOMAIN (c) && isspace (c);
-}
-
-/* Verify a requirement at compile-time (unlike assert, which is runtime).  */
-#define verify(name, assertion) struct name { char a[(assertion) ? 1 : -1]; }
 
 /* Non-GNU systems lack these options, so we don't need to check them.  */
 #ifndef FNM_CASEFOLD
 # define FNM_CASEFOLD 0
 #endif
+#ifndef FNM_EXTMATCH
+# define FNM_EXTMATCH 0
+#endif
 #ifndef FNM_LEADING_DIR
 # define FNM_LEADING_DIR 0
 #endif
 
-verify (EXCLUDE_macros_do_not_collide_with_FNM_macros,
-	(((EXCLUDE_ANCHORED | EXCLUDE_INCLUDE | EXCLUDE_WILDCARDS)
-	  & (FNM_PATHNAME | FNM_NOESCAPE | FNM_PERIOD | FNM_LEADING_DIR
-	     | FNM_CASEFOLD))
-	 == 0));
+verify (((EXCLUDE_ANCHORED | EXCLUDE_INCLUDE | EXCLUDE_WILDCARDS)
+	 & (FNM_PATHNAME | FNM_NOESCAPE | FNM_PERIOD | FNM_LEADING_DIR
+	    | FNM_CASEFOLD | FNM_EXTMATCH))
+	== 0);
 
 /* An exclude pattern-options pair.  The options are fnmatch options
    ORed with EXCLUDE_* options.  */
@@ -113,14 +99,12 @@ fnmatch_no_wildcards (char const *pattern, char const *f, int options)
 {
   if (! (options & FNM_LEADING_DIR))
     return ((options & FNM_CASEFOLD)
-	    ? strcasecmp (pattern, f)
+	    ? mbscasecmp (pattern, f)
 	    : strcmp (pattern, f));
-  else
+  else if (! (options & FNM_CASEFOLD))
     {
       size_t patlen = strlen (pattern);
-      int r = ((options & FNM_CASEFOLD)
-		? strncasecmp (pattern, f, patlen)
-		: strncmp (pattern, f, patlen));
+      int r = strncmp (pattern, f, patlen);
       if (! r)
 	{
 	  r = f[patlen];
@@ -129,12 +113,54 @@ fnmatch_no_wildcards (char const *pattern, char const *f, int options)
 	}
       return r;
     }
+  else
+    {
+      /* Walk through a copy of F, seeing whether P matches any prefix
+	 of F.
+
+	 FIXME: This is an O(N**2) algorithm; it should be O(N).
+	 Also, the copy should not be necessary.  However, fixing this
+	 will probably involve a change to the mbs* API.  */
+
+      char *fcopy = xstrdup (f);
+      char *p;
+      int r;
+      for (p = fcopy; ; *p++ = '/')
+	{
+	  p = strchr (p, '/');
+	  if (p)
+	    *p = '\0';
+	  r = mbscasecmp (pattern, fcopy);
+	  if (!p || r <= 0)
+	    break;
+	}
+      free (fcopy);
+      return r;
+    }
+}
+
+bool
+exclude_fnmatch (char const *pattern, char const *f, int options)
+{
+  int (*matcher) (char const *, char const *, int) =
+    (options & EXCLUDE_WILDCARDS
+     ? fnmatch
+     : fnmatch_no_wildcards);
+  bool matched = ((*matcher) (pattern, f, options) == 0);
+  char const *p;
+
+  if (! (options & EXCLUDE_ANCHORED))
+    for (p = f; *p && ! matched; p++)
+      if (*p == '/' && p[1] != '/')
+	matched = ((*matcher) (pattern, p + 1, options) == 0);
+
+  return matched;
 }
 
 /* Return true if EX excludes F.  */
 
 bool
-excluded_filename (struct exclude const *ex, char const *f)
+excluded_file_name (struct exclude const *ex, char const *f)
 {
   size_t exclude_count = ex->exclude_count;
 
@@ -156,21 +182,7 @@ excluded_filename (struct exclude const *ex, char const *f)
 	  char const *pattern = exclude[i].pattern;
 	  int options = exclude[i].options;
 	  if (excluded == !! (options & EXCLUDE_INCLUDE))
-	    {
-	      int (*matcher) (char const *, char const *, int) =
-		(options & EXCLUDE_WILDCARDS
-		 ? fnmatch
-		 : fnmatch_no_wildcards);
-	      bool matched = ((*matcher) (pattern, f, options) == 0);
-	      char const *p;
-
-	      if (! (options & EXCLUDE_ANCHORED))
-		for (p = f; *p && ! matched; p++)
-		  if (*p == '/' && p[1] != '/')
-		    matched = ((*matcher) (pattern, p + 1, options) == 0);
-
-	      excluded ^= matched;
-	    }
+	    excluded ^= exclude_fnmatch (pattern, f, options);
 	}
 
       return excluded;
@@ -193,17 +205,17 @@ add_exclude (struct exclude *ex, char const *pattern, int options)
   patopts->options = options;
 }
 
-/* Use ADD_FUNC to append to EX the patterns in FILENAME, each with
+/* Use ADD_FUNC to append to EX the patterns in FILE_NAME, each with
    OPTIONS.  LINE_END terminates each pattern in the file.  If
    LINE_END is a space character, ignore trailing spaces and empty
    lines in FILE.  Return -1 on failure, 0 on success.  */
 
 int
 add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
-		  struct exclude *ex, char const *filename, int options,
+		  struct exclude *ex, char const *file_name, int options,
 		  char line_end)
 {
-  bool use_stdin = filename[0] == '-' && !filename[1];
+  bool use_stdin = file_name[0] == '-' && !file_name[1];
   FILE *in;
   char *buf = NULL;
   char *p;
@@ -216,7 +228,7 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
 
   if (use_stdin)
     in = stdin;
-  else if (! (in = fopen (filename, "r")))
+  else if (! (in = fopen (file_name, "r")))
     return -1;
 
   while ((c = getc (in)) != EOF)
@@ -242,12 +254,12 @@ add_exclude_file (void (*add_func) (struct exclude *, char const *, int),
       {
 	char *pattern_end = p;
 
-	if (is_space (line_end))
+	if (isspace ((unsigned char) line_end))
 	  {
 	    for (; ; pattern_end--)
 	      if (pattern_end == pattern)
 		goto next_pattern;
-	      else if (! is_space (pattern_end[-1]))
+	      else if (! isspace ((unsigned char) pattern_end[-1]))
 		break;
 	  }
 

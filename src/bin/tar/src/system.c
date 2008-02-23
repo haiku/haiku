@@ -1,10 +1,10 @@
 /* System-dependent calls for tar.
 
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any later
+   Free Software Foundation; either version 3, or (at your option) any later
    version.
 
    This program is distributed in the hope that it will be useful, but
@@ -14,55 +14,19 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#include "system.h"
+#include <system.h>
+#include <setenv.h>
 
 #include "common.h"
-#include "rmt.h"
+#include <rmt.h>
 #include <signal.h>
-
-void
-sys_stat_nanoseconds(struct tar_stat_info *stat)
-{
-#if defined(HAVE_STRUCT_STAT_ST_SPARE1)
-  stat->atime_nsec = stat->stat.st_spare1 * 1000;
-  stat->mtime_nsec = stat->stat.st_spare2 * 1000;
-  stat->ctime_nsec = stat->stat.st_spare3 * 1000;
-#elif defined(HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC)
-  stat->atime_nsec = stat->stat.st_atim.tv_nsec;
-  stat->mtime_nsec = stat->stat.st_mtim.tv_nsec;
-  stat->ctime_nsec = stat->stat.st_ctim.tv_nsec;
-#elif defined(HAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC)
-  stat->atime_nsec = stat->stat.st_atimespec.tv_nsec;
-  stat->mtime_nsec = stat->stat.st_mtimespec.tv_nsec;
-  stat->ctime_nsec = stat->stat.st_ctimespec.tv_nsec;
-#elif defined(HAVE_STRUCT_STAT_ST_ATIMENSEC)
-  stat->atime_nsec = stat->stat.st_atimensec;
-  stat->mtime_nsec = stat->stat.st_mtimensec;
-  stat->ctime_nsec = stat->stat.st_ctimensec;
-#else
-  stat->atime_nsec  = stat->mtime_nsec = stat->ctime_nsec = 0;
-#endif
-}
-
-int
-sys_utimes(char *file_name, struct timeval tvp[3])
-{
-#ifdef HAVE_UTIMES
-  return utimes (file_name, tvp);
-#else
-  struct utimbuf utimbuf;
-  utimbuf.actime = tvp[0].tv_sec;
-  utimbuf.modtime = tvp[1].tv_sec;
-  return utime (file_name, &utimbuf);
-#endif
-}
 
 #if MSDOS
 
 bool
-sys_get_archive_stat ()
+sys_get_archive_stat (void)
 {
   return 0;
 }
@@ -74,12 +38,12 @@ sys_file_is_archive (struct tar_stat_info *p)
 }
 
 void
-sys_save_archive_dev_ino ()
+sys_save_archive_dev_ino (void)
 {
 }
 
 void
-sys_detect_dev_null_output ()
+sys_detect_dev_null_output (void)
 {
   static char const dev_null[] = "nul";
 
@@ -88,7 +52,7 @@ sys_detect_dev_null_output ()
 }
 
 void
-sys_drain_input_pipe ()
+sys_drain_input_pipe (void)
 {
 }
 
@@ -98,7 +62,7 @@ sys_wait_for_child (pid_t child_pid)
 }
 
 void
-sys_spawn_shell ()
+sys_spawn_shell (void)
 {
   spawnl (P_WAIT, getenv ("COMSPEC"), "-", 0);
 }
@@ -131,26 +95,10 @@ sys_truncate (int fd)
   return write (fd, "", 0);
 }
 
-void
-sys_reset_uid_gid ()
-{
-}
-
-ssize_t
+size_t
 sys_write_archive_buffer (void)
 {
-  ssize_t status;
-  ssize_t written = 0;
-
-  while (0 <= (status = full_write (archive, record_start->buffer + written,
-				    record_size - written)))
-    {
-      written += status;
-      if (written == record_size)
-        break;
-    }
-
-  return written ? written : status;
+  return full_write (archive, record_start->buffer, record_size);
 }
 
 /* Set ARCHIVE for writing, then compressing an archive.  */
@@ -174,11 +122,11 @@ extern union block *record_start; /* FIXME */
 static struct stat archive_stat; /* stat block for archive file */
 
 bool
-sys_get_archive_stat ()
+sys_get_archive_stat (void)
 {
   return fstat (archive, &archive_stat) == 0;
 }
-    
+
 bool
 sys_file_is_archive (struct tar_stat_info *p)
 {
@@ -187,7 +135,7 @@ sys_file_is_archive (struct tar_stat_info *p)
 
 /* Save archive file inode and device numbers */
 void
-sys_save_archive_dev_ino ()
+sys_save_archive_dev_ino (void)
 {
   if (!_isrmt (archive) && S_ISREG (archive_stat.st_mode))
     {
@@ -200,7 +148,7 @@ sys_save_archive_dev_ino ()
 
 /* Detect if outputting to "/dev/null".  */
 void
-sys_detect_dev_null_output ()
+sys_detect_dev_null_output (void)
 {
   static char const dev_null[] = "/dev/null";
   struct stat dev_null_stat;
@@ -219,12 +167,15 @@ sys_detect_dev_null_output ()
    work to do, we might have to revise this area in such time.  */
 
 void
-sys_drain_input_pipe ()
+sys_drain_input_pipe (void)
 {
+  size_t r;
+
   if (access_mode == ACCESS_READ
       && ! _isrmt (archive)
       && (S_ISFIFO (archive_stat.st_mode) || S_ISSOCK (archive_stat.st_mode)))
-    while (rmtread (archive, record_start->buffer, record_size) > 0)
+    while ((r = rmtread (archive, record_start->buffer, record_size)) != 0
+	   && r != SAFE_READ_ERROR)
       continue;
 }
 
@@ -252,7 +203,7 @@ sys_wait_for_child (pid_t child_pid)
 }
 
 void
-sys_spawn_shell ()
+sys_spawn_shell (void)
 {
   pid_t child;
   const char *shell = getenv ("SHELL");
@@ -302,13 +253,6 @@ sys_truncate (int fd)
   return pos < 0 ? -1 : ftruncate (fd, pos);
 }
 
-void
-sys_reset_uid_gid ()
-{
-  setuid (getuid ());
-  setgid (getgid ());
-}
-
 /* Return nonzero if NAME is the name of a regular file, or if the file
    does not exist (so it would be created as a regular file).  */
 static int
@@ -322,24 +266,10 @@ is_regular_file (const char *name)
     return errno == ENOENT;
 }
 
-ssize_t
+size_t
 sys_write_archive_buffer (void)
 {
-  ssize_t status;
-  ssize_t written = 0;
-
-  while (0 <= (status = rmtwrite (archive, record_start->buffer + written,
-				  record_size - written)))
-    {
-      written += status;
-      if (written == record_size
-	  || _isrmt (archive)
-	  || ! (S_ISFIFO (archive_stat.st_mode)
-		|| S_ISSOCK (archive_stat.st_mode)))
-	break;
-    }
-
-  return written ? written : status;
+  return rmtwrite (archive, record_start->buffer, record_size);
 }
 
 #define	PREAD 0			/* read file descriptor from pipe() */
@@ -403,12 +333,10 @@ sys_child_open_for_compress (void)
   xclose (parent_pipe[PWRITE]);
 
   /* Check if we need a grandchild tar.  This happens only if either:
-     a) we are writing stdout: to force reblocking;
-     b) the file is to be accessed by rmt: compressor doesn't know how;
-     c) the file is not a plain file.  */
+     a) the file is to be accessed by rmt: compressor doesn't know how;
+     b) the file is not a plain file.  */
 
-  if (strcmp (archive_name_array[0], "-") != 0
-      && !_remdev (archive_name_array[0])
+  if (!_remdev (archive_name_array[0])
       && is_regular_file (archive_name_array[0]))
     {
       if (backup_option)
@@ -416,20 +344,21 @@ sys_child_open_for_compress (void)
 
       /* We don't need a grandchild tar.  Open the archive and launch the
 	 compressor.  */
-
-      archive = creat (archive_name_array[0], MODE_RW);
-      if (archive < 0)
+      if (strcmp (archive_name_array[0], "-"))
 	{
-	  int saved_errno = errno;
+	  archive = creat (archive_name_array[0], MODE_RW);
+	  if (archive < 0)
+	    {
+	      int saved_errno = errno;
 
-	  if (backup_option)
-	    undo_last_backup ();
-	  errno = saved_errno;
-	  open_fatal (archive_name_array[0]);
+	      if (backup_option)
+		undo_last_backup ();
+	      errno = saved_errno;
+	      open_fatal (archive_name_array[0]);
+	    }
+	  xdup2 (archive, STDOUT_FILENO);
 	}
-      xdup2 (archive, STDOUT_FILENO);
-      execlp (use_compress_program_option, use_compress_program_option,
-	      (char *) 0);
+      execlp (use_compress_program_option, use_compress_program_option, NULL);
       exec_fatal (use_compress_program_option);
     }
 
@@ -471,7 +400,7 @@ sys_child_open_for_compress (void)
 
   while (1)
     {
-      ssize_t status = 0;
+      size_t status = 0;
       char *cursor;
       size_t length;
 
@@ -484,12 +413,11 @@ sys_child_open_for_compress (void)
 	  size_t size = record_size - length;
 
 	  status = safe_read (STDIN_FILENO, cursor, size);
-	  if (status <= 0)
+	  if (status == SAFE_READ_ERROR)
+	    read_fatal (use_compress_program_option);
+	  if (status == 0)
 	    break;
 	}
-
-      if (status < 0)
-	read_fatal (use_compress_program_option);
 
       /* Copy the record.  */
 
@@ -553,7 +481,6 @@ sys_child_open_for_uncompress (void)
     {
       /* The parent tar is still here!  Just clean up.  */
 
-      read_full_records_option = true;
       archive = parent_pipe[PREAD];
       xclose (parent_pipe[PWRITE]);
       return child_pid;
@@ -628,13 +555,13 @@ sys_child_open_for_uncompress (void)
       char *cursor;
       size_t maximum;
       size_t count;
-      ssize_t status;
+      size_t status;
 
       clear_read_error_count ();
 
     error_loop:
       status = rmtread (archive, record_start->buffer, record_size);
-      if (status < 0)
+      if (status == SAFE_READ_ERROR)
 	{
 	  archive_read_error ();
 	  goto error_loop;
@@ -675,5 +602,242 @@ sys_child_open_for_uncompress (void)
   exit (exit_status);
 }
 
-#endif /* not MSDOS */
+
 
+static void
+dec_to_env (char *envar, uintmax_t num)
+{
+  char buf[UINTMAX_STRSIZE_BOUND];
+  char *numstr;
+
+  numstr = STRINGIFY_BIGINT (num, buf);
+  if (setenv (envar, numstr, 1) != 0)
+    xalloc_die ();
+}
+
+static void
+time_to_env (char *envar, struct timespec t)
+{
+  char buf[TIMESPEC_STRSIZE_BOUND];
+  if (setenv (envar, code_timespec (t, buf), 1) != 0)
+    xalloc_die ();
+}
+
+static void
+oct_to_env (char *envar, unsigned long num)
+{
+  char buf[1+1+(sizeof(unsigned long)*CHAR_BIT+2)/3];
+
+  snprintf (buf, sizeof buf, "0%lo", num);
+  if (setenv (envar, buf, 1) != 0)
+    xalloc_die ();
+}
+
+static void
+str_to_env (char *envar, char const *str)
+{
+  if (str)
+    {
+      if (setenv (envar, str, 1) != 0)
+	xalloc_die ();
+    }
+  else
+    unsetenv (envar);
+}
+
+static void
+chr_to_env (char *envar, char c)
+{
+  char buf[2];
+  buf[0] = c;
+  buf[1] = 0;
+  if (setenv (envar, buf, 1) != 0)
+    xalloc_die ();
+}
+
+static void
+stat_to_env (char *name, char type, struct tar_stat_info *st)
+{
+  str_to_env ("TAR_VERSION", PACKAGE_VERSION);
+  chr_to_env ("TAR_FILETYPE", type);
+  oct_to_env ("TAR_MODE", st->stat.st_mode);
+  str_to_env ("TAR_FILENAME", name);
+  str_to_env ("TAR_REALNAME", st->file_name);
+  str_to_env ("TAR_UNAME", st->uname);
+  str_to_env ("TAR_GNAME", st->gname);
+  time_to_env ("TAR_ATIME", st->atime);
+  time_to_env ("TAR_MTIME", st->mtime);
+  time_to_env ("TAR_CTIME", st->ctime);
+  dec_to_env ("TAR_SIZE", st->stat.st_size);
+  dec_to_env ("TAR_UID", st->stat.st_uid);
+  dec_to_env ("TAR_GID", st->stat.st_gid);
+
+  switch (type)
+    {
+    case 'b':
+    case 'c':
+      dec_to_env ("TAR_MINOR", minor (st->stat.st_rdev));
+      dec_to_env ("TAR_MAJOR", major (st->stat.st_rdev));
+      unsetenv ("TAR_LINKNAME");
+      break;
+
+    case 'l':
+    case 'h':
+      unsetenv ("TAR_MINOR");
+      unsetenv ("TAR_MAJOR");
+      str_to_env ("TAR_LINKNAME", st->link_name);
+      break;
+
+    default:
+      unsetenv ("TAR_MINOR");
+      unsetenv ("TAR_MAJOR");
+      unsetenv ("TAR_LINKNAME");
+      break;
+    }
+}
+
+static pid_t global_pid;
+static RETSIGTYPE (*pipe_handler) (int sig);
+
+int
+sys_exec_command (char *file_name, int typechar, struct tar_stat_info *st)
+{
+  int p[2];
+  char *argv[4];
+
+  xpipe (p);
+  pipe_handler = signal (SIGPIPE, SIG_IGN);
+  global_pid = xfork ();
+
+  if (global_pid != 0)
+    {
+      xclose (p[PREAD]);
+      return p[PWRITE];
+    }
+
+  /* Child */
+  xdup2 (p[PREAD], STDIN_FILENO);
+  xclose (p[PWRITE]);
+
+  stat_to_env (file_name, typechar, st);
+
+  argv[0] = "/bin/sh";
+  argv[1] = "-c";
+  argv[2] = to_command_option;
+  argv[3] = NULL;
+
+  execv ("/bin/sh", argv);
+
+  exec_fatal (file_name);
+}
+
+void
+sys_wait_command (void)
+{
+  int status;
+
+  if (global_pid < 0)
+    return;
+
+  signal (SIGPIPE, pipe_handler);
+  while (waitpid (global_pid, &status, 0) == -1)
+    if (errno != EINTR)
+      {
+        global_pid = -1;
+        waitpid_error (to_command_option);
+        return;
+      }
+
+  if (WIFEXITED (status))
+    {
+      if (!ignore_command_error_option && WEXITSTATUS (status))
+	ERROR ((0, 0, _("%lu: Child returned status %d"),
+		(unsigned long) global_pid, WEXITSTATUS (status)));
+    }
+  else if (WIFSIGNALED (status))
+    {
+      WARN ((0, 0, _("%lu: Child terminated on signal %d"),
+	     (unsigned long) global_pid, WTERMSIG (status)));
+    }
+  else
+    ERROR ((0, 0, _("%lu: Child terminated on unknown reason"),
+	    (unsigned long) global_pid));
+
+  global_pid = -1;
+}
+
+int
+sys_exec_info_script (const char **archive_name, int volume_number)
+{
+  pid_t pid;
+  char *argv[4];
+  char uintbuf[UINTMAX_STRSIZE_BOUND];
+  int p[2];
+
+  xpipe (p);
+  pipe_handler = signal (SIGPIPE, SIG_IGN);
+
+  pid = xfork ();
+
+  if (pid != 0)
+    {
+      /* Master */
+
+      int rc;
+      int status;
+      char *buf;
+      size_t size = 0;
+      FILE *fp;
+
+      xclose (p[PWRITE]);
+      fp = fdopen (p[PREAD], "r");
+      rc = getline (&buf, &size, fp);
+      fclose (fp);
+
+      if (rc > 0 && buf[rc-1] == '\n')
+	buf[--rc] = 0;
+
+      while (waitpid (pid, &status, 0) == -1)
+	if (errno != EINTR)
+	  {
+	    waitpid_error (info_script_option);
+	    return -1;
+	  }
+
+      if (WIFEXITED (status))
+	{
+	  if (WEXITSTATUS (status) == 0 && rc > 0)
+	    *archive_name = buf;
+	  else
+	    free (buf);
+	  return WEXITSTATUS (status);
+	}
+
+      free (buf);
+      return -1;
+    }
+
+  /* Child */
+  setenv ("TAR_VERSION", PACKAGE_VERSION, 1);
+  setenv ("TAR_ARCHIVE", *archive_name, 1);
+  setenv ("TAR_VOLUME", STRINGIFY_BIGINT (volume_number, uintbuf), 1);
+  setenv ("TAR_SUBCOMMAND", subcommand_string (subcommand_option), 1);
+  setenv ("TAR_FORMAT",
+	  archive_format_string (current_format == DEFAULT_FORMAT ?
+				 archive_format : current_format), 1);
+  setenv ("TAR_FD", STRINGIFY_BIGINT (p[PWRITE], uintbuf), 1);
+
+  xclose (p[PREAD]);
+
+  argv[0] = "/bin/sh";
+  argv[1] = "-c";
+  argv[2] = (char*) info_script_option;
+  argv[3] = NULL;
+
+  execv (argv[0], argv);
+
+  exec_fatal (info_script_option);
+}
+
+
+#endif /* not MSDOS */

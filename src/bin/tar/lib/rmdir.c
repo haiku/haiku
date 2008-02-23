@@ -1,6 +1,7 @@
 /* BSD compatible remove directory function for System V
 
-   Copyright (C) 1988, 1990, 1999, 2003 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1990, 1999, 2003, 2004, 2005, 2006 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,41 +15,27 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
-
 #include <errno.h>
-#ifndef errno
-extern int errno;
-#endif
-
-#if STAT_MACROS_BROKEN
-# undef S_ISDIR
-#endif
-
-#if !defined(S_ISDIR) && defined(S_IFDIR)
-# define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
-#endif
 
 /* rmdir adapted from GNU tar.  */
 
-/* Remove directory DPATH.
+/* Remove directory DIR.
    Return 0 if successful, -1 if not.  */
 
 int
-rmdir (char const *dpath)
+rmdir (char const *dir)
 {
   pid_t cpid;
   int status;
   struct stat statbuf;
 
-  if (stat (dpath, &statbuf) != 0)
+  if (stat (dir, &statbuf) != 0)
     return -1;			/* errno already set */
 
   if (!S_ISDIR (statbuf.st_mode))
@@ -64,7 +51,7 @@ rmdir (char const *dpath)
       return -1;		/* errno already set */
 
     case 0:			/* child process */
-      execl ("/bin/rmdir", "rmdir", dpath, (char *) 0);
+      execl ("/bin/rmdir", "rmdir", dir, (char *) 0);
       _exit (1);
 
     default:			/* parent process */

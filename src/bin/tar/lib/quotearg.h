@@ -1,7 +1,7 @@
 /* quotearg.h - quote arguments for output
 
-   Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software
-   Foundation, Inc.
+   Copyright (C) 1998, 1999, 2000, 2001, 2002, 2004, 2006 Free
+   Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert <eggert@twinsun.com> */
 
@@ -27,13 +27,31 @@
 /* Basic quoting styles.  */
 enum quoting_style
   {
-    literal_quoting_style,	/* --quoting-style=literal */
-    shell_quoting_style,	/* --quoting-style=shell */
-    shell_always_quoting_style,	/* --quoting-style=shell-always */
-    c_quoting_style,		/* --quoting-style=c */
-    escape_quoting_style,	/* --quoting-style=escape */
-    locale_quoting_style,	/* --quoting-style=locale */
-    clocale_quoting_style	/* --quoting-style=clocale */
+    /* Output names as-is (ls --quoting-style=literal).  */
+    literal_quoting_style,
+
+    /* Quote names for the shell if they contain shell metacharacters
+       or would cause ambiguous output (ls --quoting-style=shell).  */
+    shell_quoting_style,
+
+    /* Quote names for the shell, even if they would normally not
+       require quoting (ls --quoting-style=shell-always).  */
+    shell_always_quoting_style,
+
+    /* Quote names as for a C language string (ls --quoting-style=c).  */
+    c_quoting_style,
+
+    /* Like c_quoting_style except omit the surrounding double-quote
+       characters (ls --quoting-style=escape).  */
+    escape_quoting_style,
+
+    /* Like clocale_quoting_style, but quote `like this' instead of
+       "like this" in the default C locale (ls --quoting-style=locale).  */
+    locale_quoting_style,
+
+    /* Like c_quoting_style except use quotation marks appropriate for
+       the locale (ls --quoting-style=clocale).  */
+    clocale_quoting_style
   };
 
 /* For now, --quoting-style=literal is the default, but this may change.  */
@@ -81,6 +99,11 @@ size_t quotearg_buffer (char *buffer, size_t buffersize,
 			char const *arg, size_t argsize,
 			struct quoting_options const *o);
 
+/* Like quotearg_buffer, except return the result in a newly allocated
+   buffer.  It is the caller's responsibility to free the result.  */
+char *quotearg_alloc (char const *arg, size_t argsize,
+		      struct quoting_options const *o);
+
 /* Use storage slot N to return a quoted version of the string ARG.
    Use the default quoting options.
    The returned value points to static storage that can be
@@ -110,5 +133,8 @@ char *quotearg_char (char const *arg, char ch);
 
 /* Equivalent to quotearg_char (ARG, ':').  */
 char *quotearg_colon (char const *arg);
+
+/* Free any dynamically allocated memory.  */
+void quotearg_free (void);
 
 #endif /* !QUOTEARG_H_ */

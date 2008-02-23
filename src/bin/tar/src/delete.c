@@ -1,11 +1,11 @@
 /* Delete entries from a tar archive.
 
-   Copyright (C) 1988, 1992, 1994, 1996, 1997, 2000, 2001, 2003 Free
-   Software Foundation, Inc.
+   Copyright (C) 1988, 1992, 1994, 1996, 1997, 2000, 2001, 2003, 2004,
+   2005, 2006 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any later
+   Free Software Foundation; either version 3, or (at your option) any later
    version.
 
    This program is distributed in the hope that it will be useful, but
@@ -15,12 +15,13 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#include "system.h"
+#include <system.h>
+#include <system-ioctl.h>
 
 #include "common.h"
-#include "rmt.h"
+#include <rmt.h>
 
 static union block *new_record;
 static int new_blocks;
@@ -33,12 +34,12 @@ extern union block *record_end;
 extern union block *current_block;
 extern union block *recent_long_name;
 extern union block *recent_long_link;
-extern off_t records_read; 
+extern off_t records_read;
 extern off_t records_written;
 
 /* The number of records skipped at the start of the archive, when
    passing over members that are not deleted.  */
-static off_t records_skipped;
+off_t records_skipped;
 
 /* Move archive descriptor by COUNT records worth.  If COUNT is
    positive we move forward, else we move negative.  If it's a tape,
@@ -184,7 +185,7 @@ delete_archive_members (void)
 	      skip_member ();
 	      break;
 	    }
-	  
+
 	  /* Fall through.  */
 	case HEADER_SUCCESS_EXTENDED:
 	  logical_status = status;
@@ -261,9 +262,9 @@ delete_archive_members (void)
 	  if (current_block == record_end)
 	    flush_archive ();
 	  status = read_header (false);
-	  
+
 	  xheader_decode (&current_stat_info);
-	  
+
 	  if (status == HEADER_ZERO_BLOCK && ignore_zeros_option)
 	    {
 	      set_next_block_after (current_header);
@@ -293,7 +294,7 @@ delete_archive_members (void)
 		  set_next_block_after (current_header);
 		  blocks_to_skip = (current_stat_info.stat.st_size
 				    + BLOCKSIZE - 1) / BLOCKSIZE;
-
+		  
 		  while (record_end - current_block <= blocks_to_skip)
 		    {
 		      blocks_to_skip -= (record_end - current_block);
@@ -306,10 +307,10 @@ delete_archive_members (void)
 	    }
 	  /* Copy header.  */
 
-	  if (extended_header.size)
+	  if (current_stat_info.xhdr.size)
 	    {
-	      write_recent_bytes (extended_header.buffer,
-				  extended_header.size);
+	      write_recent_bytes (current_stat_info.xhdr.buffer,
+				  current_stat_info.xhdr.size);
 	    }
 	  else
 	    {
@@ -359,32 +360,31 @@ delete_archive_members (void)
 		write_record (1);
 	    }
 	}
-    }
 
-  if (logical_status == HEADER_END_OF_FILE)
-    {
-      /* Write the end of tape.  FIXME: we can't use write_eot here,
-	 as it gets confused when the input is at end of file.  */
-
-      int total_zero_blocks = 0;
-
-      do
+      if (logical_status == HEADER_END_OF_FILE)
 	{
-	  int zero_blocks = blocking_factor - new_blocks;
-	  memset (new_record + new_blocks, 0, BLOCKSIZE * zero_blocks);
-	  total_zero_blocks += zero_blocks;
-	  write_record (total_zero_blocks < 2);
+	  /* Write the end of tape.  FIXME: we can't use write_eot here,
+	     as it gets confused when the input is at end of file.  */
+
+	  int total_zero_blocks = 0;
+
+	  do
+	    {
+	      int zero_blocks = blocking_factor - new_blocks;
+	      memset (new_record + new_blocks, 0, BLOCKSIZE * zero_blocks);
+	      total_zero_blocks += zero_blocks;
+	      write_record (total_zero_blocks < 2);
+	    }
+	  while (total_zero_blocks < 2);
 	}
-      while (total_zero_blocks < 2);
-    }
 
+      if (! acting_as_filter && ! _isrmt (archive))
+	{
+	  if (sys_truncate (archive))
+	    truncate_warn (archive_name_array[0]);
+	}
+    }
   free (new_record);
-
-  if (! acting_as_filter && ! _isrmt (archive))
-    {
-      if (sys_truncate (archive))
-	truncate_warn (archive_name_array[0]);
-    }
 
   close_archive ();
   names_notfound ();

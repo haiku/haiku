@@ -1,8 +1,6 @@
 /* Declarations for getopt.
-
-   Copyright (C) 1989, 1990, 1991, 1992, 1993, 1994, 1996, 1997, 1998,
-   1999, 2001, 2003 Free Software Foundation, Inc.
-
+   Copyright (C) 1989-1994,1996-1999,2001,2003,2004,2005,2006,2007
+   Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This program is free software; you can redistribute it and/or modify
@@ -17,12 +15,68 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef _GETOPT_H
 
 #ifndef __need_getopt
 # define _GETOPT_H 1
+#endif
+
+/* Standalone applications should #define __GETOPT_PREFIX to an
+   identifier that prefixes the external functions and variables
+   defined in this header.  When this happens, include the
+   headers that might declare getopt so that they will not cause
+   confusion if included after this file.  Then systematically rename
+   identifiers so that they do not collide with the system functions
+   and variables.  Renaming avoids problems with some compilers and
+   linkers.  */
+#if defined __GETOPT_PREFIX && !defined __need_getopt
+# include <stdlib.h>
+# include <stdio.h>
+# include <unistd.h>
+# undef __need_getopt
+# undef getopt
+# undef getopt_long
+# undef getopt_long_only
+# undef optarg
+# undef opterr
+# undef optind
+# undef optopt
+# define __GETOPT_CONCAT(x, y) x ## y
+# define __GETOPT_XCONCAT(x, y) __GETOPT_CONCAT (x, y)
+# define __GETOPT_ID(y) __GETOPT_XCONCAT (__GETOPT_PREFIX, y)
+# define getopt __GETOPT_ID (getopt)
+# define getopt_long __GETOPT_ID (getopt_long)
+# define getopt_long_only __GETOPT_ID (getopt_long_only)
+# define optarg __GETOPT_ID (optarg)
+# define opterr __GETOPT_ID (opterr)
+# define optind __GETOPT_ID (optind)
+# define optopt __GETOPT_ID (optopt)
+#endif
+
+/* Standalone applications get correct prototypes for getopt_long and
+   getopt_long_only; they declare "char **argv".  libc uses prototypes
+   with "char *const *argv" that are incorrect because getopt_long and
+   getopt_long_only can permute argv; this is required for backward
+   compatibility (e.g., for LSB 2.0.1).
+
+   This used to be `#if defined __GETOPT_PREFIX && !defined __need_getopt',
+   but it caused redefinition warnings if both unistd.h and getopt.h were
+   included, since unistd.h includes getopt.h having previously defined
+   __need_getopt.
+
+   The only place where __getopt_argv_const is used is in definitions
+   of getopt_long and getopt_long_only below, but these are visible
+   only if __need_getopt is not defined, so it is quite safe to rewrite
+   the conditional as follows:
+*/
+#if !defined __need_getopt
+# if defined __GETOPT_PREFIX
+#  define __getopt_argv_const /* empty */
+# else
+#  define __getopt_argv_const const
+# endif
 #endif
 
 /* If __GNU_LIBRARY__ is not already defined, either we are being used
@@ -36,7 +90,18 @@
 # include <ctype.h>
 #endif
 
-#ifdef	__cplusplus
+#ifndef __THROW
+# ifndef __GNUC_PREREQ
+#  define __GNUC_PREREQ(maj, min) (0)
+# endif
+# if defined __cplusplus && __GNUC_PREREQ (2,8)
+#  define __THROW	throw ()
+# else
+#  define __THROW
+# endif
+#endif
+
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -80,7 +145,7 @@ extern int optopt;
    The field `has_arg' is:
    no_argument		(or 0) if the option does not take an argument,
    required_argument	(or 1) if the option requires an argument,
-   optional_argument 	(or 2) if the option takes an optional argument.
+   optional_argument	(or 2) if the option takes an optional argument.
 
    If the field `flag' is not NULL, it points to a variable that is set
    to the value given in the field `val' when the option is found, but
@@ -131,35 +196,27 @@ struct option
    scanning, explicitly telling `getopt' that there are no more
    options.
 
-   If OPTS begins with `--', then non-option arguments are treated as
-   arguments to the option '\0'.  This behavior is specific to the GNU
-   `getopt'.  */
+   If OPTS begins with `-', then non-option arguments are treated as
+   arguments to the option '\1'.  This behavior is specific to the GNU
+   `getopt'.  If OPTS begins with `+', or POSIXLY_CORRECT is set in
+   the environment, then do not permute arguments.  */
 
-#ifdef __GNU_LIBRARY__
-/* Many other libraries have conflicting prototypes for getopt, with
-   differences in the consts, in stdlib.h.  To avoid compilation
-   errors, only prototype getopt for the GNU C library.  */
-extern int getopt (int ___argc, char *const *___argv, const char *__shortopts);
-#else /* not __GNU_LIBRARY__ */
-extern int getopt ();
-#endif /* __GNU_LIBRARY__ */
+extern int getopt (int ___argc, char *const *___argv, const char *__shortopts)
+       __THROW;
 
 #ifndef __need_getopt
-extern int getopt_long (int ___argc, char *const *___argv,
+extern int getopt_long (int ___argc, char *__getopt_argv_const *___argv,
 			const char *__shortopts,
-		        const struct option *__longopts, int *__longind);
-extern int getopt_long_only (int ___argc, char *const *___argv,
+		        const struct option *__longopts, int *__longind)
+       __THROW;
+extern int getopt_long_only (int ___argc, char *__getopt_argv_const *___argv,
 			     const char *__shortopts,
-		             const struct option *__longopts, int *__longind);
+		             const struct option *__longopts, int *__longind)
+       __THROW;
 
-/* Internal only.  Users should not call this directly.  */
-extern int _getopt_internal (int ___argc, char *const *___argv,
-			     const char *__shortopts,
-		             const struct option *__longopts, int *__longind,
-			     int __long_only);
 #endif
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 

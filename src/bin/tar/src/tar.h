@@ -1,11 +1,11 @@
 /* GNU tar Archive Format description.
 
    Copyright (C) 1988, 1989, 1991, 1992, 1993, 1994, 1995, 1996, 1997,
-   2000, 2001, 2003 Free Software Foundation, Inc.
+   2000, 2001, 2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any later
+   Free Software Foundation; either version 3, or (at your option) any later
    version.
 
    This program is distributed in the hope that it will be useful, but
@@ -15,7 +15,7 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* tar Header Block, from POSIX 1003.1-1990.  */
 
@@ -165,6 +165,7 @@ struct oldgnu_header
    'A' Solaris Access Control List
    'E' Solaris Extended Attribute File
    'I' Inode only, as in 'star'
+   'N' Obsolete GNU tar, for file names that do not fit into the main header.
    'X' POSIX 1003.1-2001 eXtended (VU version)  */
 
 /* This is a dir entry that contains the names of files that were in the
@@ -180,17 +181,16 @@ struct oldgnu_header
 /* This is the continuation of a file that began on another volume.  */
 #define GNUTYPE_MULTIVOL 'M'
 
-/* For storing filenames that do not fit into the main header.  */
-#define GNUTYPE_NAMES 'N'
-
 /* This is for sparse files.  */
 #define GNUTYPE_SPARSE 'S'
 
 /* This file is a tape/volume header.  Ignore it on extraction.  */
 #define GNUTYPE_VOLHDR 'V'
 
-
-/* Jörg Schilling star header */
+/* Solaris extended header */
+#define SOLARIS_XHDTYPE 'X'
+
+/* J@"org Schilling star header */
 
 struct star_header
 {				/* byte offset */
@@ -218,7 +218,8 @@ struct star_header
 #define SPARSES_IN_STAR_HEADER      4
 #define SPARSES_IN_STAR_EXT_HEADER  21
 
-struct star_in_header {
+struct star_in_header
+{
   char fill[345];       /*   0  Everything that is before t_prefix */
   char prefix[1];       /* 345  t_name prefix */
   char fill2;           /* 346  */
@@ -233,11 +234,13 @@ struct star_in_header {
   char xmagic[4];       /* 508  "tar" */
 };
 
-struct star_ext_header {
+struct star_ext_header
+{
   struct sparse sp[SPARSES_IN_STAR_EXT_HEADER];
   char isextended;
 };
 
+/* END */
 
 
 /* tar Header Block, overall structure.  */
@@ -260,41 +263,60 @@ enum archive_format
 
 /* Information about a sparse file.  */
 struct sp_array
-  {
-    off_t offset;
-    size_t numbytes;
-  };
+{
+  off_t offset;
+  size_t numbytes;
+};
+
+struct xheader
+{
+  struct obstack *stk;
+  size_t size;
+  char *buffer;
+  uintmax_t string_length;
+};
 
 struct tar_stat_info
 {
   char *orig_file_name;     /* name of file read from the archive header */
   char *file_name;          /* name of file for the current archive entry
 			       after being normalized.  */
-  int had_trailing_slash;   /* nonzero if the current archive entry had a
+  bool had_trailing_slash;  /* true if the current archive entry had a
 			       trailing slash before it was normalized. */
   char *link_name;          /* name of link for the current archive entry.  */
 
-  unsigned int  devminor;   /* device minor number */
-  unsigned int  devmajor;   /* device major number */
   char          *uname;     /* user name of owner */
   char          *gname;     /* group name of owner */
   struct stat   stat;       /* regular filesystem stat */
 
-  /* Nanosecond parts of file timestamps (if available) */
-  unsigned long atime_nsec;
-  unsigned long mtime_nsec;
-  unsigned long ctime_nsec;
-  
+  /* STAT doesn't always have access, data modification, and status
+     change times in a convenient form, so store them separately.  */
+  struct timespec atime;
+  struct timespec mtime;
+  struct timespec ctime;
+
   off_t archive_file_size;  /* Size of file as stored in the archive.
 			       Equals stat.st_size for non-sparse files */
 
-  bool   is_sparse;         /* Is the file sparse */ 
-  
+  bool   is_sparse;         /* Is the file sparse */
+
+  /* For sparse files: */
+  unsigned sparse_major;
+  unsigned sparse_minor;
   size_t sparse_map_avail;  /* Index to the first unused element in
 			       sparse_map array. Zero if the file is
 			       not sparse */
   size_t sparse_map_size;   /* Size of the sparse map */
-  struct sp_array *sparse_map; 
+  struct sp_array *sparse_map;
+
+  /* Extended headers */
+  struct xheader xhdr;
+  
+  /* For dumpdirs */
+  bool is_dumpdir;          /* Is the member a dumpdir? */
+  bool skipped;             /* The member contents is already read
+			       (for GNUTYPE_DUMPDIR) */
+  char *dumpdir;            /* Contents of the dump directory */
 };
 
 union block
@@ -307,5 +329,3 @@ union block
   struct star_in_header star_in_header;
   struct star_ext_header star_ext_header;
 };
-
-/* End of Format description.  */

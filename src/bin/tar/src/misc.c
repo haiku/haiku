@@ -1,11 +1,11 @@
 /* Miscellaneous functions, not really specific to GNU tar.
 
    Copyright (C) 1988, 1992, 1994, 1995, 1996, 1997, 1999, 2000, 2001,
-   2003 Free Software Foundation, Inc.
+   2003, 2004, 2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any later
+   Free Software Foundation; either version 3, or (at your option) any later
    version.
 
    This program is distributed in the hope that it will be useful, but
@@ -15,16 +15,24 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-#include "system.h"
-#include "rmt.h"
+#include <system.h>
+#include <rmt.h>
 #include "common.h"
 #include <quotearg.h>
 #include <save-cwd.h>
+#include <xgetcwd.h>
+#include <unlinkdir.h>
+#include <utimens.h>
 
-static void call_arg_fatal (char const *, char const *)
-     __attribute__ ((noreturn));
+#if HAVE_STROPTS_H
+# include <stropts.h>
+#endif
+#if HAVE_SYS_FILIO_H
+# include <sys/filio.h>
+#endif
+
 
 /* Handling strings.  */
 
@@ -123,18 +131,8 @@ unquote_string (char *string)
 	  source++;
 	  break;
 
-	case 'n':
-	  *destination++ = '\n';
-	  source++;
-	  break;
-
-	case 't':
-	  *destination++ = '\t';
-	  source++;
-	  break;
-
-	case 'f':
-	  *destination++ = '\f';
+	case 'a':
+	  *destination++ = '\a';
 	  source++;
 	  break;
 
@@ -143,8 +141,28 @@ unquote_string (char *string)
 	  source++;
 	  break;
 
+	case 'f':
+	  *destination++ = '\f';
+	  source++;
+	  break;
+
+	case 'n':
+	  *destination++ = '\n';
+	  source++;
+	  break;
+
 	case 'r':
 	  *destination++ = '\r';
+	  source++;
+	  break;
+
+	case 't':
+	  *destination++ = '\t';
+	  source++;
+	  break;
+
+	case 'v':
+	  *destination++ = '\v';
 	  source++;
 	  break;
 
@@ -197,38 +215,94 @@ unquote_string (char *string)
   return result;
 }
 
+/* Handling numbers.  */
+
+/* Output fraction and trailing digits appropriate for a nanoseconds
+   count equal to NS, but don't output unnecessary '.' or trailing
+   zeros.  */
+
+void
+code_ns_fraction (int ns, char *p)
+{
+  if (ns == 0)
+    *p = '\0';
+  else
+    {
+      int i = 9;
+      *p++ = '.';
+
+      while (ns % 10 == 0)
+	{
+	  ns /= 10;
+	  i--;
+	}
+
+      p[i] = '\0';
+
+      for (;;)
+	{
+	  p[--i] = '0' + ns % 10;
+	  if (i == 0)
+	    break;
+	  ns /= 10;
+	}
+    }
+}
+
+char const *
+code_timespec (struct timespec t, char sbuf[TIMESPEC_STRSIZE_BOUND])
+{
+  time_t s = t.tv_sec;
+  int ns = t.tv_nsec;
+  char *np;
+  bool negative = s < 0;
+
+  if (negative && ns != 0)
+    {
+      s++;
+      ns = BILLION - ns;
+    }
+
+  np = umaxtostr (negative ? - (uintmax_t) s : (uintmax_t) s, sbuf + 1);
+  if (negative)
+    *--np = '-';
+  code_ns_fraction (ns, sbuf + UINTMAX_STRSIZE_BOUND);
+  return np;
+}
+
 /* File handling.  */
 
 /* Saved names in case backup needs to be undone.  */
 static char *before_backup_name;
 static char *after_backup_name;
 
-/* Return 1 if PATH is obviously "." or "/".  */
+/* Return 1 if FILE_NAME is obviously "." or "/".  */
 static bool
-must_be_dot_or_slash (char const *path)
+must_be_dot_or_slash (char const *file_name)
 {
-  path += FILESYSTEM_PREFIX_LEN (path);
+  file_name += FILE_SYSTEM_PREFIX_LEN (file_name);
 
-  if (ISSLASH (path[0]))
+  if (ISSLASH (file_name[0]))
     {
       for (;;)
-	if (ISSLASH (path[1]))
-	  path++;
-	else if (path[1] == '.' && ISSLASH (path[2 + (path[2] == '.')]))
-	  path += 2 + (path[2] == '.');
+	if (ISSLASH (file_name[1]))
+	  file_name++;
+	else if (file_name[1] == '.'
+                 && ISSLASH (file_name[2 + (file_name[2] == '.')]))
+	  file_name += 2 + (file_name[2] == '.');
 	else
-	  return ! path[1];
+	  return ! file_name[1];
     }
   else
     {
-      while (path[0] == '.' && ISSLASH (path[1]))
+      while (file_name[0] == '.' && ISSLASH (file_name[1]))
 	{
-	  path += 2;
-	  while (ISSLASH (*path))
-	    path++;
+	  file_name += 2;
+	  while (ISSLASH (*file_name))
+	    file_name++;
 	}
 
-      return ! path[0] || (path[0] == '.' && ! path[1]);
+      return ! file_name[0] || (file_name[0] == '.' && ! file_name[1]);
     }
 }
 
@@ -236,32 +310,35 @@ must_be_dot_or_slash (char const *path)
    Report an error with errno set to zero for obvious cases of this;
    otherwise call rmdir.  */
 static int
-safer_rmdir (const char *path)
+safer_rmdir (const char *file_name)
 {
-  if (must_be_dot_or_slash (path))
+  if (must_be_dot_or_slash (file_name))
     {
       errno = 0;
       return -1;
     }
 
-  return rmdir (path);
+  return rmdir (file_name);
 }
 
-/* Remove PATH, returning 1 on success.  If PATH is a directory, then
-   if OPTION is RECURSIVE_REMOVE_OPTION is set remove PATH
-   recursively; otherwise, remove it only if it is empty.  If PATH is
+/* Remove FILE_NAME, returning 1 on success.  If FILE_NAME is a directory,
+   then if OPTION is RECURSIVE_REMOVE_OPTION is set remove FILE_NAME
+   recursively; otherwise, remove it only if it is empty.  If FILE_NAME is
    a directory that cannot be removed (e.g., because it is nonempty)
    and if OPTION is WANT_DIRECTORY_REMOVE_OPTION, then return -1.
-   Return 0 on error, with errno set; if PATH is obviously the working
+   Return 0 on error, with errno set; if FILE_NAME is obviously the working
    directory return zero with errno set to zero.  */
 int
-remove_any_file (const char *path, enum remove_option option)
+remove_any_file (const char *file_name, enum remove_option option)
 {
-  /* Try unlink first if we are not root, as this saves us a system
-     call in the common case where we're removing a non-directory.  */
-  if (! we_are_root)
+  /* Try unlink first if we cannot unlink directories, as this saves
+     us a system call in the common case where we're removing a
+     non-directory.  */
+  bool try_unlink_first = cannot_unlink_dir ();
+
+  if (try_unlink_first)
     {
-      if (unlink (path) == 0)
+      if (unlink (file_name) == 0)
 	return 1;
 
       /* POSIX 1003.1-2001 requires EPERM when attempting to unlink a
@@ -271,13 +348,13 @@ remove_any_file (const char *path, enum remove_option option)
 	return 0;
     }
 
-  if (safer_rmdir (path) == 0)
+  if (safer_rmdir (file_name) == 0)
     return 1;
 
   switch (errno)
     {
     case ENOTDIR:
-      return we_are_root && unlink (path) == 0;
+      return !try_unlink_first && unlink (file_name) == 0;
 
     case 0:
     case EEXIST:
@@ -294,7 +371,7 @@ remove_any_file (const char *path, enum remove_option option)
 
 	case RECURSIVE_REMOVE_OPTION:
 	  {
-	    char *directory = savedir (path);
+	    char *directory = savedir (file_name);
 	    char const *entry;
 	    size_t entrylen;
 
@@ -305,10 +382,11 @@ remove_any_file (const char *path, enum remove_option option)
 		 (entrylen = strlen (entry)) != 0;
 		 entry += entrylen + 1)
 	      {
-		char *path_buffer = new_name (path, entry);
-		int r = remove_any_file (path_buffer, 1);
+		char *file_name_buffer = new_name (file_name, entry);
+		int r = remove_any_file (file_name_buffer,
+                                         RECURSIVE_REMOVE_OPTION);
 		int e = errno;
-		free (path_buffer);
+		free (file_name_buffer);
 
 		if (! r)
 		  {
@@ -319,7 +397,7 @@ remove_any_file (const char *path, enum remove_option option)
 	      }
 
 	    free (directory);
-	    return safer_rmdir (path) == 0;
+	    return safer_rmdir (file_name) == 0;
 	  }
 	}
       break;
@@ -328,37 +406,39 @@ remove_any_file (const char *path, enum remove_option option)
   return 0;
 }
 
-/* Check if PATH already exists and make a backup of it right now.
+/* Check if FILE_NAME already exists and make a backup of it right now.
    Return success (nonzero) only if the backup is either unneeded, or
    successful.  For now, directories are considered to never need
-   backup.  If ARCHIVE is nonzero, this is the archive and so, we do
-   not have to backup block or character devices, nor remote entities.  */
+   backup.  If THIS_IS_THE_ARCHIVE is nonzero, this is the archive and
+   so, we do not have to backup block or character devices, nor remote
+   entities.  */
 bool
-maybe_backup_file (const char *path, int archive)
+maybe_backup_file (const char *file_name, bool this_is_the_archive)
 {
   struct stat file_stat;
 
   /* Check if we really need to backup the file.  */
 
-  if (archive && _remdev (path))
+  if (this_is_the_archive && _remdev (file_name))
     return true;
 
-  if (stat (path, &file_stat))
+  if (stat (file_name, &file_stat))
     {
       if (errno == ENOENT)
 	return true;
 
-      stat_error (path);
+      stat_error (file_name);
       return false;
     }
 
   if (S_ISDIR (file_stat.st_mode))
     return true;
 
-  if (archive && (S_ISBLK (file_stat.st_mode) || S_ISCHR (file_stat.st_mode)))
+  if (this_is_the_archive
+      && (S_ISBLK (file_stat.st_mode) || S_ISCHR (file_stat.st_mode)))
     return true;
 
-  assign_string (&before_backup_name, path);
+  assign_string (&before_backup_name, file_name);
 
   /* A run situation may exist between Emacs or other GNU programs trying to
      make a backup for the same file simultaneously.  If theoretically
@@ -366,7 +446,7 @@ maybe_backup_file (const char *path, int archive)
      convention, GNU-wide, for all programs doing backups.  */
 
   assign_string (&after_backup_name, 0);
-  after_backup_name = find_backup_file_name (path, backup_type);
+  after_backup_name = find_backup_file_name (file_name, backup_type);
   if (! after_backup_name)
     xalloc_die ();
 
@@ -419,6 +499,26 @@ deref_stat (bool deref, char const *name, struct stat *buf)
   return deref ? stat (name, buf) : lstat (name, buf);
 }
 
+/* Set FD's (i.e., FILE's) access time to TIMESPEC[0].  If that's not
+   possible to do by itself, set its access and data modification
+   times to TIMESPEC[0] and TIMESPEC[1], respectively.  */
+int
+set_file_atime (int fd, char const *file, struct timespec const timespec[2])
+{
+#ifdef _FIOSATIME
+  if (0 <= fd)
+    {
+      struct timeval timeval;
+      timeval.tv_sec = timespec[0].tv_sec;
+      timeval.tv_usec = timespec[0].tv_nsec / 1000;
+      if (ioctl (fd, _FIOSATIME, &timeval) == 0)
+	return 0;
+    }
+#endif
+
+  return gl_futimens (fd, file, timespec);
+}
+
 /* A description of a working directory.  */
 struct wd
 {
@@ -443,8 +543,14 @@ chdir_arg (char const *dir)
 {
   if (wds == wd_alloc)
     {
-      wd_alloc = 2 * (wd_alloc + 1);
-      wd = xrealloc (wd, sizeof *wd * wd_alloc);
+      if (wd_alloc == 0)
+	{
+	  wd_alloc = 2;
+	  wd = xmalloc (sizeof *wd * wd_alloc);
+	}
+      else
+	wd = x2nrealloc (wd, &wd_alloc, sizeof *wd);
+
       if (! wds)
 	{
 	  wd[wds].name = ".";
@@ -483,9 +589,30 @@ chdir_do (int i)
 
       if (! prev->saved)
 	{
+	  int err = 0;
 	  prev->saved = 1;
 	  if (save_cwd (&prev->saved_cwd) != 0)
-	    FATAL_ERROR ((0, 0, _("Cannot save working directory")));
+	    err = errno;
+	  else if (0 <= prev->saved_cwd.desc)
+	    {
+	      /* Make sure we still have at least one descriptor available.  */
+	      int fd1 = prev->saved_cwd.desc;
+	      int fd2 = dup (fd1);
+	      if (0 <= fd2)
+		close (fd2);
+	      else if (errno == EMFILE)
+		{
+		  /* Force restore_cwd to use chdir_long.  */
+		  close (fd1);
+		  prev->saved_cwd.desc = -1;
+		  prev->saved_cwd.name = xgetcwd ();
+		}
+	      else
+		err = errno;
+	    }
+
+	  if (err)
+	    FATAL_ERROR ((0, err, _("Cannot save working directory")));
 	}
 
       if (curr->saved)
@@ -505,99 +632,6 @@ chdir_do (int i)
     }
 }
 
-/* Decode MODE from its binary form in a stat structure, and encode it
-   into a 9-byte string STRING, terminated with a NUL.  */
-
-void
-decode_mode (mode_t mode, char *string)
-{
-  *string++ = mode & S_IRUSR ? 'r' : '-';
-  *string++ = mode & S_IWUSR ? 'w' : '-';
-  *string++ = (mode & S_ISUID
-	       ? (mode & S_IXUSR ? 's' : 'S')
-	       : (mode & S_IXUSR ? 'x' : '-'));
-  *string++ = mode & S_IRGRP ? 'r' : '-';
-  *string++ = mode & S_IWGRP ? 'w' : '-';
-  *string++ = (mode & S_ISGID
-	       ? (mode & S_IXGRP ? 's' : 'S')
-	       : (mode & S_IXGRP ? 'x' : '-'));
-  *string++ = mode & S_IROTH ? 'r' : '-';
-  *string++ = mode & S_IWOTH ? 'w' : '-';
-  *string++ = (mode & S_ISVTX
-	       ? (mode & S_IXOTH ? 't' : 'T')
-	       : (mode & S_IXOTH ? 'x' : '-'));
-  *string = '\0';
-}
-
-/* Report an error associated with the system call CALL and the
-   optional name NAME.  */
-static void
-call_arg_error (char const *call, char const *name)
-{
-  int e = errno;
-  ERROR ((0, e, _("%s: Cannot %s"), quotearg_colon (name), call));
-}
-
-/* Report a fatal error associated with the system call CALL and
-   the optional file name NAME.  */
-static void
-call_arg_fatal (char const *call, char const *name)
-{
-  int e = errno;
-  FATAL_ERROR ((0, e, _("%s: Cannot %s"), quotearg_colon (name),  call));
-}
-
-/* Report a warning associated with the system call CALL and
-   the optional file name NAME.  */
-static void
-call_arg_warn (char const *call, char const *name)
-{
-  int e = errno;
-  WARN ((0, e, _("%s: Warning: Cannot %s"), quotearg_colon (name), call));
-}
-
-void
-chdir_fatal (char const *name)
-{
-  call_arg_fatal ("chdir", name);
-}
-
-void
-chmod_error_details (char const *name, mode_t mode)
-{
-  int e = errno;
-  char buf[10];
-  decode_mode (mode, buf);
-  ERROR ((0, e, _("%s: Cannot change mode to %s"),
-	  quotearg_colon (name), buf));
-}
-
-void
-chown_error_details (char const *name, uid_t uid, gid_t gid)
-{
-  int e = errno;
-  ERROR ((0, e, _("%s: Cannot change ownership to uid %lu, gid %lu"),
-	  quotearg_colon (name), (unsigned long) uid, (unsigned long) gid));
-}
-
-void
-close_error (char const *name)
-{
-  call_arg_error ("close", name);
-}
-
-void
-close_fatal (char const *name)
-{
-  call_arg_fatal ("close", name);
-}
-
-void
-close_warn (char const *name)
-{
-  call_arg_warn ("close", name);
-}
-
 void
 close_diag (char const *name)
 {
@@ -605,56 +639,6 @@ close_diag (char const *name)
     close_warn (name);
   else
     close_error (name);
-}
-
-void
-exec_fatal (char const *name)
-{
-  call_arg_fatal ("exec", name);
-}
-
-void
-link_error (char const *target, char const *source)
-{
-  int e = errno;
-  ERROR ((0, e, _("%s: Cannot hard link to %s"),
-	  quotearg_colon (source), quote_n (1, target)));
-}
-
-void
-mkdir_error (char const *name)
-{
-  call_arg_error ("mkdir", name);
-}
-
-void
-mkfifo_error (char const *name)
-{
-  call_arg_error ("mkfifo", name);
-}
-
-void
-mknod_error (char const *name)
-{
-  call_arg_error ("mknod", name);
-}
-
-void
-open_error (char const *name)
-{
-  call_arg_error ("open", name);
-}
-
-void
-open_fatal (char const *name)
-{
-  call_arg_fatal ("open", name);
-}
-
-void
-open_warn (char const *name)
-{
-  call_arg_warn ("open", name);
 }
 
 void
@@ -667,75 +651,12 @@ open_diag (char const *name)
 }
 
 void
-read_error (char const *name)
-{
-  call_arg_error ("read", name);
-}
-
-void
-read_error_details (char const *name, off_t offset, size_t size)
-{
-  char buf[UINTMAX_STRSIZE_BOUND];
-  int e = errno;
-  ERROR ((0, e,
-	  ngettext ("%s: Read error at byte %s, reading %lu byte",
-		    "%s: Read error at byte %s, reading %lu bytes",
-		    size),
-	  quotearg_colon (name), STRINGIFY_BIGINT (offset, buf),
-	  (unsigned long) size));
-}
-
-void
-read_warn_details (char const *name, off_t offset, size_t size)
-{
-  char buf[UINTMAX_STRSIZE_BOUND];
-  int e = errno;
-  WARN ((0, e,
-	 ngettext ("%s: Warning: Read error at byte %s, reading %lu byte",
-		   "%s: Warning: Read error at byte %s, reading %lu bytes",
-		   size),
-	 quotearg_colon (name), STRINGIFY_BIGINT (offset, buf),
-	 (unsigned long) size));
-}
-
-void
 read_diag_details (char const *name, off_t offset, size_t size)
 {
   if (ignore_failed_read_option)
     read_warn_details (name, offset, size);
   else
     read_error_details (name, offset, size);
-}
-
-void
-read_fatal (char const *name)
-{
-  call_arg_fatal ("read", name);
-}
-
-void
-read_fatal_details (char const *name, off_t offset, size_t size)
-{
-  char buf[UINTMAX_STRSIZE_BOUND];
-  int e = errno;
-  FATAL_ERROR ((0, e,
-		ngettext ("%s: Read error at byte %s, reading %lu byte",
-			  "%s: Read error at byte %s, reading %lu bytes",
-			  size),
-		quotearg_colon (name), STRINGIFY_BIGINT (offset, buf),
-		(unsigned long) size));
-}
-
-void
-readlink_error (char const *name)
-{
-  call_arg_error ("readlink", name);
-}
-
-void
-readlink_warn (char const *name)
-{
-  call_arg_warn ("readlink", name);
 }
 
 void
@@ -748,56 +669,12 @@ readlink_diag (char const *name)
 }
 
 void
-savedir_error (char const *name)
-{
-  call_arg_error ("savedir", name);
-}
-
-void
-savedir_warn (char const *name)
-{
-  call_arg_warn ("savedir", name);
-}
-
-void
 savedir_diag (char const *name)
 {
   if (ignore_failed_read_option)
     savedir_warn (name);
   else
     savedir_error (name);
-}
-
-void
-seek_error (char const *name)
-{
-  call_arg_error ("seek", name);
-}
-
-void
-seek_error_details (char const *name, off_t offset)
-{
-  char buf[UINTMAX_STRSIZE_BOUND];
-  int e = errno;
-  ERROR ((0, e, _("%s: Cannot seek to %s"),
-	  quotearg_colon (name),
-	  STRINGIFY_BIGINT (offset, buf)));
-}
-
-void
-seek_warn (char const *name)
-{
-  call_arg_warn ("seek", name);
-}
-
-void
-seek_warn_details (char const *name, off_t offset)
-{
-  char buf[UINTMAX_STRSIZE_BOUND];
-  int e = errno;
-  WARN ((0, e, _("%s: Warning: Cannot seek to %s"),
-	 quotearg_colon (name),
-	 STRINGIFY_BIGINT (offset, buf)));
 }
 
 void
@@ -810,26 +687,6 @@ seek_diag_details (char const *name, off_t offset)
 }
 
 void
-symlink_error (char const *contents, char const *name)
-{
-  int e = errno;
-  ERROR ((0, e, _("%s: Cannot create symlink to %s"),
-	  quotearg_colon (name), quote_n (1, contents)));
-}
-
-void
-stat_error (char const *name)
-{
-  call_arg_error ("stat", name);
-}
-
-void
-stat_warn (char const *name)
-{
-  call_arg_warn ("stat", name);
-}
-
-void
 stat_diag (char const *name)
 {
   if (ignore_failed_read_option)
@@ -839,67 +696,11 @@ stat_diag (char const *name)
 }
 
 void
-truncate_error (char const *name)
-{
-  call_arg_error ("truncate", name);
-}
-
-void
-truncate_warn (char const *name)
-{
-  call_arg_warn ("truncate", name);
-}
-
-void
-unlink_error (char const *name)
-{
-  call_arg_error ("unlink", name);
-}
-
-void
-utime_error (char const *name)
-{
-  call_arg_error ("utime", name);
-}
-
-void
-waitpid_error (char const *name)
-{
-  call_arg_error ("waitpid", name);
-}
-
-void
-write_error (char const *name)
-{
-  call_arg_error ("write", name);
-}
-
-void
-write_error_details (char const *name, ssize_t status, size_t size)
-{
-  if (status < 0)
-    write_error (name);
-  else
-    ERROR ((0, 0,
-	    ngettext ("%s: Wrote only %lu of %lu byte",
-		      "%s: Wrote only %lu of %lu bytes",
-		      record_size),
-	    name, (unsigned long) status, (unsigned long) record_size));
-}
-
-void
-write_fatal (char const *name)
-{
-  call_arg_fatal ("write", name);
-}
-
-void
 write_fatal_details (char const *name, ssize_t status, size_t size)
 {
   write_error_details (name, status, size);
   fatal_exit ();
 }
-
 
 /* Fork, aborting if unsuccessful.  */
 pid_t
@@ -919,18 +720,29 @@ xpipe (int fd[2])
     call_arg_fatal ("pipe", _("interprocess channel"));
 }
 
-/* Return an unambiguous printable representation, allocated in slot N,
-   for NAME, suitable for diagnostics.  */
-char const *
-quote_n (int n, char const *name)
+/* Return PTR, aligned upward to the next multiple of ALIGNMENT.
+   ALIGNMENT must be nonzero.  The caller must arrange for ((char *)
+   PTR) through ((char *) PTR + ALIGNMENT - 1) to be addressable
+   locations.  */
+
+static inline void *
+ptr_align (void *ptr, size_t alignment)
 {
-  return quotearg_n_style (n, locale_quoting_style, name);
+  char *p0 = ptr;
+  char *p1 = p0 + alignment - 1;
+  return p1 - (size_t) p1 % alignment;
 }
 
-/* Return an unambiguous printable representation of NAME, suitable
-   for diagnostics.  */
-char const *
-quote (char const *name)
+/* Return the address of a page-aligned buffer of at least SIZE bytes.
+   The caller should free *PTR when done with the buffer.  */
+
+void *
+page_aligned_alloc (void **ptr, size_t size)
 {
-  return quote_n (0, name);
+  size_t alignment = getpagesize ();
+  size_t size1 = size + alignment;
+  if (size1 < size)
+    xalloc_die ();
+  *ptr = xmalloc (size1);
+  return ptr_align (*ptr, alignment);
 }

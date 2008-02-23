@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src bin tar rmt ;
+
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_CONFIG_H -w -DLOCALEDIR=\'\"/etc/locale\"\' ;
+}
+
+BinCommand rmt :
+	rmt.c
+	: libtar.a network : <src!bin!tar!src>tar.rsrc ;

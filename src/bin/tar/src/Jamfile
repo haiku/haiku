@@ -5,9 +5,7 @@ SubDirSysHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirSysHdrs [ FDirName $(SUBDIR) ] ;
 
 # set some additional defines
-{
-	SubDirCcFlags -DHAVE_CONFIG_H -w ;
-}
+SubDirCcFlags -DHAVE_CONFIG_H -w -DLOCALEDIR=\'\"/etc/locale\"\' -DDEFAULT_RMT_COMMAND=\'\"/bin/rmt\"\' ;
 
 local tar_rsrc = [ FGristFiles tar.rsrc ] ;
 ResComp $(tar_rsrc) : [ FGristFiles tar.rdef ] ;
@@ -21,18 +19,12 @@ BinCommand tar :
 	xheader.c
 	incremen.c
 	list.c
-	mangle.c
 	misc.c
 	names.c
-	rtapelib.c
 	sparse.c
 	system.c
 	tar.c
+	transform.c
 	update.c
 	utf8.c
 	: libtar.a : tar.rsrc ;
-
-BinCommand rmt :
-	rmt.c
-	: libtar.a $(TARGET_NETWORK_LIBS)
-	: tar.rsrc ;

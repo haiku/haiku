@@ -1,7 +1,7 @@
 /* human.c -- print human readable file size
 
-   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003 Free
-   Software Foundation, Inc.
+   Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+   2005, 2006, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,37 +15,22 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software Foundation,
-   Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Written by Paul Eggert and Larry McVoy.  */
 
-#if HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include "human.h"
 
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
-#endif
-#ifndef UINTMAX_MAX
-# define UINTMAX_MAX ((uintmax_t) -1)
-#endif
-
-#if HAVE_LOCALE_H && HAVE_LOCALECONV
-# include <locale.h>
-#endif
-
+#include <locale.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "gettext.h"
-#define _(msgid) gettext (msgid)
-
 #include <argmatch.h>
 #include <error.h>
-#include <xstrtol.h>
+#include <intprops.h>
 
 /* The maximum length of a suffix like "KiB".  */
 #define HUMAN_READABLE_SUFFIX_LENGTH_MAX 3
@@ -102,10 +87,8 @@ group_number (char *number, size_t numberlen,
   size_t i = numberlen;
 
   /* The maximum possible value for NUMBERLEN is the number of digits
-     in the square of the largest uintmax_t, so double the size of
-     uintmax_t before converting to a bound.  302 / 1000 is ceil
-     (log10 (2.0)).  Add 1 for integer division truncation.  */
-  char buf[2 * sizeof (uintmax_t) * CHAR_BIT * 302 / 1000 + 1];
+     in the square of the largest uintmax_t, so double the size needed.  */
+  char buf[2 * INT_STRLEN_BOUND (uintmax_t) + 1];
 
   memcpy (buf, number, numberlen);
   d = number + numberlen;
@@ -158,6 +141,9 @@ group_number (char *number, size_t numberlen,
    so on.  Numbers smaller than the power aren't modified.
    human_autoscale is normally used together with human_SI.
 
+   If (OPTS & human_space_before_unit), use a space to separate the
+   number from any suffix that is appended as described below.
+
    If (OPTS & human_SI), append an SI prefix indicating which power is
    being used.  If in addition (OPTS & human_B), append "B" (if base
    1000) or "iB" (if base 1024) to the SI prefix.  When ((OPTS &
@@ -190,7 +176,6 @@ human_readable (uintmax_t n, char *buf, int opts,
   size_t decimal_pointlen = 1;
   char const *grouping = "";
   char const *thousands_sep = "";
-#if HAVE_LOCALE_H && HAVE_LOCALECONV
   struct lconv const *l = localeconv ();
   size_t pointlen = strlen (l->decimal_point);
   if (0 < pointlen && pointlen <= MB_LEN_MAX)
@@ -201,7 +186,6 @@ human_readable (uintmax_t n, char *buf, int opts,
   grouping = l->grouping;
   if (strlen (l->thousands_sep) <= MB_LEN_MAX)
     thousands_sep = l->thousands_sep;
-#endif
 
   psuffix = buf + LONGEST_HUMAN_READABLE - HUMAN_READABLE_SUFFIX_LENGTH_MAX;
   p = psuffix;
@@ -300,8 +284,8 @@ human_readable (uintmax_t n, char *buf, int opts,
 	  {
 	    do
 	      {
-		unsigned r10 = (amt % base) * 10 + tenths;
-		unsigned r2 = (r10 % base) * 2 + (rounding >> 1);
+		unsigned int r10 = (amt % base) * 10 + tenths;
+		unsigned int r2 = (r10 % base) * 2 + (rounding >> 1);
 		amt /= base;
 		tenths = r10 / base;
 		rounding = (r2 < base
@@ -384,6 +368,9 @@ human_readable (uintmax_t n, char *buf, int opts,
 	      break;
 	}
 
+      if ((exponent | (opts & human_B)) && (opts & human_space_before_unit))
+	*psuffix++ = ' ';
+
       if (exponent)
 	*psuffix++ = (! (opts & human_base_1024) && exponent == 1
 		      ? 'k'
@@ -428,7 +415,9 @@ humblock (char const *spec, uintmax_t *block_size, int *options)
   int i;
   int opts = 0;
 
-  if (! spec && ! (spec = getenv ("BLOCK_SIZE")))
+  if (! spec
+      && ! (spec = getenv ("BLOCK_SIZE"))
+      && ! (spec = getenv ("BLOCKSIZE")))
     *block_size = default_block_size ();
   else
     {
@@ -449,7 +438,10 @@ humblock (char const *spec, uintmax_t *block_size, int *options)
 	  strtol_error e = xstrtoumax (spec, &ptr, 0, block_size,
 				       "eEgGkKmMpPtTyYzZ0");
 	  if (e != LONGINT_OK)
-	    return e;
+	    {
+	      *options = 0;
+	      return e;
+	    }
 	  for (; ! ('0' <= *spec && *spec <= '9'); spec++)
 	    if (spec == ptr)
 	      {
@@ -467,17 +459,14 @@ humblock (char const *spec, uintmax_t *block_size, int *options)
   return LONGINT_OK;
 }
 
-int
-human_options (char const *spec, bool report_errors, uintmax_t *block_size)
+enum strtol_error
+human_options (char const *spec, int *opts, uintmax_t *block_size)
 {
-  int opts;
-  strtol_error e = humblock (spec, block_size, &opts);
+  strtol_error e = humblock (spec, block_size, opts);
   if (*block_size == 0)
     {
       *block_size = default_block_size ();
       e = LONGINT_INVALID;
     }
-  if (e != LONGINT_OK && report_errors)
-    STRTOL_FATAL_ERROR (spec, _("block size"), e);
-  return opts;
+  return e;
 }

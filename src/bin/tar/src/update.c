@@ -1,11 +1,11 @@
 /* Update a tar archive.
 
-   Copyright (C) 1988, 1992, 1994, 1996, 1997, 1999, 2000, 2001, 2003
-   Free Software Foundation, Inc.
+   Copyright (C) 1988, 1992, 1994, 1996, 1997, 1999, 2000, 2001, 2003,
+   2004, 2005, 2007 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
-   Free Software Foundation; either version 2, or (at your option) any later
+   Free Software Foundation; either version 3, or (at your option) any later
    version.
 
    This program is distributed in the hope that it will be useful, but
@@ -15,14 +15,14 @@
 
    You should have received a copy of the GNU General Public License along
    with this program; if not, write to the Free Software Foundation, Inc.,
-   59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.  */
+   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Implement the 'r', 'u' and 'A' options for tar.  'A' means that the
    file names are tar files, and they should simply be appended to the end
    of the archive.  No attempt is made to record the reads from the args; if
    they're on raw tape or something like that, it'll probably lose...  */
 
-#include "system.h"
+#include <system.h>
 #include <quotearg.h>
 #include "common.h"
 
@@ -33,7 +33,7 @@ extern union block *current_block;
 /* We've hit the end of the old stuff, and its time to start writing new
    stuff to the tape.  This involves seeking back one record and
    re-writing the current record (which has been changed).
-   FIXME: Either eliminate it or move it to common.h. 
+   FIXME: Either eliminate it or move it to common.h.
 */
 bool time_to_start_writing;
 
@@ -42,22 +42,22 @@ bool time_to_start_writing;
    first part of the record.  */
 char *output_start;
 
-/* Catenate file PATH to the archive without creating a header for it.
+/* Catenate file FILE_NAME to the archive without creating a header for it.
    It had better be a tar file or the archive is screwed.  */
 static void
-append_file (char *path)
+append_file (char *file_name)
 {
-  int handle = open (path, O_RDONLY | O_BINARY);
+  int handle = open (file_name, O_RDONLY | O_BINARY);
   struct stat stat_data;
 
   if (handle < 0)
     {
-      open_error (path);
+      open_error (file_name);
       return;
     }
 
   if (fstat (handle, &stat_data) != 0)
-    stat_error (path);
+    stat_error (file_name);
   else
     {
       off_t bytes_left = stat_data.st_size;
@@ -66,7 +66,7 @@ append_file (char *path)
 	{
 	  union block *start = find_next_block ();
 	  size_t buffer_size = available_space_after (start);
-	  ssize_t status;
+	  size_t status;
 	  char buf[UINTMAX_STRSIZE_BOUND];
 
 	  if (bytes_left < buffer_size)
@@ -78,15 +78,15 @@ append_file (char *path)
 	    }
 
 	  status = safe_read (handle, start->buffer, buffer_size);
-	  if (status < 0)
-	    read_fatal_details (path, stat_data.st_size - bytes_left,
+	  if (status == SAFE_READ_ERROR)
+	    read_fatal_details (file_name, stat_data.st_size - bytes_left,
 				buffer_size);
 	  if (status == 0)
 	    FATAL_ERROR ((0, 0,
 			  ngettext ("%s: File shrank by %s byte",
 				    "%s: File shrank by %s bytes",
 				    bytes_left),
-			  quotearg_colon (path),
+			  quotearg_colon (file_name),
 			  STRINGIFY_BIGINT (bytes_left, buf)));
 
 	  bytes_left -= status;
@@ -96,7 +96,7 @@ append_file (char *path)
     }
 
   if (close (handle) != 0)
-    close_error (path);
+    close_error (file_name);
 }
 
 /* Implement the 'r' (add files to end of archive), and 'u' (add files
@@ -106,12 +106,12 @@ void
 update_archive (void)
 {
   enum read_header previous_status = HEADER_STILL_UNREAD;
-  int found_end = 0;
+  bool found_end = false;
 
   name_gather ();
   open_archive (ACCESS_UPDATE);
-  xheader_write_global ();
-  
+  buffer_write_global_xheader ();
+
   while (!found_end)
     {
       enum read_header status = read_header (false);
@@ -126,30 +126,35 @@ update_archive (void)
 	  {
 	    struct name *name;
 
+	    decode_header (current_header, &current_stat_info,
+			   &current_format, 0);
+	    archive_format = current_format;
+
 	    if (subcommand_option == UPDATE_SUBCOMMAND
 		&& (name = name_scan (current_stat_info.file_name)) != NULL)
 	      {
 		struct stat s;
-		enum archive_format unused;
 
-		decode_header (current_header, &current_stat_info, &unused, 0);
 		chdir_do (name->change_dir);
 		if (deref_stat (dereference_option,
 				current_stat_info.file_name, &s) == 0
-		    && s.st_mtime <= current_stat_info.stat.st_mtime)
+		    && (tar_timespec_cmp (get_stat_mtime (&s),
+				          current_stat_info.mtime)
+			<= 0))
 		  add_avoided_name (current_stat_info.file_name);
 	      }
+
 	    skip_member ();
 	    break;
 	  }
 
 	case HEADER_ZERO_BLOCK:
 	  current_block = current_header;
-	  found_end = 1;
+	  found_end = true;
 	  break;
 
 	case HEADER_END_OF_FILE:
-	  found_end = 1;
+	  found_end = true;
 	  break;
 
 	case HEADER_FAILURE:
@@ -175,6 +180,7 @@ update_archive (void)
 	  break;
 	}
 
+      tar_stat_destroy (&current_stat_info);
       previous_status = status;
     }
 
@@ -183,18 +189,18 @@ update_archive (void)
   output_start = current_block->buffer;
 
   {
-    char *path;
+    char *file_name;
 
-    while ((path = name_from_list ()) != NULL)
+    while ((file_name = name_from_list ()) != NULL)
       {
-	if (excluded_name (path))
+	if (excluded_name (file_name))
 	  continue;
-	if (interactive_option && !confirm ("add", path))
+	if (interactive_option && !confirm ("add", file_name))
 	  continue;
 	if (subcommand_option == CAT_SUBCOMMAND)
-	  append_file (path);
+	  append_file (file_name);
 	else
-	  dump_file (path, 1, (dev_t) 0);
+	  dump_file (file_name, 1, (dev_t) 0);
       }
   }
 

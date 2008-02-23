@@ -5,4 +5,5 @@ TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
 	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 SubInclude HAIKU_TOP src bin tar lib ;
+SubInclude HAIKU_TOP src bin tar rmt ;
 SubInclude HAIKU_TOP src bin tar src ;
