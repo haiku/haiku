@@ -10,6 +10,11 @@
 #include <thread.h>
 
 
+/*! Helper function for syscalls with relative timeout.
+	Converts the given relative timeout to an absolute timeout or retrieves
+	the value from the syscall restart parameters, if the syscall has been
+	restarted. A negative value means infinite timeout.
+*/
 static inline void
 syscall_restart_handle_timeout_pre(bigtime_t& timeout)
 {
@@ -20,12 +25,18 @@ syscall_restart_handle_timeout_pre(bigtime_t& timeout)
 		timeout = *(bigtime_t*)thread->syscall_restart.parameters;
 	else if (timeout >= 0) {
 		timeout += system_time();
+		// deal with overflow
 		if (timeout < 0)
 			timeout = B_INFINITE_TIMEOUT;
 	}
 }
 
 
+/*! Helper function for syscalls with flags + timeout.
+	If necessary converts the given timeout to an absolute timeout or retrieves
+	the value from the syscall restart parameters, if the syscall has been
+	restarted.
+*/
 static inline void
 syscall_restart_handle_timeout_pre(uint32& flags, bigtime_t& timeout)
 {
@@ -36,11 +47,12 @@ syscall_restart_handle_timeout_pre(uint32& flags, bigtime_t& timeout)
 	struct thread* thread = thread_get_current_thread();
 	if ((thread->flags & THREAD_FLAGS_SYSCALL_RESTARTED) != 0) {
 		timeout = *(bigtime_t*)thread->syscall_restart.parameters;
-		if (timeout != 0 && (flags & B_RELATIVE_TIMEOUT) != 0)
+		if (timeout > 0 && (flags & B_RELATIVE_TIMEOUT) != 0)
 			flags = (flags & ~B_RELATIVE_TIMEOUT) | B_ABSOLUTE_TIMEOUT;
 	} else if ((flags & B_RELATIVE_TIMEOUT) != 0) {
-		if (timeout != 0) {
+		if (timeout > 0) {
 			timeout += system_time();
+			// deal with overflow
 			if (timeout < 0)
 				timeout = B_INFINITE_TIMEOUT;
 
