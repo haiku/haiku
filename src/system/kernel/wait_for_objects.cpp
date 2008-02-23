@@ -220,7 +220,7 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// wait for something to happen
 	status = acquire_sem_etc(sync->sem, 1,
-		B_CAN_INTERRUPT | (timeout != -1 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
+		B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// restore the old signal mask
 	if (sigMask != NULL)
@@ -325,7 +325,7 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 	locker.Unlock();
 
 	status = acquire_sem_etc(sync->sem, 1,
-		B_CAN_INTERRUPT | (timeout != -1 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
+		B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// deselect file descriptors
 
