@@ -22,17 +22,17 @@ float displayScale = 1.0;
 float depthOfView = 30.0;
 float zRatio = 10.0;
 
-float white[3] = {1.0,1.0,1.0};
-float dimWhite[3] = {0.25,0.25,0.25};
-float black[3] = {0.0,0.0,0.0};
-float foggy[3] = {0.4,0.4,0.4};
-float blue[3] = {0.0,0.0,1.0};
-float dimBlue[3] = {0.0,0.0,0.5};
-float yellow[3] = {1.0,1.0,0.0};
-float dimYellow[3] = {0.5,0.5,0.0};
-float green[3] = {0.0,1.0,0.0};
-float dimGreen[3] = {0.0,0.5,0.0};
-float red[3] = {1.0,0.0,0.0};
+float white[3] = {1.0, 1.0, 1.0};
+float dimWhite[3] = {0.25, 0.25, 0.25};
+float black[3] = {0.0, 0.0, 0.0};
+float foggy[3] = {0.4, 0.4, 0.4};
+float blue[3] = {0.0, 0.0, 1.0};
+float dimBlue[3] = {0.0, 0.0, 0.5};
+float yellow[3] = {1.0, 1.0, 0.0};
+float dimYellow[3] = {0.5, 0.5, 0.0};
+float green[3] = {0.0, 1.0, 0.0};
+float dimGreen[3] = {0.0, 0.5, 0.0};
+float red[3] = {1.0, 0.0, 0.0};
 
 float* bgColor = black;
 
@@ -96,26 +96,26 @@ waitEvent(sem_id event)
 static int32
 simonThread(void* cookie)
 {
-	ObjectView* ov = (ObjectView*)cookie;
+	ObjectView* objectView = reinterpret_cast<ObjectView*>(cookie);
 
 	int noPause = 0;
-	while (acquire_sem_etc(ov->quittingSem, 1, B_TIMEOUT, 0) == B_NO_ERROR) {
-		if (ov->SpinIt()) {
-			ov->DrawFrame(noPause);
-			release_sem(ov->quittingSem);
+	while (acquire_sem_etc(objectView->quittingSem, 1, B_TIMEOUT, 0) == B_NO_ERROR) {
+		if (objectView->SpinIt()) {
+			objectView->DrawFrame(noPause);
+			release_sem(objectView->quittingSem);
 			noPause = 1;
 		} else {
-			release_sem(ov->quittingSem);
+			release_sem(objectView->quittingSem);
 			noPause = 0;
-			waitEvent(ov->drawEvent);
+			waitEvent(objectView->drawEvent);
 		}
 	}
 	return 0;
 }
 
 
-ObjectView::ObjectView(BRect r, char *name, ulong resizingMode, ulong options)
-	: BGLView(r,name,resizingMode,0,options),
+ObjectView::ObjectView(BRect rect, char *name, ulong resizingMode, ulong options)
+	: BGLView(rect, name, resizingMode, 0, options),
 	fHistEntries(0),
 	fOldestEntry(0),
 	fFps(true),
@@ -147,9 +147,9 @@ ObjectView::ObjectView(BRect r, char *name, ulong resizingMode, ulong options)
 	fTrackingInfo.lastDx = 0.0f;
 	fTrackingInfo.lastDy = 0.0f;
 		
-	fLastObjectDistance = fObjectDistance = depthOfView/8;
-	quittingSem = create_sem(1,"quitting sem");
-	drawEvent = create_sem(0,"draw event");
+	fLastObjectDistance = fObjectDistance = depthOfView / 8;
+	quittingSem = create_sem(1, "quitting sem");
+	drawEvent = create_sem(0, "draw event");
 
 	char findDir[PATH_MAX];
 	find_directory(B_BEOS_ETC_DIRECTORY, -1, true, findDir, PATH_MAX);
@@ -173,12 +173,12 @@ ObjectView::AttachedToWindow()
 	float position[] = {0.0, 3.0, 3.0, 0.0};
 	float position1[] = {-3.0, -3.0, 3.0, 0.0};
 	float position2[] = {3.0, 0.0, 0.0, 0.0};
-	float local_view[] = {0.0,0.0};
+	float local_view[] = {0.0, 0.0};
 //	float ambient[] = {0.1745, 0.03175, 0.03175};
 //	float diffuse[] = {0.61424, 0.10136, 0.10136};
 //	float specular[] = {0.727811, 0.626959, 0.626959};
-//	rgb_color black = {0,0,0,255};
-	BRect r = Bounds();
+//	rgb_color black = {0, 0, 0, 255};
+	BRect bounds = Bounds();
 
 	BGLView::AttachedToWindow();
 	Window()->SetPulseRate(100000);
@@ -193,8 +193,8 @@ ObjectView::AttachedToWindow()
 	glShadeModel(GL_SMOOTH);
 	
 	glLightfv(GL_LIGHT0, GL_POSITION, position);
-	glLightfv(GL_LIGHT0+1, GL_POSITION, position1);
-	glLightfv(GL_LIGHT0+2, GL_POSITION, position2);
+	glLightfv(GL_LIGHT0 + 1, GL_POSITION, position1);
+	glLightfv(GL_LIGHT0 + 2, GL_POSITION, position2);
 	glLightModelfv(GL_LIGHT_MODEL_LOCAL_VIEWER, local_view);
 
 	glEnable(GL_LIGHT0);
@@ -211,26 +211,25 @@ ObjectView::AttachedToWindow()
 	glEnable(GL_AUTO_NORMAL);
 	glEnable(GL_NORMALIZE);
 	
-	glMaterialf(GL_FRONT, GL_SHININESS, 0.6*128.0);
+	glMaterialf(GL_FRONT, GL_SHININESS, 0.6 * 128.0);
 
-	glClearColor(bgColor[0],bgColor[1],bgColor[2], 1.0);
+	glClearColor(bgColor[0], bgColor[1], bgColor[2], 1.0);
 	glColor3f(1.0, 1.0, 1.0);
 		
-	glViewport(0, 0, (GLint)r.IntegerWidth()+1, (GLint)r.IntegerHeight()+1);
+	glViewport(0, 0, (GLint)bounds.IntegerWidth() + 1,
+				(GLint)bounds.IntegerHeight() + 1);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	float scale=displayScale;
-	//    glOrtho (0.0, 16.0, 0, 16.0*(GLfloat)300/(GLfloat)300,
-	//			         -10.0, 10.0);
-	glOrtho(-scale, scale, -scale, scale, -scale*depthOfView,
-			scale*depthOfView);
+	
+	float scale = displayScale;	
+	glOrtho(-scale, scale, -scale, scale, -scale * depthOfView,
+			scale * depthOfView);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
 	UnlockGL();
 
-	fDrawThread = spawn_thread(simonThread,
-		"Simon", B_NORMAL_PRIORITY, this);
+	fDrawThread = spawn_thread(simonThread, "Simon", B_NORMAL_PRIORITY, this);
 	resume_thread(fDrawThread);
 	fForceRedraw = true;
 	setEvent(drawEvent);
@@ -264,12 +263,13 @@ void
 ObjectView::Pulse()
 {
 	Window()->Lock();
-	BRect p = Parent()->Bounds();
-	BRect b = Bounds();
-	p.OffsetTo(0,0);
-	b.OffsetTo(0,0);
-	if (b != p) {
-		ResizeTo(p.right - p.left, p.bottom - p.top);
+	BRect parentBounds = Parent()->Bounds();
+	BRect bounds = Bounds();
+	parentBounds.OffsetTo(0, 0);
+	bounds.OffsetTo(0, 0);
+	if (bounds != parentBounds) {
+		ResizeTo(parentBounds.right - parentBounds.left,
+				 parentBounds.bottom - parentBounds.top);
 	}
 	Window()->Unlock();
 }
@@ -278,98 +278,94 @@ ObjectView::Pulse()
 void
 ObjectView::MessageReceived(BMessage* msg)
 {
-//	msg->PrintToStream();
-	BMenuItem* i;
-	bool* b;
+	BMenuItem* item = NULL;	
+	bool toggleItem = false;
 
 	switch (msg->what) {
-   	    case bmsgFPS:
+   	    case kMsgFPS:
 		    fFps = (fFps) ? false : true;
-			msg->FindPointer("source", (void**)&i);
-			i->SetMarked(fFps);
+			msg->FindPointer("source", reinterpret_cast<void**>(&item));
+			item->SetMarked(fFps);
 			fForceRedraw = true;
 			setEvent(drawEvent);
 			break;
-	    case bmsgAddModel:
+	    case kMsgAddModel:
 		    fObjListLock.Lock();
 			fObjects.AddItem(new TriangleObject(this, teapotPath));
 			fObjListLock.Unlock();
 			setEvent(drawEvent);
 			break;
-		case bmsgLights:
+		case kMsgLights:
 		{
-			msg->FindPointer("source", (void**)&i);
+			msg->FindPointer("source", reinterpret_cast<void**>(&item));
 			long lightNum = msg->FindInt32("num");
 			long color = msg->FindInt32("color");
-			BMenu *m = i->Menu();
-			long index = m->IndexOf(i);
-			m->ItemAt(index)->SetMarked(true);
-			for (int i = 0; i < m->CountItems(); i++) {
+			BMenu *menu = item->Menu();
+			long index = menu->IndexOf(item);
+			menu->ItemAt(index)->SetMarked(true);
+			for (int i = 0; i < menu->CountItems(); i++) {
 				if (i != index)
-					m->ItemAt(i)->SetMarked(false);
+					menu->ItemAt(i)->SetMarked(false);
 			}
 			
 			LockGL();
 			if (color != lightNone) {
-				glEnable(GL_LIGHT0+lightNum - 1);
-				glLightfv(GL_LIGHT0+lightNum - 1, GL_SPECULAR,
+				glEnable(GL_LIGHT0 + lightNum - 1);
+				glLightfv(GL_LIGHT0 + lightNum - 1, GL_SPECULAR,
 					lights[color].specular);
-				glLightfv(GL_LIGHT0+lightNum - 1, GL_DIFFUSE,
+				glLightfv(GL_LIGHT0 + lightNum - 1, GL_DIFFUSE,
 					lights[color].diffuse);
-				glLightfv(GL_LIGHT0+lightNum - 1, GL_AMBIENT,
+				glLightfv(GL_LIGHT0 + lightNum - 1, GL_AMBIENT,
 					lights[color].ambient);
 			} else {
-				glDisable(GL_LIGHT0+lightNum - 1);
+				glDisable(GL_LIGHT0 + lightNum - 1);
 			}
 			UnlockGL();
 			fForceRedraw = true;
 			setEvent(drawEvent);
 			break;
 		}
-		case bmsgGouraud:
-			b = &fGouraud;
-			goto stateChange;
-		case bmsgZBuffer:
-			b = &fZbuf;
-			goto stateChange;
-		case bmsgCulling:
-			b = &fCulling;
-			goto stateChange;
-		case bmsgLighting:
-			b = &fLighting;
-			goto stateChange;
-		case bmsgFilled:
-			b = &fFilled;
-			goto stateChange;
-		case bmsgPerspective:
-			b = &fPersp;
-			goto stateChange;
-		case bmsgFog:
-			b = &fFog;
-			goto stateChange;
-		stateChange:
-			if (msg->FindPointer("source", (void**)&i) < B_OK)
-				i = NULL;
-			
-			if (!i)
-				return;
-
-			if (*b) {
-				i->SetMarked(*b = false);
-			} else {
-				i->SetMarked(*b = true);
-			}
-			
-			setEvent(drawEvent);
+		case kMsgGouraud:
+			fGouraud = !fGouraud;
+			toggleItem = true;
 			break;
-		default:
-			BGLView::MessageReceived(msg);
+		case kMsgZBuffer:
+			fZbuf = !fZbuf;
+			toggleItem = true;
+			break;
+		case kMsgCulling:
+			fCulling = !fCulling;
+			toggleItem = true;
+			break;
+		case kMsgLighting:
+			fLighting = !fLighting;
+			toggleItem = true;
+			break;
+		case kMsgFilled:
+			fFilled = !fFilled;
+			toggleItem = true;
+			break;
+		case kMsgPerspective:
+			fPersp = !fPersp;
+			toggleItem = true;
+			break;
+		case kMsgFog:
+			fFog = !fFog;
+			toggleItem = true;
+			break;			
 	}
+	
+	if (toggleItem && msg->FindPointer("source", reinterpret_cast<void**>(&item)) == B_OK){		
+		item->SetMarked(!item->IsMarked());
+		setEvent(drawEvent);			
+	}
+	
+	BGLView::MessageReceived(msg);
 }
 
 
 int
-ObjectView::ObjectAtPoint(BPoint p)
+ObjectView::ObjectAtPoint(const BPoint &point)
 {
 	LockGL();
 	glShadeModel(GL_FLAT);
@@ -378,16 +374,17 @@ ObjectView::ObjectAtPoint(BPoint p)
 	glClearColor(black[0], black[1], black[2], 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | (fZbuf ? GL_DEPTH_BUFFER_BIT : 0));
 
-	float f[3];
-	f[1] = f[2] = 0;
+	float idColor[3];
+	idColor[1] = idColor[2] = 0;
 	for (int i = 0; i < fObjects.CountItems(); i++) {
-		// to take into account 16 bits colorspaces, only use the 5 highest bits of the red channel
-		f[0] = (255 - (i << 3)) / 255.0;
-		((GLObject*)fObjects.ItemAt(i))->Draw(true, f);
+		// to take into account 16 bits colorspaces,
+		// only use the 5 highest bits of the red channel
+		idColor[0] = (255 - (i << 3)) / 255.0;
+		reinterpret_cast<GLObject*>(fObjects.ItemAt(i))->Draw(true, idColor);
 	}
 	glReadBuffer(GL_BACK);
 	uchar pixel[256];
-	glReadPixels((GLint)p.x, (GLint)(Bounds().bottom - p.y), 1, 1,
+	glReadPixels((GLint)point.x, (GLint)(Bounds().bottom - point.y), 1, 1,
 		GL_RGB, GL_UNSIGNED_BYTE, pixel);
 	int objNum = pixel[0];
 	objNum = (255 - objNum) >> 3;
@@ -406,7 +403,7 @@ ObjectView::MouseDown(BPoint point)
 
 	BMessage *msg = Window()->CurrentMessage();
 	uint32 buttons = msg->FindInt32("buttons");
-	object = ((GLObject*)fObjects.ItemAt(ObjectAtPoint(point)));
+	object = reinterpret_cast<GLObject*>(fObjects.ItemAt(ObjectAtPoint(point)));
 
 	if (object != NULL){
 		if (buttons == B_PRIMARY_MOUSE_BUTTON || buttons == B_SECONDARY_MOUSE_BUTTON) {
@@ -506,17 +503,16 @@ ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 
 
 void
-ObjectView::FrameResized(float w, float h)
+ObjectView::FrameResized(float width, float height)
 {
 	LockGL();
 
-	BGLView::FrameResized(w, h);
-
-	BRect b = Bounds();
-	w = b.Width();
-	h = b.Height();
-	fYxRatio = h / w;
-    glViewport(0, 0, (GLint)w + 1, (GLint)h + 1);
+	BGLView::FrameResized(width, height);
+	
+	width = Bounds().Width();
+	height = Bounds().Height();
+	fYxRatio = height / width;
+    glViewport(0, 0, (GLint)width + 1, (GLint)height + 1);
 
 	// To prevent weird buffer contents
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -590,6 +586,7 @@ void
 ObjectView::EnforceState()
 {
 	glShadeModel(fGouraud ? GL_SMOOTH : GL_FLAT);
+		
 	if (fZbuf)
 		glEnable(GL_DEPTH_TEST);
 	else
@@ -605,11 +602,10 @@ ObjectView::EnforceState()
 	else
 		glDisable(GL_LIGHTING);
 	
-	if (fFilled) {
+	if (fFilled)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	} else {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);	
 	
 	if (fFog) {
 		glFogf(GL_FOG_START, 10.0);
@@ -708,7 +704,7 @@ ObjectView::SpinIt()
 	fForceRedraw = false;
 
 	for (int i = 0; i < fObjects.CountItems(); i++) {
-		bool hack = ((GLObject*)fObjects.ItemAt(i))->SpinIt();
+		bool hack = reinterpret_cast<GLObject*>(fObjects.ItemAt(i))->SpinIt();
 		changed = changed || hack;
 	}
 
@@ -724,15 +720,15 @@ ObjectView::DrawFrame(bool noPause)
 
 	fObjListLock.Lock();
 	for (int i = 0; i < fObjects.CountItems(); i++) {
-	  GLObject *o = ((GLObject*)fObjects.ItemAt(i));
-		if (o->solidity == 0)
-			o->Draw(false, NULL);
+	  GLObject *object = reinterpret_cast<GLObject*>(fObjects.ItemAt(i));
+		if (object->solidity == 0)
+			object->Draw(false, NULL);
 	}
 	EnforceState();
 	for (int i = 0; i < fObjects.CountItems(); i++) {
-		GLObject *o = ((GLObject*)fObjects.ItemAt(i));
-		if (o->solidity != 0)
-			o->Draw(false, NULL);
+		GLObject *object = reinterpret_cast<GLObject*>(fObjects.ItemAt(i));
+		if (object->solidity != 0)
+			object->Draw(false, NULL);
 	}
 	fObjListLock.Unlock();
 
@@ -741,24 +737,26 @@ ObjectView::DrawFrame(bool noPause)
 
 	if (noPause) {
 		uint64 now = system_time();
-		float f = 1.0 / ((now - fLastFrame) / 1000000.0);
+		float fps = 1.0 / ((now - fLastFrame) / 1000000.0);
 		fLastFrame = now;
-		int e;
+		int entry;
 		if (fHistEntries < HISTSIZE) {
-			e = (fOldestEntry + fHistEntries) % HISTSIZE;
+			entry = (fOldestEntry + fHistEntries) % HISTSIZE;
 			fHistEntries++;
 		} else {
-			e = fOldestEntry;
+			entry = fOldestEntry;
 			fOldestEntry = (fOldestEntry + 1) % HISTSIZE;
 		}
 
-		fFpsHistory[e] = f;
+		fFpsHistory[entry] = fps;
 	  
 		if (fHistEntries > 5) {
-			f = 0;
+			fps = 0;
 			for (int i = 0; i < fHistEntries; i++)
-				f += fFpsHistory[(fOldestEntry + i) % HISTSIZE];
-			f = f/fHistEntries;
+				fps += fFpsHistory[(fOldestEntry + i) % HISTSIZE];
+				
+			fps /= fHistEntries;
+			
 			if (fFps) {
 				glPushAttrib(GL_ENABLE_BIT | GL_LIGHTING_BIT);
 				glPushMatrix();
@@ -774,7 +772,7 @@ ObjectView::DrawFrame(bool noPause)
 				glLoadIdentity();
 				glMatrixMode(GL_MODELVIEW);
 				
-				FPS::drawCounter(f);
+				FPS::drawCounter(fps);
 
 				glMatrixMode(GL_PROJECTION);
 				glPopMatrix();

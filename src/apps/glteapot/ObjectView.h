@@ -9,17 +9,17 @@
 #include <GL/glu.h>
 #include <GLView.h>
 
-#define bmsgFPS	        'fps '
-#define bmsgAddModel	'addm'
-#define bmsgGouraud		'gour'
-#define bmsgZBuffer		'zbuf'
-#define bmsgCulling 	'cull'
-#define bmsgTextured	'txtr'
-#define bmsgFog			'fog '
-#define bmsgLighting	'lite'
-#define bmsgLights		'lits'
-#define bmsgFilled		'fill'
-#define bmsgPerspective	'prsp'
+#define kMsgFPS			'fps '
+#define kMsgAddModel	'addm'
+#define kMsgGouraud		'gour'
+#define kMsgZBuffer		'zbuf'
+#define kMsgCulling		'cull'
+#define kMsgTextured	'txtr'
+#define kMsgFog			'fog '
+#define kMsgLighting	'lite'
+#define kMsgLights		'lits'
+#define kMsgFilled		'fill'
+#define kMsgPerspective	'prsp'
 
 enum lights {
 	lightNone = 0,
@@ -36,23 +36,23 @@ class ResScroll;
 class GLObject;
 
 struct TrackingInfo {
-	float			lastX;
-	float			lastY;
-	float			lastDx;
-	float			lastDy;	
-	bool			isTracking;
-	GLObject		*pickedObject;
-	uint32			buttons;
+	float		lastX;
+	float		lastY;
+	float		lastDx;
+	float		lastDy;	
+	bool		isTracking;
+	GLObject	*pickedObject;
+	uint32		buttons;
 };
 
 class ObjectView : public BGLView {
 	public:
-						ObjectView(BRect r, char* name, ulong resizingMode,
+						ObjectView(BRect rect, char* name, ulong resizingMode,
 							ulong options);
 						~ObjectView();
 
-		virtual	void	MouseDown(BPoint p);
-		virtual	void	MouseUp(BPoint p);
+		virtual	void	MouseDown(BPoint point);
+		virtual	void	MouseUp(BPoint point);
 		virtual	void	MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
 		
 		virtual	void	MessageReceived(BMessage* msg);
@@ -60,7 +60,7 @@ class ObjectView : public BGLView {
 		virtual	void	DetachedFromWindow();
 		virtual	void	FrameResized(float width, float height);
 				bool	SpinIt();
-				int		ObjectAtPoint(BPoint p);
+				int		ObjectAtPoint(const BPoint &point);
 		virtual	void	DrawFrame(bool noPause);
 		virtual	void	Pulse();
 				void	EnforceState();
@@ -82,7 +82,7 @@ class ObjectView : public BGLView {
 		bool			fLastPersp, fPersp, fLastTextured, fTextured;
 		bool			fLastFog, fFog, fForceRedraw;
 		float			fLastYXRatio, fYxRatio, fFpsHistory[HISTSIZE];
-		float			fObjectDistance,fLastObjectDistance;
+		float			fObjectDistance, fLastObjectDistance;
 		TrackingInfo	fTrackingInfo;		
 };
 
