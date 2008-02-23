@@ -576,8 +576,9 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		// -> fall back to double buffer for fDisplayMode.space != B_RGB32
 		// as intermediate solution...
 		bool doubleBuffered = HWInterface::IsDoubleBuffered();
-		if ((color_space)fDisplayMode.space != B_RGB32
+		if (((color_space)fDisplayMode.space != B_RGB32
 			&& (color_space)fDisplayMode.space != B_RGBA32)
+			|| fVGADevice > 0)
 			doubleBuffered = true;
 
 		if (doubleBuffered) {
