@@ -216,6 +216,7 @@ _BWidthBuffer_::InsertTable(const BFont *font)
 	return position;
 }
 
+
 /*! \brief Gets the escapement for the given charachter.
 	\param value An integer which uniquely identifies a charachter.
 	\param index The index of the table to search.
@@ -300,13 +301,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 		const uint32 value = CharToCode(text, charLen);
 		
 		uint32 hashed = Hash(value) & (table.tableCount - 1);
-		uint32 found = widths[hashed].code;
-
-		if (found == value) {
-			text += charLen;
-			continue;
-		}
-		
+		uint32 found;
 		while ((found = widths[hashed].code) != kInvalidCode) {
 			if (found == value)
 				break;
@@ -325,6 +320,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 			// the total size.
 			if (table.tableCount * 2 / 3 <= table.hashCount) {
 				const int32 newSize = table.tableCount * 2;
+				table.tableCount = newSize;
 					
 				// Create and initialize a new hash table
 				hashed_escapement *newWidths = new hashed_escapement[newSize];
@@ -338,10 +334,8 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 								newPos = 0;
 						}
 						newWidths[newPos] = widths[oldPos];
-						
 					}
 				}
-				table.tableCount = newSize;
 
 				// Delete the old table, and put the new pointer into the _width_table_
 				delete[] widths;
