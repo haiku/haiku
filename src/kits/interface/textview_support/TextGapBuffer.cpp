@@ -230,9 +230,10 @@ _BTextGapBuffer_::FindChar(char inChar, long fromIndex, long *ioDelta)
 {
 	long numChars = *ioDelta;
 	for (long i = 0; i < numChars; i++) {
-		if ((RealCharAt(fromIndex + i) & 0xc0) == 0x80)
+		char realChar = RealCharAt(fromIndex + i);
+		if ((realChar & 0xc0) == 0x80)
 			continue;
-		if (RealCharAt(fromIndex + i) == inChar) {
+		if (realChar == inChar) {
 			*ioDelta = i;
 			return true;
 		}
