@@ -1,9 +1,9 @@
 /*
- * Copyright 2003-2006, Haiku, Inc.
+ * Copyright 2003-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 //!	Caches string widths in a hash table, to avoid a trip to the app server.
@@ -83,7 +83,7 @@ float
 _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 		const BFont *inStyle)
 {
-	if (inText == NULL)
+	if (inText == NULL || length == 0)
 		return 0;
 
 	int32 index = 0;
@@ -94,36 +94,35 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 	int32 numChars = 0;
 	int32 textLen = 0;
 
+	char *sourceText = (char *)inText + fromOffset;
 	const float fontSize = inStyle->Size();
 	float stringWidth = 0;
-	if (length > 0) {		
-		for (int32 charLen = 0, currentOffset = fromOffset;
-				currentOffset < fromOffset + length;
-				currentOffset += charLen) {
-			charLen = UTF8NextCharLen(inText + currentOffset);
+	for (int32 charLen = 0;
+			sourceText < inText + length;
+			sourceText += charLen) {
+		charLen = UTF8NextCharLen(sourceText);
 
-			// End of string, bail out
-			if (charLen == 0)
-				break;
+		// End of string, bail out
+		if (charLen <= 0)
+			break;
 
-			// Some magic, to uniquely identify this charachter	
-			const uint32 value = CharToCode(inText + currentOffset, charLen);
+		// Some magic, to uniquely identify this charachter	
+		const uint32 value = CharToCode(sourceText, charLen);
 
-			float escapement;
-			if (GetEscapement(value, index, &escapement)) {
-				// Well, we've got a match for this charachter
-				stringWidth += escapement;
-			} else {
-				// Store this charachter into an array, which we'll
-				// pass to HashEscapements() later
-				int32 offset = textLen;
-				textLen += charLen;
-				numChars++;
-				text = (char *)realloc(text, textLen);
-				for (int32 x = 0; x < charLen; x++)
-					text[offset + x] = inText[currentOffset + x];
-			}			
-		}		
+		float escapement;
+		if (GetEscapement(value, index, &escapement)) {
+			// Well, we've got a match for this charachter
+			stringWidth += escapement;
+		} else {
+			// Store this charachter into an array, which we'll
+			// pass to HashEscapements() later
+			int32 offset = textLen;
+			textLen += charLen;
+			numChars++;
+			text = (char *)realloc(text, textLen);
+			for (int32 x = 0; x < charLen; x++)
+				text[offset + x] = sourceText[x];
+		}			
 	}
 
 	if (text != NULL) {
@@ -232,7 +231,6 @@ _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 	const hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
 	uint32 hashed = Hash(value) & (table.tableCount - 1);
 
-	DEBUG_ONLY(uint32 iterations = 1;)
 	uint32 found;
 	while ((found = widths[hashed].code) != kInvalidCode) {
 		if (found == value)
@@ -240,13 +238,10 @@ _BWidthBuffer_::GetEscapement(uint32 value, int32 index, float *escapement)
 		
 		if (++hashed >= (uint32)table.tableCount)
 			hashed = 0;
-		DEBUG_ONLY(iterations++;)
 	}
 
 	if (found == kInvalidCode)
 		return false;
-
-	//PRINT(("Value found with %d iterations\n", iterations));
 
 	if (escapement != NULL)
 		*escapement = widths[hashed].escapement;
@@ -283,76 +278,81 @@ float
 _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLen,
 		int32 tableIndex, const BFont *inStyle)
 {
+	ASSERT(inText != NULL);
+	ASSERT(numChars > 0);
+	ASSERT(textLen > 0);
+	
 	float *escapements = new float[numChars];
 	inStyle->GetEscapements(inText, numChars, escapements);
 
 	_width_table_ &table = fBuffer[tableIndex];	
 	hashed_escapement *widths = static_cast<hashed_escapement *>(table.widths);
 
-	int32 offset = 0;
 	int32 charCount = 0;
-
+	char *text = (char *)inText;
+	const char *textEnd = inText + textLen;
 	// Insert the escapements into the hash table
 	do {
-		const int32 charLen = UTF8NextCharLen(inText + offset);
+		const int32 charLen = UTF8NextCharLen(text);
 		if (charLen == 0)
 			break;
 
-		const uint32 value = CharToCode(inText + offset, charLen);
-
+		const uint32 value = CharToCode(text, charLen);
+		
 		uint32 hashed = Hash(value) & (table.tableCount - 1);
 		uint32 found = widths[hashed].code;
 
-		// Check if the value is already in the table
-		if (found != value) {
-			while ((found = widths[hashed].code) != kInvalidCode) {
-				if (found == value)
-					break;
-				if (++hashed >= (uint32)table.tableCount)
-					hashed = 0;
-			}
+		if (found == value) {
+			text += charLen;
+			continue;
+		}
+		
+		while ((found = widths[hashed].code) != kInvalidCode) {
+			if (found == value)
+				break;
+			if (++hashed >= (uint32)table.tableCount)
+				hashed = 0;
+		}
 
-			if (found == kInvalidCode) {
-				// The value is not in the table. Add it.
-				widths[hashed].code = value;
-				widths[hashed].escapement = escapements[charCount];
-				table.hashCount++;
+		if (found == kInvalidCode) {
+			// The value is not in the table. Add it.
+			widths[hashed].code = value;
+			widths[hashed].escapement = escapements[charCount];
+			table.hashCount++;
 
-				// We always keep some free space in the hash table
-				// TODO: Not sure how much space, currently we double
-				// the current size when hashCount is at least 2/3 of
-				// the total size.
-				if (table.tableCount * 2 / 3 <= table.hashCount) {
-					table.hashCount = 0;
-					const int32 newSize = table.tableCount * 2;
-
-					// Create and initialize a new hash table
-					hashed_escapement *newWidths = new hashed_escapement[newSize];
-
-					// Rehash the values, and put them into the new table
-					for (int32 oldPos = 0; oldPos < table.tableCount; oldPos++) {
-						if (widths[oldPos].code != kInvalidCode) {
-							uint32 newPos = Hash(widths[oldPos].code) & (newSize - 1);
-							while (newWidths[newPos].code != kInvalidCode) {
-								if (++newPos >= (uint32)newSize)
-									newPos = 0;
-							}					
-							newWidths[newPos].code = widths[oldPos].code;
-							newWidths[newPos].escapement = widths[oldPos].escapement;
-							table.hashCount++;
+			// We always keep some free space in the hash table:
+			// we double the current size when hashCount is 2/3 of
+			// the total size.
+			if (table.tableCount * 2 / 3 <= table.hashCount) {
+				const int32 newSize = table.tableCount * 2;
+					
+				// Create and initialize a new hash table
+				hashed_escapement *newWidths = new hashed_escapement[newSize];
+				for (int32 i = 0; i < newSize; i++)
+					newWidths[i].code = kInvalidCode;
+					
+				// Rehash the values, and put them into the new table
+				for (uint32 oldPos = 0; oldPos < (uint32)table.tableCount; oldPos++) {
+					if (widths[oldPos].code != kInvalidCode) {
+						uint32 newPos = Hash(widths[oldPos].code) & (newSize - 1);
+						while (newWidths[newPos].code != kInvalidCode) {
+							if (++newPos >= (uint32)newSize)
+								newPos = 0;
 						}
+						newWidths[newPos] = widths[oldPos];
+						
 					}
-					table.tableCount = newSize;
-
-					// Delete the old table, and put the new pointer into the _width_table_
-					delete[] widths;
-					widths = newWidths;
 				}
+				table.tableCount = newSize;
+
+				// Delete the old table, and put the new pointer into the _width_table_
+				delete[] widths;
+				table.widths = widths = newWidths;
 			}
 		}
 		charCount++;
-		offset += charLen;
-	} while (offset < textLen);
+		text += charLen;
+	} while (text < textEnd);
 
 	// Calculate the width of the string
 	float width = 0;
