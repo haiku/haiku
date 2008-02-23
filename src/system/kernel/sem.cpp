@@ -864,11 +864,16 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 		goto err;
 	}
 
-	if (sSems[slot].u.used.count - count < 0 && (flags & B_RELATIVE_TIMEOUT) != 0
-		&& timeout <= 0) {
-		// immediate timeout
-		status = B_WOULD_BLOCK;
-		goto err;
+	if (sSems[slot].u.used.count - count < 0) {
+		if ((flags & B_RELATIVE_TIMEOUT) != 0 && timeout <= 0) {
+			// immediate timeout
+			status = B_WOULD_BLOCK;
+			goto err;
+		} else if ((flags & B_ABSOLUTE_TIMEOUT) != 0 && timeout < 0) {
+			// absolute negative timeout
+			status = B_TIMED_OUT;
+			goto err;
+		}
 	}
 
 	if ((sSems[slot].u.used.count -= count) < 0) {
