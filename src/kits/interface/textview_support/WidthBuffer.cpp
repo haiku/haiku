@@ -328,8 +328,6 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 					
 				// Create and initialize a new hash table
 				hashed_escapement *newWidths = new hashed_escapement[newSize];
-				for (int32 i = 0; i < newSize; i++)
-					newWidths[i].code = kInvalidCode;
 					
 				// Rehash the values, and put them into the new table
 				for (uint32 oldPos = 0; oldPos < (uint32)table.tableCount; oldPos++) {
