@@ -28,7 +28,7 @@ public:
 	void Write(void *buffer, size_t size);
 		// copy nbytes from the stream into pinto
 	
-	bool Seek(off_t position);
+	off_t Seek(off_t position, uint32 seekMode);
 		// seek the stream to the given position
 	
 	off_t Position();

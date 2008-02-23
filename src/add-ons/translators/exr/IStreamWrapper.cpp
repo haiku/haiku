@@ -39,5 +39,5 @@ IStreamWrapper::tellg()
 void
 IStreamWrapper::seekg(Int64 pos)
 {
-	fStream.Seek(pos);
+	fStream.Seek(pos, SEEK_SET);
 }

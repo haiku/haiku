@@ -9,9 +9,11 @@
 #include <hpgs.h>
 #include <DataIO.h>
 
+#include "StreamBuffer.h"
+
 typedef struct my_hpgs_istream_st
 {
-  BPositionIO *stream;
+  StreamBuffer *buffer;
   status_t iseof;
 } my_hpgs_istream;
 
@@ -22,7 +24,7 @@ positionio_getc(my_hpgs_istream *stream)
 	unsigned char value;
 	status_t error;
 	stream->iseof = 0;
-	error = stream->stream->Read((void *)&value, sizeof(unsigned char));
+	error = stream->buffer->Read((void *)&value, sizeof(unsigned char));
 	if (error > B_OK)
 		return value;
 	stream->iseof = EOF;
@@ -33,7 +35,7 @@ positionio_getc(my_hpgs_istream *stream)
 static int 
 positionio_ungetc(int c, my_hpgs_istream *stream)
 {
-	return stream->stream->Seek(-1, SEEK_CUR);
+	return stream->buffer->Seek(-1, SEEK_CUR);
 }
 
 
@@ -61,7 +63,7 @@ positionio_error(my_hpgs_istream *stream)
 static int 
 positionio_tell(my_hpgs_istream *stream, size_t *pos)
 {
-	*pos = stream->stream->Position();
+	*pos = stream->buffer->Position();
 	return 0;
 }
 
@@ -69,7 +71,7 @@ positionio_tell(my_hpgs_istream *stream, size_t *pos)
 static int 
 positionio_seek(my_hpgs_istream *stream, size_t pos)
 {
-	stream->stream->Seek(pos, SEEK_SET);
+	stream->buffer->Seek(pos, SEEK_SET);
 	return 0;
 }
 
@@ -77,7 +79,7 @@ positionio_seek(my_hpgs_istream *stream, size_t pos)
 static int 
 positionio_seekend(my_hpgs_istream *stream, size_t pos)
 {
-	stream->stream->Seek(pos, SEEK_END);
+	stream->buffer->Seek(pos, SEEK_END);
 	return 0;
 }
 
@@ -88,7 +90,7 @@ positionio_read(void *ptr, size_t size, size_t nmemb, my_hpgs_istream *stream)
 	unsigned char *iptr = (unsigned char *)ptr;
 	size_t i = 0;
 	for (; i < nmemb; i++) {
-		if (size != stream->stream->Read(iptr, size))
+		if (size != stream->buffer->Read(iptr, size))
 			break;
 		iptr += size;
 	}
@@ -109,7 +111,8 @@ static hpgs_istream_vtable positionio_vtable =
     (hpgs_istream_seekend_func_t) positionio_seekend
   };
 
-hpgs_istream *hpgs_new_wrapper_istream(BPositionIO *stream)
+hpgs_istream *
+hpgs_new_wrapper_istream(BPositionIO *stream)
 {
 	hpgs_istream *ret = (hpgs_istream *)malloc(sizeof(hpgs_istream));
 
@@ -119,9 +122,18 @@ hpgs_istream *hpgs_new_wrapper_istream(BPositionIO *stream)
 	ret->stream = (my_hpgs_istream *)malloc(sizeof(my_hpgs_istream));
 	ret->vtable = &positionio_vtable;
 	((my_hpgs_istream *)ret->stream)->iseof = 0;
-	((my_hpgs_istream *)ret->stream)->stream = stream;
+	((my_hpgs_istream *)ret->stream)->buffer = new StreamBuffer(stream, 2048);
 
 	return ret;
+}
+
+
+void
+hpgs_free_wrapper_istream(hpgs_istream *istream)
+{
+	delete ((my_hpgs_istream *)istream->stream)->buffer;
+	free(istream->stream);
+	free(istream);
 }
 
 #endif // READ_HELPER_H

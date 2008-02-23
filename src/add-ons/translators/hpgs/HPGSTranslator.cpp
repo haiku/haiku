@@ -129,8 +129,7 @@ HPGSTranslator::DerivedIdentify(BPositionIO *stream,
 	
 	free(reader);
 	free(size_dev);
-	free(istream->stream);
-	free(istream);
+	hpgs_free_wrapper_istream(istream);
 
 	return err;
 }

@@ -190,20 +190,36 @@ StreamBuffer::Write(void *pinto, size_t nbytes)
 //
 // Postconditions:
 //
-// Returns: true if the seek was successful,
-// false if the seek operation failed
+// Returns: the new position
 // ---------------------------------------------------------------
-bool
-StreamBuffer::Seek(off_t position)
+off_t
+StreamBuffer::Seek(off_t position, uint32 seekMode)
 {
-	fLen = 0;
-	fPos = 0;
+	// just seek in the current buffer if the new position is in it
+	if (seekMode == SEEK_CUR) {
+		if (fToRead
+			&& (fPos + position < fLen)
+			&& (fPos + position >= 0)) {
+			fPos += position;
+			return Position();
+		} else if (!fToRead
+			&& (fLen + position < fBufferSize)
+			&& (fLen + position >= 0)) {
+			fLen += position;
+			return Position();
+		}
+	} 
 	
-	if (fStream->Seek(position, SEEK_SET) == position) {
-		return true;
+	// flush if something to write
+	if (!fToRead
+		&& fLen > 0) {
+			fStream->Write(fBuffer, fLen);	
 	}
 	
-	return false;
+	fLen = 0;
+	fPos = 0;
+		
+	return fStream->Seek(position, seekMode);
 }
 
 
