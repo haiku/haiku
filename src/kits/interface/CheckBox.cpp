@@ -154,18 +154,15 @@ BCheckBox::Draw(BRect updateRect)
 
 		// Checkmark
 		if (Value() == B_CONTROL_ON) {
-			rect.InsetBy(2, 2);
+			rect.InsetBy(3, 3);
 
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
 			SetPenSize(2);
-			SetDrawingMode(B_OP_OVER);
-				// needed because of anti-aliasing
 			StrokeLine(BPoint(rect.left, rect.top),
 					   BPoint(rect.right, rect.bottom));
 			StrokeLine(BPoint(rect.left, rect.bottom),
 					   BPoint(rect.right, rect.top));
 			SetPenSize(1);
-			SetDrawingMode(B_OP_COPY);
 		}
 
 		// Label
@@ -207,19 +204,16 @@ BCheckBox::Draw(BRect updateRect)
 
 		// Checkmark
 		if (Value() == B_CONTROL_ON) {
-			rect.InsetBy(2, 2);
+			rect.InsetBy(3, 3);
 
 			SetHighColor(tint_color(ui_color(B_KEYBOARD_NAVIGATION_COLOR),
 				B_DISABLED_MARK_TINT));
 			SetPenSize(2);
-			SetDrawingMode(B_OP_OVER);
-				// needed because of anti-aliasing
 			StrokeLine(BPoint(rect.left, rect.top),
 					   BPoint(rect.right, rect.bottom));
 			StrokeLine(BPoint(rect.left, rect.bottom),
 					   BPoint(rect.right, rect.top));
 			SetPenSize(1);
-			SetDrawingMode(B_OP_COPY);
 		}
 
 		// Label
