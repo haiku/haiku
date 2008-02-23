@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "StreamBuffer.h"
 
 #ifndef min
@@ -115,17 +116,20 @@ StreamBuffer::InitCheck()
 // error code returned by BPositionIO::Read()
 // ---------------------------------------------------------------
 ssize_t
-StreamBuffer::Read(void *pinto, size_t nbytes)
+StreamBuffer::Read(void *_pinto, size_t nbytes)
 {
+	if (_pinto == NULL)
+		return B_BAD_VALUE;
 	if (nbytes == 0)
 		return 0;
-	
+
 	ssize_t result = B_ERROR;
+	uint8 *pinto = (uint8 *)_pinto;
 		
 	size_t totalRead = min(nbytes, fLen - fPos);
 	memcpy(pinto, fBuffer + fPos, totalRead);
 	fPos += totalRead;
-	(uint8 *)pinto += totalRead;
+	pinto += totalRead;
 	nbytes -= totalRead;
 	
 	while (nbytes > 0) {
@@ -136,7 +140,7 @@ StreamBuffer::Read(void *pinto, size_t nbytes)
 			size_t left = min(nbytes, fLen - fPos);
 			memcpy(pinto, fBuffer + fPos, left);
 			fPos += left;
-			(uint8 *)pinto += left;
+			pinto += left;
 			nbytes -= left;
 			totalRead += left;
 		}
