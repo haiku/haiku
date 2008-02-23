@@ -38,7 +38,8 @@ main(int argc, char *argv[])
 	const char *file = NULL;
 
 	if (sizeof(SparseExtentHeader) != 512) {
-		fprintf(stderr, "compilation error: struct size is %u byte\n", sizeof(SparseExtentHeader));
+		fprintf(stderr, "compilation error: struct size is %lu byte\n",
+			sizeof(SparseExtentHeader));
 		exit(EXIT_FAILURE);
 	}
 
@@ -97,7 +98,8 @@ main(int argc, char *argv[])
 	SparseExtentHeader header;
 
 	if (headersize < sizeof(desc) + sizeof(header)) {
-		fprintf(stderr, "Error: header size must be at least %u byte\n", sizeof(desc) + sizeof(header));
+		fprintf(stderr, "Error: header size must be at least %lu byte\n",
+			sizeof(desc) + sizeof(header));
 		exit(EXIT_FAILURE);
 	}
 
@@ -185,7 +187,8 @@ main(int argc, char *argv[])
 	
 	int fd = open(file, O_RDWR | O_CREAT, 0666);
 	if (fd < 0) {
-		fprintf(stderr, "Error: couldn't open file %s (%s)\n", file, strerror(errno));
+		fprintf(stderr, "Error: couldn't open file %s (%s)\n", file,
+			strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	if (sizeof(header) != write(fd, &header, sizeof(header)))
@@ -205,7 +208,8 @@ main(int argc, char *argv[])
 	return 0;
 
 write_err:
-	fprintf(stderr, "Error: writing file %s failed (%s)\n", file, strerror(errno));
+	fprintf(stderr, "Error: writing file %s failed (%s)\n", file,
+		strerror(errno));
 	close(fd);
 	exit(EXIT_FAILURE);
 }
