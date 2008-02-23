@@ -120,6 +120,9 @@ typedef uint32_t uintptr_t;
 typedef signed long long intmax_t;
 typedef unsigned long long uintmax_t;
 
+/* Other types */
+#define SIZE_MAX 	UINT32_MAX
+
 
 /* BSD compatibility */
 
