@@ -2,15 +2,21 @@
  * Copyright 2003, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#include <Application.h>
-#include <Autolock.h>
-#include <MediaFiles.h>
-#include <string.h>
-#include <storage/FindDirectory.h>
-#include <storage/Path.h>
+#include "debug.h"
 #include "MMediaFilesManager.h"
 #include "MediaSounds.h"
-#include "debug.h"
+
+#include <Application.h>
+#include <Autolock.h>
+#include <Directory.h>
+#include <FindDirectory.h>
+#include <MediaFiles.h>
+#include <Path.h>
+#include <string.h>
+
+
+const char *kMediaFilesManagerSettingsDirectory			= "Media";
+const char *kMediaFilesManagerSettingsFile				= "MMediaFilesManager";
 
 
 MMediaFilesManager::MMediaFilesManager()
@@ -39,6 +45,7 @@ MMediaFilesManager::MMediaFilesManager()
 	Dump();
 #endif
 }
+
 
 MMediaFilesManager::~MMediaFilesManager()
 {
@@ -91,12 +98,14 @@ status_t
 MMediaFilesManager::LoadState()
 {
 	CALLED();
-	status_t err = B_OK;
 	BPath path;
-	if ((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path)) != B_OK)
+	status_t err = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (err >= B_OK)
+		err = path.Append(kMediaFilesManagerSettingsDirectory);
+	if (err >= B_OK)
+		err = path.Append(kMediaFilesManagerSettingsFile);
+	if (err < B_OK)
 		return err;
-
-	path.Append("Media/MMediaFilesManager");
 
 	BFile file(path.Path(), B_READ_ONLY);
 
@@ -160,12 +169,18 @@ status_t
 MMediaFilesManager::SaveState()
 {
 	CALLED();
-	status_t err = B_OK;
 	BPath path;
-	if ((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path)) != B_OK)
+	status_t err = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (err >= B_OK)
+		err = path.Append(kMediaFilesManagerSettingsDirectory);
+	if (err >= B_OK) {
+		err = create_directory(path.Path(),
+			S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH);
+	}
+	if (err >= B_OK)
+		err = path.Append(kMediaFilesManagerSettingsFile);
+	if (err < B_OK)
 		return err;
-
-	path.Append("Media/MMediaFilesManager");
 
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 	uint32 zero = 0;
@@ -206,11 +221,10 @@ void
 MMediaFilesManager::Dump()
 {
 	BAutolock lock(fLocker);
-	printf("\n");
 
 	/* for each type, the registry map contains a map of item/entry_ref
 	 */
-	printf("MMediaFilesManager: registry map follows\n");
+	TRACE("MMediaFilesManager: registry map follows\n");
 	BString *type = NULL;
 	Map<BString, entry_ref> *map;
 	BString *item = NULL;
@@ -221,13 +235,11 @@ MMediaFilesManager::Dump()
 		for (map->Rewind(); map->GetNext(&ref);) {
 			map->GetCurrentKey(&item);
 			BPath path(ref);
-			printf(" type \"%s\", item \"%s\", path \"%s\"\n",
+			TRACE(" type \"%s\", item \"%s\", path \"%s\"\n",
 				type->String(), item->String(), (path.InitCheck() == B_OK) ? path.Path() : "INVALID");
 		}
 	}
-	printf("MMediaFilesManager: list end\n");
-	printf("\n");
-
+	TRACE("MMediaFilesManager: list end\n");
 }
 
 
