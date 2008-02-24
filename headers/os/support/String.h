@@ -14,8 +14,7 @@
 class BStringRef;
 
 
-class BString
-{
+class BString {
 public:
 				BString();
 				BString(const char* string);
