@@ -95,7 +95,7 @@ StringAssignTest::PerformTest(void)
 	const char *oldString = newstring.String();
 	str = new BString;
 	str->Adopt(newstring, 2);
-	CPPUNIT_ASSERT(strncmp(str->String(), oldString, 2) == 0);
+	CPPUNIT_ASSERT(strncmp(str->String(), "SomethingElseAgain", 2) == 0);
 	CPPUNIT_ASSERT(str->Length() == 2);
 	CPPUNIT_ASSERT(strcmp(newstring.String(), "") == 0);
 	delete str;
