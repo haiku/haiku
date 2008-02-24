@@ -15,6 +15,12 @@ debug_printf(const char *format, ...)
 }
 
 
+extern "C" void
+ktrace_printf(const char *format, ...)
+{
+}
+
+
 dev_t
 fs_mount_volume(const char *where, const char *device, const char *filesystem,
 	uint32 flags, const char *parameters)
@@ -28,3 +34,4 @@ fs_unmount_volume(const char *path, uint32 flags)
 {
 	return B_ERROR;
 }
+
