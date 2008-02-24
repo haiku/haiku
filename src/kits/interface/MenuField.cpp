@@ -790,15 +790,15 @@ BMenuField::DrawLabel(BRect bounds, BRect update)
 		float x;
 		switch (fAlign) {
 			case B_ALIGN_RIGHT:
-				x = fDivider - fLayoutData->label_width - 3.0f;
+				x = fDivider - fLayoutData->label_width - 3.0;
 				break;
 
 			case B_ALIGN_CENTER:
-				x = fDivider - fLayoutData->label_width / 2.0f;
+				x = fDivider - fLayoutData->label_width / 2.0;
 				break;
 
 			default:
-				x = 3.0f;
+				x = 0.0;
 				break;
 		}
 
