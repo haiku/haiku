@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -44,6 +44,7 @@
 #include <DirectWindowPrivate.h>
 #include <MessagePrivate.h>
 #include <PortLink.h>
+#include <ViewPrivate.h>
 #include <WindowInfo.h>
 #include <WindowPrivate.h>
 
@@ -561,9 +562,10 @@ ServerWindow::_CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent
 
 	ViewLayer* newLayer;
 
-	if (link.Code() == AS_LAYER_CREATE_ROOT
-		&& (fWindowLayer->Flags() & kWorkspacesWindowFlag) != 0) {
-		// this is a workspaces window!
+	if ((fWindowLayer->Flags() & kWorkspacesWindowFlag) != 0
+		&& (flags & kWorkspacesViewFlag) != 0) {
+		// TODO: there can currently only be one of these views per desktop!
+		// TODO: get rid of the kWorkspacesWindowFlag
 		newLayer = new (nothrow) WorkspacesLayer(frame, scrollingOffset, name,
 			token, resizeMask, flags);
 	} else {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Haiku.
+ * Copyright 2003-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,8 +10,6 @@
 #define VIEW_PRIVATE_H
 
 
-#include <PortLink.h>
-
 #include <Font.h>
 #include <InterfaceDefs.h>
 #include <Point.h>
@@ -19,6 +17,9 @@
 #include <Region.h>
 
 const static uint32 kDeleteReplicant = 'JAHA';
+
+const static uint32 kWorkspacesViewFlag = 0x40000000UL;
+	// was/is _B_RESERVED1_ in View.h
 
 enum {
 	B_VIEW_FONT_BIT				= 0x00000001,
@@ -47,6 +48,8 @@ enum {
 
 
 namespace BPrivate {
+
+class PortLink;
 
 class ViewState {
 	public:

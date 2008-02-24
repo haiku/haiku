@@ -377,6 +377,22 @@ ViewLayer::MarkAt(DrawingEngine* engine, const BPoint& where, int32 level)
 
 
 ViewLayer*
+ViewLayer::FindView(uint32 flags)
+{
+	if ((Flags() & flags) == flags)
+		return this;
+
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		ViewLayer* layer = child->FindView(flags);
+		if (layer != NULL)
+			return layer;
+	}
+
+	return NULL;
+}
+
+
+ViewLayer*
 ViewLayer::ViewAt(const BPoint& where)
 {
 	if (!fVisible)

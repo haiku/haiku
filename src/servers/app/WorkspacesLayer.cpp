@@ -33,6 +33,7 @@ WorkspacesLayer::WorkspacesLayer(BRect frame, BPoint scrollingOffset,
 
 WorkspacesLayer::~WorkspacesLayer()
 {
+	// TODO: we actually need to tell the Desktop that we're gone
 }
 
 
@@ -74,21 +75,25 @@ WorkspacesLayer::_WorkspaceAt(int32 i)
 	int32 columns, rows;
 	_GetGrid(columns, rows);
 
-	int32 width = Frame().IntegerWidth() / columns;
-	int32 height = Frame().IntegerHeight() / rows;
+	BRect frame = Bounds();
+	ConvertToScreen(&frame);
+
+	int32 width = frame.IntegerWidth() / columns;
+	int32 height = frame.IntegerHeight() / rows;
 
 	int32 column = i % columns;
 	int32 row = i / columns;
 
-	BRect rect(column * width, row * height, (column + 1) * width, (row + 1) * height);
+	BRect rect(column * width, row * height, (column + 1) * width,
+		(row + 1) * height);
 
-	rect.OffsetBy(Frame().LeftTop());
+	rect.OffsetBy(frame.LeftTop());
 
 	// make sure there is no gap anywhere
 	if (column == columns - 1)
-		rect.right = Frame().right;
+		rect.right = frame.right;
 	if (row == rows - 1)
-		rect.bottom = Frame().bottom;
+		rect.bottom = frame.bottom;
 
 	return rect;
 }
@@ -288,7 +293,10 @@ WorkspacesLayer::_DarkenColor(rgb_color& color) const
 void
 WorkspacesLayer::_Invalidate() const
 {
-	BRegion region((BRect)Frame());
+	BRect frame = Bounds();
+	ConvertToScreen(&frame);
+
+	BRegion region(frame);
 	Window()->MarkContentDirty(region);
 }
 
@@ -314,8 +322,8 @@ WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	gridRegion.Exclude(activeRect);
 	drawingEngine->ConstrainClippingRegion(&gridRegion);
 
-	BRect frame = Frame();
-		// top ViewLayer frame is in screen coordinates
+	BRect frame = Bounds();
+	ConvertToScreen(&frame);
 
 	// horizontal lines
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,6 +29,7 @@
 #include "Workspace.h"
 #include "WorkspacesLayer.h"
 
+#include <ViewPrivate.h>
 #include <WindowInfo.h>
 #include <ServerProtocol.h>
 
@@ -1598,8 +1599,11 @@ Desktop::ShowWindow(WindowLayer* window)
 		return;
 	}
 
-	if (WorkspacesLayer* layer = dynamic_cast<WorkspacesLayer*>(window->TopLayer()))
-		fWorkspacesLayer = layer;
+	if ((window->Flags() & kWorkspacesWindowFlag) != 0) {
+		// find workspaces layer in view hierarchy
+		fWorkspacesLayer = dynamic_cast<WorkspacesLayer*>(
+			window->TopLayer()->FindView(kWorkspacesViewFlag));
+	}
 
 	UnlockAllWindows();
 
@@ -1637,7 +1641,7 @@ Desktop::HideWindow(WindowLayer* window)
 	if (fWorkspacesLayer != NULL)
 		fWorkspacesLayer->WindowRemoved(window);
 
-	if (dynamic_cast<WorkspacesLayer*>(window->TopLayer()) != NULL)
+	if ((window->Flags() & kWorkspacesWindowFlag) != 0)
 		fWorkspacesLayer = NULL;
 
 	UnlockAllWindows();

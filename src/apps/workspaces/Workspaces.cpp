@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc.
+ * Copyright 2002-2008, Haiku, Inc.
  * Copyright 2002, François Revol, revol@free.fr.
  * This file is distributed under the terms of the MIT License.
  *
@@ -32,7 +32,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "WindowPrivate.h"
+#include <ViewPrivate.h>
+#include <WindowPrivate.h>
+
 
 static const char *kWorkspacesSignature = "application/x-vnd.Be-WORK";
 static const char *kWorkspacesSettingFile = "Workspace_data";
@@ -63,6 +65,7 @@ class WorkspacesView : public BView {
 
 		virtual void MouseMoved(BPoint where, uint32 transit,
 			const BMessage* dragMessage);
+		virtual void MouseDown(BPoint where);
 };
 
 class WorkspacesWindow : public BWindow {
@@ -126,9 +129,10 @@ WorkspacesPreferences::WorkspacesPreferences()
 			}
 
 			// check if loaded values are valid
-			if (screen.Frame().right >= fWindowFrame.right
-				&& screen.Frame().bottom >= fWindowFrame.bottom
-				&& fWindowFrame.right > 0 && fWindowFrame.bottom > 0) 
+			if (screen.Frame().right + 5 >= fWindowFrame.right
+				&& screen.Frame().bottom + 5 >= fWindowFrame.bottom
+				&& screen.Frame().left - 5 <= fWindowFrame.left
+				&& screen.Frame().top - 5 <= fWindowFrame.top)
 				settingsValid = true;	
 		}
 	}
@@ -200,7 +204,7 @@ WorkspacesPreferences::SetWindowFrame(BRect frame)
 
 
 WorkspacesView::WorkspacesView(BRect frame)
-	: BView(frame, "workspaces", 0, B_FOLLOW_NONE)
+	: BView(frame, "workspaces", B_FOLLOW_NONE, kWorkspacesViewFlag)
 {
 }
 
@@ -231,6 +235,20 @@ WorkspacesView::MouseMoved(BPoint where, uint32 transit,
 }
 
 
+void
+WorkspacesView::MouseDown(BPoint where)
+{
+	int32 buttons = 0;
+	if (Window() != NULL && Window()->CurrentMessage() != NULL)
+		Window()->CurrentMessage()->FindInt32("buttons", &buttons);
+
+	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
+		return;
+
+	// TODO: open menu
+}
+
+
 //	#pragma mark -
 
 
@@ -241,7 +259,7 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesPreferences *preferences)
  			B_ALL_WORKSPACES),
  	fPreferences(preferences)
 {
-	AddChild(new WorkspacesView(BRect(-10, -10, -5, -5)));
+	AddChild(new WorkspacesView(Bounds()));
 	fPreviousFrame = Frame();
 }
 

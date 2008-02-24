@@ -100,6 +100,7 @@ class ViewLayer {
 
 			uint32			CountChildren(bool deep = false) const;
 			void			CollectTokensForChildren(BList* tokenMap) const;
+			ViewLayer*		FindView(uint32 flags);
 
 			ViewLayer*		ViewAt(const BPoint& where);
 
