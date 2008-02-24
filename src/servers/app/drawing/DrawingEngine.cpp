@@ -55,29 +55,35 @@ extend_by_stroke_width(BRect& rect, float penSize)
 }
 
 
-class FontLocker {
+class AutoFloatingOverlaysHider {
 	public:
-		FontLocker(const DrawState* context)
-			:
-			fFont(&context->Font())
+		AutoFloatingOverlaysHider(HWInterface* interface, const BRect& area)
+			: fInterface(interface)
+			, fHidden(interface->HideFloatingOverlays(area))
 		{
-			fFont->Lock();
 		}
 		
-		FontLocker(const ServerFont* font)
-			:
-			fFont(font)
+		AutoFloatingOverlaysHider(HWInterface* interface)
+			: fInterface(interface)
+			, fHidden(fInterface->HideFloatingOverlays())
 		{
-			fFont->Lock();
 		}
 
-		~FontLocker()
+		~AutoFloatingOverlaysHider()
 		{
-			fFont->Unlock();
+			if (fHidden)
+				fInterface->ShowFloatingOverlays();
+		}
+
+		bool WasHidden() const
+		{
+			return fHidden;
 		}
 
 	private:
-		const ServerFont*	fFont;
+		HWInterface*	fInterface;
+		bool			fHidden;
+		
 };
 
 
@@ -395,7 +401,8 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 
 	BRect frame = region->Frame();
 	frame = frame | frame.OffsetByCopy(xOffset, yOffset);
-	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(frame);
+
+	AutoFloatingOverlaysHider _(fGraphicsCard, frame);
 
 	int32 count = region->CountRects();
 
@@ -498,9 +505,6 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 		fGraphicsCard->CopyRegion(sortedRectList, count, xOffset, yOffset);
 
 	delete[] sortedRectList;
-
-	if (cursorTouched)
-		fGraphicsCard->ShowSoftwareCursor();
 }
 
 // InvertRect
@@ -512,7 +516,7 @@ DrawingEngine::InvertRect(BRect r)
 	make_rect_valid(r);
 	r = fPainter->ClipRect(r);
 	if (r.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
+		AutoFloatingOverlaysHider _(fGraphicsCard, r);
 
 		// try hardware optimized version first
 		if (fAvailableHWAccleration & HW_ACC_INVERT_REGION) {
@@ -524,9 +528,6 @@ DrawingEngine::InvertRect(BRect r)
 
 			fGraphicsCard->Invalidate(r);
 		}
-
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -539,13 +540,11 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 
 	BRect clipped = fPainter->ClipRect(dest);
 	if (clipped.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		fPainter->DrawBitmap(bitmap, source, dest);
 
 		fGraphicsCard->Invalidate(clipped);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -562,7 +561,7 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 		extend_by_stroke_width(clipped, fPainter->PenSize());
 	clipped = fPainter->ClipRect(r);
 	if (clipped.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		float xRadius = r.Width() / 2.0;
 		float yRadius = r.Height() / 2.0;
@@ -575,8 +574,6 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 			fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
 
 		fGraphicsCard->Invalidate(clipped);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -587,12 +584,12 @@ DrawingEngine::DrawBezier(BPoint *pts, bool filled)
 	CRASH_IF_NOT_LOCKED
 
 	// TODO: figure out bounds and hide cursor depending on that
-	fGraphicsCard->HideSoftwareCursor();
+	fGraphicsCard->HideFloatingOverlays();
 
 	BRect touched = fPainter->DrawBezier(pts, filled);
 
 	fGraphicsCard->Invalidate(touched);
-	fGraphicsCard->ShowSoftwareCursor();
+	fGraphicsCard->ShowFloatingOverlays();
 }
 
 // DrawEllipse
@@ -616,13 +613,11 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 	clipped = fPainter->ClipRect(clipped);
 
 	if (clipped.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		fPainter->DrawEllipse(r, filled);
 
 		fGraphicsCard->Invalidate(clipped);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -638,13 +633,11 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 		extend_by_stroke_width(bounds, fPainter->PenSize());
 	bounds = fPainter->ClipRect(bounds);
 	if (bounds.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(bounds);
+		AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
 
 		fPainter->DrawPolygon(ptlist, numpts, filled, closed);
 
 		fGraphicsCard->Invalidate(bounds);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -669,7 +662,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 	BRect touched(start, end);
 	make_rect_valid(touched);
 	touched = fPainter->ClipRect(touched);
-	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
+	AutoFloatingOverlaysHider _(fGraphicsCard, touched);
 
 	if (!fPainter->StraightLine(start, end, color)) {
 		fPainter->SetHighColor(color);
@@ -678,8 +671,6 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 	}
 
 	fGraphicsCard->Invalidate(touched);
-	if (cursorTouched)
-		fGraphicsCard->ShowSoftwareCursor();
 }
 
 // this function is used to draw a one pixel wide rect
@@ -691,13 +682,11 @@ DrawingEngine::StrokeRect(BRect r, const rgb_color &color)
 	make_rect_valid(r);
 	BRect clipped = fPainter->ClipRect(r);
 	if (clipped.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		fPainter->StrokeRect(r, color);
 
 		fGraphicsCard->Invalidate(clipped);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -713,7 +702,7 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 	make_rect_valid(r);
 	r = fPainter->ClipRect(r);
 	if (r.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
+		AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
 
 		// try hardware optimized version first
 		if (fAvailableHWAccleration & HW_ACC_FILL_REGION) {
@@ -721,15 +710,12 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 			region.IntersectWith(fPainter->ClippingRegion());
 			fGraphicsCard->FillRegion(region, color,
 									  fSuspendSyncLevel == 0
-									  || cursorTouched);
+									  || overlaysHider.WasHidden());
 		} else {
 			fPainter->FillRect(r, color);
 	
 			fGraphicsCard->Invalidate(r);
 		}
-
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -755,13 +741,13 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 		return;
 	}
 
-	bool cursorTouched = fGraphicsCard->HideSoftwareCursor(frame);
+	AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, frame);
 
 	// try hardware optimized version first
 	if ((fAvailableHWAccleration & HW_ACC_FILL_REGION) != 0
 		&& frame.Width() * frame.Height() > 100) {
 		fGraphicsCard->FillRegion(r, color, fSuspendSyncLevel == 0
-											|| cursorTouched);
+											|| overlaysHider.WasHidden());
 	} else {
 		int32 count = r.CountRects();
 		for (int32 i = 0; i < count; i++) {
@@ -770,9 +756,6 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 
 		fGraphicsCard->Invalidate(frame);
 	}
-
-	if (cursorTouched)
-		fGraphicsCard->ShowSoftwareCursor();
 }
 
 // #pragma mark - DrawState
@@ -788,14 +771,11 @@ DrawingEngine::StrokeRect(BRect r)
 	extend_by_stroke_width(clipped, fPainter->PenSize());
 	clipped = fPainter->ClipRect(clipped);
 	if (clipped.IsValid()) {
-
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		fPainter->StrokeRect(r);
 
 		fGraphicsCard->Invalidate(clipped);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -808,7 +788,7 @@ DrawingEngine::FillRect(BRect r)
 	make_rect_valid(r);
 	r = fPainter->AlignAndClipRect(r);
 	if (r.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(r);
+		AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, r);
 
 		bool doInSoftware = true;
 		if ((r.Width() + 1) * (r.Height() + 1) > 100.0) {
@@ -822,7 +802,7 @@ DrawingEngine::FillRect(BRect r)
 					region.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(region, fPainter->HighColor(),
 											  fSuspendSyncLevel == 0
-											  || cursorTouched);
+											  || overlaysHider.WasHidden());
 					doInSoftware = false;
 				} else if (fPainter->Pattern() == B_SOLID_LOW
 						&& fPainter->DrawingMode() == B_OP_COPY) {
@@ -830,7 +810,7 @@ DrawingEngine::FillRect(BRect r)
 					region.IntersectWith(fPainter->ClippingRegion());
 					fGraphicsCard->FillRegion(region, fPainter->LowColor(),
 											  fSuspendSyncLevel == 0
-											  || cursorTouched);
+											  || overlaysHider.WasHidden());
 					doInSoftware = false;
 				}
 			}
@@ -850,9 +830,6 @@ DrawingEngine::FillRect(BRect r)
 
 			fGraphicsCard->Invalidate(r);
 		}
-
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -864,7 +841,7 @@ DrawingEngine::FillRegion(BRegion& r)
 
 	BRect clipped = fPainter->ClipRect(r.Frame());
 	if (clipped.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider overlaysHider(fGraphicsCard, clipped);
 
 		bool doInSoftware = true;
 		// try hardware optimized version first
@@ -875,14 +852,14 @@ DrawingEngine::FillRegion(BRegion& r)
 				r.IntersectWith(fPainter->ClippingRegion());
 				fGraphicsCard->FillRegion(r, fPainter->HighColor(),
 										  fSuspendSyncLevel == 0
-										  || cursorTouched);
+										  || overlaysHider.WasHidden());
 				doInSoftware = false;
 			} else if (fPainter->Pattern() == B_SOLID_LOW
 					&& fPainter->DrawingMode() == B_OP_COPY) {
 				r.IntersectWith(fPainter->ClippingRegion());
 				fGraphicsCard->FillRegion(r, fPainter->LowColor(),
 										  fSuspendSyncLevel == 0
-										  || cursorTouched);
+										  || overlaysHider.WasHidden());
 				doInSoftware = false;
 			}
 		}
@@ -906,9 +883,6 @@ DrawingEngine::FillRegion(BRegion& r)
 
 			fGraphicsCard->Invalidate(touched);
 		}
-
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -929,14 +903,12 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 	clipped.bottom = ceilf(clipped.bottom);
 
 	if (clipped.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
 							   : fPainter->StrokeRoundRect(r, xrad, yrad);
 
 		fGraphicsCard->Invalidate(touched);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -949,14 +921,14 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 
 	// NOTE: hides cursor regardless of if and where
 	// shape is drawn on screen, TODO: optimize
-	fGraphicsCard->HideSoftwareCursor();
+	fGraphicsCard->HideFloatingOverlays();
 
 	BRect touched = fPainter->DrawShape(opCount, opList,
 										ptCount, ptList,
 										filled);
 
 	fGraphicsCard->Invalidate(touched);
-	fGraphicsCard->ShowSoftwareCursor();
+	fGraphicsCard->ShowFloatingOverlays();
 }
 
 
@@ -970,7 +942,7 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 		extend_by_stroke_width(clipped, fPainter->PenSize());
 	clipped = fPainter->ClipRect(clipped);
 	if (clipped.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(clipped);
+		AutoFloatingOverlaysHider _(fGraphicsCard, clipped);
 
 		if (filled)
 			fPainter->FillTriangle(pts[0], pts[1], pts[2]);
@@ -978,8 +950,6 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 			fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 
 		fGraphicsCard->Invalidate(clipped);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -994,13 +964,11 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end)
 	extend_by_stroke_width(touched, fPainter->PenSize());
 	touched = fPainter->ClipRect(touched);
 	if (touched.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
+		AutoFloatingOverlaysHider _(fGraphicsCard, touched);
 
 		fPainter->StrokeLine(start, end);
 
 		fGraphicsCard->Invalidate(touched);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -1032,7 +1000,7 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 	extend_by_stroke_width(touched, fPainter->PenSize());
 	touched = fPainter->ClipRect(touched);
 	if (touched.IsValid()) {
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(touched);
+		AutoFloatingOverlaysHider _(fGraphicsCard, touched);
 
 		data = (const LineArrayData *)&(linedata[0]);
 
@@ -1056,8 +1024,6 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 		fPainter->SetPattern(pattern);
 
 		fGraphicsCard->Invalidate(touched);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 }
 
@@ -1088,7 +1054,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
 // Cursiously, the DrawString after it is actually faster!?!
 // TODO: make the availability of the hardware cursor part of the 
-// HW acceleration flags and skip all calculations for HideSoftwareCursor
+// HW acceleration flags and skip all calculations for HideFloatingOverlays
 // in case we don't have one.
 // TODO: Watch out about penLocation and use Painter::PenLocation() when
 // not using BoundindBox anymore.
@@ -1098,7 +1064,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 	b = fPainter->ClipRect(b);
 	if (b.IsValid()) {
 //printf("bounding box '%s': %lld µs\n", string, system_time() - now);
-		bool cursorTouched = fGraphicsCard->HideSoftwareCursor(b);
+		AutoFloatingOverlaysHider _(fGraphicsCard, b);
 
 //now = system_time();
 		BRect touched = fPainter->DrawString(string, length, pt, delta,
@@ -1106,8 +1072,6 @@ DrawingEngine::DrawString(const char* string, int32 length,
 //printf("drawing string: %lld µs\n", system_time() - now);
 
 		fGraphicsCard->Invalidate(touched);
-		if (cursorTouched)
-			fGraphicsCard->ShowSoftwareCursor();
 	}
 
 	return penLocation;
@@ -1167,7 +1131,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 
 	BRect clip(0, 0, buffer->Width() - 1, buffer->Height() - 1);
 	bounds = bounds & clip;
-	fGraphicsCard->HideSoftwareCursor(bounds);
+	AutoFloatingOverlaysHider _(fGraphicsCard, bounds);
 
 	status_t result = bitmap->ImportBits(buffer->Bits(), buffer->BitsLength(),
 		buffer->BytesPerRow(), buffer->ColorSpace(),
@@ -1208,8 +1172,6 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 			BPoint(0, 0), cursorPosition, 
 			cursorWidth, cursorHeight);
 	}
-
-	fGraphicsCard->ShowSoftwareCursor();
 
 	return result;
 }

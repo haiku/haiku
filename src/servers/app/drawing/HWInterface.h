@@ -159,9 +159,9 @@ class HWInterface : protected MultiLocker {
 	// ---
 	// NOTE: Investigate locking for these! The client code should already hold a
 	// ReadLock, but maybe these functions should acquire a WriteLock!
-			bool				HideSoftwareCursor(const BRect& area);
-			void				HideSoftwareCursor();
-			void				ShowSoftwareCursor();
+			bool				HideFloatingOverlays(const BRect& area);
+			bool				HideFloatingOverlays();
+			void				ShowFloatingOverlays();
 
 	// Listener support
 			bool				AddListener(HWInterfaceListener* listener);
@@ -217,7 +217,7 @@ class HWInterface : protected MultiLocker {
 			};
 
 			buffer_clip*		fCursorAreaBackup;
-	mutable	BLocker				fSoftwareCursorLock;
+	mutable	BLocker				fFloatingOverlaysLock;
 
 			ServerCursor*		fCursor;
 			const ServerBitmap*	fDragBitmap;
@@ -226,6 +226,9 @@ class HWInterface : protected MultiLocker {
 			bool				fCursorVisible;
 			bool				fCursorObscured;
 			BPoint				fCursorLocation;
+
+			BRect				fTrackingRect;
+
 			bool				fDoubleBuffered;
 			int					fVGADevice;
 

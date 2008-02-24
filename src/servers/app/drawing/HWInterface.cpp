@@ -39,7 +39,7 @@ HWInterfaceListener::~HWInterfaceListener()
 HWInterface::HWInterface(bool doubleBuffered)
 	: MultiLocker("hw interface lock"),
 	  fCursorAreaBackup(NULL),
-	  fSoftwareCursorLock("software cursor lock"),
+	  fFloatingOverlaysLock("floating overlays lock"),
 	  fCursor(NULL),
 	  fDragBitmap(NULL),
 	  fDragBitmapOffset(0, 0),
@@ -109,7 +109,7 @@ HWInterface::GetMonitorInfo(monitor_info* info)
 void
 HWInterface::SetCursor(ServerCursor* cursor)
 {
-	if (!fSoftwareCursorLock.Lock())
+	if (!fFloatingOverlaysLock.Lock())
 		return;
 
 	// TODO: if a bitmap is being dragged, it could
@@ -145,14 +145,14 @@ HWInterface::SetCursor(ServerCursor* cursor)
 		_AdoptDragBitmap(fDragBitmap, fDragBitmapOffset);
 		Invalidate(_CursorFrame());
 	}
-	fSoftwareCursorLock.Unlock();
+	fFloatingOverlaysLock.Unlock();
 }
 
 // SetCursorVisible
 void
 HWInterface::SetCursorVisible(bool visible)
 {
-	if (!fSoftwareCursorLock.Lock())
+	if (!fFloatingOverlaysLock.Lock())
 		return;
 
 	if (fCursorVisible != visible) {
@@ -174,7 +174,7 @@ HWInterface::SetCursorVisible(bool visible)
 			Invalidate(r);
 		}
 	}
-	fSoftwareCursorLock.Unlock();
+	fFloatingOverlaysLock.Unlock();
 }
 
 // IsCursorVisible
@@ -182,9 +182,9 @@ bool
 HWInterface::IsCursorVisible()
 {
 	bool visible = true;
-	if (fSoftwareCursorLock.Lock()) {
+	if (fFloatingOverlaysLock.Lock()) {
 		visible = fCursorVisible;
-		fSoftwareCursorLock.Unlock();
+		fFloatingOverlaysLock.Unlock();
 	}
 	return visible;
 }
@@ -193,21 +193,21 @@ HWInterface::IsCursorVisible()
 void
 HWInterface::ObscureCursor()
 {
-	if (!fSoftwareCursorLock.Lock())
+	if (!fFloatingOverlaysLock.Lock())
 		return;
 
 	if (!fCursorObscured) {
 		SetCursorVisible(false);
 		fCursorObscured = true;
 	}
-	fSoftwareCursorLock.Unlock();
+	fFloatingOverlaysLock.Unlock();
 }
 
 // MoveCursorTo
 void
 HWInterface::MoveCursorTo(const float& x, const float& y)
 {
-	if (!fSoftwareCursorLock.Lock())
+	if (!fFloatingOverlaysLock.Lock())
 		return;
 
 	BPoint p(x, y);
@@ -232,7 +232,7 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 			Invalidate(_CursorFrame());
 		}
 	}
-	fSoftwareCursorLock.Unlock();
+	fFloatingOverlaysLock.Unlock();
 }
 
 
@@ -240,9 +240,9 @@ BPoint
 HWInterface::CursorPosition()
 {
 	BPoint location;
-	if (fSoftwareCursorLock.Lock()) {
+	if (fFloatingOverlaysLock.Lock()) {
 		location = fCursorLocation;
-		fSoftwareCursorLock.Unlock();
+		fFloatingOverlaysLock.Unlock();
 	}
 	return location;
 }
@@ -252,9 +252,9 @@ void
 HWInterface::SetDragBitmap(const ServerBitmap* bitmap,
 						   const BPoint& offsetFromCursor)
 {
-	if (fSoftwareCursorLock.Lock()) {
+	if (fFloatingOverlaysLock.Lock()) {
 		_AdoptDragBitmap(bitmap, offsetFromCursor);
-		fSoftwareCursorLock.Unlock();
+		fFloatingOverlaysLock.Unlock();
 	}
 }
 
@@ -403,9 +403,9 @@ HWInterface::HideOverlay(Overlay* overlay)
 
 
 bool
-HWInterface::HideSoftwareCursor(const BRect& area)
+HWInterface::HideFloatingOverlays(const BRect& area)
 {
-	if (!fSoftwareCursorLock.Lock())
+	if (!fFloatingOverlaysLock.Lock())
 		return false;
 	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
 		BRect backupArea(fCursorAreaBackup->left,
@@ -418,26 +418,29 @@ HWInterface::HideSoftwareCursor(const BRect& area)
 			return true;
 		}
 	}
-	fSoftwareCursorLock.Unlock();
+	fFloatingOverlaysLock.Unlock();
 	return false;
 }
 
 
-void
-HWInterface::HideSoftwareCursor()
+bool
+HWInterface::HideFloatingOverlays()
 {
-	fSoftwareCursorLock.Lock();
+	if (!fFloatingOverlaysLock.Lock())
+		return false;
+
 	_RestoreCursorArea();
+	return true;
 }
 
 
 void
-HWInterface::ShowSoftwareCursor()
+HWInterface::ShowFloatingOverlays()
 {
 	if (fCursorAreaBackup && fCursorAreaBackup->cursor_hidden) {
 		_DrawCursor(_CursorFrame());
 	}
-	fSoftwareCursorLock.Unlock();
+	fFloatingOverlaysLock.Unlock();
 }
 
 
@@ -514,7 +517,7 @@ HWInterface::_DrawCursor(BRect area) const
 		uint8* dst = buffer;
 
 		if (fCursorAreaBackup && fCursorAreaBackup->buffer
-			&& fSoftwareCursorLock.Lock()) {
+			&& fFloatingOverlaysLock.Lock()) {
 			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
 			fCursorAreaBackup->left = left;
@@ -550,7 +553,7 @@ HWInterface::_DrawCursor(BRect area) const
 				dst += width * 4;
 				bup += bupBPR;
 			}
-			fSoftwareCursorLock.Unlock();
+			fFloatingOverlaysLock.Unlock();
 		} else {
 			// blending
 			for (int32 y = top; y <= bottom; y++) {
@@ -775,7 +778,8 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 			break;
 
 		default:
-			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported front buffer format! (0x%lx)\n", frontBuffer->ColorSpace());
+			fprintf(stderr, "HWInterface::CopyBackToFront() - unsupported front "
+				"buffer format! (0x%x)\n", frontBuffer->ColorSpace());
 			break;
 	}
 }
