@@ -280,21 +280,27 @@ BMenuWindow::DetachMenu()
 void
 BMenuWindow::AttachScrollers()
 {
-	// We want to attach a scroller only if there's a menu frame already
-	// existing.
+	// We want to attach a scroller only if there's a
+	// menu frame already existing.
 	if (!fMenu || !fMenuFrame)
 		return;
- 
-	if (fUpperScroller || fLowerScroller)
-		debugger("Scrollers are already attached!");
-
+ 	
 	fMenu->MakeFocus(true);
 
 	BRect frame = Bounds();
-	fUpperScroller = new UpperScroller(BRect(0, 0, frame.right, kScrollerHeight));
-	AddChild(fUpperScroller);
-	fLowerScroller = new LowerScroller(BRect(0, frame.bottom - kScrollerHeight, frame.right, frame.bottom));
-	AddChild(fLowerScroller);
+	
+	if (fUpperScroller == NULL) {
+		fUpperScroller = new UpperScroller(
+							BRect(0, 0, frame.right, kScrollerHeight));
+		AddChild(fUpperScroller);
+	}
+	
+	if (fLowerScroller == NULL) {
+		fLowerScroller = new LowerScroller(
+							BRect(0, frame.bottom - kScrollerHeight,
+										frame.right, frame.bottom));
+		AddChild(fLowerScroller);
+	}
 	
 	fUpperScroller->SetEnabled(false);
 	fLowerScroller->SetEnabled(true);
