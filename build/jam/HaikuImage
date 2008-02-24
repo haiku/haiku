@@ -513,53 +513,73 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 
 # Vision
 if [ IsOptionalHaikuImagePackageAdded Vision ] {
-	InstallOptionalHaikuImagePackage Vision
-		: http://vision.sf.net/Vision-0.9.7-H-26012008.zip
-		: apps
-	;
-	AddSymlinkToHaikuImage home config be Applications
-		: /boot/apps/Vision-0.9.7-H-26012008/Vision ;
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Vision available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Vision
+			: http://vision.sf.net/Vision-0.9.7-H-26012008.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Vision-0.9.7-H-26012008/Vision ;
+	}
 }
 
 # WonderBrush
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
-	InstallOptionalHaikuImagePackage WonderBrush
-		: http://www.yellowbites.com/downloads/WonderBrush-2.1.1-demo-x86-R5.zip
-		: apps
-	;
-	AddSymlinkToHaikuImage home config be Applications
-		: /boot/apps/WonderBrush/WonderBrush ;
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package WonderBrush available for gcc4" ;
+	} else {  
+		InstallOptionalHaikuImagePackage WonderBrush
+			: http://www.yellowbites.com/downloads/WonderBrush-2.1.1-demo-x86-R5.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/WonderBrush/WonderBrush ;
+	}
 }
 
 # OpenSound drivers
 if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
-	InstallOptionalHaikuImagePackage OpenSound
-		: http://revolf.free.fr/beos/oss-beos-v4.1test-bin.zip
-		: 
-	;
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package OpenSound available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage OpenSound
+			: http://revolf.free.fr/beos/oss-beos-v4.1test-bin.zip
+			: 
+		;
+	}
 	#UnzipArchiveToHaikuImage home : data/vv.mp3.zip : 0 ;
 }
 
 # Links web browser
 if [ IsOptionalHaikuImagePackageAdded Links ] {
-	InstallOptionalHaikuImagePackage Links
-		: http://revolf.free.fr/beos/links-beos-bin.zip
-		: 
-	;
-	AddSymlinkToHaikuImage home config be Applications
-		: /boot/home/config/bin/links ;
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Links available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Links
+			: http://revolf.free.fr/beos/links-beos-bin.zip
+			: 
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/home/config/bin/links ;
+	}
 }
 
 # Pe text editor
 if [ IsOptionalHaikuImagePackageAdded Pe ] {
-	InstallOptionalHaikuImagePackage Pe
-		: http://dl.hirschkaefer.de/beos/pe-2.4-x86.zip
-		: apps
-	;
-	AddSymlinkToHaikuImage home config be Applications
-		: /boot/apps/pe-2.4-x86/pe ;
-	AddSymlinkToHaikuImage home config bin
-		: /boot/apps/pe-2.4-x86/lpe ;
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Pe available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Pe
+			: http://dl.hirschkaefer.de/beos/pe-2.4-x86.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/pe-2.4-x86/pe ;
+		AddSymlinkToHaikuImage home config bin
+			: /boot/apps/pe-2.4-x86/lpe ;
+	}
 }
 
 #pragma mark - Build The Image
