@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,20 +20,21 @@
 #include "TextInput.h"
 
 
+namespace BPrivate {
+
+
 _BTextInput_::_BTextInput_(BRect frame, BRect textRect, uint32 resizeMask,
-						   uint32 flags)
-	:	BTextView(frame, "_input_", textRect, resizeMask, flags),
-		fPreviousText(NULL),
-		fBool(false)
+		uint32 flags)
+	: BTextView(frame, "_input_", textRect, resizeMask, flags)
+	, fPreviousText(NULL)
 {
 	MakeResizable(true);
 }
 
 
-_BTextInput_::_BTextInput_(BMessage *archive)
-	:	BTextView(archive),
-		fPreviousText(NULL),
-		fBool(false)
+_BTextInput_::_BTextInput_(BMessage* archive)
+	: BTextView(archive)
+	, fPreviousText(NULL)
 {
 	MakeResizable(true);
 }
@@ -59,6 +60,19 @@ status_t
 _BTextInput_::Archive(BMessage *data, bool deep) const
 {
 	return BTextView::Archive(data, true);
+}
+
+
+void
+_BTextInput_::MouseDown(BPoint where)
+{
+	if (!IsFocus()) {
+		MakeFocus(true);
+		return;
+	}
+
+	// only pass through to base class if we already have focus
+	BTextView::MouseDown(where);
 }
 
 
@@ -116,50 +130,39 @@ _BTextInput_::MakeFocus(bool state)
 
 	if (state) {
 		SetInitialText();
-
-		fBool = true;
-
-		if (Window()) {
-			BMessage *message = Window()->CurrentMessage();
-
-			if (message && message->what == B_KEY_DOWN)
-				SelectAll();
-		}
+		SelectAll();
 	} else {
 		if (strcmp(Text(), fPreviousText) != 0)
 			TextControl()->Invoke();
 
 		free(fPreviousText);
 		fPreviousText = NULL;
-		fBool = false;
-
-		if (Window()) {
-			BMessage *message = Window()->CurrentMessage();
-
-			if (message && message->what == B_MOUSE_DOWN)
-				Select(0, 0);
-		}
 	}
 
-	if (Window()) {
+//	if (Window()) {
 // TODO: why do we have to invalidate here?
 // I'm leaving this in, but it looks suspicious... :-)
-		Invalidate(Bounds());
+//		Invalidate(Bounds());
 		if (BTextControl* parent = dynamic_cast<BTextControl*>(Parent())) {
 			BRect frame = Frame();
 			frame.InsetBy(-1.0, -1.0);
 			parent->Invalidate(frame);
 		}
-	}
+//	}
 }
 
 
 void
 _BTextInput_::AlignTextRect()
 {
-	// TODO: just to get something working, it wouldn't be correct for
-	// scrolled views
+	// the label font could require the control to be higher than
+	// necessary for the text view, we compensate this by layouting
+	// the text rect to be in the middle, normally this means there
+	// is one pixel spacing on each side
 	BRect textRect(Bounds());
+	textRect.left = 0.0;
+	float vInset = max_c(1, floorf((textRect.Height() - LineHeight(0)) / 2.0));
+	textRect.InsetBy(2, vInset);
 	SetTextRect(textRect);
 }
 
@@ -167,10 +170,8 @@ _BTextInput_::AlignTextRect()
 void
 _BTextInput_::SetInitialText()
 {
-	if (fPreviousText) {
-		free(fPreviousText);
-		fPreviousText = NULL;
-	}
+	free(fPreviousText);
+	fPreviousText = NULL;
 
 	if (Text())
 		fPreviousText = strdup(Text());
@@ -237,3 +238,7 @@ _BTextInput_::TextControl()
 
 	return textControl;
 }
+
+
+}	// namespace BPrivate
+

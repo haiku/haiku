@@ -315,6 +315,8 @@ class BTextView : public BView {
 		_BLineBuffer_*			fLines;
 		_BStyleBuffer_*			fStyles;
 		BRect					fTextRect;
+		float					fLeftInset;
+		float					fRightInset;
 		int32					fSelStart;
 		int32					fSelEnd;
 		bool					fCaretVisible;
@@ -345,7 +347,7 @@ class BTextView : public BView {
 		BPoint					fWhere;
 		_BTextTrackState_*		fTrackingMouse;
 		_BTextChangeResult_*	fTextChange;
-		uint32					_reserved[9];
+		uint32					_reserved[7];
 
 		static _BWidthBuffer_*	sWidths;
 		static sem_id			sWidthSem;

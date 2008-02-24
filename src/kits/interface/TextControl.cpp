@@ -333,24 +333,26 @@ BTextControl::Draw(BRect updateRect)
 	// label
 
 	if (Label()) {
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
+		font_height fh;
+		GetFontHeight(&fh);
 
-		float y = fontHeight.ascent + fText->Frame().top + 1;
+		float y = Bounds().top
+			+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
+			+ fh.ascent;
 		float x;
 
 		float labelWidth = StringWidth(Label());
 		switch (fLabelAlign) {
 			case B_ALIGN_RIGHT:
-				x = fDivider - labelWidth - 3.0f;
+				x = fDivider - labelWidth - 3.0;
 				break;
 
 			case B_ALIGN_CENTER:
-				x = fDivider - labelWidth / 2.0f;
+				x = fDivider - labelWidth / 2.0;
 				break;
 
 			default:
-				x = 3.0f;
+				x = 0.0;
 				break;
 		}
 
@@ -373,7 +375,6 @@ BTextControl::MouseDown(BPoint where)
 {
 	if (!fText->IsFocus()) {
 		fText->MakeFocus(true);
-		fText->SelectAll();
 	}
 }
 
@@ -428,7 +429,7 @@ BTextControl::GetPreferredSize(float *_width, float *_height)
 		GetFontHeight(&fontHeight);
 		float labelHeight = ceil(fontHeight.ascent + fontHeight.descent
 			+ fontHeight.leading);
-		float textHeight = ceilf(fText->LineHeight(0)) + 4.0;
+		float textHeight = ceilf(fText->LineHeight(0) + 1.0) + 4.0;
 
 		*_height = max_c(labelHeight, textHeight);
 	}
@@ -730,7 +731,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 	}
 
 	if (archive)
-		fText = static_cast<_BTextInput_ *>(FindView("_input_"));
+		fText = static_cast<BPrivate::_BTextInput_*>(FindView("_input_"));
 	else {
 		BRect frame(fDivider, bounds.top,
 					bounds.right, bounds.bottom);
@@ -739,7 +740,7 @@ BTextControl::_InitData(const char* label, const char* initialText,
 		frame.InsetBy(2.0, 3.0);
 		BRect textRect(frame.OffsetToCopy(B_ORIGIN));
 
-		fText = new _BTextInput_(frame, textRect,
+		fText = new BPrivate::_BTextInput_(frame, textRect,
 			B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 			B_WILL_DRAW | B_FRAME_EVENTS | navigableFlags);
 		AddChild(fText);
@@ -775,16 +776,7 @@ BTextControl::_LayoutTextView()
 	frame.InsetBy(2.0, 2.0);
 	fText->MoveTo(frame.left, frame.top);
 	fText->ResizeTo(frame.Width(), frame.Height());
-
-	BRect textRect(frame.OffsetToCopy(B_ORIGIN));
-
-	// the label font could require the control to be higher than
-	// necessary for the text view, we compensate this by layouting
-	// the text rect to be in the middle, normally this means there
-	// is one pixel spacing on each side
-	float lineHeight = ceilf(fText->LineHeight(0));
-	textRect.InsetBy(1, floorf((frame.Height() - lineHeight) / 2));
-	fText->SetTextRect(textRect);
+	fText->AlignTextRect();
 }
 
 

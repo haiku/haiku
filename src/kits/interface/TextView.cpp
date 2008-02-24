@@ -400,8 +400,7 @@ BTextView::AttachedToWindow()
 	fDragOffset = -1;
 	fActive = false;
 	
-	if (fResizable)
-		_AutoResize(true);
+	_AutoResize(true);
 	
 	_UpdateScrollbars();
 	
@@ -995,7 +994,7 @@ BTextView::SetText(const char *inText, int32 inLength, const text_run_array *inR
 	// recalc line breaks and draw the text
 	_Refresh(0, inLength, true, false);
 	fClickOffset = fSelStart = fSelEnd = 0;	
-	ScrollToOffset(fSelStart);
+	ScrollTo(B_ORIGIN);
 
 	// draw the caret
 	if (fActive)
@@ -1917,13 +1916,16 @@ BTextView::_ScrollToOffset(int32 inOffset, bool useHorizontal, bool useVertical)
 	float lineHeight = 0.0;
 	float xDiff = 0.0;
 	float yDiff = 0.0;
-        BPoint point = PointAt(inOffset, &lineHeight);
+	BPoint point = PointAt(inOffset, &lineHeight);
 	
 	if (useHorizontal) {
 		if (point.x < bounds.left)
 			xDiff = point.x - bounds.left - bounds.IntegerWidth() / 2;
 		else if (point.x >= bounds.right)
 			xDiff = point.x - bounds.right + bounds.IntegerWidth() / 2;
+		// prevent negative scroll offset
+		if (bounds.left + xDiff < 0.0)
+			xDiff = -bounds.left;
 	}
 
 	if (useVertical) {
@@ -1931,6 +1933,9 @@ BTextView::_ScrollToOffset(int32 inOffset, bool useHorizontal, bool useVertical)
 			yDiff = point.y - bounds.top - bounds.IntegerHeight() / 2;
 		else if (point.y >= bounds.bottom)
 			yDiff = point.y - bounds.bottom + bounds.IntegerHeight() / 2;
+		// prevent negative scroll offset
+		if (bounds.top + yDiff < 0.0)
+			yDiff = -bounds.top;
 	}
 
 	ScrollBy(xDiff, yDiff);
@@ -1978,6 +1983,8 @@ BTextView::SetTextRect(BRect rect)
 		return;
 		
 	fTextRect = rect;
+	fLeftInset = fTextRect.left;
+	fRightInset = Bounds().right - fTextRect.right;
 	
 	if (Window() != NULL) {
 		Invalidate();		
@@ -2708,6 +2715,8 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	// to have less code duplication, and a single place where to do changes
 	// if needed.,
 	fTextRect = textRect;
+	fLeftInset = fTextRect.left;
+	fRightInset = Bounds().right - fTextRect.right;
 	fSelStart = fSelEnd = 0;
 	fCaretVisible = false;
 	fCaretTime = 0;
@@ -3117,8 +3126,7 @@ BTextView::_Refresh(int32 fromOffset, int32 toOffset, bool erase, bool scroll)
 		|| fAlignment != B_ALIGN_LEFT)
 		drawOffset = (*fLines)[fromLine]->offset;
 
-	if (fResizable)
-		_AutoResize(false);
+	_AutoResize(false);
 
 	_DrawLines(fromLine, toLine, drawOffset, erase);
 
@@ -3541,7 +3549,7 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset
 			startLeft /= 2;
 		startLeft += fTextRect.left;
 	}
-	
+
 	view->MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top + 1);
 	
 	if (erase) {
@@ -3671,10 +3679,6 @@ BTextView::_DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 	if (fAlignment != B_ALIGN_LEFT)
 		erase = true;
 
-	// Actually hide the caret
-	if (fCaretVisible)
-		_DrawCaret(fSelStart);
-		
 	BRect eraseRect = clipRect;
 	int32 startEraseLine = startLine;
 	STELine* line = (*fLines)[startLine];
@@ -4097,32 +4101,31 @@ BTextView::_UpdateScrollbars()
 void
 BTextView::_AutoResize(bool redraw)
 {
-	if (fResizable) {
-		float oldWidth = Bounds().Width() + 1;
-		float newWidth = 3;
-		for (int32 i = 0; i < CountLines(); i++)
-			newWidth += LineWidth(i);
-		
-		BRect newRect(0, 0, ceilf(newWidth), ceilf(LineHeight(0)) + 2);
-		
-		if (fContainerView != NULL) {
-			fContainerView->ResizeTo(newRect.Width() + 1, newRect.Height());	
-			if (fAlignment == B_ALIGN_CENTER)
-				fContainerView->MoveBy(ceilf((oldWidth - (newRect.Width() + 1)) / 2), 0);
-			else if (fAlignment == B_ALIGN_RIGHT)
-				fContainerView->MoveBy(oldWidth - (newRect.Width() + 1), 0);
-			fContainerView->Invalidate();
-		}
-	
-		fTextRect = newRect.InsetBySelf(0, 1);
-		
-		if (redraw)
-			_DrawLines(0, 0);
-		
-		// Erase the old text (TODO: Might not work for alignments different than B_ALIGN_LEFT)
-		SetLowColor(ViewColor());
-		FillRect(BRect(fTextRect.right, fTextRect.top, Bounds().right, fTextRect.bottom), B_SOLID_LOW);
+	if (!fResizable)
+		return;
+
+	BRect bounds = Bounds();
+	float oldWidth = fTextRect.Width();
+	float newWidth = max_c(bounds.Width() - (fLeftInset + fRightInset),
+		ceilf(LineWidth(0)));
+
+	if (fContainerView != NULL) {
+		fContainerView->ResizeBy(ceilf(newWidth - oldWidth), 0);	
+		if (fAlignment == B_ALIGN_CENTER)
+			fContainerView->MoveBy(ceilf((oldWidth - newWidth) / 2), 0);
+		else if (fAlignment == B_ALIGN_RIGHT)
+			fContainerView->MoveBy(ceilf(oldWidth - newWidth), 0);
+//		fContainerView->Invalidate();
 	}
+
+	fTextRect.right = fTextRect.left + newWidth;
+
+	if (redraw)
+		_DrawLines(0, 0);
+
+	// Erase the old text (TODO: Might not work for alignments different than B_ALIGN_LEFT)
+	SetLowColor(ViewColor());
+	FillRect(BRect(fTextRect.right, fTextRect.top, Bounds().right, fTextRect.bottom), B_SOLID_LOW);
 }
 
 

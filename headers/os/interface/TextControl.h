@@ -10,8 +10,9 @@
 #include <TextView.h>
 
 class BLayoutItem;
+namespace BPrivate {
 class _BTextInput_;
-
+}
 
 class BTextControl : public BControl {
 	public:
@@ -105,7 +106,7 @@ class BTextControl : public BControl {
 		void				_UpdateFrame();
 
 	private:
-		_BTextInput_*		fText;
+		BPrivate::_BTextInput_* fText;
 		char*				fLabel;
 		BMessage*			fModificationMessage;
 		alignment			fLabelAlign;
