@@ -102,8 +102,6 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 			sourceText += charLen) {
 		charLen = UTF8NextCharLen(sourceText);
 		
-		printf("charlen: %ld\n", charLen);
-		
 		// End of string, bail out
 		if (charLen <= 0)
 			break;
@@ -296,7 +294,6 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 	// Insert the escapements into the hash table
 	do {
 		const int32 charLen = UTF8NextCharLen(text);
-		printf("charlen: %ld\n", charLen);
 		if (charLen == 0)
 			break;
 
