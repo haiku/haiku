@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:	
@@ -7,6 +7,7 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stephan Assmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Rene Gollent (rene@gollent.com)
  */
 
 
@@ -102,8 +103,6 @@ BListView::BListView(BMessage* archive)
 	fScrollView = NULL;
 	fTrack = NULL;
 
-	fWidth = Bounds().Width();
-	
 	int32 i = 0;
 	BMessage subData;
 	
@@ -464,7 +463,6 @@ BListView::MakeFocus(bool focused)
 void
 BListView::FrameResized(float width, float height)
 {
-	fWidth = Bounds().right;
 	_FixupScrollBar();
 }
 
@@ -475,14 +473,12 @@ BListView::TargetedByScrollView(BScrollView *view)
 	fScrollView = view;
 }
 
-
+// ScrollTo
 void
 BListView::ScrollTo(BPoint point)
 {
 	BView::ScrollTo(point);
-	fWidth = Bounds().right;
 }
-
 
 bool
 BListView::AddItem(BListItem *item, int32 index)
@@ -502,6 +498,8 @@ BListView::AddItem(BListItem *item, int32 index)
 
 		item->Update(this, &font);
 
+		_RecalcItemTops(index);	
+		
 		_FixupScrollBar();
 		_InvalidateFrom(index);
 	}
@@ -517,12 +515,14 @@ BListView::AddItem(BListItem* item)
 		return false;
 
 	// No need to adapt selection, as this item is the last in the list
-
+	
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
 
 		item->Update(this, &font);
+
+		_RecalcItemTops(CountItems() - 1);	
 
 		_FixupScrollBar();
 		InvalidateItem(CountItems() - 1);
@@ -549,12 +549,11 @@ BListView::AddList(BList* list, int32 index)
 	if (Window()) {
 		BFont font;
 		GetFont(&font);
-
-		int32 i = 0;
-		while(BListItem *item = (BListItem*)list->ItemAt(i)) {
-			item->Update(this, &font);
-			i++;
-		}
+		
+		for (int32 i = index; i <= (index + list->CountItems() - 1); i++) 
+			ItemAt(i)->Update(this, &font);
+		
+		_RecalcItemTops(index);
 		
 		_FixupScrollBar();
 		Invalidate(); // TODO
@@ -583,13 +582,15 @@ BListView::RemoveItem(int32 index)
 
 	if (!fList.RemoveItem(item))
 		return NULL;
-
+	
 	if (fFirstSelected != -1 && index < fFirstSelected)
 		fFirstSelected--;
 
 	if (fLastSelected != -1 && index < fLastSelected)
 		fLastSelected--;
-
+	
+	_RecalcItemTops(index);
+	
 	_InvalidateFrom(index);
 	_FixupScrollBar();
 
@@ -700,16 +701,24 @@ BListView::IndexOf(BListItem *item) const
 int32
 BListView::IndexOf(BPoint point) const
 {
-	float y = 0.0f;
-
-	// TODO: somehow binary search, but items don't know their frame
-	for (int i = 0; i < fList.CountItems(); i++) {
-		y += ceilf(ItemAt(i)->Height());
-
-		if (point.y < y)
-			return i;
-	}
-
+	int32 low = 0;
+	int32 high = fList.CountItems() - 1;
+	int32 mid = -1;
+	float frameTop = -1.0;
+	float frameBottom = 1.0;
+	// binary search the list
+	while (high >= low) {
+		mid = (low + high) / 2;
+		frameTop = ItemAt(mid)->Top();
+		frameBottom = ItemAt(mid)->Bottom();
+		if (point.y < frameTop) 
+			high = mid - 1;
+		else if (point.y > frameBottom) 
+			low = mid + 1;
+		else
+			return mid;
+	} 
+	
 	return -1;
 }
 
@@ -955,6 +964,7 @@ BListView::SortItems(int (*cmp)(const void *, const void *))
 	}
 
 	fList.SortItems(cmp);
+	_RecalcItemTops(0);
 	Invalidate();
 }
 
@@ -1003,7 +1013,7 @@ BListView::AttachedToWindow()
 
 	if (!Messenger().IsValid())
 		SetTarget(Window(), NULL);
-
+	
 	_FixupScrollBar();
 }
 
@@ -1018,17 +1028,16 @@ BListView::FrameMoved(BPoint new_position)
 BRect
 BListView::ItemFrame(int32 index)
 {
-	BRect frame(Bounds().left, 0, Bounds().right, -1);
-
-	if (index < 0 || index >= CountItems())
-		return frame;
-
-	// TODO: this is very expensive, the (last) offsets could be cached
-	for (int32 i = 0; i <= index; i++) {
-		frame.top = frame.bottom + 1;
-		frame.bottom = frame.top + ceilf(ItemAt(i)->Height()) - 1;
+	BRect frame = Bounds();
+	if (index < 0 || index >= CountItems()) {
+		frame.top = 0;
+		frame.bottom = -1;
+	} else {
+		BListItem* item = ItemAt(index);
+		frame.left = 0.0;
+		frame.top = item->Top();
+		frame.bottom = item->Bottom();
 	}
-
 	return frame;
 }
 
@@ -1104,7 +1113,21 @@ BListView::ResizeToPreferred()
 void
 BListView::GetPreferredSize(float *width, float *height)
 {
-	BView::GetPreferredSize(width, height);
+	int32 count = CountItems();
+
+	if (count > 0) {
+		float maxWidth = 0.0; 
+		for (int32 i = 0; i < count; i++) {
+			float itemWidth = ItemAt(i)->Width();
+			if (itemWidth > maxWidth)
+				maxWidth = itemWidth; 
+		}
+	
+		*width = maxWidth;
+		*height = ItemAt(count - 1)->Bottom();
+	} else {
+		BView::GetPreferredSize(width, height);
+	}
 }
 
 // AllAttached
@@ -1187,7 +1210,6 @@ BListView::_InitObject(list_view_type type)
 	fFirstSelected = -1;
 	fLastSelected = -1;
 	fAnchorIndex = -1;
-	fWidth = Bounds().Width();
 	fSelectMessage = NULL;
 	fScrollView = NULL;
 	fTrack = new track_data;
@@ -1206,10 +1228,11 @@ BListView::_FixupScrollBar()
 
 	BRect bounds = Bounds();
 	int32 count = CountItems();
+	
+	float itemHeight = 0.0;
 
-	float itemHeight = 0;
-	for (int32 i = 0; i < count; i++)
-		itemHeight += ceilf(ItemAt(i)->Height());
+	if (CountItems() > 0)
+		itemHeight = ItemAt(CountItems() - 1)->Bottom();
 
 	if (bounds.Height() > itemHeight) {
 		// no scrolling
@@ -1254,10 +1277,10 @@ BListView::_FontChanged()
 {
 	BFont font;
 	GetFont(&font);
-
-	for (int i = 0; i < CountItems (); i ++)
+	for (int32 i = 0; i < CountItems(); i++) 
 		ItemAt(i)->Update(this, &font);
-}
+	_RecalcItemTops(0);
+}	
 
 
 /*!
@@ -1504,7 +1527,7 @@ BListView::_SwapItems(int32 a, int32 b)
 		fAnchorIndex = b;
 	else if (fAnchorIndex == b)
 		fAnchorIndex = a;
-
+	
 	// track selection
 	// NOTE: this is only important if the selection status
 	// of both items is not the same
@@ -1525,6 +1548,8 @@ BListView::_SwapItems(int32 a, int32 b)
 	if (Window()) {
 		// NOTE: window looper is assumed to be locked!
 		if (aFrame.Height() != bFrame.Height()) {
+			ItemAt(a)->SetTop(bFrame.top);
+			ItemAt(b)->SetTop(aFrame.top);
 			// items in between shifted visually
 			Invalidate(aFrame | bFrame);
 		} else {
@@ -1558,7 +1583,9 @@ BListView::_MoveItem(int32 from, int32 to)
 		// same, the selection has still changed
 		SelectionChanged();
 	}
-
+	
+	_RecalcItemTops((to > from) ? from : to);
+	
 	// take care of invalidation
 	if (Window()) {
 		// NOTE: window looper is assumed to be locked!
@@ -1594,6 +1621,7 @@ BListView::_ReplaceItem(int32 index, BListItem *item)
 		_RescanSelection(start, end);
 		SelectionChanged();
 	}
+	_RecalcItemTops(index);
 
 	bool itemHeightChanged = frame != ItemFrame(index);
 
@@ -1647,4 +1675,18 @@ BListView::_RescanSelection(int32 from, int32 to)
 	}
 }
 
+void
+BListView::_RecalcItemTops(int32 start)
+{
+	int32 count = CountItems();
+	if ((start < 0) || (start >= count))
+		return;
+	float top = (start == 0) ? 0.0 : ItemAt(start - 1)->Bottom() + 1.0;
+
+	for (int32 i = start; i < CountItems(); i++) {
+		BListItem *item = ItemAt(i);
+		item->SetTop(top);
+		top += ceilf(item->Height());
+	}
+}
 

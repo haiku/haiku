@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2005, Haiku, Inc.
+//	Copyright (c) 2001-2008, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -21,7 +21,8 @@
 //
 //	File Name:		ListItem.cpp
 //	Author:			Ulrich Wimboeck
-//					Marc Flerackers (mflerackers@androme.be)
+//				Marc Flerackers (mflerackers@androme.be)
+//				Rene Gollent
 //	Description:	BListItem is the base class for BListView's items,
 //					BStringItem is a subclass of BListItem which draws a string.
 //------------------------------------------------------------------------------
@@ -34,7 +35,8 @@
 
 
 BListItem::BListItem(uint32 level, bool expanded)
-	:	fWidth(0),
+	:	fTop(0.0),
+		fWidth(0),
 		fHeight(0),
 		fLevel(level),
 		fSelected(false),
@@ -48,6 +50,7 @@ BListItem::BListItem(uint32 level, bool expanded)
 
 BListItem::BListItem(BMessage *data)
 	:	BArchivable(data),
+		fTop(0.0),
 		fWidth(0),
 		fHeight(0),
 		fLevel(0),
@@ -226,6 +229,11 @@ BListItem::IsItemVisible() const
 	return fVisible;
 }
 
+void
+BListItem::SetTop(float top)
+{
+	fTop = top;
+}
 
 void
 BListItem::SetItemVisible(bool visible)

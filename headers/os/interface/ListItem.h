@@ -18,7 +18,8 @@ class BView;
 
 class BListItem : public BArchivable {
 	public:
-							BListItem(uint32 outlineLevel = 0, bool expanded = true);
+							BListItem(uint32 outlineLevel = 0,
+								bool expanded = true);
 							BListItem(BMessage* archive);
 		virtual				~BListItem();
 
@@ -47,7 +48,7 @@ class BListItem : public BArchivable {
 
 	private:
 		friend class BOutlineListView;
-
+		friend class BListView;
 		bool				HasSubitems() const;
 
 		virtual	void		_ReservedListItem1();
@@ -58,9 +59,11 @@ class BListItem : public BArchivable {
 
 		bool				IsItemVisible() const;
 		void				SetItemVisible(bool visible);
-
+		inline float			Top() const;
+		inline float			Bottom() const;
+		void				SetTop(float top);
 	private:
-		uint32				_reserved[1];
+		float				fTop;
 		BList*				fTemporaryList;
 		float				fWidth;
 		float				fHeight;
@@ -71,6 +74,18 @@ class BListItem : public BArchivable {
 		bool				fHasSubitems : 1;
 		bool				fVisible : 1;
 };
+
+inline float
+BListItem::Top(void) const 
+{
+	return fTop;
+}
+
+inline float
+BListItem::Bottom(void) const
+{
+	return (fTop + ceilf(fHeight) - 1.0);
+}
 
 #include <StringItem.h>
 	// to maintain source compatibility

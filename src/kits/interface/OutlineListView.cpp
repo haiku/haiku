@@ -1,15 +1,17 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Rene Gollent (rene@gollent.com)
  */
 
 //! BOutlineListView represents a "nestable" list view.
 
 #include <OutlineListView.h>
+#include <Window.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,14 +37,14 @@ quick_sort_item_array(BListItem** items, int32 first, int32 last,
 	int32 right = last;
 
 	do {
-		while (compareFunc(items[left], pivot) < 0) {
+		while ((compareFunc(items[left], pivot) < 0) && (left < last)) 
 			left++;
-		}
-		while (compareFunc(items[right], pivot) > 0) {
+		
+		while ((compareFunc(items[right], pivot) > 0) && (right > first)) 
 			right--;
-		}
+		
 
-		if (left <= right) {
+		if (left < right) {
 			// swap entries
 			BListItem* temp = items[left];
 			items[left] = items[right];
@@ -51,11 +53,14 @@ quick_sort_item_array(BListItem** items, int32 first, int32 last,
 			left++;
 			right--;
 		}
-	} while (left <= right);
+	} while (left < right);
+
+	// if our subset of the array consists of two elements, then we're done recursing
+	if (last - first <= 1)
+		return;
 
 	// At this point, the elements in the left half are all smaller
 	// than the elements in the right half
-
 	if (first < right) {
 		// sort left half
 		quick_sort_item_array(items, first, right, compareFunc);
@@ -181,7 +186,7 @@ BOutlineListView::AddUnder(BListItem* item, BListItem* superitem)
 {
 	if (superitem == NULL)
 		return AddItem(item);
-
+	
 	fFullList.AddItem(item, FullListIndexOf(superitem) + 1);
 
 	item->fLevel = superitem->OutlineLevel() + 1;
@@ -254,16 +259,20 @@ BOutlineListView::AddItem(BListItem* item, int32 fullListIndex)
 bool
 BOutlineListView::AddList(BList* newItems)
 {
-	printf("BOutlineListView::AddList Not implemented\n");
-	return false;
+	return AddList(newItems, FullListCountItems());
 }
 
 
 bool
 BOutlineListView::AddList(BList* newItems, int32 fullListIndex)
 {
-	printf("BOutlineListView::AddList Not implemented\n");
-	return false;
+	if ((newItems == NULL) || (newItems->CountItems() == 0))
+		return false;
+
+	for (int32 i = 0; i < newItems->CountItems(); i++)
+		AddItem((BListItem *)newItems->ItemAt(i), fullListIndex + i);
+
+	return true;
 }
 
 
@@ -308,7 +317,12 @@ BOutlineListView::FullListItemAt(int32 fullListIndex) const
 int32
 BOutlineListView::FullListIndexOf(BPoint point) const
 {
-	return BListView::IndexOf(point);
+	int32 index = BListView::IndexOf(point);
+	
+	if (index > 0)
+		index = FullListIndex(index);
+
+	return index;
 }
 
 
@@ -386,7 +400,7 @@ void
 BOutlineListView::FullListDoForEach(bool (*func)(BListItem* item, void* arg),
 	void* arg)
 {
-	fList.DoForEach(reinterpret_cast<bool (*)(void*, void*)>(func), arg);
+	fFullList.DoForEach(reinterpret_cast<bool (*)(void*, void*)>(func), arg);
 }
 
 
@@ -412,12 +426,12 @@ BOutlineListView::Expand(BListItem* item)
 	uint32 level = item->fLevel;
 	int32 fullIndex = FullListIndexOf(item);
 	int32 index = IndexOf(item) + 1;
+	int32 startIndex = index;
 	int32 count = FullListCountItems() - fullIndex - 1;
 	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
 
 	BFont font;
 	GetFont(&font);
-
 	while (count-- > 0) {
 		item = items[0];
 		if (item->fLevel <= level)
@@ -445,7 +459,7 @@ BOutlineListView::Expand(BListItem* item)
 		} else
 			items++;
 	}
-
+	_RecalcItemTops(startIndex);
 	_FixupScrollBar();
 	Invalidate();
 }
@@ -462,6 +476,7 @@ BOutlineListView::Collapse(BListItem* item)
 	uint32 level = item->fLevel;
 	int32 fullIndex = FullListIndexOf(item);
 	int32 index = IndexOf(item);
+	int32 startIndex = index;
 	int32 max = FullListCountItems() - fullIndex - 1;
 	int32 count = 0;
 	BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
@@ -482,7 +497,8 @@ BOutlineListView::Collapse(BListItem* item)
 
 		items++;
 	}
-
+	
+	_RecalcItemTops(startIndex);
 	// fix selection hints
 	// TODO: revise for multi selection lists
 	if (index < fFirstSelected) {
@@ -496,7 +512,7 @@ BOutlineListView::Collapse(BListItem* item)
 			Select(index);
 		}
 	}
-
+	
 	_FixupScrollBar();
 	Invalidate();
 }
@@ -615,8 +631,9 @@ BOutlineListView::SortItemsUnder(BListItem* underItem, bool oneLevelOnly,
 		}
 
 		// only invalidate what may have changed
+		_RecalcItemTops(firstIndex);
 		BRect top = ItemFrame(firstIndex);
-		BRect bottom = ItemFrame(lastIndex);
+		BRect bottom = ItemFrame(lastIndex - 1);
 		BRect update(top.left, top.top, bottom.right, bottom.bottom);
 		Invalidate(update);
 	}
@@ -798,6 +815,12 @@ BOutlineListView::ItemUnderAt(BListItem* underItem,
 bool
 BOutlineListView::DoMiscellaneous(MiscCode code, MiscData* data)
 {
+	if (code == B_SWAP_OP) {
+		// todo: If we do a swap and the items in question have children, we need
+		// to move the child hierarchy together with the item if we want to correctly
+		// mimic R5 behavior.
+	} 
+		
 	return BListView::DoMiscellaneous(code, data);
 }
 
@@ -915,29 +938,24 @@ BOutlineListView::_RemoveItem(BListItem* item, int32 fullIndex)
 	uint32 level = item->OutlineLevel();
 	int32 superIndex;
 	BListItem* super = _SuperitemForIndex(fullIndex, level, &superIndex);
-
+	
 	if (item->IsItemVisible()) {
 		// remove children, too
-		int32 max = FullListCountItems() - fullIndex - 1;
-		BListItem** items = (BListItem**)fFullList.Items() + fullIndex + 1;
-
-		while (max-- > 0) {
-			BListItem* subItem = items[0];
-			if (subItem->fLevel <= level)
+		while (fullIndex + 1 < CountItems()) {
+			BListItem *subItem = ItemAt(fullIndex + 1);
+			
+			if (subItem->OutlineLevel() <= level)
 				break;
 
 			if (subItem->IsItemVisible())
 				BListView::RemoveItem(subItem);
-
+			
 			fFullList.RemoveItem(fullIndex + 1);
-
-			// TODO: this might be problematic, see comment above
 			delete subItem;
 		}
-
 		BListView::RemoveItem(item);
 	}
-
+	
 	fFullList.RemoveItem(fullIndex);
 
 	if (super != NULL) {
@@ -946,7 +964,6 @@ BOutlineListView::_RemoveItem(BListItem* item, int32 fullIndex)
 		if (child == NULL || child->OutlineLevel() <= super->OutlineLevel())
 			super->fHasSubitems = false;
 	}
-
 	return item;
 }
 

@@ -43,8 +43,8 @@ class BListView : public BView, public BInvoker {
 		virtual void		MakeFocus(bool state = true);
 		virtual void		FrameResized(float newWidth, float newHeight);
 		virtual void		TargetedByScrollView(BScrollView* scroller);
-				void		ScrollTo(float x, float y);
 		virtual void		ScrollTo(BPoint where);
+		inline	void		ScrollTo(float x, float y);
 		virtual bool		AddItem(BListItem* item);
 		virtual bool		AddItem(BListItem* item, int32 atIndex);
 		virtual bool		AddList(BList* newItems);
@@ -136,7 +136,6 @@ class BListView : public BView, public BInvoker {
 		};
 
 		virtual bool		DoMiscellaneous(MiscCode code, MiscData *data);
-
 	private:
 		friend class BOutlineListView;
 
@@ -161,6 +160,7 @@ class BListView : public BView, public BInvoker {
 				bool		_TryInitiateDrag(BPoint where);
 				int32		_CalcFirstSelected(int32 after);
 				int32		_CalcLastSelected(int32 before);
+				void		_RecalcItemTops(int32 start);
 		virtual void		DrawItem(BListItem* item, BRect itemRect,
 								bool complete = false);
 	
@@ -174,12 +174,11 @@ class BListView : public BView, public BInvoker {
 		int32				fFirstSelected;
 		int32				fLastSelected;
 		int32				fAnchorIndex;
-		float				fWidth;
 		BMessage*			fSelectMessage;
 		BScrollView*		fScrollView;
 		track_data*			fTrack;
 
-		uint32				_reserved[3];
+		uint32				_reserved[4];
 };
 
 inline void
