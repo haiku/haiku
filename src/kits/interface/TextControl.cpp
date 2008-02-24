@@ -333,12 +333,11 @@ BTextControl::Draw(BRect updateRect)
 	// label
 
 	if (Label()) {
-		font_height fh;
-		GetFontHeight(&fh);
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
 
-		float y = Bounds().top
-			+ (Bounds().Height() + 1 - fh.ascent - fh.descent) / 2
-			+ fh.ascent;
+		float y = Bounds().top + (Bounds().Height() + 1 - fontHeight.ascent
+			- fontHeight.descent) / 2 + fontHeight.ascent;
 		float x;
 
 		float labelWidth = StringWidth(Label());
