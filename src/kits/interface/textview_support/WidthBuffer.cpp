@@ -101,7 +101,9 @@ _BWidthBuffer_::StringWidth(const char *inText, int32 fromOffset, int32 length,
 			sourceText < inText + length;
 			sourceText += charLen) {
 		charLen = UTF8NextCharLen(sourceText);
-
+		
+		printf("charlen: %ld\n", charLen);
+		
 		// End of string, bail out
 		if (charLen <= 0)
 			break;
@@ -197,8 +199,7 @@ int32
 _BWidthBuffer_::InsertTable(const BFont *font)
 {
 	_width_table_ table;
-	hashed_escapement *deltas = new hashed_escapement[kTableCount];
-
+	
 #if USE_DANO_WIDTHBUFFER
 	table.font = *font;
 #else
@@ -208,7 +209,7 @@ _BWidthBuffer_::InsertTable(const BFont *font)
 
 	table.hashCount = 0;
 	table.tableCount = kTableCount;
-	table.widths = deltas;
+	table.widths = new hashed_escapement[kTableCount];
 	
 	uint32 position = fItemCount;
 	InsertItemsAt(1, position, &table);
@@ -295,6 +296,7 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 	// Insert the escapements into the hash table
 	do {
 		const int32 charLen = UTF8NextCharLen(text);
+		printf("charlen: %ld\n", charLen);
 		if (charLen == 0)
 			break;
 
@@ -320,7 +322,6 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 			// the total size.
 			if (table.tableCount * 2 / 3 <= table.hashCount) {
 				const int32 newSize = table.tableCount * 2;
-				table.tableCount = newSize;
 					
 				// Create and initialize a new hash table
 				hashed_escapement *newWidths = new hashed_escapement[newSize];
@@ -336,9 +337,10 @@ _BWidthBuffer_::HashEscapements(const char *inText, int32 numChars, int32 textLe
 						newWidths[newPos] = widths[oldPos];
 					}
 				}
-
+				
 				// Delete the old table, and put the new pointer into the _width_table_
 				delete[] widths;
+				table.tableCount = newSize;
 				table.widths = widths = newWidths;
 			}
 		}
