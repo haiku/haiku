@@ -584,12 +584,11 @@ DrawingEngine::DrawBezier(BPoint *pts, bool filled)
 	CRASH_IF_NOT_LOCKED
 
 	// TODO: figure out bounds and hide cursor depending on that
-	fGraphicsCard->HideFloatingOverlays();
+	AutoFloatingOverlaysHider _(fGraphicsCard);
 
 	BRect touched = fPainter->DrawBezier(pts, filled);
 
 	fGraphicsCard->Invalidate(touched);
-	fGraphicsCard->ShowFloatingOverlays();
 }
 
 // DrawEllipse
@@ -921,14 +920,13 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 
 	// NOTE: hides cursor regardless of if and where
 	// shape is drawn on screen, TODO: optimize
-	fGraphicsCard->HideFloatingOverlays();
+	AutoFloatingOverlaysHider _(fGraphicsCard);
 
 	BRect touched = fPainter->DrawShape(opCount, opList,
 										ptCount, ptList,
 										filled);
 
 	fGraphicsCard->Invalidate(touched);
-	fGraphicsCard->ShowFloatingOverlays();
 }
 
 
