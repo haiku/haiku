@@ -133,7 +133,7 @@ WebCamMediaAddOn::InstantiateNodeFor(
 	/* At most one instance of the node should be instantiated at any given
 	 * time. The locking for this restriction may be found in the VideoProducer
 	 * class. */
-	node = new VideoProducer(this, cam, cam->FlavorInfo()->name, fDefaultFlavorInfo.internal_id);
+	node = new VideoProducer(this, cam, cam->FlavorInfo()->name, cam->FlavorInfo()->internal_id);
 	if (node && (node->InitCheck() < B_OK)) {
 		delete node;
 		node = NULL;
