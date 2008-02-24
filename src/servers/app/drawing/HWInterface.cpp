@@ -162,12 +162,12 @@ HWInterface::SetCursorVisible(bool visible)
 		if (visible) {
 			fCursorVisible = visible;
 			fCursorObscured = false;
-			BRect r = _CursorFrame();
+			IntRect r = _CursorFrame();
 
 			_DrawCursor(r);
 			Invalidate(r);
 		} else {
-			BRect r = _CursorFrame();
+			IntRect r = _CursorFrame();
 			fCursorVisible = visible;
 
 			_RestoreCursorArea();
@@ -313,7 +313,7 @@ HWInterface::CopyBackToFront(const BRect& frame)
 		return B_NO_INIT;
 
 	// we need to mess with the area, but it is const
-	BRect area(frame);
+	IntRect area(frame);
 	BRect bufferClip(backBuffer->Bounds());
 
 	if (area.IsValid() && area.Intersects(bufferClip)) {
@@ -471,13 +471,13 @@ HWInterface::RemoveListener(HWInterfaceListener* listener)
 // * area is where we potentially draw the cursor, the cursor
 //   might be somewhere else, in which case this function does nothing
 void
-HWInterface::_DrawCursor(BRect area) const
+HWInterface::_DrawCursor(IntRect area) const
 {
 	RenderingBuffer* backBuffer = DrawingBuffer();
 	if (!backBuffer || !area.IsValid())
 		return;
 
-	BRect cf = _CursorFrame();
+	IntRect cf = _CursorFrame();
 
 	// make sure we don't copy out of bounds
 	area = backBuffer->Bounds() & area;
@@ -487,12 +487,8 @@ HWInterface::_DrawCursor(BRect area) const
 		// clip to common area
 		area = area & cf;
 
-		int32 left = (int32)area.left;
-		int32 top = (int32)area.top;
-		int32 right = (int32)area.right;
-		int32 bottom = (int32)area.bottom;
-		int32 width = right - left + 1;
-		int32 height = bottom - top + 1;
+		int32 width = area.right - area.left + 1;
+		int32 height = area.bottom - area.top + 1;
 
 		// make a bitmap from the backbuffer
 		// that has the cursor blended on top of it
@@ -503,16 +499,16 @@ HWInterface::_DrawCursor(BRect area) const
 		// offset into back buffer
 		uint8* src = (uint8*)backBuffer->Bits();
 		uint32 srcBPR = backBuffer->BytesPerRow();
-		src += top * srcBPR + left * 4;
+		src += area.top * srcBPR + area.left * 4;
 
 		// offset into cursor bitmap
 		uint8* crs = (uint8*)fCursorAndDragBitmap->Bits();
 		uint32 crsBPR = fCursorAndDragBitmap->BytesPerRow();
 		// since area is clipped to cf,
-		// the diff between top and cf.top is always positive,
-		// same for diff between left and cf.left
-		crs += (top - (int32)floorf(cf.top)) * crsBPR
-				+ (left - (int32)floorf(cf.left)) * 4;
+		// the diff between area.top and cf.top is always positive,
+		// same for diff between area.left and cf.left
+		crs += (area.top - (int32)floorf(cf.top)) * crsBPR
+				+ (area.left - (int32)floorf(cf.left)) * 4;
 
 		uint8* dst = buffer;
 
@@ -520,21 +516,21 @@ HWInterface::_DrawCursor(BRect area) const
 			&& fFloatingOverlaysLock.Lock()) {
 			fCursorAreaBackup->cursor_hidden = false;
 			// remember which area the backup contains
-			fCursorAreaBackup->left = left;
-			fCursorAreaBackup->top = top;
-			fCursorAreaBackup->right = right;
-			fCursorAreaBackup->bottom = bottom;
+			fCursorAreaBackup->left = area.left;
+			fCursorAreaBackup->top = area.top;
+			fCursorAreaBackup->right = area.right;
+			fCursorAreaBackup->bottom = area.bottom;
 			uint8* bup = fCursorAreaBackup->buffer;
 			uint32 bupBPR = fCursorAreaBackup->bpr;
 
 			// blending and backup of drawing buffer
-			for (int32 y = top; y <= bottom; y++) {
+			for (int32 y = area.top; y <= area.bottom; y++) {
 				uint8* s = src;
 				uint8* c = crs;
 				uint8* d = dst;
 				uint8* b = bup;
 				
-				for (int32 x = left; x <= right; x++) {
+				for (int32 x = area.left; x <= area.right; x++) {
 					*(uint32*)b = *(uint32*)s;
 					// assumes backbuffer alpha = 255
 					// assuming pre-multiplied cursor bitmap
@@ -556,11 +552,11 @@ HWInterface::_DrawCursor(BRect area) const
 			fFloatingOverlaysLock.Unlock();
 		} else {
 			// blending
-			for (int32 y = top; y <= bottom; y++) {
+			for (int32 y = area.top; y <= area.bottom; y++) {
 				uint8* s = src;
 				uint8* c = crs;
 				uint8* d = dst;
-				for (int32 x = left; x <= right; x++) {
+				for (int32 x = area.left; x <= area.right; x++) {
 					// assumes backbuffer alpha = 255
 					// assuming pre-multiplied cursor bitmap
 					uint8 a = 255 - c[3];
@@ -578,7 +574,8 @@ HWInterface::_DrawCursor(BRect area) const
 			}
 		}
 		// copy result to front buffer
-		_CopyToFront(buffer, width * 4, left, top, right, bottom);
+		_CopyToFront(buffer, width * 4, area.left, area.top, area.right,
+			area.bottom);
 
 		delete[] buffer;
 	}
@@ -786,10 +783,10 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 
 
 // PRE: the object must be locked
-BRect
+IntRect
 HWInterface::_CursorFrame() const
 {
-	BRect frame(0.0, 0.0, -1.0, -1.0);
+	IntRect frame(0, 0, -1, -1);
 	if (fCursorAndDragBitmap && fCursorVisible) {
 		frame = fCursorAndDragBitmap->Bounds();
 		frame.OffsetTo(fCursorLocation - fCursorAndDragBitmap->GetHotSpot());

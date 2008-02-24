@@ -20,6 +20,8 @@
 #include <OS.h>
 #include <Region.h>
 
+#include "IntRect.h"
+
 
 class Overlay;
 class RenderingBuffer;
@@ -169,14 +171,14 @@ class HWInterface : protected MultiLocker {
 
  protected:
 	// implement this in derived classes
-	virtual	void				_DrawCursor(BRect area) const;
+	virtual	void				_DrawCursor(IntRect area) const;
 
 	// does the actual transfer and handles color space conversion
 			void				_CopyToFront(uint8* src, uint32 srcBPR,
 											 int32 x, int32 y,
 											 int32 right, int32 bottom) const;
 
-			BRect				_CursorFrame() const;
+			IntRect				_CursorFrame() const;
 			void				_RestoreCursorArea() const;
 			void				_AdoptDragBitmap(const ServerBitmap* bitmap,
 												 const BPoint& offset);
