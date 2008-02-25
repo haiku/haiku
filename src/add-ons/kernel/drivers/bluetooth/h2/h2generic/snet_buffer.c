@@ -124,26 +124,26 @@ snb_set_cookie(snet_buffer* snb, void* cookie)
 /* Return true if we canot "put" more data in the buffer */
 inline bool     snb_completed(snet_buffer* snb)
 {
-    return (snb != NULL && (snb->expectedSize == snb->puttingSize));
+    return (snb->expectedSize == snb->puttingSize);
 }
 
 
 /* Return true if we cannot pull more more data from the buffer */
 inline bool      snb_finished(snet_buffer* snb)
 {
-    return (snb != NULL && (snb->expectedSize == snb->pullingSize));
+    return (snb->expectedSize == snb->pullingSize);
 }
 
 
-inline bool      snb_remaining_to_put(snet_buffer* snb)
+inline uint16    snb_remaining_to_put(snet_buffer* snb)
 {
-    return (snb != NULL && (snb->expectedSize - snb->puttingSize));
+    return (snb->expectedSize - snb->puttingSize);
 }
 
 
-inline bool      snb_remaining_to_pull(snet_buffer* snb)
+inline uint16    snb_remaining_to_pull(snet_buffer* snb)
 {
-    return (snb != NULL && (snb->expectedSize - snb->pullingSize));
+    return (snb->expectedSize - snb->pullingSize);
 }
 
 

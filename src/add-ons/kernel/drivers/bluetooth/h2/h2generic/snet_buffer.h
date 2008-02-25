@@ -60,9 +60,9 @@ bool            snb_completed(snet_buffer* snb);
 /* Return true if we cannot pull more more data from the buffer */
 bool            snb_finished(snet_buffer* snb);
 /* Return the amount of data we can still put in the buffer */
-bool      		snb_remaining_to_put(snet_buffer* snb);
+uint16     		snb_remaining_to_put(snet_buffer* snb);
 /* Return the amount of data we can still pull in the buffer */
-bool      		snb_remaining_to_pull(snet_buffer* snb);
+uint16     		snb_remaining_to_pull(snet_buffer* snb);
 
 /* These to functions are provided to avoid memory fragmentation 
  * allocating and freeing many snb_buffers and its possible overhead. 
