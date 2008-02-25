@@ -1905,38 +1905,32 @@ BTextView::GetTextRegion(int32 startOffset, int32 endOffset, BRegion *outRegion)
 void
 BTextView::ScrollToOffset(int32 inOffset)
 {
-	_ScrollToOffset(inOffset, ScrollBar(B_HORIZONTAL) != NULL, ScrollBar(B_VERTICAL) != NULL);
-}
-
-
-void
-BTextView::_ScrollToOffset(int32 inOffset, bool useHorizontal, bool useVertical)
-{
 	BRect bounds = Bounds();
 	float lineHeight = 0.0;
 	float xDiff = 0.0;
 	float yDiff = 0.0;
 	BPoint point = PointAt(inOffset, &lineHeight);
-	
-	if (useHorizontal) {
-		if (point.x < bounds.left)
-			xDiff = point.x - bounds.left - bounds.IntegerWidth() / 2;
-		else if (point.x >= bounds.right)
-			xDiff = point.x - bounds.right + bounds.IntegerWidth() / 2;
-		// prevent negative scroll offset
-		if (bounds.left + xDiff < 0.0)
-			xDiff = -bounds.left;
-	}
 
-	if (useVertical) {
-		if (point.y < bounds.top)
-			yDiff = point.y - bounds.top - bounds.IntegerHeight() / 2;
-		else if (point.y >= bounds.bottom)
-			yDiff = point.y - bounds.bottom + bounds.IntegerHeight() / 2;
-		// prevent negative scroll offset
-		if (bounds.top + yDiff < 0.0)
-			yDiff = -bounds.top;
-	}
+	// horizontal
+	float extraSpace = fAlignment == B_ALIGN_LEFT ?
+		ceilf(bounds.IntegerWidth() / 2) : 0.0;
+
+	if (point.x < bounds.left)
+		xDiff = point.x - bounds.left - extraSpace;
+	else if (point.x >= bounds.right)
+		xDiff = point.x - bounds.right + extraSpace;
+
+	// vertical
+	if (point.y < bounds.top)
+		yDiff = point.y - bounds.top;
+	else if (point.y + lineHeight >= bounds.bottom)
+		yDiff = point.y + lineHeight - bounds.bottom;
+
+	// prevent negative scroll offset
+	if (bounds.left + xDiff < 0.0)
+		xDiff = -bounds.left;
+	if (bounds.top + yDiff < 0.0)
+		yDiff = -bounds.top;
 
 	ScrollBy(xDiff, yDiff);
 }
@@ -1983,13 +1977,10 @@ BTextView::SetTextRect(BRect rect)
 		return;
 		
 	fTextRect = rect;
-	fLeftInset = fTextRect.left;
-	fRightInset = Bounds().right - fTextRect.right;
-	
-	if (Window() != NULL) {
+	fMinTextRectWidth = fTextRect.Width();
+
+	if (Window() != NULL)
 		Invalidate();		
-		Window()->UpdateIfNeeded();	
-	}
 }
 
 
@@ -2237,11 +2228,8 @@ BTextView::SetAlignment(alignment flag)
 		fAlignment = flag;
 		
 		// After setting new alignment, update the view/window
-		BWindow *window = Window();
-		if (window) {
+		if (Window() != NULL)
 			Invalidate();
-			window->UpdateIfNeeded();
-		}
 	}
 }
 
@@ -2715,8 +2703,7 @@ BTextView::_InitObject(BRect textRect, const BFont *initialFont,
 	// to have less code duplication, and a single place where to do changes
 	// if needed.,
 	fTextRect = textRect;
-	fLeftInset = fTextRect.left;
-	fRightInset = Bounds().right - fTextRect.right;
+	fMinTextRectWidth = fTextRect.Width();
 	fSelStart = fSelEnd = 0;
 	fCaretVisible = false;
 	fCaretTime = 0;
@@ -4031,7 +4018,7 @@ BTextView::_PerformAutoScrolling()
 		if (bounds.left - value >= 0)
 			scrollBy.x = -value;
 	}
-	
+
 	float lineHeight = 0;
 	float vertDiff = 0;
 	if (fWhere.y > bounds.bottom) {
@@ -4106,16 +4093,24 @@ BTextView::_AutoResize(bool redraw)
 
 	BRect bounds = Bounds();
 	float oldWidth = fTextRect.Width();
-	float newWidth = max_c(bounds.Width() - (fLeftInset + fRightInset),
-		ceilf(LineWidth(0)));
+	float minWidth = fContainerView != NULL ? 3.0 : fMinTextRectWidth;
+	float newWidth = max_c(minWidth, ceilf(LineWidth(0)));
+
+	if (newWidth == oldWidth)
+		return;
 
 	if (fContainerView != NULL) {
-		fContainerView->ResizeBy(ceilf(newWidth - oldWidth), 0);	
-		if (fAlignment == B_ALIGN_CENTER)
-			fContainerView->MoveBy(ceilf((oldWidth - newWidth) / 2), 0);
-		else if (fAlignment == B_ALIGN_RIGHT)
+		// NOTE: This container view thing is only used by Tracker
+		// move container view if not left aligned
+		if (fAlignment == B_ALIGN_CENTER) {
+			if (fmod(ceilf(newWidth - oldWidth), 2.0) != 0.0)
+				newWidth += 1;
+			fContainerView->MoveBy(ceilf(oldWidth - newWidth) / 2, 0);
+		} else if (fAlignment == B_ALIGN_RIGHT) {
 			fContainerView->MoveBy(ceilf(oldWidth - newWidth), 0);
-//		fContainerView->Invalidate();
+		}
+		// resize container view
+		fContainerView->ResizeBy(ceilf(newWidth - oldWidth), 0);	
 	}
 
 	fTextRect.right = fTextRect.left + newWidth;
@@ -4123,9 +4118,13 @@ BTextView::_AutoResize(bool redraw)
 	if (redraw)
 		_DrawLines(0, 0);
 
-	// Erase the old text (TODO: Might not work for alignments different than B_ALIGN_LEFT)
-	SetLowColor(ViewColor());
-	FillRect(BRect(fTextRect.right, fTextRect.top, Bounds().right, fTextRect.bottom), B_SOLID_LOW);
+	// erase any potential left over outside the text rect
+	// (can only be on right hand side)
+	BRect dirty(fTextRect.right + 1, fTextRect.top, bounds.right, fTextRect.bottom);
+	if (dirty.IsValid()) {
+		SetLowColor(ViewColor());
+		FillRect(dirty, B_SOLID_LOW);
+	}
 }
 
 

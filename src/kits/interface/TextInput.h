@@ -37,7 +37,6 @@ virtual	void			MakeFocus(bool focusState = true);
 		void			AlignTextRect();
 		void			SetInitialText();
 
-virtual void			ScrollToOffset(int32 nOffset);
 virtual	void			Paste(BClipboard *clipboard);
 
 protected:

@@ -115,12 +115,6 @@ _BTextInput_::KeyDown(const char* bytes, int32 numBytes)
 }
 
 void
-_BTextInput_::ScrollToOffset(int32 nOffset)
-{
-	_ScrollToOffset(nOffset, true, false);
-}
-
-void
 _BTextInput_::MakeFocus(bool state)
 {
 	if (state == IsFocus())

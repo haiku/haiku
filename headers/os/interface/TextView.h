@@ -205,8 +205,6 @@ class BTextView : public BView {
 		undo_state UndoState(bool* isRedo) const;
 
 	protected:
-		void _ScrollToOffset(int32 nOffset, bool useHorz, bool useVert);
-
 		virtual	void GetDragParameters(BMessage* drag, BBitmap** _bitmap,
 			BPoint* point, BHandler** _handler);
 
@@ -315,8 +313,7 @@ class BTextView : public BView {
 		_BLineBuffer_*			fLines;
 		_BStyleBuffer_*			fStyles;
 		BRect					fTextRect;
-		float					fLeftInset;
-		float					fRightInset;
+		float					fMinTextRectWidth;
 		int32					fSelStart;
 		int32					fSelEnd;
 		bool					fCaretVisible;
@@ -347,7 +344,7 @@ class BTextView : public BView {
 		BPoint					fWhere;
 		_BTextTrackState_*		fTrackingMouse;
 		_BTextChangeResult_*	fTextChange;
-		uint32					_reserved[7];
+		uint32					_reserved[8];
 
 		static _BWidthBuffer_*	sWidths;
 		static sem_id			sWidthSem;
