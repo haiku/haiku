@@ -8,48 +8,48 @@
 #ifndef _HDA_H_
 #define _HDA_H_
 
-#include <drivers/KernelExport.h>
-#include <drivers/Drivers.h>
-#include <drivers/PCI.h>
+#include <KernelExport.h>
+#include <Drivers.h>
+#include <PCI.h>
 
 #include <string.h>
 #include <stdlib.h>
 
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
-	#define DEVFS_PATH_FORMAT	"audio/multi/hda/%lu"
-	#include <multi_audio.h>
+#	define DEVFS_PATH_FORMAT	"audio/multi/hda/%lu"
+#	include <multi_audio.h>
 #else
-	#define DEVFS_PATH_FORMAT	"audio/hmulti/hda/%lu"
-	#include <hmulti_audio.h>
+#	define DEVFS_PATH_FORMAT	"audio/hmulti/hda/%lu"
+#	include <hmulti_audio.h>
 #endif
 
 #include "hda_controller_defs.h"
 #include "hda_codec_defs.h"
 
-#define MAXCARDS		4
+#define MAX_CARDS				4
 
 /* values for the class_sub field for class_base = 0x04 (multimedia device) */
-#define PCI_hd_audio		3
+#define PCI_hd_audio			3
 
-#define HDA_MAXAFGS		15
-#define HDA_MAXCODECS		15
-#define HDA_MAXSTREAMS		16
-#define MAX_CODEC_RESPONSES	10
-#define MAXINPUTS		32
+#define HDA_MAX_AUDIO_GROUPS	15
+#define HDA_MAX_CODECS			15
+#define HDA_MAX_STREAMS			16
+#define MAX_CODEC_RESPONSES		10
+#define MAX_INPUTS				32
 
 /* FIXME: Find out why we need so much! */
-#define DEFAULT_FRAMESPERBUF	4096
+#define DEFAULT_FRAMES_PER_BUFFER	4096
 
-typedef struct hda_controller_s hda_controller;
-typedef struct hda_codec_s hda_codec;
-typedef struct hda_afg_s hda_afg;
+typedef struct hda_controller hda_controller;
+typedef struct hda_codec hda_codec;
+typedef struct hda_audio_group hda_audio_group;
 
-#define STRMAXBUF	10
-#define STRMINBUF	2
+#define STREAM_MAX_BUFFERS	10
+#define STREAM_MIN_BUFFERS	2
 
 enum {
-	STRM_PLAYBACK,
-	STRM_RECORD
+	STREAM_PLAYBACK,
+	STREAM_RECORD
 };
 
 /* hda_stream_info
@@ -58,24 +58,26 @@ enum {
  * which is can have multiple channels (for stereo or better).
  */
 
-typedef struct hda_stream_info_s {
-	uint32		id;				/* HDA controller stream # */
+typedef struct hda_stream_info {
+	uint32		id;					/* HDA controller stream # */
 	uint32		off;				/* HDA I/O/B descriptor offset */
 	bool		running;			/* Is this stream active? */
 	spinlock	lock;				/* Write lock */
 
-	uint32		pin_wid;			/* PIN Widget ID */
-	uint32		io_wid;				/* Input/Output Converter Widget ID */
+	uint32		pin_widget;			/* PIN Widget ID */
+	uint32		io_widget;			/* Input/Output Converter Widget ID */
 
-	uint32		samplerate;	
-	uint32		sampleformat;
+	uint32		sample_rate;	
+	uint32		sample_format;
 
 	uint32		num_buffers;
 	uint32		num_channels;
-	uint32		buffer_length;			/* size of buffer in samples */
+	uint32		buffer_length;		/* size of buffer in samples */
 	uint32		sample_size;
-	void*		buffers[STRMAXBUF];		/* Virtual addresses for buffer */
-	uint32		buffers_pa[STRMAXBUF];		/* Physical addresses for buffer */
+	void*		buffers[STREAM_MAX_BUFFERS];
+					/* Virtual addresses for buffer */
+	uint32		physical_buffers[STREAM_MAX_BUFFERS];
+					/* Physical addresses for buffer */
 	sem_id		buffer_ready_sem;
 	bigtime_t	real_time;
 	uint32		frames_count;
@@ -84,38 +86,36 @@ typedef struct hda_stream_info_s {
 	uint32		rate, bps;			/* Samplerate & bits per sample */
 
 	area_id		buffer_area;
-	area_id		bdl_area;
-	uint32		bdl_pa;				/* BDL physical address */
+	area_id		buffer_descriptors_area;
+	uint32		physical_buffer_descriptors;	/* BDL physical address */
 } hda_stream;
 
-/* hda_afg
+/* hda_audio_group
  *
  * This structure describes a single Audio Function Group. An afg
  * is a group of audio widgets which can be used to configure multiple
  * streams of audio either from the HDA Link to an output device (= playback)
  * or from an input device to the HDA link (= recording).
  */
-
-struct hda_afg_s {
-	hda_codec*		codec;
+struct hda_audio_group {
+	hda_codec*			codec;
 
 	/* Multi Audio API data */
-	hda_stream*		playback_stream;
-	hda_stream*		record_stream;
+	hda_stream*			playback_stream;
+	hda_stream*			record_stream;
 
-	
-	uint32				root_nid,
-					wid_start,
-					wid_count;
-						
-	uint32				deffmts,
-					defrates,
-					defpm;
+	uint32				root_node_id;
+	uint32				widget_start;
+	uint32				widget_count;
+
+	uint32				supported_formats;
+	uint32				supported_rates;
+	uint32				supported_pm;
 
 	struct {
 		uint32			num_inputs;
 		int32			active_input;
-		uint32			inputs[MAXINPUTS];
+		uint32			inputs[MAX_INPUTS];
 		uint32			flags;
 
 		hda_widget_type	type;
@@ -133,9 +133,9 @@ struct hda_afg_s {
 			struct {
 			} mixer;
 			struct {
-				uint32		output;
-				uint32		input;
-				pin_dev_type	device;
+				uint32	output;
+				uint32	input;
+				pin_dev_type device;
 			} pin;
 		} d;
 	} *widgets;
@@ -150,22 +150,21 @@ struct hda_afg_s {
  *
  * NOTE: Atm, only Audio Function Groups are supported.
  */
+struct hda_codec {
+	uint16		vendor_id;
+	uint16		product_id;
+	uint8		revision;
+	uint16		stepping;		
+	uint8		addr;
 
-struct hda_codec_s {
-	uint16	vendor_id;
-	uint16	product_id;
-	uint8	hda_rev;
-	uint16	rev_stepping;		
-	uint8	addr;
+	sem_id		response_sem;
+	uint32		responses[MAX_CODEC_RESPONSES];
+	uint32		response_count;
 
-	sem_id	response_sem;
-	uint32	responses[MAX_CODEC_RESPONSES];
-	uint32	response_count;
+	hda_audio_group* audio_groups[HDA_MAX_AUDIO_GROUPS];
+	uint32		num_audio_groups;
 
-	hda_afg*	afgs[HDA_MAXAFGS];
-	uint32		num_afgs;
-	
-	struct hda_controller_s* controller;
+	struct hda_controller* controller;
 };
 
 /* hda_controller
@@ -175,61 +174,61 @@ struct hda_codec_s {
  * for use by the codecs contained, and the messaging queue
  * (verb/response) buffers for communication.
  */
-
-struct hda_controller_s {
+struct hda_controller {
 	struct pci_info	pci_info;
-	vuint32		opened;
-	const char*	devfs_path;
-	
-	area_id		regs_area;
-	vuint8*		regs;
-	uint32		irq;
+	vuint32			opened;
+	const char*		devfs_path;
 
-	uint16		codecsts;
-	uint32		num_input_streams;
-	uint32		num_output_streams;
-	uint32		num_bidir_streams;
-	
-	uint32		corblen;
-	uint32		rirblen;
-	uint32		rirbrp;
-	uint32		corbwp;
-	area_id		rb_area;
-	corb_t*		corb;
-	rirb_t*		rirb;
+	area_id			regs_area;
+	vuint8*			regs;
+	uint32			irq;
 
-	hda_codec*		codecs[HDA_MAXCODECS];
+	uint16			codecsts;
+	uint32			num_input_streams;
+	uint32			num_output_streams;
+	uint32			num_bidir_streams;
+	
+	uint32			corb_length;
+	uint32			rirb_length;
+	uint32			rirbrp;
+	uint32			corbwp;
+	area_id			rb_area;
+	corb_t*			corb;
+	rirb_t*			rirb;
+
+	hda_codec*		codecs[HDA_MAX_CODECS];
 	hda_codec*		active_codec;
 	uint32			num_codecs;
 	
-	hda_stream*		streams[HDA_MAXSTREAMS];
+	hda_stream*		streams[HDA_MAX_STREAMS];
 };
 
 /* driver.c */
 extern device_hooks gDriverHooks;
 extern pci_module_info* gPci;
-extern hda_controller gCards[MAXCARDS];
+extern hda_controller gCards[MAX_CARDS];
 extern uint32 gNumCards;
 
 /* hda_codec.c */
 hda_codec* hda_codec_new(hda_controller* controller, uint32 cad);
-void hda_codec_delete(hda_codec*);
+void hda_codec_delete(hda_codec* codec);
 
 /* hda_multi_audio.c */
-status_t multi_audio_control(void* cookie, uint32 op, void* arg, size_t len);
+status_t multi_audio_control(void* cookie, uint32 op, void* arg, size_t length);
 
 /* hda_controller.c: Basic controller support */
 status_t hda_hw_init(hda_controller* controller);
 void hda_hw_stop(hda_controller* controller);
 void hda_hw_uninit(hda_controller* controller);
-status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, int count);
+status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses,
+	int count);
 
 /* hda_controller.c: Stream support */
 hda_stream* hda_stream_new(hda_controller* controller, int type);
-void hda_stream_delete(hda_stream* s);
-status_t hda_stream_setup_buffers(hda_afg* afg, hda_stream* s, const char* desc);
-status_t hda_stream_start(hda_controller* controller, hda_stream* s);
-status_t hda_stream_stop(hda_controller* controller, hda_stream* s);
-status_t hda_stream_check_intr(hda_controller* controller, hda_stream* s);
+void hda_stream_delete(hda_stream* stream);
+status_t hda_stream_setup_buffers(hda_audio_group* audioGroup,
+	hda_stream* stream, const char* desc);
+status_t hda_stream_start(hda_controller* controller, hda_stream* stream);
+status_t hda_stream_stop(hda_controller* controller, hda_stream* stream);
 
-#endif /* _HDA_H_ */
+#endif	/* _HDA_H_ */

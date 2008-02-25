@@ -21,8 +21,8 @@ hda_stream_delete(hda_stream* stream)
 	if (stream->buffer_area >= B_OK)
 		delete_area(stream->buffer_area);
 
-	if (stream->bdl_area >= B_OK)
-		delete_area(stream->bdl_area);
+	if (stream->buffer_descriptors_area >= B_OK)
+		delete_area(stream->buffer_descriptors_area);
 
 	free(stream);
 }
@@ -36,19 +36,19 @@ hda_stream_new(hda_controller* controller, int type)
 		return NULL;
 
 	stream->buffer_area = B_ERROR;
-	stream->bdl_area = B_ERROR;
+	stream->buffer_descriptors_area = B_ERROR;
 
 	switch (type) {
-		case STRM_PLAYBACK:
+		case STREAM_PLAYBACK:
 			stream->buffer_ready_sem = create_sem(0, "hda_playback_sem");
 			stream->id = 1;
 			stream->off = (controller->num_input_streams * HDAC_SDSIZE);
 			controller->streams[controller->num_input_streams] = stream;
 			break;
-			
-		case STRM_RECORD:
+
+		case STREAM_RECORD:
 			stream->buffer_area = B_ERROR;
-			stream->bdl_area = B_ERROR;
+			stream->buffer_descriptors_area = B_ERROR;
 			stream->buffer_ready_sem = create_sem(0, "hda_record_sem");
 			stream->id = 2;
 			stream->off = 0;
@@ -80,31 +80,35 @@ hda_stream_start(hda_controller* controller, hda_stream* stream)
 }
 
 
-status_t
+//! Called with interrupts off
+static void
 hda_stream_check_intr(hda_controller* controller, hda_stream* stream)
 {
-	if (stream->running) {
-		uint8 sts = OREG8(controller, stream->off, STS);
-		if (sts) {
-			cpu_status status;
+	uint8 status;
 
-			OREG8(controller, stream->off, STS) = sts;
-			status = disable_interrupts();
-			acquire_spinlock(&stream->lock);
+	if (!stream->running)
+		return;
 
-			stream->real_time = system_time();
-			stream->frames_count += stream->buffer_length;
-			stream->buffer_cycle = (stream->buffer_cycle + 1)
-				% stream->num_buffers;
+	status = OREG8(controller, stream->off, STS);
+	if (status == 0)
+		return;
 
-			release_spinlock(&stream->lock);
-			restore_interrupts(status);
+	OREG8(controller, stream->off, STS) = status;
 
-			release_sem_etc(stream->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
-		}
-	}
+	if ((status & STS_BCIS) != 0) {
+		// Buffer Completed Interrupt
+		acquire_spinlock(&stream->lock);
 
-	return B_OK;
+		stream->real_time = system_time();
+		stream->frames_count += stream->buffer_length;
+		stream->buffer_cycle = (stream->buffer_cycle + 1)
+			% stream->num_buffers;
+
+		release_spinlock(&stream->lock);
+
+		release_sem_etc(stream->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
+	} else
+		dprintf("HDA: stream status %x\n", status);
 }
 
 
@@ -123,12 +127,13 @@ hda_stream_stop(hda_controller* controller, hda_stream* stream)
 
 
 status_t
-hda_stream_setup_buffers(hda_afg* afg, hda_stream* stream, const char* desc)
+hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
+	const char* desc)
 {
 	uint32 bufferSize, bufferPhysicalAddress, alloc;
 	uint32 response[2], index;
 	physical_entry pe;
-	bdl_entry_t* bdl;
+	bdl_entry_t* bufferDescriptors;
 	corb_t verb[2];
 	uint8* buffer;
 	status_t rc;
@@ -140,22 +145,24 @@ hda_stream_setup_buffers(hda_afg* afg, hda_stream* stream, const char* desc)
 		stream->buffer_area = B_ERROR;
 	}
 
-	if (stream->bdl_area >= B_OK) {
-		delete_area(stream->bdl_area);
-		stream->bdl_area = B_ERROR;
+	if (stream->buffer_descriptors_area >= B_OK) {
+		delete_area(stream->buffer_descriptors_area);
+		stream->buffer_descriptors_area = B_ERROR;
 	}
 
 	/* Calculate size of buffer (aligned to 128 bytes) */		
 	bufferSize = stream->sample_size * stream->num_channels
 		* stream->buffer_length;
 	bufferSize = (bufferSize + 127) & (~127);
-	
+dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld ****************\n",
+	stream->sample_size, stream->num_channels, stream->buffer_length);
+
 	/* Calculate total size of all buffers (aligned to size of B_PAGE_SIZE) */
 	alloc = bufferSize * stream->num_buffers;
 	alloc = (alloc + B_PAGE_SIZE - 1) & (~(B_PAGE_SIZE -1));
 
 	/* Allocate memory for buffers */
-	stream->buffer_area = create_area("hda_buffers", (void**)&buffer,
+	stream->buffer_area = create_area("hda buffers", (void**)&buffer,
 		B_ANY_KERNEL_ADDRESS, alloc, B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (stream->buffer_area < B_OK)
 		return stream->buffer_area;
@@ -175,55 +182,58 @@ hda_stream_setup_buffers(hda_afg* afg, hda_stream* stream, const char* desc)
 	/* Store pointers (both virtual/physical) */	
 	for (index = 0; index < stream->num_buffers; index++) {
 		stream->buffers[index] = buffer + (index * bufferSize);
-		stream->buffers_pa[index] = bufferPhysicalAddress + (index * bufferSize);
+		stream->physical_buffers[index] = bufferPhysicalAddress
+			+ (index * bufferSize);
 	}
 
 	/* Now allocate BDL for buffer range */
 	alloc = stream->num_buffers * sizeof(bdl_entry_t);
 	alloc = (alloc + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	stream->bdl_area = create_area("hda_bdl", (void**)&bdl,
-		B_ANY_KERNEL_ADDRESS, alloc, B_CONTIGUOUS, 0);
-	if (stream->bdl_area < B_OK) {
+	stream->buffer_descriptors_area = create_area("hda buffer descriptors",
+		(void**)&bufferDescriptors, B_ANY_KERNEL_ADDRESS, alloc,
+		B_CONTIGUOUS, 0);
+	if (stream->buffer_descriptors_area < B_OK) {
 		delete_area(stream->buffer_area);
-		return stream->bdl_area;
+		return stream->buffer_descriptors_area;
 	}
 
 	/* Get the physical address of memory */
-	rc = get_memory_map(bdl, alloc, &pe, 1);
+	rc = get_memory_map(bufferDescriptors, alloc, &pe, 1);
 	if (rc != B_OK) {
 		delete_area(stream->buffer_area);
-		delete_area(stream->bdl_area);
+		delete_area(stream->buffer_descriptors_area);
 		return rc;
 	}
 
-	stream->bdl_pa = (uint32)pe.address;
+	stream->physical_buffer_descriptors = (uint32)pe.address;
 
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, stream->num_buffers);
 
 	/* Setup BDL entries */	
-	for (index = 0; index < stream->num_buffers; index++, bdl++) {
-		bdl->address = stream->buffers_pa[index];
-		bdl->length = bufferSize;
-		bdl->ioc = 1;
+	for (index = 0; index < stream->num_buffers; index++, bufferDescriptors++) {
+		bufferDescriptors->address = stream->physical_buffers[index];
+		bufferDescriptors->length = bufferSize;
+		bufferDescriptors->ioc = 1;
 	}
 
 	/* Configure stream registers */
-	wfmt = stream->num_channels -1;
-	switch (stream->sampleformat) {
+	wfmt = stream->num_channels - 1;
+	switch (stream->sample_format) {
 		case B_FMT_8BIT_S:	wfmt |= (0 << 4); stream->bps = 8; break;
 		case B_FMT_16BIT:	wfmt |= (1 << 4); stream->bps = 16; break;
+		case B_FMT_20BIT:	wfmt |= (2 << 4); stream->bps = 20; break;
 		case B_FMT_24BIT:	wfmt |= (3 << 4); stream->bps = 24; break;
 		case B_FMT_32BIT:	wfmt |= (4 << 4); stream->bps = 32; break;
 
 		default:
 			dprintf("%s: Invalid sample format: 0x%lx\n", __func__,
-				stream->sampleformat);
+				stream->sample_format);
 			break;
 	}
 
-	switch (stream->samplerate) {
+	switch (stream->sample_rate) {
 		case B_SR_8000:
 			wfmt |= (0 << 14) | (0 << 11) | (5 << 8);
 			stream->rate = 8000;
@@ -271,29 +281,32 @@ hda_stream_setup_buffers(hda_afg* afg, hda_stream* stream, const char* desc)
 
 		default:
 			dprintf("%s: Invalid sample rate: 0x%lx\n", __func__,
-				stream->samplerate);
+				stream->sample_rate);
 			break;
 	}
 
 	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld\n", __func__, stream->id,
 		stream->rate, stream->bps);
 
-	OREG16(afg->codec->controller, stream->off, FMT) = wfmt;
-	OREG32(afg->codec->controller, stream->off, BDPL) = stream->bdl_pa;
-	OREG32(afg->codec->controller, stream->off, BDPU) = 0;
-	OREG16(afg->codec->controller, stream->off, LVI) = stream->num_buffers -1;
+	OREG16(audioGroup->codec->controller, stream->off, FMT) = wfmt;
+	OREG32(audioGroup->codec->controller, stream->off, BDPL)
+		= stream->physical_buffer_descriptors;
+	OREG32(audioGroup->codec->controller, stream->off, BDPU) = 0;
+	OREG16(audioGroup->codec->controller, stream->off, LVI)
+		= stream->num_buffers - 1;
 	/* total cyclic buffer size in _bytes_ */
-	OREG32(afg->codec->controller, stream->off, CBL) = stream->sample_size
-		* stream->num_channels * stream->num_buffers * stream->buffer_length;
-	OREG8(afg->codec->controller, stream->off, CTL0)
+	OREG32(audioGroup->codec->controller, stream->off, CBL)
+		= stream->sample_size * stream->num_channels * stream->num_buffers
+		* stream->buffer_length;
+	OREG8(audioGroup->codec->controller, stream->off, CTL0)
 		= CTL0_IOCE | CTL0_FEIE | CTL0_DEIE;
-	OREG8(afg->codec->controller, stream->off, CTL2) = stream->id << 4;
+	OREG8(audioGroup->codec->controller, stream->off, CTL2) = stream->id << 4;
 
-	verb[0] = MAKE_VERB(afg->codec->addr, stream->io_wid, VID_SET_CONVFORMAT,
-		wfmt);
-	verb[1] = MAKE_VERB(afg->codec->addr, stream->io_wid, VID_SET_CVTSTRCHN,
-		stream->id << 4);
-	rc = hda_send_verbs(afg->codec, verb, response, 2);
+	verb[0] = MAKE_VERB(audioGroup->codec->addr, stream->io_widget,
+		VID_SET_CONVFORMAT, wfmt);
+	verb[1] = MAKE_VERB(audioGroup->codec->addr, stream->io_widget,
+		VID_SET_CVTSTRCHN, stream->id << 4);
+	rc = hda_send_verbs(audioGroup->codec, verb, response, 2);
 
 	return rc;
 }
@@ -353,7 +366,7 @@ hda_interrupt_handler(hda_controller* controller)
 				while (controller->rirbrp <= rirbwp) {
 					uint32 resp_ex
 						= controller->rirb[controller->rirbrp].resp_ex;
-					uint32 cad = resp_ex & HDA_MAXCODECS;
+					uint32 cad = resp_ex & HDA_MAX_CODECS;
 					hda_codec* codec = controller->codecs[cad];
 
 					if (resp_ex & RESP_EX_UNSOL) {
@@ -394,7 +407,7 @@ hda_interrupt_handler(hda_controller* controller)
 
 	if (intsts & ~(INTSTS_CIS | INTSTS_GIS)) {
 		int index;
-		for (index = 0; index < HDA_MAXSTREAMS; index++) {
+		for (index = 0; index < HDA_MAX_STREAMS; index++) {
 			if ((intsts & (1 << index)) != 0) {
 				if (controller->streams[index])
 					hda_stream_check_intr(controller, controller->streams[index]);
@@ -431,59 +444,59 @@ hda_hw_start(hda_controller* controller)
 static status_t
 hda_hw_corb_rirb_init(hda_controller* controller)
 {
-	uint32 memsz, rirboff;
-	uint8 corbsz, rirbsz;
+	uint32 memSize, rirbOffset;
+	uint8 corbSize, rirbSize;
 	status_t rc = B_OK;
 	physical_entry pe;
 
 	/* Determine and set size of CORB */
-	corbsz = REG8(controller, CORBSIZE);
-	if (corbsz & CORBSIZE_CAP_256E) {
-		controller->corblen = 256;
+	corbSize = REG8(controller, CORBSIZE);
+	if (corbSize & CORBSIZE_CAP_256E) {
+		controller->corb_length = 256;
 		REG8(controller, CORBSIZE) = CORBSIZE_SZ_256E;
-	} else if (corbsz & CORBSIZE_CAP_16E) {
-		controller->corblen = 16;
+	} else if (corbSize & CORBSIZE_CAP_16E) {
+		controller->corb_length = 16;
 		REG8(controller, CORBSIZE) = CORBSIZE_SZ_16E;
-	} else if (corbsz & CORBSIZE_CAP_2E) {
-		controller->corblen = 2;
+	} else if (corbSize & CORBSIZE_CAP_2E) {
+		controller->corb_length = 2;
 		REG8(controller, CORBSIZE) = CORBSIZE_SZ_2E;
 	}
 
 	/* Determine and set size of RIRB */
-	rirbsz = REG8(controller, RIRBSIZE);
-	if (rirbsz & RIRBSIZE_CAP_256E) {
-		controller->rirblen = 256;
+	rirbSize = REG8(controller, RIRBSIZE);
+	if (rirbSize & RIRBSIZE_CAP_256E) {
+		controller->rirb_length = 256;
 		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_256E;
-	} else if (rirbsz & RIRBSIZE_CAP_16E) {
-		controller->rirblen = 16;
+	} else if (rirbSize & RIRBSIZE_CAP_16E) {
+		controller->rirb_length = 16;
 		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_16E;
-	} else if (rirbsz & RIRBSIZE_CAP_2E) {
-		controller->rirblen = 2;
+	} else if (rirbSize & RIRBSIZE_CAP_2E) {
+		controller->rirb_length = 2;
 		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_2E;
 	}
 
 	/* Determine rirb offset in memory and total size of corb+alignment+rirb */
-	rirboff = (controller->corblen * sizeof(corb_t) + 0x7f) & ~0x7f;
-	memsz = (rirboff + controller->rirblen * sizeof(rirb_t) + B_PAGE_SIZE - 1)
-		& ~(B_PAGE_SIZE - 1);
+	rirbOffset = (controller->corb_length * sizeof(corb_t) + 0x7f) & ~0x7f;
+	memSize = (rirbOffset + controller->rirb_length * sizeof(rirb_t)
+		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	/* Allocate memory area */
 	controller->rb_area = create_area("hda_corb_rirb", (void**)&controller->corb,
-		B_ANY_KERNEL_ADDRESS, memsz, B_CONTIGUOUS, 0);
+		B_ANY_KERNEL_ADDRESS, memSize, B_CONTIGUOUS, 0);
 	if (controller->rb_area < 0)
 		return controller->rb_area;
 
 	/* Rirb is after corb+aligment */
-	controller->rirb = (rirb_t*)(((uint8*)controller->corb) + rirboff);
+	controller->rirb = (rirb_t*)(((uint8*)controller->corb) + rirbOffset);
 
-	if ((rc = get_memory_map(controller->corb, memsz, &pe, 1)) != B_OK) {
+	if ((rc = get_memory_map(controller->corb, memSize, &pe, 1)) != B_OK) {
 		delete_area(controller->rb_area);
 		return rc;
 	}
 
 	/* Program CORB/RIRB for these locations */
 	REG32(controller, CORBLBASE) = (uint32)pe.address;
-	REG32(controller, RIRBLBASE) = (uint32)pe.address + rirboff;
+	REG32(controller, RIRBLBASE) = (uint32)pe.address + rirbOffset;
 
 	/* Reset CORB read pointer */
 	/* NOTE: See HDA011 for corrected procedure! */
@@ -574,13 +587,14 @@ hda_hw_init(hda_controller* controller)
 		goto corb_rirb_failed;
 	}
 
-	for (index = 0; index < HDA_MAXCODECS; index++) {
+	for (index = 0; index < HDA_MAX_CODECS; index++) {
 		if ((controller->codecsts & (1 << index)) != 0)
 			hda_codec_new(controller, index);
 	}
 
-	for (index = 0; index < HDA_MAXCODECS; index++) {
-		if (controller->codecs[index] && controller->codecs[index]->num_afgs) {
+	for (index = 0; index < HDA_MAX_CODECS; index++) {
+		if (controller->codecs[index]
+			&& controller->codecs[index]->num_audio_groups > 0) {
 			controller->active_codec = controller->codecs[index];
 			break;
 		}
@@ -617,7 +631,7 @@ hda_hw_stop(hda_controller* controller)
 	int index;
 
 	/* Stop all audio streams */
-	for (index = 0; index < HDA_MAXSTREAMS; index++)
+	for (index = 0; index < HDA_MAX_STREAMS; index++)
 		if (controller->streams[index] && controller->streams[index]->running)
 			hda_stream_stop(controller, controller->streams[index]);
 }
@@ -661,7 +675,7 @@ hda_hw_uninit(hda_controller* controller)
 	}
 
 	/* Now delete all codecs */
-	for (index = 0; index < HDA_MAXCODECS; index++) {
+	for (index = 0; index < HDA_MAX_CODECS; index++) {
 		if (controller->codecs[index] != NULL)
 			hda_codec_delete(controller->codecs[index]);
 	}

@@ -134,4 +134,16 @@ typedef enum {
 #define PID_OUTPUT_AMP_CAP		0x12
 #define PID_VOLUMEKNOB_CAP		0x13
 
+/* PCM support */
+#define PCM_8_BIT				(1L << 16)
+#define PCM_16_BIT				(1L << 17)
+#define PCM_20_BIT				(1L << 18)
+#define PCM_24_BIT				(1L << 19)
+#define PCM_32_BIT				(1L << 20)
+
+/* stream support */
+#define STREAM_AC3				0x00000004
+#define STREAM_FLOAT			0x00000002
+#define STREAM_PCM				0x00000001
+
 #endif /* HDA_CODEC_H */

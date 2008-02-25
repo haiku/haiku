@@ -12,7 +12,7 @@
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-hda_controller gCards[MAXCARDS];
+hda_controller gCards[MAX_CARDS];
 uint32 gNumCards;
 pci_module_info* gPci;
 
@@ -51,7 +51,8 @@ init_driver(void)
 
 	gNumCards = 0;
 
-	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK; i++) {
+	for (i = 0; gPci->get_nth_pci_info(i, &info) == B_OK
+			&& gNumCards < MAX_CARDS; i++) {
 		if (info.class_base == PCI_multimedia
 			&& info.class_sub == PCI_hd_audio) {
 			gCards[gNumCards].pci_info = info;
@@ -93,7 +94,7 @@ uninit_driver(void)
 const char**
 publish_devices(void)
 {
-	static const char* devs[MAXCARDS+1];
+	static const char* devs[MAX_CARDS + 1];
 	long i;
 
 	dprintf("IRA: %s\n", __func__);
