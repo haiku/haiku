@@ -25,14 +25,15 @@
 #include "Keymap.h"
 
 class KeymapListItem;
+class BBitmap;
 
 class MapView : public BControl
 {
 public:
 	MapView(BRect rect, const char *name, Keymap *keymap);
+	~MapView();
+	
 	void Draw(BRect rect);
-	void DrawKey(uint32 keyCode);
-	void DrawBorder(BRect borderRect);
 	void AttachedToWindow();
 	void KeyDown(const char* bytes, int32 numBytes);
 	void KeyUp(const char* bytes, int32 numBytes);
@@ -41,9 +42,21 @@ public:
 	void MouseDown(BPoint point);
 	void MouseUp(BPoint point);
 	void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
-	void InvalidateKeys();
-	void DrawLocks();
+		
 private:	
+	void _InvalidateKey(uint32 keyCode);	
+	void _InvalidateKeys();
+	void _DrawKey(uint32 keyCode);
+	void _DrawBackground();
+	void _DrawKeysBackground();
+	void _DrawLocksBackground();
+	void _DrawBorder(BView *view, const BRect &borderRect);
+	void _DrawLocksLights();	
+	void _InitOffscreen();
+	
+	BBitmap		*fBitmap;
+	BView		*fOffscreenView;
+	
 	key_info fOldKeyInfo;
 	BRect fKeysRect[128];
 	bool fKeysVertical[128];
