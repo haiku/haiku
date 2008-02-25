@@ -31,20 +31,20 @@
 #include "KeymapListItem.h"
 #include "KeymapApplication.h"
 
-#define MENU_FILE_OPEN		'mMFO'
-#define MENU_FILE_SAVE		'mMFS'
-#define MENU_FILE_SAVE_AS	'mMFA'
-#define MENU_EDIT_UNDO		'mMEU'
-#define MENU_EDIT_CUT		'mMEX'
-#define MENU_EDIT_COPY		'mMEC'
-#define MENU_EDIT_PASTE		'mMEV'
-#define MENU_EDIT_CLEAR		'mMEL'
-#define MENU_EDIT_SELECT_ALL 'mMEA'
-#define MENU_FONT_CHANGED	'mMFC'
-#define SYSTEM_MAP_SELECTED	'SmST'
-#define USER_MAP_SELECTED	'UmST'
-#define	USE_KEYMAP			'UkyM'
-#define REVERT				'Rvrt'
+static const uint32 kMsgMenuFileOpen = 'mMFO';
+static const uint32 kMsgMenuFileSave = 'mMFS';
+static const uint32 kMsgMenuFileSaveAs = 'mMFA';
+static const uint32 kMsgMenuEditUndo = 'mMEU';
+static const uint32 kMsgMenuEditCut = 'mMEX';
+static const uint32 kMsgMenuEditCopy = 'mMEC';
+static const uint32 kMsgMenuEditPaste = 'mMEV';
+static const uint32 kMsgMenuEditClear = 'mMEL';
+static const uint32 kMsgMenuEditSelectAll = 'mMEA';
+static const uint32 kMsgMenuFontChanged = 'mMFC';
+static const uint32 kMsgSystemMapSelected = 'SmST';
+static const uint32 kMsgUserMapSelected = 'UmST';
+static const uint32 kMsgUseKeymap = 'UkyM';
+static const uint32 kMsgRevertKeymap = 'Rvrt';
 
 KeymapWindow::KeymapWindow()
 	:	BWindow(BRect(80, 25, 692, 281), "Keymap", B_TITLED_WINDOW,
@@ -75,12 +75,12 @@ KeymapWindow::KeymapWindow()
 	
 	// The 'Use' button
 	fUseButton = new BButton(BRect(527, 200, 600, 220), "useButton", "Use",
-		new BMessage(USE_KEYMAP));
+		new BMessage(kMsgUseKeymap));
 	placeholderView->AddChild(fUseButton);
 	
 	// The 'Revert' button
 	fRevertButton = new BButton(BRect(442, 200, 515, 220), "revertButton",
-		 "Revert", new BMessage(REVERT));
+		 "Revert", new BMessage(kMsgRevertKeymap));
 	placeholderView->AddChild(fRevertButton);
 	
 	BPath path;
@@ -124,14 +124,14 @@ KeymapWindow::AddMenuBar()
 	// Create the File menu
 	menu = new BMenu("File");
 	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS,
-		new BMessage(MENU_FILE_OPEN), 'O'));
+		new BMessage(kMsgMenuFileOpen), 'O'));
 	menu->AddSeparatorItem();
 	currentItem = new BMenuItem("Save",
-		new BMessage(MENU_FILE_SAVE), 'S');
+		new BMessage(kMsgMenuFileSave), 'S');
 	currentItem->SetEnabled(false);
 	menu->AddItem(currentItem);
 	menu->AddItem(new BMenuItem("Save As" B_UTF8_ELLIPSIS,
-		new BMessage(MENU_FILE_SAVE_AS)));
+		new BMessage(kMsgMenuFileSaveAs)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit",
 		new BMessage(B_QUIT_REQUESTED), 'Q'));
@@ -140,21 +140,21 @@ KeymapWindow::AddMenuBar()
 	// Create the Edit menu
 	menu = new BMenu("Edit");
 	currentItem = new BMenuItem("Undo",
-		new BMessage(MENU_EDIT_UNDO), 'Z');
+		new BMessage(kMsgMenuEditUndo), 'Z');
 	currentItem->SetEnabled(false);
 	menu->AddItem(currentItem);
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem( "Cut",
-		new BMessage(MENU_EDIT_CUT), 'X'));
+		new BMessage(kMsgMenuEditCut), 'X'));
 	menu->AddItem(new BMenuItem( "Copy",
-		new BMessage(MENU_EDIT_COPY), 'C'));
+		new BMessage(kMsgMenuEditCopy), 'C'));
 	menu->AddItem(new BMenuItem( "Paste",
-		new BMessage(MENU_EDIT_PASTE), 'V'));
+		new BMessage(kMsgMenuEditPaste), 'V'));
 	menu->AddItem(new BMenuItem( "Clear",
-		new BMessage(MENU_EDIT_CLEAR)));
+		new BMessage(kMsgMenuEditClear)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem( "Select All",
-		new BMessage(MENU_EDIT_SELECT_ALL), 'A'));
+		new BMessage(kMsgMenuEditSelectAll), 'A'));
 	menubar->AddItem(menu);
 	
 	// Create the Font menu
@@ -170,7 +170,7 @@ KeymapWindow::AddMenuBar()
 	for (int32 i = 0; i < numFamilies; i++ )
 		if (get_font_family(i, &family, &flags) == B_OK) {
 			BMenuItem *item = 
-				new BMenuItem(family, new BMessage(MENU_FONT_CHANGED));
+				new BMenuItem(family, new BMessage(kMsgMenuFontChanged));
 			fFontMenu->AddItem(item);
 			if (strcmp(family, current_family) == 0)
 				item->SetMarked(true);
@@ -199,7 +199,7 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	
 	mapsBox->AddChild(new BScrollView("systemScrollList", fSystemListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true));
-	fSystemListView->SetSelectionMessage(new BMessage(SYSTEM_MAP_SELECTED));
+	fSystemListView->SetSelectionMessage(new BMessage(kMsgSystemMapSelected));
 
 	// The User list
 	BStringView *userLabel = new BStringView(BRect(13, 110, 113, 128), "user", "User");
@@ -214,7 +214,7 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	// Saved keymaps
 	mapsBox->AddChild(new BScrollView("userScrollList", fUserListView,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true));
-	fUserListView->SetSelectionMessage(new BMessage(USER_MAP_SELECTED));
+	fUserListView->SetSelectionMessage(new BMessage(kMsgUserMapSelected));
 	
 	FillSystemMaps();
 	
@@ -265,23 +265,23 @@ KeymapWindow::MessageReceived(BMessage* message)
 			}
 		}
 			break;
-		case MENU_FILE_OPEN:
+		case kMsgMenuFileOpen:
 			fOpenPanel->Show();
 			break;
-		case MENU_FILE_SAVE:
+		case kMsgMenuFileSave:
 			break;
-		case MENU_FILE_SAVE_AS:
+		case kMsgMenuFileSaveAs:
 			fSavePanel->Show();
 			break;
-		case MENU_EDIT_UNDO:
-		case MENU_EDIT_CUT:
-		case MENU_EDIT_COPY:
-		case MENU_EDIT_PASTE:
-		case MENU_EDIT_CLEAR:
-		case MENU_EDIT_SELECT_ALL:
+		case kMsgMenuEditUndo:
+		case kMsgMenuEditCut:
+		case kMsgMenuEditCopy:
+		case kMsgMenuEditPaste:
+		case kMsgMenuEditClear:
+		case kMsgMenuEditSelectAll:
 			fMapView->MessageReceived(message);
 			break;
-		case MENU_FONT_CHANGED:
+		case kMsgMenuFontChanged:
 		{
 			BMenuItem *item = fFontMenu->FindMarked();
 			if (item) {
@@ -290,7 +290,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 			}
 		}
 			break;
-		case SYSTEM_MAP_SELECTED:
+		case kMsgSystemMapSelected:
 		{
 			KeymapListItem *keymapListItem = 
 				static_cast<KeymapListItem*>(fSystemListView->ItemAt(fSystemListView->CurrentSelection()));
@@ -303,7 +303,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 			}
 		}
 			break;
-		case USER_MAP_SELECTED:
+		case kMsgUserMapSelected:
 		{
 			KeymapListItem *keymapListItem = 
 				static_cast<KeymapListItem*>(fUserListView->ItemAt(fUserListView->CurrentSelection()));
@@ -316,10 +316,10 @@ KeymapWindow::MessageReceived(BMessage* message)
 			}
 		}
 			break;
-		case USE_KEYMAP:
+		case kMsgUseKeymap:
 			UseKeymap();
 			break;
-		case REVERT:	// do nothing, just like the original
+		case kMsgRevertKeymap:	// do nothing, just like the original
 			break;
 		default:
 			BWindow::MessageReceived(message);
@@ -1410,22 +1410,22 @@ void
 MapView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case MENU_EDIT_UNDO:
+		case kMsgMenuEditUndo:
 			fTextView->Undo(be_clipboard);
 			break;
-		case MENU_EDIT_CUT:
+		case kMsgMenuEditCut:
 			fTextView->Cut(be_clipboard);
 			break;
-		case MENU_EDIT_COPY:
+		case kMsgMenuEditCopy:
 			fTextView->Copy(be_clipboard);
 			break;
-		case MENU_EDIT_PASTE:
+		case kMsgMenuEditPaste:
 			fTextView->Paste(be_clipboard);
 			break;
-		case MENU_EDIT_CLEAR:
+		case kMsgMenuEditClear:
 			fTextView->Clear();
 			break;
-		case MENU_EDIT_SELECT_ALL:
+		case kMsgMenuEditSelectAll:
 			fTextView->SelectAll();
 			break;
 		case B_KEY_DOWN:
