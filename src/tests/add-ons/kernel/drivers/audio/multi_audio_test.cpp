@@ -74,9 +74,18 @@ static void
 set_frame(char* frame, uint32 format, float value)
 {
 	switch (format) {
+		case B_FMT_8BIT_U:
+			*(uint8*)frame = uint8(value * INT8_MAX) + 128;
+			break;
+		case B_FMT_8BIT_S:
+			*(int8*)frame = int8(value * INT8_MAX);
+			break;
 		case B_FMT_16BIT:
 			*(int16*)frame = int16(value * INT16_MAX);
 			break;
+		case B_FMT_18BIT:
+		case B_FMT_20BIT:
+		case B_FMT_24BIT:
 		case B_FMT_32BIT:
 			*(int32*)frame = int32(value * INT32_MAX);
 			break;
@@ -91,12 +100,25 @@ static uint32
 get_rate(uint32 rateBits)
 {
 	uint32 rate = 0;
-	for (uint32 i = 0; (1UL << i) <= rateBits; i++) {
-		if ((1UL << i) == rateBits)
+	for (uint32 i = 0; (1UL << i) <= rateBits
+			&& i < sizeof(kSampleRates) / sizeof(kSampleRates[0]); i++) {
+		if (((1 << i) & rateBits) != 0)
 			rate = kSampleRates[i];
 	}
 
 	return rate;
+}
+
+
+static void
+print_rates(uint32 rateBits)
+{
+	for (uint32 i = 0; i < sizeof(kSampleRates) / sizeof(kSampleRates[0]);
+			i++) {
+		if (((1 << i) & rateBits) != 0)
+			printf("  %lu", kSampleRates[i]);
+	}
+	putchar('\n');
 }
 
 
@@ -109,6 +131,17 @@ get_format_name(uint32 format)
 	}
 
 	return "unknown";
+}
+
+
+static void
+print_formats(uint32 formatBits)
+{
+	for (uint32 i = 0; i < sizeof(kFormats) / sizeof(kFormats[0]); i++) {
+		if ((kFormats[i].type & formatBits) != 0)
+			printf("  %s", kFormats[i].name);
+	}
+	putchar('\n');
 }
 
 
@@ -195,16 +228,18 @@ do_desc(int argc, char** argv)
 	printf("friendly name:\t\t\t%s\n", sDescription.friendly_name);
 	printf("vendor:\t\t\t\t%s\n\n", sDescription.vendor_info);
 
-	printf("output rates:\t\t\t0x%lx (max %lu)\n", sDescription.output_rates,
-		get_rate(sDescription.output_rates));
-	printf("input rates:\t\t\t0x%lx (max %lu)\n", sDescription.input_rates,
-		get_rate(sDescription.input_rates));
+	printf("output rates:\t\t\t0x%lx\n", sDescription.output_rates);
+	print_rates(sDescription.output_rates);
+	printf("input rates:\t\t\t0x%lx\n", sDescription.input_rates);
+	print_rates(sDescription.input_rates);
 	printf("max cont. var. sample rate:\t%.0f\n",
 		sDescription.max_cvsr_rate);
 	printf("min cont. var. sample rate:\t%.0f\n",
 		sDescription.min_cvsr_rate);
 	printf("output formats:\t\t\t0x%lx\n", sDescription.output_formats);
+	print_formats(sDescription.output_formats);
 	printf("input formats:\t\t\t0x%lx\n", sDescription.input_formats);
+	print_formats(sDescription.input_formats);
 	printf("lock sources:\t\t\t0x%lx\n", sDescription.lock_sources);
 	printf("timecode sources:\t\t0x%lx\n", sDescription.timecode_sources);
 	printf("interface flags:\t\t0x%lx\n", sDescription.interface_flags);
@@ -336,7 +371,7 @@ do_play(int argc, char** argv)
 
 	bigtime_t startTime = system_time();
 	uint32 exchanged = 0;
-	uint32 cycle = ~0;
+	int32 cycle = -1;
 	uint32 x = 0;
 	while (true) {
 		if (system_time() - startTime > 1000000LL)
@@ -375,7 +410,7 @@ do_play(int argc, char** argv)
 		exchanged++;
 	}
 
-	printf("%ld buffers exchanged while playing (%lu frames played (%lu)).\n",
+	printf("%ld buffers exchanged while playing (%lu frames played (%Ld)).\n",
 		exchanged, x, bufferInfo.played_frames_count);
 
 	// clear buffers
