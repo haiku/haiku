@@ -60,13 +60,13 @@ KeymapWindow::KeymapWindow()
 		B_FOLLOW_ALL);
 	placeholderView->SetBorder(B_NO_BORDER);
 	AddChild(placeholderView);
-
+	
 	// Create the Maps box and contents
 	AddMaps(placeholderView);
 	
 	fMapView = new MapView(BRect(150, 9, 600, 189), "mapView", &fCurrentMap);
 	placeholderView->AddChild(fMapView);
-	SetPulseRate(10000);
+	fMapView->SetViewColor(B_TRANSPARENT_COLOR);
 	
 	BMenuItem *item = fFontMenu->FindMarked();
 	if (item) {
@@ -416,7 +416,7 @@ KeymapWindow::CurrentMap()
 
 
 MapView::MapView(BRect rect, const char *name, Keymap* keymap)
-	: BControl(rect, name, NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_PULSE_NEEDED),
+	: BControl(rect, name, NULL, NULL, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
 		fCurrentFont(*be_plain_font),
 		fCurrentMap(keymap),
 		fCurrentMouseKey(0)
@@ -426,10 +426,8 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 	// can be done the Right Way.
 	if (fCurrentFont.Size() > 14)
 		fCurrentFont.SetSize(14);
-	
-	SetViewColor(B_TRANSPARENT_COLOR);
-	
-	BRect frameRect = BRect(14, 16, Bounds().right-12, 30);
+		
+	BRect frameRect = BRect(14, 16, Bounds().right - 12, 30);
 	BRect textRect = frameRect;
 	textRect.OffsetTo(B_ORIGIN);
 	textRect.InsetBy(1, 1);
