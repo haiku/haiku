@@ -1233,7 +1233,7 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer,
 		if (!inode->IsDeleted() && cookie->last_size != inode->Size()
 			&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
 			notify_stat_changed(volume->ID(), inode->ID(),
-				B_STAT_MODIFICATION_TIME | B_STAT_SIZE);
+				B_STAT_MODIFICATION_TIME | B_STAT_SIZE | B_STAT_INTERIM_UPDATE);
 			cookie->last_size = inode->Size();
 			cookie->last_notification = system_time();
 		}
@@ -1306,7 +1306,7 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 				status = B_OK;
 			}
 		}
-		if (needsTrimming || inode->OldSize() != inode->Size()) {
+		if (inode->OldSize() != inode->Size()) {
 			index.UpdateSize(transaction, inode);
 			changedSize = true;
 		}

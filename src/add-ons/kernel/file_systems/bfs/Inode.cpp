@@ -1429,6 +1429,10 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 			*_length = 0;
 			RETURN_ERROR(status);
 		}
+		// TODO: In theory we would need to update the file size
+		// index here as part of the current transaction - this might just
+		// be a bit too expensive, but worth a try.
+
 		// If the position of the write was beyond the file size, we
 		// have to fill the gap between that position and the old file
 		// size with zeros.

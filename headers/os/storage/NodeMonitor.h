@@ -1,9 +1,9 @@
+/*
+ * Copyright 2003-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _NODE_MONITOR_H
 #define _NODE_MONITOR_H
-/* Node monitor calls for kernel add-ons
-**
-** Distributed under the terms of the OpenBeOS License.
-*/
 
 
 #include <StorageDefs.h>
@@ -16,14 +16,15 @@
  */
 
 enum {
-    B_STOP_WATCHING		= 0x0000,
-	B_WATCH_NAME		= 0x0001,
-	B_WATCH_STAT		= 0x0002,
-	B_WATCH_ATTR		= 0x0004,
-	B_WATCH_DIRECTORY	= 0x0008,
-	B_WATCH_ALL			= 0x000f,
+    B_STOP_WATCHING			= 0x0000,
+	B_WATCH_NAME			= 0x0001,
+	B_WATCH_STAT			= 0x0002,
+	B_WATCH_ATTR			= 0x0004,
+	B_WATCH_DIRECTORY		= 0x0008,
+	B_WATCH_ALL				= 0x000f,
 
-	B_WATCH_MOUNT		= 0x0010
+	B_WATCH_MOUNT			= 0x0010,
+	B_WATCH_INTERIM_STAT	= 0x0020
 };
 
 
@@ -53,14 +54,16 @@ enum {
 // messages, specifying what parts of the stat data have actually been
 // changed. (Haiku only)
 enum {
-	B_STAT_MODE					= 0x01,
-	B_STAT_UID					= 0x02,
-	B_STAT_GID					= 0x04,
-	B_STAT_SIZE					= 0x08,
-	B_STAT_ACCESS_TIME			= 0x10,
-	B_STAT_MODIFICATION_TIME	= 0x20,
-	B_STAT_CREATION_TIME		= 0x40,
-	B_STAT_CHANGE_TIME			= 0x80,
+	B_STAT_MODE					= 0x0001,
+	B_STAT_UID					= 0x0002,
+	B_STAT_GID					= 0x0004,
+	B_STAT_SIZE					= 0x0008,
+	B_STAT_ACCESS_TIME			= 0x0010,
+	B_STAT_MODIFICATION_TIME	= 0x0020,
+	B_STAT_CREATION_TIME		= 0x0040,
+	B_STAT_CHANGE_TIME			= 0x0080,
+
+	B_STAT_INTERIM_UPDATE		= 0x1000
 };
 
 

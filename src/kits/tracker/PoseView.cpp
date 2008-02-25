@@ -1038,7 +1038,11 @@ BPoseView::InitDirentIterator(const entry_ref *ref)
 uint32 
 BPoseView::WatchNewNodeMask()
 {
+#ifdef __HAIKU__
+	return B_WATCH_STAT | B_WATCH_INTERIM_STAT | B_WATCH_ATTR;
+#else
 	return B_WATCH_STAT | B_WATCH_ATTR;
+#endif
 }
 
 

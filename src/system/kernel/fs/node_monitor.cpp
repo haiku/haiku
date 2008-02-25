@@ -1,5 +1,7 @@
 /*
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
+ *
  * Distributed under the terms of the MIT License.
  */
 
@@ -620,8 +622,10 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
-	// ... for the node
-	_GetInterestedMonitorListeners(device, node, B_WATCH_STAT,
+	// ... for the node, depending on wether its an interim update or not
+	_GetInterestedMonitorListeners(device, node,
+		(statFields & B_STAT_INTERIM_UPDATE) != 0
+			? B_WATCH_INTERIM_STAT : B_WATCH_STAT,
 		interestedListeners, interestedListenerCount);
 
 	if (interestedListenerCount == 0)
