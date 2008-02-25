@@ -60,7 +60,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
 
 
         if ( (type != BT_EVENT && nbuf == NULL) ||
-             (type == BT_EVENT && snb_completed(snbuf)) ) {
+             (type == BT_EVENT && (snbuf == NULL || snb_completed(snbuf))) ) {
 
             /* new buffer incoming */                        
             switch (type) {
@@ -121,7 +121,7 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
         } 
         else {
             /* Continuation */
-            if (type == BT_EVENT)
+            if (type != BT_EVENT)
 	            currentPacketLen = get_expected_size(nbuf) - nbuf->size;        
 	        else
 	        	currentPacketLen = snb_remaining_to_put(snbuf);
@@ -138,17 +138,16 @@ assembly_rx(bt_usb_dev* bdev, bt_packet_t type, void *data, int count)
         if (type == BT_EVENT && snb_completed(snbuf)) {
 
 			flowf("Frame goes up!\n");
-			snbuf = bdev->eventRx = NULL;
 			post_packet_up(bdev, type, snbuf);
-
+			snbuf = bdev->eventRx = NULL;
 
         }
 	
 		if (type != BT_EVENT && (get_expected_size(nbuf) - nbuf->size) == 0 ) {
 
 			flowf("Frame goes up!\n");
-			bdev->nbufferRx[type] = nbuf = NULL;
 			post_packet_up(bdev, type, nbuf);
+			bdev->nbufferRx[type] = nbuf = NULL;
 		}
 		        
         /* in case in the pipe there is info about the next buffer ... */
