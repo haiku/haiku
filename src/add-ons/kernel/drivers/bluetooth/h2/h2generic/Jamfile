@@ -25,4 +25,4 @@ SEARCH on [ FGristFiles $(r5_src)
 Package haiku-h2generic-cvs :
 	h2generic :
 	boot home config add-ons kernel drivers bin ;
-PackageDriverSymLink haiku-hda-cvs : bluetooth h2 h2generic ;
+PackageDriverSymLink haiku-h2generic-cvs : bluetooth h2 h2generic ;
