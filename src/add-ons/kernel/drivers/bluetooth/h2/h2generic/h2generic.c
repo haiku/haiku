@@ -628,7 +628,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 
 		case GET_HCI_ID:
 		    *(hci_id*)params = bdev->hdev;
-		    err = bdev->hdev + 15;
+		    err = B_OK;
 		break;		
 
 		
