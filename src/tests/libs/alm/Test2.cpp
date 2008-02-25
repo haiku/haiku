@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <Application.h>
 #include <Button.h>
@@ -18,9 +23,9 @@ using namespace BALM;
 
 class Test2Window : public BWindow {
 public:
-	Test2Window(BRect frame) : BWindow(frame, "Test2", B_TITLED_WINDOW,
-			B_QUIT_ON_WINDOW_CLOSE) {
-				
+	Test2Window(BRect frame)
+		: BWindow(frame, "Test2", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+	{			
 		fLS = new BALMLayout();
 				
 		SetLayout(fLS);
@@ -50,7 +55,9 @@ public:
 	}
 	
 	
-	void SetBALMLayout() {
+	void
+	SetBALMLayout()
+	{
 		XTab* x1 = fLS->AddXTab();
 		XTab* x2 = fLS->AddXTab();
 		XTab* x3 = fLS->AddXTab();
@@ -67,32 +74,8 @@ public:
 		fLS->AddArea(fLS->Left(), y2, x1, y3, button5);
 		fLS->AddArea(x1, y2, x2, y3, button6);
 
-		//~ BList* coeffs1 = new BList(2);
-		//~ coeffs1->AddItem(new double(2.0));
-		//~ coeffs1->AddItem(new double(-1.0));
-		//~ BList* vars1 = new BList(2);
-		//~ vars1->AddItem(x1);
-		//~ vars1->AddItem(x2);
-		//~ fLS->AddConstraint(coeffs1, vars1, OperatorType(EQ), 0.0);
-
 		fLS->AddConstraint(2.0, x1, -1.0, x2, OperatorType(EQ), 0.0);
-
-		//~ BList* coeffs2 = new BList(2);
-		//~ coeffs2->AddItem(new double(2.0));
-		//~ coeffs2->AddItem(new double(-1.0));
-		//~ BList* vars2 = new BList(2);
-		//~ vars2->AddItem(y1);
-		//~ vars2->AddItem(y2);
 		fLS->AddConstraint(2.0, y1, -1.0, y2, OperatorType(EQ), 0.0);
-
-		//~ BList* coeffs3 = new BList(3);
-		//~ coeffs3->AddItem(new double(1.0));
-		//~ coeffs3->AddItem(new double(1.0));
-		//~ coeffs3->AddItem(new double(-1.0));
-		//~ BList* vars3 = new BList(3);
-		//~ vars3->AddItem(y1);
-		//~ vars3->AddItem(y2);
-		//~ vars3->AddItem(y3);
 		fLS->AddConstraint(1.0, y1, 1.0, y2, -1.0, y3, OperatorType(EQ), 0.0);
 		
 		fLS->AddArea(fLS->Left(), y3, x2, y4, checkedListBox1);
@@ -147,7 +130,9 @@ private:
 
 class Test2 : public BApplication {
 public:
-	Test2() : BApplication("application/x-vnd.haiku.test2") {
+	Test2()
+		: BApplication("application/x-vnd.haiku.test2")
+	{
 		BRect frameRect;
 		frameRect.Set(100, 100, 610, 456);
 		Test2Window* theWindow = new Test2Window(frameRect);
@@ -155,8 +140,11 @@ public:
 };
 
 
-int main() {
+int
+main()
+{
 	Test2 test;
 	test.Run();
 	return 0;
 }
+

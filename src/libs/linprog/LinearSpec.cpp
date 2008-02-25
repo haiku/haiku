@@ -1,8 +1,14 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "LinearSpec.h"
 #include "Constraint.h"
 #include "ObjFunctionSummand.h"
 #include "PenaltyFunction.h"
-#include "SoftConstraint.h"
+#include "Constraint.h"
 #include "Variable.h"
 
 #include "lp_lib.h"
@@ -46,17 +52,17 @@ LinearSpec::~LinearSpec()
 void
 LinearSpec::UpdateObjFunction()
 {
-	int32 size = fObjFunctionSummands->CountItems();;
+	int32 size = fObjFunctionSummands->CountItems();
 	double coeffs[size];
-	int vIndexes[size];
+	int varIndexes[size];
 	ObjFunctionSummand* current;
 	for (int32 i = 0; i < size; i++) {
 		current = (ObjFunctionSummand*)fObjFunctionSummands->ItemAt(i);
 		coeffs[i] = current->Coeff();
-		vIndexes[i] = current->Var()->Index();
+		varIndexes[i] = current->Var()->Index();
 	}
 	
-	if (!set_obj_fnex(fLP, size, &coeffs[0], &vIndexes[0]))
+	if (!set_obj_fnex(fLP, size, &coeffs[0], &varIndexes[0]))
 		printf("Error in set_obj_fnex.");
 	
 	RemovePresolved();
@@ -70,18 +76,9 @@ LinearSpec::UpdateObjFunction()
  * @param vars	the objective function's variables
  */
 void
-LinearSpec::SetObjFunction(BList* coeffs, BList* vars)
+LinearSpec::SetObjFunction(BList* summands)
 {
-	int32 sizeCoeffs = coeffs->CountItems();
-	int32 sizeVars = vars->CountItems();
-	if (sizeCoeffs != sizeVars)
-		printf("Number of coefficients and number of fVariables in objective function must be equal.");
-	
-	fObjFunctionSummands = new BList(1);
-	for (int32 i = 0; i < sizeCoeffs; i++)
-		fObjFunctionSummands->AddItem(new ObjFunctionSummand(this, 
-				*(double*)coeffs->ItemAt(i), (Variable*)vars->ItemAt(i)));
-	
+	fObjFunctionSummands = summands;
 	UpdateObjFunction();
 }
 
@@ -125,10 +122,10 @@ LinearSpec::AddVariable()
  * @return the new constraint
  */
 Constraint*
-LinearSpec::AddConstraint(BList* coeffs, BList* vars, OperatorType op, 
-	double rightSide)
+LinearSpec::AddConstraint(BList* summands, OperatorType op, double rightSide)
 {	
-	Constraint* c = new Constraint(this, coeffs, vars, op, rightSide);
+	Constraint* c = new Constraint(this, summands, op, rightSide,
+		INFINITY, INFINITY);
 	RemovePresolved();
 	return c;
 }
@@ -147,11 +144,11 @@ Constraint*
 LinearSpec::AddConstraint(double coeff1, Variable* var1, 
 	OperatorType op, double rightSide)
 {		
-	BList* coeffs = new BList(1);
-	coeffs->AddItem(new double(coeff1));
-	BList* vars = new BList(1);
-	vars->AddItem(var1);
-	Constraint* c = AddConstraint(coeffs, vars, op, rightSide);
+	BList* summands = new BList(1);
+	summands->AddItem(new Summand(coeff1, var1));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
+		INFINITY, INFINITY);
+	RemovePresolved();
 	return c;
 }
 
@@ -171,13 +168,12 @@ Constraint*
 LinearSpec::AddConstraint(double coeff1, Variable* var1, 
 	double coeff2, Variable* var2, OperatorType op, double rightSide)
 {		
-	BList* coeffs = new BList(2);
-	coeffs->AddItem(new double(coeff1));
-	coeffs->AddItem(new double(coeff2));
-	BList* vars = new BList(2);
-	vars->AddItem(var1);
-	vars->AddItem(var2);
-	Constraint* c = AddConstraint(coeffs, vars, op, rightSide);
+	BList* summands = new BList(2);
+	summands->AddItem(new Summand(coeff1, var1));
+	summands->AddItem(new Summand(coeff2, var2));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
+		INFINITY, INFINITY);
+	RemovePresolved();
 	return c;	
 }
 
@@ -200,15 +196,13 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		double coeff2, Variable* var2, double coeff3, Variable* var3, 
 		OperatorType op, double rightSide)
 {			
-	BList* coeffs = new BList(3);
-	coeffs->AddItem(new double(coeff1));
-	coeffs->AddItem(new double(coeff2));
-	coeffs->AddItem(new double(coeff3));
-	BList* vars = new BList(3);
-	vars->AddItem(var1);
-	vars->AddItem(var2);
-	vars->AddItem(var3);
-	Constraint* c = AddConstraint(coeffs, vars, op, rightSide);
+	BList* summands = new BList(3);
+	summands->AddItem(new Summand(coeff1, var1));
+	summands->AddItem(new Summand(coeff2, var2));
+	summands->AddItem(new Summand(coeff3, var3));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
+		INFINITY, INFINITY);
+	RemovePresolved();
 	return c;	
 }
 
@@ -233,17 +227,14 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
 		double coeff2, Variable* var2, double coeff3, Variable* var3, 
 		double coeff4, Variable* var4, OperatorType op, double rightSide)
 {			
-	BList* coeffs = new BList(4);
-	coeffs->AddItem(new double(coeff1));
-	coeffs->AddItem(new double(coeff2));
-	coeffs->AddItem(new double(coeff3));
-	coeffs->AddItem(new double(coeff4));
-	BList* vars = new BList(4);
-	vars->AddItem(var1);
-	vars->AddItem(var2);
-	vars->AddItem(var3);
-	vars->AddItem(var4);
-	Constraint* c = AddConstraint(coeffs, vars, op, rightSide);
+	BList* summands = new BList(3);
+	summands->AddItem(new Summand(coeff1, var1));
+	summands->AddItem(new Summand(coeff2, var2));
+	summands->AddItem(new Summand(coeff3, var3));
+	summands->AddItem(new Summand(coeff4, var4));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
+		INFINITY, INFINITY);
+	RemovePresolved();
 	return c;	
 }
 
@@ -259,13 +250,12 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
-SoftConstraint*
-LinearSpec::AddSoftConstraint(BList* coeffs, BList* vars, OperatorType op, 
+Constraint*
+LinearSpec::AddConstraint(BList* summands, OperatorType op, 
 		double rightSide, double penaltyNeg, double penaltyPos)
 {			
-	SoftConstraint* c = new SoftConstraint(this, coeffs, vars, op, rightSide, 
+	Constraint* c = new Constraint(this, summands, op, rightSide, 
 			penaltyNeg, penaltyPos);
-
 	RemovePresolved();
 	return c;
 }
@@ -281,17 +271,16 @@ LinearSpec::AddSoftConstraint(BList* coeffs, BList* vars, OperatorType op,
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
-SoftConstraint*
-LinearSpec::AddSoftConstraint(double coeff1, Variable* var1, 
+Constraint*
+LinearSpec::AddConstraint(double coeff1, Variable* var1, 
 		OperatorType op, double rightSide, double penaltyNeg, double penaltyPos)
 {			
-	BList* coeffs = new BList(1);
-	coeffs->AddItem(new double(coeff1));
-	BList* vars = new BList(1);
-	vars->AddItem(var1);
-	SoftConstraint* c = AddSoftConstraint(coeffs, vars, op, rightSide, 
+	BList* summands = new BList(1);
+	summands->AddItem(new Summand(coeff1, var1));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
 		penaltyNeg, penaltyPos);
-	return c;	
+	RemovePresolved();
+	return c;
 }
 
 
@@ -307,20 +296,18 @@ LinearSpec::AddSoftConstraint(double coeff1, Variable* var1,
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
-SoftConstraint*
-LinearSpec::AddSoftConstraint(double coeff1, Variable* var1, 
+Constraint*
+LinearSpec::AddConstraint(double coeff1, Variable* var1, 
 	double coeff2, Variable* var2, OperatorType op, double rightSide, 
 	double penaltyNeg, double penaltyPos)
 {			
-	BList* coeffs = new BList(2);
-	coeffs->AddItem(new double(coeff1));
-	coeffs->AddItem(new double(coeff2));
-	BList* vars = new BList(2);
-	vars->AddItem(var1);
-	vars->AddItem(var2);
-	SoftConstraint* c = AddSoftConstraint(coeffs, vars, op, rightSide, 
-			penaltyNeg, penaltyPos);
-	return c;	
+	BList* summands = new BList(2);
+	summands->AddItem(new Summand(coeff1, var1));
+	summands->AddItem(new Summand(coeff2, var2));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
+		penaltyNeg, penaltyPos);
+	RemovePresolved();
+	return c;
 }
 
 
@@ -338,21 +325,18 @@ LinearSpec::AddSoftConstraint(double coeff1, Variable* var1,
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
-SoftConstraint*
-LinearSpec::AddSoftConstraint(double coeff1, Variable* var1, 
+Constraint*
+LinearSpec::AddConstraint(double coeff1, Variable* var1, 
 	double coeff2, Variable* var2, double coeff3, Variable* var3, 
 	OperatorType op, double rightSide, double penaltyNeg, double penaltyPos)
 {
-	BList* coeffs = new BList(3);
-	coeffs->AddItem(new double(coeff1));
-	coeffs->AddItem(new double(coeff2));
-	coeffs->AddItem(new double(coeff3));
-	BList* vars = new BList(3);
-	vars->AddItem(var1);
-	vars->AddItem(var2);
-	vars->AddItem(var3);
-	SoftConstraint* c = AddSoftConstraint(coeffs, vars, op, rightSide, 
-			penaltyNeg, penaltyPos);
+	BList* summands = new BList(2);
+	summands->AddItem(new Summand(coeff1, var1));
+	summands->AddItem(new Summand(coeff2, var2));
+	summands->AddItem(new Summand(coeff3, var3));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
+		penaltyNeg, penaltyPos);
+	RemovePresolved();
 	return c;
 }
 
@@ -373,24 +357,20 @@ LinearSpec::AddSoftConstraint(double coeff1, Variable* var1,
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
-SoftConstraint*
-LinearSpec::AddSoftConstraint(double coeff1, Variable* var1, 
+Constraint*
+LinearSpec::AddConstraint(double coeff1, Variable* var1, 
 	double coeff2, Variable* var2, double coeff3, Variable* var3, 
 	double coeff4, Variable* var4, OperatorType op, double rightSide, 
 	double penaltyNeg, double penaltyPos)
 {			
-	BList* coeffs = new BList(4);
-	coeffs->AddItem(new double(coeff1));
-	coeffs->AddItem(new double(coeff2));
-	coeffs->AddItem(new double(coeff3));
-	coeffs->AddItem(new double(coeff4));
-	BList* vars = new BList(4);
-	vars->AddItem(var1);
-	vars->AddItem(var2);
-	vars->AddItem(var3);
-	vars->AddItem(var4);
-	SoftConstraint* c = AddSoftConstraint(coeffs, vars, op, rightSide, 
+	BList* summands = new BList(2);
+	summands->AddItem(new Summand(coeff1, var1));
+	summands->AddItem(new Summand(coeff2, var2));
+	summands->AddItem(new Summand(coeff3, var3));
+	summands->AddItem(new Summand(coeff4, var4));
+	Constraint* c = new Constraint(this, summands, op, rightSide,
 		penaltyNeg, penaltyPos);
+	RemovePresolved();
 	return c;
 }
 

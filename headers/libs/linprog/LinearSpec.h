@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #ifndef	LINEAR_SPEC_H
 #define	LINEAR_SPEC_H
 
@@ -10,6 +16,7 @@
 #include <List.h>
 #include <OS.h>
 #include <SupportDefs.h>
+#include <math.h>
 
 
 namespace LinearProgramming {
@@ -17,7 +24,6 @@ namespace LinearProgramming {
 class Constraint;
 class ObjFunctionSummand;
 class PenaltyFunction;
-class SoftConstraint;
 class Variable;
 
 /**
@@ -28,81 +34,81 @@ class LinearSpec {
 public:
 						LinearSpec();
 						~LinearSpec();
-	void					UpdateObjFunction();
-	void					SetObjFunction(BList* coeffs, BList* vars);
+	void				UpdateObjFunction();
+	void				SetObjFunction(BList* summands);
 	ObjFunctionSummand*	AddObjFunctionSummand(double coeff, Variable* var);
-	Variable*				AddVariable();
+	Variable*			AddVariable();
 
-	Constraint*			AddConstraint(BList* coeffs, BList* vars, 
+	Constraint*			AddConstraint(BList* summands, 
 								OperatorType op, double rightSide);
 	Constraint*			AddConstraint(double coeff1, Variable* var1, 
 								OperatorType op, double rightSide);
 	Constraint*			AddConstraint(double coeff1, Variable* var1, 
 								double coeff2, Variable* var2, 
 								OperatorType op, double rightSide);
-	Constraint*			AddConstraint(double coeff1, Variable* var1, 
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
 								double coeff2, Variable* var2, 
 								double coeff3, Variable* var3, 
 								OperatorType op, double rightSide);
-	Constraint*			AddConstraint(double coeff1, Variable* var1, 
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
 								double coeff2, Variable* var2, 
 								double coeff3, Variable* var3, 
 								double coeff4, Variable* var4, 
 								OperatorType op, double rightSide);
 
-	SoftConstraint*		AddSoftConstraint(BList* coeffs, BList* vars, 
+	Constraint*			AddConstraint(BList* summands, 
 								OperatorType op, double rightSide, 
 								double penaltyNeg, double penaltyPos);
-	SoftConstraint*		AddSoftConstraint(double coeff1, Variable* var1, 
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
 								OperatorType op, double rightSide, 
 								double penaltyNeg, double penaltyPos);
-	SoftConstraint*		AddSoftConstraint(double coeff1, Variable* var1, 
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
 								double coeff2, Variable* var2, 
 								OperatorType op, double rightSide, 
 								double penaltyNeg, double penaltyPos);
-	SoftConstraint*		AddSoftConstraint(double coeff1, Variable* var1, 
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
 								double coeff2, Variable* var2, 
 								double coeff3, Variable* var3, 
 								OperatorType op, double rightSide, 
 								double penaltyNeg, double penaltyPos);
-	SoftConstraint*		AddSoftConstraint(double coeff1, Variable* var1, 
+	Constraint*			AddConstraint(double coeff1, Variable* var1,
 								double coeff2, Variable* var2, 
 								double coeff3, Variable* var3, 
 								double coeff4, Variable* var4, 
 								OperatorType op, double rightSide, 
 								double penaltyNeg, double penaltyPos);
 	
-	PenaltyFunction*		AddPenaltyFunction(Variable* var, BList* xs, BList* gs);
-	void					RemovePresolved();
+	PenaltyFunction*	AddPenaltyFunction(Variable* var, BList* xs, BList* gs);
+	void				RemovePresolved();
 	ResultType			Presolve();
 	ResultType			Solve();
-	void					Save(char* fname);
+	void				Save(char* fname);
 
 	int32				Columns() const;
-	void					SetColumns(int32 value);
-	OptimizationType		Optimization() const;
-	void					SetOptimization(OptimizationType value);
+	void				SetColumns(int32 value);
+	OptimizationType	Optimization() const;
+	void				SetOptimization(OptimizationType value);
 	lprec*				LP() const;
-	void					SetLP(lprec* value);
+	void				SetLP(lprec* value);
 	BList*				ObjFunctionSummands() const;
-	void					SetObjFunctionSummands(BList* value);
+	void				SetObjFunctionSummands(BList* value);
 	BList*				Variables() const;
-	void					SetVariables(BList* value);
+	void				SetVariables(BList* value);
 	BList*				Constraints() const;
-	void					SetConstraints(BList* value);
+	void				SetConstraints(BList* value);
 	ResultType			Result() const;
-	void					SetResult(ResultType value);
+	void				SetResult(ResultType value);
 	double				ObjectiveValue() const;
-	void					SetObjectiveValue(double value);
+	void				SetObjectiveValue(double value);
 	double				SolvingTime() const;
-	void					SetSolvingTime(double value);
+	void				SetSolvingTime(double value);
 
 protected:
 	int32 				fColumns;
 
 private:
 	lprec*				fLpPresolved;
-	OptimizationType		fOptimization;
+	OptimizationType	fOptimization;
 	lprec*				fLP;
 	BList*				fObjFunctionSummands;
 	BList*				fVariables;
@@ -112,8 +118,8 @@ private:
 	double 				fSolvingTime;		// = Double.Nan
 
 public:
-	friend class			ObjFunctionSummand;
-	friend class			SoftConstraint;
+	friend class		ObjFunctionSummand;
+	friend class		Constraint;
 
 };
 

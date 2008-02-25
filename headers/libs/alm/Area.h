@@ -1,8 +1,13 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #ifndef	AREA_H
 #define	AREA_H
 
 #include "Constraint.h"
-#include "SoftConstraint.h"
 
 #include <Alignment.h>
 #include <List.h>
@@ -26,51 +31,51 @@ class Area {
 	
 public:
 	bool				AutoPrefContentSize() const;
-	void					SetAutoPrefContentSize(bool value);
+	void				SetAutoPrefContentSize(bool value);
 	XTab*				Left() const;
-	void					SetLeft(XTab* left);
+	void				SetLeft(XTab* left);
 	XTab*				Right() const;
-	void					SetRight(XTab* right);
+	void				SetRight(XTab* right);
 	YTab*				Top() const;
-	void					SetTop(YTab* top);
+	void				SetTop(YTab* top);
 	YTab*				Bottom() const;
-	void					SetBottom(YTab* bottom);
+	void				SetBottom(YTab* bottom);
 	Row*				GetRow() const;
-	void					SetRow(Row* row);
+	void				SetRow(Row* row);
 	Column*				GetColumn() const;
-	void					SetColumn(Column* column);
+	void				SetColumn(Column* column);
 	BView*				Content() const;
-	void					SetContent(BView* content);
+	void				SetContent(BView* content);
 	XTab*				ContentLeft() const;
 	YTab*				ContentTop() const;
 	XTab*				ContentRight() const;
 	YTab*				ContentBottom() const;
 	BSize				MinContentSize() const;
-	void					SetMinContentSize(BSize min);
+	void				SetMinContentSize(BSize min);
 	BSize				MaxContentSize() const;
-	void					SetMaxContentSize(BSize max);
+	void				SetMaxContentSize(BSize max);
 	BSize				PrefContentSize() const;
-	void					SetPrefContentSize(BSize pref);
+	void				SetPrefContentSize(BSize pref);
 	BSize				ShrinkRigidity() const;
-	void					SetShrinkRigidity(BSize shrink);
+	void				SetShrinkRigidity(BSize shrink);
 	BSize				ExpandRigidity() const;
-	void					SetExpandRigidity(BSize expand);
+	void				SetExpandRigidity(BSize expand);
 	double				ContentAspectRatio() const;
-	void					SetContentAspectRatio(double ratio);
+	void				SetContentAspectRatio(double ratio);
 	BAlignment			Alignment() const;
-	void					SetAlignment(BAlignment alignment);
-	void					SetHAlignment(alignment horizontal);
-	void					SetVAlignment(vertical_alignment vertical);
+	void				SetAlignment(BAlignment alignment);
+	void				SetHAlignment(alignment horizontal);
+	void				SetVAlignment(vertical_alignment vertical);
 	int32				LeftInset() const;
-	void					SetLeftInset(int32 left);
+	void				SetLeftInset(int32 left);
 	int32				TopInset() const;
-	void					SetTopInset(int32 top);
+	void				SetTopInset(int32 top);
 	int32				RightInset() const;
-	void					SetRightInset(int32 right);
+	void				SetRightInset(int32 right);
 	int32				BottomInset() const;
-	void					SetBottomInset(int32 bottom);
-	void					SetDefaultPrefContentSize();
-	//~ string				ToString();
+	void				SetBottomInset(int32 bottom);
+	void				SetDefaultPrefContentSize();
+	//~ string			ToString();
 	Constraint*			HasSameWidthAs(Area* area);
 	Constraint*			HasSameHeightAs(Area* area);
 	BList*				HasSameSizetAs(Area* area);
@@ -84,7 +89,7 @@ protected:
 						Area(BALMLayout* ls, Row* row, Column* column, 
 								BView* content,
 								BSize minContentSize);
-	void					DoLayout();
+	void				DoLayout();
 	
 private:
 	void					InitChildArea();
@@ -124,8 +129,8 @@ private:
 	double				fContentAspectRatio;
 	Constraint*			fContentAspectRatioC;
 	bool				fAutoPrefContentSize;
-	SoftConstraint*		fPrefContentWidth;
-	SoftConstraint*		fPrefContentHeight;
+	Constraint*			fPrefContentWidth;
+	Constraint*			fPrefContentHeight;
 	Area*				fChildArea;
 	BAlignment			fAlignment;
 	int32				fLeftInset;

@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include <Application.h>
 #include <Button.h>
 #include <List.h>
@@ -14,9 +20,9 @@ using namespace BALM;
 
 class Test1Window : public BWindow {
 public:
-	Test1Window(BRect frame) : BWindow(frame, "Test1", B_TITLED_WINDOW,
-			B_QUIT_ON_WINDOW_CLOSE) {
-		
+	Test1Window(BRect frame) 
+		: BWindow(frame, "Test1", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE)
+	{
 		fLS = new BALMLayout();
 		
 		SetLayout(fLS);
@@ -32,7 +38,9 @@ public:
 	}
 	
 	
-	void SetBALMLayout() {
+	void
+	SetBALMLayout()
+	{
 		XTab* x1 = fLS->AddXTab();
 		YTab* y1 = fLS->AddYTab();
 		
@@ -40,20 +48,8 @@ public:
 		fLS->AddArea(x1, fLS->Top(), fLS->Right(), y1, button2);
 		fLS->AddArea(fLS->Left(), y1, fLS->Right(), fLS->Bottom(), button3);
 		
-		//~ BList* coeffs1 = new BList(2);
-		//~ coeffs1->AddItem(new double(2.0));
-		//~ coeffs1->AddItem(new double(-1.0));
-		//~ BList* vars1 = new BList(2);
-		//~ vars1->AddItem(x1);
-		//~ vars1->AddItem(fLS->Right());
-		fLS->AddConstraint(2.0, x1, -1.0, fLS->Right(), OperatorType(EQ), 0.0);
 		
-		//~ BList* coeffs2 = new BList(2);
-		//~ coeffs2->AddItem(new double(2.0));
-		//~ coeffs2->AddItem(new double(-1.0));
-		//~ BList* vars2 = new BList(2);
-		//~ vars2->AddItem(y1);
-		//~ vars2->AddItem(fLS->Bottom());
+		fLS->AddConstraint(2.0, x1, -1.0, fLS->Right(), OperatorType(EQ), 0.0);		
 		fLS->AddConstraint(2.0, y1, -1.0, fLS->Bottom(), OperatorType(EQ), 0.0);
 	}
 	
@@ -68,7 +64,9 @@ private:
 
 class Test1 : public BApplication {
 public:
-	Test1() : BApplication("application/x-vnd.haiku.test1") {
+	Test1() 
+		: BApplication("application/x-vnd.haiku.test1") 
+	{
 		BRect frameRect;
 		frameRect.Set(100, 100, 392, 366);
 		Test1Window* theWindow = new Test1Window(frameRect);
@@ -76,8 +74,11 @@ public:
 };
 
 
-int main() {
+int
+main()
+{
 	Test1 test;
 	test.Run();
 	return 0;
 }
+

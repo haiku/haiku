@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders lp_solve linprog ;
 
-SimpleTest linprog :
+SimpleTest linprog_test :
 	Program.cpp
 	:
 	be liblpsolve55.so liblinprog.so

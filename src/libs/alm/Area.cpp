@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "Area.h"
 #include "Column.h"
 #include "BALMLayout.h"
@@ -71,23 +77,10 @@ Area::SetLeft(XTab* left)
 	fColumn = NULL;
 	
 	if (fChildArea == NULL) {
-		BList* coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		BList* vars = new BList(2);
-		vars->AddItem(fLeft);
-		vars->AddItem(fRight);
-		fMinContentWidth->ChangeLeftSide(coeffs, vars);
+		fMinContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
 	
-		if (fMaxContentWidth != NULL) {
-			BList* coeffs2 = new BList(2);
-			coeffs2->AddItem(new double(-1.0));
-			coeffs2->AddItem(new double(1.0));
-			BList* vars2 = new BList(2);
-			vars2->AddItem(fLeft);
-			vars2->AddItem(fRight);
-			fMaxContentWidth->ChangeLeftSide(coeffs2, vars2);
-		}
+		if (fMaxContentWidth != NULL)
+			fMaxContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
 	} else
 		UpdateHorizontal();
 	fLS->InvalidateLayout();
@@ -119,23 +112,10 @@ Area::SetRight(XTab* right)
 	fColumn = NULL;
 	
 	if (fChildArea == NULL) {
-		BList* coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		BList* vars = new BList(2);
-		vars->AddItem(fLeft);
-		vars->AddItem(fRight);
-		fMinContentWidth->ChangeLeftSide(coeffs, vars);
+		fMinContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
 	
-		if (fMaxContentWidth != NULL) {
-			BList* coeffs2 = new BList(2);
-			coeffs2->AddItem(new double(-1.0));
-			coeffs2->AddItem(new double(1.0));
-			BList* vars2 = new BList(2);
-			vars2->AddItem(fLeft);
-			vars2->AddItem(fRight);
-			fMaxContentWidth->ChangeLeftSide(coeffs2, vars2);
-		}
+		if (fMaxContentWidth != NULL)
+			fMaxContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
 	} else
 		UpdateHorizontal();
 	fLS->InvalidateLayout();
@@ -163,23 +143,10 @@ Area::SetTop(YTab* top)
 	fRow = NULL;
 	
 	if (fChildArea == NULL) {
-		BList* coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		BList* vars = new BList(2);
-		vars->AddItem(fTop);
-		vars->AddItem(fBottom);
-		fMinContentHeight->ChangeLeftSide(coeffs, vars);
+		fMinContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
 		
-		if (fMaxContentHeight != NULL) {
-			BList* coeffs2 = new BList(2);
-			coeffs2->AddItem(new double(-1.0));
-			coeffs2->AddItem(new double(1.0));
-			BList* vars2 = new BList(2);
-			vars2->AddItem(fTop);
-			vars2->AddItem(fBottom);
-			fMaxContentHeight->ChangeLeftSide(coeffs2, vars2);
-		}
+		if (fMaxContentHeight != NULL)
+			fMaxContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
 	} else
 		UpdateVertical();
 	fLS->InvalidateLayout();
@@ -207,23 +174,10 @@ Area::SetBottom(YTab* bottom)
 	fRow = NULL;
 	
 	if (fChildArea == NULL) {
-		BList* coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		BList* vars = new BList(2);
-		vars->AddItem(fTop);
-		vars->AddItem(fBottom);
-		fMinContentHeight->ChangeLeftSide(coeffs, vars);
+		fMinContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
 		
-		if (fMaxContentHeight != NULL) {
-			BList* coeffs2 = new BList(2);
-			coeffs2->AddItem(new double(-1.0));
-			coeffs2->AddItem(new double(1.0));
-			BList* vars2 = new BList(2);
-			vars2->AddItem(fTop);
-			vars2->AddItem(fBottom);
-			fMaxContentHeight->ChangeLeftSide(coeffs2, vars2);
-		}
+		if (fMaxContentHeight != NULL)
+			fMaxContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
 	} else
 		UpdateVertical();
 	fLS->InvalidateLayout();
@@ -385,23 +339,11 @@ Area::SetMaxContentSize(BSize max)
 	if (fChildArea == NULL) {
 		fMaxContentSize = max;
 		if (fMaxContentWidth == NULL) {
-			BList* coeffs = new BList(2);
-			coeffs->AddItem(new double(-1.0));
-			coeffs->AddItem(new double(1.0));
-			BList* vars = new BList(2);
-			vars->AddItem(fLeft);
-			vars->AddItem(fRight);
-			fMaxContentWidth = fLS->AddConstraint(coeffs, vars, OperatorType(LE),
+			fMaxContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, OperatorType(LE),
 					fMaxContentSize.Width());
 			fConstraints->AddItem(fMaxContentWidth);
 			
-			BList* coeffs2 = new BList(2);
-			coeffs2->AddItem(new double(-1.0));
-			coeffs2->AddItem(new double(1.0));
-			BList* vars2 = new BList(2);
-			vars2->AddItem(fTop);
-			vars2->AddItem(fBottom);
-			fMaxContentHeight = fLS->AddConstraint(coeffs2, vars2, OperatorType(LE),
+			fMaxContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, OperatorType(LE),
 					fMaxContentSize.Height());
 			fConstraints->AddItem(fMaxContentHeight);
 		} else {
@@ -435,24 +377,12 @@ Area::SetPrefContentSize(BSize pref)
 	if (fChildArea == NULL) {
 		fPrefContentSize = pref;
 		if (fPrefContentWidth == NULL) {
-			BList* coeffs = new BList(2);
-			coeffs->AddItem(new double(-1.0));
-			coeffs->AddItem(new double(1.0));
-			BList* vars = new BList(2);
-			vars->AddItem(fLeft);
-			vars->AddItem(fRight);
-			fPrefContentWidth = fLS->AddSoftConstraint(coeffs, vars, OperatorType(EQ),
+			fPrefContentWidth = fLS->AddConstraint(-1.0, fLeft, 1.0, fRight, OperatorType(EQ),
 					fPrefContentSize.Width(), fShrinkRigidity.Width(),
 					fExpandRigidity.Width());
 			fConstraints->AddItem(fPrefContentWidth);
 			
-			BList* coeffs2 = new BList(2);
-			coeffs2->AddItem(new double(-1.0));
-			coeffs2->AddItem(new double(1.0));
-			BList* vars2 = new BList(2);
-			vars2->AddItem(fTop);
-			vars2->AddItem(fBottom);
-			fPrefContentHeight = fLS->AddSoftConstraint(coeffs2, vars2, OperatorType(EQ),
+			fPrefContentHeight = fLS->AddConstraint(-1.0, fTop, 1.0, fBottom, OperatorType(EQ),
 					fPrefContentSize.Height(), fShrinkRigidity.Height(),
 					fExpandRigidity.Height());
 			fConstraints->AddItem(fPrefContentHeight);
@@ -536,31 +466,13 @@ Area::SetContentAspectRatio(double ratio)
 	if (fChildArea == NULL) {
 		fContentAspectRatio = ratio;
 		if (fContentAspectRatioC == NULL) {
-			BList* coeffs = new BList(4);
-			coeffs->AddItem(new double(-1.0));
-			coeffs->AddItem(new double(1.0));
-			coeffs->AddItem(new double(ratio));
-			coeffs->AddItem(new double(-ratio));
-			BList* vars = new BList(4);
-			vars->AddItem(fLeft);
-			vars->AddItem(fRight);
-			vars->AddItem(fTop);
-			vars->AddItem(fBottom);
-			fContentAspectRatioC = fLS->AddConstraint(coeffs, vars,
-					OperatorType(EQ), 0.0);
+			fContentAspectRatioC = fLS->AddConstraint(
+				-1.0, fLeft, 1.0, fRight, ratio, fTop, -ratio, fBottom,
+				OperatorType(EQ), 0.0);
 			fConstraints->AddItem(fContentAspectRatioC);
 		} else {
-			BList* coeffs2 = new BList(4);
-			coeffs2->AddItem(new double(-1.0));
-			coeffs2->AddItem(new double(1.0));
-			coeffs2->AddItem(new double(ratio));
-			coeffs2->AddItem(new double(-ratio));
-			BList* vars2 = new BList(4);
-			vars2->AddItem(fLeft);
-			vars2->AddItem(fRight);
-			vars2->AddItem(fTop);
-			vars2->AddItem(fBottom);
-			fContentAspectRatioC->ChangeLeftSide(coeffs2, vars2);
+			fContentAspectRatioC->ChangeLeftSide(
+				-1.0, fLeft, 1.0, fRight, ratio, fTop, -ratio, fBottom);
 		}
 	} else
 		fChildArea->SetContentAspectRatio(ratio);
@@ -586,7 +498,6 @@ Area::SetAlignment(BAlignment alignment)
 {
 	fAlignment = alignment;
 	UpdateHorizontal();
-	fLS->InvalidateLayout();
 	UpdateVertical();
 	fLS->InvalidateLayout();
 }
@@ -751,17 +662,9 @@ Area::SetDefaultPrefContentSize()
 Constraint*
 Area::HasSameWidthAs(Area* area)
 {
-	BList* coeffs = new BList(4);
-	coeffs->AddItem(new double(-1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(-1.0));
-	BList* vars = new BList(4);
-	vars->AddItem(fLeft);
-	vars->AddItem(fRight);
-	vars->AddItem(area->fLeft);
-	vars->AddItem(area->fRight);
-	return fLS->AddConstraint(coeffs, vars, OperatorType(EQ), 0.0);
+	return fLS->AddConstraint(
+		-1.0, fLeft, 1.0, fRight, 1.0, area->fLeft, -1.0, area->fRight, 
+		OperatorType(EQ), 0.0);
 }
 
 
@@ -774,17 +677,9 @@ Area::HasSameWidthAs(Area* area)
 Constraint*
 Area::HasSameHeightAs(Area* area)
 {
-	BList* coeffs = new BList(4);
-	coeffs->AddItem(new double(-1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(-1.0));
-	BList* vars = new BList(4);
-	vars->AddItem(fTop);
-	vars->AddItem(fBottom);
-	vars->AddItem(area->fTop);
-	vars->AddItem(area->fBottom);
-	return fLS->AddConstraint(coeffs, vars, OperatorType(EQ), 0.0);
+	return fLS->AddConstraint(
+		-1.0, fTop, 1.0, fBottom, 1.0, area->fTop, -1.0, area->fBottom, 
+		OperatorType(EQ), 0.0);
 }
 
 
@@ -891,23 +786,11 @@ Area::Init(BALMLayout* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	
 	// adds the two essential constraints of the area that make sure that the left x-tab is 
 	// really to the left of the right x-tab, and the top y-tab really above the bottom y-tab
-	BList* coeffs = new BList(2);
-	coeffs->AddItem(new double(-1.0));
-	coeffs->AddItem(new double(1.0));
-	BList* vars = new BList(2);
-	vars->AddItem(left);
-	vars->AddItem(right);
-	fMinContentWidth = ls->AddConstraint(coeffs, vars, OperatorType(GE),
+	fMinContentWidth = ls->AddConstraint(-1.0, left, 1.0, right, OperatorType(GE),
 			minContentSize.Width());
 	fConstraints->AddItem(fMinContentWidth);
 	
-	BList* coeffs2 = new BList(2);
-	coeffs2->AddItem(new double(-1.0));
-	coeffs2->AddItem(new double(1.0));
-	BList* vars2 = new BList(2);
-	vars2->AddItem(top);
-	vars2->AddItem(bottom);
-	fMinContentHeight = ls->AddConstraint(coeffs2, vars2, OperatorType(GE),
+	fMinContentHeight = ls->AddConstraint(-1.0, top, 1.0, bottom, OperatorType(GE),
 			minContentSize.Height());
 	fConstraints->AddItem(fMinContentHeight);
 }
@@ -946,13 +829,13 @@ Area::InitChildArea()
 	// coresponding tabs of this area (for a start)
 	fChildArea = new Area(fLS, new XTab(fLS), new YTab(fLS), new XTab(fLS),
 			new YTab(fLS), fContent, BSize(0, 0));
-	fLeftConstraint = Left()->IsEqual(fChildArea->Left());
+	fLeftConstraint = fLeft->IsEqual(fChildArea->Left());
 	fConstraints->AddItem(fLeftConstraint);
-	fTopConstraint = Top()->IsEqual(fChildArea->Top());
+	fTopConstraint = fTop->IsEqual(fChildArea->Top());
 	fConstraints->AddItem(fTopConstraint);
-	fRightConstraint = Right()->IsEqual(fChildArea->Right());
+	fRightConstraint = fRight->IsEqual(fChildArea->Right());
 	fConstraints->AddItem(fRightConstraint);
-	fBottomConstraint = Bottom()->IsEqual(fChildArea->Bottom());
+	fBottomConstraint = fBottom->IsEqual(fChildArea->Bottom());
 	fConstraints->AddItem(fBottomConstraint);
 	
 	// remove the minimum content size constraints from this area
@@ -972,22 +855,10 @@ Area::InitChildArea()
 		fChildArea->fMaxContentSize = fMaxContentSize;
 		
 		fChildArea->fMaxContentWidth = fMaxContentWidth;
-		BList* coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		BList* vars = new BList(2);
-		vars->AddItem(fChildArea->Left());
-		vars->AddItem(fChildArea->Right());
-		fMaxContentWidth->ChangeLeftSide(coeffs, vars);
+		fMaxContentWidth->ChangeLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
 		
 		fChildArea->fMaxContentHeight = fMaxContentHeight;
-		BList* coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		BList* vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Top());
-		vars2->AddItem(fChildArea->Bottom());
-		fMaxContentHeight->ChangeLeftSide(coeffs2, vars2);
+		fMaxContentHeight->ChangeLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
 	}
 	
 	// if there are preferred content size constraints on this area, 
@@ -999,22 +870,10 @@ Area::InitChildArea()
 		fChildArea->fExpandRigidity = fExpandRigidity;
 		
 		fChildArea->fPrefContentWidth = fPrefContentWidth;
-		BList* coeffs3 = new BList(2);
-		coeffs3->AddItem(new double(-1.0));
-		coeffs3->AddItem(new double(1.0));
-		BList* vars3 = new BList(2);
-		vars3->AddItem(fChildArea->Left());
-		vars3->AddItem(fChildArea->Right());
-		fPrefContentWidth->ChangeLeftSide(coeffs3, vars3);
+		fPrefContentWidth->ChangeLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
 		
 		fChildArea->fPrefContentHeight = fPrefContentHeight;
-		BList* coeffs4 = new BList(2);
-		coeffs4->AddItem(new double(-1.0));
-		coeffs4->AddItem(new double(1.0));
-		BList* vars4 = new BList(2);
-		vars4->AddItem(fChildArea->Top());
-		vars4->AddItem(fChildArea->Bottom());
-		fPrefContentHeight->ChangeLeftSide(coeffs4, vars4);
+		fPrefContentHeight->ChangeLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
 	}
 }
 
@@ -1028,116 +887,47 @@ Area::UpdateHorizontal()
 	// if the area does not have a childAdrea yet, this is the time to add it
 	if (fChildArea == NULL)
 		InitChildArea();
-	
-	BList* coeffs;
-	BList* coeffs2;
-	BList* vars;
-	BList* vars2;
-	
+
 	// change the constraints leftConstraint and rightConstraint so that the horizontal 
 	// alignment and insets of the childArea within this area are as specified by the user
 	if (fAlignment.Horizontal() == B_ALIGN_LEFT) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Left());
-		vars->AddItem(fChildArea->Left());
-		fLeftConstraint->ChangeLeftSide(coeffs, vars);
+		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(EQ));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Right());
-		vars2->AddItem(Right());
-		fRightConstraint->ChangeLeftSide(coeffs2, vars2);
+		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(GE));
 		fRightConstraint->SetRightSide(fRightInset);
 	} else if (fAlignment.Horizontal() == B_ALIGN_RIGHT) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Left());
-		vars->AddItem(fChildArea->Left());
-		fLeftConstraint->ChangeLeftSide(coeffs, vars);
+		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(GE));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Right());
-		vars2->AddItem(Right());
-		fRightConstraint->ChangeLeftSide(coeffs2, vars2);
+		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(EQ));
 		fRightConstraint->SetRightSide(fRightInset);
 	} else if (fAlignment.Horizontal() == B_ALIGN_HORIZONTAL_CENTER) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Left());
-		vars->AddItem(fChildArea->Left());
-		fLeftConstraint->ChangeLeftSide(coeffs, vars);
+		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(GE));
 		fLeftConstraint->SetRightSide(max(fLeftInset, fRightInset));
 		
-		coeffs2 = new BList(4);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		coeffs2->AddItem(new double(1.0));
-		coeffs2->AddItem(new double(-1.0));
-		vars2 = new BList(4);
-		vars2->AddItem(Left());
-		vars2->AddItem(fChildArea->Left());
-		vars2->AddItem(fChildArea->Right());
-		vars2->AddItem(Right());
-		fRightConstraint->ChangeLeftSide(coeffs2, vars2);
+		fRightConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left(), 1.0, fChildArea->Right(), -1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(EQ));
 		fRightConstraint->SetRightSide(0);
 	} else if (fAlignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Left());
-		vars->AddItem(fChildArea->Left());
-		fLeftConstraint->ChangeLeftSide(coeffs, vars);
+		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(EQ));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Right());
-		vars2->AddItem(Right());
-		fRightConstraint->ChangeLeftSide(coeffs2, vars2);
+		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(EQ));
 		fRightConstraint->SetRightSide(fRightInset);
 	} else if (fAlignment.Horizontal() == B_ALIGN_HORIZONTAL_UNSET) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Left());
-		vars->AddItem(fChildArea->Left());
-		fLeftConstraint->ChangeLeftSide(coeffs, vars);
+		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(GE));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Right());
-		vars2->AddItem(Right());
-		fRightConstraint->ChangeLeftSide(coeffs2, vars2);
+		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(GE));
 		fRightConstraint->SetRightSide(fRightInset);
 	}
@@ -1152,115 +942,46 @@ void Area::UpdateVertical() {
 	if (fChildArea == NULL) 
 		InitChildArea();
 	
-	BList* coeffs;
-	BList* coeffs2;
-	BList* vars;
-	BList* vars2;
-	
 	// change the constraints topConstraint and bottomConstraint so that the vertical 
 	// alignment and insets of the childArea within this area are as specified by the user
 	if (fAlignment.Vertical() == B_ALIGN_TOP) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Top());
-		vars->AddItem(fChildArea->Top());
-		fTopConstraint->ChangeLeftSide(coeffs, vars);
+		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(EQ));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Bottom());
-		vars2->AddItem(Bottom());
-		fBottomConstraint->ChangeLeftSide(coeffs2, vars2);
+		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(GE));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	} else if (fAlignment.Vertical() == B_ALIGN_BOTTOM) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Top());
-		vars->AddItem(fChildArea->Top());
-		fTopConstraint->ChangeLeftSide(coeffs, vars);
+		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(GE));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Bottom());
-		vars2->AddItem(Bottom());
-		fBottomConstraint->ChangeLeftSide(coeffs2, vars2);
+		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(EQ));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	} else if (fAlignment.Vertical() == B_ALIGN_VERTICAL_CENTER) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Top());
-		vars->AddItem(fChildArea->Top());
-		fTopConstraint->ChangeLeftSide(coeffs, vars);
+		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(GE));
 		fTopConstraint->SetRightSide(max(fTopInset, fBottomInset));
 		
-		coeffs2 = new BList(4);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		coeffs2->AddItem(new double(1.0));
-		coeffs2->AddItem(new double(-1.0));
-		vars2 = new BList(4);
-		vars2->AddItem(Top());
-		vars2->AddItem(fChildArea->Top());
-		vars2->AddItem(fChildArea->Bottom());
-		vars2->AddItem(Bottom());
-		fBottomConstraint->ChangeLeftSide(coeffs2, vars2);
+		fBottomConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top(), 1.0, fChildArea->Bottom(), -1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(EQ));
 		fBottomConstraint->SetRightSide(0);
 	} else if (fAlignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Top());
-		vars->AddItem(fChildArea->Top());
-		fTopConstraint->ChangeLeftSide(coeffs, vars);
+		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(EQ));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Bottom());
-		vars2->AddItem(Bottom());
-		fBottomConstraint->ChangeLeftSide(coeffs2, vars2);
+		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(EQ));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	} else if (fAlignment.Vertical() == B_ALIGN_VERTICAL_UNSET) {
-		coeffs = new BList(2);
-		coeffs->AddItem(new double(-1.0));
-		coeffs->AddItem(new double(1.0));
-		vars = new BList(2);
-		vars->AddItem(Top());
-		vars->AddItem(fChildArea->Top());
-		fTopConstraint->ChangeLeftSide(coeffs, vars);
+		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(GE));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		coeffs2 = new BList(2);
-		coeffs2->AddItem(new double(-1.0));
-		coeffs2->AddItem(new double(1.0));
-		vars2 = new BList(2);
-		vars2->AddItem(fChildArea->Bottom());
-		vars2->AddItem(Bottom());
-		fBottomConstraint->ChangeLeftSide(coeffs2, vars2);
+		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(GE));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	}

@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "PenaltyFunction.h"
 #include "Constraint.h"
 #include "ObjFunctionSummand.h"
@@ -27,29 +33,15 @@ PenaltyFunction::PenaltyFunction(LinearSpec* ls, Variable* var, BList* xs, BList
 	fGs = gs;
 	fConstraints = new BList(1);
 	fObjFunctionSummands = new BList(1);
-	
-	BList* coeffs = new BList(1);
-	coeffs->AddItem(new double(1.0));
-	
-	BList* vars = new BList(1);
-	vars->AddItem(var);
-	
-	fConstraints->AddItem(ls->AddSoftConstraint(coeffs, vars, OperatorType(EQ), 
+		
+	fConstraints->AddItem(ls->AddConstraint(1.0, var, OperatorType(EQ), 
 		*(double*)(xs->ItemAt(0)), -*(double*)(gs->ItemAt(0)), 
 		*(double*)(gs->ItemAt(1))));
 	
 	for (int32 i = 1; i < sizeGs; i++) {
 		Variable* dPos = ls->AddVariable();
-		
-		BList* coeffs = new BList(2);
-		coeffs->AddItem(new double(1.0));
-		coeffs->AddItem(new double(-1.0));
-		
-		BList* vars = new BList(2);
-		vars->AddItem(var);
-		vars->AddItem(dPos);
-		
-		fConstraints->AddItem(ls->AddConstraint(coeffs, vars, OperatorType(LE), 
+			
+		fConstraints->AddItem(ls->AddConstraint(1.0, var, -1.0, dPos, OperatorType(LE), 
 			*(double*)(xs->ItemAt(i))));
 		
 		fObjFunctionSummands->AddItem(ls->AddObjFunctionSummand(

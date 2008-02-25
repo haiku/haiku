@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "Column.h"
 #include "BALMLayout.h"
 #include "OperatorType.h"
@@ -152,19 +158,9 @@ Column::InsertAfter(Column* column)
 Constraint*
 Column::HasSameWidthAs(Column* column)
 {
-	BList* coeffs = new BList(4);
-	coeffs->AddItem(new double(-1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(-1.0));
-	
-	BList* vars = new BList(4);
-	vars->AddItem(fLeft);
-	vars->AddItem(fRight);
-	vars->AddItem(column->fLeft);
-	vars->AddItem(column->fRight);
-	
-	Constraint* constraint = fLS->AddConstraint(coeffs, vars, OperatorType(EQ), 0.0);
+	Constraint* constraint = fLS->AddConstraint(
+		-1.0, fLeft, 1.0, fRight, 1.0, column->fLeft, -1.0, column->fRight,
+		OperatorType(EQ), 0.0);
 	fConstraints->AddItem(constraint);
 	return constraint;
 }

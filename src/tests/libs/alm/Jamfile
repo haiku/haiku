@@ -22,3 +22,9 @@ Application ALMTest2 :
 	be liblpsolve55.so be liblinprog.so libalm.so
 ;
 
+Application ALMSimpleTest :
+	SimpleTest.cpp
+	:
+	be liblpsolve55.so be liblinprog.so libalm.so
+;
+

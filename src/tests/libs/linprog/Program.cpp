@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <List.h>
 #include <SupportDefs.h>
@@ -10,7 +15,9 @@
 #include <stdio.h>
 
 
-void PrintVars(LinearSpec* ls) {
+void
+PrintVars(LinearSpec* ls)
+{
 	int32 size = ls->Variables()->CountItems();
 	Variable* variable;
 	for (int i = 0; i < size; i++) {
@@ -21,7 +28,9 @@ void PrintVars(LinearSpec* ls) {
 }
 
 
-void Test1() {
+void
+Test1()
+{
 	LinearSpec* ls = new LinearSpec();
 	Variable* x1 = ls->AddVariable();
 	Variable* x2 = ls->AddVariable();
@@ -62,6 +71,9 @@ void Test1() {
 }
 
 
-int main() {
+int
+main()
+{
 	Test1();
 }
+

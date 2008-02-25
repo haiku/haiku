@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #ifndef	VARIABLE_H
 #define	VARIABLE_H
 
@@ -17,15 +23,15 @@ class Variable {
 public:
 	int32				Index();
 	LinearSpec*			LS() const;
-	void					SetLS(LinearSpec* value);
+	void				SetLS(LinearSpec* value);
 	double				Value() const;
-	void					SetValue(double value);
+	void				SetValue(double value);
 	double				Min() const;
-	void					SetMin(double min);
+	void				SetMin(double min);
 	double				Max() const;
-	void					SetMax(double max);
-	void					SetRange(double min, double max);
-	//~ string				ToString();
+	void				SetMax(double max);
+	void				SetRange(double min, double max);
+	//~ string			ToString();
 	Constraint*			IsEqual(Variable* var);
 	Constraint*			IsSmallerOrEqual(Variable* var);
 	Constraint*			IsGreaterorEqual(Variable* var);
@@ -42,7 +48,7 @@ private:
 
 public:
 	friend class			LinearSpec;
-	friend class			SoftConstraint;
+	friend class			Constraint;
 
 };
 

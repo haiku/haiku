@@ -1,5 +1,13 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #ifndef	OBJ_FUNCTION_SUMMAND_H
 #define	OBJ_FUNCTION_SUMMAND_H
+
+#include "Summand.h"
 
 
 namespace LinearProgramming {
@@ -10,25 +18,21 @@ class Variable;
 /**
  * A summand of the objective function.
  */
-class ObjFunctionSummand {
+class ObjFunctionSummand : public Summand {
 
 public:
-	double				Coeff();
-	void					SetCoeff(double coeff);
-	Variable*				Var();
-	void					SetVar(Variable* var);
-						~ObjFunctionSummand();
+	void		SetCoeff(double coeff);
+	void		SetVar(Variable* var);
+				~ObjFunctionSummand();
 
 protected:
 						ObjFunctionSummand(LinearSpec* ls, double coeff, Variable* var);
 
 private:
 	LinearSpec*			fLS;
-	double				fCoeff;
-	Variable*				fVar;
 
 public:
-	friend class			LinearSpec;
+	friend class		LinearSpec;
 
 };
 

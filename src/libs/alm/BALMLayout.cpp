@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "BALMLayout.h"
 #include "Area.h"
 #include "Column.h"
@@ -224,7 +230,7 @@ BALMLayout::AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 		View()->AddChild(content);
 	Area* area = new Area(this, left, top, right, bottom, content, BSize(0, 0));
 	area->SetDefaultPrefContentSize();
-	area->SetAutoPrefContentSize(true);
+	area->SetAutoPrefContentSize(false);
 	fAreas->AddItem(area);
 	return area;
 }
@@ -246,7 +252,7 @@ BALMLayout::AddArea(Row* row, Column* column, BView* content)
 		View()->AddChild(content);
 	Area* area = new Area(this, row, column, content, BSize(0, 0));
 	area->SetDefaultPrefContentSize();
-	area->SetAutoPrefContentSize(true);
+	area->SetAutoPrefContentSize(false);
 	fAreas->AddItem(area);
 	return area;
 }

@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "Constraint.h"
 #include "LinearSpec.h"
 #include "Variable.h"
@@ -21,26 +27,45 @@ Constraint::Index()
 
 
 /**
- * Gets the coefficients of the constraint.
+ * Gets the summands of the constraint.
  * 
- * @return the coefficients of the constraint
+ * @return pointer to a BList containing the summands of the constraint
  */
 BList*
-Constraint::Coeffs()
+Constraint::Summands()
 {
-	return fCoeffs;
+	return fSummands;
 }
 
 
-/**
- * Gets the variables of the constraint.
- * 
- * @return the variables of the constraint
- */
-BList*
-Constraint::Vars()
+void
+Constraint::_UpdateLeftSide()
 {
-	return fVars;
+	double coeffs[fSummands->CountItems() + 2];
+	int varIndexes[fSummands->CountItems() + 2];
+	int32 i;
+	for (i = 0; i < fSummands->CountItems(); i++) {
+		Summand* s = (Summand*)fSummands->ItemAt(i);
+		coeffs[i] = s->Coeff();
+		varIndexes[i] = s->Var()->Index();
+	}
+	
+	if (fDNegSummand != NULL && fOp != OperatorType(LE)) {
+		varIndexes[i] = fDNegSummand->Var()->Index();
+		coeffs[i] = 1.0;
+		i++;
+	}
+	
+	if (fDPosSummand != NULL && fOp != OperatorType(GE)) {
+		varIndexes[i] = fDPosSummand->Var()->Index();
+		coeffs[i] = -1.0;
+		i++;
+	}
+	
+	if (!set_rowex(fLS->LP(), this->Index(), i, &coeffs[0], &varIndexes[0]))
+		printf("Error in set_rowex.");
+	
+	fLS->RemovePresolved();
 }
 
 
@@ -48,32 +73,61 @@ Constraint::Vars()
  * Changes the left side of the constraint, i.e.&nbsp;its coefficients and variables.
  * There must be exactly one coefficient for each variable.
  * 
- * @param coeffs	the new coefficients
- * @param vars		the new variables
+ * @param summands	a BList containing the Summand objects that make up the new left side
  */
 void
-Constraint::ChangeLeftSide(BList* coeffs, BList* vars)
+Constraint::ChangeLeftSide(BList* summands)
 {
-	int32 sizeCoeffs = coeffs->CountItems();
-	int32 sizeVars = vars->CountItems();
-	if (sizeCoeffs != sizeVars)
-		printf("Number of coefficients and number of variables in a constraint must be equal.");
-	
-	fCoeffs = coeffs;
-	fVars = vars;
-	
-	double coeffsArray[sizeCoeffs];
-	for (int32 i = 0; i < sizeCoeffs; i++)
-	coeffsArray[i] = *(double*)coeffs->ItemAt(i);
-	
-	int vIndexes[sizeCoeffs];
-	for (int32 i = 0; i < sizeVars; i++)
-		vIndexes[i] = ((Variable*)vars->ItemAt(i))->Index();
+	fSummands = summands;
+	_UpdateLeftSide();
+}
 
-	if (!set_rowex(fLS->LP(), this->Index(), sizeCoeffs, &coeffsArray[0], &vIndexes[0]))
-		printf("Error in set_rowex.");
+
+void
+Constraint::ChangeLeftSide(double coeff1, Variable* var1)
+{
+	fSummands->MakeEmpty();
+	fSummands->AddItem(new Summand(coeff1, var1));
+	_UpdateLeftSide();
+}
+
+
+void
+Constraint::ChangeLeftSide(double coeff1, Variable* var1, 
+	double coeff2, Variable* var2)
+{
+	fSummands->MakeEmpty();
+	fSummands->AddItem(new Summand(coeff1, var1));
+	fSummands->AddItem(new Summand(coeff2, var2));
+	_UpdateLeftSide();
+}
+
 	
-	fLS->RemovePresolved();
+void
+Constraint::ChangeLeftSide(double coeff1, Variable* var1, 
+	double coeff2, Variable* var2,
+	double coeff3, Variable* var3)
+{
+	fSummands->MakeEmpty();
+	fSummands->AddItem(new Summand(coeff1, var1));
+	fSummands->AddItem(new Summand(coeff2, var2));
+	fSummands->AddItem(new Summand(coeff3, var3));
+	_UpdateLeftSide();
+}
+
+
+void
+Constraint::ChangeLeftSide(double coeff1, Variable* var1,
+	double coeff2, Variable* var2,
+	double coeff3, Variable* var3,
+	double coeff4, Variable* var4)
+{
+	fSummands->MakeEmpty();
+	fSummands->AddItem(new Summand(coeff1, var1));
+	fSummands->AddItem(new Summand(coeff2, var2));
+	fSummands->AddItem(new Summand(coeff3, var3));
+	fSummands->AddItem(new Summand(coeff4, var4));
+	_UpdateLeftSide();
 }
 
 
@@ -136,18 +190,156 @@ Constraint::SetRightSide(double value)
 }
 
 
-// Needs to be fixed. Use BString. Substring?
-//~ string Constraint::ToString() {
-	//~ string s = "";
-	//~ for (int32 i = 0; i < fVars->CountItems(); i++)
-		//~ s += (double)fCoeffs->ItemAt(i) + "*" + (Variable*)fVars->ItemAt(i).ToString() + " + ";
-	//~ s = s.Substring(0, s.Length - 2);
-	//~ if (Op == OperatorType.EQ) s += "= ";
-	//~ else if (Op == OperatorType.GE) s += ">= ";
-	//~ else s += "<= ";
-	//~ s += rightSide.ToString();
-	//~ return s;
-//~ }
+/**
+ * Gets the penalty coefficient for negative deviations.
+ * 
+ * @return the penalty coefficient
+ */
+double
+Constraint::PenaltyNeg()
+{
+	if (fDNegSummand == NULL)
+		return INFINITY;
+	return fDNegSummand->Coeff();
+}
+
+
+/**
+ * The penalty coefficient for negative deviations from the soft constraint's exact solution,&nbsp;
+ * i.e. if the left side is too large.
+ * 
+ * @param value	coefficient of negative penalty <code>double</code>
+ */
+void
+Constraint::SetPenaltyNeg(double value)
+{
+	if (fDNegSummand == NULL) {
+		fDNegSummand = fLS->AddObjFunctionSummand(value, new Variable(fLS));
+		ChangeLeftSide(fSummands);
+		fLS->UpdateObjFunction();
+		return;
+	}
+	
+	if (value == fDNegSummand->Coeff())
+		return;
+	fDNegSummand->SetCoeff(value);
+	fLS->UpdateObjFunction();
+}
+
+
+/**
+ * Gets the penalty coefficient for positive deviations.
+ * 
+ * @return the penalty coefficient
+ */
+double
+Constraint::PenaltyPos()
+{
+	if (fDPosSummand == NULL)
+		return INFINITY;
+	return fDPosSummand->Coeff();
+}
+
+
+/**
+ * The penalty coefficient for negative deviations from the soft constraint's exact solution,
+ * i.e. if the left side is too small.
+ * 
+ * @param value	coefficient of positive penalty <code>double</code>
+ */
+void
+Constraint::SetPenaltyPos(double value)
+{
+	if (fDPosSummand == NULL) {
+		fDPosSummand = fLS->AddObjFunctionSummand(value, new Variable(fLS));
+		ChangeLeftSide(fSummands);
+		fLS->UpdateObjFunction();
+		return;
+	}
+
+	if (value == fDPosSummand->Coeff())
+		return;
+	fDPosSummand->SetCoeff(value);
+	fLS->UpdateObjFunction();
+}
+
+
+/**
+ * Gets the slack variable for the negative variations.
+ * 
+ * @return the slack variable for the negative variations
+ */
+Variable*
+Constraint::DNeg() const
+{
+	if (fDNegSummand == NULL)
+		return NULL;
+	return fDNegSummand->Var();
+}
+
+
+/**
+ * Gets the slack variable for the positive variations.
+ * 
+ * @return the slack variable for the positive variations
+ */
+Variable*
+Constraint::DPos() const
+{
+	if (fDPosSummand == NULL)
+		return NULL;
+	return fDPosSummand->Var();
+}
+
+
+/**
+ * Constructor.
+ */
+Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op, 
+	double rightSide, double penaltyNeg, double penaltyPos)
+{
+	fLS = ls;
+	fSummands = summands;
+	fOp = op;
+	fRightSide = rightSide;
+		
+	double coeffs[summands->CountItems() + 2];
+	int varIndexes[summands->CountItems() + 2];
+	int32 i;
+	for (i = 0; i < summands->CountItems(); i++) {
+		Summand* s = (Summand*)summands->ItemAt(i);
+		coeffs[i] = s->Coeff();
+		varIndexes[i] = s->Var()->Index();
+	}
+	
+	if (penaltyNeg != INFINITY
+		&& fOp != OperatorType(LE)) {
+		fDNegSummand = ls->AddObjFunctionSummand(penaltyNeg, new Variable(ls));
+		varIndexes[i] = fDNegSummand->Var()->Index();
+		coeffs[i] = 1.0;
+		i++;
+	}
+	else
+		fDNegSummand = NULL;
+	
+	if (penaltyPos != INFINITY
+		&& fOp != OperatorType(GE)) {
+		fDPosSummand = ls->AddObjFunctionSummand(penaltyPos, new Variable(ls));
+		varIndexes[i] = fDPosSummand->Var()->Index();
+		coeffs[i] = -1.0;
+		i++;
+	}
+	else
+		fDPosSummand = NULL;
+
+	if (!add_constraintex(ls->LP(), i, &coeffs[0], &varIndexes[0],
+			((fOp == OperatorType(EQ)) ? EQ
+			: (fOp == OperatorType(GE)) ? GE
+			: LE), rightSide))
+		printf("Error in add_constraintex.");
+
+	ls->Constraints()->AddItem(this);
+}
 
 
 /**
@@ -157,50 +349,15 @@ Constraint::SetRightSide(double value)
 Constraint::~Constraint()
 {
 	del_constraint(fLS->LP(), Index());
-	delete fCoeffs;
-	delete fVars;
+	delete fSummands;
+	if(fDNegSummand != NULL) {
+		delete fDNegSummand->Var();
+		delete fDNegSummand;
+	}
+	if(fDPosSummand != NULL) {
+		delete fDPosSummand->Var();
+		delete fDPosSummand;
+	}
 	fLS->Constraints()->RemoveItem(this);
-}
-
-
-/**
- * Default constructor.
- */
-Constraint::Constraint() {}
-
-
-/**
- * Constructor.
- */
-Constraint::Constraint(LinearSpec* ls, BList* coeffs, BList* vars, OperatorType op, 
-	double rightSide)
-{
-			
-	int32 sizeCoeffs = coeffs->CountItems();
-	int32 sizeVars = vars->CountItems();
-	if (sizeCoeffs != sizeVars)
-		printf("Number of coefficients and number of variables in a constraint must be equal.");
-	
-	fLS = ls;
-	fCoeffs = coeffs;
-	fVars = vars;
-	fOp = op;
-	fRightSide = rightSide;
-	
-	double coeffsArray[sizeCoeffs];
-	for (int32 i = 0; i < sizeCoeffs; i++)
-		coeffsArray[i] = *(double*)coeffs->ItemAt(i);
-	
-	int vIndexes[sizeCoeffs];
-	for (int32 i = 0; i < sizeVars; i++)
-		vIndexes[i] = ((Variable*)vars->ItemAt(i))->Index();
-	
-	if (!add_constraintex(ls->LP(), sizeCoeffs, &coeffsArray[0], &vIndexes[0],
-			((op == OperatorType(EQ)) ? EQ
-			: (op == OperatorType(GE)) ? GE
-			: LE), rightSide))
-		printf("Error in add_constraintex.");
-	
-	ls->Constraints()->AddItem(this);
 }
 

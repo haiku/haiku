@@ -1,18 +1,12 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "ObjFunctionSummand.h"
 #include "Variable.h"
 #include "LinearSpec.h"
-
-
-/**
- * Gets the summmand's coefficient.
- * 
- * @return the summand's coefficient
- */
-double
-ObjFunctionSummand::Coeff()
-{
-	return fCoeff;
-}
 
 
 /**
@@ -23,20 +17,8 @@ ObjFunctionSummand::Coeff()
 void
 ObjFunctionSummand::SetCoeff(double coeff)
 {
-	fCoeff = coeff;
+	Summand::SetCoeff(coeff);
 	fLS->UpdateObjFunction();
-}
-
-
-/**
- * Gets the summand's variable.
- * 
- * @return the summand's variable
- */
-Variable*
-ObjFunctionSummand::Var()
-{
-	return fVar;
 }
 
 
@@ -48,7 +30,7 @@ ObjFunctionSummand::Var()
 void
 ObjFunctionSummand::SetVar(Variable* var)
 {
-	fVar = var;
+	Summand::SetVar(var);
 	fLS->UpdateObjFunction();
 }
 
@@ -68,9 +50,8 @@ ObjFunctionSummand::~ObjFunctionSummand()
  * Constructor.
  */
 ObjFunctionSummand::ObjFunctionSummand(LinearSpec* ls, double coeff, Variable* var)
+	: Summand(coeff, var)
 {
 	fLS = ls;
-	fCoeff = coeff;
-	fVar = var;
 }
 

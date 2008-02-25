@@ -1,3 +1,8 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <Application.h>
 #include <File.h>
@@ -14,9 +19,9 @@ using namespace BALM;
 
 class TableTestWindow : public BWindow {
 public:
-	TableTestWindow(BRect frame) : BWindow(frame, "TableTest", B_TITLED_WINDOW,
-			B_QUIT_ON_WINDOW_CLOSE) {
-		
+	TableTestWindow(BRect frame) 
+		: BWindow(frame, "TableTest", B_TITLED_WINDOW, B_QUIT_ON_WINDOW_CLOSE) 
+	{	
 		BALMLayout* fLS = new BALMLayout();
 		
 		SetLayout(fLS);
@@ -55,7 +60,9 @@ public:
 
 class TableTest : public BApplication {
 public:
-	TableTest() : BApplication("application/x-vnd.haiku.table-test") {
+	TableTest() 
+		: BApplication("application/x-vnd.haiku.table-test")
+	{
 		BRect frameRect;
 		frameRect.Set(100, 100, 400, 400);
 		TableTestWindow* theWindow = new TableTestWindow(frameRect);
@@ -63,8 +70,11 @@ public:
 };
 
 
-int main() {
+int
+main()
+{
 	TableTest test;
 	test.Run();
 	return 0;
 }
+

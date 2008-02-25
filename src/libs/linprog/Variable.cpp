@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "Variable.h"
 #include "Constraint.h"
 #include "LinearSpec.h"
@@ -156,15 +162,7 @@ Variable::SetRange(double min, double max)
 Constraint*
 Variable::IsEqual(Variable* var)
 {
-	BList* coeffs = new BList(2);
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(-1.0));
-	
-	BList* vars = new BList(2);
-	vars->AddItem(this);
-	vars->AddItem(var);
-	
-	return fLS->AddConstraint(coeffs, vars, OperatorType(EQ), 0.0);
+	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(EQ), 0.0);
 }
 
 
@@ -177,15 +175,7 @@ Variable::IsEqual(Variable* var)
 Constraint*
 Variable::IsSmallerOrEqual(Variable* var)
 {
-	BList* coeffs = new BList(2);
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(-1.0));
-	
-	BList* vars = new BList(2);
-	vars->AddItem(this);
-	vars->AddItem(var);
-	
-	return fLS->AddConstraint(coeffs, vars, OperatorType(LE), 0.0);
+	return fLS->AddConstraint(1.0, this, -1.0, var, OperatorType(LE), 0.0);
 }
 
 
@@ -198,15 +188,7 @@ Variable::IsSmallerOrEqual(Variable* var)
 Constraint*
 Variable::IsGreaterorEqual(Variable* var)
 {
-	BList* coeffs = new BList(2);
-	coeffs->AddItem(new double(-1.0));
-	coeffs->AddItem(new double(1.0));
-	
-	BList* vars = new BList(2);
-	vars->AddItem(var);
-	vars->AddItem(this);
-	
-	return fLS->AddConstraint(coeffs, vars, OperatorType(GE), 0.0);
+	return fLS->AddConstraint(-1.0, var, 1.0, this, OperatorType(GE), 0.0);
 }
 
 

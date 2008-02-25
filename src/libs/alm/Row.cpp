@@ -1,3 +1,9 @@
+/*
+ * Copyright 2007-2008, Christof Lutteroth, lutteroth@cs.auckland.ac.nz
+ * Copyright 2007-2008, James Kim, jkim202@ec.auckland.ac.nz
+ * Distributed under the terms of the MIT License.
+ */
+
 #include "Row.h"
 #include "BALMLayout.h"
 #include "OperatorType.h"
@@ -154,19 +160,9 @@ Row::InsertAfter(Row* row)
 Constraint*
 Row::HasSameHeightAs(Row* row)
 {
-	BList* coeffs = new BList(4);
-	coeffs->AddItem(new double(-1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(1.0));
-	coeffs->AddItem(new double(-1.0));
-	
-	BList* vars = new BList(4);
-	vars->AddItem(fTop);
-	vars->AddItem(fBottom);
-	vars->AddItem(row->fTop);
-	vars->AddItem(row->fBottom);
-	
-	Constraint* constraint = fLS->AddConstraint(coeffs, vars, OperatorType(EQ), 0.0);
+	Constraint* constraint = fLS->AddConstraint(
+		-1.0, fTop, 1.0, fBottom, 1.0, row->fTop, -1.0, row->fBottom,
+		OperatorType(EQ), 0.0);
 	fConstraints->AddItem(constraint);
 	return constraint;
 }

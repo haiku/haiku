@@ -7,9 +7,9 @@ UseLibraryHeaders lp_solve linprog ;
 SharedLibrary liblinprog.so : 
 	Constraint.cpp
 	LinearSpec.cpp
+	Summand.cpp
 	ObjFunctionSummand.cpp
 	PenaltyFunction.cpp
-	SoftConstraint.cpp
 	Variable.cpp
 	:
 	be liblpsolve55.so

@@ -4,7 +4,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UseLibraryHeaders lp_solve ;
 
-SimpleTest lp_solve : 
+SimpleTest lp_solve_test : 
 	demo.c 
 	: 
 	liblpsolve55.so
