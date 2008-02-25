@@ -35,21 +35,19 @@ hda_stream_new(hda_controller* controller, int type)
 	if (stream == NULL)
 		return NULL;
 
+	stream->buffer_ready_sem = B_ERROR;
 	stream->buffer_area = B_ERROR;
 	stream->buffer_descriptors_area = B_ERROR;
+	stream->type = type;
 
 	switch (type) {
 		case STREAM_PLAYBACK:
-			stream->buffer_ready_sem = create_sem(0, "hda_playback_sem");
 			stream->id = 1;
 			stream->off = (controller->num_input_streams * HDAC_SDSIZE);
 			controller->streams[controller->num_input_streams] = stream;
 			break;
 
 		case STREAM_RECORD:
-			stream->buffer_area = B_ERROR;
-			stream->buffer_descriptors_area = B_ERROR;
-			stream->buffer_ready_sem = create_sem(0, "hda_record_sem");
 			stream->id = 2;
 			stream->off = 0;
 			controller->streams[0] = stream;
@@ -69,6 +67,11 @@ hda_stream_new(hda_controller* controller, int type)
 status_t
 hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
+	stream->buffer_ready_sem = create_sem(0,
+		stream->type == STREAM_PLAYBACK ? "hda_playback_sem" : "hda_record_sem");
+	if (stream->buffer_ready_sem < B_OK)
+		return stream->buffer_ready_sem;
+
 	OREG8(controller, stream->off, CTL0) |= CTL0_RUN;
 
 	while (!(OREG8(controller, stream->off, CTL0) & CTL0_RUN))
@@ -121,6 +124,8 @@ hda_stream_stop(hda_controller* controller, hda_stream* stream)
 		snooze(1);
 
 	stream->running = false;
+	delete_sem(stream->buffer_ready_sem);
+	stream->buffer_ready_sem = -1;
 
 	return B_OK;
 }
@@ -211,11 +216,12 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, stream->num_buffers);
 
-	/* Setup BDL entries */	
+	/* Setup buffer descriptor list (BDL) entries */	
 	for (index = 0; index < stream->num_buffers; index++, bufferDescriptors++) {
 		bufferDescriptors->address = stream->physical_buffers[index];
 		bufferDescriptors->length = bufferSize;
 		bufferDescriptors->ioc = 1;
+			// we want an interrupt after every buffer
 	}
 
 	/* Configure stream registers */
@@ -502,7 +508,7 @@ hda_hw_corb_rirb_init(hda_controller* controller)
 	/* NOTE: See HDA011 for corrected procedure! */
 	REG16(controller, CORBRP) = CORBRP_RST;
 	do {
-		snooze(10);
+		spin(10);
 	} while ( !(REG16(controller, CORBRP) & CORBRP_RST) );
 	REG16(controller, CORBRP) = 0;
 
@@ -631,9 +637,10 @@ hda_hw_stop(hda_controller* controller)
 	int index;
 
 	/* Stop all audio streams */
-	for (index = 0; index < HDA_MAX_STREAMS; index++)
+	for (index = 0; index < HDA_MAX_STREAMS; index++) {
 		if (controller->streams[index] && controller->streams[index]->running)
 			hda_stream_stop(controller, controller->streams[index]);
+	}
 }
 
 

@@ -140,6 +140,13 @@ get_global_format(hda_audio_group* audioGroup, multi_format_info* data)
 static status_t
 set_global_format(hda_audio_group* audioGroup, multi_format_info* data)
 {
+	// TODO: it looks like we're not supposed to fail; fix this!
+#if 0
+	if ((data->output.format & audioGroup->supported_formats) == 0)
+		|| (data->output.rate & audioGroup->supported_rates) == 0)
+		return B_BAD_VALUE;
+#endif
+
 	audioGroup->playback_stream->sample_format = data->output.format;
 	audioGroup->playback_stream->sample_rate = data->output.rate;
 	audioGroup->playback_stream->sample_size = format2size(
@@ -181,8 +188,8 @@ list_mix_channels(hda_audio_group* audioGroup, multi_mix_channel_info *data)
 static status_t
 get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 {
-	uint32 playback_sample_size = audioGroup->playback_stream->sample_size;
-	uint32 record_sample_size = audioGroup->record_stream->sample_size;
+	uint32 playbackSampleSize = audioGroup->playback_stream->sample_size;
+	uint32 recordSampleSize = audioGroup->record_stream->sample_size;
 	uint32 cidx, bidx;
 	status_t status;
 
@@ -257,9 +264,9 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 		for (cidx = 0; cidx < data->return_playback_channels; cidx++) {
 			data->playback_buffers[bidx][cidx].base
 				= audioGroup->playback_stream->buffers[bidx]
-					+ (playback_sample_size * cidx);
+					+ playbackSampleSize * cidx;
 			data->playback_buffers[bidx][cidx].stride
-				= playback_sample_size * data->return_playback_channels;
+				= playbackSampleSize * data->return_playback_channels;
 		}
 	}
 
@@ -267,9 +274,9 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 		for (cidx = 0; cidx < data->return_record_channels; cidx++) {
 			data->record_buffers[bidx][cidx].base
 				= audioGroup->record_stream->buffers[bidx]
-					+ (record_sample_size * cidx);
+					+ recordSampleSize * cidx;
 			data->record_buffers[bidx][cidx].stride
-				= record_sample_size * data->return_record_channels;
+				= recordSampleSize * data->return_record_channels;
 		}
 	}
 
@@ -322,9 +329,6 @@ buffer_force_stop(hda_audio_group* audioGroup)
 {
 	hda_stream_stop(audioGroup->codec->controller, audioGroup->playback_stream);
 	//hda_stream_stop(audioGroup->codec->controller, audioGroup->record_stream);
-
-	delete_sem(audioGroup->playback_stream->buffer_ready_sem);
-//	delete_sem(audioGroup->record_stream->buffer_ready_sem);
 
 	return B_OK;
 }

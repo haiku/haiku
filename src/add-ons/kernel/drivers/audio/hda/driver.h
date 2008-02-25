@@ -52,17 +52,17 @@ enum {
 	STREAM_RECORD
 };
 
-/* hda_stream_info
+/* hda_stream
  *
  * This structure describes a single stream of audio data,
  * which is can have multiple channels (for stereo or better).
  */
-
-typedef struct hda_stream_info {
+typedef struct hda_stream {
 	uint32		id;					/* HDA controller stream # */
 	uint32		off;				/* HDA I/O/B descriptor offset */
 	bool		running;			/* Is this stream active? */
 	spinlock	lock;				/* Write lock */
+	uint32		type;
 
 	uint32		pin_widget;			/* PIN Widget ID */
 	uint32		io_widget;			/* Input/Output Converter Widget ID */
