@@ -308,8 +308,12 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 		io_vectors[vector].unhandled_count++;
 		io_vectors[vector].ignored_count++;
 	}
-	// disable interrupt when more than 99% are unhandled
-	if (io_vectors[vector].trigger_count > 100000) {
+
+	// disable interrupt when more than 99% are unhandled and this is not a
+	// shared interrupt
+	if (io_vectors[vector].trigger_count > 100000
+	 && !(io_vectors[vector].handler_list.next != NULL
+	 && io_vectors[vector].handler_list.next->next != NULL)) {
 		if (io_vectors[vector].ignored_count > 99000) {
 			io_vectors[vector].enable_count = -100;
 			arch_int_disable_io_interrupt(vector);
