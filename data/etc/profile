@@ -20,6 +20,8 @@ bind '"\e[6~":history-search-backward'
 alias ls="ls --color"
 alias ll="ls -l"
 alias la="ls -A"
+alias lal="ls -Al"
+alias m="more"
 
 #
 # and now we include a few useful things...
