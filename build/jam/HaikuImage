@@ -324,12 +324,6 @@ AddFilesToHaikuImage beos etc KanBe dic canna : $(kanbeDicCanna) ;
 AddDirectoryToHaikuImage beos etc KanBe dic group ;
 AddDirectoryToHaikuImage beos etc KanBe dic user ;
 
-#local libnetFiles = networks protocols resolv.conf services ;
-#libnetFiles = $(libnetFiles:G=libnet-files) ;
-#SEARCH on $(libnetFiles)
-#	= [ FDirName $(HAIKU_TOP) src kits network compat libnet ] ;
-#AddFilesToHaikuImage beos etc : $(libnetFiles) ;
-
 local keymapFiles = [ GLOB [ FDirName $(HAIKU_TOP) src data etc keymaps ]
 	: *.keymap ] ;
 keymapFiles = $(keymapFiles:BG=keymap) ;
@@ -353,7 +347,7 @@ AddFilesToHaikuImage home config settings kernel drivers
 local networkSettingsFiles = <network-settings>services ;
 SEARCH on $(networkSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings network ] ;
-AddFilesToHaikuImage common config settings network : $(networkSettingsFiles) ;
+AddFilesToHaikuImage common settings network : $(networkSettingsFiles) ;
 
 AddSymlinkToHaikuImage home config settings
 	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
