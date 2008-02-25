@@ -1,17 +1,11 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        KeymapListItem.h
-//  Author:      Sandor Vroemisse, Jérôme Duval
-//  Description: Keymap Preferences
-//  Created :    July 12, 2004
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2004-2006 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Sandor Vroemisse
+ *		Jérôme Duval
+ */
 
 /*
  * A BStringItem modified such that it holds

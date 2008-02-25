@@ -1,17 +1,10 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        Keymap.h
-//  Author:      Jérôme Duval
-//  Description: Keymap Preferences
-//  Created :    July 12, 2004
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2004-2008 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Jérôme Duval
+ */
 
 #ifndef KEYMAP_H
 #define KEYMAP_H

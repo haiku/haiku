@@ -1,17 +1,12 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//	Copyright (c) 2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        KeymapWindow.h
-//  Author:      Sandor Vroemisse, Jérôme Duval
-//  Description: Keymap Preferences
-//  Created :    July 12, 2004
-// 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2004-2008 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Sandor Vroemisse
+ *		Jérôme Duval
+ *		Alexandre Deckner, alex@zappotek.com
+ */
 
 #ifndef KEYMAP_WINDOW_H
 #define KEYMAP_WINDOW_H

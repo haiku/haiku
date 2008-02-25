@@ -1,11 +1,12 @@
 /*
- * Copyright 2004-2006, Haiku. All rights reserved.
+ * Copyright 2004-2006 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Authors in chronological order:
+ * Authors:
  *		Sandor Vroemisse
  *		Jérôme Duval
  */
+ 
 #ifndef KEYMAP_APPLICATION_H
 #define KEYMAP_APPLICATION_H
 
