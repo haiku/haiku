@@ -8,6 +8,8 @@
 #ifndef _BDADDR_UTILS_H
 #define _BDADDR_UTILS_H
 
+#include <stdio.h>
+
 #include <bluetooth/bluetooth.h>
 
 namespace Bluetooth {
@@ -36,16 +38,28 @@ class bdaddrUtils {
 		}
 		
 		
-		static const char* ToString(bdaddr_t bdaddr) 
+		static char* ToString(const bdaddr_t bdaddr) 
 		{
-			// TODO: 
-			static char str[12];
+			// TODO: not safe
+			static char str[18];
 			
+			sprintf(str,"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",bdaddr.b[0],
+															bdaddr.b[1],
+															bdaddr.b[2],
+															bdaddr.b[3],
+															bdaddr.b[4],
+															bdaddr.b[5]);
+															
 			return str;
 		}
 			
 };
 
 }
+
+#ifndef _BT_USE_EXPLICIT_NAMESPACE
+using Bluetooth::bdaddrUtils;
+#endif
+
 
 #endif
