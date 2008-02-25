@@ -9,6 +9,7 @@
 
 #include <new>
 #include <set>
+#include <stdlib.h>
 #include <string>
 
 #include <AppFileInfo.h>

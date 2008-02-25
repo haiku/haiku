@@ -6,9 +6,12 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz <mmlr@mlotz.ch>
  */
+#include <stdlib.h>
+
 #include <MessageAdapter.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
+
 
 namespace BPrivate {
 

@@ -9,6 +9,7 @@
 #include <list>
 #include <stack>
 #include <string>
+#include <string.h>
 #include <vector>
 
 #include "gensyscalls_common.h"

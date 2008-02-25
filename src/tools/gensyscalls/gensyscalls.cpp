@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <string>
+#include <string.h>
 #include <vector>
 
 #include "gensyscalls.h"
