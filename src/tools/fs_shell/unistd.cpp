@@ -212,6 +212,10 @@ fssh_ioctl(int fd, unsigned long op, ...)
 				struct stat status;
 
 				if (fstat(fd, &status) == 0) {
+					// Do nothing for a regular file
+					if (S_ISREG(status.st_mode))
+						break;
+
 					struct disklabel disklabel;
 					off_t mediaSize;
 
