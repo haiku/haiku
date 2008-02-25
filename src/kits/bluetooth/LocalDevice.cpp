@@ -14,6 +14,9 @@
 
 #include "bluetoothserver_p.h"
 
+/* TODO: remove me */
+#include <stdio.h>
+
 namespace Bluetooth {
 
 BMessenger*  LocalDevice::sfMessenger = NULL;
@@ -22,7 +25,7 @@ status_t
 LocalDevice::SRetrieveBluetoothMessenger(void)
 {
     if (sfMessenger == NULL || !sfMessenger->IsValid() )
-        sfMessenger = new BMessenger();
+        sfMessenger = new BMessenger(BLUETOOTH_SIGNATURE);
 
     return (sfMessenger != NULL)?B_OK:B_ERROR;
 }
@@ -30,7 +33,7 @@ LocalDevice::SRetrieveBluetoothMessenger(void)
 status_t LocalDevice::RetrieveBluetoothMessenger(void)
 {
     if (fMessenger == NULL || !fMessenger->IsValid())
-        fMessenger = new BMessenger();
+        fMessenger = new BMessenger(BLUETOOTH_SIGNATURE);
 
     return (fMessenger != NULL)?B_OK:B_ERROR;
 }
@@ -44,8 +47,9 @@ LocalDevice::RequestLocalDeviceID(BMessage* request)
     if (sfMessenger->SendMessage(request, &reply) == B_OK &&
         reply.FindInt32("hci_id", &hid) == B_OK ){		
 	    
-	    if (hid > 0)	        
+	    if (hid >= 0) {
 		    return new LocalDevice(hid);
+		}
     }
 
     return NULL;	            
@@ -192,19 +196,27 @@ LocalDevice::GetBluetoothAddress()
     if (RetrieveBluetoothMessenger() != B_OK)
         return bdaddrUtils::NullAddress();            
  
-    bdaddr_t bdaddr;
+    const bdaddr_t* bdaddr;
     BMessage request(BT_MSG_GET_ADDRESS);
     BMessage reply;
  	ssize_t	size;   
     /* ADD ID */
     request.AddInt32("hci_id", hid);
     
-    if (fMessenger->SendMessage(&request, &reply) == B_OK &&
-        reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){		
-	    
-	    return bdaddr;
-    }
+    if (fMessenger->SendMessage(&request, &reply) == B_OK) {
     
+    	if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){		
+	    
+			printf("%s: %s size=%ld\n", __FUNCTION__, bdaddrUtils::ToString(*bdaddr), size);
+			
+	    	return *bdaddr;
+	    
+	    } else {
+	    	return bdaddrUtils::NullAddress();	    
+	    }
+	    
+    }
+
 	return bdaddrUtils::NullAddress();
 }
 
