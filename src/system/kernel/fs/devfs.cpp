@@ -165,12 +165,15 @@ static status_t unpublish_node(struct devfs *fs, devfs_vnode *node,
 static status_t publish_device(struct devfs *fs, const char *path,
 	device_node_info *deviceNode, pnp_devfs_driver_info *info,
 	driver_entry *driver, device_hooks *ops, int32 apiVersion);
+static status_t unload_driver(driver_entry *driver);
+static status_t load_driver(driver_entry *driver);
 
 
 /* the one and only allowed devfs instance */
 static struct devfs *sDeviceFileSystem = NULL;
 static int32 sDefaultApiVersion = 1;
 static DriverWatcher sDriverWatcher;
+static int32 sDriverEvents;
 
 
 //	#pragma mark - driver private
@@ -196,180 +199,6 @@ driver_entry_compare(void *_driver, const void *_key)
 	const char *key = (const char *)_key;
 
 	return strcmp(driver->name, key);
-}
-
-
-static status_t
-load_driver(driver_entry *driver)
-{
-	status_t (*init_hardware)(void);
-	status_t (*init_driver)(void);
-	const char **devicePaths;
-	int32 exported = 0;
-	status_t status;
-
-	// load the module
-	image_id image = driver->image;
-	if (image < 0) {
-		image = load_kernel_add_on(driver->path);
-		if (image < 0)
-			return image;
-	}
-
-	// For a valid device driver the following exports are required
-
-	driver->api_version = &sDefaultApiVersion;
-	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
-			(void **)&driver->api_version) == B_OK) {
-#if B_CUR_DRIVER_API_VERSION != 2
-		// just in case someone decides to bump up the api version
-#error Add checks here for new vs old api version!
-#endif
-		if (*driver->api_version > B_CUR_DRIVER_API_VERSION) {
-			dprintf("devfs: \"%s\" api_version %ld not handled\n", driver->name,
-				*driver->api_version);
-			status = B_BAD_VALUE;
-			goto error1;
-		}
-		if (*driver->api_version < 1) {
-			dprintf("devfs: \"%s\" api_version invalid\n", driver->name);
-			status = B_BAD_VALUE;
-			goto error1;
-		}
-	} else
-		dprintf("devfs: \"%s\" api_version missing\n", driver->name);
-
-	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT,
-				(void **)&driver->publish_devices) != B_OK
-		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT,
-				(void **)&driver->find_device) != B_OK) {
-		dprintf("devfs: \"%s\" mandatory driver symbol(s) missing!\n",
-			driver->name);
-		status = B_BAD_VALUE;
-		goto error1;
-	}
-
-	// Init the driver
-
-	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
-			(void **)&init_hardware) == B_OK
-		&& (status = init_hardware()) != B_OK) {
-		TRACE(("%s: init_hardware() failed: %s\n", driver->name,
-			strerror(status)));
-		status = ENXIO;
-		goto error1;
-	}
-
-	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
-			(void **)&init_driver) == B_OK
-		&& (status = init_driver()) != B_OK) {
-		TRACE(("%s: init_driver() failed: %s\n", driver->name,
-			strerror(status)));
-		status = ENXIO;
-		goto error2;
-	}
-
-	// resolve and cache those for the driver unload code
-	if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
-		(void **)&driver->uninit_driver) != B_OK)
-		driver->uninit_driver = NULL;
-	if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
-		(void **)&driver->uninit_hardware) != B_OK)
-		driver->uninit_hardware = NULL;
-
-	// The driver has successfully been initialized, now we can
-	// finally publish its device entries
-
-	// we keep the driver loaded if it exports at least a single interface
-	devicePaths = driver->publish_devices();
-	if (devicePaths == NULL) {
-		TRACE(("%s: publish_devices() returned NULL.\n", driver->name));
-		status = ENXIO;
-		goto error3;
-	}
-
-	for (; devicePaths[0]; devicePaths++) {
-		device_hooks *hooks = driver->find_device(devicePaths[0]);
-
-		if (hooks != NULL
-			&& publish_device(sDeviceFileSystem, devicePaths[0],
-					NULL, NULL, driver, hooks, *driver->api_version) == B_OK)
-			exported++;
-	}
-
-	// we're all done, driver will be kept loaded
-	if (exported > 0) {
-		driver->image = image;
-		return B_OK;
-	}
-
-	status = B_ERROR;	// whatever...
-
-error3:
-	if (driver->uninit_driver)
-		driver->uninit_driver();
-
-error2:
-	if (driver->uninit_hardware)
-		driver->uninit_hardware();
-
-error1:
-	if (driver->image < 0) {
-		unload_kernel_add_on(image);
-		driver->image = status;
-	}
-
-	return status;
-}
-
-
-static status_t
-unload_driver(driver_entry *driver)
-{
-	if (driver->image < 0) {
-		// driver is not currently loaded
-		return B_NO_INIT;
-	}
-
-	if (driver->uninit_driver)
-		driver->uninit_driver();
-
-	if (driver->uninit_hardware)
-		driver->uninit_hardware();
-
-	unload_kernel_add_on(driver->image);
-	driver->image = -1;
-	return B_OK;
-}
-
-
-/*!	Collects all devices belonging to the \a driver and unpublishs them.
-*/
-static void
-unpublish_driver(driver_entry *driver)
-{
-	RecursiveLocker locker(&sDeviceFileSystem->lock);
-
-	// Iterate through all nodes until all devices of this driver have
-	// been unpublished
-
-	while (driver->devices_published > 0) {
-		struct hash_iterator i;
-		hash_open(sDeviceFileSystem->vnode_hash, &i);
-
-		while (true) {
-			devfs_vnode *vnode = (devfs_vnode *)hash_next(
-				sDeviceFileSystem->vnode_hash, &i);
-			if (vnode == NULL)
-				break;
-
-			if (S_ISCHR(vnode->stream.type)
-				&& vnode->stream.u.dev.driver == driver)
-				unpublish_node(sDeviceFileSystem, vnode, S_IFCHR);
-		}
-
-		hash_close(sDeviceFileSystem->vnode_hash, &i, false);
-	}
 }
 
 
@@ -468,6 +297,162 @@ republish_driver(driver_entry *driver)
 
 	return B_OK;
 }
+
+
+static status_t
+load_driver(driver_entry *driver)
+{
+	status_t (*init_hardware)(void);
+	status_t (*init_driver)(void);
+	const char **devicePaths;
+	int32 exported = 0;
+	status_t status;
+
+	// load the module
+	image_id image = driver->image;
+	if (image < 0) {
+		image = load_kernel_add_on(driver->path);
+		if (image < 0)
+			return image;
+	}
+
+	// For a valid device driver the following exports are required
+
+	driver->api_version = &sDefaultApiVersion;
+	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
+			(void **)&driver->api_version) == B_OK) {
+#if B_CUR_DRIVER_API_VERSION != 2
+		// just in case someone decides to bump up the api version
+#error Add checks here for new vs old api version!
+#endif
+		if (*driver->api_version > B_CUR_DRIVER_API_VERSION) {
+			dprintf("devfs: \"%s\" api_version %ld not handled\n", driver->name,
+				*driver->api_version);
+			status = B_BAD_VALUE;
+			goto error1;
+		}
+		if (*driver->api_version < 1) {
+			dprintf("devfs: \"%s\" api_version invalid\n", driver->name);
+			status = B_BAD_VALUE;
+			goto error1;
+		}
+	} else
+		dprintf("devfs: \"%s\" api_version missing\n", driver->name);
+
+	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT,
+				(void **)&driver->publish_devices) != B_OK
+		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT,
+				(void **)&driver->find_device) != B_OK) {
+		dprintf("devfs: \"%s\" mandatory driver symbol(s) missing!\n",
+			driver->name);
+		status = B_BAD_VALUE;
+		goto error1;
+	}
+
+	// Init the driver
+
+	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_hardware) == B_OK
+		&& (status = init_hardware()) != B_OK) {
+		TRACE(("%s: init_hardware() failed: %s\n", driver->name,
+			strerror(status)));
+		status = ENXIO;
+		goto error1;
+	}
+
+	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_driver) == B_OK
+		&& (status = init_driver()) != B_OK) {
+		TRACE(("%s: init_driver() failed: %s\n", driver->name,
+			strerror(status)));
+		status = ENXIO;
+		goto error2;
+	}
+
+	// resolve and cache those for the driver unload code
+	if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
+		(void **)&driver->uninit_driver) != B_OK)
+		driver->uninit_driver = NULL;
+	if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
+		(void **)&driver->uninit_hardware) != B_OK)
+		driver->uninit_hardware = NULL;
+
+	// The driver has successfully been initialized, now we can
+	// finally publish its device entries
+
+	driver->image = image;
+	return republish_driver(driver);
+
+error3:
+	if (driver->uninit_driver)
+		driver->uninit_driver();
+
+error2:
+	if (driver->uninit_hardware)
+		driver->uninit_hardware();
+
+error1:
+	if (driver->image < 0) {
+		unload_kernel_add_on(image);
+		driver->image = status;
+	}
+
+	return status;
+}
+
+
+static status_t
+unload_driver(driver_entry *driver)
+{
+	if (driver->image < 0) {
+		// driver is not currently loaded
+		return B_NO_INIT;
+	}
+
+	if (driver->uninit_driver)
+		driver->uninit_driver();
+
+	if (driver->uninit_hardware)
+		driver->uninit_hardware();
+
+	unload_kernel_add_on(driver->image);
+	driver->image = -1;
+	driver->binary_updated = false;
+	return B_OK;
+}
+
+
+/*!	Collects all devices belonging to the \a driver and unpublishs them.
+*/
+static void
+unpublish_driver(driver_entry *driver)
+{
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	// Iterate through all nodes until all devices of this driver have
+	// been unpublished
+
+	while (driver->devices_published > 0) {
+		struct hash_iterator i;
+		hash_open(sDeviceFileSystem->vnode_hash, &i);
+
+		while (true) {
+			devfs_vnode *vnode = (devfs_vnode *)hash_next(
+				sDeviceFileSystem->vnode_hash, &i);
+			if (vnode == NULL)
+				break;
+
+			if (S_ISCHR(vnode->stream.type)
+				&& vnode->stream.u.dev.driver == driver) {
+				unpublish_node(sDeviceFileSystem, vnode, S_IFCHR);
+				break;
+			}
+		}
+
+		hash_close(sDeviceFileSystem->vnode_hash, &i, false);
+	}
+}
+
 
 
 static const char *
@@ -615,6 +600,52 @@ scan_for_drivers(devfs_vnode *dir)
 }
 
 
+static status_t
+reload_driver(driver_entry *driver)
+{
+	dprintf("devfs: reload driver \"%s\"\n", driver->name);
+
+	unload_driver(driver);
+
+	status_t status = load_driver(driver);
+	if (status < B_OK)
+		unpublish_driver(driver);
+
+	return status;
+}
+
+
+static void
+handle_driver_events(void *_fs, int /*iteration*/)
+{
+	struct devfs *fs = (devfs *)_fs;
+
+	if (atomic_and(&sDriverEvents, 0) == 0)
+		return;
+
+	// something happened, let's see what it was
+
+	RecursiveLocker locker(fs->lock);
+
+	hash_iterator iterator;
+	hash_open(sDeviceFileSystem->driver_hash, &iterator);
+	driver_entry *driver;
+	while (true) {
+		driver = (driver_entry *)hash_next(sDeviceFileSystem->driver_hash,
+			&iterator);
+		if (driver == NULL)
+			break;
+		if (!driver->binary_updated || driver->devices_used != 0)
+			continue;
+
+		// try to reload the driver
+		reload_driver(driver);
+	}
+
+	hash_close(sDeviceFileSystem->driver_hash, &iterator, false);
+}
+
+
 //	#pragma mark - DriverWatcher
 
 
@@ -643,19 +674,14 @@ DriverWatcher::EventOccured(NotificationService& service,
 	if (driver == NULL)
 		return;
 
+	driver->binary_updated = true;
+dprintf("%s: devices published %ld, used %ld\n", driver->name, driver->devices_published, driver->devices_used);
 	if (driver->devices_used == 0) {
-		// reload driver
-		dprintf("devfs: reload driver \"%s\"\n", driver->name);
-		//unpublish_driver(driver);
-			// TODO: even though we would need to unpublish the driver, this
-			// doesn't work right now from here (dead lock in the node monitor
-			// notifications)
-		unload_driver(driver);
-		load_driver(driver);
+		// trigger a reload of the driver
+		atomic_add(&sDriverEvents, 1);
 	} else {
-		// driver is in use right now, only mark it to be updated when possible
+		// driver is in use right now
 		dprintf("devfs: changed driver \"%s\" is still in use\n", driver->name);
-		driver->binary_updated = true;
 	}
 }
 
@@ -749,8 +775,7 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode,
 }
 
 
-/** makes sure none of the dircookies point to the vnode passed in */
-
+/*! Makes sure none of the dircookies point to the vnode passed in */
 static void
 update_dir_cookies(struct devfs_vnode *dir, struct devfs_vnode *vnode)
 {
@@ -1189,7 +1214,7 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 	}
 
 	if ((ops == NULL && (deviceNode == NULL || info == NULL))
-		|| path == NULL || path[0] == '/')
+		|| path == NULL || path[0] == '\0' || path[0] == '/')
 		return B_BAD_VALUE;
 
 	// are the provided device hooks okay?
@@ -1242,11 +1267,10 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 }
 
 
-/** Construct complete device name (as used for device_open()).
- *	This is safe to use only when the device is in use (and therefore
- *	cannot be unpublished during the iteration).
- */
-
+/*!	Construct complete device name (as used for device_open()).
+	This is safe to use only when the device is in use (and therefore
+	cannot be unpublished during the iteration).
+*/
 static void
 get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 {
@@ -1349,6 +1373,8 @@ devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
 	}
 
 	new(&sDriverWatcher) DriverWatcher;
+	register_kernel_daemon(&handle_driver_events, fs, 10);
+		// once every second
 
 	// create a vnode
 	vnode = devfs_create_vnode(fs, NULL, "");
@@ -1395,6 +1421,8 @@ devfs_unmount(fs_volume _fs)
 	struct hash_iterator i;
 
 	TRACE(("devfs_unmount: entry fs = %p\n", fs));
+
+	unregister_kernel_daemon(&handle_driver_events, fs);
 
 	// release the reference to the root
 	put_vnode(fs->id, fs->root_vnode->id);
@@ -1631,6 +1659,20 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 		return B_NO_MEMORY;
 
 	if (S_ISCHR(vnode->stream.type)) {
+		RecursiveLocker locker(fs->lock);
+
+		driver_entry *driver = vnode->stream.u.dev.driver;
+		// TODO: we might want to check if the current node does still exist
+		// (it should fail in the driver's open(), though, if it doesn't)
+		if (driver != NULL
+			&& (driver->image < 0 || driver->binary_updated)) {
+			status = reload_driver(driver);
+			if (status < B_OK)
+				return status;
+		}
+
+		locker.Unlock();
+
 		if (vnode->stream.u.dev.node != NULL) {
 			status = vnode->stream.u.dev.info->open(
 				vnode->stream.u.dev.node->parent->cookie, openMode,
@@ -1643,10 +1685,10 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 				&cookie->device_cookie);
 		}
 
-		RecursiveLocker _(fs->lock);
+		locker.Lock();
 
-		if (status == B_OK && vnode->stream.u.dev.driver != NULL)
-			vnode->stream.u.dev.driver->devices_used++;
+		if (status == B_OK && driver != NULL)
+			driver->devices_used++;
 	}
 	if (status < B_OK)
 		free(cookie);
@@ -2460,8 +2502,7 @@ static const device_attr pnp_devfs_attrs[] = {
 };
 
 
-/** someone registered a device */
-
+/*! Someone registered a device */
 static status_t
 pnp_devfs_register_device(device_node_handle parent)
 {
