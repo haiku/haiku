@@ -1510,9 +1510,6 @@ devfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
 	if (vnode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	if (S_ISCHR(vnode->stream.type) && vnode->stream.u.dev.driver != NULL)
-		vnode->stream.u.dev.driver->devices_used++;
-
 	TRACE(("devfs_get_vnode: looked it up at %p\n", *_vnode));
 
 	*_vnode = vnode;
@@ -1523,15 +1520,12 @@ devfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
 static status_t
 devfs_put_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 {
-	struct devfs *fs = (struct devfs *)_fs;
+#ifdef TRACE_DEVFS
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_v;
 
-	TRACE(("devfs_put_vnode: entry on vnode %p, id = %Ld, reenter %d\n", vnode, vnode->id, reenter));
-
-	RecursiveLocker _(fs->lock);
-
-	if (S_ISCHR(vnode->stream.type) && vnode->stream.u.dev.driver != NULL)
-		vnode->stream.u.dev.driver->devices_used++;
+	TRACE(("devfs_put_vnode: entry on vnode %p, id = %Ld, reenter %d\n",
+		vnode, vnode->id, reenter));
+#endif
 
 	return B_OK;
 }
@@ -1626,6 +1620,7 @@ static status_t
 devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_cookie *cookie;
 	status_t status = B_OK;
 
@@ -1647,6 +1642,11 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 			status = vnode->stream.u.dev.ops->open(buffer, openMode,
 				&cookie->device_cookie);
 		}
+
+		RecursiveLocker _(fs->lock);
+
+		if (status == B_OK && vnode->stream.u.dev.driver != NULL)
+			vnode->stream.u.dev.driver->devices_used++;
 	}
 	if (status < B_OK)
 		free(cookie);
@@ -1679,12 +1679,18 @@ devfs_free_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
+	struct devfs *fs = (struct devfs *)_fs;
 
 	TRACE(("devfs_freecookie: entry vnode %p, cookie %p\n", vnode, cookie));
 
 	if (S_ISCHR(vnode->stream.type)) {
 		// pass the call through to the underlying device
 		vnode->stream.u.dev.info->free(cookie->device_cookie);
+
+		RecursiveLocker _(fs->lock);
+
+		if (vnode->stream.u.dev.driver != NULL)
+			vnode->stream.u.dev.driver->devices_used--;
 	}
 
 	free(cookie);
