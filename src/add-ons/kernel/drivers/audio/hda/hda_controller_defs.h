@@ -119,6 +119,14 @@
 #define HDAC_SD_LVI			0x0C		/* 16bits */
 #define HDAC_SD_FIFOS		0x10		/* 16bits */
 #define HDAC_SD_FMT			0x12		/* 16bits */
+#define FMT_8BIT			(0 << 4)
+#define FMT_16BIT			(1 << 4)
+#define FMT_20BIT			(2 << 4)
+#define FMT_24BIT			(3 << 4)
+#define FMT_32BIT			(4 << 4)
+#define FMT_44_1_BASE_RATE		(1 << 14)
+#define FMT_MULTIPLY_RATE_SHIFT	11
+#define FMT_DIVIDE_RATE_SHIFT	8
 #define HDAC_SD_BDPL		0x18		/* 32bits */
 #define HDAC_SD_BDPU		0x1C		/* 32bits */
 

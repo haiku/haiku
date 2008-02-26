@@ -12,6 +12,33 @@
 #include "hda_codec_defs.h"
 
 
+#define MAKE_RATE(base, multiply, divide) \
+	((base == 44100 ? FMT_44_1_BASE_RATE : 0) \
+		| ((multiply - 1) << FMT_MULTIPLY_RATE_SHIFT) \
+		| ((divide - 1) << FMT_DIVIDE_RATE_SHIFT))
+
+static const struct {
+	uint32 multi_rate;
+	uint32 hw_rate;
+	uint32 rate;
+} kRates[] = {
+	{B_SR_8000, MAKE_RATE(48000, 1, 6), 8000},
+	{B_SR_11025, MAKE_RATE(44100, 1, 4), 11025},
+	{B_SR_16000, MAKE_RATE(48000, 1, 3), 16000},
+	{B_SR_22050, MAKE_RATE(44100, 1, 2), 22050},
+	{B_SR_32000, MAKE_RATE(48000, 2, 3), 32000},
+	{B_SR_44100, MAKE_RATE(44100, 1, 1), 44100},
+	{B_SR_48000, MAKE_RATE(48000, 1, 1), 48000},
+	{B_SR_88200, MAKE_RATE(44100, 2, 1), 88200},
+	{B_SR_96000, MAKE_RATE(48000, 2, 1), 96000},
+	{B_SR_176400, MAKE_RATE(44100, 4, 1), 176400},
+	{B_SR_192000, MAKE_RATE(48000, 4, 1), 192000},
+};
+
+
+//	#pragma mark -
+
+
 void
 hda_stream_delete(hda_stream* stream)
 {
@@ -142,7 +169,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	corb_t verb[2];
 	uint8* buffer;
 	status_t rc;
-	uint16 wfmt;
+	uint16 format;
 
 	/* Clear previously allocated memory */
 	if (stream->buffer_area >= B_OK) {
@@ -225,13 +252,13 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 	}
 
 	/* Configure stream registers */
-	wfmt = stream->num_channels - 1;
+	format = stream->num_channels - 1;
 	switch (stream->sample_format) {
-		case B_FMT_8BIT_S:	wfmt |= (0 << 4); stream->bps = 8; break;
-		case B_FMT_16BIT:	wfmt |= (1 << 4); stream->bps = 16; break;
-		case B_FMT_20BIT:	wfmt |= (2 << 4); stream->bps = 20; break;
-		case B_FMT_24BIT:	wfmt |= (3 << 4); stream->bps = 24; break;
-		case B_FMT_32BIT:	wfmt |= (4 << 4); stream->bps = 32; break;
+		case B_FMT_8BIT_S:	format |= FMT_8BIT; stream->bps = 8; break;
+		case B_FMT_16BIT:	format |= FMT_16BIT; stream->bps = 16; break;
+		case B_FMT_20BIT:	format |= FMT_20BIT; stream->bps = 20; break;
+		case B_FMT_24BIT:	format |= FMT_24BIT; stream->bps = 24; break;
+		case B_FMT_32BIT:	format |= FMT_32BIT; stream->bps = 32; break;
 
 		default:
 			dprintf("%s: Invalid sample format: 0x%lx\n", __func__,
@@ -239,62 +266,18 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 			break;
 	}
 
-	switch (stream->sample_rate) {
-		case B_SR_8000:
-			wfmt |= (0 << 14) | (0 << 11) | (5 << 8);
-			stream->rate = 8000;
+	for (index = 0; index < sizeof(kRates) / sizeof(kRates[0]); index++) {
+		if (kRates[index].multi_rate == stream->sample_rate) {
+			format |= kRates[index].hw_rate;
+			stream->rate = kRates[index].rate;
 			break;
-		case B_SR_11025:
-			wfmt |= (1 << 14) | (0 << 11) | (3 << 8);
-			stream->rate = 11025;
-			break;
-		case B_SR_16000:
-			wfmt |= (0 << 14) | (0 << 11) | (2 << 8);
-			stream->rate = 16000;
-			break;
-		case B_SR_22050:
-			wfmt |= (1 << 14) | (0 << 11) | (1 << 8);
-			stream->rate = 22050;
-			break;
-		case B_SR_32000:
-			wfmt |= (0 << 14) | (1 << 11) | (2 << 8);
-			stream->rate = 32000;
-			break;
-		case B_SR_44100:
-			wfmt |= (1 << 14) | (0 << 11) | (0 << 8);
-			stream->rate = 44100;
-			break;
-		case B_SR_48000:
-			wfmt |= (0 << 14) | (0 << 11) | (0 << 8);
-			stream->rate = 48000;
-			break;
-		case B_SR_88200:
-			wfmt |= (1 << 14) | (1 << 11) | (0 << 8);
-			stream->rate = 88200;
-			break;
-		case B_SR_96000:
-			wfmt |= (0 << 14) | (2 << 11) | (0 << 8);
-			stream->rate = 96000;
-			break;
-		case B_SR_176400:
-			wfmt |= (1 << 14) | (3 << 11) | (0 << 8);
-			stream->rate = 176400;
-			break;
-		case B_SR_192000:
-			wfmt |= (0 << 14) | (3 << 11) | (0 << 8);
-			stream->rate = 192000;
-			break;
-
-		default:
-			dprintf("%s: Invalid sample rate: 0x%lx\n", __func__,
-				stream->sample_rate);
-			break;
+		}
 	}
 
 	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld\n", __func__, stream->id,
 		stream->rate, stream->bps);
 
-	OREG16(audioGroup->codec->controller, stream->off, FMT) = wfmt;
+	OREG16(audioGroup->codec->controller, stream->off, FMT) = format;
 	OREG32(audioGroup->codec->controller, stream->off, BDPL)
 		= stream->physical_buffer_descriptors;
 	OREG32(audioGroup->codec->controller, stream->off, BDPU) = 0;
