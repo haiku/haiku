@@ -335,6 +335,9 @@ BRegion::Include(BRect rect)
 void
 BRegion::Include(clipping_rect rect)
 {
+	if (!valid_rect(rect))
+		return;
+		
 	// convert to internal rect format
 	rect.right ++;
 	rect.bottom ++;
@@ -381,6 +384,9 @@ BRegion::Exclude(BRect rect)
 void
 BRegion::Exclude(clipping_rect rect)
 {
+	if (!valid_rect(rect))
+		return;
+		
 	// convert to internal rect format
 	rect.right ++;
 	rect.bottom ++;
