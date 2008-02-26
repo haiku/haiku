@@ -1917,14 +1917,16 @@ BTextView::ScrollToOffset(int32 inOffset)
 
 	if (point.x < bounds.left)
 		xDiff = point.x - bounds.left - extraSpace;
-	else if (point.x >= bounds.right)
+	else if (point.x > bounds.right)
 		xDiff = point.x - bounds.right + extraSpace;
 
 	// vertical
 	if (point.y < bounds.top)
 		yDiff = point.y - bounds.top;
-	else if (point.y + lineHeight >= bounds.bottom)
+	else if (point.y + lineHeight > bounds.bottom
+		&& point.y - lineHeight > bounds.top) {
 		yDiff = point.y + lineHeight - bounds.bottom;
+	}
 
 	// prevent negative scroll offset
 	if (bounds.left + xDiff < 0.0)
