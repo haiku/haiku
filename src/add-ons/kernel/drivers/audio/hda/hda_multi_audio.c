@@ -298,7 +298,8 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	}
 
 	/* do playback */
-	rc = acquire_sem(audioGroup->playback_stream->buffer_ready_sem);
+	rc = acquire_sem_etc(audioGroup->playback_stream->buffer_ready_sem,
+		1, B_CAN_INTERRUPT, 0);
 	if (rc != B_OK) {
 		dprintf("%s: Error waiting for playback buffer to finish (%s)!\n", __func__,
 			strerror(rc));
