@@ -72,14 +72,14 @@ execve(const char *path, char * const args[], char * const environment[])
 
 	// test validity of executable + support for scripts
 	{
-		status_t status = __test_executable(args[0], invoker);
+		status_t status = __test_executable(path, invoker);
 		if (status < B_OK) {
 			errno = status;
 			return -1;
 		}
 
 		if (invoker[0]) {
-			status = __parse_invoke_line(invoker, &newArgs, &args, &argCount);
+			status = __parse_invoke_line(invoker, &newArgs, &args, &argCount, path);
 			if (status < B_OK) {
 				errno = status;
 				return -1;
@@ -94,7 +94,7 @@ execve(const char *path, char * const args[], char * const environment[])
 	// don't care and pass everything to the kernel - it will have to
 	// do the right thing :)
 
-	errno = _kern_exec(path, argCount, args, envCount, environment);
+	errno = _kern_exec(path, argCount, newArgs ? newArgs : args, envCount, environment);
 		// if this call returns, something definitely went wrong
 
 	free(newArgs);

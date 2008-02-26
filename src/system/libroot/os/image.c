@@ -33,7 +33,7 @@ load_image(int32 argCount, const char **args, const char **environ)
 
 		if (invoker[0]) {
 			status = __parse_invoke_line(invoker, &newArgs,
-				(char * const **)&args, &argCount);
+				(char * const **)&args, &argCount, args[1]);
 			if (status < B_OK)
 				return status;
 		}
@@ -146,7 +146,7 @@ next_argument(char **_start, bool separate)
 
 status_t
 __parse_invoke_line(char *invoker, char ***_newArgs,
-	char * const **_oldArgs, int32 *_argCount)
+	char * const **_oldArgs, int32 *_argCount, const char *arg0)
 {
 	int32 i, count = 0;
 	char *arg = invoker;
@@ -169,7 +169,10 @@ __parse_invoke_line(char *invoker, char ***_newArgs,
 		newArgs[i] = arg;
 	}
 	for (i = 0; i < *_argCount; i++) {
-		newArgs[i + count] = (char *)(*_oldArgs)[i];
+		if (i == 0)
+			newArgs[i + count] = arg0;
+		else
+			newArgs[i + count] = (char *)(*_oldArgs)[i];
 	}
 
 	newArgs[i + count] = NULL;

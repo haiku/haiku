@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 status_t __parse_invoke_line(char *invoker, char ***_newArgs,
-			char * const **_oldArgs, int32 *_argCount);
+			char * const **_oldArgs, int32 *_argCount, const char *arg0);
 status_t __get_next_image_dependency(image_id id, uint32 *cookie,
 			const char **_name);
 status_t __test_executable(const char *path, char *invoker);
