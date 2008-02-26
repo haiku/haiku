@@ -38,6 +38,14 @@ init_hardware(void)
 
 
 status_t
+uninit_hardware(void)
+{
+	dprintf("test: uninit_hardware\n");
+	return B_OK;
+}
+
+
+status_t
 init_driver(void)
 {
 	dprintf("test: init_driver\n");
@@ -116,7 +124,7 @@ driver_control(void *cookie, uint32 op, void *arg, size_t len)
 const char**
 publish_devices(void)
 {
-	static const char *names[] = {"misc/test/1", "" };
+	static const char *names[] = {"misc/test/1", NULL};
 	dprintf("test: publish_devices\n");
 	return names;
 }
@@ -136,3 +144,4 @@ find_device(const char* name)
 	dprintf("test: find_device\n");
 	return &hooks;
 }
+
