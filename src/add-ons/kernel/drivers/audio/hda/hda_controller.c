@@ -292,12 +292,10 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 	OREG8(audioGroup->codec->controller, stream->off, CTL2) = stream->id << 4;
 
 	verb[0] = MAKE_VERB(audioGroup->codec->addr, stream->io_widget,
-		VID_SET_CONVFORMAT, wfmt);
+		VID_SET_CONVERTER_FORMAT, format);
 	verb[1] = MAKE_VERB(audioGroup->codec->addr, stream->io_widget,
-		VID_SET_CVTSTRCHN, stream->id << 4);
-	rc = hda_send_verbs(audioGroup->codec, verb, response, 2);
-
-	return rc;
+		VID_SET_CONVERTER_STREAM_CHANNEL, stream->id << 4);
+	return hda_send_verbs(audioGroup->codec, verb, response, 2);
 }
 
 

@@ -42,7 +42,8 @@ typedef enum {
 
 
 /* Verb Helper Macro */
-#define MAKE_VERB(cad,nid,vid,payl)	(((cad)<<28)|((nid)<<20)|(vid)|(payl))
+#define MAKE_VERB(cad, nid, vid, payload) \
+	(((cad) << 28) | ((nid) << 20) | (vid) | (payload))
 
 /* Verb IDs */
 #define VID_GET_PARAM			0xF0000
@@ -57,15 +58,15 @@ typedef enum {
 #define VID_SET_PROCCOEFF		0x40000
 #define VID_GET_AMPGAINMUTE		0xB0000
 #define VID_SET_AMPGAINMUTE		0x30000
-#define VID_GET_CONVFORMAT		0xA0000
-#define VID_SET_CONVFORMAT		0x20000
+#define VID_GET_CONVERTER_FORMAT			0xa0000
+#define VID_SET_CONVERTER_FORMAT			0x20000
+#define VID_GET_CONVERTER_STREAM_CHANNEL	0xf0600
+#define VID_SET_CONVERTER_STREAM_CHANNEL	0x70600
 #define VID_GET_DIGCVTCTRL		0xF0D00
 #define VID_SET_DIGCVTCTRL1		0x70D00
 #define VID_SET_DIGCVTCTRL2		0x70E00
 #define VID_GET_POWERSTATE		0xF0500
 #define VID_SET_POWERSTATE		0x70500
-#define VID_GET_CVTSTRCHN		0xF0600
-#define VID_SET_CVTSTRCHN		0x70600
 #define VID_GET_SDISELECT		0xF0400
 #define VID_SET_SDISELECT		0x70400
 #define VID_GET_PINWCTRL		0xF0700
