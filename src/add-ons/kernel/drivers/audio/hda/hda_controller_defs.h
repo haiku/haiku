@@ -96,6 +96,10 @@
 #define RIRBSIZE_SZ_16E		(1 << 0)
 #define RIRBSIZE_SZ_256E	(1 << 1)
 
+#define HDAC_DMA_POSITION_BASE_LOWER	0x70	/* 32bits */
+#define HDAC_DMA_POSITION_BASE_UPPER	0x74	/* 32bits */
+#define DMA_POSITION_ENABLED			1
+
 #define HDAC_SDBASE			0x80
 #define HDAC_SDSIZE			0x20
 

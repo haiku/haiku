@@ -99,10 +99,14 @@ hda_stream_start(hda_controller* controller, hda_stream* stream)
 	if (stream->buffer_ready_sem < B_OK)
 		return stream->buffer_ready_sem;
 
-	OREG8(controller, stream->off, CTL0) |= CTL0_RUN;
+	REG32(controller, INTCTL) |= 1 << (stream->off / HDAC_SDSIZE);
+	OREG8(controller, stream->off, CTL0) |= CTL0_IOCE | CTL0_FEIE | CTL0_DEIE
+		| CTL0_RUN;
 
+#if 0
 	while (!(OREG8(controller, stream->off, CTL0) & CTL0_RUN))
 		snooze(1);
+#endif
 
 	stream->running = true;
 
@@ -145,10 +149,14 @@ hda_stream_check_intr(hda_controller* controller, hda_stream* stream)
 status_t
 hda_stream_stop(hda_controller* controller, hda_stream* stream)
 {
-	OREG8(controller, stream->off, CTL0) &= ~CTL0_RUN;
+	OREG8(controller, stream->off, CTL0) &= ~(CTL0_IOCE | CTL0_FEIE | CTL0_DEIE
+		| CTL0_RUN);
+	REG32(controller, INTCTL) &= ~(1 << (stream->off / HDAC_SDSIZE));
 
+#if 0
 	while ((OREG8(controller, stream->off, CTL0) & CTL0_RUN) != 0)
 		snooze(1);
+#endif
 
 	stream->running = false;
 	delete_sem(stream->buffer_ready_sem);
@@ -287,9 +295,10 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 	OREG32(audioGroup->codec->controller, stream->off, CBL)
 		= stream->sample_size * stream->num_channels * stream->num_buffers
 		* stream->buffer_length;
-	OREG8(audioGroup->codec->controller, stream->off, CTL0)
-		= CTL0_IOCE | CTL0_FEIE | CTL0_DEIE;
 	OREG8(audioGroup->codec->controller, stream->off, CTL2) = stream->id << 4;
+
+	REG32(audioGroup->codec->controller, DMA_POSITION_BASE_LOWER)
+		|= DMA_POSITION_ENABLED;
 
 	verb[0] = MAKE_VERB(audioGroup->codec->addr, stream->io_widget,
 		VID_SET_CONVERTER_FORMAT, format);
@@ -429,10 +438,10 @@ hda_hw_start(hda_controller* controller)
 
 
 static status_t
-hda_hw_corb_rirb_init(hda_controller* controller)
+hda_hw_corb_rirb_pos_init(hda_controller* controller)
 {
-	uint32 memSize, rirbOffset;
-	uint8 corbSize, rirbSize;
+	uint32 memSize, rirbOffset, posOffset;
+	uint8 corbSize, rirbSize, posSize;
 	status_t rc = B_OK;
 	physical_entry pe;
 
@@ -464,12 +473,17 @@ hda_hw_corb_rirb_init(hda_controller* controller)
 
 	/* Determine rirb offset in memory and total size of corb+alignment+rirb */
 	rirbOffset = (controller->corb_length * sizeof(corb_t) + 0x7f) & ~0x7f;
-	memSize = (rirbOffset + controller->rirb_length * sizeof(rirb_t)
-		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	posOffset = (rirbOffset + controller->rirb_length * sizeof(rirb_t) + 0x7f)
+		& 0x7f;
+	posSize = 8 * (controller->num_input_streams
+		+ controller->num_output_streams + controller->num_bidir_streams);
+
+	memSize = (posOffset + posSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	/* Allocate memory area */
-	controller->rb_area = create_area("hda_corb_rirb", (void**)&controller->corb,
-		B_ANY_KERNEL_ADDRESS, memSize, B_CONTIGUOUS, 0);
+	controller->rb_area = create_area("hda corb/rirb/pos",
+		(void**)&controller->corb, B_ANY_KERNEL_ADDRESS, memSize,
+		B_CONTIGUOUS, 0);
 	if (controller->rb_area < 0)
 		return controller->rb_area;
 
@@ -483,7 +497,16 @@ hda_hw_corb_rirb_init(hda_controller* controller)
 
 	/* Program CORB/RIRB for these locations */
 	REG32(controller, CORBLBASE) = (uint32)pe.address;
+	REG32(controller, CORBUBASE) = 0;
 	REG32(controller, RIRBLBASE) = (uint32)pe.address + rirbOffset;
+	REG32(controller, RIRBUBASE) = 0;
+
+	/* Program DMA position update */
+	REG32(controller, DMA_POSITION_BASE_LOWER) = (uint32)pe.address + posOffset;
+	REG32(controller, DMA_POSITION_BASE_UPPER) = 0;
+
+	controller->stream_positions = (uint32*)
+		((uint8*)controller->corb + posOffset);
 
 	/* Reset CORB read pointer */
 	/* NOTE: See HDA011 for corrected procedure! */
@@ -556,15 +579,15 @@ hda_hw_init(hda_controller* controller)
 	if (rc != B_OK)
 		goto reset_failed;
 
-	/* Setup CORB/RIRB */
-	rc = hda_hw_corb_rirb_init(controller);
+	/* Setup CORB/RIRB/DMA POS */
+	rc = hda_hw_corb_rirb_pos_init(controller);
 	if (rc != B_OK)
 		goto corb_rirb_failed;
 
 	REG16(controller, WAKEEN) = 0x7fff;
 
 	/* Enable controller interrupts */
-	REG32(controller, INTCTL) = INTCTL_GIE | INTCTL_CIE | 0xffff;
+	REG32(controller, INTCTL) = INTCTL_GIE | INTCTL_CIE;
 
 	/* Wait for codecs to warm up */
 	snooze(1000);
@@ -640,6 +663,10 @@ hda_hw_uninit(hda_controller* controller)
 	/* Stop CORB/RIRB */
 	REG8(controller, CORBCTL) = 0;
 	REG8(controller, RIRBCTL) = 0;
+
+	REG32(controller, CORBLBASE) = 0;
+	REG32(controller, RIRBLBASE) = 0;
+	REG32(controller, DMA_POSITION_BASE_LOWER) = 0;
 
 	/* Disable interrupts and remove interrupt handler */
 	REG32(controller, INTCTL) = 0;

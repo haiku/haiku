@@ -195,6 +195,7 @@ struct hda_controller {
 	area_id			rb_area;
 	corb_t*			corb;
 	rirb_t*			rirb;
+	uint32*			stream_positions;
 
 	hda_codec*		codecs[HDA_MAX_CODECS];
 	hda_codec*		active_codec;
