@@ -1531,25 +1531,24 @@ BListView::_SwapItems(int32 a, int32 b)
 	// track selection
 	// NOTE: this is only important if the selection status
 	// of both items is not the same
+	int32 first = min_c(a, b);
+	int32 last = max_c(a, b);
 	if (ItemAt(a)->IsSelected() != ItemAt(b)->IsSelected()) {
-		int32 first = min_c(a, b);
-		int32 last = max_c(a, b);
-		if (first < fFirstSelected || last > fLastSelected) {
-			first = min_c(first, fFirstSelected);
-			last = max_c(last, fLastSelected);
-			_RescanSelection(first, last);
-		}
+		if (first < fFirstSelected || last > fLastSelected) 
+			_RescanSelection(min_c(first, fFirstSelected), min_c(last, fLastSelected));
 		// though the actually selected items stayed the
 		// same, the selection has still changed
 		SelectionChanged();
 	}
 
+	ItemAt(a)->SetTop(bFrame.top);
+	ItemAt(b)->SetTop(aFrame.top);
+	
 	// take care of invalidation
 	if (Window()) {
 		// NOTE: window looper is assumed to be locked!
 		if (aFrame.Height() != bFrame.Height()) {
-			ItemAt(a)->SetTop(bFrame.top);
-			ItemAt(b)->SetTop(aFrame.top);
+			_RecalcItemTops(first, last);
 			// items in between shifted visually
 			Invalidate(aFrame | bFrame);
 		} else {
@@ -1676,14 +1675,18 @@ BListView::_RescanSelection(int32 from, int32 to)
 }
 
 void
-BListView::_RecalcItemTops(int32 start)
+BListView::_RecalcItemTops(int32 start, int32 end)
 {
 	int32 count = CountItems();
 	if ((start < 0) || (start >= count))
 		return;
+
+	if (end >= 0)
+		count = end + 1;
+
 	float top = (start == 0) ? 0.0 : ItemAt(start - 1)->Bottom() + 1.0;
 
-	for (int32 i = start; i < CountItems(); i++) {
+	for (int32 i = start; i < count; i++) {
 		BListItem *item = ItemAt(i);
 		item->SetTop(top);
 		top += ceilf(item->Height());

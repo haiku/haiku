@@ -160,7 +160,7 @@ class BListView : public BView, public BInvoker {
 				bool		_TryInitiateDrag(BPoint where);
 				int32		_CalcFirstSelected(int32 after);
 				int32		_CalcLastSelected(int32 before);
-				void		_RecalcItemTops(int32 start);
+				void		_RecalcItemTops(int32 start, int32 end = -1);
 		virtual void		DrawItem(BListItem* item, BRect itemRect,
 								bool complete = false);
 	
