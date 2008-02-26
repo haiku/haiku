@@ -33,7 +33,7 @@ load_image(int32 argCount, const char **args, const char **environ)
 
 		if (invoker[0]) {
 			status = __parse_invoke_line(invoker, &newArgs,
-				(char * const **)&args, &argCount, args[1]);
+				(char * const **)&args, &argCount, args[0]);
 			if (status < B_OK)
 				return status;
 		}
