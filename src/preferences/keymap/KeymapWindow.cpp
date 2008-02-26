@@ -66,7 +66,6 @@ KeymapWindow::KeymapWindow()
 	
 	fMapView = new MapView(BRect(150, 9, 600, 189), "mapView", &fCurrentMap);
 	placeholderView->AddChild(fMapView);
-	fMapView->SetViewColor(B_TRANSPARENT_COLOR);
 	
 	BMenuItem *item = fFontMenu->FindMarked();
 	if (item) {
@@ -928,15 +927,18 @@ MapView::_InitOffscreen()
 	}
 }
 
+
 void
 MapView::AttachedToWindow()
 {
-	SetEventMask(B_KEYBOARD_EVENTS, 0);
-	fTextView->SetViewColor(255, 255, 255);
-	_InitOffscreen();
-	
 	BControl::AttachedToWindow();
+		
+	SetEventMask(B_KEYBOARD_EVENTS, 0);
+	SetViewColor(B_TRANSPARENT_COLOR);	
+	fTextView->SetViewColor(255, 255, 255);
+	_InitOffscreen();	
 }
+
 
 void
 MapView::_DrawBackground(){
@@ -1587,4 +1589,4 @@ MapView::SetFontFamily(const font_family family)
 {
 	fCurrentFont.SetFamilyAndStyle(family, NULL); 
 	fTextView->SetFontAndColor(&fCurrentFont);
-};
+}
