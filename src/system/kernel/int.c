@@ -309,16 +309,21 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 		io_vectors[vector].ignored_count++;
 	}
 
-	// disable interrupt when more than 99% are unhandled and this is not a
-	// shared interrupt
-	if (io_vectors[vector].trigger_count > 100000
-	 && !(io_vectors[vector].handler_list.next != NULL
-	 && io_vectors[vector].handler_list.next->next != NULL)) {
-		if (io_vectors[vector].ignored_count > 99000) {
-			io_vectors[vector].enable_count = -100;
-			arch_int_disable_io_interrupt(vector);
-			dprintf("Disabling unhandled io interrupt %d\n", vector);
+	if (io_vectors[vector].trigger_count > 10000) {
+		if (io_vectors[vector].ignored_count > 9900) {
+			if (io_vectors[vector].handler_list.next == NULL
+				|| io_vectors[vector].handler_list.next->next == NULL) {
+				// this interrupt vector is not shared, disable it
+				io_vectors[vector].enable_count = -100;
+				arch_int_disable_io_interrupt(vector);
+				dprintf("Disabling unhandled io interrupt %d\n", vector);
+			} else {
+				// this is a shared interrupt vector, we cannot just disable it
+				dprintf("More than 99%% interrupts of vector %d are unhandled\n",
+					vector);
+			}
 		}
+
 		io_vectors[vector].trigger_count = 0;
 		io_vectors[vector].ignored_count = 0;
 	}
