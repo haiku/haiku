@@ -523,7 +523,7 @@ BOutlineListView::IsExpanded(int32 fullListIndex)
 {
 	BListItem *item = FullListItemAt(fullListIndex);
 	if (!item)
-		return false;
+		return false;	
 
 	return item->IsExpanded();
 }
@@ -640,7 +640,6 @@ BOutlineListView::SortItemsUnder(BListItem* underItem, bool oneLevelOnly,
 
 	_DestructTree(tree);
 }
-
 
 void
 BOutlineListView::_PopulateTree(BList* tree, BList& target,
@@ -811,16 +810,86 @@ BOutlineListView::ItemUnderAt(BListItem* underItem,
 	return NULL;
 }
 
+int32
+BOutlineListView::_GetSubitemCount(BList &list, int32 itemIndex)
+{
+	uint32 level = ((BListItem *)list.ItemAt(itemIndex))->OutlineLevel();
+	int32 count = 1; // the count we return includes the parent
+	for (int32 i = itemIndex + 1; i < fFullList.CountItems(); i++, count++) {
+		if (((BListItem *)list.ItemAt(i))->OutlineLevel() <= level)
+			break;
+	}
+
+	return count;
+}
+
+void
+BOutlineListView::_DoSwap(BList &list, int32 firstIndex, int32 secondIndex, int32 firstCount, 
+	int32 secondCount, int32 swapCount)
+{
+	if (firstCount < secondCount) { 
+		for (int32 i = swapCount + 1; i < secondCount; i++)
+			list.MoveItem(secondIndex + swapCount + i, firstIndex + i);
+	} else {
+		for (int32 i = swapCount + 1; i < firstCount; i++)
+			list.MoveItem(firstIndex + swapCount + 1, secondIndex + swapCount + 1);
+	}
+}
+
+bool
+BOutlineListView::_SwapItems(int32 first, int32 second)
+{
+	// same item, do nothing
+	if (first == second)
+		return true;
+
+	// fail, first item out of bounds
+	if ((first < 0) || (first >= CountItems()))
+		return false;
+
+	// fail, second item out of bounds
+	if ((second < 0) || (second >= CountItems()))
+		return false;
+
+	int32 firstIndex = min_c(first, second);
+	int32 secondIndex = max_c(first, second);
+	BListItem *firstItem = ItemAt(firstIndex);
+	BListItem *secondItem = ItemAt(secondIndex);
+
+	if (Superitem(firstItem) != Superitem(secondItem))
+		return false;
+
+	if (!firstItem->IsItemVisible() || !secondItem->IsItemVisible())
+		return false;
+	
+	int32 fullFirstIndex = FullListIndex(firstIndex);
+	int32 fullSecondIndex = FullListIndex(secondIndex);
+	int32 firstCount = _GetSubitemCount(fFullList, fullFirstIndex);
+	int32 secondCount = _GetSubitemCount(fFullList, fullSecondIndex);
+		
+	int32 index = (firstCount < secondCount) ? firstCount : secondCount;
+	for (int32 i = 0; i < index; i++) 
+		fFullList.SwapItems(fullFirstIndex + i, fullSecondIndex + i);
+	_DoSwap(fFullList, fullFirstIndex, fullSecondIndex, firstCount, secondCount, index);
+	
+	firstCount = _GetSubitemCount(fList, firstIndex);
+	secondCount = _GetSubitemCount(fList, secondIndex);
+	index = (firstCount < secondCount) ? firstCount : secondCount;
+	for (int32 i = 0; i < index; i++)
+		fList.SwapItems(firstIndex + i, secondIndex + i);
+	_DoSwap(fList, firstIndex, secondIndex, firstCount, secondCount, index);	
+
+	_RecalcItemTops(firstIndex);
+	Invalidate(Bounds());	
+	return true;
+}
 
 bool
 BOutlineListView::DoMiscellaneous(MiscCode code, MiscData* data)
 {
-	if (code == B_SWAP_OP) {
-		// todo: If we do a swap and the items in question have children, we need
-		// to move the child hierarchy together with the item if we want to correctly
-		// mimic R5 behavior.
-	} 
-		
+	if (code == B_SWAP_OP)
+		return _SwapItems(data->swap.a, data->swap.b);
+	
 	return BListView::DoMiscellaneous(code, data);
 }
 
