@@ -3647,7 +3647,7 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	status_t status;
 
 	// filter invalid leaf names
-	if (leaf[0] == '\0' || strchr(leaf, '/'))
+	if (leaf != NULL && (leaf[0] == '\0' || strchr(leaf, '/')))
 		return B_BAD_VALUE;
 
 	// get the vnode matching the dir's node_ref
