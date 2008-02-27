@@ -95,8 +95,8 @@ public:
 
 	inline Vector3& operator/=(const float& s) 
 	{
-		//btFullAssert(s != float(0.0));
-		return *this *= float(1.0) / s;
+		assert(s != 0.0f);
+		return *this *= 1.0f / s;
 	}
 
 
@@ -139,7 +139,7 @@ public:
 	inline float angle(const Vector3& v) const 
 	{
 		float s = sqrt(length2() * v.length2());
-		//btFullAssert(s != float(0.0));
+		assert(s != 0.0f);
 		return acos(dot(v) / s);
 	}
 
@@ -196,7 +196,7 @@ public:
 
 	inline void setInterpolate3(const Vector3& v0, const Vector3& v1, float rt)
 	{
-		float s = float(1.0) - rt;
+		float s = 1.0f - rt;
 		m_x = s * v0.x() + rt * v1.x();
 		m_y = s * v0.y() + rt * v1.y();
 		m_z = s * v0.z() + rt * v1.z();
@@ -260,8 +260,8 @@ operator*(const float& s, const Vector3& v)
 inline Vector3
 operator/(const Vector3& v, const float& s)
 {
-	//btFullAssert(s != float(0.0));
-	return v * (float(1.0) / s);
+	assert(s != 0.0f);
+	return v * (1.0f / s);
 }
 
 inline Vector3

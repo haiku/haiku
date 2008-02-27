@@ -97,18 +97,18 @@ public:
 	void setRotation(const Vector3& axis, const float& angle)
 	{
 		float d = axis.length();
-		assert(d != float(0.0));
-		float s = sin(angle * float(0.5)) / d;
+		assert(d != 0.0f);
+		float s = sin(angle * 0.5f) / d;
 		setValue(axis.x() * s, axis.y() * s, axis.z() * s, 
-			cos(angle * float(0.5)));
+			cos(angle * 0.5f));
 	}
 
 
 	void setEuler(const float& yaw, const float& pitch, const float& roll)
 	{
-		float halfYaw = float(yaw) * float(0.5);  
-		float halfPitch = float(pitch) * float(0.5);  
-		float halfRoll = float(roll) * float(0.5);  
+		float halfYaw = yaw * 0.5f;  
+		float halfPitch = pitch * 0.5f;  
+		float halfRoll = roll * 0.5f;  
 		float cosYaw = cos(halfYaw);
 		float sinYaw = sin(halfYaw);
 		float cosPitch = cos(halfPitch);
@@ -186,15 +186,15 @@ public:
 
 	Quaternion operator/(const float& s) const
 	{
-		assert(s != float(0.0));
-		return *this * (float(1.0) / s);
+		assert(s != 0.0f);
+		return *this * (1.0f / s);
 	}
 
 
 	Quaternion& operator/=(const float& s) 
 	{
-		assert(s != float(0.0));
-		return *this *= float(1.0) / s;
+		assert(s != 0.0f);
+		return *this *= 1.0f / s;
 	}
 
 
@@ -207,14 +207,14 @@ public:
 	float angle(const Quaternion& q) const 
 	{
 		float s = sqrt(length2() * q.length2());
-		assert(s != float(0.0));
+		assert(s != 0.0f);
 		return acos(dot(q) / s);
 	}
 
 
 	float getAngle() const 
 	{
-		float s = float(2.) * acos(m_w);
+		float s = 2.0f * acos(m_w);
 		return s;
 	}
 
@@ -262,10 +262,10 @@ public:
 	Quaternion slerp(const Quaternion& q, const float& t) const
 	{
 		float theta = angle(q);
-		if (theta != float(0.0))
+		if (theta != 0.0f)
 		{
-			float d = float(1.0) / sin(theta);
-			float s0 = sin((float(1.0) - t) * theta);
+			float d = 1.0f / sin(theta);
+			float s0 = sin((1.0f - t) * theta);
 			float s1 = sin(t * theta);   
 			return Quaternion((m_x * s0 + q.x() * s1) * d,
 				(m_y * s0 + q.y() * s1) * d,
