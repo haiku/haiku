@@ -572,7 +572,8 @@ AboutView::AboutView(const BRect &rect)
 		
 	// Bullet copyrights
 	AddCopyrightEntry("Bullet", 
-		"Copyright " B_UTF8_COPYRIGHT " 2003-2008 Erwin Coumans  http://continuousphysics.com/Bullet/");
+		"Copyright " B_UTF8_COPYRIGHT " 2003-2008 Erwin Coumans",
+		"www.bulletphysics.com");
 
 	// Build a list of installed applications and show their 
 	// long version info. Well-behaved apps usually give
