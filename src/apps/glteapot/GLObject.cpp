@@ -1,4 +1,17 @@
 /*
+ * Copyright 2008 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alexandre Deckner
+ *
+ */
+
+/*
+ * Original Be Sample source modified to use a quaternion for the object's orientation
+ */
+ 
+/*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
@@ -61,16 +74,13 @@ extern long setEvent(sem_id event);
 
 GLObject::GLObject(ObjectView* ov)
 	:
-	rotX(0),
-	rotY(0),
-	spinX(2),
-	spinY(2),
 	x(0),
 	y(0),
 	z(-2.0),
+	fRotation(0.0f, 0.0f, 0.0f, 1.0f),
+	spinX(2),
+	spinY(2),	
 	solidity(0),
-	lastRotX(0),
-	lastRotY(0),
 	color(4),	
 	changed(false),
 	fObjView(ov)
@@ -131,18 +141,40 @@ GLObject::MenuInvoked(BPoint point)
 	setEvent(fObjView->drawEvent);
 }
 
+int
+GLObject::Solidity() const
+{
+	return solidity;
+}
+
 
 bool
 GLObject::SpinIt()
 {
-	rotX += spinX;
-	rotY += spinY;
 	bool c = changed;
-	c = c || ((rotX != lastRotX) || (rotY != lastRotY));
-	lastRotX = rotX;
-	lastRotY = rotY;
+	c = c || ((spinX != 0.0f) || (spinY != 0.0f));
+	
+	if (c)
+		RotateWorldSpace(spinY, spinX);
 	
 	return c;
+}
+
+
+void
+GLObject::Spin(float rx, float ry)
+{
+	spinX = rx;
+	spinY = ry;	
+}
+
+
+void
+GLObject::RotateWorldSpace(float rx, float ry)
+{
+	fRotation = Quaternion(Vector3(0.0f, 1.0f, 0.0f), 0.01f * rx) * fRotation;
+	fRotation = Quaternion(Vector3(1.0f, 0.0f, 0.0f), 0.01f * ry) * fRotation;	
+	changed = true;
 }
 
 
@@ -151,9 +183,11 @@ GLObject::Draw(bool forID, float IDcolor[])
 {
 	glPushMatrix();
 		glTranslatef(x, y, z);
-		glRotatef(rotY, 0.0,1.0,0.0);
-		glRotatef(rotX, 1.0,0.0,0.0);
-
+				
+		float mat[4][4];
+		fRotation.toOpenGLMatrix(mat);
+		glMultMatrixf((GLfloat*)mat);
+		
 		if (forID) {
 			glColor3fv(IDcolor);
 		}

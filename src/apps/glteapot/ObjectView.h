@@ -1,4 +1,10 @@
 /*
+ * Copyright 2008 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ */
+
+/*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */

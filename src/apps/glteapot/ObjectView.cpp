@@ -1,4 +1,17 @@
 /*
+ * Copyright 2008 Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Alexandre Deckner
+ *
+ */
+
+/*
+ * Original Be Sample source modified to use a quaternion for the object's orientation
+ */
+
+/*
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
@@ -409,13 +422,13 @@ ObjectView::MouseDown(BPoint point)
 		if (buttons == B_PRIMARY_MOUSE_BUTTON || buttons == B_SECONDARY_MOUSE_BUTTON) {
 			fTrackingInfo.pickedObject = object;
 			fTrackingInfo.buttons = buttons;
-			fTrackingInfo.isTracking = true;				
+			fTrackingInfo.isTracking = true;
 			fTrackingInfo.lastX = point.x;
-			fTrackingInfo.lastY = point.y;	
+			fTrackingInfo.lastY = point.y;
 			fTrackingInfo.lastDx = 0.0f;
-			fTrackingInfo.lastDy = 0.0f;	
-			fTrackingInfo.pickedObject->spinX = 0.0f;
-			fTrackingInfo.pickedObject->spinY = 0.0f;		
+			fTrackingInfo.lastDy = 0.0f;
+			fTrackingInfo.pickedObject->Spin(0.0f, 0.0f);		
+					
 			
 			SetMouseEventMask(B_POINTER_EVENTS,
 						B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);	
@@ -437,9 +450,8 @@ ObjectView::MouseUp(BPoint point)
 			&& fTrackingInfo.pickedObject != NULL 
 			&& (fabs(fTrackingInfo.lastDx) > 1.0f 
 				|| fabs(fTrackingInfo.lastDy) > 1.0f) ) {	
-												
-			fTrackingInfo.pickedObject->spinX = 0.5f * fTrackingInfo.lastDy;
-			fTrackingInfo.pickedObject->spinY = 0.5f * fTrackingInfo.lastDx;		
+			
+			fTrackingInfo.pickedObject->Spin(0.5f * fTrackingInfo.lastDy, 0.5f * fTrackingInfo.lastDx);		
 						
 			setEvent(drawEvent);				
 		}
@@ -468,10 +480,8 @@ ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 				
 		if (fTrackingInfo.buttons == B_PRIMARY_MOUSE_BUTTON) {
 								
-			fTrackingInfo.pickedObject->spinX = 0;
-			fTrackingInfo.pickedObject->spinY = 0;
-			fTrackingInfo.pickedObject->rotY += dx;
-			fTrackingInfo.pickedObject->rotX += dy;
+			fTrackingInfo.pickedObject->Spin(0.0f, 0.0f);
+			fTrackingInfo.pickedObject->RotateWorldSpace(dx,dy);
 			fTrackingInfo.lastDx = dx;
 			fTrackingInfo.lastDy = dy;			
 			
@@ -489,12 +499,12 @@ ObjectView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 				yinc *= -(fTrackingInfo.pickedObject->z * 4 / zRatio);
 			}
 			
-			fTrackingInfo.pickedObject->x += xinc;			
+			fTrackingInfo.pickedObject->x += xinc;
 			if (modifiers() & B_SHIFT_KEY)
 				fTrackingInfo.pickedObject->z += zinc;
 			else
 	  			fTrackingInfo.pickedObject->y += yinc;
-			
+	  						
 			fForceRedraw = true;
 			setEvent(drawEvent);									
 		} 
@@ -721,13 +731,13 @@ ObjectView::DrawFrame(bool noPause)
 	fObjListLock.Lock();
 	for (int i = 0; i < fObjects.CountItems(); i++) {
 	  GLObject *object = reinterpret_cast<GLObject*>(fObjects.ItemAt(i));
-		if (object->solidity == 0)
+		if (object->Solidity() == 0)
 			object->Draw(false, NULL);
 	}
 	EnforceState();
 	for (int i = 0; i < fObjects.CountItems(); i++) {
 		GLObject *object = reinterpret_cast<GLObject*>(fObjects.ItemAt(i));
-		if (object->solidity != 0)
+		if (object->Solidity() != 0)
 			object->Draw(false, NULL);
 	}
 	fObjListLock.Unlock();
