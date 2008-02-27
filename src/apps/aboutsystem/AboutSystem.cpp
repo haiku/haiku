@@ -569,6 +569,10 @@ AboutView::AboutView(const BRect &rect)
 	// OpenEXR copyrights
 	AddCopyrightEntry("OpenEXR", 
 		"Copyright " B_UTF8_COPYRIGHT " 2002-2005, Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.");
+		
+	// Bullet copyrights
+	AddCopyrightEntry("Bullet", 
+		"Copyright " B_UTF8_COPYRIGHT " 2003-2008 Erwin Coumans  http://continuousphysics.com/Bullet/");
 
 	// Build a list of installed applications and show their 
 	// long version info. Well-behaved apps usually give
