@@ -135,16 +135,17 @@ struct driver_entry {
 	uint32			devices_published;
 	uint32			devices_used;
 	bool			binary_updated;
+	int32			priority;
 
 	// driver image information
-	int32			*api_version;
+	int32			api_version;
 	device_hooks	*(*find_device)(const char *);
 	const char		**(*publish_devices)(void);
 	status_t		(*uninit_driver)(void);
 	status_t		(*uninit_hardware)(void);
 };
 
-struct node_path_entry : DoublyLinkedListLinkImpl<node_path_entry> {
+struct path_entry : DoublyLinkedListLinkImpl<path_entry> {
 	char			path[B_PATH_NAME_LENGTH];
 };
 
@@ -174,6 +175,7 @@ static struct devfs *sDeviceFileSystem = NULL;
 static int32 sDefaultApiVersion = 1;
 static DriverWatcher sDriverWatcher;
 static int32 sDriverEvents;
+static DoublyLinkedList<path_entry> sDriversToAdd;
 
 
 //	#pragma mark - driver private
@@ -222,7 +224,7 @@ republish_driver(driver_entry *driver)
 	struct hash_iterator i;
 	hash_open(sDeviceFileSystem->vnode_hash, &i);
 
-	DoublyLinkedList<node_path_entry> currentNodes;
+	DoublyLinkedList<path_entry> currentNodes;
 	while (true) {
 		devfs_vnode *vnode = (devfs_vnode *)hash_next(
 			sDeviceFileSystem->vnode_hash, &i);
@@ -231,16 +233,16 @@ republish_driver(driver_entry *driver)
 
 		if (S_ISCHR(vnode->stream.type)
 			&& vnode->stream.u.dev.driver == driver) {
-			node_path_entry *path = new(std::nothrow) node_path_entry;
-			if (!path) {
-				while ((path = currentNodes.RemoveHead()))
-					delete path;
+			path_entry *entry = new(std::nothrow) path_entry;
+			if (entry == NULL) {
+				while ((entry = currentNodes.RemoveHead()))
+					delete entry;
 				hash_close(sDeviceFileSystem->vnode_hash, &i, false);
 				return B_NO_MEMORY;
 			}
 
-			get_device_name(vnode, path->path, sizeof(path->path));
-			currentNodes.Add(path);
+			get_device_name(vnode, entry->path, sizeof(entry->path));
+			currentNodes.Add(entry);
 		}
 	}
 	hash_close(sDeviceFileSystem->vnode_hash, &i, false);
@@ -251,7 +253,7 @@ republish_driver(driver_entry *driver)
 	int32 exported = 0;
 	for (; devicePaths != NULL && devicePaths[0]; devicePaths++) {
 		bool present = false;
-		node_path_entry *entry = currentNodes.Head();
+		path_entry *entry = currentNodes.Head();
 		while (entry) {
 			if (strncmp(entry->path, devicePaths[0], B_PATH_NAME_LENGTH) == 0) {
 				// this device was present before and still is -> no republish
@@ -275,16 +277,16 @@ republish_driver(driver_entry *driver)
 
 		TRACE(("devfs: publishing new device \"%s\"\n", devicePaths[0]));
 		if (publish_device(sDeviceFileSystem, devicePaths[0], NULL, NULL,
-			driver, hooks, *driver->api_version) == B_OK)
+				driver, hooks, driver->api_version) == B_OK)
 			exported++;
 	}
 
 	// what's left in currentNodes was present but is not anymore -> unpublish
-	node_path_entry *entry = currentNodes.Head();
+	path_entry *entry = currentNodes.Head();
 	while (entry) {
 		TRACE(("devfs: unpublishing no more present \"%s\"\n", entry->path));
 		devfs_unpublish_device(entry->path, true);
-		node_path_entry *next = currentNodes.GetNext(entry);
+		path_entry *next = currentNodes.GetNext(entry);
 		currentNodes.Remove(entry);
 		delete entry;
 		entry = next;
@@ -308,6 +310,8 @@ load_driver(driver_entry *driver)
 	int32 exported = 0;
 	status_t status;
 
+	driver->binary_updated = false;
+
 	// load the module
 	image_id image = driver->image;
 	if (image < 0) {
@@ -318,24 +322,26 @@ load_driver(driver_entry *driver)
 
 	// For a valid device driver the following exports are required
 
-	driver->api_version = &sDefaultApiVersion;
+	int32 *apiVersion;
 	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
-			(void **)&driver->api_version) == B_OK) {
+			(void **)&apiVersion) == B_OK) {
 #if B_CUR_DRIVER_API_VERSION != 2
 		// just in case someone decides to bump up the api version
 #error Add checks here for new vs old api version!
 #endif
-		if (*driver->api_version > B_CUR_DRIVER_API_VERSION) {
+		if (*apiVersion > B_CUR_DRIVER_API_VERSION) {
 			dprintf("devfs: \"%s\" api_version %ld not handled\n", driver->name,
-				*driver->api_version);
+				*apiVersion);
 			status = B_BAD_VALUE;
 			goto error1;
 		}
-		if (*driver->api_version < 1) {
+		if (*apiVersion < 1) {
 			dprintf("devfs: \"%s\" api_version invalid\n", driver->name);
 			status = B_BAD_VALUE;
 			goto error1;
 		}
+
+		driver->api_version = *apiVersion;
 	} else
 		dprintf("devfs: \"%s\" api_version missing\n", driver->name);
 
@@ -418,6 +424,11 @@ unload_driver(driver_entry *driver)
 	unload_kernel_add_on(driver->image);
 	driver->image = -1;
 	driver->binary_updated = false;
+	driver->find_device = NULL;
+	driver->publish_devices = NULL;
+	driver->uninit_driver = NULL;
+	driver->uninit_hardware = NULL;
+
 	return B_OK;
 }
 
@@ -444,7 +455,13 @@ unpublish_driver(driver_entry *driver)
 
 			if (S_ISCHR(vnode->stream.type)
 				&& vnode->stream.u.dev.driver == driver) {
+				void *dummy;
+				get_vnode(sDeviceFileSystem->id, vnode->id, &dummy);
+					// We need to get/put the node, so that it is
+					// actually removed
+
 				unpublish_node(sDeviceFileSystem, vnode, S_IFCHR);
+				put_vnode(sDeviceFileSystem->id, vnode->id);
 				break;
 			}
 		}
@@ -453,6 +470,20 @@ unpublish_driver(driver_entry *driver)
 	}
 }
 
+
+static int32
+get_priority(const char *path)
+{
+	// TODO: use find_directory()
+	const char *kPaths[] = {"/boot/beos", "/boot/common", "/boot/home", NULL};
+
+	for (int32 i = 0; kPaths[i] != NULL; i++) {
+		if (!strncmp(kPaths[i], path, strlen(kPaths[i])))
+			return i;
+	}
+
+	return -1;
+}
 
 
 static const char *
@@ -502,6 +533,8 @@ add_driver(const char *path, image_id image)
 			return errno;
 	}
 
+	int32 priority = get_priority(path);
+
 	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
 	driver_entry *driver = (driver_entry *)hash_lookup(
@@ -510,6 +543,12 @@ add_driver(const char *path, image_id image)
 		// we know this driver
 		// TODO: check if this driver is a different one and has precendence
 		// (ie. common supersedes system).
+		//dprintf("new driver has priority %ld, old %ld\n", priority, driver->priority);
+		if (priority >= driver->priority) {
+			driver->binary_updated = true;
+			return B_OK;
+		}
+
 		// TODO: test for changes here and/or via node monitoring and reload
 		//	the driver if necessary
 		if (driver->image < B_OK)
@@ -538,8 +577,9 @@ add_driver(const char *path, image_id image)
 	driver->devices_published = 0;
 	driver->devices_used = 0;
 	driver->binary_updated = false;
+	driver->priority = priority;
 
-	driver->api_version = NULL;
+	driver->api_version = 1;
 	driver->find_device = NULL;
 	driver->publish_devices = NULL;
 	driver->uninit_driver = NULL;
@@ -627,6 +667,15 @@ handle_driver_events(void *_fs, int /*iteration*/)
 
 	RecursiveLocker locker(fs->lock);
 
+	while (true) {
+		path_entry *path = sDriversToAdd.RemoveHead();
+		if (path == NULL)
+			break;
+
+		devfs_add_driver(path->path);
+		delete path;
+	}
+
 	hash_iterator iterator;
 	hash_open(sDeviceFileSystem->driver_hash, &iterator);
 	driver_entry *driver;
@@ -675,7 +724,7 @@ DriverWatcher::EventOccured(NotificationService& service,
 		return;
 
 	driver->binary_updated = true;
-dprintf("%s: devices published %ld, used %ld\n", driver->name, driver->devices_published, driver->devices_used);
+//dprintf("%s: devices published %ld, used %ld\n", driver->name, driver->devices_published, driver->devices_used);
 	if (driver->devices_used == 0) {
 		// trigger a reload of the driver
 		atomic_add(&sDriverEvents, 1);
@@ -1325,6 +1374,59 @@ dump_node(int argc, char **argv)
 }
 
 
+static int
+dump_driver(int argc, char **argv)
+{
+	if (argc < 2) {
+		// print list of all drivers
+		kprintf("address    image used publ.   pri name\n");
+		hash_iterator iterator;
+		hash_open(sDeviceFileSystem->driver_hash, &iterator);
+		while (true) {
+			driver_entry *driver = (driver_entry *)hash_next(
+				sDeviceFileSystem->driver_hash, &iterator);
+			if (driver == NULL)
+				break;
+
+			kprintf("%p  %5ld %3ld %5ld %c %3ld %s\n", driver,
+				driver->image < 0 ? -1 : driver->image,
+				driver->devices_used, driver->devices_published,
+				driver->binary_updated ? 'U' : ' ', driver->priority,
+				driver->name);
+		}
+
+		hash_close(sDeviceFileSystem->driver_hash, &iterator, false);
+		return 0;
+	}
+
+	driver_entry *driver = (driver_entry *)hash_lookup(
+		sDeviceFileSystem->driver_hash, argv[1]);
+	if (driver == NULL) {
+		kprintf("Driver named \"%s\" not found.\n", argv[1]);
+		return 0;
+	}
+
+	kprintf("DEVFS DRIVER: %p\n", driver);
+	kprintf(" name:           %s\n", driver->name);
+	kprintf(" path:           %s\n", driver->path);
+	kprintf(" image:          %ld\n", driver->image);
+	kprintf(" device:         %ld\n", driver->device);
+	kprintf(" node:           %Ld\n", driver->node);
+	kprintf(" last modified:  %ld\n", driver->last_modified);
+	kprintf(" devs used:      %ld\n", driver->devices_used);
+	kprintf(" devs published: %ld\n", driver->devices_published);
+	kprintf(" binary updated: %d\n", driver->binary_updated);
+	kprintf(" priority:       %ld\n", driver->priority);
+	kprintf(" api version:    %ld\n", driver->api_version);
+	kprintf(" hooks:          find_device %p, publish_devices %p\n"
+		"                 uninit_driver %p, uninit_hardware %p\n",
+		driver->find_device, driver->publish_devices, driver->uninit_driver,
+		driver->uninit_hardware);
+
+	return 0;
+}
+
+
 //	#pragma mark - file system interface
 
 
@@ -1373,6 +1475,8 @@ devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
 	}
 
 	new(&sDriverWatcher) DriverWatcher;
+	new(&sDriversToAdd) DoublyLinkedList<path_entry>;
+
 	register_kernel_daemon(&handle_driver_events, fs, 10);
 		// once every second
 
@@ -1424,6 +1528,16 @@ devfs_unmount(fs_volume _fs)
 
 	unregister_kernel_daemon(&handle_driver_events, fs);
 
+	recursive_lock_lock(&fs->lock);
+
+	while (true) {
+		path_entry *entry = sDriversToAdd.RemoveHead();
+		if (entry == NULL)
+			break;
+
+		delete entry;
+	}
+
 	// release the reference to the root
 	put_vnode(fs->id, fs->root_vnode->id);
 
@@ -1454,7 +1568,8 @@ devfs_sync(fs_volume fs)
 
 
 static status_t
-devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, ino_t *_id, int *_type)
+devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, ino_t *_id,
+	int *_type)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
@@ -1474,32 +1589,9 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, ino_t *_id, int *_t
 	// look it up
 	vnode = devfs_find_in_dir(dir, name);
 	if (vnode == NULL) {
-#if 0
-		// ToDo: with node monitoring in place, we *know* here that the file does not exist
-		//		and don't have to scan for it again.
-		// scan for drivers in the given directory (that indicates the type of the driver)
-		KPath path;
-		if (path.InitCheck() != B_OK)
-			return B_NO_MEMORY;
-
-		get_device_name(dir, path.LockBuffer(), path.BufferSize());
-		path.UnlockBuffer();
-		path.Append(name);
-		dprintf("lookup: \"%s\"\n", path.Path());
-
-		// scan for drivers of this type
-		probe_for_device_type(path.Path());
-
-		vnode = devfs_find_in_dir(dir, name);
-		if (vnode == NULL) {
-#endif
-			return B_ENTRY_NOT_FOUND;
-#if 0
-		}
-
-		if (S_ISDIR(vnode->stream.type) && gBootDevice >= 0)
-			vnode->stream.u.dir.scanned = true;
-#endif
+		// We don't have to rescan here, because thanks to node monitoring
+		// we already know it does not exist
+		return B_ENTRY_NOT_FOUND;
 	}
 
 	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
@@ -2403,10 +2495,13 @@ devfs_std_ops(int32 op, ...)
 		case B_MODULE_INIT:
 			add_debugger_command("devfs_node", &dump_node,
 				"info about a private devfs node");
+			add_debugger_command("devfs_driver", &dump_driver,
+				"info about a devfs driver entry");
 			return B_OK;
 
 		case B_MODULE_UNINIT:
 			remove_debugger_command("devfs_node", &dump_node);
+			remove_debugger_command("devfs_driver", &dump_driver);
 			return B_OK;
 
 		default:
@@ -2683,6 +2778,51 @@ devfs_add_driver(const char *path)
 }
 
 
+extern "C" void
+devfs_driver_added(const char *path)
+{
+	int32 priority = get_priority(path);
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	driver_entry *driver = (driver_entry *)hash_lookup(
+		sDeviceFileSystem->driver_hash, get_leaf(path));
+
+	if (driver == NULL) {
+		// Add the driver to our list
+		path_entry *entry = new(std::nothrow) path_entry;
+		if (entry == NULL)
+			return;
+
+		strlcpy(entry->path, path, sizeof(entry->path));
+		sDriversToAdd.Add(entry);
+	} else {
+		// Update the driver if it is affected by the new entry
+		if (priority < driver->priority)
+			return;
+
+		driver->binary_updated = true;
+	}
+
+	atomic_add(&sDriverEvents, 1);
+}
+
+
+extern "C" void
+devfs_driver_removed(const char *path)
+{
+	int32 priority = get_priority(path);
+	RecursiveLocker locker(&sDeviceFileSystem->lock);
+
+	driver_entry *driver = (driver_entry *)hash_lookup(
+		sDeviceFileSystem->driver_hash, get_leaf(path));
+	if (driver == NULL || priority < driver->priority)
+		return;
+
+	driver->binary_updated = true;
+	atomic_add(&sDriverEvents, 1);
+}
+
+
 extern "C" status_t
 devfs_unpublish_file_device(const char *path)
 {
@@ -2773,7 +2913,7 @@ devfs_unpublish_device(const char *path, bool disconnect)
 
 
 extern "C" status_t
-devfs_publish_device(const char *path, void *obsolete, device_hooks *ops)
+devfs_publish_device(const char *path, device_hooks *ops)
 {
 	// post R5: assume version 2
 	return publish_device(sDeviceFileSystem, path, NULL, NULL, NULL, ops, 2);

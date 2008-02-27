@@ -68,8 +68,8 @@ ps2_dev_publish(ps2_dev *dev)
 
 	dev->active = true;
 	
-	status = devfs_publish_device(dev->name, NULL, 
-		(atomic_get(&dev->flags) & PS2_FLAG_KEYB) ? &gKeyboardDeviceHooks : &gMouseDeviceHooks);
+	status = devfs_publish_device(dev->name, (atomic_get(&dev->flags)
+			& PS2_FLAG_KEYB) ? &gKeyboardDeviceHooks : &gMouseDeviceHooks);
 
 	INFO("ps2: devfs_publish_device %s, status = 0x%08lx\n", dev->name, status);
 }

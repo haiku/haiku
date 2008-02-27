@@ -20,8 +20,10 @@
 #include <fs/node_monitor.h>
 #include <kmodule.h>
 #include <Notifications.h>
-#include <util/Stack.h>
 #include <util/kernel_cpp.h>
+#include <util/OpenHashTable.h>
+#include <util/Stack.h>
+#include <vfs.h>
 
 #include <image.h>
 #include <KernelExport.h>
@@ -57,6 +59,30 @@ struct module_entry {
 	float				support;
 	bool				no_connection;
 };
+
+struct directory_node_entry {
+	HashTableLink<directory_node_entry> link;
+	ino_t				node;
+};
+
+struct DirectoryNodeHashDefinition {
+	typedef ino_t *KeyType;
+	typedef directory_node_entry ValueType;
+
+	size_t HashKey(ino_t *key) const
+		{ return _Hash(*key); }
+	size_t Hash(directory_node_entry *entry) const
+		{ return _Hash(entry->node); }
+	bool Compare(ino_t *key, directory_node_entry *entry) const
+		{ return *key == entry->node; }
+	HashTableLink<directory_node_entry>* GetLink(directory_node_entry *entry) const
+		{ return &entry->link; }
+
+	uint32 _Hash(ino_t node) const
+		{ return (uint32)(node >> 32) + (uint32)node; }
+};
+
+typedef OpenHashTable<DirectoryNodeHashDefinition> DirectoryNodeHash;
 
 // list of driver registration directories
 const char *pnp_registration_dirs[2] = {
@@ -112,6 +138,7 @@ class DirectoryWatcher : public NotificationListener {
 
 
 static DirectoryWatcher sDirectoryWatcher;
+static DirectoryNodeHash sDirectoryNodeHash;
 static bool sWatching;
 
 
@@ -153,7 +180,8 @@ DirectoryIterator::SetTo(const char *path, const char *subPath, bool recursive)
 
 
 void 
-DirectoryIterator::SetTo(const char **paths, const char *subPath, bool recursive)
+DirectoryIterator::SetTo(const char **paths, const char *subPath,
+	bool recursive)
 {
 	Unset();
 	fRecursive = recursive;
@@ -261,14 +289,46 @@ DirectoryWatcher::EventOccured(NotificationService& service,
 	const KMessage* event)
 {
 	int32 opcode = event->GetInt32("opcode", -1);
-/*
-	if (opcode == B_ENTRY_CREATED)
-		devfs_publish_directory();
-*/
-	dprintf("DRIVER DIRECTORY EVENT: %ld\n", opcode);
-	dprintf("  device %ld\n", event->GetInt32("device", -1));
-	dprintf("  node %Ld\n", event->GetInt64("node", -1));
-	dprintf("  name %s\n", event->GetString("name", "<none>"));
+	dev_t device = event->GetInt32("device", -1);
+	ino_t directory = event->GetInt64("directory", -1);
+	const char *name = event->GetString("name", NULL);
+
+	if (opcode == B_ENTRY_MOVED) {
+		// Determine wether it's a move within, out of, or into one
+		// of our watched directories.
+		ino_t from = event->GetInt64("from directory", -1);
+		ino_t to = event->GetInt64("to directory", -1);
+		if (sDirectoryNodeHash.Lookup(&from) == NULL) {
+			directory = to;
+			opcode = B_ENTRY_CREATED;
+		} else if (sDirectoryNodeHash.Lookup(&to) == NULL) {
+			directory = from;
+			opcode = B_ENTRY_REMOVED;
+		} else {
+			// Move within, don't do anything for now
+			// TODO: adjust driver priority if necessary
+			return;
+		}
+	}
+
+	KPath path(B_PATH_NAME_LENGTH + 1);
+	if (path.InitCheck() != B_OK || vfs_entry_ref_to_path(device, directory,
+			name, path.LockBuffer(), path.BufferSize()) != B_OK)
+		return;
+
+	path.UnlockBuffer();
+
+	dprintf("driver \"%s\" %s\n", path.Leaf(),
+		opcode == B_ENTRY_CREATED ? "added" : "removed");
+
+	switch (opcode) {
+		case B_ENTRY_CREATED:
+			devfs_driver_added(path.Path());
+			break;
+		case B_ENTRY_REMOVED:
+			devfs_driver_removed(path.Path());
+			break;
+	}
 }
 
 
@@ -288,6 +348,12 @@ start_watching(const char *base, const char *sub)
 
 	add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
 		sDirectoryWatcher);
+
+	directory_node_entry *entry = new(std::nothrow) directory_node_entry;
+	if (entry != NULL) {
+		entry->node = stat.st_ino;
+		sDirectoryNodeHash.Insert(entry);
+	}
 }
 
 
@@ -1299,6 +1365,13 @@ probe_for_driver_modules(const char *type)
 		if (S_ISDIR(stat.st_mode)) {
 			add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
 				sDirectoryWatcher);
+
+			directory_node_entry *entry
+				= new(std::nothrow) directory_node_entry;
+			if (entry != NULL) {
+				entry->node = stat.st_ino;
+				sDirectoryNodeHash.Insert(entry);
+			}
 
 			// We need to make sure that drivers in ie. "audio/raw/" can
 			// be found as well - therefore, we must make sure that "audio"
