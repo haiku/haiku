@@ -22,7 +22,10 @@ USES_BE_API on $(tools) = true ;
 # TODO: temporary kludge
 local libHaikuCompat ;
 if $(HOST_PLATFORM) in r5 bone dano {
-	UseHeaders [ FDirName $(HAIKU_TOP) headers build os support ] : true ;
+	ObjectC++Flags database_support.cpp UpdateMimeInfoThread.cpp
+		MimeUpdateThread.cpp
+		: -include [ FDirName $(HAIKU_TOP) headers build
+			HaikuBuildCompatibility.h ] ;
 	libHaikuCompat = libhaikucompat_build.a ;
 }
 

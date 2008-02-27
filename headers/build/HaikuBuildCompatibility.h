@@ -9,14 +9,18 @@
 	kludges in our source files at a minimum.
 */
 
-#include <sys/types.h>
-#include <SupportDefs.h>
+#ifdef HAIKU_HOST_PLATFORM_DANO
+#	include <be_setup.h>
+#endif
 
-#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#if defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) || defined(HAIKU_HOST_PLATFORM_DANO)
 #	define _BE_ERRNO_H_
 		// this is what Dano/Zeta is using
 #	include <Errors.h>
 #endif
+
+#include <sys/types.h>
+#include <SupportDefs.h>
 
 #include <string.h>
 
@@ -117,14 +121,17 @@ extern float	roundf(float value);
 
 // These are R1-specific extensions
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-#	define B_TRANSLATION_MAKE_VERSION(major,minor,revision) ((major << 8) | ((minor << 4) & 0xf0) | (revision & 0x0f))
+#	define B_TRANSLATION_MAKE_VERSION(major, minor, revision) \
+		((major << 8) | ((minor << 4) & 0xf0) | (revision & 0x0f))
 #	define B_TRANSLATION_MAJOR_VERSION(v) (v >> 8)
 #	define B_TRANSLATION_MINOR_VERSION(v) ((v >> 4) & 0xf)
 #	define B_TRANSLATION_REVISION_VERSION(v) (v & 0xf)
-#	define B_LARGE_ICON_TYPE		'ICON'
-#	define B_MINI_ICON_TYPE			'MICN'
-#	define B_VECTOR_ICON_TYPE		'VICN'
-#	define B_BITMAP_NO_SERVER_LINK	0
+#	ifndef HAIKU_HOST_PLATFORM_DANO
+#		define B_LARGE_ICON_TYPE		'ICON'
+#		define B_MINI_ICON_TYPE			'MICN'
+#		define B_VECTOR_ICON_TYPE		'VICN'
+#		define B_BITMAP_NO_SERVER_LINK	0
+#	endif
 #endif	// HAIKU_TARGET_PLATFORM_LIBBE_TEST
 
 #if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_BONE)
@@ -135,10 +142,9 @@ extern float	roundf(float value);
 #endif
 
 #if !defined(HAIKU_TARGET_PLATFORM_HAIKU) && !defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
-#	ifndef B_VECTOR_ICON_TYPE
-#		define B_VECTOR_ICON_TYPE 'VICN'
+#	ifndef HAIKU_HOST_PLATFORM_DANO
+#		define B_NOT_SUPPORTED			(B_ERROR)
 #	endif
-#	define B_NOT_SUPPORTED				(B_ERROR)
 #	define B_KERNEL_READ_AREA			0
 #	define B_KERNEL_WRITE_AREA			0
 #endif

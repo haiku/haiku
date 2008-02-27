@@ -28,6 +28,9 @@ if $(HOST_PLATFORM) in r5 bone dano {
 	if $(HOST_PLATFORM) = dano {
 		ObjectDefines $(libbePatchSources) : _IMPEXP_BE= ;
 	}
+	ObjectC++Flags $(libbePatchSources)
+		: -include [ FDirName $(HAIKU_TOP) headers build
+			HaikuBuildCompatibility.h ] ;
 }
 
 BuildPlatformStaticLibrary libhaikucompat_build.a :
