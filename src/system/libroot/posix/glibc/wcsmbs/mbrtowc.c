@@ -1,4 +1,4 @@
-/* Copyright (C) 1996,1997,1998,1999,2000,2002 Free Software Foundation, Inc.
+/* Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gnu.org>, 1996.
 
@@ -21,7 +21,7 @@
 #include <errno.h>
 #include <gconv.h>
 #include <wchar.h>
-//#include <wcsmbsload.h>
+#include <wcsmbsload.h>
 
 #include <assert.h>
 
@@ -35,19 +35,6 @@ static mbstate_t state;
 size_t
 __mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 {
-	// ToDo: this is a dummy implementation to get it going
-	if (s == NULL)
-		n = 1, s = "";
-
-	if (pwc == NULL || n == 0)
-		return 0;
-
-	if (ps == NULL)
-		ps = &state;
-
-	pwc[0] = s[0];
-	return s[0] == 0 ? 0 : 1;
-#if 0
   wchar_t buf[1];
   struct __gconv_step_data data;
   int status;
@@ -55,7 +42,6 @@ __mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
   size_t dummy;
   const unsigned char *inbuf;
   char *outbuf = (char *) (pwc ?: buf);
-  const struct gconv_fcts *fcts;
 
   /* Set information for this step.  */
   data.__invocation_counter = 0;
@@ -77,13 +63,13 @@ __mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
   data.__outbuf = outbuf;
   data.__outbufend = outbuf + sizeof (wchar_t);
 
-  /* Get the conversion functions.  */
-  fcts = get_gconv_fcts (_NL_CURRENT_DATA (LC_CTYPE));
+  /* Make sure we use the correct function.  */
+  update_conversion_ptrs ();
 
   /* Do a normal conversion.  */
   inbuf = (const unsigned char *) s;
-  status = DL_CALL_FCT (fcts->towc->__fct,
-			(fcts->towc, &data, &inbuf, inbuf + n,
+  status = DL_CALL_FCT (__wcsmbs_gconv_fcts.towc->__fct,
+			(__wcsmbs_gconv_fcts.towc, &data, &inbuf, inbuf + n,
 			 NULL, &dummy, 0, 1));
 
   /* There must not be any problems with the conversion but illegal input
@@ -117,8 +103,5 @@ __mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
     }
 
   return result;
-#endif
 }
-libc_hidden_def (__mbrtowc)
 weak_alias (__mbrtowc, mbrtowc)
-libc_hidden_weak (mbrtowc)

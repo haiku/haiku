@@ -20,4 +20,5 @@ MergeObject posix_gnu_iconv.o :
 	gconv_db.c
 #	gconv_dl.c
 	gconv_simple.c
+	gconv_trans.c
 ;

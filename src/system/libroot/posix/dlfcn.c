@@ -68,3 +68,25 @@ dlerror(void)
 	return NULL;
 }
 
+
+// __libc_dl*** wrappers
+// We use a mixed glibc / bsd libc, and glibc wants these
+void *
+__libc_dlopen(const char *name)
+{
+	return dlopen(name, 0);
+}
+ 
+ 
+void *
+__libc_dlsym(void *handle, const char *name)
+{
+	return dlsym(handle, name);
+}
+
+
+void
+__libc_dlclose(void *handle)
+{
+	dlclose(handle);
+}
