@@ -1060,21 +1060,21 @@ TMenu::AttachedToWindow()
 
 TMagnify::TMagnify(BRect r, TWindow* parent)
 	: BView(r, "MagView", B_FOLLOW_NONE, B_WILL_DRAW | B_FRAME_EVENTS),
+	fNeedToUpdate(true),
+	fThread(-1),
+	fActive(true),
+	fImageBuf(NULL),
+	fImageView(NULL),
+	fLastLoc(-1, -1),
+	fSelection(-1),
+	fShowSelection(false),
+	fSelectionLoc(0, 0),
+	fShowCrossHair1(false),
+	fCrossHair1(-1, -1),
+	fShowCrossHair2(false),
+	fCrossHair2(-1, -1),
 	fParent(parent)
 {
-	fLastLoc.Set(-1, -1);
-	fSelectionLoc.x = 0; fSelectionLoc.y = 0;
-	fActive = true;
-	fShowSelection = false;
-	fShowCrossHair1 = false;
-	fCrossHair1.x = -1; fCrossHair1.y = -1;
-	fShowCrossHair2 = false;
-	fCrossHair2.x = -1; fCrossHair2.y = -1;
-	fSelection = -1;
-
-	fImageBuf = NULL;
-	fImageView = NULL;
-
 	SetViewColor(B_TRANSPARENT_32_BIT);
 }
 
