@@ -107,6 +107,8 @@ status_t vfs_get_fs_node_from_path(dev_t mountID, const char *path,
 			bool kernel, void **_node);
 status_t vfs_stat_vnode(struct vnode *vnode, struct stat *stat);
 status_t vfs_get_vnode_name(struct vnode *vnode, char *name, size_t nameSize);
+status_t vfs_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
+	char *path, size_t pathLength);
 status_t vfs_get_cwd(dev_t *_mountID, ino_t *_vnodeID);
 void vfs_unlock_vnode_if_locked(struct file_descriptor *descriptor);
 status_t vfs_unmount(dev_t mountID, uint32 flags);

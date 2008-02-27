@@ -3639,6 +3639,49 @@ vfs_get_vnode_name(struct vnode *vnode, char *name, size_t nameSize)
 }
 
 
+status_t
+vfs_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
+	char *path, size_t pathLength)
+{
+	struct vnode *vnode;
+	status_t status;
+
+	// filter invalid leaf names
+	if (leaf[0] == '\0' || strchr(leaf, '/'))
+		return B_BAD_VALUE;
+
+	// get the vnode matching the dir's node_ref
+	if (leaf && (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0)) {
+		// special cases "." and "..": we can directly get the vnode of the
+		// referenced directory
+		status = entry_ref_to_vnode(device, inode, leaf, &vnode);
+		leaf = NULL;
+	} else
+		status = get_vnode(device, inode, &vnode, true, false);
+	if (status < B_OK)
+		return status;
+
+	// get the directory path
+	status = dir_vnode_to_path(vnode, path, pathLength);
+	put_vnode(vnode);
+		// we don't need the vnode anymore
+	if (status < B_OK)
+		return status;
+
+	// append the leaf name
+	if (leaf) {
+		// insert a directory separator if this is not the file system root
+		if ((strcmp(path, "/") && strlcat(path, "/", pathLength)
+				>= pathLength)
+			|| strlcat(path, leaf, pathLength) >= pathLength) {
+			return B_NAME_TOO_LONG;
+		}
+	}
+
+	return B_OK;
+}
+
+
 /*!	If the given descriptor locked its vnode, that lock will be released. */
 void
 vfs_unlock_vnode_if_locked(struct file_descriptor *descriptor)
@@ -7216,15 +7259,12 @@ status_t
 _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	char *userPath, size_t pathLength)
 {
-	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
-	if (pathBuffer.InitCheck() != B_OK)
-		return B_NO_MEMORY;
-
-	struct vnode *vnode;
-	status_t status;
-
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
+
+	KPath path(B_PATH_NAME_LENGTH + 1);
+	if (path.InitCheck() != B_OK)
+		return B_NO_MEMORY;
 
 	// copy the leaf name onto the stack
 	char stackLeaf[B_FILE_NAME_LENGTH];
@@ -7232,52 +7272,26 @@ _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 		if (!IS_USER_ADDRESS(leaf))
 			return B_BAD_ADDRESS;
 
-		int len = user_strlcpy(stackLeaf, leaf, B_FILE_NAME_LENGTH);
-		if (len < 0)
-			return len;
-		if (len >= B_FILE_NAME_LENGTH)
+		int length = user_strlcpy(stackLeaf, leaf, B_FILE_NAME_LENGTH);
+		if (length < 0)
+			return length;
+		if (length >= B_FILE_NAME_LENGTH)
 			return B_NAME_TOO_LONG;
+
 		leaf = stackLeaf;
-
-		// filter invalid leaf names
-		if (leaf[0] == '\0' || strchr(leaf, '/'))
-			return B_BAD_VALUE;
 	}
 
-	// get the vnode matching the dir's node_ref
-	if (leaf && (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0)) {
-		// special cases "." and "..": we can directly get the vnode of the
-		// referenced directory
-		status = entry_ref_to_vnode(device, inode, leaf, &vnode);
-		leaf = NULL;
-	} else
-		status = get_vnode(device, inode, &vnode, true, false);
+	status_t status = vfs_entry_ref_to_path(device, inode, leaf,
+		path.LockBuffer(), path.BufferSize());
 	if (status < B_OK)
 		return status;
 
-	char *path = pathBuffer.LockBuffer();
+	path.UnlockBuffer();
 
-	// get the directory path
-	status = dir_vnode_to_path(vnode, path, pathBuffer.BufferSize());
-	put_vnode(vnode);
-		// we don't need the vnode anymore
-	if (status < B_OK)
-		return status;
-
-	// append the leaf name
-	if (leaf) {
-		// insert a directory separator if this is not the file system root
-		if ((strcmp(path, "/") && strlcat(path, "/", pathBuffer.BufferSize())
-				>= pathBuffer.BufferSize())
-			|| strlcat(path, leaf, pathBuffer.BufferSize()) >= pathBuffer.BufferSize()) {
-			return B_NAME_TOO_LONG;
-		}
-	}
-
-	int len = user_strlcpy(userPath, path, pathLength);
-	if (len < 0)
-		return len;
-	if (len >= (int)pathLength)
+	int length = user_strlcpy(userPath, path.Path(), pathLength);
+	if (length < 0)
+		return length;
+	if (length >= (int)pathLength)
 		return B_BUFFER_OVERFLOW;
 
 	return B_OK;
