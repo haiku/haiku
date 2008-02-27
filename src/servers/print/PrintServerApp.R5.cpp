@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku. All rights reserved.
+ * Copyright 2001-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,95 +45,76 @@ struct AsyncThreadParams {
 status_t PrintServerApp::async_thread(void* data)
 {
 	AsyncThreadParams* p = (AsyncThreadParams*)data;
-	
+
 	Printer* printer = p->printer;
 	BMessage* msg = p->AcquireMessage();
-
 	{
 		AutoReply sender(msg, 'stop');
 		switch (msg->what) {
-				// Handle showing the page config dialog
+			// Handle showing the config dialog
 			case PSRV_SHOW_PAGE_SETUP: {
-					BMessage reply(*msg);
-					if (printer != NULL) {
-						if (p->app->fUseConfigWindow) {
-							ConfigWindow* w = new ConfigWindow(kPageSetup, printer, msg, &sender);
-							w->Go();
-						} else if (printer->ConfigurePage(reply) == B_OK) {
-							sender.SetReply(&reply);
-						}
-					} else {
-							// If no default printer, give user choice of aborting or setting up a printer
-						BAlert* alert = new BAlert("Info", "There are no printers set up. Would you set one up now?", "No", "Yes");
-						if (alert->Go() == 1) {
-							run_add_printer_panel();
-						}						
-					}
-				}
-				break;
-	
-				// Handle showing the print config dialog
-			case PSRV_SHOW_PRINT_SETUP: {
-					if (printer == NULL) break;
+			case PSRV_SHOW_PRINT_SETUP:
+				if (printer) {
 					if (p->app->fUseConfigWindow) {
-						ConfigWindow* w = new ConfigWindow(kJobSetup, printer, msg, &sender);
+						ConfigWindow* w = new ConfigWindow(PSRV_SHOW_PAGE_SETUP
+							? kPageSetup : kJobSetup, printer, msg, &sender);
 						w->Go();
 					} else {
 						BMessage reply(*msg);
-						if (printer->ConfigureJob(reply) == B_OK) {
+						if (printer->ConfigurePage(reply) == B_OK)
 							sender.SetReply(&reply);
-						}
 					}
+				} else {
+					// If no default printer is set, give user
+					// choice of aborting or setting up a printer
+					BAlert* alert = new BAlert("Info", "There are no printers "
+						"set up. Would you set one up now?", "No", "Yes");
+					if (alert->Go() == 1)
+						run_add_printer_panel();
 				}
-				break;
-	
-				// Retrieve default configuration message from printer add-on
-			case PSRV_GET_DEFAULT_SETTINGS:
-				if (printer != NULL) {
+			}	break;
+
+			// Retrieve default configuration message from printer add-on
+			case PSRV_GET_DEFAULT_SETTINGS: {
+				if (printer) {
 					BMessage reply;
 					if (printer->GetDefaultSettings(reply) == B_OK) {
 						sender.SetReply(&reply);
 						break;
 					}
 				}
-				break;
+			}	break;
 
-				// Create a new printer
+			// Create a new printer
 			case PSRV_MAKE_PRINTER: {
-					BString driverName, transportName, transportPath;
-					BString printerName, connection;
-					
-					if (msg->FindString("driver", &driverName) == B_OK &&
-						msg->FindString("transport", &transportName) == B_OK &&
-						msg->FindString("transport path", &transportPath) == B_OK &&
-						msg->FindString("printer name", &printerName) == B_OK
-						) {
-	
-						if (msg->FindString("connection", &connection) != B_OK)
-							connection = "Local";
-	
-							// then create the actual printer
-						if (p->app->CreatePrinter(printerName.String(), driverName.String(),
-							connection.String(),
-							transportName.String(), transportPath.String()) == B_OK) {				
-								// If printer was created ok, ask if it needs to be the default
-							char buffer[256];
-							::sprintf(buffer, "Would you like to make %s the default printer?",
-								printerName.String());
-		
-							BAlert* alert = new BAlert("", buffer, "No", "Yes");
-							if (alert->Go() == 1) {
-								p->app->SelectPrinter(printerName.String());
-							}
-						}
+				BString driverName;
+				BString printerName;
+				BString transportName;
+				BString transportPath;
+				if (msg->FindString("driver", &driverName) == B_OK
+					&& msg->FindString("transport", &transportName) == B_OK
+					&& msg->FindString("transport path", &transportPath) == B_OK
+					&& msg->FindString("printer name", &printerName) == B_OK) {
+					BString connection;
+					if (msg->FindString("connection", &connection) != B_OK)
+						connection = "Local";
+
+					// then create the actual printer
+					if (p->app->CreatePrinter(printerName.String(),
+						driverName.String(), connection.String(),
+						transportName.String(), transportPath.String()) == B_OK) {
+						// If printer was created ok, ask if it needs to be the default
+						BString text("Would you like to make @ the default printer?");
+						text.ReplaceFirst("@", printerName.String());
+						BAlert* alert = new BAlert("", text.String(), "No", "Yes");
+						if (alert->Go() == 1)
+							p->app->SelectPrinter(printerName.String());
 					}
 				}
-				break;
-		}	
+			}	break;
+		}
 	}
-
 	delete p;
-
 	return B_OK;
 }
 
