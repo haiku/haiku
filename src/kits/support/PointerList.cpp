@@ -72,7 +72,7 @@ struct comparator;
 class AbstractPointerListHelper {
 public:
 	AbstractPointerListHelper() {};
-	virtual ~AbstractPointerListHelper() {};
+	virtual ~AbstractPointerListHelper();
 	
 	/** 
 		Returns the index of the item that matches key or
@@ -137,6 +137,12 @@ struct comparator : public binary_function<const void*, const void*, bool>
 	AbstractPointerListHelper* helper;
 };
 #endif
+
+
+AbstractPointerListHelper::~AbstractPointerListHelper()
+{
+}
+
 
 void
 AbstractPointerListHelper::Swap(void **items, int32 i, int32 j)
