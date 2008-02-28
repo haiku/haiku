@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku, Inc.
+ * Copyright 2004-2006, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UTF8_FUNCTIONS_H
@@ -64,22 +64,48 @@ UTF8PreviousCharLen(const char *text, const char *limit)
 static inline uint32
 UTF8CountBytes(const char *bytes, int32 numChars)
 {
-	if (bytes == NULL)
+	if (!bytes)
 		return 0;
 
 	if (numChars < 0)
 		numChars = INT_MAX;
 
 	const char *base = bytes;
-	while (bytes[0] != '\0') {
-		if ((bytes[0] & 0xc0) != 0x80) {
-			if (--numChars <= 0)
-				break;
+	while (*bytes && numChars-- > 0) {
+		if (bytes[0] & 0x80) {
+			if (bytes[0] & 0x40) {
+				if (bytes[0] & 0x20) {
+					if (bytes[0] & 0x10) {
+						if (bytes[1] == 0 || bytes[2] == 0 || bytes[3] == 0)
+							return (bytes - base);
+
+						bytes += 4;
+						continue;
+					}
+
+					if (bytes[1] == 0 || bytes[2] == 0)
+						return (bytes - base);
+
+					bytes += 3;
+					continue;
+				}
+
+				if (bytes[1] == 0)
+					return (bytes - base);
+
+				bytes += 2;
+				continue;
+			}
+
+			/* Not a startbyte - skip */
+			bytes += 1;
+			continue;
 		}
-		bytes++;
+
+		bytes += 1;
 	}
 
-	return bytes - base;
+	return (bytes - base);
 }
 
 
