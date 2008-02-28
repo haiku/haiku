@@ -96,10 +96,6 @@ find_video_mode(int32 width, int32 height)
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
 		if (mode->width == width && mode->height == height) {
-			// prefer 16 bit mode
-			if (mode->bits_per_pixel == 16)
-				return mode;
-
 			if (found == NULL || found->bits_per_pixel < mode->bits_per_pixel)
 				found = mode;
 		}
