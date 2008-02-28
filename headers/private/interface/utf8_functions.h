@@ -112,81 +112,70 @@ UTF8CountChars(const char *bytes, int32 numBytes)
 /*!	UTF8ToCharCode converts the input that includes potential multibyte chars
 	to UTF-32 char codes that can be used by FreeType. The string pointer is
 	then advanced to the next character in the string. In case the terminating
-	0 is reached, the string pointer is not advanced anymore and spaces are
+	0 is reached, the string pointer is not advanced anymore and nulls are
 	returned. This makes it safe to overruns and enables streamed processing
 	of UTF8 strings.
 */
 static inline uint32
 UTF8ToCharCode(const char **bytes)
 {
-	register uint32 result = 0;
+	#define UTF8_SUBSTITUTE_CHARACTER	0xfffd
 
-	if ((*bytes)[0] & 0x80) {
-		if ((*bytes)[0] & 0x40) {
-			if ((*bytes)[0] & 0x20) {
-				if ((*bytes)[0] & 0x10) {
-					if ((*bytes)[0] & 0x08) {
-						/*	A five byte char?!
-							Something's wrong, substitute. */
-						result += 0x20;
-						(*bytes)++;
-						return result;
-					}
-
-					if ((*bytes)[1] == 0 || (*bytes)[2] == 0 || (*bytes)[3] == 0)
-						return 0x00;
-
-					/* A four byte char */
-					result += (*bytes)[0] & 0x07;
-					result <<= 6;
-					result += (*bytes)[1] & 0x3f;
-					result <<= 6;
-					result += (*bytes)[2] & 0x3f;
-					result <<= 6;
-					result += (*bytes)[3] & 0x3f;
-					(*bytes) += 4;
-					return result;
-				}
-
-				if ((*bytes)[1] == 0 || (*bytes)[2] == 0)
-					return 0x00;
-
-				/* A three byte char */
-				result += (*bytes)[0] & 0x0f;
-				result <<= 6;
-				result += (*bytes)[1] & 0x3f;
-				result <<= 6;
-				result += (*bytes)[2] & 0x3f;
-				(*bytes) += 3;
-				return result;
-			}
-
-			if ((*bytes)[1] == 0)
-				return 0x00;
-
-			/* A two byte char */
-			result += (*bytes)[0] & 0x1f;
-			result <<= 6;
-			result += (*bytes)[1] & 0x3f;
-			(*bytes) += 2;
-			return result;
+	uint32 result;
+	if (((*bytes)[0] & 0x80) == 0) {
+		// a single byte character
+		result = (*bytes)[0];
+		if (result != '\0') {
+			// do not advance beyond the terminating '\0'
+			(*bytes)++;
 		}
 
-		/*	This (10) is not a startbyte.
-			Substitute with a space. */
-		result += 0x20;
-		(*bytes)++;
 		return result;
 	}
 
-	if ((*bytes)[0] == 0) {
-		/*	We do not advance beyond the terminating 0. */
+	if (((*bytes)[0] & 0xc0) == 0x80) {
+		// not a proper multibyte start
+		(*bytes)++;
+		return UTF8_SUBSTITUTE_CHARACTER;
+	}
+
+	// start of a multibyte character
+	uint8 mask = 0x80;
+	result = (uint32)((*bytes)[0] & 0xff);
+	(*bytes)++;
+
+	while (result & mask) {
+		if (mask == 0x02) {
+			// seven byte char - invalid
+			return UTF8_SUBSTITUTE_CHARACTER;
+		}
+
+		result &= ~mask;
+		mask >>= 1;
+	}
+
+	while (((*bytes)[0] & 0xc0) == 0x80) {
+		result <<= 6;
+		result += (*bytes)[0] & 0x3f;
+		(*bytes)++;
+
+		mask <<= 1;
+		if (mask == 0x40)
+			break;
+	}
+
+	if (mask == 0x40)
+		return result;
+
+	if ((*bytes)[0] == '\0') {
+		// string terminated within multibyte char
 		return 0x00;
 	}
 
-	result += (*bytes)[0];
-	(*bytes)++;
-	return result;
+	// not enough bytes in multibyte char
+	return UTF8_SUBSTITUTE_CHARACTER;
+
+	#undef UTF8_SUBSTITUTE_CHARACTER
 }
 
 #endif	// _UTF8_FUNCTIONS_H
