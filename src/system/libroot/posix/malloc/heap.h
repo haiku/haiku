@@ -178,13 +178,6 @@ class hoardHeap {
 
 		//// Members ////
 
-#if HEAP_DEBUG
-		// For sanity checking.
-		const unsigned long _magic;
-#else
-#	define _magic HEAP_MAGIC
-#endif
-
 		// Heap statistics.
 		heapStats _stats[SIZE_CLASSES];
 
@@ -203,6 +196,13 @@ class hoardHeap {
 
 		// The current least-empty superblock bin.
 		int _leastEmptyBin[SIZE_CLASSES];
+
+#if HEAP_DEBUG
+		// For sanity checking.
+		const unsigned long _magic;
+#else
+#	define _magic HEAP_MAGIC
+#endif
 
 		// The lookup table for size classes.
 		static size_t _sizeTable[SIZE_CLASSES];
