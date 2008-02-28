@@ -608,16 +608,16 @@ BListView::RemoveItem(BListItem *item)
 bool
 BListView::RemoveItems(int32 index, int32 count)
 {
-	if (index >= CountItems())
+	if (index >= fList.CountItems())
 		index = -1;
 
 	if (index < 0)
 		return false;
 
-	// TODO: very bad for performance!!
-	while (count--)
-		BListView::RemoveItem(index);
-
+	fList.RemoveItems(index, count);
+	if (index < fList.CountItems())
+		_RecalcItemTops(index);
+	Invalidate();
 	return true;
 }
 
