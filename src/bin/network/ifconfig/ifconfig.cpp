@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -563,30 +563,6 @@ configure_interface(int socket, const char* name, char* const* args,
 	}
 	currentFlags = request.ifr_flags;
 
-	if (!hasMask && hasAddress && kFamilies[familyIndex].family == AF_INET
-		&& ioctl(socket, SIOCGIFNETMASK, &request, sizeof(struct ifreq)) == 0
-		&& request.ifr_mask.sa_family == AF_UNSPEC) {
-		// generate standard netmask if it doesn't have one yet
-		sockaddr_in *netmask = (sockaddr_in *)&mask;
-		netmask->sin_len = sizeof(sockaddr_in);
-		netmask->sin_family = AF_INET;
-
-		// choose default netmask depending on the class of the address
-		in_addr_t net = ((sockaddr_in *)&address)->sin_addr.s_addr;
-		if (IN_CLASSA(net)
-			|| (ntohl(net) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
-			// class A, or loopback
-			netmask->sin_addr.s_addr = IN_CLASSA_NET;
-		} else if (IN_CLASSB(net)) {
-			// class B
-			netmask->sin_addr.s_addr = IN_CLASSB_NET;
-		} else {
-			// class C and rest
-			netmask->sin_addr.s_addr = IN_CLASSC_NET;
-		}
-
-		hasMask = true;
-	}
 	if (hasMask) {
 		memcpy(&request.ifr_mask, &mask, mask.sa_len);
 
@@ -596,20 +572,6 @@ configure_interface(int socket, const char* name, char* const* args,
 		}
 	}
 
-	if (!hasBroadcast && hasAddress && (currentFlags & IFF_BROADCAST)
-		&& kFamilies[familyIndex].family == AF_INET
-		&& ioctl(socket, SIOCGIFBRDADDR, &request, sizeof(struct ifreq)) == 0
-		&& request.ifr_mask.sa_family == AF_UNSPEC) {
-			// generate standard broadcast address if it doesn't have one yet
-		sockaddr_in *broadcastAddr = (sockaddr_in *)&broadcast;
-		uint32 maskValue = ((sockaddr_in *)&mask)->sin_addr.s_addr;
-		uint32 broadcastValue = ((sockaddr_in *)&address)->sin_addr.s_addr;
-		broadcastValue = (broadcastValue & maskValue) | ~maskValue;
-		broadcastAddr->sin_len = sizeof(sockaddr_in);
-		broadcastAddr->sin_family = AF_INET;
-		broadcastAddr->sin_addr.s_addr = broadcastValue;
-		hasBroadcast = true;
-	}
 	if (hasBroadcast) {
 		memcpy(&request.ifr_broadaddr, &broadcast, broadcast.sa_len);
 
