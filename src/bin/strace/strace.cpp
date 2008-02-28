@@ -67,7 +67,7 @@ static const char *kUsage =
 "  -f             - Fast mode. Syscall arguments contents aren't retrieved.\n"
 "  -h, --help     - Print this text.\n"
 "  -i             - Print integers in decimal format instead of hexadecimal.\n"
-"  -l             - Also trace loading the excecutable. Only considered when\n"
+"  -l             - Also trace loading the executable. Only considered when\n"
 "                   an executable is provided.\n"
 "  -r             - Don't print syscall return values.\n"
 "  -s             - Also trace all threads spawned by the supplied thread,\n"
