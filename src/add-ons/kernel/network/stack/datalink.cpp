@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -161,6 +161,26 @@ add_default_routes(net_interface_private *interface, int32 option)
 		route.flags = RTF_LOCAL | RTF_HOST;
 		add_route(interface->domain, &route);
 	}
+}
+
+
+sockaddr *
+reallocate_address(sockaddr **_address, uint32 size)
+{
+	sockaddr *address = *_address;
+
+	size = max_c(size, sizeof(struct sockaddr));
+	if (address != NULL && address->sa_len >= size)
+		return address;
+
+	address = (sockaddr *)malloc(size);
+	if (address == NULL)
+		return NULL;
+
+	free(*_address);
+	*_address = address;
+
+	return address;
 }
 
 
@@ -624,27 +644,32 @@ interface_protocol_control(net_datalink_protocol *_protocol,
 			if (_address == NULL)
 				return B_BAD_VALUE;
 
-			sockaddr *address = *_address;
-			sockaddr *original = address;
-
 			// allocate new address if needed
-			if (address == NULL
-				|| (address->sa_len < request.ifr_addr.sa_len
-					&& request.ifr_addr.sa_len > sizeof(struct sockaddr))) {
-				address = (sockaddr *)malloc(
-					max_c(request.ifr_addr.sa_len, sizeof(struct sockaddr)));
-			}
+			sockaddr *address = reallocate_address(_address,
+				request.ifr_addr.sa_len);
 
 			// copy new address over
 			if (address != NULL) {
 				remove_default_routes(interface, option);
+				memcpy(address, &request.ifr_addr, request.ifr_addr.sa_len);
 
-				if (original != address) {
-					free(original);
-					*_address = address;
+				if (option == SIOCSIFADDR || option == SIOCSIFNETMASK) {
+					// reset netmask and broadcast addresses to defaults
+					sockaddr *netmask = NULL;
+					sockaddr *oldNetmask = NULL;
+					if (option == SIOCSIFADDR) {
+						netmask = reallocate_address(&interface->mask,
+							request.ifr_addr.sa_len);
+					} else
+						oldNetmask = address;
+
+					sockaddr *broadcast = reallocate_address(
+						&interface->destination, request.ifr_addr.sa_len);
+
+					interface->domain->address_module->set_to_defaults(
+						netmask, broadcast, interface->address, oldNetmask);
 				}
 
-				memcpy(address, &request.ifr_addr, request.ifr_addr.sa_len);
 				add_default_routes(interface, option);
 			}
 

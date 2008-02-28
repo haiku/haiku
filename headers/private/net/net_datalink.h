@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_DATALINK_H
@@ -67,7 +67,7 @@ struct net_datalink_module_info {
 					size_t *_length);
 	status_t (*send_data)(struct net_route *route, struct net_buffer *buffer);
 	status_t (*send_datagram)(struct net_protocol *protocol,
-		struct net_domain *domain, struct net_buffer *buffer);
+					struct net_domain *domain, struct net_buffer *buffer);
 
 	bool (*is_local_address)(struct net_domain *domain,
 					const struct sockaddr *address,
@@ -75,7 +75,7 @@ struct net_datalink_module_info {
 					uint32 *_matchedType);
 	net_interface *(*get_interface)(struct net_domain *domain, uint32 index);
 	net_interface *(*get_interface_with_address)(struct net_domain *domain,
-		const struct sockaddr *address);
+					const struct sockaddr *address);
 
 	// routes
 	status_t (*add_route)(struct net_domain *domain,
@@ -85,7 +85,7 @@ struct net_datalink_module_info {
 	struct net_route *(*get_route)(struct net_domain *domain,
 					const struct sockaddr *address);
 	status_t (*get_buffer_route)(struct net_domain *domain,
-		struct net_buffer *buffer, struct net_route **_route);
+					struct net_buffer *buffer, struct net_route **_route);
 	void (*put_route)(struct net_domain *domain, struct net_route *route);
 
 	status_t (*register_route_info)(struct net_domain *domain,
@@ -100,7 +100,7 @@ struct net_address_module_info {
 	module_info info;
 
 	status_t (*copy_address)(const sockaddr *from, sockaddr **to,
-					bool replaceWithZeros /* = false */, const sockaddr *mask /* = NULL*/);
+					bool replaceWithZeros, const sockaddr *mask);
 
 	status_t (*mask_address)(const sockaddr *address, const sockaddr *mask, 
 					sockaddr *result);
@@ -110,7 +110,7 @@ struct net_address_module_info {
 	bool (*equal_addresses_and_ports)(const sockaddr *a, const sockaddr *b);
 	bool (*equal_masked_addresses)(const sockaddr *a, const sockaddr *b, 
 					const sockaddr *mask);
-	bool (*is_empty_address)(const sockaddr *address, bool checkPort /* = true */);
+	bool (*is_empty_address)(const sockaddr *address, bool checkPort);
 
 	int32 (*first_mask_bit)(const sockaddr *mask);
 
@@ -126,6 +126,9 @@ struct net_address_module_info {
 
 	status_t (*set_to)(sockaddr *address, const sockaddr *from);
 	status_t (*set_to_empty_address)(sockaddr *address);
+	status_t (*set_to_defaults)(sockaddr *defaultMask,
+					sockaddr *defaultBroadcast, sockaddr *address,
+					sockaddr *netmask);
 
 	status_t (*update_to)(sockaddr *address, const sockaddr *from);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -388,6 +388,55 @@ ipv4_set_to_empty_address(sockaddr *address)
 }
 
 
+static status_t
+ipv4_set_to_defaults(sockaddr *_defaultMask, sockaddr *_defaultBroadcast,
+	sockaddr *_address, sockaddr *_mask)
+{
+	sockaddr_in *defaultMask = (sockaddr_in *)_defaultMask;
+	sockaddr_in *defaultBroadcast = (sockaddr_in *)_defaultBroadcast;
+	sockaddr_in *address = (sockaddr_in *)_address;
+	sockaddr_in *mask = (sockaddr_in *)_mask;
+
+	if (address == NULL || (defaultMask == NULL && defaultBroadcast == NULL))
+		return B_BAD_VALUE;
+
+	in_addr_t net;
+	if (mask == NULL) {
+		// choose default netmask depending on the class of the address
+		net = address->sin_addr.s_addr;
+		if (IN_CLASSA(net)
+			|| (ntohl(net) >> IN_CLASSA_NSHIFT) == IN_LOOPBACKNET) {
+			// class A, or loopback
+			net = IN_CLASSA_NET;
+		} else if (IN_CLASSB(net)) {
+			// class B
+			net = IN_CLASSB_NET;
+		} else {
+			// class C and rest
+			net = IN_CLASSC_NET;
+		}
+	} else
+		net = mask->sin_addr.s_addr;
+
+	if (defaultMask != NULL) {
+		defaultMask->sin_len = sizeof(sockaddr_in);
+		defaultMask->sin_family = AF_INET;
+		defaultMask->sin_port = 0;
+		defaultMask->sin_addr.s_addr = net;
+	}
+
+	if (defaultBroadcast != NULL) {
+		defaultBroadcast->sin_len = sizeof(sockaddr_in);
+		defaultBroadcast->sin_family = AF_INET;
+		defaultBroadcast->sin_port = 0;
+		defaultBroadcast->sin_addr.s_addr = (address->sin_addr.s_addr & net)
+			| ~net;
+	}
+
+	return B_OK;
+}
+
+
 /*!
 	Computes a hash-value of the given addresses \a ourAddress 
 	and \a peerAddress.
@@ -441,6 +490,7 @@ net_address_module_info gIPv4AddressModule = {
 	ipv4_set_port,
 	ipv4_set_to,
 	ipv4_set_to_empty_address,
+	ipv4_set_to_defaults,
 	ipv4_update_to,
 	ipv4_hash_address_pair,
 	ipv4_checksum_address,
