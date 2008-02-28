@@ -63,8 +63,8 @@ enum { SUPERBLOCK_FULLNESS_GROUP = 9 };
 #define HEAP_CALL_STACK_SIZE 8
 
 // A simple wall checker
-#define HEAP_WALL 1
-#define HEAP_WALL_SIZE 64
+#define HEAP_WALL 0
+#define HEAP_WALL_SIZE 32
 
 // CACHE_LINE = The number of bytes in a cache line.
 
