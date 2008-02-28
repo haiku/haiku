@@ -855,7 +855,7 @@ BOutlineListView::_SwapItems(int32 first, int32 second)
 	int32 secondIndex = max_c(first, second);
 	BListItem *firstItem = ItemAt(firstIndex);
 	BListItem *secondItem = ItemAt(secondIndex);
-
+	
 	if (Superitem(firstItem) != Superitem(secondItem))
 		return false;
 
@@ -880,6 +880,7 @@ BOutlineListView::_SwapItems(int32 first, int32 second)
 	_DoSwap(fList, firstIndex, secondIndex, firstCount, secondCount, index);	
 
 	_RecalcItemTops(firstIndex);
+	_RescanSelection(firstIndex, secondIndex + secondCount);
 	Invalidate(Bounds());	
 	return true;
 }
