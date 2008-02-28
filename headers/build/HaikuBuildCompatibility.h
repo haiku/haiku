@@ -11,9 +11,12 @@
 
 #ifdef HAIKU_HOST_PLATFORM_DANO
 #	include <be_setup.h>
+#	include <be_errors.h>
+#	define _ERRORS_H
+		// this is what Haiku/BeOS is using
 #endif
 
-#if defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST) || defined(HAIKU_HOST_PLATFORM_DANO)
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 #	define _BE_ERRNO_H_
 		// this is what Dano/Zeta is using
 #	include <Errors.h>
