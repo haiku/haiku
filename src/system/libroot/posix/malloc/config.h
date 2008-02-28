@@ -51,7 +51,6 @@
 enum { SUPERBLOCK_FULLNESS_GROUP = 9 };
 
 
-
 // DO NOT CHANGE THESE.  They require running of maketable to replace
 // the values in heap.cpp for the _numBlocks array.
 
@@ -62,6 +61,10 @@ enum { SUPERBLOCK_FULLNESS_GROUP = 9 };
 // A simple (and slow) leak checker
 #define HEAP_LEAK_CHECK 0
 #define HEAP_CALL_STACK_SIZE 8
+
+// A simple wall checker
+#define HEAP_WALL 1
+#define HEAP_WALL_SIZE 64
 
 // CACHE_LINE = The number of bytes in a cache line.
 

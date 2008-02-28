@@ -189,8 +189,50 @@ remove_address(void* address)
 
 	hoardUnlock(sUsedLock);
 }
+
 #endif	// HEAP_LEAK_CHECK
 
+#if HEAP_WALL
+
+static void*
+set_wall(void* addr, size_t size)
+{
+	size_t *start = (size_t*)addr;
+
+	start[0] = size;
+	memset(start + 1, 0x88, HEAP_WALL_SIZE - sizeof(size_t));
+	memset((uint8*)addr + size - HEAP_WALL_SIZE, 0x66, HEAP_WALL_SIZE);
+
+	return (uint8*)addr + HEAP_WALL_SIZE;
+}
+
+
+static void*
+check_wall(uint8* buffer)
+{
+	buffer -= HEAP_WALL_SIZE;
+	size_t size = *(size_t*)buffer;
+
+	if (threadHeap::objectSize(buffer) < size)
+		debugger("invalid size");
+
+	for (size_t i = 0; i < HEAP_WALL_SIZE; i++) {
+		if (i >= sizeof(size_t) && buffer[i] != 0x88) {
+			debug_printf("allocation %p, size %ld front wall clobbered at byte %ld.\n",
+				buffer + HEAP_WALL_SIZE, size - 2 * HEAP_WALL_SIZE, i);
+			debugger("front wall clobbered");
+		}
+		if (buffer[i + size - HEAP_WALL_SIZE] != 0x66) {
+			debug_printf("allocation %p, size %ld back wall clobbered at byte %ld.\n",
+				buffer + HEAP_WALL_SIZE, size - 2 * HEAP_WALL_SIZE, i);
+			debugger("back wall clobbered");
+		}
+	}
+
+	return buffer;
+}
+
+#endif	// HEAP_WALL
 
 inline static processHeap *
 getAllocator(void)
@@ -210,6 +252,10 @@ malloc(size_t size)
 {
 	static processHeap *pHeap = getAllocator();
 
+#if HEAP_WALL
+	size += 2 * HEAP_WALL_SIZE;
+#endif
+
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (addr == NULL) {
 		errno = B_NO_MEMORY;
@@ -218,6 +264,9 @@ malloc(size_t size)
 
 #if HEAP_LEAK_CHECK
 	add_address(addr, size);
+#endif
+#if HEAP_WALL
+	addr = set_wall(addr, size);
 #endif
 
 	return addr;
@@ -228,18 +277,28 @@ extern "C" void *
 calloc(size_t nelem, size_t elsize)
 {
 	static processHeap *pHeap = getAllocator();
-	void *ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(nelem * elsize);
+	size_t size = nelem * elsize;
+
+#if HEAP_WALL
+	size += 2 * HEAP_WALL_SIZE;
+#endif
+
+	void *ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (ptr == NULL) {
 		errno = B_NO_MEMORY;
 		return NULL;
 	}
 
 #if HEAP_LEAK_CHECK
-	add_address(ptr, nelem * elsize);
+	add_address(ptr, size);
+#endif
+#if HEAP_WALL
+	ptr = set_wall(ptr, size);
+	size -= 2 * HEAP_WALL_SIZE;
 #endif
 
 	// Zero out the malloc'd block.
-	memset(ptr, 0, nelem * elsize);
+	memset(ptr, 0, size);
 	return ptr;
 }
 
@@ -248,6 +307,11 @@ extern "C" void
 free(void *ptr)
 {
 	static processHeap *pHeap = getAllocator();
+#if HEAP_WALL
+	if (ptr == NULL)
+		return;
+	ptr = check_wall((uint8*)ptr);
+#endif
 #if HEAP_LEAK_CHECK
 	if (ptr != NULL)
 		remove_address(ptr);
@@ -260,6 +324,11 @@ extern "C" void *
 memalign(size_t alignment, size_t size)
 {
 	static processHeap *pHeap = getAllocator();
+
+#if HEAP_WALL
+	debug_printf("memalign() is not yet supported by the wall code.\n");
+	return NULL;
+#endif
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
 		size);
 	if (addr == NULL) {
@@ -281,6 +350,10 @@ posix_memalign(void **_pointer, size_t alignment, size_t size)
 	if ((alignment & (sizeof(void *) - 1)) != 0 || _pointer == NULL)
 		return B_BAD_VALUE;
 
+#if HEAP_WALL
+	debug_printf("posix_memalign() is not yet supported by the wall code.\n");
+	return -1;
+#endif
 	static processHeap *pHeap = getAllocator();
 	void *pointer = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
 		size);
@@ -317,9 +390,25 @@ realloc(void *ptr, size_t size)
 	// If the existing object can hold the new size,
 	// just return it.
 
+#if HEAP_WALL
+	size += 2 * HEAP_WALL_SIZE;
+	ptr = (uint8*)ptr - HEAP_WALL_SIZE;
+#endif
+
 	size_t objSize = threadHeap::objectSize(ptr);
-	if (objSize >= size)
+	if (objSize >= size) {
+#if HEAP_WALL
+		check_wall((uint8*)ptr + HEAP_WALL_SIZE);
+		ptr = set_wall(ptr, size);
+#endif
 		return ptr;
+	}
+
+#if HEAP_WALL
+	size -= 2 * HEAP_WALL_SIZE;
+	objSize -= 2 * HEAP_WALL_SIZE;
+	ptr = (uint8*)ptr + HEAP_WALL_SIZE;
+#endif
 
 	// Allocate a new block of size sz.
 	void *buffer = malloc(size);
