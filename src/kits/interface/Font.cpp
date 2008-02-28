@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -223,7 +223,8 @@ FontList::_FindFamily(font_family name)
 
 	::family family;
 	family.name = name;
-	fLastFamily = const_cast< ::family*>(fFamilies.BinarySearch(family, compare_families));
+	fLastFamily = const_cast< ::family*>(fFamilies.BinarySearch(family,
+		compare_families));
 	return fLastFamily;
 }
 
@@ -408,7 +409,6 @@ _get_system_default_font_(const char* which, font_family family,
 	\brief Returns the number of installed font families
 	\return The number of installed font families
 */
-
 int32
 count_font_families()
 {
@@ -420,7 +420,6 @@ count_font_families()
 	\brief Returns the number of styles available for a font family
 	\return The number of styles available for a font family
 */
-
 int32
 count_font_styles(font_family family)
 {
@@ -432,10 +431,10 @@ count_font_styles(font_family family)
 	\brief Retrieves the family name at the specified index
 	\param index Unique font identifier code.
 	\param name font_family string to receive the name of the family
-	\param flags if non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\param flags if non-NULL, the values of the flags IS_FIXED and
+		B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font family
 */
-
 status_t
 get_font_family(int32 index, font_family *_name, uint32 *_flags)
 {
@@ -450,10 +449,10 @@ get_font_family(int32 index, font_family *_name, uint32 *_flags)
 	\brief Retrieves the family name at the specified index
 	\param index Unique font identifier code.
 	\param name font_family string to receive the name of the family
-	\param flags if non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\param flags if non-NULL, the values of the flags IS_FIXED and
+		B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font style
 */
-
 status_t
 get_font_style(font_family family, int32 index, font_style *_name,
 	uint32 *_flags)
@@ -467,13 +466,14 @@ get_font_style(font_family family, int32 index, font_style *_name,
 	\param index Unique font identifier code.
 	\param name font_family string to receive the name of the family
 	\param face recipient of font face value, such as B_REGULAR_FACE
-	\param flags if non-NULL, the values of the flags IS_FIXED and B_HAS_TUNED_FONT are returned
+	\param flags if non-NULL, the values of the flags IS_FIXED and
+		B_HAS_TUNED_FONT are returned
 	\return B_ERROR if the index does not correspond to a font style
 	
-	The face value returned by this function is not very reliable. At the same time, the value
-	returned should be fairly reliable, returning the proper flag for 90%-99% of font names.
+	The face value returned by this function is not very reliable. At the same
+	time, the value returned should be fairly reliable, returning the proper
+	flag for 90%-99% of font names.
 */
-
 status_t
 get_font_style(font_family family, int32 index, font_style *_name,
 	uint16 *_face, uint32 *_flags)
@@ -490,7 +490,6 @@ get_font_style(font_family family, int32 index, font_style *_name,
 	\param checkOnly is ignored
 	\return true if the font list has changed, false if not.
 */
-
 bool
 update_font_families(bool /*checkOnly*/)
 {
@@ -547,7 +546,6 @@ BFont::BFont(const BFont *font)
 	\param style Font style to set
 	\return B_NAME_NOT_FOUND if family or style do not exist.
 */
-
 status_t
 BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 {
@@ -582,7 +580,6 @@ BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 	\brief Sets the font's family and style all at once
 	\param code Unique font identifier obtained from the server.
 */
-
 void
 BFont::SetFamilyAndStyle(uint32 fontcode)
 {
@@ -628,7 +625,6 @@ BFont::SetFamilyAndStyle(uint32 fontcode)
 	Additionally, if a particular  face does not exist in a family, the closest
 	match will be chosen.
 */
-
 status_t
 BFont::SetFamilyAndFace(const font_family family, uint16 face)
 {
@@ -838,7 +834,6 @@ BFont::IsFixed() const
 	This was left unimplemented as of R5. It was a way to work with both
 	Kanji and Roman characters in the same fixed-width font.
 */
-
 bool
 BFont::IsFullAndHalfFixed() const
 {
@@ -987,8 +982,7 @@ BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 			GetEscapements(stringArray[i], numChars, NULL, escapementArray);
 
 			truncate_string(stringArray[i], mode, width, resultArray[i],
-							escapementArray, fSize, ellipsisWidth, length,
-							numChars);
+				escapementArray, fSize, ellipsisWidth, length, numChars);
 
 			delete[] escapementArray;
 		}
@@ -1039,7 +1033,8 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 	link.Attach<int32>(numStrings);
 
 	// TODO: all strings into a single array???
-	//	we do have a maximum message length, and it could be easily touched here...
+	//	we do have a maximum message length, and it could be easily touched
+	//	here...
 	for (int32 i = 0; i < numStrings; i++) {
 		link.AttachString(stringArray[i], lengthArray[i]);
 	}
@@ -1054,15 +1049,16 @@ BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[],
 
 
 void
-BFont::GetEscapements(const char charArray[], int32 numChars, float escapementArray[]) const
+BFont::GetEscapements(const char charArray[], int32 numChars,
+	float escapementArray[]) const
 {
 	GetEscapements(charArray, numChars, NULL, escapementArray);
 }
 
 
 void
-BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
-	float escapementArray[]) const
+BFont::GetEscapements(const char charArray[], int32 numChars,
+	escapement_delta *delta, float escapementArray[]) const
 {
 	if (!charArray || numChars < 1 || !escapementArray)
 		return;
@@ -1095,16 +1091,17 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 
 
 void
-BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
-	BPoint escapementArray[]) const
+BFont::GetEscapements(const char charArray[], int32 numChars,
+	escapement_delta *delta, BPoint escapementArray[]) const
 {
 	GetEscapements(charArray, numChars, delta, escapementArray, NULL);
 }
 
 
 void
-BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *delta, 
-	BPoint escapementArray[], BPoint offsetArray[]) const
+BFont::GetEscapements(const char charArray[], int32 numChars,
+	escapement_delta *delta, BPoint escapementArray[],
+	BPoint offsetArray[]) const
 {
 	if (!charArray || numChars < 1 || !escapementArray)
 		return;
@@ -1140,7 +1137,8 @@ BFont::GetEscapements(const char charArray[], int32 numChars, escapement_delta *
 
 
 void
-BFont::GetEdges(const char charArray[], int32 numChars, edge_info edgeArray[]) const
+BFont::GetEdges(const char charArray[], int32 numChars,
+	edge_info edgeArray[]) const
 {
 	if (!charArray || numChars < 1 || !edgeArray)
 		return;
@@ -1186,7 +1184,8 @@ BFont::GetHeight(font_height *_height) const
 			return;
 
 		// Who put that "const" to this method? :-)
-		// We made fHeight mutable for this, but we should drop the "const" when we can
+		// We made fHeight mutable for this, but we should drop the "const"
+		// when we can
 		link.Read<font_height>(&fHeight);
 	}
 
@@ -1195,24 +1194,28 @@ BFont::GetHeight(font_height *_height) const
 
 
 void
-BFont::GetBoundingBoxesAsGlyphs(const char charArray[], int32 numChars, font_metric_mode mode,
+BFont::GetBoundingBoxesAsGlyphs(const char charArray[], int32 numChars,
+	font_metric_mode mode, BRect boundingBoxArray[]) const
+{
+	_GetBoundingBoxes(charArray, numChars, mode, false, NULL, boundingBoxArray,
+		false);
+}
+
+
+void
+BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars,
+	font_metric_mode mode, escapement_delta *delta,
 	BRect boundingBoxArray[]) const
 {
-	_GetBoundingBoxes(charArray, numChars, mode, false, NULL, boundingBoxArray, false);
+	_GetBoundingBoxes(charArray, numChars, mode, true, delta, boundingBoxArray,
+		true);
 }
 
 
 void
-BFont::GetBoundingBoxesAsString(const char charArray[], int32 numChars, font_metric_mode mode,
-	escapement_delta *delta, BRect boundingBoxArray[]) const
-{
-	_GetBoundingBoxes(charArray, numChars, mode, true, delta, boundingBoxArray, true);
-}
-
-
-void
-BFont::_GetBoundingBoxes(const char charArray[], int32 numChars, font_metric_mode mode,
-	bool string_escapement, escapement_delta *delta, BRect boundingBoxArray[], bool asString) const
+BFont::_GetBoundingBoxes(const char charArray[], int32 numChars,
+	font_metric_mode mode, bool string_escapement, escapement_delta *delta,
+	BRect boundingBoxArray[], bool asString) const
 {
 	if (!charArray || numChars < 1 || !boundingBoxArray)
 		return;
@@ -1220,7 +1223,8 @@ BFont::_GetBoundingBoxes(const char charArray[], int32 numChars, font_metric_mod
 	int32 code;
 	BPrivate::AppServerLink link;
 
-	link.StartMessage(asString ? AS_GET_BOUNDINGBOXES_STRING : AS_GET_BOUNDINGBOXES_CHARS);
+	link.StartMessage(asString
+		? AS_GET_BOUNDINGBOXES_STRING : AS_GET_BOUNDINGBOXES_CHARS);
 	link.Attach<uint16>(fFamilyID);
 	link.Attach<uint16>(fStyleID);
 	link.Attach<float>(fSize);
@@ -1255,7 +1259,8 @@ BFont::_GetBoundingBoxes(const char charArray[], int32 numChars, font_metric_mod
 
 void
 BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
-	font_metric_mode mode, escapement_delta deltas[], BRect boundingBoxArray[]) const
+	font_metric_mode mode, escapement_delta deltas[],
+	BRect boundingBoxArray[]) const
 {
 	if (!stringArray || numStrings < 1 || !boundingBoxArray)
 		return;
@@ -1298,9 +1303,11 @@ BFont::GetBoundingBoxesForStrings(const char *stringArray[], int32 numStrings,
 
 
 void
-BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShapeArray[]) const
+BFont::GetGlyphShapes(const char charArray[], int32 numChars,
+	BShape *glyphShapeArray[]) const
 {
-	// TODO: implement code specifically for passing BShapes to and from the server
+	// TODO: implement code specifically for passing BShapes to and
+	// from the server
 	if (!charArray || numChars < 1 || !glyphShapeArray)
 		return;
 
@@ -1331,7 +1338,8 @@ BFont::GetGlyphShapes(const char charArray[], int32 numChars, BShape *glyphShape
 
 
 void
-BFont::GetHasGlyphs(const char charArray[], int32 numChars, bool hasArray[]) const
+BFont::GetHasGlyphs(const char charArray[], int32 numChars,
+	bool hasArray[]) const
 {
 	if (!charArray || numChars < 1 || !hasArray)
 		return;
@@ -1413,8 +1421,8 @@ BFont::PrintToStream() const
 	font_style style;
 	GetFamilyAndStyle(&family, &style);
 
-	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %d }\n", family,
-		fFamilyID, style, fStyleID, fFace, fShear, fRotation, fSize,
+	printf("BFont { %s (%d), %s (%d) 0x%x %f/%f %fpt (%f %f %f), %d }\n",
+		family, fFamilyID, style, fStyleID, fFace, fShear, fRotation, fSize,
 		fHeight.ascent, fHeight.descent, fHeight.leading, fEncoding);
 }
 
@@ -1422,7 +1430,8 @@ BFont::PrintToStream() const
 void
 BFont::_GetExtraFlags() const
 {
-	// TODO: this has to be const in order to allow other font getters to stay const as well
+	// TODO: this has to be const in order to allow other font getters to
+	// stay const as well
 	if (fExtraFlags != kUninitializedExtraFlags)
 		return;
 
@@ -1435,9 +1444,11 @@ BFont::_GetExtraFlags() const
 	if (link.FlushWithReply(status) != B_OK
 		|| status != B_OK) {
 		// use defaut values for the flags
-		fExtraFlags = (uint32)B_FONT_LEFT_TO_RIGHT << B_PRIVATE_FONT_DIRECTION_SHIFT;
+		fExtraFlags = (uint32)B_FONT_LEFT_TO_RIGHT
+			<< B_PRIVATE_FONT_DIRECTION_SHIFT;
 		return;
 	}
 
 	link.Read<uint32>(&fExtraFlags);
 }
+
