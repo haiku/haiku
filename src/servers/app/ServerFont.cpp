@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -496,28 +496,36 @@ ServerFont::GetEdges(const char* string, int32 numBytes,
 
 
 class BPointEscapementConsumer {
- public:
-	BPointEscapementConsumer(BPoint* escapements, BPoint* offsets, float size)
-		: fEscapements(escapements)
-		, fOffsets(offsets)
-		, fSize(size)
+public:
+	BPointEscapementConsumer(BPoint* escapements, BPoint* offsets,
+			int32 numChars, float size)
+		:
+		fEscapements(escapements),
+		fOffsets(offsets),
+		fNumChars(numChars),
+		fSize(size)
 	{
 	}
+
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
 	{
 		_Set(index, 0, 0);
 	}
+
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
 		FontCacheEntry* entry, double x, double y)
 	{
-		_Set(index, glyph->advance_x, glyph->advance_y);
-		return true;
+		return _Set(index, glyph->advance_x, glyph->advance_y);
 	}
- private:
-	inline void _Set(int32 index, double x, double y)
+
+private:
+	inline bool _Set(int32 index, double x, double y)
 	{
+		if (index >= fNumChars)
+			return false;
+
 		fEscapements[index].x = x / fSize;
 		fEscapements[index].y = y / fSize;
 		if (fOffsets) {
@@ -529,16 +537,18 @@ class BPointEscapementConsumer {
 			fOffsets[index].x = 0;
 			fOffsets[index].y = 0;
 		}
+		return true;
 	}
 
 	BPoint* fEscapements;
 	BPoint* fOffsets;
+	int32 fNumChars;
  	float fSize;
 };
 
 
 status_t
-ServerFont::GetEscapements(const char* string, int32 numBytes,
+ServerFont::GetEscapements(const char* string, int32 numBytes, int32 numChars,
 	escapement_delta delta, BPoint escapementArray[],
 	BPoint offsetArray[]) const
 {
@@ -547,7 +557,8 @@ ServerFont::GetEscapements(const char* string, int32 numBytes,
 
 	bool kerning = true; // TODO make this a property?
 
-	BPointEscapementConsumer consumer(escapementArray, offsetArray, fSize);
+	BPointEscapementConsumer consumer(escapementArray, offsetArray, numChars,
+		fSize);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 		&delta, kerning, fSpacing))
 		return B_OK;
@@ -557,34 +568,42 @@ ServerFont::GetEscapements(const char* string, int32 numBytes,
 
 
 class WidthEscapementConsumer {
- public:
-	WidthEscapementConsumer(float* widths, float size)
-		: fWidths(widths)
-		, fSize(size)
+public:
+	WidthEscapementConsumer(float* widths, int32 numChars, float size)
+		:
+		fWidths(widths),
+		fNumChars(numChars),
+		fSize(size)
 	{
 	}
+
 	void Start() {}
 	void Finish(double x, double y) {}
 	void ConsumeEmptyGlyph(int32 index, uint32 charCode, double x, double y)
 	{
 		fWidths[index] = 0.0;
 	}
+
 	bool ConsumeGlyph(int32 index, uint32 charCode, const GlyphCache* glyph,
 		FontCacheEntry* entry, double x, double y)
 	{
+		if (index >= fNumChars)
+			return false;
+
 		fWidths[index] = glyph->advance_x / fSize;
 		return true;
 	}
 
  private:
 	float* fWidths;
+	int32 fNumChars;
 	float fSize;
 };
 
 
 
 status_t
-ServerFont::GetEscapements(const char* string, int32 numBytes,
+ServerFont::GetEscapements(const char* string, int32 numBytes, int32 numChars,
 	escapement_delta delta, float widthArray[]) const
 {
 	if (!string || numBytes <= 0 || !widthArray)
@@ -592,7 +611,7 @@ ServerFont::GetEscapements(const char* string, int32 numBytes,
 
 	bool kerning = true; // TODO make this a property?
 
-	WidthEscapementConsumer consumer(widthArray, fSize);
+	WidthEscapementConsumer consumer(widthArray, numChars, fSize);
 	if (GlyphLayoutEngine::LayoutGlyphs(consumer, *this, string, numBytes,
 		&delta, kerning, fSpacing))
 		return B_OK;
@@ -813,7 +832,8 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 	// get the escapement of each glyph in font units
 	float *escapementArray = new float[numChars];
 	static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
-	if (GetEscapements(string, length, delta, escapementArray) == B_OK) {
+	if (GetEscapements(string, length, numChars, delta, escapementArray)
+			== B_OK) {
 		truncate_string(string, mode, width, result, escapementArray, fSize,
 			ellipsisWidth, length, numChars);
 

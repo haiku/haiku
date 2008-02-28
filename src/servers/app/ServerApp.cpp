@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -62,15 +62,14 @@
 
 //#define DEBUG_SERVERAPP
 #ifdef DEBUG_SERVERAPP
-#	define STRACE(x) printf x
+#	define STRACE(x) debug_printf x
 #else
 #	define STRACE(x) ;
 #endif
 
 //#define DEBUG_SERVERAPP_FONT
-
 #ifdef DEBUG_SERVERAPP_FONT
-#	define FTRACE(x) printf x
+#	define FTRACE(x) debug_printf x
 #else
 #	define FTRACE(x) ;
 #endif
@@ -1414,6 +1413,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				size = 0.0f;
 			}
 
+			// TODO: don't use the stack for this - numStrings could be large
 			float widthArray[numStrings];
 			int32 lengthArray[numStrings];
 			char *stringArray[numStrings];
@@ -1599,6 +1599,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			link.Read<int32>(&numChars);
 			link.Read<int32>(&numBytes);
 
+			// TODO: proper error checking
 			char* charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
@@ -1611,6 +1612,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetFalseBoldWidth(falseBoldWidth);
 				font.SetFlags(flags);
 
+				// TODO: proper error checking
 				BShape** shapes = new (nothrow) BShape*[numChars];
 				status = font.GetGlyphShapes(charArray, numChars, shapes);
 				if (status == B_OK) {
@@ -1647,6 +1649,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 numChars, numBytes;
 			link.Read<int32>(&numChars);
 			link.Read<int32>(&numBytes);
+			// TODO: proper error checking
 			char* charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
@@ -1686,6 +1689,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
+			// TODO: proper error checking
 			char* charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
@@ -1748,7 +1752,24 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
+
 			char *charArray = new (nothrow) char[numBytes];
+			BPoint *escapements = new (nothrow) BPoint[numChars];
+			BPoint *offsets = NULL;
+			if (wantsOffsets)
+				offsets = new (nothrow) BPoint[numChars];
+
+			if (charArray == NULL || escapements == NULL
+				|| (offsets == NULL && wantsOffsets)) {
+				delete[] charArray;
+				delete[] escapements;
+				delete[] offsets;
+
+				fLink.StartMessage(B_NO_MEMORY);
+				fLink.Flush();
+				break;
+			}
+
 			link.Read(charArray, numBytes);
 
 			ServerFont font;
@@ -1759,20 +1780,15 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				BPoint *escapements = new (nothrow) BPoint[numChars];
-				BPoint *offsets = NULL;
-				if (wantsOffsets)
-					offsets = new (nothrow) BPoint[numChars];
-
-				status = font.GetEscapements(charArray, numBytes, delta,
-					escapements, offsets);
+				status = font.GetEscapements(charArray, numBytes, numChars,
+					delta, escapements, offsets);
 
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
 					for (int32 i = 0; i < numChars; i++)
 						fLink.Attach<BPoint>(escapements[i]);
 
-					if (wantsOffsets) {
+					if (offsets) {
 						for (int32 i = 0; i < numChars; i++)
 							fLink.Attach<BPoint>(offsets[i]);
 					}
@@ -1781,7 +1797,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 				delete[] escapements;
 				delete[] offsets;
-
 			} else
 				fLink.StartMessage(status);
 
@@ -1831,10 +1846,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
-			char* charArray = new (nothrow) char[numBytes];
-			link.Read(charArray, numBytes);
 
+			char* charArray = new (nothrow) char[numBytes];
 			float* escapements = new (nothrow) float[numChars];
+			if (charArray == NULL || escapements == NULL) {
+				delete[] charArray;
+				delete[] escapements;
+				fLink.StartMessage(B_NO_MEMORY);
+				fLink.Flush();
+				break;
+			}
+
+			link.Read(charArray, numBytes);
 
 			// figure out escapements
 
@@ -1846,8 +1869,8 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				font.SetRotation(rotation);
 				font.SetFlags(flags);
 
-				status = font.GetEscapements(charArray, numBytes, delta,
-					escapements);
+				status = font.GetEscapements(charArray, numBytes, numChars,
+					delta, escapements);
 
 				if (status == B_OK) {
 					fLink.StartMessage(B_OK);
@@ -1917,6 +1940,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			uint32 numBytes;
 			link.Read<uint32>(&numBytes);
 
+			// TODO: proper error checking
 			char *charArray = new (nothrow) char[numBytes];
 			link.Read(charArray, numBytes);
 
@@ -2574,7 +2598,7 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 		frame.bottom = frame.top + 1;
 	}
 
-	status_t status = B_ERROR;
+	status_t status = B_NO_MEMORY;
 	ServerWindow *window = NULL;
 
 	if (code == AS_CREATE_OFFSCREEN_WINDOW) {
@@ -2583,7 +2607,8 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 		if (bitmap != NULL) {
 			window = new (nothrow) OffscreenServerWindow(title, this, clientReplyPort,
 				looperPort, token, bitmap);
-		}
+		} else
+			status = B_ERROR;
 	} else {
 		window = new (nothrow) ServerWindow(title, this, clientReplyPort, looperPort, token);
 		STRACE(("\nServerApp %s: New Window %s (%g:%g, %g:%g)\n",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -125,12 +125,14 @@ class ServerFont {
 									edge_info edgeArray[]) const;
 
 			status_t			GetEscapements(const char charArray[],
-									int32 numBytes, escapement_delta delta,
+									int32 numBytes, int32 numChars,
+									escapement_delta delta,
 									BPoint escapementArray[],
 									BPoint offsetArray[]) const;
 
 			status_t			GetEscapements(const char charArray[],
-									int32 numBytes, escapement_delta delta,
+									int32 numBytes, int32 numChars,
+									escapement_delta delta,
 									float widthArray[]) const;
 
 			status_t			GetBoundingBoxes(const char charArray[],
