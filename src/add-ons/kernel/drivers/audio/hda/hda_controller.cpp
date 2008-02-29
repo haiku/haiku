@@ -37,10 +37,10 @@ static const struct {
 };
 
 
-static inline rirb_t*
+static inline rirb_t&
 current_rirb(hda_controller *controller)
 {
-	return &controller->rirb[controller->rirb_read_pos];
+	return controller->rirb[controller->rirb_read_pos];
 }
 
 
@@ -401,11 +401,13 @@ hda_interrupt_handler(hda_controller* controller)
 			REG8(controller, RIRBSTS) = rirbStatus;
 
 			if (rirbStatus & RIRBSTS_RINTFL) {
-				uint16 writePos = REG16(controller, RIRBWP);
+				uint16 writePos = (REG16(controller, RIRBWP) + 1)
+					% controller->rirb_length;
+
 				for (; controller->rirb_read_pos != writePos;
 						controller->rirb_read_pos = next_rirb(controller)) {
-					uint32 response = current_rirb(controller)->response;
-					uint32 responseFlags = current_rirb(controller)->flags;
+					uint32 response = current_rirb(controller).response;
+					uint32 responseFlags = current_rirb(controller).flags;
 					uint32 cad = responseFlags & RESPONSE_FLAGS_CODEC_MASK;
 					hda_codec* codec = controller->codecs[cad];
 
