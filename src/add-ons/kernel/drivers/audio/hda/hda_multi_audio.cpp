@@ -188,11 +188,6 @@ list_mix_channels(hda_audio_group* audioGroup, multi_mix_channel_info *data)
 static status_t
 get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 {
-	uint32 playbackSampleSize = audioGroup->playback_stream->sample_size;
-	uint32 recordSampleSize = audioGroup->record_stream->sample_size;
-	uint32 cidx, bidx;
-	status_t status;
-
 	TRACE("playback: %ld buffers, %ld channels, %ld samples\n",
 		data->request_playback_buffers, data->request_playback_channels,
 		data->request_playback_buffer_size);
@@ -237,8 +232,8 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 	audioGroup->playback_stream->buffer_length
 		= data->return_playback_buffer_size;
 
-	status = hda_stream_setup_buffers(audioGroup, audioGroup->playback_stream,
-		"Playback");
+	status_t status = hda_stream_setup_buffers(audioGroup,
+		audioGroup->playback_stream, "Playback");
 	if (status != B_OK) {
 		dprintf("hda: Error setting up playback buffers: %s\n",
 			strerror(status));
@@ -260,22 +255,27 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 
 	/* Setup data structure for multi_audio API... */
 
-	for (bidx = 0; bidx < data->return_playback_buffers; bidx++) {
-		for (cidx = 0; cidx < data->return_playback_channels; cidx++) {
-			data->playback_buffers[bidx][cidx].base
-				= audioGroup->playback_stream->buffers[bidx]
-					+ playbackSampleSize * cidx;
-			data->playback_buffers[bidx][cidx].stride
+	uint32 playbackSampleSize = audioGroup->playback_stream->sample_size;
+	uint32 recordSampleSize = audioGroup->record_stream->sample_size;
+
+	for (int32 i = 0; i < data->return_playback_buffers; i++) {
+		for (int32 channelIndex = 0;
+				channelIndex < data->return_playback_channels; channelIndex++) {
+			data->playback_buffers[i][channelIndex].base
+				= (char*)audioGroup->playback_stream->buffers[i]
+					+ playbackSampleSize * channelIndex;
+			data->playback_buffers[i][channelIndex].stride
 				= playbackSampleSize * data->return_playback_channels;
 		}
 	}
 
-	for (bidx = 0; bidx < data->return_record_buffers; bidx++) {
-		for (cidx = 0; cidx < data->return_record_channels; cidx++) {
-			data->record_buffers[bidx][cidx].base
-				= audioGroup->record_stream->buffers[bidx]
-					+ recordSampleSize * cidx;
-			data->record_buffers[bidx][cidx].stride
+	for (int32 i = 0; i < data->return_record_buffers; i++) {
+		for (int32 channelIndex = 0;
+				channelIndex < data->return_record_channels; channelIndex++) {
+			data->record_buffers[i][channelIndex].base
+				= (char*)audioGroup->record_stream->buffers[i]
+					+ recordSampleSize * channelIndex;
+			data->record_buffers[i][channelIndex].stride
 				= recordSampleSize * data->return_record_channels;
 		}
 	}
@@ -347,31 +347,34 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 
 	audioGroup = codec->audio_groups[0];
 
+	// TODO: make userland-safe when built for Haiku!
+
 	switch (op) {
 		case B_MULTI_GET_DESCRIPTION:
-			return get_description(audioGroup, arg);
+			return get_description(audioGroup, (multi_description*)arg);
 
 		case B_MULTI_GET_ENABLED_CHANNELS:
-			return get_enabled_channels(audioGroup, arg);
+			return get_enabled_channels(audioGroup, (multi_channel_enable*)arg);
 		case B_MULTI_SET_ENABLED_CHANNELS:
 			return B_OK;
 
 		case B_MULTI_GET_GLOBAL_FORMAT:
-			return get_global_format(audioGroup, arg);
+			return get_global_format(audioGroup, (multi_format_info*)arg);
 		case B_MULTI_SET_GLOBAL_FORMAT:
-			return set_global_format(audioGroup, arg);
+			return set_global_format(audioGroup, (multi_format_info*)arg);
 
 		case B_MULTI_LIST_MIX_CHANNELS:
-			return list_mix_channels(audioGroup, arg);
+			return list_mix_channels(audioGroup, (multi_mix_channel_info*)arg);
 		case B_MULTI_LIST_MIX_CONTROLS:
-			return list_mix_controls(audioGroup, arg);
+			return list_mix_controls(audioGroup, (multi_mix_control_info*)arg);
 		case B_MULTI_LIST_MIX_CONNECTIONS:
-			return list_mix_connections(audioGroup, arg);
+			return list_mix_connections(audioGroup,
+				(multi_mix_connection_info*)arg);
 		case B_MULTI_GET_BUFFERS:
-			return get_buffers(audioGroup, arg);
+			return get_buffers(audioGroup, (multi_buffer_list*)arg);
 
 		case B_MULTI_BUFFER_EXCHANGE:
-			return buffer_exchange(audioGroup, arg);
+			return buffer_exchange(audioGroup, (multi_buffer_info*)arg);
 		case B_MULTI_BUFFER_FORCE_STOP:
 			return buffer_force_stop(audioGroup);
 

@@ -17,7 +17,7 @@ uint32 gNumCards;
 pci_module_info* gPci;
 
 
-status_t
+extern "C" status_t
 init_hardware(void)
 {
 	pci_info info;
@@ -39,7 +39,7 @@ init_hardware(void)
 }
 
 
-status_t
+extern "C" status_t
 init_driver(void)
 {
 	char path[B_PATH_NAME_LENGTH];
@@ -76,13 +76,12 @@ init_driver(void)
 }
 
 
-void
+extern "C" void
 uninit_driver(void)
 {
-	long i;
 	dprintf("IRA: %s\n", __func__);
 
-	for (i = 0; i < gNumCards; i++) {
+	for (uint32 i = 0; i < gNumCards; i++) {
 		free((void*)gCards[i].devfs_path);
 		gCards[i].devfs_path = NULL;
 	}
@@ -91,15 +90,16 @@ uninit_driver(void)
 }
 
 
-const char**
+extern "C" const char**
 publish_devices(void)
 {
 	static const char* devs[MAX_CARDS + 1];
-	long i;
+	uint32 i;
 
 	dprintf("IRA: %s\n", __func__);
-	for (i = 0; i < gNumCards; i++)
+	for (i = 0; i < gNumCards; i++) {
 		devs[i] = gCards[i].devfs_path;
+	}
 
 	devs[i] = NULL;
 
@@ -107,7 +107,7 @@ publish_devices(void)
 }
 
 
-device_hooks*
+extern "C" device_hooks*
 find_device(const char* name)
 {
 	dprintf("IRA: %s\n", __func__);

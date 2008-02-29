@@ -40,10 +40,6 @@
 /* FIXME: Find out why we need so much! */
 #define DEFAULT_FRAMES_PER_BUFFER	4096
 
-typedef struct hda_controller hda_controller;
-typedef struct hda_codec hda_codec;
-typedef struct hda_audio_group hda_audio_group;
-
 #define STREAM_MAX_BUFFERS	10
 #define STREAM_MIN_BUFFERS	2
 
@@ -52,12 +48,12 @@ enum {
 	STREAM_RECORD
 };
 
-/* hda_stream
- *
- * This structure describes a single stream of audio data,
- * which is can have multiple channels (for stereo or better).
- */
-typedef struct hda_stream {
+struct hda_codec;
+
+/*!	This structure describes a single stream of audio data,
+	which is can have multiple channels (for stereo or better).
+*/
+struct hda_stream {
 	uint32		id;					/* HDA controller stream # */
 	uint32		off;				/* HDA I/O/B descriptor offset */
 	bool		running;			/* Is this stream active? */
@@ -74,7 +70,7 @@ typedef struct hda_stream {
 	uint32		num_channels;
 	uint32		buffer_length;		/* size of buffer in samples */
 	uint32		sample_size;
-	void*		buffers[STREAM_MAX_BUFFERS];
+	uint8*		buffers[STREAM_MAX_BUFFERS];
 					/* Virtual addresses for buffer */
 	uint32		physical_buffers[STREAM_MAX_BUFFERS];
 					/* Physical addresses for buffer */
@@ -88,68 +84,66 @@ typedef struct hda_stream {
 	area_id		buffer_area;
 	area_id		buffer_descriptors_area;
 	uint32		physical_buffer_descriptors;	/* BDL physical address */
-} hda_stream;
-
-/* hda_audio_group
- *
- * This structure describes a single Audio Function Group. An afg
- * is a group of audio widgets which can be used to configure multiple
- * streams of audio either from the HDA Link to an output device (= playback)
- * or from an input device to the HDA link (= recording).
- */
-struct hda_audio_group {
-	hda_codec*			codec;
-
-	/* Multi Audio API data */
-	hda_stream*			playback_stream;
-	hda_stream*			record_stream;
-
-	uint32				root_node_id;
-	uint32				widget_start;
-	uint32				widget_count;
-
-	uint32				supported_formats;
-	uint32				supported_rates;
-	uint32				supported_pm;
-
-	struct {
-		uint32			num_inputs;
-		int32			active_input;
-		uint32			inputs[MAX_INPUTS];
-		uint32			flags;
-
-		hda_widget_type	type;
-		uint32			pm;
-
-		union {
-			struct {
-				uint32	formats;
-				uint32	rates;
-			} output;
-			struct {
-				uint32	formats;
-				uint32	rates;
-			} input;
-			struct {
-			} mixer;
-			struct {
-				uint32	output;
-				uint32	input;
-				pin_dev_type device;
-			} pin;
-		} d;
-	} *widgets;
 };
 
-/* hda_codec
- *
- * This structure describes a single codec module in the
- * HDA compliant device. This is a discrete component, which
- * can contain both Audio Function Groups, Modem Function Groups,
- * and other customized (vendor specific) Function Groups.
- *
- * NOTE: Atm, only Audio Function Groups are supported.
- */
+struct hda_widget {
+	uint32			num_inputs;
+	int32			active_input;
+	uint32			inputs[MAX_INPUTS];
+	uint32			flags;
+
+	hda_widget_type	type;
+	uint32			pm;
+
+	union {
+		struct {
+			uint32	formats;
+			uint32	rates;
+		} output;
+		struct {
+			uint32	formats;
+			uint32	rates;
+		} input;
+		struct {
+		} mixer;
+		struct {
+			uint32	output;
+			uint32	input;
+			pin_dev_type device;
+		} pin;
+	} d;
+};
+
+/*!	This structure describes a single Audio Function Group. An afg
+	is a group of audio widgets which can be used to configure multiple
+	streams of audio either from the HDA Link to an output device (= playback)
+	or from an input device to the HDA link (= recording).
+*/
+struct hda_audio_group {
+	hda_codec*		codec;
+
+	/* Multi Audio API data */
+	hda_stream*		playback_stream;
+	hda_stream*		record_stream;
+
+	uint32			root_node_id;
+	uint32			widget_start;
+	uint32			widget_count;
+
+	uint32			supported_formats;
+	uint32			supported_rates;
+	uint32			supported_pm;
+
+	hda_widget*		widgets;
+};
+
+/*!	This structure describes a single codec module in the
+	HDA compliant device. This is a discrete component, which
+	can contain both Audio Function Groups, Modem Function Groups,
+	and other customized (vendor specific) Function Groups.
+
+	NOTE: ATM, only Audio Function Groups are supported.
+*/
 struct hda_codec {
 	uint16		vendor_id;
 	uint16		product_id;
@@ -167,16 +161,14 @@ struct hda_codec {
 	struct hda_controller* controller;
 };
 
-/* hda_controller
- *
- * This structure describes a single HDA compliant 
- * controller. It contains a list of available streams
- * for use by the codecs contained, and the messaging queue
- * (verb/response) buffers for communication.
- */
+/*!	This structure describes a single HDA compliant 
+	controller. It contains a list of available streams
+	for use by the codecs contained, and the messaging queue
+	(verb/response) buffers for communication.
+*/
 struct hda_controller {
 	struct pci_info	pci_info;
-	vuint32			opened;
+	vint32			opened;
 	const char*		devfs_path;
 
 	area_id			regs_area;
@@ -222,7 +214,7 @@ status_t hda_hw_init(hda_controller* controller);
 void hda_hw_stop(hda_controller* controller);
 void hda_hw_uninit(hda_controller* controller);
 status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses,
-	int count);
+	uint32 count);
 
 /* hda_controller.c: Stream support */
 hda_stream* hda_stream_new(hda_controller* controller, int type);

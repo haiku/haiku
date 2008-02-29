@@ -14,10 +14,8 @@ static status_t
 hda_open(const char *name, uint32 flags, void** cookie)
 {
 	hda_controller* controller = NULL;
-	status_t rc = B_OK;
-	long i;
 
-	for (i = 0; i < gNumCards; i++) {
+	for (uint32 i = 0; i < gNumCards; i++) {
 		if (strcmp(gCards[i].devfs_path, name) == 0) {
 			controller = &gCards[i];
 			break;
@@ -30,11 +28,11 @@ hda_open(const char *name, uint32 flags, void** cookie)
 	if (controller->opened)
 		return B_BUSY;
 
-	rc = hda_hw_init(controller);
-	if (rc != B_OK)
-		return rc;
+	status_t status = hda_hw_init(controller);
+	if (status != B_OK)
+		return status;
 
-	controller->opened++;
+	atomic_add(&controller->opened, 1);
 
 	*cookie = controller;
 	return B_OK;
@@ -75,7 +73,7 @@ hda_close(void* cookie)
 {
 	hda_controller* controller = (hda_controller*)cookie;
 	hda_hw_stop(controller);
-	--controller->opened;
+	atomic_add(&controller->opened, -1);
 
 	return B_OK;
 }

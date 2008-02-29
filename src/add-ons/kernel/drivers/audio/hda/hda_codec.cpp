@@ -174,7 +174,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	audioGroup->widget_start = resp[2] >> 16;
 	audioGroup->widget_count = resp[2] & 0xFF;
 
-	audioGroup->widgets = calloc(audioGroup->widget_count,
+	audioGroup->widgets = (hda_widget*)calloc(audioGroup->widget_count,
 		sizeof(*audioGroup->widgets));
 	if (audioGroup->widgets == NULL) {
 		dprintf("ERROR: Not enough memory!\n");
@@ -193,7 +193,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			PID_CONNLIST_LEN);
 		hda_send_verbs(audioGroup->codec, verbs, resp, 2);
 
-		audioGroup->widgets[widx].type = resp[0] >> 20;
+		audioGroup->widgets[widx].type = (hda_widget_type)(resp[0] >> 20);
 		audioGroup->widgets[widx].num_inputs = resp[1] & 0x7F;
 
 		off = 0;
@@ -272,7 +272,8 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 				verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid,
 					VID_GET_CFGDEFAULT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
-					audioGroup->widgets[widx].d.pin.device = (resp[0] >> 20) & 0xF;
+					audioGroup->widgets[widx].d.pin.device = (pin_dev_type)
+						((resp[0] >> 20) & 0xf);
 					dprintf("\t%s, %s, %s, %s\n",
 						kPortConnector[resp[0] >> 30],	
 						kDefaultDevice[audioGroup->widgets[widx].d.pin.device],
@@ -304,10 +305,6 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			&audioGroup->widgets[widx].pm);
 
 		if (audioGroup->widgets[widx].num_inputs) {
-			int idx;
-
-			off = 0;
-
 			if (audioGroup->widgets[widx].num_inputs > 1) {
 				verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid,
 					VID_GET_CONNSEL, 0);
@@ -318,10 +315,12 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			} else 
 				audioGroup->widgets[widx].active_input = -1;
 
-			for (idx = 0; idx < audioGroup->widgets[widx].num_inputs; idx ++) {
-				if (!(idx % 4)) {
+			off = 0;
+
+			for (uint32 i = 0; i < audioGroup->widgets[widx].num_inputs; i++) {
+				if (!(i % 4)) {
 					verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid,
-						VID_GET_CONNLENTRY, idx);
+						VID_GET_CONNLENTRY, i);
 					if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) != B_OK) {
 						dprintf("%s: Error parsing inputs for widget %ld!\n",
 							__func__, wid);
@@ -329,16 +328,16 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 					}
 				}
 
-				if (idx != audioGroup->widgets[widx].active_input) {
+				if ((int32)i != audioGroup->widgets[widx].active_input) {
 					off += sprintf(buf + off, "%ld ",
-						(resp[0] >> (8 * (idx % 4))) & 0xff);
+						(resp[0] >> (8 * (i % 4))) & 0xff);
 				} else {
 					off += sprintf(buf + off, "(%ld) ",
-						(resp[0] >> (8 * (idx % 4))) & 0xff);
+						(resp[0] >> (8 * (i % 4))) & 0xff);
 				}
 
-				audioGroup->widgets[widx].inputs[idx]
-					= (resp[0] >> (8 * (idx % 4))) & 0xff;
+				audioGroup->widgets[widx].inputs[i]
+					= (resp[0] >> (8 * (i % 4))) & 0xff;
 			}
 
 			dprintf("\t[ %s]\n", buf);
@@ -349,35 +348,35 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 }
 
 
-/*! Find path from 'wid' to a widget of type 'wtype', returning its widget id.
- * Returns 0 if not found.
- */
+/*! Find path from 'wid' to a widget of type \a widgetType, returning its
+	widget id.
+	Returns 0 if not found.
+*/
 static uint32
 hda_codec_audio_group_find_path(hda_audio_group* audioGroup, uint32 widget,
-	uint32 widgetType, uint32 depth)
+	hda_widget_type widgetType, uint32 depth)
 {
 	int widx = widget - audioGroup->widget_start;
-	int idx;
 
 	switch (audioGroup->widgets[widx].type) {
 		case WT_AUDIO_MIXER:
-			for (idx = 0; idx < audioGroup->widgets[widx].num_inputs; idx++) {
+			for (uint32 i = 0; i < audioGroup->widgets[widx].num_inputs; i++) {
 				if (hda_codec_audio_group_find_path(audioGroup,
-						audioGroup->widgets[widx].inputs[idx], widgetType,
+						audioGroup->widgets[widx].inputs[i], widgetType,
 						depth + 1)) {
 					if (audioGroup->widgets[widx].active_input == -1)
-						audioGroup->widgets[widx].active_input = idx;
+						audioGroup->widgets[widx].active_input = i;
 
-					return audioGroup->widgets[widx].inputs[idx];
+					return audioGroup->widgets[widx].inputs[i];
 				}
 			}
 			break;
 
 		case WT_AUDIO_SELECTOR:
 		{
-			int idx = audioGroup->widgets[widx].active_input;
-			if (idx != -1) {
-				widget = audioGroup->widgets[widx].inputs[idx];
+			int32 i = audioGroup->widgets[widx].active_input;
+			if (i != -1) {
+				widget = audioGroup->widgets[widx].inputs[i];
 				if (hda_codec_audio_group_find_path(audioGroup, widget,
 						widgetType, depth + 1)) {
 					return widget;
@@ -417,49 +416,48 @@ hda_codec_delete_audio_group(hda_audio_group* audioGroup)
 static status_t
 hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 {
-	hda_audio_group* audioGroup;
-	status_t rc;
-	uint32 idx;
-
-	if ((audioGroup = calloc(1, sizeof(hda_audio_group))) == NULL) {
-		rc =  B_NO_MEMORY;
-		goto done;
-	}
+	hda_audio_group* audioGroup = (hda_audio_group*)calloc(1,
+		sizeof(hda_audio_group));
+	if (audioGroup == NULL)
+		return B_NO_MEMORY;
 
 	/* Setup minimal info needed by hda_codec_parse_afg */
 	audioGroup->root_node_id = audioGroupNodeID;
 	audioGroup->codec = codec;
 
 	/* Parse all widgets in Audio Function Group */
-	rc = hda_codec_parse_audio_group(audioGroup);
-	if (rc != B_OK)
-		goto free_audio_group;
+	status_t status = hda_codec_parse_audio_group(audioGroup);
+	if (status != B_OK)
+		goto err;
 
 	/* Setup for worst-case scenario; we cannot find any output Pin Widgets */
-	rc = ENODEV;
+	status = ENODEV;
 
 	/* Try to locate all input/output channels */
-	for (idx = 0; idx < audioGroup->widget_count; idx++) {
+	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
 		uint32 outputWidget = 0, inputWidget = 0;
-		int32 iidx;
 
 		if (audioGroup->playback_stream == NULL
-			&& audioGroup->widgets[idx].type == WT_PIN_COMPLEX
-			&& audioGroup->widgets[idx].d.pin.output) {
-			if (audioGroup->widgets[idx].d.pin.device == PIN_DEV_HP_OUT
-				|| audioGroup->widgets[idx].d.pin.device == PIN_DEV_SPEAKER
-				|| audioGroup->widgets[idx].d.pin.device == PIN_DEV_LINE_OUT) {
-				iidx = audioGroup->widgets[idx].active_input;
-				if (iidx != -1) {
+			&& audioGroup->widgets[i].type == WT_PIN_COMPLEX
+			&& audioGroup->widgets[i].d.pin.output) {
+			if (audioGroup->widgets[i].d.pin.device == PIN_DEV_HP_OUT
+				|| audioGroup->widgets[i].d.pin.device == PIN_DEV_SPEAKER
+				|| audioGroup->widgets[i].d.pin.device == PIN_DEV_LINE_OUT) {
+				int32 inputIndex = audioGroup->widgets[i].active_input;
+				if (inputIndex != -1) {
 					outputWidget = hda_codec_audio_group_find_path(audioGroup,
-						audioGroup->widgets[idx].inputs[iidx], WT_AUDIO_OUTPUT, 0);
+						audioGroup->widgets[i].inputs[inputIndex],
+						WT_AUDIO_OUTPUT, 0);
 				} else {
-					for (iidx = 0; iidx < audioGroup->widgets[idx].num_inputs; iidx++) {
+					for (inputIndex = 0; (uint32)inputIndex
+							< audioGroup->widgets[i].num_inputs; inputIndex++) {
 						outputWidget = hda_codec_audio_group_find_path(audioGroup,
-							audioGroup->widgets[idx].inputs[iidx], WT_AUDIO_OUTPUT, 0);
+							audioGroup->widgets[i].inputs[inputIndex],
+							WT_AUDIO_OUTPUT, 0);
 						if (outputWidget) {
 							corb_t verb = MAKE_VERB(codec->addr,
-								idx + audioGroup->widget_start, VID_SET_CONNSEL, iidx);
+								i + audioGroup->widget_start, VID_SET_CONNSEL,
+								inputIndex);
 							if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK)
 								dprintf("%s: Setting output selector failed!\n", __func__);
 							break;
@@ -477,40 +475,45 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 						audioGroup->record_stream = hda_stream_new(
 							audioGroup->codec->controller, STREAM_RECORD);
 
-						audioGroup->playback_stream->pin_widget = idx
+						audioGroup->playback_stream->pin_widget = i
 							+ audioGroup->widget_start;
 						audioGroup->playback_stream->io_widget = outputWidget;
 
 						/* FIXME: Force Pin Widget to unmute; enable hp/output */
 						verb[0] = MAKE_VERB(codec->addr,
-							audioGroup->playback_stream->pin_widget, VID_SET_AMPGAINMUTE,
+							audioGroup->playback_stream->pin_widget,
+							VID_SET_AMPGAINMUTE,
 							(1 << 15) | (1 << 13) | (1 << 12));
 						verb[1] = MAKE_VERB(codec->addr,
-							audioGroup->playback_stream->pin_widget, VID_SET_PINWCTRL,
+							audioGroup->playback_stream->pin_widget,
+							VID_SET_PINWCTRL,
 							(1 << 7) | (1 << 6));
 						hda_send_verbs(codec, verb, NULL, 2);
 
 						dprintf("%s: Found output PIN (%s) connected to output "
 							"CONV wid:%ld\n", __func__,
-							kDefaultDevice[audioGroup->widgets[idx].d.pin.device], outputWidget);
+							kDefaultDevice[audioGroup->widgets[i].d.pin.device], outputWidget);
 					}	
 				}
 			}
 		}
 
-		if (audioGroup->widgets[idx].type == WT_AUDIO_INPUT) {
-			iidx = audioGroup->widgets[idx].active_input;
-			if (iidx != -1) {
+		if (audioGroup->widgets[i].type == WT_AUDIO_INPUT) {
+			int32 inputIndex = audioGroup->widgets[i].active_input;
+			if (inputIndex != -1) {
 				inputWidget = hda_codec_audio_group_find_path(audioGroup,
-					audioGroup->widgets[idx].inputs[iidx], WT_PIN_COMPLEX, 0);
+					audioGroup->widgets[i].inputs[inputIndex], WT_PIN_COMPLEX,
+					0);
 			} else {
-				for (iidx = 0; iidx < audioGroup->widgets[idx].num_inputs; iidx++) {
+				for (inputIndex = 0; (uint32)inputIndex
+						< audioGroup->widgets[i].num_inputs; inputIndex++) {
 					inputWidget = hda_codec_audio_group_find_path(audioGroup,
-						audioGroup->widgets[idx].inputs[iidx], WT_PIN_COMPLEX, 0);
+						audioGroup->widgets[i].inputs[inputIndex],
+						WT_PIN_COMPLEX, 0);
 					if (inputWidget) {
 						corb_t verb = MAKE_VERB(codec->addr,
-							idx + audioGroup->widget_start, VID_SET_CONNSEL,
-							iidx);
+							i + audioGroup->widget_start, VID_SET_CONNSEL,
+							inputIndex);
 						if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK) {
 							dprintf("%s: Setting input selector failed!\n",
 								__func__);
@@ -529,7 +532,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 						audioGroup->codec->controller, STREAM_RECORD);
 
 					audioGroup->record_stream->pin_widget = inputWidget;
-					audioGroup->record_stream->io_widget = idx
+					audioGroup->record_stream->io_widget = i
 						+ audioGroup->widget_start;
 
 					/* FIXME: Force Pin Widget to unmute */
@@ -542,7 +545,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 				dprintf("%s: Found input PIN (%s) connected to input CONV "
 					"wid:%ld\n", __func__, kDefaultDevice[audioGroup->widgets[
 						inputWidget - audioGroup->widget_start].d.pin.device],
-					idx + audioGroup->widget_start);
+					i + audioGroup->widget_start);
 			}
 		}
 	}
@@ -550,15 +553,12 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 	/* If we found any valid output channels, we're in the clear */
 	if (audioGroup && audioGroup->playback_stream) {
 		codec->audio_groups[codec->num_audio_groups++] = audioGroup;
-		rc = B_OK;
-		goto done;
+		return B_OK;
 	}
 
-free_audio_group:
+err:
 	free(audioGroup);
-
-done:
-	return rc;
+	return status;
 }
 
 
@@ -586,7 +586,7 @@ hda_codec_delete(hda_codec* codec)
 hda_codec*
 hda_codec_new(hda_controller* controller, uint32 cad)
 {
-	hda_codec* codec = calloc(1, sizeof(hda_codec));
+	hda_codec* codec = (hda_codec*)calloc(1, sizeof(hda_codec));
 	uint32 responses[3];
 	corb_t verbs[3];
 	uint32 nodeID;

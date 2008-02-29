@@ -8,7 +8,7 @@
 #ifndef HDA_CODEC_H
 #define HDA_CODEC_H
 
-typedef enum {
+enum hda_widget_type {
 	WT_AUDIO_OUTPUT		= 0,
 	WT_AUDIO_INPUT		= 1,
 	WT_AUDIO_MIXER		= 2,
@@ -18,10 +18,10 @@ typedef enum {
 	WT_VOLUME_KNOB		= 6,
 	WT_BEEP_GENERATOR	= 7,
 	WT_VENDOR_DEFINED	= 15
-} hda_widget_type;
+};
 
 
-typedef enum {
+enum pin_dev_type {
 	PIN_DEV_LINE_OUT = 0,
 	PIN_DEV_SPEAKER,
 	PIN_DEV_HP_OUT,
@@ -38,7 +38,7 @@ typedef enum {
 	PIN_DEV_DIGITAL_OTHER_IN,
 	PIN_DEV_RESERVED,
 	PIN_DEV_OTHER
-} pin_dev_type;
+};
 
 
 /* Verb Helper Macro */

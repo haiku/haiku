@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ithamar Adema, ithamar AT unet DOT nl
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -79,7 +80,7 @@ hda_stream_delete(hda_stream* stream)
 hda_stream*
 hda_stream_new(hda_controller* controller, int type)
 {
-	hda_stream* stream = calloc(1, sizeof(hda_stream));
+	hda_stream* stream = (hda_stream*)calloc(1, sizeof(hda_stream));
 	if (stream == NULL)
 		return NULL;
 
@@ -333,7 +334,7 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 
 
 status_t
-hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, int count)
+hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 {
 	hda_controller *controller = codec->controller;
 	uint32 sent = 0;
@@ -410,7 +411,7 @@ hda_interrupt_handler(hda_controller* controller)
 
 					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
 						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
-							response, extendedResponse);
+							response, responseFlags);
 						continue;
 					}
 					if (codec == NULL) {

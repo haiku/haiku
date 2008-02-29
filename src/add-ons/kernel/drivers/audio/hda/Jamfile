@@ -5,11 +5,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders media ;
 
 KernelAddon hda :
-	driver.c
-	hooks.c
-	hda_multi_audio.c
-	hda_controller.c
-	hda_codec.c
+	driver.cpp
+	device.cpp
+	hda_multi_audio.cpp
+	hda_controller.cpp
+	hda_codec.cpp
 ;
 
 Package haiku-hda-cvs :
