@@ -23,6 +23,8 @@ public:
 	bool IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey);
 	void GetChars(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** chars, int32* numBytes);
 	status_t Use();
+	bool Equals(const Keymap& map) const;
+	
 private:
 	char *fChars;
 	key_map fKeys;

@@ -74,6 +74,16 @@ public:
 	void	MessageReceived( BMessage* message );
 
 protected:
+	BMenuBar			*AddMenuBar();
+	void				AddMaps(BView *placeholderView);
+	void				UseKeymap();
+	void				RevertKeymap();
+	void				UpdateButtons();
+	
+	void 				FillSystemMaps();
+	void 				FillUserMaps();
+		
+
 	BListView			*fSystemListView;
 	BListView			*fUserListView;
 	// the map that's currently highlighted
@@ -82,18 +92,12 @@ protected:
 	BMenu				*fFontMenu;
 	
 	MapView				*fMapView;
-
-	BMenuBar			*AddMenuBar();
-	void				AddMaps(BView *placeholderView);
-	void				UseKeymap();
-	
-	void 				FillSystemMaps();
-	void 				FillUserMaps();
-	
-	BEntry* 			CurrentMap();
 		
 	Keymap				fCurrentMap;
-	
+	Keymap				fPreviousMap;
+	Keymap				fAppliedMap;
+	bool				fFirstTime;
+			
 	BFilePanel 			*fOpenPanel;		// the file panel to open
 	BFilePanel 			*fSavePanel;		// the file panel to save
 };

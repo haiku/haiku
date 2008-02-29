@@ -154,6 +154,14 @@ Keymap::Save(entry_ref &ref)
 }
 
 
+bool Keymap::Equals(const Keymap& map) const
+{
+	// not really efficient but this is the only way i found
+	// to reliably compare keymaps (used only for apply and revert)
+	return memcmp( &map.fKeys, &fKeys, sizeof(key_map)) == 0;
+}
+
+
 /* we need to know if a key is a modifier key to choose 
 	a valid key when several are pressed together
 */

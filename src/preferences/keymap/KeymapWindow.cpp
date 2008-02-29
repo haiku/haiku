@@ -50,6 +50,8 @@ KeymapWindow::KeymapWindow()
 	:	BWindow(BRect(80, 25, 692, 281), "Keymap", B_TITLED_WINDOW,
 			B_NOT_ZOOMABLE | B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS )
 {
+	fFirstTime = true;
+	
 	// Add the menu bar
 	BMenuBar *menubar = AddMenuBar();
 
@@ -81,6 +83,7 @@ KeymapWindow::KeymapWindow()
 	fRevertButton = new BButton(BRect(442, 200, 515, 220), "revertButton",
 		 "Revert", new BMessage(kMsgRevertKeymap));
 	placeholderView->AddChild(fRevertButton);
+	UpdateButtons();
 	
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
@@ -216,7 +219,6 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	fUserListView->SetSelectionMessage(new BMessage(kMsgUserMapSelected));
 	
 	FillSystemMaps();
-	
 	FillUserMaps();
 }
 
@@ -299,6 +301,7 @@ KeymapWindow::MessageReceived(BMessage* message)
 				
 				// Deselect item in other BListView
 				fUserListView->DeselectAll();
+				UpdateButtons();
 			}
 		}
 			break;
@@ -308,22 +311,70 @@ KeymapWindow::MessageReceived(BMessage* message)
 				static_cast<KeymapListItem*>(fUserListView->ItemAt(fUserListView->CurrentSelection()));
 			if (keymapListItem) {
 				fCurrentMap.Load(keymapListItem->KeymapEntry());
+				
+				if (fFirstTime) {
+					fPreviousMap.Load(keymapListItem->KeymapEntry());
+					fAppliedMap.Load(keymapListItem->KeymapEntry());
+					fFirstTime = false;
+				}
+				
 				fMapView->Invalidate();
 				
 				// Deselect item in other BListView
 				fSystemListView->DeselectAll();
+				UpdateButtons();
 			}
 		}
 			break;
 		case kMsgUseKeymap:
 			UseKeymap();
+			UpdateButtons();
 			break;
-		case kMsgRevertKeymap:	// do nothing, just like the original
+		case kMsgRevertKeymap:
+			RevertKeymap();
+			UpdateButtons();
 			break;
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+ void 
+KeymapWindow::UpdateButtons()
+{
+	fUseButton->SetEnabled(!fCurrentMap.Equals(fAppliedMap));
+	fRevertButton->SetEnabled(!fCurrentMap.Equals(fPreviousMap));
+}
+
+
+void 
+KeymapWindow::RevertKeymap()
+{
+	//saves previous map to the Key_map file
+	
+	printf("REVERT\n");
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return;
+	
+	path.Append("Key_map");
+
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+
+	status_t err;
+	if ((err = fPreviousMap.Save(ref)) != B_OK) {
+		printf("error when saving : %s", strerror(err));
+		return;
+	}
+	fPreviousMap.Use();
+	fAppliedMap.Load(ref);
+	
+	//select and load it (first item in fUserListView is a ref to Key_map)
+	fUserListView->DeselectAll();
+	fUserListView->Select(0);		
 }
 
 
@@ -345,6 +396,7 @@ KeymapWindow::UseKeymap()
 		return;
 	}
 	fCurrentMap.Use();
+	fAppliedMap.Load(ref);
 	
 	fUserListView->Select(0);
 }
@@ -404,13 +456,6 @@ KeymapWindow::FillUserMaps()
 		}
 	
 	fUserListView->Select(0);
-}
-
-
-BEntry* 
-KeymapWindow::CurrentMap()
-{
-	return NULL;
 }
 
 
