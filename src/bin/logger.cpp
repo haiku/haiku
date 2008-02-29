@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2006-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -108,7 +108,8 @@ get_priority(const char *option)
 static void
 usage(void)
 {
-	fprintf(stderr, "usage: %s [-i] [-t <tag>] [-p <[facility.]priority>] <message>\n\n"
+	fprintf(stderr, "usage: %s [-i] [-t <tag>] [-p <[facility.]priority>] "
+			"<message>\n\n"
 		"Sends a message to the system logging facility.\n"
 		"If <message> is omitted, the message is read from stdin.\n\n"
 		"   -i\tAdds the team ID to the log.\n"
@@ -175,7 +176,7 @@ main(int argc, char **argv)
 		for (int32 i = 0; i < argc; i++) {
 			int32 newLength = length + strlen(argv[i]) + 1;
 
-			buffer = (char *)realloc(buffer, newLength);
+			buffer = (char *)realloc(buffer, newLength + 1);
 			if (buffer == NULL) {
 				fprintf(stderr, "%s: out of memory\n", sProgramName);
 				return -1;
@@ -187,7 +188,12 @@ main(int argc, char **argv)
 			buffer[length - 1] = ' ';
 		}
 
-		buffer[length - 1] = '\0';
+		if (length > 1 && buffer[length - 2] != '\n') {
+			buffer[length - 1] = '\n';
+			buffer[length] = '\0';
+		} else
+			buffer[length - 1] = '\0';
+
 		syslog(priority, "%s", buffer);
 		free(buffer);
 	} else {
