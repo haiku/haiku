@@ -137,9 +137,11 @@
 typedef uint32 corb_t;
 typedef struct {
 	uint32 response;
-	uint32 resp_ex;
-#define RESP_EX_UNSOL	(1 << 4)
+	uint32 flags;
 } rirb_t;
+
+#define RESPONSE_FLAGS_CODEC_MASK	0x0000000f
+#define RESPONSE_FLAGS_UNSOLICITED	(1 << 4)
 
 typedef struct {
 	uint64	address;

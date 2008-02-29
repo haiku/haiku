@@ -36,6 +36,27 @@ static const struct {
 };
 
 
+static inline rirb_t*
+current_rirb(hda_controller *controller)
+{
+	return &controller->rirb[controller->rirb_read_pos];
+}
+
+
+static inline uint32
+next_rirb(hda_controller *controller)
+{
+	return (controller->rirb_read_pos + 1) % controller->rirb_length;
+}
+
+
+static inline uint32
+next_corb(hda_controller *controller)
+{
+	return (controller->corb_write_pos + 1) % controller->corb_length;
+}
+
+
 //	#pragma mark -
 
 
@@ -314,20 +335,41 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 status_t
 hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, int count)
 {
-	corb_t* corb = codec->controller->corb;
+	hda_controller *controller = codec->controller;
+	uint32 sent = 0;
 	status_t rc;
 
 	codec->response_count = 0;
-	memcpy(corb + (codec->controller->corbwp + 1), verbs,
-		sizeof(corb_t) * count);
-	REG16(codec->controller, CORBWP) = (codec->controller->corbwp += count);
 
-	rc = acquire_sem_etc(codec->response_sem, count, /*B_CAN_INTERRUPT | */
-		B_RELATIVE_TIMEOUT, 1000ULL * 50);
-	if (rc == B_OK && responses != NULL)
+	while (sent < count) {
+		uint32 readPos = REG16(controller, CORBRP);
+		uint32 queued = 0;
+
+		while (sent < count) {
+			uint32 writePos = next_corb(controller);
+
+			if (writePos == readPos) {
+				// There is no space left in the ring buffer; execute the
+				// queued commands and wait until
+				break;
+			}
+
+			controller->corb[writePos] = verbs[sent++];
+			controller->corb_write_pos = writePos;
+			queued++;
+		}
+
+		REG16(controller, CORBWP) = controller->corb_write_pos;
+		rc = acquire_sem_etc(codec->response_sem, queued, B_RELATIVE_TIMEOUT,
+			1000ULL * 50);
+		if (rc < B_OK)
+			return rc;
+	}
+
+	if (responses != NULL)
 		memcpy(responses, codec->responses, count * sizeof(uint32));
 
-	return rc;
+	return B_OK;
 }
 
 
@@ -343,60 +385,61 @@ hda_interrupt_handler(hda_controller* controller)
 
 	/* Controller or stream related? */
 	if (intsts & INTSTS_CIS) {
-		uint32 statests = REG16(controller, STATESTS);
-		uint8 rirbsts = REG8(controller, RIRBSTS);
-		uint8 corbsts = REG8(controller, CORBSTS);
+		uint32 stateStatus = REG16(controller, STATESTS);
+		uint8 rirbStatus = REG8(controller, RIRBSTS);
+		uint8 corbStatus = REG8(controller, CORBSTS);
 
-		if (statests) {
+		if (stateStatus) {
 			/* Detected Codec state change */
-			REG16(controller, STATESTS) = statests;
-			controller->codecsts = statests;
+			REG16(controller, STATESTS) = stateStatus;
+			controller->codec_status = stateStatus;
 		}
 
 		/* Check for incoming responses */			
-		if (rirbsts) {
-			REG8(controller, RIRBSTS) = rirbsts;
+		if (rirbStatus) {
+			REG8(controller, RIRBSTS) = rirbStatus;
 
-			if (rirbsts & RIRBSTS_RINTFL) {
-				uint16 rirbwp = REG16(controller, RIRBWP);
-				while (controller->rirbrp <= rirbwp) {
-					uint32 resp_ex
-						= controller->rirb[controller->rirbrp].resp_ex;
-					uint32 cad = resp_ex & HDA_MAX_CODECS;
+			if (rirbStatus & RIRBSTS_RINTFL) {
+				uint16 writePos = REG16(controller, RIRBWP);
+				for (; controller->rirb_read_pos != writePos;
+						controller->rirb_read_pos = next_rirb(controller)) {
+					uint32 response = current_rirb(controller)->response;
+					uint32 responseFlags = current_rirb(controller)->flags;
+					uint32 cad = responseFlags & RESPONSE_FLAGS_CODEC_MASK;
 					hda_codec* codec = controller->codecs[cad];
 
-					if (resp_ex & RESP_EX_UNSOL) {
-						dprintf("%s: Unsolicited response: %08lx/%08lx\n",
-							__func__,
-							controller->rirb[controller->rirbrp].response,
-							resp_ex);
-					} else if (codec) {
-						/* Store responses in codec */
-						codec->responses[codec->response_count++]
-							= controller->rirb[controller->rirbrp].response;
-						release_sem_etc(codec->response_sem, 1,
-							B_DO_NOT_RESCHEDULE);
-						rc = B_INVOKE_SCHEDULER;
-					} else {
-						dprintf("%s: Response for unknown codec %ld: "
-							"%08lx/%08lx\n", __func__, cad, 
-							controller->rirb[controller->rirbrp].response,
-								resp_ex);
+					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
+						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
+							response, extendedResponse);
+						continue;
+					}
+					if (codec == NULL) {
+						dprintf("hda: Response for unknown codec %ld: "
+							"%08lx/%08lx\n", cad, response, responseFlags);
+						continue;
+					}
+					if (codec->response_count >= MAX_CODEC_RESPONSES) {
+						dprintf("hda: too many responses received for codec %ld"
+							": %08lx/%08lx!\n", cad, response, responseFlags);
+						continue;
 					}
 
-					++controller->rirbrp;
+					/* Store response in codec */
+					codec->responses[codec->response_count++] = response;
+					release_sem_etc(codec->response_sem, 1, B_DO_NOT_RESCHEDULE);
+					rc = B_INVOKE_SCHEDULER;
 				}			
 			}
 
-			if (rirbsts & RIRBSTS_OIS)
+			if (rirbStatus & RIRBSTS_OIS)
 				dprintf("%s: RIRB Overflow\n", __func__);
 		}
 
 		/* Check for sending errors */
-		if (corbsts) {
-			REG8(controller, CORBSTS) = corbsts;
+		if (corbStatus) {
+			REG8(controller, CORBSTS) = corbStatus;
 
-			if (corbsts & CORBSTS_MEI)
+			if (corbStatus & CORBSTS_MEI)
 				dprintf("%s: CORB Memory Error!\n", __func__);
 		}
 	}
@@ -481,17 +524,17 @@ hda_hw_corb_rirb_pos_init(hda_controller* controller)
 	memSize = (posOffset + posSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
 	/* Allocate memory area */
-	controller->rb_area = create_area("hda corb/rirb/pos",
+	controller->corb_rirb_pos_area = create_area("hda corb/rirb/pos",
 		(void**)&controller->corb, B_ANY_KERNEL_ADDRESS, memSize,
 		B_CONTIGUOUS, 0);
-	if (controller->rb_area < 0)
-		return controller->rb_area;
+	if (controller->corb_rirb_pos_area < 0)
+		return controller->corb_rirb_pos_area;
 
 	/* Rirb is after corb+aligment */
 	controller->rirb = (rirb_t*)(((uint8*)controller->corb) + rirbOffset);
 
 	if ((rc = get_memory_map(controller->corb, memSize, &pe, 1)) != B_OK) {
-		delete_area(controller->rb_area);
+		delete_area(controller->corb_rirb_pos_area);
 		return rc;
 	}
 
@@ -523,8 +566,8 @@ hda_hw_corb_rirb_pos_init(hda_controller* controller)
 	REG16(controller, RINTCNT) = 1;
 
 	/* Setup cached read/write indices */
-	controller->rirbrp = 1;
-	controller->corbwp = 0;
+	controller->rirb_read_pos = 1;
+	controller->corb_write_pos = 0;
 
 	/* Gentlemen, start your engines... */
 	REG8(controller, CORBCTL) = CORBCTL_RUN | CORBCTL_MEIE;
@@ -592,13 +635,13 @@ hda_hw_init(hda_controller* controller)
 	/* Wait for codecs to warm up */
 	snooze(1000);
 
-	if (!controller->codecsts) {	
+	if (!controller->codec_status) {	
 		rc = ENODEV;
 		goto corb_rirb_failed;
 	}
 
 	for (index = 0; index < HDA_MAX_CODECS; index++) {
-		if ((controller->codecsts & (1 << index)) != 0)
+		if ((controller->codec_status & (1 << index)) != 0)
 			hda_codec_new(controller, index);
 	}
 
@@ -675,11 +718,12 @@ hda_hw_uninit(hda_controller* controller)
 		(interrupt_handler)hda_interrupt_handler, controller);
 
 	/* Delete corb/rirb area */
-	if (controller->rb_area >= 0) {
-		delete_area(controller->rb_area);
-		controller->rb_area = B_ERROR;
+	if (controller->corb_rirb_pos_area >= 0) {
+		delete_area(controller->corb_rirb_pos_area);
+		controller->corb_rirb_pos_area = B_ERROR;
 		controller->corb = NULL;
 		controller->rirb = NULL;
+		controller->stream_positions = NULL;
 	}
 
 	/* Unmap registers */

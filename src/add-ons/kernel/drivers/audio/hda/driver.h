@@ -183,21 +183,21 @@ struct hda_controller {
 	vuint8*			regs;
 	uint32			irq;
 
-	uint16			codecsts;
+	uint16			codec_status;
 	uint32			num_input_streams;
 	uint32			num_output_streams;
 	uint32			num_bidir_streams;
 	
 	uint32			corb_length;
 	uint32			rirb_length;
-	uint32			rirbrp;
-	uint32			corbwp;
-	area_id			rb_area;
+	uint32			rirb_read_pos;
+	uint32			corb_write_pos;
+	area_id			corb_rirb_pos_area;
 	corb_t*			corb;
 	rirb_t*			rirb;
 	uint32*			stream_positions;
 
-	hda_codec*		codecs[HDA_MAX_CODECS];
+	hda_codec*		codecs[HDA_MAX_CODECS + 1];
 	hda_codec*		active_codec;
 	uint32			num_codecs;
 	
