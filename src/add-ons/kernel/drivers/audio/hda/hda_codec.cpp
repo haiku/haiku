@@ -36,7 +36,7 @@ static const char* kJackColor[] = {
 static status_t
 hda_widget_get_pm_support(hda_codec* codec, uint32 nodeID, uint32* pm)
 {
-	corb_t verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAM,
+	corb_t verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
 		PID_POWERSTATE_SUPPORT);
 	status_t rc;
 	uint32 resp;
@@ -63,8 +63,10 @@ hda_widget_get_stream_support(hda_codec* codec, uint32 nodeID, uint32* formats,
 	uint32 resp[2];
 	status_t status;
 
-	verbs[0] = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAM, PID_STREAM_SUPPORT);
-	verbs[1] = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAM, PID_PCM_SUPPORT);
+	verbs[0] = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
+		PID_STREAM_SUPPORT);
+	verbs[1] = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
+		PID_PCM_SUPPORT);
 
 	status = hda_send_verbs(codec, verbs, resp, 2);
 	if (status != B_OK)
@@ -126,7 +128,7 @@ hda_widget_get_amplifier_capabilities(hda_codec* codec, uint32 nodeID)
 	corb_t verb;
 	uint32 resp;
 
-	verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAM, PID_OUTPUT_AMP_CAP);
+	verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER, PID_OUTPUT_AMP_CAP);
 	rc = hda_send_verbs(codec, &verb, &resp, 1);
 	if (rc == B_OK && resp != 0) {
 		dprintf("\tAMP: Mute: %s, step size: %ld, # steps: %ld, offset: %ld\n",
@@ -153,11 +155,11 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		&audioGroup->supported_pm);
 
 	verbs[0] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
-		VID_GET_PARAM, PID_AUDIO_FG_CAP);
+		VID_GET_PARAMETER, PID_AUDIO_GROUP_CAP);
 	verbs[1] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
-		VID_GET_PARAM, PID_GPIO_COUNT);
+		VID_GET_PARAMETER, PID_GPIO_COUNT);
 	verbs[2] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
-		VID_GET_PARAM, PID_SUBORD_NODE_COUNT);
+		VID_GET_PARAMETER, PID_SUBORD_NODE_COUNT);
 
 	if (hda_send_verbs(audioGroup->codec, verbs, resp, 3) != B_OK)
 		return B_ERROR;
@@ -187,10 +189,10 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		char buf[256];
 		int off;
 
-		verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid, VID_GET_PARAM,
+		verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid, VID_GET_PARAMETER,
 			PID_AUDIO_WIDGET_CAP);
-		verbs[1] = MAKE_VERB(audioGroup->codec->addr, wid, VID_GET_PARAM,
-			PID_CONNLIST_LEN);
+		verbs[1] = MAKE_VERB(audioGroup->codec->addr, wid, VID_GET_PARAMETER,
+			PID_CONNECTION_LIST_LENGTH);
 		hda_send_verbs(audioGroup->codec, verbs, resp, 2);
 
 		audioGroup->widgets[widx].type = (hda_widget_type)(resp[0] >> 20);
@@ -208,7 +210,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 			/* We support power; switch us on! */
 			verb = MAKE_VERB(audioGroup->codec->addr, wid,
-				VID_SET_POWERSTATE, 0);
+				VID_SET_POWER_STATE, 0);
 			hda_send_verbs(audioGroup->codec, &verb, &resp, 1);
 		}
 
@@ -256,7 +258,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 				break;
 			case WT_PIN_COMPLEX:
 				dprintf("%ld:\tPin Complex\n", wid);
-				verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid, VID_GET_PARAM,
+				verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid, VID_GET_PARAMETER,
 					PID_PIN_CAP);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
 					audioGroup->widgets[widx].d.pin.input = resp[0] & (1 << 5);
@@ -270,7 +272,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 				}
 
 				verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid,
-					VID_GET_CFGDEFAULT, 0);
+					VID_GET_CONFIGURATION_DEFAULT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
 					audioGroup->widgets[widx].d.pin.device = (pin_dev_type)
 						((resp[0] >> 20) & 0xf);
@@ -307,7 +309,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 		if (audioGroup->widgets[widx].num_inputs) {
 			if (audioGroup->widgets[widx].num_inputs > 1) {
 				verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid,
-					VID_GET_CONNSEL, 0);
+					VID_GET_CONNECTION_SELECT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK)
 					audioGroup->widgets[widx].active_input = resp[0] & 0xFF;
 				else
@@ -320,7 +322,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 			for (uint32 i = 0; i < audioGroup->widgets[widx].num_inputs; i++) {
 				if (!(i % 4)) {
 					verbs[0] = MAKE_VERB(audioGroup->codec->addr, wid,
-						VID_GET_CONNLENTRY, i);
+						VID_GET_CONNECTION_LIST_ENTRY, i);
 					if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) != B_OK) {
 						dprintf("%s: Error parsing inputs for widget %ld!\n",
 							__func__, wid);
@@ -440,7 +442,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 		if (audioGroup->playback_stream == NULL
 			&& audioGroup->widgets[i].type == WT_PIN_COMPLEX
 			&& audioGroup->widgets[i].d.pin.output) {
-			if (audioGroup->widgets[i].d.pin.device == PIN_DEV_HP_OUT
+			if (audioGroup->widgets[i].d.pin.device == PIN_DEV_HEAD_PHONE_OUT
 				|| audioGroup->widgets[i].d.pin.device == PIN_DEV_SPEAKER
 				|| audioGroup->widgets[i].d.pin.device == PIN_DEV_LINE_OUT) {
 				int32 inputIndex = audioGroup->widgets[i].active_input;
@@ -456,8 +458,8 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 							WT_AUDIO_OUTPUT, 0);
 						if (outputWidget) {
 							corb_t verb = MAKE_VERB(codec->addr,
-								i + audioGroup->widget_start, VID_SET_CONNSEL,
-								inputIndex);
+								i + audioGroup->widget_start,
+								VID_SET_CONNECTION_SELECT, inputIndex);
 							if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK)
 								dprintf("%s: Setting output selector failed!\n", __func__);
 							break;
@@ -482,11 +484,11 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 						/* FIXME: Force Pin Widget to unmute; enable hp/output */
 						verb[0] = MAKE_VERB(codec->addr,
 							audioGroup->playback_stream->pin_widget,
-							VID_SET_AMPGAINMUTE,
+							VID_SET_AMPLIFIER_GAIN_MUTE,
 							(1 << 15) | (1 << 13) | (1 << 12));
 						verb[1] = MAKE_VERB(codec->addr,
 							audioGroup->playback_stream->pin_widget,
-							VID_SET_PINWCTRL,
+							VID_SET_PIN_WIDGET_CONTROL,
 							(1 << 7) | (1 << 6));
 						hda_send_verbs(codec, verb, NULL, 2);
 
@@ -512,8 +514,8 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 						WT_PIN_COMPLEX, 0);
 					if (inputWidget) {
 						corb_t verb = MAKE_VERB(codec->addr,
-							i + audioGroup->widget_start, VID_SET_CONNSEL,
-							inputIndex);
+							i + audioGroup->widget_start,
+							VID_SET_CONNECTION_SELECT, inputIndex);
 						if (hda_send_verbs(codec, &verb, NULL, 1) != B_OK) {
 							dprintf("%s: Setting input selector failed!\n",
 								__func__);
@@ -538,7 +540,8 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 					/* FIXME: Force Pin Widget to unmute */
 					verb = MAKE_VERB(codec->addr,
 						audioGroup->record_stream->pin_widget,
-						VID_SET_AMPGAINMUTE, (1 << 15) | (1 << 13) | (1 << 12));
+						VID_SET_AMPLIFIER_GAIN_MUTE,
+						(1 << 15) | (1 << 13) | (1 << 12));
 					hda_send_verbs(codec, &verb, NULL, 1);
 				}	
 
@@ -599,9 +602,9 @@ hda_codec_new(hda_controller* controller, uint32 cad)
 	codec->response_sem = create_sem(0, "hda_codec_response_sem");
 	controller->codecs[cad] = codec;
 
-	verbs[0] = MAKE_VERB(cad, 0, VID_GET_PARAM, PID_VENDORID);
-	verbs[1] = MAKE_VERB(cad, 0, VID_GET_PARAM, PID_REVISIONID);
-	verbs[2] = MAKE_VERB(cad, 0, VID_GET_PARAM, PID_SUBORD_NODE_COUNT);
+	verbs[0] = MAKE_VERB(cad, 0, VID_GET_PARAMETER, PID_VENDOR_ID);
+	verbs[1] = MAKE_VERB(cad, 0, VID_GET_PARAMETER, PID_REVISION_ID);
+	verbs[2] = MAKE_VERB(cad, 0, VID_GET_PARAMETER, PID_SUBORD_NODE_COUNT);
 
 	if (hda_send_verbs(codec, verbs, responses, 3) != B_OK)
 		goto cmd_failed;
@@ -612,7 +615,8 @@ hda_codec_new(hda_controller* controller, uint32 cad)
 	for (nodeID = responses[2] >> 16;
 			nodeID < (responses[2] >> 16) + (responses[2] & 0xff); nodeID++) {
 		uint32 resp;
-		verbs[0] = MAKE_VERB(cad, nodeID, VID_GET_PARAM, PID_FUNCGRP_TYPE);
+		verbs[0] = MAKE_VERB(cad, nodeID, VID_GET_PARAMETER,
+			PID_FUNCTION_GROUP_TYPE);
 
 		if (hda_send_verbs(codec, verbs, &resp, 1) != B_OK)
 			goto cmd_failed;

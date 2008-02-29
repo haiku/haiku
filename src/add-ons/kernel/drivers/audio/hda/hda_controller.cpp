@@ -171,7 +171,7 @@ hda_interrupt_handler(hda_controller* controller)
 						controller->streams[index]);
 				} else {
 					dprintf("hda: Stream interrupt for unconfigured stream "
-						"%d!\n", index);
+						"%ld!\n", index);
 				}
 			}
 		}
