@@ -26,7 +26,8 @@ if $(HOST_PLATFORM) in r5 bone dano {
 	ObjectSysHdrs $(libbePatchSources)
 		: [ FDirName $(HAIKU_TOP) headers build os storage ] ;
 	if $(HOST_PLATFORM) = dano {
-		ObjectDefines $(libbePatchSources) : _IMPEXP_BE= ;
+		ObjectDefines $(libbePatchSources) : _IMPEXP_BE=
+			USING_HAIKU_TYPE_CONSTANTS_H= ;
 	}
 	ObjectC++Flags $(libbePatchSources)
 		: -include [ FDirName $(HAIKU_TOP) headers build

@@ -129,7 +129,7 @@ extern float	roundf(float value);
 #	define B_TRANSLATION_MAJOR_VERSION(v) (v >> 8)
 #	define B_TRANSLATION_MINOR_VERSION(v) ((v >> 4) & 0xf)
 #	define B_TRANSLATION_REVISION_VERSION(v) (v & 0xf)
-#	ifndef HAIKU_HOST_PLATFORM_DANO
+#	ifndef USING_HAIKU_TYPE_CONSTANTS_H
 #		define B_LARGE_ICON_TYPE		'ICON'
 #		define B_MINI_ICON_TYPE			'MICN'
 #		define B_VECTOR_ICON_TYPE		'VICN'
