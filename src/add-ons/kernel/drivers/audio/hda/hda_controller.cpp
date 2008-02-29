@@ -58,7 +58,254 @@ next_corb(hda_controller *controller)
 }
 
 
-//	#pragma mark -
+//! Called with interrupts off
+static void
+stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
+{
+	uint8 status;
+
+	if (!stream->running)
+		return;
+
+	status = OREG8(controller, stream->off, STS);
+	if (status == 0)
+		return;
+
+	OREG8(controller, stream->off, STS) = status;
+
+	if ((status & STS_BCIS) != 0) {
+		// Buffer Completed Interrupt
+		acquire_spinlock(&stream->lock);
+
+		stream->real_time = system_time();
+		stream->frames_count += stream->buffer_length;
+		stream->buffer_cycle = (stream->buffer_cycle + 1)
+			% stream->num_buffers;
+
+		release_spinlock(&stream->lock);
+
+		release_sem_etc(stream->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
+	} else
+		dprintf("HDA: stream status %x\n", status);
+}
+
+
+static int32
+hda_interrupt_handler(hda_controller* controller)
+{
+	int32 rc = B_HANDLED_INTERRUPT;
+
+	/* Check if this interrupt is ours */
+	uint32 intsts = REG32(controller, INTSTS);
+	if ((intsts & INTSTS_GIS) == 0)
+		return B_UNHANDLED_INTERRUPT;
+
+	/* Controller or stream related? */
+	if (intsts & INTSTS_CIS) {
+		uint32 stateStatus = REG16(controller, STATESTS);
+		uint8 rirbStatus = REG8(controller, RIRBSTS);
+		uint8 corbStatus = REG8(controller, CORBSTS);
+
+		if (stateStatus) {
+			/* Detected Codec state change */
+			REG16(controller, STATESTS) = stateStatus;
+			controller->codec_status = stateStatus;
+		}
+
+		/* Check for incoming responses */			
+		if (rirbStatus) {
+			REG8(controller, RIRBSTS) = rirbStatus;
+
+			if (rirbStatus & RIRBSTS_RINTFL) {
+				uint16 writePos = (REG16(controller, RIRBWP) + 1)
+					% controller->rirb_length;
+
+				for (; controller->rirb_read_pos != writePos;
+						controller->rirb_read_pos = next_rirb(controller)) {
+					uint32 response = current_rirb(controller).response;
+					uint32 responseFlags = current_rirb(controller).flags;
+					uint32 cad = responseFlags & RESPONSE_FLAGS_CODEC_MASK;
+					hda_codec* codec = controller->codecs[cad];
+
+					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
+						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
+							response, responseFlags);
+						continue;
+					}
+					if (codec == NULL) {
+						dprintf("hda: Response for unknown codec %ld: "
+							"%08lx/%08lx\n", cad, response, responseFlags);
+						continue;
+					}
+					if (codec->response_count >= MAX_CODEC_RESPONSES) {
+						dprintf("hda: too many responses received for codec %ld"
+							": %08lx/%08lx!\n", cad, response, responseFlags);
+						continue;
+					}
+
+					/* Store response in codec */
+					codec->responses[codec->response_count++] = response;
+					release_sem_etc(codec->response_sem, 1, B_DO_NOT_RESCHEDULE);
+					rc = B_INVOKE_SCHEDULER;
+				}			
+			}
+
+			if (rirbStatus & RIRBSTS_OIS)
+				dprintf("hda: RIRB Overflow\n");
+		}
+
+		/* Check for sending errors */
+		if (corbStatus) {
+			REG8(controller, CORBSTS) = corbStatus;
+
+			if (corbStatus & CORBSTS_MEI)
+				dprintf("hda: CORB Memory Error!\n");
+		}
+	}
+
+	if (intsts & ~(INTSTS_CIS | INTSTS_GIS)) {
+		for (uint32 index = 0; index < HDA_MAX_STREAMS; index++) {
+			if ((intsts & (1 << index)) != 0) {
+				if (controller->streams[index]) {
+					stream_handle_interrupt(controller,
+						controller->streams[index]);
+				} else {
+					dprintf("hda: Stream interrupt for unconfigured stream "
+						"%d!\n", index);
+				}
+			}
+		}
+	}
+
+	/* NOTE: See HDA001 => CIS/GIS cannot be cleared! */
+
+	return rc;
+}
+
+
+static status_t
+hda_hw_start(hda_controller* controller)
+{
+	int timeout = 10;
+
+	// TODO: reset controller first? (we currently reset on uninit only)
+
+	/* Put controller out of reset mode */
+	REG32(controller, GCTL) |= GCTL_CRST;
+
+	do {
+		snooze(100);
+	} while (--timeout && !(REG32(controller, GCTL) & GCTL_CRST));	
+
+	return timeout ? B_OK : B_TIMED_OUT;
+}
+
+
+/*! Allocates and initializes the Command Output Ring Buffer (CORB), and
+	Response Input Ring Buffer (RIRB) to the maximum supported size, and also
+	the DMA position buffer.
+
+	Programs the controller hardware to make use of these buffers (the DMA
+	positioning is actually enabled in hda_stream_setup_buffers()).
+*/
+static status_t
+init_corb_rirb_pos(hda_controller* controller)
+{
+	uint32 memSize, rirbOffset, posOffset;
+	uint8 corbSize, rirbSize, posSize;
+	status_t rc = B_OK;
+	physical_entry pe;
+
+	/* Determine and set size of CORB */
+	corbSize = REG8(controller, CORBSIZE);
+	if (corbSize & CORBSIZE_CAP_256E) {
+		controller->corb_length = 256;
+		REG8(controller, CORBSIZE) = CORBSIZE_SZ_256E;
+	} else if (corbSize & CORBSIZE_CAP_16E) {
+		controller->corb_length = 16;
+		REG8(controller, CORBSIZE) = CORBSIZE_SZ_16E;
+	} else if (corbSize & CORBSIZE_CAP_2E) {
+		controller->corb_length = 2;
+		REG8(controller, CORBSIZE) = CORBSIZE_SZ_2E;
+	}
+
+	/* Determine and set size of RIRB */
+	rirbSize = REG8(controller, RIRBSIZE);
+	if (rirbSize & RIRBSIZE_CAP_256E) {
+		controller->rirb_length = 256;
+		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_256E;
+	} else if (rirbSize & RIRBSIZE_CAP_16E) {
+		controller->rirb_length = 16;
+		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_16E;
+	} else if (rirbSize & RIRBSIZE_CAP_2E) {
+		controller->rirb_length = 2;
+		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_2E;
+	}
+
+	/* Determine rirb offset in memory and total size of corb+alignment+rirb */
+	rirbOffset = (controller->corb_length * sizeof(corb_t) + 0x7f) & ~0x7f;
+	posOffset = (rirbOffset + controller->rirb_length * sizeof(rirb_t) + 0x7f)
+		& 0x7f;
+	posSize = 8 * (controller->num_input_streams
+		+ controller->num_output_streams + controller->num_bidir_streams);
+
+	memSize = (posOffset + posSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
+	/* Allocate memory area */
+	controller->corb_rirb_pos_area = create_area("hda corb/rirb/pos",
+		(void**)&controller->corb, B_ANY_KERNEL_ADDRESS, memSize,
+		B_CONTIGUOUS, 0);
+	if (controller->corb_rirb_pos_area < 0)
+		return controller->corb_rirb_pos_area;
+
+	/* Rirb is after corb+aligment */
+	controller->rirb = (rirb_t*)(((uint8*)controller->corb) + rirbOffset);
+
+	if ((rc = get_memory_map(controller->corb, memSize, &pe, 1)) != B_OK) {
+		delete_area(controller->corb_rirb_pos_area);
+		return rc;
+	}
+
+	/* Program CORB/RIRB for these locations */
+	REG32(controller, CORBLBASE) = (uint32)pe.address;
+	REG32(controller, CORBUBASE) = 0;
+	REG32(controller, RIRBLBASE) = (uint32)pe.address + rirbOffset;
+	REG32(controller, RIRBUBASE) = 0;
+
+	/* Program DMA position update */
+	REG32(controller, DMA_POSITION_BASE_LOWER) = (uint32)pe.address + posOffset;
+	REG32(controller, DMA_POSITION_BASE_UPPER) = 0;
+
+	controller->stream_positions = (uint32*)
+		((uint8*)controller->corb + posOffset);
+
+	/* Reset CORB read pointer */
+	/* NOTE: See HDA011 for corrected procedure! */
+	REG16(controller, CORBRP) = CORBRP_RST;
+	do {
+		spin(10);
+	} while ( !(REG16(controller, CORBRP) & CORBRP_RST) );
+	REG16(controller, CORBRP) = 0;
+
+	/* Reset RIRB write pointer */
+	REG16(controller, RIRBWP) = RIRBWP_RST;
+
+	/* Generate interrupt for every response */
+	REG16(controller, RINTCNT) = 1;
+
+	/* Setup cached read/write indices */
+	controller->rirb_read_pos = 1;
+	controller->corb_write_pos = 0;
+
+	/* Gentlemen, start your engines... */
+	REG8(controller, CORBCTL) = CORBCTL_RUN | CORBCTL_MEIE;
+	REG8(controller, RIRBCTL) = RIRBCTL_DMAEN | RIRBCTL_OIC | RIRBCTL_RINTCTL;
+
+	return B_OK;
+}
+
+
+//	#pragma mark - public stream functions
 
 
 void
@@ -113,6 +360,9 @@ hda_stream_new(hda_controller* controller, int type)
 }
 
 
+/*!	Starts a stream's DMA engine, and enables generating and receiving
+	interrupts for this stream.
+*/
 status_t
 hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
@@ -136,38 +386,9 @@ hda_stream_start(hda_controller* controller, hda_stream* stream)
 }
 
 
-//! Called with interrupts off
-static void
-hda_stream_check_intr(hda_controller* controller, hda_stream* stream)
-{
-	uint8 status;
-
-	if (!stream->running)
-		return;
-
-	status = OREG8(controller, stream->off, STS);
-	if (status == 0)
-		return;
-
-	OREG8(controller, stream->off, STS) = status;
-
-	if ((status & STS_BCIS) != 0) {
-		// Buffer Completed Interrupt
-		acquire_spinlock(&stream->lock);
-
-		stream->real_time = system_time();
-		stream->frames_count += stream->buffer_length;
-		stream->buffer_cycle = (stream->buffer_cycle + 1)
-			% stream->num_buffers;
-
-		release_spinlock(&stream->lock);
-
-		release_sem_etc(stream->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
-	} else
-		dprintf("HDA: stream status %x\n", status);
-}
-
-
+/*!	Stops the stream's DMA engine, and turns off interrupts for this
+	stream.
+*/
 status_t
 hda_stream_stop(hda_controller* controller, hda_stream* stream)
 {
@@ -330,7 +551,7 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 }
 
 
-//	#pragma mark -
+//	#pragma mark - public controller functions
 
 
 status_t
@@ -372,215 +593,6 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 
 	return B_OK;
 }
-
-
-static int32
-hda_interrupt_handler(hda_controller* controller)
-{
-	int32 rc = B_HANDLED_INTERRUPT;
-
-	/* Check if this interrupt is ours */
-	uint32 intsts = REG32(controller, INTSTS);
-	if ((intsts & INTSTS_GIS) == 0)
-		return B_UNHANDLED_INTERRUPT;
-
-	/* Controller or stream related? */
-	if (intsts & INTSTS_CIS) {
-		uint32 stateStatus = REG16(controller, STATESTS);
-		uint8 rirbStatus = REG8(controller, RIRBSTS);
-		uint8 corbStatus = REG8(controller, CORBSTS);
-
-		if (stateStatus) {
-			/* Detected Codec state change */
-			REG16(controller, STATESTS) = stateStatus;
-			controller->codec_status = stateStatus;
-		}
-
-		/* Check for incoming responses */			
-		if (rirbStatus) {
-			REG8(controller, RIRBSTS) = rirbStatus;
-
-			if (rirbStatus & RIRBSTS_RINTFL) {
-				uint16 writePos = (REG16(controller, RIRBWP) + 1)
-					% controller->rirb_length;
-
-				for (; controller->rirb_read_pos != writePos;
-						controller->rirb_read_pos = next_rirb(controller)) {
-					uint32 response = current_rirb(controller).response;
-					uint32 responseFlags = current_rirb(controller).flags;
-					uint32 cad = responseFlags & RESPONSE_FLAGS_CODEC_MASK;
-					hda_codec* codec = controller->codecs[cad];
-
-					if ((responseFlags & RESPONSE_FLAGS_UNSOLICITED) != 0) {
-						dprintf("hda: Unsolicited response: %08lx/%08lx\n",
-							response, responseFlags);
-						continue;
-					}
-					if (codec == NULL) {
-						dprintf("hda: Response for unknown codec %ld: "
-							"%08lx/%08lx\n", cad, response, responseFlags);
-						continue;
-					}
-					if (codec->response_count >= MAX_CODEC_RESPONSES) {
-						dprintf("hda: too many responses received for codec %ld"
-							": %08lx/%08lx!\n", cad, response, responseFlags);
-						continue;
-					}
-
-					/* Store response in codec */
-					codec->responses[codec->response_count++] = response;
-					release_sem_etc(codec->response_sem, 1, B_DO_NOT_RESCHEDULE);
-					rc = B_INVOKE_SCHEDULER;
-				}			
-			}
-
-			if (rirbStatus & RIRBSTS_OIS)
-				dprintf("%s: RIRB Overflow\n", __func__);
-		}
-
-		/* Check for sending errors */
-		if (corbStatus) {
-			REG8(controller, CORBSTS) = corbStatus;
-
-			if (corbStatus & CORBSTS_MEI)
-				dprintf("%s: CORB Memory Error!\n", __func__);
-		}
-	}
-
-	if (intsts & ~(INTSTS_CIS | INTSTS_GIS)) {
-		int index;
-		for (index = 0; index < HDA_MAX_STREAMS; index++) {
-			if ((intsts & (1 << index)) != 0) {
-				if (controller->streams[index])
-					hda_stream_check_intr(controller, controller->streams[index]);
-				else {
-					dprintf("%s: Stream interrupt for unconfigured stream "
-						"%d!\n", __func__, index);
-				}
-			}
-		}
-	}
-
-	/* NOTE: See HDA001 => CIS/GIS cannot be cleared! */
-
-	return rc;
-}
-
-
-static status_t
-hda_hw_start(hda_controller* controller)
-{
-	int timeout = 10;
-
-	/* Put controller out of reset mode */
-	REG32(controller, GCTL) |= GCTL_CRST;
-
-	do {
-		snooze(100);
-	} while (--timeout && !(REG32(controller, GCTL) & GCTL_CRST));	
-
-	return timeout ? B_OK : B_TIMED_OUT;
-}
-
-
-static status_t
-hda_hw_corb_rirb_pos_init(hda_controller* controller)
-{
-	uint32 memSize, rirbOffset, posOffset;
-	uint8 corbSize, rirbSize, posSize;
-	status_t rc = B_OK;
-	physical_entry pe;
-
-	/* Determine and set size of CORB */
-	corbSize = REG8(controller, CORBSIZE);
-	if (corbSize & CORBSIZE_CAP_256E) {
-		controller->corb_length = 256;
-		REG8(controller, CORBSIZE) = CORBSIZE_SZ_256E;
-	} else if (corbSize & CORBSIZE_CAP_16E) {
-		controller->corb_length = 16;
-		REG8(controller, CORBSIZE) = CORBSIZE_SZ_16E;
-	} else if (corbSize & CORBSIZE_CAP_2E) {
-		controller->corb_length = 2;
-		REG8(controller, CORBSIZE) = CORBSIZE_SZ_2E;
-	}
-
-	/* Determine and set size of RIRB */
-	rirbSize = REG8(controller, RIRBSIZE);
-	if (rirbSize & RIRBSIZE_CAP_256E) {
-		controller->rirb_length = 256;
-		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_256E;
-	} else if (rirbSize & RIRBSIZE_CAP_16E) {
-		controller->rirb_length = 16;
-		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_16E;
-	} else if (rirbSize & RIRBSIZE_CAP_2E) {
-		controller->rirb_length = 2;
-		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_2E;
-	}
-
-	/* Determine rirb offset in memory and total size of corb+alignment+rirb */
-	rirbOffset = (controller->corb_length * sizeof(corb_t) + 0x7f) & ~0x7f;
-	posOffset = (rirbOffset + controller->rirb_length * sizeof(rirb_t) + 0x7f)
-		& 0x7f;
-	posSize = 8 * (controller->num_input_streams
-		+ controller->num_output_streams + controller->num_bidir_streams);
-
-	memSize = (posOffset + posSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-
-	/* Allocate memory area */
-	controller->corb_rirb_pos_area = create_area("hda corb/rirb/pos",
-		(void**)&controller->corb, B_ANY_KERNEL_ADDRESS, memSize,
-		B_CONTIGUOUS, 0);
-	if (controller->corb_rirb_pos_area < 0)
-		return controller->corb_rirb_pos_area;
-
-	/* Rirb is after corb+aligment */
-	controller->rirb = (rirb_t*)(((uint8*)controller->corb) + rirbOffset);
-
-	if ((rc = get_memory_map(controller->corb, memSize, &pe, 1)) != B_OK) {
-		delete_area(controller->corb_rirb_pos_area);
-		return rc;
-	}
-
-	/* Program CORB/RIRB for these locations */
-	REG32(controller, CORBLBASE) = (uint32)pe.address;
-	REG32(controller, CORBUBASE) = 0;
-	REG32(controller, RIRBLBASE) = (uint32)pe.address + rirbOffset;
-	REG32(controller, RIRBUBASE) = 0;
-
-	/* Program DMA position update */
-	REG32(controller, DMA_POSITION_BASE_LOWER) = (uint32)pe.address + posOffset;
-	REG32(controller, DMA_POSITION_BASE_UPPER) = 0;
-
-	controller->stream_positions = (uint32*)
-		((uint8*)controller->corb + posOffset);
-
-	/* Reset CORB read pointer */
-	/* NOTE: See HDA011 for corrected procedure! */
-	REG16(controller, CORBRP) = CORBRP_RST;
-	do {
-		spin(10);
-	} while ( !(REG16(controller, CORBRP) & CORBRP_RST) );
-	REG16(controller, CORBRP) = 0;
-
-	/* Reset RIRB write pointer */
-	REG16(controller, RIRBWP) = RIRBWP_RST;
-
-	/* Generate interrupt for every response */
-	REG16(controller, RINTCNT) = 1;
-
-	/* Setup cached read/write indices */
-	controller->rirb_read_pos = 1;
-	controller->corb_write_pos = 0;
-
-	/* Gentlemen, start your engines... */
-	REG8(controller, CORBCTL) = CORBCTL_RUN | CORBCTL_MEIE;
-	REG8(controller, RIRBCTL) = RIRBCTL_DMAEN | RIRBCTL_OIC | RIRBCTL_RINTCTL;
-
-	return B_OK;
-}
-
-
-//	#pragma mark -
 
 
 /*! Setup hardware for use; detect codecs; etc */
@@ -626,7 +638,7 @@ hda_hw_init(hda_controller* controller)
 		goto reset_failed;
 
 	/* Setup CORB/RIRB/DMA POS */
-	rc = hda_hw_corb_rirb_pos_init(controller);
+	rc = init_corb_rirb_pos(controller);
 	if (rc != B_OK)
 		goto corb_rirb_failed;
 
@@ -714,7 +726,7 @@ hda_hw_uninit(hda_controller* controller)
 	REG32(controller, RIRBLBASE) = 0;
 	REG32(controller, DMA_POSITION_BASE_LOWER) = 0;
 
-	/* Disable interrupts and remove interrupt handler */
+	/* Disable interrupts, reset controller, and remove interrupt handler */
 	REG32(controller, INTCTL) = 0;
 	REG32(controller, GCTL) &= ~GCTL_CRST;
 	remove_io_interrupt_handler(controller->irq,
