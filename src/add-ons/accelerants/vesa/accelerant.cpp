@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -74,10 +74,9 @@ AreaCloner::Keep()
 //	#pragma mark -
 
 
-/** This is the common accelerant_info initializer. It is called by
- *	both, the first accelerant and all clones.
- */
-
+/*!	This is the common accelerant_info initializer. It is called by
+	both, the first accelerant and all clones.
+*/
 static status_t
 init_common(int device, bool isClone)
 {
@@ -95,16 +94,16 @@ init_common(int device, bool isClone)
 	// get basic info from driver
 
 	area_id sharedArea;
-	if (ioctl(device, VESA_GET_PRIVATE_DATA, &sharedArea, sizeof(area_id)) != 0) {
+	if (ioctl(device, VESA_GET_PRIVATE_DATA, &sharedArea, sizeof(area_id))
+			!= 0) {
 		free(gInfo);
 		return B_ERROR;
 	}
 
 	AreaCloner sharedCloner;
 	gInfo->shared_info_area = sharedCloner.Clone("vesa shared info",
-								(void **)&gInfo->shared_info, B_ANY_ADDRESS,
-								B_READ_AREA | B_WRITE_AREA,
-								sharedArea);
+		(void **)&gInfo->shared_info, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, sharedArea);
 	status_t status = sharedCloner.InitCheck();
 	if (status < B_OK) {
 		free(gInfo);
@@ -135,11 +134,10 @@ uninit_common(void)
 }
 
 
-//	#pragma mark -
-//	public accelerant functions
+//	#pragma mark - public accelerant functions
 
 
-/** init primary accelerant */
+/*!	Init primary accelerant */
 
 status_t
 vesa_init_accelerant(int device)
@@ -156,6 +154,8 @@ vesa_init_accelerant(int device)
 		return status;
 	}
 
+	// Initialize current mode completely from the mode list
+	vesa_propose_display_mode(&gInfo->shared_info->current_mode, NULL, NULL);
 	return B_OK;
 }
 
@@ -210,10 +210,9 @@ err1:
 }
 
 
-/** This function is called for both, the primary accelerant and all of
- *	its clones.
- */
-
+/*!	This function is called for both, the primary accelerant and all of
+	its clones.
+*/
 void
 vesa_uninit_accelerant(void)
 {
