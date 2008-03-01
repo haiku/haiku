@@ -453,6 +453,7 @@ AboutView::AboutView(const BRect &rect)
 		"Oliver Tappe\n"
 		"Jason Vandermark\n"
 		"Sandor Vroemisse\n"
+		"Denis Washington\n"
 		"Nathan Whitehorn\n"
 		"Michael Wilber\n"
 		"Ulrich Wimboeck\n"
