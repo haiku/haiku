@@ -233,6 +233,7 @@ rgb_color
 ColorSet::StringToColor(const char *string) const
 {
 	rgb_color color;
+	color.set_to(0,0,0);
 
 	if (!string)
 		return color;
