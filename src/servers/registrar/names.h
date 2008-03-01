@@ -41,7 +41,7 @@
 */
 
 /* these types are used to index the table 'types': keep em in sync! */
-#define	L_C	0		/* first and foremost on UNIX */
+#define	L_C		0		/* first and foremost on UNIX */
 #define	L_CC	1		/* Bjarne's postincrement */
 #define	L_FORT	2		/* the oldest one */
 #define	L_MAKE	3		/* Makefiles */
@@ -59,25 +59,26 @@
 
 static const struct {
 	const char *human;
-	const char *mime;
+	const char *generic_mime;
+	const char *specific_mime;
 } types[] = {
-	{ "C program",					"text/x-c", },
-	{ "C++ program",				"text/x-c++" },
-	{ "FORTRAN program",				"text/x-fortran" },
-	{ "make commands",				"text/x-makefile" },
-	{ "PL/1 program",				"text/x-pl1" },
-	{ "assembler program",				"text/x-asm" },
-	{ "English",					"text/plain" },
-	{ "Pascal program",				"text/x-pascal" },
-	{ "mail",					"text/x-mail" },
-	{ "news",					"text/x-news" },
-	{ "Java program",				"text/x-java" },
-	{ "HTML document",				"text/html", },
-	{ "BCPL program",				"text/x-bcpl" },
-	{ "M4 macro language pre-processor",		"text/x-m4" },
-	{ "PO (gettext message catalogue)",             "text/x-po" },
-	{ "cannot happen error on names.h/types",	"error/x-error" },
-	{ 0, 0}
+	{ "C program",					"text/x-source-code", "text/x-c", },
+	{ "C++ program",				"text/x-source-code", "text/x-c++" },
+	{ "FORTRAN program",			"text/x-source-code", "text/x-fortran" },
+	{ "make commands",				"text/x-source-code", "text/x-makefile" },
+	{ "PL/1 program",				"text/x-source-code", "text/x-pl1" },
+	{ "assembler program",			"text/x-source-code", "text/x-asm" },
+	{ "English",					"text/plain", NULL },
+	{ "Pascal program",				"text/x-source-code", "text/x-pascal" },
+	{ "mail",						"text/plain", "text/x-mail" },
+	{ "news",						"text/plain", "text/x-news" },
+	{ "Java program",				"text/x-source-code", "text/x-java" },
+	{ "HTML document",				"text/x-source-code", "text/html", },
+	{ "BCPL program",				"text/x-source-code", "text/x-bcpl" },
+	{ "M4 macro language pre-processor", "text/x-source-code", "text/x-m4" },
+	{ "PO (gettext message catalogue)",	"text/plain", "text/x-po" },
+	{ "cannot happen error on names.h/types", "text/plain", "error/x-error" },
+	{ NULL, NULL, NULL }
 };
 
 /*

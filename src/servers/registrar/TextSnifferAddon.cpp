@@ -135,7 +135,8 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType)
 	const char *code_mime = NULL;
 	const char *type = NULL;
 	const char *subtype = NULL;
-	const char *subtype_mime = NULL;
+	const char *subtypeMimeGeneric = NULL;
+	const char *subtypeMimeSpecific = NULL;
 
 	int has_escapes = 0;
 	int has_backspace = 0;
@@ -225,14 +226,16 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType)
 		     isascii((unsigned char)tp[1]) &&
 		     isalnum((unsigned char)tp[1]) &&
 		     ISSPC(tp[2]))) {
-			subtype_mime = "text/troff";
+		    subtypeMimeGeneric = "text/x-source-code";
+			subtypeMimeSpecific = "text/troff";
 			subtype = "troff or preprocessor input";
 			goto subtype_identified;
 		}
 	}
 
 	if ((*buf == 'c' || *buf == 'C') && ISSPC(buf[1])) {
-		subtype_mime = "text/fortran";
+		subtypeMimeGeneric = "text/x-source-code";
+		subtypeMimeSpecific = "text/fortran";
 		subtype = "fortran program";
 		goto subtype_identified;
 	}
@@ -265,7 +268,8 @@ file_ascmagic(const unsigned char *buf, size_t nbytes, BMimeType* mimeType)
 			if (ascmatch((const unsigned char *)p->name, ubuf + i,
 			    end - i)) {
 				subtype = types[p->type].human;
-				subtype_mime = types[p->type].mime;
+				subtypeMimeGeneric = types[p->type].generic_mime;
+				subtypeMimeSpecific = types[p->type].specific_mime;
 				goto subtype_identified;
 			}
 		}
@@ -317,9 +321,19 @@ done:
 	if (rv) {
 		// If we have identified the subtype, return it, otherwise just
 		// text/plain.
-		if (subtype_mime)
-			mimeType->SetTo(subtype_mime);
-		else
+
+		bool found = false;
+		if (subtypeMimeSpecific != NULL) {
+			mimeType->SetTo(subtypeMimeSpecific);
+			if (mimeType->IsInstalled())
+				found = true;			
+		}
+		if (!found && subtypeMimeGeneric != NULL) {
+			mimeType->SetTo(subtypeMimeGeneric);
+			if (mimeType->IsInstalled())
+				found = true;			
+		}
+		if (!found)
 			mimeType->SetTo("text/plain");
 	}
 
