@@ -12,7 +12,6 @@ MergeObject posix_stdlib.o :
 	div.c 
 	env.c
 	exit.c
-	gcvt.c
 	heapsort.c 
 	merge.c
 	mktemp.c
