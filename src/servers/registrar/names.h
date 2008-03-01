@@ -56,6 +56,7 @@
 #define	L_BCPL	12		/* BCPL */
 #define	L_M4	13		/* M4 */
 #define	L_PO	14		/* PO */
+#define L_JAM	15		/* Jamfiles */
 
 static const struct {
 	const char *human;
@@ -77,6 +78,7 @@ static const struct {
 	{ "BCPL program",				"text/x-source-code", "text/x-bcpl" },
 	{ "M4 macro language pre-processor", "text/x-source-code", "text/x-m4" },
 	{ "PO (gettext message catalogue)",	"text/plain", "text/x-po" },
+	{ "Jamfile",					"text/x-source-code", "text/x-jamfile" },
 	{ "cannot happen error on names.h/types", "text/plain", "error/x-error" },
 	{ NULL, NULL, NULL }
 };
@@ -144,6 +146,9 @@ static struct names {
 	{"float",	L_C},
 	{"struct",	L_C},
 	{"union",	L_C},
+	{"SubDir",	L_JAM},
+	{"rule",	L_JAM},
+	{"actions",	L_JAM},
 	{"CFLAGS",	L_MAKE},
 	{"LDFLAGS",	L_MAKE},
 	{"all:",	L_MAKE},
