@@ -180,8 +180,13 @@ private:
 			void			_Hide();
 			BMenuItem*		_Track(int* action, long start = -1);
 
+			void			_UpdateNavigationArea(BPoint position,
+								BRect& navAreaRectAbove, BRect& navAreaBelow);
+
 			void			_UpdateStateOpenSelect(BMenuItem* item,
-								bigtime_t& openTime, const int32 &mouseSpeed);
+								BPoint position, BRect& navAreaRectAbove,
+								BRect& navAreaBelow, bigtime_t& selectedTime,
+								bigtime_t& navigationAreaTime);
 			void			_UpdateStateClose(BMenuItem* item, const BPoint& where,
 								const uint32& buttons);
 

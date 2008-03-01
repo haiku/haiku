@@ -1384,6 +1384,8 @@ BMenu::_Hide()
 }
 
 
+const static bigtime_t kOpenSubmenuDelay = 225000;
+const static bigtime_t kNavigationAreaTimeout = 1000000;
 const static bigtime_t kHysteresis = 200000; // TODO: Test and reduce if needed.
 const static int32 kMouseMotionThreshold = 15; 
 	// TODO: Same as above. Actually, we could get rid of the kHysteresis
@@ -1394,8 +1396,10 @@ BMenu::_Track(int *action, long start)
 {
 	// TODO: cleanup
 	BMenuItem *item = NULL;
-	bigtime_t openTime = system_time();
-	
+	BRect navAreaRectAbove, navAreaRectBelow;
+	bigtime_t selectedTime = system_time();
+	bigtime_t navigationAreaTime = 0;
+
 	fState = MENU_STATE_TRACKING;
 	if (fSuper != NULL)
 		fSuper->fState = MENU_STATE_TRACKING_SUBMENU;
@@ -1432,6 +1436,9 @@ BMenu::_Track(int *action, long start)
 		bool overSub = _OverSubmenu(fSelected, screenLocation);
 		item = _HitTestItems(location, B_ORIGIN);
 		if (overSub) {
+			navAreaRectAbove = BRect();
+			navAreaRectBelow = BRect();
+
 			// Since the submenu has its own looper,
 			// we can unlock ours. Doing so also make sure
 			// that our window gets any update message to
@@ -1453,7 +1460,8 @@ BMenu::_Track(int *action, long start)
 			if (!LockLooper())
 				break;			
 		} else if (item != NULL) {
-			_UpdateStateOpenSelect(item, openTime, mouseSpeed);
+			_UpdateStateOpenSelect(item, location, navAreaRectAbove,
+				navAreaRectBelow, selectedTime, navigationAreaTime);
 			if (!releasedOnce)
 				releasedOnce = true;		
 		} else if (_OverSuper(screenLocation)) {
@@ -1528,26 +1536,164 @@ BMenu::_Track(int *action, long start)
 
 
 void
-BMenu::_UpdateStateOpenSelect(BMenuItem* item, bigtime_t& openTime,
-	const int32 &mouseSpeed)
+BMenu::_UpdateNavigationArea(BPoint position, BRect& navAreaRectAbove,
+	BRect& navAreaRectBelow)
+{
+#define NAV_AREA_THRESHOLD    8
+
+	// The navigation area is a region in which mouse-overs won't select
+	// the item under the cursor. This makes it easier to navigate to
+	// submenus, as the cursor can be moved to submenu items directly instead
+	// of having to move it horizontally into the submenu first. The concept
+	// is illustrated below:
+	// 
+	// +-------+----+---------+
+	// |       |   /|         |
+	// |       |  /*|         |
+	// |[2]--> | /**|         |
+	// |       |/[4]|         |
+	// |------------|         |
+	// |    [1]     |   [6]   |
+	// |------------|         |
+	// |       |\[5]|         |
+	// |[3]--> | \**|         |
+	// |       |  \*|         |
+	// |       |   \|         |
+	// |       +----|---------+
+	// |            |
+	// +------------+
+	//
+	// [1] Selected item, cursor position ('position')
+	// [2] Upper navigation area rectangle ('navAreaRectAbove')
+	// [3] Lower navigation area rectangle ('navAreaRectBelow')
+	// [4] Upper navigation area
+	// [5] Lower navigation area
+	// [6] Submenu	
+	//
+	// The rectangles are used to calculate if the cursor is in the actual
+	// navigation area (see _UpdateStateOpenSelect()).
+
+	if (fSelected == NULL)
+		return;
+
+	BMenu *submenu = fSelected->Submenu();
+
+	if (submenu != NULL) {
+		BRect menuBounds = ConvertToScreen(Bounds());
+
+		fSelected->Submenu()->LockLooper();
+		BRect submenuBounds = fSelected->Submenu()->ConvertToScreen(
+			fSelected->Submenu()->Bounds());
+		fSelected->Submenu()->UnlockLooper();
+
+		if (menuBounds.left < submenuBounds.left) {
+			navAreaRectAbove.Set(position.x + NAV_AREA_THRESHOLD,
+				submenuBounds.top, menuBounds.right,
+				position.y);
+			navAreaRectBelow.Set(position.x + NAV_AREA_THRESHOLD,
+				position.y, menuBounds.right,
+				submenuBounds.bottom);
+		} else {
+			navAreaRectAbove.Set(menuBounds.left,
+				submenuBounds.top, position.x - NAV_AREA_THRESHOLD,
+				position.y);
+			navAreaRectBelow.Set(menuBounds.left,
+				position.y, position.x - NAV_AREA_THRESHOLD,
+				submenuBounds.bottom);
+		}	
+	} else {
+		navAreaRectAbove = BRect();
+		navAreaRectBelow = BRect();
+	}
+}
+
+void
+BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
+	BRect& navAreaRectAbove, BRect& navAreaRectBelow, bigtime_t& selectedTime,
+	bigtime_t& navigationAreaTime)
 {
 	if (fState == MENU_STATE_CLOSED)
 		return;
 
+
 	if (item != fSelected) {
-		if (mouseSpeed < kMouseMotionThreshold) {		
+		if (navigationAreaTime == 0)
+			navigationAreaTime = system_time();
+
+		position = ConvertToScreen(position);
+
+		bool inNavAreaRectAbove = navAreaRectAbove.Contains(position);
+		bool inNavAreaRectBelow = navAreaRectBelow.Contains(position);
+
+		if (!inNavAreaRectAbove && !inNavAreaRectBelow) {
 			_SelectItem(item, false);
-			openTime = system_time();
-		} else {
-			//printf("Mouse moving too fast (%ld), ignoring...\n", mouseSpeed);		
+			navAreaRectAbove = BRect();
+			navAreaRectBelow = BRect();
+			selectedTime = system_time();
+			navigationAreaTime = 0;
+			return;
 		}
-	} else if (system_time() > kHysteresis + openTime && item->Submenu() != NULL
-		&& item->Submenu()->Window() == NULL) {
-		// Open the submenu if it's not opened yet, but only if
-		// the mouse pointer stayed over there for some time
-		// (hysteresis)
-		_SelectItem(item);
+
+		BRect menuBounds = ConvertToScreen(Bounds());
+
+		fSelected->Submenu()->LockLooper();
+		BRect submenuBounds = fSelected->Submenu()->ConvertToScreen(
+			fSelected->Submenu()->Bounds());
+		fSelected->Submenu()->UnlockLooper();
+
+		float x_offset;
+
+		// navAreaRectAbove and navAreaRectBelow have the same X
+		// position and width, so it doesn't matter which one we use to
+		// calculate the X offset
+		if (menuBounds.left < submenuBounds.left)
+			x_offset = position.x - navAreaRectAbove.left;
+		else
+			x_offset = navAreaRectAbove.right - position.x;
+
+		bool inNavArea;
+
+		if (inNavAreaRectAbove) {
+			float y_offset = navAreaRectAbove.bottom - position.y;
+			float ratio = navAreaRectAbove.Width() / navAreaRectAbove.Height();
+
+			inNavArea = y_offset <= x_offset / ratio;
+		} else {
+			float y_offset = navAreaRectBelow.bottom - position.y;
+			float ratio = navAreaRectBelow.Width() / navAreaRectBelow.Height();
+
+			inNavArea = y_offset >= (navAreaRectBelow.Height() - x_offset / ratio);
+		}
+
+		bigtime_t systime = system_time();
+
+		if (!inNavArea || (navigationAreaTime > 0 && systime -
+			navigationAreaTime > kNavigationAreaTimeout)) {
+			// Don't delay opening of submenu if the user had
+			// to wait for the navigation area timeout anyway
+			_SelectItem(item, inNavArea);
+
+			if (inNavArea) {
+				_UpdateNavigationArea(position, navAreaRectAbove,
+					navAreaRectBelow);
+			} else {
+				navAreaRectAbove = BRect();
+				navAreaRectBelow = BRect();
+			}
+
+			selectedTime = system_time();
+			navigationAreaTime = 0;
+		}
+	} else if (fSelected->Submenu() != NULL &&
+		system_time() - selectedTime > kOpenSubmenuDelay) {
+		_SelectItem(fSelected, true);
+
+		if (!navAreaRectAbove.IsValid() && !navAreaRectBelow.IsValid()) {
+			position = ConvertToScreen(position);
+			_UpdateNavigationArea(position, navAreaRectAbove, navAreaRectBelow);
+		}
 	}
+
 	if (fState != MENU_STATE_TRACKING)
 		fState = MENU_STATE_TRACKING;
 }
@@ -1561,9 +1707,14 @@ BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
 		return;
 
 	if (buttons != 0 && _IsStickyMode()) {
-		if (item == NULL)
+		if (item == NULL) {
+			if (item != fSelected) {
+				LockLooper();
+				_SelectItem(item, false);
+				UnlockLooper();
+			}
 			fState = MENU_STATE_CLOSED;
-		else
+		} else
 			_SetStickyMode(false);
 	} else if (buttons == 0 && !_IsStickyMode()) {
 		if (fExtraRect != NULL && fExtraRect->Contains(where)) {
@@ -1571,8 +1722,14 @@ BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
 			fExtraRect = NULL;
 				// Setting this to NULL will prevent this code
 				// to be executed next time
-		} else
+		} else {
+			if (item != fSelected) {
+				LockLooper();
+				_SelectItem(item, false);
+				UnlockLooper();
+			}
 			fState = MENU_STATE_CLOSED;
+		}
 	}
 }
 
