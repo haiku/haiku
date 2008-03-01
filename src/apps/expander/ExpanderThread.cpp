@@ -73,6 +73,9 @@ ExpanderThread::ThreadStartup()
 	if (fThreadId < 0)
 		return fThreadId;
 
+	// lower the command priority since it is a background task.
+	set_thread_priority(fThreadId, B_LOW_PRIORITY);
+
 	resume_thread(fThreadId);
 
 	fExpanderOutput = fdopen(fStdOut, "r");
