@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
+ *		Rene Gollent (rene@gollent.com)
  */
 #include <OS.h>
 #include <Directory.h>
@@ -32,6 +33,36 @@
 
 #define COLOR_DROPPED 'cldp'
 #define DECORATOR_CHANGED 'dcch'
+
+int32 sColorConsts[] = {
+	B_PANEL_BACKGROUND_COLOR,
+	B_PANEL_TEXT_COLOR,
+	B_DOCUMENT_BACKGROUND_COLOR,
+	B_DOCUMENT_TEXT_COLOR,
+	B_CONTROL_BACKGROUND_COLOR,
+	B_CONTROL_TEXT_COLOR,
+	B_CONTROL_BORDER_COLOR,
+	B_CONTROL_HIGHLIGHT_COLOR,
+	B_NAVIGATION_BASE_COLOR,
+	B_NAVIGATION_PULSE_COLOR,
+	B_SHINE_COLOR,
+	B_SHADOW_COLOR,
+	B_MENU_BACKGROUND_COLOR,
+	B_MENU_SELECTED_BACKGROUND_COLOR,
+	B_MENU_ITEM_TEXT_COLOR,
+	B_MENU_SELECTED_ITEM_TEXT_COLOR,
+	B_MENU_SELECTED_BORDER_COLOR,
+	B_TOOLTIP_BACKGROUND_COLOR,
+	B_TOOLTIP_TEXT_COLOR,
+	B_SUCCESS_COLOR,
+	B_FAILURE_COLOR,
+	B_WINDOW_TAB_COLOR,
+	B_WINDOW_TEXT_COLOR,
+	B_WINDOW_INACTIVE_TAB_COLOR,
+	B_WINDOW_INACTIVE_TEXT_COLOR,
+};
+
+const uint32 sColorCount = sizeof(sColorConsts) / sizeof(int32);
 
 namespace BPrivate
 {
@@ -99,32 +130,12 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	
 	fAttrList->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 
-	fAttrList->AddItem(new ColorWhichItem(B_PANEL_BACKGROUND_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_PANEL_TEXT_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_BACKGROUND_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_DOCUMENT_TEXT_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_BACKGROUND_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_TEXT_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_BORDER_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_CONTROL_HIGHLIGHT_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_BASE_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_NAVIGATION_PULSE_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_SHINE_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_SHADOW_COLOR));
-	fAttrList->AddItem(new ColorWhichItem(B_MENU_BACKGROUND_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BACKGROUND_COLOR));
-	fAttrList->AddItem(new ColorWhichItem(B_MENU_ITEM_TEXT_COLOR));
-	fAttrList->AddItem(new ColorWhichItem(B_MENU_SELECTED_ITEM_TEXT_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_MENU_SELECTED_BORDER_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_TOOLTIP_BACKGROUND_COLOR));
-	
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_SUCCESS_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_FAILURE_COLOR));
-	fAttrList->AddItem(new ColorWhichItem(B_WINDOW_TAB_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_WINDOW_TAB_TEXT_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_COLOR));
-	fAttrList->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR));
+	printf("Color count: %lu\n", sColorCount);
 
+	for (uint32 i = 0; i < sColorCount; i++) {
+		printf("Adding color item for which: %ld\n", sColorConsts[i]);
+		fAttrList->AddItem(new ColorWhichItem((color_which)sColorConsts[i]));
+	}
 
 	BRect wellrect(0,0,50,50);
 	wellrect.OffsetTo(rect.right + 30, rect.top +
@@ -201,6 +212,7 @@ APRView::MessageReceived(BMessage *msg)
 			fPicker->SetValue(*col);
 			fColorWell->SetColor(*col);
 			fColorWell->Invalidate();
+			UpdateCurrentColor();
 		}
 	}
 
@@ -220,10 +232,11 @@ APRView::MessageReceived(BMessage *msg)
 
 			fColorWell->SetColor(col);
 			fColorWell->Invalidate();
-			
+				
 			// Update current fAttribute in the settings
-			fCurrentSet.SetColor(fAttrString.String(),col);
-			
+			fCurrentSet.SetColor(fAttribute, col);
+			UpdateCurrentColor();				
+	
 			fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
 			fRevert->SetEnabled(true);
 			
@@ -240,23 +253,26 @@ APRView::MessageReceived(BMessage *msg)
 			
 			fAttrString=whichitem->Text();
 			UpdateControlsFromAttr(whichitem->Text());
-
+			
 			fDefaults->SetEnabled(fCurrentSet.IsDefaultable());
 			break;
 		}
 		case REVERT_SETTINGS: {
 			fCurrentSet=fPrevSet;
 			UpdateControlsFromAttr(fAttrString.String());
+			UpdateAllColors();
 			
 			fRevert->SetEnabled(false);
 			
 			break;
 		}
 		case DEFAULT_SETTINGS: {
-			fCurrentSet.SetToDefaults();
+			fCurrentSet = ColorSet::DefaultColorSet();
 			fDefaults->SetEnabled(false);
 			
 			UpdateControlsFromAttr(fAttrString.String());
+			UpdateAllColors();
+
 			BMenuItem *item = fDecorMenu->FindItem("Default");
 			if (item)
 			{
@@ -275,19 +291,29 @@ APRView::MessageReceived(BMessage *msg)
 
 void APRView::LoadSettings(void)
 {
-	// Load the current GUI color settings from disk. This is done instead of
-	// getting them from the server at this point for testing purposes.
-	
-	// Query the server for the current settings
-	//BPrivate::get_system_colors(&fCurrentSet);
-	
-	// TODO: remove this and enable the get_system_colors() call
-	if (ColorSet::LoadColorSet("/boot/home/config/settings/app_server/system_colors",&fCurrentSet) != B_OK) {
-		fCurrentSet.SetToDefaults();
-		ColorSet::SaveColorSet("/boot/home/config/settings/app_server/system_colors",fCurrentSet);
+	printf("Max colors: %lu\n", sColorCount);
+	for (uint32 i = 0; i < sColorCount; i++) {
+		printf("getting ui_color for index %lu, constant: %ld\n", i, sColorConsts[i]);
+		fCurrentSet.SetColor((color_which)sColorConsts[i], ui_color((color_which)sColorConsts[i]));
 	}
-	
+
+	fCurrentSet.PrintToStream();
+
 	fPrevSet = fCurrentSet;
+}
+
+void APRView::UpdateAllColors(void)
+{
+	for (uint32 i = 0; i < sColorCount; i++)
+		set_ui_color((color_which)sColorConsts[i], 
+			fCurrentSet.AttributeToColor((color_which)sColorConsts[i]));
+}
+
+void APRView::UpdateCurrentColor(void)
+{
+	rgb_color col=fPicker->ValueAsColor();
+	ColorWhichItem *whichitem = (ColorWhichItem *)fAttrList->ItemAt(fAttrList->CurrentSelection());
+	set_ui_color(whichitem->GetAttribute(), col);
 }
 
 void APRView::UpdateControlsFromAttr(const char *string)

@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
+ *		Rene Gollent (rene@gollent.com)
  */
 #ifndef APR_VIEW_H_
 #define APR_VIEW_H_
@@ -43,6 +44,8 @@ public:
 protected:
 
 	void	UpdateControlsFromAttr(const char *string);
+	void	UpdateCurrentColor();
+	void	UpdateAllColors();
 	
 	BColorControl	*fPicker;
 	

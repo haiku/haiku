@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
+ *		Rene Gollent (rene@gollent.com)
  */
 #include "ColorWhichItem.h"
 #include <stdio.h>
@@ -134,17 +135,17 @@ ColorWhichItem::SetAttribute(color_which which)
 			SetText("Window Tab");
 			break;
 		}
-		case B_WINDOW_TAB_TEXT_COLOR: {
+		case B_WINDOW_TEXT_COLOR: {
 			attribute=which;
-			SetText("Window Tab Text");
+			SetText("Window Text");
 			break;
 		}
-		case B_INACTIVE_WINDOW_TAB_COLOR: {
+		case B_WINDOW_INACTIVE_TAB_COLOR: {
 			attribute=which;
 			SetText("Inactive Window Tab");
 			break;
 		}
-		case B_INACTIVE_WINDOW_TAB_TEXT_COLOR: {
+		case B_WINDOW_INACTIVE_TEXT_COLOR: {
 			attribute=which;
 			SetText("Inactive Window Tab Text");
 			break;

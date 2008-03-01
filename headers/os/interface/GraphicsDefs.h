@@ -101,6 +101,12 @@ typedef struct rgb_color {
 	{
 		return *(const uint32 *)this != *(const uint32 *)&other;
 	}
+	
+	inline rgb_color&
+	operator=(const rgb_color& other)
+	{
+		return set_to(other.red, other.green, other.blue, other.alpha);
+	}
 #endif
 } rgb_color;
 
