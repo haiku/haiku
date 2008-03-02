@@ -2300,13 +2300,25 @@ BMessage::AddMessage(const char *name, const BMessage *message)
 	copying an extra buffer. Functions can be added that return a direct
 	pointer into the message. */
 
+	char buf[4096] = { 0 };
 	ssize_t size = message->FlattenedSize();
-	char buffer[size];
+
+	bool freeBuffer = false;
+	char* buffer = NULL;
+	if (size > (ssize_t)sizeof(buffer)) {
+		freeBuffer = true;
+		buffer = static_cast<char*>(malloc(size));
+	} else {
+		buffer = buf;
+	}
 
 	status_t error = message->Flatten(buffer, size);
 
 	if (error >= B_OK)
-		error = AddData(name, B_MESSAGE_TYPE, &buffer, size, false);
+		error = AddData(name, B_MESSAGE_TYPE, buffer, size, false);
+
+	if (freeBuffer)
+		free(buffer);
 
 	return error;
 }
