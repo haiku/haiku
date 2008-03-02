@@ -476,8 +476,8 @@ BPlusTree::SetTo(Inode *stream)
 			| S_FLOAT_INDEX | S_DOUBLE_INDEX);
 
 		if (fHeader->DataType() > BPLUSTREE_DOUBLE_TYPE
-			|| (stream->Mode() & S_INDEX_DIR)
-				&& toMode[fHeader->DataType()] != mode
+			|| ((stream->Mode() & S_INDEX_DIR) != 0
+				&& toMode[fHeader->DataType()] != mode)
 			|| !stream->IsContainer()) {
 			D(	dump_bplustree_header(fHeader);
 				dump_inode(&stream->Node());
@@ -1709,7 +1709,7 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
 		// to a leaf node by dropping the overflow link, or,
 		// if it's already a leaf node, just empty it
 		if (nodeAndKey.nodeOffset == fHeader->RootNode()
-			&& (node->NumKeys() == 0 || node->NumKeys() == 1 && node->IsLeaf())) {
+			&& (node->NumKeys() == 0 || (node->NumKeys() == 1 && node->IsLeaf()))) {
 			writableNode->overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
 			writableNode->all_key_count = 0;
 			writableNode->all_key_length = 0;
@@ -1730,7 +1730,7 @@ BPlusTree::Remove(Transaction &transaction, const uint8 *key, uint16 keyLength,
 		// it, we can just dump the node (index nodes still have
 		// the overflow link, so we have to drop the last key)
 		if (writableNode->NumKeys() > 1
-			|| !writableNode->IsLeaf() && writableNode->NumKeys() == 1) {
+			|| (!writableNode->IsLeaf() && writableNode->NumKeys() == 1)) {
 			_RemoveKey(writableNode, nodeAndKey.keyIndex);
 			return B_OK;
 		}
