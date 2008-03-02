@@ -408,6 +408,7 @@ AboutView::AboutView(const BRect &rect)
 		"Morgan Howe\n"
 		"Erik Jaesler\n"
 		"Carwyn Jones\n"
+		"Maurice Kalinowski\n"
 		"Vasilis Kaoutsis\n"
 		"James Kim\n"
 		"Euan Kirkhope\n"
