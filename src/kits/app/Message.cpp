@@ -1,10 +1,11 @@
 /*
- * Copyright 2005-2007, Haiku Inc. All rights reserved.
+ * Copyright 2005-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
+
 #include <Message.h>
 #include <MessageAdapter.h>
 #include <MessagePrivate.h>
@@ -51,19 +52,70 @@ const char *B_PROPERTY_ENTRY = "property";
 const char *B_PROPERTY_NAME_ENTRY = "name";
 
 
-static status_t		handle_reply(port_id replyPort, int32 *pCode,
-						bigtime_t timeout, BMessage *reply);
+static status_t	handle_reply(port_id replyPort, int32 *pCode, bigtime_t timeout,
+	BMessage *reply);
 
 extern "C" {
-		// private os function to set the owning team of an area
-		status_t	_kern_transfer_area(area_id area, void **_address,
-						uint32 addressSpec, team_id target);
+	// private os function to set the owning team of an area
+	status_t _kern_transfer_area(area_id area, void **_address,
+		uint32 addressSpec, team_id target);
 }
 
 
 BBlockCache *BMessage::sMsgCache = NULL;
 port_id BMessage::sReplyPorts[sNumReplyPorts];
 long BMessage::sReplyPortInUse[sNumReplyPorts];
+
+
+template<typename Type> static uint8 *
+print_to_stream_type(uint8* pointer)
+{
+	Type *item = (Type *)pointer;
+	item->PrintToStream();
+	return (uint8 *)(item+1);
+}
+
+
+template<typename Type> static uint8 *
+print_type(const char* format, uint8* pointer)
+{
+	Type *item = (Type *)pointer;
+	printf(format, *item, *item);
+	return (uint8 *)(item+1);
+}
+
+
+static status_t
+handle_reply(port_id replyPort, int32 *_code, bigtime_t timeout,
+	BMessage *reply)
+{
+	DEBUG_FUNCTION_ENTER2;
+	ssize_t size;
+	do {
+		size = port_buffer_size_etc(replyPort, B_RELATIVE_TIMEOUT, timeout);
+	} while (size == B_INTERRUPTED);
+
+	if (size < B_OK)
+		return size;
+
+	status_t result;
+	char *buffer = (char *)malloc(size);
+	do {
+		result = read_port(replyPort, _code, buffer, size);
+	} while (result == B_INTERRUPTED);
+
+	if (result < B_OK || *_code != kPortMessageCode) {
+		free(buffer);
+		return result < B_OK ? result : B_ERROR;
+	}
+
+	result = reply->Unflatten(buffer);
+	free(buffer);
+	return result;
+}
+
+
+//	#pragma mark -
 
 
 BMessage::BMessage()
@@ -373,24 +425,6 @@ BMessage::IsReply() const
 {
 	DEBUG_FUNCTION_ENTER;
 	return fHeader->flags & MESSAGE_FLAG_IS_REPLY;
-}
-
-
-template<typename Type> static uint8 *
-print_to_stream_type(uint8* pointer)
-{
-	Type *item = (Type *)pointer;
-	item->PrintToStream();
-	return (uint8 *)(item+1);
-}
-
-
-template<typename Type> static uint8 *
-print_type(const char* format, uint8* pointer)
-{
-	Type *item = (Type *)pointer;
-	printf(format, *item, *item);
-	return (uint8 *)(item+1);
 }
 
 
@@ -2107,36 +2141,6 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 }
 
 
-static status_t
-handle_reply(port_id replyPort, int32 *_code, bigtime_t timeout,
-	BMessage *reply)
-{
-	DEBUG_FUNCTION_ENTER2;
-	ssize_t size;
-	do {
-		size = port_buffer_size_etc(replyPort, B_RELATIVE_TIMEOUT, timeout);
-	} while (size == B_INTERRUPTED);
-
-	if (size < B_OK)
-		return size;
-
-	status_t result;
-	char *buffer = (char *)malloc(size);
-	do {
-		result = read_port(replyPort, _code, buffer, size);
-	} while (result == B_INTERRUPTED);
-
-	if (result < B_OK || *_code != kPortMessageCode) {
-		free(buffer);
-		return result < B_OK ? result : B_ERROR;
-	}
-
-	result = reply->Unflatten(buffer);
-	free(buffer);
-	return result;
-}
-
-
 void BMessage::_ReservedMessage1(void) {};
 void BMessage::_ReservedMessage2(void) {};
 void BMessage::_ReservedMessage3(void) {};
@@ -2300,16 +2304,18 @@ BMessage::AddMessage(const char *name, const BMessage *message)
 	copying an extra buffer. Functions can be added that return a direct
 	pointer into the message. */
 
-	char buf[4096] = { 0 };
+	char stackBuffer[16384];
 	ssize_t size = message->FlattenedSize();
 
 	bool freeBuffer = false;
-	char* buffer = NULL;
-	if (size > (ssize_t)sizeof(buffer)) {
+	char* buffer;
+	if (size > (ssize_t)sizeof(stackBuffer)) {
 		freeBuffer = true;
 		buffer = static_cast<char*>(malloc(size));
+		if (buffer == NULL)
+			return B_NO_MEMORY;
 	} else {
-		buffer = buf;
+		buffer = stackBuffer;
 	}
 
 	status_t error = message->Flatten(buffer, size);
