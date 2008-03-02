@@ -181,7 +181,7 @@ public:						// *** DiagramView impl
 								BPoint point,
 								BMessage *message);
 
-	virtual void			selectionChanged();
+	virtual void			SelectionChanged();
 
 public:						// *** BView impl
 

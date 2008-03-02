@@ -273,7 +273,7 @@ MediaRoutingView::MessageDropped(BPoint point, BMessage *message)
 
 
 void
-MediaRoutingView::selectionChanged()
+MediaRoutingView::SelectionChanged()
 {
 	D_METHOD(("MediaRoutingView::selectionChanged()\n"));
 	_broadcastSelection();
