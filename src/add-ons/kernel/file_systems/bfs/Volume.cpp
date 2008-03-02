@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -40,10 +40,16 @@ class DeviceOpener {
 
 		int Device() const { return fDevice; }
 		int Mode() const { return fMode; }
+		bool IsReadOnly() const { return _IsReadOnly(fMode); }
 
 		status_t GetSize(off_t *_size, uint32 *_blockSize = NULL);
 
 	private:
+		static bool _IsReadOnly(int mode)
+			{ return (mode & O_RWMASK) == O_RDONLY;}
+		static bool _IsReadWrite(int mode)
+			{ return (mode & O_RWMASK) == O_RDWR;}
+
 		int		fDevice;
 		int		fMode;
 		void	*fBlockCache;
@@ -82,7 +88,7 @@ DeviceOpener::Open(const char *device, int mode)
 	if (fDevice < 0)
 		fDevice = errno;
 
-	if (fDevice < 0 && mode == O_RDWR) {
+	if (fDevice < 0 && _IsReadWrite(mode)) {
 		// try again to open read-only (don't rely on a specific error code)
 		return Open(device, O_RDONLY | O_NOCACHE);
 	}
@@ -90,7 +96,7 @@ DeviceOpener::Open(const char *device, int mode)
 	if (fDevice >= 0) {
 		// opening succeeded
 		fMode = mode;
-		if (mode == O_RDWR) {
+		if (_IsReadWrite(mode)) {
 			// check out if the device really allows for read/write access
 			device_geometry geometry;
 			if (!ioctl(fDevice, B_GET_GEOMETRY, &geometry)) {
@@ -145,10 +151,9 @@ DeviceOpener::Keep()
 }
 
 
-/** Returns the size of the device in bytes. It uses B_GET_GEOMETRY
- *	to compute the size, or fstat() if that failed.
- */
-
+/*!	Returns the size of the device in bytes. It uses B_GET_GEOMETRY
+	to compute the size, or fstat() if that failed.
+*/
 status_t
 DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
 {
@@ -319,7 +324,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	if (fDevice < B_OK)
 		RETURN_ERROR(fDevice);
 
-	if (opener.Mode() == O_RDONLY)
+	if (opener.IsReadOnly())
 		fFlags |= VOLUME_READ_ONLY;
 
 	// check if it's a regular file, and if so, disable the cache for the
@@ -513,8 +518,7 @@ Volume::UpdateLiveQueries(Inode *inode, const char *attribute, int32 type,
 }
 
 
-/*!
-	Checks if there is a live query whose results depend on the presence
+/*!	Checks if there is a live query whose results depend on the presence
 	or value of the specified attribute.
 	Don't use it if you already have all the data together to evaluate
 	the queries - it wouldn't safe you anything in this case.
@@ -594,6 +598,9 @@ Volume::Initialize(int fd, const char *name, uint32 blockSize,
 	DeviceOpener opener(fd, O_RDWR);
 	if (opener.Device() < B_OK)
 		return B_BAD_VALUE;
+
+	if (opener.IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	fDevice = opener.Device();
 
