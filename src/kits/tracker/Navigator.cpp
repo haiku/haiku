@@ -46,11 +46,6 @@ namespace BPrivate {
 
 static const int32 kMaxHistory = 32;
 
-static const rgb_color kBgColor = {220, 220, 220, 255};
-static const rgb_color kShineColor = {255, 255, 255, 255};
-static const rgb_color kHalfDarkColor = {200, 200, 200, 255};
-static const rgb_color kDarkColor = {166, 166, 166, 255};
-
 }
 
 // BPictureButton() will crash when giving zero pointers,
@@ -67,9 +62,9 @@ BNavigatorButton::BNavigatorButton(BRect rect, const char *name, BMessage *messa
 {
 	// Clear to background color to 
 	// avoid ugly border on click
-	SetViewColor(kBgColor);
-	SetHighColor(kBgColor);
-	SetLowColor(kBgColor);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 BNavigatorButton::~BNavigatorButton()
@@ -104,7 +99,7 @@ BNavigatorButton::SetPicture(BBitmap *bitmap, bool enabled, bool on)
 		BView view(bitmap->Bounds(), "", 0, 0);
 		AddChild(&view);
 		view.BeginPicture(&picture);
-		view.SetHighColor(kBgColor);
+		view.SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		view.FillRect(view.Bounds());
 		view.SetDrawingMode(B_OP_OVER);
 		view.DrawBitmap(bitmap, BPoint(0, 0));
@@ -135,7 +130,7 @@ BNavigator::BNavigator(const Model *model, BRect rect, uint32 resizeMask)
 	// Get initial path
 	model->GetPath(&fPath);
 	
-	SetViewColor(kBgColor);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	float top = 2 + (be_plain_font->Size() - 8) / 2;
 
@@ -186,12 +181,16 @@ BNavigator::AttachedToWindow()
 void 
 BNavigator::Draw(BRect)
 {
+	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color shineColor = ui_color(B_SHINE_COLOR);
+	rgb_color halfDarkColor = tint_color(bgColor, B_DARKEN_1_TINT);
+	rgb_color darkColor = tint_color(bgColor, B_DARKEN_2_TINT);
 	// Draws a beveled smooth border
 	BeginLineArray(4);
-	AddLine(Bounds().LeftTop(), Bounds().RightTop(), kShineColor);
-	AddLine(Bounds().LeftTop(), Bounds().LeftBottom() - BPoint(0, 1), kShineColor);
-	AddLine(Bounds().LeftBottom() - BPoint(-1, 1), Bounds().RightBottom() - BPoint(0, 1), kHalfDarkColor);
-	AddLine(Bounds().LeftBottom(), Bounds().RightBottom(), kDarkColor);
+	AddLine(Bounds().LeftTop(), Bounds().RightTop(), shineColor);
+	AddLine(Bounds().LeftTop(), Bounds().LeftBottom() - BPoint(0, 1), shineColor);
+	AddLine(Bounds().LeftBottom() - BPoint(-1, 1), Bounds().RightBottom() - BPoint(0, 1), halfDarkColor);
+	AddLine(Bounds().LeftBottom(), Bounds().RightBottom(), darkColor);
 	EndLineArray();
 }
 
