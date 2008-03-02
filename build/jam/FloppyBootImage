@@ -14,6 +14,22 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
+local NET_BOOT = 0 ;
+
+local BOOT_ADD_ONS_NET ;
+if $(NET_BOOT) = 1 {
+BOOT_ADD_ONS_NET = 
+#	nbd
+#	remote_disk
+#	$(BEOS_ADD_ONS_DRIVERS_NET)
+#	stack socket
+#	$(BEOS_NETWORK_DEVICES)
+#	$(BEOS_NETWORK_DATALINK_PROTOCOLS) 
+#	$(BEOS_NETWORK_PPP)
+#	$(BEOS_NETWORK_PROTOCOLS)
+;
+}
+
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
 	config_manager agp_gart
 ;
@@ -44,9 +60,11 @@ if $(TARGET_ARCH) = x86 {
 
 # drivers
 AddDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_dsk ;
+if $(NET_BOOT) = 1 {
 #AddDriversToFloppyBootArchive disk virtual	: nbd ;
 AddDriversToFloppyBootArchive disk virtual	: remote_disk ;
 AddDriversToFloppyBootArchive net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
+}
 
 # kernel
 AddFilesToFloppyBootArchive beos system : <revisioned>kernel_$(TARGET_ARCH) ;
@@ -59,6 +77,7 @@ SEARCH on $(driverSettingsFiles)
 AddFilesToFloppyBootArchive home config settings kernel drivers
 	: $(driverSettingsFiles) ;
 
+if $(NET_BOOT) = 1 {
 # add-ons
 AddFilesToFloppyBootArchive beos system add-ons kernel network
 	: stack socket ;
@@ -70,6 +89,7 @@ AddFilesToFloppyBootArchive beos system add-ons kernel network ppp
 	: $(BEOS_NETWORK_PPP) ;
 AddFilesToFloppyBootArchive beos system add-ons kernel network protocols
 	: $(BEOS_NETWORK_PROTOCOLS) ;
+}
 
 # boot module links
 AddBootModuleSymlinksToFloppyBootArchive
@@ -80,14 +100,7 @@ AddBootModuleSymlinksToFloppyBootArchive
 	intel session
 	$(PPC_ONLY)openpic
 	$(X86_ONLY)generic_x86
-#	nbd
-	remote_disk
-	$(BEOS_ADD_ONS_DRIVERS_NET)
-	stack socket
-	$(BEOS_NETWORK_DEVICES)
-	$(BEOS_NETWORK_DATALINK_PROTOCOLS) 
-	$(BEOS_NETWORK_PPP)
-	$(BEOS_NETWORK_PROTOCOLS)
+	$(BOOT_ADD_ONS_NET)
 ;
 
 
