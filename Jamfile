@@ -151,6 +151,7 @@ SubDir HAIKU_TOP ;
 # specify the Haiku image and network boot archive contents
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) NetBootArchive ] ;
+include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
 
 # Perform deferred SubIncludes.
 ExecuteDeferredSubIncludes ;

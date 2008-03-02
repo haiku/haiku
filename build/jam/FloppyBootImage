@@ -1,0 +1,149 @@
+# This file defines what ends up in the floppy boot image and it executes the
+# rules building the image.
+
+local X86_ONLY = ;
+local PPC_ONLY = ;
+if $(TARGET_ARCH) = x86 {
+	X86_ONLY = "" ;
+} else if $(TARGET_ARCH) = ppc {
+	X86_ONLY = ;
+}
+
+local GPL_ONLY = ;
+if $(INCLUDE_GPL_ADDONS) = 1 {
+	GPL_ONLY = "" ;
+}
+
+BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
+	config_manager agp_gart
+;
+BEOS_ADD_ONS_FILE_SYSTEMS = bfs ;
+#cdda fat googlefs iso9660 nfs ;
+
+
+# modules
+AddFilesToFloppyBootArchive beos system add-ons kernel bus_managers
+	: $(BEOS_ADD_ONS_BUS_MANAGERS) ;
+AddFilesToFloppyBootArchive beos system add-ons kernel busses agp_gart
+	: $(X86_ONLY)<agp_gart>intel ;
+AddFilesToFloppyBootArchive beos system add-ons kernel busses ide
+	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
+AddFilesToFloppyBootArchive beos system add-ons kernel console : vga_text ;
+AddFilesToFloppyBootArchive beos system add-ons kernel file_systems
+	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
+AddFilesToFloppyBootArchive beos system add-ons kernel generic
+	: block_io fast_log ide_adapter locked_pool scsi_periph ;
+AddFilesToFloppyBootArchive beos system add-ons kernel partitioning_systems
+	: intel session ;
+AddFilesToFloppyBootArchive beos system add-ons kernel interrupt_controllers
+	: $(PPC_ONLY)openpic ;
+
+if $(TARGET_ARCH) = x86 {
+	AddFilesToFloppyBootArchive beos system add-ons kernel cpu : generic_x86 ;
+}
+
+# drivers
+AddDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_dsk ;
+#AddDriversToFloppyBootArchive disk virtual	: nbd ;
+AddDriversToFloppyBootArchive disk virtual	: remote_disk ;
+AddDriversToFloppyBootArchive net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
+
+# kernel
+AddFilesToFloppyBootArchive beos system : <revisioned>kernel_$(TARGET_ARCH) ;
+
+# scripts and data files
+
+local driverSettingsFiles = <driver-settings>kernel ;
+SEARCH on $(driverSettingsFiles)
+	= [ FDirName $(HAIKU_TOP) data settings kernel drivers ] ;
+AddFilesToFloppyBootArchive home config settings kernel drivers
+	: $(driverSettingsFiles) ;
+
+# add-ons
+AddFilesToFloppyBootArchive beos system add-ons kernel network
+	: stack socket ;
+AddFilesToFloppyBootArchive beos system add-ons kernel network devices
+	: $(BEOS_NETWORK_DEVICES) ;
+AddFilesToFloppyBootArchive beos system add-ons kernel network datalink_protocols
+	: $(BEOS_NETWORK_DATALINK_PROTOCOLS) ;
+AddFilesToFloppyBootArchive beos system add-ons kernel network ppp
+	: $(BEOS_NETWORK_PPP) ;
+AddFilesToFloppyBootArchive beos system add-ons kernel network protocols
+	: $(BEOS_NETWORK_PROTOCOLS) ;
+
+# boot module links
+AddBootModuleSymlinksToFloppyBootArchive
+	$(BEOS_ADD_ONS_BUS_MANAGERS)
+	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112
+	$(BEOS_ADD_ONS_FILE_SYSTEMS)
+	block_io fast_log ide_adapter locked_pool scsi_periph
+	intel session
+	$(PPC_ONLY)openpic
+	$(X86_ONLY)generic_x86
+#	nbd
+	remote_disk
+	$(BEOS_ADD_ONS_DRIVERS_NET)
+	stack socket
+	$(BEOS_NETWORK_DEVICES)
+	$(BEOS_NETWORK_DATALINK_PROTOCOLS) 
+	$(BEOS_NETWORK_PPP)
+	$(BEOS_NETWORK_PROTOCOLS)
+;
+
+
+#pragma mark - Build The Archive
+
+# archive target
+HAIKU_FLOPPY_BOOT_ARCHIVE = haiku-floppyboot.tgz ;
+MakeLocate $(HAIKU_FLOPPY_BOOT_ARCHIVE) : $(HAIKU_OUTPUT_DIR) ;
+
+# the pseudo target all archive contents is attached to
+NotFile $(HAIKU_BOOT_FLOPPY_CONTAINER_NAME) ;
+
+# prepare the script that initializes the shell variables
+local initVarsScript = <FloppyBootArchive>haiku-floppyboot-init-vars ;
+local script = $(initVarsScript) ;
+MakeLocate $(script) : $(HAIKU_OUTPUT_DIR) ;
+Always $(script) ;
+
+AddVariableToScript $(script) : tmpDir : $(HAIKU_TMP_DIR) ;
+AddVariableToScript $(script) : addBuildCompatibilityLibDir
+	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
+AddTargetVariableToScript $(script) : <build>copyattr ;
+
+# create the other scripts
+local makeDirsScript = <FloppyBootArchive>haiku-floppyboot-make-dirs ;
+local copyFilesScript = <FloppyBootArchive>haiku-floppyboot-copy-files ;
+MakeLocate $(makeDirsScript) $(copyFilesScript) : $(HAIKU_OUTPUT_DIR) ;
+
+CreateFloppyBootArchiveMakeDirectoriesScript $(makeDirsScript) ;
+CreateFloppyBootArchiveCopyFilesScript $(copyFilesScript) ;
+
+# build the archive
+
+BuildFloppyBootArchive $(HAIKU_FLOPPY_BOOT_ARCHIVE) :
+	$(initVarsScript)
+	$(makeDirsScript)
+	$(copyFilesScript)
+;
+
+# remove the scripts we have generated
+RmTemps $(HAIKU_FLOPPY_BOOT_ARCHIVE) :
+	$(initVarsScript)
+	$(makeDirsScript)
+	$(copyFilesScript)
+;
+
+NotFile haiku-floppyboot-archive ;
+Depends haiku-floppyboot-archive : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
+
+# floppy image target
+HAIKU_BOOT_FLOPPY = haiku-boot-floppy.image ;
+MakeLocate $(HAIKU_BOOT_FLOPPY) : $(HAIKU_OUTPUT_DIR) ;
+
+BuildFloppyBootImage $(HAIKU_BOOT_FLOPPY) : zbeos : $(HAIKU_FLOPPY_BOOT_ARCHIVE) ;
+
+NotFile haiku-boot-floppy ;
+Depends haiku-boot-floppy : $(HAIKU_BOOT_FLOPPY) ;
+
+

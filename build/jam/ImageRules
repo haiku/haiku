@@ -763,3 +763,109 @@ actions BuildNetBootArchive1
 {
 	$(2[1]) $(1) $(2[2-])
 }
+
+
+#pragma mark - Floppy Boot Archive rules
+
+rule AddDirectoryToFloppyBootArchive directoryTokens
+{
+	# AddDirectoryToFloppyBootArchive <directoryTokens>
+
+	return [ AddDirectoryToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+		: $(directoryTokens) ] ;
+}
+
+rule AddFilesToFloppyBootArchive directory : targets : destName
+{
+	# AddFilesToFloppyBootArchive <directory> : <targets> [ : dest name ]
+
+	AddFilesToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME) : $(directory)
+		: $(targets) : $(destName) ;
+}
+
+rule AddSymlinkToFloppyBootArchive directoryTokens : linkTarget : linkName
+{
+	# AddSymlinkToFloppyBootArchive <directory> : <link target> [ : <link name> ] ;
+
+	AddSymlinkToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+		: $(directoryTokens) : $(linkTarget) : $(linkName) ;
+}
+
+rule AddDriversToFloppyBootArchive relativeDirectoryTokens : targets
+{
+	# AddDriversToFloppyBootArchive <relative directory> : <targets> ;
+
+	AddDriversToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(targets) ;
+}
+
+rule AddDriverRegistrationToFloppyBootArchive relativeDirectoryTokens : target
+	: links
+{
+	# AddDriverRegistrationToFloppyBootArchive <directory> : <link target>
+	#	: <link names> ] ;
+
+	AddDriverRegistrationToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(target) : $(links) ;
+}
+
+rule AddBootModuleSymlinksToFloppyBootArchive targets
+{
+	# AddBootModuleSymlinksToFloppyBootArchive <targets> ;
+
+	AddBootModuleSymlinksToContainer $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+		: $(targets) ;
+}
+
+rule CreateFloppyBootArchiveMakeDirectoriesScript script
+{
+	CreateContainerMakeDirectoriesScript
+		$(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME) : $(script) ;
+}
+
+rule CreateFloppyBootArchiveCopyFilesScript script
+{
+	CreateContainerCopyFilesScript $(HAIKU_FLOPPY_BOOT_IMAGE_CONTAINER_NAME)
+		: $(script) ;
+}
+
+rule BuildFloppyBootArchive archive : scripts
+{
+	# BuildHFloppyBootArchive <archive> : <scripts>  ;
+
+	local mainScript = build_tgz_archive ;
+	SEARCH on $(mainScript) = [ FDirName $(HAIKU_TOP) build scripts ] ;
+
+	Depends $(archive) : $(mainScript) $(scripts) ;
+	BuildFloppyBootArchive1 $(archive) : $(mainScript) $(scripts) ;
+}
+
+actions BuildFloppyBootArchive1
+{
+	$(2[1]) $(1) $(2[2-])
+}
+
+# warning: that is quite x86 dependant...
+
+rule BuildFloppyBootImage image : zbeos : archive
+{
+	Depends $(image) : $(zbeos) ;
+	Depends $(image) : $(archive) ;
+	#MakeLocateDebug $(image) ;
+	BuildFloppyBootImage1 $(image) : $(zbeos) $(archive) ;
+}
+
+actions BuildFloppyBootImage1
+{
+	rm -f $(<)
+	# make an empty image
+	dd if=/dev/zero of=$(<) bs=1k count=1440
+	# add zbeos
+	dd if=$(>[1]) of=$(<) conv=notrunc
+	# add the boot drivers tgz archive
+	# keep the offset in sync with
+	# src/system/boot/loader/file_systems/tarfs/tarfs.cpp:kFloppyArchiveOffset
+	dd if=$(>[2]) of=$(<) bs=192k seek=1 conv=notrunc
+}
+
+
