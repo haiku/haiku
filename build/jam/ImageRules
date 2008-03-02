@@ -869,3 +869,21 @@ actions BuildFloppyBootImage1
 }
 
 
+#pragma mark - CD Boot Image rules
+
+rule BuildCDBootImage image : bootfloppy : extrafiles
+{
+	Depends $(image) : $(bootfloppy) ;
+	Depends $(image) : $(extrafiles) ;
+	BOOTIMG on $(image) = $(bootfloppy) ;
+
+	BuildCDBootImage1 $(image) : $(bootfloppy) $(extrafiles) ;
+}
+
+actions BuildCDBootImage1
+{
+	rm -f $(<)
+	mkisofs -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
+}
+
+

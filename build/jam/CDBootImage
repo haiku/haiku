@@ -1,0 +1,24 @@
+# This file defines what ends up in the CD boot image and it executes the
+# rules building the image.
+
+#HAIKU_BOOT_FLOPPY = haiku-boot-floppy.image ;
+#MakeLocate $(HAIKU_BOOT_FLOPPY) : $(HAIKU_OUTPUT_DIR) ;
+
+# CD image target
+HAIKU_CD_BOOT_IMAGE = haiku-boot-cd.iso ;
+MakeLocate $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_OUTPUT_DIR) ;
+
+# the pseudo target all archive contents is attached to
+NotFile $(HAIKU_CD_BOOT_IMAGE_CONTAINER_NAME) ;
+
+# extra files to put on the boot iso
+local extras = README.html ;
+SEARCH on $(extras) = [ FDirName $(HAIKU_TOP) data boot_cd ] ;
+
+BuildCDBootImage $(HAIKU_CD_BOOT_IMAGE) : $(HAIKU_BOOT_FLOPPY) : $(extras) ;
+
+
+NotFile haiku-boot-cd ;
+Depends haiku-boot-cd : $(HAIKU_CD_BOOT_IMAGE) ;
+
+
