@@ -158,27 +158,35 @@ void MediaIcon::_findIconFor(
 	}
 }
 
-void MediaIcon::_findIconFor(
-	const dormant_node_info &nodeInfo) {
+
+void
+MediaIcon::_findIconFor(const dormant_node_info &nodeInfo)
+{
 	D_INTERNAL(("MediaIcon::_findIconFor(dormant_node_info)\n"));
 
 	dormant_flavor_info flavorInfo;
 	BMediaRoster *roster = BMediaRoster::CurrentRoster();
 	status_t error = roster->GetDormantFlavorInfoFor(nodeInfo, &flavorInfo);
-	if (!error) {
+	if (error == B_OK) {
 		m_nodeKind = flavorInfo.kinds;
-		bool audioIn = false, audioOut = false, videoIn = false, videoOut = false;
+		bool audioIn = false, audioOut = false;
+		bool videoIn = false, videoOut = false;
 		_getMediaTypesFor(flavorInfo, &audioIn, &audioOut, &videoIn, &videoOut);
 		_findDefaultIconFor(audioIn, audioOut, videoIn, videoOut);
+	} else {
+		// use generic icon in case we couldn't get any info
+		if (m_size == B_LARGE_ICON)
+			SetBits(M_GENERIC_ICON.large, 1024, 0, B_CMAP8);
+		else if (m_size == B_MINI_ICON)
+			SetBits(M_GENERIC_ICON.small, 256, 0, B_CMAP8);
 	}
 }
 
-void MediaIcon::_getMediaTypesFor(
-	const live_node_info &nodeInfo,
-	bool *audioIn,
-	bool *audioOut,
-	bool *videoIn,
-	bool *videoOut) {
+
+void
+MediaIcon::_getMediaTypesFor(const live_node_info &nodeInfo, bool *audioIn,
+	bool *audioOut, bool *videoIn, bool *videoOut)
+{
 	D_INTERNAL(("MediaIcon::_getMediaTypeFor(live_node_info)\n"));
 
 	// get the media_types supported by this node
