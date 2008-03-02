@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -683,6 +683,9 @@ arch_cpu_shutdown(bool rebootSystem)
 
 	// try to reset the system using the keyboard controller
 	out8(0xfe, 0x64);
+
+	// Give some time to the controller to do its job (0.5s)
+	snooze(500000);
 
 	// if that didn't help, try it this way
 	reboot();
