@@ -452,6 +452,7 @@ AboutView::AboutView(const BRect &rect)
 		"Daniel Switkin\n"
 		"Atsushi Takamatsu\n"
 		"Oliver Tappe\n"
+		"James Urquhart\n"
 		"Jason Vandermark\n"
 		"Sandor Vroemisse\n"
 		"Denis Washington\n"
