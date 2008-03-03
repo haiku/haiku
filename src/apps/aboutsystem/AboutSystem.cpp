@@ -404,6 +404,7 @@ AboutView::AboutView(const BRect &rect)
 		"Marc Flerackers\n"
 		"Daniel Furrer\n"
 		"Troeglazov Gerasim\n"
+		"Rene Gollent\n"
 		"Matthijs Hollemans\n"
 		"Morgan Howe\n"
 		"Erik Jaesler\n"
