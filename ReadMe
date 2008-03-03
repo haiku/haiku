@@ -72,6 +72,28 @@ use DriveSetup and initialize it to BFS.
 Note that installing Haiku in a directory only works as expected under BeOS,
 but it is not yet supported under Linux and other non-BeOS platforms.
 
+Bootable CD-ROM Image
+---------------------
+
+* UNSUPPORTED yet *
+
+Creating a bootable CD requires burning 2 tracks on a single CD.
+The first track is an El-Torito bootable ISO file-system containing a boot 
+floppy image, and is created with:
+
+  jam -q haiku-boot-cd
+
+This generates an image file named 'haiku-boot-cd.iso' in your output directory
+under 'generated/'.
+The second track is the raw BFS image 'haiku.image' in 'generated/' created 
+with:
+
+  jam -q haiku-image
+
+Under Unix/Linux, and BeOS you can use cdrecord to create a CD with:
+
+  cdrecord dev=x,y,z -v -eject -dao -data generated/haiku-boot-cd.iso generated/haiku.image
+
 Building Components
 -------------------
 
