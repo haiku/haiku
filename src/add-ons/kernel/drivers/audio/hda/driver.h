@@ -114,7 +114,7 @@ struct hda_widget {
 	} d;
 };
 
-/*!	This structure describes a single Audio Function Group. An afg
+/*!	This structure describes a single Audio Function Group. An AFG
 	is a group of audio widgets which can be used to configure multiple
 	streams of audio either from the HDA Link to an output device (= playback)
 	or from an input device to the HDA link (= recording).

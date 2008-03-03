@@ -101,8 +101,8 @@ enum pin_dev_type {
 #define VID_SET_GPIOSTICKY		0x71A00
 #define VID_GET_BEEPGEN			0xF0A00
 #define VID_SET_BEEPGEN			0x70A00
-#define VID_GET_VOLUMEKNOB		0xF0F00
-#define VID_SET_VOLUMEKNOB		0x70F00
+#define VID_GET_VOLUME_KNOB					0xf0f00
+#define VID_SET_VOLUME_KNOB					0x70f00
 #define VID_GET_SUBSYSTEMID		0xF2000
 #define VID_SET_SUBSYSTEMID1	0x72000
 #define VID_SET_SUBSYSTEMID2	0x72100
@@ -113,38 +113,62 @@ enum pin_dev_type {
 #define VID_SET_CONFIGURATION_DEFAULT2		0x71d00
 #define VID_SET_CONFIGURATION_DEFAULT3		0x71e00
 #define VID_SET_CONFIGURATION_DEFAULT4		0x71f00
-#define VID_GET_STRIPECTRL		0xF2400
-#define VID_SET_STRIPECTRL		0x72000
-#define VID_FUNCTION_RESET		0x7FF00
+#define VID_GET_STRIPE_CONTROL				0xf2400
+#define VID_SET_STRIPE_CONTROL				0x72000
+#define VID_FUNCTION_RESET					0x7ff00
 
 /* Parameter IDs */
-#define PID_VENDOR_ID			0x00
-#define PID_REVISION_ID			0x02
-#define PID_SUBORD_NODE_COUNT	0x04
-#define PID_FUNCTION_GROUP_TYPE	0x05
-#define PID_AUDIO_GROUP_CAP		0x08
-#define PID_AUDIO_WIDGET_CAP	0x09
-#define PID_PCM_SUPPORT			0x0A
-#define PID_STREAM_SUPPORT		0x0B
-#define PID_PIN_CAP				0x0C
-#define PID_INPUT_AMP_CAP		0x0D
-#define PID_CONNECTION_LIST_LENGTH	0x0E
-#define PID_POWERSTATE_SUPPORT	0x0F
-#define PID_PROCESSING_CAP		0x10
-#define PID_GPIO_COUNT			0x11
-#define PID_OUTPUT_AMP_CAP		0x12
-#define PID_VOLUMEKNOB_CAP		0x13
+#define PID_VENDOR_ID				0x00
+#define PID_REVISION_ID				0x02
+#define PID_SUBORDINATE_NODE_COUNT	0x04
+#define PID_FUNCTION_GROUP_TYPE		0x05
+#define PID_AUDIO_GROUP_CAP			0x08
+#define PID_AUDIO_WIDGET_CAP		0x09
+#define PID_PCM_SUPPORT				0x0a
+#define PID_STREAM_SUPPORT			0x0b
+#define PID_PIN_CAP					0x0c
+#define PID_INPUT_AMPLIFIER_CAP		0x0d
+#define PID_CONNECTION_LIST_LENGTH	0x0e
+#define PID_POWERSTATE_SUPPORT		0x0f
+#define PID_PROCESSING_CAP			0x10
+#define PID_GPIO_COUNT				0x11
+#define PID_OUTPUT_AMPLIFIER_CAP	0x12
+#define PID_VOLUME_KNOB_CAP			0x13
 
 /* PCM support */
-#define PCM_8_BIT				(1L << 16)
-#define PCM_16_BIT				(1L << 17)
-#define PCM_20_BIT				(1L << 18)
-#define PCM_24_BIT				(1L << 19)
-#define PCM_32_BIT				(1L << 20)
+#define PCM_8_BIT					(1L << 16)
+#define PCM_16_BIT					(1L << 17)
+#define PCM_20_BIT					(1L << 18)
+#define PCM_24_BIT					(1L << 19)
+#define PCM_32_BIT					(1L << 20)
 
 /* stream support */
-#define STREAM_AC3				0x00000004
-#define STREAM_FLOAT			0x00000002
-#define STREAM_PCM				0x00000001
+#define STREAM_AC3					0x00000004
+#define STREAM_FLOAT				0x00000002
+#define STREAM_PCM					0x00000001
+
+/* Amplifier Gain/Mute */
+#define AMP_GET_OUTPUT				(1L << 15)
+#define AMP_GET_INPUT				(0L << 15)
+#define AMP_GET_LEFT_CHANNEL		(1L << 13)
+#define AMP_GET_RIGHT_CHANNEL		(0L << 13)
+#define AMP_GET_INPUT_INDEX_MASK	0x0000000f
+#define AMP_GET_INPUT_INDEX_SHIFT	0
+
+#define AMP_SET_OUTPUT				(1L << 15)
+#define AMP_SET_INPUT				(1L << 14)
+#define AMP_SET_LEFT_CHANNEL		(1L << 13)
+#define AMP_SET_RIGHT_CHANNEL		(1L << 12)
+#define AMP_SET_INPUT_INDEX_MASK	0x00000f00
+#define AMP_SET_INPUT_INDEX_SHIFT	8
+
+#define AMP_GAIN_MASK				0x0000007f
+#define AMP_MUTE					(1L << 8)
+
+/* Pin Widget Control */
+#define PIN_ENABLE_HEAD_PHONE		(1L << 7)
+#define PIN_ENABLE_OUTPUT			(1L << 6)
+#define PIN_ENABLE_INPUT			(1L << 5)
+#define PIN_ENABLE_VOLTAGE_REF_MASK	0x3
 
 #endif /* HDA_CODEC_H */

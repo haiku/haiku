@@ -128,7 +128,8 @@ hda_widget_get_amplifier_capabilities(hda_codec* codec, uint32 nodeID)
 	corb_t verb;
 	uint32 resp;
 
-	verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER, PID_OUTPUT_AMP_CAP);
+	verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
+		PID_OUTPUT_AMPLIFIER_CAP);
 	rc = hda_send_verbs(codec, &verb, &resp, 1);
 	if (rc == B_OK && resp != 0) {
 		dprintf("\tAMP: Mute: %s, step size: %ld, # steps: %ld, offset: %ld\n",
@@ -159,7 +160,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	verbs[1] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
 		VID_GET_PARAMETER, PID_GPIO_COUNT);
 	verbs[2] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
-		VID_GET_PARAMETER, PID_SUBORD_NODE_COUNT);
+		VID_GET_PARAMETER, PID_SUBORDINATE_NODE_COUNT);
 
 	if (hda_send_verbs(audioGroup->codec, verbs, resp, 3) != B_OK)
 		return B_ERROR;
@@ -266,7 +267,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 					dprintf("\t%s%s\n", 
 						audioGroup->widgets[widx].d.pin.input ? "[Input] " : "",
-						audioGroup->widgets[widx].d.pin.input ? "[Output]" : "");
+						audioGroup->widgets[widx].d.pin.output ? "[Output]" : "");
 				} else {
 					dprintf("%s: Error getting Pin Complex IO\n", __func__);
 				}
@@ -451,6 +452,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 						audioGroup->widgets[i].inputs[inputIndex],
 						WT_AUDIO_OUTPUT, 0);
 				} else {
+					// find and select output widget
 					for (inputIndex = 0; (uint32)inputIndex
 							< audioGroup->widgets[i].num_inputs; inputIndex++) {
 						outputWidget = hda_codec_audio_group_find_path(audioGroup,
@@ -485,11 +487,12 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 						verb[0] = MAKE_VERB(codec->addr,
 							audioGroup->playback_stream->pin_widget,
 							VID_SET_AMPLIFIER_GAIN_MUTE,
-							(1 << 15) | (1 << 13) | (1 << 12));
+							AMP_SET_OUTPUT | AMP_SET_LEFT_CHANNEL
+								| AMP_SET_RIGHT_CHANNEL);
 						verb[1] = MAKE_VERB(codec->addr,
 							audioGroup->playback_stream->pin_widget,
 							VID_SET_PIN_WIDGET_CONTROL,
-							(1 << 7) | (1 << 6));
+							PIN_ENABLE_HEAD_PHONE | PIN_ENABLE_OUTPUT);
 						hda_send_verbs(codec, verb, NULL, 2);
 
 						dprintf("%s: Found output PIN (%s) connected to output "
@@ -507,6 +510,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 					audioGroup->widgets[i].inputs[inputIndex], WT_PIN_COMPLEX,
 					0);
 			} else {
+				// find and select input widget
 				for (inputIndex = 0; (uint32)inputIndex
 						< audioGroup->widgets[i].num_inputs; inputIndex++) {
 					inputWidget = hda_codec_audio_group_find_path(audioGroup,
@@ -541,9 +545,10 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 					verb = MAKE_VERB(codec->addr,
 						audioGroup->record_stream->pin_widget,
 						VID_SET_AMPLIFIER_GAIN_MUTE,
-						(1 << 15) | (1 << 13) | (1 << 12));
+						AMP_SET_INPUT | AMP_SET_LEFT_CHANNEL
+							| AMP_SET_RIGHT_CHANNEL);
 					hda_send_verbs(codec, &verb, NULL, 1);
-				}	
+				}
 
 				dprintf("%s: Found input PIN (%s) connected to input CONV "
 					"wid:%ld\n", __func__, kDefaultDevice[audioGroup->widgets[
@@ -571,74 +576,86 @@ err:
 void
 hda_codec_delete(hda_codec* codec)
 {
-	if (codec == NULL) {
-		uint32 idx;
+	if (codec == NULL)
+		return;
 
-		delete_sem(codec->response_sem);
+	delete_sem(codec->response_sem);
 
-		for (idx = 0; idx < codec->num_audio_groups; idx++) {
-			hda_codec_delete_audio_group(codec->audio_groups[idx]);
-			codec->audio_groups[idx] = NULL;
-		}
-
-		free(codec);
+	for (uint32 i = 0; i < codec->num_audio_groups; i++) {
+		hda_codec_delete_audio_group(codec->audio_groups[i]);
+		codec->audio_groups[i] = NULL;
 	}
+
+	free(codec);
 }
 
 
 hda_codec*
-hda_codec_new(hda_controller* controller, uint32 cad)
+hda_codec_new(hda_controller* controller, uint32 codecAddress)
 {
-	hda_codec* codec = (hda_codec*)calloc(1, sizeof(hda_codec));
-	uint32 responses[3];
-	corb_t verbs[3];
-	uint32 nodeID;
+	if (codecAddress > HDA_MAX_CODECS)
+		return NULL;
 
+	hda_codec* codec = (hda_codec*)calloc(1, sizeof(hda_codec));
 	if (codec == NULL)
-		goto exit_new;
+		return NULL;
 
 	codec->controller = controller;
-	codec->addr = cad;
+	codec->addr = codecAddress;
 	codec->response_sem = create_sem(0, "hda_codec_response_sem");
-	controller->codecs[cad] = codec;
+	controller->codecs[codecAddress] = codec;
 
-	verbs[0] = MAKE_VERB(cad, 0, VID_GET_PARAMETER, PID_VENDOR_ID);
-	verbs[1] = MAKE_VERB(cad, 0, VID_GET_PARAMETER, PID_REVISION_ID);
-	verbs[2] = MAKE_VERB(cad, 0, VID_GET_PARAMETER, PID_SUBORD_NODE_COUNT);
+	struct {
+		uint32 device : 16;
+		uint32 vendor : 16;
+		uint32 stepping : 8;
+		uint32 revision : 8;
+		uint32 minor : 4;
+		uint32 major : 4;
+		uint32 _reserved0 : 8;
+		uint32 count : 8;
+		uint32 _reserved1 : 8;
+		uint32 start : 8;
+		uint32 _reserved2 : 8;
+	} response;
+	corb_t verbs[3];
 
-	if (hda_send_verbs(codec, verbs, responses, 3) != B_OK)
-		goto cmd_failed;
+	verbs[0] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_VENDOR_ID);
+	verbs[1] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER, PID_REVISION_ID);
+	verbs[2] = MAKE_VERB(codecAddress, 0, VID_GET_PARAMETER,
+		PID_SUBORDINATE_NODE_COUNT);
 
-	dprintf("Codec %ld Vendor: %04lx Product: %04lx\n",  
-		cad, responses[0] >> 16, responses[0] & 0xffff);
+	if (hda_send_verbs(codec, verbs, (uint32*)&response, 3) != B_OK)
+		goto err;
 
-	for (nodeID = responses[2] >> 16;
-			nodeID < (responses[2] >> 16) + (responses[2] & 0xff); nodeID++) {
-		uint32 resp;
-		verbs[0] = MAKE_VERB(cad, nodeID, VID_GET_PARAMETER,
+	dprintf("Codec %ld Vendor: %04lx Product: %04lx, Revision: "
+		"%lu.%lu.%lu.%lu\n", codecAddress, response.vendor, response.device,
+		response.major, response.minor, response.revision, response.stepping);
+
+	for (uint32 nodeID = response.start; nodeID < response.start
+			+ response.count; nodeID++) {
+		uint32 groupType;
+		verbs[0] = MAKE_VERB(codecAddress, nodeID, VID_GET_PARAMETER,
 			PID_FUNCTION_GROUP_TYPE);
 
-		if (hda_send_verbs(codec, verbs, &resp, 1) != B_OK)
-			goto cmd_failed;
+		if (hda_send_verbs(codec, verbs, &groupType, 1) != B_OK)
+			goto err;
 
-		if ((resp & 0xff) == 1) {
+		if ((groupType & 0xff) == 1) {
 			/* Found an Audio Function Group! */
-			status_t rc = hda_codec_new_audio_group(codec, nodeID);
-			if (rc != B_OK) {
-				dprintf("%s: Failed to setup new audio function group (%s)!\n",
-					__func__, strerror(rc));
-				goto cmd_failed;
+			status_t status = hda_codec_new_audio_group(codec, nodeID);
+			if (status != B_OK) {
+				dprintf("hda: Failed to setup new audio function group (%s)!\n",
+					strerror(status));
+				goto err;
 			}
 		}
 	}
 
-	goto exit_new;
-
-cmd_failed:
-	controller->codecs[cad] = NULL;
-	hda_codec_delete(codec);
-	codec = NULL;
-
-exit_new:
 	return codec;
+
+err:
+	controller->codecs[codecAddress] = NULL;
+	hda_codec_delete(codec);
+	return NULL;
 }
