@@ -508,37 +508,68 @@ BTabView::DetachedFromWindow()
 void
 BTabView::MessageReceived(BMessage *message)
 {
-	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
-		BMessage reply(B_REPLY);
-		bool handled = false;
+	switch (message->what) {
+		case B_GET_PROPERTY:
+		case B_SET_PROPERTY:
+		{
+			BMessage reply(B_REPLY);
+			bool handled = false;
 
-		BMessage specifier;
-		int32 index;
-		int32 form;
-		const char *property;
-		if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
-			if (strcmp(property, "Selection") == 0) {
-				if (message->what == B_GET_PROPERTY) {
-					reply.AddInt32("result", fSelection);
-					handled = true;
-				} else {
-					// B_GET_PROPERTY
-					int32 selection;
-					if (message->FindInt32("data", &selection) == B_OK) {
-						Select(selection);
-						reply.AddInt32("error", B_OK);
+			BMessage specifier;
+			int32 index;
+			int32 form;
+			const char *property;
+			if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
+				if (strcmp(property, "Selection") == 0) {
+					if (message->what == B_GET_PROPERTY) {
+						reply.AddInt32("result", fSelection);
 						handled = true;
+					} else {
+						// B_GET_PROPERTY
+						int32 selection;
+						if (message->FindInt32("data", &selection) == B_OK) {
+							Select(selection);
+							reply.AddInt32("error", B_OK);
+							handled = true;
+						}
 					}
 				}
 			}
+			
+			if (handled)
+				message->SendReply(&reply);
+			else
+				BView::MessageReceived(message);
+			break;
 		}
 		
-		if (handled) {
-			message->SendReply(&reply);
-			return;
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float deltaX = 0.0f;
+			float deltaY = 0.0f;
+			message->FindFloat("be:wheel_delta_x", &deltaX);
+			message->FindFloat("be:wheel_delta_y", &deltaY);
+			
+			if (deltaX == 0.0f && deltaY == 0.0f)
+				return;
+			
+			if (deltaY == 0.0f)
+				deltaY = deltaX;
+				
+			int32 selection = Selection();
+			int32 numTabs = CountTabs();
+			if (deltaY > 0  && selection < numTabs - 1) {
+				//move to the right tab.
+				Select(Selection() + 1);
+			} else if (deltaY < 0 && selection > 0 && numTabs > 1) {
+				//move to the left tab.
+				Select(selection - 1);
+			}
 		}
+		default:
+			BView::MessageReceived(message);
+			break;	
 	}
-	BView::MessageReceived(message);
 }
 
 
