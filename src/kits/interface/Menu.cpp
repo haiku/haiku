@@ -1641,28 +1641,28 @@ BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 			fSelected->Submenu()->Bounds());
 		fSelected->Submenu()->UnlockLooper();
 
-		float x_offset;
+		float xOffset;
 
 		// navAreaRectAbove and navAreaRectBelow have the same X
 		// position and width, so it doesn't matter which one we use to
 		// calculate the X offset
 		if (menuBounds.left < submenuBounds.left)
-			x_offset = position.x - navAreaRectAbove.left;
+			xOffset = position.x - navAreaRectAbove.left;
 		else
-			x_offset = navAreaRectAbove.right - position.x;
+			xOffset = navAreaRectAbove.right - position.x;
 
 		bool inNavArea;
 
 		if (inNavAreaRectAbove) {
-			float y_offset = navAreaRectAbove.bottom - position.y;
+			float yOffset = navAreaRectAbove.bottom - position.y;
 			float ratio = navAreaRectAbove.Width() / navAreaRectAbove.Height();
 
-			inNavArea = y_offset <= x_offset / ratio;
+			inNavArea = yOffset <= xOffset / ratio;
 		} else {
-			float y_offset = navAreaRectBelow.bottom - position.y;
+			float yOffset = navAreaRectBelow.bottom - position.y;
 			float ratio = navAreaRectBelow.Width() / navAreaRectBelow.Height();
 
-			inNavArea = y_offset >= (navAreaRectBelow.Height() - x_offset / ratio);
+			inNavArea = yOffset >= (navAreaRectBelow.Height() - xOffset / ratio);
 		}
 
 		bigtime_t systime = system_time();
