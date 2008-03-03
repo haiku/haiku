@@ -375,7 +375,7 @@ AboutView::AboutView(const BRect &rect)
 		"Stefano Ceccherini\n"
 		"Rudolf Cornelissen\n"
 		"Jérôme Duval\n"
-		"René Goollent\n"
+		"René Gollent\n"
 		"Julun\n"
 		"Waldemar Kornewald\n"
 		"Ryan Leavengood\n"
