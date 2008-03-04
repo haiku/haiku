@@ -20,6 +20,8 @@ struct server_read_only_memory {
 };
 
 
+// NOTE: these functions must be kept in sync with InterfaceDefs.h color_which!
+
 static inline int32
 color_which_to_index(color_which which)
 {
@@ -30,6 +32,19 @@ color_which_to_index(color_which which)
 		return which - B_SUCCESS_COLOR + B_WINDOW_INACTIVE_TEXT_COLOR;
 
 	return -1;
+}
+
+static inline color_which
+index_to_color_which(int32 index)
+{
+	if (index >= 0 && index < kNumColors) {
+		if ((color_which)index < B_WINDOW_INACTIVE_TEXT_COLOR)
+			return (color_which)(index + 1);
+		else 
+			return (color_which)(index + B_SUCCESS_COLOR - B_WINDOW_INACTIVE_TEXT_COLOR);
+	}
+
+	return (color_which)-1;
 }
 
 #endif	/* SERVER_READ_ONLY_MEMORY_H */

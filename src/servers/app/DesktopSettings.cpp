@@ -216,6 +216,13 @@ DesktopSettingsPrivate::_Load()
 			bool triggersAlwaysShown;
 			if (settings.FindBool("triggers always shown", &triggersAlwaysShown) == B_OK)
 				fMenuInfo.triggers_always_shown = triggersAlwaysShown;
+			
+			char colorName[12];	
+			
+			for (int32 i = 0; i < kNumColors; i++) {
+				snprintf(colorName, sizeof(colorName), "color%ld", index_to_color_which(i));
+				settings.FindInt32(colorName, (int32*)&fShared.colors[i]);
+			}
 		}
 	}
 
@@ -313,7 +320,13 @@ DesktopSettingsPrivate::Save(uint32 mask)
 			settings.AddInt32("separator", fMenuInfo.separator);
 			settings.AddBool("click to open", fMenuInfo.click_to_open);
 			settings.AddBool("triggers always shown", fMenuInfo.triggers_always_shown);
-			// TODO: more appearance settings
+
+			char colorName[12];
+
+			for (int32 i = 0; i < kNumColors; i++) {
+				snprintf(colorName, sizeof(colorName), "color%ld", index_to_color_which(i));
+				settings.AddInt32(colorName, (const int32&)fShared.colors[i]);
+			}
 
 			BFile file;
 			status = file.SetTo(path.Path(), B_CREATE_FILE | B_ERASE_FILE | B_READ_WRITE);
