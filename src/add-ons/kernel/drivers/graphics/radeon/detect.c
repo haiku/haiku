@@ -632,7 +632,8 @@ static bool probeDevice( device_info *di )
 				// rs410                  
 				case DEVICE_ID_RS410_5a61:
 				case DEVICE_ID_RS410_5a62:
-				                          
+				// r430
+				case DEVICE_ID_RADEON_UM:	                          
 				// rs480                  
 				case DEVICE_ID_RS480_5954:
 				case DEVICE_ID_RS480_5955:
