@@ -43,7 +43,7 @@ AddFilesToFloppyBootArchive beos system add-ons kernel bus_managers
 AddFilesToFloppyBootArchive beos system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToFloppyBootArchive beos system add-ons kernel busses ide
-	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 ;
+	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata ;
 AddFilesToFloppyBootArchive beos system add-ons kernel console : vga_text ;
 AddFilesToFloppyBootArchive beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
@@ -94,12 +94,13 @@ AddFilesToFloppyBootArchive beos system add-ons kernel network protocols
 # boot module links
 AddBootModuleSymlinksToFloppyBootArchive
 	$(BEOS_ADD_ONS_BUS_MANAGERS)
-	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112
-	$(BEOS_ADD_ONS_FILE_SYSTEMS)
-	block_io fast_log ide_adapter locked_pool scsi_periph
-	intel session
 	$(PPC_ONLY)openpic
+	block_io fast_log ide_adapter locked_pool scsi_periph
 	$(X86_ONLY)generic_x86
+	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+	scsi_cd scsi_dsk
+	intel session
+	$(BEOS_ADD_ONS_FILE_SYSTEMS)
 	$(BOOT_ADD_ONS_NET)
 ;
 
