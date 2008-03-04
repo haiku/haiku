@@ -94,6 +94,11 @@ Under Unix/Linux, and BeOS you can use cdrecord to create a CD with:
 
   cdrecord dev=x,y,z -v -eject -dao -data generated/haiku-boot-cd.iso generated/haiku.image
 
+Here x,y,z is the device number as found with cdrecord -scanbus, it can also 
+be a device path on Linux.
+
+Windows users will find '3rdparty/nero/haiku-cd.cue' useful.
+
 Building Components
 -------------------
 
