@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -153,7 +153,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetViewUnderMouse(const WindowLayer* window, int32 viewToken);
 		int32					ViewUnderMouse(const WindowLayer* window);
 
-		void					SetFocusWindow(WindowLayer* window);
+		void					SetFocusWindow(WindowLayer* window = NULL);
 		EventTarget*			KeyboardEventTarget();
 
 		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
@@ -253,6 +253,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		WindowList				fAllWindows;
 		WindowList				fSubsetWindows;
+		WindowList				fFocusList;
 		WorkspacesLayer*		fWorkspacesLayer;
 
 		Screen*					fActiveScreen;

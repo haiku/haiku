@@ -316,6 +316,7 @@ Desktop::Desktop(uid_t userID)
 	fCurrentWorkspace(0),
 	fAllWindows(kAllWindowList),
 	fSubsetWindows(kSubsetList),
+	fFocusList(kFocusList),
 	fWorkspacesLayer(NULL),
 	fActiveScreen(NULL),
 
@@ -670,7 +671,7 @@ Desktop::_ActivateApp(team_id team)
 
 	for (WindowLayer* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
-		// if window is a normal window of the team, and not hidden, 
+		// if window is a normal window of the team, and not hidden,
 		// we've found our target
 		if (!window->IsHidden() && window->IsNormal()
 			&& window->ServerWindow()->ClientTeam() == team) {
@@ -685,8 +686,8 @@ Desktop::_ActivateApp(team_id team)
 
 /*!
 	\brief Send a quick (no attachments) message to all applications
-	
-	Quite useful for notification for things like server shutdown, system 
+
+	Quite useful for notification for things like server shutdown, system
 	color changes, etc.
 */
 void
@@ -1020,7 +1021,7 @@ Desktop::_SetWorkspace(int32 index)
 	if (!_Windows(index).HasWindow(FocusWindow()) || !FocusWindow()->IsFloating())
 		SetFocusWindow(FrontWindow());
 
-	_WindowChanged(NULL);	
+	_WindowChanged(NULL);
 	MarkDirty(dirty);
 
 #if 0
@@ -1147,7 +1148,7 @@ Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
 			_HideWindow(floating);
 
 			if (FocusWindow() == floating)
-				SetFocusWindow(_CurrentWindows().LastWindow());
+				SetFocusWindow();
 		}
 	}
 }
@@ -1324,21 +1325,16 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 		return;
 	}
 
-	if (focus == NULL || hasModal) {
-		focus = FrontWindow();
-		if (focus == NULL) {
-			// there might be no front window in case of only a single
-			// window with B_FLOATING_ALL_WINDOW_FEEL
-			focus = _CurrentWindows().LastWindow();
-		}
-	}
+	if (focus == NULL || hasModal)
+		focus = fFocusList.LastWindow();
 
 	// make sure no window is chosen that doesn't want focus or cannot have it
 	while (focus != NULL
-		&& ((focus->Flags() & B_AVOID_FOCUS) != 0
+		&& (!focus->InWorkspace(fCurrentWorkspace)
+			|| (focus->Flags() & B_AVOID_FOCUS) != 0
 			|| _WindowHasModal(focus)
 			|| focus->IsHidden())) {
-		focus = focus->PreviousWindow(fCurrentWorkspace);
+		focus = focus->PreviousWindow(kFocusList);
 	}
 
 	if (fFocus == focus) {
@@ -1360,6 +1356,10 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 	if (fFocus != NULL) {
 		fFocus->SetFocus(true);
 		newActiveApp = fFocus->ServerWindow()->App()->ClientTeam();
+
+		// move current focus to the end of the focus list
+		fFocusList.RemoveWindow(fFocus);
+		fFocusList.AddWindow(fFocus);
 	}
 
 	if (newActiveApp == -1) {
@@ -1571,7 +1571,7 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 	MarkDirty(dirty);
 
 	_UpdateFronts();
-	SetFocusWindow(_CurrentWindows().LastWindow());
+	SetFocusWindow();
 	_WindowChanged(window);
 
 	UnlockAllWindows();
@@ -1587,6 +1587,7 @@ Desktop::ShowWindow(WindowLayer* window)
 	LockAllWindows();
 
 	window->SetHidden(false);
+	fFocusList.AddWindow(window);
 
 	if (window->InWorkspace(fCurrentWorkspace)) {
 		_ShowWindow(window, true);
@@ -1625,6 +1626,8 @@ Desktop::HideWindow(WindowLayer* window)
 		return;
 
 	window->SetHidden(true);
+	fFocusList.RemoveWindow(window);
+
 	if (fMouseEventWindow == window)
 		fMouseEventWindow = NULL;
 
@@ -1634,7 +1637,7 @@ Desktop::HideWindow(WindowLayer* window)
 		_UpdateFronts();
 
 		if (FocusWindow() == window)
-			SetFocusWindow(_CurrentWindows().LastWindow());
+			SetFocusWindow();
 	} else
 		_WindowChanged(window);
 
@@ -1785,7 +1788,7 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 	// track the dirty region outside the window in case
 	// it is shrunk in "previouslyOccupiedRegion"
 	BRegion previouslyOccupiedRegion(window->VisibleRegion());
-	
+
 	window->ResizeBy(x, y, &newDirtyRegion);
 
 	BRegion background;
@@ -1848,7 +1851,7 @@ Desktop::SetWindowDecoratorSettings(WindowLayer* window,
 		BRegion stillAvailableOnScreen;
 		_RebuildClippingForAllWindows(stillAvailableOnScreen);
 		_SetBackground(stillAvailableOnScreen);
-	
+
 		_TriggerWindowRedrawing(dirty);
 	}
 
@@ -2157,7 +2160,7 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 	_UpdateFronts();
 
 	if (window == FocusWindow() && !window->IsVisible())
-		SetFocusWindow(_CurrentWindows().LastWindow());
+		SetFocusWindow();
 
 	UnlockAllWindows();
 }
@@ -2201,7 +2204,7 @@ Desktop::SetWindowTitle(WindowLayer *window, const char* title)
 		BRegion stillAvailableOnScreen;
 		_RebuildClippingForAllWindows(stillAvailableOnScreen);
 		_SetBackground(stillAvailableOnScreen);
-	
+
 		_TriggerWindowRedrawing(dirty);
 	}
 
@@ -2448,7 +2451,7 @@ Desktop::_SetBackground(BRegion& background)
 	// moving windows
 
 	// remember the region not covered by any windows
-	// and redraw the dirty background 
+	// and redraw the dirty background
 	BRegion dirtyBackground(background);
 	dirtyBackground.Exclude(&fBackgroundRegion);
 	dirtyBackground.IntersectWith(&background);

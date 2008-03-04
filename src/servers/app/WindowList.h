@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005, Haiku, Inc.
+ * Copyright (c) 2005-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -41,6 +41,7 @@ class WindowList {
 enum window_lists {
 	kAllWindowList = 32,
 	kSubsetList,
+	kFocusList,
 	kWorkingList,
 
 	kListCount
