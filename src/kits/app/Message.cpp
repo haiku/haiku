@@ -613,7 +613,7 @@ bool
 BMessage::IsSourceWaiting() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED)
+	return fHeader && (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED)
 		&& !(fHeader->flags & MESSAGE_FLAG_REPLY_DONE);
 }
 
@@ -622,7 +622,7 @@ bool
 BMessage::IsSourceRemote() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED)
+	return fHeader && (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED)
 		&& (fHeader->reply_team != BPrivate::current_team());
 }
 
