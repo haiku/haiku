@@ -421,31 +421,56 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = description.u.quicktime.codec; format->user_data[4] = 0;
 		
-		format->u.encoded_video.max_bit_rate = 8 * theFileReader->MovMainHeader()->max_bytes_per_sec;
-		format->u.encoded_video.avg_bit_rate = format->u.encoded_video.max_bit_rate / 2; // XXX fix this
+//		format->u.encoded_video.max_bit_rate = 8 * theFileReader->MovMainHeader()->max_bytes_per_sec;
+//		format->u.encoded_video.avg_bit_rate = format->u.encoded_video.max_bit_rate / 2; // XXX fix this
 		format->u.encoded_video.output.field_rate = cookie->frames_per_sec_rate / (float)cookie->frames_per_sec_scale;
-		format->u.encoded_video.output.interlace = 1; // 1: progressive
-		format->u.encoded_video.output.first_active = 0;
-		format->u.encoded_video.output.last_active = cookie->line_count - 1;
-		format->u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
-		format->u.encoded_video.output.pixel_width_aspect = 1;
-		format->u.encoded_video.output.pixel_height_aspect = 1;
-		// format->u.encoded_video.output.display.format = 0;
-		format->u.encoded_video.output.display.line_width = theFileReader->MovMainHeader()->width;
-		format->u.encoded_video.output.display.line_count = cookie->line_count;
-		format->u.encoded_video.output.display.bytes_per_row = 0; // format->u.encoded_video.output.display.line_width * 4;
+
+		format->u.encoded_video.avg_bit_rate = 1;
+		format->u.encoded_video.max_bit_rate = 1;
+
+		format->u.encoded_video.frame_size = video_format->width * video_format->height * video_format->planes / 8;
+		format->u.encoded_video.output.display.bytes_per_row = video_format->planes / 8 * video_format->width;
+		// align to 2 bytes
+		format->u.encoded_video.output.display.bytes_per_row +=	format->u.encoded_video.output.display.bytes_per_row & 1;
+
+		switch (video_format->planes) {
+			case 16:
+				format->u.encoded_video.output.display.format = B_RGB15_BIG;
+				break;
+			case 24:
+				format->u.encoded_video.output.display.format = B_RGB24_BIG;
+				break;
+			case 32:
+				format->u.encoded_video.output.display.format = B_RGB32_BIG;
+				break;
+			default:
+				format->u.encoded_video.output.display.format = B_NO_COLOR_SPACE;
+				format->u.encoded_video.frame_size = video_format->width * video_format->height * 8 / 8;
+		}
+
+		format->u.encoded_video.output.display.line_width = video_format->width;
+		format->u.encoded_video.output.display.line_count = video_format->height;
 		format->u.encoded_video.output.display.pixel_offset = 0;
 		format->u.encoded_video.output.display.line_offset = 0;
 		format->u.encoded_video.output.display.flags = 0;
+		format->u.encoded_video.output.interlace = 1; // 1: progressive
+		format->u.encoded_video.output.first_active = 0;
+		format->u.encoded_video.output.last_active = format->u.encoded_video.output.display.line_count - 1;
+		format->u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
+		format->u.encoded_video.output.pixel_width_aspect = 1;
+		format->u.encoded_video.output.pixel_height_aspect = 1;
 		
 		TRACE("max_bit_rate %.3f\n", format->u.encoded_video.max_bit_rate);
 		TRACE("field_rate   %.3f\n", format->u.encoded_video.output.field_rate);
 
 		// Set the VOL
 		if (video_format->VOLSize > 0) {
+			TRACE("VOL Found Size is %ld\n",video_format->VOLSize);
 			size_t size = video_format->VOLSize;
 			const void *data = video_format->theVOL;
-			format->SetMetaData(data, size);
+			if (format->SetMetaData(data, size) != B_OK) {
+				printf("Failed to set VOL\n %d %d",(16 << 20),32000);
+			}
 
 #ifdef TRACE_MP4_READER
 			if (data) {
@@ -485,8 +510,17 @@ mp4Reader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 	*frameCount = cookie->frame_count;
 	*duration = cookie->duration;
 	*format = cookie->format;
-	*infoBuffer = 0;
-	*infoSize = 0;
+
+	// Copy metadata to infoBuffer
+	if (theFileReader->IsVideo(cookie->stream)) {
+		const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
+		*infoBuffer = video_format->theVOL;
+		*infoSize = video_format->VOLSize;
+	} else {
+		const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
+		*infoBuffer = audio_format->theVOL;
+		*infoSize = audio_format->VOLSize;
+	}
 	return B_OK;
 }
 
@@ -578,6 +612,8 @@ mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
 		mediaHeader->u.encoded_video.line_count = cookie->line_count;
+		mediaHeader->u.encoded_video.field_number = 0;
+		mediaHeader->u.encoded_video.field_sequence = cookie->frame_pos;
 	
 		cookie->frame_pos++;
 	}

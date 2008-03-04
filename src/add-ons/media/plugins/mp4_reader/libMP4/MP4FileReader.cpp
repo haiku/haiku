@@ -275,14 +275,24 @@ MP4FileReader::getVideoFrameCount(uint32 streamIndex)
 uint32
 MP4FileReader::getAudioFrameCount(uint32 streamIndex)
 {
-	if (IsAudio(streamIndex)) {
-		return uint32(((getAudioDuration(streamIndex)
-			* AudioFormat(streamIndex)->SampleRate) / 1000000L) + 0.5);
-	}
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
 
-	return 0;
+	if (aAtomBase && dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())
+		return dynamic_cast<TRAKAtom *>(aAtomBase)->FrameCount();
+
+	return 1;
 }
 
+uint32
+MP4FileReader::getAudioChunkCount(uint32 streamIndex)
+{
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
+
+	if (aAtomBase && dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())
+		return dynamic_cast<TRAKAtom *>(aAtomBase)->getTotalChunks();
+	
+	return 0;
+}
 
 bool
 MP4FileReader::IsVideo(uint32 streamIndex)
@@ -329,23 +339,18 @@ MP4FileReader::getFirstFrameInChunk(uint32 streamIndex, uint32 pChunkID)
 
 
 uint32
-MP4FileReader::getNoFramesInChunk(uint32 stream_index, uint32 pFrameNo)
+MP4FileReader::getNoFramesInChunk(uint32 streamIndex, uint32 pFrameNo)
 {
 	// Find Track
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 		uint32 ChunkNo = 1;
 
-		if (IsAudio(stream_index))
-			ChunkNo = pFrameNo;
+		uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
 
-		if (IsVideo(stream_index)) {
-			uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-
-			uint32 OffsetInChunk;
-			ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
-		}
+		uint32 OffsetInChunk;
+		ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
 
 		return aTrakAtom->getNoSamplesInChunk(ChunkNo);
 	}
@@ -355,48 +360,38 @@ MP4FileReader::getNoFramesInChunk(uint32 stream_index, uint32 pFrameNo)
 
 
 uint64
-MP4FileReader::getOffsetForFrame(uint32 stream_index, uint32 pFrameNo)
+MP4FileReader::getOffsetForFrame(uint32 streamIndex, uint32 pFrameNo)
 {
 	// Find Track
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
-		if (IsAudio(stream_index)) {
-			// FrameNo is really chunk No for audio
-			uint32 ChunkNo = pFrameNo;
-
+		if (pFrameNo < aTrakAtom->FrameCount()) {
+			// Get Sample for Frame
+			uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
+			// Get Chunk For Sample and the offset for the frame within that chunk
+			uint32 OffsetInChunk;
+			uint32 ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
 			// Get Offset For Chunk
-			return aTrakAtom->getOffsetForChunk(ChunkNo);
-		}
+			uint64 OffsetNo = aTrakAtom->getOffsetForChunk(ChunkNo);
 
-		if (IsVideo(stream_index)) {
-			if (pFrameNo < aTrakAtom->FrameCount()) {
-				// Get Sample for Frame
-				uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-				// Get Chunk For Sample and the offset for the frame within that chunk
-				uint32 OffsetInChunk;
-				uint32 ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
-				// Get Offset For Chunk
-				uint64 OffsetNo = aTrakAtom->getOffsetForChunk(ChunkNo);
-
-				if (ChunkNo != 0) {
-					uint32 SizeForSample;
-					// Adjust the Offset for the Offset in the chunk
-					if (aTrakAtom->IsSingleSampleSize()) {
-						SizeForSample = aTrakAtom->getSizeForSample(SampleNo);
-						OffsetNo = OffsetNo + (OffsetInChunk * SizeForSample);
-					} else {
-						// This is bad news performance wise
-						for (uint32 i=1;i<=OffsetInChunk;i++) {
-							SizeForSample = aTrakAtom->getSizeForSample(SampleNo-i);
-							OffsetNo = OffsetNo + SizeForSample;
-						}
+			if (ChunkNo != 0) {
+				uint32 SizeForSample;
+				// Adjust the Offset for the Offset in the chunk
+				if (aTrakAtom->IsSingleSampleSize()) {
+					SizeForSample = aTrakAtom->getSizeForSample(SampleNo);
+					OffsetNo = OffsetNo + (OffsetInChunk * SizeForSample);
+				} else {
+					// This is bad news performance wise
+					for (uint32 i=1;i<=OffsetInChunk;i++) {
+						SizeForSample = aTrakAtom->getSizeForSample(SampleNo-i);
+						OffsetNo = OffsetNo + SizeForSample;
 					}
 				}
-		
-				return OffsetNo;
 			}
+		
+			return OffsetNo;
 		}
 	}
 
@@ -476,10 +471,10 @@ MP4FileReader::MovMainHeader()
 
 
 const AudioMetaData *
-MP4FileReader::AudioFormat(uint32 stream_index, size_t *size)
+MP4FileReader::AudioFormat(uint32 streamIndex, size_t *size)
 {
-	if (IsAudio(stream_index)) {
-		AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	if (IsAudio(streamIndex)) {
+		AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
 
 		if (aAtomBase) {
 			TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
@@ -496,7 +491,7 @@ MP4FileReader::AudioFormat(uint32 stream_index, size_t *size)
 				theAudio.NoOfChannels = aAudioDescription.theAudioSampleEntry.ChannelCount;
 				theAudio.SampleSize = aAudioDescription.theAudioSampleEntry.SampleSize;
 				theAudio.SampleRate = aAudioDescription.theAudioSampleEntry.SampleRate / 65536;	// Convert from fixed point decimal to float
-				theAudio.PacketSize = uint32((theAudio.SampleRate * theAudio.NoOfChannels * theAudio.SampleSize) / 8);
+				theAudio.PacketSize = uint32((theAudio.SampleSize * theAudio.NoOfChannels * 1024) / 8);
 
 				theAudio.theVOL = aAudioDescription.theVOL;
 				theAudio.VOLSize = aAudioDescription.VOLSize;
@@ -509,12 +504,11 @@ MP4FileReader::AudioFormat(uint32 stream_index, size_t *size)
 	return NULL;
 }
 
-
 const VideoMetaData*
-MP4FileReader::VideoFormat(uint32 stream_index)
+MP4FileReader::VideoFormat(uint32 streamIndex)
 {
-	if (IsVideo(stream_index)) {
-		AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	if (IsVideo(streamIndex)) {
+		AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
 
 		if (aAtomBase) {
 			TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
@@ -556,26 +550,26 @@ MP4FileReader::VideoFormat(uint32 stream_index)
 
 
 const mp4_stream_header*
-MP4FileReader::StreamFormat(uint32 stream_index)
+MP4FileReader::StreamFormat(uint32 streamIndex)
 {
 	// Fill In a Stream Header
 	theStreamHeader.length = 0;
 	
-	if (IsActive(stream_index) == false) {
+	if (IsActive(streamIndex) == false) {
 		return NULL;
 	}
 
-	if (IsVideo(stream_index)) {
-		theStreamHeader.rate = uint32(1000000L*VideoFormat(stream_index)->FrameRate);
+	if (IsVideo(streamIndex)) {
+		theStreamHeader.rate = uint32(1000000L*VideoFormat(streamIndex)->FrameRate);
 		theStreamHeader.scale = 1000000L;
-		theStreamHeader.length = getVideoFrameCount(stream_index);
+		theStreamHeader.length = getVideoFrameCount(streamIndex);
 	}
 
-	if (IsAudio(stream_index)) {
-		theStreamHeader.rate = uint32(AudioFormat(stream_index)->SampleRate);
+	if (IsAudio(streamIndex)) {
+		theStreamHeader.rate = uint32(AudioFormat(streamIndex)->SampleRate);
 		theStreamHeader.scale = 1;
-		theStreamHeader.length = getAudioFrameCount(stream_index);
-		theStreamHeader.sample_size = AudioFormat(stream_index)->SampleSize;
+		theStreamHeader.length = getAudioFrameCount(streamIndex);
+		theStreamHeader.sample_size = AudioFormat(streamIndex)->SampleSize;
 		theStreamHeader.suggested_buffer_size =	theStreamHeader.rate * theStreamHeader.sample_size;
 	}
 
@@ -584,27 +578,15 @@ MP4FileReader::StreamFormat(uint32 stream_index)
 
 
 uint32
-MP4FileReader::getChunkSize(uint32 stream_index, uint32 pFrameNo)
+MP4FileReader::getChunkSize(uint32 streamIndex, uint32 pFrameNo)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
-		if (IsAudio(stream_index)) {
-			// We read audio in chunk by chunk so chunk size is chunk size
-			uint32	ChunkNo 	= pFrameNo;
-			off_t	Chunk_Start = aTrakAtom->getOffsetForChunk(ChunkNo);
-			uint32	ChunkSize 	= theChunkSuperIndex.getChunkSize(stream_index,ChunkNo,Chunk_Start);
-
-			return ChunkSize;
-		}
-
-		if (IsVideo(stream_index)) {
-			if (pFrameNo < aTrakAtom->FrameCount()) {
-				// We read video in Sample by Sample so we use get Sample Size
-				uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-				return aTrakAtom->getSizeForSample(SampleNo);
-			}
+		if (pFrameNo < aTrakAtom->FrameCount()) {
+			uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
+			return aTrakAtom->getSizeForSample(SampleNo);
 		}
 	}
 
@@ -613,9 +595,9 @@ MP4FileReader::getChunkSize(uint32 stream_index, uint32 pFrameNo)
 
 
 bool
-MP4FileReader::IsKeyFrame(uint32 stream_index, uint32 pFrameNo)
+MP4FileReader::IsKeyFrame(uint32 streamIndex, uint32 pFrameNo)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
@@ -628,14 +610,14 @@ MP4FileReader::IsKeyFrame(uint32 stream_index, uint32 pFrameNo)
 
 
 bool
-MP4FileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo,
+MP4FileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 	off_t *start, uint32 *size, bool *keyframe)
 {
-	*start = getOffsetForFrame(stream_index, pFrameNo);
-	*size = getChunkSize(stream_index, pFrameNo);
+	*start = getOffsetForFrame(streamIndex, pFrameNo);
+	*size = getChunkSize(streamIndex, pFrameNo);
 
 	if ((*start > 0) && (*size > 0)) {
-		*keyframe = IsKeyFrame(stream_index, pFrameNo);
+		*keyframe = IsKeyFrame(streamIndex, pFrameNo);
 	}
 
 	// TODO need a better method for detecting End of Data Note ChunkSize of 0 seems to be it.
@@ -645,9 +627,9 @@ MP4FileReader::GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo,
 
 
 bool
-MP4FileReader::IsActive(uint32 stream_index)
+MP4FileReader::IsActive(uint32 streamIndex)
 {
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),stream_index);
+	AtomBase *aAtomBase = GetChildAtom(uint32('trak'),streamIndex);
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 		return aTrakAtom->IsActive();

@@ -209,7 +209,7 @@ void MOOVAtom::OnProcessMetaData()
 
 char *MOOVAtom::OnGetAtomName()
 {
-	return "Quicktime Movie";
+	return "MPEG-4 Movie";
 }
 
 CMOVAtom::CMOVAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)
@@ -322,7 +322,7 @@ void CMOVAtom::OnChildProcessingComplete()
 
 char *CMOVAtom::OnGetAtomName()
 {
-	return "Compressed Quicktime Movie";
+	return "Compressed MPEG-4 Movie";
 }
 
 DCOMAtom::DCOMAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
@@ -438,7 +438,7 @@ void MVHDAtom::OnProcessMetaData()
 
 char *MVHDAtom::OnGetAtomName()
 {
-	return "Quicktime Movie Header";
+	return "MPEG-4 Movie Header";
 }
 
 MVHDAtom *MOOVAtom::getMVHDAtom()
@@ -908,7 +908,7 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 	return 0LL;
 }
 
-ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
+ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
 {
 	theVOL = NULL;
 }
@@ -920,15 +920,116 @@ ESDSAtom::~ESDSAtom()
 	}
 }
 
-void ESDSAtom::OnProcessMetaData()
-{
-	theVOL = (uint8 *)(malloc(getBytesRemaining()));
-	Read(theVOL,getBytesRemaining());
+bool ESDSAtom::SkipTag(uint8 Tag, uint32 *offset) {
+	uint8 byte;
+
+	byte = theVOL[(*offset)++];
+	if (byte == Tag) {
+		uint8 numBytes = 0;
+		unsigned int length = 0;
+
+		do {
+			byte = theVOL[(*offset)++];
+			numBytes++;
+			length = (length << 7) | (byte & 0x7F);
+		} while ((byte & 0x80) && numBytes < 4);
+
+	} else {
+		// go back Tag not found
+		(*offset)--;
+		printf("No Tag %d\n",Tag);
+		return false;
+	}
+	
+	return true;
 }
 
-uint8 *ESDSAtom::getVOL()
+void ESDSAtom::OnProcessMetaData()
 {
-	return theVOL;
+	FullAtom::OnProcessMetaData();
+
+	VOLSize = getBytesRemaining();
+	uint32 offset = 0;
+	
+	theVOL = (uint8 *)(malloc(VOLSize));
+	Read(theVOL,VOLSize);
+	
+	// Display the VOL
+	if (VOLSize > 0) {
+		if (SkipTag(0x03,&offset)) {
+			offset += 3;
+		} else {
+			offset += 2;
+		}
+
+		if (SkipTag(0x04,&offset)) {
+			printf("type id is %d", theVOL[offset]);
+			switch (theVOL[offset]) {
+				case 1: printf("system v1"); break;
+				case 2: printf("system v2"); break;
+				case 32: printf("MPEG-4 video"); break;
+				case 33: printf("MPEG-4 AVC SPS"); break;
+				case 34: printf("MPEG-4 AVC PPS"); break;
+				case 64: printf("MPEG-4 audio"); break;
+			}
+			
+			offset+=2;
+			
+			uint32 a,b,c;
+			uint32 buff;
+			
+			a = theVOL[offset];
+			b = theVOL[offset+1];
+			c = theVOL[offset+2];
+
+			buff = (a << 16) | (b << 8) | c;
+
+			printf(" buf size %ld ",buff);
+			printf(" max bit rate %ld",uint32(theVOL[offset+4]));
+			printf(" avg bit rate %ld\n",uint32(theVOL[offset+8]));
+		}
+	} else {
+		printf("VOL size is 0\n");
+	}
+	
+}
+
+size_t ESDSAtom::getVOLSize(bool forAudio) 
+{
+	uint32 offset = 0;
+	if (forAudio) {
+		if (SkipTag(0x03,&offset)) {
+			offset += 3;
+		} else {
+			offset += 2;
+		}
+		if (SkipTag(0x04,&offset)) {
+			offset += 13;
+		}
+
+		SkipTag(0x05,&offset);
+	}
+	
+	return ( VOLSize - offset);
+}
+
+uint8 *ESDSAtom::getVOL(bool forAudio)
+{
+	uint32 offset = 0;
+	if (forAudio) {
+		if (SkipTag(0x03,&offset)) {
+			offset += 3;
+		} else {
+			offset += 2;
+		}
+		if (SkipTag(0x04,&offset)) {
+			offset += 13;
+		}
+
+		SkipTag(0x05,&offset);
+	}
+	
+	return &theVOL[offset];
 }
 
 char *ESDSAtom::OnGetAtomName()
@@ -961,7 +1062,7 @@ uint32	STSDAtom::getMediaHandlerType()
 	return dynamic_cast<STBLAtom *>(getParent())->getMediaHandlerType();
 }
 
-void STSDAtom::ReadESDS(uint8 **VOL, size_t *VOLSize)
+void STSDAtom::ReadESDS(uint8 **VOL, size_t *VOLSize, bool forAudio)
 {
 	// Check for a esds and if it exists read it into the VOL buffer
 	// MPEG-4 video/audio use the esds to store the VOL (STUPID COMMITTEE IDEA)
@@ -976,9 +1077,9 @@ void STSDAtom::ReadESDS(uint8 **VOL, size_t *VOLSize)
 
 		if (dynamic_cast<ESDSAtom *>(aAtomBase)) {
 			// ESDS atom good
-			*VOLSize = aAtomBase->getDataSize();
+			*VOLSize = dynamic_cast<ESDSAtom *>(aAtomBase)->getVOLSize(forAudio);
 			*VOL = (uint8 *)(malloc(*VOLSize));
-			memcpy(*VOL,dynamic_cast<ESDSAtom *>(aAtomBase)->getVOL(),*VOLSize);
+			memcpy(*VOL,dynamic_cast<ESDSAtom *>(aAtomBase)->getVOL(forAudio),*VOLSize);
 
 			delete aAtomBase;
 		} else {
@@ -997,8 +1098,8 @@ void STSDAtom::ReadSoundDescription()
 	Read(&theAudioDescription.theAudioSampleEntry.pre_defined);
 	Read(&theAudioDescription.theAudioSampleEntry.reserved);
 	Read(&theAudioDescription.theAudioSampleEntry.SampleRate);
-
-	ReadESDS(&theAudioDescription.theVOL,&theAudioDescription.VOLSize);
+	
+	ReadESDS(&theAudioDescription.theVOL,&theAudioDescription.VOLSize,true);
 }
 
 void STSDAtom::ReadVideoDescription()
@@ -1028,7 +1129,7 @@ void STSDAtom::ReadVideoDescription()
 	Read(&theVideoDescription.theVideoSampleEntry.Depth);
 	Read(&theVideoDescription.theVideoSampleEntry.pre_defined3);
 
-	ReadESDS(&theVideoDescription.theVOL,&theVideoDescription.VOLSize);
+	ReadESDS(&theVideoDescription.theVOL,&theVideoDescription.VOLSize, false);
 }
 
 void STSDAtom::OnProcessMetaData()
@@ -1253,7 +1354,7 @@ void MINFAtom::OnProcessMetaData()
 
 char *MINFAtom::OnGetAtomName()
 {
-	return "Quicktime Media Information Atom";
+	return "MPEG-4 Media Information Atom";
 }
 
 uint32 MINFAtom::getMediaHandlerType()
@@ -1275,7 +1376,7 @@ void STBLAtom::OnProcessMetaData()
 
 char *STBLAtom::OnGetAtomName()
 {
-	return "Quicktime Sample Table Atom";
+	return "MPEG-4 Sample Table Atom";
 }
 
 uint32 STBLAtom::getMediaHandlerType()
@@ -1297,7 +1398,7 @@ void DINFAtom::OnProcessMetaData()
 
 char *DINFAtom::OnGetAtomName()
 {
-	return "Quicktime Data Information Atom";
+	return "MPEG-4 Data Information Atom";
 }
 
 TKHDAtom::TKHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
@@ -1371,7 +1472,7 @@ void TKHDAtom::OnProcessMetaData()
 
 char *TKHDAtom::OnGetAtomName()
 {
-	return "Quicktime Track Header";
+	return "MPEG-4 Track Header";
 }
 
 MDIAAtom::MDIAAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)
@@ -1388,7 +1489,7 @@ void MDIAAtom::OnProcessMetaData()
 
 char *MDIAAtom::OnGetAtomName()
 {
-	return "Quicktime Media Atom";
+	return "MPEG-4 Media Atom";
 }
 
 uint32 MDIAAtom::getMediaHandlerType()
@@ -1443,7 +1544,7 @@ void MDHDAtom::OnProcessMetaData()
 
 char *MDHDAtom::OnGetAtomName()
 {
-	return "Quicktime Media Header";
+	return "MPEG-4 Media Header";
 }
 
 bigtime_t	MDHDAtom::getDuration() 
@@ -1486,7 +1587,7 @@ void HDLRAtom::OnProcessMetaData()
 char *HDLRAtom::OnGetAtomName()
 {
 	printf("%s %s:",(char *)&(theHeader.handler_type),name);
-	return "Quicktime Handler Reference Atom ";
+	return "MPEG-4 Handler Reference Atom ";
 }
 
 bool HDLRAtom::IsVideoHandler()
@@ -1524,7 +1625,7 @@ void VMHDAtom::OnProcessMetaData()
 
 char *VMHDAtom::OnGetAtomName()
 {
-	return "Quicktime Video Media Header";
+	return "MPEG-4 Video Media Header";
 }
 
 SMHDAtom::SMHDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
@@ -1545,5 +1646,5 @@ void SMHDAtom::OnProcessMetaData()
 
 char *SMHDAtom::OnGetAtomName()
 {
-	return "Quicktime Sound Media Header";
+	return "MPEG-4 Sound Media Header";
 }

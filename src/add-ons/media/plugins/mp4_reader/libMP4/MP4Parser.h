@@ -300,16 +300,19 @@ public:
 	off_t	getEOF();
 };
 
-class ESDSAtom : public AtomBase {
+class ESDSAtom : public FullAtom {
 public:
 			ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
 	virtual	~ESDSAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint8	*getVOL();
+	uint8	*getVOL(bool forAudio);
+	size_t	getVOLSize(bool forAudio);
 private:
+	bool SkipTag(uint8 Tag, uint32 *offset);
 	uint8	*theVOL;
+	size_t	VOLSize;
 };
 
 // Atom class for reading the sdst atom
@@ -326,7 +329,7 @@ public:
 private:
 	uint32	getMediaHandlerType();
 
-	void	ReadESDS(uint8 **VOL, size_t *VOLSize);
+	void	ReadESDS(uint8 **VOL, size_t *VOLSize, bool forAudio);
 	void	ReadSoundDescription();
 	void	ReadVideoDescription();
 

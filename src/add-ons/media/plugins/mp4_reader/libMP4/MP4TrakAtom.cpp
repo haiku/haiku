@@ -42,7 +42,7 @@ void TRAKAtom::OnProcessMetaData()
 
 char *TRAKAtom::OnGetAtomName()
 {
-	return "Quicktime Track Atom";
+	return "MPEG-4 Track Atom";
 }
 
 TKHDAtom	*TRAKAtom::getTKHDAtom()
