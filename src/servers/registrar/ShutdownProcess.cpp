@@ -264,6 +264,8 @@ public:
 		if (!fTextView)
 			return B_NO_MEMORY;
 		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+		fTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 		fTextView->MakeEditable(false);
 		fTextView->MakeSelectable(false);
 		fTextView->SetWordWrap(true);

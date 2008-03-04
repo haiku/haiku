@@ -533,6 +533,8 @@ BAlert::_InitObject(const char* text, const char* button0, const char* button1,
 		textViewRect.OffsetByCopy(B_ORIGIN),
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	fTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 	fTextView->SetText(text, strlen(text));
 	fTextView->MakeEditable(false);
 	fTextView->MakeSelectable(false);
