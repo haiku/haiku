@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -107,7 +107,7 @@ register_elf_image(struct elf_image_info *image)
 	imageInfo.id = image->id;
 	imageInfo.type = B_SYSTEM_IMAGE;
 	strlcpy(imageInfo.name, image->name, sizeof(imageInfo.name));
-	
+
 	imageInfo.text = (void *)image->text_region.start;
 	imageInfo.text_size = image->text_region.size;
 	imageInfo.data = (void *)image->data_region.start;
@@ -144,7 +144,7 @@ find_image_at_address(addr_t address)
 }
 
 
-static int 
+static int
 dump_address_info(int argc, char **argv)
 {
 	const char *symbol, *imageName;
@@ -273,7 +273,7 @@ dump_symbols(int argc, char **argv)
 	if (argc > 1) {
 		if (isdigit(argv[1][0])) {
 			uint32 num = strtoul(argv[1], NULL, 0);
-	
+
 			if (IS_KERNEL_ADDRESS(num)) {
 				// find image at address
 
@@ -284,7 +284,7 @@ dump_symbols(int argc, char **argv)
 						break;
 				}
 				hash_close(sImagesHash, &iterator, false);
-	
+
 				if (image == NULL)
 					kprintf("No image covers 0x%lx in the kernel!\n", num);
 			} else {
@@ -669,13 +669,13 @@ static int
 elf_unlink_relocs(struct elf_image_info *image)
 {
 	elf_linked_image *link, *next_link;
-	
+
 	for (link = image->linked_images; link; link = next_link) {
 		next_link = link->next;
 		elf_unload_image(link->image);
 		free(link);
 	}
-	
+
 	return B_NO_ERROR;
 }
 #endif
@@ -684,8 +684,10 @@ elf_unlink_relocs(struct elf_image_info *image)
 static status_t
 unload_elf_image(struct elf_image_info *image)
 {
-	if (atomic_add(&image->ref_count, -1) > 0)
-		return B_NO_ERROR;
+	if (atomic_add(&image->ref_count, -1) > 1)
+		return B_OK;
+
+	TRACE(("unload image %ld, %s\n", image->id, image->name));
 
 	//elf_unlink_relocs(image);
 		// not yet used
@@ -699,7 +701,7 @@ unload_elf_image(struct elf_image_info *image)
 	unregister_elf_image(image);
 
 	free(image->elf_header);
-	free(image->name);	
+	free(image->name);
 	free(image);
 
 	return B_NO_ERROR;
@@ -904,7 +906,7 @@ public:
 		// the tables referred to by the .dynamic section, also contain proper names
 		// and sizes for those symbols. Therefore, to get completely satisfying
 		// results, we would need to read those tables from the shared object.
-	
+
 		// get the image for the address
 		image_t image;
 		status_t error = _FindImageAtAddress(address, image);
@@ -928,7 +930,7 @@ public:
 		Elf32_Sym symbolFound;
 		addr_t deltaFound = INT_MAX;
 		bool exactMatch = false;
-	
+
 		for (uint32 i = 0; i < hashTabSize; i++) {
 			uint32 bucket;
 			if (!_Read(&hashBuckets[i], bucket))
@@ -936,11 +938,11 @@ public:
 
 			for (uint32 j = bucket; j != STN_UNDEF;
 					_Read(&hashChains[j], j) ? 0 : j = STN_UNDEF) {
-	
+
 				Elf32_Sym symbol;
 				if (!_Read(image.syms + j, symbol))
 					continue;
-	
+
 				// The symbol table contains not only symbols referring to functions
 				// and data symbols within the shared object, but also referenced
 				// symbols of other shared objects, as well as section and file
@@ -955,17 +957,17 @@ public:
 						> textRegion.vmstart + textRegion.size) {
 					continue;
 				}
-	
+
 				// skip symbols starting after the given address
 				addr_t symbolAddress = symbol.st_value + textRegion.delta;
 				if (symbolAddress > address)
 					continue;
 				addr_t symbolDelta = address - symbolAddress;
-	
+
 				if (symbolDelta < deltaFound) {
 					deltaFound = symbolDelta;
 					symbolFound = symbol;
-	
+
 					if (symbolDelta >= 0 && symbolDelta < symbol.st_size) {
 						// exact match
 						exactMatch = true;
@@ -974,10 +976,10 @@ public:
 				}
 			}
 		}
-	
+
 		if (_imageName)
 			*_imageName = fImageName;
-	
+
 		if (_symbolName) {
 			*_symbolName = NULL;
 
@@ -991,17 +993,17 @@ public:
 				}
 			}
 		}
-	
+
 		if (_baseAddress) {
 			if (deltaFound < INT_MAX)
 				*_baseAddress = symbolFound.st_value + textRegion.delta;
 			else
 				*_baseAddress = textRegion.vmstart;
 		}
-	
+
 		if (_exactMatch)
 			*_exactMatch = exactMatch;
-	
+
 		return B_OK;
 	}
 
@@ -1024,7 +1026,7 @@ public:
 
 			imageAddress = image.next;
 		}
-	
+
 		return B_ENTRY_NOT_FOUND;
 	}
 
@@ -1093,7 +1095,7 @@ get_image_symbol(image_id id, const char *name, int32 sclass, void **_symbol)
 
 	// ToDo: support the "sclass" parameter!
 
-	TRACE(("found: %lx (%lx + %lx)\n", symbol->st_value + image->text_region.delta, 
+	TRACE(("found: %lx (%lx + %lx)\n", symbol->st_value + image->text_region.delta,
 		symbol->st_value, image->text_region.delta));
 
 	*_symbol = (void *)(symbol->st_value + image->text_region.delta);
@@ -1712,14 +1714,14 @@ unload_kernel_add_on(image_id id)
 
 	mutex_lock(&sImageLoadMutex);
 	mutex_lock(&sImageMutex);
-	
+
 	image = find_image(id);
 	if (image != NULL)
 		status = unload_elf_image(image);
 	else
 		status = B_BAD_IMAGE_ID;
 
-	mutex_unlock(&sImageMutex);	
+	mutex_unlock(&sImageMutex);
 	mutex_unlock(&sImageLoadMutex);
 
 	return status;
