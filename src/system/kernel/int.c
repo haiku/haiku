@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -126,12 +126,12 @@ int_init_post_vm(kernel_args *args)
 		io_vectors[i].vector_lock = 0;			/* initialize spinlock */
 		io_vectors[i].enable_count = 0;
 		io_vectors[i].no_lock_vector = false;
-		#ifdef DEBUG_INT
-			io_vectors[i].handled_count = 0;
-			io_vectors[i].unhandled_count = 0;
-			io_vectors[i].trigger_count = 0;
-			io_vectors[i].ignored_count = 0;
-		#endif
+#ifdef DEBUG_INT
+		io_vectors[i].handled_count = 0;
+		io_vectors[i].unhandled_count = 0;
+		io_vectors[i].trigger_count = 0;
+		io_vectors[i].ignored_count = 0;
+#endif
 		initque(&io_vectors[i].handler_list);	/* initialize handler queue */
 	}
 
@@ -302,7 +302,7 @@ int_io_interrupt_handler(int vector, bool levelTriggered)
 
 #ifdef DEBUG_INT
 	io_vectors[vector].trigger_count++;
-	if (status != B_UNHANDLED_INTERRUPT) {
+	if (status != B_UNHANDLED_INTERRUPT || handled || invokeScheduler) {
 		io_vectors[vector].handled_count++;
 	} else {
 		io_vectors[vector].unhandled_count++;
