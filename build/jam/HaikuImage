@@ -367,10 +367,14 @@ AddFilesToHaikuImage beos etc : $(bisonFiles) ;
 AddFilesToHaikuImage beos system : zbeos ;
 
 # boot module links
-AddBootModuleSymlinksToHaikuImage config_manager bfs block_io fast_log
-	generic_ide_pci $(X86_ONLY)isa ide ide_adapter $(X86_ONLY)ide_isa intel
-	locked_pool $(PPC_ONLY)openpic pci scsi scsi_cd scsi_dsk scsi_periph
-	silicon_image_3112 legacy_sata ahci
+AddBootModuleSymlinksToHaikuImage 
+	pci $(X86_ONLY)isa config_manager ide scsi
+	$(PPC_ONLY)openpic
+	block_io fast_log ide_adapter locked_pool scsi_periph
+	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+	scsi_cd scsi_dsk
+	intel
+	bfs
 ;
 
 # add-ons
