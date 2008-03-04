@@ -159,6 +159,8 @@ class DriverWatcher : public NotificationListener {
 };
 
 
+static status_t get_node_for_path(struct devfs *fs, const char *path,
+	struct devfs_vnode **_node);
 static void get_device_name(struct devfs_vnode *vnode, char *buffer,
 	size_t size);
 static status_t unpublish_node(struct devfs *fs, devfs_vnode *node,
@@ -267,14 +269,23 @@ republish_driver(driver_entry *driver)
 			entry = currentNodes.GetNext(entry);
 		}
 
-		if (present)
-			continue;
-
-		// the device was not present before -> publish it now
 		device_hooks *hooks = driver->find_device(devicePaths[0]);
 		if (hooks == NULL)
 			continue;
 
+		if (present) {
+			// update hooks
+			devfs_vnode *vnode;
+			status_t status = get_node_for_path(sDeviceFileSystem,
+				devicePaths[0], &vnode);
+			if (status != B_OK)
+				return status;
+
+			vnode->stream.u.dev.ops = hooks;
+			continue;
+		}
+
+		// the device was not present before -> publish it now
 		TRACE(("devfs: publishing new device \"%s\"\n", devicePaths[0]));
 		if (publish_device(sDeviceFileSystem, devicePaths[0], NULL, NULL,
 				driver, hooks, driver->api_version) == B_OK)
@@ -960,8 +971,8 @@ add_partition(struct devfs *fs, struct devfs_vnode *device,
 		goto err1;
 	}
 
-	// increase reference count of raw device - 
-	// the partition device really needs it 
+	// increase reference count of raw device -
+	// the partition device really needs it
 	status = get_vnode(fs->id, device->id, (fs_vnode *)&partition->raw_device);
 	if (status < B_OK)
 		goto err1;
@@ -1031,7 +1042,7 @@ create_new_driver_info(device_hooks *ops, int32 version)
 	info->read_pages = NULL;
 	info->write_pages = NULL;
 		// old devices can't know how to do physical page access
-	
+
 	if (version >= 2) {
 		// According to Be newsletter, vol II, issue 36,
 		// version 2 added readv/writev, which we don't support, but also
@@ -1334,7 +1345,8 @@ get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 
 	// construct full path name
 
-	for (vnode = leaf; vnode->parent && vnode->parent != vnode; vnode = vnode->parent) {
+	for (vnode = leaf; vnode->parent && vnode->parent != vnode;
+			vnode = vnode->parent) {
 		size_t length = strlen(vnode->name);
 		size_t start = offset - length - 1;
 
@@ -1344,7 +1356,7 @@ get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 				buffer[offset - 1] = '/';
 		}
 
-		offset = start;	
+		offset = start;
 	}
 }
 
@@ -1357,18 +1369,38 @@ dump_node(int argc, char **argv)
 		return 0;
 	}
 
-	struct devfs_vnode *vnode = (struct devfs_vnode *)strtoul(argv[1], NULL, 0);
+	struct devfs_vnode *vnode = (struct devfs_vnode *)parse_expression(argv[1]);
 	if (vnode == NULL) {
 		kprintf("invalid node address\n");
 		return 0;
 	}
 
 	kprintf("DEVFS NODE: %p\n", vnode);
-	kprintf(" id:       %Ld\n", vnode->id);
-	kprintf(" name:     %s\n", vnode->name);
-	kprintf(" type:     %x\n", vnode->stream.type);
-	kprintf(" parent:   %p\n", vnode->parent);
-	kprintf(" dir_next: %p\n", vnode->dir_next);
+	kprintf(" id:          %Ld\n", vnode->id);
+	kprintf(" name:        \"%s\"\n", vnode->name);
+	kprintf(" type:        %x\n", vnode->stream.type);
+	kprintf(" parent:      %p\n", vnode->parent);
+	kprintf(" dir next:    %p\n", vnode->dir_next);
+
+	if (S_ISDIR(vnode->stream.type)) {
+		kprintf(" dir scanned: %ld\n", vnode->stream.u.dir.scanned);
+		kprintf(" contents:\n");
+
+		devfs_vnode *children = vnode->stream.u.dir.dir_head;
+		while (children != NULL) {
+			kprintf("   %p, id %Ld\n", children, children->id);
+			children = children->dir_next;
+		}
+	} else if (S_ISLNK(vnode->stream.type)) {
+		kprintf(" symlink to:  %s\n", vnode->stream.u.symlink.path);
+	} else {
+		kprintf(" device node: %p\n", vnode->stream.u.dev.node);
+		kprintf(" driver info: %p\n", vnode->stream.u.dev.info);
+		kprintf(" hooks:       %p\n", vnode->stream.u.dev.ops);
+		kprintf(" partition:   %p\n", vnode->stream.u.dev.partition);
+		kprintf(" scheduler:   %p\n", vnode->stream.u.dev.scheduler);
+		kprintf(" driver:      %p\n", vnode->stream.u.dev.driver);
+	}
 
 	return 0;
 }
@@ -1611,7 +1643,7 @@ devfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t buffer
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 
 	TRACE(("devfs_get_vnode_name: vnode = %p\n", vnode));
-	
+
 	strlcpy(buffer, vnode->name, bufferSize);
 	return B_OK;
 }
@@ -1952,7 +1984,7 @@ devfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name,
 	if (vnode != NULL) {
 		return EEXIST;
 	}
-	
+
 	vnode = devfs_create_vnode(fs, dir, name);
 	if (vnode == NULL) {
 		return B_NO_MEMORY;
@@ -2480,7 +2512,7 @@ devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat,
 
 	if (statMask & FS_WRITE_STAT_MTIME)
 		vnode->modification_time = stat->st_mtime;
-	if (statMask & FS_WRITE_STAT_CRTIME) 
+	if (statMask & FS_WRITE_STAT_CRTIME)
 		vnode->creation_time = stat->st_crtime;
 
 	notify_stat_changed(fs->id, vnode->id, statMask);
@@ -2659,16 +2691,16 @@ pnp_devfs_remove_device(device_info *device)
 {
 	TRACE(("removing device %s from public list\n", device->name));
 
-	--num_devices;	
+	--num_devices;
 	REMOVE_DL_LIST( device, devices, );
-	
+
 	++num_unpublished_devices;
 	ADD_DL_LIST_HEAD( device, devices_to_unpublish, );
-	
+
 	// (don't free it even if no handle is open - the device
 	//  info block contains the hook list which may just got passed
-	//  to the devfs layer; we better wait until next 
-	//  publish_devices, so we are sure that devfs won't access 
+	//  to the devfs layer; we better wait until next
+	//  publish_devices, so we are sure that devfs won't access
 	//  the hook list anymore)
 }
 #endif
@@ -2686,13 +2718,13 @@ pnp_devfs_device_removed(device_node_handle node, void *cookie)
 	TRACE(("pnp_devfs_device_removed()\n"));
 #if 0
 	parent = sDeviceManager->get_parent(node);
-	
+
 	// don't use cookie - we don't use sDeviceManager loading scheme but
 	// global data and keep care of everything ourself!
 	ACQUIRE_BEN( &device_list_lock );
-	
+
 	for( device = devices; device; device = device->next ) {
-		if( device->parent == parent ) 
+		if( device->parent == parent )
 			break;
 	}
 
@@ -2702,9 +2734,9 @@ pnp_devfs_device_removed(device_node_handle node, void *cookie)
 		SHOW_ERROR( 0, "bug: node %p couldn't been found", node );
 		res = B_NAME_NOT_FOUND;
 	}
-		
+
 	RELEASE_BEN( &device_list_lock );
-	
+
 	//nudge();
 #endif
 }
