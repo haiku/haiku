@@ -99,6 +99,14 @@ be a device path on Linux.
 
 Windows users will find '3rdparty/nero/haiku-cd.cue' useful.
 
+Since the CD has two tracks it is not easy to test it from an emulator.
+Instead it is simpler to use the 'haiku.image' as CD image and the floppy
+image 'haiku-boot-floppy.image' to boot from it.
+
+For Qemu:
+
+qemu -cdrom generated/haiku.image -fda generated/haiku-boot-floppy.image -boot a
+
 Building Components
 -------------------
 
