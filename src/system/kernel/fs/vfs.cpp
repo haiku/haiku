@@ -157,7 +157,7 @@ static mutex sMountMutex;
 	- the fields immutable after initialization of the fs_mount structures in
 	  sMountsTable will not be modified,
 	- vnode::covered_by of any vnode in sVnodeTable will not be modified.
-	
+
 	The thread trying to lock the lock must not hold sVnodeMutex or
 	sMountMutex.
 */
@@ -643,7 +643,7 @@ create_new_vnode(struct vnode **_vnode, dev_t mountID, ino_t vnodeID)
 	vnode->id = vnodeID;
 
 	// add the vnode to the mount structure
-	mutex_lock(&sMountMutex);	
+	mutex_lock(&sMountMutex);
 	vnode->mount = find_mount(mountID);
 	if (!vnode->mount || vnode->mount->unmounting) {
 		mutex_unlock(&sMountMutex);
@@ -1390,7 +1390,7 @@ normalize_flock(struct file_descriptor *descriptor, struct flock *flock)
 }
 
 
-/*!	Disconnects all file descriptors that are associated with the 
+/*!	Disconnects all file descriptors that are associated with the
 	\a vnodeToDisconnect, or if this is NULL, all vnodes of the specified
 	\a mount object.
 
@@ -2606,7 +2606,7 @@ dump_vnode_caches(int argc, char **argv)
 {
 	struct hash_iterator iterator;
 	struct vnode *vnode;
-	
+
 	if (argc > 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: %s [device]\n", argv[0]);
 		return 0;
@@ -2672,7 +2672,7 @@ dump_io_context(int argc, char **argv)
 	kprintf(" cwd vnode:\t%p\n", context->cwd);
 	kprintf(" used fds:\t%lu\n", context->num_used_fds);
 	kprintf(" max fds:\t%lu\n", context->table_size);
-	
+
 	if (context->num_used_fds)
 		kprintf("   no. type     ops ref open mode        pos cookie\n");
 
@@ -2816,7 +2816,7 @@ common_file_io_vec_pages(struct vnode *vnode, void *cookie,
 			uint32 tempCount = 0;
 
 			// size tracks how much of what is left of the current fileVec
-			// (fileLeft) has been assigned to tempVecs 
+			// (fileLeft) has been assigned to tempVecs
 			size = 0;
 
 			// assign what is left of the current fileVec to the tempVecs
@@ -3004,7 +3004,7 @@ remove_vnode(dev_t mountID, ino_t vnodeID)
 	}
 
 	locker.Unlock();
-	
+
 	if (remove) {
 		// if the vnode hasn't been published yet, we delete it here
 		atomic_add(&vnode->ref_count, -1);
@@ -3973,15 +3973,15 @@ vfs_setrlimit(int resource, const struct rlimit * rlp)
 	switch (resource) {
 		case RLIMIT_NOFILE:
 			/* TODO: check getuid() */
-			if (rlp->rlim_max != RLIM_SAVED_MAX && 
-			    rlp->rlim_max != MAX_FD_TABLE_SIZE)
+			if (rlp->rlim_max != RLIM_SAVED_MAX
+				&& rlp->rlim_max != MAX_FD_TABLE_SIZE)
 				return EPERM;
 			return vfs_resize_fd_table(get_current_io_context(false), rlp->rlim_cur);
 
 		case RLIMIT_NOVMON:
 			/* TODO: check getuid() */
-			if (rlp->rlim_max != RLIM_SAVED_MAX && 
-			    rlp->rlim_max != MAX_NODE_MONITORS)
+			if (rlp->rlim_max != RLIM_SAVED_MAX
+				&& rlp->rlim_max != MAX_NODE_MONITORS)
 				return EPERM;
 			return vfs_resize_monitor_table(get_current_io_context(false), rlp->rlim_cur);
 
@@ -4089,7 +4089,7 @@ create_vnode(struct vnode *directory, const char *name, int openMode,
 	put_vnode(vnode);
 
 	FS_CALL(directory, unlink)(directory->mount->cookie, directory->private_node, name);
-	
+
 	return status;
 }
 
@@ -4180,7 +4180,7 @@ file_create_entry_ref(dev_t mountID, ino_t directoryID, const char *name,
 
 	FUNCTION(("file_create_entry_ref: name = '%s', omode %x, perms %d, kernel %d\n", name, openMode, perms, kernel));
 
-	// get directory to put the new file in	
+	// get directory to put the new file in
 	status = get_vnode(mountID, directoryID, &directory, true, false);
 	if (status < B_OK)
 		return status;
@@ -4201,7 +4201,7 @@ file_create(int fd, char *path, int openMode, int perms, bool kernel)
 
 	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, openMode, perms, kernel));
 
-	// get directory to put the new file in	
+	// get directory to put the new file in
 	status = fd_and_path_to_dir_vnode(fd, path, &directory, name, kernel);
 	if (status < 0)
 		return status;
@@ -4421,7 +4421,7 @@ dir_create_entry_ref(dev_t mountID, ino_t parentID, const char *name, int perms,
 		return B_BAD_VALUE;
 
 	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', perms = %d)\n", mountID, parentID, name, perms));
-	
+
 	status = get_vnode(mountID, parentID, &vnode, true, false);
 	if (status < B_OK)
 		return status;
@@ -4539,7 +4539,7 @@ dir_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static status_t 
+static status_t
 dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	return dir_read(descriptor->u.vnode, descriptor->cookie, buffer, bufferSize, _count);
@@ -4589,7 +4589,7 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 }
 
 
-static status_t 
+static status_t
 dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	if (!FS_CALL(vnode, read_dir))
@@ -4609,7 +4609,7 @@ dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bu
 }
 
 
-static status_t 
+static status_t
 dir_rewind(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -4641,7 +4641,7 @@ dir_remove(int fd, char *path, bool kernel)
 				lastSlash--;
 			}
 
-			if (!leaf[0]		
+			if (!leaf[0]
 				|| !strcmp(leaf, ".")) {
 				// "name/" -> "name", or "name/." -> "name"
 				lastSlash[0] = '\0';
@@ -4680,7 +4680,7 @@ common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
 }
 
 
-static status_t 
+static status_t
 common_fcntl(int fd, int op, uint32 argument, bool kernel)
 {
 	struct file_descriptor *descriptor;
@@ -5074,7 +5074,7 @@ static status_t
 common_write_stat(struct file_descriptor *descriptor, const struct stat *stat, int statMask)
 {
 	struct vnode *vnode = descriptor->u.vnode;
-	
+
 	FUNCTION(("common_write_stat(vnode = %p, stat = %p, statMask = %d)\n", vnode, stat, statMask));
 	if (!FS_CALL(vnode, write_stat))
 		return EROFS;
@@ -5179,7 +5179,7 @@ attr_dir_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static status_t 
+static status_t
 attr_dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -5193,7 +5193,7 @@ attr_dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t 
 }
 
 
-static status_t 
+static status_t
 attr_dir_rewind(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -5538,7 +5538,7 @@ index_dir_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static status_t 
+static status_t
 index_dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	struct fs_mount *mount = descriptor->u.mount;
@@ -5550,7 +5550,7 @@ index_dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t
 }
 
 
-static status_t 
+static status_t
 index_dir_rewind(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
@@ -5729,7 +5729,7 @@ query_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static status_t 
+static status_t
 query_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	struct fs_mount *mount = descriptor->u.mount;
@@ -5741,7 +5741,7 @@ query_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t buf
 }
 
 
-static status_t 
+static status_t
 query_rewind(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
@@ -6326,7 +6326,7 @@ fs_next_device(int32 *_cookie)
 	struct fs_mount *mount = NULL;
 	dev_t device = *_cookie;
 
-	mutex_lock(&sMountMutex);	
+	mutex_lock(&sMountMutex);
 
 	// Since device IDs are assigned sequentially, this algorithm
 	// does work good enough. It makes sure that the device list
@@ -6347,7 +6347,7 @@ fs_next_device(int32 *_cookie)
 		device = B_BAD_VALUE;
 
 	mutex_unlock(&sMountMutex);
-	
+
 	return device;
 }
 
@@ -6369,7 +6369,7 @@ get_cwd(char *buffer, size_t size, bool kernel)
 		status = B_ERROR;
 
 	mutex_unlock(&context->io_mutex);
-	return status; 
+	return status;
 }
 
 
@@ -6643,7 +6643,7 @@ _kern_open_dir(int fd, const char *path)
 }
 
 
-status_t 
+status_t
 _kern_fcntl(int fd, int op, uint32 argument)
 {
 	return common_fcntl(fd, op, argument, true);
@@ -6746,7 +6746,7 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
-		return common_read_link(fd, pathBuffer.LockBuffer(), 
+		return common_read_link(fd, pathBuffer.LockBuffer(),
 			buffer, _bufferSize, true);
 	}
 
@@ -6775,7 +6775,7 @@ _kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 	if (pathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	return common_create_symlink(fd, pathBuffer.LockBuffer(), 
+	return common_create_symlink(fd, pathBuffer.LockBuffer(),
 		toPath, mode, true);
 }
 
@@ -6788,7 +6788,7 @@ _kern_create_link(const char *path, const char *toPath)
 	if (pathBuffer.InitCheck() != B_OK || toPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	return common_create_link(pathBuffer.LockBuffer(), 
+	return common_create_link(pathBuffer.LockBuffer(),
 		toPathBuffer.LockBuffer(), true);
 }
 
@@ -6843,7 +6843,7 @@ _kern_rename(int oldFD, const char *oldPath, int newFD, const char *newPath)
 	if (oldPathBuffer.InitCheck() != B_OK || newPathBuffer.InitCheck() != B_OK)
 		return B_NO_MEMORY;
 
-	return common_rename(oldFD, oldPathBuffer.LockBuffer(), 
+	return common_rename(oldFD, oldPathBuffer.LockBuffer(),
 		newFD, newPathBuffer.LockBuffer(), true);
 }
 
@@ -6901,7 +6901,7 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
-		status = common_path_read_stat(fd, pathBuffer.LockBuffer(), 
+		status = common_path_read_stat(fd, pathBuffer.LockBuffer(),
 			traverseLeafLink, stat, true);
 	} else {
 		// no path given: get the FD and use the FD operation
@@ -6970,7 +6970,7 @@ _kern_write_stat(int fd, const char *path, bool traverseLeafLink,
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
 
-		status = common_path_write_stat(fd, pathBuffer.LockBuffer(), 
+		status = common_path_write_stat(fd, pathBuffer.LockBuffer(),
 			traverseLeafLink, stat, statMask, true);
 	} else {
 		// no path given: get the FD and use the FD operation
@@ -7385,7 +7385,7 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 				return len;
 			if (len >= B_PATH_NAME_LENGTH)
 				return B_BUFFER_OVERFLOW;
-		
+
 			return B_OK;
 		}
 
@@ -7537,7 +7537,7 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 }
 
 
-status_t 
+status_t
 _user_fcntl(int fd, int op, uint32 argument)
 {
 	status_t status = common_fcntl(fd, op, argument, false);
@@ -7555,7 +7555,7 @@ _user_fsync(int fd)
 }
 
 
-status_t 
+status_t
 _user_flock(int fd, int op)
 {
 	struct file_descriptor *descriptor;
@@ -7823,13 +7823,13 @@ _user_read_stat(int fd, const char *userPath, bool traverseLink,
 		// path given: get the stat of the node referred to by (fd, path)
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
-		
+
 		KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
-	
+
 		char *path = pathBuffer.LockBuffer();
-	
+
 		ssize_t length = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
 		if (length < B_OK)
 			return length;
@@ -7882,13 +7882,13 @@ _user_write_stat(int fd, const char *userPath, bool traverseLeafLink,
 		// path given: write the stat of the node referred to by (fd, path)
 		if (!IS_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
-		
+
 		KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 		if (pathBuffer.InitCheck() != B_OK)
 			return B_NO_MEMORY;
-	
+
 		char *path = pathBuffer.LockBuffer();
-	
+
 		ssize_t length = user_strlcpy(path, userPath, B_PATH_NAME_LENGTH);
 		if (length < B_OK)
 			return length;
@@ -8008,7 +8008,7 @@ status_t
 _user_create_index(dev_t device, const char *userName, uint32 type, uint32 flags)
 {
 	char name[B_FILE_NAME_LENGTH];
-	
+
 	if (!IS_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
@@ -8043,7 +8043,7 @@ status_t
 _user_remove_index(dev_t device, const char *userName)
 {
 	char name[B_FILE_NAME_LENGTH];
-	
+
 	if (!IS_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
