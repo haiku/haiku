@@ -12,7 +12,7 @@
 
 #include <bluetooth/HCI/btHCI.h>
 #include <bluetooth/HCI/btHCI_transport.h>
-#include <net/net_buffer.h>
+#include <net_buffer.h>
 
 /* defines */
 #define	BT_HCI_MODULE_NAME	"bus_managers/hci/v1"

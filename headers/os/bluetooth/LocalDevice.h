@@ -37,7 +37,7 @@ class LocalDevice {
                  BString GetFriendlyName();
                  DeviceClass GetDeviceClass();
         /* Possible throwing */
-                 bool SetDiscoverable(int mode);
+                 status_t SetDiscoverable(int mode);
                  
                  BString GetProperty(const char* property);                     
                  void GetProperty(const char* property, uint32* value);

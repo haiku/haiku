@@ -10,7 +10,7 @@
 
 #include <bluetooth/HCI/btHCI.h>
 
-#include <net/net_buffer.h>
+#include <net_buffer.h>
 #include <Drivers.h>
 
 typedef enum { ANCILLYANT = 1, 
