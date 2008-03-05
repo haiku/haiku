@@ -87,7 +87,7 @@ InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	BRect rect = Bounds();
 
 	// accomodate for big fonts
-	float div = max_c(2 * 32, be_plain_font->StringWidth("Container") + 5);
+	float div = max_c(2 * 32, be_plain_font->StringWidth("Display Mode") + 10);
 
 	fInfoView = new InfoView(rect, "background", div);
 	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
@@ -310,7 +310,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 
 	// statistics
 	if ((which & INFO_STATS) && fController->HasFile()) {
-		fLabelsView->Insert("Duration\n\n");
+		fLabelsView->Insert("Duration\n");
 		BString s;
 		bigtime_t d = fController->Duration();
 		bigtime_t v;
@@ -333,13 +333,22 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			s << " h";
 		else
 			s << " min";
-		s << "\n\n";
+		s << "\n";
 		fContentsView->Insert(s.String());
 		// TODO: demux/video/audio/... perfs (Kb/s)
+		
+		fLabelsView->Insert("Display Mode\n");
+		if (fController->IsOverlayActive())
+			fContentsView->Insert("Overlay\n");
+		else
+			fContentsView->Insert("DrawBitmap\n");
+		
+		fLabelsView->Insert("\n");
+		fContentsView->Insert("\n");
 	}
 
 	if (which & INFO_TRANSPORT) {
-		// what is "Transport"?
+		// Transport protocol info (file, http, rtsp, ...)
 	}
 
 	if (which & INFO_FILE) {
