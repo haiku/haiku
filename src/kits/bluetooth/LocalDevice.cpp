@@ -5,6 +5,9 @@
  *
  */
 
+
+#include <bluetooth/bluetooth_error.h>
+
 #include <bluetooth/LocalDevice.h>
 #include <bluetooth/RemoteDevice.h>
 #include <bluetooth/DeviceClass.h>
@@ -126,6 +129,92 @@ LocalDevice::GetDiscoveryAgent()
 }
 
 
+BString
+LocalDevice::GetProperty(const char* property)
+{
+
+	return NULL;
+
+}
+
+
+void 
+LocalDevice::GetProperty(const char* property, uint32* value)
+{
+
+	*value = 0;
+}
+
+
+int 
+LocalDevice::GetDiscoverable()
+{
+
+	return 0;
+}
+
+
+status_t 
+LocalDevice::SetDiscoverable(int mode)
+{
+    if (RetrieveBluetoothMessenger() != B_OK)
+        return B_ERROR;            
+
+
+    BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+    BMessage reply;
+	int8	 bt_status = BT_ERROR;
+	
+    /* ADD ID */
+    request.AddInt32("hci_id", hid);
+	
+	/* Add command */
+
+    if (fMessenger->SendMessage(&request, &reply) == B_OK) {
+    	if (reply.FindInt8("status", &bt_status ) == B_OK ) {	    
+			
+			
+		}
+		
+	}    
+
+
+	return B_ERROR;
+}
+
+
+bdaddr_t 
+LocalDevice::GetBluetoothAddress()
+{
+    if (RetrieveBluetoothMessenger() != B_OK)
+        return bdaddrUtils::NullAddress();            
+ 
+    const bdaddr_t* bdaddr;
+    BMessage request(BT_MSG_GET_ADDRESS);
+    BMessage reply;
+ 	ssize_t	size;   
+
+    /* ADD ID */
+    request.AddInt32("hci_id", hid);
+    
+    if (fMessenger->SendMessage(&request, &reply) == B_OK) {
+    
+    	if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){		
+	    
+			printf("%s: %s size=%ld\n", __FUNCTION__, bdaddrUtils::ToString(*bdaddr), size);
+			
+	    	return *bdaddr;
+	    
+	    } else {
+	    	return bdaddrUtils::NullAddress();	    
+	    }
+	    
+    }
+
+	return bdaddrUtils::NullAddress();
+}
+
+
 BString 
 LocalDevice::GetFriendlyName()
 {
@@ -157,70 +246,6 @@ LocalDevice::GetDeviceClass()
 }
 
 
-bool 
-LocalDevice::SetDiscoverable(int mode)
-{
-
-	return false;
-}
-
-
-BString
-LocalDevice::GetProperty(const char* property)
-{
-
-	return NULL;
-
-}
-
-
-void 
-LocalDevice::GetProperty(const char* property, uint32* value)
-{
-
-	*value = 0;
-}
-
-
-int 
-LocalDevice::GetDiscoverable()
-{
-
-	return 0;
-}
-
-
-bdaddr_t 
-LocalDevice::GetBluetoothAddress()
-{
-    if (RetrieveBluetoothMessenger() != B_OK)
-        return bdaddrUtils::NullAddress();            
- 
-    const bdaddr_t* bdaddr;
-    BMessage request(BT_MSG_GET_ADDRESS);
-    BMessage reply;
- 	ssize_t	size;   
-    /* ADD ID */
-    request.AddInt32("hci_id", hid);
-    
-    if (fMessenger->SendMessage(&request, &reply) == B_OK) {
-    
-    	if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){		
-	    
-			printf("%s: %s size=%ld\n", __FUNCTION__, bdaddrUtils::ToString(*bdaddr), size);
-			
-	    	return *bdaddr;
-	    
-	    } else {
-	    	return bdaddrUtils::NullAddress();	    
-	    }
-	    
-    }
-
-	return bdaddrUtils::NullAddress();
-}
-
-
 /*
 ServiceRecord 
 LocalDevice::getRecord(Connection notifier) {
@@ -232,6 +257,8 @@ LocalDevice::updateRecord(ServiceRecord srvRecord) {
 
 }
 */
+
+
 LocalDevice::LocalDevice(hci_id hid) : hid(hid)
 {
 
