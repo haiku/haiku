@@ -1,6 +1,6 @@
 /* 
+ * Copyright 2007-2008, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
- * Copyright 2007, Haiku Inc. All Rights Reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -32,18 +32,21 @@
 #include <Resources.h>
 #include <Region.h>
 
+#include <AppFileInfo.h>
 #include <Entry.h>
 #include <Directory.h>
 #include <FindDirectory.h>
 #include <Path.h>
-#include <AppFileInfo.h>
 
 #include <MailSettings.h>
 
+#include <new>
 #include <stdio.h>
 #include <string.h>
 
 #include <MDRLanguage.h>
+
+using std::nothrow;
 
 // define if you want to have an apply button
 //#define HAVE_APPLY_BUTTON
@@ -53,7 +56,7 @@ const char *kMailto = "mailto:bemaildaemon-talk@bug-br.org.br";
 const char *kBugsitePretty = "Bug-Tracker at SourceForge.net";
 const char *kBugsite = "http://sourceforge.net/tracker/?func=add&group_id=26926&atid=388726";
 const char *kWebsite = "http://www.haiku-os.org";
-const rgb_color kLinkColor = {40,40,180};
+const rgb_color kLinkColor = { 40, 40, 180, 255 };
 
 
 const uint32 kMsgAccountSelected = 'acsl';
@@ -88,11 +91,13 @@ class AccountsListView : public BListView {
 class BitmapView : public BView
 {
 	public:
-		BitmapView(BBitmap *bitmap) : BView(bitmap->Bounds(),NULL,B_FOLLOW_NONE,B_WILL_DRAW)
+		BitmapView(BBitmap *bitmap) : BView(bitmap->Bounds(), NULL,
+			B_FOLLOW_NONE, B_WILL_DRAW)
 		{
 			fBitmap = bitmap;
 
 			SetDrawingMode(B_OP_ALPHA);
+			SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
 		}
 
 		~BitmapView()
@@ -104,12 +109,13 @@ class BitmapView : public BView
 		{
 			SetViewColor(Parent()->ViewColor());
 
-			MoveTo((Parent()->Bounds().Width() - Bounds().Width()) / 2,Frame().top);
+			MoveTo((Parent()->Bounds().Width() - Bounds().Width()) / 2,
+				Frame().top);
 		}
 
 		virtual void Draw(BRect updateRect)
 		{
-			DrawBitmap(fBitmap,updateRect,updateRect);
+			DrawBitmap(fBitmap, updateRect, updateRect);
 		}
 
 	private:
@@ -120,24 +126,22 @@ class BitmapView : public BView
 class AboutTextView : public BTextView
 {
 	public:
-		AboutTextView(BRect rect) : BTextView(rect,NULL,rect.OffsetToCopy(B_ORIGIN),B_FOLLOW_NONE,B_WILL_DRAW)
+		AboutTextView(BRect rect) : BTextView(rect, NULL,
+			rect.OffsetToCopy(B_ORIGIN), B_FOLLOW_NONE, B_WILL_DRAW)
 		{
 			int32 major = 0,middle = 0,minor = 0,variety = 0,internal = 1;
 
 			// get version information for app
 
 			app_info appInfo;
-			if (be_app->GetAppInfo(&appInfo) == B_OK)
-			{
-				BFile file(&appInfo.ref,B_READ_ONLY);
-				if (file.InitCheck() == B_OK)
-				{
+			if (be_app->GetAppInfo(&appInfo) == B_OK) {
+				BFile file(&appInfo.ref, B_READ_ONLY);
+				if (file.InitCheck() == B_OK) {
 					BAppFileInfo info(&file);
-					if (info.InitCheck() == B_OK)
-					{
+					if (info.InitCheck() == B_OK) {
 						version_info versionInfo;
-						if (info.GetVersionInfo(&versionInfo,B_APP_VERSION_KIND) == B_OK)
-						{
+						if (info.GetVersionInfo(&versionInfo,
+							B_APP_VERSION_KIND) == B_OK) {
 							major = versionInfo.major;
 							middle = versionInfo.middle;
 							minor = versionInfo.minor;
@@ -440,12 +444,13 @@ ConfigWindow::~ConfigWindow()
 void
 ConfigWindow::MakeHowToView()
 {
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
 	BResources *resources = BApplication::AppResources();
 	if (resources) {
 		size_t length;
 		char *buffer = (char *)resources->FindResource(B_LARGE_ICON_TYPE, 101, &length);
 		if (buffer) {
-			BBitmap *bitmap = new BBitmap(BRect(0, 0, 63, 63), B_CMAP8);
+			BBitmap *bitmap = new (nothrow) BBitmap(BRect(0, 0, 63, 63), B_CMAP8);
 			if (bitmap && bitmap->InitCheck() == B_OK) {
 				// copy and enlarge a 32x32 8-bit bitmap
 				char *bits = (char *)bitmap->Bits();
@@ -461,6 +466,20 @@ ConfigWindow::MakeHowToView()
 				delete bitmap;
 		}
 	}
+#else
+	app_info info;
+	if (be_app->GetAppInfo(&info) == B_OK) {
+		BFile appFile(&info.ref, B_READ_ONLY);
+		BAppFileInfo appFileInfo(&appFile);
+		if (appFileInfo.InitCheck() == B_OK) {
+			BBitmap *bitmap = new (nothrow) BBitmap(BRect(0, 0, 63, 63), B_RGBA32);
+			if (appFileInfo.GetIcon(bitmap, B_LARGE_ICON) == B_OK) {
+				fConfigView->AddChild(new BitmapView(bitmap));
+			} else
+				delete bitmap;
+		}
+	}
+#endif // HAIKU_TARGET_PLATFORM_HAIKU
 
 	BRect rect = fConfigView->Bounds();
 	BTextView *text = new BTextView(rect, NULL, rect, B_FOLLOW_NONE, B_WILL_DRAW);
