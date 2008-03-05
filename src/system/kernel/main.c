@@ -264,8 +264,14 @@ main2(void *unused)
 
 	// CPU specific modules may now be available
 	cpu_init_post_modules(&sKernelArgs);
+
+	TRACE("vm_init_post_modules\n");
 	vm_init_post_modules(&sKernelArgs);
+	
+	TRACE("debug_init_post_modules\n");
 	debug_init_post_modules(&sKernelArgs);
+
+	TRACE("device_manager_init_post_modules\n");
 	device_manager_init_post_modules(&sKernelArgs);
 
 	// start the init process
