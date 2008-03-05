@@ -363,6 +363,10 @@ local bisonFiles = "yacc.c" "c.m4" "c++.m4" ;
 SEARCH on $(bisonFiles) = [ FDirName $(HAIKU_TOP) src bin bison data ] ;
 AddFilesToHaikuImage beos etc : $(bisonFiles) ;
 
+# fresh install indicator file
+SEARCH on <settings>fresh_install = [ FDirName $(HAIKU_TOP) data settings ] ;
+AddFilesToHaikuImage home config settings : <settings>fresh_install ;
+
 # boot loader
 AddFilesToHaikuImage beos system : zbeos ;
 

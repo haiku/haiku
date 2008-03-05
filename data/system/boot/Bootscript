@@ -121,3 +121,15 @@ if [ "$SAFEMODE" != "yes" ]; then
 		. $HOME/config/boot/UserBootscript
 	fi
 fi
+
+# Check for fresh install and register all bundled app mimetypes
+FRESH_INSTALL_INDICATOR_FILE=$HOME/config/settings/fresh_install
+if [ -e $FRESH_INSTALL_INDICATOR_FILE ]; then
+	mimeset -all -f /boot/beos/apps
+	mimeset -all -f /boot/beos/preferences
+	mimeset -all -f /boot/beos/system/servers
+	mimeset -all -f /boot/apps
+	rm $FRESH_INSTALL_INDICATOR_FILE
+fi
+
+
