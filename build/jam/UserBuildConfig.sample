@@ -19,18 +19,18 @@
 # Turn off warnings in directory src/system/kernel. As fourth (scope) parameter
 # "local" is specified, which means, that this setting applies only to the
 # given directory, but not any of its subdirectories.
-SetConfigVar WARNINGS : HAIKU_TOP src system kernel : 0 : local ;
+#SetConfigVar WARNINGS : HAIKU_TOP src system kernel : 0 : local ;
 
 # Set the debug level for directory src/system/boot/loader and recursively all
 # of its subdirectories (scope is "global") to 1. All affected generated files
 # will be put into another subtree of the "generated" directory, which allows
 # for fast switching between normal and debug builds.
-SetConfigVar DEBUG : HAIKU_TOP src system boot loader : 1 : global ;
+#SetConfigVar DEBUG : HAIKU_TOP src system boot loader : 1 : global ;
 
 # Add "RUN_WITHOUT_REGISTRAR" to the DEFINES for the directory src/kits and
 # all of its subdirectories.
-AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
-	: global ;
+#AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
+#	: global ;
 
 # Set the debug level for file src/bin/gdb/gdb/haiku-nat.c (note, that
 # the object file must be specified) to 1. It is worth mentioning, that the
@@ -38,25 +38,25 @@ AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
 # generated/objects/.../release/... Only when setting DEBUG for the executable,
 # too, it will be placed in .../debug_1/.... Apart from that, the DEBUG variable
 # has no effect on executables or other shared objects.
-DEBUG on <src!bin!gdb!gdb!>haiku-nat.o = 1 ;
+#DEBUG on <src!bin!gdb!gdb!>haiku-nat.o = 1 ;
 
 
 # Haiku Image Related Modifications
 
 # Create a 100 MB image at /tmp/walter.image.
-HAIKU_IMAGE_NAME	= walter.image ;
-HAIKU_IMAGE_DIR		= /tmp ;
-HAIKU_IMAGE_SIZE	= 100 ;
+#HAIKU_IMAGE_NAME	= walter.image ;
+#HAIKU_IMAGE_DIR		= /tmp ;
+#HAIKU_IMAGE_SIZE	= 100 ;
 
 # Name the VMWare image walter.vmdk (in directory $(HAIKU_IMAGE_DIR)).
-HAIKU_VMWARE_IMAGE_NAME	= walter.vmdk ;
+#HAIKU_VMWARE_IMAGE_NAME	= walter.vmdk ;
 
 # Install Haiku in directory /Haiku.
-HAIKU_INSTALL_DIR = /Haiku ;
+#HAIKU_INSTALL_DIR = /Haiku ;
 
 # If the image does already exist it won't be zeroed out. It will nevertheless
 # freshly be initialized with BFS. Useful when installing Haiku on a partition.
-HAIKU_DONT_CLEAR_IMAGE = 1 ;
+#HAIKU_DONT_CLEAR_IMAGE = 1 ;
 
 
 # Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
@@ -64,49 +64,55 @@ HAIKU_DONT_CLEAR_IMAGE = 1 ;
 # updated in the image file/installation directory.
 # The update-image, update-vmware-image, and update-install targets always invoke
 # this rule, so one likely doesn't ever need to do it manually.
-SetUpdateHaikuImageOnly 1 ;
+#SetUpdateHaikuImageOnly 1 ;
 
 # libbe.so and the kernel will be updated on image updates. Note that this
 # generally doesn't work for pseudo targets (it does where special support
 # has been added, like for "kernel").
-HAIKU_INCLUDE_IN_IMAGE on libbe.so kernel = 1 ;
+#HAIKU_INCLUDE_IN_IMAGE on libbe.so kernel = 1 ;
 
 # Add "crashing_app" to the beos/bin directory of the Haiku image/installation.
 # Note, that this also makes the image depend on the target, i.e. it is
 # automatically updated when the image is built.
-AddFilesToHaikuImage beos bin : crashing_app ;
+#AddFilesToHaikuImage beos bin : crashing_app ;
 
 # Make a symlink to home/config/bin/crash.
-AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
+#AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
 
 # Adds the source directories src/kits/storage and src/tests/servers/debug
 # (recursively) to the image (as /boot/home/HaikuSources/src/kits/storage
 # and /boot/home/HaikuSources/src/tests/servers/debug respectively).
 # Note that the second directory will also be copied, if the image will only
 # be updated; the first one won't in that case.
-AddSourceDirectoryToHaikuImage src/kits/storage ;
-AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
+#AddSourceDirectoryToHaikuImage src/kits/storage ;
+#AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
 
 # Unzips the given zip archive onto the image under /boot/develop/tools.
-UnzipArchiveToHaikuImage develop tools
-	: /home/bonefish/develop/haiku/misc/gcc-2.95.3-beos-070218/gcc-2.95.3_binutils-2.17_rel-070218.zip ;
+#UnzipArchiveToHaikuImage develop tools
+#	: /home/bonefish/develop/haiku/misc/gcc-2.95.3-beos-070218/gcc-2.95.3_binutils-2.17_rel-070218.zip ;
 
 # Adds the optional package WonderBrush to the image. The package is downloaded
 # via wget (i.e. wget must be installed).
-AddOptionalHaikuImagePackages WonderBrush ;
+#AddOptionalHaikuImagePackages WonderBrush ;
 
 # Adds the optional package Vision to the image. See above.
-AddOptionalHaikuImagePackages Vision ;
+#AddOptionalHaikuImagePackages Vision ;
+
+# Adds the optional package Pe to the image. See above.
+#AddOptionalHaikuImagePackages Pe ;
+
+# Adds the optional package Links to the image. See above.
+#AddOptionalHaikuImagePackages Links ;
 
 # Add all available optional packages.
-HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
+#HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
 
 # Specify scripts that shall be run when populating the image/installation
 # directory. The "early" script is run before anything has been copied onto
 # the image/into the installation directory. The "late" script is run after
 # everything has been copied, but before the MIME database is installed.
-HAIKU_IMAGE_EARLY_USER_SCRIPTS	= $(HAIKU_TOP)/../early-image-script.sh ;
-HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
+#HAIKU_IMAGE_EARLY_USER_SCRIPTS	= $(HAIKU_TOP)/../early-image-script.sh ;
+#HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
 
 
 # Creating Sourceable Shell Scripts
@@ -117,22 +123,22 @@ HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
 
 # General setup for the shell script to generate. Name is test.inc, located
 # in the output directory.
-MakeLocate test.inc : $(HAIKU_OUTPUT_DIR) ;
-Always test.inc ;
+#MakeLocate test.inc : $(HAIKU_OUTPUT_DIR) ;
+#Always test.inc ;
 
 # Define variable "outputDir" in the shell script, with the value of
 # HAIKU_OUTPUT_DIR.
-AddVariableToScript test.inc : outputDir : $(HAIKU_OUTPUT_DIR) ;
+#AddVariableToScript test.inc : outputDir : $(HAIKU_OUTPUT_DIR) ;
 
 # Define variables "bfsShell" and "fsShellCommand" referring to the
 # generated bfs_shell and fs_shell_command respectively.
-AddTargetVariableToScript test.inc : bfs_shell : bfsShell ;
-AddTargetVariableToScript test.inc : fs_shell_command : fsShellCommand ;
+#AddTargetVariableToScript test.inc : bfs_shell : bfsShell ;
+#AddTargetVariableToScript test.inc : fs_shell_command : fsShellCommand ;
 
 # If no variable name is given, the name (without grist) of the target is
 # used, i.e. a variable "rc" referring to the rc command built for the host
 # platform is defined in the script.
-AddTargetVariableToScript test.inc : <build>rc ;
+#AddTargetVariableToScript test.inc : <build>rc ;
 
 
 # Optimizing Jamfile Parsing Times
@@ -140,16 +146,16 @@ AddTargetVariableToScript test.inc : <build>rc ;
 # Setting this variable will prevent the root Jamfile to include the Jamfile
 # in the src directory. Instead only the directories required for building the
 # build tools are included. Only useful in combination with DeferredSubInclude.
-HAIKU_DONT_INCLUDE_SRC = 1 ;
+#HAIKU_DONT_INCLUDE_SRC = 1 ;
 
 # Schedule the given subdirectory for inclusion at the end of the root
 # Jamfile (directly using SubInclude here is not possible). Using this
 # feature together with HAIKU_DONT_INCLUDE_SRC allows developers working
 # only on a subproject to reduce Jamfile parsing times considerably.
-DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
-	userlandfs ;
+#DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
+#	userlandfs ;
 
 
 # Copy the posix test suite onto the image (or on the installation) into 
 # "home/posixtestsuite" directory, including the run script.
-HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE = 1 ;
+#HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE = 1 ;
