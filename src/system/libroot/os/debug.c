@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -53,6 +53,8 @@ static const debug_string_entry sDebugExceptionTypeStrings[] = {
 	{ "Floating point exception",	B_FLOATING_POINT_EXCEPTION },
 	{ NULL, 0 }
 };
+
+bool _rtDebugFlag = true;
 
 
 void
@@ -180,14 +182,8 @@ get_debug_exception_string(debug_exception_type exception, char *buffer,
 }
 
 
-//	#pragma mark -
-//	Debug.h functions
+//	#pragma mark - Debug.h functions
 
-// TODO: verify these functions
-// TODO: add implementations for printfs?
-
-
-bool _rtDebugFlag = false;
 
 bool
 _debugFlag(void)
@@ -211,6 +207,9 @@ _debugPrintf(const char *fmt, ...)
 	va_list ap;
 	int ret;
 
+	if (!_rtDebugFlag)
+		return 0;
+
 	va_start(ap, fmt);
 	ret = vfprintf(stdout, fmt, ap);
 	va_end(ap);
@@ -222,9 +221,12 @@ _debugPrintf(const char *fmt, ...)
 int
 _sPrintf(const char *fmt, ...)
 {
-	char buffer[1024];
+	char buffer[512];
 	va_list ap;
 	int ret;
+
+	if (!_rtDebugFlag)
+		return 0;
 
 	va_start(ap, fmt);
 	ret = vsnprintf(buffer, sizeof(buffer), fmt, ap);
@@ -238,7 +240,7 @@ _sPrintf(const char *fmt, ...)
 
 
 int
-_xdebugPrintf(const char * fmt, ...)
+_xdebugPrintf(const char *fmt, ...)
 {
 	va_list ap;
 	int ret;
@@ -252,14 +254,15 @@ _xdebugPrintf(const char * fmt, ...)
 
 
 int
-_debuggerAssert(const char * file, int line, char *message)
+_debuggerAssert(const char *file, int line, char *message)
 {
 	char buffer[1024];
 	snprintf(buffer, sizeof(buffer),
 		"Assert failed: File: %s, Line: %d, %s",
 		file, line, message);
-	
-	debug_printf("%ld: ASSERT: %s\n", find_thread(NULL), buffer);
+
+	debug_printf("%ld: ASSERT: %s:%d %s\n", find_thread(NULL), file, line,
+		buffer);
 	_kern_debugger(buffer);
 
 	return 0;
