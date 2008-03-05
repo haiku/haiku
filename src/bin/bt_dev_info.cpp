@@ -1,29 +1,28 @@
 /*
- * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  */
- 
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <bluetooth/LocalDevice.h>
+#include <bluetooth/bdaddrUtils.h>
 
 
-void
-DumpInfo(LocalDevice* device)
+static void
+DumpInfo(LocalDevice &device)
 {
-
-
+        printf("[LocalDevice] %s\t%s\n", (device.GetFriendlyName()).String(),
+                                    bdaddrUtils::ToString(device.GetBluetoothAddress()));
 
 }
 
 static status_t
 LocalDeviceError(status_t status)
 {
-	// switch (status) {}
     fprintf(stderr,"No Device/s found");
     
     return status;
@@ -33,36 +32,33 @@ LocalDeviceError(status_t status)
 int
 main(int argc, char *argv[])
 {
-	LocalDevice* ld = NULL;
+        if(argc == 2) {
+            // device specified
+            LocalDevice* ld = LocalDevice::GetLocalDevice(atoi(argv[0]));
+            if (ld == NULL)
+               return LocalDeviceError(ENODEV);
 
-    if(argc == 2) {
-	    // device specified
-        ld = LocalDevice::GetLocalDevice(atoi(argv[0]));
-        if (ld == NULL)
-           return LocalDeviceError(ENODEV);
+            DumpInfo(*ld);
 
-        DumpInfo(ld);
+        } else if (argc == 1) {
+            // show all devices
+            LocalDevice* ld = NULL;
 
-    } else if (argc == 1) {
-        // show all devices
-        LocalDevice* firstLocalDevice = LocalDevice::GetLocalDevice();
+            printf("Listing %ld Bluetooth Local Devices ...\n", LocalDevice::GetLocalDeviceCount());
 
-        if (firstLocalDevice == NULL)
-            return LocalDeviceError(ENODEV);
+            for (uint32 index = 0 ; index < LocalDevice::GetLocalDeviceCount() ; index++) {
 
-        printf("Listing %ld Bluetooth devices ...\n", LocalDevice::GetLocalDeviceCount());
+               ld = LocalDevice::GetLocalDevice();
+               if (ld == NULL)
+                    return LocalDeviceError(ENODEV);
+               DumpInfo(*ld);
 
-        ld = firstLocalDevice;
-        do {
-           DumpInfo(ld);
-           ld = LocalDevice::GetLocalDevice();
+            }
 
-        } while (ld != firstLocalDevice);
+            return B_OK;
 
-    	return B_OK;
-
-    } else {
-        fprintf(stderr,"Usage: bt_dev_info [device]\n");
-        return B_ERROR;
-    }
+        } else {
+                fprintf(stderr,"Usage: bt_dev_info [device]\n");
+                return B_ERROR;
+        }
 }
