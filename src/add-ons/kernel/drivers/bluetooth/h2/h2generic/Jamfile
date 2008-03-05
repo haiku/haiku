@@ -7,6 +7,13 @@ UsePrivateHeaders net kernel bluetooth ;
 local r5_src =  ;
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os bluetooth ] : true ;
+	# HACKs HACKs HACKs...
+	# for <bluetooth/*> ...
+        UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
+	# for <net/*> hmmm...
+	UseHeaders [ FDirName $(HAIKU_TOP) headers private ] : true ;
+	# for USB_spec.h from Haiku
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers ] : true ;
 	r5_src = list.c ;
 }
 
