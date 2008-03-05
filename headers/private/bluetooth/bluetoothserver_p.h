@@ -8,5 +8,8 @@
 #define BT_MSG_ADQUIRE_LOCAL_DEVICE     'btAd'
 #define BT_MSG_GET_FRIENDLY_NAME        'btFn'
 #define BT_MSG_GET_ADDRESS              'btGa'
+#define BT_MSG_HANDLE_SIMPLE_REQUEST    'btsR'
+#define BT_MSG_ADD_DEVICE               'btDD'
+
 
 #endif
