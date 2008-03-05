@@ -15,7 +15,6 @@
 #include <USB_spec.h>
 #include <USB.h>
 
-#include <net/net_buffer.h>
 #include "snet_buffer.h"
 
 #include <bluetooth/bluetooth_util.h>

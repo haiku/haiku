@@ -15,7 +15,7 @@
 #include <bluetooth/HCI/btHCI.h>
 #include <bluetooth/HCI/btHCI_module.h>
 
-#include <net/net_buffer.h>
+#include <net_buffer.h>
 
 #include "snet_buffer.h"
 
