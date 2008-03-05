@@ -91,21 +91,23 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 	if (type == 0)
 		return B_OK;
 
+	uint32 newType;
+
 	switch (type) {
 		case B_MTR_UC:
-			type = IA32_MTR_UNCACHED;
+			newType = IA32_MTR_UNCACHED;
 			break;
 		case B_MTR_WC:
-			type = IA32_MTR_WRITE_COMBINING;
+			newType = IA32_MTR_WRITE_COMBINING;
 			break;
 		case B_MTR_WT:
-			type = IA32_MTR_WRITE_THROUGH;
+			newType = IA32_MTR_WRITE_THROUGH;
 			break;
 		case B_MTR_WP:
-			type = IA32_MTR_WRITE_PROTECTED;
+			newType = IA32_MTR_WRITE_PROTECTED;
 			break;
 		case B_MTR_WB:
-			type = IA32_MTR_WRITE_BACK;
+			newType = IA32_MTR_WRITE_BACK;
 			break;
 
 		default:
@@ -116,14 +118,19 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 		return B_NOT_SUPPORTED;
 
 	// length must be a power of 2; just round it up to the next value
-	length = nearest_power(length);
-	if (length + base <= base) {
+	uint64 newLength = nearest_power(length);
+
+	// avoids more than 2GB slots
+	if (newLength > 0x80000000)
+		newLength = 0x80000000;
+
+	if (newLength + base <= base) {
 		// 4GB overflow
 		return B_BAD_VALUE;
 	}
 
 	// base must be aligned to the length
-	if (base & (length - 1))
+	if (base & (newLength - 1))
 		return B_BAD_VALUE;
 
 	index = allocate_mtrr();
@@ -131,10 +138,16 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 		return B_ERROR;
 
 	TRACE(("allocate MTRR slot %ld, base = %Lx, length = %Lx\n", index,
-		base, length));
+		base, newLength));
 
 	sMemoryTypeIDs[index] = id;
-	x86_set_mtrr(index, base, length, type);
+	x86_set_mtrr(index, base, newLength, newType);
+
+	// now handle remaining memory
+	if (length > newLength) {
+		// TODO iterate over smaller lengths to avoid the PCI hole after the physical memory.
+		set_memory_type(id, base + newLength, length - newLength, type);
+	}
 
 	return B_OK;
 }
