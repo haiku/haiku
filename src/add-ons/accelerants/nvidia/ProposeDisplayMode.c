@@ -217,15 +217,19 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 				}
 				break;
 			default:
+#if 0
 				/* at least one analog monitor is connected, or nothing detected at all */
 				/* (if forcing widescreen type was requested don't block mode) */
 				if (target_aspect > 1.34 && !si->settings.force_ws) {
 					LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
 					return B_ERROR;
 				}
+#endif
 				break;
 		}
 
+// Wide screen modes are pretty common these days... - better use EDID!
+#if 0
 		/* only export widescreen panel-TV modes when an exact resolution match exists,
 		 * to prevent the modelist from becoming too crowded */
 		if (target_aspect > 1.61 && !si->settings.force_ws) {
@@ -246,6 +250,7 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 				return B_ERROR;
 			}
 		}
+#endif
 	}
 
 	/* check if panel(s) can display the requested resolution (if connected) */
