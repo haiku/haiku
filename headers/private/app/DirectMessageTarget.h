@@ -17,7 +17,6 @@ namespace BPrivate {
 class BDirectMessageTarget {
 	public:
 		BDirectMessageTarget();
-		~BDirectMessageTarget();
 
 		bool AddMessage(BMessage* message);
 
@@ -28,6 +27,8 @@ class BDirectMessageTarget {
 		BMessageQueue* Queue() { return &fQueue; }
 
 	private:
+		~BDirectMessageTarget();
+		
 		int32			fReferenceCount;
 		BMessageQueue	fQueue;
 		bool			fClosed;
