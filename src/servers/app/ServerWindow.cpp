@@ -1821,6 +1821,7 @@ fDesktop->LockSingleWindow();
 				// of the previous state
 				fCurrentLayer->SetUserClipping(NULL);
 			}
+			fCurrentDrawingRegionValid = false;
 
 			break;
 		}
