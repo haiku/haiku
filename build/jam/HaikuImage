@@ -57,7 +57,7 @@ BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	FileTypes Fonts Keyboard Keymap Media Menu Mouse Network Printers Screen
 	ScreenSaver Sounds Time VirtualMemory
 ;
-BEOS_DEMOS = BitmapDrawing BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
+BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
 	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot PictureTest
 	Playground Pulse Sudoku
 ;
