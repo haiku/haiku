@@ -108,7 +108,7 @@ uint32
 LocalDevice::GetLocalDeviceCount()
 {
     if (SRetrieveBluetoothMessenger() != B_OK)
-        return NULL;
+        return 0;
 
 	BMessage request(BT_MSG_COUNT_LOCAL_DEVICES);	
 	BMessage reply;
@@ -116,7 +116,7 @@ LocalDevice::GetLocalDeviceCount()
 	if (sfMessenger->SendMessage(&request, &reply) == B_OK)
 		return reply.FindInt32("count");
     else
-        return B_ERROR;
+        return 0;
 		
 }
 
@@ -165,14 +165,14 @@ LocalDevice::SetDiscoverable(int mode)
     BMessage reply;
 	int8	 bt_status = BT_ERROR;
 	
-    /* ADD ID */
+    
     request.AddInt32("hci_id", hid);
 	
-	/* Add command */
+	// TODO: Add the raw command to the BMessage + expected event
 
     if (fMessenger->SendMessage(&request, &reply) == B_OK) {
     	if (reply.FindInt8("status", &bt_status ) == B_OK ) {	    
-			
+			return bt_status;			
 			
 		}
 		
@@ -199,9 +199,7 @@ LocalDevice::GetBluetoothAddress()
     
     if (fMessenger->SendMessage(&request, &reply) == B_OK) {
     
-    	if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){		
-	    
-			printf("%s: %s size=%ld\n", __FUNCTION__, bdaddrUtils::ToString(*bdaddr), size);
+    	if (reply.FindData("bdaddr", B_ANY_TYPE, 0, (const void**)&bdaddr, &size) == B_OK ){
 			
 	    	return *bdaddr;
 	    
@@ -242,7 +240,8 @@ DeviceClass
 LocalDevice::GetDeviceClass()
 {
 
-	return NULL;
+	return DeviceClass(0);
+
 }
 
 
