@@ -19,6 +19,8 @@
 #include <unistd.h>
 #include <Drivers.h>
 #include <device/scsi.h>
+#include <fs_info.h>
+
 
 static int usage(char *prog)
 {
@@ -44,17 +46,18 @@ int main(int argc, char **argv)
 	char operation = 'e';
 	int i;
 	int ret;
+	
 	for (i = 1; i < argc; i++) {
-		if (strncmp(argv[i], "-", 1) == 0) {
+		if (strncmp(argv[i], "--h", 3) == 0) {
+			return usage("eject");
+		} else if (strncmp(argv[i], "-", 1) == 0) {
 			if (strlen(argv[i]) > 1)
 				operation = argv[i][1];
 			else {
 				usage("eject");
 				return 1;
 			}
-		} else if (strncmp(argv[i], "--h", 2) == 0)
-			return usage("eject");
-		else {
+		} else {
 			device = argv[i];
 			ret = do_eject(operation, device);
 			if (ret != 0)
@@ -72,6 +75,16 @@ static int do_eject(char operation, char *device)
 	bool bval;
 	int fd;
 	status_t devstatus;
+	fs_info info;
+
+	// if the path is not on devfs, it's probably on 
+	// the mountpoint of the device we want to act on.
+	// (should rather stat() for blk(char) device though).
+	if (fs_stat_dev(dev_for_path(device), &info) >= B_OK) {
+		if (strcmp(info.fsh_name, "devfs"))
+			device = info.device_name;
+	}
+
 	fd = open(device, O_RDONLY);
 	if (fd < 0) {
 		perror(device);
