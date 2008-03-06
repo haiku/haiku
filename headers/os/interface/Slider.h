@@ -28,7 +28,7 @@ enum thumb_style {
 };
 
 
-#define USE_OFF_SCREEN_VIEW 0
+#define USE_OFF_SCREEN_VIEW 1 
 
 
 class BSlider : public BControl {
