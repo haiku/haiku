@@ -271,7 +271,7 @@ AddSymlinkToHaikuImage beos bin : vim : view ;
 
 
 # scripts and data files
-local bootScripts = Bootscript SetupEnvironment Netscript InstallerInitScript
+local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript InstallerInitScript
 	InstallerFinishScript ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToHaikuImage beos system boot : $(bootScripts) ;
