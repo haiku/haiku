@@ -50,7 +50,7 @@
 
 //#define DEBUG_DESKTOP
 #ifdef DEBUG_DESKTOP
-#	define STRACE(a) printf(a)
+#	define STRACE(a) printf a
 #else
 #	define STRACE(a) ;
 #endif
