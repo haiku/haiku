@@ -72,13 +72,13 @@ fi
 
 # Launch Terminal or consoled depending on $SAFEMODE
 if [ "$SAFEMODE" != "yes" ]; then
-	if [ -x /boot/apps/Installer ]; then
-		launch /boot/apps/Installer
-		#/boot/apps/Terminal -x /boot/apps/Installer
+	if [ -x /boot/beos/apps/Installer ]; then
+		/boot/beos/apps/Installer
+		#/boot/beos/apps/Terminal -x /boot/beos/apps/Installer
 	else
-		#launch /boot/apps/Terminal
+		/boot/beos/apps/Terminal
 	fi
-	launch beos/apps/Terminal
+	#launch beos/apps/Terminal
 else
 	launch beos/bin/consoled
 fi
