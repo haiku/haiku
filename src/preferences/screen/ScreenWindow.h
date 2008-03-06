@@ -50,10 +50,8 @@ class ScreenWindow : public BWindow {
 
 		void Apply();
 
-		bool CanApply() const;
-		bool CanRevert() const;
-
 		status_t _WriteVesaModeFile(const screen_mode& mode) const;
+		status_t _ReadVesaModeFile(screen_mode& mode) const;		
 		bool _IsVesa() const { return fIsVesa; }
 
 		void LayoutControls(uint32 flags);
