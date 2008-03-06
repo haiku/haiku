@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src add-ons media media-add-ons videowindow ;
+
+Addon video_window_demo.media_addon :
+    VideoAddOn.cpp
+    VideoNode.cpp
+    VideoView.cpp
+    VideoWindow.cpp
+	: be media
+;

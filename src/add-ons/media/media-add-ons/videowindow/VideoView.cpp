@@ -3,39 +3,32 @@
  *
  * Distributed under the terms of the MIT License.
  */
-#include <Bitmap.h>
-#include <MediaRoster.h>
-#include "VideoView.h"
 #include "VideoNode.h"
+#include "VideoView.h"
+#include "debug.h"
+
+#include <Bitmap.h>
+#include <Locker.h>
+#include <MediaRoster.h>
+#include <Message.h>
+
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-VideoView::VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
+
+VideoView::VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 flags, VideoNode *node)
  :	BView(frame, name, resizeMask, flags)
- ,	fVideoNode(0)
+ ,	fVideoNode(node)
  ,	fOverlayActive(false)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-
-	status_t err = B_OK;
-	BMediaRoster *mroster = BMediaRoster::Roster(&err);
-	if (!mroster || err) {
-		printf("VideoView::VideoView: media_server is dead\n");
-		exit(1);
-	} else {
-		fVideoNode = new VideoNode("video in", this);
-		err = mroster->RegisterNode(fVideoNode);
-	}
 }
 
 
 VideoView::~VideoView()
 {	
-	if (fVideoNode) {
-		BMediaRoster::Roster()->UnregisterNode(fVideoNode);
-		delete fVideoNode;
-	}
 }
 
 
@@ -55,14 +48,14 @@ VideoView::Node()
 void
 VideoView::OverlayLockAcquire()
 {
-   printf("VideoView::OverlayLockAcquire\n");
+	CALLED();
 }
 
 
 void
 VideoView::OverlayLockRelease()
 {
-   printf("VideoView::OverlayLockRelease\n");
+	CALLED();
 	// overlaybitmap->UnlockBits	
 }
 
@@ -70,7 +63,7 @@ VideoView::OverlayLockRelease()
 void
 VideoView::OverlayScreenshotPrepare()
 {
-	printf("OverlayScreenshotPrepare enter\n");
+	CALLED();
 /*
 	fVideoNode->LockBitmap();
 	if (fOverlayActive) {
@@ -88,14 +81,13 @@ VideoView::OverlayScreenshotPrepare()
 	}
 	fVideoNode->UnlockBitmap();
 */
-	printf("OverlayScreenshotPrepare leave\n");
 }
 
 
 void
 VideoView::OverlayScreenshotCleanup()
 {
-	printf("OverlayScreenshotCleanup enter\n");
+	CALLED();
 /*
 	snooze(50000); // give app server some time to take the screenshot
 	fVideoNode->LockBitmap();
@@ -110,15 +102,14 @@ VideoView::OverlayScreenshotCleanup()
 	}
 	fVideoNode->UnlockBitmap();
 */
-	printf("OverlayScreenshotCleanup leave\n");
 }
 
 
 void
 VideoView::RemoveVideoDisplay()
 {
-	printf("VideoView::RemoveVideoDisplay\n");
-	
+	CALLED();
+
 	if (fOverlayActive) {
 		ClearViewOverlay();
 		fOverlayActive = false;
@@ -130,7 +121,7 @@ VideoView::RemoveVideoDisplay()
 void
 VideoView::RemoveOverlay()
 {
-	printf("VideoView::RemoveOverlay\n");
+	CALLED();
 	if (LockLooperWithTimeout(50000) == B_OK) {
 		ClearViewOverlay();
 		fOverlayActive = false;
@@ -148,7 +139,10 @@ VideoView::Draw(BRect updateRect)
 	} else {
 		fVideoNode->LockBitmap();
 		BBitmap *bmp = fVideoNode->Bitmap();
-		if (bmp)
+		if (!bmp) {
+			SetHighColor(0, 0, 0, 0);
+			FillRect(updateRect);
+		} else 
 			DrawBitmap(bmp, Bounds());
 		fVideoNode->UnlockBitmap();
 	}
@@ -158,8 +152,8 @@ VideoView::Draw(BRect updateRect)
 void
 VideoView::DrawFrame()
 {
-//	printf("VideoView::DrawFrame\n");
-	
+	//CALLED();
+
 	bool want_overlay = fVideoNode->IsOverlayActive();
 
 	if (!want_overlay && fOverlayActive) {
@@ -168,9 +162,10 @@ VideoView::DrawFrame()
 			UnlockLooper();			
 			fOverlayActive = false;
 		} else {
-			printf("can't ClearViewOverlay, as LockLooperWithTimeout failed\n");
+			fprintf(stderr, "VideoView::DrawFrame: cannot ClearViewOverlay, as LockLooperWithTimeout failed\n");
 		}
 	}
+
 	if (want_overlay && !fOverlayActive) {
 		fVideoNode->LockBitmap();
 		BBitmap *bmp = fVideoNode->Bitmap();
@@ -247,4 +242,3 @@ VideoView::IsOverlaySupported()
 	}
 	return supported;
 }
-

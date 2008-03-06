@@ -1,51 +1,78 @@
 /*
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
+ * Copyright (C) 2008 Maurice Kalinowski <haiku@kaldience.com>. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
-#include <stdio.h>
-#include <string.h>
-#include <Window.h>
-#include <TimeSource.h>
-#include <MediaRoster.h>
-#include <BufferGroup.h>
-#include <Buffer.h>
-#include <Bitmap.h>
-#include <Locker.h>
-#include <Debug.h>
-
 #include "VideoNode.h"
 #include "VideoView.h"
+#include "VideoWindow.h"
 
 
-VideoNode::VideoNode(const char *name, VideoView *view)
+#include <Bitmap.h>
+#include <Buffer.h>
+#include <BufferGroup.h>
+#include <Debug.h>
+#include <MediaRoster.h>
+#include <Locker.h>
+#include <TimeSource.h>
+#include <Window.h>
+#include <stdio.h>
+#include <string.h>
+
+
+VideoNode::VideoNode(const char *name)
  :	BMediaNode(name)
  ,	BMediaEventLooper()
  ,	BBufferConsumer(B_MEDIA_RAW_VIDEO)
- ,	fVideoView(view)
+ ,	fWindow(0)
+ ,	fVideoView(0)
  ,	fInput()
  ,	fOverlayEnabled(true)
  ,	fOverlayActive(false)
  ,	fDirectOverlayBuffer(false)
  ,	fBitmap(0)
  ,	fBitmapLocker(new BLocker("Video Node Locker"))
+ ,	fAddOn(0)
+ ,	fInternalFlavorId(0)
 {
+	_InitDisplay();
 }
 
+
+VideoNode::VideoNode(const char *name, BMediaAddOn* addon, int32 id)
+ :	BMediaNode(name)
+ ,	BMediaEventLooper()
+ ,	BBufferConsumer(B_MEDIA_RAW_VIDEO)
+ ,	fWindow(0)
+ ,	fVideoView(0)
+ ,	fInput()
+ ,	fOverlayEnabled(true)
+ ,	fOverlayActive(false)
+ ,	fDirectOverlayBuffer(false)
+ ,	fBitmap(0)
+ ,	fBitmapLocker(new BLocker("Video Node Locker"))
+ ,	fAddOn(addon)
+ ,	fInternalFlavorId(id)
+{
+	_InitDisplay();
+}
 
 VideoNode::~VideoNode()
 {
 	Quit();
 	DeleteBuffers();
 	delete fBitmapLocker;
+	if (fWindow)
+		fWindow->Quit();
 }
 
 
 BMediaAddOn	*
 VideoNode::AddOn(int32 *internal_id) const
 {
-	*internal_id = 0;
-	return NULL;
+	*internal_id = fInternalFlavorId;
+	return fAddOn;
 }
 
 
@@ -127,7 +154,7 @@ VideoNode::HandleEvent(const media_timed_event *event,
 			HandleBuffer((BBuffer *)event->pointer);
 			break;
 		default:
-			printf("VideoNode::HandleEvent unknown event");
+			fprintf(stderr, "VideoNode::HandleEvent unknown event");
 			break;
 	}			
 }
@@ -149,11 +176,12 @@ VideoNode::GetLatencyFor(const media_destination &dst,
 {
 	if (dst != fInput.destination)
 		return B_MEDIA_BAD_DESTINATION;
-	
+
 	*out_latency = 10000;
 	*out_id = TimeSource()->ID();
 	return B_OK;
 }
+
 
 status_t
 VideoNode::AcceptFormat(const media_destination &dst,
@@ -166,16 +194,14 @@ VideoNode::AcceptFormat(const media_destination &dst,
 	 *                BBufferConsumer::Connected
 	 *                BBufferProducer::Connect
 	 */
-	
 	if (dst != fInput.destination)
 		return B_MEDIA_BAD_DESTINATION;	
-	
+
 	if (format->type == B_MEDIA_NO_TYPE)
 		format->type = B_MEDIA_RAW_VIDEO;
-	
+
 	if (format->type != B_MEDIA_RAW_VIDEO)
 		return B_MEDIA_BAD_FORMAT;
-
 
 	return B_OK;	
 }
@@ -210,15 +236,19 @@ VideoNode::Connected(const media_source &src,
 
 	DeleteBuffers();
 	err = CreateBuffers(frame, colorspace, fOverlayEnabled);
+	if (err && fOverlayEnabled) {
+		SetOverlayEnabled(false);
+		err = CreateBuffers(frame, colorspace, fOverlayEnabled);
+	}
+
 	if (err) {
-		printf("VideoNode::Connected failed, fOverlayEnabled = %d\n", fOverlayEnabled);
+		fprintf(stderr, "VideoNode::Connected failed, fOverlayEnabled = %d\n", fOverlayEnabled);
 		return err;
 	}	
 
 	*out_input = fInput;
 
 	return B_OK;
-	
 }
 
 
@@ -244,7 +274,6 @@ VideoNode::FormatChanged(const media_source &src,
 						 int32 from_change_count,
 						 const media_format &format)
 {
-	printf("VideoNode::FormatChanged enter\n");
 	if (src != fInput.source)
 		return B_MEDIA_BAD_SOURCE;
 	if (dst != fInput.destination)
@@ -259,20 +288,20 @@ VideoNode::FormatChanged(const media_source &src,
 		fVideoView->RemoveOverlay();
 		err = CreateBuffers(frame, colorspace, true); // try overlay
 		if (err) {
-			printf("VideoNode::FormatChanged creating overlay buffer failed\n");
+			fprintf(stderr, "VideoNode::FormatChanged creating overlay buffer failed\n");
 			err = CreateBuffers(frame, colorspace, false); // no overlay
 		}
 	} else {
 		err = CreateBuffers(frame, colorspace, false); // no overlay
 	}
+
 	if (err) {
-		printf("VideoNode::FormatChanged failed (lost buffer group!)\n");
+		fprintf(stderr, "VideoNode::FormatChanged failed (lost buffer group!)\n");
 		return B_MEDIA_BAD_FORMAT;
 	}	
 
 	fInput.format = format;
 
-	printf("VideoNode::FormatChanged leave\n");
 	return B_OK;	
 }
 
@@ -280,10 +309,8 @@ VideoNode::FormatChanged(const media_source &src,
 void
 VideoNode::HandleBuffer(BBuffer *buffer)
 {
-//	printf("VideoNode::HandleBuffer\n");
-	
 	LockBitmap();
-	if (fBitmap) {
+	if (fBitmap && fWindow && fVideoView) {
 //		bigtime_t start = system_time();
 		if (fOverlayActive) {
 			if (B_OK == fBitmap->LockBits()) {
@@ -341,8 +368,8 @@ VideoNode::IsOverlayActive()
 status_t
 VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 {
-	printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, overlay %d\n", 
-		int(frame.left), int(frame.top), int(frame.right), int(frame.bottom), int(cspace), overlay);
+	//printf("VideoNode::CreateBuffers: frame %d,%d,%d,%d colorspace 0x%08x, overlay %d\n", 
+	//	int(frame.left), int(frame.top), int(frame.right), int(frame.bottom), int(cspace), overlay);
 
 	LockBitmap();
 	ASSERT(fBitmap == 0);
@@ -353,12 +380,12 @@ VideoNode::CreateBuffers(BRect frame, color_space cspace, bool overlay)
 		fBitmap = 0;
 		fOverlayActive = false;
 		UnlockBitmap();
-		printf("VideoNode::CreateBuffers failed\n");
+		fprintf(stderr, "VideoNode::CreateBuffers failed\n");
 		return B_ERROR;
 	}
 	fOverlayActive = overlay;
 	UnlockBitmap();
-	printf("VideoNode::CreateBuffers success\n");
+
 	return B_OK;
 }
 
@@ -370,4 +397,17 @@ VideoNode::DeleteBuffers()
 	delete fBitmap;
 	fBitmap = NULL;
 	UnlockBitmap();
+}
+
+
+void
+VideoNode::_InitDisplay()
+{
+	// TODO: Get rid of hardcoded values
+	BRect size(0,0,320,240);
+	fVideoView = new VideoView(size, "Video View", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE, this);
+
+	size.OffsetBy(40.f, 40.f);
+	fWindow = new VideoWindow(size, fVideoView);
+	fWindow->Show();
 }

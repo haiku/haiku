@@ -1,25 +1,34 @@
 /*
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
+ * Copyright (C) 2008 Maurice Kalinowski <haiku@kaldience.com>. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
 #ifndef __VIDEO_NODE_H_
 #define __VIDEO_NODE_H_
 
+
 #include <BufferConsumer.h>
 #include <MediaEventLooper.h>
 
+
+class BBitmap;
+class BLocker;
+class BWindow;
 class VideoView;
+class VideoWindow;
+
 
 class VideoNode : public BMediaEventLooper, public BBufferConsumer
 {
 public:
-					VideoNode(const char *name, VideoView *view);
+					VideoNode(const char *name);
+					VideoNode(const char *name, BMediaAddOn* addon, int32 id);
 					~VideoNode();
 
 	void			SetOverlayEnabled(bool yesno);
 	bool			IsOverlayActive();
-	
+
 	void			LockBitmap();
 	BBitmap *		Bitmap();
 	void			UnlockBitmap();
@@ -52,7 +61,7 @@ protected:
 							const media_destination &dst,
 							int32 status,
 							bigtime_t at_media_time);
-															
+
 	status_t		GetLatencyFor(
 							const media_destination &dst,
 							bigtime_t *out_latency,
@@ -74,12 +83,13 @@ protected:
 							int32 from_change_count,
 							const media_format &format);
 
-protected:
 	void			HandleBuffer(BBuffer *buffer);
 	status_t		CreateBuffers(BRect frame, color_space cspace, bool overlay);
 	void			DeleteBuffers();
 
-protected:
+private:
+	void			_InitDisplay();
+	VideoWindow *	fWindow;
 	VideoView *		fVideoView;
 	media_input		fInput;
 	bool			fOverlayEnabled;
@@ -87,6 +97,8 @@ protected:
 	bool			fDirectOverlayBuffer;	// If the overlay memory is directly written by the producer node.
 	BBitmap *		fBitmap;
 	BLocker	*		fBitmapLocker;
+	BMediaAddOn*	fAddOn;
+	int32			fInternalFlavorId;
 };
 
 #endif
