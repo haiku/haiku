@@ -1,0 +1,99 @@
+## The system's main CD boot script.
+
+##
+## Some functions used by the main script
+##
+
+# launch <executable path> [thread to wait for]
+
+launch() {
+	if [ -f "/boot/$1" ]
+	then
+		"/boot/$1" &
+		[ "$2" != "" ] && waitfor "$2"
+		return 1
+	else
+		echo There is no "$1"
+	fi
+	return 0
+}
+
+# launchscript <script path>
+
+launchscript() {
+	if [ -f "/boot/$1" ]
+	then
+		. "/boot/$1"
+	fi
+}
+
+# runprog <executable path>
+
+runprog() {
+	if [ -f "/boot/$1" ]
+	then
+		"/boot/$1"
+		return 1
+	else
+		echo There is no "$1"
+	fi
+	return 0
+}
+
+##
+## Main script starts here
+##
+
+# block the CD tray (avoid accidental ejection)
+/bin/eject -b /boot
+
+# Launch servers
+
+# We must wait for the app_server and registrar to be ready
+launch $SERVERS/registrar _roster_thread_	# launch registrar
+
+#launch $SERVERS/debug_server				# launch debug_server
+
+# Init Network
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/net_server				# launch net_server
+fi
+
+if [ "$SAFEMODE" != "yes" ]; then
+	launch $SERVERS/app_server picasso		# launch app_server
+else
+	launch $SERVERS/fake_app_server picasso
+fi
+
+if [ "$SAFEMODE" != "yes" ]; then
+	#launch $SERVERS/syslog_daemon
+	waitfor _input_server_event_loop_		# wait for input devices
+fi
+
+# Launch Terminal or consoled depending on $SAFEMODE
+if [ "$SAFEMODE" != "yes" ]; then
+	if [ -x /boot/apps/Installer ]; then
+		launch /boot/apps/Installer
+		#/boot/apps/Terminal -x /boot/apps/Installer
+	else
+		#launch /boot/apps/Terminal
+	fi
+	launch beos/apps/Terminal
+else
+	launch beos/bin/consoled
+fi
+
+# sync disks
+sync
+
+# prepare for reboot
+# (reboot quickly in 10 seconds)
+# (we must start the shutdown process before /boot is ejected)
+/bin/shutdown -r -q -d 10 &
+
+# unblock the CD tray
+/bin/eject -u /boot
+# and open it before rebooting
+/bin/eject /boot
+
+

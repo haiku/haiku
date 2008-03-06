@@ -59,6 +59,13 @@ export SAFEMODE=`/bin/safemode`
 
 launchscript $SCRIPTS/SetupEnvironment
 
+# If the boot volume is a CD we use another script
+iw=`/bin/isvolume -readonly /boot`
+if [ "$iw" = "yes" ]; then
+	launchscript $SCRIPTS/Bootscript.cd
+	exit 0 # and return
+fi
+
 # Sets timezone etc.
 runprog beos/bin/clockconfig
 
