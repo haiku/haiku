@@ -26,10 +26,8 @@ class Prefs {
 			deskbar_active_color, deskbar_idle_color, deskbar_frame_color;
 		bool normal_fade_colors;
 
-		bool fatalerror;
-		
 	private:
-		BFile *file;
+		BFile *fFile;
 
 		bool GetInt(char *name, int *value, int *defaultvalue);
 		bool GetBool(char *name, bool *value, bool *defaultvalue);
@@ -42,6 +40,8 @@ class Prefs {
 		void ComputeNormalWindowSize();
 		BRect GetNormalWindowRect();
 		BRect GetMiniWindowRect();
+
+		bool fFatalError;
 };
 
-#endif
+#endif	// PREFS_H

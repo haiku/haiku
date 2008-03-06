@@ -9,37 +9,45 @@
 //****************************************************************************************
 
 #include "Prefs.h"
-#include "Common.h"
-#include "PulseApp.h"
-#include <FindDirectory.h>
-#include <Path.h>
-#include <interface/Screen.h>
-#include <kernel/OS.h>
+
 #include <stdio.h>
 #include <string.h>
 
+#include <FindDirectory.h>
+#include <OS.h>
+#include <Path.h>
+#include <Screen.h>
+
+#include "Common.h"
+#include "PulseApp.h"
+
+
 Prefs::Prefs()
-: fatalerror(false)
+	:
+	fFatalError(false)
 {
 	BPath path;
 	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
 	path.Append("Pulse_settings");
-	file = new BFile(path.Path(), B_READ_WRITE | B_CREATE_FILE);
-	if (file->InitCheck() != B_OK) {
-		fatalerror = true;
-		return;
+	fFile = new BFile(path.Path(), B_READ_WRITE | B_CREATE_FILE);
+	if (fFile->InitCheck() != B_OK) {
+		// try to open read-only
+		if (fFile->SetTo(path.Path(), B_READ_ONLY) != B_OK) {
+			fFatalError = true;
+			return;
+		}
 	}
 
 	int i = NORMAL_WINDOW_MODE;
 	if (!GetInt("window_mode", &window_mode, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	// These three prefs require a connection to the app_server
 	BRect r = GetNormalWindowRect();
 	if (!GetRect("normal_window_rect", &normal_window_rect, &r)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 	// While normal window position is under user control, size is not.
@@ -49,61 +57,61 @@ Prefs::Prefs()
 	
 	r = GetMiniWindowRect();
 	if (!GetRect("mini_window_rect", &mini_window_rect, &r)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	r.Set(100, 100, 415, 329);
 	if (!GetRect("prefs_window_rect", &prefs_window_rect, &r)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	i = DEFAULT_NORMAL_BAR_COLOR;
 	if (!GetInt("normal_bar_color", &normal_bar_color, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	i = DEFAULT_MINI_ACTIVE_COLOR;
 	if (!GetInt("mini_active_color", &mini_active_color, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	i = DEFAULT_MINI_IDLE_COLOR;
 	if (!GetInt("mini_idle_color", &mini_idle_color, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	i = DEFAULT_MINI_FRAME_COLOR;
 	if (!GetInt("mini_frame_color", &mini_frame_color, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	i = DEFAULT_DESKBAR_ACTIVE_COLOR;
 	if (!GetInt("deskbar_active_color", &deskbar_active_color, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	i = DEFAULT_DESKBAR_IDLE_COLOR;
 	if (!GetInt("deskbar_idle_color", &deskbar_idle_color, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	i = DEFAULT_DESKBAR_FRAME_COLOR;
 	if (!GetInt("deskbar_frame_color", &deskbar_frame_color, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
 	bool b = DEFAULT_NORMAL_FADE_COLORS;
 	if (!GetBool("normal_fade_colors", &normal_fade_colors, &b)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 
@@ -113,7 +121,7 @@ Prefs::Prefs()
 	if (i < GetMinimumViewWidth())
 		i = GetMinimumViewWidth();
 	if (!GetInt("deskbar_icon_width", &deskbar_icon_width, &i)) {
-		fatalerror = true;
+		fFatalError = true;
 		return;
 	}
 }
@@ -121,7 +129,7 @@ Prefs::Prefs()
 
 Prefs::~Prefs()
 {
-	delete file;
+	delete fFile;
 }
 
 
@@ -131,7 +139,8 @@ Prefs::GetNormalWindowHeight()
 	system_info sys_info;
 	get_system_info(&sys_info);
 
-	float height = PROGRESS_MTOP + PROGRESS_MBOTTOM + sys_info.cpu_count * ITEM_OFFSET;
+	float height = PROGRESS_MTOP + PROGRESS_MBOTTOM
+		+ sys_info.cpu_count * ITEM_OFFSET;
 	if (PULSEVIEW_MIN_HEIGHT > height)
 		height = PULSEVIEW_MIN_HEIGHT;
 
@@ -173,17 +182,16 @@ Prefs::GetMiniWindowRect()
 bool
 Prefs::GetInt(char *name, int *value, int *defaultvalue)
 {
-	status_t err = file->ReadAttr(name, B_INT32_TYPE, 0, value, 4);
+	status_t err = fFile->ReadAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err == B_ENTRY_NOT_FOUND) {
 		*value = *defaultvalue;
-		if (file->WriteAttr(name, B_INT32_TYPE, 0, defaultvalue, 4) < 0) {
+		if (fFile->WriteAttr(name, B_INT32_TYPE, 0, defaultvalue, 4) < 0) {
 			printf("WriteAttr on %s died\n", name);
-			fatalerror = true;
-			return false;
+			fFatalError = true;
 		}
 	} else if  (err < 0) {
 		printf("Unknown error reading %s:\n%s\n", name, strerror(err));
-		fatalerror = true;
+		fFatalError = true;
 		return false;
 	}
 	return true;
@@ -193,17 +201,16 @@ Prefs::GetInt(char *name, int *value, int *defaultvalue)
 bool
 Prefs::GetBool(char *name, bool *value, bool *defaultvalue)
 {
-	status_t err = file->ReadAttr(name, B_BOOL_TYPE, 0, value, 1);
+	status_t err = fFile->ReadAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err == B_ENTRY_NOT_FOUND) {
 		*value = *defaultvalue;
-		if (file->WriteAttr(name, B_BOOL_TYPE, 0, defaultvalue, 1) < 0) {
+		if (fFile->WriteAttr(name, B_BOOL_TYPE, 0, defaultvalue, 1) < 0) {
 			printf("WriteAttr on %s died\n", name);
-			fatalerror = true;
-			return false;
+			fFatalError = true;
 		}
 	} else if (err < 0) {
 		printf("Unknown error reading %s:\n%s\n", name, strerror(err));
-		fatalerror = true;
+		fFatalError = true;
 		return false;
 	}
 	return true;
@@ -213,17 +220,16 @@ Prefs::GetBool(char *name, bool *value, bool *defaultvalue)
 bool
 Prefs::GetRect(char *name, BRect *value, BRect *defaultvalue)
 {
-	status_t err = file->ReadAttr(name, B_RECT_TYPE, 0, value, sizeof(BRect));
+	status_t err = fFile->ReadAttr(name, B_RECT_TYPE, 0, value, sizeof(BRect));
 	if (err == B_ENTRY_NOT_FOUND) {
 		*value = *defaultvalue;
-		if (file->WriteAttr(name, B_RECT_TYPE, 0, defaultvalue, sizeof(BRect)) < 0) {
+		if (fFile->WriteAttr(name, B_RECT_TYPE, 0, defaultvalue, sizeof(BRect)) < 0) {
 			printf("WriteAttr on %s died\n", name);
-			fatalerror = true;
-			return false;
+			fFatalError = true;
 		}
 	} else if (err < 0) {
 		printf("Unknown error reading %s:\n%s\n", name, strerror(err));
-		fatalerror = true;
+		fFatalError = true;
 		return false;
 	}
 	return true;
@@ -233,10 +239,10 @@ Prefs::GetRect(char *name, BRect *value, BRect *defaultvalue)
 bool
 Prefs::PutInt(char *name, int *value)
 {
-	status_t err = file->WriteAttr(name, B_INT32_TYPE, 0, value, 4);
+	status_t err = fFile->WriteAttr(name, B_INT32_TYPE, 0, value, 4);
 	if (err < 0) {
 		printf("Unknown error writing %s:\n%s\n", name, strerror(err));
-		fatalerror = true;
+		fFatalError = true;
 		return false;
 	}
 	return true;
@@ -246,10 +252,10 @@ Prefs::PutInt(char *name, int *value)
 bool
 Prefs::PutBool(char *name, bool *value)
 {
-	status_t err = file->WriteAttr(name, B_BOOL_TYPE, 0, value, 1);
+	status_t err = fFile->WriteAttr(name, B_BOOL_TYPE, 0, value, 1);
 	if (err < 0) {
 		printf("Unknown error writing %s:\n%s\n", name, strerror(err));
-		fatalerror = true;
+		fFatalError = true;
 		return false;
 	}
 	return true;
@@ -259,10 +265,10 @@ Prefs::PutBool(char *name, bool *value)
 bool
 Prefs::PutRect(char *name, BRect *value)
 {
-	status_t err = file->WriteAttr(name, B_RECT_TYPE, 0, value, sizeof(BRect));
+	status_t err = fFile->WriteAttr(name, B_RECT_TYPE, 0, value, sizeof(BRect));
 	if (err < 0) {
 		printf("Unknown error writing %s:\n%s\n", name, strerror(err));
-		fatalerror = true;
+		fFatalError = true;
 		return false;
 	}
 	return true;
@@ -272,7 +278,7 @@ Prefs::PutRect(char *name, BRect *value)
 bool
 Prefs::Save()
 {
-	if (fatalerror)
+	if (fFatalError)
 		return false;
 
 	if (!PutInt("window_mode", &window_mode)
