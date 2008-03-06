@@ -747,8 +747,8 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 	if (mask & B_STAT_MODE) {
 		PRINT(("original mode = %ld, stat->st_mode = %d\n", node.Mode(), stat->st_mode));
-		node.mode = HOST_ENDIAN_TO_BFS_INT32(node.Mode() & ~S_IUMSK
-			| stat->st_mode & S_IUMSK);
+		node.mode = HOST_ENDIAN_TO_BFS_INT32((node.Mode() & ~S_IUMSK)
+			| (stat->st_mode & S_IUMSK));
 	}
 
 	if (mask & B_STAT_UID)

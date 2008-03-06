@@ -226,9 +226,9 @@ Index::Update(Transaction &transaction, const char *name, int32 type,
 	uint16 newLength, Inode *inode)
 {
 	if (name == NULL
-		|| oldKey == NULL && newKey == NULL
-		|| oldKey != NULL && oldLength == 0
-		|| newKey != NULL && newLength == 0)
+		|| (oldKey == NULL && newKey == NULL)
+		|| (oldKey != NULL && oldLength == 0)
+		|| (newKey != NULL && newLength == 0))
 		return B_BAD_VALUE;
 
 	// B_MIME_STRING_TYPE is the only supported non-standard type

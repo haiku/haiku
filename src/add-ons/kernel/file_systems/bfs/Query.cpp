@@ -1,13 +1,14 @@
-/* Query - query parsing and evaluation
- *
- * The pattern matching is roughly based on code originally written
- * by J. Kercheval, and on code written by Kenneth Almquist, though
- * it shares no code.
- *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
+/*!	Query parsing and evaluation
+
+	The pattern matching is roughly based on code originally written
+	by J. Kercheval, and on code written by Kenneth Almquist, though
+	it shares no code.
+*/
 
 #include "Query.h"
 #include "bfs.h"
@@ -1190,10 +1191,10 @@ Operator::Score() const
 }
 
 
-status_t 
+status_t
 Operator::InitCheck()
 {
-	if (fOp != OP_AND && fOp != OP_OR
+	if ((fOp != OP_AND && fOp != OP_OR)
 		|| fLeft == NULL || fLeft->InitCheck() < B_OK
 		|| fRight == NULL || fRight->InitCheck() < B_OK)
 		return B_ERROR;

@@ -360,7 +360,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 
 	fJournal = new Journal(this);
 	// replaying the log is the first thing we will do on this disk
-	if (fJournal && fJournal->InitCheck() < B_OK
+	if ((fJournal != NULL && fJournal->InitCheck() < B_OK)
 		|| fBlockAllocator.Initialize() < B_OK) {
 		// ToDo: improve error reporting for a bad journal
 		FATAL(("could not initialize journal/block bitmap allocator!\n"));

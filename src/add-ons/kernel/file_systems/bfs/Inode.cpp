@@ -1245,7 +1245,7 @@ Inode::IsEmpty()
 		if (Mode() & (S_ATTR_DIR | S_INDEX_DIR))
 			return false;
 
-		if (++count > 2 || strcmp(".", name) && strcmp("..", name))
+		if (++count > 2 || (strcmp(".", name) && strcmp("..", name)))
 			return false;
 	}
 	return true;
