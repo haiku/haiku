@@ -690,6 +690,7 @@ AboutView::MessageReceived(BMessage *msg)
 			BEntry ent;
 			if (fAppsQuery.GetNextEntry(&ent) < B_OK) {
 				fAppsQuery.Clear();
+				fCreditsView->MakeSelectable(true);
 				break;
 			}
 			BFile file;
