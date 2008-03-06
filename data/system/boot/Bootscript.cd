@@ -66,7 +66,7 @@ else
 fi
 
 if [ "$SAFEMODE" != "yes" ]; then
-	#launch $SERVERS/syslog_daemon
+	launch $SERVERS/syslog_daemon
 	waitfor _input_server_event_loop_		# wait for input devices
 fi
 
