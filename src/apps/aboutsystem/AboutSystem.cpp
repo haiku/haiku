@@ -321,6 +321,7 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetFlags(fCreditsView->Flags() | B_FRAME_EVENTS );
 	fCreditsView->SetStylable(true);
 	fCreditsView->MakeEditable(false);
+	fCreditsView->MakeSelectable(false);
 	fCreditsView->SetWordWrap(true);
 
 	BScrollView *creditsScroller = new BScrollView("creditsScroller",
