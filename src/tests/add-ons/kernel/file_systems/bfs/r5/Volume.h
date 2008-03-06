@@ -1,6 +1,5 @@
-/* Volume - BFS super block, mounting, etc.
- *
- * Initial version by Axel Dörfler, axeld@pinc-software.de
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef VOLUME_H
@@ -8,7 +7,7 @@
 
 
 #include <KernelExport.h>
-#include <fs_interface.h>
+#include "fsproto.h"
 
 #include "cache.h"
 
@@ -31,7 +30,7 @@ enum volume_initialize_flags {
 
 class Volume {
 	public:
-		Volume(mount_id id);
+		Volume(dev_t id);
 		~Volume();
 
 		status_t			Mount(const char *device, uint32 flags);
@@ -53,7 +52,7 @@ class Volume {
 		vint32				&LogEnd() { return fLogEnd; }
 		int					Device() const { return fDevice; }
 
-		mount_id			ID() const { return fID; }
+		dev_t				ID() const { return fID; }
 		const char			*Name() const { return fSuperBlock.name; }
 
 		off_t				NumBlocks() const { return fSuperBlock.NumBlocks(); }
@@ -112,7 +111,7 @@ class Volume {
 		static status_t		Identify(int fd, disk_super_block *superBlock);
 
 	protected:
-		mount_id			fID;
+		dev_t				fID;
 		int					fDevice;
 		disk_super_block	fSuperBlock;
 

@@ -1,11 +1,17 @@
-/* Journal - transaction and logging
- *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 #ifndef JOURNAL_H
 #define JOURNAL_H
 
+
+#include "Debug.h"
+#include "Volume.h"
+#include "Chain.h"
+#include "Utility.h"
+
+#include "cache.h"
 
 #include <KernelExport.h>
 #include <util/DoublyLinkedList.h>
@@ -13,12 +19,6 @@
 #ifdef USER
 #	include <stdio.h>
 #endif
-
-#include "cache.h"
-
-#include "Volume.h"
-#include "Chain.h"
-#include "Utility.h"
 
 
 struct run_array;

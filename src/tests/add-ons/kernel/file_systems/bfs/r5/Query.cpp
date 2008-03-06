@@ -4,7 +4,7 @@
  * by J. Kercheval, and on code written by Kenneth Almquist, though
  * it shares no code.
  *
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1504,7 +1504,7 @@ Query::GetNextEntry(struct dirent *dirent, size_t size)
 			if (!fStack.Pop(&fCurrent)
 				|| fCurrent == NULL
 				|| fCurrent->PrepareQuery(fVolume, fIndex, &fIterator,
-						fFlags & B_QUERY_NON_INDEXED) < B_OK)
+						false/*fFlags & B_QUERY_NON_INDEXED*/) < B_OK)
 				return B_ENTRY_NOT_FOUND;
 		}
 		if (fCurrent == NULL)

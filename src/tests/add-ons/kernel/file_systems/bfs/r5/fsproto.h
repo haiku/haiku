@@ -238,19 +238,25 @@ typedef struct vnode_ops {
 extern "C" {
 #endif
 
-extern _IMPEXP_KERNEL int		new_path(const char *path, char **copy);
-extern _IMPEXP_KERNEL void		free_path(char *p);
+extern _IMPEXP_KERNEL int	new_path(const char *path, char **copy);
+extern _IMPEXP_KERNEL void	free_path(char *p);
 
-extern _IMPEXP_KERNEL void		notify_select_event(selectsync *sync, uint32 ref);
-extern _IMPEXP_KERNEL status_t	is_vnode_removed(nspace_id nsid, vnode_id vnid);
+extern _IMPEXP_KERNEL void	notify_select_event(selectsync *sync, uint32 ref);
 
+extern _IMPEXP_KERNEL int	notify_listener(int op, nspace_id nsid,
+									vnode_id vnida,	vnode_id vnidb,
+									vnode_id vnidc, const char *name);
 extern _IMPEXP_KERNEL status_t	send_notification(port_id port, long token,
 	ulong what, long op, nspace_id device, nspace_id toDevice,
 	vnode_id parentNode, vnode_id toParentNode, vnode_id node,
 	const char *name);
 
-// The missing prototypes can be found in the fs_interface.h file.
-// That part of the VFS is still compatible with BeOS :)
+extern _IMPEXP_KERNEL int	get_vnode(nspace_id nsid, vnode_id vnid, void **data);
+extern _IMPEXP_KERNEL int	put_vnode(nspace_id nsid, vnode_id vnid);
+extern _IMPEXP_KERNEL int	new_vnode(nspace_id nsid, vnode_id vnid, void *data);
+extern _IMPEXP_KERNEL int	remove_vnode(nspace_id nsid, vnode_id vnid);
+extern _IMPEXP_KERNEL int	unremove_vnode(nspace_id nsid, vnode_id vnid);
+extern _IMPEXP_KERNEL int	is_vnode_removed(nspace_id nsid, vnode_id vnid);
 
 #ifdef __cplusplus
 }

@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs r5 ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 # save original optimization level
 oldOPTIM = $(OPTIM) ;
 

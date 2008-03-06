@@ -1,13 +1,12 @@
-/* Journal - transaction and logging
- *
- * Copyright 2001-2006, Axel Dörfler, axeld@pinc-software.de
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 
+//!	Transaction and logging
 
 #include "Journal.h"
 #include "Inode.h"
-#include "Debug.h"
 
 #include <Drivers.h>
 #include <util/kernel_cpp.h>

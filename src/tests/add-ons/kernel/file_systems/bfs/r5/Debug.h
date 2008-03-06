@@ -1,10 +1,9 @@
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
+ * This file may be used under the terms of the MIT License.
+ */
 #ifndef DEBUG_H
 #define DEBUG_H
-/* Debug - debug stuff
-**
-** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
-*/
 
 
 #include <KernelExport.h>
@@ -20,6 +19,9 @@
 #	include <null.h>
 #	define __out dprintf
 #endif
+
+#define _KERNEL_DEBUG_H
+	// to work around problems with private/kernel/debug.h
 
 // Which debugger should be used when?
 // The DEBUGGER() macro actually has no effect if DEBUG is not defined,

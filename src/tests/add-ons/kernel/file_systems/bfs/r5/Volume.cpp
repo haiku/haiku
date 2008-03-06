@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de. All Rights Reserved.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -15,7 +15,6 @@
 #include <util/kernel_cpp.h>
 #include <KernelExport.h>
 #include <Drivers.h>
-#include <fs_volume.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -232,7 +231,7 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 //	#pragma mark -
 
 
-Volume::Volume(mount_id id)
+Volume::Volume(dev_t id)
 	:
 	fID(id),
 	fBlockAllocator(this),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de
  * This file may be used under the terms of the MIT License.
  */
 
@@ -12,7 +12,6 @@
 #include "Stream.h"
 #include "Index.h"
 
-#include <fs_cache.h>
 #include <util/kernel_cpp.h>
 
 #include <string.h>
