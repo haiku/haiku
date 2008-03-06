@@ -269,8 +269,6 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		BRegion					fBackgroundRegion;
 		BRegion					fScreenRegion;
 
-		bool					fFocusFollowsMouse;
-
 		WindowLayer*			fMouseEventWindow;
 		const WindowLayer*		fWindowUnderMouse;
 		int32					fViewUnderMouse;

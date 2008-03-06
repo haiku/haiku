@@ -322,8 +322,6 @@ Desktop::Desktop(uid_t userID)
 
 	fWindowLock("window lock"),
 
-	fFocusFollowsMouse(false),
-
 	fMouseEventWindow(NULL),
 	fWindowUnderMouse(NULL),
 	fViewUnderMouse(B_NULL_TOKEN),
@@ -1316,7 +1314,7 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 
 	bool hasModal = _WindowHasModal(focus);
 
-	// TODO: test for FFM and B_LOCK_WINDOW_FOCUS
+	// TODO: test for B_LOCK_WINDOW_FOCUS
 
 	if (focus == fFocus && focus != NULL && !focus->IsHidden()
 		&& (focus->Flags() & B_AVOID_FOCUS) == 0 && !hasModal) {
@@ -1325,8 +1323,22 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 		return;
 	}
 
-	if (focus == NULL || hasModal)
-		focus = fFocusList.LastWindow();
+	uint32 list = fCurrentWorkspace;
+
+	if (fSettings->FocusFollowsMouse())
+		list = kFocusList;
+
+	if (focus == NULL || hasModal) {
+		if (!fSettings->FocusFollowsMouse()) {
+			focus = FrontWindow();
+			if (focus == NULL) {
+				// there might be no front window in case of only a single
+				// window with B_FLOATING_ALL_WINDOW_FEEL
+				focus = _CurrentWindows().LastWindow();
+			}
+		} else
+			focus = fFocusList.LastWindow();
+	}
 
 	// make sure no window is chosen that doesn't want focus or cannot have it
 	while (focus != NULL
@@ -1334,7 +1346,7 @@ Desktop::SetFocusWindow(WindowLayer* focus)
 			|| (focus->Flags() & B_AVOID_FOCUS) != 0
 			|| _WindowHasModal(focus)
 			|| focus->IsHidden())) {
-		focus = focus->PreviousWindow(kFocusList);
+		focus = focus->PreviousWindow(list);
 	}
 
 	if (fFocus == focus) {
@@ -1571,10 +1583,19 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 	MarkDirty(dirty);
 
 	_UpdateFronts();
-	SetFocusWindow();
+	SetFocusWindow(fSettings->FocusFollowsMouse() ?
+		WindowAt(fLastMousePosition) : NULL);
+
+	bool sendFakeMouseMoved = false;
+	if (FocusWindow() != window)
+		sendFakeMouseMoved = true;
+
 	_WindowChanged(window);
 
 	UnlockAllWindows();
+
+	if (sendFakeMouseMoved)
+		_SendFakeMouseMoved();
 }
 
 

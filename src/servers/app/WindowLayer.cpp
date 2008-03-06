@@ -128,7 +128,7 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fMinHeight(1),
 	fMaxHeight(32768)
 {
-	// make sure our arguments are valid 
+	// make sure our arguments are valid
 	if (!IsValidLook(fLook))
 		fLook = B_TITLED_WINDOW_LOOK;
 	if (!IsValidFeel(fFeel))
@@ -432,7 +432,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 			region->OffsetBy(-xOffset, -yOffset);
 			// the part which we can copy is not dirty
 			newDirty->Exclude(region);
-	
+
 			fDrawingEngine->CopyRegion(region, xOffset, yOffset);
 
 			// move along the already dirty regions that are common
@@ -485,22 +485,22 @@ void
 WindowLayer::SetTopLayer(ViewLayer* topLayer)
 {
 	fTopLayer = topLayer;
-	
+
 	if (fTopLayer) {
 		// the top layer is special, it has a coordinate system
 		// as if it was attached directly to the desktop, therefor,
 		// the coordinate conversion through the layer tree works
 		// as expected, since the top layer has no "parent" but has
 		// fFrame as if it had
-	
+
 		// make sure the location of the top layer on screen matches ours
 		fTopLayer->MoveBy(fFrame.left - fTopLayer->Frame().left,
 			fFrame.top - fTopLayer->Frame().top, NULL);
-	
+
 		// make sure the size of the top layer matches ours
 		fTopLayer->ResizeBy(fFrame.Width() - fTopLayer->Frame().Width(),
 			fFrame.Height() - fTopLayer->Frame().Height(), NULL);
-	
+
 		fTopLayer->AttachedToWindow(this);
 	}
 }
@@ -592,7 +592,7 @@ WindowLayer::ProcessDirtyRegion(BRegion& region)
 		// when the dirty region was empty.
 		// NOTE: when the window thread has processed
 		// the dirty region in MessageReceived(),
-		// it will make the region empty again, 
+		// it will make the region empty again,
 		// when it is empty here, we need to send
 		// the message to initiate the next update round.
 		// Until the message is processed in the window
@@ -614,7 +614,7 @@ WindowLayer::RedrawDirtyRegion()
 	if (IsVisible()) {
 		_DrawBorder();
 
-		BRegion* dirtyContentRegion = 
+		BRegion* dirtyContentRegion =
 			fRegionPool.GetRegion(VisibleContentRegion());
 		dirtyContentRegion->IntersectWith(&fDirtyRegion);
 
@@ -812,7 +812,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 
 			// activate window if not in FFM mode
 			DesktopSettings desktopSettings(fDesktop);
-			if (desktopSettings.MouseMode() == B_NORMAL_MOUSE) {
+			if (!desktopSettings.FocusFollowsMouse()) {
 				fDesktop->ActivateWindow(this);
 			} else {
 				// actually, the window should already be
@@ -838,7 +838,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 				// Activate window in case it doesn't accept first click, and
 				// we're not in FFM mode
 				if ((Flags() & B_WILL_ACCEPT_FIRST_CLICK) == 0
-					&& desktopSettings.MouseMode() == B_NORMAL_MOUSE)
+					&& !desktopSettings.FocusFollowsMouse())
 					fDesktop->ActivateWindow(this);
 
 				// Eat the click if we don't accept first click
@@ -1046,7 +1046,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
-	if (desktopSettings.MouseMode() != B_NORMAL_MOUSE
+	if (desktopSettings.FocusFollowsMouse()
 		&& !IsFocus() && !(Flags() & B_AVOID_FOCUS)) {
 		fDesktop->SetFocusWindow(this);
 	}
@@ -1078,7 +1078,7 @@ WindowLayer::WorkspaceActivated(int32 index, bool active)
 	activatedMsg.AddBool("active", active);
 
 	ServerWindow()->SendMessageToClient(&activatedMsg);
-	
+
 	if (active)
 		fWindow->HandleDirectConnection(B_DIRECT_START | B_BUFFER_RESET);
 }
