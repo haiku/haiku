@@ -2354,10 +2354,13 @@ BMenu::_NextItem(BMenuItem *item, bool forward) const
 {
 	// go to next item, and skip over disabled items such as separators
  	int32 index = fItems.IndexOf(item);
-	if (index < 0)
-		index = 0;
-
 	const int32 numItems = fItems.CountItems();
+	if (index < 0) {
+		if (forward)
+			index = -1;
+		else
+			index = numItems;
+	}	
 	int32 startIndex = index;
 	do {
 		if (forward)
@@ -2373,7 +2376,7 @@ BMenu::_NextItem(BMenuItem *item, bool forward) const
 	} while (!ItemAt(index)->IsEnabled() && index != startIndex);
 
 	if (index == startIndex) // we are back where we started and no item was enabled
-		return false;
+		return NULL;
 
 	return ItemAt(index);
 }
