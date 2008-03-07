@@ -4608,8 +4608,15 @@ BView::_Detach()
 
 		// make sure our owner doesn't need us anymore
 
-		if (fOwner->CurrentFocus() == this)
+		if (fOwner->CurrentFocus() == this) {
 			MakeFocus(false);
+			// MakeFocus() is virtual and might not be
+			// passing through to the BView version,
+			// but we need to make sure at this point
+			// that we are not the focus view anymore.
+			if (fOwner->CurrentFocus() == this)
+				fOwner->_SetFocus(NULL, true);
+		}
 
 		if (fOwner->fDefaultButton == this)
 			fOwner->SetDefaultButton(NULL);
