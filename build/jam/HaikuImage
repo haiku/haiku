@@ -574,7 +574,8 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 		Echo "No optional package Pe available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Pe
-			: http://dl.hirschkaefer.de/beos/pe-2.4-x86.zip
+#			: http://dl.hirschkaefer.de/beos/pe-2.4-x86.zip
+			: http://www.yellowbites.com/downloads/pe-2.4-x86.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
@@ -583,6 +584,35 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 			: /boot/apps/pe-2.4-x86/lpe ;
 	}
 }
+
+# VLC media player
+if [ IsOptionalHaikuImagePackageAdded VLC ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package VLC available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage VLC
+			: http://www.yellowbites.com/downloads/vlc-0.8.6c.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/vlc-0.8.6c/vlc ;
+	}
+}
+
+# Firefox web browser
+if [ IsOptionalHaikuImagePackageAdded Firefox ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Firefox available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Firefox
+			: http://www.sheltonfamily.org/firefoxbuilds/firefox-2.0.0.12.en-US.beosR5-i586.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/firefox/firefox ;
+	}
+}
+
 
 #pragma mark - Build The Image
 
