@@ -519,11 +519,11 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 		Echo "No optional package Vision available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Vision
-			: http://vision.sf.net/Vision-0.9.7-H-26012008.zip
+			: http://vision.sf.net/Vision-0.9.7-H-06032008.zip
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/Vision-0.9.7-H-26012008/Vision ;
+			: /boot/apps/Vision-0.9.7-H-06032008/Vision ;
 	}
 }
 
