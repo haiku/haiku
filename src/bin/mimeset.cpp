@@ -18,7 +18,7 @@ static const char *sProgramName = __progname;
 // options
 bool gFiles = true;
 bool gApps = false;
-int gForce = 0;
+int gForce = 0; // B_UPDATE_MIME_INFO_NO_FORCE;
 
 
 void
@@ -49,9 +49,9 @@ process_file(const char *path)
 		status = B_ENTRY_NOT_FOUND;
 
 	if (gFiles && status >= B_OK)
-		update_mime_info(path, true, true, gForce);
+		status = update_mime_info(path, true, true, gForce);
 	if (gApps && status >= B_OK)
-		create_app_meta_mime(path, true, true, gForce);
+		status = create_app_meta_mime(path, true, true, gForce);
 
 	if (status < B_OK) {
 		fprintf(stderr, "%s: \"%s\": %s\n",
@@ -80,9 +80,9 @@ main(int argc, char **argv)
 			gApps = true;
 			gFiles = false;
 		} else if (!strcmp(arg, "-f"))
-			gForce = 1;
+			gForce = 1; // B_UPDATE_MIME_INFO_FORCE_KEEP_TYPE;
 		else if (!strcmp(arg, "-F"))
-			gForce = 2;
+			gForce = 2; // B_UPDATE_MIME_INFO_FORCE_UPDATE_ALL;
 		else if (!strcmp(arg, "--help"))
 			usage(0);
 		else {
