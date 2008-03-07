@@ -2431,7 +2431,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 
 	fFeel = feel;
 	fLook = look;
-	fFlags = flags;
+	fFlags = flags | B_ASYNCHRONOUS_CONTROLS;
 
 	fInTransaction = false;
 	fActive = false;
