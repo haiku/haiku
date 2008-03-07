@@ -531,14 +531,22 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 
 		window->Unlock();
 		
-		if (fState != MENU_STATE_CLOSED) {
-			if (snoozeAmount > 0)
-				snooze(snoozeAmount);	
+		if (fState != MENU_STATE_CLOSED) {	
+			// if user doesn't move the mouse, loop here,
+			// so we don't interfer with keyboard menu navigation
+			BPoint newLocation;
+			uint32 newButtons;
+			do {
+				snooze(snoozeAmount);
+				if (!LockLooper())
+					break;
+				GetMouse(&newLocation, &newButtons, true);
+				UnlockLooper();
+			} while (newLocation == where 
+					&& newButtons == buttons);
 			
-			if (window->Lock()) {
-				GetMouse(&where, &buttons, true);
-				window->Unlock();
-			}
+			where = newLocation;
+			buttons = newButtons;
 
 			if (buttons != 0 && _IsStickyMode()) {
 				if (menuItem == NULL)
