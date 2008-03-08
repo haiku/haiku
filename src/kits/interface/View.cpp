@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -156,7 +156,7 @@ ViewState::ViewState()
 void
 ViewState::UpdateServerFontState(BPrivate::PortLink &link)
 {
-	link.StartMessage(AS_LAYER_SET_FONT_STATE);
+	link.StartMessage(AS_VIEW_SET_FONT_STATE);
 	link.Attach<uint16>(font_flags);
 		// always present
 
@@ -194,7 +194,7 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 {
 	UpdateServerFontState(link);
 
-	link.StartMessage(AS_LAYER_SET_STATE);
+	link.StartMessage(AS_VIEW_SET_STATE);
 	link.Attach<BPoint>(pen_location);
 	link.Attach<float>(pen_size);
 	link.Attach<rgb_color>(high_color);
@@ -232,7 +232,7 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 void
 ViewState::UpdateFrom(BPrivate::PortLink &link)
 {
-	link.StartMessage(AS_LAYER_GET_STATE);
+	link.StartMessage(AS_VIEW_GET_STATE);
 
 	int32 code;
 	if (link.FlushWithReply(code) != B_OK
@@ -612,7 +612,7 @@ BView::Bounds() const
 	if (!fState->IsValid(B_VIEW_FRAME_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_COORD);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_COORD);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -865,7 +865,7 @@ BView::SetFlags(uint32 flags)
 					| B_FRAME_EVENTS | B_SUBPIXEL_PRECISE)) {
 			_CheckLockAndSwitchCurrent();
 
-			fOwner->fLink->StartMessage(AS_LAYER_SET_FLAGS);
+			fOwner->fLink->StartMessage(AS_VIEW_SET_FLAGS);
 			fOwner->fLink->Attach<uint32>(flags);
 		}
 	}
@@ -897,7 +897,7 @@ BView::Hide()
 {
 	if (fOwner && fShowLevel == 0) {
 		_CheckLockAndSwitchCurrent();
-		fOwner->fLink->StartMessage(AS_LAYER_HIDE);
+		fOwner->fLink->StartMessage(AS_VIEW_HIDE);
 	}
 	fShowLevel++;
 
@@ -912,7 +912,7 @@ BView::Show()
 	fShowLevel--;
 	if (fOwner && fShowLevel == 0) {
 		_CheckLockAndSwitchCurrent();
-		fOwner->fLink->StartMessage(AS_LAYER_SHOW);
+		fOwner->fLink->StartMessage(AS_VIEW_SHOW);
 	}
 
 	if (fShowLevel == 0 && fParent)
@@ -995,7 +995,7 @@ BView::SetOrigin(float x, float y)
 	fState->origin.y = y;
 
 	if (_CheckOwnerLockAndSwitchCurrent()) {
-		fOwner->fLink->StartMessage(AS_LAYER_SET_ORIGIN);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_ORIGIN);
 		fOwner->fLink->Attach<float>(x);
 		fOwner->fLink->Attach<float>(y);
 
@@ -1015,7 +1015,7 @@ BView::Origin() const
 		// we need to ask the server for the origin after PopState()
 		_CheckOwnerLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_ORIGIN);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_ORIGIN);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1036,7 +1036,7 @@ BView::SetResizingMode(uint32 mode)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_RESIZE_MODE);
+		fOwner->fLink->StartMessage(AS_VIEW_RESIZE_MODE);
 		fOwner->fLink->Attach<uint32>(mode);
 	}
 
@@ -1060,7 +1060,7 @@ BView::SetViewCursor(const BCursor *cursor, bool sync)
 
 	_CheckLockAndSwitchCurrent();
 
-	fOwner->fLink->StartMessage(AS_LAYER_SET_CURSOR);
+	fOwner->fLink->StartMessage(AS_VIEW_SET_CURSOR);
 	fOwner->fLink->Attach<int32>(cursor->fServerToken);
 	fOwner->fLink->Attach<bool>(sync);
 
@@ -1273,7 +1273,7 @@ void
 BView::BeginRectTracking(BRect startRect, uint32 style)
 {
 	if (_CheckOwnerLockAndSwitchCurrent()) {
-		fOwner->fLink->StartMessage(AS_LAYER_BEGIN_RECT_TRACK);
+		fOwner->fLink->StartMessage(AS_VIEW_BEGIN_RECT_TRACK);
 		fOwner->fLink->Attach<BRect>(startRect);
 		fOwner->fLink->Attach<uint32>(style);
 	}
@@ -1284,7 +1284,7 @@ void
 BView::EndRectTracking()
 {
 	if (_CheckOwnerLockAndSwitchCurrent())
-		fOwner->fLink->StartMessage(AS_LAYER_END_RECT_TRACK);
+		fOwner->fLink->StartMessage(AS_VIEW_END_RECT_TRACK);
 }
 
 
@@ -1395,7 +1395,7 @@ BView::DragMessage(BMessage *message, BBitmap *image,
 	if (buffer) {
 		privateMessage.NativeFlatten(buffer, bufferSize);
 
-		fOwner->fLink->StartMessage(AS_LAYER_DRAG_IMAGE);
+		fOwner->fLink->StartMessage(AS_VIEW_DRAG_IMAGE);
 		fOwner->fLink->Attach<int32>(image->_ServerToken());
 		fOwner->fLink->Attach<int32>((int32)dragMode);
 		fOwner->fLink->Attach<BPoint>(offset);
@@ -1556,7 +1556,7 @@ BView::ScrollBy(float deltaX, float deltaY)
 
 	// if we're attached to a window tell app_server about this change
 	if (fOwner) {
-		fOwner->fLink->StartMessage(AS_LAYER_SCROLL);
+		fOwner->fLink->StartMessage(AS_VIEW_SCROLL);
 		fOwner->fLink->Attach<float>(deltaX);
 		fOwner->fLink->Attach<float>(deltaY);
 
@@ -1597,7 +1597,7 @@ BView::SetEventMask(uint32 mask, uint32 options)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_EVENT_MASK);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_EVENT_MASK);
 		fOwner->fLink->Attach<uint32>(mask);
 		fOwner->fLink->Attach<uint32>(options);
 		fOwner->fLink->Flush();
@@ -1625,7 +1625,7 @@ BView::SetMouseEventMask(uint32 mask, uint32 options)
 		_CheckLockAndSwitchCurrent();
 		fMouseEventOptions = options;
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_MOUSE_EVENT_MASK);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_MOUSE_EVENT_MASK);
 		fOwner->fLink->Attach<uint32>(mask);
 		fOwner->fLink->Attach<uint32>(options);
 		fOwner->fLink->Flush();
@@ -1650,7 +1650,7 @@ BView::SetLineMode(cap_mode lineCap, join_mode lineJoin, float miterLimit)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_LINE_MODE);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_LINE_MODE);
 		fOwner->fLink->Attach<int8>((int8)lineCap);
 		fOwner->fLink->Attach<int8>((int8)lineJoin);
 		fOwner->fLink->Attach<float>(miterLimit);
@@ -1694,7 +1694,7 @@ BView::LineMiterLimit() const
 	if (!fState->IsValid(B_VIEW_LINE_MODES_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_LINE_MODE);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_LINE_MODE);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1720,7 +1720,7 @@ BView::PushState()
 {
 	_CheckOwnerLockAndSwitchCurrent();
 
-	fOwner->fLink->StartMessage(AS_LAYER_PUSH_STATE);
+	fOwner->fLink->StartMessage(AS_VIEW_PUSH_STATE);
 
 	// initialize origin and scale
 	fState->valid_flags |= B_VIEW_SCALE_BIT | B_VIEW_ORIGIN_BIT;
@@ -1734,7 +1734,7 @@ BView::PopState()
 {
 	_CheckOwnerLockAndSwitchCurrent();
 
-	fOwner->fLink->StartMessage(AS_LAYER_POP_STATE);
+	fOwner->fLink->StartMessage(AS_VIEW_POP_STATE);
 
 	// invalidate all flags (except those that are not part of pop/push)
 	fState->valid_flags = B_VIEW_VIEW_COLOR_BIT;
@@ -1750,7 +1750,7 @@ BView::SetScale(float scale) const
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_SCALE);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_SCALE);
 		fOwner->fLink->Attach<float>(scale);
 
 		fState->valid_flags |= B_VIEW_SCALE_BIT;
@@ -1767,7 +1767,7 @@ BView::Scale() const
 	if (!fState->IsValid(B_VIEW_SCALE_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_SCALE);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_SCALE);
 
  		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1791,7 +1791,7 @@ BView::SetDrawingMode(drawing_mode mode)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_DRAWING_MODE);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_DRAWING_MODE);
 		fOwner->fLink->Attach<int8>((int8)mode);
 
 		fState->valid_flags |= B_VIEW_DRAWING_MODE_BIT;
@@ -1808,7 +1808,7 @@ BView::DrawingMode() const
 	if (!fState->IsValid(B_VIEW_DRAWING_MODE_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_DRAWING_MODE);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_DRAWING_MODE);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1836,7 +1836,7 @@ BView::SetBlendingMode(source_alpha sourceAlpha, alpha_function alphaFunction)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_BLENDING_MODE);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_BLENDING_MODE);
 		fOwner->fLink->Attach<int8>((int8)sourceAlpha);
 		fOwner->fLink->Attach<int8>((int8)alphaFunction);
 
@@ -1857,7 +1857,7 @@ BView::GetBlendingMode(source_alpha *_sourceAlpha,
 	if (!fState->IsValid(B_VIEW_BLENDING_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_BLENDING_MODE);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_BLENDING_MODE);
 
 		int32 code;
  		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1898,7 +1898,7 @@ BView::MovePenTo(float x, float y)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_PEN_LOC);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_PEN_LOC);
 		fOwner->fLink->Attach<float>(x);
 		fOwner->fLink->Attach<float>(y);
 
@@ -1929,7 +1929,7 @@ BView::PenLocation() const
 	if (!fState->IsValid(B_VIEW_PEN_LOCATION_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_PEN_LOC);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_PEN_LOC);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1953,7 +1953,7 @@ BView::SetPenSize(float size)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_PEN_SIZE);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_PEN_SIZE);
 		fOwner->fLink->Attach<float>(size);
 
 		fState->valid_flags |= B_VIEW_PEN_SIZE_BIT;	
@@ -1970,7 +1970,7 @@ BView::PenSize() const
 	if (!fState->IsValid(B_VIEW_PEN_SIZE_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_PEN_SIZE);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_PEN_SIZE);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -1996,7 +1996,7 @@ BView::SetHighColor(rgb_color color)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_HIGH_COLOR);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_HIGH_COLOR);
 		fOwner->fLink->Attach<rgb_color>(color);
 
 		fState->valid_flags |= B_VIEW_HIGH_COLOR_BIT;	
@@ -2014,7 +2014,7 @@ BView::HighColor() const
 	if (!fState->IsValid(B_VIEW_HIGH_COLOR_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_HIGH_COLOR);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_HIGH_COLOR);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -2039,7 +2039,7 @@ BView::SetLowColor(rgb_color color)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_LOW_COLOR);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_LOW_COLOR);
 		fOwner->fLink->Attach<rgb_color>(color);
 
 		fState->valid_flags |= B_VIEW_LOW_COLOR_BIT;
@@ -2057,7 +2057,7 @@ BView::LowColor() const
 	if (!fState->IsValid(B_VIEW_LOW_COLOR_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_LOW_COLOR);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_LOW_COLOR);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -2081,7 +2081,7 @@ BView::SetViewColor(rgb_color color)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_VIEW_COLOR);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_VIEW_COLOR);
 		fOwner->fLink->Attach<rgb_color>(color);
 
 		fState->valid_flags |= B_VIEW_VIEW_COLOR_BIT;
@@ -2099,7 +2099,7 @@ BView::ViewColor() const
 	if (!fState->IsValid(B_VIEW_VIEW_COLOR_BIT) && fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_GET_VIEW_COLOR);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_VIEW_COLOR);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -2123,7 +2123,7 @@ BView::ForceFontAliasing(bool enable)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_PRINT_ALIASING);
+		fOwner->fLink->StartMessage(AS_VIEW_PRINT_ALIASING);
 		fOwner->fLink->Attach<bool>(enable);
 
 		fState->valid_flags |= B_VIEW_FONT_ALIASING_BIT;
@@ -2263,7 +2263,7 @@ BView::GetClippingRegion(BRegion* region) const
 
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
-		fOwner->fLink->StartMessage(AS_LAYER_GET_CLIP_REGION);
+		fOwner->fLink->StartMessage(AS_VIEW_GET_CLIP_REGION);
 
  		int32 code;
  		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -2279,7 +2279,7 @@ void
 BView::ConstrainClippingRegion(BRegion* region)
 {
 	if (_CheckOwnerLockAndSwitchCurrent()) {
-		fOwner->fLink->StartMessage(AS_LAYER_SET_CLIP_REGION);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_CLIP_REGION);
 
 		if (region) {
 			int32 count = region->CountRects();
@@ -2313,7 +2313,7 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BRect srcRect, BRect dstRect)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP);
+		fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
 		fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
 		fOwner->fLink->Attach<BRect>(dstRect);
 		fOwner->fLink->Attach<BRect>(srcRect);
@@ -2346,7 +2346,7 @@ BView::DrawBitmapAsync(const BBitmap *bitmap, BPoint where)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_DRAW_BITMAP);
+		fOwner->fLink->StartMessage(AS_VIEW_DRAW_BITMAP);
 		fOwner->fLink->Attach<int32>(bitmap->_ServerToken());
 		BRect src = bitmap->Bounds().OffsetToCopy(B_ORIGIN);
 		BRect dst = src.OffsetToCopy(where);
@@ -3098,7 +3098,7 @@ BView::BeginPicture(BPicture *picture)
 		picture->Usurp(cpicture);
 		cpicture = picture;
 
-		fOwner->fLink->StartMessage(AS_LAYER_BEGIN_PICTURE);
+		fOwner->fLink->StartMessage(AS_VIEW_BEGIN_PICTURE);
 	}
 }
 
@@ -3117,7 +3117,7 @@ BView::AppendToPicture(BPicture *picture)
 			picture->SetToken(-1);
 			picture->Usurp(cpicture);
 			cpicture = picture;			
-			fOwner->fLink->StartMessage(AS_LAYER_APPEND_TO_PICTURE);
+			fOwner->fLink->StartMessage(AS_VIEW_APPEND_TO_PICTURE);
 			fOwner->fLink->Attach<int32>(token);
 		}
 	}
@@ -3130,7 +3130,7 @@ BView::EndPicture()
 	if (_CheckOwnerLockAndSwitchCurrent() && cpicture) {
 		int32 token;
 
-		fOwner->fLink->StartMessage(AS_LAYER_END_PICTURE);
+		fOwner->fLink->StartMessage(AS_VIEW_END_PICTURE);
 
 		int32 code;
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -3226,7 +3226,7 @@ BView::CopyBits(BRect src, BRect dst)
 
 	_CheckLockAndSwitchCurrent();
 
-	fOwner->fLink->StartMessage(AS_LAYER_COPY_BITS);
+	fOwner->fLink->StartMessage(AS_VIEW_COPY_BITS);
 	fOwner->fLink->Attach<BRect>(src);
 	fOwner->fLink->Attach<BRect>(dst);
 
@@ -3284,7 +3284,7 @@ BView::DrawPictureAsync(const BPicture *picture, BPoint where)
 		return;
 
 	if (_CheckOwnerLockAndSwitchCurrent() && picture->Token() > 0) {
-		fOwner->fLink->StartMessage(AS_LAYER_DRAW_PICTURE);
+		fOwner->fLink->StartMessage(AS_VIEW_DRAW_PICTURE);
 		fOwner->fLink->Attach<int32>(picture->Token());
 		fOwner->fLink->Attach<BPoint>(where);
 
@@ -3335,7 +3335,7 @@ BView::Invalidate(BRect invalRect)
 
 	_CheckLockAndSwitchCurrent();
 
-	fOwner->fLink->StartMessage(AS_LAYER_INVALIDATE_RECT);
+	fOwner->fLink->StartMessage(AS_VIEW_INVALIDATE_RECT);
 	fOwner->fLink->Attach<BRect>(invalRect);
 	fOwner->fLink->Flush();
 }
@@ -3349,7 +3349,7 @@ BView::Invalidate(const BRegion* region)
 
 	_CheckLockAndSwitchCurrent();
 
-	fOwner->fLink->StartMessage(AS_LAYER_INVALIDATE_REGION);
+	fOwner->fLink->StartMessage(AS_VIEW_INVALIDATE_REGION);
 	fOwner->fLink->AttachRegion(*region);
 
 	fOwner->fLink->Flush();
@@ -3369,7 +3369,7 @@ BView::InvertRect(BRect rect)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_INVERT_RECT);
+		fOwner->fLink->StartMessage(AS_VIEW_INVERT_RECT);
 		fOwner->fLink->Attach<BRect>(rect);
 
 		_FlushIfNotInTransaction();
@@ -3533,7 +3533,7 @@ BView::_RemoveSelf()
 
 	if (owner != NULL && !fTopLevelView) {
 		// the top level view is deleted by the app_server automatically
-		owner->fLink->StartMessage(AS_LAYER_DELETE);
+		owner->fLink->StartMessage(AS_VIEW_DELETE);
 		owner->fLink->Attach<int32>(_get_object_token_(this));
 	}
 
@@ -3603,7 +3603,7 @@ BView::MoveTo(float x, float y)
 
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
-		fOwner->fLink->StartMessage(AS_LAYER_MOVE_TO);
+		fOwner->fLink->StartMessage(AS_VIEW_MOVE_TO);
 		fOwner->fLink->Attach<float>(x);
 		fOwner->fLink->Attach<float>(y);
 
@@ -3628,7 +3628,7 @@ BView::ResizeBy(float deltaWidth, float deltaHeight)
 
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
-		fOwner->fLink->StartMessage(AS_LAYER_RESIZE_TO);
+		fOwner->fLink->StartMessage(AS_VIEW_RESIZE_TO);
 
 		fOwner->fLink->Attach<float>(fBounds.Width() + deltaWidth);
 		fOwner->fLink->Attach<float>(fBounds.Height() + deltaHeight);
@@ -4300,7 +4300,7 @@ BView::_ClipToPicture(BPicture *picture, BPoint where,
 		return;
 
 	if (_CheckOwnerLockAndSwitchCurrent()) {
-		fOwner->fLink->StartMessage(AS_LAYER_CLIP_TO_PICTURE);
+		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(picture->Token());
 		fOwner->fLink->Attach<BPoint>(where);
 		fOwner->fLink->Attach<bool>(invert);
@@ -4397,14 +4397,14 @@ BView::_AddChildToList(BView* child, BView* before)
 bool
 BView::_CreateSelf()
 {
-	// AS_LAYER_CREATE & AS_LAYER_CREATE_ROOT do not use the
+	// AS_VIEW_CREATE & AS_VIEW_CREATE_ROOT do not use the
 	// current view mechanism via _CheckLockAndSwitchCurrent() - the token
 	// of the view and its parent are both send to the server.
 
 	if (fTopLevelView)
-		fOwner->fLink->StartMessage(AS_LAYER_CREATE_ROOT);
+		fOwner->fLink->StartMessage(AS_VIEW_CREATE_ROOT);
 	else
- 		fOwner->fLink->StartMessage(AS_LAYER_CREATE);
+ 		fOwner->fLink->StartMessage(AS_VIEW_CREATE);
 
 	fOwner->fLink->Attach<int32>(_get_object_token_(this));
 	fOwner->fLink->AttachString(Name());
@@ -4700,7 +4700,7 @@ BView::_UpdateStateForRemove()
 
 	fState->UpdateFrom(*fOwner->fLink);
 //	if (!fState->IsValid(B_VIEW_FRAME_BIT)) {
-//		fOwner->fLink->StartMessage(AS_LAYER_GET_COORD);
+//		fOwner->fLink->StartMessage(AS_VIEW_GET_COORD);
 //
 //		status_t code;
 //		if (fOwner->fLink->FlushWithReply(code) == B_OK
@@ -4729,7 +4729,7 @@ BView::_UpdatePattern(::pattern pattern)
 	if (fOwner) {
 		_CheckLockAndSwitchCurrent();
 
-		fOwner->fLink->StartMessage(AS_LAYER_SET_PATTERN);
+		fOwner->fLink->StartMessage(AS_VIEW_SET_PATTERN);
 		fOwner->fLink->Attach< ::pattern>(pattern);
 
 		fState->valid_flags |= B_VIEW_PATTERN_BIT;
@@ -4777,7 +4777,7 @@ BView::_SetViewBitmap(const BBitmap* bitmap, BRect srcRect,
 
 	int32 serverToken = bitmap ? bitmap->_ServerToken() : -1;
 
-	fOwner->fLink->StartMessage(AS_LAYER_SET_VIEW_BITMAP);
+	fOwner->fLink->StartMessage(AS_VIEW_SET_VIEW_BITMAP);
 	fOwner->fLink->Attach<int32>(serverToken);
 	fOwner->fLink->Attach<BRect>(srcRect);
 	fOwner->fLink->Attach<BRect>(dstRect);
@@ -4849,7 +4849,7 @@ BView::_SwitchServerCurrentView() const
 
 	if (fOwner->fLastViewToken != serverToken) {
 		STRACE(("contacting app_server... sending token: %ld\n", serverToken));
-		fOwner->fLink->StartMessage(AS_SET_CURRENT_LAYER);
+		fOwner->fLink->StartMessage(AS_SET_CURRENT_VIEW);
 		fOwner->fLink->Attach<int32>(serverToken);
 
 		fOwner->fLastViewToken = serverToken;
