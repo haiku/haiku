@@ -33,6 +33,20 @@ get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize)
 }
 
 
+extern "C" bool
+get_safemode_boolean(const char *parameter, bool defaultValue)
+{
+	char value[16];
+	size_t length = sizeof(value);
+
+	if (get_safemode_option(parameter, value, &length) != B_OK)
+		return defaultValue;
+
+	return !strcmp(value, "on") || !strcmp(value, "true") || !strcmp(value, "1")
+		|| !strcmp(value, "yes") || !strcmp(value, "enabled");
+}
+
+
 //	#pragma mark -
 
 

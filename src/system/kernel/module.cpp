@@ -1,12 +1,12 @@
 /*
- * Copyright 2002-2007, Haiku Inc. All rights reserved.
+ * Copyright 2002-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
 
-/** Manages kernel add-ons and their exported modules. */
+/*!	Manages kernel add-ons and their exported modules. */
 
 
 #include <kmodule.h>
@@ -22,6 +22,7 @@
 #include <vfs.h>
 #include <boot/elf.h>
 #include <fs/KPath.h>
+#include <safemode.h>
 #include <util/AutoLock.h>
 #include <util/khash.h>
 
@@ -37,10 +38,9 @@
 
 #define MODULE_HASH_SIZE 16
 
-/** The modules referenced by this structure are built-in
- *	modules that can't be loaded from disk.
- */
-
+/*! The modules referenced by this structure are built-in
+	modules that can't be loaded from disk.
+*/
 extern module_info gDeviceManagerModule;
 extern module_info gDeviceRootModule;
 extern module_info gDeviceForDriversModule;
@@ -157,15 +157,14 @@ static const char * const sModulePaths[] = {
 #define NUM_MODULE_PATHS (sizeof(sModulePaths) / sizeof(sModulePaths[0]))
 #define FIRST_USER_MODULE_PATH (NUM_MODULE_PATHS - 1)	/* first user path */
 
-/* we store the loaded modules by directory path, and all known modules by module name
- * in a hash table for quick access
+/* We store the loaded modules by directory path, and all known modules
+ * by module name in a hash table for quick access
  */
 static hash_table *sModuleImagesHash;
 static hash_table *sModulesHash;
 
 
-/** calculates hash for a module using its name */
-
+/*!	Calculates hash for a module using its name */
 static uint32
 module_hash(void *_module, const void *_key, uint32 range)
 {
@@ -182,8 +181,7 @@ module_hash(void *_module, const void *_key, uint32 range)
 }
 
 
-/** compares a module to a given name */
-
+/*!	Compares a module to a given name */
 static int
 module_compare(void *_module, const void *_key)
 {
@@ -196,8 +194,7 @@ module_compare(void *_module, const void *_key)
 }
 
 
-/** calculates the hash of a module image using its path */
-
+/*!	Calculates the hash of a module image using its path */
 static uint32
 module_image_hash(void *_module, const void *_key, uint32 range)
 {
@@ -214,8 +211,7 @@ module_image_hash(void *_module, const void *_key, uint32 range)
 }
 
 
-/** compares a module image to a path */
-
+/*!	Compares a module image to a path */
 static int
 module_image_compare(void *_module, const void *_key)
 {
@@ -228,11 +224,10 @@ module_image_compare(void *_module, const void *_key)
 }
 
 
-/** Try to load the module image at the specified location.
- *	If it could be loaded, it returns B_OK, and stores a pointer
- *	to the module_image object in "_moduleImage".
- */
-
+/*!	Try to load the module image at the specified location.
+	If it could be loaded, it returns B_OK, and stores a pointer
+	to the module_image object in "_moduleImage".
+*/
 static status_t
 load_module_image(const char *path, module_image **_moduleImage)
 {
@@ -361,10 +356,9 @@ get_module_image(const char *path, module_image **_image)
 }
 
 
-/** Extract the information from the module_info structure pointed at
- *	by "info" and create the entries required for access to it's details.
- */
-
+/*!	Extract the information from the module_info structure pointed at
+	by "info" and create the entries required for access to it's details.
+*/
 static status_t
 create_module(module_info *info, const char *file, int offset, module **_module)
 {
@@ -419,13 +413,12 @@ create_module(module_info *info, const char *file, int offset, module **_module)
 }
 
 
-/** Loads the file at "path" and scans all modules contained therein.
- *	Returns B_OK if "searchedName" could be found under those modules,
- *	B_ENTRY_NOT_FOUND if not.
- *	Must only be called for files that haven't been scanned yet.
- *	"searchedName" is allowed to be NULL (if all modules should be scanned)
- */
-
+/*!	Loads the file at "path" and scans all modules contained therein.
+	Returns B_OK if "searchedName" could be found under those modules,
+	B_ENTRY_NOT_FOUND if not.
+	Must only be called for files that haven't been scanned yet.
+	"searchedName" is allowed to be NULL (if all modules should be scanned)
+*/
 static status_t
 check_module_image(const char *path, const char *searchedName)
 {
@@ -463,10 +456,9 @@ check_module_image(const char *path, const char *searchedName)
 }
 
 
-/** This is only called if we fail to find a module already in our cache...
- *	saves us some extra checking here :)
- */
-
+/*!	This is only called if we fail to find a module already in our cache...
+	saves us some extra checking here :)
+*/
 static module *
 search_module(const char *name)
 {
@@ -546,8 +538,7 @@ get_dependent_modules(struct module *module)
 }
 
 
-/** Initializes a loaded module depending on its state */
-
+/*!	Initializes a loaded module depending on its state */
 static inline status_t
 init_module(module *module)
 {
@@ -604,8 +595,7 @@ init_module(module *module)
 }
 
 
-/** Uninitializes a module depeding on its state */
-
+/*!	Uninitializes a module depeding on its state */
 static inline int
 uninit_module(module *module)
 {
@@ -999,14 +989,12 @@ dump_modules(int argc, char **argv)
 }
 
 
-//	#pragma mark -
-//	Exported Kernel API (private part)
+//	#pragma mark - Exported Kernel API (private part)
 
 
-/**	Unloads a module in case it's not in use. This is the counterpart
- *	to load_module().
- */
-
+/*!	Unloads a module in case it's not in use. This is the counterpart
+	to load_module().
+*/
 status_t
 unload_module(const char *path)
 {
@@ -1024,15 +1012,14 @@ unload_module(const char *path)
 }
 
 
-/**	Unlike get_module(), this function lets you specify the add-on to
- *	be loaded by path.
- *	However, you must not use the exported modules without having called
- *	get_module() on them. When you're done with the NULL terminated
- *	\a modules array, you have to call unload_module(), no matter if
- *	you're actually using any of the modules or not - of course, the
- *	add-on won't be unloaded until the last put_module().
- */
-
+/*!	Unlike get_module(), this function lets you specify the add-on to
+	be loaded by path.
+	However, you must not use the exported modules without having called
+	get_module() on them. When you're done with the NULL terminated
+	\a modules array, you have to call unload_module(), no matter if
+	you're actually using any of the modules or not - of course, the
+	add-on won't be unloaded until the last put_module().
+*/
 status_t
 load_module(const char *path, module_info ***_modules)
 {
@@ -1046,10 +1033,9 @@ load_module(const char *path, module_info ***_modules)
 }
 
 
-/** Setup the module structures and data for use - must be called
- *	before any other module call.
- */
-
+/*! Setup the module structures and data for use - must be called
+	before any other module call.
+*/
 status_t
 module_init(kernel_args *args)
 {
@@ -1081,7 +1067,8 @@ module_init(kernel_args *args)
 		}
 	}
 
-	// ToDo: set sDisableUserAddOns from kernel_args!
+	sDisableUserAddOns = get_safemode_boolean(B_SAFEMODE_DISABLE_USER_ADD_ONS,
+		false);
 
 	add_debugger_command("modules", &dump_modules,
 		"list all known & loaded modules");
@@ -1090,19 +1077,17 @@ module_init(kernel_args *args)
 }
 
 
-//	#pragma mark -
-//	Exported Kernel API (public part)
+//	#pragma mark - Exported Kernel API (public part)
 
 
-/** This returns a pointer to a structure that can be used to
- *	iterate through a list of all modules available under
- *	a given prefix.
- *	All paths will be searched and the returned list will
- *	contain all modules available under the prefix.
- *	The structure is then used by read_next_module_name(), and
- *	must be freed by calling close_module_list().
- */
-
+/*! This returns a pointer to a structure that can be used to
+	iterate through a list of all modules available under
+	a given prefix.
+	All paths will be searched and the returned list will
+	contain all modules available under the prefix.
+	The structure is then used by read_next_module_name(), and
+	must be freed by calling close_module_list().
+*/
 void *
 open_module_list(const char *prefix)
 {
@@ -1180,9 +1165,7 @@ open_module_list(const char *prefix)
 }
 
 
-/** Frees the cookie allocated by open_module_list()
- */
-
+/*!	Frees the cookie allocated by open_module_list() */
 status_t
 close_module_list(void *cookie)
 {
@@ -1216,12 +1199,11 @@ close_module_list(void *cookie)
 }
 
 
-/** Return the next module name from the available list, using
- *	a structure previously created by a call to open_module_list().
- *	Returns B_OK as long as it found another module, B_ENTRY_NOT_FOUND
- *	when done.
- */
-
+/*!	Return the next module name from the available list, using
+	a structure previously created by a call to open_module_list().
+	Returns B_OK as long as it found another module, B_ENTRY_NOT_FOUND
+	when done.
+*/
 status_t
 read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 {
@@ -1250,12 +1232,11 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 }
 
 
-/** Iterates through all loaded modules, and stores its path in "buffer".
- *	ToDo: check if the function in BeOS really does that (could also mean:
- *		iterate through all modules that are currently loaded; have a valid
- *		module_image pointer, which would be hard to test for)
- */
-
+/*!	Iterates through all loaded modules, and stores its path in "buffer".
+	ToDo: check if the function in BeOS really does that (could also mean:
+		iterate through all modules that are currently loaded; have a valid
+		module_image pointer, which would be hard to test for)
+*/
 status_t 
 get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 {
