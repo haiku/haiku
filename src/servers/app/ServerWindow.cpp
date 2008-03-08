@@ -282,8 +282,11 @@ ServerWindow::Init(BRect frame, window_look look, window_feel feel,
 	// We cannot call MakeWindow in the constructor, since it
 	// is a virtual function!
 	fWindow = MakeWindow(frame, fTitle, look, feel, flags, workspace);
-	if (!fWindow)
+	if (!fWindow || fWindow->InitCheck() != B_OK) {
+		delete fWindow;
+		fWindow = NULL;
 		return B_NO_MEMORY;
+	}
 
 	if (!fWindow->IsOffscreenWindow()) {
 		fDesktop->AddWindow(fWindow);
@@ -2999,7 +3002,7 @@ ServerWindow::MakeWindow(BRect frame, const char* name,
 	// The non-offscreen ServerWindow uses the DrawingEngine instance from
 	// the desktop.
 	return new (nothrow) ::Window(frame, name, look, feel, flags,
-		workspace, this, new DrawingEngine(fDesktop->HWInterface()));
+		workspace, this, new (nothrow) DrawingEngine(fDesktop->HWInterface()));
 }
 
 

@@ -50,6 +50,8 @@ public:
 									DrawingEngine* drawingEngine);
 	virtual						~Window();
 
+			status_t			InitCheck() const;
+
 			BRect				Frame() const { return fFrame; }
 			const char*			Title() const { return fTitle.String(); }
 

@@ -175,11 +175,24 @@ Window::Window(const BRect& frame, const char *name,
 
 Window::~Window()
 {
-	if (fTopView)
+	if (fTopView) {
 		fTopView->DetachedFromWindow();
+		delete fTopView;
+	}
 
-	delete fTopView;
 	delete fDecorator;
+
+	delete fDrawingEngine;
+}
+
+
+status_t
+Window::InitCheck() const
+{
+	if (!fDrawingEngine)
+		return B_NO_MEMORY;
+	// TODO: anything else?
+	return B_OK;
 }
 
 

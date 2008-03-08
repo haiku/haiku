@@ -9,6 +9,7 @@
 
 #include "OffscreenWindow.h"
 
+#include <new>
 #include <stdio.h>
 
 #include <Debug.h>
@@ -17,15 +18,20 @@
 #include "DrawingEngine.h"
 #include "ServerBitmap.h"
 
+using std::nothrow;
+
 
 OffscreenWindow::OffscreenWindow(ServerBitmap* bitmap,
 		const char* name, ::ServerWindow* window)
 	: Window(bitmap->Bounds(), name,
 			B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			0, 0, window, new DrawingEngine()),
+			0, 0, window, new (nothrow) DrawingEngine()),
 	fBitmap(bitmap),
-	fHWInterface(new BitmapHWInterface(fBitmap))
+	fHWInterface(new (nothrow) BitmapHWInterface(fBitmap))
 {
+	if (!fHWInterface || !GetDrawingEngine())
+		return;
+
 	fHWInterface->Initialize();
 	GetDrawingEngine()->SetHWInterface(fHWInterface);
 
@@ -39,11 +45,14 @@ OffscreenWindow::OffscreenWindow(ServerBitmap* bitmap,
 
 OffscreenWindow::~OffscreenWindow()
 {
-	fHWInterface->LockExclusiveAccess();
-	// Unlike normal windows, we own the DrawingEngine instance
-	delete GetDrawingEngine();
-	fHWInterface->Shutdown();
-	fHWInterface->UnlockExclusiveAccess();
-	delete fHWInterface;
+	if (GetDrawingEngine())
+		GetDrawingEngine()->SetHWInterface(NULL);
+
+	if (fHWInterface) {
+		fHWInterface->LockExclusiveAccess();
+		fHWInterface->Shutdown();
+		fHWInterface->UnlockExclusiveAccess();
+		delete fHWInterface;
+	}
 }
 
