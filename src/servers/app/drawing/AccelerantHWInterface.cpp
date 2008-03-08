@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1324,7 +1324,7 @@ AccelerantHWInterface::IsDoubleBuffered() const
 
 // _DrawCursor
 void
-AccelerantHWInterface::_DrawCursor(BRect area) const
+AccelerantHWInterface::_DrawCursor(IntRect area) const
 {
 	// use the default implementation for now,
 	// until we have a hardware cursor

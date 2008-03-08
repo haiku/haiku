@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Haiku.
+ * Copyright 2005-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -95,7 +95,7 @@ public:
 	virtual	bool				IsDoubleBuffered() const;
 
 protected:
-	virtual	void				_DrawCursor(BRect area) const;
+	virtual	void				_DrawCursor(IntRect area) const;
 
 private:
 		int						_OpenGraphicsDevice(int deviceNumber);
