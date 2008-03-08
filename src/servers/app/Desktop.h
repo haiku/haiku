@@ -13,8 +13,8 @@
 
 #include "CursorManager.h"
 #include "EventDispatcher.h"
+#include "Screen.h"
 #include "ScreenManager.h"
-#include "ServerScreen.h"
 #include "VirtualScreen.h"
 #include "DesktopSettings.h"
 #include "MessageLooper.h"
@@ -44,7 +44,8 @@ class BMessage;
 class DrawingEngine;
 class HWInterface;
 class ServerApp;
-class WorkspacesLayer;
+class Window;
+class WorkspacesView;
 struct server_read_only_memory;
 
 namespace BPrivate {
@@ -109,55 +110,55 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									{ return fWorkspaces[index]; }
 		status_t				SetWorkspacesCount(int32 newCount);
 
-		// WindowLayer methods
+		// Window methods
 
-		void					ActivateWindow(WindowLayer* window);
-		void					SendWindowBehind(WindowLayer* window,
-									WindowLayer* behindOf = NULL);
+		void					ActivateWindow(Window* window);
+		void					SendWindowBehind(Window* window,
+									Window* behindOf = NULL);
 
-		void					ShowWindow(WindowLayer* window);
-		void					HideWindow(WindowLayer* window);
+		void					ShowWindow(Window* window);
+		void					HideWindow(Window* window);
 
-		void					MoveWindowBy(WindowLayer* window, float x, float y,
+		void					MoveWindowBy(Window* window, float x, float y,
 									int32 workspace = -1);
-		void					ResizeWindowBy(WindowLayer* window, float x, float y);
-		bool					SetWindowTabLocation(WindowLayer* window, float location);
-		bool					SetWindowDecoratorSettings(WindowLayer* window,
+		void					ResizeWindowBy(Window* window, float x, float y);
+		bool					SetWindowTabLocation(Window* window, float location);
+		bool					SetWindowDecoratorSettings(Window* window,
 														   const BMessage& settings);
 
-		void					SetWindowWorkspaces(WindowLayer* window,
+		void					SetWindowWorkspaces(Window* window,
 									uint32 workspaces);
 
-		void					AddWindow(WindowLayer* window);
-		void					RemoveWindow(WindowLayer* window);
+		void					AddWindow(Window* window);
+		void					RemoveWindow(Window* window);
 
-		bool					AddWindowToSubset(WindowLayer* subset,
-									WindowLayer* window);
-		void					RemoveWindowFromSubset(WindowLayer* subset,
-									WindowLayer* window);
+		bool					AddWindowToSubset(Window* subset,
+									Window* window);
+		void					RemoveWindowFromSubset(Window* subset,
+									Window* window);
 
-		void					SetWindowLook(WindowLayer* window, window_look look);
-		void					SetWindowFeel(WindowLayer* window, window_feel feel);
-		void					SetWindowFlags(WindowLayer* window, uint32 flags);
-		void					SetWindowTitle(WindowLayer* window, const char* title);
+		void					SetWindowLook(Window* window, window_look look);
+		void					SetWindowFeel(Window* window, window_feel feel);
+		void					SetWindowFlags(Window* window, uint32 flags);
+		void					SetWindowTitle(Window* window, const char* title);
 
-		WindowLayer*			FocusWindow() const { return fFocus; }
-		WindowLayer*			FrontWindow() const { return fFront; }
-		WindowLayer*			BackWindow() const { return fBack; }
+		Window*					FocusWindow() const { return fFocus; }
+		Window*					FrontWindow() const { return fFront; }
+		Window*					BackWindow() const { return fBack; }
 
-		WindowLayer*			WindowAt(BPoint where);
+		Window*					WindowAt(BPoint where);
 
-		WindowLayer*			MouseEventWindow() const { return fMouseEventWindow; }
-		void					SetMouseEventWindow(WindowLayer* window);
+		Window*					MouseEventWindow() const { return fMouseEventWindow; }
+		void					SetMouseEventWindow(Window* window);
 
-		void					SetViewUnderMouse(const WindowLayer* window, int32 viewToken);
-		int32					ViewUnderMouse(const WindowLayer* window);
+		void					SetViewUnderMouse(const Window* window, int32 viewToken);
+		int32					ViewUnderMouse(const Window* window);
 
-		void					SetFocusWindow(WindowLayer* window = NULL);
+		void					SetFocusWindow(Window* window = NULL);
 		EventTarget*			KeyboardEventTarget();
 
-		WindowLayer*			FindWindowLayerByClientToken(int32 token, team_id teamID);
-		//WindowLayer*			FindWindowLayerByServerToken(int32 token);
+		Window*					FindWindowByClientToken(int32 token,
+									team_id teamID);
 
 #if USE_MULTI_LOCKER
 		bool					LockSingleWindow() { return fWindowLock.ReadLock(); }
@@ -181,8 +182,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					RedrawBackground();
 		void					StoreWorkspaceConfiguration(int32 index);
 
-		void					AddWorkspacesView(WorkspacesLayer* view);
-		void					RemoveWorkspacesView(WorkspacesLayer* view);
+		void					AddWorkspacesView(WorkspacesView* view);
+		void					RemoveWorkspacesView(WorkspacesView* view);
 
 		void					MinimizeApplication(team_id team);
 		void					BringApplicationToFront(team_id team);
@@ -196,19 +197,19 @@ class Desktop : public MessageLooper, public ScreenOwner {
 	private:
 		void					_LaunchInputServer();
 		void					_SetWorkspace(int32 index);
-		void					_ShowWindow(WindowLayer* window,
+		void					_ShowWindow(Window* window,
 									bool affectsOtherWindows = true);
-		void					_HideWindow(WindowLayer* window);
+		void					_HideWindow(Window* window);
 
-		void					_UpdateSubsetWorkspaces(WindowLayer* window,
+		void					_UpdateSubsetWorkspaces(Window* window,
 									int32 previousIndex = -1,
 									int32 newIndex = -1);
-		void					_ChangeWindowWorkspaces(WindowLayer* window,
+		void					_ChangeWindowWorkspaces(Window* window,
 									uint32 oldWorkspaces, uint32 newWorkspaces);
 		void					_BringWindowsToFront(WindowList& windows,
 									int32 list, bool wereVisible);
  		status_t				_ActivateApp(team_id team);
- 		void					_SendFakeMouseMoved(WindowLayer* window = NULL);
+ 		void					_SendFakeMouseMoved(Window* window = NULL);
 
 		void					_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen);
 		void					_TriggerWindowRedrawing(BRegion& newDirtyRegion);
@@ -216,14 +217,14 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		void					_UpdateFloating(int32 previousWorkspace = -1,
 									int32 nextWorkspace = -1,
-									WindowLayer* mouseEventWindow = NULL);
+									Window* mouseEventWindow = NULL);
 		void					_UpdateBack();
 		void					_UpdateFront(bool updateFloating = true);
 		void					_UpdateFronts(bool updateFloating = true);
-		bool					_WindowHasModal(WindowLayer* window);
+		bool					_WindowHasModal(Window* window);
 
-		void					_WindowChanged(WindowLayer* window);
-		void					_WindowRemoved(WindowLayer* window);
+		void					_WindowChanged(Window* window);
+		void					_WindowRemoved(Window* window);
 
 		void					_GetLooperName(char* name, size_t size);
 		void					_PrepareQuit();
@@ -258,7 +259,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		WindowList				fAllWindows;
 		WindowList				fSubsetWindows;
 		WindowList				fFocusList;
-		BObjectList<WorkspacesLayer> fWorkspacesViews;
+		BObjectList<WorkspacesView> fWorkspacesViews;
 
 		Screen*					fActiveScreen;
 
@@ -273,15 +274,15 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		BRegion					fBackgroundRegion;
 		BRegion					fScreenRegion;
 
-		WindowLayer*			fMouseEventWindow;
-		const WindowLayer*		fWindowUnderMouse;
+		Window*					fMouseEventWindow;
+		const Window*			fWindowUnderMouse;
 		int32					fViewUnderMouse;
 		BPoint					fLastMousePosition;
 		int32					fLastMouseButtons;
 
-		WindowLayer*			fFocus;
-		WindowLayer*			fFront;
-		WindowLayer*			fBack;
+		Window*			fFocus;
+		Window*			fFront;
+		Window*			fBack;
 };
 
 #endif	// DESKTOP_H

@@ -5,23 +5,21 @@
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef WORKSPACES_LAYER_H
-#define WORKSPACES_LAYER_H
+#ifndef WORKSPACES_VIEW_H
+#define WORKSPACES_VIEW_H
 
 
-#include "ViewLayer.h"
-
-class WindowLayer;
+#include "View.h"
 
 
-class WorkspacesLayer : public ViewLayer {
+class WorkspacesView : public View {
 public:
-					WorkspacesLayer(BRect frame, BPoint scrollingOffset,
+					WorkspacesView(BRect frame, BPoint scrollingOffset,
 						const char* name, int32 token, uint32 resize,
 						uint32 flags);
-	virtual			~WorkspacesLayer();
+	virtual			~WorkspacesView();
 
-	virtual	void	AttachedToWindow(WindowLayer* window);
+	virtual	void	AttachedToWindow(::Window* window);
 	virtual	void	DetachedFromWindow();
 
 	virtual	void	Draw(DrawingEngine* drawingEngine,
@@ -32,8 +30,8 @@ public:
 	virtual	void	MouseUp(BMessage* message, BPoint where);
 	virtual	void	MouseMoved(BMessage* message, BPoint where);
 
-			void	WindowChanged(WindowLayer* window);
-			void	WindowRemoved(WindowLayer* window);
+			void	WindowChanged(::Window* window);
+			void	WindowRemoved(::Window* window);
 
 private:
 			void	_GetGrid(int32& columns, int32& rows);
@@ -46,7 +44,7 @@ private:
 
 			void	_DrawWindow(DrawingEngine* drawingEngine,
 						const BRect& workspaceFrame, const BRect& screenFrame,
-						WindowLayer* window, BPoint windowPosition,
+						::Window* window, BPoint windowPosition,
 						BRegion& backgroundRegion, bool active);
 			void	_DrawWorkspace(DrawingEngine* drawingEngine,
 						BRegion& redraw, int32 index);
@@ -55,10 +53,10 @@ private:
 			void	_Invalidate() const;
 
 private:
-	WindowLayer*	fSelectedWindow;
+	::Window*		fSelectedWindow;
 	int32			fSelectedWorkspace;
 	bool			fHasMoved;
 	BPoint			fLeftTopOffset;
 };
 
-#endif	// WORKSPACES_LAYER_H
+#endif	// WORKSPACES_VIEW_H

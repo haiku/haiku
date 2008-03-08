@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku.
+ * Copyright 2005-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,7 +10,7 @@
 #include "Desktop.h"
 #include "Workspace.h"
 #include "WorkspacePrivate.h"
-#include "WindowLayer.h"
+#include "Window.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -116,7 +116,7 @@ Workspace::SetColor(const rgb_color& color, bool makeDefault)
 
 
 status_t
-Workspace::GetNextWindow(WindowLayer*& _window, BPoint& _leftTop)
+Workspace::GetNextWindow(Window*& _window, BPoint& _leftTop)
 {
 	if (fCurrent == NULL)
 		fCurrent = fWorkspace.Windows().FirstWindow();
@@ -138,7 +138,7 @@ Workspace::GetNextWindow(WindowLayer*& _window, BPoint& _leftTop)
 
 
 status_t
-Workspace::GetPreviousWindow(WindowLayer*& _window, BPoint& _leftTop)
+Workspace::GetPreviousWindow(Window*& _window, BPoint& _leftTop)
 {
 	if (fCurrent == NULL)
 		fCurrent = fWorkspace.Windows().LastWindow();

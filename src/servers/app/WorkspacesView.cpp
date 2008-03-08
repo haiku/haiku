@@ -8,20 +8,20 @@
  */
 
 
-#include "WorkspacesLayer.h"
+#include "WorkspacesView.h"
 
 #include "AppServer.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
-#include "WindowLayer.h"
+#include "Window.h"
 #include "Workspace.h"
 
 #include <WindowPrivate.h>
 
 
-WorkspacesLayer::WorkspacesLayer(BRect frame, BPoint scrollingOffset,
+WorkspacesView::WorkspacesView(BRect frame, BPoint scrollingOffset,
 		const char* name, int32 token, uint32 resizeMode, uint32 flags)
-	: ViewLayer(frame, scrollingOffset, name, token, resizeMode, flags),
+	: View(frame, scrollingOffset, name, token, resizeMode, flags),
 	fSelectedWindow(NULL),
 	fSelectedWorkspace(-1),
 	fHasMoved(false)
@@ -31,15 +31,15 @@ WorkspacesLayer::WorkspacesLayer(BRect frame, BPoint scrollingOffset,
 }
 
 
-WorkspacesLayer::~WorkspacesLayer()
+WorkspacesView::~WorkspacesView()
 {
 }
 
 
 void
-WorkspacesLayer::AttachedToWindow(WindowLayer* window)
+WorkspacesView::AttachedToWindow(::Window* window)
 {
-	ViewLayer::AttachedToWindow(window);
+	View::AttachedToWindow(window);
 
 	window->AddWorkspacesView();
 	window->Desktop()->AddWorkspacesView(this);
@@ -47,17 +47,17 @@ WorkspacesLayer::AttachedToWindow(WindowLayer* window)
 
 
 void
-WorkspacesLayer::DetachedFromWindow()
+WorkspacesView::DetachedFromWindow()
 {
 	fWindow->Desktop()->RemoveWorkspacesView(this);
 	fWindow->RemoveWorkspacesView();
 
-	ViewLayer::DetachedFromWindow();
+	View::DetachedFromWindow();
 }
 
 
 void
-WorkspacesLayer::_GetGrid(int32& columns, int32& rows)
+WorkspacesView::_GetGrid(int32& columns, int32& rows)
 {
 	DesktopSettings settings(Window()->Desktop());
 
@@ -78,7 +78,7 @@ WorkspacesLayer::_GetGrid(int32& columns, int32& rows)
 	\brief Returns the frame of the screen for the specified workspace.
 */
 BRect
-WorkspacesLayer::_ScreenFrame(int32 i)
+WorkspacesView::_ScreenFrame(int32 i)
 {
 	return Window()->Desktop()->VirtualScreen().Frame();
 }
@@ -89,7 +89,7 @@ WorkspacesLayer::_ScreenFrame(int32 i)
 		workspaces layer.
 */
 BRect
-WorkspacesLayer::_WorkspaceAt(int32 i)
+WorkspacesView::_WorkspaceAt(int32 i)
 {
 	int32 columns, rows;
 	_GetGrid(columns, rows);
@@ -126,7 +126,7 @@ WorkspacesLayer::_WorkspaceAt(int32 i)
 	an empty rectangle is returned, and \a index is set to -1.
 */
 BRect
-WorkspacesLayer::_WorkspaceAt(BPoint where, int32& index)
+WorkspacesView::_WorkspaceAt(BPoint where, int32& index)
 {
 	int32 columns, rows;
 	_GetGrid(columns, rows);
@@ -143,7 +143,7 @@ WorkspacesLayer::_WorkspaceAt(BPoint where, int32& index)
 
 
 BRect
-WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
+WorkspacesView::_WindowFrame(const BRect& workspaceFrame,
 	const BRect& screenFrame, const BRect& windowFrame,
 	BPoint windowPosition)
 {
@@ -164,9 +164,9 @@ WorkspacesLayer::_WindowFrame(const BRect& workspaceFrame,
 
 
 void
-WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspaceFrame,
-	const BRect& screenFrame, WindowLayer* window, BPoint windowPosition,
-	BRegion& backgroundRegion, bool active)
+WorkspacesView::_DrawWindow(DrawingEngine* drawingEngine,
+	const BRect& workspaceFrame, const BRect& screenFrame, ::Window* window,
+	BPoint windowPosition, BRegion& backgroundRegion, bool active)
 {
 	if (window->Feel() == kDesktopWindowFeel || window->IsHidden())
 		return;
@@ -226,7 +226,7 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 	// draw title
 
 	// TODO: disabled because it's much too slow this way - the mini-window
-	//	functionality should probably be moved into the WindowLayer class,
+	//	functionality should probably be moved into the Window class,
 	//	so that it has only to be recalculated on demand. With double buffered
 	//	windows, this would also open up the door to have a more detailed
 	//	preview.
@@ -252,7 +252,7 @@ WorkspacesLayer::_DrawWindow(DrawingEngine* drawingEngine, const BRect& workspac
 
 
 void
-WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
+WorkspacesView::_DrawWorkspace(DrawingEngine* drawingEngine,
 	BRegion& redraw, int32 index)
 {
 	BRect rect = _WorkspaceAt(index);
@@ -288,7 +288,7 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 
 	// We draw from top down and cut the window out of the clipping region
 	// which reduces the flickering
-	WindowLayer* window;
+	::Window* window;
 	BPoint leftTop;
 	while (workspace.GetPreviousWindow(window, leftTop) == B_OK) {
 		_DrawWindow(drawingEngine, rect, screenFrame, window,
@@ -303,14 +303,14 @@ WorkspacesLayer::_DrawWorkspace(DrawingEngine* drawingEngine,
 
 
 void
-WorkspacesLayer::_DarkenColor(rgb_color& color) const
+WorkspacesView::_DarkenColor(rgb_color& color) const
 {
 	color = tint_color(color, B_DARKEN_2_TINT);
 }
 
 
 void
-WorkspacesLayer::_Invalidate() const
+WorkspacesView::_Invalidate() const
 {
 	BRect frame = Bounds();
 	ConvertToScreen(&frame);
@@ -321,7 +321,7 @@ WorkspacesLayer::_Invalidate() const
 
 
 void
-WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
+WorkspacesView::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion* windowContentClipping, bool deep)
 {
 	// we can only draw within our own area
@@ -377,7 +377,7 @@ WorkspacesLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 
 void
-WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
+WorkspacesView::MouseDown(BMessage* message, BPoint where)
 {
 	// reset tracking variables
 	fSelectedWorkspace = -1;
@@ -400,7 +400,7 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 
 	BRect screenFrame = _ScreenFrame(index);
 
-	WindowLayer* window;
+	::Window* window;
 	BRect windowFrame;
 	BPoint leftTop;
 	while (workspace.GetPreviousWindow(window, leftTop) == B_OK) {
@@ -453,7 +453,7 @@ WorkspacesLayer::MouseDown(BMessage* message, BPoint where)
 
 
 void
-WorkspacesLayer::MouseUp(BMessage* message, BPoint where)
+WorkspacesView::MouseUp(BMessage* message, BPoint where)
 {
 	if (!fHasMoved && fSelectedWorkspace >= 0) {
 		int32 index;
@@ -473,7 +473,7 @@ WorkspacesLayer::MouseUp(BMessage* message, BPoint where)
 
 
 void
-WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
+WorkspacesView::MouseMoved(BMessage* message, BPoint where)
 {
 	if (fSelectedWindow == NULL && fSelectedWorkspace < 0)
 		return;
@@ -537,7 +537,7 @@ WorkspacesLayer::MouseMoved(BMessage* message, BPoint where)
 
 
 void
-WorkspacesLayer::WindowChanged(WindowLayer* window)
+WorkspacesView::WindowChanged(::Window* window)
 {
 	// TODO: be smarter about this!
 	_Invalidate();
@@ -545,7 +545,7 @@ WorkspacesLayer::WindowChanged(WindowLayer* window)
 
 
 void
-WorkspacesLayer::WindowRemoved(WindowLayer* window)
+WorkspacesView::WindowRemoved(::Window* window)
 {
 	if (fSelectedWindow == window)
 		fSelectedWindow = NULL;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku.
+ * Copyright 2005-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,7 +13,7 @@
 
 
 class Desktop;
-class WindowLayer;
+class Window;
 
 
 class Workspace {
@@ -26,8 +26,8 @@ class Workspace {
 		bool		IsCurrent() const
 						{ return fCurrentWorkspace; }
 
-		status_t	GetNextWindow(WindowLayer*& _window, BPoint& _leftTop);
-		status_t	GetPreviousWindow(WindowLayer*& _window, BPoint& _leftTop);
+		status_t	GetNextWindow(Window*& _window, BPoint& _leftTop);
+		status_t	GetPreviousWindow(Window*& _window, BPoint& _leftTop);
 		void		RewindWindows();
 
 		class Private;
@@ -35,7 +35,7 @@ class Workspace {
 	private:
 		Workspace::Private& fWorkspace;
 		Desktop&	fDesktop;
-		WindowLayer* fCurrent;
+		Window*		fCurrent;
 		bool		fCurrentWorkspace;
 };
 

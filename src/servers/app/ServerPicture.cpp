@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,8 +15,8 @@
 #include "ServerFont.h"
 #include "ServerPicture.h"
 #include "ServerTokenSpace.h"
-#include "ViewLayer.h"
-#include "WindowLayer.h"
+#include "View.h"
+#include "Window.h"
 
 #include <LinkReceiver.h>
 #include <OffsetFile.h>
@@ -47,7 +47,7 @@ class ShapePainter : public BShapeIterator {
 		virtual status_t IterateBezierTo(int32 bezierCount, BPoint *bezierPts);
 		virtual status_t IterateClose();
 
-		void Draw(ViewLayer *view, BRect frame, bool filled);
+		void Draw(View *view, BRect frame, bool filled);
 
 	private:
 		stack<uint32> fOpStack;
@@ -109,7 +109,7 @@ ShapePainter::IterateClose(void)
 }
 
 void
-ShapePainter::Draw(ViewLayer *view, BRect frame, bool filled)
+ShapePainter::Draw(View *view, BRect frame, bool filled)
 {
 	// We're going to draw the currently iterated shape.
 	int32 opCount, ptCount;
@@ -177,14 +177,14 @@ nop()
 
 
 static void
-move_pen_by(ViewLayer *view, BPoint delta)
+move_pen_by(View *view, BPoint delta)
 {
 	view->CurrentState()->SetPenLocation(view->CurrentState()->PenLocation() + delta);
 }
 
 
 static void
-stroke_line(ViewLayer *view, BPoint start, BPoint end)
+stroke_line(View *view, BPoint start, BPoint end)
 {
 	BPoint penPos = end;
 
@@ -200,7 +200,7 @@ stroke_line(ViewLayer *view, BPoint start, BPoint end)
 
 
 static void
-stroke_rect(ViewLayer *view, BRect rect)
+stroke_rect(View *view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);	
 	view->Window()->GetDrawingEngine()->StrokeRect(rect);
@@ -208,7 +208,7 @@ stroke_rect(ViewLayer *view, BRect rect)
 
 
 static void
-fill_rect(ViewLayer *view, BRect rect)
+fill_rect(View *view, BRect rect)
 {
 	view->ConvertToScreenForDrawing(&rect);			
 	view->Window()->GetDrawingEngine()->FillRect(rect);
@@ -216,7 +216,7 @@ fill_rect(ViewLayer *view, BRect rect)
 
 
 static void
-stroke_round_rect(ViewLayer *view, BRect rect, BPoint radii)
+stroke_round_rect(View *view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);	
 	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
@@ -225,7 +225,7 @@ stroke_round_rect(ViewLayer *view, BRect rect, BPoint radii)
 
 
 static void
-fill_round_rect(ViewLayer *view, BRect rect, BPoint radii)
+fill_round_rect(View *view, BRect rect, BPoint radii)
 {
 	view->ConvertToScreenForDrawing(&rect);	
 	view->Window()->GetDrawingEngine()->DrawRoundRect(rect, radii.x, radii.y,
@@ -234,7 +234,7 @@ fill_round_rect(ViewLayer *view, BRect rect, BPoint radii)
 
 
 static void
-stroke_bezier(ViewLayer *view, const BPoint *viewPoints)
+stroke_bezier(View *view, const BPoint *viewPoints)
 {
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
@@ -244,7 +244,7 @@ stroke_bezier(ViewLayer *view, const BPoint *viewPoints)
 
 
 static void
-fill_bezier(ViewLayer *view, const BPoint *viewPoints)
+fill_bezier(View *view, const BPoint *viewPoints)
 {
 	BPoint points[4];
 	view->ConvertToScreenForDrawing(points, viewPoints, 4);
@@ -254,8 +254,8 @@ fill_bezier(ViewLayer *view, const BPoint *viewPoints)
 
 
 static void
-stroke_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
-			   float arcTheta)
+stroke_arc(View *view, BPoint center, BPoint radii, float startTheta,
+	float arcTheta)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
 			center.y + radii.y - 1);
@@ -265,8 +265,8 @@ stroke_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 
 
 static void
-fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
-			 float arcTheta)
+fill_arc(View *view, BPoint center, BPoint radii, float startTheta,
+	float arcTheta)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
 			center.y + radii.y - 1);
@@ -276,7 +276,7 @@ fill_arc(ViewLayer *view, BPoint center, BPoint radii, float startTheta,
 
 
 static void
-stroke_ellipse(ViewLayer *view, BPoint center, BPoint radii)
+stroke_ellipse(View *view, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
 			center.y + radii.y - 1);
@@ -286,7 +286,7 @@ stroke_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 
 
 static void
-fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
+fill_ellipse(View *view, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y, center.x + radii.x - 1,
 			center.y + radii.y - 1);
@@ -296,11 +296,13 @@ fill_ellipse(ViewLayer *view, BPoint center, BPoint radii)
 
 
 static void
-stroke_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints, bool isClosed)
+stroke_polygon(View *view, int32 numPoints, const BPoint *viewPoints,
+	bool isClosed)
 {
-	if (numPoints <= 0) {
+	if (numPoints <= 0)
 		return;
-	} else if (numPoints <= 200) {
+
+	if (numPoints <= 200) {
 		// fast path: no malloc/free, also avoid constructor/destructor calls
 		char data[200 * sizeof(BPoint)];
 		BPoint *points = (BPoint *)data;
@@ -331,11 +333,12 @@ stroke_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints, bool 
 
 
 static void
-fill_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints)
+fill_polygon(View *view, int32 numPoints, const BPoint *viewPoints)
 {
-	if (numPoints <= 0) {
+	if (numPoints <= 0)
 		return;
-	} else if (numPoints <= 200) {
+
+	if (numPoints <= 200) {
 		// fast path: no malloc/free, also avoid constructor/destructor calls
 		char data[200 * sizeof(BPoint)];
 		BPoint *points = (BPoint *)data;
@@ -366,7 +369,7 @@ fill_polygon(ViewLayer *view, int32 numPoints, const BPoint *viewPoints)
 
 
 static void
-stroke_shape(ViewLayer *view, const BShape *shape)
+stroke_shape(View *view, const BShape *shape)
 {
 	ShapePainter drawShape;
 
@@ -376,7 +379,7 @@ stroke_shape(ViewLayer *view, const BShape *shape)
 
 
 static void
-fill_shape(ViewLayer *view, const BShape *shape)
+fill_shape(View *view, const BShape *shape)
 {
 	ShapePainter drawShape;
 
@@ -386,7 +389,7 @@ fill_shape(ViewLayer *view, const BShape *shape)
 
 
 static void
-draw_string(ViewLayer *view, const char *string, float deltaSpace,
+draw_string(View *view, const char *string, float deltaSpace,
 	float deltaNonSpace)
 {
 	// NOTE: the picture data was recorded with a "set pen location" command
@@ -407,10 +410,11 @@ draw_string(ViewLayer *view, const char *string, float deltaSpace,
 
 
 static void
-draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
-				 int32 bytesPerRow, int32 pixelFormat, int32 flags, const void *data)
+draw_pixels(View *view, BRect src, BRect dest, int32 width, int32 height,
+	int32 bytesPerRow, int32 pixelFormat, int32 flags, const void *data)
 {
-	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1), (color_space)pixelFormat, flags, bytesPerRow);
+	UtilityBitmap bitmap(BRect(0, 0, width - 1, height - 1),
+		(color_space)pixelFormat, flags, bytesPerRow);
 	
 	if (!bitmap.IsValid())
 		return;
@@ -424,7 +428,7 @@ draw_pixels(ViewLayer *view, BRect src, BRect dest, int32 width, int32 height,
 
 
 static void
-draw_picture(ViewLayer *view, BPoint where, int32 token)
+draw_picture(View *view, BPoint where, int32 token)
 {
 	ServerPicture *picture = view->Window()->ServerWindow()->App()->FindPicture(token);	
 	if (picture != NULL) {
@@ -435,7 +439,7 @@ draw_picture(ViewLayer *view, BPoint where, int32 token)
 
 
 static void
-set_clipping_rects(ViewLayer *view, const BRect *rects, uint32 numRects)
+set_clipping_rects(View *view, const BRect *rects, uint32 numRects)
 {
 	// TODO: This might be too slow, we should copy the rects
 	// directly to BRegion's internal data
@@ -447,8 +451,8 @@ set_clipping_rects(ViewLayer *view, const BRect *rects, uint32 numRects)
 
 
 static void
-clip_to_picture(ViewLayer *view, BPicture *picture, BPoint pt,
-				   bool clip_to_inverse_picture)
+clip_to_picture(View *view, BPicture *picture, BPoint pt,
+	bool clip_to_inverse_picture)
 {
 	printf("ClipToPicture(picture, BPoint(%.2f, %.2f), %s)\n", pt.x, pt.y,
 		clip_to_inverse_picture ? "inverse" : "");
@@ -456,14 +460,14 @@ clip_to_picture(ViewLayer *view, BPicture *picture, BPoint pt,
 
 
 static void
-push_state(ViewLayer *view)
+push_state(View *view)
 {
 	view->PushState();
 }
 
 
 static void
-pop_state(ViewLayer *view)
+pop_state(View *view)
 {
 	view->PopState();
 
@@ -477,40 +481,40 @@ pop_state(ViewLayer *view)
 // TODO: Be smart and actually take advantage of these methods:
 // only apply state changes when they are called
 static void
-enter_state_change(ViewLayer *view)
+enter_state_change(View *view)
 {
 }
 
 
 static void
-exit_state_change(ViewLayer *view)
+exit_state_change(View *view)
 {
 	view->Window()->ServerWindow()->ResyncDrawState();
 }
 
 
 static void 
-enter_font_state(ViewLayer *view)
+enter_font_state(View *view)
 {
 }
 
 
 static void
-exit_font_state(ViewLayer *view)
+exit_font_state(View *view)
 {
 	view->Window()->GetDrawingEngine()->SetFont(view->CurrentState()->Font());
 }
 
 
 static void 
-set_origin(ViewLayer *view, BPoint pt)
+set_origin(View *view, BPoint pt)
 {
 	view->CurrentState()->SetOrigin(pt);
 }
 
 
 static void
-set_pen_location(ViewLayer *view, BPoint pt)
+set_pen_location(View *view, BPoint pt)
 {
 	view->CurrentState()->SetPenLocation(pt);
 	// the DrawingEngine/Painter does not need to be updated, since this
@@ -520,7 +524,7 @@ set_pen_location(ViewLayer *view, BPoint pt)
 
 
 static void
-set_drawing_mode(ViewLayer *view, drawing_mode mode)
+set_drawing_mode(View *view, drawing_mode mode)
 {
 	view->CurrentState()->SetDrawingMode(mode);
 	view->Window()->GetDrawingEngine()->SetDrawingMode(mode);
@@ -528,7 +532,7 @@ set_drawing_mode(ViewLayer *view, drawing_mode mode)
 
 
 static void
-set_line_mode(ViewLayer *view, cap_mode capMode, join_mode joinMode, float miterLimit)
+set_line_mode(View *view, cap_mode capMode, join_mode joinMode, float miterLimit)
 {
 	DrawState *state = view->CurrentState();
 	state->SetLineCapMode(capMode);
@@ -539,7 +543,7 @@ set_line_mode(ViewLayer *view, cap_mode capMode, join_mode joinMode, float miter
 
 
 static void
-set_pen_size(ViewLayer *view, float size)
+set_pen_size(View *view, float size)
 {
 	view->CurrentState()->SetPenSize(size);
 	view->Window()->GetDrawingEngine()->SetPenSize(view->CurrentState()->PenSize());
@@ -549,7 +553,7 @@ set_pen_size(ViewLayer *view, float size)
 
 
 static void
-set_fore_color(ViewLayer *view, rgb_color color)
+set_fore_color(View *view, rgb_color color)
 {
 	view->CurrentState()->SetHighColor(color);
 	view->Window()->GetDrawingEngine()->SetHighColor(color);
@@ -557,7 +561,7 @@ set_fore_color(ViewLayer *view, rgb_color color)
 
 
 static void
-set_back_color(ViewLayer *view, rgb_color color)
+set_back_color(View *view, rgb_color color)
 {
 	view->CurrentState()->SetLowColor(color);
 	view->Window()->GetDrawingEngine()->SetLowColor(color);
@@ -565,7 +569,7 @@ set_back_color(ViewLayer *view, rgb_color color)
 
 
 static void
-set_stipple_pattern(ViewLayer *view, pattern p)
+set_stipple_pattern(View *view, pattern p)
 {
 	view->CurrentState()->SetPattern(Pattern(p));
 	view->Window()->GetDrawingEngine()->SetPattern(p);
@@ -573,7 +577,7 @@ set_stipple_pattern(ViewLayer *view, pattern p)
 
 
 static void
-set_scale(ViewLayer *view, float scale)
+set_scale(View *view, float scale)
 {
 	view->CurrentState()->SetScale(scale);
 	view->Window()->ServerWindow()->ResyncDrawState();
@@ -584,7 +588,7 @@ set_scale(ViewLayer *view, float scale)
 
 
 static void
-set_font_family(ViewLayer *view, const char *family)
+set_font_family(View *view, const char *family)
 {
 	// TODO: Implement
 	// Can we have a ServerFont::SetFamily() which accepts a string ?
@@ -592,7 +596,7 @@ set_font_family(ViewLayer *view, const char *family)
 
 
 static void
-set_font_style(ViewLayer *view, const char *style)
+set_font_style(View *view, const char *style)
 {
 	// TODO: Implement
 	// Can we have a ServerFont::SetStyle() which accepts a string ?
@@ -600,7 +604,7 @@ set_font_style(ViewLayer *view, const char *style)
 
 
 static void
-set_font_spacing(ViewLayer *view, int32 spacing)
+set_font_spacing(View *view, int32 spacing)
 {
 	ServerFont font;
 	font.SetSpacing(spacing);
@@ -609,7 +613,7 @@ set_font_spacing(ViewLayer *view, int32 spacing)
 
 
 static void
-set_font_size(ViewLayer *view, float size)
+set_font_size(View *view, float size)
 {
 	ServerFont font;
 	font.SetSize(size);
@@ -618,7 +622,7 @@ set_font_size(ViewLayer *view, float size)
 
 
 static void
-set_font_rotate(ViewLayer *view, float rotation)
+set_font_rotate(View *view, float rotation)
 {
 	ServerFont font;
 	font.SetRotation(rotation);
@@ -627,7 +631,7 @@ set_font_rotate(ViewLayer *view, float rotation)
 
 
 static void
-set_font_encoding(ViewLayer *view, int32 encoding)
+set_font_encoding(View *view, int32 encoding)
 {
 	ServerFont font;
 	font.SetEncoding(encoding);
@@ -636,7 +640,7 @@ set_font_encoding(ViewLayer *view, int32 encoding)
 
 
 static void
-set_font_flags(ViewLayer *view, int32 flags)
+set_font_flags(View *view, int32 flags)
 {
 	ServerFont font;
 	font.SetFlags(flags);
@@ -645,7 +649,7 @@ set_font_flags(ViewLayer *view, int32 flags)
 
 
 static void
-set_font_shear(ViewLayer *view, float shear)
+set_font_shear(View *view, float shear)
 {
 	ServerFont font;
 	font.SetShear(shear);
@@ -654,7 +658,7 @@ set_font_shear(ViewLayer *view, float shear)
 
 
 static void
-set_font_face(ViewLayer *view, int32 face)
+set_font_face(View *view, int32 face)
 {
 	ServerFont font;
 	font.SetFace(face);
@@ -663,7 +667,7 @@ set_font_face(ViewLayer *view, int32 face)
 
 
 static void
-set_blending_mode(ViewLayer *view, int16 alphaSrcMode, int16 alphaFncMode)
+set_blending_mode(View *view, int16 alphaSrcMode, int16 alphaFncMode)
 {
 	view->CurrentState()->SetBlendingMode((source_alpha)alphaSrcMode, (alpha_function)alphaFncMode);
 }
@@ -813,7 +817,7 @@ ServerPicture::ExitStateChange()
 
 
 void
-ServerPicture::SyncState(ViewLayer *view)
+ServerPicture::SyncState(View *view)
 {
 	// TODO: Finish this
 	EnterStateChange();
@@ -903,7 +907,7 @@ ServerPicture::SetFontFromLink(BPrivate::LinkReceiver& link)
 
 
 void
-ServerPicture::Play(ViewLayer *view)
+ServerPicture::Play(View *view)
 {
 	// TODO: for now: then change PicturePlayer to accept a BPositionIO object
 	BMallocIO *mallocIO = dynamic_cast<BMallocIO *>(fData);

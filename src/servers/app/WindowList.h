@@ -13,29 +13,29 @@
 #include <Point.h>
 
 
-class WindowLayer;
+class Window;
 
 
 class WindowList {
-	public:
-		WindowList(int32 index = 0);
-		~WindowList();
+public:
+					WindowList(int32 index = 0);
+					~WindowList();
 
-		void SetIndex(int32 index);
-		int32 Index() const { return fIndex; }
+			void	SetIndex(int32 index);
+			int32	Index() const { return fIndex; }
+	
+			Window*	FirstWindow() { return fFirstWindow; }
+			Window*	LastWindow() { return fLastWindow; }
+	
+			void	AddWindow(Window* window, Window* before = NULL);
+			void	RemoveWindow(Window* window);
+	
+			bool	HasWindow(Window* window) const;
 
-		WindowLayer* FirstWindow() { return fFirstWindow; }
-		WindowLayer* LastWindow() { return fLastWindow; }
-
-		void AddWindow(WindowLayer* window, WindowLayer* before = NULL);
-		void RemoveWindow(WindowLayer* window);
-
-		bool HasWindow(WindowLayer* window) const;
-
-	private:
-		int32			fIndex;
-		WindowLayer*	fFirstWindow;
-		WindowLayer*	fLastWindow;
+private:
+	int32			fIndex;
+	Window*			fFirstWindow;
+	Window*			fLastWindow;
 };
 
 enum window_lists {
@@ -50,9 +50,9 @@ enum window_lists {
 struct window_anchor {
 	window_anchor();
 
-	WindowLayer*	next;
-	WindowLayer*	previous;
-	BPoint			position;
+	Window*	next;
+	Window*	previous;
+	BPoint	position;
 };
 
 extern const BPoint kInvalidWindowPosition;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -7,24 +7,25 @@
  */
 
 
-#include "BitmapHWInterface.h"
-#include "DrawingEngine.h"
-#include "OffscreenWindowLayer.h"
-#include "ServerBitmap.h"
-
-#include <Debug.h>
-#include "DebugInfoManager.h"
+#include "OffscreenWindow.h"
 
 #include <stdio.h>
 
+#include <Debug.h>
 
-OffscreenWindowLayer::OffscreenWindowLayer(ServerBitmap* bitmap,
+#include "BitmapHWInterface.h"
+#include "DebugInfoManager.h"
+#include "DrawingEngine.h"
+#include "ServerBitmap.h"
+
+
+OffscreenWindow::OffscreenWindow(ServerBitmap* bitmap,
 		const char* name, ::ServerWindow* window)
-	: WindowLayer(bitmap->Bounds(), name,
+	: Window(bitmap->Bounds(), name,
 			B_NO_BORDER_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 			0, 0, window, new DrawingEngine()),
-	  fBitmap(bitmap),
-	  fHWInterface(new BitmapHWInterface(fBitmap))
+	fBitmap(bitmap),
+	fHWInterface(new BitmapHWInterface(fBitmap))
 {
 	fHWInterface->Initialize();
 	GetDrawingEngine()->SetHWInterface(fHWInterface);
@@ -37,7 +38,7 @@ OffscreenWindowLayer::OffscreenWindowLayer(ServerBitmap* bitmap,
 }
 
 
-OffscreenWindowLayer::~OffscreenWindowLayer()
+OffscreenWindow::~OffscreenWindow()
 {
 	fHWInterface->LockExclusiveAccess();
 	// Unlike normal Layers, we own the DrawingEngine instance

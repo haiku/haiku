@@ -11,7 +11,7 @@
  */
 
 
-#include "ViewLayer.h"
+#include "View.h"
 
 #include "BitmapManager.h"
 #include "Desktop.h"
@@ -22,7 +22,7 @@
 #include "ServerCursor.h"
 #include "ServerPicture.h"
 #include "ServerWindow.h"
-#include "WindowLayer.h"
+#include "Window.h"
 
 #include "drawing_support.h"
 
@@ -71,7 +71,7 @@ resize_frame(IntRect& frame, uint32 resizingMode, int32 x, int32 y)
 //	#pragma mark -
 
 
-ViewLayer::ViewLayer(IntRect frame, IntPoint scrollingOffset, const char* name,
+View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 		int32 token, uint32 resizeMode, uint32 flags)
 	:
 	fName(name),
@@ -116,7 +116,7 @@ ViewLayer::ViewLayer(IntRect frame, IntPoint scrollingOffset, const char* name,
 }
 
 
-ViewLayer::~ViewLayer()
+View::~View()
 {
 	if (fViewBitmap != NULL)
 		gBitmapManager->DeleteBitmap(fViewBitmap);
@@ -130,9 +130,9 @@ ViewLayer::~ViewLayer()
 		fCursor->Release();
 
 	// iterate over children and delete each one
-	ViewLayer* layer = fFirstChild;
+	View* layer = fFirstChild;
 	while (layer) {
-		ViewLayer* toast = layer;
+		View* toast = layer;
 		layer = layer->fNextSibling;
 		delete toast;
 	}
@@ -140,7 +140,7 @@ ViewLayer::~ViewLayer()
 
 
 IntRect
-ViewLayer::Bounds() const
+View::Bounds() const
 {
 	IntRect bounds(fScrollingOffset.x, fScrollingOffset.y,
 		fScrollingOffset.x + fFrame.Width(),
@@ -150,7 +150,7 @@ ViewLayer::Bounds() const
 
 
 void
-ViewLayer::ConvertToVisibleInTopView(IntRect* bounds) const
+View::ConvertToVisibleInTopView(IntRect* bounds) const
 {
 	*bounds = *bounds & Bounds();
 	// NOTE: this step is necessary even if we don't have a parent!
@@ -162,7 +162,7 @@ ViewLayer::ConvertToVisibleInTopView(IntRect* bounds) const
 
 
 void
-ViewLayer::AttachedToWindow(WindowLayer* window)
+View::AttachedToWindow(::Window* window)
 {
 	fWindow = window;
 
@@ -177,13 +177,13 @@ ViewLayer::AttachedToWindow(WindowLayer* window)
 	}
 
 	// attach child views as well
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+	for (View* child = FirstChild(); child; child = child->NextSibling())
 		child->AttachedToWindow(window);
 }
 
 
 void
-ViewLayer::DetachedFromWindow()
+View::DetachedFromWindow()
 {
 	// remove view from local token space
 	if (fWindow != NULL)
@@ -191,7 +191,7 @@ ViewLayer::DetachedFromWindow()
 
 	fWindow = NULL;
 	// detach child views as well
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+	for (View* child = FirstChild(); child; child = child->NextSibling())
 		child->DetachedFromWindow();
 }
 
@@ -200,10 +200,10 @@ ViewLayer::DetachedFromWindow()
 
 
 void
-ViewLayer::AddChild(ViewLayer* layer)
+View::AddChild(View* layer)
 {
 	if (layer->fParent) {
-		printf("ViewLayer::AddChild() - ViewLayer already has a parent\n");
+		printf("View::AddChild() - View already has a parent\n");
 		return;
 	}
 
@@ -243,10 +243,10 @@ ViewLayer::AddChild(ViewLayer* layer)
 
 
 bool
-ViewLayer::RemoveChild(ViewLayer* layer)
+View::RemoveChild(View* layer)
 {
 	if (layer->fParent != this) {
-		printf("ViewLayer::RemoveChild(%p - %s) - ViewLayer is not child of "
+		printf("View::RemoveChild(%p - %s) - View is not child of "
 			"this (%p) layer!\n", layer, layer ? layer->Name() : NULL, this);
 		return false;
 	}
@@ -300,8 +300,8 @@ ViewLayer::RemoveChild(ViewLayer* layer)
 }
 
 
-ViewLayer*
-ViewLayer::TopLayer()
+View*
+View::TopLayer()
 {
 	// returns the top level view of the hirarchy,
 	// it doesn't have to be the top level of a window
@@ -314,10 +314,10 @@ ViewLayer::TopLayer()
 
 
 uint32
-ViewLayer::CountChildren(bool deep) const
+View::CountChildren(bool deep) const
 {
 	uint32 count = 0;
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		count++;
 		if (deep) {
 			count += child->CountChildren(deep);
@@ -328,9 +328,9 @@ ViewLayer::CountChildren(bool deep) const
 
 
 void
-ViewLayer::CollectTokensForChildren(BList* tokenMap) const
+View::CollectTokensForChildren(BList* tokenMap) const
 {
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		tokenMap->AddItem((void*)child);
 		child->CollectTokensForChildren(tokenMap);
 	}
@@ -339,7 +339,7 @@ ViewLayer::CollectTokensForChildren(BList* tokenMap) const
 
 #if 0
 bool
-ViewLayer::MarkAt(DrawingEngine* engine, const BPoint& where, int32 level)
+View::MarkAt(DrawingEngine* engine, const BPoint& where, int32 level)
 {
 	BRect rect(fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
 
@@ -353,7 +353,7 @@ ViewLayer::MarkAt(DrawingEngine* engine, const BPoint& where, int32 level)
 
 
 	bool found = false;
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		found |= child->MarkAt(engine, where, level + 1);
 	}
 
@@ -377,7 +377,7 @@ ViewLayer::MarkAt(DrawingEngine* engine, const BPoint& where, int32 level)
 
 
 void
-ViewLayer::FindViews(uint32 flags, BObjectList<ViewLayer>& list, int32& left)
+View::FindViews(uint32 flags, BObjectList<View>& list, int32& left)
 {
 	if ((Flags() & flags) == flags) {
 		list.AddItem(this);
@@ -385,7 +385,7 @@ ViewLayer::FindViews(uint32 flags, BObjectList<ViewLayer>& list, int32& left)
 		return;
 	}
 
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		child->FindViews(flags, list, left);
 		if (left == 0)
 			break;
@@ -393,8 +393,8 @@ ViewLayer::FindViews(uint32 flags, BObjectList<ViewLayer>& list, int32& left)
 }
 
 
-ViewLayer*
-ViewLayer::ViewAt(const BPoint& where)
+View*
+View::ViewAt(const BPoint& where)
 {
 	if (!fVisible)
 		return NULL;
@@ -406,8 +406,8 @@ ViewLayer::ViewAt(const BPoint& where)
 	if (!frame.Contains(where))
 		return NULL;
 
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
-		ViewLayer* layer = child->ViewAt(where);
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
+		View* layer = child->ViewAt(where);
 		if (layer != NULL)
 			return layer;
 	}
@@ -420,14 +420,14 @@ ViewLayer::ViewAt(const BPoint& where)
 
 
 void
-ViewLayer::SetName(const char* string)
+View::SetName(const char* string)
 {
 	fName.SetTo(string);
 }
 
 
 void
-ViewLayer::SetFlags(uint32 flags)
+View::SetFlags(uint32 flags)
 {
 	fFlags = flags;
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
@@ -435,7 +435,7 @@ ViewLayer::SetFlags(uint32 flags)
 
 
 void
-ViewLayer::SetDrawingOrigin(BPoint origin)
+View::SetDrawingOrigin(BPoint origin)
 {
 	fDrawState->SetOrigin(origin);
 
@@ -446,7 +446,7 @@ ViewLayer::SetDrawingOrigin(BPoint origin)
 
 
 BPoint
-ViewLayer::DrawingOrigin() const
+View::DrawingOrigin() const
 {
 	BPoint origin(fDrawState->Origin());
 	float scale = Scale();
@@ -459,7 +459,7 @@ ViewLayer::DrawingOrigin() const
 
 
 void
-ViewLayer::SetScale(float scale)
+View::SetScale(float scale)
 {
 	fDrawState->SetScale(scale);
 
@@ -470,14 +470,14 @@ ViewLayer::SetScale(float scale)
 
 
 float
-ViewLayer::Scale() const
+View::Scale() const
 {
 	return CurrentState()->Scale();
 }
 
 
 void
-ViewLayer::SetUserClipping(const BRegion* region)
+View::SetUserClipping(const BRegion* region)
 {
 	fDrawState->SetClippingRegion(region);
 	
@@ -487,7 +487,7 @@ ViewLayer::SetUserClipping(const BRegion* region)
 
 
 void
-ViewLayer::SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
+View::SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
 	IntRect destRect, int32 resizingMode, int32 options)
 {
 	if (fViewBitmap != NULL) {
@@ -520,7 +520,7 @@ ViewLayer::SetViewBitmap(ServerBitmap* bitmap, IntRect sourceRect,
 
 
 ::Overlay*
-ViewLayer::_Overlay() const
+View::_Overlay() const
 {
 	if (fViewBitmap == NULL)
 		return NULL;
@@ -530,7 +530,7 @@ ViewLayer::_Overlay() const
 
 
 void
-ViewLayer::_UpdateOverlayView() const
+View::_UpdateOverlayView() const
 {
 	Overlay* overlay = _Overlay();
 	if (overlay == NULL)
@@ -548,7 +548,7 @@ ViewLayer::_UpdateOverlayView() const
 	be nice to have a better solution for this, though.
 */
 void
-ViewLayer::UpdateOverlay()
+View::UpdateOverlay()
 {
 	if (!IsVisible())
 		return;
@@ -558,7 +558,7 @@ ViewLayer::UpdateOverlay()
 	} else {
 		// recursively ask children of this view
 
-		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		for (View* child = FirstChild(); child; child = child->NextSibling()) {
 			child->UpdateOverlay();
 		}
 	}
@@ -569,7 +569,7 @@ ViewLayer::UpdateOverlay()
 
 
 void
-ViewLayer::ConvertToParent(BPoint* point) const
+View::ConvertToParent(BPoint* point) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	point->x += fFrame.left - fScrollingOffset.x;
@@ -578,7 +578,7 @@ ViewLayer::ConvertToParent(BPoint* point) const
 
 
 void
-ViewLayer::ConvertToParent(IntPoint* point) const
+View::ConvertToParent(IntPoint* point) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	point->x += fFrame.left - fScrollingOffset.x;
@@ -587,7 +587,7 @@ ViewLayer::ConvertToParent(IntPoint* point) const
 
 
 void
-ViewLayer::ConvertToParent(BRect* rect) const
+View::ConvertToParent(BRect* rect) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	rect->OffsetBy(fFrame.left - fScrollingOffset.x,
@@ -596,7 +596,7 @@ ViewLayer::ConvertToParent(BRect* rect) const
 
 
 void
-ViewLayer::ConvertToParent(IntRect* rect) const
+View::ConvertToParent(IntRect* rect) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	rect->OffsetBy(fFrame.left - fScrollingOffset.x,
@@ -605,7 +605,7 @@ ViewLayer::ConvertToParent(IntRect* rect) const
 
 
 void
-ViewLayer::ConvertToParent(BRegion* region) const
+View::ConvertToParent(BRegion* region) const
 {
 	// remove scrolling offset and convert to parent coordinate space
 	region->OffsetBy(fFrame.left - fScrollingOffset.x,
@@ -614,7 +614,7 @@ ViewLayer::ConvertToParent(BRegion* region) const
 
 
 void
-ViewLayer::ConvertFromParent(BPoint* point) const
+View::ConvertFromParent(BPoint* point) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	point->x += fScrollingOffset.x - fFrame.left;
@@ -623,7 +623,7 @@ ViewLayer::ConvertFromParent(BPoint* point) const
 
 
 void
-ViewLayer::ConvertFromParent(IntPoint* point) const
+View::ConvertFromParent(IntPoint* point) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	point->x += fScrollingOffset.x - fFrame.left;
@@ -632,7 +632,7 @@ ViewLayer::ConvertFromParent(IntPoint* point) const
 
 
 void
-ViewLayer::ConvertFromParent(BRect* rect) const
+View::ConvertFromParent(BRect* rect) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
@@ -641,7 +641,7 @@ ViewLayer::ConvertFromParent(BRect* rect) const
 
 
 void
-ViewLayer::ConvertFromParent(IntRect* rect) const
+View::ConvertFromParent(IntRect* rect) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	rect->OffsetBy(fScrollingOffset.x - fFrame.left,
@@ -650,7 +650,7 @@ ViewLayer::ConvertFromParent(IntRect* rect) const
 
 
 void
-ViewLayer::ConvertFromParent(BRegion* region) const
+View::ConvertFromParent(BRegion* region) const
 {
 	// convert from parent coordinate space amd add scrolling offset
 	region->OffsetBy(fScrollingOffset.x - fFrame.left,
@@ -659,7 +659,7 @@ ViewLayer::ConvertFromParent(BRegion* region) const
 
 //! converts a point from local to screen coordinate system 
 void
-ViewLayer::ConvertToScreen(BPoint* pt) const
+View::ConvertToScreen(BPoint* pt) const
 {
 	ConvertToParent(pt);
 
@@ -670,7 +670,7 @@ ViewLayer::ConvertToScreen(BPoint* pt) const
 
 //! converts a point from local to screen coordinate system 
 void
-ViewLayer::ConvertToScreen(IntPoint* pt) const
+View::ConvertToScreen(IntPoint* pt) const
 {
 	ConvertToParent(pt);
 
@@ -681,7 +681,7 @@ ViewLayer::ConvertToScreen(IntPoint* pt) const
 
 //! converts a rect from local to screen coordinate system 
 void
-ViewLayer::ConvertToScreen(BRect* rect) const
+View::ConvertToScreen(BRect* rect) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertToScreen(&offset);
@@ -692,7 +692,7 @@ ViewLayer::ConvertToScreen(BRect* rect) const
 
 //! converts a rect from local to screen coordinate system 
 void
-ViewLayer::ConvertToScreen(IntRect* rect) const
+View::ConvertToScreen(IntRect* rect) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertToScreen(&offset);
@@ -703,7 +703,7 @@ ViewLayer::ConvertToScreen(IntRect* rect) const
 
 //! converts a region from local to screen coordinate system 
 void
-ViewLayer::ConvertToScreen(BRegion* region) const
+View::ConvertToScreen(BRegion* region) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertToScreen(&offset);
@@ -714,7 +714,7 @@ ViewLayer::ConvertToScreen(BRegion* region) const
 
 //! converts a point from screen to local coordinate system 
 void
-ViewLayer::ConvertFromScreen(BPoint* pt) const
+View::ConvertFromScreen(BPoint* pt) const
 {
 	ConvertFromParent(pt);
 
@@ -725,7 +725,7 @@ ViewLayer::ConvertFromScreen(BPoint* pt) const
 
 //! converts a point from screen to local coordinate system 
 void
-ViewLayer::ConvertFromScreen(IntPoint* pt) const
+View::ConvertFromScreen(IntPoint* pt) const
 {
 	ConvertFromParent(pt);
 
@@ -736,7 +736,7 @@ ViewLayer::ConvertFromScreen(IntPoint* pt) const
 
 //! converts a rect from screen to local coordinate system 
 void
-ViewLayer::ConvertFromScreen(BRect* rect) const
+View::ConvertFromScreen(BRect* rect) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertFromScreen(&offset);
@@ -747,7 +747,7 @@ ViewLayer::ConvertFromScreen(BRect* rect) const
 
 //! converts a rect from screen to local coordinate system 
 void
-ViewLayer::ConvertFromScreen(IntRect* rect) const
+View::ConvertFromScreen(IntRect* rect) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertFromScreen(&offset);
@@ -758,7 +758,7 @@ ViewLayer::ConvertFromScreen(IntRect* rect) const
 
 //! converts a region from screen to local coordinate system 
 void
-ViewLayer::ConvertFromScreen(BRegion* region) const
+View::ConvertFromScreen(BRegion* region) const
 {
 	BPoint offset(0.0, 0.0);
 	ConvertFromScreen(&offset);
@@ -769,7 +769,7 @@ ViewLayer::ConvertFromScreen(BRegion* region) const
 
 //! converts a point from local *drawing* to screen coordinate system 
 void
-ViewLayer::ConvertToScreenForDrawing(BPoint* point) const
+View::ConvertToScreenForDrawing(BPoint* point) const
 {
 	fDrawState->Transform(point);
 	// NOTE: from here on, don't use the
@@ -780,7 +780,7 @@ ViewLayer::ConvertToScreenForDrawing(BPoint* point) const
 
 //! converts a rect from local *drawing* to screen coordinate system 
 void
-ViewLayer::ConvertToScreenForDrawing(BRect* rect) const
+View::ConvertToScreenForDrawing(BRect* rect) const
 {
 	fDrawState->Transform(rect);
 	// NOTE: from here on, don't use the
@@ -791,7 +791,7 @@ ViewLayer::ConvertToScreenForDrawing(BRect* rect) const
 
 //! converts a region from local *drawing* to screen coordinate system 
 void
-ViewLayer::ConvertToScreenForDrawing(BRegion* region) const
+View::ConvertToScreenForDrawing(BRegion* region) const
 {
 	fDrawState->Transform(region);
 	// NOTE: from here on, don't use the
@@ -802,7 +802,7 @@ ViewLayer::ConvertToScreenForDrawing(BRegion* region) const
 
 //! converts points from local *drawing* to screen coordinate system 
 void
-ViewLayer::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
+View::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) const
 {
 	// TODO: optimize this, it should be smarter
 	while (num--) {
@@ -819,7 +819,7 @@ ViewLayer::ConvertToScreenForDrawing(BPoint* dst, const BPoint* src, int32 num) 
 
 //! converts rects from local *drawing* to screen coordinate system 
 void
-ViewLayer::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
+View::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) const
 {
 	// TODO: optimize this, it should be smarter
 	while (num--) {
@@ -836,7 +836,7 @@ ViewLayer::ConvertToScreenForDrawing(BRect* dst, const BRect* src, int32 num) co
 
 //! converts regions from local *drawing* to screen coordinate system 
 void
-ViewLayer::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
+View::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num) const
 {
 	// TODO: optimize this, it should be smarter
 	while (num--) {
@@ -853,7 +853,7 @@ ViewLayer::ConvertToScreenForDrawing(BRegion* dst, const BRegion* src, int32 num
 
 //! converts a point from screen to local coordinate system 
 void
-ViewLayer::ConvertFromScreenForDrawing(BPoint* point) const
+View::ConvertFromScreenForDrawing(BPoint* point) const
 {
 	ConvertFromScreen(point);
 	fDrawState->InverseTransform(point);
@@ -864,7 +864,7 @@ ViewLayer::ConvertFromScreenForDrawing(BPoint* point) const
 
 
 void
-ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
+View::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	if (x == 0 && y == 0)
 		return;
@@ -937,7 +937,7 @@ ViewLayer::MoveBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 
 void
-ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
+View::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	if (x == 0 && y == 0)
 		return;
@@ -969,7 +969,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 			if ((fFlags & B_DRAW_ON_CHILDREN) == 0) {
 				// exclude children, they are expected to
 				// include their own dirty regions in ParentResized()
-				for (ViewLayer* child = FirstChild(); child;
+				for (View* child = FirstChild(); child;
 						child = child->NextSibling()) {
 					if (!child->IsVisible())
 						continue;
@@ -988,7 +988,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 	}
 
 	// layout the children
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+	for (View* child = FirstChild(); child; child = child->NextSibling())
 		child->ParentResized(x, y, dirtyRegion);
 
 	// view bitmap
@@ -1004,7 +1004,7 @@ ViewLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 
 void
-ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
+View::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	IntRect newFrame = fFrame;
 	resize_frame(newFrame, fResizeMode & 0x0000ffff, x, y);
@@ -1029,7 +1029,7 @@ ViewLayer::ParentResized(int32 x, int32 y, BRegion* dirtyRegion)
 
 
 void
-ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
+View::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	if (!fVisible || !fWindow) {
 		fScrollingOffset.x += x;
@@ -1087,7 +1087,7 @@ ViewLayer::ScrollBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 
 void
-ViewLayer::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
+View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 {
 	if (!fVisible || !fWindow)
 		return;
@@ -1167,7 +1167,7 @@ ViewLayer::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 
 
 void
-ViewLayer::PushState()
+View::PushState()
 {
 	fDrawState = fDrawState->PushState();
 	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
@@ -1175,7 +1175,7 @@ ViewLayer::PushState()
 
 
 void
-ViewLayer::PopState()
+View::PopState()
 {
 	if (fDrawState->PreviousState() == NULL) {
 		fprintf(stderr, "WARNING: User called BView(%s)::PopState(), "
@@ -1196,7 +1196,7 @@ ViewLayer::PopState()
 
 
 void
-ViewLayer::SetEventMask(uint32 eventMask, uint32 options)
+View::SetEventMask(uint32 eventMask, uint32 options)
 {
 	fEventMask = eventMask;
 	fEventOptions = options;
@@ -1204,7 +1204,7 @@ ViewLayer::SetEventMask(uint32 eventMask, uint32 options)
 
 
 void
-ViewLayer::SetCursor(ServerCursor *cursor)
+View::SetCursor(ServerCursor *cursor)
 {
 	if (cursor == fCursor)
 		return;
@@ -1222,14 +1222,14 @@ ViewLayer::SetCursor(ServerCursor *cursor)
 
 
 void
-ViewLayer::SetPicture(ServerPicture *picture)
+View::SetPicture(ServerPicture *picture)
 {
 	fPicture = picture;
 }
 
 
 void
-ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
+View::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion* windowContentClipping, bool deep)
 {
 	if (!fVisible) {
@@ -1266,7 +1266,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 					rect.OffsetBy(-(rect.Width() + 1), 0.0);
 			}
 
-// XXX: locking removed because the WindowLayer keeps the engine locked
+// XXX: locking removed because the Window keeps the engine locked
 // because it keeps track of syncing right now
 
 			// lock the drawing engine for as long as we need the clipping
@@ -1357,7 +1357,7 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 	// let children draw
 	if (deep) {
-		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		for (View* child = FirstChild(); child; child = child->NextSibling()) {
 			child->Draw(drawingEngine, effectiveClipping,
 				windowContentClipping, deep);
 		}
@@ -1369,21 +1369,21 @@ ViewLayer::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 
 void
-ViewLayer::MouseDown(BMessage* message, BPoint where)
+View::MouseDown(BMessage* message, BPoint where)
 {
 	// empty hook method
 }
 
 
 void
-ViewLayer::MouseUp(BMessage* message, BPoint where)
+View::MouseUp(BMessage* message, BPoint where)
 {
 	// empty hook method
 }
 
 
 void
-ViewLayer::MouseMoved(BMessage* message, BPoint where)
+View::MouseMoved(BMessage* message, BPoint where)
 {
 	// empty hook method
 }
@@ -1393,7 +1393,7 @@ ViewLayer::MouseMoved(BMessage* message, BPoint where)
 
 
 void
-ViewLayer::SetHidden(bool hidden)
+View::SetHidden(bool hidden)
 {
 	if (fHidden != hidden) {
 		fHidden = hidden;
@@ -1426,19 +1426,19 @@ ViewLayer::SetHidden(bool hidden)
 
 
 bool
-ViewLayer::IsHidden() const
+View::IsHidden() const
 {
 	return fHidden;
 }
 
 
 void
-ViewLayer::UpdateVisibleDeep(bool parentVisible)
+View::UpdateVisibleDeep(bool parentVisible)
 {
 	bool wasVisible = fVisible;
 
 	fVisible = parentVisible && !fHidden;
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+	for (View* child = FirstChild(); child; child = child->NextSibling())
 		child->UpdateVisibleDeep(fVisible);
 
 	// overlay handling
@@ -1458,18 +1458,18 @@ ViewLayer::UpdateVisibleDeep(bool parentVisible)
 
 
 void
-ViewLayer::MarkBackgroundDirty()
+View::MarkBackgroundDirty()
 {
 	if (fBackgroundDirty)
 		return;
 	fBackgroundDirty = true;
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling())
+	for (View* child = FirstChild(); child; child = child->NextSibling())
 		child->MarkBackgroundDirty();
 }
 
 
 void
-ViewLayer::AddTokensForLayersInRegion(BMessage* message, BRegion& region,
+View::AddTokensForLayersInRegion(BMessage* message, BRegion& region,
 	BRegion* windowContentClipping)
 {
 	if (!fVisible)
@@ -1478,7 +1478,7 @@ ViewLayer::AddTokensForLayersInRegion(BMessage* message, BRegion& region,
 	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
 		message->AddInt32("_token", fToken);
 
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		child->AddTokensForLayersInRegion(message, region,
 			windowContentClipping);
 	}
@@ -1486,7 +1486,7 @@ ViewLayer::AddTokensForLayersInRegion(BMessage* message, BRegion& region,
 
 
 void
-ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link, BRegion& region,
+View::AddTokensForLayersInRegion(BPrivate::PortLink& link, BRegion& region,
 	BRegion* windowContentClipping)
 {
 	if (!fVisible)
@@ -1500,16 +1500,16 @@ ViewLayer::AddTokensForLayersInRegion(BPrivate::PortLink& link, BRegion& region,
 	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
 		link.Attach<int32>(fToken);
 
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		child->AddTokensForLayersInRegion(link, region, windowContentClipping);
 	}
 }
 
 
 void
-ViewLayer::PrintToStream() const
+View::PrintToStream() const
 {
-	printf("ViewLayer:          %s\n", Name());
+	printf("View:          %s\n", Name());
 	printf("  fToken:           %ld\n", fToken);
 	printf("  fFrame:           IntRect(%ld, %ld, %ld, %ld)\n", fFrame.left, fFrame.top, fFrame.right, fFrame.bottom);
 	printf("  fScrollingOffset: IntPoint(%ld, %ld)\n", fScrollingOffset.x, fScrollingOffset.y);
@@ -1531,12 +1531,12 @@ ViewLayer::PrintToStream() const
 
 
 void
-ViewLayer::RebuildClipping(bool deep)
+View::RebuildClipping(bool deep)
 {
 	// the clipping spans over the bounds area
 	fLocalClipping.Set((clipping_rect)Bounds());
 
-	if (ViewLayer* child = FirstChild()) {
+	if (View* child = FirstChild()) {
 		// if this view does not draw over children,
 		// exclude all children from the clipping
 		if ((fFlags & B_DRAW_ON_CHILDREN) == 0) {
@@ -1581,7 +1581,7 @@ ViewLayer::RebuildClipping(bool deep)
 
 
 BRegion&
-ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
+View::ScreenClipping(BRegion* windowContentClipping, bool force) const
 {
 	if (!fScreenClippingValid || force) {
 		fScreenClipping = fLocalClipping;
@@ -1604,14 +1604,14 @@ ViewLayer::ScreenClipping(BRegion* windowContentClipping, bool force) const
 		fScreenClipping.IntersectWith(windowContentClipping);
 		fScreenClippingValid = true;
 	}
-//printf("###ViewLayer(%s)::ScreenClipping():\n", Name());
+//printf("###View(%s)::ScreenClipping():\n", Name());
 //fScreenClipping.PrintToStream();
 	return fScreenClipping;
 }
 
 
 void
-ViewLayer::InvalidateScreenClipping()
+View::InvalidateScreenClipping()
 {
 // TODO: appearantly, we are calling ScreenClipping() on
 // views who's parents don't have a valid screen clipping yet,
@@ -1631,21 +1631,21 @@ ViewLayer::InvalidateScreenClipping()
 
 	fScreenClippingValid = false;
 	// invalidate the childrens screen clipping as well
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
 		child->InvalidateScreenClipping();
 	}
 }
 
 
 void
-ViewLayer::_MoveScreenClipping(int32 x, int32 y, bool deep)
+View::_MoveScreenClipping(int32 x, int32 y, bool deep)
 {
 	if (fScreenClippingValid)
 		fScreenClipping.OffsetBy(x, y);
 
 	if (deep) {
 		// move the childrens screen clipping as well
-		for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		for (View* child = FirstChild(); child; child = child->NextSibling()) {
 			child->_MoveScreenClipping(x, y, deep);
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,32 +7,29 @@
  */
 
 
-#include "OffscreenWindowLayer.h"
+#include "OffscreenWindow.h"
 #include "ServerBitmap.h"
 
 #include "OffscreenServerWindow.h"
 
 
-OffscreenServerWindow::OffscreenServerWindow(const char *title,
-											 ServerApp *app,
-											 port_id clientPort,
-											 port_id looperPort,
-											 int32 handlerID,
-											 ServerBitmap* bitmap)
+OffscreenServerWindow::OffscreenServerWindow(const char *title, ServerApp *app,
+		port_id clientPort, port_id looperPort, int32 handlerID,
+		ServerBitmap* bitmap)
 	: ServerWindow(title, app, clientPort, looperPort, handlerID),
-	  fBitmap(bitmap)
+	fBitmap(bitmap)
 {
 }
 
-// destructor
+
 OffscreenServerWindow::~OffscreenServerWindow()
 {
 }
 
-// SendMessageToClient
+
 void
 OffscreenServerWindow::SendMessageToClient(const BMessage* msg, int32 target,
-								  bool usePreferred) const
+	bool usePreferred) const
 {
 	// We're a special kind of window. The client BWindow thread is not running,
 	// so we cannot post messages to the client. In order to not mess arround
@@ -41,9 +38,9 @@ OffscreenServerWindow::SendMessageToClient(const BMessage* msg, int32 target,
 }
 
 
-WindowLayer*
-OffscreenServerWindow::MakeWindowLayer(BRect frame, const char* name,
+Window*
+OffscreenServerWindow::MakeWindow(BRect frame, const char* name,
 	window_look look, window_feel feel, uint32 flags, uint32 workspace)
 {
-	return new OffscreenWindowLayer(fBitmap, name, this);
+	return new OffscreenWindow(fBitmap, name, this);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,8 +51,8 @@ class Workspace::Private {
 		void				_SetDefaults();
 
 		WindowList			fWindows;
-		WindowLayer*		fFront;
-		WindowLayer*		fFocus;
+		Window*				fFront;
+		Window*				fFocus;
 
 		BObjectList<display_info> fDisplays;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,7 +9,7 @@
  */
 
 
-#include "ServerScreen.h"
+#include "Screen.h"
 
 #include "BitmapManager.h"
 #include "DrawingEngine.h"

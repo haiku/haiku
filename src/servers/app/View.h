@@ -9,8 +9,8 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
  */
-#ifndef	VIEW_LAYER_H
-#define VIEW_LAYER_H
+#ifndef	VIEW_H
+#define VIEW_H
 
 
 #include "IntRect.h"
@@ -30,18 +30,17 @@ namespace BPrivate {
 class DrawState;
 class DrawingEngine;
 class Overlay;
-class WindowLayer;
+class Window;
 class ServerBitmap;
 class ServerCursor;
 class ServerPicture;
 
-class ViewLayer {
+class View {
  public:
-							ViewLayer(IntRect frame, IntPoint scrollingOffset,
+							View(IntRect frame, IntPoint scrollingOffset,
 								const char* name, int32 token,
 								uint32 resizeMode, uint32 flags);
-
-	virtual					~ViewLayer();
+	virtual					~View();
 
 			int32			Token() const
 								{ return fToken; }
@@ -77,34 +76,34 @@ class ViewLayer {
 			// clips to each views bounds
 			void			ConvertToVisibleInTopView(IntRect* bounds) const;
 
-	virtual	void			AttachedToWindow(WindowLayer* window);
+	virtual	void			AttachedToWindow(::Window* window);
 	virtual void			DetachedFromWindow();
-			WindowLayer*	Window() const { return fWindow; }
+			::Window*		Window() const { return fWindow; }
 
 			// tree stuff
-			void			AddChild(ViewLayer* layer);
-			bool			RemoveChild(ViewLayer* layer);
+			void			AddChild(View* layer);
+			bool			RemoveChild(View* layer);
 
-	inline	ViewLayer*		Parent() const
+	inline	View*			Parent() const
 								{ return fParent; }
 
-	inline	ViewLayer*		FirstChild() const
+	inline	View*			FirstChild() const
 								{ return fFirstChild; }
-	inline	ViewLayer*		LastChild() const
+	inline	View*			LastChild() const
 								{ return fLastChild; }
-	inline	ViewLayer*		PreviousSibling() const
+	inline	View*			PreviousSibling() const
 								{ return fPreviousSibling; }
-	inline	ViewLayer*		NextSibling() const
+	inline	View*			NextSibling() const
 								{ return fNextSibling; }
 
-			ViewLayer*		TopLayer();
+			View*			TopLayer();
 
 			uint32			CountChildren(bool deep = false) const;
 			void			CollectTokensForChildren(BList* tokenMap) const;
-			void			FindViews(uint32 flags,
-								BObjectList<ViewLayer>& list, int32& left);
+			void			FindViews(uint32 flags, BObjectList<View>& list,
+								int32& left);
 
-			ViewLayer*		ViewAt(const BPoint& where);
+			View*			ViewAt(const BPoint& where);
 
 			// coordinate conversion
 			void			ConvertToParent(BPoint* point) const;
@@ -155,7 +154,7 @@ class ViewLayer {
 								BRegion* dirtyRegion);
 
 			void			CopyBits(IntRect src, IntRect dst,
-									 BRegion& windowContentClipping);
+								BRegion& windowContentClipping);
 
 			const BRegion&	LocalClipping() const { return fLocalClipping; }
 
@@ -270,13 +269,13 @@ class ViewLayer {
 			uint32			fEventMask;
 			uint32			fEventOptions;
 
-			WindowLayer*	fWindow;
-			ViewLayer*		fParent;
+			::Window*		fWindow;
+			View*			fParent;
 
-			ViewLayer*		fFirstChild;
-			ViewLayer*		fPreviousSibling;
-			ViewLayer*		fNextSibling;
-			ViewLayer*		fLastChild;
+			View*			fFirstChild;
+			View*			fPreviousSibling;
+			View*			fNextSibling;
+			View*			fLastChild;
 
 			ServerCursor*	fCursor;
 			ServerPicture*	fPicture;
@@ -286,8 +285,6 @@ class ViewLayer {
 
 	mutable	BRegion			fScreenClipping;
 	mutable	bool			fScreenClippingValid;
-
 };
 
-
-#endif // LAYER_H
+#endif	// VIEW_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2005-2006, Haiku, Inc.
+ * Copyright (c) 2005-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,7 +8,7 @@
 
 
 #include "DesktopSettings.h"
-#include "WindowLayer.h"
+#include "Window.h"
 
 
 const BPoint kInvalidWindowPosition = BPoint(INFINITY, INFINITY);
@@ -52,7 +52,7 @@ WindowList::SetIndex(int32 index)
 	given, it will be inserted right before that window.
 */
 void
-WindowList::AddWindow(WindowLayer* window, WindowLayer* before)
+WindowList::AddWindow(Window* window, Window* before)
 {
 	window_anchor& windowAnchor = window->Anchor(fIndex);
 
@@ -88,7 +88,7 @@ WindowList::AddWindow(WindowLayer* window, WindowLayer* before)
 
 
 void
-WindowList::RemoveWindow(WindowLayer* window)
+WindowList::RemoveWindow(Window* window)
 {
 	window_anchor& windowAnchor = window->Anchor(fIndex);
 
@@ -117,7 +117,7 @@ WindowList::RemoveWindow(WindowLayer* window)
 
 
 bool
-WindowList::HasWindow(WindowLayer* window) const
+WindowList::HasWindow(Window* window) const
 {
 	if (window == NULL)
 		return false;

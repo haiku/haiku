@@ -1,18 +1,27 @@
-#ifndef __SERVER_PICTURE_H
-#define __SERVER_PICTURE_H
+/*
+ * Copyright 2001-2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
+ */
+#ifndef SERVER_PICTURE_H
+#define SERVER_PICTURE_H
 
 #include <DataIO.h>
 
 #include <PictureDataWriter.h>
 
-#include <PortLink.h> 
-	// TODO: For some reason, the forward declaration "class BPrivate::PortLink" causes compiling errors 
-
 
 class ServerApp;
-class ViewLayer;
-class BPrivate::LinkReceiver;
+class View;
+namespace BPrivate {
+	class LinkReceiver;
+	class PortLink;
+}
 class BList;
+
 class ServerPicture : public PictureDataWriter {
 public:	
 		int32		Token() { return fToken; }
@@ -20,10 +29,10 @@ public:
 		void		EnterStateChange();
 		void		ExitStateChange();
 		
-		void		SyncState(ViewLayer *view);
+		void		SyncState(View *view);
 		void		SetFontFromLink(BPrivate::LinkReceiver& link);	
 		
-		void		Play(ViewLayer *view);
+		void		Play(View *view);
 		
 		void 		Usurp(ServerPicture *newPicture);
 		ServerPicture*	StepDown();		
@@ -50,4 +59,4 @@ friend class	ServerApp;
 		ServerPicture	*fUsurped;
 };
 
-#endif // __SERVER_PICTURE_H
+#endif	// SERVER_PICTURE_H

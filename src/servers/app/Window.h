@@ -8,14 +8,14 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  */
-#ifndef WINDOW_LAYER_H
-#define WINDOW_LAYER_H
+#ifndef WINDOW_H
+#define WINDOW_H
 
 
 #include "Decorator.h"
-#include "ViewLayer.h"
 #include "RegionPool.h"
 #include "ServerWindow.h"
+#include "View.h"
 #include "WindowList.h"
 
 #include <ObjectList.h>
@@ -31,7 +31,7 @@ class Decorator;
 class Desktop;
 class DrawingEngine;
 class EventDispatcher;
-class WorkspacesLayer;
+class WorkspacesView;
 
 // TODO: move this into a proper place
 #define AS_REDRAW 'rdrw'
@@ -41,22 +41,21 @@ enum {
 	UPDATE_EXPOSE		= 0x02,
 };
 
-class WindowLayer {
+class Window {
 public:
-								WindowLayer(const BRect& frame,
-											const char *name, window_look look,
-											window_feel feel, uint32 flags,
-											uint32 workspaces,
-											::ServerWindow* window,
-											DrawingEngine* drawingEngine);
-	virtual						~WindowLayer();
+								Window(const BRect& frame, const char *name,
+									window_look look, window_feel feel,
+									uint32 flags, uint32 workspaces,
+									::ServerWindow* window,
+									DrawingEngine* drawingEngine);
+	virtual						~Window();
 
 			BRect				Frame() const { return fFrame; }
 			const char*			Title() const { return fTitle.String(); }
 
 			window_anchor&		Anchor(int32 index);
-			WindowLayer*		NextWindow(int32 index) const;
-			WindowLayer*		PreviousWindow(int32 index) const;
+			Window*				NextWindow(int32 index) const;
+			Window*				PreviousWindow(int32 index) const;
 
 			::Desktop*			Desktop() const { return fDesktop; }
 			::Decorator*		Decorator() const { return fDecorator; }
@@ -71,7 +70,7 @@ public:
 			BRegion&			VisibleContentRegion();
 
 			// TODO: not protected by a lock, but noone should need this anyways
-			// make private? when used inside WindowLayer, it has the ReadLock()
+			// make private? when used inside Window, it has the ReadLock()
 			void				GetFullRegion(BRegion* region);
 			void				GetBorderRegion(BRegion* region);
 			void				GetContentRegion(BRegion* region);
@@ -79,18 +78,16 @@ public:
 			void				MoveBy(int32 x, int32 y);
 			void				ResizeBy(int32 x, int32 y, BRegion* dirtyRegion);
 
-			void				ScrollViewBy(ViewLayer* view, int32 dx, int32 dy);
+			void				ScrollViewBy(View* view, int32 dx, int32 dy);
 
-			void				SetTopLayer(ViewLayer* topLayer);
-			ViewLayer*			TopLayer() const { return fTopLayer; }
-				// TODO: only used for WorkspacesLayer, can go away if we do
-				//	this differently one day
-			ViewLayer*			ViewAt(const BPoint& where);
+			void				SetTopLayer(View* topLayer);
+			View*				TopLayer() const { return fTopLayer; }
+			View*				ViewAt(const BPoint& where);
 
 	virtual	bool				IsOffscreenWindow() const { return false; }
 
-			void				GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region);
-			bool				DrawingRegionChanged(ViewLayer* layer) const;
+			void				GetEffectiveDrawingRegion(View* layer, BRegion& region);
+			bool				DrawingRegionChanged(View* layer) const;
 
 			// generic version, used by the Desktop
 			void				ProcessDirtyRegion(BRegion& regionOnScreen);
@@ -103,7 +100,7 @@ public:
 			void				MarkContentDirty(BRegion& regionOnScreen);
 			void				MarkContentDirtyAsync(BRegion& regionOnScreen);
 			// shortcut for invalidating just one view
-			void				InvalidateView(ViewLayer* view, BRegion& layerRegion);
+			void				InvalidateView(View* view, BRegion& layerRegion);
 
 			void				DisableUpdateRequests();
 			void				EnableUpdateRequests();
@@ -130,7 +127,7 @@ public:
 									{ fRegionPool.Recycle(region); }
 
 			void				CopyContents(BRegion* region,
-											 int32 xOffset, int32 yOffset);
+									int32 xOffset, int32 yOffset);
 
 			void				MouseDown(BMessage* message, BPoint where, int32* _viewToken);
 			void				MouseUp(BMessage* message, BPoint where, int32* _viewToken);
@@ -200,13 +197,15 @@ public:
 
 			bool				HasModal() const;
 
-			WindowLayer*		Frontmost(WindowLayer* first = NULL, int32 workspace = -1);
-			WindowLayer*		Backmost(WindowLayer* first = NULL, int32 workspace = -1);
+			Window*				Frontmost(Window* first = NULL,
+									int32 workspace = -1);
+			Window*				Backmost(Window* first = NULL,
+									int32 workspace = -1);
 
-			bool				AddToSubset(WindowLayer* window);
-			void				RemoveFromSubset(WindowLayer* window);
-			bool				HasInSubset(const WindowLayer* window) const;
-			bool				SameSubset(WindowLayer* window);
+			bool				AddToSubset(Window* window);
+			void				RemoveFromSubset(Window* window);
+			bool				HasInSubset(const Window* window) const;
+			bool				SameSubset(Window* window);
 			uint32				SubsetWorkspaces() const;
 
 			bool				HasWorkspacesViews() const
@@ -216,7 +215,7 @@ public:
 			void				RemoveWorkspacesView()
 									{ fWorkspacesViewCount--; }
 			void				FindWorkspacesViews(
-									BObjectList<WorkspacesLayer>& list) const;
+									BObjectList<WorkspacesView>& list) const;
 
 	static bool					IsValidLook(window_look look);
 	static bool					IsValidFeel(window_feel feel);
@@ -230,8 +229,9 @@ protected:
  	friend class Desktop;
  		// TODO: for now (list management)
 
-			void				_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
-												   int32 xOffset, int32 yOffset);
+			void				_ShiftPartOfRegion(BRegion* region,
+									BRegion* regionToShift, int32 xOffset,
+									int32 yOffset);
 
 			// different types of drawing
 			void				_TriggerContentRedraw(BRegion& dirty);
@@ -280,7 +280,7 @@ protected:
 
 			::RegionPool		fRegionPool;
 
-			BObjectList<WindowLayer> fSubsets;
+			BObjectList<Window> fSubsets;
 
 // TODO: remove those some day (let the decorator handle that stuff)
 			bool				fIsClosing : 1;
@@ -292,7 +292,7 @@ protected:
 			bool				fActivateOnMouseUp : 1;
 
 			::Decorator*		fDecorator;
-			ViewLayer*			fTopLayer;
+			View*				fTopLayer;
 			::ServerWindow*		fWindow;
 			DrawingEngine*		fDrawingEngine;
 			::Desktop*			fDesktop;
@@ -366,4 +366,4 @@ protected:
 			int32				fWorkspacesViewCount;
 };
 
-#endif // WINDOW_LAYER_H
+#endif // WINDOW_H

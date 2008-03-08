@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,26 +13,23 @@
 
 
 class OffscreenServerWindow : public ServerWindow {
- public:
-								OffscreenServerWindow(const char *title,
-													  ServerApp *app,
-													  port_id clientPort,
-													  port_id looperPort,
-													  int32 handlerID,
-													  ServerBitmap* bitmap);
-	virtual						~OffscreenServerWindow();
+public:
+						OffscreenServerWindow(const char *title, ServerApp *app,
+							port_id clientPort, port_id looperPort,
+							int32 handlerID, ServerBitmap* bitmap);
+	virtual				~OffscreenServerWindow();
 
 			// util methods.	
-	virtual	void				SendMessageToClient(const BMessage* msg,
-													int32 target = B_NULL_TOKEN,
-													bool usePreferred = false) const;
+	virtual	void		SendMessageToClient(const BMessage* msg,
+							int32 target = B_NULL_TOKEN,
+							bool usePreferred = false) const;
 
-	virtual	WindowLayer*		MakeWindowLayer(BRect frame, const char* name,
-									window_look look, window_feel feel, uint32 flags,
-									uint32 workspace);
+	virtual	::Window*	MakeWindow(BRect frame, const char* name,
+							window_look look, window_feel feel, uint32 flags,
+							uint32 workspace);
 
- private:
-			ServerBitmap*		fBitmap;
+private:
+	ServerBitmap*		fBitmap;
 };
 
 #endif	// OFFSCREEN_SERVER_WINDOW_H

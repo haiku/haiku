@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -36,9 +36,9 @@ class BMessage;
 class Desktop;
 class ServerApp;
 class Decorator;
-class WindowLayer;
+class Window;
 class Workspace;
-class ViewLayer;
+class View;
 class ServerPicture;
 struct direct_window_data;
 struct window_info;
@@ -70,20 +70,22 @@ public:
 			void				NotifyZoom();
 
 			// util methods.
-			const BMessenger&	FocusMessenger() const { return fFocusMessenger; }
-			const BMessenger&	HandlerMessenger() const { return fHandlerMessenger; }
+			const BMessenger&	FocusMessenger() const
+									{ return fFocusMessenger; }
+			const BMessenger&	HandlerMessenger() const
+									{ return fHandlerMessenger; }
 
 			status_t			SendMessageToClient(const BMessage* msg,
 									int32 target = B_NULL_TOKEN) const;
 
-	virtual	WindowLayer*		MakeWindowLayer(BRect frame, const char* name,
-									window_look look, window_feel feel, uint32 flags,
-									uint32 workspace);
+	virtual	::Window*			MakeWindow(BRect frame, const char* name,
+									window_look look, window_feel feel,
+									uint32 flags, uint32 workspace);
 
 			// to who we belong. who do we own. our title.
 	inline	ServerApp*			App() const { return fServerApp; }
 			::Desktop*			Desktop() const { return fDesktop; }
-			::WindowLayer*		Window() const;
+			::Window*			Window() const;
 
 			void				SetTitle(const char* newTitle);
 	inline	const char*			Title() const { return fTitle; }
@@ -104,8 +106,8 @@ public:
 			void				ResyncDrawState();
 
 private:
-			ViewLayer*			_CreateLayerTree(BPrivate::LinkReceiver &link,
-									ViewLayer **_parent);
+			View*				_CreateView(BPrivate::LinkReceiver &link,
+									View **_parent);
 
 			void				_Show();
 			void				_Hide();
@@ -124,23 +126,22 @@ private:
 
 			status_t			_EnableDirectWindowMode();
 
-			void				_SetCurrentLayer(ViewLayer* view);
-			void				_UpdateDrawState(ViewLayer* view);
+			void				_SetCurrentView(View* view);
+			void				_UpdateDrawState(View* view);
 
 			bool				_MessageNeedsAllWindowsLocked(uint32 code) const;
 
 			// TODO: Move me elsewhere
 			status_t			PictureToRegion(ServerPicture *picture,
-												BRegion &,
-												bool inverse,
-												BPoint where);
+									BRegion& region, bool inverse,
+									BPoint where);
 
 private:
 			char*				fTitle;
 
 			::Desktop*			fDesktop;
 			ServerApp*			fServerApp;
-			WindowLayer*		fWindowLayer;
+			::Window*			fWindow;
 			bool				fWindowAddedToDesktop;
 
 			team_id				fClientTeam;
@@ -157,7 +158,7 @@ private:
 			int32				fServerToken;
 			int32				fClientToken;
 
-			ViewLayer*			fCurrentLayer;
+			View*				fCurrentView;
 			BRegion				fCurrentDrawingRegion;
 			bool				fCurrentDrawingRegionValid;
 

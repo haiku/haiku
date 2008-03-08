@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,8 +11,8 @@
 
 #include "ScreenManager.h"
 
+#include "Screen.h"
 #include "ServerConfig.h"
-#include "ServerScreen.h"
 
 #include <Autolock.h>
 #include <Entry.h>

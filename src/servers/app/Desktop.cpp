@@ -18,16 +18,16 @@
 #include "DrawingEngine.h"
 #include "HWInterface.h"
 #include "InputManager.h"
+#include "Screen.h"
 #include "ServerApp.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
-#include "ServerScreen.h"
 #include "ServerWindow.h"
 #include "SystemPalette.h"
 #include "WindowPrivate.h"
-#include "WindowLayer.h"
+#include "Window.h"
 #include "Workspace.h"
-#include "WorkspacesLayer.h"
+#include "WorkspacesView.h"
 
 #include <ViewPrivate.h>
 #include <WindowInfo.h>
@@ -239,7 +239,7 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 
 	int32 viewToken = B_NULL_TOKEN;
 
-	WindowLayer* window = fDesktop->MouseEventWindow();
+	Window* window = fDesktop->MouseEventWindow();
 	if (window == NULL)
 		window = fDesktop->WindowAt(where);
 
@@ -667,7 +667,7 @@ Desktop::_ActivateApp(team_id team)
 
 	// search for an unhidden window to give focus to
 
-	for (WindowLayer* window = fAllWindows.FirstWindow(); window != NULL;
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		// if window is a normal window of the team, and not hidden,
 		// we've found our target
@@ -752,13 +752,13 @@ Desktop::RedrawBackground()
 
 	BRegion redraw;
 
-	WindowLayer* window = _CurrentWindows().FirstWindow();
+	Window* window = _CurrentWindows().FirstWindow();
 	if (window->Feel() == kDesktopWindowFeel) {
 		redraw = window->VisibleContentRegion();
 
 		// look for desktop background view, and update its background color
 		// TODO: is there a better way to do this?
-		ViewLayer* view = window->TopLayer();
+		View* view = window->TopLayer();
 		if (view != NULL)
 			view = view->FirstChild();
 
@@ -909,7 +909,7 @@ Desktop::_SetWorkspace(int32 index)
 
 	BRegion dirty;
 
-	for (WindowLayer* window = _CurrentWindows().FirstWindow();
+	for (Window* window = _CurrentWindows().FirstWindow();
 			window != NULL; window = window->NextWindow(previousIndex)) {
 		// store current position in Workspace anchor
 		window->Anchor(previousIndex).position = window->Frame().LeftTop();
@@ -935,7 +935,7 @@ Desktop::_SetWorkspace(int32 index)
 	WindowList windows(kWorkingList);
 	BList previousRegions;
 
-	for (WindowLayer* window = _Windows(index).FirstWindow();
+	for (Window* window = _Windows(index).FirstWindow();
 			window != NULL; window = window->NextWindow(index)) {
 		BPoint position = window->Anchor(index).position;
 
@@ -989,7 +989,7 @@ Desktop::_SetWorkspace(int32 index)
 	_RebuildClippingForAllWindows(stillAvailableOnScreen);
 	_SetBackground(stillAvailableOnScreen);
 
-	for (WindowLayer* window = _Windows(index).FirstWindow(); window != NULL;
+	for (Window* window = _Windows(index).FirstWindow(); window != NULL;
 			window = window->NextWindow(index)) {
 		// send B_WORKSPACE_ACTIVATED message
 		window->WorkspaceActivated(index, true);
@@ -1006,7 +1006,7 @@ Desktop::_SetWorkspace(int32 index)
 
 	// Catch order changes in the new workspaces window list
 	int32 i = 0;
-	for (WindowLayer* window = windows.FirstWindow(); window != NULL;
+	for (Window* window = windows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kWorkingList), i++) {
 		BRegion* region = (BRegion*)previousRegions.ItemAt(i);
 		region->ExclusiveInclude(&window->VisibleRegion());
@@ -1066,7 +1066,7 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 	update.AddInt32("mode", screen->ColorSpace());
 
 	// TODO: currently ignores the screen argument!
-	for (WindowLayer* window = fAllWindows.FirstWindow(); window != NULL;
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		window->ServerWindow()->SendMessageToClient(&update);
 	}
@@ -1085,7 +1085,7 @@ Desktop::ScreenChanged(Screen* screen, bool makeDefault)
 }
 
 
-//	#pragma mark - Methods for WindowLayer manipulation
+//	#pragma mark - Methods for Window manipulation
 
 
 WindowList&
@@ -1104,14 +1104,14 @@ Desktop::_Windows(int32 index)
 
 void
 Desktop::_UpdateFloating(int32 previousWorkspace, int32 nextWorkspace,
-	WindowLayer* mouseEventWindow)
+	Window* mouseEventWindow)
 {
 	if (previousWorkspace == -1)
 		previousWorkspace = fCurrentWorkspace;
 	if (nextWorkspace == -1)
 		nextWorkspace = previousWorkspace;
 
-	for (WindowLayer* floating = fSubsetWindows.FirstWindow(); floating != NULL;
+	for (Window* floating = fSubsetWindows.FirstWindow(); floating != NULL;
 			floating = floating->NextWindow(kSubsetList)) {
 		// we only care about app/subset floating windows
 		if (floating->Feel() != B_FLOATING_SUBSET_WINDOW_FEEL
@@ -1161,7 +1161,7 @@ Desktop::_UpdateBack()
 {
 	fBack = NULL;
 
-	for (WindowLayer* window = _CurrentWindows().FirstWindow();
+	for (Window* window = _CurrentWindows().FirstWindow();
 			window != NULL; window = window->NextWindow(fCurrentWorkspace)) {
 		if (window->IsHidden() || window->Feel() == kDesktopWindowFeel)
 			continue;
@@ -1185,7 +1185,7 @@ Desktop::_UpdateFront(bool updateFloating)
 {
 	fFront = NULL;
 
-	for (WindowLayer* window = _CurrentWindows().LastWindow();
+	for (Window* window = _CurrentWindows().LastWindow();
 			window != NULL; window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->IsHidden() || window->IsFloating() || !window->SupportsFront())
 			continue;
@@ -1215,7 +1215,7 @@ Desktop::_UpdateFronts(bool updateFloating)
 EventTarget*
 Desktop::KeyboardEventTarget()
 {
-	WindowLayer* window = _CurrentWindows().LastWindow();
+	Window* window = _CurrentWindows().LastWindow();
 	while (window != NULL && window->IsHidden()) {
 		window = window->PreviousWindow(fCurrentWorkspace);
 	}
@@ -1230,12 +1230,12 @@ Desktop::KeyboardEventTarget()
 
 
 bool
-Desktop::_WindowHasModal(WindowLayer* window)
+Desktop::_WindowHasModal(Window* window)
 {
 	if (window == NULL)
 		return false;
 
-	for (WindowLayer* modal = fSubsetWindows.FirstWindow(); modal != NULL;
+	for (Window* modal = fSubsetWindows.FirstWindow(); modal != NULL;
 			modal = modal->NextWindow(kSubsetList)) {
 		// only visible modal windows count
 		if (!modal->IsModal() || modal->IsHidden())
@@ -1253,10 +1253,10 @@ Desktop::_WindowHasModal(WindowLayer* window)
 	You must at least hold a single window lock when calling this method.
 */
 void
-Desktop::_WindowChanged(WindowLayer* window)
+Desktop::_WindowChanged(Window* window)
 {
 	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
-		WorkspacesLayer* view = fWorkspacesViews.ItemAt(i);
+		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
 		view->WindowChanged(window);
 	}
 }
@@ -1266,17 +1266,17 @@ Desktop::_WindowChanged(WindowLayer* window)
 	You must at least hold a single window lock when calling this method.
 */
 void
-Desktop::_WindowRemoved(WindowLayer* window)
+Desktop::_WindowRemoved(Window* window)
 {
 	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
-		WorkspacesLayer* view = fWorkspacesViews.ItemAt(i);
+		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
 		view->WindowRemoved(window);
 	}
 }
 
 
 void
-Desktop::AddWorkspacesView(WorkspacesLayer* view)
+Desktop::AddWorkspacesView(WorkspacesView* view)
 {
 	if (view->Window() == NULL || view->Window()->IsHidden())
 		return;
@@ -1291,7 +1291,7 @@ Desktop::AddWorkspacesView(WorkspacesLayer* view)
 
 
 void
-Desktop::RemoveWorkspacesView(WorkspacesLayer* view)
+Desktop::RemoveWorkspacesView(WorkspacesView* view)
 {
 	if (!LockAllWindows())
 		return;
@@ -1311,7 +1311,7 @@ Desktop::RemoveWorkspacesView(WorkspacesLayer* view)
 	Windows must not be locked when calling this method.
 */
 void
-Desktop::_SendFakeMouseMoved(WindowLayer* window)
+Desktop::_SendFakeMouseMoved(Window* window)
 {
 	int32 viewToken = B_NULL_TOKEN;
 	EventTarget* target = NULL;
@@ -1346,7 +1346,7 @@ Desktop::_SendFakeMouseMoved(WindowLayer* window)
 
 
 void
-Desktop::SetFocusWindow(WindowLayer* focus)
+Desktop::SetFocusWindow(Window* focus)
 {
 	if (!LockAllWindows())
 		return;
@@ -1445,7 +1445,7 @@ Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
 	// visible of the window
 	BRegion clean;
 
-	for (WindowLayer* window = windows.FirstWindow(); window != NULL;
+	for (Window* window = windows.FirstWindow(); window != NULL;
 			window = window->NextWindow(list)) {
 		if (wereVisible)
 			clean.Include(&window->VisibleRegion());
@@ -1463,7 +1463,7 @@ Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
 	// redraw what became visible of the window(s)
 
 	BRegion dirty;
-	for (WindowLayer* window = windows.FirstWindow(); window != NULL;
+	for (Window* window = windows.FirstWindow(); window != NULL;
 			window = window->NextWindow(list)) {
 		dirty.Include(&window->VisibleRegion());
 	}
@@ -1487,7 +1487,7 @@ Desktop::_BringWindowsToFront(WindowList& windows, int32 list,
 	of their subset.
 */
 void
-Desktop::ActivateWindow(WindowLayer* window)
+Desktop::ActivateWindow(Window* window)
 {
 	STRACE(("ActivateWindow(%p, %s)\n", window, window ? window->Title() : "<none>"));
 
@@ -1533,7 +1533,7 @@ Desktop::ActivateWindow(WindowLayer* window)
 
 	if (window == FrontWindow()) {
 		// see if there is a normal B_AVOID_FRONT window still in front of us
-		WindowLayer* avoidsFront = window->NextWindow(fCurrentWorkspace);
+		Window* avoidsFront = window->NextWindow(fCurrentWorkspace);
 		while (avoidsFront && avoidsFront->IsNormal()
 			&& (avoidsFront->Flags() & B_AVOID_FRONT) == 0) {
 			avoidsFront = avoidsFront->NextWindow(fCurrentWorkspace);
@@ -1554,7 +1554,7 @@ Desktop::ActivateWindow(WindowLayer* window)
 	BRegion clean(window->VisibleRegion());
 	WindowList windows(kWorkingList);
 
-	WindowLayer* frontmost = window->Frontmost();
+	Window* frontmost = window->Frontmost();
 
 	_CurrentWindows().RemoveWindow(window);
 	windows.AddWindow(window);
@@ -1564,8 +1564,8 @@ Desktop::ActivateWindow(WindowLayer* window)
 		// (ie. they are staying in front of them, but they are
 		// not supposed to change their order because of that)
 
-		WindowLayer* nextModal;
-		for (WindowLayer* modal = frontmost; modal != NULL; modal = nextModal) {
+		Window* nextModal;
+		for (Window* modal = frontmost; modal != NULL; modal = nextModal) {
 			// get the next modal window
 			nextModal = modal->NextWindow(fCurrentWorkspace);
 			while (nextModal != NULL && !nextModal->IsModal()) {
@@ -1588,7 +1588,7 @@ Desktop::ActivateWindow(WindowLayer* window)
 
 
 void
-Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
+Desktop::SendWindowBehind(Window* window, Window* behindOf)
 {
 	// TODO: should the "not in current workspace" be handled anyway?
 	//	(the code below would have to be changed then, though)
@@ -1607,7 +1607,7 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 	BRegion dirty(window->VisibleRegion());
 
 	// detach window and re-attach at desired position
-	WindowLayer* backmost = window->Backmost(behindOf);
+	Window* backmost = window->Backmost(behindOf);
 
 	_CurrentWindows().RemoveWindow(window);
 	_CurrentWindows().AddWindow(window, backmost
@@ -1639,7 +1639,7 @@ Desktop::SendWindowBehind(WindowLayer* window, WindowLayer* behindOf)
 
 
 void
-Desktop::ShowWindow(WindowLayer* window)
+Desktop::ShowWindow(Window* window)
 {
 	if (!window->IsHidden())
 		return;
@@ -1676,7 +1676,7 @@ Desktop::ShowWindow(WindowLayer* window)
 
 
 void
-Desktop::HideWindow(WindowLayer* window)
+Desktop::HideWindow(Window* window)
 {
 	if (window->IsHidden())
 		return;
@@ -1704,10 +1704,10 @@ Desktop::HideWindow(WindowLayer* window)
 
 	if (window->HasWorkspacesViews()) {
 		// remove workspaces views from this window
-		BObjectList<WorkspacesLayer> list(false);
+		BObjectList<WorkspacesView> list(false);
 		window->FindWorkspacesViews(list);
 
-		while (WorkspacesLayer* view = list.RemoveItemAt(0)) {
+		while (WorkspacesView* view = list.RemoveItemAt(0)) {
 			fWorkspacesViews.RemoveItem(view);
 		}
 	}
@@ -1721,10 +1721,10 @@ Desktop::HideWindow(WindowLayer* window)
 
 /*!
 	Shows the window on the screen - it does this independently of the
-	WindowLayer::IsHidden() state.
+	Window::IsHidden() state.
 */
 void
-Desktop::_ShowWindow(WindowLayer* window, bool affectsOtherWindows)
+Desktop::_ShowWindow(Window* window, bool affectsOtherWindows)
 {
 	BRegion background;
 	_RebuildClippingForAllWindows(background);
@@ -1746,10 +1746,10 @@ Desktop::_ShowWindow(WindowLayer* window, bool affectsOtherWindows)
 
 /*!
 	Hides the window from the screen - it does this independently of the
-	WindowLayer::IsHidden() state.
+	Window::IsHidden() state.
 */
 void
-Desktop::_HideWindow(WindowLayer* window)
+Desktop::_HideWindow(Window* window)
 {
 	// after rebuilding the clipping,
 	// this window will not have a visible
@@ -1770,7 +1770,7 @@ Desktop::_HideWindow(WindowLayer* window)
 
 
 void
-Desktop::MoveWindowBy(WindowLayer* window, float x, float y, int32 workspace)
+Desktop::MoveWindowBy(Window* window, float x, float y, int32 workspace)
 {
 	if (!LockAllWindows())
 		return;
@@ -1836,7 +1836,7 @@ Desktop::MoveWindowBy(WindowLayer* window, float x, float y, int32 workspace)
 
 
 void
-Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
+Desktop::ResizeWindowBy(Window* window, float x, float y)
 {
 	if (!LockAllWindows())
 		return;
@@ -1877,7 +1877,7 @@ Desktop::ResizeWindowBy(WindowLayer* window, float x, float y)
 
 
 bool
-Desktop::SetWindowTabLocation(WindowLayer* window, float location)
+Desktop::SetWindowTabLocation(Window* window, float location)
 {
 	if (!LockAllWindows())
 		return false;
@@ -1901,8 +1901,7 @@ Desktop::SetWindowTabLocation(WindowLayer* window, float location)
 
 
 bool
-Desktop::SetWindowDecoratorSettings(WindowLayer* window,
-									const BMessage& settings)
+Desktop::SetWindowDecoratorSettings(Window* window, const BMessage& settings)
 {
 	// TODO: almost exact code duplication to above function...
 
@@ -1934,7 +1933,7 @@ Desktop::SetWindowDecoratorSettings(WindowLayer* window,
 	SetWorkspace().
 */
 void
-Desktop::_UpdateSubsetWorkspaces(WindowLayer* window, int32 previousIndex,
+Desktop::_UpdateSubsetWorkspaces(Window* window, int32 previousIndex,
 	int32 newIndex)
 {
 	STRACE(("_UpdateSubsetWorkspaces(window %p, %s)\n", window, window->Title()));
@@ -1943,7 +1942,7 @@ Desktop::_UpdateSubsetWorkspaces(WindowLayer* window, int32 previousIndex,
 	if (!window->IsNormal() || window->IsHidden())
 		return;
 
-	for (WindowLayer* subset = fSubsetWindows.FirstWindow(); subset != NULL;
+	for (Window* subset = fSubsetWindows.FirstWindow(); subset != NULL;
 			subset = subset->NextWindow(kSubsetList)) {
 		if (subset->Feel() == B_MODAL_ALL_WINDOW_FEEL
 			|| subset->Feel() == B_FLOATING_ALL_WINDOW_FEEL) {
@@ -1975,7 +1974,7 @@ Desktop::_UpdateSubsetWorkspaces(WindowLayer* window, int32 previousIndex,
 	\brief Adds or removes the window to or from the workspaces it's on.
 */
 void
-Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
+Desktop::_ChangeWindowWorkspaces(Window* window, uint32 oldWorkspaces,
 	uint32 newWorkspaces)
 {
 	// apply changes to the workspaces' window lists
@@ -2025,7 +2024,7 @@ Desktop::_ChangeWindowWorkspaces(WindowLayer* window, uint32 oldWorkspaces,
 
 
 void
-Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
+Desktop::SetWindowWorkspaces(Window* window, uint32 workspaces)
 {
 	LockAllWindows();
 
@@ -2046,7 +2045,7 @@ Desktop::SetWindowWorkspaces(WindowLayer* window, uint32 workspaces)
 	via ShowWindow().
 */
 void
-Desktop::AddWindow(WindowLayer *window)
+Desktop::AddWindow(Window *window)
 {
 	LockAllWindows();
 
@@ -2068,7 +2067,7 @@ Desktop::AddWindow(WindowLayer *window)
 
 
 void
-Desktop::RemoveWindow(WindowLayer *window)
+Desktop::RemoveWindow(Window *window)
 {
 	LockAllWindows();
 
@@ -2089,7 +2088,7 @@ Desktop::RemoveWindow(WindowLayer *window)
 
 
 bool
-Desktop::AddWindowToSubset(WindowLayer* subset, WindowLayer* window)
+Desktop::AddWindowToSubset(Window* subset, Window* window)
 {
 	if (!subset->AddToSubset(window))
 		return false;
@@ -2100,7 +2099,7 @@ Desktop::AddWindowToSubset(WindowLayer* subset, WindowLayer* window)
 
 
 void
-Desktop::RemoveWindowFromSubset(WindowLayer* subset, WindowLayer* window)
+Desktop::RemoveWindowFromSubset(Window* subset, Window* window)
 {
 	subset->RemoveFromSubset(window);
 	_ChangeWindowWorkspaces(subset, subset->Workspaces(), subset->SubsetWorkspaces());
@@ -2108,7 +2107,7 @@ Desktop::RemoveWindowFromSubset(WindowLayer* subset, WindowLayer* window)
 
 
 void
-Desktop::SetWindowLook(WindowLayer *window, window_look newLook)
+Desktop::SetWindowLook(Window *window, window_look newLook)
 {
 	if (window->Look() == newLook)
 		return;
@@ -2133,7 +2132,7 @@ Desktop::SetWindowLook(WindowLayer *window, window_look newLook)
 
 
 void
-Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
+Desktop::SetWindowFeel(Window *window, window_feel newFeel)
 {
 	if (window->Feel() == newFeel)
 		return;
@@ -2168,10 +2167,10 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 		if (i == fCurrentWorkspace && window->IsVisible())
 			visibleBefore = window->VisibleRegion();
 
-		WindowLayer* backmost = window->Backmost(_Windows(i).LastWindow(), i);
+		Window* backmost = window->Backmost(_Windows(i).LastWindow(), i);
 		if (backmost != NULL) {
 			// check if the backmost window is really behind it
-			WindowLayer* previous = window->PreviousWindow(i);
+			Window* previous = window->PreviousWindow(i);
 			while (previous != NULL) {
 				if (previous == backmost)
 					break;
@@ -2187,10 +2186,10 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 			}
 		}
 
-		WindowLayer* frontmost = window->Frontmost(_Windows(i).FirstWindow(), i);
+		Window* frontmost = window->Frontmost(_Windows(i).FirstWindow(), i);
 		if (frontmost != NULL) {
 			// check if the frontmost window is really in front of it
-			WindowLayer* next = window->NextWindow(i);
+			Window* next = window->NextWindow(i);
 			while (next != NULL) {
 				if (next == frontmost)
 					break;
@@ -2232,7 +2231,7 @@ Desktop::SetWindowFeel(WindowLayer *window, window_feel newFeel)
 
 
 void
-Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
+Desktop::SetWindowFlags(Window *window, uint32 newFlags)
 {
 	if (window->Flags() == newFlags)
 		return;
@@ -2257,7 +2256,7 @@ Desktop::SetWindowFlags(WindowLayer *window, uint32 newFlags)
 
 
 void
-Desktop::SetWindowTitle(WindowLayer *window, const char* title)
+Desktop::SetWindowTitle(Window *window, const char* title)
 {
 	if (!LockAllWindows())
 		return;
@@ -2281,10 +2280,10 @@ Desktop::SetWindowTitle(WindowLayer *window, const char* title)
 	Returns the window under the mouse cursor.
 	You need to have acquired the All Windows lock when calling this method.
 */
-WindowLayer*
+Window*
 Desktop::WindowAt(BPoint where)
 {
-	for (WindowLayer* window = _CurrentWindows().LastWindow(); window;
+	for (Window* window = _CurrentWindows().LastWindow(); window;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (window->IsVisible() && window->VisibleRegion().Contains(where))
 			return window;
@@ -2295,14 +2294,14 @@ Desktop::WindowAt(BPoint where)
 
 
 void
-Desktop::SetMouseEventWindow(WindowLayer* window)
+Desktop::SetMouseEventWindow(Window* window)
 {
 	fMouseEventWindow = window;
 }
 
 
 void
-Desktop::SetViewUnderMouse(const WindowLayer* window, int32 viewToken)
+Desktop::SetViewUnderMouse(const Window* window, int32 viewToken)
 {
 	fWindowUnderMouse = window;
 	fViewUnderMouse = viewToken;
@@ -2310,7 +2309,7 @@ Desktop::SetViewUnderMouse(const WindowLayer* window, int32 viewToken)
 
 
 int32
-Desktop::ViewUnderMouse(const WindowLayer* window)
+Desktop::ViewUnderMouse(const Window* window)
 {
 	if (window != NULL && fWindowUnderMouse == window)
 		return fViewUnderMouse;
@@ -2319,10 +2318,10 @@ Desktop::ViewUnderMouse(const WindowLayer* window)
 }
 
 
-WindowLayer *
-Desktop::FindWindowLayerByClientToken(int32 token, team_id teamID)
+Window *
+Desktop::FindWindowByClientToken(int32 token, team_id teamID)
 {
-	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (window->ServerWindow()->ClientToken() == token
 			&& window->ServerWindow()->ClientTeam() == teamID) {
@@ -2341,7 +2340,7 @@ Desktop::MinimizeApplication(team_id team)
 
 	// Just minimize all windows of that application
 
-	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (window->ServerWindow()->ClientTeam() != team)
 			continue;
@@ -2358,7 +2357,7 @@ Desktop::BringApplicationToFront(team_id team)
 
 	// TODO: for now, just maximize all windows of that application
 
-	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (window->ServerWindow()->ClientTeam() != team)
 			continue;
@@ -2377,7 +2376,7 @@ Desktop::WindowAction(int32 windowToken, int32 action)
 	LockAllWindows();
 
 	::ServerWindow* serverWindow;
-	WindowLayer* window;
+	Window* window;
 	if (BPrivate::gDefaultTokens.GetToken(windowToken,
 			B_SERVER_TOKEN, (void**)&serverWindow) != B_OK
 		|| (window = serverWindow->Window()) == NULL) {
@@ -2405,7 +2404,7 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 
 	int32 count = 0;
 
-	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (team < B_OK || window->ServerWindow()->ClientTeam() == team)
 			count++;
@@ -2416,7 +2415,7 @@ Desktop::WriteWindowList(team_id team, BPrivate::LinkSender& sender)
 	sender.StartMessage(B_OK);
 	sender.Attach<int32>(count);
 
-	for (WindowLayer *window = fAllWindows.FirstWindow(); window != NULL;
+	for (Window *window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		if (team >= B_OK && window->ServerWindow()->ClientTeam() != team)
 			continue;
@@ -2483,7 +2482,7 @@ Desktop::_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen)
 	stillAvailableOnScreen = fScreenRegion;
 
 	// set clipping of each window
-	for (WindowLayer* window = _CurrentWindows().LastWindow(); window != NULL;
+	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (!window->IsHidden()) {
 			window->SetClipping(&stillAvailableOnScreen);
@@ -2498,7 +2497,7 @@ void
 Desktop::_TriggerWindowRedrawing(BRegion& newDirtyRegion)
 {
 	// send redraw messages to all windows intersecting the dirty region
-	for (WindowLayer* window = _CurrentWindows().LastWindow(); window != NULL;
+	for (Window* window = _CurrentWindows().LastWindow(); window != NULL;
 			window = window->PreviousWindow(fCurrentWorkspace)) {
 		if (!window->IsHidden()
 			&& newDirtyRegion.Intersects(window->VisibleRegion().Frame()))

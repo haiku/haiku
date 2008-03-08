@@ -10,7 +10,7 @@
  */
 
 
-#include "WindowLayer.h"
+#include "Window.h"
 
 #include "DebugInfoManager.h"
 #include "Decorator.h"
@@ -23,7 +23,7 @@
 #include "ServerApp.h"
 #include "ServerWindow.h"
 #include "Workspace.h"
-#include "WorkspacesLayer.h"
+#include "WorkspacesView.h"
 
 #include <ViewPrivate.h>
 #include <WindowPrivate.h>
@@ -68,7 +68,7 @@ using std::nothrow;
 // the update session, which tells us the cause of the update
 
 
-WindowLayer::WindowLayer(const BRect& frame, const char *name,
+Window::Window(const BRect& frame, const char *name,
 		window_look look, window_feel feel, uint32 flags, uint32 workspaces,
 		::ServerWindow* window, DrawingEngine* drawingEngine)
 	:
@@ -167,14 +167,14 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 		}
 	}
 
-	STRACE(("WindowLayer %p, %s:\n", this, Name()));
+	STRACE(("Window %p, %s:\n", this, Name()));
 	STRACE(("\tFrame: (%.1f, %.1f, %.1f, %.1f)\n", fFrame.left, fFrame.top,
 		fFrame.right, fFrame.bottom));
 	STRACE(("\tWindow %s\n", window ? window->Title() : "NULL"));
 }
 
 
-WindowLayer::~WindowLayer()
+Window::~Window()
 {
 	if (fTopLayer)
 		fTopLayer->DetachedFromWindow();
@@ -185,7 +185,7 @@ WindowLayer::~WindowLayer()
 
 
 void
-WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
+Window::SetClipping(BRegion* stillAvailableOnScreen)
 {
 	// this function is only called from the Desktop thread
 
@@ -203,7 +203,7 @@ WindowLayer::SetClipping(BRegion* stillAvailableOnScreen)
 
 
 void
-WindowLayer::GetFullRegion(BRegion* region)
+Window::GetFullRegion(BRegion* region)
 {
 	// TODO: if someone needs to call this from
 	// the outside, the clipping needs to be readlocked!
@@ -215,7 +215,7 @@ WindowLayer::GetFullRegion(BRegion* region)
 
 // GetBorderRegion
 void
-WindowLayer::GetBorderRegion(BRegion* region)
+Window::GetBorderRegion(BRegion* region)
 {
 	// TODO: if someone needs to call this from
 	// the outside, the clipping needs to be readlocked!
@@ -234,7 +234,7 @@ WindowLayer::GetBorderRegion(BRegion* region)
 
 
 void
-WindowLayer::GetContentRegion(BRegion* region)
+Window::GetContentRegion(BRegion* region)
 {
 	// TODO: if someone needs to call this from
 	// the outside, the clipping needs to be readlocked!
@@ -248,7 +248,7 @@ WindowLayer::GetContentRegion(BRegion* region)
 
 
 BRegion&
-WindowLayer::VisibleContentRegion()
+Window::VisibleContentRegion()
 {
 	// TODO: if someone needs to call this from
 	// the outside, the clipping needs to be readlocked!
@@ -266,7 +266,7 @@ WindowLayer::VisibleContentRegion()
 
 
 void
-WindowLayer::_PropagatePosition()
+Window::_PropagatePosition()
 {
 	if ((fFlags & B_SAME_POSITION_IN_ALL_WORKSPACES) == 0)
 		return;
@@ -278,7 +278,7 @@ WindowLayer::_PropagatePosition()
 
 
 void
-WindowLayer::MoveBy(int32 x, int32 y)
+Window::MoveBy(int32 x, int32 y)
 {
 	// this function is only called from the desktop thread
 
@@ -323,7 +323,7 @@ WindowLayer::MoveBy(int32 x, int32 y)
 
 
 void
-WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
+Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 {
 	// this function is only called from the desktop thread
 
@@ -385,7 +385,7 @@ WindowLayer::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 
 
 void
-WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
+Window::ScrollViewBy(View* view, int32 dx, int32 dy)
 {
 	// this is executed in ServerWindow with the Readlock
 	// held
@@ -413,7 +413,7 @@ WindowLayer::ScrollViewBy(ViewLayer* view, int32 dx, int32 dy)
 
 //! Takes care of invalidating parts that could not be copied
 void
-WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
+Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 {
 	// executed in ServerWindow thread with the read lock held
 	if (!IsVisible())
@@ -485,7 +485,7 @@ WindowLayer::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 
 
 void
-WindowLayer::SetTopLayer(ViewLayer* topLayer)
+Window::SetTopLayer(View* topLayer)
 {
 	fTopLayer = topLayer;
 
@@ -509,29 +509,29 @@ WindowLayer::SetTopLayer(ViewLayer* topLayer)
 }
 
 
-ViewLayer*
-WindowLayer::ViewAt(const BPoint& where)
+View*
+Window::ViewAt(const BPoint& where)
 {
 	return fTopLayer->ViewAt(where);
 }
 
 
 window_anchor&
-WindowLayer::Anchor(int32 index)
+Window::Anchor(int32 index)
 {
 	return fAnchor[index];
 }
 
 
-WindowLayer*
-WindowLayer::NextWindow(int32 index) const
+Window*
+Window::NextWindow(int32 index) const
 {
 	return fAnchor[index].next;
 }
 
 
-WindowLayer*
-WindowLayer::PreviousWindow(int32 index) const
+Window*
+Window::PreviousWindow(int32 index) const
 {
 	return fAnchor[index].previous;
 }
@@ -541,7 +541,7 @@ WindowLayer::PreviousWindow(int32 index) const
 
 
 void
-WindowLayer::GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region)
+Window::GetEffectiveDrawingRegion(View* layer, BRegion& region)
 {
 	if (!fEffectiveDrawingRegionValid) {
 		fEffectiveDrawingRegion = VisibleContentRegion();
@@ -554,7 +554,7 @@ WindowLayer::GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region)
 			fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
 		} else {
 			// not in update, the view can draw everywhere
-//printf("WindowLayer(%s)::GetEffectiveDrawingRegion(for %s) - outside update\n", Title(), layer->Name());
+//printf("Window(%s)::GetEffectiveDrawingRegion(for %s) - outside update\n", Title(), layer->Name());
 		}
 
 		fEffectiveDrawingRegionValid = true;
@@ -574,14 +574,14 @@ WindowLayer::GetEffectiveDrawingRegion(ViewLayer* layer, BRegion& region)
 
 
 bool
-WindowLayer::DrawingRegionChanged(ViewLayer* layer) const
+Window::DrawingRegionChanged(View* layer) const
 {
 	return !fEffectiveDrawingRegionValid || !layer->IsScreenClippingValid();
 }
 
 
 void
-WindowLayer::ProcessDirtyRegion(BRegion& region)
+Window::ProcessDirtyRegion(BRegion& region)
 {
 	// if this is exectuted in the desktop thread,
 	// it means that the window thread currently
@@ -610,7 +610,7 @@ WindowLayer::ProcessDirtyRegion(BRegion& region)
 
 
 void
-WindowLayer::RedrawDirtyRegion()
+Window::RedrawDirtyRegion()
 {
 	// executed from ServerWindow with the read lock held
 
@@ -639,7 +639,7 @@ WindowLayer::RedrawDirtyRegion()
 
 
 void
-WindowLayer::MarkDirty(BRegion& regionOnScreen)
+Window::MarkDirty(BRegion& regionOnScreen)
 {
 	// for marking any part of the desktop dirty
 	// this will get write access to the global
@@ -651,7 +651,7 @@ WindowLayer::MarkDirty(BRegion& regionOnScreen)
 
 
 void
-WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
+Window::MarkContentDirty(BRegion& regionOnScreen)
 {
 	// for triggering AS_REDRAW
 	// since this won't affect other windows, read locking
@@ -667,7 +667,7 @@ WindowLayer::MarkContentDirty(BRegion& regionOnScreen)
 
 
 void
-WindowLayer::MarkContentDirtyAsync(BRegion& regionOnScreen)
+Window::MarkContentDirtyAsync(BRegion& regionOnScreen)
 {
 	// NOTE: see comments in ProcessDirtyRegion()
 	if (fHidden)
@@ -685,7 +685,7 @@ WindowLayer::MarkContentDirtyAsync(BRegion& regionOnScreen)
 
 
 void
-WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
+Window::InvalidateView(View* layer, BRegion& layerRegion)
 {
 	if (layer && IsVisible() && layer->IsVisible()) {
 
@@ -707,7 +707,7 @@ WindowLayer::InvalidateView(ViewLayer* layer, BRegion& layerRegion)
 
 // DisableUpdateRequests
 void
-WindowLayer::DisableUpdateRequests()
+Window::DisableUpdateRequests()
 {
 	fUpdatesEnabled = false;
 }
@@ -715,7 +715,7 @@ WindowLayer::DisableUpdateRequests()
 
 // EnableUpdateRequests
 void
-WindowLayer::EnableUpdateRequests()
+Window::EnableUpdateRequests()
 {
 	fUpdatesEnabled = true;
 	if (!fUpdateRequested && fPendingUpdateSession->IsUsed())
@@ -726,15 +726,15 @@ WindowLayer::EnableUpdateRequests()
 
 
 void
-WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
+Window::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 {
 	// TODO: move into Decorator
 	if (!fBorderRegionValid)
 		GetBorderRegion(&fBorderRegion);
 
-	// default action is to drag the WindowLayer
+	// default action is to drag the Window
 	if (fBorderRegion.Contains(where)) {
-		// clicking WindowLayer visible area
+		// clicking Window visible area
 
 		click_type action = DEC_DRAG;
 
@@ -830,11 +830,11 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 		}
 	} else {
 		// click was inside the window contents
-		if (ViewLayer* view = ViewAt(where)) {
+		if (View* view = ViewAt(where)) {
 			if (HasModal())
 				return;
 
-			// clicking a simple ViewLayer
+			// clicking a simple View
 			if (!IsFocus()) {
 				DesktopSettings desktopSettings(fDesktop);
 
@@ -864,7 +864,7 @@ WindowLayer::MouseDown(BMessage* message, BPoint where, int32* _viewToken)
 
 
 void
-WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
+Window::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 {
 	bool invalidate = false;
 	if (fDecorator) {
@@ -924,7 +924,7 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 	fIsResizing = false;
 	fIsSlidingTab = false;
 
-	if (ViewLayer* view = ViewAt(where)) {
+	if (View* view = ViewAt(where)) {
 		if (HasModal())
 			return;
 
@@ -935,7 +935,7 @@ WindowLayer::MouseUp(BMessage* message, BPoint where, int32* _viewToken)
 
 
 void
-WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
+Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	bool isLatestMouseMoved)
 {
 #if 0
@@ -949,7 +949,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	}
 #endif
 
-	ViewLayer* view = ViewAt(where);
+	View* view = ViewAt(where);
 	if (view != NULL)
 		*_viewToken = view->Token();
 
@@ -1070,7 +1070,7 @@ WindowLayer::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 
 
 void
-WindowLayer::WorkspaceActivated(int32 index, bool active)
+Window::WorkspaceActivated(int32 index, bool active)
 {
 	if (!active)
 		fWindow->HandleDirectConnection(B_DIRECT_STOP);
@@ -1088,7 +1088,7 @@ WindowLayer::WorkspaceActivated(int32 index, bool active)
 
 
 void
-WindowLayer::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
+Window::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 {
 	fWorkspaces = newWorkspaces;
 
@@ -1102,7 +1102,7 @@ WindowLayer::WorkspacesChanged(uint32 oldWorkspaces, uint32 newWorkspaces)
 
 
 void
-WindowLayer::Activated(bool active)
+Window::Activated(bool active)
 {
 	BMessage msg(B_WINDOW_ACTIVATED);
 	msg.AddBool("active", active);
@@ -1114,7 +1114,7 @@ WindowLayer::Activated(bool active)
 
 
 void
-WindowLayer::SetTitle(const char* name, BRegion& dirty)
+Window::SetTitle(const char* name, BRegion& dirty)
 {
 	// rebuild the clipping for the title area
 	// and redraw it.
@@ -1131,7 +1131,7 @@ WindowLayer::SetTitle(const char* name, BRegion& dirty)
 
 
 void
-WindowLayer::SetFocus(bool focus)
+Window::SetFocus(bool focus)
 {
 	// executed from Desktop thread
 	// it holds the clipping write lock,
@@ -1154,7 +1154,7 @@ WindowLayer::SetFocus(bool focus)
 
 
 void
-WindowLayer::SetHidden(bool hidden)
+Window::SetHidden(bool hidden)
 {
 	// the desktop takes care of dirty regions
 	if (fHidden != hidden) {
@@ -1168,7 +1168,7 @@ WindowLayer::SetHidden(bool hidden)
 
 
 void
-WindowLayer::SetMinimized(bool minimized)
+Window::SetMinimized(bool minimized)
 {
 	if (minimized == fMinimized)
 		return;
@@ -1178,7 +1178,7 @@ WindowLayer::SetMinimized(bool minimized)
 
 
 bool
-WindowLayer::IsVisible() const
+Window::IsVisible() const
 {
 	if (IsOffscreenWindow())
 		return true;
@@ -1195,7 +1195,7 @@ WindowLayer::IsVisible() const
 
 
 void
-WindowLayer::SetSizeLimits(int32 minWidth, int32 maxWidth,
+Window::SetSizeLimits(int32 minWidth, int32 maxWidth,
 	int32 minHeight, int32 maxHeight)
 {
 	if (minWidth < 0)
@@ -1220,7 +1220,7 @@ WindowLayer::SetSizeLimits(int32 minWidth, int32 maxWidth,
 
 
 void
-WindowLayer::GetSizeLimits(int32* minWidth, int32* maxWidth,
+Window::GetSizeLimits(int32* minWidth, int32* maxWidth,
 	int32* minHeight, int32* maxHeight) const
 {
 	*minWidth = fMinWidth;
@@ -1231,7 +1231,7 @@ WindowLayer::GetSizeLimits(int32* minWidth, int32* maxWidth,
 
 
 bool
-WindowLayer::SetTabLocation(float location, BRegion& dirty)
+Window::SetTabLocation(float location, BRegion& dirty)
 {
 	bool ret = false;
 	if (fDecorator) {
@@ -1244,7 +1244,7 @@ WindowLayer::SetTabLocation(float location, BRegion& dirty)
 
 
 float
-WindowLayer::TabLocation() const
+Window::TabLocation() const
 {
 	if (fDecorator)
 		return fDecorator->TabLocation();
@@ -1253,7 +1253,7 @@ WindowLayer::TabLocation() const
 
 
 bool
-WindowLayer::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
+Window::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
 {
 	bool ret = false;
 	if (fDecorator) {
@@ -1266,7 +1266,7 @@ WindowLayer::SetDecoratorSettings(const BMessage& settings, BRegion& dirty)
 
 
 bool
-WindowLayer::GetDecoratorSettings(BMessage* settings)
+Window::GetDecoratorSettings(BMessage* settings)
 {
 	if (fDecorator)
 		return fDecorator->GetSettings(settings);
@@ -1276,7 +1276,7 @@ WindowLayer::GetDecoratorSettings(BMessage* settings)
 
 
 void
-WindowLayer::SetLook(window_look look, BRegion* updateRegion)
+Window::SetLook(window_look look, BRegion* updateRegion)
 {
 	if (fDecorator == NULL && look != B_NO_BORDER_WINDOW_LOOK) {
 		// we need a new decorator
@@ -1314,7 +1314,7 @@ WindowLayer::SetLook(window_look look, BRegion* updateRegion)
 
 
 void
-WindowLayer::SetFeel(window_feel feel)
+Window::SetFeel(window_feel feel)
 {
 	// if the subset list is no longer needed, clear it
 	if ((fFeel == B_MODAL_SUBSET_WINDOW_FEEL || fFeel == B_FLOATING_SUBSET_WINDOW_FEEL)
@@ -1336,7 +1336,7 @@ WindowLayer::SetFeel(window_feel feel)
 
 
 void
-WindowLayer::SetFlags(uint32 flags, BRegion* updateRegion)
+Window::SetFlags(uint32 flags, BRegion* updateRegion)
 {
 	fOriginalFlags = flags;
 	fFlags = flags & ValidWindowFlags(fFeel);
@@ -1366,14 +1366,14 @@ WindowLayer::SetFlags(uint32 flags, BRegion* updateRegion)
 	specified \a index.
 */
 bool
-WindowLayer::InWorkspace(int32 index) const
+Window::InWorkspace(int32 index) const
 {
 	return (fWorkspaces & (1UL << index)) != 0;
 }
 
 
 bool
-WindowLayer::SupportsFront()
+Window::SupportsFront()
 {
 	if (fFeel == kDesktopWindowFeel
 		|| fFeel == kMenuWindowFeel
@@ -1385,30 +1385,30 @@ WindowLayer::SupportsFront()
 
 
 bool
-WindowLayer::IsModal() const
+Window::IsModal() const
 {
 	return IsModalFeel(fFeel);
 }
 
 
 bool
-WindowLayer::IsFloating() const
+Window::IsFloating() const
 {
 	return IsFloatingFeel(fFeel);
 }
 
 
 bool
-WindowLayer::IsNormal() const
+Window::IsNormal() const
 {
 	return !IsFloatingFeel(fFeel) && !IsModalFeel(fFeel);
 }
 
 
 bool
-WindowLayer::HasModal() const
+Window::HasModal() const
 {
-	for (WindowLayer* window = NextWindow(fCurrentWorkspace); window != NULL;
+	for (Window* window = NextWindow(fCurrentWorkspace); window != NULL;
 			window = window->NextWindow(fCurrentWorkspace)) {
 		if (window->IsHidden() || !window->IsModal())
 			continue;
@@ -1425,8 +1425,8 @@ WindowLayer::HasModal() const
 		this window can get.
 		Returns NULL is this window can be the backmost window.
 */
-WindowLayer*
-WindowLayer::Backmost(WindowLayer* window, int32 workspace)
+Window*
+Window::Backmost(Window* window, int32 workspace)
 {
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
@@ -1454,8 +1454,8 @@ WindowLayer::Backmost(WindowLayer* window, int32 workspace)
 		this window can get.
 		Returns NULL if this window can be the frontmost window.
 */
-WindowLayer*
-WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
+Window*
+Window::Frontmost(Window* first, int32 workspace)
 {
 	if (workspace == -1)
 		workspace = fCurrentWorkspace;
@@ -1466,7 +1466,7 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 	if (first == NULL)
 		first = NextWindow(workspace);
 
-	for (WindowLayer* window = first; window != NULL;
+	for (Window* window = first; window != NULL;
 			window = window->NextWindow(workspace)) {
 		if (window->IsHidden() || window == this)
 			continue;
@@ -1480,21 +1480,21 @@ WindowLayer::Frontmost(WindowLayer* first, int32 workspace)
 
 
 bool
-WindowLayer::AddToSubset(WindowLayer* window)
+Window::AddToSubset(Window* window)
 {
 	return fSubsets.AddItem(window);
 }
 
 
 void
-WindowLayer::RemoveFromSubset(WindowLayer* window)
+Window::RemoveFromSubset(Window* window)
 {
 	fSubsets.RemoveItem(window);
 }
 
 
 bool
-WindowLayer::HasInSubset(const WindowLayer* window) const
+Window::HasInSubset(const Window* window) const
 {
 	if (window == NULL || fFeel == window->Feel()
 		|| fFeel == B_NORMAL_WINDOW_FEEL)
@@ -1531,11 +1531,10 @@ WindowLayer::HasInSubset(const WindowLayer* window) const
 /*!	\brief Collects all workspaces views in this window and puts it into \a list
 */
 void
-WindowLayer::FindWorkspacesViews(BObjectList<WorkspacesLayer>& list) const
+Window::FindWorkspacesViews(BObjectList<WorkspacesView>& list) const
 {
 	int32 count = fWorkspacesViewCount;
-	TopLayer()->FindViews(kWorkspacesViewFlag, (BObjectList<ViewLayer>&)list,
-		count);
+	fTopLayer->FindViews(kWorkspacesViewFlag, (BObjectList<View>&)list, count);
 }
 
 
@@ -1546,14 +1545,14 @@ WindowLayer::FindWorkspacesViews(BObjectList<WorkspacesLayer>& list) const
 	to have a subset as front window to be visible.
 */
 uint32
-WindowLayer::SubsetWorkspaces() const
+Window::SubsetWorkspaces() const
 {
 	if (fFeel == B_MODAL_ALL_WINDOW_FEEL
 		|| fFeel == B_FLOATING_ALL_WINDOW_FEEL)
 		return B_ALL_WORKSPACES;
 
 	if (fFeel == B_FLOATING_APP_WINDOW_FEEL) {
-		WindowLayer* front = fDesktop->FrontWindow();
+		Window* front = fDesktop->FrontWindow();
 		if (front != NULL && front->IsNormal()
 			&& front->ServerWindow()->App() == ServerWindow()->App())
 			return ServerWindow()->App()->Workspaces();
@@ -1577,7 +1576,7 @@ WindowLayer::SubsetWorkspaces() const
 		uint32 workspaces = 0;
 		bool hasNormalFront = false;
 		for (int32 i = 0; i < fSubsets.CountItems(); i++) {
-			WindowLayer* window = fSubsets.ItemAt(i);
+			Window* window = fSubsets.ItemAt(i);
 
 			if (!window->IsHidden())
 				workspaces |= window->Workspaces();
@@ -1600,7 +1599,7 @@ WindowLayer::SubsetWorkspaces() const
 
 /*static*/
 bool
-WindowLayer::IsValidLook(window_look look)
+Window::IsValidLook(window_look look)
 {
 	return look == B_TITLED_WINDOW_LOOK
 		|| look == B_DOCUMENT_WINDOW_LOOK
@@ -1615,7 +1614,7 @@ WindowLayer::IsValidLook(window_look look)
 
 /*static*/
 bool
-WindowLayer::IsValidFeel(window_feel feel)
+Window::IsValidFeel(window_feel feel)
 {
 	return feel == B_NORMAL_WINDOW_FEEL
 		|| feel == B_MODAL_SUBSET_WINDOW_FEEL
@@ -1632,7 +1631,7 @@ WindowLayer::IsValidFeel(window_feel feel)
 
 /*static*/
 bool
-WindowLayer::IsModalFeel(window_feel feel)
+Window::IsModalFeel(window_feel feel)
 {
 	return feel == B_MODAL_SUBSET_WINDOW_FEEL
 		|| feel == B_MODAL_APP_WINDOW_FEEL
@@ -1642,7 +1641,7 @@ WindowLayer::IsModalFeel(window_feel feel)
 
 /*static*/
 bool
-WindowLayer::IsFloatingFeel(window_feel feel)
+Window::IsFloatingFeel(window_feel feel)
 {
 	return feel == B_FLOATING_SUBSET_WINDOW_FEEL
 		|| feel == B_FLOATING_APP_WINDOW_FEEL
@@ -1652,7 +1651,7 @@ WindowLayer::IsFloatingFeel(window_feel feel)
 
 /*static*/
 uint32
-WindowLayer::ValidWindowFlags()
+Window::ValidWindowFlags()
 {
 	return B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
 		| B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
@@ -1671,7 +1670,7 @@ WindowLayer::ValidWindowFlags()
 
 /*static*/
 uint32
-WindowLayer::ValidWindowFlags(window_feel feel)
+Window::ValidWindowFlags(window_feel feel)
 {
 	uint32 flags = ValidWindowFlags();
 	if (IsModalFeel(feel))
@@ -1686,7 +1685,7 @@ WindowLayer::ValidWindowFlags(window_feel feel)
 
 // _ShiftPartOfRegion
 void
-WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
+Window::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 	int32 xOffset, int32 yOffset)
 {
 	BRegion* common = fRegionPool.GetRegion(*regionToShift);
@@ -1706,7 +1705,7 @@ WindowLayer::_ShiftPartOfRegion(BRegion* region, BRegion* regionToShift,
 
 
 void
-WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
+Window::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 {
 	if (IsVisible() && dirtyContentRegion.CountRects() > 0) {
 		// put this into the pending dirty region
@@ -1742,7 +1741,7 @@ WindowLayer::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 
 
 void
-WindowLayer::_DrawBorder()
+Window::_DrawBorder()
 {
 	// this is executed in the window thread, but only
 	// in respond to a REDRAW message having been received, the
@@ -1790,7 +1789,7 @@ fWindow->ResyncDrawState();
 	the clipping lock held
 */
 void
-WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
+Window::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 {
 	if (contentDirtyRegion->CountRects() <= 0)
 		return;
@@ -1832,7 +1831,7 @@ WindowLayer::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 
 // _SendUpdateMessage
 void
-WindowLayer::_SendUpdateMessage()
+Window::_SendUpdateMessage()
 {
 	if (!fUpdatesEnabled)
 		return;
@@ -1846,11 +1845,11 @@ WindowLayer::_SendUpdateMessage()
 
 
 void
-WindowLayer::BeginUpdate(BPrivate::PortLink& link)
+Window::BeginUpdate(BPrivate::PortLink& link)
 {
 	// NOTE: since we might "shift" parts of the
 	// internal dirty regions from the desktop thread
-	// in response to WindowLayer::ResizeBy(), which
+	// in response to Window::ResizeBy(), which
 	// might move arround views, the user of this function
 	// needs to hold the global clipping lock so that the internal
 	// dirty regions are not messed with from the Desktop thread
@@ -1872,7 +1871,7 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 		// TODO: each view could be drawn individually
 		// right before carrying out the first drawing
 		// command from the client during an update
-		// (ViewLayer::IsBackgroundDirty() can be used
+		// (View::IsBackgroundDirty() can be used
 		// for this)
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
@@ -1928,13 +1927,13 @@ WindowLayer::BeginUpdate(BPrivate::PortLink& link)
 printf("BeginUpdate() but no update requested!!\n");
 		link.StartMessage(B_ERROR);
 		link.Flush();
-		fprintf(stderr, "WindowLayer::BeginUpdate() - no update requested!\n");
+		fprintf(stderr, "Window::BeginUpdate() - no update requested!\n");
 	}
 }
 
 
 void
-WindowLayer::EndUpdate()
+Window::EndUpdate()
 {
 	// NOTE: see comment in _BeginUpdate()
 
@@ -1954,7 +1953,7 @@ WindowLayer::EndUpdate()
 
 
 void
-WindowLayer::_UpdateContentRegion()
+Window::_UpdateContentRegion()
 {
 	fContentRegion.Set(fFrame);
 
@@ -1971,7 +1970,7 @@ WindowLayer::_UpdateContentRegion()
 
 
 click_type
-WindowLayer::_ActionFor(const BMessage* msg) const
+Window::_ActionFor(const BMessage* msg) const
 {
 	if (fDecorator == NULL)
 		return DEC_NONE;
@@ -1993,7 +1992,7 @@ WindowLayer::_ActionFor(const BMessage* msg) const
 
 
 void
-WindowLayer::_ObeySizeLimits()
+Window::_ObeySizeLimits()
 {
 	// make sure we even have valid size limits
 	if (fMaxWidth < fMinWidth)
@@ -2038,7 +2037,7 @@ WindowLayer::_ObeySizeLimits()
 // #pragma mark - UpdateSession
 
 
-WindowLayer::UpdateSession::UpdateSession()
+Window::UpdateSession::UpdateSession()
 	: fDirtyRegion(),
 	  fInUse(false),
 	  fCause(0)
@@ -2046,34 +2045,34 @@ WindowLayer::UpdateSession::UpdateSession()
 }
 
 
-WindowLayer::UpdateSession::~UpdateSession()
+Window::UpdateSession::~UpdateSession()
 {
 }
 
 
 void
-WindowLayer::UpdateSession::Include(BRegion* additionalDirty)
+Window::UpdateSession::Include(BRegion* additionalDirty)
 {
 	fDirtyRegion.Include(additionalDirty);
 }
 
 
 void
-WindowLayer::UpdateSession::Exclude(BRegion* dirtyInNextSession)
+Window::UpdateSession::Exclude(BRegion* dirtyInNextSession)
 {
 	fDirtyRegion.Exclude(dirtyInNextSession);
 }
 
 
 void
-WindowLayer::UpdateSession::MoveBy(int32 x, int32 y)
+Window::UpdateSession::MoveBy(int32 x, int32 y)
 {
 	fDirtyRegion.OffsetBy(x, y);
 }
 
 
 void
-WindowLayer::UpdateSession::SetUsed(bool used)
+Window::UpdateSession::SetUsed(bool used)
 {
 	fInUse = used;
 	if (!fInUse) {
@@ -2084,7 +2083,7 @@ WindowLayer::UpdateSession::SetUsed(bool used)
 
 
 void
-WindowLayer::UpdateSession::AddCause(uint8 cause)
+Window::UpdateSession::AddCause(uint8 cause)
 {
 	fCause |= cause;
 }

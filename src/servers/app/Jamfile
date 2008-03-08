@@ -39,27 +39,27 @@ Server app_server :
 	MessageLooper.cpp
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp
-	OffscreenWindowLayer.cpp
+	OffscreenWindow.cpp
 	PNGDump.cpp
 	ProfileMessageSupport.cpp
 	RAMLinkMsgReader.cpp
 	RGBColor.cpp
 	RegionPool.cpp
+	Screen.cpp
 	ScreenManager.cpp
 	ServerApp.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
 	ServerFont.cpp
 	ServerPicture.cpp
-	ServerScreen.cpp
 	ServerWindow.cpp
 	SystemPalette.cpp
-	ViewLayer.cpp
+	View.cpp
 	VirtualScreen.cpp
-	WindowLayer.cpp
+	Window.cpp
 	WindowList.cpp
 	Workspace.cpp
-	WorkspacesLayer.cpp
+	WorkspacesView.cpp
 
 	# libraries
 	:

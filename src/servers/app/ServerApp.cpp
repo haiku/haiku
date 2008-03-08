@@ -30,16 +30,16 @@
 #include "InputManager.h"
 #include "OffscreenServerWindow.h"
 #include "RAMLinkMsgReader.h"
+#include "Screen.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerConfig.h"
 #include "ServerCursor.h"
 #include "ServerPicture.h"
-#include "ServerScreen.h"
 #include "ServerTokenSpace.h"
 #include "ServerWindow.h"
 #include "SystemPalette.h"
-#include "WindowLayer.h"
+#include "Window.h"
 
 #include <FontPrivate.h>
 #include <MessengerPrivate.h>
@@ -444,7 +444,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 					ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
-					WindowLayer* window = serverWindow->Window();
+					Window* window = serverWindow->Window();
 					if (window == NULL || window->IsOffscreenWindow())
 						continue;
 
@@ -2666,7 +2666,7 @@ ServerApp::InWorkspace(int32 index) const
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
-		const WindowLayer* window = serverWindow->Window();
+		const Window* window = serverWindow->Window();
 		if (window == NULL || window->IsOffscreenWindow())
 			continue;
 
@@ -2693,7 +2693,7 @@ ServerApp::Workspaces() const
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
-		const WindowLayer* window = serverWindow->Window();
+		const Window* window = serverWindow->Window();
 		if (window == NULL || window->IsOffscreenWindow())
 			continue;
 
