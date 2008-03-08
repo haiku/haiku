@@ -613,7 +613,7 @@ bool
 BMessage::IsSourceWaiting() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return fHeader && (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED)
+	return (fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED)
 		&& !(fHeader->flags & MESSAGE_FLAG_REPLY_DONE);
 }
 
@@ -622,7 +622,7 @@ bool
 BMessage::IsSourceRemote() const
 {
 	DEBUG_FUNCTION_ENTER;
-	return fHeader && (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED)
+	return (fHeader->flags & MESSAGE_FLAG_WAS_DELIVERED)
 		&& (fHeader->reply_team != BPrivate::current_team());
 }
 
@@ -1953,21 +1953,7 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	header->reply_target = replyToPrivate.Token();
 	header->flags |= MESSAGE_FLAG_WAS_DELIVERED;
 
-	if (direct != NULL) {
-		KTRACE("BMessage send direct: port: %ld, token: %ld, "
-			"message: '%c%c%c%c'", port, token,
-			char(what >> 24), char(what >> 16), char(what >> 8), (char)what);
-
-		// this is a local message transmission
-		direct->AddMessage(copy);
-
-		if (direct->Queue()->IsNextMessage(copy) && port_count(port) <= 0) {
-			// there is currently no message waiting, and we need to wakeup the looper
-			write_port_etc(port, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
-		}
-
-		direct->Release();
-	} else {
+	if (direct == NULL) {
 		KTRACE("BMessage send remote: team: %ld, port: %ld, token: %ld, "
 			"message: '%c%c%c%c'", portOwner, port, token,
 			char(what >> 24), char(what >> 16), char(what >> 8), (char)what);
@@ -1982,6 +1968,24 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		// the forwarded message will handle the reply - we must not do
 		// this anymore
 		fHeader->flags |= MESSAGE_FLAG_REPLY_DONE;
+	}
+
+	// we need to do this last because it is possible our 
+	// message might be destroyed after it's enqueued in the 
+	// target looper. Thus we don't want to do any ops that depend on
+	// members of this after the enqueue.
+	if (direct != NULL) {
+		KTRACE("BMessage send direct: port: %ld, token: %ld, "
+			"message: '%c%c%c%c'", port, token,
+			char(what >> 24), char(what >> 16), char(what >> 8), (char)what);
+
+		// this is a local message transmission
+		direct->AddMessage(copy);
+		if (direct->Queue()->IsNextMessage(copy) && port_count(port) <= 0) {
+			// there is currently no message waiting, and we need to wakeup the looper
+			write_port_etc(port, 0, NULL, 0, B_RELATIVE_TIMEOUT, 0);
+		}
+		direct->Release();
 	}
 
 	free(buffer);
