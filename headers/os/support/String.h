@@ -26,7 +26,6 @@ public:
 	const char*	String() const;
 	int32 		Length() const;
 	int32		CountChars() const;
-	int32 		ReferenceCount() const;
 
 	// Assignment
 	BString&	operator=(const BString& string);
@@ -231,7 +230,6 @@ private:
 
 	// Data
 	void		_SetLength(int32 length);
-	void		_SetReferenceCount(int32 count);
 	bool		_DoAppend(const char* string, int32 length);
 	bool		_DoPrepend(const char* string, int32 length);
 	bool		_DoInsert(const char* string, int32 offset, int32 length);
@@ -256,7 +254,11 @@ private:
 					const char* with, int32 withLen);
 
 private:
-	char*	            fPrivateData;
+	inline int32& 	_ReferenceCount();
+	bool			_IsShareable();
+	void			_FreePrivateData();
+
+	char*			fPrivateData;
 };
 
 
@@ -291,13 +293,6 @@ BString::String() const
 	if (!fPrivateData)
 		return "";
 	return fPrivateData;
-}
-
-
-inline int32
-BString::ReferenceCount() const
-{
-	return fPrivateData ? (*(((int32 *)fPrivateData) - 2)) : 1;
 }
 
 
@@ -441,8 +436,7 @@ operator!=(const char *str, const BString &string)
 //	#pragma mark - BStringRef
 
 
-class BStringRef
-{
+class BStringRef {
 public:
 	BStringRef(BString& string, int32 position);
 	~BStringRef() {}
@@ -453,7 +447,7 @@ public:
 	const char* operator&() const;
 
 	BStringRef& operator=(char c);
-	BStringRef &operator=(const BStringRef &rc);
+	BStringRef& operator=(const BStringRef& rc);
 
 private:
 	BString&	fString;

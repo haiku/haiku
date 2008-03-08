@@ -6,11 +6,11 @@
 *		Marc Flerackers (mflerackers@androme.be)
 *		Stefano Ceccherini (burton666@libero.it)
 *		Oliver Tappe (openbeos@hirschkaefer.de)
-*		Axel Dörfler, axeld@pinc-software.de
+*		Axel DÃ¶rfler, axeld@pinc-software.de
 *		Julun <host.haiku@gmx.de>
 */
 
-/* String class supporting common string operations. */
+/*! String class supporting common string operations. */
 
 
 #include <Debug.h>
@@ -31,6 +31,8 @@
 // define proper names for count-option of _DoReplace()
 #define REPLACE_ALL 0x7FFFFFFF
 
+
+const uint32 kPrivateDataOffset = 2 * sizeof(int32);
 
 const char *B_EMPTY_STRING = "";
 
@@ -146,7 +148,7 @@ BStringRef::operator=(const BStringRef &rc)
 const char*
 BStringRef::operator&() const
 {
-	return &(fString.fPrivateData[fPosition]);
+	return &fString.fPrivateData[fPosition];
 }
 
 
@@ -154,8 +156,9 @@ char*
 BStringRef::operator&()
 {
 	fString._Detach();
-	fString._SetReferenceCount(-1);
-	return &(fString.fPrivateData[fPosition]);
+	fString._ReferenceCount() = -1;
+		// mark as unsharable
+	return &fString.fPrivateData[fPosition];
 }
 
 
@@ -180,11 +183,12 @@ BString::BString(const BString& string)
 	: fPrivateData(NULL)
 {
 	// check if source is sharable - if so, share else clone
-	if (atomic_get(&(*(((vint32*)string.fPrivateData) - 2))) >= 0) {
+	if (_IsShareable()) {
 		fPrivateData = string.fPrivateData;
-		atomic_add(&(*(((vint32*)fPrivateData) - 2)), 1);
+		atomic_add(&_ReferenceCount(), 1);
+			// string cannot go away right now
 	} else
-		fPrivateData = _Clone(string.fPrivateData, string.Length());
+		_Init(string.String(), string.Length());
 }
 
 
@@ -197,8 +201,8 @@ BString::BString(const char* string, int32 maxLength)
 
 BString::~BString()
 {
-	if (atomic_add(&(*(((vint32*)fPrivateData) - 2)), -1) < 1)
-		free(fPrivateData - (2 * sizeof(int32)));
+	if (!_IsShareable() || atomic_add(&_ReferenceCount(), -1) == 1)
+		_FreePrivateData();
 }
 
 
@@ -268,27 +272,23 @@ BString::SetTo(const BString& string)
 	if (fPrivateData == string.fPrivateData)
 		return *this;
 
-	// check if we are shared by someone else
-	if (atomic_get(&(*(((vint32*)fPrivateData) - 2))) > 1) {
-		// we share our data with someone else
-		if (atomic_add(&(*((vint32*)fPrivateData - 2)), -1) < 1) {
-			// someone else decrement, we are the last owner
-			free(fPrivateData - (2 * sizeof(int32)));
-		} else {
-			; // there is still someone who shares our data
-		}
-	} else {
-		// we don't share our data with someone else
-		// or we are marked as unsharable, but this will go away
-		free(fPrivateData - (2 * sizeof(int32)));
+	bool freeData = true;
+
+	if (_IsShareable() && atomic_add(&_ReferenceCount(), -1) > 1) {
+		// there is still someone who shares our data
+		freeData = false;
 	}
 
+	if (freeData)
+		_FreePrivateData();
+
 	// if source is sharable share, otherwise clone
-	if (atomic_get(&(*(((vint32*)string.fPrivateData) - 2))) >= 0) {
+	if (_IsShareable()) {
 		fPrivateData = string.fPrivateData;
-		atomic_add(&(*(((vint32*)fPrivateData) - 2)), 1);
+		atomic_add(&_ReferenceCount(), 1);
+			// the string cannot go away right now
 	} else
-		fPrivateData = _Clone(string.fPrivateData, string.Length());
+		_Init(string.String(), string.Length());
 
 	return *this;
 }
@@ -309,10 +309,10 @@ BString::SetTo(const BString& string, int32 maxLength)
 {
 	if (fPrivateData != string.fPrivateData
 		// make sure we reassing in case length is different
-		|| (fPrivateData == string.fPrivateData && Length() != maxLength)) {
-			maxLength = min_clamp0(maxLength, string.Length());
-			if (_DetachWith("", maxLength) == B_OK)
-				memcpy(fPrivateData, string.fPrivateData, maxLength);
+		|| (fPrivateData == string.fPrivateData && Length() > maxLength)) {
+		maxLength = min_clamp0(maxLength, string.Length());
+		if (_DetachWith("", maxLength) == B_OK)
+			memcpy(fPrivateData, string.String(), maxLength);
 	}
 	return *this;
 }
@@ -1384,7 +1384,7 @@ char&
 BString::operator[](int32 index)
 {
 	_Detach();
-	_SetReferenceCount(-1);
+	_ReferenceCount() = -1;
 
 	return fPrivateData[index];
 }
@@ -1643,24 +1643,27 @@ BString::operator<<(float f)
 //	#pragma mark - Private or reserved
 
 
+/*!	Detaches this string from an eventually shared fPrivateData.
+*/
 status_t
 BString::_Detach()
 {
 	char* newData = fPrivateData;
-	if (atomic_get(&(*(((vint32*)fPrivateData - 2)))) > 1) {
-		// we share our data with someone else
-		if (atomic_add(&(*(((vint32*)fPrivateData) - 2)), -1) < 1) {
-			; // someone else decrement, we are the last owner
-		} else {
-			// there is still someone who shares our data
-			newData = _Clone(fPrivateData, Length());
+
+	// TODO: this is not thread safe! A string could be used in than one
+	// thread at a time (and one of those threads could create a ref)
+	if (atomic_get(&_ReferenceCount()) > 1) {
+		// It might be shared, and this requires special treatment
+		newData = _Clone(fPrivateData, Length());
+		if (atomic_add(&_ReferenceCount(), -1) == 1) {
+			// someone else left, we were the last owner
+			_FreePrivateData();
 		}
-	} else {
-		; // we don't share our data with someone else
 	}
 
 	if (newData)
 		fPrivateData = newData;
+
 	return newData != NULL ? B_OK : B_NO_MEMORY;
 }
 
@@ -1671,20 +1674,18 @@ BString::_Realloc(int32 length)
 	if (length == Length())
 		return fPrivateData;
 
-	int32 offset = 2 * sizeof(int32);
-	char *dataPtr = fPrivateData ? fPrivateData - offset : NULL;
+	char *dataPtr = fPrivateData ? fPrivateData - kPrivateDataOffset : NULL;
 	if (length < 0)
 		length = 0;
 
-	dataPtr = (char*)realloc(dataPtr, length + offset + 1);
+	dataPtr = (char*)realloc(dataPtr, length + kPrivateDataOffset + 1);
 	if (dataPtr) {
-		dataPtr += offset;
+		dataPtr += kPrivateDataOffset;
 
 		fPrivateData = dataPtr;
 		fPrivateData[length] = '\0';
 
 		_SetLength(length);
-		_SetReferenceCount(1);
 	}
 	return dataPtr;
 }
@@ -1694,41 +1695,33 @@ void
 BString::_Init(const char* src, int32 length)
 {
 	fPrivateData = _Clone(src, length);
-	if (!fPrivateData) {
-		int32 offset = 2 * sizeof(int32);
-		fPrivateData = (char *)realloc(fPrivateData, offset + 1);
-
-		fPrivateData += offset;
-		fPrivateData[0] = '\0';
-
-		_SetLength(0);
-		_SetReferenceCount(1);
-	}
+	if (fPrivateData == NULL)
+		fPrivateData = _Clone(NULL, 0);
 }
 
 
 char*
 BString::_Clone(const char* data, int32 length)
 {
-	char* newData = NULL;
-	int32 offset = 2 * sizeof(int32);
-	newData = (char *)realloc(newData, length + offset + 1);
+	char* newData = (char *)malloc(length + kPrivateDataOffset + 1);
+	if (newData == NULL)
+		return NULL;
 
-	if (newData) {
-		newData += offset;
-		newData[length] = '\0';
+	newData += kPrivateDataOffset;
+	newData[length] = '\0';
 
-		*(((vint32*)newData) - 2) = 1;
-		*(((int32*)newData) - 1) = length & 0x7fffffff;
+	// initialize reference count & length
+	*(((vint32*)newData) - 2) = 1;
+	*(((int32*)newData) - 1) = length & 0x7fffffff;
 
-		if (data && length)
-			memcpy(newData, data, length);
-	}
+	if (data && length)
+		memcpy(newData, data, length);
+
 	return newData;
 }
 
 
-char *
+char*
 BString::_OpenAtBy(int32 offset, int32 length)
 {
 	int32 oldLength = Length();
@@ -1759,14 +1752,14 @@ status_t
 BString::_DetachWith(const char* string, int32 length)
 {
 	char* newData = NULL;
-	if (atomic_get(&(*(((vint32*)fPrivateData) - 2))) > 1) {
-		// we share our data with someone else
-		if (atomic_add(&(*(((vint32*)fPrivateData) - 2)), -1) < 1) {
-			// someone else decrement, we are the last owner
-			newData = _Realloc(length);
-		} else {
-			// there is still someone who shares our data
-			newData = _Clone(string, length);
+	// TODO: this is not thread safe! A string could be used in than one
+	// thread at a time (and one of those threads could create a ref)
+	if (atomic_get(&_ReferenceCount()) > 1) {
+		// we might share our data with someone else
+		newData = _Clone(string, length);
+		if (atomic_add(&_ReferenceCount(), -1) == 1) {
+			// someone else left, we were the last owner
+			_FreePrivateData();
 		}
 	} else {
 		// we don't share our data with someone else
@@ -1775,6 +1768,7 @@ BString::_DetachWith(const char* string, int32 length)
 
 	if (newData)
 		fPrivateData = newData;
+
 	return newData != NULL ? B_OK : B_NO_MEMORY;
 }
 
@@ -1786,20 +1780,34 @@ BString::_SetLength(int32 length)
 }
 
 
-void
-BString::_SetReferenceCount(int32 count)
+inline int32&
+BString::_ReferenceCount()
 {
-	*(((vint32*)fPrivateData) - 2) = count;
+	return *(((int32 *)fPrivateData) - 2);
+}
+
+
+inline bool
+BString::_IsShareable()
+{
+	return fPrivateData != NULL && _ReferenceCount() >= 0;
+}
+
+
+void
+BString::_FreePrivateData()
+{
+	free(fPrivateData - (2 * sizeof(int32)));
 }
 
 
 bool
 BString::_DoAppend(const char* string, int32 length)
 {
-	int32 len = Length();
-	if (_DetachWith(fPrivateData, len + length) == B_OK) {
+	int32 oldLength = Length();
+	if (_DetachWith(fPrivateData, oldLength + length) == B_OK) {
 		if (string && length)
-			memcpy(fPrivateData + len, string, length);
+			memcpy(fPrivateData + oldLength, string, length);
 		return true;
 	}
 	return false;
@@ -1809,9 +1817,9 @@ BString::_DoAppend(const char* string, int32 length)
 bool
 BString::_DoPrepend(const char* string, int32 length)
 {
-	int32 len = Length();
-	if (_DetachWith(fPrivateData, len + length) == B_OK) {
-		memmove(fPrivateData + length, fPrivateData, len);
+	int32 oldLength = Length();
+	if (_DetachWith(fPrivateData, oldLength + length) == B_OK) {
+		memmove(fPrivateData + length, fPrivateData, oldLength);
 		if (string && length)
 			memcpy(fPrivateData, string, length);
 		return true;
@@ -1823,9 +1831,10 @@ BString::_DoPrepend(const char* string, int32 length)
 bool
 BString::_DoInsert(const char* string, int32 offset, int32 length)
 {
-	int32 len = Length();
-	if (_DetachWith(fPrivateData, len + length) == B_OK) {
-		memmove(fPrivateData + offset + length, fPrivateData + offset, len - offset);
+	int32 oldLength = Length();
+	if (_DetachWith(fPrivateData, oldLength + length) == B_OK) {
+		memmove(fPrivateData + offset + length, fPrivateData + offset,
+			oldLength - offset);
 		if (string && length)
 			memcpy(fPrivateData + offset, string, length);
 		return true;
@@ -1903,8 +1912,8 @@ BString::_IFindBefore(const char* string, int32 offset, int32 strlen) const
 
 
 BString&
-BString::_DoCharacterEscape(const char* string,
-							const char *setOfCharsToEscape, char escapeChar)
+BString::_DoCharacterEscape(const char* string, const char *setOfCharsToEscape,
+	char escapeChar)
 {
 	if (_DetachWith(string, strlen(safestr(string))) != B_OK)
 		return *this;
@@ -1930,11 +1939,10 @@ BString::_DoCharacterEscape(const char* string,
 
 	int32 lastPos = 0;
 	char* oldAdr = fPrivateData;
-	int32 offset = 2 * sizeof(int32);
 
-	char* newData = (char*)malloc(newLength + offset + 1);
+	char* newData = (char*)malloc(newLength + kPrivateDataOffset + 1);
 	if (newData) {
-		newData += offset;
+		newData += kPrivateDataOffset;
 		char* newAdr = newData;
 		for (uint32 i = 0; i < count; ++i) {
 			pos = positions.ItemAt(i);
@@ -1952,7 +1960,7 @@ BString::_DoCharacterEscape(const char* string,
 		if (len > 0)
 			memcpy(newAdr, oldAdr, len);
 
-		free(fPrivateData - offset);
+		_FreePrivateData();
 
 		fPrivateData = newData;
 		_SetLength(newLength);
@@ -1976,7 +1984,7 @@ BString::_DoCharacterDeescape(const char* string, char escapeChar)
 
 BString&
 BString::_DoReplace(const char* findThis, const char* replaceWith,
-					int32 maxReplaceCount, int32 fromOffset, bool ignoreCase)
+	int32 maxReplaceCount, int32 fromOffset, bool ignoreCase)
 {
 	if (findThis == NULL || maxReplaceCount <= 0
 		|| fromOffset < 0 || fromOffset >= Length())
@@ -2006,7 +2014,7 @@ BString::_DoReplace(const char* findThis, const char* replaceWith,
 
 void
 BString::_ReplaceAtPositions(const PosVect* positions, int32 searchLen,
-							 const char* with, int32 withLen)
+	const char* with, int32 withLen)
 {
 	int32 len = Length();
 	uint32 count = positions->CountItems();
@@ -2020,10 +2028,9 @@ BString::_ReplaceAtPositions(const PosVect* positions, int32 searchLen,
 	int32 lastPos = 0;
 	char *oldAdr = fPrivateData;
 
-	int32 offset = 2 * sizeof(int32);
-	char *newData = (char *)malloc(newLength + offset + 1);
+	char *newData = (char *)malloc(newLength + kPrivateDataOffset + 1);
 	if (newData) {
-		newData += offset;
+		newData += kPrivateDataOffset;
 		char *newAdr = newData;
 		for (uint32 i = 0; i < count; ++i) {
 			pos = positions->ItemAt(i);
@@ -2042,7 +2049,7 @@ BString::_ReplaceAtPositions(const PosVect* positions, int32 searchLen,
 		if (len > 0)
 			memcpy(newAdr, oldAdr, len);
 
-		free(fPrivateData - offset);
+		_FreePrivateData();
 
 		fPrivateData = newData;
 		_SetLength(newLength);
