@@ -63,8 +63,8 @@ convert_from_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
 	const r5_sockaddr_in *from = (r5_sockaddr_in *)_from;
 	sockaddr_in *to = (sockaddr_in *)_to;
 
-	memset(to, 0, sizeof(*to));
-	to->sin_len = sizeof(*to);
+	memset(to, 0, sizeof(sockaddr));
+	to->sin_len = sizeof(sockaddr);
 
 	if (from == NULL)
 		return;
@@ -80,7 +80,8 @@ convert_from_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
 
 
 static void
-convert_to_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
+convert_to_r5_sockaddr(struct sockaddr *_to,
+	const struct sockaddr *_from)
 {
 	const sockaddr_in *from = (sockaddr_in *)_from;
 	r5_sockaddr_in *to = (r5_sockaddr_in *)_to;
@@ -88,7 +89,8 @@ convert_to_r5_sockaddr(struct sockaddr *_to, const struct sockaddr *_from)
 	if (to == NULL)
 		return;
 
-	memset(to, 0, sizeof(*to));
+	memset(to, 0, sizeof(r5_sockaddr_in));
+
 	if (from->sin_family == AF_INET)
 		to->sin_family = R5_AF_INET;
 	else
