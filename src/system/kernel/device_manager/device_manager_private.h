@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002-04, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -25,11 +25,6 @@
 #define PNP_DIR
 #define SYSTEM_DRIVER_REGISTRATION "/boot/beos/system/add-ons/kernel/"PNP_DIR"registration/"
 #define COMMON_DRIVER_REGISTRATION "/boot/home/config/add-ons/kernel/"PNP_DIR"registration/"
-
-// module directories
-#define SYSTEM_MODULES_DIR "/boot/beos/add-ons/kernel/"
-#define COMMON_MODULES_DIR "/boot/home/config/add-ons/kernel/"
-
 
 // info about ID generator
 typedef struct id_generator {

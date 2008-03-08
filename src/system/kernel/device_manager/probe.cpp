@@ -20,12 +20,14 @@
 #include <fs/node_monitor.h>
 #include <kmodule.h>
 #include <Notifications.h>
+#include <safemode.h>
 #include <util/kernel_cpp.h>
 #include <util/OpenHashTable.h>
 #include <util/Stack.h>
 #include <vfs.h>
 
 #include <image.h>
+#include <FindDirectory.h>
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 
@@ -91,25 +93,13 @@ const char *pnp_registration_dirs[2] = {
 };
 
 
-// list of module directories
-static const char *kModulePaths[] = {
-	COMMON_MODULES_DIR,
-	"/boot/beos/system/add-ons/kernel",//SYSTEM_MODULES_DIR,
-	NULL
-};
-
-
 class DirectoryIterator {
 	public:
 		DirectoryIterator(const char *path, const char *subPath = NULL,
 			bool recursive = false);
-		DirectoryIterator(const char **paths, const char *subPath = NULL,
-			bool recursive = false);
 		~DirectoryIterator();
 
 		void SetTo(const char *path, const char *subPath = NULL,
-			bool recursive = false);
-		void SetTo(const char **paths, const char *subPath = NULL,
 			bool recursive = false);
 
 		status_t GetNext(KPath &path, struct stat &stat);
@@ -153,16 +143,6 @@ DirectoryIterator::DirectoryIterator(const char *path, const char *subPath,
 }
 
 
-DirectoryIterator::DirectoryIterator(const char **paths, const char *subPath,
-		bool recursive)
-	:
-	fDirectory(NULL),
-	fBasePath(NULL)
-{
-	SetTo(paths, subPath, recursive);
-}
-
-
 DirectoryIterator::~DirectoryIterator()
 {
 	Unset();
@@ -175,20 +155,31 @@ DirectoryIterator::SetTo(const char *path, const char *subPath, bool recursive)
 	Unset();
 	fRecursive = recursive;
 
-	AddPath(path, subPath);
-}
+	if (path == NULL) {
+		// add default paths
+		const directory_which whichPath[] = {
+			B_USER_ADDONS_DIRECTORY,
+			B_COMMON_ADDONS_DIRECTORY,
+			B_BEOS_ADDONS_DIRECTORY
+		};
+		KPath pathBuffer;
 
+		bool disableUserAddOns = get_safemode_boolean(
+			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
 
-void 
-DirectoryIterator::SetTo(const char **paths, const char *subPath,
-	bool recursive)
-{
-	Unset();
-	fRecursive = recursive;
+		for (uint32 i = 0; i < sizeof(whichPath) / sizeof(whichPath[0]); i++) {
+			if (i < 2 && disableUserAddOns)
+				continue;
 
-	for (int32 i = 0; paths[i] != NULL; i++) {
-		AddPath(paths[i], subPath);
-	}
+			if (find_directory(whichPath[i], gBootDevice, true,
+					pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
+				pathBuffer.UnlockBuffer();
+				pathBuffer.Append("kernel");
+				AddPath(pathBuffer.Path(), subPath);
+			}
+		}
+	} else
+		AddPath(path, subPath);
 }
 
 
@@ -1357,7 +1348,7 @@ probe_for_driver_modules(const char *type)
 
 	// build list of potential drivers for that type
 
-	DirectoryIterator iterator(kModulePaths, type, false);
+	DirectoryIterator iterator(NULL, type, false);
 	struct stat stat;
 	KPath path;
 
@@ -1401,7 +1392,7 @@ probe_for_driver_modules(const char *type)
 	// Iterate through bus managers to shrink the list (let them publish
 	// their own devices)
 
-	iterator.SetTo(kModulePaths, "drivers/bus", false);
+	iterator.SetTo(NULL, "drivers/bus", false);
 
 	while (iterator.GetNext(path, stat) == B_OK) {
 		DirectoryIterator busIterator(path.Path(), NULL, true);
@@ -1455,12 +1446,32 @@ probe_for_device_type(const char *type)
 	if (!sWatching && gBootDevice > 0) {
 		// We're probing the actual boot volume for the first time,
 		// let's watch its driver directories for changes
+		const directory_which whichPath[] = {
+			B_USER_ADDONS_DIRECTORY,
+			B_COMMON_ADDONS_DIRECTORY,
+			B_BEOS_ADDONS_DIRECTORY
+		};
+		KPath path;
 
 		new(&sDirectoryWatcher) DirectoryWatcher;
-		for (uint32 i = 0; kModulePaths[i] != NULL; i++) {
-			start_watching(kModulePaths[i], "drivers/dev");
-			start_watching(kModulePaths[i], "drivers/bin");
+
+		bool disableUserAddOns = get_safemode_boolean(
+			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
+
+		for (uint32 i = 0; i < sizeof(whichPath) / sizeof(whichPath[0]); i++) {
+			if (i < 2 && disableUserAddOns)
+				continue;
+
+			if (find_directory(whichPath[i], gBootDevice, true,
+					path.LockBuffer(), path.BufferSize()) == B_OK) {
+				path.UnlockBuffer();
+				path.Append("kernel/drivers");
+
+				start_watching(path.Path(), "dev");
+				start_watching(path.Path(), "bin");
+			}
 		}
+
 		sWatching = true;
 	}
 
