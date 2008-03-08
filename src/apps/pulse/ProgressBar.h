@@ -24,10 +24,11 @@ typedef struct {
 class ProgressBar : public BView {
 	public:
 		ProgressBar(BRect r, char* name);
-		void Draw(BRect rect);
+		virtual void Draw(BRect rect);
 		void Set(int32 value);
 		void UpdateColors(int32 color, bool fade);
-		void AttachedToWindow();
+		virtual void AttachedToWindow();
+		virtual void MouseDown(BPoint point);
 
 		enum {
 			PROGRESS_WIDTH	= 146,

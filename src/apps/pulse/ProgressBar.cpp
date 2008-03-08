@@ -69,6 +69,14 @@ ProgressBar::AttachedToWindow()
 
 
 void
+ProgressBar::MouseDown(BPoint point)
+{
+	point = ConvertToParent(point);
+	Parent()->MouseDown(point);
+}
+
+
+void
 ProgressBar::Set(int32 value)
 {
 	// How many segments to light up
