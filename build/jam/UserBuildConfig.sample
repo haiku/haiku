@@ -2,6 +2,13 @@
 # If existent it is included by the build system, but it is ignored by svn.
 # This file documents a few examples, what can be done.
 
+# Adding timezone and keymap settings
+#AddSymlinkToHaikuImage home config settings
+#	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+
+#AddFilesToHaikuImage home config settings : <keymap>US-International 
+#	: Key_map ;
+
 
 # Adjusting Build Variables
 

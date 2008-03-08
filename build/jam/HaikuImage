@@ -349,11 +349,6 @@ SEARCH on $(networkSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings network ] ;
 AddFilesToHaikuImage common settings network : $(networkSettingsFiles) ;
 
-AddSymlinkToHaikuImage home config settings
-	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
-
-AddFilesToHaikuImage home config settings : <keymap>US-International : Key_map ;
-
 # bison files
 SEARCH on <bison>m4sugar.m4
 	= [ FDirName $(HAIKU_TOP) src bin bison data m4sugar ] ;
