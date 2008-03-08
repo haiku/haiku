@@ -87,7 +87,7 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fResizeMode(resizeMode),
 	fFlags(flags),
 
-	// ViewLayers start visible by default
+	// Views start visible by default
 	fHidden(false),
 	fVisible(true),
 	fBackgroundDirty(true),
@@ -123,17 +123,17 @@ View::~View()
 
 	delete fDrawState;
 
-//	if (fWindow && this == fWindow->TopLayer())
-//		fWindow->SetTopLayer(NULL);
+//	if (fWindow && this == fWindow->TopView())
+//		fWindow->SetTopView(NULL);
 
 	if (fCursor)
 		fCursor->Release();
 
 	// iterate over children and delete each one
-	View* layer = fFirstChild;
-	while (layer) {
-		View* toast = layer;
-		layer = layer->fNextSibling;
+	View* view = fFirstChild;
+	while (view) {
+		View* toast = view;
+		view = view->fNextSibling;
 		delete toast;
 	}
 }
@@ -167,7 +167,7 @@ View::AttachedToWindow(::Window* window)
 	fWindow = window;
 
 	// an ugly hack to detect the desktop background
-	if (window->Feel() == kDesktopWindowFeel && Parent() == TopLayer())
+	if (window->Feel() == kDesktopWindowFeel && Parent() == TopView())
 		fIsDesktopBackground = true;
 
 	// insert view into local token space
@@ -200,36 +200,36 @@ View::DetachedFromWindow()
 
 
 void
-View::AddChild(View* layer)
+View::AddChild(View* view)
 {
-	if (layer->fParent) {
+	if (view->fParent) {
 		printf("View::AddChild() - View already has a parent\n");
 		return;
 	}
 
-	layer->fParent = this;
+	view->fParent = this;
 
 	if (!fLastChild) {
 		// no children yet
-		fFirstChild = layer;
+		fFirstChild = view;
 	} else {
-		// append layer to formerly last child
-		fLastChild->fNextSibling = layer;
-		layer->fPreviousSibling = fLastChild;
+		// append view to formerly last child
+		fLastChild->fNextSibling = view;
+		view->fPreviousSibling = fLastChild;
 	}
-	fLastChild = layer;
+	fLastChild = view;
 
-	layer->UpdateVisibleDeep(fVisible);
+	view->UpdateVisibleDeep(fVisible);
 
-	if (layer->IsVisible())
+	if (view->IsVisible())
 		RebuildClipping(false);
 
 	if (fWindow) {
-		layer->AttachedToWindow(fWindow);
+		view->AttachedToWindow(fWindow);
 
-		if (layer->IsVisible()) {
+		if (view->IsVisible()) {
 			// trigger redraw
-			IntRect clippedFrame = layer->Frame();
+			IntRect clippedFrame = view->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
 			BRegion* dirty = fWindow->GetRegion();
 			if (dirty) {
@@ -243,37 +243,37 @@ View::AddChild(View* layer)
 
 
 bool
-View::RemoveChild(View* layer)
+View::RemoveChild(View* view)
 {
-	if (layer->fParent != this) {
+	if (view->fParent != this) {
 		printf("View::RemoveChild(%p - %s) - View is not child of "
-			"this (%p) layer!\n", layer, layer ? layer->Name() : NULL, this);
+			"this (%p) view!\n", view, view ? view->Name() : NULL, this);
 		return false;
 	}
 
-	layer->fParent = NULL;
+	view->fParent = NULL;
 
-	if (fLastChild == layer)
-		fLastChild = layer->fPreviousSibling;
-		// layer->fNextSibling would be NULL
+	if (fLastChild == view)
+		fLastChild = view->fPreviousSibling;
+		// view->fNextSibling would be NULL
 
-	if (fFirstChild == layer )
-		fFirstChild = layer->fNextSibling;
-		// layer->fPreviousSibling would be NULL
+	if (fFirstChild == view )
+		fFirstChild = view->fNextSibling;
+		// view->fPreviousSibling would be NULL
 
-	// connect child before and after layer
-	if (layer->fPreviousSibling)
-		layer->fPreviousSibling->fNextSibling = layer->fNextSibling;
+	// connect child before and after view
+	if (view->fPreviousSibling)
+		view->fPreviousSibling->fNextSibling = view->fNextSibling;
 
-	if (layer->fNextSibling)
-		layer->fNextSibling->fPreviousSibling = layer->fPreviousSibling;
+	if (view->fNextSibling)
+		view->fNextSibling->fPreviousSibling = view->fPreviousSibling;
 
-	// layer has no siblings anymore
-	layer->fPreviousSibling = NULL;
-	layer->fNextSibling = NULL;
+	// view has no siblings anymore
+	view->fPreviousSibling = NULL;
+	view->fNextSibling = NULL;
 
-	if (layer->IsVisible()) {
-		Overlay* overlay = layer->_Overlay();
+	if (view->IsVisible()) {
+		Overlay* overlay = view->_Overlay();
 		if (overlay != NULL)
 			overlay->Hide();
 
@@ -281,11 +281,11 @@ View::RemoveChild(View* layer)
 	}
 
 	if (fWindow) {
-		layer->DetachedFromWindow();
+		view->DetachedFromWindow();
 
-		if (fVisible && layer->IsVisible()) {
+		if (fVisible && view->IsVisible()) {
 			// trigger redraw
-			IntRect clippedFrame = layer->Frame();
+			IntRect clippedFrame = view->Frame();
 			ConvertToVisibleInTopView(&clippedFrame);
 			BRegion* dirty = fWindow->GetRegion();
 			if (dirty) {
@@ -301,13 +301,13 @@ View::RemoveChild(View* layer)
 
 
 View*
-View::TopLayer()
+View::TopView()
 {
 	// returns the top level view of the hirarchy,
 	// it doesn't have to be the top level of a window
 
 	if (fParent)
-		return fParent->TopLayer();
+		return fParent->TopView();
 
 	return this;
 }
@@ -407,9 +407,9 @@ View::ViewAt(const BPoint& where)
 		return NULL;
 
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
-		View* layer = child->ViewAt(where);
-		if (layer != NULL)
-			return layer;
+		View* view = child->ViewAt(where);
+		if (view != NULL)
+			return view;
 	}
 
 	return this;
@@ -1469,7 +1469,7 @@ View::MarkBackgroundDirty()
 
 
 void
-View::AddTokensForLayersInRegion(BMessage* message, BRegion& region,
+View::AddTokensForViewsInRegion(BMessage* message, BRegion& region,
 	BRegion* windowContentClipping)
 {
 	if (!fVisible)
@@ -1479,14 +1479,14 @@ View::AddTokensForLayersInRegion(BMessage* message, BRegion& region,
 		message->AddInt32("_token", fToken);
 
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
-		child->AddTokensForLayersInRegion(message, region,
+		child->AddTokensForViewsInRegion(message, region,
 			windowContentClipping);
 	}
 }
 
 
 void
-View::AddTokensForLayersInRegion(BPrivate::PortLink& link, BRegion& region,
+View::AddTokensForViewsInRegion(BPrivate::PortLink& link, BRegion& region,
 	BRegion* windowContentClipping)
 {
 	if (!fVisible)
@@ -1501,7 +1501,7 @@ View::AddTokensForLayersInRegion(BPrivate::PortLink& link, BRegion& region,
 		link.Attach<int32>(fToken);
 
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
-		child->AddTokensForLayersInRegion(link, region, windowContentClipping);
+		child->AddTokensForViewsInRegion(link, region, windowContentClipping);
 	}
 }
 

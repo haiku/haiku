@@ -83,7 +83,7 @@ Workspace::Workspace(Desktop& desktop, int32 index)
 //	fDesktop.LockSingleWindow();
 		// TODO: in which threads is this being used?
 		// from my investigations, it is used in the
-		// WorkspacesLayer::Draw(), which would have
+		// WorkspacesView::Draw(), which would have
 		// to hold the read lock already
 	RewindWindows();
 }

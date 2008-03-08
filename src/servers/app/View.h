@@ -70,7 +70,7 @@ class View {
 			float			Scale() const;
 
 			void			SetUserClipping(const BRegion* region);
-				// region is expected in layer coordinates
+				// region is expected in view coordinates
 
 			// converts the given frame up the view hierarchy and
 			// clips to each views bounds
@@ -81,8 +81,8 @@ class View {
 			::Window*		Window() const { return fWindow; }
 
 			// tree stuff
-			void			AddChild(View* layer);
-			bool			RemoveChild(View* layer);
+			void			AddChild(View* view);
+			bool			RemoveChild(View* view);
 
 	inline	View*			Parent() const
 								{ return fParent; }
@@ -96,7 +96,7 @@ class View {
 	inline	View*			NextSibling() const
 								{ return fNextSibling; }
 
-			View*			TopLayer();
+			View*			TopView();
 
 			uint32			CountChildren(bool deep = false) const;
 			void			CollectTokensForChildren(BList* tokenMap) const;
@@ -215,11 +215,11 @@ class View {
 			bool			IsDesktopBackground() const
 								{ return fIsDesktopBackground; }
 
-			void			AddTokensForLayersInRegion(BMessage* message,
+			void			AddTokensForViewsInRegion(BMessage* message,
 								BRegion& region,
 								BRegion* windowContentClipping);
 
-			void			AddTokensForLayersInRegion(BPrivate::PortLink& link,
+			void			AddTokensForViewsInRegion(BPrivate::PortLink& link,
 								BRegion& region,
 								BRegion* windowContentClipping);
 

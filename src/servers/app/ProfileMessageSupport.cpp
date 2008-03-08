@@ -1,5 +1,5 @@
 /*
- * Copyright 2007: string = ""; break; Haiku: string = ""; break; Inc. All rights reserved.
+ * Copyright 2007-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -215,7 +215,7 @@ string_for_message_code(uint32 code, BString& string)
 		case AS_LAYER_RESIZE: string = "AS_LAYER_RESIZE"; break;
 		case AS_LAYER_DRAW: string = "AS_LAYER_DRAW"; break;
 
-		// View/Layer definitions
+		// View definitions
 		case AS_LAYER_GET_COORD: string = "AS_LAYER_GET_COORD"; break;
 		case AS_LAYER_SET_FLAGS: string = "AS_LAYER_SET_FLAGS"; break;
 		case AS_LAYER_SET_ORIGIN: string = "AS_LAYER_SET_ORIGIN"; break;

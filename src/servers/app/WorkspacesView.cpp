@@ -86,7 +86,7 @@ WorkspacesView::_ScreenFrame(int32 i)
 
 /*!
 	\brief Returns the frame of the specified workspace within the
-		workspaces layer.
+		workspaces view.
 */
 BRect
 WorkspacesView::_WorkspaceAt(int32 i)

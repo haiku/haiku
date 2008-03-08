@@ -12,7 +12,6 @@
 
 #include "Window.h"
 
-#include "DebugInfoManager.h"
 #include "Decorator.h"
 #include "DecorManager.h"
 #include "Desktop.h"
@@ -38,16 +37,16 @@
 
 
 // Toggle debug output
-//#define DEBUG_WINDOW_LAYER
-//#define DEBUG_WINDOW_LAYER_CLICK
+//#define DEBUG_WINDOW
+//#define DEBUG_WINDOW_CLICK
 
-#ifdef DEBUG_WINDOW_LAYER
+#ifdef DEBUG_WINDOW
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
 #endif
 
-#ifdef DEBUG_WINDOW_LAYER_CLICK
+#ifdef DEBUG_WINDOW_CLICK
 #	define STRACE_CLICK(x) printf x
 #else
 #	define STRACE_CLICK(x) ;
@@ -100,7 +99,7 @@ Window::Window(const BRect& frame, const char *name,
 	fActivateOnMouseUp(false),
 
 	fDecorator(NULL),
-	fTopLayer(NULL),
+	fTopView(NULL),
 	fWindow(window),
 	fDrawingEngine(drawingEngine),
 	fDesktop(window->Desktop()),
@@ -161,7 +160,7 @@ Window::Window(const BRect& frame, const char *name,
 			fDesktop->ScreenAt(0)->GetMode(width, height,
 				colorSpace, frequency);
 // TODO: MOVE THIS AWAY!!! ResizeBy contains calls to virtual methods!
-// Also, there is no TopLayer()!
+// Also, there is no TopView()!
 			fFrame.OffsetTo(B_ORIGIN);
 //			ResizeBy(width - frame.Width(), height - frame.Height(), NULL);
 		}
@@ -176,10 +175,10 @@ Window::Window(const BRect& frame, const char *name,
 
 Window::~Window()
 {
-	if (fTopLayer)
-		fTopLayer->DetachedFromWindow();
+	if (fTopView)
+		fTopView->DetachedFromWindow();
 
-	delete fTopLayer;
+	delete fTopView;
 	delete fDecorator;
 }
 
@@ -307,9 +306,9 @@ Window::MoveBy(int32 x, int32 y)
 	if (fDecorator)
 		fDecorator->MoveBy(x, y);
 
-	if (fTopLayer != NULL) {
-		fTopLayer->MoveBy(x, y, NULL);
-		fTopLayer->UpdateOverlay();
+	if (fTopView != NULL) {
+		fTopView->MoveBy(x, y, NULL);
+		fTopView->UpdateOverlay();
 	}
 
 	// the desktop will take care of dirty regions
@@ -366,9 +365,9 @@ Window::ResizeBy(int32 x, int32 y, BRegion* dirtyRegion)
 //}
 	}
 
-	if (fTopLayer != NULL) {
-		fTopLayer->ResizeBy(x, y, dirtyRegion);
-		fTopLayer->UpdateOverlay();
+	if (fTopView != NULL) {
+		fTopView->ResizeBy(x, y, dirtyRegion);
+		fTopView->UpdateOverlay();
 	}
 
 //if (dirtyRegion)
@@ -390,7 +389,7 @@ Window::ScrollViewBy(View* view, int32 dx, int32 dy)
 	// this is executed in ServerWindow with the Readlock
 	// held
 
-	if (!view || view == fTopLayer || (dx == 0 && dy == 0))
+	if (!view || view == fTopView || (dx == 0 && dy == 0))
 		return;
 
 	BRegion* dirty = fRegionPool.GetRegion();
@@ -485,26 +484,26 @@ Window::CopyContents(BRegion* region, int32 xOffset, int32 yOffset)
 
 
 void
-Window::SetTopLayer(View* topLayer)
+Window::SetTopView(View* topView)
 {
-	fTopLayer = topLayer;
+	fTopView = topView;
 
-	if (fTopLayer) {
-		// the top layer is special, it has a coordinate system
+	if (fTopView) {
+		// the top view is special, it has a coordinate system
 		// as if it was attached directly to the desktop, therefor,
-		// the coordinate conversion through the layer tree works
-		// as expected, since the top layer has no "parent" but has
+		// the coordinate conversion through the view tree works
+		// as expected, since the top view has no "parent" but has
 		// fFrame as if it had
 
-		// make sure the location of the top layer on screen matches ours
-		fTopLayer->MoveBy(fFrame.left - fTopLayer->Frame().left,
-			fFrame.top - fTopLayer->Frame().top, NULL);
+		// make sure the location of the top view on screen matches ours
+		fTopView->MoveBy(fFrame.left - fTopView->Frame().left,
+			fFrame.top - fTopView->Frame().top, NULL);
 
-		// make sure the size of the top layer matches ours
-		fTopLayer->ResizeBy(fFrame.Width() - fTopLayer->Frame().Width(),
-			fFrame.Height() - fTopLayer->Frame().Height(), NULL);
+		// make sure the size of the top view matches ours
+		fTopView->ResizeBy(fFrame.Width() - fTopView->Frame().Width(),
+			fFrame.Height() - fTopView->Frame().Height(), NULL);
 
-		fTopLayer->AttachedToWindow(this);
+		fTopView->AttachedToWindow(this);
 	}
 }
 
@@ -512,7 +511,7 @@ Window::SetTopLayer(View* topLayer)
 View*
 Window::ViewAt(const BPoint& where)
 {
-	return fTopLayer->ViewAt(where);
+	return fTopView->ViewAt(where);
 }
 
 
@@ -541,7 +540,7 @@ Window::PreviousWindow(int32 index) const
 
 
 void
-Window::GetEffectiveDrawingRegion(View* layer, BRegion& region)
+Window::GetEffectiveDrawingRegion(View* view, BRegion& region)
 {
 	if (!fEffectiveDrawingRegionValid) {
 		fEffectiveDrawingRegion = VisibleContentRegion();
@@ -554,29 +553,29 @@ Window::GetEffectiveDrawingRegion(View* layer, BRegion& region)
 			fEffectiveDrawingRegion.IntersectWith(&fCurrentUpdateSession->DirtyRegion());
 		} else {
 			// not in update, the view can draw everywhere
-//printf("Window(%s)::GetEffectiveDrawingRegion(for %s) - outside update\n", Title(), layer->Name());
+//printf("Window(%s)::GetEffectiveDrawingRegion(for %s) - outside update\n", Title(), view->Name());
 		}
 
 		fEffectiveDrawingRegionValid = true;
 	}
 
 	// TODO: this is a region that needs to be cached later in the server
-	// when the current layer in ServerWindow is set, and we are currently
+	// when the current view in ServerWindow is set, and we are currently
 	// in an update (fInUpdate), than we can set this region and remember
-	// it for the comming drawing commands until the current layer changes
+	// it for the comming drawing commands until the current view changes
 	// again or fEffectiveDrawingRegionValid is suddenly false.
 	region = fEffectiveDrawingRegion;
 	if (!fContentRegionValid)
 		_UpdateContentRegion();
 
-	region.IntersectWith(&layer->ScreenClipping(&fContentRegion));
+	region.IntersectWith(&view->ScreenClipping(&fContentRegion));
 }
 
 
 bool
-Window::DrawingRegionChanged(View* layer) const
+Window::DrawingRegionChanged(View* view) const
 {
-	return !fEffectiveDrawingRegionValid || !layer->IsScreenClippingValid();
+	return !fEffectiveDrawingRegionValid || !view->IsScreenClippingValid();
 }
 
 
@@ -685,22 +684,21 @@ Window::MarkContentDirtyAsync(BRegion& regionOnScreen)
 
 
 void
-Window::InvalidateView(View* layer, BRegion& layerRegion)
+Window::InvalidateView(View* view, BRegion& viewRegion)
 {
-	if (layer && IsVisible() && layer->IsVisible()) {
-
+	if (view && IsVisible() && view->IsVisible()) {
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
 
-		layer->ConvertToScreen(&layerRegion);
-		layerRegion.IntersectWith(&VisibleContentRegion());
-		if (layerRegion.CountRects() > 0) {
-			layerRegion.IntersectWith(&layer->ScreenClipping(&fContentRegion));
+		view->ConvertToScreen(&viewRegion);
+		viewRegion.IntersectWith(&VisibleContentRegion());
+		if (viewRegion.CountRects() > 0) {
+			viewRegion.IntersectWith(&view->ScreenClipping(&fContentRegion));
 
-//fDrawingEngine->FillRegion(layerRegion, rgb_color{ 0, 255, 0, 255 });
+//fDrawingEngine->FillRegion(viewRegion, rgb_color{ 0, 255, 0, 255 });
 //snooze(10000);
 			fDirtyCause |= UPDATE_REQUEST;
-			_TriggerContentRedraw(layerRegion);
+			_TriggerContentRedraw(viewRegion);
 		}
 	}
 }
@@ -939,12 +937,12 @@ Window::MouseMoved(BMessage *message, BPoint where, int32* _viewToken,
 	bool isLatestMouseMoved)
 {
 #if 0
-	if (fDecorator != NULL && fTopLayer != NULL) {
+	if (fDecorator != NULL && fTopView != NULL) {
 		DrawingEngine* engine = fDecorator->GetDrawingEngine();
 		engine->LockParallelAccess();
 		engine->ConstrainClippingRegion(&VisibleRegion());
 
-		fTopLayer->MarkAt(engine, where);
+		fTopView->MarkAt(engine, where);
 		engine->UnlockParallelAccess();
 	}
 #endif
@@ -1160,7 +1158,7 @@ Window::SetHidden(bool hidden)
 	if (fHidden != hidden) {
 		fHidden = hidden;
 
-		fTopLayer->SetHidden(hidden);
+		fTopView->SetHidden(hidden);
 
 		// TODO: anything else?
 	}
@@ -1534,7 +1532,7 @@ void
 Window::FindWorkspacesViews(BObjectList<WorkspacesView>& list) const
 {
 	int32 count = fWorkspacesViewCount;
-	fTopLayer->FindViews(kWorkspacesViewFlag, (BObjectList<View>&)list, count);
+	fTopView->FindViews(kWorkspacesViewFlag, (BObjectList<View>&)list, count);
 }
 
 
@@ -1680,8 +1678,8 @@ Window::ValidWindowFlags(window_feel feel)
 }
 
 
-
 // #pragma mark - private
+
 
 // _ShiftPartOfRegion
 void
@@ -1723,14 +1721,15 @@ Window::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 				// there was suddenly added a dirty region
 				// caused by exposing content, we need to clear
 				// the entire background
-				backgroundClearingRegion = &(fPendingUpdateSession->DirtyRegion());
+				backgroundClearingRegion
+					= &(fPendingUpdateSession->DirtyRegion());
 			}
 
 			if (fDrawingEngine->LockParallelAccess()) {
 				fDrawingEngine->SuspendAutoSync();
 
-				fTopLayer->Draw(fDrawingEngine, backgroundClearingRegion,
-								&fContentRegion, true);
+				fTopView->Draw(fDrawingEngine, backgroundClearingRegion,
+					&fContentRegion, true);
 
 				fDrawingEngine->Sync();
 				fDrawingEngine->UnlockParallelAccess();
@@ -1806,7 +1805,7 @@ Window::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	// clip pending update session from current
 	// update session, it makes no sense to draw stuff
 	// already needing a redraw anyways. Theoretically,
-	// this could be done smarter (clip layers from pending
+	// this could be done smarter (clip views from pending
 	// that have not yet been redrawn in the current update
 	// session)
 	// NOTE: appearently the R5 app_server does not do that, it just
@@ -1905,7 +1904,7 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 		link.Attach<BRect>(dirty->Frame());
 		// find and attach all views that intersect with
 		// the dirty region
-		fTopLayer->AddTokensForLayersInRegion(link, *dirty, &fContentRegion);
+		fTopView->AddTokensForViewsInRegion(link, *dirty, &fContentRegion);
 		// mark the end of the token "list"
 		link.Attach<int32>(B_NULL_TOKEN);
 		link.Flush();
@@ -1914,8 +1913,7 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 //fDrawingEngine->FillRegion(dirty, (rgb_color){ 255, 0, 0, 255 });
 			fDrawingEngine->SuspendAutoSync();
 
-			fTopLayer->Draw(fDrawingEngine, dirty,
-							&fContentRegion, true);
+			fTopView->Draw(fDrawingEngine, dirty, &fContentRegion, true);
 
 			fDrawingEngine->Sync();
 			fDrawingEngine->UnlockParallelAccess();

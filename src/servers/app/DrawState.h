@@ -162,7 +162,7 @@ class DrawState {
 		bool				fFontAliasing;
 
 		// This is not part of the normal state stack.
-		// Layer will update it in PushState/PopState.
+		// The view will update it in PushState/PopState.
 		// A BView can have a flag "B_SUBPIXEL_PRECISE",
 		// I never knew what it does on R5, but I can use
 		// it in Painter to actually draw stuff with

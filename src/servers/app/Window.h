@@ -80,14 +80,14 @@ public:
 
 			void				ScrollViewBy(View* view, int32 dx, int32 dy);
 
-			void				SetTopLayer(View* topLayer);
-			View*				TopLayer() const { return fTopLayer; }
+			void				SetTopView(View* topView);
+			View*				TopView() const { return fTopView; }
 			View*				ViewAt(const BPoint& where);
 
 	virtual	bool				IsOffscreenWindow() const { return false; }
 
-			void				GetEffectiveDrawingRegion(View* layer, BRegion& region);
-			bool				DrawingRegionChanged(View* layer) const;
+			void				GetEffectiveDrawingRegion(View* view, BRegion& region);
+			bool				DrawingRegionChanged(View* view) const;
 
 			// generic version, used by the Desktop
 			void				ProcessDirtyRegion(BRegion& regionOnScreen);
@@ -100,7 +100,7 @@ public:
 			void				MarkContentDirty(BRegion& regionOnScreen);
 			void				MarkContentDirtyAsync(BRegion& regionOnScreen);
 			// shortcut for invalidating just one view
-			void				InvalidateView(View* view, BRegion& layerRegion);
+			void				InvalidateView(View* view, BRegion& viewRegion);
 
 			void				DisableUpdateRequests();
 			void				EnableUpdateRequests();
@@ -292,7 +292,7 @@ protected:
 			bool				fActivateOnMouseUp : 1;
 
 			::Decorator*		fDecorator;
-			View*				fTopLayer;
+			View*				fTopView;
 			::ServerWindow*		fWindow;
 			DrawingEngine*		fDrawingEngine;
 			::Desktop*			fDesktop;

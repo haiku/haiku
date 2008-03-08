@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/**	Default and fallback decorator for the app_server - the yellow tabs */
+/*!	Default and fallback decorator for the app_server - the yellow tabs */
 
 
 #include "DefaultDecorator.h"
@@ -464,7 +464,7 @@ DefaultDecorator::GetFootprint(BRegion *region)
 {
 	STRACE(("DefaultDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
-	// relative to the layer. This is most often used to set a WindowLayer
+	// relative to the view. This is most often used to set a Window
 	// object's visible region.
 	if (!region)
 		return;
@@ -487,7 +487,7 @@ DefaultDecorator::GetFootprint(BRegion *region)
 	if (fLook == B_DOCUMENT_WINDOW_LOOK) {
 		// include the rectangular resize knob on the bottom right
 		region->Include(BRect(fFrame.right - 13.0f, fFrame.bottom - 13.0f,
-							  fFrame.right, fFrame.bottom));
+			fFrame.right, fFrame.bottom));
 	}
 }
 

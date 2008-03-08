@@ -95,7 +95,6 @@ AddResources haiku_app_server : app_server.rdef ;
 Server haiku_app_server :
 	# Misc. Sources
 	Decorator.cpp
-	DebugInfoManager.cpp
 	ProfileMessageSupport.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
@@ -128,15 +127,15 @@ Server haiku_app_server :
 	BitmapHWInterface.cpp
 	DefaultDecorator.cpp
 	OffscreenServerWindow.cpp
-	OffscreenWindowLayer.cpp
+	OffscreenWindow.cpp
 	RegionPool.cpp
+	Screen.cpp
 	ServerPicture.cpp
-	ServerScreen.cpp
-	ViewLayer.cpp
-	WindowLayer.cpp
+	View.cpp
+	Window.cpp
 	WindowList.cpp
 	Workspace.cpp
-	WorkspacesLayer.cpp
+	WorkspacesView.cpp
 
 	# libraries
 	:

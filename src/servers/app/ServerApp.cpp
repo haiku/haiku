@@ -21,7 +21,6 @@
 #include "CursorManager.h"
 #include "CursorSet.h"
 #include "Desktop.h"
-#include "DebugInfoManager.h"
 #include "DecorManager.h"
 #include "DrawingEngine.h"
 #include "EventStream.h"
@@ -132,9 +131,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 ServerApp::~ServerApp()
 {
 	STRACE(("*ServerApp %s:~ServerApp()\n", Signature()));
-
-	if (!fQuitting)
-		CRITICAL("ServerApp: destructor called after Run()!\n");
+	ASSERT(fQuitting);
 
 	// quit all server windows
 

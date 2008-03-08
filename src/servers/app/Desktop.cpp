@@ -244,7 +244,7 @@ MouseFilter::Filter(BMessage* message, EventTarget** _target, int32* _viewToken,
 		window = fDesktop->WindowAt(where);
 
 	if (window != NULL) {
-		// dispatch event in the window layers
+		// dispatch event to the window
 		switch (message->what) {
 			case B_MOUSE_DOWN:
 				window->MouseDown(message, where, &viewToken);
@@ -758,7 +758,7 @@ Desktop::RedrawBackground()
 
 		// look for desktop background view, and update its background color
 		// TODO: is there a better way to do this?
-		View* view = window->TopLayer();
+		View* view = window->TopView();
 		if (view != NULL)
 			view = view->FirstChild();
 
@@ -1661,7 +1661,7 @@ Desktop::ShowWindow(Window* window)
 	}
 
 	if (window->HasWorkspacesViews()) {
-		// find workspaces layer in view hierarchy
+		// find workspaces views in view hierarchy
 		window->FindWorkspacesViews(fWorkspacesViews);
 	}
 

@@ -17,7 +17,6 @@ Server app_server :
 	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
-	DebugInfoManager.cpp
 	DecorManager.cpp
 	Decorator.cpp
 	DefaultDecorator.cpp

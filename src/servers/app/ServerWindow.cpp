@@ -24,7 +24,6 @@
 #include "ServerWindow.h"
 
 #include "AppServer.h"
-#include "DebugInfoManager.h"
 #include "Desktop.h"
 #include "DrawingEngine.h"
 #include "HWInterface.h"
@@ -345,7 +344,7 @@ ServerWindow::_GetLooperName(char* name, size_t length)
 }
 
 
-//! Forces the window layer to update its decorator
+//! Forces the window to update its decorator
 void
 ServerWindow::ReplaceDecorator()
 {
@@ -557,28 +556,28 @@ ServerWindow::_CreateView(BPrivate::LinkReceiver &link, View **_parent)
 	link.Read<rgb_color>(&viewColor);
 	link.Read<int32>(&parentToken);
 
-	STRACE(("ServerWindow(%s)::_CreateView()-> layer %s, token %ld\n",
+	STRACE(("ServerWindow(%s)::_CreateView()-> view %s, token %ld\n",
 		fTitle, name, token));
 
-	View* newLayer;
+	View* newView;
 
 	if ((flags & kWorkspacesViewFlag) != 0) {
-		newLayer = new (nothrow) WorkspacesView(frame, scrollingOffset, name,
+		newView = new (nothrow) WorkspacesView(frame, scrollingOffset, name,
 			token, resizeMask, flags);
 	} else {
-		newLayer = new (nothrow) View(frame, scrollingOffset, name, token,
+		newView = new (nothrow) View(frame, scrollingOffset, name, token,
 			resizeMask, flags);
 	}
 
 	free(name);
 
-	if (newLayer == NULL)
+	if (newView == NULL)
 		return NULL;
 
 	// there is no way of setting this, other than manually :-)
-	newLayer->SetViewColor(viewColor);
-	newLayer->SetHidden(hidden);
-	newLayer->SetEventMask(eventMask, eventOptions);
+	newView->SetViewColor(viewColor);
+	newView->SetHidden(hidden);
+	newView->SetEventMask(eventMask, eventOptions);
 
 	if (eventMask != 0 || eventOptions != 0) {
 //		fDesktop->UnlockSingleWindow();
@@ -586,7 +585,7 @@ ServerWindow::_CreateView(BPrivate::LinkReceiver &link, View **_parent)
 fDesktop->UnlockAllWindows();
 		// TODO: possible deadlock
 		fDesktop->EventDispatcher().AddListener(EventTarget(),
-			newLayer->Token(), eventMask, eventOptions);
+			newView->Token(), eventMask, eventOptions);
 fDesktop->LockAllWindows();
 //		fDesktop->UnlockAllWindows();
 //		fDesktop->LockSingleWindow();
@@ -596,27 +595,27 @@ fDesktop->LockAllWindows();
 	DesktopSettings settings(fDesktop);
 	ServerFont font;
 	settings.GetDefaultPlainFont(font);
-	newLayer->CurrentState()->SetFont(font);
+	newView->CurrentState()->SetFont(font);
 
 	if (_parent) {
 		View *parent;
 		if (App()->ViewTokens().GetToken(parentToken, B_HANDLER_TOKEN,
 				(void**)&parent) != B_OK
 			|| parent->Window()->ServerWindow() != this) {
-			CRITICAL("View token not found!\n");
+			debug_printf("View token not found!\n");
 			parent = NULL;
 		}
 
 		*_parent = parent;
 	}
 
-	return newLayer;
+	return newView;
 }
 
 
 /*!
 	Dispatches all window messages, and those view messages that
-	don't need a valid fCurrentView (ie. layer creation).
+	don't need a valid fCurrentView (ie. view creation).
 */
 void
 ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
@@ -1127,7 +1126,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 					(void**)&current) != B_OK
 				|| current->Window()->ServerWindow() != this) {
 				// ToDo: if this happens, we probably want to kill the app and clean up
-				fprintf(stderr, "ServerWindow %s: Message AS_SET_CURRENT_LAYER: layer not found, token %ld\n", fTitle, token);
+				fprintf(stderr, "ServerWindow %s: Message AS_SET_CURRENT_LAYER: view not found, token %ld\n", fTitle, token);
 				current = NULL;
 			} else {
 				DTRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: %s, token %ld\n", fTitle, current->Name(), token));
@@ -1148,7 +1147,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			}
 
 			_SetCurrentView(_CreateView(link, NULL));
-			fWindow->SetTopLayer(fCurrentView);
+			fWindow->SetTopView(fCurrentView);
 			break;
 		}
 
@@ -1157,11 +1156,11 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: View name: %s\n", fTitle, fCurrentView->Name()));
 
 			View* parent = NULL;
-			View* newLayer = _CreateView(link, &parent);
-			if (parent != NULL && newLayer != NULL)
-				parent->AddChild(newLayer);
+			View* newView = _CreateView(link, &parent);
+			if (parent != NULL && newView != NULL)
+				parent->AddChild(newView);
 			else
-				fprintf(stderr, "ServerWindow %s: Message AS_LAYER_CREATE: parent or newLayer NULL!!\n", fTitle);
+				fprintf(stderr, "ServerWindow %s: Message AS_LAYER_CREATE: parent or newView NULL!!\n", fTitle);
 			break;
 		}
 
@@ -2890,9 +2889,7 @@ ServerWindow::_MessageLooper()
 				quitLoop = true;
 
 				// ServerWindow's destructor takes care of pulling this object off the desktop.
-				if (!fWindow->IsHidden())
-					CRITICAL("ServerWindow: a window must be hidden before it's deleted\n");
-				
+				ASSERT(fWindow->IsHidden());				
 				break;
 			}
 
@@ -3132,12 +3129,12 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 
 
 void
-ServerWindow::_SetCurrentView(View* layer)
+ServerWindow::_SetCurrentView(View* view)
 {
-	if (fCurrentView == layer)
+	if (fCurrentView == view)
 		return;
 
-	fCurrentView = layer;
+	fCurrentView = view;
 	fCurrentDrawingRegionValid = false;
 	_UpdateDrawState(fCurrentView);
 
@@ -3166,17 +3163,17 @@ ServerWindow::_SetCurrentView(View* layer)
 
 
 void
-ServerWindow::_UpdateDrawState(View* layer)
+ServerWindow::_UpdateDrawState(View* view)
 {
 	// switch the drawing state
 	// TODO: is it possible to scroll a view while it
 	// is being drawn? probably not... otherwise the
 	// "offsets" passed below would need to be updated again
 	DrawingEngine* drawingEngine = fWindow->GetDrawingEngine();
-	if (layer && drawingEngine) {
+	if (view && drawingEngine) {
 		BPoint p(0, 0);
-		layer->ConvertToScreenForDrawing(&p);
-		drawingEngine->SetDrawState(layer->CurrentState(), p.x, p.y);
+		view->ConvertToScreenForDrawing(&p);
+		drawingEngine->SetDrawState(view->CurrentState(), p.x, p.y);
 	}
 }
 

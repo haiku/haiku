@@ -14,7 +14,6 @@
 #include <Debug.h>
 
 #include "BitmapHWInterface.h"
-#include "DebugInfoManager.h"
 #include "DrawingEngine.h"
 #include "ServerBitmap.h"
 
@@ -41,7 +40,7 @@ OffscreenWindow::OffscreenWindow(ServerBitmap* bitmap,
 OffscreenWindow::~OffscreenWindow()
 {
 	fHWInterface->LockExclusiveAccess();
-	// Unlike normal Layers, we own the DrawingEngine instance
+	// Unlike normal windows, we own the DrawingEngine instance
 	delete GetDrawingEngine();
 	fHWInterface->Shutdown();
 	fHWInterface->UnlockExclusiveAccess();
