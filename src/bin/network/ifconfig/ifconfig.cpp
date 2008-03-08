@@ -88,6 +88,89 @@ inet_print_address(sockaddr* _address)
 //	#pragma mark -
 
 
+struct media_type {
+	int			type;
+	const char*	name;
+	const char* pretty;
+	struct {
+		int subtype;
+		const char* name;
+		const char* pretty;
+	} subtypes [6];
+	struct {
+		int option;
+		bool ro;
+		const char* name;
+		const char* pretty;
+	} options [6];
+};
+
+
+static const media_type kMediaTypes[] = {
+	{
+		0, // for generic options
+		"all",
+		"All",
+		{
+			{ IFM_AUTO, "auto", "Auto-select" },
+			{ -1, NULL, NULL }
+		},
+		{
+			{ IFM_FULL_DUPLEX, true, "fullduplex", "Full Duplex" },
+			{ IFM_HALF_DUPLEX, true, "halfduplex", "Half Duplex" },
+			{ IFM_LOOP, true, "loop", "Loop" },
+			//{ IFM_ACTIVE, false, "active", "Active" },
+			{ -1, false, NULL, NULL }
+		}
+	},
+	{
+		IFM_ETHER,
+		"ether",
+		"Ethernet",
+		{
+			//{ IFM_AUTO, "auto", "Auto-select" },
+			//{ IFM_AUI, "AUI", "10 MBit, AUI" },
+			//{ IFM_10_2, "10base2", "10 MBit, 10BASE-2" },
+			{ IFM_10_T, "10baseT", "10 MBit, 10BASE-T" },
+			{ IFM_100_TX, "100baseTX", "100 MBit, 100BASE-TX" },
+			{ IFM_1000_T, "1000baseT", "1 GBit, 1000BASE-T" },
+			{ IFM_1000_SX, "1000baseSX", "1 GBit, 1000BASE-SX" },
+			{ -1, NULL, NULL }
+		},
+		{
+			{ -1, false, NULL, NULL }
+		}
+	},
+	{ -1, NULL, NULL, {{ -1, NULL, NULL }}, {{ -1, false, NULL, NULL }} }
+};
+
+
+static bool media_parse_subtype(const char* string, int media, int* type);
+
+
+static bool
+media_parse_subtype(const char* string, int media, int* type)
+{
+	for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
+		// only check for generic or correct subtypes
+		if (kMediaTypes[i].type && 
+			kMediaTypes[i].type != media)
+			continue;
+		for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++) {
+			if (strcmp(kMediaTypes[i].subtypes[j].name, string) == 0) {
+				// found a match
+				*type = kMediaTypes[i].subtypes[j].subtype;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+//	#pragma mark -
+
+
 void
 usage(int status)
 {
@@ -99,10 +182,18 @@ usage(int status)
 		"  peer <addr>      - ppp-peer address\n"
 		"  mtu <bytes>      - maximal transfer unit\n"
 		"  metric <number>  - metric number to use (defaults to 0)\n"
-		"And <flags> can be: up, down, [-]promisc, [-]allmulti, [-]bcast, loopback\n\n"
+		"  media <media>    - media type to use (defaults to auto)\n",
+		kProgramName, kProgramName);
+	for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
+		printf("For %s <media> can be one of: ", kMediaTypes[i].pretty);
+		for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++)
+			printf("%s ", kMediaTypes[i].subtypes[j].name);
+		printf("\n");
+	}
+	printf("And <flags> can be: up, down, [-]promisc, [-]allmulti, [-]bcast, loopback\n\n"
 		"Example:\n"
 		"\t%s loop 127.0.0.1 255.0.0.0 up\n",
-		kProgramName, kProgramName, kProgramName);
+		kProgramName);
 
 	exit(status);
 }
@@ -218,32 +309,24 @@ list_interface(int socket, const char* name)
 		&& (request.ifr_media & IFM_ACTIVE) != 0) {
 		// dump media state in case we're linked
 		const char* type = "unknown";
-		bool show = true;
+		bool show = false;
 
-		switch (IFM_TYPE(request.ifr_media)) {
-			case IFM_ETHER:
-				switch (IFM_SUBTYPE(request.ifr_media)) {
-					case IFM_AUTO:
-						type = "Auto-select";
-						break;
-					case IFM_10_T:
-						type = "10 MBit, 10BASE-T";
-						break;
-					case IFM_100_TX:
-						type = "100 MBit, 100BASE-TX";
-						break;
-					case IFM_1000_T:
-						type = "1 GBit, 1000BASE-T";
-						break;
-					case IFM_1000_SX:
-						type = "1 GBit, 1000BASE-SX";
-						break;
+		for (int32 i = 0; kMediaTypes[i].type >= 0; i++) {
+			// loopback don't really have a media anyway
+			if (IFM_TYPE(request.ifr_media) == 0/*IFT_LOOP*/)
+				break;
+			// only check for generic or correct subtypes
+			if (kMediaTypes[i].type && 
+				kMediaTypes[i].type != IFM_TYPE(request.ifr_media))
+				continue;
+			for (int32 j = 0; kMediaTypes[i].subtypes[j].subtype >= 0; j++) {
+				if (kMediaTypes[i].subtypes[j].subtype == IFM_SUBTYPE(request.ifr_media)) {
+					// found a match
+					type = kMediaTypes[i].subtypes[j].pretty;
+					show = true;
+					break;
 				}
-				break;
-
-			default:
-				show = false;
-				break;
+			}
 		}
 
 		if (show)
@@ -416,7 +499,8 @@ configure_interface(int socket, const char* name, char* const* args,
 
 	bool hasAddress = false, hasMask = false, hasPeer = false, hasBroadcast = false;
 	struct sockaddr address, mask, peer, broadcast;
-	int mtu = -1, metric = -1, addFlags = 0, removeFlags = 0, currentFlags = 0;
+	int mtu = -1, metric = -1, media = -1;
+	int addFlags = 0, removeFlags = 0, currentFlags = 0;
 
 	// try to parse address family
 
@@ -517,6 +601,23 @@ configure_interface(int socket, const char* name, char* const* args,
 			}
 			metric = strtol(args[i + 1], NULL, 0);
 			i++;
+		} else if (!strcmp(args[i], "media")) {
+			if (ioctl(socket, SIOCGIFMEDIA, &request, sizeof(struct ifreq)) < 0) {
+				fprintf(stderr, "%s: Unable to detect media type\n",
+					kProgramName);
+				exit(1);
+			}
+			if (i + 1 >= argCount) {
+				fprintf(stderr, "%s: Option 'media' exptected parameter\n",
+					kProgramName);
+				exit(1);
+			}
+			if (!media_parse_subtype(args[i + 1], IFM_TYPE(request.ifr_media), &media)) {
+				fprintf(stderr, "%s: Invalid parameter for option 'media': '%s'\n",
+					kProgramName, args[i + 1]);
+				exit(1);
+			}
+			i++;
 		} else if (!strcmp(args[i], "up") || !strcmp(args[i], "-down")) {
 			addFlags |= IFF_UP;
 		} else if (!strcmp(args[i], "down") || !strcmp(args[i], "-up")) {
@@ -610,6 +711,12 @@ configure_interface(int socket, const char* name, char* const* args,
 		request.ifr_metric = metric;
 		if (ioctl(socket, SIOCSIFMETRIC, &request, sizeof(struct ifreq)) < 0)
 			fprintf(stderr, "%s: Setting metric failed: %s\n", kProgramName, strerror(errno));
+	}
+
+	if (media != -1) {
+		request.ifr_media = media;
+		if (ioctl(socket, SIOCSIFMEDIA, &request, sizeof(struct ifreq)) < 0)
+			fprintf(stderr, "%s: Setting media failed: %s\n", kProgramName, strerror(errno));
 	}
 }
 
