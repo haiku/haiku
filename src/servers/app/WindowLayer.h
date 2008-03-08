@@ -1,11 +1,12 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author:  DarkWyrm <bpmagic@columbus.rr.com>
- *			Adi Oanca <adioanca@gmail.com>
- *			Stephan Aßmus <superstippi@gmx.de>
- *			Axel Dörfler, axeld@pinc-software.de
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Adi Oanca <adioanca@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef WINDOW_LAYER_H
 #define WINDOW_LAYER_H
@@ -30,7 +31,7 @@ class Decorator;
 class Desktop;
 class DrawingEngine;
 class EventDispatcher;
-class WindowLayer;
+class WorkspacesLayer;
 
 // TODO: move this into a proper place
 #define AS_REDRAW 'rdrw'
@@ -41,7 +42,7 @@ enum {
 };
 
 class WindowLayer {
- public:
+public:
 								WindowLayer(const BRect& frame,
 											const char *name, window_look look,
 											window_feel feel, uint32 flags,
@@ -208,6 +209,15 @@ class WindowLayer {
 			bool				SameSubset(WindowLayer* window);
 			uint32				SubsetWorkspaces() const;
 
+			bool				HasWorkspacesViews() const
+									{ return fWorkspacesViewCount != 0; }
+			void				AddWorkspacesView()
+									{ fWorkspacesViewCount++; }
+			void				RemoveWorkspacesView()
+									{ fWorkspacesViewCount--; }
+			void				FindWorkspacesViews(
+									BObjectList<WorkspacesLayer>& list) const;
+
 	static bool					IsValidLook(window_look look);
 	static bool					IsValidFeel(window_feel feel);
 	static bool					IsModalFeel(window_feel feel);
@@ -216,7 +226,7 @@ class WindowLayer {
 	static uint32				ValidWindowFlags();
 	static uint32				ValidWindowFlags(window_feel feel);
 
- protected:
+protected:
  	friend class Desktop;
  		// TODO: for now (list management)
 
@@ -298,7 +308,7 @@ class WindowLayer {
 			// redraw requests from the Desktop will go
 			// into the pending update session.
 	class UpdateSession {
-	 public:
+	public:
 									UpdateSession();
 		virtual						~UpdateSession();
 	
@@ -320,7 +330,7 @@ class WindowLayer {
 		inline	bool				IsRequest() const
 										{ return fCause & UPDATE_REQUEST; }
 	
-	 private:
+	private:
 				BRegion				fDirtyRegion;
 				bool				fInUse;
 				uint8				fCause;
@@ -352,6 +362,8 @@ class WindowLayer {
 			int32				fMaxWidth;
 			int32				fMinHeight;
 			int32				fMaxHeight;
+
+			int32				fWorkspacesViewCount;
 };
 
 #endif // WINDOW_LAYER_H

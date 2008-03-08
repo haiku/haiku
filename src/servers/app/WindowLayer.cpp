@@ -25,6 +25,7 @@
 #include "Workspace.h"
 #include "WorkspacesLayer.h"
 
+#include <ViewPrivate.h>
 #include <WindowPrivate.h>
 
 #include <Debug.h>
@@ -126,7 +127,9 @@ WindowLayer::WindowLayer(const BRect& frame, const char *name,
 	fMinWidth(1),
 	fMaxWidth(32768),
 	fMinHeight(1),
-	fMaxHeight(32768)
+	fMaxHeight(32768),
+
+	fWorkspacesViewCount(0)
 {
 	// make sure our arguments are valid
 	if (!IsValidLook(fLook))
@@ -1522,6 +1525,17 @@ WindowLayer::HasInSubset(const WindowLayer* window) const
 		return window->ServerWindow()->App() == ServerWindow()->App();
 
 	return fSubsets.HasItem(window);
+}
+
+
+/*!	\brief Collects all workspaces views in this window and puts it into \a list
+*/
+void
+WindowLayer::FindWorkspacesViews(BObjectList<WorkspacesLayer>& list) const
+{
+	int32 count = fWorkspacesViewCount;
+	TopLayer()->FindViews(kWorkspacesViewFlag, (BObjectList<ViewLayer>&)list,
+		count);
 }
 
 

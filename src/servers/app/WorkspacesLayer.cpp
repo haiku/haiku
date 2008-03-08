@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku Inc.
+ * Copyright 2005-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,7 +33,26 @@ WorkspacesLayer::WorkspacesLayer(BRect frame, BPoint scrollingOffset,
 
 WorkspacesLayer::~WorkspacesLayer()
 {
-	// TODO: we actually need to tell the Desktop that we're gone
+}
+
+
+void
+WorkspacesLayer::AttachedToWindow(WindowLayer* window)
+{
+	ViewLayer::AttachedToWindow(window);
+
+	window->AddWorkspacesView();
+	window->Desktop()->AddWorkspacesView(this);
+}
+
+
+void
+WorkspacesLayer::DetachedFromWindow()
+{
+	fWindow->Desktop()->RemoveWorkspacesView(this);
+	fWindow->RemoveWorkspacesView();
+
+	ViewLayer::DetachedFromWindow();
 }
 
 

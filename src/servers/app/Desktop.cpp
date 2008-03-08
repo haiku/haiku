@@ -317,7 +317,7 @@ Desktop::Desktop(uid_t userID)
 	fAllWindows(kAllWindowList),
 	fSubsetWindows(kSubsetList),
 	fFocusList(kFocusList),
-	fWorkspacesLayer(NULL),
+	fWorkspacesViews(false),
 	fActiveScreen(NULL),
 
 	fWindowLock("window lock"),
@@ -1255,10 +1255,49 @@ Desktop::_WindowHasModal(WindowLayer* window)
 void
 Desktop::_WindowChanged(WindowLayer* window)
 {
-	if (fWorkspacesLayer == NULL)
+	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
+		WorkspacesLayer* view = fWorkspacesViews.ItemAt(i);
+		view->WindowChanged(window);
+	}
+}
+
+
+/*!
+	You must at least hold a single window lock when calling this method.
+*/
+void
+Desktop::_WindowRemoved(WindowLayer* window)
+{
+	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
+		WorkspacesLayer* view = fWorkspacesViews.ItemAt(i);
+		view->WindowRemoved(window);
+	}
+}
+
+
+void
+Desktop::AddWorkspacesView(WorkspacesLayer* view)
+{
+	if (view->Window() == NULL || view->Window()->IsHidden())
 		return;
 
-	fWorkspacesLayer->WindowChanged(window);
+	if (!LockAllWindows())
+		return;
+
+	if (!fWorkspacesViews.HasItem(view))
+		fWorkspacesViews.AddItem(view);
+	UnlockAllWindows();	
+}
+
+
+void
+Desktop::RemoveWorkspacesView(WorkspacesLayer* view)
+{
+	if (!LockAllWindows())
+		return;
+
+	fWorkspacesViews.RemoveItem(view);
+	UnlockAllWindows();	
 }
 
 
@@ -1621,10 +1660,9 @@ Desktop::ShowWindow(WindowLayer* window)
 		return;
 	}
 
-	if ((window->Flags() & kWorkspacesWindowFlag) != 0) {
+	if (window->HasWorkspacesViews()) {
 		// find workspaces layer in view hierarchy
-		fWorkspacesLayer = dynamic_cast<WorkspacesLayer*>(
-			window->TopLayer()->FindView(kWorkspacesViewFlag));
+		window->FindWorkspacesViews(fWorkspacesViews);
 	}
 
 	UnlockAllWindows();
@@ -1662,11 +1700,17 @@ Desktop::HideWindow(WindowLayer* window)
 	} else
 		_WindowChanged(window);
 
-	if (fWorkspacesLayer != NULL)
-		fWorkspacesLayer->WindowRemoved(window);
+	_WindowRemoved(window);
 
-	if ((window->Flags() & kWorkspacesWindowFlag) != 0)
-		fWorkspacesLayer = NULL;
+	if (window->HasWorkspacesViews()) {
+		// remove workspaces views from this window
+		BObjectList<WorkspacesLayer> list(false);
+		window->FindWorkspacesViews(list);
+
+		while (WorkspacesLayer* view = list.RemoveItemAt(0)) {
+			fWorkspacesViews.RemoveItem(view);
+		}
+	}
 
 	UnlockAllWindows();
 

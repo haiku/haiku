@@ -16,6 +16,7 @@
 #include "IntRect.h"
 
 #include <GraphicsDefs.h>
+#include <ObjectList.h>
 #include <Region.h>
 #include <String.h>
 
@@ -76,8 +77,8 @@ class ViewLayer {
 			// clips to each views bounds
 			void			ConvertToVisibleInTopView(IntRect* bounds) const;
 
-			void			AttachedToWindow(WindowLayer* window);
-			void			DetachedFromWindow();
+	virtual	void			AttachedToWindow(WindowLayer* window);
+	virtual void			DetachedFromWindow();
 			WindowLayer*	Window() const { return fWindow; }
 
 			// tree stuff
@@ -100,7 +101,8 @@ class ViewLayer {
 
 			uint32			CountChildren(bool deep = false) const;
 			void			CollectTokensForChildren(BList* tokenMap) const;
-			ViewLayer*		FindView(uint32 flags);
+			void			FindViews(uint32 flags,
+								BObjectList<ViewLayer>& list, int32& left);
 
 			ViewLayer*		ViewAt(const BPoint& where);
 

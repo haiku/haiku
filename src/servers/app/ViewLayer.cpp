@@ -206,9 +206,9 @@ ViewLayer::AddChild(ViewLayer* layer)
 		printf("ViewLayer::AddChild() - ViewLayer already has a parent\n");
 		return;
 	}
-	
+
 	layer->fParent = this;
-	
+
 	if (!fLastChild) {
 		// no children yet
 		fFirstChild = layer;
@@ -376,19 +376,20 @@ ViewLayer::MarkAt(DrawingEngine* engine, const BPoint& where, int32 level)
 #endif
 
 
-ViewLayer*
-ViewLayer::FindView(uint32 flags)
+void
+ViewLayer::FindViews(uint32 flags, BObjectList<ViewLayer>& list, int32& left)
 {
-	if ((Flags() & flags) == flags)
-		return this;
-
-	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
-		ViewLayer* layer = child->FindView(flags);
-		if (layer != NULL)
-			return layer;
+	if ((Flags() & flags) == flags) {
+		list.AddItem(this);
+		left--;
+		return;
 	}
 
-	return NULL;
+	for (ViewLayer* child = FirstChild(); child; child = child->NextSibling()) {
+		child->FindViews(flags, list, left);
+		if (left == 0)
+			break;
+	}
 }
 
 

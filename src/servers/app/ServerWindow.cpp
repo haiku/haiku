@@ -562,10 +562,7 @@ ServerWindow::_CreateLayerTree(BPrivate::LinkReceiver &link, ViewLayer **_parent
 
 	ViewLayer* newLayer;
 
-	if ((fWindowLayer->Flags() & kWorkspacesWindowFlag) != 0
-		&& (flags & kWorkspacesViewFlag) != 0) {
-		// TODO: there can currently only be one of these views per desktop!
-		// TODO: get rid of the kWorkspacesWindowFlag
+	if ((flags & kWorkspacesViewFlag) != 0) {
 		newLayer = new (nothrow) WorkspacesLayer(frame, scrollingOffset, name,
 			token, resizeMask, flags);
 	} else {

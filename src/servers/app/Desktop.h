@@ -181,6 +181,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					RedrawBackground();
 		void					StoreWorkspaceConfiguration(int32 index);
 
+		void					AddWorkspacesView(WorkspacesLayer* view);
+		void					RemoveWorkspacesView(WorkspacesLayer* view);
+
 		void					MinimizeApplication(team_id team);
 		void					BringApplicationToFront(team_id team);
 		void					WindowAction(int32 windowToken, int32 action);
@@ -220,6 +223,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		bool					_WindowHasModal(WindowLayer* window);
 
 		void					_WindowChanged(WindowLayer* window);
+		void					_WindowRemoved(WindowLayer* window);
 
 		void					_GetLooperName(char* name, size_t size);
 		void					_PrepareQuit();
@@ -254,7 +258,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		WindowList				fAllWindows;
 		WindowList				fSubsetWindows;
 		WindowList				fFocusList;
-		WorkspacesLayer*		fWorkspacesLayer;
+		BObjectList<WorkspacesLayer> fWorkspacesViews;
 
 		Screen*					fActiveScreen;
 
