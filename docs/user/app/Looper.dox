@@ -1,0 +1,791 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/app/Looper.h  rev 21863
+ *		/trunk/src/kits/app/Looper.cpp  rev 21864
+ */
+
+/*!
+	\file Looper.h
+	\brief Provides the BLooper class.
+*/
+
+
+/*!
+	\def B_LOOPER_PORT_DEFAULT_CAPACITY
+	\brief The default size of the port of a BLooper.
+*/
+
+
+/*!
+	\class BLooper
+	\ingroup app
+	\brief Receive and process messages in a separate thread.
+	
+	When an object of this class is created, the message loop can be started
+	with Run(). This spawns the thread that receives messages and processes
+	messages. Messages are actually passed on to \link BHandler handlers \endlink
+	that are associated with this looper. By default there is always one
+	handler available: the looper itself. To 'quit' a looper, you should pass
+	a \c B_QUIT_REQUESTED message using one of the message post functions. Do
+	not call Quit() directly! When a looper receives such a request, it will 
+	\b delete itself. As such, looper should <em>always be created on the
+	heap</em> (with \c new), and never on the stack. 
+	
+	Posting messages can be done using the various PostMessage() methods.
+	Whenever a message is posted, it will be added through to the message
+	queue. It is possible to apply filters (see AddCommonFilter()) to filter
+	out any messages that correspond with certain criteria. Whenever you post
+	a message, you \e lose ownership. The looper will dispose of it when it is 
+	processed. The handler for the message is chosen using the following
+	criteria:
+	
+	-# If PostMessage() or the BMessenger is set to a specific handler, and
+		this handler is associated with this looper, than the message is
+		processed by that handler.
+	-# Else, the preferred handler is used. You can set this using
+		SetPreferredHandler().
+	-# If there is no preferred handler, then the looper itself will process
+		the message.
+	
+	Because a looper usually is used in multiple threads, you should make sure
+	you Lock() and Unlock() it during most operations. Locking calls can be
+	recursive (so multiple locks can come from a single thread), but make sure
+	you pair every Lock() with an Unlock() call. Failing to do so will
+	inevitably cause a deadlock.
+	
+	Because a looper provides a separate thread, and the inherited handler is
+	usually a default handler, you will most often use this class by
+	subclassing it. For example, you are likely to subclass BWindow (which is
+	derived from BLooper) to customize your window and handle the messages
+	sent to that window. You can override Run() in case you want to perform
+	additional tasks before (or right after) starting the message loop. You can
+	override QuitRequested() if you want to decline quitting in certain 
+	circumstances. You can override Quit() in case you want to perform
+	additional procedures during closing time. You can also override
+	DispatchMessage() if you want to do something with all incoming messages
+	before they are dispatched to a handler.
+	
+	BLooper is one of the major base classes of the Haiku application
+	programmers interface. Closely related classes are BMessage, BHandler and 
+	BMessenger. It is used in the interface kit, for example by the BWindow
+	class, which makes sure every window runs it its own thread.
+	
+	BLooper is a part of the chain in the eloquent messaging structure. For a
+	proper understanding of all its facets, have a look at the \ref app_messaging
+	"messaging overview".
+*/
+
+
+/*!
+	\fn BLooper::BLooper(const char* name, int32 priority, int32 port_capacity)
+	\brief Construct a new BLooper with a \a priority and an \a capacity.
+	
+	The new looper is, by default, not running yet. If you have set up
+	everything properly, you may call Run().
+	
+	\attention Remember that loopers should be created on the heap, because
+		they will \c delete themselves in the Quit() method.
+	
+	\param name The name of the looper.
+	\param priority The priority of the message thread of this looper. The
+		default priority should be good enough for most tasks. Also, some
+		derived versions of BLooper will use a specialized priority. So it is
+		advised to leave this setting at the default, unless you know why you
+		would like another setting.
+	\param port_capacity Loopers use ports to send and receive messages (see
+		the kernel kit). Ports have a maximum capacity; if there are so many
+		messages queued that the port is full, all other incoming messages are
+		dropped. There are situations where the size of the port should be
+		different from the default. This might be when your looper receives
+		a lot of messages, or if the message handling thread runs at a lower
+		priority than normal, which would decrease the processing speed.
+		Finding a suitable value for these custom scenarios would be done by
+		testing. 
+	
+	\see Run()
+*/
+
+
+/*!
+	\fn BLooper::~BLooper()
+	\brief Destruct the looper.
+	
+	You will never delete a looper yourself. You should pass a 
+	\c B_QUIT_REQUESTED message, or if you are destroying the looper from
+	inside its own message handling thread, you should call Quit().
+	
+	\see Quit()
+*/
+
+
+///// Archiving /////
+
+
+/*!
+	\name Archiving
+*/
+
+
+//! @{
+	
+
+/*!
+	\fn BLooper::BLooper(BMessage *data)
+	\brief Construct a looper from an archived message.
+	
+	The \a data message has to be constructed by a BLooper::Archive() call.
+	Note that the data that is restored, is merely the port capacity and the
+	name of the looper/handler. Other data, such as filters, is not archived by
+	the default archiver.
+	
+	\warning This constructor does no type check whatsoever. Since you can pass
+		any BMessage, you should - if you are not sure about the exact type -
+		use the Instantiate() method, which does check the type.
+	
+	\see Instantiate()
+	\see Archive()
+*/
+
+
+/*!
+	\fn BArchivable *BLooper::Instantiate(BMessage *data)
+	\brief Static method to instantiate a looper from an archived message.
+
+	\return A pointer to the instantiated looper, or \c NULL if the \a data
+		is not a valid archived BLooper object.
+	\see BLooper(BMessage* data)
+*/
+
+
+/*!
+	\fn status_t BLooper::Archive(BMessage *data, bool deep) const
+	\brief Archive a looper to a message
+	
+	Currently, only the name and the port capacity are archived. Any other
+	data, such as the filters, is not stored. 
+	
+	\param data The message to archive the object in.
+	\param deep This parameter is ignored, as BLooper does not have children.
+	\retval B_OK Archiving succeeded.
+	\retval B_BAD_VALUE The \a data parameter is not a valid message.
+	\see BLooper::Instantiate(BMessage *data)
+*/
+
+
+//! @}
+
+
+/*!
+	\name Message Mechanics
+*/
+
+
+//! @{
+	
+
+/*!
+	\fn status_t BLooper::PostMessage(uint32 command)
+	\brief Post a message with the \a command as \c what identifier to this
+		looper.
+	
+	Posting a message puts it in the message queue. The message passes through
+	the default handler chain.
+	
+	\param command The \c what identifier of the message that needs to be sent.
+	
+	\retval B_OK The operation succeeded, and the message is sent to the port.
+	\retval B_ERROR There was a general operation error.
+	\retval B_BAD_VALUE This looper is not yet running and therefore cannot
+		receive messages.
+	
+	\see PostMessage(BMessage *) if you want to send a message with data
+		members.
+	\see PostMessage(uint32, BHandler *, BHandler *) if you want to send a
+		message to a specific handler, and request a reply.
+	\see PostMessage(BMessage *, BHandler *, BHandler *) for the same thing,
+		but with a complete message.
+*/
+
+
+/*!
+	\fn status_t BLooper::PostMessage(BMessage *message)
+	\brief Post a \a message to this looper.
+	
+	Posting a message puts it in the message queue. The message passes through
+	the default handler chain.
+	
+	\param message The message you would like to pass to this method.
+	
+	\retval B_OK The operation succeeded, and the message is sent to the port.
+	\retval B_ERROR There was a general operation error.
+	\retval B_BAD_VALUE This looper is not yet running and therefore cannot
+		receive messages.
+	
+	\see PostMessage(uint32) if you want to send a message without data
+		members.
+	\see PostMessage(uint32, BHandler *, BHandler *) if you want to send a
+		message to a specific handler, and request a reply.
+	\see PostMessage(BMessage *, BHandler *, BHandler *) for the same thing,
+		but with a complete message.
+*/
+
+
+/*!
+	\fn status_t BLooper::PostMessage(uint32 command, BHandler *handler,
+		BHandler *replyTo)
+	\brief Send a message with the \a command as \c what identifier to the
+		\a handler associated with this looper, and (optionally) request a
+		reply.
+		
+	The target \a handler should be associated with this looper. This method
+	bypasses the default message queue.
+	
+	\param command The value you want as the message's \c what identifier.
+	\param handler The handler you would like to pass this message to.
+	\param replyTo If you would like to request a reply, pass the handler to
+		which this reply should be directed to. If you pass \c NULL, you will
+		not receive a reply.
+	
+	\retval B_OK The operation succeeded, and the message is sent to the port.
+	\retval B_ERROR There was a general operation error.
+	\retval B_BAD_VALUE This looper is not yet running and therefore cannot
+		receive messages.	
+	\retval B_MISMATCHED_VALUES The \a handler is not associated with this
+		looper.
+	
+	\see PostMessage(uint32) if you want to send a message without data
+		members.
+	\see PostMessage(BMessage *) if you want to send a message with data
+		members.
+	\see PostMessage(BMessage *, BHandler *, BHandler *) if you want to send a
+		message to a specific handler, and request a reply.
+*/
+
+
+/*!
+	\fn status_t BLooper::PostMessage(BMessage *message, BHandler *handler,
+		BHandler *replyTo)
+	\brief Send a \a message to the \a handler associated with this looper, 
+		and (optionally) request a reply.
+		
+	The target \a handler should be associated with this looper. This method
+	bypasses the default message queue.
+	
+	\param message The message you want to pass.
+	\param handler The handler you would like to pass this message to.
+	\param replyTo If you would like to request a reply, pass the handler to
+		which this reply should be directed to. If you pass \c NULL, you will
+		not receive a reply.
+	
+	\retval B_OK The operation succeeded, and the message is sent to the port.
+	\retval B_ERROR There was a general operation error.
+	\retval B_BAD_VALUE This looper is not yet running and therefore cannot
+		receive messages.	
+	\retval B_MISMATCHED_VALUES The \a handler is not associated with this
+		looper.
+	
+	\see PostMessage(uint32) if you want to send a message without data
+		members.
+	\see PostMessage(BMessage *) if you want to send a message with data
+		members.
+	\see PostMessage(uint32, BHandler *, BHandler *) if you want to send a
+		message without data to a specific handler, and request a reply.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Message Processing
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BLooper::DispatchMessage(BMessage *message, BHandler *handler)
+	\brief Dispatch a message to a handler. Override if there are messages that
+		you want to catch before they are sent to the handlers.
+	
+	This method is called by the message looping thread to dispatch a message
+	to \a handler. If you implement the BLooper class and your looper receives
+	messages that absolutely have to be processed by the looper instead of any
+	of the handlers, override this method. For example, the default
+	implementation catches B_QUIT_REQUESTED messages before they are sent to
+	the handlers, so that the looper will quit at those messages.
+	
+	You are discouraged from using this method to filter out any messages you
+	do not want to process. For this, there is a more generic method using
+	the BMessageFilter class. If you want to skip messages with certain
+	patterns, have a look at the AddCommonFilter() and SetCommonFilterList()
+	methods.
+	
+	If you do override this method, please remember to call the
+	DispatchMessage() method of the parent class.
+*/
+
+
+/*!
+	\fn void BLooper::MessageReceived(BMessage *msg)
+	\brief Process a message received by the internal handler of this looper.
+	
+	Reimplemented from BHandler::MessageReceived();
+*/
+
+
+/*!
+	\fn BMessage* BLooper::CurrentMessage() const
+	\brief Retrieve the current message.
+	
+	\attention Only call this method from within the thread that processes the
+		messages. It contains a pointer to the message that is currently being
+		handled. Due to the multithreaded nature of the operating system, this
+		method will not safely let you read the message that is being processed
+		by this handler from outside the context of the processing. If you do
+		want to use a message outside of the processing thread, have a look at
+		DetachCurrentMessage() to safely retrieve a message.
+	
+	\return A pointer to the message that is currently being processed. Note
+		that calling it from outside the thread that processes the message,
+		could give you a \c NULL pointer or an invalid pointer.
+*/
+
+
+/*!
+	\fn BMessage* BLooper::DetachCurrentMessage()
+	\brief Get ownership of the message currently being processed.
+	
+	Retrieve the current message and gain ownership of it. This means that the
+	message will not be deleted as soon as the looper is done processing it.
+	You can then use it for different purposes.
+	
+	\attention Only call this method from within the thread that processes the
+	messages. Due to the multithreaded nature of the operating system, calling
+	it from another thread is very likely to give you an invalid or a \c NULL
+	pointer.
+*/
+
+
+/*!
+	\fn BMessageQueue* BLooper::MessageQueue() const
+	\brief Get a pointer to the internal message queue of this looper.
+	
+	You can use this pointer to manipulate the message queue. Note that the
+	message that is being processed is already detached from this queue.
+	
+	\return A pointer to the internal message queue.
+*/
+
+
+/*!
+	\fn bool BLooper::IsMessageWaiting() const
+	\brief Check if there is a message waiting.
+	
+	\retval true There are still messages to be processed.
+	\retval false There is no message waiting.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Handler Management
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BLooper::AddHandler(BHandler* handler)
+	\brief Associate a \a handler to this looper.
+	
+	The \a handler will be associated to this looper. By default, the handler
+	in this looper will be chained to the supplied \a handler.
+	
+	\param handler The handler to associate with this looper. If the handler is
+		already associated to another looper, the operation will fail silently.
+		Check beforehand if you cannot be sure that the \a handler is
+		unassociated.
+	
+	\see RemoveHandler()
+*/
+
+
+/*!
+	\fn bool BLooper::RemoveHandler(BHandler* handler)
+	\brief Disassociate a \a handler from this looper.
+	
+	If the handler is disassociated, it can be reassociated to another looper.
+	
+	\retval true The \a handler has been removed from this looper.
+	\retval false The \a handler was invalid. or the handler was not
+		associated to this looper.
+	\see AddHandler()
+*/
+
+
+/*!
+	\fn int32 BLooper::CountHandlers() const
+	\brief Get the number of handlers associated with this looper.
+	
+	\see HandlerAt(), IndexOf()
+*/
+
+
+/*!
+	\fn BHandler* BLooper::HandlerAt(int32 index) const
+	\brief Get the handler at an \a index of the list of associated handlers.
+	
+	\return A pointer to the handler at that \a index, or \c NULL if the
+		\a index is out of range.
+
+	\see CountHandlers(), IndexOf()
+*/
+
+
+/*!
+	\fn int32 BLooper::IndexOf(BHandler* handler) const
+	\brief Get the index of the \a handler that is in the associated handler
+		list.
+	
+	\return If the \a handler is not in the list, this method will return -1.
+		Else, you will get the index of the handler in the list.
+*/
+
+
+/*!
+	\fn BHandler* BLooper::PreferredHandler() const
+	\brief Get the preferred handler.
+	
+	\return A pointer to the preferred handler, or \c NULL if none is set.
+	\see SetPreferredHandler()
+*/
+
+
+/*!
+	\fn void BLooper::SetPreferredHandler(BHandler* handler)
+	\brief Set a preferred handler.
+	
+	If messages are posted to this looper using one of the PostMessage()
+	methods without a specific BHandler argument, the messages will be handled
+	by the looper itself (since a looper is a subclass of BHandler, this is
+	perfectly possible). If you want to override that behavior, you should set
+	a preferred handler. This handler will be called if incoming messages do
+	not ask to be directly passed on to a specific handler.
+	
+	\param handler The preferred handler you want undesignated messages to be
+		handled by. If you want to unset the preferred handler, pass \c NULL.
+		If the supplied \a handler is not associated with this looper, this
+		call will fail silently and the current preferred handler will be unset.
+	\see PreferredHandler()
+*/
+
+
+//! @}
+
+
+/*!
+	\name Loop Control
+*/
+
+
+//! @{
+
+
+/*!
+	\fn thread_id BLooper::Run()
+	\brief Start the event loop.
+	
+	After the looper has been constructed, it needs to be started using this
+	method. A thread will be spawned, which will receive messages.
+	
+	Make sure the looper is not yet running before you call this method.
+	
+	\return A (positive) thread id if spawning the thread succeeded, or an
+		error code.
+*/
+
+
+/*!
+	\fn void BLooper::Quit()
+	\brief Hook method that is called after a \c B_QUIT_REQUESTED message.
+	
+	If you want to quit and delete the looper, do \b not call this method
+	directly, rather, post a \c B_QUIT_REQUESTED message to the looper.
+	
+	Override this method if your subclass needs to perform specific clean-up
+	tasks. Remember to call the base class implementation when you're done.
+	
+	\attention You will not have to delete the looper object, if a looper quits
+		it will delete itself.
+*/
+
+
+/*!
+	\fn bool BLooper::QuitRequested()
+	\brief Hook method that is called during a \c B_QUIT_REQUESTED message.
+	
+	This hook function is called by the looper thread when a
+	\c B_QUIT_REQUESTED is received. The default implementation always accepts
+	the message, but if your subclass needs a special condition to be met
+	before actually accepting a quit message, you can test for that condition
+	in this hook method. A good example is a window (which is a derivative of
+	BLooper), which contains a modified document. The condition may be that a
+	modal dialog requesting a path of action is closed.
+	
+	\retval true The looper can be quit and destroyed.
+	\retval false Do not accept the quit message and continue processing
+		messages.
+*/
+
+
+/*!
+	\fn bool BLooper::Lock()
+	\brief Lock the looper. 
+	
+	For most operations involving the internal data of the looper, you need to
+	hold the lock. Each looper implements a global lock, which you can use to
+	perform operations on internal data in a thread-safe manner.
+	
+	Do not forget to pair each Lock() request with an Unlock() request. Lock()
+	requests can be stacked, which means that recursively locking a looper from
+	a thread that actually holds the lock, will not cause a deadlock. See
+	BLocker for more information on locking internals.
+	
+	\retval true The locking request succeeded.
+	\retval false The locking request could not be completed. There are a
+		variety of reasons for this to happen, for example when the looper is
+		destroyed.
+	\see Unlock(), LockWithTimeout(), IsLocked()
+*/
+
+
+/*!
+	\fn void BLooper::Unlock()
+	\brief Unlock a locked looper.
+	
+	Use this method paired with Lock() calls, to release a lock. Make sure that
+	this method is only called on a locked looper.
+	
+	\see Lock(), LockWithTimeout(), IsLocked()
+*/
+
+
+/*!
+	\fn bool BLooper::IsLocked() const
+	\brief Check if a looper is locked.
+	
+	\retval true The looper is locked.
+	\retval false The looper is not locked, or the looper has been deleted.
+	\see Lock(), Unlock(), LockWithTimeout()
+*/
+
+
+/*!
+	\fn status_t BLooper::LockWithTimeout(bigtime_t timeout)
+	\brief Lock a looper with a \a timeout.
+	
+	This method locks the looper like Lock(), but if the locking request does
+	not succeed within the provided \a timeout, the method will return.
+	
+	\param timeout The maximum time to wait for the lock request to succeed.
+	
+	\retval B_OK The lock is acquired.
+	\retval B_BAD_VALUE The looper has been destroyed.
+	\retval "other errors" There was an error acquiring the lock.
+	\see Lock(), Unlock(), IsLocked()
+*/
+
+
+/*!
+	\fn thread_id BLooper::Thread() const
+	\brief Return the thread id of the internal message looper thread.
+	
+	If the looper is not yet running, this method will return 0.
+	
+	\see Run()
+*/
+
+
+/*!
+	\fn team_id BLooper::Team() const
+	\brief Return the team id in which this looper exists.
+*/
+
+
+/*!
+	\fn BLooper* BLooper::LooperForThread(thread_id thread)
+	\brief Static method to retrieve a BLooper for a specified \a thread.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Loop debugging
+	
+	These methods may aid you in debugging problems when they occur, but do not
+	use these in actual production code. These methods are unrealiable because
+	they are not thread-safe, and as such are only useful in specific debugging
+	situations. Handle with care.
+*/
+
+
+//! @{
+	
+
+/*!
+	\fn thread_id BLooper::LockingThread() const
+	\brief Return the thread id of the thread that currenty holds the lock.
+*/
+
+
+/*!
+	\fn int32 BLooper::CountLocks() const
+	\brief Return the number of recursive locks that are currently being held
+	on this looper
+*/
+
+
+/*!
+	\fn int32 BLooper::CountLockRequests() const
+	\brief Return the number of pending locks.
+*/
+
+
+/*!
+	\fn sem_id BLooper::Sem() const
+	\brief Return the id of the semaphore that is used to lock this looper.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Scripting Functions
+*/
+
+
+//! @{
+	
+
+/*!
+	\fn BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
+		BMessage* specifier, int32 form, const char* property)
+	\brief Undocumented.
+*/
+
+
+/*!
+	\fn status_t BLooper::GetSupportedSuites(BMessage* data)
+	\brief Undocumented.
+*/
+
+
+//! @}
+
+
+/*!
+	\name Looper Message Filters
+	Note that filters added with these methods will be applied to all
+	associated handlers. Have a look at the filtering methods of the BHandler
+	class to see how filters can be applied to the inherited handler of this
+	looper specifically.
+*/
+
+
+//! @{
+
+
+/*!
+	\fn void BLooper::AddCommonFilter(BMessageFilter* filter)
+	\brief Add a common filter to the list of filters that are applied to all
+		incoming messages.
+		
+	Filters can only be applied once, so they cannot be shared between loopers,
+	a handler and a looper or between two handlers.
+	
+	The \a filter is not copied; rather a pointer is stored. Keep the \a filter
+	alive as long as it is used by a looper.
+	
+	\see RemoveCommonFilter(), SetCommonFilterList(), CommonFilterList()
+*/
+
+
+/*!
+	\fn bool BLooper::RemoveCommonFilter(BMessageFilter* filter)
+	\brief Remove a \a filter from the common message filter list.
+	
+	Note that this will not free the memory used by the \a filter, so you
+	should dispose of it yourself. 
+	
+	\see AddCommonFilter(), SetCommonFilterList(), CommonFilterList()
+*/
+
+
+/*!
+	\fn void BLooper::SetCommonFilterList(BList* filters)
+	\brief Set a new list of \a filters that need to be applied to all
+		incoming messages.
+	
+	You are responsible for validating that all the items in the list of
+	\a filters are actual filters. The old list is discarded; all the filters
+	are \b destroyed.
+	
+	Note that filters can only be applied to one looper or handler. If any
+	of the filters is already associated with another one, this call will fail.
+	
+	\see AddCommonFilter(), RemoveCommonFilter(), CommonFilterList()
+*/
+
+
+/*!
+	\fn BList* BLooper::CommonFilterList() const
+	\brief Return a list of filters applied to all incoming messages.
+	
+	\return A pointer to the internal filter list, or \c NULL if such a list
+		has not yet been created. Please note that you should use the internal
+		list management functions to manipulate the internal filter list, in
+		order to maintain internal consistency.
+	\see AddCommonFilter(), RemoveCommonFilter(), SetCommonFilterList()
+*/
+
+//! @}
+
+
+/*!
+	\fn status_t BLooper::Perform(perform_code d, void* arg)
+	\brief Internal method.
+*/
+
+
+/*!
+	\fn BMessage* BLooper::MessageFromPort(bigtime_t timeout)
+	\brief Hook function to retrieve a message from the looper's port.
+	
+	The default implementation is called by the internal message looping thread
+	and retrieves the next message from the port that belongs to this looper.
+	
+	If you use a looper in a context where it might receive messages from other
+	sources, you can override this method in order to insert these methods into
+	the message processing. Note that any messages that are returned by this
+	method will be deleted by this looper, so make sure you have ownership of
+	the message. If you override this method, remember to call the base
+	implementation every now and then, in order to retrieve the messages
+	arriving at the default port.
+*/
+
+
+	
