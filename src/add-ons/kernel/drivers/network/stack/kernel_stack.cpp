@@ -60,15 +60,21 @@ template<typename ArgType> status_t
 return_address(ArgType &args, void *data)
 {
 	sockaddr_storage *target;
+	socklen_t length;
 
-	if (user_memcpy(&target, &((ArgType *)data)->address, sizeof(void *)) < B_OK)
+	if (user_memcpy(&target, &((ArgType *)data)->address, sizeof(void *))
+			< B_OK
+		|| user_memcpy(&length, &((ArgType *)data)->address_length,
+			sizeof(socklen_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	if (target == NULL)
 		return B_OK;
 
-	if (user_memcpy(&((ArgType *)data)->address_length, &args.address_length, sizeof(socklen_t)) < B_OK
-		|| user_memcpy(target, args.address, args.address_length) < B_OK)
+	if (user_memcpy(&((ArgType *)data)->address_length, &args.address_length,
+			sizeof(socklen_t)) < B_OK
+		|| user_memcpy(target, args.address, min_c(length, args.address_length))
+			< B_OK)
 		return B_BAD_ADDRESS;
 
 	return B_OK;
@@ -76,8 +82,8 @@ return_address(ArgType &args, void *data)
 
 
 template<typename ArgType> status_t
-check_args_and_address(ArgType &args, sockaddr_storage &address, void *data, size_t length,
-	bool copyAddress = true)
+check_args_and_address(ArgType &args, sockaddr_storage &address, void *data,
+	size_t length, bool copyAddress = true)
 {
 	if (data == NULL || length != sizeof(ArgType))
 		return B_BAD_VALUE;
@@ -88,7 +94,8 @@ check_args_and_address(ArgType &args, sockaddr_storage &address, void *data, siz
 	if (copyAddress && args.address_length > sizeof(sockaddr_storage))
 		return B_BAD_VALUE;
 
-	if (copyAddress && user_memcpy(&address, args.address, args.address_length) < B_OK)
+	if (copyAddress
+		&& user_memcpy(&address, args.address, args.address_length) < B_OK)
 		return B_BAD_ADDRESS;
 
 	args.address = (sockaddr *)&address;
@@ -121,7 +128,8 @@ check_message_args(message_args &args, msghdr &header,
 				return B_BAD_VALUE;
 
 			if (header.msg_name != NULL) {
-				status = user_memcpy(&address, header.msg_name, header.msg_namelen);
+				status = user_memcpy(&address, header.msg_name,
+					header.msg_namelen);
 				if (status < B_OK)
 					return B_BAD_ADDRESS;
 			}
@@ -347,7 +355,8 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (status < B_OK)
 					return status;
 
-				status = sSocket->get_next_stat(&args.cookie, args.family, &args.stat);
+				status = sSocket->get_next_stat(&args.cookie, args.family,
+					&args.stat);
 				if (status < B_OK)
 					return status;
 
@@ -381,7 +390,8 @@ net_stack_control(void *_cookie, uint32 op, void *data, size_t length)
 				if (status < B_OK)
 					return status;
 
-				return sSocket->bind(cookie->socket, args.address, args.address_length);
+				return sSocket->bind(cookie->socket, args.address,
+					args.address_length);
 			}
 
 			case NET_STACK_LISTEN:
@@ -582,7 +592,8 @@ net_stack_read(void *_cookie, off_t /*offset*/, void *buffer, size_t *_length)
 	if (cookie->socket == NULL)
 		return B_BAD_VALUE;
 
-	ssize_t bytesRead = sSocket->receive(cookie->socket, NULL, buffer, *_length, 0);
+	ssize_t bytesRead = sSocket->receive(cookie->socket, NULL, buffer, *_length,
+		0);
 	if (bytesRead < 0) {
 		*_length = 0;
 		return bytesRead;
@@ -609,7 +620,8 @@ net_stack_readv(void *_cookie, off_t /*offset*/, const struct iovec *vecs,
 
 
 static status_t
-net_stack_write(void *_cookie, off_t /*offset*/, const void *buffer, size_t *_length)
+net_stack_write(void *_cookie, off_t /*offset*/, const void *buffer,
+	size_t *_length)
 {
 	net_stack_cookie *cookie = (net_stack_cookie *)_cookie;
 
@@ -618,7 +630,8 @@ net_stack_write(void *_cookie, off_t /*offset*/, const void *buffer, size_t *_le
 	if (cookie->socket == NULL)
 		return B_BAD_VALUE;
 
-	ssize_t bytesWritten = sSocket->send(cookie->socket, NULL, buffer, *_length, 0);
+	ssize_t bytesWritten = sSocket->send(cookie->socket, NULL, buffer, *_length,
+		0);
 	if (bytesWritten < 0) {
 		*_length = 0;
 		return bytesWritten;
