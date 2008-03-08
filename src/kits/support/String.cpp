@@ -1797,7 +1797,7 @@ BString::_IsShareable()
 void
 BString::_FreePrivateData()
 {
-	free(fPrivateData - (2 * sizeof(int32)));
+	free(fPrivateData - kPrivateDataOffset);
 }
 
 
