@@ -30,6 +30,7 @@ extern "C" {
 		const char* name, const char* value);
 	int getusername(char *user, size_t bufferLength);
 	int getpassword(char *password, size_t bufferLength);
+	char *_netconfig_find(const char *heaading, const char *name, char *value, int nbytes);
 }
 
 
@@ -117,4 +118,10 @@ getpassword(char *password, size_t length)
 		return B_ERROR;
 
 	return strlen(password);
+}
+
+char *
+_netconfig_find(const char *heading, const char *name, char *value, int nbytes)
+{
+	return find_net_setting(NULL, heading, name, value, nbytes);
 }
