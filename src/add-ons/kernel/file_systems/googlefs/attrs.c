@@ -201,10 +201,10 @@ struct attr_entry text_attrs[] = {
 char *readmestr = \
 "Welcome to the Google™ FileSystem for BeOS™, Zeta™ and Haiku™.\n"
 "Copyright© 2004, 2005, François Revol.\n"
-"Google is a trademark of Google,Inc.\n"
-"BeOS is a trademark of PalmSource.\n"
+"Google is a trademark of Google, Inc.\n"
+"BeOS is a trademark of ACCESS.\n"
 "Zeta is a trademark of yellowTAB GmbH.\n"
-"Haiku is a trademark of Haiku Inc.\n"
+"Haiku is a trademark of Haiku, Inc.\n"
 "\n"
 "Use \"Search Google\" query template in this folder to ask google anything.\n"
 "\n";
@@ -215,10 +215,10 @@ struct attr_entry mailto_me_bookmark_attrs[] = {
 { "META:name", 'CSTR', SZSTR("François Revol") },
 { "META:country", 'CSTR', SZSTR("France") },
 { "META:nickname", 'CSTR', SZSTR("mmu_man") },
-{ "META:company", 'CSTR', SZSTR("yellowTAB GmbH") },
-{ "META:url", 'CSTR', SZSTR("") },
+//{ "META:company", 'CSTR', SZSTR("yellowTAB GmbH") },
+{ "META:url", 'CSTR', SZSTR("http://revolf.free.fr/") },
 { "META:group", 'CSTR', SZSTR("") },
-{ "IM:connections", 'CSTR', SZSTR("icq:77792625") },
+{ "IM:connections", 'CSTR', SZSTR("icq:77792625;gtalk:revolf@gmail.com;yahoo:mmu_man;msn:revol@mail.com") },
 #if 0
 { "BEOS:TYPE", /*B_MIME_STRING_TYPE*/'MIMS', SZSTR("application/x-vnd.Be-bookmark") },
 { "META:title", 'CSTR', SZSTR("Report googlefs bugs") },
