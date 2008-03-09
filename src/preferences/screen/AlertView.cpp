@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -26,8 +26,8 @@
 
 AlertView::AlertView(BRect frame, char *name)
 	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
-	// we will wait 8 seconds until we send a message
-	fSeconds(8)
+	// we will wait 12 seconds until we send a message
+	fSeconds(12)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fBitmap = InitIcon();
