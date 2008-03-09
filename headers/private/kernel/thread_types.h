@@ -80,6 +80,7 @@ struct process_group {
 	struct process_group *next;		// next in hash
 	struct process_session *session;
 	pid_t				id;
+	int32				refs;
 	struct team			*teams;
 	bool				orphaned;
 };
@@ -115,6 +116,7 @@ typedef struct job_control_entry job_control_entry;
 struct job_control_entry : DoublyLinkedListLinkImpl<job_control_entry> {
 	job_control_state	state;		// current team job control state
 	thread_id			thread;		// main thread ID == team ID
+	bool				has_group_ref;
 
 	// valid while state != JOB_CONTROL_STATE_DEAD
 	struct team*		team;
@@ -124,6 +126,13 @@ struct job_control_entry : DoublyLinkedListLinkImpl<job_control_entry> {
 	status_t			status;
 	uint16				reason;
 	uint16				signal;
+
+	job_control_entry();
+	~job_control_entry();
+
+	void InitDeadState();
+
+	job_control_entry& operator=(const job_control_entry& other);
 };
 
 typedef DoublyLinkedList<job_control_entry> JobControlEntryList;

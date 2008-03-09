@@ -1192,7 +1192,6 @@ thread_exit(void)
 {
 	cpu_status state;
 	struct thread *thread = thread_get_current_thread();
-	struct process_group *freeGroup = NULL;
 	struct team *team = thread->team;
 	thread_id parentID = -1;
 	bool deleteTeam = false;
@@ -1261,12 +1260,7 @@ thread_exit(void)
 			team->job_control_entry = NULL;
 
 			if (death != NULL) {
-				death->team = NULL;
-				death->group_id = team->group_id;
-				death->thread = thread->id;
-				death->status = thread->exit.status;
-				death->reason = thread->exit.reason;
-				death->signal = thread->exit.signal;
+				death->InitDeadState();
 
 				// team_set_job_control_state() already moved our entry
 				// into the parent's list. We just check the soft limit of
@@ -1281,7 +1275,7 @@ thread_exit(void)
 			} else
 				RELEASE_THREAD_LOCK();
 
-			team_remove_team(team, &freeGroup);
+			team_remove_team(team);
 
 			send_signal_etc(parentID, SIGCHLD,
 				SIGNAL_FLAG_TEAMS_LOCKED | B_DO_NOT_RESCHEDULE);
@@ -1324,15 +1318,6 @@ thread_exit(void)
 
 	// delete the team if we're its main thread
 	if (deleteTeam) {
-		// TODO: Deleting the process group is actually a problem. According to
-		// the POSIX standard the process should become a zombie and live on
-		// until it is reaped. Hence the process group would continue to exist
-		// for that time as well. That is moving processes to it (setpgid())
-		// should work. This can actually happen e.g. when executing something
-		// like "echo foobar | wc" in the shell. The built-in "echo" could
-		// exit() even before setpgid() has been invoked for the "wc" child.
-		// Cf. bug #1799.
-		team_delete_process_group(freeGroup);
 		team_delete_team(team);
 
 		// we need to delete any death entry that made it to here

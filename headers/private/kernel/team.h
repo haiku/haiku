@@ -17,7 +17,7 @@ status_t team_init(struct kernel_args *args);
 team_id team_create_team(const char *path, const char *name, char **args,
 			int argc, char **envp, int envc, int priority);
 status_t wait_for_team(team_id id, status_t *returnCode);
-void team_remove_team(struct team *team, struct process_group **_freeGroup);
+void team_remove_team(struct team *team);
 void team_delete_team(struct team *team);
 struct process_group *team_get_process_group_locked(
 			struct process_session *session, pid_t id);

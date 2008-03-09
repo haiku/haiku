@@ -19,6 +19,7 @@
 
 #include <elf.h>
 #include <file_cache.h>
+#include <heap.h>
 #include <int.h>
 #include <kernel.h>
 #include <kimage.h>
@@ -620,29 +621,21 @@ is_process_group_leader(struct team *team)
 }
 
 
-/*!	You must hold the team lock when calling this function. */
 static void
-insert_group_into_session(struct process_session *session, struct process_group *group)
+deferred_delete_process_group(struct process_group *group)
 {
 	if (group == NULL)
 		return;
 
-	group->session = session;
-	hash_insert(sGroupHash, group);
-	session->group_count++;
-}
+	// remove_group_from_session() keeps this pointer around
+	// only if the session can be freed as well
+	if (group->session) {
+		TRACE(("deferred_delete_process_group(): frees session %ld\n",
+			group->session->id));
+		deferred_free(group->session);
+	}
 
-
-/*!	You must hold the team lock when calling this function. */
-static void
-insert_team_into_group(struct process_group *group, struct team *team)
-{
-	team->group = group;
-	team->group_id = group->id;
-	team->session_id = group->session->id;
-
-	team->group_next = group->teams;
-	group->teams = team;
+	deferred_free(group);
 }
 
 
@@ -668,22 +661,83 @@ remove_group_from_session(struct process_group *group)
 }
 
 
-/*!	Removes the team from the group. If that group becomes therefore
-	unused, it will set \a _freeGroup to point to the group - otherwise
-	it will be \c NULL.
-	It cannot be freed here because this function has to be called
-	with having the team lock held.
-
-	\param team the team that'll be removed from it's group
-	\param _freeGroup points to the group to be freed or NULL
+/*!	Team lock must be held.
 */
 static void
-remove_team_from_group(struct team *team, struct process_group **_freeGroup)
+acquire_process_group_ref(pid_t groupID)
+{
+	process_group* group = team_get_process_group_locked(NULL, groupID);
+	if (group == NULL) {
+		panic("acquire_process_group_ref(): unknown group ID: %ld", groupID);
+		return;
+	}
+
+	group->refs++;
+}
+
+
+/*!	Team lock must be held.
+*/
+static void
+release_process_group_ref(pid_t groupID)
+{
+	process_group* group = team_get_process_group_locked(NULL, groupID);
+	if (group == NULL) {
+		panic("release_process_group_ref(): unknown group ID: %ld", groupID);
+		return;
+	}
+
+	if (group->refs <= 0) {
+		panic("release_process_group_ref(%ld): ref count already 0", groupID);
+		return;
+	}
+
+	if (--group->refs > 0)
+		return;
+
+	// group is no longer used
+
+	remove_group_from_session(group);
+	deferred_delete_process_group(group);
+}
+
+
+/*!	You must hold the team lock when calling this function. */
+static void
+insert_group_into_session(struct process_session *session, struct process_group *group)
+{
+	if (group == NULL)
+		return;
+
+	group->session = session;
+	hash_insert(sGroupHash, group);
+	session->group_count++;
+}
+
+
+/*!	You must hold the team lock when calling this function. */
+static void
+insert_team_into_group(struct process_group *group, struct team *team)
+{
+	team->group = group;
+	team->group_id = group->id;
+	team->session_id = group->session->id;
+
+	team->group_next = group->teams;
+	group->teams = team;
+	acquire_process_group_ref(group->id);
+}
+
+
+/*!	Removes the team from the group.
+
+	\param team the team that'll be removed from it's group
+*/
+static void
+remove_team_from_group(struct team *team)
 {
 	struct process_group *group = team->group;
 	struct team *current, *last = NULL;
-
-	*_freeGroup = NULL;
 
 	// the team must be in any team to let this function have any effect
 	if  (group == NULL)
@@ -705,13 +759,7 @@ remove_team_from_group(struct team *team, struct process_group **_freeGroup)
 	team->group = NULL;
 	team->group_next = NULL;
 
-	if (group->teams != NULL)
-		return;
-
-	// we can remove this group as it is no longer used
-
-	remove_group_from_session(group);
-	*_freeGroup = group;
+	release_process_group_ref(group->id);
 }
 
 
@@ -723,6 +771,7 @@ create_process_group(pid_t id)
 		return NULL;
 
 	group->id = id;
+	group->refs = 0;
 	group->session = NULL;
 	group->teams = NULL;
 	group->orphaned = true;
@@ -1095,7 +1144,6 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 	char * const *env, int32 priority, uint32 flags,
 	port_id errorPort, uint32 errorToken, bool kernel)
 {
-	struct process_group *group;
 	struct team *team, *parent;
 	const char *threadName;
 	thread_id thread;
@@ -1221,14 +1269,13 @@ err1:
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	remove_team_from_group(team, &group);
+	remove_team_from_group(team);
 	remove_team_from_parent(parent, team);
 	hash_remove(sTeamHash, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	team_delete_process_group(group);
 	delete_team_struct(team);
 
 	return status;
@@ -1381,7 +1428,6 @@ fork_team(void)
 {
 	struct thread *parentThread = thread_get_current_thread();
 	struct team *parentTeam = parentThread->team, *team;
-	struct process_group *group = NULL;
 	struct fork_arg *forkArgs;
 	struct area_info info;
 	thread_id threadID;
@@ -1490,14 +1536,13 @@ err1:
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	remove_team_from_group(team, &group);
+	remove_team_from_group(team);
 	remove_team_from_parent(parentTeam, team);
 	hash_remove(sTeamHash, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	team_delete_process_group(group);
 	delete_team_struct(team);
 
 	return status;
@@ -1562,6 +1607,57 @@ get_job_control_entry(struct team* team, pid_t id, uint32 flags)
 		entry = get_job_control_entry(team->stopped_children, id);
 
 	return entry;
+}
+
+
+job_control_entry::job_control_entry()
+	:
+	has_group_ref(false)
+{
+}
+
+
+job_control_entry::~job_control_entry()
+{
+	if (has_group_ref) {
+		InterruptsSpinLocker locker(team_spinlock);
+		release_process_group_ref(group_id);
+	}
+}
+
+
+/*!	Team and thread lock must be held.
+*/
+void
+job_control_entry::InitDeadState()
+{
+	if (team != NULL) {
+		struct thread* thread = team->main_thread;
+		group_id = team->group_id;
+		this->thread = thread->id;
+		status = thread->exit.status;
+		reason = thread->exit.reason;
+		signal = thread->exit.signal;
+		team = NULL;
+		acquire_process_group_ref(group_id);
+		has_group_ref = true;
+	}
+}
+
+
+job_control_entry&
+job_control_entry::operator=(const job_control_entry& other)
+{
+	state = other.state;
+	thread = other.thread;
+	has_group_ref = false;
+	team = other.team;
+	group_id = other.group_id;
+	status = other.status;
+	reason = other.reason;
+	signal = other.signal;
+
+	return *this;
 }
 
 
@@ -2041,11 +2137,9 @@ team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 /*!	Removes the specified team from the global team hash, and from its parent.
 	It also moves all of its children up to the parent.
 	You must hold the team lock when you call this function.
-	If \a _freeGroup is set to a value other than \c NULL, it must be freed
-	from the calling function.
 */
 void
-team_remove_team(struct team *team, struct process_group **_freeGroup)
+team_remove_team(struct team *team)
 {
 	struct team *parent = team->parent;
 
@@ -2109,7 +2203,7 @@ team_remove_team(struct team *team, struct process_group **_freeGroup)
 	reparent_children(team);
 
 	// remove us from our process group
-	remove_team_from_group(team, _freeGroup);
+	remove_team_from_group(team);
 
 	// remove us from our parent
 	remove_team_from_parent(parent, team);
@@ -2870,7 +2964,6 @@ _user_setpgid(pid_t processID, pid_t groupID)
 
 	status_t status = B_OK;
 	struct process_group *freeGroup = NULL;
-	struct process_group *freeGroup2 = NULL;
 
 	InterruptsSpinLocker locker(team_spinlock);
 
@@ -2893,7 +2986,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 			if (targetGroup != NULL) {
 				// In case of processID == groupID we have to free the
 				// allocated group.
-				freeGroup2 = group;
+				freeGroup = group;
 			} else if (processID == groupID) {
 				// We created a new process group, let us insert it into the
 				// team's session.
@@ -2905,7 +2998,7 @@ _user_setpgid(pid_t processID, pid_t groupID)
 				// we got a group, let's move the team there
 				process_group* oldGroup = team->group;
 
-				remove_team_from_group(team, &freeGroup);
+				remove_team_from_group(team);
 				insert_team_into_group(targetGroup, team);
 
 				// Update the "orphaned" flag of all potentially affected
@@ -2953,7 +3046,6 @@ _user_setpgid(pid_t processID, pid_t groupID)
 	}
 
 	team_delete_process_group(freeGroup);
-	team_delete_process_group(freeGroup2);
 
 	return status == B_OK ? groupID : status;
 }
@@ -2964,7 +3056,7 @@ _user_setsid(void)
 {
 	struct team *team = thread_get_current_thread()->team;
 	struct process_session *session;
-	struct process_group *group, *freeGroup = NULL;
+	struct process_group *group;
 	cpu_status state;
 	bool failed = false;
 
@@ -2987,7 +3079,7 @@ _user_setsid(void)
 
 	// this may have changed since the check above
 	if (!is_process_group_leader(team)) {
-		remove_team_from_group(team, &freeGroup);
+		remove_team_from_group(team);
 
 		insert_group_into_session(session, group);
 		insert_team_into_group(group, team);
@@ -3001,8 +3093,7 @@ _user_setsid(void)
 		team_delete_process_group(group);
 		free(session);
 		return B_NOT_ALLOWED;
-	} else
-		team_delete_process_group(freeGroup);
+	}
 
 	return team->group_id;
 }
