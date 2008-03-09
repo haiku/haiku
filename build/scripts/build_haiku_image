@@ -116,11 +116,13 @@ if [ $isImage ]; then
 		if [ ! -e $imagePath -o ! "$dontClearImage" ]; then
 			dd if=/dev/zero of=$imagePath bs=1048576 count=$imageSize $ddFlags
 		fi
-		$bfsShell --initialize $imageOffsetFlags $imagePath Haiku
+		$bfsShell --initialize $imageOffsetFlags $imagePath Haiku || exit 1
 		$makebootable $imageOffsetFlags $imagePath
 	fi
 	$bfsShell -n $imageOffsetFlags $imagePath > /dev/null &
 	sleep 1
+	# bail out, if mounting fails
+	$cd . || exit 1
 fi
 
 # create BEOS:APP_SIG index -- needed to launch apps via signature
