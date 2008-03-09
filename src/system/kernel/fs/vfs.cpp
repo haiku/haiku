@@ -3792,6 +3792,9 @@ vfs_new_io_context(void *_parentContext)
 				context->num_used_fds++;
 				atomic_add(&descriptor->ref_count, 1);
 				atomic_add(&descriptor->open_count, 1);
+
+				if (fd_close_on_exec(parentContext, i))
+					fd_set_close_on_exec(context, i, true);
 			}
 		}
 
