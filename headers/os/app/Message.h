@@ -257,7 +257,7 @@ class BMessage {
 		friend class Private;
 		friend class BMessageQueue;
 
-		status_t		_InitCommon();
+		status_t		_InitCommon(bool initHeader);
 		status_t		_InitHeader();
 		status_t		_Clear();
 
@@ -284,14 +284,13 @@ class BMessage {
 		message_header*	fHeader;
 		field_header*	fFields;
 		uint8*			fData;
-		area_id			fClonedArea;
 
 		mutable	BMessage* fOriginal;
 
 		BMessage*		fQueueLink;
 			// fQueueLink is used by BMessageQueue to build a linked list
 
-		uint32			fReserved[10];
+		uint32			fReserved[11];
 
 						// deprecated
 						BMessage(BMessage *message);

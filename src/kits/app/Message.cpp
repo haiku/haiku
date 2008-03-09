@@ -100,6 +100,9 @@ handle_reply(port_id replyPort, int32 *_code, bigtime_t timeout,
 
 	status_t result;
 	char *buffer = (char *)malloc(size);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
 	do {
 		result = read_port(replyPort, _code, buffer, size);
 	} while (result == B_INTERRUPTED);
@@ -121,14 +124,14 @@ handle_reply(port_id replyPort, int32 *_code, bigtime_t timeout,
 BMessage::BMessage()
 {
 	DEBUG_FUNCTION_ENTER;
-	_InitCommon();
+	_InitCommon(true);
 }
 
 
 BMessage::BMessage(BMessage *other)
 {
 	DEBUG_FUNCTION_ENTER;
-	_InitCommon();
+	_InitCommon(false);
 	*this = *other;
 }
 
@@ -136,7 +139,7 @@ BMessage::BMessage(BMessage *other)
 BMessage::BMessage(uint32 _what)
 {
 	DEBUG_FUNCTION_ENTER;
-	_InitCommon();
+	_InitCommon(true);
 	fHeader->what = what = _what;
 }
 
@@ -144,7 +147,7 @@ BMessage::BMessage(uint32 _what)
 BMessage::BMessage(const BMessage &other)
 {
 	DEBUG_FUNCTION_ENTER;
-	_InitCommon();
+	_InitCommon(false);
 	*this = other;
 }
 
@@ -152,7 +155,6 @@ BMessage::BMessage(const BMessage &other)
 BMessage::~BMessage()
 {
 	DEBUG_FUNCTION_ENTER;
-
 	_Clear();
 }
 
@@ -184,7 +186,7 @@ BMessage::operator=(const BMessage &other)
 		memcpy(fData, other.fData, fHeader->data_size);
 	}
 
-	fHeader->shared_area = -1;
+	fHeader->message_area = -1;
 	fHeader->fields_available = 0;
 	fHeader->data_available = 0;
 	fHeader->what = what = other.what;
@@ -219,7 +221,7 @@ BMessage::operator delete(void *pointer, size_t size)
 
 
 status_t
-BMessage::_InitCommon()
+BMessage::_InitCommon(bool initHeader)
 {
 	DEBUG_FUNCTION_ENTER;
 	what = 0;
@@ -228,12 +230,14 @@ BMessage::_InitCommon()
 	fFields = NULL;
 	fData = NULL;
 
-	fClonedArea = -1;
-
 	fOriginal = NULL;
 	fQueueLink = NULL;
 
-	return _InitHeader();
+	if (initHeader)
+		return _InitHeader();
+
+	fHeader = NULL;
+	return B_OK;
 }
 
 
@@ -248,7 +252,7 @@ BMessage::_InitHeader()
 	fHeader->flags = MESSAGE_FLAG_VALID;
 	fHeader->what = what;
 	fHeader->current_specifier = -1;
-	fHeader->shared_area = -1;
+	fHeader->message_area = -1;
 
 	fHeader->target = B_NULL_TOKEN;
 	fHeader->reply_target = B_NULL_TOKEN;
@@ -266,17 +270,20 @@ status_t
 BMessage::_Clear()
 {
 	DEBUG_FUNCTION_ENTER;
-	// We're going to destroy all information of this message. If there's
-	// still someone waiting for a reply to this message, we have to send
-	// one now.
-	if (IsSourceWaiting())
-		SendReply(B_NO_REPLY);
+	if (fHeader) {
+		// We're going to destroy all information of this message. If there's
+		// still someone waiting for a reply to this message, we have to send
+		// one now.
+		if (IsSourceWaiting())
+			SendReply(B_NO_REPLY);
 
-	if (fClonedArea >= B_OK)
-		_Dereference();
+		if (fHeader->message_area >= 0)
+			_Dereference();
 
-	free(fHeader);
-	fHeader = NULL;
+		free(fHeader);
+		fHeader = NULL;
+	}
+
 	free(fFields);
 	fFields = NULL;
 	free(fData);
@@ -561,7 +568,7 @@ BMessage::Rename(const char *oldEntry, const char *newEntry)
 	if (!oldEntry || !newEntry)
 		return B_BAD_VALUE;
 
-	if (fClonedArea >= B_OK)
+	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
 	uint32 hash = _HashName(oldEntry) % fHeader->hash_table_size;
@@ -926,6 +933,9 @@ BMessage::_FlattenToArea(message_header **_header) const
 {
 	DEBUG_FUNCTION_ENTER;
 	message_header *header = (message_header *)malloc(sizeof(message_header));
+	if (header == NULL)
+		return B_NO_MEMORY;
+
 	memcpy(header, fHeader, sizeof(message_header));
 
 	header->what = what;
@@ -934,7 +944,7 @@ BMessage::_FlattenToArea(message_header **_header) const
 	header->flags |= MESSAGE_FLAG_PASS_BY_AREA;
 	*_header = header;
 
-	if (header->shared_area >= B_OK)
+	if (header->message_area >= 0)
 		return B_OK;
 
 	if (header->fields_size == 0 && header->data_size == 0)
@@ -943,7 +953,7 @@ BMessage::_FlattenToArea(message_header **_header) const
 	uint8 *address = NULL;
 	ssize_t size = header->fields_size + header->data_size;
 	size = (size + B_PAGE_SIZE) & ~(B_PAGE_SIZE - 1);
-	area_id area = create_area("Shared BMessage data", (void **)&address,
+	area_id area = create_area("BMessage data", (void **)&address,
 		B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
 	if (area < B_OK) {
@@ -963,7 +973,7 @@ BMessage::_FlattenToArea(message_header **_header) const
 		header->data_checksum = BPrivate::CalculateChecksum((uint8 *)address, header->data_size);
 	}
 
-	header->shared_area = area;
+	header->message_area = area;
 	return B_OK;
 }
 
@@ -979,25 +989,37 @@ BMessage::_Reference(message_header *header)
 	if (fHeader->fields_size == 0 && header->data_size == 0)
 		return B_OK;
 
+	area_info areaInfo;
+	status_t result = get_area_info(fHeader->message_area, &areaInfo);
+	if (result < B_OK)
+		return result;
+
 	uint8 *address = NULL;
-	area_id clone = clone_area("Cloned BMessage data", (void **)&address,
-		B_ANY_ADDRESS, B_READ_AREA, fHeader->shared_area);
+	thread_info threadInfo;
+	get_thread_info(find_thread(NULL), &threadInfo);
+	if (areaInfo.team != threadInfo.team) {
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+		// we are accessing a message from a port not owned by us
+		area_id transfered = _kern_transfer_area(fHeader->message_area,
+			(void **)&address, B_ANY_ADDRESS, threadInfo.team);
+		if (transfered < 0) {
+			debug_printf("BMessage: failed to transfer area into current team\n");
+			return transfered;
+		}
 
-	if (clone < B_OK) {
-		free(fHeader);
-		fHeader = NULL;
-		_InitHeader();
-		return clone;
-	}
+		fHeader->message_area = transfered;
+#endif
+	} else
+		address = (uint8 *)areaInfo.address;
 
-	fClonedArea = clone;
 	fFields = (field_header *)address;
 	address += fHeader->fields_size;
 	fData = address;
 
+	// ToDo: once we fully trust this mechanism we might want to remove this
 	if (fHeader->fields_checksum != BPrivate::CalculateChecksum((uint8 *)fFields, fHeader->fields_size)
 		|| fHeader->data_checksum != BPrivate::CalculateChecksum((uint8 *)fData, fHeader->data_size)) {
-		debug_printf("checksum mismatch\n");
+		debug_printf("BMessage: checksum mismatch in message passed by area!\n");
 		_Clear();
 		_InitHeader();
 		return B_BAD_VALUE;
@@ -1011,8 +1033,8 @@ status_t
 BMessage::_Dereference()
 {
 	DEBUG_FUNCTION_ENTER;
-	delete_area(fClonedArea);
-	fClonedArea = -1;
+	delete_area(fHeader->message_area);
+	fHeader->message_area = -1;
 	fFields = NULL;
 	fData = NULL;
 	return B_OK;
@@ -1023,19 +1045,25 @@ status_t
 BMessage::_CopyForWrite()
 {
 	DEBUG_FUNCTION_ENTER;
-	if (fClonedArea < B_OK)
-		return B_OK;
 
 	field_header *newFields = NULL;
 	uint8 *newData = NULL;
 
 	if (fHeader->fields_size > 0) {
 		newFields = (field_header *)malloc(fHeader->fields_size);
+		if (newFields == NULL)
+			return B_NO_MEMORY;
+
 		memcpy(newFields, fFields, fHeader->fields_size);
 	}
 
 	if (fHeader->data_size > 0) {
 		newData = (uint8 *)malloc(fHeader->data_size);
+		if (newData == NULL) {
+			free(newFields);
+			return B_NO_MEMORY;
+		}
+
 		memcpy(newData, fData, fHeader->data_size);
 	}
 
@@ -1089,7 +1117,7 @@ BMessage::Unflatten(const char *flatBuffer)
 		if (result < B_OK)
 			return result;
 	} else {
-		fHeader->shared_area = -1;
+		fHeader->message_area = -1;
 
 		if (fHeader->fields_size > 0) {
 			fFields = (field_header *)malloc(fHeader->fields_size);
@@ -1102,8 +1130,11 @@ BMessage::Unflatten(const char *flatBuffer)
 
 		if (fHeader->data_size > 0) {
 			fData = (uint8 *)malloc(fHeader->data_size);
-			if (!fData)
+			if (!fData) {
+				free(fFields);
+				fFields = NULL;
 				return B_NO_MEMORY;
+			}
 
 			memcpy(fData, flatBuffer, fHeader->data_size);
 		}
@@ -1156,7 +1187,7 @@ BMessage::Unflatten(BDataIO *stream)
 		if (result < B_OK)
 			return result;
 	} else {
-		fHeader->shared_area = -1;
+		fHeader->message_area = -1;
 
 		if (result == B_OK && fHeader->fields_size > 0) {
 			fFields = (field_header *)malloc(fHeader->fields_size);
@@ -1571,7 +1602,7 @@ BMessage::AddData(const char *name, type_code type, const void *data,
 	if (numBytes <= 0 || !data)
 		return B_BAD_VALUE;
 
-	if (fClonedArea >= B_OK)
+	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
 	field_header *field = NULL;
@@ -1628,7 +1659,7 @@ BMessage::RemoveData(const char *name, int32 index)
 	if (index < 0)
 		return B_BAD_VALUE;
 
-	if (fClonedArea >= B_OK)
+	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
 	field_header *field = NULL;
@@ -1679,7 +1710,7 @@ status_t
 BMessage::RemoveName(const char *name)
 {
 	DEBUG_FUNCTION_ENTER;
-	if (fClonedArea >= B_OK)
+	if (fHeader->message_area >= 0)
 		_CopyForWrite();
 
 	field_header *field = NULL;
@@ -1751,9 +1782,6 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 	if (numBytes <= 0 || !data)
 		return B_BAD_VALUE;
 
-	if (fClonedArea >= B_OK)
-		_CopyForWrite();
-
 	field_header *field = NULL;
 	status_t result = _FindField(name, type, &field);
 
@@ -1765,6 +1793,9 @@ BMessage::ReplaceData(const char *name, type_code type, int32 index,
 
 	if (index >= field->count)
 		return B_BAD_INDEX;
+
+	if (fHeader->message_area >= 0)
+		_CopyForWrite();
 
 	if (field->flags & FIELD_FLAG_FIXED_SIZE) {
 		ssize_t size = field->data_size / field->count;
@@ -1885,7 +1916,7 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	ssize_t size = 0;
 	char *buffer = NULL;
 	message_header *header = NULL;
-	status_t result;
+	status_t result = B_OK;
 
 	BPrivate::BDirectMessageTarget* direct = NULL;
 	BMessage* copy = NULL;
@@ -1900,37 +1931,55 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		if (copy != NULL) {
 			header = copy->fHeader;
 			header->flags = fHeader->flags;
-			result = B_OK;
 		} else {
 			direct->Release();
-			result = B_NO_MEMORY;
+			return B_NO_MEMORY;
 		}
-	} else if (/*fHeader->fields_size + fHeader->data_size > B_PAGE_SIZE*/false) {
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+	} else if (fHeader->fields_size + fHeader->data_size > B_PAGE_SIZE * 10) {
+		// ToDo: bind the above size to the max port message size
+		// use message passing by area for such a large message
 		result = _FlattenToArea(&header);
+		if (result < B_OK)
+			return result;
+
 		buffer = (char *)header;
 		size = sizeof(message_header);
 
-#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
-		// TODO: this is not yet finished - the target needs to get the
-		// address (and ID) of the area
-		port_info info;
-		get_port_info(port, &info);
+		team_id target = portOwner;
+		if (target < 0) {
+			port_info info;
+			result = get_port_info(port, &info);
+			if (result < B_OK)
+				return result;
+			target = info.team;
+		}
+
 		void *address = NULL;
-		_kern_transfer_area(header->shared_area, &address, B_ANY_ADDRESS,
-			info.team);
+		area_id transfered = _kern_transfer_area(header->message_area,
+			&address, B_ANY_ADDRESS, target);
+		if (transfered < B_OK) {
+			delete_area(header->message_area);
+			free(header);
+			return transfered;
+		}
+
+		header->message_area = transfered;
 #endif
 	} else {
 		size = _NativeFlattenedSize();
 		buffer = (char *)malloc(size);
-		if (buffer != NULL) {
-			result = _NativeFlatten(buffer, size);
-			header = (message_header *)buffer;
-		} else
-			result = B_NO_MEMORY;
-	}
+		if (buffer == NULL)
+			return B_NO_MEMORY;
 
-	if (result < B_OK)
-		return result;
+		result = _NativeFlatten(buffer, size);
+		if (result < B_OK) {
+			free(buffer);
+			return result;
+		}
+
+		header = (message_header *)buffer;
+	}
 
 	if (!replyTo.IsValid()) {
 		BMessenger::Private(replyTo).SetTo(fHeader->reply_team,

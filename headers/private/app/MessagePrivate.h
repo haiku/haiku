@@ -68,7 +68,7 @@ struct BMessage::message_header {
 
 	int32		target;
 	int32		current_specifier;
-	area_id		shared_area;
+	area_id		message_area;
 
 	// reply info
 	port_id		reply_port;
