@@ -19,6 +19,8 @@
 #include <team.h>
 #include <thread.h>
 #include <tracing.h>
+#include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
 #include <vm.h>
 
 //#define TRACE_HEAP
@@ -81,12 +83,20 @@ typedef struct heap_allocator_s {
 	heap_allocator_s *	next;
 } heap_allocator;
 
+struct DeferredFreeListEntry : DoublyLinkedListLinkImpl<DeferredFreeListEntry> {
+};
+typedef DoublyLinkedList<DeferredFreeListEntry> DeferredFreeList;
+
 static heap_allocator *sHeapList = NULL;
 static heap_allocator *sLastGrowRequest = NULL;
 static heap_allocator *sGrowHeap = NULL;
 static thread_id sHeapGrowThread = -1;
 static sem_id sHeapGrowSem = -1;
 static sem_id sHeapGrownNotify = -1;
+
+static DeferredFreeList sDeferredFreeList;
+static spinlock sDeferredFreeListLock;
+
 
 
 // #pragma mark - Tracing
@@ -962,6 +972,25 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 }
 
 
+static void
+deferred_deleter(void *arg, int iteration)
+{
+	// move entries to on-stack list
+	InterruptsSpinLocker locker(sDeferredFreeListLock);
+	if (sDeferredFreeList.IsEmpty())
+		return;
+
+	DeferredFreeList entries;
+	entries.MoveFrom(&sDeferredFreeList);
+
+	locker.Unlock();
+
+	// free the entries
+	while (DeferredFreeListEntry* entry = entries.RemoveHead())
+		free(entry);
+}
+
+
 //	#pragma mark -
 
 
@@ -1091,6 +1120,9 @@ heap_init_post_thread()
 		delete_area(area);
 		return sHeapGrowThread;
 	}
+
+	if (register_kernel_daemon(deferred_deleter, NULL, 50) != B_OK)
+		panic("heap_init_post_thread(): failed to init deferred deleter");
 
 	send_signal_etc(sHeapGrowThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 	return B_OK;
@@ -1235,4 +1267,18 @@ calloc(size_t numElements, size_t size)
 		memset(address, 0, numElements * size);
 
 	return address;
+}
+
+
+void
+deferred_free(void* block)
+{
+	if (block == NULL)
+		return;
+
+	// TODO: Use SinglyLinkedList, so that we only need sizeof(void*).
+	DeferredFreeListEntry* entry = new(block) DeferredFreeListEntry;
+
+	InterruptsSpinLocker _(sDeferredFreeListLock);
+	sDeferredFreeList.Add(entry);
 }
