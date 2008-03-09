@@ -4978,113 +4978,26 @@ resize_area(area_id areaID, size_t newSize)
  *	only accessible using the _kern_transfer_area() syscall.
  */
 
-static status_t
+static area_id
 transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 {
-	// TODO: implement like clone_area(), just atomically (ie. hand out a new area ID)!
-	return B_ERROR;
-#if 0
-	vm_address_space *sourceAddressSpace;
-	vm_address_space *targetAddressSpace;
-	void *reservedAddress = NULL;
-	vm_area *reserved;
-	vm_area *area = vm_get_area(id);
-	if (area == NULL)
-		return B_BAD_VALUE;
-
-	// ToDo: check if the current team owns the area
-	status_t status = team_get_address_space(target, &targetAddressSpace);
-	if (status != B_OK)
-		goto err1;
-
-	// We will first remove the area, and then reserve its former
-	// address range so that we can later reclaim it if the
-	// transfer failed.
-
-	sourceAddressSpace = area->address_space;
-	reserved = create_reserved_area_struct(sourceAddressSpace, 0);
-	if (reserved == NULL) {
-		status = B_NO_MEMORY;
-		goto err2;
-	}
-
-	acquire_sem_etc(sourceAddressSpace->sem, WRITE_COUNT, 0, 0);
-
-	// unmap the area in the source address space
-	vm_unmap_pages(area, area->base, area->size);
-
-	// TODO: there might be additional page faults at this point!
-
-	reservedAddress = (void *)area->base;
-	remove_area_from_address_space(sourceAddressSpace, area);
-	status = insert_area(sourceAddressSpace, &reservedAddress, B_EXACT_ADDRESS,
-		area->size, reserved);
-		// famous last words: this cannot fail :)
-
-	release_sem_etc(sourceAddressSpace->sem, WRITE_COUNT, 0);
-
-	if (status != B_OK)
-		goto err3;
-
-	// insert the area into the target address space
-
-	acquire_sem_etc(targetAddressSpace->sem, WRITE_COUNT, 0, 0);
-	// check to see if this address space has entered DELETE state
-	if (targetAddressSpace->state == VM_ASPACE_STATE_DELETION) {
-		// okay, someone is trying to delete this adress space now, so we can't
-		// insert the area, so back out
-		status = B_BAD_TEAM_ID;
-		goto err4;
-	}
-
-	status = insert_area(targetAddressSpace, _address, addressSpec, area->size, area);
+	area_info info;	
+	status_t status = get_area_info(id, &info);
 	if (status < B_OK)
-		goto err4;
+		return status;
 
-	// The area was successfully transferred to the new team when we got here
-	area->address_space = targetAddressSpace;
+	area_id clonedArea = vm_clone_area(target, info.name, _address,
+		addressSpec, info.protection, REGION_NO_PRIVATE_MAP, id);
+	if (clonedArea < B_OK)
+		return clonedArea;
 
-	// TODO: take area lock/wiring into account!
-
-	release_sem_etc(targetAddressSpace->sem, WRITE_COUNT, 0);
-
-	vm_unreserve_address_range(sourceAddressSpace->id, reservedAddress,
-		area->size);
-	vm_put_address_space(sourceAddressSpace);
-		// we keep the reference of the target address space for the
-		// area, so we only have to put the one from the source
-	vm_put_area(area);
-
-	return B_OK;
-
-err4:
-	release_sem_etc(targetAddressSpace->sem, WRITE_COUNT, 0);
-err3:
-	// insert the area again into the source address space
-	acquire_sem_etc(sourceAddressSpace->sem, WRITE_COUNT, 0, 0);
-	// check to see if this address space has entered DELETE state
-	if (sourceAddressSpace->state == VM_ASPACE_STATE_DELETION
-		|| insert_area(sourceAddressSpace, &reservedAddress, B_EXACT_ADDRESS,
-				area->size, area) != B_OK) {
-		// We can't insert the area anymore - we have to delete it manually
-		vm_cache *cache = vm_area_get_locked_cache(area);
-		atomic_add(&area->no_cache_change, 1);
-		vm_area_put_locked_cache(cache);
-
-		vm_cache_remove_area(cache, area);
-		vm_cache_release_ref(cache);
-		free(area->name);
-		free(area);
-		area = NULL;
+	status = vm_delete_area(info.team, id);
+	if (status < B_OK) {
+		vm_delete_area(target, clonedArea);
+		return status;
 	}
-	release_sem_etc(sourceAddressSpace->sem, WRITE_COUNT, 0);
-err2:
-	vm_put_address_space(targetAddressSpace);
-err1:
-	if (area != NULL)
-		vm_put_area(area);
-	return status;
-#endif
+
+	return clonedArea;
 }
 
 
@@ -5272,7 +5185,7 @@ _user_resize_area(area_id area, size_t newSize)
 }
 
 
-status_t
+area_id
 _user_transfer_area(area_id area, void **userAddress, uint32 addressSpec, team_id target)
 {
 	// filter out some unavailable values (for userland)
@@ -5287,14 +5200,14 @@ _user_transfer_area(area_id area, void **userAddress, uint32 addressSpec, team_i
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	status_t status = transfer_area(area, &address, addressSpec, target);
-	if (status < B_OK)
-		return status;
+	area_id newArea = transfer_area(area, &address, addressSpec, target);
+	if (newArea < B_OK)
+		return newArea;
 
 	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return status;
+	return newArea;
 }
 
 

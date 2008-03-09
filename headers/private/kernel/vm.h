@@ -149,7 +149,7 @@ area_id _user_find_area(const char *name);
 status_t _user_get_area_info(area_id area, area_info *info);
 status_t _user_get_next_area_info(team_id team, int32 *cookie, area_info *info);
 status_t _user_resize_area(area_id area, size_t newSize);
-status_t _user_transfer_area(area_id area, void **_address, uint32 addressSpec, 
+area_id _user_transfer_area(area_id area, void **_address, uint32 addressSpec, 
 			team_id target);
 status_t _user_set_area_protection(area_id area, uint32 newProtection);
 area_id _user_clone_area(const char *name, void **_address, uint32 addressSpec, 
