@@ -40,7 +40,7 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 
 	PRINT((CH "(%p, %d), IB: %d" CT, buffer, size, IB.BufferLength()));
 
-	if (l < fMinFrameSize + fSkipSOFTags + fSkipEOFTags)
+	if (l < (int)(fMinFrameSize + fSkipSOFTags + fSkipEOFTags))
 		return size; // not enough data anyway
 
 	if (!fCurrentFrame) {
@@ -53,9 +53,9 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 		}
 	}
 
-	for (s = 0; (l - s > fMinFrameSize) && ((i = FindSOF(b + s, l - fMinFrameSize - s, &which)) > -1); s++) {
+	for (s = 0; (l - s > (int)fMinFrameSize) && ((i = FindSOF(b + s, l - fMinFrameSize - s, &which)) > -1); s++) {
 		s += i;
-		if (s + fSkipSOFTags + fMinFrameSize + fSkipEOFTags > l)
+		if ((int)(s + fSkipSOFTags + fMinFrameSize + fSkipEOFTags) > l)
 			break;
 		if (!fDevice->ValidateStartOfFrameTag(b + s, fSkipSOFTags))
 			continue;
@@ -64,7 +64,7 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 		PRINT((CH ": SOF: ... %02x %02x %02x %02x %02x %02x" CT, b[s+6], b[s+7], b[s+8], b[s+9], b[s+10], b[s+11]));
 		
 		for (e = s + fSkipSOFTags + fMinFrameSize;
-			 ((e <= s + fSkipSOFTags + fMaxFrameSize) && 
+			 ((e <= (int)(s + fSkipSOFTags + fMaxFrameSize)) && 
 			  (e < l) && ((i = 0*FindEOF(b + e, l - e, &which)) > -1)); 
 			 e++) {
 			e += i;
@@ -115,6 +115,6 @@ CamBufferingDeframer::DiscardFromInput(size_t size)
 	IB.Seek(0LL, SEEK_SET);
 	IB.SetSize(0);
 	fInputBuffIndex = next;
-	
+	return size;
 }
 

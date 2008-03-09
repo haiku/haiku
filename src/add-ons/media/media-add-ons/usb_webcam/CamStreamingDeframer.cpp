@@ -115,7 +115,7 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 		}
 		PRINT((CH ": checking for EOF; bufsize=%d i=%d" CT, bufsize, i));
 		
-		if (i + fSkipEOFTags > bufsize) { // not enough room to check for EOF, leave it for next time
+		if (i + (int)fSkipEOFTags > bufsize) { // not enough room to check for EOF, leave it for next time
 			end = i;
 			i = -1; // don't detach yet
 		} else {

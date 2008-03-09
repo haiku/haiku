@@ -62,7 +62,7 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	const BUSBConfiguration *config = GetDevice()->ConfigurationAt(0);
 	if (config) {
 		const BUSBInterface *inter = config->InterfaceAt(0);
-		int i;
+		uint32 i;
 		
 		GetDevice()->SetConfiguration(config);
 
@@ -228,7 +228,6 @@ ssize_t
 SonixCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
 	status_t err;
-	uint8 status;
 	uint8 buffer[8];
 	if (!Sensor())
 		return B_NO_INIT;
@@ -265,7 +264,6 @@ ssize_t
 SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 {
 	status_t err, lasterr = B_OK;
-	uint8 status;
 	uint8 buffer[8];
 	if (!Sensor())
 		return B_NO_INIT;
@@ -431,8 +429,8 @@ SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp /* = NULL */)
 		return err;
 	PRINT((CH ": VideoFrame = %fx%f,%fx%f" CT, VideoFrame().left, VideoFrame().top, VideoFrame().right, VideoFrame().bottom));
 	
-	long int w = VideoFrame().right - VideoFrame().left + 1;
-	long int h = VideoFrame().bottom - VideoFrame().top + 1;
+	long int w = (long)(VideoFrame().right - VideoFrame().left + 1);
+	long int h = (long)(VideoFrame().bottom - VideoFrame().top + 1);
 	b = new BBitmap(VideoFrame().OffsetToSelf(0,0), 0, B_RGB32, w*4);
 	PRINT((CH ": Frame: %dx%d" CT, w, h));
 	
@@ -462,17 +460,17 @@ SonixCamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 	if (err < B_OK)
 		return err;
 
-	long int w = VideoFrame().right - VideoFrame().left + 1;
-	long int h = VideoFrame().bottom - VideoFrame().top + 1;
+	long int w = (long)(VideoFrame().right - VideoFrame().left + 1);
+	long int h = (long)(VideoFrame().bottom - VideoFrame().top + 1);
 	PRINT((CH ": VideoFrame = %fx%f,%fx%f Frame: %dx%d" CT, VideoFrame().left, VideoFrame().top, VideoFrame().right, VideoFrame().bottom, w, h));
 	
-	if (buffer->SizeAvailable() >= w*h*4)
+	if (buffer->SizeAvailable() >= (size_t)w*h*4)
 		bayer2rgb32le((unsigned char *)buffer->Data(), (unsigned char *)f->Buffer(), w, h);
 	
 	delete f;
 	
 	PRINT((CH ": available %d, required %d" CT, buffer->SizeAvailable(), w*h*4));
-	if (buffer->SizeAvailable() < w*h*4)
+	if (buffer->SizeAvailable() < (size_t)w*h*4)
 		return E2BIG;
 	PRINT((CH ": got 1 frame (len %d)" CT, buffer->SizeUsed()));
 	return B_OK;

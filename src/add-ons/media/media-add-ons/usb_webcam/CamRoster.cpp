@@ -61,7 +61,7 @@ void
 CamRoster::DeviceRemoved(BUSBDevice* _device)
 {
 	PRINT((CH "()" CT));
-	for(uint32 i = 0; i < fCameras.CountItems(); ++i)
+	for(int32 i = 0; i < fCameras.CountItems(); ++i)
 	{
 		CamDevice* cam = (CamDevice *)fCameras.ItemAt(i);
 		if( cam->Matches(_device) )

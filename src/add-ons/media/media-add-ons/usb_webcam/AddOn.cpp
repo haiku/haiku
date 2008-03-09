@@ -109,7 +109,7 @@ WebCamMediaAddOn::InstantiateNodeFor(
 		return NULL;
 
 	fRoster->Lock();
-	for (int i = 0; i < fRoster->CountCameras(); i++) {
+	for (uint32 i = 0; i < fRoster->CountCameras(); i++) {
 		CamDevice *c;
 		c = fRoster->CameraAt(i);
 		PRINT((CH ": cam[%d]: %d, %s" CT, i, c->FlavorInfo()->internal_id, c->BrandName()));
@@ -147,6 +147,7 @@ WebCamMediaAddOn::CameraAdded(CamDevice* device)
 {
 	PRINT((CH "()" CT));
 	NotifyFlavorChange();
+	return B_OK;
 }
 
 status_t
@@ -154,6 +155,7 @@ WebCamMediaAddOn::CameraRemoved(CamDevice* device)
 {
 	PRINT((CH "()" CT));
 	NotifyFlavorChange();
+	return B_OK;
 }
 
 void

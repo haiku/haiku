@@ -762,8 +762,8 @@ VideoProducer::FrameGenerator()
 
 		// This is where we fill the video buffer.
 		
-		uint32 *p = (uint32 *)buffer->Data();
 #if 0
+		uint32 *p = (uint32 *)buffer->Data();
 		/* Fill in a pattern */
 		for (uint32 y=0;y<fConnectedFormat.display.line_count;y++)
 			for (uint32 x=0;x<fConnectedFormat.display.line_width;x++)

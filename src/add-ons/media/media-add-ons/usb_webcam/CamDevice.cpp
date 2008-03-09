@@ -29,12 +29,12 @@ struct { const char *name; SensorInstFunc instfunc; } kSensorTable[] = {
 // -----------------------------------------------------------------------------
 CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	: fInitStatus(B_NO_INIT),
+	  fSensor(NULL),
 	  fCamDeviceAddon(_addon),
 	  fDevice(_device),
 	  fSupportedDeviceIndex(-1),
 	  fTransferEnabled(false),
-	  fLocker("WebcamDeviceLock"),
-	  fSensor(NULL)
+	  fLocker("WebcamDeviceLock")
 {
 	// fill in the generic flavor
 	memset(&fFlavorInfo, 0, sizeof(fFlavorInfo));

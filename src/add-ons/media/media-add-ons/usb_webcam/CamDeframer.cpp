@@ -101,7 +101,6 @@ CamDeframer::WaitFrame(bigtime_t timeout)
 status_t
 CamDeframer::GetFrame(CamFrame **frame, bigtime_t *stamp)
 {
-	status_t err = EINTR;
 	PRINT((CH "()" CT));
 	BAutolock l(fLocker);
 	CamFrame *f = (CamFrame *)fFrames.RemoveItem((int32)0);
@@ -115,7 +114,6 @@ CamDeframer::GetFrame(CamFrame **frame, bigtime_t *stamp)
 status_t
 CamDeframer::DropFrame()
 {
-	status_t err = EINTR;
 	PRINT((CH "()" CT));
 	BAutolock l(fLocker);
 	CamFrame *f = (CamFrame *)fFrames.RemoveItem((int32)0);
@@ -161,7 +159,7 @@ int
 CamDeframer::FindTags(const uint8 *buf, size_t buflen, const uint8 **tags, int tagcount, size_t taglen, size_t skiplen, int *which)
 {
 	int i, t;
-	for (i = 0; i < buflen - skiplen + 1; i++) {
+	for (i = 0; i < (int)(buflen - skiplen + 1); i++) {
 		for (t = 0; t < tagcount; t++) {
 			if (!memcmp(buf+i, tags[t], taglen)) {
 				if (which)
