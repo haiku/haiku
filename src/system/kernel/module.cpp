@@ -16,6 +16,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <FindDirectory.h>
+
 #include <boot_device.h>
 #include <elf.h>
 #include <lock.h>
@@ -147,15 +149,16 @@ static recursive_lock sModulesLock;
 /* These are the standard base paths where we start to look for modules
  * to load. Order is important, the last entry here will be searched
  * first.
- * ToDo: these should probably be retrieved by using find_directory().
  */
-static const char * const sModulePaths[] = {
-	"/boot/beos/system/add-ons/kernel",
-	"/boot/home/config/add-ons/kernel",
+static const directory_which kModulePaths[] = {
+	B_BEOS_ADDONS_DIRECTORY,
+	B_COMMON_ADDONS_DIRECTORY,
+	B_USER_ADDONS_DIRECTORY,
 };
 
-#define NUM_MODULE_PATHS (sizeof(sModulePaths) / sizeof(sModulePaths[0]))
-#define FIRST_USER_MODULE_PATH (NUM_MODULE_PATHS - 1)	/* first user path */
+static const uint32 kNumModulePaths = sizeof(kModulePaths)
+	/ sizeof(kModulePaths[0]);
+static const uint32 kFirstNonSystemModulePath = 1;
 
 /* We store the loaded modules by directory path, and all known modules
  * by module name in a hash table for quick access
@@ -467,17 +470,26 @@ search_module(const char *name)
 
 	TRACE(("search_module(%s)\n", name));
 
-	for (i = 0; i < NUM_MODULE_PATHS; i++) {
-		char path[B_FILE_NAME_LENGTH];
-
-		if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
-			return NULL;
+	for (i = kNumModulePaths; i-- > 0;) {
+		if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
+			continue;
 
 		// let the VFS find that module for us
 
-		status = vfs_get_module_path(sModulePaths[i], name, path, sizeof(path));
+		KPath basePath;
+		if (find_directory(kModulePaths[i], gBootDevice, true,
+				basePath.LockBuffer(), basePath.BufferSize()) != B_OK)
+			continue;
+
+		basePath.UnlockBuffer();
+		basePath.Append("kernel");
+
+		KPath path;
+		status = vfs_get_module_path(basePath.Path(), name, path.LockBuffer(),
+			path.BufferSize());
 		if (status == B_OK) {
-			status = check_module_image(path, name);
+			path.UnlockBuffer();
+			status = check_module_image(path.Path(), name);
 			if (status == B_OK)
 				break;
 		}
@@ -1122,15 +1134,23 @@ open_module_list(const char *prefix)
 		iterator->loaded_modules = false;
 
 		// put all search paths on the stack
-		for (i = 0; i < NUM_MODULE_PATHS; i++) {
-			if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
+		for (i = 0; i < kNumModulePaths; i++) {
+			if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
 				break;
 
+			KPath pathBuffer;
+			if (find_directory(kModulePaths[i], gBootDevice, true,
+					pathBuffer.LockBuffer(), pathBuffer.BufferSize()) != B_OK)
+				continue;
+
+			pathBuffer.UnlockBuffer();
+			pathBuffer.Append("kernel");
+
 			// Copy base path onto the iterator stack
-			char *path = strdup(sModulePaths[i]);
+			char *path = strdup(pathBuffer.Path());
 			if (path == NULL)
 				continue;
-				
+
 			size_t length = strlen(path);
 
 			// TODO: it would currently be nicer to use the commented

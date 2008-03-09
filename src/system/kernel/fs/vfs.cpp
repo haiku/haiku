@@ -3304,6 +3304,7 @@ vfs_get_fs_node_from_path(dev_t mountID, const char *path, bool kernel,
 	\c B_ENTRY_NOT_FOUNT if no file could be found.
 	\a pathBuffer is clobbered in any case and must not be relied on if this
 	functions returns unsuccessfully.
+	\a basePath and \a pathBuffer must not point to the same space.
 */
 status_t
 vfs_get_module_path(const char *basePath, const char *moduleName,
@@ -3314,7 +3315,8 @@ vfs_get_module_path(const char *basePath, const char *moduleName,
 	size_t length;
 	char *path;
 
-	if (bufferSize == 0 || strlcpy(pathBuffer, basePath, bufferSize) >= bufferSize)
+	if (bufferSize == 0
+		|| strlcpy(pathBuffer, basePath, bufferSize) >= bufferSize)
 		return B_BUFFER_OVERFLOW;
 
 	status = path_to_vnode(pathBuffer, true, &dir, NULL, true);
