@@ -6,14 +6,16 @@
 
 #include <locale.h>
 #include <limits.h>
+#include <string.h>
 
 
 char *
 setlocale(int category, const char *locale)
 {
-	if (locale == NULL || !locale[0])
+	if (locale == NULL || !locale[0] || strcmp(locale, "C") == 0)
 		return "C";
 
-	// ToDo: this should check if liblocale.so is available and use its functions
+	// TODO: this should check if liblocale.so is available and use its
+	// functions.
 	return NULL;
 }
