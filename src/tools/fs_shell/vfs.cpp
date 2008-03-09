@@ -2587,6 +2587,49 @@ vfs_get_vnode_name(void *_vnode, char *name, fssh_size_t nameSize)
 }
 
 
+fssh_status_t
+vfs_entry_ref_to_path(fssh_dev_t device, fssh_ino_t inode, const char *leaf,
+	char *path, fssh_size_t pathLength)
+{
+	struct vnode *vnode;
+	fssh_status_t status;
+
+	// filter invalid leaf names
+	if (leaf != NULL && (leaf[0] == '\0' || fssh_strchr(leaf, '/')))
+		return FSSH_B_BAD_VALUE;
+
+	// get the vnode matching the dir's node_ref
+	if (leaf && (fssh_strcmp(leaf, ".") == 0 || fssh_strcmp(leaf, "..") == 0)) {
+		// special cases "." and "..": we can directly get the vnode of the
+		// referenced directory
+		status = entry_ref_to_vnode(device, inode, leaf, &vnode);
+		leaf = NULL;
+	} else
+		status = get_vnode(device, inode, &vnode, false);
+	if (status < FSSH_B_OK)
+		return status;
+
+	// get the directory path
+	status = dir_vnode_to_path(vnode, path, pathLength);
+	put_vnode(vnode);
+		// we don't need the vnode anymore
+	if (status < FSSH_B_OK)
+		return status;
+
+	// append the leaf name
+	if (leaf) {
+		// insert a directory separator if this is not the file system root
+		if ((fssh_strcmp(path, "/") && fssh_strlcat(path, "/", pathLength)
+				>= pathLength)
+			|| fssh_strlcat(path, leaf, pathLength) >= pathLength) {
+			return FSSH_B_NAME_TOO_LONG;
+		}
+	}
+
+	return FSSH_B_OK;
+}
+
+
 /**	If the given descriptor locked its vnode, that lock will be released.
  */
 
@@ -4283,6 +4326,48 @@ out:
 }
 
 
+/*!	ToDo: the query FS API is still the pretty much the same as in R5.
+		It would be nice if the FS would find some more kernel support
+		for them.
+		For example, query parsing should be moved into the kernel.
+*/
+static int
+query_open(fssh_dev_t device, const char *query, uint32_t flags,
+	fssh_port_id port, int32_t token, bool kernel)
+{
+	struct fs_mount *mount;
+	fssh_fs_cookie cookie;
+
+	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", device, query, kernel));
+
+	fssh_status_t status = get_mount(device, &mount);
+	if (status < FSSH_B_OK)
+		return status;
+
+	if (FS_MOUNT_CALL(mount, open_query) == NULL) {
+		status = FSSH_EOPNOTSUPP;
+		goto out;
+	}
+
+	status = FS_MOUNT_CALL(mount, open_query)(mount->cookie, query, flags, port, token, &cookie);
+	if (status < FSSH_B_OK)
+		goto out;
+
+	// get fd for the index directory
+	status = get_new_fd(FDTYPE_QUERY, mount, NULL, cookie, 0, kernel);
+	if (status >= 0)
+		goto out;
+
+	// something went wrong
+	FS_MOUNT_CALL(mount, close_query)(mount->cookie, cookie);
+	FS_MOUNT_CALL(mount, free_query_cookie)(mount->cookie, cookie);
+
+out:
+	put_mount(mount);
+	return status;
+}
+
+
 static fssh_status_t
 query_close(struct file_descriptor *descriptor)
 {
@@ -5501,5 +5586,22 @@ _kern_initialize_volume(const char* fsName, const char *partition,
 
 	return status;
 }
+
+
+fssh_status_t
+_kern_entry_ref_to_path(fssh_dev_t device, fssh_ino_t inode, const char *leaf,
+	char* path, fssh_size_t pathLength)
+{
+	return vfs_entry_ref_to_path(device, inode, leaf, path, pathLength);
+}
+
+
+int
+_kern_open_query(fssh_dev_t device, const char *query, fssh_size_t queryLength,
+	uint32_t flags, fssh_port_id port, int32_t token)
+{
+	return query_open(device, query, flags, port, token, false);
+}
+
 
 }	// namespace FSShell

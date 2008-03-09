@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -278,6 +278,87 @@ command_cd(int argc, const char* const* argv)
 }
 
 
+static bool
+get_permissions(const char* modeString, fssh_mode_t& _permissions)
+{
+	// currently only octal mode is supported
+	if (strlen(modeString) != 3)
+		return false;
+
+	fssh_mode_t permissions = 0;
+	for (int i = 0; i < 3; i++) {
+		char c = modeString[i];
+		if (c < '0' || c > '7')
+			return false;
+		permissions = (permissions << 3) | (c - '0');
+	}
+
+	_permissions = permissions;
+	return true;
+}
+
+
+static fssh_status_t
+command_chmod(int argc, const char* const* argv)
+{
+	bool recursive = false;
+
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
+
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Error: Invalid option \"-\"\n");
+			return FSSH_B_BAD_VALUE;
+		}
+
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'R':
+					recursive = true;
+					fprintf(stderr, "Sorry, recursive mode not supported "
+						"yet.\n");
+					return FSSH_B_BAD_VALUE;
+				default:
+					fprintf(stderr, "Error: Unknown option \"-%c\"\n", arg[i]);
+					return FSSH_B_BAD_VALUE;
+			}
+		}
+	}
+
+	// get mode
+	fssh_mode_t permissions;
+	if (argi + 1 >= argc || !get_permissions(argv[argi++], permissions)) {
+		printf("Usage: %s [ -R ] <octal mode> <file>...\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	fssh_struct_stat st;
+	st.fssh_st_mode = permissions;
+
+	// chmod loop
+	for (; argi < argc; argi++) {
+		const char *file = argv[argi];
+		if (strlen(file) == 0) {
+			fprintf(stderr, "Error: An empty path is not a valid argument!\n");
+			return FSSH_B_BAD_VALUE;
+		}
+
+		fssh_status_t error = _kern_write_stat(-1, file, false, &st, sizeof(st),
+			FSSH_FS_WRITE_STAT_MODE);
+		if (error != FSSH_B_OK) {
+			fprintf(stderr, "Error: Failed to change mode of \"%s\"!\n", file);
+			return error;
+		}
+	}
+
+	return FSSH_B_OK;
+}
+
+
 static fssh_status_t
 command_help(int argc, const char* const* argv)
 {
@@ -539,7 +620,6 @@ command_ls(int argc, const char* const* argv)
 					"%s\n", file, fd, fssh_strerror(error));
 				continue;
 			}
-
 		} else
 			list_entry(file);
 	}
@@ -667,6 +747,22 @@ command_mkdir(int argc, const char* const* argv)
 }
 
 
+static fssh_dev_t
+get_volume_id()
+{
+	struct fssh_stat st;
+	fssh_status_t error = _kern_read_stat(-1, kMountPoint, false, &st,
+		sizeof(st));
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Failed to stat() mount point: %s\n",
+			fssh_strerror(error));
+		return error;
+	}
+
+	return st.fssh_st_dev;
+}
+
+
 static fssh_status_t
 command_mkindex(int argc, const char* const* argv)
 {
@@ -677,18 +773,14 @@ command_mkindex(int argc, const char* const* argv)
 
 	const char* indexName = argv[1];
 
-	// get the device ID
-	struct fssh_stat st;
-	fssh_status_t error = _kern_read_stat(-1, kMountPoint, false, &st,
-		sizeof(st));
-	if (error != FSSH_B_OK) {
-		fprintf(stderr, "Error: Failed to stat() mount point: %s\n",
-			fssh_strerror(error));
-		return error;
-	}
+	// get the volume ID
+	fssh_dev_t volumeID = get_volume_id();
+	if (volumeID < 0)
+		return volumeID;
 	
 	// create the index
-	error =_kern_create_index(st.fssh_st_dev, indexName, FSSH_B_STRING_TYPE, 0);
+	fssh_status_t error =_kern_create_index(volumeID, indexName,
+		FSSH_B_STRING_TYPE, 0);
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "Error: Failed to create index \"%s\": %s\n",
 			indexName, fssh_strerror(error));
@@ -696,6 +788,61 @@ command_mkindex(int argc, const char* const* argv)
 	}
 
 	return FSSH_B_OK;
+}
+
+
+static fssh_status_t
+command_query(int argc, const char* const* argv)
+{
+	if (argc != 2) {
+		fprintf(stderr, "Usage: %s <query string>\n", argv[0]);
+		return FSSH_B_BAD_VALUE;
+	}
+
+	const char* query = argv[1];
+
+	// get the volume ID
+	fssh_dev_t volumeID = get_volume_id();
+	if (volumeID < 0)
+		return volumeID;
+	
+	// open query
+	int fd = _kern_open_query(volumeID, query, strlen(query), 0, -1, -1);
+	if (fd < 0) {
+		fprintf(stderr, "Error: Failed to open query: %s\n", fssh_strerror(fd));
+		return fd;
+	}
+
+	// iterate through the entries
+	fssh_status_t error = FSSH_B_OK;
+	char buffer[sizeof(fssh_dirent) + FSSH_B_FILE_NAME_LENGTH];
+	fssh_dirent* entry = (fssh_dirent*)buffer;
+	fssh_ssize_t entriesRead = 0;
+	while ((entriesRead = _kern_read_dir(fd, entry, sizeof(buffer), 1)) == 1) {
+		char path[FSSH_B_PATH_NAME_LENGTH];
+		error = _kern_entry_ref_to_path(volumeID, entry->d_pino, entry->d_name,
+			path, sizeof(path));
+		if (error == FSSH_B_OK) {
+			printf("  %s\n", path);
+		} else {
+			fprintf(stderr, "  failed to resolve entry (%8lld, \"%s\")\n",
+				entry->d_pino, entry->d_name);
+		}
+	}
+
+	if (entriesRead < 0) {
+		fprintf(stderr, "Error: reading query failed: %s\n",
+			fssh_strerror(entriesRead));
+	}
+
+	// close query
+	error = _kern_close(fd);
+	if (error != FSSH_B_OK) {
+		fprintf(stderr, "Error: Closing query (fd: %d) failed: %s\n",
+			fd, fssh_strerror(error));
+	}
+
+	return error;
 }
 
 
@@ -866,12 +1013,14 @@ register_commands()
 {
 	CommandManager::Default()->AddCommands(
 		command_cd,			"cd",			"change current directory",
+		command_chmod,		"chmod",		"change file permissions",
 		command_cp,			"cp",			"copy files and directories",
 		command_help,		"help",			"list supported commands",
 		command_ln,			"ln",			"create a hard or symbolic link",
 		command_ls,			"ls",			"list files or directories",
 		command_mkdir,		"mkdir",		"create directories",
 		command_mkindex,	"mkindex",		"create an index",
+		command_query,		"query",		"query for files",
 		command_quit,		"quit/exit",	"quit the shell",
 		command_rm,			"rm",			"remove files and directories",
 		command_sync,		"sync",			"syncs the file system",

@@ -6,6 +6,7 @@
 #define _FSSH_SYSCALLS_H
 
 #include "fssh_defs.h"
+#include "fssh_os.h"
 
 
 struct fssh_iovec;
@@ -24,6 +25,8 @@ fssh_status_t 	_kern_read_fs_info(fssh_dev_t device,
 fssh_status_t	_kern_write_fs_info(fssh_dev_t device,
 					const struct fssh_fs_info *info, int mask);
 fssh_status_t	_kern_sync(void);
+fssh_status_t	_kern_entry_ref_to_path(fssh_dev_t device, fssh_ino_t inode,
+					const char *leaf, char *userPath, fssh_size_t pathLength);
 fssh_dev_t		_kern_next_device(int32_t *_cookie);
 int				_kern_open_entry_ref(fssh_dev_t device, fssh_ino_t inode,
 					const char *name, int openMode, int perms);
@@ -72,6 +75,10 @@ fssh_status_t	_kern_setcwd(int fd, const char *path);
 fssh_status_t	_kern_initialize_volume(const char* fileSystem,
 					const char *partition, const char *name,
 					const char *parameters);
+
+extern int		_kern_open_query(fssh_dev_t device, const char* query,
+					fssh_size_t queryLength, uint32_t flags, fssh_port_id port,
+					int32_t token);
 
 // defined in fd.cpp
 fssh_ssize_t	_kern_read(int fd, fssh_off_t pos, void *buffer,
