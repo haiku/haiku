@@ -10,6 +10,7 @@ UsePrivateHeaders bluetooth ;
 
 SharedLibrary libbluetooth.so :
 	LocalDevice.cpp
+	DiscoveryAgent.cpp
 	DiscoveryListener.cpp
 	: be
 ;
