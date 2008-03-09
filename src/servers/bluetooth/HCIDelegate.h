@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ *
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ */
+
 #ifndef _HCIDELEGATE_H_
 #define _HCIDELEGATE_H_
 
@@ -20,14 +27,13 @@ class HCIDelegate {
 			status_t status;
 				
 			fFD = open (path->Path(), O_RDWR);
-			printf("## fdesc %d\n", fFD);
 			if (fFD > 0) {
 				// find out which ID was assigned
 				status = ioctl(fFD, GET_HCI_ID, &fHID, 0);
-				printf("## id fdesc %ld ### %ld\n", fHID, status);									
-
+				printf("%s: hid retrieved %ld status=%ld\n", __FUNCTION__, fHID, status);
 			}
 			else {
+				printf("%s: Device driver could not be opened %ld\n", __FUNCTION__, fHID);
 				fHID = B_ERROR;
 			}
 	    

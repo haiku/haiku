@@ -1,3 +1,10 @@
+/*
+ * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ *
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ */
+
 
 #include <String.h>
 
@@ -17,11 +24,11 @@ HCITransportAccessor::IssueCommand(raw_command rc, size_t size)
 	if (GetID() < 0 || fFD < 0)
 		return B_ERROR;
 
-printf("Command going: len = %d\n", size);
-for (int16 index = 0 ; index < size; index++ ) {
+printf("### Command going: len = %ld\n", size);
+for (uint16 index = 0 ; index < size; index++ ) {
 	printf("%x:",((uint8*)rc)[index]);
 }
-printf("\n");
+printf("### \n");
 
 
 	return ioctl(fFD, ISSUE_BT_COMMAND, rc, size);

@@ -15,8 +15,13 @@
 #include <bluetooth/bluetooth_error.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
-
 #include <stdio.h>
+
+
+#if 0
+#pragma mark - Class methods -
+#endif
+
 
 // Factory methods
 LocalDeviceImpl* 
@@ -49,27 +54,33 @@ LocalDeviceImpl::LocalDeviceImpl(HCIDelegate* hd) : LocalDeviceHandler(hd)
 }
 
 #if 0
-#pragma mark - Class methods -
+#pragma mark - Event handling methods -
 #endif
 
 void 
 LocalDeviceImpl::HandleEvent(struct hci_event_header* event)
 {
-	// Check if it was a non requested events
+
+printf("### Event comming: len = %d\n", event->elen);
+for (int16 index = 0 ; index < event->elen + 2; index++ ) {
+	printf("%x:",((uint8*)event)[index]);
+}
+printf("### \n");
+
+	// Events here might have not been initated by us
     switch (event->ecode) {
 	        case HCI_EVENT_HARDWARE_ERROR:
    				//HardwareError(event);    	
    			return;
+			case HCI_EVENT_CONN_REQUEST:
+	
+			break;
+
    			default:
    				// lets go on
    			break;        
 	}
 
-printf("Event comming: len = %d\n", event->elen);
-for (int16 index = 0 ; index < event->elen + 2; index++ ) {
-	printf("%x:",((uint8*)event)[index]);
-}
-printf("\n");
 	
 
 	BMessage* request = NULL;
@@ -101,10 +112,7 @@ printf("\n");
  	
 		case HCI_EVENT_CONN_COMPLETE:
 		break;
- 	
-		case HCI_EVENT_CONN_REQUEST:
-		break;
- 	
+ 	 	
 		case HCI_EVENT_DISCONNECTION_COMPLETE:
 		break;
  	
@@ -216,15 +224,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 	// Handle command complete information
     request->FindInt16("opcodeExpected", 0 /*REVIEW!*/, &opcodeExpected);
 
-printf("Command complete ...%p\n",event);
-for (int16 index = 0 ; index < 10; index++ ) {
-	printf("%x:",((uint8*)event)[index]);
-}
-printf("\n");
-
 
 	if (request->IsSourceWaiting() == false)
-		Output::Instance()->Post("nobody waiting\n", BLACKBOARD_KIT);                	
+		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);                	
     
     
     switch (opcodeExpected) {
@@ -232,14 +234,7 @@ printf("\n");
         case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR):
         {    
         	struct hci_rp_read_bd_addr* readbdaddr = (struct hci_rp_read_bd_addr*)(event+1);
-        	
-			printf("read bdaddr ...%p\n", readbdaddr);
-			for (int16 index = 0 ; index < 10; index++ ) {
-				printf("%x:",((uint8*)readbdaddr)[index]);
-			}
-			printf("\n");
-
-        	
+        	       	
             if (readbdaddr->status == BT_OK) {
                 
                                 
@@ -266,12 +261,6 @@ printf("\n");
         {    
         	struct hci_rp_read_local_name* readLocalName = (struct hci_rp_read_local_name*)(event+1);
         	
-			printf("read bdaddr ...%p\n", readLocalName);
-			for (int16 index = 0 ; index < 10; index++ ) {
-				printf("%x:",((uint8*)readLocalName)[index]);
-			}
-			printf("\n");
-
         	reply.AddInt8("status", readLocalName->status);
         	
             if (readLocalName->status == BT_OK) {

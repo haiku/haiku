@@ -63,19 +63,7 @@ BPortNot::loop()
 		    Output::Instance()->Post("Wrong type frame code", BLACKBOARD_GENERAL);
 		    continue;
 		 }
-		 
-#if 0		 
-		 for (int i=0 ; i<ssize ; i++ ) {		 
-		 	printf("%x:",((uint8*)hdr)[i]);
-		 }
- 		 printf("$\n");
-
-		 for (int i=0 ; i<ssize ; i++) {		 
-		 	printf("%c",((uint8*)hdr)[i]);
-		 }
-		 printf("$\n");
-#endif
-		    
+		 	    
          ld = ourapp->LocateLocalDeviceImpl(GET_PORTCODE_HID(code));
 		 if (ld == NULL) {
 		    Output::Instance()->Post("LocalDevice could not be fetched", BLACKBOARD_EVENTS);

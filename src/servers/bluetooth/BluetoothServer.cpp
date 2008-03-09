@@ -158,7 +158,7 @@ void BluetoothServer::MessageReceived(BMessage *message)
         break;
 
 
-		/* Handle if the bluetooth preferences is running */
+		/* Handle if the bluetooth preferences is running?? */
 		case B_SOME_APP_LAUNCHED:
    		{
 			const char *signature;
@@ -178,7 +178,8 @@ void BluetoothServer::MessageReceived(BMessage *message)
 		break;
 	}
 	
-	/* Can we reply right now? */
+	// Can we reply right now? 
+	// TOD: review this condition
     if (status != B_WOULD_BLOCK) {
 	    reply.AddInt32("status", status);
 	    message->SendReply(&reply);
@@ -391,50 +392,6 @@ BluetoothServer::sdp_server_Thread(void* data)
 
 #if 0
 
-void BluetoothServer::DevicesWatching(void) {
-
-	BDirectory* hdoses;
-	BEntry entrada;
-	BPath path;
-
-	//status_t err;
-	int fd1 = -1;
-
-	// only cheks the actual driver which we have
-	hdoses = new BDirectory("/dev/bus/bluetooth/h2/");
-//	hdoses = new BDirectory("/dev/bus/bluetooth/h3/...");
-//	hdoses = new BDirectory("/dev/bus/bluetooth/h4/...");
-	Output::Instance()->Post("Exploring present devices ...\n",1);
-	
-	while (hdoses->GetNextEntry(&entrada,true) == B_OK) {
-	Output::Instance()->Post((char*)path.Path(), 1);		
-		entrada.GetPath(&path);
-		if (entrada.IsDirectory()) {
-			Output::Instance()->Post((char*)path.Path(),1);
-			BDirectory* driver_directory = new BDirectory(path.Path());					
-			BEntry driver_entry;
-
-			syslog(LOG_ALERT, "Bluetooth driver %s\n",path.Path());
-			fprintf(stderr, "Bluetooth driver %s\n",path.Path());
-						
-			while (driver_directory->GetNextEntry(&driver_entry,true) == B_OK) {
-				Output::Instance()->Post((char*)path.Path(),1);
-				driver_entry.GetPath(&path);
-				fd1 = open(path.Path(), O_RDWR);
-				
-
-			
-				// TODO: Watching all folders under and set some kind of internal structure that hold all
-				//		 LocalDevices. 
-				// devloop = new DeviceLooper();
-				// devloop->StartMonitoringDevice("bus/bluetooth/h2");
-
-				if (fd1 < 0) {
-					syslog(LOG_ALERT,BT "Error opening device %s\n",path.Path());
-					fprintf(stderr, "Error opening device %s\n",path.Path());
-				} 
-				else 
-				{
 					struct  {
 						size_t	size;
 						struct hci_command_header header;
@@ -468,7 +425,7 @@ void BluetoothServer::DevicesWatching(void) {
 					cm1.header.clen = 0;					
 					ioctl(fd1, ISSUE_BT_COMMAND, &cm1, sizeof(cm1));	
 
-					/*cm1.size = sizeof(struct hci_command_header);
+					cm1.size = sizeof(struct hci_command_header);
 					cm1.header.opcode = B_HOST_TO_LENDIAN_INT16(hci_opcode_pack(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
 					cm1.header.clen = 0;					
 					ioctl(fd1, ISSUE_BT_COMMAND, &cm1, sizeof(cm1));	
@@ -487,6 +444,7 @@ void BluetoothServer::DevicesWatching(void) {
 					cm2.body.num_rsp = 8;
 					cm2.header.clen = 5;					
 					ioctl(fd1, ISSUE_BT_COMMAND, &cm2, sizeof(cm1));	
+					
 					snooze(60*1000*1000);*/
 					cm3.size = sizeof(struct hci_command_header)+sizeof(struct hci_remote_name_request);
 					cm3.header.opcode = B_HOST_TO_LENDIAN_INT16(hci_opcode_pack(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
@@ -518,14 +476,7 @@ void BluetoothServer::DevicesWatching(void) {
 					ioctl(fd1, ISSUE_BT_COMMAND, &cm4, sizeof(cm4));
 					*/
 				}		
-			}
-		}
-	}
 
-	syslog(LOG_ALERT,BT "All devices registered\n");	
-	fprintf(stderr, "Waiting with opened devices\n");
-
-}
 #endif
 
 void

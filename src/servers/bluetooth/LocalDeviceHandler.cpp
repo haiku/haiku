@@ -110,9 +110,10 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event = 0, uint16 opc
     }
             
 bail:    */
-    fEventsWanted.Unlock();
-    
     fEventsWanted.RemoveMessage(msg);
+    
+    fEventsWanted.Unlock();
+
 }
 
 

@@ -47,7 +47,11 @@ inline void* buildCommand(uint8 ogf, uint8 ocf, void** param, size_t psize, size
 }
 
 
-/* CONTROL BASEBAND */
+#if 0
+#pragma mark - CONTROL BASEBAND -
+#endif
+
+
 void* buildReset(size_t* outsize)
 {
     return buildCommand(OGF_CONTROL_BASEBAND, OCF_RESET, NULL, 0, outsize);
@@ -60,7 +64,11 @@ void* buildReadLocalName(size_t* outsize)
 }
 
 
-/* LINK CONTROL */
+#if 0
+#pragma mark - LINK CONTROL -
+#endif
+
+
 void* buildRemoteNameRequest(bdaddr_t bdaddr,uint8 pscan_rep_mode, uint16 clock_offset, size_t* outsize)
 {
     
@@ -96,7 +104,11 @@ void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize)
 }
 
 
-/* OGF_INFORMATIONAL_PARAM */
+#if 0
+#pragma mark - INFORMATIONAL_PARAM -
+#endif
+
+
 void* buildReadBufferSize(size_t* outsize)
 {
     return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BUFFER_SIZE, NULL, 0, outsize);
