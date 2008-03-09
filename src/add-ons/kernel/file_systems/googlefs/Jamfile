@@ -10,7 +10,6 @@ SubDirCcFlags -D_IMPEXP_KERNEL= ;
 
 KernelAddon googlefs :
 	attrs.c
-	google_icon.c
 	google_request.c
 	googlefs.c
 	http_cnx.c

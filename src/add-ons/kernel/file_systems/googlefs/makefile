@@ -37,7 +37,6 @@ parse_google_html.c \
 google_request.c \
 query.c \
 googlefs.c \
-google_icon.c \
 attrs.c \
 settings.c \
 string_utils.c
