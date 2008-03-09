@@ -404,7 +404,7 @@
 
 /* #undef OPENDIR_NOT_ROBUST */
 
-/* #undef PGRP_PIPE */
+#define PGRP_PIPE 1
 
 /* Define if the setvbuf function takes the buffering type as its second
    argument and the buffer pointer as the third, as on System V
