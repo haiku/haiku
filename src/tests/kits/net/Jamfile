@@ -9,6 +9,8 @@ SimpleTest udp_server : udp_server.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest tcp_server : tcp_server.c : $(TARGET_NETWORK_LIBS) ;
 SimpleTest tcp_client : tcp_client.c : $(TARGET_NETWORK_LIBS) ;
 
+SimpleTest getpeername : getpeername.cpp : $(TARGET_NETWORK_LIBS) ;
+
 SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net multicast ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
