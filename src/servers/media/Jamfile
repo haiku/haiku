@@ -3,6 +3,7 @@ SubDir HAIKU_TOP src servers media ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders media shared storage ;
+UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 AddResources media_server : media_server.rdef ;
 
