@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,18 +32,18 @@
 	messages. Messages are actually passed on to \link BHandler handlers \endlink
 	that are associated with this looper. By default there is always one
 	handler available: the looper itself. To 'quit' a looper, you should pass
-	a \c B_QUIT_REQUESTED message using one of the message post functions. Do
-	not call Quit() directly! When a looper receives such a request, it will 
-	\b delete itself. As such, looper should <em>always be created on the
-	heap</em> (with \c new), and never on the stack. 
+	a \c B_QUIT_REQUESTED message using one of the message post functions. When
+	a looper receives such a request, it will \b delete itself. As such, looper
+	should <em>always be created on the heap</em> (with \c new), and never on
+	the stack. 
 	
 	Posting messages can be done using the various PostMessage() methods.
 	Whenever a message is posted, it will be added through to the message
 	queue. It is possible to apply filters (see AddCommonFilter()) to filter
-	out any messages that correspond with certain criteria. Whenever you post
-	a message, you \e lose ownership. The looper will dispose of it when it is 
-	processed. The handler for the message is chosen using the following
-	criteria:
+	out any messages that correspond with certain criteria. The method will
+	copy the contents of the message and this copy is processed, so make sure
+	you delete the original messages in case you create them on the heap.
+	The handler for the message is chosen using the following criteria:
 	
 	-# If PostMessage() or the BMessenger is set to a specific handler, and
 		this handler is associated with this looper, than the message is
@@ -220,6 +220,17 @@
 	Posting a message puts it in the message queue. The message passes through
 	the default handler chain.
 	
+	The \a message is copied, and as such, you should make sure you will not
+	leak it. The best way to send messages is like this:
+
+\code
+	BMessage message;
+	message.what = B_DO_SOMETHING;
+	message.AddString("some_data", "This is data")
+	
+	aLooper->PostMessage(&message);
+\endcode
+	
 	\param message The message you would like to pass to this method.
 	
 	\retval B_OK The operation succeeded, and the message is sent to the port.
@@ -276,6 +287,17 @@
 		
 	The target \a handler should be associated with this looper. This method
 	bypasses the default message queue.
+	
+	The \a message is copied, and as such, you should make sure you will not
+	leak it. The best way to send messages is like this:
+
+\code
+	BMessage message;
+	message.what = B_DO_SOMETHING;
+	message.AddString("some_data", "This is data")
+
+	aLooper->PostMessage(&message, aHandler);
+\endcode
 	
 	\param message The message you want to pass.
 	\param handler The handler you would like to pass this message to.
@@ -520,8 +542,12 @@
 	\fn void BLooper::Quit()
 	\brief Hook method that is called after a \c B_QUIT_REQUESTED message.
 	
-	If you want to quit and delete the looper, do \b not call this method
-	directly, rather, post a \c B_QUIT_REQUESTED message to the looper.
+	If you want to quit and delete the looper, you should post a 
+	\c B_QUIT_REQUESTED message. This will first call the hook method
+	QuitRequested(), which can be overridden in child classes in case there
+	are conditions that would prevent the looper to be quit. If you really
+	know what you are doing, and you definitely want to quit this looper,
+	you may call this method, but only after performing a Lock() operation.
 	
 	Override this method if your subclass needs to perform specific clean-up
 	tasks. Remember to call the base class implementation when you're done.
