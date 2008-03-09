@@ -40,8 +40,8 @@ extern uint32_t		fssh_parse_expression(const char *string);	/* utility for debug
 
 typedef int (*fssh_debugger_command_hook)(int argc, char **argv);
 
-extern int			fssh_add_debugger_command(char *name,
-							fssh_debugger_command_hook hook, char *help);
+extern int			fssh_add_debugger_command(const char *name,
+							fssh_debugger_command_hook hook, const char *help);
 extern int			fssh_remove_debugger_command(char *name,
 							fssh_debugger_command_hook hook); 
 

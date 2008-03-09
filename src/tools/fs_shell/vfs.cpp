@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1050,14 +1050,14 @@ entry_ref_to_vnode(fssh_mount_id mountID, fssh_vnode_id directoryID, const char 
 }
 
 
-/**	Returns the vnode for the relative path starting at the specified \a vnode.
- *	\a path must not be NULL.
- *	If it returns successfully, \a path contains the name of the last path
- *	component.
- *	Note, this reduces the ref_count of the starting \a vnode, no matter if
- *	it is successful or not!
- */
-
+/*!	Returns the vnode for the relative path starting at the specified \a vnode.
+	\a path must not be NULL.
+	If it returns successfully, \a path contains the name of the last path
+	component. This function clobbers the buffer pointed to by \a path only
+	if it does contain more than one component.
+	Note, this reduces the ref_count of the starting \a vnode, no matter if
+	it is successful or not!
+*/
 static fssh_status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	int count, struct vnode **_vnode, fssh_vnode_id *_parentID, int *_type)
@@ -3237,9 +3237,10 @@ fix_dirent(struct vnode *parent, struct fssh_dirent *entry)
 		inc_vnode_ref_count(parent);
 			// vnode_path_to_vnode() puts the node
 
+		// ".." is guaranteed to to be clobbered by this call
 		struct vnode *vnode;
-		fssh_status_t status = vnode_path_to_vnode(parent, "..", false, 0, &vnode,
-			NULL, NULL);
+		fssh_status_t status = vnode_path_to_vnode(parent, (char*)"..", false,
+			0, &vnode, NULL, NULL);
 
 		if (status == FSSH_B_OK) {
 			entry->d_dev = vnode->device;

@@ -90,8 +90,8 @@ fssh_parse_expression(const char *string)
 
 
 int
-fssh_add_debugger_command(char *name, fssh_debugger_command_hook hook,
-	char *help)
+fssh_add_debugger_command(const char *name, fssh_debugger_command_hook hook,
+	const char *help)
 {
 	return 0;
 }

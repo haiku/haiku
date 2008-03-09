@@ -1670,7 +1670,8 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
 /*!	Returns the vnode for the relative path starting at the specified \a vnode.
 	\a path must not be NULL.
 	If it returns successfully, \a path contains the name of the last path
-	component.
+	component. This function clobbers the buffer pointed to by \a path only
+	if it does contain more than one component.
 	Note, this reduces the ref_count of the starting \a vnode, no matter if
 	it is successful or not!
 */
@@ -4561,9 +4562,10 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 		inc_vnode_ref_count(parent);
 			// vnode_path_to_vnode() puts the node
 
+		// ".." is guaranteed to to be clobbered by this call
 		struct vnode *vnode;
-		status_t status = vnode_path_to_vnode(parent, "..", false, 0, &vnode,
-			NULL, NULL);
+		status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
+			&vnode, NULL, NULL);
 
 		if (status == B_OK) {
 			entry->d_dev = vnode->device;
