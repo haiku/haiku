@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -38,6 +38,7 @@ static const int sCopyBufferSize = 64 * 1024;	// 64 KB
 struct Options {
 	Options()
 		: attributesOnly(false),
+		  ignoreAttributes(false),
 		  dereference(true),
 		  force(false),
 		  recursive(false)
@@ -45,6 +46,7 @@ struct Options {
 	}
 
 	bool	attributesOnly;
+	bool	ignoreAttributes;
 	bool	dereference;
 	bool	force;
 	bool	recursive;
@@ -1189,9 +1191,11 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 	targetDeleter.SetTo(targetNode);
 
 	// copy attributes
-	error = copy_attributes(source, sourceNode, target, targetNode);
-	if (error != FSSH_B_OK)
-		return error;
+	if (!options.ignoreAttributes) {
+		error = copy_attributes(source, sourceNode, target, targetNode);
+		if (error != FSSH_B_OK)
+			return error;
+	}
 
 	// copy contents
 	if (sourceNode->IsFile()) {
@@ -1224,27 +1228,36 @@ command_cp(int argc, const char* const* argv)
 		const char *arg = argv[argi];
 		if (arg[0] == '-') {
 			if (arg[1] == '\0') {
-				fprintf(stderr, "Error: Invalid option `-'\n");
+				fprintf(stderr, "Error: Invalid option '-'\n");
 				return FSSH_EINVAL;
 			}
 
-			for (int i = 1; arg[i]; i++) {
-				switch (arg[i]) {
-					case 'a':
-						options.attributesOnly = true;
-					case 'd':
-						options.dereference = false;
-						break;
-					case 'f':
-						options.force = true;
-						break;
-					case 'r':
-						options.recursive = true;
-						break;
-					default:
-						fprintf(stderr, "Error: Unknown option `-%c'\n",
-							arg[i]);
-						return FSSH_EINVAL;
+			if (arg[1] == '-') {
+				if (strcmp(arg, "--ignore-attributes") == 0) {
+					options.ignoreAttributes = true;
+				} else {
+					fprintf(stderr, "Error: Unknown option '%s'\n", arg);
+					return FSSH_EINVAL;
+				}
+			} else {
+				for (int i = 1; arg[i]; i++) {
+					switch (arg[i]) {
+						case 'a':
+							options.attributesOnly = true;
+						case 'd':
+							options.dereference = false;
+							break;
+						case 'f':
+							options.force = true;
+							break;
+						case 'r':
+							options.recursive = true;
+							break;
+						default:
+							fprintf(stderr, "Error: Unknown option '-%c'\n",
+								arg[i]);
+							return FSSH_EINVAL;
+					}
 				}
 			}
 		} else {
