@@ -83,6 +83,28 @@ class HandleSignals : public AbstractTraceEntry {
 };
 
 
+class ExecuteSignalHandler : public AbstractTraceEntry {
+	public:
+		ExecuteSignalHandler(int signal, struct sigaction* handler)
+			:
+			fSignal(signal),
+			fHandler((void*)handler->sa_handler)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("signal exec handler: signal: %d, handler: %p",
+				fSignal, fHandler);
+		}
+
+	private:
+		int		fSignal;
+		void*	fHandler;
+};
+
+
 class SendSignal : public AbstractTraceEntry {
 	public:
 		SendSignal(pid_t target, uint32 signal, uint32 flags)
@@ -387,6 +409,8 @@ handle_signals(struct thread *thread)
 
 		if (!restart || (handler->sa_flags & SA_RESTART) == 0)
 			atomic_and(&thread->flags, ~THREAD_FLAGS_RESTART_SYSCALL);
+
+		T(ExecuteSignalHandler(signal, handler));
 
 		TRACE(("### Setting up custom signal handler frame...\n"));
 		arch_setup_signal_frame(thread, handler, signal,
