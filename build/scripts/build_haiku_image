@@ -65,7 +65,10 @@ attrrmrf()
 {
 	test -e "$1" || return
 	if [ -d "$outputDir/attributes" ]; then
-		find "$1" -print0 | xargs -0 stat -c %i | awk "{ print \"$outputDir/attributes/\" \$1 }" | xargs rm -rf
+		# test for gnu stat, else fallback to the bsd one.
+		statFormatOpt="-c"
+		stat -c '%i' . >/dev/null 2>&1 || statFormatOpt="-f"
+		find "$1" -print0 | xargs -0 stat $statFormatOpt %i | awk "{ print \"$outputDir/attributes/\" \$1 }" | xargs rm -rf
 	fi
 	rm -rf "$1"
 }
