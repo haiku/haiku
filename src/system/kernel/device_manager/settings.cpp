@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -42,8 +42,9 @@ get_safemode_boolean(const char *parameter, bool defaultValue)
 	if (get_safemode_option(parameter, value, &length) != B_OK)
 		return defaultValue;
 
-	return !strcmp(value, "on") || !strcmp(value, "true") || !strcmp(value, "1")
-		|| !strcmp(value, "yes") || !strcmp(value, "enabled");
+	return !strcasecmp(value, "on") || !strcasecmp(value, "true")
+		|| !strcmp(value, "1") || !strcasecmp(value, "yes")
+		|| !strcasecmp(value, "enabled");
 }
 
 
@@ -51,7 +52,8 @@ get_safemode_boolean(const char *parameter, bool defaultValue)
 
 
 extern "C" status_t
-_user_get_safemode_option(const char *userParameter, char *userBuffer, size_t *_userBufferSize)
+_user_get_safemode_option(const char *userParameter, char *userBuffer,
+	size_t *_userBufferSize)
 {
 	char parameter[B_FILE_NAME_LENGTH];
 	char buffer[B_PATH_NAME_LENGTH];
@@ -71,7 +73,8 @@ _user_get_safemode_option(const char *userParameter, char *userBuffer, size_t *_
 
 	if (status == B_OK
 		&& (user_strlcpy(userBuffer, buffer, originalBufferSize) < B_OK
-			|| user_memcpy(_userBufferSize, &bufferSize, sizeof(size_t)) < B_OK))
+			|| user_memcpy(_userBufferSize, &bufferSize, sizeof(size_t))
+				< B_OK))
 		return B_BAD_ADDRESS;
 
 	return status;
