@@ -791,8 +791,8 @@ BDirectory::CreateFile(const char *path, BFile *file, bool failIfExists)
 	if (!path)
 		return B_BAD_VALUE;
 	// Let BFile do the dirty job.
-	uint32 openMode = B_READ_WRITE | B_CREATE_FILE
-					  | (failIfExists ? B_FAIL_IF_EXISTS : 0);
+	uint32 openMode = B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE
+		| (failIfExists ? B_FAIL_IF_EXISTS : 0);
 	BFile tmpFile;
 	BFile *realFile = (file ? file : &tmpFile);
 	status_t error = B_OK;
