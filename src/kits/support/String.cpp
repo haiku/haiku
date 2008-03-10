@@ -155,7 +155,9 @@ BStringRef::operator&() const
 char*
 BStringRef::operator&()
 {
-	fString._Detach();
+	if (fString._Detach() != B_OK)
+		return NULL;
+
 	fString._ReferenceCount() = -1;
 		// mark as unsharable
 	return &fString.fPrivateData[fPosition];
@@ -385,7 +387,8 @@ BString::operator+=(char c)
 BString&
 BString::Append(const BString& string, int32 length)
 {
-	_DoAppend(string.fPrivateData, min_clamp0(length, string.Length()));
+	if (&string != this)
+		_DoAppend(string.fPrivateData, min_clamp0(length, string.Length()));
 	return *this;
 }
 
@@ -424,8 +427,8 @@ BString::Prepend(const char* string)
 BString&
 BString::Prepend(const BString& string)
 {
-	if (fPrivateData != string.fPrivateData)
-		_DoPrepend(string.fPrivateData, string.Length());
+	if (&string != this)
+		_DoPrepend(string.String(), string.Length());
 	return *this;
 }
 
@@ -442,7 +445,7 @@ BString::Prepend(const char* string, int32 length)
 BString&
 BString::Prepend(const BString& string, int32 length)
 {
-	if (fPrivateData != string.fPrivateData)
+	if (&string != this)
 		_DoPrepend(string.fPrivateData, min_clamp0(length, string.Length()));
 	return *this;
 }
@@ -511,7 +514,7 @@ BString::Insert(const char* string, int32 fromOffset, int32 length,
 BString&
 BString::Insert(const BString& string, int32 position)
 {
-	if ((fPrivateData != string.fPrivateData) && string.Length() > 0)
+	if (&string != this && string.Length() > 0)
 		Insert(string.fPrivateData, position);
 	return *this;
 }
@@ -520,7 +523,7 @@ BString::Insert(const BString& string, int32 position)
 BString&
 BString::Insert(const BString& string, int32 length, int32 position)
 {
-	if ((fPrivateData != string.fPrivateData) && string.Length() > 0)
+	if (&string != this && string.Length() > 0)
 		Insert(string.String(), length, position);
 	return *this;
 }
@@ -530,7 +533,7 @@ BString&
 BString::Insert(const BString& string, int32 fromOffset, int32 length,
 	int32 position)
 {
-	if ((fPrivateData != string.fPrivateData) && string.Length() > 0)
+	if (&string != this && string.Length() > 0)
 		Insert(string.String() + fromOffset, length, position);
 	return *this;
 }
@@ -1381,8 +1384,13 @@ BString::operator[](int32 index)
 char&
 BString::operator[](int32 index)
 {
-	_Detach();
+	if (_Detach() != B_OK) {
+		static char invalid;
+		return invalid;
+	}
+
 	_ReferenceCount() = -1;
+		// mark string as unshareable
 
 	return fPrivateData[index];
 }
@@ -1399,9 +1407,10 @@ BString::LockBuffer(int32 maxLength)
 	if (maxLength > length)
 		length += maxLength - length;
 
-	_DetachWith(fPrivateData, length);
-	_ReferenceCount() = -1;
-		// mark unshareable
+	if (_DetachWith(fPrivateData, length) == B_OK) {
+		_ReferenceCount() = -1;
+			// mark unshareable
+	}
 	return fPrivateData;
 }
 
@@ -1416,10 +1425,11 @@ BString::UnlockBuffer(int32 length)
 		length = (fPrivateData == NULL) ? 0 : strlen(fPrivateData);
 	}
 
-	_Realloc(length);
-	fPrivateData[length] = '\0';
-	_ReferenceCount() = 1;
-		// mark shareable again
+	if (_Realloc(length) != NULL) {
+		fPrivateData[length] = '\0';
+		_ReferenceCount() = 1;
+			// mark shareable again
+	}
 
 	return *this;
 }
@@ -1819,7 +1829,7 @@ BString::_DoAppend(const char* string, int32 length)
 	int32 oldLength = Length();
 	if (_DetachWith(fPrivateData, oldLength + length) == B_OK) {
 		if (string && length)
-			memcpy(fPrivateData + oldLength, string, length);
+			strncpy(fPrivateData + oldLength, string, length);
 		return true;
 	}
 	return false;
@@ -1833,7 +1843,7 @@ BString::_DoPrepend(const char* string, int32 length)
 	if (_DetachWith(fPrivateData, oldLength + length) == B_OK) {
 		memmove(fPrivateData + length, fPrivateData, oldLength);
 		if (string && length)
-			memcpy(fPrivateData, string, length);
+			strncpy(fPrivateData, string, length);
 		return true;
 	}
 	return false;
@@ -1848,7 +1858,7 @@ BString::_DoInsert(const char* string, int32 offset, int32 length)
 		memmove(fPrivateData + offset + length, fPrivateData + offset,
 			oldLength - offset);
 		if (string && length)
-			memcpy(fPrivateData + offset, string, length);
+			strncpy(fPrivateData + offset, string, length);
 		return true;
 	}
 	return false;
