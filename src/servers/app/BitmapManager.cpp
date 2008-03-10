@@ -188,16 +188,8 @@ BitmapManager::CreateBitmap(ClientMemoryAllocator* allocator,
 	if (success) {
 		bitmap->fBuffer = buffer;
 		bitmap->fToken = gTokenSpace.NewToken(kBitmapToken, bitmap);
-
-		if (flags & (B_BITMAP_CLEAR_TO_WHITE | B_BITMAP_ACCEPTS_VIEWS)) {
-			if (space == B_CMAP8) {
-				// "255" is the "transparent magic" index for B_CMAP8 bitmaps
-				memset(bitmap->Bits(), 65, bitmap->BitsLength());
-			} else {
-				// should work for most colorspaces
-				memset(bitmap->Bits(), 0xff, bitmap->BitsLength());
-			}
-		}
+		// NOTE: the client handles clearing to white in case the flags
+		// indicate this is needed
 	} else {
 		// Allocation failed for buffer or bitmap list
 		delete bitmap;

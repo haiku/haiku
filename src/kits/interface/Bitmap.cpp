@@ -949,12 +949,13 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	if (!bounds.IsValid() || !bitmaps_support_space(colorSpace, NULL)) {
 		error = B_BAD_VALUE;
 	} else {
-		// bounds is in floats and might be valid but much larger than what we can handle
-		// the size could not be expressed in int32
+		// bounds is in floats and might be valid but much larger than what we
+		// can handle the size could not be expressed in int32
 		double realSize = bounds.Width() * bounds.Height();
 		if (realSize > (double)(INT_MAX / 4)) {
-			fprintf(stderr, "bitmap bounds is much too large: BRect(%.1f, %.1f, %.1f, %.1f)\n",
-					bounds.left, bounds.top, bounds.right, bounds.bottom);
+			fprintf(stderr, "bitmap bounds is much too large: "
+				"BRect(%.1f, %.1f, %.1f, %.1f)\n",
+				bounds.left, bounds.top, bounds.right, bounds.bottom);
 			error = B_BAD_VALUE;
 		}
 	}
@@ -1052,16 +1053,28 @@ BBitmap::_InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	}
 
 	fInitError = error;
-	// TODO: on success, handle clearing to white if the flags say so. Needs to be
-	// dependent on color space.
 
 	if (fInitError == B_OK) {
 		if (flags & B_BITMAP_ACCEPTS_VIEWS) {
-			fWindow = new BWindow(Bounds(), fServerToken);
-			// A BWindow starts life locked and is unlocked
-			// in Show(), but this window is never shown and
-			// it's message loop is never started.
-			fWindow->Unlock();
+			fWindow = new(std::nothrow) BWindow(Bounds(), fServerToken);
+			if (fWindow) {
+				// A BWindow starts life locked and is unlocked
+				// in Show(), but this window is never shown and
+				// it's message loop is never started.
+				fWindow->Unlock();
+			} else
+				fInitError = B_NO_MEMORY;
+		}
+		// clear to white if the flags say so.
+		if (flags & (B_BITMAP_CLEAR_TO_WHITE | B_BITMAP_ACCEPTS_VIEWS)) {
+			if (fColorSpace == B_CMAP8) {
+				// "255" is the "transparent magic" index for B_CMAP8 bitmaps
+				// use the correct index for "white"
+				memset(fBasePointer, 65, fSize);
+			} else {
+				// should work for most colorspaces
+				memset(fBasePointer, 0xff, fSize);
+			}
 		}
 	}
 }
