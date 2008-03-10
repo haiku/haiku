@@ -1739,12 +1739,15 @@ Window::_TriggerContentRedraw(BRegion& dirtyContentRegion)
 			}
 
 			if (fDrawingEngine->LockParallelAccess()) {
+				bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
+				fDrawingEngine->SetCopyToFrontEnabled(true);
 				fDrawingEngine->SuspendAutoSync();
 
 				fTopView->Draw(fDrawingEngine, backgroundClearingRegion,
 					&fContentRegion, true);
 
 				fDrawingEngine->Sync();
+				fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
 				fDrawingEngine->UnlockParallelAccess();
 			}
 		}
@@ -1775,7 +1778,12 @@ Window::_DrawBorder()
 	DrawingEngine* engine = fDecorator->GetDrawingEngine();
 	if (dirtyBorderRegion->CountRects() > 0 && engine->LockParallelAccess()) {
 		engine->ConstrainClippingRegion(dirtyBorderRegion);
+		bool copyToFrontEnabled = engine->CopyToFrontEnabled();
+		engine->SetCopyToFrontEnabled(true);
+
 		fDecorator->Draw(dirtyBorderRegion->Frame());
+
+		engine->SetCopyToFrontEnabled(copyToFrontEnabled);
 
 // TODO: remove this once the DrawState stuff is handled
 // more cleanly. The reason why this is needed is that
@@ -1815,23 +1823,6 @@ Window::_TransferToUpdateSession(BRegion* contentDirtyRegion)
 	fPendingUpdateSession->AddCause(fDirtyCause);
 	fPendingUpdateSession->Include(contentDirtyRegion);
 
-	// clip pending update session from current
-	// update session, it makes no sense to draw stuff
-	// already needing a redraw anyways. Theoretically,
-	// this could be done smarter (clip views from pending
-	// that have not yet been redrawn in the current update
-	// session)
-	// NOTE: appearently the R5 app_server does not do that, it just
-	// keeps drawing until the screen is valid, without caring much
-	// for a consistent display while it does so, it just keeps drawing
-	// until everything settles down. Potentially, this could even give
-	// the impression of faster updates, even though they might look
-	// wrong when looked at closer, but will fix themselves shortly later
-//	if (fCurrentUpdateSession->IsUsed() && fCurrentUpdateSession->IsExpose()) {
-//		fCurrentUpdateSession->Exclude(contentDirtyRegion);
-//		fEffectiveDrawingRegionValid = false;
-//	}
-
 	if (!fUpdateRequested) {
 		// send this to client
 		_SendUpdateMessage();
@@ -1867,36 +1858,42 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	// dirty regions are not messed with from the Desktop thread
 	// and ServerWindow thread at the same time.
 
-	if (fUpdateRequested) {
-		// make the pending update session the current update session
-		// (toggle the pointers)
-		UpdateSession* temp = fCurrentUpdateSession;
-		fCurrentUpdateSession = fPendingUpdateSession;
-		fPendingUpdateSession = temp;
-		fPendingUpdateSession->SetUsed(false);
-		// all drawing command from the client
-		// will have the dirty region from the update
-		// session enforced
-		fInUpdate = true;
-		fEffectiveDrawingRegionValid = false;
+	if (!fUpdateRequested) {
+		link.StartMessage(B_ERROR);
+		link.Flush();
+		fprintf(stderr, "Window::BeginUpdate() - no update requested!\n");
+		return;
+	}
 
-		// TODO: each view could be drawn individually
-		// right before carrying out the first drawing
-		// command from the client during an update
-		// (View::IsBackgroundDirty() can be used
-		// for this)
-		if (!fContentRegionValid)
-			_UpdateContentRegion();
+	// make the pending update session the current update session
+	// (toggle the pointers)
+	UpdateSession* temp = fCurrentUpdateSession;
+	fCurrentUpdateSession = fPendingUpdateSession;
+	fPendingUpdateSession = temp;
+	fPendingUpdateSession->SetUsed(false);
+	// all drawing command from the client
+	// will have the dirty region from the update
+	// session enforced
+	fInUpdate = true;
+	fEffectiveDrawingRegionValid = false;
 
-		BRegion* dirty = fRegionPool.GetRegion(
-			fCurrentUpdateSession->DirtyRegion());
-		if (!dirty) {
-			link.StartMessage(B_ERROR);
-			link.Flush();
-			return;
-		}
+	// TODO: each view could be drawn individually
+	// right before carrying out the first drawing
+	// command from the client during an update
+	// (View::IsBackgroundDirty() can be used
+	// for this)
+	if (!fContentRegionValid)
+		_UpdateContentRegion();
 
-		dirty->IntersectWith(&VisibleContentRegion());
+	BRegion* dirty = fRegionPool.GetRegion(
+		fCurrentUpdateSession->DirtyRegion());
+	if (!dirty) {
+		link.StartMessage(B_ERROR);
+		link.Flush();
+		return;
+	}
+
+	dirty->IntersectWith(&VisibleContentRegion());
 
 //sCurrentColor.red = rand() % 255;
 //sCurrentColor.green = rand() % 255;
@@ -1907,39 +1904,35 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 //fDrawingEngine->FillRegion(*dirty, sCurrentColor);
 //snooze(10000);
 
-		link.StartMessage(B_OK);
-		// append the current window geometry to the
-		// message, the client will need it
-		link.Attach<BPoint>(fFrame.LeftTop());
-		link.Attach<float>(fFrame.Width());
-		link.Attach<float>(fFrame.Height());
-		// append he update rect in screen coords
-		link.Attach<BRect>(dirty->Frame());
-		// find and attach all views that intersect with
-		// the dirty region
-		fTopView->AddTokensForViewsInRegion(link, *dirty, &fContentRegion);
-		// mark the end of the token "list"
-		link.Attach<int32>(B_NULL_TOKEN);
-		link.Flush();
+	link.StartMessage(B_OK);
+	// append the current window geometry to the
+	// message, the client will need it
+	link.Attach<BPoint>(fFrame.LeftTop());
+	link.Attach<float>(fFrame.Width());
+	link.Attach<float>(fFrame.Height());
+	// append he update rect in screen coords
+	link.Attach<BRect>(dirty->Frame());
+	// find and attach all views that intersect with
+	// the dirty region
+	fTopView->AddTokensForViewsInRegion(link, *dirty, &fContentRegion);
+	// mark the end of the token "list"
+	link.Attach<int32>(B_NULL_TOKEN);
+	link.Flush();
 
-		if (!fCurrentUpdateSession->IsExpose() && fDrawingEngine->LockParallelAccess()) {
+	// supress back to front buffer copies in the drawing engine
+	fDrawingEngine->SetCopyToFrontEnabled(false);
+
+	if (!fCurrentUpdateSession->IsExpose() && fDrawingEngine->LockParallelAccess()) {
 //fDrawingEngine->FillRegion(dirty, (rgb_color){ 255, 0, 0, 255 });
-			fDrawingEngine->SuspendAutoSync();
+		fDrawingEngine->SuspendAutoSync();
 
-			fTopView->Draw(fDrawingEngine, dirty, &fContentRegion, true);
+		fTopView->Draw(fDrawingEngine, dirty, &fContentRegion, true);
 
-			fDrawingEngine->Sync();
-			fDrawingEngine->UnlockParallelAccess();
-		} // else the background was cleared already
+		fDrawingEngine->Sync();
+		fDrawingEngine->UnlockParallelAccess();
+	} // else the background was cleared already
 
-		fRegionPool.Recycle(dirty);
-
-	} else {
-printf("BeginUpdate() but no update requested!!\n");
-		link.StartMessage(B_ERROR);
-		link.Flush();
-		fprintf(stderr, "Window::BeginUpdate() - no update requested!\n");
-	}
+	fRegionPool.Recycle(dirty);
 }
 
 
@@ -1949,6 +1942,19 @@ Window::EndUpdate()
 	// NOTE: see comment in _BeginUpdate()
 
 	if (fInUpdate) {
+		// reenable copy to front
+		fDrawingEngine->SetCopyToFrontEnabled(true);
+
+		BRegion* dirty = fRegionPool.GetRegion(
+			fCurrentUpdateSession->DirtyRegion());
+
+		if (dirty) {
+			dirty->IntersectWith(&VisibleContentRegion());
+
+			fDrawingEngine->CopyToFront(*dirty);
+			fRegionPool.Recycle(dirty);
+		}
+
 		fCurrentUpdateSession->SetUsed(false);
 
 		fInUpdate = false;
