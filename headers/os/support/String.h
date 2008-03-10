@@ -221,6 +221,7 @@ private:
 
 	// Management
 	status_t	_Detach();
+	char*		_Alloc(int32 length);
 	char*		_Realloc(int32 length);
 	void		_Init(const char* src, int32 length);
 	char*		_Clone(const char* data, int32 length);

@@ -1679,6 +1679,27 @@ BString::_Detach()
 
 
 char*
+BString::_Alloc(int32 length)
+{
+	if (length < 0)
+		return NULL;
+
+	char* newData = (char *)malloc(length + kPrivateDataOffset + 1);
+	if (newData == NULL)
+		return NULL;
+
+	newData += kPrivateDataOffset;
+	newData[length] = '\0';
+
+	// initialize reference count & length
+	*(((vint32*)newData) - 2) = 1;
+	*(((int32*)newData) - 1) = length & 0x7fffffff;
+
+	return newData;
+}
+
+
+char*
 BString::_Realloc(int32 length)
 {
 	if (length == Length())
@@ -1713,18 +1734,11 @@ BString::_Init(const char* src, int32 length)
 char*
 BString::_Clone(const char* data, int32 length)
 {
-	char* newData = (char *)malloc(length + kPrivateDataOffset + 1);
+	char* newData = _Alloc(length);
 	if (newData == NULL)
 		return NULL;
 
-	newData += kPrivateDataOffset;
-	newData[length] = '\0';
-
-	// initialize reference count & length
-	*(((vint32*)newData) - 2) = 1;
-	*(((int32*)newData) - 1) = length & 0x7fffffff;
-
-	if (data && length) {
+	if (data != NULL && length > 0) {
 		// "data" may not span over the whole length
 		strncpy(newData, data, length);
 	}
@@ -1808,8 +1822,7 @@ BString::_ReferenceCount() const
 inline bool
 BString::_IsShareable() const
 {
-	return false;
-//	return fPrivateData != NULL && _ReferenceCount() >= 0;
+	return fPrivateData != NULL && _ReferenceCount() >= 0;
 }
 
 
@@ -1934,7 +1947,7 @@ BString::_IFindBefore(const char* string, int32 offset, int32 strlen) const
 
 
 BString&
-BString::_DoCharacterEscape(const char* string, const char *setOfCharsToEscape,
+BString::_DoCharacterEscape(const char* string, const char* setOfCharsToEscape,
 	char escapeChar)
 {
 	if (_DetachWith(string, strlen(safestr(string))) != B_OK)
@@ -1943,50 +1956,48 @@ BString::_DoCharacterEscape(const char* string, const char *setOfCharsToEscape,
 	memcpy(fPrivateData, string, Length());
 
 	PosVect positions;
-	int32 len = Length();
+	int32 length = Length();
 	int32 pos = 0;
-	for (int32 offset = 0; offset < len; offset += pos + 1) {
-		if ((pos = strcspn(fPrivateData + offset, setOfCharsToEscape)) < len - offset) {
+	for (int32 offset = 0; offset < length; offset += pos + 1) {
+		if ((pos = strcspn(fPrivateData + offset, setOfCharsToEscape))
+				< length - offset) {
 			if (!positions.Add(offset + pos))
 				return *this;
 		}
 	}
 
 	uint32 count = positions.CountItems();
-	int32 newLength = len + count;
+	int32 newLength = length + count;
 	if (!newLength) {
 		_Realloc(0);
 		return *this;
 	}
 
-	int32 lastPos = 0;
-	char* oldAdr = fPrivateData;
-
-	char* newData = (char*)malloc(newLength + kPrivateDataOffset + 1);
+	char* newData = _Alloc(newLength);
 	if (newData) {
-		newData += kPrivateDataOffset;
-		char* newAdr = newData;
+		char* oldString = fPrivateData;
+		char* newString = newData;
+		int32 lastPos = 0;
+
 		for (uint32 i = 0; i < count; ++i) {
 			pos = positions.ItemAt(i);
-			len = pos - lastPos;
-			if (len > 0) {
-				memcpy(newAdr, oldAdr, len);
-				oldAdr += len;
-				newAdr += len;
+			length = pos - lastPos;
+			if (length > 0) {
+				memcpy(newString, oldString, length);
+				oldString += length;
+				newString += length;
 			}
-			*newAdr++ = escapeChar;
-			*newAdr++ = *oldAdr++;
+			*newString++ = escapeChar;
+			*newString++ = *oldString++;
 			lastPos = pos + 1;
 		}
-		len = Length() + 1 - lastPos;
-		if (len > 0)
-			memcpy(newAdr, oldAdr, len);
+
+		length = Length() + 1 - lastPos;
+		if (length > 0)
+			memcpy(newString, oldString, length);
 
 		_FreePrivateData();
-
 		fPrivateData = newData;
-		_SetLength(newLength);
-		fPrivateData[newLength] = '\0';
 	}
 	return *this;
 }
@@ -1999,8 +2010,8 @@ BString::_DoCharacterDeescape(const char* string, char escapeChar)
 		return *this;
 
 	memcpy(fPrivateData, string, Length());
-	const char temp[2] = { escapeChar, '\0' };
-	return _DoReplace(temp, "", REPLACE_ALL, 0, KEEP_CASE);
+	const char escape[2] = { escapeChar, '\0' };
+	return _DoReplace(escape, "", REPLACE_ALL, 0, KEEP_CASE);
 }
 
 
@@ -2025,7 +2036,7 @@ BString::_DoReplace(const char* findThis, const char* replaceWith,
 	PosVect positions;
 	for (int32 srcPos = 0; maxReplaceCount > 0
 		&& (srcPos = (this->*findMethod)(findThis, lastSrcPos, findLen)) >= 0;
-		maxReplaceCount--) {
+			maxReplaceCount--) {
 		positions.Add(srcPos);
 		lastSrcPos = srcPos + findLen;
 	}
@@ -2035,48 +2046,45 @@ BString::_DoReplace(const char* findThis, const char* replaceWith,
 
 
 void
-BString::_ReplaceAtPositions(const PosVect* positions, int32 searchLen,
-	const char* with, int32 withLen)
+BString::_ReplaceAtPositions(const PosVect* positions, int32 searchLength,
+	const char* with, int32 withLength)
 {
-	int32 len = Length();
+	int32 length = Length();
 	uint32 count = positions->CountItems();
-	int32 newLength = len + count * (withLen - searchLen);
+	int32 newLength = length + count * (withLength - searchLength);
 	if (!newLength) {
 		_Realloc(0);
 		return;
 	}
 
-	int32 pos;
+	char *newData = _Alloc(newLength);
+	if (newData == NULL)
+		return;
+
+	char *oldString = fPrivateData;
+	char *newString = newData;
 	int32 lastPos = 0;
-	char *oldAdr = fPrivateData;
 
-	char *newData = (char *)malloc(newLength + kPrivateDataOffset + 1);
-	if (newData) {
-		newData += kPrivateDataOffset;
-		char *newAdr = newData;
-		for (uint32 i = 0; i < count; ++i) {
-			pos = positions->ItemAt(i);
-			len = pos - lastPos;
-			if (len > 0) {
-				memcpy(newAdr, oldAdr, len);
-				oldAdr += len;
-				newAdr += len;
-			}
-			memcpy(newAdr, with, withLen);
-			oldAdr += searchLen;
-			newAdr += withLen;
-			lastPos = pos+searchLen;
+	for (uint32 i = 0; i < count; ++i) {
+		int32 pos = positions->ItemAt(i);
+		length = pos - lastPos;
+		if (length > 0) {
+			memcpy(newString, oldString, length);
+			oldString += length;
+			newString += length;
 		}
-		len = Length() + 1 - lastPos;
-		if (len > 0)
-			memcpy(newAdr, oldAdr, len);
-
-		_FreePrivateData();
-
-		fPrivateData = newData;
-		_SetLength(newLength);
-		fPrivateData[newLength] = '\0';
+		memcpy(newString, with, withLength);
+		oldString += searchLength;
+		newString += withLength;
+		lastPos = pos + searchLength;
 	}
+
+	length = Length() + 1 - lastPos;
+	if (length > 0)
+		memcpy(newString, oldString, length);
+
+	_FreePrivateData();
+	fPrivateData = newData;
 }
 
 
