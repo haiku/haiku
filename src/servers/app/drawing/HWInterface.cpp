@@ -314,7 +314,7 @@ HWInterface::CopyBackToFront(const BRect& frame)
 
 	// we need to mess with the area, but it is const
 	IntRect area(frame);
-	BRect bufferClip(backBuffer->Bounds());
+	IntRect bufferClip(backBuffer->Bounds());
 
 	if (area.IsValid() && area.Intersects(bufferClip)) {
 
