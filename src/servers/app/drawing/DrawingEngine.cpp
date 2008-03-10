@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -94,7 +94,8 @@ DrawingEngine::DrawingEngine(HWInterface* interface)
 	: fPainter(new Painter()),
 	  fGraphicsCard(NULL),
 	  fAvailableHWAccleration(0),
-	  fSuspendSyncLevel(0)
+	  fSuspendSyncLevel(0),
+	  fCopyToFront(true)
 {
 	SetHWInterface(interface);
 }
@@ -175,6 +176,23 @@ DrawingEngine::SetHWInterface(HWInterface* interface)
 
 	FrameBufferChanged();
 }
+
+
+void
+DrawingEngine::SetCopyToFrontEnabled(bool enable)
+{
+	fCopyToFront = enable;
+}
+
+
+void
+DrawingEngine::CopyToFront(/*const*/ BRegion& region)
+{
+	int32 count = region.CountRects();
+	for (int32 i = 0; i < count; i++)
+		fGraphicsCard->CopyBackToFront(region.RectAt(i));
+}
+
 
 // #pragma mark -
 
@@ -526,7 +544,7 @@ DrawingEngine::InvertRect(BRect r)
 		} else {		
 			fPainter->InvertRect(r);
 
-			fGraphicsCard->Invalidate(r);
+			_CopyToFront(r);
 		}
 	}
 }
@@ -544,7 +562,7 @@ DrawingEngine::DrawBitmap(ServerBitmap *bitmap,
 
 		fPainter->DrawBitmap(bitmap, source, dest);
 
-		fGraphicsCard->Invalidate(clipped);
+		_CopyToFront(clipped);
 	}
 }
 
@@ -573,7 +591,7 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 		else
 			fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
 
-		fGraphicsCard->Invalidate(clipped);
+		_CopyToFront(clipped);
 	}
 }
 
@@ -588,7 +606,7 @@ DrawingEngine::DrawBezier(BPoint *pts, bool filled)
 
 	BRect touched = fPainter->DrawBezier(pts, filled);
 
-	fGraphicsCard->Invalidate(touched);
+	_CopyToFront(touched);
 }
 
 // DrawEllipse
@@ -616,7 +634,7 @@ DrawingEngine::DrawEllipse(BRect r, bool filled)
 
 		fPainter->DrawEllipse(r, filled);
 
-		fGraphicsCard->Invalidate(clipped);
+		_CopyToFront(clipped);
 	}
 }
 
@@ -636,7 +654,7 @@ DrawingEngine::DrawPolygon(BPoint* ptlist, int32 numpts,
 
 		fPainter->DrawPolygon(ptlist, numpts, filled, closed);
 
-		fGraphicsCard->Invalidate(bounds);
+		_CopyToFront(bounds);
 	}
 }
 
@@ -669,7 +687,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 		fPainter->StrokeLine(start, end);
 	}
 
-	fGraphicsCard->Invalidate(touched);
+	_CopyToFront(touched);
 }
 
 // this function is used to draw a one pixel wide rect
@@ -685,7 +703,7 @@ DrawingEngine::StrokeRect(BRect r, const rgb_color &color)
 
 		fPainter->StrokeRect(r, color);
 
-		fGraphicsCard->Invalidate(clipped);
+		_CopyToFront(clipped);
 	}
 }
 
@@ -713,7 +731,7 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 		} else {
 			fPainter->FillRect(r, color);
 	
-			fGraphicsCard->Invalidate(r);
+			_CopyToFront(r);
 		}
 	}
 }
@@ -753,7 +771,7 @@ DrawingEngine::FillRegion(BRegion& r, const rgb_color& color)
 			fPainter->FillRectNoClipping(r.RectAtInt(i), color);
 		}
 
-		fGraphicsCard->Invalidate(frame);
+		_CopyToFront(frame);
 	}
 }
 
@@ -774,7 +792,7 @@ DrawingEngine::StrokeRect(BRect r)
 
 		fPainter->StrokeRect(r);
 
-		fGraphicsCard->Invalidate(clipped);
+		_CopyToFront(clipped);
 	}
 }
 
@@ -827,7 +845,7 @@ DrawingEngine::FillRect(BRect r)
 		if (doInSoftware) {
 			fPainter->FillRect(r);
 
-			fGraphicsCard->Invalidate(r);
+			_CopyToFront(r);
 		}
 	}
 }
@@ -880,7 +898,7 @@ DrawingEngine::FillRegion(BRegion& r)
 				touched = touched | fPainter->FillRect(r.RectAt(i));
 			}
 
-			fGraphicsCard->Invalidate(touched);
+			_CopyToFront(touched);
 		}
 	}
 }
@@ -907,7 +925,7 @@ DrawingEngine::DrawRoundRect(BRect r, float xrad, float yrad, bool filled)
 		BRect touched = filled ? fPainter->FillRoundRect(r, xrad, yrad)
 							   : fPainter->StrokeRoundRect(r, xrad, yrad);
 
-		fGraphicsCard->Invalidate(touched);
+		_CopyToFront(touched);
 	}
 }
 
@@ -926,7 +944,7 @@ DrawingEngine::DrawShape(const BRect& bounds, int32 opCount,
 										ptCount, ptList,
 										filled);
 
-	fGraphicsCard->Invalidate(touched);
+	_CopyToFront(touched);
 }
 
 
@@ -947,7 +965,7 @@ DrawingEngine::DrawTriangle(BPoint* pts, const BRect& bounds, bool filled)
 		else
 			fPainter->StrokeTriangle(pts[0], pts[1], pts[2]);
 
-		fGraphicsCard->Invalidate(clipped);
+		_CopyToFront(clipped);
 	}
 }
 
@@ -966,7 +984,7 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end)
 
 		fPainter->StrokeLine(start, end);
 
-		fGraphicsCard->Invalidate(touched);
+		_CopyToFront(touched);
 	}
 }
 
@@ -1021,7 +1039,7 @@ DrawingEngine::StrokeLineArray(int32 numLines,
 		fPainter->SetHighColor(oldColor);
 		fPainter->SetPattern(pattern);
 
-		fGraphicsCard->Invalidate(touched);
+		_CopyToFront(touched);
 	}
 }
 
@@ -1069,7 +1087,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 			&cacheReference);
 //printf("drawing string: %lld µs\n", system_time() - now);
 
-		fGraphicsCard->Invalidate(touched);
+		_CopyToFront(touched);
 	}
 
 	return penLocation;
@@ -1276,6 +1294,14 @@ DrawingEngine::_CopyRect(uint8* src, uint32 width, uint32 height,
 			dst += yIncrement;
 		}
 	}
+}
+
+
+inline void
+DrawingEngine::_CopyToFront(const BRect& frame)
+{
+	if (fCopyToFront)
+		fGraphicsCard->Invalidate(frame);
 }
 
 

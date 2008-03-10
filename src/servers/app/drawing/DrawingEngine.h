@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -45,6 +45,11 @@ public:
 
 			// for "changing" hardware
 			void			SetHWInterface(HWInterface* interface);
+
+			void			SetCopyToFrontEnabled(bool enable);
+			bool			CopyToFrontEnabled() const
+								{ return fCopyToFront; }
+			void			CopyToFront(/*const*/ BRegion& region);
 
 			// locking
 			bool			LockParallelAccess();
@@ -161,10 +166,13 @@ public:
 								uint32 height, uint32 bytesPerRow,
 								int32 xOffset, int32 yOffset) const;
 
+	inline	void			_CopyToFront(const BRect& frame);
+
 			Painter*		fPainter;
 			HWInterface*	fGraphicsCard;
 			uint32			fAvailableHWAccleration;
 			int32			fSuspendSyncLevel;
+			bool			fCopyToFront;
 };
 
 #endif // DRAWING_ENGINE_H_
