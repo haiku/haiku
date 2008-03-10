@@ -1679,7 +1679,7 @@ BString::_Detach()
 
 
 char*
-BString::_Alloc(int32 length)
+BString::_Alloc(int32 length, bool adoptReferenceCount)
 {
 	if (length < 0)
 		return NULL;
@@ -1692,7 +1692,11 @@ BString::_Alloc(int32 length)
 	newData[length] = '\0';
 
 	// initialize reference count & length
-	*(((vint32*)newData) - 2) = 1;
+	int32 referenceCount = 1;
+	if (adoptReferenceCount && fPrivateData != NULL)
+		referenceCount = _ReferenceCount();
+
+	*(((vint32*)newData) - 2) = referenceCount;
 	*(((int32*)newData) - 1) = length & 0x7fffffff;
 
 	return newData;
@@ -1711,12 +1715,15 @@ BString::_Realloc(int32 length)
 
 	dataPtr = (char*)realloc(dataPtr, length + kPrivateDataOffset + 1);
 	if (dataPtr) {
+		int32 oldReferenceCount = _ReferenceCount();
+
 		dataPtr += kPrivateDataOffset;
 
 		fPrivateData = dataPtr;
 		fPrivateData[length] = '\0';
 
 		_SetLength(length);
+		_ReferenceCount() = oldReferenceCount;
 	}
 	return dataPtr;
 }
@@ -1734,7 +1741,7 @@ BString::_Init(const char* src, int32 length)
 char*
 BString::_Clone(const char* data, int32 length)
 {
-	char* newData = _Alloc(length);
+	char* newData = _Alloc(length, false);
 	if (newData == NULL)
 		return NULL;
 
