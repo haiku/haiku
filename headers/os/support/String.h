@@ -254,8 +254,9 @@ private:
 					const char* with, int32 withLen);
 
 private:
-	inline int32& 	_ReferenceCount();
-	bool			_IsShareable();
+	int32& 			_ReferenceCount();
+	const int32& 	_ReferenceCount() const;
+	bool			_IsShareable() const;
 	void			_FreePrivateData();
 
 	char*			fPrivateData;

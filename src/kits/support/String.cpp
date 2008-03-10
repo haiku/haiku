@@ -183,7 +183,7 @@ BString::BString(const BString& string)
 	: fPrivateData(NULL)
 {
 	// check if source is sharable - if so, share else clone
-	if (_IsShareable()) {
+	if (string._IsShareable()) {
 		fPrivateData = string.fPrivateData;
 		atomic_add(&_ReferenceCount(), 1);
 			// string cannot go away right now
@@ -283,7 +283,7 @@ BString::SetTo(const BString& string)
 		_FreePrivateData();
 
 	// if source is sharable share, otherwise clone
-	if (_IsShareable()) {
+	if (string._IsShareable()) {
 		fPrivateData = string.fPrivateData;
 		atomic_add(&_ReferenceCount(), 1);
 			// the string cannot go away right now
@@ -344,8 +344,7 @@ BString::SetTo(char c, int32 count)
 
 
 BString&
-BString::CopyInto(BString& into, int32 fromOffset,
-				  int32 length) const
+BString::CopyInto(BString& into, int32 fromOffset, int32 length) const
 {
 	if (this != &into)
 		into.SetTo(fPrivateData + fromOffset, length);
@@ -501,7 +500,7 @@ BString::Insert(const char* string, int32 length, int32 position)
 
 BString&
 BString::Insert(const char* string, int32 fromOffset, int32 length,
-				int32 position)
+	int32 position)
 {
 	if (string)
 		Insert(string + fromOffset, length, position);
@@ -519,8 +518,7 @@ BString::Insert(const BString& string, int32 position)
 
 
 BString&
-BString::Insert(const BString& string, int32 length,
-				int32 position)
+BString::Insert(const BString& string, int32 length, int32 position)
 {
 	if ((fPrivateData != string.fPrivateData) && string.Length() > 0)
 		Insert(string.String(), length, position);
@@ -529,8 +527,8 @@ BString::Insert(const BString& string, int32 length,
 
 
 BString&
-BString::Insert(const BString& string, int32 fromOffset,
-				int32 length, int32 position)
+BString::Insert(const BString& string, int32 fromOffset, int32 length,
+	int32 position)
 {
 	if ((fPrivateData != string.fPrivateData) && string.Length() > 0)
 		Insert(string.String() + fromOffset, length, position);
@@ -1078,7 +1076,7 @@ BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 
 BString&
 BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount,
-				 int32 fromOffset)
+	int32 fromOffset)
 {
 	fromOffset = min_clamp0(fromOffset, Length());
 	int32 pos = FindFirst(replaceThis, fromOffset);
@@ -1142,7 +1140,7 @@ BString::ReplaceLast(const char* replaceThis, const char* withThis)
 
 BString&
 BString::ReplaceAll(const char* replaceThis, const char* withThis,
-					int32 fromOffset)
+	int32 fromOffset)
 {
 	if (!replaceThis || !withThis || FindFirst(replaceThis) < 0)
 		return *this;
@@ -1157,7 +1155,7 @@ BString::ReplaceAll(const char* replaceThis, const char* withThis,
 
 BString&
 BString::Replace(const char* replaceThis, const char* withThis,
-				 int32 maxReplaceCount, int32 fromOffset)
+	int32 maxReplaceCount, int32 fromOffset)
 {
 	if (!replaceThis || !withThis || maxReplaceCount <= 0
 		|| FindFirst(replaceThis) < 0)
@@ -1217,7 +1215,7 @@ BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 
 BString&
 BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount,
-				  int32 fromOffset)
+	int32 fromOffset)
 {
 	char tmp[2] = { replaceThis, '\0' };
 	fromOffset = min_clamp0(fromOffset, Length());
@@ -1282,7 +1280,7 @@ BString::IReplaceLast(const char* replaceThis, const char* withThis)
 
 BString&
 BString::IReplaceAll(const char* replaceThis, const char* withThis,
-					 int32 fromOffset)
+	int32 fromOffset)
 {
 	if (!replaceThis || !withThis || IFindFirst(replaceThis) < 0)
 		return *this;
@@ -1297,7 +1295,7 @@ BString::IReplaceAll(const char* replaceThis, const char* withThis,
 
 BString&
 BString::IReplace(const char* replaceThis, const char* withThis,
-				  int32 maxReplaceCount, int32 fromOffset)
+	int32 maxReplaceCount, int32 fromOffset)
 {
 	if (!replaceThis || !withThis || maxReplaceCount <= 0
 		|| FindFirst(replaceThis) < 0)
@@ -1402,6 +1400,8 @@ BString::LockBuffer(int32 maxLength)
 		length += maxLength - length;
 
 	_DetachWith(fPrivateData, length);
+	_ReferenceCount() = -1;
+		// mark unshareable
 	return fPrivateData;
 }
 
@@ -1418,6 +1418,8 @@ BString::UnlockBuffer(int32 length)
 
 	_Realloc(length);
 	fPrivateData[length] = '\0';
+	_ReferenceCount() = 1;
+		// mark shareable again
 
 	return *this;
 }
@@ -1650,8 +1652,6 @@ BString::_Detach()
 {
 	char* newData = fPrivateData;
 
-	// TODO: this is not thread safe! A string could be used in than one
-	// thread at a time (and one of those threads could create a ref)
 	if (atomic_get(&_ReferenceCount()) > 1) {
 		// It might be shared, and this requires special treatment
 		newData = _Clone(fPrivateData, Length());
@@ -1714,8 +1714,10 @@ BString::_Clone(const char* data, int32 length)
 	*(((vint32*)newData) - 2) = 1;
 	*(((int32*)newData) - 1) = length & 0x7fffffff;
 
-	if (data && length)
-		memcpy(newData, data, length);
+	if (data && length) {
+		// "data" may not span over the whole length
+		strncpy(newData, data, length);
+	}
 
 	return newData;
 }
@@ -1752,8 +1754,7 @@ status_t
 BString::_DetachWith(const char* string, int32 length)
 {
 	char* newData = NULL;
-	// TODO: this is not thread safe! A string could be used in than one
-	// thread at a time (and one of those threads could create a ref)
+
 	if (atomic_get(&_ReferenceCount()) > 1) {
 		// we might share our data with someone else
 		newData = _Clone(string, length);
@@ -1787,17 +1788,28 @@ BString::_ReferenceCount()
 }
 
 
-inline bool
-BString::_IsShareable()
+inline const int32&
+BString::_ReferenceCount() const
 {
-	return fPrivateData != NULL && _ReferenceCount() >= 0;
+	return *(((int32 *)fPrivateData) - 2);
+}
+
+
+inline bool
+BString::_IsShareable() const
+{
+	return false;
+//	return fPrivateData != NULL && _ReferenceCount() >= 0;
 }
 
 
 void
 BString::_FreePrivateData()
 {
-	free(fPrivateData - kPrivateDataOffset);
+	if (fPrivateData != NULL) {
+		free(fPrivateData - kPrivateDataOffset);
+		fPrivateData = NULL;
+	}
 }
 
 
