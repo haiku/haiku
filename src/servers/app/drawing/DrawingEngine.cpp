@@ -1123,7 +1123,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 {
 	CRASH_IF_NOT_EXCLUSIVE_LOCKED
 
-	RenderingBuffer *buffer = fGraphicsCard->DrawingBuffer();
+	RenderingBuffer *buffer = fGraphicsCard->FrontBuffer();
 	if (!buffer)
 		return B_ERROR;
 
