@@ -26,12 +26,12 @@ protected:
 public:
 						~PenaltyFunction();
 	const Variable*		Var() const;
-	const BList*			Xs() const;
-	const BList*			Gs() const;
+	const BList*		Xs() const;
+	const BList*		Gs() const;
 
 private:
 	LinearSpec*			fLS;
-	Variable*				fVar;
+	Variable*			fVar;
 	BList*				fXs;		// double
 	BList*				fGs;		// double
 	BList*				fConstraints;
@@ -47,3 +47,4 @@ public:
 using LinearProgramming::PenaltyFunction;
 
 #endif	// PENALTY_FUNCTION_H
+

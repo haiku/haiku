@@ -7,6 +7,10 @@
 #ifndef	LINEAR_SPEC_H
 #define	LINEAR_SPEC_H
 
+#include "Variable.h"
+#include "Constraint.h"
+#include "Summand.h"
+#include "PenaltyFunction.h"
 #include "OperatorType.h"
 #include "ResultType.h"
 #include "OptimizationType.h"
@@ -34,9 +38,7 @@ class LinearSpec {
 public:
 						LinearSpec();
 						~LinearSpec();
-	void				UpdateObjFunction();
-	void				SetObjFunction(BList* summands);
-	ObjFunctionSummand*	AddObjFunctionSummand(double coeff, Variable* var);
+
 	Variable*			AddVariable();
 
 	Constraint*			AddConstraint(BList* summands, 
@@ -79,47 +81,42 @@ public:
 								double penaltyNeg, double penaltyPos);
 	
 	PenaltyFunction*	AddPenaltyFunction(Variable* var, BList* xs, BList* gs);
-	void				RemovePresolved();
+
+	BList*				ObjFunction();
+	void				SetObjFunction(BList* summands);
+	void				UpdateObjFunction();
+
 	ResultType			Presolve();
+	void				RemovePresolved();
 	ResultType			Solve();
 	void				Save(char* fname);
 
-	int32				Columns() const;
-	void				SetColumns(int32 value);
+	int32				CountColumns() const;
 	OptimizationType	Optimization() const;
 	void				SetOptimization(OptimizationType value);
-	lprec*				LP() const;
-	void				SetLP(lprec* value);
-	BList*				ObjFunctionSummands() const;
-	void				SetObjFunctionSummands(BList* value);
 	BList*				Variables() const;
-	void				SetVariables(BList* value);
 	BList*				Constraints() const;
-	void				SetConstraints(BList* value);
 	ResultType			Result() const;
-	void				SetResult(ResultType value);
 	double				ObjectiveValue() const;
-	void				SetObjectiveValue(double value);
 	double				SolvingTime() const;
-	void				SetSolvingTime(double value);
 
 protected:
-	int32 				fColumns;
+	int32 				fCountColumns;
 
 private:
 	lprec*				fLpPresolved;
 	OptimizationType	fOptimization;
 	lprec*				fLP;
-	BList*				fObjFunctionSummands;
+	BList*				fObjFunction;
 	BList*				fVariables;
 	BList*				fConstraints;
 	ResultType			fResult;
 	double 				fObjectiveValue;
-	double 				fSolvingTime;		// = Double.Nan
+	double 				fSolvingTime;
 
 public:
-	friend class		ObjFunctionSummand;
 	friend class		Constraint;
+	friend class		Variable;
 
 };
 

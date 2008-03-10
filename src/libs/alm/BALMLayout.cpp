@@ -290,34 +290,12 @@ BALMLayout::Areas() const
 
 
 /**
- * Sets the ares.
- *
- * @param areas	the areas
- */
-void
-BALMLayout::SetAreas(BList* areas)
-{
-	fAreas = areas;
-}
-
-
-/**
  * Gets the left variable.
  */
 XTab*
 BALMLayout::Left() const
 {
 	return fLeft;
-}
-
-
-/**
- * Sets the left variable.
- */
-void
-BALMLayout::SetLeft(XTab* left)
-{
-	fLeft = left;
 }
 
 
@@ -332,16 +310,6 @@ BALMLayout::Right() const
 
 
 /**
- * Sets the right variable.
- */
-void
-BALMLayout::SetRight(XTab* right)
-{
-	fRight = right;
-}
-
-
-/**
  * Gets the top variable.
  */
 YTab*
@@ -352,32 +320,12 @@ BALMLayout::Top() const
 
 
 /**
- * Sets the top variable.
- */
-void
-BALMLayout::SetTop(YTab* top)
-{
-	fTop = top;
-}
-
-
-/**
  * Gets the bottom variable.
  */
 YTab*
 BALMLayout::Bottom() const
 {
 	return fBottom;
-}
-
-
-/**
- * Sets the bottom variable.
- */
-void
-BALMLayout::SetBottom(YTab* bottom)
-{
-	fBottom = bottom;
 }
 
 
@@ -641,14 +589,17 @@ BALMLayout::SetPerformancePath(char* path)
 BSize
 BALMLayout::CalculateMinSize()
 {
-	printf("CalculateMinSize");
-	BList* buf = ObjFunctionSummands();
-	SetObjFunctionSummands(new BList(2));
-	AddObjFunctionSummand(1.0, fRight);
-	AddObjFunctionSummand(1.0, fBottom);
+	BList* oldObjFunction = ObjFunction();
+	BList* newObjFunction = new BList(2);
+	newObjFunction->AddItem(new Summand(1.0, fRight));
+	newObjFunction->AddItem(new Summand(1.0, fBottom));
+	SetObjFunction(newObjFunction);
 	SolveLayout();
-	SetObjFunctionSummands(buf);
+	SetObjFunction(oldObjFunction);
 	UpdateObjFunction();
+	delete (Summand*)newObjFunction->ItemAt(0);
+	delete (Summand*)newObjFunction->ItemAt(1);
+	delete newObjFunction;
 	
 	if (Result() == UNBOUNDED)
 		return Area::kMinSize;
@@ -667,14 +618,17 @@ BALMLayout::CalculateMinSize()
 BSize
 BALMLayout::CalculateMaxSize()
 {
-	printf("CalculateMaxSize");
-	BList* buf = ObjFunctionSummands();
-	SetObjFunctionSummands(new BList(2));
-	AddObjFunctionSummand(-1.0, fRight);
-	AddObjFunctionSummand(-1.0, fBottom);
+	BList* oldObjFunction = ObjFunction();
+	BList* newObjFunction = new BList(2);
+	newObjFunction->AddItem(new Summand(-1.0, fRight));
+	newObjFunction->AddItem(new Summand(-1.0, fBottom));
+	SetObjFunction(newObjFunction);
 	SolveLayout();
-	SetObjFunctionSummands(buf);
+	SetObjFunction(oldObjFunction);
 	UpdateObjFunction();
+	delete (Summand*)newObjFunction->ItemAt(0);
+	delete (Summand*)newObjFunction->ItemAt(1);
+	delete newObjFunction;
 	
 	if (Result() == UNBOUNDED)
 		return Area::kMaxSize;
@@ -693,7 +647,6 @@ BALMLayout::CalculateMaxSize()
 BSize
 BALMLayout::CalculatePreferredSize()
 {
-	printf("CalculatePreferredSize");
 	SolveLayout();
 	if (Result() != OPTIMAL) {
 		Save("failed-layout.txt");

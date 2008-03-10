@@ -32,6 +32,7 @@ class Area {
 public:
 	bool				AutoPrefContentSize() const;
 	void				SetAutoPrefContentSize(bool value);
+	
 	XTab*				Left() const;
 	void				SetLeft(XTab* left);
 	XTab*				Right() const;
@@ -40,10 +41,12 @@ public:
 	void				SetTop(YTab* top);
 	YTab*				Bottom() const;
 	void				SetBottom(YTab* bottom);
+
 	Row*				GetRow() const;
 	void				SetRow(Row* row);
 	Column*				GetColumn() const;
 	void				SetColumn(Column* column);
+
 	BView*				Content() const;
 	void				SetContent(BView* content);
 	XTab*				ContentLeft() const;
@@ -76,6 +79,7 @@ public:
 	void				SetBottomInset(int32 bottom);
 	void				SetDefaultPrefContentSize();
 	//~ string			ToString();
+
 	Constraint*			HasSameWidthAs(Area* area);
 	Constraint*			HasSameHeightAs(Area* area);
 	BList*				HasSameSizetAs(Area* area);
@@ -92,18 +96,18 @@ protected:
 	void				DoLayout();
 	
 private:
-	void					InitChildArea();
-	void					UpdateHorizontal();
-	void					UpdateVertical();
-	void					Init(BALMLayout* ls, XTab* left, YTab* top, 
-								XTab* right, YTab* bottom, 
-								BView* content, 
-								BSize minContentSize);
+	void				InitChildArea();
+	void				UpdateHorizontal();
+	void				UpdateVertical();
+	void				Init(BALMLayout* ls, XTab* left, YTab* top, 
+							XTab* right, YTab* bottom, 
+							BView* content, 
+							BSize minContentSize);
 
 public:
-	static BSize			kMaxSize;
-	static BSize			kMinSize;
-	static BSize			kUndefinedSize;
+	static BSize		kMaxSize;
+	static BSize		kMinSize;
+	static BSize		kUndefinedSize;
 
 protected:
 	BView*				fContent;
@@ -152,3 +156,4 @@ public:
 using BALM::Area;
 
 #endif	// AREA_H
+

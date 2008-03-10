@@ -8,7 +8,6 @@ SharedLibrary liblinprog.so :
 	Constraint.cpp
 	LinearSpec.cpp
 	Summand.cpp
-	ObjFunctionSummand.cpp
 	PenaltyFunction.cpp
 	Variable.cpp
 	:

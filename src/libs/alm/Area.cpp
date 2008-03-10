@@ -77,10 +77,10 @@ Area::SetLeft(XTab* left)
 	fColumn = NULL;
 	
 	if (fChildArea == NULL) {
-		fMinContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
+		fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	
 		if (fMaxContentWidth != NULL)
-			fMaxContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
+			fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	} else
 		UpdateHorizontal();
 	fLS->InvalidateLayout();
@@ -112,10 +112,10 @@ Area::SetRight(XTab* right)
 	fColumn = NULL;
 	
 	if (fChildArea == NULL) {
-		fMinContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
+		fMinContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	
 		if (fMaxContentWidth != NULL)
-			fMaxContentWidth->ChangeLeftSide(-1.0, fLeft, 1.0, fRight);
+			fMaxContentWidth->SetLeftSide(-1.0, fLeft, 1.0, fRight);
 	} else
 		UpdateHorizontal();
 	fLS->InvalidateLayout();
@@ -143,10 +143,10 @@ Area::SetTop(YTab* top)
 	fRow = NULL;
 	
 	if (fChildArea == NULL) {
-		fMinContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
+		fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 		
 		if (fMaxContentHeight != NULL)
-			fMaxContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
+			fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 	} else
 		UpdateVertical();
 	fLS->InvalidateLayout();
@@ -174,10 +174,10 @@ Area::SetBottom(YTab* bottom)
 	fRow = NULL;
 	
 	if (fChildArea == NULL) {
-		fMinContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
+		fMinContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 		
 		if (fMaxContentHeight != NULL)
-			fMaxContentHeight->ChangeLeftSide(-1.0, fTop, 1.0, fBottom);
+			fMaxContentHeight->SetLeftSide(-1.0, fTop, 1.0, fBottom);
 	} else
 		UpdateVertical();
 	fLS->InvalidateLayout();
@@ -471,7 +471,7 @@ Area::SetContentAspectRatio(double ratio)
 				OperatorType(EQ), 0.0);
 			fConstraints->AddItem(fContentAspectRatioC);
 		} else {
-			fContentAspectRatioC->ChangeLeftSide(
+			fContentAspectRatioC->SetLeftSide(
 				-1.0, fLeft, 1.0, fRight, ratio, fTop, -ratio, fBottom);
 		}
 	} else
@@ -855,10 +855,10 @@ Area::InitChildArea()
 		fChildArea->fMaxContentSize = fMaxContentSize;
 		
 		fChildArea->fMaxContentWidth = fMaxContentWidth;
-		fMaxContentWidth->ChangeLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
+		fMaxContentWidth->SetLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
 		
 		fChildArea->fMaxContentHeight = fMaxContentHeight;
-		fMaxContentHeight->ChangeLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
+		fMaxContentHeight->SetLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
 	}
 	
 	// if there are preferred content size constraints on this area, 
@@ -870,10 +870,10 @@ Area::InitChildArea()
 		fChildArea->fExpandRigidity = fExpandRigidity;
 		
 		fChildArea->fPrefContentWidth = fPrefContentWidth;
-		fPrefContentWidth->ChangeLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
+		fPrefContentWidth->SetLeftSide(-1.0, fChildArea->Left(), 1.0, fChildArea->Right());
 		
 		fChildArea->fPrefContentHeight = fPrefContentHeight;
-		fPrefContentHeight->ChangeLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
+		fPrefContentHeight->SetLeftSide(-1.0, fChildArea->Top(), 1.0, fChildArea->Bottom());
 	}
 }
 
@@ -891,43 +891,43 @@ Area::UpdateHorizontal()
 	// change the constraints leftConstraint and rightConstraint so that the horizontal 
 	// alignment and insets of the childArea within this area are as specified by the user
 	if (fAlignment.Horizontal() == B_ALIGN_LEFT) {
-		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
+		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(EQ));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
+		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(GE));
 		fRightConstraint->SetRightSide(fRightInset);
 	} else if (fAlignment.Horizontal() == B_ALIGN_RIGHT) {
-		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
+		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(GE));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
+		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(EQ));
 		fRightConstraint->SetRightSide(fRightInset);
 	} else if (fAlignment.Horizontal() == B_ALIGN_HORIZONTAL_CENTER) {
-		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
+		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(GE));
 		fLeftConstraint->SetRightSide(max(fLeftInset, fRightInset));
 		
-		fRightConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left(), 1.0, fChildArea->Right(), -1.0, fRight);
+		fRightConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left(), 1.0, fChildArea->Right(), -1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(EQ));
 		fRightConstraint->SetRightSide(0);
 	} else if (fAlignment.Horizontal() == B_ALIGN_USE_FULL_WIDTH) {
-		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
+		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(EQ));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
+		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(EQ));
 		fRightConstraint->SetRightSide(fRightInset);
 	} else if (fAlignment.Horizontal() == B_ALIGN_HORIZONTAL_UNSET) {
-		fLeftConstraint->ChangeLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
+		fLeftConstraint->SetLeftSide(-1.0, fLeft, 1.0, fChildArea->Left());
 		fLeftConstraint->SetOp(OperatorType(GE));
 		fLeftConstraint->SetRightSide(fLeftInset);
 		
-		fRightConstraint->ChangeLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
+		fRightConstraint->SetLeftSide(-1.0, fChildArea->Right(), 1.0, fRight);
 		fRightConstraint->SetOp(OperatorType(GE));
 		fRightConstraint->SetRightSide(fRightInset);
 	}
@@ -945,43 +945,43 @@ void Area::UpdateVertical() {
 	// change the constraints topConstraint and bottomConstraint so that the vertical 
 	// alignment and insets of the childArea within this area are as specified by the user
 	if (fAlignment.Vertical() == B_ALIGN_TOP) {
-		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
+		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(EQ));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
+		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(GE));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	} else if (fAlignment.Vertical() == B_ALIGN_BOTTOM) {
-		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
+		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(GE));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
+		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(EQ));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	} else if (fAlignment.Vertical() == B_ALIGN_VERTICAL_CENTER) {
-		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
+		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(GE));
 		fTopConstraint->SetRightSide(max(fTopInset, fBottomInset));
 		
-		fBottomConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top(), 1.0, fChildArea->Bottom(), -1.0, fBottom);
+		fBottomConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top(), 1.0, fChildArea->Bottom(), -1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(EQ));
 		fBottomConstraint->SetRightSide(0);
 	} else if (fAlignment.Vertical() == B_ALIGN_USE_FULL_HEIGHT) {
-		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
+		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(EQ));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
+		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(EQ));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	} else if (fAlignment.Vertical() == B_ALIGN_VERTICAL_UNSET) {
-		fTopConstraint->ChangeLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
+		fTopConstraint->SetLeftSide(-1.0, fTop, 1.0, fChildArea->Top());
 		fTopConstraint->SetOp(OperatorType(GE));
 		fTopConstraint->SetRightSide(fTopInset);
 		
-		fBottomConstraint->ChangeLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
+		fBottomConstraint->SetLeftSide(-1.0, fChildArea->Bottom(), 1.0, fBottom);
 		fBottomConstraint->SetOp(OperatorType(GE));
 		fBottomConstraint->SetRightSide(fBottomInset);
 	}

@@ -9,7 +9,7 @@
 
 #include "OperatorType.h"
 #include "Variable.h"
-#include "ObjFunctionSummand.h"
+#include "Summand.h"
 
 #include <List.h>
 #include <String.h>
@@ -29,18 +29,21 @@ class Constraint {
 	
 public:
 	int32				Index();
-	BList*				Summands();
-	void				ChangeLeftSide(BList* summands);
-	void				ChangeLeftSide(double coeff1, Variable* var1);
-	void				ChangeLeftSide(double coeff1, Variable* var1, 
+	
+	BList*				LeftSide();
+	void				SetLeftSide(BList* summands);
+	void				UpdateLeftSide();
+	void				SetLeftSide(double coeff1, Variable* var1);
+	void				SetLeftSide(double coeff1, Variable* var1, 
 							double coeff2, Variable* var2);
-	void				ChangeLeftSide(double coeff1, Variable* var1, 
+	void				SetLeftSide(double coeff1, Variable* var1, 
 							double coeff2, Variable* var2,
 							double coeff3, Variable* var3);
-	void				ChangeLeftSide(double coeff1, Variable* var1, 
+	void				SetLeftSide(double coeff1, Variable* var1, 
 							double coeff2, Variable* var2,
 							double coeff3, Variable* var3,
 							double coeff4, Variable* var4);
+
 	OperatorType		Op();
 	void				SetOp(OperatorType value);
 	double				RightSide();
@@ -49,6 +52,7 @@ public:
 	void				SetPenaltyNeg(double value);
 	double				PenaltyPos();
 	void				SetPenaltyPos(double value);
+
 	Variable*			DNeg() const;
 	Variable*			DPos() const;
 	
@@ -56,21 +60,17 @@ public:
 						~Constraint();
 
 protected:
-						Constraint(LinearSpec* ls, BList* summands, 
+						Constraint(LinearSpec* ls, BList* summands,
 								OperatorType op, double rightSide,
 								double penaltyNeg, double penaltyPos);
 
 private:
 	LinearSpec*			fLS;
-	BList*				fSummands;
+	BList*				fLeftSide;
 	OperatorType		fOp;
 	double				fRightSide;
-	Variable*			fDNeg;
-	Variable*			fDPos;
-	ObjFunctionSummand*	fDNegSummand;
-	ObjFunctionSummand*	fDPosSummand;
-	
-	void				_UpdateLeftSide();
+	Summand*			fDNegObjSummand;
+	Summand*			fDPosObjSummand;
 
 public:
 	friend class		LinearSpec;
@@ -82,3 +82,4 @@ public:
 using LinearProgramming::Constraint;
 
 #endif	// CONSTRAINT_H
+

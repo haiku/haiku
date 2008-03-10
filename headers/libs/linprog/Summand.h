@@ -37,3 +37,4 @@ private:
 using LinearProgramming::Summand;
 
 #endif	// OBJ_FUNCTION_SUMMAND_H
+

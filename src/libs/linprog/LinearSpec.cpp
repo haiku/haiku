@@ -5,13 +5,6 @@
  */
 
 #include "LinearSpec.h"
-#include "Constraint.h"
-#include "ObjFunctionSummand.h"
-#include "PenaltyFunction.h"
-#include "Constraint.h"
-#include "Variable.h"
-
-#include "lp_lib.h"
 
 
 /**
@@ -25,78 +18,34 @@ LinearSpec::LinearSpec()
 		printf("Couldn't construct a new model.");
 	set_verbose(fLP, 1);
 	
-	fObjFunctionSummands = new BList(1);
-	fVariables = new BList(1);
-	fConstraints = new BList(1);
-	fColumns = 0;
+	fObjFunction = new BList();
+	fVariables = new BList();
+	fConstraints = new BList();
+	fCountColumns = 0;
 	fLpPresolved = NULL;
 	fOptimization = MINIMIZE;
 	fResult = ERROR;
-	fObjectiveValue = NULL;
+	fObjectiveValue = NAN;
+	fSolvingTime = NAN;
 }
 
 
 /**
  * Destructor.
- * Removes the specification.
+ * Removes the specification and deletes all constraints, 
+ * objective function summands and variables.
  */
 LinearSpec::~LinearSpec()
 {
-	delete_lp(fLP);
-}
-
-
-/**
- * Updates the objective function.
- */
-void
-LinearSpec::UpdateObjFunction()
-{
-	int32 size = fObjFunctionSummands->CountItems();
-	double coeffs[size];
-	int varIndexes[size];
-	ObjFunctionSummand* current;
-	for (int32 i = 0; i < size; i++) {
-		current = (ObjFunctionSummand*)fObjFunctionSummands->ItemAt(i);
-		coeffs[i] = current->Coeff();
-		varIndexes[i] = current->Var()->Index();
-	}
-	
-	if (!set_obj_fnex(fLP, size, &coeffs[0], &varIndexes[0]))
-		printf("Error in set_obj_fnex.");
-	
 	RemovePresolved();
-}
-
-
-/**
- * Sets the objective function.
- * 
- * @param coeffs	the objective function's coefficients
- * @param vars	the objective function's variables
- */
-void
-LinearSpec::SetObjFunction(BList* summands)
-{
-	fObjFunctionSummands = summands;
-	UpdateObjFunction();
-}
-
-
-/**
- * Adds a new summand to the objective function.
- * 
- * @param coeff	the summand's coefficient
- * @param var		the summand's variable
- * @return the new summand
- */
-ObjFunctionSummand*
-LinearSpec::AddObjFunctionSummand(double coeff, Variable* var)
-{
-	ObjFunctionSummand* s = new ObjFunctionSummand(this, coeff, var);
-	fObjFunctionSummands->AddItem(s);
-	UpdateObjFunction();
-	return s;
+	int i;
+	for (i=0; i<fConstraints->CountItems(); i++)
+		delete (Constraint*)fConstraints->ItemAt(i);
+	for (i=0; i<fObjFunction->CountItems(); i++)
+		delete (Summand*)fObjFunction->ItemAt(i);
+	for (i=0; i<fVariables->CountItems(); i++)
+		delete (Variable*)fVariables->ItemAt(i);
+	delete_lp(fLP);
 }
 
 
@@ -116,7 +65,7 @@ LinearSpec::AddVariable()
  * Adds a new hard linear constraint to the specification.
  * 
  * @param coeffs		the constraint's coefficients
- * @param vars		the constraint's variables
+ * @param vars			the constraint's variables
  * @param op			the constraint's operand
  * @param rightSide	the constant value on the constraint's right side
  * @return the new constraint
@@ -135,7 +84,7 @@ LinearSpec::AddConstraint(BList* summands, OperatorType op, double rightSide)
  * Adds a new hard linear constraint to the specification with a single summand.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param op			the constraint's operand
  * @param rightSide	the constant value on the constraint's right side
  * @return the new constraint
@@ -157,9 +106,9 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * Adds a new hard linear constraint to the specification with two summands.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param coeff2		the constraint's second coefficient
- * @param var2		the constraint's second variable
+ * @param var2			the constraint's second variable
  * @param op			the constraint's operand
  * @param rightSide	the constant value on the constraint's right side
  * @return the new constraint
@@ -182,11 +131,11 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * Adds a new hard linear constraint to the specification with three summands.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param coeff2		the constraint's second coefficient
- * @param var2		the constraint's second variable
+ * @param var2			the constraint's second variable
  * @param coeff3		the constraint's third coefficient
- * @param var3		the constraint's third variable
+ * @param var3			the constraint's third variable
  * @param op			the constraint's operand
  * @param rightSide	the constant value on the constraint's right side
  * @return the new constraint
@@ -211,13 +160,13 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * Adds a new hard linear constraint to the specification with four summands.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param coeff2		the constraint's second coefficient
- * @param var2		the constraint's second variable
+ * @param var2			the constraint's second variable
  * @param coeff3		the constraint's third coefficient
- * @param var3		the constraint's third variable
+ * @param var3			the constraint's third variable
  * @param coeff4		the constraint's fourth coefficient
- * @param var4		the constraint's fourth variable
+ * @param var4			the constraint's fourth variable
  * @param op			the constraint's operand
  * @param rightSide	the constant value on the constraint's right side
  * @return the new constraint
@@ -244,9 +193,9 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * i.e. a constraint that does not always have to be satisfied.
  * 
  * @param coeffs		the constraint's coefficients
- * @param vars		the constraint's variables
+ * @param vars			the constraint's variables
  * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
+ * @param rightSide		the constant value on the constraint's right side
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
@@ -265,9 +214,9 @@ LinearSpec::AddConstraint(BList* summands, OperatorType op,
  * Adds a new soft linear constraint to the specification with a single summand.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
+ * @param rightSide		the constant value on the constraint's right side
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
@@ -288,11 +237,11 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * Adds a new soft linear constraint to the specification with two summands.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param coeff2		the constraint's second coefficient
- * @param var2		the constraint's second variable
+ * @param var2			the constraint's second variable
  * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
+ * @param rightSide		the constant value on the constraint's right side
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
@@ -315,13 +264,13 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * Adds a new soft linear constraint to the specification with three summands.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param coeff2		the constraint's second coefficient
- * @param var2		the constraint's second variable
+ * @param var2			the constraint's second variable
  * @param coeff3		the constraint's third coefficient
- * @param var3		the constraint's third variable
+ * @param var3			the constraint's third variable
  * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
+ * @param rightSide		the constant value on the constraint's right side
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
@@ -345,15 +294,15 @@ LinearSpec::AddConstraint(double coeff1, Variable* var1,
  * Adds a new soft linear constraint to the specification with four summands.
  * 
  * @param coeff1		the constraint's first coefficient
- * @param var1		the constraint's first variable
+ * @param var1			the constraint's first variable
  * @param coeff2		the constraint's second coefficient
- * @param var2		the constraint's second variable
+ * @param var2			the constraint's second variable
  * @param coeff3		the constraint's third coefficient
- * @param var3		the constraint's third variable
+ * @param var3			the constraint's third variable
  * @param coeff4		the constraint's fourth coefficient
- * @param var4		the constraint's fourth variable
+ * @param var4			the constraint's fourth variable
  * @param op			the constraint's operand
- * @param rightSide	the constant value on the constraint's right side
+ * @param rightSide		the constant value on the constraint's right side
  * @param penaltyNeg	the coefficient penalizing negative deviations from the exact solution
  * @param penaltyPos	the coefficient penalizing positive deviations from the exact solution
  */
@@ -387,6 +336,56 @@ PenaltyFunction*
 LinearSpec::AddPenaltyFunction(Variable* var, BList* xs, BList* gs)
 {
 	return new PenaltyFunction(this, var, xs, gs);
+}
+
+
+/**
+ * Gets the objective function.
+ * 
+ * @return BList containing the objective function's summands
+ */
+BList*
+LinearSpec::ObjFunction()
+{
+	return fObjFunction;
+}
+
+
+/**
+ * Sets a new objective function.
+ * The old objective function summands are NOT deleted.
+ * 
+ * @param summands	BList containing the objective function's summands
+ */
+void
+LinearSpec::SetObjFunction(BList* summands)
+{
+	fObjFunction = summands;
+	UpdateObjFunction();
+}
+
+
+/**
+ * Updates the internal representation of the objective function.
+ * Must be called whenever the summands of the objective function are changed.
+ */
+void
+LinearSpec::UpdateObjFunction()
+{
+	int32 size = fObjFunction->CountItems();
+	double coeffs[size];
+	int varIndexes[size];
+	Summand* current;
+	for (int32 i = 0; i < size; i++) {
+		current = (Summand*)fObjFunction->ItemAt(i);
+		coeffs[i] = current->Coeff();
+		varIndexes[i] = current->Var()->Index();
+	}
+	
+	if (!set_obj_fnex(fLP, size, &coeffs[0], &varIndexes[0]))
+		printf("Error in set_obj_fnex.");
+	
+	RemovePresolved();
 }
 
 
@@ -501,21 +500,9 @@ LinearSpec::Save(char* fname)
  * @return the number of columns
  */
 int32
-LinearSpec::Columns() const
+LinearSpec::CountColumns() const
 {
-	return fColumns;
-}
-
-
-/**
- * Sets the number of columns.
- * 
- * @param value	the number of columns
- */
-void
-LinearSpec::SetColumns(int32 value)
-{
-	fColumns = value;
+	return fCountColumns;
 }
 
 
@@ -550,54 +537,6 @@ LinearSpec::SetOptimization(OptimizationType value)
 
 
 /**
- * Gets the lpsolve variable.
- * 
- * @return the lpsolve variable
- */
-lprec*
-LinearSpec::LP() const
-{
-	return fLP;
-}
-
-
-/**
- * Sets the lpsolve variable.
- * 
- * @param value	the lpsolve variable
- */
-void
-LinearSpec::SetLP(lprec* value)
-{
-	fLP = value;
-}
-
-
-/**
- * Gets the objective function summand.
- * 
- * @return the objective function summand
- */
-BList*
-LinearSpec::ObjFunctionSummands() const
-{
-	return fObjFunctionSummands;
-}
-
-
-/**
- * Sets the objective function summand.
- * 
- * @param value	the objective function summand
- */
-void
-LinearSpec::SetObjFunctionSummands(BList* value)
-{
-	fObjFunctionSummands = value;
-}
-
-
-/**
  * Gets the the variables.
  * 
  * @return the variables
@@ -606,18 +545,6 @@ BList*
 LinearSpec::Variables() const
 {
 	return fVariables;
-}
-
-
-/**
- * Sets the the variables.
- * 
- * @param value	the variables
- */
-void
-LinearSpec::SetVariables(BList* value)
-{
-	fVariables = value;
 }
 
 
@@ -634,16 +561,6 @@ LinearSpec::Constraints() const
 
 
 /**
- * Sets the constraints.
- * 
- * @param value	the constraints
- */
-void LinearSpec::SetConstraints(BList* value) {
-	fConstraints = value;
-}
-
-
-/**
  * Gets the result type.
  * 
  * @return the result type
@@ -652,18 +569,6 @@ ResultType
 LinearSpec::Result() const
 {
 	return fResult;
-}
-
-
-/**
- * Sets the result type.
- * 
- * @param value	the result type
- */
-void
-LinearSpec::SetResult(ResultType value)
-{
-	fResult = value;
 }
 
 
@@ -680,18 +585,6 @@ LinearSpec::ObjectiveValue() const
 
 
 /**
- * Sets the objective value.
- * 
- * @param value	the objective value
- */
-void
-LinearSpec::SetObjectiveValue(double value)
-{
-	fObjectiveValue = value;
-}
-
-
-/**
  * Gets the solving time.
  * 
  * @return the solving time
@@ -700,17 +593,5 @@ double
 LinearSpec::SolvingTime() const
 {
 	return fSolvingTime;
-}
-
-
-/**
- * Sets the solving time.
- * 
- * @param value	the solving time
- */
-void
-LinearSpec::SetSolvingTime(double value)
-{
-	fSolvingTime = value;
 }
 

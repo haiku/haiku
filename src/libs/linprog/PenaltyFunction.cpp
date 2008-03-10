@@ -6,7 +6,7 @@
 
 #include "PenaltyFunction.h"
 #include "Constraint.h"
-#include "ObjFunctionSummand.h"
+#include "Summand.h"
 #include "OperatorType.h"
 #include "Variable.h"
 #include "LinearSpec.h"
@@ -31,8 +31,8 @@ PenaltyFunction::PenaltyFunction(LinearSpec* ls, Variable* var, BList* xs, BList
 	fVar = var;
 	fXs = xs;
 	fGs = gs;
-	fConstraints = new BList(1);
-	fObjFunctionSummands = new BList(1);
+	fConstraints = new BList(sizeGs + 1);
+	fObjFunctionSummands = new BList(sizeGs);
 		
 	fConstraints->AddItem(ls->AddConstraint(1.0, var, OperatorType(EQ), 
 		*(double*)(xs->ItemAt(0)), -*(double*)(gs->ItemAt(0)), 
@@ -44,9 +44,11 @@ PenaltyFunction::PenaltyFunction(LinearSpec* ls, Variable* var, BList* xs, BList
 		fConstraints->AddItem(ls->AddConstraint(1.0, var, -1.0, dPos, OperatorType(LE), 
 			*(double*)(xs->ItemAt(i))));
 		
-		fObjFunctionSummands->AddItem(ls->AddObjFunctionSummand(
-			*(double*)(gs->ItemAt(i + 1)) - *(double*)(gs->ItemAt(i)), dPos));
+		Summand* objSummand =  new Summand(*(double*)(gs->ItemAt(i + 1)) - *(double*)(gs->ItemAt(i)), dPos);
+		ls->ObjFunction()->AddItem(objSummand);
+		fObjFunctionSummands->AddItem(objSummand);
 	}
+	ls->UpdateObjFunction();
 }
 
 
@@ -56,53 +58,10 @@ PenaltyFunction::PenaltyFunction(LinearSpec* ls, Variable* var, BList* xs, BList
  */
 PenaltyFunction::~PenaltyFunction()
 {
-	int32 sizeConstraints = fConstraints->CountItems();
-	for (int32 i = 0; i < sizeConstraints; i++) {
-		Constraint* currentConstraint = (Constraint*)fConstraints->ItemAt(i);
-		delete currentConstraint;
-	}
+	for (int32 i = 0; i < fConstraints->CountItems(); i++)
+		delete (Constraint*)fConstraints->ItemAt(i);
 	
-	int32 sizeObjFunctionSummands = fObjFunctionSummands->CountItems();
-	for (int32 i = 0; i < sizeObjFunctionSummands; i++) {
-		ObjFunctionSummand* currentObjFunctionSummand = 
-			(ObjFunctionSummand*)fObjFunctionSummands->ItemAt(i);
-		delete currentObjFunctionSummand;
-	}
-}
-
-
-/**
- * Gets the variable.
- * 
- * @return the variable
- */
-const Variable*
-PenaltyFunction::Var() const
-{
-	return fVar;
-}
-
-
-/**
- * Gets the sampling points.
- * 
- * @return the sampling points
- */
-const BList*
-PenaltyFunction::Xs() const
-{
-	return fXs;
-}
-
-
-/**
- * Gets the sampling gradients.
- * 
- * @return the sampling gradients
- */
-const
-BList* PenaltyFunction::Gs() const
-{
-	return fGs;
+	for (int32 i = 0; i < fObjFunctionSummands->CountItems(); i++)
+		delete (Summand*)fObjFunctionSummands->ItemAt(i);
 }
 

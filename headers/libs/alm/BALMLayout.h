@@ -33,7 +33,7 @@ class BALMLayout : public BLayout, public LinearSpec {
 		
 public:
 						BALMLayout();
-	void					SolveLayout();
+	void				SolveLayout();
 
 	XTab*				AddXTab();
 	YTab*				AddYTab();
@@ -41,6 +41,7 @@ public:
 	Row*				AddRow(YTab* top, YTab* bottom);
 	Column*				AddColumn();
 	Column*				AddColumn(XTab* left, XTab* right);
+	
 	Area*				AddArea(XTab* left, YTab* top, XTab* right, YTab* bottom,
 								BView* content, BSize minContentSize);
 	Area*				AddArea(Row* row, Column* column, BView* content,
@@ -50,40 +51,37 @@ public:
 	Area*				AddArea(Row* row, Column* column, BView* content);
 	Area*				AreaOf(BView* control);
 	BList*				Areas() const;
-	void					SetAreas(BList* areas);
-	XTab*				Left() const;
-	void					SetLeft(XTab* left);
-	XTab*				Right() const;
-	void					SetRight(XTab* right);
-	YTab*				Top() const;
-	void					SetTop(YTab* top);
-	YTab*				Bottom() const;
-	void					SetBottom(YTab* bottom);
-	
-	void					RecoverLayout(BView* parent);
-	LayoutStyleType		LayoutStyle() const;
-	void					SetLayoutStyle(LayoutStyleType style);
 
-	BLayoutItem*			AddView(BView* child);
-	BLayoutItem*			AddView(int32 index, BView* child);
+	XTab*				Left() const;
+	XTab*				Right() const;
+	YTab*				Top() const;
+	YTab*				Bottom() const;
+	
+	void				RecoverLayout(BView* parent);
+	
+	LayoutStyleType		LayoutStyle() const;
+	void				SetLayoutStyle(LayoutStyleType style);
+
+	BLayoutItem*		AddView(BView* child);
+	BLayoutItem*		AddView(int32 index, BView* child);
 	bool				AddItem(BLayoutItem* item);
 	bool				AddItem(int32 index, BLayoutItem* item);
 	bool				RemoveView(BView* child);
 	bool				RemoveItem(BLayoutItem* item);
-	BLayoutItem*			RemoveItem(int32 index);
+	BLayoutItem*		RemoveItem(int32 index);
 
 	BSize				MinSize();
 	BSize				MaxSize();
 	BSize				PreferredSize();
 	BAlignment			Alignment();
 	bool				HasHeightForWidth();
-	void					GetHeightForWidth(float width, float* min,
+	void				GetHeightForWidth(float width, float* min,
 								float* max, float* preferred);
-	void					InvalidateLayout();
-	void					LayoutView();
+	void				InvalidateLayout();
+	void				LayoutView();
 	
 	char*				PerformancePath() const;
-	void					SetPerformancePath(char* path);
+	void				SetPerformancePath(char* path);
 
 private:
 	BSize				CalculateMinSize();

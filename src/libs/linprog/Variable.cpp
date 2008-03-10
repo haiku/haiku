@@ -98,7 +98,7 @@ void
 Variable::SetMin(double min)
 {
 	fMin = min;
-	set_bounds(fLS->LP(), this->Index(), fMin, fMax);
+	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
 }
 
 
@@ -123,7 +123,7 @@ void
 Variable::SetMax(double max)
 {
 	fMax = max;
-	set_bounds(fLS->LP(), this->Index(), fMin, fMax);
+	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
 }
 
 
@@ -138,7 +138,7 @@ Variable::SetRange(double min, double max)
 {
 	fMin = min;
 	fMax = max;
-	set_bounds(fLS->LP(), this->Index(), fMin, fMax);
+	set_bounds(fLS->fLP, this->Index(), fMin, fMax);
 }
 
 
@@ -204,11 +204,10 @@ Variable::Variable(LinearSpec* ls)
 	
 	ls->Variables()->AddItem(this);
 	
-	int32 size = ls->Variables()->CountItems();
-	if (size > ls->Columns()) {
+	if (ls->Variables()->CountItems() > ls->CountColumns()) {
 		double d = 0;
 		int i = 0;
-		if (!add_columnex(ls->LP(), 0, &d, &i))
+		if (!add_columnex(ls->fLP, 0, &d, &i))
 			printf("Error in add_columnex.");
 	}
 }
@@ -220,7 +219,7 @@ Variable::Variable(LinearSpec* ls)
  */
 Variable::~Variable()
 {
-	del_column(fLS->LP(), this->Index());
+	del_column(fLS->fLP, this->Index());
 	fLS->Variables()->RemoveItem(this);
 }
 

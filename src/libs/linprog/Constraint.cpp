@@ -27,107 +27,116 @@ Constraint::Index()
 
 
 /**
- * Gets the summands of the constraint.
+ * Gets the left side of the constraint.
  * 
- * @return pointer to a BList containing the summands of the constraint
+ * @return pointer to a BList containing the summands on the left side of the constraint
  */
 BList*
-Constraint::Summands()
+Constraint::LeftSide()
 {
-	return fSummands;
-}
-
-
-void
-Constraint::_UpdateLeftSide()
-{
-	double coeffs[fSummands->CountItems() + 2];
-	int varIndexes[fSummands->CountItems() + 2];
-	int32 i;
-	for (i = 0; i < fSummands->CountItems(); i++) {
-		Summand* s = (Summand*)fSummands->ItemAt(i);
-		coeffs[i] = s->Coeff();
-		varIndexes[i] = s->Var()->Index();
-	}
-	
-	if (fDNegSummand != NULL && fOp != OperatorType(LE)) {
-		varIndexes[i] = fDNegSummand->Var()->Index();
-		coeffs[i] = 1.0;
-		i++;
-	}
-	
-	if (fDPosSummand != NULL && fOp != OperatorType(GE)) {
-		varIndexes[i] = fDPosSummand->Var()->Index();
-		coeffs[i] = -1.0;
-		i++;
-	}
-	
-	if (!set_rowex(fLS->LP(), this->Index(), i, &coeffs[0], &varIndexes[0]))
-		printf("Error in set_rowex.");
-	
-	fLS->RemovePresolved();
+	return fLeftSide;
 }
 
 
 /**
- * Changes the left side of the constraint, i.e.&nbsp;its coefficients and variables.
- * There must be exactly one coefficient for each variable.
+ * Sets the summands on the left side of the constraint.
+ * The old summands are NOT deleted.
  * 
  * @param summands	a BList containing the Summand objects that make up the new left side
  */
 void
-Constraint::ChangeLeftSide(BList* summands)
+Constraint::SetLeftSide(BList* summands)
 {
-	fSummands = summands;
-	_UpdateLeftSide();
+	fLeftSide = summands;
+	UpdateLeftSide();
 }
 
 
 void
-Constraint::ChangeLeftSide(double coeff1, Variable* var1)
+Constraint::UpdateLeftSide()
 {
-	fSummands->MakeEmpty();
-	fSummands->AddItem(new Summand(coeff1, var1));
-	_UpdateLeftSide();
+	double coeffs[fLeftSide->CountItems() + 2];
+	int varIndexes[fLeftSide->CountItems() + 2];
+	int32 i;
+	for (i = 0; i < fLeftSide->CountItems(); i++) {
+		Summand* s = (Summand*)fLeftSide->ItemAt(i);
+		coeffs[i] = s->Coeff();
+		varIndexes[i] = s->Var()->Index();
+	}
+	
+	if (fDNegObjSummand != NULL && fOp != OperatorType(LE)) {
+		varIndexes[i] = fDNegObjSummand->Var()->Index();
+		coeffs[i] = 1.0;
+		i++;
+	}
+	
+	if (fDPosObjSummand != NULL && fOp != OperatorType(GE)) {
+		varIndexes[i] = fDPosObjSummand->Var()->Index();
+		coeffs[i] = -1.0;
+		i++;
+	}
+	
+	if (!set_rowex(fLS->fLP, this->Index(), i, &coeffs[0], &varIndexes[0]))
+		printf("Error in set_rowex.");
+	
+	fLS->UpdateObjFunction();
+	fLS->RemovePresolved();
 }
 
 
 void
-Constraint::ChangeLeftSide(double coeff1, Variable* var1, 
+Constraint::SetLeftSide(double coeff1, Variable* var1)
+{
+	for (int i=0; i<fLeftSide->CountItems(); i++)
+		delete (Summand*)fLeftSide->ItemAt(i);
+	fLeftSide->MakeEmpty();
+	fLeftSide->AddItem(new Summand(coeff1, var1));
+	UpdateLeftSide();
+}
+
+
+void
+Constraint::SetLeftSide(double coeff1, Variable* var1, 
 	double coeff2, Variable* var2)
 {
-	fSummands->MakeEmpty();
-	fSummands->AddItem(new Summand(coeff1, var1));
-	fSummands->AddItem(new Summand(coeff2, var2));
-	_UpdateLeftSide();
+	for (int i=0; i<fLeftSide->CountItems(); i++)
+		delete (Summand*)fLeftSide->ItemAt(i);
+	fLeftSide->MakeEmpty();
+	fLeftSide->AddItem(new Summand(coeff1, var1));
+	fLeftSide->AddItem(new Summand(coeff2, var2));
+	UpdateLeftSide();
 }
 
 	
 void
-Constraint::ChangeLeftSide(double coeff1, Variable* var1, 
+Constraint::SetLeftSide(double coeff1, Variable* var1, 
 	double coeff2, Variable* var2,
 	double coeff3, Variable* var3)
 {
-	fSummands->MakeEmpty();
-	fSummands->AddItem(new Summand(coeff1, var1));
-	fSummands->AddItem(new Summand(coeff2, var2));
-	fSummands->AddItem(new Summand(coeff3, var3));
-	_UpdateLeftSide();
+	for (int i=0; i<fLeftSide->CountItems(); i++)
+		delete (Summand*)fLeftSide->ItemAt(i);
+	fLeftSide->MakeEmpty();
+	fLeftSide->AddItem(new Summand(coeff1, var1));
+	fLeftSide->AddItem(new Summand(coeff2, var2));
+	fLeftSide->AddItem(new Summand(coeff3, var3));
+	UpdateLeftSide();
 }
 
 
 void
-Constraint::ChangeLeftSide(double coeff1, Variable* var1,
+Constraint::SetLeftSide(double coeff1, Variable* var1,
 	double coeff2, Variable* var2,
 	double coeff3, Variable* var3,
 	double coeff4, Variable* var4)
 {
-	fSummands->MakeEmpty();
-	fSummands->AddItem(new Summand(coeff1, var1));
-	fSummands->AddItem(new Summand(coeff2, var2));
-	fSummands->AddItem(new Summand(coeff3, var3));
-	fSummands->AddItem(new Summand(coeff4, var4));
-	_UpdateLeftSide();
+	for (int i=0; i<fLeftSide->CountItems(); i++)
+		delete (Summand*)fLeftSide->ItemAt(i);
+	fLeftSide->MakeEmpty();
+	fLeftSide->AddItem(new Summand(coeff1, var1));
+	fLeftSide->AddItem(new Summand(coeff2, var2));
+	fLeftSide->AddItem(new Summand(coeff3, var3));
+	fLeftSide->AddItem(new Summand(coeff4, var4));
+	UpdateLeftSide();
 }
 
 
@@ -152,7 +161,7 @@ void
 Constraint::SetOp(OperatorType value)
 {
 	fOp = value;
-	if (!set_constr_type(fLS->LP(), this->Index(),
+	if (!set_constr_type(fLS->fLP, this->Index(),
 			((fOp == OperatorType(EQ)) ? EQ
 			: (fOp == OperatorType(GE)) ? GE
 			: LE)))
@@ -183,7 +192,7 @@ void
 Constraint::SetRightSide(double value)
 {
 	fRightSide = value;
-	if (!set_rh(fLS->LP(), Index(), fRightSide))
+	if (!set_rh(fLS->fLP, Index(), fRightSide))
 		printf("Error in set_rh.");
 	
 	fLS->RemovePresolved();
@@ -198,9 +207,9 @@ Constraint::SetRightSide(double value)
 double
 Constraint::PenaltyNeg()
 {
-	if (fDNegSummand == NULL)
+	if (fDNegObjSummand == NULL)
 		return INFINITY;
-	return fDNegSummand->Coeff();
+	return fDNegObjSummand->Coeff();
 }
 
 
@@ -213,16 +222,18 @@ Constraint::PenaltyNeg()
 void
 Constraint::SetPenaltyNeg(double value)
 {
-	if (fDNegSummand == NULL) {
-		fDNegSummand = fLS->AddObjFunctionSummand(value, new Variable(fLS));
-		ChangeLeftSide(fSummands);
+	if (fDNegObjSummand == NULL) {
+		fDNegObjSummand = new Summand(value, new Variable(fLS));
+		fLS->ObjFunction()->AddItem(fDNegObjSummand);
+		UpdateLeftSide();
 		fLS->UpdateObjFunction();
 		return;
 	}
-	
-	if (value == fDNegSummand->Coeff())
+		
+	if (value == fDNegObjSummand->Coeff())
 		return;
-	fDNegSummand->SetCoeff(value);
+
+	fDNegObjSummand->SetCoeff(value);
 	fLS->UpdateObjFunction();
 }
 
@@ -235,9 +246,9 @@ Constraint::SetPenaltyNeg(double value)
 double
 Constraint::PenaltyPos()
 {
-	if (fDPosSummand == NULL)
+	if (fDPosObjSummand == NULL)
 		return INFINITY;
-	return fDPosSummand->Coeff();
+	return fDPosObjSummand->Coeff();
 }
 
 
@@ -250,16 +261,18 @@ Constraint::PenaltyPos()
 void
 Constraint::SetPenaltyPos(double value)
 {
-	if (fDPosSummand == NULL) {
-		fDPosSummand = fLS->AddObjFunctionSummand(value, new Variable(fLS));
-		ChangeLeftSide(fSummands);
+	if (fDPosObjSummand == NULL) {
+		fDPosObjSummand = new Summand(value, new Variable(fLS));
+		fLS->ObjFunction()->AddItem(fDPosObjSummand);
+		UpdateLeftSide();
 		fLS->UpdateObjFunction();
 		return;
 	}
 
-	if (value == fDPosSummand->Coeff())
+	if (value == fDPosObjSummand->Coeff())
 		return;
-	fDPosSummand->SetCoeff(value);
+
+	fDPosObjSummand->SetCoeff(value);
 	fLS->UpdateObjFunction();
 }
 
@@ -272,9 +285,9 @@ Constraint::SetPenaltyPos(double value)
 Variable*
 Constraint::DNeg() const
 {
-	if (fDNegSummand == NULL)
+	if (fDNegObjSummand == NULL)
 		return NULL;
-	return fDNegSummand->Var();
+	return fDNegObjSummand->Var();
 }
 
 
@@ -286,9 +299,9 @@ Constraint::DNeg() const
 Variable*
 Constraint::DPos() const
 {
-	if (fDPosSummand == NULL)
+	if (fDPosObjSummand == NULL)
 		return NULL;
-	return fDPosSummand->Var();
+	return fDPosObjSummand->Var();
 }
 
 
@@ -299,7 +312,7 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	double rightSide, double penaltyNeg, double penaltyPos)
 {
 	fLS = ls;
-	fSummands = summands;
+	fLeftSide = summands;
 	fOp = op;
 	fRightSide = rightSide;
 		
@@ -314,50 +327,57 @@ Constraint::Constraint(LinearSpec* ls, BList* summands, OperatorType op,
 	
 	if (penaltyNeg != INFINITY
 		&& fOp != OperatorType(LE)) {
-		fDNegSummand = ls->AddObjFunctionSummand(penaltyNeg, new Variable(ls));
-		varIndexes[i] = fDNegSummand->Var()->Index();
+		fDNegObjSummand = new Summand(penaltyNeg, new Variable(ls));
+		ls->fObjFunction->AddItem(fDNegObjSummand);
+		varIndexes[i] = fDNegObjSummand->Var()->Index();
 		coeffs[i] = 1.0;
 		i++;
 	}
 	else
-		fDNegSummand = NULL;
+		fDNegObjSummand = NULL;
 	
 	if (penaltyPos != INFINITY
 		&& fOp != OperatorType(GE)) {
-		fDPosSummand = ls->AddObjFunctionSummand(penaltyPos, new Variable(ls));
-		varIndexes[i] = fDPosSummand->Var()->Index();
+		fDPosObjSummand = new Summand(penaltyPos, new Variable(ls));
+		ls->fObjFunction->AddItem(fDPosObjSummand);
+		varIndexes[i] = fDPosObjSummand->Var()->Index();
 		coeffs[i] = -1.0;
 		i++;
 	}
 	else
-		fDPosSummand = NULL;
+		fDPosObjSummand = NULL;
 
-	if (!add_constraintex(ls->LP(), i, &coeffs[0], &varIndexes[0],
+	if (!add_constraintex(ls->fLP, i, &coeffs[0], &varIndexes[0],
 			((fOp == OperatorType(EQ)) ? EQ
 			: (fOp == OperatorType(GE)) ? GE
 			: LE), rightSide))
 		printf("Error in add_constraintex.");
 
+	fLS->UpdateObjFunction();
 	ls->Constraints()->AddItem(this);
 }
 
 
 /**
  * Destructor.
- * Removes the constraint from its specification.
+ * Removes the constraint from its specification and deletes all the summands.
  */
 Constraint::~Constraint()
 {
-	del_constraint(fLS->LP(), Index());
-	delete fSummands;
-	if(fDNegSummand != NULL) {
-		delete fDNegSummand->Var();
-		delete fDNegSummand;
+	for (int i=0; i<fLeftSide->CountItems(); i++)
+		delete (Summand*)fLeftSide->ItemAt(i);
+	delete fLeftSide;
+	
+	if (fDNegObjSummand != NULL) {
+		delete fDNegObjSummand->Var();
+		delete fDNegObjSummand;
 	}
-	if(fDPosSummand != NULL) {
-		delete fDPosSummand->Var();
-		delete fDPosSummand;
+	if (fDPosObjSummand != NULL) {
+		delete fDPosObjSummand->Var();
+		delete fDPosObjSummand;
 	}
+
+	del_constraint(fLS->fLP, Index());	
 	fLS->Constraints()->RemoveItem(this);
 }
 
