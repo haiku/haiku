@@ -1,168 +1,31 @@
-# UserBuildConfig can be used to customize the build according to your needs.
-# If existent it is included by the build system, but it is ignored by svn.
-# This file documents a few examples, what can be done.
+# Quick start file for UserBuildConfig. Copy it and uncomment and edit the
+# lines you want. See UserBuildConfig.ReadMe for details.
 
-# Adding timezone and keymap settings
-#AddSymlinkToHaikuImage home config settings
-#	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
-
-#AddFilesToHaikuImage home config settings : <keymap>US-International 
-#	: Key_map ;
-
-
-# Adjusting Build Variables
-
-# The following variables can be configured per subdirectory (or subtree) or
-# even per object file:
-#
-#	CCFLAGS C++FLAGS DEBUG DEFINES HDRS LINKFLAGS OPTIM OPTIMIZE SYSHDRS
-#	WARNINGS
-#	HOST_WARNING_CCFLAGS HOST_WARNING_C++FLAGS
-#	TARGET_WARNING_CCFLAGS TARGET_WARNING_C++FLAGS
-#	PLATFORM SUPPORTED_PLATFORMS
-#
-# The following examples would work analogously for any of these variables.
-
-# Turn off warnings in directory src/system/kernel. As fourth (scope) parameter
-# "local" is specified, which means, that this setting applies only to the
-# given directory, but not any of its subdirectories.
-#SetConfigVar WARNINGS : HAIKU_TOP src system kernel : 0 : local ;
-
-# Set the debug level for directory src/system/boot/loader and recursively all
-# of its subdirectories (scope is "global") to 1. All affected generated files
-# will be put into another subtree of the "generated" directory, which allows
-# for fast switching between normal and debug builds.
-#SetConfigVar DEBUG : HAIKU_TOP src system boot loader : 1 : global ;
-
-# Add "RUN_WITHOUT_REGISTRAR" to the DEFINES for the directory src/kits and
-# all of its subdirectories.
-#AppendToConfigVar DEFINES : HAIKU_TOP src kits : RUN_WITHOUT_REGISTRAR
-#	: global ;
-
-# Set the debug level for file src/bin/gdb/gdb/haiku-nat.c (note, that
-# the object file must be specified) to 1. It is worth mentioning, that the
-# executable the object file is linked into (gdb), will still be placed in
-# generated/objects/.../release/... Only when setting DEBUG for the executable,
-# too, it will be placed in .../debug_1/.... Apart from that, the DEBUG variable
-# has no effect on executables or other shared objects.
-#DEBUG on <src!bin!gdb!gdb!>haiku-nat.o = 1 ;
-
-
-# Haiku Image Related Modifications
-
-# Create a 100 MB image at /tmp/walter.image.
-#HAIKU_IMAGE_NAME	= walter.image ;
-#HAIKU_IMAGE_DIR		= /tmp ;
+# Specify image size in MB.
 #HAIKU_IMAGE_SIZE	= 100 ;
-
-# Name the VMWare image walter.vmdk (in directory $(HAIKU_IMAGE_DIR)).
-#HAIKU_VMWARE_IMAGE_NAME	= walter.vmdk ;
 
 # Install Haiku in directory /Haiku.
 #HAIKU_INSTALL_DIR = /Haiku ;
 
-# If the image does already exist it won't be zeroed out. It will nevertheless
-# freshly be initialized with BFS. Useful when installing Haiku on a partition.
+# Install Haiku on device /dev/sda57. Be sure you know what you're doing!
+#HAIKU_IMAGE_DIR		= /dev ;
+#HAIKU_IMAGE_NAME	= sda57 ;
 #HAIKU_DONT_CLEAR_IMAGE = 1 ;
 
 
-# Affects the haiku-image, haiku-vmware-image, and install-haiku targets. Only
-# targets on which the HAIKU_INCLUDE_IN_IMAGE variable has been set will be
-# updated in the image file/installation directory.
-# The update-image, update-vmware-image, and update-install targets always invoke
-# this rule, so one likely doesn't ever need to do it manually.
-#SetUpdateHaikuImageOnly 1 ;
+# Enable debugging for directory src/system/boot/loader recursively.
+#SetConfigVar DEBUG : HAIKU_TOP src system boot loader : 1 : global ;
 
-# libbe.so and the kernel will be updated on image updates. Note that this
-# generally doesn't work for pseudo targets (it does where special support
-# has been added, like for "kernel").
-#HAIKU_INCLUDE_IN_IMAGE on libbe.so kernel = 1 ;
 
-# Add "crashing_app" to the beos/bin directory of the Haiku image/installation.
-# Note, that this also makes the image depend on the target, i.e. it is
-# automatically updated when the image is built.
-#AddFilesToHaikuImage beos bin : crashing_app ;
+# Add symlink/file (timezone and keymap settings) to the image.
+#AddSymlinkToHaikuImage home config settings
+#	: /boot/beos/etc/timezones/Europe/Paris : timezone ;
+#AddFilesToHaikuImage home config settings : <keymap>US-International 
+#	: Key_map ;
 
-# Make a symlink to home/config/bin/crash.
-#AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
 
-# Adds the source directories src/kits/storage and src/tests/servers/debug
-# (recursively) to the image (as /boot/home/HaikuSources/src/kits/storage
-# and /boot/home/HaikuSources/src/tests/servers/debug respectively).
-# Note that the second directory will also be copied, if the image will only
-# be updated; the first one won't in that case.
-#AddSourceDirectoryToHaikuImage src/kits/storage ;
-#AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
-
-# Unzips the given zip archive onto the image under /boot/develop/tools.
-#UnzipArchiveToHaikuImage develop tools
-#	: /home/bonefish/develop/haiku/misc/gcc-2.95.3-beos-070218/gcc-2.95.3_binutils-2.17_rel-070218.zip ;
-
-# Adds the optional package WonderBrush to the image. The package is downloaded
-# via wget (i.e. wget must be installed).
+# Add the optional package WonderBrush to the image.
 #AddOptionalHaikuImagePackages WonderBrush ;
-
-# Adds the optional package Vision to the image. See above.
-#AddOptionalHaikuImagePackages Vision ;
-
-# Adds the optional package Pe to the image. See above.
-#AddOptionalHaikuImagePackages Pe ;
-
-# Adds the optional package Links to the image. See above.
-#AddOptionalHaikuImagePackages Links ;
 
 # Add all available optional packages.
 #HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
-
-# Specify scripts that shall be run when populating the image/installation
-# directory. The "early" script is run before anything has been copied onto
-# the image/into the installation directory. The "late" script is run after
-# everything has been copied, but before the MIME database is installed.
-#HAIKU_IMAGE_EARLY_USER_SCRIPTS	= $(HAIKU_TOP)/../early-image-script.sh ;
-#HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
-
-
-# Creating Sourceable Shell Scripts
-
-# If you use shell scripts (e.g. for testing) that need to access targets or
-# build system properties, you can tell the build system to generate a
-# variables defining shell script you can source from your shell script.
-
-# General setup for the shell script to generate. Name is test.inc, located
-# in the output directory.
-#MakeLocate test.inc : $(HAIKU_OUTPUT_DIR) ;
-#Always test.inc ;
-
-# Define variable "outputDir" in the shell script, with the value of
-# HAIKU_OUTPUT_DIR.
-#AddVariableToScript test.inc : outputDir : $(HAIKU_OUTPUT_DIR) ;
-
-# Define variables "bfsShell" and "fsShellCommand" referring to the
-# generated bfs_shell and fs_shell_command respectively.
-#AddTargetVariableToScript test.inc : bfs_shell : bfsShell ;
-#AddTargetVariableToScript test.inc : fs_shell_command : fsShellCommand ;
-
-# If no variable name is given, the name (without grist) of the target is
-# used, i.e. a variable "rc" referring to the rc command built for the host
-# platform is defined in the script.
-#AddTargetVariableToScript test.inc : <build>rc ;
-
-
-# Optimizing Jamfile Parsing Times
-
-# Setting this variable will prevent the root Jamfile to include the Jamfile
-# in the src directory. Instead only the directories required for building the
-# build tools are included. Only useful in combination with DeferredSubInclude.
-#HAIKU_DONT_INCLUDE_SRC = 1 ;
-
-# Schedule the given subdirectory for inclusion at the end of the root
-# Jamfile (directly using SubInclude here is not possible). Using this
-# feature together with HAIKU_DONT_INCLUDE_SRC allows developers working
-# only on a subproject to reduce Jamfile parsing times considerably.
-#DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
-#	userlandfs ;
-
-
-# Copy the posix test suite onto the image (or on the installation) into 
-# "home/posixtestsuite" directory, including the run script.
-#HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE = 1 ;
