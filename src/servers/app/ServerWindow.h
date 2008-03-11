@@ -128,6 +128,7 @@ private:
 
 			void				_SetCurrentView(View* view);
 			void				_UpdateDrawState(View* view);
+			void				_UpdateCurrentDrawingRegion();
 
 			bool				_MessageNeedsAllWindowsLocked(uint32 code) const;
 

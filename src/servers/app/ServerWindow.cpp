@@ -1787,8 +1787,10 @@ fDesktop->LockSingleWindow();
 				BRegion empty;
 				fLink.AttachRegion(empty);
 			} else {
-				BRegion drawingRegion = fCurrentView->LocalClipping();
-				fLink.AttachRegion(drawingRegion);
+				_UpdateCurrentDrawingRegion();
+				BRegion region(fCurrentDrawingRegion);
+				fCurrentView->ConvertFromScreen(&region);
+				fLink.AttachRegion(region);
 			}
 			fLink.Flush();
 
@@ -2047,11 +2049,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 		return;
 	}
 
-	if (!fCurrentDrawingRegionValid || fWindow->DrawingRegionChanged(fCurrentView)) {
-		fWindow->GetEffectiveDrawingRegion(fCurrentView, fCurrentDrawingRegion);
-		fCurrentDrawingRegionValid = true;
-	}
-
+	_UpdateCurrentDrawingRegion();
 	if (fCurrentDrawingRegion.CountRects() <= 0) {
 		if (link.NeedsReply()) {
 			// the client is now blocking and waiting for a reply!
@@ -3177,6 +3175,18 @@ ServerWindow::_UpdateDrawState(View* view)
 		BPoint p(0, 0);
 		view->ConvertToScreenForDrawing(&p);
 		drawingEngine->SetDrawState(view->CurrentState(), p.x, p.y);
+	}
+}
+
+
+void
+ServerWindow::_UpdateCurrentDrawingRegion()
+{
+	if (!fCurrentDrawingRegionValid
+		|| fWindow->DrawingRegionChanged(fCurrentView)) {
+		fWindow->GetEffectiveDrawingRegion(fCurrentView,
+			fCurrentDrawingRegion);
+		fCurrentDrawingRegionValid = true;
 	}
 }
 
