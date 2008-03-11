@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>
+ * Copyright (c) 2002, 2003, 2008 Marcus Overhagen <Marcus@Overhagen.de>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files or portions
@@ -30,6 +30,7 @@
 #include <MediaAddOn.h>
 #include <string.h>
 #include <stdlib.h>
+#include <new>
 #include "debug.h"
 #include "DataExchange.h"
 
@@ -37,16 +38,20 @@
  * some little helper function
  */
 
-static inline char *newstrdup(const char *str);
-char *newstrdup(const char *str)
+static inline char *_newstrdup(const char *str);
+char *_newstrdup(const char *str)
 {
 	if (str == NULL)
 		return NULL;
 	int len = strlen(str) + 1;
-	char *p = new char[len];
-	memcpy(p, str, len);
+	char *p = new(std::nothrow) char[len];
+	if (p)
+		memcpy(p, str, len);
 	return p;
 }
+
+#define MAX_FLAVOR_IN_FORMAT_COUNT	300
+#define MAX_FLAVOR_OUT_FORMAT_COUNT	300
 
 #define FLATTEN_MAGIC 		'CODE'
 #define FLATTEN_TYPECODE	'DFIT'
@@ -129,47 +134,54 @@ dormant_flavor_info::operator=(const dormant_flavor_info &clone)
 dormant_flavor_info &
 dormant_flavor_info::operator=(const flavor_info &clone)
 {
-	delete [] name;
-	delete [] info;
-	delete [] in_formats;
-	delete [] out_formats;
-
-	name = newstrdup(clone.name);
-	info = newstrdup(clone.info);
-	
 	kinds = clone.kinds;
 	flavor_flags = clone.flavor_flags;
 	internal_id = clone.internal_id;
 	possible_count = clone.possible_count;
 
-	in_format_count = clone.in_format_count;
-	in_format_flags = clone.in_format_flags;
-	out_format_count = clone.out_format_count;
-	out_format_flags = clone.out_format_flags;
+	delete [] info;
+	info = _newstrdup(clone.info);
 
-	if (in_format_count > 0) {
-		media_format *temp;
-		temp = new media_format[in_format_count];
-		for (int i = 0; i < in_format_count; i++)
-			temp[i] = clone.in_formats[i];
-		in_formats = temp;
-	} else {
-		in_formats = 0;
-	}
-		
-	if (out_format_count > 0) {
-		media_format *temp;
-		temp = new media_format[out_format_count];
-		for (int i = 0; i < out_format_count; i++)
-			temp[i] = clone.out_formats[i];
-		out_formats = temp;
-	} else {
-		out_formats = 0;
-	}
-	
+	delete [] name;
+	name = _newstrdup(clone.name);
+
+	delete [] in_formats;
+	in_formats = 0;
+	in_format_count = 0;
+	in_format_flags = clone.in_format_flags;
+	if (kinds & B_BUFFER_CONSUMER) {
+		if (clone.in_format_count >= 0 && clone.in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT) {
+			in_formats = new(std::nothrow) media_format[clone.in_format_count];
+			if (in_formats != NULL && clone.in_formats != NULL) {
+				in_format_count = clone.in_format_count;
+				for (int i = 0; i < in_format_count; i++)
+					const_cast<media_format &>(in_formats[i]) = clone.in_formats[i];
+			}
+		} else
+			fprintf(stderr, "error: dormant_flavor_info::operator= clone.in_format_count is invalid\n");
+	} else if (clone.in_format_count)
+		fprintf(stderr, "warning: dormant_flavor_info::operator= not B_BUFFER_CONSUMER and clone.in_format_count is != 0\n");
+
+	delete [] out_formats;
+	out_formats = 0;
+	out_format_count = 0;
+	out_format_flags = clone.out_format_flags;
+	if (kinds & B_BUFFER_PRODUCER) {
+		if (clone.out_format_count >= 0 && clone.out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT) {
+			out_formats = new(std::nothrow) media_format[clone.out_format_count];
+			if (out_formats != NULL && clone.out_formats != NULL) {
+				out_format_count = clone.out_format_count;
+				for (int i = 0; i < out_format_count; i++)
+					const_cast<media_format &>(out_formats[i]) = clone.out_formats[i];
+			}
+		} else
+			fprintf(stderr, "error dormant_flavor_info::operator= clone.out_format_count is invalid\n");
+	} else if (clone.in_format_count)
+		fprintf(stderr, "warning: dormant_flavor_info::operator= not B_BUFFER_PRODUCER and clone.out_format_count is != 0\n");
+
 	// initialize node_info with default values from dormant_node_info constructor
-	dormant_node_info temp;
-	node_info = temp;
+	dormant_node_info defaultValues;
+	node_info = defaultValues;
 	
 	return *this;
 }
@@ -179,7 +191,7 @@ void
 dormant_flavor_info::set_name(const char *in_name)
 {
 	delete [] name;
-	name = newstrdup(in_name);
+	name = _newstrdup(in_name);
 }
 
 
@@ -187,35 +199,37 @@ void
 dormant_flavor_info::set_info(const char *in_info)
 {
 	delete [] info;
-	info = newstrdup(in_info);
+	info = _newstrdup(in_info);
 }
 
 
 void
 dormant_flavor_info::add_in_format(const media_format &in_format)
 {
-	media_format *temp;
-	temp = new media_format[in_format_count + 1];
-	for (int i = 0; i < in_format_count; i++)
-		temp[i] = in_formats[i];
-	temp[in_format_count] = in_format;
-	delete [] in_formats;
-	in_format_count += 1;
-	in_formats = temp;
+	media_format *p = new(std::nothrow) media_format[in_format_count + 1];
+	if (p) {
+		for (int i = 0; i < in_format_count; i++)
+			p[i] = in_formats[i];
+		p[in_format_count] = in_format;
+		delete [] in_formats;
+		in_formats = p;
+		in_format_count += 1;
+	}
 }
 
 
 void
 dormant_flavor_info::add_out_format(const media_format &out_format)
 {
-	media_format *temp;
-	temp = new media_format[out_format_count + 1];
-	for (int i = 0; i < out_format_count; i++)
-		temp[i] = out_formats[i];
-	temp[out_format_count] = out_format;
-	delete [] out_formats;
-	out_format_count += 1;
-	out_formats = temp;
+	media_format *p = new(std::nothrow) media_format[out_format_count + 1];
+	if (p) {
+		for (int i = 0; i < out_format_count; i++)
+			p[i] = out_formats[i];
+		p[out_format_count] = out_format;
+		delete [] out_formats;
+		out_formats = p;
+		out_format_count += 1;
+	}
 }
 
 
@@ -250,10 +264,12 @@ dormant_flavor_info::FlattenedSize() const
 	size += sizeof(possible_count);
 	size += sizeof(in_format_count);
 	size += sizeof(in_format_flags);
-	size += in_format_count * sizeof(media_format);
+	if (in_format_count > 0 && in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT && in_formats != NULL)
+		size += in_format_count * sizeof(media_format);
 	size += sizeof(out_format_count);
 	size += sizeof(out_format_flags);
-	size += out_format_count * sizeof(media_format);
+	if (out_format_count > 0 && out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT && out_formats != NULL)
+		size += out_format_count * sizeof(media_format);
 	// struct dormant_node_info	node_info
 	size += sizeof(node_info);
 
@@ -269,8 +285,32 @@ dormant_flavor_info::Flatten(void *buffer,
 		return B_ERROR;
 
 	char *buf = (char *)buffer;	
-	int32 namelen = name ? (int32)strlen(name) : -1;
-	int32 infolen = info ? (int32)strlen(info) : -1;
+	int32 nameLength = name ? (int32)strlen(name) : -1;
+	int32 infoLength = info ? (int32)strlen(info) : -1;
+	int32 inFormatCount = 0;
+	size_t inFormatSize = 0;
+	int32 outFormatCount = 0;
+	size_t outFormatSize = 0;
+
+	if ((kinds & B_BUFFER_CONSUMER) && in_format_count > 0 && in_formats != NULL) {
+		if (in_format_count <= MAX_FLAVOR_IN_FORMAT_COUNT) {
+			inFormatCount = in_format_count;
+			inFormatSize = in_format_count * sizeof(media_format);
+		} else {
+			fprintf(stderr, "error dormant_flavor_info::Flatten: in_format_count is too large\n");
+			return B_ERROR;
+		}
+	}
+
+	if ((kinds & B_BUFFER_PRODUCER) && out_format_count > 0 && out_formats != NULL) {
+		if (out_format_count <= MAX_FLAVOR_OUT_FORMAT_COUNT) {
+			outFormatCount = out_format_count;
+			outFormatSize = out_format_count * sizeof(media_format);
+		} else {
+			fprintf(stderr, "error dormant_flavor_info::Flatten: out_format_count is too large\n");
+			return B_ERROR;
+		}
+	}
 
 	// magic
 	*(int32*)buf = FLATTEN_MAGIC; buf += sizeof(int32);
@@ -279,32 +319,32 @@ dormant_flavor_info::Flatten(void *buffer,
 	*(int32*)buf = FlattenedSize(); buf += sizeof(int32);
 
 	// struct flavor_info
-	*(int32*)buf = namelen; buf += sizeof(int32);
-	if (namelen > 0) {
-		memcpy(buf,name,namelen);
-		buf += namelen;
+	*(int32*)buf = nameLength; buf += sizeof(int32);
+	if (nameLength > 0) {
+		memcpy(buf, name, nameLength);
+		buf += nameLength;
 	}
-	*(int32*)buf = infolen; buf += sizeof(int32);
-	if (infolen > 0) {
-		memcpy(buf,info,infolen);
-		buf += infolen;
+	*(int32*)buf = infoLength; buf += sizeof(int32);
+	if (infoLength > 0) {
+		memcpy(buf, info, infoLength);
+		buf += infoLength;
 	}
 
 	*(uint64*)buf = kinds; buf += sizeof(uint64);
 	*(uint32*)buf = flavor_flags; buf += sizeof(uint32);
 	*(int32*)buf = internal_id; buf += sizeof(int32);
 	*(int32*)buf = possible_count; buf += sizeof(int32);
-	*(int32*)buf = in_format_count; buf += sizeof(int32);
+	*(int32*)buf = inFormatCount; buf += sizeof(int32);
 	*(uint32*)buf = in_format_flags; buf += sizeof(uint32);
 
 	// XXX FIXME! we should not!!! make flat copies	of media_format
-	memcpy(buf,in_formats,in_format_count * sizeof(media_format)); buf += in_format_count * sizeof(media_format);
+	memcpy(buf, in_formats, inFormatSize); buf += inFormatSize;
 
-	*(int32*)buf = out_format_count; buf += sizeof(int32);
+	*(int32*)buf = outFormatCount; buf += sizeof(int32);
 	*(uint32*)buf = out_format_flags; buf += sizeof(uint32);
 
 	// XXX FIXME! we should not!!! make flat copies	of media_format
-	memcpy(buf,out_formats,out_format_count * sizeof(media_format)); buf += out_format_count * sizeof(media_format);
+	memcpy(buf, out_formats, outFormatSize); buf += outFormatSize;
 
 	*(dormant_node_info*)buf = node_info; buf += sizeof(dormant_node_info);
 
@@ -323,69 +363,85 @@ dormant_flavor_info::Unflatten(type_code c,
 		return B_ERROR;
 
 	const char *buf = (const char *)buffer;	
-	int32 namelen;
-	int32 infolen;
+	int32 nameLength;
+	int32 infoLength;
 
-	// magic
+	// check magic
 	if (*(int32*)buf != FLATTEN_MAGIC)
 		return B_ERROR;
 	buf += sizeof(int32);
 
-	// size
-	if (*(int32*)buf > size)
+	// check size
+	if (*(uint32*)buf > (uint32)size)
 		return B_ERROR;
 	buf += sizeof(int32);
 
-
 	delete [] name;
+	name = NULL;
 	delete [] info;
+	info = NULL;
 	delete [] in_formats;
+	in_formats = NULL;
+	in_format_count = 0;
 	delete [] out_formats;
-	name = 0;
-	info = 0;
-	in_formats = 0;
-	out_formats = 0;
-
+	out_formats = NULL;
+	out_format_count = 0;
 
 	// struct flavor_info
-	namelen = *(int32*)buf; buf += sizeof(int32);
-	if (namelen >= 0) { // if namelen is -1, we leave name = 0
-		name = new char [namelen + 1];
-		memcpy(name,buf,namelen);
-		name[namelen] = 0;
-		buf += namelen;
+	nameLength = *(int32*)buf; buf += sizeof(int32);
+	if (nameLength >= 0) { // if nameLength is -1, we leave name = 0
+		name = new(std::nothrow) char [nameLength + 1];
+		if (name) {
+			memcpy(name, buf, nameLength);
+			name[nameLength] = 0;
+			buf += nameLength; // XXX not save
+		}
 	}
 
-	infolen = *(int32*)buf; buf += sizeof(int32);
-	if (infolen >= 0) { // if infolen is -1, we leave info = 0
-		info = new char [infolen + 1];
-		memcpy(info,buf,infolen);
-		info[infolen] = 0;
-		buf += infolen;
+	infoLength = *(int32*)buf; buf += sizeof(int32);
+	if (infoLength >= 0) { // if infoLength is -1, we leave info = 0
+		info = new(std::nothrow) char [infoLength + 1];
+		if (info) {
+			memcpy(info, buf, infoLength);
+			info[infoLength] = 0;
+			buf += infoLength; // XXX not save
+		}
 	}
+
+	int32 count;
 	
 	kinds = *(uint64*)buf; buf += sizeof(uint64);
 	flavor_flags = *(uint32*)buf; buf += sizeof(uint32);
 	internal_id = *(int32*)buf; buf += sizeof(int32);
 	possible_count = *(int32*)buf; buf += sizeof(int32);
-	in_format_count = *(int32*)buf; buf += sizeof(int32);
+	count = *(int32*)buf; buf += sizeof(int32);
 	in_format_flags = *(uint32*)buf; buf += sizeof(uint32);
 
-	// XXX FIXME! we should not!!! make flat copies	of media_format
-	if (in_format_count > 0) {
-		in_formats = new media_format[in_format_count];
-		memcpy((media_format *)in_formats,buf,in_format_count * sizeof(media_format)); 
-		buf += in_format_count * sizeof(media_format);
+	if (count > 0) {
+		if (count <= MAX_FLAVOR_IN_FORMAT_COUNT) {
+			in_formats = new(std::nothrow) media_format[count];
+			if (!in_formats)
+				return B_NO_MEMORY;
+			// XXX FIXME! we should not!!! make flat copies	of media_format
+			memcpy(const_cast<media_format *>(in_formats), buf, count * sizeof(media_format)); 
+			in_format_count = count;
+		}
+		buf += count * sizeof(media_format); // XXX not save
 	}
 	
-	out_format_count = *(int32*)buf; buf += sizeof(int32);
+	count = *(int32*)buf; buf += sizeof(int32);
 	out_format_flags = *(uint32*)buf; buf += sizeof(uint32);
 
-	// XXX FIXME! we should not!!! make flat copies	of media_format
-	if (out_format_count > 0) {
-		out_formats = new media_format[out_format_count];
-		memcpy((media_format *)out_formats,buf,out_format_count * sizeof(media_format)); 
-		buf += out_format_count * sizeof(media_format);
+	if (count > 0) {
+		if (count <= MAX_FLAVOR_OUT_FORMAT_COUNT) {
+			out_formats = new(std::nothrow) media_format[count];
+			if (!out_formats)
+				return B_NO_MEMORY;
+			// XXX FIXME! we should not!!! make flat copies	of media_format
+			memcpy(const_cast<media_format *>(out_formats), buf, count * sizeof(media_format)); 
+			out_format_count = count;
+		}
+		buf += count * sizeof(media_format); // XXX not save
 	}
 
 	node_info = *(dormant_node_info*)buf; buf += sizeof(dormant_node_info);
