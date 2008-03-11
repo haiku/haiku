@@ -23,5 +23,6 @@
 //#define SIGNAL_TRACING
 //#define SYSCALL_TRACING
 //#define TEAM_TRACING
+//#define USER_MALLOC_TRACING
 
 #endif	// KERNEL_TRACING_CONFIG_H

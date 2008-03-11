@@ -24,12 +24,21 @@
 #include "processheap.h"
 #include "arch-specific.h"
 
+#include <tracing_config.h>
+
 #include <image.h>
 
 #include <errno.h>
 #include <string.h>
 
 using namespace BPrivate;
+
+
+#ifdef USER_MALLOC_TRACING
+#	define KTRACE(format...)	ktrace_printf(format)
+#else
+#	define KTRACE(format...)	do {} while (false)
+#endif
 
 
 #if HEAP_LEAK_CHECK
@@ -259,6 +268,7 @@ malloc(size_t size)
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (addr == NULL) {
 		errno = B_NO_MEMORY;
+		KTRACE("malloc(%lu) -> NULL", size);
 		return NULL;
 	}
 
@@ -268,6 +278,8 @@ malloc(size_t size)
 #if HEAP_WALL
 	addr = set_wall(addr, size);
 #endif
+
+	KTRACE("malloc(%lu) -> %p", size, addr);
 
 	return addr;
 }
@@ -286,6 +298,7 @@ calloc(size_t nelem, size_t elsize)
 	void *ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (ptr == NULL) {
 		errno = B_NO_MEMORY;
+		KTRACE("calloc(%lu, %lu) -> NULL", nelem, elsize);
 		return NULL;
 	}
 
@@ -299,6 +312,7 @@ calloc(size_t nelem, size_t elsize)
 
 	// Zero out the malloc'd block.
 	memset(ptr, 0, size);
+	KTRACE("calloc(%lu, %lu) -> %p", nelem, elsize, ptr);
 	return ptr;
 }
 
@@ -310,6 +324,7 @@ free(void *ptr)
 #if HEAP_WALL
 	if (ptr == NULL)
 		return;
+	KTRACE("free(%p)", ptr);
 	ptr = check_wall((uint8*)ptr);
 #endif
 #if HEAP_LEAK_CHECK
@@ -333,6 +348,7 @@ memalign(size_t alignment, size_t size)
 		size);
 	if (addr == NULL) {
 		errno = B_NO_MEMORY;
+		KTRACE("memalign(%lu, %lu) -> NULL", alignment, size);
 		return NULL;
 	}
 
@@ -340,6 +356,7 @@ memalign(size_t alignment, size_t size)
 	add_address(addr, size);
 #endif
 
+	KTRACE("memalign(%lu, %lu) -> %p", alignment, size, addr);
 	return addr;
 }
 
@@ -357,15 +374,20 @@ posix_memalign(void **_pointer, size_t alignment, size_t size)
 	static processHeap *pHeap = getAllocator();
 	void *pointer = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
 		size);
-	if (pointer == NULL)
+	if (pointer == NULL) {
+		KTRACE("posix_memalign(%p, %lu, %lu) -> NULL", _pointer, alignment,
+			size);
 		return B_NO_MEMORY;
+	}
 
 #if HEAP_LEAK_CHECK
 	add_address(pointer, size);
 #endif
 
 	*_pointer = pointer;
-	return 0;	
+	KTRACE("posix_memalign(%p, %lu, %lu) -> %p", _pointer, alignment, size,
+		pointer);
+	return 0;
 }
 
 
@@ -401,6 +423,7 @@ realloc(void *ptr, size_t size)
 		check_wall((uint8*)ptr + HEAP_WALL_SIZE);
 		ptr = set_wall(ptr, size);
 #endif
+		KTRACE("realloc(%p, %lu) -> %p", ptr, size, ptr);
 		return ptr;
 	}
 
@@ -415,6 +438,7 @@ realloc(void *ptr, size_t size)
 	if (buffer == NULL) {
 		// Allocation failed, leave old block and return
 		errno = B_NO_MEMORY;
+		KTRACE("realloc(%p, %lu) -> NULL", ptr, size);
 		return NULL;
 	}
 
@@ -428,6 +452,7 @@ realloc(void *ptr, size_t size)
 	free(ptr);
 
 	// Return a pointer to the new one.
+	KTRACE("realloc(%p, %lu) -> %p", ptr, size, buffer);
 	return buffer;
 }
 
