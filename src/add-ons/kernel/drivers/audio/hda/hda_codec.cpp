@@ -143,6 +143,81 @@ hda_widget_get_amplifier_capabilities(hda_codec* codec, uint32 nodeID)
 }
 
 
+static status_t
+hda_widget_get_connections(hda_codec* codec, uint32 nodeID, hda_widget* widget)
+{
+	uint32 verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
+		PID_CONNECTION_LIST_LENGTH);
+	uint32 response;
+
+	if (hda_send_verbs(codec, &verb, &response, 1) != B_OK)
+		return B_ERROR;
+
+	uint32 listEntries = response & 0x7f;
+	bool longForm = (response & 0xf0) != 0;
+
+	if (listEntries == 0)
+		return B_OK;
+
+#if 1
+	if (widget->num_inputs > 1) {
+		// Get currently active connection
+		verb = MAKE_VERB(codec->addr, nodeID, VID_GET_CONNECTION_SELECT, 0);
+		if (hda_send_verbs(codec, &verb, &response, 1) == B_OK)
+			widget->active_input = response & 0xff;
+	}
+#endif
+
+	uint32 valuesPerEntry = longForm ? 2 : 4;
+	uint32 shift = 32 / valuesPerEntry;
+	uint32 rangeMask = (1 << (shift - 1));
+	int32 previousInput = -1;
+	uint32 numInputs = 0;
+
+	for (uint32 i = 0; i < listEntries; i++) {
+		if ((i % valuesPerEntry) == 0) {
+			// We get 2 or 4 answers per call depending on if we're
+			// in short or long list mode
+			verb = MAKE_VERB(codec->addr, nodeID,
+				VID_GET_CONNECTION_LIST_ENTRY, i);
+			if (hda_send_verbs(codec, &verb, &response, 1) != B_OK) {
+				dprintf("hda: Error parsing inputs for widget %ld!\n",
+					nodeID);
+				break;
+			}
+		}
+
+		int32 input = (response >> (shift * (i % valuesPerEntry)))
+			& ((1 << shift) - 1);
+
+		if (input & rangeMask) {
+			// found range
+			input &= ~rangeMask;
+
+			if (input < previousInput || previousInput == -1) {
+				dprintf("hda: invalid range from %ld to %ld\n", previousInput,
+					input);
+				continue;
+			}
+
+			for (int32 rangeInput = previousInput + 1; rangeInput <= input
+					&& numInputs < MAX_INPUTS; rangeInput++) {
+				widget->inputs[numInputs++] = rangeInput;
+			}
+
+			previousInput = -1;
+		} else if (numInputs < MAX_INPUTS) {
+			// standard value
+			widget->inputs[numInputs++] = input;
+			previousInput = input;
+		}
+	}
+
+	widget->num_inputs = numInputs;
+	return B_OK;
+}
+
+
 static const char*
 get_widget_type_name(hda_widget_type type)
 {
@@ -220,13 +295,11 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 		verbs[0] = MAKE_VERB(audioGroup->codec->addr, widget, VID_GET_PARAMETER,
 			PID_AUDIO_WIDGET_CAP);
-		verbs[1] = MAKE_VERB(audioGroup->codec->addr, widget, VID_GET_PARAMETER,
-			PID_CONNECTION_LIST_LENGTH);
-		if (hda_send_verbs(audioGroup->codec, verbs, resp, 2) != B_OK)
+		if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) != B_OK)
 			return B_ERROR;
 
 		audioGroup->widgets[i].type = (hda_widget_type)(resp[0] >> 20);
-		audioGroup->widgets[i].num_inputs = resp[1] & 0x7f;
+		audioGroup->widgets[i].active_input = -1;
 
 		dprintf("%ld: %s\n", widget,
 			get_widget_type_name(audioGroup->widgets[i].type));
@@ -326,48 +399,26 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 		hda_widget_get_pm_support(audioGroup->codec, widget,
 			&audioGroup->widgets[i].pm);
+		hda_widget_get_connections(audioGroup->codec, widget,
+			&audioGroup->widgets[i]);
 
-		if (audioGroup->widgets[i].num_inputs) {
-			if (audioGroup->widgets[i].num_inputs > 1) {
-				verbs[0] = MAKE_VERB(audioGroup->codec->addr, widget,
-					VID_GET_CONNECTION_SELECT, 0);
-				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK)
-					audioGroup->widgets[i].active_input = resp[0] & 0xff;
-				else
-					audioGroup->widgets[i].active_input = -1;
-			} else 
-				audioGroup->widgets[i].active_input = -1;
+		// dump connections
 
-			buf[0] = '\0';
-			off = 0;
+		buf[0] = '\0';
+		off = 0;
 
-			for (uint32 inputIndex = 0; inputIndex
-					< audioGroup->widgets[i].num_inputs; inputIndex++) {
-				if ((inputIndex % 4) == 0) {
-					// we get 4 answers per call in short list mode
-					verbs[0] = MAKE_VERB(audioGroup->codec->addr, widget,
-						VID_GET_CONNECTION_LIST_ENTRY, inputIndex);
-					if (hda_send_verbs(audioGroup->codec, verbs, resp, 1)
-							!= B_OK) {
-						dprintf("hda: Error parsing inputs for widget %ld!\n",
-							widget);
-						break;
-					}
-				}
+		for (uint32 inputIndex = 0; inputIndex
+				< audioGroup->widgets[i].num_inputs; inputIndex++) {
+			int32 input = audioGroup->widgets[i].inputs[inputIndex];
 
-				uint32 input = (resp[0] >> (8 * (inputIndex % 4))) & 0xff;
-
-				if ((int32)inputIndex != audioGroup->widgets[i].active_input)
-					off += sprintf(buf + off, "%ld ", input);
-				else
-					off += sprintf(buf + off, "(%ld) ", input);
-
-				audioGroup->widgets[i].inputs[inputIndex] = input;
-			}
-
-			if (off != 0)
-				dprintf("\tConnections: %s\n", buf);
+			if ((int32)inputIndex != audioGroup->widgets[i].active_input)
+				off += sprintf(buf + off, "%ld ", input);
+			else
+				off += sprintf(buf + off, "(%ld) ", input);
 		}
+
+		if (off != 0)
+			dprintf("\tConnections: %s\n", buf);
 	}
 
 	return B_OK;
