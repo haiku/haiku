@@ -400,7 +400,9 @@ handle_syscall:
 	jz		1f
 	pushl	-4(%ebp)				// syscall start time
 	pushl	-8(%ebp)
-	push	%edx					// syscall return value
+	movl	IFRAME_edx(%ebp), %edx	// syscall return value
+	movl	IFRAME_eax(%ebp), %eax
+	push	%edx
 	push	%eax
 	lea		16(%esp), %eax			// syscall parameters
 	push	%eax
