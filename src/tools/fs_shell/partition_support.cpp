@@ -151,8 +151,6 @@ restricted_file_restrict_stat(struct fssh_stat* st)
 	if (!restriction)
 		return;
 
-printf("restricted_file_restrict_stat(): startOffset: %lld, endOffset: %lld\n",
-restriction->startOffset, restriction->endOffset);
 	st->fssh_st_size = restriction->endOffset - restriction->startOffset;
 }
 
