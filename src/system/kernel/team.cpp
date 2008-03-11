@@ -34,6 +34,7 @@
 #include <tls.h>
 #include <tracing.h>
 #include <user_runtime.h>
+#include <usergroup.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_address_space.h>
@@ -1171,6 +1172,11 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 		team->loading_info = &loadingInfo;
 	}
 
+	// Inherit the parent's user/group, but also check the executable's
+	// set-user/group-id permission
+	inherit_parent_user_and_group(team, parent);
+	update_set_id_user_and_group(team, args[0]);
+
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
@@ -1377,6 +1383,10 @@ exec_team(const char *path, int32 argCount, char * const *args,
 
 	atomic_or(&team->flags, TEAM_FLAG_EXEC_DONE);
 
+	// Update user/group according to the executable's set-user/group-id
+	// permission.
+	update_set_id_user_and_group(team, path);
+
 	status = team_create_thread_start(teamArgs);
 		// this one usually doesn't return...
 
@@ -1448,6 +1458,9 @@ fork_team(void)
 		return B_NO_MEMORY;
 
 	strlcpy(team->args, parentTeam->args, sizeof(team->args));
+
+	// Inherit the parent's user/group.
+	inherit_parent_user_and_group(team, parentTeam);
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
@@ -1939,6 +1952,13 @@ team_init(kernel_args *args)
 		panic("could not create kernel team!\n");
 	strcpy(sKernelTeam->args, sKernelTeam->name);
 	sKernelTeam->state = TEAM_STATE_NORMAL;
+
+	sKernelTeam->saved_set_uid = 0;
+	sKernelTeam->real_uid = 0;
+	sKernelTeam->effective_uid = 0;
+	sKernelTeam->saved_set_gid = 0;
+	sKernelTeam->real_gid = 0;
+	sKernelTeam->effective_gid = 0;
 
 	insert_team_into_group(group, sKernelTeam);
 

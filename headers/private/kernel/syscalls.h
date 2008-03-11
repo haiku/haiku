@@ -113,6 +113,15 @@ extern status_t		_kern_get_team_info(team_id id, team_info *info);
 extern status_t		_kern_get_next_team_info(int32 *cookie, team_info *info);
 extern status_t		_kern_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size);
 
+// user/group functions
+extern gid_t		_kern_getgid(bool effective);
+extern uid_t		_kern_getuid(bool effective);
+extern ssize_t		_kern_getgroups(int groupSize, gid_t* groupList);
+extern status_t		_kern_setregid(gid_t rgid, gid_t egid,
+						bool setAllIfPrivileged);
+extern status_t		_kern_setreuid(uid_t ruid, uid_t euid,
+						bool setAllIfPrivileged);
+
 // signal functions
 extern status_t		_kern_send_signal(pid_t tid, uint sig);
 extern status_t		_kern_sigprocmask(int how, const sigset_t *set,

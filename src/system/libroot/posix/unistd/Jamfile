@@ -35,7 +35,7 @@ MergeObject posix_unistd.o :
 	truncate.c
 	ttyname.c
 	ualarm.c
-	usergroup.c
+	usergroup.cpp
 	usleep.c
 	write.c
 ;

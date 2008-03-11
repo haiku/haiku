@@ -159,13 +159,15 @@ extern pid_t	setpgrp(void);
 extern gid_t	getegid(void);
 extern uid_t	geteuid(void);
 extern gid_t	getgid(void);
-extern int		getgroups(int groupSize, gid_t groupList[]);
 extern uid_t	getuid(void);
+extern int		getgroups(int groupSize, gid_t groupList[]);
 
 extern int		setgid(gid_t gid);
 extern int		setuid(uid_t uid);
 extern int		setegid(gid_t gid);
 extern int		seteuid(uid_t uid);
+extern int		setregid(gid_t rgid, gid_t egid);
+extern int		setreuid(uid_t ruid, uid_t euid);
 
 extern char		*getlogin(void);
 extern int		getlogin_r(char *name, size_t nameSize);

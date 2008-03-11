@@ -189,6 +189,13 @@ struct team {
 
 	bigtime_t		dead_threads_kernel_time;
 	bigtime_t		dead_threads_user_time;
+
+	uid_t			saved_set_uid;
+	uid_t			real_uid;
+	uid_t			effective_uid;
+	gid_t			saved_set_gid;
+	gid_t			real_gid;
+	gid_t			effective_gid;
 };
 
 typedef int32 (*thread_entry_func)(thread_func, void *);

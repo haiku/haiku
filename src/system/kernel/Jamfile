@@ -42,6 +42,7 @@ KernelMergeObject kernel_core.o :
 	team.cpp
 	thread.cpp
 	timer.c
+	usergroup.cpp
 	wait_for_objects.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)

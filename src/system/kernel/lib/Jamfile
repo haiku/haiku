@@ -80,7 +80,7 @@ KernelMergeObject kernel_posix.o :
 	read.c
 	sync.c
 	truncate.c
-	usergroup.c
+	usergroup.cpp
 	write.c
 	# string
 	memchr.c
