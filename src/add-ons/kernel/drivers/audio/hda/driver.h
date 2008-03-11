@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ithamar Adema, ithamar AT unet DOT nl
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef _HDA_H_
 #define _HDA_H_
@@ -87,6 +88,8 @@ struct hda_stream {
 };
 
 struct hda_widget {
+	uint32			node_id;
+
 	uint32			num_inputs;
 	int32			active_input;
 	uint32			inputs[MAX_INPUTS];
@@ -94,6 +97,12 @@ struct hda_widget {
 
 	hda_widget_type	type;
 	uint32			pm;
+
+	struct {
+		uint32		audio;
+		uint32		output_amplifier;
+		uint32		input_amplifier;
+	} capabilities;
 
 	union {
 		struct {
@@ -133,6 +142,9 @@ struct hda_audio_group {
 	uint32			supported_formats;
 	uint32			supported_rates;
 	uint32			supported_pm;
+
+	uint32			input_amplifier_capabilities;
+	uint32			output_amplifier_capabilities;
 
 	hda_widget*		widgets;
 };

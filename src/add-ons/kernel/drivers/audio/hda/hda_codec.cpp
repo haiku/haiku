@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ithamar Adema, ithamar AT unet DOT nl
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -33,22 +34,132 @@ static const char* kJackColor[] = {
 };
 
 
+static const char*
+get_widget_type_name(hda_widget_type type)
+{
+	switch (type) {
+		case WT_AUDIO_OUTPUT:
+			return "Audio Output";
+		case WT_AUDIO_INPUT:
+			return "Audio Input";
+		case WT_AUDIO_MIXER:
+			return "Audio Mixer";
+		case WT_AUDIO_SELECTOR:
+			return "Audio Selector";
+		case WT_PIN_COMPLEX:
+			return "Pin Complex";
+		case WT_POWER:
+			return "Power";
+		case WT_VOLUME_KNOB:
+			return "Volume Knob";
+		case WT_BEEP_GENERATOR:
+			return "Beep Generator";
+		case WT_VENDOR_DEFINED:
+			return "Vendor Defined";
+		default:
+			return "Unknown";
+	}
+}
+
+
+static void
+dump_widget_audio_capabilities(uint32 capabilities)
+{
+	const struct {
+		uint32		flag;
+		const char*	name;
+	} kFlags[] = {
+		{AUDIO_CAP_LEFT_RIGHT_SWAP, "L-R Swap"},
+		{AUDIO_CAP_POWER_CONTROL, "Power"},
+		{AUDIO_CAP_DIGITAL, "Digital"},
+		{AUDIO_CAP_CONNECTION_LIST, "Conn. List"},
+		{AUDIO_CAP_UNSOLICITED_RESPONSES, "Unsol. Responses"},
+		{AUDIO_CAP_PROCESSING_CONTROLS, "Proc Widget"},
+		{AUDIO_CAP_STRIPE, "Stripe"},
+		{AUDIO_CAP_FORMAT_OVERRIDE, "Format Override"},
+		{AUDIO_CAP_AMPLIFIER_OVERRIDE, "Amplifier Override"},
+		{AUDIO_CAP_OUTPUT_AMPLIFIER, "Out Amplifier"},
+		{AUDIO_CAP_INPUT_AMPLIFIER, "In Amplifier"},
+		{AUDIO_CAP_STEREO, "Stereo"},			
+	};
+
+	char buffer[256];
+	int offset = 0;
+
+	for (uint32 j = 0; j < sizeof(kFlags) / sizeof(kFlags[0]); j++) {
+		if (capabilities & kFlags[j].flag)
+			offset += sprintf(buffer + offset, "[%s] ", kFlags[j].name);
+	}
+
+	if (offset != 0)
+		dprintf("\t%s\n", buffer);
+}
+
+
+static void
+dump_widget_inputs(hda_widget& widget)
+{
+	// dump connections
+
+	char buffer[256];
+	int offset = 0;
+
+	for (uint32 i = 0; i < widget.num_inputs; i++) {
+		int32 input = widget.inputs[i];
+
+		if ((int32)i != widget.active_input)
+			offset += sprintf(buffer + offset, "%ld ", input);
+		else
+			offset += sprintf(buffer + offset, "<%ld> ", input);
+	}
+
+	if (offset != 0)
+		dprintf("\tConnections: %s\n", buffer);
+}
+
+
+static void
+dump_widget_amplifier_capabilities(hda_widget& widget, bool input)
+{
+	uint32 capabilities;
+	if (input)
+		capabilities = widget.capabilities.input_amplifier;
+	else
+		capabilities = widget.capabilities.output_amplifier;
+
+	if (capabilities == 0)
+		return;
+
+	dprintf("\t%s Amp: %sstep size: %ld dB, # steps: %ld, offset to 0 dB: "
+		"%ld\n", input ? "In" : "Out",
+		(capabilities & AMP_CAP_MUTE) != 0 ? "supports mute, " : "",
+		(((capabilities & AMP_CAP_STEP_SIZE_MASK)
+			>> AMP_CAP_STEP_SIZE_SHIFT) + 1) / 4,
+		(capabilities & AMP_CAP_NUM_STEPS_MASK) >> AMP_CAP_NUM_STEPS_SHIFT,
+		capabilities & AMP_CAP_OFFSET_MASK);
+}
+
+
+//	#pragma mark -
+
+
 static status_t
-hda_widget_get_pm_support(hda_codec* codec, uint32 nodeID, uint32* pm)
+hda_get_pm_support(hda_codec* codec, uint32 nodeID, uint32* pm)
 {
 	corb_t verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
 		PID_POWERSTATE_SUPPORT);
 	status_t rc;
-	uint32 resp;
+	uint32 response;
 
-	if ((rc = hda_send_verbs(codec, &verb, &resp, 1)) == B_OK) {
-		*pm = 0;
-
+	if ((rc = hda_send_verbs(codec, &verb, &response, 1)) == B_OK) {
+		*pm = response & 0xf;
+#if 0
 		/* FIXME: Define constants for powermanagement modes */
 		if (resp & (1 << 0))	;
 		if (resp & (1 << 1))	;
 		if (resp & (1 << 2))	;
 		if (resp & (1 << 3))	;
+#endif
 	}
 
 	return rc;
@@ -56,7 +167,7 @@ hda_widget_get_pm_support(hda_codec* codec, uint32 nodeID, uint32* pm)
 
 
 static status_t
-hda_widget_get_stream_support(hda_codec* codec, uint32 nodeID, uint32* formats,
+hda_get_stream_support(hda_codec* codec, uint32 nodeID, uint32* formats,
 	uint32* rates)
 {
 	corb_t verbs[2];
@@ -121,36 +232,85 @@ hda_widget_get_stream_support(hda_codec* codec, uint32 nodeID, uint32* formats,
 }
 
 
+//	#pragma mark - widget functions
+
+
 static status_t
-hda_widget_get_amplifier_capabilities(hda_codec* codec, uint32 nodeID)
+hda_widget_get_pm_support(hda_audio_group* audioGroup, hda_widget* widget)
 {
-	status_t rc;
-	corb_t verb;
-	uint32 resp;
-
-	verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
-		PID_OUTPUT_AMPLIFIER_CAP);
-	rc = hda_send_verbs(codec, &verb, &resp, 1);
-	if (rc == B_OK && resp != 0) {
-		dprintf("\tAMP: Mute: %s, step size: %ld, # steps: %ld, offset: %ld\n",
-			(resp & (1 << 31)) ? "supported" : "N/A",
-			(resp >> 16) & 0x7F,
-			(resp >> 8) & 0x7F,
-			resp & 0x7F);
-	}
-
-	return rc;
+	return hda_get_pm_support(audioGroup->codec, widget->node_id,
+		&widget->pm);
 }
 
 
 static status_t
-hda_widget_get_connections(hda_codec* codec, uint32 nodeID, hda_widget* widget)
+hda_widget_get_stream_support(hda_audio_group* audioGroup, hda_widget* widget)
 {
-	uint32 verb = MAKE_VERB(codec->addr, nodeID, VID_GET_PARAMETER,
-		PID_CONNECTION_LIST_LENGTH);
+	if ((widget->capabilities.audio & AUDIO_CAP_FORMAT_OVERRIDE) == 0) {
+		// adopt capabilities of the audio group
+		widget->d.output.formats = audioGroup->supported_formats;
+		widget->d.output.rates = audioGroup->supported_rates;
+		return B_OK;
+	}
+
+	return hda_get_stream_support(audioGroup->codec, widget->node_id,
+		&widget->d.output.formats, &widget->d.output.rates);
+}
+
+
+static status_t
+hda_widget_get_amplifier_capabilities(hda_audio_group* audioGroup,
+	hda_widget* widget)
+{
+	uint32 response;
+	corb_t verb;
+
+	if ((widget->capabilities.audio & AUDIO_CAP_OUTPUT_AMPLIFIER) != 0) {
+		if ((widget->capabilities.audio & AUDIO_CAP_AMPLIFIER_OVERRIDE) != 0) {
+			verb = MAKE_VERB(audioGroup->codec->addr, widget->node_id,
+				VID_GET_PARAMETER, PID_OUTPUT_AMPLIFIER_CAP);
+			status_t status = hda_send_verbs(audioGroup->codec, &verb,
+				&response, 1);
+			if (status < B_OK)
+				return status;
+
+			widget->capabilities.output_amplifier = response;
+		} else {
+			// adopt capabilities from the audio function group
+			widget->capabilities.output_amplifier
+				= audioGroup->output_amplifier_capabilities;
+		}
+	}
+
+	if ((widget->capabilities.audio & AUDIO_CAP_INPUT_AMPLIFIER) != 0) {
+		if ((widget->capabilities.audio & AUDIO_CAP_AMPLIFIER_OVERRIDE) != 0) {
+			verb = MAKE_VERB(audioGroup->codec->addr, widget->node_id,
+				VID_GET_PARAMETER, PID_INPUT_AMPLIFIER_CAP);
+			status_t status = hda_send_verbs(audioGroup->codec, &verb,
+				&response, 1);
+			if (status < B_OK)
+				return status;
+
+			widget->capabilities.input_amplifier = response;
+		} else {
+			// adopt capabilities from the audio function group
+			widget->capabilities.input_amplifier
+				= audioGroup->input_amplifier_capabilities;
+		}
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+hda_widget_get_connections(hda_audio_group* audioGroup, hda_widget* widget)
+{
+	uint32 verb = MAKE_VERB(audioGroup->codec->addr, widget->node_id,
+		VID_GET_PARAMETER, PID_CONNECTION_LIST_LENGTH);
 	uint32 response;
 
-	if (hda_send_verbs(codec, &verb, &response, 1) != B_OK)
+	if (hda_send_verbs(audioGroup->codec, &verb, &response, 1) != B_OK)
 		return B_ERROR;
 
 	uint32 listEntries = response & 0x7f;
@@ -162,8 +322,9 @@ hda_widget_get_connections(hda_codec* codec, uint32 nodeID, hda_widget* widget)
 #if 1
 	if (widget->num_inputs > 1) {
 		// Get currently active connection
-		verb = MAKE_VERB(codec->addr, nodeID, VID_GET_CONNECTION_SELECT, 0);
-		if (hda_send_verbs(codec, &verb, &response, 1) == B_OK)
+		verb = MAKE_VERB(audioGroup->codec->addr, widget->node_id,
+			VID_GET_CONNECTION_SELECT, 0);
+		if (hda_send_verbs(audioGroup->codec, &verb, &response, 1) == B_OK)
 			widget->active_input = response & 0xff;
 	}
 #endif
@@ -178,11 +339,12 @@ hda_widget_get_connections(hda_codec* codec, uint32 nodeID, hda_widget* widget)
 		if ((i % valuesPerEntry) == 0) {
 			// We get 2 or 4 answers per call depending on if we're
 			// in short or long list mode
-			verb = MAKE_VERB(codec->addr, nodeID,
+			verb = MAKE_VERB(audioGroup->codec->addr, widget->node_id,
 				VID_GET_CONNECTION_LIST_ENTRY, i);
-			if (hda_send_verbs(codec, &verb, &response, 1) != B_OK) {
+			if (hda_send_verbs(audioGroup->codec, &verb, &response, 1)
+					!= B_OK) {
 				dprintf("hda: Error parsing inputs for widget %ld!\n",
-					nodeID);
+					widget->node_id);
 				break;
 			}
 		}
@@ -214,36 +376,15 @@ hda_widget_get_connections(hda_codec* codec, uint32 nodeID, hda_widget* widget)
 	}
 
 	widget->num_inputs = numInputs;
+
+	if (widget->num_inputs == 1)
+		widget->active_input = widget->inputs[0];
+
 	return B_OK;
 }
 
 
-static const char*
-get_widget_type_name(hda_widget_type type)
-{
-	switch (type) {
-		case WT_AUDIO_OUTPUT:
-			return "Audio Output";
-		case WT_AUDIO_INPUT:
-			return "Audio Input";
-		case WT_AUDIO_MIXER:
-			return "Audio Mixer";
-		case WT_AUDIO_SELECTOR:
-			return "Audio Selector";
-		case WT_PIN_COMPLEX:
-			return "Pin Complex";
-		case WT_POWER:
-			return "Power";
-		case WT_VOLUME_KNOB:
-			return "Volume Knob";
-		case WT_BEEP_GENERATOR:
-			return "Beep Generator";
-		case WT_VENDOR_DEFINED:
-			return "Vendor Defined";
-		default:
-			return "Unknown";
-	}
-}
+//	#pragma mark - audio group functions
 
 
 static status_t
@@ -252,9 +393,9 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	corb_t verbs[3];
 	uint32 resp[3];
 
-	hda_widget_get_stream_support(audioGroup->codec, audioGroup->root_node_id,
+	hda_get_stream_support(audioGroup->codec, audioGroup->root_node_id,
 		&audioGroup->supported_formats, &audioGroup->supported_rates);
-	hda_widget_get_pm_support(audioGroup->codec, audioGroup->root_node_id,
+	hda_get_pm_support(audioGroup->codec, audioGroup->root_node_id,
 		&audioGroup->supported_pm);
 
 	verbs[0] = MAKE_VERB(audioGroup->codec->addr, audioGroup->root_node_id,
@@ -291,134 +432,79 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 
 	/* Iterate over all Widgets and collect info */
 	for (uint32 i = 0; i < audioGroup->widget_count; i++) {
-		uint32 widget = audioGroup->widget_start + i;
+		hda_widget& widget = audioGroup->widgets[i];
+		uint32 nodeID = audioGroup->widget_start + i;
+		uint32 capabilities;
 
-		verbs[0] = MAKE_VERB(audioGroup->codec->addr, widget, VID_GET_PARAMETER,
+		verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID, VID_GET_PARAMETER,
 			PID_AUDIO_WIDGET_CAP);
-		if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) != B_OK)
+		if (hda_send_verbs(audioGroup->codec, verbs, &capabilities, 1) != B_OK)
 			return B_ERROR;
 
-		audioGroup->widgets[i].type = (hda_widget_type)(resp[0] >> 20);
-		audioGroup->widgets[i].active_input = -1;
+		widget.type = (hda_widget_type)((capabilities & AUDIO_CAP_TYPE_MASK)
+			>> AUDIO_CAP_TYPE_SHIFT);
+		widget.active_input = -1;
+		widget.capabilities.audio = capabilities;
+		widget.node_id = nodeID;
 
-		dprintf("%ld: %s\n", widget,
-			get_widget_type_name(audioGroup->widgets[i].type));
-
-		char buf[256];
-		int off = 0;
-		buf[0] = '\0';
-
-		if (resp[0] & (1 << 11))
-			off += sprintf(buf + off, "[L-R Swap] ");
-
-		if (resp[0] & (1 << 10)) {
-			corb_t verb;
-			uint32 resp;
-
-			off += sprintf(buf + off, "[Power] ");
-
+		if ((capabilities & AUDIO_CAP_POWER_CONTROL) != 0) {
 			/* We support power; switch us on! */
-			verb = MAKE_VERB(audioGroup->codec->addr, widget,
+			verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
 				VID_SET_POWER_STATE, 0);
-			hda_send_verbs(audioGroup->codec, &verb, &resp, 1);
+			hda_send_verbs(audioGroup->codec, verbs, NULL, 1);
+
+			snooze(1000);
+		}
+		if ((capabilities & (AUDIO_CAP_INPUT_AMPLIFIER
+				| AUDIO_CAP_OUTPUT_AMPLIFIER)) != 0) {
+			hda_widget_get_amplifier_capabilities(audioGroup, &widget);
 		}
 
-		if (resp[0] & (1 << 9))
-			off += sprintf(buf + off, "[Digital] ");
-		if (resp[0] & (1 << 7))
-			off += sprintf(buf + off, "[Unsol Capable] ");
-		if (resp[0] & (1 << 6))
-			off += sprintf(buf + off, "[Proc Widget] ");
-		if (resp[0] & (1 << 5))
-			off += sprintf(buf + off, "[Stripe] ");
-		if (resp[0] & (1 << 4))
-			off += sprintf(buf + off, "[Format Override] ");
-		if (resp[0] & (1 << 3))
-			off += sprintf(buf + off, "[Amp Param Override] ");
-		if (resp[0] & (1 << 2))
-			off += sprintf(buf + off, "[Out Amp] ");
-		if (resp[0] & (1 << 1))
-			off += sprintf(buf + off, "[In Amp] ");
-		if (resp[0] & (1 << 0))
-			off += sprintf(buf + off, "[Stereo] ");
+		dprintf("%ld: %s\n", nodeID, get_widget_type_name(widget.type));
 
-		switch (audioGroup->widgets[i].type) {
+		switch (widget.type) {
 			case WT_AUDIO_OUTPUT:
-				hda_widget_get_stream_support(audioGroup->codec, widget,
-					&audioGroup->widgets[i].d.input.formats,
-					&audioGroup->widgets[i].d.input.rates);
-				hda_widget_get_amplifier_capabilities(audioGroup->codec, widget);
-				break;
 			case WT_AUDIO_INPUT:
-				hda_widget_get_stream_support(audioGroup->codec, widget,
-					&audioGroup->widgets[i].d.input.formats,
-					&audioGroup->widgets[i].d.input.rates);
-				hda_widget_get_amplifier_capabilities(audioGroup->codec, widget);
+				hda_widget_get_stream_support(audioGroup, &widget);
 				break;
-			case WT_AUDIO_MIXER:
-				hda_widget_get_amplifier_capabilities(audioGroup->codec, widget);
-				break;
-			case WT_AUDIO_SELECTOR:
-				hda_widget_get_amplifier_capabilities(audioGroup->codec, widget);
-				break;
+
 			case WT_PIN_COMPLEX:
-				verbs[0] = MAKE_VERB(audioGroup->codec->addr, widget,
+				verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
 					VID_GET_PARAMETER, PID_PIN_CAP);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
-					audioGroup->widgets[i].d.pin.input = resp[0] & (1 << 5);
-					audioGroup->widgets[i].d.pin.output = resp[0] & (1 << 4);
+					widget.d.pin.input = resp[0] & (1 << 5);
+					widget.d.pin.output = resp[0] & (1 << 4);
 
-					dprintf("\t%s%s\n", 
-						audioGroup->widgets[i].d.pin.input ? "[Input] " : "",
-						audioGroup->widgets[i].d.pin.output ? "[Output]" : "");
+					dprintf("\t%s%s\n", widget.d.pin.input ? "[Input] " : "",
+						widget.d.pin.output ? "[Output]" : "");
 				} else {
 					dprintf("%s: Error getting Pin Complex IO\n", __func__);
 				}
 
-				verbs[0] = MAKE_VERB(audioGroup->codec->addr, widget,
+				verbs[0] = MAKE_VERB(audioGroup->codec->addr, nodeID,
 					VID_GET_CONFIGURATION_DEFAULT, 0);
 				if (hda_send_verbs(audioGroup->codec, verbs, resp, 1) == B_OK) {
-					audioGroup->widgets[i].d.pin.device = (pin_dev_type)
+					widget.d.pin.device = (pin_dev_type)
 						((resp[0] >> 20) & 0xf);
 					dprintf("\t%s, %s, %s, %s\n",
 						kPortConnector[resp[0] >> 30],	
-						kDefaultDevice[audioGroup->widgets[i].d.pin.device],
+						kDefaultDevice[widget.d.pin.device],
 						kConnectionType[(resp[0] >> 16) & 0xF],
 						kJackColor[(resp[0] >> 12) & 0xF]);
 				}
-
-				hda_widget_get_amplifier_capabilities(audioGroup->codec, widget);
 				break;
 
 			default:
 				break;
 		}
 
-		if (off)
-			dprintf("\t%s\n", buf);
+		hda_widget_get_pm_support(audioGroup, &widget);
+		hda_widget_get_connections(audioGroup, &widget);
 
-		hda_widget_get_pm_support(audioGroup->codec, widget,
-			&audioGroup->widgets[i].pm);
-		hda_widget_get_connections(audioGroup->codec, widget,
-			&audioGroup->widgets[i]);
-
-		// dump connections
-
-		buf[0] = '\0';
-		off = 0;
-
-		for (uint32 inputIndex = 0; inputIndex
-				< audioGroup->widgets[i].num_inputs; inputIndex++) {
-			int32 input = audioGroup->widgets[i].inputs[inputIndex];
-
-			if ((int32)inputIndex != audioGroup->widgets[i].active_input)
-				off += sprintf(buf + off, "%ld ", input);
-			else
-				off += sprintf(buf + off, "(%ld) ", input);
-		}
-
-		if (off != 0)
-			dprintf("\tConnections: %s\n", buf);
+		dump_widget_audio_capabilities(capabilities);
+		dump_widget_amplifier_capabilities(widget, true);
+		dump_widget_amplifier_capabilities(widget, false);
+		dump_widget_inputs(widget);
 	}
 
 	return B_OK;
