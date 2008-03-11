@@ -18,6 +18,10 @@ VideoWindowAddOn::VideoWindowAddOn(image_id id)
 		: BMediaAddOn(id)
 {
 	CALLED();
+
+	fInputFormat.type = B_MEDIA_RAW_VIDEO;
+	fInputFormat.u.raw_video = media_raw_video_format::wildcard;
+
 	fInfo.internal_id = 0;
 	fInfo.name = strdup("VideoWindow Consumer");
 	fInfo.info = strdup("This node displays a simple video window");
@@ -25,10 +29,11 @@ VideoWindowAddOn::VideoWindowAddOn(image_id id)
 	fInfo.flavor_flags = 0;
 	fInfo.possible_count = 0;
 	fInfo.in_format_count = 1;
-	media_format *inFormat = new media_format;
-	inFormat->type = B_MEDIA_RAW_VIDEO;
-	inFormat->u.raw_video = media_raw_video_format::wildcard;
-	fInfo.in_formats = inFormat;
+	fInfo.in_format_flags = 0;
+	fInfo.in_formats = &fInputFormat;
+	fInfo.out_format_count = 0;
+	fInfo.out_formats = 0;
+	fInfo.out_format_flags = 0;
 }
 
 

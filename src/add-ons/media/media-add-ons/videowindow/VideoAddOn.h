@@ -24,6 +24,7 @@ public:
 
 private:
 	flavor_info					fInfo;
+	media_format				fInputFormat;
 };
 
 extern "C" BMediaAddOn *make_media_addon(image_id id);
