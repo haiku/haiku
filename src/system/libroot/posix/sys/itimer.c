@@ -24,11 +24,18 @@ getitimer(int which, struct itimerval *value)
 int
 setitimer(int which, const struct itimerval *value, struct itimerval *oldValue)
 {
-	// ToDo: implement me properly!
+	// TODO: implement me properly!
 	// We probably need a better internal set_alarm() implementation to do this
 
 	bigtime_t interval = value->it_interval.tv_sec * USEC_PER_SECOND + value->it_interval.tv_usec;
 	bigtime_t remaining;
+
+	// Only real time timers work at all.
+	if (which != ITIMER_REAL) {
+		errno = B_NOT_SUPPORTED;
+		return -1;
+	}
+
 	if (interval != 0)
 		remaining = set_alarm(interval, B_PERIODIC_ALARM);
 	else {
