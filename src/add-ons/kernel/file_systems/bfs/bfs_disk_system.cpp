@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2007-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,7 +27,7 @@ parse_initialize_parameters(const char* parameterString,
 
 	const char *string = get_driver_parameter(handle, "block_size",
 		NULL, NULL);
-	uint32 blockSize = 1024;
+	uint32 blockSize = 2048;
 	if (string != NULL)
 		blockSize = strtoul(string, NULL, 0);
 
