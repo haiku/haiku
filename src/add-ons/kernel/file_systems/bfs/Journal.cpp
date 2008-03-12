@@ -419,12 +419,22 @@ Journal::_ReplayRunArray(int32 *_start)
 			if (data == NULL)
 				RETURN_ERROR(B_IO_ERROR);
 
-			ssize_t written = write_pos(fVolume->Device(),
-				offset + (i * blockSize), data, blockSize);
+			// TODO: eventually check other well known offsets, like the
+			// root and index dirs
+			if (offset == 0) {
+				// This log entry writes over the super block - check if
+				// it's valid!
+				if (Volume::CheckSuperBlock(data) != B_OK)
+					RETURN_ERROR(B_BAD_DATA);
+			}
+
+			ssize_t written = write_pos(fVolume->Device(), offset, data,
+				blockSize);
 			if (written != blockSize)
 				RETURN_ERROR(B_IO_ERROR);
 
 			blockNumber = (blockNumber + 1) % fLogSize;
+			offset += blockSize;
 			count++;
 		}
 	}

@@ -558,25 +558,42 @@ Volume::RemoveQuery(Query *query)
 //	#pragma mark - Disk scanning and initialization
 
 
-status_t
+/*static*/ status_t
+Volume::CheckSuperBlock(const uint8* data, uint32* _offset)
+{
+	disk_super_block* superBlock = (disk_super_block*)(data + 512);
+	if (superBlock->IsValid()) {
+		if (_offset != NULL)
+			*_offset = 512;
+		return B_OK;
+	}
+
+#ifndef BFS_LITTLE_ENDIAN_ONLY
+	// For PPC, the super block might be located at offset 0
+	superBlock = (disk_super_block*)data;
+	if (superBlock->IsValid()) {
+		if (_offset != NULL)
+			*_offset = 0;
+		return B_OK;
+	}
+#endif
+
+	return B_BAD_VALUE;
+}
+
+
+/*static*/ status_t
 Volume::Identify(int fd, disk_super_block *superBlock)
 {
-	char buffer[1024];
+	uint8 buffer[1024];
 	if (read_pos(fd, 0, buffer, sizeof(buffer)) != sizeof(buffer))
 		return B_IO_ERROR;
 
-	memcpy(superBlock, buffer + 512, sizeof(disk_super_block));
-	if (!superBlock->IsValid()) {
-#ifndef BFS_LITTLE_ENDIAN_ONLY
-		// For PPC, the super block might be located at offset 0
-		memcpy(superBlock, buffer, sizeof(disk_super_block));
-		if (!superBlock->IsValid())
-			return B_BAD_VALUE;
-#else
+	uint32 offset;
+	if (CheckSuperBlock(buffer, &offset) != B_OK)
 		return B_BAD_VALUE;
-#endif
-	}
 
+	memcpy(superBlock, buffer + offset, sizeof(disk_super_block));
 	return B_OK;
 }
 

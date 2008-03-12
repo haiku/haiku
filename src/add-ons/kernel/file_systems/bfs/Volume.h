@@ -102,6 +102,8 @@ class Volume {
 
 		uint32				GetUniqueID();
 
+		static status_t		CheckSuperBlock(const uint8* data,
+								uint32* _offset = NULL);
 		static status_t		Identify(int fd, disk_super_block *superBlock);
 
 	protected:
