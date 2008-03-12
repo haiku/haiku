@@ -119,7 +119,7 @@ if [ $isImage ]; then
 		if [ ! -e $imagePath -o ! "$dontClearImage" ]; then
 			dd if=/dev/zero of=$imagePath bs=1048576 count=$imageSize $ddFlags
 		fi
-		$bfsShell --initialize $imageOffsetFlags $imagePath Haiku || exit 1
+		$bfsShell --initialize $imageOffsetFlags $imagePath Haiku "block_size 2048" || exit 1
 		$makebootable $imageOffsetFlags $imagePath
 	fi
 	$bfsShell -n $imageOffsetFlags $imagePath > /dev/null &
