@@ -14,6 +14,9 @@ __BEGIN_CORTEX_NAMESPACE
 
 class IObservable {
 
+public:
+	IObservable() { }
+	virtual ~IObservable() { }
 public:											// *** deletion
 	// clients must call release() rather than deleting,
 	// to ensure that all observers are notified of the

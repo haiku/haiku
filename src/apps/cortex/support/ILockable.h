@@ -32,6 +32,9 @@ __BEGIN_CORTEX_NAMESPACE
 // the locking interface
 
 class ILockable {
+public:
+	ILockable() { }
+	virtual ~ILockable() { }
 public:						// constants
 	enum lock_t {
 		WRITE,

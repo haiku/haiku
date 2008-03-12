@@ -288,7 +288,7 @@ StatusView::drawInto(BView *v, BRect updateRect)
 
 	r.InsetBy(2.0, 0.0);
 	v->SetDrawingMode(B_OP_ALPHA);
-	v->SetHighColor(0, 0, 0, 255 * m_opacity);
+	v->SetHighColor(0, 0, 0, uchar(255 * m_opacity));
 
 	// draw icon
 	if (m_icon) {

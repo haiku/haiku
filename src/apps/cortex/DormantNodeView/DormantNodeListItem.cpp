@@ -69,12 +69,12 @@ void DormantNodeListItem::DrawItem(
 		r.right = r.left + B_MINI_ICON - 1.0;
 		r.bottom = r.top + B_MINI_ICON - 1.0;
 		if (IsSelected()) {
-			owner->SetHighColor(255.0, 255.0, 255.0, 255.0);
+			owner->SetHighColor(255, 255, 255, 255);
 			owner->FillRect(r);
 			owner->SetDrawingMode(B_OP_INVERT);
 			owner->DrawBitmap(m_icon, r.LeftTop());
 			owner->SetDrawingMode(B_OP_ALPHA);
-			owner->SetHighColor(0.0, 0.0, 0.0, 180.0);
+			owner->SetHighColor(0, 0, 0, 180);
 			owner->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 			owner->DrawBitmap(m_icon, r.LeftTop());
 			owner->SetDrawingMode(B_OP_OVER);
@@ -93,7 +93,7 @@ void DormantNodeListItem::DrawItem(
 	r.bottom = r.top + m_fontHeight.ascent + m_fontHeight.descent;		
 	if (IsSelected() || drawEverything) {
 		if (IsSelected()) {
-			owner->SetHighColor(16.0, 64.0, 96.0, 255.0);
+			owner->SetHighColor(16, 64, 96, 255);
 		}
 		else {
 			owner->SetHighColor(owner->ViewColor());
@@ -101,10 +101,10 @@ void DormantNodeListItem::DrawItem(
 		owner->FillRect(r);
 	}
 	if (IsSelected()) {
-		owner->SetHighColor(255.0, 255.0, 255.0, 255.0);
+		owner->SetHighColor(255, 255, 255, 255);
 	}
 	else {
-		owner->SetHighColor(0.0, 0.0, 0.0, 0.0);
+		owner->SetHighColor(0, 0, 0, 0);
 	}
 	BPoint labelOffset(r.left + 1.0, r.bottom - m_fontHeight.descent);
 	owner->DrawString(m_info.name, labelOffset);
@@ -199,10 +199,10 @@ BBitmap *DormantNodeListItem::getDragBitmap() {
 		BView *dragView = new BView(dragBitmap->Bounds(), "", B_FOLLOW_NONE, 0); 
 		dragBitmap->AddChild(dragView); 
 		dragView->SetOrigin(0.0, 0.0);
-		dragView->SetHighColor(0.0, 0.0, 0.0, 0.0);
+		dragView->SetHighColor(0, 0, 0, 0);
 		dragView->FillRect(dragView->Bounds()); 
 		dragView->SetDrawingMode(B_OP_ALPHA); 
-		dragView->SetHighColor(0.0, 0.0, 0.0, 128.0);       
+		dragView->SetHighColor(0, 0, 0, 128);       
 	    dragView->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE); 
 		// Drawing code back again
 		if (m_icon) {

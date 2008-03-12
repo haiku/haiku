@@ -25,6 +25,8 @@ class MouseTrackingSourceView;
 // interface for a mouse-tracking destination
 class IMouseTrackingDestination {
 public:							// operations
+	IMouseTrackingDestination() { }
+	virtual ~IMouseTrackingDestination() { }
 	// a MouseTrackingSourceView has started tracking the mouse
 	// (point is in pSource view coordinates)
 	virtual void mouseTrackingBegin(

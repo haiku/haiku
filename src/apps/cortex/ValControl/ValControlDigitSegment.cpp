@@ -316,7 +316,7 @@ void ValControlDigitSegment::MessageReceived(BMessage* pMsg) {
 		case ValControl::M_SET_VALUE:
 			err = pMsg->FindDouble("value", &fVal);
 			ASSERT(err == B_OK);
-			setValue(fVal, fVal < 0);
+			setValue((int64)fVal, fVal < 0);
 			break;
 			
 		case ValControl::M_GET_VALUE: {
