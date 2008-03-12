@@ -12,5 +12,6 @@ SharedLibrary libbluetooth.so :
 	LocalDevice.cpp
 	DiscoveryAgent.cpp
 	DiscoveryListener.cpp
+	CommandManager.cpp
 	: be
 ;
