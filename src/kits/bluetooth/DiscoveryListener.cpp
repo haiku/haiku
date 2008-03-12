@@ -9,19 +9,14 @@
 #include <bluetooth/RemoteDevice.h>
 #include <bluetooth/DeviceClass.h>
 
+#include <bluetoothserver_p.h>
+
 #include <Message.h>
 
 namespace Bluetooth {
 
 
-/* Move to some private header */
-#define B_BT_INQUIRY_COMPLETED_MSG  'IqCM'
-#define B_BT_INQUIRY_TERMINATED_MSG 'IqTR'
-#define B_BT_INQUIRY_ERROR_MSG      'IqER'
-#define B_BT_INQUIRY_DEVICE_MSG     'IqDE'
-
 /* hooks */
-
 void 
 DiscoveryListener::DeviceDiscovered(RemoteDevice btDevice, DeviceClass cod)
 {
@@ -31,25 +26,33 @@ DiscoveryListener::DeviceDiscovered(RemoteDevice btDevice, DeviceClass cod)
 
 
 void 
+DiscoveryListener::InquiryStarted(status_t status)
+{
+    
+}
+
+
+
+void 
 DiscoveryListener::InquiryCompleted(int discType)
 {
     
 }
 
 
-/* private */        
-    
+/* private */            
 DiscoveryListener::DiscoveryListener()
 {
 
 }
+
 
 void 
 DiscoveryListener::MessageReceived(BMessage* message)
 {
     switch (message->what) 
     {
-        case B_BT_INQUIRY_DEVICE_MSG:
+        case BT_MSG_INQUIRY_DEVICE:
             
             /* TODO: Extract info from BMessage to create a 
                proper RemoteDevice, message should be passed from Agent??? */
@@ -59,17 +62,17 @@ DiscoveryListener::MessageReceived(BMessage* message)
 
         break;
         
-        case B_BT_INQUIRY_COMPLETED_MSG:
+        case BT_MSG_INQUIRY_COMPLETED:
 
             InquiryCompleted(B_BT_INQUIRY_COMPLETED);
 
         break;
-        case B_BT_INQUIRY_TERMINATED_MSG:
+        case BT_MSG_INQUIRY_TERMINATED:
 
             InquiryCompleted(B_BT_INQUIRY_TERMINATED);
 
         break;
-        case B_BT_INQUIRY_ERROR_MSG:
+        case BT_MSG_INQUIRY_ERROR:
 
             InquiryCompleted(B_BT_INQUIRY_ERROR);            
 

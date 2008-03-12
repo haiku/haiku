@@ -42,6 +42,9 @@ class DiscoveryListener : BLooper {
         virtual void serviceSearchCompleted(int transID, int respCode);
         */
         virtual void InquiryCompleted(int discType);
+
+		/* JSR82 non-defined methods */
+		virtual void InquiryStarted(status_t status);
         
     private:                
         DiscoveryListener();

@@ -42,6 +42,7 @@ class RemoteDevice {
                 
     protected:
         RemoteDevice(BString address);
+        RemoteDevice(bdaddr_t address);        
     
     /* Instances of this class only will be done by Discovery[Listener|Agent] TODO */
     friend class DiscoveryListener;
