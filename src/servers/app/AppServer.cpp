@@ -188,8 +188,12 @@ AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
 			}
 
 			BPrivate::LinkSender reply(replyPort);
-			reply.StartMessage(B_OK);
-			reply.Attach<port_id>(desktop->MessagePort());
+			if (desktop != NULL) {
+				reply.StartMessage(B_OK);
+				reply.Attach<port_id>(desktop->MessagePort());
+			} else
+				reply.StartMessage(B_ERROR);
+
 			reply.Flush();
 			break;
 		}

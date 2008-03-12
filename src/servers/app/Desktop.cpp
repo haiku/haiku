@@ -385,6 +385,11 @@ Desktop::Init()
 	// TODO: temporary workaround, fActiveScreen will be removed
 	fActiveScreen = fVirtualScreen.ScreenAt(0);
 
+	if (fVirtualScreen.HWInterface() == NULL) {
+		debug_printf("Could not initialize graphics output. Exiting.\n");
+		return B_ERROR;
+	}
+
 	fVirtualScreen.HWInterface()->MoveCursorTo(fVirtualScreen.Frame().Width() / 2,
 		fVirtualScreen.Frame().Height() / 2);
 
