@@ -10,13 +10,13 @@ Server bluetooth_server
  	:
 	BPortNot.cpp
 	BluetoothServer.cpp
-	CommandManager.cpp
+#	CommandManager.cpp
 	DeviceManager.cpp
 	HCIControllerAccessor.cpp
 	HCITransportAccessor.cpp
 	LocalDeviceHandler.cpp
 	LocalDeviceImpl.cpp  
 	Output.cpp
-	: be
+	: be libbluetooth.so
 	$(TARGET_LIBSTDC++)
 ;
