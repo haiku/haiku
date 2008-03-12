@@ -38,10 +38,9 @@ Application Cortex :
 	cortex_transport_view.a
 	cortex_val_control.a
 	cortex_diagram_view.a
-	cortex_expat_xmlparse.a
-	cortex_expat_xmltok.a
 	cortex_support.a
 	be media tracker translation
+	libexpat.a
 	$(TARGET_LIBSTDC++)
 	: ../Resource.rdef
 ;
