@@ -176,7 +176,7 @@ dormant_flavor_info::operator=(const flavor_info &clone)
 			}
 		} else
 			fprintf(stderr, "error dormant_flavor_info::operator= clone.out_format_count is invalid\n");
-	} else if (clone.in_format_count)
+	} else if (clone.out_format_count)
 		fprintf(stderr, "warning: dormant_flavor_info::operator= not B_BUFFER_PRODUCER and clone.out_format_count is != 0\n");
 
 	// initialize node_info with default values from dormant_node_info constructor
