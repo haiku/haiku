@@ -191,8 +191,17 @@ reseed(ch_randgen *prandgen, const uint32 initTimes)
 
 	for (j = initTimes; j; j--) {
 		for (i = NK * initTimes; i; i--) {
+			// TODO: Yielding sounds all nice in principle, but this will take
+			// ages (at least initTimes * initTimes * NK * quantum, i.e. ca. 49s
+			// for initTimes == 8) in a busy system. Since perl initializes its
+			// random seed on startup by reading from /dev/urandom, perl
+			// programs are all but unusable when at least one other thread
+			// hogs the CPU.
 			thread_yield(false);
 
+			// TODO: Introduce a clock_counter() function that directly returns
+			// the value of the hardware clock counter. This will be cheaper
+			// and will yield more randomness.
 			y.Q[0] += system_time();
 			attach(&x, &y, 0x52437EFFU, 0x026A4CEBU, 0xD9E66AC9U, 0x56E5A975U);
 			attach(&y, &x, 0xC70B8B41U, 0x9126B036U, 0x36CC6FDBU, 0x31D477F7U);
