@@ -277,7 +277,7 @@ mp3Decoder::DecodeNextChunk()
 			return B_ERROR;
 		}
 		int len = GetFrameLength(chunkBuffer);
-		TRACE("mp3Decoder::DecodeNextChunk: chunkSize %d, first frame length %d\n", chunkSize, len);
+		TRACE("mp3Decoder::DecodeNextChunk: chunkSize %ld, first frame length %d\n", chunkSize, len);
 		// len == -1 when not at frame start
 		// len == chunkSize for mp3 reader (delivers single frames)
 		if (len < (int)chunkSize) {
@@ -295,7 +295,7 @@ mp3Decoder::DecodeNextChunk()
 				TRACE("mp3Decoder::DecodeNextChunk: Sync failed\n");
 				return B_ERROR;
 			}
-			TRACE("mp3Decoder::DecodeNextChunk: new chunkSize %d, first frame length %d\n", chunkSize, GetFrameLength(chunkBuffer));
+			TRACE("mp3Decoder::DecodeNextChunk: new chunkSize %ld, first frame length %d\n", chunkSize, GetFrameLength(chunkBuffer));
 		}
 		fNeedSync = false;
 	}
