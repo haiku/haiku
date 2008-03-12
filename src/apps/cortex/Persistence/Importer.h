@@ -18,7 +18,7 @@
 
 #include "ImportContext.h"
 #include "XML.h"
-#include "xmlparse.h"
+#include "expat.h"
 
 #include "cortex_defs.h"
 __BEGIN_CORTEX_NAMESPACE

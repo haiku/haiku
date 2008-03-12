@@ -1,8 +1,9 @@
 SubDir HAIKU_TOP src apps cortex Persistence ;
 
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
-SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) expat xmlparse ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
+
+UseLibraryHeaders expat ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 

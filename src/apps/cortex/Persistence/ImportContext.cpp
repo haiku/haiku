@@ -2,7 +2,7 @@
 // e.moon 1jul99
 
 #include "ImportContext.h"
-#include "xmlparse.h"
+#include "expat.h"
 
 using namespace std;
 
