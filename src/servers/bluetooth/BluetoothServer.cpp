@@ -141,7 +141,7 @@ void BluetoothServer::MessageReceived(BMessage *message)
 			status = HandleLocalDevicesCount(message, &reply);
     	break;	
     	
-		case BT_MSG_ADQUIRE_LOCAL_DEVICE:
+		case BT_MSG_ACQUIRE_LOCAL_DEVICE:
 			status = HandleAcquireLocalDevice(message, &reply);
 		break;
 

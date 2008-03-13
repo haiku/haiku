@@ -70,7 +70,7 @@ LocalDevice::GetLocalDevice()
     if (SRetrieveBluetoothMessenger() != B_OK)
         return NULL;
  
-    BMessage request(BT_MSG_ADQUIRE_LOCAL_DEVICE);
+    BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);
         
     return RequestLocalDeviceID(&request);
 }
@@ -82,7 +82,7 @@ LocalDevice::GetLocalDevice(hci_id hid)
     if (SRetrieveBluetoothMessenger() != B_OK)
         return NULL;
  
-    BMessage request(BT_MSG_ADQUIRE_LOCAL_DEVICE);    
+    BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);    
     request.AddInt32("hci_id", hid);
        
     return RequestLocalDeviceID(&request);
@@ -96,7 +96,7 @@ LocalDevice::GetLocalDevice(bdaddr_t bdaddr)
     if (SRetrieveBluetoothMessenger() != B_OK)
         return NULL;
  
-    BMessage request(BT_MSG_ADQUIRE_LOCAL_DEVICE);    
+    BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);    
     request.AddData("bdaddr", B_ANY_TYPE, &bdaddr, sizeof(bdaddr_t));
     
        
