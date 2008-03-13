@@ -88,7 +88,14 @@ store_acquire_unreferenced_ref(struct vm_store *_store)
 {
 	vnode_store *store = (vnode_store *)_store;
 	struct vnode *vnode;
-	return vfs_get_vnode(store->device, store->inode, false, &vnode);
+	status_t status = vfs_get_vnode(store->device, store->inode, false, &vnode);
+
+	// If successful, update the store's vnode pointer, so that release_ref()
+	// won't use a stale pointer.
+	if (status == B_OK)
+		store->vnode = vnode;
+
+	return status;
 }
 
 
