@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src kits bluetooth ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-        UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
+       UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
 }
 
 UsePrivateHeaders bluetooth ;
@@ -13,5 +13,6 @@ SharedLibrary libbluetooth.so :
 	DiscoveryAgent.cpp
 	DiscoveryListener.cpp
 	CommandManager.cpp
+	KitSupport.cpp
 	: be
 ;

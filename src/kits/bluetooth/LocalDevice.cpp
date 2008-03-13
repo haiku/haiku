@@ -15,7 +15,9 @@
 
 #include <bluetooth/bdaddrUtils.h>
 
-#include "bluetoothserver_p.h"
+#include <bluetoothserver_p.h>
+
+#include "KitSupport.h"
 
 /* TODO: remove me */
 #include <stdio.h>
@@ -24,22 +26,6 @@ namespace Bluetooth {
 
 BMessenger*  LocalDevice::sfMessenger = NULL;
 
-status_t
-LocalDevice::SRetrieveBluetoothMessenger(void)
-{
-    if (sfMessenger == NULL || !sfMessenger->IsValid() )
-        sfMessenger = new BMessenger(BLUETOOTH_SIGNATURE);
-
-    return (sfMessenger != NULL)?B_OK:B_ERROR;
-}
-
-status_t LocalDevice::RetrieveBluetoothMessenger(void)
-{
-    if (fMessenger == NULL || !fMessenger->IsValid())
-        fMessenger = new BMessenger(BLUETOOTH_SIGNATURE);
-
-    return (fMessenger != NULL)?B_OK:B_ERROR;
-}
 
 LocalDevice*
 LocalDevice::RequestLocalDeviceID(BMessage* request)
@@ -67,7 +53,7 @@ LocalDevice::RequestLocalDeviceID(BMessage* request)
 LocalDevice*
 LocalDevice::GetLocalDevice()
 {          
-    if (SRetrieveBluetoothMessenger() != B_OK)
+    if ((sfMessenger = _RetrieveBluetoothMessenger()) == NULL)
         return NULL;
  
     BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);
@@ -79,7 +65,7 @@ LocalDevice::GetLocalDevice()
 LocalDevice*
 LocalDevice::GetLocalDevice(hci_id hid)
 {
-    if (SRetrieveBluetoothMessenger() != B_OK)
+    if ((sfMessenger = _RetrieveBluetoothMessenger()) == NULL)
         return NULL;
  
     BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);    
@@ -93,7 +79,7 @@ LocalDevice::GetLocalDevice(hci_id hid)
 LocalDevice*
 LocalDevice::GetLocalDevice(bdaddr_t bdaddr)
 {
-    if (SRetrieveBluetoothMessenger() != B_OK)
+    if ((sfMessenger = _RetrieveBluetoothMessenger()) == NULL)
         return NULL;
  
     BMessage request(BT_MSG_ACQUIRE_LOCAL_DEVICE);    
@@ -107,7 +93,7 @@ LocalDevice::GetLocalDevice(bdaddr_t bdaddr)
 uint32
 LocalDevice::GetLocalDeviceCount()
 {
-    if (SRetrieveBluetoothMessenger() != B_OK)
+    if ((sfMessenger = _RetrieveBluetoothMessenger()) == NULL)
         return 0;
 
 	BMessage request(BT_MSG_COUNT_LOCAL_DEVICES);	
@@ -157,9 +143,8 @@ LocalDevice::GetDiscoverable()
 status_t 
 LocalDevice::SetDiscoverable(int mode)
 {
-    if (RetrieveBluetoothMessenger() != B_OK)
-        return B_ERROR;            
-
+    if ((fMessenger = _RetrieveBluetoothMessenger()) == NULL)
+        return B_ERROR;
 
     BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
     BMessage reply;
@@ -186,7 +171,7 @@ LocalDevice::SetDiscoverable(int mode)
 bdaddr_t 
 LocalDevice::GetBluetoothAddress()
 {
-    if (RetrieveBluetoothMessenger() != B_OK)
+    if ((fMessenger = _RetrieveBluetoothMessenger()) == NULL)
         return bdaddrUtils::NullAddress();            
  
     const bdaddr_t* bdaddr;
@@ -216,7 +201,7 @@ LocalDevice::GetBluetoothAddress()
 BString 
 LocalDevice::GetFriendlyName()
 {
-    if (RetrieveBluetoothMessenger() != B_OK)
+    if ((fMessenger = _RetrieveBluetoothMessenger()) == NULL)
         return NULL;            
  
     BString friendlyname;

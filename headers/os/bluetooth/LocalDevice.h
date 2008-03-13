@@ -51,8 +51,6 @@ class LocalDevice {
     private:
         LocalDevice(hci_id hid);
         
-        static   status_t 		SRetrieveBluetoothMessenger(void);           
-                 status_t 		RetrieveBluetoothMessenger(void);
         static   LocalDevice*   RequestLocalDeviceID(BMessage* request);
         
         static BMessenger*      sfMessenger;
