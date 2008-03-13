@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Ithamar Adema, ithamar AT unet DOT nl
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 
 
@@ -67,10 +68,18 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 	strcpy(data->friendly_name, "HD Audio");
 	strcpy(data->vendor_info, "Haiku");
 
-	data->output_channel_count = 2;
-	data->input_channel_count = 2;
-	data->output_bus_channel_count = 2;
-	data->input_bus_channel_count = 2;
+	int32 inChannels = 0;
+	if (audioGroup->record_stream != NULL)
+		inChannels = 2;
+
+	int32 outChannels = 0;
+	if (audioGroup->playback_stream != NULL)
+		outChannels = 2;
+
+	data->output_channel_count = outChannels;
+	data->output_bus_channel_count = outChannels;
+	data->input_channel_count = inChannels;
+	data->input_bus_channel_count = inChannels;
 	data->aux_bus_channel_count = 0;
 
 	dprintf("%s: request_channel_count: %ld\n", __func__,
@@ -81,7 +90,7 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 		memcpy(data->channels, &sChannels, sizeof(sChannels));
 	}
 
-	/* determine output/input rates */	
+	/* determine output/input rates */
 	data->output_rates = audioGroup->supported_rates;
 	data->input_rates = audioGroup->supported_rates;
 
@@ -127,11 +136,21 @@ get_global_format(hda_audio_group* audioGroup, multi_format_info* data)
 	data->input_latency = 0;
 	data->timecode_kind = 0;
 
-	data->output.format = audioGroup->playback_stream->sample_format;
-	data->output.rate = audioGroup->playback_stream->sample_rate;
+	if (audioGroup->playback_stream != NULL) {
+		data->output.format = audioGroup->playback_stream->sample_format;
+		data->output.rate = audioGroup->playback_stream->sample_rate;
+	} else {
+		data->output.format = 0;
+		data->output.rate = 0;
+	}
 
-	data->input.format = audioGroup->record_stream->sample_format;
-	data->input.rate = audioGroup->record_stream->sample_format;
+	if (audioGroup->record_stream != NULL) {
+		data->input.format = audioGroup->record_stream->sample_format;
+		data->input.rate = audioGroup->record_stream->sample_format;
+	} else {
+		data->input.format = 0;
+		data->input.rate = 0;
+	}
 
 	return B_OK;
 }
@@ -147,15 +166,19 @@ set_global_format(hda_audio_group* audioGroup, multi_format_info* data)
 		return B_BAD_VALUE;
 #endif
 
-	audioGroup->playback_stream->sample_format = data->output.format;
-	audioGroup->playback_stream->sample_rate = data->output.rate;
-	audioGroup->playback_stream->sample_size = format2size(
-		audioGroup->playback_stream->sample_format);
+	if (audioGroup->playback_stream != NULL) {
+		audioGroup->playback_stream->sample_format = data->output.format;
+		audioGroup->playback_stream->sample_rate = data->output.rate;
+		audioGroup->playback_stream->sample_size = format2size(
+			audioGroup->playback_stream->sample_format);
+	}
 
-	audioGroup->record_stream->sample_rate = data->input.rate;
-	audioGroup->record_stream->sample_format = data->input.format;
-	audioGroup->record_stream->sample_size = format2size(
-		audioGroup->record_stream->sample_format);
+	if (audioGroup->record_stream != NULL) {
+		audioGroup->record_stream->sample_rate = data->input.rate;
+		audioGroup->record_stream->sample_format = data->input.format;
+		audioGroup->record_stream->sample_size = format2size(
+			audioGroup->record_stream->sample_format);
+	}
 
 	return B_OK;
 }
@@ -227,56 +250,66 @@ get_buffers(hda_audio_group* audioGroup, multi_buffer_list* data)
 	data->flags = B_MULTI_BUFFER_PLAYBACK;
 
 	/* Copy the settings into the streams */
-	audioGroup->playback_stream->num_buffers = data->return_playback_buffers;
-	audioGroup->playback_stream->num_channels = data->return_playback_channels;
-	audioGroup->playback_stream->buffer_length
-		= data->return_playback_buffer_size;
 
-	status_t status = hda_stream_setup_buffers(audioGroup,
-		audioGroup->playback_stream, "Playback");
-	if (status != B_OK) {
-		dprintf("hda: Error setting up playback buffers: %s\n",
-			strerror(status));
-		return status;
+	if (audioGroup->playback_stream != NULL) {
+		audioGroup->playback_stream->num_buffers = data->return_playback_buffers;
+		audioGroup->playback_stream->num_channels = data->return_playback_channels;
+		audioGroup->playback_stream->buffer_length
+			= data->return_playback_buffer_size;
+
+		status_t status = hda_stream_setup_buffers(audioGroup,
+			audioGroup->playback_stream, "Playback");
+		if (status != B_OK) {
+			dprintf("hda: Error setting up playback buffers: %s\n",
+				strerror(status));
+			return status;
+		}
 	}
 
-	audioGroup->record_stream->num_buffers = data->return_record_buffers;
-	audioGroup->record_stream->num_channels = data->return_record_channels;
-	audioGroup->record_stream->buffer_length
-		= data->return_record_buffer_size;
+	if (audioGroup->record_stream != NULL) {
+		audioGroup->record_stream->num_buffers = data->return_record_buffers;
+		audioGroup->record_stream->num_channels = data->return_record_channels;
+		audioGroup->record_stream->buffer_length
+			= data->return_record_buffer_size;
 
-	status = hda_stream_setup_buffers(audioGroup, audioGroup->record_stream,
-		"Recording");
-	if (status != B_OK) {
-		dprintf("hda: Error setting up recording buffers: %s\n",
-			strerror(status));
-		return status;
+		status_t status = hda_stream_setup_buffers(audioGroup,
+			audioGroup->record_stream, "Recording");
+		if (status != B_OK) {
+			dprintf("hda: Error setting up recording buffers: %s\n",
+				strerror(status));
+			return status;
+		}
 	}
 
 	/* Setup data structure for multi_audio API... */
 
-	uint32 playbackSampleSize = audioGroup->playback_stream->sample_size;
-	uint32 recordSampleSize = audioGroup->record_stream->sample_size;
+	if (audioGroup->playback_stream != NULL) {
+		uint32 playbackSampleSize = audioGroup->playback_stream->sample_size;
 
-	for (int32 i = 0; i < data->return_playback_buffers; i++) {
-		for (int32 channelIndex = 0;
-				channelIndex < data->return_playback_channels; channelIndex++) {
-			data->playback_buffers[i][channelIndex].base
-				= (char*)audioGroup->playback_stream->buffers[i]
-					+ playbackSampleSize * channelIndex;
-			data->playback_buffers[i][channelIndex].stride
-				= playbackSampleSize * data->return_playback_channels;
+		for (int32 i = 0; i < data->return_playback_buffers; i++) {
+			for (int32 channelIndex = 0;
+					channelIndex < data->return_playback_channels; channelIndex++) {
+				data->playback_buffers[i][channelIndex].base
+					= (char*)audioGroup->playback_stream->buffers[i]
+						+ playbackSampleSize * channelIndex;
+				data->playback_buffers[i][channelIndex].stride
+					= playbackSampleSize * data->return_playback_channels;
+			}
 		}
 	}
 
-	for (int32 i = 0; i < data->return_record_buffers; i++) {
-		for (int32 channelIndex = 0;
-				channelIndex < data->return_record_channels; channelIndex++) {
-			data->record_buffers[i][channelIndex].base
-				= (char*)audioGroup->record_stream->buffers[i]
-					+ recordSampleSize * channelIndex;
-			data->record_buffers[i][channelIndex].stride
-				= recordSampleSize * data->return_record_channels;
+	if (audioGroup->record_stream != NULL) {
+		uint32 recordSampleSize = audioGroup->record_stream->sample_size;
+
+		for (int32 i = 0; i < data->return_record_buffers; i++) {
+			for (int32 channelIndex = 0;
+					channelIndex < data->return_record_channels; channelIndex++) {
+				data->record_buffers[i][channelIndex].base
+					= (char*)audioGroup->record_stream->buffers[i]
+						+ recordSampleSize * channelIndex;
+				data->record_buffers[i][channelIndex].stride
+					= recordSampleSize * data->return_record_channels;
+			}
 		}
 	}
 
@@ -291,6 +324,10 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	static int debug_buffers_exchanged = 0;
 	cpu_status status;
 	status_t rc;
+
+	// TODO: support recording!
+	if (audioGroup->playback_stream == NULL)
+		return B_ERROR;
 
 	if (!audioGroup->playback_stream->running) {
 		hda_stream_start(audioGroup->codec->controller,
@@ -328,7 +365,10 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 static status_t
 buffer_force_stop(hda_audio_group* audioGroup)
 {
-	hda_stream_stop(audioGroup->codec->controller, audioGroup->playback_stream);
+	if (audioGroup->playback_stream != NULL) {
+		hda_stream_stop(audioGroup->codec->controller,
+			audioGroup->playback_stream);
+	}
 	//hda_stream_stop(audioGroup->codec->controller, audioGroup->record_stream);
 
 	return B_OK;
@@ -351,7 +391,34 @@ multi_audio_control(void* cookie, uint32 op, void* arg, size_t len)
 
 	switch (op) {
 		case B_MULTI_GET_DESCRIPTION:
+		{
+#ifdef __HAIKU
+			multi_description description;
+			multi_channel_info channels[16];
+			multi_channel_info* originalChannels;
+
+			if (user_memcpy(&description, arg, sizeof(multi_description))
+					!= B_OK)
+				return B_BAD_ADDRESS;
+
+			originalChannels = description.channels;
+			description.channels = channels;
+			if (description.request_channel_count > 16)
+				description.request_channel_count = 16;
+
+			status_t status = get_description(audioGroup, &description);
+			if (status != B_OK)
+				return status;
+
+			description.channels = originalChannels;
+			return user_memcpy(arg, &description, sizeof(multi_description))
+				&& user_memcpy(originalChannels, channels,
+					sizeof(multi_channel_info)
+						* description.request_channel_count;
+#else
 			return get_description(audioGroup, (multi_description*)arg);
+#endif
+		}
 
 		case B_MULTI_GET_ENABLED_CHANNELS:
 			return get_enabled_channels(audioGroup, (multi_channel_enable*)arg);

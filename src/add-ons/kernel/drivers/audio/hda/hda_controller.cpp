@@ -325,8 +325,10 @@ hda_stream_delete(hda_stream* stream)
 
 
 hda_stream*
-hda_stream_new(hda_controller* controller, int type)
+hda_stream_new(hda_audio_group* audioGroup, int type)
 {
+	hda_controller* controller = audioGroup->codec->controller;
+
 	hda_stream* stream = (hda_stream*)calloc(1, sizeof(hda_stream));
 	if (stream == NULL)
 		return NULL;
@@ -339,7 +341,7 @@ hda_stream_new(hda_controller* controller, int type)
 	switch (type) {
 		case STREAM_PLAYBACK:
 			stream->id = 1;
-			stream->off = (controller->num_input_streams * HDAC_SDSIZE);
+			stream->off = controller->num_input_streams * HDAC_SDSIZE;
 			controller->streams[controller->num_input_streams] = stream;
 			break;
 
@@ -356,7 +358,13 @@ hda_stream_new(hda_controller* controller, int type)
 			break;
 	}
 
-	return stream;
+	// find I/O and Pin widgets for this stream
+
+	if (hda_audio_group_get_widgets(audioGroup, stream) == B_OK)
+		return stream;
+
+	free(stream);
+	return NULL;
 }
 
 
@@ -543,11 +551,16 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 	REG32(audioGroup->codec->controller, DMA_POSITION_BASE_LOWER)
 		|= DMA_POSITION_ENABLED;
 
-	verb[0] = MAKE_VERB(audioGroup->codec->addr, stream->io_widget,
-		VID_SET_CONVERTER_FORMAT, format);
-	verb[1] = MAKE_VERB(audioGroup->codec->addr, stream->io_widget,
-		VID_SET_CONVERTER_STREAM_CHANNEL, stream->id << 4);
-	return hda_send_verbs(audioGroup->codec, verb, response, 2);
+	for (uint32 i = 0; i < stream->num_io_widgets; i++) {
+		verb[0] = MAKE_VERB(audioGroup->codec->addr, stream->io_widgets[i],
+			VID_SET_CONVERTER_FORMAT, format);
+		verb[1] = MAKE_VERB(audioGroup->codec->addr, stream->io_widgets[i],
+			VID_SET_CONVERTER_STREAM_CHANNEL, stream->id << 4);
+		hda_send_verbs(audioGroup->codec, verb, response, 2);
+	}
+
+	snooze(1000);
+	return B_OK;
 }
 
 

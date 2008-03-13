@@ -37,6 +37,7 @@
 #define HDA_MAX_STREAMS			16
 #define MAX_CODEC_RESPONSES		10
 #define MAX_INPUTS				32
+#define MAX_IO_WIDGETS			8
 
 /* FIXME: Find out why we need so much! */
 #define DEFAULT_FRAMES_PER_BUFFER	4096
@@ -62,7 +63,8 @@ struct hda_stream {
 	uint32		type;
 
 	uint32		pin_widget;			/* PIN Widget ID */
-	uint32		io_widget;			/* Input/Output Converter Widget ID */
+	uint32		io_widgets[MAX_IO_WIDGETS];	/* Input/Output Converter Widget ID */
+	uint32		num_io_widgets;
 
 	uint32		sample_rate;	
 	uint32		sample_format;
@@ -108,11 +110,7 @@ struct hda_widget {
 		struct {
 			uint32	formats;
 			uint32	rates;
-		} output;
-		struct {
-			uint32	formats;
-			uint32	rates;
-		} input;
+		} io;
 		struct {
 		} mixer;
 		struct {
@@ -122,6 +120,9 @@ struct hda_widget {
 		} pin;
 	} d;
 };
+
+#define WIDGET_FLAG_OUTPUT_PATH	0x01
+#define WIDGET_FLAG_INPUT_PATH	0x02
 
 /*!	This structure describes a single Audio Function Group. An AFG
 	is a group of audio widgets which can be used to configure multiple
@@ -215,6 +216,8 @@ extern hda_controller gCards[MAX_CARDS];
 extern uint32 gNumCards;
 
 /* hda_codec.c */
+status_t hda_audio_group_get_widgets(hda_audio_group* audioGroup,
+	hda_stream* stream);
 hda_codec* hda_codec_new(hda_controller* controller, uint32 cad);
 void hda_codec_delete(hda_codec* codec);
 
@@ -229,7 +232,7 @@ status_t hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses,
 	uint32 count);
 
 /* hda_controller.c: Stream support */
-hda_stream* hda_stream_new(hda_controller* controller, int type);
+hda_stream* hda_stream_new(hda_audio_group* audioGroup, int type);
 void hda_stream_delete(hda_stream* stream);
 status_t hda_stream_setup_buffers(hda_audio_group* audioGroup,
 	hda_stream* stream, const char* desc);
