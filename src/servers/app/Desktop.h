@@ -259,7 +259,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		WindowList				fAllWindows;
 		WindowList				fSubsetWindows;
 		WindowList				fFocusList;
+
 		BObjectList<WorkspacesView> fWorkspacesViews;
+		BLocker					fWorkspacesLock;
 
 		Screen*					fActiveScreen;
 

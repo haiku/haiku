@@ -318,6 +318,7 @@ Desktop::Desktop(uid_t userID)
 	fSubsetWindows(kSubsetList),
 	fFocusList(kFocusList),
 	fWorkspacesViews(false),
+	fWorkspacesLock("workspaces list"),
 	fActiveScreen(NULL),
 
 	fWindowLock("window lock"),
@@ -1260,6 +1261,8 @@ Desktop::_WindowHasModal(Window* window)
 void
 Desktop::_WindowChanged(Window* window)
 {
+	BAutolock _(fWorkspacesLock);
+
 	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
 		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
 		view->WindowChanged(window);
@@ -1273,6 +1276,8 @@ Desktop::_WindowChanged(Window* window)
 void
 Desktop::_WindowRemoved(Window* window)
 {
+	BAutolock _(fWorkspacesLock);
+
 	for (uint32 i = fWorkspacesViews.CountItems(); i-- > 0;) {
 		WorkspacesView* view = fWorkspacesViews.ItemAt(i);
 		view->WindowRemoved(window);
@@ -1286,23 +1291,18 @@ Desktop::AddWorkspacesView(WorkspacesView* view)
 	if (view->Window() == NULL || view->Window()->IsHidden())
 		return;
 
-	if (!LockAllWindows())
-		return;
+	BAutolock _(fWorkspacesLock);
 
 	if (!fWorkspacesViews.HasItem(view))
 		fWorkspacesViews.AddItem(view);
-	UnlockAllWindows();	
 }
 
 
 void
 Desktop::RemoveWorkspacesView(WorkspacesView* view)
 {
-	if (!LockAllWindows())
-		return;
-
+	BAutolock _(fWorkspacesLock);
 	fWorkspacesViews.RemoveItem(view);
-	UnlockAllWindows();	
 }
 
 
@@ -1667,6 +1667,7 @@ Desktop::ShowWindow(Window* window)
 
 	if (window->HasWorkspacesViews()) {
 		// find workspaces views in view hierarchy
+		BAutolock _(fWorkspacesLock);
 		window->FindWorkspacesViews(fWorkspacesViews);
 	}
 
@@ -1711,6 +1712,8 @@ Desktop::HideWindow(Window* window)
 		// remove workspaces views from this window
 		BObjectList<WorkspacesView> list(false);
 		window->FindWorkspacesViews(list);
+
+		BAutolock _(fWorkspacesLock);
 
 		while (WorkspacesView* view = list.RemoveItemAt(0)) {
 			fWorkspacesViews.RemoveItem(view);
