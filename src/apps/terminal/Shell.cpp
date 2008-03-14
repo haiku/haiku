@@ -58,9 +58,13 @@
 /*
  * Set environment variable.
  */
-#if defined(HAIKU_TARGET_PLATFORM_BEOS) || defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
+#if defined(HAIKU_TARGET_PLATFORM_BEOS) || \
+	defined(HAIKU_TARGET_PLATFORM_BONE) || \
+	defined(HAIKU_TARGET_PLATFORM_LIBBE_TEST)
 
 extern char **environ;
+
+static int setenv(const char *var, const char *value, bool overwrite);
 
 static int
 setenv(const char *var, const char *value, bool overwrite)
