@@ -10,14 +10,10 @@
  *		Matt Madia
  */
 
-/*!
-	Workspaces window trick found by Michael "Minox" Paine.
-	(using B_ALL_WORKSPACES as flags in BWindow)
-*/
-
 
 #include <Alert.h>
 #include <Application.h>
+#include <Dragger.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>
@@ -36,7 +32,7 @@
 #include <WindowPrivate.h>
 
 
-static const char *kWorkspacesSignature = "application/x-vnd.Be-WORK";
+static const char *kSignature = "application/x-vnd.Be-WORK";
 static const char *kWorkspacesSettingFile = "Workspace_data";
 
 static const float kScreenBorderOffset = 10.0;
@@ -61,7 +57,11 @@ class WorkspacesPreferences {
 class WorkspacesView : public BView {
 	public:
 		WorkspacesView(BRect frame);
+		WorkspacesView(BMessage* archive);
 		~WorkspacesView();
+
+		static	WorkspacesView* Instantiate(BMessage* archive);
+		virtual	status_t Archive(BMessage* archive, bool deep = true) const;
 
 		virtual void MouseMoved(BPoint where, uint32 transit,
 			const BMessage* dragMessage);
@@ -133,7 +133,7 @@ WorkspacesPreferences::WorkspacesPreferences()
 				&& screen.Frame().bottom + 5 >= fWindowFrame.bottom
 				&& screen.Frame().left - 5 <= fWindowFrame.left
 				&& screen.Frame().top - 5 <= fWindowFrame.top)
-				settingsValid = true;	
+				settingsValid = true;
 		}
 	}
 
@@ -204,13 +204,48 @@ WorkspacesPreferences::SetWindowFrame(BRect frame)
 
 
 WorkspacesView::WorkspacesView(BRect frame)
-	: BView(frame, "workspaces", B_FOLLOW_NONE, kWorkspacesViewFlag)
+	: BView(frame, "workspaces", B_FOLLOW_ALL, kWorkspacesViewFlag)
+{
+	frame.OffsetTo(B_ORIGIN);
+	frame.top = frame.bottom - 7;
+	frame.left = frame.right - 7;
+	BDragger* dragger = new BDragger(frame, this,
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	AddChild(dragger);
+}
+
+
+WorkspacesView::WorkspacesView(BMessage* archive)
+	: BView(archive)
 {
 }
 
 
 WorkspacesView::~WorkspacesView()
 {
+}
+
+
+/*static*/ WorkspacesView*
+WorkspacesView::Instantiate(BMessage* archive)
+{
+	if (!validate_instantiation(archive, "WorkspacesView"))
+		return NULL;
+
+	return new WorkspacesView(archive);
+}
+
+
+status_t
+WorkspacesView::Archive(BMessage* archive, bool deep) const
+{
+	status_t status = BView::Archive(archive, deep);
+	if (status == B_OK)
+		status = archive->AddString("add_on", kSignature);
+	if (status == B_OK)
+		status = archive->AddString("class", "WorkspacesView");
+
+	return status;
 }
 
 
@@ -254,8 +289,7 @@ WorkspacesView::MouseDown(BPoint where)
 
 WorkspacesWindow::WorkspacesWindow(WorkspacesPreferences *preferences)
 	: BWindow(preferences->WindowFrame(), "Workspaces", B_TITLED_WINDOW_LOOK,
- 			B_NORMAL_WINDOW_FEEL,
-			kWorkspacesWindowFlag | B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK,
+ 			B_NORMAL_WINDOW_FEEL, B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK,
  			B_ALL_WORKSPACES),
  	fPreferences(preferences)
 {
@@ -303,7 +337,7 @@ WorkspacesWindow::FrameResized(float width, float height)
 }
 
 
-void 
+void
 WorkspacesWindow::Zoom(BPoint origin, float width, float height)
 {
 	BScreen screen;
@@ -347,8 +381,8 @@ WorkspacesWindow::SetAutoRaise()
 
 
 WorkspacesApp::WorkspacesApp()
-	: BApplication(kWorkspacesSignature)
-{	
+	: BApplication(kSignature)
+{
 	fWindow = new WorkspacesWindow(new WorkspacesPreferences());
 }
 
@@ -372,7 +406,7 @@ WorkspacesApp::AboutRequested()
 
 	view->GetFont(&font);
 	font.SetSize(18);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, 10, &font);
 
 	alert->Go();
@@ -408,7 +442,7 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 			// evaluate --arguments
 			if (!strcmp(argv[i], "--notitle"))
 				fWindow->SetLook(B_MODAL_WINDOW_LOOK);
-			else if (!strcmp(argv[i], "--noborder")) 
+			else if (!strcmp(argv[i], "--noborder"))
 				fWindow->SetLook(B_NO_BORDER_WINDOW_LOOK);
 			else if (!strcmp(argv[i], "--avoidfocus"))
 				fWindow->SetFlags(fWindow->Flags() | B_AVOID_FOCUS);
