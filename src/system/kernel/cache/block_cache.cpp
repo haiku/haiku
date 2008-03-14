@@ -296,7 +296,11 @@ cached_block::Compare(void *_cacheEntry, const void *_block)
 	cached_block *cacheEntry = (cached_block *)_cacheEntry;
 	const off_t *block = (const off_t *)_block;
 
-	return cacheEntry->block_number - *block;
+	off_t diff = cacheEntry->block_number - *block;
+	if (diff > 0)
+		return 1;
+
+	return diff < 0 ? -1 : 0;	
 }
 
 
