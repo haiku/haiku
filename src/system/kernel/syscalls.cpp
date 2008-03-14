@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2006, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -447,7 +448,12 @@ extern "C" void trace_pre_syscall(uint32 syscallNumber, const void* parameters);
 void
 trace_pre_syscall(uint32 syscallNumber, const void* parameters)
 {
-	new(std::nothrow) SyscallTracing::PreSyscall(syscallNumber, parameters);
+#ifdef SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT
+	if (syscallNumber != SYSCALL_KTRACE_OUTPUT)
+#endif
+	{
+		new(std::nothrow) SyscallTracing::PreSyscall(syscallNumber, parameters);
+	}
 }
 
 
@@ -456,7 +462,13 @@ extern "C" void trace_post_syscall(int syscallNumber, uint64 returnValue);
 void
 trace_post_syscall(int syscallNumber, uint64 returnValue)
 {
-	new(std::nothrow) SyscallTracing::PostSyscall(syscallNumber, returnValue);
+#ifdef SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT
+	if (syscallNumber != SYSCALL_KTRACE_OUTPUT)
+#endif
+	{
+		new(std::nothrow) SyscallTracing::PostSyscall(syscallNumber,
+			returnValue);
+	}
 }
 
 
