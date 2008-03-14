@@ -1674,7 +1674,6 @@ Window::ValidWindowFlags()
 		| B_ASYNCHRONOUS_CONTROLS
 		| B_QUIT_ON_WINDOW_CLOSE
 		| B_SAME_POSITION_IN_ALL_WORKSPACES
-		| kWorkspacesWindowFlag
 		| kWindowScreenFlag;
 }
 

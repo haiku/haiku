@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Jérôme Duval, jerome.duval@free.fr.
+ * Copyright 2005-2008, Jérôme Duval, jerome.duval@free.fr.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _WINDOW_PRIVATE_H
@@ -26,7 +26,6 @@ const window_type kWindowScreenWindow = window_type(1026);
 
 /* Private window flags */
 
-const uint32 kWorkspacesWindowFlag = 0x8000;
 const uint32 kWindowScreenFlag = 0x10000;
 
 #endif // _WINDOW_PRIVATE_H
