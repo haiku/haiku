@@ -227,7 +227,7 @@ TTimeView::MessageReceived(BMessage* message)
 
 		case kMsgChangeClock:
 			// launch the time prefs app
-			be_roster->Launch("application/x-vnd.Be-TIME");
+			be_roster->Launch("application/x-vnd.Haiku-Time");
 			break;
 
 		case 'time':

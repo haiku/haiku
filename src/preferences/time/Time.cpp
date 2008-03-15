@@ -18,7 +18,7 @@
 #include <unistd.h>
 
 
-const char* kAppSignature = "application/x-vnd.Be-TIME";
+const char* kAppSignature = "application/x-vnd.Haiku-Time";
 
 
 TimeApplication::TimeApplication()
