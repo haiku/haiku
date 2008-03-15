@@ -1,3 +1,7 @@
+/*
+ * Copyright 2005-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef NODE_REF_H
 #define NODE_REF_H
 
@@ -47,7 +51,7 @@ struct NodeRef {
 	bool operator<(const NodeRef &other) const
 	{
 		return (device < other.device
-			|| device == other.device && node < other.node);
+			|| (device == other.device && node < other.node));
 	}
 
 };

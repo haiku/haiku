@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NODE_H
@@ -27,8 +27,8 @@ struct node_ref {
 
 	bool operator<(const node_ref &ref) const
 	{
-		return (device < ref.device
-			|| device == ref.device && node < ref.node);
+		return device < ref.device
+			|| (device == ref.device && node < ref.node);
 	}
 
 	dev_t device;
