@@ -12,8 +12,11 @@
 #include "KitSupport.h"
 
 
+
+
 BMessenger* _RetrieveBluetoothMessenger(void)
 {
+	// Fix/review: leaking memory here
 	BMessenger* fMessenger = new BMessenger(BLUETOOTH_SIGNATURE);
 
     if (fMessenger == NULL || !fMessenger->IsValid())
