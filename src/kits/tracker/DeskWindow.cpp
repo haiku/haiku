@@ -125,7 +125,7 @@ BDeskWindow::Init(const BMessage *)
 	BPath path;
 	if (!BootedInSafeMode() && FSFindTrackerSettingsDir(&path) == B_OK) {
 		path.Append(kShelfPath);
-		close(open(path.Path(), O_RDONLY | O_CREAT));
+		close(open(path.Path(), O_RDONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH));
 		if (get_ref_for_path(path.Path(), &ref) == B_OK)
 			fDeskShelf = new BShelf(&ref, fPoseView);
 		if (fDeskShelf)
