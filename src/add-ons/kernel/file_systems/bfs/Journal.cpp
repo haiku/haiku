@@ -24,8 +24,7 @@ struct run_array {
 		// that -1 accounts for an off-by-one error in Be's BFS implementation
 	const block_run &RunAt(int32 i) const { return runs[i]; }
 
-	static int32 MaxRuns(int32 blockSize)
-		{ return (blockSize - sizeof(run_array)) / sizeof(block_run); }
+	static int32 MaxRuns(int32 blockSize);
 
 private:
 	static int _Compare(block_run &a, block_run &b);
@@ -149,6 +148,18 @@ run_array::Insert(block_run &run)
 	}
 
 	count = HOST_ENDIAN_TO_BFS_INT32(CountRuns() + 1);
+}
+
+
+/*static*/ int32
+run_array::MaxRuns(int32 blockSize)
+{
+	// For whatever reason, BFS restricts the maximum array size
+	uint32 maxCount = (blockSize - sizeof(run_array)) / sizeof(block_run);
+	if (maxCount < 128)
+		return maxCount;
+
+	return 127;
 }
 
 
@@ -424,8 +435,10 @@ Journal::_ReplayRunArray(int32 *_start)
 			if (offset == 0) {
 				// This log entry writes over the super block - check if
 				// it's valid!
-				if (Volume::CheckSuperBlock(data) != B_OK)
+				if (Volume::CheckSuperBlock(data) != B_OK) {
+					FATAL(("Log contains invalid super block!\n"));
 					RETURN_ERROR(B_BAD_DATA);
+				}
 			}
 
 			ssize_t written = write_pos(fVolume->Device(), offset, data,
@@ -475,7 +488,7 @@ Journal::ReplayLog()
 		}
 		start = start % fLogSize;
 	}
-	
+
 	PRINT(("replaying worked fine!\n"));
 	fVolume->SuperBlock().log_start = fVolume->LogEnd();
 	fVolume->LogStart() = fVolume->LogEnd();
@@ -731,7 +744,7 @@ Journal::_WriteTransactionToLog()
 }
 
 
-status_t 
+status_t
 Journal::FlushLogAndBlocks()
 {
 	status_t status = fLock.Lock();
@@ -861,7 +874,7 @@ Journal::_TransactionDone(bool success)
 //	#pragma mark - Transaction
 
 
-status_t 
+status_t
 Transaction::Start(Volume *volume, off_t refBlock)
 {
 	// has it already been started?
