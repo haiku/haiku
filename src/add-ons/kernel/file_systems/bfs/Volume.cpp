@@ -359,15 +359,21 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		return B_ERROR;
 
 	fJournal = new Journal(this);
-	// replaying the log is the first thing we will do on this disk
-	if ((fJournal != NULL && fJournal->InitCheck() < B_OK)
-		|| fBlockAllocator.Initialize() < B_OK) {
-		// ToDo: improve error reporting for a bad journal
-		FATAL(("could not initialize journal/block bitmap allocator!\n"));
+	if (fJournal == NULL)
 		return B_NO_MEMORY;
+
+	// replaying the log is the first thing we will do on this disk
+	status_t status = fJournal->InitCheck();
+	if (status < B_OK) {
+		FATAL(("could not initialize journal: %s!\n", strerror(status)));
+		return status;
 	}
 
-	status_t status = B_OK;
+	status = fBlockAllocator.Initialize();
+	if (status < B_OK) {
+		FATAL(("could not initialize block bitmap allocator!\n"));
+		return status;
+	}
 
 	fRootNode = new Inode(this, ToVnode(Root()));
 	if (fRootNode && fRootNode->InitCheck() == B_OK) {

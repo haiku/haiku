@@ -114,17 +114,18 @@ bfs_mount(dev_t mountID, const char *device, uint32 flags, const char *args,
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
-	status_t status;
-	if ((status = volume->Mount(device, flags)) == B_OK) {
-		*_data = volume;
-		*_rootID = volume->ToVnode(volume->Root());
-		INFORM(("mounted \"%s\" (root node at %Ld, device = %s)\n",
-			volume->Name(), *_rootID, device));
-	}
-	else
+	status_t status = volume->Mount(device, flags);
+	if (status != B_OK) {
 		delete volume;
+		RETURN_ERROR(status);
+	}
 
-	RETURN_ERROR(status);
+	*_data = volume;
+	*_rootID = volume->ToVnode(volume->Root());
+
+	INFORM(("mounted \"%s\" (root node at %Ld, device = %s)\n",
+		volume->Name(), *_rootID, device));
+	return B_OK;
 }
 
 
