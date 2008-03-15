@@ -7,22 +7,11 @@
 #ifndef _WCHAR_H
 #define _WCHAR_H
 
-#include <stddef.h>
+#include <wchar_t.h>
 #include <stdio.h>
 
-// stddef.h is not supposed to define wint_t, but gcc 2.95.3's one does.
-// In all other cases we will do that.
-#ifndef _WINT_T
 #define _WINT_T
-
-#ifndef __WINT_TYPE__
-#define __WINT_TYPE__ unsigned int
-#endif
-
-typedef __WINT_TYPE__ wint_t;
-
-#endif	// _WINT_T
-
+typedef unsigned int wint_t;
 typedef int wctype_t;
 
 typedef struct {
@@ -30,6 +19,7 @@ typedef struct {
 	wint_t	__value;
 } mbstate_t;
 
+#include <size_t.h>
 
 #ifdef __cplusplus
 extern "C" {
