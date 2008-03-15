@@ -54,12 +54,12 @@ typedef struct heap_page_s {
 	uint16			in_use : 1;
 	heap_page_s *	next;
 	heap_page_s *	prev;
-	uint16			empty_index;
+	union {
+		uint16			empty_index;
+		uint16			allocation_id; // used for bin == bin_count allocations
+	};
 	addr_t *		free_list;
 } heap_page;
-
-// used for bin == bin_count allocations
-#define allocation_id empty_index
 
 typedef struct heap_bin_s {
 	uint32		element_size;
