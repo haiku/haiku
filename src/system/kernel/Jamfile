@@ -36,7 +36,7 @@ KernelMergeObject kernel_core.o :
 	sem.cpp
 	shutdown.c
 	signal.cpp
-	system_info.c
+	system_info.cpp
 	smp.c
 	syscalls.cpp
 	team.cpp

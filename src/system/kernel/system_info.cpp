@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004-2007, Haiku, Inc.
+ * Copyright (c) 2004-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,6 +9,9 @@
 
 
 #include <system_info.h>
+#include <arch/system_info.h>
+
+#include <string.h>
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -25,10 +28,6 @@
 #include <vm.h>
 #include <vm_page.h>
 
-#include <arch/system_info.h>
-
-#include <string.h>
-
 
 const static int64 kKernelVersion = 0x1;
 const static char *kKernelName = "kernel_" HAIKU_ARCH;
@@ -37,18 +36,15 @@ const static char *kKernelName = "kernel_" HAIKU_ARCH;
 // Haiku SVN revision. Will be set when copying the kernel to the image.
 // Lives in a separate section so that it can easily be found.
 static uint32 sHaikuRevision __attribute__((section("_haiku_revision")));
-static uint32 sHaikuRevision = 0;
 
 
 static int
 dump_info(int argc, char **argv)
 {
-	int32 i;
-
 	kprintf("kernel build: %s %s\n\n", __DATE__, __TIME__);
 	kprintf("cpu count: %ld, active times:\n", smp_get_num_cpus());
 
-	for (i = 0; i < smp_get_num_cpus(); i++)
+	for (int32 i = 0; i < smp_get_num_cpus(); i++)
 		kprintf("  [%ld] %Ld\n", i + 1, cpu_get_active_time(i));
 
 	// ToDo: Add page_faults
@@ -70,8 +66,6 @@ dump_info(int argc, char **argv)
 status_t
 _get_system_info(system_info *info, size_t size)
 {
-	int32 i;
-
 	if (size != sizeof(system_info))
 		return B_BAD_VALUE;
 
@@ -80,7 +74,7 @@ _get_system_info(system_info *info, size_t size)
 	info->boot_time = rtc_boot_time();
 	info->cpu_count = smp_get_num_cpus();
 
-	for (i = 0; i < info->cpu_count; i++)
+	for (int32 i = 0; i < info->cpu_count; i++)
 		info->cpu_infos[i].active_time = cpu_get_active_time(i);
 
 	// ToDo: Add page_faults
@@ -128,15 +122,13 @@ get_haiku_revision(void)
 status_t
 _user_get_system_info(system_info *userInfo, size_t size)
 {
-	system_info info;
-	status_t status;
-
 	// The BeBook says get_system_info() always returns B_OK,
 	// but that ain't true with invalid addresses
 	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
 
-	status = _get_system_info(&info, size);
+	system_info info;
+	status_t status = _get_system_info(&info, size);
 	if (status == B_OK) {
 		if (user_memcpy(userInfo, &info, sizeof(system_info)) < B_OK)
 			return B_BAD_ADDRESS;
