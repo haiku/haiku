@@ -252,7 +252,7 @@
 #define HAVE_SIGNED_SIG_ATOMIC_T 1
 
 /* Define to 1 if 'wchar_t' is a signed integer type. */
-#define HAVE_SIGNED_WCHAR_T 1
+/* #undef HAVE_SIGNED_WCHAR_T */
 
 /* Define to 1 if 'wint_t' is a signed integer type. */
 /* #undef HAVE_SIGNED_WINT_T */
@@ -421,9 +421,6 @@
 /* Define as the maximum value of type 'size_t', if the system doesn't define
    it. */
 /* #undef SIZE_MAX */
-#ifndef SIZE_MAX
-# define SIZE_MAX ((size_t) -1)
-#endif
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'size_t'. */
@@ -459,7 +456,7 @@
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wchar_t'. */
-#define WCHAR_T_SUFFIX 
+#define WCHAR_T_SUFFIX u
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'wint_t'. */
