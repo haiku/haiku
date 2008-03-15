@@ -59,7 +59,7 @@ typedef struct heap_page_s {
 } heap_page;
 
 // used for bin == bin_count allocations
-#define allocation_id free_count
+#define allocation_id empty_index
 
 typedef struct heap_bin_s {
 	uint32		element_size;
@@ -71,7 +71,6 @@ typedef struct heap_allocator_s {
 	addr_t		base;
 	size_t		size;
 	mutex		lock;
-	vint32		large_alloc_id;
 
 	uint32		bin_count;
 	uint32		page_count;
@@ -536,13 +535,6 @@ heap_attach(addr_t base, size_t size, bool postSem)
 }
 
 
-static inline uint32
-heap_next_alloc_id(heap_allocator *heap)
-{
-	return atomic_add(&heap->large_alloc_id, 1) & ((1 << 9) - 1);
-}
-
-
 static inline void
 heap_link_page(heap_page *page, heap_page **list)
 {
@@ -672,7 +664,6 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		return NULL;
 	}
 
-	uint32 allocationID = heap_next_alloc_id(heap);
 	uint32 pageCount = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 	for (uint32 i = first; i < first + pageCount; i++) {
 		heap_page *page = &heap->page_table[i];
@@ -683,7 +674,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 
 		page->next = page->prev = NULL;
 		page->free_list = NULL;
-		page->allocation_id = allocationID;
+		page->allocation_id = (uint16)first;
 	}
 
 #if KERNEL_HEAP_LEAK_CHECK
