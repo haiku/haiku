@@ -367,6 +367,10 @@ Journal::InitCheck()
 }
 
 
+/*!	\brief Does a very basic consistency check of the run array.
+	It will check the maximum run count as well as if all of the runs fall
+	within a the volume.
+*/
 status_t
 Journal::_CheckRunArray(const run_array *array)
 {
@@ -402,27 +406,28 @@ Journal::_ReplayRunArray(int32 *_start)
 	PRINT(("ReplayRunArray(start = %ld)\n", *_start));
 
 	off_t logOffset = fVolume->ToBlock(fVolume->Log());
-	off_t blockNumber = *_start % fLogSize;
-	int32 blockSize = fVolume->BlockSize();
-	int32 count = 1;
+	off_t firstBlockNumber = *_start % fLogSize;
 
 	CachedBlock cachedArray(fVolume);
 
 	const run_array *array = (const run_array *)cachedArray.SetTo(logOffset
-		+ blockNumber);
+		+ firstBlockNumber);
 	if (array == NULL)
 		return B_IO_ERROR;
 
 	if (_CheckRunArray(array) < B_OK)
 		return B_BAD_DATA;
 
-	blockNumber = (blockNumber + 1) % fLogSize;
+	// First pass: check integrity of the blocks in the run array
 
 	CachedBlock cached(fVolume);
+
+	firstBlockNumber = (firstBlockNumber + 1) % fLogSize;
+	off_t blockNumber = firstBlockNumber;
+	int32 blockSize = fVolume->BlockSize();
+
 	for (int32 index = 0; index < array->CountRuns(); index++) {
 		const block_run &run = array->RunAt(index);
-		INFORM(("replay block run %u:%u:%u in log at %Ld!\n",
-			(int)run.AllocationGroup(), run.Start(), run.Length(), blockNumber));
 
 		off_t offset = fVolume->ToOffset(run);
 		for (int32 i = 0; i < run.Length(); i++) {
@@ -440,6 +445,27 @@ Journal::_ReplayRunArray(int32 *_start)
 					RETURN_ERROR(B_BAD_DATA);
 				}
 			}
+
+			blockNumber = (blockNumber + 1) % fLogSize;
+			offset += blockSize;
+		}
+	}
+
+	// Second pass: write back its blocks
+
+	blockNumber = firstBlockNumber;
+	int32 count = 1;
+
+	for (int32 index = 0; index < array->CountRuns(); index++) {
+		const block_run &run = array->RunAt(index);
+		INFORM(("replay block run %u:%u:%u in log at %Ld!\n",
+			(int)run.AllocationGroup(), run.Start(), run.Length(), blockNumber));
+
+		off_t offset = fVolume->ToOffset(run);
+		for (int32 i = 0; i < run.Length(); i++) {
+			const uint8 *data = cached.SetTo(logOffset + blockNumber);
+			if (data == NULL)
+				RETURN_ERROR(B_IO_ERROR);
 
 			ssize_t written = write_pos(fVolume->Device(), offset, data,
 				blockSize);
