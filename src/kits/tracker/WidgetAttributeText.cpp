@@ -61,6 +61,9 @@ All rights reserved.
 #include "WidgetAttributeText.h"
 
 
+const int32 kGenericReadBufferSize = 1024;
+
+
 template <class View>
 float
 TruncStringBase(BString *result, const char *str, int32 length,
@@ -663,7 +666,7 @@ ScalarAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 	if (fValueDirty)
 		fValue = ReadValue();
 
-	return fValue <= compareTo->Value() ? (fValue == compareTo->Value() ? 0 : -1) : 1 ;
+	return fValue >= compareTo->Value() ? (fValue == compareTo->Value() ? 0 : -1) : 1 ;
 }
 
 
@@ -671,7 +674,7 @@ ScalarAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 
 
 PathAttributeText::PathAttributeText(const Model *model, const BColumn *column)
-	:	StringAttributeText(model, column)
+	: StringAttributeText(model, column)
 {
 }
 
@@ -695,8 +698,9 @@ PathAttributeText::ReadValue(BString *result)
 //	#pragma mark -
 
 
-OriginalPathAttributeText::OriginalPathAttributeText(const Model *model, const BColumn *column)
-	:	StringAttributeText(model, column)
+OriginalPathAttributeText::OriginalPathAttributeText(const Model *model,
+		const BColumn *column)
+	: StringAttributeText(model, column)
 {
 }
 
@@ -720,7 +724,7 @@ OriginalPathAttributeText::ReadValue(BString *result)
 
 
 KindAttributeText::KindAttributeText(const Model *model, const BColumn *column)
-	:	StringAttributeText(model, column)
+	: StringAttributeText(model, column)
 {
 }
 
@@ -747,7 +751,7 @@ KindAttributeText::ReadValue(BString *result)
 
 
 NameAttributeText::NameAttributeText(const Model *model, const BColumn *column)
-	:	StringAttributeText(model, column)
+	: StringAttributeText(model, column)
 {
 }
 
@@ -823,8 +827,8 @@ NameAttributeText::FitValue(BString *result, const BPoseView *view)
 	if (fValueDirty)
 		ReadValue(&fFullValueText);
 	fOldWidth = fColumn->Width();
-	fTruncatedWidth = TruncString(result, fFullValueText.String(), fFullValueText.Length(),
-		view, fOldWidth, B_TRUNCATE_END);
+	fTruncatedWidth = TruncString(result, fFullValueText.String(),
+		fFullValueText.Length(), view, fOldWidth, B_TRUNCATE_END);
 	fDirty = false;
 }
 
@@ -911,7 +915,7 @@ NameAttributeText::SetSortFolderNamesFirst(bool enabled)
 #ifdef OWNER_GROUP_ATTRIBUTES
 
 OwnerAttributeText::OwnerAttributeText(const Model *model, const BColumn *column)
-	:	StringAttributeText(model, column)
+	: StringAttributeText(model, column)
 {
 }
 
@@ -936,7 +940,7 @@ OwnerAttributeText::ReadValue(BString *result)
 
 
 GroupAttributeText::GroupAttributeText(const Model *model, const BColumn *column)
-	:	StringAttributeText(model, column)
+	: StringAttributeText(model, column)
 {
 }
 
@@ -962,7 +966,7 @@ GroupAttributeText::ReadValue(BString *result)
 #endif  /* OWNER_GROUP_ATTRIBUTES */
 
 ModeAttributeText::ModeAttributeText(const Model *model, const BColumn *column)
-	:	StringAttributeText(model, column)
+	: StringAttributeText(model, column)
 {
 }
 
@@ -1003,7 +1007,7 @@ ModeAttributeText::ReadValue(BString *result)
 
 
 SizeAttributeText::SizeAttributeText(const Model *model, const BColumn *column)
-	:	ScalarAttributeText(model, column)
+	: ScalarAttributeText(model, column)
 {
 }
 
@@ -1057,7 +1061,7 @@ SizeAttributeText::PreferredWidth(const BPoseView *pose) const
 
 
 TimeAttributeText::TimeAttributeText(const Model *model, const BColumn *column)
-	:	ScalarAttributeText(model, column)
+	: ScalarAttributeText(model, column)
 {
 }
 
@@ -1083,8 +1087,8 @@ TimeAttributeText::FitValue(BString *result, const BPoseView *view)
 
 
 CreationTimeAttributeText::CreationTimeAttributeText(const Model *model,
-	const BColumn *column)
-	:	TimeAttributeText(model, column)
+		const BColumn *column)
+	: TimeAttributeText(model, column)
 {
 }
 
@@ -1098,8 +1102,8 @@ CreationTimeAttributeText::ReadValue()
 }
 
 ModificationTimeAttributeText::ModificationTimeAttributeText(const Model *model,
-	const BColumn *column)
-	:	TimeAttributeText(model, column)
+		const BColumn *column)
+	: TimeAttributeText(model, column)
 {
 }
 
@@ -1115,10 +1119,10 @@ ModificationTimeAttributeText::ReadValue()
 
 //	#pragma mark -
 
-const int32 kGenericReadBufferSize = 1024;
 
-GenericAttributeText::GenericAttributeText(const Model *model, const BColumn *column)
-	:	WidgetAttributeText(model, column),
+GenericAttributeText::GenericAttributeText(const Model *model,
+		const BColumn *column)
+	: WidgetAttributeText(model, column),
 	fValueDirty(true)
 {
 }
@@ -1445,52 +1449,52 @@ GenericAttributeText::Compare(WidgetAttributeText &attr, BPoseView *)
 			}
 
 		case B_FLOAT_TYPE:
-			return fValue.floatt <= compareTo->fValue.floatt ?
+			return fValue.floatt >= compareTo->fValue.floatt ?
 				(fValue.floatt == compareTo->fValue.floatt ? 0 : -1) : 1;
 
 		case B_DOUBLE_TYPE:
-			return fValue.doublet <= compareTo->fValue.doublet ?
+			return fValue.doublet >= compareTo->fValue.doublet ?
 				(fValue.doublet == compareTo->fValue.doublet ? 0 : -1) : 1;
 
 		case B_BOOL_TYPE:
-			return fValue.boolt <= compareTo->fValue.boolt ?
+			return fValue.boolt >= compareTo->fValue.boolt ?
 				(fValue.boolt == compareTo->fValue.boolt ? 0 : -1) : 1;
 
 		case B_UINT8_TYPE:
-			return fValue.uint8t <= compareTo->fValue.uint8t ?
+			return fValue.uint8t >= compareTo->fValue.uint8t ?
 				(fValue.uint8t == compareTo->fValue.uint8t ? 0 : -1) : 1;
 
 		case B_INT8_TYPE:
-			return fValue.int8t <= compareTo->fValue.int8t ?
+			return fValue.int8t >= compareTo->fValue.int8t ?
 					(fValue.int8t == compareTo->fValue.int8t ? 0 : -1) : 1;
 
 		case B_UINT16_TYPE:
-			return fValue.uint16t <= compareTo->fValue.uint16t ?
+			return fValue.uint16t >= compareTo->fValue.uint16t ?
 				(fValue.uint16t == compareTo->fValue.uint16t ? 0 : -1) : 1;
 
 		case B_INT16_TYPE:
-			return fValue.int16t <= compareTo->fValue.int16t ?
+			return fValue.int16t >= compareTo->fValue.int16t ?
 				(fValue.int16t == compareTo->fValue.int16t ? 0 : -1) : 1;
 
 		case B_UINT32_TYPE:
-			return fValue.uint32t <= compareTo->fValue.uint32t ?
+			return fValue.uint32t >= compareTo->fValue.uint32t ?
 				(fValue.uint32t == compareTo->fValue.uint32t ? 0 : -1) : 1;
 
 		case B_TIME_TYPE:
 			// time_t typedef'd to a long, i.e. a int32
 		case B_INT32_TYPE:
-			return fValue.int32t <= compareTo->fValue.int32t ?
+			return fValue.int32t >= compareTo->fValue.int32t ?
 				(fValue.int32t == compareTo->fValue.int32t ? 0 : -1) : 1;
 
 		case B_OFF_T_TYPE:
 			// off_t typedef'd to a long long, i.e. a int64
 		case B_INT64_TYPE:
-			return fValue.int64t <= compareTo->fValue.int64t ?
+			return fValue.int64t >= compareTo->fValue.int64t ?
 				(fValue.int64t == compareTo->fValue.int64t ? 0 : -1) : 1;
 
 		case B_UINT64_TYPE:
 		default:
-			return fValue.uint64t <= compareTo->fValue.uint64t ?
+			return fValue.uint64t >= compareTo->fValue.uint64t ?
 				(fValue.uint64t == compareTo->fValue.uint64t ? 0 : -1) : 1;
 	}
 	return 0;
