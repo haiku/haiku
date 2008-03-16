@@ -59,7 +59,7 @@ class NodeChecker {
 // Since BFS supports block sizes of 1024 bytes or greater, and the node size
 // is hard-coded to 1024 bytes, that's not an issue now.
 
-void 
+void
 CachedNode::UnsetUnchanged(Transaction &transaction)
 {
 	if (fTree == NULL || fTree->fStream == NULL)
@@ -75,7 +75,7 @@ CachedNode::UnsetUnchanged(Transaction &transaction)
 }
 
 
-void 
+void
 CachedNode::Unset()
 {
 	if (fTree == NULL || fTree->fStream == NULL)
@@ -504,7 +504,7 @@ BPlusTree::InitCheck()
 }
 
 
-int32 
+int32
 BPlusTree::TypeCodeToKeyType(type_code code)
 {
 	switch (code) {
@@ -530,7 +530,7 @@ BPlusTree::TypeCodeToKeyType(type_code code)
 }
 
 
-int32 
+int32
 BPlusTree::ModeToKeyType(mode_t mode)
 {
 	switch (mode & (S_STR_INDEX | S_INT_INDEX | S_UINT_INDEX | S_LONG_LONG_INDEX
@@ -588,7 +588,7 @@ BPlusTree::_AddIterator(TreeIterator *iterator)
 }
 
 
-void 
+void
 BPlusTree::_RemoveIterator(TreeIterator *iterator)
 {
 	if (fIteratorLock.Lock() < B_OK)
@@ -723,13 +723,18 @@ BPlusTree::_SeekDown(Stack<node_and_key> &stack, const uint8 *key,
 		if (status == B_ENTRY_NOT_FOUND && nextOffset == nodeAndKey.nodeOffset)
 			RETURN_ERROR(B_ERROR);
 
+		if ((uint32)stack.CountItems() > fHeader->MaxNumberOfLevels()) {
+			dprintf("BPlusTree::_SeekDown() node walked too deep.\n");
+			break;
+		}
+
 		// put the node offset & the correct keyIndex on the stack
 		stack.Push(nodeAndKey);
 
 		nodeAndKey.nodeOffset = nextOffset;
 	}
 
-	FATAL(("BPlusTree::SeekDown() could not open node %Ld\n",
+	FATAL(("BPlusTree::_SeekDown() could not open node %Ld\n",
 		nodeAndKey.nodeOffset));
 	return B_ERROR;
 }
@@ -814,7 +819,7 @@ BPlusTree::_InsertDuplicate(Transaction &transaction, CachedNode &cached,
 			if (array->count < NUM_FRAGMENT_VALUES) {
 				array->Insert(value);
 			} else {
-				// test if the fragment will be empty if we remove this key's values			
+				// test if the fragment will be empty if we remove this key's values
 				if (duplicate->FragmentsUsed(fNodeSize) < 2) {
 					// the node will be empty without our values, so let us
 					// reuse it as a duplicate node
@@ -1353,7 +1358,7 @@ BPlusTree::Insert(Transaction &transaction, const uint8 *key, uint16 keyLength,
 					otherOffset, &nodeAndKey.keyIndex, keyBuffer, &keyLength,
 					&value) < B_OK) {
 				// free root node & other node here
-				cachedOther.Free(transaction, otherOffset);					
+				cachedOther.Free(transaction, otherOffset);
 				cachedNewRoot.Free(transaction, newRoot);
 
 				RETURN_ERROR(B_ERROR);
@@ -1951,11 +1956,11 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength,
 {
 	if (fTree == NULL)
 		return B_INTERRUPTED;
-	
+
 	bool forward = direction == BPLUSTREE_FORWARD;
 
 	if (fCurrentNodeOffset == BPLUSTREE_NULL
-		&& Goto(forward ? BPLUSTREE_BEGIN : BPLUSTREE_END) < B_OK) 
+		&& Goto(forward ? BPLUSTREE_BEGIN : BPLUSTREE_END) < B_OK)
 		RETURN_ERROR(B_ERROR);
 
 	// if the tree was emptied since the last call
@@ -2089,7 +2094,7 @@ TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength,
 	sets the current position in the iterator, regardless of if the
 	key could be found or not.
 */
-status_t 
+status_t
 TreeIterator::Find(const uint8 *key, uint16 keyLength)
 {
 	if (fTree == NULL)
@@ -2126,14 +2131,14 @@ TreeIterator::Find(const uint8 *key, uint16 keyLength)
 }
 
 
-void 
+void
 TreeIterator::SkipDuplicates()
 {
 	fDuplicateNode = BPLUSTREE_NULL;
 }
 
 
-void 
+void
 TreeIterator::Update(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 splitAt, int8 change)
 {
 	if (offset != fCurrentNodeOffset)
@@ -2157,7 +2162,7 @@ TreeIterator::Update(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 spl
 }
 
 
-void 
+void
 TreeIterator::Stop()
 {
 	fTree = NULL;
@@ -2165,7 +2170,7 @@ TreeIterator::Stop()
 
 
 #ifdef DEBUG
-void 
+void
 TreeIterator::Dump()
 {
 	__out("TreeIterator at %p:\n", this);
@@ -2183,7 +2188,7 @@ TreeIterator::Dump()
 //	#pragma mark -
 
 
-void 
+void
 bplustree_node::Initialize()
 {
 	left_link = right_link = overflow_link = HOST_ENDIAN_TO_BFS_INT64((uint64)BPLUSTREE_NULL);
