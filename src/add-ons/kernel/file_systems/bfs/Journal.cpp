@@ -36,12 +36,13 @@ class RunArrays {
 		RunArrays(Journal *journal);
 		~RunArrays();
 
-		uint32 Length() const { return fLength; }
-
 		status_t Insert(off_t blockNumber);
 
 		run_array *ArrayAt(int32 i) { return fArrays.Array()[i]; }
 		int32 CountArrays() const { return fArrays.CountItems(); }
+
+		uint32 CountBlocks() const { return fBlockCount; }
+		uint32 LogEntryLength() const { return CountBlocks() + CountArrays(); }
 
 		int32 MaxArrayLength();
 
@@ -51,7 +52,7 @@ class RunArrays {
 		bool _AddRun(block_run &run);
 
 		Journal		*fJournal;
-		uint32		fLength;
+		uint32		fBlockCount;
 		Stack<run_array *> fArrays;
 		run_array	*fLastArray;
 };
@@ -213,7 +214,7 @@ run_array::_FindInsertionIndex(block_run &run)
 RunArrays::RunArrays(Journal *journal)
 	:
 	fJournal(journal),
-	fLength(0),
+	fBlockCount(0),
 	fArrays(),
 	fLastArray(NULL)
 {
@@ -266,7 +267,7 @@ RunArrays::_AddRun(block_run &run)
 		return false;
 
 	fLastArray->Insert(run);
-	fLength++;
+	fBlockCount++;
 	return true;
 }
 
@@ -639,7 +640,7 @@ Journal::_WriteTransactionToLog()
 		}
 	}
 
-	if (runArrays.Length() == 0) {
+	if (runArrays.CountBlocks() == 0) {
 		// nothing has changed during this transaction
 		if (detached) {
 			fTransactionID = cache_detach_sub_transaction(fVolume->BlockCache(),
@@ -729,7 +730,7 @@ Journal::_WriteTransactionToLog()
 	free(vecs);
 
 	LogEntry *logEntry = new LogEntry(this, fVolume->LogEnd(),
-		runArrays.Length());
+		runArrays.LogEntryLength());
 	if (logEntry == NULL) {
 		FATAL(("no memory to allocate log entries!"));
 		return B_NO_MEMORY;
