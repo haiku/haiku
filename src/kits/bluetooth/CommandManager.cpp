@@ -64,9 +64,62 @@ void* buildReadLocalName(size_t* outsize)
 }
 
 
+void* buildWriteScan(uint8 scanmode, size_t* outsize)
+{
+    struct hci_write_scan_enable* param;
+	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE, (void**) &param, sizeof(struct hci_write_scan_enable), outsize);
+     
+     
+    if (command != NULL) {
+        param->scan = scanmode;
+    }
+
+    return command;
+
+}
+
+
+void* buildAuthEnable(uint8 auth, size_t* outsize)
+{
+    struct hci_write_authentication_enable* param;
+	void* command = buildCommand(OGF_CONTROL_BASEBAND, OCF_WRITE_AUTH_ENABLE, (void**) &param, sizeof(struct hci_write_authentication_enable), outsize);
+     
+     
+    if (command != NULL) {
+        param->authentication = auth;
+    }
+
+    return command;
+
+}
+
+
 #if 0
 #pragma mark - LINK CONTROL -
 #endif
+
+void* buildCreateConnection(bdaddr_t bdaddr)
+{
+	/*
+	cm4.size = sizeof(struct hci_command_header)+sizeof(struct hci_cp_create_conn);
+	cm4.header.opcode = B_HOST_TO_LENDIAN_INT16(hci_opcode_pack(OGF_LINK_CONTROL, OCF_CREATE_CONN));
+	cm4.body.bdaddr.b[0] = 0x92;
+	cm4.body.bdaddr.b[1] = 0xd3;
+	cm4.body.bdaddr.b[2] = 0xaf;
+	cm4.body.bdaddr.b[3] = 0xd9;
+	cm4.body.bdaddr.b[4] = 0x0a;
+	cm4.body.bdaddr.b[5] = 0x00;
+	cm4.body.pkt_type = 0xFFFF;
+	cm4.body.pscan_rep_mode = 1;
+	cm4.body.pscan_mode = 0;
+	cm4.body.clock_offset = 0xc7;
+	cm4.body.role_switch = 1;
+	cm4.header.clen = 13;					
+	ioctl(fd1, ISSUE_BT_COMMAND, &cm4, sizeof(cm4));
+	*/
+
+	return NULL;
+}
 
 
 void* buildRemoteNameRequest(bdaddr_t bdaddr,uint8 pscan_rep_mode, uint16 clock_offset, size_t* outsize)
@@ -119,3 +172,7 @@ void* buildReadBdAddr(size_t* outsize)
 {
 	return buildCommand(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR, NULL, 0, outsize);
 }    
+
+
+
+
