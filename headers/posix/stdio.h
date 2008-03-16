@@ -10,6 +10,10 @@
 #include <stdarg.h>
 
 
+// Dodge gcc 2.95.3's fixincludes hack stdio_va_list by including this string:
+// __gnuc_va_list
+
+
 #define BUFSIZ			1024
 #define _IOFBF			0		/* fully buffered */
 #define _IOLBF			1		/* line buffered */

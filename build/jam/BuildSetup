@@ -118,9 +118,19 @@ HAIKU_HAIKU_COMPATIBLE_PLATFORMS = haiku haiku_host ;
 
 # haiku target platform settings
 
+# analyze GCC version
+HAIKU_GCC_VERSION = [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION ] ;
+
 # enable GCC -pipe option, if requested
 if $(HAIKU_USE_GCC_PIPE) = 1 {
 	HAIKU_GCC_BASE_FLAGS = -pipe ;
+}
+
+# override gcc 2.95.3's header directory -- strictly necessary only when using
+# the BeOS native compiler (since its headers are incompatible), but it doesn't
+# harm for the cross-compiler either.
+if $(HAIKU_GCC_VERSION[1]) = 2 {
+	HAIKU_GCC_HEADERS_DIR = [ FDirName $(HAIKU_TOP) headers build gcc-2.95.3 ] ;
 }
 
 # initial state for flags etc.
@@ -191,9 +201,6 @@ for level in $(HAIKU_DEBUG_LEVELS[2-]) {
 	HAIKU_DEBUG_$(level)_OBJECT_DIR
 		= [ FDirName $(HAIKU_ARCH_OBJECT_DIR) debug_$(level) ] ;
 }
-
-# analyze GCC version
-HAIKU_GCC_VERSION = [ FAnalyzeGCCVersion HAIKU_GCC_RAW_VERSION ] ;
 
 # set variables for gcc header options
 SetIncludePropertiesVariables HAIKU ;
