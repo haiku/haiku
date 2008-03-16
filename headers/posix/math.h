@@ -26,7 +26,9 @@
 /* platform independent IEEE floating point special values */
 #define	__HUGE_VAL_v	0x7ff0000000000000LL
 #define __huge_val_t	union { unsigned char __c[8]; long long __ll; double __d; }
-#define HUGE_VAL		(((__huge_val_t) { __ll: __HUGE_VAL_v }).__d)
+#ifndef HUGE_VAL
+#	define HUGE_VAL		(((__huge_val_t) { __ll: __HUGE_VAL_v }).__d)
+#endif
 
 #define __HUGE_VALF_v	0x7f800000L
 #define __huge_valf_t	union { unsigned char __c[4]; long __l; float __f; }
