@@ -90,12 +90,15 @@ AutoconfigLooper::_ReadyToRun()
 	}
 
 	char string[64];
-	snprintf(string, sizeof(string), "192.168.0.%u", last);
+	// IANA defined the default autoconfig network (for when a DHCP request
+	// fails for some reason) as being 169.254.0.0/255.255.0.0. We are only
+	// generating the last octet but we could also use the 2 last octets if
+	// wanted.
+	snprintf(string, sizeof(string), "169.254.0.%u", last);
 
 	BMessage address;
 	address.AddString("family", "inet");
 	address.AddString("address", string);
-	address.AddString("gateway", "192.168.0.254");
 	interface.AddMessage("address", &address);
 
 	fTarget.SendMessage(&interface);
