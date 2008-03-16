@@ -116,6 +116,8 @@ struct replicant_data {
 	static int32 IndexOf(BList const *list, BMessage const *msg);
 	static int32 IndexOf(BList const *list, BView const *view, bool allowZombie);
 	static int32 IndexOf(BList const *list, unsigned long id);
+	
+	status_t Archive(BMessage *msg);
 
 	BMessage*			message;
 	BView*				view;
@@ -228,6 +230,24 @@ replicant_data::replicant_data()
 {
 }
 
+status_t
+replicant_data::Archive(BMessage* msg)
+{
+	status_t result = B_ERROR;
+	if (message) {
+		msg->AddMessage("message", message);
+		msg->AddInt32("uniqueid", id);
+		BPoint pos (0,0);
+		if (view) 
+			pos = view->Frame().LeftTop();
+		else if (zombie_view)
+			pos = zombie_view->Frame().LeftTop();
+		msg->AddPoint("position", pos);
+		result = B_OK;
+	}
+
+	return result;
+}
 
 //static
 replicant_data *
@@ -1012,10 +1032,14 @@ BShelf::_Archive(BMessage *data) const
 	data->AddInt32("_sg_cnt", fGenCount);
 
 	BMessage archive('ARCV');
-
-	// TODO archive replicants
-
-	return B_ERROR;
+	
+	for (int32 i = 0; i < fReplicants.CountItems(); i++) {
+		if (((replicant_data *)fReplicants.ItemAt(i))->Archive(&archive) == B_OK)
+			data->AddMessage("replicant", &archive);
+		archive.MakeEmpty();
+	}
+	
+	return B_OK;
 }
 
 
@@ -1063,7 +1087,15 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 			if (!archive.FindInt32("_sg_cnt", &genCount))
 				genCount = 1;
 
-			// TODO find archived replicants
+			BMessage replicant;
+			BMessage *replmsg = NULL;
+			for (int32 i = 0; archive.FindMessage("replicant", i, &replicant) == B_OK; i++) {
+				BPoint point;
+				replmsg = new BMessage();
+				replicant.FindPoint("position", &point);
+				replicant.FindMessage("message", replmsg);
+				AddReplicant(replmsg, point);				
+			}
 		}
 	}
 }
