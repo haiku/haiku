@@ -446,9 +446,14 @@ Inode::CheckPermissions(int accessMode) const
 	if (accessMode & W_OK && fVolume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
 
-	// root users always have full access (but they can't execute anything)
-	if (user == 0 && !((accessMode & X_OK) && (Mode() & S_IXUSR) == 0))
-		return B_OK;
+	// root users always have full access (but they can't execute files without
+	// any execute permissions set)
+	if (user == 0) {
+		if (!((accessMode & X_OK) != 0 && (Mode() & S_IXUSR) == 0)
+			|| (Mode() & S_DIRECTORY) != 0) {
+			return B_OK;
+		}
+	}
 
 	// shift mode bits, to check directly against accessMode
 	mode_t mode = Mode();
