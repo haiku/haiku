@@ -170,8 +170,8 @@ find_route(net_domain *_domain, const sockaddr *address)
 				continue;
 		} else if (!domain->address_module->equal_addresses(address,
 				route->destination))
-			continue
-
+			continue;
+		
 		TRACE(("  found route: %s, flags %lx\n",
 			AddressString(domain, route->destination).Data(), route->flags));
 
