@@ -1192,7 +1192,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		const BPoint point = location ? *location : view->Frame().LeftTop();
 		replicant = _GetReplicant(data, view, point, dragger, relation);
 		if (replicant == NULL)
-			send_reply(data, B_ERROR, uniqueID);
+			return send_reply(data, B_ERROR, uniqueID);
 
 	} else if (fDisplayZombies && fAllowZombies)
 		zombie = _CreateZombie(data, dragger);
