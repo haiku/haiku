@@ -31,6 +31,13 @@
 #	define TRACE(x) ;
 #endif
 
+#define TRACE_MTRR_ARCH_VM
+#ifdef TRACE_MTRR_ARCH_VM
+#	define TRACE_MTRR(x...) dprintf(x)
+#else
+#	define TRACE_MTRR(x...) 
+#endif
+
 
 #define kMaxMemoryTypeRegisters 32
 
@@ -83,6 +90,22 @@ nearest_power(addr_t value)
 }
 
 
+static void
+nearest_powers(uint64 value, uint64 *lower, uint64 *upper)
+{
+	uint64 power = 1UL << 12;
+	*lower = power;
+		// 12 bits is the smallest supported alignment/length
+
+	while (value >= power) {
+		*lower = power;
+		power <<= 1;
+	}
+
+	*upper = power;
+}
+
+
 static status_t
 set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 {
@@ -91,23 +114,21 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 	if (type == 0)
 		return B_OK;
 
-	uint32 newType;
-
 	switch (type) {
 		case B_MTR_UC:
-			newType = IA32_MTR_UNCACHED;
+			type = IA32_MTR_UNCACHED;
 			break;
 		case B_MTR_WC:
-			newType = IA32_MTR_WRITE_COMBINING;
+			type = IA32_MTR_WRITE_COMBINING;
 			break;
 		case B_MTR_WT:
-			newType = IA32_MTR_WRITE_THROUGH;
+			type = IA32_MTR_WRITE_THROUGH;
 			break;
 		case B_MTR_WP:
-			newType = IA32_MTR_WRITE_PROTECTED;
+			type = IA32_MTR_WRITE_PROTECTED;
 			break;
 		case B_MTR_WB:
-			newType = IA32_MTR_WRITE_BACK;
+			type = IA32_MTR_WRITE_BACK;
 			break;
 
 		default:
@@ -118,38 +139,96 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 		return B_NOT_SUPPORTED;
 
 	// length must be a power of 2; just round it up to the next value
-	uint64 newLength = nearest_power(length);
+	length = nearest_power(length); 	
 
-	// avoids more than 2GB slots
-	if (newLength > 0x80000000)
-		newLength = 0x80000000;
-
-	if (newLength + base <= base) {
+	if (length + base <= base) {
 		// 4GB overflow
 		return B_BAD_VALUE;
 	}
 
 	// base must be aligned to the length
-	if (base & (newLength - 1))
+	if (base & (length - 1))
 		return B_BAD_VALUE;
 
 	index = allocate_mtrr();
 	if (index < 0)
 		return B_ERROR;
 
-	TRACE(("allocate MTRR slot %ld, base = %Lx, length = %Lx\n", index,
-		base, newLength));
+	TRACE_MTRR("allocate MTRR slot %ld, base = %Lx, length = %Lx\n", index, base, length);
 
 	sMemoryTypeIDs[index] = id;
-	x86_set_mtrr(index, base, newLength, newType);
-
-	// now handle remaining memory
-	if (length > newLength) {
-		// TODO iterate over smaller lengths to avoid the PCI hole after the physical memory.
-		set_memory_type(id, base + newLength, length - newLength, type);
-	}
+	x86_set_mtrr(index, base, length, type);
 
 	return B_OK;
+}
+
+
+static int64 sols[5];
+static int solCount;
+static int64 props[5];
+
+
+static void
+find_nearest(uint64 value, int iteration)
+{
+	TRACE_MTRR("find_nearest %Lx %d\n", value, iteration);
+	if (iteration > 4 || (iteration + 1) >= solCount)
+		return;
+	uint64 down, up;
+	int i;
+	nearest_powers(value, &down, &up);
+	props[iteration] = down;
+	if (value - down < 0x100000) {
+		for (i=0; i<=iteration; i++)
+			sols[i] = props[i];
+		solCount = iteration + 1;
+		return;
+	}
+	find_nearest(value - down, iteration + 1);
+	props[iteration] = -up;
+	if (up - value < 0x100000) {
+		for (i=0; i<=iteration; i++)
+			sols[i] = props[i];
+		solCount = iteration + 1;
+		return;
+	}
+	find_nearest(up - value, iteration + 1);
+}
+
+
+static status_t
+set_memory_write_back(int32 id, uint64 base, uint64 length)
+{
+	int i;
+	TRACE_MTRR("set_memory_write_back base %Lx length %Lx\n", base, length);
+	solCount = 5;
+	find_nearest(length, 0);
+
+#ifdef TRACE_MTRR
+	dprintf("sols: ");
+	for (i=0; i<solCount; i++) {
+                dprintf("0x%Lx ", sols[i]);
+        }
+        dprintf("\n");
+#endif
+
+	bool nextDown = false;
+	for (int i = 0; i < solCount; i++) {
+		if (sols[i] < 0) {
+			if (nextDown)
+				base += sols[i];
+			set_memory_type(id, base, -sols[i], nextDown ? B_MTR_UC : B_MTR_WB);
+			if (!nextDown)
+				base -= sols[i];
+			nextDown = !nextDown;
+		} else {
+			if (nextDown)
+				base -= sols[i];
+			set_memory_type(id, base, sols[i], nextDown ? B_MTR_UC : B_MTR_WB);
+			if (!nextDown)
+				base += sols[i];
+		}
+	}
 }
 
 
@@ -226,8 +305,8 @@ arch_vm_init_post_modules(kernel_args *args)
 	// set the physical memory ranges to write-back mode
 
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		set_memory_type(-1, args->physical_memory_range[i].start,
-			args->physical_memory_range[i].size, B_MTR_WB);
+		set_memory_write_back(-1, args->physical_memory_range[i].start,
+			args->physical_memory_range[i].size);
 	}
 
 	return B_OK;
