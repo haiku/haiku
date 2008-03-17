@@ -280,6 +280,29 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
             ClearWantedEvent(request, PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
      	}       
         break;
+
+        case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE):
+        {    
+        	uint8* statusReply = (uint8*)(event+1);
+        	
+        	reply.AddInt8("status", *statusReply);
+        	
+            if (*statusReply == BT_OK) {
+                                
+                Output::Instance()->Post("Positive reply for scanmode\n", BLACKBOARD_KIT);
+
+            } else {
+
+                Output::Instance()->Post("Negative reply for scanmode\n", BLACKBOARD_KIT);
+
+            }
+
+            printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
+            reply.PrintToStream();
+                        
+            ClearWantedEvent(request, PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE));
+     	}       
+        break;
 		
 		default:
 		    Output::Instance()->Post("Command Complete not handled\n", BLACKBOARD_KIT);                		
@@ -369,7 +392,7 @@ LocalDeviceImpl::ProcessSimpleRequest(BMessage* request)
 	ssize_t size;
 	void* command = NULL;
 
-	if (request->FindData("raw command", B_ANY_TYPE, 0, (const void **)command, &size) == B_OK) 
+	if (request->FindData("raw command", B_ANY_TYPE, 0, (const void **)&command, &size) == B_OK) 
 	    if (((HCITransportAccessor*)fHCIDelegate)->IssueCommand(command, size) == B_ERROR)
 			(Output::Instance()->Post("Command issue error\n", BLACKBOARD_EVENTS));
 		else
