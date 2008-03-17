@@ -93,7 +93,8 @@ BSymLink::~BSymLink()
 
 // ReadLink
 //! Reads the contents of the symbolic link into a buffer.
-/*!	\param buf the buffer
+/*!	The string written to the buffer will be null-terminated.
+	\param buf the buffer
 	\param size the size of the buffer
 	\return
 	- the number of bytes written into the buffer
@@ -110,11 +111,17 @@ BSymLink::ReadLink(char *buffer, size_t size)
 	if (InitCheck() != B_OK)
 		return B_FILE_ERROR;
 
-	status_t error = _kern_read_link(get_fd(), NULL, buffer, &size);
+	size_t linkLen = size;
+	status_t error = _kern_read_link(get_fd(), NULL, buffer, &linkLen);
 	if (error < B_OK)
 		return error;
 
-	return size;
+	// null-terminate
+	if (linkLen >= size)
+		return B_BUFFER_OVERFLOW;
+	buffer[linkLen] = '\0';
+
+	return linkLen;
 }
 
 // MakeLinkedPath

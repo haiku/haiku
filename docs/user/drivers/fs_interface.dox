@@ -1,9 +1,9 @@
 /*
- * Copyright 2007 Haiku Inc. All rights reserved.
+ * Copyright 2007-2008 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  *		Niels Sascha Reedijk <niels.reedijk@gmail.com>
  *		Axel Dörfler <axeld@pinc-software.de>
  *
@@ -536,21 +536,24 @@
 			fs_vnode link, char *buffer, size_t *_bufferSize)
 	\brief Read the value of a symbolic link.
 
-	If the function is successful, the string written to the buffer shall be
-	null-terminated and the variable \a _bufferSize points to shall be set to
-	the length of that string, including the terminating null character.
+	If the function is successful, the symlink string shall be written to the
+	buffer. It does not need to be null-terminated. If the buffer is too small
+	to hold the complete string, only the first \c *_bufferSize bytes of the
+	string shall be written to the buffer; the buffer shall not be
+	null-terminated in this case. Furthermore the variable \a _bufferSize
+	points to shall be set to the length of the string written to the buffer,
+	not including any terminating null character (if written).
 
 	\param fs The volume handle.
 	\param link The node handle.
 	\param buffer Pointer to a pre-allocated buffer the link value shall be
 		written to.
-	\param buffer Pointer to a pre-allocated variable containing the size of the
-		buffer supplied to the function. Upon successful completion the hook shall
-		store the number of bytes actually written into the buffer in the variable.
+	\param _bufferSize Pointer to a pre-allocated variable containing the size
+		of the buffer supplied to the function. Upon successful completion the
+		hook shall store the number of bytes actually written into the buffer
+		in the variable.
 	\retval B_OK Everything went fine.
 	\retval B_BAD_VALUE \a link does not identify a symbolic link.
-	\retval B_BUFFER_OVERFLOW The supplied buffer is not big enough to contain
-		the complete link value.
 */
 
 /*!

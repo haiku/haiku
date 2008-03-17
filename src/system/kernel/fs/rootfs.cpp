@@ -805,18 +805,14 @@ static status_t
 rootfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t *_bufferSize)
 {
 	struct rootfs_vnode *link = (rootfs_vnode*)_link;
-	size_t bufferSize = *_bufferSize;
 
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
-	*_bufferSize = link->stream.symlink.length + 1;
-		// we always need to return the number of bytes we intend to write!
+	if (link->stream.symlink.length < *_bufferSize)
+		*_bufferSize = link->stream.symlink.length;
 
-	if (bufferSize <= link->stream.symlink.length)
-		return B_BUFFER_OVERFLOW;
-
-	memcpy(buffer, link->stream.symlink.path, link->stream.symlink.length + 1);
+	memcpy(buffer, link->stream.symlink.path, *_bufferSize);
 	return B_OK;
 }
 
@@ -975,7 +971,10 @@ rootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 	// stream exists, but we know to return size 0, since we can only hold directories
 	stat->st_dev = fs->id;
 	stat->st_ino = vnode->id;
-	stat->st_size = 0;
+	if (S_ISLNK(vnode->stream.type))
+		stat->st_size = vnode->stream.symlink.length;
+	else
+		stat->st_size = 0;
 	stat->st_mode = vnode->stream.type;
 
 	stat->st_nlink = 1;

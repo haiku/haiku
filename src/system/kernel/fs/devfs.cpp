@@ -1880,13 +1880,10 @@ devfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t *_bufferSize
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
-	*_bufferSize = link->stream.u.symlink.length + 1;
-		// we always need to return the number of bytes we intend to write!
+	if (link->stream.u.symlink.length < *_bufferSize)
+		*_bufferSize = link->stream.u.symlink.length;
 
-	if (bufferSize <= link->stream.u.symlink.length)
-		return B_BUFFER_OVERFLOW;
-
-	memcpy(buffer, link->stream.u.symlink.path, link->stream.u.symlink.length + 1);
+	memcpy(buffer, link->stream.u.symlink.path, *_bufferSize);
 	return B_OK;
 }
 
@@ -2478,6 +2475,8 @@ devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 		// is this a real block device? then let's have it reported like that
 		if (stat->st_size != 0)
 			stat->st_mode = S_IFBLK | (vnode->stream.type & S_IUMSK);
+	} else if (S_ISLNK(vnode->stream.type)) {
+		stat->st_size = vnode->stream.u.symlink.length;
 	}
 
 	return B_OK;

@@ -928,10 +928,11 @@ BEntry::set(int dirFD, const char *path, bool traverse)
 			// we need to traverse the symlink
 			if (--linkLimit < 0)
 				return B_LINK_LIMIT;
-			size_t bufferSize = B_PATH_NAME_LENGTH;
+			size_t bufferSize = B_PATH_NAME_LENGTH - 1;
 			error = _kern_read_link(dirFD, leafName, tmpPath, &bufferSize);
 			if (error < 0)
 				return error;
+			tmpPath[bufferSize] = '\0';
 			path = tmpPath;
 			// next round...
 		}

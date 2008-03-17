@@ -534,7 +534,6 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 	if (result < 0)
 		return result;
 
-	buffer[result] = '\0';
 	*_bufferSize = result;
 	return B_OK;
 }

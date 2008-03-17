@@ -20,13 +20,19 @@
 ssize_t
 readlink(const char *path, char *buffer, size_t bufferSize)
 {
-	status_t status = _kern_read_link(-1, path, buffer, &bufferSize);
-	if (status < B_OK && status != B_BUFFER_OVERFLOW) {
+	size_t linkLen = bufferSize;
+	status_t status = _kern_read_link(-1, path, buffer, &linkLen);
+	if (status < B_OK) {
 		errno = status;
 		return -1;
 	}
 
-	return bufferSize;
+	// If the buffer is big enough, null-terminate the string. That's not
+	// required by the standard, but helps non-conforming apps.
+	if (linkLen < bufferSize)
+		buffer[linkLen] = '\0';
+
+	return linkLen;
 }
 
 

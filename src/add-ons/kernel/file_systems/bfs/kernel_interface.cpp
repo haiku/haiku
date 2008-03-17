@@ -49,7 +49,7 @@ fill_stat_buffer(Inode *inode, struct stat &stat)
 
 	if (inode->IsSymLink() && (node.Flags() & INODE_LONG_SYMLINK) == 0) {
 		// symlinks report the size of the link here
-		stat.st_size = strlen(node.short_symlink) + 1;
+		stat.st_size = strlen(node.short_symlink);
 	} else
 		stat.st_size = inode->Size();
 }
@@ -1366,29 +1366,26 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 	FUNCTION();
 
 	Inode *inode = (Inode *)_node;
-	size_t bufferSize = *_bufferSize;
 
 	if (!inode->IsSymLink())
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (inode->Flags() & INODE_LONG_SYMLINK) {
-		// we also need space for the terminating null byte
-		if (inode->Size() >= bufferSize) {
-			*_bufferSize = inode->Size() + 1;
-			return B_BUFFER_OVERFLOW;
-		}
+		if (inode->Size() < *_bufferSize)
+			*_bufferSize = inode->Size();
 
 		status_t status = inode->ReadAt(0, (uint8 *)buffer, _bufferSize);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
-		buffer[++*_bufferSize] = '\0';
 		return B_OK;
 	}
 
-	*_bufferSize = strlcpy(buffer, inode->Node().short_symlink, bufferSize) + 1;
-	if (*_bufferSize > bufferSize)
-		return B_BUFFER_OVERFLOW;
+	size_t linkLen = strlen(inode->Node().short_symlink);
+	if (linkLen < *_bufferSize)
+		*_bufferSize = linkLen;
+
+	memcpy(buffer, inode->Node().short_symlink, *_bufferSize);
 
 	return B_OK;
 }

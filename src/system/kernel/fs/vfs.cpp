@@ -1780,9 +1780,13 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 			}
 
 			if (FS_CALL(nextVnode, read_symlink) != NULL) {
+				bufferSize--;
 				status = FS_CALL(nextVnode, read_symlink)(
 					nextVnode->mount->cookie, nextVnode->private_node, buffer,
 					&bufferSize);
+				// null-terminate
+				if (status >= 0)
+					buffer[bufferSize] = '\0';
 			} else
 				status = B_BAD_VALUE;
 
@@ -7399,11 +7403,12 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 		// read link
 		struct stat st;
 		if (FS_CALL(fileVnode, read_symlink) != NULL) {
-			size_t bufferSize = B_PATH_NAME_LENGTH;
+			size_t bufferSize = B_PATH_NAME_LENGTH - 1;
 			error = FS_CALL(fileVnode, read_symlink)(fileVnode->mount->cookie,
 				fileVnode->private_node, path, &bufferSize);
 			if (error != B_OK)
 				return error;
+			path[bufferSize] = '\0';
 		} else
 			return B_BAD_VALUE;
 	}
@@ -7704,7 +7709,7 @@ _user_read_link(int fd, const char *userPath, char *userBuffer, size_t *userBuff
 	if (status < B_OK)
 		return status;
 
-	if (user_strlcpy(userBuffer, buffer, bufferSize) < 0)
+	if (user_memcpy(userBuffer, buffer, bufferSize) != B_OK)
 		return B_BAD_ADDRESS;
 
 	return B_OK;
