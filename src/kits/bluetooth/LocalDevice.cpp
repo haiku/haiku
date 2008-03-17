@@ -8,14 +8,17 @@
 
 #include <bluetooth/bluetooth_error.h>
 
+#include <bluetooth/HCI/btHCI_command.h>
+#include <bluetooth/HCI/btHCI_event.h>
+
 #include <bluetooth/LocalDevice.h>
 #include <bluetooth/RemoteDevice.h>
 #include <bluetooth/DeviceClass.h>
 #include <bluetooth/DiscoveryAgent.h>
 
 #include <bluetooth/bdaddrUtils.h>
-
 #include <bluetoothserver_p.h>
+#include <CommandManager.h>
 
 #include "KitSupport.h"
 
@@ -148,12 +151,23 @@ LocalDevice::SetDiscoverable(int mode)
 
     BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
     BMessage reply;
+
+	size_t   size;
 	int8	 bt_status = BT_ERROR;
 	
     
     request.AddInt32("hci_id", hid);
+
+
+	void* command = buildWriteScan(mode, &size);
 	
-	// TODO: Add the raw command to the BMessage + expected event
+	if (command == NULL) {
+		return B_NO_MEMORY;		
+	}
+	
+	request.AddData("raw command", B_ANY_TYPE, command, size);
+    request.AddInt16("eventExpected",  HCI_EVENT_CMD_COMPLETE);
+    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE));
 
     if (fMessenger->SendMessage(&request, &reply) == B_OK) {
     	if (reply.FindInt8("status", &bt_status ) == B_OK ) {	    
@@ -162,7 +176,6 @@ LocalDevice::SetDiscoverable(int mode)
 		}
 		
 	}    
-
 
 	return B_ERROR;
 }
