@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -50,7 +50,7 @@ net_route_private::~net_route_private()
 }
 
 
-//	#pragma mark -
+//	#pragma mark - private functions
 
 
 #if 0
@@ -118,6 +118,7 @@ user_copy_address(const sockaddr *from, sockaddr_storage *to)
 	return B_OK;
 }
 
+
 static net_route_private *
 find_route(struct net_domain *_domain, const net_route *description)
 {
@@ -129,14 +130,18 @@ find_route(struct net_domain *_domain, const net_route *description)
 
 		if ((route->flags & RTF_DEFAULT) != 0
 			&& (description->flags & RTF_DEFAULT) != 0) {
-			// there can only be one default route
-			return route;
+			// there can only be one default route per interface
+			if (route->interface == description->interface)
+				return route;
+
+			continue;
 		}
 
-		if ((route->flags & (RTF_GATEWAY | RTF_HOST | RTF_LOCAL)) ==
-				(description->flags & (RTF_GATEWAY | RTF_HOST | RTF_LOCAL))
-			&& domain->address_module->equal_masked_addresses(route->destination,
-				description->destination, description->mask)
+		if ((route->flags & (RTF_GATEWAY | RTF_HOST | RTF_LOCAL | RTF_DEFAULT))
+				== (description->flags
+					& (RTF_GATEWAY | RTF_HOST | RTF_LOCAL | RTF_DEFAULT))
+			&& domain->address_module->equal_masked_addresses(
+				route->destination, description->destination, description->mask)
 			&& domain->address_module->equal_addresses(route->mask,
 				description->mask)
 			&& domain->address_module->equal_addresses(route->gateway,
@@ -158,8 +163,14 @@ find_route(net_domain *_domain, const sockaddr *address)
 	RouteList::Iterator iterator = domain->routes.GetIterator();
 	TRACE(("test address %s for routes...\n", AddressString(domain, address).Data()));
 
+	// TODO: alternate equal default routes
+
 	while (iterator.HasNext()) {
 		net_route_private *route = iterator.Next();
+
+		// ignore routes that point to devices that have no link
+		if ((route->interface->device->flags & IFF_LINK) == 0)
+			continue;
 
 		if (route->mask) {
 			sockaddr maskedAddress;
@@ -171,7 +182,7 @@ find_route(net_domain *_domain, const sockaddr *address)
 		} else if (!domain->address_module->equal_addresses(address,
 				route->destination))
 			continue;
-		
+
 		TRACE(("  found route: %s, flags %lx\n",
 			AddressString(domain, route->destination).Data(), route->flags));
 
@@ -200,7 +211,29 @@ static struct net_route *
 get_route_internal(struct net_domain_private *domain,
 	const struct sockaddr *address)
 {
-	net_route_private *route = find_route(domain, address);
+	net_route_private *route = NULL;
+
+	if (address->sa_family == AF_LINK) {
+		// special address to find an interface directly
+		RouteList::Iterator iterator = domain->routes.GetIterator();
+		const sockaddr_dl* link = (const sockaddr_dl*)address;
+
+		while (iterator.HasNext()) {
+			route = iterator.Next();
+
+			net_device* device = route->interface->device;
+
+			if ((link->sdl_nlen > 0
+					&& !strncmp(device->name, (const char*)link->sdl_data,
+							IF_NAMESIZE))
+				|| (link->sdl_nlen == 0 && link->sdl_alen > 0
+					&& !memcmp(LLADDR(link), device->address.data,
+							device->address.length)))
+				break;
+		}
+	} else
+		route = find_route(domain, address);
+
 	if (route != NULL && atomic_add(&route->ref_count, 1) == 0) {
 		// route has been deleted already
 		route = NULL;
@@ -224,7 +257,35 @@ update_route_infos(struct net_domain_private *domain)
 }
 
 
-//	#pragma mark -
+static sockaddr *
+copy_address(UserBuffer &buffer, sockaddr *address)
+{
+	if (address == NULL)
+		return NULL;
+
+	return (sockaddr *)buffer.Copy(address, address->sa_len);
+}
+
+
+static status_t
+fill_route_entry(route_entry *target, void *_buffer, size_t bufferSize,
+		 net_route *route)
+{
+	UserBuffer buffer(((uint8 *)_buffer) + sizeof(route_entry),
+		bufferSize - sizeof(route_entry));
+
+	target->destination = copy_address(buffer, route->destination);
+	target->mask = copy_address(buffer, route->mask);
+	target->gateway = copy_address(buffer, route->gateway);
+	target->source = copy_address(buffer, route->interface->address);
+	target->flags = route->flags;
+	target->mtu = route->mtu;
+
+	return buffer.Status();
+}
+
+
+//	#pragma mark - exported functions
 
 
 /*!
@@ -307,10 +368,15 @@ list_routes(net_domain_private *domain, void *buffer, size_t size)
 		request.ifr_route.mtu = route->mtu;
 		request.ifr_route.flags = route->flags;
 
+		// copy data into userland buffer
 		if (user_memcpy(buffer, &request, size) < B_OK
-			|| (route->destination != NULL && user_memcpy(request.ifr_route.destination, route->destination, route->destination->sa_len) < B_OK)
-			|| (route->mask != NULL && user_memcpy(request.ifr_route.mask, route->mask, route->mask->sa_len) < B_OK)
-			|| (route->gateway != NULL && user_memcpy(request.ifr_route.gateway, route->gateway, route->gateway->sa_len) < B_OK))
+			|| (route->destination != NULL
+				&& user_memcpy(request.ifr_route.destination,
+					route->destination, route->destination->sa_len) < B_OK)
+			|| (route->mask != NULL && user_memcpy(request.ifr_route.mask,
+					route->mask, route->mask->sa_len) < B_OK)
+			|| (route->gateway != NULL && user_memcpy(request.ifr_route.gateway,
+					route->gateway, route->gateway->sa_len) < B_OK))
 			return B_BAD_ADDRESS;
 
 		buffer = (void *)next;
@@ -322,7 +388,8 @@ list_routes(net_domain_private *domain, void *buffer, size_t size)
 
 
 status_t
-control_routes(struct net_interface *interface, int32 option, void *argument, size_t length)
+control_routes(struct net_interface *interface, int32 option, void *argument,
+	size_t length)
 {
 	net_domain_private *domain = (net_domain_private *)interface->domain;
 
@@ -335,14 +402,17 @@ control_routes(struct net_interface *interface, int32 option, void *argument, si
 				return B_BAD_VALUE;
 
 			route_entry entry;
-			if (user_memcpy(&entry, &((ifreq *)argument)->ifr_route, sizeof(route_entry)) != B_OK)
+			if (user_memcpy(&entry, &((ifreq *)argument)->ifr_route,
+					sizeof(route_entry)) != B_OK)
 				return B_BAD_ADDRESS;
 
 			net_route_private route;
 			status_t status;
-			if ((status = user_copy_address(entry.destination, &route.destination)) != B_OK
+			if ((status = user_copy_address(entry.destination,
+					&route.destination)) != B_OK
 				|| (status = user_copy_address(entry.mask, &route.mask)) != B_OK
-				|| (status = user_copy_address(entry.gateway, &route.gateway)) != B_OK)
+				|| (status = user_copy_address(entry.gateway, &route.gateway))
+					!= B_OK)
 				return status;
 
 			route.mtu = entry.mtu;
@@ -416,6 +486,15 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 		if (domain->address_module->first_mask_bit(before->mask)
 				> domain->address_module->first_mask_bit(route->mask))
 			break;
+
+		if ((route->flags & RTF_DEFAULT) != 0
+			&& (before->flags & RTF_DEFAULT) != 0) {
+			// both routes are equal - let the link speed decide the
+			// order
+			if (before->interface->device->link_speed
+					< route->interface->device->link_speed)
+				break;
+		}
 	}
 
 	domain->routes.Insert(before, route);
@@ -448,33 +527,6 @@ remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
 	update_route_infos(domain);
 
 	return B_OK;
-}
-
-
-static sockaddr *
-copy_address(UserBuffer &buffer, sockaddr *address)
-{
-	if (address == NULL)
-		return NULL;
-
-	return (sockaddr *)buffer.Copy(address, address->sa_len);
-}
-
-static status_t
-fill_route_entry(route_entry *target, void *_buffer, size_t bufferSize,
-		 net_route *route)
-{
-	UserBuffer buffer(((uint8 *)_buffer) + sizeof(route_entry),
-		bufferSize - sizeof(route_entry));
-
-	target->destination = copy_address(buffer, route->destination);
-	target->mask = copy_address(buffer, route->mask);
-	target->gateway = copy_address(buffer, route->gateway);
-	target->source = copy_address(buffer, route->interface->address);
-	target->flags = route->flags;
-	target->mtu = route->mtu;
-
-	return buffer.Status();
 }
 
 
@@ -598,8 +650,7 @@ put_route(struct net_domain *_domain, net_route *route)
 
 
 status_t
-register_route_info(struct net_domain *_domain,
-	struct net_route_info *info)
+register_route_info(struct net_domain *_domain, struct net_route_info *info)
 {
 	struct net_domain_private *domain = (net_domain_private *)_domain;
 	BenaphoreLocker locker(domain->lock);
@@ -612,8 +663,7 @@ register_route_info(struct net_domain *_domain,
 
 
 status_t
-unregister_route_info(struct net_domain *_domain,
-	struct net_route_info *info)
+unregister_route_info(struct net_domain *_domain, struct net_route_info *info)
 {
 	struct net_domain_private *domain = (net_domain_private *)_domain;
 	BenaphoreLocker locker(domain->lock);
@@ -627,9 +677,13 @@ unregister_route_info(struct net_domain *_domain,
 
 
 status_t
-update_route_info(struct net_domain *domain,
-	struct net_route_info *info)
+update_route_info(struct net_domain *_domain, struct net_route_info *info)
 {
-	return B_ERROR;
+	struct net_domain_private *domain = (net_domain_private *)_domain;
+	BenaphoreLocker locker(domain->lock);
+
+	put_route_internal(domain, info->route);
+	info->route = get_route_internal(domain, &info->address);
+	return B_OK;
 }
 
