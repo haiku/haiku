@@ -1,4 +1,12 @@
-// KFileSystem.cpp
+/*
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ */
+
+#include "KFileSystem.h"
 
 #include <fcntl.h>
 #include <stdlib.h>
@@ -7,9 +15,7 @@
 #include <fs_interface.h>
 
 #include "ddm_modules.h"
-//#include "KDiskDeviceJob.h"
 #include "KDiskDeviceUtils.h"
-#include "KFileSystem.h"
 #include "KPartition.h"
 
 
@@ -54,7 +60,7 @@ KFileSystem::Identify(KPartition *partition, void **cookie)
 	if (partition->Open(O_RDONLY, &fd) != B_OK)
 		return -1;
 	float result = fModule->identify_partition(fd, partition->PartitionData(),
-											   cookie);
+		cookie);
 	close(fd);
 	return result;
 }
@@ -82,8 +88,7 @@ KFileSystem::FreeIdentifyCookie(KPartition *partition, void *cookie)
 {
 	if (!partition || !fModule || !fModule->free_identify_partition_cookie)
 		return;
-	fModule->free_identify_partition_cookie(partition->PartitionData(),
-											cookie);
+	fModule->free_identify_partition_cookie(partition->PartitionData(), cookie);
 }
 
 
@@ -138,8 +143,24 @@ status_t
 KFileSystem::SetContentName(KPartition* partition, const char* name,
 	disk_job_id job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !fModule)
+		return B_BAD_VALUE;
+	if (!fModule->set_content_name)
+		return B_NOT_SUPPORTED;
+
+	// open partition device
+	int fd = -1;
+	status_t result = partition->Open(O_RDWR, &fd);
+	if (result != B_OK)
+		return result;
+
+	// let the module do its job
+	result = fModule->set_content_name(fd, partition->ID(), name, job);
+
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 
@@ -148,8 +169,25 @@ status_t
 KFileSystem::SetContentParameters(KPartition* partition,
 	const char* parameters, disk_job_id job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !fModule)
+		return B_BAD_VALUE;
+	if (!fModule->set_content_parameters)
+		return B_NOT_SUPPORTED;
+
+	// open partition device
+	int fd = -1;
+	status_t result = partition->Open(O_RDWR, &fd);
+	if (result != B_OK)
+		return result;
+
+	// let the module do its job
+	result = fModule->set_content_parameters(fd, partition->ID(), parameters,
+		job);
+
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 
