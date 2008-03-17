@@ -21,7 +21,7 @@
 using std::nothrow;
 
 
-static const uint32 kDiskSystemFlags = 
+static const uint32 kDiskSystemFlags =
 	0
 //	| B_DISK_SYSTEM_SUPPORTS_CHECKING
 //	| B_DISK_SYSTEM_SUPPORTS_REPAIRING
@@ -155,6 +155,7 @@ BFSAddOn::Initialize(BMutablePartition* partition, const char* name,
 	uint32 blockSize = parameters.blockSize;
 	partition->SetBlockSize(blockSize);
 	partition->SetContentSize(partition->Size() / blockSize * blockSize);
+	partition->Changed(B_PARTITION_CHANGED_INITIALIZATION);
 
 	*_handle = handleDeleter.Detach();
 
