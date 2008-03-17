@@ -190,7 +190,7 @@ DrawingEngine::CopyToFront(/*const*/ BRegion& region)
 {
 	int32 count = region.CountRects();
 	for (int32 i = 0; i < count; i++)
-		fGraphicsCard->CopyBackToFront(region.RectAt(i));
+		fGraphicsCard->Invalidate(region.RectAt(i));
 }
 
 

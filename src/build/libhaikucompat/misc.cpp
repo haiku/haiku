@@ -35,3 +35,11 @@ fs_unmount_volume(const char *path, uint32 flags)
 	return B_ERROR;
 }
 
+
+int32
+atomic_get(vint32 *value)
+{
+	return *value;
+}
+
+
