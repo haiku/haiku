@@ -1,7 +1,15 @@
-/** \file ddm_userland_interface.cpp
+/*
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
  *
- * 	\brief Interface for userspace calls.
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
  */
+
+/*! \file ddm_userland_interface.cpp
+
+ 	\brief Interface for userspace calls.
+*/
 
 #include <stdlib.h>
 
@@ -33,8 +41,8 @@ using namespace BPrivate::DiskDevice;
 // ddm_strlcpy
 /*! \brief Wrapper around user_strlcpy() that returns a status_t
 	indicating appropriate success or failure.
-	
-	\param allowTruncation If \c true, does not return an error if 
+
+	\param allowTruncation If \c true, does not return an error if
 	       \a from is longer than \to. If \c false, returns \c B_NAME_TOO_LONG
 	       if \a from is longer than \to.
 */
@@ -216,7 +224,7 @@ _user_get_next_disk_device_id(int32 *_cookie, size_t *neededSize)
 		return B_BAD_VALUE;
 	int32 cookie;
 	user_memcpy(&cookie, _cookie, sizeof(cookie));
-	
+
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the next device
@@ -250,7 +258,7 @@ _user_find_disk_device(const char *_filename, size_t *neededSize)
 	status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
 	if (error)
 		return error;
-		
+
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// find the device
@@ -425,7 +433,7 @@ status_t
 _user_unregister_file_device(partition_id deviceID, const char *_filename)
 {
 	if (deviceID < 0 && !_filename)
-		return B_BAD_VALUE;	
+		return B_BAD_VALUE;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (deviceID >= 0) {
 		return manager->DeleteFileDevice(deviceID);
@@ -1232,6 +1240,9 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 
 	// uninitialize
 	error = partition->UninitializeContents(true);
+
+	partition->UnmarkBusy(true);
+
 	if (error != B_OK)
 		return error;
 
