@@ -300,7 +300,7 @@ boot_splash_fb_blit32_cropped(const uint8 *data, uint16 imageLeft,
 		const uint8* src = data;
 		uint32* dst = start;
 		for (int32 x = imageLeft; x < imageRight; x++) {
-			dst[0] = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
+			dst[0] = (src[2] << 16) | (src[1] << 8) | (src[0]);
 			dst++;
 			src += 3;
 		}
