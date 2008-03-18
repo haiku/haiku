@@ -226,7 +226,7 @@ main2(void *unused)
 	boot_splash_fb_init(&sKernelArgs);
 
 	TRACE("Init modules\n");
-	boot_splash_set_stage(BOOT_SPLASH_STAGE_1);
+	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);
 	module_init(&sKernelArgs);
 
 	// ToDo: the preloaded image debug data is placed in the kernel args, and
@@ -250,11 +250,11 @@ main2(void *unused)
 
 	/* bootstrap all the filesystems */
 	TRACE("Bootstrap file systems\n");
-	boot_splash_set_stage(BOOT_SPLASH_STAGE_2);
+	boot_splash_set_stage(BOOT_SPLASH_STAGE_2_BOOTSTRAP_FS);
 	vfs_bootstrap_file_systems();
 
 	TRACE("Init Device Manager\n");
-	boot_splash_set_stage(BOOT_SPLASH_STAGE_3);
+	boot_splash_set_stage(BOOT_SPLASH_STAGE_3_INIT_DEVICES);
 	device_manager_init(&sKernelArgs);
 
 	TRACE("Add preloaded old-style drivers\n");
@@ -266,15 +266,15 @@ main2(void *unused)
 	int_init_post_device_manager(&sKernelArgs);
 
 	TRACE("Mount boot file system\n");
-	boot_splash_set_stage(BOOT_SPLASH_STAGE_4);
+	boot_splash_set_stage(BOOT_SPLASH_STAGE_4_MOUNT_BOOT_FS);
 	vfs_mount_boot_file_system(&sKernelArgs);
 
 	// CPU specific modules may now be available
-	boot_splash_set_stage(BOOT_SPLASH_STAGE_5);
+	boot_splash_set_stage(BOOT_SPLASH_STAGE_5_INIT_CPU_MODULES);
 	cpu_init_post_modules(&sKernelArgs);
 
 	TRACE("vm_init_post_modules\n");
-	boot_splash_set_stage(BOOT_SPLASH_STAGE_6);
+	boot_splash_set_stage(BOOT_SPLASH_STAGE_6_INIT_VM_MODULES);
 	vm_init_post_modules(&sKernelArgs);
 	
 	TRACE("debug_init_post_modules\n");
@@ -283,7 +283,7 @@ main2(void *unused)
 	TRACE("device_manager_init_post_modules\n");
 	device_manager_init_post_modules(&sKernelArgs);
 
-	boot_splash_set_stage(BOOT_SPLASH_STAGE_7);
+	boot_splash_set_stage(BOOT_SPLASH_STAGE_7_RUN_BOOT_SCRIPT);
 	// start the init process
 	{
 		const char *shellArgs[] = {"/bin/sh", "/boot/beos/system/boot/Bootscript", NULL};

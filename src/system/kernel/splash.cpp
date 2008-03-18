@@ -335,37 +335,17 @@ boot_splash_set_stage(int stage)
 	if (!sBootSplash.enabled)
 		return;
 
+	if (stage < 0 || stage >= BOOT_SPLASH_STAGE_MAX)
+		return;
+
+	// TODO: Use placement info from images.h
 	int x = sBootSplash.width / 2 - iconsWidth / 2;
 	int y = sBootSplash.height / 2 - splashHeight / 2;
 	y = y + splashHeight;
-	
-	int stageOffset = 0;
-	switch (stage) {
-		case BOOT_SPLASH_STAGE_1:
-			stageOffset = 32;
-			break;
-		case BOOT_SPLASH_STAGE_2:
-			stageOffset = 74;
-			break;
-		case BOOT_SPLASH_STAGE_3:
-			stageOffset = 116;
-			break;
-		case BOOT_SPLASH_STAGE_4:
-			stageOffset = 158;
-			break;
-		case BOOT_SPLASH_STAGE_5:
-			stageOffset = 200;
-			break;
-		case BOOT_SPLASH_STAGE_6:
-			stageOffset = 242;
-			break;
-		case BOOT_SPLASH_STAGE_7:
-		default:
-			stageOffset = iconsWidth;
-			break;
-	}
 
-	boot_splash_fb_blit_cropped(iconsImage, 0, 0, stageOffset, 32,
-		iconsWidth, iconsHeight, iconsPalette, x, y );
+	int stageLeftEdge = iconsWidth * stage / BOOT_SPLASH_STAGE_MAX;
+	int stageRightEdge = iconsWidth * (stage + 1) / BOOT_SPLASH_STAGE_MAX;
+	boot_splash_fb_blit_cropped(iconsImage, stageLeftEdge, 0,
+		stageRightEdge, 32, iconsWidth, iconsHeight, iconsPalette, x, y );
 }
 
