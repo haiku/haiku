@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -64,7 +64,7 @@ FontFamily::FontFamily(const char *name, uint16 id)
 
 /*!
 	\brief Destructor
-	
+
 	Deletes all attached styles. Note that a FontFamily must only be deleted
 	by the font manager.
 */
@@ -102,7 +102,7 @@ FontFamily::AddStyle(FontStyle *style)
 	if (!style)
 		return false;
 
-	// Don't add if it already is in the family.	
+	// Don't add if it already is in the family.
 	int32 count = fStyles.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		FontStyle *item = fStyles.ItemAt(i);
@@ -157,6 +157,23 @@ FontFamily::CountStyles() const
 }
 
 
+FontStyle*
+FontFamily::_FindStyle(const char* name) const
+{
+	int32 count = fStyles.CountItems();
+	if (!name || count < 1)
+		return NULL;
+
+	for (int32 i = 0; i < count; i++) {
+		FontStyle *style = fStyles.ItemAt(i);
+		if (!strcmp(style->Name(), name))
+			return style;
+	}
+
+	return NULL;
+}
+
+
 /*!
 	\brief Determines whether the style belongs to the family
 	\param style Name of the style being checked
@@ -165,11 +182,11 @@ FontFamily::CountStyles() const
 bool
 FontFamily::HasStyle(const char *styleName) const
 {
-	return GetStyle(styleName) != NULL;
+	return _FindStyle(styleName) != NULL;
 }
 
 
-/*! 
+/*!
 	\brief Returns the name of a style in the family
 	\param index list index of the style to be found
 	\return name of the style or NULL if the index is not valid
@@ -185,20 +202,40 @@ FontFamily::StyleAt(int32 index) const
 	\brief Get the FontStyle object for the name given
 	\param style Name of the style to be obtained
 	\return The FontStyle object or NULL if none was found.
-	
+
 	The object returned belongs to the family and must not be deleted.
 */
 FontStyle*
-FontFamily::GetStyle(const char *styleName) const
+FontFamily::GetStyle(const char *name) const
 {
-	int32 count = fStyles.CountItems();
-	if (!styleName || count < 1)
+	if (name == NULL || !name[0])
 		return NULL;
 
-	for (int32 i = 0; i < count; i++) {
-		FontStyle *style = fStyles.ItemAt(i);
-		if (!strcmp(style->Name(), styleName))
-			return style;
+	FontStyle* style = _FindStyle(name);
+	if (style != NULL)
+		return style;
+
+	// try alternative names
+
+	if (!strcmp(name, "Roman") || !strcmp(name, "Regular")
+		|| !strcmp(name, "Book")) {
+		style = _FindStyle("Roman");
+		if (style == NULL) {
+			style = _FindStyle("Regular");
+			if (style == NULL)
+				style = _FindStyle("Book");
+		}
+		return style;
+	}
+
+	BString alternative = name;
+	if (alternative.FindFirst("Italic") >= 0) {
+		alternative.ReplaceFirst("Italic", "Oblique");
+		return _FindStyle(alternative.String());
+	}
+	if (alternative.FindFirst("Oblique") >= 0) {
+		alternative.ReplaceFirst("Oblique", "Italic");
+		return _FindStyle(alternative.String());
 	}
 
 	return NULL;
@@ -228,7 +265,7 @@ FontFamily::GetStyleMatchingFace(uint16 face) const
 	int32 count = fStyles.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		FontStyle* style = fStyles.ItemAt(i);
-		
+
 		if (style->Face() == face)
 			return style;
 	}
@@ -253,6 +290,6 @@ FontFamily::Flags()
 				fFlags |= B_HAS_TUNED_FONT;
 		}
 	}
-	
+
 	return fFlags;
 }

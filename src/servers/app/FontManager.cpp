@@ -317,11 +317,11 @@ FontManager::_LoadRecentFontMappings()
 	// default known mappings
 	// TODO: load them for real, and use these as a fallback
 
-	_AddDefaultMapping("Bitstream Vera Sans", "Roman", 
+	_AddDefaultMapping("Bitstream Vera Sans", "Roman",
 		"/boot/beos/etc/fonts/ttfonts/Vera.ttf");
-	_AddDefaultMapping("Bitstream Vera Sans", "Bold", 
+	_AddDefaultMapping("Bitstream Vera Sans", "Bold",
 		"/boot/beos/etc/fonts/ttfonts/VeraBd.ttf");
-	_AddDefaultMapping("Bitstream Vera Sans Mono", "Roman", 
+	_AddDefaultMapping("Bitstream Vera Sans Mono", "Roman",
 		"/boot/beos/etc/fonts/ttfonts/VeraMono.ttf");
 
 	return false;
@@ -572,7 +572,7 @@ FontManager::_FindDirectory(node_ref& nodeRef)
 	for (int32 i = fDirectories.CountItems(); i-- > 0;) {
 		font_directory* directory = fDirectories.ItemAt(i);
 
-		if (directory->directory == nodeRef) 
+		if (directory->directory == nodeRef)
 			return directory;
 	}
 
@@ -768,7 +768,7 @@ FontManager::_ScanFontDirectory(font_directory& fontDirectory)
 
 /*!
 	\brief Finds and returns the first valid charmap in a font
-	
+
 	\param face Font handle obtained from FT_Load_Face()
 	\return An FT_CharMap or NULL if unsuccessful
 */
@@ -943,8 +943,8 @@ FontManager::GetStyleByIndex(const char* familyName, int32 index)
 	\return The FontStyle having those attributes or NULL if not available
 */
 FontStyle*
-FontManager::GetStyle(const char* familyName, const char* styleName, uint16 familyID,
-	uint16 styleID, uint16 face)
+FontManager::GetStyle(const char* familyName, const char* styleName,
+	uint16 familyID, uint16 styleID, uint16 face)
 {
 	FontFamily* family;
 
