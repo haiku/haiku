@@ -196,7 +196,7 @@ find_nearest(uint64 value, int iteration)
 }
 
 
-static status_t
+static void
 set_memory_write_back(int32 id, uint64 base, uint64 length)
 {
 	int i;
