@@ -965,6 +965,11 @@ page_writer(void* /*unused*/)
 			}
 
 			InterruptsSpinLocker locker(sPageLock);
+
+			// state might have change while we were locking the cache
+			if (page->state != PAGE_STATE_MODIFIED)
+				continue;
+
 			remove_page_from_queue(&sModifiedPageQueue, page);
 			page->state = PAGE_STATE_BUSY;
 			page->busy_writing = true;
