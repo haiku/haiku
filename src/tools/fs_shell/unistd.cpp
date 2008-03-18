@@ -25,7 +25,9 @@
 #		include <sys/ioctl.h>
 #		include <sys/stat.h>
 #		include <sys/disk.h>
-#		include <sys/disklabel.h>
+#		ifndef HAIKU_HOST_PLATFORM_DARWIN
+#			include <sys/disklabel.h>
+#		endif
 #	else
 		// the (POSIX) correct place of definition for ioctl()
 #		include <stropts.h>
