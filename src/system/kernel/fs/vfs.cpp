@@ -1071,7 +1071,7 @@ create_advisory_locking(struct vnode *vnode)
 	// else might set one at the same time
 	do {
 		if (atomic_test_and_set((vint32 *)&vnode->advisory_locking,
-				(addr_t)locking, NULL) == NULL)
+				(addr_t)locking, (addr_t)NULL) == (addr_t)NULL)
 			return B_OK;
 	} while (get_advisory_locking(vnode) == NULL);
 
@@ -1649,7 +1649,7 @@ get_dir_path_and_leaf(char *path, char *filename)
 
 static status_t
 entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
-	struct vnode **_vnode)
+	bool traverse, struct vnode **_vnode)
 {
 	char clonedName[B_FILE_NAME_LENGTH + 1];
 	if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
@@ -1662,7 +1662,7 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
 	if (status < 0)
 		return status;
 
-	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL,
+	return vnode_path_to_vnode(directory, clonedName, traverse, 0, _vnode, NULL,
 		NULL);
 }
 
@@ -3225,7 +3225,7 @@ extern "C" status_t
 vfs_entry_ref_to_vnode(dev_t mountID, ino_t directoryID,
 	const char *name, struct vnode **_vnode)
 {
-	return entry_ref_to_vnode(mountID, directoryID, name, _vnode);
+	return entry_ref_to_vnode(mountID, directoryID, name, false, _vnode);
 }
 
 
@@ -3661,7 +3661,7 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	if (leaf && (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0)) {
 		// special cases "." and "..": we can directly get the vnode of the
 		// referenced directory
-		status = entry_ref_to_vnode(device, inode, leaf, &vnode);
+		status = entry_ref_to_vnode(device, inode, leaf, false, &vnode);
 		leaf = NULL;
 	} else
 		status = get_vnode(device, inode, &vnode, true, false);
@@ -4224,8 +4224,10 @@ file_create(int fd, char *path, int openMode, int perms, bool kernel)
 
 
 static int
-file_open_entry_ref(dev_t mountID, ino_t directoryID, const char *name, int openMode, bool kernel)
+file_open_entry_ref(dev_t mountID, ino_t directoryID, const char *name,
+	int openMode, bool kernel)
 {
+	bool traverse = ((openMode & O_NOTRAVERSE) == 0);
 	struct vnode *vnode;
 	int status;
 
@@ -4236,7 +4238,7 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char *name, int open
 		mountID, directoryID, name, openMode));
 
 	// get the vnode matching the entry_ref
-	status = entry_ref_to_vnode(mountID, directoryID, name, &vnode);
+	status = entry_ref_to_vnode(mountID, directoryID, name, traverse, &vnode);
 	if (status < B_OK)
 		return status;
 
@@ -4244,7 +4246,8 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char *name, int open
 	if (status < B_OK)
 		put_vnode(vnode);
 
-	cache_node_opened(vnode, FDTYPE_FILE, vnode->cache, mountID, directoryID, vnode->id, name);
+	cache_node_opened(vnode, FDTYPE_FILE, vnode->cache, mountID, directoryID,
+		vnode->id, name);
 	return status;
 }
 
@@ -4483,7 +4486,7 @@ dir_open_entry_ref(dev_t mountID, ino_t parentID, const char *name, bool kernel)
 
 	// get the vnode matching the entry_ref/node_ref
 	if (name)
-		status = entry_ref_to_vnode(mountID, parentID, name, &vnode);
+		status = entry_ref_to_vnode(mountID, parentID, name, true, &vnode);
 	else
 		status = get_vnode(mountID, parentID, &vnode, true, false);
 	if (status < B_OK)
@@ -4493,7 +4496,8 @@ dir_open_entry_ref(dev_t mountID, ino_t parentID, const char *name, bool kernel)
 	if (status < B_OK)
 		put_vnode(vnode);
 
-	cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, mountID, parentID, vnode->id, name);
+	cache_node_opened(vnode, FDTYPE_DIR, vnode->cache, mountID, parentID,
+		vnode->id, name);
 	return status;
 }
 
@@ -4863,7 +4867,7 @@ common_lock_node(int fd, bool kernel)
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
 	if (atomic_test_and_set((vint32 *)&vnode->mandatory_locked_by,
-			(addr_t)descriptor, NULL) != NULL)
+			(addr_t)descriptor, (addr_t)NULL) != (addr_t)NULL)
 		status = B_BUSY;
 
 	put_fd(descriptor);
@@ -4886,7 +4890,7 @@ common_unlock_node(int fd, bool kernel)
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
 	if (atomic_test_and_set((vint32 *)&vnode->mandatory_locked_by,
-			NULL, (addr_t)descriptor) != (int32)descriptor)
+			(addr_t)NULL, (addr_t)descriptor) != (int32)descriptor)
 		status = B_BAD_VALUE;
 
 	put_fd(descriptor);
