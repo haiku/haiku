@@ -35,7 +35,7 @@ struct boot_splash_info {
 
 static struct boot_splash_info sBootSplash;
 
-
+/*
 static void
 boot_splash_fb_vga_set_palette(const uint8 *palette, int32 firstIndex,
 	int32 numEntries)
@@ -55,6 +55,8 @@ static void
 boot_splash_fb_blit4(const uint8 *data, uint16 width,
 	uint16 height, const uint8 *palette, uint16 left, uint16 top)
 {
+	if (!data || !palette)
+		return;
 	// ToDo: no blit yet in VGA mode
 }
 
@@ -63,6 +65,9 @@ static void
 boot_splash_fb_blit8(const uint8 *data, uint16 width,
 	uint16 height, const uint8 *palette, uint16 left, uint16 top)
 {
+	if (!data || !palette)
+		return;
+
 	boot_splash_fb_vga_set_palette(palette, 0, 256);
 
 	addr_t start = sBootSplash.frame_buffer + sBootSplash.bytes_per_row * top
@@ -76,115 +81,152 @@ boot_splash_fb_blit8(const uint8 *data, uint16 width,
 
 
 static void
-boot_splash_fb_blit15(const uint8 *data, uint16 width,
-	uint16 height, const uint8 *palette, uint16 left, uint16 top)
+boot_splash_fb_blit15(const uint8 *data, uint16 width, uint16 height,
+	uint16 left, uint16 top)
 {
-	uint16 *start = (uint16 *)(sBootSplash.frame_buffer
+	uint16* start = (uint16*)(sBootSplash.frame_buffer
 		+ sBootSplash.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint16* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-
-			start[x] = ((palette[color + 0] >> 3) << 10)
-				| ((palette[color + 1] >> 3) << 5)
-				| ((palette[color + 2] >> 3));
+			dst[0] = ((src[2] >> 3) << 10)
+				| ((src[1] >> 3) << 5)
+				| ((src[0] >> 3));
+			dst++;
+			src += 3;
 		}
 
-		start = (uint16 *)((addr_t)start
-			+ sBootSplash.bytes_per_row);
+		data += width * 3;
+		start = (uint16*)((addr_t)start + sBootSplash.bytes_per_row);
 	}
 }
 
 
 static void
-boot_splash_fb_blit16(const uint8 *data, uint16 width,
-	uint16 height, const uint8 *palette, uint16 left, uint16 top)
+boot_splash_fb_blit16(const uint8 *data, uint16 width, uint16 height,
+	uint16 left, uint16 top)
 {
-	uint16 *start = (uint16 *)(sBootSplash.frame_buffer
+	uint16* start = (uint16*)(sBootSplash.frame_buffer
 		+ sBootSplash.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint16* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-
-			start[x] = ((palette[color + 0] >> 3) << 11)
-				| ((palette[color + 1] >> 2) << 5)
-				| ((palette[color + 2] >> 3));
+			dst[0] = ((src[2] >> 3) << 11)
+				| ((src[1] >> 2) << 5)
+				| ((src[0] >> 3));
+			dst++;
+			src += 3;
 		}
 
-		start = (uint16 *)((addr_t)start
-			+ sBootSplash.bytes_per_row);
+		data += width * 3;
+		start = (uint16*)((addr_t)start + sBootSplash.bytes_per_row);
 	}
 }
 
 
 static void
-boot_splash_fb_blit24(const uint8 *data, uint16 width,
-	uint16 height, const uint8 *palette, uint16 left, uint16 top)
+boot_splash_fb_blit24(const uint8 *data, uint16 width, uint16 height,
+	uint16 left, uint16 top)
 {
-	uint8 *start = (uint8 *)sBootSplash.frame_buffer
+	uint8* start = (uint8*)sBootSplash.frame_buffer
 		+ sBootSplash.bytes_per_row * top + 3 * left;
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint8* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-			uint32 index = x * 3;
-
-			start[index + 0] = palette[color + 2];
-			start[index + 1] = palette[color + 1];
-			start[index + 2] = palette[color + 0];
+			dst[0] = src[2];
+			dst[1] = src[1];
+			dst[2] = src[0];
+			dst += 3;
+			src += 3;
 		}
 
+		data += width * 3;
 		start = start + sBootSplash.bytes_per_row;
 	}
 }
 
 
 static void
-boot_splash_fb_blit32(const uint8 *data, uint16 width,
-	uint16 height, const uint8 *palette, uint16 left, uint16 top)
+boot_splash_fb_blit32(const uint8 *data, uint16 width, uint16 height,
+	uint16 left, uint16 top)
 {
-	uint32 *start = (uint32 *)(sBootSplash.frame_buffer
+	uint32* start = (uint32*)(sBootSplash.frame_buffer
 		+ sBootSplash.bytes_per_row * top + 4 * left);
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint32* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-
-			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8)
-				| (palette[color + 2]);
+			dst[0] = (src[2] << 16) | (src[1] << 8) | (src[0]);
+			dst++;
+			src += 3;
 		}
 
-		start = (uint32 *)((addr_t)start
-			+ sBootSplash.bytes_per_row);
+		data += width * 3;
+		start = (uint32*)((addr_t)start + sBootSplash.bytes_per_row);
 	}
 }
 
 
 static void
-boot_splash_fb_blit(const uint8 *data, uint16 width,
+boot_splash_fb_blit(const uint8 *data, const uint8* indexedData, uint16 width,
 	uint16 height, const uint8 *palette, uint16 left, uint16 top)
 {
 	switch (sBootSplash.depth) {
 		case 4:
-			boot_splash_fb_blit4(data, width, height, palette, left, top);
+			boot_splash_fb_blit4(indexedData, width, height, palette,
+				left, top);
 			return;
 		case 8:
-			boot_splash_fb_blit8(data, width, height, palette, left, top);
+			boot_splash_fb_blit8(indexedData, width, height, palette,
+				left, top);
 			return;
 		case 15:
-			boot_splash_fb_blit15(data, width, height, palette, left, top);
+			boot_splash_fb_blit15(data, width, height, left, top);
 			return;
 		case 16:
-			boot_splash_fb_blit16(data, width, height, palette, left, top);
+			boot_splash_fb_blit16(data, width, height, left, top);
 			return;
 		case 24:
-			boot_splash_fb_blit24(data, width, height, palette, left, top);
+			boot_splash_fb_blit24(data, width, height, left, top);
 			return;
 		case 32:
-			boot_splash_fb_blit32(data, width, height, palette, left, top);
+			boot_splash_fb_blit32(data, width, height, left, top);
 			return;
+	}
+}
+*/
+
+static void
+boot_splash_fb_blit15_cropped(const uint8 *data, uint16 imageLeft,
+	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
+	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+{
+	data += (imageWidth * imageTop + imageLeft) * 3;
+	uint16* start = (uint16*)(sBootSplash.frame_buffer
+		+ sBootSplash.bytes_per_row * (top + imageTop)
+		+ 2 * (left + imageLeft));
+
+	for (int32 y = imageTop; y < imageBottom; y++) {
+		const uint8* src = data;
+		uint16* dst = start;
+		for (int32 x = imageLeft; x < imageRight; x++) {
+			dst[0] = ((src[2] >> 3) << 10)
+				| ((src[1] >> 3) << 5)
+				| ((src[0] >> 3));
+
+			dst++;
+			src += 3;
+		}
+
+		data += imageWidth * 3;
+		start = (uint16*)((addr_t)start + sBootSplash.bytes_per_row);
 	}
 }
 
@@ -194,23 +236,52 @@ boot_splash_fb_blit16_cropped(const uint8 *data, uint16 imageLeft,
 	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
 	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
 {
-	int32 dataOffset = (imageWidth * imageTop) + imageLeft;
-
-	uint16 *start = (uint16 *)(sBootSplash.frame_buffer
-		+ sBootSplash.bytes_per_row * top + 2 * left);
+	data += (imageWidth * imageTop + imageLeft) * 3;
+	uint16* start = (uint16*)(sBootSplash.frame_buffer
+		+ sBootSplash.bytes_per_row * (top + imageTop)
+		+ 2 * (left + imageLeft));
 
 	for (int32 y = imageTop; y < imageBottom; y++) {
+		const uint8* src = data;
+		uint16* dst = start;
 		for (int32 x = imageLeft; x < imageRight; x++) {
-			uint16 color = data[(y * (imageWidth)) + x] * 3;
+			dst[0] = ((src[2] >> 3) << 11)
+				| ((src[1] >> 2) << 5)
+				| ((src[0] >> 3));
 
-			start[x] = ((palette[color + 0] >> 3) << 11)
-				| ((palette[color + 1] >> 2) << 5)
-				| ((palette[color + 2] >> 3));
-			dataOffset += imageWidth;
+			dst++;
+			src += 3;
 		}
 
+		data += imageWidth * 3;
+		start = (uint16*)((addr_t)start + sBootSplash.bytes_per_row);
+	}
+}
 
-		start = (uint16 *)((addr_t)start + sBootSplash.bytes_per_row);
+
+static void
+boot_splash_fb_blit24_cropped(const uint8 *data, uint16 imageLeft,
+	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
+	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+{
+	data += (imageWidth * imageTop + imageLeft) * 3;
+	uint8* start = (uint8*)(sBootSplash.frame_buffer
+		+ sBootSplash.bytes_per_row * (top + imageTop)
+		+ 3 * (left + imageLeft));
+
+	for (int32 y = imageTop; y < imageBottom; y++) {
+		const uint8* src = data;
+		uint8* dst = start;
+		for (int32 x = imageLeft; x < imageRight; x++) {
+			dst[0] = src[0];
+			dst[1] = src[1];
+			dst[2] = src[2];
+			dst += 3;
+			src += 3;
+		}
+
+		data += imageWidth * 3;
+		start = (uint8*)((addr_t)start + sBootSplash.bytes_per_row);
 	}
 }
 
@@ -220,38 +291,48 @@ boot_splash_fb_blit32_cropped(const uint8 *data, uint16 imageLeft,
 	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
 	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
 {
-	int32 dataOffset = (imageWidth * imageTop) + imageLeft;
-
-	uint32 *start = (uint32 *)(sBootSplash.frame_buffer
-		+ sBootSplash.bytes_per_row * top + 4 * left);
+	data += (imageWidth * imageTop + imageLeft) * 3;
+	uint32* start = (uint32*)(sBootSplash.frame_buffer
+		+ sBootSplash.bytes_per_row * (top + imageTop)
+		+ 4 * (left + imageLeft));
 
 	for (int32 y = imageTop; y < imageBottom; y++) {
+		const uint8* src = data;
+		uint32* dst = start;
 		for (int32 x = imageLeft; x < imageRight; x++) {
-			uint16 color = data[(y * (imageWidth)) + x] * 3;
-
-			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8)
-				| (palette[color + 2]);
-			dataOffset += imageWidth;
+			dst[0] = (src[0] << 16) | (src[1] << 8) | (src[2]);
+			dst++;
+			src += 3;
 		}
 
-
-		start = (uint32 *)((addr_t)start + sBootSplash.bytes_per_row);
+		data += imageWidth * 3;
+		start = (uint32*)((addr_t)start + sBootSplash.bytes_per_row);
 	}
 }
 
 
 static void
-boot_splash_fb_blit_cropped(const uint8 *data, uint16 imageLeft,
-	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+boot_splash_fb_blit_cropped(const uint8* data, const uint8* indexedData,
+	uint16 imageLeft, uint16 imageTop, uint16 imageRight, uint16 imageBottom,
+	uint16 imageWidth, uint16 imageHeight, const uint8 *palette,
+	uint16 left, uint16 top)
 {
 	switch (sBootSplash.depth) {
 		case 4:
 		case 8:
+			return;
 		case 15:
+			boot_splash_fb_blit15_cropped(data, imageLeft, imageTop,
+				imageRight, imageBottom, imageWidth, imageHeight, palette,
+				left, top);
 			return;
 		case 16:
 			boot_splash_fb_blit16_cropped(data, imageLeft, imageTop,
+				imageRight, imageBottom, imageWidth, imageHeight, palette,
+				left, top);
+			return;
+		case 24:
+			boot_splash_fb_blit24_cropped(data, imageLeft, imageTop,
 				imageRight, imageBottom, imageWidth, imageHeight, palette,
 				left, top);
 			return;
@@ -259,8 +340,6 @@ boot_splash_fb_blit_cropped(const uint8 *data, uint16 imageLeft,
 			boot_splash_fb_blit32_cropped(data, imageLeft, imageTop,
 				imageRight, imageBottom, imageWidth, imageHeight, palette,
 				left, top);
-			return;
-		case 24:
 			return;
 	}
 }
@@ -304,7 +383,7 @@ boot_splash_fb_init(struct kernel_args *args)
 {
 	TRACE("boot_splash_fb_init: enter\n");
 
-	if (!args->frame_buffer.enabled) {
+	if (!args->frame_buffer.enabled/* || sDebugScreenEnabled*/) {
 		sBootSplash.enabled = false;
 		return B_OK;
 	}
@@ -339,13 +418,15 @@ boot_splash_set_stage(int stage)
 		return;
 
 	// TODO: Use placement info from images.h
-	int x = sBootSplash.width / 2 - iconsWidth / 2;
-	int y = sBootSplash.height / 2 - splashHeight / 2;
-	y = y + splashHeight;
+	int x = sBootSplash.width / 2 - kSplashIconsWidth / 2;
+	int y = sBootSplash.height / 2 - kSplashLogoHeight / 2;
+	y = y + kSplashLogoHeight;
 
-	int stageLeftEdge = iconsWidth * stage / BOOT_SPLASH_STAGE_MAX;
-	int stageRightEdge = iconsWidth * (stage + 1) / BOOT_SPLASH_STAGE_MAX;
-	boot_splash_fb_blit_cropped(iconsImage, stageLeftEdge, 0,
-		stageRightEdge, 32, iconsWidth, iconsHeight, iconsPalette, x, y );
+	int stageLeftEdge = kSplashIconsWidth * stage / BOOT_SPLASH_STAGE_MAX;
+	int stageRightEdge = kSplashIconsWidth * (stage + 1)
+		/ BOOT_SPLASH_STAGE_MAX;
+	boot_splash_fb_blit_cropped(kSplashIconsImage, NULL, stageLeftEdge, 0,
+		stageRightEdge, kSplashIconsHeight / 2,
+		kSplashIconsWidth, kSplashIconsHeight, NULL, x, y );
 }
 

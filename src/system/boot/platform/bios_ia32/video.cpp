@@ -547,20 +547,21 @@ set_text_mode(void)
 
 
 static void
-blit32(const uint8 *data, uint16 width, uint16 height,
-	const uint8 *palette, uint16 left, uint16 top)
+blit32(const uint8 *data, uint16 width, uint16 height, uint16 left, uint16 top)
 {
 	uint32 *start = (uint32 *)(sFrameBuffer
 		+ gKernelArgs.frame_buffer.bytes_per_row * top + 4 * left);
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint32* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-
-			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8)
-				| (palette[color + 2]);
+			dst[0] = (src[0] << 16) | (src[1] << 8) | (src[2]);
+			dst++;
+			src += 3;
 		}
 
+		data += width * 3;
 		start = (uint32 *)((addr_t)start
 			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
@@ -568,43 +569,46 @@ blit32(const uint8 *data, uint16 width, uint16 height,
 
 
 static void
-blit24(const uint8 *data, uint16 width, uint16 height,
-	const uint8 *palette, uint16 left, uint16 top)
+blit24(const uint8 *data, uint16 width, uint16 height, uint16 left, uint16 top)
 {
 	uint8 *start = (uint8 *)sFrameBuffer
 		+ gKernelArgs.frame_buffer.bytes_per_row * top + 3 * left;
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint8* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-			uint32 index = x * 3;
-
-			start[index + 0] = palette[color + 2];
-			start[index + 1] = palette[color + 1];
-			start[index + 2] = palette[color + 0];
+			dst[0] = src[0];
+			dst[1] = src[1];
+			dst[2] = src[2];
+			dst += 3;
+			src += 3;
 		}
 
+		data += width * 3;
 		start = start + gKernelArgs.frame_buffer.bytes_per_row;
 	}
 }
 
 
 static void
-blit16(const uint8 *data, uint16 width, uint16 height,
-	const uint8 *palette, uint16 left, uint16 top)
+blit16(const uint8 *data, uint16 width, uint16 height, uint16 left, uint16 top)
 {
 	uint16 *start = (uint16 *)(sFrameBuffer
 		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint16* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-
-			start[x] = ((palette[color + 0] >> 3) << 11)
-				| ((palette[color + 1] >> 2) << 5)
-				| ((palette[color + 2] >> 3));
+			dst[0] = ((src[2] >> 3) << 11)
+				| ((src[1] >> 2) << 5)
+				| ((src[0] >> 3));
+			dst++;
+			src += 3;
 		}
 
+		data += width * 3;
 		start = (uint16 *)((addr_t)start
 			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
@@ -612,21 +616,23 @@ blit16(const uint8 *data, uint16 width, uint16 height,
 
 
 static void
-blit15(const uint8 *data, uint16 width, uint16 height,
-	const uint8 *palette, uint16 left, uint16 top)
+blit15(const uint8 *data, uint16 width, uint16 height, uint16 left, uint16 top)
 {
 	uint16 *start = (uint16 *)(sFrameBuffer
 		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
 
 	for (int32 y = 0; y < height; y++) {
+		const uint8* src = data;
+		uint16* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			uint16 color = data[y * width + x] * 3;
-
-			start[x] = ((palette[color + 0] >> 3) << 10)
-				| ((palette[color + 1] >> 3) << 5)
-				| ((palette[color + 2] >> 3));
+			dst[0] = ((src[2] >> 3) << 10)
+				| ((src[1] >> 3) << 5)
+				| ((src[0] >> 3));
+			dst++;
+			src += 3;
 		}
 
+		data += width * 3;
 		start = (uint16 *)((addr_t)start
 			+ gKernelArgs.frame_buffer.bytes_per_row);
 	}
@@ -637,6 +643,9 @@ static void
 blit8(const uint8 *data, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
+	if (!data || !palette)
+		return;
+
 	if (vesa_set_palette((const uint8 *)palette, 0, 256) != B_OK)
 		dprintf("set palette failed!\n");
 
@@ -654,6 +663,8 @@ static void
 blit4(const uint8 *data, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
+	if (!data || !palette)
+		return;
 	//	vga_set_palette((const uint8 *)kPalette16, 0, 16);
 	// ToDo: no boot logo yet in VGA mode
 #if 1
@@ -700,22 +711,22 @@ blit4(const uint8 *data, uint16 width, uint16 height,
 
 
 static void
-blit_8bit_image(const uint8 *data, uint16 width, uint16 height,
+blit_image(const uint8 *data, const uint8* indexedData, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
 	switch (gKernelArgs.frame_buffer.depth) {
 		case 4:
-			return blit4(data, width, height, palette, left, top);
+			return blit4(indexedData, width, height, palette, left, top);
 		case 8:
-			return blit8(data, width, height, palette, left, top);
+			return blit8(indexedData, width, height, palette, left, top);
 		case 15:
-			return blit15(data, width, height, palette, left, top);
+			return blit15(data, width, height, left, top);
 		case 16:
-			return blit16(data, width, height, palette, left, top);
+			return blit16(data, width, height, left, top);
 		case 24:
-			return blit24(data, width, height, palette, left, top);
+			return blit24(data, width, height, left, top);
 		case 32:
-			return blit32(data, width, height, palette, left, top);
+			return blit32(data, width, height, left, top);
 	}
 }
 
@@ -786,22 +797,26 @@ fallback:
 	}
 
 	// clear the video memory
-	memset((void *)sFrameBuffer, 255,
+	memset((void *)sFrameBuffer, 0,
 		gKernelArgs.frame_buffer.physical_buffer.size);
 
-	int x = gKernelArgs.frame_buffer.width / 2 - splashWidth / 2;
-	int y = gKernelArgs.frame_buffer.height / 2 - splashHeight / 2;
-	blit_8bit_image(splashImage, splashWidth, splashHeight, splashPalette, x, y);
+	// TODO: support indexed versions of the images!
+	// TODO: support compressed RGB image data
 
-	x = gKernelArgs.frame_buffer.width / 2 - iconsWidth / 2;
-	y = y + splashHeight;
-	uint16 iconsHalfHeight = iconsHeight / 2;
-	const uint8* lowerHalfIconImage = iconsImage + iconsWidth * iconsHalfHeight;
-	blit_8bit_image(lowerHalfIconImage, iconsWidth, iconsHalfHeight, iconsPalette, x, y);
+	// render splash logo
+	int x = gKernelArgs.frame_buffer.width / 2 - kSplashLogoWidth / 2;
+	int y = gKernelArgs.frame_buffer.height / 2 - kSplashLogoHeight / 2;
+	blit_image(kSplashLogoImage, NULL, kSplashLogoWidth, kSplashLogoHeight,
+		NULL, x, y);
 
-	x = gKernelArgs.frame_buffer.width / 2 - copyrightWidth / 2;
-	y = gKernelArgs.frame_buffer.height - copyrightHeight - 5;
-	blit_8bit_image(copyrightImage, copyrightWidth, copyrightHeight, copyrightPalette, x, y);
+	// render initial (grayed out) icons
+	x = gKernelArgs.frame_buffer.width / 2 - kSplashIconsWidth / 2;
+	y = y + kSplashLogoHeight;
+	uint16 iconsHalfHeight = kSplashIconsHeight / 2;
+	const uint8* lowerHalfIconImage = kSplashIconsImage
+		+ (kSplashIconsWidth * iconsHalfHeight) * 3;
+	blit_image(lowerHalfIconImage, NULL, kSplashIconsWidth, iconsHalfHeight,
+		NULL, x, y);
 }
 
 

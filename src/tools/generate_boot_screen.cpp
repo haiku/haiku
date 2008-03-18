@@ -164,14 +164,14 @@ parseImage(const char* filename, const char* baseName)
 int
 main(int argc, char* argv[])
 {
-	if (argc < 5) {
+	if (argc < 4) {
 		printf("Usage:\n");
-		printf("\t%s <splash.png> <icons.png> <copyright.png> <images.h>\n",
+		printf("\t%s <splash.png> <icons.png> <images.h>\n",
 			argv[0]);
 		return 0;
 	}
 
-	const char* headerFileName = argv[4];
+	const char* headerFileName = argv[3];
 
 	sOutput = fopen(headerFileName, "wb");
 	if (!sOutput)
@@ -182,7 +182,6 @@ main(int argc, char* argv[])
 
 	parseImage(argv[1], "kSplashLogo");
 	parseImage(argv[2], "kSplashIcons");
-	parseImage(argv[3], "kSplashCopyright");
 
 	fclose(sOutput);
 	return 0;
