@@ -216,6 +216,31 @@ boot_splash_fb_blit16_cropped(const uint8 *data, uint16 imageLeft,
 
 
 static void
+boot_splash_fb_blit32_cropped(const uint8 *data, uint16 imageLeft,
+	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
+	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+{
+	int32 dataOffset = (imageWidth * imageTop) + imageLeft;
+
+	uint32 *start = (uint32 *)(sBootSplash.frame_buffer
+		+ sBootSplash.bytes_per_row * top + 4 * left);
+
+	for (int32 y = imageTop; y < imageBottom; y++) {
+		for (int32 x = imageLeft; x < imageRight; x++) {
+			uint16 color = data[(y * (imageWidth)) + x] * 3;
+
+			start[x] = (palette[color + 0] << 16) | (palette[color + 1] << 8)
+				| (palette[color + 2]);
+			dataOffset += imageWidth;
+		}
+
+
+		start = (uint32 *)((addr_t)start + sBootSplash.bytes_per_row);
+	}
+}
+
+
+static void
 boot_splash_fb_blit_cropped(const uint8 *data, uint16 imageLeft,
 	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
 	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
@@ -230,8 +255,12 @@ boot_splash_fb_blit_cropped(const uint8 *data, uint16 imageLeft,
 				imageRight, imageBottom, imageWidth, imageHeight, palette,
 				left, top);
 			return;
-		case 24:
 		case 32:
+			boot_splash_fb_blit32_cropped(data, imageLeft, imageTop,
+				imageRight, imageBottom, imageWidth, imageHeight, palette,
+				left, top);
+			return;
+		case 24:
 			return;
 	}
 }
