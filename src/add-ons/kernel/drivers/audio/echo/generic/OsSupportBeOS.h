@@ -91,7 +91,8 @@ typedef int64 		LONGLONG;
 typedef uint64 		ULONGLONG ;
 typedef uint64 		*PULONGLONG ;
 typedef long 		*PKEVENT ;
-//#define NULL 0
+#undef NULL
+#define NULL 0
 #define CALLBACK
 
 #define CONST const
