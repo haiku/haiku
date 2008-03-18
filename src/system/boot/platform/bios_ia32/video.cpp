@@ -556,7 +556,7 @@ blit32(const uint8 *data, uint16 width, uint16 height, uint16 left, uint16 top)
 		const uint8* src = data;
 		uint32* dst = start;
 		for (int32 x = 0; x < width; x++) {
-			dst[0] = (src[0] << 16) | (src[1] << 8) | (src[2]);
+			dst[0] = (src[0] << 24) | (src[1] << 16) | (src[2] << 8);
 			dst++;
 			src += 3;
 		}
