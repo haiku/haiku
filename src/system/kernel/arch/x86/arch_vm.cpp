@@ -1,5 +1,6 @@
 /*
  * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, Jérôme Duval.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -163,22 +164,29 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 }
 
 
-static int64 sols[5];
+#define MTRR_MAX_SOLUTIONS 	5	// usually MTRR count is eight, keep a few for other needs
+#define MTRR_MIN_SIZE 		0x100000	// 1 MB
+static int64 sols[MTRR_MAX_SOLUTIONS];
 static int solCount;
-static int64 props[5];
+static int64 props[MTRR_MAX_SOLUTIONS];
 
 
+/*!	Find the nearest powers of two for a value, save current iteration,
+  	then make recursives calls for the remaining values.
+  	It uses at most MTRR_MAX_SOLUTIONS levels of recursion because
+  	only that count of MTRR registers are available to map the memory.
+*/
 static void
 find_nearest(uint64 value, int iteration)
 {
 	TRACE_MTRR("find_nearest %Lx %d\n", value, iteration);
-	if (iteration > 4 || (iteration + 1) >= solCount)
+	if (iteration > (MTRR_MAX_SOLUTIONS - 1) || (iteration + 1) >= solCount)
 		return;
 	uint64 down, up;
 	int i;
 	nearest_powers(value, &down, &up);
 	props[iteration] = down;
-	if (value - down < 0x100000) {
+	if (value - down < MTRR_MIN_SIZE) {
 		for (i=0; i<=iteration; i++)
 			sols[i] = props[i];
 		solCount = iteration + 1;
@@ -186,7 +194,7 @@ find_nearest(uint64 value, int iteration)
 	}
 	find_nearest(value - down, iteration + 1);
 	props[iteration] = -up;
-	if (up - value < 0x100000) {
+	if (up - value < MTRR_MIN_SIZE) {
 		for (i=0; i<=iteration; i++)
 			sols[i] = props[i];
 		solCount = iteration + 1;
@@ -196,17 +204,17 @@ find_nearest(uint64 value, int iteration)
 }
 
 
+/*!	Set up MTRR to map the memory to write-back using uncached if necessary */
 static void
 set_memory_write_back(int32 id, uint64 base, uint64 length)
 {
-	int i;
 	TRACE_MTRR("set_memory_write_back base %Lx length %Lx\n", base, length);
-	solCount = 5;
+	solCount = MTRR_MAX_SOLUTIONS;
 	find_nearest(length, 0);
 
 #ifdef TRACE_MTRR
 	dprintf("sols: ");
-	for (i=0; i<solCount; i++) {
+	for (int i=0; i<solCount; i++) {
                 dprintf("0x%Lx ", sols[i]);
         }
         dprintf("\n");
