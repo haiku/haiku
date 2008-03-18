@@ -71,11 +71,12 @@ waitpid(pid_t pid, int *_status, int options)
 }
 
 
-int
-waitid(idtype_t idType, id_t id, siginfo_t *info, int options)
-{
-	// waitid() is not available on BeOS so we may be lazy here and remove it...
-	fprintf(stderr, "waitid(): NOT IMPLEMENTED\n");
-	return -1;
-}
+// TODO: Implement as part of real-time signal support!
+//int
+//waitid(idtype_t idType, id_t id, siginfo_t *info, int options)
+//{
+//	// waitid() is not available on BeOS so we may be lazy here and remove it...
+//	fprintf(stderr, "waitid(): NOT IMPLEMENTED\n");
+//	return -1;
+//}
 
