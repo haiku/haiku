@@ -465,6 +465,7 @@ AboutView::AboutView(const BRect &rect)
 		"Nathan Whitehorn\n"
 		"Michael Wilber\n"
 		"Ulrich Wimboeck\n"
+		"Artur Wyszynski\n"
 		"Gabe Yoder\n"
 		"Gerald Zajac\n"
 		"Łukasz Zemczak\n"

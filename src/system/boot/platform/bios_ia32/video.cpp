@@ -9,7 +9,6 @@
 #include "vesa.h"
 #include "vga.h"
 #include "mmu.h"
-#include "images.h"
 
 #include <edid.h>
 
@@ -18,6 +17,7 @@
 #include <boot/platform.h>
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
+#include <boot/images.h>
 #include <util/list.h>
 #include <drivers/driver_settings.h>
 
@@ -637,7 +637,7 @@ static void
 blit8(const uint8 *data, uint16 width, uint16 height,
 	const uint8 *palette, uint16 left, uint16 top)
 {
-	if (vesa_set_palette((const uint8 *)kPalette, 0, 256) != B_OK)
+	if (vesa_set_palette((const uint8 *)palette, 0, 256) != B_OK)
 		dprintf("set palette failed!\n");
 
 	addr_t start = sFrameBuffer + gKernelArgs.frame_buffer.bytes_per_row * top
@@ -719,9 +719,29 @@ blit_8bit_image(const uint8 *data, uint16 width, uint16 height,
 	}
 }
 
+static void
+blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop, uint16 imageRight,
+	uint16 imageBottom, uint16 imageWidth, uint16 imageHeight, const uint8 *palette,
+	uint16 left, uint16 top)
+{
+	int32 dataOffset = (imageWidth * imageTop) + imageLeft;
+	uint16 *start = (uint16 *)(sFrameBuffer
+		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
+
+	for (int32 y = imageTop; y < imageBottom; y++) {
+		for (int32 x = imageLeft; x < imageRight; x++) {
+			uint16 color = data[(y * (imageWidth)) + x] * 3;
+			start[x] = ((palette[color + 0] >> 3) << 11)
+				| ((palette[color + 1] >> 2) << 5)
+				| ((palette[color + 2] >> 3));
+			dataOffset += imageWidth;
+		}
+		start = (uint16 *)((addr_t)start
+			+ gKernelArgs.frame_buffer.bytes_per_row);
+	}
+}
 
 //	#pragma mark -
-
 
 extern "C" void
 platform_switch_to_logo(void)
@@ -788,15 +808,20 @@ fallback:
 	}
 
 	// clear the video memory
-	memset((void *)sFrameBuffer, 0,
+	memset((void *)sFrameBuffer, 255,
 		gKernelArgs.frame_buffer.physical_buffer.size);
 
-	// TODO: The image should be compressed, and eventually added by
-	//	the build process.
+	int x = gKernelArgs.frame_buffer.width / 2 - splashWidth / 2;
+	int y = gKernelArgs.frame_buffer.height / 2 - splashHeight / 2;
+	blit_8bit_image(splashImage, splashWidth, splashHeight, splashPalette, x, y);
 
-	blit_8bit_image(kImageData, kWidth, kHeight, kPalette,
-		gKernelArgs.frame_buffer.width - kWidth - 40,
-		gKernelArgs.frame_buffer.height - kHeight - 60);
+	x = gKernelArgs.frame_buffer.width / 2 - iconsWidth / 2;
+	y = y + splashHeight;
+	blit16_cropped(iconsImage, 0, 32, iconsWidth, 64, iconsWidth, iconsHeight, iconsPalette, x, y);
+
+	x = gKernelArgs.frame_buffer.width / 2 - copyrightWidth / 2;
+	y = gKernelArgs.frame_buffer.height - copyrightHeight - 5;
+	blit_8bit_image(copyrightImage, copyrightWidth, copyrightHeight, copyrightPalette, x, y);
 }
 
 
