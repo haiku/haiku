@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -17,6 +17,7 @@
 
 #include <net/if.h>
 #include <net/if_dl.h>
+#include <net/if_types.h>
 
 #include <errno.h>
 #include <stdio.h>
@@ -137,8 +138,8 @@ pcap_stats_haiku(pcap_t *handle, struct pcap_stat *stats)
 
 
 extern "C" pcap_t *
-pcap_open_live(const char *device, int snapLength, int /*promisc*/, int /*timeout*/,
-    char *errorBuffer)
+pcap_open_live(const char *device, int snapLength, int /*promisc*/,
+	int /*timeout*/, char *errorBuffer)
 {
 	// TODO: handle promiscous mode!
 
@@ -247,7 +248,100 @@ pcap_open_live(const char *device, int snapLength, int /*promisc*/, int /*timeou
 
 
 extern "C" int
-pcap_platform_finddevs(pcap_if_t **alldevsp, char *errbuf)
+pcap_platform_finddevs(pcap_if_t** _allDevices, char* errorBuffer)
 {
-	return -1;
+	// we need a socket to talk to the networking stack
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0) {
+		snprintf(errorBuffer, PCAP_ERRBUF_SIZE,
+			"The networking stack doesn't seem to be available.\n");
+		return -1;
+	}
+
+	// get a list of all interfaces
+
+	ifconf config;
+	config.ifc_len = sizeof(config.ifc_value);
+	if (ioctl(socket, SIOCGIFCOUNT, &config, sizeof(struct ifconf)) < 0) {
+		close(socket);
+		return -1;
+	}
+
+	uint32 count = (uint32)config.ifc_value;
+	if (count == 0) {
+		snprintf(errorBuffer, PCAP_ERRBUF_SIZE,
+			"There are no interfaces defined!\n");
+		close(socket);
+		return -1;
+	}
+
+	void *buffer = malloc(count * sizeof(struct ifreq));
+	if (buffer == NULL) {
+		snprintf(errorBuffer, PCAP_ERRBUF_SIZE, "Out of memory.\n");
+		close(socket);
+		return -1;
+	}
+
+	config.ifc_len = count * sizeof(struct ifreq);
+	config.ifc_buf = buffer;
+	if (ioctl(socket, SIOCGIFCONF, &config, sizeof(struct ifconf)) < 0) {
+		close(socket);
+		return -1;
+	}
+
+	ifreq *interface = (ifreq *)buffer;
+	pcap_if_t* last = NULL;
+
+	for (uint32 i = 0; i < count; i++) {
+		pcap_if_t* pcapInterface = (pcap_if_t*)malloc(sizeof(pcap_if_t));
+		if (pcapInterface == NULL)
+			continue;
+
+		if (last == NULL)
+			*_allDevices = pcapInterface;
+		else
+			last->next = pcapInterface;
+
+		pcapInterface->next = NULL;
+		pcapInterface->name = strdup(interface->ifr_name);
+		pcapInterface->description = NULL;
+		pcapInterface->addresses = NULL;
+		pcapInterface->flags = 0;
+
+		// get interface type
+
+		int linkSocket = ::socket(AF_LINK, SOCK_DGRAM, 0);
+		if (linkSocket < 0) {
+			fprintf(stderr, "No link level: %s\n", strerror(errno));
+		} else {
+			struct ifreq request;
+			if (!prepare_request(request, interface->ifr_name)) {
+				snprintf(errorBuffer, PCAP_ERRBUF_SIZE,
+					"Interface name \"%s\" is too long.", interface->ifr_name);
+				close(linkSocket);
+				close(socket);
+				return -1;
+			}
+
+			if (ioctl(socket, SIOCGIFPARAM, &request, sizeof(struct ifreq))
+					== 0) {
+				prepare_request(request, request.ifr_parameter.device);
+				if (ioctl(linkSocket, SIOCGIFADDR, &request,
+						sizeof(struct ifreq)) == 0) {
+					sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
+
+					if (link.sdl_type == IFT_LOOP)
+						pcapInterface->flags = PCAP_IF_LOOPBACK;
+				}
+			}
+			close(linkSocket);
+		}
+
+		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
+			+ interface->ifr_addr.sa_len);
+	}
+
+	free(buffer);
+	close(socket);
+	return 0;
 }
