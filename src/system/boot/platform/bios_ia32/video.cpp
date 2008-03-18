@@ -238,7 +238,7 @@ vesa_get_edid(edid1_info *info)
 		return B_NOT_SUPPORTED;
 
 	// retrieved EDID - now parse it
-	dprintf("Got EDID!\n");	
+	dprintf("Got EDID!\n");
 	edid_decode(info, &edidRaw);
 	edid_dump(info);
 	return B_OK;
@@ -719,28 +719,6 @@ blit_8bit_image(const uint8 *data, uint16 width, uint16 height,
 	}
 }
 
-static void
-blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop, uint16 imageRight,
-	uint16 imageBottom, uint16 imageWidth, uint16 imageHeight, const uint8 *palette,
-	uint16 left, uint16 top)
-{
-	int32 dataOffset = (imageWidth * imageTop) + imageLeft;
-	uint16 *start = (uint16 *)(sFrameBuffer
-		+ gKernelArgs.frame_buffer.bytes_per_row * top + 2 * left);
-
-	for (int32 y = imageTop; y < imageBottom; y++) {
-		for (int32 x = imageLeft; x < imageRight; x++) {
-			uint16 color = data[(y * (imageWidth)) + x] * 3;
-			start[x] = ((palette[color + 0] >> 3) << 11)
-				| ((palette[color + 1] >> 2) << 5)
-				| ((palette[color + 2] >> 3));
-			dataOffset += imageWidth;
-		}
-		start = (uint16 *)((addr_t)start
-			+ gKernelArgs.frame_buffer.bytes_per_row);
-	}
-}
-
 //	#pragma mark -
 
 extern "C" void
@@ -817,7 +795,9 @@ fallback:
 
 	x = gKernelArgs.frame_buffer.width / 2 - iconsWidth / 2;
 	y = y + splashHeight;
-	blit16_cropped(iconsImage, 0, 32, iconsWidth, 64, iconsWidth, iconsHeight, iconsPalette, x, y);
+	uint16 iconsHalfHeight = iconsHeight / 2;
+	const uint8* lowerHalfIconImage = iconsImage + iconsWidth * iconsHalfHeight;
+	blit_8bit_image(lowerHalfIconImage, iconsWidth, iconsHalfHeight, iconsPalette, x, y);
 
 	x = gKernelArgs.frame_buffer.width / 2 - copyrightWidth / 2;
 	y = gKernelArgs.frame_buffer.height - copyrightHeight - 5;
@@ -840,7 +820,7 @@ platform_switch_to_text_mode(void)
 }
 
 
-extern "C" status_t 
+extern "C" status_t
 platform_init_video(void)
 {
 	gKernelArgs.frame_buffer.enabled = 0;
