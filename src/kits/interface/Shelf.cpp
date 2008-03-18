@@ -6,6 +6,7 @@
  *		Marc Flerackers (mflerackers@androme.be)
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval
+ *		René Gollent
  */
 
 /*!	BShelf stores replicant views that are dropped onto it */
@@ -108,6 +109,7 @@ struct replicant_data {
 	replicant_data(BMessage *message, BView *view, BDragger *dragger,
 		BDragger::relation relation, unsigned long id, image_id image);
 	replicant_data();
+	~replicant_data();
 
 	static replicant_data* Find(BList const *list, BMessage const *msg);
 	static replicant_data* Find(BList const *list, BView const *view, bool allowZombie);
@@ -228,6 +230,17 @@ replicant_data::replicant_data()
 	error(B_ERROR),
 	zombie_view(NULL)
 {
+}
+
+replicant_data::~replicant_data()
+{
+	delete message;
+	// we can't delete the view or image here since 
+	// 1 - the view may already have been deleted and thus our pointer is invalid
+	// and 2 - we don't know what order they will be deleted in, so we can't unload the image yet
+	// since the destructor code for the view might still be needed if it has not been destroyed yet.
+	// this does mean we technically leak add-on images on exit, but I don't see a way around that,
+	// and in theory they should be unloaded by team cleanup on exit anyways.
 }
 
 status_t
@@ -489,6 +502,13 @@ BShelf::~BShelf()
 	Save();
 
 	delete fEntry;
+	delete fStream;
+
+	while (fReplicants.CountItems() > 0) {
+		replicant_data *data = (replicant_data *)fReplicants.ItemAt(0);
+		fReplicants.RemoveItem(0L);
+		delete data;
+	}
 }
 
 
@@ -1104,7 +1124,7 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 status_t
 BShelf::_DeleteReplicant(replicant_data* item)
 {
-	bool loadedImage = item->message->FindBool("");
+	bool loadedImage = item->message->FindBool("_loaded_image_");
 
 	BView *view = item->view;
 	if (view == NULL)
@@ -1122,12 +1142,20 @@ BShelf::_DeleteReplicant(replicant_data* item)
 	
 	fReplicants.RemoveItem(item);	
 
+	if (item->relation == BDragger::TARGET_IS_PARENT
+		|| item->relation == BDragger::TARGET_IS_SIBLING) {			
+		delete view;			
+	}
+	if (item->relation == BDragger::TARGET_IS_CHILD
+		|| item->relation == BDragger::TARGET_IS_SIBLING) {	
+		delete item->dragger;
+	}
+
 	if (loadedImage && item->image >= 0)
 		unload_add_on(item->image);
 
 	delete item;
 
-	// TODO: Should we also delete the view ?
 
 	return B_OK;
 }
@@ -1205,6 +1233,9 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 
 	data->RemoveName("_drop_point_");
 	data->RemoveName("_drop_offset_");
+
+	if (image >= 0)
+		data->AddBool("_loaded_image_", true);
 
 	replicant_data *item = new replicant_data(data, replicant, dragger,
 		relation, uniqueID, image);
