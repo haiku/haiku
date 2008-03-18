@@ -9,7 +9,7 @@ resource app_version {
 	internal = 0,
 
 	short_info = "Kernel",
-	long_info = "Kernel ©2002-2007 Haiku Inc."
+	long_info = "Kernel ©2002-2008 Haiku Inc."
 };
 
 resource vector_icon {
