@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,12 +30,12 @@ namespace BPrivate {
 
 
 class DrawState {
-	public:
+public:
 							DrawState();
-							DrawState(const DrawState& from);
+private:
+							DrawState(DrawState* from);
+public:
 		virtual				~DrawState();
-
-		DrawState&			operator=(const DrawState& from);
 
 		DrawState*			PushState();
 		DrawState*			PopState();
@@ -50,13 +50,22 @@ class DrawState {
 
 							// coordinate transformation
 		void				SetOrigin(const BPoint& origin);
-		void				OffsetOrigin(const BPoint& offset);
 		const BPoint&		Origin() const
 								{ return fOrigin; }
+		const BPoint&		CombinedOrigin() const
+								{ return fCombinedOrigin; }
 
 		void				SetScale(float scale);
 		float				Scale() const
 								{ return fScale; }
+		float				CombinedScale() const
+								{ return fCombinedScale; }
+
+							// additional clipping as requested by client
+		void				SetClippingRegion(const BRegion* region);
+
+		bool				HasClipping() const;
+		bool				GetCombinedClippingRegion(BRegion* region) const;
 
 							// coordinate transformations
 				void		Transform(float* x, float* y) const;
@@ -67,14 +76,6 @@ class DrawState {
 				void		Transform(BRegion* region) const;
 
 				void		InverseTransform(BPoint* point) const;
-
-							// additional clipping as requested by client
-		void				SetClippingRegion(const BRegion* region);
-		const BRegion*		ClippingRegion() const
-								{ return fClippingRegion; }
-/*	inline	int32				CountClippingRects() const
-									{ return fClippingRegion ? fClippingRegion.CountRects() : 0; }
-	inline	BRect				ClippingRectAt(int32 index) const;*/
 
 							// color
 		void				SetHighColor(const rgb_color& color);
@@ -140,9 +141,11 @@ class DrawState {
 		bool				SubPixelPrecise() const
 								{ return fSubPixelPrecise; }
 
-	protected:
+protected:
 		BPoint				fOrigin;
+		BPoint				fCombinedOrigin;
 		float				fScale;
+		float				fCombinedScale;
 
 		BRegion*			fClippingRegion;
 
@@ -182,19 +185,4 @@ class DrawState {
 		DrawState*			fPreviousState;
 };
 
-
-// inline implementations
-
-/*
-// ClippingRectAt
-BRect
-DrawState::ClippingRectAt(int32 index) const
-{
-	BRect r;
-	if (fClippingRegion) {
-		r = fClippingRegion.RectAt(index);
-	}
-	return r;
-}*/
-
-#endif	/* _DRAW_STATE_H_ */
+#endif	// _DRAW_STATE_H_

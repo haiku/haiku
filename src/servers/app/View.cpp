@@ -440,7 +440,7 @@ View::SetDrawingOrigin(BPoint origin)
 	fDrawState->SetOrigin(origin);
 
 	// rebuild clipping
-	if (fDrawState->ClippingRegion())
+	if (fDrawState->HasClipping())
 		RebuildClipping(false);
 }
 
@@ -464,7 +464,7 @@ View::SetScale(float scale)
 	fDrawState->SetScale(scale);
 
 	// rebuild clipping
-	if (fDrawState->ClippingRegion())
+	if (fDrawState->HasClipping())
 		RebuildClipping(false);
 }
 
@@ -1169,8 +1169,11 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 void
 View::PushState()
 {
-	fDrawState = fDrawState->PushState();
-	fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+	DrawState* newState = fDrawState->PushState();
+	if (newState) {
+		fDrawState = newState;
+		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
+	}
 }
 
 
@@ -1523,9 +1526,10 @@ View::PrintToStream() const
 	fScreenClipping.PrintToStream();
 	printf("  valid:            %d\n", fScreenClippingValid);
 	printf("  state:\n");
-	printf("    user clipping:  %p\n", fDrawState->ClippingRegion());
-	printf("    origin:         BPoint(%.1f, %.1f)\n", fDrawState->Origin().x, fDrawState->Origin().y);
-	printf("    scale:          %.2f\n", fDrawState->Scale());
+	printf("    user clipping:  %d\n", fDrawState->HasClipping());
+	BPoint origin = fDrawState->CombinedOrigin();
+	printf("    origin:         BPoint(%.1f, %.1f)\n", origin.x, origin.y);
+	printf("    scale:          %.2f\n", fDrawState->CombinedScale());
 	printf("\n");
 }
 
@@ -1561,17 +1565,17 @@ View::RebuildClipping(bool deep)
 	}
 
 	// add the user clipping in case there is one
-	if (const BRegion* userClipping = fDrawState->ClippingRegion()) {
+	if (fDrawState->HasClipping()) {
 		// NOTE: in case the user sets a user defined clipping region,
 		// rebuilding the clipping is a bit more expensive because there
 		// is no separate "drawing region"... on the other
 		// hand, views for which this feature is actually used will
 		// probably not have any children, so it is not that expensive
 		// after all
-		BRegion* screenUserClipping = fWindow->GetRegion(*userClipping);
+		BRegion* screenUserClipping = fWindow->GetRegion();
 		if (!screenUserClipping)
 			return;
-		fDrawState->Transform(screenUserClipping);
+		fDrawState->GetCombinedClippingRegion(screenUserClipping);
 		fLocalClipping.IntersectWith(screenUserClipping);
 		fWindow->RecycleRegion(screenUserClipping);
 	}

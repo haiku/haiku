@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,9 +10,10 @@
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 
-/**	Data classes for working with BView states and draw parameters */
+//!	Data classes for working with BView states and draw parameters
 
 
+#include <new>
 #include <stdio.h>
 
 #include <Region.h>
@@ -22,19 +23,27 @@
 
 #include "DrawState.h"
 
+using std::nothrow;
+
 
 DrawState::DrawState()
 	: fOrigin(0.0, 0.0),
+	  fCombinedOrigin(0.0, 0.0),
 	  fScale(1.0),
+	  fCombinedScale(1.0),
 	  fClippingRegion(NULL),
+
 	  fHighColor((rgb_color){ 0, 0, 0, 255 }),
 	  fLowColor((rgb_color){ 255, 255, 255, 255 }),
 	  fPattern(kSolidHigh),
+
 	  fDrawingMode(B_OP_COPY),
 	  fAlphaSrcMode(B_PIXEL_ALPHA),
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
+
 	  fPenLocation(0.0, 0.0),
 	  fPenSize(1.0),
+
 	  fFontAliasing(false),
 	  fSubPixelPrecise(false),
 	  fLineCapMode(B_BUTT_CAP),
@@ -46,10 +55,39 @@ DrawState::DrawState()
 }
 
 
-DrawState::DrawState(const DrawState& from)
-	: fClippingRegion(NULL)
+DrawState::DrawState(DrawState* from)
+	: fOrigin(0.0, 0.0),
+	  fCombinedOrigin(from->fCombinedOrigin),
+	  fScale(1.0),
+	  fCombinedScale(from->fCombinedScale),
+	  fClippingRegion(NULL),
+
+	  fHighColor(from->fHighColor),
+	  fLowColor(from->fLowColor),
+	  fPattern(from->fPattern),
+
+	  fDrawingMode(from->fDrawingMode),
+	  fAlphaSrcMode(from->fAlphaSrcMode),
+	  fAlphaFncMode(from->fAlphaFncMode),
+
+	  fPenLocation(from->fPenLocation),
+	  fPenSize(from->fPenSize),
+
+	  fFont(from->fFont),
+	  fFontAliasing(from->fFontAliasing),
+
+	  fSubPixelPrecise(from->fSubPixelPrecise),
+
+	  fLineCapMode(from->fLineCapMode),
+	  fLineJoinMode(from->fLineJoinMode),
+	  fMiterLimit(from->fMiterLimit),
+
+	  // Since fScale is reset to 1.0, the unscaled
+	  // font size is the current size of the font
+	  // (which is from->fUnscaledFontSize * from->fCombinedScale)
+	  fUnscaledFontSize(from->fUnscaledFontSize),
+	  fPreviousState(from)
 {
-	*this = from;
 }
 
 
@@ -60,59 +98,10 @@ DrawState::~DrawState()
 }
 
 
-DrawState&
-DrawState::operator=(const DrawState& from)
-{
-	fOrigin	= from.fOrigin;
-	fScale	= from.fScale;
-
-	if (from.fClippingRegion) {
-		if (fClippingRegion)
-			*fClippingRegion = *from.fClippingRegion;
-		else
-			fClippingRegion = new BRegion(*from.fClippingRegion);
-	} else {
-		delete fClippingRegion;
-		fClippingRegion = NULL;
-	}
-
-	fHighColor			= from.fHighColor;
-	fLowColor			= from.fLowColor;
-	fPattern			= from.fPattern;
-
-	fDrawingMode		= from.fDrawingMode;
-	fAlphaSrcMode		= from.fAlphaSrcMode;
-	fAlphaFncMode		= from.fAlphaFncMode;
-
-	fPenLocation		= from.fPenLocation;
-	fPenSize			= from.fPenSize;
-
-	fFont				= from.fFont;
-	fFontAliasing		= from.fFontAliasing;
-
-	fSubPixelPrecise	= from.fSubPixelPrecise;
-
-	fLineCapMode		= from.fLineCapMode;
-	fLineJoinMode		= from.fLineJoinMode;
-	fMiterLimit			= from.fMiterLimit;
-
-	// Since fScale is reset to 1.0, the unscaled
-	// font size is the current size of the font
-	// (which is from->fUnscaledFontSize * from->fScale)
-	fUnscaledFontSize	= from.fUnscaledFontSize;
-	fPreviousState		= from.fPreviousState;
-
-	return *this;
-}
-
-
 DrawState*
 DrawState::PushState()
 {
-	DrawState* next = new DrawState(*this);
-		// this may throw an exception that our caller should handle
-
-	next->fPreviousState = this;
+	DrawState* next = new (nothrow) DrawState(this);
 	return next;
 }
 
@@ -213,6 +202,14 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	link.Read<float>(&fScale);
 	link.Read<bool>(&fFontAliasing);
 
+	if (fPreviousState) {
+		fCombinedOrigin = fPreviousState->fCombinedOrigin + fOrigin;
+		fCombinedScale = fPreviousState->fCombinedScale * fScale;
+	} else {
+		fCombinedOrigin = fOrigin;
+		fCombinedScale = fScale;
+	}
+
 	fHighColor = highColor;
 	fLowColor = lowColor;
 	fPattern = patt;
@@ -283,78 +280,115 @@ void
 DrawState::SetOrigin(const BPoint& origin)
 {
 	fOrigin = origin;
-	// origin is given as a point in the
-	// "outer" coordinate system, therefore
-	// it has to be transformed
-	if (PreviousState() != NULL)
-		PreviousState()->Transform(&fOrigin);
-}
 
-
-void
-DrawState::OffsetOrigin(const BPoint& offset)
-{
-	if (PreviousState() == NULL)
-		fOrigin += offset;
-	else {
-		// TODO this is necessary only if offset 
-		// is in the "outer" coordinate system
-		float scale = PreviousState()->Scale();
-		fOrigin.x += offset.x * scale;
-		fOrigin.y += offset.y * scale;
-	}		
+	// NOTE: the origins of earlier states are never expected to
+	// change, only the topmost state ever changes
+	if (fPreviousState)
+		fCombinedOrigin = fPreviousState->fCombinedOrigin + fOrigin;
+	else
+		fCombinedOrigin = fOrigin;
 }
 
 
 void
 DrawState::SetScale(float scale)
 {
-	// the scale is multiplied with the scale of the previous state if any
-	float localScale = scale;
-	if (PreviousState() != NULL)
-		localScale *= PreviousState()->Scale();
+	if (fScale != scale) {
+		fScale = scale;
 
-	if (fScale != localScale) {
-		fScale = localScale;
+		// NOTE: the scales of earlier states are never expected to
+		// change, only the topmost state ever changes
+		if (fPreviousState)
+			fCombinedScale = fPreviousState->fCombinedScale * fScale;
+		else
+			fCombinedScale = fScale;
 
 		// update font size
-		// (pen size is currently calulated on the fly)
-		fFont.SetSize(fUnscaledFontSize * fScale);
+		fFont.SetSize(fUnscaledFontSize * fCombinedScale);
 	}
 }
 
-// Transform
+
+void
+DrawState::SetClippingRegion(const BRegion* region)
+{
+	if (region) {
+		if (fClippingRegion)
+			*fClippingRegion = *region;
+		else
+			fClippingRegion = new (nothrow) BRegion(*region);
+	} else {
+		delete fClippingRegion;
+		fClippingRegion = NULL;
+	}
+}
+
+
+bool
+DrawState::HasClipping() const
+{
+	if (fClippingRegion)
+		return true;
+	if (fPreviousState)
+		return fPreviousState->HasClipping();
+	return false;
+}
+
+
+bool
+DrawState::GetCombinedClippingRegion(BRegion* region) const
+{
+	if (fClippingRegion) {
+		BRegion localTransformedClipping(*fClippingRegion);
+		Transform(&localTransformedClipping);
+
+		if (fPreviousState && fPreviousState->GetCombinedClippingRegion(region))
+			localTransformedClipping.IntersectWith(region);
+		*region = localTransformedClipping;
+		return true;
+	} else {
+		if (fPreviousState)
+			return fPreviousState->GetCombinedClippingRegion(region);
+	}
+	return false;
+}
+
+
+// #pragma mark -
+
+
 void
 DrawState::Transform(float* x, float* y) const
 {
 	// scale relative to origin, therefore
 	// scale first then translate to
 	// origin
-	*x *= fScale;
-	*y *= fScale;
-	*x += fOrigin.x;
-	*y += fOrigin.y;
+	*x *= fCombinedScale;
+	*y *= fCombinedScale;
+	*x += fCombinedOrigin.x;
+	*y += fCombinedOrigin.y;
 }
 
-// InverseTransform
+
 void
 DrawState::InverseTransform(float* x, float* y) const
 {
-	// TODO: watch out for fScale = 0?
-	*x -= fOrigin.x;
-	*y -= fOrigin.y;
-	*x /= fScale;
-	*y /= fScale;
+	*x -= fCombinedOrigin.x;
+	*y -= fCombinedOrigin.y;
+	if (fCombinedScale != 0.0) {
+		*x /= fCombinedScale;
+		*y /= fCombinedScale;
+	}
 }
 
-// Transform
+
 void
 DrawState::Transform(BPoint* point) const
 {
 	Transform(&(point->x), &(point->y));
 }
 
-// Transform
+
 void
 DrawState::Transform(BRect* rect) const
 {
@@ -362,13 +396,12 @@ DrawState::Transform(BRect* rect) const
 	Transform(&(rect->right), &(rect->bottom));
 }
 
-// Transform
+
 void
 DrawState::Transform(BRegion* region) const
 {
-	if (fScale == 1.0) {
-		if (fOrigin.x != 0.0 || fOrigin.y != 0.0)
-			region->OffsetBy((int32)fOrigin.x, (int32)fOrigin.y);
+	if (fCombinedScale == 1.0) {
+		region->OffsetBy(fCombinedOrigin.x, fCombinedOrigin.y);
 	} else {
 		// TODO: optimize some more
 		BRegion converted;
@@ -384,8 +417,8 @@ DrawState::Transform(BRegion* region) const
 			Transform(&lt.x, &lt.y);
 			Transform(&rb.x, &rb.y);
 			// reset bottom right to pixel "index"
-			rb.x++;
-			rb.y++;
+			rb.x--;
+			rb.y--;
 			// add rect to converted region
 			// NOTE/TODO: the rect would not have to go
 			// through the whole intersection test process,
@@ -405,32 +438,7 @@ DrawState::InverseTransform(BPoint* point) const
 }
 
 
-void
-DrawState::SetClippingRegion(const BRegion* region)
-{
-	// reset clipping to that of previous state
-	// (that's the starting point)
-	if (PreviousState() != NULL && PreviousState()->ClippingRegion()) {
-		if (fClippingRegion)
-			*fClippingRegion = *(PreviousState()->ClippingRegion());
-		else
-			fClippingRegion = new BRegion(*(PreviousState()->ClippingRegion()));
-	} else {
-		delete fClippingRegion;
-		fClippingRegion = NULL;
-	}
-
-	// intersect with the clipping from the passed region
-	// (even if it is empty)
-	// passing NULL unsets this states additional region,
-	// it will then be the region of the previous state
-	if (region) {
-		if (fClippingRegion)
-			fClippingRegion->IntersectWith(region);
-		else 
-			fClippingRegion = new BRegion(*region);
-	}
-}
+// #pragma mark -
 
 
 void
@@ -490,8 +498,6 @@ DrawState::PenLocation() const
 void
 DrawState::SetPenSize(float size)
 {
-	// NOTE: since pensize is calculated on the fly,
-	// it is ok to set it here regardless of previous state
 	fPenSize = size;
 }
 
@@ -500,7 +506,7 @@ DrawState::SetPenSize(float size)
 float
 DrawState::PenSize() const
 {
-	float penSize = fPenSize * fScale;
+	float penSize = fPenSize * fCombinedScale;
 	// NOTE: As documented in the BeBook,
 	// pen size is never smaller than 1.0.
 	// This is supposed to be the smallest
@@ -530,7 +536,7 @@ DrawState::SetFont(const ServerFont& font, uint32 flags)
 	if (flags == B_FONT_ALL) {
 		fFont = font;
 		fUnscaledFontSize = font.Size();
-		fFont.SetSize(fUnscaledFontSize * fScale);
+		fFont.SetSize(fUnscaledFontSize * fCombinedScale);
 	} else {
 		// family & style
 		if (flags & B_FONT_FAMILY_AND_STYLE)
@@ -538,7 +544,7 @@ DrawState::SetFont(const ServerFont& font, uint32 flags)
 		// size
 		if (flags & B_FONT_SIZE) {
 			fUnscaledFontSize = font.Size();
-			fFont.SetSize(fUnscaledFontSize * fScale);
+			fFont.SetSize(fUnscaledFontSize * fCombinedScale);
 		}
 		// shear
 		if (flags & B_FONT_SHEAR)
