@@ -11,7 +11,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -26,9 +26,9 @@
 #include "config.h"
 #endif
 
-//#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
-//#include "config_maxmsp43.h"
-//#endif
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#include "config_maxmsp43.h"
+#endif
 
 #if defined(WIN32) && !defined(MINGW32)
 #include "config_win32.h"
@@ -229,7 +229,7 @@ typedef u_int64_t          uint64;
 
 /***************************************************************
  *
- *       FORWARD DECLARATIONS 
+ *       FORWARD DECLARATIONS
  */
 typedef struct _fluid_env_data_t fluid_env_data_t;
 typedef struct _fluid_adriver_definition_t fluid_adriver_definition_t;
@@ -241,7 +241,7 @@ typedef struct _fluid_server_socket_t fluid_server_socket_t;
 
 /***************************************************************
  *
- *                      CONSTANTS 
+ *                      CONSTANTS
  */
 
 #define FLUID_BUFSIZE                64
@@ -267,7 +267,7 @@ typedef FILE*  fluid_file;
 #define FLUID_FSEEK(_f,_n,_set)      fseek(_f,_n,_set)
 #define FLUID_MEMCPY(_dst,_src,_n)   memcpy(_dst,_src,_n)
 #define FLUID_MEMSET(_s,_c,_n)       memset(_s,_c,_n)
-#define FLUID_STRLEN(_s)             strlen(_s)                  
+#define FLUID_STRLEN(_s)             strlen(_s)
 #define FLUID_STRCMP(_s,_t)          strcmp(_s,_t)
 #define FLUID_STRNCMP(_s,_t,_n)      strncmp(_s,_t,_n)
 #define FLUID_STRCPY(_dst,_src)      strcpy(_dst,_src)
@@ -276,31 +276,16 @@ typedef FILE*  fluid_file;
 #define FLUID_STRDUP(s)              strdup(s)
 #else
 #define FLUID_STRDUP(s) 		    FLUID_STRCPY(FLUID_MALLOC(FLUID_STRLEN(s) + 1), s)
-#endif 
+#endif
 #define FLUID_SPRINTF                sprintf
 #define FLUID_FPRINTF                fprintf
 
 #define fluid_clip(_val, _min, _max) \
 { (_val) = ((_val) < (_min))? (_min) : (((_val) > (_max))? (_max) : (_val)); }
 
-/* Purpose:
- * Some commands (SSE extensions on Pentium) need aligned data(
- * The address must be ...xxx0. 
- * Take a pointer, and round it up to the next suitable address.
- * Obviously, one has to allocate 15 bytes of additional memory.
- * As soon as proper alignment is supported by the compiler, this
- * can be removed.
- */
-#ifdef ENABLE_SSE
-/* FIXME - This is broken on AMD 64 - only used if SSE enabled */
-#define FLUID_ALIGN16BYTE(ptr)(((int)(ptr)+15) & (~0xFL))
-#else
-#define FLUID_ALIGN16BYTE(ptr) ptr
-#endif
-
 #if WITH_FTS
 #define FLUID_PRINTF                 post
-#define FLUID_FLUSH()                
+#define FLUID_FLUSH()
 #else
 #define FLUID_PRINTF                 printf
 #define FLUID_FLUSH()                fflush(stdout)

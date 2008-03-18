@@ -11,13 +11,14 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
  * 02111-1307, USA
  */
 
+#include <math.h>
 
 #include "fluid_synth.h"
 #include "fluid_sys.h"
@@ -25,6 +26,14 @@
 #include "fluid_tuning.h"
 #include "fluid_settings.h"
 #include "fluid_sfont.h"
+
+#ifdef TRAP_ON_FPE
+#define _GNU_SOURCE
+#include <fenv.h>
+
+/* seems to not be declared in fenv.h */
+extern int feenableexcept (int excepts);
+#endif
 
 
 fluid_sfloader_t* new_fluid_defsfloader(void);
@@ -37,35 +46,36 @@ fluid_sfloader_t* new_fluid_defsfloader(void);
  *
  ************************************************************************/
 
-int fluid_synth_program_select2(fluid_synth_t* synth, 
-				int chan, 
-				char* sfont_name, 
-				unsigned int bank_num, 
+int fluid_synth_program_select2(fluid_synth_t* synth,
+				int chan,
+				char* sfont_name,
+				unsigned int bank_num,
 				unsigned int preset_num);
 
 fluid_sfont_t* fluid_synth_get_sfont_by_name(fluid_synth_t* synth, char *name);
 
-int fluid_synth_set_gen2(fluid_synth_t* synth, int chan, 
-			 int param, float value, 
+int fluid_synth_set_gen2(fluid_synth_t* synth, int chan,
+			 int param, float value,
 			 int absolute, int normalized);
 
- 
+
 /***************************************************************
  *
  *                         GLOBAL
  */
 
 /* has the synth module been initialized? */
-static int fluid_synth_initialized = 0;        
+static int fluid_synth_initialized = 0;
 static void fluid_synth_init(void);
+static void init_dither(void);
 
 /* default modulators
  * SF2.01 page 52 ff:
  *
  * There is a set of predefined default modulators. They have to be
- * explicitly overridden by the sound font in order to turn them off.  
+ * explicitly overridden by the sound font in order to turn them off.
  */
- 
+
 fluid_mod_t default_vel2att_mod;        /* SF2.01 section 8.4.1  */
 fluid_mod_t default_vel2filter_mod;     /* SF2.01 section 8.4.2  */
 fluid_mod_t default_at2viblfo_mod;      /* SF2.01 section 8.4.3  */
@@ -80,11 +90,11 @@ fluid_mod_t default_pitch_bend_mod;     /* SF2.01 section 8.4.10 */
 /* reverb presets */
 static fluid_revmodel_presets_t revmodel_preset[] = {
   /* name */    /* roomsize */ /* damp */ /* width */ /* level */
-  { "Test 1",          0.2f,      0.0f,       0.5f,       0.9f }, 
-  { "Test 2",          0.4f,      0.2f,       0.5f,       0.8f }, 
-  { "Test 3",          0.6f,      0.4f,       0.5f,       0.7f }, 
-  { "Test 4",          0.8f,      0.7f,       0.5f,       0.6f }, 
-  { "Test 5",          0.8f,      1.0f,       0.5f,       0.5f }, 
+  { "Test 1",          0.2f,      0.0f,       0.5f,       0.9f },
+  { "Test 2",          0.4f,      0.2f,       0.5f,       0.8f },
+  { "Test 3",          0.6f,      0.4f,       0.5f,       0.7f },
+  { "Test 4",          0.8f,      0.7f,       0.5f,       0.6f },
+  { "Test 5",          0.8f,      1.0f,       0.5f,       0.5f },
   { NULL, 0.0f, 0.0f, 0.0f, 0.0f }
 };
 
@@ -103,21 +113,21 @@ void fluid_synth_settings(fluid_settings_t* settings)
   fluid_settings_register_str(settings, "synth.chorus.active", "yes", 0, NULL, NULL);
   fluid_settings_register_str(settings, "synth.ladspa.active", "no", 0, NULL, NULL);
 
-  fluid_settings_register_int(settings, "synth.polyphony", 
+  fluid_settings_register_int(settings, "synth.polyphony",
 			     256, 16, 4096, 0, NULL, NULL);
-  fluid_settings_register_int(settings, "synth.midi-channels", 
+  fluid_settings_register_int(settings, "synth.midi-channels",
 			     16, 16, 256, 0, NULL, NULL);
-  fluid_settings_register_num(settings, "synth.gain", 
-			     0.2f, 0.0f, 10.0f, 
+  fluid_settings_register_num(settings, "synth.gain",
+			     0.2f, 0.0f, 10.0f,
 			     0, NULL, NULL);
-  fluid_settings_register_int(settings, "synth.audio-channels", 
+  fluid_settings_register_int(settings, "synth.audio-channels",
 			     1, 1, 256, 0, NULL, NULL);
-  fluid_settings_register_int(settings, "synth.audio-groups", 
+  fluid_settings_register_int(settings, "synth.audio-groups",
 			     1, 1, 256, 0, NULL, NULL);
-  fluid_settings_register_int(settings, "synth.effects-channels", 
+  fluid_settings_register_int(settings, "synth.effects-channels",
 			     2, 2, 2, 0, NULL, NULL);
-  fluid_settings_register_num(settings, "synth.sample-rate", 
-			     44100.0f, 22050.0f, 96000.0f, 
+  fluid_settings_register_num(settings, "synth.sample-rate",
+			     44100.0f, 22050.0f, 96000.0f,
 			     0, NULL, NULL);
 }
 
@@ -145,23 +155,30 @@ char* fluid_version_str(void)
  *
  * Does all the initialization for this module.
  */
-static void 
+static void
 fluid_synth_init()
 {
   fluid_synth_initialized++;
 
+#ifdef TRAP_ON_FPE
+  /* Turn on floating point exception traps */
+  feenableexcept (FE_DIVBYZERO | FE_UNDERFLOW | FE_OVERFLOW | FE_INVALID);
+#endif
+
   fluid_conversion_config();
 
-  fluid_voice_config();
+  fluid_dsp_float_config();
 
   fluid_sys_config();
+
+  init_dither();
 
 
   /* SF2.01 page 53 section 8.4.1: MIDI Note-On Velocity to Initial Attenuation */
   fluid_mod_set_source1(&default_vel2att_mod, /* The modulator we are programming here */
 		       FLUID_MOD_VELOCITY,    /* Source. VELOCITY corresponds to 'index=2'. */
 		       FLUID_MOD_GC           /* Not a MIDI continuous controller */
-		       | FLUID_MOD_CONCAVE    /* Curve shape. Corresponds to 'type=1' */ 
+		       | FLUID_MOD_CONCAVE    /* Curve shape. Corresponds to 'type=1' */
 		       | FLUID_MOD_UNIPOLAR   /* Polarity. Corresponds to 'P=0' */
 		       | FLUID_MOD_NEGATIVE   /* Direction. Corresponds to 'D=1' */
 		       );
@@ -171,10 +188,10 @@ fluid_synth_init()
 
 
 
-  /* SF2.01 page 53 section 8.4.2: MIDI Note-On Velocity to Filter Cutoff 
+  /* SF2.01 page 53 section 8.4.2: MIDI Note-On Velocity to Filter Cutoff
    * Have to make a design decision here. The specs don't make any sense this way or another.
    * One sound font, 'Kingston Piano', which has been praised for its quality, tries to
-   * override this modulator with an amount of 0 and positive polarity (instead of what 
+   * override this modulator with an amount of 0 and positive polarity (instead of what
    * the specs say, D=1) for the secondary source.
    * So if we change the polarity to 'positive', one of the best free sound fonts works...
    */
@@ -184,10 +201,10 @@ fluid_synth_init()
 		       | FLUID_MOD_UNIPOLAR                /* P=0 */
                        | FLUID_MOD_NEGATIVE                /* D=1 */
 		       );
-  fluid_mod_set_source2(&default_vel2filter_mod, FLUID_MOD_VELOCITY, /* Index=2 */ 
+  fluid_mod_set_source2(&default_vel2filter_mod, FLUID_MOD_VELOCITY, /* Index=2 */
 		       FLUID_MOD_GC                                 /* CC=0 */
 		       | FLUID_MOD_SWITCH                           /* type=3 */
-		       | FLUID_MOD_UNIPOLAR                         /* P=0 */ 
+		       | FLUID_MOD_UNIPOLAR                         /* P=0 */
 		       // do not remove       | FLUID_MOD_NEGATIVE                         /* D=1 */
 		       | FLUID_MOD_POSITIVE                         /* D=0 */
 		       );
@@ -223,9 +240,9 @@ fluid_synth_init()
 
 
   /* SF2.01 page 55 section 8.4.5: MIDI continuous controller 7 to initial attenuation*/
-  fluid_mod_set_source1(&default_att_mod, 7,                     /* index=7 */ 
-		       FLUID_MOD_CC                              /* CC=1 */ 
-		       | FLUID_MOD_CONCAVE                       /* type=1 */ 
+  fluid_mod_set_source1(&default_att_mod, 7,                     /* index=7 */
+		       FLUID_MOD_CC                              /* CC=1 */
+		       | FLUID_MOD_CONCAVE                       /* type=1 */
 		       | FLUID_MOD_UNIPOLAR                      /* P=0 */
 		       | FLUID_MOD_NEGATIVE                      /* D=1 */
 		       );
@@ -238,8 +255,8 @@ fluid_synth_init()
   /* SF2.01 page 55 section 8.4.6 MIDI continuous controller 10 to Pan Position */
   fluid_mod_set_source1(&default_pan_mod, 10,                    /* index=10 */
 		       FLUID_MOD_CC                              /* CC=1 */
-		       | FLUID_MOD_LINEAR                        /* type=0 */ 
-		       | FLUID_MOD_BIPOLAR                       /* P=1 */ 
+		       | FLUID_MOD_LINEAR                        /* type=0 */
+		       | FLUID_MOD_BIPOLAR                       /* P=1 */
 		       | FLUID_MOD_POSITIVE                      /* D=0 */
 		       );
   fluid_mod_set_source2(&default_pan_mod, 0, 0);                 /* No second source */
@@ -247,13 +264,13 @@ fluid_synth_init()
   /* Amount: 500. The SF specs $8.4.6, p. 55 syas: "Amount = 1000
      tenths of a percent". The center value (64) corresponds to 50%,
      so it follows that amount = 50% x 1000/% = 500. */
-  fluid_mod_set_amount(&default_pan_mod, 500.0);                 
+  fluid_mod_set_amount(&default_pan_mod, 500.0);
 
 
   /* SF2.01 page 55 section 8.4.7: MIDI continuous controller 11 to initial attenuation*/
-  fluid_mod_set_source1(&default_expr_mod, 11,                     /* index=11 */ 
-		       FLUID_MOD_CC                              /* CC=1 */ 
-		       | FLUID_MOD_CONCAVE                       /* type=1 */ 
+  fluid_mod_set_source1(&default_expr_mod, 11,                     /* index=11 */
+		       FLUID_MOD_CC                              /* CC=1 */
+		       | FLUID_MOD_CONCAVE                       /* type=1 */
 		       | FLUID_MOD_UNIPOLAR                      /* P=0 */
 		       | FLUID_MOD_NEGATIVE                      /* D=1 */
 		       );
@@ -264,9 +281,9 @@ fluid_synth_init()
 
 
   /* SF2.01 page 55 section 8.4.8: MIDI continuous controller 91 to Reverb send */
-  fluid_mod_set_source1(&default_reverb_mod, 91,                 /* index=91 */ 
-		       FLUID_MOD_CC                              /* CC=1 */ 
-		       | FLUID_MOD_LINEAR                        /* type=0 */ 
+  fluid_mod_set_source1(&default_reverb_mod, 91,                 /* index=91 */
+		       FLUID_MOD_CC                              /* CC=1 */
+		       | FLUID_MOD_LINEAR                        /* type=0 */
 		       | FLUID_MOD_UNIPOLAR                      /* P=0 */
 		       | FLUID_MOD_POSITIVE                      /* D=0 */
 		       );
@@ -277,9 +294,9 @@ fluid_synth_init()
 
 
   /* SF2.01 page 55 section 8.4.9: MIDI continuous controller 93 to Reverb send */
-  fluid_mod_set_source1(&default_chorus_mod, 93,                 /* index=93 */ 
-		       FLUID_MOD_CC                              /* CC=1 */ 
-		       | FLUID_MOD_LINEAR                        /* type=0 */ 
+  fluid_mod_set_source1(&default_chorus_mod, 93,                 /* index=93 */
+		       FLUID_MOD_CC                              /* CC=1 */
+		       | FLUID_MOD_LINEAR                        /* type=0 */
 		       | FLUID_MOD_UNIPOLAR                      /* P=0 */
 		       | FLUID_MOD_POSITIVE                      /* D=0 */
 		       );
@@ -290,10 +307,10 @@ fluid_synth_init()
 
 
   /* SF2.01 page 57 section 8.4.10 MIDI Pitch Wheel to Initial Pitch ... */
-  fluid_mod_set_source1(&default_pitch_bend_mod, FLUID_MOD_PITCHWHEEL, /* Index=14 */ 
+  fluid_mod_set_source1(&default_pitch_bend_mod, FLUID_MOD_PITCHWHEEL, /* Index=14 */
 		       FLUID_MOD_GC                              /* CC =0 */
 		       | FLUID_MOD_LINEAR                        /* type=0 */
-		       | FLUID_MOD_BIPOLAR                       /* P=1 */ 
+		       | FLUID_MOD_BIPOLAR                       /* P=1 */
 		       | FLUID_MOD_POSITIVE                      /* D=0 */
 		       );
   fluid_mod_set_source2(&default_pitch_bend_mod, FLUID_MOD_PITCHWHEELSENS,  /* Index = 16 */
@@ -301,7 +318,7 @@ fluid_synth_init()
 		       | FLUID_MOD_LINEAR                                  /* type=0 */
 		       | FLUID_MOD_UNIPOLAR                                /* P=0 */
 		       | FLUID_MOD_POSITIVE                                /* D=0 */
-		       );     
+		       );
   fluid_mod_set_dest(&default_pitch_bend_mod, GEN_PITCH);                 /* Destination: Initial pitch */
   fluid_mod_set_amount(&default_pitch_bend_mod, 12700.0);                 /* Amount: 12700 cents */
 }
@@ -320,7 +337,7 @@ int fluid_synth_verify_settings(fluid_settings_t *settings)
 /*
  * new_fluid_synth
  */
-fluid_synth_t* 
+fluid_synth_t*
 new_fluid_synth(fluid_settings_t *settings)
 {
   int i;
@@ -337,11 +354,11 @@ new_fluid_synth(fluid_settings_t *settings)
   /* allocate a new synthesizer object */
   synth = FLUID_NEW(fluid_synth_t);
   if (synth == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory"); 
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     return NULL;
   }
   FLUID_MEMSET(synth, 0, sizeof(fluid_synth_t));
-  
+
   fluid_mutex_init(synth->busy);
 
   synth->settings = settings;
@@ -360,10 +377,10 @@ new_fluid_synth(fluid_settings_t *settings)
   fluid_settings_getnum(settings, "synth.gain", &synth->gain);
 
   /* register the callbacks */
-  fluid_settings_register_num(settings, "synth.gain", 
-			      0.2f, 0.0f, 10.0f, 0, 
+  fluid_settings_register_num(settings, "synth.gain",
+			      0.2f, 0.0f, 10.0f, 0,
 			      (fluid_num_update_t) fluid_synth_update_gain, synth);
-  fluid_settings_register_int(settings, "synth.polyphony", 
+  fluid_settings_register_int(settings, "synth.polyphony",
 			      synth->polyphony, 16, 4096, 0,
 			      (fluid_int_update_t) fluid_synth_update_polyphony,
                               synth);
@@ -374,27 +391,27 @@ new_fluid_synth(fluid_settings_t *settings)
     int n = synth->midi_channels / 16;
     synth->midi_channels = (n + 1) * 16;
     fluid_settings_setint(settings, "synth.midi-channels", synth->midi_channels);
-    FLUID_LOG(FLUID_WARN, "Requested number of MIDI channels is not a multiple of 16. " 
-	     "I'll increase the number of channels to the next multiple."); 
+    FLUID_LOG(FLUID_WARN, "Requested number of MIDI channels is not a multiple of 16. "
+	     "I'll increase the number of channels to the next multiple.");
   }
 
   if (synth->audio_channels < 1) {
-    FLUID_LOG(FLUID_WARN, "Requested number of audio channels is smaller than 1. " 
-	     "Changing this setting to 1."); 
+    FLUID_LOG(FLUID_WARN, "Requested number of audio channels is smaller than 1. "
+	     "Changing this setting to 1.");
     synth->audio_channels = 1;
   } else if (synth->audio_channels > 128) {
-    FLUID_LOG(FLUID_WARN, "Requested number of audio channels is too big (%d). " 
-	     "Limiting this setting to 128.", synth->audio_channels); 
+    FLUID_LOG(FLUID_WARN, "Requested number of audio channels is too big (%d). "
+	     "Limiting this setting to 128.", synth->audio_channels);
     synth->audio_channels = 128;
   }
 
   if (synth->audio_groups < 1) {
-    FLUID_LOG(FLUID_WARN, "Requested number of audio groups is smaller than 1. " 
-	     "Changing this setting to 1."); 
+    FLUID_LOG(FLUID_WARN, "Requested number of audio groups is smaller than 1. "
+	     "Changing this setting to 1.");
     synth->audio_groups = 1;
   } else if (synth->audio_groups > 128) {
-    FLUID_LOG(FLUID_WARN, "Requested number of audio groups is too big (%d). " 
-	     "Limiting this setting to 128.", synth->audio_groups); 
+    FLUID_LOG(FLUID_WARN, "Requested number of audio groups is too big (%d). "
+	     "Limiting this setting to 128.", synth->audio_groups);
     synth->audio_groups = 128;
   }
 
@@ -417,7 +434,7 @@ new_fluid_synth(fluid_settings_t *settings)
   /* Create and initialize the Fx unit.*/
   synth->LADSPA_FxUnit = new_fluid_LADSPA_FxUnit(synth);
 #endif
-  
+
   /* as soon as the synth is created it starts playing. */
   synth->state = FLUID_SYNTH_PLAYING;
   synth->sfont = NULL;
@@ -429,7 +446,7 @@ new_fluid_synth(fluid_settings_t *settings)
   loader = new_fluid_defsfloader();
 
   if (loader == NULL) {
-    FLUID_LOG(FLUID_WARN, "Failed to create the default SoundFont loader"); 
+    FLUID_LOG(FLUID_WARN, "Failed to create the default SoundFont loader");
   } else {
     fluid_synth_add_sfloader(synth, loader);
   }
@@ -437,7 +454,7 @@ new_fluid_synth(fluid_settings_t *settings)
   /* allocate all channel objects */
   synth->channel = FLUID_ARRAY(fluid_channel_t*, synth->midi_channels);
   if (synth->channel == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory"); 
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     goto error_recovery;
   }
   for (i = 0; i < synth->midi_channels; i++) {
@@ -460,109 +477,80 @@ new_fluid_synth(fluid_settings_t *settings)
     }
   }
 
-  /* Allocate the sample buffers 
-   *
-   * GCC seems to have a bug with alignment (address must be multiple
-   * of 16 bytes.  So we have to align for ourselves...  As soon as
-   * GCC aligns reliably, this mess can be cleaned up.
-   */
-
+  /* Allocate the sample buffers */
   synth->left_buf = NULL;
   synth->right_buf = NULL;
-  synth->left_ubuf = NULL;
-  synth->right_ubuf = NULL;
   synth->fx_left_buf = NULL;
   synth->fx_right_buf = NULL;
-  synth->fx_left_ubuf = NULL;
-  synth->fx_right_ubuf = NULL;
 
   /* Left and right audio buffers */
 
   synth->left_buf = FLUID_ARRAY(fluid_real_t*, synth->nbuf);
   synth->right_buf = FLUID_ARRAY(fluid_real_t*, synth->nbuf);
-  synth->left_ubuf = FLUID_ARRAY(fluid_real_t*, synth->nbuf);
-  synth->right_ubuf = FLUID_ARRAY(fluid_real_t*, synth->nbuf);
 
-  if ((synth->left_buf == NULL) || (synth->right_buf == NULL) ||
-      (synth->left_ubuf == NULL) || (synth->right_ubuf == NULL)) {
-    FLUID_LOG(FLUID_ERR, "Out of memory"); 
+  if ((synth->left_buf == NULL) || (synth->right_buf == NULL)) {
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     goto error_recovery;
-  } 
+  }
 
   FLUID_MEMSET(synth->left_buf, 0, synth->nbuf * sizeof(fluid_real_t*));
   FLUID_MEMSET(synth->right_buf, 0, synth->nbuf * sizeof(fluid_real_t*));
-  FLUID_MEMSET(synth->left_ubuf, 0, synth->nbuf * sizeof(fluid_real_t*));
-  FLUID_MEMSET(synth->right_ubuf, 0, synth->nbuf * sizeof(fluid_real_t*));
 
   for (i = 0; i < synth->nbuf; i++) {
 
-    /* +4: add four floats for 16 added bytes */
+    synth->left_buf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE);
+    synth->right_buf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE);
 
-    synth->left_ubuf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE + 4);  
-    synth->right_ubuf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE + 4);
-
-    if ((synth->left_ubuf[i] == NULL) || (synth->right_ubuf[i] == NULL)) {
-      FLUID_LOG(FLUID_ERR, "Out of memory"); 
+    if ((synth->left_buf[i] == NULL) || (synth->right_buf[i] == NULL)) {
+      FLUID_LOG(FLUID_ERR, "Out of memory");
       goto error_recovery;
-    } 
-
-    synth->left_buf[i] = (fluid_real_t*) FLUID_ALIGN16BYTE(synth->left_ubuf[i]);
-    synth->right_buf[i] = (fluid_real_t*) FLUID_ALIGN16BYTE(synth->right_ubuf[i]);
+    }
   }
 
   /* Effects audio buffers */
 
   synth->fx_left_buf = FLUID_ARRAY(fluid_real_t*, synth->effects_channels);
   synth->fx_right_buf = FLUID_ARRAY(fluid_real_t*, synth->effects_channels);
-  synth->fx_left_ubuf = FLUID_ARRAY(fluid_real_t*, synth->effects_channels);
-  synth->fx_right_ubuf = FLUID_ARRAY(fluid_real_t*, synth->effects_channels);
 
-  if ((synth->fx_left_buf == NULL) || (synth->fx_left_ubuf == NULL) ||
-      (synth->fx_right_buf == NULL) || (synth->fx_right_ubuf == NULL)) {
-    FLUID_LOG(FLUID_ERR, "Out of memory"); 
+  if ((synth->fx_left_buf == NULL) || (synth->fx_right_buf == NULL)) {
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     goto error_recovery;
-  } 
+  }
 
-  FLUID_MEMSET(synth->fx_left_ubuf, 0, 2 * sizeof(fluid_real_t*));
   FLUID_MEMSET(synth->fx_left_buf, 0, 2 * sizeof(fluid_real_t*));
-  FLUID_MEMSET(synth->fx_right_ubuf, 0, 2 * sizeof(fluid_real_t*));
   FLUID_MEMSET(synth->fx_right_buf, 0, 2 * sizeof(fluid_real_t*));
 
   for (i = 0; i < synth->effects_channels; i++) {
+    synth->fx_left_buf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE);
+    synth->fx_right_buf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE);
 
-    /* +4: add four floats for 16 added bytes */
-    synth->fx_left_ubuf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE + 4);  
-    synth->fx_right_ubuf[i] = FLUID_ARRAY(fluid_real_t, FLUID_BUFSIZE + 4);  
-
-    if ((synth->fx_left_ubuf[i] == NULL) || (synth->fx_right_ubuf[i] == NULL)) {
-      FLUID_LOG(FLUID_ERR, "Out of memory"); 
+    if ((synth->fx_left_buf[i] == NULL) || (synth->fx_right_buf[i] == NULL)) {
+      FLUID_LOG(FLUID_ERR, "Out of memory");
       goto error_recovery;
-    } 
-
-    synth->fx_left_buf[i] = (fluid_real_t*) FLUID_ALIGN16BYTE(synth->fx_left_ubuf[i]);
-    synth->fx_right_buf[i] = (fluid_real_t*) FLUID_ALIGN16BYTE(synth->fx_right_ubuf[i]);
+    }
   }
 
 
   synth->cur = FLUID_BUFSIZE;
+  synth->dither_index = 0;
 
   /* allocate the reverb module */
   synth->reverb = new_fluid_revmodel();
   if (synth->reverb == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory"); 
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     goto error_recovery;
   }
 
-  fluid_synth_set_reverb(synth, 
-			FLUID_REVERB_DEFAULT_ROOMSIZE, 
-			FLUID_REVERB_DEFAULT_DAMP, 
-			FLUID_REVERB_DEFAULT_WIDTH, 
+  fluid_synth_set_reverb(synth,
+			FLUID_REVERB_DEFAULT_ROOMSIZE,
+			FLUID_REVERB_DEFAULT_DAMP,
+			FLUID_REVERB_DEFAULT_WIDTH,
 			FLUID_REVERB_DEFAULT_LEVEL);
 
   /* allocate the chorus module */
   synth->chorus = new_fluid_chorus(synth->sample_rate);
   if (synth->chorus == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory"); 
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     goto error_recovery;
   }
 
@@ -579,8 +567,8 @@ new_fluid_synth(fluid_settings_t *settings)
 /*
  * delete_fluid_synth
  */
-int 
-delete_fluid_synth(fluid_synth_t* synth) 
+int
+delete_fluid_synth(fluid_synth_t* synth)
 {
   int i, k;
   fluid_list_t *list;
@@ -596,6 +584,14 @@ delete_fluid_synth(fluid_synth_t* synth)
 
   synth->state = FLUID_SYNTH_STOPPED;
 
+  /* turn off all voices, needed to unload SoundFont data */
+  if (synth->voice != NULL) {
+    for (i = 0; i < synth->nvoice; i++) {
+      if (synth->voice[i] && fluid_voice_is_playing (synth->voice[i]))
+	fluid_voice_off (synth->voice[i]);
+    }
+  }
+
   /* delete all the SoundFonts */
   for (list = synth->sfont; list; list = fluid_list_next(list)) {
     sfont = (fluid_sfont_t*) fluid_list_get(list);
@@ -603,7 +599,7 @@ delete_fluid_synth(fluid_synth_t* synth)
   }
 
   delete_fluid_list(synth->sfont);
- 
+
   /* and the SoundFont offsets */
   for (list = synth->bank_offsets; list; list = fluid_list_next(list)) {
     bank_offset = (fluid_bank_offset_t*) fluid_list_get(list);
@@ -611,10 +607,10 @@ delete_fluid_synth(fluid_synth_t* synth)
   }
 
   delete_fluid_list(synth->bank_offsets);
- 
-  
+
+
   /* delete all the SoundFont loaders */
-  
+
   for (list = synth->loaders; list; list = fluid_list_next(list)) {
     loader = (fluid_sfloader_t*) fluid_list_get(list);
     fluid_sfloader_delete(loader);
@@ -642,31 +638,40 @@ delete_fluid_synth(fluid_synth_t* synth)
   }
 
   /* free all the sample buffers */
-  if (synth->left_ubuf != NULL) {
+  if (synth->left_buf != NULL) {
     for (i = 0; i < synth->nbuf; i++) {
-      if (synth->left_ubuf[i] != NULL) {
-	FLUID_FREE(synth->left_ubuf[i]);
+      if (synth->left_buf[i] != NULL) {
+	FLUID_FREE(synth->left_buf[i]);
       }
     }
-    FLUID_FREE(synth->left_ubuf);
+    FLUID_FREE(synth->left_buf);
   }
 
-  if (synth->right_ubuf != NULL) {
+  if (synth->right_buf != NULL) {
     for (i = 0; i < synth->nbuf; i++) {
-      if (synth->right_ubuf[i] != NULL) {
-	FLUID_FREE(synth->right_ubuf[i]);
+      if (synth->right_buf[i] != NULL) {
+	FLUID_FREE(synth->right_buf[i]);
       }
     }
-    FLUID_FREE(synth->right_ubuf);
+    FLUID_FREE(synth->right_buf);
   }
 
-  if (synth->fx_left_ubuf != NULL) {
+  if (synth->fx_left_buf != NULL) {
     for (i = 0; i < 2; i++) {
-      if (synth->fx_left_ubuf[i] != NULL) {
-	FLUID_FREE(synth->fx_left_ubuf[i]);
+      if (synth->fx_left_buf[i] != NULL) {
+	FLUID_FREE(synth->fx_left_buf[i]);
       }
     }
-    FLUID_FREE(synth->fx_left_ubuf);
+    FLUID_FREE(synth->fx_left_buf);
+  }
+
+  if (synth->fx_right_buf != NULL) {
+    for (i = 0; i < 2; i++) {
+      if (synth->fx_right_buf[i] != NULL) {
+	FLUID_FREE(synth->fx_right_buf[i]);
+      }
+    }
+    FLUID_FREE(synth->fx_right_buf);
   }
 
   /* release the reverb module */
@@ -699,7 +704,7 @@ delete_fluid_synth(fluid_synth_t* synth)
   fluid_LADSPA_shutdown(synth->LADSPA_FxUnit);
   FLUID_FREE(synth->LADSPA_FxUnit);
 #endif
-  
+
   fluid_mutex_destroy(synth->busy);
 
   FLUID_FREE(synth);
@@ -713,7 +718,7 @@ delete_fluid_synth(fluid_synth_t* synth)
  * The error messages are not thread-save, yet. They are still stored
  * in a global message buffer (see fluid_sys.c).
  * */
-char* 
+char*
 fluid_synth_error(fluid_synth_t* synth)
 {
   return fluid_error();
@@ -722,8 +727,8 @@ fluid_synth_error(fluid_synth_t* synth)
 /*
  * fluid_synth_noteon
  */
-int 
-fluid_synth_noteon(fluid_synth_t* synth, int chan, int key, int vel) 
+int
+fluid_synth_noteon(fluid_synth_t* synth, int chan, int key, int vel)
 {
   fluid_channel_t* channel;
   int r = FLUID_FAILED;
@@ -744,14 +749,14 @@ fluid_synth_noteon(fluid_synth_t* synth, int chan, int key, int vel)
   /* make sure this channel has a preset */
   if (channel->preset == NULL) {
     if (synth->verbose) {
-      FLUID_LOG(FLUID_INFO, "noteon\t%d\t%d\t%d\t%05d\t%.3f\t%.3f\t%.3f\t%d\t%s", 
-	       chan, key, vel, 0, 
-	       (float) synth->ticks / 44100.0f, 
+      FLUID_LOG(FLUID_INFO, "noteon\t%d\t%d\t%d\t%05d\t%.3f\t%.3f\t%.3f\t%d\t%s",
+	       chan, key, vel, 0,
+	       (float) synth->ticks / 44100.0f,
 	       (fluid_curtime() - synth->start) / 1000.0f,
 	       0.0f, 0, "channel has no preset");
     }
     return FLUID_FAILED;
-  } 
+  }
 
   /* If there is another voice process on the same channel and key,
      advance it to the release phase. */
@@ -763,7 +768,7 @@ fluid_synth_noteon(fluid_synth_t* synth, int chan, int key, int vel)
 /*
  * fluid_synth_noteoff
  */
-int 
+int
 fluid_synth_noteoff(fluid_synth_t* synth, int chan, int key)
 {
   int i;
@@ -771,7 +776,7 @@ fluid_synth_noteoff(fluid_synth_t* synth, int chan, int key)
   int status = FLUID_FAILED;
 /*   fluid_mutex_lock(synth->busy); /\* Don't interfere with the audio thread *\/ */
 /*   fluid_mutex_unlock(synth->busy); */
-  
+
   for (i = 0; i < synth->polyphony; i++) {
     voice = synth->voice[i];
     if (_ON(voice) && (voice->chan == chan) && (voice->key == key)) {
@@ -783,8 +788,8 @@ fluid_synth_noteoff(fluid_synth_t* synth, int chan, int key)
 	    used_voices++;
 	  }
 	}
-	FLUID_LOG(FLUID_INFO, "noteoff\t%d\t%d\t%d\t%05d\t%.3f\t%.3f\t%.3f\t%d", 
-		 voice->chan, voice->key, 0, voice->id, 
+	FLUID_LOG(FLUID_INFO, "noteoff\t%d\t%d\t%d\t%05d\t%.3f\t%.3f\t%.3f\t%d",
+		 voice->chan, voice->key, 0, voice->id,
 		 (float) (voice->start_time + voice->ticks) / 44100.0f,
 		 (fluid_curtime() - synth->start) / 1000.0f,
 		 (float) voice->ticks / 44100.0f,
@@ -800,7 +805,7 @@ fluid_synth_noteoff(fluid_synth_t* synth, int chan, int key)
 /*
  * fluid_synth_damp_voices
  */
-int 
+int
 fluid_synth_damp_voices(fluid_synth_t* synth, int chan)
 {
   int i;
@@ -823,7 +828,7 @@ fluid_synth_damp_voices(fluid_synth_t* synth, int chan)
 /*
  * fluid_synth_cc
  */
-int 
+int
 fluid_synth_cc(fluid_synth_t* synth, int chan, int num, int val)
 {
 /*   fluid_mutex_lock(synth->busy); /\* Don't interfere with the audio thread *\/ */
@@ -832,15 +837,15 @@ fluid_synth_cc(fluid_synth_t* synth, int chan, int num, int val)
   /* check the ranges of the arguments */
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
   if ((num < 0) || (num >= 128)) {
     FLUID_LOG(FLUID_WARN, "Ctrl out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
   if ((val < 0) || (val >= 128)) {
     FLUID_LOG(FLUID_WARN, "Value out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   if (synth->verbose) {
@@ -862,13 +867,13 @@ fluid_synth_get_cc(fluid_synth_t* synth, int chan, int num, int* pval)
   /* check the ranges of the arguments */
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
   if ((num < 0) || (num >= 128)) {
     FLUID_LOG(FLUID_WARN, "Ctrl out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
-  
+
   *pval = synth->channel[chan]->cc[num];
   return FLUID_OK;
 }
@@ -916,7 +921,7 @@ fluid_synth_all_sounds_off(fluid_synth_t* synth, int chan)
 /*
  * fluid_synth_system_reset
  *
- * Purpose: 
+ * Purpose:
  * Respond to the MIDI command 'system reset' (0xFF, big red 'panic' button)
  */
 int
@@ -948,7 +953,7 @@ fluid_synth_system_reset(fluid_synth_t* synth)
  * tell all synthesis processes on this channel to update their
  * synthesis parameters after a control change.
  */
-int 
+int
 fluid_synth_modulate_voices(fluid_synth_t* synth, int chan, int is_cc, int ctrl)
 {
   int i;
@@ -973,7 +978,7 @@ fluid_synth_modulate_voices(fluid_synth_t* synth, int chan, int is_cc, int ctrl)
  * synthesis parameters after an all control off message (i.e. all
  * controller have been reset to their default value).
  */
-int 
+int
 fluid_synth_modulate_voices_all(fluid_synth_t* synth, int chan)
 {
   int i;
@@ -994,7 +999,7 @@ fluid_synth_modulate_voices_all(fluid_synth_t* synth, int chan)
 /*
  * fluid_synth_pitch_bend
  */
-int 
+int
 fluid_synth_pitch_bend(fluid_synth_t* synth, int chan, int val)
 {
 
@@ -1004,7 +1009,7 @@ fluid_synth_pitch_bend(fluid_synth_t* synth, int chan, int val)
   /* check the ranges of the arguments */
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   if (synth->verbose) {
@@ -1026,9 +1031,9 @@ fluid_synth_get_pitch_bend(fluid_synth_t* synth, int chan, int* ppitch_bend)
   /* check the ranges of the arguments */
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
-  
+
   *ppitch_bend = synth->channel[chan]->pitch_bend;
   return FLUID_OK;
 }
@@ -1036,14 +1041,14 @@ fluid_synth_get_pitch_bend(fluid_synth_t* synth, int chan, int* ppitch_bend)
 /*
  * Fluid_synth_pitch_wheel_sens
  */
-int 
+int
 fluid_synth_pitch_wheel_sens(fluid_synth_t* synth, int chan, int val)
 {
 
   /* check the ranges of the arguments */
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   if (synth->verbose) {
@@ -1064,14 +1069,14 @@ fluid_synth_pitch_wheel_sens(fluid_synth_t* synth, int chan, int val)
  * version of fluidsynth. Maybe v2.0 ? -- Antoine Schmitt May 2003
  */
 
-int 
+int
 fluid_synth_get_pitch_wheel_sens(fluid_synth_t* synth, int chan, int* pval)
 {
 
   // check the ranges of the arguments
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   // get the pitch-bend value in the channel
@@ -1084,7 +1089,7 @@ fluid_synth_get_pitch_wheel_sens(fluid_synth_t* synth, int chan, int* pval)
  * fluid_synth_get_preset
  */
 fluid_preset_t*
-fluid_synth_get_preset(fluid_synth_t* synth, unsigned int sfontnum, 
+fluid_synth_get_preset(fluid_synth_t* synth, unsigned int sfontnum,
 		      unsigned int banknum, unsigned int prognum)
 {
   fluid_preset_t* preset = NULL;
@@ -1093,7 +1098,7 @@ fluid_synth_get_preset(fluid_synth_t* synth, unsigned int sfontnum,
   int offset;
 
   sfont = fluid_synth_get_sfont_by_id(synth, sfontnum);
-  
+
   if (sfont != NULL) {
     offset = fluid_synth_get_bank_offset(synth, sfontnum);
     preset = fluid_sfont_get_preset(sfont, banknum - offset, prognum);
@@ -1108,7 +1113,7 @@ fluid_synth_get_preset(fluid_synth_t* synth, unsigned int sfontnum,
  * fluid_synth_get_preset2
  */
 fluid_preset_t*
-fluid_synth_get_preset2(fluid_synth_t* synth, char* sfont_name, 
+fluid_synth_get_preset2(fluid_synth_t* synth, char* sfont_name,
 			unsigned int banknum, unsigned int prognum)
 {
   fluid_preset_t* preset = NULL;
@@ -1116,7 +1121,7 @@ fluid_synth_get_preset2(fluid_synth_t* synth, char* sfont_name,
   int offset;
 
   sfont = fluid_synth_get_sfont_by_name(synth, sfont_name);
-  
+
   if (sfont != NULL) {
     offset = fluid_synth_get_bank_offset(synth, fluid_sfont_get_id(sfont));
     preset = fluid_sfont_get_preset(sfont, banknum - offset, prognum);
@@ -1127,8 +1132,8 @@ fluid_synth_get_preset2(fluid_synth_t* synth, char* sfont_name,
   return NULL;
 }
 
-fluid_preset_t* fluid_synth_find_preset(fluid_synth_t* synth, 
-				      unsigned int banknum, 
+fluid_preset_t* fluid_synth_find_preset(fluid_synth_t* synth,
+				      unsigned int banknum,
 				      unsigned int prognum)
 {
   fluid_preset_t* preset = NULL;
@@ -1146,7 +1151,7 @@ fluid_preset_t* fluid_synth_find_preset(fluid_synth_t* synth,
       preset->sfont = sfont; /* FIXME */
       return preset;
     }
-    
+
     list = fluid_list_next(list);
 
   }
@@ -1157,7 +1162,7 @@ fluid_preset_t* fluid_synth_find_preset(fluid_synth_t* synth,
 /*
  * fluid_synth_program_change
  */
-int 
+int
 fluid_synth_program_change(fluid_synth_t* synth, int chan, int prognum)
 {
   fluid_preset_t* preset = NULL;
@@ -1236,8 +1241,8 @@ int fluid_synth_sfont_select(fluid_synth_t* synth, int chan, unsigned int sfont_
 /*
  * fluid_synth_get_program
  */
-int 
-fluid_synth_get_program(fluid_synth_t* synth, int chan, 
+int
+fluid_synth_get_program(fluid_synth_t* synth, int chan,
 		       unsigned int* sfont_id, unsigned int* bank_num, unsigned int* preset_num)
 {
   fluid_channel_t* channel;
@@ -1254,10 +1259,10 @@ fluid_synth_get_program(fluid_synth_t* synth, int chan,
 /*
  * fluid_synth_program_select
  */
-int fluid_synth_program_select(fluid_synth_t* synth, 
-			      int chan, 
-			      unsigned int sfont_id, 
-			      unsigned int bank_num, 
+int fluid_synth_program_select(fluid_synth_t* synth,
+			      int chan,
+			      unsigned int sfont_id,
+			      unsigned int bank_num,
 			      unsigned int preset_num)
 {
   fluid_preset_t* preset = NULL;
@@ -1271,12 +1276,12 @@ int fluid_synth_program_select(fluid_synth_t* synth,
 
   preset = fluid_synth_get_preset(synth, sfont_id, bank_num, preset_num);
   if (preset == NULL) {
-    FLUID_LOG(FLUID_ERR, 
-	     "There is no preset with bank number %d and preset number %d in SoundFont %d", 
+    FLUID_LOG(FLUID_ERR,
+	     "There is no preset with bank number %d and preset number %d in SoundFont %d",
 	     bank_num, preset_num, sfont_id);
     return FLUID_FAILED;
   }
-  
+
   /* inform the channel of the new bank and program number */
   fluid_channel_set_sfontnum(channel, sfont_id);
   fluid_channel_set_banknum(channel, bank_num);
@@ -1290,10 +1295,10 @@ int fluid_synth_program_select(fluid_synth_t* synth,
 /*
  * fluid_synth_program_select2
  */
-int fluid_synth_program_select2(fluid_synth_t* synth, 
-				int chan, 
-				char* sfont_name, 
-				unsigned int bank_num, 
+int fluid_synth_program_select2(fluid_synth_t* synth,
+				int chan,
+				char* sfont_name,
+				unsigned int bank_num,
 				unsigned int preset_num)
 {
   fluid_preset_t* preset = NULL;
@@ -1316,8 +1321,8 @@ int fluid_synth_program_select2(fluid_synth_t* synth,
   offset = fluid_synth_get_bank_offset(synth, fluid_sfont_get_id(sfont));
   preset = fluid_sfont_get_preset(sfont, bank_num - offset, preset_num);
   if (preset == NULL) {
-    FLUID_LOG(FLUID_ERR, 
-	      "There is no preset with bank number %d and preset number %d in SoundFont %s", 
+    FLUID_LOG(FLUID_ERR,
+	      "There is no preset with bank number %d and preset number %d in SoundFont %s",
 	      bank_num, preset_num, sfont_name);
     return FLUID_FAILED;
   }
@@ -1342,10 +1347,10 @@ void fluid_synth_update_presets(fluid_synth_t* synth)
 
   for (chan = 0; chan < synth->midi_channels; chan++) {
     channel = synth->channel[chan];
-    fluid_channel_set_preset(channel, 
-			    fluid_synth_get_preset(synth, 
-						  fluid_channel_get_sfontnum(channel), 
-						  fluid_channel_get_banknum(channel), 
+    fluid_channel_set_preset(channel,
+			    fluid_synth_get_preset(synth,
+						  fluid_channel_get_sfontnum(channel),
+						  fluid_channel_get_banknum(channel),
 						  fluid_channel_get_prognum(channel)));
   }
 }
@@ -1354,7 +1359,7 @@ void fluid_synth_update_presets(fluid_synth_t* synth)
 /*
  * fluid_synth_update_gain
  */
-int fluid_synth_update_gain(fluid_synth_t* synth, char* name, double value) 
+int fluid_synth_update_gain(fluid_synth_t* synth, char* name, double value)
 {
   fluid_synth_set_gain(synth, (float) value);
   return 0;
@@ -1371,7 +1376,7 @@ void fluid_synth_set_gain(fluid_synth_t* synth, float gain)
   synth->gain = gain;
 
   for (i = 0; i < synth->polyphony; i++) {
-    fluid_voice_t* voice = synth->voice[i];    
+    fluid_voice_t* voice = synth->voice[i];
     if (_PLAYING(voice)) {
       fluid_voice_set_gain(voice, gain);
     }
@@ -1408,7 +1413,7 @@ int fluid_synth_set_polyphony(fluid_synth_t* synth, int polyphony)
 
   /* turn off any voices above the new limit */
   for (i = polyphony; i < synth->nvoice; i++) {
-    fluid_voice_t* voice = synth->voice[i];    
+    fluid_voice_t* voice = synth->voice[i];
     if (_PLAYING(voice)) {
       fluid_voice_off(voice);
     }
@@ -1441,9 +1446,9 @@ int fluid_synth_get_internal_bufsize(fluid_synth_t* synth)
  * Resend a bank select and a program change for every channel. This
  * function is called mainly after a SoundFont has been loaded,
  * unloaded or reloaded.  */
-int 
+int
 fluid_synth_program_reset(fluid_synth_t* synth)
-{ 
+{
   int i;
   /* try to set the correct presets */
   for (i = 0; i < synth->midi_channels; i++){
@@ -1474,7 +1479,7 @@ int fluid_synth_set_reverb_preset(fluid_synth_t* synth, int num)
 /*
  * fluid_synth_set_reverb
  */
-void fluid_synth_set_reverb(fluid_synth_t* synth, double roomsize, double damping, 
+void fluid_synth_set_reverb(fluid_synth_t* synth, double roomsize, double damping,
 			   double width, double level)
 {
 /*   fluid_mutex_lock(synth->busy); /\* Don't interfere with the audio thread *\/ */
@@ -1489,7 +1494,7 @@ void fluid_synth_set_reverb(fluid_synth_t* synth, double roomsize, double dampin
 /*
  * fluid_synth_set_chorus
  */
-void fluid_synth_set_chorus(fluid_synth_t* synth, int nr, double level, 
+void fluid_synth_set_chorus(fluid_synth_t* synth, int nr, double level,
 			   double speed, double depth_ms, int type)
 {
 /*   fluid_mutex_lock(synth->busy); /\* Don't interfere with the audio thread *\/ */
@@ -1552,12 +1557,12 @@ void fluid_synth_set_chorus(fluid_synth_t* synth, int nr, double level,
 
 ***************************************************/
 
-/* 
+/*
  *  fluid_synth_nwrite_float
  */
-int 
-fluid_synth_nwrite_float(fluid_synth_t* synth, int len, 
-			float** left, float** right, 
+int
+fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
+			float** left, float** right,
 			float** fx_left, float** fx_right)
 {
   fluid_real_t** left_in = synth->left_buf;
@@ -1599,7 +1604,7 @@ fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
 
     num = (FLUID_BUFSIZE > len - count)? len - count : FLUID_BUFSIZE;
     bytes = num * sizeof(float);
-    
+
     for (i = 0; i < synth->audio_channels; i++) {
       FLUID_MEMCPY(left[i] + count, left_in[i], bytes);
       FLUID_MEMCPY(right[i] + count, right_in[i], bytes);
@@ -1608,7 +1613,7 @@ fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
       FLUID_MEMCPY(fx_left[i] + count, fx_left_in[i], bytes);
       FLUID_MEMCPY(fx_right[i] + count, fx_right_in[i], bytes);
     }
-    
+
     count += num;
   }
 
@@ -1624,19 +1629,19 @@ fluid_synth_nwrite_float(fluid_synth_t* synth, int len,
 }
 
 int fluid_synth_process(fluid_synth_t* synth, int len,
-		       int nin, float** in, 
+		       int nin, float** in,
 		       int nout, float** out)
 {
-  return fluid_synth_write_float(synth, len, out[0], 0, 1, out[1], 0, 1); 
+  return fluid_synth_write_float(synth, len, out[0], 0, 1, out[1], 0, 1);
 }
 
 
-/* 
+/*
  *  fluid_synth_write_float
  */
-int 
-fluid_synth_write_float(fluid_synth_t* synth, int len, 
-		       void* lout, int loff, int lincr, 
+int
+fluid_synth_write_float(fluid_synth_t* synth, int len,
+		       void* lout, int loff, int lincr,
 		       void* rout, int roff, int rincr)
 {
   int i, j, k, l;
@@ -1659,11 +1664,11 @@ fluid_synth_write_float(fluid_synth_t* synth, int len,
 	fluid_synth_one_block(synth, 0);
 	l = 0;
       }
-      
+
       left_out[j] = (float) left_in[l];
       right_out[k] = (float) right_in[l];
   }
-  
+
   synth->cur = l;
 
   time = fluid_utime() - time;
@@ -1675,12 +1680,43 @@ fluid_synth_write_float(fluid_synth_t* synth, int len,
   return 0;
 }
 
-/* 
+#define DITHER_SIZE 48000
+#define DITHER_CHANNELS 2
+
+static float rand_table[DITHER_CHANNELS][DITHER_SIZE];
+
+static void init_dither(void)
+{
+  float d, dp;
+  int c, i;
+
+  for (c = 0; c < DITHER_CHANNELS; c++) {
+    dp = 0;
+    for (i = 0; i < DITHER_SIZE-1; i++) {
+      d = rand() / (float)RAND_MAX - 0.5f;
+      rand_table[c][i] = d - dp;
+      dp = d;
+    }
+    rand_table[c][DITHER_SIZE-1] = 0 - dp;
+  }
+}
+
+/* A portable replacement for roundf(), seems it may actually be faster too! */
+static inline int
+roundi (float x)
+{
+  if (x >= 0.0f)
+    return (int)(x+0.5f);
+  else
+    return (int)(x-0.5f);
+}
+
+/*
  *  fluid_synth_write_s16
  */
-int 
-fluid_synth_write_s16(fluid_synth_t* synth, int len, 
-		     void* lout, int loff, int lincr, 
+int
+fluid_synth_write_s16(fluid_synth_t* synth, int len,
+		     void* lout, int loff, int lincr,
 		     void* rout, int roff, int rincr)
 {
   int i, j, k, cur;
@@ -1692,6 +1728,8 @@ fluid_synth_write_s16(fluid_synth_t* synth, int len,
   fluid_real_t left_sample;
   fluid_real_t right_sample;
   double time = fluid_utime();
+  int di = synth->dither_index;
+  double prof_ref_on_block;
 
   /* make sure we're playing */
   if (synth->state != FLUID_SYNTH_PLAYING) {
@@ -1704,36 +1742,32 @@ fluid_synth_write_s16(fluid_synth_t* synth, int len,
 
     /* fill up the buffers as needed */
     if (cur == FLUID_BUFSIZE) {
-
-      double prof_ref_on_block = fluid_profile_ref();
+      prof_ref_on_block = fluid_profile_ref();
 
       fluid_synth_one_block(synth, 0);
       cur = 0;
-      
+
       fluid_profile(FLUID_PROF_ONE_BLOCK, prof_ref_on_block);
     }
 
-    left_sample=left_in[cur]* 32767.0f;
-    right_sample=right_in[cur] * 32767.0f;
-    
+    left_sample = roundi (left_in[cur] * 32766.0f + rand_table[0][di]);
+    right_sample = roundi (right_in[cur] * 32766.0f + rand_table[1][di]);
+
+    di++;
+    if (di >= DITHER_SIZE) di = 0;
+
     /* digital clipping */
-    if (left_sample > 32767.0f) {
-      left_sample = 32767;
-    } 
-    if (left_sample < -32768.0f) {
-      left_sample = -32768;
-    }
-    if (right_sample > 32767.0f) {
-      right_sample = 32767;
-    } 
-    if (right_sample < -32768.0f) {
-      right_sample = -32768;
-    } 
+    if (left_sample > 32767.0f) left_sample = 32767.0f;
+    if (left_sample < -32768.0f) left_sample = -32768.0f;
+    if (right_sample > 32767.0f) right_sample = 32767.0f;
+    if (right_sample < -32768.0f) right_sample = -32768.0f;
+
     left_out[j] = (signed short) left_sample;
     right_out[k] = (signed short) right_sample;
   }
-  
+
   synth->cur = cur;
+  synth->dither_index = di;	/* keep dither buffer continous */
 
   fluid_profile(FLUID_PROF_WRITE_S16, prof_ref);
 
@@ -1747,11 +1781,54 @@ fluid_synth_write_s16(fluid_synth_t* synth, int len,
   return 0;
 }
 
+/*
+ * fluid_synth_dither_s16
+ * Converts stereo floating point sample data to signed 16 bit data with
+ * dithering.  'dither_index' parameter is a caller supplied pointer to an
+ * integer which should be initialized to 0 before the first call and passed
+ * unmodified to additional calls which are part of the same synthesis output.
+ * Only used internally currently.
+ */
+void
+fluid_synth_dither_s16(int *dither_index, int len, float* lin, float* rin,
+		       void* lout, int loff, int lincr,
+		       void* rout, int roff, int rincr)
+{
+  int i, j, k;
+  signed short* left_out = (signed short*) lout;
+  signed short* right_out = (signed short*) rout;
+  double prof_ref = fluid_profile_ref();
+  fluid_real_t left_sample;
+  fluid_real_t right_sample;
+  int di = *dither_index;
 
-/* 
+  for (i = 0, j = loff, k = roff; i < len; i++, j += lincr, k += rincr) {
+
+    left_sample = roundi (lin[i] * 32766.0f + rand_table[0][di]);
+    right_sample = roundi (rin[i] * 32766.0f + rand_table[1][di]);
+
+    di++;
+    if (di >= DITHER_SIZE) di = 0;
+
+    /* digital clipping */
+    if (left_sample > 32767.0f) left_sample = 32767.0f;
+    if (left_sample < -32768.0f) left_sample = -32768.0f;
+    if (right_sample > 32767.0f) right_sample = 32767.0f;
+    if (right_sample < -32768.0f) right_sample = -32768.0f;
+
+    left_out[j] = (signed short) left_sample;
+    right_out[k] = (signed short) right_sample;
+  }
+
+  *dither_index = di;	/* keep dither buffer continous */
+
+  fluid_profile(FLUID_PROF_WRITE_S16, prof_ref);
+}
+
+/*
  *  fluid_synth_one_block
  */
-int 
+int
 fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out)
 {
   int i, auchan;
@@ -1764,14 +1841,15 @@ fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out)
   double prof_ref = fluid_profile_ref();
 
 /*   fluid_mutex_lock(synth->busy); /\* Here comes the audio thread. Lock the synth. *\/ */
-  
-  fluid_check_fpe("??? Just starting up ???");  
+
+  fluid_check_fpe("??? Just starting up ???");
 
   /* clean the audio buffers */
   for (i = 0; i < synth->nbuf; i++) {
     FLUID_MEMSET(synth->left_buf[i], 0, byte_size);
     FLUID_MEMSET(synth->right_buf[i], 0, byte_size);
   }
+
   for (i = 0; i < synth->effects_channels; i++) {
     FLUID_MEMSET(synth->fx_left_buf[i], 0, byte_size);
     FLUID_MEMSET(synth->fx_right_buf[i], 0, byte_size);
@@ -1781,25 +1859,15 @@ fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out)
    * enabled on synth level.  Nonexisting buffers are detected in the
    * DSP loop. Not sending the reverb / chorus signal saves some time
    * in that case. */
-  if (synth->with_reverb) {
-    reverb_buf = synth->fx_left_buf[0];
-  } else {
-    reverb_buf = NULL;
-  }
-  
-  if (synth->with_chorus) {
-    chorus_buf = synth->fx_left_buf[1];
-  } else {
-    chorus_buf = NULL;
-  }
-
+  reverb_buf = synth->with_reverb ? synth->fx_left_buf[0] : NULL;
+  chorus_buf = synth->with_chorus ? synth->fx_left_buf[1] : NULL;
 
   fluid_profile(FLUID_PROF_ONE_BLOCK_CLEAR, prof_ref);
 
   /* call all playing synthesis processes */
   for (i = 0; i < synth->polyphony; i++) {
     voice = synth->voice[i];
-    
+
     if (_PLAYING(voice)) {
       double prof_ref_voice = fluid_profile_ref();
 
@@ -1825,6 +1893,7 @@ fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out)
       fluid_profile(FLUID_PROF_ONE_BLOCK_VOICE, prof_ref_voice);
     }
   }
+
   fluid_check_fpe("Synthesis processes");
 
   fluid_profile(FLUID_PROF_ONE_BLOCK_VOICES, prof_ref);
@@ -1837,16 +1906,16 @@ fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out)
 
     /* send to reverb */
     if (reverb_buf) {
-      fluid_revmodel_processreplace(synth->reverb, reverb_buf, 
+      fluid_revmodel_processreplace(synth->reverb, reverb_buf,
 				   synth->fx_left_buf[0], synth->fx_right_buf[0]);
       fluid_check_fpe("Reverb");
     }
 
     fluid_profile(FLUID_PROF_ONE_BLOCK_REVERB, prof_ref);
-    
+
     /* send to chorus */
     if (chorus_buf) {
-      fluid_chorus_processreplace(synth->chorus, chorus_buf, 
+      fluid_chorus_processreplace(synth->chorus, chorus_buf,
 				 synth->fx_left_buf[1], synth->fx_right_buf[1]);
       fluid_check_fpe("Chorus");
     }
@@ -1855,16 +1924,16 @@ fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out)
 
     /* send to reverb */
     if (reverb_buf) {
-      fluid_revmodel_processmix(synth->reverb, reverb_buf, 
+      fluid_revmodel_processmix(synth->reverb, reverb_buf,
 			       synth->left_buf[0], synth->right_buf[0]);
       fluid_check_fpe("Reverb");
     }
 
     fluid_profile(FLUID_PROF_ONE_BLOCK_REVERB, prof_ref);
-    
+
     /* send to chorus */
     if (chorus_buf) {
-      fluid_chorus_processmix(synth->chorus, chorus_buf, 
+      fluid_chorus_processmix(synth->chorus, chorus_buf,
 			     synth->left_buf[0], synth->right_buf[0]);
       fluid_check_fpe("Chorus");
     }
@@ -1888,7 +1957,7 @@ fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out)
 
 /*   fluid_mutex_unlock(synth->busy); /\* Allow other threads to touch the synth *\/ */
 
-  return 0;  
+  return 0;
 }
 
 
@@ -1911,9 +1980,9 @@ fluid_synth_free_voice_by_kill(fluid_synth_t* synth)
 /*   fluid_mutex_unlock(synth->busy); */
 
   for (i = 0; i < synth->polyphony; i++) {
-    
+
     voice = synth->voice[i];
-    
+
     /* safeguard against an available voice. */
     if (_AVAILABLE(voice)) {
       return voice;
@@ -1921,9 +1990,9 @@ fluid_synth_free_voice_by_kill(fluid_synth_t* synth)
 
     /* Determine, how 'important' a voice is.
      * Start with an arbitrary number */
-    this_voice_prio = 10000.; 
-    
-    /* Is this voice on the drum channel? 
+    this_voice_prio = 10000.;
+
+    /* Is this voice on the drum channel?
      * Then it is very important.
      * Also, forget about the released-note condition:
      * Typically, drum notes are triggered only very briefly, they run most
@@ -1948,15 +2017,15 @@ fluid_synth_free_voice_by_kill(fluid_synth_t* synth)
        */
       this_voice_prio -= 1000;
     }
-        
+
     /* We are not enthusiastic about releasing voices, which have just been started.
      * Otherwise hitting a chord may result in killing notes belonging to that very same
-     * chord. 
+     * chord.
      * So subtract the age of the voice from the priority - an older voice is just a little
-     * bit less important than a younger voice. 
+     * bit less important than a younger voice.
      * This is a number between roughly 0 and 100.*/
     this_voice_prio -= (synth->noteid - fluid_voice_get_id(voice));
-    
+
     /* take a rough estimate of loudness into account. Louder voices are more important. */
     if (voice->volenv_section != FLUID_VOICE_ENVATTACK){
       this_voice_prio += voice->volenv_val * 1000.;
@@ -1981,7 +2050,7 @@ fluid_synth_free_voice_by_kill(fluid_synth_t* synth)
 /*
  * fluid_synth_alloc_voice
  */
-fluid_voice_t* 
+fluid_voice_t*
 fluid_synth_alloc_voice(fluid_synth_t* synth, fluid_sample_t* sample, int chan, int key, int vel)
 {
   int i, k;
@@ -2007,7 +2076,7 @@ fluid_synth_alloc_voice(fluid_synth_t* synth, fluid_sample_t* sample, int chan, 
   if (voice == NULL) {
     FLUID_LOG(FLUID_WARN, "Failed to allocate a synthesis process. (chan=%d,key=%d)", chan, key);
     return NULL;
-  }  
+  }
 
   if (synth->verbose) {
     k = 0;
@@ -2017,9 +2086,9 @@ fluid_synth_alloc_voice(fluid_synth_t* synth, fluid_sample_t* sample, int chan, 
       }
     }
 
-    FLUID_LOG(FLUID_INFO, "noteon\t%d\t%d\t%d\t%05d\t%.3f\t%.3f\t%.3f\t%d", 
-	     chan, key, vel, synth->storeid, 
-	     (float) synth->ticks / 44100.0f, 
+    FLUID_LOG(FLUID_INFO, "noteon\t%d\t%d\t%d\t%05d\t%.3f\t%.3f\t%.3f\t%d",
+	     chan, key, vel, synth->storeid,
+	     (float) synth->ticks / 44100.0f,
 	     (fluid_curtime() - synth->start) / 1000.0f,
 	     0.0f,
 	     k);
@@ -2029,12 +2098,12 @@ fluid_synth_alloc_voice(fluid_synth_t* synth, fluid_sample_t* sample, int chan, 
 	  channel = synth->channel[chan];
   }
 
-  if (fluid_voice_init(voice, sample, channel, key, vel, 
+  if (fluid_voice_init(voice, sample, channel, key, vel,
 		       synth->storeid, synth->ticks, synth->gain) != FLUID_OK) {
     FLUID_LOG(FLUID_WARN, "Failed to initialize voice");
     return NULL;
   }
-   
+
   /* add the default modulators to the synthesis process. */
   fluid_voice_add_mod(voice, &default_vel2att_mod, FLUID_VOICE_DEFAULT);    /* SF2.01 $8.4.1  */
   fluid_voice_add_mod(voice, &default_vel2filter_mod, FLUID_VOICE_DEFAULT); /* SF2.01 $8.4.2  */
@@ -2046,7 +2115,7 @@ fluid_synth_alloc_voice(fluid_synth_t* synth, fluid_sample_t* sample, int chan, 
   fluid_voice_add_mod(voice, &default_reverb_mod, FLUID_VOICE_DEFAULT);     /* SF2.01 $8.4.8  */
   fluid_voice_add_mod(voice, &default_chorus_mod, FLUID_VOICE_DEFAULT);     /* SF2.01 $8.4.9  */
   fluid_voice_add_mod(voice, &default_pitch_bend_mod, FLUID_VOICE_DEFAULT); /* SF2.01 $8.4.10 */
-  
+
   return voice;
 }
 
@@ -2064,50 +2133,50 @@ void fluid_synth_kill_by_exclusive_class(fluid_synth_t* synth, fluid_voice_t* ne
       terminate all voices on a channel belonging into the exclusive
       class excl_class.
   */
-  
+
   int i;
   int excl_class = _GEN(new_voice,GEN_EXCLUSIVECLASS);
 
   /* Check if the voice belongs to an exclusive class. In that case,
      previous notes from the same class are released. */
-  
+
   /* Excl. class 0: No exclusive class */
-  if (excl_class == 0) { 
-    return; 
+  if (excl_class == 0) {
+    return;
   }
-  
+
   //  FLUID_LOG(FLUID_INFO, "Voice belongs to exclusive class (class=%d, ignore_id=%d)", excl_class, ignore_ID);
-  
+
     /* Kill all notes on the same channel with the same exclusive class */
-  
+
   for (i = 0; i < synth->polyphony; i++) {
     fluid_voice_t* existing_voice = synth->voice[i];
-    
+
     /* Existing voice does not play? Leave it alone. */
     if (!_PLAYING(existing_voice)) {
       continue;
     }
-    
+
     /* An exclusive class is valid for a whole channel (or preset).
      * Is the voice on a different channel? Leave it alone. */
     if (existing_voice->chan != new_voice->chan) {
       continue;
     }
-    
+
     /* Existing voice has a different (or no) exclusive class? Leave it alone. */
     if ((int)_GEN(existing_voice, GEN_EXCLUSIVECLASS) != excl_class) {
       continue;
     }
-    
+
     /* Existing voice is a voice process belonging to this noteon
      * event (for example: stereo sample)?  Leave it alone. */
     if (fluid_voice_get_id(existing_voice) == fluid_voice_get_id(new_voice)) {
       continue;
     }
-    
-    //    FLUID_LOG(FLUID_INFO, "Releasing previous voice of exclusive class (class=%d, id=%d)", 
+
+    //    FLUID_LOG(FLUID_INFO, "Releasing previous voice of exclusive class (class=%d, id=%d)",
     //     (int)_GEN(existing_voice, GEN_EXCLUSIVECLASS), (int)fluid_voice_get_id(existing_voice));
-    
+
     fluid_voice_kill_excl(existing_voice);
   };
 };
@@ -2123,7 +2192,7 @@ void fluid_synth_start_voice(fluid_synth_t* synth, fluid_voice_t* voice)
   /* Find the exclusive class of this voice. If set, kill all voices
    * that match the exclusive class and are younger than the first
    * voice process created by this noteon event. */
-  fluid_synth_kill_by_exclusive_class(synth, voice);  
+  fluid_synth_kill_by_exclusive_class(synth, voice);
 
   /* Start the new voice */
 
@@ -2142,7 +2211,7 @@ void fluid_synth_add_sfloader(fluid_synth_t* synth, fluid_sfloader_t* loader)
 /*
  * fluid_synth_sfload
  */
-int 
+int
 fluid_synth_sfload(fluid_synth_t* synth, const char* filename, int reset_presets)
 {
   fluid_sfont_t* sfont;
@@ -2154,13 +2223,13 @@ fluid_synth_sfload(fluid_synth_t* synth, const char* filename, int reset_presets
 #endif
 
   if (filename == NULL) {
-    FLUID_LOG(FLUID_ERR, "Invalid filename"); 
+    FLUID_LOG(FLUID_ERR, "Invalid filename");
     return FLUID_FAILED;
   }
 
   for (list = synth->loaders; list; list = fluid_list_next(list)) {
     loader = (fluid_sfloader_t*) fluid_list_get(list);
-    
+
     sfont = fluid_sfloader_load(loader, filename);
 
     if (sfont != NULL) {
@@ -2179,7 +2248,7 @@ fluid_synth_sfload(fluid_synth_t* synth, const char* filename, int reset_presets
     }
   }
 
-  FLUID_LOG(FLUID_ERR, "Failed to load SoundFont \"%s\"", filename); 
+  FLUID_LOG(FLUID_ERR, "Failed to load SoundFont \"%s\"", filename);
   return -1;
 }
 
@@ -2214,7 +2283,7 @@ void fluid_synth_sfunload_macos9(fluid_synth_t* synth)
     }
     list = next;
   }
-#endif    
+#endif
 }
 
 /*
@@ -2230,7 +2299,7 @@ fluid_synth_sfunload(fluid_synth_t* synth, unsigned int id, int reset_presets)
 #endif
 
   if (!sfont) {
-    FLUID_LOG(FLUID_ERR, "No SoundFont with id = %d", id); 
+    FLUID_LOG(FLUID_ERR, "No SoundFont with id = %d", id);
     return FLUID_FAILED;
   }
 
@@ -2250,9 +2319,9 @@ fluid_synth_sfunload(fluid_synth_t* synth, unsigned int id, int reset_presets)
 #else
     /* spin off a timer thread to unload the sfont later */
     new_fluid_timer(100, fluid_synth_sfunload_callback, sfont, 1, 1);
-#endif    
+#endif
   }
-	
+
   return FLUID_OK;
 }
 
@@ -2270,7 +2339,7 @@ int fluid_synth_sfreload(fluid_synth_t* synth, unsigned int id)
 
   sfont = fluid_synth_get_sfont_by_id(synth, id);
   if (!sfont) {
-    FLUID_LOG(FLUID_ERR, "No SoundFont with id = %d", id); 
+    FLUID_LOG(FLUID_ERR, "No SoundFont with id = %d", id);
     return FLUID_FAILED;
   }
 
@@ -2293,7 +2362,7 @@ int fluid_synth_sfreload(fluid_synth_t* synth, unsigned int id)
 
   for (list = synth->loaders; list; list = fluid_list_next(list)) {
     loader = (fluid_sfloader_t*) fluid_list_get(list);
-    
+
     sfont = fluid_sfloader_load(loader, filename);
 
     if (sfont != NULL) {
@@ -2310,7 +2379,7 @@ int fluid_synth_sfreload(fluid_synth_t* synth, unsigned int id)
     }
   }
 
-  FLUID_LOG(FLUID_ERR, "Failed to load SoundFont \"%s\"", filename); 
+  FLUID_LOG(FLUID_ERR, "Failed to load SoundFont \"%s\"", filename);
   return -1;
 }
 
@@ -2324,10 +2393,10 @@ int fluid_synth_add_sfont(fluid_synth_t* synth, fluid_sfont_t* sfont)
 
 	/* insert the sfont as the first one on the list */
 	synth->sfont = fluid_list_prepend(synth->sfont, sfont);
-	
+
 	/* reset the presets for all channels */
 	fluid_synth_program_reset(synth);
-	
+
 	return sfont->id;
 }
 
@@ -2343,7 +2412,7 @@ void fluid_synth_remove_sfont(fluid_synth_t* synth, fluid_sfont_t* sfont)
 
 	/* remove a possible bank offset */
 	fluid_synth_remove_bank_offset(synth, sfont_id);
-	
+
 	/* reset the presets for all channels */
 	fluid_synth_program_reset(synth);
 }
@@ -2351,9 +2420,9 @@ void fluid_synth_remove_sfont(fluid_synth_t* synth, fluid_sfont_t* sfont)
 
 /* fluid_synth_sfcount
  *
- * Returns the number of loaded SoundFonts 
+ * Returns the number of loaded SoundFonts
  */
-int 
+int
 fluid_synth_sfcount(fluid_synth_t* synth)
 {
   return fluid_list_size(synth->sfont);
@@ -2361,9 +2430,9 @@ fluid_synth_sfcount(fluid_synth_t* synth)
 
 /* fluid_synth_get_sfont
  *
- * Returns SoundFont num 
+ * Returns SoundFont num
  */
-fluid_sfont_t* 
+fluid_sfont_t*
 fluid_synth_get_sfont(fluid_synth_t* synth, unsigned int num)
 {
   return (fluid_sfont_t*) fluid_list_get(fluid_list_nth(synth->sfont, num));
@@ -2384,7 +2453,7 @@ fluid_sfont_t* fluid_synth_get_sfont_by_id(fluid_synth_t* synth, unsigned int id
     }
     list = fluid_list_next(list);
   }
-  return NULL;  
+  return NULL;
 }
 
 /* fluid_synth_get_sfont_by_name
@@ -2402,7 +2471,7 @@ fluid_sfont_t* fluid_synth_get_sfont_by_name(fluid_synth_t* synth, char *name)
     }
     list = fluid_list_next(list);
   }
-  return NULL;  
+  return NULL;
 }
 
 /*
@@ -2414,7 +2483,7 @@ fluid_synth_get_channel_preset(fluid_synth_t* synth, int chan)
   if ((chan >= 0) && (chan < synth->midi_channels)) {
     return fluid_channel_get_preset(synth->channel[chan]);
   }
-  
+
   return NULL;
 }
 
@@ -2431,7 +2500,7 @@ fluid_synth_get_voicelist(fluid_synth_t* synth, fluid_voice_t* buf[], int bufsiz
     if (count >= bufsize) {
       return;
     }
-    
+
     if (_PLAYING(voice) && ((int)voice->id == ID || ID < 0)) {
       buf[count++] = voice;
     }
@@ -2442,21 +2511,21 @@ fluid_synth_get_voicelist(fluid_synth_t* synth, fluid_voice_t* buf[], int bufsiz
   buf[count++] = NULL;
 }
 
-/* Purpose: 
+/* Purpose:
  * Turns on / off the reverb unit in the synth */
 void fluid_synth_set_reverb_on(fluid_synth_t* synth, int on)
 {
   synth->with_reverb = on;
 }
 
-/* Purpose: 
+/* Purpose:
  * Turns on / off the chorus unit in the synth */
 void fluid_synth_set_chorus_on(fluid_synth_t* synth, int on)
 {
   synth->with_chorus = on;
 }
 
-/* Purpose: 
+/* Purpose:
  * Reports the current setting of the chorus unit. */
 int fluid_synth_get_chorus_nr(fluid_synth_t* synth)
 {
@@ -2505,7 +2574,7 @@ double fluid_synth_get_reverb_width(fluid_synth_t* synth)
     return (double) fluid_revmodel_getwidth(synth->reverb);
 }
 
-/* Purpose: 
+/* Purpose:
  *
  * If the same note is hit twice on the same channel, then the older
  * voice process is advanced to the release stage.  Using a mechanical
@@ -2524,9 +2593,9 @@ void fluid_synth_release_voice_on_same_note(fluid_synth_t* synth, int chan, int 
 
   for (i = 0; i < synth->polyphony; i++) {
     voice = synth->voice[i];
-    if (_PLAYING(voice) 
-	&& (voice->chan == chan) 
-	&& (voice->key == key) 
+    if (_PLAYING(voice)
+	&& (voice->chan == chan)
+	&& (voice->key == key)
 	&& (fluid_voice_get_id(voice) != synth->noteid)) {
       fluid_voice_noteoff(voice);
     }
@@ -2541,7 +2610,7 @@ int fluid_synth_set_interp_method(fluid_synth_t* synth, int chan, int interp_met
   int i;
   for (i = 0; i < synth->midi_channels; i++) {
     if (synth->channel[i] == NULL){
-      FLUID_LOG(FLUID_ERR, "Channels don't exist (yet)!"); 
+      FLUID_LOG(FLUID_ERR, "Channels don't exist (yet)!");
       return FLUID_FAILED;
     };
     if (chan < 0 || fluid_channel_get_num(synth->channel[i]) == chan){
@@ -2554,7 +2623,7 @@ int fluid_synth_set_interp_method(fluid_synth_t* synth, int chan, int interp_met
 /* Purpose:
  * Returns the number of allocated midi channels
  */
-int 
+int
 fluid_synth_count_midi_channels(fluid_synth_t* synth)
 {
   return synth->midi_channels;
@@ -2563,7 +2632,7 @@ fluid_synth_count_midi_channels(fluid_synth_t* synth)
 /* Purpose:
  * Returns the number of allocated audio channels
  */
-int 
+int
 fluid_synth_count_audio_channels(fluid_synth_t* synth)
 {
   return synth->audio_channels;
@@ -2572,7 +2641,7 @@ fluid_synth_count_audio_channels(fluid_synth_t* synth)
 /* Purpose:
  * Returns the number of allocated audio channels
  */
-int 
+int
 fluid_synth_count_audio_groups(fluid_synth_t* synth)
 {
   return synth->audio_groups;
@@ -2592,36 +2661,36 @@ double fluid_synth_get_cpu_load(fluid_synth_t* synth)
   return synth->cpu_load;
 }
 
-static fluid_tuning_t* 
+static fluid_tuning_t*
 fluid_synth_get_tuning(fluid_synth_t* synth, int bank, int prog)
 {
   if ((bank < 0) || (bank >= 128)) {
     FLUID_LOG(FLUID_WARN, "Bank number out of range");
-    return NULL;     
+    return NULL;
   }
   if ((prog < 0) || (prog >= 128)) {
     FLUID_LOG(FLUID_WARN, "Program number out of range");
-    return NULL;     
+    return NULL;
   }
   if ((synth->tuning == NULL) ||
       (synth->tuning[bank] == NULL) ||
       (synth->tuning[bank][prog] == NULL)) {
     FLUID_LOG(FLUID_WARN, "No tuning at bank %d, prog %d", bank, prog);
-    return NULL;     
+    return NULL;
   }
   return synth->tuning[bank][prog];
 }
 
-static fluid_tuning_t* 
+static fluid_tuning_t*
 fluid_synth_create_tuning(fluid_synth_t* synth, int bank, int prog, char* name)
 {
   if ((bank < 0) || (bank >= 128)) {
     FLUID_LOG(FLUID_WARN, "Bank number out of range");
-    return NULL;     
+    return NULL;
   }
   if ((prog < 0) || (prog >= 128)) {
     FLUID_LOG(FLUID_WARN, "Program number out of range");
-    return NULL;     
+    return NULL;
   }
   if (synth->tuning == NULL) {
     synth->tuning = FLUID_ARRAY(fluid_tuning_t**, 128);
@@ -2648,7 +2717,7 @@ fluid_synth_create_tuning(fluid_synth_t* synth, int bank, int prog, char* name)
     }
   }
 
-  if ((fluid_tuning_get_name(synth->tuning[bank][prog]) == NULL) 
+  if ((fluid_tuning_get_name(synth->tuning[bank][prog]) == NULL)
       || (FLUID_STRCMP(fluid_tuning_get_name(synth->tuning[bank][prog]), name) != 0)) {
     fluid_tuning_set_name(synth->tuning[bank][prog], name);
   }
@@ -2656,7 +2725,7 @@ fluid_synth_create_tuning(fluid_synth_t* synth, int bank, int prog, char* name)
   return synth->tuning[bank][prog];
 }
 
-int fluid_synth_create_key_tuning(fluid_synth_t* synth, 
+int fluid_synth_create_key_tuning(fluid_synth_t* synth,
 				 int bank, int prog,
 				 char* name, double* pitch)
 {
@@ -2671,7 +2740,7 @@ int fluid_synth_create_key_tuning(fluid_synth_t* synth,
 }
 
 
-int fluid_synth_create_octave_tuning(fluid_synth_t* synth, 
+int fluid_synth_create_octave_tuning(fluid_synth_t* synth,
 				    int bank, int prog,
 				    char* name, double* pitch)
 {
@@ -2689,8 +2758,8 @@ int fluid_synth_tune_notes(fluid_synth_t* synth, int bank, int prog,
   fluid_tuning_t* tuning = fluid_synth_get_tuning(synth, bank, prog);
   int i;
 
-  if (tuning == NULL) { 
-    return FLUID_FAILED;     
+  if (tuning == NULL) {
+    return FLUID_FAILED;
   }
 
   for (i = 0; i < len; i++) {
@@ -2700,17 +2769,17 @@ int fluid_synth_tune_notes(fluid_synth_t* synth, int bank, int prog,
   return FLUID_OK;
 }
 
-int fluid_synth_select_tuning(fluid_synth_t* synth, int chan, 
+int fluid_synth_select_tuning(fluid_synth_t* synth, int chan,
 			     int bank, int prog)
 {
   fluid_tuning_t* tuning = fluid_synth_get_tuning(synth, bank, prog);
 
-  if (tuning == NULL) { 
-    return FLUID_FAILED;     
+  if (tuning == NULL) {
+    return FLUID_FAILED;
   }
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   fluid_channel_set_tuning(synth->channel[chan], synth->tuning[bank][prog]);
@@ -2722,11 +2791,11 @@ int fluid_synth_reset_tuning(fluid_synth_t* synth, int chan)
 {
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   fluid_channel_set_tuning(synth->channel[chan], NULL);
-  
+
   return FLUID_OK;
 }
 
@@ -2738,7 +2807,7 @@ void fluid_synth_tuning_iteration_start(fluid_synth_t* synth)
 int fluid_synth_tuning_iteration_next(fluid_synth_t* synth, int* bank, int* prog)
 {
   int b = 0, p = 0;
-  
+
   if (synth->tuning == NULL) {
     return 0;
   }
@@ -2772,13 +2841,13 @@ int fluid_synth_tuning_iteration_next(fluid_synth_t* synth, int* bank, int* prog
   return 0;
 }
 
-int fluid_synth_tuning_dump(fluid_synth_t* synth, int bank, int prog, 
+int fluid_synth_tuning_dump(fluid_synth_t* synth, int bank, int prog,
 			   char* name, int len, double* pitch)
 {
   fluid_tuning_t* tuning = fluid_synth_get_tuning(synth, bank, prog);
 
-  if (tuning == NULL) { 
-    return FLUID_FAILED;     
+  if (tuning == NULL) {
+    return FLUID_FAILED;
   }
 
   if (name) {
@@ -2827,7 +2896,7 @@ int fluid_synth_getint(fluid_synth_t* synth, char* name, int* val)
   return fluid_settings_getint(synth->settings, name, val);
 }
 
-int 
+int
 fluid_synth_set_gen(fluid_synth_t* synth, int chan, int param, float value)
 {
   int i;
@@ -2835,12 +2904,12 @@ fluid_synth_set_gen(fluid_synth_t* synth, int chan, int param, float value)
 
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   if ((param < 0) || (param >= GEN_LAST)) {
     FLUID_LOG(FLUID_WARN, "Parameter number out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   fluid_channel_set_gen(synth->channel[chan], param, value, 0);
@@ -2852,7 +2921,7 @@ fluid_synth_set_gen(fluid_synth_t* synth, int chan, int param, float value)
     }
   }
 
-  return FLUID_OK;  
+  return FLUID_OK;
 }
 
 /** Change the value of a generator. This function allows to control
@@ -2863,7 +2932,7 @@ fluid_synth_set_gen(fluid_synth_t* synth, int chan, int param, float value)
     parameter numbers and ranges are described in the SoundFont 2.01
     specification, paragraph 8.1.3, page 48. See also
     'fluid_gen_type'.
- 
+
     Using the fluid_synth_set_gen2() function, it is possible to set
     the absolute value of a generator. This is an extension to the
     SoundFont standard. If 'absolute' is non-zero, the value of the
@@ -2871,15 +2940,15 @@ fluid_synth_set_gen(fluid_synth_t* synth, int chan, int param, float value)
     generator is fixed to the value passed as argument. To undo this
     behavior, you must call fluid_synth_set_gen2 again, with
     'absolute' set to 0 (and possibly 'value' set to zero).
- 
+
     If 'normalized' is non-zero, the value is supposed to be
     normalized between 0 and 1. Before applying the value, it will be
     scaled and shifted to the range defined in the SoundFont
     specifications.
 
  */
-int 
-fluid_synth_set_gen2(fluid_synth_t* synth, int chan, int param, 
+int
+fluid_synth_set_gen2(fluid_synth_t* synth, int chan, int param,
 		     float value, int absolute, int normalized)
 {
   int i;
@@ -2888,12 +2957,12 @@ fluid_synth_set_gen2(fluid_synth_t* synth, int chan, int param,
 
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   if ((param < 0) || (param >= GEN_LAST)) {
     FLUID_LOG(FLUID_WARN, "Parameter number out of range");
-    return FLUID_FAILED;     
+    return FLUID_FAILED;
   }
 
   v = (normalized)? fluid_gen_scale(param, value) : value;
@@ -2907,25 +2976,25 @@ fluid_synth_set_gen2(fluid_synth_t* synth, int chan, int param,
     }
   }
 
-  return FLUID_OK;  
+  return FLUID_OK;
 }
 
 float fluid_synth_get_gen(fluid_synth_t* synth, int chan, int param)
 {
   if ((chan < 0) || (chan >= synth->midi_channels)) {
     FLUID_LOG(FLUID_WARN, "Channel out of range");
-    return 0.0;     
+    return 0.0;
   }
 
   if ((param < 0) || (param >= GEN_LAST)) {
     FLUID_LOG(FLUID_WARN, "Parameter number out of range");
-    return 0.0;     
+    return 0.0;
   }
 
   return fluid_channel_get_gen(synth->channel[chan], param);
 }
 
-/* The synth needs to know the router for the command line handlers (they only 
+/* The synth needs to know the router for the command line handlers (they only
  * supply the synth as argument)
  */
 void fluid_synth_set_midi_router(fluid_synth_t* synth, fluid_midi_router_t* router){
@@ -2944,16 +3013,16 @@ int fluid_synth_handle_midi_event(void* data, fluid_midi_event_t* event)
 
   switch(type) {
       case NOTE_ON:
-	return fluid_synth_noteon(synth, chan, 
-				 fluid_midi_event_get_key(event), 
+	return fluid_synth_noteon(synth, chan,
+				 fluid_midi_event_get_key(event),
 				 fluid_midi_event_get_velocity(event));
 
       case NOTE_OFF:
 	return fluid_synth_noteoff(synth, chan, fluid_midi_event_get_key(event));
 
       case CONTROL_CHANGE:
-	return fluid_synth_cc(synth, chan, 
-			     fluid_midi_event_get_control(event), 
+	return fluid_synth_cc(synth, chan,
+			     fluid_midi_event_get_control(event),
 			     fluid_midi_event_get_value(event));
 
       case PROGRAM_CHANGE:
@@ -2969,7 +3038,7 @@ int fluid_synth_handle_midi_event(void* data, fluid_midi_event_t* event)
 }
 
 
-int fluid_synth_start(fluid_synth_t* synth, unsigned int id, fluid_preset_t* preset, 
+int fluid_synth_start(fluid_synth_t* synth, unsigned int id, fluid_preset_t* preset,
 		      int audio_chan, int midi_chan, int key, int vel)
 {
   int r;
@@ -3006,7 +3075,7 @@ int fluid_synth_stop(fluid_synth_t* synth, unsigned int id)
   fluid_voice_t* voice;
   int status = FLUID_FAILED;
   int count = 0;
-  
+
   for (i = 0; i < synth->polyphony; i++) {
 
     voice = synth->voice[i];
@@ -3021,12 +3090,12 @@ int fluid_synth_stop(fluid_synth_t* synth, unsigned int id)
   return status;
 }
 
-fluid_bank_offset_t* 
+fluid_bank_offset_t*
 fluid_synth_get_bank_offset0(fluid_synth_t* synth, int sfont_id)
 {
 	fluid_list_t* list = synth->bank_offsets;
 	fluid_bank_offset_t* offset;
- 
+
 	while (list) {
 
 		offset = (fluid_bank_offset_t*) fluid_list_get(list);
@@ -3036,11 +3105,11 @@ fluid_synth_get_bank_offset0(fluid_synth_t* synth, int sfont_id)
 
 		list = fluid_list_next(list);
 	}
-	
+
 	return NULL;
 }
 
-int 
+int
 fluid_synth_set_bank_offset(fluid_synth_t* synth, int sfont_id, int offset)
 {
 	fluid_bank_offset_t* bank_offset;
@@ -3062,7 +3131,7 @@ fluid_synth_set_bank_offset(fluid_synth_t* synth, int sfont_id, int offset)
 	return 0;
 }
 
-int 
+int
 fluid_synth_get_bank_offset(fluid_synth_t* synth, int sfont_id)
 {
 	fluid_bank_offset_t* bank_offset;
@@ -3071,7 +3140,7 @@ fluid_synth_get_bank_offset(fluid_synth_t* synth, int sfont_id)
 	return (bank_offset == NULL)? 0 : bank_offset->offset;
 }
 
-void 
+void
 fluid_synth_remove_bank_offset(fluid_synth_t* synth, int sfont_id)
 {
 	fluid_bank_offset_t* bank_offset;

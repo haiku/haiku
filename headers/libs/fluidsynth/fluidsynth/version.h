@@ -26,10 +26,10 @@
 extern "C" {
 #endif
 
-#define FLUIDSYNTH_VERSION       "1.0.7"
+#define FLUIDSYNTH_VERSION       "1.0.8"
 #define FLUIDSYNTH_VERSION_MAJOR 1
 #define FLUIDSYNTH_VERSION_MINOR 0
-#define FLUIDSYNTH_VERSION_MICRO 7
+#define FLUIDSYNTH_VERSION_MICRO 8
 
 
 FLUIDSYNTH_API void fluid_version(int *major, int *minor, int *micro);

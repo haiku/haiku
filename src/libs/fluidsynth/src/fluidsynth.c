@@ -11,14 +11,16 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
  * 02111-1307, USA
  */
 
+#if HAVE_CONFIG_H
 #include "config.h"
+#endif
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -36,10 +38,6 @@
 #endif
 
 #include "fluidsynth.h"
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 #if defined(WIN32) && !defined(MINGW32)
 #include "config_win32.h"
@@ -88,7 +86,7 @@ extern int optind, opterr, optopt;
 /* process_o_cmd_line_option
  *
  * Purpose:
- * Process a command line option -o setting=value, 
+ * Process a command line option -o setting=value,
  * for example: -o synth.polyhony=16
  */
 void process_o_cmd_line_option(fluid_settings_t* settings, char* optarg){
@@ -127,7 +125,7 @@ void process_o_cmd_line_option(fluid_settings_t* settings, char* optarg){
   default:
     fprintf (stderr, "Settings argument on command line: Failed to set \"%s\" to \"%s\".\n"
 	      "Most likely the parameter \"%s\" does not exist.\n", optarg, val, optarg);
-  }  
+  }
 }
 
 static void
@@ -180,7 +178,7 @@ settings_foreach_func (void *data, char *name, int type)
 
 
 #ifdef HAVE_SIGNAL_H
-/* 
+/*
  * handle_signal
  */
 void handle_signal(int sig_num)
@@ -192,7 +190,7 @@ void handle_signal(int sig_num)
 /*
  * main
  */
-int main(int argc, char** argv) 
+int main(int argc, char** argv)
 {
   fluid_settings_t* settings;
   int arg1 = 1;
@@ -200,7 +198,7 @@ int main(int argc, char** argv)
   int c, i, fragcount = DEFAULT_FRAG_COUNT;
   int interactive = 1;
   int midi_in = 1;
-  fluid_player_t* player = NULL; 
+  fluid_player_t* player = NULL;
   fluid_midi_router_t* router = NULL;
   fluid_midi_driver_t* mdriver = NULL;
   fluid_audio_driver_t* adriver = NULL;
@@ -354,7 +352,7 @@ int main(int argc, char** argv)
     case 'n':
       midi_in = 0;
       break;
-    case 'o': 
+    case 'o':
       process_o_cmd_line_option(settings, optarg);
       break;
     case 'R':
@@ -433,16 +431,16 @@ int main(int argc, char** argv)
    */
   if ((audio_groups == 0) && (audio_channels != 0)) {
       audio_groups = audio_channels;
-  } 
+  }
   fluid_settings_setint(settings, "synth.audio-groups", audio_groups);
-  
+
   /* create the synthesizer */
   synth = new_fluid_synth(settings);
   if (synth == NULL) {
     fprintf(stderr, "Failed to create the synthesizer\n");
     exit(-1);
   }
-  
+
   cmd_handler = new_fluid_cmd_handler(synth);
   if (cmd_handler == NULL) {
     fprintf(stderr, "Failed to create the command handler\n");
@@ -458,13 +456,16 @@ int main(int argc, char** argv)
     fluid_source(cmd_handler, buf);
   }
 
-  /* load the soundfonts */
+  /* load the soundfonts (check that all non options are SoundFont or MIDI files) */
   for (i = arg1; i < argc; i++) {
-    if ((argv[i][0] != '-') && fluid_is_soundfont(argv[i])) {
-      if (fluid_synth_sfload(synth, argv[i], 1) == -1) {
+    if (fluid_is_soundfont(argv[i]))
+    {
+      if (fluid_synth_sfload(synth, argv[i], 1) == -1)
 	fprintf(stderr, "Failed to load the SoundFont %s\n", argv[i]);
-      }
     }
+    else if (!fluid_is_midifile(argv[i]))
+      fprintf (stderr, "Parameter '%s' not a SoundFont or MIDI file or error occurred identifying it.\n",
+	       argv[i]);
   }
 
 #ifdef HAVE_SIGNAL_H
@@ -487,10 +488,10 @@ int main(int argc, char** argv)
      */
 
     router = new_fluid_midi_router(
-      settings, 
-      dump ? fluid_midi_dump_postrouter : fluid_synth_handle_midi_event, 
+      settings,
+      dump ? fluid_midi_dump_postrouter : fluid_synth_handle_midi_event,
       (void*)synth);
-    
+
     if (router == NULL) {
       fprintf(stderr, "Failed to create the MIDI input router; no MIDI input\n"
 	      "will be available. You can access the synthesizer \n"
@@ -498,7 +499,7 @@ int main(int argc, char** argv)
     } else {
       fluid_synth_set_midi_router(synth, router); /* Fixme, needed for command handler */
       mdriver = new_fluid_midi_driver(
-	settings, 
+	settings,
 	dump ? fluid_midi_dump_prerouter : fluid_midi_router_handle_midi_event,
 	(void*) router);
       if (mdriver == NULL) {
@@ -561,7 +562,7 @@ int main(int argc, char** argv)
      * 0.
      */
     fluid_settings_setstr(settings, "shell.prompt", dump ? "" : "> ");
-    fluid_usershell(settings, cmd_handler);    
+    fluid_usershell(settings, cmd_handler);
   }
 
  cleanup:
@@ -584,7 +585,7 @@ int main(int argc, char** argv)
     /* if the user typed 'quit' in the shell, stop the player */
     if (interactive) {
       fluid_player_stop(player);
-    } 
+    }
     fluid_player_join(player);
     delete_fluid_player(player);
   }
@@ -623,8 +624,8 @@ static fluid_cmd_handler_t* newclient(void* data, char* addr)
 /*
  * print_usage
  */
-void 
-print_usage() 
+void
+print_usage()
 {
   print_welcome ();
   fprintf(stderr, "Usage: fluidsynth [options] [soundfonts]\n");
@@ -635,8 +636,8 @@ print_usage()
 /*
  * print_welcome
  */
-void 
-print_welcome() 
+void
+print_welcome()
 {
   printf("FluidSynth version %s\n"
 	 "Copyright (C) 2000-2006 Peter Hanappe and others.\n"
@@ -648,8 +649,8 @@ print_welcome()
 /*
  * print_help
  */
-void 
-print_help() 
+void
+print_help()
 {
   print_welcome ();
   printf("Usage: \n");

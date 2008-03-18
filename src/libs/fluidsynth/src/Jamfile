@@ -14,6 +14,7 @@ SharedLibrary libfluidsynth.so :
 	fluid_cmd.c
 	fluid_conv.c
 	fluid_defsfont.c
+	fluid_dsp_float.c
 	fluid_event.c
 	fluid_gen.c
 	fluid_hash.c
@@ -28,7 +29,6 @@ SharedLibrary libfluidsynth.so :
 	fluid_seq.c
 	fluid_seqbind.c
 	fluid_settings.c
-	fluid_strtok.c
 	fluid_synth.c
 	fluid_sys.c
 	fluid_tuning.c

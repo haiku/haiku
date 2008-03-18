@@ -11,7 +11,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -20,7 +20,6 @@
 
 
 #include "fluid_sys.h"
-//#include <fpu_control.h>
 
 static char fluid_errbuf[512];  /* buffer for error message */
 
@@ -34,7 +33,7 @@ static char* fluid_libname = "fluidsynth";
 void fluid_sys_config()
 {
   fluid_log_config();
-  fluid_time_config();  
+  fluid_time_config();
 }
 
 
@@ -48,25 +47,29 @@ int fluid_debug(int level, char * fmt, ...)
 {
   if (fluid_debug_flags & level) {
     fluid_log_function_t fun;
-    va_list args; 
+    va_list args;
 
-    va_start (args, fmt); 
+    va_start (args, fmt);
     vsnprintf(fluid_errbuf, sizeof (fluid_errbuf), fmt, args);
-    va_end (args); 
+    va_end (args);
 
     fun = fluid_log_function[FLUID_DBG];
     if (fun != NULL) {
       (*fun)(level, fluid_errbuf, fluid_log_user_data[FLUID_DBG]);
     }
-  } 
+  }
   return 0;
 }
 #endif
 
-/*
- * fluid_set_log_function
+/**
+ * Installs a new log function for a specified log level.
+ * @param level Log level to install handler for.
+ * @param fun Callback function handler to call for logged messages
+ * @param data User supplied data pointer to pass to log function
+ * @return The previously installed function.
  */
-fluid_log_function_t 
+fluid_log_function_t
 fluid_set_log_function(int level, fluid_log_function_t fun, void* data)
 {
   fluid_log_function_t old = NULL;
@@ -79,10 +82,13 @@ fluid_set_log_function(int level, fluid_log_function_t fun, void* data)
   return old;
 }
 
-/*
- * fluid_default_log_function
+/**
+ * Default log function which prints to the stderr.
+ * @param level Log level
+ * @param message Log message
+ * @param data User supplied data (not used)
  */
-void 
+void
 fluid_default_log_function(int level, char* message, void* data)
 {
   FILE* out;
@@ -92,25 +98,25 @@ fluid_default_log_function(int level, char* message, void* data)
 #else
   out = stderr;
 #endif
-  
+
   if (fluid_log_initialized == 0) {
     fluid_log_config();
   }
 
   switch (level) {
-  case FLUID_PANIC: 
+  case FLUID_PANIC:
     FLUID_FPRINTF(out, "%s: panic: %s\n", fluid_libname, message);
     break;
-  case FLUID_ERR: 
+  case FLUID_ERR:
     FLUID_FPRINTF(out, "%s: error: %s\n", fluid_libname, message);
     break;
-  case FLUID_WARN: 
+  case FLUID_WARN:
     FLUID_FPRINTF(out, "%s: warning: %s\n", fluid_libname, message);
     break;
-  case FLUID_INFO: 
+  case FLUID_INFO:
     FLUID_FPRINTF(out, "%s: %s\n", fluid_libname, message);
     break;
-  case FLUID_DBG: 
+  case FLUID_DBG:
 #if DEBUG
     FLUID_FPRINTF(out, "%s: debug: %s\n", fluid_libname, message);
 #endif
@@ -125,7 +131,7 @@ fluid_default_log_function(int level, char* message, void* data)
 /*
  * fluid_init_log
  */
-void 
+void
 fluid_log_config(void)
 {
   if (fluid_log_initialized == 0) {
@@ -135,37 +141,41 @@ fluid_log_config(void)
     if (fluid_log_function[FLUID_PANIC] == NULL) {
       fluid_set_log_function(FLUID_PANIC, fluid_default_log_function, NULL);
     }
-    
+
     if (fluid_log_function[FLUID_ERR] == NULL) {
       fluid_set_log_function(FLUID_ERR, fluid_default_log_function, NULL);
     }
-    
+
     if (fluid_log_function[FLUID_WARN] == NULL) {
       fluid_set_log_function(FLUID_WARN, fluid_default_log_function, NULL);
     }
-    
+
     if (fluid_log_function[FLUID_INFO] == NULL) {
       fluid_set_log_function(FLUID_INFO, fluid_default_log_function, NULL);
     }
-    
+
     if (fluid_log_function[FLUID_DBG] == NULL) {
       fluid_set_log_function(FLUID_DBG, fluid_default_log_function, NULL);
     }
   }
 }
 
-/*
- * fluid_log
+/**
+ * Print a message to the log.
+ * @param level Log level (#fluid_log_level).
+ * @param fmt Printf style format string for log message
+ * @param ... Arguments for printf 'fmt' message string
+ * @return Always returns -1
  */
-int 
+int
 fluid_log(int level, char* fmt, ...)
 {
   fluid_log_function_t fun = NULL;
 
-  va_list args; 
-  va_start (args, fmt); 
+  va_list args;
+  va_start (args, fmt);
   vsnprintf(fluid_errbuf, sizeof (fluid_errbuf), fmt, args);
-  va_end (args); 
+  va_end (args);
 
   if ((level >= 0) && (level < LAST_LOG_LEVEL)) {
     fun = fluid_log_function[level];
@@ -173,14 +183,83 @@ fluid_log(int level, char* fmt, ...)
       (*fun)(level, fluid_errbuf, fluid_log_user_data[level]);
     }
   }
-  return FLUID_FAILED; 
+  return FLUID_FAILED;
 }
 
+/**
+ * An improved strtok, still trashes the input string, but is portable and
+ * thread safe.  Also skips token chars at beginning of token string and never
+ * returns an empty token (will return NULL if source ends in token chars though).
+ * NOTE: NOT part of public API
+ * @internal
+ * @param str Pointer to a string pointer of source to tokenize.  Pointer gets
+ *   updated on each invocation to point to beginning of next token.  Note that
+ *   token char get's overwritten with a 0 byte.  String pointer is set to NULL
+ *   when final token is returned.
+ * @param delim String of delimiter chars.
+ * @return Pointer to the next token or NULL if no more tokens.
+ */
+char *fluid_strtok (char **str, char *delim)
+{
+  char *s, *d, *token;
+  char c;
+
+  if (str == NULL || delim == NULL || !*delim)
+  {
+    FLUID_LOG(FLUID_ERR, "Null pointer");
+    return NULL;
+  }
+
+  s = *str;
+  if (!s) return NULL;	/* str points to a NULL pointer? (tokenize already ended) */
+
+  /* skip delimiter chars at beginning of token */
+  do
+  {
+    c = *s;
+    if (!c)	/* end of source string? */
+    {
+      *str = NULL;
+      return NULL;
+    }
+
+    for (d = delim; *d; d++)	/* is source char a token char? */
+    {
+      if (c == *d)	/* token char match? */
+      {
+	s++;		/* advance to next source char */
+	break;
+      }
+    }
+  } while (*d);		/* while token char match */
+
+  token = s;		/* start of token found */
+
+  /* search for next token char or end of source string */
+  for (s = s+1; *s; s++)
+  {
+    c = *s;
+
+    for (d = delim; *d; d++)	/* is source char a token char? */
+    {
+      if (c == *d)	/* token char match? */
+      {
+	*s = '\0';	/* overwrite token char with zero byte to terminate token */
+	*str = s+1;	/* update str to point to beginning of next token */
+	return token;
+      }
+    }
+  }
+
+  /* we get here only if source string ended */
+  *str = NULL;
+  return token;
+}
 
 /*
  * fluid_error
  */
-char* 
+char*
 fluid_error()
 {
   return fluid_errbuf;
@@ -188,9 +267,9 @@ fluid_error()
 
 
 /*
- * 
+ *
  *  fluid_is_midifile
- */ 
+ */
 int
 fluid_is_midifile(char* filename)
 {
@@ -205,14 +284,14 @@ fluid_is_midifile(char* filename)
     return 0;
   }
   fclose(fp);
-  
+
   return strncmp(id, "MThd", 4) == 0;
 }
 
 /*
- *  fluid_is_soundfont 
- * 
- */ 
+ *  fluid_is_soundfont
+ *
+ */
 int
 fluid_is_soundfont(char* filename)
 {
@@ -227,7 +306,7 @@ fluid_is_soundfont(char* filename)
     return 0;
   }
   fclose(fp);
-  
+
   return strncmp(id, "RIFF", 4) == 0;
 }
 
@@ -245,7 +324,7 @@ fluid_is_soundfont(char* filename)
  *
  */
 
-struct _fluid_timer_t 
+struct _fluid_timer_t
 {
   long msec;
   fluid_timer_callback_t callback;
@@ -259,13 +338,13 @@ struct _fluid_timer_t
 static int fluid_timer_count = 0;
 DWORD WINAPI fluid_timer_run(LPVOID data);
 
-fluid_timer_t* 
-new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data, 
+fluid_timer_t*
+new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
 	       int new_thread, int auto_destroy)
 {
   fluid_timer_t* timer = FLUID_NEW(fluid_timer_t);
   if (timer == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory");     
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     return NULL;
   }
 
@@ -279,18 +358,18 @@ new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
   if (new_thread) {
     timer->thread = CreateThread(NULL, 0, fluid_timer_run, (LPVOID) timer, 0, &timer->thread_id);
     if (timer->thread == NULL) {
-      FLUID_LOG(FLUID_ERR, "Couldn't create timer thread");     
+      FLUID_LOG(FLUID_ERR, "Couldn't create timer thread");
       FLUID_FREE(timer);
       return NULL;
     }
     SetThreadPriority(timer->thread, THREAD_PRIORITY_TIME_CRITICAL);
   } else {
-    fluid_timer_run((LPVOID) timer); 
+    fluid_timer_run((LPVOID) timer);
   }
   return timer;
 }
 
-DWORD WINAPI 
+DWORD WINAPI
 fluid_timer_run(LPVOID data)
 {
   int count = 0;
@@ -337,16 +416,16 @@ fluid_timer_run(LPVOID data)
   return 0;
 }
 
-int 
+int
 delete_fluid_timer(fluid_timer_t* timer)
 {
   timer->cont = 0;
-  fluid_timer_join(timer); 
+  fluid_timer_join(timer);
   FLUID_FREE(timer);
   return FLUID_OK;
 }
 
-int 
+int
 fluid_timer_join(fluid_timer_t* timer)
 {
   DWORD wait_result;
@@ -371,7 +450,7 @@ static double fluid_cpu_frequency = -1.0;
 void fluid_time_config(void)
 {
   if (fluid_cpu_frequency < 0.0) {
-    fluid_cpu_frequency = fluid_estimate_cpu_frequency() / 1000000.0;  
+    fluid_cpu_frequency = fluid_estimate_cpu_frequency() / 1000000.0;
   }
 }
 
@@ -422,7 +501,7 @@ double fluid_estimate_cpu_frequency(void)
   QueryPerformanceCounter(&start);
 
   Sleep(1000);
-  
+
   after = fluid_curtime();
   QueryPerformanceCounter(&stop);
 
@@ -445,7 +524,7 @@ double fluid_estimate_cpu_frequency(void)
  *               Timer
  */
 
-struct _fluid_timer_t 
+struct _fluid_timer_t
 {
 	TMTask myTmTask;
   long msec;
@@ -472,13 +551,13 @@ _timerCallback(fluid_timer_t *timer)
   timer->count++;
 }
 
-fluid_timer_t* 
-new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data, 
+fluid_timer_t*
+new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
 	       int new_thread, int auto_destroy)
 {
   fluid_timer_t* timer = FLUID_NEW(fluid_timer_t);
   if (timer == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory");     
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     return NULL;
   }
 
@@ -501,14 +580,14 @@ new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
   timer->isInstalled = 1;
   timer->count = 0;
   timer->auto_destroy = auto_destroy;
-  
+
   InsXTime((QElemPtr)timer);
   PrimeTime((QElemPtr)timer, msec);
 
   return timer;
 }
 
-int 
+int
 delete_fluid_timer(fluid_timer_t* timer)
 {
 	if (timer->isInstalled) {
@@ -518,7 +597,7 @@ delete_fluid_timer(fluid_timer_t* timer)
   return FLUID_OK;
 }
 
-int 
+int
 fluid_timer_join(fluid_timer_t* timer)
 {
 	if (timer->isInstalled) {
@@ -545,15 +624,16 @@ unsigned int fluid_curtime()
 	UnsignedWide    uS;
 	double mSf;
 	unsigned int ms;
-	
+
 	Microseconds(&uS);
-	
+
   mSf = ((((double) uS.hi) * kTwoPower32) + uS.lo)/1000.0f;
-  
+
   ms = mSf;
-  
+
   return (ms);
 }
+
 
 #elif __BEOS__
 
@@ -660,8 +740,8 @@ double fluid_utime(void)
  *
  *               Timer
  */
- 
-struct _fluid_timer_t 
+
+struct _fluid_timer_t
 {
   long msec;
   fluid_timer_callback_t callback;
@@ -671,7 +751,7 @@ struct _fluid_timer_t
   int auto_destroy;
 };
 
-void* 
+void*
 fluid_timer_start(void *data)
 {
   int count = 0;
@@ -714,8 +794,8 @@ fluid_timer_start(void *data)
   return NULL;
 }
 
-fluid_timer_t* 
-new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data, 
+fluid_timer_t*
+new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
 	       int new_thread, int auto_destroy)
 {
   pthread_attr_t *attr = NULL;
@@ -726,7 +806,7 @@ new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
 
   fluid_timer_t* timer = FLUID_NEW(fluid_timer_t);
   if (timer == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory");     
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     return NULL;
   }
   timer->msec = msec;
@@ -736,7 +816,7 @@ new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
   timer->thread = 0;
   timer->auto_destroy = auto_destroy;
 
-  err = pthread_attr_init(&rt_attr); 
+  err = pthread_attr_init(&rt_attr);
   if (err == 0) {
 	  err = pthread_attr_setschedpolicy(&rt_attr, SCHED_FIFO);
 	  if (err == 0) {
@@ -744,14 +824,14 @@ new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
 		  err = pthread_attr_setschedparam(&rt_attr, &priority);
 		  if (err == 0) {
 			  attr = &rt_attr;
-		  } 
+		  }
 	  }
   }
 
   if (new_thread) {
 	  err = pthread_create(&timer->thread, attr, fluid_timer_start, (void*) timer);
 	  if (err == 0) {
-		  FLUID_LOG(FLUID_DBG, "The timer thread was created with real-time priority");     		  
+		  FLUID_LOG(FLUID_DBG, "The timer thread was created with real-time priority");
 	  } else {
 		  /* Create the thread with default attributes */
 		  err = pthread_create(&timer->thread, NULL, fluid_timer_start, (void*) timer);
@@ -769,7 +849,7 @@ new_fluid_timer(int msec, fluid_timer_callback_t callback, void* data,
   return timer;
 }
 
-int 
+int
 delete_fluid_timer(fluid_timer_t* timer)
 {
   timer->cont = 0;
@@ -779,7 +859,7 @@ delete_fluid_timer(fluid_timer_t* timer)
   return FLUID_OK;
 }
 
-int 
+int
 fluid_timer_join(fluid_timer_t* timer)
 {
   int err = 0;
@@ -805,7 +885,8 @@ double fluid_estimate_cpu_frequency(void);
 void fluid_time_config(void)
 {
   if (fluid_cpu_frequency < 0.0) {
-    fluid_cpu_frequency = fluid_estimate_cpu_frequency() / 1000000.0;  
+    fluid_cpu_frequency = fluid_estimate_cpu_frequency() / 1000000.0;
+    if (fluid_cpu_frequency == 0.0) fluid_cpu_frequency = 1.0;
   }
 }
 
@@ -849,11 +930,11 @@ double fluid_estimate_cpu_frequency(void)
   unsigned int a0, b0, a1, b1;
   unsigned int before, after;
 
-  before = fluid_curtime();  
+  before = fluid_curtime();
   __asm__ ("rdtsc" : "=a" (a0), "=d" (b0));
 
   sleep(1);
-  
+
   after = fluid_curtime();
   __asm__ ("rdtsc" : "=a" (a1), "=d" (b1));
 
@@ -866,7 +947,7 @@ double fluid_estimate_cpu_frequency(void)
 #endif
 
 
-#if 0
+#ifdef FPE_CHECK
 
 /***************************************************************
  *
@@ -875,7 +956,7 @@ double fluid_estimate_cpu_frequency(void)
  *  The floating point exception functions were taken from Ircam's
  *  jMax source code. http://www.ircam.fr/jmax
  *
- *  FIXME: check in config for i386 machine  
+ *  FIXME: check in config for i386 machine
  *
  *  Currently not used. I leave the code here in case we want to pick
  *  this up again some time later.
@@ -900,7 +981,8 @@ double fluid_estimate_cpu_frequency(void)
 #define _FPU_CLR_SW() __asm__ ("fnclex" : : )
 
 /* Purpose:
- * Checks, if the floating point unit has produced an exception in the meantime.
+ * Checks, if the floating point unit has produced an exception, print a message
+ * if so and clear the exception.
  */
 unsigned int fluid_check_fpe_i386(char* explanation)
 {
@@ -909,11 +991,10 @@ unsigned int fluid_check_fpe_i386(char* explanation)
   _FPU_GET_SW(s);
   _FPU_CLR_SW();
 
-  if ((s & _FPU_STATUS_IE) 
-      || (s & _FPU_STATUS_DE)
-      || (s & _FPU_STATUS_ZE)
-      || (s & _FPU_STATUS_OE)
-      || (s & _FPU_STATUS_UE)) {
+  s &= _FPU_STATUS_IE | _FPU_STATUS_DE | _FPU_STATUS_ZE | _FPU_STATUS_OE | _FPU_STATUS_UE;
+
+  if (s)
+  {
       FLUID_LOG(FLUID_WARN, "FPE exception (before or in %s): %s%s%s%s%s", explanation,
 	       (s & _FPU_STATUS_IE) ? "Invalid operation " : "",
 	       (s & _FPU_STATUS_DE) ? "Denormal number " : "",
@@ -921,14 +1002,22 @@ unsigned int fluid_check_fpe_i386(char* explanation)
 	       (s & _FPU_STATUS_OE) ? "Overflow " : "",
 	       (s & _FPU_STATUS_UE) ? "Underflow " : "");
   }
-  
+
   return s;
 }
 
-#endif
+/* Purpose:
+ * Clear floating point exception.
+ */
+void fluid_clear_fpe_i386 (void)
+{
+  _FPU_CLR_SW();
+}
+
+#endif	// ifdef FPE_CHECK
 
 
-#endif
+#endif	// #else    (its POSIX)
 
 
 /***************************************************************
@@ -939,7 +1028,7 @@ unsigned int fluid_check_fpe_i386(char* explanation)
 
 #if WITH_PROFILING
 
-fluid_profile_data_t fluid_profile_data[] = 
+fluid_profile_data_t fluid_profile_data[] =
 {
   { FLUID_PROF_WRITE_S16,        "fluid_synth_write_s16           ", 1e10, 0.0, 0.0, 0},
   { FLUID_PROF_ONE_BLOCK,        "fluid_synth_one_block           ", 1e10, 0.0, 0.0, 0},
@@ -950,7 +1039,7 @@ fluid_profile_data_t fluid_profile_data[] =
   { FLUID_PROF_ONE_BLOCK_CHORUS, "fluid_synth_one_block:chorus    ", 1e10, 0.0, 0.0, 0},
   { FLUID_PROF_VOICE_NOTE,       "fluid_voice:note                ", 1e10, 0.0, 0.0, 0},
   { FLUID_PROF_VOICE_RELEASE,    "fluid_voice:release             ", 1e10, 0.0, 0.0, 0},
-  { FLUID_PROF_LAST, "last", 1e100, 0.0, 0.0, 0}  
+  { FLUID_PROF_LAST, "last", 1e100, 0.0, 0.0, 0}
 };
 
 
@@ -959,16 +1048,16 @@ void fluid_profiling_print(void)
   int i;
 
   printf("fluid_profiling_print\n");
-  
-  FLUID_LOG(FLUID_INFO, "Estimated CPU frequency: %.0f MHz", fluid_cpu_frequency); 
-  FLUID_LOG(FLUID_INFO, "Estimated times: min/avg/max (micro seconds)"); 
+
+  FLUID_LOG(FLUID_INFO, "Estimated CPU frequency: %.0f MHz", fluid_cpu_frequency);
+  FLUID_LOG(FLUID_INFO, "Estimated times: min/avg/max (micro seconds)");
 
   for (i = 0; i < FLUID_PROF_LAST; i++) {
     if (fluid_profile_data[i].count > 0) {
-      FLUID_LOG(FLUID_INFO, "%s: %.3f/%.3f/%.3f", 
-	       fluid_profile_data[i].description, 
-	       fluid_profile_data[i].min, 
-	       fluid_profile_data[i].total / fluid_profile_data[i].count, 
+      FLUID_LOG(FLUID_INFO, "%s: %.3f/%.3f/%.3f",
+	       fluid_profile_data[i].description,
+	       fluid_profile_data[i].min,
+	       fluid_profile_data[i].total / fluid_profile_data[i].count,
 	       fluid_profile_data[i].max);
     } else {
       FLUID_LOG(FLUID_DBG, "%s: no profiling available", fluid_profile_data[i].description);
@@ -1010,7 +1099,7 @@ static DWORD WINAPI fluid_thread_start(LPVOID data)
   thread->func(thread->data);
 
   if (thread->detached) {
-    FLUID_FREE(thread);    
+    FLUID_FREE(thread);
   }
 
   return 0;
@@ -1022,13 +1111,13 @@ fluid_thread_t* new_fluid_thread(fluid_thread_func_t func, void* data, int detac
   fluid_thread_t* thread;
 
   if (func == NULL) {
-    FLUID_LOG(FLUID_ERR, "Invalid thread function");     
+    FLUID_LOG(FLUID_ERR, "Invalid thread function");
     return NULL;
   }
 
   thread = FLUID_NEW(fluid_thread_t);
   if (thread == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory");     
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     return NULL;
   }
 
@@ -1036,21 +1125,21 @@ fluid_thread_t* new_fluid_thread(fluid_thread_func_t func, void* data, int detac
   thread->func = func;
   thread->detached = detach;
 
-  thread->thread = CreateThread(NULL, 0, fluid_thread_start, (LPVOID) thread, 
+  thread->thread = CreateThread(NULL, 0, fluid_thread_start, (LPVOID) thread,
 				0, &thread->thread_id);
   if (thread->thread == NULL) {
-    FLUID_LOG(FLUID_ERR, "Couldn't create the thread");     
+    FLUID_LOG(FLUID_ERR, "Couldn't create the thread");
     FLUID_FREE(thread);
     return NULL;
   }
-  
+
   return thread;
 }
 
 int delete_fluid_thread(fluid_thread_t* thread)
 {
   FLUID_FREE(thread);
-  return FLUID_OK;  
+  return FLUID_OK;
 }
 
 
@@ -1087,7 +1176,7 @@ static void* fluid_thread_start(void *data)
   thread->func(thread->data);
 
   if (thread->detached) {
-    FLUID_FREE(thread);    
+    FLUID_FREE(thread);
   }
 
   return NULL;
@@ -1099,13 +1188,13 @@ fluid_thread_t* new_fluid_thread(fluid_thread_func_t func, void* data, int detac
   pthread_attr_t attr;
 
   if (func == NULL) {
-    FLUID_LOG(FLUID_ERR, "Invalid thread function");     
+    FLUID_LOG(FLUID_ERR, "Invalid thread function");
     return NULL;
   }
 
   thread = FLUID_NEW(fluid_thread_t);
   if (thread == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory");     
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     return NULL;
   }
 
@@ -1124,14 +1213,14 @@ fluid_thread_t* new_fluid_thread(fluid_thread_func_t func, void* data, int detac
     FLUID_FREE(thread);
     return NULL;
   }
-  
+
   return thread;
 }
 
 int delete_fluid_thread(fluid_thread_t* thread)
 {
   FLUID_FREE(thread);
-  return FLUID_OK;  
+  return FLUID_OK;
 }
 
 int fluid_thread_join(fluid_thread_t* thread)
@@ -1235,7 +1324,7 @@ static void fluid_server_socket_run(void* data)
   while (server_socket->cont) {
 
     client_socket = accept(server_socket->socket, (struct sockaddr*) &addr, &addrlen);
-    
+
     FLUID_LOG(FLUID_DBG, "New client connection");
 
     if (client_socket == INVALID_SOCKET) {
@@ -1250,13 +1339,13 @@ static void fluid_server_socket_run(void* data)
       if (r != 0) {
 	fluid_socket_close(client_socket);
       }
-    } 
+    }
   }
 
   FLUID_LOG(FLUID_DBG, "Server closing");
 }
 
-fluid_server_socket_t* 
+fluid_server_socket_t*
 new_fluid_server_socket(int port, fluid_server_func_t func, void* data)
 {
   fluid_server_socket_t* server_socket;
@@ -1293,7 +1382,7 @@ new_fluid_server_socket(int port, fluid_server_func_t func, void* data)
 
   server_socket = FLUID_NEW(fluid_server_socket_t);
   if (server_socket == NULL) {
-    FLUID_LOG(FLUID_ERR, "Out of memory");     
+    FLUID_LOG(FLUID_ERR, "Out of memory");
     fluid_socket_close(sock);
     return NULL;
   }

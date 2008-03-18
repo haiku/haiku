@@ -11,7 +11,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -28,7 +28,7 @@
 /*
  * new_fluid_channel
  */
-fluid_channel_t* 
+fluid_channel_t*
 new_fluid_channel(fluid_synth_t* synth, int num)
 {
   fluid_channel_t* chan;
@@ -41,6 +41,7 @@ new_fluid_channel(fluid_synth_t* synth, int num)
 
   chan->synth = synth;
   chan->channum = num;
+  chan->preset = NULL;
 
   fluid_channel_init(chan);
   fluid_channel_init_ctrl(chan);
@@ -48,19 +49,22 @@ new_fluid_channel(fluid_synth_t* synth, int num)
   return chan;
 }
 
-void 
+void
 fluid_channel_init(fluid_channel_t* chan)
 {
   chan->prognum = (chan->channum == 9)? 0 : chan->channum;
   chan->banknum = (chan->channum == 9)? 128 : 0;
   chan->sfontnum = 0;
+
+  if (chan->preset) delete_fluid_preset (chan->preset);
   chan->preset = fluid_synth_find_preset(chan->synth, chan->banknum, chan->prognum);
+
   chan->interp_method = FLUID_INTERP_DEFAULT;
   chan->tuning = NULL;
   chan->nrpn_select = 0;
 }
 
-void 
+void
 fluid_channel_init_ctrl(fluid_channel_t* chan)
 {
   int i;
@@ -79,21 +83,21 @@ fluid_channel_init_ctrl(fluid_channel_t* chan)
   for (i = 0; i < 128; i++) {
     SETCC(chan, i, 0);
   }
-  
+
   /* Volume / initial attenuation (MSB & LSB) */
-  SETCC(chan, 7, 127); 
-  SETCC(chan, 39, 0); 
+  SETCC(chan, 7, 127);
+  SETCC(chan, 39, 0);
 
   /* Pan (MSB & LSB) */
-  SETCC(chan, 10, 64); 
-  SETCC(chan, 10, 64); 
+  SETCC(chan, 10, 64);
+  SETCC(chan, 10, 64);
 
   /* Expression (MSB & LSB) */
-  SETCC(chan, 11, 127); 
-  SETCC(chan, 43, 127); 
+  SETCC(chan, 11, 127);
+  SETCC(chan, 43, 127);
 }
 
-void 
+void
 fluid_channel_reset(fluid_channel_t* chan)
 {
   fluid_channel_init(chan);
@@ -103,9 +107,10 @@ fluid_channel_reset(fluid_channel_t* chan)
 /*
  * delete_fluid_channel
  */
-int 
+int
 delete_fluid_channel(fluid_channel_t* chan)
 {
+  if (chan->preset) delete_fluid_preset (chan->preset);
   FLUID_FREE(chan);
   return FLUID_OK;
 }
@@ -113,12 +118,13 @@ delete_fluid_channel(fluid_channel_t* chan)
 /*
  * fluid_channel_set_preset
  */
-int 
+int
 fluid_channel_set_preset(fluid_channel_t* chan, fluid_preset_t* preset)
 {
   fluid_preset_notify(chan->preset, FLUID_PRESET_UNSELECTED, chan->channum);
   fluid_preset_notify(preset, FLUID_PRESET_SELECTED, chan->channum);
 
+  if (chan->preset) delete_fluid_preset (chan->preset);
   chan->preset = preset;
   return FLUID_OK;
 }
@@ -126,7 +132,7 @@ fluid_channel_set_preset(fluid_channel_t* chan, fluid_preset_t* preset)
 /*
  * fluid_channel_get_preset
  */
-fluid_preset_t* 
+fluid_preset_t*
 fluid_channel_get_preset(fluid_channel_t* chan)
 {
   return chan->preset;
@@ -135,7 +141,7 @@ fluid_channel_get_preset(fluid_channel_t* chan)
 /*
  * fluid_channel_get_banknum
  */
-unsigned int 
+unsigned int
 fluid_channel_get_banknum(fluid_channel_t* chan)
 {
   return chan->banknum;
@@ -144,7 +150,7 @@ fluid_channel_get_banknum(fluid_channel_t* chan)
 /*
  * fluid_channel_set_prognum
  */
-int 
+int
 fluid_channel_set_prognum(fluid_channel_t* chan, int prognum)
 {
   chan->prognum = prognum;
@@ -154,7 +160,7 @@ fluid_channel_set_prognum(fluid_channel_t* chan, int prognum)
 /*
  * fluid_channel_get_prognum
  */
-int 
+int
 fluid_channel_get_prognum(fluid_channel_t* chan)
 {
   return chan->prognum;
@@ -163,7 +169,7 @@ fluid_channel_get_prognum(fluid_channel_t* chan)
 /*
  * fluid_channel_set_banknum
  */
-int 
+int
 fluid_channel_set_banknum(fluid_channel_t* chan, unsigned int banknum)
 {
   chan->banknum = banknum;
@@ -173,14 +179,14 @@ fluid_channel_set_banknum(fluid_channel_t* chan, unsigned int banknum)
 /*
  * fluid_channel_cc
  */
-int 
+int
 fluid_channel_cc(fluid_channel_t* chan, int num, int value)
 {
   chan->cc[num] = value;
-    
+
   switch (num) {
-    
-  case SUSTAIN_SWITCH: 
+
+  case SUSTAIN_SWITCH:
     {
       if (value < 64) {
 /*  	printf("** sustain off\n"); */
@@ -190,7 +196,7 @@ fluid_channel_cc(fluid_channel_t* chan, int num, int value)
       }
     }
     break;
-  
+
   case BANK_SELECT_MSB:
     {
       chan->bank_msb = (unsigned char) (value & 0x7f);
@@ -207,17 +213,17 @@ fluid_channel_cc(fluid_channel_t* chan, int num, int value)
       fluid_channel_set_banknum(chan, (unsigned int)(value & 0x7f));  /* KLE */
     }
     break;
-  
+
   case BANK_SELECT_LSB:
     {
       /* FIXME: according to the Downloadable Sounds II specification,
          bit 31 should be set when we receive the message on channel
          10 (drum channel) */
-	fluid_channel_set_banknum(chan, (((unsigned int) value & 0x7f) 
+	fluid_channel_set_banknum(chan, (((unsigned int) value & 0x7f)
 					+ ((unsigned int) chan->bank_msb << 7)));
     }
     break;
-    
+
   case ALL_NOTES_OFF:
     fluid_synth_all_notes_off(chan->synth, chan->channum);
     break;
@@ -231,7 +237,7 @@ fluid_channel_cc(fluid_channel_t* chan, int num, int value)
     fluid_synth_modulate_voices_all(chan->synth, chan->channum);
     break;
 
-  case DATA_ENTRY_MSB: 
+  case DATA_ENTRY_MSB:
     {
       int data = (value << 7) + chan->cc[DATA_ENTRY_LSB];
 
@@ -239,7 +245,7 @@ fluid_channel_cc(fluid_channel_t* chan, int num, int value)
       if ((chan->cc[NRPN_MSB] == 120) && (chan->cc[NRPN_LSB] < 100)) {
 	float val = fluid_gen_scale_nrpn(chan->nrpn_select, data);
 	FLUID_LOG(FLUID_WARN, "%s: %d: Data = %d, value = %f", __FILE__, __LINE__, data, val);
-	fluid_synth_set_gen(chan->synth, chan->channum, chan->nrpn_select, val);	
+	fluid_synth_set_gen(chan->synth, chan->channum, chan->nrpn_select, val);
       }
       break;
     }
@@ -262,7 +268,7 @@ fluid_channel_cc(fluid_channel_t* chan, int num, int value)
 	chan->nrpn_select += value;
 	FLUID_LOG(FLUID_WARN, "%s: %d: NRPN Select = %d", __FILE__, __LINE__, chan->nrpn_select);
       }
-    } 
+    }
     break;
 
   case RPN_MSB:
@@ -278,14 +284,14 @@ fluid_channel_cc(fluid_channel_t* chan, int num, int value)
   default:
     fluid_synth_modulate_voices(chan->synth, chan->channum, 1, num);
   }
-  
+
   return FLUID_OK;
 }
 
 /*
  * fluid_channel_get_cc
  */
-int 
+int
 fluid_channel_get_cc(fluid_channel_t* chan, int num)
 {
   return ((num >= 0) && (num < 128))? chan->cc[num] : 0;
@@ -294,7 +300,7 @@ fluid_channel_get_cc(fluid_channel_t* chan, int num)
 /*
  * fluid_channel_pitch_bend
  */
-int 
+int
 fluid_channel_pitch_bend(fluid_channel_t* chan, int val)
 {
   chan->pitch_bend = val;
@@ -305,7 +311,7 @@ fluid_channel_pitch_bend(fluid_channel_t* chan, int val)
 /*
  * fluid_channel_pitch_wheel_sens
  */
-int 
+int
 fluid_channel_pitch_wheel_sens(fluid_channel_t* chan, int val)
 {
   chan->pitch_wheel_sensitivity = val;
@@ -316,7 +322,7 @@ fluid_channel_pitch_wheel_sens(fluid_channel_t* chan, int val)
 /*
  * fluid_channel_get_num
  */
-int 
+int
 fluid_channel_get_num(fluid_channel_t* chan)
 {
   return chan->channum;
@@ -324,7 +330,7 @@ fluid_channel_get_num(fluid_channel_t* chan)
 
 /* Purpose:
  * Sets the index of the interpolation method used on this channel,
- * as in fluid_interp in fluidsynth.h 
+ * as in fluid_interp in fluidsynth.h
  */
 void fluid_channel_set_interp_method(fluid_channel_t* chan, int new_method)
 {
@@ -333,7 +339,7 @@ void fluid_channel_set_interp_method(fluid_channel_t* chan, int new_method)
 
 /* Purpose:
  * Returns the index of the interpolation method used on this channel,
- * as in fluid_interp in fluidsynth.h 
+ * as in fluid_interp in fluidsynth.h
  */
 int fluid_channel_get_interp_method(fluid_channel_t* chan)
 {

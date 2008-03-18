@@ -11,7 +11,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -98,7 +98,7 @@ struct _fluid_synth_t
   double sample_rate;                /** The sample rate */
   int midi_channels;                 /** the number of MIDI channels (>= 16) */
   int audio_channels;                /** the number of audio channels (1 channel=left+right) */
-  int audio_groups;                  /** the number of (stereo) 'sub'groups from the synth. 
+  int audio_groups;                  /** the number of (stereo) 'sub'groups from the synth.
 					 Typically equal to audio_channels. */
   int effects_channels;              /** the number of effects channels (= 2) */
   unsigned int state;                /** the synthesizer state */
@@ -120,7 +120,7 @@ struct _fluid_synth_t
   int nvoice;                         /** the length of the synthesis process array */
   fluid_voice_t** voice;              /** the synthesis processes */
   unsigned int noteid;                /** the id is incremented for every new note. it's used for noteoff's  */
-  unsigned int storeid;               
+  unsigned int storeid;
   int nbuf;                           /** How many audio buffers are used? (depends on nr of audio channels / groups)*/
 
   fluid_real_t** left_buf;
@@ -128,23 +128,19 @@ struct _fluid_synth_t
   fluid_real_t** fx_left_buf;
   fluid_real_t** fx_right_buf;
 
-  fluid_real_t** left_ubuf;       /* Stores the unaligned buffers (see new_fluid_synth) */
-  fluid_real_t** right_ubuf;      /* Stores the unaligned buffers (see new_fluid_synth) */
-  fluid_real_t** fx_left_ubuf;    /* Stores the unaligned buffers (see new_fluid_synth) */
-  fluid_real_t** fx_right_ubuf;   /* Stores the unaligned buffers (see new_fluid_synth) */
-
   fluid_revmodel_t* reverb;
   fluid_chorus_t* chorus;
   int cur;                           /** the current sample in the audio buffers to be output */
+  int dither_index;		/* current index in random dither value buffer: fluid_synth_(write_s16|dither_s16) */
 
   char outbuf[256];                  /** buffer for message output */
   double cpu_load;
 
-  fluid_tuning_t*** tuning;           /** 128 banks of 128 programs for the tunings */ 
-  fluid_tuning_t* cur_tuning;         /** current tuning in the iteration */ 
+  fluid_tuning_t*** tuning;           /** 128 banks of 128 programs for the tunings */
+  fluid_tuning_t* cur_tuning;         /** current tuning in the iteration */
 
   fluid_midi_router_t* midi_router;     /* The midi router. Could be done nicer. */
-  fluid_mutex_t busy;                   /* Indicates, whether the audio thread is currently running. 
+  fluid_mutex_t busy;                   /* Indicates, whether the audio thread is currently running.
 					 * Note: This simple scheme does -not- provide 100 % protection against
 					 * thread problems, for example from MIDI thread and shell thread
 					 */
@@ -152,7 +148,6 @@ struct _fluid_synth_t
   fluid_LADSPA_FxUnit_t* LADSPA_FxUnit; /** Effects unit for LADSPA support */
 #endif
 };
-
 
 /** returns 1 if the value has been set, 0 otherwise */
 int fluid_synth_setstr(fluid_synth_t* synth, char* name, char* str);
@@ -177,13 +172,13 @@ int fluid_synth_set_reverb_preset(fluid_synth_t* synth, int num);
 
 int fluid_synth_one_block(fluid_synth_t* synth, int do_not_mix_fx_to_out);
 
-fluid_preset_t* fluid_synth_get_preset(fluid_synth_t* synth, 
-				     unsigned int sfontnum, 
-				     unsigned int banknum, 
+fluid_preset_t* fluid_synth_get_preset(fluid_synth_t* synth,
+				     unsigned int sfontnum,
+				     unsigned int banknum,
 				     unsigned int prognum);
 
-fluid_preset_t* fluid_synth_find_preset(fluid_synth_t* synth, 
-				      unsigned int banknum, 
+fluid_preset_t* fluid_synth_find_preset(fluid_synth_t* synth,
+				      unsigned int banknum,
 				      unsigned int prognum);
 
 int fluid_synth_all_notes_off(fluid_synth_t* synth, int chan);
@@ -210,8 +205,9 @@ int fluid_synth_update_polyphony(fluid_synth_t* synth, char* name, int value);
 fluid_bank_offset_t* fluid_synth_get_bank_offset0(fluid_synth_t* synth, int sfont_id);
 void fluid_synth_remove_bank_offset(fluid_synth_t* synth, int sfont_id);
 
-
-
+void fluid_synth_dither_s16(int *dither_index, int len, float* lin, float* rin,
+			    void* lout, int loff, int lincr,
+			    void* rout, int roff, int rincr);
 /*
  * misc
  */

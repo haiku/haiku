@@ -13,7 +13,7 @@
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- *  
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
@@ -218,7 +218,6 @@ extern unsigned short badpgen[]; 	/* list of bad preset generators */
 void sfont_init_chunks (void);
 
 void sfont_close (SFData * sf);
-void sfont_free_data (SFData * sf);
 void sfont_free_zone (SFZone * zone);
 int sfont_preset_compare_func (void* a, void* b);
 
@@ -230,8 +229,8 @@ int gen_validp (int gen);
 
 
 /*-----------------------------------sffile.h----------------------------*/
-/* 
-   File structures and routines (used to be in sffile.h) 
+/*
+   File structures and routines (used to be in sffile.h)
 */
 
 #define CHNKIDSTR(id)           &idlist[(id - 1) * 4]
@@ -427,7 +426,6 @@ enum
 #define ErrnoEnd	ErrWrite
 
 int gerr (int ev, char * fmt, ...);
-void *safe_malloc (size_t size);
 int safe_fread (void *buf, int count, FILE * fd);
 int safe_fwrite (void *buf, int count, FILE * fd);
 int safe_fseek (FILE * fd, long ofs, int whence);
@@ -443,7 +441,7 @@ int safe_fseek (FILE * fd, long ofs, int whence);
 
 /***************************************************************
  *
- *       FORWARD DECLARATIONS 
+ *       FORWARD DECLARATIONS
  */
 typedef struct _fluid_defsfont_t fluid_defsfont_t;
 typedef struct _fluid_defpreset_t fluid_defpreset_t;
