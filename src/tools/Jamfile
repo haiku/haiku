@@ -37,6 +37,9 @@ BuildPlatformMain <build>copyattr : copyattr.cpp
 BuildPlatformMain <build>data_to_source : data_to_source.cpp
 	: $(HOST_LIBSUPC++) ;
 
+BuildPlatformMain <build>generate_boot_screen : generate_boot_screen.cpp
+	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) png ;
+
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
