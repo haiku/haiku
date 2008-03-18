@@ -1,55 +1,28 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2008, Haiku, Inc.
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		hbsg.cpp
-//	Author:			Artur Wyszynski <harakash@gmail.com>
-//	Description:	Haiku Boot Splash Generator
-//  
-//------------------------------------------------------------------------------
+/*
+ *	Copyright (c) 2008, Haiku, Inc. All rights reserved.
+ *	Distributed under the terms of the MIT license. 
+ *
+ *	Authors:
+ *		Artur Wyszynski <harakash@gmail.com>
+ *		Stephan Aßmus <superstippi@gmx.de>
+ */
 
-#include <string>
+//! Haiku boot splash image generator/converter
+
 #include <iostream>
 #include <png.h>
+#include <string>
 
-int x, y;
-int width, height;
-png_byte colorType;
-png_byte bpp;
-png_structp pngPtr;
-png_infop infoPtr;
-int noOfPasses;
-png_bytep* rowPtrs;
-FILE* finput = NULL;
-FILE* foutput = NULL;
-png_colorp palette;
-int paletteColors = 0;
+// TODO: Generate the single optimal palette for all three images,
+// store palette versions of these images as well, so that they are
+// ready to be used during boot in case we need to run in palette
+// VGA mode.
 
-void
-cleanup()
-{
-	fclose(finput);
-	fclose(foutput);
-}
 
-void
+FILE* sOutput = NULL;
+
+
+static void
 error(const char *s, ...)
 {
 	va_list args;
@@ -57,147 +30,161 @@ error(const char *s, ...)
 	vfprintf(stderr, s, args);
 	fprintf(stderr, "\n");
 	va_end(args);
-	cleanup();
 	exit(-1);
 }
 
-void
-readPNG(char *filename)
+
+class AutoFileCloser {
+public:
+	AutoFileCloser(FILE* file)
+		: fFile(file)
+	{}
+	~AutoFileCloser()
+	{
+		fclose(fFile);
+	}
+private:
+	FILE* fFile;
+};
+
+
+static void
+readPNG(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
+	png_structp& pngPtr, png_infop& infoPtr)
 {
-	printf("Reading file %s\n", filename);
 	char header[8];
-	finput = fopen(filename, "rb");
-	if (!finput)
+	FILE* input = fopen(filename, "rb");
+	if (!input)
 		error("[readPNG] File %s could not be opened for reading", filename);
-	
-	fread(header, 1, 8, finput);
+
+	AutoFileCloser _(input);
+
+	fread(header, 1, 8, input);
 	if (png_sig_cmp((png_byte *)header, 0, 8 ))
 		error("[readPNG] File %s is not recognized as a PNG file", filename);
 	
-	pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+	pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+		NULL, NULL, NULL);
 	if (!pngPtr)
 		error("[readPNG] png_create_read_struct failed");
 	
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr)
 		error("[readPNG] png_create_info_struct failed");
-	
+
+// TODO: I don't know which version of libpng introduced this feature:
+#if PNG_LIBPNG_VER > 10005
 	if (setjmp(png_jmpbuf(pngPtr)))
 		error("[readPNG] Error during init_io");
-	
-	png_init_io(pngPtr, finput);
+#endif
+
+	png_init_io(pngPtr, input);
 	png_set_sig_bytes(pngPtr, 8);
+
+	// make sure we automatically get RGB data with 8 bits per channel
+	// also make sure the alpha channel is stripped, in the end, we
+	// expect 24 bits BGR data
+	png_set_expand(pngPtr);
+	png_set_gray_1_2_4_to_8(pngPtr);
+	png_set_palette_to_rgb(pngPtr);
+	png_set_gray_to_rgb(pngPtr);
+	png_set_strip_alpha(pngPtr);
+	png_set_bgr(pngPtr);
+
 	png_read_info(pngPtr, infoPtr);
 	width = infoPtr->width;
 	height = infoPtr->height;
-	colorType = infoPtr->color_type;
-	bpp = infoPtr->bit_depth;
-	noOfPasses = png_set_interlace_handling(pngPtr);
+	if (infoPtr->bit_depth != 8)
+		error("[readPNG] File %s has wrong bit depth\n", filename);
+	if ((int)infoPtr->rowbytes < width * 3) {
+		error("[readPNG] File %s has wrong color type (RGB required)\n",
+			filename);
+	}
+
+
+	png_set_interlace_handling(pngPtr);
 	png_read_update_info(pngPtr, infoPtr);
+
+#if PNG_LIBPNG_VER > 10005
 	if (setjmp(png_jmpbuf(pngPtr)))
 		error("[readPNG] Error during read_image");
+#endif
 
 	rowPtrs = (png_bytep*)malloc(sizeof(png_bytep) * height);
-	for ( y = 0; y < height; y++)
+	for (int y = 0; y < height; y++)
 		rowPtrs[y] = (png_byte*)malloc(infoPtr->rowbytes);
+
 	png_read_image(pngPtr, rowPtrs);
-	png_get_PLTE(pngPtr, infoPtr, &palette, &paletteColors);
-	fclose(finput);
-	printf("[PNG] width:\t%d\n", width);
-	printf("[PNG] height:\t%d\n", height);
-	printf("[PNG] bpp:\t%d\n", bpp);
-	printf("[PNG] palette:\t%d\n", paletteColors);
 }
 
-void
-writeHeader(char *filename)
+
+static void
+writeHeader(const char* baseName, int width, int height, png_bytep* rowPtrs)
 {
-	int length = strlen(filename) - 4;
-	char *varName = NULL;
-	varName = new char[length];
-	memset(varName, 0, sizeof(char) * length);
-	strncat(varName, filename, length);
-	printf("Exporting image %s\n", varName);
+	fprintf(sOutput, "static const uint16 %sWidth = %d;\n", baseName, width);
+	fprintf(sOutput, "static const uint16 %sHeight = %d;\n", baseName, height);
+	fprintf(sOutput, "static const uint8 %sImage[] = {\n\t", baseName);
 
-	// dumping palette
-	fprintf(foutput, "static const uint8 %sPalette[] = {\n", varName);
-	for (int i = 0; i < paletteColors; i++) {
-		if (i == paletteColors - 1) {
-			fprintf(foutput, "\t0x%x, 0x%x, 0x%x\n", palette[i].red,
-				palette[i].green, palette[i].blue);
-		} else {
-			fprintf(foutput, "\t0x%x, 0x%x, 0x%x,\n", palette[i].red,
-				palette[i].green, palette[i].blue);
-		}
-	}
-	fputs("};\n\n", foutput);
-
-	fprintf(foutput, "static const uint %sWidth=%d;\n", varName, width);
-	fprintf(foutput, "static const uint %sHeight=%d;\n", varName, height);
-	fprintf(foutput, "static const uint8 %sImage[] = {\n\t", varName);
 	int offset = 0;
-	unsigned char *data = new unsigned char[width * height];
-	for (y = 0; y < height; y++) {
+	for (int y = 0; y < height; y++) {
 		png_byte* row = rowPtrs[y];
-		for (x = 0; x < width; x++) {
-			png_byte* ptr = &row[x];
-			offset = (y * width) + x;
-			data[offset] = ptr[0];
+		for (int x = 0; x < width * 3; x++) {
+			offset++;
+			if (x == width * 3 - 1 && y == height - 1) {
+				fprintf(sOutput, "0x%02x\n};\n\n", row[x]);
+				break;
+			} else if ((offset % 8) == 0)
+				fprintf(sOutput, "0x%02x,\n\t", row[x]);
+			else
+				fprintf(sOutput, "0x%02x, ", row[x]);
 		}
 	}
-	
-	bool end = false;
-	offset = 0;
-	while (!end) {
-		if (offset == (width * height)) {
-			fprintf(foutput, "0x%x", data[offset]);
-			end = true;
-		}
-		else
-			fprintf(foutput, "0x%x, ", data[offset]);
-		if ((offset % 8) == 0) {
-			fputs("\n\t", foutput);
-		}
-		offset++;
-	}
-
-	fputs("};\n\n", foutput);
-	delete varName;
 }
 
-void
-parseImage(char *filename)
+
+static void
+parseImage(const char* filename, const char* baseName)
 {
-	readPNG(filename);
-	writeHeader(filename);
+	int width;
+	int height;
+	png_bytep* rowPtrs = NULL;
+	png_structp pngPtr;
+	png_infop infoPtr;
+	readPNG(filename, width, height, rowPtrs, pngPtr, infoPtr);
+	writeHeader(baseName, width, height, rowPtrs);
+
+	// free resources
+	png_destroy_read_struct(&pngPtr, &infoPtr, NULL);
+	for (int y = 0; y < height; y++)
+		free(rowPtrs[y]);
+	free(rowPtrs);
 }
+
 
 int
-main(int argc, char *argv[])
+main(int argc, char* argv[])
 {
-	printf("Haiku Boot Splash Generator\n");
-	printf("Copyright 2008, Artur Wyszynski <harakash@gmail.com>\n");
-	printf("Distributed under the terms of the Haiku License. All rights reserved.\n");
-
 	if (argc < 5) {
 		printf("Usage:\n");
-		printf("\thbsg <splash.png> <icons.png> <copyright.png> <images.h>\n");
+		printf("\t%s <splash.png> <icons.png> <copyright.png> <images.h>\n",
+			argv[0]);
 		return 0;
 	}
 
 	const char* headerFileName = argv[4];
 
-	foutput = fopen(headerFileName, "wb");
-	if (!foutput)
+	sOutput = fopen(headerFileName, "wb");
+	if (!sOutput)
 		error("Could not open file \"%s\" for writing", headerFileName);
 
-	fputs("// This file was generated by Haiku Boot Splash Generator\n\n",
-		foutput);
+	fputs("// This file was generated by the generate_boot_screen build tool."
+		"\n\n", sOutput);
 
-	parseImage(argv[1]);
-	parseImage(argv[2]);
-	parseImage(argv[3]);
+	parseImage(argv[1], "kSplashLogo");
+	parseImage(argv[2], "kSplashIcons");
+	parseImage(argv[3], "kSplashCopyright");
 
-	fclose(foutput);
+	fclose(sOutput);
 	return 0;
 }
+

@@ -38,7 +38,7 @@ BuildPlatformMain <build>data_to_source : data_to_source.cpp
 	: $(HOST_LIBSUPC++) ;
 
 BuildPlatformMain <build>generate_boot_screen : generate_boot_screen.cpp
-	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) png ;
+	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) png z ;
 
 BuildPlatformMain <build>listattr : listattr.cpp : $(HOST_LIBBE) ;
 
