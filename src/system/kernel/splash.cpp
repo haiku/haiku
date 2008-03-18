@@ -20,6 +20,7 @@
 #	define TRACE(x...) ;
 #endif
 
+
 struct boot_splash_info {
 	mutex lock;
 	area_id area;
@@ -34,8 +35,10 @@ struct boot_splash_info {
 
 static struct boot_splash_info sBootSplash;
 
+
 static void
-boot_splash_fb_vga_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
+boot_splash_fb_vga_set_palette(const uint8 *palette, int32 firstIndex,
+	int32 numEntries)
 {
 	out8(firstIndex, VGA_COLOR_WRITE_MODE);
 	// write VGA palette
@@ -47,12 +50,14 @@ boot_splash_fb_vga_set_palette(const uint8 *palette, int32 firstIndex, int32 num
 	}
 }
 
+
 static void
 boot_splash_fb_blit4(const uint8 *data, uint16 width,
 	uint16 height, const uint8 *palette, uint16 left, uint16 top)
 {
 	// ToDo: no blit yet in VGA mode
 }
+
 
 static void
 boot_splash_fb_blit8(const uint8 *data, uint16 width,
@@ -68,6 +73,7 @@ boot_splash_fb_blit8(const uint8 *data, uint16 width,
 			&data[i * width], width);
 	}
 }
+
 
 static void
 boot_splash_fb_blit15(const uint8 *data, uint16 width,
@@ -90,6 +96,7 @@ boot_splash_fb_blit15(const uint8 *data, uint16 width,
 	}
 }
 
+
 static void
 boot_splash_fb_blit16(const uint8 *data, uint16 width,
 	uint16 height, const uint8 *palette, uint16 left, uint16 top)
@@ -110,6 +117,7 @@ boot_splash_fb_blit16(const uint8 *data, uint16 width,
 			+ sBootSplash.bytes_per_row);
 	}
 }
+
 
 static void
 boot_splash_fb_blit24(const uint8 *data, uint16 width,
@@ -132,6 +140,7 @@ boot_splash_fb_blit24(const uint8 *data, uint16 width,
 	}
 }
 
+
 static void
 boot_splash_fb_blit32(const uint8 *data, uint16 width,
 	uint16 height, const uint8 *palette, uint16 left, uint16 top)
@@ -152,30 +161,38 @@ boot_splash_fb_blit32(const uint8 *data, uint16 width,
 	}
 }
 
+
 static void
 boot_splash_fb_blit(const uint8 *data, uint16 width,
 	uint16 height, const uint8 *palette, uint16 left, uint16 top)
 {
 	switch (sBootSplash.depth) {
 		case 4:
-			return boot_splash_fb_blit4(data, width, height, palette, left, top);
+			boot_splash_fb_blit4(data, width, height, palette, left, top);
+			return;
 		case 8:
-			return boot_splash_fb_blit8(data, width, height, palette, left, top);
+			boot_splash_fb_blit8(data, width, height, palette, left, top);
+			return;
 		case 15:
-			return boot_splash_fb_blit15(data, width, height, palette, left, top);
+			boot_splash_fb_blit15(data, width, height, palette, left, top);
+			return;
 		case 16:
-			return boot_splash_fb_blit16(data, width, height, palette, left, top);
+			boot_splash_fb_blit16(data, width, height, palette, left, top);
+			return;
 		case 24:
-			return boot_splash_fb_blit24(data, width, height, palette, left, top);
+			boot_splash_fb_blit24(data, width, height, palette, left, top);
+			return;
 		case 32:
-			return boot_splash_fb_blit32(data, width, height, palette, left, top);
+			boot_splash_fb_blit32(data, width, height, palette, left, top);
+			return;
 	}
 }
 
 
 static void
-boot_splash_fb_blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop, uint16 imageRight, uint16 imageBottom,
-	uint16 imageWidth, uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+boot_splash_fb_blit16_cropped(const uint8 *data, uint16 imageLeft,
+	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
+	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
 {
 	int32 dataOffset = (imageWidth * imageTop) + imageLeft;
 
@@ -197,10 +214,11 @@ boot_splash_fb_blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageT
 	}
 }
 
+
 static void
-boot_splash_fb_blit_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
-	uint16 imageRight, uint16 imageBottom, uint16 imageWidth, uint16 imageHeight,
-	const uint8 *palette, uint16 left, uint16 top)
+boot_splash_fb_blit_cropped(const uint8 *data, uint16 imageLeft,
+	uint16 imageTop, uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
+	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
 {
 	switch (sBootSplash.depth) {
 		case 4:
@@ -208,19 +226,24 @@ boot_splash_fb_blit_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop
 		case 15:
 			return;
 		case 16:
-			return boot_splash_fb_blit16_cropped(data, imageLeft, imageTop, imageRight,
-				imageBottom, imageWidth, imageHeight, palette, left, top);
+			boot_splash_fb_blit16_cropped(data, imageLeft, imageTop,
+				imageRight, imageBottom, imageWidth, imageHeight, palette,
+				left, top);
+			return;
 		case 24:
 		case 32:
 			return;
 	}
 }
 
+
 static status_t
-boot_splash_fb_update(addr_t baseAddress, int32 width, int32 height, int32 depth, int32 bytesPerRow)
+boot_splash_fb_update(addr_t baseAddress, int32 width, int32 height,
+	int32 depth, int32 bytesPerRow)
 {
-	TRACE("boot_splash_fb_update: buffer=%p, width=%ld, height=%ld, depth=%ld, bytesPerRow=%ld\n",
-		(void *)baseAddress, width, height, depth, bytesPerRow);
+	TRACE("boot_splash_fb_update: buffer=%p, width=%ld, height=%ld, depth=%ld, "
+		"bytesPerRow=%ld\n", (void *)baseAddress, width, height, depth,
+		bytesPerRow);
 	
 	mutex_lock(&sBootSplash.lock);
 	
@@ -231,11 +254,13 @@ boot_splash_fb_update(addr_t baseAddress, int32 width, int32 height, int32 depth
 	sBootSplash.bytes_per_pixel = (depth + 7) / 8;
 	sBootSplash.bytes_per_row = bytesPerRow;
 
-	TRACE("boot_splash_fb_update: frame buffer mapped at %p\n", (void *)sBootSplash.frame_buffer);
+	TRACE("boot_splash_fb_update: frame buffer mapped at %p\n",
+		(void *)sBootSplash.frame_buffer);
 	
 	mutex_unlock(&sBootSplash.lock);
 	return B_OK;
 }
+
 
 bool
 boot_splash_fb_available(void)
@@ -243,6 +268,7 @@ boot_splash_fb_available(void)
 	TRACE("boot_splash_fb_available: enter\n");
 	return sBootSplash.frame_buffer != (addr_t)NULL;
 }
+
 
 status_t
 boot_splash_fb_init(struct kernel_args *args)
@@ -270,6 +296,7 @@ boot_splash_fb_init(struct kernel_args *args)
 	
 	return B_OK;
 }
+
 
 void
 boot_splash_set_stage(int stage)
@@ -304,12 +331,12 @@ boot_splash_set_stage(int stage)
 			stageOffset = 242;
 			break;
 		case BOOT_SPLASH_STAGE_7:
+		default:
 			stageOffset = iconsWidth;
 			break;
 	}
-	if (stage == BOOT_SPLASH_STAGE_7)
-		stageOffset = iconsWidth;
 
 	boot_splash_fb_blit_cropped(iconsImage, 0, 0, stageOffset, 32,
 		iconsWidth, iconsHeight, iconsPalette, x, y );
 }
+
