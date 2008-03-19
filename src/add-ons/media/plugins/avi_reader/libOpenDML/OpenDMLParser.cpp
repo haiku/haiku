@@ -27,7 +27,7 @@
 #include "OpenDMLParser.h"
 #include "avi.h"
 
-#define TRACE_ODML_PARSER
+//#define TRACE_ODML_PARSER
 #ifdef TRACE_ODML_PARSER
   #define TRACE printf
 #else
@@ -167,9 +167,13 @@ OpenDMLParser::Init()
 		return B_ERROR;
 	}	
 
-	uint32 frame_count = OdmlExtendedHeader() ? OdmlExtendedHeader()->total_frames : AviMainHeader()->total_frames;
-	bigtime_t duration = frame_count * AviMainHeader()->micro_sec_per_frame;
-	printf("AVI Header frame count %lu, duration %.6f\n", frame_count, duration / 1E6);
+#ifdef TRACE_ODML_PARSER
+	uint32 frameCount = OdmlExtendedHeader() ?
+		OdmlExtendedHeader()->total_frames : AviMainHeader()->total_frames;
+	bigtime_t duration = frameCount * AviMainHeader()->micro_sec_per_frame;
+	printf("AVI Header frame count %lu, duration %.6f\n", frameCount,
+		duration / 1E6);
+#endif
 	
 	for (int i = 0; i < fStreamCount; i++) {
 		SetupStreamLength(const_cast<stream_info *>(StreamInfo(i)));
@@ -197,42 +201,48 @@ OpenDMLParser::SetupAudioStreamLength(stream_info *stream)
 	  && stream->stream_header.sample_size != 0
 	  && stream->stream_header.sample_size != 1) { // PCM
 		stream->frame_count /= (stream->stream_header.sample_size + 7) / 8;
-		printf("audio: messing up PCM frame_count?\n");
+		TRACE("audio: messing up PCM frame_count?\n");
 	}
 
 	if (stream->stream_header.rate && stream->stream_header.scale) {
 		stream->frames_per_sec_rate = stream->stream_header.rate;
 		stream->frames_per_sec_scale = stream->stream_header.scale;
 		stream->duration = (stream->frame_count * stream->frames_per_sec_scale * 1000000) / stream->frames_per_sec_rate;
-		printf("audio: using rate+scale\n");
+		TRACE("audio: using rate+scale\n");
 	} else if (stream->audio_format->avg_bytes_per_sec) {
 		stream->frames_per_sec_rate = stream->audio_format->avg_bytes_per_sec;
 		stream->frames_per_sec_scale = 1;
 		stream->duration = (stream->frame_count * stream->frames_per_sec_scale * 1000000) / stream->frames_per_sec_rate;
-		printf("audio: using avg_bytes_per_sec\n");
+		TRACE("audio: using avg_bytes_per_sec\n");
 	} else if (AviMainHeader()->micro_sec_per_frame) {
 		uint32 video_frame_count = OdmlExtendedHeader() ? OdmlExtendedHeader()->total_frames : AviMainHeader()->total_frames;
 		stream->duration = video_frame_count * AviMainHeader()->micro_sec_per_frame;
 		stream->frames_per_sec_rate = (stream->frame_count * 1000 * 1000000) / stream->duration;
 		stream->frames_per_sec_scale = 1000;
-		printf("audio: using micro_sec_per_frame\n");
+		TRACE("audio: using micro_sec_per_frame\n");
 	} else {
-		printf("audio: no idea what to do\n");
+		TRACE("audio: no idea what to do\n");
 	}
 
 	if (stream->audio_format->avg_bytes_per_sec) {
-		int64 expected_frame_count = (stream->duration * stream->audio_format->avg_bytes_per_sec) / 1000000;
-		printf("audio: expected frame_count %lld, calculated stream frame_count %lld\n", expected_frame_count, stream->frame_count);
-		if (expected_frame_count * 9 > stream->frame_count * 10) {
-			printf("audio: something is wrong, ignoring calculated stream frame_count, rate and scale\n");
-			stream->frame_count = expected_frame_count;
-			stream->frames_per_sec_rate = stream->audio_format->avg_bytes_per_sec;
+		int64 expectedFrameCount
+			= (stream->duration * stream->audio_format->avg_bytes_per_sec)
+				/ 1000000;
+		TRACE("audio: expected frame_count %lld, calculated stream "
+			"frame_count %lld\n", expectedFrameCount, stream->frame_count);
+		if (expectedFrameCount * 9 > stream->frame_count * 10) {
+			TRACE("audio: something is wrong, ignoring calculated stream "
+				"frame_count, rate and scale\n");
+			stream->frame_count = expectedFrameCount;
+			stream->frames_per_sec_rate
+				= stream->audio_format->avg_bytes_per_sec;
 			stream->frames_per_sec_scale = 1;
 		}
 	}
 
-	printf("audio: frame_count %lld, duration %.6f, fps %.3f\n", 
-		stream->frame_count, stream->duration / 1E6, stream->frames_per_sec_rate / (double)stream->frames_per_sec_scale);
+	TRACE("audio: frame_count %lld, duration %.6f, fps %.3f\n", 
+		stream->frame_count, stream->duration / 1E6,
+		stream->frames_per_sec_rate / (double)stream->frames_per_sec_scale);
 }
 
 void
@@ -242,20 +252,22 @@ OpenDMLParser::SetupVideoStreamLength(stream_info *stream)
 	if (stream->stream_header.rate && stream->stream_header.scale) {
 		stream->frames_per_sec_rate = stream->stream_header.rate;
 		stream->frames_per_sec_scale = stream->stream_header.scale;
-		printf("video: using rate+scale\n");
+		TRACE("video: using rate+scale\n");
 	} else if (AviMainHeader()->micro_sec_per_frame) {
 		stream->frames_per_sec_rate = 1000000;
 		stream->frames_per_sec_scale = AviMainHeader()->micro_sec_per_frame;
-		printf("video: using micro_sec_per_frame\n");
+		TRACE("video: using micro_sec_per_frame\n");
 	} else {
 		stream->frames_per_sec_rate = 25;
 		stream->frames_per_sec_scale = 1;
-		printf("video: using fallback\n");
+		TRACE("video: using fallback\n");
 	}
-	stream->duration = (stream->frame_count * stream->frames_per_sec_scale * 1000000) / stream->frames_per_sec_rate;
+	stream->duration = (stream->frame_count * stream->frames_per_sec_scale
+		* 1000000) / stream->frames_per_sec_rate;
 
-	printf("video: frame_count %lld, duration %.6f, fps %.3f\n", 
-		stream->frame_count, stream->duration / 1E6, stream->frames_per_sec_rate / (double)stream->frames_per_sec_scale);
+	TRACE("video: frame_count %lld, duration %.6f, fps %.3f\n", 
+		stream->frame_count, stream->duration / 1E6,
+		stream->frames_per_sec_rate / (double)stream->frames_per_sec_scale);
 }
 
 status_t
