@@ -370,17 +370,20 @@ BMediaFormats::GetFormatFor(const media_format_description &description,
 
 	status_t status = update_media_formats();
 	if (status < B_OK) {
-		printf("BMediaFormats: updating formats from server failed: %s!\n", strerror(status));
+		ERROR("BMediaFormats: updating formats from server failed: %s!\n",
+			strerror(status));
 		return status;
 	}
-	printf("search for description family = %d, a = 0x%lx, b = 0x%lx\n",
-		description.family, description.u.misc.file_format, description.u.misc.codec);
+	TRACE("search for description family = %d, a = 0x%lx, b = 0x%lx\n",
+		description.family, description.u.misc.file_format,
+		description.u.misc.codec);
 
 	// search for a matching format description
 
 	meta_format other(description);
-	const meta_format *metaFormat = sFormats.BinarySearch(other, meta_format::CompareDescriptions);
-	printf("meta format == %p\n", metaFormat);
+	const meta_format *metaFormat = sFormats.BinarySearch(other,
+		meta_format::CompareDescriptions);
+	TRACE("meta format == %p\n", metaFormat);
 	if (metaFormat == NULL) {
 		memset(_format, 0, sizeof(*_format)); // clear to widlcard
 		return B_MEDIA_BAD_FORMAT;

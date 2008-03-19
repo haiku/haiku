@@ -517,12 +517,14 @@ multistream_format_specialize(media_multistream_format *format, const media_mult
 			break;
 
 		default:
-			ERROR("media_format::SpecializeTo can't specialize media_multistream_format of format %d\n", format->format);
+			ERROR("media_format::SpecializeTo can't specialize "
+				"media_multistream_format of format %ld\n", format->format);
 	}
 }
 
 static void
-encoded_audio_format_specialize(media_encoded_audio_format *format, const media_encoded_audio_format *other)
+encoded_audio_format_specialize(media_encoded_audio_format *format,
+	const media_encoded_audio_format *other)
 {
 	raw_audio_format_specialize(&format->output, &other->output);
 	if (format->encoding == 0)
@@ -535,7 +537,8 @@ encoded_audio_format_specialize(media_encoded_audio_format *format, const media_
 }
 
 static void
-encoded_video_format_specialize(media_encoded_video_format *format, const media_encoded_video_format *other)
+encoded_video_format_specialize(media_encoded_video_format *format,
+	const media_encoded_video_format *other)
 {
 	raw_video_format_specialize(&format->output, &other->output);
 	if (format->avg_bit_rate == 0)

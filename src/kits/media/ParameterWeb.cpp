@@ -1256,13 +1256,15 @@ BParameterGroup::MakeControl(int32 type)
 			return new BNullParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL);
 
 		case BParameter::B_DISCRETE_PARAMETER:
-			return new BDiscreteParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL);
+			return new BDiscreteParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL,
+				NULL);
 
 		case BParameter::B_CONTINUOUS_PARAMETER:
-			return new BContinuousParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL, NULL, 0, 0, 0);
+			return new BContinuousParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL,
+				NULL, NULL, 0, 0, 0);
 
 		case BParameter::B_TEXT_PARAMETER:
-			return new BTextParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL, NULL);
+			return new BTextParameter(-1, B_MEDIA_NO_TYPE, NULL, NULL, NULL, 0);
 
 		default:
 			ERROR("BParameterGroup::MakeControl unknown type %ld\n", type);
@@ -1401,8 +1403,9 @@ BParameter::GetValue(void *buffer, size_t *_ioSize, bigtime_t *_when)
 		if (_when != NULL)
 			*_when = reply.last_change;
 	} else
-		ERROR("BParameter::GetValue parameter '%s' querying node %d, port %d failed: %s\n", 
-			mName, node.node, node.port, strerror(status));
+		ERROR("BParameter::GetValue parameter '%s' querying node %d, "
+			"port %d failed: %s\n",  mName, (int)node.node, (int)node.port,
+			strerror(status));
 
 	if (area >= B_OK)
 		delete_area(area);

@@ -44,7 +44,7 @@
 	#define BROKEN()					((void)0)
 	#define CALLED()					((void)0)
 	#define PRINT(l, a...)				((void)0)
-	#define ERROR(a...)					((void)0)
+	#define ERROR(a...)					fprintf(stderr, a)
 	#define TRACE(a...)					((void)0)
 
 #endif

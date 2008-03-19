@@ -544,7 +544,9 @@ ContinuousMessageFilter::ContinuousMessageFilter(BControl *control,
 	float value[fParameter.CountChannels()];
 	size_t size = sizeof(value);
 	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
-		ERROR("ContinuousMessageFilter: Could not get value for continuous parameter %p (name '%s', node %d)\n", &parameter, parameter.Name(), parameter.Web()->Node().node);
+		ERROR("ContinuousMessageFilter: Could not get value for continuous "
+			"parameter %p (name '%s', node %d)\n", &parameter,
+			parameter.Name(), (int)(parameter.Web()->Node().node));
 		return;
 	}
 
@@ -614,7 +616,9 @@ DiscreteMessageFilter::DiscreteMessageFilter(BControl *control,
 	size_t size = sizeof(int32);
 	int32 value;
 	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
-		ERROR("DiscreteMessageFilter: Could not get value for discrete parameter %p (name '%s', node %d)\n", &parameter, parameter.Name(), parameter.Web()->Node().node);
+		ERROR("DiscreteMessageFilter: Could not get value for discrete "
+			"parameter %p (name '%s', node %d)\n", &parameter,
+			parameter.Name(), (int)(parameter.Web()->Node().node));
 		return;
 	}
 
@@ -1033,7 +1037,8 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 		}
 
 		default:
-			ERROR("BMediaTheme: Don't know parameter type: 0x%lx\n", parameter->Type());
+			ERROR("BMediaTheme: Don't know parameter type: 0x%x\n",
+				parameter->Type());
 	}
 	return NULL;
 }
