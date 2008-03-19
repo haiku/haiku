@@ -2301,7 +2301,7 @@ compareKeys(type_code type, const void *key1, int keyLength1,
 		// give a meaningful result
 		if (key1 == NULL && key2 != NULL)
 			return 1;
-		else if (key2 == NULL && key1 != NULL)
+		if (key2 == NULL && key1 != NULL)
 			return -1;
 
 		return 0;
@@ -2310,11 +2310,8 @@ compareKeys(type_code type, const void *key1, int keyLength1,
 	switch (type) {
 	    case B_STRING_TYPE:
     	{
-			int len = min_c(keyLength1, keyLength2);
-			int result = strncmp((const char *)key1, (const char *)key2, len);
-
-			if (result == 0
-				&& !(((const char *)key1)[len] == '\0' && ((const char *)key2)[len] == '\0'))
+			int result = memcmp(key1, key2, min_c(keyLength1, keyLength2));
+			if (result == 0)
 				result = keyLength1 - keyLength2;
 
 			return result;
@@ -2328,7 +2325,7 @@ compareKeys(type_code type, const void *key1, int keyLength1,
 		case B_UINT32_TYPE:
 			if (*(uint32 *)key1 == *(uint32 *)key2)
 				return 0;
-			else if (*(uint32 *)key1 > *(uint32 *)key2)
+			if (*(uint32 *)key1 > *(uint32 *)key2)
 				return 1;
 
 			return -1;
@@ -2337,7 +2334,7 @@ compareKeys(type_code type, const void *key1, int keyLength1,
 		case B_INT64_TYPE:
 			if (*(int64 *)key1 == *(int64 *)key2)
 				return 0;
-			else if (*(int64 *)key1 > *(int64 *)key2)
+			if (*(int64 *)key1 > *(int64 *)key2)
 				return 1;
 
 			return -1;
@@ -2345,7 +2342,7 @@ compareKeys(type_code type, const void *key1, int keyLength1,
 		case B_UINT64_TYPE:
 			if (*(uint64 *)key1 == *(uint64 *)key2)
 				return 0;
-			else if (*(uint64 *)key1 > *(uint64 *)key2)
+			if (*(uint64 *)key1 > *(uint64 *)key2)
 				return 1;
 
 			return -1;
