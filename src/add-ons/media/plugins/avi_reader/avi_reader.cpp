@@ -33,7 +33,7 @@
 #include "RawFormats.h"
 #include "avi_reader.h"
 
-#define TRACE_AVI_READER
+//#define TRACE_AVI_READER
 #ifdef TRACE_AVI_READER
   #define TRACE printf
 #else

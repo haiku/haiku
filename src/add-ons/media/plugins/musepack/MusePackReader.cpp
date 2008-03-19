@@ -11,6 +11,14 @@
 #include <string.h>
 
 
+//#define TRACE_MUSEPACK_READER
+#ifdef TRACE_MUSEPACK_READER
+  #define TRACE printf
+#else
+  #define TRACE(a...)
+#endif
+
+
 MusePackReader::MusePackReader()
 {
 }
@@ -40,12 +48,12 @@ MusePackReader::Sniff(int32 *_streamCount)
 	int error = fInfo.ReadStreamInfo(file);
 	if (error > B_OK) {
 		// error came from engine
-		printf("MusePackReader: ReadStreamInfo() engine error %d\n", error);
+		TRACE("MusePackReader: ReadStreamInfo() engine error %d\n", error);
 		return B_ERROR;
 	} else if (error < B_OK)
 		return error;
 
-	printf("MusePackReader: recognized MPC file\n");
+	TRACE("MusePackReader: recognized MPC file\n");
 	*_streamCount = 1;
 	return B_OK;
 }

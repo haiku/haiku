@@ -27,6 +27,15 @@
 #include <MediaFormats.h>
 #include "matroska_codecs.h"
 
+//#define TRACE_MATROSKA
+#ifdef TRACE_MATROSKA
+  #define TRACE printf
+#else
+  #define TRACE(a...)
+#endif
+
+#define ERROR(a...) fprintf(stderr, a)
+
 #define IS_CODEC(a,b) !memcmp(a, b, strlen(b))
 
 struct bitmap_info_header
@@ -50,7 +59,7 @@ struct bitmap_info_header
 status_t
 GetAudioFormat(media_format *format, const char *codec, void *private_data, int private_size)
 {
-	printf("GetAudioFormat: codec '%s', private data size %d\n", codec, private_size);
+	TRACE("GetAudioFormat: codec '%s', private data size %d\n", codec, private_size);
 	
 	BMediaFormats formats;
 	media_format_description description;
@@ -129,7 +138,7 @@ GetAudioFormat(media_format *format, const char *codec, void *private_data, int 
 status_t
 GetVideoFormat(media_format *format, const char *codec, void *private_data, int private_size)
 {
-	printf("private_data: codec '%s', private data size %d\n", codec, private_size);
+	TRACE("private_data: codec '%s', private data size %d\n", codec, private_size);
 	
 	BMediaFormats formats;
 	media_format_description description;

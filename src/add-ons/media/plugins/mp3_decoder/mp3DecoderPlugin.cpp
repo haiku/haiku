@@ -29,7 +29,7 @@
 #include <MediaRoster.h>
 #include "mp3DecoderPlugin.h"
 
-#define TRACE_MP3_DECODER
+//#define TRACE_MP3_DECODER
 #ifdef TRACE_MP3_DECODER
   #define TRACE printf
 #else

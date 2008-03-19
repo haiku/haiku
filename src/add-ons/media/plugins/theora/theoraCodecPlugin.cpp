@@ -8,7 +8,7 @@
 #include "theoraCodecPlugin.h"
 #include "OggTheoraFormats.h"
 
-#define TRACE_THIS 1
+#define TRACE_THIS 0
 #if TRACE_THIS
   #define TRACE printf
 #else

@@ -34,7 +34,7 @@
 
 #include "mov_reader.h"
 
-#define TRACE_MOV_READER
+//#define TRACE_MOV_READER
 #ifdef TRACE_MOV_READER
   #define TRACE printf
 #else

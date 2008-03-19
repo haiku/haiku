@@ -153,7 +153,7 @@ avCodec::Setup(media_format *ioEncodedFormat, const void *infoBuffer, size_t inf
 			if (gCodecTable[i].family == descr.family && gCodecTable[i].fourcc == cid) {
 				fCodec = avcodec_find_decoder(gCodecTable[i].id);
 				if (!fCodec) {
-					printf("avCodec: unable to find the correct ffmpeg decoder (id = %d)!!!\n",gCodecTable[i].id);
+					PRINT(("avCodec: unable to find the correct ffmpeg decoder (id = %d)!!!\n",gCodecTable[i].id));
 					return B_ERROR;
 				}
 				
@@ -225,8 +225,8 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		ffc->extradata = fExtraData;
 		ffc->extradata_size = fExtraDataSize;
 
-		printf("bit_rate %d, sample_rate %d, channels %d, block_align %d, extradata_size %d\n",
-			ffc->bit_rate, ffc->sample_rate, ffc->channels, ffc->block_align, ffc->extradata_size);
+		PRINT(("bit_rate %d, sample_rate %d, channels %d, block_align %d, extradata_size %d\n",
+			ffc->bit_rate, ffc->sample_rate, ffc->channels, ffc->block_align, ffc->extradata_size));
 
 		// close any previous instance
 		if (fCodecInitDone) {
@@ -268,7 +268,7 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 			ffc->extradata_size = fInputFormat.MetaDataSize();
 		}
 
-		printf("#### requested video format 0x%x\n", inout_format->u.raw_video.display.format);
+		PRINT(("#### requested video format 0x%x\n", inout_format->u.raw_video.display.format));
 
 		// make MediaPlayer happy (if not in rgb32 screen depth and no overlay,
 		// it will only ask for YCbCr, which DrawBitmap doesn't handle, so the default
@@ -300,11 +300,11 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		}
 
 		if (!fCodecInitDone) {
-			printf("avcodec_open() failed!\n");
+			PRINT(("avcodec_open() failed!\n"));
 			return B_ERROR;
 		}
 		if (!conv_func) {
-			printf("no conv_func!\n");
+			PRINT(("no conv_func!\n"));
 			return B_ERROR;
 		}
 
@@ -324,7 +324,7 @@ avCodec::NegotiateOutputFormat(media_format *inout_format)
 		PRINT(("[%c]  out_format=%s\n", isAudio?('a'):('v'), buffer));
 	#endif
 
-		printf("#### returned  video format 0x%x\n", inout_format->u.raw_video.display.format);
+		PRINT(("#### returned  video format 0x%x\n", inout_format->u.raw_video.display.format));
 
 		return B_OK;
 	}
@@ -354,17 +354,17 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 
 		mh->start_time = fStartTime;
 
-//		printf("audio start_time %.6f\n", mh->start_time / 1000000.0);
+//		PRINT(("audio start_time %.6f\n", mh->start_time / 1000000.0));
 
 		char *output_buffer = (char *)out_buffer;
 		*out_frameCount = 0;
 		while (*out_frameCount < fOutputFrameCount) {
 			if (fOutputBufferSize < 0) {
-				printf("############ fOutputBufferSize %ld\n", fOutputBufferSize);
+				PRINT(("############ fOutputBufferSize %ld\n", fOutputBufferSize));
 				fOutputBufferSize = 0;
 			}
 			if (fChunkBufferSize < 0) {
-				printf("############ fChunkBufferSize %ld\n", fChunkBufferSize);
+				PRINT(("############ fChunkBufferSize %ld\n", fChunkBufferSize));
 				fChunkBufferSize = 0;
 			}
 		
@@ -383,7 +383,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 				status_t err;
 				err = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, &chunk_mh);
 				if (err != B_OK || fChunkBufferSize < 0) {
-					printf("GetNextChunk error\n");
+					PRINT(("GetNextChunk error\n"));
 					fChunkBufferSize = 0;
 					break;
 				}
@@ -397,13 +397,13 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 				int len, out_size;
 				len = avcodec_decode_audio(ffc, (short *)fOutputBuffer, &out_size, const_cast<uint8_t *>(static_cast<const uint8_t *>(fChunkBuffer)) + fChunkBufferOffset, fChunkBufferSize);
 				if (len < 0) {
-					printf("########### audio decode error, fChunkBufferSize %ld, fChunkBufferOffset %ld\n", fChunkBufferSize, fChunkBufferOffset);
+					PRINT(("########### audio decode error, fChunkBufferSize %ld, fChunkBufferOffset %ld\n", fChunkBufferSize, fChunkBufferOffset));
 					out_size = 0;
 					len = 0;
 					fChunkBufferOffset = 0;
 					fChunkBufferSize = 0;
 				}
-//				else printf("audio decode: len %d, out_size %d\n", len, out_size);
+//				else PRINT(("audio decode: len %d, out_size %d\n", len, out_size));
 				fChunkBufferOffset += len;
 				fChunkBufferSize -= len;
 				fOutputBufferOffset = 0;
@@ -451,8 +451,8 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 		int len;
 		len = avcodec_decode_video(ffc, ffpicture, &got_picture, (uint8_t *)data, size);
 
-//printf("FFDEC: PTS = %d:%d:%d.%d - ffc->frame_number = %ld ffc->frame_rate = %ld\n", (int)(ffc->pts / (60*60*1000000)), (int)(ffc->pts / (60*1000000)), (int)(ffc->pts / (1000000)), (int)(ffc->pts % 1000000), ffc->frame_number, ffc->frame_rate);
-//printf("FFDEC: PTS = %d:%d:%d.%d - ffc->frame_number = %ld ffc->frame_rate = %ld\n", (int)(ffpicture->pts / (60*60*1000000)), (int)(ffpicture->pts / (60*1000000)), (int)(ffpicture->pts / (1000000)), (int)(ffpicture->pts % 1000000), ffc->frame_number, ffc->frame_rate);
+//PRINT(("FFDEC: PTS = %d:%d:%d.%d - ffc->frame_number = %ld ffc->frame_rate = %ld\n", (int)(ffc->pts / (60*60*1000000)), (int)(ffc->pts / (60*1000000)), (int)(ffc->pts / (1000000)), (int)(ffc->pts % 1000000), ffc->frame_number, ffc->frame_rate));
+//PRINT(("FFDEC: PTS = %d:%d:%d.%d - ffc->frame_number = %ld ffc->frame_rate = %ld\n", (int)(ffpicture->pts / (60*60*1000000)), (int)(ffpicture->pts / (60*1000000)), (int)(ffpicture->pts / (1000000)), (int)(ffpicture->pts % 1000000), ffc->frame_number, ffc->frame_rate));
 
 		if (len < 0)
 			printf("[%c] avCodec: error in decoding frame %lld\n", isAudio?('a'):('v'), *out_frameCount);
@@ -488,7 +488,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 			diff2 += prof_t3 - prof_t2;
 			prof_cnt++;
 			if (!(fFrame % 10))
-				printf("[%c] profile: d1 = %lld, d2 = %lld (%ld)\n", isAudio?('a'):('v'), diff1/prof_cnt, diff2/prof_cnt, fFrame);
+				PRINT(("[%c] profile: d1 = %lld, d2 = %lld (%ld)\n", isAudio?('a'):('v'), diff1/prof_cnt, diff2/prof_cnt, fFrame));
 #endif
 		}
 	}

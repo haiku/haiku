@@ -38,7 +38,7 @@
 #include <string.h>
 
 
-#define TRACE_MP4_READER
+//#define TRACE_MP4_READER
 #ifdef TRACE_MP4_READER
 #	define TRACE printf
 #else
@@ -469,7 +469,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			size_t size = video_format->VOLSize;
 			const void *data = video_format->theVOL;
 			if (format->SetMetaData(data, size) != B_OK) {
-				printf("Failed to set VOL\n %d %d",(16 << 20),32000);
+				ERROR("Failed to set VOL\n %d %d",(16 << 20),32000);
 			}
 
 #ifdef TRACE_MP4_READER

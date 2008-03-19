@@ -34,7 +34,7 @@
 #include "matroska_codecs.h"
 #include "matroska_util.h"
 
-#define TRACE_MKV_READER
+//#define TRACE_MKV_READER
 #ifdef TRACE_MKV_READER
   #define TRACE printf
 #else
