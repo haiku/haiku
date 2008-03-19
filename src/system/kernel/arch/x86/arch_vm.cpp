@@ -79,7 +79,7 @@ free_mtrr(int32 index)
 
 
 static uint64
-nearest_power(addr_t value)
+nearest_power(uint64 value)
 {
 	uint64 power = 1UL << 12;
 		// 12 bits is the smallest supported alignment/length
@@ -131,7 +131,6 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 		case B_MTR_WB:
 			type = IA32_MTR_WRITE_BACK;
 			break;
-
 		default:
 			return B_BAD_VALUE;
 	}
@@ -155,7 +154,8 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 	if (index < 0)
 		return B_ERROR;
 
-	TRACE_MTRR("allocate MTRR slot %ld, base = %Lx, length = %Lx\n", index, base, length);
+	TRACE_MTRR("allocate MTRR slot %ld, base = %Lx, length = %Lx, type=0x%lx\n", 
+		index, base, length, type);
 
 	sMemoryTypeIDs[index] = id;
 	x86_set_mtrr(index, base, length, type);
@@ -166,9 +166,9 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 
 #define MTRR_MAX_SOLUTIONS 	5	// usually MTRR count is eight, keep a few for other needs
 #define MTRR_MIN_SIZE 		0x100000	// 1 MB
-static int64 sols[MTRR_MAX_SOLUTIONS];
-static int solCount;
-static int64 props[MTRR_MAX_SOLUTIONS];
+static int64 sSolutions[MTRR_MAX_SOLUTIONS];
+static int32 sSolutionCount;
+static int64 sPropositions[MTRR_MAX_SOLUTIONS];
 
 
 /*!	Find the nearest powers of two for a value, save current iteration,
@@ -180,24 +180,24 @@ static void
 find_nearest(uint64 value, int iteration)
 {
 	TRACE_MTRR("find_nearest %Lx %d\n", value, iteration);
-	if (iteration > (MTRR_MAX_SOLUTIONS - 1) || (iteration + 1) >= solCount)
+	if (iteration > (MTRR_MAX_SOLUTIONS - 1) || (iteration + 1) >= sSolutionCount)
 		return;
 	uint64 down, up;
 	int i;
 	nearest_powers(value, &down, &up);
-	props[iteration] = down;
+	sPropositions[iteration] = down;
 	if (value - down < MTRR_MIN_SIZE) {
 		for (i=0; i<=iteration; i++)
-			sols[i] = props[i];
-		solCount = iteration + 1;
+			sSolutions[i] = sPropositions[i];
+		sSolutionCount = iteration + 1;
 		return;
 	}
 	find_nearest(value - down, iteration + 1);
-	props[iteration] = -up;
+	sPropositions[iteration] = -up;
 	if (up - value < MTRR_MIN_SIZE) {
 		for (i=0; i<=iteration; i++)
-			sols[i] = props[i];
-		solCount = iteration + 1;
+			sSolutions[i] = sPropositions[i];
+		sSolutionCount = iteration + 1;
 		return;
 	}
 	find_nearest(up - value, iteration + 1);
@@ -208,33 +208,40 @@ find_nearest(uint64 value, int iteration)
 static void
 set_memory_write_back(int32 id, uint64 base, uint64 length)
 {
+	status_t err;
 	TRACE_MTRR("set_memory_write_back base %Lx length %Lx\n", base, length);
-	solCount = MTRR_MAX_SOLUTIONS;
+	sSolutionCount = MTRR_MAX_SOLUTIONS;
 	find_nearest(length, 0);
 
 #ifdef TRACE_MTRR
-	dprintf("sols: ");
-	for (int i=0; i<solCount; i++) {
-                dprintf("0x%Lx ", sols[i]);
+	dprintf("solutions: ");
+	for (int i=0; i<sSolutionCount; i++) {
+                dprintf("0x%Lx ", sSolutions[i]);
         }
         dprintf("\n");
 #endif
 
 	bool nextDown = false;
-	for (int i = 0; i < solCount; i++) {
-		if (sols[i] < 0) {
+	for (int i = 0; i < sSolutionCount; i++) {
+		if (sSolutions[i] < 0) {
 			if (nextDown)
-				base += sols[i];
-			set_memory_type(id, base, -sols[i], nextDown ? B_MTR_UC : B_MTR_WB);
+				base += sSolutions[i];
+			err = set_memory_type(id, base, -sSolutions[i], nextDown ? B_MTR_UC : B_MTR_WB);
+			if (err != B_OK) {
+				dprintf("set_memory_type returned %s (0x%lx)\n", strerror(err), err);
+			}
 			if (!nextDown)
-				base -= sols[i];
+				base -= sSolutions[i];
 			nextDown = !nextDown;
 		} else {
 			if (nextDown)
-				base -= sols[i];
-			set_memory_type(id, base, sols[i], nextDown ? B_MTR_UC : B_MTR_WB);
+				base -= sSolutions[i];
+			err = set_memory_type(id, base, sSolutions[i], nextDown ? B_MTR_UC : B_MTR_WB);
+			if (err != B_OK) {
+				dprintf("set_memory_type returned %s (0x%lx)\n", strerror(err), err);
+			}
 			if (!nextDown)
-				base += sols[i];
+				base += sSolutions[i];
 		}
 	}
 }
