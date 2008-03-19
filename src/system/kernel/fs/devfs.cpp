@@ -1431,6 +1431,11 @@ dump_driver(int argc, char **argv)
 		return 0;
 	}
 
+	if (!strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [name]\n", argv[0]);
+		return 0;
+	}
+
 	driver_entry *driver = (driver_entry *)hash_lookup(
 		sDeviceFileSystem->driver_hash, argv[1]);
 	if (driver == NULL) {
