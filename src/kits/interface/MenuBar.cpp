@@ -471,22 +471,7 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			break;
 
 		BMenuItem *menuItem = _HitTestItems(where, B_ORIGIN);
-		if (menuItem != NULL) {
-			if (menuItem->Submenu() != NULL && menuItem != fSelected) {
-				if (menuItem->Submenu()->Window() == NULL) {
-					// open the menu if it's not opened yet
-					_SelectItem(menuItem);
-				} else {
-					// Menu was already opened, close it and bail
-					_SelectItem(NULL);
-					fState = MENU_STATE_CLOSED;
-					fChosenItem = NULL;
-				}
-			} else {
-				// No submenu, just select the item
-				_SelectItem(menuItem);					
-			}
-		} else if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
+		if (_OverSubmenu(fSelected, ConvertToScreen(where))) {
 			// call _Track() from the selected sub-menu when the mouse cursor
 			// is over its window
 			BMenu *menu = fSelected->Submenu();
@@ -523,6 +508,21 @@ BMenuBar::_Track(int32 *action, int32 startIndex, bool showMenu)
 			}
 			if (!window->Lock())
 				break;
+		} else if (menuItem != NULL) {
+			if (menuItem->Submenu() != NULL && menuItem != fSelected) {
+				if (menuItem->Submenu()->Window() == NULL) {
+					// open the menu if it's not opened yet
+					_SelectItem(menuItem);
+				} else {
+					// Menu was already opened, close it and bail
+					_SelectItem(NULL);
+					fState = MENU_STATE_CLOSED;
+					fChosenItem = NULL;
+				}
+			} else {
+				// No submenu, just select the item
+				_SelectItem(menuItem);					
+			}
 		} else if (menuItem == NULL && fSelected != NULL
 			&& !_IsStickyMode() && Bounds().Contains(where)) {
 			_SelectItem(NULL);

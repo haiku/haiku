@@ -1607,6 +1607,7 @@ BMenu::_UpdateNavigationArea(BPoint position, BRect& navAreaRectAbove,
 	}
 }
 
+
 void
 BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 	BRect& navAreaRectAbove, BRect& navAreaRectBelow, bigtime_t& selectedTime,
@@ -1614,7 +1615,6 @@ BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 {
 	if (fState == MENU_STATE_CLOSED)
 		return;
-
 
 	if (item != fSelected) {
 		if (navigationAreaTime == 0)
