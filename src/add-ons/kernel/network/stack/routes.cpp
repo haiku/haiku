@@ -161,16 +161,14 @@ find_route(net_domain *_domain, const sockaddr *address)
 	// find last matching route
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
+	net_route_private *candidate = NULL;
+
 	TRACE(("test address %s for routes...\n", AddressString(domain, address).Data()));
 
 	// TODO: alternate equal default routes
 
 	while (iterator.HasNext()) {
 		net_route_private *route = iterator.Next();
-
-		// ignore routes that point to devices that have no link
-		if ((route->interface->device->flags & IFF_LINK) == 0)
-			continue;
 
 		if (route->mask) {
 			sockaddr maskedAddress;
@@ -186,10 +184,16 @@ find_route(net_domain *_domain, const sockaddr *address)
 		TRACE(("  found route: %s, flags %lx\n",
 			AddressString(domain, route->destination).Data(), route->flags));
 
+		// neglect routes that point to devices that have no link
+		if ((route->interface->device->flags & IFF_LINK) == 0) {
+			candidate = route;
+			continue;
+		}
+
 		return route;
 	}
 
-	return NULL;
+	return candidate;
 }
 
 
