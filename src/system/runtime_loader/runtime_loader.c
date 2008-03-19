@@ -139,13 +139,14 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 
 	if (S_ISLNK(stat.st_mode)) {
 		char buffer[PATH_MAX];
-		size_t length = PATH_MAX;
+		size_t length = PATH_MAX - 1;
 		char *lastSlash;
 
 		// it's a link, indeed
 		status = _kern_read_link(-1, path, buffer, &length);
 		if (status < B_OK)
 			return status;
+		buffer[length] = '\0';
 
 		lastSlash = strrchr(path, '/');
 		if (buffer[0] != '/' && lastSlash != NULL) {
