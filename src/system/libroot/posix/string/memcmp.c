@@ -1,20 +1,23 @@
-/* 
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT license.
+ */
 
-#include <sys/types.h>
+
 #include <string.h>
 
 
 int
-memcmp(const void *cs, const void *ct, size_t count)
+memcmp(const void *_a, const void *_b, size_t count)
 {
-	const unsigned char *su1, *su2;
-	signed char res = 0;
+	const unsigned char *a = (const unsigned char *)_a;
+	const unsigned char *b = (const unsigned char *)_b;
 
-	for (su1 = cs, su2 = ct; 0 < count; ++su1, ++su2, count--)
-		if ((res = *su1 - *su2) != 0)
-			break;
-	return res;
+	while (count-- > 0) {
+		int cmp = *a++ - *b++;
+		if (cmp != 0)
+			return cmp;
+	}
+
+	return 0;
 }

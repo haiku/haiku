@@ -1,21 +1,19 @@
-/* 
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT license.
+ */
 
-#include <sys/types.h>
+
+#include <stdbool.h>
 #include <string.h>
 
 
 int
-strcmp(char const *cs, char const *ct)
+strcmp(char const *a, char const *b)
 {
-	signed char __res;
-
-	while (1) {
-		if ((__res = *cs - *ct++) != 0 || !*cs++)
-			break;
+	while (true) {
+		int cmp = (unsigned char)*a - (unsigned char)*b++;
+		if (cmp != 0 || *a++ == '\0')
+			return cmp;
 	}
-
-	return __res;
 }

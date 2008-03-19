@@ -1,22 +1,20 @@
-/* 
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT license.
+ */
 
-#include <sys/types.h>
+
 #include <string.h>
 
 
 int
-strncmp(char const *cs, char const *ct, size_t count)
+strncmp(char const *a, char const *b, size_t count)
 {
-	signed char __res = 0;
-
-	while (count > 0) {
-		if ((__res = *cs - *ct++) != 0 || !*cs++)
-			break;
-		count--;
+	while (count-- > 0) {
+		int cmp = (unsigned char)*a - (unsigned char)*b++;
+		if (cmp != 0 || *a++ == '\0')
+			return cmp;
 	}
 
-	return __res;
+	return 0;
 }

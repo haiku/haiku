@@ -35,8 +35,6 @@
 #include <string.h>
 #include <ctype.h>
 
-//typedef unsigned char u_char;
-
 
 int
 strcasecmp(const char *s1, const char *s2)
@@ -44,9 +42,10 @@ strcasecmp(const char *s1, const char *s2)
 	const u_char *us1 = (const u_char *)s1;
 	const u_char *us2 = (const u_char *)s2;
 
-	while (tolower(*us1) == tolower(*us2++))
+	while (tolower(*us1) == tolower(*us2++)) {
 		if (*us1++ == '\0')
 			return 0;
+	}
 
 	return tolower(*us1) - tolower(*--us2);
 }
