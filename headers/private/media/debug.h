@@ -2,7 +2,7 @@
 #define _MEDIA_DEBUG_OLD_H_
 
 #ifndef DEBUG
-  #define DEBUG 1
+  #define DEBUG 0
 #endif
 
 #include <Debug.h>
@@ -40,7 +40,7 @@
 	#define PRINT_FORMAT(_text, _fmt)	((void)0)
 	#define PRINT_INPUT(_text, _in)		((void)0)
 	#define PRINT_OUTPUT(_text, _out)	((void)0)
-	#define UNIMPLEMENTED() 			((void)0)
+	#define UNIMPLEMENTED() 			printf("UNIMPLEMENTED %s\n",__PRETTY_FUNCTION__)
 	#define BROKEN()					((void)0)
 	#define CALLED()					((void)0)
 	#define PRINT(l, a...)				((void)0)

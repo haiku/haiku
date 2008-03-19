@@ -32,6 +32,20 @@
 #include "PluginManager.h"
 #include "debug.h"
 
+//#define TRACE_MEDIA_TRACK
+#ifdef TRACE_MEDIA_TRACK
+  #ifndef TRACE
+    #define TRACE printf
+  #endif
+#else
+  #ifndef TRACE
+    #define TRACE(a...)
+  #endif
+#endif
+
+#define ERROR(a...) fprintf(stderr, a)
+
+
 #define CONVERT_TO_INT32 0 // XXX test! this triggers a few bugs!
 
 // flags used for workarounds
@@ -112,9 +126,11 @@ BMediaTrack::EncodedFormat(media_format *out_format) const
 
 	*out_format = *fExtractor->EncodedFormat(fStream);
 
+#ifdef TRACE_MEDIA_TRACK
 	char s[200];
 	string_for_format(*out_format, s, sizeof(s));
-	printf("BMediaTrack::EncodedFormat: %s\n", s);  
+	printf("BMediaTrack::EncodedFormat: %s\n", s);
+#endif
 
 	return B_OK;
 }
@@ -141,10 +157,11 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 	_plugin_manager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = 0;
 
+#ifdef TRACE_MEDIA_TRACK
 	char s[200];
-
 	string_for_format(*inout_format, s, sizeof(s));
 	printf("BMediaTrack::DecodedFormat: req1: %s\n", s);  
+#endif
 	
 	if ((fWorkaroundFlags & FORCE_RAW_AUDIO) || ((fWorkaroundFlags & IGNORE_ENCODED_AUDIO) && inout_format->type == B_MEDIA_ENCODED_AUDIO)) {
 		inout_format->type = B_MEDIA_RAW_AUDIO;
@@ -165,8 +182,10 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 			inout_format->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	}
 
+#ifdef TRACE_MEDIA_TRACK
 	string_for_format(*inout_format, s, sizeof(s));
-	printf("BMediaTrack::DecodedFormat: req2: %s\n", s);  
+	printf("BMediaTrack::DecodedFormat: req2: %s\n", s);
+#endif
 
 	media_format requested_format = *inout_format;
 
@@ -174,8 +193,10 @@ BMediaTrack::DecodedFormat(media_format *inout_format, uint32 flags)
 
 	res = fDecoder->NegotiateOutputFormat(inout_format);
 
+#ifdef TRACE_MEDIA_TRACK
 	string_for_format(*inout_format, s, sizeof(s));
 	printf("BMediaTrack::DecodedFormat: nego: %s\n", s);  
+#endif
 	
 	if (inout_format->type == 0)
 		debugger("Decoder didn't set output format type");
@@ -284,7 +305,7 @@ BMediaTrack::ReadFrames(void *out_buffer,
 		fCurFrame += *out_frameCount;
 		fCurTime = header.start_time;
 	} else {
-		printf("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n", result, strerror(result));
+		ERROR("BMediaTrack::ReadFrames: decoder returned error 0x%08lx (%s)\n", result, strerror(result));
 		*out_frameCount = 0;
 	}
 	if (mh)
@@ -330,20 +351,20 @@ BMediaTrack::SeekToTime(bigtime_t *inout_time,
 	time = seekTime;
 	result = fExtractor->Seek(fStream, seekTo, &frame, &time);
 	if (result != B_OK) {
-		printf("BMediaTrack::SeekToTime: extractor seek failed\n");
+		ERROR("BMediaTrack::SeekToTime: extractor seek failed\n");
 		return result;
 	}
 
 	result = fDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
 	if (result != B_OK) {
-		printf("BMediaTrack::SeekToTime: decoder seek failed\n");
+		ERROR("BMediaTrack::SeekToTime: decoder seek failed\n");
 		return result;
 	}
 
 	if (fRawDecoder) {
 		result = fRawDecoder->Seek(seekTo, 0, &frame, seekTime, &time);
 		if (result != B_OK) {
-			printf("BMediaTrack::SeekToTime: raw decoder seek failed\n");
+			ERROR("BMediaTrack::SeekToTime: raw decoder seek failed\n");
 			return result;
 		}
 	}
@@ -381,20 +402,20 @@ BMediaTrack::SeekToFrame(int64 *inout_frame,
 	frame = seekFrame;
 	result = fExtractor->Seek(fStream, seekTo, &frame, &time);
 	if (result != B_OK) {
-		printf("BMediaTrack::SeekToFrame: extractor seek failed\n");
+		ERROR("BMediaTrack::SeekToFrame: extractor seek failed\n");
 		return result;
 	}
 		
 	result = fDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
 	if (result != B_OK) {
+		ERROR("BMediaTrack::SeekToFrame: decoder seek failed\n");
 		return result;
-		printf("BMediaTrack::SeekToFrame: decoder seek failed\n");
 	}		
 
 	if (fRawDecoder) {
 		result = fRawDecoder->Seek(seekTo, seekFrame, &frame, 0, &time);
 		if (result != B_OK) {
-			printf("BMediaTrack::SeekToFrame: raw decoder seek failed\n");
+			ERROR("BMediaTrack::SeekToFrame: raw decoder seek failed\n");
 			return result;
 		}
 	}
@@ -707,18 +728,18 @@ BMediaTrack::SetupWorkaround()
 bool
 BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 {
-	char s[200];
-	status_t res;
-
 	_plugin_manager.DestroyDecoder(fRawDecoder);
 	fRawDecoder = NULL;
-	
+
+#ifdef TRACE_MEDIA_TRACK	
+	char s[200];
 	string_for_format(from, s, sizeof(s));
 	printf("BMediaTrack::SetupFormatTranslation: from: %s\n", s);  
+#endif
 
-	res = _plugin_manager.CreateDecoder(&fRawDecoder, from);
+	status_t res = _plugin_manager.CreateDecoder(&fRawDecoder, from);
 	if (res != B_OK) {
-		printf("BMediaTrack::SetupFormatTranslation: CreateDecoder failed\n");
+		ERROR("BMediaTrack::SetupFormatTranslation: CreateDecoder failed\n");
 		return false;
 	}
 
@@ -729,28 +750,32 @@ BMediaTrack::SetupFormatTranslation(const media_format &from, media_format *to)
 
 	ChunkProvider *chunkProvider = new(std::nothrow) RawDecoderChunkProvider(fDecoder, buffer_size, frame_size);
 	if (!chunkProvider) {
-		printf("BMediaTrack::SetupFormatTranslation: can't create chunk provider\n");
+		ERROR("BMediaTrack::SetupFormatTranslation: can't create chunk provider\n");
 		goto error;
 	}
 	fRawDecoder->SetChunkProvider(chunkProvider);
 
 	res = fRawDecoder->Setup(&notconstFrom, 0, 0);
 	if (res != B_OK) {
-		printf("BMediaTrack::SetupFormatTranslation: Setup failed\n");
+		ERROR("BMediaTrack::SetupFormatTranslation: Setup failed\n");
 		goto error;
 	}
 
+#ifdef TRACE_MEDIA_TRACK	
 	string_for_format(*to, s, sizeof(s));
 	printf("BMediaTrack::SetupFormatTranslation:   to: %s\n", s);  
+#endif
 
 	res = fRawDecoder->NegotiateOutputFormat(to);
 	if (res != B_OK) {
-		printf("BMediaTrack::SetupFormatTranslation: NegotiateOutputFormat failed\n");
+		ERROR("BMediaTrack::SetupFormatTranslation: NegotiateOutputFormat failed\n");
 		goto error;
 	}
 
+#ifdef TRACE_MEDIA_TRACK	
 	string_for_format(*to, s, sizeof(s));
 	printf("BMediaTrack::SetupFormatTranslation:  res: %s\n", s);  
+#endif
 
 	return true;
 
@@ -843,7 +868,7 @@ RawDecoderChunkProvider::GetNextChunk(const void **chunkBuffer, size_t *chunkSiz
 		*chunkSize = frames * fFrameSize;
 //		printf("RawDecoderChunkProvider::GetNextChunk, %Ld frames, %ld bytes, start-time %Ld\n", frames, *chunkSize, mediaHeader->start_time);
 	} else {
-		printf("RawDecoderChunkProvider::GetNextChunk failed\n");
+		ERROR("RawDecoderChunkProvider::GetNextChunk failed\n");
 	}
 	return res;
 }
