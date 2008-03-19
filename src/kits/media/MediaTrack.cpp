@@ -434,9 +434,14 @@ status_t
 BMediaTrack::FindKeyFrameForTime(bigtime_t *inout_time,
 								 int32 flags) const
 {
+	// TODO: let the codec handle this, but it is almost
+	// save to assume that frame at time 0 is a keyframe
+	if (*inout_time == 0)
+		return B_OK;
+
 	UNIMPLEMENTED();
 
-	return B_OK;
+	return B_ERROR;
 }
 
 
@@ -444,9 +449,14 @@ status_t
 BMediaTrack::FindKeyFrameForFrame(int64 *inout_frame,
 								  int32 flags) const
 {
+	// TODO: let the codec handle this, but it is almost
+	// save to assume that frame 0 is a keyframe
+	if (*inout_frame == 0)
+		return B_OK;
+
 	UNIMPLEMENTED();
 
-	return B_OK;
+	return B_ERROR;
 }
 
 
