@@ -343,8 +343,11 @@ BStatusBar::SetTrailingText(const char* string)
 void
 BStatusBar::SetMaxValue(float max)
 {
+	// R5 and/or Zeta's SetMaxValue does not trigger an invalidate here.
+	// this is probably not ideal behavior, but it does break apps in some cases 
+	// as observed with SpaceMonitor.
+	// TODO: revisit this when we break binary compatibility
 	fMax = max;
-	Invalidate(_BarFrame());
 }
 
 
