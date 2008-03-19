@@ -33,8 +33,8 @@
 #include <StopWatch.h>
 
 
-//#define TRACE_ODML_PARSER
-#ifdef TRACE_ODML_PARSER
+//#define TRACE_START_INDEX
+#ifdef TRACE_START_INDEX
   #define TRACE printf
 #else
   #define TRACE(a...)
@@ -77,7 +77,7 @@ StandardIndex::Init()
 	TRACE("StandardIndex::Init: seekHintsStride %lu\n", seekHintsStride);
 	TRACE("StandardIndex::Init: seekHintsMax %lu\n", seekHintsMax);
 
-#ifdef TRACE_ODML_PARSER
+#ifdef TRACE_START_INDEX
 { BStopWatch w("StandardIndex::Init: malloc");
 #endif
 
@@ -96,7 +96,7 @@ StandardIndex::Init()
 		ERROR("libOpenDML: StandardIndex::Init out of memory\n");
 		return B_NO_MEMORY;
 	}
-#ifdef TRACE_ODML_PARSER
+#ifdef TRACE_START_INDEX
 }
 { BStopWatch w("StandardIndex::Init: file read");
 #endif
@@ -108,7 +108,7 @@ StandardIndex::Init()
 		fIndex = NULL;
 		return B_IO_ERROR;
 	}
-#ifdef TRACE_ODML_PARSER
+#ifdef TRACE_START_INDEX
 }
 	//DumpIndex();
 #endif
@@ -125,7 +125,7 @@ StandardIndex::Init()
 		fStreamData[i].seek_hints_next = seekHintsStride;
 	}
 
-#ifdef TRACE_ODML_PARSER
+#ifdef TRACE_START_INDEX
 { BStopWatch w("StandardIndex::Init: scan index");
 #endif
 	
@@ -156,7 +156,7 @@ StandardIndex::Init()
 		fStreamData[stream].keyframe_count = keyframe_count;
 		fStreamData[stream].seek_hints_count = seek_hints_count;
 	}
-#ifdef TRACE_ODML_PARSER
+#ifdef TRACE_START_INDEX
 }
 
 	for (int i = 0; i < fStreamCount; i++) {
@@ -172,7 +172,7 @@ StandardIndex::Init()
 				fStreamData[i].seek_hints[j].stream_pos);
 		}
 	}
-#endif // TRACE_ODML_PARSER
+#endif // TRACE_START_INDEX
 
 	return B_OK;
 }
