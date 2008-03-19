@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 
@@ -25,8 +26,14 @@ class NetworkStatus : public BApplication {
 		NetworkStatus();
 		virtual	~NetworkStatus();
 
+		virtual	void	ArgvReceived(int32 argc, char** argv);
 		virtual	void	ReadyToRun();
 		virtual void	AboutRequested();
+	private:
+				void	_InstallReplicantInDeskbar();
+
+				bool	fAutoInstallInDeskbar;
+				bool	fQuitImmediately;
 };
 
 
@@ -53,7 +60,9 @@ our_image(image_info& image)
 
 
 NetworkStatus::NetworkStatus()
-	: BApplication(kSignature)
+	: BApplication(kSignature),
+	  fAutoInstallInDeskbar(false),
+	  fQuitImmediately(false)
 {
 }
 
@@ -64,10 +73,37 @@ NetworkStatus::~NetworkStatus()
 
 
 void
+NetworkStatus::ArgvReceived(int32 argc, char** argv)
+{
+	if (argc <= 1)
+		return;
+
+	if (strcmp(argv[1], "--help") == 0
+		|| strcmp(argv[1], "-h") == 0) {
+		printf("NetworkStatus options:\n");
+		printf("   --deskbar      automatically add replicant to Deskbar\n");
+		printf("   --help         print this info and exit\n");
+		fQuitImmediately = true;
+		return;
+	}
+
+	if (strcmp(argv[1], "--deskbar") == 0)
+		fAutoInstallInDeskbar = true;
+}
+
+
+void
 NetworkStatus::ReadyToRun()
 {
-	bool isInstalled = false;
+	if (fQuitImmediately) {
+		// we printed the help message into the Terminal and
+		// should just quit
+		Quit();
+		return;
+	}
+
 	bool isDeskbarRunning = true;
+	bool isInstalled = false;
 
 	{
 		// if the Deskbar is not alive at this point, it might be after having
@@ -79,22 +115,42 @@ NetworkStatus::ReadyToRun()
 		isInstalled = deskbar.HasItem(kDeskbarItemName);
 	}
 
+	if (fAutoInstallInDeskbar) {
+		if (isInstalled) {
+			Quit();
+			return;
+		}
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		// wait up to 10 seconds for Deskbar to become available
+		// in case it is not running (yet?)
+		int32 tries = 10;
+		while (!isDeskbarRunning && --tries) {
+			BDeskbar deskbar;
+			if (deskbar.IsRunning()) {
+				isDeskbarRunning = true;
+				break;
+			}
+			snooze(1000000);
+		}
+#endif
+		if (!isDeskbarRunning) {
+			printf("Deskbar is not running, giving up.\n");
+			Quit();
+			return;
+		}
+
+		_InstallReplicantInDeskbar();
+		return;
+	}
+
 	if (isDeskbarRunning && !isInstalled) {
-		BAlert* alert = new BAlert("", "Do you want NetworkStatus to live in the Deskbar?",
-			"Don't", "Install", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		BAlert* alert = new BAlert("", "Do you want NetworkStatus to live in "
+			"the Deskbar?", "Don't", "Install", NULL, B_WIDTH_AS_USUAL,
+			B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
 
-		if (alert->Go()) {
-			image_info info;
-			entry_ref ref;
-
-			if (our_image(info) == B_OK
-				&& get_ref_for_path(info.name, &ref) == B_OK) {
-				BDeskbar deskbar;
-				deskbar.AddItem(&ref);
-			}
-
-			Quit();
+		if (alert->Go() == 1) {
+			_InstallReplicantInDeskbar();
 			return;
 		}
 	}
@@ -118,6 +174,22 @@ NetworkStatus::AboutRequested()
 	BMessenger target((BHandler*)view);
 	BMessage about(B_ABOUT_REQUESTED);
 	target.SendMessage(&about);
+}
+
+
+void
+NetworkStatus::_InstallReplicantInDeskbar()
+{
+	image_info info;
+	entry_ref ref;
+
+	if (our_image(info) == B_OK
+		&& get_ref_for_path(info.name, &ref) == B_OK) {
+		BDeskbar deskbar;
+		deskbar.AddItem(&ref);
+	}
+
+	Quit();
 }
 
 
