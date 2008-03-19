@@ -38,7 +38,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bison bzip2 cal cat
 	mount_nfs mountvolume mv nc netstat nl nohup od open paste patch pathchk pc
 	ping play playfile playsound playwav pr prio printenv printf ps ptx pwd
 	query quit readlink release renice rescan rlog rm rmattr rmindex rmdir roster route
-	safemode screen_blanker sed setdecor settype setversion setvolume seq sh sha1sum shar 
+	safemode screen_blanker sed setdecor settype setversion setvolume seq sh sha1sum shar
 	shred shuf shutdown sleep sort split stat strace stty su sum sync sysinfo tac tail tar
 	tcpdump tcptester tee telnet telnetd test top touch tput tr traceroute
 	translate true tsort tty uname unchop unexpand unmount uniq unrar unshar
@@ -47,7 +47,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bison bzip2 cal cat
 	zipcloak zipgrep zipnote zipsplit zmore znew
 ;
 
-	
+
 BEOS_APPS = AboutSystem CodyCam DeskCalc DiskProbe DriveSetup CDPlayer Expander
 	Icon-O-Matic Installer LaunchBox Magnify Mail MediaPlayer MidiPlayer
 	NetworkStatus PackageInstaller People PowerStatus ProcessController
@@ -91,8 +91,8 @@ BEOS_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator JPEGTransla
 	TIFFTranslator WonderBrushTranslator
 ;
 BEOS_ADD_ONS_MEDIA = dvb.media_addon
-	hmulti_audio.media_addon 
-	mixer.media_addon 
+	hmulti_audio.media_addon
+	mixer.media_addon
 	opensound.media_addon
     tone_producer_demo.media_addon
 	usb_webcam.media_addon
@@ -105,7 +105,7 @@ BEOS_ADD_ONS_MEDIA_PLUGINS = $(GPL_ONLY)ac3_decoder
 	matroska mov_reader
 	mp3_decoder mp3_reader
 	mp4_reader musepack
-	ogg raw_decoder speex 
+	ogg raw_decoder speex
 	# theora
 	vorbis wav_reader
 ;
@@ -368,7 +368,7 @@ AddFilesToHaikuImage home config settings : <settings>fresh_install ;
 AddFilesToHaikuImage beos system : zbeos ;
 
 # boot module links
-AddBootModuleSymlinksToHaikuImage 
+AddBootModuleSymlinksToHaikuImage
 	pci $(X86_ONLY)isa config_manager ide scsi
 	$(PPC_ONLY)openpic
 	block_io fast_log ide_adapter locked_pool scsi_periph
@@ -381,7 +381,7 @@ AddBootModuleSymlinksToHaikuImage
 # add-ons
 AddFilesToHaikuImage beos system add-ons accelerants
 	: $(BEOS_ADD_ONS_ACCELERANTS) ;
-AddFilesToHaikuImage beos system add-ons opengl 
+AddFilesToHaikuImage beos system add-ons opengl
 	: $(X86_ONLY)Mesa\ Software\ Renderer ;
 AddFilesToHaikuImage beos system add-ons Translators
 	: $(BEOS_ADD_ONS_TRANSLATORS) ;
@@ -493,7 +493,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 
 	# library symlinks
 	local lib ;
-	for lib in $(BEOS_SYSTEM_LIBS) 
+	for lib in $(BEOS_SYSTEM_LIBS)
 		$(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) libglut.so {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
 	}
@@ -505,6 +505,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	AddHeaderDirectoryToHaikuImage gnu ;
 	AddHeaderDirectoryToHaikuImage os ;
 	AddHeaderDirectoryToHaikuImage posix ;
+	AddHeaderDirectoryToHaikuImage build gcc-2.95.3 ;
 
 	# make be -> os symlink for now
 	AddSymlinkToHaikuImage develop headers : /boot/develop/headers/os : be ;
@@ -528,7 +529,7 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		Echo "No optional package WonderBrush available for gcc4" ;
-	} else {  
+	} else {
 		InstallOptionalHaikuImagePackage WonderBrush
 			: http://www.yellowbites.com/downloads/WonderBrush-2.1.1-demo-x86-R5.zip
 			: apps
@@ -545,7 +546,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 	} else {
 		InstallOptionalHaikuImagePackage OpenSound
 			: http://revolf.free.fr/beos/oss-beos-v4.1test-bin.zip
-			: 
+			:
 		;
 	}
 	#UnzipArchiveToHaikuImage home : data/vv.mp3.zip : 0 ;
@@ -558,7 +559,7 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 	} else {
 		InstallOptionalHaikuImagePackage Links
 			: http://revolf.free.fr/beos/links-beos-bin.zip
-			: 
+			:
 		;
 		AddSymlinkToHaikuImage home config be Applications
 			: /boot/home/config/bin/links ;
