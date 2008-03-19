@@ -1364,7 +1364,7 @@ get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 static int
 dump_node(int argc, char **argv)
 {
-	if (argc < 2) {
+	if (argc < 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: %s <address>\n", argv[0]);
 		return 0;
 	}
