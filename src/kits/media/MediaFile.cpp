@@ -123,7 +123,7 @@ BMediaFile::~BMediaFile()
 	CALLED();
 	
 	ReleaseAllTracks();
-	delete fTrackList;
+	delete[] fTrackList;
 	delete fExtractor;
 	if (fDeleteSource)
 		delete fSource;
@@ -200,7 +200,7 @@ BMediaFile::ReleaseTrack(BMediaTrack *track)
 			return B_OK;
 		}
 	}
-	printf("BMediaFile::ReleaseTrack track %p not found\n", track);
+	fprintf(stderr, "BMediaFile::ReleaseTrack track %p not found\n", track);
 	return B_ERROR;
 }
 
