@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -381,7 +381,7 @@ frame_buffer_update(addr_t baseAddress, int32 width, int32 height, int32 depth, 
 bool
 frame_buffer_console_available(void)
 {
-	return sConsole.frame_buffer != NULL;
+	return sConsole.frame_buffer != 0;
 }
 
 
@@ -425,8 +425,7 @@ frame_buffer_console_init_post_modules(kernel_args *args)
 {
 	mutex_init(&sConsole.lock, "console_lock");
 
-	// TODO: enable MTRR in VESA mode!
-	if (sConsole.frame_buffer == NULL)
+	if (sConsole.frame_buffer == 0)
 		return B_OK;
 
 	// try to set frame buffer memory to write combined
@@ -447,7 +446,7 @@ _user_frame_buffer_update(addr_t baseAddress, int32 width, int32 height,
 
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
-	if (IS_USER_ADDRESS(baseAddress) && baseAddress != NULL)
+	if (IS_USER_ADDRESS(baseAddress) && baseAddress != 0)
 		return B_BAD_ADDRESS;
 
 	return frame_buffer_update(baseAddress, width, height, depth, bytesPerRow);

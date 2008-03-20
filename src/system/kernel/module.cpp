@@ -1262,7 +1262,7 @@ get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 {
 	if (sModulesHash == NULL) {
 		dprintf("get_next_loaded_module_name() called too early!\n");
-		return NULL;
+		return B_ERROR;
 	}
 
 	//TRACE(("get_next_loaded_module_name(\"%s\")\n", buffer));

@@ -1434,7 +1434,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 	AddressSpaceWriteLocker locker;
 	status_t status = locker.SetTo(team);
-	if (status != NULL)
+	if (status != B_OK)
 		return status;
 
 	vm_address_space *addressSpace = locker.AddressSpace();
@@ -2837,7 +2837,7 @@ dump_cache_tree(int argc, char **argv)
 	}
 
 	addr_t address = strtoul(argv[1], NULL, 0);
-	if (address == NULL)
+	if (address == 0)
 		return 0;
 
 	vm_cache *cache = (vm_cache *)address;
@@ -2923,7 +2923,7 @@ dump_cache(int argc, char **argv)
 	}
 
 	addr_t address = strtoul(argv[i], NULL, 0);
-	if (address == NULL)
+	if (address == 0)
 		return 0;
 
 	cache = (vm_cache *)address;

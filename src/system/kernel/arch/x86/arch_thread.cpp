@@ -353,7 +353,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 
 	// set TLS GDT entry to the current thread - since this action is
 	// dependent on the current CPU, we have to do it here
-	if (to->user_local_storage != NULL)
+	if (to->user_local_storage != 0)
 		set_tls_context(to);
 
 	newPageDirectory = (addr_t)x86_next_page_directory(from, to);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -224,6 +224,12 @@ pic_init(void)
 	out8(0xff, PIC_SLAVE_MASK); 	// Mask off interrupts on the slave.
 
 	// determine which interrupts are level or edge triggered
+
+#if 0
+	// should set everything possible to level triggered
+	out8(PIC_MASTER_TRIGGER_MODE, 0xf8);
+	out8(PIC_SLAVE_TRIGGER_MODE, 0xde);
+#endif
 
 	sLevelTriggeredInterrupts = in8(PIC_MASTER_TRIGGER_MODE)
 		| (in8(PIC_SLAVE_TRIGGER_MODE) << 8);
@@ -453,7 +459,7 @@ page_fault_exception(struct iframe* frame)
 
 	if (kernelDebugger) {
 		// if this thread has a fault handler, we're allowed to be here
-		if (thread && thread->fault_handler != NULL) {
+		if (thread && thread->fault_handler != 0) {
 			frame->eip = thread->fault_handler;
 			return;
 		}

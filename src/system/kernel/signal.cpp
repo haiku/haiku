@@ -724,7 +724,7 @@ sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
 			// remove pending signal if it should now be ignored
 			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(signal));
 		} else if (act && act->sa_handler == SIG_DFL
-			&& (SIGNAL_TO_MASK(signal) & DEFAULT_IGNORE_SIGNALS) != NULL) {
+			&& (SIGNAL_TO_MASK(signal) & DEFAULT_IGNORE_SIGNALS) != 0) {
 			// remove pending signal for those signals whose default
 			// action is to ignore them
 			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(signal));
