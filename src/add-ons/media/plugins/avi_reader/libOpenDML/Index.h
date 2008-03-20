@@ -42,7 +42,7 @@ public:
 	virtual status_t	GetNextChunkInfo(int stream_index, int64 *start,
 							uint32 *size, bool *keyframe) = 0;
 	virtual status_t	Seek(int stream_index, uint32 seekTo, int64 *frame,
-							bigtime_t *time) = 0;
+							bigtime_t *time, bool readOnly) = 0;
 
 protected:
 	BPositionIO *		fSource;

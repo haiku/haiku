@@ -225,7 +225,7 @@ StandardIndex::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size,
 
 status_t
 StandardIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
-	bigtime_t *time)
+	bigtime_t *time, bool readOnly)
 {
 	TRACE("StandardIndex::Seek: stream %d, seekTo%s%s%s%s, time %Ld, "
 		"frame %Ld\n", stream_index,
@@ -249,13 +249,15 @@ StandardIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
 	} else
 		return B_BAD_VALUE;
 
+	// TODO: Actually take keyframe flags into account!
 	if (stream->is_audio) {
 		int64 bytes = 0;
 		for (uint32 i = 0; i < fIndexSize; i++) {
 			if ((fIndex[i].chunk_id & 0xffff) == data->chunk_id) {
 				int64 bytesNext = bytes + fIndex[i].chunk_length;
 				if (bytes <= frame_pos && bytesNext > frame_pos) {
-					data->stream_pos = i;
+					if (!readOnly)
+						data->stream_pos = i;
 					goto done;
 				}
 				bytes = bytesNext;
@@ -266,7 +268,8 @@ StandardIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
 		for (uint32 i = 0; i < fIndexSize; i++) {
 			if ((fIndex[i].chunk_id & 0xffff) == data->chunk_id) {
 				if (pos == frame_pos) {
-					data->stream_pos = i;
+					if (!readOnly)
+						data->stream_pos = i;
 					goto done;
 				}
 				pos++;
@@ -282,7 +285,8 @@ StandardIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
 done:
 	TRACE("seek done: index: pos %d, size  %d\n", data->stream_pos, fIndexSize);
 	*frame = frame_pos;
-	*time = (frame_pos * 1000000 * stream->frames_per_sec_scale) / stream->frames_per_sec_rate;
+	*time = (frame_pos * 1000000 * stream->frames_per_sec_scale)
+		/ stream->frames_per_sec_rate;
 	return B_OK;
 }
 

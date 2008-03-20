@@ -39,7 +39,7 @@ public:
 	status_t		GetNextChunkInfo(int stream_index, int64 *start,
 						uint32 *size, bool *keyframe);
 	status_t		Seek(int stream_index, uint32 seekTo, int64 *frame,
-						bigtime_t *time);
+						bigtime_t *time, bool readOnly);
 };
 
 #endif	// _FALLBACK_INDEX_H

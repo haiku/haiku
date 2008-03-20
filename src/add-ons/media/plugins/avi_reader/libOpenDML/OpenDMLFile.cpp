@@ -385,15 +385,17 @@ OpenDMLFile::AviGetNextChunkInfo(int stream_index, int64 *start, uint32 *size, b
 
 
 status_t
-OpenDMLFile::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe)
+OpenDMLFile::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size,
+	bool *keyframe)
 {
 	return fIndex->GetNextChunkInfo(stream_index, start, size, keyframe);
 }
 
 status_t
-OpenDMLFile::Seek(int stream_index, uint32 seekTo, int64 *frame, bigtime_t *time)
+OpenDMLFile::Seek(int stream_index, uint32 seekTo, int64 *frame,
+	bigtime_t *time, bool readOnly)
 {
-	return fIndex->Seek(stream_index, seekTo, frame, time);
+	return fIndex->Seek(stream_index, seekTo, frame, time, readOnly);
 }
 
 int

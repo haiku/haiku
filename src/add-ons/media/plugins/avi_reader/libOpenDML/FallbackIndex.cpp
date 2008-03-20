@@ -46,14 +46,17 @@ FallbackIndex::Init()
 
 
 status_t
-FallbackIndex::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size, bool *keyframe)
+FallbackIndex::GetNextChunkInfo(int stream_index, int64 *start, uint32 *size,
+	bool *keyframe)
 {
 	return B_ERROR;
 }
 
 
 status_t
-FallbackIndex::Seek(int stream_index, uint32 seekTo, int64 *frame, bigtime_t *time)
+FallbackIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
+	bigtime_t *time, bool readOnly)
 {
 	return B_ERROR;
 }
+

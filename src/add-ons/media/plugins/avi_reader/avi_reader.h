@@ -28,42 +28,44 @@
 #include "ReaderPlugin.h"
 #include "OpenDMLFile.h"
 
-class aviReader : public Reader
-{
+class aviReader : public Reader {
 public:
-				aviReader();
-				~aviReader();
+								aviReader();
+								~aviReader();
 	
-	const char *Copyright();
+	virtual	const char*			Copyright();
 	
-	status_t	Sniff(int32 *streamCount);
+	virtual	status_t			Sniff(int32* streamCount);
 
-	void		GetFileFormatInfo(media_file_format *mff);
+	virtual	void				GetFileFormatInfo(media_file_format* mff);
 
-	status_t	AllocateCookie(int32 streamNumber, void **cookie);
-	status_t	FreeCookie(void *cookie);
+	virtual	status_t			AllocateCookie(int32 streamNumber,
+									void** cookie);
+	virtual	status_t			FreeCookie(void* cookie);
 	
-	status_t	GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
-							  media_format *format, const void **infoBuffer, size_t *infoSize);
+	virtual	status_t			GetStreamInfo(void* cookie, int64* frameCount,
+									bigtime_t *duration, media_format* format,
+									const void** infoBuffer,
+									size_t* infoSize);
 
-	status_t	Seek(void *cookie,
-					 uint32 seekTo,
-					 int64 *frame, bigtime_t *time);
+	virtual	status_t			Seek(void* cookie, uint32 flags, int64* frame,
+									bigtime_t* time);
+	virtual	status_t			FindKeyFrame(void* cookie, uint32 flags,
+									int64* frame, bigtime_t* time);
 
-	status_t	GetNextChunk(void *cookie,
-							 const void **chunkBuffer, size_t *chunkSize,
-							 media_header *mediaHeader);
+	virtual	status_t			GetNextChunk(void* cookie,
+									const void** chunkBuffer, size_t* chunkSize,
+									media_header* mediaHeader);
 private:
-	OpenDMLFile	*fFile;
+			OpenDMLFile*		fFile;
 };
 
 
-class aviReaderPlugin : public ReaderPlugin
-{
+class aviReaderPlugin : public ReaderPlugin {
 public:
-	Reader *NewReader();
+			Reader*				NewReader();
 };
 
 MediaPlugin *instantiate_plugin();
 
-#endif
+#endif // _AVI_READER_H

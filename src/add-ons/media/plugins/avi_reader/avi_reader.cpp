@@ -307,7 +307,7 @@ aviReader::FreeCookie(void *_cookie)
 
 status_t
 aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
-						 media_format *format, const void **infoBuffer, size_t *infoSize)
+	media_format *format, const void **infoBuffer, size_t *infoSize)
 {
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
@@ -321,8 +321,7 @@ aviReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-aviReader::Seek(void *_cookie, uint32 seekTo,
-				int64 *frame, bigtime_t *time)
+aviReader::Seek(void *_cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
 {
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
@@ -330,32 +329,61 @@ aviReader::Seek(void *_cookie, uint32 seekTo,
 		cookie->stream,
 		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
 		(seekTo & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		(seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) ?
+			" B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ?
+			" B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		*time, *frame);
 
-	status_t rv = fFile->Seek(cookie->stream, seekTo, frame, time);
+	status_t rv = fFile->Seek(cookie->stream, seekTo, frame, time, false);
 	if (rv == B_OK) {
 		cookie->frame_pos = *frame;
-		TRACE("aviReader::Seek: stream %d, success, setting frame_pos to %lld\n", cookie->stream, cookie->frame_pos);
+		TRACE("aviReader::Seek: stream %d, success, setting frame_pos "
+			"to %lld\n", cookie->stream, cookie->frame_pos);
 	}
 	return rv;
 }
 
 
 status_t
-aviReader::GetNextChunk(void *_cookie,
-						const void **chunkBuffer, size_t *chunkSize,
-						media_header *mediaHeader)
+aviReader::FindKeyFrame(void *_cookie, uint32 flags, int64 *frame,
+	bigtime_t *time)
+{
+	avi_cookie *cookie = (avi_cookie *)_cookie;
+
+	TRACE("aviReader::FindKeyFrame: stream %d, flags%s%s%s%s, time %Ld, "
+		"frame %Ld\n",
+		cookie->stream,
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ?
+			" B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ?
+			" B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		*time, *frame);
+
+	status_t rv = fFile->Seek(cookie->stream, flags, frame, time, true);
+	if (rv == B_OK) {
+		TRACE("aviReader::FindKeyFrame: stream %d, success\n",
+			cookie->stream);
+	}
+	return rv;
+}
+
+
+status_t
+aviReader::GetNextChunk(void *_cookie, const void **chunkBuffer,
+	size_t *chunkSize, media_header *mediaHeader)
 {
 	avi_cookie *cookie = (avi_cookie *)_cookie;
 
 	int64 start; uint32 size; bool keyframe;
-	if (fFile->GetNextChunkInfo(cookie->stream, &start, &size, &keyframe) < B_OK)
+	if (fFile->GetNextChunkInfo(cookie->stream, &start, &size,
+			&keyframe) < B_OK)
 		return B_LAST_BUFFER_ERROR;
 
 	if (size > 0x200000) { // 2 MB
-		ERROR("stream %u: frame too big: %u byte\n", cookie->stream, size);
+		ERROR("stream %u: frame too big: %lu bytes\n", cookie->stream, size);
 		return B_NO_MEMORY;
 	}
 
@@ -369,17 +397,20 @@ aviReader::GetNextChunk(void *_cookie,
 		}
 	}
 
-	mediaHeader->start_time = (cookie->frame_pos * 1000000 * cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
+	mediaHeader->start_time = (cookie->frame_pos * 1000000
+		* cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
 	
 	if (cookie->is_audio) {
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
-		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
+		mediaHeader->u.encoded_audio.buffer_flags = keyframe ?
+			B_MEDIA_KEY_FRAME : 0;
 		cookie->frame_pos += size;
 	} else if (cookie->is_video) {
 		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
-		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
+		mediaHeader->u.encoded_video.field_flags = keyframe ?
+			B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
-		mediaHeader->u.encoded_video.line_count = cookie->line_count;	
+		mediaHeader->u.encoded_video.line_count = cookie->line_count;
 		cookie->frame_pos += 1;
 	} else {
 		return B_BAD_VALUE;
@@ -387,11 +418,13 @@ aviReader::GetNextChunk(void *_cookie,
 	
 //	TRACE("stream %d (%s): start_time %.6f, pos %.3f %%\n", 
 //		cookie->stream, cookie->is_audio ? "A" : cookie->is_video ? "V" : "?", 
-//		mediaHeader->start_time / 1000000.0, cookie->frame_pos * 100.0 / cookie->frame_count);
+//		mediaHeader->start_time / 1000000.0, cookie->frame_pos * 100.0
+//		/ cookie->frame_count);
 
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;
-	return (int)size == fFile->Source()->ReadAt(start, cookie->buffer, size) ? B_OK : B_LAST_BUFFER_ERROR;
+	return (int)size == fFile->Source()->ReadAt(start, cookie->buffer, size) ?
+		B_OK : B_LAST_BUFFER_ERROR;
 }
 
 

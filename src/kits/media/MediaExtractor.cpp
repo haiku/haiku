@@ -195,6 +195,19 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo,
 
 
 status_t
+MediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64 *frame,
+	bigtime_t *time) const
+{
+	CALLED();
+	if (fStreamInfo[stream].status != B_OK)
+		return fStreamInfo[stream].status;
+	
+	return fReader->FindKeyFrame(fStreamInfo[stream].cookie,
+		seekTo, frame, time);
+}
+
+
+status_t
 MediaExtractor::GetNextChunk(int32 stream,
 							 const void **chunkBuffer, size_t *chunkSize,
 							 media_header *mediaHeader)

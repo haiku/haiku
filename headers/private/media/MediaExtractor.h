@@ -38,6 +38,8 @@ public:
 
 	status_t		Seek(int32 stream, uint32 seekTo,
 						 int64 *frame, bigtime_t *time);
+	status_t		FindKeyFrame(int32 stream, uint32 seekTo,
+						 int64 *frame, bigtime_t *time) const;
 	
 	status_t		GetNextChunk(int32 stream,
 								 const void **chunkBuffer, size_t *chunkSize,
