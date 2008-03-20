@@ -201,6 +201,13 @@ convert_cap_mode_svg(agg::line_cap_e mode)
 status_t
 SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 {
+	if (shape->MaxVisibilityScale() < 1.0
+		|| shape->MinVisibilityScale() > 1.0) {
+		// don't export shapes which are not visible at the
+		// default scale
+		return B_OK;
+	}
+
 	const Style* style = shape->Style();
 
 	char color[64];
