@@ -887,7 +887,7 @@ remove_dir_contents(int parentDir, const char *name, bool force)
 	if (numRead < 0) {
 		fprintf(stderr, "Error: Failed to read directory \"%s\": %s\n", name,
 			fssh_strerror(numRead));
-		return numRead;
+		error = numRead;
 	}
 
 	// close
