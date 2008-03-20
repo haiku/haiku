@@ -677,7 +677,7 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
 	SetupWorkaround();
 	
 	if (fExtractor->CreateDecoder(fStream, &fDecoder, &fMCI) != B_OK) {
-		ERROR("BMediaTrack::BMediaTrack: Error: creating decoder failed\n");
+		TRACE("BMediaTrack::BMediaTrack: Error: creating decoder failed\n");
 		// we do not set fErr here, because ReadChunk should still work
 		fDecoder = 0;
 		return;
