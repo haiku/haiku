@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -13,6 +13,7 @@
 
 #include <arch/platform.h>
 #include <boot_item.h>
+#include <boot_splash.h>
 #include <cbuf.h>
 #include <commpage.h>
 #include <condition_variable.h>
@@ -40,7 +41,6 @@
 #include <vfs.h>
 #include <vm.h>
 #include <boot/kernel_args.h>
-#include <boot/splash.h>
 
 #include <string.h>
 
@@ -222,8 +222,7 @@ main2(void *unused)
 	
 	TRACE("start of main2: initializing devices\n");
 	
-	TRACE("Init boot splash frame buffer\n");
-	boot_splash_fb_init(&sKernelArgs);
+	boot_splash_init();
 
 	TRACE("Init modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);

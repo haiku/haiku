@@ -17,6 +17,7 @@ AddResources kernel_$(TARGET_ARCH) : kernel.rdef ;
 
 KernelMergeObject kernel_core.o :
 	boot_item.cpp
+	boot_splash.cpp
 	commpage.cpp
 	condition_variable.cpp
 	cpu.c
@@ -39,7 +40,6 @@ KernelMergeObject kernel_core.o :
 	system_info.cpp
 	smp.c
 	syscalls.cpp
-	splash.cpp
 	team.cpp
 	thread.cpp
 	timer.c

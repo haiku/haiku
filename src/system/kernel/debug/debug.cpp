@@ -899,6 +899,13 @@ call_modules_hook(bool enter)
 //	#pragma mark - private kernel API
 
 
+bool
+debug_screen_output_enabled(void)
+{
+	return sDebugScreenEnabled;
+}
+
+
 void
 debug_stop_screen_debug_output(void)
 {
