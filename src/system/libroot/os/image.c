@@ -195,7 +195,7 @@ __get_next_image_dependency(image_id id, uint32 *cookie, const char **_name)
 status_t
 __test_executable(const char *path, char *invoker)
 {
-	return __gRuntimeLoader->test_executable(path, geteuid(), getegid(), invoker);
+	return __gRuntimeLoader->test_executable(path, invoker);
 }
 
 

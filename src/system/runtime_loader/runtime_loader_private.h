@@ -25,8 +25,7 @@ extern "C" {
 int runtime_loader(void *arg);
 int open_executable(char *name, image_type type, const char *rpath,
 	const char *programPath);
-status_t test_executable(const char *path, uid_t user, gid_t group,
-	char *starter);
+status_t test_executable(const char *path, char *interpreter);
 
 void terminate_program(void);
 image_id load_program(char const *path, void **entry);

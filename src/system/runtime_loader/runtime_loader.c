@@ -267,12 +267,11 @@ open_executable(char *name, image_type type, const char *rpath,
 	both types, the caller will give scripts a proper treatment.
 */
 status_t
-test_executable(const char *name, uid_t user, gid_t group, char *invoker)
+test_executable(const char *name, char *invoker)
 {
 	char path[B_PATH_NAME_LENGTH];
 	char buffer[B_FILE_NAME_LENGTH];
 		// must be large enough to hold the ELF header
-	struct stat stat;
 	status_t status;
 	ssize_t length;
 	int fd;
@@ -287,21 +286,9 @@ test_executable(const char *name, uid_t user, gid_t group, char *invoker)
 		return fd;
 
 	// see if it's executable at all
-
-	status = _kern_read_stat(fd, NULL, true, &stat, sizeof(struct stat));
+	status = _kern_access(path, X_OK);
 	if (status != B_OK)
 		goto out;
-
-	// shift mode bits, to check directly against accessMode
-	if (user == stat.st_uid)
-		stat.st_mode >>= 6;
-	else if (group == stat.st_gid)
-		stat.st_mode >>= 3;
-
-	if (~(stat.st_mode & S_IRWXO) & X_OK) {
-		status = B_NOT_ALLOWED;
-		goto out;
-	}
 
 	// read and verify the ELF header
 
