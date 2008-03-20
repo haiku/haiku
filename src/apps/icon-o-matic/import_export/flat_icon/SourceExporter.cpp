@@ -52,7 +52,7 @@ SourceExporter::_Export(const uint8* source, size_t sourceSize,
 {
 	char buffer[2048];
 	// write header
-	sprintf(buffer, "\nconst unsigned char kIconName = {\n");
+	sprintf(buffer, "\nconst unsigned char kIconName[] = {\n");
 	size_t size = strlen(buffer);
 
 	ssize_t written = stream->Write(buffer, size);
