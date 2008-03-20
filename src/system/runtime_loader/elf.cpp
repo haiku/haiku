@@ -757,7 +757,7 @@ find_symbol(image_t *image, const char *name, int32 type)
 	// ToDo: "type" is currently ignored!
 	(void)type;
 
-	if (image->dynamic_ptr == NULL)
+	if (image->dynamic_ptr == 0)
 		return NULL;
 
 	hash = elf_hash((uint8 *)name) % HASHTABSIZE(image);
@@ -1093,7 +1093,7 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		goto err3;
 	}
 
-	if (eheader.e_entry != NULL)
+	if (eheader.e_entry != 0)
 		image->entry_point = eheader.e_entry + image->regions[0].delta;
 
 	image->type = type;
@@ -1309,7 +1309,7 @@ init_dependencies(image_t *image, bool initHead)
 
 		TRACE(("%ld:  init: %s\n", find_thread(NULL), image->name));
 
-		if (image->init_routine != NULL)
+		if (image->init_routine != 0)
 			((init_term_function)image->init_routine)(image->id);
 	}
 	TRACE(("%ld:  init done.\n", find_thread(NULL)));
@@ -1392,7 +1392,7 @@ load_program(char const *path, void **_entry)
 				(symbol->st_value + image->regions[0].delta);
 	}
 
-	if (sProgramImage->entry_point == NULL) {
+	if (sProgramImage->entry_point == 0) {
 		status = B_NOT_AN_EXECUTABLE;
 		goto err;
 	}
