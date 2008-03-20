@@ -360,7 +360,6 @@ SVGExporter::_ExportShape(const Shape* shape, BPositionIO* stream)
 status_t
 SVGExporter::_ExportGradient(const Gradient* gradient, BPositionIO* stream)
 {
-	status_t ret = B_OK;
 	BString helper;
 
 	// start new gradient tag
@@ -435,11 +434,7 @@ SVGExporter::_ExportGradient(const Gradient* gradient, BPositionIO* stream)
 		helper << "  </linearGradient>\n";
 	}
 
-	if (ret >= B_OK) {
-		ret = write_line(stream, helper);
-	}
-
-	return ret;
+	return write_line(stream, helper);
 }
 
 // _AppendMatrix
