@@ -78,6 +78,24 @@ free_mtrr(int32 index)
 }
 
 
+static bool
+is_memory_overlapping(uint64 base, uint64 length)
+{
+	for (uint32 index = 0; index < sMemoryTypeRegisterCount; index++) {
+		if (sMemoryTypeBitmap & (1UL << index)) {
+			uint64 b,l;
+			uint8 t;
+			x86_get_mtrr(index, &b, &l, &t);
+			if ((base > b && base < (b + l))
+				|| ((base + length) > b 
+					&& (base + length) < (b + l)))
+				return true;
+		}
+	}
+	return false;
+}
+
+
 static uint64
 nearest_power(uint64 value)
 {
@@ -137,6 +155,13 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 
 	if (sMemoryTypeRegisterCount == 0)
 		return B_NOT_SUPPORTED;
+
+	// check if it overlaps
+	if (type == IA32_MTR_WRITE_COMBINING
+		&& is_memory_overlapping(base, length)) {
+		dprintf("allocate MTRR failed, it overlaps an existing MTRR slot\n");
+		return B_BAD_VALUE;
+	}
 
 	// length must be a power of 2; just round it up to the next value
 	length = nearest_power(length); 	
