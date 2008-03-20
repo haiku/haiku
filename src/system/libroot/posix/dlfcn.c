@@ -21,6 +21,9 @@ static status_t sStatus;
 void *
 dlopen(char const *name, int mode)
 {
+// TODO: According to the standard multiple dlopen() invocations for the same
+// file will cause the object to be loaded once only. That is we should load
+// the object as a library, not an add-on.
 	status_t status;
 
 	if (name == NULL)
