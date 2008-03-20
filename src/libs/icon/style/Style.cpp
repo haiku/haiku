@@ -162,6 +162,22 @@ Style::operator==(const Style& other) const
 
 #endif // ICON_O_MATIC
 
+// HasTransparency
+bool
+Style::HasTransparency() const
+{
+	if (fGradient) {
+		int32 count = fGradient->CountColors();
+		for (int32 i = 0; i < count; i++) {
+			color_step* step = fGradient->ColorAtFast(i);
+			if (step->color.alpha < 255)
+				return true;
+		}
+		return false;
+	}
+	return fColor.alpha < 255;
+}
+
 // SetColor
 void
 Style::SetColor(const rgb_color& color)

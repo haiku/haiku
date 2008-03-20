@@ -55,6 +55,8 @@ class Style {
 	inline	void				Notify() {}
 #endif // ICON_O_MATIC
 
+			bool				HasTransparency() const;
+
 			void				SetColor(const rgb_color& color);
 	inline	rgb_color			Color() const
 									{ return fColor; }

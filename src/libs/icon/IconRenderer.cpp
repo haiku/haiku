@@ -26,7 +26,7 @@
 
 using std::nothrow;
 
-class StyleHandler {
+class IconRenderer::StyleHandler {
 	struct StyleItem {
 		Style*			style;
 		Transformation	transformation;
@@ -96,7 +96,7 @@ private:
 
 // color
 const agg::rgba8&
-StyleHandler::color(unsigned styleIndex)
+IconRenderer::StyleHandler::color(unsigned styleIndex)
 {
 	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
 	if (!styleItem) {
@@ -115,8 +115,8 @@ StyleHandler::color(unsigned styleIndex)
 
 // generate_span
 void
-StyleHandler::generate_span(agg::rgba8* span, int x, int y,
-							unsigned len, unsigned styleIndex)
+IconRenderer::StyleHandler::generate_span(agg::rgba8* span, int x, int y,
+	unsigned len, unsigned styleIndex)
 {
 	StyleItem* styleItem = (StyleItem*)fStyles.ItemAt(styleIndex);
 	if (!styleItem || !styleItem->style->Gradient()) {
@@ -172,12 +172,9 @@ StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 // _GenerateGradient
 template<class GradientFunction>
 void
-StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
-								GradientFunction function,
-								int32 start, int32 end,
-								const agg::rgba8* gradientColors,
-								Transformation& gradientTransform)
-
+IconRenderer::StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y,
+	unsigned len, GradientFunction function, int32 start, int32 end,
+	const agg::rgba8* gradientColors, Transformation& gradientTransform)
 {
 	typedef agg::pod_auto_array<agg::rgba8, 256>	ColorArray;
 	typedef agg::span_interpolator_linear<>			Interpolator;
@@ -393,6 +390,12 @@ IconRenderer::_Render(const BRect& r)
 			printf("IconRenderer::_Render() - out of memory\n");
 			break;
 		}
+
+		// if this is not the first shape, and the style contains
+		// transparency, commit a render pass of previous shapes
+		if (i > 0 && style->HasTransparency())
+			_CommitRenderPass(styleHandler);
+
 		fRasterizer.styles(styleIndex, -1);
 		styleIndex++;
 
@@ -409,12 +412,7 @@ IconRenderer::_Render(const BRect& r)
 		}
 	}
 
-	agg::render_scanlines_compound(fRasterizer,
-								   fScanline,
-								   fBinaryScanline,
-								   fBaseRendererPre,
-								   fSpanAllocator,
-								   styleHandler);
+	_CommitRenderPass(styleHandler, false);
 
 	if (fGammaTable.gamma() != 1.0)
 		fPixelFormat.apply_gamma_inv(fGammaTable);
@@ -423,6 +421,19 @@ IconRenderer::_Render(const BRect& r)
 //printf("rendering 64x64: %lld\n", system_time() - start);
 }
 
+// _CommitRenderPass
+void
+IconRenderer::_CommitRenderPass(StyleHandler& styleHandler, bool reset)
+{
+	agg::render_scanlines_compound(fRasterizer,
+								   fScanline,
+								   fBinaryScanline,
+								   fBaseRendererPre,
+								   fSpanAllocator,
+								   styleHandler);
+	if (reset)
+		fRasterizer.reset();
+}
 
 
 

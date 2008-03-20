@@ -72,7 +72,11 @@ class IconRenderer {
 			void				Demultiply();
 
  private:
+		class StyleHandler;
+
 			void				_Render(const BRect& area);
+			void				_CommitRenderPass(StyleHandler& styleHandler,
+									bool reset = true);
 
 			BBitmap*			fBitmap;
 			const BBitmap*		fBackground;
