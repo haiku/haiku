@@ -96,14 +96,18 @@ BMediaRosterEx::SaveNodeConfiguration(BMediaNode *node)
 	int32 flavorid;
 	addon = node->AddOn(&flavorid);
 	if (!addon) {
+		// NOTE: This node could have been created by an application,
+		// it does not mean there is an error.
 		// XXX this check incorrectly triggers on BeOS R5 BT848 node
-		ERROR("BMediaRosterEx::SaveNodeConfiguration node %ld not instantiated from BMediaAddOn!\n", node->ID());
+		TRACE("BMediaRosterEx::SaveNodeConfiguration node %ld not instantiated "
+			"from BMediaAddOn!\n", node->ID());
 		return B_ERROR;
 	}
 	addonid = addon->AddonID();
 	
 	// XXX fix this
-	printf("### BMediaRosterEx::SaveNodeConfiguration should save addon-id %ld, flavor-id %ld config NOW!\n", addonid, flavorid);
+	printf("### BMediaRosterEx::SaveNodeConfiguration should save addon-id "
+		"%ld, flavor-id %ld config NOW!\n", addonid, flavorid);
 	return B_OK;
 }
 
