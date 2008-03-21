@@ -356,10 +356,15 @@ detect_cpu(int curr_cpu)
 	get_current_cpuid(&cpuid, 1);
 	cpu->arch.type = cpuid.eax_1.type;
 	cpu->arch.family = cpuid.eax_1.family;
+	cpu->arch.extended_family = cpuid.eax_1.extended_family;
 	cpu->arch.model = cpuid.eax_1.model;
+	cpu->arch.extended_model = cpuid.eax_1.extended_model;
 	cpu->arch.stepping = cpuid.eax_1.stepping;
-	dprintf("CPU %d: type %d family %d model %d stepping %d, string '%s'\n",
-		curr_cpu, cpu->arch.type, cpu->arch.family, cpu->arch.model, cpu->arch.stepping, vendor_str);
+	dprintf("CPU %d: type %d family %d extended_family %d model %d "
+		"extended_model %d stepping %d, string '%s'\n",
+		curr_cpu, cpu->arch.type, cpu->arch.family,
+		cpu->arch.extended_family, cpu->arch.model,
+		cpu->arch.extended_model, cpu->arch.stepping, vendor_str);
 
 	// figure out what vendor we have here
 

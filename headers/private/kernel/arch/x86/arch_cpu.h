@@ -189,8 +189,10 @@ typedef struct arch_cpu_info {
 	const char *vendor_name;
 	int type;
 	int family;
+	int extended_family;
 	int stepping;
 	int model;
+	int extended_model;
 	char feature_string[256];
 
 	// local TSS for this cpu

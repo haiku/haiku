@@ -115,9 +115,13 @@ arch_system_info_init(struct kernel_args *args)
 	}
 
 	if (base != B_CPU_x86)
-		model = (cpu->arch.family << 4) + cpu->arch.model;
+		model = (cpu->arch.extended_family << 14) +
+		(cpu->arch.extended_model << 10) + (cpu->arch.family << 4) +
+		cpu->arch.model;
 
-	sCpuRevision = (cpu->arch.type << 12)
+	sCpuRevision = (cpu->arch.extended_family << 18)
+					| (cpu->arch.extended_model << 14)
+					| (cpu->arch.type << 12)
 					| (cpu->arch.family << 8)
 					| (cpu->arch.model << 4)
 					| cpu->arch.stepping;
