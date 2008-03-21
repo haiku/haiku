@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2008, Stephan Aßmus <superstippi@gmx.de>
  * Copyright (c) 2007, Marcus Overhagen
  * All rights reserved.
  *
@@ -249,8 +250,8 @@ StandardIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
 	} else
 		return B_BAD_VALUE;
 
-	// TODO: Actually take keyframe flags into account!
 	if (stream->is_audio) {
+		// TODO: Actually take keyframe flags into account!
 		int64 bytes = 0;
 		for (uint32 i = 0; i < fIndexSize; i++) {
 			if ((fIndex[i].chunk_id & 0xffff) == data->chunk_id) {
@@ -264,16 +265,52 @@ StandardIndex::Seek(int stream_index, uint32 seekTo, int64 *frame,
 			}
 		}
 	} else if (stream->is_video) {
+		// iterate over all index entries of the stream,
+		// there is one entry per frame (TODO: actually one per field,
+		// if I interprete the documentation correctly...)
 		int pos = 0;
+		int lastKeyframePos = 0;
+		int lastKeyframeIndex = 0;
 		for (uint32 i = 0; i < fIndexSize; i++) {
-			if ((fIndex[i].chunk_id & 0xffff) == data->chunk_id) {
+			// ignore index entries which are not for this stream
+			if ((fIndex[i].chunk_id & 0xffff) != data->chunk_id)
+				continue;
+
+			// remember the last known keyframe index/frame
+			if (fIndex[i].flags & AVIIF_KEYFRAME) {
+				lastKeyframePos = pos;
+				lastKeyframeIndex = i;
+				TRACE("keyframe at index %ld, frame %ld (seek: %ld)\n", i,
+					pos, frame_pos);
+			}
+
+			if (seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+				// use the index and frame of the last keyframe
+				if (pos == frame_pos) {
+					frame_pos = lastKeyframePos;
+					if (!readOnly)
+						data->stream_pos = lastKeyframeIndex;
+					goto done;
+				}
+			} else if (seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) {
+				// use the index and frame of the last keyframe
+				// if this frame is a keyframe and we at or past
+				// the seek position
+				if (pos >= frame_pos && pos == lastKeyframePos) {
+					frame_pos = lastKeyframePos;
+					if (!readOnly)
+						data->stream_pos = lastKeyframeIndex;
+					goto done;
+				}
+			} else {
+				// ignore keyframes
 				if (pos == frame_pos) {
 					if (!readOnly)
 						data->stream_pos = i;
 					goto done;
 				}
-				pos++;
 			}
+			pos++;
 		}
 	} else {
 		return B_BAD_VALUE;
