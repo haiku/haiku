@@ -367,10 +367,11 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	ssize_t size = read_port_etc(ControlPort(), &message, data, sizeof(data),
 		B_ABSOLUTE_TIMEOUT, waitUntil);
 	if (size < 0) {
-		if ((status_t)size != B_TIMED_OUT)
+		status_t error = (status_t)size;
+		if (error != B_TIMED_OUT && error != B_BAD_PORT_ID)
 			ERROR("BMediaNode::WaitForMessage: read_port_etc error: %s\n",
-				strerror((status_t)size));
-		return (status_t)size;
+				strerror(error));
+		return error;
 	}
 
 	TRACE("BMediaNode::WaitForMessage request is: %#lx, node %ld, this %p\n",
