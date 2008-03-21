@@ -48,7 +48,7 @@
 #include "vm_store_null.h"
 
 
-//#define TRACE_VM
+#define TRACE_VM
 //#define TRACE_FAULTS
 #ifdef TRACE_VM
 #	define TRACE(x) dprintf x
@@ -2128,7 +2128,7 @@ vm_copy_on_write_area(vm_cache* lowerCache)
 	vm_page *page;
 	status_t status;
 
-	TRACE(("vm_copy_on_write_area(area = %p)\n", area));
+	TRACE(("vm_copy_on_write_area(cache = %p)\n", lowerCache));
 
 	// We need to separate the cache from its areas. The cache goes one level
 	// deeper and we create a new cache inbetween.
