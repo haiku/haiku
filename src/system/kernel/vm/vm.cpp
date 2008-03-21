@@ -48,7 +48,7 @@
 #include "vm_store_null.h"
 
 
-#define TRACE_VM
+//#define TRACE_VM
 //#define TRACE_FAULTS
 #ifdef TRACE_VM
 #	define TRACE(x) dprintf x
