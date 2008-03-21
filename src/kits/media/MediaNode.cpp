@@ -364,16 +364,17 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 
 	char data[B_MEDIA_MESSAGE_SIZE]; // about 16 KByte stack used
 	int32 message;
-	ssize_t size;
-	
-	size = read_port_etc(ControlPort(), &message, data, sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);
+	ssize_t size = read_port_etc(ControlPort(), &message, data, sizeof(data),
+		B_ABSOLUTE_TIMEOUT, waitUntil);
 	if (size < 0) {
-		if (size != B_TIMED_OUT)
-			ERROR("BMediaNode::WaitForMessage: read_port_etc error 0x%08lx\n",size);
-		return size;	// return the error code
+		if ((status_t)size != B_TIMED_OUT)
+			ERROR("BMediaNode::WaitForMessage: read_port_etc error: %s\n",
+				strerror((status_t)size));
+		return (status_t)size;
 	}
 
-	TRACE("BMediaNode::WaitForMessage request is: %#lx, node %ld, this %p\n", message, fNodeID, this);
+	TRACE("BMediaNode::WaitForMessage request is: %#lx, node %ld, this %p\n",
+		message, fNodeID, this);
 
 	if (message > NODE_MESSAGE_START && message < NODE_MESSAGE_END) {
 		TRACE("BMediaNode::WaitForMessage calling BMediaNode\n");
@@ -384,41 +385,61 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	if (message > PRODUCER_MESSAGE_START && message < PRODUCER_MESSAGE_END) {
 		if (!fProducerThis)
 			fProducerThis = dynamic_cast<BBufferProducer *>(this);
-		TRACE("BMediaNode::WaitForMessage calling BBufferProducer %p\n", fProducerThis);
-		if (fProducerThis && B_OK == fProducerThis->BBufferProducer::HandleMessage(message, data, size))
+		TRACE("BMediaNode::WaitForMessage calling BBufferProducer %p\n",
+			fProducerThis);
+		if (fProducerThis && fProducerThis->BBufferProducer::HandleMessage(
+				message, data, size) == B_OK) {
 			return B_OK;
+		}
 	}
 
 	if (message > CONSUMER_MESSAGE_START && message < CONSUMER_MESSAGE_END) {
 		if (!fConsumerThis)
 			fConsumerThis = dynamic_cast<BBufferConsumer *>(this);
-		TRACE("BMediaNode::WaitForMessage calling BBufferConsumer %p\n", fConsumerThis);
-		if (fConsumerThis && B_OK == fConsumerThis->BBufferConsumer::HandleMessage(message, data, size))
+		TRACE("BMediaNode::WaitForMessage calling BBufferConsumer %p\n",
+			fConsumerThis);
+		if (fConsumerThis && fConsumerThis->BBufferConsumer::HandleMessage(
+			message, data, size) == B_OK) {
 			return B_OK;
+		}
 	}
 
-	if (message > FILEINTERFACE_MESSAGE_START && message < FILEINTERFACE_MESSAGE_END) {
+	if (message > FILEINTERFACE_MESSAGE_START
+		&& message < FILEINTERFACE_MESSAGE_END) {
 		if (!fFileInterfaceThis)
 			fFileInterfaceThis = dynamic_cast<BFileInterface *>(this);
-		TRACE("BMediaNode::WaitForMessage calling BFileInterface %p\n", fFileInterfaceThis);
-		if (fFileInterfaceThis && B_OK == fFileInterfaceThis->BFileInterface::HandleMessage(message, data, size))
+		TRACE("BMediaNode::WaitForMessage calling BFileInterface %p\n",
+			fFileInterfaceThis);
+		if (fFileInterfaceThis
+			&& fFileInterfaceThis->BFileInterface::HandleMessage(
+				message, data, size) == B_OK) {
 			return B_OK;
+		}
 	}
 
-	if (message > CONTROLLABLE_MESSAGE_START && message < CONTROLLABLE_MESSAGE_END) {
+	if (message > CONTROLLABLE_MESSAGE_START
+		&& message < CONTROLLABLE_MESSAGE_END) {
 		if (!fControllableThis)
 			fControllableThis = dynamic_cast<BControllable *>(this);
-		TRACE("BMediaNode::WaitForMessage calling BControllable %p\n", fControllableThis);
-		if (fControllableThis && B_OK == fControllableThis->BControllable::HandleMessage(message, data, size))
+		TRACE("BMediaNode::WaitForMessage calling BControllable %p\n",
+			fControllableThis);
+		if (fControllableThis
+			&& fControllableThis->BControllable::HandleMessage(
+				message, data, size) == B_OK) {
 			return B_OK;
+		}
 	}
 
-	if (message > TIMESOURCE_MESSAGE_START && message < TIMESOURCE_MESSAGE_END) {
+	if (message > TIMESOURCE_MESSAGE_START
+		&& message < TIMESOURCE_MESSAGE_END) {
 		if (!fTimeSourceThis)
 			fTimeSourceThis = dynamic_cast<BTimeSource *>(this);
-		TRACE("BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
-		if (fTimeSourceThis && B_OK == fTimeSourceThis->BTimeSource::HandleMessage(message, data, size))
+		TRACE("BMediaNode::WaitForMessage calling BTimeSource %p\n",
+			fTimeSourceThis);
+		if (fTimeSourceThis && fTimeSourceThis->BTimeSource::HandleMessage(
+				message, data, size) == B_OK) {
 			return B_OK;
+		}
 	}
 
 	TRACE("BMediaNode::WaitForMessage calling default HandleMessage\n");
