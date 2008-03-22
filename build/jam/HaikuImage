@@ -507,8 +507,16 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	AddHeaderDirectoryToHaikuImage posix ;
 	AddHeaderDirectoryToHaikuImage build gcc-2.95.3 ;
 
+	# add _G_config.h to posix/
+	SEARCH on <header>_G_config.h = [ FDirName $(HAIKU_TOP) headers glibc ] ;
+	AddFilesToHaikuImage develop headers posix : <header>_G_config.h ;
+
 	# make be -> os symlink for now
 	AddSymlinkToHaikuImage develop headers : /boot/develop/headers/os : be ;
+
+	# symlink cpp to g++'s headers
+	AddSymlinkToHaikuImage develop headers
+		: /boot/develop/tools/gnupro/include/g++ : cpp ;
 }
 
 # Vision
