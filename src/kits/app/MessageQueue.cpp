@@ -25,18 +25,6 @@ BMessageQueue::BMessageQueue()
 }
 
 
-/*!
-	\brief This is the desctructor for the BMessageQueue.  It iterates over
-		any messages left on the queue and deletes them.
-
-	The implementation is careful not to release the lock when the
-	BMessageQueue is deconstructed.  If the lock is released, it is
-	possible another thread will start an AddMessage() operation before
-	the BLocker is deleted.  The safe thing to do is not to unlock the
-	BLocker from the destructor once it is acquired. That way, any thread
-	waiting to do a AddMessage() will fail to acquire the lock since the
-	BLocker will be deleted before they can acquire it.
-*/
 BMessageQueue::~BMessageQueue()
 {
 	if (!Lock())
@@ -52,15 +40,6 @@ BMessageQueue::~BMessageQueue()
 }
 
 
-/*!
-	\brief This method adds a BMessage to the queue.
-
-	It makes a couple of assumptions:
-		- The BMessage was allocated on the heap with new, since the
-		  destructor delete's BMessages left on the queue.
-		- The BMessage is not already on this or any other BMessageQueue.
-		  If it is, the queue it is already on will be corrupted.
-*/
 void
 BMessageQueue::AddMessage(BMessage* message)
 {
@@ -88,10 +67,6 @@ BMessageQueue::AddMessage(BMessage* message)
 }
 
 
-/*!
-	\brief This method searches the queue for a particular BMessage.
- 		If it is found, it is removed from the queue.
-*/
 void
 BMessageQueue::RemoveMessage(BMessage* message)
 {
@@ -122,9 +97,6 @@ BMessageQueue::RemoveMessage(BMessage* message)
 }
 
 
-/*!
-	\brief This method just returns the number of BMessages on the queue.
-*/
 int32
 BMessageQueue::CountMessages() const
 {
@@ -132,9 +104,6 @@ BMessageQueue::CountMessages() const
 }
 
 
-/*!
-	\brief This method just returns true if there are no BMessages on the queue.
-*/
 bool
 BMessageQueue::IsEmpty() const
 {
@@ -142,14 +111,6 @@ BMessageQueue::IsEmpty() const
 }
 
 
-/*!
-	\brief This method searches the queue for the index'th BMessage.
-	
-	The first BMessage is at index 0, the second at index 1 etc.
-	The BMessage is returned if it is found.  If no BMessage exists at that
-	index (ie the queue is not that long or the index is invalid) NULL is
-	returned.
-*/
 BMessage *
 BMessageQueue::FindMessage(int32 index) const
 {
@@ -172,10 +133,6 @@ BMessageQueue::FindMessage(int32 index) const
 }
 
 
-/*!
-	\brief Searches the queue for the index'th BMessage that has a
-		particular what code.
-*/
 BMessage *
 BMessageQueue::FindMessage(uint32 what, int32 index) const
 {
@@ -200,10 +157,6 @@ BMessageQueue::FindMessage(uint32 what, int32 index) const
 }
 
 
-/*!
-	\brief Locks the BMessageQueue so no other thread can change
-		or search the queue.
-*/
 bool
 BMessageQueue::Lock()
 {
@@ -211,9 +164,6 @@ BMessageQueue::Lock()
 }
 
 
-/*!
-	\brief Releases the lock which was acquired by Lock().
-*/
 void
 BMessageQueue::Unlock()
 {
@@ -221,9 +171,6 @@ BMessageQueue::Unlock()
 }
 
 
-/*!
-	\brief Returns whether or not the queue is locked
-*/
 bool
 BMessageQueue::IsLocked() const
 {
@@ -231,10 +178,6 @@ BMessageQueue::IsLocked() const
 }
 
 
-/*!
-	\brief Removes the first BMessage on the queue and returns
-		it to the caller.  If the queue is empty, NULL is returned.
-*/
 BMessage *
 BMessageQueue::NextMessage()
 {
@@ -262,10 +205,6 @@ BMessageQueue::NextMessage()
 }
 
 
-/*!
-	\brief Checks wether or not the specified \a message is the message
-		you would get when calling NextMessage().
-*/
 bool
 BMessageQueue::IsNextMessage(const BMessage* message) const
 {

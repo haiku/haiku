@@ -1,0 +1,164 @@
+/*
+ * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Niels Sascha Reedijk, niels.reedijk@gmail.com
+ * 
+ * Corresponds to:
+ *		/trunk/headers/os/app/MessageQueue.h  rev 19956
+ *		/trunk/src/kits/app/MessageQueue.cpp  rev 19956
+ */
+
+/*!
+	\file MessageQueue.h
+	\brief Provides the BMessageQueue class.
+*/
+
+
+/*!
+	\class BMessageQueue
+	\ingroup app
+	\brief A container that maintains a queue of messages.
+	
+	This class is used by BLooper to maintain a queue of messages that need to
+	be processed. This class has been designed as a first in, first out
+	container.
+	
+	The default message handling of a BLooper probably suffices for most uses,
+	but if you want more control, you can perform operations using the methods
+	of this class. Use BLooper::MessageQueue() to retrieve the specific
+	BMessageQueue instance. 
+	
+	Note that you are encouraged to make sure that whichever operation you
+	perform, that you only do this after the object has been locked (see
+	Lock()). The most important method, NextMessage() will fail if you have not
+	complied with this requirement.
+*/
+
+
+/*!
+	\fn BMessageQueue::BMessageQueue()
+	\brief Constructs an empty message queue.
+*/
+
+
+/*!
+	\fn BMessageQueue::~BMessageQueue()
+	\brief Destruct the BMessageQueue. It iterates over any messages left on
+		the queue and deletes them.
+
+	The implementation is careful not to release the lock when the
+	BMessageQueue is deconstructed.  If the lock is released, it is
+	possible another thread will start an AddMessage() operation before
+	the BLocker is deleted.  The safe thing to do is not to unlock the
+	BLocker from the destructor once it is acquired. That way, any thread
+	waiting to do a AddMessage() will fail to acquire the lock since the
+	BLocker will be deleted before they can acquire it.
+*/
+
+
+/*!
+	\fn void BMessageQueue::AddMessage(BMessage* message)
+	\brief Add a \a message to the end of the queue.
+
+	The message has to be allocated on the heap with \c new, because the queue
+	claims ownership of the message. Messages that were constructed on the
+	stack will corrupt the queue.
+	
+	Because a BMessageQueue claims ownership of the \a message, it is important
+	that the message does not belong to another BMessageQueue.
+*/
+
+
+/*!
+	\fn void BMessageQueue::RemoveMessage(BMessage* message)
+	\brief Remove a \a message from the queue.
+	
+	If the \a message is indeed associated with this queue, it is removed from
+	it. This effectively means that you regain ownership of the message.
+*/
+
+
+/*!
+	\fn int32 BMessageQueue::CountMessages() const
+	\brief Return the number of messages waiting in the queue.
+*/
+
+
+/*!
+	\fn bool BMessageQueue::IsEmpty() const
+	\brief Check if there are messages waiting in the queue.
+*/
+
+
+/*!
+	\fn BMessage *BMessageQueue::FindMessage(int32 index) const
+	\brief Retrieve the message at the \a index of this queue.
+	
+	\param index A zero-based index of the message you want to retrieve.
+	
+	\return A pointer to a message, or \c NULL if the \a index is out of
+		bounds.
+	\see FindMessage(uint32, int32) for a variant that takes a specific \c what
+		identifier.
+*/
+
+
+/*!
+	\fn BMessage *BMessageQueue::FindMessage(uint32 what, int32 index) const
+	\brief Retrieve the message at the \a index of this queue, but only if it
+	 	has a specific \a what constant.
+
+	\param index A zero-based index of the message you want to retrieve.
+	\param what The \a what code of the message.
+	
+	\return A pointer to a message, or \c NULL if there is no message at the
+		\a index with that \a what constant, or if the \a index is out of
+		bounds.
+*/
+
+
+/*!
+	\fn bool BMessageQueue::Lock()
+	\brief Lock the queue so no other thread can perform operations on it.
+	
+	\see Unlock()
+*/
+
+
+/*!
+	\fn void BMessageQueue::Unlock()
+	\brief Unlock the queue after a Lock() request.
+	
+	\see Lock()
+*/
+
+
+/*!
+	\fn bool BMessageQueue::IsLocked() const
+	\brief Check if the queue is locked.
+
+	\see Lock() and Unlock()
+*/
+
+
+/*!
+	\fn BMessage *BMessageQueue::NextMessage()
+	\brief Remove the first BMessage on the queue and return it to the caller.
+	
+	After calling this method, you get the ownership of the message, so make
+	sure it is deleted after you are done.
+	
+	\return A pointer to a message, or \c NULL if the queue is empty, or the
+		object has not been properly locked.
+	\see Lock()
+	\see IsNextMessage()
+*/
+
+
+/*!
+	\fn bool BMessageQueue::IsNextMessage(const BMessage* message) const
+	\brief Check if the pointer to a \a message points at the next message on
+		the queue.
+*/
