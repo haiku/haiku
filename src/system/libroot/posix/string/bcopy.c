@@ -16,6 +16,6 @@ void *bcopy(void const *src, void *dest, size_t count);
 void *
 bcopy(void const *src, void *dest, size_t count)
 {
-	return memcpy(dest, src, count);
+	return memmove(dest, src, count);
 }
 

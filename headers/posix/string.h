@@ -75,7 +75,7 @@ extern const char	*strsignal(int signal);
 
 /* legacy compatibility -- might be removed one day */
 #define bcmp(a, b, length) memcmp((a), (b), (length))
-#define bcopy(source, dest, length) memcpy((dest), (source), (length))
+#define bcopy(source, dest, length) memmove((dest), (source), (length))
 #define bzero(buffer, length) memset((buffer), 0, (length))
 
 extern int ffs(int i);
