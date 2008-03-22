@@ -598,3 +598,15 @@ _kern_remove_attr(int fd, const char *name)
 
 	return B_OK;
 }
+
+
+// __get_attribute_dir_path
+extern "C" bool __get_attribute_dir_path(const struct stat* st, char* buffer);
+bool
+__get_attribute_dir_path(const struct stat* st, char* buffer)
+{
+	NodeRef ref(*st);
+	string path = get_attribute_dir_path(ref);
+	strcpy(buffer, path.c_str());
+	return true;
+}
