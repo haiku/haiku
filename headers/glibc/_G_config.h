@@ -11,7 +11,9 @@
 #define _GLIBCPP_USE_THREADS
 #define _GLIBCPP_USE_WCHAR_T
 
+#ifndef _IO_MTSAFE_IO
 #define _IO_MTSAFE_IO
+#endif
 
 /* Define types for libio in terms of the standard internal type names.  */
 
