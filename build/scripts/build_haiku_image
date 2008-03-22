@@ -21,6 +21,7 @@
 # makebootable
 # resattr
 # rc
+# rmAttrs
 # unzip
 # vmdkheader
 #
@@ -59,20 +60,6 @@ else
 fi
 
 
-# attribute-safe rm -rf
-# This makes sure there are no leftover attribute file before removing each file
-attrrmrf()
-{
-	test -e "$1" || return
-	if [ -d "$outputDir/attributes" ]; then
-		# test for gnu stat, else fallback to the bsd one.
-		statFormatOpt="-c"
-		stat -c '%i' . >/dev/null 2>&1 || statFormatOpt="-f"
-		find "$1" -print0 | xargs -0 stat $statFormatOpt %i | awk "{ print \"$outputDir/attributes/\" \$1 }" | xargs rm -rf
-	fi
-	rm -rf "$1"
-}
-
 unzipFile()
 {
 	# unzipFile <archive> <directory>
@@ -83,13 +70,13 @@ unzipFile()
 
 	if [ $isImage ]; then
 		unzipDir=$tmpDir/unzip
-		attrrmrf "$unzipDir"
+		$rmAttrs -rf "$unzipDir"
 		mkdir -p "$unzipDir"
 
 		$unzip -q -d "$unzipDir" "$zipFile"
 		$cp -r "${sPrefix}$unzipDir/." "${tPrefix}$targetUnzipDir"
 
-		attrrmrf "$unzipDir"
+		$rmAttrs -rf "$unzipDir"
 	else
 		$unzip -q -o -d "${tPrefix}$targetUnzipDir" "${sPrefix}$zipFile"
 	fi
@@ -192,7 +179,7 @@ if [ ! $updateOnly ]; then
 	done
 
 	# cleanup tmp dir
-	attrrmrf $mimeTmpDir
+	$rmAttrs -rf $mimeTmpDir
 fi	# ! updateOnly
 
 

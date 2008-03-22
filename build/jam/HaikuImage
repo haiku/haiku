@@ -664,6 +664,12 @@ AddVariableToScript $(script) : sourceDirsToCopy
 	: $(HAIKU_INSTALL_SOURCE_DIRS) ;
 AddVariableToScript $(script) : headerDirsToCopy
 	: $(HAIKU_INSTALL_HEADER_DIRS) ;
+if $(HOST_RM_ATTRS_TARGET) {
+	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
+} else {
+	AddVariableToScript $(script) : rmAttrs : rm ;
+}
+
 
 # create the other scripts
 HAIKU_IMAGE_MAKE_DIRS_SCRIPT = <HaikuImage>haiku.image-make-dirs ;

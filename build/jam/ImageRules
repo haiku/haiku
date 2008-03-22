@@ -37,7 +37,7 @@ rule InitScript
 
 actions InitScript1
 {
-	rm -f $(1)
+	$(RM) $(1)
 	echo -n > $(1)
 }
 
@@ -678,7 +678,7 @@ rule BuildVMWareImage vmwareImage : plainImage : imageSize
 
 actions BuildVMWareImage1
 {
-	rm -f $(1)
+	$(RM) $(1)
 	$(2[1]) -h 64k -i$(IMAGE_SIZE)M $(1) &&
 	cat $(2[2]) >> $(1)
 }
@@ -857,7 +857,7 @@ rule BuildFloppyBootImage image : zbeos : archive
 
 actions BuildFloppyBootImage1
 {
-	rm -f $(<)
+	$(RM) $(<)
 	# make an empty image
 	dd if=/dev/zero of=$(<) bs=1k count=1440
 	# add zbeos
@@ -882,7 +882,7 @@ rule BuildCDBootImage image : bootfloppy : extrafiles
 
 actions BuildCDBootImage1
 {
-	rm -f $(<)
+	$(RM) $(<)
 	mkisofs -b $(BOOTIMG) -r -J -V bootimg -o $(<) $(>[1]) $(>[2-])
 }
 

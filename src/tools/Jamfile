@@ -11,6 +11,7 @@ local tools =
 	<build>listattr
 	<build>mimeset
 	<build>mkindex
+	<build>rm_attrs_tmp
 	<build>rmattr
 	<build>settype
 	<build>setversion
@@ -55,6 +56,14 @@ BuildPlatformMain <build>mimeset :
 ;
 
 BuildPlatformMain <build>mkindex : mkindex.cpp : $(HOST_LIBBE) ;
+
+# We want rm_attrs to be self-contained, so we link against the static libroot.
+HOST_LIBROOT on <build>rm_attrs_tmp = $(HOST_STATIC_LIBROOT) ;
+BuildPlatformMain <build>rm_attrs_tmp : rm_attrs.cpp
+	: $(HOST_LIBSUPC++) $(HOST_LIBSTDC++) ;
+MakeLocateDebug <build>rm_attrs ;
+File <build>rm_attrs : <build>rm_attrs_tmp ;
+MODE on <build>rm_attrs = 755 ;
 
 BuildPlatformMain <build>rmattr : rmattr.cpp : $(HOST_LIBBE) ;
 

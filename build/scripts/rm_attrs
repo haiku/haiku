@@ -1,0 +1,15 @@
+#!/bin/sh
+
+if [ $# -lt 2 ]; then
+	echo "$0: Usage:..."
+	exit 1;
+fi
+
+rmAttrs=$1
+shift
+
+if [ -f $rmAttrs ]; then
+	$rmAttrs $@
+else
+	rm $@
+fi

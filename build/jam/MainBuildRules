@@ -557,8 +557,9 @@ rule BuildPlatformMain
 
 		# add the build libroot
 		if ! $(HOST_PLATFORM_BEOS_COMPATIBLE) {
-			Depends $(target) : $(HOST_LIBROOT) ;
-			NEEDLIBS on $(target) += $(HOST_LIBROOT) ;
+			local libroot = [ on $(target) return $(HOST_LIBROOT) ] ;
+			Depends $(target) : $(libroot) ;
+			NEEDLIBS on $(target) += $(libroot) ;
 		}
 	}
 
@@ -635,15 +636,15 @@ rule BuildPlatformMergeObjectPIC target : sources : otherObjects
 	BuildPlatformMergeObject $(target) : $(sources) : $(otherObjects) ;
 }
 
-rule BuildPlatformStaticLibrary
+rule BuildPlatformStaticLibrary lib : sources : otherObjects
 {
 	# BuildPlatformStaticLibrary <lib> : <sources> ;
 	# Creates a static library from sources.
-	# <lib>: The library.
+	# <lib>: The static library to be built.
 	# <sources>: List of source files.
+	# <otherObjects>: List of additional object files.
+	#
 
-	local lib = $(1) ;
-	local sources = $(2) ;
 	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 
 	PLATFORM on $(lib) = host ;
@@ -655,6 +656,6 @@ rule BuildPlatformStaticLibrary
 		USES_BE_API on $(objects) = $(usesBeAPI) ;
 	}
 
-	StaticLibrary $(lib) : $(sources) ;
+	StaticLibrary $(lib) : $(sources) : $(otherObjects) ;
 }
 

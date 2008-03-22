@@ -262,7 +262,7 @@ actions ResAttr1
 {
 	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
 	if [ \\"$(deleteAttributeFile1)\\" = "true" ]; then
-		rm -f $(1)
+		$(RM) $(1)
 	fi
 	$(2[1]) -O -o "$(1)" "$(2[2-])"
 }

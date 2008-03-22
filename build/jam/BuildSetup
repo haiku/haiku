@@ -527,15 +527,21 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 # for builds of tools in the current environment
 HOST_BUILD_COMPATIBILITY_LIB_DIR = [ FDirName $(HOST_OBJECT_BASE_DIR) lib ] ;
 
+# For the generic attributes emulation: Target rm_attrs -- rm replacement that
+# also removes the attributes.
+HOST_RM_ATTRS_TARGET = ;
+
 if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	HOST_LIBSTDC++ = stdc++.r4 ;
 	HOST_LIBROOT = root ;
+	HOST_STATIC_LIBROOT = $(HOST_LIBROOT) ;
 	HOST_LIBBE = be ;
 	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR = ;
 	HOST_LIBRARY_NAME_MAP_input_server = /system/servers/input_server ;
 } else {
 	HOST_LIBSTDC++ = stdc++ ;
 	HOST_LIBROOT = libroot_build.so ;
+	HOST_STATIC_LIBROOT = libroot_build.a ;
 	HOST_LIBBE = libbe_build.so ;
 	HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR
 		= "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(HOST_BUILD_COMPATIBILITY_LIB_DIR)" ;
@@ -556,8 +562,10 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# Unlike glibc FreeBSD's libc doesn't have built-in regex support.
 	if $(HOST_PLATFORM) = freebsd {
 		HOST_LIBROOT += /usr/lib/libgnuregex.so ;
+		HOST_STATIC_LIBROOT += /usr/lib/libgnuregex.so ;
 	} else if $(HOST_PLATFORM) = darwin {
 		HOST_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
+		HOST_STATIC_LIBROOT += /opt/local/lib/libgnuregex.dylib ;
 	}
 
 
@@ -580,6 +588,19 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 	# which is somewhat more robust.
 	if $(HAIKU_HOST_USE_XATTR) = 1 {
 		HOST_DEFINES += HAIKU_HOST_USE_XATTR ;
+	} else {
+		# Otherwise the generic attribute emulation is used, which uses a
+		# directory per file to store its attribute. We need to redefine RM so
+		# that the attributes are removed as well. We use a wrapper script, which
+		# invokes a build tool. If the build tool hasn't been built yet, the
+		# normal "rm" is used and the attributes are leaked (likely there aren't
+		# any yet).
+		RM = $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ";"
+			[ FDirName $(HAIKU_TOP) build scripts rm_attrs ]
+			[ FDirName $(HAIKU_OBJECT_DIR) $(HOST_PLATFORM) $(HOST_ARCH) release
+				tools rm_attrs ] -f ;
+			# assumes that rm_attrs is built with debugging disabled
+		HOST_RM_ATTRS_TARGET = <build>rm_attrs ;
 	}
 }
 

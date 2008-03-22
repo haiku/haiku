@@ -37,6 +37,12 @@ rule Link
 		SetType $(1) ;
 		MimeSet $(1) ;
 		SetVersion $(1) ;
+
+		# If the generic attribute emulation is enabled, make sure the tool to
+		# remove the attributes is built first.
+		if $(HOST_RM_ATTRS_TARGET) {
+			Depends $(1) : $(HOST_RM_ATTRS_TARGET) ;
+		}
 	}
 }
 
