@@ -32,7 +32,7 @@ if $(HOST_PLATFORM) = freebsd {
 	hostPlatformSources = fs_freebsd.cpp ;
 }
 
-BuildPlatformSharedLibrary libroot_build.so :
+local librootSources =
 	atomic.cpp
 	byteorder.cpp
 	errors.cpp
@@ -47,9 +47,17 @@ BuildPlatformSharedLibrary libroot_build.so :
 
 	$(strlSources)
 	strnlen.c
+;
 
+BuildPlatformSharedLibrary libroot_build.so :
+	$(librootSources)
 	:
 	$(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+;
+
+BuildPlatformStaticLibrary libroot_build.a :
+	:
+	[ FGristFiles $(librootSources:S=$(SUFOBJ)) ]
 ;
 
 SEARCH on [ FGristFiles $(strlSources) strnlen.c ]
