@@ -26,7 +26,7 @@ struct AsyncThreadParams {
 		: app(app)
 		, printer(p)
 		, message(m)
-	{ 
+	{
 		app->Acquire();
 		if (printer) printer->Acquire();
 	}
@@ -36,8 +36,8 @@ struct AsyncThreadParams {
 		delete message;
 		app->Release();
 	}
-	
-	BMessage* AcquireMessage() { 
+
+	BMessage* AcquireMessage() {
 		BMessage* m = message; message = NULL; return m;
 	}
 };
@@ -56,8 +56,11 @@ status_t PrintServerApp::async_thread(void* data)
 			case PSRV_SHOW_PRINT_SETUP:
 				if (printer) {
 					if (p->app->fUseConfigWindow) {
-						ConfigWindow* w = new ConfigWindow(PSRV_SHOW_PAGE_SETUP
-							? kPageSetup : kJobSetup, printer, msg, &sender);
+						config_setup_kind kind = kJobSetup;
+						if (msg->what == PSRV_SHOW_PAGE_SETUP)
+							kind = kPageSetup;
+						ConfigWindow* w = new ConfigWindow(kind, printer, msg,
+							&sender);
 						w->Go();
 					} else {
 						BMessage reply(*msg);
@@ -67,10 +70,17 @@ status_t PrintServerApp::async_thread(void* data)
 				} else {
 					// If no default printer is set, give user
 					// choice of aborting or setting up a printer
-					BAlert* alert = new BAlert("Info", "There are no printers "
-						"set up. Would you set one up now?", "No", "Yes");
-					if (alert->Go() == 1)
+					int32 count = Printer::CountPrinters();
+					BString alertText("There are no printers set up. ");
+					if (count > 0)
+						alertText.SetTo("There is no default printer set up. ");
+
+					BAlert* alert = new BAlert("Info", alertText.Append("Would "
+						"you like to set one up now?").String(), "No", "Yes");
+					if (alert->Go() == 1 && count == 0)
 						run_add_printer_panel();
+					else
+						run_select_printer_panel();
 				}
 			}	break;
 
@@ -127,7 +137,7 @@ void PrintServerApp::AsyncHandleMessage(BMessage* msg)
 	thread_id tid = spawn_thread(async_thread, "async", B_NORMAL_PRIORITY, (void*)data);
 
 	if (tid > 0) {
-		resume_thread(tid);	
+		resume_thread(tid);
 	} else {
 		delete data;
 	}
@@ -150,7 +160,8 @@ void PrintServerApp::Handle_BeOSR5_Message(BMessage* msg)
 					}
 				}
 				reply.AddString("printer_name", printerName);
-				reply.AddInt32("color", BPrintJob::B_COLOR_PRINTER);	// BeOS knows not if color or not, so always color
+				// BeOS knows not if color or not, so always color
+				reply.AddInt32("color", BPrintJob::B_COLOR_PRINTER);
 				msg->SendReply(&reply);
 			}
 			break;
