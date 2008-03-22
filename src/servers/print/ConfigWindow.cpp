@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,6 +22,7 @@
 #include <Application.h>
 #include <Autolock.h>
 #include <Window.h>
+
 
 static const float a0_width = 2380.0;
 static const float a0_height = 3368.0;
@@ -48,6 +49,7 @@ static const float ledger_height = 792.0;
 static const float p11x17_width = 792.0;
 static const float p11x17_height = 1224.0;
 
+
 static struct PageFormat
 {
 	char  *label;
@@ -69,7 +71,9 @@ static struct PageFormat
 	{"B5",     b5_width,     b5_height     },
 };
 
-static void GetPageFormat(float w, float h, BString& label) {
+
+static void GetPageFormat(float w, float h, BString& label)
+{
 	w = floor(w + 0.5); h = floor(h + 0.5);
 	for (uint i = 0; i < sizeof(pageFormat) / sizeof(struct PageFormat); i ++) {
 		struct PageFormat& pf = pageFormat[i];
@@ -82,19 +86,24 @@ static void GetPageFormat(float w, float h, BString& label) {
 	label << (w / unit) << "x" << (h / unit) << " in.";
 }
 
-ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMessage* settings, AutoReply* sender)
-	: BWindow(ConfigWindow::GetWindowFrame(), "Page Setup", 
+
+ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
+	BMessage* settings, AutoReply* sender)
+	: BWindow(ConfigWindow::GetWindowFrame(), "Page Setup",
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 	, fKind(kind)
 	, fDefaultPrinter(defaultPrinter)
 	, fSettings(settings)
 	, fSender(sender)
 	, fCurrentPrinter(NULL)
+	, fPageFormatText(NULL)
+	, fJobSetupText(NULL)
 {
 	MimeTypeForSender(settings, fSenderMimeType);
 	PrinterForMimeType();
 
-	if (kind == kJobSetup) SetTitle("Print Setup");
+	if (kind == kJobSetup)
+		SetTitle("Print Setup");
 
 	BView* panel = new BBox(Bounds(), "top_panel", B_FOLLOW_ALL, 
 					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
@@ -105,66 +114,72 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	float left = 10, top = 10;
 	BRect r(left, top, 160, 20);
 
-		// print selection popup menu
+	// print selection popup menu
 	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
 	SetupPrintersMenu(menu);
 	
-	r.right = r.left + be_plain_font->StringWidth("Printer:") + menu->MaxContentWidth() + 10;
+	float width = be_plain_font->StringWidth("Printer:") + 10.0;
+	r.right = r.left + width + menu->MaxContentWidth() + 10;
 	fPrinters = new BMenuField(r, "Printer", "Printer:", menu);
-	fPrinters->SetDivider(be_plain_font->StringWidth("Printer:") + 10);
+	fPrinters->SetDivider(width);
 	panel->AddChild(fPrinters);
 	top += fPrinters->Bounds().Height() + 10;
 	
-		// page format button
+	// page format button
 	r.OffsetTo(left, top);
-	fPageSetup = AddPictureButton(panel, r, "Page Format", "PAGE_SETUP_ON", "PAGE_SETUP_OFF", MSG_PAGE_SETUP);
-		// add description to button
+	fPageSetup = AddPictureButton(panel, r, "Page Format", "PAGE_SETUP_ON",
+		"PAGE_SETUP_OFF", MSG_PAGE_SETUP);
+	
+	// add description to button
 	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, fPageSetup->Frame().top);
 	BStringView *stringView = AddStringView(panel, r, "Paper Setup:");
 	stringView->ResizeToPreferred();
 	r = stringView->Frame();
-	r.right = panel->Bounds().right;
 	r.OffsetBy(0, r.Height());
 	fPageFormatText = AddStringView(panel, r, "");
+	fPageFormatText->ResizeToPreferred();
 	top = fPageSetup->Frame().bottom + 15;
 	
-		// page selection button
+	// page selection button
 	fJobSetup = NULL;
 	if (kind == kJobSetup) {
 		r.OffsetTo(left, top);
-		fJobSetup = AddPictureButton(panel, r, "Page Selection", "JOB_SETUP_ON", "JOB_SETUP_OFF", MSG_JOB_SETUP);
-			// add description to button
+		fJobSetup = AddPictureButton(panel, r, "Page Selection", "JOB_SETUP_ON",
+			"JOB_SETUP_OFF", MSG_JOB_SETUP);
+		// add description to button
 		r.OffsetTo(left + fJobSetup->Bounds().Width() + 5, top);
 		stringView = AddStringView(panel, r, "Pages to Print:");
 		stringView->ResizeToPreferred();
 		r.OffsetBy(0, stringView->Frame().Height());
 		fJobSetupText = AddStringView(panel, r, "");
+		fJobSetupText->ResizeToPreferred();
 		top = fJobSetup->Frame().bottom + 15;
 	}
 	top += 5;
 	
-		// separator line
+	// separator line
 	BRect line(Bounds());
 	line.OffsetTo(0, top);
 	line.bottom = line.top+1;
 	AddChild(new BBox(line, "line", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP));
 	top += 10;
 	
-		// Cancel button
+	// Cancel button
 	r.OffsetTo(left, top);
-	BButton* cancel = new BButton(r, "Cancel", "Cancel", new BMessage(B_QUIT_REQUESTED));
+	BButton* cancel = new BButton(r, "Cancel", "Cancel",
+		new BMessage(B_QUIT_REQUESTED));
 	panel->AddChild(cancel);
 	cancel->ResizeToPreferred();
 	left = cancel->Frame().right + 10;
 	
-		// OK button
+	// OK button
 	r.OffsetTo(left, top);
 	fOk = new BButton(r, "OK", "OK", new BMessage(MSG_OK));
 	panel->AddChild(fOk);
 	fOk->ResizeToPreferred();
 	top += fOk->Bounds().Height() + 10;
-	
-		// resize window	
+
+	// resize window	
 	ResizeTo(fOk->Frame().right + 10, top);
 	
 	AddShortcut('i', 0, new BMessage(B_ABOUT_REQUESTED));
@@ -176,12 +191,16 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	UpdateSettings(true);
 }
 
-ConfigWindow::~ConfigWindow() {
-	if (fCurrentPrinter) fCurrentPrinter->Release();
+ConfigWindow::~ConfigWindow()
+{
+	if (fCurrentPrinter)
+		fCurrentPrinter->Release();
 	release_sem(fFinished);
 }
 
-void ConfigWindow::Go() {
+
+void ConfigWindow::Go()
+{
 	sem_id sid = create_sem(0, "finished");
 	if (sid >= 0) {
 		fFinished = sid;
@@ -193,11 +212,15 @@ void ConfigWindow::Go() {
 	}
 }
 
-void ConfigWindow::MessageReceived(BMessage* m) {
+
+void ConfigWindow::MessageReceived(BMessage* m)
+{
 	switch (m->what) {
-		case MSG_PAGE_SETUP: Setup(kPageSetup);
+		case MSG_PAGE_SETUP:
+			Setup(kPageSetup);
 			break;
-		case MSG_JOB_SETUP: Setup(kJobSetup);
+		case MSG_JOB_SETUP:
+			Setup(kJobSetup);
 			break;
 		case MSG_PRINTER_SELECTED: {
 				BString printer;
@@ -220,67 +243,54 @@ void ConfigWindow::MessageReceived(BMessage* m) {
 	}
 }
 
+
 static const char* 
 kAbout =
 "Printer Server\n"
-"© 2001-2006 Haiku\n"
+"© 2001-2008 Haiku\n"
 "\n"
 "\tIthamar R. Adema - Initial Implementation\n"
 "\tMichael Pfeiffer - Release 1 and beyond\n"
 ;
 
+
 void
 ConfigWindow::AboutRequested()
 {
 	BAlert *about = new BAlert("About Printer Server", kAbout, "OK");
-	BTextView *v = about->TextView();
-	if (v) {
-		rgb_color red = {255, 0, 51, 255};
-		rgb_color blue = {0, 102, 255, 255};
-
-		v->SetStylable(true);
-		char *text = (char*)v->Text();
-		char *s = text;
-		// set all Be in blue and red
-		while ((s = strstr(s, "Be")) != NULL) {
-			int32 i = s - text;
-			v->SetFontAndColor(i, i+1, NULL, 0, &blue);
-			v->SetFontAndColor(i+1, i+2, NULL, 0, &red);
-			s += 2;
-		}
-		// first text line 
-		s = strchr(text, '\n');
-		BFont font;
-		v->GetFontAndColor(0, &font);
-		font.SetSize(12);
-		v->SetFontAndColor(0, s-text+1, &font, B_FONT_SIZE);
-	};
 	about->Go();
 }
 
 
-void ConfigWindow::FrameMoved(BPoint p) {
+void ConfigWindow::FrameMoved(BPoint p)
+{
 	BRect frame = GetWindowFrame();
 	frame.OffsetTo(p);
 	SetWindowFrame(frame);
 }
 
-BRect ConfigWindow::GetWindowFrame() {
+
+BRect ConfigWindow::GetWindowFrame()
+{
 	BAutolock lock(gLock);
-	if (lock.IsLocked()) {
+	if (lock.IsLocked())
 		return Settings::GetSettings()->ConfigWindowFrame();
-	}
+
 	return BRect(30, 30, 300, 300);
 }
 
-void ConfigWindow::SetWindowFrame(BRect r) {
+
+void ConfigWindow::SetWindowFrame(BRect r)
+{
 	BAutolock lock(gLock);
-	if (lock.IsLocked()) {
+	if (lock.IsLocked())
 		Settings::GetSettings()->SetConfigWindowFrame(r);
-	}
 }
 
-BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame, const char* name, const char* on, const char* off, uint32 what) {
+
+BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame,
+	const char* name, const char* on, const char* off, uint32 what)
+{
 	BBitmap* onBM = LoadBitmap(on);
 	BBitmap* offBM = LoadBitmap(off);
 	
@@ -312,7 +322,9 @@ BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame, const 
 	return button;
 }
 
-BStringView* ConfigWindow::AddStringView(BView* panel, BRect frame, const char* text) {
+
+BStringView* ConfigWindow::AddStringView(BView* panel, BRect frame, const char* text)
+{
 	// frame.bottom = frame.top ;
 	BStringView* string = new BStringView(frame, "", text);
 	string->SetViewColor(panel->ViewColor());
@@ -321,11 +333,15 @@ BStringView* ConfigWindow::AddStringView(BView* panel, BRect frame, const char* 
  	return string;
 }
 
-void ConfigWindow::PrinterForMimeType() {
+
+void ConfigWindow::PrinterForMimeType()
+{
 	BAutolock lock(gLock);
 	if (fCurrentPrinter) {
-		fCurrentPrinter->Release(); fCurrentPrinter = NULL;
+		fCurrentPrinter->Release();
+		fCurrentPrinter = NULL;
 	}
+
 	if (lock.IsLocked()) {
 		Settings* s = Settings::GetSettings();
 		AppSettings* app = s->FindAppSettings(fSenderMimeType.String());
@@ -335,16 +351,19 @@ void ConfigWindow::PrinterForMimeType() {
 			fPrinterName = fDefaultPrinter ? fDefaultPrinter->Name() : "";
 		}
 		fCurrentPrinter = Printer::Find(fPrinterName);
-		if (fCurrentPrinter) fCurrentPrinter->Acquire();
+		if (fCurrentPrinter)
+			fCurrentPrinter->Acquire();
 	}
 }
 
-void ConfigWindow::SetupPrintersMenu(BMenu* menu) {
-		// clear menu
-	for (int i = menu->CountItems() - 1; i >= 0; i --) {
-		delete menu->RemoveItem(i);
-	}
-		// fill menu with printer names
+
+void ConfigWindow::SetupPrintersMenu(BMenu* menu)
+{
+	// clear menu
+	while (menu->CountItems() != 0)
+		delete menu->RemoveItem(0L);
+
+	// fill menu with printer names
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
 		BString n;
@@ -355,22 +374,29 @@ void ConfigWindow::SetupPrintersMenu(BMenu* menu) {
 			m = new BMessage(MSG_PRINTER_SELECTED);
 			m->AddString("name", n.String());
 			menu->AddItem(item = new BMenuItem(n.String(), m));
-			if (n == fPrinterName) item->SetMarked(true);
+			if (n == fPrinterName)
+				item->SetMarked(true);
 		}
 	}
 }
 
-void ConfigWindow::UpdateAppSettings(const char* mime, const char* printer) {
+
+void ConfigWindow::UpdateAppSettings(const char* mime, const char* printer)
+{
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
 		Settings* s = Settings::GetSettings();
 		AppSettings* app = s->FindAppSettings(mime);
-		if (app) app->SetPrinter(printer);
-		else s->AddAppSettings(new AppSettings(mime, printer));
+		if (app)
+			app->SetPrinter(printer);
+		else
+			s->AddAppSettings(new AppSettings(mime, printer));
 	}
 }
 
-void ConfigWindow::UpdateSettings(bool read) {
+
+void ConfigWindow::UpdateSettings(bool read)
+{
 	BAutolock lock(gLock);
 	if (lock.IsLocked()) {
 		Settings* s = Settings::GetSettings();
@@ -391,25 +417,29 @@ void ConfigWindow::UpdateSettings(bool read) {
 	UpdateUI();
 }
 
-void ConfigWindow::UpdateUI() {
+
+void ConfigWindow::UpdateUI()
+{
 	if (fCurrentPrinter == NULL) {
 		fPageSetup->SetEnabled(false);
 		if (fJobSetup) {
 			fJobSetup->SetEnabled(false);
 			fJobSetupText->SetText("Undefined job settings");
+			fJobSetupText->ResizeToPreferred();
 		}
 		fOk->SetEnabled(false);
 		fPageFormatText->SetText("Undefined paper format");
+		fPageFormatText->ResizeToPreferred();
 	} else {	
 		fPageSetup->SetEnabled(true);
 	
-		if (fJobSetup) {
+		if (fJobSetup)
 			fJobSetup->SetEnabled(fKind == kJobSetup && !fPageSettings.IsEmpty());
-		}
+
 		fOk->SetEnabled(fKind == kJobSetup && !fJobSettings.IsEmpty() ||
 			fKind == kPageSetup && !fPageSettings.IsEmpty());
 		
-			// display information about page format	
+		// display information about page format	
 		BRect paperRect;
 		BString pageFormat;
 		if (fPageSettings.FindRect(PSRV_FIELD_PAPER_RECT, &paperRect) == B_OK) {
@@ -417,13 +447,16 @@ void ConfigWindow::UpdateUI() {
 			
 			int32 orientation = 0;
 			fPageSettings.FindInt32(PSRV_FIELD_ORIENTATION, &orientation);
-			if (orientation == 0) pageFormat << ", Portrait";
-			else pageFormat << ", Landscape";
+			if (orientation == 0)
+				pageFormat << ", Portrait";
+			else
+				pageFormat << ", Landscape";
 		} else {
 			pageFormat << "Undefined paper format";
 		}
 		fPageFormatText->SetText(pageFormat.String());
-		
+		fPageFormatText->ResizeToPreferred();
+
 			// display information about job
 		if (fKind == kJobSetup) {
 			BString job;
@@ -436,26 +469,39 @@ void ConfigWindow::UpdateUI() {
 					job << "All pages";
 				}
 				int32 copies;
-				if (fJobSettings.FindInt32(PSRV_FIELD_COPIES, &copies) == B_OK && copies > 1) {
+				if (fJobSettings.FindInt32(PSRV_FIELD_COPIES, &copies)
+					== B_OK && copies > 1) {
 					job << ", " << copies << " copies";
 				}
 			} else {
 				job << "Undefined job settings";
 			}
-			
 			fJobSetupText->SetText(job.String());
+			fJobSetupText->ResizeToPreferred();
 		}
+	}
+	if (fPageFormatText) {
+		if (fOk->Frame().right < fPageFormatText->Frame().right)
+			ResizeTo(fPageFormatText->Frame().right + 10, Bounds().bottom);
+	}
+
+	if (fJobSetupText) {
+		if (fOk->Frame().right < fJobSetupText->Frame().right)
+			ResizeTo(fJobSetupText->Frame().right + 10, Bounds().bottom);
 	}
 }
 
-void ConfigWindow::Setup(config_setup_kind kind) {
+
+void ConfigWindow::Setup(config_setup_kind kind)
+{
 	if (fCurrentPrinter) {
 		Hide();
 		if (kind == kPageSetup) {
 			BMessage settings = fPageSettings;			
 			if (fCurrentPrinter->ConfigurePage(settings) == B_OK) {
 				fPageSettings = settings;
-				if (!fJobSettings.IsEmpty()) AddFields(&fJobSettings, &fPageSettings);
+				if (!fJobSettings.IsEmpty())
+					AddFields(&fJobSettings, &fPageSettings);
 			}
 		} else {
 			BMessage settings;			

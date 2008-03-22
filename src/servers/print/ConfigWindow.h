@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,7 +29,8 @@ class ConfigWindow : public BWindow {
 	};
 	
 public:
-	ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMessage* settings, AutoReply* sender);
+	ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
+		BMessage* settings, AutoReply* sender);
 	~ConfigWindow();
 	void Go();
 	
@@ -41,7 +42,8 @@ public:
 	static void SetWindowFrame(BRect frame);
 
 private:
-	BPictureButton* AddPictureButton(BView* panel, BRect frame, const char* name, const char* on, const char* off, uint32 what);
+	BPictureButton* AddPictureButton(BView* panel, BRect frame, const char* name,
+		const char* on, const char* off, uint32 what);
 	BStringView* AddStringView(BView* panel, BRect frame, const char* text);
 	void PrinterForMimeType();
 	void SetupPrintersMenu(BMenu* menu);
