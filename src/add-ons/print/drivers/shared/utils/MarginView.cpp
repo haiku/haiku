@@ -453,7 +453,7 @@ MarginView::ConstructGUI()
 
 	menu = new BPopUpMenu("units");
 	mf = new BMenuField(r, "units", "Units", menu,
-			B_FOLLOW_BOTTOM|B_FOLLOW_RIGHT|B_WILL_DRAW);
+			B_FOLLOW_BOTTOM|B_FOLLOW_RIGHT);
 	mf->ResizeToPreferred();
 	mf->SetDivider(be_plain_font->StringWidth("Units#"));
 	
