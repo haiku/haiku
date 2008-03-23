@@ -31,7 +31,7 @@ options:
                               Assume cross compilation. <prefix> should be a
                               path to the directory where the cross
                               compilation tools are located, plus the platform
-                              prefix, e.g. "/path/to/tools/i586-pc-beos-".
+                              prefix, e.g. "/path/to/tools/i586-pc-haiku-".
                               This overrides the HAIKU_* tool variables.
   --distro-compatibility <level>
                               The distribution's level of compatibility with
@@ -211,7 +211,7 @@ cd "$currentDir"
 #
 platform=`uname`
 haikuGCCVersion=
-haikuGCCMachine=i586-pc-beos
+haikuGCCMachine=i586-pc-haiku
 haikuStaticLibStdCxx=
 haikuSharedLibStdCxx=
 haikuStaticLibSupCxx=
@@ -232,7 +232,7 @@ buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsMachine=
 
-export haikuRequiredLegacyGCCVersion="2.95.3-beos-060710"
+export haikuRequiredLegacyGCCVersion="2.95.3-haiku-080323"
 	# version of legacy gcc required to build haiku
 
 set_default_value HAIKU_AR			ar
