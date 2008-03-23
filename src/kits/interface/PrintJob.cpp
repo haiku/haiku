@@ -38,9 +38,12 @@ static const char *kNoPagesToPrintText = "No Pages to print!";
 
 // Summery of spool file format:
 // See articel "How to Write a BeOS R5 Printer Driver" for description
-// of spool file format: http://haiku-os.org/node/82
+// of spool file format: 
+// http://haiku-os.org/documents/dev/how_to_write_a_printer_driver
 
 // print_file_header header
+//   On BeOS R5 header.version is 1 << 16 and 
+//   header.first_page is -1.
 // BMessage          job_settings
 // _page_header_     page_header
 // followed by number_of_pictures:
@@ -397,6 +400,9 @@ BPrintJob::BeginJob()
 	// page_count is updated in CommitJob()	
 	fCurrentHeader.version = 1 << 16;
 	fCurrentHeader.page_count = 0;
+	// on BeOS R5 the offset to the first page 
+	// was always -1.  
+	fCurrentHeader.first_page = (off_t)-1;
 	
 	if (fSpoolFile->Write(&fCurrentHeader, sizeof(fCurrentHeader)) != sizeof(fCurrentHeader)) {
 		CancelJob();
