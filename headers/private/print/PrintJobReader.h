@@ -57,7 +57,6 @@ public:
 class PrintJobReader {
 	BFile fJobFile;  // the job file
 	int32 fNumberOfPages; // the number of pages in the job file
-	off_t fFirstPage; // the page number of the first page
 	BMessage fJobSettings; // the settings extracted from the job file
 	off_t* fPageIndex; // start positions of pages in the job file
 
@@ -72,8 +71,8 @@ public:
 
 		// accessors to informations from job file
 	int32 NumberOfPages() const { return fNumberOfPages; }
-	int32 FirstPage() const { return fFirstPage; }
-	int32 LastPage() const { return fFirstPage + fNumberOfPages - 1; }
+	int32 FirstPage() const;
+	int32 LastPage() const;
 	const BMessage* JobSettings() const { return &fJobSettings; }
 	BRect PaperRect() const;
 	BRect PrintableRect() const;

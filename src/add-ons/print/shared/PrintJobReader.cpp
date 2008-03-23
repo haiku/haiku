@@ -135,7 +135,6 @@ PrintJobReader::PrintJobReader(BFile* jobFile)
 	if (fJobFile.Read(&header, sizeof(header)) == sizeof(header)) {
 		if (fJobSettings.Unflatten(&fJobFile) == B_OK) {
 			fNumberOfPages = header.page_count;
-			fFirstPage = header.first_page;
 			fPageIndex = new off_t[fNumberOfPages];
 
 			BuildPageIndex();
@@ -189,6 +188,22 @@ status_t PrintJobReader::GetPage(int32 page, PrintJobPage& pjp)
 }
 
 
+int32 PrintJobReader::FirstPage() const
+{
+	int32 firstPage = -1;
+	fJobSettings.FindInt32("first_page", &firstPage);
+	return firstPage;
+}
+
+
+int32 PrintJobReader::LastPage() const
+{
+	int32 lastPage = -1;
+	fJobSettings.FindInt32("last_page", &lastPage);
+	return lastPage;
+}
+
+
 BRect PrintJobReader::PaperRect() const
 {
 	BRect r;
@@ -210,6 +225,7 @@ void PrintJobReader::GetResolution(int32 *xdpi, int32 *ydpi) const
 	fJobSettings.FindInt32("xres", xdpi);
 	fJobSettings.FindInt32("yres", ydpi);
 }
+
 
 float PrintJobReader::GetScale() const
 {
