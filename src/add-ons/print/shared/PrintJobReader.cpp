@@ -2,11 +2,11 @@
 
 PrintJobReader
 
-Copyright (c) 2002 OpenBeOS. 
+Copyright (c) 2002 OpenBeOS.
 
-Author: 
+Author:
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -45,7 +45,7 @@ PrintJobPage::PrintJobPage()
 	, fNumberOfPictures(0)
 	, fPicture(0)
 	, fStatus(B_ERROR)
-{	
+{
 }
 
 
@@ -72,7 +72,7 @@ PrintJobPage& PrintJobPage::operator=(const PrintJobPage& copy)
 }
 
 
-PrintJobPage::PrintJobPage(BFile* jobFile, off_t start) 
+PrintJobPage::PrintJobPage(BFile* jobFile, off_t start)
 	: fJobFile(*jobFile)
 	, fPicture(0)
 	, fStatus(B_ERROR)
@@ -84,7 +84,6 @@ PrintJobPage::PrintJobPage(BFile* jobFile, off_t start)
 	if (fJobFile.Seek(start, SEEK_SET) != start)
 		return;
 
-	off_t nextPage;
 	if (fJobFile.Read(&fNumberOfPictures, sizeof(int32)) == sizeof(int32)) {
 		// (sizeof(int32) * 10) == padding in _page_header_
 		fJobFile.Seek(sizeof(off_t) + sizeof(int32) * 10, SEEK_CUR);
@@ -105,13 +104,13 @@ status_t PrintJobPage::NextPicture(BPicture& picture, BPoint& point, BRect& rect
 	if (fPicture >= fNumberOfPictures)
 		return B_ERROR;
 	fPicture++;
-	
+
 	fJobFile.Seek(fNextPicture, SEEK_SET);
 	fJobFile.Read(&point, sizeof(BPoint));
 	fJobFile.Read(&rect, sizeof(BRect));
 	status_t rc = picture.Unflatten(&fJobFile);
 	fNextPicture = fJobFile.Position();
-	
+
 	if (rc != B_OK)
 		fPicture = fNumberOfPictures;
 
@@ -122,7 +121,7 @@ status_t PrintJobPage::NextPicture(BPicture& picture, BPoint& point, BRect& rect
 // # pragma mark --- PrintJobReader
 
 
-PrintJobReader::PrintJobReader(BFile* jobFile) 
+PrintJobReader::PrintJobReader(BFile* jobFile)
 	: fJobFile(*jobFile)
 	, fNumberOfPages(-1)
 	, fPageIndex(NULL)

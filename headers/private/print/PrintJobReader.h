@@ -2,11 +2,11 @@
 
 PrintJobReader
 
-Copyright (c) 2002 OpenBeOS. 
+Copyright (c) 2002 OpenBeOS.
 
-Author: 
+Author:
 	Michael Pfeiffer
-	
+
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
 the Software without restriction, including without limitation the rights to
@@ -32,6 +32,7 @@ THE SOFTWARE.
 
 #include <File.h>
 #include <Message.h>
+#include <Picture.h>
 
 class PrintJobPage {
 	BFile fJobFile; // the job file
@@ -39,17 +40,17 @@ class PrintJobPage {
 	int32 fNumberOfPictures; // of this page
 	int32 fPicture; // the picture returned by NextPicture()
 	status_t fStatus;
-		
+
 public:
 	PrintJobPage();
 	PrintJobPage(const PrintJobPage& copy);
 	PrintJobPage(BFile* jobFile, off_t start);
 	status_t InitCheck() const;
-	
+
 	int32 NumberOfPictures() const { return fNumberOfPictures; }
-	
+
 	status_t NextPicture(BPicture& picture, BPoint& p, BRect& r);
-	
+
 	PrintJobPage& operator=(const PrintJobPage& copy);
 };
 
@@ -65,10 +66,10 @@ class PrintJobReader {
 public:
 	PrintJobReader(BFile* jobFile);
 	virtual ~PrintJobReader();
-		
+
 		// test after construction if this is a valid job file
 	status_t InitCheck() const;
-	
+
 		// accessors to informations from job file
 	int32 NumberOfPages() const { return fNumberOfPages; }
 	int32 FirstPage() const { return fFirstPage; }
@@ -78,7 +79,7 @@ public:
 	BRect PrintableRect() const;
 	void GetResolution(int32 *xdpi, int32 *ydpi) const;
 	float GetScale() const;
-		
+
 		// retrieve page
 	status_t GetPage(int32 no, PrintJobPage& pjp);
 };
