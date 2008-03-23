@@ -782,7 +782,7 @@ write_protected_non_symlink (int fd_cwd,
     if (euidaccess (full_filename (file), W_OK) == 0)
       return 0;
     if (errno == EACCES)
-      return -1;
+      return 1;
 
     /* Perhaps some other process has removed the file, or perhaps this
        is a buggy NFS client.  */
@@ -828,7 +828,7 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
 	  write_protected = errno;
 	}
 
-      if (write_protected <= 0)
+      if (write_protected >= 0)
 	{
 	  /* Using permissions doesn't make sense for symlinks.  */
 	  if (S_ISLNK (sbuf->st_mode) && x->interactive != RMI_ALWAYS)
@@ -838,7 +838,7 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
 	    write_protected = EISDIR;
 	}
 
-      if (0 < write_protected)
+      if (write_protected < 0)
 	{
 	  error (0, write_protected, _("cannot remove %s"), quoted_name);
 	  return RM_ERROR;
