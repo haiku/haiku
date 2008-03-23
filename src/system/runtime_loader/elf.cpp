@@ -82,12 +82,6 @@ static uint32 sLoadedImageCount = 0;
 static image_t *sProgramImage;
 static KMessage sErrorMessage;
 
-#ifdef BEOS_STYLE_SYMBOLS_RESOLUTION
-static bool sResolveSymbolsBeOSStyle = true;
-#else
-static bool sResolveSymbolsBeOSStyle = false;
-#endif
-
 // a recursive lock
 static sem_id rld_sem;
 static thread_id rld_sem_owner;
@@ -280,13 +274,23 @@ find_loaded_image_by_id(image_id id)
 }
 
 
-static const char *
-get_program_path()
+static image_t*
+get_program_image()
 {
 	for (image_t *image = sLoadedImages.head; image; image = image->next) {
 		if (image->type == B_APP_IMAGE)
-			return image->path;
+			return image;
 	}
+
+	return NULL;
+}
+
+
+static const char *
+get_program_path()
+{
+	if (image_t* image = get_program_image())
+		return image->path;
 
 	return NULL;
 }
@@ -1020,8 +1024,20 @@ find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 	// If not simulating BeOS style symbol resolution, undefined symbols are
 	// search recursively starting from the root image. (Note, breadth first
 	// might be better than the depth first use here.)
-	if (!sResolveSymbolsBeOSStyle)
-		return find_symbol_recursively(rootImage, name, foundInImage);
+	if ((rootImage->flags & IMAGE_FLAG_R5_SYMBOL_RESOLUTION) == 0) {
+		Elf32_Sym* symbol = find_symbol_recursively(rootImage, name,
+			foundInImage);
+		if (symbol != NULL)
+			return symbol;
+
+		// If the root image is not the program image (i.e. it is a dynamically
+		// loaded add-on or library), we try the program image hierarchy too.
+		image_t* programImage = get_program_image();
+		if (rootImage != programImage)
+			return find_symbol_recursively(programImage, name, foundInImage);
+
+		return NULL;
+	}
 
 	// BeOS style symbol resolution: It is sufficient to check the direct
 	// dependencies. The linker would have complained, if the symbol wasn't
@@ -1254,6 +1270,14 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 			sizeof(ph_buff))) {
 		FATAL("Failed to get gcc version for %s\n", path);
 		// not really fatal, actually
+	}
+
+	// init gcc version dependent image flags
+	// symbol resolution strategy (fallback is R5-style, if version is
+	// unavailable)
+	if (image->gcc_version.major == 0
+		|| image->gcc_version.major == 2 && image->gcc_version.middle < 95) {
+		image->flags |= IMAGE_FLAG_R5_SYMBOL_RESOLUTION;
 	}
 
 	status = map_image(fd, path, image, type == B_APP_IMAGE);

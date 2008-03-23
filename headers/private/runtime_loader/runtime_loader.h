@@ -74,6 +74,11 @@ typedef struct image_queue_t {
 	image_t *tail;
 } image_queue_t;
 
+// image_t::flags
+#define	IMAGE_FLAG_RTLD_MASK			0x03
+			// RTLD_{LAZY,NOW} | RTLD_{LOCAL,GLOBAL}
+#define	IMAGE_FLAG_R5_SYMBOL_RESOLUTION	0x04
+
 #define STRING(image, offset) ((char *)(&(image)->strtab[(offset)]))
 #define SYMNAME(image, sym) STRING(image, (sym)->st_name)
 #define SYMBOL(image, num) ((struct Elf32_Sym *)&(image)->syms[num])

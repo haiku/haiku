@@ -8,8 +8,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 SubDirCcFlags -fno-builtin ;
 SubDirC++Flags -fno-builtin -fno-exceptions ;
 
-# default to BeOS style symbol resolution
-DEFINES += BEOS_STYLE_SYMBOLS_RESOLUTION
+DEFINES +=
 	KMESSAGE_CONTAINER_ONLY
 	_LOADER_MODE
 ;
