@@ -27,12 +27,18 @@ THE SOFTWARE.
 
 */
 
-#include <stdio.h>
-#include <Picture.h>
-#include <PrintJob.h>
 #include "PrintJobReader.h"
 
-// Implementation of PrintJobPage
+
+#include <stdio.h>
+
+
+#include <Picture.h>
+#include <PrintJob.h>
+
+
+// #pragma mark --- PrintJobPage
+
 
 PrintJobPage::PrintJobPage()
 	: fNextPicture(-1)
@@ -41,6 +47,7 @@ PrintJobPage::PrintJobPage()
 	, fStatus(B_ERROR)
 {	
 }
+
 
 PrintJobPage::PrintJobPage(const PrintJobPage& copy)
 	: fJobFile(copy.fJobFile)
@@ -51,7 +58,9 @@ PrintJobPage::PrintJobPage(const PrintJobPage& copy)
 {
 }
 
-PrintJobPage& PrintJobPage::operator=(const PrintJobPage& copy) {
+
+PrintJobPage& PrintJobPage::operator=(const PrintJobPage& copy)
+{
 	if (this != &copy) {
 		fJobFile = copy.fJobFile;
 		fNextPicture = copy.fNextPicture;
@@ -62,42 +71,56 @@ PrintJobPage& PrintJobPage::operator=(const PrintJobPage& copy) {
 	return *this;
 }
 
+
 PrintJobPage::PrintJobPage(BFile* jobFile, off_t start) 
 	: fJobFile(*jobFile)
 	, fPicture(0)
 	, fStatus(B_ERROR)
 {
 	off_t size;
-	if (fJobFile.GetSize(&size) != B_OK || start > size) return;
-	if (fJobFile.Seek(start, SEEK_SET) != start) return;
-	if (fJobFile.Read(&fNumberOfPictures, sizeof(fNumberOfPictures)) == sizeof(fNumberOfPictures)) {
-		fJobFile.Seek(40 + sizeof(off_t), SEEK_CUR);
+	if (fJobFile.GetSize(&size) != B_OK || start > size)
+		return;
+
+	if (fJobFile.Seek(start, SEEK_SET) != start)
+		return;
+
+	off_t nextPage;
+	if (fJobFile.Read(&fNumberOfPictures, sizeof(int32)) == sizeof(int32)) {
+		// (sizeof(int32) * 10) == padding in _page_header_
+		fJobFile.Seek(sizeof(off_t) + sizeof(int32) * 10, SEEK_CUR);
 		fNextPicture = fJobFile.Position();
 		fStatus = B_OK;
 	}
 }
 
-status_t PrintJobPage::InitCheck() const {
+
+status_t PrintJobPage::InitCheck() const
+{
 	return fStatus;
 }
 
-status_t PrintJobPage::NextPicture(BPicture& picture, BPoint& point, BRect& rect) {
-	if (fPicture >= fNumberOfPictures) return B_ERROR;
-	fPicture ++;
+
+status_t PrintJobPage::NextPicture(BPicture& picture, BPoint& point, BRect& rect)
+{
+	if (fPicture >= fNumberOfPictures)
+		return B_ERROR;
+	fPicture++;
 	
 	fJobFile.Seek(fNextPicture, SEEK_SET);
-	fJobFile.Read(&point, sizeof(point));
-	fJobFile.Read(&rect, sizeof(rect));
+	fJobFile.Read(&point, sizeof(BPoint));
+	fJobFile.Read(&rect, sizeof(BRect));
 	status_t rc = picture.Unflatten(&fJobFile);
 	fNextPicture = fJobFile.Position();
-	if (rc != B_OK) {
+	
+	if (rc != B_OK)
 		fPicture = fNumberOfPictures;
-	}
+
 	return rc;
 }
 
 
-// Implementation of PrintJobReader
+// # pragma mark --- PrintJobReader
+
 
 PrintJobReader::PrintJobReader(BFile* jobFile) 
 	: fJobFile(*jobFile)
@@ -110,71 +133,87 @@ PrintJobReader::PrintJobReader(BFile* jobFile)
 	BPrintJob::print_file_header header;
 #endif
 	fJobFile.Seek(0, SEEK_SET);
-	if (fJobFile.Read(&header, sizeof(header)) == sizeof(header) &&
-		fJobSettings.Unflatten(&fJobFile) == B_OK) {
-		fNumberOfPages = header.page_count;
-		fFirstPage = header.first_page;
-		BuildPageIndex();
+	if (fJobFile.Read(&header, sizeof(header)) == sizeof(header)) {
+		if (fJobSettings.Unflatten(&fJobFile) == B_OK) {
+			fNumberOfPages = header.page_count;
+			fFirstPage = header.first_page;
+			fPageIndex = new off_t[fNumberOfPages];
+
+			BuildPageIndex();
+		}
 	}
 }
 
-PrintJobReader::~PrintJobReader() {
+
+PrintJobReader::~PrintJobReader()
+{
 	delete[] fPageIndex;
 }
 
-status_t PrintJobReader::InitCheck() const {
+
+status_t PrintJobReader::InitCheck() const
+{
 	return fNumberOfPages > 0 ? B_OK : B_ERROR;
 }
 
-void PrintJobReader::BuildPageIndex() {
-	fPageIndex = new off_t[fNumberOfPages];
-	
-	for (int page = 0; page < fNumberOfPages; page ++) {
-		int32 pictures;
-		off_t next_page;
-			// add position to page index
+
+void PrintJobReader::BuildPageIndex()
+{
+	off_t next_page;
+	int32 number_of_pictures;
+	for (int32 page = 0; page < fNumberOfPages; ++page) {
 		fPageIndex[page] = fJobFile.Position();
-			
-			// determine start position of next page
-		if (fJobFile.Read(&pictures, sizeof(pictures)) == sizeof(pictures) &&
-			fJobFile.Read(&next_page, sizeof(next_page)) == sizeof(next_page) &&
-			fPageIndex[page] < next_page) {
+		if (fJobFile.Read(&number_of_pictures, sizeof(int32)) == sizeof(int32)
+			&& fJobFile.Read(&next_page, sizeof(off_t)) == sizeof(off_t)
+			&& fPageIndex[page] < next_page) {
 			fJobFile.Seek(next_page, SEEK_SET);
 		} else {
-			fNumberOfPages = 0; delete fPageIndex; fPageIndex = NULL;
+			fNumberOfPages = 0;
+			delete fPageIndex;
+			fPageIndex = NULL;
 			return;
 		}
 	}
 }
 
-status_t PrintJobReader::GetPage(int page, PrintJobPage& pjp) {
+
+status_t PrintJobReader::GetPage(int32 page, PrintJobPage& pjp)
+{
 	if (0 <= page && page < fNumberOfPages) {
 		PrintJobPage p(&fJobFile, fPageIndex[page]);
 		if (p.InitCheck() == B_OK) {
-			pjp = p; return B_OK;
+			pjp = p;
+			return B_OK;
 		}
 	}
 	return B_ERROR;
 }
 
-BRect PrintJobReader::PaperRect() const {
+
+BRect PrintJobReader::PaperRect() const
+{
 	BRect r;
 	fJobSettings.FindRect("paper_rect", &r);
 	return r;
 }
 
-BRect PrintJobReader::PrintableRect() const {
+
+BRect PrintJobReader::PrintableRect() const
+{
 	BRect r;
 	fJobSettings.FindRect("printable_rect", &r);
 	return r;
 }
 
-void PrintJobReader::GetResolution(int32 *xdpi, int32 *ydpi) const {
+
+void PrintJobReader::GetResolution(int32 *xdpi, int32 *ydpi) const
+{
 	fJobSettings.FindInt32("xres", xdpi);
 	fJobSettings.FindInt32("yres", ydpi);
 }
 
-float PrintJobReader::GetScale() const {
+float PrintJobReader::GetScale() const
+{
 	float scale = 1.0;
 	fJobSettings.FindFloat("scale", &scale);
 	return scale;

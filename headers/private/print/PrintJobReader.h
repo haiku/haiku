@@ -56,7 +56,7 @@ public:
 class PrintJobReader {
 	BFile fJobFile;  // the job file
 	int32 fNumberOfPages; // the number of pages in the job file
-	int32 fFirstPage; // the page number of the first page
+	off_t fFirstPage; // the page number of the first page
 	BMessage fJobSettings; // the settings extracted from the job file
 	off_t* fPageIndex; // start positions of pages in the job file
 
@@ -80,7 +80,7 @@ public:
 	float GetScale() const;
 		
 		// retrieve page
-	status_t GetPage(int no, PrintJobPage& pjp);
+	status_t GetPage(int32 no, PrintJobPage& pjp);
 };
 
 #endif
