@@ -2,6 +2,10 @@
 #define _SYS_CDEFS_H
 
 
+#ifndef __THROW
+#define __THROW
+#endif
+
 #ifndef __P
 #define	__P(s) s
 #endif
