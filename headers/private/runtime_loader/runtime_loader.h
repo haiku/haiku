@@ -39,6 +39,12 @@ typedef struct image_t {
 	int32				ref_count;
 	uint32				flags;
 
+	struct {
+		int				major;
+		int				middle;
+		int				minor;
+	} gcc_version;
+
 	addr_t 				entry_point;
 	addr_t				init_routine;
 	addr_t				term_routine;

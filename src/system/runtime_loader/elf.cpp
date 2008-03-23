@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -16,6 +17,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <arch/cpu.h>
 #include <elf32.h>
@@ -111,6 +113,21 @@ dprintf(const char *format, ...)
 #else
 #	define FATAL(x...) printf("runtime_loader: " x);
 #endif
+
+
+/*!	Mini atoi(), so we don't have to include the libroot dependencies.
+ */
+int
+atoi(const char* num)
+{
+	int result = 0;
+	while (*num >= '0' && *num <= '9') {
+		result = (result * 10) + (*num - '0');
+		num++;
+	}
+
+	return result;
+}
 
 
 #ifdef RUNTIME_LOADER_TRACING
@@ -514,6 +531,159 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 	}
 
 	return B_OK;
+}
+
+
+static bool
+analyze_object_gcc_version(int fd, image_t* image, Elf32_Ehdr& eheader,
+	int32 sheaderSize, char* buffer, size_t bufferSize)
+{
+	image->gcc_version.major = 0;
+	image->gcc_version.middle = 0;
+	image->gcc_version.minor = 0;
+
+	if (sheaderSize > (int)bufferSize) {
+		FATAL("Cannot handle section headers bigger than %lu\n", bufferSize);
+		return false;
+	}
+
+	// read section headers
+	ssize_t length = _kern_read(fd, eheader.e_shoff, buffer, sheaderSize);
+	if (length != sheaderSize) {
+		FATAL("Could not read section headers: %s\n", strerror(length));
+		return false;
+	}
+
+	// load the string section
+	Elf32_Shdr* sectionHeader
+		= (Elf32_Shdr*)(buffer + eheader.e_shstrndx * eheader.e_shentsize);
+
+	if (sheaderSize + sectionHeader->sh_size > bufferSize) {
+		FATAL("Buffer not big enough for section string section\n");
+		return false;
+	}
+
+	char* sectionStrings = buffer + bufferSize - sectionHeader->sh_size;
+	length = _kern_read(fd, sectionHeader->sh_offset, sectionStrings,
+		sectionHeader->sh_size);
+	if (length != (int)sectionHeader->sh_size) {
+		FATAL("Could not read section string section: %s\n", strerror(length));
+		return false;
+	}
+
+	// find the .comment section
+	off_t commentOffset = 0;
+	size_t commentSize = 0;
+	for (uint32 i = 0; i < eheader.e_shnum; i++) {
+		sectionHeader = (Elf32_Shdr*)(buffer + i * eheader.e_shentsize);
+		const char* sectionName = sectionStrings + sectionHeader->sh_name;
+		if (sectionHeader->sh_name != 0
+			&& strcmp(sectionName, ".comment") == 0) {
+			commentOffset = sectionHeader->sh_offset;
+			commentSize = sectionHeader->sh_size;
+			break;
+		}
+	}
+
+	if (commentSize == 0) {
+		FATAL("Could not find .comment section\n");
+		return false;
+	}
+
+	// read a part of the comment section
+	if (commentSize > 512)
+		commentSize = 512;
+
+	length = _kern_read(fd, commentOffset, buffer, commentSize);
+	if (length != (int)commentSize) {
+		FATAL("Could not read .comment section: %s\n", strerror(length));
+		return false;
+	}
+
+	// the common prefix of the strings in the .comment section
+	static const char* kGCCVersionPrefix = "GCC: (GNU) ";
+	size_t gccVersionPrefixLen = strlen(kGCCVersionPrefix);
+
+	size_t index = 0;
+	int gccMajor = 0;
+	int gccMiddle = 0;
+	int gccMinor = 0;
+
+	// Read up to 10 comments. The first three or four are usually from the
+	// glue code.
+	for (int i = 0; i < 10; i++) {
+		// skip '\0'
+		while (index < commentSize && buffer[index] == '\0')
+			index++;
+		char* stringStart = buffer + index;
+
+		// find string end
+		while (index < commentSize && buffer[index] != '\0')
+			index++;
+
+		// ignore the entry at the end of the buffer
+		if (index == commentSize)
+			break;
+
+		// We have to analyze string like these:
+		// GCC: (GNU) 2.9-beos-991026
+		// GCC: (GNU) 2.95.3-haiku-080322
+		// GCC: (GNU) 4.1.2
+
+		// skip the common prefix
+		if (strncmp(stringStart, kGCCVersionPrefix, gccVersionPrefixLen) != 0)
+			continue;
+
+		// the rest is the GCC version
+		char* gccVersion = stringStart + gccVersionPrefixLen;
+		char* gccPlatform = strchr(gccVersion, '-');
+		char* patchLevel = NULL;
+		if (gccPlatform != NULL) {
+			*gccPlatform = '\0';
+			gccPlatform++;
+			patchLevel = strchr(gccPlatform, '-');
+			if (patchLevel != NULL) {
+				*patchLevel = '\0';
+				patchLevel++;
+			}
+		}
+
+		// split the gcc version into major, middle, and minor
+		int version[3] = { 0, 0, 0 };
+
+		for (int k = 0; gccVersion != NULL && k < 3; k++) {
+			char* dot = strchr(gccVersion, '.');
+			if (dot) {
+				*dot = '\0';
+				dot++;
+			}
+			version[k] = atoi(gccVersion);
+			gccVersion = dot;
+		}
+
+		// got any version?
+		if (version[0] == 0)
+			continue;
+
+		// Select the gcc version with the smallest major, but the greatest
+		// middle/minor. This should usually ignore the glue code version as
+		// well as cases where e.g. in a gcc 2 program a single C file has
+		// been compiled with gcc 4.
+		if (gccMajor == 0 || gccMajor > version[0]
+		 	|| gccMajor == version[0]
+				&& (gccMiddle < version[1]
+					|| gccMiddle == version[1] && gccMinor < version[2])) {
+			gccMajor = version[0];
+			gccMiddle = version[1];
+			gccMinor = version[2];
+		}
+	}
+
+	image->gcc_version.major = gccMajor;
+	image->gcc_version.middle = gccMiddle;
+	image->gcc_version.minor = gccMinor;
+
+	return gccMajor != 0;
 }
 
 
@@ -1080,6 +1250,12 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		goto err2;
 	}
 
+	if (!analyze_object_gcc_version(fd, image, eheader, sheaderSize, ph_buff,
+			sizeof(ph_buff))) {
+		FATAL("Failed to get gcc version for %s\n", path);
+		// not really fatal, actually
+	}
+
 	status = map_image(fd, path, image, type == B_APP_IMAGE);
 	if (status < B_OK) {
 		FATAL("Could not map image: %s\n", strerror(status));
@@ -1106,7 +1282,9 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 
 	*_image = image;
 
-	KTRACE("rld: load_container(\"%s\"): done: id: %ld", name, image->id);
+	KTRACE("rld: load_container(\"%s\"): done: id: %ld (gcc: %d.%d.%d)", name,
+		image->id, image->gcc_version.major, image->gcc_version.middle,
+		image->gcc_version.minor);
 
 	return B_OK;
 
