@@ -1,18 +1,18 @@
 // kernel_interface.cpp
 //
-// Copyright (c) 2003, Axel Dörfler (axeld@pinc-software.de)
+// Copyright (c) 2003-2008, Axel Dörfler (axeld@pinc-software.de)
 // Copyright (c) 2003, Ingo Weinhold (bonefish@cs.tu-berlin.de)
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
-// 
+//
 // This program is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -79,7 +79,7 @@ notify_if_stat_changed(Volume *volume, Node *node)
 
 // ramfs_mount
 static status_t
-ramfs_mount(dev_t nsid, const char* /*device*/, uint32 flags, 
+ramfs_mount(dev_t nsid, const char* /*device*/, uint32 flags,
 	const char* /*args*/, fs_volume* _volume, ino_t* rootID)
 {
 	FUNCTION_START();
@@ -700,25 +700,25 @@ ramfs_write_stat(fs_volume fs, fs_vnode _node, const struct stat *st,
 		// check permissions
 		error = node->CheckPermissions(ACCESS_W);
 		// size
-		if (error == B_OK && (mask & FS_WRITE_STAT_SIZE))
+		if (error == B_OK && (mask & B_STAT_SIZE))
 			error = node->SetSize(st->st_size);
 		if (error == B_OK) {
 			// permissions
-			if (mask & FS_WRITE_STAT_MODE) {
+			if (mask & B_STAT_MODE) {
 				node->SetMode(node->GetMode() & ~S_IUMSK
-							  | st->st_mode & S_IUMSK);
+					| st->st_mode & S_IUMSK);
 			}
 			// UID
-			if (mask & FS_WRITE_STAT_UID)
+			if (mask & B_STAT_UID)
 				node->SetUID(st->st_uid);
 			// GID
-			if (mask & FS_WRITE_STAT_GID)
+			if (mask & B_STAT_GID)
 				node->SetGID(st->st_gid);
 			// mtime
-			if (mask & FS_WRITE_STAT_MTIME)
+			if (mask & B_STAT_MODIFICATION_TIME)
 				node->SetMTime(st->st_mtime);
 			// crtime
-			if (mask & FS_WRITE_STAT_CRTIME)
+			if (mask & B_STAT_CREATION_TIME)
 				node->SetCrTime(st->st_crtime);
 		}
 		// notify listeners
@@ -1214,7 +1214,7 @@ ramfs_close_dir(fs_volume /*fs*/, fs_vnode DARG(_node), fs_cookie _cookie)
 	FUNCTION_START();
 FUNCTION(("dir: (%Lu)\n", ((Node*)_node)->GetID()));
 	// No locking needed, since the Directory is guaranteed to live at this
-	// time and for iterators there is a separate locking. 
+	// time and for iterators there is a separate locking.
 	DirectoryCookie *cookie = (DirectoryCookie*)_cookie;
 	cookie->Unset();
 	return B_OK;
@@ -1278,7 +1278,7 @@ ramfs_rewind_dir(fs_volume /*fs*/, fs_vnode /*_node*/, fs_cookie _cookie)
 {
 	FUNCTION_START();
 	// No locking needed, since the Directory is guaranteed to live at this
-	// time and for iterators there is a separate locking. 
+	// time and for iterators there is a separate locking.
 	DirectoryCookie *cookie = (DirectoryCookie*)_cookie;
 	// no need to Resume(), iterator remains suspended
 	status_t error = cookie->Rewind();
@@ -1325,7 +1325,7 @@ ramfs_close_attr_dir(fs_volume /*fs*/, fs_vnode /*_node*/, fs_cookie cookie)
 {
 	FUNCTION_START();
 	// No locking needed, since the Node is guaranteed to live at this time
-	// and for iterators there is a separate locking. 
+	// and for iterators there is a separate locking.
 	AttributeIterator *iterator = (AttributeIterator*)cookie;
 	iterator->Unset();
 	return B_OK;
@@ -1338,7 +1338,7 @@ ramfs_free_attr_dir_cookie(fs_volume /*fs*/, fs_vnode /*_node*/,
 {
 	FUNCTION_START();
 	// No locking needed, since the Node is guaranteed to live at this time
-	// and for iterators there is a separate locking. 
+	// and for iterators there is a separate locking.
 	AttributeIterator *iterator = (AttributeIterator*)cookie;
 	delete iterator;
 	return B_OK;
@@ -1389,7 +1389,7 @@ ramfs_rewind_attr_dir(fs_volume /*fs*/, fs_vnode /*_node*/, fs_cookie cookie)
 {
 	FUNCTION_START();
 	// No locking needed, since the Node is guaranteed to live at this time
-	// and for iterators there is a separate locking. 
+	// and for iterators there is a separate locking.
 	AttributeIterator *iterator = (AttributeIterator*)cookie;
 	// no need to Resume(), iterator remains suspended
 	status_t error = iterator->Rewind();
@@ -2131,7 +2131,7 @@ static file_system_module_info sRamFSModuleInfo = {
 	&ramfs_free_dir_cookie,
 	&ramfs_read_dir,
 	&ramfs_rewind_dir,
-	
+
 	/* attribute directory operations */
 	&ramfs_open_attr_dir,
 	&ramfs_close_attr_dir,
