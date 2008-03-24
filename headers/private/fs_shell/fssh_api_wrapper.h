@@ -874,6 +874,9 @@
 #define fs_cookie	fssh_fs_cookie
 #define fs_vnode	fssh_fs_vnode
 
+/* additional flags passed to write_stat() */
+#define B_STAT_SIZE_INSECURE	FSSH_B_STAT_SIZE_INSECURE
+
 /* passed to write_fs_info() */
 #define FS_WRITE_FSINFO_NAME	FSSH_FS_WRITE_FSINFO_NAME
 

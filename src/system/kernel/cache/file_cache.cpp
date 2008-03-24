@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -51,7 +51,7 @@ struct file_cache_ref {
 };
 
 typedef status_t (*cache_func)(file_cache_ref *ref, void *cookie, off_t offset,
-	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages);
 
 
@@ -169,7 +169,7 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 */
 static status_t
 read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
-	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages)
 {
 	TRACE(("read_into_cache(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
@@ -240,14 +240,14 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		return status;
 	}
 
-	// copy the pages and unmap them again
+	// copy the pages if needed and unmap them again
 
 	for (int32 i = 0; i < vecCount; i++) {
 		addr_t base = (addr_t)vecs[i].iov_base;
 		size_t size = vecs[i].iov_len;
 
 		// copy to user buffer if necessary
-		if (bufferSize != 0) {
+		if (useBuffer && bufferSize != 0) {
 			size_t bytes = min_c(bufferSize, size - pageOffset);
 
 			user_memcpy((void *)buffer, (void *)(base + pageOffset), bytes);
@@ -278,11 +278,14 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 static status_t
 read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
-	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages)
 {
 	TRACE(("read_from_file(offset = %Ld, pageOffset = %ld, buffer = %#lx, "
 		"bufferSize = %lu\n", offset, pageOffset, buffer, bufferSize));
+
+	if (!useBuffer)
+		return B_OK;
 
 	iovec vec;
 	vec.iov_base = (void *)buffer;
@@ -310,7 +313,7 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 */
 static status_t
 write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
-	int32 pageOffset, addr_t buffer, size_t bufferSize,
+	int32 pageOffset, addr_t buffer, size_t bufferSize, bool useBuffer,
 	size_t lastReservedPages, size_t reservePages)
 {
 	// TODO: We're using way too much stack! Rather allocate a sufficiently
@@ -400,8 +403,13 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 		addr_t base = (addr_t)vecs[i].iov_base;
 		size_t bytes = min_c(bufferSize, size_t(vecs[i].iov_len - pageOffset));
 
-		// copy data from user buffer
-		user_memcpy((void *)(base + pageOffset), (void *)buffer, bytes);
+		if (useBuffer) {
+			// copy data from user buffer
+			user_memcpy((void *)(base + pageOffset), (void *)buffer, bytes);
+		} else {
+			// clear buffer instead
+			memset((void *)(base + pageOffset), 0, bytes);
+		}
 
 		bufferSize -= bytes;
 		if (bufferSize == 0)
@@ -454,9 +462,21 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 static status_t
 write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
-	addr_t buffer, size_t bufferSize, size_t lastReservedPages,
+	addr_t buffer, size_t bufferSize, bool useBuffer, size_t lastReservedPages,
 	size_t reservePages)
 {
+	size_t chunkSize;
+	if (!useBuffer) {
+		// we need to allocate a zero buffer
+		// TODO: use smaller buffers if this fails
+		chunkSize = min_c(bufferSize, B_PAGE_SIZE);
+		buffer = (addr_t)malloc(chunkSize);
+		if (buffer == 0)
+			return B_NO_MEMORY;
+
+		memset((void *)buffer, 0, chunkSize);
+	}
+
 	iovec vec;
 	vec.iov_base = (void *)buffer;
 	vec.iov_len = bufferSize;
@@ -465,8 +485,26 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
-	status_t status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
-		&vec, 1, &bufferSize, false);
+	status_t status;
+
+	if (!useBuffer) {
+		while (bufferSize > 0) {
+			if (bufferSize < chunkSize)
+				chunkSize = bufferSize;
+
+			status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
+				&vec, 1, &chunkSize, false);
+			if (status < B_OK)
+				break;
+
+			bufferSize -= chunkSize;
+			pageOffset += chunkSize;
+		}
+	} else {
+		status = vfs_write_pages(ref->vnode, cookie, offset + pageOffset,
+			&vec, 1, &bufferSize, false);
+	}
+
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, true);
 
@@ -478,9 +516,10 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 
 static inline status_t
 satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
-	off_t offset, addr_t buffer, int32 &pageOffset, size_t bytesLeft,
-	size_t &reservePages, off_t &lastOffset, addr_t &lastBuffer,
-	int32 &lastPageOffset, size_t &lastLeft, size_t &lastReservedPages)
+	off_t offset, addr_t buffer, bool useBuffer, int32 &pageOffset,
+	size_t bytesLeft, size_t &reservePages, off_t &lastOffset,
+	addr_t &lastBuffer, int32 &lastPageOffset, size_t &lastLeft,
+	size_t &lastReservedPages)
 {
 	if (lastBuffer == buffer)
 		return B_OK;
@@ -490,7 +529,7 @@ satisfy_cache_io(file_cache_ref *ref, void *cookie, cache_func function,
 		+ lastPageOffset + B_PAGE_SIZE - 1) >> PAGE_SHIFT);
 
 	status_t status = function(ref, cookie, lastOffset, lastPageOffset,
-		lastBuffer, requestSize, lastReservedPages, reservePages);
+		lastBuffer, requestSize, useBuffer, lastReservedPages, reservePages);
 	if (status == B_OK) {
 		lastReservedPages = reservePages;
 		lastBuffer = buffer;
@@ -513,6 +552,7 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 	vm_cache *cache = ref->cache;
 	off_t fileSize = cache->virtual_size;
+	bool useBuffer = buffer != 0;
 
 	TRACE(("cache_io(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s)\n",
 		ref, offset, (void *)buffer, *_size, doWrite ? "write" : "read"));
@@ -575,8 +615,9 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 			// we didn't get yet (to make sure no one else interferes in the
 			// mean time).
 			status_t status = satisfy_cache_io(ref, cookie, function, offset,
-				buffer, pageOffset, bytesLeft, reservePages, lastOffset,
-				lastBuffer, lastPageOffset, lastLeft, lastReservedPages);
+				buffer, useBuffer, pageOffset, bytesLeft, reservePages,
+				lastOffset, lastBuffer, lastPageOffset, lastLeft,
+				lastReservedPages);
 			if (status != B_OK)
 				return status;
 
@@ -606,13 +647,18 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 
 			// and copy the contents of the page already in memory
 			if (doWrite) {
-				user_memcpy((void *)(virtualAddress + pageOffset),
-					(void *)buffer, bytesInPage);
+				if (useBuffer) {
+					user_memcpy((void *)(virtualAddress + pageOffset),
+						(void *)buffer, bytesInPage);
+				} else {
+					user_memset((void *)(virtualAddress + pageOffset),
+						0, bytesInPage);
+				}
 
 				// make sure the page is in the modified list
 				if (page->state != PAGE_STATE_MODIFIED)
 					vm_page_set_state(page, PAGE_STATE_MODIFIED);
-			} else {
+			} else if (useBuffer) {
 				user_memcpy((void *)buffer,
 					(void *)(virtualAddress + pageOffset), bytesInPage);
 			}
@@ -643,8 +689,9 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 
 		if (buffer - lastBuffer + lastPageOffset >= kMaxChunkSize) {
 			status_t status = satisfy_cache_io(ref, cookie, function, offset,
-				buffer, pageOffset, bytesLeft, reservePages, lastOffset,
-				lastBuffer, lastPageOffset, lastLeft, lastReservedPages);
+				buffer, useBuffer, pageOffset, bytesLeft, reservePages,
+				lastOffset, lastBuffer, lastPageOffset, lastLeft,
+				lastReservedPages);
 			if (status != B_OK)
 				return status;
 		}
@@ -653,7 +700,7 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 	// fill the last remaining bytes of the request (either write or read)
 
 	return function(ref, cookie, lastOffset, lastPageOffset, lastBuffer,
-		lastLeft, lastReservedPages, 0);
+		lastLeft, useBuffer, lastReservedPages, 0);
 }
 
 
@@ -837,7 +884,7 @@ cache_node_closed(struct vnode *vnode, int32 fdType, vm_cache *cache,
 }
 
 
-extern "C" void 
+extern "C" void
 cache_node_launched(size_t argCount, char * const *args)
 {
 	if (sCacheModule == NULL || sCacheModule->node_launched == NULL)

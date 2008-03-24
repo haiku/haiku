@@ -708,7 +708,7 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 	// TODO: we should definitely check a bit more if the new stats are
 	//	valid - or even better, the VFS should check this before calling us
-	
+
 	status_t status = inode->CheckPermissions(W_OK);
 	if (status < B_OK)
 		RETURN_ERROR(status);
@@ -734,7 +734,8 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 				return status;
 
 			// fill the new blocks (if any) with zeros
-			inode->FillGapWithZeros(inode->OldSize(), inode->Size());
+			if ((mask & B_STAT_SIZE_INSECURE) == 0)
+				inode->FillGapWithZeros(inode->OldSize(), inode->Size());
 
 			if (!inode->IsDeleted()) {
 				Index index(volume);
@@ -784,7 +785,7 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 }
 
 
-status_t 
+status_t
 bfs_create(void *_ns, void *_directory, const char *name, int openMode,
 	int mode, void **_cookie, ino_t *_vnodeID)
 {
@@ -804,7 +805,7 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode,
 	// to remove the inode if we don't have enough free memory later...
 	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
 	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY); 
+		RETURN_ERROR(B_NO_MEMORY);
 
 	// initialize the cookie
 	cookie->open_mode = openMode;
@@ -832,7 +833,7 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode,
 }
 
 
-static status_t 
+static status_t
 bfs_create_symlink(void *_ns, void *_directory, const char *name,
 	const char *path, int mode)
 {
@@ -895,7 +896,7 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name,
 }
 
 
-status_t 
+status_t
 bfs_link(void *ns, void *dir, const char *name, void *node)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
@@ -906,7 +907,7 @@ bfs_link(void *ns, void *dir, const char *name, void *node)
 }
 
 
-status_t 
+status_t
 bfs_unlink(void *_ns, void *_directory, const char *name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
@@ -935,7 +936,7 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 }
 
 
-status_t 
+status_t
 bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const char *newName)
 {
 	FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = \"%s\"\n", _oldDir, oldName, _newDir, newName));
@@ -1150,7 +1151,7 @@ bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 
 	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
 	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY); 
+		RETURN_ERROR(B_NO_MEMORY);
 
 	// initialize the cookie
 	cookie->open_mode = openMode;
@@ -1347,7 +1348,7 @@ static status_t
 bfs_access(void *_ns, void *_node, int accessMode)
 {
 	//FUNCTION();
-	
+
 	if (_ns == NULL || _node == NULL)
 		return B_BAD_VALUE;
 
@@ -1438,7 +1439,7 @@ static status_t
 bfs_remove_dir(void *_ns, void *_directory, const char *name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
-	
+
 	if (_ns == NULL || _directory == NULL || name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
@@ -1467,10 +1468,10 @@ static status_t
 bfs_open_dir(void *_ns, void *_node, void **_cookie)
 {
 	FUNCTION();
-	
+
 	if (_ns == NULL || _node == NULL || _cookie == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
-	
+
 	Inode *inode = (Inode *)_node;
 
 	status_t status = inode->CheckPermissions(R_OK);
@@ -1496,7 +1497,7 @@ bfs_open_dir(void *_ns, void *_node, void **_cookie)
 
 
 static status_t
-bfs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *dirent, 
+bfs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *dirent,
 	size_t bufferSize, uint32 *_num)
 {
 	FUNCTION();
@@ -1537,7 +1538,7 @@ bfs_rewind_dir(void * /*ns*/, void * /*node*/, void *_cookie)
 
 	if (iterator == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
-	
+
 	return iterator->Rewind();
 }
 
@@ -1555,7 +1556,7 @@ static status_t
 bfs_free_dir_cookie(void *ns, void *node, void *_cookie)
 {
 	TreeIterator *iterator = (TreeIterator *)_cookie;
-	
+
 	if (iterator == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
@@ -1610,7 +1611,7 @@ static status_t
 bfs_rewind_attr_dir(void *_ns, void *_node, void *_cookie)
 {
 	FUNCTION();
-	
+
 	AttributeIterator *iterator = (AttributeIterator *)_cookie;
 	if (iterator == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
@@ -2234,7 +2235,7 @@ static file_system_module_info sBeFileSystem = {
 	&bfs_free_dir_cookie,
 	&bfs_read_dir,
 	&bfs_rewind_dir,
-	
+
 	/* attribute directory operations */
 	&bfs_open_attr_dir,
 	&bfs_close_attr_dir,

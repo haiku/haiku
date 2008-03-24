@@ -14,6 +14,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <fs_interface.h>
 #include <NodeMonitor.h>
 
 #include <syscalls.h>
@@ -77,7 +78,7 @@ BFile::BFile(const BEntry *entry, uint32 openMode)
 
 /*! \brief Creates a BFile and initializes it to the file referred to by
 		   the supplied path name and according to the specified open mode.
-	\param path the file's path name 
+	\param path the file's path name
 	\param openMode the mode in which the file should be opened
 	\see SetTo() for values for \a openMode
 */
@@ -217,7 +218,7 @@ BFile::SetTo(const BEntry *entry, uint32 openMode)
 
 /*! \brief Re-initializes the BFile to the file referred to by the
 		   supplied path name and according to the specified open mode.
-	\param path the file's path name 
+	\param path the file's path name
 	\param openMode the mode in which the file should be opened
 	\return
 	- \c B_OK: Everything went fine.
@@ -352,7 +353,7 @@ BFile::ReadAt(off_t location, void *buffer, size_t size)
 		return InitCheck();
 	if (location < 0)
 		return B_BAD_VALUE;
-	
+
 	return _kern_read(get_fd(), location, buffer, size);
 }
 
@@ -453,7 +454,7 @@ BFile::SetSize(off_t size)
 		return B_BAD_VALUE;
 	struct stat statData;
 	statData.st_size = size;
-	return set_stat(statData, B_STAT_SIZE);
+	return set_stat(statData, B_STAT_SIZE | B_STAT_SIZE_INSECURE);
 }
 
 

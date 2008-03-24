@@ -27,8 +27,10 @@ typedef void *fs_cookie;
 typedef void *fs_vnode;
 
 /* additional flags passed to write_stat() (see NodeMonitor.h for the others) */
-	// NOTE: Changing the constants here or in NodeMonitor.h will break
-	// src/kits/storage/LibBeAdapter.cpp:_kern_write_stat().
+// NOTE: Changing the constants here or in NodeMonitor.h will break
+// src/kits/storage/LibBeAdapter.cpp:_kern_write_stat().
+#define B_STAT_SIZE_INSECURE	0x2000
+	// TODO: this should be faded out once BFS supports sparse files
 
 /* passed to write_fs_info() */
 #define	FS_WRITE_FSINFO_NAME	0x0001

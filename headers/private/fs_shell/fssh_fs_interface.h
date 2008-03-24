@@ -29,6 +29,7 @@ typedef void *fssh_fs_cookie;
 typedef void *fssh_fs_vnode;
 
 /* additional flags passed to write_stat() */
+#define FSSH_B_STAT_SIZE_INSECURE	0x2000
 
 /* passed to write_fs_info() */
 #define	FSSH_FS_WRITE_FSINFO_NAME	0x0001

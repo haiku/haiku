@@ -176,7 +176,7 @@ InodeAllocator::~InodeAllocator()
 }
 
 
-status_t 
+status_t
 InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
 	Inode **_inode)
 {
@@ -273,7 +273,7 @@ InodeAllocator::_TransactionListener(int32 id, int32 event, void *_inode)
 //	#pragma mark -
 
 
-status_t 
+status_t
 bfs_inode::InitCheck(Volume *volume)
 {
 	if (Magic1() != INODE_MAGIC1
@@ -407,7 +407,7 @@ Inode::InitCheck(bool checkNode)
 	}
 
 	if (IsContainer()) {
-		// inodes that have a 
+		// inodes that have a B+tree
 		if (fTree == NULL)
 			RETURN_ERROR(B_NO_MEMORY);
 
@@ -715,7 +715,7 @@ Inode::_AddSmallData(Transaction &transaction, NodeGetter &nodeGetter,
 				small_data *next = item->Next();
 				if (!next->IsLast(node))
 					memmove((uint8 *)item + spaceNeeded, next, (uint8 *)last - (uint8 *)next);
-	
+
 				// Move the "last" one to its new location and
 				// correctly terminate the small_data section
 				last = (small_data *)((uint8 *)last - ((uint8 *)next - ((uint8 *)item + spaceNeeded)));
@@ -967,7 +967,7 @@ Inode::ReadAttribute(const char *name, int32 type, off_t pos, uint8 *buffer,
 			}
 			if (length + pos > smallData->DataSize())
 				length = smallData->DataSize() - pos;
-	
+
 			memcpy(buffer, smallData->Data() + pos, length);
 			*_length = length;
 			return B_OK;
@@ -1190,7 +1190,7 @@ Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type,
 {
 	// do we need to create the attribute directory first?
 	if (Attributes().IsZero()) {
-		status_t status = Inode::Create(transaction, this, NULL, 
+		status_t status = Inode::Create(transaction, this, NULL,
 			S_ATTR_DIR | S_DIRECTORY | 0666, 0, 0, NULL);
 		if (status < B_OK)
 			RETURN_ERROR(status);
@@ -1201,7 +1201,7 @@ Inode::CreateAttribute(Transaction &transaction, const char *name, uint32 type,
 		return B_ERROR;
 
 	// Inode::Create() locks the inode for us
-	return Inode::Create(transaction, attributes, name, 
+	return Inode::Create(transaction, attributes, name,
 		S_ATTR | S_FILE | 0666, 0, type, NULL, NULL, attribute);
 }
 
@@ -1426,8 +1426,6 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 	locker.Lock();
 
 	if (pos + length > Size()) {
-		off_t oldSize = Size();
-
 		// let's grow the data stream to the size needed
 		status_t status = SetFileSize(transaction, pos + length);
 		if (status < B_OK) {
@@ -1437,11 +1435,6 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 		// TODO: In theory we would need to update the file size
 		// index here as part of the current transaction - this might just
 		// be a bit too expensive, but worth a try.
-
-		// If the position of the write was beyond the file size, we
-		// have to fill the gap between that position and the old file
-		// size with zeros.
-		FillGapWithZeros(oldSize, pos);
 
 		// we need to write back the inode here because it has to
 		// go into this transaction (we cannot wait until the file
@@ -1472,81 +1465,21 @@ Inode::WriteAt(Transaction &transaction, off_t pos, const uint8 *buffer,
 status_t
 Inode::FillGapWithZeros(off_t pos, off_t newSize)
 {
-	// ToDo: we currently do anything here, same as original BFS!
-	//if (pos >= newSize)
-	return B_OK;
-#if 0
-	block_run run;
-	off_t offset;
-	if (FindBlockRun(pos, run, offset) < B_OK)
-		RETURN_ERROR(B_BAD_VALUE);
+	while (pos < newSize) {
+		size_t size;
+		if (newSize > pos + 1024 * 1024 * 1024)
+			size = 1024 * 1024 * 1024;
+		else
+			size = newSize - pos;
 
-	off_t length = newSize - pos;
-	uint32 bytesWritten = 0;
-	uint32 blockSize = fVolume->BlockSize();
-	uint32 blockShift = fVolume->BlockShift();
-	uint8 *block;
+		status_t status = file_cache_write(FileCache(), NULL, pos, NULL, &size);
+		if (status < B_OK)
+			return status;
 
-	// the first block_run we write could not be aligned to the block_size boundary
-	// (write partial block at the beginning)
-
-	// pos % block_size == (pos - offset) % block_size, offset % block_size == 0
-	if (pos % blockSize != 0) {
-		run.start += (pos - offset) / blockSize;
-		run.length -= (pos - offset) / blockSize;
-
-		CachedBlock cached(fVolume,run);
-		if ((block = cached.Block()) == NULL)
-			RETURN_ERROR(B_BAD_VALUE);
-
-		bytesWritten = blockSize - (pos % blockSize);
-		if (length < bytesWritten)
-			bytesWritten = length;
-
-		memset(block + (pos % blockSize), 0, bytesWritten);
-		if (fVolume->WriteBlocks(cached.BlockNumber(), block, 1) < B_OK)
-			RETURN_ERROR(B_IO_ERROR);
-
-		pos += bytesWritten;
-
-		length -= bytesWritten;
-		if (length == 0)
-			return B_OK;
-
-		if (FindBlockRun(pos, run, offset) < B_OK)
-			RETURN_ERROR(B_BAD_VALUE);
+		pos += size;
 	}
 
-	while (length > 0) {
-		// offset is the offset to the current pos in the block_run
-		run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + ((pos - offset) >> blockShift));
-		run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - ((pos - offset) >> blockShift));
-
-		CachedBlock cached(fVolume);
-		off_t blockNumber = fVolume->ToBlock(run);
-		for (int32 i = 0; i < run.Length(); i++) {
-			if ((block = cached.SetTo(blockNumber + i, true)) == NULL)
-				RETURN_ERROR(B_IO_ERROR);
-
-			if (fVolume->WriteBlocks(cached.BlockNumber(), block, 1) < B_OK)
-				RETURN_ERROR(B_IO_ERROR);
-		}
-
-		int32 bytes = run.Length() << blockShift;
-		length -= bytes;
-		bytesWritten += bytes;
-
-		// since we don't respect a last partial block, length can be lower
-		if (length <= 0)
-			break;
-
-		pos += bytes;
-
-		if (FindBlockRun(pos, run, offset) < B_OK)
-			RETURN_ERROR(B_BAD_VALUE);
-	}
 	return B_OK;
-#endif
 }
 
 
@@ -2264,7 +2197,7 @@ Inode::Sync()
 			if (indirectRuns[k].IsZero())
 				return B_OK;
 
-			block = fVolume->ToBlock(indirectRuns[k]);			
+			block = fVolume->ToBlock(indirectRuns[k]);
 			for (int32 j = 0; j < indirectRuns[k].Length(); j++) {
 				block_run *runs = (block_run *)directCached.SetTo(block + j);
 				if (runs == NULL)
@@ -2532,7 +2465,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	// handle this case on their own (or other cases where "parent" is
 	// NULL)
 	if (status < B_OK)
-		RETURN_ERROR(status);		
+		RETURN_ERROR(status);
 
 	// Update the main indices (name, size & last_modified)
 	// (live queries might want to access us after this)
