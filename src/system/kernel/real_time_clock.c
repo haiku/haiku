@@ -17,7 +17,7 @@
 
 #include <stdlib.h>
 
-//#define TRACE_TIME
+#define TRACE_TIME
 #ifdef TRACE_TIME
 #	define TRACE(x) dprintf x
 #else
@@ -268,7 +268,7 @@ _user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 
 	TRACE(("new system_time_offset %Ld\n",
 		arch_rtc_get_system_time_offset(sRealTimeData)));
-
+	
 	return B_OK;
 }
 
@@ -292,6 +292,8 @@ _user_get_timezone(time_t *_timezoneOffset, bool *_daylightSavingTime)
 status_t
 _user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 {
+	// store previous value
+	bool wasGMT = sIsGMT;
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
@@ -301,8 +303,12 @@ _user_set_tzfilename(const char *filename, size_t length, bool isGMT)
 				B_PATH_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
-	// ToDo: Shouldn't this update the system_time_offset as well?
 	sIsGMT = isGMT;
+
+	if (wasGMT != sIsGMT)
+                arch_rtc_set_system_time_offset(sRealTimeData,
+                        arch_rtc_get_system_time_offset(sRealTimeData) + (((sIsGMT) ? 1 : -1) * sTimezoneOffset));
+ 
 	return B_OK;
 }
 
