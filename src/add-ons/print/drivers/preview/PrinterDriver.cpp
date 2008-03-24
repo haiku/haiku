@@ -1,52 +1,42 @@
 /*
- * Copyright 2003-2007, Haiku. All rights reserved.
+ * Copyright 2003-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Philippe Houdoin
- *		Simon Gauvin	
+ *		Simon Gauvin
  *		Michael Pfeiffer
  *		Dr. Hartmut Reh
  */
 
-#include <stdio.h>
-#include <string.h>			// for memset()
-
-#include <StorageKit.h>
-
 #include "PrinterDriver.h"
+#include "PrintJobReader.h"
 
-#include "PrinterSetupWindow.h"
-#include "PageSetupWindow.h"
+
 #include "JobSetupWindow.h"
+#include "PageSetupWindow.h"
 
-// Private prototypes
-// ------------------
 
-#ifdef CODEWARRIOR
-	#pragma mark [Constructor & destructor]
-#endif
+#include <File.h>
+#include <Node.h>
+#include <Message.h>
 
-// Constructor & destructor
-// ------------------------
 
-// --------------------------------------------------
+#include <stdio.h>
+
+
 PrinterDriver::PrinterDriver(BNode* printerNode)
-	:	fJobFile(NULL),
-		fPrinterNode(printerNode),
-		fJobMsg(NULL)
+	: fPrinting(false)
+	, fJobFile(NULL)
+	, fPrinterNode(printerNode)
 {
 }
 
 
-// --------------------------------------------------
-PrinterDriver::~PrinterDriver() 
+PrinterDriver::~PrinterDriver()
 {
 }
 
-#ifdef CODEWARRIOR
-	#pragma mark [Public methods]
-#endif
 
 #ifdef B_BEOS_VERSION_DANO
 struct print_file_header {
@@ -60,166 +50,111 @@ struct print_file_header {
 #endif
 
 
-// Public methods
-// --------------
-
-status_t 
-PrinterDriver::PrintJob
-	(
-	BFile 		*jobFile,		// spool file
-	BMessage 	*jobMsg			// job message
-	)
+status_t
+PrinterDriver::PrintJob(BFile *spoolFile, BMessage *jobMsg)
 {
-	print_file_header	pfh;
-	status_t			status;
-	BMessage 			*msg;
-	int32 				page;
-	uint32				copy;
-	uint32				copies;
-	const int32         passes = 2;
-
-	fJobFile		= jobFile;
-	fJobMsg			= jobMsg;
-
-	if (!fJobFile || !fPrinterNode) 
+	if (!spoolFile || !fPrinterNode)
 		return B_ERROR;
 
-	// read print file header	
+	fJobFile = spoolFile;
+	print_file_header pfh;
+
+	// read print file header
 	fJobFile->Seek(0, SEEK_SET);
 	fJobFile->Read(&pfh, sizeof(pfh));
-	
-	// read job message
-	fJobMsg = msg = new BMessage();
-	msg->Unflatten(fJobFile);
-	
-	if (msg->HasInt32("copies")) {
-		copies = msg->FindInt32("copies");
-	} else {
-		copies = 1;
-	}
-	
-	status = BeginJob();
 
+	// read job message
+	BMessage msg;
+	msg.Unflatten(fJobFile);
+
+	BeginJob();
 	fPrinting = true;
-	for (fPass = 0; fPass < passes && status == B_OK && fPrinting; fPass++) {
-		for (copy = 0; copy < copies && status == B_OK && fPrinting; copy++) 
-		{
-			for (page = 1; page <= pfh.page_count && status == B_OK && fPrinting; page++) {
-				status = PrintPage(page, pfh.page_count);
-			}
-	
-			// re-read job message for next page
-			fJobFile->Seek(sizeof(pfh), SEEK_SET);
-			msg->Unflatten(fJobFile);
-		}
+
+	for (int32 page = 1; page <= pfh.page_count; ++page) {
+		printf("PrinterDriver::PrintPage(): Faking print of page %ld/ %ld",
+			page, pfh.page_count);
 	}
-	
-	status_t s = EndJob();
-	if (status == B_OK) status = s;
-		
-	delete fJobMsg;
-		
+
+	fJobFile->Seek(0, SEEK_SET);
+	PrintJobReader reader(fJobFile);
+
+	status_t status = reader.InitCheck();
+	printf("PrintJobReader::InitCheck(): %s\n", status == B_OK ? "B_OK" : "B_ERROR");
+	printf("PrintJobReader::NumberOfPages(): %ld\n", reader.NumberOfPages());
+	printf("PrintJobReader::FirstPage(): %ld\n", reader.FirstPage());
+	printf("PrintJobReader::LastPage(): %ld\n", reader.LastPage());
+
+	BRect rect = reader.PaperRect();
+	printf("PrintJobReader::PaperRect(): BRect(l:%.1f, t:%.1f, r:%.1f, b:%.1f)\n",
+		rect.left, rect.top, rect.right, rect.bottom);
+
+	rect = reader.PrintableRect();
+	printf("PrintJobReader::PrintableRect(): BRect(l:%.1f, t:%.1f, r:%.1f, b:%.1f)\n",
+		rect.left, rect.top, rect.right, rect.bottom);
+
+	int32 xdpi, ydpi;
+	reader.GetResolution(&xdpi, &ydpi);
+	printf("PrintJobReader::GetResolution(): xdpi:%ld, ydpi:%ld\n", xdpi, ydpi);
+	printf("PrintJobReader::GetScale(): %.1f\n", reader.GetScale());
+
+	fPrinting = false;
+	EndJob();
+
 	return status;
 }
 
-/**
- * This will stop the printing loop
- *
- * @param none
- * @return void
- */
-void 
+
+void
 PrinterDriver::StopPrinting()
 {
 	fPrinting = false;
 }
 
 
-// --------------------------------------------------
 status_t
-PrinterDriver::BeginJob() 
+PrinterDriver::BeginJob()
 {
 	return B_OK;
 }
 
 
-// --------------------------------------------------
-status_t 
-PrinterDriver::PrintPage(int32 pageNumber, int32 pageCount) 
-{
-	char text[128];
-
-	sprintf(text, "Faking print of page %ld/%ld...", pageNumber, pageCount);
-	BAlert *alert = new BAlert("PrinterDriver::PrintPage()", text, "Hmm?");
-	alert->Go();
-	return B_OK;
-}
-
-
-// --------------------------------------------------
 status_t
-PrinterDriver::EndJob() 
+PrinterDriver::PrintPage(int32 pageNumber, int32 pageCount)
 {
 	return B_OK;
 }
 
 
-BlockingWindow* PrinterDriver::NewPrinterSetupWindow(char* printerName) {
-	return NULL;
+status_t
+PrinterDriver::EndJob()
+{
+	return B_OK;
 }
 
-BlockingWindow* PrinterDriver::NewPageSetupWindow(BMessage *setupMsg, const char *printerName) {
+
+BlockingWindow*
+PrinterDriver::NewPageSetupWindow(BMessage *setupMsg, const char *printerName)
+{
 	return new PageSetupWindow(setupMsg, printerName);
 }
 
-BlockingWindow* PrinterDriver::NewJobSetupWindow(BMessage *jobMsg, const char *printerName) {
+
+BlockingWindow*
+PrinterDriver::NewJobSetupWindow(BMessage *jobMsg, const char *printerName)
+{
 	return new JobSetupWindow(jobMsg, printerName);
 }
 
-status_t PrinterDriver::Go(BlockingWindow* w) {
-	if (w) {
-		return w->Go();
-	} else {
-		return B_OK;
-	}
-}
 
-// --------------------------------------------------
-status_t 
-PrinterDriver::PrinterSetup(char *printerName)
-	// name of printer, to attach printer settings
-{
-	return Go(NewPrinterSetupWindow(printerName));
-}
-
-
-// --------------------------------------------------
-status_t 
+status_t
 PrinterDriver::PageSetup(BMessage *setupMsg, const char *printerName)
 {
-	// check to see if the messag is built correctly...
-	if (setupMsg->HasFloat("scaling") != B_OK) {
-#if HAS_PRINTER_SETTINGS
-		PrinterSettings *ps = new PrinterSettings(printerName);
-
-		if (ps->InitCheck() == B_OK) {
-			// first read the settings from the spool dir
-			if (ps->ReadSettings(setupMsg) != B_OK) {
-				// if there were none, then create a default set...
-				ps->GetDefaults(setupMsg);
-				// ...and save them
-				ps->WriteSettings(setupMsg);
-			}
-		}			
-#endif
-	}
-
-	return Go(NewPageSetupWindow(setupMsg, printerName));
+	BlockingWindow* w = NewPageSetupWindow(setupMsg, printerName);
+	return w->Go();
 }
 
 
-// --------------------------------------------------
-status_t 
+status_t
 PrinterDriver::JobSetup(BMessage *jobMsg, const char *printerName)
 {
 	// set default value if property not set
@@ -228,16 +163,22 @@ PrinterDriver::JobSetup(BMessage *jobMsg, const char *printerName)
 
 	if (!jobMsg->HasInt32("first_page"))
 		jobMsg->AddInt32("first_page", 1);
-		
-	if (!jobMsg->HasInt32("last_page"))
-		jobMsg->AddInt32("last_page", MAX_INT32);
 
-	return Go(NewJobSetupWindow(jobMsg, printerName));
+	if (!jobMsg->HasInt32("last_page"))
+		jobMsg->AddInt32("last_page", LONG_MAX);
+
+	BlockingWindow* w = NewJobSetupWindow(jobMsg, printerName);
+	return w->Go();
 }
 
-// --------------------------------------------------
-BMessage*       
-PrinterDriver::GetDefaultSettings() 
+
+/* copied from PDFlib.h: */
+#define letter_width	 (float) 612.0
+#define letter_height	 (float) 792.0
+
+
+BMessage*
+PrinterDriver::GetDefaultSettings()
 {
 	BMessage* msg = new BMessage();
 	BRect paperRect(0, 0, letter_width, letter_height);
@@ -250,10 +191,3 @@ PrinterDriver::GetDefaultSettings()
 	msg->AddInt32("yres", 300);
 	return msg;
 }
-
-#ifdef CODEWARRIOR
-	#pragma mark [Privates routines]
-#endif
-
-// Private routines
-// ----------------

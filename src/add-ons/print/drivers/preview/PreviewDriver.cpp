@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku. All rights reserved.
+ * Copyright 2003-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,25 +8,35 @@
 
 #include "PreviewDriver.h"
 
-status_t PreviewDriver::PrintJob(BFile *jobFile, BMessage *jobMsg) {
-	PreviewWindow* w;
-	w = new PreviewWindow(jobFile);
-	return w->Go();
+
+#define PREVIEW_DRIVER_DEBUG 0
+
+
+PreviewDriver::PreviewDriver(BNode* spoolDir)
+	: PrinterDriver(spoolDir)
+{
+};
+
+
+PreviewDriver::~PreviewDriver()
+{
 }
 
-PrinterDriver* instanciate_driver(BNode *spoolDir)
+
+status_t
+PreviewDriver::PrintJob(BFile *jobFile, BMessage *jobMsg)
+{
+#if PREVIEW_DRIVER_DEBUG
+	return PrinterDriver::PrintJob(jobFile, jobMessage)
+#else
+	PreviewWindow* w = new PreviewWindow(jobFile);
+	return w->Go();
+#endif
+}
+
+
+PrinterDriver*
+instanciate_driver(BNode *spoolDir)
 {
 	return new PreviewDriver(spoolDir);
 }
-
-// About dialog text:
-const char* 
-kAbout =
-"Preview for Haiku\n"
-"© 2003-2007 Haiku\n"
-"by Michael Pfeiffer\n"
-"\n"
-"Based on PDF Writer by\nPhilippe Houdoin, Simon Gauvin, Michael Pfeiffer\n"
-;
-
-

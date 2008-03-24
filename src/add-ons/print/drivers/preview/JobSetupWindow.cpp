@@ -1,255 +1,180 @@
 /*
- * Copyright 2003-2007, Haiku. All rights reserved.
+ * Copyright 2003-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Philippe Houdoin
- *		Simon Gauvin	
+ *		Simon Gauvin
  *		Michael Pfeiffer
+ *		julun <host.haiku@gmx.de>
  */
 
-#include <InterfaceKit.h>
-#include <SupportKit.h>
+#include "JobSetupWindow.h"
+#include "PrinterDriver.h"
+
+
 #include <stdlib.h>
 
-#include "PrinterDriver.h"
-#include "JobSetupWindow.h"
 
-// --------------------------------------------------
+#include <Box.h>
+#include <Button.h>
+#include <RadioButton.h>
+#include <Screen.h>
+#include <TextControl.h>
+
+
 JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
-	:	BlockingWindow(BRect(0, 0, 320, 160), "Job Setup", B_TITLED_WINDOW_LOOK,
+	:	BlockingWindow(BRect(0, 0, 300, 200), "Job Setup", B_TITLED_WINDOW_LOOK,
  			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE)
+ 			B_NOT_ZOOMABLE),
+	fPrinterName(printerName),
+	fSetupMsg(msg)
 {
-	MoveTo(300, 300);
+	if (printerName)
+		SetTitle(BString(printerName).Append(" Job Setup").String());
 
-	fSetupMsg	= msg;
-	
-	if (printerName) {
-		BString	title;
-		title << printerName << " Job Setup";
-		SetTitle(title.String());
-		fPrinterName = printerName;
-	}
-	
-	// ---- Ok, build a default job setup user interface
-	BRect			r;
-	BBox			*panel;
-	BBox			*line;
-	BButton	 		*ok;
-	BButton			*cancel;
-	BStringView		*sv;
-	float			x, y, w, h;
-	float			indent;
-	int32           copies;
-	int32           firstPage;
-	int32           lastPage;
-	bool            allPages;
-	char            buffer[80];
-	
-	// PrinterDriver ensures that property exists
-	fSetupMsg->FindInt32("copies",     &copies);
+	int32 firstPage;
 	fSetupMsg->FindInt32("first_page", &firstPage);
-	fSetupMsg->FindInt32("last_page",  &lastPage);
-	
-	allPages = firstPage == 1 && lastPage == MAX_INT32;
 
-	r = Bounds();
+	int32 lastPage;
+	fSetupMsg->FindInt32("last_page", &lastPage);
+	bool allPages = firstPage == 1 && lastPage == LONG_MAX;
 
-	// add a *dialog* background
-	panel = new BBox(r, "top_panel", B_FOLLOW_ALL, 
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-		B_PLAIN_BORDER);
+	BRect bounds(Bounds());
+	BBox *panel = new BBox(bounds, "background", B_FOLLOW_ALL,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
+	AddChild(panel);
 
-	const int kMargin = 6;
+	bounds.InsetBy(10.0, 10.0);
 
-	//const char *kCopiesLabel				= "Copies:";
-	const char *kCopiesLabelExtraSpace		= "Copies:##";
-	const char *kPagesRangeLabel			= "Pages:";
-	const char *kAllPagesLabel				= "All";
-	const char *kPagesRangeSelectionLabel	= "";
-	const char *kFromLabel					= "From:";
-	const char *kFromLabelExtraSpace		= "From:##";
-	const char *kToLabel					= "To:";
-	const char *kToLabelExtraSpace			= "To:##";
-
-	r = panel->Bounds();
-
-	x = r.left + kMargin;
-	y = r.top + kMargin;
-	
-	
-	// add a "copies" input field
-
-/* Simon: temporarily removed this code
-	sprintf(buffer, "%d", (int)copies);
-	fCopies = new BTextControl(BRect(x, y, x+100, y+20), "copies", kCopiesLabel,
-								buffer, new BMessage(NB_COPIES_MSG));
-	fCopies->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fCopies->ResizeToPreferred();
-	fCopies->GetPreferredSize(&w, &h);
-	panel->AddChild(fCopies);
-	
-	y += h + kMargin;	// "new line"
-*/
-	// add a "pages" label
-	sv = new BStringView(BRect(x, y, x+100, y+20), "pages_range", kPagesRangeLabel);
-	panel->AddChild(sv);
-	sv->ResizeToPreferred();
-	sv->GetPreferredSize(&w, &h);
-
-	// align "copies" textcontrol field on the "allPages" radiobutton bellow...
-	indent = be_plain_font->StringWidth(kCopiesLabelExtraSpace);
-	w += kMargin;
-	if ( w > indent )
-		indent = w;
-	// fCopies->SetDivider(indent);
-
-	x += indent;
-
-	// add a "all" radiobutton
-	fAll = new BRadioButton(BRect(x, y, x+100, y+20), "all_pages", kAllPagesLabel,
-						new BMessage(ALL_PAGES_MGS));
-	fAll->ResizeToPreferred();
-	fAll->GetPreferredSize(&w, &h);
-	fAll->SetValue(allPages);
+	fAll = new BRadioButton(bounds, "allPages", "Print all pages",
+		new BMessage(ALL_PAGES_MGS));
 	panel->AddChild(fAll);
+	fAll->ResizeToPreferred();
+	fAll->SetValue(allPages);
 
-	y += h + kMargin;	// "new line"
-
-	// add a range selection raddiobutton
-	fRange = new BRadioButton(BRect(x, y, x+100, y+20), "pages_range_selection", kPagesRangeSelectionLabel,
-						new BMessage(RANGE_SELECTION_MSG));
-	fRange->ResizeToPreferred();
-	fRange->GetPreferredSize(&w, &h);
-	fRange->SetValue(!allPages);
+	bounds.OffsetBy(0.0, fAll->Bounds().Height() + 10.0);
+	fRange = new BRadioButton(bounds, "pagesRange", "Print pages:",
+		new BMessage(RANGE_SELECTION_MSG));
 	panel->AddChild(fRange);
+	fRange->ResizeToPreferred();
+	fRange->SetValue(!allPages);
 
-	x += w + kMargin;
-	
-	// add a "from" field
-	if (allPages) { 
-		buffer[0] = 0;
-	} else {
-		sprintf(buffer, "%d", (int)firstPage);
-	}
-	fFrom = new BTextControl(BRect(x, y, x+100, y+20), "from_field", kFromLabel, buffer,
-							new BMessage(RANGE_FROM_MSG));
-	fFrom->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fFrom->SetDivider(be_plain_font->StringWidth(kFromLabelExtraSpace));
-	fFrom->ResizeToPreferred();
-	fFrom->GetPreferredSize(&w, &h);
+	bounds.OffsetBy(0.0, fRange->Bounds().Height() + 5.0);
+	BRect rect(bounds);
+	rect.right = be_plain_font->StringWidth("From: SomeSpaceHere");
+	fFrom = new BTextControl(rect, "from", "From:", "SomeSpaceHere", NULL);
 	panel->AddChild(fFrom);
+	fFrom->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+	fFrom->ResizeToPreferred();
+	fFrom->SetDivider(be_plain_font->StringWidth("From: "));
+	fFrom->SetEnabled(!allPages);
 
-	x += w + kMargin;
-	
-	// add a "to" field
-	if (allPages) {
-		buffer[0] = 0;
-	} else {
-		sprintf(buffer, "%d", (int)lastPage);
-	} 
-	fTo = new BTextControl(BRect(x, y, x+100, y+20), "to_field", kToLabel, buffer,
-							new BMessage(RANGE_TO_MSG));
-	fTo->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fTo->SetDivider(be_plain_font->StringWidth(kToLabelExtraSpace));
-	fTo->ResizeToPreferred();
-	fTo->GetPreferredSize(&w, &h);
+	fTo = new BTextControl(rect, "to", "To:", "SomeSpaceHere", NULL);
 	panel->AddChild(fTo);
+	fTo->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
+	fTo->ResizeToPreferred();
+	fTo->SetDivider(be_plain_font->StringWidth("To: "));
+	fTo->MoveTo(fFrom->Frame().right + 10.0, fTo->Frame().top);
+	fTo->SetEnabled(!allPages);
 
-	y += h + kMargin + kMargin;	// "new line"
-	x = r.left + kMargin;
+	BString buffer;
+	buffer << firstPage;
+	fFrom->SetText(buffer.String());
 
-	// add a separator line...
-	line = new BBox(BRect(r.left, y - 1, r.right, y), NULL,
-						 B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
+	buffer = "";
+	buffer << lastPage;
+	fTo->SetText(buffer.String());
+
+	for (uint32 i = 0; i < '0'; i++) {
+		fTo->TextView()->DisallowChar(i);
+		fFrom->TextView()->DisallowChar(i);
+	}
+
+	for (uint32 i = '9' + 1; i < 255; i++) {
+		fTo->TextView()->DisallowChar(i);
+		fFrom->TextView()->DisallowChar(i);
+	}
+
+	bounds.OffsetBy(0.0, fTo->Bounds().Height() + 10.0);
+	BBox *line = new BBox(BRect(bounds.left - 5.0, bounds.top, bounds.right + 5.0,
+		bounds.top + 1.0), NULL, B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP );
 	panel->AddChild(line);
 
-	y += 2 + kMargin + kMargin;	// "new line"
-
-	// add a "OK" button, and make it default
-	ok 	= new BButton(BRect(x, y, x+100, y+20), NULL, "OK", new BMessage(OK_MSG), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	ok->MakeDefault(true);
-	ok->ResizeToPreferred();
-	ok->GetPreferredSize(&w, &h);
-	x = r.right - w - kMargin;
-	ok->MoveTo(x, ok->Frame().top);	// put the ok bottom at bottom right corner
-	panel->AddChild(ok);
-
-	// add a "Cancel" button	
-	cancel 	= new BButton(BRect(x, y, x + 100, y + 20), NULL, "Cancel", new BMessage(CANCEL_MSG), B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	cancel->ResizeToPreferred();
-	cancel->GetPreferredSize(&w, &h);
-	cancel->MoveTo(x - w - kMargin, y);	// put cancel button left next the ok button
+	bounds.OffsetBy(0.0, 11.0);
+	BButton *cancel = new BButton(bounds, NULL, "Cancel", new BMessage(CANCEL_MSG));
 	panel->AddChild(cancel);
+	cancel->ResizeToPreferred();
 
-	// Finally, add our panel to window
-	AddChild(panel);
-	
-	// Auto resize window
-	ResizeTo(ok->Frame().right + kMargin, ok->Frame().bottom + kMargin);
+	BButton *ok = new BButton(bounds, NULL, "OK", new BMessage(OK_MSG));
+	panel->AddChild(ok, cancel);
+	ok->ResizeToPreferred();
+
+	bounds.right = fTo->Frame().right;
+	ok->MoveTo(bounds.right - ok->Bounds().Width(), ok->Frame().top);
+
+	bounds = ok->Frame();
+	cancel->MoveTo(bounds.left - cancel->Bounds().Width() - 10.0, bounds.top);
+
+	ok->MakeDefault(true);
+	ResizeTo(bounds.right + 10.0, bounds.bottom + 10.0);
+
+	BRect winFrame(Frame());
+	BRect screenFrame(BScreen().Frame());
+	MoveTo((screenFrame.right - winFrame.right) / 2,
+		(screenFrame.bottom - winFrame.bottom) / 2);
 }
 
 
-// --------------------------------------------------
-void 
-JobSetupWindow::UpdateJobMessage() 
+void
+JobSetupWindow::UpdateJobMessage()
 {
-	int32 copies = 1;
-
-	int32 from;
-	int32 to;
-	if (fAll->Value() == B_CONTROL_ON) {
-		from = 1; to = MAX_INT32;
-	} else {
+	int32 from = 1;
+	int32 to = LONG_MAX;
+	if (fAll->Value() == B_CONTROL_OFF) {
 		from = atoi(fFrom->Text());
-		to   = atoi(fTo->Text());
+		to = atoi(fTo->Text());
 		if (from <= 0) from = 1;
 		if (to < from) to = from;
 	}
 
-	if (fSetupMsg->HasInt32("copies")) {
-		fSetupMsg->ReplaceInt32("copies", copies);
-	} else {
-		fSetupMsg->AddInt32("copies", copies);
-	}
-	if (fSetupMsg->HasInt32("first_page")) {
-		fSetupMsg->ReplaceInt32("first_page", from);
-	} else {
-		fSetupMsg->AddInt32("first_page", from);
-	}
-	if (fSetupMsg->HasInt32("last_page")) {
-		fSetupMsg->ReplaceInt32("last_page", to);
-	} else {
-		fSetupMsg->AddInt32("last_page", to);
-	}
+	int32 copies = 1;
+	fSetupMsg->RemoveName("copies");
+	fSetupMsg->AddInt32("copies", copies);
+
+	fSetupMsg->RemoveName("first_page");
+	fSetupMsg->AddInt32("first_page", from);
+
+	fSetupMsg->RemoveName("last_page");
+	fSetupMsg->AddInt32("last_page", to);
 }
 
 
-// --------------------------------------------------
-void 
+void
 JobSetupWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case OK_MSG:
+		case OK_MSG: {
 			UpdateJobMessage();
 			Quit(B_OK);
-			break;
-		
-		case CANCEL_MSG:
+		}	break;
+
+		case CANCEL_MSG: {
 			Quit(B_ERROR);
-			break;
+		}	break;
 
-		case RANGE_FROM_MSG:
-		case RANGE_TO_MSG:
-			fRange->SetValue(B_CONTROL_ON);
-			break;
+		case ALL_PAGES_MGS : {
+			fTo->SetEnabled(false);
+			fFrom->SetEnabled(false);
+		}	break;
 
-		default:
-			inherited::MessageReceived(msg);
-			break;
+		case RANGE_SELECTION_MSG : {
+			fTo->SetEnabled(true);
+			fFrom->SetEnabled(true);
+		}	break;
+
+		default: {
+			BlockingWindow::MessageReceived(msg);
+		}	break;
 	}
 }
-			
-
-

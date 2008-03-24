@@ -2,15 +2,14 @@ SubDir HAIKU_TOP src add-ons print drivers preview ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print ] ; 
-SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ; 
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) headers private print utils ] ;
 
 UsePrivateHeaders interface ;
 
 AddResources Preview : Preview.rsrc ;
 
 Addon Preview :
-	PrinterSetupWindow.cpp
 	PageSetupWindow.cpp
 	JobSetupWindow.cpp
 	Driver.cpp
@@ -18,8 +17,8 @@ Addon Preview :
 	PrinterDriver.cpp
 	PreviewDriver.cpp
 	:
-	be 
-	root 
+	be
+	root
 	libprintutils.a
 ;
 

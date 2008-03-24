@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,7 +11,8 @@
 
 class PreviewDriver : public PrinterDriver {
 public:
-	PreviewDriver(BNode* spoolDir) : PrinterDriver(spoolDir) {};
-	~PreviewDriver() {};
-	virtual status_t 		PrintJob(BFile *jobFile, BMessage *jobMsg);	
+						PreviewDriver(BNode* spoolDir);
+						~PreviewDriver();
+
+	virtual status_t	PrintJob(BFile *jobFile, BMessage *jobMsg);
 };

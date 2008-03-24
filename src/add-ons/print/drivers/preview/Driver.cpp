@@ -1,126 +1,89 @@
 /*
- * Copyright 2001-2007, Haiku. All rights reserved.
+ * Copyright 2001-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Philippe Houdoin
- *		Simon Gauvin	
+ *		Simon Gauvin
  *		Michael Pfeiffer
  */
-
 
 #include <stdio.h>
 #include <string.h>
 
+
 #include <StorageKit.h>
+
 
 #include "Driver.h"
 #include "PrinterDriver.h"
 
-// --------------------------------------------------
-BMessage* 
-take_job(BFile *spoolFile, BNode *spoolDir, BMessage *msg) 
+
+BMessage*
+take_job(BFile *spoolFile, BNode *spoolDir, BMessage *msg)
 {
-	PrinterDriver *driver;
-	
-	driver = instanciate_driver(spoolDir);
-	if (driver->PrintJob(spoolFile, msg) == B_OK) {
-		msg = new BMessage('okok');
-	} else {	
-		msg = new BMessage('baad');
-	}
+	PrinterDriver *driver = instanciate_driver(spoolDir);
+	status_t status = driver->PrintJob(spoolFile, msg);
 	delete driver;
-			
+
+	msg = new BMessage('okok');
+	if (status != B_OK)
+		msg->what = 'baad';
+
 	return msg;
 }
 
 
-// --------------------------------------------------
-BMessage* 
-config_page(BNode *spoolDir, BMessage *msg) 
+BMessage*
+config_page(BNode *spoolDir, BMessage *msg)
 {
-	BMessage		*pagesetupMsg = new BMessage(*msg);
-	PrinterDriver	*driver;
-	const char		*printerName;
-	char			buffer[B_ATTR_NAME_LENGTH+1];
+	BString printerName;
+	spoolDir->ReadAttrString("Printer Name", &printerName);
 
-	// retrieve the printer (spool) name.
-	printerName = NULL;
-	if (spoolDir->ReadAttr("Printer Name", B_STRING_TYPE, 1, buffer, B_ATTR_NAME_LENGTH+1) > 0) {
-		printerName = buffer;
-	}
+	BMessage *pagesetupMsg = new BMessage(*msg);
+	pagesetupMsg->what = 'okok';
 
-	driver = instanciate_driver(spoolDir);
-	if (driver->PageSetup(pagesetupMsg, printerName) == B_OK) {
-		pagesetupMsg->what = 'okok';
-	} else {
+	PrinterDriver *driver = instanciate_driver(spoolDir);
+	if (driver->PageSetup(pagesetupMsg, printerName.String()) != B_OK) {
 		delete pagesetupMsg;
 		pagesetupMsg = NULL;
 	}
-		
 	delete driver;
-	
 	return pagesetupMsg;
 }
 
 
-// --------------------------------------------------
-BMessage* 
+BMessage*
 config_job(BNode *spoolDir, BMessage *msg)
 {
-	BMessage		*jobsetupMsg = new BMessage(*msg);
-	PrinterDriver	*driver;
-	const char		*printerName;
-	char			buffer[B_ATTR_NAME_LENGTH+1];
+	BString printerName;
+	spoolDir->ReadAttrString("Printer Name", &printerName);
 
-	// retrieve the printer (spool) name.
-	printerName = NULL;
-	if (spoolDir->ReadAttr("Printer Name", B_STRING_TYPE, 1, buffer, B_ATTR_NAME_LENGTH+1) > 0) {
-		printerName = buffer;
-	}
-	driver = instanciate_driver(spoolDir);
-	if (driver->JobSetup(jobsetupMsg, printerName) == B_OK) {
-		jobsetupMsg->what = 'okok';
-	} else {
+	BMessage *jobsetupMsg = new BMessage(*msg);
+	jobsetupMsg->what = 'okok';
+
+	PrinterDriver *driver = instanciate_driver(spoolDir);
+	if (driver->JobSetup(jobsetupMsg, printerName.String()) != B_OK) {
 		delete jobsetupMsg;
 		jobsetupMsg = NULL;
 	}
-
 	delete driver;
-	
 	return jobsetupMsg;
 }
 
 
-// --------------------------------------------------
-char* 
+char*
 add_printer(char *printerName)
 {
-	status_t st;
-	PrinterDriver* driver;
-	driver = instanciate_driver(NULL);
-	st = driver->PrinterSetup(printerName);
-	delete driver;
-	if (st == B_OK) {
-		return printerName; 
-	} else {
-		return NULL;
-	}
+	return printerName;
 }
 
-/**
- * default_settings  
- *
- * @param BNode* printer spool directory
- * @return BMessage* the settings
- */
-BMessage* 
+
+BMessage*
 default_settings(BNode* spoolDir)
 {
-	PrinterDriver* driver;
-	BMessage* settings;
-	driver = instanciate_driver(spoolDir);
-	settings = driver->GetDefaultSettings();
+	PrinterDriver *driver = instanciate_driver(spoolDir);
+	BMessage *settings = driver->GetDefaultSettings();
 	delete driver;
 	return settings;
 }

@@ -1,65 +1,54 @@
 /*
- * Copyright 2003-2007, Haiku. All rights reserved.
+ * Copyright 2003-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Philippe Houdoin
- *		Simon Gauvin	
+ *		Simon Gauvin
  *		Michael Pfeiffer
- *		Hartmut Reh
+ *		Dr. Hartmut Reh
+ *		julun <host.haiku@gmx.de>
  */
 
 #ifndef PAGESETUPWINDOW_H
 #define PAGESETUPWINDOW_H
 
-#include <InterfaceKit.h>
-#include <Message.h>
-#include <Messenger.h>
-#include <File.h>
-#include <FindDirectory.h>
-#include <Path.h>
-#include <String.h>
+
 #include "InterfaceUtils.h"
 #include "Utils.h"
 
+
+#include <String.h>
+
+
+class BMessage;
+class BMenuField;
+class BTextControl;
 class MarginView;
 
-class PageSetupWindow : public BlockingWindow 
+
+class PageSetupWindow : public BlockingWindow
 {
 public:
-	// Constructors, destructors, operators...
+					PageSetupWindow(BMessage *msg, const char *printerName = NULL);
+	virtual void 	MessageReceived(BMessage *msg);
 
-							PageSetupWindow(BMessage *msg, const char *printerName = NULL);
-
-	typedef BlockingWindow 		inherited;
-
-	// public constantes
-	enum {
-		OK_MSG				= 'ok__',
-		CANCEL_MSG			= 'cncl',
-	};
-			
-	// Virtual function overrides
-public:	
-	virtual void 			MessageReceived(BMessage *msg);
-
-	// From here, it's none of your business! ;-)
+	enum			{
+						OK_MSG = 'ok__',
+						CANCEL_MSG = 'cncl',
+						PAGE_SIZE_CHANGED = 'pgsz',
+						ORIENTATION_CHANGED = 'ornt'
+					};
 private:
-	BMessage *				fSetupMsg;
-	BMenuField *			fPageSizeMenu;
-	BMenuField *			fOrientationMenu;
-	BTextControl *          fScaleControl;
-		
-	void					UpdateSetupMessage();
+	void			UpdateSetupMessage();
 
-	MarginView * 			fMarginView;
-	
-	// used for saving settings 
-	BString					fPrinterDirName;
-
-	//private class constants
-	static const int kMargin = 10;
-	static const int kOffset = 200;
+private:
+	BMessage *		fSetupMsg;
+	BMenuField *	fPageSizeMenu;
+	BMenuField *	fOrientationMenu;
+	BTextControl *	fScaleControl;
+	MarginView *	fMarginView;
+	BString			fPrinterDirName;
 };
 
 #endif
