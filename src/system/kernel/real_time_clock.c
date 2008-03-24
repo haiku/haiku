@@ -17,7 +17,7 @@
 
 #include <stdlib.h>
 
-#define TRACE_TIME
+//#define TRACE_TIME
 #ifdef TRACE_TIME
 #	define TRACE(x) dprintf x
 #else
