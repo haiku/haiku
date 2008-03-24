@@ -34,6 +34,8 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 //#define DEBUG 7
 #include <MediaRoster.h>
 
+#include <new>
+
 #include <Locker.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -1951,8 +1953,10 @@ BMediaRoster::Roster(status_t *out_error)
 		*out_error = B_OK;
 	if (_sDefault == NULL) {
 		status_t err;
-		_sDefault = new BMediaRosterEx(&err);
-		if (err != B_OK) {
+		_sDefault = new (std::nothrow) BMediaRosterEx(&err);
+		if (_sDefault == NULL)
+			err = B_NO_MEMORY;
+		else if (err != B_OK) {
 			if (_sDefault) {
 				_sDefault->Lock();
 				_sDefault->Quit();
@@ -2061,26 +2065,27 @@ BMediaRoster::GetParameterWebFor(const media_node & node,
 			// no parameter web available
 			// XXX should we return an error?
 			ERROR("BMediaRoster::GetParameterWebFor node %ld has no parameter web\n", node.node);
-			*out_web = new BParameterWeb();
+			*out_web = new (std::nothrow) BParameterWeb();
 			delete_area(area);
-			return B_OK;
+			return *out_web != NULL ? B_OK : B_NO_MEMORY;
 		}
 		if (reply.size > 0) {
 			// we got a flattened parameter web!
-			*out_web = new BParameterWeb();
-			
-			printf("BMediaRoster::GetParameterWebFor Unflattening %ld bytes, 0x%08lx, 0x%08lx, 0x%08lx, 0x%08lx\n",
-				reply.size, ((uint32*)data)[0], ((uint32*)data)[1], ((uint32*)data)[2], ((uint32*)data)[3]);
-			
-			rv = (*out_web)->Unflatten(reply.code, data, reply.size);
+			*out_web = new (std::nothrow) BParameterWeb();
+			if (*out_web == NULL)
+				rv = B_NO_MEMORY;
+			else {
+				printf("BMediaRoster::GetParameterWebFor Unflattening %ld bytes, 0x%08lx, 0x%08lx, 0x%08lx, 0x%08lx\n",
+					reply.size, ((uint32*)data)[0], ((uint32*)data)[1], ((uint32*)data)[2], ((uint32*)data)[3]);
+
+				rv = (*out_web)->Unflatten(reply.code, data, reply.size);
+			}
 			if (rv != B_OK) {
 				ERROR("BMediaRoster::GetParameterWebFor Unflatten failed, %s\n", strerror(rv));
-				delete_area(area);
 				delete *out_web;
-				return B_ERROR;
 			}
 			delete_area(area);
-			return B_OK;
+			return rv;
 		}
 		delete_area(area);
 		ASSERT(reply.size == -1);
