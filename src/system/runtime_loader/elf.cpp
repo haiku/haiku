@@ -1022,8 +1022,10 @@ find_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 	image_t** foundInImage)
 {
 	// If not simulating BeOS style symbol resolution, undefined symbols are
-	// search recursively starting from the root image. (Note, breadth first
-	// might be better than the depth first use here.)
+	// searched recursively starting from the root image.
+	// TODO: Breadth first might be better than the depth first strategy used
+	// here. We're also visiting images multiple times. Consider building a
+	// breadth-first sorted array of images for each root image.
 	if ((rootImage->flags & IMAGE_FLAG_R5_SYMBOL_RESOLUTION) == 0) {
 		Elf32_Sym* symbol = find_symbol_recursively(rootImage, name,
 			foundInImage);
