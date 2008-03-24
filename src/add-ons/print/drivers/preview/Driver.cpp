@@ -13,6 +13,7 @@
 
 
 #include <StorageKit.h>
+#include <String.h>
 
 
 #include "Driver.h"
