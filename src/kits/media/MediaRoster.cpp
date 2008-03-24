@@ -67,9 +67,9 @@ namespace BPrivate { namespace media {
 	public:
 		~DefaultDeleter()
 		{
-			if (BMediaRoster::_sDefault) {
-				BMediaRoster::_sDefault->Lock();
-				BMediaRoster::_sDefault->Quit();
+			if (BMediaRoster::sDefaultInstance) {
+				BMediaRoster::sDefaultInstance->Lock();
+				BMediaRoster::sDefaultInstance->Quit();
 			}
 		}
 	};
@@ -1951,23 +1951,23 @@ BMediaRoster::Roster(status_t *out_error)
 	locker.Lock();
 	if (out_error)
 		*out_error = B_OK;
-	if (_sDefault == NULL) {
+	if (sDefaultInstance == NULL) {
 		status_t err;
-		_sDefault = new (std::nothrow) BMediaRosterEx(&err);
-		if (_sDefault == NULL)
+		sDefaultInstance = new (std::nothrow) BMediaRosterEx(&err);
+		if (sDefaultInstance == NULL)
 			err = B_NO_MEMORY;
 		else if (err != B_OK) {
-			if (_sDefault) {
-				_sDefault->Lock();
-				_sDefault->Quit();
-				_sDefault = NULL;
+			if (sDefaultInstance) {
+				sDefaultInstance->Lock();
+				sDefaultInstance->Quit();
+				sDefaultInstance = NULL;
 			}
 			if (out_error)
 				*out_error = err;
 		}
 	}
 	locker.Unlock();
-	return _sDefault;
+	return sDefaultInstance;
 }
 
 
@@ -1976,7 +1976,7 @@ BMediaRoster::Roster(status_t *out_error)
 /* static */ BMediaRoster * 
 BMediaRoster::CurrentRoster()			
 {
-	return _sDefault;
+	return sDefaultInstance;
 }
 
 												
@@ -2927,7 +2927,7 @@ BMediaRoster::~BMediaRoster()
 
 	// Unset the global instance pointer, the destructor is also called
 	// if a client app calls Lock(); and Quit(); directly.
-	_sDefault = NULL;
+	sDefaultInstance = NULL;
 }
 
 
@@ -2968,6 +2968,7 @@ BMediaRoster::BMediaRoster() :
 }
 
 
+// TODO: Looks like these can be safely removed:
 /* static */ status_t
 BMediaRoster::ParseCommand(BMessage & reply)
 {
@@ -2995,13 +2996,8 @@ BMediaRoster::SetRunningDefault(media_node_id for_default,
 }
 
 
-/*************************************************************
- * static BMediaRoster variables
- *************************************************************/
+// #pragma mark - static variables
 
-bool BMediaRoster::_isMediaServer;
-port_id BMediaRoster::_mReplyPort;
-int32 BMediaRoster::_mReplyPortRes;
-int32 BMediaRoster::_mReplyPortUnavailCount;
-BMediaRoster * BMediaRoster::_sDefault = NULL;
+
+BMediaRoster* BMediaRoster::sDefaultInstance = NULL;
 
