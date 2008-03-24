@@ -1181,6 +1181,9 @@ MessageView::SetTo(BMessage& message)
 
 	type_code type;
 	int32 count;
+#ifdef HAIKU_TARGET_PLATFORM_DANO
+	const
+#endif
 	char* name;
 	for (int32 i = 0; message.GetInfo(B_ANY_TYPE, i, &name, &type, &count)
 			== B_OK; i++) {
