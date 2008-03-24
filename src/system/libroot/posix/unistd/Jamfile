@@ -10,7 +10,7 @@ MergeObject posix_unistd.o :
 	conf.c
 	directory.c
 	dup.c
-	exec.c
+	exec.cpp
 	_exit.c
 	fcntl.c
 	fork.c
