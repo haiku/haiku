@@ -28,10 +28,12 @@
  */
 
 /* to comply with the license above, do not remove the following line */
-char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus Overhagen <Marcus@Overhagen.de>";
+char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
+	"Overhagen <Marcus@Overhagen.de>";
 
 //#define DEBUG 7
 #include <MediaRoster.h>
+
 #include <Locker.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -42,6 +44,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus Ove
 #include <ParameterWeb.h>
 #include <BufferProducer.h>
 #include <BufferConsumer.h>
+
 #include "debug.h"
 #include "MediaRosterEx.h"
 #include "MediaMisc.h"
@@ -112,11 +115,13 @@ BMediaRosterEx::SaveNodeConfiguration(BMediaNode *node)
 }
 
 status_t
-BMediaRosterEx::LoadNodeConfiguration(media_addon_id addonid, int32 flavorid, BMessage *out_msg)
+BMediaRosterEx::LoadNodeConfiguration(media_addon_id addonid, int32 flavorid,
+	BMessage *out_msg)
 {
 	// XXX fix this
 	out_msg->MakeEmpty(); // to be fully R5 compliant
-	printf("### BMediaRosterEx::LoadNodeConfiguration should load addon-id %ld, flavor-id %ld config NOW!\n", addonid, flavorid);
+	printf("### BMediaRosterEx::LoadNodeConfiguration should load addon-id "
+		"%ld, flavor-id %ld config NOW!\n", addonid, flavorid);
 	return B_OK;
 }
 
@@ -2914,6 +2919,10 @@ BMediaRoster::~BMediaRoster()
 	server_unregister_app_reply reply;
 	request.team = team;
 	QueryServer(SERVER_UNREGISTER_APP, &request, sizeof(request), &reply, sizeof(reply));
+
+	// Unset the global instance pointer, the destructor is also called
+	// if a client app calls Lock(); and Quit(); directly.
+	_sDefault = NULL;
 }
 
 
