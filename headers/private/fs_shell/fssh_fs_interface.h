@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_FS_INTERFACE_H
@@ -28,16 +28,7 @@ typedef void *fssh_fs_volume;
 typedef void *fssh_fs_cookie;
 typedef void *fssh_fs_vnode;
 
-/* passed to write_stat() */
-enum fssh_write_stat_mask {
-	FSSH_FS_WRITE_STAT_MODE		= 0x0001,
-	FSSH_FS_WRITE_STAT_UID		= 0x0002,
-	FSSH_FS_WRITE_STAT_GID		= 0x0004,
-	FSSH_FS_WRITE_STAT_SIZE		= 0x0008,
-	FSSH_FS_WRITE_STAT_ATIME	= 0x0010,
-	FSSH_FS_WRITE_STAT_MTIME	= 0x0020,
-	FSSH_FS_WRITE_STAT_CRTIME	= 0x0040
-};
+/* additional flags passed to write_stat() */
 
 /* passed to write_fs_info() */
 #define	FSSH_FS_WRITE_FSINFO_NAME	0x0001
@@ -51,7 +42,7 @@ struct fssh_file_io_vec {
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 typedef struct fssh_file_system_module_info {
 	struct fssh_module_info	info;
@@ -68,7 +59,7 @@ typedef struct fssh_file_system_module_info {
 	void (*free_partition_content_cookie)(fssh_partition_data *partition);
 
 	/* general operations */
-	fssh_status_t (*mount)(fssh_mount_id id, const char *device, uint32_t flags, 
+	fssh_status_t (*mount)(fssh_mount_id id, const char *device, uint32_t flags,
 				const char *args, fssh_fs_volume *_fs,
 				fssh_vnode_id *_rootVnodeID);
 	fssh_status_t (*unmount)(fssh_fs_volume fs);
@@ -235,7 +226,7 @@ typedef struct fssh_file_system_module_info {
 	fssh_status_t (*close_query)(fssh_fs_volume fs, fssh_fs_cookie cookie);
 	fssh_status_t (*free_query_cookie)(fssh_fs_volume fs,
 				fssh_fs_cookie cookie);
-	fssh_status_t (*read_query)(fssh_fs_volume fs, fssh_fs_cookie cookie, 
+	fssh_status_t (*read_query)(fssh_fs_volume fs, fssh_fs_cookie cookie,
 				struct fssh_dirent *buffer, fssh_size_t bufferSize,
 				uint32_t *_num);
 	fssh_status_t (*rewind_query)(fssh_fs_volume fs, fssh_fs_cookie cookie);

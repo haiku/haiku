@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -342,8 +342,8 @@ Settings::Update(BMessage* message)
 	int32 fields;
 	if (opcode == B_STAT_CHANGED
 		&& message->FindInt32("fields", &fields) == B_OK
-		&& (fields & FS_WRITE_STAT_MTIME) == 0) {
-		// only update when the modified time has changed
+		&& (fields & (B_STAT_MODIFICATION_TIME | B_STAT_SIZE)) == 0) {
+		// only update when the modified time or size has changed
 		return B_OK;
 	}
 

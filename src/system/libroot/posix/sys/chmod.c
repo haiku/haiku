@@ -1,10 +1,10 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include <fs_interface.h>
+#include <NodeMonitor.h>
 
 #include <sys/stat.h>
 #include <syscalls.h>
@@ -27,7 +27,7 @@ chmod(const char *path, mode_t mode)
 
 	stat.st_mode = mode;
 	status = _kern_write_stat(-1, path, true, &stat, sizeof(struct stat),
-		FS_WRITE_STAT_MODE);
+		B_STAT_MODE);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -41,7 +41,7 @@ fchmod(int fd, mode_t mode)
 
 	stat.st_mode = mode;
 	status = _kern_write_stat(fd, NULL, false, &stat, sizeof(struct stat),
-		FS_WRITE_STAT_MODE);
+		B_STAT_MODE);
 
 	RETURN_AND_SET_ERRNO(status);
 }

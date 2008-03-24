@@ -24,6 +24,7 @@
 #include "fssh_errno.h"
 #include "fssh_errors.h"
 #include "fssh_module.h"
+#include "fssh_node_monitor.h"
 #include "fssh_stat.h"
 #include "fssh_string.h"
 #include "fssh_type_constants.h"
@@ -94,7 +95,7 @@ init_kernel()
 		return rootDev;
 	}
 
-	// set cwd to "/"	
+	// set cwd to "/"
 	error = _kern_setcwd(-1, "/");
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "setting cwd failed: %s\n", fssh_strerror(error));
@@ -348,7 +349,7 @@ command_chmod(int argc, const char* const* argv)
 		}
 
 		fssh_status_t error = _kern_write_stat(-1, file, false, &st, sizeof(st),
-			FSSH_FS_WRITE_STAT_MODE);
+			FSSH_B_STAT_MODE);
 		if (error != FSSH_B_OK) {
 			fprintf(stderr, "Error: Failed to change mode of \"%s\"!\n", file);
 			return error;
@@ -435,7 +436,7 @@ command_ln(int argc, const char* const* argv)
 				fprintf(stderr, "Error: Resulting target path is too long.\n");
 				return FSSH_B_BAD_VALUE;
 			}
-			
+
 			strcpy(targetBuffer, target);
 			strcat(targetBuffer, "/");
 			strcat(targetBuffer, leaf);
@@ -777,7 +778,7 @@ command_mkindex(int argc, const char* const* argv)
 	fssh_dev_t volumeID = get_volume_id();
 	if (volumeID < 0)
 		return volumeID;
-	
+
 	// create the index
 	fssh_status_t error =_kern_create_index(volumeID, indexName,
 		FSSH_B_STRING_TYPE, 0);
@@ -805,7 +806,7 @@ command_query(int argc, const char* const* argv)
 	fssh_dev_t volumeID = get_volume_id();
 	if (volumeID < 0)
 		return volumeID;
-	
+
 	// open query
 	int fd = _kern_open_query(volumeID, query, strlen(query), 0, -1, -1);
 	if (fd < 0) {
@@ -977,7 +978,7 @@ command_rm(int argc, char **argv)
 			}
 		}
 	}
-	
+
 	// check params
 	if (argi >= argc) {
 		fprintf(stderr, "Usage: %s [ -r ] <file>...\n", argv[0]);

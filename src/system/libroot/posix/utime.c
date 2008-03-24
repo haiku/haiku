@@ -1,10 +1,10 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include <fs_interface.h>
+#include <NodeMonitor.h>
 
 #include <utime.h>
 #include <time.h>
@@ -33,7 +33,7 @@ utime(const char *path, const struct utimbuf *times)
 		stat.st_atime = stat.st_mtime = time(NULL);
 
 	status = _kern_write_stat(-1, path, true, &stat, sizeof(struct stat),
-		FS_WRITE_STAT_MTIME | FS_WRITE_STAT_ATIME);
+		B_STAT_MODIFICATION_TIME | B_STAT_ACCESS_TIME);
 
 	RETURN_AND_SET_ERRNO(status);
 }

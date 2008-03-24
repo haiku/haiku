@@ -2499,24 +2499,24 @@ devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat,
 		stat));
 
 	// we cannot change the size of anything
-	if (statMask & FS_WRITE_STAT_SIZE)
+	if (statMask & B_STAT_SIZE)
 		return B_BAD_VALUE;
 
 	RecursiveLocker locker(&fs->lock);
 
-	if (statMask & FS_WRITE_STAT_MODE) {
+	if (statMask & B_STAT_MODE) {
 		vnode->stream.type = (vnode->stream.type & ~S_IUMSK)
 			| (stat->st_mode & S_IUMSK);
 	}
 
-	if (statMask & FS_WRITE_STAT_UID)
+	if (statMask & B_STAT_UID)
 		vnode->uid = stat->st_uid;
-	if (statMask & FS_WRITE_STAT_GID)
+	if (statMask & B_STAT_GID)
 		vnode->gid = stat->st_gid;
 
-	if (statMask & FS_WRITE_STAT_MTIME)
+	if (statMask & B_STAT_MODIFICATION_TIME)
 		vnode->modification_time = stat->st_mtime;
-	if (statMask & FS_WRITE_STAT_CRTIME)
+	if (statMask & B_STAT_CREATION_TIME)
 		vnode->creation_time = stat->st_crtime;
 
 	notify_stat_changed(fs->id, vnode->id, statMask);

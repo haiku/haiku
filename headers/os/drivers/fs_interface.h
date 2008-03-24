@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_INTERFACE_H
@@ -26,18 +26,9 @@ typedef void *fs_volume;
 typedef void *fs_cookie;
 typedef void *fs_vnode;
 
-/* passed to write_stat() */
-enum write_stat_mask {
-	FS_WRITE_STAT_MODE		= 0x0001,
-	FS_WRITE_STAT_UID		= 0x0002,
-	FS_WRITE_STAT_GID		= 0x0004,
-	FS_WRITE_STAT_SIZE		= 0x0008,
-	FS_WRITE_STAT_ATIME		= 0x0010,
-	FS_WRITE_STAT_MTIME		= 0x0020,
-	FS_WRITE_STAT_CRTIME	= 0x0040
-	// NOTE: Changing these constants will break
+/* additional flags passed to write_stat() (see NodeMonitor.h for the others) */
+	// NOTE: Changing the constants here or in NodeMonitor.h will break
 	// src/kits/storage/LibBeAdapter.cpp:_kern_write_stat().
-};
 
 /* passed to write_fs_info() */
 #define	FS_WRITE_FSINFO_NAME	0x0001
@@ -51,7 +42,7 @@ struct file_io_vec {
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 typedef struct file_system_module_info {
 	struct module_info	info;
@@ -68,7 +59,7 @@ typedef struct file_system_module_info {
 	void (*free_partition_content_cookie)(partition_data *partition);
 
 	/* general operations */
-	status_t (*mount)(dev_t id, const char *device, uint32 flags, 
+	status_t (*mount)(dev_t id, const char *device, uint32 flags,
 				const char *args, fs_volume *_fs, ino_t *_rootVnodeID);
 	status_t (*unmount)(fs_volume fs);
 
@@ -201,7 +192,7 @@ typedef struct file_system_module_info {
 				port_id port, uint32 token, fs_cookie *_cookie);
 	status_t (*close_query)(fs_volume fs, fs_cookie cookie);
 	status_t (*free_query_cookie)(fs_volume fs, fs_cookie cookie);
-	status_t (*read_query)(fs_volume fs, fs_cookie cookie, 
+	status_t (*read_query)(fs_volume fs, fs_cookie cookie,
 				struct dirent *buffer, size_t bufferSize, uint32 *_num);
 	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
 

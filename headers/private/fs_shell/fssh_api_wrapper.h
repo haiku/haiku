@@ -874,17 +874,6 @@
 #define fs_cookie	fssh_fs_cookie
 #define fs_vnode	fssh_fs_vnode
 
-/* passed to write_stat() */
-#define write_stat_mask	fssh_write_stat_mask
-
-#define FS_WRITE_STAT_MODE		FSSH_FS_WRITE_STAT_MODE
-#define FS_WRITE_STAT_UID		FSSH_FS_WRITE_STAT_UID
-#define FS_WRITE_STAT_GID		FSSH_FS_WRITE_STAT_GID
-#define FS_WRITE_STAT_SIZE		FSSH_FS_WRITE_STAT_SIZE
-#define FS_WRITE_STAT_ATIME		FSSH_FS_WRITE_STAT_ATIME
-#define FS_WRITE_STAT_MTIME		FSSH_FS_WRITE_STAT_MTIME
-#define FS_WRITE_STAT_CRTIME	FSSH_FS_WRITE_STAT_CRTIME
-
 /* passed to write_fs_info() */
 #define FS_WRITE_FSINFO_NAME	FSSH_FS_WRITE_FSINFO_NAME
 
@@ -896,7 +885,7 @@
 
 
 /* file system add-ons only prototypes */
-#define new_vnode 					fssh_new_vnode 
+#define new_vnode 					fssh_new_vnode
 #define publish_vnode				fssh_publish_vnode
 #define get_vnode					fssh_get_vnode
 #define put_vnode					fssh_put_vnode
@@ -1099,9 +1088,9 @@
 #define suspend_thread		fssh_suspend_thread
 
 #define rename_thread		fssh_rename_thread
-#define set_thread_priority	fssh_set_thread_priority 
+#define set_thread_priority	fssh_set_thread_priority
 #define exit_thread			fssh_exit_thread
-#define wait_for_thread 	fssh_wait_for_thread 
+#define wait_for_thread 	fssh_wait_for_thread
 #define on_exit_thread		fssh_on_exit_thread
 
 #define find_thread			fssh_find_thread
@@ -1497,7 +1486,7 @@
 #define sync		fssh_sync
 #define fsync		fssh_fsync
 
-/* access permissions */				
+/* access permissions */
 #define getegid		fssh_getegid
 #define geteuid		fssh_geteuid
 #define getgid		fssh_getgid
