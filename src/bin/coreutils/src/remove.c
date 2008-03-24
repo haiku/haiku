@@ -709,9 +709,9 @@ is_empty_dir (int fd_cwd, char const *dir)
   return saved_errno == 0 ? true : false;
 }
 
-/* Return -1 if FILE is an unwritable non-symlink,
-   0 if it is writable or some other type of file,
-   a positive error number if there is some problem in determining the answer.
+/* Return 1 if FILE is an unwritable non-symlink, 0 if it is writable or some
+   other type of file.
+   Returns -1 and sets errno if there is some problem in determining the answer.
    Set *BUF to the file status.
    This is to avoid calling euidaccess when FILE is a symlink.  */
 static int
@@ -721,7 +721,7 @@ write_protected_non_symlink (int fd_cwd,
 			     struct stat *buf)
 {
   if (cache_fstatat (fd_cwd, file, buf, AT_SYMLINK_NOFOLLOW) != 0)
-    return errno;
+    return -1;
   if (S_ISLNK (buf->st_mode))
     return 0;
   /* Here, we know FILE is not a symbolic link.  */
@@ -778,15 +778,18 @@ write_protected_non_symlink (int fd_cwd,
       = obstack_object_size (&ds->dir_stack) + strlen (file);
 
     if (MIN (PATH_MAX, 8192) <= file_name_len)
-      return - euidaccess_stat (buf, W_OK);
+      return !euidaccess_stat (buf, W_OK);
     if (euidaccess (full_filename (file), W_OK) == 0)
       return 0;
     if (errno == EACCES)
-      return 1;
+      {
+        errno = 0;
+        return 1;
+      }
 
     /* Perhaps some other process has removed the file, or perhaps this
        is a buggy NFS client.  */
-    return errno;
+    return -1;
   }
 }
 
@@ -814,33 +817,34 @@ prompt (int fd_cwd, Dirstack_state const *ds, char const *filename,
   if (x->interactive == RMI_NEVER)
     return RM_OK;
 
+  errno = 0;
+
   if (!x->ignore_missing_files
       & ((x->interactive == RMI_ALWAYS) | x->stdin_tty))
     write_protected = write_protected_non_symlink (fd_cwd, filename, ds, sbuf);
 
-  if (write_protected || x->interactive == RMI_ALWAYS)
+  if (write_protected || errno || x->interactive == RMI_ALWAYS)
     {
       char const *quoted_name = quote (full_filename (filename));
-      if (write_protected <= 0
-	  && cache_fstatat (fd_cwd, filename, sbuf, AT_SYMLINK_NOFOLLOW) != 0)
+      if (errno == 0)
 	{
-	  /* This happens, e.g., with `rm '''.  */
-	  write_protected = errno;
+	  /* May fail for, e.g., with `rm '''.  */
+	  cache_fstatat (fd_cwd, filename, sbuf, AT_SYMLINK_NOFOLLOW);
 	}
 
-      if (write_protected >= 0)
+      if (errno == 0)
 	{
 	  /* Using permissions doesn't make sense for symlinks.  */
 	  if (S_ISLNK (sbuf->st_mode) && x->interactive != RMI_ALWAYS)
 	    return RM_OK;
 
 	  if (S_ISDIR (sbuf->st_mode) && !x->recursive)
-	    write_protected = EISDIR;
+	    errno = EISDIR;
 	}
 
-      if (write_protected < 0)
+      if (errno != 0)
 	{
-	  error (0, write_protected, _("cannot remove %s"), quoted_name);
+	  error (0, errno, _("cannot remove %s"), quoted_name);
 	  return RM_ERROR;
 	}
 
