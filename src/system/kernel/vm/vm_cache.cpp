@@ -545,13 +545,16 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
 	ASSERT_LOCKED_MUTEX(&consumer->lock);
 
+	// Remove the store ref before locking the cache. Otherwise we'd call into
+	// the VFS while holding the cache lock, which would reverse the usual
+	// locking order.
+	if (cache->store->ops->release_ref)
+		cache->store->ops->release_ref(cache->store);
+
 	// remove the consumer from the cache, but keep its reference until later
 	mutex_lock(&cache->lock);
 	list_remove_item(&cache->consumers, consumer);
 	consumer->source = NULL;
-
-	if (cache->store->ops->release_ref)
-		cache->store->ops->release_ref(cache->store);
 
 	if (cache->areas == NULL && cache->source != NULL
 		&& !list_is_empty(&cache->consumers)
