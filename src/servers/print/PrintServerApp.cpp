@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku. All rights reserved.
+ * Copyright 2001-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,7 +31,7 @@
 // ANSI C
 #include <stdio.h>
 	// for printf
-#include <unistd.h> 
+#include <unistd.h>
 	// for unlink
 
 BLocker *gLock = NULL;
@@ -52,7 +52,7 @@ typedef char* (*add_printer_func_t)(const char* printer_name);
  *          application failed to start.
  */
 int
-main() 
+main()
 {
 	status_t rc = B_OK;
 	gLock = new BLocker();
@@ -85,12 +85,12 @@ PrintServerApp::PrintServerApp(status_t* err)
 {
 	fSettings = Settings::GetSettings();
 	LoadSettings();
-	
+
 	if (*err != B_OK)
 		return;
-		
+
 	fHasReferences = create_sem(1, "has_references");
-	
+
 	// Build list of transport addons
 	Transport::Scan(B_USER_ADDONS_DIRECTORY);
 	Transport::Scan(B_COMMON_ADDONS_DIRECTORY);
@@ -98,14 +98,14 @@ PrintServerApp::PrintServerApp(status_t* err)
 
 	SetupPrinterList();
 	RetrieveDefaultPrinter();
-	
+
 	// Cache icons for selected printer
 	fSelectedIconMini = new BBitmap(BRect(0,0,B_MINI_ICON-1,B_MINI_ICON-1), B_CMAP8);
-	fSelectedIconLarge = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);	
+	fSelectedIconLarge = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
 	BMimeType type(PRNT_SIGNATURE_TYPE);
 	type.GetIcon(fSelectedIconMini, B_MINI_ICON);
 	type.GetIcon(fSelectedIconLarge, B_LARGE_ICON);
-	
+
 	PostMessage(PSRV_PRINT_SPOOLED_JOB);
 		// Start handling of spooled files
 }
@@ -118,15 +118,15 @@ PrintServerApp::~PrintServerApp()
 }
 
 
-bool 
+bool
 PrintServerApp::QuitRequested()
 {
-	// don't quit when user types Command+Q! 
+	// don't quit when user types Command+Q!
 	BMessage* m = CurrentMessage();
-	bool shortcut;	
-	if (m != NULL && m->FindBool("shortcut", &shortcut) == B_OK && shortcut) 
+	bool shortcut;
+	if (m != NULL && m->FindBool("shortcut", &shortcut) == B_OK && shortcut)
 		return false;
-		
+
 	if (!Inherited::QuitRequested())
 		return false;
 
@@ -174,23 +174,23 @@ void
 PrintServerApp::RegisterPrinter(BDirectory* printer)
 {
 	BString transport, address, connection, state;
-	
-	if (printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport) == B_OK 
+
+	if (printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT, &transport) == B_OK
 		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, &address) == B_OK
 		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection) == B_OK
-		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK 
+		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK
 		&& state == "free") {
-	
+
  		BAutolock lock(gLock);
 		if (lock.IsLocked()) {
 			// check if printer is already registered
 			node_ref node;
-			if (printer->GetNodeRef(&node) != B_OK) 
+			if (printer->GetNodeRef(&node) != B_OK)
 				return;
-			
-			if (Printer::Find(&node) != NULL) 
+
+			if (Printer::Find(&node) != NULL)
 				return;
-			
+
 			// register new printer
 			Resource* r = fResourceManager.Allocate(transport.String(), address.String(), connection.String());
 		 	AddHandler(new Printer(printer, r));
@@ -204,7 +204,7 @@ void
 PrintServerApp::UnregisterPrinter(Printer* printer)
 {
 	RemoveHandler(printer);
-	Printer::Remove(printer);	
+	Printer::Remove(printer);
 	printer->Release();
 }
 
@@ -256,7 +256,7 @@ PrintServerApp::AttributeChanged(node_ref* node)
 // SetupPrinterList
 //
 // This method builds the internal list of printers from disk. It
-// also installs a node monitor to be sure that the list keeps 
+// also installs a node monitor to be sure that the list keeps
 // updated with the definitions on disk.
 //
 // Parameters:
@@ -275,12 +275,12 @@ PrintServerApp::SetupPrinterList()
 	rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path);
 	if (rc != B_OK)
 		return rc;
-	
+
 	// Directory has to exist in order to watch it
 	mode_t mode = 0777;
 	create_directory(path.Path(), mode);
 
-	BDirectory dir(path.Path());		
+	BDirectory dir(path.Path());
 	rc = dir.InitCheck();
 	if (rc != B_OK)
 		return rc;
@@ -288,21 +288,21 @@ PrintServerApp::SetupPrinterList()
 	// Register printer definition nodes
 	BEntry entry;
 	while(dir.GetNextEntry(&entry) == B_OK) {
-		if (!entry.IsDirectory()) 
+		if (!entry.IsDirectory())
 			continue;
 
 		BDirectory node(&entry);
 		BNodeInfo info(&node);
-		char buffer[256];	
+		char buffer[256];
 		if (info.GetType(buffer) == B_OK && strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
 			RegisterPrinter(&node);
 		}
 	}
 
-	// Now we are ready to start node watching 
+	// Now we are ready to start node watching
 	fFolder = new FolderWatcher(this, dir, true);
 	fFolder->SetListener(this);
-	
+
 	return B_OK;
 }
 
@@ -340,10 +340,10 @@ PrintServerApp::MessageReceived(BMessage* msg)
 		case B_EXECUTE_PROPERTY:
 			HandleScriptingCommand(msg);
 			break;
-		
+
 		default:
 			Inherited::MessageReceived(msg);
-	}	
+	}
 }
 
 // ---------------------------------------------------------------
@@ -370,7 +370,7 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 	const char* connection, const char* transportName, const char* transportPath)
 {
 	status_t rc;
-	
+
 	// Find directory containing printer definitions
 	BPath path;
 	rc = ::find_directory(B_USER_PRINTERS_DIRECTORY,&path,true,NULL);
@@ -382,20 +382,57 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 	BDirectory printer;
 
 	rc = printersDir.CreateDirectory(printerName, &printer);
-	if (rc != B_OK) 
+	if (rc == B_FILE_EXISTS) {
+		printer.SetTo(&printersDir, printerName);
+
+		BString info;
+		char type[B_MIME_TYPE_LENGTH];
+		BNodeInfo(&printer).GetType(type);
+		if (strcmp(PSRV_PRINTER_FILETYPE, type) == 0) {
+			BPath tmp;
+			if (FindPrinterDriver(printerName, tmp) == B_OK) {
+				if (fDefaultPrinter) {
+					// the printer exists, but is not the default printer
+					if(strcmp(fDefaultPrinter->Name(), printerName) != 0)
+						rc = B_OK;
+					return rc;
+				}
+				// the printer exists, but no default at all
+				return B_OK;
+			} else {
+				info.SetTo("There already exists an printer you are going to"
+					" create, but it's driver could not be found! Replace?");
+			}
+		} else {
+			info.SetTo("There already exists an printer you are going to"
+				" create, but it's not usable at all! Replace?");
+		}
+
+		if (info.Length() != 0) {
+			BAlert *alert = new BAlert("Info", info.String(), "Cancel", "OK");
+			alert->SetShortcut(0, B_ESCAPE);
+			if (alert->Go() == 0)
+				return rc;
+		}
+	} else if (rc != B_OK) {
 		return rc;
-		
+	}
+
 	// Set its type to a printer
 	BNodeInfo info(&printer);
 	info.SetType(PSRV_PRINTER_FILETYPE);
-	
+
 	// Store the settings in its attributes
-	printer.WriteAttr(PSRV_PRINTER_ATTR_PRT_NAME, B_STRING_TYPE, 0, printerName, 	::strlen(printerName)+1);
-	printer.WriteAttr(PSRV_PRINTER_ATTR_DRV_NAME, B_STRING_TYPE, 0, driverName,	::strlen(driverName)+1);
-	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT, B_STRING_TYPE, 0, transportName,::strlen(transportName)+1);
-	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, B_STRING_TYPE, 0, transportPath,::strlen(transportPath)+1);
-	printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,	::strlen(connection)+1);
-	
+	printer.WriteAttr(PSRV_PRINTER_ATTR_PRT_NAME, B_STRING_TYPE, 0, printerName,
+		::strlen(printerName) + 1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_DRV_NAME, B_STRING_TYPE, 0, driverName,
+		::strlen(driverName) + 1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT, B_STRING_TYPE, 0, transportName,
+		::strlen(transportName) + 1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_TRANSPORT_ADDR, B_STRING_TYPE, 0,
+		transportPath, ::strlen(transportPath) + 1);
+	printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,
+		::strlen(connection) + 1);
 
 	// Notify printer driver that a new printer definition node
 	// has been created.
@@ -405,30 +442,30 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 	rc = FindPrinterDriver(driverName, path);
 	if (rc != B_OK)
 		goto error;
-		 
+
 	id = ::load_add_on(path.Path());
 	if (id <= 0) {
 		rc = B_ERROR;
 		goto error;
 	}
-	
+
 	rc = get_image_symbol(id, "add_printer", B_SYMBOL_TYPE_TEXT, (void**)&func);
 	if (rc != B_OK)
 		goto error;
-		
+
 	// call the function and check its result
 	if ((*func)(printerName) == NULL)
-		rc = B_ERROR;			
+		rc = B_ERROR;
 	else
 		printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free", ::strlen("free")+1);
 
-error:	
+error:
 	if (rc != B_OK) {
 		BEntry entry;
 		if (printer.GetEntry(&entry) == B_OK)
-			entry.Remove();	
+			entry.Remove();
 	}
-	
+
 	if (id > 0)
 		::unload_add_on(id);
 
@@ -455,9 +492,9 @@ PrintServerApp::SelectPrinter(const char* printerName)
 {
 	status_t rc;
 	BNode node;
-	
+
 	// Find the node of the "old" default printer
-	if (fDefaultPrinter != NULL 
+	if (fDefaultPrinter != NULL
 		&& FindPrinterNode(fDefaultPrinter->Name(), node) == B_OK) {
 		// and remove the custom icon
 		BNodeInfo info(&node);
@@ -473,12 +510,12 @@ PrintServerApp::SelectPrinter(const char* printerName)
 		info.SetIcon(fSelectedIconMini, B_MINI_ICON);
 		info.SetIcon(fSelectedIconLarge, B_LARGE_ICON);
 	}
-	
+
 	fDefaultPrinter = Printer::Find(printerName);
-	StoreDefaultPrinter(); 
+	StoreDefaultPrinter();
 		// update our pref file
 	be_roster->Broadcast(new BMessage(B_PRINTER_CHANGED));
-	
+
 	return rc;
 }
 
@@ -554,7 +591,7 @@ PrintServerApp::StoreDefaultPrinter()
 // ---------------------------------------------------------------
 status_t
 PrintServerApp::FindPrinterNode(const char* name, BNode& node)
-{	
+{
 	// Find directory containing printer definitions
 	BPath path;
 	status_t rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path, true, NULL);
@@ -594,8 +631,8 @@ PrintServerApp::FindPrinterDriver(const char* name, BPath& outPath)
 bool PrintServerApp::OpenSettings(BFile& file, const char* name, bool forReading) {
 	BPath path;
 	uint32 openMode = forReading ? B_READ_ONLY : B_CREATE_FILE | B_ERASE_FILE | B_WRITE_ONLY;
-	return find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK 
-		&& path.Append(name) == B_OK 
+	return find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK
+		&& path.Append(name) == B_OK
 		&& file.SetTo(path.Path(), openMode) == B_OK;
 }
 
