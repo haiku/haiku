@@ -145,7 +145,7 @@ execvp(const char *file, char* const* argv)
 	const char* pathEnd = paths - 1;
 	while (pathEnd != NULL) {
 		paths = pathEnd + 1;
-		const char* pathEnd = strchr(paths, ':');
+		pathEnd = strchr(paths, ':');
 		int pathLen = (pathEnd ? pathEnd - paths : strlen(paths));
 
 		// We skip empty paths and those that would become too long.
