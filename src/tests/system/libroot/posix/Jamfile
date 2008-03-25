@@ -24,6 +24,10 @@ SimpleTest sigsetjmp_test
 	: sigsetjmp_test.c
 ;
 
+SimpleTest truncate
+	: truncate.cpp
+;
+
 SimpleTest init_rld_after_fork_test
 	: init_rld_after_fork_test.cpp
 ;
