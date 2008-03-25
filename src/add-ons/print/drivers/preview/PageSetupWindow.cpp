@@ -290,6 +290,9 @@ PageSetupWindow::UpdateSetupMessage()
 
 		SetInt32(fSetupMsg, "units", fMarginView->GetMarginUnit());
 	}
+
+	SetInt32(fSetupMsg, "xres", 300);
+	SetInt32(fSetupMsg, "yres", 300);
 }
 
 

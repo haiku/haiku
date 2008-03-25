@@ -27,7 +27,7 @@ status_t
 PreviewDriver::PrintJob(BFile *jobFile, BMessage *jobMsg)
 {
 #if PREVIEW_DRIVER_DEBUG
-	return PrinterDriver::PrintJob(jobFile, jobMessage)
+	return PrinterDriver::PrintJob(jobFile, jobMsg)
 #else
 	PreviewWindow* w = new PreviewWindow(jobFile);
 	return w->Go();
