@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1827,6 +1827,20 @@ size_t
 vm_page_num_pages(void)
 {
 	return sNumPages;
+}
+
+
+/*! There is a subtle distinction between the page counts returned by
+	this function and vm_page_num_free_pages():
+	The latter returns the number of pages that are completely uncommitted,
+	whereas this one returns the number of pages that are available for
+	use by being reclaimed as well (IOW it factors in things like cache pages
+	as available).
+*/
+size_t
+vm_page_num_available_pages(void)
+{
+	return vm_get_available_memory() / B_PAGE_SIZE;
 }
 
 

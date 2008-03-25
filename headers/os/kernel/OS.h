@@ -657,7 +657,8 @@ typedef struct {
 	int64			kernel_version;             			/* version of this kernel */
 
 	bigtime_t		_busy_wait_time;			/* reserved for whatever */
-	int32			pad[4];   	               	/* just in case... */
+	int32			cached_pages;
+	int32			pad[3];   	               	/* just in case... */
 } system_info;
 
 /* system private, use macro instead */

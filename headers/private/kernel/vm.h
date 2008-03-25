@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -137,6 +137,8 @@ status_t vm_map_page(struct vm_area *area, struct vm_page *page, addr_t address,
 			uint32 protection);
 status_t vm_get_physical_page(addr_t paddr, addr_t *vaddr, uint32 flags);
 status_t vm_put_physical_page(addr_t vaddr);
+
+off_t vm_get_available_memory(void);
 
 // user syscalls
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
