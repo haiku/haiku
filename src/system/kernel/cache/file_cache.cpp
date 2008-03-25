@@ -485,7 +485,7 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 	mutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
-	status_t status;
+	status_t status = B_OK;
 
 	if (!useBuffer) {
 		while (bufferSize > 0) {
