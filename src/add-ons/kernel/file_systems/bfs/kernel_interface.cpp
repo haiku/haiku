@@ -729,13 +729,15 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 			return B_IS_A_DIRECTORY;
 
 		if (inode->Size() != stat->st_size) {
+			off_t oldSize = inode->Size();
+
 			status = inode->SetFileSize(transaction, stat->st_size);
 			if (status < B_OK)
 				return status;
 
 			// fill the new blocks (if any) with zeros
 			if ((mask & B_STAT_SIZE_INSECURE) == 0)
-				inode->FillGapWithZeros(inode->OldSize(), inode->Size());
+				inode->FillGapWithZeros(oldSize, inode->Size());
 
 			if (!inode->IsDeleted()) {
 				Index index(volume);
