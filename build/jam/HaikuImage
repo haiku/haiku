@@ -508,8 +508,6 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	AddHeaderDirectoryToHaikuImage gnu ;
 	AddHeaderDirectoryToHaikuImage os ;
 	AddHeaderDirectoryToHaikuImage posix ;
-	AddHeaderDirectoryToHaikuImage build gcc-2.95.3 ;
-		# TODO: Remove when adding gcc.
 
 	# add _G_config.h to posix/
 	SEARCH on <header>_G_config.h = [ FDirName $(HAIKU_TOP) headers glibc ] ;
@@ -518,11 +516,58 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	# make be -> os symlink for now
 	AddSymlinkToHaikuImage develop headers : /boot/develop/headers/os : be ;
 
-	AddHeaderDirectoryToHaikuImage cpp ;
-	# TODO: This method is the right one for the non-legacy gcc:
-#	# symlink cpp to g++'s headers
-#	AddSymlinkToHaikuImage develop headers
-#		: /boot/develop/tools/gnupro/include/g++ : cpp ;
+	if $(HAIKU_GCC_VERSION[1]) > 2 {
+		# gcc 4
+
+		# symlink cpp to g++'s headers
+		AddSymlinkToHaikuImage develop headers
+			: /boot/develop/tools/gnupro/include/g++ : cpp ;
+	} else {
+		# gcc 2.95.3
+
+		AddHeaderDirectoryToHaikuImage cpp ;
+
+		# gcc and binutils
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-080323
+			: $(baseURL)/gcc-2.95.3-haiku-080323.zip
+			: develop tools
+		;
+		AddSymlinkToHaikuImage develop tools : gcc-2.95.3-haiku-080323
+			: gnupro ;
+
+		# other tools
+		InstallOptionalHaikuImagePackage autoconf-2.61-gcc2-2008-03-24
+			: $(baseURL)/autoconf-2.61-gcc2-2008-03-24.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-03-24
+			: $(baseURL)/automake-1.10.1-gcc2-2008-03-24.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage libtool-1.5.26-gcc2-2008-03-24
+			: $(baseURL)/libtool-1.5.26-gcc2-2008-03-24.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage texinfo-4.11-gcc2-2008-03-24
+			: $(baseURL)/texinfo-4.11-gcc2-2008-03-24.zip
+			: home
+		;
+		AddOptionalHaikuImagePackages Perl ;	# required by the auto tools
+	}
+}
+
+# Perl
+if [ IsOptionalHaikuImagePackageAdded Perl ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Perl available for gcc4" ;
+	} else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-03-24
+			: $(baseURL)/perl-5.10.0-gcc2-2008-03-24.zip
+			: home
+		;
+	}
 }
 
 # Vision
