@@ -13,13 +13,13 @@
 struct user_space_program_args;
 struct real_time_data;
 
-extern char _single_threaded;
-	/* This determines if a process runs single threaded or not */
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern char _single_threaded;
+	/* This determines if a process runs single threaded or not */
 
 status_t __parse_invoke_line(char *invoker, char ***_newArgs,
 			char * const **_oldArgs, int32 *_argCount, const char *arg0);

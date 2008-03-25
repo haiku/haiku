@@ -14,10 +14,18 @@
 #	error "This file must be included from stdio.h!"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern char _single_threaded;
 	// this boolean value is true (1) if there is only the main thread
 	// running - as soon as you spawn the first thread, it's set to
 	// false (0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #define getc(stream) \
 	(_single_threaded ? getc_unlocked(stream) : getc(stream))
