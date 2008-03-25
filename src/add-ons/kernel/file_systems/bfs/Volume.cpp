@@ -74,7 +74,7 @@ DeviceOpener::DeviceOpener(int fd, int mode)
 
 DeviceOpener::~DeviceOpener()
 {
-	if (fDevice >= B_OK) {
+	if (fDevice >= 0) {
 		RemoveCache(false);
 		close(fDevice);
 	}
@@ -129,7 +129,8 @@ DeviceOpener::Open(int fd, int mode)
 void *
 DeviceOpener::InitCache(off_t numBlocks, uint32 blockSize)
 {
-	return block_cache_create(fDevice, numBlocks, blockSize, fMode == O_RDONLY);
+	return fBlockCache = block_cache_create(fDevice, numBlocks, blockSize,
+		IsReadOnly());
 }
 
 
