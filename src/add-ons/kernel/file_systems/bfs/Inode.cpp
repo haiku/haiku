@@ -38,7 +38,7 @@ class Create : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("CREATE %Ld (%p), parent %Ld (%p), \"%s\", "
+			out.Print("bfs:Create %Ld (%p), parent %Ld (%p), \"%s\", "
 				"mode %lx, omode %x, type %lx", fID, fInode, fParentID,
 				fParent, fName, fMode, fOpenMode, fType);
 		}
@@ -68,7 +68,7 @@ class Remove : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("REMOVE %Ld (%p), \"%s\"", fID, fInode, fName);
+			out.Print("bfs:Remove %Ld (%p), \"%s\"", fID, fInode, fName);
 		}
 
 	private:
@@ -90,7 +90,7 @@ class Action : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("%s %Ld (%p)\n", fAction, fID, fInode);
+			out.Print("bfs:%s %Ld (%p)\n", fAction, fID, fInode);
 		}
 
 	private:
@@ -101,20 +101,21 @@ class Action : public AbstractTraceEntry {
 
 class Resize : public AbstractTraceEntry {
 	public:
-		Resize(Inode* inode, off_t oldSize, off_t newSize)
+		Resize(Inode* inode, off_t oldSize, off_t newSize, bool trim)
 			:
 			fInode(inode),
 			fID(inode->ID()),
 			fOldSize(oldSize),
-			fNewSize(newSize)
+			fNewSize(newSize),
+			fTrim(trim)
 		{
 			Initialized();
 		}
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("RESIZE %Ld (%p), %Ld -> %Ld", fID, fInode,
-				fOldSize, fNewSize);
+			out.Print("bfs:%s %Ld (%p), %Ld -> %Ld", fTrim ? "Trim" : "Resize",
+				fID, fInode, fOldSize, fNewSize);
 		}
 
 	private:
@@ -122,6 +123,7 @@ class Resize : public AbstractTraceEntry {
 		ino_t	fID;
 		off_t	fOldSize;
 		off_t	fNewSize;
+		bool	fTrim;
 };
 
 }	// namespace BFSInodeTracing
@@ -2024,7 +2026,7 @@ Inode::SetFileSize(Transaction &transaction, off_t size)
 	if (size == oldSize)
 		return B_OK;
 
-	T(Resize(this, oldSize, size));
+	T(Resize(this, oldSize, size, false));
 
 	// should the data stream grow or shrink?
 	status_t status;
@@ -2063,9 +2065,10 @@ Inode::Append(Transaction &transaction, off_t bytes)
 bool
 Inode::NeedsTrimming()
 {
-	// We never trim preallocated index blocks to make them grow as smooth as possible.
-	// There are only few indices anyway, so this doesn't hurt
-	// Also, if an inode is already in deleted state, we don't bother trimming it
+	// We never trim preallocated index blocks to make them grow as smooth as
+	// possible. There are only few indices anyway, so this doesn't hurt.
+	// Also, if an inode is already in deleted state, we don't bother trimming
+	// it.
 	if (IsIndex() || IsDeleted())
 		return false;
 
@@ -2081,7 +2084,8 @@ Inode::NeedsTrimming()
 status_t
 Inode::TrimPreallocation(Transaction &transaction)
 {
-	T(Action("TRIM", this));
+	T(Resize(this, max_c(Node().data.MaxDirectRange(),
+		Node().data.MaxIndirectRange()), Size(), true));
 
 	status_t status = _ShrinkStream(transaction, Size());
 	if (status < B_OK)

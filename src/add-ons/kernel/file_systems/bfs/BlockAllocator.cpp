@@ -50,7 +50,7 @@ class Allocate : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("alloc %lu.%u.%u", fRun.AllocationGroup(),
+			out.Print("bfs:alloc %lu.%u.%u", fRun.AllocationGroup(),
 				fRun.Start(), fRun.Length());
 		}
 
@@ -69,7 +69,7 @@ class Free : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("free %lu.%u.%u", fRun.AllocationGroup(),
+			out.Print("bfs:free %lu.%u.%u", fRun.AllocationGroup(),
 				fRun.Start(), fRun.Length());
 		}
 
@@ -109,7 +109,7 @@ class Block : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("%s: block %Ld (%p), sum %lu, s/l %lu/%lu", fLabel,
+			out.Print("bfs:%s: block %Ld (%p), sum %lu, s/l %lu/%lu", fLabel,
 				fBlock, fData, fSum, fStart, fLength);
 		}
 
@@ -846,7 +846,7 @@ BlockAllocator::Free(Transaction &transaction, block_run run)
 		DEBUGGER(("tried to free reserved block"));
 		return B_BAD_VALUE;
 	}
-#ifdef DEBUG	
+#ifdef DEBUG
 	if (CheckBlockRun(run) < B_OK)
 		return B_BAD_DATA;
 #endif
@@ -953,12 +953,12 @@ BlockAllocator::StopChecking(check_control *control)
 		delete cookie->iterator;
 		cookie->iterator = NULL;
 
-		// the current directory inode is still locked in memory			
+		// the current directory inode is still locked in memory
 		put_vnode(fVolume->ID(), fVolume->ToVnode(cookie->current));
 	}
 
 	// if CheckNextNode() could completely work through, we can
-	// fix any damages of the bitmap	
+	// fix any damages of the bitmap
 	if (control != NULL && control->status == B_ENTRY_NOT_FOUND) {
 		// calculate the number of used blocks in the check bitmap
 		size_t size = fVolume->BlockSize() * fNumGroups * fBlocksPerGroup;
@@ -1088,12 +1088,12 @@ BlockAllocator::CheckNextNode(check_control *control)
 			delete cookie->iterator;
 			cookie->iterator = NULL;
 
-			// unlock the directory's inode from memory			
+			// unlock the directory's inode from memory
 			put_vnode(fVolume->ID(), fVolume->ToVnode(cookie->current));
 
 			continue;
 		} else if (status == B_OK) {
-			// ignore "." and ".." entries		
+			// ignore "." and ".." entries
 			if (!strcmp(name, ".") || !strcmp(name, ".."))
 				continue;
 
@@ -1129,7 +1129,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 			// file don't fit to its parent, there is a serious problem)
 			if (((cookie->parent_mode & S_ATTR_DIR) != 0 && !inode->IsAttribute())
 				|| ((cookie->parent_mode & S_INDEX_DIR) != 0 && !inode->IsIndex())
-				|| ((cookie->parent_mode & (S_DIRECTORY | S_ATTR_DIR | S_INDEX_DIR)) 
+				|| ((cookie->parent_mode & (S_DIRECTORY | S_ATTR_DIR | S_INDEX_DIR))
 						== S_DIRECTORY
 					&& (inode->Mode() & (S_ATTR | S_ATTR_DIR | S_INDEX_DIR)) != 0)) {
 				FATAL(("inode at %Ld is of wrong type: %o (parent %o at %Ld)!\n",
