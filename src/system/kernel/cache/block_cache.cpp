@@ -54,7 +54,7 @@ struct cache_hook : DoublyLinkedListLinkImpl<cache_hook> {
 	void							*data;
 };
 
-typedef DoublyLinkedList<cache_hook> HookList; 
+typedef DoublyLinkedList<cache_hook> HookList;
 
 struct cache_transaction {
 	cache_transaction();
@@ -88,7 +88,7 @@ class Action : public AbstractTraceEntry {
 			fNumBlocks(transaction->num_blocks),
 			fSubNumBlocks(transaction->sub_num_blocks)
 		{
-			strlcpy(fLabel, label, sizeof(label));
+			strlcpy(fLabel, label, sizeof(fLabel));
 			Initialized();
 		}
 
@@ -286,7 +286,7 @@ compare_blocks(const void *_blockA, const void *_blockB)
 	if (diff > 0)
 		return 1;
 
-	return diff < 0 ? -1 : 0;	
+	return diff < 0 ? -1 : 0;
 }
 
 
@@ -300,7 +300,7 @@ cached_block::Compare(void *_cacheEntry, const void *_block)
 	if (diff > 0)
 		return 1;
 
-	return diff < 0 ? -1 : 0;	
+	return diff < 0 ? -1 : 0;
 }
 
 
@@ -917,10 +917,10 @@ dump_cache(int argc, char **argv)
 
 	off_t blockNumber = -1;
 	if (i + 1 < argc) {
-		blockNumber = strtoll(argv[i + 1], NULL, 0);
+		blockNumber = parse_expression(argv[i + 1]);
 		cached_block *block = (cached_block *)hash_lookup(cache->hash,
 			&blockNumber);
-		if (cache != NULL) {
+		if (block != NULL) {
 			kprintf("BLOCK %p\n", block);
 			kprintf(" current data:  %p\n", block->current_data);
 			kprintf(" original data: %p\n", block->original_data);
@@ -1136,7 +1136,7 @@ block_writer(void *)
 						blocks[count++] = block;
 				}
 
-				hash_close(cache->hash, &iterator, false);			
+				hash_close(cache->hash, &iterator, false);
 			} else {
 				hash_iterator iterator;
 				hash_open(cache->transaction_hash, &iterator);
@@ -1158,7 +1158,7 @@ block_writer(void *)
 					}
 				}
 
-				hash_close(cache->transaction_hash, &iterator, false);			
+				hash_close(cache->transaction_hash, &iterator, false);
 			}
 
 			qsort(blocks, count, sizeof(void *), &compare_blocks);
@@ -1679,7 +1679,7 @@ cache_next_block_in_transaction(void *_cache, int32 id, bool mainOnly,
 		*_unchangedData = block->original_data;
 
 	*_cookie = (addr_t)block;
-	return B_OK;	
+	return B_OK;
 }
 
 
@@ -1747,7 +1747,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 		cache->FreeBlock(block);
 	}
 
-	// free all transactions (they will all be aborted)	
+	// free all transactions (they will all be aborted)
 
 	cookie = 0;
 	cache_transaction *transaction;
