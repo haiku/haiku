@@ -78,14 +78,27 @@ free_mtrr(int32 index)
 }
 
 
+/*!
+ 	Checks if the provided range overlaps an existing mtrr range
+ 	If it actually extends an existing range, extendedIndex is filled
+*/
 static bool
-is_memory_overlapping(uint64 base, uint64 length)
+is_memory_overlapping(uint64 base, uint64 length, int32 *extendedIndex)
 {
+	*extendedIndex = -1;
 	for (uint32 index = 0; index < sMemoryTypeRegisterCount; index++) {
 		if (sMemoryTypeBitmap & (1UL << index)) {
 			uint64 b,l;
 			uint8 t;
 			x86_get_mtrr(index, &b, &l, &t);
+
+			// check first for write combining extensions
+			if (base < b 
+				&& (base + length) > (b + l)
+				&& t == IA32_MTR_WRITE_COMBINING) {
+				*extendedIndex = index;
+				return true;
+			}
 			if ((base > b && base < (b + l))
 				|| ((base + length) > b 
 					&& (base + length) < (b + l)))
@@ -128,7 +141,7 @@ nearest_powers(uint64 value, uint64 *lower, uint64 *upper)
 static status_t
 set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 {
-	int32 index;
+	int32 index = -1;
 
 	if (type == 0)
 		return B_OK;
@@ -158,9 +171,12 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 
 	// check if it overlaps
 	if (type == IA32_MTR_WRITE_COMBINING
-		&& is_memory_overlapping(base, length)) {
-		dprintf("allocate MTRR failed, it overlaps an existing MTRR slot\n");
-		return B_BAD_VALUE;
+		&& is_memory_overlapping(base, length, &index)) {
+		if (index < 0) {
+			dprintf("allocate MTRR failed, it overlaps an existing MTRR slot\n");
+			return B_BAD_VALUE;
+		}
+		// we replace an existing write-combining mtrr with a bigger one at the index position
 	}
 
 	// length must be a power of 2; just round it up to the next value
@@ -175,7 +191,8 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 	if (base & (length - 1))
 		return B_BAD_VALUE;
 
-	index = allocate_mtrr();
+	if (index < 0)
+		index = allocate_mtrr();
 	if (index < 0)
 		return B_ERROR;
 
