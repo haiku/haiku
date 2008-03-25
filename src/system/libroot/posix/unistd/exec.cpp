@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -141,7 +142,9 @@ execvp(const char *file, char* const* argv)
 	int fileNameLen = strlen(file);
 
 	// iterate through the paths
-	while (true) {
+	const char* pathEnd = paths - 1;
+	while (pathEnd != NULL) {
+		paths = pathEnd + 1;
 		const char* pathEnd = strchr(paths, ':');
 		int pathLen = (pathEnd ? pathEnd - paths : strlen(paths));
 
@@ -164,12 +167,6 @@ execvp(const char *file, char* const* argv)
 		// if executable, execute it
 		if (access(path, X_OK) == 0)
 			return do_exec(path, argv, environ, true);
-
-		// not found yet -- get the next path, if any
-		if (pathEnd == NULL)
-			break;
-
-        paths = pathEnd + 1;
 	}
 
 	errno = B_ENTRY_NOT_FOUND;
