@@ -12,6 +12,7 @@ Addon hmulti_audio.media_addon :
 	MultiAudioAddOn.cpp
 	MultiAudioDevice.cpp
 	MultiAudioNode.cpp
+	MultiAudioUtility.cpp
 	: be media
 ;
 

@@ -27,8 +27,7 @@
 						const media_format & consumer_format);*/
 
 
-class node_input
-{
+class node_input {
 	public:
 		node_input(media_input &input, media_format format);
 		~node_input();
@@ -42,8 +41,7 @@ class node_input
 		BBuffer				*fBuffer;
 };
 
-class node_output
-{
+class node_output {
 	public:
 		node_output(media_output &output, media_format format);
 		~node_output();
@@ -60,47 +58,38 @@ class node_output
 		multi_buffer_info	fOldMBI;
 };
 
-class MultiAudioNode :
-	public BBufferConsumer,
-	public BBufferProducer,
-	public BTimeSource,
-	public BMediaEventLooper,
-	public BControllable
-{
-	protected:
-		virtual ~MultiAudioNode(void);
+class MultiAudioNode : public BBufferConsumer, public BBufferProducer,
+		public BTimeSource,	public BMediaEventLooper, public BControllable {
+protected:
+	virtual ~MultiAudioNode(void);
 
-	public:
+public:
+	explicit MultiAudioNode(BMediaAddOn* addon, const char* name,
+		MultiAudioDevice* device, int32 internalID, BMessage* config);
 
-		explicit MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice *device,
-			int32 internal_id, BMessage * config);
-
-		virtual status_t InitCheck(void) const;
+	virtual status_t InitCheck(void) const;
 
 		/*************************/
 		/* begin from BMediaNode */
-	public:
-		virtual	BMediaAddOn* AddOn(
-			int32 * internal_id) const;	/* Who instantiated you -- or NULL for app class */
+public:
+	virtual	BMediaAddOn* AddOn(int32* internalID) const;
 
-	protected:
-		/* These don't return errors; instead, they use the global error condition reporter. */
-		/* A node is required to have a queue of at least one pending command (plus TimeWarp) */
-		/* and is recommended to allow for at least one pending command of each type. */
-		/* Allowing an arbitrary number of outstanding commands might be nice, but apps */
-		/* cannot depend on that happening. */
-		virtual	void Preroll(void);
+protected:
+	/* These don't return errors; instead, they use the global error condition reporter. */
+	/* A node is required to have a queue of at least one pending command (plus TimeWarp) */
+	/* and is recommended to allow for at least one pending command of each type. */
+	/* Allowing an arbitrary number of outstanding commands might be nice, but apps */
+	/* cannot depend on that happening. */
+	virtual	void Preroll(void);
 
-	public:
-		virtual	status_t HandleMessage(
-			int32 message,
-			const void * data,
-			size_t size);
+public:
+	virtual	status_t	HandleMessage(int32 message, const void* data,
+							size_t size);
 
-	protected:
-		virtual		void NodeRegistered(void);	/* reserved 2 */
-		virtual		status_t RequestCompleted(const media_request_info &info);
-		virtual		void SetTimeSource(BTimeSource *timeSource);
+protected:
+	virtual	void		NodeRegistered();
+	virtual	status_t	RequestCompleted(const media_request_info &info);
+	virtual	void		SetTimeSource(BTimeSource *timeSource);
 
 		/* end from BMediaNode */
 		/***********************/
@@ -108,61 +97,28 @@ class MultiAudioNode :
 		/******************************/
 		/* begin from BBufferConsumer */
 
-//included from BMediaAddOn
-//virtual	status_t HandleMessage(
-//				int32 message,
-//				const void * data,
-//				size_t size);
+	virtual	status_t	AcceptFormat(const media_destination& dest,
+							media_format* format);
+	virtual	status_t	GetNextInput(int32* cookie, media_input* input);
+	virtual	void		DisposeInputCookie(int32 cookie);
+	virtual	void		BufferReceived(BBuffer* buffer);
+	virtual	void		ProducerDataStatus(const media_destination& forWhom,
+							int32 status, bigtime_t atPerformanceTime);
+	virtual	status_t	GetLatencyFor(const media_destination& forWhom,
+							bigtime_t* latency, media_node_id* timeSource);
+	virtual	status_t 	Connected(const media_source& producer,
+							const media_destination& where,
+							const media_format& withFormat, media_input* input);
+	virtual	void		Disconnected(const media_source& producer,
+							const media_destination& where);
+	virtual	status_t	FormatChanged(const media_source& producer,
+							const media_destination& consumer, int32 changeTag,
+							const media_format& format);
 
-		/* Someone, probably the producer, is asking you about this format. Give */
-		/* your honest opinion, possibly modifying *format. Do not ask upstream */
-		/* producer about the format, since he's synchronously waiting for your */
-		/* reply. */
-		virtual	status_t AcceptFormat(
-			const media_destination & dest,
-			media_format * format);
-		virtual	status_t GetNextInput(
-			int32 * cookie,
-			media_input * out_input);
-		virtual	void DisposeInputCookie(
-			int32 cookie);
-		virtual	void BufferReceived(
-			BBuffer * buffer);
-		virtual	void ProducerDataStatus(
-			const media_destination & for_whom,
-			int32 status,
-			bigtime_t at_performance_time);
-		virtual	status_t GetLatencyFor(
-			const media_destination & for_whom,
-			bigtime_t * out_latency,
-			media_node_id * out_timesource);
-		virtual	status_t Connected(
-			const media_source & producer,	/* here's a good place to request buffer group usage */
-			const media_destination & where,
-			const media_format & with_format,
-			media_input * out_input);
-		virtual	void Disconnected(
-			const media_source & producer,
-			const media_destination & where);
-		/* The notification comes from the upstream producer, so he's already cool with */
-		/* the format; you should not ask him about it in here. */
-		virtual	status_t FormatChanged(
-			const media_source & producer,
-			const media_destination & consumer,
-			int32 change_tag,
-			const media_format & format);
-
-		/* Given a performance time of some previous buffer, retrieve the remembered tag */
-		/* of the closest (previous or exact) performance time. Set *out_flags to 0; the */
-		/* idea being that flags can be added later, and the understood flags returned in */
-		/* *out_flags. */
-		virtual	status_t SeekTagRequested(
-			const media_destination & destination,
-			bigtime_t in_target_time,
-			uint32 in_flags,
-			media_seek_tag * out_seek_tag,
-			bigtime_t * out_tagged_time,
-			uint32 * out_flags);
+	virtual	status_t	SeekTagRequested(const media_destination& destination,
+							bigtime_t targetTime, uint32 flags,
+							media_seek_tag* _seekTag, bigtime_t* _taggedTime,
+							uint32* _flags);
 
 		/* end from BBufferConsumer */
 		/****************************/

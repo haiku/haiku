@@ -26,15 +26,18 @@
 
 #define MULTI_SAVE
 
-// instantiation function
-extern "C" _EXPORT BMediaAddOn * make_media_addon(image_id image) {
+
+//! instantiation function
+extern "C" BMediaAddOn*
+make_media_addon(image_id image)
+{
 	CALLED();
 	return new MultiAudioAddOn(image);
 }
 
-// -------------------------------------------------------- //
-// ctor/dtor
-// -------------------------------------------------------- //
+
+//	#pragma mark -
+
 
 MultiAudioAddOn::~MultiAudioAddOn()
 {
@@ -47,8 +50,9 @@ MultiAudioAddOn::~MultiAudioAddOn()
 	SaveSettings();
 }
 
-MultiAudioAddOn::MultiAudioAddOn(image_id image) :
-	BMediaAddOn(image),
+
+MultiAudioAddOn::MultiAudioAddOn(image_id image)
+	: BMediaAddOn(image),
 	fDevices()
 {
 	CALLED();
@@ -66,79 +70,77 @@ MultiAudioAddOn::MultiAudioAddOn(image_id image) :
 // BMediaAddOn impl
 // -------------------------------------------------------- //
 
-status_t MultiAudioAddOn::InitCheck(
-	const char ** out_failure_text)
+status_t
+MultiAudioAddOn::InitCheck(const char** _failureText)
 {
 	CALLED();
 	return B_OK;
 }
 
-int32 MultiAudioAddOn::CountFlavors()
+
+int32
+MultiAudioAddOn::CountFlavors()
 {
 	CALLED();
 	return fDevices.CountItems();
 }
 
-status_t MultiAudioAddOn::GetFlavorAt(
-	int32 n,
-	const flavor_info ** out_info)
+
+status_t
+MultiAudioAddOn::GetFlavorAt(int32 n, const flavor_info** _info)
 {
 	CALLED();
-	if (out_info == 0) {
-		fprintf(stderr, "<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}
-	if (n < 0 || n > fDevices.CountItems() - 1) {
-		fprintf(stderr, "<- B_BAD_INDEX\n");
+	if (_info == NULL)
+		return B_BAD_VALUE;
+
+	MultiAudioDevice* device = (MultiAudioDevice*)fDevices.ItemAt(n);
+	if (device == NULL)
 		return B_BAD_INDEX;
-	}
 
-	MultiAudioDevice *device = (MultiAudioDevice *) fDevices.ItemAt(n);
+	flavor_info* info = new (std::nothrow) flavor_info;
+	if (info == NULL)
+		return B_NO_MEMORY;
 
-	flavor_info * infos = new flavor_info[1];
-	MultiAudioNode::GetFlavor(&infos[0], n);
-	infos[0].name = device->MD.friendly_name;
-	(*out_info) = infos;
+	MultiAudioNode::GetFlavor(info, n);
+	info->name = (char*)device->Description().friendly_name;
+
+	*_info = info;
 	return B_OK;
 }
 
-BMediaNode * MultiAudioAddOn::InstantiateNodeFor(
-	const flavor_info * info,
-	BMessage * config,
-	status_t * out_error)
+
+BMediaNode*
+MultiAudioAddOn::InstantiateNodeFor(const flavor_info* info, BMessage* config,
+	status_t* _error)
 {
 	CALLED();
-	if (out_error == 0) {
-		fprintf(stderr, "<- NULL\n");
-		return 0; // we refuse to crash because you were stupid
-	}
+	if (_error == NULL)
+		return NULL;
 
-	MultiAudioDevice *device = (MultiAudioDevice*)fDevices.ItemAt(info->internal_id);
+	MultiAudioDevice* device = (MultiAudioDevice*)fDevices.ItemAt(
+		info->internal_id);
 	if (device == NULL) {
-		*out_error = B_ERROR;
+		*_error = B_ERROR;
 		return NULL;
 	}
 
 #ifdef MULTI_SAVE
-	if (fSettings.FindMessage(device->MD.friendly_name, config) == B_OK) {
-		fSettings.RemoveData(device->MD.friendly_name);
+	if (fSettings.FindMessage(device->Description().friendly_name, config)
+			== B_OK) {
+		fSettings.RemoveData(device->Description().friendly_name);
 	}
 #endif
 
-	MultiAudioNode * node =
-		new MultiAudioNode(this,
-			device->MD.friendly_name,
-			device,
-			info->internal_id,
-			config);
-	if (node == 0) {
-		*out_error = B_NO_MEMORY;
-		fprintf(stderr, "<- B_NO_MEMORY\n");
-	} else {
-		*out_error = node->InitCheck();
-	}
+	MultiAudioNode* node = new (std::nothrow) MultiAudioNode(this,
+		device->Description().friendly_name, device, info->internal_id, config);
+	if (node == NULL)
+		*_error = B_NO_MEMORY;
+	else
+		*_error = node->InitCheck();
+
 	return node;
 }
+
 
 status_t
 MultiAudioAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_message)
@@ -172,47 +174,48 @@ MultiAudioAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_mes
 }
 
 
-bool MultiAudioAddOn::WantsAutoStart()
+bool
+MultiAudioAddOn::WantsAutoStart()
 {
 	CALLED();
 	return false;
 }
 
-status_t MultiAudioAddOn::AutoStart(
-	int in_count,
-	BMediaNode ** out_node,
-	int32 * out_internal_id,
-	bool * out_has_more)
+
+status_t
+MultiAudioAddOn::AutoStart(int count, BMediaNode** _node, int32* _internalID,
+	bool* _hasMore)
 {
 	CALLED();
 	return B_OK;
 }
 
+
 status_t
-MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry)
+MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry* rootEntry)
 {
 	CALLED();
 
 	BDirectory root;
 	if (rootEntry != NULL)
 		root.SetTo(rootEntry);
-	else if (rootPath != NULL) {
+	else if (rootPath != NULL)
 		root.SetTo(rootPath);
-	} else {
-		PRINT(("Error in MultiAudioAddOn::RecursiveScan null params\n"));
+	else {
+		PRINT(("Error in MultiAudioAddOn::RecursiveScan() null params\n"));
 		return B_ERROR;
 	}
 
 	BEntry entry;
 
 	while (root.GetNextEntry(&entry) > B_ERROR) {
-
 		if (entry.IsDirectory()) {
 			RecursiveScan(rootPath, &entry);
 		} else {
 			BPath path;
 			entry.GetPath(&path);
-			MultiAudioDevice *device = new MultiAudioDevice(path.Path() + strlen(rootPath), path.Path());
+			MultiAudioDevice *device = new MultiAudioDevice(path.Path()
+				+ strlen(rootPath), path.Path());
 			if (device) {
 				if (device->InitCheck() == B_OK)
 					fDevices.AddItem(device);
@@ -227,7 +230,7 @@ MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry)
 
 
 void
-MultiAudioAddOn::SaveSettings(void)
+MultiAudioAddOn::SaveSettings()
 {
 	CALLED();
 	BPath path;
@@ -241,7 +244,7 @@ MultiAudioAddOn::SaveSettings(void)
 
 
 void
-MultiAudioAddOn::LoadSettings(void)
+MultiAudioAddOn::LoadSettings()
 {
 	CALLED();
 	fSettings.MakeEmpty();

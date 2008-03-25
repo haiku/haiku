@@ -3,343 +3,232 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "MultiAudioDevice.h"
-#include "debug.h"
-#include "driver_io.h"
-#include <MediaDefs.h>
+
 #include <errno.h>
 #include <string.h>
 
-float SAMPLE_RATES[] = {
-	8000.0, 11025.0, 12000.0, 16000.0, 22050.0, 24000.0, 32000.0, 44100.0,
-	48000.0, 64000.0, 88200.0, 96000.0, 176400.0, 192000.0, 384000.0, 1536000.0
-					   };
+#include <MediaDefs.h>
+
+#include "debug.h"
+#include "MultiAudioUtility.h"
 
 
-float MultiAudioDevice::convert_multiaudio_rate_to_media_rate(uint32 rate)
+using namespace MultiAudio;
+
+
+MultiAudioDevice::MultiAudioDevice(const char* name, const char* path)
 {
-	uint8 count = 0;
-	uint8 size = sizeof(SAMPLE_RATES) / sizeof(SAMPLE_RATES[0]);
-	while (count < size) {
-		if (rate & 1)
-			return SAMPLE_RATES[count];
-		count++;
-		rate >>= 1;
-	}
-	return 0.0;
+	CALLED();
+
+	strlcpy(fPath, path, B_PATH_NAME_LENGTH);
+	PRINT(("name: %s, path: %s\n", name, fPath));
+
+	fInitStatus = _InitDriver();
 }
-
-
-uint32 MultiAudioDevice::convert_media_rate_to_multiaudio_rate(float rate)
-{
-	uint8 count = 0;
-	uint size = sizeof(SAMPLE_RATES) / sizeof(SAMPLE_RATES[0]);
-	while (count < size) {
-		if (rate <= SAMPLE_RATES[count])
-			return (0x1 << count);
-		count++;
-	}
-	return 0;
-}
-
-
-uint32 MultiAudioDevice::convert_multiaudio_format_to_media_format(uint32 fmt)
-{
-	switch (fmt) {
-		case B_FMT_FLOAT:
-			return media_raw_audio_format::B_AUDIO_FLOAT;
-		case B_FMT_18BIT:
-		case B_FMT_20BIT:
-		case B_FMT_24BIT:
-		case B_FMT_32BIT:
-			return media_raw_audio_format::B_AUDIO_INT;
-		case B_FMT_16BIT:
-			return media_raw_audio_format::B_AUDIO_SHORT;
-		case B_FMT_8BIT_S:
-			return media_raw_audio_format::B_AUDIO_CHAR;
-		case B_FMT_8BIT_U:
-			return media_raw_audio_format::B_AUDIO_UCHAR;
-		default:
-			return 0;
-	}
-}
-
-
-int16 MultiAudioDevice::convert_multiaudio_format_to_valid_bits(uint32 fmt)
-{
-	switch (fmt) {
-		case B_FMT_18BIT:
-			return 18;
-		case B_FMT_20BIT:
-			return 20;
-		case B_FMT_24BIT:
-			return 24;
-		case B_FMT_32BIT:
-			return 32;
-		default: {
-			return 0;
-		}
-	}
-}
-
-
-uint32 MultiAudioDevice::convert_media_format_to_multiaudio_format(uint32 fmt)
-{
-	switch (fmt) {
-		case media_raw_audio_format::B_AUDIO_FLOAT:
-			return B_FMT_FLOAT;
-		case media_raw_audio_format::B_AUDIO_INT:
-			return B_FMT_32BIT;
-		case media_raw_audio_format::B_AUDIO_SHORT:
-			return B_FMT_16BIT;
-		case media_raw_audio_format::B_AUDIO_CHAR:
-			return B_FMT_8BIT_S;
-		case media_raw_audio_format::B_AUDIO_UCHAR:
-			return B_FMT_8BIT_U;
-		default:
-			return 0;
-	}
-}
-
-
-uint32 MultiAudioDevice::select_multiaudio_rate(uint32 rate)
-{
-	//highest rate
-	uint32 crate = B_SR_1536000;
-	while (crate != 0) {
-		if (rate & crate)
-			return crate;
-		crate >>= 1;
-	}
-	return 0;
-}
-
-
-uint32 MultiAudioDevice::select_multiaudio_format(uint32 fmt)
-{
-	//highest format
-	if (fmt & B_FMT_FLOAT) {
-		return B_FMT_FLOAT;
-	} else if (fmt & B_FMT_32BIT) {
-		return B_FMT_32BIT;
-	} else if (fmt & B_FMT_24BIT) {
-		return B_FMT_24BIT;
-	} else if (fmt & B_FMT_20BIT) {
-		return B_FMT_20BIT;
-	} else if (fmt & B_FMT_18BIT) {
-		return B_FMT_18BIT;
-	} else if (fmt & B_FMT_16BIT) {
-		return B_FMT_16BIT;
-	} else if (fmt & B_FMT_8BIT_S) {
-		return B_FMT_8BIT_S;
-	} else if (fmt & B_FMT_8BIT_U) {
-		return B_FMT_8BIT_U;
-	} else
-		return 0;
-}
-
 
 
 MultiAudioDevice::~MultiAudioDevice()
 {
 	CALLED();
-	if (fd != 0) {
-		close(fd);
-	}
-}
-
-MultiAudioDevice::MultiAudioDevice(const char* name, const char* path)
-{
-	CALLED();
-	fInitCheckStatus = B_NO_INIT;
-
-	strcpy(fDevice_name, name);
-	strcpy(fDevice_path, path);
-
-	PRINT(("name : %s, path : %s\n", fDevice_name, fDevice_path));
-
-	if (InitDriver() != B_OK)
-		return;
-
-	fInitCheckStatus = B_OK;
+	if (fDevice >= 0)
+		close(fDevice);
 }
 
 
-status_t MultiAudioDevice::InitCheck(void) const
+status_t
+MultiAudioDevice::InitCheck() const
 {
 	CALLED();
-	return fInitCheckStatus;
+	return fInitStatus;
 }
 
 
-status_t MultiAudioDevice::InitDriver()
+status_t
+MultiAudioDevice::_InitDriver()
 {
-	multi_channel_enable 	MCE;
-	uint32					mce_enable_bits;
-	int rval, i, num_outputs, num_inputs, num_channels;
+	int num_outputs, num_inputs, num_channels;
 
 	CALLED();
 
-	//open the device driver for output
-	fd = open(fDevice_path, O_WRONLY);
+	// open the device driver
 
-	if (fd == -1) {
-		fprintf(stderr, "Failed to open %s: %s\n", fDevice_path, strerror(errno));
+	fDevice = open(fPath, O_WRONLY);
+	if (fDevice == -1) {
+		fprintf(stderr, "Failed to open %s: %s\n", fPath, strerror(errno));
 		return B_ERROR;
 	}
 
-	//
 	// Get description
-	//
-	MD.info_size = sizeof(MD);
-	MD.request_channel_count = MAX_CHANNELS;
-	MD.channels = MCI;
-	rval = DRIVER_GET_DESCRIPTION(&MD, 0);
-	if (B_OK != rval)
-	{
-		fprintf(stderr, "Failed on B_MULTI_GET_DESCRIPTION\n");
-		return B_ERROR;
+
+	fDescription.info_size = sizeof(fDescription);
+	fDescription.request_channel_count = MAX_CHANNELS;
+	fDescription.channels = fChannelInfo;
+	status_t status = get_description(fDevice, &fDescription);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_GET_DESCRIPTION: %s\n",
+			strerror(status));
+		return status;
 	}
 
 	PRINT(("Friendly name:\t%s\nVendor:\t\t%s\n",
-		MD.friendly_name, MD.vendor_info));
+		fDescription.friendly_name, fDescription.vendor_info));
 	PRINT(("%ld outputs\t%ld inputs\n%ld out busses\t%ld in busses\n",
-		MD.output_channel_count, MD.input_channel_count,
-		MD.output_bus_channel_count, MD.input_bus_channel_count));
+		fDescription.output_channel_count, fDescription.input_channel_count,
+		fDescription.output_bus_channel_count,
+		fDescription.input_bus_channel_count));
 	PRINT(("\nChannels\n"
 		"ID\tKind\tDesig\tConnectors\n"));
 
-	for (i = 0 ; i < (MD.output_channel_count + MD.input_channel_count); i++)
-	{
-		PRINT(("%ld\t%d\t0x%lx\t0x%lx\n", MD.channels[i].channel_id,
-			MD.channels[i].kind,
-			MD.channels[i].designations,
-			MD.channels[i].connectors));
+	for (int32 i = 0; i < fDescription.output_channel_count
+			+ fDescription.input_channel_count; i++) {
+		PRINT(("%ld\t%d\t0x%lx\t0x%lx\n", fDescription.channels[i].channel_id,
+			fDescription.channels[i].kind,
+			fDescription.channels[i].designations,
+			fDescription.channels[i].connectors));
 	}
 	PRINT(("\n"));
 
-	PRINT(("Output rates\t\t0x%lx\n", MD.output_rates));
-	PRINT(("Input rates\t\t0x%lx\n", MD.input_rates));
-	PRINT(("Max CVSR\t\t%.0f\n", MD.max_cvsr_rate));
-	PRINT(("Min CVSR\t\t%.0f\n", MD.min_cvsr_rate));
-	PRINT(("Output formats\t\t0x%lx\n", MD.output_formats));
-	PRINT(("Input formats\t\t0x%lx\n", MD.input_formats));
-	PRINT(("Lock sources\t\t0x%lx\n", MD.lock_sources));
-	PRINT(("Timecode sources\t0x%lx\n", MD.timecode_sources));
-	PRINT(("Interface flags\t\t0x%lx\n", MD.interface_flags));
-	PRINT(("Control panel string:\t\t%s\n", MD.control_panel));
+	PRINT(("Output rates\t\t0x%lx\n", fDescription.output_rates));
+	PRINT(("Input rates\t\t0x%lx\n", fDescription.input_rates));
+	PRINT(("Max CVSR\t\t%.0f\n", fDescription.max_cvsr_rate));
+	PRINT(("Min CVSR\t\t%.0f\n", fDescription.min_cvsr_rate));
+	PRINT(("Output formats\t\t0x%lx\n", fDescription.output_formats));
+	PRINT(("Input formats\t\t0x%lx\n", fDescription.input_formats));
+	PRINT(("Lock sources\t\t0x%lx\n", fDescription.lock_sources));
+	PRINT(("Timecode sources\t0x%lx\n", fDescription.timecode_sources));
+	PRINT(("Interface flags\t\t0x%lx\n", fDescription.interface_flags));
+	PRINT(("Control panel string:\t\t%s\n", fDescription.control_panel));
 	PRINT(("\n"));
 
-	num_outputs = MD.output_channel_count;
-	num_inputs = MD.input_channel_count;
+	num_outputs = fDescription.output_channel_count;
+	num_inputs = fDescription.input_channel_count;
 	num_channels = num_outputs + num_inputs;
 
 	// Get and set enabled channels
-	MCE.info_size = sizeof(MCE);
-	MCE.enable_bits = (uchar *) & mce_enable_bits;
-	rval = DRIVER_GET_ENABLED_CHANNELS(&MCE, sizeof(MCE));
-	if (B_OK != rval)
-	{
-		fprintf(stderr, "Failed on B_MULTI_GET_ENABLED_CHANNELS len is 0x%lx\n", sizeof(MCE));
-		return B_ERROR;
+
+	multi_channel_enable enable;
+	uint32 enableBits;
+	enable.info_size = sizeof(enable);
+	enable.enable_bits = (uchar*)&enableBits;
+
+	status = get_enabled_channels(fDevice, &enable);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_GET_ENABLED_CHANNELS: %s\n",
+			strerror(status));
+		return status;
 	}
 
-	mce_enable_bits = (1 << num_channels) - 1;
-	MCE.lock_source = B_MULTI_LOCK_INTERNAL;
-	rval = DRIVER_SET_ENABLED_CHANNELS(&MCE, 0);
-	if (B_OK != rval)
-	{
-		fprintf(stderr, "Failed on B_MULTI_SET_ENABLED_CHANNELS 0x%p 0x%x\n", MCE.enable_bits, *(MCE.enable_bits));
-		return B_ERROR;
+	enableBits = (1 << num_channels) - 1;
+	enable.lock_source = B_MULTI_LOCK_INTERNAL;
+
+	status = set_enabled_channels(fDevice, &enable);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_SET_ENABLED_CHANNELS 0x%x: %s\n",
+			*enable.enable_bits, strerror(status));
+		return status;
 	}
 
-	//
 	// Set the sample rate
-	//
-	MFI.info_size = sizeof(MFI);
-	MFI.output.rate = select_multiaudio_rate(MD.output_rates);
-	MFI.output.cvsr = 0;
-	MFI.output.format = select_multiaudio_format(MD.output_formats);
-	MFI.input.rate = MFI.output.rate;
-	MFI.input.cvsr = MFI.output.cvsr;
-	MFI.input.format = MFI.output.format;
-	rval = DRIVER_SET_GLOBAL_FORMAT(&MFI, 0);
-	if (B_OK != rval)
-	{
-		fprintf(stderr, "Failed on B_MULTI_SET_GLOBAL_FORMAT\n");
-		return B_ERROR;
+
+	fFormatInfo.info_size = sizeof(multi_format_info);
+	fFormatInfo.output.rate = select_sample_rate(fDescription.output_rates);
+	fFormatInfo.output.cvsr = 0;
+	fFormatInfo.output.format = select_format(fDescription.output_formats);
+	fFormatInfo.input.rate = select_sample_rate(fDescription.input_rates);
+	fFormatInfo.input.cvsr = fFormatInfo.output.cvsr;
+	fFormatInfo.input.format = select_format(fDescription.input_formats);
+
+	status = set_global_format(fDevice, &fFormatInfo);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_SET_GLOBAL_FORMAT: %s\n",
+			strerror(status));
+#if 0
 	}
 
-	//
+	status = get_global_format(fDevice, &fFormatInfo);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_GET_GLOBAL_FORMAT: %s\n",
+			strerror(status));
+#endif
+		return status;
+	}
+
 	// Get the buffers
-	//
-	for (i = 0; i < NB_BUFFERS; i++) {
-		play_buffer_desc[i] = &play_buffer_list[i * MAX_CHANNELS];
-		record_buffer_desc[i] = &record_buffer_list[i * MAX_CHANNELS];
+
+	for (uint32 i = 0; i < MAX_BUFFERS; i++) {
+		fPlayBuffers[i] = &fPlayBufferList[i * MAX_CHANNELS];
+		fRecordBuffers[i] = &fRecordBufferList[i * MAX_CHANNELS];
 	}
-	MBL.info_size = sizeof(MBL);
-	MBL.request_playback_buffer_size = 0;           //use the default......
-	MBL.request_playback_buffers = NB_BUFFERS;
-	MBL.request_playback_channels = num_outputs;
-	MBL.playback_buffers = (buffer_desc **) play_buffer_desc;
-	MBL.request_record_buffer_size = 0;           //use the default......
-	MBL.request_record_buffers = NB_BUFFERS;
-	MBL.request_record_channels = num_inputs;
-	MBL.record_buffers = (buffer_desc **) record_buffer_desc;
+	fBufferList.info_size = sizeof(multi_buffer_list);
+	fBufferList.request_playback_buffer_size = 0;
+		// use the default...
+	fBufferList.request_playback_buffers = MAX_BUFFERS;
+	fBufferList.request_playback_channels = num_outputs;
+	fBufferList.playback_buffers = (buffer_desc **) fPlayBuffers;
+	fBufferList.request_record_buffer_size = 0;
+		// use the default...
+	fBufferList.request_record_buffers = MAX_BUFFERS;
+	fBufferList.request_record_channels = num_inputs;
+	fBufferList.record_buffers = /*(buffer_desc **)*/ fRecordBuffers;
 
-	rval = DRIVER_GET_BUFFERS(&MBL, 0);
-
-	if (B_OK != rval)
-	{
-		fprintf(stderr, "Failed on B_MULTI_GET_BUFFERS\n");
-		return B_ERROR;
+	status = get_buffers(fDevice, &fBufferList);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on B_MULTI_GET_BUFFERS: %s\n",
+			strerror(status));
+		return status;
 	}
 
-	for (i = 0; i < MBL.return_playback_buffers; i++)
-		for (int j = 0; j < MBL.return_playback_channels; j++) {
-			PRINT(("MBL.playback_buffers[%d][%d].base: %p\n",
-				i, j, MBL.playback_buffers[i][j].base));
-			PRINT(("MBL.playback_buffers[%d][%d].stride: %i\n",
-				i, j, MBL.playback_buffers[i][j].stride));
+	for (int32 i = 0; i < fBufferList.return_playback_buffers; i++) {
+		for (int32 j = 0; j < fBufferList.return_playback_channels; j++) {
+			PRINT(("fBufferList.playback_buffers[%d][%d].base: %p\n",
+				i, j, fBufferList.playback_buffers[i][j].base));
+			PRINT(("fBufferList.playback_buffers[%d][%d].stride: %i\n",
+				i, j, fBufferList.playback_buffers[i][j].stride));
 		}
+	}
 
-	for (i = 0; i < MBL.return_record_buffers; i++)
-		for (int j = 0; j < MBL.return_record_channels; j++) {
-			PRINT(("MBL.record_buffers[%d][%d].base: %p\n",
-				i, j, MBL.record_buffers[i][j].base));
-			PRINT(("MBL.record_buffers[%d][%d].stride: %i\n",
-				i, j, MBL.record_buffers[i][j].stride));
+	for (int32 i = 0; i < fBufferList.return_record_buffers; i++) {
+		for (int32 j = 0; j < fBufferList.return_record_channels; j++) {
+			PRINT(("fBufferList.record_buffers[%d][%d].base: %p\n",
+				i, j, fBufferList.record_buffers[i][j].base));
+			PRINT(("fBufferList.record_buffers[%d][%d].stride: %i\n",
+				i, j, fBufferList.record_buffers[i][j].stride));
 		}
+	}
 
-	MMCI.info_size = sizeof(MMCI);
-	MMCI.control_count = MAX_CONTROLS;
-	MMCI.controls = MMC;
+	fMixControlInfo.info_size = sizeof(fMixControlInfo);
+	fMixControlInfo.control_count = MAX_CONTROLS;
+	fMixControlInfo.controls = fMixControl;
 
-	rval = DRIVER_LIST_MIX_CONTROLS(&MMCI, 0);
-
-	if (B_OK != rval)
-	{
-		fprintf(stderr, "Failed on DRIVER_LIST_MIX_CONTROLS\n");
-		return B_ERROR;
+	status = list_mix_controls(fDevice, &fMixControlInfo);
+	if (status != B_OK) {
+		fprintf(stderr, "Failed on DRIVER_LIST_MIX_CONTROLS: %s\n",
+			strerror(status));
+		return status;
 	}
 
 	return B_OK;
 }
 
-int
-MultiAudioDevice::DoBufferExchange(multi_buffer_info *MBI)
+
+status_t
+MultiAudioDevice::DoBufferExchange(multi_buffer_info *info)
 {
-	return DRIVER_BUFFER_EXCHANGE(MBI, 0);
+	return buffer_exchange(fDevice, info);
 }
 
-int
-MultiAudioDevice::DoSetMix(multi_mix_value_info *MMVI)
+
+status_t
+MultiAudioDevice::DoSetMix(multi_mix_value_info *info)
 {
-	return DRIVER_SET_MIX(MMVI, 0);
+	return set_mix(fDevice, info);
 }
 
-int
-MultiAudioDevice::DoGetMix(multi_mix_value_info *MMVI)
+
+status_t
+MultiAudioDevice::DoGetMix(multi_mix_value_info *info)
 {
-	return DRIVER_GET_MIX(MMVI, 0);
+	return get_mix(fDevice, info);
 }

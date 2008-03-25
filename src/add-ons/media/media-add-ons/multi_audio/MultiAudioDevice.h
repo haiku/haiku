@@ -2,59 +2,54 @@
  * Copyright (c) 2002-2007, Jerome Duval (jerome.duval@free.fr)
  * Distributed under the terms of the MIT License.
  */
+#ifndef MULTI_AUDIO_DEVICE_H
+#define MULTI_AUDIO_DEVICE_H
 
-#ifndef _MULTIAUDIODEVICE_H
-#define _MULTIAUDIODEVICE_H
 
 #include "hmulti_audio.h"
 
+
 #define MAX_CONTROLS	128
 #define MAX_CHANNELS	32
-#define NB_BUFFERS		32
+#define MAX_BUFFERS		32
 
-class MultiAudioDevice
-{
-	public:
-		explicit MultiAudioDevice(const char *name, const char* path);
-		virtual ~MultiAudioDevice(void);
 
-		virtual status_t InitCheck(void) const;
+class MultiAudioDevice {
+public:
+						MultiAudioDevice(const char* name, const char* path);
+						~MultiAudioDevice();
 
-		static float convert_multiaudio_rate_to_media_rate(uint32 rate);
-		static uint32 convert_media_rate_to_multiaudio_rate(float rate);
-		static uint32 convert_multiaudio_format_to_media_format(uint32 fmt);
-		static int16 convert_multiaudio_format_to_valid_bits(uint32 fmt);
-		static uint32 convert_media_format_to_multiaudio_format(uint32 fmt);
-		static uint32 select_multiaudio_rate(uint32 rate);
-		static uint32 select_multiaudio_format(uint32 fmt);
+	status_t			InitCheck() const;
 
-		int DoBufferExchange(multi_buffer_info *MBI);
-		int DoSetMix(multi_mix_value_info *MMVI);
-		int DoGetMix(multi_mix_value_info *MMVI);
+	const multi_description& Description() const { return fDescription; }
+	const multi_format_info& FormatInfo() const { return fFormatInfo; }
+	const multi_buffer_list& BufferList() const { return fBufferList; }
+	const multi_mix_control_info& MixControlInfo() const
+							{ return fMixControlInfo; }
 
-	private:
-		status_t			InitDriver();
+	status_t			DoBufferExchange(multi_buffer_info* bufferInfo);
+	status_t			DoSetMix(multi_mix_value_info* mixValueInfo);
+	status_t			DoGetMix(multi_mix_value_info* mixValueInfo);
 
-		int						fd; 			//file descriptor for hw driver
-		char					fDevice_name[32];
-		char					fDevice_path[32];
+private:
+	status_t			_InitDriver();
 
-	public:
-		multi_description		MD;
-		multi_channel_info		MCI[MAX_CHANNELS];
-		multi_format_info 		MFI;
-		multi_buffer_list 		MBL;
+	status_t 			fInitStatus;
+	int					fDevice;
+	char				fPath[B_PATH_NAME_LENGTH];
 
-		multi_mix_control_info 	MMCI;
-		multi_mix_control		MMC[MAX_CONTROLS];
+	multi_description	fDescription;
+	multi_channel_info	fChannelInfo[MAX_CHANNELS];
+	multi_format_info 	fFormatInfo;
+	multi_buffer_list 	fBufferList;
 
-		buffer_desc		play_buffer_list[NB_BUFFERS * MAX_CHANNELS];
-		buffer_desc		record_buffer_list[NB_BUFFERS * MAX_CHANNELS];
-		buffer_desc 	*play_buffer_desc[NB_BUFFERS];
-		buffer_desc 	*record_buffer_desc[NB_BUFFERS];
+	multi_mix_control_info fMixControlInfo;
+	multi_mix_control	fMixControl[MAX_CONTROLS];
 
-	private:
-		status_t 				fInitCheckStatus;
+	buffer_desc			fPlayBufferList[MAX_BUFFERS * MAX_CHANNELS];
+	buffer_desc			fRecordBufferList[MAX_BUFFERS * MAX_CHANNELS];
+	buffer_desc*		fPlayBuffers[MAX_BUFFERS];
+	buffer_desc*		fRecordBuffers[MAX_BUFFERS];
 };
 
-#endif
+#endif	// MULTI_AUDIO_DEVICE_H
