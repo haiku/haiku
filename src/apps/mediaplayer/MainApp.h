@@ -2,6 +2,7 @@
  * MainApp.h - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,7 +25,10 @@
 #include "MainWin.h"
 
 enum  {
-	M_PLAYER_QUIT = 'plqt',
+	M_PLAYER_QUIT				= 'plqt',
+
+	M_MEDIA_SERVER_STARTED		= 'msst',
+	M_MEDIA_SERVER_QUIT			= 'msqt'
 };
 
 class MainApp : public BApplication {
@@ -35,14 +39,20 @@ public:
 			BWindow*			NewWindow();
 
 private:
+	virtual	void				ReadyToRun();
 	virtual	void				RefsReceived(BMessage* message);
 	virtual	void				ArgvReceived(int32 argc, char** argv);
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	void				AboutRequested();
 
+			void				_BroadcastMessage(const BMessage& message);
+
 private:
 			int32				fPlayerCount;
 			BWindow*			fFirstWindow;
+
+			bool				fMediaServerRunning;
+			bool				fMediaAddOnServerRunning;
 };
 
 extern MainApp* gMainApp;

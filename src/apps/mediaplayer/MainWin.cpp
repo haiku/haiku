@@ -328,6 +328,14 @@ MainWin::MessageReceived(BMessage *msg)
 				_RefsReceived(msg);
 			break;
 
+		case M_MEDIA_SERVER_STARTED:
+			// fController->...
+			break;
+
+		case M_MEDIA_SERVER_QUIT:
+			// fController->...
+			break;
+
 		// PlaylistObserver messages
 		case MSG_PLAYLIST_REF_ADDED: {
 			entry_ref ref;

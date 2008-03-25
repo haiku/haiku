@@ -2,6 +2,7 @@
  * MainApp.cpp - Media Player for the Haiku Operating System
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (C) 2008 Stephan Aßmus <superstippi@gmx.de>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,21 +18,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  *
  */
-#include <Path.h>
-#include <Entry.h>
+#include "MainApp.h"
+
 #include <Alert.h>
 #include <Autolock.h>
-#include <unistd.h>
-#include <stdio.h>
+#include <Entry.h>
+#include <MediaRoster.h>
+#include <Path.h>
+#include <Roster.h>
 
-#include "MainApp.h"
+#include <stdio.h>
+#include <unistd.h>
+
 
 MainApp *gMainApp;
 
+static const char* kMediaServerSig = "application/x-vnd.Be.media-server";
+static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
+
+
 MainApp::MainApp()
 	: BApplication("application/x-vnd.Haiku-MediaPlayer"),
-	fPlayerCount(0),
-	fFirstWindow(NewWindow())
+	  fPlayerCount(0),
+	  fFirstWindow(NewWindow()),
+
+	  fMediaServerRunning(false),
+	  fMediaAddOnServerRunning(false)
 {
 }
 
@@ -47,6 +59,21 @@ MainApp::NewWindow()
 	BAutolock _(this);
 	fPlayerCount++;
 	return new MainWin();
+}
+
+
+void
+MainApp::ReadyToRun()
+{
+	// Now tell the application roster, that we're interested
+	// in getting notifications of apps being launched or quit.
+	// In this way we are going to detect a media_server restart.
+	be_roster->StartWatching(BMessenger(this, this),
+		B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
+	// we will keep track of the status of media_server
+	// and media_addon_server
+	fMediaServerRunning =  be_roster->IsRunning(kMediaServerSig);
+	fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
 }
 
 
@@ -106,17 +133,65 @@ MainApp::ArgvReceived(int32 argc, char **argv)
 
 
 void 
-MainApp::MessageReceived(BMessage *msg)
+MainApp::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case M_PLAYER_QUIT:
 			fPlayerCount--;
 			if (fPlayerCount == 0)
 				PostMessage(B_QUIT_REQUESTED);
 			break;
 
+		case B_SOME_APP_LAUNCHED:
+		case B_SOME_APP_QUIT:
+		{
+			const char* mimeSig;
+			if (message->FindString("be:signature", &mimeSig) < B_OK)
+				break;
+
+			bool isMediaServer = strcmp(mimeSig, kMediaServerSig) == 0;
+			bool isAddonServer = strcmp(mimeSig, kMediaServerAddOnSig) == 0;
+			if (!isMediaServer && !isAddonServer)
+				break;
+	
+			bool running = (message->what == B_SOME_APP_LAUNCHED);
+			if (isMediaServer)
+				fMediaServerRunning = running;
+			if (isAddonServer)
+				fMediaAddOnServerRunning = running;
+
+			if (!fMediaServerRunning && !fMediaAddOnServerRunning) {
+				fprintf(stderr, "media server has quit.\n");
+				// trigger closing of media nodes
+				BMessage broadcast(M_MEDIA_SERVER_QUIT);
+				_BroadcastMessage(broadcast);
+			} else if (fMediaServerRunning && fMediaAddOnServerRunning) {
+				fprintf(stderr, "media server has launched.\n");
+				// HACK!
+				// quit our now invalid instance of the media roster
+				// so that before new nodes are created,
+				// we get a new roster (it is a normal looper)
+				// TODO: This functionality could become part of
+				// BMediaRoster. It could detect the start/quit of
+				// the servers like it is done here, and either quit
+				// itself, or re-establish the connection, and send some
+				// notification to the app... something along those lines.
+				BMediaRoster* roster = BMediaRoster::CurrentRoster();
+				if (roster) {
+					roster->Lock();
+					roster->Quit();
+				}
+				// give the servers some time to init...
+				snooze(3000000);
+				// trigger re-init of media nodes
+				BMessage broadcast(M_MEDIA_SERVER_STARTED);
+				_BroadcastMessage(broadcast);
+			}
+			break;
+		}
+
 		default:
-			BApplication::MessageReceived(msg);
+			BApplication::MessageReceived(message);
 			break;
 	}
 }
@@ -127,6 +202,19 @@ MainApp::AboutRequested()
 {
 	fFirstWindow->PostMessage(B_ABOUT_REQUESTED);
 }
+
+
+void
+MainApp::_BroadcastMessage(const BMessage& _message)
+{
+	for (int32 i = 0; BWindow* window = WindowAt(i); i++) {
+		BMessage message(_message);
+		window->PostMessage(&message);
+	}
+}
+
+
+// #pragma mark -
 
 
 int 
