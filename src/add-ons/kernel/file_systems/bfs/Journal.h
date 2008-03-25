@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef JOURNAL_H
@@ -34,7 +34,7 @@ class Journal {
 	public:
 		Journal(Volume *);
 		~Journal();
-		
+
 		status_t InitCheck();
 
 		status_t Lock(Transaction *owner);
@@ -57,7 +57,8 @@ class Journal {
 		status_t _CheckRunArray(const run_array *array);
 		status_t _ReplayRunArray(int32 *start);
 		status_t _TransactionDone(bool success);
-		static void _BlockNotify(int32 transactionID, int32 event, void *arg);
+		static void _TransactionNotify(int32 transactionID, int32 event,
+			void *_logEntry);
 
 		Volume			*fVolume;
 		RecursiveLock	fLock;
@@ -72,11 +73,11 @@ class Journal {
 };
 
 
-inline uint32 
+inline uint32
 Journal::FreeLogBlocks() const
 {
-	return fVolume->LogStart() <= fVolume->LogEnd() ?
-		fLogSize - fVolume->LogEnd() + fVolume->LogStart()
+	return fVolume->LogStart() <= fVolume->LogEnd()
+		? fLogSize - fVolume->LogEnd() + fVolume->LogStart()
 		: fVolume->LogStart() - fVolume->LogEnd();
 }
 

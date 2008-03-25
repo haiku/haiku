@@ -526,39 +526,38 @@ Journal::ReplayLog()
 
 
 /*!	This is a callback function that is called by the cache, whenever
-	a block is flushed to disk that was updated as part of a transaction.
-	This is necessary to keep track of completed transactions, to be
-	able to update the log start pointer.
+	all blocks of a transaction have been flushed to disk.
+	This lets us keep track of completed transactions, and update
+	the log start pointer as needed. Note, the transactions may not be
+	completed in the order they were written.
 */
 void
-Journal::_BlockNotify(int32 transactionID, int32 event, void *arg)
+Journal::_TransactionNotify(int32 transactionID, int32 event, void *_logEntry)
 {
-	LogEntry *logEntry = (LogEntry *)arg;
+	LogEntry *logEntry = (LogEntry *)_logEntry;
 
 	if (event != TRANSACTION_WRITTEN)
 		return;
 
-	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry, transactionID));
+	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry,
+		transactionID));
 
 	Journal *journal = logEntry->GetJournal();
 	disk_super_block &superBlock = journal->fVolume->SuperBlock();
 	bool update = false;
 
 	// Set log_start pointer if possible...
+	// TODO: this is not endian safe!
 
 	journal->fEntriesLock.Lock();
 
 	if (logEntry == journal->fEntries.First()) {
 		LogEntry *next = journal->fEntries.GetNext(logEntry);
-		if (next != NULL) {
-			int32 length = next->Start() - logEntry->Start();
-				// log entries inbetween could have been already released, so
-				// we can't just use LogEntry::Length() here
-			superBlock.log_start = superBlock.log_start + length;
-		} else
+		if (next != NULL)
+			superBlock.log_start = next->Start() % journal->fLogSize;
+		else
 			superBlock.log_start = journal->fVolume->LogEnd();
 
-		superBlock.log_start %= journal->fLogSize;
 		update = true;
 	}
 
@@ -653,6 +652,11 @@ Journal::_WriteTransactionToLog()
 		}
 		return B_OK;
 	}
+
+	// If necessary, flush the log, so that we have enough space for this
+	// transaction
+	if (runArrays.LogEntryLength() > FreeLogBlocks())
+		cache_sync_transaction(fVolume->BlockCache(), fTransactionID);
 
 	// Write log entries to disk
 
@@ -759,11 +763,11 @@ Journal::_WriteTransactionToLog()
 
 	if (detached) {
 		fTransactionID = cache_detach_sub_transaction(fVolume->BlockCache(),
-			fTransactionID, _BlockNotify, logEntry);
+			fTransactionID, _TransactionNotify, logEntry);
 		fUnwrittenTransactions = 1;
 	} else {
 		cache_end_transaction(fVolume->BlockCache(), fTransactionID,
-			_BlockNotify, logEntry);
+			_TransactionNotify, logEntry);
 		fUnwrittenTransactions = 0;
 	}
 
@@ -866,7 +870,10 @@ Journal::_TransactionSize() const
 	if (count < 0)
 		return 0;
 
-	return count;
+	// take the number of array blocks in this transaction into account
+	uint32 maxRuns = run_array::MaxRuns(fVolume->BlockSize());
+	uint32 arrayBlocks = (count + maxRuns - 1) / maxRuns;
+	return count + arrayBlocks;
 }
 
 
@@ -882,14 +889,15 @@ Journal::_TransactionDone(bool success)
 		return B_OK;
 	}
 
-	// If necessary, flush the log, so that we have enough space for this
-	// transaction
-	if (_TransactionSize() > FreeLogBlocks())
-		cache_sync_transaction(fVolume->BlockCache(), fTransactionID);
-
 	// Up to a maximum size, we will just batch several
 	// transactions together to improve speed
-	if (_TransactionSize() < fMaxTransactionSize) {
+	uint32 size = _TransactionSize();
+	if (size < fMaxTransactionSize) {
+		// Flush the log from time to time, so that we have enough space
+		// for this transaction
+		if (size > FreeLogBlocks())
+			cache_sync_transaction(fVolume->BlockCache(), fTransactionID);
+
 		fUnwrittenTransactions++;
 		return B_OK;
 	}
