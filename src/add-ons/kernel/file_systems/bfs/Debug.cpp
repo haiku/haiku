@@ -248,14 +248,23 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 static int
 dump_inode(int argc, char **argv)
 {
-	if (argc != 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: bfsinode <ptr-to-inode>\n");
+	bool block = false;
+	if (argc == 3 && !strcmp(argv[1], "-b"))
+		block = true;
+
+	if (argc != 2 + (block ? 1 : 0) || !strcmp(argv[1], "--help")) {
+		kprintf("usage: bfsinode [-b] <ptr-to-inode>\n");
 		return 0;
 	}
 
-	Inode *inode = (Inode *)parse_expression(argv[1]);
-	dump_inode(&inode->Node());
+	addr_t address = parse_expression(argv[argc - 1]);
+	bfs_inode *node;
+	if (block)
+		node = (bfs_inode *)address;
+	else
+		node = &((Inode *)address)->Node();
 
+	dump_inode(node);
 	return 0;
 }
 
