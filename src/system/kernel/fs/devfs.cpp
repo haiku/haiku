@@ -1794,6 +1794,7 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 		// TODO: we might want to check if the current node does still exist
 		// (it should fail in the driver's open(), though, if it doesn't)
 		if (driver != NULL
+			&& (driver->devices_used == 0)
 			&& (driver->image < 0 || driver->binary_updated)) {
 			status = reload_driver(driver);
 			if (status < B_OK)
