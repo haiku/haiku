@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #include <AutoDeleter.h>
+#include <EntryFilter.h>
 #include <fs_attr.h>
 #include <StorageDefs.h>
 
@@ -29,6 +30,9 @@
 #include "syscalls.h"
 
 
+using BPrivate::EntryFilter;
+
+
 namespace FSShell {
 
 
@@ -37,7 +41,8 @@ static const int sCopyBufferSize = 64 * 1024;	// 64 KB
 
 struct Options {
 	Options()
-		: attributesOnly(false),
+		: entryFilter(),
+		  attributesOnly(false),
 		  ignoreAttributes(false),
 		  dereference(true),
 		  force(false),
@@ -45,11 +50,12 @@ struct Options {
 	{
 	}
 
-	bool	attributesOnly;
-	bool	ignoreAttributes;
-	bool	dereference;
-	bool	force;
-	bool	recursive;
+	EntryFilter	entryFilter;
+	bool		attributesOnly;
+	bool		ignoreAttributes;
+	bool		dereference;
+	bool		force;
+	bool		recursive;
 };
 
 class Directory;
@@ -1064,6 +1070,10 @@ copy_entry(FSDomain *sourceDomain, const char *source,
 	FSDomain *targetDomain, const char *target, const Options &options,
 	bool dereference)
 {
+	// apply entry filter
+	if (!options.entryFilter.Filter(source))
+		return FSSH_B_OK;
+
 	// open the source node
 	Node *sourceNode;
 	fssh_status_t error = sourceDomain->Open(source,
@@ -1253,6 +1263,24 @@ command_cp(int argc, const char* const* argv)
 						case 'r':
 							options.recursive = true;
 							break;
+						case 'x':
+						case 'X':
+						{
+							const char* pattern;
+							if (arg[i + 1] == '\0') {
+								if (++argi >= argc) {
+									fprintf(stderr, "Error: Option '-%c' need "
+										"a pattern as parameter\n", arg[i]);
+									return FSSH_EINVAL;
+								}
+								pattern = argv[argi];
+							} else
+								pattern = arg + i + 1;
+
+							options.entryFilter.AddExcludeFilter(pattern,
+								arg[i] == 'x');
+							break;
+						}
 						default:
 							fprintf(stderr, "Error: Unknown option '-%c'\n",
 								arg[i]);
