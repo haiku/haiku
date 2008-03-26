@@ -549,11 +549,12 @@ list_entry(const char* file, const char* name = NULL)
 	std::string nameSuffix;
 	if (FSSH_S_ISLNK(mode)) {
 		char buffer[FSSH_B_PATH_NAME_LENGTH];
-		fssh_size_t size = sizeof(buffer);
+		fssh_size_t size = sizeof(buffer) - 1;
 		error = _kern_read_link(-1, file, buffer, &size);
 		if (error != FSSH_B_OK)
 			snprintf(buffer, sizeof(buffer), "(%s)", fssh_strerror(error));
 
+		buffer[size] = '\0';
 		nameSuffix += " -> ";
 		nameSuffix += buffer;
 	}
