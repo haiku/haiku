@@ -164,6 +164,11 @@ execvp(const char *file, char* const* argv)
 			strcat(path, "/");
 		strcat(path, file);
 
+		// check whether it is a file
+		struct stat st;
+		if (stat(path, &st) != 0 || !S_ISREG(st.st_mode))
+			continue;
+
 		// if executable, execute it
 		if (access(path, X_OK) == 0)
 			return do_exec(path, argv, environ, true);
