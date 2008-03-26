@@ -419,6 +419,7 @@ public:
 		thread_id	fThread;
 		team_id		fTeam;
 		const char*	fString;
+		uint64		fValue;
 		struct {
 			TraceFilter*	first;
 			TraceFilter*	second;
@@ -457,6 +458,42 @@ public:
 	}
 };
 
+
+class DecimalPatternTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		// TODO: this is *very* slow
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "%Ld", fValue);
+		return strstr(out.DumpEntry(entry), buffer) != NULL;
+	}
+};
+
+class HexPatternTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		// TODO: this is *very* slow
+		char buffer[64];
+		snprintf(buffer, sizeof(buffer), "%Lx", fValue);
+		return strstr(out.DumpEntry(entry), buffer) != NULL;
+	}
+};
+
+class StringPatternTraceFilter : public TraceFilter {
+public:
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	{
+		if (IS_KERNEL_ADDRESS(fValue))
+			return strstr(out.DumpEntry(entry), (const char*)fValue) != NULL;
+
+		// TODO: this is *very* slow
+		char buffer[64];
+		user_strlcpy(buffer, (const char*)fValue, sizeof(buffer));
+		return strstr(out.DumpEntry(entry), buffer) != NULL;
+	}
+};
 
 class NotTraceFilter : public TraceFilter {
 public:
@@ -528,6 +565,21 @@ private:
 			TraceFilter* filter = new(&fFilters[fFilterCount++])
 				PatternTraceFilter;
 			filter->fString = token + 1;
+			return filter;
+		} else if (token[0] == 'd' && token[1] == '#') {
+			TraceFilter* filter = new(&fFilters[fFilterCount++])
+				DecimalPatternTraceFilter;
+			filter->fValue = parse_expression(token + 2);
+			return filter;
+		} else if (token[0] == 'x' && token[1] == '#') {
+			TraceFilter* filter = new(&fFilters[fFilterCount++])
+				HexPatternTraceFilter;
+			filter->fValue = parse_expression(token + 2);
+			return filter;
+		} else if (token[0] == 's' && token[1] == '#') {
+			TraceFilter* filter = new(&fFilters[fFilterCount++])
+				StringPatternTraceFilter;
+			filter->fValue = parse_expression(token + 2);
 			return filter;
 		} else if (strcmp(token, "not") == 0) {
 			TraceFilter* filter = new(&fFilters[fFilterCount++]) NotTraceFilter;
