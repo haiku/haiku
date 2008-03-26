@@ -1,27 +1,27 @@
 /*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ *
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Deadlock-safe allocation of locked memory.
+/*!	Deadlock-safe allocation of locked memory.
 
 	Allocation/freeing is optimized for speed. Count of <sem>
-	is the number of free blocks and thus should be modified 
+	is the number of free blocks and thus should be modified
 	by each alloc() and free(). As this count is only crucial if
 	an allocation is waiting for a free block, <sem> is only
-	updated on demand - the correct number of free blocks is 
-	stored in <free_blocks> and the difference between <free_blocks>
-	and the semaphore count is stored in <diff_locks>. There
-	are only three cases where <sem> is updated:
+	updated on demand - the correct number of free blocks is
+	stored in <free_blocks>. There are only three cases where
+	<sem> is updated:
 
 	- if an	allocation fails because there is no free block left;
-	  in this case, <num_waiting> increased by one and then the 
-	  thread makes <sem> up-to-date and waits for a free block 
+	  in this case, <num_waiting> increased by one and then the
+	  thread makes <sem> up-to-date and waits for a free block
 	  via <sem> in one step; finally, <num_waiting> is decreased
 	  by one
 	- if a block is freed and <num_waiting> is non-zero;
-	  here, count of <sem> is updated to release threads waiting 
+	  here, count of <sem> is updated to release threads waiting
 	  for allocation
 	- if a new chunk of blocks is allocated;
 	  same as previous case
@@ -51,7 +51,6 @@ typedef struct locked_pool {
 	benaphore mutex;			// to be used whenever some variable of the first
 								// block of this structure is read or modified
 	int free_blocks;			// # free blocks
-	int diff_locks;				// # how often <sem> must be acquired
 	int num_waiting;			// # waiting allocations
 	void *free_list;			// list of free blocks
 	int next_ofs;				// offset of next-pointer in block
@@ -77,265 +76,141 @@ typedef struct locked_pool {
 // header of memory chunk
 typedef struct chunk_header {
 	struct chunk_header *next;	// free-list
-	area_id region;				// underlying region
+	area_id area;				// underlying area
 	int num_blocks;				// size in blocks
 } chunk_header;
 
 
 // global list of pools
-static locked_pool *locked_pools;
-// benaphore to protect locked_pools
-static benaphore locked_pool_ben;
+static locked_pool *sLockedPools;
+// benaphore to protect sLockedPools
+static benaphore sLockedPoolsLock;
 // true, if thread should shut down
-static bool locked_pool_shutting_down;
+static bool sShuttingDown;
 // background thread to enlarge pools
-static thread_id locked_pool_enlarger_thread;
+static thread_id sEnlargerThread;
 // semaphore to wake up enlarger thread
-static sem_id locked_pool_enlarger_sem;
+static sem_id sEnlargerSemaphore;
 
 // macro to access next-pointer in free block
 #define NEXT_PTR(pool, a) ((void **)(((char *)a) + pool->next_ofs))
 
 
-/** public: alloc memory from pool */
-
-static void *
-pool_alloc(locked_pool *pool)
-{
-	void *block;
-	int num_to_lock;
-
-	TRACE(("pool_alloc()\n"));
-
-	benaphore_lock(&pool->mutex);
-
-	--pool->free_blocks;
-
-	if (pool->free_blocks > 0) {
-		// there are free blocks - grab one
-
-		// increase difference between allocations executed and those
-		// reflected in pool semaphore
-		++pool->diff_locks;
-
-		TRACE(("freeblocks=%d, diff_locks=%d, free_list=%p\n",
-			pool->free_blocks, pool->diff_locks, pool->free_list));
-
-		block = pool->free_list;
-		pool->free_list = *NEXT_PTR(pool, block);
-		
-		TRACE(("new free_list=%p\n", pool->free_list));
-
-		benaphore_unlock(&pool->mutex);
-		return block;
-	}
-
-	// entire pool is in use
-	// we should do a ++free_blocks here, but this can lead to race
-	// condition: when we wait for <sem> and a block gets released
-	// and another thread calls alloc() before we grab the freshly freed
-	// block, the other thread could overtake us and grab the free block
-	// instead! by leaving free_block at a negative value, the other
-	// thread cannot see the free block and thus will leave it for us
-
-	// tell them we are waiting on semaphore
-	++pool->num_waiting;
-
-	// make pool semaphore up-to-date; 
-	// add one as we want to allocate a block
-	num_to_lock = pool->diff_locks+1;
-	pool->diff_locks = 0;
-
-	TRACE(("locking %d times (%d waiting allocs)\n", num_to_lock, pool->num_waiting));
-
-	benaphore_unlock(&pool->mutex);
-
-	// awake background thread
-	release_sem_etc(locked_pool_enlarger_sem, 1, B_DO_NOT_RESCHEDULE);
-	// make samphore up-to-date and wait until a block is available
-	acquire_sem_etc(pool->sem, num_to_lock, 0, 0);
-
-	benaphore_lock(&pool->mutex);
-
-	// tell them that we don't wait on semaphore anymore	
-	--pool->num_waiting;
-
-	TRACE(("continuing alloc (%d free blocks)\n", pool->free_blocks));
-
-	block = pool->free_list;
-	pool->free_list = *NEXT_PTR(pool, block);
-
-	benaphore_unlock(&pool->mutex);
-	return block;
-}
-
-
-/** public: free block */
-
-static void
-pool_free(locked_pool *pool, void *block)
-{
-	int num_to_unlock;
-
-	TRACE(("pool_free()\n"));
-
-	benaphore_lock(&pool->mutex);
-
-	// add to free list	
-	*NEXT_PTR(pool, block) = pool->free_list;
-	pool->free_list = block;
-
-	++pool->free_blocks;
-
-	// increase difference between allocation executed and those
-	// reflected in pool semaphore
-	--pool->diff_locks;
-
-	TRACE(("freeblocks=%d, diff_locks=%d, free_list=%p\n",
-		pool->free_blocks, pool->diff_locks, pool->free_list));
-
-	if (pool->num_waiting == 0) {
-		// if noone is waiting, this is it
-		//SHOW_FLOW0( 3, "leaving" );
-		benaphore_unlock(&pool->mutex);
-		//SHOW_FLOW0( 3, "done" );
-		return;
-	}
-
-	// someone is waiting on semaphore, so we have to make it up-to-date
-	num_to_unlock = -pool->diff_locks;
-	pool->diff_locks = 0;
-
-	TRACE(("unlocking %d times (%d waiting allocs)\n",
-		num_to_unlock, pool->num_waiting));
-
-	benaphore_unlock(&pool->mutex);
-
-	// now it is up-to-date and waiting allocations can be continued
-	release_sem_etc(pool->sem, num_to_unlock, 0);
-	return;
-}
-
-
-/** enlarge memory pool by <num_block> blocks */
-
+/*! Enlarge memory pool by <num_block> blocks */
 static status_t
-enlarge_pool(locked_pool *pool, int num_blocks)
+enlarge_pool(locked_pool *pool, int numBlocks)
 {
 	void **next;
 	int i;
-	status_t res;
-	area_id region;
+	int numWaiting;
+	status_t status;
+	area_id area;
 	chunk_header *chunk;
-	size_t chunk_size;
-	int num_to_unlock;
-	void *block, *last_block;
-	
+	size_t chunkSize;
+	void *block, *lastBlock;
+
 	TRACE(("enlarge_pool()\n"));
 
 	// get memory directly from VM; we don't let user code access memory
-	chunk_size = num_blocks * pool->block_size + pool->header_size;
-	chunk_size = (chunk_size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	chunkSize = numBlocks * pool->block_size + pool->header_size;
+	chunkSize = (chunkSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 
-	res = region = create_area(pool->name,
-		(void **)&chunk, B_ANY_KERNEL_ADDRESS, chunk_size,
+	status = area = create_area(pool->name,
+		(void **)&chunk, B_ANY_KERNEL_ADDRESS, chunkSize,
 		pool->lock_flags, 0);
-	if (res < 0) {
-		dprintf("cannot enlarge pool (%s)\n", strerror(res));
-		return res;
+	if (status < B_OK) {
+		dprintf("cannot enlarge pool (%s)\n", strerror(status));
+		// TODO: we should wait a bit and try again!
+		return status;
 	}
 
-	chunk->region = region;
-	chunk->num_blocks = num_blocks;
+	chunk->area = area;
+	chunk->num_blocks = numBlocks;
 
 	// create free_list and call add-hook
 	// very important: we first create a freelist within the chunk,
 	// going from lower to higher addresses; at the end of the loop,
-	// "next" points to the head of the list and "last_block" to the
+	// "next" points to the head of the list and "lastBlock" to the
 	// last list node!
 	next = NULL;
 
-	last_block = (char *)chunk + pool->header_size + 
-		(num_blocks-1) * pool->block_size;
+	lastBlock = (char *)chunk + pool->header_size +
+		(numBlocks-1) * pool->block_size;
 
-	for (i = 0, block = last_block; i < num_blocks;
-		 ++i, block = (char *)block - pool->block_size) 
+	for (i = 0, block = lastBlock; i < numBlocks;
+		 ++i, block = (char *)block - pool->block_size)
 	{
 		if (pool->add_hook) {
-			if ((res = pool->add_hook(block, pool->hook_arg)) < 0)
+			if ((status = pool->add_hook(block, pool->hook_arg)) < B_OK)
 				break;
 		}
 
-		*NEXT_PTR(pool, block) = next;		
+		*NEXT_PTR(pool, block) = next;
 		next = block;
 	}
 
-	if (i < num_blocks) {
+	if (i < numBlocks) {
 		// ups - pre-init failed somehow
 		// call remove-hook for blocks that we called add-hook for
 		int j;
 
-		for (block = last_block, j = 0; j < i; ++j, block = (char *)block - pool->block_size) {
+		for (block = lastBlock, j = 0; j < i; ++j,
+				block = (char *)block - pool->block_size) {
 			if (pool->remove_hook)
 				pool->remove_hook(block, pool->hook_arg);
 		}
 
-		// destroy area and give up		
-		delete_area(chunk->region);
+		// destroy area and give up
+		delete_area(chunk->area);
 
-		return res;
+		return status;
 	}
 
 	// add new blocks to pool
 	benaphore_lock(&pool->mutex);
 
-	// see remarks about initialising list within chunk	
-	*NEXT_PTR(pool, last_block) = pool->free_list;
+	// see remarks about initialising list within chunk
+	*NEXT_PTR(pool, lastBlock) = pool->free_list;
 	pool->free_list = next;
 
 	chunk->next = pool->chunks;
 	pool->chunks = chunk;
 
-	pool->num_blocks += num_blocks;
+	pool->num_blocks += numBlocks;
+	pool->free_blocks += numBlocks;
 
-	pool->free_blocks += num_blocks;
-	pool->diff_locks -= num_blocks;
+	TRACE(("done - num_blocks=%d, free_blocks=%d, num_waiting=%d\n",
+		pool->num_blocks, pool->free_blocks, pool->num_waiting));
 
-	// update sem instantly (we could check waiting flag whether updating
-	// is really necessary, but we don't go for speed here)
-	num_to_unlock = -pool->diff_locks;
-	pool->diff_locks = 0;
-
-	TRACE(("done - num_blocks=%d, free_blocks=%d, num_waiting=%d, num_to_unlock=%d\n",
-		pool->num_blocks, pool->free_blocks, pool->num_waiting, num_to_unlock));
+	numWaiting = min_c(pool->num_waiting, numBlocks);
+	pool->num_waiting -= numWaiting;
 
 	benaphore_unlock(&pool->mutex);
 
-	// bring sem up-to-date, releasing threads that wait for empty blocks	
-	release_sem_etc(pool->sem, num_to_unlock, 0);
+	// release threads that wait for empty blocks
+	release_sem_etc(pool->sem, numWaiting, 0);
 
 	return B_OK;
 }
 
 
-/** background thread that adjusts pool size */
-
+/*! Background thread that adjusts pool size */
 static int32
-enlarger_threadproc(void *arg)
-{	
+enlarger_thread(void *arg)
+{
 	while (1) {
 		locked_pool *pool;
 
-		acquire_sem(locked_pool_enlarger_sem);
+		acquire_sem(sEnlargerSemaphore);
 
-		if (locked_pool_shutting_down)
+		if (sShuttingDown)
 			break;
 
 		// protect traversing of global list and
 		// block destroy_pool() to not clean up a pool we are enlarging
-		benaphore_lock(&locked_pool_ben);
+		benaphore_lock(&sLockedPoolsLock);
 
-		for (pool = locked_pools; pool; pool = pool->next) {
+		for (pool = sLockedPools; pool; pool = pool->next) {
 			int num_free;
 
 			// this mutex is probably not necessary (at least on 80x86)
@@ -353,20 +228,19 @@ enlarger_threadproc(void *arg)
 			// never create more blocks then defined - the caller may have
 			// a good reason for choosing the limit
 			if (pool->num_blocks < pool->max_blocks) {
-				enlarge_pool(pool, 
+				enlarge_pool(pool,
 					min(pool->enlarge_by, pool->max_blocks - pool->num_blocks));
 			}
 		}
 
-		benaphore_unlock(&locked_pool_ben);
+		benaphore_unlock(&sLockedPoolsLock);
 	}
 
 	return 0;
 }
 
 
-/** free all chunks belonging to pool */
-
+/*! Free all chunks belonging to pool */
 static void
 free_chunks(locked_pool *pool)
 {
@@ -374,37 +248,182 @@ free_chunks(locked_pool *pool)
 
 	for (chunk = pool->chunks; chunk; chunk = next) {
 		int i;
-		void *block, *last_block;
+		void *block, *lastBlock;
 
 		next = chunk->next;
 
-		last_block = (char *)chunk + pool->header_size + 
+		lastBlock = (char *)chunk + pool->header_size +
 			(chunk->num_blocks-1) * pool->block_size;
 
-		// don't forget to call remove-hook		
-		for (i = 0, block = last_block; i < pool->num_blocks; ++i, block = (char *)block - pool->block_size) {
+		// don't forget to call remove-hook
+		for (i = 0, block = lastBlock; i < pool->num_blocks; ++i, block = (char *)block - pool->block_size) {
 			if (pool->remove_hook)
 				pool->remove_hook(block, pool->hook_arg);
 		}
 
-		delete_area(chunk->region);
+		delete_area(chunk->area);
 	}
 
 	pool->chunks = NULL;
 }
 
 
-/** public: create pool */
+/*! Global init, executed when module is loaded */
+static status_t
+init_locked_pool(void)
+{
+	status_t status = benaphore_init(&sLockedPoolsLock,
+		"locked_pool_global_list");
+	if (status < B_OK)
+		goto err;
+
+	status = sEnlargerSemaphore = create_sem(0, "locked_pool_enlarger");
+	if (status < B_OK)
+		goto err2;
+
+	sLockedPools = NULL;
+	sShuttingDown = false;
+
+	status = sEnlargerThread = spawn_kernel_thread(enlarger_thread,
+		"locked_pool_enlarger", B_NORMAL_PRIORITY, NULL);
+	if (status < B_OK)
+		goto err3;
+
+	resume_thread(sEnlargerThread);
+	return B_OK;
+
+err3:
+	delete_sem(sEnlargerSemaphore);
+err2:
+	benaphore_destroy(&sLockedPoolsLock);
+err:
+	return status;
+}
+
+
+/*! Global uninit, executed before module is unloaded */
+static status_t
+uninit_locked_pool(void)
+{
+	sShuttingDown = true;
+
+	release_sem(sEnlargerSemaphore);
+
+	wait_for_thread(sEnlargerThread, NULL);
+
+	delete_sem(sEnlargerSemaphore);
+	benaphore_destroy(&sLockedPoolsLock);
+
+	return B_OK;
+}
+
+
+//	#pragma mark - Module API
+
+
+/*! Alloc memory from pool */
+static void *
+pool_alloc(locked_pool *pool)
+{
+	void *block;
+
+	TRACE(("pool_alloc()\n"));
+
+	benaphore_lock(&pool->mutex);
+
+	--pool->free_blocks;
+
+	if (pool->free_blocks > 0) {
+		// there are free blocks - grab one
+
+		TRACE(("freeblocks=%d, free_list=%p\n",
+			pool->free_blocks, pool->free_list));
+
+		block = pool->free_list;
+		pool->free_list = *NEXT_PTR(pool, block);
+
+		TRACE(("new free_list=%p\n", pool->free_list));
+
+		benaphore_unlock(&pool->mutex);
+		return block;
+	}
+
+	// entire pool is in use
+	// we should do a ++free_blocks here, but this can lead to race
+	// condition: when we wait for <sem> and a block gets released
+	// and another thread calls alloc() before we grab the freshly freed
+	// block, the other thread could overtake us and grab the free block
+	// instead! by leaving free_block at a negative value, the other
+	// thread cannot see the free block and thus will leave it for us
+
+	// tell them we are waiting on semaphore
+	++pool->num_waiting;
+
+	TRACE(("%d waiting allocs\n", pool->num_waiting));
+
+	benaphore_unlock(&pool->mutex);
+
+	// awake background thread
+	release_sem_etc(sEnlargerSemaphore, 1, B_DO_NOT_RESCHEDULE);
+	// make samphore up-to-date and wait until a block is available
+	acquire_sem(pool->sem);
+
+	benaphore_lock(&pool->mutex);
+
+	TRACE(("continuing alloc (%d free blocks)\n", pool->free_blocks));
+
+	block = pool->free_list;
+	pool->free_list = *NEXT_PTR(pool, block);
+
+	benaphore_unlock(&pool->mutex);
+	return block;
+}
+
+
+static void
+pool_free(locked_pool *pool, void *block)
+{
+	TRACE(("pool_free()\n"));
+
+	benaphore_lock(&pool->mutex);
+
+	// add to free list
+	*NEXT_PTR(pool, block) = pool->free_list;
+	pool->free_list = block;
+
+	++pool->free_blocks;
+
+	TRACE(("freeblocks=%d, free_list=%p\n", pool->free_blocks,
+		pool->free_list));
+
+	if (pool->num_waiting == 0) {
+		// if no one is waiting, this is it
+		benaphore_unlock(&pool->mutex);
+		return;
+	}
+
+	// someone is waiting on the semaphore
+
+	TRACE(("%d waiting allocs\n", pool->num_waiting));
+	pool->num_waiting--;
+
+	benaphore_unlock(&pool->mutex);
+
+	// now it is up-to-date and waiting allocations can be continued
+	release_sem(pool->sem);
+	return;
+}
+
 
 static locked_pool *
 create_pool(int block_size, int alignment, int next_ofs,
-	int chunk_size, int max_blocks, int min_free_blocks, 
+	int chunkSize, int max_blocks, int min_free_blocks,
 	const char *name, uint32 lock_flags,
-	locked_pool_add_hook add_hook, 
+	locked_pool_add_hook add_hook,
 	locked_pool_remove_hook remove_hook, void *hook_arg)
 {
 	locked_pool *pool;
-	status_t res;
+	status_t status;
 
 	TRACE(("create_pool()\n"));
 
@@ -414,36 +433,35 @@ create_pool(int block_size, int alignment, int next_ofs,
 
 	memset(pool, sizeof(*pool), 0);
 
-	if ((res = benaphore_init(&pool->mutex, "locked_pool")) < 0)
+	if ((status = benaphore_init(&pool->mutex, "locked_pool")) < 0)
 		goto err;
 
-	if ((res = pool->sem = create_sem(0, "locked_pool")) < 0)
+	if ((status = pool->sem = create_sem(0, "locked_pool")) < 0)
 		goto err1;
 
 	if ((pool->name = strdup(name)) == NULL) {
-		res = B_NO_MEMORY;
+		status = B_NO_MEMORY;
 		goto err3;
 	}
-	
+
 	pool->alignment = alignment;
-	
-	// take care that there is always enough space to fulfill alignment	
+
+	// take care that there is always enough space to fulfill alignment
 	pool->block_size = (block_size + pool->alignment) & ~pool->alignment;
-	
+
 	pool->next_ofs = next_ofs;
 	pool->lock_flags = lock_flags;
-	
-	pool->header_size = max((sizeof( chunk_header ) + pool->alignment) & ~pool->alignment, 
+
+	pool->header_size = max((sizeof( chunk_header ) + pool->alignment) & ~pool->alignment,
 		pool->alignment + 1);
 
-	pool->enlarge_by = (((chunk_size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1)) - pool->header_size)
+	pool->enlarge_by = (((chunkSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1)) - pool->header_size)
 		/ pool->block_size;
 
 	pool->max_blocks = max_blocks;
 	pool->min_free_blocks = min_free_blocks;
 	pool->free_blocks = 0;
 	pool->num_blocks = 0;
-	pool->diff_locks = 0;
 	pool->num_waiting = 0;
 	pool->free_list = NULL;
 	pool->add_hook = add_hook;
@@ -457,14 +475,14 @@ create_pool(int block_size, int alignment, int next_ofs,
 
 	// if there is a minimum size, enlarge pool right now
 	if (min_free_blocks > 0) {
-		if ((res = enlarge_pool(pool, min(pool->enlarge_by, pool->max_blocks))) < 0)
+		if ((status = enlarge_pool(pool, min(pool->enlarge_by, pool->max_blocks))) < 0)
 			goto err4;
 	}
 
 	// add to global list, so enlarger thread takes care of pool
-	benaphore_lock(&locked_pool_ben);
-	ADD_DL_LIST_HEAD(pool, locked_pools, );
-	benaphore_unlock(&locked_pool_ben);
+	benaphore_lock(&sLockedPoolsLock);
+	ADD_DL_LIST_HEAD(pool, sLockedPools, );
+	benaphore_unlock(&sLockedPoolsLock);
 
 	return pool;
 
@@ -480,8 +498,6 @@ err:
 }
 
 
-/** public: destroy pool */
-
 static void
 destroy_pool(locked_pool *pool)
 {
@@ -489,11 +505,11 @@ destroy_pool(locked_pool *pool)
 
 	// first, remove from global list, so enlarger thread
 	// won't touch this pool anymore
-	benaphore_lock(&locked_pool_ben);
-	REMOVE_DL_LIST(pool, locked_pools, );
-	benaphore_unlock(&locked_pool_ben);
+	benaphore_lock(&sLockedPoolsLock);
+	REMOVE_DL_LIST(pool, sLockedPools, );
+	benaphore_unlock(&sLockedPoolsLock);
 
-	// then cleanup pool	
+	// then cleanup pool
 	free_chunks(pool);
 
 	free(pool->name);
@@ -501,58 +517,6 @@ destroy_pool(locked_pool *pool)
 	benaphore_destroy(&pool->mutex);
 
 	free(pool);
-}
-
-
-/** global init, executed when module is loaded */
-
-static status_t
-init_locked_pool(void)
-{
-	status_t res;
-	
-	if ((res = benaphore_init(&locked_pool_ben, "locked_pool_global_list")) < B_OK)
-		goto err;
-
-	if ((res = locked_pool_enlarger_sem = create_sem(0, "locked_pool_enlarger")) < B_OK)
-		goto err2;
-
-	locked_pools = NULL;
-	locked_pool_shutting_down = false;
-
-	if ((res = locked_pool_enlarger_thread = spawn_kernel_thread(enlarger_threadproc,
-					"locked_pool_enlarger", B_NORMAL_PRIORITY, NULL)) < B_OK)
-		goto err3;
-
-	resume_thread(locked_pool_enlarger_thread);
-
-	return B_OK;
-
-err3:
-	delete_sem(locked_pool_enlarger_sem);
-err2:
-	benaphore_destroy(&locked_pool_ben);
-err:
-	return res;
-}
-
-
-/** global uninit, executed before module is unloaded */
-
-static status_t
-uninit_locked_pool(void)
-{
-	int32 retcode;
-	locked_pool_shutting_down = true;
-	
-	release_sem(locked_pool_enlarger_sem);
-
-	wait_for_thread(locked_pool_enlarger_thread, &retcode);
-
-	delete_sem(locked_pool_enlarger_sem);
-	benaphore_destroy(&locked_pool_ben);
-
-	return B_OK;
 }
 
 
@@ -578,16 +542,15 @@ locked_pool_interface interface = {
 		std_ops
 	},
 
-	pool_alloc, 
+	pool_alloc,
 	pool_free,
 
-	create_pool, 
+	create_pool,
 	destroy_pool
 };
 
-#if !_BUILDING_kernel && !BOOT
+
 module_info *modules[] = {
 	&interface.minfo,
 	NULL
 };
-#endif
