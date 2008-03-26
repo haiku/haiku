@@ -250,7 +250,7 @@ TTracker::InitMimeTypes()
 	InstallMimeIfNeeded(B_LINK_MIMETYPE, kResBrokenLinkIcon,
 		"Symbolic Link", "Link to another item in the file system.", kTrackerSignature);
 
-	InstallMimeIfNeeded(B_ROOT_MIMETYPE, kResBeBoxIcon,
+	InstallMimeIfNeeded(B_ROOT_MIMETYPE, kResRootIcon,
 		"Be Root", "File system root.", kTrackerSignature);
 
 	InstallMimeIfNeeded(B_BOOKMARK_MIMETYPE, kResBookmarkIcon,
@@ -439,6 +439,7 @@ AddTemporaryBackgroundImages(BMessage *message, const char *imagePath,
 	message->AddPoint(kBackgroundImageInfoOffset, offset);
 }
 
+#if 0 // dead code, don't know what it was used for
 static void
 InstallTemporaryBackgroundImagesIfNeeded(BNode *node, const char *imagePath,
 	BackgroundImage::Mode mode, BPoint offset, uint32 workspaces, bool textWidgetOutlines)
@@ -451,6 +452,7 @@ InstallTemporaryBackgroundImagesIfNeeded(BNode *node, const char *imagePath,
 		InstallTemporaryBackgroundImages(node, &message);
 	}
 }
+#endif
 
 void 
 TTracker::InstallTemporaryBackgroundImages()

@@ -63,7 +63,7 @@ enum {
 	kResFloppyIcon = R_FloppyIcon,
 	kResHardDiskIcon = 3,
 	kResCDIcon = R_CDIcon,
-	kResBeBoxIcon = R_BeBoxIcon,
+	kResRootIcon = R_RootIcon,
 	kResBookmarkIcon = R_BookmarkIcon,
 	kResPersonIcon = R_PersonIcon,
 	kResBrokenLinkIcon = R_BrokenLinkIcon,

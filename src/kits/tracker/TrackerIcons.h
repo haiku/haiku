@@ -40,7 +40,7 @@ enum {
 	R_PrinterIcon = 1007,
 	R_FloppyIcon = 1011,
 	R_CDIcon = 1013,
-	R_BeBoxIcon = 1014,
+	R_RootIcon = 1014,
 	R_BookmarkIcon = 1015,
 	R_PersonIcon = 1016,
 	R_BrokenLinkIcon = 1017,
