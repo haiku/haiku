@@ -948,6 +948,10 @@ dump_cache(int argc, char **argv)
 					block->previous_transaction,
 					block->previous_transaction->id);
 			}
+
+			set_debug_variable("_current", (addr_t)block->current_data);
+			set_debug_variable("_original", (addr_t)block->original_data);
+			set_debug_variable("_parent", (addr_t)block->parent_data);
 		} else
 			kprintf("block %Ld not found\n", blockNumber);
 		return 0;
