@@ -9,8 +9,6 @@
 # imagePath
 # imageSize
 # addBuildCompatibilityLibDir
-# sourceDirsToCopy
-# headerDirsToCopy
 # updateOnly
 # dontClearImage
 # isVMwareImage
@@ -181,82 +179,6 @@ if [ ! $updateOnly ]; then
 	# cleanup tmp dir
 	$rmAttrs -rf $mimeTmpDir
 fi	# ! updateOnly
-
-
-# install sources
-
-sourcesDest=${tPrefix}home/HaikuSources
-
-# create sources directory
-if [ -n "${sourceDirsToCopy}" ]; then
-	echo "Installing Haiku Sources ..."
-
-	$mkdir -p ${sourcesDest}
-fi
-
-# When building in the root of the source directory, sourceDir is "." and
-# the source directory are not prefixed, which breaks the sed expressions
-# used below. We work around, by adjusting the strings to match and insert.
-sourcePathPrefix=$sourceDir
-destPathPrefix=$sourcesDest
-if [ $sourcePathPrefix = "." ]; then
-	sourcePathPrefix=""
-	destPathPrefix="${sourcesDest}/"
-fi
-
-for sourcesDir in ${sourceDirsToCopy}; do
-	echo "  sources dir: ${sourcesDir}"
-
-	# create all subdirectories
-	subDirs=$(find ${sourcesDir} -type d | grep -v '.svn' |
-		sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
-	$mkdir -p ${subDirs}
-
-	# get all files and copy each one individually
-	sourceFiles=$(find $sourcesDir -type f | grep -v '.svn')
-	for sourceFile in $sourceFiles; do
-		destSourceFile=$(echo $sourceFile |
-			sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
-		$cp ${sPrefix}$sourceFile $destSourceFile
-	done
-done
-
-
-# install headers
-
-headersDest=${tPrefix}develop
-
-# create headers directory
-if [ -n "${headerDirsToCopy}" ]; then
-	echo "Installing Haiku Headers ..."
-
-	$mkdir -p ${headersDest}
-fi
-
-# See above (sourceDirs)
-sourcePathPrefix=$sourceDir
-destPathPrefix=$headersDest
-if [ $sourcePathPrefix = "." ]; then
-	sourcePathPrefix=""
-	destPathPrefix="${headersDest}/"
-fi
-
-for headersDir in ${headerDirsToCopy}; do
-	echo "  header dir: ${headersDir}"
-
-	# create all subdirectories
-	subDirs=$(find ${headersDir} -type d | grep -v '.svn' |
-		sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
-	$mkdir -p ${subDirs}
-
-	# get all files and copy each one individually
-	headerFiles=$(find $headersDir -type f | grep -v '.svn')
-	for headerFile in $headerFiles; do
-		destHeaderFile=$(echo $headerFile |
-			sed -e "s@^${sourcePathPrefix}@${destPathPrefix}@")
-		$cp ${sPrefix}$headerFile $destHeaderFile
-	done
-done
 
 
 # unmount

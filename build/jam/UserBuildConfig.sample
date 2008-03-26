@@ -23,6 +23,9 @@
 #AddFilesToHaikuImage home config settings : <keymap>US-International 
 #	: Key_map ;
 
+# Copy artwork to the image.
+#CopyDirectoryToHaikuImage home Desktop : $(HAIKU_TOP)/data/artwork : : -x .svn ;
+
 
 # Add the optional package WonderBrush to the image.
 #AddOptionalHaikuImagePackages WonderBrush ;

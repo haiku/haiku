@@ -100,6 +100,19 @@ AddSymlinkToHaikuImage home config bin : /beos/bin/crashing_app : crash ;
 AddSourceDirectoryToHaikuImage src/kits/storage ;
 AddSourceDirectoryToHaikuImage src/tests/servers/debug : 1 ;
 
+# Copy the jam sources (assuming they are located ../buildtools/jam relatively
+# to your Haiku sources) to the image as /boot/home/Desktop/jam-src, excluding
+# any file or directory named ".svn" and any source path that matches the
+# pattern "*/jam/./bin.*". Note that the "*" character needs to be escaped with
+# two backslashes (one because it goes through a shell and one to quote the
+# first one in jam), and that the build system always appends "/." to the source
+# path (hence this pattern). Just as AddSourceDirectoryToHaikuImage this rule
+# can also take another optional parameter indicating whether the directory shall
+# also be copied in update mode.
+CopyDirectoryToHaikuImage home Desktop
+	: $(HAIKU_TOP)/../buildtools/jam
+	: "jam-src" : -x .svn -X \\*/jam/./bin.\\* ;
+
 # Unzips the given zip archive onto the image under /boot/develop/tools.
 UnzipArchiveToHaikuImage develop tools
 	: /home/bonefish/develop/haiku/misc/gcc-2.95.3-beos-070218/gcc-2.95.3_binutils-2.17_rel-070218.zip ;

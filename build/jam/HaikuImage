@@ -711,10 +711,6 @@ AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
 AddTargetVariableToScript $(script) : <build>unzip ;
 AddTargetVariableToScript $(script) : <build>vmdkheader ;
-AddVariableToScript $(script) : sourceDirsToCopy
-	: $(HAIKU_INSTALL_SOURCE_DIRS) ;
-AddVariableToScript $(script) : headerDirsToCopy
-	: $(HAIKU_INSTALL_HEADER_DIRS) ;
 if $(HOST_RM_ATTRS_TARGET) {
 	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
 } else {

@@ -202,6 +202,35 @@ rule AddSymlinkToContainer container : directoryTokens : linkTarget : linkName
 	SYMLINKS_TO_INSTALL on $(directory) += $(link) ;
 }
 
+rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
+	: targetDirectoryName : excludePatterns : alwaysUpdate
+{
+	# CopyDirectoryToContainer <container> : <directoryTokens>
+	#	: <sourceDirectory> : <targetDirectoryName> : <excludePatterns>
+	#	: <alwaysUpdate> ;
+	#
+
+	# If the image shall only be updated, we don't copy any directories
+	if [ on $(container) return $(HAIKU_CONTAINER_UPDATE_ONLY) ]
+			&& ! $(alwaysUpdate) {
+		return ;
+	}
+
+	if ! $(targetDirectoryName) {
+		local path = [ FReverse [ FSplitPath $(sourceDirectory) ] ] ;
+		targetDirectoryName = $(path[1]) ;
+	}
+
+	local directory = [ AddDirectoryToContainer $(container)
+		: $(directoryTokens) $(targetDirectoryName) ] ;
+
+	local targetDir = $(directory)/-/$(sourceDirectory) ;
+	EXCLUDE_PATTERNS on $(targetDir) = $(excludePatterns) ;
+	SOURCE_DIRECTORY on $(targetDir) = $(sourceDirectory) ;
+	TARGET_DIRECTORY on $(targetDir) = $(directory) ;
+	DIRECTORIES_TO_INSTALL on $(directory) += $(targetDir) ;
+}
+
 rule UnzipArchiveToContainer container : directoryTokens : zipFile
 {
 	# UnzipArchiveToContainer <container> : <directory> : <zipFile> ] ;
@@ -432,6 +461,17 @@ rule CreateContainerCopyFilesScript container : script
 
 			AddSymlinkToContainerCopyFilesScript $(symlink) : $(initScript) ;
 		}
+
+		local targetDirs = [ on $(dir) return $(DIRECTORIES_TO_INSTALL) ] ;
+		local targetDir ;
+		for targetDir in $(targetDirs) {
+			NotFile $(targetDir) ;
+
+			Depends $(script) : $(targetDir) ;
+			Depends $(targetDir) : $(initScript) ;
+
+			AddDirectoryToContainerCopyFilesScript $(targetDir) : $(initScript) ;
+		}
 	}
 }
 
@@ -449,6 +489,12 @@ actions AppendToContainerCopyFilesScriptSingleFile
 actions AddSymlinkToContainerCopyFilesScript
 {
 	echo \$ln -sfn "\"$(SYMLINK_TARGET)\"" "\"\${tPrefix}$(1:G=)\"" >> $(2[1])
+}
+
+actions AddDirectoryToContainerCopyFilesScript
+{
+	echo \$cp -r $(EXCLUDE_PATTERNS) "\"\${sPrefix}$(SOURCE_DIRECTORY)/.\"" \
+		"\"\${tPrefix}$(TARGET_DIRECTORY:G=)\"" >> $(2[1])
 }
 
 
@@ -535,26 +581,30 @@ rule AddSymlinkToHaikuImage directoryTokens : linkTarget : linkName
 		: $(linkTarget) : $(linkName) ;
 }
 
+rule CopyDirectoryToHaikuImage directoryTokens : sourceDirectory
+	: targetDirectoryName : excludePatterns : alwaysUpdate
+{
+	CopyDirectoryToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directoryTokens)
+		: $(sourceDirectory) : $(targetDirectoryName) : $(excludePatterns)
+		: $(alwaysUpdate) ;
+}
+
 rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
 {
 	# AddSourceDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
 
-	# If the image shall only be updated, we update sources only, if explicitely
-	# requested.
-	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
-		HAIKU_INSTALL_SOURCE_DIRS += [ FDirName $(HAIKU_TOP) $(dirTokens) ] ;
-	}
+	CopyDirectoryToHaikuImage home HaikuSources
+		: [ FDirName $(HAIKU_TOP) $(dirTokens) ]
+		: : -x .svn : $(alwaysUpdate) ;
 }
 
 rule AddHeaderDirectoryToHaikuImage dirTokens : alwaysUpdate
 {
 	# AddHeaderDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
 
-	# If the image shall only be updated, we update sources only, if explicitely
-	# requested.
-	if ! [ IsUpdateHaikuImageOnly ] || $(alwaysUpdate) {
-		HAIKU_INSTALL_HEADER_DIRS += [ FDirName $(HAIKU_TOP) headers $(dirTokens) ] ;
-	}
+	CopyDirectoryToHaikuImage develop headers
+		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
+		: : -x .svn : $(alwaysUpdate) ;
 }
 
 rule UnzipArchiveToHaikuImage dirTokens : zipFile : alwaysUpdate
