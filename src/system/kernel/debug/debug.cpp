@@ -83,6 +83,7 @@ static const uint32 kMaxDebuggerModules = sizeof(sDebuggerModules)
 
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
 static char sParseLine[LINE_BUFFER_SIZE];
+static char sFilter[64];
 static int32 sCurrentLine = 0;
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
@@ -280,7 +281,7 @@ public:
 			} else if (longestCommonPrefix > position) {
 				// multiple possible completions with longer common prefix
 				// -- insert the remainder of the common prefix
-				
+
 				// check for sufficient space in the buffer
 				int32 neededSpace = longestCommonPrefix - position;
 				// also consider the terminating null char
@@ -516,7 +517,7 @@ read_line(char *buffer, int32 maxLength,
 						position = 4;
 						done = true;
 						break;
-					} 
+					}
 				}
 				/* supposed to fall through */
 			default:
@@ -693,6 +694,19 @@ cmd_expr(int argc, char **argv)
 		set_debug_variable("_", result);
 	}
 
+	return 0;
+}
+
+
+static int
+cmd_filter(int argc, char **argv)
+{
+	if (argc != 2) {
+		sFilter[0] = '\0';
+		return 0;
+	}
+
+	strlcpy(sFilter, argv[1], sizeof(sFilter));
 	return 0;
 }
 
@@ -996,6 +1010,11 @@ debug_init_post_vm(kernel_args *args)
 		"<expression>\n"
 		"Evaluates the given expression and prints the result.\n",
 		B_KDEBUG_DONT_PARSE_ARGUMENTS);
+	add_debugger_command_etc("filter", &cmd_filter,
+		"Filters output of all debugger commands",
+		"<pattern>\n"
+		"Filters out all debug output of commands that does not match the\n"
+		"specified pattern. If no pattern is given, it is removed\n", 0);
 	add_debugger_command_etc("error", &cmd_error,
 		"Prints a human-readable description for an error code",
 		"<error>\n"
@@ -1305,10 +1324,9 @@ dprintf_no_syslog(const char *format, ...)
 }
 
 
-/**	Similar to dprintf() but thought to be used in the kernel
- *	debugger only (it doesn't lock).
- */
-
+/*!	Similar to dprintf() but thought to be used in the kernel
+	debugger only (it doesn't lock).
+*/
 void
 kprintf(const char *format, ...)
 {
@@ -1319,6 +1337,11 @@ kprintf(const char *format, ...)
 	va_start(args, format);
 	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
 	va_end(args);
+
+	if (in_command_invocation() && sFilter[0]) {
+		if (strstr(sOutputBuffer, sFilter) == NULL)
+			return;
+	}
 
 	flush_pending_repeats();
 	kputs(sOutputBuffer);
@@ -1354,7 +1377,7 @@ dump_block(const char *buffer, int size, const char *prefix)
 {
 	const int DUMPED_BLOCK_SIZE = 16;
 	int i;
-	
+
 	for (i = 0; i < size;) {
 		int start = i;
 
