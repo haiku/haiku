@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,12 @@
 #include <Path.h>
 #include <SymLink.h>
 #include <TypeConstants.h>
+
+#include <EntryFilter.h>
+
+
+using BPrivate::EntryFilter;
+
 
 static const char *kCommandName = "copyattr";
 static const int kCopyBufferSize = 64 * 1024;	// 64 KB
@@ -68,6 +74,8 @@ const char *kUsage =
 "  -t, --type <type>  - Copy only the attributes of type <type>. If -n is\n"
 "                       specified too, only the attribute matching the name\n"
 "                       and the type is copied.\n"
+"  -x <pattern>       - Exclude source entries matching <pattern>.\n"
+"  -X <pattern>       - Exclude source paths matching <pattern>.\n"
 "  -v, --verbose      - Print more messages.\n"
 "   -, --             - Marks the end of options. The arguments after, even\n"
 "                       if starting with \"-\" are considered file names.\n"
@@ -121,6 +129,7 @@ private:
 	type_code	fType;
 };
 
+
 // Parameters
 struct Parameters {
 	Parameters()
@@ -136,6 +145,7 @@ struct Parameters {
 	bool			move_files;
 	bool			verbose;
 	AttributeFilter	attribute_filter;
+	EntryFilter		entry_filter;
 };
 
 
@@ -275,6 +285,10 @@ static void
 copy_entry(const char *sourcePath, const char *destPath,
 	const Parameters &parameters)
 {
+	// apply entry filter
+	if (!parameters.entry_filter.Filter(sourcePath))
+		return;
+
 	// stat source
 	struct stat sourceStat;
 	if (lstat(sourcePath, &sourceStat) < 0) {
@@ -625,6 +639,12 @@ main(int argc, const char *const *argv)
 			} else if (strcmp(arg, "-v") == 0
 					|| strcmp(arg, "--verbose") == 0) {
 				parameters.verbose = true;
+
+ 			} else if (strcmp(arg, "-x") == 0 || strcmp(arg, "--type") == 0) {
+ 				parameters.entry_filter.AddExcludeFilter(next_arg(argi), true);
+
+ 			} else if (strcmp(arg, "-X") == 0 || strcmp(arg, "--type") == 0) {
+ 				parameters.entry_filter.AddExcludeFilter(next_arg(argi), false);
 
 			} else if (strcmp(arg, "-") == 0 || strcmp(arg, "--") == 0) {
 				moreOptions = false;
