@@ -21,6 +21,7 @@
 #include <util/AutoLock.h>
 #include <util/khash.h>
 
+#include <arch/debug.h>
 #include <boot/kernel_args.h>
 #include <condition_variable.h>
 #include <cpu.h>
@@ -624,7 +625,7 @@ thread_exit2(void *_args)
 	TRACE(("thread_exit2: done removing thread from lists\n"));
 
 	if (args.death_sem >= 0)
-		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);	
+		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);
 
 	// notify the debugger
 	if (args.original_team_id >= 0
@@ -972,7 +973,7 @@ drop_into_debugger(int argc, char **argv)
 		kprintf("drop failed\n");
 	else
 		kprintf("thread %ld dropped into user debugger\n", id);
-	
+
 	return 0;
 }
 
@@ -1121,6 +1122,10 @@ dump_thread_list(int argc, char **argv)
 	struct thread *thread;
 	struct hash_iterator i;
 	bool realTimeOnly = false;
+	bool calling = false;
+	const char *callSymbol = NULL;
+	addr_t callStart = 0;
+	addr_t callEnd = 0;
 	int32 requiredState = 0;
 	team_id team = -1;
 	sem_id sem = -1;
@@ -1139,6 +1144,17 @@ dump_thread_list(int argc, char **argv)
 			if (sem == 0)
 				kprintf("ignoring invalid semaphore argument.\n");
 		}
+	} else if (!strcmp(argv[0], "calling")) {
+		if (argc < 2) {
+			kprintf("Need to give a symbol name or start and end arguments.\n");
+			return 0;
+		} else if (argc == 3) {
+			callStart = parse_expression(argv[1]);
+			callEnd = parse_expression(argv[2]);
+		} else
+			callSymbol = argv[1];
+
+		calling = true;
 	} else if (argc > 1) {
 		team = strtoul(argv[1], NULL, 0);
 		if (team == 0)
@@ -1152,6 +1168,8 @@ dump_thread_list(int argc, char **argv)
 	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
 		// filter out threads not matching the search criteria
 		if ((requiredState && thread->state != requiredState)
+			|| (calling && !arch_debug_contains_call(thread, callSymbol,
+					callStart, callEnd))
 			|| (sem > 0 && thread->sem.blocking != sem)
 			|| (team > 0 && thread->team->id != team)
 			|| (realTimeOnly && thread->priority < B_REAL_TIME_DISPLAY_PRIORITY))
@@ -1978,6 +1996,9 @@ thread_init(kernel_args *args)
 		"  <id>       - The ID of the thread.\n"
 		"  <address>  - The address of the thread structure.\n"
 		"  <name>     - The thread's name.\n", 0);
+	add_debugger_command_etc("calling", &dump_thread_list,
+		"Show all threads that have a specific address in their call chain",
+		"{ <symbol-pattern> | <start> <end> }\n", 0);
 	add_debugger_command_etc("unreal", &make_thread_unreal,
 		"Set realtime priority threads to normal priority",
 		"[ <id> ]\n"
@@ -2016,7 +2037,7 @@ status_t
 thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum)
 {
 	// set up the cpu pointer in the not yet initialized per-cpu idle thread
-	// so that get_current_cpu and friends will work, which is crucial for 
+	// so that get_current_cpu and friends will work, which is crucial for
 	// a lot of low level routines
 	sIdleThreads[cpuNum].cpu = &gCPU[cpuNum];
 	arch_thread_set_current_thread(&sIdleThreads[cpuNum]);
@@ -2527,7 +2548,7 @@ thread_id
 _user_find_thread(const char *userName)
 {
 	char name[B_OS_NAME_LENGTH];
-	
+
 	if (userName == NULL)
 		return find_thread(NULL);
 

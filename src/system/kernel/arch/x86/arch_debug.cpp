@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -279,7 +279,7 @@ stack_trace(int argc, char **argv)
 		kprintf("stack trace for thread %ld \"%s\"\n", thread->id,
 			thread->name);
 
-		kprintf("    kernel stack: %p to %p\n", 
+		kprintf("    kernel stack: %p to %p\n",
 			(void *)thread->kernel_stack_base,
 			(void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
 		if (thread->user_stack_base != 0) {
@@ -519,14 +519,73 @@ dump_iframes(int argc, char **argv)
 }
 
 
+static bool
+is_calling(struct thread *thread, addr_t eip, const char *pattern,
+	addr_t start, addr_t end)
+{
+	if (pattern == NULL)
+		return eip >= start && eip < end;
+
+	const char *symbol;
+	if (lookup_symbol(thread, eip, NULL, &symbol, NULL, NULL) != B_OK)
+		return false;
+
+	return strstr(symbol, pattern);
+}
+
+
 //	#pragma mark -
+
+
+bool
+arch_debug_contains_call(struct thread *thread, const char *symbol,
+	addr_t start, addr_t end)
+{
+	addr_t ebp;
+	if (thread == thread_get_current_thread())
+		ebp = x86_read_ebp();
+	else
+		ebp = thread->arch_info.current_stack.esp[2];
+
+	bool onKernelStack = true;
+
+	for (;;) {
+		onKernelStack = onKernelStack
+			&& is_kernel_stack_address(thread, ebp);
+
+		if (onKernelStack && is_iframe(thread, ebp)) {
+			struct iframe *frame = (struct iframe *)ebp;
+
+			if (is_calling(thread, frame->eip, symbol, start, end))
+				return true;
+
+ 			ebp = frame->ebp;
+		} else {
+			addr_t eip, nextEbp;
+
+			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK
+				|| eip == 0 || ebp == 0)
+				break;
+
+			if (is_calling(thread, eip, symbol, start, end))
+				return true;
+
+			ebp = nextEbp;
+		}
+
+		if (ebp == 0)
+			break;
+	}
+
+	return false;
+}
 
 
 void *
 arch_debug_get_caller(void)
 {
 	// It looks like you would get the wrong stack frame here, but
-	// since read_ebp() is an assembler inline macro, GCC seems to 
+	// since read_ebp() is an assembler inline macro, GCC seems to
 	// be smart enough to save its original value.
 	struct stack_frame *frame = (struct stack_frame *)x86_read_ebp();
 
@@ -541,8 +600,10 @@ arch_debug_init(kernel_args *args)
 
 	add_debugger_command("where", &stack_trace, "Same as \"sc\"");
 	add_debugger_command("bt", &stack_trace, "Same as \"sc\" (as in gdb)");
-	add_debugger_command("sc", &stack_trace, "Stack crawl for current thread (or any other)");
-	add_debugger_command("iframe", &dump_iframes, "Dump iframes for the specified thread");
+	add_debugger_command("sc", &stack_trace,
+		"Stack crawl for current thread (or any other)");
+	add_debugger_command("iframe", &dump_iframes,
+		"Dump iframes for the specified thread");
 	add_debugger_command("call", &show_call, "Show call with arguments");
 
 	return B_NO_ERROR;

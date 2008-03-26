@@ -1,5 +1,5 @@
-/* 
- * Copyright 2003-2007, Haiku Inc. All rights reserved.
+/*
+ * Copyright 2003-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -179,7 +179,7 @@ return 0;
 		kprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id,
 			thread->name);
 
-		kprintf("    kernel stack: %p to %p\n", 
+		kprintf("    kernel stack: %p to %p\n",
 			(void *)thread->kernel_stack_base,
 			(void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
 		if (thread->user_stack_base != 0) {
@@ -261,6 +261,14 @@ return 0;
 void
 arch_debug_save_registers(int *regs)
 {
+}
+
+
+bool
+arch_debug_contains_call(struct thread *thread, const char *symbol,
+	addr_t start, addr_t end)
+{
+	return false;
 }
 
 
