@@ -262,6 +262,56 @@ get_symbol_bind_string(struct Elf32_Sym *symbol)
 }
 
 
+/*!	Searches a symbol (pattern) in all kernel images */
+static int
+dump_symbol(int argc, char **argv)
+{
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <symbol-name>\n", argv[0]);
+		return 0;
+	}
+
+	struct elf_image_info *image = NULL;
+	struct hash_iterator iterator;
+	const char *pattern = argv[1];
+
+	hash_open(sImagesHash, &iterator);
+	while ((image = (elf_image_info *)hash_next(sImagesHash, &iterator))
+			!= NULL) {
+		if (image->num_debug_symbols > 0) {
+			// search extended debug symbol table (contains static symbols)
+			for (uint32 i = 0; i < image->num_debug_symbols; i++) {
+				struct Elf32_Sym *symbol = &image->debug_symbols[i];
+				const char *name = image->debug_string_table + symbol->st_name;
+
+				if (symbol->st_value > 0 && strstr(name, pattern) != 0) {
+					kprintf("%p %5lu %s:%s\n",
+						(void *)(symbol->st_value + image->text_region.delta),
+						symbol->st_size, image->name, name);
+				}
+			}
+		} else {
+			// search standard symbol lookup table
+			for (uint32 i = 0; i < HASHTABSIZE(image); i++) {
+				for (uint32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
+						j = HASHCHAINS(image)[j]) {
+					struct Elf32_Sym *symbol = &image->syms[j];
+					const char *name = SYMNAME(image, symbol);
+
+					if (symbol->st_value > 0 && strstr(name, pattern) != 0) {
+						kprintf("%p %5lu %s:%s\n", (void *)(symbol->st_value
+								+ image->text_region.delta),
+							symbol->st_size, image->name, name);
+					}
+				}
+			}
+		}
+	}
+	hash_close(sImagesHash, &iterator, false);
+	return 0;
+}
+
+
 static int
 dump_symbols(int argc, char **argv)
 {
@@ -1754,6 +1804,7 @@ elf_init(kernel_args *args)
 
 	add_debugger_command("ls", &dump_address_info, "lookup symbol for a particular address");
 	add_debugger_command("symbols", &dump_symbols, "dump symbols for image");
+	add_debugger_command("symbol", &dump_symbol, "search symbol in images");
 	add_debugger_command("image", &dump_image, "dump image info");
 
 	sInitialized = true;
