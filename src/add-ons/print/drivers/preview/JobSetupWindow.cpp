@@ -70,10 +70,10 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	fFrom->SetDivider(be_plain_font->StringWidth("From: "));
 	fFrom->SetEnabled(!allPages);
 
+	rect = fFrom->Frame();
 	fTo = new BTextControl(rect, "to", "To:", "SomeSpaceHere", NULL);
 	panel->AddChild(fTo);
 	fTo->SetAlignment(B_ALIGN_LEFT, B_ALIGN_RIGHT);
-	fTo->ResizeToPreferred();
 	fTo->SetDivider(be_plain_font->StringWidth("To: "));
 	fTo->MoveTo(fFrom->Frame().right + 10.0, fTo->Frame().top);
 	fTo->SetEnabled(!allPages);

@@ -70,8 +70,15 @@ PrinterDriver::PrintJob(BFile *spoolFile, BMessage *jobMsg)
 	BeginJob();
 	fPrinting = true;
 
+	printf("PrinterDriver::PrintJob, print massage read from spool file\n");
+	jobMsg->PrintToStream();
+	
+	printf("\nPrinterDriver::PrintJob, print massage passed to print job\n");
+	msg.PrintToStream();
+	printf("\n");
+
 	for (int32 page = 1; page <= pfh.page_count; ++page) {
-		printf("PrinterDriver::PrintPage(): Faking print of page %ld/ %ld",
+		printf("PrinterDriver::PrintPage(): Faking print of page %ld/ %ld\n",
 			page, pfh.page_count);
 	}
 
@@ -79,7 +86,7 @@ PrinterDriver::PrintJob(BFile *spoolFile, BMessage *jobMsg)
 	PrintJobReader reader(fJobFile);
 
 	status_t status = reader.InitCheck();
-	printf("PrintJobReader::InitCheck(): %s\n", status == B_OK ? "B_OK" : "B_ERROR");
+	printf("\nPrintJobReader::InitCheck(): %s\n", status == B_OK ? "B_OK" : "B_ERROR");
 	printf("PrintJobReader::NumberOfPages(): %ld\n", reader.NumberOfPages());
 	printf("PrintJobReader::FirstPage(): %ld\n", reader.FirstPage());
 	printf("PrintJobReader::LastPage(): %ld\n", reader.LastPage());

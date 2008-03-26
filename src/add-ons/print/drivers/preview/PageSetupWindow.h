@@ -49,6 +49,7 @@ private:
 	BTextControl *	fScaleControl;
 	MarginView *	fMarginView;
 	BString			fPrinterDirName;
+	int32			fCurrentOrientation;
 };
 
 #endif

@@ -101,20 +101,23 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		SetTitle(BString(printerName).Append(" Page Setup").String());
 
 	// load orientation
-	int32 orient = 0;
-	fSetupMsg->FindInt32("orientation", &orient);
+	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
+		fCurrentOrientation = 0;
 
 	// load page rect
+	BRect page;
 	float width = letter_width;
 	float height = letter_height;
-	BRect page(0, 0, width, height);
 	if (fSetupMsg->FindRect("preview:paper_rect", &page) == B_OK) {
 		width = page.Width();
 		height = page.Height();
+	} else {
+		page.Set(0, 0, width, height);
 	}
 
-	BString label("Letter");
-	fSetupMsg->FindString("preview:paper_size", &label);
+	BString label;
+	if (fSetupMsg->FindString("preview:paper_size", &label) != B_OK)
+		label = "Letter";
 
 	// Load units
 	int32 units;
@@ -183,7 +186,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		BMenuItem* item = new BMenuItem(orientation[i].label, message);
 		m->AddItem(item);
 
-		if (orient == orientation[i].orientation)
+		if (fCurrentOrientation == orientation[i].orientation)
 			item->SetMarked(true);
 	}
 
@@ -247,13 +250,9 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 void
 PageSetupWindow::UpdateSetupMessage()
 {
-	int32 orientation = 0;
-	BMenuItem *item = fOrientationMenu->Menu()->FindMarked();
-	if (item) {
-		BMessage *msg = item->Message();
-		msg->FindInt32("orientation", &orientation);
-		SetInt32(fSetupMsg, "orientation", orientation);
-	}
+	SetInt32(fSetupMsg, "xres", 300);
+	SetInt32(fSetupMsg, "yres", 300);
+	SetInt32(fSetupMsg, "orientation", fCurrentOrientation);
 
 	// Save scaling factor
 	float scale = atoi(fScaleControl->Text());
@@ -262,14 +261,14 @@ PageSetupWindow::UpdateSetupMessage()
 	SetFloat(fSetupMsg, "scale", scale);
 
 	float scaleR = 100.0 / scale;
-	item = fPageSizeMenu->Menu()->FindMarked();
+	BMenuItem *item = fPageSizeMenu->Menu()->FindMarked();
 	if (item) {
 		float w, h;
 		BMessage *msg = item->Message();
 		msg->FindFloat("width", &w);
 		msg->FindFloat("height", &h);
 		BRect r(0, 0, w, h);
-		if (orientation != 0)
+		if (fCurrentOrientation != 0)
 			r.Set(0, 0, h, w);
 
 		SetRect(fSetupMsg, "preview:paper_rect", r);
@@ -290,9 +289,6 @@ PageSetupWindow::UpdateSetupMessage()
 
 		SetInt32(fSetupMsg, "units", fMarginView->GetMarginUnit());
 	}
-
-	SetInt32(fSetupMsg, "xres", 300);
-	SetInt32(fSetupMsg, "yres", 300);
 }
 
 
@@ -313,23 +309,22 @@ PageSetupWindow::MessageReceived(BMessage *msg)
 			float w, h;
 			msg->FindFloat("width", &w);
 			msg->FindFloat("height", &h);
-			BMenuItem *item = fOrientationMenu->Menu()->FindMarked();
-			if (item) {
-				int32 orientation = 0;
-				item->Message()->FindInt32("orientation", &orientation);
-				if (orientation == PrinterDriver::PORTRAIT_ORIENTATION) {
-					fMarginView->SetPageSize(w, h);
-				} else {
-					fMarginView->SetPageSize(h, w);
-				}
-				fMarginView->UpdateView(MARGIN_CHANGED);
+			if (fCurrentOrientation == PrinterDriver::PORTRAIT_ORIENTATION) {
+				fMarginView->SetPageSize(w, h);
+			} else {
+				fMarginView->SetPageSize(h, w);
 			}
+			fMarginView->UpdateView(MARGIN_CHANGED);
 		}	break;
 
 		case ORIENTATION_CHANGED: {
 			int32 orientation;
 			msg->FindInt32("orientation", &orientation);
 
+			if (fCurrentOrientation == orientation)
+				break;
+			
+			fCurrentOrientation = orientation;
 			BPoint p = fMarginView->GetPageSize();
 			if (orientation == PrinterDriver::LANDSCAPE_ORIENTATION) {
 				fMarginView->SetPageSize(p.y, p.x);
