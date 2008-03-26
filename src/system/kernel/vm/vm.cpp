@@ -496,7 +496,7 @@ MultiAddressSpaceLocker::_IndexOfAddressSpace(vm_address_space* space) const
 		if (fItems[i].space == space)
 			return i;
 	}
-	
+
 	return -1;
 }
 
@@ -876,7 +876,7 @@ find_reserved_area(vm_address_space *addressSpace, addr_t start,
 	// now we have to transfer the requested part of the reserved
 	// range to the new area - and remove, resize or split the old
 	// reserved area.
-	
+
 	if (start == next->base) {
 		// the area starts at the beginning of the reserved range
 		if (last)
@@ -1339,7 +1339,7 @@ vm_unreserve_address_range(team_id team, void *address, addr_t size)
 
 
 status_t
-vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec, 
+vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec,
 	addr_t size, uint32 flags)
 {
 	if (size == 0)
@@ -1378,7 +1378,7 @@ vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec,
 
 
 area_id
-vm_create_anonymous_area(team_id team, const char *name, void **address, 
+vm_create_anonymous_area(team_id team, const char *name, void **address,
 	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection)
 {
 	vm_area *area;
@@ -1451,7 +1451,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	// create an anonymous store object
 	// if it's a stack, make sure that two pages are available at least
 	store = vm_store_create_anonymous_noswap(canOvercommit, isStack ? 2 : 0,
-		isStack ? ((protection & B_USER_PROTECTION) != 0 ? 
+		isStack ? ((protection & B_USER_PROTECTION) != 0 ?
 			USER_STACK_GUARD_PAGES : KERNEL_STACK_GUARD_PAGES) : 0);
 	if (store == NULL) {
 		status = B_NO_MEMORY;
@@ -1641,9 +1641,9 @@ err1:
 
 			vm_page_set_state(page, PAGE_STATE_FREE);
 		}
-	}	
+	}
 
-	return status;	
+	return status;
 }
 
 
@@ -2633,7 +2633,7 @@ vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 		mapping = (vm_page_mapping *)malloc(sizeof(vm_page_mapping));
 		if (mapping == NULL)
 			return B_NO_MEMORY;
-		
+
 		mapping->page = page;
 		mapping->area = area;
 	}
@@ -2684,19 +2684,21 @@ display_mem(int argc, char **argv)
 	}
 
 	if (argc < i + 1 || argc > i + 2) {
-		kprintf("usage: dl/dw/ds/db [-p|--physical] <address> [num]\n"
+		kprintf("usage: dl/dw/ds/db/string [-p|--physical] <address> [num]\n"
 			"\tdl - 8 bytes\n"
 			"\tdw - 4 bytes\n"
 			"\tds - 2 bytes\n"
 			"\tdb - 1 byte\n"
-			"  -p or --physical only allows memory from a single page to be displayed.\n");
+			"\tstring - a whole string\n"
+			"  -p or --physical only allows memory from a single page to be "
+			"displayed.\n");
 		return 0;
 	}
 
-	address = strtoul(argv[i], NULL, 0);
+	address = parse_expression(argv[i]);
 
 	if (argc > i + 1)
-		num = atoi(argv[i + 1]);
+		num = parse_expression(argv[i + 1]);
 
 	// build the format string
 	if (strcmp(argv[0], "db") == 0) {
@@ -2711,6 +2713,9 @@ display_mem(int argc, char **argv)
 	} else if (strcmp(argv[0], "dl") == 0) {
 		itemSize = 8;
 		displayWidth = 2;
+	} else if (strcmp(argv[0], "string") == 0) {
+		itemSize = 1;
+		displayWidth = -1;
 	} else {
 		kprintf("display_mem called in an invalid way!\n");
 		return 0;
@@ -2743,57 +2748,85 @@ display_mem(int argc, char **argv)
 	} else
 		copyAddress = address;
 
-	for (i = 0; i < num; i++) {
-		uint32 value;
+	if (!strcmp(argv[0], "string")) {
+		kprintf("%p \"", (char*)copyAddress);
 
-		if ((i % displayWidth) == 0) {
-			int32 displayed = min_c(displayWidth, (num-i)) * itemSize;
-			if (i != 0)
-				kprintf("\n");
+		// string mode
+		for (i = 0; true; i++) {
+			char c;
+			if (user_memcpy(&c, (char*)copyAddress + i, 1) != B_OK
+				|| c == '\0')
+				break;
 
-			kprintf("[0x%lx]  ", address + i * itemSize);
-
-			for (j = 0; j < displayed; j++) {
-				char c;
-				if (user_memcpy(&c, (char *)copyAddress + i * itemSize + j, 1) != B_OK) {
-					displayed = j;
-					break;
-				}
+			if (c == '\n')
+				kprintf("\\n");
+			else if (c == '\t')
+				kprintf("\\t");
+			else {
 				if (!isprint(c))
 					c = '.';
 
 				kprintf("%c", c);
 			}
-			if (num > displayWidth) {
-				// make sure the spacing in the last line is correct
-				for (j = displayed; j < displayWidth * itemSize; j++)
-					kprintf(" ");
+		}
+
+		kprintf("\"\n");
+	} else {
+		// number mode
+		for (i = 0; i < num; i++) {
+			uint32 value;
+
+			if ((i % displayWidth) == 0) {
+				int32 displayed = min_c(displayWidth, (num-i)) * itemSize;
+				if (i != 0)
+					kprintf("\n");
+
+				kprintf("[0x%lx]  ", address + i * itemSize);
+
+				for (j = 0; j < displayed; j++) {
+					char c;
+					if (user_memcpy(&c, (char*)copyAddress + i * itemSize + j,
+							1) != B_OK) {
+						displayed = j;
+						break;
+					}
+					if (!isprint(c))
+						c = '.';
+
+					kprintf("%c", c);
+				}
+				if (num > displayWidth) {
+					// make sure the spacing in the last line is correct
+					for (j = displayed; j < displayWidth * itemSize; j++)
+						kprintf(" ");
+				}
+				kprintf("  ");
 			}
-			kprintf("  ");
+
+			if (user_memcpy(&value, (uint8*)copyAddress + i * itemSize,
+					itemSize) != B_OK) {
+				kprintf("read fault");
+				break;
+			}
+
+			switch (itemSize) {
+				case 1:
+					kprintf(" %02x", *(uint8 *)&value);
+					break;
+				case 2:
+					kprintf(" %04x", *(uint16 *)&value);
+					break;
+				case 4:
+					kprintf(" %08lx", *(uint32 *)&value);
+					break;
+				case 8:
+					kprintf(" %016Lx", *(uint64 *)&value);
+					break;
+			}
 		}
 
-		if (user_memcpy(&value, (uint8 *)copyAddress + i * itemSize, itemSize) != B_OK) {
-			kprintf("read fault");
-			break;
-		}
-
-		switch (itemSize) {
-			case 1:
-				kprintf(" %02x", *(uint8 *)&value);
-				break;
-			case 2:
-				kprintf(" %04x", *(uint16 *)&value);
-				break;
-			case 4:
-				kprintf(" %08lx", *(uint32 *)&value);
-				break;
-			case 8:
-				kprintf(" %016Lx", *(uint64 *)&value);
-				break;
-		}
+		kprintf("\n");
 	}
-
-	kprintf("\n");
 
 	if (physical) {
 		copyAddress = ROUNDOWN(copyAddress, B_PAGE_SIZE);
@@ -2829,14 +2862,12 @@ dump_cache_tree_recursively(vm_cache* cache, int level,
 static int
 dump_cache_tree(int argc, char **argv)
 {
-	if (argc < 2 || strlen(argv[1]) < 2
-		|| argv[1][0] != '0'
-		|| argv[1][1] != 'x') {
-		kprintf("%s: invalid argument, pass address\n", argv[0]);
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <address>\n", argv[0]);
 		return 0;
 	}
 
-	addr_t address = strtoul(argv[1], NULL, 0);
+	addr_t address = parse_expression(argv[1]);
 	if (address == 0)
 		return 0;
 
@@ -2900,7 +2931,7 @@ dump_cache(int argc, char **argv)
 	bool showPages = false;
 	int i = 1;
 
-	if (argc < 2) {
+	if (argc < 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: %s [-ps] <address>\n"
 			"  if -p is specified, all pages are shown, if -s is used\n"
 			"  only the cache info is shown respectively.\n", argv[0]);
@@ -2915,14 +2946,12 @@ dump_cache(int argc, char **argv)
 		}
 		i++;
 	}
-	if (argv[i] == NULL || strlen(argv[i]) < 2
-		|| argv[i][0] != '0'
-		|| argv[i][1] != 'x') {
+	if (argv[i] == NULL) {
 		kprintf("%s: invalid argument, pass address\n", argv[0]);
 		return 0;
 	}
 
-	addr_t address = strtoul(argv[i], NULL, 0);
+	addr_t address = parse_expression(argv[i]);
 	if (address == 0)
 		return 0;
 
@@ -2966,7 +2995,7 @@ dump_cache(int argc, char **argv)
 				page, page->physical_page_number, page->cache_offset, page->type, page->state,
 				page_state_to_string(page->state), page->wired_count);
 		} else if(page->type == PAGE_TYPE_DUMMY) {
-			kprintf("\t%p DUMMY PAGE state %u (%s)\n", 
+			kprintf("\t%p DUMMY PAGE state %u (%s)\n",
 				page, page->state, page_state_to_string(page->state));
 		} else
 			kprintf("\t%p UNKNOWN PAGE type %u\n", page, page->type);
@@ -3024,7 +3053,7 @@ dump_area(int argc, char **argv)
 	vm_area *area;
 	addr_t num;
 
-	if (argc < 2) {
+	if (argc < 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: area [-m] <id|address|name>\n");
 		return 0;
 	}
@@ -3034,7 +3063,7 @@ dump_area(int argc, char **argv)
 		index++;
 	}
 
-	num = strtoul(argv[index], NULL, 0);
+	num = parse_expression(argv[index]);
 
 	// walk through the area list, looking for the arguments as a name
 	struct hash_iterator iter;
@@ -3065,7 +3094,7 @@ dump_area_list(int argc, char **argv)
 	int32 id = 0;
 
 	if (argc > 1) {
-		id = strtoul(argv[1], NULL, 0);
+		id = parse_expression(argv[1]);
 		if (id == 0)
 			name = argv[1];
 	}
@@ -3364,7 +3393,7 @@ allocate_early_virtual(kernel_args *args, size_t size)
 		// we hadn't found one between allocation ranges. this is ok.
 		// see if there's a gap after the last one
 		addr_t lastRangeEnd
-			= args->virtual_allocated_range[last_valloc_entry].start 
+			= args->virtual_allocated_range[last_valloc_entry].start
 				+ args->virtual_allocated_range[last_valloc_entry].size;
 		if (KERNEL_BASE + (KERNEL_SIZE - 1) - lastRangeEnd >= size) {
 			spot = lastRangeEnd;
@@ -3391,8 +3420,8 @@ is_page_in_physical_memory_range(kernel_args *args, addr_t address)
 {
 	// TODO: horrible brute-force method of determining if the page can be allocated
 	for (uint32 i = 0; i < args->num_physical_memory_ranges; i++) {
-		if (address >= args->physical_memory_range[i].start 
-			&& address < args->physical_memory_range[i].start 
+		if (address >= args->physical_memory_range[i].start
+			&& address < args->physical_memory_range[i].start
 				+ args->physical_memory_range[i].size)
 			return true;
 	}
@@ -3561,6 +3590,7 @@ vm_init(kernel_args *args)
 	add_debugger_command("dw", &display_mem, "dump memory words (32-bit)");
 	add_debugger_command("ds", &display_mem, "dump memory shorts (16-bit)");
 	add_debugger_command("db", &display_mem, "dump memory bytes (8-bit)");
+	add_debugger_command("string", &display_mem, "dump strings");
 
 	TRACE(("vm_init: exit\n"));
 
@@ -3962,7 +3992,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			// We rolled off the end of the cache chain, so we need to decide which
 			// cache will get the new page we're about to create.
 			cache = isWrite ? topCache : lastCache;
-				// Read-only pages come in the deepest cache - only the 
+				// Read-only pages come in the deepest cache - only the
 				// top most cache may have direct write access.
 			vm_cache_acquire_ref(cache);
 			mutex_lock(&cache->lock);
@@ -4511,7 +4541,7 @@ user_memcpy(void *to, const void *from, size_t size)
  *	\param to Pointer to the destination C-string.
  *	\param from Pointer to the source C-string.
  *	\param size Size in bytes of the string buffer pointed to by \a to.
- *	
+ *
  *	\return strlen(\a from).
  */
 
@@ -4695,7 +4725,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table,
 	if (numEntries == 0 || numBytes == 0)
 		return B_BAD_VALUE;
 
-	// in which address space is the address to be found?	
+	// in which address space is the address to be found?
 	if (IS_USER_ADDRESS(virtualAddress))
 		addressSpace = thread_get_current_thread()->team->address_space;
 	else
@@ -4793,11 +4823,11 @@ area_id
 find_area(const char *name)
 {
 	acquire_sem_etc(sAreaHashLock, READ_COUNT, 0, 0);
-	struct hash_iterator iterator;	
+	struct hash_iterator iterator;
 	hash_open(sAreaHash, &iterator);
 
-	vm_area *area;	
-	area_id id = B_NAME_NOT_FOUND;	
+	vm_area *area;
+	area_id id = B_NAME_NOT_FOUND;
 	while ((area = (vm_area *)hash_next(sAreaHash, &iterator)) != NULL) {
 		if (area->id == RESERVED_AREA_ID)
 			continue;
@@ -4988,7 +5018,7 @@ resize_area(area_id areaID, size_t newSize)
 static area_id
 transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 {
-	area_info info;	
+	area_info info;
 	status_t status = get_area_info(id, &info);
 	if (status < B_OK)
 		return status;
@@ -5040,7 +5070,7 @@ create_area_etc(struct team *team, const char *name, void **address, uint32 addr
 {
 	fix_protection(&protection);
 
-	return vm_create_anonymous_area(team->id, (char *)name, address, 
+	return vm_create_anonymous_area(team->id, (char *)name, address,
 		addressSpec, size, lock, protection);
 }
 
@@ -5051,7 +5081,7 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 {
 	fix_protection(&protection);
 
-	return vm_create_anonymous_area(vm_kernel_address_space_id(), (char *)name, _address, 
+	return vm_create_anonymous_area(vm_kernel_address_space_id(), (char *)name, _address,
 		addressSpec, size, lock, protection);
 }
 
@@ -5115,7 +5145,7 @@ area_id
 _user_find_area(const char *userName)
 {
 	char name[B_OS_NAME_LENGTH];
-	
+
 	if (!IS_USER_ADDRESS(userName)
 		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
@@ -5129,8 +5159,8 @@ _user_get_area_info(area_id area, area_info *userInfo)
 {
 	if (!IS_USER_ADDRESS(userInfo))
 		return B_BAD_ADDRESS;
-	
-	area_info info;	
+
+	area_info info;
 	status_t status = get_area_info(area, &info);
 	if (status < B_OK)
 		return status;
@@ -5224,7 +5254,7 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 {
 	char name[B_OS_NAME_LENGTH];
 	void *address;
-	
+
 	// filter out some unavailable values (for userland)
 	switch (addressSpec) {
 		case B_ANY_KERNEL_ADDRESS:
