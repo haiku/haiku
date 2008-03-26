@@ -598,13 +598,14 @@ rule AddSourceDirectoryToHaikuImage dirTokens : alwaysUpdate
 		: : -x .svn : $(alwaysUpdate) ;
 }
 
-rule AddHeaderDirectoryToHaikuImage dirTokens : alwaysUpdate
+rule AddHeaderDirectoryToHaikuImage dirTokens : dirName : alwaysUpdate
 {
-	# AddHeaderDirectoryToHaikuImage <dirTokens> : <alwaysUpdate> ;
+	# AddHeaderDirectoryToHaikuImage <dirTokens> : [ <dirName> ]
+	#	: <alwaysUpdate> ;
 
 	CopyDirectoryToHaikuImage develop headers
 		: [ FDirName $(HAIKU_TOP) headers $(dirTokens) ]
-		: : -x .svn : $(alwaysUpdate) ;
+		: $(dirName) : -x .svn : $(alwaysUpdate) ;
 }
 
 rule UnzipArchiveToHaikuImage dirTokens : zipFile : alwaysUpdate

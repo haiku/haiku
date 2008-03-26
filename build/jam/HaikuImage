@@ -505,7 +505,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	AddFilesToHaikuImage beos bin : cc c++ ;
 
 	# headers
-	AddHeaderDirectoryToHaikuImage gnu ;
+	AddHeaderDirectoryToHaikuImage gnu : 3rdparty ;
 	AddHeaderDirectoryToHaikuImage os ;
 	AddHeaderDirectoryToHaikuImage posix ;
 
@@ -513,8 +513,20 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	SEARCH on <header>_G_config.h = [ FDirName $(HAIKU_TOP) headers glibc ] ;
 	AddFilesToHaikuImage develop headers posix : <header>_G_config.h ;
 
-	# make be -> os symlink for now
-	AddSymlinkToHaikuImage develop headers : /boot/develop/headers/os : be ;
+	# create be -> os symlink for now
+	AddSymlinkToHaikuImage develop headers : os : be ;
+
+	# create gnu -> 3rdparty symlink
+	AddSymlinkToHaikuImage develop headers : 3rdparty : gnu ;
+		# TODO: Change BEINCLUDES and gcc to refer to 3rdparty rather than gnu.
+
+	# individual headers of third party libs
+	local zlibHeaders = <header>zlib.h <header>zconf.h ;
+	SEARCH on $(zlibHeaders) = [ FDirName $(HAIKU_TOP) headers libs zlib ] ;
+	local pngHeaders = <header>png.h <header>pngconf.h ;
+	SEARCH on $(pngHeaders) = [ FDirName $(HAIKU_TOP) headers libs png ] ;
+	AddFilesToHaikuImage develop headers 3rdparty
+		: $(zlibHeaders) $(pngHeaders) ;
 
 	if $(HAIKU_GCC_VERSION[1]) > 2 {
 		# gcc 4
