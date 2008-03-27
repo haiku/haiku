@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -537,7 +537,7 @@ get_node_for_path(Directory *directory, const char *pathName, Node **_node)
 		}
 	}
 
-	return NULL;
+	return B_ENTRY_NOT_FOUND;
 }
 
 

@@ -1,7 +1,7 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "elf.h"
@@ -57,28 +57,29 @@ elf_parse_dynamic_section(struct preloaded_image *image)
 	for (int i = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
 			case DT_HASH:
-//				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->text_region.delta);
-				break;
 			case DT_STRTAB:
-//				image->strtab = (char *)(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_SYMTAB:
-				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_REL:
-				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_RELSZ:
 				image->rel_len = d[i].d_un.d_val;
 				break;
 			case DT_RELA:
-				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_RELASZ:
 				image->rela_len = d[i].d_un.d_val;
 				break;
 			case DT_JMPREL:
-				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
+				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr
+					+ image->text_region.delta);
 				break;
 			case DT_PLTRELSZ:
 				image->pltrel_len = d[i].d_un.d_val;
@@ -93,8 +94,7 @@ elf_parse_dynamic_section(struct preloaded_image *image)
 	}
 
 	// lets make sure we found all the required sections
-//	if (!image->symhash || !image->syms || !image->strtab)
-	if (/* !image->symhash ||*/ !image->syms /*|| !image->strtab*/)
+	if (image->syms == NULL)
 		return B_ERROR;
 
 	return B_OK;
@@ -140,13 +140,15 @@ load_elf_symbol_table(int fd, preloaded_image *image)
 			}
 
 			// read in symbol table
-			symbolTable = (Elf32_Sym *)kernel_args_malloc(size = sectionHeaders[i].sh_size);
+			symbolTable = (Elf32_Sym *)kernel_args_malloc(
+				size = sectionHeaders[i].sh_size);
 			if (symbolTable == NULL) {
 				status = B_NO_MEMORY;
 				goto error1;
 			}
 
-			length = read_pos(fd, sectionHeaders[i].sh_offset, symbolTable, size);
+			length = read_pos(fd, sectionHeaders[i].sh_offset, symbolTable,
+				size);
 			if (length < size) {
 				TRACE(("error reading in symbol table\n"));
 				status = B_ERROR;
@@ -270,7 +272,8 @@ elf_load_image(int fd, preloaded_image *image)
 			continue;
 
 		region->start = ROUNDOWN(header.p_vaddr, B_PAGE_SIZE);
-		region->size = ROUNDUP(header.p_memsz + (header.p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+		region->size = ROUNDUP(header.p_memsz + (header.p_vaddr % B_PAGE_SIZE),
+			B_PAGE_SIZE);
 		region->delta = -region->start;
 
 		TRACE(("segment %d: start = %p, size = %lu, delta = %lx\n", i,
@@ -338,14 +341,16 @@ elf_load_image(int fd, preloaded_image *image)
 		TRACE(("load segment %d (%ld bytes)...\n", i, header.p_filesz));
 
 		length = read_pos(fd, header.p_offset,
-			(void *)(region->start + (header.p_vaddr % B_PAGE_SIZE)), header.p_filesz);
+			(void *)(region->start + (header.p_vaddr % B_PAGE_SIZE)),
+			header.p_filesz);
 		if (length < (ssize_t)header.p_filesz) {
 			status = B_BAD_DATA;
 			dprintf("error reading in seg %d\n", i);
 			goto error2;
 		}
 
-		// clear anything above the file size (that may also contain the BSS area)
+		// Clear anything above the file size (that may also contain the BSS
+		// area)
 
 		uint32 offset = (header.p_vaddr % B_PAGE_SIZE) + header.p_filesz;
 		if (offset < region->size)
@@ -370,7 +375,7 @@ elf_load_image(int fd, preloaded_image *image)
 	return B_OK;
 
 error2:
-	if (image->text_region.start != NULL)
+	if (image->text_region.start != 0)
 		platform_free_region((void *)image->text_region.start, totalSize);
 error1:
 	free(programHeaders);
