@@ -691,12 +691,6 @@ free_vnode(struct vnode *vnode, bool reenter)
 	// count, so that it will neither become negative nor 0.
 	vnode->ref_count = 2;
 
-	// The file system has removed the resources of the vnode now, so we can
-	// make it available again (and remove the busy vnode from the hash)
-	mutex_lock(&sVnodeMutex);
-	hash_remove(sVnodeTable, vnode);
-	mutex_unlock(&sVnodeMutex);
-
 	// TODO: Usually, when the vnode is unreferenced, no one can get hold of the
 	// cache either (i.e. no one can get a cache reference while we're deleting
 	// the vnode).. This is, however, not the case for the page daemon. It gets
@@ -712,6 +706,12 @@ free_vnode(struct vnode *vnode, bool reenter)
 				reenter);
 		}
 	}
+
+	// The file system has removed the resources of the vnode now, so we can
+	// make it available again (and remove the busy vnode from the hash)
+	mutex_lock(&sVnodeMutex);
+	hash_remove(sVnodeTable, vnode);
+	mutex_unlock(&sVnodeMutex);
 
 	// if we have a vm_cache attached, remove it
 	if (vnode->cache)
