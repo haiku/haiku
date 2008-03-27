@@ -13,6 +13,8 @@
 #include <stdio.h>	// for SEEK_* defines
 #include <new>
 
+#include <AutoDeleter.h>
+
 using namespace BPrivate::Storage::Sniffer;
 
 Pattern::Pattern(const std::string &string, const std::string &mask)
@@ -115,6 +117,7 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive)
 	off_t len = fString.length();
 	char *buffer = new(nothrow) char[len+1];
 	if (buffer) {
+		ArrayDeleter<char> _(buffer);
 		ssize_t bytesRead = data->ReadAt(start, buffer, len);
 		// \todo If there are fewer bytes left in the data stream
 		// from the given position than the length of our data
@@ -160,6 +163,7 @@ Pattern::Sniff(off_t start, off_t size, BPositionIO *data, bool caseInsensitive)
 	off_t len = fString.length();
 	char *buffer = new(std::nothrow) char[len+1];
 	if (buffer) {
+		ArrayDeleter<char> _(buffer);
 		ssize_t bytesRead = data->ReadAt(start, buffer, len);
 		// \todo If there are fewer bytes left in the data stream
 		// from the given position than the length of our data
