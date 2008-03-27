@@ -207,6 +207,8 @@ AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
 AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
 AddFilesToHaikuImage beos demos			: $(BEOS_DEMOS) ;
 
+AddSymlinkToHaikuImage beos bin : sh : bash ;
+
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Deskbar Application links
