@@ -171,7 +171,7 @@ make_space(size_t needed)
 static trace_entry*
 allocate_entry(size_t size, uint16 flags)
 {
-	if (sBuffer == NULL || size == 0 || size >= 65532)
+	if (sAfterLastEntry == NULL || size == 0 || size >= 65532)
 		return NULL;
 
 	InterruptsSpinLocker _(sLock);
@@ -290,9 +290,8 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 {
 #if ENABLE_TRACING
 	return allocate_entry(size, 0);
-#else
-	return NULL;
 #endif
+	return NULL;
 }
 
 
@@ -300,11 +299,14 @@ TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 
 
 AbstractTraceEntry::AbstractTraceEntry()
-	:
-	fThread(thread_get_current_thread_id()),
-	fTeam(team_get_current_team_id()),
-	fTime(system_time())
 {
+	struct thread* thread = thread_get_current_thread();
+	if (thread != NULL) {
+		fThread = thread->id;
+		if (thread->team)
+			fTeam = thread->team->id;
+	}
+	fTime = system_time();
 }
 
 AbstractTraceEntry::~AbstractTraceEntry()
