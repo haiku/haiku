@@ -861,6 +861,11 @@ write_cached_block(block_cache *cache, cached_block *block,
 			}
 		}
 	}
+	if (block->transaction == NULL && block->ref_count == 0) {
+		// the block is no longer used
+		block->unused = true;
+		cache->unused_blocks.Add(block);
+	}
 
 	return B_OK;
 }
@@ -1004,8 +1009,8 @@ dump_cache(int argc, char **argv)
 		count++;
 	}
 
-	kprintf(" %ld blocks total, %ld dirty, %ld referenced.\n", count, dirty,
-		referenced);
+	kprintf(" %ld blocks total, %ld dirty, %ld referenced, %ld in unused.\n", count, dirty,
+		referenced, cache->unused_blocks.Size());
 
 	hash_close(cache->hash, &iterator, false);
 	return 0;
