@@ -19,6 +19,7 @@
 #include <condition_variable.h>
 #include <kernel.h>
 #include <thread.h>
+#include <tracing.h>
 #include <util/AutoLock.h>
 #include <vm.h>
 #include <vm_address_space.h>
@@ -36,10 +37,6 @@
 #else
 #	define TRACE(x) ;
 #endif
-
-//#define TRACK_PAGE_ALLOCATIONS 1
-	// [Debugging feature] Enables a small history of page allocation operations
-	// that can be listed in KDL via "page_allocations".
 
 #define SCRUB_SIZE 16
 	// this many pages will be cleared at once in the page scrubber thread
@@ -69,112 +66,160 @@ static spinlock sPageLock;
 static sem_id sWriterWaitSem;
 
 
-#if TRACK_PAGE_ALLOCATIONS
+#ifdef PAGE_ALLOCATION_TRACING
 
+namespace PageAllocationTracing {
 
-enum {
-	NO_PAGE_OPERATION = 0,
-	RESERVE_PAGES,
-	UNRESERVE_PAGES,
-	ALLOCATE_PAGE,
-	ALLOCATE_PAGE_RUN,
-	FREE_PAGE,
-	SCRUBBING_PAGES,
-	SCRUBBED_PAGES,
-	STOLEN_PAGE
-};
-
-
-struct allocation_history_entry {
-	bigtime_t	time;
-	thread_id	thread;
-	uint32		operation;
-	uint32		count;
-	uint32		flags;
-	uint32		free;
-	uint32		reserved;
-};
-
-
-static const int kAllocationHistoryCapacity = 512;
-static allocation_history_entry sAllocationHistory[kAllocationHistoryCapacity];
-static int kAllocationHistoryIndex = 0;
-
-
-/*!	sPageLock must be held.
-*/
-static void
-add_allocation_history_entry(uint32 operation, uint32 count, uint32 flags)
-{
-	allocation_history_entry& entry
-		= sAllocationHistory[kAllocationHistoryIndex];
-	kAllocationHistoryIndex = (kAllocationHistoryIndex + 1)
-		% kAllocationHistoryCapacity;
-
-	entry.time = system_time();
-	entry.thread = find_thread(NULL);
-	entry.operation = operation;
-	entry.count = count;
-	entry.flags = flags;
-	entry.free = sFreePageQueue.count + sClearPageQueue.count;
-	entry.reserved = sReservedPages;
-}
-
-
-static int
-dump_page_allocations(int argc, char **argv)
-{
-	kprintf("thread  operation  count  flags      free  reserved        time\n");
-	kprintf("---------------------------------------------------------------\n");
-
-	for (int i = 0; i < kAllocationHistoryCapacity; i++) {
-		int index = (kAllocationHistoryIndex + i) % kAllocationHistoryCapacity;
-		allocation_history_entry& entry = sAllocationHistory[index];
-
-		const char* operation;
-		switch (entry.operation) {
-			case NO_PAGE_OPERATION:
-				operation = "no op";
-				break;
-			case RESERVE_PAGES:
-				operation = "reserve";
-				break;
-			case UNRESERVE_PAGES:
-				operation = "unreserve";
-				break;
-			case ALLOCATE_PAGE:
-				operation = "alloc";
-				break;
-			case ALLOCATE_PAGE_RUN:
-				operation = "alloc run";
-				break;
-			case FREE_PAGE:
-				operation = "free";
-				break;
-			case SCRUBBING_PAGES:
-				operation = "scrubbing";
-				break;
-			case SCRUBBED_PAGES:
-				operation = "scrubbed";
-				break;
-			case STOLEN_PAGE:
-				operation = "stolen";
-				break;
-			default:
-				operation = "invalid";
-				break;
+class ReservePages : public AbstractTraceEntry {
+	public:
+		ReservePages(uint32 count)
+			:
+			fCount(count)
+		{
+			Initialized();
 		}
 
-		kprintf("%6ld  %-9s  %5ld  %5lx  %8ld  %8ld  %10lld\n",
-			entry.thread, operation, entry.count, entry.flags, entry.free,
-			entry.reserved, entry.time);
-	}
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page reserve:   %lu", fCount);
+		}
 
-	return 0;
-}
+	private:
+		uint32		fCount;
+};
 
 
-#endif	// TRACK_PAGE_ALLOCATIONS
+class UnreservePages : public AbstractTraceEntry {
+	public:
+		UnreservePages(uint32 count)
+			:
+			fCount(count)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page unreserve: %lu", fCount);
+		}
+
+	private:
+		uint32		fCount;
+};
+
+
+class AllocatePage : public AbstractTraceEntry {
+	public:
+		AllocatePage(bool reserved)
+			:
+			fReserved(reserved)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page alloc");
+			if (fReserved)
+				out.Print(" reserved");
+		}
+
+	private:
+		bool		fReserved;
+};
+
+
+class AllocatePageRun : public AbstractTraceEntry {
+	public:
+		AllocatePageRun(uint32 length)
+			:
+			fLength(length)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page alloc run: length: %ld", fLength);
+		}
+
+	private:
+		uint32		fLength;
+};
+
+
+class FreePage : public AbstractTraceEntry {
+	public:
+		FreePage()
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page free");
+		}
+};
+
+
+class ScrubbingPages : public AbstractTraceEntry {
+	public:
+		ScrubbingPages(uint32 count)
+			:
+			fCount(count)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page scrubbing: %lu", fCount);
+		}
+
+	private:
+		uint32		fCount;
+};
+
+
+class ScrubbedPages : public AbstractTraceEntry {
+	public:
+		ScrubbedPages(uint32 count)
+			:
+			fCount(count)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page scrubbed:  %lu", fCount);
+		}
+
+	private:
+		uint32		fCount;
+};
+
+
+class StolenPage : public AbstractTraceEntry {
+	public:
+		StolenPage()
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("page stolen");
+		}
+};
+
+}	// namespace PageAllocationTracing
+
+#	define T(x)	new(std::nothrow) PageAllocationTracing::x
+
+#else
+#	define T(x)
+#endif	// PAGE_ALLOCATION_TRACING
 
 
 /*!	Dequeues a page from the head of the given queue */
@@ -672,13 +717,12 @@ set_page_state_nolock(vm_page *page, int pageState)
 			sModifiedTemporaryPages--;
 	}
 
-#if TRACK_PAGE_ALLOCATIONS
+#ifdef PAGE_ALLOCATION_TRACING
 	if ((pageState == PAGE_STATE_CLEAR || pageState == PAGE_STATE_FREE)
 		&& page->state != PAGE_STATE_CLEAR && page->state != PAGE_STATE_FREE) {
-		add_allocation_history_entry(FREE_PAGE, 1, 0);
-		
+		T(FreePage());
 	}
-#endif	// TRACK_PAGE_ALLOCATIONS
+#endif	// PAGE_ALLOCATION_TRACING
 
 	page->state = pageState;
 	move_page_to_queue(fromQueue, toQueue, page);
@@ -772,10 +816,9 @@ page_scrubber(void *unused)
 
 			scrubCount = i;
 
-#if TRACK_PAGE_ALLOCATIONS
-			if (scrubCount > 0)
-				add_allocation_history_entry(SCRUBBING_PAGES, scrubCount, 0);
-#endif
+			if (scrubCount > 0) {
+				T(ScrubbingPages(scrubCount));
+			}
 
 			release_spinlock(&sPageLock);
 			restore_interrupts(state);
@@ -796,10 +839,9 @@ page_scrubber(void *unused)
 				enqueue_page(&sClearPageQueue, page[i]);
 			}
 
-#if TRACK_PAGE_ALLOCATIONS
-			if (scrubCount > 0)
-				add_allocation_history_entry(SCRUBBED_PAGES, scrubCount, 0);
-#endif
+			if (scrubCount > 0) {
+				T(ScrubbedPages(scrubCount));
+			}
 
 			release_spinlock(&sPageLock);
 			restore_interrupts(state);
@@ -1197,9 +1239,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 					enqueue_page(&sFreePageQueue, page);
 					page->state = PAGE_STATE_FREE;
 
-#if TRACK_PAGE_ALLOCATIONS
-					add_allocation_history_entry(STOLEN_PAGE, 1, 0);
-#endif
+					T(StolenPage());
 				} else if (stolen < maxCount) {
 					pages[stolen] = page;
 				}
@@ -1434,10 +1474,6 @@ vm_page_init_post_area(kernel_args *args)
 	add_debugger_command("page_queue", &dump_page_queue, "Dump page queue");
 	add_debugger_command("find_page", &find_page,
 		"Find out which queue a page is actually in");
-#if TRACK_PAGE_ALLOCATIONS
-	add_debugger_command("page_allocations", &dump_page_allocations,
-		"Dump page allocation history");
-#endif
 
 	return B_OK;
 }
@@ -1537,9 +1573,7 @@ vm_page_unreserve_pages(uint32 count)
 	InterruptsSpinLocker locker(sPageLock);
 	ASSERT(sReservedPages >= count);
 
-#if TRACK_PAGE_ALLOCATIONS
-	add_allocation_history_entry(UNRESERVE_PAGES, count, 0);
-#endif
+	T(UnreservePages(count));
 
 	sReservedPages -= count;
 
@@ -1561,9 +1595,7 @@ vm_page_reserve_pages(uint32 count)
 
 	InterruptsSpinLocker locker(sPageLock);
 
-#if TRACK_PAGE_ALLOCATIONS
-	add_allocation_history_entry(RESERVE_PAGES, count, 0);
-#endif
+	T(ReservePages(count));
 
 	sReservedPages += count;
 	size_t freePages = free_page_queue_count();
@@ -1600,9 +1632,7 @@ vm_page_allocate_page(int pageState, bool reserved)
 
 	InterruptsSpinLocker locker(sPageLock);
 
-#if TRACK_PAGE_ALLOCATIONS
-	add_allocation_history_entry(ALLOCATE_PAGE, 1, reserved ? 1 : 0);
-#endif
+	T(AllocatePage(reserved));
 
 	vm_page *page = NULL;
 	while (true) {
@@ -1722,9 +1752,7 @@ vm_page_allocate_page_run(int pageState, addr_t length)
 		}
 	}
 
-#if TRACK_PAGE_ALLOCATIONS
-	add_allocation_history_entry(ALLOCATE_PAGE_RUN, length, 0);
-#endif
+	T(AllocatePageRun(length));
 
 	locker.Unlock();
 
