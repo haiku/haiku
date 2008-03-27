@@ -1223,11 +1223,17 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 			continue;
 		}
 		if (tried) {
-			// we had our go, but there are pages left, let someone else
-			// try
+			// We tried all potential pages, but one or more couldn't be stolen
+			// at that time (likely because their cache was locked). No one
+			// else will have any better luck, so we'll just retry a little
+			// later.
+			// TODO: Think about better strategies. E.g. if our condition
+			// variables had timeouts, we could just wait with timeout on
+			// the free page queue condition variable, which could might
+			// succeed earlier.
 			locker.Unlock();
-			sFreePageCondition.NotifyOne();
-			locker.Lock();
+			snooze(10000);
+			continue;
 		}
 
 		// we need to wait for pages to become inactive
