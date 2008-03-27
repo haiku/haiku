@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -73,7 +73,8 @@ static void
 add_video_mode(video_mode *videoMode)
 {
 	video_mode *mode = NULL;
-	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
+			!= NULL) {
 		int compare = compare_video_modes(videoMode, mode);
 		if (compare == 0) {
 			// mode already exists
@@ -88,14 +89,16 @@ add_video_mode(video_mode *videoMode)
 }
 
 
-//! Finds a video mode with the given resolution, prefers 16 bit modes
+//! Finds a video mode with the given resolution
 static video_mode *
-find_video_mode(int32 width, int32 height)
+find_video_mode(int32 width, int32 height, bool allowPalette)
 {
 	video_mode *found = NULL;
 	video_mode *mode = NULL;
-	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
-		if (mode->width == width && mode->height == height) {
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
+			!= NULL) {
+		if (mode->width == width && mode->height == height
+			&& (mode->bits_per_pixel > 8 || allowPalette)) {
 			if (found == NULL || found->bits_per_pixel < mode->bits_per_pixel)
 				found = mode;
 		}
@@ -109,11 +112,50 @@ static video_mode *
 find_video_mode(int32 width, int32 height, int32 depth)
 {
 	video_mode *mode = NULL;
-	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
+			!= NULL) {
 		if (mode->width == width
 			&& mode->height == height
 			&& mode->bits_per_pixel == depth) {
 			return mode;
+		}
+	}
+
+	return NULL;
+}
+
+
+static video_mode *
+find_edid_mode(edid1_info &info, bool allowPalette)
+{
+	video_mode *mode = NULL;
+
+	// try detailed timing first
+	for (int32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; i++) {
+		edid1_detailed_monitor &monitor = info.detailed_monitor[i];
+
+		if (monitor.monitor_desc_type == EDID1_IS_DETAILED_TIMING) {
+			mode = find_video_mode(monitor.data.detailed_timing.h_active,
+				monitor.data.detailed_timing.v_active, allowPalette);
+			if (mode != NULL)
+				return mode;
+		}
+	}
+
+	// try standard timings next
+	for (int32 i = 0; i < EDID1_NUM_STD_TIMING; i++) {
+		if (info.std_timing[i].h_size <= 256)
+			continue;
+
+		video_mode *found = find_video_mode(info.std_timing[i].h_size,
+			info.std_timing[i].v_size, allowPalette);
+		if (found != NULL) {
+			if (mode != NULL) {
+				// prefer higher resolutions
+				if (found->width > mode->width)
+					mode = found;
+			} else
+				mode = found;
 		}
 	}
 
@@ -860,32 +902,9 @@ platform_init_video(void)
 	if (vesa_get_edid(&info) == B_OK) {
 		// we got EDID information from the monitor, try to find a new default
 		// mode
-		video_mode *defaultMode = NULL;
-
-		// try detailed timing first
-		for (int32 i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; i++) {
-			edid1_detailed_monitor &monitor = info.detailed_monitor[i];
-
-			if (monitor.monitor_desc_type == EDID1_IS_DETAILED_TIMING) {
-				defaultMode = find_video_mode(monitor.data.detailed_timing.h_active,
-					monitor.data.detailed_timing.v_active);
-				if (defaultMode != NULL)
-					break;
-			}
-		}
-
-		if (defaultMode == NULL) {
-			// try standard timings next
-			for (int32 i = 0; i < EDID1_NUM_STD_TIMING; i++) {
-				if (info.std_timing[i].h_size <= 256)
-					continue;
-
-				defaultMode = find_video_mode(info.std_timing[i].h_size,
-					info.std_timing[i].v_size);
-				if (defaultMode != NULL)
-					break;
-			}
-		}
+		video_mode *defaultMode = find_edid_mode(info, false);
+		if (defaultMode == NULL)
+			find_edid_mode(info, true);
 
 		if (defaultMode != NULL) {
 			// We found a new default mode to use!
