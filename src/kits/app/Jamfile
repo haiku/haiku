@@ -49,8 +49,6 @@ MergeObject <libbe>app_kit.o :
 	PropertyInfo.cpp
 	PortLink.cpp
 	RegistrarDefs.cpp
-	RegistrarThread.cpp
-	RegistrarThreadManager.cpp
 	Roster.cpp
 	RosterPrivate.cpp
 	Server.cpp

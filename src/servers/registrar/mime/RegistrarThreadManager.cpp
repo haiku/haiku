@@ -10,9 +10,11 @@
 #include "RegistrarThreadManager.h"
 
 #include <RegistrarDefs.h>
-#include <RegistrarThread.h>
 
 #include <stdio.h>
+
+#include "RegistrarThread.h"
+
 
 //#define DBG(x) x
 #define DBG(x)

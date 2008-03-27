@@ -11,11 +11,12 @@
 #define _MIME_UPDATE_THREAD_H
 
 #include <Entry.h>
-#include <RegistrarThread.h>
 #include <SupportDefs.h>
 
 #include <list>
 #include <utility>
+
+#include "RegistrarThread.h"
 
 struct entry_ref;
 class BMessage;

@@ -4,9 +4,9 @@
 #define MIME_MANAGER_H
 
 #include <Looper.h>
-#include <RegistrarThreadManager.h>
 
 #include "Database.h"
+#include "RegistrarThreadManager.h"
 
 class MIMEManager : public BLooper {
 public:

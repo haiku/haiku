@@ -44,6 +44,8 @@ Server registrar
 	MimeSnifferAddon.cpp
 	MimeSnifferAddonManager.cpp
 	MimeUpdateThread.cpp
+	RegistrarThread.cpp
+	RegistrarThreadManager.cpp
 	SnifferRules.cpp
 	Supertype.cpp
 	SupportingApps.cpp
