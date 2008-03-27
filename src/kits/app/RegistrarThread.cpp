@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold (bonefish@users.sf.net)
+ *		Tyler Akidau
  */
 
 //! Base thread class for threads spawned and managed by the registrar
