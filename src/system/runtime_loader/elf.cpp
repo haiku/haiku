@@ -24,9 +24,10 @@
 #include <runtime_loader.h>
 #include <sem.h>
 #include <syscalls.h>
-#include <tracing_config.h>
 #include <user_runtime.h>
 #include <vm_types.h>
+
+#include "tracing_config.h"
 
 
 //#define TRACE_RLD

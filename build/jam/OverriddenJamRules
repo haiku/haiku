@@ -69,7 +69,8 @@ rule Object
 		# yacc, lex, etc) are located in $(LOCATE_TARGET), possibly
 		# different from $(SEARCH_SOURCE).
 
-		headers = $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ;
+		headers = $(HAIKU_CONFIG_HEADERS) $(SEARCH_SOURCE) $(SUBDIRHDRS)
+			$(HDRS) ;
 		sysHeaders = $(SUBDIRSYSHDRS) $(SYSHDRS) ;
 		defines = $(DEFINES) ;
 

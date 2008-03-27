@@ -113,6 +113,10 @@ HAIKU_BONE_COMPATIBLE_PLATFORMS = haiku bone dano haiku_host ;
 HAIKU_DANO_COMPATIBLE_PLATFORMS = haiku dano haiku_host ;
 HAIKU_HAIKU_COMPATIBLE_PLATFORMS = haiku haiku_host ;
 
+# configuration header directories
+HAIKU_CONFIG_HEADERS = [ FDirName $(HAIKU_TOP) build user_config_headers ]
+	[ FDirName $(HAIKU_TOP) build config_headers ] ;
+
 
 #pragma mark -
 

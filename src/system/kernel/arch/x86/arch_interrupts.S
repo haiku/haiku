@@ -12,7 +12,8 @@
 #include <arch/x86/descriptors.h>
 #include <commpage.h>
 #include <thread_types.h>
-#include <tracing_config.h>
+
+#include "tracing_config.h"
 
 #include "asm_offsets.h"
 #include "syscall_numbers.h"

@@ -33,7 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <tracing_config.h>
+#include "tracing_config.h"
 	// kernel tracing configuration
 
 #define DEBUG_FUNCTION_ENTER	//debug_printf("thread: 0x%x; this: 0x%08x; header: 0x%08x; fields: 0x%08x; data: 0x%08x; line: %04ld; func: %s\n", find_thread(NULL), this, fHeader, fFields, fData, __LINE__, __PRETTY_FUNCTION__);

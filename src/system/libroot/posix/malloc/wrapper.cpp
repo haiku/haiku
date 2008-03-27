@@ -24,12 +24,12 @@
 #include "processheap.h"
 #include "arch-specific.h"
 
-#include <tracing_config.h>
-
 #include <image.h>
 
 #include <errno.h>
 #include <string.h>
+
+#include "tracing_config.h"
 
 using namespace BPrivate;
 
