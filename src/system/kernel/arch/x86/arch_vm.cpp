@@ -93,15 +93,15 @@ is_memory_overlapping(uint64 base, uint64 length, int32 *extendedIndex)
 			x86_get_mtrr(index, &b, &l, &t);
 
 			// check first for write combining extensions
-			if (base < b 
-				&& (base + length) > (b + l)
+			if (base <= b 
+				&& (base + length) >= (b + l)
 				&& t == IA32_MTR_WRITE_COMBINING) {
 				*extendedIndex = index;
 				return true;
 			}
-			if ((base > b && base < (b + l))
+			if ((base >= b && base < (b + l))
 				|| ((base + length) > b 
-					&& (base + length) < (b + l)))
+					&& (base + length) <= (b + l)))
 				return true;
 		}
 	}
