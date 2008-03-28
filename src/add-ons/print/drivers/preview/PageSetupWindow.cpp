@@ -84,9 +84,9 @@ static struct
 	int32 orientation;
 } orientation[] =
 {
-	{"Portrait",  PrinterDriver::PORTRAIT_ORIENTATION},
-	{"Landscape", PrinterDriver::LANDSCAPE_ORIENTATION},
-	{NULL, 0}
+	{ "Portrait", PrinterDriver::PORTRAIT_ORIENTATION },
+	{ "Landscape", PrinterDriver::LANDSCAPE_ORIENTATION },
+	{ NULL, 0 }
 };
 
 
@@ -102,7 +102,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 
 	// load orientation
 	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
-		fCurrentOrientation = 0;
+		fCurrentOrientation = PrinterDriver::PORTRAIT_ORIENTATION;
 
 	// load page rect
 	BRect page;
@@ -268,7 +268,7 @@ PageSetupWindow::UpdateSetupMessage()
 		msg->FindFloat("width", &w);
 		msg->FindFloat("height", &h);
 		BRect r(0, 0, w, h);
-		if (fCurrentOrientation != 0)
+		if (fCurrentOrientation == PrinterDriver::LANDSCAPE_ORIENTATION)
 			r.Set(0, 0, h, w);
 
 		SetRect(fSetupMsg, "preview:paper_rect", r);
@@ -277,7 +277,7 @@ PageSetupWindow::UpdateSetupMessage()
 
 		// Save the printable_rect
 		BRect margin = fMarginView->GetMargin();
-		if (orientation == 0) {
+		if (fCurrentOrientation == PrinterDriver::PORTRAIT_ORIENTATION) {
 			margin.right = w - margin.right;
 			margin.bottom = h - margin.bottom;
 		} else {
@@ -321,17 +321,9 @@ PageSetupWindow::MessageReceived(BMessage *msg)
 			int32 orientation;
 			msg->FindInt32("orientation", &orientation);
 
-			if (fCurrentOrientation == orientation)
-				break;
-			
-			fCurrentOrientation = orientation;
-			BPoint p = fMarginView->GetPageSize();
-			if (orientation == PrinterDriver::LANDSCAPE_ORIENTATION) {
-				fMarginView->SetPageSize(p.y, p.x);
-				fMarginView->UpdateView(MARGIN_CHANGED);
-			}
-
-			if (orientation == PrinterDriver::PORTRAIT_ORIENTATION) {
+			if (fCurrentOrientation != orientation) {
+				fCurrentOrientation = orientation;
+				BPoint p = fMarginView->GetPageSize();
 				fMarginView->SetPageSize(p.y, p.x);
 				fMarginView->UpdateView(MARGIN_CHANGED);
 			}
