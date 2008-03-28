@@ -954,6 +954,8 @@ Database::DeleteAppHint(const char *type)
 	status_t status = delete_attribute(type, kAppHintAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_APP_HINT_CHANGED, type, B_META_MIME_DELETED);
+	else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -974,6 +976,8 @@ Database::DeleteAttrInfo(const char *type)
 	status_t status = delete_attribute(type, kAttrInfoAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_ATTR_INFO_CHANGED, type, B_META_MIME_DELETED);
+	else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -994,6 +998,8 @@ Database::DeleteShortDescription(const char *type)
 	status_t status = delete_attribute(type, kShortDescriptionAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_SHORT_DESCRIPTION_CHANGED, type, B_META_MIME_DELETED);
+	else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1014,6 +1020,8 @@ Database::DeleteLongDescription(const char *type)
 	status_t status = delete_attribute(type, kLongDescriptionAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_LONG_DESCRIPTION_CHANGED, type, B_META_MIME_DELETED);
+	else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1034,6 +1042,8 @@ Database::DeleteFileExtensions(const char *type)
 	status_t status = delete_attribute(type, kFileExtensionsAttr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_FILE_EXTENSIONS_CHANGED, type, B_META_MIME_DELETED);
+	else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1056,6 +1066,8 @@ Database::DeleteIcon(const char *type, icon_size which)
 	status_t status = delete_attribute(type, attr);
 	if (status == B_OK)
 		_SendMonitorUpdate(B_ICON_CHANGED, type, which, B_META_MIME_DELETED);
+	else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1073,11 +1085,13 @@ Database::DeleteIcon(const char *type, icon_size which)
 status_t
 Database::DeleteIcon(const char *type)
 {
-	// TODO: exta notification for vector icon (uses B_LARGE_ICON now)
+	// TODO: extra notification for vector icon (uses B_LARGE_ICON now)
 	status_t status = delete_attribute(type, kIconAttr);
-	if (status == B_OK)
+	if (status == B_OK) {
 		_SendMonitorUpdate(B_ICON_CHANGED, type, B_LARGE_ICON,
 						   B_META_MIME_DELETED);
+	} else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1111,7 +1125,8 @@ Database::DeleteIconForType(const char *type, const char *fileType, icon_size wh
 	if (status == B_OK) {
 		_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
 			which == B_LARGE_ICON, B_META_MIME_DELETED);
-	}
+	} else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1145,7 +1160,8 @@ Database::DeleteIconForType(const char *type, const char *fileType)
 	if (status == B_OK) {
 		_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
 			true, B_META_MIME_DELETED);
-	}
+	} else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1181,6 +1197,8 @@ Database::DeletePreferredApp(const char *type, app_verb verb)
 	*/
 	if (status == B_OK)
 		_SendMonitorUpdate(B_PREFERRED_APP_CHANGED, type, B_META_MIME_DELETED);
+	else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1200,10 +1218,14 @@ status_t
 Database::DeleteSnifferRule(const char *type)
 {
 	status_t status = delete_attribute(type, kSnifferRuleAttr);
-	if (status == B_OK)
+	if (status == B_OK) {
 		status = fSnifferRules.DeleteSnifferRule(type);
-	if (status == B_OK)
-		_SendMonitorUpdate(B_SNIFFER_RULE_CHANGED, type, B_META_MIME_DELETED);
+		if (status == B_OK) {
+			_SendMonitorUpdate(B_SNIFFER_RULE_CHANGED, type,
+				B_META_MIME_DELETED);
+		}
+	} else if (status == B_ENTRY_NOT_FOUND)
+		status = B_OK;
 
 	return status;
 }
@@ -1233,13 +1255,19 @@ Database::DeleteSupportedTypes(const char *type, bool fullSync)
 	// do so even if the supported types attribute didn't exist, as
 	// stranded types *may* exist in the database due to previous
 	// calls to {Set,Delete}SupportedTypes() with fullSync == false.
+	bool sendUpdate = true;
 	if (status == B_OK)
 		status = fSupportingApps.DeleteSupportedTypes(type, fullSync);
-	else if (fullSync && status == B_ENTRY_NOT_FOUND)
-		fSupportingApps.DeleteSupportedTypes(type, fullSync);
+	else if (status == B_ENTRY_NOT_FOUND) {
+		status = B_OK;
+		if (fullSync)
+			fSupportingApps.DeleteSupportedTypes(type, fullSync);
+		else
+			sendUpdate = false;
+	}
 
 	// Send a monitor notification
-	if (status == B_OK)
+	if (status == B_OK && sendUpdate)
 		_SendMonitorUpdate(B_SUPPORTED_TYPES_CHANGED, type, B_META_MIME_DELETED);
 
 	return status;
