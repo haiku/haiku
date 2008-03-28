@@ -79,9 +79,13 @@ _get_system_info(system_info *info, size_t size)
 
 	// ToDo: Add page_faults
 	info->max_pages = vm_page_num_pages();
+	info->used_pages = info->max_pages - vm_page_num_free_pages();
+	
+/*	TODO: return to using these once sAvailableMemory yields correct values.
 	info->used_pages = vm_page_num_pages() - vm_page_num_available_pages();
 	info->cached_pages = vm_page_num_pages() - vm_page_num_free_pages()
 		- info->used_pages;
+*/
 	info->used_threads = thread_used_threads();
 	info->max_threads = thread_max_threads();
 	info->used_teams = team_used_teams();
