@@ -3,28 +3,27 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <MediaDefs.h>
-#include <MediaAddOn.h>
-#include <Errors.h>
-#include <Node.h>
-#include <Mime.h>
-#include <StorageDefs.h>
-#include <Path.h>
-#include <Directory.h>
-#include <Entry.h>
-#include <FindDirectory.h>
 
-#include "MultiAudioNode.h"
 #include "MultiAudioAddOn.h"
-#include "MultiAudioDevice.h"
 
 #include <limits.h>
 #include <stdio.h>
 #include <string.h>
 
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <File.h>
+#include <Path.h>
+
 #include "debug.h"
+#include "MultiAudioNode.h"
+#include "MultiAudioDevice.h"
+
 
 #define MULTI_SAVE
+
+const char* kSettingsName = "Media/multi_audio_settings";
 
 
 //! instantiation function
@@ -39,42 +38,37 @@ make_media_addon(image_id image)
 //	#pragma mark -
 
 
+MultiAudioAddOn::MultiAudioAddOn(image_id image)
+	: BMediaAddOn(image),
+	fDevices()
+{
+	CALLED();
+	fInitStatus = _RecursiveScan("/dev/audio/hmulti/");
+	if (fInitStatus != B_OK)
+		return;
+
+	_LoadSettings();
+	fInitStatus = B_OK;
+}
+
+
 MultiAudioAddOn::~MultiAudioAddOn()
 {
 	CALLED();
 
 	void *device = NULL;
 	for (int32 i = 0; (device = fDevices.ItemAt(i)); i++)
-		delete (MultiAudioDevice *)device;
+		delete (MultiAudioDevice*)device;
 
-	SaveSettings();
+	_SaveSettings();
 }
 
-
-MultiAudioAddOn::MultiAudioAddOn(image_id image)
-	: BMediaAddOn(image),
-	fDevices()
-{
-	CALLED();
-	fInitCheckStatus = B_NO_INIT;
-
-	if (RecursiveScan("/dev/audio/hmulti/") != B_OK)
-		return;
-
-	LoadSettings();
-
-	fInitCheckStatus = B_OK;
-}
-
-// -------------------------------------------------------- //
-// BMediaAddOn impl
-// -------------------------------------------------------- //
 
 status_t
 MultiAudioAddOn::InitCheck(const char** _failureText)
 {
 	CALLED();
-	return B_OK;
+	return fInitStatus;
 }
 
 
@@ -87,13 +81,13 @@ MultiAudioAddOn::CountFlavors()
 
 
 status_t
-MultiAudioAddOn::GetFlavorAt(int32 n, const flavor_info** _info)
+MultiAudioAddOn::GetFlavorAt(int32 index, const flavor_info** _info)
 {
 	CALLED();
 	if (_info == NULL)
 		return B_BAD_VALUE;
 
-	MultiAudioDevice* device = (MultiAudioDevice*)fDevices.ItemAt(n);
+	MultiAudioDevice* device = (MultiAudioDevice*)fDevices.ItemAt(index);
 	if (device == NULL)
 		return B_BAD_INDEX;
 
@@ -101,7 +95,7 @@ MultiAudioAddOn::GetFlavorAt(int32 n, const flavor_info** _info)
 	if (info == NULL)
 		return B_NO_MEMORY;
 
-	MultiAudioNode::GetFlavor(info, n);
+	MultiAudioNode::GetFlavor(info, index);
 	info->name = (char*)device->Description().friendly_name;
 
 	*_info = info;
@@ -143,34 +137,28 @@ MultiAudioAddOn::InstantiateNodeFor(const flavor_info* info, BMessage* config,
 
 
 status_t
-MultiAudioAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_message)
+MultiAudioAddOn::GetConfigurationFor(BMediaNode* _node, BMessage* message)
 {
 	CALLED();
+	MultiAudioNode* node = dynamic_cast<MultiAudioNode*>(_node);
+	if (node == NULL)
+		return B_BAD_TYPE;
+
 #ifdef MULTI_SAVE
-	if (into_message == 0) {
-		into_message = new BMessage();
-		MultiAudioNode * node = dynamic_cast<MultiAudioNode*>(your_node);
-		if (node == 0) {
-			fprintf(stderr, "<- B_BAD_TYPE\n");
-			return B_BAD_TYPE;
-		}
-		if (node->GetConfigurationFor(into_message) == B_OK) {
-			fSettings.AddMessage(your_node->Name(), into_message);
+	if (message == NULL) {
+		BMessage settings;
+		if (node->GetConfigurationFor(&settings) == B_OK) {
+			fSettings.AddMessage(node->Name(), &settings);
 		}
 		return B_OK;
 	}
 #endif
+
 	// currently never called by the media kit. Seems it is not implemented.
-	if (into_message == 0) {
-		fprintf(stderr, "<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}
-	MultiAudioNode * node = dynamic_cast<MultiAudioNode*>(your_node);
-	if (node == 0) {
-		fprintf(stderr, "<- B_BAD_TYPE\n");
-		return B_BAD_TYPE;
-	}
-	return node->GetConfigurationFor(into_message);
+	if (message == NULL)
+		return B_BAD_VALUE;
+
+	return node->GetConfigurationFor(message);
 }
 
 
@@ -192,9 +180,11 @@ MultiAudioAddOn::AutoStart(int count, BMediaNode** _node, int32* _internalID,
 
 
 status_t
-MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry* rootEntry)
+MultiAudioAddOn::_RecursiveScan(char* rootPath, BEntry* rootEntry, uint32 depth)
 {
 	CALLED();
+	if (depth > 16)
+		return B_ERROR;
 
 	BDirectory root;
 	if (rootEntry != NULL)
@@ -207,10 +197,9 @@ MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry* rootEntry)
 	}
 
 	BEntry entry;
-
-	while (root.GetNextEntry(&entry) > B_ERROR) {
+	while (root.GetNextEntry(&entry) == B_OK) {
 		if (entry.IsDirectory()) {
-			RecursiveScan(rootPath, &entry);
+			_RecursiveScan(rootPath, &entry, depth + 1);
 		} else {
 			BPath path;
 			entry.GetPath(&path);
@@ -230,34 +219,37 @@ MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry* rootEntry)
 
 
 void
-MultiAudioAddOn::SaveSettings()
+MultiAudioAddOn::_SaveSettings()
 {
 	CALLED();
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append(SETTINGS_FILE);
-		BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-		if (file.InitCheck() == B_OK)
-			fSettings.Flatten(&file);
-	}
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	path.Append(kSettingsName);
+
+	BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	if (file.InitCheck() == B_OK)
+		fSettings.Flatten(&file);
 }
 
 
 void
-MultiAudioAddOn::LoadSettings()
+MultiAudioAddOn::_LoadSettings()
 {
 	CALLED();
 	fSettings.MakeEmpty();
 
 	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append(SETTINGS_FILE);
-		BFile file(path.Path(), B_READ_ONLY);
-		if ((file.InitCheck() == B_OK) && (fSettings.Unflatten(&file) == B_OK))
-		{
-			PRINT_OBJECT(fSettings);
-		} else {
-			PRINT(("Error unflattening settings file %s\n", path.Path()));
-		}
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
+		return;
+
+	path.Append(kSettingsName);
+
+	BFile file(path.Path(), B_READ_ONLY);
+	if (file.InitCheck() == B_OK && fSettings.Unflatten(&file) == B_OK) {
+		PRINT_OBJECT(fSettings);
+	} else {
+		PRINT(("Error unflattening settings file %s\n", path.Path()));
 	}
 }

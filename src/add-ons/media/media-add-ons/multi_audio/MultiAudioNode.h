@@ -22,37 +22,9 @@
 class BDiscreteParameter;
 class BParameterGroup;
 
+class node_input;
+class node_output;
 
-class node_input {
-public:
-	node_input(media_input& input, media_format format);
-	~node_input();
-
-	int32				fChannelId;
-	media_input			fInput;
-	media_format 		fPreferredFormat;
-	media_format		fFormat;
-	uint32 				fBufferCycle;
-	multi_buffer_info	fOldBufferInfo;
-	BBuffer*			fBuffer;
-};
-
-class node_output {
-public:
-	node_output(media_output& output, media_format format);
-	~node_output();
-
-	int32				fChannelId;
-	media_output		fOutput;
-	media_format 		fPreferredFormat;
-	media_format		fFormat;
-
-	BBufferGroup*		fBufferGroup;
-	bool 				fOutputEnabled;
-	uint64 				fSamplesSent;
-	volatile uint32 	fBufferCycle;
-	multi_buffer_info	fOldBufferInfo;
-};
 
 class MultiAudioNode : public BBufferConsumer, public BBufferProducer,
 		public BTimeSource,	public BMediaEventLooper, public BControllable {

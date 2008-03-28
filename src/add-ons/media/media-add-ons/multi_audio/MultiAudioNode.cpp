@@ -7,15 +7,12 @@
 
 #include "MultiAudioNode.h"
 
-#if 0
-#include <Entry.h>
-#include <File.h>
-#include <FileInterface.h>
-#endif
+#include <stdio.h>
+#include <string.h>
+
 #include <Buffer.h>
 #include <BufferGroup.h>
 #include <ParameterWeb.h>
-
 
 #include "MultiAudioUtility.h"
 #ifdef DEBUG
@@ -23,10 +20,39 @@
 #endif
 #include "debug.h"
 
-#include <stdio.h>
-#include <string.h>
+class node_input {
+public:
+	node_input(media_input& input, media_format format);
+	~node_input();
 
-const char * multi_string[] = {
+	int32				fChannelId;
+	media_input			fInput;
+	media_format 		fPreferredFormat;
+	media_format		fFormat;
+	uint32 				fBufferCycle;
+	multi_buffer_info	fOldBufferInfo;
+	BBuffer*			fBuffer;
+};
+
+class node_output {
+public:
+	node_output(media_output& output, media_format format);
+	~node_output();
+
+	int32				fChannelId;
+	media_output		fOutput;
+	media_format 		fPreferredFormat;
+	media_format		fFormat;
+
+	BBufferGroup*		fBufferGroup;
+	bool 				fOutputEnabled;
+	uint64 				fSamplesSent;
+	volatile uint32 	fBufferCycle;
+	multi_buffer_info	fOldBufferInfo;
+};
+
+
+const char* kMultiControlString[] = {
 	"NAME IS ATTACHED",
 	"Output", "Input", "Setup", "Tone Control", "Extended Setup", "Enhanced Setup", "Master",
 	"Beep", "Phone", "Mic", "Line", "CD", "Video", "Aux", "Wave", "Gain", "Level", "Volume",
@@ -35,7 +61,7 @@ const char * multi_string[] = {
 };
 
 
-node_input::node_input(media_input &input, media_format format)
+node_input::node_input(media_input& input, media_format format)
 {
 	CALLED();
 	fInput = input;
@@ -44,14 +70,20 @@ node_input::node_input(media_input &input, media_format format)
 	fBuffer = NULL;
 }
 
+
 node_input::~node_input()
 {
 	CALLED();
 }
 
-node_output::node_output(media_output &output, media_format format)
-	: fBufferGroup(NULL),
-	  fOutputEnabled(true)
+
+//	#pragma mark -
+
+
+node_output::node_output(media_output& output, media_format format)
+	:
+	fBufferGroup(NULL),
+	fOutputEnabled(true)
 {
 	CALLED();
 	fOutput = output;
@@ -59,10 +91,14 @@ node_output::node_output(media_output &output, media_format format)
 	fBufferCycle = 1;
 }
 
+
 node_output::~node_output()
 {
 	CALLED();
 }
+
+
+//	#pragma mark -
 
 
 MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
@@ -1292,7 +1328,7 @@ const char*
 MultiAudioNode::_GetControlName(multi_mix_control& control)
 {
 	if (control.string != S_null)
-		return multi_string[control.string];
+		return kMultiControlString[control.string];
 
 	return control.name;
 }
