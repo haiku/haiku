@@ -24,7 +24,7 @@ Server media_server :
 	AddOnMonitorHandler.cpp
 	NodeMonitorHandler.cpp
 	
-	: be libmedia.so
+	: be libmedia.so stdc++
 ;
 
 SEARCH on [ FGristFiles AddOnMonitor.cpp
