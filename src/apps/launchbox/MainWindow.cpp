@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -28,11 +28,11 @@
 
 // constructor
 MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
-	: BWindow(frame, name,
-			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-			  | B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
-			  | B_AUTO_UPDATE_SIZE_LIMITS),
+	: BWindow(frame, name, B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+			| B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
+			| B_AUTO_UPDATE_SIZE_LIMITS | B_SAME_POSITION_IN_ALL_WORKSPACES,
+			B_ALL_WORKSPACES),
 	  fSettings(new BMessage('sett')),
 	  fPadView(new PadView("pad view")),
 	  fLastID(0),
@@ -57,10 +57,11 @@ MainWindow::MainWindow(const char* name, BRect frame, bool addDefaultButtons)
 // constructor
 MainWindow::MainWindow(const char* name, BRect frame, BMessage* settings)
 	: BWindow(frame, name,
-			  B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-			  B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-			  | B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
-			  | B_AUTO_UPDATE_SIZE_LIMITS),
+			B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
+			B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+			| B_WILL_ACCEPT_FIRST_CLICK | B_NO_WORKSPACE_ACTIVATION
+			| B_AUTO_UPDATE_SIZE_LIMITS | B_SAME_POSITION_IN_ALL_WORKSPACES,
+			B_ALL_WORKSPACES),
 	  fSettings(settings),
 	  fPadView(new PadView("pad view")),
 	  fLastID(0),
@@ -96,8 +97,8 @@ MainWindow::QuitRequested()
 		return false;
 	} else {
 		BAlert* alert = new BAlert("last chance", "Really close this pad?\n"
-												  "(The pad will not be remembered.)",
-									"Close", "Cancel", NULL);
+			"(The pad will not be remembered.)",
+			"Close", "Cancel", NULL);
 		if (alert->Go() == 1)
 			return false;
 	}
@@ -112,7 +113,8 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_LAUNCH: {
 			BView* pointer;
 			if (message->FindPointer("be:source", (void**)&pointer) >= B_OK) {
-				if (LaunchButton* button = dynamic_cast<LaunchButton*>(pointer)) {
+				if (LaunchButton* button
+						= dynamic_cast<LaunchButton*>(pointer)) {
 					if (button->AppSignature()) {
 						be_roster->Launch(button->AppSignature());
 					} else {
@@ -129,7 +131,7 @@ MainWindow::MessageReceived(BMessage* message)
 							status_t ret = be_roster->Launch(button->Ref());
 							if (ret < B_OK)
 								fprintf(stderr, "launching %s failed: %s\n",
-										button->Ref()->name, strerror(ret));
+									button->Ref()->name, strerror(ret));
 						}
 					}
 				}
@@ -139,8 +141,8 @@ MainWindow::MessageReceived(BMessage* message)
 		case MSG_ADD_SLOT: {
 			LaunchButton* button;
 			if (message->FindPointer("be:source", (void**)&button) >= B_OK) {
-				fPadView->AddButton(new LaunchButton("launch button", fLastID++, NULL,
-													 new BMessage(MSG_LAUNCH)), button);
+				fPadView->AddButton(new LaunchButton("launch button", fLastID++,
+					NULL, new BMessage(MSG_LAUNCH)), button);
 			}
 			break;
 		}
@@ -173,11 +175,9 @@ MainWindow::MessageReceived(BMessage* message)
 						BString helper("Description for '");
 						helper << ref->name << "'";
 //						BRect* frame = fNamePanelFrame.IsValid() ? &fNamePanelFrame : NULL;
-						new NamePanel(helper.String(),
-									  button->Description(),
-									  this, this,
-									  new BMessage(*message),
-									  fNamePanelFrame);
+						new NamePanel(helper.String(), button->Description(),
+							this, this, new BMessage(*message),
+							fNamePanelFrame);
 					}
 				}
 			}
@@ -201,6 +201,10 @@ MainWindow::MessageReceived(BMessage* message)
 			break;
 		case MSG_SHOW_ON_ALL_WORKSPACES:
 			fShowOnAllWorkspaces = !fShowOnAllWorkspaces;
+			if (fShowOnAllWorkspaces)
+				SetWorkspaces(B_ALL_WORKSPACES);
+			else
+				SetWorkspaces(1L << current_workspace());
 			break;
 		case B_SIMPLE_DATA:
 		case B_REFS_RECEIVED:
@@ -230,17 +234,16 @@ MainWindow::ScreenChanged(BRect frame, color_space format)
 {
 	_AdjustLocation(Frame());
 }
-	
+
 // WorkspaceActivated
 void
 MainWindow::WorkspaceActivated(int32 workspace, bool active)
 {
 	if (fShowOnAllWorkspaces) {
-		if (!active) {
-			SetWorkspaces(1 << current_workspace());
-			_AdjustLocation(Frame());
-		} else
+		if (!active)
 			_GetLocation();
+		else
+			_AdjustLocation(Frame());
 	}
 }
 
@@ -321,8 +324,8 @@ MainWindow::LoadSettings(const BMessage* message)
 	const char* path;
 	bool buttonAdded = false;
 	for (int32 i = 0; message->FindString("path", i, &path) >= B_OK; i++) {
-		LaunchButton* button = new LaunchButton("launch button", fLastID++, NULL,
-												new BMessage(MSG_LAUNCH));
+		LaunchButton* button = new LaunchButton("launch button", fLastID++,
+			NULL, new BMessage(MSG_LAUNCH));
 		fPadView->AddButton(button);
 		BString signature;
 		if (message->FindString("signature", i, &signature) >= B_OK
@@ -348,6 +351,8 @@ MainWindow::LoadSettings(const BMessage* message)
 	bool showOnAllWorkspaces;
 	if (message->FindBool("all workspaces", &showOnAllWorkspaces) == B_OK)
 		fShowOnAllWorkspaces = showOnAllWorkspaces;
+		SetWorkspaces(showOnAllWorkspaces
+			? B_ALL_WORKSPACES : 1L << current_workspace());
 	if (!fShowOnAllWorkspaces) {
 		uint32 workspaces;
 		if (message->FindInt32("workspaces", (int32*)&workspaces) == B_OK)
@@ -369,7 +374,7 @@ MainWindow::SaveSettings(BMessage* message)
 
 	if (message->ReplaceFloat("border distance", fBorderDist) != B_OK)
 		message->AddFloat("border distance", fBorderDist);
-	
+
 	// store window frame
 	if (message->ReplaceRect("window frame", Frame()) != B_OK)
 		message->AddRect("window frame", Frame());
@@ -403,7 +408,7 @@ MainWindow::SaveSettings(BMessage* message)
 		else
 			message->AddString("signature", "");
 	}
-	
+
 	// store auto raise setting
 	if (message->ReplaceBool("auto raise", fAutoRaise) != B_OK)
 		message->AddBool("auto raise", fAutoRaise);
@@ -421,7 +426,8 @@ MainWindow::_GetLocation()
 {
 	BRect frame = Frame();
 	BPoint origin = frame.LeftTop();
-	BPoint center(origin.x + frame.Width() / 2.0, origin.y + frame.Height() / 2.0);
+	BPoint center(origin.x + frame.Width() / 2.0,
+		origin.y + frame.Height() / 2.0);
 	BScreen screen(this);
 	BRect screenFrame = screen.Frame();
 	fScreenPosition.x = center.x / screenFrame.Width();
@@ -448,9 +454,9 @@ MainWindow::_AdjustLocation(BRect frame)
 	BScreen screen(this);
 	BRect screenFrame = screen.Frame();
 	BPoint center(fScreenPosition.x * screenFrame.Width(),
-				  fScreenPosition.y * screenFrame.Height());
+		fScreenPosition.y * screenFrame.Height());
 	BPoint frameCenter(frame.left + frame.Width() / 2.0,
-					   frame.top + frame.Height() / 2.0);
+		frame.top + frame.Height() / 2.0);
 	frame.OffsetBy(center - frameCenter);
 	// ignore border dist when distance too large
 	if (fBorderDist < 10.0) {
