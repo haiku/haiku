@@ -23,7 +23,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
-BEOS_BIN = "[" addattr alert arp base64 basename bc beep bison bzip2 cal cat
+BEOS_BIN = "[" addattr alert arp base64 basename bc beep bzip2 cal cat
 	catattr chgrp chmod chop chown cksum clear clockconfig cmp comm compress
 	cp copyattr $(X86_ONLY)CortexAddOnHost
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
@@ -352,15 +352,6 @@ local networkSettingsFiles = <network-settings>services ;
 SEARCH on $(networkSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings network ] ;
 AddFilesToHaikuImage common settings network : $(networkSettingsFiles) ;
-
-# bison files
-SEARCH on <bison>m4sugar.m4
-	= [ FDirName $(HAIKU_TOP) src bin bison data m4sugar ] ;
-AddFilesToHaikuImage beos etc m4sugar : <bison>m4sugar.m4 ;
-
-local bisonFiles = "yacc.c" "c.m4" "c++.m4" ;
-SEARCH on $(bisonFiles) = [ FDirName $(HAIKU_TOP) src bin bison data ] ;
-AddFilesToHaikuImage beos etc : $(bisonFiles) ;
 
 # fresh install indicator file
 SEARCH on <settings>fresh_install = [ FDirName $(HAIKU_TOP) data settings ] ;
