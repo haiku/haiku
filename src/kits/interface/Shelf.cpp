@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1052,7 +1052,7 @@ BShelf::_Archive(BMessage *data) const
 	data->AddInt32("_sg_cnt", fGenCount);
 
 	BMessage archive('ARCV');
-	
+
 	for (int32 i = 0; i < fReplicants.CountItems(); i++) {
 		if (((replicant_data *)fReplicants.ItemAt(i))->Archive(&archive) == B_OK)
 			data->AddMessage("replicant", &archive);
@@ -1161,6 +1161,7 @@ BShelf::_DeleteReplicant(replicant_data* item)
 }
 
 
+//! Takes over ownership of \a data on success only
 status_t
 BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 {
@@ -1202,7 +1203,7 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 			}
 		}
 	}
-	
+
 	// Instantiate the object, if this fails we have a zombie
 	image_id image;
 	BArchivable *archivable = _InstantiateObject(data, &image);
@@ -1221,7 +1222,6 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 		replicant = _GetReplicant(data, view, point, dragger, relation);
 		if (replicant == NULL)
 			return send_reply(data, B_ERROR, uniqueID);
-
 	} else if (fDisplayZombies && fAllowZombies)
 		zombie = _CreateZombie(data, dragger);
 

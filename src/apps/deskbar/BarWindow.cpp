@@ -518,7 +518,10 @@ TBarWindow::AddItem(BMessage *message)
 #endif
 			shelf = B_DESKBAR_TRAY;
 
-		err = fBarView->AddItem(new BMessage(archivedView), shelf, &id);
+		BMessage* archive = new BMessage(archivedView);
+		err = fBarView->AddItem(archive, shelf, &id);
+		if (err < B_OK)
+			delete archive;
 	} else if (message->FindRef("addon", &ref) == B_OK) {
 		//
 		//	exposing the name of the view here is not so great

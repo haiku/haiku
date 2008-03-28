@@ -1022,15 +1022,15 @@ TReplicantTray::IconCount() const
 }
 
 
-/**	Message must contain an archivable view
- *	in the Archives folder for later rehydration
- *	returns the current boot id
- */
-
+/*!	Message must contain an archivable view for later rehydration.
+	This function takes over ownership of the provided message on success
+	only.
+	Returns the current replicant ID.
+*/
 status_t
-TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
+TReplicantTray::AddIcon(BMessage *archive, int32 *id, const entry_ref *addOn)
 {
-	if (!icon || !id)
+	if (archive == NULL || id == NULL)
 		return B_ERROR;
 
 	// find entry_ref
@@ -1041,7 +1041,7 @@ TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
 		ref = *addOn;
 	} else {
 		const char *signature;
-		status_t status = icon->FindString("add_on", &signature);
+		status_t status = archive->FindString("add_on", &signature);
 		if (status == B_OK) {
 			BRoster roster;
 			status = roster.FindApp(signature, &ref);
@@ -1070,15 +1070,15 @@ TReplicantTray::AddIcon(BMessage *icon, int32 *id, const entry_ref *addOn)
 		return status;
 
 	*id = 999;
-	if (icon->what == B_ARCHIVED_OBJECT)
-		icon->what = 0;
+	if (archive->what == B_ARCHIVED_OBJECT)
+		archive->what = 0;
 
-	BRect originalBounds = icon->FindRect("_frame");
+	BRect originalBounds = archive->FindRect("_frame");
 		// this is a work-around for buggy replicants that change their
 		// size in AttachedToWindow() (such as "SVM")
 
 	// !! check for name collisions?
-	status = fShelf->AddReplicant(icon, BPoint(1, 1));
+	status = fShelf->AddReplicant(archive, BPoint(1, 1));
 	if (status != B_OK)
 		return status;
 
