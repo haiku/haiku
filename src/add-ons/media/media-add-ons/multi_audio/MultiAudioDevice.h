@@ -27,9 +27,9 @@ public:
 	const multi_mix_control_info& MixControlInfo() const
 							{ return fMixControlInfo; }
 
-	status_t			DoBufferExchange(multi_buffer_info* bufferInfo);
-	status_t			DoSetMix(multi_mix_value_info* mixValueInfo);
-	status_t			DoGetMix(multi_mix_value_info* mixValueInfo);
+	status_t			BufferExchange(multi_buffer_info* bufferInfo);
+	status_t			SetMix(multi_mix_value_info* mixValueInfo);
+	status_t			GetMix(multi_mix_value_info* mixValueInfo);
 
 private:
 	status_t			_InitDriver();

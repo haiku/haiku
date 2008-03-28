@@ -1,315 +1,245 @@
 /*
- * multiaudio replacement media addon for BeOS
- *
  * Copyright (c) 2002, Jerome Duval (jerome.duval@free.fr)
  * Distributed under the terms of the MIT License.
  */
-#ifndef _MULTIAUDIONODE_H
-#define _MULTIAUDIONODE_H
+#ifndef MULTI_AUDIO_NODE_H
+#define MULTI_AUDIO_NODE_H
 
-#include <MediaDefs.h>
-#include <MediaNode.h>
-#include <FileInterface.h>
+
 #include <BufferConsumer.h>
 #include <BufferProducer.h>
 #include <Controllable.h>
+#include <MediaAddOn.h>
+#include <MediaDefs.h>
 #include <MediaEventLooper.h>
-#include <ParameterWeb.h>
+#include <MediaNode.h>
+#include <Message.h>
 #include <TimeSource.h>
-#include <Controllable.h>
-#include <File.h>
-#include <Entry.h>
+
 #include "hmulti_audio.h"
 #include "MultiAudioDevice.h"
 
-/*bool format_is_acceptible(
-						const media_format & producer_format,
-						const media_format & consumer_format);*/
+class BDiscreteParameter;
+class BParameterGroup;
 
 
 class node_input {
-	public:
-		node_input(media_input &input, media_format format);
-		~node_input();
+public:
+	node_input(media_input& input, media_format format);
+	~node_input();
 
-		int32				fChannelId;
-		media_input			fInput;
-		media_format 		fPreferredFormat;
-		media_format		fFormat;
-		uint32 				fBufferCycle;
-		multi_buffer_info	fOldMBI;
-		BBuffer				*fBuffer;
+	int32				fChannelId;
+	media_input			fInput;
+	media_format 		fPreferredFormat;
+	media_format		fFormat;
+	uint32 				fBufferCycle;
+	multi_buffer_info	fOldBufferInfo;
+	BBuffer*			fBuffer;
 };
 
 class node_output {
-	public:
-		node_output(media_output &output, media_format format);
-		~node_output();
+public:
+	node_output(media_output& output, media_format format);
+	~node_output();
 
-		int32				fChannelId;
-		media_output		fOutput;
-		media_format 		fPreferredFormat;
-		media_format		fFormat;
+	int32				fChannelId;
+	media_output		fOutput;
+	media_format 		fPreferredFormat;
+	media_format		fFormat;
 
-		BBufferGroup		*fBufferGroup;
-		bool 				fOutputEnabled;
-		uint64 				fSamplesSent;
-		volatile uint32 	fBufferCycle;
-		multi_buffer_info	fOldMBI;
+	BBufferGroup*		fBufferGroup;
+	bool 				fOutputEnabled;
+	uint64 				fSamplesSent;
+	volatile uint32 	fBufferCycle;
+	multi_buffer_info	fOldBufferInfo;
 };
 
 class MultiAudioNode : public BBufferConsumer, public BBufferProducer,
 		public BTimeSource,	public BMediaEventLooper, public BControllable {
 protected:
-	virtual ~MultiAudioNode(void);
+	virtual					~MultiAudioNode();
 
 public:
-	explicit MultiAudioNode(BMediaAddOn* addon, const char* name,
-		MultiAudioDevice* device, int32 internalID, BMessage* config);
+							MultiAudioNode(BMediaAddOn* addon, const char* name,
+								MultiAudioDevice* device, int32 internalID,
+								BMessage* config);
 
-	virtual status_t InitCheck(void) const;
+	virtual status_t		InitCheck() const;
 
-		/*************************/
-		/* begin from BMediaNode */
-public:
-	virtual	BMediaAddOn* AddOn(int32* internalID) const;
+	static	void			GetFlavor(flavor_info* info, int32 id);
+	static	void			GetFormat(media_format* outFormat);
+
+			status_t		GetConfigurationFor(BMessage* message);
+
+	// BMediaNode methods
+	virtual	BMediaAddOn*	AddOn(int32* internalID) const;
+	virtual	status_t		HandleMessage(int32 message, const void* data,
+								size_t size);
 
 protected:
-	/* These don't return errors; instead, they use the global error condition reporter. */
-	/* A node is required to have a queue of at least one pending command (plus TimeWarp) */
-	/* and is recommended to allow for at least one pending command of each type. */
-	/* Allowing an arbitrary number of outstanding commands might be nice, but apps */
-	/* cannot depend on that happening. */
-	virtual	void Preroll(void);
+	virtual	void			Preroll();
+	virtual	void			NodeRegistered();
+	virtual	status_t		RequestCompleted(const media_request_info& info);
+	virtual	void			SetTimeSource(BTimeSource* timeSource);
 
-public:
-	virtual	status_t	HandleMessage(int32 message, const void* data,
-							size_t size);
+	// BBufferConsumer methods
 
-protected:
-	virtual	void		NodeRegistered();
-	virtual	status_t	RequestCompleted(const media_request_info &info);
-	virtual	void		SetTimeSource(BTimeSource *timeSource);
+	virtual	status_t		AcceptFormat(const media_destination& dest,
+								media_format* format);
+	virtual	status_t		GetNextInput(int32* cookie, media_input* input);
+	virtual	void			DisposeInputCookie(int32 cookie);
+	virtual	void			BufferReceived(BBuffer* buffer);
+	virtual	void			ProducerDataStatus(const media_destination& forWhom,
+								int32 status, bigtime_t atPerformanceTime);
+	virtual	status_t		GetLatencyFor(const media_destination& forWhom,
+								bigtime_t* latency, media_node_id* timeSource);
+	virtual	status_t 		Connected(const media_source& producer,
+								const media_destination& where,
+								const media_format& withFormat,
+								media_input* input);
+	virtual	void			Disconnected(const media_source& producer,
+								const media_destination& where);
+	virtual	status_t		FormatChanged(const media_source& producer,
+								const media_destination& consumer,
+								int32 changeTag, const media_format& format);
 
-		/* end from BMediaNode */
-		/***********************/
+	virtual	status_t		SeekTagRequested(
+								const media_destination& destination,
+								bigtime_t targetTime, uint32 flags,
+								media_seek_tag* _seekTag, bigtime_t* _taggedTime,
+								uint32* _flags);
 
-		/******************************/
-		/* begin from BBufferConsumer */
+	// BBufferProducer methods
 
-	virtual	status_t	AcceptFormat(const media_destination& dest,
-							media_format* format);
-	virtual	status_t	GetNextInput(int32* cookie, media_input* input);
-	virtual	void		DisposeInputCookie(int32 cookie);
-	virtual	void		BufferReceived(BBuffer* buffer);
-	virtual	void		ProducerDataStatus(const media_destination& forWhom,
-							int32 status, bigtime_t atPerformanceTime);
-	virtual	status_t	GetLatencyFor(const media_destination& forWhom,
-							bigtime_t* latency, media_node_id* timeSource);
-	virtual	status_t 	Connected(const media_source& producer,
-							const media_destination& where,
-							const media_format& withFormat, media_input* input);
-	virtual	void		Disconnected(const media_source& producer,
-							const media_destination& where);
-	virtual	status_t	FormatChanged(const media_source& producer,
-							const media_destination& consumer, int32 changeTag,
-							const media_format& format);
+	virtual status_t		FormatSuggestionRequested(media_type type,
+								int32 quality, media_format* format);
 
-	virtual	status_t	SeekTagRequested(const media_destination& destination,
-							bigtime_t targetTime, uint32 flags,
-							media_seek_tag* _seekTag, bigtime_t* _taggedTime,
-							uint32* _flags);
+	virtual status_t		FormatProposal(const media_source& output,
+								media_format* format);
 
-		/* end from BBufferConsumer */
-		/****************************/
+	virtual status_t		FormatChangeRequested(const media_source& source,
+								const media_destination& destination,
+								media_format* io_format, int32* _deprecated);
+	virtual status_t		GetNextOutput(int32* cookie,
+								media_output* out_output);
+	virtual status_t		DisposeOutputCookie(int32 cookie);
 
-		/******************************/
-		/* begin from BBufferProducer */
+	virtual	status_t		SetBufferGroup(const media_source& for_source,
+								BBufferGroup* group);
 
-		virtual status_t 	FormatSuggestionRequested(media_type type,
-			int32 quality,
-			media_format* format);
+	virtual status_t		PrepareToConnect(const media_source& what,
+								const media_destination& where,
+								media_format* format, media_source* source,
+								char* name);
 
-		virtual status_t 	FormatProposal(const media_source& output,
-			media_format* format);
+	virtual void			Connect(status_t error, const media_source& source,
+								const media_destination& destination,
+								const media_format& format, char* name);
+	virtual void			Disconnect(const media_source& what,
+								const media_destination& where);
 
-		virtual status_t 	FormatChangeRequested(const media_source& source,
-			const media_destination& destination,
-			media_format* io_format,
-			int32* _deprecated_);
-		virtual status_t 	GetNextOutput(int32* cookie,
-			media_output* out_output);
-		virtual status_t 	DisposeOutputCookie(int32 cookie);
+	virtual void			LateNoticeReceived(const media_source& what,
+								bigtime_t howMuch, bigtime_t performanceTime);
 
-		virtual	status_t 	SetBufferGroup(const media_source& for_source,
-			BBufferGroup* group);
+	virtual void			EnableOutput(const media_source& what, bool enabled,
+								int32* _deprecated);
+	virtual void			AdditionalBufferRequested(const media_source& source,
+								media_buffer_id previousBuffer,
+								bigtime_t previousTime,
+								const media_seek_tag* previousTag);
 
-		virtual status_t 	PrepareToConnect(const media_source& what,
-			const media_destination& where,
-			media_format* format,
-			media_source* out_source,
-			char* out_name);
+	// BMediaEventLooper methods
+	virtual void			HandleEvent(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
 
-		virtual void 		Connect(status_t error,
-			const media_source& source,
-			const media_destination& destination,
-			const media_format& format,
-			char* io_name);
+	// BTimeSource methods
+	virtual void			SetRunMode(run_mode mode);
+	virtual status_t		TimeSourceOp(const time_source_op_info& op,
+								void *_reserved);
 
-		virtual void 		Disconnect(const media_source& what,
-			const media_destination& where);
+	// BControllable methods
+	virtual status_t		GetParameterValue(int32 id, bigtime_t* lastChange,
+								void* value, size_t* size);
+	virtual void			SetParameterValue(int32 id, bigtime_t when,
+								const void* value, size_t size);
+	virtual BParameterWeb*	MakeParameterWeb();
 
-		virtual void 		LateNoticeReceived(const media_source& what,
-			bigtime_t how_much,
-			bigtime_t performance_time);
+private:
+	// private unimplemented
+							MultiAudioNode(const MultiAudioNode& clone);
+	MultiAudioNode& 		operator=(const MultiAudioNode& clone);
 
-		virtual void 		EnableOutput(const media_source & what,
-			bool enabled,
-			int32* _deprecated_);
-		virtual void 		AdditionalBufferRequested(const media_source& source,
-			media_buffer_id prev_buffer,
-			bigtime_t prev_time,
-			const media_seek_tag* prev_tag);
+			status_t		_HandleStart(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
+			status_t		_HandleSeek(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
+			status_t		_HandleWarp(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
+			status_t		_HandleStop(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
+			status_t		_HandleBuffer(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
+			status_t		_HandleDataStatus(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
+			status_t		_HandleParameter(const media_timed_event* event,
+								bigtime_t lateness, bool realTimeEvent = false);
 
-		/* end from BBufferProducer */
-		/****************************/
+			char*			_PlaybackBuffer(int32 cycle, int32 channel)
+								{ return fDevice->BufferList().playback_buffers
+									[cycle][channel].base; }
+			uint32			_PlaybackStride(int32 cycle, int32 channel)
+								{ return fDevice->BufferList().playback_buffers
+									[cycle][channel].stride; }
 
-		/*****************/
-		/* BControllable */
-		/*****************/
+			void			_WriteZeros(node_input& input, uint32 bufferCycle);
+			void			_FillWithZeros(node_input& input);
+			void			_FillNextBuffer(node_input& channel,
+								BBuffer* buffer);
 
-		/********************************/
-		/* start from BMediaEventLooper */
+	static	int32			_run_thread_(void* data);
+			int32			_RunThread();
+			status_t		_StartThread();
+			status_t		_StopThread();
 
-	protected:
-		/* you must override to handle your events! */
-		/* you should not call HandleEvent directly */
-		virtual void		HandleEvent(const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
+			void 			_AllocateBuffers(node_output& channel);
+			BBuffer* 		_FillNextBuffer(multi_buffer_info& info,
+								node_output& channel);
+			void			_UpdateTimeSource(multi_buffer_info& info,
+								multi_buffer_info& oldInfo, node_input& input);
 
-		/* end from BMediaEventLooper */
-		/******************************/
+			node_output* 	_FindOutput(media_source source);
+			node_input* 	_FindInput(media_destination destination);
+			node_input* 	_FindInput(int32 destinationId);
 
-		/********************************/
-		/* start from BTimeSource */
-	protected:
-		virtual void		SetRunMode(run_mode mode);
-		virtual status_t 	TimeSourceOp(const time_source_op_info &op,
-			void *_reserved);
+			const char*		_GetControlName(multi_mix_control& control);
+			void 			_ProcessGroup(BParameterGroup* group, int32 index,
+								int32& numParameters);
+			void 			_ProcessMux(BDiscreteParameter* parameter,
+								int32 index);
 
-		/* end from BTimeSource */
-		/******************************/
+private:
+	status_t			fInitStatus;
 
-		/********************************/
-		/* start from BControllable */
-	protected:
-		virtual status_t 	GetParameterValue(int32 id,
-			bigtime_t* last_change,
-			void * value,
-			size_t* ioSize);
-		virtual void 		SetParameterValue(int32 id,
-			bigtime_t when,
-			const void * value,
-			size_t size);
-		virtual BParameterWeb* MakeParameterWeb();
+	BMediaAddOn*		fAddOn;
+	int32				fId;
 
-		/* end from BControllable */
-		/******************************/
+	BList				fInputs;
 
-	protected:
+	bigtime_t 			fLatency;
+	BList				fOutputs;
+	media_format 		fPreferredFormat;
 
-		virtual status_t HandleStart(
-			const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
-		virtual status_t HandleSeek(
-			const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
-		virtual status_t HandleWarp(
-			const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
-		virtual status_t HandleStop(
-			const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
-		virtual status_t HandleBuffer(
-			const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
-		virtual status_t HandleDataStatus(
-			const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
-		virtual status_t HandleParameter(
-			const media_timed_event *event,
-			bigtime_t lateness,
-			bool realTimeEvent = false);
-
-	public:
-
-		static void GetFlavor(flavor_info * outInfo, int32 id);
-		static void GetFormat(media_format * outFormat);
-
-		status_t GetConfigurationFor(BMessage * into_message);
-
-
-	private:
-
-		MultiAudioNode(/* private unimplemented */
-			const MultiAudioNode & clone);
-		MultiAudioNode & operator=(
-			const MultiAudioNode & clone);
-
-		//void	WriteBuffer( BBuffer *buffer, node_input &input );
-		void	WriteZeros(node_input &input, uint32 bufferCycle);
-		void	FillWithZeros(node_input &input);
-		void	FillNextBuffer(node_input &channel, BBuffer* buffer);
-
-		static int32		_run_thread_(void *data);
-		int32				RunThread();
-		status_t			StartThread();
-		status_t			StopThread();
-
-
-		void 				AllocateBuffers(node_output &channel);
-		BBuffer* 			FillNextBuffer(multi_buffer_info &MBI,
-			node_output &channel);
-		void				UpdateTimeSource(multi_buffer_info &MBI,
-			multi_buffer_info &oldMBI,
-			node_input &input);
-
-		node_output* 		FindOutput(media_source source);
-		node_input* 		FindInput(media_destination dest);
-		node_input* 		FindInput(int32 destinationId);
-
-		void 				ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParameters);
-		void 				ProcessMux(BDiscreteParameter *parameter, int32 index);
-
-		status_t fInitCheckStatus;
-
-		BMediaAddOn 		*fAddOn;
-		int32				fId;
-
-		BList				fInputs;
-
-		bigtime_t 			fLatency;
-		BList				fOutputs;
-		media_format 		fPreferredFormat;
-
-		bigtime_t fInternalLatency;
+	bigtime_t			fInternalLatency;
 		// this is computed from the real (negotiated) chunk size and bit rate,
 		// not the defaults that are in the parameters
-		bigtime_t fBufferPeriod;
+	bigtime_t			fBufferPeriod;
 
-		sem_id				fBuffer_free;
-		thread_id			fThread;
-		MultiAudioDevice 	*fDevice;
-		bool 				fTimeSourceStarted;
-		BParameterWeb		*fWeb;
-		BMessage			fConfig;
+	sem_id				fBufferFreeSem;
+	thread_id			fThread;
+	MultiAudioDevice*	fDevice;
+	bool 				fTimeSourceStarted;
+	BParameterWeb*		fWeb;
+	BMessage			fConfig;
 };
 
-#endif /* _MULTIAUDIONODE_H */
+#endif	// MULTI_AUDIO_NODE_H

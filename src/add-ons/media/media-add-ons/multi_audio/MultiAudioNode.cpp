@@ -1,32 +1,23 @@
 /*
- * multiaudio replacement media addon for BeOS
- *
  * Copyright (c) 2002, 2003 Jerome Duval (jerome.duval@free.fr)
  * Distributed under the terms of the MIT License.
  */
 
+//! Multi-audio replacement media addon for BeOS
 
-#include <MediaDefs.h>
-#include <MediaNode.h>
-#include <MediaAddOn.h>
-#include <BufferConsumer.h>
-#include <FileInterface.h>
-#include <Controllable.h>
-#include <MediaEventLooper.h>
-#include <File.h>
-#include <Errors.h>
+#include "MultiAudioNode.h"
+
+#if 0
 #include <Entry.h>
-#include <BufferGroup.h>
-#include <TimeSource.h>
+#include <File.h>
+#include <FileInterface.h>
+#endif
 #include <Buffer.h>
+#include <BufferGroup.h>
 #include <ParameterWeb.h>
-#include <MediaRoster.h>
-#include <limits.h>
-#include <MediaDefs.h>
-#include <Message.h>
+
 
 #include "MultiAudioUtility.h"
-#include "MultiAudioNode.h"
 #ifdef DEBUG
 #	define PRINTING
 #endif
@@ -85,7 +76,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	fConfig(*config)
 {
 	CALLED();
-	fInitCheckStatus = B_NO_INIT;
+	fInitStatus = B_NO_INIT;
 
 	if (!device)
 		return;
@@ -114,7 +105,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		PRINT_OBJECT(*config);
 	}
 
-	fInitCheckStatus = B_OK;
+	fInitStatus = B_OK;
 }
 
 
@@ -123,7 +114,7 @@ MultiAudioNode::~MultiAudioNode()
 	CALLED();
 	fAddOn->GetConfigurationFor(this, NULL);
 		
-	StopThread();
+	_StopThread();
 	BMediaEventLooper::Quit();
 		
 	fWeb = NULL;	
@@ -134,7 +125,7 @@ status_t
 MultiAudioNode::InitCheck() const
 {
 	CALLED();
-	return fInitCheckStatus;
+	return fInitStatus;
 }
 
 
@@ -176,7 +167,7 @@ MultiAudioNode::NodeRegistered()
 {
 	CALLED();
 
-	if (fInitCheckStatus != B_OK) {
+	if (fInitStatus != B_OK) {
 		ReportError(B_NODE_IN_DISTRESS);
 		return;
 	}
@@ -198,12 +189,13 @@ MultiAudioNode::NodeRegistered()
 					!(fDevice->Description().channels[i].designations & B_CHANNEL_SURROUND_BUS)))
 			) {
 			PRINT(("NodeRegistered() : creating an input for %i\n", i));
-			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",fDevice->Description().channels[i].channel_id,
-											fDevice->Description().channels[i].kind,
-											fDevice->Description().channels[i].designations,
-											fDevice->Description().channels[i].connectors));
+			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",
+				fDevice->Description().channels[i].channel_id,
+				fDevice->Description().channels[i].kind,
+				fDevice->Description().channels[i].designations,
+				fDevice->Description().channels[i].connectors));
 
-			media_input *input = new media_input;
+			media_input* input = new media_input;
 
 			input->format = fPreferredFormat;
 			input->destination.port = ControlPort();
@@ -231,8 +223,8 @@ MultiAudioNode::NodeRegistered()
 	currentId = 0;
 
 	for (int32 i = fDevice->Description().output_channel_count; 
-			i < (fDevice->Description().output_channel_count + fDevice->Description().input_channel_count); i++) {
-
+			i < fDevice->Description().output_channel_count
+				+ fDevice->Description().input_channel_count; i++) {
 		if (currentOutput == NULL
 			|| (fDevice->Description().channels[i].designations & B_CHANNEL_MONO_BUS)
 			|| (fDevice->Description().channels[currentId].designations & B_CHANNEL_STEREO_BUS
@@ -285,8 +277,10 @@ MultiAudioNode::NodeRegistered()
 	const void *data;
 	ssize_t size;
 	while (fConfig.FindInt32("parameterID", index, &parameterID) == B_OK) {
-		if(fConfig.FindData("parameterData", B_RAW_TYPE, index, &data, &size) == B_OK)
+		if (fConfig.FindData("parameterData", B_RAW_TYPE, index, &data, &size)
+				== B_OK) {
 			SetParameterValue(parameterID, TimeSource()->Now(), data, size);
+		}
 		index++;
 	}
 
@@ -325,7 +319,7 @@ MultiAudioNode::AcceptFormat(const media_destination& dest,
 	if (format->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
 
-	node_input *channel = FindInput(dest);
+	node_input *channel = _FindInput(dest);
 	if (channel == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
@@ -435,7 +429,7 @@ MultiAudioNode::ProducerDataStatus(const media_destination& forWhom,
 {
 	//CALLED();
 
-	node_input *channel = FindInput(forWhom);
+	node_input *channel = _FindInput(forWhom);
 	if (channel == NULL) {
 		fprintf(stderr,"invalid destination received in MultiAudioNode::ProducerDataStatus\n");
 		return;
@@ -455,7 +449,7 @@ MultiAudioNode::GetLatencyFor(const media_destination& forWhom,
 	if (_latency == NULL || _timeSource == NULL)
 		return B_BAD_VALUE;
 
-	node_input *channel = FindInput(forWhom);
+	node_input *channel = _FindInput(forWhom);
 	if (channel == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
@@ -476,7 +470,7 @@ MultiAudioNode::Connected(const media_source& producer,
 		return B_BAD_VALUE; // no crashing
 	}
 	
-	node_input *channel = FindInput(where);
+	node_input *channel = _FindInput(where);
 	
 	if(channel==NULL) {
 		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
@@ -499,7 +493,7 @@ MultiAudioNode::Connected(const media_source& producer,
 	*out_input = channel->fInput;
 	
 	// we are sure the thread is started
-	StartThread();
+	_StartThread();
 	
 	return B_OK;
 }
@@ -510,20 +504,14 @@ MultiAudioNode::Disconnected(const media_source& producer,
 	const media_destination& where)
 {
 	CALLED();
-	node_input *channel = FindInput(where);
+	node_input *channel = _FindInput(where);
 	
-	if(channel==NULL) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+	if (channel == NULL || channel->fInput.source != producer)
 		return;
-	}
-	if (channel->fInput.source != producer) {
-		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
-		return;
-	}
-		
+
 	channel->fInput.source = media_source::null;
 	channel->fInput.format = channel->fPreferredFormat;
-	FillWithZeros(*channel);
+	_FillWithZeros(*channel);
 	//GetFormat(&channel->fInput.format);
 }
 
@@ -534,7 +522,7 @@ MultiAudioNode::FormatChanged(const media_source& producer,
 	const media_format& format)
 {
 	CALLED();
-	node_input *channel = FindInput(consumer);
+	node_input *channel = _FindInput(consumer);
 	
 	if(channel==NULL) {
 		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
@@ -598,7 +586,7 @@ MultiAudioNode::FormatProposal(const media_source& output, media_format* format)
 	// FormatProposal() is the first stage in the BMediaRoster::Connect() process.  We hand
 	// out a suggested format, with wildcards for any variations we support.
 	CALLED();
-	node_output *channel = FindOutput(output);
+	node_output *channel = _FindOutput(output);
 	
 	// is this a proposal for our select output?
 	if (channel == NULL)
@@ -662,7 +650,7 @@ MultiAudioNode::SetBufferGroup(const media_source& for_source,
 {
 	CALLED();
 
-	node_output *channel = FindOutput(for_source);
+	node_output *channel = _FindOutput(for_source);
 	
 	// is this our output?
 	if (channel == NULL)
@@ -700,20 +688,15 @@ MultiAudioNode::SetBufferGroup(const media_source& for_source,
 
 
 status_t
-MultiAudioNode::PrepareToConnect(const media_source& what, const media_destination& where, media_format* format, media_source* out_source, char* out_name)
+MultiAudioNode::PrepareToConnect(const media_source& what,
+	const media_destination& where, media_format* format,
+	media_source* source, char* name)
 {
-	// PrepareToConnect() is the second stage of format negotiations that happens
-	// inside BMediaRoster::Connect().  At this point, the consumer's AcceptFormat()
-	// method has been called, and that node has potentially changed the proposed
-	// format.  It may also have left wildcards in the format.  PrepareToConnect()
-	// *must* fully specialize the format before returning!
 	CALLED();
 
-	node_output *channel = FindOutput(what);
-	
 	// is this our output?
-	if (channel == NULL)
-	{
+	node_output* channel = _FindOutput(what);
+	if (channel == NULL) {
 		fprintf(stderr, "MultiAudioNode::PrepareToConnect returning B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
@@ -725,73 +708,73 @@ MultiAudioNode::PrepareToConnect(const media_source& what, const media_destinati
 	// the format may not yet be fully specialized (the consumer might have
 	// passed back some wildcards).  Finish specializing it now, and return an
 	// error if we don't support the requested format.
-	if (format->type != B_MEDIA_RAW_AUDIO)
-	{
+	if (format->type != B_MEDIA_RAW_AUDIO) {
 		fprintf(stderr, "\tnon-raw-audio format?!\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	
-	 // !!! validate all other fields except for buffer_size here, because the consumer might have
-	// supplied different values from AcceptFormat()?
+
+	// !!! validate all other fields except for buffer_size here, because the
+	// consumer might have supplied different values from AcceptFormat()?
 
 	// check the buffer size, which may still be wildcarded
-	if (format->u.raw_audio.buffer_size == media_raw_audio_format::wildcard.buffer_size)
-	{
-		format->u.raw_audio.buffer_size = 2048;		// pick something comfortable to suggest
-		fprintf(stderr, "\tno buffer size provided, suggesting %lu\n", format->u.raw_audio.buffer_size);
-	}
-	else
-	{
-		fprintf(stderr, "\tconsumer suggested buffer_size %lu\n", format->u.raw_audio.buffer_size);
+	if (format->u.raw_audio.buffer_size
+			== media_raw_audio_format::wildcard.buffer_size) {
+		format->u.raw_audio.buffer_size = 2048;
+			// pick something comfortable to suggest
+		fprintf(stderr, "\tno buffer size provided, suggesting %lu\n",
+			format->u.raw_audio.buffer_size);
+	} else {
+		fprintf(stderr, "\tconsumer suggested buffer_size %lu\n",
+			format->u.raw_audio.buffer_size);
 	}
 
 	// Now reserve the connection, and return information about it
 	channel->fOutput.destination = where;
 	channel->fOutput.format = *format;
-	*out_source = channel->fOutput.source;
-	strncpy(out_name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
+
+	*source = channel->fOutput.source;
+	strncpy(name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
 	return B_OK;
 }
 
 
 void
-MultiAudioNode::Connect(status_t error, const media_source& source, const media_destination& destination, const media_format& format, char* io_name)
+MultiAudioNode::Connect(status_t error, const media_source& source,
+	const media_destination& destination, const media_format& format,
+	char* name)
 {
 	CALLED();
-	
-	node_output *channel = FindOutput(source);
-	
+
 	// is this our output?
-	if (channel == NULL)
-	{
+	node_output* channel = _FindOutput(source);
+	if (channel == NULL) {
 		fprintf(stderr, "MultiAudioNode::Connect returning (cause : B_MEDIA_BAD_SOURCE)\n");
 		return;
 	}
-	
-	// If something earlier failed, Connect() might still be called, but with a non-zero
-	// error code.  When that happens we simply unreserve the connection and do
-	// nothing else.
-	if (error)
-	{
+
+	// If something earlier failed, Connect() might still be called, but with
+	// a non-zero error code.  When that happens we simply unreserve the
+	// connection and do nothing else.
+	if (error) {
 		channel->fOutput.destination = media_destination::null;
 		channel->fOutput.format = channel->fPreferredFormat;
 		return;
 	}
 
-	// Okay, the connection has been confirmed.  Record the destination and format
-	// that we agreed on, and report our connection name again.
+	// Okay, the connection has been confirmed.  Record the destination and
+	// format that we agreed on, and report our connection name again.
 	channel->fOutput.destination = destination;
 	channel->fOutput.format = format;
-	strncpy(io_name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
+	strncpy(name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
 
 	// reset our buffer duration, etc. to avoid later calculations
 	bigtime_t duration = channel->fOutput.format.u.raw_audio.buffer_size * 10000
-			/ ( (channel->fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-				* channel->fOutput.format.u.raw_audio.channel_count) 
-			/ ((int32)(channel->fOutput.format.u.raw_audio.frame_rate / 100));
-	
+		/ ((channel->fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* channel->fOutput.format.u.raw_audio.channel_count) 
+		/ ((int32)(channel->fOutput.format.u.raw_audio.frame_rate / 100));
+
 	SetBufferDuration(duration);
-	
+
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
@@ -802,42 +785,39 @@ MultiAudioNode::Connect(status_t error, const media_source& source, const media_
 	PRINT(("\tbuffer-filling took %Ld usec on this machine\n", fInternalLatency));
 	//SetEventLatency(fLatency + fInternalLatency);
 
-	// Set up the buffer group for our connection, as long as nobody handed us a
-	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
-	// if the consumer calls SetOutputBuffersFor() on us from within its Connected()
-	// method.
+	// Set up the buffer group for our connection, as long as nobody handed us
+	// a buffer group (via SetBufferGroup()) prior to this.  That can happen,
+	// for example, if the consumer calls SetOutputBuffersFor() on us from
+	// within its Connected() method.
 	if (!channel->fBufferGroup) 
-		AllocateBuffers(*channel);
-		
+		_AllocateBuffers(*channel);
+
 	// we are sure the thread is started
-	StartThread();
+	_StartThread();
 }
 
 
 void
-MultiAudioNode::Disconnect(const media_source& what, const media_destination& where)
+MultiAudioNode::Disconnect(const media_source& what,
+	const media_destination& where)
 {
 	CALLED();
-	
-	node_output *channel = FindOutput(what);
-	
+
 	// is this our output?
-	if (channel == NULL)
-	{
+	node_output* channel = _FindOutput(what);
+	if (channel == NULL) {
 		fprintf(stderr, "MultiAudioNode::Disconnect() returning (cause : B_MEDIA_BAD_SOURCE)\n");
 		return;
 	}
 
 	// Make sure that our connection is the one being disconnected
-	if ((where == channel->fOutput.destination) && (what == channel->fOutput.source))
-	{
+	if (where == channel->fOutput.destination
+		&& what == channel->fOutput.source) {
 		channel->fOutput.destination = media_destination::null;
 		channel->fOutput.format = channel->fPreferredFormat;
 		delete channel->fBufferGroup;
 		channel->fBufferGroup = NULL;
-	}
-	else
-	{
+	} else {
 		fprintf(stderr, "\tDisconnect() called with wrong source/destination (%ld/%ld), ours is (%ld/%ld)\n",
 			what.id, where.id, channel->fOutput.source.id, channel->fOutput.destination.id);
 	}
@@ -845,44 +825,39 @@ MultiAudioNode::Disconnect(const media_source& what, const media_destination& wh
 
 
 void
-MultiAudioNode::LateNoticeReceived(const media_source& what, bigtime_t how_much, bigtime_t performance_time)
+MultiAudioNode::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
+	bigtime_t performanceTime)
 {
 	CALLED();
-	
-	node_output *channel = FindOutput(what);
-	
-	// is this our output?
-	if (channel == NULL)
-	{
-		return;
-	}
 
-	// If we're late, we need to catch up.  Respond in a manner appropriate to our
-	// current run mode.
-	if (RunMode() == B_RECORDING)
-	{
+	// is this our output?
+	node_output *channel = _FindOutput(what);
+	if (channel == NULL)
+		return;
+
+	// If we're late, we need to catch up.  Respond in a manner appropriate
+	// to our current run mode.
+	if (RunMode() == B_RECORDING) {
 		// A hardware capture node can't adjust; it simply emits buffers at
 		// appropriate points.  We (partially) simulate this by not adjusting
 		// our behavior upon receiving late notices -- after all, the hardware
 		// can't choose to capture "sooner"....
-	}
-	else if (RunMode() == B_INCREASE_LATENCY)
-	{
+	} else if (RunMode() == B_INCREASE_LATENCY) {
 		// We're late, and our run mode dictates that we try to produce buffers
-		// earlier in order to catch up.  This argues that the downstream nodes are
-		// not properly reporting their latency, but there's not much we can do about
-		// that at the moment, so we try to start producing buffers earlier to
-		// compensate.
-		fInternalLatency += how_much;
+		// earlier in order to catch up.  This argues that the downstream nodes
+		// are not properly reporting their latency, but there's not much we can
+		// do about that at the moment, so we try to start producing buffers
+		// earlier to compensate.
+		fInternalLatency += howMuch;
 		SetEventLatency(fLatency + fInternalLatency);
 
-		fprintf(stderr, "\tincreasing latency to %Ld\n", fLatency + fInternalLatency);
-	}
-	else
-	{
-		// The other run modes dictate various strategies for sacrificing data quality
-		// in the interests of timely data delivery.  The way *we* do this is to skip
-		// a buffer, which catches us up in time by one buffer duration.
+		fprintf(stderr, "\tincreasing latency to %Ld\n",
+			fLatency + fInternalLatency);
+	} else {
+		// The other run modes dictate various strategies for sacrificing data
+		// quality in the interests of timely data delivery.  The way *we* do
+		// this is to skip a buffer, which catches us up in time by one buffer
+		// duration.
 		/*size_t nSamples = fOutput.format.u.raw_audio.buffer_size / sizeof(float);
 		mSamplesSent += nSamples;*/
 
@@ -892,25 +867,26 @@ MultiAudioNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 
 
 void
-MultiAudioNode::EnableOutput(const media_source& what, bool enabled, int32* _deprecated_)
+MultiAudioNode::EnableOutput(const media_source& what, bool enabled,
+	int32* _deprecated_)
 {
 	CALLED();
 
-	// If I had more than one output, I'd have to walk my list of output records to see
-	// which one matched the given source, and then enable/disable that one.  But this
-	// node only has one output, so I just make sure the given source matches, then set
-	// the enable state accordingly.
-	node_output *channel = FindOutput(what);
-	
+	// If I had more than one output, I'd have to walk my list of output
+	// records to see which one matched the given source, and then
+	// enable/disable that one.  But this node only has one output, so I
+	// just make sure the given source matches, then set the enable state
+	// accordingly.
+	node_output *channel = _FindOutput(what);
 	if (channel != NULL)
-	{
 		channel->fOutputEnabled = enabled;
-	}
 }
 
 
 void
-MultiAudioNode::AdditionalBufferRequested(const media_source& source, media_buffer_id prev_buffer, bigtime_t prev_time, const media_seek_tag* prev_tag)
+MultiAudioNode::AdditionalBufferRequested(const media_source& source,
+	media_buffer_id previousBuffer, bigtime_t previousTime,
+	const media_seek_tag* previousTag)
 {
 	CALLED();
 	// we don't support offline mode
@@ -928,81 +904,73 @@ MultiAudioNode::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 	//CALLED();
 	switch (event->type) {
 		case BTimedEventQueue::B_START:
-			HandleStart(event,lateness,realTimeEvent);
+			_HandleStart(event, lateness, realTimeEvent);
 			break;
 		case BTimedEventQueue::B_SEEK:
-			HandleSeek(event,lateness,realTimeEvent);
+			_HandleSeek(event, lateness, realTimeEvent);
 			break;
 		case BTimedEventQueue::B_WARP:
-			HandleWarp(event,lateness,realTimeEvent);
+			_HandleWarp(event, lateness, realTimeEvent);
 			break;
 		case BTimedEventQueue::B_STOP:
-			HandleStop(event,lateness,realTimeEvent);
+			_HandleStop(event, lateness, realTimeEvent);
 			break;
 		case BTimedEventQueue::B_HANDLE_BUFFER:
-			if (RunState() == BMediaEventLooper::B_STARTED) {
-				HandleBuffer(event,lateness,realTimeEvent);
-			}
+			if (RunState() == BMediaEventLooper::B_STARTED)
+				_HandleBuffer(event, lateness, realTimeEvent);
 			break;
 		case BTimedEventQueue::B_DATA_STATUS:
-			HandleDataStatus(event,lateness,realTimeEvent);
+			_HandleDataStatus(event, lateness, realTimeEvent);
 			break;
 		case BTimedEventQueue::B_PARAMETER:
-			HandleParameter(event,lateness,realTimeEvent);
+			_HandleParameter(event, lateness, realTimeEvent);
 			break;
 		default:
-			fprintf(stderr,"  unknown event type: %li\n",event->type);
+			fprintf(stderr,"  unknown event type: %li\n", event->type);
 			break;
 	}
 }
 
 
-// how should we handle late buffers?  drop them?
+// TODO: how should we handle late buffers? drop them?
 // notify the producer?
 status_t
-MultiAudioNode::HandleBuffer(const media_timed_event* event, bigtime_t lateness,
-	bool realTimeEvent)
+MultiAudioNode::_HandleBuffer(const media_timed_event* event,
+	bigtime_t lateness, bool realTimeEvent)
 {
 	//CALLED();
-	BBuffer * buffer = const_cast<BBuffer*>((BBuffer*)event->pointer);
-	if (buffer == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
+	BBuffer* buffer = const_cast<BBuffer*>((BBuffer*)event->pointer);
+	if (buffer == NULL)
 		return B_BAD_VALUE;
-	}
-	
-	node_input *channel = FindInput(buffer->Header()->destination);
+
 	//PRINT(("buffer->Header()->destination : %i\n", buffer->Header()->destination));
-	
-	if(channel==NULL) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+
+	node_input* channel = _FindInput(buffer->Header()->destination);
+	if (channel == NULL)
 		return B_MEDIA_BAD_DESTINATION;
-	}
-	
-	media_header* hdr = buffer->Header();
+
 	bigtime_t now = TimeSource()->Now();
-	bigtime_t perf_time = hdr->start_time;
-	
+	bigtime_t performanceTime = buffer->Header()->start_time;
+
 	// the how_early calculate here doesn't include scheduling latency because
 	// we've already been scheduled to handle the buffer
-	bigtime_t how_early = perf_time - EventLatency() - now;
-	
+	bigtime_t howEarly = performanceTime - EventLatency() - now;
+
 	// if the buffer is late, we ignore it and report the fact to the producer
 	// who sent it to us
-	if ((RunMode() != B_OFFLINE) &&				// lateness doesn't matter in offline mode...
-		(RunMode() != B_RECORDING) &&		// ...or in recording mode
-		(how_early < 0LL))
-	{
+	if (RunMode() != B_OFFLINE && RunMode() != B_RECORDING && howEarly < 0LL) {
+		// lateness doesn't matter in offline mode or in recording mode
 		//mLateBuffers++;
-		NotifyLateProducer(channel->fInput.source, -how_early, perf_time);
-		fprintf(stderr,"	<- LATE BUFFER : %lli\n", how_early);
+		NotifyLateProducer(channel->fInput.source, -howEarly, performanceTime);
+		fprintf(stderr,"	<- LATE BUFFER : %lli\n", howEarly);
 		buffer->Recycle();
 	} else {
 		//WriteBuffer(buffer, *channel);
-		if(channel->fBuffer != NULL) {
+		if (channel->fBuffer != NULL) {
 			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId : %i, how_early:%lli\n", channel->fChannelId, how_early));
 			//channel->fBuffer->Recycle();
 			snooze(100);
-			if(channel->fBuffer != NULL)
+			if (channel->fBuffer != NULL)
 				buffer->Recycle();
 			else
 				channel->fBuffer = buffer;
@@ -1016,12 +984,12 @@ MultiAudioNode::HandleBuffer(const media_timed_event* event, bigtime_t lateness,
 
 
 status_t
-MultiAudioNode::HandleDataStatus(const media_timed_event* event,
+MultiAudioNode::_HandleDataStatus(const media_timed_event* event,
 	bigtime_t lateness, bool realTimeEvent)
 {
 	//CALLED();
 	PRINT(("MultiAudioNode::HandleDataStatus status:%li, lateness:%li\n", event->data, lateness));
-	switch(event->data) {
+	switch (event->data) {
 		case B_DATA_NOT_AVAILABLE:
 			break;
 		case B_DATA_AVAILABLE:
@@ -1036,7 +1004,7 @@ MultiAudioNode::HandleDataStatus(const media_timed_event* event,
 
 
 status_t
-MultiAudioNode::HandleStart(const media_timed_event *event, bigtime_t lateness,
+MultiAudioNode::_HandleStart(const media_timed_event *event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
@@ -1047,7 +1015,7 @@ MultiAudioNode::HandleStart(const media_timed_event *event, bigtime_t lateness,
 
 
 status_t
-MultiAudioNode::HandleSeek(const media_timed_event* event, bigtime_t lateness,
+MultiAudioNode::_HandleSeek(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
@@ -1058,7 +1026,7 @@ MultiAudioNode::HandleSeek(const media_timed_event* event, bigtime_t lateness,
 
 
 status_t
-MultiAudioNode::HandleWarp(const media_timed_event* event, bigtime_t lateness,
+MultiAudioNode::_HandleWarp(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
@@ -1067,23 +1035,22 @@ MultiAudioNode::HandleWarp(const media_timed_event* event, bigtime_t lateness,
 
 
 status_t
-MultiAudioNode::HandleStop(const media_timed_event* event, bigtime_t lateness,
+MultiAudioNode::_HandleStop(const media_timed_event* event, bigtime_t lateness,
 	bool realTimeEvent)
 {
 	CALLED();
 	// flush the queue so downstreamers don't get any more
-	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
-	
-	//StopThread();
+	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
+		BTimedEventQueue::B_HANDLE_BUFFER);
+
+	//_StopThread();
 	return B_OK;
 }
 
 
 status_t
-MultiAudioNode::HandleParameter(
-				const media_timed_event *event,
-				bigtime_t lateness,
-				bool realTimeEvent)
+MultiAudioNode::_HandleParameter(const media_timed_event* event,
+	bigtime_t lateness, bool realTimeEvent)
 {
 	CALLED();
 	return B_OK;
@@ -1103,16 +1070,16 @@ MultiAudioNode::SetRunMode(run_mode mode)
 
 
 status_t
-MultiAudioNode::TimeSourceOp(const time_source_op_info &op, void *_reserved)
+MultiAudioNode::TimeSourceOp(const time_source_op_info& op, void* _reserved)
 {
 	CALLED();
-	switch(op.op) {
+	switch (op.op) {
 		case B_TIMESOURCE_START:
 			PRINT(("TimeSourceOp op B_TIMESOURCE_START\n"));
 			if (RunState() != BMediaEventLooper::B_STARTED) {
 				fTimeSourceStarted = true;
-				StartThread();
-			
+				_StartThread();
+
 				media_timed_event startEvent(0, BTimedEventQueue::B_START);
 				EventQueue()->AddEvent(startEvent);
 			}	
@@ -1123,7 +1090,7 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info &op, void *_reserved)
 				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
-				StopThread();
+				_StopThread();
 				PublishTime(0, 0, 0);
 			}
 			break;
@@ -1133,7 +1100,7 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info &op, void *_reserved)
 				media_timed_event stopEvent(0, BTimedEventQueue::B_STOP);
 				EventQueue()->AddEvent(stopEvent);
 				fTimeSourceStarted = false;
-				StopThread();
+				_StopThread();
 				PublishTime(0, 0, 0);
 			}
 			break;
@@ -1152,85 +1119,81 @@ MultiAudioNode::TimeSourceOp(const time_source_op_info &op, void *_reserved)
 
 
 status_t
-MultiAudioNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value, size_t* ioSize)
+MultiAudioNode::GetParameterValue(int32 id, bigtime_t* lastChange, void* value,
+	size_t* size)
 {
 	CALLED();
-	
+
 	PRINT(("id : %i\n", id));
-	BParameter *parameter = NULL;
-	for(int32 i=0; i<fWeb->CountParameters(); i++) {
+	BParameter* parameter = NULL;
+	for (int32 i = 0; i < fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
-		if(parameter->ID() == id)
+		if (parameter->ID() == id)
 			break;
 	}
 
-	if(!parameter) {
+	if (parameter == NULL) {
 		// Hmmm, we were asked for a parameter that we don't actually
 		// support.  Report an error back to the caller.
 		PRINT(("\terror - asked for illegal parameter %ld\n", id));
 		return B_ERROR;
 	}
-	
-	multi_mix_value_info MMVI;
-	multi_mix_value MMV[2];
-	int rval;
-	MMVI.values = MMV;
+
+	multi_mix_value_info info;
+	multi_mix_value values[2];
+	info.values = values;
+	info.item_count = 0;
+
 	id = id - 100;
-	MMVI.item_count = 0;
-	
-	if (*ioSize < sizeof(float))
+
+	if (*size < sizeof(float))
 		return B_ERROR;
-	
-	if(parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
-		MMVI.item_count = 1;
-		MMV[0].id = id;
-		
-		if(parameter->CountChannels() == 2) {
-			if (*ioSize < 2*sizeof(float))
+
+	if (parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
+		info.item_count = 1;
+		values[0].id = id;
+
+		if (parameter->CountChannels() == 2) {
+			if (*size < 2*sizeof(float))
 				return B_ERROR;
-			MMVI.item_count = 2;
-			MMV[1].id = id + 1;
+			info.item_count = 2;
+			values[1].id = id + 1;
 		}
-		
 	} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
-		MMVI.item_count = 1;
-		MMV[0].id = id;
+		info.item_count = 1;
+		values[0].id = id;
 	}
-	
-	if(MMVI.item_count > 0) {
-		rval = fDevice->DoGetMix(&MMVI);
-			
-		if (B_OK != rval) {	
+
+	if (info.item_count > 0) {
+		status_t status = fDevice->GetMix(&info);
+		if (status != B_OK) {	
 			fprintf(stderr, "Failed on DRIVER_GET_MIX\n");
 		} else {
-			
-			if(parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
-				((float*)value)[0] = MMV[0].gain;
-				*ioSize = sizeof(float); 
-				
-				if(parameter->CountChannels() == 2) {
-					((float*)value)[1] = MMV[1].gain;
-					*ioSize = 2*sizeof(float); 
+			if (parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
+				((float*)value)[0] = values[0].gain;
+				*size = sizeof(float); 
+
+				if (parameter->CountChannels() == 2) {
+					((float*)value)[1] = values[1].gain;
+					*size = 2*sizeof(float); 
 				}
-				
-				for(uint32 i=0; i < (*ioSize/sizeof(float)); i++) {
+
+				for (uint32 i = 0; i < *size / sizeof(float); i++) {
 					PRINT(("GetParameterValue B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
 				}
-			} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
-			
-				BDiscreteParameter *dparameter = (BDiscreteParameter*) parameter;
-				if(dparameter->CountItems()<=2) {
-					((int32*)value)[0] = (MMV[0].enable) ? 1 : 0;
-				} else {
-					((int32*)value)[0] = MMV[0].mux;
-				}
-				*ioSize = sizeof(int32);
-				
-				for(uint32 i=0; i < (*ioSize/sizeof(int32)); i++) {
+			} else if (parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
+				BDiscreteParameter* discrete = (BDiscreteParameter*)parameter;
+				if (discrete->CountItems() <= 2)
+					((int32*)value)[0] = values[0].enable ? 1 : 0;
+				else
+					((int32*)value)[0] = values[0].mux;
+
+				*size = sizeof(int32);
+
+				for (uint32 i = 0; i < *size / sizeof(int32); i++) {
 					PRINT(("GetParameterValue B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
 				}
 			}
-		
 		}
 	}
 	return B_OK;
@@ -1238,65 +1201,64 @@ MultiAudioNode::GetParameterValue(int32 id, bigtime_t* last_change, void* value,
 
 
 void
-MultiAudioNode::SetParameterValue(int32 id, bigtime_t performance_time, const void* value, size_t size)
+MultiAudioNode::SetParameterValue(int32 id, bigtime_t performanceTime,
+	const void* value, size_t size)
 {
 	CALLED();
-	PRINT(("id : %i, performance_time : %lld, size : %i\n", id, performance_time, size));
-	BParameter *parameter = NULL;
-	for(int32 i=0; i<fWeb->CountParameters(); i++) {
+	PRINT(("id : %i, performance_time : %lld, size : %i\n", id, performanceTime, size));
+
+	BParameter* parameter = NULL;
+	for (int32 i = 0; i < fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
-		if(parameter->ID() == id)
+		if (parameter->ID() == id)
 			break;
 	}
-	if(parameter) {
-		multi_mix_value_info MMVI;
-		multi_mix_value MMV[2];
-		int rval;
-		MMVI.values = MMV;
-		id = id - 100;
-		MMVI.item_count = 0;
-		
-		if(parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
-			for(uint32 i=0; i < (size/sizeof(float)); i++) {
-				PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
-			}
-			MMVI.item_count = 1;
-			MMV[0].id = id;
-			MMV[0].gain = ((float*)value)[0];
-			
-			if(parameter->CountChannels() == 2) {
-				MMVI.item_count = 2;
-				MMV[1].id = id + 1;
-				MMV[1].gain = ((float*)value)[1];
-			}
-			
-		} else if(parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
-			for(uint32 i=0; i < (size/sizeof(int32)); i++) {
-				PRINT(("SetParameterValue B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
-			}
-			BDiscreteParameter *dparameter = (BDiscreteParameter*) parameter;
-			
-			if(dparameter->CountItems()<=2) {
-				MMVI.item_count = 1;
-				MMV[0].id = id;
-				MMV[0].enable = (((int32*)value)[0] == 1) ? true : false;
-			} else {
-				MMVI.item_count = 1;
-				MMV[0].id = id;
-				MMV[0].mux = ((uint32*)value)[0];
-			}
+
+	if (parameter == NULL)
+		return;
+
+	multi_mix_value_info info;
+	multi_mix_value values[2];
+	info.values = values;
+	info.item_count = 0;
+
+	id = id - 100;
+
+	if (parameter->Type() == BParameter::B_CONTINUOUS_PARAMETER) {
+		for (uint32 i = 0; i < size / sizeof(float); i++) {
+			PRINT(("SetParameterValue B_CONTINUOUS_PARAMETER value[%i] : %f\n", i, ((float*)value)[i]));
 		}
-		
-		if(MMVI.item_count > 0) {
-			rval = fDevice->DoSetMix(&MMVI);
-				
-			if (B_OK != rval)
-			{	
-				fprintf(stderr, "Failed on DRIVER_SET_MIX\n");
-			}
+		info.item_count = 1;
+		values[0].id = id;
+		values[0].gain = ((float*)value)[0];
+
+		if (parameter->CountChannels() == 2) {
+			info.item_count = 2;
+			values[1].id = id + 1;
+			values[1].gain = ((float*)value)[1];
+		}
+	} else if (parameter->Type() == BParameter::B_DISCRETE_PARAMETER) {
+		for (uint32 i = 0; i < size / sizeof(int32); i++) {
+			PRINT(("SetParameterValue B_DISCRETE_PARAMETER value[%i] : %i\n", i, ((int32*)value)[i]));
+		}
+
+		BDiscreteParameter* discrete = (BDiscreteParameter*)parameter;
+		if (discrete->CountItems() <= 2) {
+			info.item_count = 1;
+			values[0].id = id;
+			values[0].enable = ((int32*)value)[0] == 1;
+		} else {
+			info.item_count = 1;
+			values[0].id = id;
+			values[0].mux = ((uint32*)value)[0];
 		}
 	}
-	
+
+	if (info.item_count > 0) {
+		status_t status = fDevice->SetMix(&info);
+		if (status != B_OK)
+			fprintf(stderr, "Failed on DRIVER_SET_MIX\n");
+	}
 }
 
 
@@ -1305,21 +1267,20 @@ MultiAudioNode::MakeParameterWeb()
 {
 	CALLED();
 	BParameterWeb* web = new BParameterWeb;
-	
-	PRINT(("MixControlInfo().control_count : %i\n", fDevice->MixControlInfo().control_count));
-	multi_mix_control		*MMC = fDevice->MixControlInfo().controls;
-	
-	for(int i=0; i<fDevice->MixControlInfo().control_count; i++) {
-		if(MMC[i].flags & B_MULTI_MIX_GROUP && MMC[i].parent == 0) {
-				PRINT(("NEW_GROUP\n"));
-				int32 nb = 0;
-				const char* childName;
-				if(MMC[i].string != S_null)
-					childName = multi_string[MMC[i].string];
-				else
-					childName = MMC[i].name;
-				BParameterGroup *child = web->MakeGroup(childName);
-				ProcessGroup(child, i, nb);
+
+	PRINT(("MixControlInfo().control_count : %i\n",
+		fDevice->MixControlInfo().control_count));
+
+	multi_mix_control* controls = fDevice->MixControlInfo().controls;
+
+	for (int i = 0; i < fDevice->MixControlInfo().control_count; i++) {
+		if (controls[i].flags & B_MULTI_MIX_GROUP && controls[i].parent == 0) {
+			PRINT(("NEW_GROUP\n"));
+			BParameterGroup* child = web->MakeGroup(
+				_GetControlName(controls[i]));
+
+			int32 numParameters = 0;
+			_ProcessGroup(child, i, numParameters);
 		}
 	}
 		
@@ -1327,62 +1288,82 @@ MultiAudioNode::MakeParameterWeb()
 }
 
 
+const char*
+MultiAudioNode::_GetControlName(multi_mix_control& control)
+{
+	if (control.string != S_null)
+		return multi_string[control.string];
+
+	return control.name;
+}
+
+
 void
-MultiAudioNode::ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParameters)
+MultiAudioNode::_ProcessGroup(BParameterGroup* group, int32 index,
+	int32& numParameters)
 {
 	CALLED();
-	multi_mix_control		*parent = &fDevice->MixControlInfo().controls[index];
-	multi_mix_control		*MMC = fDevice->MixControlInfo().controls;
-	for(int32 i=0; i<fDevice->MixControlInfo().control_count; i++) {
-		if(MMC[i].parent != parent->id)
+	multi_mix_control* parent = &fDevice->MixControlInfo().controls[index];
+	multi_mix_control* controls = fDevice->MixControlInfo().controls;
+
+	for (int32 i = 0; i < fDevice->MixControlInfo().control_count; i++) {
+		if (controls[i].parent != parent->id)
 			continue;
-			
-		const char* childName;
-		if(MMC[i].string != S_null)
-			childName = multi_string[MMC[i].string];
-		else
-			childName = MMC[i].name;
-			
-		if(MMC[i].flags & B_MULTI_MIX_GROUP) {
+
+		const char* name = _GetControlName(controls[i]);
+
+		if (controls[i].flags & B_MULTI_MIX_GROUP) {
 			PRINT(("NEW_GROUP\n"));
-			int32 nb = 1;
-			BParameterGroup *child = group->MakeGroup(childName);
-			child->MakeNullParameter(MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_WEB_BUFFER_OUTPUT);
-			ProcessGroup(child, i, nb);
-		} else if(MMC[i].flags & B_MULTI_MIX_MUX) {
+			BParameterGroup* child = group->MakeGroup(name);
+			child->MakeNullParameter(controls[i].id, B_MEDIA_RAW_AUDIO, name,
+				B_WEB_BUFFER_OUTPUT);
+
+			int32 num = 1;
+			_ProcessGroup(child, i, num);
+		} else if (controls[i].flags & B_MULTI_MIX_MUX) {
 			PRINT(("NEW_MUX\n"));
-			BDiscreteParameter *parameter = 
-				group->MakeDiscreteParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_INPUT_MUX);
-			if(nbParameters>0) {
-				(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
-				nbParameters++;
+			BDiscreteParameter* parameter = group->MakeDiscreteParameter(
+				100 + controls[i].id, B_MEDIA_RAW_AUDIO, name, B_INPUT_MUX);
+			if (numParameters > 0) {
+				(group->ParameterAt(numParameters - 1))->AddOutput(
+					group->ParameterAt(numParameters));
+				numParameters++;
 			}
-			ProcessMux(parameter, i);
-		} else if(MMC[i].flags & B_MULTI_MIX_GAIN) {
+			_ProcessMux(parameter, i);
+		} else if (controls[i].flags & B_MULTI_MIX_GAIN) {
 			PRINT(("NEW_GAIN\n"));
-			group->MakeContinuousParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, "", B_MASTER_GAIN, 
-				"dB", MMC[i].gain.min_gain, MMC[i].gain.max_gain, MMC[i].gain.granularity);
-			
-			if(i+1 <fDevice->MixControlInfo().control_count && MMC[i+1].master == MMC[i].id && MMC[i+1].flags & B_MULTI_MIX_GAIN) {
-				group->ParameterAt(nbParameters)->SetChannelCount(
-					group->ParameterAt(nbParameters)->CountChannels() + 1);
+			group->MakeContinuousParameter(100 + controls[i].id,
+				B_MEDIA_RAW_AUDIO, "", B_MASTER_GAIN, "dB",
+				controls[i].gain.min_gain, controls[i].gain.max_gain,
+				controls[i].gain.granularity);
+
+			if (i + 1 < fDevice->MixControlInfo().control_count
+				&& controls[i + 1].master == controls[i].id
+				&& controls[i + 1].flags & B_MULTI_MIX_GAIN) {
+				group->ParameterAt(numParameters)->SetChannelCount(
+					group->ParameterAt(numParameters)->CountChannels() + 1);
 				i++;
 			}
-			
-			PRINT(("nb parameters : %d\n", nbParameters));
-			if (nbParameters > 0) {
-				(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
-				nbParameters++;
+
+			PRINT(("num parameters : %d\n", numParameters));
+			if (numParameters > 0) {
+				(group->ParameterAt(numParameters - 1))->AddOutput(
+					group->ParameterAt(numParameters));
+				numParameters++;
 			}
-		} else if(MMC[i].flags & B_MULTI_MIX_ENABLE) {
+		} else if (controls[i].flags & B_MULTI_MIX_ENABLE) {
 			PRINT(("NEW_ENABLE\n"));
-			if(MMC[i].string == S_MUTE)
-				group->MakeDiscreteParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_MUTE);
-			else
-				group->MakeDiscreteParameter(100 + MMC[i].id, B_MEDIA_RAW_AUDIO, childName, B_ENABLE);
-			if(nbParameters>0) {
-				(group->ParameterAt(nbParameters - 1))->AddOutput(group->ParameterAt(nbParameters));
-				nbParameters++;
+			if (controls[i].string == S_MUTE) {
+				group->MakeDiscreteParameter(100 + controls[i].id,
+					B_MEDIA_RAW_AUDIO, name, B_MUTE);
+			} else {
+				group->MakeDiscreteParameter(100 + controls[i].id,
+					B_MEDIA_RAW_AUDIO, name, B_ENABLE);
+			}
+			if (numParameters > 0) {
+				(group->ParameterAt(numParameters - 1))->AddOutput(
+					group->ParameterAt(numParameters));
+				numParameters++;
 			}
 		}
 	}
@@ -1390,25 +1371,20 @@ MultiAudioNode::ProcessGroup(BParameterGroup *group, int32 index, int32 &nbParam
 
 
 void
-MultiAudioNode::ProcessMux(BDiscreteParameter *parameter, int32 index)
+MultiAudioNode::_ProcessMux(BDiscreteParameter* parameter, int32 index)
 {
 	CALLED();
-	multi_mix_control		*parent = &fDevice->MixControlInfo().controls[index];
-	multi_mix_control		*MMC = fDevice->MixControlInfo().controls;
-	int32 	itemIndex = 0;
-	for(int32 i=0; i<fDevice->MixControlInfo().control_count; i++) {
-		if(MMC[i].parent != parent->id)
+	multi_mix_control* parent = &fDevice->MixControlInfo().controls[index];
+	multi_mix_control* controls = fDevice->MixControlInfo().controls;
+	int32 itemIndex = 0;
+
+	for (int32 i = 0; i < fDevice->MixControlInfo().control_count; i++) {
+		if (controls[i].parent != parent->id)
 			continue;
-			
-		const char* childName;
-		if(MMC[i].string != S_null)
-			childName = multi_string[MMC[i].string];
-		else
-			childName = MMC[i].name;	
-			
-		if(MMC[i].flags & B_MULTI_MIX_MUX_VALUE) {
+
+		if (controls[i].flags & B_MULTI_MIX_MUX_VALUE) {
 			PRINT(("NEW_MUX_VALUE\n"));
-			parameter->AddItem(itemIndex, childName);
+			parameter->AddItem(itemIndex, _GetControlName(controls[i]));
 			itemIndex++;
 		}
 	}
@@ -1419,120 +1395,127 @@ MultiAudioNode::ProcessMux(BDiscreteParameter *parameter, int32 index)
 
 
 int32
-MultiAudioNode::RunThread()
+MultiAudioNode::_RunThread()
 {
 	CALLED();
-	multi_buffer_info		MBI;
-	MBI.info_size = sizeof(MBI);
-	MBI._reserved_0 = 0;
-	MBI._reserved_1 = 2;
-	MBI.playback_buffer_cycle = 0;
-	MBI.record_buffer_cycle = 0;
-	
-	while ( 1 ) {
-		//acquire buffer if any
-		if ( acquire_sem_etc( fBuffer_free, 1, B_RELATIVE_TIMEOUT, 0 ) == B_BAD_SEM_ID ) {
+	multi_buffer_info bufferInfo;
+	bufferInfo.info_size = sizeof(multi_buffer_info);
+	bufferInfo._reserved_0 = 0;
+	bufferInfo._reserved_1 = 2;
+	bufferInfo.playback_buffer_cycle = 0;
+	bufferInfo.record_buffer_cycle = 0;
+
+	while (true) {
+		// TODO: why this semaphore??
+		if (acquire_sem_etc(fBufferFreeSem, 1, B_RELATIVE_TIMEOUT, 0)
+				== B_BAD_SEM_ID)
 			return B_OK;
-		}
 
-		//send buffer
-		fDevice->DoBufferExchange(&MBI);
-		
+		// send buffer
+		fDevice->BufferExchange(&bufferInfo);
+
 		//PRINT(("MultiAudioNode::RunThread: buffer exchanged\n"));
-		//PRINT(("MultiAudioNode::RunThread: played_real_time : %i\n", MBI.played_real_time));
-		//PRINT(("MultiAudioNode::RunThread: played_frames_count : %i\n", MBI.played_frames_count));
-		//PRINT(("MultiAudioNode::RunThread: buffer_cycle : %i\n", MBI.playback_buffer_cycle));
+		//PRINT(("MultiAudioNode::RunThread: played_real_time : %i\n", bufferInfo.played_real_time));
+		//PRINT(("MultiAudioNode::RunThread: played_frames_count : %i\n", bufferInfo.played_frames_count));
+		//PRINT(("MultiAudioNode::RunThread: buffer_cycle : %i\n", bufferInfo.playback_buffer_cycle));
 
-		node_input *input = NULL;
-		
-		for(int32 i=0; i<fInputs.CountItems(); i++) {
-			input = (node_input *)fInputs.ItemAt(i);
-			
-			if ((MBI._reserved_0 == input->fChannelId)
-				&& MBI.playback_buffer_cycle >= 0
-				&& MBI.playback_buffer_cycle < fDevice->BufferList().return_playback_buffers
-				&& (input->fOldMBI.playback_buffer_cycle != MBI.playback_buffer_cycle 
+		for (int32 i = 0; i < fInputs.CountItems(); i++) {
+			node_input* input = (node_input*)fInputs.ItemAt(i);
+
+			if (bufferInfo._reserved_0 == input->fChannelId
+				&& bufferInfo.playback_buffer_cycle >= 0
+				&& bufferInfo.playback_buffer_cycle
+						< fDevice->BufferList().return_playback_buffers
+				&& (input->fOldBufferInfo.playback_buffer_cycle
+						!= bufferInfo.playback_buffer_cycle 
 					|| fDevice->BufferList().return_playback_buffers == 1)
 				&& (input->fInput.source != media_source::null 
 					|| input->fChannelId == 0)) {
-				
-				//PRINT(("playback_buffer_cycle ok input : %i %d\n", i, MBI.playback_buffer_cycle));
-				
-				input->fBufferCycle = (MBI.playback_buffer_cycle - 1 
-					+ fDevice->BufferList().return_playback_buffers) % fDevice->BufferList().return_playback_buffers;
-											
+				//PRINT(("playback_buffer_cycle ok input : %i %d\n", i, bufferInfo.playback_buffer_cycle));
+
+				input->fBufferCycle = (bufferInfo.playback_buffer_cycle - 1 
+						+ fDevice->BufferList().return_playback_buffers)
+					% fDevice->BufferList().return_playback_buffers;
+
 				// update the timesource
-				if(input->fChannelId==0) {
+				if (input->fChannelId == 0) {
 					//PRINT(("updating timesource\n"));
-					UpdateTimeSource(MBI, input->fOldMBI, *input);
+					_UpdateTimeSource(bufferInfo, input->fOldBufferInfo,
+						*input);
 				}
-				
-				input->fOldMBI = MBI;
-				
-				if(input->fBuffer!=NULL) {
-					FillNextBuffer(*input, input->fBuffer);
+
+				input->fOldBufferInfo = bufferInfo;
+
+				if (input->fBuffer != NULL) {
+					_FillNextBuffer(*input, input->fBuffer);
 					input->fBuffer->Recycle();
 					input->fBuffer = NULL;
 				} else {
 					// put zeros in current buffer
-					if(input->fInput.source != media_source::null)
-						WriteZeros(*input, input->fBufferCycle);
+					if (input->fInput.source != media_source::null)
+						_WriteZeros(*input, input->fBufferCycle);
 					//PRINT(("MultiAudioNode::Runthread WriteZeros\n"));
 				}
-				
-				//mark buffer free
-				release_sem( fBuffer_free );
+
+				// mark buffer free
+				release_sem(fBufferFreeSem);
 			} else {
 				//PRINT(("playback_buffer_cycle non ok input : %i\n", i));
 			}
 		}
 		
-		node_output *output = NULL;
-		for(int32 i=0; i<fOutputs.CountItems(); i++) {
-			output = (node_output *)fOutputs.ItemAt(i);
-			
-			// make sure we're both started *and* connected before delivering a buffer		
-			if ((RunState() == BMediaEventLooper::B_STARTED) && (output->fOutput.destination != media_destination::null)) {
-				if ((MBI._reserved_1 == output->fChannelId)
-					&& MBI.record_buffer_cycle >= 0
-					&& MBI.record_buffer_cycle < fDevice->BufferList().return_record_buffers
-					&& (output->fOldMBI.record_buffer_cycle != MBI.record_buffer_cycle 
-					|| fDevice->BufferList().return_record_buffers == 1)) {
+		for (int32 i = 0; i < fOutputs.CountItems(); i++) {
+			node_output* output = (node_output*)fOutputs.ItemAt(i);
+
+			// make sure we're both started *and* connected before delivering a
+			// buffer		
+			if (RunState() == BMediaEventLooper::B_STARTED
+				&& output->fOutput.destination != media_destination::null) {
+				if (bufferInfo._reserved_1 == output->fChannelId
+					&& bufferInfo.record_buffer_cycle >= 0
+					&& bufferInfo.record_buffer_cycle
+							< fDevice->BufferList().return_record_buffers
+					&& (output->fOldBufferInfo.record_buffer_cycle
+							!= bufferInfo.record_buffer_cycle 
+						|| fDevice->BufferList().return_record_buffers == 1)) {
 					//PRINT(("record_buffer_cycle ok\n"));
-					
+
 					// Get the next buffer of data
-					BBuffer* buffer = FillNextBuffer(MBI, *output);
-					if (buffer)
-					{
-						// send the buffer downstream if and only if output is enabled
+					BBuffer* buffer = _FillNextBuffer(bufferInfo, *output);
+					if (buffer != NULL) {
+						// send the buffer downstream if and only if output is
+						// enabled
 						status_t err = B_ERROR;
-						if (output->fOutputEnabled)
-							err = SendBuffer(buffer, output->fOutput.destination);
+						if (output->fOutputEnabled) {
+							err = SendBuffer(buffer,
+								output->fOutput.destination);
+						}
 						if (err) {
 							buffer->Recycle();
 						} else {
 							// track how much media we've delivered so far
-							size_t nSamples = output->fOutput.format.u.raw_audio.buffer_size
-								/ output->fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
-							output->fSamplesSent += nSamples;
+							size_t numSamples
+								= output->fOutput.format.u.raw_audio.buffer_size
+								/ (output->fOutput.format.u.raw_audio.format
+									& media_raw_audio_format::B_AUDIO_SIZE_MASK);
+							output->fSamplesSent += numSamples;
 						}
 					}
-					
-					output->fOldMBI = MBI;
+
+					output->fOldBufferInfo = bufferInfo;
 				} else {
 					//PRINT(("record_buffer_cycle non ok\n"));
 				}
 			}
 		}
-	
 	}
-	
+
 	return B_OK;
 }
 
 
 void
-MultiAudioNode::WriteZeros(node_input &input, uint32 bufferCycle)
+MultiAudioNode::_WriteZeros(node_input& input, uint32 bufferCycle)
 {
 	//CALLED();
 	/*int32 samples = input.fInput.format.u.raw_audio.buffer_size;
@@ -1540,217 +1523,271 @@ MultiAudioNode::WriteZeros(node_input &input, uint32 bufferCycle)
 		uint8 *sample = (uint8*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].base;
 		for(int32 i = samples-1; i>=0; i--)
 			*sample++ = 128;
-	
 	} else {
 		int32 *sample = (int32*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].base;
 		for(int32 i = (samples / 4)-1; i>=0; i--)
-			*sample++ = 0;*/
-	
-	size_t stride = fDevice->BufferList().playback_buffers[bufferCycle][input.fChannelId].stride;
+			*sample++ = 0;
+	}*/
+
 	uint32 channelCount = input.fFormat.u.raw_audio.channel_count;
-	
-	switch(input.fFormat.u.raw_audio.format) {
+	uint32 bufferSize = fDevice->BufferList().return_playback_buffer_size;
+	size_t stride = fDevice->BufferList().playback_buffers[bufferCycle]
+		[input.fChannelId].stride;
+
+	switch (input.fFormat.u.raw_audio.format) {
 		case media_raw_audio_format::B_AUDIO_FLOAT:
-			for(uint32 channel = 0; channel < channelCount; channel++) {
-				char *sample_dest = fDevice->BufferList().playback_buffers[bufferCycle][input.fChannelId + channel].base;
-				for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-					*(float*)sample_dest = 0;
-					sample_dest += stride;
+			for (uint32 channel = 0; channel < channelCount; channel++) {
+				char* dest = _PlaybackBuffer(bufferCycle,
+					input.fChannelId + channel);
+				for (uint32 i = bufferSize; i > 0; i--) {
+					*(float*)dest = 0;
+					dest += stride;
 				}
 			}
 			break;
+
 		case media_raw_audio_format::B_AUDIO_INT:
-			for(uint32 channel = 0; channel < channelCount; channel++) {
-				char *sample_dest = fDevice->BufferList().playback_buffers[bufferCycle][input.fChannelId + channel].base;
-				for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-					*(int32*)sample_dest = 0;
-					sample_dest += stride;
+			for (uint32 channel = 0; channel < channelCount; channel++) {
+				char* dest = _PlaybackBuffer(bufferCycle,
+					input.fChannelId + channel);
+				for (uint32 i = bufferSize; i > 0; i--) {
+					*(int32*)dest = 0;
+					dest += stride;
 				}
 			}
 			break;
-		case media_raw_audio_format::B_AUDIO_SHORT:{
-			for(uint32 channel = 0; channel < channelCount; channel++) {
-				char *sample_dest = fDevice->BufferList().playback_buffers[bufferCycle][input.fChannelId + channel].base;
-				for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-					*(int16*)sample_dest = 0;
-					sample_dest += stride;
+
+		case media_raw_audio_format::B_AUDIO_SHORT:
+			for (uint32 channel = 0; channel < channelCount; channel++) {
+				char* dest = _PlaybackBuffer(bufferCycle,
+					input.fChannelId + channel);
+				for (uint32 i = bufferSize; i > 0; i--) {
+					*(int16*)dest = 0;
+					dest += stride;
 				}
 			}
 			break;
-		}
+
 		default:
 			fprintf(stderr, "ERROR in WriteZeros format not handled\n");
 	}
-	
 }
 
 
 void
-MultiAudioNode::FillWithZeros(node_input &input)
+MultiAudioNode::_FillWithZeros(node_input& input)
 {
 	CALLED();
-	for(int32 i=0; i<fDevice->BufferList().return_playback_buffers; i++)
-		WriteZeros(input, i);
+	for (int32 i = 0; i < fDevice->BufferList().return_playback_buffers; i++) {
+		_WriteZeros(input, i);
+	}
 }
 
 
 void
-MultiAudioNode::FillNextBuffer(node_input &input, BBuffer* buffer)
+MultiAudioNode::_FillNextBuffer(node_input& input, BBuffer* buffer)
 {
-	switch(input.fInput.format.u.raw_audio.format) {
+	// TODO: simplify this, or put it into a static function to remove
+	// the need for checking all over again
+
+	uint32 bufferSize = fDevice->BufferList().return_playback_buffer_size;
+
+	switch (input.fInput.format.u.raw_audio.format) {
 		case media_raw_audio_format::B_AUDIO_FLOAT:
-
-			switch(input.fFormat.u.raw_audio.format) {
-			case media_raw_audio_format::B_AUDIO_FLOAT: {
-					size_t frame_size = input.fInput.format.u.raw_audio.channel_count * sizeof(float);
-					size_t stride = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride;
+			switch (input.fFormat.u.raw_audio.format) {
+				case media_raw_audio_format::B_AUDIO_FLOAT:
+				{
+					size_t frameSize = input.fInput.format.u.raw_audio
+						.channel_count * sizeof(float);
+					size_t stride = _PlaybackStride(input.fBufferCycle,
+						input.fChannelId);
 					//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-					for(uint32 channel = 0; channel < input.fInput.format.u.raw_audio.channel_count; channel++) {
-						char *sample_dest = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + channel].base;
-						//char *sample_src = (char*)buffer->Data() + (input.fInput.format.u.raw_audio.channel_count - 1 - channel) * sizeof(int16);
-						char *sample_src = (char*)buffer->Data() + channel * sizeof(float);
-						for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-							*(float *)sample_dest = *(float *)sample_src;
-							sample_dest += stride;
-							sample_src += frame_size;
+					for (uint32 channel = 0; channel
+							< input.fInput.format.u.raw_audio.channel_count;
+							channel++) {
+						char* dest = _PlaybackBuffer(input.fBufferCycle,
+							input.fChannelId + channel);
+						char* src = (char*)buffer->Data()
+							+ channel * sizeof(float);
+
+						for (uint32 i = bufferSize; i > 0; i--) {
+							*(float *)dest = *(float *)src;
+							dest += stride;
+							src += frameSize;
 						}
 					}
+					break;
 				}
-				break;
-			case media_raw_audio_format::B_AUDIO_INT:
-				break;
-			case media_raw_audio_format::B_AUDIO_SHORT:
-				if(input.fInput.format.u.raw_audio.channel_count == 2) {
-					int16 *sample_dest1 = (int16*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].base;
-					int16 *sample_dest2 = (int16*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].base;
-					float *sample_src = (float*)buffer->Data();
-					if(fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride == sizeof(int16)
-						&& fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].stride == sizeof(int16)) {
-						//PRINT(("FillNextBuffer : 2 channels strides 2\n"));
-						for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-							*sample_dest1++ = int16(32767 * *sample_src++);
-							*sample_dest2++ = int16(32767 * *sample_src++);
-						}
-					} else if(fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride == 2 * sizeof(int16)
-						&& fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].stride == 2 * sizeof(int16)
-						&& sample_dest1 + 1 == sample_dest2) {
+
+				case media_raw_audio_format::B_AUDIO_SHORT:
+					if (input.fInput.format.u.raw_audio.channel_count == 2) {
+						int16* dest1 = (int16*)_PlaybackBuffer(
+							input.fBufferCycle, input.fChannelId);
+						int16* dest2 = (int16*)_PlaybackBuffer(
+							input.fBufferCycle, input.fChannelId + 1);
+						float* src = (float*)buffer->Data();
+						if (_PlaybackStride(input.fBufferCycle,
+									input.fChannelId) == sizeof(int16)
+							&& _PlaybackStride(input.fBufferCycle,
+									input.fChannelId + 1) == sizeof(int16)) {
+							//PRINT(("FillNextBuffer : 2 channels strides 2\n"));
+							for (uint32 i = bufferSize; i > 0; i--) {
+								*dest1++ = int16(32767 * *src++);
+								*dest2++ = int16(32767 * *src++);
+							}
+						} else if (_PlaybackStride(input.fBufferCycle,
+									input.fChannelId) == 2 * sizeof(int16)
+							&& _PlaybackStride(input.fBufferCycle,
+									input.fChannelId + 1) == 2 * sizeof(int16)
+							&& dest1 + 1 == dest2) {
 							//PRINT(("FillNextBuffer : 2 channels strides 4\n"));
-							for(uint32 i=2*fDevice->BufferList().return_playback_buffer_size; i>0; i--)
-								*sample_dest1++ = int16(32767 * *sample_src++);
+							for (uint32 i = 2 * bufferSize; i > 0; i--)
+								*dest1++ = int16(32767 * *src++);
 						} else {
 							//PRINT(("FillNextBuffer : 2 channels strides != 2\n"));
-							size_t stride1 = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride / sizeof(int16);
-							size_t stride2 = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].stride / sizeof(int16);
-							for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-								*sample_dest1 = int16(32767 * *sample_src++);
-								*sample_dest2 = int16(32767 * *sample_src++);
-								sample_dest1 += stride1;
-								sample_dest2 += stride2;
+							size_t stride1 = _PlaybackStride(input.fBufferCycle,
+								input.fChannelId) / sizeof(int16);
+							size_t stride2 = _PlaybackStride(input.fBufferCycle,
+								input.fChannelId + 1) / sizeof(int16);
+							for (uint32 i = bufferSize; i > 0; i--) {
+								*dest1 = int16(32767 * *src++);
+								*dest2 = int16(32767 * *src++);
+								dest1 += stride1;
+								dest2 += stride2;
 							}
 						}
-				} else {
-					size_t frame_size = input.fInput.format.u.raw_audio.channel_count * sizeof(int16);
-					size_t stride = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride;
-					//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-					for(uint32 channel = 0; channel < input.fInput.format.u.raw_audio.channel_count; channel++) {
-						char *sample_dest = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + channel].base;
-						//char *sample_src = (char*)buffer->Data() + (input.fInput.format.u.raw_audio.channel_count - 1 - channel) * sizeof(int16);
-						char *sample_src = (char*)buffer->Data() + channel * sizeof(int16);
-						for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-							*(int16*)sample_dest = int16(32767 * *(float*)sample_src);
-							sample_dest += stride;
-							sample_src += frame_size;
+					} else {
+						size_t frameSize = input.fInput.format.u
+							.raw_audio.channel_count * sizeof(int16);
+						size_t stride = _PlaybackStride(input.fBufferCycle,
+							input.fChannelId);
+						//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
+						for (uint32 channel = 0; channel <
+								input.fInput.format.u.raw_audio.channel_count;
+								channel++) {
+							char* dest = _PlaybackBuffer(input.fBufferCycle,
+								input.fChannelId + channel);
+							char* src = (char*)buffer->Data()
+								+ channel * sizeof(int16);
+
+							for (uint32 i = bufferSize; i > 0; i--) {
+								*(int16*)dest = int16(32767 * *(float*)src);
+								dest += stride;
+								src += frameSize;
+							}
 						}
 					}
-				}
-				break;
-			default:
-				break;
-			}
+					break;
 
+				case media_raw_audio_format::B_AUDIO_INT:
+				default:
+					break;
+			}
 			break;
+
 		case media_raw_audio_format::B_AUDIO_INT:
-			switch(input.fFormat.u.raw_audio.format) {
-			case media_raw_audio_format::B_AUDIO_FLOAT:
-				break;
-			case media_raw_audio_format::B_AUDIO_INT: {
-					size_t frame_size = input.fInput.format.u.raw_audio.channel_count * sizeof(int32);
-					size_t stride = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride;
+			switch (input.fFormat.u.raw_audio.format) {
+				case media_raw_audio_format::B_AUDIO_INT:
+				{
+					size_t frameSize = input.fInput.format.u.raw_audio
+						.channel_count * sizeof(int32);
+					size_t stride = _PlaybackStride(input.fBufferCycle,
+						input.fChannelId);
 					//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-					for(uint32 channel = 0; channel < input.fInput.format.u.raw_audio.channel_count; channel++) {
-						char *sample_dest = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + channel].base;
-						//char *sample_src = (char*)buffer->Data() + (input.fInput.format.u.raw_audio.channel_count - 1 - channel) * sizeof(int16);
-						char *sample_src = (char*)buffer->Data() + channel * sizeof(int32);
-						for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-							*(int32 *)sample_dest = *(int32 *)sample_src;
-							sample_dest += stride;
-							sample_src += frame_size;
+					for (uint32 channel = 0; channel
+							< input.fInput.format.u.raw_audio.channel_count;
+							channel++) {
+						char* dest = _PlaybackBuffer(input.fBufferCycle,
+							input.fChannelId + channel);
+						char* src = (char*)buffer->Data()
+							+ channel * sizeof(int32);
+
+						for (uint32 i = bufferSize; i > 0; i--) {
+							*(int32 *)dest = *(int32 *)src;
+							dest += stride;
+							src += frameSize;
 						}
 					}
+					break;
 				}
-				break;
-			case media_raw_audio_format::B_AUDIO_SHORT:
-			break;
-			default:
-				break;
+				case media_raw_audio_format::B_AUDIO_SHORT:
+				case media_raw_audio_format::B_AUDIO_FLOAT:
+				default:
+					break;
 			}
 			break;
+
 		case media_raw_audio_format::B_AUDIO_SHORT:
-		
-			switch(input.fFormat.u.raw_audio.format) {
-			case media_raw_audio_format::B_AUDIO_FLOAT:
-				break;
-			case media_raw_audio_format::B_AUDIO_INT:
-				break;
-			case media_raw_audio_format::B_AUDIO_SHORT:
-				if(input.fInput.format.u.raw_audio.channel_count == 2) {
-					int16 *sample_dest1 = (int16*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].base;
-					int16 *sample_dest2 = (int16*)fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].base;
-					int16 *sample_src = (int16*)buffer->Data();
-					if(fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride == sizeof(int16)
-						&& fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].stride == sizeof(int16)) {
-						//PRINT(("FillNextBuffer : 2 channels strides 2\n"));
-						for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-							*sample_dest1++ = *sample_src++;
-							*sample_dest2++ = *sample_src++;
-						}
-					} else if(fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride == 2 * sizeof(int16)
-						&& fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].stride == 2 * sizeof(int16)
-						&& sample_dest1 + 1 == sample_dest2) {
-							//PRINT(("FillNextBuffer : 2 channels strides 4\n"));
-							memcpy(sample_dest1, sample_src, fDevice->BufferList().return_playback_buffer_size * 2 * sizeof(int16));
-						} else {
-							//PRINT(("FillNextBuffer : 2 channels strides != 2\n"));
-							size_t stride1 = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride / 2;
-							size_t stride2 = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + 1].stride / 2;
-							for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-								*sample_dest1 = *sample_src++;
-								*sample_dest2 = *sample_src++;
-								sample_dest1 += stride1;
-								sample_dest2 += stride2;
+			switch (input.fFormat.u.raw_audio.format) {
+				case media_raw_audio_format::B_AUDIO_SHORT:
+					if (input.fInput.format.u.raw_audio.channel_count == 2) {
+						int16* dest1 = (int16*)_PlaybackBuffer(
+							input.fBufferCycle, input.fChannelId);
+						int16* dest2 = (int16*)_PlaybackBuffer(
+							input.fBufferCycle, input.fChannelId + 1);
+						int16* src = (int16*)buffer->Data();
+						if (_PlaybackStride(input.fBufferCycle,
+								input.fChannelId) == sizeof(int16)
+							&& _PlaybackStride(input.fBufferCycle,
+								input.fChannelId + 1) == sizeof(int16)) {
+							//PRINT(("FillNextBuffer : 2 channels strides 2\n"));
+							for (uint32 i = bufferSize; i > 0; i--) {
+								*dest1++ = *src++;
+								*dest2++ = *src++;
+							}
+						} else if (_PlaybackStride(input.fBufferCycle,
+								input.fChannelId) == 2 * sizeof(int16)
+							&& _PlaybackStride(input.fBufferCycle,
+								input.fChannelId + 1) == 2 * sizeof(int16)
+							&& dest1 + 1 == dest2) {
+								//PRINT(("FillNextBuffer : 2 channels strides 4\n"));
+								memcpy(dest1, src,
+									bufferSize * 2 * sizeof(int16));
+							} else {
+								//PRINT(("FillNextBuffer : 2 channels strides != 2\n"));
+								size_t stride1 = _PlaybackStride(
+									input.fBufferCycle, input.fChannelId) / 2;
+								size_t stride2 = _PlaybackStride(
+									input.fBufferCycle, input.fChannelId + 1)
+									/ 2;
+
+								for (uint32 i = bufferSize; i > 0; i--) {
+									*dest1 = *src++;
+									*dest2 = *src++;
+									dest1 += stride1;
+									dest2 += stride2;
+								}
+							}
+					} else {
+						size_t frameSize = input.fInput.format.u
+							.raw_audio.channel_count * sizeof(int16);
+						size_t stride = _PlaybackStride(input.fBufferCycle,
+							input.fChannelId);
+						//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
+						for (uint32 channel = 0; channel
+								< input.fInput.format.u.raw_audio.channel_count;
+								channel++) {
+							char* dest = _PlaybackBuffer(input.fBufferCycle,
+								input.fChannelId + channel);
+							char* src = (char*)buffer->Data()
+								+ channel * sizeof(int16);
+
+							for (uint32 i = bufferSize; i > 0; i--) {
+								*(int16*)dest = *(int16*)src;
+								dest += stride;
+								src += frameSize;
 							}
 						}
-				} else {
-					size_t frame_size = input.fInput.format.u.raw_audio.channel_count * sizeof(int16);
-					size_t stride = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId].stride;
-					//PRINT(("stride : %i, frame_size : %i, return_playback_buffer_size : %i\n", stride, frame_size, fDevice->BufferList().return_playback_buffer_size));
-					for(uint32 channel = 0; channel < input.fInput.format.u.raw_audio.channel_count; channel++) {
-						char *sample_dest = fDevice->BufferList().playback_buffers[input.fBufferCycle][input.fChannelId + channel].base;
-						//char *sample_src = (char*)buffer->Data() + (input.fInput.format.u.raw_audio.channel_count - 1 - channel) * sizeof(int16);
-						char *sample_src = (char*)buffer->Data() + channel * sizeof(int16);
-						for(uint32 i=fDevice->BufferList().return_playback_buffer_size; i>0; i--) {
-							*(int16 *)sample_dest = *(int16 *)sample_src;
-							sample_dest += stride;
-							sample_src += frame_size;
-						}
 					}
-				}
-				break;
-			default:
-				break;
+					break;
+
+				case media_raw_audio_format::B_AUDIO_FLOAT:
+				case media_raw_audio_format::B_AUDIO_INT:
+				default:
+					break;
 			}
-			
 			break;
+
 		case media_raw_audio_format::B_AUDIO_UCHAR:
 		default:
 			break;	
@@ -1759,45 +1796,45 @@ MultiAudioNode::FillNextBuffer(node_input &input, BBuffer* buffer)
 
 
 status_t
-MultiAudioNode::StartThread()
+MultiAudioNode::_StartThread()
 {
 	CALLED();
 	// the thread is already started ?
-	if(fThread > B_OK)
+	if (fThread > B_OK)
 		return B_OK;
-	
-	//allocate buffer free semaphore
-	fBuffer_free = create_sem( fDevice->BufferList().return_playback_buffers - 1, "multi_audio out buffer free" );
-	
-	if ( fBuffer_free < B_OK ) {
-		return B_ERROR;
+
+	// allocate buffer free semaphore
+	fBufferFreeSem = create_sem(
+		fDevice->BufferList().return_playback_buffers - 1,
+		"multi_audio out buffer free");
+	if (fBufferFreeSem < B_OK)
+		return fBufferFreeSem;
+
+	fThread = spawn_thread(_run_thread_, "multi_audio audio output",
+		B_REAL_TIME_PRIORITY, this);
+	if (fThread < B_OK) {
+		delete_sem(fBufferFreeSem);
+		return fThread;
 	}
 
-	fThread = spawn_thread( _run_thread_, "multi_audio audio output", B_REAL_TIME_PRIORITY, this );
-
-	if ( fThread < B_OK ) {
-		delete_sem( fBuffer_free );
-		return B_ERROR;
-	}
-
-	resume_thread( fThread );
-	
+	resume_thread(fThread);
 	return B_OK;
 }
 
 
 status_t
-MultiAudioNode::StopThread()
+MultiAudioNode::_StopThread()
 {
 	CALLED();
-	delete_sem( fBuffer_free );
-	wait_for_thread( fThread, &fThread );
+	delete_sem(fBufferFreeSem);
+
+	wait_for_thread(fThread, &fThread);
 	return B_OK;
 }
 
 
 void
-MultiAudioNode::AllocateBuffers(node_output &channel)
+MultiAudioNode::_AllocateBuffers(node_output &channel)
 {
 	CALLED();
 
@@ -1812,25 +1849,27 @@ MultiAudioNode::AllocateBuffers(node_output &channel)
 
 
 void
-MultiAudioNode::UpdateTimeSource(multi_buffer_info &MBI, multi_buffer_info &oldMBI, node_input &input)
+MultiAudioNode::_UpdateTimeSource(multi_buffer_info& info,
+	multi_buffer_info& oldInfo, node_input& input)
 {
 	//CALLED();
-	if(fTimeSourceStarted) {
-		bigtime_t perf_time = (bigtime_t)(MBI.played_frames_count / 
-						input.fInput.format.u.raw_audio.frame_rate * 1000000LL);
-		bigtime_t real_time = MBI.played_real_time;
-		float drift = ((MBI.played_frames_count - oldMBI.played_frames_count)
-						/ input.fInput.format.u.raw_audio.frame_rate * 1000000LL)
-						/ (MBI.played_real_time - oldMBI.played_real_time);
-	
-		PublishTime(perf_time, real_time, drift);
-		//PRINT(("UpdateTimeSource() perf_time : %lli, real_time : %lli, drift : %f\n", perf_time, real_time, drift));
-	}
+	if (!fTimeSourceStarted)
+		return;
+
+	bigtime_t performanceTime = (bigtime_t)(info.played_frames_count / 
+		input.fInput.format.u.raw_audio.frame_rate * 1000000LL);
+	bigtime_t realTime = info.played_real_time;
+	float drift = ((info.played_frames_count - oldInfo.played_frames_count)
+		/ input.fInput.format.u.raw_audio.frame_rate * 1000000LL)
+		/ (info.played_real_time - oldInfo.played_real_time);
+
+	PublishTime(performanceTime, realTime, drift);
+	//PRINT(("_UpdateTimeSource() perf_time : %lli, real_time : %lli, drift : %f\n", perf_time, real_time, drift));
 }
 
 
 BBuffer*
-MultiAudioNode::FillNextBuffer(multi_buffer_info &MBI, node_output &channel)
+MultiAudioNode::_FillNextBuffer(multi_buffer_info &info, node_output &channel)
 {
 	//CALLED();
 	// get a buffer from our buffer group
@@ -1838,16 +1877,18 @@ MultiAudioNode::FillNextBuffer(multi_buffer_info &MBI, node_output &channel)
 	//PRINT(("MBI.record_buffer_cycle : %i\n", MBI.record_buffer_cycle));
 	//PRINT(("MBI.recorded_real_time : %i\n", MBI.recorded_real_time));
 	//PRINT(("MBI.recorded_frames_count : %i\n", MBI.recorded_frames_count));
-	if(!channel.fBufferGroup)
+	if (!channel.fBufferGroup)
 		return NULL;
-	
-	BBuffer* buffer = channel.fBufferGroup->RequestBuffer(channel.fOutput.format.u.raw_audio.buffer_size, BufferDuration());
 
-	// if we fail to get a buffer (for example, if the request times out), we skip this
-	// buffer and go on to the next, to avoid locking up the control thread
-	if (!buffer)
+	BBuffer* buffer = channel.fBufferGroup->RequestBuffer(
+		channel.fOutput.format.u.raw_audio.buffer_size, BufferDuration());
+	if (buffer == NULL) {
+		// If we fail to get a buffer (for example, if the request times out),
+		// we skip this buffer and go on to the next, to avoid locking up the
+		// control thread.
 		return NULL;
-	
+	}
+
 	if (fDevice == NULL)
 		fprintf(stderr, "fDevice NULL\n");
 	if (buffer->Header() == NULL)
@@ -1857,35 +1898,38 @@ MultiAudioNode::FillNextBuffer(multi_buffer_info &MBI, node_output &channel)
 
 	// now fill it with data, continuing where the last buffer left off
 	memcpy(buffer->Data(),
-		fDevice->BufferList().record_buffers[MBI.record_buffer_cycle][channel.fChannelId - fDevice->Description().output_channel_count].base, 
-		channel.fOutput.format.u.raw_audio.buffer_size );
+		fDevice->BufferList().record_buffers[info.record_buffer_cycle]
+			[channel.fChannelId - fDevice->Description().output_channel_count].base,
+		channel.fOutput.format.u.raw_audio.buffer_size);
 
 	// fill in the buffer header
-	media_header* hdr = buffer->Header();
-	hdr->type = B_MEDIA_RAW_AUDIO;
-	hdr->size_used = channel.fOutput.format.u.raw_audio.buffer_size;
-	hdr->time_source = TimeSource()->ID();
-	hdr->start_time = PerformanceTimeFor(MBI.recorded_real_time);
+	media_header* header = buffer->Header();
+	header->type = B_MEDIA_RAW_AUDIO;
+	header->size_used = channel.fOutput.format.u.raw_audio.buffer_size;
+	header->time_source = TimeSource()->ID();
+	header->start_time = PerformanceTimeFor(info.recorded_real_time);
 
 	return buffer;
 }
 
 
 status_t
-MultiAudioNode::GetConfigurationFor(BMessage* into_message)
+MultiAudioNode::GetConfigurationFor(BMessage* message)
 {
 	CALLED();
 
 	BParameter *parameter = NULL;
 	void *buffer;
-	size_t size = 128;
-	bigtime_t last_change;
+	size_t bufferSize = 128;
+	bigtime_t lastChange;
 	status_t err;
 
-	if (!into_message)
+	if (message == NULL)
 		return B_BAD_VALUE;
 
-	buffer = malloc(size);
+	buffer = malloc(bufferSize);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
 
 	for (int32 i = 0; i < fWeb->CountParameters(); i++) {
 		parameter = fWeb->ParameterAt(i);
@@ -1894,34 +1938,37 @@ MultiAudioNode::GetConfigurationFor(BMessage* into_message)
 			continue;
 
 		PRINT(("getting parameter %i\n", parameter->ID()));
-		size = 128;
-		while((err = GetParameterValue(parameter->ID(), &last_change, buffer, &size))==B_NO_MEMORY) {
-			size += 128;
+		size_t size = bufferSize;
+		while ((err = GetParameterValue(parameter->ID(), &lastChange, buffer,
+				&size)) == B_NO_MEMORY && bufferSize < 128 * 1024) {
+			bufferSize += 128;
 			free(buffer);
-			buffer = malloc(size);
+			buffer = malloc(bufferSize);
+			if (buffer == NULL)
+				return B_NO_MEMORY;
 		}
 
 		if (err == B_OK && size > 0) {
-			into_message->AddInt32("parameterID", parameter->ID());
-			into_message->AddData("parameterData", B_RAW_TYPE, buffer, size, false);
+			message->AddInt32("parameterID", parameter->ID());
+			message->AddData("parameterData", B_RAW_TYPE, buffer, size, false);
 		} else {
 			PRINT(("parameter err : %s\n", strerror(err)));
 		}
 	}
 
-	PRINT_OBJECT(*into_message);
-
+	free(buffer);
+	PRINT_OBJECT(*message);
 	return B_OK;
 }
 
 
 node_output*
-MultiAudioNode::FindOutput(media_source source)
+MultiAudioNode::_FindOutput(media_source source)
 {
-	node_output *channel = NULL;
+	node_output* channel = NULL;
 
 	for (int32 i = 0; i < fOutputs.CountItems(); i++) {
-		channel = (node_output *)fOutputs.ItemAt(i);
+		channel = (node_output*)fOutputs.ItemAt(i);
 		if (source == channel->fOutput.source)
 			break;
 	}
@@ -1934,12 +1981,12 @@ MultiAudioNode::FindOutput(media_source source)
 
 
 node_input*
-MultiAudioNode::FindInput(media_destination dest)
+MultiAudioNode::_FindInput(media_destination dest)
 {
-	node_input *channel = NULL;
+	node_input* channel = NULL;
 
 	for (int32 i = 0; i < fInputs.CountItems(); i++) {
-		channel = (node_input *)fInputs.ItemAt(i);
+		channel = (node_input*)fInputs.ItemAt(i);
 		if (dest == channel->fInput.destination)
 			break;
 	}
@@ -1952,12 +1999,12 @@ MultiAudioNode::FindInput(media_destination dest)
 
 
 node_input*
-MultiAudioNode::FindInput(int32 destinationId)
+MultiAudioNode::_FindInput(int32 destinationId)
 {
-	node_input *channel = NULL;
+	node_input* channel = NULL;
 
 	for (int32 i = 0; i < fInputs.CountItems(); i++) {
-		channel = (node_input *)fInputs.ItemAt(i);
+		channel = (node_input*)fInputs.ItemAt(i);
 		if (destinationId == channel->fInput.destination.id)
 			break;
 	}
@@ -1973,51 +2020,51 @@ MultiAudioNode::FindInput(int32 destinationId)
 MultiAudioNode::_run_thread_(void* data)
 {
 	CALLED();
-	return static_cast<MultiAudioNode*>(data)->RunThread();
+	return static_cast<MultiAudioNode*>(data)->_RunThread();
 }
 
 
 void
-MultiAudioNode::GetFlavor(flavor_info* outInfo, int32 id)
+MultiAudioNode::GetFlavor(flavor_info* info, int32 id)
 {
 	CALLED();
-	if (outInfo == 0)
+	if (info == NULL)
 		return;
 
-	outInfo->flavor_flags = 0;
-	outInfo->possible_count = 1;	// one flavor at a time
-	outInfo->in_format_count = 0; // no inputs
-	outInfo->in_formats = 0;
-	outInfo->out_format_count = 0; // no outputs
-	outInfo->out_formats = 0;
-	outInfo->internal_id = id;
+	info->flavor_flags = 0;
+	info->possible_count = 1;	// one flavor at a time
+	info->in_format_count = 0; // no inputs
+	info->in_formats = 0;
+	info->out_format_count = 0; // no outputs
+	info->out_formats = 0;
+	info->internal_id = id;
 
-	outInfo->name = "MultiAudioNode Node";
-	outInfo->info = "The MultiAudioNode node outputs to multi_audio drivers.";
-	outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE 
+	info->name = "MultiAudioNode Node";
+	info->info = "The MultiAudioNode node outputs to multi_audio drivers.";
+	info->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER | B_TIME_SOURCE 
 		| B_PHYSICAL_OUTPUT | B_PHYSICAL_INPUT | B_CONTROLLABLE;
-	outInfo->in_format_count = 1; // 1 input
-	media_format * informats = new media_format[outInfo->in_format_count];
-	GetFormat(&informats[0]);
-	outInfo->in_formats = informats;
+	info->in_format_count = 1; // 1 input
+	media_format* inFormats = new media_format[info->in_format_count];
+	GetFormat(&inFormats[0]);
+	info->in_formats = inFormats;
 
-	outInfo->out_format_count = 1; // 1 output
-	media_format * outformats = new media_format[outInfo->out_format_count];
-	GetFormat(&outformats[0]);
-	outInfo->out_formats = outformats;
+	info->out_format_count = 1; // 1 output
+	media_format* outFormats = new media_format[info->out_format_count];
+	GetFormat(&outFormats[0]);
+	info->out_formats = outFormats;
 }
 
 
 void
-MultiAudioNode::GetFormat(media_format* outFormat)
+MultiAudioNode::GetFormat(media_format* format)
 {
 	CALLED();
-	if (outFormat == NULL)
+	if (format == NULL)
 		return;
 
-	outFormat->type = B_MEDIA_RAW_AUDIO;
-	outFormat->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
-	outFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;	
-	outFormat->u.raw_audio = media_raw_audio_format::wildcard;
+	format->type = B_MEDIA_RAW_AUDIO;
+	format->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
+	format->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;	
+	format->u.raw_audio = media_raw_audio_format::wildcard;
 }
 

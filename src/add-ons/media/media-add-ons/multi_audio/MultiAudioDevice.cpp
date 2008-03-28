@@ -144,14 +144,12 @@ MultiAudioDevice::_InitDriver()
 	if (status != B_OK) {
 		fprintf(stderr, "Failed on B_MULTI_SET_GLOBAL_FORMAT: %s\n",
 			strerror(status));
-#if 0
 	}
 
 	status = get_global_format(fDevice, &fFormatInfo);
 	if (status != B_OK) {
 		fprintf(stderr, "Failed on B_MULTI_GET_GLOBAL_FORMAT: %s\n",
 			strerror(status));
-#endif
 		return status;
 	}
 
@@ -214,21 +212,21 @@ MultiAudioDevice::_InitDriver()
 
 
 status_t
-MultiAudioDevice::DoBufferExchange(multi_buffer_info *info)
+MultiAudioDevice::BufferExchange(multi_buffer_info *info)
 {
 	return buffer_exchange(fDevice, info);
 }
 
 
 status_t
-MultiAudioDevice::DoSetMix(multi_mix_value_info *info)
+MultiAudioDevice::SetMix(multi_mix_value_info *info)
 {
 	return set_mix(fDevice, info);
 }
 
 
 status_t
-MultiAudioDevice::DoGetMix(multi_mix_value_info *info)
+MultiAudioDevice::GetMix(multi_mix_value_info *info)
 {
 	return get_mix(fDevice, info);
 }
