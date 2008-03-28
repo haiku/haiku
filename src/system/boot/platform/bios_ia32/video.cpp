@@ -89,7 +89,11 @@ add_video_mode(video_mode *videoMode)
 }
 
 
-//! Finds a video mode with the given resolution
+/*! \brief Finds a video mode with the given resolution.
+	If \a allowPalette is true, 8-bit modes are considered, too.
+	If \a height is \c -1, the height is ignored, and only the width
+	matters.
+*/
 static video_mode *
 find_video_mode(int32 width, int32 height, bool allowPalette)
 {
@@ -97,7 +101,7 @@ find_video_mode(int32 width, int32 height, bool allowPalette)
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
 			!= NULL) {
-		if (mode->width == width && mode->height == height
+		if (mode->width == width && (height == -1 || mode->height == height)
 			&& (mode->bits_per_pixel > 8 || allowPalette)) {
 			if (found == NULL || found->bits_per_pixel < mode->bits_per_pixel)
 				found = mode;
@@ -394,26 +398,18 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 					videoMode->bits_per_pixel = 15;
 				}
 
-				if (standardMode == NULL)
-					standardMode = videoMode;
-				else if (standardMode != NULL && modeInfo.bits_per_pixel <= 16) {
-					// for the standard mode, we prefer a bit depth of 16
-					// switch to the one with the higher resolution
-					// ToDo: is that always a good idea? for now we'll use 800x600
-					if (modeInfo.width >= standardMode->width
-						&& modeInfo.width <= 800) {
-						if (modeInfo.width != standardMode->width
-							|| modeInfo.bits_per_pixel
-								>= standardMode->bits_per_pixel)
-							standardMode = videoMode;
-					}
-				}
-
 				add_video_mode(videoMode);
 			}
 		} else
 			TRACE(("(failed)\n"));
 	}
+
+	// Choose default resolution (when no EDID information is available)
+	// TODO: eventually enlarge this to 1024x768?
+	const uint32 kWidth = 800;
+	standardMode = find_video_mode(kWidth, -1, false);
+	if (standardMode == NULL)
+		standardMode = find_video_mode(kWidth, -1, true);
 
 	if (standardMode == NULL) {
 		// no usable VESA mode found...
