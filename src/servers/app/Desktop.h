@@ -61,7 +61,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		uid_t					UserID() const { return fUserID; }
 		virtual port_id			MessagePort() const { return fMessagePort; }
-		area_id					SharedReadOnlyArea() const { return fSharedReadOnlyArea; }
+		area_id					SharedReadOnlyArea() const
+									{ return fSharedReadOnlyArea; }
 
 		::EventDispatcher&		EventDispatcher() { return fEventDispatcher; }
 
@@ -121,10 +122,12 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		void					MoveWindowBy(Window* window, float x, float y,
 									int32 workspace = -1);
-		void					ResizeWindowBy(Window* window, float x, float y);
-		bool					SetWindowTabLocation(Window* window, float location);
+		void					ResizeWindowBy(Window* window, float x,
+									float y);
+		bool					SetWindowTabLocation(Window* window,
+									float location);
 		bool					SetWindowDecoratorSettings(Window* window,
-														   const BMessage& settings);
+									const BMessage& settings);
 
 		void					SetWindowWorkspaces(Window* window,
 									uint32 workspaces);
@@ -140,7 +143,8 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		void					SetWindowLook(Window* window, window_look look);
 		void					SetWindowFeel(Window* window, window_feel feel);
 		void					SetWindowFlags(Window* window, uint32 flags);
-		void					SetWindowTitle(Window* window, const char* title);
+		void					SetWindowTitle(Window* window,
+									const char* title);
 
 		Window*					FocusWindow() const { return fFocus; }
 		Window*					FrontWindow() const { return fFront; }
@@ -148,10 +152,12 @@ class Desktop : public MessageLooper, public ScreenOwner {
 
 		Window*					WindowAt(BPoint where);
 
-		Window*					MouseEventWindow() const { return fMouseEventWindow; }
+		Window*					MouseEventWindow() const
+									{ return fMouseEventWindow; }
 		void					SetMouseEventWindow(Window* window);
 
-		void					SetViewUnderMouse(const Window* window, int32 viewToken);
+		void					SetViewUnderMouse(const Window* window,
+									int32 viewToken);
 		int32					ViewUnderMouse(const Window* window);
 
 		void					SetFocusWindow(Window* window = NULL);
@@ -161,17 +167,25 @@ class Desktop : public MessageLooper, public ScreenOwner {
 									team_id teamID);
 
 #if USE_MULTI_LOCKER
-		bool					LockSingleWindow() { return fWindowLock.ReadLock(); }
-		void					UnlockSingleWindow() { fWindowLock.ReadUnlock(); }
+		bool					LockSingleWindow()
+									{ return fWindowLock.ReadLock(); }
+		void					UnlockSingleWindow()
+									{ fWindowLock.ReadUnlock(); }
 
-		bool					LockAllWindows() { return fWindowLock.WriteLock(); }
-		void					UnlockAllWindows() { fWindowLock.WriteUnlock(); }
+		bool					LockAllWindows()
+									{ return fWindowLock.WriteLock(); }
+		void					UnlockAllWindows()
+									{ fWindowLock.WriteUnlock(); }
 #else // USE_MULTI_LOCKER
-		bool					LockSingleWindow() { return fWindowLock.Lock(); }
-		void					UnlockSingleWindow() { fWindowLock.Unlock(); }
+		bool					LockSingleWindow()
+									{ return fWindowLock.Lock(); }
+		void					UnlockSingleWindow()
+									{ fWindowLock.Unlock(); }
 
-		bool					LockAllWindows() { return fWindowLock.Lock(); }
-		void					UnlockAllWindows() { fWindowLock.Unlock(); }
+		bool					LockAllWindows()
+									{ return fWindowLock.Lock(); }
+		void					UnlockAllWindows()
+									{ fWindowLock.Unlock(); }
 #endif // USE_MULTI_LOCKER
 
 		void					MarkDirty(BRegion& region);
@@ -211,8 +225,10 @@ class Desktop : public MessageLooper, public ScreenOwner {
  		status_t				_ActivateApp(team_id team);
  		void					_SendFakeMouseMoved(Window* window = NULL);
 
-		void					_RebuildClippingForAllWindows(BRegion& stillAvailableOnScreen);
-		void					_TriggerWindowRedrawing(BRegion& newDirtyRegion);
+		void					_RebuildClippingForAllWindows(
+									BRegion& stillAvailableOnScreen);
+		void					_TriggerWindowRedrawing(
+									BRegion& newDirtyRegion);
 		void					_SetBackground(BRegion& background);
 
 		void					_UpdateFloating(int32 previousWorkspace = -1,
@@ -282,9 +298,9 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		BPoint					fLastMousePosition;
 		int32					fLastMouseButtons;
 
-		Window*			fFocus;
-		Window*			fFront;
-		Window*			fBack;
+		Window*					fFocus;
+		Window*					fFront;
+		Window*					fBack;
 };
 
 #endif	// DESKTOP_H

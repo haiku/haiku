@@ -266,7 +266,7 @@ bool
 ServerApp::_HasWindowUnderMouse()
 {
 	BAutolock locker(fWindowListLock);
-	
+
 	for (int32 i = fWindowList.CountItems(); i-- > 0;) {
 		ServerWindow* serverWindow = fWindowList.ItemAt(i);
 
@@ -281,7 +281,7 @@ ServerApp::_HasWindowUnderMouse()
 /*!
 	\brief Sets the ServerApp's active status
 	\param value The new status of the ServerApp.
-	
+
 	This changes an internal flag and also sets the current cursor to the one specified by
 	the application
 */
@@ -410,8 +410,8 @@ ServerApp::_MessageLooper()
 	\param code Identifier code for the message. Equivalent to BMessage::what
 	\param buffer Any attachments
 
-	Note that the buffer's exact format is determined by the particular message. 
-	All attachments are placed in the buffer via a PortLink, so it will be a 
+	Note that the buffer's exact format is determined by the particular message.
+	All attachments are placed in the buffer via a PortLink, so it will be a
 	matter of casting and incrementing an index variable to access them.
 */
 void
@@ -561,7 +561,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		}
 		case AS_R5_SET_DECORATOR:
 		{
-			// Sort of supports Tracker's nifty Easter Egg. It was easy to do and 
+			// Sort of supports Tracker's nifty Easter Egg. It was easy to do and
 			// it's kind of neat, so why not?
 
 			// Attached Data:
@@ -576,7 +576,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (gDecorManager.SetR5Decorator(decindex))
 				fDesktop->BroadcastToAllApps(AS_UPDATE_DECORATOR);
-			
+
 			break;
 		}
 		case AS_CREATE_BITMAP:
@@ -590,12 +590,12 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 3) int32 bitmap_flags
 			// 4) int32 bytes_per_row
 			// 5) int32 screen_id::id
-			
+
 			// Reply Data:
 			//	1) int32 server token
 			//	2) area_id id of the area in which the bitmap data resides
 			//	3) int32 area pointer offset used to calculate fBasePtr
-			
+
 			// First, let's attempt to allocate the bitmap
 			ServerBitmap *bitmap = NULL;
 			uint8 allocationFlags = kAllocator;
@@ -689,7 +689,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			// TODO: Maybe rename this to AS_UPLOAD_PICTURE ?
 			STRACE(("ServerApp %s: Create Picture\n", Signature()));
-			status_t status = B_ERROR;			
+			status_t status = B_ERROR;
 			ServerPicture *picture = CreatePicture();
 			if (picture != NULL) {
 				int32 subPicturesCount = 0;
@@ -729,18 +729,18 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			ServerPicture *original = NULL;
 			if (link.Read<int32>(&token) == B_OK)
 				original = FindPicture(token);
-			
+
 			ServerPicture *cloned = NULL;
 			if (original != NULL)
 				cloned = CreatePicture(original);
-		
+
 			if (cloned != NULL) {
 				fLink.StartMessage(B_OK);
-				fLink.Attach<int32>(cloned->Token());	
+				fLink.Attach<int32>(cloned->Token());
 			} else
 				fLink.StartMessage(B_ERROR);
 
-			fLink.Flush();	
+			fLink.Flush();
 			break;
 		}
 
@@ -755,9 +755,9 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 					// ExportData() calls StartMessage() already
 			} else
 				fLink.StartMessage(B_ERROR);
-			
+
 			fLink.Flush();
-			
+
 			break;
 		}
 
@@ -787,8 +787,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_CURRENT_WORKSPACE:
 			STRACE(("ServerApp %s: get current workspace\n", Signature()));
 
-			fLink.StartMessage(B_OK);
-			fLink.Attach<int32>(fDesktop->CurrentWorkspace());
+			if (fDesktop->LockSingleWindow()) {
+				fLink.StartMessage(B_OK);
+				fLink.Attach<int32>(fDesktop->CurrentWorkspace());
+				fDesktop->UnlockSingleWindow();
+			} else
+				fLink.StartMessage(B_ERROR);
+
 			fLink.Flush();
 			break;
 
@@ -952,7 +957,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			STRACE(("ServerApp %s: Get ScrollBar info\n", Signature()));
-			
+
 			if (fDesktop->LockSingleWindow()) {
 				scroll_bar_info info;
 				DesktopSettings settings(fDesktop);
@@ -1258,7 +1263,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				fLink.StartMessage(B_OK);
 				fLink.AttachString(family->Name());
 				fLink.Attach<uint32>(family->Flags());
-				
+
 				int32 count = family->CountStyles();
 				fLink.Attach<int32>(count);
 
@@ -1388,7 +1393,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 2) uint16 ID of style
 			// 3) float point size of font
 			// 4) uint8 spacing to use
-			// 5) int32 numStrings 
+			// 5) int32 numStrings
 			// 6) int32 string length to measure (numStrings times)
 			// 7) string String to measure (numStrings times)
 
@@ -1676,7 +1681,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 3) int32 - numChars
 			// 4) int32 - numBytes
 			// 5) char - the char buffer with size numBytes
-			
+
 			uint16 familyID, styleID;
 			link.Read<uint16>(&familyID);
 			link.Read<uint16>(&styleID);
@@ -1821,7 +1826,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// Returns:
 			// 1) float - escapement buffer with numChar entries
-			
+
 			uint16 familyID, styleID;
 			uint32 flags;
 			float size, rotation;
@@ -1837,7 +1842,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			escapement_delta delta;
 			link.Read<float>(&delta.nonspace);
 			link.Read<float>(&delta.space);
-			
+
 			int32 numChars;
 			link.Read<int32>(&numChars);
 
@@ -1897,7 +1902,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 6) float - false bold width
 			// 7) uint8 - spacing
 			// 8) uint32 - flags
-			
+
 			// 9) font_metric_mode - mode
 			// 10) bool - string escapement
 
@@ -1909,14 +1914,14 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// Returns:
 			// 1) BRect - rects with numChar entries
-			
+
 			uint16 famid, styid;
 			uint32 flags;
 			float ptsize, rotation, shear, falseBoldWidth;
 			uint8 spacing;
 			font_metric_mode mode;
 			bool string_escapement;
-			
+
 			link.Read<uint16>(&famid);
 			link.Read<uint16>(&styid);
 			link.Read<float>(&ptsize);
@@ -1930,7 +1935,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			escapement_delta delta;
 			link.Read<escapement_delta>(&delta);
-			
+
 			int32 numChars;
 			link.Read<int32>(&numChars);
 
@@ -1983,7 +1988,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			// 6) float - false bold width
 			// 7) uint8 - spacing
 			// 8) uint32 - flags
-			
+
 			// 9) font_metric_mode - mode
 			// 10) int32 numStrings
 
@@ -1993,13 +1998,13 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			// Returns:
 			// 1) BRect - rects with numStrings entries
-			
+
 			uint16 famid, styid;
 			uint32 flags;
 			float ptsize, rotation, shear, falseBoldWidth;
 			uint8 spacing;
 			font_metric_mode mode;
-			
+
 			link.Read<uint16>(&famid);
 			link.Read<uint16>(&styid);
 			link.Read<float>(&ptsize);
@@ -2012,7 +2017,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			int32 numStrings;
 			link.Read<int32>(&numStrings);
-			
+
 			escapement_delta deltaArray[numStrings];
 			char *stringArray[numStrings];
 			int32 lengthArray[numStrings];
@@ -2238,7 +2243,7 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (colorMap != NULL) {
 				fLink.StartMessage(B_OK);
 				fLink.Attach<color_map>(*colorMap);
-			} else 
+			} else
 				fLink.StartMessage(B_ERROR);
 
 			fLink.Flush();
@@ -2503,22 +2508,22 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_GET_ACCELERANT_PATH:
 		{
 			int32 index;
 			fLink.Read<int32>(&index);
-			
+
 			BString path;
 			status_t status = fDesktop->HWInterface()->GetAccelerantPath(path);
 			fLink.StartMessage(status);
 			if (status == B_OK)
 				fLink.AttachString(path.String());
-			
+
 			fLink.Flush();
 			break;
 		}
-		
+
 		case AS_GET_DRIVER_PATH:
 		{
 			int32 index;
@@ -2747,7 +2752,7 @@ ServerApp::CreatePicture(const ServerPicture *original)
 
 	if (picture != NULL)
 		fPictureList.AddItem(picture);
-	
+
 	return picture;
 }
 
@@ -2755,7 +2760,7 @@ ServerApp::CreatePicture(const ServerPicture *original)
 ServerPicture *
 ServerApp::FindPicture(const int32 &token) const
 {
-	// TODO: we need to make sure the picture is ours?!	
+	// TODO: we need to make sure the picture is ours?!
 	ServerPicture* picture;
 	if (gTokenSpace.GetToken(token, kPictureToken, (void**)&picture) == B_OK)
 		return picture;
@@ -2770,10 +2775,10 @@ ServerApp::DeletePicture(const int32 &token)
 	ServerPicture *picture = FindPicture(token);
 	if (picture == NULL)
 		return false;
-	
+
 	if (!fPictureList.RemoveItem(picture))
 		return false;
-	
+
 	delete picture;
 
 	return true;
