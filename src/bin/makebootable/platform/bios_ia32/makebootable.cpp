@@ -478,7 +478,7 @@ main(int argc, const char *const *argv)
 		#ifdef __BEOS__
 
 			// get a partition info
-			if (!noPartition) {
+			if (!noPartition && strncmp("/raw", fileName + strlen(fileName) - 4, 4)) {
 				partition_info partitionInfo;
 				if (ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo) == 0) {
 					partitionOffset = partitionInfo.offset;
