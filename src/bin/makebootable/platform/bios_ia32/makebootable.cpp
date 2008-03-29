@@ -483,7 +483,7 @@ main(int argc, const char *const *argv)
 				if (ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo) == 0) {
 					partitionOffset = partitionInfo.offset;
 				} else {
-					fprintf(stderr, "Error: Failed to get partition info: %s",
+					fprintf(stderr, "Error: Failed to get partition info: %s\n",
 						strerror(errno));
 					exit(1);
 				}
