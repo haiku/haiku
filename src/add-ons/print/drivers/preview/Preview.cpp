@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,7 @@
 
 #include <stdlib.h>
 
+#include <Application.h>
 #include <Debug.h>
 #include <String.h>
 #include "BeUtils.h"
@@ -61,10 +62,22 @@ const float kPreviewBottomMargin = 30;
 const float kPreviewLeftMargin = 10;
 const float kPreviewRightMargin = 30;
 
+const uint8 ZOOM_IN[] = { 16, 1, 6, 6, 0, 0, 15, 128, 48, 96, 32, 32, 66, 16, 66, 16,
+	79, 144, 66, 16, 66, 16, 32, 32, 48, 112, 15, 184, 0, 28, 0, 14, 0, 6, 0, 0, 15,
+	128, 63, 224, 127, 240, 127, 240, 255, 248, 255, 248, 255, 248, 255, 248, 255, 248,
+	127, 248, 127, 248, 63, 252, 15, 254, 0, 31, 0, 15, 0, 7 };
+
+const uint8 ZOOM_OUT[] = { 16, 1, 6, 6, 0, 0, 15, 128, 48, 96, 32, 32, 64, 16, 64, 16,
+	79, 144, 64, 16, 64, 16, 32, 32, 48, 112, 15, 184, 0, 28, 0, 14, 0, 6, 0, 0, 15,
+	128, 63, 224, 127, 240, 127, 240, 255, 248, 255, 248, 255, 248, 255, 248, 255, 248,
+	127, 248, 127, 248, 63, 252, 15, 254, 0, 31, 0, 15, 0, 7 };
+
 PreviewView::PreviewView(BFile* jobFile, BRect rect)
-	: BView(rect, "PreviewView", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
+	: BView(rect, "PreviewView", B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)
 	, fPage(0)
 	, fZoom(0)
+	, fTracking(false)
+	, fInsideView(true)
 	, fReader(jobFile)
 	, fCachedPage(NULL)
 {
@@ -73,6 +86,122 @@ PreviewView::PreviewView(BFile* jobFile, BRect rect)
 PreviewView::~PreviewView() {
 	delete fCachedPage;
 }
+
+
+void
+PreviewView::Show()
+{
+	BView::Show();
+	be_app->SetCursor(ZOOM_IN);
+}
+
+
+void
+PreviewView::MouseDown(BPoint point)
+{
+	MakeFocus(true);
+	BMessage *message = Window()->CurrentMessage();
+
+	int32 button;
+	if (message && message->FindInt32("buttons", &button) == B_OK) {
+		if (button == B_PRIMARY_MOUSE_BUTTON) {
+			int32 modifier;
+			if (message->FindInt32("modifiers", &modifier) == B_OK) {
+				if (modifier & B_SHIFT_KEY)
+					ZoomOut();
+				else
+					ZoomIn();
+			}
+		}
+
+		if (button == B_SECONDARY_MOUSE_BUTTON) {
+			fTracking = true;
+			be_app->SetCursor(B_HAND_CURSOR);
+			SetMouseEventMask(B_POINTER_EVENTS,
+				B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+			fScrollStart = Bounds().LeftTop() + ConvertToScreen(point);
+		}
+	}
+}
+
+
+void
+PreviewView::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
+{
+	if (fTracking) {
+		uint32 button;
+		GetMouse(&point, &button, false);
+		point = fScrollStart - ConvertToScreen(point);
+
+		float hMin, hMax;
+		BScrollBar *hBar = ScrollBar(B_HORIZONTAL);
+		hBar->GetRange(&hMin, &hMax);
+
+		float vMin, vMax;
+		BScrollBar *vBar = ScrollBar(B_VERTICAL);
+		vBar->GetRange(&vMin, &vMax);
+
+		if (point.x < 0.0) point.x = 0.0;
+		if (point.y < 0.0) point.y = 0.0;
+		if (point.x > hMax) point.x = hMax;
+		if (point.y > vMax) point.y = vMax;
+
+		ScrollTo(point);
+	} else {
+		switch (transit) {
+			case B_ENTERED_VIEW: {
+				fInsideView = true;
+				be_app->SetCursor(ZOOM_IN);
+			}	break;
+
+			case B_EXITED_VIEW: {
+				fInsideView = false;
+				be_app->SetCursor(B_HAND_CURSOR);
+			}	break;
+
+			default: {
+				if (modifiers() & B_SHIFT_KEY)
+					be_app->SetCursor(ZOOM_OUT);
+				else
+					be_app->SetCursor(ZOOM_IN);
+			}	break;
+		}
+	}
+}
+
+
+void
+PreviewView::MouseUp(BPoint point)
+{
+	(void)point;
+	fTracking = false;
+	fScrollStart.Set(0.0, 0.0);
+	if (fInsideView && ((modifiers() & B_SHIFT_KEY) == 0))
+		be_app->SetCursor(ZOOM_IN);
+}
+
+
+void
+PreviewView::KeyDown(const char* bytes, int32 numBytes)
+{
+	MakeFocus(true);	
+	switch (bytes[0]) {
+		case '-': {
+			if (modifiers() & B_CONTROL_KEY)
+				ZoomOut();
+		}	break;
+
+		case '+' : {
+			if (modifiers() & B_CONTROL_KEY)
+				ZoomIn();
+		}	break;
+
+		default: {
+			BView::KeyDown(bytes, numBytes);
+		}	break;
+	}
+}
+
 
 // returns 2 ^ fZoom
 float PreviewView::ZoomFactor() const {
@@ -313,7 +442,8 @@ void PreviewView::FixScrollbars() {
 // Implementation of PreviewWindow
 
 PreviewWindow::PreviewWindow(BFile* jobFile) 
-	: BlockingWindow(BRect(20, 24, 400, 600), "Preview", B_DOCUMENT_WINDOW, 0)
+	: BlockingWindow(BRect(20, 24, 400, 600), "Preview", B_DOCUMENT_WINDOW,
+		B_ASYNCHRONOUS_CONTROLS)
 {
 	const float kButtonDistance = 15;
 	const float kPageTextDistance = 10;
@@ -407,6 +537,7 @@ PreviewWindow::PreviewWindow(BFile* jobFile)
 		ResizeToPage();
 		fPreview->FixScrollbars();
 		UpdateControls();
+		fPreview->MakeFocus(true);
 	}
 }
 
@@ -486,6 +617,9 @@ void PreviewWindow::MessageReceived(BMessage* m) {
 		case MSG_ZOOM_OUT: 
 			fPreview->ZoomOut(); 
 			ResizeToPage();
+			break;
+		case B_MODIFIERS_CHANGED:
+			fPreview->MouseMoved(BPoint(), B_INSIDE_VIEW, m);
 			break;
 		default:
 			inherited::MessageReceived(m); return;

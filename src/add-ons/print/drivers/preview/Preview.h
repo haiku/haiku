@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku. All rights reserved.
+ * Copyright 2002-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,6 +31,9 @@ public:
 class PreviewView : public BView {
 	int32 fPage;
 	int32 fZoom;
+	bool fTracking;
+	bool fInsideView;
+	BPoint fScrollStart;
 	PrintJobReader fReader;
 	PreviewPage* fCachedPage;
 	
@@ -41,6 +44,14 @@ class PreviewView : public BView {
 public:
 	PreviewView(BFile* jobFile, BRect rect);
 	~PreviewView();
+	
+	virtual void	Show();
+	virtual void	MouseDown(BPoint point);
+	virtual void	MouseMoved(BPoint point, uint32 transit, const BMessage* message);
+	virtual void	MouseUp(BPoint point);
+
+	virtual void	KeyDown(const char* bytes, int32 numBytes);
+
 	status_t InitCheck() const;
 	
 	BRect ViewRect() const;
