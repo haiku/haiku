@@ -769,7 +769,11 @@ MultiAudioNode::PrepareToConnect(const media_source& what,
 	channel->fOutput.format = *format;
 
 	*source = channel->fOutput.source;
+#ifdef __HAIKU__
+	strlcpy(name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
+#else
 	strncpy(name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
+#endif
 	return B_OK;
 }
 
@@ -801,7 +805,11 @@ MultiAudioNode::Connect(status_t error, const media_source& source,
 	// format that we agreed on, and report our connection name again.
 	channel->fOutput.destination = destination;
 	channel->fOutput.format = format;
+#ifdef __HAIKU__
+	strlcpy(name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
+#else
 	strncpy(name, channel->fOutput.name, B_MEDIA_NAME_LENGTH);
+#endif
 
 	// reset our buffer duration, etc. to avoid later calculations
 	bigtime_t duration = channel->fOutput.format.u.raw_audio.buffer_size * 10000
