@@ -774,5 +774,7 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		_DisplayPartitionError("Failed to initialize the partition "
 			"%s!\n", partition, ret);
 	}
+
+	_ScanDrives();
 }
 
