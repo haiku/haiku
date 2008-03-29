@@ -513,13 +513,10 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 	AddSymlinkToHaikuImage develop headers : 3rdparty : gnu ;
 		# TODO: Change BEINCLUDES and gcc to refer to 3rdparty rather than gnu.
 
-	# individual headers of third party libs
-	local zlibHeaders = <header>zlib.h <header>zconf.h ;
-	SEARCH on $(zlibHeaders) = [ FDirName $(HAIKU_TOP) headers libs zlib ] ;
-	local pngHeaders = <header>png.h <header>pngconf.h ;
-	SEARCH on $(pngHeaders) = [ FDirName $(HAIKU_TOP) headers libs png ] ;
-	AddFilesToHaikuImage develop headers 3rdparty
-		: $(zlibHeaders) $(pngHeaders) ;
+	# third party libs headers
+	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
 
 	if $(HAIKU_GCC_VERSION[1]) > 2 {
 		# gcc 4
