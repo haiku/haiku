@@ -1273,3 +1273,40 @@ deferred_free(void* block)
 	InterruptsSpinLocker _(sDeferredFreeListLock);
 	sDeferredFreeList.Add(entry);
 }
+
+
+void*
+malloc_referenced(size_t size)
+{
+	int32* referencedData = (int32*)malloc(size + 4);
+	if (referencedData == NULL)
+		return NULL;
+
+	*referencedData = 1;
+
+	return referencedData + 1;
+}
+
+
+void*
+malloc_referenced_acquire(void* data)
+{
+	if (data != NULL) {
+		int32* referencedData = (int32*)data - 1;
+		atomic_add(referencedData, 1);
+	}
+
+	return data;
+}
+
+
+void
+malloc_referenced_release(void* data)
+{
+	if (data == NULL)
+		return;
+
+	int32* referencedData = (int32*)data - 1;
+	if (atomic_add(referencedData, -1) < 1)
+		free(referencedData);
+}
