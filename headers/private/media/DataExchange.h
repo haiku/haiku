@@ -177,6 +177,7 @@ enum {
 	CONTROLLABLE_GET_PARAMETER_DATA,
 	CONTROLLABLE_SET_PARAMETER_DATA,
 	CONTROLLABLE_MESSAGE_END,
+	CONTROLLABLE_START_CONTROL_PANEL,
 	TIMESOURCE_MESSAGE_START = 0x700,
 	
 	TIMESOURCE_OP, // datablock is a struct time_source_op_info
@@ -1017,6 +1018,16 @@ struct controllable_set_parameter_data_request : public request_data
 
 struct controllable_set_parameter_data_reply : public reply_data
 {
+};
+
+struct controllable_start_control_panel_request : public request_data
+{
+	media_node node;
+};
+
+struct controllable_start_control_panel_reply : public reply_data
+{
+	team_id team;
 };
 
 #endif // _DATA_EXCHANGE_H

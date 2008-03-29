@@ -2101,8 +2101,22 @@ status_t
 BMediaRoster::StartControlPanel(const media_node & node,
 								BMessenger * out_messenger)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+
+	controllable_start_control_panel_request request;
+	controllable_start_control_panel_reply reply;
+
+	request.node = node;
+
+	status_t rv;
+	rv = QueryPort(node.port, CONTROLLABLE_START_CONTROL_PANEL, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+
+	if (reply.team != -1 && out_messenger)
+		*out_messenger = BMessenger(0, reply.team);
+
+	return B_OK;
 }
 
 

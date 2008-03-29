@@ -30,6 +30,7 @@
 #include <OS.h>
 #include <Controllable.h>
 #include <ParameterWeb.h>
+#include <Roster.h>
 #include "debug.h"
 #include "DataExchange.h"
 #include "Notifications.h"
@@ -226,7 +227,21 @@ BControllable::HandleMessage(int32 message, const void *data, size_t size)
 			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
-				
+
+		case CONTROLLABLE_START_CONTROL_PANEL:
+		{
+			const controllable_start_control_panel_request *request = static_cast<const controllable_start_control_panel_request*>(data);
+			controllable_start_control_panel_reply reply;
+			BMessenger targetMessenger;
+			rv = StartControlPanel(&targetMessenger);
+			if (rv != B_OK) {
+				ERROR("BControllable::HandleMessage CONTROLLABLE_START_CONTROL_PANEL failed\n");
+			}
+			reply.result = rv;
+			reply.team = targetMessenger.Team();
+			request->SendReply(rv, &reply, sizeof(reply));
+			return B_OK;
+		}	
 	}
 	return B_ERROR;
 }
@@ -254,9 +269,46 @@ BControllable::BroadcastNewParameterValue(bigtime_t when,
 status_t
 BControllable::StartControlPanel(BMessenger *out_messenger)
 {
-	UNIMPLEMENTED();
+	CALLED();
 
-	return B_ERROR;
+	int32 internalId;
+	BMediaAddOn* addon = AddOn(&internalId);
+	if (!addon) {
+		ERROR("BControllable::StartControlPanel not instantiated per AddOn\n");
+		return B_ERROR;
+	}
+
+	image_id imageId = addon->ImageID();
+	image_info info;
+	if ((imageId <= 0) || (get_image_info(imageId, &info) != B_OK)) {
+		ERROR("BControllable::StartControlPanel Error accessing image\n");
+		return B_BAD_VALUE;
+	}
+
+	team_id id;
+	entry_ref ref;
+
+	if (BEntry(info.name).GetRef(&ref) != B_OK) {
+		ERROR("BControllable::StartControlPanel Error getting ref\n");
+		return B_BAD_VALUE;
+	}
+
+	// The first argument is "node=id" with id meaning the media_node_id
+	char *arg = (char*) malloc(10);
+	sprintf(arg, "node=%d" , (int) ID());
+
+	if (be_roster->Launch(&ref, 1, &arg, &id) != B_OK) {
+		free(arg);
+		ERROR("BControllable::StartControlPanel Error launching application\n");
+		return B_BAD_VALUE;
+	}
+	printf("BControllable::StartContolPanel done wiht id: %d\n" , id);
+	free(arg);
+
+	if (out_messenger)
+		*out_messenger = BMessenger(0, id);
+
+	return B_OK;
 }
 
 
