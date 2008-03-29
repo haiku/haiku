@@ -6,8 +6,6 @@
 #include <sys/sockio.h>
 #include <sys/param.h>
 
-#include <nameser_compat.h>
-
 // CHANGED: Haiku does not have these error codes
 #define ETOOMANYREFS B_ERROR
 

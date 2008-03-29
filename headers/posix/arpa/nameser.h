@@ -575,4 +575,6 @@ int		ns_samename(const char *, const char *);
 }
 #endif
 
+#include <arpa/nameser_compat.h>
+
 #endif	/* _ARPA_NAMESER_H_ */
