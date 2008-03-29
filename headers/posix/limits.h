@@ -52,7 +52,7 @@
 #define _POSIX_MAX_CANON		(255)
 #define _POSIX_MAX_INPUT		(255)
 #define _POSIX_NAME_MAX	 		(255) 
-#define _POSIX_NGROUPS_MAX  	(0)  
+#define _POSIX_NGROUPS_MAX  	(8)  
 #define _POSIX_OPEN_MAX	 		(128)
 #define _POSIX_PATH_MAX	 		(1024)
 #define _POSIX_PIPE_BUF	 		(512) 
