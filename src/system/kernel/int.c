@@ -8,16 +8,17 @@
 
 
 #include <int.h>
-#include <smp.h>
-#include <util/kqueue.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <arch/debug_console.h>
 #include <arch/int.h>
 #include <boot/kernel_args.h>
+#include <util/kqueue.h>
+#include <smp.h>
 
-#include <string.h>
-#include <stdio.h>
-#include <malloc.h>
 
 //#define TRACE_INT
 #ifdef TRACE_INT
@@ -27,6 +28,7 @@
 #endif
 
 #define DEBUG_INT
+	// adds statistics and unhandled counter
 
 struct io_handler {
 	struct io_handler	*next;
@@ -49,28 +51,7 @@ struct io_vector {
 #endif
 };
 
-static struct io_vector io_vectors[NUM_IO_VECTORS];
-
-
-cpu_status
-disable_interrupts(void)
-{
-	return arch_int_disable_interrupts();
-}
-
-
-void
-restore_interrupts(cpu_status status)
-{
-	arch_int_restore_interrupts(status);
-}
-
-
-bool
-interrupts_enabled(void)
-{
-	return arch_int_are_interrupts_enabled();
-}
+static struct io_vector sVectors[NUM_IO_VECTORS];
 
 
 #ifdef DEBUG_INT
@@ -81,30 +62,40 @@ dump_int_statistics(int argc, char **argv)
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
 		struct io_handler *io;
 
-		if (io_vectors[i].vector_lock == 0
-			&& io_vectors[i].enable_count == 0
-			&& io_vectors[i].handled_count == 0
-			&& io_vectors[i].unhandled_count == 0
-			&& io_vectors[i].handler_list.next == &io_vectors[i].handler_list)
+		if (sVectors[i].vector_lock == 0
+			&& sVectors[i].enable_count == 0
+			&& sVectors[i].handled_count == 0
+			&& sVectors[i].unhandled_count == 0
+			&& sVectors[i].handler_list.next == &sVectors[i].handler_list)
 			continue;
 
 		kprintf("int %3d, enabled %ld, handled %8lld, unhandled %8lld%s%s\n",
-			i, io_vectors[i].enable_count, io_vectors[i].handled_count, 
-			io_vectors[i].unhandled_count,
-			io_vectors[i].vector_lock != 0 ? ", ACTIVE" : "",
-			io_vectors[i].handler_list.next == &io_vectors[i].handler_list
+			i, sVectors[i].enable_count, sVectors[i].handled_count, 
+			sVectors[i].unhandled_count,
+			sVectors[i].vector_lock != 0 ? ", ACTIVE" : "",
+			sVectors[i].handler_list.next == &sVectors[i].handler_list
 				? ", no handler" : "");
 
-		for (io = io_vectors[i].handler_list.next;
-				io != &io_vectors[i].handler_list; io = io->next) {
+		for (io = sVectors[i].handler_list.next;
+				io != &sVectors[i].handler_list; io = io->next) {
 			kprintf("\t%p", io->func);
 		}
-		if (io_vectors[i].handler_list.next != &io_vectors[i].handler_list)
+		if (sVectors[i].handler_list.next != &sVectors[i].handler_list)
 			kprintf("\n");
 	}
 	return 0;
 }
 #endif
+
+
+//	#pragma mark - private kernel API
+
+
+bool
+interrupts_enabled(void)
+{
+	return arch_int_are_interrupts_enabled();
+}
 
 
 status_t
@@ -123,20 +114,21 @@ int_init_post_vm(kernel_args *args)
 
 	/* initialize the vector list */
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
-		io_vectors[i].vector_lock = 0;			/* initialize spinlock */
-		io_vectors[i].enable_count = 0;
-		io_vectors[i].no_lock_vector = false;
+		sVectors[i].vector_lock = 0;			/* initialize spinlock */
+		sVectors[i].enable_count = 0;
+		sVectors[i].no_lock_vector = false;
 #ifdef DEBUG_INT
-		io_vectors[i].handled_count = 0;
-		io_vectors[i].unhandled_count = 0;
-		io_vectors[i].trigger_count = 0;
-		io_vectors[i].ignored_count = 0;
+		sVectors[i].handled_count = 0;
+		sVectors[i].unhandled_count = 0;
+		sVectors[i].trigger_count = 0;
+		sVectors[i].ignored_count = 0;
 #endif
-		initque(&io_vectors[i].handler_list);	/* initialize handler queue */
+		initque(&sVectors[i].handler_list);	/* initialize handler queue */
 	}
 
 #ifdef DEBUG_INT
-	add_debugger_command("ints", &dump_int_statistics, "list interrupt statistics");
+	add_debugger_command("ints", &dump_int_statistics,
+		"list interrupt statistics");
 #endif
 
 	return arch_int_init_post_vm(args);
@@ -152,12 +144,119 @@ int_init_post_device_manager(kernel_args *args)
 }
 
 
-/** Install a handler to be called when an interrupt is triggered
- *	for the given interrupt number with \a data as the argument.
- */
+/*!	Actually process an interrupt via the handlers registered for that
+	vector (IRQ).
+*/
+int
+int_io_interrupt_handler(int vector, bool levelTriggered)
+{
+	int status = B_UNHANDLED_INTERRUPT;
+	struct io_handler *io;
+	bool invokeScheduler = false, handled = false;
 
+	if (!sVectors[vector].no_lock_vector)
+		acquire_spinlock(&sVectors[vector].vector_lock);
+
+	// The list can be empty at this place
+	if (sVectors[vector].handler_list.next == &sVectors[vector].handler_list) {
+		dprintf("unhandled io interrupt %d\n", vector);
+		if (!sVectors[vector].no_lock_vector)
+			release_spinlock(&sVectors[vector].vector_lock);
+		return B_UNHANDLED_INTERRUPT;
+	}
+
+	/* For level-triggered interrupts, we actually handle the return
+	 * value (ie. B_HANDLED_INTERRUPT) to decide wether or not we
+	 * want to call another interrupt handler.
+	 * For edge-triggered interrupts, however, we always need to call
+	 * all handlers, as multiple interrupts cannot be identified. We
+	 * still make sure the return code of this function will issue
+	 * whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
+	 */
+
+	for (io = sVectors[vector].handler_list.next;
+			io != &sVectors[vector].handler_list;
+			io = io->next) {
+		status = io->func(io->data);
+
+		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
+			break;
+
+		if (status == B_HANDLED_INTERRUPT)
+			handled = true;
+		else if (status == B_INVOKE_SCHEDULER)
+			invokeScheduler = true;
+	}
+
+#ifdef DEBUG_INT
+	sVectors[vector].trigger_count++;
+	if (status != B_UNHANDLED_INTERRUPT || handled || invokeScheduler) {
+		sVectors[vector].handled_count++;
+	} else {
+		sVectors[vector].unhandled_count++;
+		sVectors[vector].ignored_count++;
+	}
+
+	if (sVectors[vector].trigger_count > 10000) {
+		if (sVectors[vector].ignored_count > 9900) {
+			if (sVectors[vector].handler_list.next == NULL
+				|| sVectors[vector].handler_list.next->next == NULL) {
+				// this interrupt vector is not shared, disable it
+				sVectors[vector].enable_count = -100;
+				arch_int_disable_io_interrupt(vector);
+				dprintf("Disabling unhandled io interrupt %d\n", vector);
+			} else {
+				// this is a shared interrupt vector, we cannot just disable it
+				dprintf("More than 99%% interrupts of vector %d are unhandled\n",
+					vector);
+			}
+		}
+
+		sVectors[vector].trigger_count = 0;
+		sVectors[vector].ignored_count = 0;
+	}
+#endif
+
+	if (!sVectors[vector].no_lock_vector)
+		release_spinlock(&sVectors[vector].vector_lock);
+
+	if (levelTriggered)
+		return status;
+
+	// edge triggered return value
+
+	if (invokeScheduler)
+		return B_INVOKE_SCHEDULER;
+	if (handled)
+		return B_HANDLED_INTERRUPT;
+
+	return B_UNHANDLED_INTERRUPT;
+}
+
+
+//	#pragma mark - public API
+
+
+cpu_status
+disable_interrupts(void)
+{
+	return arch_int_disable_interrupts();
+}
+
+
+void
+restore_interrupts(cpu_status status)
+{
+	arch_int_restore_interrupts(status);
+}
+
+
+/*!	Install a handler to be called when an interrupt is triggered
+	for the given interrupt number with \a data as the argument.
+*/
 status_t
-install_io_interrupt_handler(long vector, interrupt_handler handler, void *data, ulong flags)
+install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
+	ulong flags)
 {
 	struct io_handler *io = NULL; 
 	cpu_status state;
@@ -180,14 +279,14 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	// Disable the interrupts, get the spinlock for this irq only
 	// and then insert the handler
 	state = disable_interrupts();
-	acquire_spinlock(&io_vectors[vector].vector_lock);
+	acquire_spinlock(&sVectors[vector].vector_lock);
 
-	insque(io, &io_vectors[vector].handler_list);
+	insque(io, &sVectors[vector].handler_list);
 
 	// If B_NO_ENABLE_COUNTER is set, we're being asked to not alter
 	// whether the interrupt should be enabled or not
 	if (io->use_enable_counter) {
-		if (io_vectors[vector].enable_count++ == 0)
+		if (sVectors[vector].enable_count++ == 0)
 			arch_int_enable_io_interrupt(vector);
 	}
 
@@ -199,17 +298,16 @@ install_io_interrupt_handler(long vector, interrupt_handler handler, void *data,
 	// would in that case defeat the purpose as it would serialize calling the
 	// handlers in parallel on different CPUs.
 	if (flags & B_NO_LOCK_VECTOR)
-		io_vectors[vector].no_lock_vector = true;
+		sVectors[vector].no_lock_vector = true;
 
-	release_spinlock(&io_vectors[vector].vector_lock);
+	release_spinlock(&sVectors[vector].vector_lock);
 	restore_interrupts(state);
 
 	return B_OK;
 }
 
 
-/** Remove a previously installed interrupt handler */
-
+/*!	Remove a previously installed interrupt handler */
 status_t
 remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 {
@@ -222,21 +320,21 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 
 	/* lock the structures down so it is not modified while we search */
 	state = disable_interrupts();
-	acquire_spinlock(&io_vectors[vector].vector_lock);
+	acquire_spinlock(&sVectors[vector].vector_lock);
 
 	/* loop through the available handlers and try to find a match.
 	 * We go forward through the list but this means we start with the
 	 * most recently added handlers.
 	 */
-	for (io = io_vectors[vector].handler_list.next;
-	     io != &io_vectors[vector].handler_list;
+	for (io = sVectors[vector].handler_list.next;
+	     io != &sVectors[vector].handler_list;
 	     io = io->next) {
 		/* we have to match both function and data */
 		if (io->func == handler && io->data == data) {
 			remque(io);
 
 			// Check if we need to disable the interrupt
-			if (io->use_enable_counter && --io_vectors[vector].enable_count == 0)
+			if (io->use_enable_counter && --sVectors[vector].enable_count == 0)
 				arch_int_disable_io_interrupt(vector);
 
 			status = B_OK;
@@ -244,7 +342,7 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 		}
 	}
 
-	release_spinlock(&io_vectors[vector].vector_lock);
+	release_spinlock(&sVectors[vector].vector_lock);
 	restore_interrupts(state);
 
 	// if the handler could be found and removed, we still have to free it
@@ -253,95 +351,4 @@ remove_io_interrupt_handler(long vector, interrupt_handler handler, void *data)
 
 	return status;
 } 
-
-
-/** actually process an interrupt via the handlers registered for that
- *	vector (irq)
- */
-
-int
-int_io_interrupt_handler(int vector, bool levelTriggered)
-{
-	int status = B_UNHANDLED_INTERRUPT;
-	struct io_handler *io;
-	bool invokeScheduler = false, handled = false;
-
-	if (!io_vectors[vector].no_lock_vector)
-		acquire_spinlock(&io_vectors[vector].vector_lock);
-
-	// The list can be empty at this place
-	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list) {
-		dprintf("unhandled io interrupt %d\n", vector);
-		if (!io_vectors[vector].no_lock_vector)
-			release_spinlock(&io_vectors[vector].vector_lock);
-		return B_UNHANDLED_INTERRUPT;
-	}
-
-	/* For level-triggered interrupts, we actually handle the return
-	 * value (ie. B_HANDLED_INTERRUPT) to decide wether or not we
-	 * want to call another interrupt handler.
-	 * For edge-triggered interrupts, however, we always need to call
-	 * all handlers, as multiple interrupts cannot be identified. We
-	 * still make sure the return code of this function will issue
-	 * whatever the driver thought would be useful (ie. B_INVOKE_SCHEDULER)
-	 */
-
-	for (io = io_vectors[vector].handler_list.next;
-			io != &io_vectors[vector].handler_list; // Are we already at the end of the list?
-			io = io->next) {
-		status = io->func(io->data);
-
-		if (levelTriggered && status != B_UNHANDLED_INTERRUPT)
-			break;
-
-		if (status == B_HANDLED_INTERRUPT)
-			handled = true;
-		else if (status == B_INVOKE_SCHEDULER)
-			invokeScheduler = true;
-	}
-
-#ifdef DEBUG_INT
-	io_vectors[vector].trigger_count++;
-	if (status != B_UNHANDLED_INTERRUPT || handled || invokeScheduler) {
-		io_vectors[vector].handled_count++;
-	} else {
-		io_vectors[vector].unhandled_count++;
-		io_vectors[vector].ignored_count++;
-	}
-
-	if (io_vectors[vector].trigger_count > 10000) {
-		if (io_vectors[vector].ignored_count > 9900) {
-			if (io_vectors[vector].handler_list.next == NULL
-				|| io_vectors[vector].handler_list.next->next == NULL) {
-				// this interrupt vector is not shared, disable it
-				io_vectors[vector].enable_count = -100;
-				arch_int_disable_io_interrupt(vector);
-				dprintf("Disabling unhandled io interrupt %d\n", vector);
-			} else {
-				// this is a shared interrupt vector, we cannot just disable it
-				dprintf("More than 99%% interrupts of vector %d are unhandled\n",
-					vector);
-			}
-		}
-
-		io_vectors[vector].trigger_count = 0;
-		io_vectors[vector].ignored_count = 0;
-	}
-#endif
-
-	if (!io_vectors[vector].no_lock_vector)
-		release_spinlock(&io_vectors[vector].vector_lock);
-
-	if (levelTriggered)
-		return status;
-
-	// edge triggered return value
-
-	if (invokeScheduler)
-		return B_INVOKE_SCHEDULER;
-	if (handled)
-		return B_HANDLED_INTERRUPT;
-
-	return B_UNHANDLED_INTERRUPT;
-}
 
