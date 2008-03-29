@@ -5,115 +5,143 @@
  * Authors:
  *		Michael Pfeiffer
  *		Hartmut Reh
+ *		julun <host.haiku@gmx.de>
  */
-
-#include <InterfaceKit.h>
-#include "PrintJobReader.h"
 #include "InterfaceUtils.h"
+#include "PrintJobReader.h"
+
+
+#include <View.h>
+
+
+class BButton;
+class BFile;
+class BMessage;
+class BPicture;
+class BScrollView;
+class BStringView;
+class BTextControl;
+
+
+// #pragma mark - PreviewPage
+
 
 class PreviewPage {
-	int32 fPage;
-	int32 fNumberOfPictures;
-	BPicture* fPictures;
-	BPoint* fPoints;
-	BRect* fRects;
-	status_t fStatus;
-	
 public:
-	PreviewPage(int32 page, PrintJobPage* pjp);
-	~PreviewPage();
-	status_t InitCheck() const;
-	
-	int32 Page() const { return fPage; }
-	void Draw(BView* view);
+				PreviewPage(int32 page, PrintJobPage* pjp);
+				~PreviewPage();
+
+	void		Draw(BView* view);
+	status_t	InitCheck() const;
+	int32 		Page() const { return fPage; }
+
+private:
+	int32		fPage;
+	status_t	fStatus;
+	int32		fNumberOfPictures;
+
+	BRect*		fRects;
+	BPoint*		fPoints;
+	BPicture*	fPictures;
 };
+
+
+// #pragma mark - PreviewView
+
 
 class PreviewView : public BView {
-	int32 fPage;
-	int32 fZoom;
-	bool fTracking;
-	bool fInsideView;
-	BPoint fScrollStart;
-	PrintJobReader fReader;
-	PreviewPage* fCachedPage;
-	
-	float ZoomFactor() const;
-	BRect PageRect() const;
-	BRect PrintableRect() const;
-	
 public:
-	PreviewView(BFile* jobFile, BRect rect);
-	~PreviewView();
-	
-	virtual void	Show();
-	virtual void	MouseDown(BPoint point);
-	virtual void	MouseMoved(BPoint point, uint32 transit, const BMessage* message);
-	virtual void	MouseUp(BPoint point);
+							PreviewView(BFile* jobFile, BRect rect);
+							~PreviewView();
 
-	virtual void	KeyDown(const char* bytes, int32 numBytes);
+	virtual void			Show();
+	virtual void			Draw(BRect r);
+	virtual void			FrameResized(float width, float height);
+	virtual void			MouseDown(BPoint point);
+	virtual void			MouseMoved(BPoint point, uint32 transit,
+								const BMessage* message);
+	virtual void			MouseUp(BPoint point);
+	virtual void			KeyDown(const char* bytes, int32 numBytes);
 
-	status_t InitCheck() const;
-	
-	BRect ViewRect() const;
+			void			ShowFirstPage();
+			void			ShowPrevPage();
+			void			ShowNextPage();
+			void			ShowLastPage();
+			bool			ShowsFirstPage() const;
+			bool			ShowsLastPage() const;
+			void			ShowFindPage(int32 page);
 
-	bool IsPageLoaded(int32 page) const;
-	bool IsPageValid() const;
-	void LoadPage(int32 page);
-	void DrawPageFrame(BRect r);
-	void DrawPage(BRect r);
-	void Draw(BRect r);
-	void FrameResized(float width, float height);
-	
-	void FixScrollbars();
-	
-	bool ShowsFirstPage() const;
-	bool ShowsLastPage() const;
-	int CurrentPage() const { return fPage + 1; }
-	int NumberOfPages() const;
-	void ShowNextPage();
-	void ShowPrevPage();
-	void ShowFirstPage();
-	void ShowLastPage();
-	void ShowFindPage(int page);
-	
-	bool CanZoomIn() const;
-	bool CanZoomOut() const;
-	void ZoomIn();
-	void ZoomOut();
+			void			ZoomIn();
+			bool			CanZoomIn() const;
+			void			ZoomOut();
+			bool			CanZoomOut() const;
+
+			void			FixScrollbars();
+			BRect			ViewRect() const;
+			status_t		InitCheck() const;
+			int32			NumberOfPages() const;
+			int32			CurrentPage() const { return fPage + 1; }
+
+private:
+			BRect			_PageRect() const;
+			float			_ZoomFactor() const;
+			BRect			_PrintableRect() const;
+
+			void			_LoadPage(int32 page);
+			bool			_IsPageValid() const;
+			bool			_IsPageLoaded(int32 page) const;
+
+			void			_DrawPageFrame(BRect rect);
+			void			_DrawPage(BRect updateRect);
+
+private:
+			int32			fPage;
+			int32			fZoom;
+			bool			fTracking;
+			bool			fInsideView;
+			BPoint			fScrollStart;
+			PrintJobReader	fReader;
+			PreviewPage*	fCachedPage;
 };
+
+
+// #pragma mark - PreviewWindow
+
 
 class PreviewWindow : public BlockingWindow {
-	BButton *fFirst;
-	BButton *fNext;
-	BButton *fPrev;
-	BButton *fLast;
-	BButton *fZoomIn;
-	BButton *fZoomOut;
-	BTextControl *fPageNumber;
-	BStringView *fPageText;
-	PreviewView *fPreview;
-	BScrollView *fPreviewScroller;
-	float fButtonBarHeight;
-	
-	enum {
-		MSG_FIRST_PAGE = 'pwfp',			
-		MSG_NEXT_PAGE  = 'pwnp',
-		MSG_PREV_PAGE  = 'pwpp',
-		MSG_LAST_PAGE  = 'pwlp',			
-		MSG_FIND_PAGE  = 'pwsp',
-		MSG_ZOOM_IN    = 'pwzi',
-		MSG_ZOOM_OUT   = 'pwzo',
-	};
-
-	void ResizeToPage();
-	void UpdateControls();
-	
-	typedef BlockingWindow inherited; 
-	
 public:
-	PreviewWindow(BFile* jobFile);
-	status_t InitCheck() const { return fPreview->InitCheck(); }
-	void MessageReceived(BMessage* m);
-	status_t Go();
-};
+					PreviewWindow(BFile* jobFile);
 
+	virtual void			MessageReceived(BMessage* m);
+
+			status_t		Go();
+			status_t		InitCheck() const { return fPreview->InitCheck(); }
+
+
+private:
+			void			_ResizeToPage();
+			void			_UpdateControls();
+
+private:
+			BButton*		fFirst;
+			BButton*		fNext;
+			BButton*		fPrev;
+			BButton*		fLast;
+			BButton*		fZoomIn;
+			BButton*		fZoomOut;
+			BTextControl*	fPageNumber;
+			BStringView*	fPageText;
+			PreviewView*	fPreview;
+			BScrollView*	fPreviewScroller;
+			float			fButtonBarHeight;
+
+			enum {
+							MSG_FIRST_PAGE = 'pwfp',
+							MSG_NEXT_PAGE  = 'pwnp',
+							MSG_PREV_PAGE  = 'pwpp',
+							MSG_LAST_PAGE  = 'pwlp',
+							MSG_FIND_PAGE  = 'pwsp',
+							MSG_ZOOM_IN    = 'pwzi',
+							MSG_ZOOM_OUT   = 'pwzo',
+			};
+};
