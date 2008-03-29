@@ -58,6 +58,8 @@ const static rgb_color kTermColorTable[8] = {
 	{245, 245, 245, 0},	// white
 };
 
+// Space at the borders of the view
+const int32 kOffset = 3;
 
 #define ROWS_DEFAULT 25
 #define COLUMNS_DEFAULT 80
@@ -332,9 +334,9 @@ void
 TermView::GetPreferredSize(float *width, float *height)
 {
 	if (width)
-		*width = fTermColumns * fFontWidth;
+		*width = fTermColumns * fFontWidth + 2 * kOffset;
 	if (height)
-		*height = fTermRows * fFontHeight;
+		*height = fTermRows * fFontHeight + 2 * kOffset;
 }
 
 
@@ -371,7 +373,8 @@ TermView::SetTermSize(int rows, int cols, bool resize)
 	fScrTop = 0;
 	fScrBot = fTermRows - 1;
 
-	BRect rect(0, 0, fTermColumns * fFontWidth, fTermRows * fFontHeight);
+	BRect rect(0, 0, fTermColumns * fFontWidth + 2 * kOffset,
+		fTermRows * fFontHeight + 2 * kOffset);
 
 	if (resize)
 		ResizeTo(rect.Width(), rect.Height());
@@ -941,14 +944,16 @@ TermView::MoveCurDown(int num)
 void
 TermView::DrawCursor()
 {
-	BRect rect(fFontWidth * fCurPos.x, fFontHeight * fCurPos.y + fTop,
-		fFontWidth * (fCurPos.x + 1) - 1, fFontHeight * fCurPos.y + fTop + fCursorHeight - 1);
+	BRect rect(fFontWidth * fCurPos.x + kOffset,
+		fFontHeight * fCurPos.y + fTop + kOffset,
+		fFontWidth * (fCurPos.x + 1) - 1 + kOffset,
+		fFontHeight * fCurPos.y + fTop + fCursorHeight - 1 + kOffset);
 
 	uchar buf[4];
 	ushort attr;
 
-	int top = fTop / fFontHeight;
-	bool m_flag = _CheckSelectedRegion(CurPos(fCurPos.x, fCurPos.y + fTop / fFontHeight));
+	int top = (fTop + kOffset) / fFontHeight;
+	bool m_flag = _CheckSelectedRegion(CurPos(fCurPos.x, fCurPos.y + top));
 	if (fTextBuffer->GetChar(fCurPos.y + top, fCurPos.x, buf, &attr) == A_CHAR) {
 		int width;
 		if (IS_WIDTH(attr))
@@ -1109,6 +1114,10 @@ TermView::_DrawLines(int x1, int y1, ushort attr, uchar *buf,
 	rgb_color rgb_fore = fTextForeColor, rgb_back = fTextBackColor;
 
 	inView->SetFont(&fHalfFont);
+
+	// Move the whole thing to the right
+	x1 += kOffset;
+	y1 += kOffset;
 
 	// Set pen point
 	int x2 = x1 + fFontWidth * width;
@@ -1325,11 +1334,11 @@ TermView::Draw(BRect updateRect)
 		return;
 	}
 
-	int x1 =(int)updateRect.left / fFontWidth;
-	int x2 =(int)updateRect.right / fFontWidth;
+	int x1 =(int)(updateRect.left - kOffset) / fFontWidth;
+	int x2 =(int)(updateRect.right - kOffset) / fFontWidth;
 
-	int y1 =(int)updateRect.top / fFontHeight;
-	int y2 =(int)updateRect.bottom / fFontHeight;
+	int y1 =(int)(updateRect.top - kOffset) / fFontHeight;
+	int y2 =(int)(updateRect.bottom - kOffset) / fFontHeight;
 
 	Window()->BeginViewTransaction();
 
@@ -1354,10 +1363,10 @@ TermView::Draw(BRect updateRect)
 			if (count < 0) {
 				if (insideSelection) {
 					BRect eraseRect;
-					eraseRect.Set(fFontWidth * i,
-						fFontHeight * j,
-						fFontWidth * (i - count) -1,
-						fFontHeight * (j + 1) -1);
+					eraseRect.Set(fFontWidth * i + kOffset,
+					    fFontHeight * j + kOffset,
+					    fFontWidth * (i - count) -1 + kOffset,
+					    fFontHeight * (j + 1) -1 + kOffset);
 
 					SetHighColor(fSelectBackColor);
 					FillRect(eraseRect);
@@ -1387,17 +1396,17 @@ TermView::_DoPrint(BRect updateRect)
 	ushort attr;
 	uchar buf[256];
 
-	const int numLines =(int)((updateRect.Height()) / fFontHeight);
+	const int numLines = (int)((updateRect.Height()) / fFontHeight);
 
-	int y1 =(int)updateRect.top / fFontHeight;
+	int y1 = (int)(updateRect.top - kOffset) / fFontHeight;
 	y1 = y1 -(fScrBufSize - numLines * 2);
 	if (y1 < 0)
 		y1 = 0;
 
 	const int y2 = y1 + numLines -1;
 
-	const int x1 =(int)updateRect.left / fFontWidth;
-	const int x2 =(int)updateRect.right / fFontWidth;
+	const int x1 = (int)(updateRect.left - kOffset) / fFontWidth;
+	const int x2 = (int)(updateRect.right - kOffset) / fFontWidth;
 
 	for (int j = y1; j <= y2; j++) {
 		// If(x1, y1) Buffer is in string full width character,
@@ -1590,8 +1599,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 void
 TermView::FrameResized(float width, float height)
 {
-	const int cols = ((int)width + 1) / fFontWidth;
-	const int rows = ((int)height + 1) / fFontHeight;
+	const int cols = ((int)width + 1 - 2 * kOffset) / fFontWidth;
+	const int rows = ((int)height + 1 - 2 * kOffset) / fFontHeight;
 	
 	int offset = 0;
 
@@ -2166,7 +2175,7 @@ TermView::_SelectLine(BPoint where, int mod)
 CurPos
 TermView::_ConvertToTerminal(const BPoint &p)
 {
-	return CurPos(p.x / fFontWidth, p.y / fFontHeight);
+	return CurPos((p.x - kOffset) / fFontWidth, (p.y - kOffset) / fFontHeight);
 }
 
 
@@ -2174,7 +2183,8 @@ TermView::_ConvertToTerminal(const BPoint &p)
 BPoint
 TermView::_ConvertFromTerminal(const CurPos &pos)
 {
-	return BPoint(fFontWidth * pos.x, pos.y * fFontHeight + fTop);
+	return BPoint(fFontWidth * pos.x + kOffset,
+		pos.y * fFontHeight + fTop + kOffset);
 }
 
 
@@ -2202,23 +2212,23 @@ void
 TermView::GetFrameSize(float *width, float *height)
 {
 	if (width != NULL)
-		*width = fTermColumns * fFontWidth;
+		*width = 2 * kOffset + fTermColumns * fFontWidth;
 	
 	if (height == NULL)
 		return;
 	
 	if (!fTop) {
-		*height = fTermRows * fFontHeight;
+		*height = 2 * kOffset + fTermRows * fFontHeight;
 		return;
 	}
 	
 	if (fTop - fTermRows * fFontHeight > fScrBufSize * fFontHeight) {
 		
-		*height = fScrBufSize * fFontHeight;
+		*height = fScrBufSize * fFontHeight + 2 * kOffset;
 		return;
 	}
 	
-	*height = fTop + fTermRows * fFontHeight;
+	*height = kOffset + fTop + fTermRows * fFontHeight;
 }
 
 
@@ -2373,8 +2383,10 @@ TermView::InitiateDrag()
 inline void
 TermView::_Redraw(int x1, int y1, int x2, int y2)
 {
-	BRect rect(x1 * fFontWidth, y1 * fFontHeight,
-		(x2 + 1) * fFontWidth -1, (y2 + 1) * fFontHeight -1);
+	BRect rect(x1 * fFontWidth + kOffset,
+	    y1 * fFontHeight + kOffset,
+	    (x2 + 1) * fFontWidth + kOffset - 1,
+	    (y2 + 1) * fFontHeight -1 + kOffset);
 
 	if (LockLooper()) {
 		Invalidate(rect);
