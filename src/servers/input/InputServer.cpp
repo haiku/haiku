@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -920,10 +920,9 @@ InputServer::HandleFocusUnfocusIMAwareView(BMessage* message,
 }
 
 
-/**	Enqueues the message into the event queue.
- *	The message must only be deleted in case this method returns an error.
- */
-
+/*!	Enqueues the message into the event queue.
+	The message must only be deleted in case this method returns an error.
+*/
 status_t
 InputServer::EnqueueDeviceMessage(BMessage* message)
 {
@@ -941,10 +940,9 @@ InputServer::EnqueueDeviceMessage(BMessage* message)
 }
 
 
-/**	Enqueues the message into the method queue.
- *	The message must only be deleted in case this method returns an error.
- */
-
+/*!	Enqueues the message into the method queue.
+	The message must only be deleted in case this method returns an error.
+*/
 status_t
 InputServer::EnqueueMethodMessage(BMessage* message)
 {
@@ -1032,8 +1030,7 @@ InputServer::EventLoopRunning()
 }
 
 
-/**	The fInputDeviceListLocker must be locked when calling this function */
-
+/*!	The fInputDeviceListLocker must be locked when calling this function */
 InputDeviceListItem*
 InputServer::_FindInputDeviceListItem(BInputServerDevice& device)
 {
@@ -1387,11 +1384,10 @@ InputServer::_EventLoop()
 }
 
 
-/** Frees events from unwanted fields, adds missing fields, and removes
- *	unwanted events altogether.
- *	As a side effect, it will also update the internal mouse states.
- */
-
+/*!	Frees events from unwanted fields, adds missing fields, and removes
+	unwanted events altogether.
+	As a side effect, it will also update the internal mouse states.
+*/
 bool
 InputServer::_SanitizeEvents(EventList& events)
 {
@@ -1447,6 +1443,8 @@ InputServer::_SanitizeEvents(EventList& events)
 					event->RemoveName("x"); 
 					event->RemoveName("y");
 					event->AddPoint("where", fMousePos);
+					event->AddInt32("be:delta_x", x);
+					event->AddInt32("be:delta_y", y);
 
 					PRINT(("new position: %f, %f, %ld, %ld\n",
 						fMousePos.x, fMousePos.y, x, y));
@@ -1527,11 +1525,10 @@ InputServer::_SanitizeEvents(EventList& events)
 }
 
 
-/** Applies the filters of the active input method to the
- *	incoming events. It will also move the events in the method
- *	queue to the event list.
- */
-
+/*!	Applies the filters of the active input method to the
+	incoming events. It will also move the events in the method
+	queue to the event list.
+*/
 bool
 InputServer::_MethodizeEvents(EventList& events)
 {
@@ -1620,13 +1617,12 @@ InputServer::_MethodizeEvents(EventList& events)
 }
 
 
-/**	This method applies all defined filters to each event in the
- *	supplied list.  The supplied list is modified to reflect the
- *	output of the filters.
- *	The method returns true if the filters were applied to all
- *	events without error and false otherwise.
- */
-
+/*!	This method applies all defined filters to each event in the
+	supplied list.  The supplied list is modified to reflect the
+	output of the filters.
+	The method returns true if the filters were applied to all
+	events without error and false otherwise.
+*/
 bool
 InputServer::_FilterEvents(EventList& events)
 {
@@ -1669,11 +1665,10 @@ InputServer::_DispatchEvents(EventList& events)
 }
 
 
-/**	Applies the given filter to the event list.
- *	For your convenience, it also alters the \a index and \a count arguments
- *	ready for the next call to this method.
- */
-
+/*!	Applies the given filter to the event list.
+	For your convenience, it also alters the \a index and \a count arguments
+	ready for the next call to this method.
+*/
 void
 InputServer::_FilterEvent(BInputServerFilter* filter, EventList& events,
 	int32& index, int32& count)
