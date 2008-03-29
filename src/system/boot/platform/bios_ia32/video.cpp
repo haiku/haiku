@@ -405,11 +405,22 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 	}
 
 	// Choose default resolution (when no EDID information is available)
-	// TODO: eventually enlarge this to 1024x768?
-	const uint32 kWidth = 800;
-	standardMode = find_video_mode(kWidth, -1, false);
-	if (standardMode == NULL)
-		standardMode = find_video_mode(kWidth, -1, true);
+	const uint32 kPreferredWidth = 1024;
+	const uint32 kFallbackWidth = 800;
+
+	standardMode = find_video_mode(kPreferredWidth, -1, false);
+	if (standardMode == NULL) {
+		standardMode = find_video_mode(kFallbackWidth, -1, false);
+		if (standardMode == NULL) {
+			standardMode = find_video_mode(kPreferredWidth, -1, true);
+			if (standardMode == NULL)
+				standardMode = find_video_mode(kFallbackWidth, -1, true);
+		}
+	}
+	if (standardMode == NULL) {
+		// just take any mode
+		standardMode = (video_mode *)list_get_first_item(&sModeList);
+	}
 
 	if (standardMode == NULL) {
 		// no usable VESA mode found...
