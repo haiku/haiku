@@ -102,14 +102,33 @@ extern const char * color_space_name(color_space space);
 	GLuint *P = (GLuint *)(((GLubyte **) mr->GetRows())[Y] + (X) * 4)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
-   *DST = ( ((VALUE[RCOMP]) << 16) | \
+	*DST = ( ((VALUE[RCOMP]) << 16) | \
    			((VALUE[GCOMP]) << 8) | \
    			((VALUE[BCOMP]) ) )
 #define FETCH_PIXEL(DST, SRC) \
-   DST[RCOMP] = ((*SRC & 0x00ff0000) >> 16);  \
-   DST[GCOMP] = ((*SRC & 0x0000ff00) >> 8);  \
-   DST[BCOMP] = ((*SRC & 0x000000ff)); \
-   DST[ACOMP] = 0xff;
+	DST[RCOMP] = ((*SRC & 0x00ff0000) >> 16);  \
+	DST[GCOMP] = ((*SRC & 0x0000ff00) >> 8);  \
+	DST[BCOMP] = ((*SRC & 0x000000ff)); \
+	DST[ACOMP] = 0xff;
+#include "swrast/s_spantemp.h"
+
+/* 24-bit RGB */
+#define NAME(PREFIX) PREFIX##_RGB24
+#define RB_TYPE GLubyte
+#define SPAN_VARS \
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+#define INIT_PIXEL_PTR(P, X, Y) \
+	GLubyte *P = ((GLubyte **) mr->GetRows())[Y] + (X) * 3
+#define INC_PIXEL_PTR(P) P += 3
+#define STORE_PIXEL(DST, X, Y, VALUE) \
+	DST[BE_RCOMP] = VALUE[RCOMP]; \
+	DST[BE_GCOMP] = VALUE[GCOMP]; \
+	DST[BE_BCOMP] = VALUE[BCOMP];
+#define FETCH_PIXEL(DST, SRC) \
+	DST[RCOMP] = SRC[BE_RCOMP];  \
+	DST[GCOMP] = SRC[BE_GCOMP];  \
+	DST[BCOMP] = SRC[BE_BCOMP]; \
+	DST[ACOMP] = 0xff;
 #include "swrast/s_spantemp.h"
 
 /* 16-bit RGB */
@@ -121,14 +140,14 @@ extern const char * color_space_name(color_space space);
 	GLushort *P = (GLushort *) (((GLubyte **) mr->GetRows())[Y] + (X) * 2)
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
-   *DST = ( (((VALUE[RCOMP]) & 0xf8) << 8) | \
+	*DST = ( (((VALUE[RCOMP]) & 0xf8) << 8) | \
           (((VALUE[GCOMP]) & 0xfc) << 3) | \
           (((VALUE[BCOMP])       ) >> 3) )
 #define FETCH_PIXEL(DST, SRC) \
-   DST[RCOMP] = ((*SRC & 0xf800) >> 8); \
-   DST[GCOMP] = ((*SRC & 0x07e0) >> 3); \
-   DST[BCOMP] = ((*SRC & 0x001f) << 3); \
-   DST[ACOMP] = 0xff
+	DST[RCOMP] = ((*SRC & 0xf800) >> 8); \
+	DST[GCOMP] = ((*SRC & 0x07e0) >> 3); \
+	DST[BCOMP] = ((*SRC & 0x001f) << 3); \
+	DST[ACOMP] = 0xff
 #include "swrast/s_spantemp.h"
 
 
@@ -292,6 +311,15 @@ MesaSoftwareRenderer::LockGL()
 					fRenderBuffer->PutMonoRow = put_mono_row_RGB32;
 					fRenderBuffer->PutValues = put_values_RGB32;
 					fRenderBuffer->PutMonoValues = put_mono_values_RGB32;
+					break;
+				case B_RGB24:
+					fRenderBuffer->GetRow = get_row_RGB24;
+					fRenderBuffer->GetValues = get_values_RGB24;
+					fRenderBuffer->PutRow = put_row_RGB24;
+					fRenderBuffer->PutRowRGB = put_row_rgb_RGB24;
+					fRenderBuffer->PutMonoRow = put_mono_row_RGB24;
+					fRenderBuffer->PutValues = put_values_RGB24;
+					fRenderBuffer->PutMonoValues = put_mono_values_RGB24;
 					break;
 				case B_RGB16:
 					fRenderBuffer->GetRow = get_row_RGB16;
