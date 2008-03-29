@@ -33,6 +33,8 @@ typedef uint32_t socklen_t;
 #define PF_ROUTE		AF_ROUTE
 #define PF_LINK			AF_LINK
 #define PF_INET6		AF_INET6
+#define PF_LOCAL		AF_LOCAL
+#define PF_UNIX			AF_UNIX
 
 /* Socket types */
 #define	SOCK_STREAM	1
