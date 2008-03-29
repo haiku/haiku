@@ -1449,7 +1449,7 @@ void FlangerNode::filterBuffer(
 		if(readFrameLo != (int32)fReadFrame) {
 
 			// interpolate (A)
-			int32 readFrameHi = (int32)ceil(fReadFrame);			
+			uint32 readFrameHi = (int32)ceil(fReadFrame);			
 			delayedFrame.channel[0] *= ((float)readFrameHi - fReadFrame);
 			if(stereo)
 				delayedFrame.channel[1] *= ((float)readFrameHi - fReadFrame);

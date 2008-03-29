@@ -19,12 +19,13 @@ RawBuffer::RawBuffer(
 	rtm_pool* pFromPool) :
 	
 	m_pData(0),
-	m_allocatedSize(0),
+	m_pPool(pFromPool),
 	m_frameSize(frameSize),
 	m_frames(frames),
+	m_allocatedSize(0),
 	m_bCircular(bCircular),
-	m_bOwnData(true),
-	m_pPool(pFromPool) {
+	m_bOwnData(true)
+{
 	
 	if(m_frames)
 		resize(m_frames);
@@ -40,12 +41,13 @@ RawBuffer::RawBuffer(
 	rtm_pool* pFromPool) :
 		
 	m_pData(pData),
-	m_allocatedSize(0),
+	m_pPool(pFromPool),
 	m_frameSize(frameSize),
 	m_frames(frames),
-	m_bOwnData(false),
+	m_allocatedSize(0),
 	m_bCircular(bCircular),
-	m_pPool(pFromPool) {}
+	m_bOwnData(false)
+{}
 
 RawBuffer::RawBuffer(const RawBuffer& clone) {
 	operator=(clone);

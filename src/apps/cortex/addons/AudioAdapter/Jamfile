@@ -1,0 +1,25 @@
+SubDir HAIKU_TOP src apps cortex addons AudioAdapter ;
+
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps cortex addons common ] ;
+SubDirHdrs [ FDirName $(HAIKU_TOP) src apps cortex addons audioOps ] ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps cortex addons common ] ;
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps cortex addons audioOps ] ;
+
+Addon cortex_audioadapter.media_addon :
+	AudioAdapterAddOn.cpp
+	AudioAdapterNode.cpp
+	AudioAdapterParams.cpp
+
+	# audioOps/
+        AudioAdapterOp.cpp
+
+	# common/
+	AudioBuffer.cpp
+	AudioFilterNode.cpp
+	IParameterSet.cpp
+	RawBuffer.cpp
+	SoundUtils.cpp
+
+	: be media
+;

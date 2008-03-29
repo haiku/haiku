@@ -105,7 +105,10 @@ public:													// *** HOOKS
 
 		media_format preferred;
 		preferred.type = B_MEDIA_RAW_AUDIO;
-		status_t err = getPreferredInputFormat(preferred);
+#ifdef DEBUG
+		status_t err =
+#endif
+		getPreferredInputFormat(preferred);
 		ASSERT(err == B_OK);
 		_specialize_raw_audio_format(preferred, ioFormat);
 	}
@@ -121,7 +124,10 @@ public:													// *** HOOKS
 
 		media_format preferred;
 		preferred.type = B_MEDIA_RAW_AUDIO;
-		status_t err = getPreferredOutputFormat(preferred);
+#ifdef DEBUG
+		status_t err =
+#endif
+		getPreferredOutputFormat(preferred);
 		ASSERT(err == B_OK);
 
 		string_for_format(preferred, fmt_buffer, 255);

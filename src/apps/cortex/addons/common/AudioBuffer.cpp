@@ -279,7 +279,7 @@ uint32 AudioBuffer::findMin(uint32 fromFrame, uint32 frameCount,
 			n = 0;
 		}
 				
-		float fCur;
+		float fCur = 0;
 		convert_sample(pCur, fCur, m_format.format);
 		
 		if(fCur < pMin[n % channels]) {
@@ -332,7 +332,7 @@ uint32 AudioBuffer::findMax(uint32 fromFrame, uint32 frameCount,
 			n = 0;
 		}
 				
-		float fCur;
+		float fCur = 0;
 		convert_sample(pCur, fCur, m_format.format);
 		
 		if(fCur > pMax[n % channels]) {
@@ -384,7 +384,7 @@ uint32 AudioBuffer::findPeaks(uint32 fromFrame, uint32 frameCount,
 			n = 0;
 		}
 				
-		float fCur;
+		float fCur = 0;
 		convert_sample(pCur, fCur, m_format.format);
 		
 		if(fabs(fCur) > pPeaks[n % channels]) {
@@ -437,7 +437,7 @@ uint32 AudioBuffer::average(uint32 fromFrame, uint32 frameCount,
 			n = 0;
 		}
 				
-		float fCur;
+		float fCur = 0;
 		convert_sample(pCur, fCur, m_format.format);
 
 		pAverage[n%channels] += fCur;

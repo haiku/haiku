@@ -136,7 +136,7 @@ inline void convert_sample(void* pIn, void* pOut,
 
 	else {	
 		// two-step cases
-		float fTemp;
+		float fTemp = 0;
 		convert_sample(pIn, fTemp, in_audio_format);
 		convert_sample(fTemp, pOut, out_audio_format);
 	}

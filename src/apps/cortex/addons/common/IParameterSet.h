@@ -10,6 +10,7 @@
 #ifndef __IParameterSet_H__
 #define __IParameterSet_H__
 
+#include <ParameterWeb.h>
 #include <SupportDefs.h>
 
 class IParameterSet {

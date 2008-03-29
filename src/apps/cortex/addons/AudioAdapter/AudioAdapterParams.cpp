@@ -6,7 +6,7 @@
 #include <ParameterWeb.h>
 
 status_t
-_AudioAdapterParams::store(parameterID, const void* data, size_t size)
+_AudioAdapterParams::store(int32 parameterID, const void* data, size_t size)
 {
 	if (size < sizeof(int32))
 		return B_NO_MEMORY;

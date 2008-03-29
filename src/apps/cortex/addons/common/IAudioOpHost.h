@@ -11,6 +11,7 @@ class IParameterSet;
 
 class IAudioOpHost {
 public:											// *** REQUIRED INTERFACE
+	virtual ~IAudioOpHost() { }
 	virtual IParameterSet* parameterSet() const =0;
 };
 

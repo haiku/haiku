@@ -595,7 +595,10 @@ void AudioFilterNode::Disconnected(
 	// mark disconnected
 	m_input.source = media_source::null;
 
-	status_t err = getRequiredInputFormat(m_input.format);
+#ifdef DEBUG
+	status_t err =
+#endif
+	getRequiredInputFormat(m_input.format);
 	ASSERT(err == B_OK);
 	
 	// remove operation
@@ -819,13 +822,16 @@ void AudioFilterNode::Disconnect(
 		PRINT(("\tbad destination\n"));
 		return;
 	}
-	
+
 	// clean up
 	m_output.destination = media_destination::null;
-	
-	status_t err = getRequiredOutputFormat(m_output.format);
+
+#ifdef DEBUG
+	status_t err =
+#endif
+	getRequiredOutputFormat(m_output.format);
 	ASSERT(err == B_OK);
-	
+
 	updateBufferGroup();
 	
 	if(m_op) {
