@@ -61,3 +61,6 @@ inet_lnaof(in)
 	else
 		return ((i)&IN_CLASSC_HOST);
 }
+
+#undef inet_lnaof
+#pragma weak inet_lnaof=__inet_lnaof

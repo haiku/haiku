@@ -85,3 +85,6 @@ inet_neta(src, dst, size)
 	errno = EMSGSIZE;
 	return (NULL);
 }
+
+#undef inet_neta
+#pragma weak inet_neta=__inet_neta

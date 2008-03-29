@@ -403,3 +403,6 @@ inet_net_pton(int af, const char *src, void *dst, size_t size) {
 		return (-1);
 	}
 }
+
+#undef inet_net_pton
+#pragma weak inet_net_pton=__inet_net_pton

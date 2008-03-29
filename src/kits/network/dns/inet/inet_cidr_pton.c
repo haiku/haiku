@@ -273,3 +273,6 @@ getbits(const char *src, int ipv6) {
 
 	return (bits);
 }
+
+#undef inet_cidr_pton
+#pragma weak inet_cidr_pton=__inet_cidr_pton

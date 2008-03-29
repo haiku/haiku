@@ -257,3 +257,6 @@ inet_cidr_ntop_ipv6(const u_char *src, int bits, char *dst, size_t size) {
 	strcpy(dst, tmp);
 	return (dst);
 }
+
+#undef inet_cidr_ntop
+#pragma weak inet_cidr_ntop=__inet_cidr_ntop

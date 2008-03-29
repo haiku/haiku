@@ -220,3 +220,6 @@ inet_pton6(src, dst)
 	memcpy(dst, tmp, NS_IN6ADDRSZ);
 	return (1);
 }
+
+#undef inet_pton
+#pragma weak inet_pton=__inet_pton

@@ -106,3 +106,8 @@ inet_nsap_ntoa(int binlen, const u_char *binary, char *ascii) {
 	*ascii = '\0';
 	return (start);
 }
+
+#undef inet_nsap_addr
+#undef inet_nsap_ntoa
+#pragma weak inet_nsap_addr=__inet_nsap_addr
+#pragma weak inet_nsap_ntoa=__inet_nsap_ntoa

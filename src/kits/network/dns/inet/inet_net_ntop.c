@@ -275,3 +275,6 @@ emsgsize:
 	errno = EMSGSIZE;
 	return (NULL);
 }
+
+#undef inet_net_ntop
+#pragma weak inet_net_ntop=__inet_net_ntop

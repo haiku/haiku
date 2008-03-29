@@ -201,3 +201,6 @@ inet_ntop6(src, dst, size)
 	strcpy(dst, tmp);
 	return (dst);
 }
+
+#undef inet_ntop
+#pragma weak inet_ntop=__inet_ntop

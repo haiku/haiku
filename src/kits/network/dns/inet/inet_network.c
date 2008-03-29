@@ -102,3 +102,6 @@ again:
 	}
 	return (val);
 }
+
+#undef inet_network
+#pragma weak inet_network=__inet_network

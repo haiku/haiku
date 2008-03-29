@@ -206,5 +206,6 @@ inet_aton(const char *cp, struct in_addr *addr) {
 }
 
 #undef inet_addr
+#undef inet_aton
 #pragma weak inet_addr=__inet_addr
-
+#pragma weak inet_aton=__inet_aton

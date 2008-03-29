@@ -64,3 +64,6 @@ inet_makeaddr(net, host)
 	a.s_addr = htonl(a.s_addr);
 	return (a);
 }
+
+#undef inet_makeaddr
+#pragma weak inet_makeaddr=__inet_makeaddr

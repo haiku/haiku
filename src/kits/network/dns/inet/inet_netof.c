@@ -60,3 +60,6 @@ inet_netof(in)
 	else
 		return (((i)&IN_CLASSC_NET) >> IN_CLASSC_NSHIFT);
 }
+
+#undef inet_netof
+#pragma weak inet_netof=__inet_netof
