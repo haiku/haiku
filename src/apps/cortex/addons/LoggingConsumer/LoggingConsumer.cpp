@@ -66,7 +66,6 @@ LoggingConsumer::LoggingConsumer(
 		BBufferConsumer(B_MEDIA_UNKNOWN_TYPE),
 		BControllable(),
 		BMediaEventLooper(),
-		m_pAddOn(pAddOn),
 		mLogRef(logFile),
 		mWeb(NULL),
 		mLateBuffers(0),
@@ -75,7 +74,8 @@ LoggingConsumer::LoggingConsumer(
 		mPriority(B_URGENT_DISPLAY_PRIORITY),		// !!! testing; will be B_REAL_TIME_PRIORITY for release
 		mLastLatencyChange(0),
 		mLastSpinChange(0),
-		mLastPrioChange(0)
+		mLastPrioChange(0),
+		m_pAddOn(pAddOn)
 {
 	// spin off the logging thread
 	mLogger = new LogWriter(logFile);

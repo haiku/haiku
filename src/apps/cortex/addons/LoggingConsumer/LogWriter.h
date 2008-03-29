@@ -105,7 +105,7 @@ class LogWriter
 {
 public:
 	// Set:  output for the log_what members is disabled
-	typedef set<log_what> FilterSet;
+	typedef std::set<log_what> FilterSet;
 
 public:
 	LogWriter(const entry_ref& logRef);
