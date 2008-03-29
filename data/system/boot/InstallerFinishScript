@@ -1,5 +1,20 @@
 #!/bin/sh
 ## The installer finish script.
 
+mount=$1
+
+if [ -z $mount ]; then
+	echo "Usage: $0 volume"
+	exit 1
+fi
+
+if [ ! -d $mount ]; then
+	echo "$mount isn't mounted"
+	exit 1
+fi
+
+mkdir -p "$mount/var/tmp"
+
+makebootable $mount
 
 
