@@ -141,8 +141,8 @@ extern const char * color_space_name(color_space space);
 #define INC_PIXEL_PTR(P) P += 1
 #define STORE_PIXEL(DST, X, Y, VALUE) \
 	*DST = ( (((VALUE[RCOMP]) & 0xf8) << 8) | \
-          (((VALUE[GCOMP]) & 0xfc) << 3) | \
-          (((VALUE[BCOMP])       ) >> 3) )
+		(((VALUE[GCOMP]) & 0xfc) << 3) | \
+		(((VALUE[BCOMP])       ) >> 3) )
 #define FETCH_PIXEL(DST, SRC) \
 	DST[RCOMP] = ((*SRC & 0xf800) >> 8); \
 	DST[GCOMP] = ((*SRC & 0x07e0) >> 3); \
@@ -150,6 +150,24 @@ extern const char * color_space_name(color_space space);
 	DST[ACOMP] = 0xff
 #include "swrast/s_spantemp.h"
 
+/* 15-bit RGB */
+#define NAME(PREFIX) PREFIX##_RGB15
+#define RB_TYPE GLubyte
+#define SPAN_VARS \
+        MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx;
+#define INIT_PIXEL_PTR(P, X, Y) \
+	GLushort *P = (GLushort *) (((GLubyte **) mr->GetRows())[Y] + (X) * 2)
+#define INC_PIXEL_PTR(P) P += 1
+#define STORE_PIXEL(DST, X, Y, VALUE) \
+	*DST = ( (((VALUE[RCOMP]) & 0xf8) << 7) | \
+		(((VALUE[GCOMP]) & 0xf8) << 2) | \
+		(((VALUE[BCOMP])       ) >> 3) )
+#define FETCH_PIXEL(DST, SRC) \
+	DST[RCOMP] = ((*SRC & 0x7c00) >> 7); \
+	DST[GCOMP] = ((*SRC & 0x03e0) >> 2); \
+	DST[BCOMP] = ((*SRC & 0x001f) << 3); \
+	DST[ACOMP] = 0xff
+#include "swrast/s_spantemp.h"
 
 extern "C" _EXPORT BGLRenderer*
 instantiate_gl_renderer(BGLView* view, ulong options,
@@ -329,6 +347,15 @@ MesaSoftwareRenderer::LockGL()
 					fRenderBuffer->PutMonoRow = put_mono_row_RGB16;
 					fRenderBuffer->PutValues = put_values_RGB16;
 					fRenderBuffer->PutMonoValues = put_mono_values_RGB16;
+					break;
+				case B_RGB15:
+					fRenderBuffer->GetRow = get_row_RGB15;
+					fRenderBuffer->GetValues = get_values_RGB15;
+					fRenderBuffer->PutRow = put_row_RGB15;
+					fRenderBuffer->PutRowRGB = put_row_rgb_RGB15;
+					fRenderBuffer->PutMonoRow = put_mono_row_RGB15;
+					fRenderBuffer->PutValues = put_values_RGB15;
+					fRenderBuffer->PutMonoValues = put_mono_values_RGB15;
 					break;
 				default:
 					fprintf(stderr, "unsupported screen color space %d\n", cs);
