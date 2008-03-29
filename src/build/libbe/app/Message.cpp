@@ -1,19 +1,20 @@
 /*
- * Copyright 2005-2007, Haiku Inc. All rights reserved.
+ * Copyright 2005-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-#include <Message.h>
-#include <MessageAdapter.h>
-#include <MessagePrivate.h>
-#include <MessageUtils.h>
 
-#include <TokenSpace.h>
+#include <Message.h>
+
+#include <assert.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Application.h>
-#include <AppMisc.h>
 #include <BlockCache.h>
 #include <Entry.h>
 #include <MessageQueue.h>
@@ -23,11 +24,11 @@
 #include <Rect.h>
 #include <String.h>
 
-#include <assert.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <AppMisc.h>
+#include <MessageAdapter.h>
+#include <MessagePrivate.h>
+#include <MessageUtils.h>
+#include <TokenSpace.h>
 
 
 const char *B_SPECIFIER_ENTRY = "specifiers";
@@ -384,7 +385,8 @@ BMessage::_PrintToStream(const char* indent) const
 				case B_STRING_TYPE:	{
 					ssize_t size = *(ssize_t *)pointer;
 					pointer += sizeof(ssize_t);
-					printf("string(\"%s\", %ld bytes)\n", (char *)pointer, size);
+					printf("string(\"%s\", %ld bytes)\n", (char *)pointer,
+						(long)size);
 					pointer += size;
 					break;
 				}
@@ -425,7 +427,7 @@ BMessage::_PrintToStream(const char* indent) const
 					BPrivate::entry_ref_unflatten(&ref, (char *)pointer, size);
 
 					printf("entry_ref(device=%ld, directory=%lld, name=\"%s\", ",
-							ref.device, ref.directory, ref.name);
+						(long)ref.device, ref.directory, ref.name);
 
 					BPath path(&ref);
 					printf("path=\"%s\")\n", path.Path());
@@ -441,7 +443,7 @@ BMessage::_PrintToStream(const char* indent) const
 					BMessage message;
 					const ssize_t size = *(const ssize_t *)pointer;
 					pointer += sizeof(ssize_t);
-					if (message.Unflatten((const char *)pointer)!=B_OK) {
+					if (message.Unflatten((const char *)pointer) != B_OK) {
 						fprintf(stderr, "couldn't unflatten item %ld\n", i);
 						break;
 					}
@@ -451,9 +453,10 @@ BMessage::_PrintToStream(const char* indent) const
 					break;
 				}
 
-				default: {
-					printf("(type = '%.4s')(size = %ld)\n", (char *)&value, size);
-				}
+				default:
+					printf("(type = '%.4s')(size = %ld)\n", (char *)&value,
+						(long)size);
+					break;
 			}
 		}
 	}
