@@ -115,6 +115,9 @@ status_t vfs_unmount(dev_t mountID, uint32 flags);
 status_t vfs_disconnect_vnode(dev_t mountID, ino_t vnodeID);
 void vfs_free_unused_vnodes(int32 level);
 
+status_t vfs_read_stat(int fd, const char *path, bool traverseLeafLink,
+			struct stat *stat, bool kernel);
+
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName,
 			char *pathBuffer, size_t bufferSize);

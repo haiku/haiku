@@ -241,6 +241,9 @@ static status_t common_ioctl(struct file_descriptor *, ulong, void *buf, size_t 
 static status_t common_read_stat(struct file_descriptor *, struct stat *);
 static status_t common_write_stat(struct file_descriptor *, const struct stat *, int statMask);
 
+static status_t common_path_read_stat(int fd, char *path, bool traverseLeafLink,
+	struct stat *stat, bool kernel);
+
 static status_t vnode_path_to_vnode(struct vnode *vnode, char *path,
 	bool traverseLeafLink, int count, struct vnode **_vnode, ino_t *_parentID, int *_type);
 static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
@@ -3299,6 +3302,39 @@ vfs_get_fs_node_from_path(dev_t mountID, const char *path, bool kernel,
 
 	*_node = vnode->private_node;
 	return B_OK;
+}
+
+
+status_t
+vfs_read_stat(int fd, const char *path, bool traverseLeafLink,
+	struct stat *stat, bool kernel)
+{
+	status_t status;
+
+	if (path) {
+		// path given: get the stat of the node referred to by (fd, path)
+		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
+		if (pathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
+
+		status = common_path_read_stat(fd, pathBuffer.LockBuffer(),
+			traverseLeafLink, stat, kernel);
+	} else {
+		// no path given: get the FD and use the FD operation
+		struct file_descriptor *descriptor
+			= get_fd(get_current_io_context(kernel), fd);
+		if (descriptor == NULL)
+			return B_FILE_ERROR;
+
+		if (descriptor->ops->fd_read_stat)
+			status = descriptor->ops->fd_read_stat(descriptor, stat);
+		else
+			status = EOPNOTSUPP;
+
+		put_fd(descriptor);
+	}
+
+	return status;
 }
 
 
@@ -6910,28 +6946,7 @@ _kern_read_stat(int fd, const char *path, bool traverseLeafLink,
 		stat = &completeStat;
 	}
 
-	if (path) {
-		// path given: get the stat of the node referred to by (fd, path)
-		KPath pathBuffer(path, false, B_PATH_NAME_LENGTH + 1);
-		if (pathBuffer.InitCheck() != B_OK)
-			return B_NO_MEMORY;
-
-		status = common_path_read_stat(fd, pathBuffer.LockBuffer(),
-			traverseLeafLink, stat, true);
-	} else {
-		// no path given: get the FD and use the FD operation
-		struct file_descriptor *descriptor
-			= get_fd(get_current_io_context(true), fd);
-		if (descriptor == NULL)
-			return B_FILE_ERROR;
-
-		if (descriptor->ops->fd_read_stat)
-			status = descriptor->ops->fd_read_stat(descriptor, stat);
-		else
-			status = EOPNOTSUPP;
-
-		put_fd(descriptor);
-	}
+	status = vfs_read_stat(fd, path, traverseLeafLink, stat, true);
 
 	if (status == B_OK && originalStat != NULL)
 		memcpy(originalStat, stat, statSize);
