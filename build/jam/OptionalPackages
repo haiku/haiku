@@ -1,0 +1,223 @@
+# This file defines the optional packages that can be added to the Haiku image.
+# It is directly included from HaikuImage -- all variables defined there can
+# be used
+
+# package dependencies
+OptionalPackageDependencies Development : Perl ;
+
+
+# Development
+if [ IsOptionalHaikuImagePackageAdded Development ]
+		&& $(TARGET_ARCH) = x86 {
+	# glue code
+	AddFilesToHaikuImage develop lib x86
+		: <src!system!glue!arch!x86>crti.o <src!system!glue!arch!x86>crtn.o
+		  <src!system!glue>init_term_dyn.o <src!system!glue>start_dyn.o ;
+
+	# library symlinks
+	local lib ;
+	for lib in $(BEOS_SYSTEM_LIBS)
+		$(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) libglut.so {
+		AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
+	}
+
+	# static libraries
+	AddFilesToHaikuImage develop lib x86 : libncurses.a ;
+
+	# cc and c++ wrapper scripts
+	AddFilesToHaikuImage beos bin : cc c++ ;
+
+	# headers
+	AddHeaderDirectoryToHaikuImage gnu : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage os ;
+	AddHeaderDirectoryToHaikuImage posix ;
+
+	# add _G_config.h to posix/
+	SEARCH on <header>_G_config.h = [ FDirName $(HAIKU_TOP) headers glibc ] ;
+	AddFilesToHaikuImage develop headers posix : <header>_G_config.h ;
+
+	# create be -> os symlink for now
+	AddSymlinkToHaikuImage develop headers : os : be ;
+
+	# create gnu -> 3rdparty symlink
+	AddSymlinkToHaikuImage develop headers : 3rdparty : gnu ;
+		# TODO: Change BEINCLUDES and gcc to refer to 3rdparty rather than gnu.
+
+	# third party libs headers
+	AddHeaderDirectoryToHaikuImage libs ncurses : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage libs png : 3rdparty ;
+	AddHeaderDirectoryToHaikuImage libs zlib : 3rdparty ;
+
+	if $(HAIKU_GCC_VERSION[1]) > 2 {
+		# gcc 4
+
+		# symlink cpp to g++'s headers
+		AddSymlinkToHaikuImage develop headers
+			: /boot/develop/tools/gnupro/include/g++ : cpp ;
+	} else {
+		# gcc 2.95.3
+
+		AddHeaderDirectoryToHaikuImage cpp ;
+
+		# gcc and binutils
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-080323
+			: $(baseURL)/gcc-2.95.3-haiku-080323.zip
+			: develop tools
+		;
+		AddSymlinkToHaikuImage develop tools : gcc-2.95.3-haiku-080323
+			: gnupro ;
+
+		# other tools
+		InstallOptionalHaikuImagePackage autoconf-2.61-gcc2-2008-03-24
+			: $(baseURL)/autoconf-2.61-gcc2-2008-03-24.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-03-24
+			: $(baseURL)/automake-1.10.1-gcc2-2008-03-24.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage bison-2.3-gcc2-2008-03-28
+			: $(baseURL)/bison-2.3-gcc2-2008-03-28.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage flex-2.5.35-gcc2-2008-03-28
+			: $(baseURL)/flex-2.5.35-gcc2-2008-03-28.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27
+			: $(baseURL)/jam-haiku-gcc2-2008-03-27.zip
+			: home config bin
+		;
+		InstallOptionalHaikuImagePackage libtool-1.5.26-gcc2-2008-03-24
+			: $(baseURL)/libtool-1.5.26-gcc2-2008-03-24.zip
+			: home
+		;
+		InstallOptionalHaikuImagePackage texinfo-4.11-gcc2-2008-03-24
+			: $(baseURL)/texinfo-4.11-gcc2-2008-03-24.zip
+			: home
+		;
+	}
+}
+
+
+# Firefox web browser
+if [ IsOptionalHaikuImagePackageAdded Firefox ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Firefox available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Firefox
+			: http://www.sheltonfamily.org/firefoxbuilds/firefox-2.0.0.12.en-US.beosR5-i586.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/firefox/firefox ;
+	}
+}
+
+
+# Links web browser
+if [ IsOptionalHaikuImagePackageAdded Links ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Links available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Links
+			: http://revolf.free.fr/beos/links-beos-bin.zip
+			:
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/home/config/bin/links ;
+	}
+}
+
+
+# OpenSound drivers
+if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package OpenSound available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage OpenSound
+			: http://revolf.free.fr/beos/oss-beos-v4.1test-bin.zip
+			:
+		;
+	}
+	#UnzipArchiveToHaikuImage home : data/vv.mp3.zip : 0 ;
+}
+
+
+# Pe text editor
+if [ IsOptionalHaikuImagePackageAdded Pe ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Pe available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage pe-2.4.1-x86
+			: http://dl.hirschkaefer.de/beos/pe-2.4.1-x86.zip
+			: apps
+		;
+
+		# TODO: The installation directory should probably be renamed to just
+		# "pe" (or "Pe") and the contained "(drag lpe here...)" be removed.
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/pe-2.4.1-x86/pe ;
+		AddSymlinkToHaikuImage home config bin
+			: /boot/apps/pe-2.4.1-x86/lpe ;
+	}
+}
+
+
+# Perl
+if [ IsOptionalHaikuImagePackageAdded Perl ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Perl available for gcc4" ;
+	} else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage perl-5.10.0-gcc2-2008-03-24
+			: $(baseURL)/perl-5.10.0-gcc2-2008-03-24.zip
+			: home
+		;
+	}
+}
+
+
+# Vision
+if [ IsOptionalHaikuImagePackageAdded Vision ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Vision available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Vision
+			: http://vision.sf.net/Vision-0.9.7-H-06032008.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Vision-0.9.7-H-06032008/Vision ;
+	}
+}
+
+# VLC media player
+if [ IsOptionalHaikuImagePackageAdded VLC ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package VLC available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage VLC
+			: http://www.yellowbites.com/downloads/vlc-0.8.6c.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/vlc-0.8.6c/vlc ;
+	}
+}
+
+
+# WonderBrush
+if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package WonderBrush available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage WonderBrush
+			: http://www.yellowbites.com/downloads/WonderBrush-2.1.1-demo-x86-R5.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/WonderBrush/WonderBrush ;
+	}
+}
