@@ -18,19 +18,18 @@
 #include <string.h>
 
 #include <Application.h>
-#include <AppMisc.h>
 #include <Handler.h>
 #include <Looper.h>
-#include <LooperList.h>
 #include <Message.h>
-#include <MessageUtils.h>
-#include <MessengerPrivate.h>
 #include <OS.h>
 #include <Roster.h>
-#include <TokenSpace.h>
 
+#include <AppMisc.h>
+#include <LooperList.h>
+#include <MessageUtils.h>
+#include <MessengerPrivate.h>
 #include <ObjectLocker.h>
-//#include "TokenSpace.h"
+#include <TokenSpace.h>
 
 #define DBG(x)
 #define OUT	printf
