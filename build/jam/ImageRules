@@ -658,6 +658,13 @@ rule IsOptionalHaikuImagePackageAdded package
 	return $(HAIKU_ADD_ALL_OPTIONAL_PACKAGES) ;
 }
 
+rule OptionalPackageDependencies package : dependencies
+{
+	if [ IsOptionalHaikuImagePackageAdded $(package) ] {
+		AddOptionalHaikuImagePackages $(dependencies) ;
+	}
+}
+
 rule InstallOptionalHaikuImagePackage package : url : dirTokens
 {
 	# download zip file
