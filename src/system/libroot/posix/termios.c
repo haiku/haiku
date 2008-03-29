@@ -11,8 +11,7 @@
 #include <errno.h>
 
 
-/** get the attributes of the TTY device at fd */
-
+/*! get the attributes of the TTY device at fd */
 int
 tcgetattr(int fd, struct termios *termios)
 {
@@ -20,8 +19,7 @@ tcgetattr(int fd, struct termios *termios)
 }
 
 
-/** set the attributes for the TTY device at fd */
-
+/*! set the attributes for the TTY device at fd */
 int
 tcsetattr(int fd, int opt, const struct termios *termios)
 {
@@ -50,8 +48,7 @@ tcsetattr(int fd, int opt, const struct termios *termios)
 }
 
 
-/** wait for all output to be transmitted */
-
+/*! wait for all output to be transmitted */
 int
 tcdrain(int fd)
 {
@@ -65,8 +62,7 @@ tcdrain(int fd)
 }
 
 
-/** suspend or restart transmission */
-
+/*! suspend or restart transmission */
 int
 tcflow(int fd, int action)
 {
@@ -86,8 +82,7 @@ tcflow(int fd, int action)
 }
 
 
-/** flush all pending data (input or output) */
-
+/*! flush all pending data (input or output) */
 int
 tcflush(int fd, int queueSelector)
 {
@@ -95,8 +90,7 @@ tcflush(int fd, int queueSelector)
 }
 
 
-/** send zero bits for the specified duration */
-
+/*! send zero bits for the specified duration */
 int
 tcsendbreak(int fd, int duration)
 {	
@@ -116,6 +110,16 @@ cfgetispeed(const struct termios *termios)
 int
 cfsetispeed(struct termios *termios, speed_t speed)
 {
+	/*	Check for values that the system cannot handle:
+	greater values than B230400 which is
+	the maximum value defined in termios.h
+	Note that errors from hardware device are detected only
+	until the tcsetattr() function is called */
+	if (speed > B230400) {
+		errno = EINVAL;
+		return -1;
+	}
+
 	termios->c_ispeed = speed;
 	return 0;
 }
@@ -131,7 +135,12 @@ cfgetospeed(const struct termios *termios)
 int
 cfsetospeed(struct termios *termios, speed_t speed)
 {
+	/* Check for unaccepted speed values (see above) */
+	if (speed > B230400) {
+		errno = EINVAL;
+		return -1;
+	}
+
 	termios->c_ospeed = speed;
 	return 0;
 }
-

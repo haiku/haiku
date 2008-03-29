@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TERMIOS_H_
@@ -106,11 +106,11 @@ struct termios {
 #define	B4800		0x0C
 #define	B9600		0x0D
 #define	B19200		0x0E
-#define	B38400		0x0F
-#define B57600		0x10
-#define B115200		0x11
-#define B230400		0x12
-#define B31250		0x13			/* for MIDI */
+#define	B31250		0x0F			/* for MIDI */
+#define B38400		0x10
+#define B57600		0x11
+#define B115200		0x12
+#define B230400		0x13
 
 #define	CSIZE		0x20			/* character size */
 #define	CS5			0x00			/* only 7 and 8 bits supported */
