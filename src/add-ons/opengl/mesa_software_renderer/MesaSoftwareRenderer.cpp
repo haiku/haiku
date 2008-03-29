@@ -169,6 +169,26 @@ extern const char * color_space_name(color_space space);
 	DST[ACOMP] = 0xff
 #include "swrast/s_spantemp.h"
 
+/* 8-bit CMAP */
+#define NAME(PREFIX) PREFIX##_CMAP8
+#define RB_TYPE GLubyte
+#define SPAN_VARS \
+	MesaSoftwareRenderer *mr = (MesaSoftwareRenderer *) ctx->DriverCtx; \
+	const color_map *colorMap = system_colors();
+#define INIT_PIXEL_PTR(P, X, Y) \
+	GLubyte *P = ((GLubyte **) mr->GetRows())[Y] + (X)
+#define INC_PIXEL_PTR(P) P += 1
+#define STORE_PIXEL(DST, X, Y, VALUE) \
+	*DST = colorMap->index_map[( (((VALUE[BCOMP]) ) >> 3) | \
+		(((VALUE[GCOMP]) & 0xf8) << 2) | \
+		(((VALUE[RCOMP]) & 0xf8) << 7) )]
+#define FETCH_PIXEL(DST, SRC) \
+	DST[RCOMP] = (colorMap->color_list[*SRC].red); \
+	DST[GCOMP] = (colorMap->color_list[*SRC].green); \
+	DST[BCOMP] = (colorMap->color_list[*SRC].blue); \
+	DST[ACOMP] = 0xff
+#include "swrast/s_spantemp.h"
+
 extern "C" _EXPORT BGLRenderer*
 instantiate_gl_renderer(BGLView* view, ulong options,
 	BGLDispatcher* dispatcher)
@@ -356,6 +376,15 @@ MesaSoftwareRenderer::LockGL()
 					fRenderBuffer->PutMonoRow = put_mono_row_RGB15;
 					fRenderBuffer->PutValues = put_values_RGB15;
 					fRenderBuffer->PutMonoValues = put_mono_values_RGB15;
+					break;
+				case B_CMAP8:
+					fRenderBuffer->GetRow = get_row_CMAP8;
+					fRenderBuffer->GetValues = get_values_CMAP8;
+					fRenderBuffer->PutRow = put_row_CMAP8;
+					fRenderBuffer->PutRowRGB = put_row_rgb_CMAP8;
+					fRenderBuffer->PutMonoRow = put_mono_row_CMAP8;
+					fRenderBuffer->PutValues = put_values_CMAP8;
+					fRenderBuffer->PutMonoValues = put_mono_values_CMAP8;
 					break;
 				default:
 					fprintf(stderr, "unsupported screen color space %d\n", cs);
