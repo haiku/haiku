@@ -28,6 +28,10 @@ typedef unsigned long fd_mask;
 #	define _howmany(x, y) (((x) + ((y) - 1)) / (y))
 #endif
 
+#ifndef howmany
+#	define howmany(x, y) (((x) + ((y) - 1)) / (y))
+#endif
+
 #define NFDBITS (sizeof(fd_mask) * 8)	/* bits per mask */
 
 typedef struct fd_set {
