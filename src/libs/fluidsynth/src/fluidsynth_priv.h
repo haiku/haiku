@@ -26,7 +26,7 @@
 #include "config.h"
 #endif
 
-#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__))
+#if defined(__POWERPC__) && !(defined(__APPLE__) && defined(__MACH__)) && !defined(__HAIKU__)
 #include "config_maxmsp43.h"
 #endif
 
