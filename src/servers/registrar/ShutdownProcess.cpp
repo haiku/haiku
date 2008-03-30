@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -53,7 +53,7 @@ static const bigtime_t kAppQuitTimeout = 3000000; // 3 s
 // delivered (more precisely: has been handed over to the MessageDeliverer).
 static const bigtime_t kBackgroundAppQuitTimeout = 3000000; // 3 s
 
-// The time span non-app processes have after the HUP signal has been send
+// The time span non-app processes have after the TERM signal has been send
 // to them before they get a KILL signal.
 static const bigtime_t kNonAppQuitTimeout = 500000; // 0.5 s
 
@@ -1612,16 +1612,16 @@ ShutdownProcess::_QuitNonApps()
 
 	_SetShutdownWindowText("Asking other processes to quit.");
 
-	// iterate through the remaining teams and send them the HUP signal
+	// iterate through the remaining teams and send them the TERM signal
 	int32 cookie = 0;
 	team_info teamInfo;
 	while (get_next_team_info(&cookie, &teamInfo) == B_OK) {
 		if (fVitalSystemApps.find(teamInfo.team) == fVitalSystemApps.end()) {
-			PRINT(("  sending team %ld HUP signal\n", teamInfo.team));
+			PRINT(("  sending team %ld TERM signal\n", teamInfo.team));
 
 			#ifdef __HAIKU__
 				// Note: team ID == team main thread ID under Haiku
-				send_signal(teamInfo.team, SIGHUP);
+				send_signal(teamInfo.team, SIGTERM);
 			#else
 				// We don't want to do this when testing under R5, since it
 				// would kill all teams besides our app server and registrar.
