@@ -2,6 +2,19 @@
 # It is directly included from HaikuImage -- all variables defined there can
 # be used
 
+# Available Optional Packages:
+#	Development
+#	Firefox
+#	Links
+#	OpenSound
+#	OpenSSL
+#	Pe
+#	Perl
+#	Vision
+#	VLC
+#	WonderBrush
+
+
 # package dependencies
 OptionalPackageDependencies Development : Perl ;
 
@@ -142,6 +155,20 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 		;
 	}
 	#UnzipArchiveToHaikuImage home : data/vv.mp3.zip : 0 ;
+}
+
+
+# OpenSSL
+if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package Pe available for gcc4" ;
+	} else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage openssl-0.9.8g-gcc2-2008-03-28
+			: $(baseURL)/openssl-0.9.8g-gcc2-2008-03-28.zip
+			: home
+		;
+	}
 }
 
 
