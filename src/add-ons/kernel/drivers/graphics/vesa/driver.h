@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DRIVER_H
@@ -9,7 +9,7 @@
 #include <KernelExport.h>
 #include <ISA.h>
 
-#include "vesa_info.h"
+#include "vesa_private.h"
 #include "lock.h"
 
 

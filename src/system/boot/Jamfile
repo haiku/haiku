@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system boot ;
 
 local librootFunctions =
+	abs.o
 	byteorder.o
 	ctype.o
 	qsort.o

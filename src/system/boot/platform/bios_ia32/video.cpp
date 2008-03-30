@@ -7,6 +7,7 @@
 #include "video.h"
 #include "bios.h"
 #include "vesa.h"
+#include "vesa_info.h"
 #include "vga.h"
 #include "mmu.h"
 
@@ -44,7 +45,8 @@ struct video_mode {
 static vbe_info_block sInfo;
 static video_mode *sMode, *sDefaultMode;
 static bool sVesaCompatible;
-struct list sModeList;
+static struct list sModeList;
+static uint32 sModeCount;
 static addr_t sFrameBuffer;
 static bool sModeChosen;
 static bool sSettingsLoaded;
@@ -86,6 +88,7 @@ add_video_mode(video_mode *videoMode)
 	}
 
 	list_insert_item_before(&sModeList, mode, videoMode);
+	sModeCount++;
 }
 
 
@@ -113,19 +116,24 @@ find_video_mode(int32 width, int32 height, bool allowPalette)
 
 
 static video_mode *
-find_video_mode(int32 width, int32 height, int32 depth)
+closest_video_mode(int32 width, int32 height, int32 depth)
 {
+	video_mode *bestMode = NULL;
+	uint32 bestDiff = 0;
+
 	video_mode *mode = NULL;
 	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
 			!= NULL) {
-		if (mode->width == width
-			&& mode->height == height
-			&& mode->bits_per_pixel == depth) {
-			return mode;
+		uint32 diff = 2 * abs(mode->width - width) + abs(mode->height - height)
+			+ abs(mode->bits_per_pixel - depth);
+
+		if (bestMode == NULL || bestDiff > diff) {
+			bestMode = mode;
+			bestDiff = diff;
 		}
 	}
 
-	return NULL;
+	return bestMode;
 }
 
 
@@ -196,7 +204,7 @@ get_mode_from_settings(void)
 
 			// search mode that fits
 
-			video_mode *mode = find_video_mode(width, height, depth);
+			video_mode *mode = closest_video_mode(width, height, depth);
 			if (mode != NULL) {
 				found = true;
 				sMode = mode;
@@ -904,6 +912,24 @@ platform_init_video(void)
 	}
 
 	TRACE(("VESA compatible graphics!\n"));
+
+	// store VESA modes into kernel args
+	vesa_mode *modes = (vesa_mode *)kernel_args_malloc(
+		sModeCount * sizeof(vesa_mode));
+	if (modes != NULL) {
+		video_mode *mode = NULL;
+		uint32 i = 0;
+		while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
+				!= NULL) {
+			modes[i].width = mode->width;
+			modes[i].height = mode->height;
+			modes[i].bits_per_pixel = mode->bits_per_pixel;
+			i++;
+		}
+
+		gKernelArgs.vesa_modes = modes;
+		gKernelArgs.vesa_modes_size = sModeCount * sizeof(vesa_mode);
+	}
 
 	edid1_info info;
 	if (vesa_get_edid(&info) == B_OK) {

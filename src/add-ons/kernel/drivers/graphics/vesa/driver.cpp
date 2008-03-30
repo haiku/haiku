@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -75,7 +75,7 @@ init_hardware(void)
 {
 	TRACE((DEVICE_NAME ": init_hardware()\n"));
 
-	return get_boot_item(FRAME_BUFFER_BOOT_INFO) != NULL ? B_OK : B_ERROR;
+	return get_boot_item(FRAME_BUFFER_BOOT_INFO, NULL) != NULL ? B_OK : B_ERROR;
 }
 
 

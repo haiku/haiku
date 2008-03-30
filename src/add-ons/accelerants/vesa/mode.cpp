@@ -21,6 +21,48 @@ extern "C" void _sPrintf(const char *format, ...);
 #endif
 
 
+static uint32
+get_color_space_for_depth(uint32 depth)
+{
+	switch (depth) {
+		case 4:
+			return B_GRAY8;
+				// the app_server is smart enough to translate this to VGA mode
+		case 8:
+			return B_CMAP8;
+		case 15:
+			return B_RGB15;
+		case 16:
+			return B_RGB16;
+		case 24:
+			return B_RGB24;
+		case 32:
+			return B_RGB32;
+	}
+
+	return 0;
+}
+
+
+/*!	Checks if the specified \a mode can be set using VESA. */
+static bool
+is_mode_supported(display_mode *mode)
+{
+	vesa_mode *modes = gInfo->vesa_modes;
+
+	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
+		// search mode in VESA mode list
+		// TODO: list is ordered, we could use binary search
+		if (modes[i].width == mode->virtual_width
+			&& modes[i].height == mode->virtual_height
+			&& get_color_space_for_depth(modes[i].bits_per_pixel)
+				== mode->space)
+			return true;
+	}
+
+	return false;
+}
+
 
 /*!	Creates the initial mode list of the primary accelerant.
 	It's called from vesa_init_accelerant().
@@ -28,11 +70,12 @@ extern "C" void _sPrintf(const char *format, ...);
 status_t
 create_mode_list(void)
 {
-	// ToDo: basically, the boot loader should pass a list of all supported
-	//	VESA modes to us.
-	
+	const color_space kVesaSpaces[] = {B_RGB32_LITTLE, B_RGB24_LITTLE,
+		B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
+
 	gInfo->mode_list_area = create_display_modes("vesa modes", NULL, NULL, 0,
-		NULL, 0, NULL, &gInfo->mode_list, &gInfo->shared_info->mode_count);
+		kVesaSpaces, sizeof(kVesaSpaces) / sizeof(kVesaSpaces[0]),
+		is_mode_supported, &gInfo->mode_list, &gInfo->shared_info->mode_count);
 	if (gInfo->mode_list_area < B_OK)
 		return gInfo->mode_list_area;
 
@@ -56,7 +99,8 @@ status_t
 vesa_get_mode_list(display_mode *modeList)
 {
 	TRACE(("vesa_get_mode_info()\n"));
-	memcpy(modeList, gInfo->mode_list, gInfo->shared_info->mode_count * sizeof(display_mode));
+	memcpy(modeList, gInfo->mode_list,
+		gInfo->shared_info->mode_count * sizeof(display_mode));
 	return B_OK;
 }
 

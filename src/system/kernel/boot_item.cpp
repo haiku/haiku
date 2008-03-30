@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -44,7 +44,7 @@ add_boot_item(const char *name, void *data, size_t size)
 
 
 void *
-get_boot_item(const char *name)
+get_boot_item(const char *name, size_t *_size)
 {
 	if (name == NULL || name[0] == '\0')
 		return NULL;
@@ -53,8 +53,12 @@ get_boot_item(const char *name)
 	for (ItemList::Iterator it = sItemList.GetIterator(); it.HasNext();) {
 		boot_item *item = it.Next();
 
-		if (!strcmp(name, item->name))
+		if (!strcmp(name, item->name)) {
+			if (_size != NULL)
+				*_size = item->size;
+
 			return item->data;
+		}
 	}
 
 	return NULL;

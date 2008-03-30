@@ -176,7 +176,8 @@ boot_splash_init(void)
 	if (debug_screen_output_enabled())
 		return;
 
-	sInfo = (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO);
+	sInfo = (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO,
+		NULL);
 }
 
 

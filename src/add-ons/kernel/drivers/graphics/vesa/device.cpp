@@ -1,25 +1,27 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "device.h"
-#include "driver.h"
-#include "utility.h"
-#include "vesa_info.h"
-#include "vga.h"
-
-#include <OS.h>
-#include <KernelExport.h>
-#include <Drivers.h>
-#include <PCI.h>
-#include <SupportDefs.h>
-#include <graphic_driver.h>
-#include <image.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <Drivers.h>
+#include <graphic_driver.h>
+#include <image.h>
+#include <KernelExport.h>
+#include <OS.h>
+#include <PCI.h>
+#include <SupportDefs.h>
+
+#include "driver.h"
+#include "utility.h"
+#include "vesa_info.h"
+#include "vesa_private.h"
+#include "vga.h"
 
 
 //#define TRACE_DEVICE
@@ -128,8 +130,11 @@ device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
 
 	switch (msg) {
 		case B_GET_ACCELERANT_SIGNATURE:
-			user_strlcpy((char *)buffer, VESA_ACCELERANT_NAME, B_FILE_NAME_LENGTH);
 			dprintf(DEVICE_NAME ": acc: %s\n", VESA_ACCELERANT_NAME);
+			if (user_strlcpy((char *)buffer, VESA_ACCELERANT_NAME,
+					B_FILE_NAME_LENGTH) < B_OK)
+				return B_BAD_ADDRESS;
+
 			return B_OK;
 
 		// needed to share data between kernel and accelerant		
@@ -138,8 +143,10 @@ device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
 
 		// needed for cloning
 		case VESA_GET_DEVICE_NAME:
-			if (user_strlcpy((char *)buffer, gDeviceNames[info->id], B_PATH_NAME_LENGTH) < B_OK)
+			if (user_strlcpy((char *)buffer, gDeviceNames[info->id],
+					B_PATH_NAME_LENGTH) < B_OK)
 				return B_BAD_ADDRESS;
+
 			return B_OK;
 
 		case VGA_SET_INDEXED_COLORS:

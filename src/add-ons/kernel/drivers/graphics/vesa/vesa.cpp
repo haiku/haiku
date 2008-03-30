@@ -1,19 +1,20 @@
 /*
- * Copyright 2005-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <boot_item.h>
-#include <frame_buffer_console.h>
-
-#include "vesa_info.h"
-#include "driver.h"
-#include "utility.h"
-
-#include "util/kernel_cpp.h"
+#include "vesa_private.h"
 
 #include <string.h>
+
+#include <boot_item.h>
+#include <frame_buffer_console.h>
+#include <util/kernel_cpp.h>
+
+#include "driver.h"
+#include "utility.h"
+#include "vesa_info.h"
 
 
 class PhysicalMemoryMapper {
@@ -65,55 +66,77 @@ PhysicalMemoryMapper::Keep()
 //	#pragma mark -
 
 
+static uint32
+get_color_space_for_depth(uint32 depth)
+{
+	switch (depth) {
+		case 4:
+			return B_GRAY8;
+				// the app_server is smart enough to translate this to VGA mode
+		case 8:
+			return B_CMAP8;
+		case 15:
+			return B_RGB15;
+		case 16:
+			return B_RGB16;
+		case 24:
+			return B_RGB24;
+		case 32:
+			return B_RGB32;
+	}
+
+	return 0;
+}
+
+
+//	#pragma mark -
+
+
 status_t
 vesa_init(vesa_info &info)
 {
 	frame_buffer_boot_info *bufferInfo
-		= (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO);
+		= (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO, NULL);
 	if (bufferInfo == NULL)
 		return B_ERROR;
 
-	info.shared_area = create_area("vesa shared info", (void **)&info.shared_info, 
-			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(sizeof(vesa_shared_info)),
-			B_FULL_LOCK,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
+	size_t modesSize = 0;
+	vesa_mode *modes = (vesa_mode *)get_boot_item(VESA_MODES_BOOT_INFO,
+		&modesSize);
+
+	size_t sharedSize = (sizeof(vesa_shared_info) + 7) & ~7;
+
+	info.shared_area = create_area("vesa shared info",
+		(void **)&info.shared_info, B_ANY_KERNEL_ADDRESS,
+		ROUND_TO_PAGE_SIZE(sharedSize + modesSize), B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (info.shared_area < B_OK)
 		return info.shared_area;
 
-	memset((void *)info.shared_info, 0, sizeof(vesa_shared_info));
+	vesa_shared_info &sharedInfo = *info.shared_info;
 
-	info.shared_info->frame_buffer_area = bufferInfo->area;
-	info.shared_info->frame_buffer = (uint8 *)bufferInfo->frame_buffer;
+	memset(/*(void *)*/&sharedInfo, 0, sizeof(vesa_shared_info));
 
-	info.shared_info->current_mode.virtual_width = bufferInfo->width;
-	info.shared_info->current_mode.virtual_height = bufferInfo->height;
-	switch (bufferInfo->depth) {
-		case 4:
-			info.shared_info->current_mode.space = B_GRAY8;
-				// the app_server is smart enough to translate this to VGA mode
-			break;
-		case 8:
-			info.shared_info->current_mode.space = B_CMAP8;
-			break;
-		case 15:
-			info.shared_info->current_mode.space = B_RGB15;
-			break;
-		case 16:
-			info.shared_info->current_mode.space = B_RGB16;
-			break;
-		case 24:
-			info.shared_info->current_mode.space = B_RGB24;
-			break;
-		case 32:
-			info.shared_info->current_mode.space = B_RGB32;
-			break;
+	if (modes != NULL) {
+		sharedInfo.vesa_mode_offset = sharedSize;
+		sharedInfo.vesa_mode_count = modesSize / sizeof(vesa_mode);
+
+		memcpy((uint8*)&sharedInfo + sharedSize, modes, modesSize);
 	}
-	info.shared_info->bytes_per_row = bufferInfo->bytes_per_row;
+
+	sharedInfo.frame_buffer_area = bufferInfo->area;
+	sharedInfo.frame_buffer = (uint8 *)bufferInfo->frame_buffer;
+
+	sharedInfo.current_mode.virtual_width = bufferInfo->width;
+	sharedInfo.current_mode.virtual_height = bufferInfo->height;
+	sharedInfo.current_mode.space = get_color_space_for_depth(
+		bufferInfo->depth);
+	sharedInfo.bytes_per_row = bufferInfo->bytes_per_row;
 
 	physical_entry mapping;
-	get_memory_map((void *)info.shared_info->frame_buffer, B_PAGE_SIZE,
+	get_memory_map((void *)sharedInfo.frame_buffer, B_PAGE_SIZE,
 		&mapping, 1);
-	info.shared_info->physical_frame_buffer = (uint8 *)mapping.address;
+	sharedInfo.physical_frame_buffer = (uint8 *)mapping.address;
 
 	dprintf(DEVICE_NAME ": vesa_init() completed successfully!\n");
 	return B_OK;

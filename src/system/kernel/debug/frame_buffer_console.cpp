@@ -11,6 +11,7 @@
 #include <vm.h>
 #include <fs/devfs.h>
 #include <boot/kernel_args.h>
+#include <vesa_info.h>
 
 #include <frame_buffer_console.h>
 #include "font.h"
@@ -68,6 +69,7 @@ static uint32 sPalette32[] = {
 
 static struct console_info sConsole;
 static struct frame_buffer_boot_info sBootInfo;
+static struct vesa_mode *sVesaModes;
 
 
 static inline uint8
@@ -415,6 +417,12 @@ frame_buffer_console_init(kernel_args *args)
 	sBootInfo.bytes_per_row = args->frame_buffer.bytes_per_row;
 	add_boot_item(FRAME_BUFFER_BOOT_INFO, &sBootInfo,
 		sizeof(frame_buffer_boot_info));
+
+	sVesaModes = (vesa_mode *)malloc(args->vesa_modes_size);
+	if (sVesaModes != NULL) {
+		memcpy(sVesaModes, args->vesa_modes, args->vesa_modes_size);
+		add_boot_item(VESA_MODES_BOOT_INFO, sVesaModes, args->vesa_modes_size);
+	}
 
 	return B_OK;
 }

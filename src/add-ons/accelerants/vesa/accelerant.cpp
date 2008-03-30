@@ -110,14 +110,15 @@ init_common(int device, bool isClone)
 		return status;
 	}
 
+	gInfo->vesa_modes = (vesa_mode *)((uint8 *)gInfo->shared_info
+		+ gInfo->shared_info->vesa_mode_offset);
+
 	sharedCloner.Keep();
 	return B_OK;
 }
 
 
-/** Cleans up everything done by a successful init_common().
- */
-
+/*!	Cleans up everything done by a successful init_common(). */
 static void
 uninit_common(void)
 {
@@ -138,7 +139,6 @@ uninit_common(void)
 
 
 /*!	Init primary accelerant */
-
 status_t
 vesa_init_accelerant(int device)
 {

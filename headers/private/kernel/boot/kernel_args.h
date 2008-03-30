@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -70,6 +70,9 @@ typedef struct kernel_args {
 		uint8	depth;
 		bool	enabled;
 	} frame_buffer;
+
+	void		*vesa_modes;
+	uint32		vesa_modes_size;
 
 	void		*debug_output;
 	uint32		debug_size;
