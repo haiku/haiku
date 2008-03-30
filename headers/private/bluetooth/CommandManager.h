@@ -13,6 +13,8 @@
 /* CONTROL BASEBAND */
 void* buildReset(size_t* outsize);
 void* buildReadLocalName(size_t* outsize);
+void* buildWriteScan(uint8 scanmode, size_t* outsize);
+void* buildAuthEnable(uint8 auth, size_t* outsize);
 
 /* LINK CONTROL */
 void* buildRemoteNameRequest(bdaddr_t bdaddr,uint8 pscan_rep_mode, uint16 clock_offset, size_t* outsize);
