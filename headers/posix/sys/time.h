@@ -49,4 +49,28 @@ extern int	utimes(const char *name, const struct timeval times[2]);
 }
 #endif
 
+/* BSDish macros operating on timeval structs */
+#define timeradd(a, b, res)								\
+	do {												\
+		(res)->tv_sec = (a)->tv_sec + (b)->tv_sec;		\
+		(res)->tv_usec = (a)->tv_usec + (b)->tv_usec;	\
+		if ((res)->tv_usec >= 1000000) {				\
+			(res)->tv_usec -= 1000000;					\
+			(res)->tv_sec++;							\
+		}												\
+	} while (0)
+#define timersub(a, b, res)								\
+	do {												\
+		(res)->tv_sec = (a)->tv_sec - (b)->tv_sec;		\
+		(res)->tv_usec = (a)->tv_usec - (b)->tv_usec;	\
+		if ((res)->tv_usec < 0) {						\
+			(res)->tv_usec += 1000000;					\
+			(res)->tv_sec--;							\
+		}												\
+	} while (0)
+#define timerclear(a)	((a)->tv_sec = (a)->tv_usec = 0)
+#define timerisset(a)	((a)->tv_sec != 0 || (a)->tv_usec != 0)
+#define timercmp(a, b, cmp)	((a)->tv_sec == (b)->tv_sec \
+		? (a)->tv_usec cmp (b)->tv_usec : (a)->tv_sec cmp (b)->tv_sec)
+
 #endif	/* _SYS_TIME_H */
