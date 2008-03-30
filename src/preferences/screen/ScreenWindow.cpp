@@ -229,7 +229,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		&& !strcasecmp(info.chipset, "VESA"))
 		fIsVesa = true;
 
-	UpdateOriginal();
+	_UpdateOriginal();
 	fActive = fSelected = fOriginal;
 
 	BView *view = new BView(Bounds(), "ScreenView", B_FOLLOW_ALL, B_WILL_DRAW);
@@ -254,7 +254,7 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 		item->SetEnabled(false);
 	//} else
 	//	item->SetMarked(true);
-		
+	
 	popUpMenu->AddItem(item);
 
 	BMenuField* workspaceMenuField = new BMenuField(BRect(0, 0, 100, 15),
@@ -351,8 +351,6 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 
 	float min, max;
 	if (fScreenMode.GetRefreshLimits(fActive, min, max) && min == max) {
-		// TODO: investigate, doesn't work for VESA at least
-		
 		// This is a special case for drivers that only support a single
 		// frequency, like the VESA driver
 		BString name;
@@ -516,9 +514,9 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	fApplyButton->SetEnabled(false);
 	fControlsBox->AddChild(fApplyButton);
 
-	UpdateControls();
+	_UpdateControls();
 
-	LayoutControls(controlsFlags);
+	_LayoutControls(controlsFlags);
 }
 
 
@@ -549,12 +547,11 @@ ScreenWindow::QuitRequested()
 }
 
 
-/**	update resolution list according to combine mode
- *	(some resolution may not be combinable due to memory restrictions)
- */
-
+/*!	Update resolution list according to combine mode
+	(some resolution may not be combinable due to memory restrictions)
+*/
 void
-ScreenWindow::CheckResolutionMenu()
+ScreenWindow::_CheckResolutionMenu()
 {		
 	for (int32 i = 0; i < fResolutionMenu->CountItems(); i++)
 		fResolutionMenu->ItemAt(i)->SetEnabled(false);
@@ -574,14 +571,13 @@ ScreenWindow::CheckResolutionMenu()
 }
 
 
-/**	update color and refresh options according to current mode
- *	(a color space is made active if there is any mode with 
- *	given resolution and this colour space; same applies for 
- *	refresh rate, though "Other…" is always possible)
- */
-
+/*!	Update color and refresh options according to current mode
+	(a color space is made active if there is any mode with 
+	given resolution and this colour space; same applies for 
+	refresh rate, though "Other…" is always possible)
+*/
 void
-ScreenWindow::CheckColorMenu()
+ScreenWindow::_CheckColorMenu()
 {	
 	for (int32 i = 0; i < kColorSpaceCount; i++) {
 		bool supported = false;
@@ -591,7 +587,10 @@ ScreenWindow::CheckColorMenu()
 
 			if (fSelected.width == mode.width
 				&& fSelected.height == mode.height
-				&& kColorSpaces[i].space == mode.space
+				&& (kColorSpaces[i].space == mode.space
+					// advertize 24 bit mode as 32 bit to avoid confusion
+					|| (kColorSpaces[i].space == B_RGB32
+						&& mode.space == B_RGB24))
 				&& fSelected.combine == mode.combine) {
 				supported = true;
 				break;
@@ -605,10 +604,9 @@ ScreenWindow::CheckColorMenu()
 }
 
 
-/**	Enable/disable refresh options according to current mode. */
-
+/*!	Enable/disable refresh options according to current mode. */
 void
-ScreenWindow::CheckRefreshMenu()
+ScreenWindow::_CheckRefreshMenu()
 {
 	float min, max;
 	if (fScreenMode.GetRefreshLimits(fSelected, min, max) != B_OK || min == max)
@@ -624,10 +622,9 @@ ScreenWindow::CheckRefreshMenu()
 }
 
 
-/** Activate appropriate menu item according to selected refresh rate */
-
+/*!	Activate appropriate menu item according to selected refresh rate */
 void
-ScreenWindow::UpdateRefreshControl()
+ScreenWindow::_UpdateRefreshControl()
 {
 	BString string;
 	refresh_rate_to_string(fSelected.refresh, string);
@@ -655,7 +652,7 @@ ScreenWindow::UpdateRefreshControl()
 
 
 void
-ScreenWindow::UpdateMonitorView()
+ScreenWindow::_UpdateMonitorView()
 {
 	BMessage updateMessage(UPDATE_DESKTOP_MSG);
 	updateMessage.AddInt32("width", fSelected.width);
@@ -666,12 +663,12 @@ ScreenWindow::UpdateMonitorView()
 
 
 void
-ScreenWindow::UpdateControls()
+ScreenWindow::_UpdateControls()
 {
 	BMenuItem* item = fSwapDisplaysMenu->ItemAt((int32)fSelected.swap_displays);
 	if (item && !item->IsMarked())
 		item->SetMarked(true);
-	
+
 	item = fUseLaptopPanelMenu->ItemAt((int32)fSelected.use_laptop_panel);
 	if (item && !item->IsMarked())
 		item->SetMarked(true);
@@ -688,9 +685,9 @@ ScreenWindow::UpdateControls()
 		}
 	}
 
-	CheckResolutionMenu();
-	CheckColorMenu();
-	CheckRefreshMenu();
+	_CheckResolutionMenu();
+	_CheckColorMenu();
+	_CheckRefreshMenu();
 
 	BString string;
 	resolution_to_string(fSelected, string);
@@ -733,7 +730,9 @@ ScreenWindow::UpdateControls()
 	item = fColorsMenu->ItemAt(0);
 
 	for (int32 i = kColorSpaceCount; i-- > 0;) {
-		if (kColorSpaces[i].space == fSelected.space) {
+		if (kColorSpaces[i].space == fSelected.space
+			|| (kColorSpaces[i].space == B_RGB32
+				&& fSelected.space == B_RGB24)) {
 			item = fColorsMenu->ItemAt(i);
 			break;
 		}
@@ -743,20 +742,25 @@ ScreenWindow::UpdateControls()
 		item->SetMarked(true);
 
 	string.Truncate(0);
-	string << fSelected.BitsPerPixel() << " Bits/Pixel";
+	uint32 bitsPerPixel = fSelected.BitsPerPixel();
+	// advertize 24 bit mode as 32 bit to avoid confusion
+	if (bitsPerPixel == 24)
+		bitsPerPixel = 32;
+
+	string << bitsPerPixel << " Bits/Pixel";
 	if (string != fColorsMenu->Superitem()->Label())
 		fColorsMenu->Superitem()->SetLabel(string.String());
 
-	UpdateMonitorView();
-	UpdateRefreshControl();
+	_UpdateMonitorView();
+	_UpdateRefreshControl();
 
-	CheckApplyEnabled();
+	_CheckApplyEnabled();
 }
 
 
 /*! Reflect active mode in chosen settings */
 void
-ScreenWindow::UpdateActiveMode()
+ScreenWindow::_UpdateActiveMode()
 {
 	// Usually, this function gets called after a mode
 	// has been set manually; still, as the graphics driver
@@ -766,7 +770,7 @@ ScreenWindow::UpdateActiveMode()
 		fScreenMode.Get(fActive);
 	fSelected = fActive;
 
-	UpdateControls();
+	_UpdateControls();
 }
 
 
@@ -787,9 +791,9 @@ ScreenWindow::WorkspaceActivated(int32 workspace, bool state)
 {
 	if (!_IsVesa()) {
 		fScreenMode.GetOriginalMode(fOriginal, workspace);
-		UpdateActiveMode();
+		_UpdateActiveMode();
 	}
-	
+
 	BMessage message(UPDATE_DESKTOP_COLOR_MSG);
 	PostMessage(&message, fMonitorView);
 }
@@ -800,7 +804,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case WORKSPACE_CHECK_MSG:
-			CheckApplyEnabled();
+			_CheckApplyEnabled();
 			break;
 
 		case POP_WORKSPACE_CHANGED_MSG:
@@ -809,7 +813,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			int32 index;
 			if (message->FindInt32("index", &index) == B_OK) {
 				set_workspace_count(index + 1);
-				CheckApplyEnabled();
+				_CheckApplyEnabled();
 			}
 			break;
 		}
@@ -819,13 +823,13 @@ ScreenWindow::MessageReceived(BMessage* message)
 			message->FindInt32("width", &fSelected.width);
 			message->FindInt32("height", &fSelected.height);
 
-			CheckColorMenu();
-			CheckRefreshMenu();
+			_CheckColorMenu();
+			_CheckRefreshMenu();
 
-			UpdateMonitorView();
-			UpdateRefreshControl();
+			_UpdateMonitorView();
+			_UpdateRefreshControl();
 
-			CheckApplyEnabled();
+			_CheckApplyEnabled();
 			break;
 		}
 
@@ -837,7 +841,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			string << fSelected.BitsPerPixel() << " Bits/Pixel";
 			fColorsMenu->Superitem()->SetLabel(string.String());
 
-			CheckApplyEnabled();
+			_CheckApplyEnabled();
 			break;
 		}
 
@@ -847,14 +851,14 @@ ScreenWindow::MessageReceived(BMessage* message)
 			fOtherRefresh->SetLabel("Other" B_UTF8_ELLIPSIS);
 				// revert "Other…" label - it might have had a refresh rate prefix
 
-			CheckApplyEnabled();
+			_CheckApplyEnabled();
 			break;
 		}
 
 		case POP_OTHER_REFRESH_MSG:
 		{
 			// make sure menu shows something useful
-			UpdateRefreshControl();
+			_UpdateRefreshControl();
 
 			float min = 0, max = 999;
 			fScreenMode.GetRefreshLimits(fSelected, min, max);
@@ -875,8 +879,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			// select the refresh rate chosen
 			message->FindFloat("refresh", &fSelected.refresh);
 
-			UpdateRefreshControl();
-			CheckApplyEnabled();
+			_UpdateRefreshControl();
+			_CheckApplyEnabled();
 			break;
 		}
 
@@ -887,24 +891,24 @@ ScreenWindow::MessageReceived(BMessage* message)
 			if (message->FindInt32("mode", &mode) == B_OK)
 				fSelected.combine = (combine_mode)mode;
 
-			CheckResolutionMenu();
-			CheckApplyEnabled();
+			_CheckResolutionMenu();
+			_CheckApplyEnabled();
 			break;
 		}
-		
+
 		case POP_SWAP_DISPLAYS_MSG:
 			message->FindBool("swap", &fSelected.swap_displays);
-			CheckApplyEnabled();
+			_CheckApplyEnabled();
 			break;
 
 		case POP_USE_LAPTOP_PANEL_MSG:
 			message->FindBool("use", &fSelected.use_laptop_panel);
-			CheckApplyEnabled();
+			_CheckApplyEnabled();
 			break;
 
 		case POP_TV_STANDARD_MSG:
 			message->FindInt32("tv_standard", (int32 *)&fSelected.tv_standard);
-			CheckApplyEnabled();
+			_CheckApplyEnabled();
 			break;
 
 		case BUTTON_LAUNCH_BACKGROUNDS_MSG:
@@ -932,13 +936,13 @@ ScreenWindow::MessageReceived(BMessage* message)
 			if (item != NULL)
 				item->SetMarked(true);
 
-			UpdateControls();
+			_UpdateControls();
 			break;
 		}
 
 		case BUTTON_UNDO_MSG:
 			fTempScreenMode.Revert();
-			UpdateActiveMode();
+			_UpdateActiveMode();
 			break;
 
 		case BUTTON_REVERT_MSG:
@@ -952,30 +956,30 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 			// ScreenMode::Revert() assumes that we first set the correct number
 			// of workspaces
-						
+			
 			if (_IsVesa()) {				
 				set_workspace_count(fOriginalWorkspaceCount);
 				fActive = fOriginal;
 				fSelected = fOriginal;
-				UpdateControls();
+				_UpdateControls();
 			} else {
 				set_workspace_count(fOriginalWorkspaceCount);
 				fScreenMode.Revert();
-				UpdateActiveMode();
+				_UpdateActiveMode();
 			}			
 			break;
 		}
 
 		case BUTTON_APPLY_MSG:
-			Apply();
+			_Apply();
 			break;
 
 		case MAKE_INITIAL_MSG:
 			// user pressed "keep" in confirmation dialog
 			fModified = true;
-			UpdateActiveMode();
+			_UpdateActiveMode();
 			break;
-		
+
 		default:
 			BWindow::MessageReceived(message);		
 			break;
@@ -1029,67 +1033,68 @@ ScreenWindow::_ReadVesaModeFile(screen_mode& mode) const
 		return status;
 
 	char buffer[256];
-	
+
 	ssize_t bytesRead = file.Read(buffer, sizeof(buffer) - 1);
 	if (bytesRead < B_OK) {
 		return bytesRead;
 	} else {
 		buffer[bytesRead] = '\0';	
 	}
-	
+
 	char ignore[256];
 		// if the file is malformed, sscanf shouldn't crash
 		// on reading a big string since we don't even read
 		// as much from the file
 	uint32 bitDepth = 0;
-	
-	if (sscanf(buffer, "%s %ld %ld %ld", ignore,
-		&mode.width, &mode.height, &bitDepth) == 4) {
-		
-		//TODO: check for valid width and height values
-			
-		switch (bitDepth) {
-			case 32:
-				mode.space = B_RGB32;
-				break;
-			case 24:
-				mode.space = B_RGB24;
-				break;
-			case 16:
-				mode.space = B_RGB16;
-				break;
-			case 15:
-				mode.space = B_RGB15;
-				break;
-			case 8:
-				mode.space = B_CMAP8;
-				break;
-			default:
-				// invalid value, we force it to B_RGB16 just in case
-				mode.space = B_RGB16;
-				return B_ERROR;			
-		}		
-		return B_OK;
-	} else {
+
+	if (sscanf(buffer, "%s %ld %ld %ld", ignore, &mode.width, &mode.height,
+			&bitDepth) != 4) {
 		return B_ERROR;
 	}
+
+	// TODO: check for valid width and height values
+
+	switch (bitDepth) {
+		case 32:
+			mode.space = B_RGB32;
+			break;
+		case 24:
+			mode.space = B_RGB24;
+			break;
+		case 16:
+			mode.space = B_RGB16;
+			break;
+		case 15:
+			mode.space = B_RGB15;
+			break;
+		case 8:
+			mode.space = B_CMAP8;
+			break;
+		default:
+			// invalid value, we force it to B_RGB16 just in case
+			mode.space = B_RGB16;
+			return B_ERROR;			
+	}		
+
+	return B_OK;
 }
 
 
 void
-ScreenWindow::CheckApplyEnabled()
+ScreenWindow::_CheckApplyEnabled()
 {
 	fApplyButton->SetEnabled(fSelected != fActive);
-	fRevertButton->SetEnabled(count_workspaces() != fOriginalWorkspaceCount || fSelected != fOriginal);
+	fRevertButton->SetEnabled(count_workspaces() != fOriginalWorkspaceCount
+		|| fSelected != fOriginal);
 }
 
 
 void
-ScreenWindow::UpdateOriginal()
+ScreenWindow::_UpdateOriginal()
 {
 	fOriginalWorkspaceCount = count_workspaces();
 	fScreenMode.Get(fOriginal);
-	
+
 	// If we are in vesa we overwrite fOriginal's resolution and bitdepth
 	// with those found the vesa settings file. (if the file exists)
 	if (_IsVesa())
@@ -1100,20 +1105,20 @@ ScreenWindow::UpdateOriginal()
 
 
 void
-ScreenWindow::Apply()
+ScreenWindow::_Apply()
 {
 	if (_IsVesa()) {
 		(new BAlert("VesaAlert",
-			"Haiku is using your video card in safe mode (VESA)."
+			"Haiku is using your video card in compatibility mode (VESA)."
 			" Your settings will be applied on next startup.\n", "Okay", NULL, NULL, B_WIDTH_AS_USUAL,			
 			B_INFO_ALERT))->Go(NULL);
 
 		fVesaApplied = true;
 		fActive = fSelected;
-		UpdateControls();		
+		_UpdateControls();		
 		return;
 	}
-	
+
 	// make checkpoint, so we can undo these changes
 	fTempScreenMode.UpdateOriginalModes();
 	status_t status = fScreenMode.Set(fSelected);
@@ -1124,7 +1129,7 @@ ScreenWindow::Apply()
 		display_mode newMode;
 		BScreen screen(this);
 		screen.GetMode(&newMode);
-		
+
 		if (fAllWorkspacesItem->IsMarked()) {
 			int32 originatingWorkspace = current_workspace();
 			for (int32 i = 0; i < count_workspaces(); i++) {
@@ -1132,9 +1137,9 @@ ScreenWindow::Apply()
 					screen.SetMode(i, &newMode, true);
 			}
 		}
-		
+
 		fActive = fSelected;
-		
+
 		// TODO: only show alert when this is an unknown mode
 		BWindow* window = new AlertWindow(this);
 		window->Show();
@@ -1150,7 +1155,7 @@ ScreenWindow::Apply()
 
 
 void
-ScreenWindow::LayoutControls(uint32 flags)
+ScreenWindow::_LayoutControls(uint32 flags)
 {
 	// layout the screen box and its controls
 	fWorkspaceCountField->ResizeToPreferred();
@@ -1160,10 +1165,8 @@ ScreenWindow::LayoutControls(uint32 flags)
 	float backgroundsButtonHeight = fBackgroundsButton->Bounds().Height();
 
 	float screenBoxWidth = fWorkspaceCountField->Bounds().Width() + 20.0;
-	float screenBoxHeight = monitorViewHeight + 5.0
-							+ workspaceFieldHeight + 5.0
-							+ backgroundsButtonHeight
-							+ 20.0;
+	float screenBoxHeight = monitorViewHeight + 5.0 + workspaceFieldHeight + 5.0
+		+ backgroundsButtonHeight + 20.0;
 
 #ifdef __HAIKU__
 	fScreenBox->MoveTo(10.0, 10.0 + fControlsBox->TopBorderOffset());
@@ -1191,7 +1194,7 @@ ScreenWindow::LayoutControls(uint32 flags)
 
 	// layout the right side
 	fApplyButton->ResizeToPreferred();
-	BRect controlsRect = LayoutMenuFields(flags);
+	BRect controlsRect = _LayoutMenuFields(flags);
 	controlsRect.InsetBy(-10.0, -10.0);
 	controlsRect.bottom += 8 + fApplyButton->Bounds().Height();
 	// adjust size of controls box and move aligned buttons along
@@ -1217,23 +1220,23 @@ ScreenWindow::LayoutControls(uint32 flags)
 	// TODO: we don't support getting the screen's preferred settings
 //	fDefaultsButton->ResizeToPreferred();
 //	fDefaultsButton->MoveTo(boxFrame.left, boxFrame.bottom + 8);
-	
+
 	fRevertButton->ResizeToPreferred();
 	fRevertButton->MoveTo(boxFrame.left, boxFrame.bottom + 8);
 //	fRevertButton->MoveTo(fDefaultsButton->Frame().right + 10,
 //						  fDefaultsButton->Frame().top);
-	
+
 	// Apply button was already resized above
 	float resolutionFieldRight = fResolutionField->Frame().right;
 	fApplyButton->MoveTo(resolutionFieldRight - fApplyButton->Bounds().Width(),
-				fControlsBox->Bounds().bottom - fApplyButton->Bounds().Height() - 10);
+		fControlsBox->Bounds().bottom - fApplyButton->Bounds().Height() - 10);
 
 	ResizeTo(boxFrame.right + 10, fRevertButton->Frame().bottom + 10);
 }
 
 
 BRect
-ScreenWindow::LayoutMenuFields(uint32 flags, bool sideBySide)
+ScreenWindow::_LayoutMenuFields(uint32 flags, bool sideBySide)
 {
 	BList menuFields;
 	menuFields.AddItem((void*)fResolutionField);

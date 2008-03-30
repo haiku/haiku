@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Haiku.
+ * Copyright 2005-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -54,8 +54,7 @@ get_refresh_rate(display_mode& mode)
 }
 
 
-/** helper to sort modes by resolution */
-
+/*!	Helper to sort modes by resolution */
 static int
 compare_mode(const void* _mode1, const void* _mode2)
 {
@@ -119,8 +118,17 @@ screen_mode::operator==(const screen_mode &other) const
 bool
 screen_mode::operator!=(const screen_mode &other) const
 {
+	// make no difference between 24 and 32 bit modes
+	color_space thisSpace = space;
+	if (thisSpace == B_RGB24)
+		thisSpace = B_RGB32;
+
+	color_space otherSpace = other.space;
+	if (otherSpace == B_RGB24)
+		otherSpace = B_RGB32;
+
 	return width != other.width || height != other.height
-		|| space != other.space || refresh != other.refresh
+		|| thisSpace != otherSpace || refresh != other.refresh
 		|| combine != other.combine
 		|| swap_displays != other.swap_displays
 		|| use_laptop_panel != other.use_laptop_panel
@@ -238,7 +246,9 @@ ScreenMode::GetOriginalMode(screen_mode& mode, int32 workspace) const
 }
 
 
-// this method assumes that you already reverted to the correct number of workspaces
+/*!	This method assumes that you already reverted to the correct number
+	of workspaces.
+*/
 status_t
 ScreenMode::Revert()
 {
@@ -260,7 +270,8 @@ ScreenMode::Revert()
 			SetTVStandard(&screen, fOriginal[workspace].tv_standard);
 		}
 
-		result = screen.SetMode(workspace, &fOriginalDisplayMode[workspace], true);
+		result = screen.SetMode(workspace, &fOriginalDisplayMode[workspace],
+			true);
 		if (result != B_OK)
 			break;
 	}
@@ -274,7 +285,8 @@ ScreenMode::UpdateOriginalModes()
 {
 	BScreen screen(fWindow);
 	for (int32 workspace = 0; workspace < count_workspaces(); workspace++) {
-		if (screen.GetMode(workspace, &fOriginalDisplayMode[workspace]) == B_OK) {
+		if (screen.GetMode(workspace, &fOriginalDisplayMode[workspace])
+				== B_OK) {
 			Get(fOriginal[workspace], workspace);
 			fUpdatedModes = true;
 		}

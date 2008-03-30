@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -37,25 +37,25 @@ class ScreenWindow : public BWindow {
 		virtual void ScreenChanged(BRect frame, color_space mode);
 
 	private:
-		void CheckApplyEnabled();
-		void CheckResolutionMenu();
-		void CheckColorMenu();
-		void CheckRefreshMenu();
+		void _CheckApplyEnabled();
+		void _CheckResolutionMenu();
+		void _CheckColorMenu();
+		void _CheckRefreshMenu();
 
-		void UpdateActiveMode();
-		void UpdateRefreshControl();
-		void UpdateMonitorView();
-		void UpdateControls();
-		void UpdateOriginal();
+		void _UpdateActiveMode();
+		void _UpdateRefreshControl();
+		void _UpdateMonitorView();
+		void _UpdateControls();
+		void _UpdateOriginal();
 
-		void Apply();
+		void _Apply();
 
 		status_t _WriteVesaModeFile(const screen_mode& mode) const;
 		status_t _ReadVesaModeFile(screen_mode& mode) const;		
 		bool _IsVesa() const { return fIsVesa; }
 
-		void LayoutControls(uint32 flags);
-		BRect LayoutMenuFields(uint32 flags, bool sideBySide = false);
+		void _LayoutControls(uint32 flags);
+		BRect _LayoutMenuFields(uint32 flags, bool sideBySide = false);
 
 		ScreenSettings*	fSettings;
 		bool			fIsVesa;
