@@ -193,7 +193,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	// Create real menu bar
 	fMenuBar = menu_bar = new BMenuBar(r, "");
-	
+
 	//
 	//	File Menu
 	//
@@ -224,14 +224,14 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		queryMenu->SetPredicate("MAIL:draft==1");
 		menu->AddItem(queryMenu);
 	}
-	
+
 	if(!fIncoming || resending) {
 		menu->AddItem(fSendLater = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Save as Draft", "S)ドラフトとして保存"),
 			new BMessage(M_SAVE_AS_DRAFT), 'S'));
 	}
-	
-	if(!resending && fIncoming) {	
+
+	if(!resending && fIncoming) {
 		menu->AddSeparatorItem();
 
 		subMenu = new BMenu(MDR_DIALECT_CHOICE ("Close and ","C) 閉じる"));
@@ -289,7 +289,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 			MDR_DIALECT_CHOICE ("Close", "W) 閉じる"),
 			new BMessage(B_CLOSE_REQUESTED), 'W'));
 	}
-	
+
 	menu->AddSeparatorItem();
 	menu->AddItem(fPrint = new BMenuItem(
 		MDR_DIALECT_CHOICE ("Page Setup", "G) ページ設定") B_UTF8_ELLIPSIS,
@@ -298,13 +298,13 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		MDR_DIALECT_CHOICE ("Print", "P) 印刷") B_UTF8_ELLIPSIS,
 		new BMessage(M_PRINT), 'P'));
 	menu_bar->AddItem(menu);
-	
+
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
 		MDR_DIALECT_CHOICE ("About Mail", "A) Mailについて") B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	item->SetTarget(be_app);
-	
+
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem(
 		MDR_DIALECT_CHOICE ("Quit", "Q) 終了"),
@@ -359,7 +359,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		new BMessage(M_ACCOUNTS),'-'));
 	item->SetTarget(be_app);
 
-	//	
+	//
 	// View Menu
 	//
 
@@ -371,7 +371,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu->AddItem(fRaw = new BMenuItem(MDR_DIALECT_CHOICE ("Show Raw Message","   メッセージを生で表示"), new BMessage(M_RAW)));
 		menu_bar->AddItem(menu);
 	}
-	
+
 	//
 	//	Message Menu
 	//
@@ -441,7 +441,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu_bar->AddItem(menu);
 
 		// Spam Menu
-		
+
 		if (fApp->ShowSpamGUI()) {
 			menu = new BMenu("Spam Filtering");
 			menu->AddItem(new BMenuItem("Mark as Spam and Move to Trash",
@@ -460,7 +460,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu->AddItem(fSendNow = new BMenuItem(
 			MDR_DIALECT_CHOICE ("Send Message", "M) メッセージを送信"),
 			new BMessage(M_SEND_NOW), 'M'));
-		
+
 		if(!fIncoming) {
 			menu->AddSeparatorItem();
 			fSignature = new TMenu(
@@ -477,7 +477,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		}
 		menu_bar->AddItem(menu);
 	}
-	
+
 	//
 	// Queries Menu
 	//
@@ -516,7 +516,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		(resending || !fIncoming)
 		? fApp->MailCharacterSet() // Use preferences setting for composing mail.
 		: B_MAIL_NULL_CONVERSION, // Default is automatic selection for reading mail.
-		fApp->DefaultChain()); 
+		fApp->DefaultChain());
 
 	r = Frame();
 	r.OffsetTo(0, 0);
@@ -987,7 +987,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				workable implementation would have an extra button attached to the main one
 				which has a downward-pointing arrow. Mozilla Thunderbird's 'Get Mail' button
 				is a good example of this.
-				
+
 				TODO: Replace this code with a split toolbar button
 			*/
 			uint32 buttons;
@@ -1518,7 +1518,7 @@ TMailWindow::MessageReceived(BMessage *msg)
 				fContentView->fTextView->EnableSpellCheck(fSpelling->IsMarked());
 			}
 			break;
-			
+
 		case M_EDIT_QUERIES:
 		{
 			BPath path;
@@ -1863,23 +1863,30 @@ TMailWindow::Print()
 
 	print.SetSettings(new BMessage(fApp->PrintSettings()));
 
-	if (print.ConfigJob() == B_NO_ERROR) {
+	if (print.ConfigJob() == B_OK) {
 		int32 curPage = 1;
 		int32 lastLine = 0;
-		BTextView header_view(print.PrintableRect(),"header",print.PrintableRect().OffsetByCopy(BPoint(-print.PrintableRect().left,-print.PrintableRect().top)),B_FOLLOW_ALL_SIDES);
+		BTextView header_view(print.PrintableRect(), "header",
+			print.PrintableRect().OffsetByCopy(BPoint(-print.PrintableRect().left,
+			-print.PrintableRect().top)),B_FOLLOW_ALL_SIDES);
 
 		//---------Init the header fields
-		#define add_header_field(field)			{/*header_view.SetFontAndColor(be_bold_font);*/ \
-												header_view.Insert(fHeaderView->field->Label()); \
-												header_view.Insert(" ");\
-												/*header_view.SetFontAndColor(be_plain_font);*/ \
-												header_view.Insert(fHeaderView->field->Text()); \
-												header_view.Insert("\n");}
+		#define add_header_field(field) { \
+			/*header_view.SetFontAndColor(be_bold_font);*/ \
+			header_view.Insert(fHeaderView->field->Label()); \
+			header_view.Insert(" "); \
+			/*header_view.SetFontAndColor(be_plain_font);*/ \
+			header_view.Insert(fHeaderView->field->Text()); \
+			header_view.Insert("\n"); \
+		}
+
 		add_header_field(fSubject);
 		add_header_field(fTo);
 		if ((fHeaderView->fCc != NULL) && (strcmp(fHeaderView->fCc->Text(),"") != 0))
 			add_header_field(fCc);
-		header_view.Insert(fHeaderView->fDate->Text());
+
+		if (fHeaderView->fDate != NULL)
+			header_view.Insert(fHeaderView->fDate->Text());
 
 		int32 maxLine = fContentView->fTextView->CountLines();
 		BRect pageRect = print.PrintableRect();
@@ -1887,13 +1894,15 @@ TMailWindow::Print()
 
 		print.BeginJob();
 		float header_height = header_view.TextHeight(0,header_view.CountLines());
-		BBitmap bmap(BRect(0,0,pageRect.Width(),header_height),B_BITMAP_ACCEPTS_VIEWS,B_RGBA32);
+
+		BRect rect(0, 0, pageRect.Width(), header_height);
+		BBitmap bmap(rect, B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
 		bmap.Lock();
 		bmap.AddChild(&header_view);
-		print.DrawView(&header_view,BRect(0,0,pageRect.Width(),header_height),BPoint(0.0,0.0));
-		HorizontalLine line(BRect(0,0,pageRect.right,0));
+		print.DrawView(&header_view, rect, BPoint(0.0, 0.0));
+		HorizontalLine line(BRect(0, 0, pageRect.right, 0));
 		bmap.AddChild(&line);
-		print.DrawView(&line,line.Bounds(),BPoint(0,header_height+1));
+		print.DrawView(&line, line.Bounds(), BPoint(0, header_height + 1));
 		bmap.Unlock();
 		header_height += 5;
 
@@ -1903,18 +1912,22 @@ TMailWindow::Print()
 			curPageRect.OffsetTo(0, fContentView->fTextView->PointAt(lineOffset).y);
 
 			int32 fromLine = lastLine;
-			lastLine = fContentView->fTextView->LineAt(BPoint(0.0, curPageRect.bottom - ((curPage == 1) ? header_height : 0)));
+			lastLine = fContentView->fTextView->LineAt(
+				BPoint(0.0, curPageRect.bottom - ((curPage == 1) ? header_height : 0)));
 
-			float curPageHeight = fContentView->fTextView->TextHeight(fromLine, lastLine) + ((curPage == 1) ? header_height : 0);
-			if(curPageHeight > pageRect.Height())
-				curPageHeight = fContentView->fTextView->TextHeight(fromLine, --lastLine) + ((curPage == 1) ? header_height : 0);
+			float curPageHeight = fContentView->fTextView->
+				TextHeight(fromLine, lastLine) + ((curPage == 1) ? header_height : 0);
 
+			if(curPageHeight > pageRect.Height()) {
+				curPageHeight = fContentView->fTextView->TextHeight(
+					fromLine, --lastLine) + ((curPage == 1) ? header_height : 0);
+			}
 			curPageRect.bottom = curPageRect.top + curPageHeight - 1.0;
 
-			if((curPage >= print.FirstPage()) &&
-				(curPage <= print.LastPage()))
-			{
-				print.DrawView(fContentView->fTextView, curPageRect, BPoint(0.0, (curPage == 1) ? header_height : 0.0));
+			if((curPage >= print.FirstPage())
+				&& (curPage <= print.LastPage())) {
+				print.DrawView(fContentView->fTextView, curPageRect,
+					BPoint(0.0, (curPage == 1) ? header_height : 0.0));
 				print.SpoolPage();
 			}
 
@@ -2865,12 +2878,12 @@ TMailWindow::FrontmostWindow()
 
 /*
 // Copied from src/kits/tracker/FindPanel.cpp.
-uint32 
+uint32
 TMailWindow::InitialMode(const BNode *node)
 {
 	if (!node || node->InitCheck() != B_OK)
 		return kByNameItem;
-	
+
 	uint32 result;
 	if (node->ReadAttr(kAttrQueryInitialMode, B_INT32_TYPE, 0,
 		(int32 *)&result, sizeof(int32)) <= 0)
@@ -2881,17 +2894,17 @@ TMailWindow::InitialMode(const BNode *node)
 
 
 // Copied from src/kits/tracker/FindPanel.cpp.
-int32 
+int32
 TMailWindow::InitialAttrCount(const BNode *node)
 {
 	if (!node || node->InitCheck() != B_OK)
 		return 1;
-	
+
 	int32 result;
 	if (node->ReadAttr(kAttrQueryInitialNumAttrs, B_INT32_TYPE, 0,
 		&result, sizeof(int32)) <= 0)
 		return 1;
-	
+
 	return result;
 }*/
 
@@ -2951,7 +2964,7 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 	BPath queryPath;
 	if (_GetQueryPath(&queryPath) < B_OK)
 		return;
-	
+
 	BDirectory queryDir(queryPath.Path());
 
 	if (firstTime) {
@@ -2967,11 +2980,11 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 
 		char name[B_FILE_NAME_LENGTH + 1];
 		entry.GetName(name);
-		
+
 		char* queryString = _BuildQueryString(&entry);
 		if (queryString == NULL)
 			continue;
-		
+
 		queryItemsAdded = true;
 
 		QueryMenu* queryMenu = new QueryMenu(name, false);
@@ -2999,7 +3012,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 		sizeof(int32)) <= 0) {
 		mode = kByNameItem;
 	}
-	
+
 	BString queryString;
 	switch(mode) {
 		case kByForumlaItem:
@@ -3009,7 +3022,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 				queryString << buffer;
 			break;
 		}
-			
+
 		case kByNameItem:
 		{
 			BString buffer;
@@ -3017,7 +3030,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 				queryString << "(name==*" << buffer << "*)";
 			break;
 		}
-		
+
 		case kByAttributeItem:
 		{
 			int32 count = 1;
@@ -3025,11 +3038,11 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 				(int32 *)&mode, sizeof(int32)) <= 0) {
 				count = 1;
 			}
-				
-			attr_info info; 
+
+			attr_info info;
 			if (node.GetAttrInfo(kAttrQueryInitialAttrs, &info) != B_OK)
 				break;
-		
+
 			if (count > 1 )
 				queryString << "(";
 
@@ -3048,7 +3061,7 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 							index, &value) != B_OK) {
 							break;
 						}
-							
+
 						// ignore the mime type, we'll force it to be email
 						// later
 						if (strcmp(field, "BEOS:TYPE") != 0) {
@@ -3070,28 +3083,28 @@ TMailWindow::_BuildQueryString(BEntry* entry) const
 					}
 				}
 			}
-			
+
 			if (count > 1 )
 				queryString << ")";
 
 			delete [] buffer;
 			break;
 		}
-			
+
 		default:
 			break;
 	}
-	
+
 	if (queryString.Length() == 0)
 		return NULL;
-		
-	// force it to check for email only		
+
+	// force it to check for email only
 	if (queryString.FindFirst("text/x-email") < 0 ) {
 		BString temp;
 		temp << "(" << queryString << "&&(BEOS:TYPE==\"text/x-email\"))";
 		queryString = temp;
 	}
-	
+
 	return strdup(queryString.String());
 }
 
