@@ -31,7 +31,7 @@ public:
 				PreviewPage(int32 page, PrintJobPage* pjp);
 				~PreviewPage();
 
-	void		Draw(BView* view);
+	void		Draw(BView* view, const BRect& printRect);
 	status_t	InitCheck() const;
 	int32 		Page() const { return fPage; }
 
@@ -91,8 +91,10 @@ private:
 			bool			_IsPageValid() const;
 			bool			_IsPageLoaded(int32 page) const;
 
+			BRect			_ContentRect() const;
 			void			_DrawPageFrame(BRect rect);
 			void			_DrawPage(BRect updateRect);
+			void			_DrawMarginFrame(BRect rect);
 
 private:
 			int32			fPage;
