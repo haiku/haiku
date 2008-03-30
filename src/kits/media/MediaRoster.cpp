@@ -26,6 +26,13 @@
  * THE SOFTWARE.
  *
  */
+/*
+ * Copyright 2008 Maurice Kalinowski, haiku@kaldience.com
+ *
+ * All rights reserved. Distributed under the terms of the MIT License.
+ *
+ */
+
 
 /* to comply with the license above, do not remove the following line */
 char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
@@ -36,16 +43,17 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 
 #include <new>
 
+#include <BufferConsumer.h>
+#include <BufferProducer.h>
 #include <Locker.h>
 #include <Message.h>
 #include <Messenger.h>
-#include <StopWatch.h>
+#include <MimeType.h>
 #include <OS.h>
+#include <ParameterWeb.h>
+#include <StopWatch.h>
 #include <String.h>
 #include <TimeSource.h>
-#include <ParameterWeb.h>
-#include <BufferProducer.h>
-#include <BufferConsumer.h>
 
 #include "debug.h"
 #include "MediaRosterEx.h"
@@ -2589,8 +2597,27 @@ BMediaRoster::SetRefFor(const media_node & file_interface,
 						bool create_and_truncate,
 						bigtime_t * out_length)	/* if create is false */
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+
+	fileinterface_set_ref_request request;
+	fileinterface_set_ref_reply reply;
+	status_t rv;
+
+	request.device = file.device;
+	request.directory = file.directory;
+	strcpy(request.name, file.name);
+	request.create = create_and_truncate;
+	if (out_length)
+		request.duration = *out_length;
+
+	rv = QueryPort(file_interface.port, FILEINTERFACE_SET_REF, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+
+	if (!create_and_truncate && out_length)
+		*out_length = reply.duration;
+
+	return B_OK;
 }
 
 
@@ -2599,8 +2626,25 @@ BMediaRoster::GetRefFor(const media_node & node,
 						entry_ref * out_file,
 						BMimeType * mime_type)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+
+	if (!out_file)
+		return B_BAD_VALUE;
+
+	fileinterface_get_ref_request request;
+	fileinterface_get_ref_reply reply;
+	status_t rv;
+
+	rv = QueryPort(node.port, FILEINTERFACE_GET_REF, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+
+	*out_file = entry_ref(reply.device, reply.directory, reply.name);
+
+	if (mime_type)
+		mime_type->SetTo(reply.mimetype);
+
+	return B_OK;
 }
 
 
@@ -2610,8 +2654,27 @@ BMediaRoster::SniffRefFor(const media_node & file_interface,
 						  BMimeType * mime_type,
 						  float * out_capability)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+
+	if (!mime_type || !out_capability)
+		return B_BAD_VALUE;
+
+	fileinterface_sniff_ref_request request;
+	fileinterface_sniff_ref_reply reply;
+	status_t rv;
+
+	request.device = file.device;
+	request.directory = file.directory;
+	strcpy(request.name, file.name);
+
+	rv = QueryPort(file_interface.port, FILEINTERFACE_SNIFF_REF, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+
+	mime_type->SetTo(reply.mimetype);
+	*out_capability = reply.capability;
+
+	return B_OK;
 }
 
 

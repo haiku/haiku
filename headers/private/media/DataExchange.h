@@ -171,6 +171,9 @@ enum {
 	
 	PRODUCER_MESSAGE_END,
 	FILEINTERFACE_MESSAGE_START = 0x500,
+	FILEINTERFACE_SET_REF,
+	FILEINTERFACE_GET_REF,
+	FILEINTERFACE_SNIFF_REF,
 	FILEINTERFACE_MESSAGE_END,
 	CONTROLLABLE_MESSAGE_START = 0x600,
 	CONTROLLABLE_GET_PARAMETER_WEB,
@@ -977,6 +980,45 @@ struct timesource_get_start_latency_request : public request_data
 struct timesource_get_start_latency_reply : public reply_data
 {
 	bigtime_t start_latency;
+};
+
+struct fileinterface_set_ref_request : public request_data
+{
+	dev_t device;
+	ino_t directory;
+	char name[B_FILE_NAME_LENGTH];
+	bigtime_t duration;
+	bool create;
+};
+
+struct fileinterface_set_ref_reply : public reply_data
+{
+	bigtime_t duration;
+};
+
+struct fileinterface_get_ref_request : public request_data
+{
+};
+
+struct fileinterface_get_ref_reply : public reply_data
+{
+	dev_t device;
+	ino_t directory;
+	char name[B_FILE_NAME_LENGTH];
+	char mimetype[256];
+};
+
+struct fileinterface_sniff_ref_request : public request_data
+{
+	dev_t device;
+	ino_t directory;
+	char name[B_FILE_NAME_LENGTH];
+};
+
+struct fileinterface_sniff_ref_reply : public reply_data
+{
+	char mimetype[256];
+	float capability;
 };
 
 struct controllable_get_parameter_web_request : public request_data
