@@ -207,7 +207,7 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 
 
 #define MTRR_MAX_SOLUTIONS 	5	// usually MTRR count is eight, keep a few for other needs
-#define MTRR_MIN_SIZE 		0x100000	// 1 MB
+#define MTRR_MIN_SIZE 		0x80000	// 512 KB
 static int64 sSolutions[MTRR_MAX_SOLUTIONS];
 static int32 sSolutionCount;
 static int64 sPropositions[MTRR_MAX_SOLUTIONS];
