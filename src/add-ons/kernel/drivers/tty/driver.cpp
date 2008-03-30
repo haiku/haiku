@@ -27,8 +27,9 @@ static const int kMaxCachedSemaphores = 8;
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-static char *sDeviceNames[kNumTTYs * 2 + 1];
-	// reserve space for "pt/" and "tt/" entries and the terminating NULL
+static char *sDeviceNames[kNumTTYs * 2 + 2];
+	// reserve space for "pt/" and "tt/" entries, "tty", and the terminating
+	// NULL
 
 struct mutex gGlobalTTYLock;
 struct mutex gTTYCookieLock;
@@ -99,6 +100,8 @@ init_driver(void)
 			return B_NO_MEMORY;
 		}
 	}
+
+	sDeviceNames[2 * kNumTTYs] = "tty";
 
 	tty_add_debugger_commands();
 

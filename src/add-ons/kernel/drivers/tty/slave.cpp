@@ -31,9 +31,18 @@ struct tty gSlaveTTYs[kNumTTYs];
 static status_t
 slave_open(const char *name, uint32 flags, void **_cookie)
 {
+	// Get the tty index: Opening "/dev/tty" means opening the process'
+	// controlling tty.
 	int32 index = get_tty_index(name);
-	if (index >= (int32)kNumTTYs)
-		return B_ERROR;
+	if (strcmp(name, "tty") == 0) {
+		index = team_get_controlling_tty();
+		if (index < 0)
+			return B_NOT_ALLOWED;
+	} else {
+		index = get_tty_index(name);
+		if (index >= (int32)kNumTTYs)
+			return B_ERROR;
+	}
 
 	TRACE(("slave_open: TTY index = %ld (name = %s)\n", index, name));
 
