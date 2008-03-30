@@ -156,6 +156,10 @@ common_getgroups(int groupCount, gid_t* groupList, bool kernel)
 		actualCount = 1;
 	}
 
+	// if groupCount 0 is supplied, we only return the number of groups
+	if (groupCount == 0)
+		return actualCount;
+
 	// check for sufficient space
 	if (groupCount < actualCount)
 		return B_BAD_VALUE;
