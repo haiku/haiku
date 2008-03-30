@@ -2364,8 +2364,12 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code, BPrivate::LinkReceiver &li
 				
 				ServerPicture *picture = App()->FindPicture(token);
 				if (picture != NULL) {
-					fCurrentView->CurrentState()->SetOrigin(where);
+					fCurrentView->PushState();
+					fCurrentView->SetDrawingOrigin(where);
+					fCurrentView->PushState();
 					picture->Play(fCurrentView);
+					fCurrentView->PopState();
+					fCurrentView->PopState();
 				}
 			}
 			break;

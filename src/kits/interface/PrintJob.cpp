@@ -531,7 +531,7 @@ BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 	
 	if (view->LockLooper()) {
 		BPicture picture;
-		_RecurseView(view, where, &picture, rect);
+		_RecurseView(view, B_ORIGIN - rect.LeftTop(), &picture, rect);
 		_AddPicture(picture, rect, where);		
 		view->UnlockLooper();
 	}
@@ -664,6 +664,7 @@ BPrintJob::_RecurseView(BView *view, BPoint origin,
 	view->AppendToPicture(picture);
 	view->f_is_printing = true;
 	view->PushState();
+	view->SetOrigin(origin);
 	view->Draw(rect);
 	view->PopState();
 	view->f_is_printing = false;

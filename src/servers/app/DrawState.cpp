@@ -283,10 +283,15 @@ DrawState::SetOrigin(const BPoint& origin)
 
 	// NOTE: the origins of earlier states are never expected to
 	// change, only the topmost state ever changes
-	if (fPreviousState)
-		fCombinedOrigin = fPreviousState->fCombinedOrigin + fOrigin;
-	else
-		fCombinedOrigin = fOrigin;
+	if (fPreviousState) {
+		fCombinedOrigin.x = fPreviousState->fCombinedOrigin.x
+			+ fOrigin.x * fPreviousState->fCombinedScale;
+		fCombinedOrigin.y = fPreviousState->fCombinedOrigin.y
+			+ fOrigin.y * fPreviousState->fCombinedScale;
+	} else {
+		fCombinedOrigin.x = fOrigin.x * fCombinedScale;
+		fCombinedOrigin.y = fOrigin.y * fCombinedScale;
+	}
 }
 
 
