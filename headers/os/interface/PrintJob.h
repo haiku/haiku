@@ -1,25 +1,19 @@
-/*******************************************************************************
-/
-/	File:			PrintJob.h
-/
-/   Description:    BPrintJob runs a printing session.
-/
-/	Copyright 1996-98, Be Incorporated, All Rights Reserved
-/
-*******************************************************************************/
-
+/*
+ * Copyright 2008, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef	_PRINTSESSION_H
 #define	_PRINTSESSION_H
 
+
 #include <BeBuild.h>
-#include <Picture.h>		/* For convenience */
+#include <Picture.h>
 #include <Rect.h>
+
 
 class BFile;
 class BView;
 
-/*----------------------------------------------------------------*/
-/*----- BPrintJob related structures -----------------------------*/
 
 struct	print_file_header {
 	int32	version;
@@ -30,95 +24,91 @@ struct	print_file_header {
 	int32	_reserved_5_;
 };
 
+
 struct _page_header_;
 
-/*----------------------------------------------------------------*/
-/*----- BPrintJob class ------------------------------------------*/
 
 class BPrintJob {
 public:
 
-	enum 	// These values are returned by PrinterType()
-	{
-		B_BW_PRINTER = 0,
-		B_COLOR_PRINTER
-	};
+			enum {
+						B_BW_PRINTER = 0,
+						B_COLOR_PRINTER
+			};
 
 
-					BPrintJob(const char *job_name);
-virtual				~BPrintJob();
+						BPrintJob(const char *job_name);
+	virtual				~BPrintJob();
 
-		void		BeginJob();	
-		void		CommitJob();	
-		status_t	ConfigJob();
-		void		CancelJob();
+			void		BeginJob();
+			void		CommitJob();
+			status_t	ConfigJob();
+			void		CancelJob();
 
-		status_t	ConfigPage();
-		void		SpoolPage();
+			status_t	ConfigPage();
+			void		SpoolPage();
 
-		bool		CanContinue();
+			bool		CanContinue();
 
-virtual	void		DrawView(BView *a_view, BRect a_rect, BPoint where);
+	virtual	void		DrawView(BView *a_view, BRect a_rect, BPoint where);
 
-		BMessage	*Settings()	/* const */ ;
-		void		SetSettings(BMessage *a_msg);
-		bool		IsSettingsMessageValid(BMessage *a_msg) const;
+			BMessage *	Settings()	/* const */ ;
+			void		SetSettings(BMessage *a_msg);
+			bool		IsSettingsMessageValid(BMessage *a_msg) const;
 
-		BRect		PaperRect();
-		BRect		PrintableRect();
-		void		GetResolution(int32 *xdpi, int32 *ydpi);
+			BRect		PaperRect();
+			BRect		PrintableRect();
+			void		GetResolution(int32 *xdpi, int32 *ydpi);
 
-		int32		FirstPage()	/* const */ ;
-		int32		LastPage()	/* const */ ;
-		int32		PrinterType(void * = NULL) const;
-		
+			int32		FirstPage()	/* const */ ;
+			int32		LastPage()	/* const */ ;
+			int32		PrinterType(void * = NULL) const;
 
-/*----- Private or reserved -----------------------------------------*/
+
 private:
+	virtual void		_ReservedPrintJob1();
+	virtual void		_ReservedPrintJob2();
+	virtual void		_ReservedPrintJob3();
+	virtual void		_ReservedPrintJob4();
 
-virtual void		_ReservedPrintJob1();
-virtual void		_ReservedPrintJob2();
-virtual void		_ReservedPrintJob3();
-virtual void		_ReservedPrintJob4();
+						BPrintJob(const BPrintJob &);
+			BPrintJob	&operator=(const BPrintJob &);
 
-					BPrintJob(const BPrintJob &);
-		BPrintJob	&operator=(const BPrintJob &);
+			void		_RecurseView(BView *view, BPoint origin,
+							BPicture *picture, BRect r);
+			void		_GetMangledName(char *buffer, size_t bufferSize) const;
+			void		_HandlePageSetup(BMessage *setup);
+			bool		_HandlePrintSetup(BMessage *setup);
 
-		void				_RecurseView(BView *view, BPoint origin, BPicture *p, BRect r);
-		void				_GetMangledName(char *buffer, size_t bufferSize) const;
-		void				_HandlePageSetup(BMessage *setup);
-		bool				_HandlePrintSetup(BMessage *setup);
+			void		_NewPage();
+			void		_EndLastPage();
 
-		void				_NewPage();
-		void				_EndLastPage();
+			void		_AddSetupSpec();
+			void		_AddPicture(BPicture &picture, BRect &rect, BPoint &where);
 
-		void				_AddSetupSpec();
-		void				_AddPicture(BPicture &picture, BRect &rect, BPoint &where);
+			char *		_GetCurrentPrinterName() const;
+			void		_LoadDefaultSettings();
 
-		char*				_GetCurrentPrinterName() const;
-		void				_LoadDefaultSettings();
-
-		char *				fPrintJobName;
-		int32				fPageNumber;
-		BFile *				fSpoolFile;
-		print_file_header	fCurrentHeader;
-		BRect				fPaperSize;
-		BRect				fUsableSize;
-		status_t			fError;
-		char				fSpoolFileName[256];	
-		BMessage			*fSetupMessage;
-		BMessage			*fDefaultSetupMessage;
-		char				fAbort;
-		int32				fFirstPage;
-		int32				fLastPage;
-		short				fXResolution;
-		short				fYResolution;
-		_page_header_ *		fCurrentPageHeader;
-		off_t				fCurrentPageHeaderOffset;
-		uint32				_reserved[2];
+private:
+			char *				fPrintJobName;
+			int32				fPageNumber;
+			BFile *				fSpoolFile;
+			print_file_header	fCurrentHeader;
+			BRect				fPaperSize;
+			BRect				fUsableSize;
+			status_t			fError;
+			char				fSpoolFileName[256];
+			BMessage *			fSetupMessage;
+			BMessage *			fDefaultSetupMessage;
+			char				fAbort;
+			int32				fFirstPage;
+			int32				fLastPage;
+			short				fXResolution;
+			short				fYResolution;
+			_page_header_ *		fCurrentPageHeader;
+			off_t				fCurrentPageHeaderOffset;
+			uint32				_reserved[2];
 };
- 
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
 
-#endif /* _PRINTSESSION_H */
+
+#endif	// _PRINTSESSION_H
