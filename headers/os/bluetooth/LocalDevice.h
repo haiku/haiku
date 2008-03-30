@@ -49,7 +49,7 @@ class LocalDevice {
                  void updateRecord(ServiceRecord srvRecord);
 		 */                 
     private:
-        LocalDevice(hci_id hid);
+		         LocalDevice(hci_id hid);
         
         static   LocalDevice*   RequestLocalDeviceID(BMessage* request);
         
@@ -57,6 +57,9 @@ class LocalDevice {
                BMessenger*      fMessenger;
 
 		hci_id		hid;
+		hci_id		GetID(void) {return hid;}
+		
+		friend class DiscoveryAgent;
 };
     
 }

@@ -181,6 +181,16 @@ struct hci_command_header {
     
     /* Link Control Command definition */
     #define OGF_LINK_CONTROL	0x01 
+
+    #define OCF_INQUIRY		0x0001
+    struct hci_cp_inquiry {
+    	uint8     lap[3];
+    	uint8     length;
+    	uint8     num_rsp;
+    } __attribute__ ((packed));
+    
+    #define OCF_INQUIRY_CANCEL	0x0002
+  
     #define OCF_CREATE_CONN		0x0005
     struct hci_cp_create_conn {
     	bdaddr_t bdaddr;
@@ -190,19 +200,7 @@ struct hci_command_header {
     	uint16    clock_offset;
     	uint8     role_switch;
     } __attribute__ ((packed));
-    
-    #define OCF_ACCEPT_CONN_REQ	0x0009
-    struct hci_cp_accept_conn_req {
-    	bdaddr_t bdaddr;
-    	uint8     role;
-    } __attribute__ ((packed));
-    
-    #define OCF_REJECT_CONN_REQ	0x000a
-    struct hci_cp_reject_conn_req {
-    	bdaddr_t 	bdaddr;
-    	uint8     	reason;
-    } __attribute__ ((packed));
-    
+        
     #define OCF_DISCONNECT	0x0006
     struct hci_disconnect {
     	uint16    handle;
@@ -214,19 +212,19 @@ struct hci_command_header {
     	uint16    handle;
     	uint16    pkt_type;
     } __attribute__ ((packed));
-    
-    #define OCF_INQUIRY		0x0001
-    struct hci_cp_inquiry {
-    	uint8     lap[3];
-    	/* Constants related the inquiry process */
-		#define B_BT_GIAC 0x9E8B33   
-		#define B_BT_LIAC 0x9E8B00
-    	uint8     length;
-    	uint8     num_rsp;
+
+    #define OCF_ACCEPT_CONN_REQ	0x0009
+    struct hci_cp_accept_conn_req {
+    	bdaddr_t bdaddr;
+    	uint8     role;
     } __attribute__ ((packed));
     
-    #define OCF_INQUIRY_CANCEL	0x0002
-    
+    #define OCF_REJECT_CONN_REQ	0x000a
+    struct hci_cp_reject_conn_req {
+    	bdaddr_t 	bdaddr;
+    	uint8     	reason;
+    } __attribute__ ((packed));
+        
     #define OCF_LINK_KEY_REPLY	0x000B
     struct hci_cp_link_key_reply {
     	bdaddr_t bdaddr;

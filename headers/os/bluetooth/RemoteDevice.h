@@ -19,6 +19,7 @@
 namespace Bluetooth {
 
 class Connection;
+class LocalDevice;
 
 class RemoteDevice {
 
@@ -32,12 +33,12 @@ class RemoteDevice {
         BString GetBluetoothAddress();
         bool Equals(RemoteDevice* obj);
         
-        static RemoteDevice* GetRemoteDevice(Connection conn);  /* Throwing */
+        /*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
         bool Authenticate(); /* Throwing */
-        bool Authorize(Connection conn); /* Throwing */
-        bool Encrypt(Connection conn, bool on); /* Throwing */
+        /* bool Authorize(Connection conn);  Throwing */
+        /*bool Encrypt(Connection conn, bool on);  Throwing */
         bool IsAuthenticated(); /* Throwing */
-        bool IsAuthorized(Connection conn); /* Throwing */
+        /*bool IsAuthorized(Connection conn);  Throwing */
         bool IsEncrypted(); /* Throwing */
                 
     protected:
@@ -46,6 +47,12 @@ class RemoteDevice {
     
     /* Instances of this class only will be done by Discovery[Listener|Agent] TODO */
     friend class DiscoveryListener;
+    
+    private:
+		void         SetLocalDeviceOwner(LocalDevice* ld);
+		
+    	bdaddr_t	 fBdaddr;
+    	LocalDevice* fDiscovererLocalDevice;
         
 };
 

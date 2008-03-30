@@ -9,6 +9,7 @@
 #define _BTHCI_EVENT_H_
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/HCI/btHCI.h>
 
 #define HCI_EVENT_HDR_SIZE   2
 

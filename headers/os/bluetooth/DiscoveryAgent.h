@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * Copyright 2007-2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  *
@@ -9,13 +9,19 @@
 #define _DISCOVERY_AGENT_H
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/DiscoveryListener.h>
 
-#define B_BT_CACHED 0x00
-#define B_BT_PREKNOWN 0x01
-#define B_BT_NOT_DISCOVERABLE 0x01
 
-#define B_BT_GIAC 0x9E8B33
-#define B_BT_LIAC 0x9E8B00
+#define BT_CACHED 0x00
+#define BT_PREKNOWN 0x01
+#define BT_NOT_DISCOVERABLE 0x01
+
+#define BT_GIAC 0x9E8B33
+#define BT_LIAC 0x9E8B00
+
+#define BT_MAX_RESPONSES         (32)
+#define BT_BASE_INQUIRY_TIME	 (1.28)
+#define BT_DEFAULT_INQUIRY_TIME  (0x15*BT_BASE_INQUIRY_TIME)  /* TODO: REVIEW SPECS! */
 
 namespace Bluetooth {
 
@@ -26,16 +32,17 @@ class DiscoveryAgent {
 
     public:
                 
-        static const int GIAC = B_BT_GIAC;
-        static const int LIAC = B_BT_LIAC;
+        static const int GIAC = BT_GIAC;
+        static const int LIAC = BT_LIAC;
         
-        static const int PREKNOWN = B_BT_PREKNOWN;
-        static const int CACHED = B_BT_CACHED;
-        static const int NOT_DISCOVERABLE = B_BT_NOT_DISCOVERABLE;
+        static const int PREKNOWN = BT_PREKNOWN;
+        static const int CACHED = BT_CACHED;
+        static const int NOT_DISCOVERABLE = BT_NOT_DISCOVERABLE;
         
-        RemoteDevice** RetrieveDevices(int option); /* TODO */
-        bool StartInquiry(int accessCode, DiscoveryListener listener); /* Throwing */
-        bool CancelInquiry(DiscoveryListener listener);
+        RemoteDevicesList RetrieveDevices(int option); /* TODO */
+        status_t StartInquiry(int accessCode, DiscoveryListener* listener); /* Throwing */
+        status_t StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs);
+        status_t CancelInquiry(DiscoveryListener* listener);
         
         /*
         int searchServices(int[] attrSet,
@@ -49,7 +56,11 @@ class DiscoveryAgent {
         
     private:
         DiscoveryAgent();
-        
+        void SetLocalDeviceOwner(LocalDevice* ld);
+
+        DiscoveryListener* fLastUsedListener;
+        LocalDevice*       fLocalDevice;
+
 };
 
 }
