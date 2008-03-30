@@ -91,9 +91,9 @@ private:
 
 private:
 			char *				fPrintJobName;
-			int32				fPageNumber;
+			int32				_unused;
 			BFile *				fSpoolFile;
-			print_file_header	fCurrentHeader;
+			print_file_header	fSpoolFileHeader;
 			BRect				fPaperSize;
 			BRect				fUsableSize;
 			status_t			fError;
