@@ -11,7 +11,7 @@
 /* #undef POSIX_GETGRNAM_R */
 
 #define NEED_SETGROUPENT 1
-#define NEED_GETGROUPLIST 1
+/* #undef NEED_GETGROUPLIST */
 
 /* define if prototype for getgrnam_r() is required */
 #define NEED_GETGRNAM_R 1

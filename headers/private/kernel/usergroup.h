@@ -27,9 +27,10 @@ status_t	update_set_id_user_and_group(struct team* team, const char* file);
 
 gid_t		_user_getgid(bool effective);
 uid_t		_user_getuid(bool effective);
-ssize_t		_user_getgroups(int groupSize, gid_t* groupList);
 status_t	_user_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged);
 status_t	_user_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged);
+ssize_t		_user_getgroups(int groupCount, gid_t* groupList);
+ssize_t		_user_setgroups(int groupCount, const gid_t* groupList);
 
 #ifdef __cplusplus
 }	// extern "C"

@@ -6,16 +6,19 @@
 #include <usergroup.h>
 
 #include <errno.h>
+#include <limits.h>
 #include <sys/stat.h>
 
-#include <new.h>
+#include <new>
 
+#include <heap.h>
 #include <kernel.h>
 #include <syscalls.h>
 #include <team.h>
 #include <thread.h>
 #include <thread_types.h>
 #include <util/AutoLock.h>
+#include <vfs.h>
 
 #include <AutoDeleter.h>
 
@@ -137,6 +140,81 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 }
 
 
+ssize_t
+common_getgroups(int groupCount, gid_t* groupList, bool kernel)
+{
+	struct team* team = thread_get_current_thread()->team;
+
+	InterruptsSpinLocker _(team_spinlock);
+
+	const gid_t* groups = team->supplementary_groups;
+	int actualCount = team->supplementary_group_count;
+
+	// follow the specification and return always at least one group
+	if (actualCount == 0) {
+		groups = &team->effective_gid;
+		actualCount = 1;
+	}
+
+	// check for sufficient space
+	if (groupCount < actualCount)
+		return B_BAD_VALUE;
+
+	// copy
+	if (kernel) {
+		memcpy(groupList, groups, actualCount);
+	} else {
+		if (!IS_USER_ADDRESS(groupList)
+			|| user_memcpy(groupList, groups,
+					actualCount * sizeof(gid_t)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+
+	return actualCount;
+}
+
+
+static status_t
+common_setgroups(int groupCount, const gid_t* groupList, bool kernel)
+{
+	if (groupCount < 0 || groupCount > NGROUPS_MAX)
+		return B_BAD_VALUE;
+
+	gid_t* newGroups = NULL;
+	if (groupCount > 0) {
+		newGroups = (gid_t*)malloc_referenced(sizeof(gid_t) * groupCount);
+		if (newGroups == NULL)
+			return B_NO_MEMORY;
+
+		if (kernel) {
+			memcpy(newGroups, groupList, sizeof(gid_t) * groupCount);
+		} else {
+			if (!IS_USER_ADDRESS(groupList)
+				|| user_memcpy(newGroups, groupList,
+					sizeof(gid_t) * groupCount) != B_OK) {
+				free(newGroups);
+				return B_BAD_ADDRESS;
+			}
+		}
+	}
+
+	InterruptsSpinLocker locker(team_spinlock);
+
+	struct team* team = thread_get_current_thread()->team;
+
+	gid_t* toFree = team->supplementary_groups;
+	team->supplementary_groups = newGroups;
+	team->supplementary_group_count = groupCount;
+
+	locker.Unlock();
+
+	malloc_referenced_release(toFree);
+
+	return B_OK;
+}
+
+
 // #pragma mark - Kernel Private
 
 
@@ -151,6 +229,10 @@ inherit_parent_user_and_group(struct team* team, struct team* parent)
 	team->saved_set_gid = parent->saved_set_gid;
 	team->real_gid = parent->real_gid;
 	team->effective_gid = parent->effective_gid;
+
+	malloc_referenced_acquire(parent->supplementary_groups);
+	team->supplementary_groups = parent->supplementary_groups;
+	team->supplementary_group_count = parent->supplementary_group_count;
 }
 
 
@@ -158,8 +240,9 @@ status_t
 update_set_id_user_and_group(struct team* team, const char* file)
 {
 	struct stat st;
-	if (stat(file, &st) < 0)
-		return errno;
+	status_t status = vfs_read_stat(-1, file, true, &st, false);
+	if (status != B_OK)
+		return status;
 
 	InterruptsSpinLocker _(team_spinlock);
 
@@ -195,19 +278,6 @@ _kern_getuid(bool effective)
 }
 
 
-ssize_t
-_kern_getgroups(int groupSize, gid_t* groupList)
-{
-	// TODO: Implement proper supplementary group support!
-	// For now only return the effective group.
-
-	if (groupSize > 0)
-		groupList[0] = getegid();
-
-	return 1;
-}
-
-
 status_t
 _kern_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged)
 {
@@ -219,6 +289,20 @@ status_t
 _kern_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged)
 {
 	return common_setreuid(ruid, euid, setAllIfPrivileged, true);
+}
+
+
+ssize_t
+_kern_getgroups(int groupCount, gid_t* groupList)
+{
+	return common_getgroups(groupCount, groupList, true);
+}
+
+
+status_t
+_kern_setgroups(int groupCount, const gid_t* groupList)
+{
+	return common_setgroups(groupCount, groupList, true);
 }
 
 
@@ -243,42 +327,6 @@ _user_getuid(bool effective)
 }
 
 
-ssize_t
-_user_getgroups(int groupSize, gid_t* userGroupList)
-{
-	gid_t* groupList = NULL;
-
-	if (groupSize < 0)
-		return B_BAD_VALUE;
-	if (groupSize > NGROUPS_MAX + 1)
-		groupSize = NGROUPS_MAX + 1;
-
-	if (groupSize > 0) {
-		if (userGroupList == NULL || !IS_USER_ADDRESS(userGroupList))
-			return B_BAD_VALUE;
-
-		groupList = new(nothrow) gid_t[groupSize];
-		if (groupList == NULL)
-			return B_NO_MEMORY;
-	}
-
-	ArrayDeleter<gid_t> _(groupList);
-
-	ssize_t result = _kern_getgroups(groupSize, groupList);
-	if (result < 0)
-		return result;
-
-	if (groupSize > 0) {
-		if (user_memcpy(userGroupList, groupList, sizeof(gid_t) * result)
-				!= B_OK) {
-			return B_BAD_ADDRESS;
-		}
-	}
-
-	return result;
-}
-
-
 status_t
 _user_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged)
 {
@@ -290,4 +338,21 @@ status_t
 _user_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged)
 {
 	return common_setreuid(ruid, euid, setAllIfPrivileged, false);
+}
+
+
+ssize_t
+_user_getgroups(int groupCount, gid_t* groupList)
+{
+	return common_getgroups(groupCount, groupList, false);
+}
+
+
+ssize_t
+_user_setgroups(int groupCount, const gid_t* groupList)
+{
+	if (!is_privileged(thread_get_current_thread()->team))
+		return EPERM;
+
+	return common_setgroups(groupCount, groupList, false);
 }

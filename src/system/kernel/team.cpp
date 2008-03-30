@@ -829,6 +829,9 @@ create_team_struct(const char *name, bool kernel)
 	team->flags = 0;
 	team->death_sem = -1;
 
+	team->supplementary_groups = NULL;
+	team->supplementary_group_count = 0;
+
 	team->dead_threads_kernel_time = 0;
 	team->dead_threads_user_time = 0;
 
@@ -912,6 +915,8 @@ delete_team_struct(struct team *team)
 
 	while (job_control_entry* entry = team->dead_children->entries.RemoveHead())
 		delete entry;
+
+	malloc_referenced_release(team->supplementary_groups);
 
 	delete team->job_control_entry;
 		// usually already NULL and transferred to the parent
@@ -1959,6 +1964,8 @@ team_init(kernel_args *args)
 	sKernelTeam->saved_set_gid = 0;
 	sKernelTeam->real_gid = 0;
 	sKernelTeam->effective_gid = 0;
+	sKernelTeam->supplementary_groups = NULL;
+	sKernelTeam->supplementary_group_count = 0;
 
 	insert_team_into_group(group, sKernelTeam);
 

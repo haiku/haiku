@@ -196,6 +196,8 @@ struct team {
 	gid_t			saved_set_gid;
 	gid_t			real_gid;
 	gid_t			effective_gid;
+	gid_t*			supplementary_groups;
+	int				supplementary_group_count;
 };
 
 typedef int32 (*thread_entry_func)(thread_func, void *);
