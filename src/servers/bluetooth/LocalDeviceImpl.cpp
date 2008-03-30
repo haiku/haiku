@@ -15,6 +15,8 @@
 #include <bluetooth/bluetooth_error.h>
 #include <bluetooth/HCI/btHCI_event.h>
 
+#include <bluetoothserver_p.h>
+
 #include <stdio.h>
 
 
@@ -91,8 +93,12 @@ printf("### \n");
 		(Output::Instance()->Post("Incoming Command Complete\n", BLACKBOARD_EVENTS));
 		request = FindPetition(event->ecode, ((struct hci_ev_cmd_complete*)(event+1))->opcode );
 	
+	} else if ( event->ecode == HCI_EVENT_CMD_STATUS ) {
+
+		(Output::Instance()->Post("Incoming Command Complete\n", BLACKBOARD_EVENTS));
+		request = FindPetition(event->ecode, ((struct hci_ev_cmd_status*)(event+1))->opcode );
+
 	} else 
-	// TODO: Command status should also be considered
 	{	
 		request = FindPetition(event->ecode);
 	}
@@ -145,6 +151,7 @@ printf("### \n");
  		break;
  	
  		case HCI_EVENT_CMD_STATUS:
+ 				CommandStatus((struct hci_ev_cmd_status*)(event+1), request); 		
 		break;
 
 		case HCI_EVENT_FLUSH_OCCUR:
@@ -312,6 +319,52 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
     }        
 }
 
+
+void 
+LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* request) {
+
+	int16   opcodeExpected;
+	BMessage reply;
+	
+    Output::Instance()->Post(__FUNCTION__, BLACKBOARD_LD_OFFSET + GetID());
+    Output::Instance()->Post("\n", BLACKBOARD_LD_OFFSET + GetID());
+	
+	// Handle command complete information
+    request->FindInt16("opcodeExpected", 0 /*REVIEW!*/, &opcodeExpected);
+
+
+	if (request->IsSourceWaiting() == false)
+		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);                	
+    
+    
+    switch (opcodeExpected) {
+        
+        case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR):
+        {    
+        	struct hci_ev_cmd_status* commandStatus = (struct hci_ev_cmd_status*)(event+1);
+        	       	
+        	reply.what = BT_MSG_INQUIRY_STARTED;
+        	reply.AddInt8("status", commandStatus->status);
+        	
+            if (commandStatus->status == BT_OK) {                                
+			    Output::Instance()->Post("Positive reply for inquiry\n", BLACKBOARD_KIT);
+            } else {
+			    Output::Instance()->Post("Negative reply for friendly name\n", BLACKBOARD_KIT);                
+            }
+
+            printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
+            reply.PrintToStream();
+                        
+            ClearWantedEvent(request, PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
+     	}       
+        break;
+		
+		default:
+		    Output::Instance()->Post("Command Status not handled\n", BLACKBOARD_KIT);                		
+		break;
+	}
+
+}
 
 #if 0
 #pragma mark - Request Methods -

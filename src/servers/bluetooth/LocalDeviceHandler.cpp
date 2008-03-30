@@ -63,17 +63,21 @@ LocalDeviceHandler::AddWantedEvent(BMessage* msg)
     fEventsWanted.Unlock();
 }
 
+void 
+LocalDeviceHandler::ClearWantedEvent(BMessage* msg)
+{
+    fEventsWanted.Lock();
+    fEventsWanted.RemoveMessage(msg);    
+    fEventsWanted.Unlock();
+
+}
+
 
 void 
-LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event = 0, uint16 opcode = 0)
+LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode = 0)
 {  
     // Remove the whole petition from queue
-    fEventsWanted.Lock();        
-/*    
-    if (event == 0) {
-        fEventsWanted.RemoveMessage(msg);
-        goto bail;
-    }
+    fEventsWanted.Lock();
 
     int16 eventFound;
     int16 opcodeFound;
@@ -89,17 +93,19 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event = 0, uint16 opc
             if (eventFound == event) {
                 
                 // there is an opcode specified
-                if (opcde != 0)
+                if (opcode != 0) {
                 	
                 	// The opcode matches
                 	if ( (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) &&
                 	     ((uint16)opcodeFound != opcode) ) {
                 	     
+                	    // FIX: this should remove only the entry 
                 		fEventsWanted.RemoveMessage(msg);
                 		goto bail;
                 	}                    
                 }  else {                
                 	// Event matches so far
+               	    // FIX: this should remove only the entry                 	
                		fEventsWanted.RemoveMessage(msg);
                		goto bail;
                 }
@@ -109,9 +115,9 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event = 0, uint16 opc
         }
     }
             
-bail:    */
-    fEventsWanted.RemoveMessage(msg);
-    
+bail:
+
+    fEventsWanted.RemoveMessage(msg);    
     fEventsWanted.Unlock();
 
 }

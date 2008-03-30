@@ -37,7 +37,9 @@ protected:
 	BMessage* 		fProperties;
 	
     void 		AddWantedEvent(BMessage* msg);    
-    void 		ClearWantedEvent(BMessage* msg, uint16 code, uint16 opcode = 0);
+    void 		ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode = 0);
+    void 		ClearWantedEvent(BMessage* msg);
+        
     BMessage* 	FindPetition(uint16 event, uint16 opcode = 0);
 
 private:    

@@ -38,6 +38,7 @@ public:
 
     /* Events handling */	
     void CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request);
+	void CommandStatus(struct hci_ev_cmd_status* event, BMessage* request);
 	
 };
 
