@@ -22,6 +22,7 @@
 #include <OS.h>
 #include <Path.h>
 #include <PrintJob.h>
+#include <Region.h>
 #include <Roster.h>
 #include <View.h>
 
@@ -353,18 +354,13 @@ BPrintJob::ConfigJob()
 void
 BPrintJob::BeginJob()
 {
-	if (fSpoolFile != NULL) {
-		// can not start a new job until it has been commited or cancelled
+	// can not start a new job until it has been commited or cancelled
+	if (fSpoolFile != NULL || fCurrentPageHeader == NULL)
 		return;
-	}
-	if (fCurrentPageHeader == NULL) {
-		return;
-	}
 
-	if (fSetupMessage == NULL) {
-		// TODO show alert, setup message is required
+	// TODO show alert, setup message is required
+	if (fSetupMessage == NULL)
 		return;
-	}
 
 	// create spool file
 	BPath path;
@@ -383,7 +379,6 @@ BPrintJob::BeginJob()
 	_GetMangledName(mangledName, B_FILE_NAME_LENGTH);
 
 	path.Append(mangledName);
-
 	if (path.InitCheck() != B_OK)
 		return;
 
@@ -398,13 +393,13 @@ BPrintJob::BeginJob()
 
 	// add print_file_header
 	// page_count is updated in CommitJob()
+	// on BeOS R5 the offset to the first page was always -1
 	fCurrentHeader.version = 1 << 16;
 	fCurrentHeader.page_count = 0;
-	// on BeOS R5 the offset to the first page
-	// was always -1.
 	fCurrentHeader.first_page = (off_t)-1;
 
-	if (fSpoolFile->Write(&fCurrentHeader, sizeof(fCurrentHeader)) != sizeof(fCurrentHeader)) {
+	if (fSpoolFile->Write(&fCurrentHeader, sizeof(print_file_header))
+		!= sizeof(print_file_header)) {
 		CancelJob();
 		return;
 	}
@@ -658,10 +653,14 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 {
 	ASSERT(picture != NULL);
 
+	BRegion region;
+	region.Set(BRect(rect.left, rect.top, rect.right, rect.bottom));
+
 	view->AppendToPicture(picture);
 	view->f_is_printing = true;
 	view->PushState();
 	view->SetOrigin(origin);
+	view->ConstrainClippingRegion(&region);
 	view->Draw(rect);
 	view->PopState();
 	view->f_is_printing = false;
@@ -682,6 +681,7 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 		view->f_is_printing = true;
 		view->PushState();
 		view->SetOrigin(origin);
+		view->ConstrainClippingRegion(&region);
 		view->DrawAfterChildren(rect);
 		view->PopState();
 		view->f_is_printing = false;
