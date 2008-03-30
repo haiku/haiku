@@ -90,11 +90,12 @@ BEOS_ADD_ONS_TRANSLATORS = BMPTranslator EXRTranslator GIFTranslator JPEGTransla
 	RTF-Translator SGITranslator STXTTranslator TGATranslator
 	TIFFTranslator WonderBrushTranslator
 ;
-BEOS_ADD_ONS_MEDIA = dvb.media_addon
+BEOS_ADD_ONS_MEDIA = cortex_audioadapter.media_addon cortex_flanger.media_addon
+	dvb.media_addon
 	hmulti_audio.media_addon
 	mixer.media_addon
 	opensound.media_addon
-    tone_producer_demo.media_addon
+	tone_producer_demo.media_addon
 	usb_webcam.media_addon
 	video_producer_demo.media_addon
 	video_window_demo.media_addon
