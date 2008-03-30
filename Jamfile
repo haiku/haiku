@@ -145,6 +145,9 @@ if $(HAIKU_INCLUDE_3RDPARTY) {
 	SubInclude HAIKU_TOP 3rdparty ;
 }
 
+# Perform deferred SubIncludes.
+ExecuteDeferredSubIncludes ;
+
 # reset subdir
 SubDir HAIKU_TOP ;
 
@@ -153,6 +156,3 @@ include [ FDirName $(HAIKU_BUILD_RULES_DIR) HaikuImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) NetBootArchive ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) FloppyBootImage ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) CDBootImage ] ;
-
-# Perform deferred SubIncludes.
-ExecuteDeferredSubIncludes ;

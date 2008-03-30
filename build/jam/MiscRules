@@ -90,15 +90,22 @@ rule MakeLocateDebug
 # The variable used to collect the deferred SubIncludes.
 HAIKU_DEFERRED_SUB_INCLUDES = ;
 
-rule DeferredSubInclude params
+rule DeferredSubInclude params : jamfile : scope
 {
-	# DeferredSubInclude <subdir tokens> ;
+	# DeferredSubInclude <subdir tokens> [ : <jamfile name>  [ : <scope> ] ] ;
 	#
-	# Takes the same parameter as SubInclude. The the subdirectory referred to
-	# by <subdir tokens> will be included when ExecuteDeferredSubIncludes is
-	# invoked, i.e. at the end of the root Jamfile.
+	# Takes the same directory tokens parameter as SubInclude plus an optional
+	# alternative Jamfile name. The the subdirectory referred to by
+	# <subdir tokens> will be included when ExecuteDeferredSubIncludes is
+	# invoked, i.e. at the end of the root Jamfile. The <jamfile name> parameter
+	# specifies the name of the Jamfile to include. By default it is "Jamfile".
+	# The <scope> parameter can be "global" (default) or "local", specifying
+	# whether the alternative Jamfile name shall also be used for subdirectories.
 
 	HAIKU_DEFERRED_SUB_INCLUDES += "/" $(params) ;
+	if $(jamfile) {
+		SetConfigVar JAMFILE : $(params) : $(jamfile) : $(scope) ;
+	}
 }
 
 rule ExecuteDeferredSubIncludes

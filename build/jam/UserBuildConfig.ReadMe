@@ -158,7 +158,7 @@ AddTargetVariableToScript test.inc : fs_shell_command : fsShellCommand ;
 AddTargetVariableToScript test.inc : <build>rc ;
 
 
-# Optimizing Jamfile Parsing Times
+# Optimizing Jamfile Parsing Times / Third Party Inclusion
 
 # Setting this variable will prevent the root Jamfile to include the Jamfile
 # in the src directory. Instead only the directories required for building the
@@ -171,6 +171,13 @@ HAIKU_DONT_INCLUDE_SRC = 1 ;
 # only on a subproject to reduce Jamfile parsing times considerably.
 DeferredSubInclude HAIKU_TOP src tests add-ons kernel file_systems
 	userlandfs ;
+
+# Schedule src/3rdparty/myproject/Jamfile.haiku for later inclusion. The "local"
+# parameter specifies that the alternative Jamfile name shall not be used for
+# any subdirectory of the given directory (i.e. "Jamfile" will be used as
+# usual). Omitting this parameter or specifying "global" will cause the given
+# name to be used recursively.
+DeferredSubInclude HAIKU_TOP src 3rdparty myproject : Jamfile.haiku : local ;
 
 
 # Copy the posix test suite onto the image (or on the installation) into 
