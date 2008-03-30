@@ -16,6 +16,7 @@ extern "C" {
 #endif
 
 struct file_descriptor;
+struct io_context;
 struct selectsync;
 struct select_info;
 
@@ -28,7 +29,9 @@ struct fd_ops {
 						struct selectsync *sync);
 	status_t	(*fd_deselect)(struct file_descriptor *, uint8 event,
 						struct selectsync *sync);
-	status_t	(*fd_read_dir)(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
+	status_t	(*fd_read_dir)(struct io_context* ioContext,
+						struct file_descriptor *, struct dirent *buffer,
+						size_t bufferSize, uint32 *_count);
 	status_t	(*fd_rewind_dir)(struct file_descriptor *);
 	status_t	(*fd_read_stat)(struct file_descriptor *, struct stat *);
 	status_t	(*fd_write_stat)(struct file_descriptor *, const struct stat *, int statMask);

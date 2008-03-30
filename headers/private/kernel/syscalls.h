@@ -90,6 +90,7 @@ extern thread_id	_kern_fork(void);
 extern pid_t		_kern_process_info(pid_t process, int32 which);
 extern pid_t		_kern_setpgid(pid_t process, pid_t group);
 extern pid_t		_kern_setsid(void);
+extern status_t		_kern_change_root(const char *path);
 
 extern thread_id	_kern_spawn_thread(int32 (*func)(thread_func, void *),
 						const char *name, int32 priority, void *data1, void *data2);

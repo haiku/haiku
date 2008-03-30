@@ -89,6 +89,7 @@ StdBinCommands
 
 StdBinCommands
 	chmod.c
+	chroot.c
 	du.c
 	mkdir.c
 	pwd.c
@@ -96,7 +97,6 @@ StdBinCommands
 	sort.c
         : libfetish.a libroot.so : $(coreutils_rsrc) ;
 
-# chroot.c
 # df.c
 # hostid.c
 # pinky.c

@@ -840,13 +840,15 @@ _user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount
 
 	TRACE(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n", fd, buffer, bufferSize, maxCount));
 
-	descriptor = get_fd(get_current_io_context(false), fd);
+	struct io_context* ioContext = get_current_io_context(false);
+	descriptor = get_fd(ioContext, fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read_dir) {
 		uint32 count = maxCount;
-		retval = descriptor->ops->fd_read_dir(descriptor, buffer, bufferSize, &count);
+		retval = descriptor->ops->fd_read_dir(ioContext, descriptor, buffer,
+			bufferSize, &count);
 		if (retval >= 0)
 			retval = count;
 	} else
@@ -1138,13 +1140,15 @@ _kern_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount
 
 	TRACE(("sys_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n",fd, buffer, bufferSize, maxCount));
 
-	descriptor = get_fd(get_current_io_context(true), fd);
+	struct io_context* ioContext = get_current_io_context(true);
+	descriptor = get_fd(ioContext, fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read_dir) {
 		uint32 count = maxCount;
-		retval = descriptor->ops->fd_read_dir(descriptor, buffer, bufferSize, &count);
+		retval = descriptor->ops->fd_read_dir(ioContext, descriptor, buffer,
+			bufferSize, &count);
 		if (retval >= 0)
 			retval = count;
 	} else

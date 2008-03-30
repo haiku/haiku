@@ -7,6 +7,7 @@ AddDirectoryToHaikuImage home Desktop ;
 AddDirectoryToHaikuImage home config bin ;
 AddDirectoryToHaikuImage home config lib ;
 AddDirectoryToHaikuImage home mail ;
+AddDirectoryToHaikuImage var empty ;
 AddDirectoryToHaikuImage var log ;
 AddDirectoryToHaikuImage var tmp ;
 
@@ -24,8 +25,8 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 }
 
 BEOS_BIN = "[" addattr alert arp base64 basename bc beep bzip2 cal cat
-	catattr chgrp chmod chop chown cksum clear clockconfig cmp comm compress
-	cp copyattr $(X86_ONLY)CortexAddOnHost
+	catattr chgrp chmod chop chown chroot cksum clear clockconfig cmp comm
+	compress cp copyattr $(X86_ONLY)CortexAddOnHost
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname
 	driveinfo dstcheck du echo eject env error expand expr
 	expr factor false fdinfo ffm find finddir fmt fold fortune frcode ftp ftpd

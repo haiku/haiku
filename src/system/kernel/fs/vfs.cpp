@@ -1,4 +1,5 @@
 /*
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -186,6 +187,14 @@ static mutex sVnodeCoveredByMutex;
 */
 static mutex sVnodeMutex;
 
+/*!	\brief Guards io_context::root.
+
+	Must be held when setting or getting the io_context::root field.
+	The only operation allowed while holding this lock besides getting or
+	setting the field is inc_vnode_ref_count() on io_context::root.
+*/
+static benaphore sIOContextRootLock;
+
 #define VNODE_HASH_TABLE_SIZE 1024
 static hash_table *sVnodeTable;
 static list sUnusedVnodeList;
@@ -212,12 +221,15 @@ static status_t file_select(struct file_descriptor *, uint8 event,
 	struct selectsync *sync);
 static status_t file_deselect(struct file_descriptor *, uint8 event,
 	struct selectsync *sync);
-static status_t dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
-static status_t dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_count);
+static status_t dir_read(struct io_context *, struct file_descriptor *,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count);
+static status_t dir_read(struct io_context* ioContext, struct vnode *vnode,
+	fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t dir_rewind(struct file_descriptor *);
 static void dir_free_fd(struct file_descriptor *);
 static status_t dir_close(struct file_descriptor *);
-static status_t attr_dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
+static status_t attr_dir_read(struct io_context *, struct file_descriptor *,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t attr_dir_rewind(struct file_descriptor *);
 static void attr_dir_free_fd(struct file_descriptor *);
 static status_t attr_dir_close(struct file_descriptor *);
@@ -228,11 +240,13 @@ static void attr_free_fd(struct file_descriptor *);
 static status_t attr_close(struct file_descriptor *);
 static status_t attr_read_stat(struct file_descriptor *, struct stat *);
 static status_t attr_write_stat(struct file_descriptor *, const struct stat *, int statMask);
-static status_t index_dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
+static status_t index_dir_read(struct io_context *, struct file_descriptor *,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t index_dir_rewind(struct file_descriptor *);
 static void index_dir_free_fd(struct file_descriptor *);
 static status_t index_dir_close(struct file_descriptor *);
-static status_t query_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
+static status_t query_read(struct io_context *, struct file_descriptor *,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t query_rewind(struct file_descriptor *);
 static void query_free_fd(struct file_descriptor *);
 static status_t query_close(struct file_descriptor *);
@@ -245,8 +259,10 @@ static status_t common_path_read_stat(int fd, char *path, bool traverseLeafLink,
 	struct stat *stat, bool kernel);
 
 static status_t vnode_path_to_vnode(struct vnode *vnode, char *path,
-	bool traverseLeafLink, int count, struct vnode **_vnode, ino_t *_parentID, int *_type);
-static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
+	bool traverseLeafLink, int count, bool kernel,
+	struct vnode **_vnode, ino_t *_parentID, int *_type);
+static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer,
+	size_t bufferSize, bool kernel);
 static status_t fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 	struct vnode **_vnode, ino_t *_parentID, bool kernel);
 static void inc_vnode_ref_count(struct vnode *vnode);
@@ -1393,6 +1409,38 @@ normalize_flock(struct file_descriptor *descriptor, struct flock *flock)
 }
 
 
+static void
+replace_vnode_if_disconnected(struct fs_mount* mount,
+	struct vnode* vnodeToDisconnect, struct vnode*& vnode,
+	struct vnode* fallBack, bool lockRootLock)
+{
+	if (lockRootLock)
+		benaphore_lock(&sIOContextRootLock);
+
+	struct vnode* obsoleteVnode = NULL;
+
+	if (vnode != NULL && vnode->mount == mount
+		&& (vnodeToDisconnect == NULL || vnodeToDisconnect == vnode)) {
+		obsoleteVnode = vnode;
+
+		if (vnode == mount->root_vnode) {
+			// redirect the vnode to the covered vnode
+			vnode = mount->covers_vnode;
+		} else
+			vnode = fallBack;
+
+		if (vnode != NULL)
+			inc_vnode_ref_count(vnode);
+	}
+
+	if (lockRootLock)
+		benaphore_unlock(&sIOContextRootLock);
+
+	if (obsoleteVnode != NULL)
+		put_vnode(obsoleteVnode);
+}
+
+
 /*!	Disconnects all file descriptors that are associated with the
 	\a vnodeToDisconnect, or if this is NULL, all vnodes of the specified
 	\a mount object.
@@ -1455,20 +1503,10 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 
 		context->io_mutex.holder = thread_get_current_thread_id();
 
-		if (context->cwd != NULL && context->cwd->mount == mount
-			&& (vnodeToDisconnect == NULL
-				|| vnodeToDisconnect == context->cwd)) {
-			put_vnode(context->cwd);
-				// Note: We're only accessing the pointer, not the vnode itself
-				// in the lines below.
-
-			if (context->cwd == mount->root_vnode) {
-				// redirect the current working directory to the covered vnode
-				context->cwd = mount->covers_vnode;
-				inc_vnode_ref_count(context->cwd);
-			} else
-				context->cwd = NULL;
-		}
+		replace_vnode_if_disconnected(mount, vnodeToDisconnect, context->root,
+			sRoot, true);
+		replace_vnode_if_disconnected(mount, vnodeToDisconnect, context->cwd,
+			sRoot, false);
 
 		for (uint32 i = 0; i < context->table_size; i++) {
 			if (struct file_descriptor *descriptor = context->fds[i]) {
@@ -1490,6 +1528,38 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 
 		mutex_unlock(&context->io_mutex);
 	}
+}
+
+
+/*!	\brief Gets the root node of the current IO context.
+	If \a kernel is \c true, the kernel IO context will be used.
+	The caller obtains a reference to the returned node.
+*/
+struct vnode*
+get_root_vnode(bool kernel)
+{
+	if (!kernel) {
+		// Get current working directory from io context
+		struct io_context* context = get_current_io_context(kernel);
+
+		benaphore_lock(&sIOContextRootLock);
+
+		struct vnode* root = context->root;
+		if (root != NULL)
+			inc_vnode_ref_count(root);
+
+		benaphore_unlock(&sIOContextRootLock);
+
+		if (root != NULL)
+			return root;
+
+		// That should never happen.
+		dprintf("get_root_vnode(): IO context for team %ld doesn't have a "
+			"root\n", team_get_current_team_id());
+	}
+
+	inc_vnode_ref_count(sRoot);
+	return sRoot;
 }
 
 
@@ -1652,7 +1722,7 @@ get_dir_path_and_leaf(char *path, char *filename)
 
 static status_t
 entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
-	bool traverse, struct vnode **_vnode)
+	bool traverse, bool kernel, struct vnode **_vnode)
 {
 	char clonedName[B_FILE_NAME_LENGTH + 1];
 	if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
@@ -1665,8 +1735,8 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
 	if (status < 0)
 		return status;
 
-	return vnode_path_to_vnode(directory, clonedName, traverse, 0, _vnode, NULL,
-		NULL);
+	return vnode_path_to_vnode(directory, clonedName, traverse, 0, kernel,
+		_vnode, NULL, NULL);
 }
 
 
@@ -1680,7 +1750,8 @@ entry_ref_to_vnode(dev_t mountID, ino_t directoryID, const char *name,
 */
 static status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
-	int count, struct vnode **_vnode, ino_t *_parentID, int *_type)
+	int count, struct io_context *ioContext, struct vnode **_vnode,
+	ino_t *_parentID, int *_type)
 {
 	status_t status = 0;
 	ino_t lastParentID = vnode->id;
@@ -1721,14 +1792,20 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		}
 
 		// See if the '..' is at the root of a mount and move to the covered
-		// vnode so we pass the '..' path to the underlying filesystem
-		if (!strcmp("..", path)
-			&& vnode->mount->root_vnode == vnode
-			&& vnode->mount->covers_vnode) {
-			nextVnode = vnode->mount->covers_vnode;
-			inc_vnode_ref_count(nextVnode);
-			put_vnode(vnode);
-			vnode = nextVnode;
+		// vnode so we pass the '..' path to the underlying filesystem.
+		// Also prevent breaking the root of the IO context.
+		if (strcmp("..", path) == 0) {
+			if (vnode == ioContext->root) {
+				// Attempted prison break! Keep it contained.
+				path = nextPath;
+				continue;
+			} else if (vnode->mount->root_vnode == vnode
+				&& vnode->mount->covers_vnode) {
+				nextVnode = vnode->mount->covers_vnode;
+				inc_vnode_ref_count(nextVnode);
+				put_vnode(vnode);
+				vnode = nextVnode;
+			}
 		}
 
 		// Check if we have the right to search the current directory vnode.
@@ -1815,8 +1892,11 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 				while (*++path == '/')
 					;
-				vnode = sRoot;
+
+				benaphore_lock(&sIOContextRootLock);
+				vnode = ioContext->root;
 				inc_vnode_ref_count(vnode);
+				benaphore_unlock(&sIOContextRootLock);
 
 				absoluteSymlink = true;
 			}
@@ -1830,7 +1910,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				nextVnode = vnode;
 			} else {
 				status = vnode_path_to_vnode(vnode, path, traverseLeafLink,
-					count + 1, &nextVnode, &lastParentID, _type);
+					count + 1, ioContext, &nextVnode, &lastParentID, _type);
 			}
 
 			free(buffer);
@@ -1867,6 +1947,16 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 
 static status_t
+vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
+	int count, bool kernel, struct vnode **_vnode, ino_t *_parentID,
+	int *_type)
+{
+	return vnode_path_to_vnode(vnode, path, traverseLeafLink, count,
+		get_current_io_context(kernel), _vnode, _parentID, _type);
+}
+
+
+static status_t
 path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 	ino_t *_parentID, bool kernel)
 {
@@ -1889,8 +1979,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 
 		while (*++path == '/')
 			;
-		start = sRoot;
-		inc_vnode_ref_count(start);
+		start = get_root_vnode(kernel);
 
 		if (*path == '\0') {
 			*_vnode = start;
@@ -1910,7 +1999,8 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 			return B_ERROR;
 	}
 
-	return vnode_path_to_vnode(start, path, traverseLink, 0, _vnode, _parentID, NULL);
+	return vnode_path_to_vnode(start, path, traverseLink, 0, kernel, _vnode,
+		_parentID, NULL);
 }
 
 
@@ -2014,7 +2104,8 @@ vnode_and_path_to_dir_vnode(struct vnode* vnode, char *path,
 	inc_vnode_ref_count(vnode);
 		// vnode_path_to_vnode() always decrements the ref count
 
-	return vnode_path_to_vnode(vnode, path, true, 0, _vnode, NULL, NULL);
+	return vnode_path_to_vnode(vnode, path, true, 0, kernel, _vnode, NULL,
+		NULL);
 }
 
 
@@ -2022,7 +2113,7 @@ vnode_and_path_to_dir_vnode(struct vnode* vnode, char *path,
 */
 static status_t
 get_vnode_name(struct vnode *vnode, struct vnode *parent, struct dirent *buffer,
-	size_t bufferSize)
+	size_t bufferSize, struct io_context* ioContext)
 {
 	if (bufferSize < sizeof(struct dirent))
 		return B_BAD_VALUE;
@@ -2056,7 +2147,8 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent, struct dirent *buffer,
 	if (status >= B_OK) {
 		while (true) {
 			uint32 num = 1;
-			status = dir_read(parent, cookie, buffer, bufferSize, &num);
+			status = dir_read(ioContext, parent, cookie, buffer, bufferSize,
+				&num);
 			if (status < B_OK)
 				break;
 			if (num == 0) {
@@ -2081,12 +2173,13 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent, struct dirent *buffer,
 
 static status_t
 get_vnode_name(struct vnode *vnode, struct vnode *parent, char *name,
-	size_t nameSize)
+	size_t nameSize, bool kernel)
 {
 	char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
 	struct dirent *dirent = (struct dirent *)buffer;
 
-	status_t status = get_vnode_name(vnode, parent, buffer, sizeof(buffer));
+	status_t status = get_vnode_name(vnode, parent, buffer, sizeof(buffer),
+		get_current_io_context(kernel));
 	if (status != B_OK)
 		return status;
 
@@ -2113,7 +2206,8 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent, char *name,
 	in the calling function (it's not done here because of efficiency)
 */
 static status_t
-dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
+dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize,
+	bool kernel)
 {
 	FUNCTION(("dir_vnode_to_path(%p, %p, %lu)\n", vnode, buffer, bufferSize));
 
@@ -2144,6 +2238,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 	path[--insert] = '\0';
 
+	struct io_context* ioContext = get_current_io_context(kernel);
+
 	while (true) {
 		// the name buffer is also used for fs_read_dir()
 		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
@@ -2153,14 +2249,20 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		int type;
 
 		// lookup the parent vnode
-		status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, "..",
-			&parentID, &type);
-		if (status < B_OK)
-			goto out;
+		if (vnode == ioContext->root) {
+			// we hit the IO context root
+			parentVnode = vnode;
+			inc_vnode_ref_count(vnode);
+		} else {
+			status = FS_CALL(vnode, lookup)(vnode->mount->cookie,
+				vnode->private_node, "..", &parentID, &type);
+			if (status < B_OK)
+				goto out;
 
-		mutex_lock(&sVnodeMutex);
-		parentVnode = lookup_vnode(vnode->device, parentID);
-		mutex_unlock(&sVnodeMutex);
+			mutex_lock(&sVnodeMutex);
+			parentVnode = lookup_vnode(vnode->device, parentID);
+			mutex_unlock(&sVnodeMutex);
+		}
 
 		if (parentVnode == NULL) {
 			panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n",
@@ -2171,7 +2273,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 		// get the node's name
 		status = get_vnode_name(vnode, parentVnode, (struct dirent*)nameBuffer,
-			sizeof(nameBuffer));
+			sizeof(nameBuffer), ioContext);
 
 		// resolve a volume root to its mount point
 		mountPoint = resolve_volume_root_to_mount_point(parentVnode);
@@ -2344,7 +2446,7 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 		return B_FILE_ERROR;
 
 	if (path != NULL) {
-		return vnode_path_to_vnode(vnode, path, traverseLeafLink, 0,
+		return vnode_path_to_vnode(vnode, path, traverseLeafLink, 0, kernel,
 			_vnode, _parentID, NULL);
 	}
 
@@ -2677,6 +2779,7 @@ dump_io_context(int argc, char **argv)
 		context = get_current_io_context(true);
 
 	kprintf("I/O CONTEXT: %p\n", context);
+	kprintf(" root vnode:\t%p\n", context->root);
 	kprintf(" cwd vnode:\t%p\n", context->cwd);
 	kprintf(" used fds:\t%lu\n", context->num_used_fds);
 	kprintf(" max fds:\t%lu\n", context->table_size);
@@ -3228,7 +3331,7 @@ extern "C" status_t
 vfs_entry_ref_to_vnode(dev_t mountID, ino_t directoryID,
 	const char *name, struct vnode **_vnode)
 {
-	return entry_ref_to_vnode(mountID, directoryID, name, false, _vnode);
+	return entry_ref_to_vnode(mountID, directoryID, name, false, true, _vnode);
 }
 
 
@@ -3286,7 +3389,8 @@ vfs_get_fs_node_from_path(dev_t mountID, const char *path, bool kernel,
 	else {
 		inc_vnode_ref_count(vnode);
 			// vnode_path_to_vnode() releases a reference to the starting vnode
-		status = vnode_path_to_vnode(vnode, buffer, true, 0, &vnode, NULL, NULL);
+		status = vnode_path_to_vnode(vnode, buffer, true, 0, kernel, &vnode,
+			NULL, NULL);
 	}
 
 	put_mount(mount);
@@ -3391,7 +3495,8 @@ vfs_get_module_path(const char *basePath, const char *moduleName,
 		path[length] = '\0';
 		moduleName = nextPath;
 
-		status = vnode_path_to_vnode(dir, path, true, 0, &file, NULL, &type);
+		status = vnode_path_to_vnode(dir, path, true, 0, true, &file, NULL,
+			&type);
 		if (status < B_OK) {
 			// vnode_path_to_vnode() has already released the reference to dir
 			return status;
@@ -3481,8 +3586,10 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	// if the leaf is "." or "..", we directly get the correct directory
 	// vnode and ignore the leaf later
 	bool isDir = (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0);
-	if (isDir)
-		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL, NULL);
+	if (isDir) {
+		error = vnode_path_to_vnode(dirNode, leaf, false, 0, kernel, &dirNode,
+			NULL, NULL);
+	}
 	if (error != B_OK) {
 		TRACE(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n",
 			strerror(error)));
@@ -3490,7 +3597,7 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 	}
 
 	// get the directory path
-	error = dir_vnode_to_path(dirNode, buffer, bufferSize);
+	error = dir_vnode_to_path(dirNode, buffer, bufferSize, kernel);
 	put_vnode(dirNode);
 	if (error < B_OK) {
 		TRACE(("vfs_normalize_path(): failed to get dir path: %s\n", strerror(error)));
@@ -3678,7 +3785,7 @@ vfs_stat_vnode(struct vnode *vnode, struct stat *stat)
 status_t
 vfs_get_vnode_name(struct vnode *vnode, char *name, size_t nameSize)
 {
-	return get_vnode_name(vnode, NULL, name, nameSize);
+	return get_vnode_name(vnode, NULL, name, nameSize, true);
 }
 
 
@@ -3697,7 +3804,7 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	if (leaf && (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0)) {
 		// special cases "." and "..": we can directly get the vnode of the
 		// referenced directory
-		status = entry_ref_to_vnode(device, inode, leaf, false, &vnode);
+		status = entry_ref_to_vnode(device, inode, leaf, false, true, &vnode);
 		leaf = NULL;
 	} else
 		status = get_vnode(device, inode, &vnode, true, false);
@@ -3705,7 +3812,7 @@ vfs_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 		return status;
 
 	// get the directory path
-	status = dir_vnode_to_path(vnode, path, pathLength);
+	status = dir_vnode_to_path(vnode, path, pathLength, true);
 	put_vnode(vnode);
 		// we don't need the vnode anymore
 	if (status < B_OK)
@@ -3820,6 +3927,12 @@ vfs_new_io_context(void *_parentContext)
 
 		mutex_lock(&parentContext->io_mutex);
 
+		benaphore_lock(&sIOContextRootLock);
+		context->root = parentContext->root;
+		if (context->root)
+			inc_vnode_ref_count(context->root);
+		benaphore_unlock(&sIOContextRootLock);
+
 		context->cwd = parentContext->cwd;
 		if (context->cwd)
 			inc_vnode_ref_count(context->cwd);
@@ -3840,7 +3953,11 @@ vfs_new_io_context(void *_parentContext)
 
 		mutex_unlock(&parentContext->io_mutex);
 	} else {
+		context->root = sRoot;
 		context->cwd = sRoot;
+
+		if (context->root)
+			inc_vnode_ref_count(context->root);
 
 		if (context->cwd)
 			inc_vnode_ref_count(context->cwd);
@@ -3860,6 +3977,9 @@ vfs_free_io_context(void *_ioContext)
 {
 	struct io_context *context = (struct io_context *)_ioContext;
 	uint32 i;
+
+	if (context->root)
+		dec_vnode_ref_count(context->root, false);
 
 	if (context->cwd)
 		dec_vnode_ref_count(context->cwd, false);
@@ -4071,6 +4191,9 @@ vfs_init(kernel_args *args)
 	if (mutex_init(&sVnodeMutex, "vfs_vnode_lock") < 0)
 		panic("vfs_init: error allocating vnode lock\n");
 
+	if (benaphore_init(&sIOContextRootLock, "io_context::root lock") < 0)
+		panic("vfs_init: error allocating io_context::root lock\n");
+
 	if (block_cache_init() != B_OK)
 		return B_ERROR;
 
@@ -4274,7 +4397,8 @@ file_open_entry_ref(dev_t mountID, ino_t directoryID, const char *name,
 		mountID, directoryID, name, openMode));
 
 	// get the vnode matching the entry_ref
-	status = entry_ref_to_vnode(mountID, directoryID, name, traverse, &vnode);
+	status = entry_ref_to_vnode(mountID, directoryID, name, traverse, kernel,
+		&vnode);
 	if (status < B_OK)
 		return status;
 
@@ -4521,9 +4645,10 @@ dir_open_entry_ref(dev_t mountID, ino_t parentID, const char *name, bool kernel)
 		return B_BAD_VALUE;
 
 	// get the vnode matching the entry_ref/node_ref
-	if (name)
-		status = entry_ref_to_vnode(mountID, parentID, name, true, &vnode);
-	else
+	if (name) {
+		status = entry_ref_to_vnode(mountID, parentID, name, true, kernel,
+			&vnode);
+	} else
 		status = get_vnode(mountID, parentID, &vnode, true, false);
 	if (status < B_OK)
 		return status;
@@ -4590,14 +4715,17 @@ dir_free_fd(struct file_descriptor *descriptor)
 
 
 static status_t
-dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+dir_read(struct io_context* ioContext, struct file_descriptor *descriptor,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
-	return dir_read(descriptor->u.vnode, descriptor->cookie, buffer, bufferSize, _count);
+	return dir_read(ioContext, descriptor->u.vnode, descriptor->cookie, buffer,
+		bufferSize, _count);
 }
 
 
 static void
-fix_dirent(struct vnode *parent, struct dirent *entry)
+fix_dirent(struct vnode *parent, struct dirent *entry,
+	struct io_context* ioContext)
 {
 	// set d_pdev and d_pino
 	entry->d_pdev = parent->device;
@@ -4611,14 +4739,20 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 		inc_vnode_ref_count(parent);
 			// vnode_path_to_vnode() puts the node
 
-		// ".." is guaranteed to to be clobbered by this call
-		struct vnode *vnode;
-		status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
-			&vnode, NULL, NULL);
+		// Make sure the IO context root is not bypassed.
+		if (parent == ioContext->root) {
+			entry->d_dev = parent->device;
+			entry->d_ino = parent->id;
+		} else {
+			// ".." is guaranteed not to be clobbered by this call
+			struct vnode *vnode;
+			status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
+				ioContext, &vnode, NULL, NULL);
 
-		if (status == B_OK) {
-			entry->d_dev = vnode->device;
-			entry->d_ino = vnode->id;
+			if (status == B_OK) {
+				entry->d_dev = vnode->device;
+				entry->d_ino = vnode->id;
+			}
 		}
 	} else {
 		// resolve mount points
@@ -4641,7 +4775,8 @@ fix_dirent(struct vnode *parent, struct dirent *entry)
 
 
 static status_t
-dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+dir_read(struct io_context* ioContext, struct vnode *vnode, fs_cookie cookie,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	if (!FS_CALL(vnode, read_dir))
 		return EOPNOTSUPP;
@@ -4653,7 +4788,7 @@ dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bu
 	// we need to adjust the read dirents
 	if (*_count > 0) {
 		// XXX: Currently reading only one dirent is supported. Make this a loop!
-		fix_dirent(vnode, buffer);
+		fix_dirent(vnode, buffer, ioContext);
 	}
 
 	return error;
@@ -5231,7 +5366,8 @@ attr_dir_free_fd(struct file_descriptor *descriptor)
 
 
 static status_t
-attr_dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+attr_dir_read(struct io_context* ioContext, struct file_descriptor *descriptor,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
@@ -5590,7 +5726,8 @@ index_dir_free_fd(struct file_descriptor *descriptor)
 
 
 static status_t
-index_dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+index_dir_read(struct io_context* ioContext, struct file_descriptor *descriptor,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	struct fs_mount *mount = descriptor->u.mount;
 
@@ -5781,7 +5918,8 @@ query_free_fd(struct file_descriptor *descriptor)
 
 
 static status_t
-query_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+query_read(struct io_context *ioContext, struct file_descriptor *descriptor,
+	struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
 	struct fs_mount *mount = descriptor->u.mount;
 
@@ -6029,8 +6167,13 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		mount->covers_vnode->covered_by = mount->root_vnode;
 	mutex_unlock(&sVnodeCoveredByMutex);
 
-	if (!sRoot)
+	if (!sRoot) {
 		sRoot = mount->root_vnode;
+		benaphore_lock(&sIOContextRootLock);
+		get_current_io_context(true)->root = sRoot;
+		benaphore_unlock(&sIOContextRootLock);
+		inc_vnode_ref_count(sRoot);
+	}
 
 	// supply the partition (if any) with the mount cookie and mark it mounted
 	if (partition) {
@@ -6414,12 +6557,18 @@ get_cwd(char *buffer, size_t size, bool kernel)
 
 	mutex_lock(&context->io_mutex);
 
-	if (context->cwd)
-		status = dir_vnode_to_path(context->cwd, buffer, size);
-	else
-		status = B_ERROR;
+	struct vnode* vnode = context->cwd;
+	if (vnode)
+		inc_vnode_ref_count(vnode);
 
 	mutex_unlock(&context->io_mutex);
+
+	if (vnode) {
+		status = dir_vnode_to_path(vnode, buffer, size, kernel);
+		put_vnode(vnode);
+	} else
+		status = B_ERROR;
+
 	return status;
 }
 
@@ -7370,8 +7519,8 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 		inc_vnode_ref_count(dir);
 		struct vnode* fileVnode;
 		int type;
-		error = vnode_path_to_vnode(dir, path, false, 0, &fileVnode, NULL,
-			&type);
+		error = vnode_path_to_vnode(dir, path, false, 0, false, &fileVnode,
+			NULL, &type);
 		if (error != B_OK)
 			return error;
 		VNodePutter fileVnodePutter(fileVnode);
@@ -7382,8 +7531,8 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 			if (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0) {
 				// special cases "." and ".." -- get the dir, forget the leaf
 				inc_vnode_ref_count(dir);
-				error = vnode_path_to_vnode(dir, leaf, false, 0, &nextDir, NULL,
-					NULL);
+				error = vnode_path_to_vnode(dir, leaf, false, 0, false,
+					&nextDir, NULL, NULL);
 				if (error != B_OK)
 					return error;
 				dir = nextDir;
@@ -7392,7 +7541,7 @@ _user_normalize_path(const char* userPath, bool traverseLink, char* buffer)
 			}
 
 			// get the directory path
-			error = dir_vnode_to_path(dir, path, B_PATH_NAME_LENGTH);
+			error = dir_vnode_to_path(dir, path, B_PATH_NAME_LENGTH, false);
 			if (error != B_OK)
 				return error;
 
@@ -7552,7 +7701,7 @@ _user_open_parent_dir(int fd, char *userName, size_t nameLength)
 		char _buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
 		struct dirent *buffer = (struct dirent*)_buffer;
 		status_t status = get_vnode_name(dirVNode, parentVNode, buffer,
-			sizeof(_buffer));
+			sizeof(_buffer), get_current_io_context(false));
 		if (status != B_OK)
 			return status;
 
@@ -8130,6 +8279,45 @@ _user_setcwd(int fd, const char *userPath)
 	}
 
 	return set_cwd(fd, userPath != NULL ? path : NULL, false);
+}
+
+
+status_t
+_user_change_root(const char *userPath)
+{
+	// only root is allowed to chroot()
+	if (geteuid() != 0)
+		return EPERM;
+
+	// alloc path buffer
+	KPath pathBuffer(B_PATH_NAME_LENGTH);
+	if (pathBuffer.InitCheck() != B_OK)
+		return B_NO_MEMORY;
+
+	// copy userland path to kernel
+	char *path = pathBuffer.LockBuffer();
+	if (userPath != NULL) {
+		if (!IS_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	// get the vnode
+	struct vnode* vnode;
+	status_t status = path_to_vnode(path, true, &vnode, NULL, false);
+	if (status != B_OK)
+		return status;
+
+	// set the new root
+	struct io_context* context = get_current_io_context(false);
+	benaphore_lock(&sIOContextRootLock);
+	struct vnode* oldRoot = context->root;
+	context->root = vnode;
+	benaphore_unlock(&sIOContextRootLock);
+
+	put_vnode(oldRoot);
+
+	return B_OK;
 }
 
 

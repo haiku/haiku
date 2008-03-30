@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UNISTD_H_
@@ -154,6 +154,8 @@ extern pid_t	getpgid(pid_t pid);
 extern pid_t	setsid(void);
 extern int		setpgid(pid_t pid, pid_t pgid);
 extern pid_t	setpgrp(void);
+
+extern int		chroot(const char *path);
 
 /* access permissions */				
 extern gid_t	getegid(void);

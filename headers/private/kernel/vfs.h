@@ -39,6 +39,7 @@ struct vnode;
 
 /** The I/O context of a process/team, holds the fd array among others */
 typedef struct io_context {
+	struct vnode *root;
 	struct vnode *cwd;
 	mutex		io_mutex;
 	uint32		table_size;
@@ -184,6 +185,7 @@ status_t _user_read_index_stat(dev_t device, const char *name, struct stat *stat
 status_t _user_remove_index(dev_t device, const char *name);
 status_t _user_getcwd(char *buffer, size_t size);
 status_t _user_setcwd(int fd, const char *path);
+status_t _user_change_root(const char *path);
 int _user_open_query(dev_t device, const char *query, size_t queryLength, uint32 flags,
 			port_id port, int32 token);
 

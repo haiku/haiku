@@ -6,6 +6,7 @@ MergeObject posix_unistd.o :
 	access.c
 	alarm.c
 	chown.c
+	chroot.cpp
 	close.c
 	conf.c
 	directory.c
