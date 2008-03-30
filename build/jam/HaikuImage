@@ -24,7 +24,7 @@ if $(INCLUDE_GPL_ADDONS) = 1 {
 	GPL_ONLY = "" ;
 }
 
-BEOS_BIN = "[" addattr alert arp base64 basename bc beep bzip2 cal cat
+BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	catattr chgrp chmod chop chown chroot cksum clear clockconfig cmp comm
 	compress cp copyattr $(X86_ONLY)CortexAddOnHost
 	csplit ctags cut date dc dd desklink df diff diff3 dircolors dirname

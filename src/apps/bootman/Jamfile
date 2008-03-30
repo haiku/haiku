@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src apps bootman ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application bootman :
+	BootManager.cpp
+	BootManagerController.cpp
+	BootManagerWindow.cpp
+	DefaultPartitionPage.cpp
+	DescriptionPage.cpp
+	EntryPage.cpp
+	FileSelectionPage.cpp
+	PartitionsPage.cpp
+	TestBootDrive.cpp
+	UninstallPage.cpp
+	WizardController.cpp
+	WizardPageView.cpp
+	WizardView.cpp
+	: be 
+	: bootman.rdef
+;
