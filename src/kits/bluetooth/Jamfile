@@ -9,9 +9,11 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 UsePrivateHeaders bluetooth ;
 
 SharedLibrary libbluetooth.so :
+SharedLibrary libbluetooth.so :
 	LocalDevice.cpp
-	DiscoveryAgent.cpp
 	DiscoveryListener.cpp
+	DiscoveryAgent.cpp
+	RemoteDevice.cpp
 	CommandManager.cpp
 	KitSupport.cpp
 	: be
