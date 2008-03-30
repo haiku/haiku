@@ -3,9 +3,10 @@
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *				I.R. Adema
- *				Stefano Ceccherini (burton666@libero.it)
- *				Michael Pfeiffer
+ *		I.R. Adema
+ *		Stefano Ceccherini (burton666@libero.it)
+ *		Michael Pfeiffer
+ *		julun <host.haiku@gmx.de>
  */
 
 // TODO refactor (avoid code duplications, decrease method sizes)
@@ -26,16 +27,19 @@
 #include <Roster.h>
 #include <View.h>
 
+
 #include <pr_server.h>
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-static const int kSemTimeOut = 50000;
 
+static const int kSemTimeOut = 50000;
 static const char *kPrintServerNotRespondingText = "Print Server is not responding.";
 static const char *kNoPagesToPrintText = "No Pages to print!";
+
 
 // Summery of spool file format:
 // See articel "How to Write a BeOS R5 Printer Driver" for description
@@ -160,14 +164,12 @@ namespace BPrivate {
 	Configuration::SendRequest(thread_func function)
 	{
 		fThreadCompleted = create_sem(0, "Configuration");
-		if (fThreadCompleted < B_OK) {
+		if (fThreadCompleted < B_OK)
 			return B_ERROR;
-		}
 
 		thread_id id = spawn_thread(function, "async_request", B_NORMAL_PRIORITY, this);
-		if (id <= 0 || resume_thread(id) != B_OK) {
+		if (id <= 0 || resume_thread(id) != B_OK)
 			return B_ERROR;
-		}
 
 		// Code copied from BAlert::Go()
 		BWindow* window = dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
@@ -213,6 +215,7 @@ namespace BPrivate {
 			fRequest->what = fWhat;
 		} else
 			fRequest = new BMessage(fWhat);
+
 		return fRequest;
 	}
 
@@ -222,32 +225,28 @@ namespace BPrivate {
 	{
 		fResult = result;
 		DeleteSemaphore();
-			// terminate loop in thread spawned by SendRequest
+		// terminate loop in thread spawned by SendRequest
 	}
 
 } // BPrivate
 
 
 BPrintJob::BPrintJob(const char *job_name)
-	:
-	fPrintJobName(NULL),
-	fPageNumber(0),
-	fSpoolFile(NULL),
-	fError(B_ERROR),
-	fSetupMessage(NULL),
-	fDefaultSetupMessage(NULL),
-	fCurrentPageHeader(NULL)
+	: fPrintJobName(NULL),
+	  fSpoolFile(NULL),
+	  fError(B_ERROR),
+	  fSetupMessage(NULL),
+	  fDefaultSetupMessage(NULL),
+	  fCurrentPageHeader(NULL)
 {
-	memset(&fCurrentHeader, 0, sizeof(fCurrentHeader));
+	memset(&fSpoolFileHeader, 0, sizeof(print_file_header));
 
-	if (job_name != NULL) {
+	if (job_name != NULL)
 		fPrintJobName = strdup(job_name);
-	}
 
 	fCurrentPageHeader = new _page_header_;
-	if (fCurrentPageHeader != NULL) {
-		memset(fCurrentPageHeader, 0, sizeof(*fCurrentPageHeader));
-	}
+	if (fCurrentPageHeader != NULL)
+		memset(fCurrentPageHeader, 0, sizeof(_page_header_));
 }
 
 
@@ -300,9 +299,11 @@ BPrintJob::ConfigPage()
 	status_t status = configuration.SendRequest(ConfigPageThread);
 	if (status != B_OK)
 		return status;
+
 	delete fSetupMessage;
 	fSetupMessage = configuration.Result();
 	_HandlePageSetup(fSetupMessage);
+
 	return B_OK;
 }
 
@@ -344,9 +345,11 @@ BPrintJob::ConfigJob()
 	status_t status = configuration.SendRequest(ConfigJobThread);
 	if (status != B_OK)
 		return status;
+
 	delete fSetupMessage;
 	fSetupMessage = configuration.Result();
 	_HandlePrintSetup(fSetupMessage);
+
 	return B_OK;
 }
 
@@ -382,7 +385,7 @@ BPrintJob::BeginJob()
 	if (path.InitCheck() != B_OK)
 		return;
 
-	// TODO fSpoolFileName should store the name only (not path which can be 1024 bytes long)
+	// TODO: fSpoolFileName should store the name only (not path which can be 1024 bytes long)
 	strncpy(fSpoolFileName, path.Path(), sizeof(fSpoolFileName));
 	fSpoolFile = new BFile(fSpoolFileName, B_READ_WRITE | B_CREATE_FILE);
 
@@ -394,11 +397,11 @@ BPrintJob::BeginJob()
 	// add print_file_header
 	// page_count is updated in CommitJob()
 	// on BeOS R5 the offset to the first page was always -1
-	fCurrentHeader.version = 1 << 16;
-	fCurrentHeader.page_count = 0;
-	fCurrentHeader.first_page = (off_t)-1;
+	fSpoolFileHeader.version = 1 << 16;
+	fSpoolFileHeader.page_count = 0;
+	fSpoolFileHeader.first_page = (off_t)-1;
 
-	if (fSpoolFile->Write(&fCurrentHeader, sizeof(print_file_header))
+	if (fSpoolFile->Write(&fSpoolFileHeader, sizeof(print_file_header))
 		!= sizeof(print_file_header)) {
 		CancelJob();
 		return;
@@ -407,18 +410,14 @@ BPrintJob::BeginJob()
 	// add printer settings message
 	if (!fSetupMessage->HasString(PSRV_FIELD_CURRENT_PRINTER))
 		fSetupMessage->AddString(PSRV_FIELD_CURRENT_PRINTER, printer);
-	_AddSetupSpec();
 
-	// prepare page header
-	// number_of_pictures is updated in DrawView()
-	// next_page is updated in SpoolPage()
-	fCurrentPageHeaderOffset = fSpoolFile->Position();
-	fCurrentPageHeader->number_of_pictures = 0;
+	_AddSetupSpec();
+	_NewPage();
 
 	// state variables
 	fAbort = 0;
-	fPageNumber = 0;
 	fError = B_OK;
+
 	return;
 }
 
@@ -426,22 +425,21 @@ BPrintJob::BeginJob()
 void
 BPrintJob::CommitJob()
 {
-	if (fSpoolFile == NULL) {
+	if (fSpoolFile == NULL)
 		return;
-	}
 
-	if (fPageNumber <= 0) {
+	if (fSpoolFileHeader.page_count == 0) {
 		ShowError(kNoPagesToPrintText);
 		CancelJob();
 		return;
 	}
 
-	if (fCurrentPageHeader->number_of_pictures > 0) {
-		SpoolPage();
-	}
-
 	// update spool file
 	_EndLastPage();
+
+	// write spool file header
+	fSpoolFile->Seek(0, SEEK_SET);
+	fSpoolFile->Write(&fSpoolFileHeader, sizeof(print_file_header));
 
 	// set file attributes
  	app_info appInfo;
@@ -452,11 +450,16 @@ BPrintJob::CommitJob()
 	BNodeInfo info(fSpoolFile);
 	info.SetType(PSRV_SPOOL_FILETYPE);
 
-	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_PAGECOUNT, B_INT32_TYPE, 0, &fPageNumber, sizeof(int32));
-	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_DESCRIPTION, B_STRING_TYPE, 0, fPrintJobName, strlen(fPrintJobName) + 1);
-	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_PRINTER, B_STRING_TYPE, 0, printerName, strlen(printerName) + 1);
-	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_STATUS, B_STRING_TYPE, 0, PSRV_JOB_STATUS_WAITING, strlen(PSRV_JOB_STATUS_WAITING) + 1);
-	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_MIMETYPE, B_STRING_TYPE, 0, appInfo.signature, strlen(appInfo.signature) + 1);
+	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_PAGECOUNT, B_INT32_TYPE, 0,
+		&fSpoolFileHeader.page_count, sizeof(int32));
+	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_DESCRIPTION, B_STRING_TYPE, 0,
+		fPrintJobName, strlen(fPrintJobName) + 1);
+	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_PRINTER, B_STRING_TYPE, 0, printerName,
+		strlen(printerName) + 1);
+	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_STATUS, B_STRING_TYPE, 0,
+		PSRV_JOB_STATUS_WAITING, strlen(PSRV_JOB_STATUS_WAITING) + 1);
+	fSpoolFile->WriteAttr(PSRV_SPOOL_ATTR_MIMETYPE, B_STRING_TYPE, 0,
+		appInfo.signature, strlen(appInfo.signature) + 1);
 
 	delete fSpoolFile;
 	fSpoolFile = NULL;
@@ -464,9 +467,8 @@ BPrintJob::CommitJob()
 
 	// notify print server
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK) {
+	if (GetPrinterServerMessenger(printServer) != B_OK)
 		return;
-	}
 
 	BMessage request(PSRV_PRINT_SPOOLED_JOB);
 	BMessage reply;
@@ -479,9 +481,8 @@ BPrintJob::CommitJob()
 void
 BPrintJob::CancelJob()
 {
-	if (fSpoolFile == NULL) {
+	if (fSpoolFile == NULL)
 		return;
-	}
 
 	fAbort = 1;
 	BEntry(fSpoolFileName).Remove();
@@ -493,17 +494,23 @@ BPrintJob::CancelJob()
 void
 BPrintJob::SpoolPage()
 {
-	if (fSpoolFile == NULL) {
+	if (fSpoolFile == NULL)
 		return;
+
+	if (fCurrentPageHeader->number_of_pictures == 0)
+		return;
+
+	fSpoolFileHeader.page_count++;
+	fSpoolFile->Seek(0, SEEK_END);
+	if (fCurrentPageHeaderOffset) {
+		// update last written page_header
+		fCurrentPageHeader->next_page = fSpoolFile->Position();
+		fSpoolFile->Seek(fCurrentPageHeaderOffset, SEEK_SET);
+		fSpoolFile->Write(fCurrentPageHeader, sizeof(_page_header_));
+		fSpoolFile->Seek(fCurrentPageHeader->next_page, SEEK_SET);
 	}
 
-	// update page header
-	fCurrentPageHeader->next_page = fSpoolFile->Position();
-	fSpoolFile->Seek(fCurrentPageHeaderOffset, SEEK_SET);
-	fSpoolFile->Write(fCurrentPageHeader, sizeof(*fCurrentPageHeader));
-	fSpoolFile->Seek(0, SEEK_END);
-
-	fCurrentPageHeader->number_of_pictures = 0;
+	_NewPage();
 }
 
 
@@ -536,9 +543,8 @@ BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 BMessage *
 BPrintJob::Settings()
 {
-	if (fSetupMessage == NULL) {
+	if (fSetupMessage == NULL)
 		return NULL;
-	}
 
 	return new BMessage(*fSetupMessage);
 }
@@ -547,9 +553,9 @@ BPrintJob::Settings()
 void
 BPrintJob::SetSettings(BMessage *message)
 {
-	if (message != NULL) {
+	if (message != NULL)
 		_HandlePrintSetup(message);
-	}
+
 	delete fSetupMessage;
 	fSetupMessage = message;
 }
@@ -559,9 +565,8 @@ bool
 BPrintJob::IsSettingsMessageValid(BMessage *message) const
 {
 	char *printerName = _GetCurrentPrinterName();
-	if (printerName == NULL) {
+	if (printerName == NULL)
 		return false;
-	}
 
 	const char *name = NULL;
 	// The passed message is valid if it contains the right printer name.
@@ -570,7 +575,6 @@ BPrintJob::IsSettingsMessageValid(BMessage *message) const
 		&& strcmp(printerName, name) == 0;
 
 	free(printerName);
-
 	return valid;
 }
 
@@ -582,6 +586,7 @@ BPrintJob::PaperRect()
 {
 	if (fDefaultSetupMessage == NULL)
 		_LoadDefaultSettings();
+
 	return fPaperSize;
 }
 
@@ -591,6 +596,7 @@ BPrintJob::PrintableRect()
 {
 	if (fDefaultSetupMessage == NULL)
 		_LoadDefaultSettings();
+
 	return fUsableSize;
 }
 
@@ -603,6 +609,7 @@ BPrintJob::GetResolution(int32 *xdpi, int32 *ydpi)
 
 	if (xdpi != NULL)
 		*xdpi = fXResolution;
+
 	if (ydpi != NULL)
 		*ydpi = fYResolution;
 }
@@ -626,9 +633,8 @@ int32
 BPrintJob::PrinterType(void *) const
 {
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK) {
+	if (GetPrinterServerMessenger(printServer) != B_OK)
 		return B_COLOR_PRINTER; // default
-	}
 
 	BMessage message(PSRV_GET_ACTIVE_PRINTER);
 	BMessage reply;
@@ -636,9 +642,9 @@ BPrintJob::PrinterType(void *) const
 	printServer.SendMessage(&message, &reply);
 
 	int32 type;
-	if (reply.FindInt32("color", &type) != B_OK) {
+	if (reply.FindInt32("color", &type) != B_OK)
 		return B_COLOR_PRINTER; // default
-	}
+
 	return type;
 }
 
@@ -705,12 +711,11 @@ BPrintJob::_HandlePageSetup(BMessage *setup)
 
 	// TODO verify data type (taken from libprint)
 	int64 valueInt64;
-	if (setup->FindInt64(PSRV_FIELD_XRES, &valueInt64) == B_OK) {
+	if (setup->FindInt64(PSRV_FIELD_XRES, &valueInt64) == B_OK)
 		fXResolution = (short)valueInt64;
-	}
-	if (setup->FindInt64(PSRV_FIELD_YRES, &valueInt64) == B_OK) {
+
+	if (setup->FindInt64(PSRV_FIELD_YRES, &valueInt64) == B_OK)
 		fYResolution = (short)valueInt64;
-	}
 }
 
 
@@ -720,12 +725,11 @@ BPrintJob::_HandlePrintSetup(BMessage *message)
 	_HandlePageSetup(message);
 
 	bool valid = true;
-	if (message->FindInt32(PSRV_FIELD_FIRST_PAGE, &fFirstPage) != B_OK) {
+	if (message->FindInt32(PSRV_FIELD_FIRST_PAGE, &fFirstPage) != B_OK)
 		valid = false;
-	}
-	if (message->FindInt32(PSRV_FIELD_LAST_PAGE, &fLastPage) != B_OK) {
+
+	if (message->FindInt32(PSRV_FIELD_LAST_PAGE, &fLastPage) != B_OK)
 		valid = false;
-	}
 
 	return valid;
 }
@@ -734,23 +738,32 @@ BPrintJob::_HandlePrintSetup(BMessage *message)
 void
 BPrintJob::_NewPage()
 {
-	// write page header
+	// init, write new page_header
+	fCurrentPageHeader->next_page = 0;
+	fCurrentPageHeader->number_of_pictures = 0;
 	fCurrentPageHeaderOffset = fSpoolFile->Position();
-	fSpoolFile->Write(fCurrentPageHeader, sizeof(*fCurrentPageHeader));
-
-	if (fPageNumber == 1)
-		fCurrentHeader.first_page = fCurrentPageHeaderOffset;
-
-	fPageNumber ++;
+	fSpoolFile->Write(fCurrentPageHeader, sizeof(_page_header_));
 }
 
 
 void
 BPrintJob::_EndLastPage()
 {
-	fSpoolFile->Seek(0, SEEK_SET);
-	fCurrentHeader.page_count = fPageNumber;
-	fSpoolFile->Write(&fCurrentHeader, sizeof(fCurrentHeader));}
+	if (!fSpoolFile)
+		return;
+
+	if (fCurrentPageHeader->number_of_pictures == 0)
+		return;
+
+	fSpoolFileHeader.page_count++;
+	fSpoolFile->Seek(0, SEEK_END);
+	if (fCurrentPageHeaderOffset) {
+		fCurrentPageHeader->next_page = 0;
+		fSpoolFile->Seek(fCurrentPageHeaderOffset, SEEK_SET);
+		fSpoolFile->Write(fCurrentPageHeader, sizeof(_page_header_));
+		fSpoolFile->Seek(0, SEEK_END);
+	}
+}
 
 
 void
@@ -765,39 +778,34 @@ BPrintJob::_AddPicture(BPicture &picture, BRect &rect, BPoint &where)
 {
 	ASSERT(fSpoolFile != NULL);
 
-	if (fCurrentPageHeader->number_of_pictures == 0) {
-		_NewPage();
-	}
-	fCurrentPageHeader->number_of_pictures ++;
-
-	fSpoolFile->Write(&where, sizeof(where));
-	fSpoolFile->Write(&rect, sizeof(rect));
+	fCurrentPageHeader->number_of_pictures++;
+	fSpoolFile->Write(&where, sizeof(BRect));
+	fSpoolFile->Write(&rect, sizeof(BPoint));
 	picture.Flatten(fSpoolFile);
 }
 
 
 // Returns a copy of the current printer name
-// or NULL if it ccould not be obtained.
+// or NULL if it could not be obtained.
 // Caller is responsible to free the string using free().
 char *
 BPrintJob::_GetCurrentPrinterName() const
 {
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer)) {
+	if (GetPrinterServerMessenger(printServer))
 		return NULL;
-	}
 
 	BMessage message(PSRV_GET_ACTIVE_PRINTER);
 	BMessage reply;
 
 	const char *printerName = NULL;
 
-	if (printServer.SendMessage(&message, &reply) == B_OK) {
+	if (printServer.SendMessage(&message, &reply) == B_OK)
 		reply.FindString("printer_name", &printerName);
-	}
-	if (printerName == NULL) {
+
+	if (printerName == NULL)
 		return NULL;
-	}
+
 	return strdup(printerName);
 }
 
@@ -806,9 +814,8 @@ void
 BPrintJob::_LoadDefaultSettings()
 {
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK) {
+	if (GetPrinterServerMessenger(printServer) != B_OK)
 		return;
-	}
 
 	BMessage message(PSRV_GET_DEFAULT_SETTINGS);
 	BMessage *reply = new BMessage;
