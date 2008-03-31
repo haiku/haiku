@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2008, Haiku.
+ * Copyright 2006-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -112,29 +112,66 @@ MainWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_LAUNCH: {
 			BView* pointer;
-			if (message->FindPointer("be:source", (void**)&pointer) >= B_OK) {
-				if (LaunchButton* button
-						= dynamic_cast<LaunchButton*>(pointer)) {
-					if (button->AppSignature()) {
-						be_roster->Launch(button->AppSignature());
-					} else {
-						BEntry entry(button->Ref(), true);
-						if (entry.IsDirectory()) {
-							// open in Tracker
-							BMessenger messenger("application/x-vnd.Be-TRAK");
-							if (messenger.IsValid()) {
-								BMessage trackerMessage(B_REFS_RECEIVED);
-								trackerMessage.AddRef("refs", button->Ref());
-								messenger.SendMessage(&trackerMessage);
-							}
-						} else {
-							status_t ret = be_roster->Launch(button->Ref());
-							if (ret < B_OK)
-								fprintf(stderr, "launching %s failed: %s\n",
-									button->Ref()->name, strerror(ret));
-						}
-					}
+			if (message->FindPointer("be:source", (void**)&pointer) < B_OK)
+				break;
+			LaunchButton* button = dynamic_cast<LaunchButton*>(pointer);
+			if (button == NULL)
+				break;
+			BString errorMessage;
+			bool launchedByRef = false;
+			if (button->Ref()) {
+				BEntry entry(button->Ref(), true);
+				if (entry.IsDirectory()) {
+					// open in Tracker
+					BMessenger messenger("application/x-vnd.Be-TRAK");
+					if (messenger.IsValid()) {
+						BMessage trackerMessage(B_REFS_RECEIVED);
+						trackerMessage.AddRef("refs", button->Ref());
+						status_t ret = messenger.SendMessage(&trackerMessage);
+						if (ret < B_OK) {
+							errorMessage = "Failed to send 'open folder' "
+								"command to Tracker.\n\nError: ";
+							errorMessage << strerror(ret);
+						} else
+							launchedByRef = true;
+					} else
+						errorMessage = "Failed to open folder - is Tracker "
+							"running?";
+				} else {
+					status_t ret = be_roster->Launch(button->Ref());
+					if (ret < B_OK) {
+						errorMessage = "Failed to launch '";
+						BPath path(button->Ref());
+						if (path.InitCheck() >= B_OK)
+							errorMessage << path.Path();
+						else
+							errorMessage << button->Ref()->name;
+						errorMessage << "'.\n\nError: ";
+						errorMessage << strerror(ret);
+					} else
+						launchedByRef = true;
 				}
+			}
+			if (!launchedByRef && button->AppSignature()) {
+				status_t ret = be_roster->Launch(button->AppSignature());
+				if (ret != B_OK) {
+					errorMessage = "Failed to launch application with "
+						"signature '";
+					errorMessage << button->AppSignature() << "'.\n\nError: ";
+					errorMessage << strerror(ret);
+				} else {
+					// clear error message on success (might have been
+					// filled when trying to launch by ref)
+					errorMessage = "";
+				}
+			} else if (!launchedByRef) {
+				errorMessage = "Failed to launch 'something', error in "
+					"Pad data.";
+			}
+			if (errorMessage.Length() > 0) {
+				BAlert* alert = new BAlert("error", errorMessage.String(),
+					"Bummer", NULL, NULL, B_WIDTH_FROM_WIDEST);
+				alert->Go(NULL);
 			}
 			break;
 		}
@@ -331,11 +368,13 @@ MainWindow::LoadSettings(const BMessage* message)
 		if (message->FindString("signature", i, &signature) >= B_OK
 			&& signature.CountChars() > 0)  {
 			button->SetTo(signature.String(), true);
-		} else {
-			entry_ref ref;
-			if (get_ref_for_path(path, &ref) >= B_OK)
-				button->SetTo(&ref);
 		}
+
+		entry_ref ref;
+		BEntry entry(&ref, true);
+		if (entry.Exists())
+			button->SetTo(&ref);
+
 		const char* text;
 		if (message->FindString("description", i, &text) >= B_OK)
 			button->SetDescription(text);

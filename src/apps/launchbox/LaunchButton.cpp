@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -247,10 +247,9 @@ LaunchButton::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessa
 void
 LaunchButton::SetTo(const entry_ref* ref)
 {
-	if (fAppSig) {
-		free(fAppSig);
-		fAppSig = NULL;
-	}
+	free(fAppSig);
+	fAppSig = NULL;
+
 	delete fRef;
 	if (ref) {
 		fRef = new entry_ref(*ref);
@@ -267,10 +266,10 @@ LaunchButton::SetTo(const entry_ref* ref)
 			if (info.GetSignature(mimeSig) >= B_OK) {
 				SetTo(mimeSig, false);
 			} else {
-				printf("no MIME sig\n");
+				fprintf(stderr, "no MIME signature for '%s'\n", fRef->name);
 			}
 		} else {
-			printf("no app\n");
+			fprintf(stderr, "no BAppFileInfo for '%s'\n", fRef->name);
 		}
 	} else {
 		fRef = NULL;
