@@ -16,6 +16,6 @@ Application bootman :
 	WizardController.cpp
 	WizardPageView.cpp
 	WizardView.cpp
-	: be 
+	: be tracker
 	: bootman.rdef
 ;
