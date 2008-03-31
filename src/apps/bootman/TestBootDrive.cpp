@@ -23,7 +23,7 @@ TestBootDrive::~TestBootDrive()
 bool
 TestBootDrive::IsBootMenuInstalled()
 {
-	return true;
+	return false;
 }
 
 

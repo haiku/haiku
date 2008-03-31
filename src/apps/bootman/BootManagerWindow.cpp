@@ -29,7 +29,9 @@ BootManagerWindow::BootManagerWindow()
 	fWizardView = new WizardView(Bounds(), "wizard", B_FOLLOW_ALL);
 	AddChild(fWizardView);
 	
-	fController.Initialize(fWizardView);	
+	fController.Initialize(fWizardView);
+	
+	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_ABOUT_REQUESTED));
 }
 
 
@@ -48,6 +50,10 @@ BootManagerWindow::MessageReceived(BMessage* msg)
 		
 		case kMessagePrevious:
 			fController.Previous(fWizardView);
+			break;
+		
+		case B_ABOUT_REQUESTED:
+			be_app_messenger.SendMessage(B_ABOUT_REQUESTED);
 			break;
 		
 		default:

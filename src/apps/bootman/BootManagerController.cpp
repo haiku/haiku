@@ -47,7 +47,13 @@ BootManagerController::BootManagerController()
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path, true) == B_OK) {
 		path.Append("bootman/MBR");
-		fSettings.AddString("file", path.Path());		
+		fSettings.AddString("file", path.Path());
+		// create directory
+		BPath parent;
+		if (path.GetParent(&parent) == B_OK) {
+			BDirectory directory;
+			directory.CreateDirectory(parent.Path(), NULL);
+		}	
 	} else {
 		fSettings.AddString("file", "");
 	}
@@ -266,7 +272,8 @@ BootManagerController::_CreateSaveMBRPage(BRect frame)
 		"you later wish to remove the boot menu, simply run the "
 		"bootman program and choose to 'Uninstall' option.";	
 	
-	FileSelectionPage* page = new FileSelectionPage(&fSettings, frame, "saveMBR", description.String());
+	FileSelectionPage* page = new FileSelectionPage(&fSettings, frame, "saveMBR", description.String(), 
+		B_SAVE_PANEL);
 	return page;
 }
 
@@ -353,7 +360,8 @@ BootManagerController::_CreateUninstallPage(BRect frame)
 		"restore from. This is the file that was created when the "
 		"boot manager was first installed.";
 	
-	FileSelectionPage* page = new FileSelectionPage(&fSettings, frame, "restoreMBR", description.String());
+	FileSelectionPage* page = new FileSelectionPage(&fSettings, frame, "restoreMBR", description.String(),
+		B_OPEN_PANEL);
 	return page;
 }
 

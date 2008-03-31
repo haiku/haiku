@@ -42,7 +42,7 @@ BootManager::ReadyToRun()
 void
 BootManager::AboutRequested()
 {
-	BAlert *alert = new BAlert("about", "Haiku Boot Manager\n"
+	BAlert *alert = new BAlert("about", "Haiku Boot Manager\n\n"
 		"\twritten by Michael Pfeiffer\n"
 		"\tCopyright 2008, Haiku Inc.\n", "Ok");
 	BTextView *view = alert->TextView();
