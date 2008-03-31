@@ -98,7 +98,6 @@ DefaultPartitionPage::_BuildUI()
 	AddChild(fDescription);
 	LayoutDescriptionVertically(fDescription);
 	rect.top = fDescription->Frame().bottom + kTextDistance;
-	fDescription->SetViewColor(255, 0, 0);
 	
 	BPopUpMenu* popUpMenu = _CreatePopUpMenu();	
 	fDefaultPartition = new BMenuField(rect, "partitions", "Default Partition:", 
@@ -107,13 +106,11 @@ DefaultPartitionPage::_BuildUI()
 	fDefaultPartition->SetDivider(divider);
 	AddChild(fDefaultPartition);
 	fDefaultPartition->ResizeToPreferred();
-	fDefaultPartition->SetViewColor(0, 255, 0);
 	
 	rect.top = fDefaultPartition->Frame().bottom + kTextDistance;
 	int32 timeout;
 	fSettings->FindInt32("timeout", &timeout);
 	fWait0 = _CreateWaitRadioButton(rect, "wait0", "Wait Indefinitely", -1, timeout);
-	fWait0->SetViewColor(0, 0, 255);
 	fWait5 = _CreateWaitRadioButton(rect, "wait5", "Wait 5 Seconds", 5, timeout);
 	fWait10 = _CreateWaitRadioButton(rect, "wait10", "Wait 10 Seconds", 10, timeout);
 	fWait15 = _CreateWaitRadioButton(rect, "wait15", "Wait 15 Seconds", 15, timeout);
