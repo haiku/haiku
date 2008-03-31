@@ -2,12 +2,13 @@ SubDir HAIKU_TOP src add-ons media media-add-ons reader ;
 
 UsePrivateHeaders media ;
 
-Addon reader.media_addon :
-	../AbstractFileInterfaceNode.cpp
-	../AbstractFileInterfaceAddOn.cpp
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media media-add-ons ] ;
+
+Application reader.media_addon :
+	AbstractFileInterfaceNode.cpp
+	AbstractFileInterfaceAddOn.cpp
 	MediaReader.cpp
 	MediaReaderAddOn.cpp
 	misc.cpp
 	: be media
-	: true
 ;

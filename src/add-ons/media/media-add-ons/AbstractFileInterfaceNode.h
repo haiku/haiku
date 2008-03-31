@@ -9,14 +9,15 @@
 #if !defined(_ABSTRACT_FILE_INTERFACE_NODE_H)
 #define _ABSTRACT_FILE_INTERFACE_NODE_H
 
+#include <BufferGroup.h>
+#include <Controllable.h>
+#include <Entry.h>
+#include <File.h>
+#include <FileInterface.h>
+#include <MediaAddOn.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
-#include <FileInterface.h>
-#include <Controllable.h>
 #include <MediaEventLooper.h>
-#include <File.h>
-#include <Entry.h>
-#include <BufferGroup.h>
 
 class AbstractFileInterfaceNode :
     public BFileInterface,
