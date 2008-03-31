@@ -87,6 +87,9 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 
 	thread->entry = startRoutine;
 	thread->entry_argument = arg;
+	thread->cancel_state = PTHREAD_CANCEL_ENABLE;
+	thread->cancel_type = PTHREAD_CANCEL_DEFERRED;
+	thread->cancelled = false;
 	thread->cleanup_handlers = NULL;
 
 	if (sPthreadSlot == -1) {

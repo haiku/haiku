@@ -51,6 +51,9 @@ typedef struct _pthread_attr {
 struct pthread_thread {
 	void		*(*entry)(void*);
 	void		*entry_argument;
+	int			cancel_state;
+	int			cancel_type;
+	bool		cancelled;
 	struct __pthread_cleanup_handler *cleanup_handlers;
 	// TODO: move pthread keys in here, too
 };

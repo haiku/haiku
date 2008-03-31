@@ -154,15 +154,20 @@ extern int pthread_attr_init(pthread_attr_t *attr);
 extern int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
 extern int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
 
+/* thread functions */
 extern int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	void *(*start_routine)(void*), void *arg);
 extern int pthread_detach(pthread_t thread);
 extern int pthread_equal(pthread_t t1, pthread_t t2);
 extern void pthread_exit(void *value_ptr);
-extern int pthread_join(pthread_t thread, void **value_ptr);
+extern int pthread_join(pthread_t thread, void **_value);
 extern pthread_t pthread_self(void);
-
 extern int pthread_kill(pthread_t thread, int sig);
+
+extern int pthread_cancel(pthread_t thread);
+extern int pthread_setcancelstate(int state, int *_oldState);
+extern int pthread_setcanceltype(int type, int *_oldType);
+extern void pthread_testcancel(void);
 
 /* thread specific data functions */
 extern int pthread_key_create(pthread_key_t *key, void (*destructor)(void*));
