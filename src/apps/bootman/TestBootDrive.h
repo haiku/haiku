@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEST_BOOT_DRIVE_H
-#define TEST_BOOT_DRIVER_H
+#define TEST_BOOT_DRIVE_H
 
 #include "BootDrive.h"
 
@@ -20,4 +20,4 @@ public:
 	virtual status_t RestoreMasterBootRecord(BFile *file);
 };
 
-#endif	// TEST_BOOT_DRIVER_H
+#endif	// TEST_BOOT_DRIVE_H
