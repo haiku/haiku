@@ -1,6 +1,10 @@
 /*
- * Copyright 2008, Michael Pfeiffer, laplace@users.sourceforge.net. All rights reserved.
+ * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ * 
+ * Authors:
+ *		Michael Pfeiffer, laplace@users.sourceforge.net
+ *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
 
@@ -14,6 +18,7 @@
 #include <TextControl.h>
 #include <TextView.h>
 
+#include <stdio.h>
 #include <string.h>
 #include <String.h>
 
@@ -301,30 +306,23 @@ static const char kPrefix[] = " KMGTPE";
 
 
 void 
-PartitionsPage::_CreateSizeText(int64 size, BString* text)
+PartitionsPage::_CreateSizeText(int64 _size, BString* text)
 {
-	if (size < 0) {
-		(*text) << "Error";
-		return;
-	}
-	
+	const char* suffixes[] = {
+		"", "K", "M", "G", "T", NULL
+	};
+
+	double size = _size;
 	int index = 0;
-	int n = 7;
-	int64 remainder = 0;
-	for (; size >= 1000 && index <= n; index ++) {
-		remainder = size % 1000;
-		size /= 1000;
+	while (size > 1024 && suffixes[index + 1]) {
+		size /= 1024;
+		index++;
 	}
-	
-	// round
-	size = size + ((remainder + 500) / 1000);
-	
-	if (index == 0)
-		(*text) << size << " B";
-	else if (index < n)
-		(*text) << size << " " << kPrefix[index] << "B";
-	else
-		(*text) << "-";
+
+	char buffer[128];
+	snprintf(buffer, sizeof(buffer), "%.2f%s", size, suffixes[index]);
+
+	*text = buffer;
 }
 
 
