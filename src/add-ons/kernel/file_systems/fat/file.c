@@ -1527,7 +1527,7 @@ dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		UNLOCK_VOL(vol);
 	}
 
-	return B_ERROR;
+	return status;
 }
 
 
@@ -1579,7 +1579,7 @@ dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 		UNLOCK_VOL(vol);
 	}
 
-	return B_ERROR;
+	return status;
 }
 
 
