@@ -1,14 +1,17 @@
-/* 
-** Copyright 2006, Jérôme Duval. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
+/*
+ * Copyright 2006, Jérôme Duval. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
-#include <TLS.h>
-#include <pthread.h>
-#include <stdlib.h>
 #include "pthread_private.h"
 
+#include <stdlib.h>
+
+#include <TLS.h>
+
+
+// TODO: use a better algorithm than a linked list!
 struct key_link {
 	struct key_link *next;
 	pthread_key_t key;
@@ -20,7 +23,7 @@ static struct key_link *sKeyList = NULL;
 
 
 void
-_pthread_key_call_destructors(void *param)
+__pthread_key_call_destructors()
 {
 	struct key_link *link = NULL;
 
@@ -36,7 +39,7 @@ _pthread_key_call_destructors(void *param)
 }
 
 
-int 
+int
 pthread_key_create(pthread_key_t *key, void (*destructor)(void*))
 {
 	struct key_link *link;
@@ -63,18 +66,18 @@ pthread_key_create(pthread_key_t *key, void (*destructor)(void*))
 }
 
 
-int 
+int
 pthread_key_delete(pthread_key_t key)
 {
 	struct key_link *link, *last = NULL;
 	pthread_mutex_lock(&sKeyLock);
-	
-	//remove key/destructor from the list
+
+	// remove key/destructor from the list
 	for (link = sKeyList; link; link = link->next) {
 		if (link->key == key) {
 			if (last)
 				last->next = link->next;
-			else 
+			else
 				sKeyList = link->next;
 			free(link);
 			pthread_mutex_unlock(&sKeyLock);
@@ -95,7 +98,7 @@ pthread_getspecific(pthread_key_t key)
 }
 
 
-int 
+int
 pthread_setspecific(pthread_key_t key, const void *value)
 {
 	// we don't check if the key is valid

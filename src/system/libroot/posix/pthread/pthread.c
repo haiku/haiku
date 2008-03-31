@@ -1,45 +1,77 @@
 /*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2006, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
-#include <pthread.h>
+#include "pthread_private.h"
+
 #include <signal.h>
 #include <stdlib.h>
-#include "pthread_private.h"
+
+#include <TLS.h>
+
 
 static const pthread_attr pthread_attr_default = {
 	PTHREAD_CREATE_JOINABLE,
 	B_NORMAL_PRIORITY
 };
 
-struct pthread_data {
-	thread_entry entry;
-	void *data;
-};
+
+static int32 sPthreadSlot = -1;
+
+
+struct pthread_thread *
+__get_pthread(void)
+{
+	return (struct pthread_thread *)tls_get(sPthreadSlot);
+}
+
+
+static void
+pthread_destroy_thread(void *data)
+{
+	struct pthread_thread *thread = __get_pthread();
+
+	// call cleanup handlers
+	while (true) {
+		struct __pthread_cleanup_handler *handler = __pthread_cleanup_pop_handler();
+		if (handler == NULL)
+			break;
+
+		handler->function(handler->argument);
+	}
+
+	__pthread_key_call_destructors();
+	free(thread);
+}
+
 
 static int32
-_pthread_thread_entry(void *entry_data)
+pthread_thread_entry(void *_thread)
 {
-	struct pthread_data *pdata = (struct pthread_data *)entry_data;
-	void *(*entry)(void*) = (void *(*)(void*))pdata->entry;
-	void *data = pdata->data;
+	struct pthread_thread *thread = (struct pthread_thread *)_thread;
 
-	free(pdata);
-	on_exit_thread(_pthread_key_call_destructors, NULL);
-	
-	pthread_exit(entry(data));
+	// store thread data in TLS
+	*tls_address(sPthreadSlot) = thread;
+
+	on_exit_thread(pthread_destroy_thread, NULL);
+
+	pthread_exit(thread->entry(thread->entry_argument));
 	return B_OK;
 }
 
 
-int 
+//	#pragma mark - public API
+
+
+int
 pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
-		void *(*start_routine)(void*), void *arg)
+		void *(*startRoutine)(void*), void *arg)
 {
-	thread_id thread;
 	const pthread_attr *attr = NULL;
-	struct pthread_data *pdata;
+	struct pthread_thread *thread;
+	thread_id threadID;
 
 	if (_thread == NULL)
 		return B_BAD_VALUE;
@@ -48,39 +80,47 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 		attr = &pthread_attr_default;
 	else
 		attr = *_attr;
-	
-	pdata = malloc(sizeof(struct pthread_data));
-	if (!pdata)
-		return B_WOULD_BLOCK;
-	pdata->entry = (thread_entry)start_routine;
-	pdata->data = arg;
 
-	thread = spawn_thread(_pthread_thread_entry, "pthread func", attr->sched_priority, pdata);
-	if (thread < B_OK)
+	thread = (struct pthread_thread *)malloc(sizeof(struct pthread_thread));
+	if (thread == NULL)
+		return B_WOULD_BLOCK;
+
+	thread->entry = startRoutine;
+	thread->entry_argument = arg;
+	thread->cleanup_handlers = NULL;
+
+	if (sPthreadSlot == -1) {
+		// In a clean pthread environment, this is even thread-safe!
+		sPthreadSlot = tls_allocate();
+	}
+
+	threadID = spawn_thread(pthread_thread_entry, "pthread func",
+		attr->sched_priority, thread);
+	if (threadID < B_OK)
 		return B_WOULD_BLOCK;
 		// stupid error code (EAGAIN) but demanded by POSIX
 
-	resume_thread(thread);
-	*_thread = thread;
+	resume_thread(threadID);
+	*_thread = threadID;
 
 	return B_OK;
 }
 
 
 pthread_t
-pthread_self()
+pthread_self(void)
 {
 	return find_thread(NULL);
 }
 
 
-int 
+int
 pthread_equal(pthread_t t1, pthread_t t2)
 {
-	return (t1 > 0 && t2 > 0 && t1 == t2);
+	return t1 > 0 && t2 > 0 && t1 == t2;
 }
 
-int 
+int
 pthread_join(pthread_t thread, void **value_ptr)
 {
 	status_t error = wait_for_thread(thread, (status_t *)value_ptr);
@@ -90,14 +130,14 @@ pthread_join(pthread_t thread, void **value_ptr)
 }
 
 
-void 
-pthread_exit(void *value_ptr)
+void
+pthread_exit(void *value)
 {
-	exit_thread((status_t)value_ptr);
+	exit_thread((status_t)value);
 }
 
 
-int 
+int
 pthread_kill(pthread_t thread, int sig)
 {
 	status_t err =  kill(thread, sig);
@@ -107,7 +147,7 @@ pthread_kill(pthread_t thread, int sig)
 }
 
 
-int 
+int
 pthread_detach(pthread_t thread)
 {
 	return B_NOT_ALLOWED;

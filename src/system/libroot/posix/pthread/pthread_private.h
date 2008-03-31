@@ -1,10 +1,13 @@
-#ifndef _PTHREAD_PRIVATE_H_
-#define _PTHREAD_PRIVATE_H_
-/* 
- * Copyright 2003, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2007, Ryan Leavengood, leavengood@gmail.com.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+#ifndef _PTHREAD_PRIVATE_H_
+#define _PTHREAD_PRIVATE_H_
+
+
+#include <pthread.h>
 
 #include <OS.h>
 
@@ -44,6 +47,24 @@ typedef struct _pthread_attr {
 } pthread_attr;
 
 
-void _pthread_key_call_destructors(void *);
+// This structure is used internally only, it has no public equivalent
+struct pthread_thread {
+	void		*(*entry)(void*);
+	void		*entry_argument;
+	struct __pthread_cleanup_handler *cleanup_handlers;
+	// TODO: move pthread keys in here, too
+};
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void __pthread_key_call_destructors(void);
+struct pthread_thread *__get_pthread(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _PTHREAD_PRIVATE_H_ */

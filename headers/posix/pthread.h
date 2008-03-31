@@ -1,6 +1,7 @@
-/* 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2001-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the Haiku License.
+ */
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
 
@@ -16,8 +17,8 @@ typedef int							pthread_key_t;
 typedef struct  _pthread_once		pthread_once_t;
 typedef struct  _pthread_rwlock		*pthread_rwlock_t;
 typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
-typedef struct  _pthread_barrier		*pthread_barrier_t;
-typedef struct  _pthread_barrierattr	*pthread_barrierattr_t;
+typedef struct  _pthread_barrier	*pthread_barrier_t;
+typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
 typedef struct  _pthread_spinlock	*pthread_spinlock_t;
 
 struct _pthread_once {
@@ -58,18 +59,39 @@ enum pthread_process_shared {
 #define PTHREAD_CANCEL_DISABLE		1
 #define PTHREAD_CANCEL_DEFERRED		0
 #define PTHREAD_CANCEL_ASYNCHRONOUS	2
-#define PTHREAD_CANCELED		((void *) 1)
+#define PTHREAD_CANCELED			((void *) 1)
 
-#define PTHREAD_NEEDS_INIT	0
-#define PTHREAD_DONE_INIT	1
-#define PTHREAD_ONCE_INIT 	{ PTHREAD_NEEDS_INIT, NULL }
+#define PTHREAD_NEEDS_INIT			0
+#define PTHREAD_DONE_INIT			1
+#define PTHREAD_ONCE_INIT 			{ PTHREAD_NEEDS_INIT, NULL }
 
-#define PTHREAD_BARRIER_SERIAL_THREAD	-1
+#define PTHREAD_BARRIER_SERIAL_THREAD -1
 #define PTHREAD_PRIO_NONE			0
 #define PTHREAD_PRIO_INHERIT		1
 #define PTHREAD_PRIO_PROTECT		2
 
 //extern pthread_mutexattr_t pthread_mutexattr_default;
+
+/* private structure */
+struct __pthread_cleanup_handler {
+	struct __pthread_cleanup_handler *previous;
+	void	(*function)(void *argument);
+	void	*argument;
+};
+
+#define pthread_cleanup_push(func, arg) \
+	do { \
+		struct __pthread_cleanup_handler __handler; \
+		__handler.function = (func); \
+		__handler.argument = (arg); \
+		__pthread_cleanup_push_handler(&__handler);
+
+#define pthread_cleanup_pop(execute) \
+		if (execute) \
+			__handler.function(__handler.argument); \
+		__pthread_cleanup_pop_handler(); \
+	} while (0)
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -132,7 +154,7 @@ extern int pthread_attr_init(pthread_attr_t *attr);
 extern int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
 extern int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
 
-extern int pthread_create(pthread_t *thread, const pthread_attr_t *attr, 
+extern int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
 	void *(*start_routine)(void*), void *arg);
 extern int pthread_detach(pthread_t thread);
 extern int pthread_equal(pthread_t t1, pthread_t t2);
@@ -147,6 +169,11 @@ extern int pthread_key_create(pthread_key_t *key, void (*destructor)(void*));
 extern int pthread_key_delete(pthread_key_t key);
 extern void *pthread_getspecific(pthread_key_t key);
 extern int pthread_setspecific(pthread_key_t key, const void *value);
+
+/* private functions */
+extern void __pthread_cleanup_push_handler(
+	struct __pthread_cleanup_handler *handler);
+extern struct __pthread_cleanup_handler *__pthread_cleanup_pop_handler(void);
 
 #ifdef __cplusplus
 }
