@@ -55,7 +55,6 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
 		return B_TIMED_OUT;
 
     void*  startInquiryCommand = NULL;
-    int8   bt_status = BT_ERROR;
 
     // keep the listener whats the current listener for our inquiry state
     fLastUsedListener = listener;
@@ -71,9 +70,18 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
     request.AddInt32("hci_id", fLocalDevice->GetID());
     
 	startInquiryCommand = buildInquiry(accessCode, secs, BT_MAX_RESPONSES, &size);
+
+	// For stating the inquiry
 	request.AddData("raw command", B_ANY_TYPE, startInquiryCommand, size);
     request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
     request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
+
+	// For getting each discovered message
+    request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_RESULT);
+
+	// For finishing each discovered message
+    request.AddInt16("eventExpected",  HCI_EVENT_INQUIRY_COMPLETE);
+
 
     if (btsm->SendMessage(&request, listener) == B_OK)
     {
