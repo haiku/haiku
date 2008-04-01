@@ -1821,15 +1821,6 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 		if (status < B_OK) {
 			put_vnode(vnode);
-                        if (status == B_NOT_ALLOWED) {
-                          // We are only concerned about directories here, so
-                          // B_NOT_ALLOWED is actually B_NOT_A_DIRECTORY. This
-                          // happens because fs_access() can be called on files
-                          // to and this would be valid outside of the context
-                          // of vnode_path_to_vnode(). This is also what POSIX
-                          // programs expect as return code in this case.
-                          return B_NOT_A_DIRECTORY;
-                        }
 			return status;
 		}
 
@@ -1841,15 +1832,16 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		mutex_unlock(&sVnodeMutex);
 
 		if (!nextVnode) {
-			// pretty screwed up here - the file system found the vnode, but the hash
-			// lookup failed, so our internal structures are messed up
+			// pretty screwed up here - the file system found the vnode, but the
+			// hash lookup failed, so our internal structures are messed up
 			panic("vnode_path_to_vnode: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n",
 				vnode->device, vnodeID);
 			put_vnode(vnode);
 			return B_ENTRY_NOT_FOUND;
 		}
 
-		// If the new node is a symbolic link, resolve it (if we've been told to do it)
+		// If the new node is a symbolic link, resolve it (if we've been told
+		// to do it)
 		if (S_ISLNK(type) && !(!traverseLeafLink && nextPath[0] == '\0')) {
 			size_t bufferSize;
 			char *buffer;
@@ -1936,6 +1928,13 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 		path = nextPath;
 		vnode = nextVnode;
+
+		if (strchr(path, '/') && !S_ISDIR(type)) {
+			// We need to continue to traverse, but our next vnode is not
+			// a directory.
+			put_vnode(vnode);
+			return B_NOT_A_DIRECTORY;
+		}
 
 		// see if we hit a mount point
 		struct vnode *mountPoint = resolve_mount_point_to_volume_root(vnode);
