@@ -1821,6 +1821,15 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 		if (status < B_OK) {
 			put_vnode(vnode);
+                        if (status == B_NOT_ALLOWED) {
+                          // We are only concerned about directories here, so
+                          // B_NOT_ALLOWED is actually B_NOT_A_DIRECTORY. This
+                          // happens because fs_access() can be called on files
+                          // to and this would be valid outside of the context
+                          // of vnode_path_to_vnode(). This is also what POSIX
+                          // programs expect as return code in this case.
+                          return B_NOT_A_DIRECTORY;
+                        }
 			return status;
 		}
 
