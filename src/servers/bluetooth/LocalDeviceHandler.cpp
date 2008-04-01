@@ -99,14 +99,14 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode 
                 	if ( (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) &&
                 	     ((uint16)opcodeFound != opcode) ) {
                 	     
-                	    // FIX: this should remove only the entry 
-                		fEventsWanted.RemoveMessage(msg);
+                	    // this should remove only the entry 
+                		(void)msg->RemoveData("eventExpected", eventIndex);
+                		(void)msg->RemoveData("opcodeExpected", eventIndex);                		
                 		goto bail;
                 	}                    
                 }  else {                
-                	// Event matches so far
-               	    // FIX: this should remove only the entry                 	
-               		fEventsWanted.RemoveMessage(msg);
+                	// Event matches so far               	    
+               		(void)msg->RemoveData("eventExpected", eventIndex);
                		goto bail;
                 }
                 
