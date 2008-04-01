@@ -153,6 +153,7 @@ pthread_kill(pthread_t thread, int sig)
 int
 pthread_detach(pthread_t thread)
 {
-	return B_NOT_ALLOWED;
+	// TODO: currently, all threads are detached in our implementation...
+	return 0;
 }
 
