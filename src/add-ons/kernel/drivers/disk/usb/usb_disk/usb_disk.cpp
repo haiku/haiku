@@ -157,7 +157,7 @@ usb_disk_operation(disk_device *device, uint8 operation, uint8 opLength,
 	uint32 *dataLength, bool directionIn)
 {
 	command_block_wrapper command;
-	command.signature = 0x43425355;
+	command.signature = CBW_SIGNATURE;
 	command.tag = device->current_tag++;
 	command.data_transfer_length = (dataLength != NULL ? *dataLength : 0);
 	command.flags = (directionIn ? CBW_DATA_INPUT : CBW_DATA_OUTPUT);
@@ -500,7 +500,12 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	}
 
 	result = usb_disk_inquiry(device);
-	usb_disk_test_unit_ready(device);
+	for (uint32 tries = 0; tries < 3; tries++) {
+		if (usb_disk_test_unit_ready(device) == B_OK)
+			break;
+		snooze(10000);
+	}
+
 	if (result != B_OK || usb_disk_update_capacity(device) != B_OK) {
 		TRACE_ALWAYS("failed to read device data\n");
 		delete_sem(device->notify);
