@@ -1,6 +1,9 @@
 /*
- * Copyright 2008, Michael Pfeiffer, laplace@users.sourceforge.net. All rights reserved.
+ * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ * 
+ * Authors:
+ *		Michael Pfeiffer <laplace@users.sourceforge.net>
  */
 #ifndef DESCRIPTION_PAGE_H
 #define DESCRIPTION_PAGE_H

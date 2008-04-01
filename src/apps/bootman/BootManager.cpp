@@ -1,9 +1,11 @@
 /*
- * Copyright 2008, Michael Pfeiffer, laplace@users.sourceforge.net. All rights reserved.
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- */
- 
+ * 
+ * Authors:
+ *		Michael Pfeiffer <laplace@users.sourceforge.net>
+ * 		Axel Dörfler <axeld@pinc-software.de>
+ */ 
  
 #include "BootManagerWindow.h"
 
