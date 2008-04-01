@@ -131,6 +131,7 @@ extern status_t		_kern_sigprocmask(int how, const sigset_t *set,
 extern status_t		_kern_sigaction(int sig, const struct sigaction *action,
 						struct sigaction *oldAction);
 extern bigtime_t	_kern_set_alarm(bigtime_t time, uint32 mode);
+extern status_t		_kern_sigwait(const sigset_t *set, int *_signal);
 extern status_t		_kern_sigsuspend(const sigset_t *mask);
 extern status_t		_kern_sigpending(sigset_t *set);
 extern status_t		_kern_set_signal_stack(const stack_t *newStack,
@@ -248,7 +249,7 @@ extern status_t		_kern_resize_area(area_id area, size_t newSize);
 extern area_id		_kern_transfer_area(area_id area, void **_address, uint32 addressSpec,
 						team_id target);
 extern status_t		_kern_set_area_protection(area_id area, uint32 newProtection);
-extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addressSpec, 
+extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addressSpec,
 						uint32 protection, area_id sourceArea);
 extern status_t		_kern_reserve_heap_address_range(addr_t* _address, uint32 addressSpec,
 						addr_t size);
@@ -296,7 +297,7 @@ extern int32		_kern_atomic_set(vint32 *value, int32 newValue);
 extern int32		_kern_atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
 extern int32		_kern_atomic_add(vint32 *value, int32 addValue);
 extern int32		_kern_atomic_and(vint32 *value, int32 andValue);
-extern int32		_kern_atomic_or(vint32 *value, int32 orValue);	
+extern int32		_kern_atomic_or(vint32 *value, int32 orValue);
 extern int32		_kern_atomic_get(vint32 *value);
 #endif	// ATOMIC_FUNCS_ARE_SYSCALLS
 
@@ -305,7 +306,7 @@ extern int64		_kern_atomic_set64(vint64 *value, int64 newValue);
 extern int64		_kern_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
 extern int64		_kern_atomic_add64(vint64 *value, int64 addValue);
 extern int64		_kern_atomic_and64(vint64 *value, int64 andValue);
-extern int64		_kern_atomic_or64(vint64 *value, int64 orValue);	
+extern int64		_kern_atomic_or64(vint64 *value, int64 orValue);
 extern int64		_kern_atomic_get64(vint64 *value);
 #endif	// ATOMIC64_FUNCS_ARE_SYSCALLS
 

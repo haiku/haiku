@@ -40,6 +40,7 @@ extern status_t _user_sigprocmask(int how, const sigset_t *set,
 extern status_t _user_sigaction(int sig, const struct sigaction *newAction,
 	struct sigaction *oldAction);
 extern bigtime_t _user_set_alarm(bigtime_t time, uint32 mode);
+extern status_t _user_sigwait(const sigset_t *set, int *_signal);
 extern status_t _user_sigsuspend(const sigset_t *mask);
 extern status_t _user_sigpending(sigset_t *set);
 extern status_t _user_set_signal_stack(const stack_t *newUserStack,

@@ -19,5 +19,6 @@ MergeObject posix_signal.o :
 	sigrelse.cpp
 	sigset.c
 	sigsuspend.c
+	sigwait.c
 	strsignal.c
 ;

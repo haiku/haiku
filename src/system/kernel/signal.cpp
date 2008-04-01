@@ -7,6 +7,8 @@
 
 /*! POSIX signals handling routines */
 
+#include <ksignal.h>
+
 #include <stddef.h>
 #include <string.h>
 
@@ -17,8 +19,8 @@
 #include <debug.h>
 #include <kernel.h>
 #include <kscheduler.h>
-#include <ksignal.h>
 #include <sem.h>
+#include <syscall_restart.h>
 #include <team.h>
 #include <thread.h>
 #include <tracing.h>
@@ -203,7 +205,7 @@ class SigProcMask : public AbstractTraceEntry {
 #endif	// SIGNAL_TRACING
 
 
-// #pragma mark - 
+// #pragma mark -
 
 
 /*!	Updates the thread::flags field according to what signals are pending.
@@ -482,7 +484,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 	if (flags & B_CHECK_PERMISSION) {
 		// ToDo: introduce euid & uid fields to the team and check permission
 	}
-	
+
 	if (signal == 0)
 		return B_OK;
 
@@ -560,7 +562,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 
 	if ((flags & SIGNAL_FLAG_TEAMS_LOCKED) == 0)
 		state = disable_interrupts();
-	
+
 	if (id > 0) {
 		// send a signal to the specified thread
 
@@ -574,7 +576,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 		// (the absolute value of the id)
 
 		struct process_group *group;
-		
+
 		// TODO: handle -1 correctly
 		if (id == 0 || id == -1) {
 			// send a signal to the current team
@@ -612,7 +614,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 			RELEASE_TEAM_LOCK();
 
 		GRAB_THREAD_LOCK();
-	}		
+	}
 
 	// ToDo: maybe the scheduler should only be invoked if there is reason to do it?
 	//	(ie. deliver_signal() moved some threads in the running queue?)
@@ -798,6 +800,46 @@ set_alarm(bigtime_t time, uint32 mode)
 }
 
 
+/*!	Wait for the specified signals, and return the signal retrieved in
+	\a _signal.
+*/
+int
+sigwait(const sigset_t *set, int *_signal)
+{
+	struct thread *thread = thread_get_current_thread();
+	int signalsPending = 0;
+
+	ConditionVariable<sigset_t> conditionVar;
+	conditionVar.Publish(set, "sigwait");
+
+	while (true) {
+		ConditionVariableEntry<sigset_t> entry;
+		entry.Wait(set, B_CAN_INTERRUPT);
+
+		if (has_signals_pending(thread)) {
+			signalsPending = atomic_get(&thread->sig_pending) & *set;
+			break;
+		}
+	}
+
+	conditionVar.Unpublish();
+
+	update_current_thread_signals_flag();
+
+	if (signalsPending) {
+		// select the lowest pending signal to return in _signal
+		for (int signal = 1; signal < NSIG; signal++) {
+			if ((SIGNAL_TO_MASK(signal) & signalsPending) != 0) {
+				*_signal = signal;
+				return B_OK;
+			}
+		}
+	}
+
+	return B_INTERRUPTED;
+}
+
+
 /*!	Replace the current signal block mask and wait for any event to happen.
 	Before returning, the original signal block mask is reinstantiated.
 */
@@ -843,7 +885,7 @@ sigpending(sigset_t *set)
 	if (set == NULL)
 		return B_BAD_VALUE;
 
-	*set = atomic_get(&thread->sig_pending);	
+	*set = atomic_get(&thread->sig_pending);
 	return B_OK;
 }
 
@@ -912,6 +954,25 @@ _user_sigaction(int signal, const struct sigaction *userAction,
 		return B_BAD_ADDRESS;
 
 	return status;
+}
+
+
+status_t
+_user_sigwait(const sigset_t *userSet, int *_userSignal)
+{
+	if (userSet == NULL || _userSignal == NULL)
+		return B_BAD_VALUE;
+
+	sigset_t set;
+	if (user_memcpy(&set, userSet, sizeof(sigset_t)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	int signal;
+	status_t status = sigwait(&set, &signal);
+	if (status < B_OK)
+		return syscall_restart_handle_post(status);
+
+	return user_memcpy(_userSignal, &signal, sizeof(int));
 }
 
 
