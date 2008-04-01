@@ -1,0 +1,55 @@
+#define MII_OUI_MARVELL				0x005043
+#define MII_OUI_xxMARVELL			0x000ac2
+
+#define MII_MODEL_MARVELL_E1000		0x0000
+#define MII_MODEL_MARVELL_E1011		0x0002
+#define MII_MODEL_MARVELL_E1000_3	0x0003
+#define MII_MODEL_MARVELL_E1000S	0x0004
+#define MII_MODEL_MARVELL_E1000_5	0x0005
+#define MII_MODEL_MARVELL_E1000_6	0x0006
+#define MII_MODEL_MARVELL_E3082		0x0008
+#define MII_MODEL_MARVELL_E1112		0x0009
+#define MII_MODEL_MARVELL_E1149		0x000b
+#define MII_MODEL_MARVELL_E1111		0x000c
+#define MII_MODEL_MARVELL_E1116		0x0021
+#define MII_MODEL_MARVELL_E1118		0x0022
+
+#define MII_MODEL_xxMARVELL_E1000	0x0005
+#define MII_MODEL_xxMARVELL_E1011	0x0002
+#define MII_MODEL_xxMARVELL_E1000_3	0x0003
+#define MII_MODEL_xxMARVELL_E1000_5	0x0005
+#define MII_MODEL_xxMARVELL_E1111	0x000c
+
+#define MII_STR_MARVELL_E1000		"Marvell 88E1000 Gigabit PHY"
+#define MII_STR_MARVELL_E1011		"Marvell 88E1011 Gigabit PHY"
+#define MII_STR_MARVELL_E1000_3		"Marvell 88E1000 Gigabit PHY"
+#define MII_STR_MARVELL_E1000S		"Marvell 88E1000S Gigabit PHY"
+#define MII_STR_MARVELL_E1000_5		"Marvell 88E1000 Gigabit PHY"
+#define MII_STR_MARVELL_E1000_6		"Marvell 88E1000 Gigabit PHY"
+#define MII_STR_MARVELL_E3082		"Marvell 88E3082 10/100 Fast Ethernet PHY"
+#define MII_STR_MARVELL_E1112		"Marvell 88E1112 Gigabit PHY"
+#define MII_STR_MARVELL_E1149		"Marvell 88E1149 Gigabit PHY"
+#define MII_STR_MARVELL_E1111		"Marvell 88E1111 Gigabit PHY"
+#define MII_STR_MARVELL_E1116		"Marvell 88E1116 Gigabit PHY"
+#define MII_STR_MARVELL_E1118		"Marvell 88E1118 Gigabit PHY"
+
+#define MII_STR_xxMARVELL_E1000		"Marvell 88E1000 Gigabit PHY"
+#define MII_STR_xxMARVELL_E1011		"Marvell 88E1011 Gigabit PHY"
+#define MII_STR_xxMARVELL_E1000_3	"Marvell 88E1000 Gigabit PHY"
+#define MII_STR_xxMARVELL_E1000_5	"Marvell 88E1000 Gigabit PHY"
+#define MII_STR_xxMARVELL_E1111		"Marvell 88E1111 Gigabit PHY"
+
+#define MII_OUI_JATO				0x00e083	/*Jato Technologies*/
+#define MII_OUI_XAQTI				0x00e0ae	/*XaQti Corp.*/
+
+#define MII_OUI_xxXAQTI				0x350700	/*XaQti Corp.*/
+
+/* Jato Technologies PHYs */
+#define MII_MODEL_JATO_BASEX		0x0000 
+#define MII_STR_JATO_BASEX 			"Jato 1000baseX media interface"
+
+/* XaQti Corp. PHYs. */
+#define MII_MODEL_XAQTI_XMACII		0x0000 
+#define MII_STR_XAQTI_XMACII 		"XaQti Corp. XMAC II gigabit interface"
+
+
