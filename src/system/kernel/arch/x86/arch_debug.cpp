@@ -547,13 +547,11 @@ arch_debug_contains_call(struct thread *thread, const char *symbol,
 	else
 		ebp = thread->arch_info.current_stack.esp[2];
 
-	bool onKernelStack = true;
-
 	for (;;) {
-		onKernelStack = onKernelStack
-			&& is_kernel_stack_address(thread, ebp);
+		if (!is_kernel_stack_address(thread, ebp))
+			break;
 
-		if (onKernelStack && is_iframe(thread, ebp)) {
+		if (is_iframe(thread, ebp)) {
 			struct iframe *frame = (struct iframe *)ebp;
 
 			if (is_calling(thread, frame->eip, symbol, start, end))
