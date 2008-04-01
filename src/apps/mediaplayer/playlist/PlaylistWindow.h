@@ -24,6 +24,7 @@ class Playlist;
 class PlaylistListView;
 class RWLocker;
 class BButton;
+class BFilePanel;
 
 class PlaylistWindow : public BWindow {
  public:
