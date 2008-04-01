@@ -111,9 +111,11 @@ printf("### \n");
 	// we are waiting for a reply
 	switch (event->ecode) {
 		case HCI_EVENT_INQUIRY_COMPLETE:
+    		InquiryComplete((uint8*)(event+1), request);		
     	break;
     	
     	case HCI_EVENT_INQUIRY_RESULT:
+    		InquiryResult((struct inquiry_info*)(event+1), request);
 		break;
  	
 		case HCI_EVENT_CONN_COMPLETE:
@@ -229,6 +231,8 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
     Output::Instance()->Post("\n", BLACKBOARD_LD_OFFSET + GetID());
 	
 	// Handle command complete information
+	// FIX ME! the expected code might me in another 
+	// index as is relative to the event not the request
     request->FindInt16("opcodeExpected", 0 /*REVIEW!*/, &opcodeExpected);
 
 
@@ -259,8 +263,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
                 request->SendReply(&reply);    
 			    Output::Instance()->Post("Negative reply for getAdress\n", BLACKBOARD_KIT);                
             }
-                        
-            ClearWantedEvent(request, PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR));
+
+ 			// This request is not genna be used anymore                       
+            ClearWantedEvent(request);
      	}       
         break;
 
@@ -283,8 +288,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
             printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
             reply.PrintToStream();
-                        
-            ClearWantedEvent(request, PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME));
+            
+ 			// This request is not genna be used anymore                        
+            ClearWantedEvent(request);
      	}       
         break;
 
@@ -306,8 +312,9 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
             printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
             reply.PrintToStream();
-                        
-            ClearWantedEvent(request, PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE));
+            
+ 			// This request is not genna be used anymore                        
+            ClearWantedEvent(request);
      	}       
         break;
 		
@@ -355,7 +362,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
             printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
             reply.PrintToStream();
                         
-            ClearWantedEvent(request, PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
+            ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
      	}       
         break;
 		
@@ -365,6 +372,32 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 	}
 
 }
+
+
+void 
+LocalDeviceImpl::InquiryResult(struct inquiry_info* event, BMessage* request)
+{
+
+	BMessage reply(BT_MSG_INQUIRY_DEVICE);
+	
+    reply.AddData("info", B_ANY_TYPE, &event, sizeof(struct inquiry_info));
+	
+    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));                                
+
+
+}
+
+
+void 
+LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
+{
+	BMessage reply(BT_MSG_INQUIRY_COMPLETED);
+	
+	reply.AddInt8("status", *status);	
+    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));	
+    
+}
+
 
 #if 0
 #pragma mark - Request Methods -

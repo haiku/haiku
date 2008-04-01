@@ -40,6 +40,10 @@ public:
     void CommandComplete(struct hci_ev_cmd_complete* event, BMessage* request);
 	void CommandStatus(struct hci_ev_cmd_status* event, BMessage* request);
 	
+	// Inquiry
+	void InquiryResult(struct inquiry_info* event, BMessage* request);
+	void InquiryComplete(uint8* status, BMessage* request);
+	
 };
 
 #endif
