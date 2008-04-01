@@ -3,8 +3,10 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ *		Stephan Aßmus 	<superstippi@gmx.de>
+ *		Fredrik Modéen 	<fredrik@modeen.se>
  */
+ 
 #ifndef PLAYLIST_WINDOW_H
 #define PLAYLIST_WINDOW_H
 
@@ -21,6 +23,7 @@ class Notifier;
 class Playlist;
 class PlaylistListView;
 class RWLocker;
+class BButton;
 
 class PlaylistWindow : public BWindow {
  public:
@@ -42,6 +45,9 @@ class PlaylistWindow : public BWindow {
 			BView*				fTopView;
 			BMenuItem*			fUndoMI;
 			BMenuItem*			fRedoMI;
+			
+			BFilePanel*			fOpenPanel;
+			BFilePanel*			fSavePanel;
 
 			RWLocker*			fLocker;
 			CommandStack*		fCommandStack;

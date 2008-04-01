@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
  * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
- * Copyright (C) 2007 Fredrik Modéen <fredrik@modeen.se>
+ * Copyright (C) 2008 Fredrik Modéen 	<fredrik@modeen.se> (I have no problem changing my things to MIT)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -33,6 +33,8 @@
 #include <Directory.h>
 #include <Message.h>
 #include <Path.h>
+
+#include "FileReadWrite.h"
 
 using std::nothrow;
 
@@ -281,8 +283,7 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 
 	entry_ref ref;
 	for (int i = 0; refsReceivedMessage->FindRef("refs", i, &ref) == B_OK; i++) 
-		AppendToPlaylistRecursive(ref, playlist);	
-
+		AppendToPlaylistRecursive(ref, playlist);
 	playlist->Sort();
 
 	if (add)
@@ -300,10 +301,17 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 {
 	// recursively append the ref (dive into folders)
 	BEntry entry(&ref, true);
-	if (entry.InitCheck() < B_OK)
+	if (entry.InitCheck() < B_OK) {
+		printf("Not OK\n");
 		return;
-	if (!entry.Exists())
+	}
+	
+	if (!entry.Exists()) {
+		BPath path = BPath(&ref);
+		//printf("Don't exist - %s\n", path.Path());
 		return;
+	}
+	
 	if (entry.IsDirectory()) {
 		BDirectory dir(&entry);
 		if (dir.InitCheck() < B_OK)
@@ -313,13 +321,35 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		while (dir.GetNextRef(&subRef) == B_OK)
 			AppendToPlaylistRecursive(subRef, playlist);
 	} else if (entry.IsFile()) {
+		//printf("Is File\n");
 		BString mimeString = _MIMEString(&ref);
-		if (_IsMediaFile(mimeString))
+		if (_IsMediaFile(mimeString)) {
+			//printf("Adding\n");
 			playlist->AddRef(ref);
-		else if (_IsPlaylist(mimeString)) {
-			printf("Playlist::AppendToPlaylistRecursive() - "
-				"TODO: implement playlist file loading\n");
-		}
+		} else if (_IsPlaylist(mimeString)) {
+			//printf("RunPlaylist thing\n");
+			BFile file(&ref, B_READ_ONLY);
+			FileReadWrite lineReader(&file);
+	
+			BString str;
+			entry_ref refPath; 
+			status_t err; 
+			BPath path;
+			while (lineReader.Next(str)) {
+				str = str.RemoveFirst("file://");
+				str = str.RemoveLast("..");
+				path = BPath(str.String());
+				printf("Line %s\n", path.Path());
+				if (path.Path() != NULL) {
+					if ((err = get_ref_for_path(path.Path(), &refPath)) == B_OK) {
+						playlist->AddRef(refPath);
+					} else			
+						printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
+				} else
+					printf("Error - No File Found in playlist\n");
+			}
+		} else
+			printf("MIME Type = %s\n", mimeString.String());
 	}
 }
 
@@ -331,7 +361,6 @@ int
 Playlist::playlist_cmp(const void *p1, const void *p2)
 {
 	// compare complete path
-
 	BEntry a(*(const entry_ref **)p1, false);
 	BEntry b(*(const entry_ref **)p2, false);
 
@@ -339,6 +368,30 @@ Playlist::playlist_cmp(const void *p1, const void *p2)
 	BPath bPath(&b);
 
 	return strcmp(aPath.Path(), bPath.Path());
+}
+
+
+/*static*/ void
+Playlist::_AddPlayListFileToPlayList(const entry_ref& ref, Playlist* playlist)
+{
+	
+	BFile file(&ref, B_READ_ONLY);
+	FileReadWrite lineReader(&file);
+	
+	BString str;
+	while (lineReader.Next(str)) {
+		BPath path = BPath(str.String());
+		entry_ref refPath; 
+		status_t err; 
+		if ((err = get_ref_for_path(path.Path(), &refPath)) == B_OK) {
+			AppendToPlaylistRecursive(refPath, playlist);
+		} else			
+			printf("Error - %s: [%lx]\n", strerror(err), (int32) err);
+	}
+	/*
+		Read line for x to the end of file (while?)
+		make a enty_ref and call AppendToPlaylistRecursive(with new entry, playlist)
+	*/
 }
 
 

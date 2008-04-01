@@ -9,6 +9,7 @@ local sourceDirs =
 	playlist
 	supplier
 	support
+	settings
 ;
 
 local sourceDir ;
@@ -29,6 +30,10 @@ Application MediaPlayer :
 	RemovePLItemsCommand.cpp
 
 	# supplier
+	Settings.cpp
+	SettingsWindow.cpp
+
+	# supplier
 	AudioSupplier.cpp
 	MediaTrackAudioSupplier.cpp
 	MediaTrackVideoSupplier.cpp
@@ -42,6 +47,8 @@ Application MediaPlayer :
 	ListenerAdapter.cpp
 	Notifier.cpp
 	RWLocker.cpp
+	FileReadWrite.cpp
+	TPreferences.cpp
 
 	# .
 	Controller.cpp
@@ -59,7 +66,7 @@ Application MediaPlayer :
 	VideoView.cpp
 	VolumeSlider.cpp
 
-	: be media tracker translation $(TARGET_LIBSTDC++)
+	: be media tracker translation textencoding $(TARGET_LIBSTDC++)
 	: MediaPlayer.rdef
 ;
 

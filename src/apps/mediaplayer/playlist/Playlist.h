@@ -1,8 +1,9 @@
 /*
  * Playlist.h - Media Player for the Haiku Operating System
  *
- * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
- * Copyright (C) 2007 Stephan Aßmus <superstippi@gmx.de>
+ * Copyright (C) 2006 Marcus Overhagen 	<marcus@overhagen.de>
+ * Copyright (C) 2007 Stephan Aßmus 	<superstippi@gmx.de>
+ * Copyright (C) 2008 Fredrik Modéen 	<fredrik@modeen.se> (I have no problem changing my things to MIT)
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -88,7 +89,8 @@ private:
 			static bool 		_IsMediaFile(const BString& mimeString);
 			static bool			_IsPlaylist(const BString& mimeString);
 			static BString		_MIMEString(const entry_ref* entry);
-
+			static void 		_AddPlayListFileToPlayList(const entry_ref& ref,
+									Playlist* playlist);
 			void				_NotifyRefAdded(const entry_ref& ref,
 									int32 index) const;
 			void				_NotifyRefRemoved(int32 index) const;

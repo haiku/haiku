@@ -32,10 +32,10 @@
 #include "VideoView.h"
 #include "Playlist.h"
 
-
 class ControllerObserver;
 class PlaylistObserver;
 class PlaylistWindow;
+class SettingsWindow;
 
 class MainWin : public BWindow {
 public:
@@ -54,6 +54,7 @@ public:
 			
 			void				ShowFileInfo();
 			void				ShowPlaylistWindow();
+			void				ShowSettingsWindow();
 		
 			void				VideoFormatChange(int width, int height,
 									float widthScale, float heightScale);
@@ -100,6 +101,7 @@ private:
 			ControllerView*		fControls;
 			InfoWin*			fInfoWin;
 			PlaylistWindow*		fPlaylistWindow;
+			SettingsWindow*		fSettingsWindow;
 		
 			BMenu*				fFileMenu;
 			BMenu*				fAudioMenu;
