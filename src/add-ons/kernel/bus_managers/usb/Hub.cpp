@@ -12,7 +12,7 @@
 
 
 Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
-	int8 deviceAddress, usb_speed speed)
+	int8 deviceAddress, usb_speed speed, bool isRootHub)
 	:	Device(parent, hubPort, desc, deviceAddress, speed),
 		fInterruptPipe(NULL)
 {
@@ -71,7 +71,8 @@ Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 		InterruptCallback, this);
 
 	// Wait some time before powering up the ports
-	snooze(USB_DELAY_HUB_POWER_UP);
+	if (!isRootHub)
+		snooze(USB_DELAY_HUB_POWER_UP);
 
 	// Enable port power on all ports
 	for (int32 i = 0; i < fHubDescriptor.num_ports; i++) {

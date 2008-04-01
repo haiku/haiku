@@ -76,7 +76,7 @@ static ehci_root_hub_configuration_s sEHCIRootHubConfig =
 		USB_DESCRIPTOR_HUB,				// Descriptor type
 		0x0f,							// Number of ports
 		0x0000,							// Hub characteristics
-		50,								// Power on to power good (in 2ms units)
+		0,								// Power on to power good (in 2ms units)
 		0,								// Maximum current (in mA)
 		0x00,							// All ports are removable
 		0xff							// Depricated power control mask
@@ -123,7 +123,7 @@ static ehci_root_hub_string_s sEHCIRootHubStrings[3] = {
 
 EHCIRootHub::EHCIRootHub(Object *rootObject, int8 deviceAddress)
 	:	Hub(rootObject, rootObject->GetStack()->IndexOfBusManager(rootObject->GetBusManager()),
-			sEHCIRootHubDevice, deviceAddress, USB_SPEED_HIGHSPEED)
+			sEHCIRootHubDevice, deviceAddress, USB_SPEED_HIGHSPEED, true)
 {
 }
 

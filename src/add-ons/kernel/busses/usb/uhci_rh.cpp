@@ -79,7 +79,7 @@ static uhci_root_hub_configuration_s sUHCIRootHubConfig =
 		USB_DESCRIPTOR_HUB,				// Descriptor type
 		2,								// Number of ports
 		0x0000,							// Hub characteristics
-		50,								// Power on to power good (in 2ms units)
+		0,								// Power on to power good (in 2ms units)
 		0,								// Maximum current (in mA)
 		0x00,							// Both ports are removable
 		0xff							// Depricated power control mask
@@ -127,7 +127,7 @@ static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
 
 UHCIRootHub::UHCIRootHub(Object *rootObject, int8 deviceAddress)
 	:	Hub(rootObject, rootObject->GetStack()->IndexOfBusManager(rootObject->GetBusManager()),
-			sUHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED)
+			sUHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED, true)
 {
 }
 

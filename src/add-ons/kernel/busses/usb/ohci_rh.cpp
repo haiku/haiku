@@ -76,7 +76,7 @@ static ohci_root_hub_configuration_s sOHCIRootHubConfig =
 		USB_DESCRIPTOR_HUB,		// Type
 		0,						// Number of ports
 		0x0000,					// Hub characteristics
-		50,						// Power on to power good
+		0,						// Power on to power good
 		0,						// Current
 		0x00,					// Both ports are removable
 		0xff					// Depricated power control mask
@@ -122,7 +122,7 @@ static ohci_root_hub_string_s sOHCIRootHubStrings[3] = {
 
 OHCIRootHub::OHCIRootHub(Object *rootObject, int8 deviceAddress)
    :	Hub(rootObject, rootObject->GetStack()->IndexOfBusManager(rootObject->GetBusManager()),
-   			sOHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED)
+   			sOHCIRootHubDevice, deviceAddress, USB_SPEED_FULLSPEED, true)
 {
 }
 

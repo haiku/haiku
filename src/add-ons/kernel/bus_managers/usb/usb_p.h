@@ -483,7 +483,7 @@ public:
 										Hub(Object *parent, int8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
-											usb_speed speed);
+											usb_speed speed, bool isRootHub);
 virtual									~Hub();
 
 virtual	status_t						Changed(change_item **changeList,

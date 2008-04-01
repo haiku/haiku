@@ -204,7 +204,7 @@ BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 	if (deviceDescriptor.device_class == 0x09) {
 		TRACE(("USB BusManager: creating new hub\n"));
 		Hub *hub = new(std::nothrow) Hub(parent, port, deviceDescriptor,
-			deviceAddress, speed);
+			deviceAddress, speed, false);
 		if (!hub) {
 			TRACE_ERROR(("USB BusManager: no memory to allocate hub\n"));
 			FreeAddress(deviceAddress);
