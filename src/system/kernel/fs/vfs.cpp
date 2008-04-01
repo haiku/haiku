@@ -1753,7 +1753,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	int count, struct io_context *ioContext, struct vnode **_vnode,
 	ino_t *_parentID, int *_type)
 {
-	status_t status = 0;
+	status_t status = B_OK;
 	ino_t lastParentID = vnode->id;
 	int type = 0;
 
@@ -1782,7 +1782,8 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 		// walk to find the next path component ("path" will point to a single
 		// path component), and filter out multiple slashes
-		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/'; nextPath++);
+		for (nextPath = path + 1; *nextPath != '\0' && *nextPath != '/';
+				nextPath++);
 
 		if (*nextPath == '/') {
 			*nextPath = '\0';
@@ -1806,12 +1807,25 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				put_vnode(vnode);
 				vnode = nextVnode;
 			}
+		} else if (nextPath[0]) {
+			// check if vnode is really a directory
+			if (type == 0) {
+				// we need to retrieve the type first
+				struct stat stat;
+				status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
+					vnode->private_node, &stat);
+				if (status == B_OK)
+					type = stat.st_mode;
+			}
+
+			if (status == B_OK && !S_ISDIR(type))
+				status = B_NOT_A_DIRECTORY;
 		}
 
 		// Check if we have the right to search the current directory vnode.
 		// If a file system doesn't have the access() function, we assume that
 		// searching a directory is always allowed
-		if (FS_CALL(vnode, access))
+		if (status == B_OK && FS_CALL(vnode, access))
 			status = FS_CALL(vnode, access)(vnode->mount->cookie, vnode->private_node, X_OK);
 
 		// Tell the filesystem to get the vnode of this path component (if we got the
@@ -1928,13 +1942,6 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 		path = nextPath;
 		vnode = nextVnode;
-
-		if (strchr(path, '/') && !S_ISDIR(type)) {
-			// We need to continue to traverse, but our next vnode is not
-			// a directory.
-			put_vnode(vnode);
-			return B_NOT_A_DIRECTORY;
-		}
 
 		// see if we hit a mount point
 		struct vnode *mountPoint = resolve_mount_point_to_volume_root(vnode);
