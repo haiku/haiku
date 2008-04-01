@@ -19,8 +19,9 @@
 // ** -- Only writable with words!
 
 // PCI register
-#define PCI_LEGSUP 0xC0
-#define PCI_LEGSUP_USBPIRQDEN 0x2000
+#define PCI_LEGSUP				0xC0
+#define PCI_LEGSUP_USBPIRQDEN	0x2000
+#define PCI_LEGSUP_CLEAR_SMI	0x8f00
 
 // Registers
 #define UHCI_USBCMD				0x00 	// USB Command - word - R/W
