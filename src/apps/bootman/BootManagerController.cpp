@@ -13,9 +13,10 @@
 #include "DefaultPartitionPage.h"
 #include "DescriptionPage.h"
 #include "FileSelectionPage.h"
+#include "LegacyBootDrive.h"
 
-// TODO remove
-#define USE_TEST_BOOT_DRIVE 1
+
+#define USE_TEST_BOOT_DRIVE 0
 
 #if USE_TEST_BOOT_DRIVE
 	#include "TestBootDrive.h"
@@ -35,8 +36,7 @@ BootManagerController::BootManagerController()
 #if USE_TEST_BOOT_DRIVE
 	fBootDrive = new TestBootDrive();
 #else
-	// TODO implement
-	fBootDrive = NULL; 
+	fBootDrive = new LegacyBootDrive(); 
 #endif
 
 	// set defaults
