@@ -6,6 +6,7 @@
 #include <grp.h>
 
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <new>
@@ -108,7 +109,7 @@ init_group_db()
 	if (sGroupDB != NULL)
 		return sGroupDB;
 
-	sGroupDB = new(nothrow) GroupDB;
+	sGroupDB = new(std::nothrow) GroupDB;
 	if (sGroupDB == NULL)
 		return NULL;
 

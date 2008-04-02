@@ -520,7 +520,7 @@ status_t
 PasswdDB::HandleEntry(const char* name, const char* password, uid_t uid,
 	gid_t gid, const char* home, const char* shell, const char* realName)
 {
-	PasswdDBEntry* entry = new(nothrow) PasswdDBEntry();
+	PasswdDBEntry* entry = new(std::nothrow) PasswdDBEntry();
 	if (entry == NULL || !entry->Init(name, password, uid, gid, home, shell,
 			realName)) {
 		delete entry;
@@ -692,7 +692,7 @@ status_t
 GroupDB::HandleEntry(const char* name, const char* password, gid_t gid,
 	const char* const* members, int memberCount)
 {
-	GroupDBEntry* entry = new(nothrow) GroupDBEntry();
+	GroupDBEntry* entry = new(std::nothrow) GroupDBEntry();
 	if (entry == NULL || !entry->Init(name, password, gid, members,
 			memberCount)) {
 		delete entry;

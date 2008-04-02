@@ -6,6 +6,7 @@
 #include <pwd.h>
 
 #include <errno.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <new>
@@ -73,7 +74,7 @@ init_passwd_db()
 	if (sPasswdDB != NULL)
 		return sPasswdDB;
 
-	sPasswdDB = new(nothrow) PasswdDB;
+	sPasswdDB = new(std::nothrow) PasswdDB;
 	if (sPasswdDB == NULL)
 		return NULL;
 
