@@ -52,13 +52,17 @@ class Journal {
 
 	private:
 		bool _HasSubTransaction() { return fHasSubtransaction; }
+		status_t _FlushLog(bool flushBlocks = false);
 		uint32 _TransactionSize() const;
 		status_t _WriteTransactionToLog();
 		status_t _CheckRunArray(const run_array *array);
 		status_t _ReplayRunArray(int32 *start);
 		status_t _TransactionDone(bool success);
-		static void _TransactionNotify(int32 transactionID, int32 event,
+
+		static void _TransactionWritten(int32 transactionID, int32 event,
 			void *_logEntry);
+		static void _TransactionListener(int32 transactionID, int32 event,
+			void *_journal);
 
 		Volume			*fVolume;
 		RecursiveLock	fLock;

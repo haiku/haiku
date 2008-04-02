@@ -531,8 +531,8 @@ Journal::ReplayLog()
 	the log start pointer as needed. Note, the transactions may not be
 	completed in the order they were written.
 */
-void
-Journal::_TransactionNotify(int32 transactionID, int32 event, void *_logEntry)
+/*static*/ void
+Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 {
 	LogEntry *logEntry = (LogEntry *)_logEntry;
 
@@ -577,10 +577,24 @@ Journal::_TransactionNotify(int32 transactionID, int32 event, void *_logEntry)
 
 		status_t status = journal->fVolume->WriteSuperBlock();
 		if (status != B_OK) {
-			FATAL(("_BlockNotify: could not write back super block: %s\n",
+			FATAL(("_TransactionWritten: could not write back super block: %s\n",
 				strerror(status)));
 		}
 	}
+}
+
+
+/*!	Listens to TRANSACTION_IDLE events, and flushes the log when that happens */
+/*static*/ void
+Journal::_TransactionListener(int32 transactionID, int32 event, void *_journal)
+{
+	if (event != TRANSACTION_IDLE)
+		return;
+
+	// The current transaction seems to be idle - flush it
+
+	Journal *journal = (Journal *)_journal;
+	journal->_FlushLog();
 }
 
 
@@ -763,11 +777,11 @@ Journal::_WriteTransactionToLog()
 
 	if (detached) {
 		fTransactionID = cache_detach_sub_transaction(fVolume->BlockCache(),
-			fTransactionID, _TransactionNotify, logEntry);
+			fTransactionID, _TransactionWritten, logEntry);
 		fUnwrittenTransactions = 1;
 	} else {
 		cache_end_transaction(fVolume->BlockCache(), fTransactionID,
-			_TransactionNotify, logEntry);
+			_TransactionWritten, logEntry);
 		fUnwrittenTransactions = 0;
 	}
 
@@ -775,8 +789,11 @@ Journal::_WriteTransactionToLog()
 }
 
 
+/*!	Flushes the current log entry to disk. If \a flushBlocks is \c true it will
+	also write back all dirty blocks for this volume.
+*/
 status_t
-Journal::FlushLogAndBlocks()
+Journal::_FlushLog(bool flushBlocks)
 {
 	status_t status = fLock.Lock();
 	if (status != B_OK)
@@ -796,10 +813,21 @@ Journal::FlushLogAndBlocks()
 			FATAL(("writing current log entry failed: %s\n", strerror(status)));
 	}
 
-	status = fVolume->FlushDevice();
+	if (flushBlocks)
+		status = fVolume->FlushDevice();
 
 	fLock.Unlock();
 	return status;
+}
+
+
+/*!	Flushes the current log entry to disk, and also writes back all dirty
+	blocks for this volume (completing all open transactions).
+*/
+status_t
+Journal::FlushLogAndBlocks()
+{
+	return _FlushLog(true);
 }
 
 
@@ -809,12 +837,6 @@ Journal::Lock(Transaction *owner)
 	status_t status = fLock.Lock();
 	if (status != B_OK)
 		return status;
-
-/*	ToDo:
-	// if the last transaction is older than 2 secs, start a new one
-	if (fTransactionsInEntry != 0 && system_time() - fTimestamp > 2000000L)
-		WriteLogEntry();
-*/
 
 	if (fLock.OwnerCount() > 1) {
 		// we'll just use the current transaction again
@@ -842,6 +864,9 @@ Journal::Lock(Transaction *owner)
 		return fTransactionID;
 	}
 
+	cache_add_transaction_listener(fVolume->BlockCache(), fTransactionID,
+		_TransactionListener, this);
+
 	return B_OK;
 }
 
@@ -867,7 +892,7 @@ Journal::_TransactionSize() const
 {
 	int32 count = cache_blocks_in_transaction(fVolume->BlockCache(),
 		fTransactionID);
-	if (count < 0)
+	if (count <= 0)
 		return 0;
 
 	// take the number of array blocks in this transaction into account
