@@ -1,9 +1,9 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.20 Septhember 3, 2007
+ * Last changed in libpng 1.2.26 [April 2, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  */
@@ -380,6 +380,8 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
 #ifdef PNG_USE_LOCAL_ARRAYS
    PNG_IHDR;
 #endif
+   int ret;
+
    png_byte buf[13]; /* buffer to store the IHDR info */
 
    png_debug(1, "in png_write_IHDR\n");
@@ -523,10 +525,19 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
       png_ptr->zlib_window_bits = 15;
    if (!(png_ptr->flags & PNG_FLAG_ZLIB_CUSTOM_METHOD))
       png_ptr->zlib_method = 8;
-   if (deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
-      png_ptr->zlib_method, png_ptr->zlib_window_bits,
-      png_ptr->zlib_mem_level, png_ptr->zlib_strategy) != Z_OK)
-       png_error(png_ptr, "zlib failed to initialize compressor");
+   ret = deflateInit2(&png_ptr->zstream, png_ptr->zlib_level,
+         png_ptr->zlib_method, png_ptr->zlib_window_bits,
+         png_ptr->zlib_mem_level, png_ptr->zlib_strategy);
+   if (ret != Z_OK)
+   {
+      if (ret == Z_VERSION_ERROR) png_error(png_ptr,
+          "zlib failed to initialize compressor -- version error");
+      if (ret == Z_STREAM_ERROR) png_error(png_ptr,
+           "zlib failed to initialize compressor -- stream error");
+      if (ret == Z_MEM_ERROR) png_error(png_ptr,
+           "zlib failed to initialize compressor -- mem error");
+      png_error(png_ptr, "zlib failed to initialize compressor");
+   }
    png_ptr->zstream.next_out = png_ptr->zbuf;
    png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
    /* libpng is not interested in zstream.data_type */

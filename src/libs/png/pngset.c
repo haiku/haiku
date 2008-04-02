@@ -1,9 +1,9 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.22 [October 13, 2007]
+ * Last changed in libpng 1.2.25 [February 18, 2008]
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2007 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2008 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -41,7 +41,13 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_debug1(1, "in %s storage function\n", "cHRM");
    if (png_ptr == NULL || info_ptr == NULL)
       return;
-
+   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
+       blue_x || blue_y))
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set all-zero chromaticity values");
+      return;
+   }
    if (white_x < 0.0 || white_y < 0.0 ||
          red_x < 0.0 ||   red_y < 0.0 ||
        green_x < 0.0 || green_y < 0.0 ||
@@ -93,6 +99,13 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (!(white_x || white_y || red_x || red_y || green_x || green_y ||
+       blue_x || blue_y))
+   {
+      png_warning(png_ptr,
+        "Ignoring attempt to set all-zero chromaticity values");
+      return;
+   }
    if (white_x < 0 || white_y < 0 ||
          red_x < 0 ||   red_y < 0 ||
        green_x < 0 || green_y < 0 ||
@@ -102,25 +115,14 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
         "Ignoring attempt to set negative chromaticity value");
       return;
    }
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-   if (white_x > (double) PNG_UINT_31_MAX ||
-       white_y > (double) PNG_UINT_31_MAX ||
-         red_x > (double) PNG_UINT_31_MAX ||
-         red_y > (double) PNG_UINT_31_MAX ||
-       green_x > (double) PNG_UINT_31_MAX ||
-       green_y > (double) PNG_UINT_31_MAX ||
-        blue_x > (double) PNG_UINT_31_MAX ||
-        blue_y > (double) PNG_UINT_31_MAX)
-#else
-   if (white_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
-       white_y > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
-         red_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
-         red_y > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
-       green_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
-       green_y > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
-        blue_x > (png_fixed_point) PNG_UINT_31_MAX/100000L ||
-        blue_y > (png_fixed_point) PNG_UINT_31_MAX/100000L)
-#endif
+   if (white_x > (png_fixed_point) PNG_UINT_31_MAX ||
+       white_y > (png_fixed_point) PNG_UINT_31_MAX ||
+         red_x > (png_fixed_point) PNG_UINT_31_MAX ||
+         red_y > (png_fixed_point) PNG_UINT_31_MAX ||
+       green_x > (png_fixed_point) PNG_UINT_31_MAX ||
+       green_y > (png_fixed_point) PNG_UINT_31_MAX ||
+        blue_x > (png_fixed_point) PNG_UINT_31_MAX ||
+        blue_y > (png_fixed_point) PNG_UINT_31_MAX )
    {
       png_warning(png_ptr,
         "Ignoring attempt to set chromaticity value exceeding 21474.83");
@@ -486,6 +488,7 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
    {
       png_warning(png_ptr,
        "Memory allocation failed while processing sCAL.");
+      return;
    }
    png_memcpy(info_ptr->scal_s_width, swidth, (png_size_t)length);
 
@@ -497,9 +500,9 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
       png_free (png_ptr, info_ptr->scal_s_width);
       png_warning(png_ptr,
        "Memory allocation failed while processing sCAL.");
+      return;
    }
    png_memcpy(info_ptr->scal_s_height, sheight, (png_size_t)length);
-
    info_ptr->valid |= PNG_INFO_sCAL;
 #ifdef PNG_FREE_ME_SUPPORTED
    info_ptr->free_me |= PNG_FREE_SCAL;
@@ -679,19 +682,20 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
 {
    png_charp new_iccp_name;
    png_charp new_iccp_profile;
+   png_uint_32 length;
 
    png_debug1(1, "in %s storage function\n", "iCCP");
    if (png_ptr == NULL || info_ptr == NULL || name == NULL || profile == NULL)
       return;
 
-   new_iccp_name = (png_charp)png_malloc_warn(png_ptr, png_strlen(name)+1);
+   length = png_strlen(name)+1;
+   new_iccp_name = (png_charp)png_malloc_warn(png_ptr, length);
    if (new_iccp_name == NULL)
    {
       png_warning(png_ptr, "Insufficient memory to process iCCP chunk.");
       return;
    }
-   png_strncpy(new_iccp_name, name, png_strlen(name));
-   new_iccp_name[png_strlen(name)] = '\0';
+   png_memcpy(new_iccp_name, name, length);
    new_iccp_profile = (png_charp)png_malloc_warn(png_ptr, proflen);
    if (new_iccp_profile == NULL)
    {
@@ -972,21 +976,18 @@ png_set_sPLT(png_structp png_ptr,
     {
         png_sPLT_tp to = np + info_ptr->splt_palettes_num + i;
         png_sPLT_tp from = entries + i;
+        png_uint_32 length;
 
-        to->name = (png_charp)png_malloc_warn(png_ptr,
-          png_strlen(from->name) + 1);
+        length = png_strlen(from->name) + 1;
+        to->name = (png_charp)png_malloc_warn(png_ptr, length);
         if (to->name == NULL)
         {
            png_warning(png_ptr,
              "Out of memory while processing sPLT chunk");
+           continue;
         }
-        /* TODO: use png_malloc_warn */
-        png_strncpy(to->name, from->name, png_strlen(from->name));
-        to->name[png_strlen(from->name)] = '\0';
+        png_memcpy(to->name, from->name, length);
         to->entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
-            from->nentries * png_sizeof(png_sPLT_entry));
-        /* TODO: use png_malloc_warn */
-        png_memcpy(to->entries, from->entries,
             from->nentries * png_sizeof(png_sPLT_entry));
         if (to->entries == NULL)
         {
@@ -994,7 +995,10 @@ png_set_sPLT(png_structp png_ptr,
              "Out of memory while processing sPLT chunk");
            png_free(png_ptr,to->name);
            to->name = NULL;
+           continue;
         }
+        png_memcpy(to->entries, from->entries,
+            from->nentries * png_sizeof(png_sPLT_entry));
         to->nentries = from->nentries;
         to->depth = from->depth;
     }
@@ -1039,8 +1043,11 @@ png_set_unknown_chunks(png_structp png_ptr,
         png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
         png_unknown_chunkp from = unknowns + i;
 
-        png_strncpy((png_charp)to->name, (png_charp)from->name, 4);
-        to->name[4] = '\0';
+        png_memcpy((png_charp)to->name, 
+                   (png_charp)from->name, 
+                   png_sizeof(from->name));
+        to->name[png_sizeof(to->name)-1] = '\0';
+
         to->data = (png_bytep)png_malloc_warn(png_ptr, from->size);
         if (to->data == NULL)
         {
