@@ -1,5 +1,5 @@
-/* 
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -25,7 +25,7 @@
 
 // The stack functionality looks like a good candidate to put into its own
 // store. I have not done this because once we have a swap file backing up
-// the memory, it would probably not be a good idea to separate this 
+// the memory, it would probably not be a good idea to separate this
 // anymore.
 
 typedef struct anonymous_store {
@@ -50,6 +50,9 @@ anonymous_commit(struct vm_store *_store, off_t size)
 {
 	anonymous_store *store = (anonymous_store *)_store;
 
+	size -= store->vm.cache->virtual_base;
+		// anonymous stores don't need to span over their whole source
+
 	// if we can overcommit, we don't commit here, but in anonymous_fault()
 	if (store->can_overcommit) {
 		if (store->has_precommitted)
@@ -57,12 +60,10 @@ anonymous_commit(struct vm_store *_store, off_t size)
 
 		// pre-commit some pages to make a later failure less probable
 		store->has_precommitted = true;
-		if (size > store->vm.cache->virtual_base + store->precommitted_pages)
-			size = store->vm.cache->virtual_base + store->precommitted_pages;
+		uint32 precommitted = store->precommitted_pages * B_PAGE_SIZE;
+		if (size > precommitted)
+			size = precommitted;
 	}
-
-	size -= store->vm.cache->virtual_base;
-		// anonymous stores don't need to span over their whole source
 
 	// Check to see how much we could commit - we need real memory
 
@@ -70,13 +71,12 @@ anonymous_commit(struct vm_store *_store, off_t size)
 		// try to commit
 		if (vm_try_reserve_memory(size - store->vm.committed_size) != B_OK)
 			return B_NO_MEMORY;
-
-		store->vm.committed_size = size;
 	} else {
 		// we can release some
 		vm_unreserve_memory(store->vm.committed_size - size);
 	}
 
+	store->vm.committed_size = size;
 	return B_OK;
 }
 
@@ -136,10 +136,10 @@ anonymous_fault(struct vm_store *_store, struct vm_address_space *aspace,
 			// try to commit additional memory
 			if (vm_try_reserve_memory(B_PAGE_SIZE) != B_OK)
 				return B_NO_MEMORY;
+
+			store->vm.committed_size += B_PAGE_SIZE;
 		} else
 			store->precommitted_pages--;
-
-		store->vm.committed_size += B_PAGE_SIZE;
 	}
 
 	// This will cause vm_soft_fault() to handle the fault
@@ -177,7 +177,7 @@ vm_store_create_anonymous_noswap(bool canOvercommit,
 	store->vm.cache = NULL;
 	store->vm.committed_size = 0;
 	store->can_overcommit = canOvercommit;
-	store->has_precommitted = numPrecommittedPages != 0;
+	store->has_precommitted = false;
 	store->precommitted_pages = min_c(numPrecommittedPages, 255);
 	store->guarded_size = numGuardPages * B_PAGE_SIZE;
 

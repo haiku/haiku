@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -34,7 +34,7 @@
 #endif
 
 
-static hash_table *sPageCacheTable;
+static hash_table* sPageCacheTable;
 static spinlock sPageCacheTableLock;
 
 #if DEBUG_CACHE_LIST
@@ -45,15 +45,15 @@ static spinlock sDebugCacheListLock;
 
 struct page_lookup_key {
 	uint32	offset;
-	vm_cache *cache;
+	vm_cache* cache;
 };
 
 
 static int
-page_compare_func(void *_p, const void *_key)
+page_compare_func(void* _p, const void* _key)
 {
-	vm_page *page = (vm_page *)_p;
-	const struct page_lookup_key *key = (page_lookup_key *)_key;
+	vm_page* page = (vm_page*)_p;
+	const struct page_lookup_key* key = (page_lookup_key*)_key;
 
 	TRACE(("page_compare_func: page %p, key %p\n", page, key));
 
@@ -65,10 +65,10 @@ page_compare_func(void *_p, const void *_key)
 
 
 static uint32
-page_hash_func(void *_p, const void *_key, uint32 range)
+page_hash_func(void* _p, const void* _key, uint32 range)
 {
-	vm_page *page = (vm_page *)_p;
-	const struct page_lookup_key *key = (page_lookup_key *)_key;
+	vm_page* page = (vm_page*)_p;
+	const struct page_lookup_key* key = (page_lookup_key*)_key;
 
 	#define HASH(offset, ref) ((offset) + ((uint32)(ref) >> 6) * 997)
 		// sizeof(vm_cache) >= 64, hence (uint32)(ref) >> 6 is still unique
@@ -101,7 +101,7 @@ acquire_unreferenced_cache_ref(vm_cache* cache)
 
 
 static void
-delete_cache(vm_cache *cache)
+delete_cache(vm_cache* cache)
 {
 	if (cache->areas != NULL)
 		panic("cache %p to be deleted still has areas", cache);
@@ -127,9 +127,9 @@ delete_cache(vm_cache *cache)
 	cache->store->ops->destroy(cache->store);
 
 	// free all of the pages in the cache
-	vm_page *page = cache->page_list;
+	vm_page* page = cache->page_list;
 	while (page) {
-		vm_page *oldPage = page;
+		vm_page* oldPage = page;
 		int state;
 
 		page = page->cache_next;
@@ -168,7 +168,7 @@ delete_cache(vm_cache *cache)
 
 
 status_t
-vm_cache_init(kernel_args *args)
+vm_cache_init(kernel_args* args)
 {
 	// TODO: The table should grow/shrink dynamically.
 	sPageCacheTable = hash_init(vm_page_num_pages() / 2,
@@ -180,17 +180,17 @@ vm_cache_init(kernel_args *args)
 }
 
 
-vm_cache *
-vm_cache_create(vm_store *store)
+vm_cache*
+vm_cache_create(vm_store* store)
 {
-	vm_cache *cache;
+	vm_cache* cache;
 
 	if (store == NULL) {
 		panic("vm_cache created with NULL store!");
 		return NULL;
 	}
 
-	cache = (vm_cache *)malloc(sizeof(vm_cache));
+	cache = (vm_cache*)malloc(sizeof(vm_cache));
 	if (cache == NULL)
 		return NULL;
 
@@ -238,7 +238,7 @@ vm_cache_create(vm_store *store)
 
 
 void
-vm_cache_acquire_ref(vm_cache *cache)
+vm_cache_acquire_ref(vm_cache* cache)
 {
 	TRACE(("vm_cache_acquire_ref: cache %p, ref will be %ld\n",
 		cache, cache->ref_count + 1));
@@ -251,7 +251,7 @@ vm_cache_acquire_ref(vm_cache *cache)
 
 
 void
-vm_cache_release_ref(vm_cache *cache)
+vm_cache_release_ref(vm_cache* cache)
 {
 	TRACE(("vm_cache_release_ref: cacheRef %p, ref will be %ld\n",
 		cache, cache->ref_count - 1));
@@ -268,8 +268,8 @@ vm_cache_release_ref(vm_cache *cache)
 		void*				return_address;
 	};
 	int32 min = 0;
-	vm_area *a;
-	vm_cache *c;
+	vm_area* a;
+	vm_cache* c;
 	bool locked = false;
 	if (cacheRef->lock.holder != find_thread(NULL)) {
 		mutex_lock(&cacheRef->lock);
@@ -281,7 +281,7 @@ vm_cache_release_ref(vm_cache *cache)
 		min++;
 	dprintf("! %ld release cache_ref %p, ref_count is now %ld (min %ld, called from %p)\n",
 		find_thread(NULL), cacheRef, cacheRef->ref_count,
-		min, ((struct stack_frame *)x86_read_ebp())->return_address);
+		min, ((struct stack_frame*)x86_read_ebp())->return_address);
 	if (cacheRef->ref_count < min)
 		panic("cache_ref %p has too little ref_count!!!!", cacheRef);
 	if (locked)
@@ -314,8 +314,8 @@ vm_cache_acquire_page_cache_ref(vm_page* page)
 }
 
 
-vm_page *
-vm_cache_lookup_page(vm_cache *cache, off_t offset)
+vm_page*
+vm_cache_lookup_page(vm_cache* cache, off_t offset)
 {
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
@@ -326,7 +326,7 @@ vm_cache_lookup_page(vm_cache *cache, off_t offset)
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
 
-	vm_page *page = (vm_page *)hash_lookup(sPageCacheTable, &key);
+	vm_page* page = (vm_page*)hash_lookup(sPageCacheTable, &key);
 
 	release_spinlock(&sPageCacheTableLock);
 	restore_interrupts(state);
@@ -339,7 +339,7 @@ vm_cache_lookup_page(vm_cache *cache, off_t offset)
 
 
 void
-vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
+vm_cache_insert_page(vm_cache* cache, vm_page* page, off_t offset)
 {
 	TRACE(("vm_cache_insert_page: cache %p, page %p, offset %Ld\n",
 		cache, page, offset));
@@ -370,7 +370,7 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 	struct page_lookup_key key;
 	key.offset = (uint32)(offset >> PAGE_SHIFT);
 	key.cache = cache;
-	vm_page* otherPage = (vm_page *)hash_lookup(sPageCacheTable, &key);
+	vm_page* otherPage = (vm_page*)hash_lookup(sPageCacheTable, &key);
 	if (otherPage != NULL) {
 		panic("vm_cache_insert_page(): there's already page %p with cache "
 			"offset %lu in cache %p; inserting page %p", otherPage,
@@ -382,13 +382,12 @@ vm_cache_insert_page(vm_cache *cache, vm_page *page, off_t offset)
 }
 
 
-/*!
-	Removes the vm_page from this cache. Of course, the page must
+/*!	Removes the vm_page from this cache. Of course, the page must
 	really be in this cache or evil things will happen.
 	The cache lock must be held.
 */
 void
-vm_cache_remove_page(vm_cache *cache, vm_page *page)
+vm_cache_remove_page(vm_cache* cache, vm_page* page)
 {
 	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache, page));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
@@ -422,7 +421,7 @@ vm_cache_remove_page(vm_cache *cache, vm_page *page)
 
 
 status_t
-vm_cache_write_modified(vm_cache *cache, bool fsReenter)
+vm_cache_write_modified(vm_cache* cache, bool fsReenter)
 {
 	TRACE(("vm_cache_write_modified(cache = %p)\n", cache));
 
@@ -437,22 +436,22 @@ vm_cache_write_modified(vm_cache *cache, bool fsReenter)
 }
 
 
-/*!
-	Commits the memory to the store if the \a commitment is larger than
+/*!	Commits the memory to the store if the \a commitment is larger than
 	what's committed already.
 	Assumes you have the \a ref's lock held.
 */
 status_t
-vm_cache_set_minimal_commitment_locked(vm_cache *cache, off_t commitment)
+vm_cache_set_minimal_commitment_locked(vm_cache* cache, off_t commitment)
 {
 	TRACE(("vm_cache_set_minimal_commitment_locked(cache %p, commitment %Ld)\n",
 		cache, commitment));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
-	vm_store *store = cache->store;
+	vm_store* store = cache->store;
 	status_t status = B_OK;
 
-	// If we don't have enough committed space to cover through to the new end of region...
+	// If we don't have enough committed space to cover through to the new end
+	// of the area...
 	if (store->committed_size < commitment) {
 		// ToDo: should we check if the cache's virtual size is large
 		//	enough for a commitment of that size?
@@ -465,8 +464,7 @@ vm_cache_set_minimal_commitment_locked(vm_cache *cache, off_t commitment)
 }
 
 
-/*!
-	This function updates the size field of the vm_cache structure.
+/*!	This function updates the size field of the vm_cache structure.
 	If needed, it will free up all pages that don't belong to the cache anymore.
 	The cache lock must be held when you call it.
 	Since removed pages don't belong to the cache any longer, they are not
@@ -476,7 +474,7 @@ vm_cache_set_minimal_commitment_locked(vm_cache *cache, off_t commitment)
 	has to wait for busy pages.
 */
 status_t
-vm_cache_resize(vm_cache *cache, off_t newSize)
+vm_cache_resize(vm_cache* cache, off_t newSize)
 {
 	TRACE(("vm_cache_resize(cache %p, newSize %Ld) old size %Ld\n",
 		cache, newSize, cache->virtual_size));
@@ -493,7 +491,8 @@ vm_cache_resize(vm_cache *cache, off_t newSize)
 	if (newPageCount < oldPageCount) {
 		// we need to remove all pages in the cache outside of the new virtual
 		// size
-		vm_page *page = cache->page_list, *next;
+		vm_page* page = cache->page_list;
+		vm_page* next;
 
 		while (page != NULL) {
 			next = page->cache_next;
@@ -534,13 +533,12 @@ vm_cache_resize(vm_cache *cache, off_t newSize)
 }
 
 
-/*!
-	Removes the \a consumer from the \a cache.
+/*!	Removes the \a consumer from the \a cache.
 	It will also release the reference to the cacheRef owned by the consumer.
 	Assumes you have the consumer's cache lock held.
 */
 void
-vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
+vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 {
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
 	ASSERT_LOCKED_MUTEX(&consumer->lock);
@@ -562,7 +560,7 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 		// The cache is not really needed anymore - it can be merged with its only
 		// consumer left.
 
-		consumer = (vm_cache *)list_get_first_item(&cache->consumers);
+		consumer = (vm_cache*)list_get_first_item(&cache->consumers);
 
 		bool merge = acquire_unreferenced_cache_ref(consumer);
 
@@ -598,16 +596,15 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 		}
 
 		if (merge) {
-			vm_page *page, *nextPage;
-			vm_cache *newSource;
-
-			consumer = (vm_cache *)list_remove_head_item(&cache->consumers);
+			consumer = (vm_cache*)list_remove_head_item(&cache->consumers);
 
 			TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
 				cache, cache->ref_count, consumer));
 
-			for (page = cache->page_list; page != NULL; page = nextPage) {
-				vm_page *consumerPage;
+			vm_page* nextPage;
+			for (vm_page* page = cache->page_list; page != NULL;
+					page = nextPage) {
+				vm_page* consumerPage;
 				nextPage = page->cache_next;
 
 				consumerPage = vm_cache_lookup_page(consumer,
@@ -644,7 +641,7 @@ vm_cache_remove_consumer(vm_cache *cache, vm_cache *consumer)
 				}
 			}
 
-			newSource = cache->source;
+			vm_cache* newSource = cache->source;
 
 			// The remaining consumer has gotten a new source
 			mutex_lock(&newSource->lock);
@@ -667,7 +664,7 @@ panic("cacheRef %p ref count too low!\n", cache);
 			mutex_unlock(&consumer->lock);
 			vm_cache_release_ref(consumer);
 		}
-	
+
 		if (cache->busy)
 			busyCondition.Unpublish();
 	}
@@ -677,14 +674,13 @@ panic("cacheRef %p ref count too low!\n", cache);
 }
 
 
-/*!
-	Marks the \a cache as source of the \a consumer cache,
+/*!	Marks the \a cache as source of the \a consumer cache,
 	and adds the \a consumer to its list.
 	This also grabs a reference to the source cache.
 	Assumes you have the cache and the consumer's lock held.
 */
 void
-vm_cache_add_consumer_locked(vm_cache *cache, vm_cache *consumer)
+vm_cache_add_consumer_locked(vm_cache* cache, vm_cache* consumer)
 {
 	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cache));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
@@ -700,12 +696,11 @@ vm_cache_add_consumer_locked(vm_cache *cache, vm_cache *consumer)
 }
 
 
-/*!
-	Adds the \a area to the \a cache.
+/*!	Adds the \a area to the \a cache.
 	Assumes you have the locked the cache.
 */
 status_t
-vm_cache_insert_area_locked(vm_cache *cache, vm_area *area)
+vm_cache_insert_area_locked(vm_cache* cache, vm_area* area)
 {
 	TRACE(("vm_cache_insert_area_locked(cache %p, area %p)\n", cache, area));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
@@ -724,7 +719,7 @@ vm_cache_insert_area_locked(vm_cache *cache, vm_area *area)
 
 
 status_t
-vm_cache_remove_area(vm_cache *cache, vm_area *area)
+vm_cache_remove_area(vm_cache* cache, vm_area* area)
 {
 	TRACE(("vm_cache_remove_area(cache %p, area %p)\n", cache, area));
 
