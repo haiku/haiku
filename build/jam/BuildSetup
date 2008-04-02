@@ -871,10 +871,16 @@ SUPPORTED_PLATFORMS = haiku ;
 KEEPOBJS = true ;
 
 
+# Set permissions to how they should be on the image.
+EXEMODE		= 755 ;
+FILEMODE	= 644 ;
+SHELLMODE	= 755 ;
+
+
 # output directories
 # TODO: Review this.
 HAIKU_DOCUMENTATION_DIR ?= [ FDirName $(HAIKU_OUTPUT_DIR) documentation ] ;
-HAIKU_DOCUMENTATION_OBJECT_DIR ?= [ FDirName $(HAIKU_COMMON_PLATFORM_DIR)
+HAIKU_DOCUMENTATION_OBJECT_DIR ?= [ FDirName $(HAIKU_COMMON_PLATFORM_OBJECT_DIR)
 	documentation ] ;
 
 # TODO: Rethink test stuff.

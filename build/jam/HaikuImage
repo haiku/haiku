@@ -419,7 +419,7 @@ AddDirectoryToHaikuImage home config add-ons Translators ;
 AddDirectoryToHaikuImage beos etc synth ;
 AddDirectoryToHaikuImage beos system add-ons input_server methods ;
 
-#optional
+# optional
 AddFilesToHaikuImage optional beos system add-ons input_server methods : canna ;
 
 # printers
@@ -479,6 +479,16 @@ if $(HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE) {
 
 
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackages ] ;
+
+
+#pragma mark - User/Group Setup
+
+
+# add the root user and the root and users groups
+AddUserToHaikuImage $(HAIKU_ROOT_USER_NAME:E=baron) : 0 : 0 : /boot/home
+	: /bin/bash : $(HAIKU_ROOT_USER_REAL_NAME:E="Root User") ;
+AddGroupToHaikuImage root : 0 : ;
+AddGroupToHaikuImage users : 100 : ;
 
 
 #pragma mark - Build The Image

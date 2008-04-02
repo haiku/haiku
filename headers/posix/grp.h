@@ -29,6 +29,8 @@ extern int getgrnam_r(const char *name, struct group *group, char *buffer,
 				size_t bufferSize, struct group **_result);
 
 extern struct group *getgrent(void);
+extern int getgrent_r(struct group* group, char* buffer, size_t bufferSize,
+				struct group** _result);
 extern void setgrent(void);
 extern void endgrent(void);
 

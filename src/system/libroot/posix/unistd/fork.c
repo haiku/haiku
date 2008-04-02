@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include <libroot_private.h>
 #include <syscalls.h>
 #include <user_runtime.h>
 
@@ -156,6 +157,7 @@ fork(void)
 		__main_thread_id = find_thread(NULL);
 		__init_fork();
 		__gRuntimeLoader->reinit_after_fork();
+		__reinit_pwd_backend_after_fork();
 
 		call_fork_hooks(sChildHooks);
 	} else {

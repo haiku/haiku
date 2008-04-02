@@ -676,6 +676,53 @@ rule InstallOptionalHaikuImagePackage package : url : dirTokens
 	UnzipArchiveToHaikuImage $(dirTokens) : $(zipFile) ;
 }
 
+rule AddEntryToHaikuImageUserGroupFile file : entry
+{
+	local allEntries = [ on $(file) return $(HAIKU_IMAGE_USER_GROUP_ENTRIES) ] ;
+
+	if $(allEntries) {
+		allEntries = $(allEntries)|$(entry) ;
+	} else {
+		allEntries = $(entry) ;
+
+		Always $(file) ;
+		MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
+		BuildHaikuImageUserGroupFile $(file) ;
+		AddFilesToHaikuImage beos etc : $(file) ;
+	}
+
+	HAIKU_IMAGE_USER_GROUP_ENTRIES on $(file) = $(allEntries) ;
+}
+
+actions BuildHaikuImageUserGroupFile
+{
+	echo "$(HAIKU_IMAGE_USER_GROUP_ENTRIES)" | tr '|' '\n' > $(1) 
+}
+
+rule AddUserToHaikuImage user : uid : gid : home : shell : realName
+{
+	if ! $(user) || ! $(uid) || ! $(gid) || ! $(home) {
+		Exit "Invalid haiku user specification passed to AddUserToHaikuImage." ;
+	}
+
+	local entry
+		= $(user):x:$(uid):$(gid):$(realName:E=$(user)):$(home):$(shell:E="") ;
+
+	AddEntryToHaikuImageUserGroupFile <haiku-image>passwd : $(entry) ;
+}
+
+rule AddGroupToHaikuImage group : gid : members
+{
+	if ! $(group) || ! $(gid) {
+		Exit "Invalid haiku group specification passed to"
+			"AddGroupToHaikuImage." ;
+	}
+
+	local entry = $(group):x:$(gid):$(members:J=,:E) ;
+
+	AddEntryToHaikuImageUserGroupFile <haiku-image>group : $(entry) ;
+}
+
 
 rule CreateHaikuImageMakeDirectoriesScript script
 {

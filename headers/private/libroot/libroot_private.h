@@ -10,6 +10,30 @@
 #include <image.h>
 
 
+#define MAX_PASSWD_NAME_LEN			(32)
+#define MAX_PASSWD_PASSWORD_LEN		(32)
+#define MAX_PASSWD_REAL_NAME_LEN	(128)
+#define MAX_PASSWD_HOME_DIR_LEN		(B_PATH_NAME_LENGTH)
+#define MAX_PASSWD_SHELL_LEN		(B_PATH_NAME_LENGTH)
+
+#define MAX_PASSWD_BUFFER_SIZE	(	\
+	MAX_PASSWD_NAME_LEN				\
+	+ MAX_PASSWD_PASSWORD_LEN		\
+	+ MAX_PASSWD_REAL_NAME_LEN		\
+	+ MAX_PASSWD_HOME_DIR_LEN		\
+	+ MAX_PASSWD_SHELL_LEN)
+
+#define	MAX_GROUP_NAME_LEN			(32)
+#define	MAX_GROUP_PASSWORD_LEN		(32)
+#define	MAX_GROUP_MEMBER_COUNT		(32)
+
+#define MAX_GROUP_BUFFER_SIZE	(	\
+	MAX_GROUP_NAME_LEN				\
+	+ MAX_GROUP_PASSWORD_LEN		\
+	+ ((MAX_GROUP_MEMBER_COUNT + 1) * sizeof(char*)))
+	// MAX_GROUP_NAME_LEN and MAX_GROUP_PASSWORD_LEN are char* aligned
+
+
 struct user_space_program_args;
 struct real_time_data;
 
@@ -33,6 +57,8 @@ void __init_time(void);
 void __arch_init_time(struct real_time_data *data, bool setDefaults);
 bigtime_t __arch_get_system_time_offset(struct real_time_data *data);
 void __init_pwd_backend(void);
+void __reinit_pwd_backend_after_fork(void);
+
 
 #ifdef __cplusplus
 }

@@ -131,6 +131,22 @@ HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
 HAIKU_IMAGE_EARLY_USER_SCRIPTS	= $(HAIKU_TOP)/../early-image-script.sh ;
 HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
 
+# Set name and real name of the root user. Defaults to "baron" and "Root User".
+HAIKU_ROOT_USER_NAME = bond  ;
+HAIKU_ROOT_USER_REAL_NAME = "James Bond" ;
+
+# Add user "walter" with user ID 1000 and group ID 100 (note, that a group with
+# that ID should exist -- 100 already exists and is the "users" group), home
+# directory "/boot/home", shell "/bin/bash", and real name "Just Walter" to the
+# image.
+AddUserToHaikuImage walter : 1000 : 100 : /boot/home : /bin/bash
+	: "Just Walter" ;
+
+# Add group "party" with group ID 101 and members "baron" and "walter" to the
+# image.
+AddGroupToHaikuImage party : 101 : baron walter ;
+
+
 
 # Creating Sourceable Shell Scripts
 

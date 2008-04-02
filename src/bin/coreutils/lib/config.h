@@ -228,10 +228,10 @@
 /* #undef HAVE_CFPREFERENCESCOPYAPPVALUE */
 
 /* Define to 1 if your system has a working `chown' function. */
-/* #undef HAVE_CHOWN */
+#define HAVE_CHOWN 1
 
 /* Define to 1 if you have the `chroot' function. */
-/* #undef HAVE_CHROOT */
+#define HAVE_CHROOT 1
 
 /* Define to 1 if you have the `chsize' function. */
 /* #undef HAVE_CHSIZE */
@@ -671,7 +671,7 @@
 /* #undef HAVE_INET_NTOP */
 
 /* Define to 1 if you have the `initgroups' function. */
-/* #undef HAVE_INITGROUPS */
+#define HAVE_INITGROUPS 1
 
 /* Define to 1 if the compiler supports one of the keywords 'inline',
    '__inline__', '__inline' and effectively inlines functions marked as such.
@@ -928,7 +928,7 @@
 #define HAVE_SETENV 1
 
 /* Define to 1 if you have the `setgroups' function. */
-/* #undef HAVE_SETGROUPS */
+#define HAVE_SETGROUPS 1
 
 /* Define to 1 if you have the `sethostname' function. */
 #define HAVE_SETHOSTNAME 1

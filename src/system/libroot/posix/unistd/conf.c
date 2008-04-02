@@ -14,6 +14,8 @@
 
 #include <SupportDefs.h>
 
+#include <libroot_private.h>
+
 
 int
 getdtablesize(void)
@@ -52,6 +54,10 @@ sysconf(int name)
 			return TZNAME_MAX;
 		case _SC_VERSION:
 			return _POSIX_VERSION;
+		case _SC_GETGR_R_SIZE_MAX:
+			return MAX_GROUP_BUFFER_SIZE;
+		case _SC_GETPW_R_SIZE_MAX:
+			return MAX_PASSWD_BUFFER_SIZE;
 	}
 
 	return -1;

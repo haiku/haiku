@@ -1,12 +1,12 @@
 SubDir HAIKU_TOP src system libroot posix ;
 
-UsePrivateHeaders [ FDirName syslog_daemon ] ;
+UsePrivateHeaders shared [ FDirName syslog_daemon ] ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
-if $(HAIKU_ENABLE_MULTIUSER) = 1 {
+if $(HAIKU_MULTIUSER_QUERY) = 1 {
 	PWD_BACKEND = pwd_query.c ;
 } else {
-	PWD_BACKEND = pwd.c grp.c ;
+	PWD_BACKEND = pwd.cpp grp.cpp user_group_common.cpp ;
 }
 MergeObject posix_main.o :
  	assert.c

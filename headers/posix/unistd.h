@@ -57,6 +57,8 @@
 #define _SC_STREAM_MAX			22
 #define _SC_TZNAME_MAX			23
 #define _SC_VERSION				24
+#define _SC_GETGR_R_SIZE_MAX	25
+#define _SC_GETPW_R_SIZE_MAX	26
 
 /* lseek() constants */
 #ifndef SEEK_SET

@@ -22,10 +22,12 @@ struct passwd {
 
 /* traverse the user password database */
 extern struct passwd *getpwent(void);
+extern int getpwent_r(struct passwd* pwbuf, char* buf, size_t buflen,
+				struct passwd** pwbufp);
 extern void setpwent(void);
 extern void endpwent(void);
 
-/*search the user password database */
+/* search the user password database */
 extern struct passwd *getpwnam(const char *name);
 extern int getpwnam_r(const char *name, struct passwd *passwd, char *buffer,
 				size_t bufferSize, struct passwd **result);

@@ -16,7 +16,7 @@
 /* define if prototype for getgrnam_r() is required */
 #define NEED_GETGRNAM_R 1
 #define NEED_GETGRGID_R 1
-#define NEED_GETGRENT_R 1
+/*#define NEED_GETGRENT_R 1*/
 #define NEED_SETGRENT_R 1
 #define NEED_ENDGRENT_R 1
 
@@ -29,7 +29,7 @@
 #define NEED_SETPWENT_R 1
 #define NEED_SETPASSENT_R 1
 #define NEED_SETPWENT_R 1
-#define NEED_GETPWENT_R 1
+/*#define NEED_GETPWENT_R 1*/
 #define NEED_ENDPWENT_R 1
 
 #define NEED_SETPASSENT 1
