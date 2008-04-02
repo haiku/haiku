@@ -176,7 +176,7 @@ class NodeMonitorService : public NotificationService {
 
 		typedef OpenHashTable<HashDefinition> MonitorHash;
 		MonitorHash	fMonitors;
-		mutex		fMutex;
+		recursive_lock fRecursiveLock;
 };
 
 static NodeMonitorService sNodeMonitorService;
@@ -226,19 +226,20 @@ notify_query_entry_created_or_removed(int32 opcode, port_id port, int32 token,
 
 NodeMonitorService::NodeMonitorService()
 {
-	mutex_init(&fMutex, "node monitor");
+	recursive_lock_init(&fRecursiveLock, "node monitor");
 }
 
 
 NodeMonitorService::~NodeMonitorService()
 {
+	recursive_lock_destroy(&fRecursiveLock);
 }
 
 
 status_t
 NodeMonitorService::InitCheck()
 {
-	return fMutex.sem >= B_OK ? B_OK : fMutex.sem;
+	return fRecursiveLock.sem >= B_OK ? B_OK : fRecursiveLock.sem;
 }
 
 
@@ -384,7 +385,7 @@ NodeMonitorService::AddListener(io_context *context, dev_t device, ino_t node,
 	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, flags, &notificationListener));
 
-	MutexLocker _(fMutex);
+	RecursiveLocker _(fRecursiveLock);
 
 	node_monitor *monitor;
 	status_t status = _GetMonitor(context, device, node, true, &monitor);
@@ -405,7 +406,7 @@ NodeMonitorService::_UpdateListener(io_context *context, dev_t device,
 	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, flags, &notificationListener));
 
-	MutexLocker _(fMutex);
+	RecursiveLocker _(fRecursiveLock);
 
 	node_monitor *monitor;
 	status_t status = _GetMonitor(context, device, node, false, &monitor);
@@ -530,7 +531,7 @@ NodeMonitorService::NotifyEntryCreatedOrRemoved(int32 opcode, dev_t device,
 	if (!name)
 		return B_BAD_VALUE;
 
-	MutexLocker locker(fMutex);
+	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
@@ -575,7 +576,7 @@ NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 	dev_t nodeDevice = device;
 	resolve_mount_point_to_volume_root(device, node, &nodeDevice, &node);
 
-	MutexLocker locker(fMutex);
+	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
@@ -617,7 +618,7 @@ inline status_t
 NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	uint32 statFields)
 {
-	MutexLocker locker(fMutex);
+	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
@@ -662,7 +663,7 @@ NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
 	if (!attribute)
 		return B_BAD_VALUE;
 
-	MutexLocker locker(fMutex);
+	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
@@ -694,7 +695,7 @@ NodeMonitorService::NotifyUnmount(dev_t device)
 {
 	TRACE(("unmounted device: %ld\n", device));
 
-	MutexLocker locker(fMutex);
+	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
@@ -724,7 +725,7 @@ NodeMonitorService::NotifyMount(dev_t device, dev_t parentDevice,
 	TRACE(("mounted device: %ld, parent %ld:%Ld\n", device, parentDevice,
 		parentDirectory));
 
-	MutexLocker locker(fMutex);
+	RecursiveLocker locker(fRecursiveLock);
 
 	// get the lists of all interested listeners
 	interested_monitor_listener_list interestedListeners[3];
@@ -752,7 +753,7 @@ NodeMonitorService::NotifyMount(dev_t device, dev_t parentDevice,
 inline status_t
 NodeMonitorService::RemoveListeners(io_context *context)
 {
-	MutexLocker locker(fMutex);
+	RecursiveLocker locker(fRecursiveLock);
 
 	while (!list_is_empty(&context->node_monitors)) {
 		// the _RemoveListener() method will also free the node_monitor
@@ -826,7 +827,7 @@ NodeMonitorService::RemoveListener(io_context *context, dev_t device,
 	TRACE(("%s(dev = %ld, node = %Ld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, &notificationListener));
 
-	MutexLocker _(fMutex);
+	RecursiveLocker _(fRecursiveLock);
 
 	// get the monitor for this device/node pair
 	node_monitor *monitor = _MonitorFor(device, node);
@@ -854,7 +855,7 @@ NodeMonitorService::RemoveUserListeners(struct io_context *context,
 	monitor_listener *listener = NULL;
 	int32 count = 0;
 
-	MutexLocker _(fMutex);
+	RecursiveLocker _(fRecursiveLock);
 
 	while ((listener = (monitor_listener*)list_get_next_item(
 			&context->node_monitors, listener)) != NULL) {
@@ -883,7 +884,7 @@ NodeMonitorService::UpdateUserListener(io_context *context, dev_t device,
 	TRACE(("%s(dev = %ld, node = %Ld, flags = %ld, listener = %p\n",
 		__PRETTY_FUNCTION__, device, node, flags, &userListener));
 
-	MutexLocker _(fMutex);
+	RecursiveLocker _(fRecursiveLock);
 
 	node_monitor *monitor;
 	status_t status = _GetMonitor(context, device, node, true, &monitor);
