@@ -52,7 +52,7 @@ class Journal {
 
 	private:
 		bool _HasSubTransaction() { return fHasSubtransaction; }
-		status_t _FlushLog(bool flushBlocks = false);
+		status_t _FlushLog(bool canWait, bool flushBlocks);
 		uint32 _TransactionSize() const;
 		status_t _WriteTransactionToLog();
 		status_t _CheckRunArray(const run_array *array);

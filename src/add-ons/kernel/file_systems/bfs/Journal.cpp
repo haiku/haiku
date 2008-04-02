@@ -594,7 +594,7 @@ Journal::_TransactionListener(int32 transactionID, int32 event, void *_journal)
 	// The current transaction seems to be idle - flush it
 
 	Journal *journal = (Journal *)_journal;
-	journal->_FlushLog();
+	journal->_FlushLog(false, false);
 }
 
 
@@ -793,9 +793,9 @@ Journal::_WriteTransactionToLog()
 	also write back all dirty blocks for this volume.
 */
 status_t
-Journal::_FlushLog(bool flushBlocks)
+Journal::_FlushLog(bool canWait, bool flushBlocks)
 {
-	status_t status = fLock.Lock();
+	status_t status = canWait ? fLock.Lock() : fLock.LockWithTimeout(0);
 	if (status != B_OK)
 		return status;
 
@@ -827,7 +827,7 @@ Journal::_FlushLog(bool flushBlocks)
 status_t
 Journal::FlushLogAndBlocks()
 {
-	return _FlushLog(true);
+	return _FlushLog(true, true);
 }
 
 
