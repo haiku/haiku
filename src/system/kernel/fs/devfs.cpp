@@ -1176,7 +1176,8 @@ out:
 
 
 static status_t
-publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
+publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node,
+	struct devfs_vnode **_dir)
 {
 	ASSERT_LOCKED_MUTEX(&fs->lock);
 
@@ -1240,16 +1241,20 @@ publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 			vnode->stream.type = S_IFDIR | 0755;
 			vnode->stream.u.dir.dir_head = NULL;
 			list_init(&vnode->stream.u.dir.cookies);
+
+			hash_insert(sDeviceFileSystem->vnode_hash, vnode);
+			devfs_insert_in_dir(dir, vnode);
 		} else {
 			// this is the last component
+			// Note: We do not yet insert the node into the directory, as it
+			// is not yet fully initialized. Instead we return the directory
+			// vnode so that the calling function can insert it after all
+			// initialization is done. This ensures that no create notification
+			// is sent out for a vnode that is not yet fully valid.
 			*_node = vnode;
-		}
-
-		hash_insert(sDeviceFileSystem->vnode_hash, vnode);
-		devfs_insert_in_dir(dir, vnode);
-
-		if (atLeaf)
+			*_dir = dir;
 			break;
+		}
 
 		last = i;
 		dir = vnode;
@@ -1290,11 +1295,12 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 		isDisk = true;
 
 	struct devfs_vnode *node;
+	struct devfs_vnode *dirNode;
 	status_t status;
 
 	RecursiveLocker locker(&fs->lock);
 
-	status = publish_node(fs, path, &node);
+	status = publish_node(fs, path, &node, &dirNode);
 	if (status != B_OK)
 		return status;
 
@@ -1323,6 +1329,9 @@ publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 			return B_NO_MEMORY;
 	}
 
+	// the node is now fully valid and we may insert it into the dir
+	hash_insert(sDeviceFileSystem->vnode_hash, node);
+	devfs_insert_in_dir(dirNode, node);
 	return B_OK;
 }
 
@@ -2871,6 +2880,7 @@ extern "C" status_t
 devfs_publish_file_device(const char *path, const char *filePath)
 {
 	struct devfs_vnode *node;
+	struct devfs_vnode *dirNode;
 	status_t status;
 
 	filePath = strdup(filePath);
@@ -2879,7 +2889,7 @@ devfs_publish_file_device(const char *path, const char *filePath)
 
 	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
-	status = publish_node(sDeviceFileSystem, path, &node);
+	status = publish_node(sDeviceFileSystem, path, &node, &dirNode);
 	if (status != B_OK)
 		return status;
 
@@ -2888,6 +2898,9 @@ devfs_publish_file_device(const char *path, const char *filePath)
 	node->stream.u.symlink.path = filePath;
 	node->stream.u.symlink.length = strlen(filePath);
 
+	// the node is now fully valid and we may insert it into the dir
+	hash_insert(sDeviceFileSystem->vnode_hash, node);
+	devfs_insert_in_dir(dirNode, node);
 	return B_OK;
 }
 
