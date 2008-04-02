@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,7 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	Manages font families and styles */
+/*!	Manages font families and styles */
 
 
 #include "FontFamily.h"
@@ -369,8 +369,7 @@ FontManager::_AddMappedFont(const char* familyName, const char* styleName)
 }
 
 
-/*!
-	\brief Removes the style from the font directory.
+/*!	\brief Removes the style from the font directory.
 
 	It doesn't necessary delete the font style, if it's still
 	in use, though.
@@ -429,8 +428,7 @@ FontManager::_GetDefaultStyle(const char *familyName, const char *styleName,
 }
 
 
-/*!
-	\brief Sets the fonts that will be used when you create an empty
+/*!	\brief Sets the fonts that will be used when you create an empty
 		ServerFont without specifying a style, as well as the default
 		Desktop fonts if there are no settings available.
 */
@@ -444,21 +442,24 @@ FontManager::_SetDefaultFonts()
 	if (style == NULL)
 		return B_ERROR;
 
-	fDefaultPlainFont = new (std::nothrow) ServerFont(*style, DEFAULT_PLAIN_FONT_SIZE);
+	fDefaultPlainFont = new (std::nothrow) ServerFont(*style,
+		DEFAULT_PLAIN_FONT_SIZE);
 	if (fDefaultPlainFont == NULL)
 		return B_NO_MEMORY;
 
 	style = _GetDefaultStyle(DEFAULT_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE,
 		FALLBACK_BOLD_FONT_FAMILY, DEFAULT_BOLD_FONT_STYLE, B_BOLD_FACE);
 
-	fDefaultBoldFont = new (std::nothrow) ServerFont(*style, DEFAULT_BOLD_FONT_SIZE);
+	fDefaultBoldFont = new (std::nothrow) ServerFont(*style,
+		DEFAULT_BOLD_FONT_SIZE);
 	if (fDefaultBoldFont == NULL)
 		return B_NO_MEMORY;
 
 	style = _GetDefaultStyle(DEFAULT_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE,
 		FALLBACK_FIXED_FONT_FAMILY, DEFAULT_FIXED_FONT_STYLE, B_REGULAR_FACE);
 
-	fDefaultFixedFont = new (std::nothrow) ServerFont(*style, DEFAULT_FIXED_FONT_SIZE);
+	fDefaultFixedFont = new (std::nothrow) ServerFont(*style,
+		DEFAULT_FIXED_FONT_SIZE);
 	if (fDefaultFixedFont == NULL)
 		return B_NO_MEMORY;
 
@@ -510,8 +511,7 @@ FontManager::_ScanFonts()
 }
 
 
-/*!
-	\brief Adds the FontFamily/FontStyle that is represented by this path.
+/*!	\brief Adds the FontFamily/FontStyle that is represented by this path.
 */
 status_t
 FontManager::_AddFont(font_directory& directory, BEntry& entry)
@@ -645,7 +645,8 @@ FontManager::_AddPath(BEntry& entry, font_directory** _newDirectory)
 	if (status != B_OK) {
 		// we cannot watch this directory - while this is unfortunate,
 		// it's not a critical error
-		printf("could not watch directory %ld:%Ld\n", nodeRef.device, nodeRef.node);
+		printf("could not watch directory %ld:%Ld\n", nodeRef.device,
+			nodeRef.node);
 			// TODO: should go into syslog()
 	} else {
 		BPath path(&entry);
@@ -662,8 +663,7 @@ FontManager::_AddPath(BEntry& entry, font_directory** _newDirectory)
 }
 
 
-/*!
-	\brief Creates all unknown font_directories of the specified path - but
+/*!	\brief Creates all unknown font_directories of the specified path - but
 		only if one of its parent directories is already known.
 
 	This method is used to create the font_directories for font_mappings.
@@ -715,8 +715,7 @@ FontManager::_CreateDirectories(const char* path)
 }
 
 
-/*!
-	\brief Scan a folder for all valid fonts
+/*!	\brief Scan a folder for all valid fonts
 	\param directoryPath Path of the folder to scan.
 */
 status_t
@@ -766,8 +765,7 @@ FontManager::_ScanFontDirectory(font_directory& fontDirectory)
 }
 
 
-/*!
-	\brief Finds and returns the first valid charmap in a font
+/*!	\brief Finds and returns the first valid charmap in a font
 
 	\param face Font handle obtained from FT_Load_Face()
 	\return An FT_CharMap or NULL if unsuccessful
@@ -825,8 +823,7 @@ FontManager::CheckRevision(uid_t user)
 }
 
 
-/*!
-	\brief Counts the number of font families available
+/*!	\brief Counts the number of font families available
 	\return The number of unique font families currently available
 */
 int32
@@ -838,8 +835,7 @@ FontManager::CountFamilies()
 }
 
 
-/*!
-	\brief Counts the number of styles available in a font family
+/*!	\brief Counts the number of styles available in a font family
 	\param family Name of the font family to scan
 	\return The number of font styles currently available for the font family
 */
@@ -875,8 +871,7 @@ FontManager::_FindFamily(const char* name) const
 }
 
 
-/*!
-	\brief Locates a FontFamily object by name
+/*!	\brief Locates a FontFamily object by name
 	\param name The family to find
 	\return Pointer to the specified family or NULL if not found.
 */
@@ -930,8 +925,8 @@ FontManager::GetStyleByIndex(const char* familyName, int32 index)
 }
 
 
-/*!
-	\brief Retrieves the FontStyle object that comes closest to the one specified
+/*!	\brief Retrieves the FontStyle object that comes closest to the one
+		specified.
 
 	\param family The font's family or NULL in which case \a familyID is used
 	\param style The font's style or NULL in which case \a styleID is used
@@ -978,8 +973,7 @@ FontManager::GetStyle(const char* familyName, const char* styleName,
 }
 
 
-/*!
-	\brief Retrieves the FontStyle object
+/*!	\brief Retrieves the FontStyle object
 	\param family ID for the font's family
 	\param style ID of the font's style
 	\return The FontStyle having those attributes or NULL if not available
@@ -992,8 +986,7 @@ FontManager::GetStyle(uint16 familyID, uint16 styleID) const
 }
 
 
-/*!
-	\brief If you don't find your preferred font style, but are anxious
+/*!	\brief If you don't find your preferred font style, but are anxious
 		to have one fitting your needs, you may want to use this method.
 */
 FontStyle*
@@ -1012,8 +1005,7 @@ FontManager::FindStyleMatchingFace(uint16 face) const
 }
 
 
-/*!
-	\brief This call is used by the FontStyle class - and the FontStyle class
+/*!	\brief This call is used by the FontStyle class - and the FontStyle class
 		only - to remove itself from the font manager.
 	At this point, the style is already no longer available to the user.
 */
@@ -1061,8 +1053,9 @@ FontManager::AttachUser(uid_t userID)
 	BAutolock locker(this);
 
 #if !TEST_MODE
+	// TODO: actually, find_directory() cannot know which user ID we want here
 	BPath path;
-	if (find_directory(B_USER_FONTS_DIRECTORY, &path) != B_OK)
+	if (find_directory(B_USER_FONTS_DIRECTORY, &path, true) != B_OK)
 		return;
 
 	_AddPath(path.Path());
