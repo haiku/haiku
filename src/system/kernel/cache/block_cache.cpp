@@ -4,7 +4,7 @@
  */
 
 
-#include "block_cache_private.h"
+#include <block_cache.h>
 
 #include <unistd.h>
 #include <signal.h>
@@ -15,9 +15,9 @@
 #include <KernelExport.h>
 #include <fs_cache.h>
 
-#include <block_cache.h>
 #include <lock.h>
 #include <vm_low_memory.h>
+#include <slab/Slab.h>
 #include <tracing.h>
 #include <util/kernel_cpp.h>
 #include <util/DoublyLinkedList.h>
@@ -42,7 +42,7 @@
 #endif
 
 #define DEBUG_BLOCK_CACHE
-//#define DEBUG_CHANGED
+#define DEBUG_CHANGED
 
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
@@ -51,6 +51,74 @@
 
 static const bigtime_t kTransactionIdleTime = 2000000LL;
 	// a transaction is considered idle after 2 seconds of inactivity
+
+
+struct cache_transaction;
+struct cached_block;
+struct block_cache;
+typedef DoublyLinkedListLink<cached_block> block_link;
+
+struct cached_block {
+	cached_block	*next;			// next in hash
+	cached_block	*transaction_next;
+	block_link		link;
+	off_t			block_number;
+	void			*current_data;
+	void			*original_data;
+	void			*parent_data;
+#ifdef DEBUG_CHANGED
+	void			*compare;
+#endif
+	int32			ref_count;
+	int32			accessed;
+	bool			busy : 1;
+	bool			is_writing : 1;
+	bool			is_dirty : 1;
+	bool			unused : 1;
+	cache_transaction *transaction;
+	cache_transaction *previous_transaction;
+
+	static int Compare(void *_cacheEntry, const void *_block);
+	static uint32 Hash(void *_cacheEntry, const void *_block, uint32 range);
+};
+
+typedef DoublyLinkedList<cached_block,
+	DoublyLinkedListMemberGetLink<cached_block,
+		&cached_block::link> > block_list;
+
+struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
+	hash_table		*hash;
+	recursive_lock	lock;
+	int				fd;
+	off_t			max_blocks;
+	size_t			block_size;
+	int32			next_transaction_id;
+	cache_transaction *last_transaction;
+	hash_table		*transaction_hash;
+
+	object_cache	*buffer_cache;
+	block_list		unused_blocks;
+
+	uint32			num_dirty_blocks;
+	bool			read_only;
+
+	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
+	~block_cache();
+
+	status_t InitCheck();
+
+	void RemoveUnusedBlocks(int32 maxAccessed = LONG_MAX,
+		int32 count = LONG_MAX);
+	void FreeBlock(cached_block *block);
+	cached_block *NewBlock(off_t blockNumber);
+	void Free(void *buffer);
+	void *Allocate();
+
+	static void LowMemoryHandler(void *data, int32 level);
+
+private:
+	cached_block *_GetUnusedBlock();
+};
 
 struct cache_hook : DoublyLinkedListLinkImpl<cache_hook> {
 	transaction_notification_hook	hook;
@@ -1065,7 +1133,7 @@ dump_transaction(int argc, char **argv)
 	kprintf(" sub num block:  %ld\n", transaction->sub_num_blocks);
 	kprintf(" has sub:        %d\n", transaction->has_sub_transaction);
 	kprintf(" state:          %s\n", transaction->open ? "open" : "closed");
-	kprintf(" idle:           %ld secs\n",
+	kprintf(" idle:           %Ld secs\n",
 		(system_time() - transaction->last_used) / 1000000);
 
 	if (!showBlocks)
