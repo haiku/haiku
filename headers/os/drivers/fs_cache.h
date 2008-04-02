@@ -14,7 +14,8 @@
 enum {
 	TRANSACTION_WRITTEN,
 	TRANSACTION_ABORTED,
-	TRANSACTION_ENDED
+	TRANSACTION_ENDED,
+	TRANSACTION_IDLE
 };
 
 typedef void (*transaction_notification_hook)(int32 id, int32 event,
@@ -22,7 +23,7 @@ typedef void (*transaction_notification_hook)(int32 id, int32 event,
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 /* transactions */
 extern int32 cache_start_transaction(void *_cache);
@@ -88,6 +89,6 @@ extern status_t file_map_translate(void *_map, off_t offset, size_t size,
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif	/* _FS_CACHE_H */

@@ -14,7 +14,8 @@
 enum {
 	FSSH_TRANSACTION_WRITTEN,
 	FSSH_TRANSACTION_ABORTED,
-	FSSH_TRANSACTION_ENDED
+	FSSH_TRANSACTION_ENDED,
+	FSSH_TRANSACTION_IDLE
 };
 
 typedef void (*fssh_transaction_notification_hook)(int32_t id, int32_t event,
@@ -22,7 +23,7 @@ typedef void (*fssh_transaction_notification_hook)(int32_t id, int32_t event,
 
 #ifdef __cplusplus
 extern "C" {
-#endif 
+#endif
 
 /* transactions */
 extern int32_t			fssh_cache_start_transaction(void *_cache);
@@ -110,6 +111,6 @@ extern fssh_status_t	fssh_file_map_translate(void *_map, fssh_off_t offset,
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 #endif	/* _FSSH_FS_CACHE_H */

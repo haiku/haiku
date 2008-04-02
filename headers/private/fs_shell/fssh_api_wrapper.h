@@ -790,6 +790,7 @@
 #define TRANSACTION_WRITTEN				FSSH_TRANSACTION_WRITTEN
 #define TRANSACTION_ABORTED				FSSH_TRANSACTION_ABORTED
 #define TRANSACTION_ENDED				FSSH_TRANSACTION_ENDED
+#define TRANSACTION_IDLE				FSSH_TRANSACTION_IDLE
 
 #define transaction_notification_hook	fssh_transaction_notification_hook
 

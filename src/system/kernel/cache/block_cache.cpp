@@ -49,6 +49,9 @@
 #define FATAL(x) panic x
 
 
+static const bigtime_t kTransactionIdleTime = 2000000LL;
+	// a transaction is considered idle after 2 seconds of inactivity
+
 struct cache_hook : DoublyLinkedListLinkImpl<cache_hook> {
 	transaction_notification_hook	hook;
 	void							*data;
@@ -71,6 +74,7 @@ struct cache_transaction {
 	HookList		listeners;
 	bool			open;
 	bool			has_sub_transaction;
+	bigtime_t		last_used;
 };
 
 #ifdef BLOCK_CACHE_TRANSACTION_TRACING
@@ -212,6 +216,7 @@ cache_transaction::cache_transaction()
 	notification_hook = NULL;
 	notification_data = NULL;
 	open = true;
+	last_used = system_time();
 }
 
 
@@ -239,10 +244,11 @@ transaction_hash(void *_transaction, const void *_id, uint32 range)
 
 
 /*!	Notifies all listeners of this transaction, and removes them
-	afterwards.
+	afterwards if requested via \a removeListener.
 */
 static void
-notify_transaction_listeners(cache_transaction *transaction, int32 event)
+notify_transaction_listeners(cache_transaction *transaction, int32 event,
+	bool removeListener)
 {
 	HookList::Iterator iterator = transaction->listeners.GetIterator();
 	while (iterator.HasNext()) {
@@ -250,8 +256,10 @@ notify_transaction_listeners(cache_transaction *transaction, int32 event)
 
 		hook->hook(transaction->id, event, hook->data);
 
-		iterator.Remove();
-		delete hook;
+		if (removeListener) {
+			iterator.Remove();
+			delete hook;
+		}
 	}
 }
 
@@ -353,7 +361,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	if (transaction_hash == NULL)
 		return;
 
-	if (benaphore_init(&lock, "block cache") < B_OK)
+	if (recursive_lock_init(&lock, "block cache") < B_OK)
 		return;
 
 	register_low_memory_handler(&block_cache::LowMemoryHandler, this, 0);
@@ -368,7 +376,7 @@ block_cache::~block_cache()
 
 	unregister_low_memory_handler(&block_cache::LowMemoryHandler, this);
 
-	benaphore_destroy(&lock);
+	recursive_lock_destroy(&lock);
 
 	hash_uninit(transaction_hash);
 	hash_uninit(hash);
@@ -525,7 +533,7 @@ void
 block_cache::LowMemoryHandler(void *data, int32 level)
 {
 	block_cache *cache = (block_cache *)data;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	if (!locker.IsLocked()) {
 		// If our block_cache were deleted, it could be that we had
@@ -767,6 +775,8 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 		transaction->first_block = block;
 		transaction->num_blocks++;
 	}
+	if (transaction != NULL)
+		transaction->last_used = system_time();
 
 	bool wasUnchanged = block->original_data == NULL
 		|| block->previous_transaction != NULL;
@@ -854,6 +864,7 @@ write_cached_block(block_cache *cache, cached_block *block,
 				previous->notification_hook(previous->id, TRANSACTION_WRITTEN,
 					previous->notification_data);
 			}
+			notify_transaction_listeners(previous, TRANSACTION_WRITTEN, false);
 
 			if (deleteTransaction) {
 				hash_remove(cache->transaction_hash, previous);
@@ -1054,6 +1065,8 @@ dump_transaction(int argc, char **argv)
 	kprintf(" sub num block:  %ld\n", transaction->sub_num_blocks);
 	kprintf(" has sub:        %d\n", transaction->has_sub_transaction);
 	kprintf(" state:          %s\n", transaction->open ? "open" : "closed");
+	kprintf(" idle:           %ld secs\n",
+		(system_time() - transaction->last_used) / 1000000);
 
 	if (!showBlocks)
 		return 0;
@@ -1126,7 +1139,7 @@ block_writer(void *)
 
 		block_cache *cache = NULL;
 		while ((cache = get_next_block_cache(cache)) != NULL) {
-			BenaphoreLocker locker(&cache->lock);
+			RecursiveLocker locker(&cache->lock);
 			const uint32 kMaxCount = 64;
 			cached_block *blocks[kMaxCount];
 			uint32 count = 0;
@@ -1154,8 +1167,15 @@ block_writer(void *)
 				while ((transaction = (cache_transaction *)hash_next(
 						cache->transaction_hash, &iterator)) != NULL
 					&& count < kMaxCount) {
-					if (transaction->open)
+					if (transaction->open) {
+						if (system_time() > transaction->last_used
+								+ kTransactionIdleTime) {
+							// transaction is open but idle
+							notify_transaction_listeners(transaction,
+								TRANSACTION_IDLE, false);
+						}
 						continue;
+					}
 
 					// sort blocks to speed up writing them back
 					// TODO: ideally, this should be handled by the I/O scheduler
@@ -1223,7 +1243,7 @@ extern "C" int32
 cache_start_transaction(void *_cache)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	if (cache->last_transaction && cache->last_transaction->open) {
 		panic("last transaction (%ld) still open!\n",
@@ -1250,7 +1270,7 @@ extern "C" status_t
 cache_sync_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 	status_t status = B_ENTRY_NOT_FOUND;
 
 	TRACE(("cache_sync_transaction(id %ld)\n", id));
@@ -1313,7 +1333,7 @@ cache_end_transaction(void *_cache, int32 id,
 	transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	TRACE(("cache_end_transaction(id = %ld)\n", id));
 
@@ -1328,7 +1348,7 @@ cache_end_transaction(void *_cache, int32 id,
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
 
-	notify_transaction_listeners(transaction, TRANSACTION_ENDED);
+	notify_transaction_listeners(transaction, TRANSACTION_ENDED, true);
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -1369,7 +1389,7 @@ extern "C" status_t
 cache_abort_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_transaction(id = %ld)\n", id));
 
@@ -1380,7 +1400,7 @@ cache_abort_transaction(void *_cache, int32 id)
 	}
 
 	T(Abort(cache, transaction));
-	notify_transaction_listeners(transaction, TRANSACTION_ABORTED);
+	notify_transaction_listeners(transaction, TRANSACTION_ABORTED, true);
 
 	// iterate through all blocks and restore their original contents
 
@@ -1420,7 +1440,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	TRACE(("cache_detach_sub_transaction(id = %ld)\n", id));
 
@@ -1443,7 +1463,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
 
-	notify_transaction_listeners(transaction, TRANSACTION_ENDED);
+	notify_transaction_listeners(transaction, TRANSACTION_ENDED, true);
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -1505,7 +1525,7 @@ extern "C" status_t
 cache_abort_sub_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_sub_transaction(id = %ld)\n", id));
 
@@ -1518,7 +1538,7 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 
 	T(Abort(cache, transaction));
-	notify_transaction_listeners(transaction, TRANSACTION_ABORTED);
+	notify_transaction_listeners(transaction, TRANSACTION_ABORTED, true);
 
 	// revert all changes back to the version of the parent
 
@@ -1556,7 +1576,7 @@ extern "C" status_t
 cache_start_sub_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	TRACE(("cache_start_sub_transaction(id = %ld)\n", id));
 
@@ -1566,7 +1586,7 @@ cache_start_sub_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 	}
 
-	notify_transaction_listeners(transaction, TRANSACTION_ENDED);
+	notify_transaction_listeners(transaction, TRANSACTION_ENDED, true);
 
 	// move all changed blocks up to the parent
 
@@ -1611,7 +1631,7 @@ cache_add_transaction_listener(void *_cache, int32 id,
 	if (hook == NULL)
 		return B_NO_MEMORY;
 
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL) {
@@ -1633,7 +1653,7 @@ cache_remove_transaction_listener(void *_cache, int32 id,
 {
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1660,7 +1680,7 @@ cache_next_block_in_transaction(void *_cache, int32 id, bool mainOnly,
 	cached_block *block = (cached_block *)*_cookie;
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL || !transaction->open)
@@ -1696,7 +1716,7 @@ extern "C" int32
 cache_blocks_in_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1710,7 +1730,7 @@ extern "C" int32
 cache_blocks_in_main_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1724,7 +1744,7 @@ extern "C" int32
 cache_blocks_in_sub_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -1745,7 +1765,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 	if (allowWrites)
 		block_cache_sync(cache);
 
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	// free all blocks
 
@@ -1794,7 +1814,7 @@ block_cache_sync(void *_cache)
 	// we will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
 
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
 
@@ -1827,7 +1847,7 @@ block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
 		return B_BAD_VALUE;
 	}
 
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	for (; numBlocks > 0; numBlocks--, blockNumber++) {
 		cached_block *block = (cached_block *)hash_lookup(cache->hash,
@@ -1853,7 +1873,7 @@ extern "C" status_t
 block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	if (cache->read_only)
 		panic("tried to make block writable on a read-only cache!");
@@ -1875,7 +1895,7 @@ block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
 	off_t length, int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_writable_etc(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
@@ -1899,7 +1919,7 @@ extern "C" void *
 block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_empty(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
@@ -1915,7 +1935,7 @@ extern "C" const void *
 block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 	bool allocated;
 
 	cached_block *block = get_cached_block(cache, blockNumber, &allocated);
@@ -1952,7 +1972,7 @@ block_cache_set_dirty(void *_cache, off_t blockNumber, bool dirty,
 	int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	cached_block *block = (cached_block *)hash_lookup(cache->hash,
 		&blockNumber);
@@ -1975,7 +1995,7 @@ extern "C" void
 block_cache_put(void *_cache, off_t blockNumber)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	RecursiveLocker locker(&cache->lock);
 
 	put_cached_block(cache, blockNumber);
 }

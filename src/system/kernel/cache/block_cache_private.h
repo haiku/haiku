@@ -52,20 +52,20 @@ typedef DoublyLinkedList<cached_block,
 		&cached_block::link> > block_list;
 
 struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
-	hash_table	*hash;
-	benaphore	lock;
-	int			fd;
-	off_t		max_blocks;
-	size_t		block_size;
-	int32		next_transaction_id;
+	hash_table		*hash;
+	recursive_lock	lock;
+	int				fd;
+	off_t			max_blocks;
+	size_t			block_size;
+	int32			next_transaction_id;
 	cache_transaction *last_transaction;
-	hash_table	*transaction_hash;
+	hash_table		*transaction_hash;
 
-	object_cache *buffer_cache;
-	block_list	unused_blocks;
+	object_cache	*buffer_cache;
+	block_list		unused_blocks;
 
-	uint32		num_dirty_blocks;
-	bool		read_only;
+	uint32			num_dirty_blocks;
+	bool			read_only;
 
 	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
 	~block_cache();
