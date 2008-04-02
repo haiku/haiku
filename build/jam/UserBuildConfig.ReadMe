@@ -147,6 +147,78 @@ AddUserToHaikuImage walter : 1000 : 100 : /boot/home : /bin/bash
 AddGroupToHaikuImage party : 101 : baron walter ;
 
 
+# Build Profiles
+
+# A build profile is a named set of settings for building a Haiku image or
+# installation. The following lines define five different build profiles:
+# disk    - Installation on device /dev/sda57. All optional packages will be
+#           included. Profile type "disk" implies "HAIKU_DONT_CLEAR_IMAGE = 1".
+# qemu    - A plain 200 MB disk image (type "image") named "haiku-qemu.image".
+#           Since only the image name is given, the default location will be
+#           chosen for the image, unless HAIKU_IMAGE_DIR has been set
+#           beforehand.
+# vmware  - A 400 MB VMware image (type "vmware-image"). It will not be zeroed,
+#           if not necessary. The optional packages Development and Pe will be
+#           installed. No image name or path is given, so the defaults
+#            ("haiku.vmdk" in the generated directory) will be used, unless the
+#           respective variables are set.
+# crash   - Similar to the vmware profile, but created at a specific location
+#           and 1 GB size. Furthermore a "crash-tests" directory will be copied
+#           to the image.
+# install - Installation in directory "/Haiku2" (type "install").
+
+DefineBuildProfile disk : disk : "/dev/sda57" ;
+DefineBuildProfile qemu : image : "haiku-qemu.image" ;
+DefineBuildProfile vmware : vmware-image ;
+DefineBuildProfile crash : vmware-image
+	: "/home/foobar/vmware/Virtual Machines/CrashOMatic/CrashOMatic.vmdk" ;
+DefineBuildProfile install : install : /Haiku2 ;
+
+switch $(HAIKU_BUILD_PROFILE) {
+	case "disk" : {
+		HAIKU_ADD_ALL_OPTIONAL_PACKAGES = 1 ;
+	}
+
+	case "qemu" : {
+		HAIKU_IMAGE_SIZE = 200 ;
+	}
+
+	case "vmware" : {
+		HAIKU_IMAGE_SIZE = 400 ;
+		HAIKU_DONT_CLEAR_IMAGE = 1 ;
+		AddOptionalHaikuImagePackages Development Pe ;
+	}
+
+	case "crash" : {
+		HAIKU_IMAGE_SIZE = 1024 ;
+		HAIKU_DONT_CLEAR_IMAGE = 1 ;
+		AddOptionalHaikuImagePackages Development Pe ;
+		CopyDirectoryToHaikuImage home Desktop : $(HAIKU_TOP)/../crash-tests ;
+	}
+}
+
+# By specifying the build profile name as first (non-option) parameter on the
+# jam command line prefixed by an "@" character, the profile will be selected.
+# The second parameter specifies the action to be performed, further optional
+# parameters may follow. Jam command line examples:
+# 
+# jam -q @disk build
+#	-> Equivalent to running "jam -q haiku-image" with the settings for the
+#      "disk" profile. "build" is the default action, so it could even be
+#      omitted.
+# jam -q @vmware update kernel
+#	-> Equivalent to running "jam -q update-vmware-image kernel" with the
+#      settings for the "vmware" profile.
+# jam -q @crash mount
+#	-> Enters the bfs_shell mounting the image specified by the "crash" profile.
+#
+# Note, that the build system will automatically define the build profiles
+# "image", "vmware-image", and "install", unless they are already defined in
+# the UserBuildConfig. They correspond to the respective build profile types
+# and use the values of the variables HAIKU[_VMWARE]_IMAGE_NAME,
+# HAIKU_IMAGE_DIR, HAIKU_INSTALL_DIR, respectively their default values.
+# "jam -q @image" will therefore be equivalent to "jam -q haiku-image".
+
 
 # Creating Sourceable Shell Scripts
 

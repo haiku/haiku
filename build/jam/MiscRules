@@ -227,3 +227,121 @@ actions RunCommandLine1 {
 	$(COMMAND_LINE)
 }
 
+
+#pragma mark - DefineBuildProfile
+
+
+rule DefineBuildProfile name : type : path {
+	# DefineBuildProfile <name> : <type> [ : <path> ]
+	#
+	# Makes a build profile known. Build profiles can be used to define
+	# different sets of settings for Haiku images/installations. For each
+	# profile the default actions "build", "update", and "mount" (the latter
+	# only for disks or image types) will be available (i.e. can be specified
+	# as second parameter on the jam command line). They will build an image
+	# or installation, update only given targets, respectively just mount the
+	# image or disk using the bfs_shell.
+	#
+	# <name> - The name of the build profile.
+	# <type> - The type of the build profile. Must be one of "image" (plain
+	#          disk image), "vmware-image" (VMware disk image), "disk"
+	#          (actual partition or hard disk device), "install" (installation
+	#          in a directory), or "custom" (user-defined).
+	# <path> - The path associated with the profile. Depending on the profile
+	#          type, this is the path to the disk image/VMware image, hard
+	#          disk/partition device, or the installation directory. If the
+	#          parameter is omitted, the value of the HAIKU[_VMWARE]_IMAGE_NAME,
+	#          HAIKU_IMAGE_DIR, respectively HAIKU_INSTALL_DIR or their default
+	#          values will be used instead.
+
+	if ! $(HAIKU_BUILD_PROFILE) || $(HAIKU_BUILD_PROFILE) != $(name) {
+		return ;
+	}
+
+	HAIKU_BUILD_PROFILE_DEFINED = 1 ;
+
+	# split path into directory path and name
+	local targetDir = $(path:D) ;
+	local targetName = $(path:BS) ;
+
+	# Jam's path splitting produces an empty string, if a component doesn't
+	# exist. That's a little unhandy for checks.
+	if $(targetDir) = "" {
+		targetDir = ;
+	}
+	if $(targetName) = "" {
+		targetName = ;
+	}
+
+	targetDir ?= $(HAIKU_IMAGE_DIR) ;
+	targetDir ?= $(HAIKU_DEFAULT_IMAGE_DIR) ;
+
+	# "disk" is "image" with HAIKU_DONT_CLEAR_IMAGE
+	if $(type) = "disk" {
+		type = "image" ;
+		HAIKU_DONT_CLEAR_IMAGE = 1 ;
+	}
+
+	local buildTarget ;
+	local startOffset ;
+
+	switch $(type) {
+		case "image" : {
+			targetName ?= $(HAIKU_IMAGE_NAME) ;
+			targetName ?= $(HAIKU_DEFAULT_IMAGE_NAME) ;
+			HAIKU_IMAGE_DIR = $(targetDir) ;
+			HAIKU_IMAGE_NAME = $(targetName) ;
+			buildTarget = haiku-image ;
+		}
+
+		case "vmware-image" : {
+			targetName ?= $(HAIKU_VMWARE_IMAGE_NAME) ;
+			targetName ?= $(HAIKU_DEFAULT_VMWARE_IMAGE_NAME) ;
+			HAIKU_IMAGE_DIR = $(targetDir) ;
+			HAIKU_VMWARE_IMAGE_NAME = $(targetName) ;
+			buildTarget = haiku-vmware-image ;
+			startOffset = --start-offset 65536 ;
+		}
+
+		case "install" : {
+			path ?= $(HAIKU_INSTALL_DIR) ;
+			path ?= $(HAIKU_DEFAULT_INSTALL_DIR) ;
+			HAIKU_INSTALL_DIR = $(path) ;
+			buildTarget = install-haiku ;
+		}
+
+		case "custom" : {
+			# user-defined -- don't do anything
+			return 1 ;
+		}
+
+		case * : {
+			Exit "Unsupported build profile type: " $(type) ;
+		}
+	}
+
+	switch $(HAIKU_BUILD_PROFILE_ACTION) {
+		case "build" : {
+			JAM_TARGETS = $(buildTarget) ;
+		}
+
+		case "update" : {
+			JAM_TARGETS = $(buildTarget) ;
+			SetUpdateHaikuImageOnly 1 ;
+			HAIKU_INCLUDE_IN_IMAGE on $(HAIKU_BUILD_PROFILE_PARAMETERS) = 1 ;
+		}
+
+		case "mount" : {
+			if $(type) = "install" {
+				Exit "Build action \"mount\" not supported for profile type"
+					"\"install\"." ;
+			}
+
+			local commandLine = :<build>bfs_shell $(startOffset)
+				\"$(targetName:D=$(targetDir))\" ;
+			JAM_TARGETS = [ RunCommandLine $(commandLine) ] ;
+		}
+	}
+
+	return 1 ;
+}
