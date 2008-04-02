@@ -62,7 +62,7 @@ class AutoFloatingOverlaysHider {
 			, fHidden(interface->HideFloatingOverlays(area))
 		{
 		}
-		
+
 		AutoFloatingOverlaysHider(HWInterface* interface)
 			: fInterface(interface)
 			, fHidden(fInterface->HideFloatingOverlays())
@@ -83,7 +83,7 @@ class AutoFloatingOverlaysHider {
 	private:
 		HWInterface*	fInterface;
 		bool			fHidden;
-		
+
 };
 
 
@@ -127,7 +127,7 @@ DrawingEngine::UnlockParallelAccess()
 
 bool
 DrawingEngine::LockExclusiveAccess()
-{	
+{
 	return fGraphicsCard->LockExclusiveAccess();
 }
 
@@ -453,7 +453,7 @@ DrawingEngine::CopyRegion(/*const*/ BRegion* region,
 			// compare vertically
 			if (yOffset > 0) {
 				if (is_above(a, b)) {
-					cmp -= 1;	
+					cmp -= 1;
 				} else if (is_above(b, a)) {
 					cmp += 1;
 				}
@@ -541,7 +541,7 @@ DrawingEngine::InvertRect(BRect r)
 			BRegion region(r);
 			region.IntersectWith(fPainter->ClippingRegion());
 			fGraphicsCard->InvertRegion(region);
-		} else {		
+		} else {
 			fPainter->InvertRect(r);
 
 			_CopyToFront(r);
@@ -586,7 +586,7 @@ DrawingEngine::DrawArc(BRect r, const float &angle,
 		BPoint center(r.left + xRadius,
 					  r.top + yRadius);
 
-		if (filled)	
+		if (filled)
 			fPainter->FillArc(center, xRadius, yRadius, angle, span);
 		else
 			fPainter->StrokeArc(center, xRadius, yRadius, angle, span);
@@ -730,7 +730,7 @@ DrawingEngine::FillRect(BRect r, const rgb_color& color)
 									  || overlaysHider.WasHidden());
 		} else {
 			fPainter->FillRect(r, color);
-	
+
 			_CopyToFront(r);
 		}
 	}
@@ -1069,7 +1069,7 @@ DrawingEngine::DrawString(const char* string, int32 length,
 //bigtime_t now = system_time();
 // TODO: BoundingBox is quite slow!! Optimizing it will be beneficial.
 // Cursiously, the DrawString after it is actually faster!?!
-// TODO: make the availability of the hardware cursor part of the 
+// TODO: make the availability of the hardware cursor part of the
 // HW acceleration flags and skip all calculations for HideFloatingOverlays
 // in case we don't have one.
 // TODO: Watch out about penLocation and use Painter::PenLocation() when
@@ -1151,11 +1151,14 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 
 	status_t result = bitmap->ImportBits(buffer->Bits(), buffer->BitsLength(),
 		buffer->BytesPerRow(), buffer->ColorSpace(),
-		bounds.LeftTop(), BPoint(0, 0), 
+		bounds.LeftTop(), BPoint(0, 0),
 		bounds.IntegerWidth() + 1, bounds.IntegerHeight() + 1);
 
 	if (drawCursor) {
-		ServerCursor *cursor = fGraphicsCard->Cursor();
+		ServerCursorReference cursorRef = fGraphicsCard->Cursor();
+		ServerCursor* cursor = cursorRef.Cursor();
+		if (!cursor)
+			return result;
 		int32 cursorWidth = cursor->Width();
 		int32 cursorHeight = cursor->Height();
 
@@ -1164,7 +1167,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 
 		BBitmap cursorArea(BRect(0, 0, cursorWidth - 1, cursorHeight - 1),
 			B_BITMAP_NO_SERVER_LINK, B_RGBA32);
-			
+
 		cursorArea.ImportBits(bitmap->Bits(), bitmap->BitsLength(),
 			bitmap->BytesPerRow(), bitmap->ColorSpace(),
 			cursorPosition,	BPoint(0, 0),
@@ -1185,7 +1188,7 @@ DrawingEngine::ReadBitmap(ServerBitmap *bitmap, bool drawCursor, BRect bounds)
 
 		bitmap->ImportBits(cursorArea.Bits(), cursorArea.BitsLength(),
 			cursorArea.BytesPerRow(), cursorArea.ColorSpace(),
-			BPoint(0, 0), cursorPosition, 
+			BPoint(0, 0), cursorPosition,
 			cursorWidth, cursorHeight);
 	}
 

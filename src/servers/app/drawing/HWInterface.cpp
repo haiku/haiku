@@ -12,7 +12,6 @@
 #include "drawing_support.h"
 
 #include "RenderingBuffer.h"
-#include "ServerCursor.h"
 #include "SystemPalette.h"
 #include "UpdateQueue.h"
 
@@ -146,6 +145,17 @@ HWInterface::SetCursor(ServerCursor* cursor)
 		Invalidate(_CursorFrame());
 	}
 	fFloatingOverlaysLock.Unlock();
+}
+
+// Cursor
+ServerCursorReference
+HWInterface::Cursor() const
+{
+	if (!fFloatingOverlaysLock.Lock())
+		return ServerCursorReference(NULL);
+	ServerCursorReference reference(fCursor);
+	fFloatingOverlaysLock.Unlock();
+	return reference;
 }
 
 // SetCursorVisible
@@ -529,7 +539,7 @@ HWInterface::_DrawCursor(IntRect area) const
 				uint8* c = crs;
 				uint8* d = dst;
 				uint8* b = bup;
-				
+
 				for (int32 x = area.left; x <= area.right; x++) {
 					*(uint32*)b = *(uint32*)s;
 					// assumes backbuffer alpha = 255
@@ -601,7 +611,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 		case B_RGB32:
 		case B_RGBA32: {
 			int32 bytes = (right - x + 1) * 4;
-	
+
 			if (bytes > 0) {
 				// offset to left top pixel in dest buffer
 				dst += y * dstBPR + x * 4;
@@ -657,7 +667,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 			}
 			break;
 		}
-		case B_RGB15: 
+		case B_RGB15:
 		case B_RGBA15: {
 			// offset to left top pixel in dest buffer
 			dst += y * dstBPR + x * 2;
@@ -702,7 +712,7 @@ HWInterface::_CopyToFront(uint8* src, uint32 srcBPR,
 
 			break;
 		}
-		case B_GRAY8: 
+		case B_GRAY8:
 			if (frontBuffer->Width() > dstBPR) {
 				// VGA 16 color grayscale planar mode
 				if (fVGADevice > 0) {

@@ -9,7 +9,9 @@
 #define HW_INTERFACE_H
 
 
+#include "IntRect.h"
 #include "MultiLocker.h"
+#include "ServerCursor.h"
 
 #include <video_overlay.h>
 
@@ -20,13 +22,10 @@
 #include <OS.h>
 #include <Region.h>
 
-#include "IntRect.h"
-
 
 class Overlay;
 class RenderingBuffer;
 class ServerBitmap;
-class ServerCursor;
 class UpdateQueue;
 class BString;
 
@@ -108,7 +107,7 @@ class HWInterface : protected MultiLocker {
 	virtual	void				Sync() {}
 
 	// cursor handling (these do their own Read/Write locking)
-			ServerCursor*		Cursor() const { return fCursor; }
+			ServerCursorReference Cursor() const;
 	virtual	void				SetCursor(ServerCursor* cursor);
 	virtual	void				SetCursorVisible(bool visible);
 			bool				IsCursorVisible();

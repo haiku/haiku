@@ -714,15 +714,15 @@ Desktop::SetCursor(ServerCursor* newCursor)
 	if (newCursor == NULL)
 		newCursor = fCursorManager.GetCursor(B_CURSOR_DEFAULT);
 
-	ServerCursor* oldCursor = Cursor();
-	if (newCursor == oldCursor)
+	ServerCursorReference oldCursor = Cursor();
+	if (newCursor == oldCursor.Cursor())
 		return;
 
 	HWInterface()->SetCursor(newCursor);
 }
 
 
-ServerCursor*
+ServerCursorReference
 Desktop::Cursor() const
 {
 	return HWInterface()->Cursor();

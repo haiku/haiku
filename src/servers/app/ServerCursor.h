@@ -33,7 +33,7 @@ class ServerCursor : public ServerBitmap {
 							ServerCursor(const ServerCursor* cursor);
 
 	virtual					~ServerCursor();
-	
+
 	//! Returns the cursor's hot spot
 			void			SetHotSpot(BPoint pt);
 			BPoint			GetHotSpot() const
@@ -69,5 +69,55 @@ class ServerCursor : public ServerBitmap {
 			CursorManager*	fManager;
 			vint32			fPendingViewCursor;
 };
+
+
+class ServerCursorReference {
+public:
+							ServerCursorReference()
+								: fCursor(NULL)
+							{
+							}
+							ServerCursorReference(ServerCursor* cursor)
+								: fCursor(cursor)
+							{
+								if (fCursor)
+									fCursor->Acquire();
+							}
+							ServerCursorReference(const ServerCursorReference& other)
+								: fCursor(other.fCursor)
+							{
+								if (fCursor)
+									fCursor->Acquire();
+							}
+	virtual					~ServerCursorReference()
+							{
+								if (fCursor)
+									fCursor->Release();
+							}
+
+	ServerCursorReference&	operator=(const ServerCursorReference& other)
+							{
+								SetCursor(other.fCursor);
+								return *this;
+							}
+
+	void					SetCursor(ServerCursor* cursor)
+							{
+								if (fCursor == cursor)
+									return;
+								if (fCursor)
+									fCursor->Release();
+								fCursor = cursor;
+								if (fCursor)
+									fCursor->Acquire();
+							}
+	ServerCursor*			Cursor() const
+							{
+								return fCursor;
+							}
+private:
+	ServerCursor*			fCursor;
+};
+
 
 #endif	// SERVER_CURSOR_H

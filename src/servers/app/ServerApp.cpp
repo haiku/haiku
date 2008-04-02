@@ -291,8 +291,6 @@ ServerApp::Activate(bool value)
 	if (fIsActive == value)
 		return;
 
-	// TODO: send some message to the client?!?
-
 	fIsActive = value;
 
 	if (fIsActive) {

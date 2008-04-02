@@ -12,12 +12,13 @@
 
 
 #include "CursorManager.h"
+#include "DesktopSettings.h"
 #include "EventDispatcher.h"
+#include "MessageLooper.h"
 #include "Screen.h"
 #include "ScreenManager.h"
+#include "ServerCursor.h"
 #include "VirtualScreen.h"
-#include "DesktopSettings.h"
-#include "MessageLooper.h"
 #include "WindowList.h"
 #include "Workspace.h"
 #include "WorkspacePrivate.h"
@@ -78,7 +79,7 @@ class Desktop : public MessageLooper, public ScreenOwner {
 		CursorManager&			GetCursorManager() { return fCursorManager; }
 
 		void					SetCursor(ServerCursor* cursor);
-		ServerCursor*			Cursor() const;
+		ServerCursorReference	Cursor() const;
 		void					SetLastMouseState(const BPoint& position,
 									int32 buttons);
 									// for use by the mouse filter only
