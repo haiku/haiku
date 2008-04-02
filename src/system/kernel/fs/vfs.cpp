@@ -1811,20 +1811,20 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				put_vnode(vnode);
 				vnode = nextVnode;
 			}
-		} else if (nextPath[0]) {
-			// check if vnode is really a directory
-			if (type == 0) {
-				// we need to retrieve the type first
-				struct stat stat;
-				status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
-					vnode->private_node, &stat);
-				if (status == B_OK)
-					type = stat.st_mode;
-			}
-
-			if (status == B_OK && !S_ISDIR(type))
-				status = B_NOT_A_DIRECTORY;
 		}
+
+		// check if vnode is really a directory
+		if (type == 0) {
+			// we need to retrieve the type first
+			struct stat stat;
+			status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
+				vnode->private_node, &stat);
+			if (status == B_OK)
+				type = stat.st_mode;
+		}
+
+		if (status == B_OK && !S_ISDIR(type))
+			status = B_NOT_A_DIRECTORY;
 
 		// Check if we have the right to search the current directory vnode.
 		// If a file system doesn't have the access() function, we assume that
