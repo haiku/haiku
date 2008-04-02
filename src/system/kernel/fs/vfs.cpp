@@ -1756,6 +1756,10 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	status_t status = B_OK;
 	ino_t lastParentID = vnode->id;
 	int type = 0;
+		// TODO: Actually the caller could provide the type of the start node,
+		// if known, which it is in most cases (context root, mount root, cwd).
+		// We'd save a now always required read_stat().
+		// Doing that via _type wouldn't even require an interface change.
 
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
 
@@ -1923,9 +1927,10 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 			if (absoluteSymlink && *path == '\0') {
 				// symlink was just "/"
 				nextVnode = vnode;
+				type = S_IFDIR;
 			} else {
 				status = vnode_path_to_vnode(vnode, path, traverseLeafLink,
-					count + 1, ioContext, &nextVnode, &lastParentID, _type);
+					count + 1, ioContext, &nextVnode, &lastParentID, &type);
 			}
 
 			free(buffer);
