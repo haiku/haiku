@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright (c) 2002, Carlos Hasan, for Haiku.
  *
  * Distributed under the terms of the MIT license.
@@ -307,7 +307,7 @@ print_features(uint32 features)
 		"PAT", "PSE36", "PSN", "CFLUSH",
 		NULL, "DS", "ACPI", "MMX",
 		"FXSTR", "SSE", "SSE2", "SS",
-		"HTT", "TM", NULL, "PBE", 
+		"HTT", "TM", NULL, "PBE",
 	};
 	int32 found = 0;
 	int32 i;
@@ -517,11 +517,12 @@ dump_cpus(system_info *info)
 static void
 dump_mem(system_info *info)
 {
-	printf("%10lu bytes free      (used/cached/max %10lu / %10lu / %10lu)\n",
+	printf("%10lu bytes free      (used/max %10lu / %10lu)\n",
 		B_PAGE_SIZE * (uint32)(info->max_pages - info->used_pages),
 		B_PAGE_SIZE * (uint32)info->used_pages,
-		B_PAGE_SIZE * (uint32)info->cached_pages,
 		B_PAGE_SIZE * (uint32)info->max_pages);
+	printf("                           (cached   %10lu)\n",
+		B_PAGE_SIZE * (uint32)info->cached_pages);
 }
 
 
