@@ -289,8 +289,7 @@ DrawState::SetOrigin(const BPoint& origin)
 		fCombinedOrigin.y = fPreviousState->fCombinedOrigin.y
 			+ fOrigin.y * fPreviousState->fCombinedScale;
 	} else {
-		fCombinedOrigin.x = fOrigin.x * fCombinedScale;
-		fCombinedOrigin.y = fOrigin.y * fCombinedScale;
+		fCombinedOrigin = fOrigin;
 	}
 }
 
@@ -309,6 +308,8 @@ DrawState::SetScale(float scale)
 			fCombinedScale = fScale;
 
 		// update font size
+		// NOTE: This is what makes the call potentially expensive,
+		// hence the introductory check
 		fFont.SetSize(fUnscaledFontSize * fCombinedScale);
 	}
 }
