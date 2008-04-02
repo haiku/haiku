@@ -6,7 +6,7 @@
  * Distributed under the terms of the NewOS License.
  */
 
-/*! This is main - initializes processors and starts init */
+/*! This is main - initializes the kernel and launches the Bootscript */
 
 
 #include <OS.h>
@@ -45,7 +45,7 @@
 #include <string.h>
 
 
-//#define TRACE_BOOT 1
+//#define TRACE_BOOT
 #ifdef TRACE_BOOT
 #	define TRACE(x...) dprintf("INIT: " x)
 #else
@@ -70,7 +70,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		// This is something we cannot handle right now - release kernels
 		// should always be able to handle the kernel_args of earlier
 		// released kernels.
-		debug_early_boot_message("Version mismatch between boot loader and kernel!\n");
+		debug_early_boot_message("Version mismatch between boot loader and "
+			"kernel!\n");
 		return -1;
 	}
 
@@ -177,7 +178,8 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("exiting kernel startup\n");
 		kernel_startup = false;
 
-		smp_cpu_rendezvous(&sCpuRendezvous2, 0); // release the AP cpus to go enter the scheduler
+		smp_cpu_rendezvous(&sCpuRendezvous2, 0);
+			// release the AP cpus to go enter the scheduler
 
 		TRACE("enabling interrupts and starting scheduler on cpu 0\n");
 		enable_interrupts();
@@ -190,11 +192,11 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		resume_thread(thread);
 	} else {
 		// lets make sure we're in sync with the main cpu
-		// the boot processor has probably been sending us 
-		// tlb sync messages all along the way, but we've 
+		// the boot processor has probably been sending us
+		// tlb sync messages all along the way, but we've
 		// been ignoring them
 		arch_cpu_global_TLB_invalidate();
-	
+
 		// this is run for each non boot processor after they've been set loose
 		cpu_init_percpu(&sKernelArgs, currentCPU);
 		smp_per_cpu_init(&sKernelArgs, currentCPU);
@@ -219,9 +221,9 @@ static int32
 main2(void *unused)
 {
 	(void)(unused);
-	
+
 	TRACE("start of main2: initializing devices\n");
-	
+
 	boot_splash_init();
 
 	TRACE("Init modules\n");
@@ -259,9 +261,6 @@ main2(void *unused)
 	TRACE("Add preloaded old-style drivers\n");
 	devfs_add_preloaded_drivers(&sKernelArgs);
 
-	// ToDo: device manager starts here, bus_init()/dev_init() won't be necessary anymore,
-	//	but instead, the hardware and drivers are rescanned then.
-
 	int_init_post_device_manager(&sKernelArgs);
 
 	TRACE("Mount boot file system\n");
@@ -275,7 +274,7 @@ main2(void *unused)
 	TRACE("vm_init_post_modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_6_INIT_VM_MODULES);
 	vm_init_post_modules(&sKernelArgs);
-	
+
 	TRACE("debug_init_post_modules\n");
 	debug_init_post_modules(&sKernelArgs);
 
@@ -285,23 +284,10 @@ main2(void *unused)
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_7_RUN_BOOT_SCRIPT);
 	// start the init process
 	{
-		const char *shellArgs[] = {"/bin/sh", "/boot/beos/system/boot/Bootscript", NULL};
-		const char *initArgs[] = {"/bin/init", NULL};
-		const char **args;
-		int32 argc;
+		const char *args[] = {"/bin/sh", "/boot/beos/system/boot/Bootscript",
+			NULL};
+		int32 argc = 2;
 		thread_id thread;
-
-		struct stat st;
-		if (stat(shellArgs[1], &st) == 0) {
-			// start Bootscript
-			args = shellArgs;
-			argc = 2;
-		} else {
-			// ToDo: this is only necessary as long as we have the bootdir mechanism
-			// start init
-			args = initArgs;
-			argc = 1;
-		}
 
 		thread = load_image(argc, args, NULL);
 		if (thread >= B_OK) {
