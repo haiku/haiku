@@ -95,6 +95,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	int32			next_transaction_id;
 	cache_transaction *last_transaction;
 	hash_table		*transaction_hash;
+	int32			transaction_changed;
 
 	object_cache	*buffer_cache;
 	block_list		unused_blocks;
@@ -311,27 +312,6 @@ transaction_hash(void *_transaction, const void *_id, uint32 range)
 }
 
 
-/*!	Notifies all listeners of this transaction, and removes them
-	afterwards if requested via \a removeListener.
-*/
-static void
-notify_transaction_listeners(cache_transaction *transaction, int32 event,
-	bool removeListener)
-{
-	HookList::Iterator iterator = transaction->listeners.GetIterator();
-	while (iterator.HasNext()) {
-		cache_hook *hook = iterator.Next();
-
-		hook->hook(transaction->id, event, hook->data);
-
-		if (removeListener) {
-			iterator.Remove();
-			delete hook;
-		}
-	}
-}
-
-
 static void
 delete_transaction(block_cache *cache, cache_transaction *transaction)
 {
@@ -339,6 +319,7 @@ delete_transaction(block_cache *cache, cache_transaction *transaction)
 		cache->last_transaction = NULL;
 
 	delete transaction;
+	cache->transaction_changed++;
 }
 
 
@@ -346,6 +327,34 @@ static cache_transaction *
 lookup_transaction(block_cache *cache, int32 id)
 {
 	return (cache_transaction *)hash_lookup(cache->transaction_hash, &id);
+}
+
+
+/*!	Notifies all listeners of this transaction, and removes them
+	afterwards if requested via \a removeListener.
+*/
+static void
+notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
+	int32 event, bool removeListener)
+{
+	int32 id = transaction->id;
+
+	HookList::Iterator iterator = transaction->listeners.GetIterator();
+	while (iterator.HasNext()) {
+		cache_hook *hook = iterator.Next();
+
+		hook->hook(transaction->id, event, hook->data);
+
+		if (lookup_transaction(cache, id) != transaction) {
+			// transaction has been removed by the hook!
+			return;
+		}
+
+		if (removeListener) {
+			iterator.Remove();
+			delete hook;
+		}
+	}
 }
 
 
@@ -407,6 +416,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
+	transaction_changed(0),
 	num_dirty_blocks(0),
 	read_only(readOnly)
 {
@@ -932,7 +942,8 @@ write_cached_block(block_cache *cache, cached_block *block,
 				previous->notification_hook(previous->id, TRANSACTION_WRITTEN,
 					previous->notification_data);
 			}
-			notify_transaction_listeners(previous, TRANSACTION_WRITTEN, false);
+			notify_transaction_listeners(cache, previous, TRANSACTION_WRITTEN,
+				false);
 
 			if (deleteTransaction) {
 				hash_remove(cache->transaction_hash, previous);
@@ -1238,9 +1249,17 @@ block_writer(void *)
 					if (transaction->open) {
 						if (system_time() > transaction->last_used
 								+ kTransactionIdleTime) {
-							// transaction is open but idle
-							notify_transaction_listeners(transaction,
+							int32 change = cache->transaction_changed;
+
+							// Transaction is open but idle
+							notify_transaction_listeners(cache, transaction,
 								TRANSACTION_IDLE, false);
+
+							if (change != cache->transaction_changed) {
+								// Transactions were removed by the above
+								// notification
+								hash_rewind(cache->transaction_hash, &iterator);
+							}
 						}
 						continue;
 					}
@@ -1416,7 +1435,7 @@ cache_end_transaction(void *_cache, int32 id,
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
 
-	notify_transaction_listeners(transaction, TRANSACTION_ENDED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED, true);
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -1468,7 +1487,7 @@ cache_abort_transaction(void *_cache, int32 id)
 	}
 
 	T(Abort(cache, transaction));
-	notify_transaction_listeners(transaction, TRANSACTION_ABORTED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ABORTED, true);
 
 	// iterate through all blocks and restore their original contents
 
@@ -1531,7 +1550,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	transaction->notification_hook = hook;
 	transaction->notification_data = data;
 
-	notify_transaction_listeners(transaction, TRANSACTION_ENDED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED, true);
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -1606,7 +1625,7 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 
 	T(Abort(cache, transaction));
-	notify_transaction_listeners(transaction, TRANSACTION_ABORTED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ABORTED, true);
 
 	// revert all changes back to the version of the parent
 
@@ -1654,7 +1673,7 @@ cache_start_sub_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 	}
 
-	notify_transaction_listeners(transaction, TRANSACTION_ENDED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED, true);
 
 	// move all changed blocks up to the parent
 
@@ -1686,8 +1705,8 @@ cache_start_sub_transaction(void *_cache, int32 id)
 
 
 /*!	Adds a transaction listener that gets notified when the transaction
-	is ended or aborted.
-	The listener gets automatically removed in this case.
+	is ended, aborted, written, or idle.
+	The listener gets automatically removed when the transaction ends.
 */
 status_t
 cache_add_transaction_listener(void *_cache, int32 id,
