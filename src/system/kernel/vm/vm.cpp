@@ -4394,7 +4394,7 @@ vm_get_physical_page(addr_t paddr, addr_t *_vaddr, uint32 flags)
 
 
 off_t
-vm_get_available_memory(void)
+vm_available_memory(void)
 {
 	return sAvailableMemory;
 }

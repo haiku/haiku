@@ -1693,7 +1693,7 @@ status_t
 vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
 {
 	uint32 i;
-	
+
 	for (i = 0; i < numPages; i++) {
 		pages[i] = vm_page_allocate_page(pageState, false);
 		if (pages[i] == NULL) {
@@ -1874,7 +1874,7 @@ vm_page_num_pages(void)
 size_t
 vm_page_num_available_pages(void)
 {
-	return vm_get_available_memory() / B_PAGE_SIZE;
+	return vm_available_memory() / B_PAGE_SIZE;
 }
 
 
