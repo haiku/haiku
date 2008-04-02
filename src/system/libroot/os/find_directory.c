@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include <libroot_private.h>
 
 /* use pwents to find home */
 #define USE_PWENTS
@@ -187,7 +188,7 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		free(buffer);
 		return err;
 	}
-	
+
 	switch (which) {
 		/* Per volume directories */
 		case B_DESKTOP_DIRECTORY:
@@ -279,6 +280,10 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	err = B_OK;
 	if (template) {
 		if (!strncmp(template, "$h", 2)) {
+			struct passwd pwBuffer;
+			char pwStringBuffer[MAX_PASSWD_BUFFER_SIZE];
+			struct passwd *pw;
+
 			if (bootDevice > -1 && device != bootDevice) {
 				int l = pathLength - strlen(buffer);
 				if (l > 5)
@@ -286,11 +291,10 @@ find_directory(directory_which which, dev_t device, bool createIt,
 			} else {
 #ifndef _KERNEL_MODE
 #ifdef USE_PWENTS
-				struct passwd *pw;
-				// WARNING getpwuid() might not be threadsafe...
-				pw = getpwuid(getuid());
-				if (pw)
+				if (getpwuid_r(geteuid(), &pwBuffer, pwStringBuffer,
+						sizeof(pwStringBuffer), &pw) == 0) {
 					home = pw->pw_dir;
+				}
 #endif	// USE_PWENTS
 				if (!home) {
 					/* use env var */
