@@ -48,6 +48,8 @@ const char* kMountPoint = "/myfs";
 static	int					sArgc;
 static	const char* const*	sArgv;
 
+static mode_t sUmask = 0022;
+
 
 static fssh_status_t
 init_kernel()
@@ -687,7 +689,8 @@ create_dir(const char *path, bool createParents)
 	}
 
 	// make the directory
-	error = _kern_create_dir(-1, path, FSSH_S_IRWXU);
+	error = _kern_create_dir(-1,
+		path, (FSSH_S_IRWXU | FSSH_S_IRWXG | FSSH_S_IRWXO) & ~sUmask);
 	if (error != FSSH_B_OK) {
 		fprintf(stderr, "Error: Failed to make directory \"%s\": %s\n", path,
 			fssh_strerror(error));
