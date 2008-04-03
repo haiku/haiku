@@ -536,9 +536,6 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 {
 	LogEntry *logEntry = (LogEntry *)_logEntry;
 
-	if (event != TRANSACTION_WRITTEN)
-		return;
-
 	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry,
 		transactionID));
 
@@ -588,9 +585,6 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 /*static*/ void
 Journal::_TransactionListener(int32 transactionID, int32 event, void *_journal)
 {
-	if (event != TRANSACTION_IDLE)
-		return;
-
 	// The current transaction seems to be idle - flush it
 
 	Journal *journal = (Journal *)_journal;
@@ -865,7 +859,7 @@ Journal::Lock(Transaction *owner)
 	}
 
 	cache_add_transaction_listener(fVolume->BlockCache(), fTransactionID,
-		_TransactionListener, this);
+		TRANSACTION_IDLE, _TransactionListener, this);
 
 	return B_OK;
 }

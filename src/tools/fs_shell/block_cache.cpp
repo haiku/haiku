@@ -50,7 +50,7 @@ struct cache_hook : DoublyLinkedListLinkImpl<cache_hook> {
 	void								*data;
 };
 
-typedef DoublyLinkedList<cache_hook> HookList; 
+typedef DoublyLinkedList<cache_hook> HookList;
 
 struct cache_transaction {
 	cache_transaction();
@@ -377,7 +377,7 @@ put_cached_block(block_cache *cache, fssh_off_t blockNumber)
 		fssh_panic("put_cached_block: invalid block number %lld (max %lld)",
 			blockNumber, cache->max_blocks - 1);
 	}
-	
+
 	cached_block *block = (cached_block *)hash_lookup(cache->hash, &blockNumber);
 	if (block != NULL)
 		put_cached_block(cache, block);
@@ -974,9 +974,11 @@ fssh_cache_start_sub_transaction(void *_cache, int32_t id)
 	The listener gets automatically removed in this case.
 */
 fssh_status_t
-fssh_cache_add_transaction_listener(void *_cache, int32_t id,
+fssh_cache_add_transaction_listener(void *_cache, int32_t id, int32_t events,
 	fssh_transaction_notification_hook hookFunction, void *data)
 {
+// TODO: this is currently not used in a critical context in BFS
+#if 0
 	block_cache *cache = (block_cache *)_cache;
 
 	cache_hook *hook = new(std::nothrow) cache_hook;
@@ -995,6 +997,7 @@ fssh_cache_add_transaction_listener(void *_cache, int32_t id,
 	hook->data = data;
 
 	transaction->listeners.Add(hook);
+#endif
 	return FSSH_B_OK;
 }
 
@@ -1061,7 +1064,7 @@ fssh_cache_next_block_in_transaction(void *_cache, int32_t id, bool mainOnly,
 		*_unchangedData = block->original_data;
 
 	*_cookie = (fssh_addr_t)block;
-	return FSSH_B_OK;	
+	return FSSH_B_OK;
 }
 
 
@@ -1130,7 +1133,7 @@ fssh_block_cache_delete(void *_cache, bool allowWrites)
 		cache->FreeBlock(block);
 	}
 
-	// free all transactions (they will all be aborted)	
+	// free all transactions (they will all be aborted)
 
 	cookie = 0;
 	cache_transaction *transaction;

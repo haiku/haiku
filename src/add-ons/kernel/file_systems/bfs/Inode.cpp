@@ -252,7 +252,7 @@ InodeAllocator::Keep()
 
 	if (status == B_OK) {
 		cache_add_transaction_listener(volume->BlockCache(), fTransaction->ID(),
-			&_TransactionListener, fInode);
+			TRANSACTION_ABORTED, &_TransactionListener, fInode);
 	}
 
 	fTransaction = NULL;

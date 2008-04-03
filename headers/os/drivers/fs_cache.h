@@ -11,11 +11,12 @@
 #include <fs_interface.h>
 
 
+/* transaction events */
 enum {
-	TRANSACTION_WRITTEN,
-	TRANSACTION_ABORTED,
-	TRANSACTION_ENDED,
-	TRANSACTION_IDLE
+	TRANSACTION_WRITTEN	= 0x01,
+	TRANSACTION_ABORTED	= 0x02,
+	TRANSACTION_ENDED	= 0x04,
+	TRANSACTION_IDLE	= 0x08
 };
 
 typedef void (*transaction_notification_hook)(int32 id, int32 event,
@@ -36,7 +37,8 @@ extern int32 cache_detach_sub_transaction(void *_cache, int32 id,
 extern status_t cache_abort_sub_transaction(void *_cache, int32 id);
 extern status_t cache_start_sub_transaction(void *_cache, int32 id);
 extern status_t cache_add_transaction_listener(void *_cache, int32 id,
-					transaction_notification_hook hook, void *data);
+					int32 events, transaction_notification_hook hook,
+					void *data);
 extern status_t cache_remove_transaction_listener(void *_cache, int32 id,
 					transaction_notification_hook hook, void *data);
 extern status_t cache_next_block_in_transaction(void *_cache, int32 id,
