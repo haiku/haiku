@@ -302,7 +302,7 @@ BControllable::StartControlPanel(BMessenger *out_messenger)
 		ERROR("BControllable::StartControlPanel Error launching application\n");
 		return B_BAD_VALUE;
 	}
-	printf("BControllable::StartContolPanel done wiht id: %d\n" , id);
+	printf("BControllable::StartControlPanel done with id: %ld\n", id);
 	free(arg);
 
 	if (out_messenger)
