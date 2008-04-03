@@ -7,6 +7,10 @@
 # to UserBuildConfig -- you don't want all the things to happen, that are
 # specified here. Rather create an empty UserBuildConfig and copy the lines
 # you really want, or start out with UserBuildConfig.sample.
+# Of course, noone reads ReadMe files, so they will just get an error here
+# when copying it and jamming:
+Exit You must NOT copy UserBuildConfig.ReadMe directly but use parts of it! ;
+
 
 # Adding timezone and keymap settings
 AddSymlinkToHaikuImage home config settings
