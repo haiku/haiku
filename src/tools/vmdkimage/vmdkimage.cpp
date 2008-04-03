@@ -61,7 +61,7 @@ main(int argc, char *argv[])
 		};
 
 		opterr = 0; /* don't print errors */
-		c = getopt_long(argc, argv, "h:i:c:H:f:", long_options, NULL); 
+		c = getopt_long(argc, argv, "h:i:cHf:", long_options, NULL); 
 		if (c == -1) 
 			break; 
 
