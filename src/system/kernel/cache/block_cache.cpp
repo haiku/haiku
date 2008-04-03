@@ -141,6 +141,7 @@ struct cache_transaction {
 	transaction_notification_hook notification_hook;
 	void			*notification_data;
 	HookList		listeners;
+	uint16			listener_change;
 	bool			open;
 	bool			has_sub_transaction;
 	bigtime_t		last_used;
@@ -343,16 +344,27 @@ notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
 	while (iterator.HasNext()) {
 		cache_hook *hook = iterator.Next();
 
+		uint16 listenerChange = transaction->listener_change;
+
 		hook->hook(transaction->id, event, hook->data);
 
 		if (lookup_transaction(cache, id) != transaction) {
 			// transaction has been removed by the hook!
 			return;
+		} else if (listenerChange != transaction->listener_change) {
+			// Someone has meddled with the listener list, i.e. continuing the
+			// iteration is no longer safe. Rewind.
+			iterator.Rewind();
+			continue;
+			// TODO: Maybe even break out completely, but then we might miss
+			// listeners.
+			// TODO: The whole listener concept needs to be revised!
 		}
 
 		if (removeListener) {
 			iterator.Remove();
 			delete hook;
+			transaction->listener_change++;
 		}
 	}
 }
@@ -1730,6 +1742,7 @@ cache_add_transaction_listener(void *_cache, int32 id,
 	hook->data = data;
 
 	transaction->listeners.Add(hook);
+	transaction->listener_change++;
 	return B_OK;
 }
 
@@ -1752,6 +1765,7 @@ cache_remove_transaction_listener(void *_cache, int32 id,
 		if (hook->data == data && hook->hook == hookFunction) {
 			iterator.Remove();
 			delete hook;
+			transaction->listener_change++;
 			return B_OK;
 		}
 	}
