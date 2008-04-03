@@ -531,7 +531,7 @@ AddTargetVariableToScript $(script) : <build>makebootable ;
 AddTargetVariableToScript $(script) : <build>rc ;
 AddTargetVariableToScript $(script) : <build>resattr ;
 AddTargetVariableToScript $(script) : <build>unzip ;
-AddTargetVariableToScript $(script) : <build>vmdkheader ;
+AddTargetVariableToScript $(script) : <build>vmdkimage ;
 if $(HOST_RM_ATTRS_TARGET) {
 	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
 } else {

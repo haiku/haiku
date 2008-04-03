@@ -2,8 +2,8 @@
  * Copyright 2007, Marcus Overhagen. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _VMDKHEADER_H
-#define _VMDKHEADER_H
+#ifndef _VMDKIMAGE_H
+#define _VMDKIMAGE_H
 
 typedef unsigned char uint8;
 typedef unsigned int  uint32;

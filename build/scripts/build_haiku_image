@@ -21,7 +21,7 @@
 # rc
 # rmAttrs
 # unzip
-# vmdkheader
+# vmdkimage
 #
 if [ $# -gt 0 ]; then
 	. $1
@@ -93,17 +93,19 @@ if [ $isImage ]; then
 	if [ ! $updateOnly ]; then
 		echo "Creating image ..."
 
-		ddFlags=		
+		ddFlags=
 		if [ $isVMwareImage ]; then
-			rm -f "$imagePath"
-			$vmdkheader -h 64k -i${imageSize}M "$imagePath" || exit 1
-			ddFlags="conv=notrunc oflag=append"
-			dontClearImage=
+			vmdkImageFlags=
+			if [ ! "$dontClearImage" ]; then
+				vmdkImageFlags="-c"
+			fi
+			$vmdkimage -h 64k -i${imageSize}M $vmdkImageFlags "$imagePath" \
+				|| exit 1
+		elif [ ! -e "$imagePath" -o ! "$dontClearImage" ]; then
+			dd if=/dev/zero of="$imagePath" bs=1048576 count=$imageSize \
+				|| exit 1
 		fi
 
-		if [ ! -e "$imagePath" -o ! "$dontClearImage" ]; then
-			dd if=/dev/zero of="$imagePath" bs=1048576 count=$imageSize $ddFlags
-		fi
 		$bfsShell --initialize $imageOffsetFlags "$imagePath" Haiku \
 			"block_size 2048" || exit 1
 		$makebootable $imageOffsetFlags "$imagePath"

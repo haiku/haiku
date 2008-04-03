@@ -13,19 +13,22 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "vmdkheader.h"
+#include "vmdkimage.h"
 
 
 static void
 print_usage()
 {
 	printf("\n");
-	printf("vmdkheader\n");
+	printf("vmdkimage\n");
 	printf("\n");
-	printf("usage: vmdkheader -i <imagesize> -h <headersize> [-f] <file>\n");
+	printf("usage: vmdkimage -i <imagesize> -h <headersize> [-c] [-H] [-f] "
+		"<file>\n");
 	printf("       -i, --imagesize    size of raw partition image file\n");
 	printf("       -h, --headersize   size of the vmdk header to write\n");
 	printf("       -f, --file         the raw partition image file\n");
+	printf("       -c, --clear-image  set the image content to zero\n");
+	printf("       -H, --header-only  write only the header\n");
 	exit(EXIT_FAILURE);
 }
 
@@ -36,10 +39,12 @@ main(int argc, char *argv[])
 	uint64 headersize = 0;
 	uint64 imagesize = 0;
 	const char *file = NULL;
+	bool headerOnly = false;
+	bool clearImage = false;
 
 	if (sizeof(SparseExtentHeader) != 512) {
-		fprintf(stderr, "compilation error: struct size is %lu byte\n",
-			sizeof(SparseExtentHeader));
+		fprintf(stderr, "compilation error: struct size is %u byte\n",
+			(unsigned)sizeof(SparseExtentHeader));
 		exit(EXIT_FAILURE);
 	}
 
@@ -50,11 +55,13 @@ main(int argc, char *argv[])
 		 	{"headersize", required_argument, 0, 'h'}, 
 			{"imagesize", required_argument, 0, 'i'}, 
 			{"file", required_argument, 0, 'f'}, 
+			{"clear-image", no_argument, 0, 'c'}, 
+			{"header-only", no_argument, 0, 'H'}, 
 			{0, 0, 0, 0} 
 		};
 
 		opterr = 0; /* don't print errors */
-		c = getopt_long(argc, argv, "h:i:f:", long_options, NULL); 
+		c = getopt_long(argc, argv, "h:i:c:H:f:", long_options, NULL); 
 		if (c == -1) 
 			break; 
 
@@ -83,6 +90,14 @@ main(int argc, char *argv[])
 				file = optarg;
 				break; 
 
+			case 'c':
+				clearImage = true;
+				break; 
+
+			case 'H':
+				headerOnly = true;
+				break; 
+
 			default: 
 				print_usage();
 		} 
@@ -98,8 +113,8 @@ main(int argc, char *argv[])
 	SparseExtentHeader header;
 
 	if (headersize < sizeof(desc) + sizeof(header)) {
-		fprintf(stderr, "Error: header size must be at least %lu byte\n",
-			sizeof(desc) + sizeof(header));
+		fprintf(stderr, "Error: header size must be at least %u byte\n",
+			(unsigned)(sizeof(desc) + sizeof(header)));
 		exit(EXIT_FAILURE);
 	}
 
@@ -144,6 +159,7 @@ main(int argc, char *argv[])
 		cylinders /= 2;
 		heads *= 2;
 	}
+	off_t actualImageSize = (off_t)cylinders * sectors * heads * 512;
 
 	memset(desc, 0, sizeof(desc));
 	memset(&header, 0, sizeof(header));
@@ -203,6 +219,15 @@ main(int argc, char *argv[])
 
 	if (1 != write(fd, "", 1))
 		goto write_err;
+
+	if (!headerOnly) {
+		if (clearImage && ftruncate(fd, headersize) != 0
+			|| ftruncate(fd, actualImageSize)  != 0) {
+			fprintf(stderr, "Error: resizing file %s failed (%s)\n", file,
+				strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	close(fd);
 	return 0;
