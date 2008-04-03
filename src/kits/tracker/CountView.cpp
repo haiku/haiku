@@ -34,35 +34,41 @@ All rights reserved.
 
 // defines the status area drawn in the bottom left corner of a Tracker window
 
+#include "CountView.h"
+
 #include <Application.h>
 
 #include "AutoLock.h"
 #include "Bitmaps.h"
-#include "CountView.h"
 #include "ContainerWindow.h"
 #include "DirMenu.h"
 #include "PoseView.h"
 
+
+const bigtime_t kBarberPoleDelay = 500000;
+
+
 BCountView::BCountView(BRect bounds, BPoseView* view)
-	:	BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,
+	: BView(bounds, "CountVw", B_FOLLOW_LEFT + B_FOLLOW_BOTTOM,
 			B_PULSE_NEEDED | B_WILL_DRAW),
-		fLastCount(-1),
-		fPoseView(view),
-		fShowingBarberPole(false),
-		fBarberPoleMap(NULL),
-		fLastBarberPoleOffset(5),
-		fStartSpinningAfter(0),
-		fTypeAheadString("")
-		
+	fLastCount(-1),
+	fPoseView(view),
+	fShowingBarberPole(false),
+	fBarberPoleMap(NULL),
+	fLastBarberPoleOffset(5),
+	fStartSpinningAfter(0),
+	fTypeAheadString("")
 {
- 	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE, kResBarberPoleBitmap,
-		&fBarberPoleMap);
+ 	GetTrackerResources()->GetBitmapResource(B_MESSAGE_TYPE,
+ 		kResBarberPoleBitmap, &fBarberPoleMap);
 }
+
 
 BCountView::~BCountView()
 {
 	delete fBarberPoleMap;
 }
+
 
 void
 BCountView::TrySpinningBarberPole()
@@ -83,25 +89,26 @@ BCountView::TrySpinningBarberPole()
 		Invalidate(BarberPoleInnerRect());
 }
 
-void 
+
+void
 BCountView::Pulse()
 {
 	TrySpinningBarberPole();
 }
 
-void 
+
+void
 BCountView::EndBarberPole()
 {
 	if (!fShowingBarberPole)
 		return;
-	
+
 	fShowingBarberPole = false;
 	Invalidate();
 }
 
-const bigtime_t kBarberPoleDelay = 500000;
 
-void 
+void
 BCountView::StartBarberPole()
 {
 	AutoLock<BWindow> lock(Window());
@@ -113,7 +120,8 @@ BCountView::StartBarberPole()
 		// wait a bit before showing the barber pole
 }
 
-BRect 
+
+BRect
 BCountView::BarberPoleInnerRect() const
 {
 	BRect result = Bounds();
@@ -123,13 +131,15 @@ BCountView::BarberPoleInnerRect() const
 	return result;
 }
 
-BRect 
+
+BRect
 BCountView::BarberPoleOuterRect() const
 {
 	BRect result(BarberPoleInnerRect());
 	result.InsetBy(-1, -1);
 	return result;
 }
+
 
 BRect
 BCountView::TextInvalRect() const
@@ -138,11 +148,12 @@ BCountView::TextInvalRect() const
 	result.InsetBy(4, 2);
 
 	// if the barber pole is not present, use its space for text
-	if(fShowingBarberPole)
+	if (fShowingBarberPole)
 		result.right -= 10;
 
 	return result;
 }
+
 
 BRect
 BCountView::TextAndBarberPoleRect() const
@@ -152,6 +163,7 @@ BCountView::TextAndBarberPoleRect() const
 
 	return result;
 }
+
 
 void
 BCountView::CheckCount()
@@ -164,6 +176,7 @@ BCountView::CheckCount()
 	// invalidate barber pole area if necessary
 	TrySpinningBarberPole();
 }
+
 
 void
 BCountView::Draw(BRect)
@@ -179,17 +192,18 @@ BCountView::Draw(BRect)
 			itemString << fLastCount << " items";
 	} else
 		itemString << TypeAhead();
-		
+
 	BString string(itemString);
 	BRect textRect(TextInvalRect());
 
 	TruncateString(&string, B_TRUNCATE_END, textRect.Width());
 
-	if (IsTypingAhead())
+	if (IsTypingAhead()) {
 		// use a muted gray for the typeahead
 		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT));
-	else
+	} else
 		SetHighColor(0, 0, 0);
+
 	MovePenTo(textRect.LeftBottom());
 	DrawString(string.String());
 
@@ -212,7 +226,7 @@ BCountView::Draw(BRect)
 		EndLineArray();
 		return;
 	}
-	
+
 	BRect barberPoleRect(BarberPoleOuterRect());
 
 	AddLine(barberPoleRect.LeftTop(), barberPoleRect.RightTop(), shadow);
@@ -236,6 +250,7 @@ BCountView::Draw(BRect)
 	if (fBarberPoleMap)
 		DrawBitmap(fBarberPoleMap, destRect);
 }
+
 
 void
 BCountView::MouseDown(BPoint)
@@ -266,6 +281,7 @@ BCountView::MouseDown(BPoint)
 	}
 }
 
+
 void
 BCountView::AttachedToWindow()
 {
@@ -278,12 +294,14 @@ BCountView::AttachedToWindow()
 	CheckCount();
 }
 
-void 
+
+void
 BCountView::SetTypeAhead(const char *string)
 {
 	fTypeAheadString = string;
 	Invalidate();
 }
+
 
 const char * 
 BCountView::TypeAhead() const
@@ -291,7 +309,8 @@ BCountView::TypeAhead() const
 	return fTypeAheadString.String();
 }
 
-bool 
+
+bool
 BCountView::IsTypingAhead() const
 {
 	return fTypeAheadString.Length() != 0;
