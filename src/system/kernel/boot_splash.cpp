@@ -36,7 +36,7 @@ static struct frame_buffer_boot_info *sInfo;
 static void
 blit15_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+	const uint8 *palette, uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint16* start = (uint16*)(sInfo->frame_buffer
@@ -64,7 +64,7 @@ blit15_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 static void
 blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+	const uint8 *palette, uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint16* start = (uint16*)(sInfo->frame_buffer
@@ -91,7 +91,7 @@ blit16_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 static void
 blit24_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+	const uint8 *palette, uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint8* start = (uint8*)(sInfo->frame_buffer
@@ -117,7 +117,7 @@ blit24_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 static void
 blit32_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 	uint16 imageRight, uint16 imageBottom, uint16 imageWidth,
-	uint16 imageHeight, const uint8 *palette, uint16 left, uint16 top)
+	const uint8 *palette, uint16 left, uint16 top)
 {
 	data += (imageWidth * imageTop + imageLeft) * 3;
 	uint32* start = (uint32*)(sInfo->frame_buffer
@@ -141,25 +141,24 @@ blit32_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
 static void
 blit_cropped(const uint8* data, const uint8* indexedData,
 	uint16 imageLeft, uint16 imageTop, uint16 imageRight, uint16 imageBottom,
-	uint16 imageWidth, uint16 imageHeight, const uint8 *palette,
-	uint16 left, uint16 top)
+	uint16 imageWidth, const uint8 *palette, uint16 left, uint16 top)
 {
 	switch (sInfo->depth) {
 		case 15:
 			blit15_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, imageHeight, palette, left, top);
+				imageWidth, palette, left, top);
 			return;
 		case 16:
 			blit16_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, imageHeight, palette, left, top);
+				imageWidth, palette, left, top);
 			return;
 		case 24:
 			blit24_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, imageHeight, palette, left, top);
+				imageWidth, palette, left, top);
 			return;
 		case 32:
 			blit32_cropped(data, imageLeft, imageTop, imageRight, imageBottom,
-				imageWidth, imageHeight, palette, left, top);
+				imageWidth, palette, left, top);
 			return;
 	}
 }
@@ -189,17 +188,19 @@ boot_splash_set_stage(int stage)
 	if (sInfo == NULL || stage < 0 || stage >= BOOT_SPLASH_STAGE_MAX)
 		return;
 
-	// TODO: Use placement info from images.h
-	int x = sInfo->width / 2 - kSplashIconsWidth / 2;
-	int y = sInfo->height / 2 - kSplashLogoHeight / 2;
-	y = y + kSplashLogoHeight;
+	int iconsHalfHeight = kSplashIconsHeight / 2;
+	int width = min_c(kSplashIconsWidth, sInfo->width);
+	int height = min_c(iconsHalfHeight, sInfo->height);
+	int placementX = max_c(0, min_c(100, kSplashIconsPlacementX));
+	int placementY = max_c(0, min_c(100, kSplashIconsPlacementY));
 
-	int stageLeftEdge = kSplashIconsWidth * stage / BOOT_SPLASH_STAGE_MAX;
-	int stageRightEdge = kSplashIconsWidth * (stage + 1)
-		/ BOOT_SPLASH_STAGE_MAX;
+	int x = (sInfo->width - width) * placementX / 100;
+	int y = (sInfo->height - height) * placementY / 100;
+
+	int stageLeftEdge = width * stage / BOOT_SPLASH_STAGE_MAX;
+	int stageRightEdge = width * (stage + 1) / BOOT_SPLASH_STAGE_MAX;
 
 	blit_cropped(kSplashIconsImage, NULL, stageLeftEdge, 0, stageRightEdge,
-		kSplashIconsHeight / 2, kSplashIconsWidth, kSplashIconsHeight, NULL,
-		x, y);
+		iconsHalfHeight, kSplashIconsWidth, NULL, x, y);
 }
 
