@@ -139,7 +139,7 @@ MainWindow::MessageReceived(BMessage* message)
 							"running?";
 				} else {
 					status_t ret = be_roster->Launch(button->Ref());
-					if (ret < B_OK) {
+					if (ret < B_OK && ret != B_ALREADY_RUNNING) {
 						errorMessage = "Failed to launch '";
 						BPath path(button->Ref());
 						if (path.InitCheck() >= B_OK)
@@ -154,7 +154,7 @@ MainWindow::MessageReceived(BMessage* message)
 			}
 			if (!launchedByRef && button->AppSignature()) {
 				status_t ret = be_roster->Launch(button->AppSignature());
-				if (ret != B_OK) {
+				if (ret != B_OK && ret != B_ALREADY_RUNNING) {
 					errorMessage = "Failed to launch application with "
 						"signature '";
 					errorMessage << button->AppSignature() << "'.\n\nError: ";
