@@ -19,7 +19,7 @@
 Media::Media() 
 	: BApplication("application/x-vnd.Haiku-Media")
 {
-	BRect rect(32,64,637,442);
+	BRect rect(32,64,637,462);
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -51,7 +51,6 @@ Media::Media()
 	}
 
 	fWindow = new MediaWindow(rect);
-	fWindow->SetSizeLimits(605.0, 10000.0, 378.0, 10000.0);
 
 	be_roster->StartWatching(BMessenger(this));
 }

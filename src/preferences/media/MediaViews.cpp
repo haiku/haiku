@@ -26,6 +26,9 @@
 #include <MediaAddOn.h>
 #include <String.h>
 #include <TextView.h>
+#include <GroupView.h>
+#include <SpaceLayoutItem.h>
+
 #include "MediaViews.h"
 
 BarView::BarView(BRect frame) 
@@ -55,9 +58,10 @@ BarView::Draw(BRect updateRect)
 
 SettingsView::SettingsView (BRect frame, bool isVideo)
  : BView (frame, "SettingsView", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW ),
- 	fIsVideo(isVideo)
+	fIsVideo(isVideo)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
 	BRect rect(frame);
 	rect.left += 10;
 	rect.top += 12;
@@ -65,33 +69,46 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	rect.bottom = rect.top + 104;
 	BBox *defaultsBox = new BBox(rect, "defaults");
 	defaultsBox->SetLabel(fIsVideo ? "Default Nodes" : "Defaults");
-	AddChild(defaultsBox);
 	
+	// create the default box
+	BGroupLayout* defaultBoxLayout = new BGroupLayout(B_VERTICAL, 5);
+	float inset = defaultsBox->Frame().left - defaultsBox->InnerFrame().left;
+	defaultBoxLayout->SetInsets(inset, defaultsBox->TopBorderOffset() * 2, inset, inset);
+	defaultsBox->SetLayout(defaultBoxLayout);
+	defaultBoxLayout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(5));
+
+	BGroupView* inputField = new BGroupView(B_HORIZONTAL);
+	BGroupView* outputField = new BGroupView(B_HORIZONTAL);
+	defaultsBox->GetLayout()->AddView(inputField);
+	defaultsBox->GetLayout()->AddView(outputField);
+
 	BRect defaultRect(20, 22, 250, 40);
 	float divider = StringWidth(fIsVideo ? "Video Output:" : "Audio Output:") + 5;
 	fMenu1 = new BPopUpMenu("<none>");
 	fMenu1->SetLabelFromMarked(true);
-	BMenuField *menuField1 = new BMenuField(defaultRect, "menuField1", 
+	BMenuField *menuField1 = new BMenuField(defaultRect, "menuField1",
 		fIsVideo ? "Video Input:" : "Audio Input:", fMenu1);
-	defaultsBox->AddChild(menuField1);
 	menuField1->SetDivider(divider);
 	
 	defaultRect.OffsetBy(0, 26);
 	fMenu2 = new BPopUpMenu("<none>");
 	fMenu2->SetLabelFromMarked(true);
-	BMenuField *menuField2 = new BMenuField(defaultRect, "menuField2", 
+	BMenuField *menuField2 = new BMenuField(defaultRect, "menuField2",
 		fIsVideo ? "Video Output:" : "Audio Output:", fMenu2);
-	defaultsBox->AddChild(menuField2);
 	menuField2->SetDivider(divider);
 	
+	inputField->GroupLayout()->AddView(menuField1);
+	outputField->GroupLayout()->AddView(menuField2);
+
+	BMenuField *menuField3 = NULL;
 	if (!fIsVideo) {
 		defaultRect.OffsetBy(186, 0);
 		defaultRect.right -= 30;
 		fMenu3 = new BPopUpMenu("<none>");
 		fMenu3->SetLabelFromMarked(true);
-		BMenuField *menuField3 = new BMenuField(defaultRect, "menuField3", 
+		menuField3 = new BMenuField(defaultRect, "menuField3",
 			"Channel:", fMenu3);
-		defaultsBox->AddChild(menuField3);
+		outputField->GroupLayout()->AddView(menuField3);
 		menuField3->SetDivider(StringWidth("Channel:")+5);
 		defaultRect.right += 30;
 		defaultRect.OffsetBy(-186, 0);
@@ -100,24 +117,23 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	defaultRect.OffsetBy(0, 32);
 	defaultRect.right += 100;
 	rgb_color red_color = {222, 32, 33};
-	fRestartView = new BStringView(defaultRect, "restartStringView", "Restart the Media Server to apply changes.", 
+	fRestartView = new BStringView(defaultRect, "restartStringView", "Restart the Media Server to apply changes.",
 		B_FOLLOW_ALL, B_WILL_DRAW);
 	fRestartView->SetHighColor(red_color);
 	defaultsBox->AddChild(fRestartView);
 	fRestartView->Hide();
 	
+	// create the realtime box
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 162;
 	BBox *realtimeBox = new BBox(rect, "realtime");
 	realtimeBox->SetLabel("Real-Time");
-	AddChild(realtimeBox);
 	
 	BMessage *message = new BMessage(ML_ENABLE_REAL_TIME);
 	message->AddBool("isVideo", fIsVideo);
-	BRect rect2(22,20, 190, 40);
-	fRealtimeCheckBox = new BCheckBox(rect2, "realtimeCheckBox", 
+	BRect rect2(22,20, frame.Width() - 22, 40);
+	fRealtimeCheckBox = new BCheckBox(rect2, "realtimeCheckBox",
 		fIsVideo ? "Enable Real-Time Video" : "Enable Real-Time Audio", message);
-	realtimeBox->AddChild(fRealtimeCheckBox);
 	
 	uint32 flags;
 	BMediaRoster::Roster()->GetRealtimeFlags(&flags);
@@ -126,7 +142,6 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 		
 	rect2.top += 26;
 	rect2.bottom = rect.Height() - 5;
-	rect2.right = rect.right - 15;
 	BRect textRect(3, 3, rect2.Width() - 3, rect2.Height() - 3);
 	BTextView *textView = new BTextView(rect2, "stringView", textRect, B_FOLLOW_ALL, B_WILL_DRAW);
 	textView->Insert(fIsVideo ? "Enabling Real-Time Video allows the BeOS to perform video operations as fast and smoothly as possible.  It achieves optimum performance by using more RAM."
@@ -136,14 +151,23 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);
 	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	realtimeBox->AddChild(textView);
 	
+	BGroupLayout* realtimeBoxLayout = new BGroupLayout(B_VERTICAL, 5);
+	inset = realtimeBox->Frame().left - realtimeBox->InnerFrame().left;
+	realtimeBoxLayout->SetInsets(inset, defaultsBox->TopBorderOffset() * 2, inset, inset);
+	realtimeBox->SetLayout(realtimeBoxLayout);
+	
+	realtimeBoxLayout->AddItem(BSpaceLayoutItem::CreateVerticalStrut(5));
+	realtimeBoxLayout->AddView(fRealtimeCheckBox);
+	realtimeBoxLayout->AddView(textView);
+
+	// create the bottom line: volumen in deskbar checkbox and restart button
+	BGroupView* bottomView = new BGroupView(B_HORIZONTAL);
 	rect.top = rect.bottom + 11;
 	rect.bottom = rect.top + 20;
 	rect.left = rect.right - StringWidth("Restart Media Services") - 20;
 	BButton *restartButton = new BButton(rect, "restartButton", 
 		"Restart Media Services", new BMessage(ML_RESTART_MEDIA_SERVER));
-	AddChild(restartButton);
 	
 	if (!fIsVideo) {
 		rect.right = rect.left - 10;
@@ -151,14 +175,24 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 		rect.left = frame.left + 33;
 		if (StringWidth("Show Volume Control on Deskbar") > rect.Width() - 30)
 			rect.left -= 10;
-		
 		fVolumeCheckBox = new BCheckBox(rect, "volumeCheckBox", 
 			"Show Volume Control on Deskbar", new BMessage(ML_SHOW_VOLUME_CONTROL));
-		AddChild(fVolumeCheckBox);
-		
+		bottomView->GroupLayout()->AddView(fVolumeCheckBox);
 		if (BDeskbar().HasItem("MediaReplicant"))
 			fVolumeCheckBox->SetValue(B_CONTROL_ON);	
 	}
+	else{
+		bottomView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+	}
+	bottomView->GroupLayout()->AddView(restartButton);
+	
+	// compose all stuff
+	BGroupLayout* rootlayout = new BGroupLayout(B_VERTICAL, 5);
+	SetLayout(rootlayout);
+
+	rootlayout->AddView(defaultsBox);
+	rootlayout->AddView(realtimeBox);
+	rootlayout->AddView(bottomView);
 }
 
 void

@@ -23,6 +23,8 @@
 #include <String.h>
 #include <Debug.h>
 #include <Autolock.h>
+#include <GroupView.h>
+#include <SpaceLayoutItem.h>
 #include "MediaWindow.h"
 
 // Images
@@ -148,16 +150,19 @@ MediaWindow::InitWindow(void)
 	// Bitmaps
 	BRect iconRect(0, 0, 15, 15);
 	BBitmap *icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kDevicesBits, kDevicesWidth*kDevicesHeight, 0, kDevicesColorSpace);
+	icon->SetBits(kDevicesBits, kDevicesWidth*kDevicesHeight, 0,
+			kDevicesColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kMixerBits, kMixerWidth*kMixerHeight, 0, kMixerColorSpace);
+	icon->SetBits(kMixerBits, kMixerWidth*kMixerHeight, 0,
+			kMixerColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
 	icon->SetBits(kMicBits, kMicWidth*kMicHeight, 0, kMicColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
-	icon->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0, kSpeakerColorSpace);
+	icon->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0,
+			kSpeakerColorSpace);
 	fIcons.AddItem(icon);
 	icon = new BBitmap(iconRect, B_CMAP8);
 	icon->SetBits(kCamBits, kCamWidth*kCamHeight, 0, kCamColorSpace);
@@ -166,47 +171,80 @@ MediaWindow::InitWindow(void)
 	icon->SetBits(kTVBits, kTVWidth*kTVHeight, 0, kTVColorSpace);
 	fIcons.AddItem(icon);
 
+	const float scrollWidth = 9 * be_plain_font->Size() + 30;
+	const float contentWidth = 34 * be_plain_font->Size();
+	float totalWidthFont = scrollWidth + contentWidth + 14 * 3;
+	const float totalWidth = (605.0 > totalWidthFont) ?
+		605.0 : totalWidthFont;
 
 	BRect bounds = Bounds(); // the whole view
-
 	// Create the OutlineView
-	BRect menuRect(bounds.left+14, bounds.top+14, bounds.left+146, bounds.bottom-14);
-	BRect titleRect(menuRect.right+14, menuRect.top, bounds.right-10, menuRect.top+16);
-	BRect availableRect(menuRect.right+15, titleRect.bottom+12, bounds.right-14, bounds.bottom-4);
-	BRect barRect(titleRect.left, titleRect.bottom+10, titleRect.right-2, titleRect.bottom+11);
+	font_height titleHeightStruct;
+	be_bold_font->GetHeight(&titleHeightStruct);
+	float titleHeight = titleHeightStruct.ascent + titleHeightStruct.descent
+		+ titleHeightStruct.leading + 1;
 
-	fListView = new BListView(menuRect, "media_list_view", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
+	BRect menuRect(bounds.left + 14, bounds.top + 14, scrollWidth,
+		bounds.bottom - 14);
+	BRect titleRect(menuRect.right + 14, menuRect.top,
+		totalWidth - 10, menuRect.top + titleHeight);
+	BRect availableRect(menuRect.right + 15, titleRect.bottom + 12,
+		totalWidth - 14, bounds.bottom - 16);
+	BRect barRect(titleRect.left, titleRect.bottom + 10,
+		titleRect.right - 2, titleRect.bottom + 11);
+
+	fListView = new BListView(menuRect, "media_list_view",
+		B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
 	fListView->SetSelectionMessage(new BMessage(ML_SELECTED_NODE));
 	
 	// Add ScrollView to Media Menu
-	BScrollView *scrollView = new BScrollView("listscroller", fListView, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, false, B_FANCY_BORDER);
-	
+	BScrollView *scrollView = new BScrollView("listscroller",
+		fListView, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, false,
+		B_FANCY_BORDER);
+	scrollView->SetExplicitMinSize(BSize(scrollWidth, B_SIZE_UNSET));
+	scrollView->SetExplicitMaxSize(BSize(scrollWidth, B_SIZE_UNSET));
+
 	// Create the Views
-	fBox = new BBox(bounds, "background", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
-	
-	// Add Child(ren)
-	AddChild(fBox);
-	fBox->AddChild(scrollView);
+	fBox = new BBox(bounds, "background", B_FOLLOW_ALL_SIDES,
+		B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER);
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	GetLayout()->AddView(fBox);
 	
 	// StringViews
 	rgb_color titleFontColor = { 0,0,0,0 };
-	fTitleView = new BStringView(titleRect, "AudioSettings", "Audio Settings", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	fTitleView = new BStringView(titleRect, "AudioSettings",
+		"Audio Settings", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
 	fTitleView->SetFont(be_bold_font);
-	fTitleView->SetFontSize(12.0);
 	fTitleView->SetHighColor(titleFontColor);
 	
-	fBox->AddChild(fTitleView);
+	fContentView = new BBox(availableRect, "contentView",
+		B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
 	
-	fContentView = new BBox(availableRect, "contentView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW | B_FRAME_EVENTS, B_NO_BORDER);
-	fBox->AddChild(fContentView);
-	
-	BRect settingsRect(0, 0, 442, 335);
+	BRect settingsRect(0, 0, availableRect.Width(), availableRect.Height());
 	fAudioView = new SettingsView(settingsRect, false);
 	fVideoView = new SettingsView(settingsRect, true);
 	
 	fBar = new BarView(barRect);
-	fBox->AddChild(fBar);
+	BGroupView* titleGroupView = new BGroupView(B_HORIZONTAL);
+	titleGroupView->GroupLayout()->AddView(fTitleView);
+	titleGroupView->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+
+	// Layout all views
+	BGroupView* rightView = new BGroupView(B_VERTICAL, 5);
+	rightView->GroupLayout()->SetInsets(14, 0, 0, 0);
+	rightView->GroupLayout()->AddView(titleGroupView);
+	rightView->GroupLayout()->AddView(fBar, 0);
+	rightView->GroupLayout()->AddView(fContentView);
 	
+	BGroupLayout* rootLayout = new BGroupLayout(B_HORIZONTAL);
+	rootLayout->SetInsets(14, 14, 14, 14);
+	fBox->SetLayout(rootLayout);
+	
+	rootLayout->AddView(scrollView);
+	
+	rootLayout->AddView(rightView);
+	
+	// Start the window
 	fInitCheck = InitMedia(true);
 	if (fInitCheck != B_OK) {
 		PostMessage(B_QUIT_REQUESTED);
@@ -214,8 +252,16 @@ MediaWindow::InitWindow(void)
 		if (IsHidden())
 			Show();
 	}
+	
+	// Set window limits
+	ResizeTo(totalWidth + 14, bounds.Height());
+	SetZoomLimits(totalWidth + 14, bounds.Height());
+	SetSizeLimits(totalWidth + 14, 100000, bounds.Height(), 100000);
 }
-// ---------------------------------------------------------------------------------------------------------- //
+
+
+// #pragma mark -
+
 
 status_t
 MediaWindow::InitMedia(bool first)
