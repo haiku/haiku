@@ -65,6 +65,9 @@ public:
 
 	status_t ScanPartition(KPartition* partition);
 
+	partition_id CreateDevice(const char *path, bool *newlyCreated = NULL);
+	status_t DeleteDevice(const char *path);
+
 	partition_id CreateFileDevice(const char* filePath,
 		bool* newlyCreated = NULL);
 	status_t DeleteFileDevice(const char *filePath);
@@ -90,13 +93,9 @@ public:
 	KDiskSystem *LoadDiskSystem(disk_system_id id);
 	KDiskSystem *LoadNextDiskSystem(int32 *cookie);
 
-	// Watching
-
-	// TODO: Watching service for the kernel. The userland watching is handled
-	// by the registrar.
-
 	status_t InitialDeviceScan();
 	status_t RescanDiskSystems();
+	status_t StartMonitoring();
 
 private:
 	static status_t _CheckMediaStatusDaemon(void* self);
@@ -117,10 +116,13 @@ private:
 	status_t _ScanPartition(KPartition *partition);
 		// used by the other _ScanPartition() version only
 
+	status_t _AddRemoveMonitoring(const char *path, bool add);
+
 	struct DeviceMap;
 	struct DiskSystemMap;
 	struct PartitionMap;
 	struct PartitionSet;
+	class DeviceWatcher;
 
 	BLocker						fLock;
 	DeviceMap					*fDevices;
@@ -129,6 +131,7 @@ private:
 	PartitionSet				*fObsoletePartitions;
 	thread_id					fMediaChecker;
 	volatile bool				fTerminating;
+	DeviceWatcher				*fDeviceWatcher;
 
 	static KDiskDeviceManager	*sDefaultManager;
 };

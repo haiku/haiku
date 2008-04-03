@@ -23,6 +23,11 @@
 #include <KernelExport.h>
 #include <util/kernel_cpp.h>
 
+#include <NodeMonitor.h>
+#include <node_monitor.h>
+#include <Notifications.h>
+#include <vfs.h>
+
 #include <dirent.h>
 #include <errno.h>
 #include <module.h>
@@ -87,6 +92,73 @@ struct KDiskDeviceManager::PartitionSet : VectorSet<KPartition*> {
 };
 
 
+// DeviceWatcher
+class KDiskDeviceManager::DeviceWatcher : public NotificationListener {
+	public:
+		DeviceWatcher(KDiskDeviceManager *manager)
+			:	fManager(manager)
+		{
+		}
+
+		virtual ~DeviceWatcher()
+		{
+		}
+
+		virtual void EventOccured(NotificationService &service,
+			const KMessage *event)
+		{
+			int32 opCode = event->GetInt32("opcode", -1);
+			switch (opCode) {
+				case B_ENTRY_CREATED:
+				case B_ENTRY_REMOVED:
+				{
+					const char *name = event->GetString("name", "");
+					dev_t device = event->GetInt32("device", -1);
+					ino_t directory = event->GetInt64("directory", -1);
+					ino_t node = event->GetInt64("node", -1);
+
+					// TODO: it would be nice if we could stat based on the
+					// node here instead of having to resolve the path
+					KPath path(B_PATH_NAME_LENGTH + 1);
+					if (path.InitCheck() != B_OK
+						|| vfs_entry_ref_to_path(device, directory, name,
+						path.LockBuffer(), path.BufferSize()) != B_OK)
+						break;
+					path.UnlockBuffer();
+
+					struct stat st;
+					if (lstat(path.Path(), &st) != 0)
+						break;
+
+					if (S_ISDIR(st.st_mode)) {
+						if (opCode == B_ENTRY_CREATED)
+							add_node_listener(device, node, B_WATCH_DIRECTORY,
+								*this);
+						else
+							remove_node_listener(device, node, *this);
+					} else {
+						if (strcmp(name, "raw") == 0) {
+							// a new raw device was added/removed
+							if (opCode == B_ENTRY_CREATED)
+								fManager->CreateDevice(path.Path());
+							else
+								fManager->DeleteDevice(path.Path());
+						}
+					}
+
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+
+	private:
+		KDiskDeviceManager *fManager;
+};
+
+
 static bool
 is_active_job_status(uint32 status)
 {
@@ -105,7 +177,8 @@ KDiskDeviceManager::KDiskDeviceManager()
 	  fDiskSystems(new(nothrow) DiskSystemMap),
 	  fObsoletePartitions(new(nothrow) PartitionSet),
 	  fMediaChecker(-1),
-	  fTerminating(false)
+	  fTerminating(false),
+	  fDeviceWatcher(new(nothrow) DeviceWatcher(this))
 {
 	if (InitCheck() != B_OK)
 		return;
@@ -128,6 +201,9 @@ KDiskDeviceManager::~KDiskDeviceManager()
 
 	status_t result;
 	wait_for_thread(fMediaChecker, &result);
+
+	// stop all node monitoring
+	_AddRemoveMonitoring("/dev/disk", false);
 
 	// remove all devices
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie);) {
@@ -488,6 +564,78 @@ KDiskDeviceManager::ScanPartition(KPartition* partition)
 }
 
 
+partition_id
+KDiskDeviceManager::CreateDevice(const char *path, bool *newlyCreated)
+{
+	if (!path)
+		return B_BAD_VALUE;
+
+	status_t error = B_ERROR;
+	if (ManagerLocker locker = this) {
+		KDiskDevice *device = FindDevice(path);
+		if (device != NULL) {
+			// we already know this device
+			if (newlyCreated)
+				*newlyCreated = false;
+
+			return device->ID();
+		}
+
+		// create a KDiskDevice for it
+		device = new(nothrow) KDiskDevice;
+		if (!device)
+			return B_NO_MEMORY;
+
+		// initialize and add the device
+		error = device->SetTo(path);
+
+		// Note: Here we are allowed to lock a device although already having
+		// the manager locked, since it is not yet added to the manager.
+		DeviceWriteLocker deviceLocker(device);
+		if (error == B_OK && !deviceLocker.IsLocked())
+			error = B_ERROR;
+		if (error == B_OK && !_AddDevice(device))
+			error = B_NO_MEMORY;
+
+		// cleanup on error
+		if (error != B_OK) {
+			delete device;
+			return error;
+		}
+
+		if (error == B_OK) {
+			// scan for partitions
+			_ScanPartition(device, false);
+			device->UnmarkBusy(true);
+
+			if (newlyCreated)
+				*newlyCreated = true;
+
+			return device->ID();
+		}
+	}
+
+	return error;
+}
+
+
+status_t
+KDiskDeviceManager::DeleteDevice(const char *path)
+{
+	KDiskDevice *device = FindDevice(path);
+	if (device == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	PartitionRegistrar _(device, true);
+	if (DeviceWriteLocker locker = device) {
+		if (_RemoveDevice(device))
+			return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
 // CreateFileDevice
 partition_id
 KDiskDeviceManager::CreateFileDevice(const char *filePath, bool* newlyCreated)
@@ -757,6 +905,18 @@ KDiskDeviceManager::InitialDeviceScan()
 	}
 	return error;
 }
+
+
+status_t
+KDiskDeviceManager::StartMonitoring()
+{
+	// do another scan, this will populate the devfs directories
+	InitialDeviceScan();
+	// start monitoring all dirs under /dev/disk
+	status_t result = _AddRemoveMonitoring("/dev/disk", true);
+	return result;
+}
+
 
 // _RescanDiskSystems
 status_t
@@ -1120,6 +1280,50 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 	} else {
 		// contents not recognized
 		// nothing to be done -- partitions are created as unrecognized
+	}
+
+	return error;
+}
+
+
+status_t
+KDiskDeviceManager::_AddRemoveMonitoring(const char *path, bool add)
+{
+	struct stat st;
+	if (lstat(path, &st) < 0)
+		return errno;
+
+	status_t error = B_ENTRY_NOT_FOUND;
+	if (S_ISDIR(st.st_mode)) {
+		if (add) {
+			error = add_node_listener(st.st_dev, st.st_ino, B_WATCH_DIRECTORY,
+				*fDeviceWatcher);
+		} else {
+			error = remove_node_listener(st.st_dev, st.st_ino,
+				*fDeviceWatcher);
+		}
+		if (error != B_OK)
+			return error;
+
+		DIR *dir = opendir(path);
+		if (!dir)
+			return errno;
+
+		while (dirent *entry = readdir(dir)) {
+			// skip "." and ".."
+			if (!strcmp(entry->d_name, ".") || !strcmp(entry->d_name, ".."))
+				continue;
+
+			KPath entryPath;
+			if (entryPath.SetPath(path) != B_OK
+				|| entryPath.Append(entry->d_name) != B_OK) {
+				continue;
+			}
+
+			if (_AddRemoveMonitoring(entryPath.Path(), add) == B_OK)
+				error = B_OK;
+		}
+		closedir(dir);
 	}
 
 	return error;
