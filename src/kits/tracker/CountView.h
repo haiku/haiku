@@ -66,6 +66,7 @@ private:
 	BRect BarberPoleInnerRect() const;
 	BRect BarberPoleOuterRect() const;
 	BRect TextInvalRect() const;
+	BRect TextAndBarberPoleRect() const;
 	void TrySpinningBarberPole();
 
 	int32 fLastCount;

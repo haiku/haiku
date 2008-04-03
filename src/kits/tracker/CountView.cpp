@@ -73,9 +73,12 @@ BCountView::TrySpinningBarberPole()
 	if (fStartSpinningAfter && system_time() < fStartSpinningAfter)
 		return;
 
+	// When the barber pole just starts spinning we need to invalidate
+	// the whole rectangle of text and barber pole.
+	// After this the text needs no updating since only the pole changes.
 	if (fStartSpinningAfter) {
 		fStartSpinningAfter = 0;
-		Invalidate(BarberPoleOuterRect());
+		Invalidate(TextAndBarberPoleRect());
 	} else
 		Invalidate(BarberPoleInnerRect());
 }
@@ -133,7 +136,19 @@ BCountView::TextInvalRect() const
 {
 	BRect result = Bounds();
 	result.InsetBy(4, 2);
-	result.right -= 10;
+
+	// if the barber pole is not present, use its space for text
+	if(fShowingBarberPole)
+		result.right -= 10;
+
+	return result;
+}
+
+BRect
+BCountView::TextAndBarberPoleRect() const
+{
+	BRect result = Bounds();
+	result.InsetBy(4, 2);
 
 	return result;
 }
@@ -154,7 +169,6 @@ void
 BCountView::Draw(BRect)
 {
 	BRect bounds(Bounds());
-	BRect barberPoleRect;
 	BString itemString;
 	if (!IsTypingAhead()) {
 		if (fLastCount == 0) 
@@ -166,14 +180,10 @@ BCountView::Draw(BRect)
 	} else
 		itemString << TypeAhead();
 		
-	
 	BString string(itemString);
 	BRect textRect(TextInvalRect());
 
-	if (fShowingBarberPole && !fStartSpinningAfter) {
-		barberPoleRect = BarberPoleOuterRect();
-		TruncateString(&string, B_TRUNCATE_END, textRect.Width());
-	}
+	TruncateString(&string, B_TRUNCATE_END, textRect.Width());
 
 	if (IsTypingAhead())
 		// use a muted gray for the typeahead
@@ -202,6 +212,8 @@ BCountView::Draw(BRect)
 		EndLineArray();
 		return;
 	}
+	
+	BRect barberPoleRect(BarberPoleOuterRect());
 
 	AddLine(barberPoleRect.LeftTop(), barberPoleRect.RightTop(), shadow);
 	AddLine(barberPoleRect.LeftTop(), barberPoleRect.LeftBottom(), shadow);
