@@ -285,7 +285,7 @@ void RawBuffer::free() {
 	if(m_pPool)
 		rtm_free(m_pData);
 	else
-		delete [] m_pData;
+		delete [] (int8 *)m_pData;
 		
 	m_pData = 0;
 }
