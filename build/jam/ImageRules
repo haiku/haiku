@@ -38,7 +38,7 @@ rule InitScript
 actions InitScript1
 {
 	$(RM) $(1)
-	echo -n > $(1)
+	touch $(1)
 }
 
 rule AddVariableToScript script : variable : value
