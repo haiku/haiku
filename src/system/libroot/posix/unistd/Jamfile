@@ -16,6 +16,7 @@ MergeObject posix_unistd.o :
 	fcntl.c
 	fork.c
 	getlogin.c
+	getpagesize.c
 	hostname.cpp
 	ioctl.c
 	link.c

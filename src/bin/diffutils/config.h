@@ -36,8 +36,6 @@
 # define DIR_TO_FD(Dir_p) -1
 #endif
 
-#define getpagesize() 4096
-
 /* Define if there is a member named d_ino in the struct describing directory
    headers. */
 #define D_INO_IN_DIRENT 1
@@ -422,7 +420,7 @@
 /* #undef HAVE_GETMNTINFO */
 
 /* Define to 1 if you have the `getpagesize' function. */
-/* #undef HAVE_GETPAGESIZE */
+#define HAVE_GETPAGESIZE 1
 
 /* Define to 1 if you have the `getpass' function. */
 /* #undef HAVE_GETPASS */

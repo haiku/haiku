@@ -58,7 +58,6 @@ StaticLibrary <gdb>libiberty.a :
 	# me, but some of those should be provided by Haiku.
 	basename.c
 	clock.c
-	getpagesize.c
 	index.c
 	insque.c
 	mempcpy.c

@@ -115,6 +115,7 @@ extern int		lchown(const char *path, uid_t owner, gid_t group);
 
 extern int		mknod(const char *name, mode_t mode, dev_t dev);
 
+extern int		getpagesize(void);
 extern int      getdtablesize(void);
 extern long		sysconf(int name);
 extern long		fpathconf(int fd, int name);
