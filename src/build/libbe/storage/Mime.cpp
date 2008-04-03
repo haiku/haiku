@@ -15,7 +15,7 @@
 #include <Entry.h>
 #include <Messenger.h>
 #include <Mime.h>
-#if !defined(HAIKU_HOST_PLATFORM_DANO) && !defined(HAIKU_HOST_PLATFORM_BEOS) && !defined(HAIKU_HOST_PLATFORM_BONE)
+#if !defined(HAIKU_HOST_PLATFORM_DANO) && !defined(HAIKU_HOST_PLATFORM_BEOS) && !defined(HAIKU_HOST_PLATFORM_BONE) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
 #	include <MimeType.h>
 #endif
 #include <mime/database_access.h>
@@ -84,4 +84,3 @@ create_app_meta_mime(const char *path, int recursive, int synchronous,
 	// We don't have a MIME DB...
 	return B_OK;
 }
-

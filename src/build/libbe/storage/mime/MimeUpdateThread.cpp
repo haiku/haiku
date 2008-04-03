@@ -31,7 +31,7 @@
 namespace BPrivate {
 namespace Storage {
 
-#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE)
+#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE) || defined(HAIKU_HOST_PLATFORM_HAIKU)
 // device_is_root_device
 bool
 device_is_root_device(dev_t device)
