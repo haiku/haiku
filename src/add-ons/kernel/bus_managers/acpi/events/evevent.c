@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evevent - Fixed Event handling and dispatch
- *              $Revision: 1.124 $
+ *              $Revision: 1.127 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -369,6 +369,7 @@ AcpiEvFixedEventDetect (
         {
             /* Found an active (signalled) event */
 
+            AcpiFixedEventCount[i]++;
             IntStatus |= AcpiEvFixedEventDispatch ((UINT32) i);
         }
     }
@@ -394,7 +395,6 @@ static UINT32
 AcpiEvFixedEventDispatch (
     UINT32                  Event)
 {
-
 
     ACPI_FUNCTION_ENTRY ();
 

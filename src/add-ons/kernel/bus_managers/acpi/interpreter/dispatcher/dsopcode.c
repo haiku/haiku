@@ -2,7 +2,7 @@
  *
  * Module Name: dsopcode - Dispatcher Op Region support and handling of
  *                         "control" opcodes
- *              $Revision: 1.109 $
+ *              $Revision: 1.115 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,6 +124,7 @@
 #include "acinterp.h"
 #include "acnamesp.h"
 #include "acevents.h"
+#include "actables.h"
 
 #define _COMPONENT          ACPI_DISPATCHER
         ACPI_MODULE_NAME    ("dsopcode")
@@ -302,6 +303,53 @@ AcpiDsGetBufferFieldArguments (
 
     ACPI_DEBUG_EXEC(AcpiUtDisplayInitPathname (ACPI_TYPE_BUFFER_FIELD, Node, NULL));
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "[%4.4s] BufferField Arg Init\n",
+        AcpiUtGetNodeName (Node)));
+
+    /* Execute the AML code for the TermArg arguments */
+
+    Status = AcpiDsExecuteArguments (Node, AcpiNsGetParentNode (Node),
+                ExtraDesc->Extra.AmlLength, ExtraDesc->Extra.AmlStart);
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiDsGetBankFieldArguments
+ *
+ * PARAMETERS:  ObjDesc         - A valid BankField object
+ *
+ * RETURN:      Status.
+ *
+ * DESCRIPTION: Get BankField BankValue.  This implements the late
+ *              evaluation of these field attributes.
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiDsGetBankFieldArguments (
+    ACPI_OPERAND_OBJECT     *ObjDesc)
+{
+    ACPI_OPERAND_OBJECT     *ExtraDesc;
+    ACPI_NAMESPACE_NODE     *Node;
+    ACPI_STATUS             Status;
+
+
+    ACPI_FUNCTION_TRACE_PTR (DsGetBankFieldArguments, ObjDesc);
+
+
+    if (ObjDesc->Common.Flags & AOPOBJ_DATA_VALID)
+    {
+        return_ACPI_STATUS (AE_OK);
+    }
+
+    /* Get the AML pointer (method object) and BankField node */
+
+    ExtraDesc = AcpiNsGetSecondaryObject (ObjDesc);
+    Node = ObjDesc->BankField.Node;
+
+    ACPI_DEBUG_EXEC(AcpiUtDisplayInitPathname (ACPI_TYPE_LOCAL_BANK_FIELD, Node, NULL));
+    ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "[%4.4s] BankField Arg Init\n",
         AcpiUtGetNodeName (Node)));
 
     /* Execute the AML code for the TermArg arguments */
@@ -905,7 +953,117 @@ AcpiDsEvalRegionOperands (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "RgnObj %p Addr %8.8X%8.8X Len %X\n",
         ObjDesc,
-        ACPI_FORMAT_UINT64 (ObjDesc->Region.Address),
+        ACPI_FORMAT_NATIVE_UINT (ObjDesc->Region.Address),
+        ObjDesc->Region.Length));
+
+    /* Now the address and length are valid for this opregion */
+
+    ObjDesc->Region.Flags |= AOPOBJ_DATA_VALID;
+
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiDsEvalTableRegionOperands
+ *
+ * PARAMETERS:  WalkState       - Current walk
+ *              Op              - A valid region Op object
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Get region address and length
+ *              Called from AcpiDsExecEndOp during DataTableRegion parse tree walk
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiDsEvalTableRegionOperands (
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_PARSE_OBJECT       *Op)
+{
+    ACPI_STATUS             Status;
+    ACPI_OPERAND_OBJECT     *ObjDesc;
+    ACPI_OPERAND_OBJECT     **Operand;
+    ACPI_NAMESPACE_NODE     *Node;
+    ACPI_PARSE_OBJECT       *NextOp;
+    ACPI_NATIVE_UINT        TableIndex;
+    ACPI_TABLE_HEADER       *Table;
+
+
+    ACPI_FUNCTION_TRACE_PTR (DsEvalTableRegionOperands, Op);
+
+
+    /*
+     * This is where we evaluate the SignatureString and OemIDString
+     * and OemTableIDString of the DataTableRegion declaration
+     */
+    Node =  Op->Common.Node;
+
+    /* NextOp points to SignatureString op */
+
+    NextOp = Op->Common.Value.Arg;
+
+    /*
+     * Evaluate/create the SignatureString and OemIDString
+     * and OemTableIDString operands
+     */
+    Status = AcpiDsCreateOperands (WalkState, NextOp);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    /*
+     * Resolve the SignatureString and OemIDString
+     * and OemTableIDString operands
+     */
+    Status = AcpiExResolveOperands (Op->Common.AmlOpcode,
+                ACPI_WALK_OPERANDS, WalkState);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS, ACPI_IMODE_EXECUTE,
+                    AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
+                    1, "after AcpiExResolveOperands");
+
+    Operand = &WalkState->Operands[0];
+
+    /* Find the ACPI table */
+
+    Status = AcpiTbFindTable (Operand[0]->String.Pointer,
+                Operand[1]->String.Pointer, Operand[2]->String.Pointer,
+                &TableIndex);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    AcpiUtRemoveReference (Operand[0]);
+    AcpiUtRemoveReference (Operand[1]);
+    AcpiUtRemoveReference (Operand[2]);
+
+    Status = AcpiGetTableByIndex (TableIndex, &Table);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    ObjDesc = AcpiNsGetAttachedObject (Node);
+    if (!ObjDesc)
+    {
+        return_ACPI_STATUS (AE_NOT_EXIST);
+    }
+
+    ObjDesc->Region.Address = (ACPI_PHYSICAL_ADDRESS) ACPI_TO_INTEGER (Table);
+    ObjDesc->Region.Length = Table->Length;
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "RgnObj %p Addr %8.8X%8.8X Len %X\n",
+        ObjDesc,
+        ACPI_FORMAT_NATIVE_UINT (ObjDesc->Region.Address),
         ObjDesc->Region.Length));
 
     /* Now the address and length are valid for this opregion */
@@ -946,6 +1104,12 @@ AcpiDsEvalDataObjectOperands (
 
 
     /* The first operand (for all of these data objects) is the length */
+
+    /*
+     * Set proper index into operand stack for AcpiDsObjStackPush
+     * invoked inside AcpiDsCreateOperand.
+     */
+    WalkState->OperandIndex = WalkState->NumOperands;
 
     Status = AcpiDsCreateOperand (WalkState, Op->Common.Value.Arg, 1);
     if (ACPI_FAILURE (Status))
@@ -1012,6 +1176,113 @@ AcpiDsEvalDataObjectOperands (
         }
     }
 
+    return_ACPI_STATUS (Status);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiDsEvalBankFieldOperands
+ *
+ * PARAMETERS:  WalkState       - Current walk
+ *              Op              - A valid BankField Op object
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Get BankField BankValue
+ *              Called from AcpiDsExecEndOp during BankField parse tree walk
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiDsEvalBankFieldOperands (
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_PARSE_OBJECT       *Op)
+{
+    ACPI_STATUS             Status;
+    ACPI_OPERAND_OBJECT     *ObjDesc;
+    ACPI_OPERAND_OBJECT     *OperandDesc;
+    ACPI_NAMESPACE_NODE     *Node;
+    ACPI_PARSE_OBJECT       *NextOp;
+    ACPI_PARSE_OBJECT       *Arg;
+
+
+    ACPI_FUNCTION_TRACE_PTR (DsEvalBankFieldOperands, Op);
+
+
+    /*
+     * This is where we evaluate the BankValue field of the
+     * BankField declaration
+     */
+
+    /* NextOp points to the op that holds the Region */
+
+    NextOp = Op->Common.Value.Arg;
+
+    /* NextOp points to the op that holds the Bank Register */
+
+    NextOp = NextOp->Common.Next;
+
+    /* NextOp points to the op that holds the Bank Value */
+
+    NextOp = NextOp->Common.Next;
+
+    /*
+     * Set proper index into operand stack for AcpiDsObjStackPush
+     * invoked inside AcpiDsCreateOperand.
+     *
+     * We use WalkState->Operands[0] to store the evaluated BankValue
+     */
+    WalkState->OperandIndex = 0;
+
+    Status = AcpiDsCreateOperand (WalkState, NextOp, 0);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    Status = AcpiExResolveToValue (&WalkState->Operands[0], WalkState);
+    if (ACPI_FAILURE (Status))
+    {
+        return_ACPI_STATUS (Status);
+    }
+
+    ACPI_DUMP_OPERANDS (ACPI_WALK_OPERANDS, ACPI_IMODE_EXECUTE,
+                    AcpiPsGetOpcodeName (Op->Common.AmlOpcode),
+                    1, "after AcpiExResolveOperands");
+
+    /*
+     * Get the BankValue operand and save it
+     * (at Top of stack)
+     */
+    OperandDesc = WalkState->Operands[0];
+
+    /* Arg points to the start Bank Field */
+
+    Arg = AcpiPsGetArg (Op, 4);
+    while (Arg)
+    {
+        /* Ignore OFFSET and ACCESSAS terms here */
+
+        if (Arg->Common.AmlOpcode == AML_INT_NAMEDFIELD_OP)
+        {
+            Node = Arg->Common.Node;
+
+            ObjDesc = AcpiNsGetAttachedObject (Node);
+            if (!ObjDesc)
+            {
+                return_ACPI_STATUS (AE_NOT_EXIST);
+            }
+
+            ObjDesc->BankField.Value = (UINT32) OperandDesc->Integer.Value;
+        }
+
+        /* Move to next field in the list */
+
+        Arg = Arg->Common.Next;
+    }
+
+    AcpiUtRemoveReference (OperandDesc);
     return_ACPI_STATUS (Status);
 }
 
@@ -1217,8 +1488,7 @@ AcpiDsExecEndControlOp (
              */
             WalkState->ReturnDesc = WalkState->Operands[0];
         }
-        else if ((WalkState->Results) &&
-                 (WalkState->Results->Results.NumResults > 0))
+        else if (WalkState->ResultCount)
         {
             /* Since we have a real Return(), delete any implicit return */
 

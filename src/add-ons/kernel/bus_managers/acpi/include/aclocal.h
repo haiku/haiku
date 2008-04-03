@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: aclocal.h - Internal data types used across the ACPI subsystem
- *       $Revision: 1.242 $
+ *       $Revision: 1.250 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -693,9 +693,7 @@ typedef struct acpi_thread_state
 typedef struct acpi_result_values
 {
     ACPI_STATE_COMMON
-    UINT8                           NumResults;
-    UINT8                           LastInsert;
-    union acpi_operand_object       *ObjDesc [ACPI_OBJ_NUM_OPERANDS];
+    union acpi_operand_object       *ObjDesc [ACPI_RESULTS_FRAME_OBJ_NUM];
 
 } ACPI_RESULT_VALUES;
 
@@ -795,6 +793,7 @@ typedef union acpi_parse_value
     union acpi_parse_object         *Next;          /* Next op */\
     ACPI_NAMESPACE_NODE             *Node;          /* For use by interpreter */\
     ACPI_PARSE_VALUE                Value;          /* Value or args associated with the opcode */\
+    UINT8                           ArgListLength;  /* Number of elements in the arg list */\
     ACPI_DISASM_ONLY_MEMBERS (\
     UINT8                           DisasmFlags;    /* Used during AML disassembly */\
     UINT8                           DisasmOpcode;   /* Subtype used for disassembly */\
@@ -904,6 +903,8 @@ typedef struct acpi_parse_state
 #define ACPI_PARSEOP_NAMED              0x02
 #define ACPI_PARSEOP_DEFERRED           0x04
 #define ACPI_PARSEOP_BYTELIST           0x08
+#define ACPI_PARSEOP_IN_STACK           0x10
+#define ACPI_PARSEOP_TARGET             0x20
 #define ACPI_PARSEOP_IN_CACHE           0x80
 
 /* Parse object DisasmFlags */
@@ -1092,12 +1093,30 @@ typedef struct acpi_bit_register_info
 
 typedef struct acpi_db_method_info
 {
-    ACPI_HANDLE                     ThreadGate;
+    ACPI_HANDLE                     MainThreadGate;
+    ACPI_HANDLE                     ThreadCompleteGate;
+    UINT32                          *Threads;
+    UINT32                          NumThreads;
+    UINT32                          NumCreated;
+    UINT32                          NumCompleted;
+
     char                            *Name;
-    char                            **Args;
     UINT32                          Flags;
     UINT32                          NumLoops;
     char                            Pathname[128];
+    char                            **Args;
+
+    /*
+     * Arguments to be passed to method for the command
+     * Threads -
+     *   the Number of threads, ID of current thread and
+     *   Index of current thread inside all them created.
+     */
+    char                            InitArgs;
+    char                            *Arguments[4];
+    char                            NumThreadsStr[11];
+    char                            IdOfThreadStr[11];
+    char                            IndexOfThreadStr[11];
 
 } ACPI_DB_METHOD_INFO;
 
@@ -1170,6 +1189,8 @@ typedef struct acpi_memory_list
 
     UINT32                          TotalAllocated;
     UINT32                          TotalFreed;
+    UINT32                          MaxOccupied;
+    UINT32                          TotalSize;
     UINT32                          CurrentTotalSize;
     UINT32                          Requests;
     UINT32                          Hits;

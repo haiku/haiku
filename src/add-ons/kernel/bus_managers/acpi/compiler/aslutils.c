@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: aslutils -- compiler utilities
- *              $Revision: 1.71 $
+ *              $Revision: 1.74 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -130,6 +130,12 @@ static const char * const       *yytname = &AslCompilername[254];
 #else
 extern const char * const       yytname[];
 #endif
+
+char                    HexLookup[] =
+{
+    '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'
+};
+
 
 /* Local prototypes */
 
@@ -333,8 +339,8 @@ UtConvertByteToHex (
     Buffer[0] = '0';
     Buffer[1] = 'x';
 
-    Buffer[2] = (UINT8) hex[(RawByte >> 4) & 0xF];
-    Buffer[3] = (UINT8) hex[RawByte & 0xF];
+    Buffer[2] = (UINT8) HexLookup[(RawByte >> 4) & 0xF];
+    Buffer[3] = (UINT8) HexLookup[RawByte & 0xF];
 }
 
 
@@ -359,8 +365,8 @@ UtConvertByteToAsmHex (
 {
 
     Buffer[0] = '0';
-    Buffer[1] = (UINT8) hex[(RawByte >> 4) & 0xF];
-    Buffer[2] = (UINT8) hex[RawByte & 0xF];
+    Buffer[1] = (UINT8) HexLookup[(RawByte >> 4) & 0xF];
+    Buffer[2] = (UINT8) HexLookup[RawByte & 0xF];
     Buffer[3] = 'h';
 }
 

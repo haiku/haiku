@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acconfig.h - Global configuration constants
- *       $Revision: 1.229 $
+ *       $Revision: 1.243 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -137,7 +137,7 @@
 
 /* Current ACPICA subsystem version in YYYYMMDD format */
 
-#define ACPI_CA_VERSION                 0x20061109
+#define ACPI_CA_VERSION                 0x20080321
 
 /*
  * OS name, used for the _OS object.  The _OS object is essentially obsolete,
@@ -225,6 +225,17 @@
  */
 #define ACPI_OBJ_NUM_OPERANDS           8
 #define ACPI_OBJ_MAX_OPERAND            7
+
+/* Number of elements in the Result Stack frame, can be an arbitrary value */
+
+#define ACPI_RESULTS_FRAME_OBJ_NUM      8
+
+/*
+ * Maximal number of elements the Result Stack can contain,
+ * it may be an arbitray value not exceeding the types of
+ * ResultSize and ResultCount (now UINT8).
+ */
+#define ACPI_RESULTS_OBJ_NUM_MAX        255
 
 /* Names within the namespace are 4 bytes long */
 

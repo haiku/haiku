@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acnamesp.h - Namespace subcomponent prototypes and defines
- *       $Revision: 1.151 $
+ *       $Revision: 1.154 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -204,7 +204,8 @@ AcpiNsParseTable (
 ACPI_STATUS
 AcpiNsOneCompleteParse (
     ACPI_NATIVE_UINT        PassNumber,
-    ACPI_NATIVE_UINT        TableIndex);
+    ACPI_NATIVE_UINT        TableIndex,
+    ACPI_NAMESPACE_NODE     *StartNode);
 
 
 /*

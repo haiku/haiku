@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbutils   - table utilities
- *              $Revision: 1.87 $
+ *              $Revision: 1.91 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -181,7 +181,7 @@ AcpiTbPrintTableHeader (
         /* FACS only has signature and length fields of common table header */
 
         ACPI_INFO ((AE_INFO, "%4.4s @ 0x%p/0x%04X",
-            Header->Signature, ACPI_CAST_PTR (void, Address), Header->Length));
+            Header->Signature, ACPI_CAST_PTR (UINT64, Address), Header->Length));
     }
     else if (ACPI_COMPARE_NAME (Header->Signature, ACPI_SIG_RSDP))
     {
@@ -239,7 +239,7 @@ AcpiTbVerifyChecksum (
     if (Checksum)
     {
         ACPI_WARNING ((AE_INFO,
-            "Incorrect checksum in table [%4.4s] -  %2.2X, should be %2.2X",
+            "Incorrect checksum in table [%4.4s] - %2.2X, should be %2.2X",
             Table->Signature, Table->Checksum, (UINT8) (Table->Checksum - Checksum)));
 
 #if (ACPI_CHECKSUM_ABORT)

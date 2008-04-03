@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: asltypes.h - compiler data types and struct definitions
- *              $Revision: 1.88 $
+ *              $Revision: 1.91 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -422,7 +422,8 @@ typedef enum
     ASL_MSG_RESULT_NOT_USED,
     ASL_MSG_NOT_REFERENCED,
     ASL_MSG_NON_ZERO,
-    ASL_MSG_STRING_LENGTH
+    ASL_MSG_STRING_LENGTH,
+    ASL_MSG_SERIALIZED
 
 } ASL_MESSAGE_IDS;
 
@@ -536,7 +537,8 @@ char                        *AslMessages [] = {
 /*    ASL_MSG_RESULT_NOT_USED */            "Result is not used, operator has no effect",
 /*    ASL_MSG_NOT_REFERENCED */             "Namespace object is not referenced",
 /*    ASL_MSG_NON_ZERO */                   "Operand evaluates to zero",
-/*    ASL_MSG_STRING_LENGTH */              "String literal too long"
+/*    ASL_MSG_STRING_LENGTH */              "String literal too long",
+/*    ASL_MSG_SERIALIZED */                 "Control Method marked Serialized"
 
 };
 

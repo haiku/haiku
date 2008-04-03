@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exoparg3 - AML execution - opcodes with 3 arguments
- *              $Revision: 1.33 $
+ *              $Revision: 1.36 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -362,6 +362,7 @@ Cleanup:
     if (ACPI_FAILURE (Status) || WalkState->ResultObj)
     {
         AcpiUtRemoveReference (ReturnDesc);
+        WalkState->ResultObj = NULL;
     }
 
     /* Set the return object and exit */

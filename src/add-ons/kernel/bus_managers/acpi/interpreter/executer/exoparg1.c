@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exoparg1 - AML execution - opcodes with 1 argument
- *              $Revision: 1.181 $
+ *              $Revision: 1.186 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -189,9 +189,7 @@ AcpiExOpcode_0A_0T_1R (
             Status = AE_NO_MEMORY;
             goto Cleanup;
         }
-#if ACPI_MACHINE_WIDTH != 16
         ReturnDesc->Integer.Value = AcpiOsGetTimer ();
-#endif
         break;
 
     default:                /*  Unknown opcode  */
@@ -209,6 +207,7 @@ Cleanup:
     if ((ACPI_FAILURE (Status)) || WalkState->ResultObj)
     {
         AcpiUtRemoveReference (ReturnDesc);
+        WalkState->ResultObj = NULL;
     }
     else
     {
@@ -881,23 +880,36 @@ AcpiExOpcode_1A_0T_1R (
             Value = AcpiGbl_IntegerByteWidth;
             break;
 
-        case ACPI_TYPE_BUFFER:
-            Value = TempDesc->Buffer.Length;
-            break;
-
         case ACPI_TYPE_STRING:
             Value = TempDesc->String.Length;
             break;
 
+        case ACPI_TYPE_BUFFER:
+
+            /* Buffer arguments may not be evaluated at this point */
+
+            Status = AcpiDsGetBufferArguments (TempDesc);
+            Value = TempDesc->Buffer.Length;
+            break;
+
         case ACPI_TYPE_PACKAGE:
+
+            /* Package arguments may not be evaluated at this point */
+
+            Status = AcpiDsGetPackageArguments (TempDesc);
             Value = TempDesc->Package.Count;
             break;
 
         default:
             ACPI_ERROR ((AE_INFO,
-                "Operand is not Buf/Int/Str/Pkg - found type %s",
+                "Operand must be Buffer/Integer/String/Package - found type %s",
                 AcpiUtGetTypeName (Type)));
             Status = AE_AML_OPERAND_TYPE;
+            goto Cleanup;
+        }
+
+        if (ACPI_FAILURE (Status))
+        {
             goto Cleanup;
         }
 

@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: aslmap - parser to AML opcode mapping table
- *              $Revision: 1.85 $
+ *              $Revision: 1.88 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -308,7 +308,7 @@ const ASL_RESERVED_INFO         ReservedMethods[] = {
     {"_EJ3",     1,      0},
     {"_EJ4",     1,      0},
     {"_EJD",     0,      ASL_RSVD_RETURN_VALUE},
-    {"_ERR",     2,      ASL_RSVD_RETURN_VALUE},
+    {"_ERR",     3,      ASL_RSVD_RETURN_VALUE},
     {"_FDE",     0,      ASL_RSVD_RETURN_VALUE},
     {"_FDI",     0,      ASL_RSVD_RETURN_VALUE},
     {"_FDM",     1,      0},

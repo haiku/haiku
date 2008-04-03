@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exdump - Interpreter debug output routines
- *              $Revision: 1.200 $
+ *              $Revision: 1.206 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -601,14 +601,6 @@ AcpiExDumpOperand (
             break;
 
 
-        case AML_NAME_OP:
-
-            ACPI_DUMP_PATHNAME (ObjDesc->Reference.Object,
-                "Reference: Name: ", ACPI_LV_INFO, _COMPONENT);
-            ACPI_DUMP_ENTRY (ObjDesc->Reference.Object, ACPI_LV_INFO);
-            break;
-
-
         case AML_INDEX_OP:
 
             AcpiOsPrintf ("Reference: Index %p\n",
@@ -616,10 +608,18 @@ AcpiExDumpOperand (
             break;
 
 
+        case AML_LOAD_OP:
+
+            AcpiOsPrintf ("Reference: [DdbHandle] TableIndex %p\n",
+                ObjDesc->Reference.Object);
+            break;
+
+
         case AML_REF_OF_OP:
 
-            AcpiOsPrintf ("Reference: (RefOf) %p\n",
-                ObjDesc->Reference.Object);
+            AcpiOsPrintf ("Reference: (RefOf) %p [%s]\n",
+                ObjDesc->Reference.Object,
+                AcpiUtGetTypeName (((ACPI_OPERAND_OBJECT *) ObjDesc->Reference.Object)->Common.Type));
             break;
 
 
@@ -660,8 +660,9 @@ AcpiExDumpOperand (
 
         case AML_INT_NAMEPATH_OP:
 
-            AcpiOsPrintf ("Reference.Node->Name %X\n",
-                ObjDesc->Reference.Node->Name.Integer);
+            AcpiOsPrintf ("Reference: Namepath %X [%4.4s]\n",
+                ObjDesc->Reference.Node->Name.Integer,
+                ObjDesc->Reference.Node->Name.Ascii);
             break;
 
 
@@ -748,7 +749,7 @@ AcpiExDumpOperand (
         else
         {
             AcpiOsPrintf (" base %8.8X%8.8X Length %X\n",
-                ACPI_FORMAT_UINT64 (ObjDesc->Region.Address),
+                ACPI_FORMAT_NATIVE_UINT (ObjDesc->Region.Address),
                 ObjDesc->Region.Length);
         }
         break;
@@ -1027,12 +1028,12 @@ AcpiExDumpReferenceObj (
 
     if (ObjDesc->Reference.Opcode == AML_INT_NAMEPATH_OP)
     {
-        AcpiOsPrintf ("Named Object %p ", ObjDesc->Reference.Node);
+        AcpiOsPrintf (" Named Object %p ", ObjDesc->Reference.Node);
 
         Status = AcpiNsHandleToPathname (ObjDesc->Reference.Node, &RetBuf);
         if (ACPI_FAILURE (Status))
         {
-            AcpiOsPrintf ("Could not convert name to pathname\n");
+            AcpiOsPrintf (" Could not convert name to pathname\n");
         }
         else
         {
@@ -1042,7 +1043,29 @@ AcpiExDumpReferenceObj (
     }
     else if (ObjDesc->Reference.Object)
     {
-        AcpiOsPrintf ("\nReferenced Object: %p\n", ObjDesc->Reference.Object);
+        if (ACPI_GET_DESCRIPTOR_TYPE (ObjDesc) == ACPI_DESC_TYPE_OPERAND)
+        {
+            AcpiOsPrintf (" Target: %p", ObjDesc->Reference.Object);
+            if (ObjDesc->Reference.Opcode == AML_LOAD_OP)
+            {
+                /*
+                 * For DDBHandle reference,
+                 * ObjDesc->Reference.Object is the table index
+                 */
+                AcpiOsPrintf (" [DDBHandle]\n");
+            }
+            else
+            {
+                AcpiOsPrintf (" [%s]\n",
+                    AcpiUtGetTypeName (((ACPI_OPERAND_OBJECT *)
+                        ObjDesc->Reference.Object)->Common.Type));
+            }
+        }
+        else
+        {
+            AcpiOsPrintf (" Target: %p\n",
+                ObjDesc->Reference.Object);
+        }
     }
 }
 
@@ -1141,7 +1164,8 @@ AcpiExDumpPackageObj (
 
     case ACPI_TYPE_LOCAL_REFERENCE:
 
-        AcpiOsPrintf ("[Object Reference] ");
+        AcpiOsPrintf ("[Object Reference] %s",
+            (AcpiPsGetOpcodeInfo (ObjDesc->Reference.Opcode))->Name);
         AcpiExDumpReferenceObj (ObjDesc);
         break;
 

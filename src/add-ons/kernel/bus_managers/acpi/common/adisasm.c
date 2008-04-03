@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: adisasm - Application-level disassembler routines
- *              $Revision: 1.103 $
+ *              $Revision: 1.112 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -372,7 +372,7 @@ AdAmlDisassemble (
     ACPI_STATUS             Status;
     char                    *DisasmFilename = NULL;
     FILE                    *File = NULL;
-    ACPI_TABLE_HEADER       *Table;
+    ACPI_TABLE_HEADER       *Table = NULL;
     ACPI_TABLE_HEADER       *ExternalTable;
 
 
@@ -470,7 +470,7 @@ AdAmlDisassemble (
     {
         /* Always parse the tables, only option is what to display */
 
-        Status = AdParseTable (Table);
+        Status = AdParseTable (Table, TRUE);
         if (ACPI_FAILURE (Status))
         {
             AcpiOsPrintf ("Could not parse ACPI tables, %s\n",
@@ -547,7 +547,9 @@ AdAmlDisassemble (
             Status = AcpiNsRootInitialize ();
             AdAddExternalsToNamespace ();
 
-            Status = AdParseTable (Table);
+            /* Parse table. No need to reload it, however (FALSE) */
+
+            Status = AdParseTable (Table, FALSE);
             if (ACPI_FAILURE (Status))
             {
                 AcpiOsPrintf ("Could not parse ACPI tables, %s\n",
@@ -573,6 +575,17 @@ AdAmlDisassemble (
     }
 
 Cleanup:
+
+    if (Table && !AcpiUtIsAmlTable (Table))
+    {
+        ACPI_FREE (Table);
+    }
+
+    if (DisasmFilename)
+    {
+        ACPI_FREE (DisasmFilename);
+    }
+
     if (OutToFile && File)
     {
 
@@ -585,7 +598,8 @@ Cleanup:
     }
 
     AcpiPsDeleteParseTree (AcpiGbl_ParseOpRoot);
-    return Status;
+    AcpiGbl_ParseOpRoot = NULL;
+    return (Status);
 }
 
 
@@ -640,19 +654,36 @@ AdCreateTableHeader (
     ACPI_TABLE_HEADER       *Table)
 {
     char                    *NewFilename;
+    UINT8                   Checksum;
 
 
+    /*
+     * Print file header and dump original table header
+     */
     AdDisassemblerHeader (Filename);
 
     AcpiOsPrintf (" *\n * Original Table Header:\n");
     AcpiOsPrintf (" *     Signature        \"%4.4s\"\n",    Table->Signature);
     AcpiOsPrintf (" *     Length           0x%8.8X (%u)\n", Table->Length, Table->Length);
     AcpiOsPrintf (" *     Revision         0x%2.2X\n",      Table->Revision);
+
+    /* Print and validate the table checksum */
+
+    AcpiOsPrintf (" *     Checksum         0x%2.2X",        Table->Checksum);
+
+    Checksum = AcpiTbChecksum (ACPI_CAST_PTR (UINT8, Table), Table->Length);
+    if (Checksum)
+    {
+        AcpiOsPrintf (" **** Incorrect checksum, should be 0x%2.2X",
+            (UINT8) (Table->Checksum - Checksum));
+    }
+    AcpiOsPrintf ("\n");
+
     AcpiOsPrintf (" *     OEM ID           \"%.6s\"\n",     Table->OemId);
     AcpiOsPrintf (" *     OEM Table ID     \"%.8s\"\n",     Table->OemTableId);
     AcpiOsPrintf (" *     OEM Revision     0x%8.8X (%u)\n", Table->OemRevision, Table->OemRevision);
-    AcpiOsPrintf (" *     Creator ID       \"%.4s\"\n",     Table->AslCompilerId);
-    AcpiOsPrintf (" *     Creator Revision 0x%8.8X (%u)\n", Table->AslCompilerRevision, Table->AslCompilerRevision);
+    AcpiOsPrintf (" *     Compiler ID      \"%.4s\"\n",     Table->AslCompilerId);
+    AcpiOsPrintf (" *     Compiler Version 0x%8.8X (%u)\n", Table->AslCompilerRevision, Table->AslCompilerRevision);
     AcpiOsPrintf (" */\n");
 
     /* Create AML output filename based on input filename */
@@ -674,6 +705,8 @@ AdCreateTableHeader (
         "DefinitionBlock (\"%s\", \"%4.4s\", %hd, \"%.6s\", \"%.8s\", 0x%8.8X)\n",
         NewFilename, Table->Signature, Table->Revision,
         Table->OemId, Table->OemTableId, Table->OemRevision);
+
+    ACPI_FREE (NewFilename);
 }
 
 
@@ -904,6 +937,7 @@ AdParseDeferredOps (
         case AML_CREATE_BYTE_FIELD_OP:
         case AML_CREATE_BIT_FIELD_OP:
         case AML_CREATE_FIELD_OP:
+        case AML_BANK_FIELD_OP:
 
             /* Nothing to do in these cases */
 
@@ -1046,7 +1080,8 @@ AdGetLocalTables (
 
 ACPI_STATUS
 AdParseTable (
-    ACPI_TABLE_HEADER       *Table)
+    ACPI_TABLE_HEADER       *Table,
+    BOOLEAN                 LoadTable)
 {
     ACPI_STATUS             Status = AE_OK;
     ACPI_WALK_STATE         *WalkState;
@@ -1102,16 +1137,19 @@ AdParseTable (
 
     /* Pass 2 */
 
-    Status = AcpiTbStoreTable ((ACPI_NATIVE_UINT) Table, Table,
-                Table->Length, ACPI_TABLE_ORIGIN_ALLOCATED, &TableIndex);
-    if (ACPI_FAILURE (Status))
+    if (LoadTable)
     {
-        return Status;
+        Status = AcpiTbStoreTable ((ACPI_NATIVE_UINT) Table, Table,
+                    Table->Length, ACPI_TABLE_ORIGIN_ALLOCATED, &TableIndex);
+        if (ACPI_FAILURE (Status))
+        {
+            return Status;
+        }
     }
 
     fprintf (stderr, "Pass 2 parse of [%4.4s]\n", (char *) Table->Signature);
 
-    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS2, 0);
+    Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS2, 0, NULL);
     if (ACPI_FAILURE (Status))
     {
         return (Status);

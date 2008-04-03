@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exutils - interpreter/scanner utilities
- *              $Revision: 1.125 $
+ *              $Revision: 1.131 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -136,7 +136,6 @@
 #include "acpi.h"
 #include "acinterp.h"
 #include "amlcode.h"
-#include "acevents.h"
 
 #define _COMPONENT          ACPI_EXECUTER
         ACPI_MODULE_NAME    ("exutils")
@@ -320,9 +319,10 @@ AcpiExTruncateFor32bitTable (
 
     /*
      * Object must be a valid number and we must be executing
-     * a control method
+     * a control method. NS node could be there for AML_INT_NAMEPATH_OP.
      */
     if ((!ObjDesc) ||
+        (ACPI_GET_DESCRIPTOR_TYPE (ObjDesc) != ACPI_DESC_TYPE_OPERAND) ||
         (ACPI_GET_OBJECT_TYPE (ObjDesc) != ACPI_TYPE_INTEGER))
     {
         return;
@@ -346,44 +346,42 @@ AcpiExTruncateFor32bitTable (
  * PARAMETERS:  FieldFlags            - Flags with Lock rule:
  *                                      AlwaysLock or NeverLock
  *
- * RETURN:      TRUE/FALSE indicating whether the lock was actually acquired
+ * RETURN:      None
  *
- * DESCRIPTION: Obtain the global lock and keep track of this fact via two
- *              methods.  A global variable keeps the state of the lock, and
- *              the state is returned to the caller.
+ * DESCRIPTION: Obtain the ACPI hardware Global Lock, only if the field
+ *              flags specifiy that it is to be obtained before field access.
  *
  ******************************************************************************/
 
-BOOLEAN
+void
 AcpiExAcquireGlobalLock (
     UINT32                  FieldFlags)
 {
-    BOOLEAN                 Locked = FALSE;
     ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_TRACE (ExAcquireGlobalLock);
 
 
-    /* Only attempt lock if the AlwaysLock bit is set */
+    /* Only use the lock if the AlwaysLock bit is set */
 
-    if (FieldFlags & AML_FIELD_LOCK_RULE_MASK)
+    if (!(FieldFlags & AML_FIELD_LOCK_RULE_MASK))
     {
-        /* We should attempt to get the lock, wait forever */
-
-        Status = AcpiEvAcquireGlobalLock (ACPI_WAIT_FOREVER);
-        if (ACPI_SUCCESS (Status))
-        {
-            Locked = TRUE;
-        }
-        else
-        {
-            ACPI_EXCEPTION ((AE_INFO, Status,
-                "Could not acquire Global Lock"));
-        }
+        return_VOID;
     }
 
-    return_UINT8 (Locked);
+    /* Attempt to get the global lock, wait forever */
+
+    Status = AcpiExAcquireMutexObject (ACPI_WAIT_FOREVER,
+                AcpiGbl_GlobalLockMutex, AcpiOsGetThreadId ());
+
+    if (ACPI_FAILURE (Status))
+    {
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not acquire Global Lock"));
+    }
+
+    return_VOID;
 }
 
 
@@ -391,18 +389,18 @@ AcpiExAcquireGlobalLock (
  *
  * FUNCTION:    AcpiExReleaseGlobalLock
  *
- * PARAMETERS:  LockedByMe      - Return value from corresponding call to
- *                                AcquireGlobalLock.
+ * PARAMETERS:  FieldFlags            - Flags with Lock rule:
+ *                                      AlwaysLock or NeverLock
  *
  * RETURN:      None
  *
- * DESCRIPTION: Release the global lock if it is locked.
+ * DESCRIPTION: Release the ACPI hardware Global Lock
  *
  ******************************************************************************/
 
 void
 AcpiExReleaseGlobalLock (
-    BOOLEAN                 LockedByMe)
+    UINT32                  FieldFlags)
 {
     ACPI_STATUS             Status;
 
@@ -410,20 +408,22 @@ AcpiExReleaseGlobalLock (
     ACPI_FUNCTION_TRACE (ExReleaseGlobalLock);
 
 
-    /* Only attempt unlock if the caller locked it */
+    /* Only use the lock if the AlwaysLock bit is set */
 
-    if (LockedByMe)
+    if (!(FieldFlags & AML_FIELD_LOCK_RULE_MASK))
     {
-        /* OK, now release the lock */
+        return_VOID;
+    }
 
-        Status = AcpiEvReleaseGlobalLock ();
-        if (ACPI_FAILURE (Status))
-        {
-            /* Report the error, but there isn't much else we can do */
+    /* Release the global lock */
 
-            ACPI_EXCEPTION ((AE_INFO, Status,
-                "Could not release ACPI Global Lock"));
-        }
+    Status = AcpiExReleaseMutexObject (AcpiGbl_GlobalLockMutex);
+    if (ACPI_FAILURE (Status))
+    {
+        /* Report the error, but there isn't much else we can do */
+
+        ACPI_EXCEPTION ((AE_INFO, Status,
+            "Could not release Global Lock"));
     }
 
     return_VOID;

@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: utdelete - object deletion and reference count utilities
- *              $Revision: 1.121 $
+ *              $Revision: 1.126 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -247,7 +247,7 @@ AcpiUtDeleteInternalObj (
             "***** Mutex %p, OS Mutex %p\n",
             Object, Object->Mutex.OsMutex));
 
-        if (Object->Mutex.OsMutex == AcpiGbl_GlobalLockMutex)
+        if (Object == AcpiGbl_GlobalLockMutex)
         {
             /* Global Lock has extra semaphore */
 
@@ -336,6 +336,19 @@ AcpiUtDeleteInternalObj (
 
         ACPI_DEBUG_PRINT ((ACPI_DB_ALLOCATIONS,
             "***** Buffer Field %p\n", Object));
+
+        SecondDesc = AcpiNsGetSecondaryObject (Object);
+        if (SecondDesc)
+        {
+            AcpiUtDeleteObjectDesc (SecondDesc);
+        }
+        break;
+
+
+    case ACPI_TYPE_LOCAL_BANK_FIELD:
+
+        ACPI_DEBUG_PRINT ((ACPI_DB_ALLOCATIONS,
+            "***** Bank Field %p\n", Object));
 
         SecondDesc = AcpiNsGetSecondaryObject (Object);
         if (SecondDesc)
@@ -633,10 +646,12 @@ AcpiUtUpdateObjectReference (
 
         case ACPI_TYPE_LOCAL_REFERENCE:
             /*
-             * The target of an Index (a package, string, or buffer) must track
-             * changes to the ref count of the index.
+             * The target of an Index (a package, string, or buffer) or a named
+             * reference must track changes to the ref count of the index or
+             * target object.
              */
-            if (Object->Reference.Opcode == AML_INDEX_OP)
+            if ((Object->Reference.Opcode == AML_INDEX_OP) ||
+                (Object->Reference.Opcode == AML_INT_NAMEPATH_OP))
             {
                 NextObject = Object->Reference.Object;
             }

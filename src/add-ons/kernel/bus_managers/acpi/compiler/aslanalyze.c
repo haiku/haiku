@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: aslanalyze.c - check for semantic errors
- *              $Revision: 1.114 $
+ *              $Revision: 1.118 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -272,7 +272,11 @@ AnMapArgTypeToBtype (
         return (ACPI_BTYPE_MUTEX);
 
     case ARGI_DDBHANDLE:
-        return (ACPI_BTYPE_DDB_HANDLE);
+        /*
+         * DDBHandleObject := SuperName
+         * ACPI_BTYPE_REFERENCE: Index reference as parameter of Load/Unload
+         */
+        return (ACPI_BTYPE_DDB_HANDLE | ACPI_BTYPE_REFERENCE);
 
     /* Interchangeable types */
     /*
@@ -956,9 +960,9 @@ AnMethodAnalysisWalkBegin (
                 MethodInfo->ValidArgTypes[ActualArgs] =
                     AnMapObjTypeToBtype (NextType);
                 NextType->Asl.ParseOpcode = PARSEOP_DEFAULT_ARG;
+                ActualArgs++;
             }
 
-            ActualArgs++;
             NextType = NextType->Asl.Next;
         }
 

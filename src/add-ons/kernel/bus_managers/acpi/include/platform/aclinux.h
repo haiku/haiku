@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: aclinux.h - OS specific defines, etc.
- *       $Revision: 1.41 $
+ *       $Revision: 1.44 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -158,7 +158,10 @@
 #define ACPI_USE_NATIVE_DIVIDE
 #endif
 
+#ifndef __cdecl
 #define __cdecl
+#endif
+
 #define ACPI_FLUSH_CPU_CACHE()
 #endif /* __KERNEL__ */
 

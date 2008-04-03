@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: asllookup- Namespace lookup
- *              $Revision: 1.102 $
+ *              $Revision: 1.106 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -169,6 +169,13 @@ LkNamespaceLocateEnd (
 
 static ACPI_STATUS
 LkIsObjectUsed (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  Level,
+    void                    *Context,
+    void                    **ReturnValue);
+
+static ACPI_STATUS
+LsDoOnePathname (
     ACPI_HANDLE             ObjHandle,
     UINT32                  Level,
     void                    *Context,
@@ -416,12 +423,62 @@ LsDoOneNamespaceObject (
 }
 
 
+/*******************************************************************************
+ *
+ * FUNCTION:    LsSetupNsList
+ *
+ * PARAMETERS:  Handle          - local file handle
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Set the namespace output file to the input handle
+ *
+ ******************************************************************************/
+
 void
 LsSetupNsList (void * Handle)
 {
 
     Gbl_NsOutputFlag = TRUE;
     Gbl_Files[ASL_FILE_NAMESPACE_OUTPUT].Handle = Handle;
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    LsDoOnePathname
+ *
+ * PARAMETERS:  ACPI_WALK_CALLBACK
+ *
+ * RETURN:      Status
+ *
+ * DESCRIPTION: Print the full pathname for a namespace node.
+ *
+ ******************************************************************************/
+
+static ACPI_STATUS
+LsDoOnePathname (
+    ACPI_HANDLE             ObjHandle,
+    UINT32                  Level,
+    void                    *Context,
+    void                    **ReturnValue)
+{
+    ACPI_NAMESPACE_NODE     *Node = (ACPI_NAMESPACE_NODE *) ObjHandle;
+    ACPI_STATUS             Status;
+    ACPI_BUFFER             TargetPath;
+
+
+    TargetPath.Length = ACPI_ALLOCATE_LOCAL_BUFFER;
+    Status = AcpiNsHandleToPathname (Node, &TargetPath);
+    if (ACPI_FAILURE (Status))
+    {
+        return (Status);
+    }
+
+    FlPrintFile (ASL_FILE_NAMESPACE_OUTPUT, "%s\n", TargetPath.Pointer);
+    ACPI_FREE (TargetPath.Pointer);
+
+    return (AE_OK);
 }
 
 
@@ -463,6 +520,15 @@ LsDisplayNamespace (
     Status = AcpiNsWalkNamespace (ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
                 ACPI_UINT32_MAX, FALSE, LsDoOneNamespaceObject,
                 NULL, NULL);
+
+    /* Print the full pathname for each namespace node */
+
+    FlPrintFile (ASL_FILE_NAMESPACE_OUTPUT, "\nNamespace pathnames\n\n");
+
+    Status = AcpiNsWalkNamespace (ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
+                ACPI_UINT32_MAX, FALSE, LsDoOnePathname,
+                NULL, NULL);
+
     return (Status);
 }
 

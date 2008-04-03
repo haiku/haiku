@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: exregion - ACPI default OpRegion (address space) handlers
- *              $Revision: 1.99 $
+ *              $Revision: 1.103 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -245,7 +245,7 @@ AcpiExSystemMemorySpaceHandler (
         {
             ACPI_ERROR ((AE_INFO,
                 "Could not map memory at %8.8X%8.8X, size %X",
-                ACPI_FORMAT_UINT64 (Address), (UINT32) WindowSize));
+                ACPI_FORMAT_NATIVE_UINT (Address), (UINT32) WindowSize));
             MemInfo->MappedLength = 0;
             return_ACPI_STATUS (AE_NO_MEMORY);
         }
@@ -265,7 +265,7 @@ AcpiExSystemMemorySpaceHandler (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
         "System-Memory (width %d) R/W %d Address=%8.8X%8.8X\n",
-        BitWidth, Function, ACPI_FORMAT_UINT64 (Address)));
+        BitWidth, Function, ACPI_FORMAT_NATIVE_UINT (Address)));
 
     /*
      * Perform the memory read or write
@@ -294,11 +294,10 @@ AcpiExSystemMemorySpaceHandler (
             *Value = (ACPI_INTEGER) ACPI_GET32 (LogicalAddrPtr);
             break;
 
-#if ACPI_MACHINE_WIDTH != 16
         case 64:
             *Value = (ACPI_INTEGER) ACPI_GET64 (LogicalAddrPtr);
             break;
-#endif
+
         default:
             /* BitWidth was already validated */
             break;
@@ -321,11 +320,9 @@ AcpiExSystemMemorySpaceHandler (
             ACPI_SET32 ( LogicalAddrPtr) = (UINT32) *Value;
             break;
 
-#if ACPI_MACHINE_WIDTH != 16
         case 64:
             ACPI_SET64 (LogicalAddrPtr) = (UINT64) *Value;
             break;
-#endif
 
         default:
             /* BitWidth was already validated */
@@ -378,7 +375,7 @@ AcpiExSystemIoSpaceHandler (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
         "System-IO (width %d) R/W %d Address=%8.8X%8.8X\n",
-        BitWidth, Function, ACPI_FORMAT_UINT64 (Address)));
+        BitWidth, Function, ACPI_FORMAT_NATIVE_UINT (Address)));
 
     /* Decode the function parameter */
 

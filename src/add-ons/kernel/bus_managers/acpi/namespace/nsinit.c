@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsinit - namespace initialization
- *              $Revision: 1.85 $
+ *              $Revision: 1.88 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -346,6 +346,10 @@ AcpiNsInitOneObject (
         Info->FieldCount++;
         break;
 
+    case ACPI_TYPE_LOCAL_BANK_FIELD:
+        Info->FieldCount++;
+        break;
+
     case ACPI_TYPE_BUFFER:
         Info->BufferCount++;
         break;
@@ -389,6 +393,12 @@ AcpiNsInitOneObject (
 
         Info->FieldInit++;
         Status = AcpiDsGetBufferFieldArguments (ObjDesc);
+        break;
+
+    case ACPI_TYPE_LOCAL_BANK_FIELD:
+
+        Info->FieldInit++;
+        Status = AcpiDsGetBankFieldArguments (ObjDesc);
         break;
 
     case ACPI_TYPE_BUFFER:

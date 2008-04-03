@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: psloop - Main AML parse loop
- *              $Revision: 1.13 $
+ *              $Revision: 1.19 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -274,6 +274,7 @@ AcpiPsBuildNamedOp (
 
 
     UnnamedOp->Common.Value.Arg = NULL;
+    UnnamedOp->Common.ArgListLength = 0;
     UnnamedOp->Common.AmlOpcode = WalkState->Opcode;
 
     /*
@@ -337,7 +338,8 @@ AcpiPsBuildNamedOp (
     AcpiPsAppendArg (*Op, UnnamedOp->Common.Value.Arg);
     AcpiGbl_Depth++;
 
-    if ((*Op)->Common.AmlOpcode == AML_REGION_OP)
+    if ((*Op)->Common.AmlOpcode == AML_REGION_OP ||
+        (*Op)->Common.AmlOpcode == AML_DATA_REGION_OP)
     {
         /*
          * Defer final parsing of an OperationRegion body, because we don't
@@ -380,6 +382,9 @@ AcpiPsCreateOp (
     ACPI_STATUS             Status = AE_OK;
     ACPI_PARSE_OBJECT       *Op;
     ACPI_PARSE_OBJECT       *NamedOp = NULL;
+    ACPI_PARSE_OBJECT       *ParentScope;
+    UINT8                   ArgumentCount;
+    const ACPI_OPCODE_INFO  *OpInfo;
 
 
     ACPI_FUNCTION_TRACE_PTR (PsCreateOp, WalkState);
@@ -425,7 +430,35 @@ AcpiPsCreateOp (
         Op->Named.Length = 0;
     }
 
-    AcpiPsAppendArg (AcpiPsGetParentScope (&(WalkState->ParserState)), Op);
+    if (WalkState->Opcode == AML_BANK_FIELD_OP)
+    {
+        /*
+         * Backup to beginning of BankField declaration
+         * BodyLength is unknown until we parse the body
+         */
+        Op->Named.Data = AmlOpStart;
+        Op->Named.Length = 0;
+    }
+
+    ParentScope = AcpiPsGetParentScope (&(WalkState->ParserState));
+    AcpiPsAppendArg (ParentScope, Op);
+
+    if (ParentScope)
+    {
+        OpInfo = AcpiPsGetOpcodeInfo (ParentScope->Common.AmlOpcode);
+        if (OpInfo->Flags & AML_HAS_TARGET)
+        {
+            ArgumentCount = AcpiPsGetArgumentCount (OpInfo->Type);
+            if (ParentScope->Common.ArgListLength > ArgumentCount)
+            {
+                Op->Common.Flags |= ACPI_PARSEOP_TARGET;
+            }
+        }
+        else if (ParentScope->Common.AmlOpcode == AML_INCREMENT_OP)
+        {
+            Op->Common.Flags |= ACPI_PARSEOP_TARGET;
+        }
+    }
 
     if (WalkState->DescendingCallback != NULL)
     {
@@ -716,15 +749,6 @@ AcpiPsCompleteOp (
         {
             AcpiPsPopScope (&(WalkState->ParserState), Op,
                 &WalkState->ArgTypes, &WalkState->ArgCount);
-
-            if ((*Op)->Common.AmlOpcode != AML_WHILE_OP)
-            {
-                Status2 = AcpiDsResultStackPop (WalkState);
-                if (ACPI_FAILURE (Status2))
-                {
-                    return_ACPI_STATUS (Status2);
-                }
-            }
         }
 
         /* Close this iteration of the While loop */
@@ -754,11 +778,6 @@ AcpiPsCompleteOp (
             if (*Op)
             {
                 Status2 = AcpiPsCompleteThisOp (WalkState, *Op);
-                if (ACPI_FAILURE (Status2))
-                {
-                    return_ACPI_STATUS (Status2);
-                }
-                Status2 = AcpiDsResultStackPop (WalkState);
                 if (ACPI_FAILURE (Status2))
                 {
                     return_ACPI_STATUS (Status2);
@@ -1124,7 +1143,8 @@ AcpiPsParseLoop (
                 AcpiGbl_Depth--;
             }
 
-            if (Op->Common.AmlOpcode == AML_REGION_OP)
+            if (Op->Common.AmlOpcode == AML_REGION_OP ||
+                Op->Common.AmlOpcode == AML_DATA_REGION_OP)
             {
                 /*
                  * Skip parsing of control method or opregion body,
@@ -1143,6 +1163,16 @@ AcpiPsParseLoop (
             /*
              * Backup to beginning of CreateXXXfield declaration (1 for
              * Opcode)
+             *
+             * BodyLength is unknown until we parse the body
+             */
+            Op->Named.Length = (UINT32) (ParserState->Aml - Op->Named.Data);
+        }
+
+        if (Op->Common.AmlOpcode == AML_BANK_FIELD_OP)
+        {
+            /*
+             * Backup to beginning of BankField declaration
              *
              * BodyLength is unknown until we parse the body
              */

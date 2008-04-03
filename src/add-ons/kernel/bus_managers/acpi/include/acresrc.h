@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acresrc.h - Resource Manager function prototypes
- *       $Revision: 1.59 $
+ *       $Revision: 1.62 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -170,6 +170,7 @@ typedef const struct acpi_rsconvert_info
 #define ACPI_RSC_BITMASK16              18
 #define ACPI_RSC_EXIT_NE                19
 #define ACPI_RSC_EXIT_LE                20
+#define ACPI_RSC_EXIT_EQ                21
 
 /* Resource Conversion sub-opcodes */
 

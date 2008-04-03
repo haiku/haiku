@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: rsmisc - Miscellaneous resource descriptors
- *              $Revision: 1.45 $
+ *              $Revision: 1.48 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -606,6 +606,18 @@ AcpiRsConvertResourceToAml (
 
                 ACPI_ERROR ((AE_INFO, "Invalid conversion sub-opcode"));
                 return_ACPI_STATUS (AE_BAD_PARAMETER);
+            }
+            break;
+
+
+        case ACPI_RSC_EXIT_EQ:
+            /*
+             * Control - Exit conversion if equal
+             */
+            if (*ACPI_ADD_PTR (UINT8, Resource,
+                    COMPARE_TARGET (Info)) == COMPARE_VALUE (Info))
+            {
+                goto Exit;
             }
             break;
 

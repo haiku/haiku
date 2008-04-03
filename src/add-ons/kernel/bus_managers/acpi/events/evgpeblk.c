@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: evgpeblk - GPE block creation and initialization.
- *              $Revision: 1.58 $
+ *              $Revision: 1.62 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -709,6 +709,12 @@ AcpiEvDeleteGpeXrupt (
     {
         GpeXrupt->Previous->Next = GpeXrupt->Next;
     }
+    else
+    {
+        /* No previous, update list head */
+
+        AcpiGbl_GpeXruptListHead = GpeXrupt->Next;
+    }
 
     if (GpeXrupt->Next)
     {
@@ -945,14 +951,11 @@ AcpiEvCreateGpeInfoBlocks (
         ThisRegister->BaseGpeNumber = (UINT8) (GpeBlock->BlockBaseNumber +
                                              (i * ACPI_GPE_REGISTER_WIDTH));
 
-        ACPI_STORE_ADDRESS (ThisRegister->StatusAddress.Address,
-                        (ACPI_GET_ADDRESS (GpeBlock->BlockAddress.Address)
-                        + i));
+        ThisRegister->StatusAddress.Address =
+            GpeBlock->BlockAddress.Address + i;
 
-        ACPI_STORE_ADDRESS (ThisRegister->EnableAddress.Address,
-                        (ACPI_GET_ADDRESS (GpeBlock->BlockAddress.Address)
-                        + i
-                        + GpeBlock->RegisterCount));
+        ThisRegister->EnableAddress.Address =
+            GpeBlock->BlockAddress.Address + i + GpeBlock->RegisterCount;
 
         ThisRegister->StatusAddress.SpaceId   = GpeBlock->BlockAddress.SpaceId;
         ThisRegister->EnableAddress.SpaceId   = GpeBlock->BlockAddress.SpaceId;
@@ -1277,7 +1280,7 @@ AcpiEvGpeInitialize (
      * particular block is not supported.
      */
     if (AcpiGbl_FADT.Gpe0BlockLength &&
-        ACPI_GET_ADDRESS (AcpiGbl_FADT.XGpe0Block.Address))
+        AcpiGbl_FADT.XGpe0Block.Address)
     {
         /* GPE block 0 exists (has both length and address > 0) */
 
@@ -1299,7 +1302,7 @@ AcpiEvGpeInitialize (
     }
 
     if (AcpiGbl_FADT.Gpe1BlockLength &&
-        ACPI_GET_ADDRESS (AcpiGbl_FADT.XGpe1Block.Address))
+        AcpiGbl_FADT.XGpe1Block.Address)
     {
         /* GPE block 1 exists (has both length and address > 0) */
 

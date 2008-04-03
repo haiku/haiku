@@ -3,7 +3,7 @@
  *
  * Module Name: hwregs - Read/write access functions for the various ACPI
  *                       control and status registers.
- *              $Revision: 1.185 $
+ *              $Revision: 1.188 $
  *
  ******************************************************************************/
 
@@ -11,7 +11,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -152,7 +152,7 @@ AcpiHwClearAcpiStatus (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_IO, "About to write %04X to %04X\n",
         ACPI_BITMASK_ALL_FIXED_STATUS,
-        (UINT16) ACPI_GET_ADDRESS (AcpiGbl_FADT.XPm1aEventBlock.Address)));
+        (UINT16) AcpiGbl_FADT.XPm1aEventBlock.Address));
 
     LockFlags = AcpiOsAcquireLock (AcpiGbl_HardwareLock);
 
@@ -166,7 +166,7 @@ AcpiHwClearAcpiStatus (
 
     /* Clear the fixed events */
 
-    if (ACPI_VALID_ADDRESS (AcpiGbl_FADT.XPm1bEventBlock.Address))
+    if (AcpiGbl_FADT.XPm1bEventBlock.Address)
     {
         Status = AcpiHwLowLevelWrite (16, ACPI_BITMASK_ALL_FIXED_STATUS,
                     &AcpiGbl_FADT.XPm1bEventBlock);
@@ -519,16 +519,14 @@ AcpiSetRegister (
 
         ACPI_DEBUG_PRINT ((ACPI_DB_IO, "PM2 control: Read %X from %8.8X%8.8X\n",
             RegisterValue,
-            ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (
-                AcpiGbl_FADT.XPm2ControlBlock.Address))));
+            ACPI_FORMAT_UINT64 (AcpiGbl_FADT.XPm2ControlBlock.Address)));
 
         ACPI_REGISTER_INSERT_VALUE (RegisterValue, BitRegInfo->BitPosition,
                 BitRegInfo->AccessBitMask, Value);
 
         ACPI_DEBUG_PRINT ((ACPI_DB_IO, "About to write %4.4X to %8.8X%8.8X\n",
             RegisterValue,
-            ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (
-                AcpiGbl_FADT.XPm2ControlBlock.Address))));
+            ACPI_FORMAT_UINT64 (AcpiGbl_FADT.XPm2ControlBlock.Address)));
 
         Status = AcpiHwRegisterWrite (ACPI_MTX_DO_NOT_LOCK,
                     ACPI_REGISTER_PM2_CONTROL, (UINT8) (RegisterValue));
@@ -883,7 +881,7 @@ AcpiHwLowLevelRead (
     /* Get a local copy of the address. Handles possible alignment issues */
 
     ACPI_MOVE_64_TO_64 (&Address, &Reg->Address);
-    if (!ACPI_VALID_ADDRESS (Address))
+    if (!Address)
     {
         return (AE_OK);
     }
@@ -898,15 +896,13 @@ AcpiHwLowLevelRead (
     case ACPI_ADR_SPACE_SYSTEM_MEMORY:
 
         Status = AcpiOsReadMemory (
-                    (ACPI_PHYSICAL_ADDRESS) ACPI_GET_ADDRESS (Address),
-                    Value, Width);
+                    (ACPI_PHYSICAL_ADDRESS) Address, Value, Width);
         break;
 
 
     case ACPI_ADR_SPACE_SYSTEM_IO:
 
-        Status = AcpiOsReadPort ((ACPI_IO_ADDRESS) ACPI_GET_ADDRESS (Address),
-                    Value, Width);
+        Status = AcpiOsReadPort ((ACPI_IO_ADDRESS) Address, Value, Width);
         break;
 
 
@@ -918,8 +914,7 @@ AcpiHwLowLevelRead (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_IO,
         "Read:  %8.8X width %2d from %8.8X%8.8X (%s)\n",
-        *Value, Width,
-        ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (Address)),
+        *Value, Width, ACPI_FORMAT_UINT64 (Address),
         AcpiUtGetRegionName (Reg->SpaceId)));
 
     return (Status);
@@ -966,7 +961,7 @@ AcpiHwLowLevelWrite (
     /* Get a local copy of the address. Handles possible alignment issues */
 
     ACPI_MOVE_64_TO_64 (&Address, &Reg->Address);
-    if (!ACPI_VALID_ADDRESS (Address))
+    if (!Address)
     {
         return (AE_OK);
     }
@@ -980,15 +975,14 @@ AcpiHwLowLevelWrite (
     case ACPI_ADR_SPACE_SYSTEM_MEMORY:
 
         Status = AcpiOsWriteMemory (
-                    (ACPI_PHYSICAL_ADDRESS) ACPI_GET_ADDRESS (Address),
-                    Value, Width);
+                    (ACPI_PHYSICAL_ADDRESS) Address, Value, Width);
         break;
 
 
     case ACPI_ADR_SPACE_SYSTEM_IO:
 
-        Status = AcpiOsWritePort ((ACPI_IO_ADDRESS) ACPI_GET_ADDRESS (Address),
-                    Value, Width);
+        Status = AcpiOsWritePort (
+                    (ACPI_IO_ADDRESS) Address, Value, Width);
         break;
 
 
@@ -1000,8 +994,7 @@ AcpiHwLowLevelWrite (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_IO,
         "Wrote: %8.8X width %2d   to %8.8X%8.8X (%s)\n",
-        Value, Width,
-        ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (Address)),
+        Value, Width, ACPI_FORMAT_UINT64 (Address),
         AcpiUtGetRegionName (Reg->SpaceId)));
 
     return (Status);

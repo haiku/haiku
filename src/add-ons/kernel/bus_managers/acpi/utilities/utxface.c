@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utxface - External interfaces for "global" ACPI functions
- *              $Revision: 1.124 $
+ *              $Revision: 1.128 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -125,6 +125,8 @@
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utxface")
 
+
+#ifndef ACPI_ASL_COMPILER
 
 /*******************************************************************************
  *
@@ -405,6 +407,8 @@ AcpiInitializeObjects (
 ACPI_EXPORT_SYMBOL (AcpiInitializeObjects)
 
 
+#endif
+
 /*******************************************************************************
  *
  * FUNCTION:    AcpiTerminate
@@ -456,6 +460,7 @@ AcpiTerminate (
 
 ACPI_EXPORT_SYMBOL (AcpiTerminate)
 
+#ifndef ACPI_ASL_COMPILER
 
 /*******************************************************************************
  *
@@ -572,6 +577,51 @@ AcpiGetSystemInfo (
 ACPI_EXPORT_SYMBOL (AcpiGetSystemInfo)
 
 
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiGetStatistics
+ *
+ * PARAMETERS:  Stats           - Where the statistics are returned
+ *
+ * RETURN:      Status          - the status of the call
+ *
+ * DESCRIPTION: Get the contents of the various system counters
+ *
+ ******************************************************************************/
+
+ACPI_STATUS
+AcpiGetStatistics (
+    ACPI_STATISTICS         *Stats)
+{
+    ACPI_FUNCTION_TRACE (AcpiGetStatistics);
+
+
+    /* Parameter validation */
+
+    if (!Stats)
+    {
+        return_ACPI_STATUS (AE_BAD_PARAMETER);
+    }
+
+    /* Various interrupt-based event counters */
+
+    Stats->SciCount = AcpiSciCount;
+    Stats->GpeCount = AcpiGpeCount;
+
+    ACPI_MEMCPY (Stats->FixedEventCount, AcpiFixedEventCount,
+        sizeof (AcpiFixedEventCount));
+
+
+    /* Other counters */
+
+    Stats->MethodCount = AcpiMethodCount;
+
+    return_ACPI_STATUS (AE_OK);
+}
+
+ACPI_EXPORT_SYMBOL (AcpiGetStatistics)
+
+
 /*****************************************************************************
  *
  * FUNCTION:    AcpiInstallInitializationHandler
@@ -636,3 +686,5 @@ AcpiPurgeCachedObjects (
 }
 
 ACPI_EXPORT_SYMBOL (AcpiPurgeCachedObjects)
+
+#endif

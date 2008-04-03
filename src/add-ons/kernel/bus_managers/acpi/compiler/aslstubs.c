@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: aslstubs - Stubs used to link to Aml interpreter
- *              $Revision: 1.19 $
+ *              $Revision: 1.23 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -119,6 +119,8 @@
 #include "aslcompiler.h"
 #include "acdispat.h"
 #include "actables.h"
+#include "acevents.h"
+#include "acinterp.h"
 
 #define _COMPONENT          ACPI_COMPILER
         ACPI_MODULE_NAME    ("aslstubs")
@@ -197,14 +199,14 @@ AcpiEvIsNotifyObject (
 }
 
 ACPI_STATUS
-AcpiEvAcquireGlobalLock(
-    UINT32                  Timeout)
+AcpiEvAcquireGlobalLock (
+    UINT16                  Timeout)
 {
     return (AE_OK);
 }
 
 ACPI_STATUS
-AcpiEvReleaseGlobalLock(
+AcpiEvReleaseGlobalLock (
     void)
 {
     return (AE_OK);

@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: rscalc - Calculate stream and list lengths
- *              $Revision: 1.79 $
+ *              $Revision: 1.84 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -158,7 +158,7 @@ static UINT8
 AcpiRsCountSetBits (
     UINT16                  BitField)
 {
-    UINT8                   BitsSet;
+    ACPI_NATIVE_UINT        BitsSet;
 
 
     ACPI_FUNCTION_ENTRY ();
@@ -168,10 +168,10 @@ AcpiRsCountSetBits (
     {
         /* Zero the least significant bit that is set */
 
-        BitField &= (BitField - 1);
+        BitField &= (UINT16) (BitField - 1);
     }
 
-    return (BitsSet);
+    return ((UINT8) BitsSet);
 }
 
 
@@ -312,6 +312,28 @@ AcpiRsGetAmlLength (
          */
         switch (Resource->Type)
         {
+        case ACPI_RESOURCE_TYPE_IRQ:
+
+            /* Length can be 3 or 2 */
+
+            if (Resource->Data.Irq.DescriptorLength == 2)
+            {
+                TotalSize--;
+            }
+            break;
+
+
+        case ACPI_RESOURCE_TYPE_START_DEPENDENT:
+
+            /* Length can be 1 or 0 */
+
+            if (Resource->Data.Irq.DescriptorLength == 0)
+            {
+                TotalSize--;
+            }
+            break;
+
+
         case ACPI_RESOURCE_TYPE_VENDOR:
             /*
              * Vendor Defined Resource:

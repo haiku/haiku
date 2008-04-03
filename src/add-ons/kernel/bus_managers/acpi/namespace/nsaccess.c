@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nsaccess - Top-level functions for accessing ACPI namespace
- *              $Revision: 1.204 $
+ *              $Revision: 1.209 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -294,7 +294,7 @@ AcpiNsRootInitialize (
 
                 if (ACPI_STRCMP (InitVal->Name, "_GL_") == 0)
                 {
-                    AcpiGbl_GlobalLockMutex = ObjDesc->Mutex.OsMutex;
+                    AcpiGbl_GlobalLockMutex = ObjDesc;
 
                     /* Create additional counting semaphore for global lock */
 
@@ -679,44 +679,67 @@ AcpiNsLookup (
             return_ACPI_STATUS (Status);
         }
 
-        /*
-         * Sanity typecheck of the target object:
-         *
-         * If 1) This is the last segment (NumSegments == 0)
-         *    2) And we are looking for a specific type
-         *       (Not checking for TYPE_ANY)
-         *    3) Which is not an alias
-         *    4) Which is not a local type (TYPE_SCOPE)
-         *    5) And the type of target object is known (not TYPE_ANY)
-         *    6) And target object does not match what we are looking for
-         *
-         * Then we have a type mismatch.  Just warn and ignore it.
-         */
-        if ((NumSegments == 0)                                  &&
-            (TypeToCheckFor != ACPI_TYPE_ANY)                   &&
-            (TypeToCheckFor != ACPI_TYPE_LOCAL_ALIAS)           &&
-            (TypeToCheckFor != ACPI_TYPE_LOCAL_METHOD_ALIAS)    &&
-            (TypeToCheckFor != ACPI_TYPE_LOCAL_SCOPE)           &&
-            (ThisNode->Type != ACPI_TYPE_ANY)                   &&
-            (ThisNode->Type != TypeToCheckFor))
-        {
-            /* Complain about a type mismatch */
+        /* More segments to follow? */
 
-            ACPI_WARNING ((AE_INFO,
-                "NsLookup: Type mismatch on %4.4s (%s), searching for (%s)",
-                ACPI_CAST_PTR (char, &SimpleName),
-                AcpiUtGetTypeName (ThisNode->Type),
-                AcpiUtGetTypeName (TypeToCheckFor)));
+        if (NumSegments > 0)
+        {
+            /*
+             * If we have an alias to an object that opens a scope (such as a
+             * device or processor), we need to dereference the alias here so that
+             * we can access any children of the original node (via the remaining
+             * segments).
+             */
+            if (ThisNode->Type == ACPI_TYPE_LOCAL_ALIAS)
+            {
+                if (AcpiNsOpensScope (((ACPI_NAMESPACE_NODE *) ThisNode->Object)->Type))
+                {
+                    ThisNode = (ACPI_NAMESPACE_NODE *) ThisNode->Object;
+                }
+            }
         }
 
-        /*
-         * If this is the last name segment and we are not looking for a
-         * specific type, but the type of found object is known, use that type
-         * to see if it opens a scope.
-         */
-        if ((NumSegments == 0) && (Type == ACPI_TYPE_ANY))
+        /* Special handling for the last segment (NumSegments == 0) */
+
+        else
         {
-            Type = ThisNode->Type;
+            /*
+             * Sanity typecheck of the target object:
+             *
+             * If 1) This is the last segment (NumSegments == 0)
+             *    2) And we are looking for a specific type
+             *       (Not checking for TYPE_ANY)
+             *    3) Which is not an alias
+             *    4) Which is not a local type (TYPE_SCOPE)
+             *    5) And the type of target object is known (not TYPE_ANY)
+             *    6) And target object does not match what we are looking for
+             *
+             * Then we have a type mismatch. Just warn and ignore it.
+             */
+            if ((TypeToCheckFor != ACPI_TYPE_ANY)                   &&
+                (TypeToCheckFor != ACPI_TYPE_LOCAL_ALIAS)           &&
+                (TypeToCheckFor != ACPI_TYPE_LOCAL_METHOD_ALIAS)    &&
+                (TypeToCheckFor != ACPI_TYPE_LOCAL_SCOPE)           &&
+                (ThisNode->Type != ACPI_TYPE_ANY)                   &&
+                (ThisNode->Type != TypeToCheckFor))
+            {
+                /* Complain about a type mismatch */
+
+                ACPI_WARNING ((AE_INFO,
+                    "NsLookup: Type mismatch on %4.4s (%s), searching for (%s)",
+                    ACPI_CAST_PTR (char, &SimpleName),
+                    AcpiUtGetTypeName (ThisNode->Type),
+                    AcpiUtGetTypeName (TypeToCheckFor)));
+            }
+
+            /*
+             * If this is the last name segment and we are not looking for a
+             * specific type, but the type of found object is known, use that type
+             * to (later) see if it opens a scope.
+             */
+            if (Type == ACPI_TYPE_ANY)
+            {
+                Type = ThisNode->Type;
+            }
         }
 
         /* Point to next name segment and make this node current */

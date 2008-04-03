@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utdebug - Debug print routines
- *              $Revision: 1.132 $
+ *              $Revision: 1.137 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -124,9 +124,9 @@
 
 #ifdef ACPI_DEBUG_OUTPUT
 
-static UINT32   AcpiGbl_PrevThreadId = 0xFFFFFFFF;
-static char     *AcpiGbl_FnEntryStr = "----Entry";
-static char     *AcpiGbl_FnExitStr  = "----Exit-";
+static ACPI_THREAD_ID       AcpiGbl_PrevThreadId = 0xFFFFFFFF;
+static char                 *AcpiGbl_FnEntryStr = "----Entry";
+static char                 *AcpiGbl_FnExitStr  = "----Exit-";
 
 /* Local prototypes */
 
@@ -151,10 +151,10 @@ void
 AcpiUtInitStackPtrTrace (
     void)
 {
-    UINT32                  CurrentSp;
+    ACPI_SIZE               CurrentSp;
 
 
-    AcpiGbl_EntryStackPointer = ACPI_PTR_DIFF (&CurrentSp, NULL);
+    AcpiGbl_EntryStackPointer = &CurrentSp;
 }
 
 
@@ -177,11 +177,9 @@ AcpiUtTrackStackPtr (
     ACPI_SIZE               CurrentSp;
 
 
-    CurrentSp = ACPI_PTR_DIFF (&CurrentSp, NULL);
-
-    if (CurrentSp < AcpiGbl_LowestStackPointer)
+    if (&CurrentSp < AcpiGbl_LowestStackPointer)
     {
-        AcpiGbl_LowestStackPointer = CurrentSp;
+        AcpiGbl_LowestStackPointer = &CurrentSp;
     }
 
     if (AcpiGbl_NestingLevel > AcpiGbl_DeepestNesting)
@@ -304,6 +302,7 @@ AcpiUtDebugPrint (
 
     va_start (args, Format);
     AcpiOsVprintf (Format, args);
+    va_end (args);
 }
 
 ACPI_EXPORT_SYMBOL (AcpiUtDebugPrint)
@@ -349,6 +348,7 @@ AcpiUtDebugPrintRaw (
 
     va_start (args, Format);
     AcpiOsVprintf (Format, args);
+    va_end (args);
 }
 
 ACPI_EXPORT_SYMBOL (AcpiUtDebugPrintRaw)
@@ -673,6 +673,12 @@ AcpiUtDumpBuffer2 (
     UINT32                  Temp32;
     UINT8                   BufChar;
 
+
+    if (!Buffer)
+    {
+        AcpiOsPrintf ("Null Buffer Pointer in DumpBuffer!\n");
+        return;
+    }
 
     if ((Count < 4) || (Count & 0x01))
     {

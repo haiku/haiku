@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbinstal - ACPI table installation and removal
- *              $Revision: 1.90 $
+ *              $Revision: 1.94 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -217,9 +217,20 @@ AcpiTbAddTable (
     if ((!ACPI_COMPARE_NAME (TableDesc->Pointer->Signature, ACPI_SIG_PSDT)) &&
         (!ACPI_COMPARE_NAME (TableDesc->Pointer->Signature, ACPI_SIG_SSDT)))
     {
-        ACPI_ERROR ((AE_INFO,
-            "Table has invalid signature [%4.4s], must be SSDT or PSDT",
-            TableDesc->Pointer->Signature));
+        /* Check for a printable name */
+
+        if (AcpiUtValidAcpiName (*(UINT32 *) TableDesc->Pointer->Signature))
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Table has invalid signature [%4.4s], must be SSDT or PSDT",
+                TableDesc->Pointer->Signature));
+        }
+        else
+        {
+            ACPI_ERROR ((AE_INFO,
+                "Table has invalid signature (0x%8.8X), must be SSDT or PSDT",
+                *(UINT32 *) TableDesc->Pointer->Signature));
+        }
         return_ACPI_STATUS (AE_BAD_SIGNATURE);
     }
 
@@ -250,6 +261,7 @@ AcpiTbAddTable (
 
         AcpiTbDeleteTable (TableDesc);
         *TableIndex = i;
+        Status = AE_ALREADY_EXISTS;
         goto Release;
     }
 

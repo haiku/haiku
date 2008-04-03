@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dsmthdat - control method arguments and local variables
- *              $Revision: 1.91 $
+ *              $Revision: 1.94 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -262,6 +262,8 @@ AcpiDsMethodDataDeleteAll (
             AcpiNsDetachObject (&WalkState->Arguments[Index]);
         }
     }
+
+    AcpiDsClearImplicitReturn (WalkState);
 
     return_VOID;
 }

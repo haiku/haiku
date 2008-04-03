@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dmtable - Support for ACPI tables that contain no AML code
- *              $Revision: 1.11 $
+ *              $Revision: 1.16 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -137,11 +137,46 @@ AcpiDmCheckAscii (
 
 /* These tables map a subtable type to a description string */
 
+static const char           *AcpiDmAsfSubnames[] =
+{
+    "ASF Information",
+    "ASF Alerts",
+    "ASF Remote Control",
+    "ASF RMCP Boot Options",
+    "ASF Address",
+    "Unknown SubTable Type"         /* Reserved */
+};
+
 static const char           *AcpiDmDmarSubnames[] =
 {
     "Hardware Unit Definition",
     "Reserved Memory Region",
     "Unknown SubTable Type"         /* Reserved */
+};
+
+static const char           *AcpiDmHestSubnames[] =
+{
+    "XPF Machine Check Exception",
+    "XPF Corrected Machine Check",
+    "NOT USED???",
+    "XPF Non-Maskable Interrupt",
+    "IPF Corrected Machine Check",
+    "IPF Corrected Platform Error",
+    "PCI Express Root Port AER",
+    "PCI Express AER (AER Endpoint)",
+    "PCI Express/PCI-X Bridge AERn",
+    "Generic Hardware Error Source",
+    "Unknown SubTable Type"         /* Reserved */
+};
+
+static const char           *AcpiDmHestNotifySubnames[] =
+{
+    "Polled",
+    "External Interrupt",
+    "Local Interrupt",
+    "SCI",
+    "NMI",
+    "Unknown Notify Type"           /* Reserved */
 };
 
 static const char           *AcpiDmMadtSubnames[] =
@@ -180,16 +215,21 @@ static ACPI_DMTABLE_DATA    AcpiDmTableData[] =
 {
     {ACPI_SIG_ASF,  NULL,                   AcpiDmDumpAsf,  "Alert Standard Format table"},
     {ACPI_SIG_BOOT, AcpiDmTableInfoBoot,    NULL,           "Simple Boot Flag Table"},
+    {ACPI_SIG_BERT, AcpiDmTableInfoBert,    NULL,           "Boot Error Record Table"},
     {ACPI_SIG_CPEP, NULL,                   AcpiDmDumpCpep, "Corrected Platform Error Polling table"},
     {ACPI_SIG_DBGP, AcpiDmTableInfoDbgp,    NULL,           "Debug Port table"},
     {ACPI_SIG_DMAR, NULL,                   AcpiDmDumpDmar, "DMA Remapping table"},
     {ACPI_SIG_ECDT, AcpiDmTableInfoEcdt,    NULL,           "Embedded Controller Boot Resources Table"},
+    {ACPI_SIG_EINJ, NULL,                   AcpiDmDumpEinj, "Error Injection table"},
+    {ACPI_SIG_ERST, NULL,                   AcpiDmDumpErst, "Error Record Serialization Table"},
     {ACPI_SIG_FADT, NULL,                   AcpiDmDumpFadt, "Fixed ACPI Description Table"},
+    {ACPI_SIG_HEST, NULL,                   AcpiDmDumpHest, "Hardware Error Source Table"},
     {ACPI_SIG_HPET, AcpiDmTableInfoHpet,    NULL,           "High Precision Event Timer table"},
     {ACPI_SIG_MADT, NULL,                   AcpiDmDumpMadt, "Multiple APIC Description Table"},
     {ACPI_SIG_MCFG, NULL,                   AcpiDmDumpMcfg, "Memory Mapped Configuration table"},
     {ACPI_SIG_RSDT, NULL,                   AcpiDmDumpRsdt, "Root System Description Table"},
     {ACPI_SIG_SBST, AcpiDmTableInfoSbst,    NULL,           "Smart Battery Specification Table"},
+    {ACPI_SIG_SLIC, AcpiDmTableInfoSlic,    NULL,           "Software Licensing Description Table"},
     {ACPI_SIG_SLIT, NULL,                   AcpiDmDumpSlit, "System Locality Information Table"},
     {ACPI_SIG_SPCR, AcpiDmTableInfoSpcr,    NULL,           "Serial Port Console Redirection table"},
     {ACPI_SIG_SPMI, AcpiDmTableInfoSpmi,    NULL,           "Server Platform Management Interface table"},
@@ -284,6 +324,7 @@ void
 AcpiDmDumpDataTable (
     ACPI_TABLE_HEADER       *Table)
 {
+    ACPI_STATUS             Status;
     ACPI_DMTABLE_DATA       *TableData;
     UINT32                  Length;
 
@@ -314,7 +355,11 @@ AcpiDmDumpDataTable (
          * All other tables must use the common ACPI table header, dump it now
          */
         Length = Table->Length;
-        AcpiDmDumpTable (Length, 0, Table, 0, AcpiDmTableInfoHeader);
+        Status = AcpiDmDumpTable (Length, 0, Table, 0, AcpiDmTableInfoHeader);
+        if (ACPI_FAILURE (Status))
+        {
+            return;
+        }
         AcpiOsPrintf ("\n");
 
         /* Match signature and dispatch appropriately */
@@ -419,7 +464,7 @@ AcpiDmLineHeader2 (
  *              TableOffset         - Starting offset within the table for this
  *                                    sub-descriptor (0 if main table)
  *              Table               - The ACPI table
- *              SubtableLength      - Lenghth of this sub-descriptor
+ *              SubtableLength      - Length of this sub-descriptor
  *              Info                - Info table for this ACPI table
  *
  * RETURN:      None
@@ -428,7 +473,7 @@ AcpiDmLineHeader2 (
  *
  ******************************************************************************/
 
-void
+ACPI_STATUS
 AcpiDmDumpTable (
     UINT32                  TableLength,
     UINT32                  TableOffset,
@@ -442,12 +487,13 @@ AcpiDmDumpTable (
     UINT8                   Temp8;
     UINT16                  Temp16;
     ACPI_DMTABLE_DATA       *TableData;
+    BOOLEAN                 LastOutputBlankLine = FALSE;
 
 
     if (!Info)
     {
         AcpiOsPrintf ("Display not implemented\n");
-        return;
+        return (AE_NOT_IMPLEMENTED);
     }
 
     /* Walk entire Info table; Null name terminates */
@@ -466,7 +512,8 @@ AcpiDmDumpTable (
         if ((CurrentOffset >= TableLength) ||
             (SubtableLength && (Info->Offset >= SubtableLength)))
         {
-            return;
+            AcpiOsPrintf ("**** ACPI table terminates in the middle of a data structure!\n");
+            return (AE_BAD_DATA);
         }
 
         /* Generate the byte length for this field */
@@ -478,10 +525,13 @@ AcpiDmDumpTable (
         case ACPI_DMT_SPACEID:
         case ACPI_DMT_MADT:
         case ACPI_DMT_SRAT:
+        case ACPI_DMT_ASF:
+        case ACPI_DMT_HESTNTYP:
             ByteLength = 1;
             break;
         case ACPI_DMT_UINT16:
         case ACPI_DMT_DMAR:
+        case ACPI_DMT_HEST:
             ByteLength = 2;
             break;
         case ACPI_DMT_UINT24:
@@ -506,12 +556,30 @@ AcpiDmDumpTable (
             ByteLength = ACPI_STRLEN (ACPI_CAST_PTR (char, Target)) + 1;
             break;
         case ACPI_DMT_GAS:
-            AcpiOsPrintf ("\n");
+            if (!LastOutputBlankLine)
+            {
+                AcpiOsPrintf ("\n");
+                LastOutputBlankLine = TRUE;
+            }
             ByteLength = sizeof (ACPI_GENERIC_ADDRESS);
+            break;
+        case ACPI_DMT_HESTNTFY:
+            if (!LastOutputBlankLine)
+            {
+                AcpiOsPrintf ("\n");
+                LastOutputBlankLine = TRUE;
+            }
+            ByteLength = sizeof (ACPI_HEST_NOTIFY);
             break;
         default:
             ByteLength = 0;
             break;
+        }
+
+        if (CurrentOffset + ByteLength > TableLength)
+        {
+            AcpiOsPrintf ("**** ACPI table terminates in the middle of a data structure!\n");
+            return (AE_BAD_DATA);
         }
 
         /* Start a new line and decode the opcode */
@@ -571,9 +639,11 @@ AcpiDmDumpTable (
 
         case ACPI_DMT_UINT56:
 
-            AcpiOsPrintf ("%6.6X%8.8X\n",
-                ACPI_HIDWORD (ACPI_GET64 (Target)) & 0x00FFFFFF,
-                ACPI_LODWORD (ACPI_GET64 (Target)));
+            for (Temp8 = 0; Temp8 < 7; Temp8++)
+            {
+                AcpiOsPrintf ("%2.2X", Target[Temp8]);
+            }
+            AcpiOsPrintf ("\n");
             break;
 
         case ACPI_DMT_UINT64:
@@ -649,6 +719,21 @@ AcpiDmDumpTable (
             AcpiOsPrintf ("<Generic Address Structure>\n");
             AcpiDmDumpTable (ACPI_CAST_PTR (ACPI_TABLE_HEADER, Table)->Length,
                 CurrentOffset, Target, 0, AcpiDmTableInfoGas);
+            AcpiOsPrintf ("\n");
+            LastOutputBlankLine = TRUE;
+            break;
+
+        case ACPI_DMT_ASF:
+
+            /* ASF subtable types */
+
+            Temp16 = (UINT16) ((*Target) & 0x7F);  /* Top bit can be zero or one */
+            if (Temp16 > ACPI_ASF_TYPE_RESERVED)
+            {
+                Temp16 = ACPI_ASF_TYPE_RESERVED;
+            }
+
+            AcpiOsPrintf ("%2.2X <%s>\n", *Target, AcpiDmAsfSubnames[Temp16]);
             break;
 
         case ACPI_DMT_DMAR:
@@ -663,6 +748,42 @@ AcpiDmDumpTable (
 
             AcpiOsPrintf ("%4.4X <%s>\n", *Target, AcpiDmDmarSubnames[Temp16]);
             break;
+
+        case ACPI_DMT_HEST:
+
+            /* HEST subtable types */
+
+            Temp16 = *Target;
+            if (Temp16 > ACPI_HEST_TYPE_RESERVED)
+            {
+                Temp16 = ACPI_HEST_TYPE_RESERVED;
+            }
+
+            AcpiOsPrintf ("%4.4X (%s)\n", *Target, AcpiDmHestSubnames[Temp16]);
+            break;
+
+        case ACPI_DMT_HESTNTFY:
+
+            AcpiOsPrintf ("<Hardware Error Notification Structure>\n");
+            AcpiDmDumpTable (ACPI_CAST_PTR (ACPI_TABLE_HEADER, Table)->Length,
+                CurrentOffset, Target, 0, AcpiDmTableInfoHestNotify);
+            AcpiOsPrintf ("\n");
+            LastOutputBlankLine = TRUE;
+            break;
+
+        case ACPI_DMT_HESTNTYP:
+
+            /* HEST Notify types */
+
+            Temp8 = *Target;
+            if (Temp8 > ACPI_HEST_NOTIFY_RESERVED)
+            {
+                Temp8 = ACPI_HEST_NOTIFY_RESERVED;
+            }
+
+            AcpiOsPrintf ("%2.2X (%s)\n", *Target, AcpiDmHestNotifySubnames[Temp8]);
+            break;
+
 
         case ACPI_DMT_MADT:
 
@@ -691,14 +812,16 @@ AcpiDmDumpTable (
             break;
 
         case ACPI_DMT_EXIT:
-            return;
+            return (AE_OK);
 
         default:
             ACPI_ERROR ((AE_INFO,
                 "**** Invalid table opcode [%X] ****\n", Info->Opcode));
-            return;
+            return (AE_SUPPORT);
         }
     }
+
+    return (AE_OK);
 }
 
 

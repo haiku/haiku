@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: exconfig - Namespace reconfiguration (Load/Unload opcodes)
- *              $Revision: 1.102 $
+ *              $Revision: 1.113 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -121,7 +121,6 @@
 #include "acinterp.h"
 #include "amlcode.h"
 #include "acnamesp.h"
-#include "acevents.h"
 #include "actables.h"
 #include "acdispat.h"
 
@@ -227,6 +226,15 @@ AcpiExLoadTableOp (
     ACPI_FUNCTION_TRACE (ExLoadTableOp);
 
 
+    /* Validate lengths for the SignatureString, OEMIDString, OEMTableID */
+
+    if ((Operand[0]->String.Length > ACPI_NAME_SIZE) ||
+        (Operand[1]->String.Length > ACPI_OEM_ID_SIZE) ||
+        (Operand[2]->String.Length > ACPI_OEM_TABLE_ID_SIZE))
+    {
+        return_ACPI_STATUS (AE_BAD_PARAMETER);
+    }
+
     /* Find the ACPI table in the RSDT/XSDT */
 
     Status = AcpiTbFindTable (Operand[0]->String.Pointer,
@@ -326,8 +334,16 @@ AcpiExLoadTableOp (
     if (ACPI_SUCCESS (Status))
     {
         ACPI_INFO ((AE_INFO,
-            "Dynamic OEM Table Load - [%4.4s] OemId [%6.6s] OemTableId [%8.8s]",
+            "Dynamic OEM Table Load - [%.4s] OemId [%.6s] OemTableId [%.8s]",
             Table->Signature, Table->OemId, Table->OemTableId));
+    }
+
+    /* Invoke table handler if present */
+
+    if (AcpiGbl_TableHandler)
+    {
+        (void) AcpiGbl_TableHandler (ACPI_TABLE_EVENT_LOAD, Table,
+                    AcpiGbl_TableHandlerContext);
     }
 
     *ReturnDesc = DdbHandle;
@@ -366,13 +382,13 @@ AcpiExLoadOp (
     ACPI_TABLE_DESC         TableDesc;
     ACPI_NATIVE_UINT        TableIndex;
     ACPI_STATUS             Status;
+    UINT32                  Length;
 
 
     ACPI_FUNCTION_TRACE (ExLoadOp);
 
 
     ACPI_MEMSET (&TableDesc, 0, sizeof (ACPI_TABLE_DESC));
-    TableDesc.Flags = ACPI_TABLE_ORIGIN_ALLOCATED;
 
     /* Source Object can be either an OpRegion or a Buffer/Field */
 
@@ -380,15 +396,15 @@ AcpiExLoadOp (
     {
     case ACPI_TYPE_REGION:
 
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Load from Region %p %s\n",
+            ObjDesc, AcpiUtGetObjectTypeName (ObjDesc)));
+
         /* Region must be SystemMemory (from ACPI spec) */
 
         if (ObjDesc->Region.SpaceId != ACPI_ADR_SPACE_SYSTEM_MEMORY)
         {
             return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
         }
-
-        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Load from Region %p %s\n",
-            ObjDesc, AcpiUtGetObjectTypeName (ObjDesc)));
 
         /*
          * If the Region Address and Length have not been previously evaluated,
@@ -403,6 +419,11 @@ AcpiExLoadOp (
             }
         }
 
+        /*
+         * We will simply map the memory region for the table. However, the
+         * memory region is technically not guaranteed to remain stable and
+         * we may eventually have to copy the table to a local buffer.
+         */
         TableDesc.Address = ObjDesc->Region.Address;
         TableDesc.Length = ObjDesc->Region.Length;
         TableDesc.Flags = ACPI_TABLE_ORIGIN_MAPPED;
@@ -410,17 +431,40 @@ AcpiExLoadOp (
 
     case ACPI_TYPE_BUFFER: /* Buffer or resolved RegionField */
 
-        /* Simply extract the buffer from the buffer object */
-
         ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "Load from Buffer or Field %p %s\n",
             ObjDesc, AcpiUtGetObjectTypeName (ObjDesc)));
 
-        TableDesc.Pointer = ACPI_CAST_PTR (ACPI_TABLE_HEADER,
-            ObjDesc->Buffer.Pointer);
-        TableDesc.Length = TableDesc.Pointer->Length;
-        TableDesc.Flags = ACPI_TABLE_ORIGIN_ALLOCATED;
+        Length = ObjDesc->Buffer.Length;
 
-        ObjDesc->Buffer.Pointer = NULL;
+        /* Must have at least an ACPI table header */
+
+        if (Length < sizeof (ACPI_TABLE_HEADER))
+        {
+            return_ACPI_STATUS (AE_INVALID_TABLE_LENGTH);
+        }
+
+        /* Validate checksum here. It won't get validated in TbAddTable */
+
+        Status = AcpiTbVerifyChecksum (
+                    ACPI_CAST_PTR (ACPI_TABLE_HEADER, ObjDesc->Buffer.Pointer), Length);
+        if (ACPI_FAILURE (Status))
+        {
+            return_ACPI_STATUS (Status);
+        }
+
+        /*
+         * We need to copy the buffer since the original buffer could be
+         * changed or deleted in the future
+         */
+        TableDesc.Pointer = ACPI_ALLOCATE (Length);
+        if (!TableDesc.Pointer)
+        {
+            return_ACPI_STATUS (AE_NO_MEMORY);
+        }
+
+        ACPI_MEMCPY (TableDesc.Pointer, ObjDesc->Buffer.Pointer, Length);
+        TableDesc.Length = Length;
+        TableDesc.Flags = ACPI_TABLE_ORIGIN_ALLOCATED;
         break;
 
     default:
@@ -436,7 +480,7 @@ AcpiExLoadOp (
         goto Cleanup;
     }
 
-    Status = AcpiExAddTable (TableIndex, AcpiGbl_RootNode, &DdbHandle);
+    Status = AcpiExAddTable (TableIndex, WalkState->ScopeInfo->Scope.Node, &DdbHandle);
     if (ACPI_FAILURE (Status))
     {
         /* On error, TablePtr was deallocated above */
@@ -453,12 +497,23 @@ AcpiExLoadOp (
 
         /* TablePtr was deallocated above */
 
+        AcpiUtRemoveReference (DdbHandle);
         return_ACPI_STATUS (Status);
+    }
+
+    /* Invoke table handler if present */
+
+    if (AcpiGbl_TableHandler)
+    {
+        (void) AcpiGbl_TableHandler (ACPI_TABLE_EVENT_LOAD, TableDesc.Pointer,
+                    AcpiGbl_TableHandlerContext);
     }
 
 Cleanup:
     if (ACPI_FAILURE (Status))
     {
+        /* Delete allocated buffer or mapping */
+
         AcpiTbDeleteTable (&TableDesc);
     }
     return_ACPI_STATUS (Status);
@@ -484,6 +539,7 @@ AcpiExUnloadTable (
     ACPI_STATUS             Status = AE_OK;
     ACPI_OPERAND_OBJECT     *TableDesc = DdbHandle;
     ACPI_NATIVE_UINT        TableIndex;
+    ACPI_TABLE_HEADER       *Table;
 
 
     ACPI_FUNCTION_TRACE (ExUnloadTable);
@@ -506,18 +562,27 @@ AcpiExUnloadTable (
 
     TableIndex = (ACPI_NATIVE_UINT) TableDesc->Reference.Object;
 
+    /* Invoke table handler if present */
+
+    if (AcpiGbl_TableHandler)
+    {
+        Status = AcpiGetTableByIndex (TableIndex, &Table);
+        if (ACPI_SUCCESS (Status))
+        {
+            (void) AcpiGbl_TableHandler (ACPI_TABLE_EVENT_UNLOAD, Table,
+                        AcpiGbl_TableHandlerContext);
+        }
+    }
+
     /*
      * Delete the entire namespace under this table Node
      * (Offset contains the TableId)
      */
     AcpiTbDeleteNamespaceByOwner (TableIndex);
-    AcpiTbReleaseOwnerId (TableIndex);
+    (void) AcpiTbReleaseOwnerId (TableIndex);
 
     AcpiTbSetTableLoadedFlag (TableIndex, FALSE);
 
-    /* Delete the table descriptor (DdbHandle) */
-
-    AcpiUtRemoveReference (TableDesc);
-    return_ACPI_STATUS (Status);
+    return_ACPI_STATUS (AE_OK);
 }
 

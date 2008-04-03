@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dmobject - ACPI object decode and display
- *              $Revision: 1.21 $
+ *              $Revision: 1.24 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -352,7 +352,22 @@ AcpiDmDecodeNode (
         AcpiOsPrintf (" [Method Local]");
     }
 
-    AcpiDmDecodeInternalObject (AcpiNsGetAttachedObject (Node));
+    switch (Node->Type)
+    {
+    /* These types have no attached object */
+
+    case ACPI_TYPE_DEVICE:
+        AcpiOsPrintf (" Device");
+        break;
+
+    case ACPI_TYPE_THERMAL:
+        AcpiOsPrintf (" Thermal Zone");
+        break;
+
+    default:
+        AcpiDmDecodeInternalObject (AcpiNsGetAttachedObject (Node));
+        break;
+    }
 }
 
 

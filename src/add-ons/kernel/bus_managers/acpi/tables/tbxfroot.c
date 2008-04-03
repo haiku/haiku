@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: tbxfroot - Find the root ACPI table (RSDT)
- *              $Revision: 1.103 $
+ *              $Revision: 1.106 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -185,8 +185,6 @@ AcpiTbValidateRsdp (
     return (AE_OK);
 }
 
-
-#if ACPI_MACHINE_WIDTH != 16
 
 /*******************************************************************************
  *
@@ -369,6 +367,4 @@ AcpiTbScanMemoryForRsdp (
         StartAddress));
     return_PTR (NULL);
 }
-
-#endif
 

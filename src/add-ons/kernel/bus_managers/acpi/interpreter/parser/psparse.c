@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: psparse - Parser top level AML parse routines
- *              $Revision: 1.169 $
+ *              $Revision: 1.176 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -288,6 +288,7 @@ AcpiPsCompleteThisOp (
                 (Op->Common.Parent->Common.AmlOpcode == AML_DATA_REGION_OP)  ||
                 (Op->Common.Parent->Common.AmlOpcode == AML_BUFFER_OP)       ||
                 (Op->Common.Parent->Common.AmlOpcode == AML_PACKAGE_OP)      ||
+                (Op->Common.Parent->Common.AmlOpcode == AML_BANK_FIELD_OP)   ||
                 (Op->Common.Parent->Common.AmlOpcode == AML_VAR_PACKAGE_OP))
             {
                 ReplacementOp = AcpiPsAllocOp (AML_INT_RETURN_VALUE_OP);
@@ -434,22 +435,14 @@ AcpiPsNextParseState (
 
         ParserState->Aml = WalkState->AmlLastWhile;
         WalkState->ControlState->Common.Value = FALSE;
-        Status = AcpiDsResultStackPop (WalkState);
-        if (ACPI_SUCCESS (Status))
-        {
-            Status = AE_CTRL_BREAK;
-        }
+        Status = AE_CTRL_BREAK;
         break;
 
 
     case AE_CTRL_CONTINUE:
 
         ParserState->Aml = WalkState->AmlLastWhile;
-        Status = AcpiDsResultStackPop (WalkState);
-        if (ACPI_SUCCESS (Status))
-        {
-            Status = AE_CTRL_CONTINUE;
-        }
+        Status = AE_CTRL_CONTINUE;
         break;
 
 
@@ -472,11 +465,7 @@ AcpiPsNextParseState (
          * Just close out this package
          */
         ParserState->Aml = AcpiPsGetNextPackageEnd (ParserState);
-        Status = AcpiDsResultStackPop (WalkState);
-        if (ACPI_SUCCESS (Status))
-        {
-            Status = AE_CTRL_PENDING;
-        }
+        Status = AE_CTRL_PENDING;
         break;
 
 
@@ -642,7 +631,8 @@ AcpiPsParseAml (
             if ((Status == AE_ALREADY_EXISTS) &&
                 (!WalkState->MethodDesc->Method.Mutex))
             {
-                ACPI_INFO ((AE_INFO, "Marking method %4.4s as Serialized",
+                ACPI_INFO ((AE_INFO,
+                    "Marking method %4.4s as Serialized because of AE_ALREADY_EXISTS error",
                     WalkState->MethodNode->Name.Ascii));
 
                 /*
@@ -701,6 +691,25 @@ AcpiPsParseAml (
                  */
                 if (!PreviousWalkState->ReturnDesc)
                 {
+                    /*
+                     * In slack mode execution, if there is no return value
+                     * we should implicitly return zero (0) as a default value.
+                     */
+                    if (AcpiGbl_EnableInterpreterSlack &&
+                        !PreviousWalkState->ImplicitReturnObj)
+                    {
+                        PreviousWalkState->ImplicitReturnObj =
+                            AcpiUtCreateInternalObject (ACPI_TYPE_INTEGER);
+                        if (!PreviousWalkState->ImplicitReturnObj)
+                        {
+                            return_ACPI_STATUS (AE_NO_MEMORY);
+                        }
+
+                        PreviousWalkState->ImplicitReturnObj->Integer.Value = 0;
+                    }
+
+                    /* Restart the calling control method */
+
                     Status = AcpiDsRestartControlMethod (WalkState,
                                 PreviousWalkState->ImplicitReturnObj);
                 }

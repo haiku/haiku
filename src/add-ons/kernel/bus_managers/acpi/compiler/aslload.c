@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: dswload - Dispatcher namespace load callbacks
- *              $Revision: 1.76 $
+ *              $Revision: 1.79 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -672,7 +672,8 @@ LdNamespace1Begin (
                 Node->Type = (UINT8) ObjectType;
                 Status = AE_OK;
             }
-            else if (Node->Flags & ANOBJ_IS_EXTERNAL)
+            else if ((Node->Flags & ANOBJ_IS_EXTERNAL) &&
+                     (Op->Asl.ParseOpcode != PARSEOP_EXTERNAL))
             {
                 /*
                  * Allow one create on an object or segment that was

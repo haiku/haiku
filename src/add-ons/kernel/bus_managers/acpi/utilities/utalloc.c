@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utalloc - local memory allocation routines
- *              $Revision: 1.162 $
+ *              $Revision: 1.166 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -117,6 +117,7 @@
 #define __UTALLOC_C__
 
 #include "acpi.h"
+#include "acdebug.h"
 
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utalloc")
@@ -218,6 +219,15 @@ ACPI_STATUS
 AcpiUtDeleteCaches (
     void)
 {
+#ifdef ACPI_DBG_TRACK_ALLOCATIONS
+    char                    Buffer[7];
+
+    if (AcpiGbl_DisplayFinalMemStats)
+    {
+        ACPI_STRCPY (Buffer, "MEMORY");
+        (void) AcpiDbDisplayStatistics (Buffer);
+    }
+#endif
 
     (void) AcpiOsDeleteCache (AcpiGbl_NamespaceCache);
     AcpiGbl_NamespaceCache = NULL;

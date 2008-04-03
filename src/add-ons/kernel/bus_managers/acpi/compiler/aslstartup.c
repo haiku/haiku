@@ -1,7 +1,8 @@
+
 /******************************************************************************
  *
- * Module Name: nsload - namespace loading/expanding/contracting procedures
- *              $Revision: 1.83 $
+ * Module Name: aslstartup - Compiler startup routines, called from main
+ *              $Revision: 1.5 $
  *
  *****************************************************************************/
 
@@ -114,316 +115,338 @@
  *
  *****************************************************************************/
 
-#define __NSLOAD_C__
 
-#include "acpi.h"
+#include "aslcompiler.h"
 #include "acnamesp.h"
-#include "acdispat.h"
 #include "actables.h"
+#include "acapps.h"
+
+#define _COMPONENT          ACPI_COMPILER
+        ACPI_MODULE_NAME    ("aslstartup")
 
 
-#define _COMPONENT          ACPI_NAMESPACE
-        ACPI_MODULE_NAME    ("nsload")
+#define ASL_MAX_FILES   256
+char                    *FileList[ASL_MAX_FILES];
+int                     FileCount;
+BOOLEAN                 AslToFile = TRUE;
+
 
 /* Local prototypes */
 
-#ifdef ACPI_FUTURE_IMPLEMENTATION
-ACPI_STATUS
-AcpiNsUnloadNamespace (
-    ACPI_HANDLE             Handle);
+static void
+AslInitializeGlobals (
+    void);
+
+static char **
+AsDoWildcard (
+    char                    *DirectoryPathname,
+    char                    *FileSpecifier);
 
 static ACPI_STATUS
-AcpiNsDeleteSubtree (
-    ACPI_HANDLE             StartHandle);
-#endif
+AslDoOneFile (
+    char                    *Filename);
 
 
-#ifndef ACPI_NO_METHOD_EXECUTION
 /*******************************************************************************
  *
- * FUNCTION:    AcpiNsLoadTable
- *
- * PARAMETERS:  TableIndex      - Index for table to be loaded
- *              Node            - Owning NS node
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Load one ACPI table into the namespace
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiNsLoadTable (
-    ACPI_NATIVE_UINT        TableIndex,
-    ACPI_NAMESPACE_NODE     *Node)
-{
-    ACPI_STATUS             Status;
-
-
-    ACPI_FUNCTION_TRACE (NsLoadTable);
-
-
-    /*
-     * Parse the table and load the namespace with all named
-     * objects found within.  Control methods are NOT parsed
-     * at this time.  In fact, the control methods cannot be
-     * parsed until the entire namespace is loaded, because
-     * if a control method makes a forward reference (call)
-     * to another control method, we can't continue parsing
-     * because we don't know how many arguments to parse next!
-     */
-    Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* If table already loaded into namespace, just return */
-
-    if (AcpiTbIsTableLoaded (TableIndex))
-    {
-        Status = AE_ALREADY_EXISTS;
-        goto Unlock;
-    }
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Loading table into namespace ****\n"));
-
-    Status = AcpiTbAllocateOwnerId (TableIndex);
-    if (ACPI_FAILURE (Status))
-    {
-        goto Unlock;
-    }
-
-    Status = AcpiNsParseTable (TableIndex, Node);
-    if (ACPI_SUCCESS (Status))
-    {
-        AcpiTbSetTableLoadedFlag (TableIndex, TRUE);
-    }
-    else
-    {
-        (void) AcpiTbReleaseOwnerId (TableIndex);
-    }
-
-Unlock:
-    (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
-
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /*
-     * Now we can parse the control methods.  We always parse
-     * them here for a sanity check, and if configured for
-     * just-in-time parsing, we delete the control method
-     * parse trees.
-     */
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Begin Table Method Parsing and Object Initialization ****\n"));
-
-    Status = AcpiDsInitializeObjects (TableIndex, Node);
-
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "**** Completed Table Method Parsing and Object Initialization ****\n"));
-
-    return_ACPI_STATUS (Status);
-}
-
-
-#ifdef ACPI_OBSOLETE_FUNCTIONS
-/*******************************************************************************
- *
- * FUNCTION:    AcpiLoadNamespace
+ * FUNCTION:    AslInitializeGlobals
  *
  * PARAMETERS:  None
  *
- * RETURN:      Status
+ * RETURN:      None
  *
- * DESCRIPTION: Load the name space from what ever is pointed to by DSDT.
- *              (DSDT points to either the BIOS or a buffer.)
+ * DESCRIPTION: Re-initialize globals needed to restart the compiler. This
+ *              allows multiple files to be disassembled and/or compiled.
  *
  ******************************************************************************/
 
-ACPI_STATUS
-AcpiNsLoadNamespace (
+static void
+AslInitializeGlobals (
     void)
 {
-    ACPI_STATUS             Status;
+    UINT32                  i;
 
 
-    ACPI_FUNCTION_TRACE (AcpiLoadNameSpace);
+    /* Init compiler globals */
 
+    Gbl_CurrentColumn = 0;
+    Gbl_CurrentLineNumber = 1;
+    Gbl_LogicalLineNumber = 1;
+    Gbl_CurrentLineOffset = 0;
+    Gbl_LineBufPtr = Gbl_CurrentLineBuffer;
 
-    /* There must be at least a DSDT installed */
+    Gbl_ErrorLog = NULL;
+    Gbl_NextError = NULL;
 
-    if (AcpiGbl_DSDT == NULL)
+    AslGbl_NextEvent = 0;
+    for (i = 0; i < ASL_NUM_REPORT_LEVELS; i++)
     {
-        ACPI_ERROR ((AE_INFO, "DSDT is not in memory"));
-        return_ACPI_STATUS (AE_NO_ACPI_TABLES);
+        Gbl_ExceptionCount[i] = 0;
     }
 
-    /*
-     * Load the namespace.  The DSDT is required,
-     * but the SSDT and PSDT tables are optional.
-     */
-    Status = AcpiNsLoadTableByType (ACPI_TABLE_ID_DSDT);
-    if (ACPI_FAILURE (Status))
-    {
-        return_ACPI_STATUS (Status);
-    }
-
-    /* Ignore exceptions from these */
-
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_SSDT);
-    (void) AcpiNsLoadTableByType (ACPI_TABLE_ID_PSDT);
-
-    ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
-        "ACPI Namespace successfully loaded at root %p\n",
-        AcpiGbl_RootNode));
-
-    return_ACPI_STATUS (Status);
+    Gbl_Files[ASL_FILE_AML_OUTPUT].Filename = NULL;
 }
-#endif
 
-#ifdef ACPI_FUTURE_IMPLEMENTATION
+
+/******************************************************************************
+ *
+ * FUNCTION:    AsDoWildcard
+ *
+ * PARAMETERS:  None
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Process files via wildcards. This function is for the Windows
+ *              case only.
+ *
+ ******************************************************************************/
+
+static char **
+AsDoWildcard (
+    char                    *DirectoryPathname,
+    char                    *FileSpecifier)
+{
+#ifdef WIN32
+    void                    *DirInfo;
+    char                    *Filename;
+
+
+    FileCount = 0;
+
+    /* Open parent directory */
+
+    DirInfo = AcpiOsOpenDirectory (DirectoryPathname, FileSpecifier, REQUEST_FILE_ONLY);
+    if (!DirInfo)
+    {
+        /* Either the directory of file does not exist */
+
+        Gbl_Files[ASL_FILE_INPUT].Filename = FileSpecifier;
+        FlFileError (ASL_FILE_INPUT, ASL_MSG_OPEN);
+        AslAbort ();
+    }
+
+    /* Process each file that matches the wildcard specification */
+
+    while ((Filename = AcpiOsGetNextFilename (DirInfo)))
+    {
+        /* Add the filename to the file list */
+
+        FileList[FileCount] = AcpiOsAllocate (strlen (Filename) + 1);
+        strcpy (FileList[FileCount], Filename);
+        FileCount++;
+
+        if (FileCount >= ASL_MAX_FILES)
+        {
+            printf ("Max files reached\n");
+            FileList[0] = NULL;
+            return (FileList);
+        }
+    }
+
+    /* Cleanup */
+
+    AcpiOsCloseDirectory (DirInfo);
+    FileList[FileCount] = NULL;
+    return (FileList);
+
+#else
+    /*
+     * Linux/Unix cases - Wildcards are expanded by the shell automatically.
+     * Just return the filename in a null terminated list
+     */
+    FileList[0] = AcpiOsAllocate (strlen (FileSpecifier) + 1);
+    strcpy (FileList[0], FileSpecifier);
+    FileList[1] = NULL;
+
+    return (FileList);
+#endif
+}
+
+
 /*******************************************************************************
  *
- * FUNCTION:    AcpiNsDeleteSubtree
+ * FUNCTION:    AslDoOneFile
  *
- * PARAMETERS:  StartHandle         - Handle in namespace where search begins
+ * PARAMETERS:  Filename        - Name of the file
  *
- * RETURNS      Status
+ * RETURN:      Status
  *
- * DESCRIPTION: Walks the namespace starting at the given handle and deletes
- *              all objects, entries, and scopes in the entire subtree.
- *
- *              Namespace/Interpreter should be locked or the subsystem should
- *              be in shutdown before this routine is called.
+ * DESCRIPTION: Process a single file - either disassemble, compile, or both
  *
  ******************************************************************************/
 
 static ACPI_STATUS
-AcpiNsDeleteSubtree (
-    ACPI_HANDLE             StartHandle)
+AslDoOneFile (
+    char                    *Filename)
 {
     ACPI_STATUS             Status;
-    ACPI_HANDLE             ChildHandle;
-    ACPI_HANDLE             ParentHandle;
-    ACPI_HANDLE             NextChildHandle;
-    ACPI_HANDLE             Dummy;
-    UINT32                  Level;
 
 
-    ACPI_FUNCTION_TRACE (NsDeleteSubtree);
+    Gbl_Files[ASL_FILE_INPUT].Filename = Filename;
 
+    /* Re-initialize "some" compiler globals */
 
-    ParentHandle = StartHandle;
-    ChildHandle  = NULL;
-    Level        = 1;
+    AslInitializeGlobals ();
 
     /*
-     * Traverse the tree of objects until we bubble back up
-     * to where we started.
+     * AML Disassembly (Optional)
      */
-    while (Level > 0)
+    if (Gbl_DisasmFlag || Gbl_GetAllTables)
     {
-        /* Attempt to get the next object in this scope */
+        /* ACPI CA subsystem initialization */
 
-        Status = AcpiGetNextObject (ACPI_TYPE_ANY, ParentHandle,
-                                    ChildHandle, &NextChildHandle);
-
-        ChildHandle = NextChildHandle;
-
-        /* Did we get a new object? */
-
-        if (ACPI_SUCCESS (Status))
+        Status = AdInitialize ();
+        if (ACPI_FAILURE (Status))
         {
-            /* Check if this object has any children */
-
-            if (ACPI_SUCCESS (AcpiGetNextObject (ACPI_TYPE_ANY, ChildHandle,
-                                    NULL, &Dummy)))
-            {
-                /*
-                 * There is at least one child of this object,
-                 * visit the object
-                 */
-                Level++;
-                ParentHandle = ChildHandle;
-                ChildHandle  = NULL;
-            }
+            return (Status);
         }
-        else
+
+        Status = AcpiAllocateRootTable (4);
+        if (ACPI_FAILURE (Status))
         {
-            /*
-             * No more children in this object, go back up to
-             * the object's parent
-             */
-            Level--;
+            AcpiOsPrintf ("Could not initialize ACPI Table Manager, %s\n",
+                AcpiFormatException (Status));
+            return (Status);
+        }
 
-            /* Delete all children now */
+        /* This is where the disassembly happens */
 
-            AcpiNsDeleteChildren (ChildHandle);
+        AcpiGbl_DbOpt_disasm = TRUE;
+        Status = AdAmlDisassemble (AslToFile,
+                    Gbl_Files[ASL_FILE_INPUT].Filename,
+                    Gbl_OutputFilenamePrefix,
+                    &Gbl_Files[ASL_FILE_INPUT].Filename,
+                    Gbl_GetAllTables);
+        if (ACPI_FAILURE (Status))
+        {
+            return (Status);
+        }
 
-            ChildHandle = ParentHandle;
-            Status = AcpiGetParent (ParentHandle, &ParentHandle);
-            if (ACPI_FAILURE (Status))
-            {
-                return_ACPI_STATUS (Status);
-            }
+        /* Shutdown compiler and ACPICA subsystem */
+
+        AeClearErrorLog ();
+        AcpiTerminate ();
+
+        /*
+         * Gbl_Files[ASL_FILE_INPUT].Filename was replaced with the
+         * .DSL disassembly file, which can now be compiled if requested
+         */
+        if (Gbl_DoCompile)
+        {
+            AcpiOsPrintf ("\nCompiling \"%s\"\n",
+                Gbl_Files[ASL_FILE_INPUT].Filename);
         }
     }
 
-    /* Now delete the starting object, and we are done */
+    /*
+     * ASL Compilation (Optional)
+     */
+    if (Gbl_DoCompile)
+    {
+        /*
+         * If -p not specified, we will use the input filename as the
+         * output filename prefix
+         */
+        if (Gbl_UseDefaultAmlFilename)
+        {
+            Gbl_OutputFilenamePrefix = Gbl_Files[ASL_FILE_INPUT].Filename;
+        }
 
-    AcpiNsDeleteNode (ChildHandle);
+        /* ACPI CA subsystem initialization (Must be re-initialized) */
 
-    return_ACPI_STATUS (AE_OK);
+        Status = AdInitialize ();
+        if (ACPI_FAILURE (Status))
+        {
+            return (Status);
+        }
+
+        Status = CmDoCompile ();
+        AcpiTerminate ();
+
+        /*
+         * Return non-zero exit code if there have been errors, unless the
+         * global ignore error flag has been set
+         */
+        if ((Gbl_ExceptionCount[ASL_ERROR] > 0) && (!Gbl_IgnoreErrors))
+        {
+            return (AE_ERROR);
+        }
+
+        AeClearErrorLog ();
+    }
+
+    return (AE_OK);
 }
 
 
 /*******************************************************************************
  *
- *  FUNCTION:       AcpiNsUnloadNameSpace
+ * FUNCTION:    AslDoOnePathname
  *
- *  PARAMETERS:     Handle          - Root of namespace subtree to be deleted
+ * PARAMETERS:  Pathname            - Full pathname, possibly with wildcards
  *
- *  RETURN:         Status
+ * RETURN:      Status
  *
- *  DESCRIPTION:    Shrinks the namespace, typically in response to an undocking
- *                  event.  Deletes an entire subtree starting from (and
- *                  including) the given handle.
+ * DESCRIPTION: Process one pathname, possible terminated with a wildcard
+ *              specification. If a wildcard, it is expanded and the multiple
+ *              files are processed.
  *
  ******************************************************************************/
 
 ACPI_STATUS
-AcpiNsUnloadNamespace (
-    ACPI_HANDLE             Handle)
+AslDoOnePathname (
+    char                    *Pathname)
 {
     ACPI_STATUS             Status;
+    char                    **FileList;
+    char                    *Filename;
+    char                    *FullPathname;
 
 
-    ACPI_FUNCTION_TRACE (NsUnloadNameSpace);
+    /* Split incoming path into a directory/filename combo */
 
-
-    /* Parameter validation */
-
-    if (!AcpiGbl_RootNode)
+    Status = FlSplitInputPathname (Pathname, &Gbl_DirectoryPath, &Filename);
+    if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (AE_NO_NAMESPACE);
+        return (Status);
     }
 
-    if (!Handle)
+    /* Expand possible wildcard into a file list (Windows/DOS only) */
+
+    FileList = AsDoWildcard (Gbl_DirectoryPath, Filename);
+    while (*FileList)
     {
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
+        FullPathname = ACPI_ALLOCATE (
+            strlen (Gbl_DirectoryPath) + strlen (*FileList) + 1);
+
+        /* Construct a full path to the file */
+
+        strcpy (FullPathname, Gbl_DirectoryPath);
+        strcat (FullPathname, *FileList);
+
+        /*
+         * If -p not specified, we will use the input filename as the
+         * output filename prefix
+         */
+        if (Gbl_UseDefaultAmlFilename)
+        {
+            Gbl_OutputFilenamePrefix = FullPathname;
+        }
+
+        Status = AslDoOneFile (FullPathname);
+        if (ACPI_FAILURE (Status))
+        {
+            return (Status);
+        }
+
+        ACPI_FREE (FullPathname);
+        ACPI_FREE (*FileList);
+        *FileList = NULL;
+        FileList++;
     }
 
-    /* This function does the real work */
-
-    Status = AcpiNsDeleteSubtree (Handle);
-
-    return_ACPI_STATUS (Status);
+    ACPI_FREE (Gbl_DirectoryPath);
+    ACPI_FREE (Filename);
+    return (AE_OK);
 }
-#endif
-#endif
 

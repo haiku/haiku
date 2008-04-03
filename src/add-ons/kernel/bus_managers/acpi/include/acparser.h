@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: acparser.h - AML Parser subcomponent prototypes and defines
- *       $Revision: 1.81 $
+ *       $Revision: 1.84 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -210,6 +210,10 @@ AcpiPsGetOpcodeInfo (
 char *
 AcpiPsGetOpcodeName (
     UINT16                  Opcode);
+
+UINT8
+AcpiPsGetArgumentCount (
+    UINT32                  OpType);
 
 
 /*

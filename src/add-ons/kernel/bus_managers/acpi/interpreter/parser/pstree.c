@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: pstree - Parser op tree manipulation/traversal/search
- *              $Revision: 1.49 $
+ *              $Revision: 1.52 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -267,6 +267,8 @@ AcpiPsAppendArg (
     {
         Arg->Common.Parent = Op;
         Arg = Arg->Common.Next;
+
+        Op->Common.ArgListLength++;
     }
 }
 

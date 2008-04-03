@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Name: hwsleep.c - ACPI Hardware Sleep/Wake Interface
- *              $Revision: 1.85 $
+ *              $Revision: 1.89 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -116,7 +116,6 @@
  *****************************************************************************/
 
 #include "acpi.h"
-#include "actables.h"
 
 #define _COMPONENT          ACPI_HARDWARE
         ACPI_MODULE_NAME    ("hwsleep")
@@ -147,7 +146,8 @@ AcpiSetFirmwareWakingVector (
 
     /* Get the FACS */
 
-    Status = AcpiGetTableByIndex (ACPI_TABLE_INDEX_FACS, (ACPI_TABLE_HEADER **) &Facs);
+    Status = AcpiGetTableByIndex (ACPI_TABLE_INDEX_FACS,
+                ACPI_CAST_INDIRECT_PTR (ACPI_TABLE_HEADER, &Facs));
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -156,7 +156,7 @@ AcpiSetFirmwareWakingVector (
     /* Set the vector */
 
     if ((Facs->Length < 32) ||
-        (!(ACPI_GET_ADDRESS (Facs->XFirmwareWakingVector))))
+        (!(Facs->XFirmwareWakingVector)))
     {
         /*
          * ACPI 1.0 FACS or short table or optional X_ field is zero
@@ -209,7 +209,8 @@ AcpiGetFirmwareWakingVector (
 
     /* Get the FACS */
 
-    Status = AcpiGetTableByIndex (ACPI_TABLE_INDEX_FACS, (ACPI_TABLE_HEADER **) &Facs);
+    Status = AcpiGetTableByIndex (ACPI_TABLE_INDEX_FACS,
+                ACPI_CAST_INDIRECT_PTR (ACPI_TABLE_HEADER, &Facs));
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -218,7 +219,7 @@ AcpiGetFirmwareWakingVector (
     /* Get the vector */
 
     if ((Facs->Length < 32) ||
-        (!(ACPI_GET_ADDRESS (Facs->XFirmwareWakingVector))))
+        (!(Facs->XFirmwareWakingVector)))
     {
         /*
          * ACPI 1.0 FACS or short table or optional X_ field is zero

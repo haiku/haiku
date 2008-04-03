@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: nsalloc - Namespace allocation and deletion utilities
- *              $Revision: 1.106 $
+ *              $Revision: 1.109 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -142,6 +142,9 @@ AcpiNsCreateNode (
     UINT32                  Name)
 {
     ACPI_NAMESPACE_NODE     *Node;
+#ifdef ACPI_DBG_TRACK_ALLOCATIONS
+    UINT32                  Temp;
+#endif
 
 
     ACPI_FUNCTION_TRACE (NsCreateNode);
@@ -154,6 +157,14 @@ AcpiNsCreateNode (
     }
 
     ACPI_MEM_TRACKING (AcpiGbl_NsNodeList->TotalAllocated++);
+
+#ifdef ACPI_DBG_TRACK_ALLOCATIONS
+        Temp = AcpiGbl_NsNodeList->TotalAllocated - AcpiGbl_NsNodeList->TotalFreed;
+        if (Temp > AcpiGbl_NsNodeList->MaxOccupied)
+        {
+            AcpiGbl_NsNodeList->MaxOccupied = Temp;
+        }
+#endif
 
     Node->Name.Integer = Name;
     ACPI_SET_DESCRIPTOR_TYPE (Node, ACPI_DESC_TYPE_NAMED);

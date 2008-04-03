@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dmopcode - AML disassembler, specific AML opcodes
- *              $Revision: 1.99 $
+ *              $Revision: 1.105 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -201,8 +201,6 @@ AcpiDmFieldFlags (
 {
     UINT32                  Flags;
 
-
-    /* The next peer Op (not child op) contains the flags */
 
     Op = Op->Common.Next;
     Flags = (UINT8) Op->Common.Value.Integer;
@@ -405,6 +403,9 @@ AcpiDmDisassembleOneOp (
 
         case AML_LLESS_OP:
             AcpiOsPrintf ("LGreaterEqual");
+            break;
+
+        default:
             break;
         }
         Op->Common.DisasmOpcode = 0;
@@ -615,13 +616,15 @@ AcpiDmDisassembleOneOp (
         if ((Op->Common.AmlOpcode == AML_INT_RETURN_VALUE_OP) &&
             (WalkState) &&
             (WalkState->Results) &&
-            (WalkState->Results->Results.NumResults))
+            (WalkState->ResultCount))
         {
             AcpiDmDecodeInternalObject (
                 WalkState->Results->Results.ObjDesc [
-                    WalkState->Results->Results.NumResults-1]);
+                    (WalkState->ResultCount - 1) %
+                        ACPI_RESULTS_FRAME_OBJ_NUM]);
         }
 #endif
+
         break;
     }
 }

@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dbdisply - debug display commands
- *              $Revision: 1.117 $
+ *              $Revision: 1.121 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -160,24 +160,7 @@ AcpiDbGetPointer (
     void                    *ObjPtr;
 
 
-#if ACPI_MACHINE_WIDTH == 16
-#include <stdio.h>
-
-    /* Have to handle 16-bit pointers of the form segment:offset */
-
-    if (!sscanf (Target, "%p", &ObjPtr))
-    {
-        AcpiOsPrintf ("Invalid pointer: %s\n", Target);
-        return (NULL);
-    }
-
-#else
-
-    /* Simple flat pointer */
-
     ObjPtr = ACPI_TO_POINTER (ACPI_STRTOUL (Target, NULL, 16));
-#endif
-
     return (ObjPtr);
 }
 
@@ -597,8 +580,10 @@ AcpiDbDisplayResults (
     UINT32                  i;
     ACPI_WALK_STATE         *WalkState;
     ACPI_OPERAND_OBJECT     *ObjDesc;
-    UINT32                  NumResults = 0;
+    UINT32                  ResultCount = 0;
     ACPI_NAMESPACE_NODE     *Node;
+    ACPI_GENERIC_STATE      *Frame;
+    UINT32                  Index; /* Index onto current frame */
 
 
     WalkState = AcpiDsGetCurrentWalkState (AcpiGbl_CurrentWalkList);
@@ -613,17 +598,28 @@ AcpiDbDisplayResults (
 
     if (WalkState->Results)
     {
-        NumResults = WalkState->Results->Results.NumResults;
+        ResultCount = WalkState->ResultCount;
     }
 
     AcpiOsPrintf ("Method [%4.4s] has %X stacked result objects\n",
-            AcpiUtGetNodeName (Node), NumResults);
+            AcpiUtGetNodeName (Node), ResultCount);
 
-    for (i = 0; i < NumResults; i++)
+    /* From the top element of result stack */
+
+    Frame = WalkState->Results;
+    Index = (ResultCount - 1) % ACPI_RESULTS_FRAME_OBJ_NUM;
+
+    for (i = 0; i < ResultCount; i++)
     {
-        ObjDesc = WalkState->Results->Results.ObjDesc[i];
+        ObjDesc = Frame->Results.ObjDesc[Index];
         AcpiOsPrintf ("Result%d: ", i);
         AcpiDmDisplayInternalObject (ObjDesc, WalkState);
+        if (Index == 0)
+        {
+            Frame = Frame->Results.Next;
+            Index = ACPI_RESULTS_FRAME_OBJ_NUM;
+        }
+        Index--;
     }
 }
 
@@ -853,8 +849,8 @@ AcpiDbDisplayGpes (
             AcpiOsPrintf (
                 "    RegisterInfo: %p  Status %8.8X%8.8X Enable %8.8X%8.8X\n",
                 GpeBlock->RegisterInfo,
-                ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (GpeBlock->RegisterInfo->StatusAddress.Address)),
-                ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (GpeBlock->RegisterInfo->EnableAddress.Address)));
+                ACPI_FORMAT_UINT64 (GpeBlock->RegisterInfo->StatusAddress.Address),
+                ACPI_FORMAT_UINT64 (GpeBlock->RegisterInfo->EnableAddress.Address));
 
             AcpiOsPrintf ("    EventInfo:    %p\n", GpeBlock->EventInfo);
 
@@ -868,8 +864,8 @@ AcpiDbDisplayGpes (
                     "    Reg %u:  WakeEnable %2.2X, RunEnable %2.2X  Status %8.8X%8.8X Enable %8.8X%8.8X\n",
                     i, GpeRegisterInfo->EnableForWake,
                     GpeRegisterInfo->EnableForRun,
-                    ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (GpeRegisterInfo->StatusAddress.Address)),
-                    ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (GpeRegisterInfo->EnableAddress.Address)));
+                    ACPI_FORMAT_UINT64 (GpeRegisterInfo->StatusAddress.Address),
+                    ACPI_FORMAT_UINT64 (GpeRegisterInfo->EnableAddress.Address));
 
                 /* Now look at the individual GPEs in this byte register */
 

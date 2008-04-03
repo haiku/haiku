@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: nsdump - table dumping routines for debug
- *              $Revision: 1.181 $
+ *              $Revision: 1.184 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -358,7 +358,7 @@ AcpiNsDumpOneObject (
 
             AcpiOsPrintf ("ID %X Len %.4X Addr %p\n",
                 ObjDesc->Processor.ProcId, ObjDesc->Processor.Length,
-                (char *) ObjDesc->Processor.Address);
+                ACPI_CAST_PTR (void, ObjDesc->Processor.Address));
             break;
 
 
@@ -438,7 +438,7 @@ AcpiNsDumpOneObject (
             if (ObjDesc->Region.Flags & AOPOBJ_DATA_VALID)
             {
                 AcpiOsPrintf (" Addr %8.8X%8.8X Len %.4X\n",
-                    ACPI_FORMAT_UINT64 (ObjDesc->Region.Address),
+                    ACPI_FORMAT_NATIVE_UINT (ObjDesc->Region.Address),
                     ObjDesc->Region.Length);
             }
             else

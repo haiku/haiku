@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dmresrc.c - Resource Descriptor disassembly
- *              $Revision: 1.33 $
+ *              $Revision: 1.36 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -248,8 +248,7 @@ AcpiDmDumpInteger64 (
     UINT64                  Value,
     char                    *Name)
 {
-    AcpiOsPrintf ("0x%8.8X%8.8X, // %s\n",
-        ACPI_FORMAT_UINT64 (ACPI_GET_ADDRESS (Value)), Name);
+    AcpiOsPrintf ("0x%8.8X%8.8X, // %s\n", ACPI_FORMAT_UINT64 (Value), Name);
 }
 
 

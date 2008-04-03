@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Module Name: utglobal - Global variables for the ACPI subsystem
- *              $Revision: 1.247 $
+ *              $Revision: 1.255 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -263,7 +263,7 @@ const ACPI_PREDEFINED_NAMES     AcpiGbl_PreDefinedNames[] =
  * Properties of the ACPI Object Types, both internal and external.
  * The table is indexed by values of ACPI_OBJECT_TYPE
  */
-const UINT8                     AcpiGbl_NsProperties[] =
+const UINT8                     AcpiGbl_NsProperties[ACPI_NUM_NS_TYPES] =
 {
     ACPI_NS_NORMAL,                     /* 00 Any              */
     ACPI_NS_NORMAL,                     /* 01 Number           */
@@ -690,6 +690,56 @@ AcpiUtGetMutexName (
 
     return (AcpiGbl_MutexNames[MutexId]);
 }
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtGetNotifyName
+ *
+ * PARAMETERS:  NotifyValue     - Value from the Notify() request
+ *
+ * RETURN:      String corresponding to the Notify Value.
+ *
+ * DESCRIPTION: Translate a Notify Value to a notify namestring.
+ *
+ ******************************************************************************/
+
+/* Names for Notify() values, used for debug output */
+
+static const char        *AcpiGbl_NotifyValueNames[] =
+{
+    "Bus Check",
+    "Device Check",
+    "Device Wake",
+    "Eject Request",
+    "Device Check Light",
+    "Frequency Mismatch",
+    "Bus Mode Mismatch",
+    "Power Fault",
+    "Capabilities Check",
+    "Device PLD Check",
+    "Reserved",
+    "System Locality Update"
+};
+
+const char *
+AcpiUtGetNotifyName (
+    UINT32                  NotifyValue)
+{
+
+    if (NotifyValue <= ACPI_NOTIFY_MAX)
+    {
+        return (AcpiGbl_NotifyValueNames[NotifyValue]);
+    }
+    else if (NotifyValue <= ACPI_MAX_SYS_NOTIFY)
+    {
+        return ("Reserved");
+    }
+    else /* Greater or equal to 0x80 */
+    {
+        return ("**Device Specific**");
+    }
+}
 #endif
 
 
@@ -768,19 +818,30 @@ AcpiUtInitGlobals (
     }
     AcpiGbl_OwnerIdMask[ACPI_NUM_OWNERID_MASKS - 1] = 0x80000000; /* Last ID is never valid */
 
+    /* Event counters */
+
+    AcpiMethodCount                     = 0;
+    AcpiSciCount                        = 0;
+    AcpiGpeCount                        = 0;
+
+    for (i = 0; i < ACPI_NUM_FIXED_EVENTS; i++)
+    {
+        AcpiFixedEventCount[i]              = 0;
+    }
+
     /* GPE support */
 
-    AcpiGpeCount                        = 0;
     AcpiGbl_GpeXruptListHead            = NULL;
     AcpiGbl_GpeFadtBlocks[0]            = NULL;
     AcpiGbl_GpeFadtBlocks[1]            = NULL;
 
-    /* Global notify handlers */
+    /* Global handlers */
 
     AcpiGbl_SystemNotify.Handler        = NULL;
     AcpiGbl_DeviceNotify.Handler        = NULL;
     AcpiGbl_ExceptionHandler            = NULL;
     AcpiGbl_InitHandler                 = NULL;
+    AcpiGbl_TableHandler                = NULL;
 
     /* Global Lock support */
 
@@ -823,7 +884,11 @@ AcpiUtInitGlobals (
 
 
 #ifdef ACPI_DEBUG_OUTPUT
-    AcpiGbl_LowestStackPointer          = ACPI_SIZE_MAX;
+    AcpiGbl_LowestStackPointer          = ACPI_CAST_PTR (ACPI_SIZE, ACPI_SIZE_MAX);
+#endif
+
+#ifdef ACPI_DBG_TRACK_ALLOCATIONS
+    AcpiGbl_DisplayFinalMemStats        = FALSE;
 #endif
 
     return_VOID;

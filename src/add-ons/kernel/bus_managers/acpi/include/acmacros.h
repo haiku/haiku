@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acmacros.h - C macros for the entire subsystem.
- *       $Revision: 1.192 $
+ *       $Revision: 1.199 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -136,53 +136,6 @@
 #define ACPI_ARRAY_LENGTH(x)            (sizeof(x) / sizeof((x)[0]))
 
 
-#if ACPI_MACHINE_WIDTH == 16
-
-/*
- * For 16-bit addresses, we have to assume that the upper 32 bits
- * (out of 64) are zero.
- */
-#define ACPI_LODWORD(l)                 ((UINT32)(l))
-#define ACPI_HIDWORD(l)                 ((UINT32)(0))
-
-#define ACPI_GET_ADDRESS(a)             ((a).Lo)
-#define ACPI_STORE_ADDRESS(a,b)         {(a).Hi=0;(a).Lo=(UINT32)(b);}
-#define ACPI_VALID_ADDRESS(a)           ((a).Hi | (a).Lo)
-
-#else
-#ifdef ACPI_NO_INTEGER64_SUPPORT
-/*
- * ACPI_INTEGER is 32-bits, no 64-bit support on this platform
- */
-#define ACPI_LODWORD(l)                 ((UINT32)(l))
-#define ACPI_HIDWORD(l)                 ((UINT32)(0))
-
-#define ACPI_GET_ADDRESS(a)             (a)
-#define ACPI_STORE_ADDRESS(a,b)         ((a)=(b))
-#define ACPI_VALID_ADDRESS(a)           (a)
-
-#else
-
-/*
- * Full 64-bit address/integer on both 32-bit and 64-bit platforms
- */
-#define ACPI_LODWORD(l)                 ((UINT32)(UINT64)(l))
-#define ACPI_HIDWORD(l)                 ((UINT32)(((*(UINT64_STRUCT *)(void *)(&l))).Hi))
-
-#define ACPI_GET_ADDRESS(a)             (a)
-#define ACPI_STORE_ADDRESS(a,b)         ((a)=(ACPI_PHYSICAL_ADDRESS)(b))
-#define ACPI_VALID_ADDRESS(a)           (a)
-#endif
-#endif
-
-/*
- * printf() format helpers
- */
-
-/* Split 64-bit integer into two 32-bit values. Use with %8.8X%8.8X */
-
-#define ACPI_FORMAT_UINT64(i)           ACPI_HIDWORD(i),ACPI_LODWORD(i)
-
 /*
  * Extract data using a pointer.  Any more than a byte and we
  * get into potential aligment issues -- see the STORE macros below.
@@ -210,21 +163,42 @@
 #define ACPI_TO_POINTER(i)              ACPI_ADD_PTR (void,(void *) NULL,(ACPI_NATIVE_UINT) i)
 #define ACPI_TO_INTEGER(p)              ACPI_PTR_DIFF (p,(void *) NULL)
 #define ACPI_OFFSET(d,f)                (ACPI_SIZE) ACPI_PTR_DIFF (&(((d *)0)->f),(void *) NULL)
-
-#if ACPI_MACHINE_WIDTH == 16
-#define ACPI_STORE_POINTER(d,s)         ACPI_MOVE_32_TO_32(d,s)
-#define ACPI_PHYSADDR_TO_PTR(i)         (void *)(i)
-#define ACPI_PTR_TO_PHYSADDR(i)         (UINT32) ACPI_CAST_PTR (UINT8,(i))
-#else
 #define ACPI_PHYSADDR_TO_PTR(i)         ACPI_TO_POINTER(i)
 #define ACPI_PTR_TO_PHYSADDR(i)         ACPI_TO_INTEGER(i)
-#endif
 
 #ifndef ACPI_MISALIGNMENT_NOT_SUPPORTED
 #define ACPI_COMPARE_NAME(a,b)          (*ACPI_CAST_PTR (UINT32,(a)) == *ACPI_CAST_PTR (UINT32,(b)))
 #else
 #define ACPI_COMPARE_NAME(a,b)          (!ACPI_STRNCMP (ACPI_CAST_PTR (char,(a)), ACPI_CAST_PTR (char,(b)), ACPI_NAME_SIZE))
 #endif
+
+/*
+ * Full 64-bit integer must be available on both 32-bit and 64-bit platforms
+ */
+typedef struct acpi_integer_overlay
+{
+    UINT32              LoDword;
+    UINT32              HiDword;
+
+} ACPI_INTEGER_OVERLAY;
+
+#define ACPI_LODWORD(Integer)           (ACPI_CAST_PTR (ACPI_INTEGER_OVERLAY, &Integer)->LoDword)
+#define ACPI_HIDWORD(Integer)           (ACPI_CAST_PTR (ACPI_INTEGER_OVERLAY, &Integer)->HiDword)
+
+/*
+ * printf() format helpers
+ */
+
+/* Split 64-bit integer into two 32-bit values. Use with %8.8X%8.8X */
+
+#define ACPI_FORMAT_UINT64(i)           ACPI_HIDWORD(i),ACPI_LODWORD(i)
+
+#if ACPI_MACHINE_WIDTH == 64
+#define ACPI_FORMAT_NATIVE_UINT(i)      ACPI_FORMAT_UINT64(i)
+#else
+#define ACPI_FORMAT_NATIVE_UINT(i)      0, (i)
+#endif
+
 
 /*
  * Macros for moving data around to/from buffers that are possibly unaligned.
@@ -299,28 +273,6 @@
 
 /* The hardware supports unaligned transfers, just do the little-endian move */
 
-#if ACPI_MACHINE_WIDTH == 16
-
-/* No 64-bit integers */
-/* 16-bit source, 16/32/64 destination */
-
-#define ACPI_MOVE_16_TO_16(d,s)         *(UINT16 *)(void *)(d) = *(UINT16 *)(void *)(s)
-#define ACPI_MOVE_16_TO_32(d,s)         *(UINT32 *)(void *)(d) = *(UINT16 *)(void *)(s)
-#define ACPI_MOVE_16_TO_64(d,s)         ACPI_MOVE_16_TO_32(d,s)
-
-/* 32-bit source, 16/32/64 destination */
-
-#define ACPI_MOVE_32_TO_16(d,s)         ACPI_MOVE_16_TO_16(d,s)    /* Truncate to 16 */
-#define ACPI_MOVE_32_TO_32(d,s)         *(UINT32 *)(void *)(d) = *(UINT32 *)(void *)(s)
-#define ACPI_MOVE_32_TO_64(d,s)         ACPI_MOVE_32_TO_32(d,s)
-
-/* 64-bit source, 16/32/64 destination */
-
-#define ACPI_MOVE_64_TO_16(d,s)         ACPI_MOVE_16_TO_16(d,s)    /* Truncate to 16 */
-#define ACPI_MOVE_64_TO_32(d,s)         ACPI_MOVE_32_TO_32(d,s)    /* Truncate to 32 */
-#define ACPI_MOVE_64_TO_64(d,s)         ACPI_MOVE_32_TO_32(d,s)
-
-#else
 /* 16-bit source, 16/32/64 destination */
 
 #define ACPI_MOVE_16_TO_16(d,s)         *(UINT16 *)(void *)(d) = *(UINT16 *)(void *)(s)
@@ -338,7 +290,6 @@
 #define ACPI_MOVE_64_TO_16(d,s)         ACPI_MOVE_16_TO_16(d,s)    /* Truncate to 16 */
 #define ACPI_MOVE_64_TO_32(d,s)         ACPI_MOVE_32_TO_32(d,s)    /* Truncate to 32 */
 #define ACPI_MOVE_64_TO_64(d,s)         *(UINT64 *)(void *)(d) = *(UINT64 *)(void *)(s)
-#endif
 
 #else
 /*
@@ -383,10 +334,7 @@
 
 /* Macros based on machine integer width */
 
-#if ACPI_MACHINE_WIDTH == 16
-#define ACPI_MOVE_SIZE_TO_16(d,s)       ACPI_MOVE_16_TO_16(d,s)
-
-#elif ACPI_MACHINE_WIDTH == 32
+#if ACPI_MACHINE_WIDTH == 32
 #define ACPI_MOVE_SIZE_TO_16(d,s)       ACPI_MOVE_32_TO_16(d,s)
 
 #elif ACPI_MACHINE_WIDTH == 64
@@ -777,17 +725,6 @@
 #define ACPI_DEBUGGER_EXEC(a)           a
 #else
 #define ACPI_DEBUGGER_EXEC(a)
-#endif
-
-
-/*
- * For 16-bit code, we want to shrink some things even though
- * we are using ACPI_DEBUG_OUTPUT to get the debug output
- */
-#if ACPI_MACHINE_WIDTH == 16
-#undef ACPI_DEBUG_ONLY_MEMBERS
-#undef _VERBOSE_STRUCTURES
-#define ACPI_DEBUG_ONLY_MEMBERS(a)
 #endif
 
 

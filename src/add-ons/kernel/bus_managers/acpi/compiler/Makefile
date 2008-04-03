@@ -4,7 +4,7 @@ PROG=	iasl
 SRCS=	aslcompilerparse.c aslcompilerlex.c aslanalyze.c aslcodegen.c \
 	aslcompile.c aslerror.c aslfiles.c asllength.c \
 	asllisting.c aslload.c asllookup.c aslmain.c aslmap.c aslopcodes.c \
-	asloperands.c aslresource.c aslrestype1.c aslrestype2.c \
+	asloperands.c aslresource.c aslrestype1.c aslrestype2.c aslstartup.c \
 	asltree.c aslutils.c asltransform.c aslfold.c aslstubs.c aslopt.c \
 	../common/getopt.c \
 	../utilities/utalloc.c \
@@ -13,12 +13,14 @@ SRCS=	aslcompilerparse.c aslcompilerlex.c aslanalyze.c aslcodegen.c \
 	../utilities/utdebug.c \
 	../utilities/utdelete.c \
 	../utilities/utglobal.c \
+	../utilities/utinit.c \
 	../utilities/utobject.c \
 	../utilities/utmisc.c \
 	../utilities/utmath.c \
 	../utilities/utmutex.c \
 	../utilities/utresrc.c \
 	../utilities/utstate.c \
+	../utilities/utxface.c \
 	../namespace/nsaccess.c \
 	../namespace/nsalloc.c \
 	../namespace/nsdump.c \

@@ -2,7 +2,7 @@
  *
  * Module Name: nsxfeval - Public interfaces to the ACPI subsystem
  *                         ACPI Object evaluation interfaces
- *              $Revision: 1.29 $
+ *              $Revision: 1.33 $
  *
  ******************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -557,6 +557,7 @@ AcpiNsGetDeviceCallback (
     ACPI_DEVICE_ID          Hid;
     ACPI_COMPATIBLE_ID_LIST *Cid;
     ACPI_NATIVE_UINT        i;
+    BOOLEAN                 Found;
 
 
     Status = AcpiUtAcquireMutex (ACPI_MTX_NAMESPACE);
@@ -585,10 +586,14 @@ AcpiNsGetDeviceCallback (
         return (AE_CTRL_DEPTH);
     }
 
-    if (!(Flags & ACPI_STA_DEVICE_PRESENT))
+    if (!(Flags & ACPI_STA_DEVICE_PRESENT) &&
+        !(Flags & ACPI_STA_DEVICE_FUNCTIONING))
     {
-        /* Don't examine children of the device if not present */
-
+        /*
+         * Don't examine the children of the device only when the
+         * device is neither present nor functional. See ACPI spec,
+         * description of _STA for more information.
+         */
         return (AE_CTRL_DEPTH);
     }
 #endif
@@ -608,8 +613,10 @@ AcpiNsGetDeviceCallback (
 
         if (ACPI_STRNCMP (Hid.Value, Info->Hid, sizeof (Hid.Value)) != 0)
         {
-            /* Get the list of Compatible IDs */
-
+            /*
+             * HID does not match, attempt match within the
+             * list of Compatible IDs (CIDs)
+             */
             Status = AcpiUtExecute_CID (Node, &Cid);
             if (Status == AE_NOT_FOUND)
             {
@@ -622,18 +629,28 @@ AcpiNsGetDeviceCallback (
 
             /* Walk the CID list */
 
+            Found = FALSE;
             for (i = 0; i < Cid->Count; i++)
             {
                 if (ACPI_STRNCMP (Cid->Id[i].Value, Info->Hid,
-                                        sizeof (ACPI_COMPATIBLE_ID)) != 0)
+                        sizeof (ACPI_COMPATIBLE_ID)) == 0)
                 {
-                    ACPI_FREE (Cid);
-                    return (AE_OK);
+                    /* Found a matching CID */
+
+                    Found = TRUE;
+                    break;
                 }
             }
+
             ACPI_FREE (Cid);
+            if (!Found)
+            {
+                return (AE_OK);
+            }
         }
     }
+
+    /* We have a valid device, invoke the user function */
 
     Status = Info->UserFunction (ObjHandle, NestingLevel, Info->Context,
                 ReturnValue);
@@ -662,7 +679,7 @@ AcpiNsGetDeviceCallback (
  *              value is returned to the caller.
  *
  *              This is a wrapper for WalkNamespace, but the callback performs
- *              additional filtering. Please see AcpiGetDeviceCallback.
+ *              additional filtering. Please see AcpiNsGetDeviceCallback.
  *
  ******************************************************************************/
 

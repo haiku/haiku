@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Module Name: aslfiles - file I/O suppoert
- *              $Revision: 1.53 $
+ *              $Revision: 1.56 $
  *
  *****************************************************************************/
 
@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -369,6 +369,8 @@ FlPrintFile (
     va_start (Args, Format);
 
     Actual = vfprintf (Gbl_Files[FileId].Handle, Format, Args);
+    va_end (Args);
+
     if (Actual == -1)
     {
         FlFileError (FileId, ASL_MSG_WRITE);

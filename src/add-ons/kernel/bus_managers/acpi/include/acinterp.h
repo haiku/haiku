@@ -1,7 +1,7 @@
 /******************************************************************************
  *
  * Name: acinterp.h - Interpreter subcomponent prototypes and defines
- *       $Revision: 1.168 $
+ *       $Revision: 1.173 $
  *
  *****************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -334,10 +334,6 @@ AcpiExCreateRegion (
     ACPI_WALK_STATE         *WalkState);
 
 ACPI_STATUS
-AcpiExCreateTableRegion (
-    ACPI_WALK_STATE         *WalkState);
-
-ACPI_STATUS
 AcpiExCreateEvent (
     ACPI_WALK_STATE         *WalkState);
 
@@ -381,9 +377,19 @@ AcpiExAcquireMutex (
     ACPI_WALK_STATE         *WalkState);
 
 ACPI_STATUS
+AcpiExAcquireMutexObject (
+    UINT16                  Timeout,
+    ACPI_OPERAND_OBJECT     *ObjDesc,
+    ACPI_THREAD_ID          ThreadId);
+
+ACPI_STATUS
 AcpiExReleaseMutex (
     ACPI_OPERAND_OBJECT     *ObjDesc,
     ACPI_WALK_STATE         *WalkState);
+
+ACPI_STATUS
+AcpiExReleaseMutexObject (
+    ACPI_OPERAND_OBJECT     *ObjDesc);
 
 void
 AcpiExReleaseAllMutexes (
@@ -685,13 +691,13 @@ void
 AcpiExTruncateFor32bitTable (
     ACPI_OPERAND_OBJECT     *ObjDesc);
 
-BOOLEAN
+void
 AcpiExAcquireGlobalLock (
     UINT32                  Rule);
 
 void
 AcpiExReleaseGlobalLock (
-    BOOLEAN                 Locked);
+    UINT32                  Rule);
 
 void
 AcpiExEisaIdToString (

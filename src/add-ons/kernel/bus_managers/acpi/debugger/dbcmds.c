@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Module Name: dbcmds - debug commands and output routines
- *              $Revision: 1.148 $
+ *              $Revision: 1.157 $
  *
  ******************************************************************************/
 
@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2006, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2008, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -285,9 +285,6 @@ ACPI_STATUS
 AcpiDbSleep (
     char                    *ObjectArg)
 {
-#if ACPI_MACHINE_WIDTH == 16
-    return (AE_OK);
-#else
     ACPI_STATUS             Status;
     UINT8                   SleepState;
 
@@ -312,7 +309,6 @@ AcpiDbSleep (
     Status = AcpiLeaveSleepState (SleepState);
 
     return (Status);
-#endif
 }
 
 
@@ -447,13 +443,13 @@ AcpiDbDisplayTableInfo (
     for (i = 0; i < AcpiGbl_RootTableList.Count; i++)
     {
         TableDesc = &AcpiGbl_RootTableList.Tables[i];
-        AcpiOsPrintf ( "%4.4s at %p length %.5X",
+        AcpiOsPrintf ( "%.4s at %p length %.5X",
                 TableDesc->Signature.Ascii, TableDesc->Pointer,
                 (UINT32) TableDesc->Length);
 
         if (TableDesc->Pointer && (i != ACPI_TABLE_INDEX_FACS))
         {
-            AcpiOsPrintf (" OemId=\"%6s\" OemTableId=\"%8s\" OemRevision=%8.8X",
+            AcpiOsPrintf (" OemId=\"%.6s\" OemTableId=\"%.8s\" OemRevision=%8.8X",
                     TableDesc->Pointer->OemId,
                     TableDesc->Pointer->OemTableId,
                     TableDesc->Pointer->OemRevision);
@@ -1415,8 +1411,8 @@ AcpiDmTestResourceConversion (
     OriginalAml = ReturnObj.Pointer;
 
     AcpiDmCompareAmlResources (
-        OriginalAml->Buffer.Pointer, OriginalAml->Buffer.Length,
-        NewAml.Pointer, NewAml.Length);
+        OriginalAml->Buffer.Pointer, (ACPI_RSDESC_SIZE) OriginalAml->Buffer.Length,
+        NewAml.Pointer, (ACPI_RSDESC_SIZE) NewAml.Length);
 
     /* Cleanup and exit */
 
@@ -1445,8 +1441,6 @@ void
 AcpiDbDisplayResources (
     char                    *ObjectArg)
 {
-#if ACPI_MACHINE_WIDTH != 16
-
     ACPI_NAMESPACE_NODE     *Node;
     ACPI_STATUS             Status;
     ACPI_BUFFER             ReturnObj;
@@ -1584,7 +1578,6 @@ Cleanup:
 
     AcpiDbSetOutputDestination (ACPI_DB_CONSOLE_OUTPUT);
     return;
-#endif
 }
 
 
@@ -1610,24 +1603,45 @@ AcpiDbIntegrityWalk (
     ACPI_INTEGRITY_INFO     *Info = (ACPI_INTEGRITY_INFO *) Context;
     ACPI_NAMESPACE_NODE     *Node = (ACPI_NAMESPACE_NODE *) ObjHandle;
     ACPI_OPERAND_OBJECT     *Object;
+    BOOLEAN                 Alias = TRUE;
 
 
     Info->Nodes++;
-    if (ACPI_GET_DESCRIPTOR_TYPE (Node) != ACPI_DESC_TYPE_NAMED)
+
+    /* Verify the NS node, and dereference aliases */
+
+    while (Alias)
     {
-        AcpiOsPrintf ("Invalid Descriptor Type for Node %p [%s]\n",
-            Node, AcpiUtGetDescriptorName (Node));
+        if (ACPI_GET_DESCRIPTOR_TYPE (Node) != ACPI_DESC_TYPE_NAMED)
+        {
+            AcpiOsPrintf ("Invalid Descriptor Type for Node %p [%s] - is %2.2X should be %2.2X\n",
+                Node, AcpiUtGetDescriptorName (Node), ACPI_GET_DESCRIPTOR_TYPE (Node),
+                ACPI_DESC_TYPE_NAMED);
+            return (AE_OK);
+        }
+
+        if ((Node->Type == ACPI_TYPE_LOCAL_ALIAS)  ||
+            (Node->Type == ACPI_TYPE_LOCAL_METHOD_ALIAS))
+        {
+            Node = (ACPI_NAMESPACE_NODE *) Node->Object;
+        }
+        else
+        {
+            Alias = FALSE;
+        }
     }
 
     if (Node->Type > ACPI_TYPE_LOCAL_MAX)
     {
         AcpiOsPrintf ("Invalid Object Type for Node %p, Type = %X\n",
             Node, Node->Type);
+        return (AE_OK);
     }
 
     if (!AcpiUtValidAcpiName (Node->Name.Integer))
     {
         AcpiOsPrintf ("Invalid AcpiName for Node %p\n", Node);
+        return (AE_OK);
     }
 
     Object = AcpiNsGetAttachedObject (Node);
