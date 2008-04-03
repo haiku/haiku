@@ -106,7 +106,6 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	int32			next_transaction_id;
 	cache_transaction *last_transaction;
 	hash_table		*transaction_hash;
-	int32			transaction_changed;
 
 	object_cache	*buffer_cache;
 	block_list		unused_blocks;
@@ -545,7 +544,6 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	next_transaction_id(1),
 	last_transaction(NULL),
 	transaction_hash(NULL),
-	transaction_changed(0),
 	num_dirty_blocks(0),
 	read_only(readOnly),
 	deleting(false)
