@@ -15,6 +15,7 @@
 #include <KernelExport.h>
 #include <fs_cache.h>
 
+#include <condition_variable.h>
 #include <lock.h>
 #include <vm_low_memory.h>
 #include <slab/Slab.h>
@@ -114,6 +115,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	bool			read_only;
 
 	NotificationList pending_notifications;
+	ConditionVariable<block_cache> condition_variable;
 	bool			deleting;
 
 	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
@@ -351,7 +353,7 @@ set_notification(cache_transaction *transaction,
 	cache_notification &notification, int32 events,
 	transaction_notification_hook hook, void *data)
 {
-	notification.transaction_id = transaction->id;
+	notification.transaction_id = transaction != NULL ? transaction->id : -1;
 	notification.events_pending = 0;
 	notification.events = events;
 	notification.hook = hook;
@@ -414,8 +416,14 @@ notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
 
 		if ((listener->events & event) != 0)
 			add_notification(cache, listener, event, removeListeners);
-		else if (removeListeners)
-			delete listener;
+		else if (removeListeners) {
+			// we might need to defer the deletion if its currently in use
+			MutexLocker locker(sNotificationsLock);
+			if (listener->events_pending != 0)
+				listener->delete_after_event = true;
+			else
+				delete listener;
+		}
 	}
 }
 
@@ -552,6 +560,8 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	sCaches.Add(this);
 	mutex_unlock(&sCachesLock);
 
+	condition_variable.Publish(this, "cache transaction sync");
+
 	buffer_cache = create_object_cache_etc("block cache buffers", blockSize,
 		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
 	if (buffer_cache == NULL)
@@ -574,6 +584,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 }
 
 
+//! Should be called with the cache's lock held.
 block_cache::~block_cache()
 {
 	deleting = true;
@@ -581,6 +592,8 @@ block_cache::~block_cache()
 	unregister_low_memory_handler(&block_cache::LowMemoryHandler, this);
 
 	benaphore_destroy(&lock);
+
+	condition_variable.Unpublish();
 
 	mutex_lock(&sCachesLock);
 	sCaches.Remove(this);
@@ -1340,6 +1353,30 @@ dump_caches(int argc, char **argv)
 #endif	// DEBUG_BLOCK_CACHE
 
 
+static void
+notify_sync(int32 transactionID, int32 event, void *_cache)
+{
+	block_cache *cache = (block_cache *)_cache;
+
+	cache->condition_variable.NotifyOne();
+}
+
+
+static void
+wait_for_notifications(block_cache *cache)
+{
+	// add sync notification
+	cache_notification notification;
+	set_notification(NULL, notification, TRANSACTION_WRITTEN, notify_sync,
+		cache);
+	add_notification(cache, &notification, TRANSACTION_WRITTEN, false);
+
+	// wait for condition
+	ConditionVariableEntry<block_cache> entry;
+	entry.Wait(cache);
+}
+
+
 static block_cache *
 get_next_locked_block_cache(block_cache *last)
 {
@@ -1417,6 +1454,10 @@ flush_pending_notifications(block_cache *cache)
 }
 
 
+/*!	Flushes all pending notifications by calling the appropriate hook
+	functions.
+	Must not be called with a cache lock held.
+*/
 static void
 flush_pending_notifications()
 {
@@ -1644,6 +1685,11 @@ cache_sync_transaction(void *_cache, int32 id)
 	}
 
 	hash_close(cache->transaction_hash, &iterator, false);
+	locker.Unlock();
+
+	wait_for_notifications(cache);
+		// make sure that all pending TRANSACTION_WRITTEN notifications
+		// are handled after we return
 	return B_OK;
 }
 
