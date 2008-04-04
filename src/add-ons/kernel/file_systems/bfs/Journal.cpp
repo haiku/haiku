@@ -567,8 +567,6 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 	// update the super block, and change the disk's state, if necessary
 
 	if (update) {
-		journal->fVolume->LogStart() = superBlock.log_start;
-
 		if (superBlock.log_start == superBlock.log_end)
 			superBlock.flags = SUPER_BLOCK_DISK_CLEAN;
 
@@ -577,6 +575,8 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 			FATAL(("_TransactionWritten: could not write back super block: %s\n",
 				strerror(status)));
 		}
+
+		journal->fVolume->LogStart() = superBlock.log_start;
 	}
 }
 
