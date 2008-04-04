@@ -1,9 +1,10 @@
 /*
- * Copyright (c) 2005-2007, Haiku, Inc.
+ * Copyright (c) 2005-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
- * Author:
+ * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		René Gollent
  */
 
 
@@ -43,7 +44,8 @@
 
 
 static const char *UptimeToString(char string[], size_t size);
-static const char *MemUsageToString(char string[], size_t size);
+static const char *MemUsageToString(char string[], size_t size, system_info *info);
+static const char *CacheUsageToString(char string[], size_t size, system_info *info);
 
 static const rgb_color kDarkGrey = { 100, 100, 100, 255 };
 static const rgb_color kHaikuGreen = { 42, 131, 36, 255 };
@@ -81,6 +83,7 @@ class AboutView : public BView {
 
 	private:
 		BStringView		*fMemView;
+		BStringView		*fCacheView;
 		BStringView		*fUptimeView;
 		BView			*fInfoView;
 		BTextView		*fCreditsView;
@@ -235,7 +238,6 @@ AboutView::AboutView(const BRect &rect)
 	fInfoView->AddChild(stringView);
 	stringView->ResizeToPreferred();
 
-
 	BString cpuType;
 	cpuType << get_cpu_vendor_string(systemInfo.cpu_type) 
 		<< " " << get_cpu_model_string(&systemInfo);
@@ -272,9 +274,14 @@ AboutView::AboutView(const BRect &rect)
 
 	fMemView = new BStringView(r, "ramtext", "");
 	fInfoView->AddChild(fMemView);
-	//fMemView->ResizeToPreferred();
-	
-	fMemView->SetText(MemUsageToString(string, sizeof(string)));
+	fMemView->SetText(MemUsageToString(string, sizeof(string), &systemInfo));
+
+	r.OffsetBy(0, textHeight);
+	r.bottom = r.top + textHeight;
+
+	fCacheView = new BStringView(r, "cachetext", "");
+	fInfoView->AddChild(fCacheView);
+	fCacheView->SetText(CacheUsageToString(string, sizeof(string), &systemInfo));
 
 	// Kernel build time/date
 	r.OffsetBy(0, textHeight * 1.5);
@@ -658,9 +665,11 @@ void
 AboutView::Pulse(void)
 {
 	char string[255];
-	
+	system_info info;
+	get_system_info(&info);	
 	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
-	fMemView->SetText(MemUsageToString(string, sizeof(string)));
+	fMemView->SetText(MemUsageToString(string, sizeof(string), &info));
+	fCacheView->SetText(CacheUsageToString(string, sizeof(string), &info));
 	
 	if (fScrollRunner == NULL && (system_time() > fLastActionTime + 10000000)) {
 		BMessage message(SCROLL_CREDITS_VIEW);
@@ -823,21 +832,23 @@ AboutView::PickRandomHaiku()
 
 
 static const char *
-MemUsageToString(char string[], size_t size)
+MemUsageToString(char string[], size_t size, system_info *info)
 {
-	system_info systemInfo;
-	
-	if (get_system_info(&systemInfo) < B_OK)
-		return "Unknown";
-	
 	snprintf(string, size, "%d MB total, %d MB used (%d%%)", 
-			int(systemInfo.max_pages / 256.0f + 0.5f),
-			int(systemInfo.used_pages / 256.0f + 0.5f),
-			int(100 * systemInfo.used_pages / systemInfo.max_pages));
+			int(info->max_pages / 256.0f + 0.5f),
+			int(info->used_pages / 256.0f + 0.5f),
+			int(100 * info->used_pages / info->max_pages));
 	
 	return string;
 }
 
+static const char *
+CacheUsageToString(char string[], size_t size, system_info *info)
+{
+	snprintf(string, size, "Cache size: %d MB", int(info->cached_pages / 256.0f + 0.5f));
+
+	return string;
+}
 
 static const char *
 UptimeToString(char string[], size_t size)
