@@ -3083,10 +3083,11 @@ ServerWindow::HandleDirectConnection(int32 bufferState, int32 driverState)
 				fDirectWindowData->buffer_info->bits_per_pixel = 16;
 				break;
 			case B_CMAP8:
+			case B_GRAY8:
 				fDirectWindowData->buffer_info->bits_per_pixel = 8;
 				break;
 			default:
-				fprintf(stderr, "unkown colorspace in HandleDirectConnection()!\n");
+				fprintf(stderr, "unknown colorspace in HandleDirectConnection()!\n");
 				fDirectWindowData->buffer_info->bits_per_pixel = 0;
 				break;
 		}
