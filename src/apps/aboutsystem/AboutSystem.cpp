@@ -83,7 +83,6 @@ class AboutView : public BView {
 
 	private:
 		BStringView		*fMemView;
-		BStringView		*fCacheView;
 		BStringView		*fUptimeView;
 		BView			*fInfoView;
 		BTextView		*fCreditsView;
@@ -275,13 +274,6 @@ AboutView::AboutView(const BRect &rect)
 	fMemView = new BStringView(r, "ramtext", "");
 	fInfoView->AddChild(fMemView);
 	fMemView->SetText(MemUsageToString(string, sizeof(string), &systemInfo));
-
-	r.OffsetBy(0, textHeight);
-	r.bottom = r.top + textHeight;
-
-	fCacheView = new BStringView(r, "cachetext", "");
-	fInfoView->AddChild(fCacheView);
-	fCacheView->SetText(CacheUsageToString(string, sizeof(string), &systemInfo));
 
 	// Kernel build time/date
 	r.OffsetBy(0, textHeight * 1.5);
@@ -669,7 +661,6 @@ AboutView::Pulse(void)
 	get_system_info(&info);	
 	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
 	fMemView->SetText(MemUsageToString(string, sizeof(string), &info));
-	fCacheView->SetText(CacheUsageToString(string, sizeof(string), &info));
 	
 	if (fScrollRunner == NULL && (system_time() > fLastActionTime + 10000000)) {
 		BMessage message(SCROLL_CREDITS_VIEW);
