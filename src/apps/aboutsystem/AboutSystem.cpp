@@ -833,13 +833,6 @@ MemUsageToString(char string[], size_t size, system_info *info)
 	return string;
 }
 
-static const char *
-CacheUsageToString(char string[], size_t size, system_info *info)
-{
-	snprintf(string, size, "Cache size: %d MB", int(info->cached_pages / 256.0f + 0.5f));
-
-	return string;
-}
 
 static const char *
 UptimeToString(char string[], size_t size)
