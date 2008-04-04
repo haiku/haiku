@@ -25,6 +25,8 @@
 #define CSW_STATUS_COMMAND_FAILED	0x01
 #define CSW_STATUS_PHASE_ERROR		0x02
 
+#define SYNC_SUPPORT_RELOAD			5
+
 typedef struct device_lun_s device_lun;
 
 // holds common information about an attached device (pointed to by luns)
@@ -40,6 +42,7 @@ typedef struct disk_device_s {
 	usb_pipe	bulk_out;
 	uint8		interface;
 	uint32		current_tag;
+	uint8		sync_support;
 
 	// used to store callback information
 	sem_id		notify;

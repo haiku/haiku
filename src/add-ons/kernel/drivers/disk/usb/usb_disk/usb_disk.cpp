@@ -436,10 +436,21 @@ usb_disk_update_capacity(device_lun *lun)
 status_t
 usb_disk_synchronize(device_lun *lun, bool force)
 {
+	if (lun->device->sync_support == 0) {
+		// this device repeatedly reported an illegal request when syncing
+		// it obviously does really not support this command...
+		return B_UNSUPPORTED;
+	}
+
 	if (lun->should_sync || force) {
 		status_t result = usb_disk_operation(lun, SCSI_SYNCHRONIZE_CACHE_10,
 			10, 0, 0, NULL, NULL, false);
 		lun->should_sync = false;
+
+		if (result == B_OK)
+			lun->device->sync_support = SYNC_SUPPORT_RELOAD;
+		else if (result == B_DEV_INVALID_IOCTL)
+			lun->device->sync_support--;
 		return result;
 	}
 
@@ -474,6 +485,7 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 	device->open_count = 0;
 	device->interface = 0xff;
 	device->current_tag = 0;
+	device->sync_support = SYNC_SUPPORT_RELOAD;
 	device->luns = NULL;
 
 	// scan through the interfaces to find our bulk-only data interface
