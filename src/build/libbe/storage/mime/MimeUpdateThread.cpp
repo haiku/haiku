@@ -31,7 +31,7 @@
 namespace BPrivate {
 namespace Storage {
 
-#if defined(HAIKU_HOST_PLATFORM_DANO) || defined(HAIKU_HOST_PLATFORM_BEOS) || defined(HAIKU_HOST_PLATFORM_BONE) || defined(HAIKU_HOST_PLATFORM_HAIKU)
+#ifdef __BEOS__
 // device_is_root_device
 bool
 device_is_root_device(dev_t device)
@@ -52,7 +52,7 @@ namespace Mime {
 
 	If \a replyee is non-NULL and construction succeeds, the MimeThreadObject
 	assumes resposibility for its deletion.
-	
+
 	Also, if \c non-NULL, \a replyee is expected to be a \c B_REG_MIME_UPDATE_MIME_INFO
 	or a \c B_REG_MIME_CREATE_APP_META_MIME	message with a \c true \c "synchronous"
 	field detached from the registrar's	mime manager looper (though this is not verified).
@@ -67,7 +67,7 @@ MimeUpdateThread::MimeUpdateThread(const char *name, int32 priority,
 	, fForce(force)
 	, fReplyee(replyee)
 	, fStatus(root ? B_OK : B_BAD_VALUE)
-{	
+{
 }
 
 // destructor
@@ -131,7 +131,7 @@ MimeUpdateThread::ThreadFunction()
 // DeviceSupportsAttributes
 /*! \brief Returns true if the given device supports attributes, false
 	if not (or if an error occurs while determining).
-	
+
 	Device numbers and their corresponding support info are cached in
 	a std::list to save unnecessarily \c statvfs()ing devices that have
 	already been statvfs()ed (which might otherwise happen quite often
@@ -157,11 +157,11 @@ MimeUpdateThread::UpdateEntry(const entry_ref *ref)
 {
 	status_t err = ref ? B_OK : B_BAD_VALUE;
 	bool entryIsDir = false;
-	
+
 	// Look to see if we're being terminated
 //	if (!err && fShouldExit)
 //		err = B_CANCELED;
-		
+
 	// Before we update, make sure this entry lives on a device that supports
 	// attributes. If not, we skip it and any of its children for
 	// updates (we don't signal an error, however).
@@ -169,18 +169,18 @@ MimeUpdateThread::UpdateEntry(const entry_ref *ref)
 //BPath path(ref);
 //printf("Updating '%s' (%s)... \n", path.Path(),
 //	(DeviceSupportsAttributes(ref->device) ? "yes" : "no"));
-	
+
 	if (!err
 	      && (device_is_root_device(ref->device)
-	            || DeviceSupportsAttributes(ref->device))) {	
+	            || DeviceSupportsAttributes(ref->device))) {
 		// Update this entry
 		if (!err)
 			err = DoMimeUpdate(ref, &entryIsDir);
 
 		// If we're recursing and this is a directory, update
 		// each of the directory's children as well
-		if (!err && fRecursive && entryIsDir) {		
-			BDirectory dir;		
+		if (!err && fRecursive && entryIsDir) {
+			BDirectory dir;
 			err = dir.SetTo(ref);
 			if (!err) {
 				entry_ref childRef;
@@ -193,13 +193,13 @@ MimeUpdateThread::UpdateEntry(const entry_ref *ref)
 						 	err = B_OK;
 						break;
 					} else {
-						err = UpdateEntry(&childRef);				
-					}			
-				}		
-			}			
+						err = UpdateEntry(&childRef);
+					}
+				}
+			}
 		}
 	}
-	return err;			  
+	return err;
 }
 
 }	// namespace Mime

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku Inc.
+ * Copyright 2002-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,18 +12,8 @@
 	Mime type C functions implementation.
 */
 
-#include <Entry.h>
-#include <Messenger.h>
-#include <Mime.h>
-#if !defined(HAIKU_HOST_PLATFORM_DANO) && !defined(HAIKU_HOST_PLATFORM_BEOS) && !defined(HAIKU_HOST_PLATFORM_BONE) && !defined(HAIKU_HOST_PLATFORM_HAIKU)
-#	include <MimeType.h>
-#endif
 #include <mime/database_access.h>
 #include <mime/UpdateMimeInfoThread.h>
-#include <Node.h>
-
-#include <unistd.h>
-#include <sys/ioctl.h>
 
 using namespace BPrivate;
 
@@ -79,7 +69,7 @@ update_mime_info(const char *path, int recursive, int synchronous, int force)
 */
 status_t
 create_app_meta_mime(const char *path, int recursive, int synchronous,
-					 int force)
+	int force)
 {
 	// We don't have a MIME DB...
 	return B_OK;
