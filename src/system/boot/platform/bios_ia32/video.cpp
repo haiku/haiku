@@ -27,7 +27,7 @@
 #include <string.h>
 
 
-//#define TRACE_VIDEO
+#define TRACE_VIDEO
 #ifdef TRACE_VIDEO
 #	define TRACE(x) dprintf x
 #else
@@ -809,7 +809,11 @@ platform_switch_to_logo(void)
 	if (sVesaCompatible && sMode != NULL) {
 		if (!sModeChosen)
 			get_mode_from_settings();
-
+		
+		// On some BIOS / chipset / monitor combinations, there seems to be a timing issue between 
+		// getting the EDID data and setting the video mode. As such we wait here briefly to give
+		// everything enough time to settle.
+		spin(1000);
 		if (vesa_set_mode(sMode->mode) != B_OK)
 			goto fallback;
 
