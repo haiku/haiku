@@ -654,12 +654,18 @@ Volume::Initialize(int fd, const char *name, uint32 blockSize,
 	fBlockShift = fSuperBlock.BlockShift();
 	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
 
+	// determine log size depending on the size of the volume
+	off_t logSize = 2048;
+	if (numBlocks <= 20480)
+		logSize = 512;
+	if (deviceSize > 1LL * 1024 * 1024 * 1024)
+		logSize = 4096;
+
 	// since the allocator has not been initialized yet, we
 	// cannot use BlockAllocator::BitmapSize() here
 	fSuperBlock.log_blocks = ToBlockRun(AllocationGroups()
 		* fSuperBlock.BlocksPerAllocationGroup() + 1);
-	fSuperBlock.log_blocks.length = HOST_ENDIAN_TO_BFS_INT16(2048);
-		// ToDo: set the log size depending on the disk size
+	fSuperBlock.log_blocks.length = HOST_ENDIAN_TO_BFS_INT16(logSize);
 	fSuperBlock.log_start = fSuperBlock.log_end = HOST_ENDIAN_TO_BFS_INT64(
 		ToBlock(Log()));
 
