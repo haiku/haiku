@@ -30,12 +30,12 @@
 KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info& systemInfo)
 	: BMenuItem("System Resources & Caches...", NULL)
 {
-	fTotalWriteMemory = -1;
 	fLastSum = -1;
 	fGrenze1 = -1;
 	fGrenze2 = -1;
-	fPhsysicalMemory = float(int(systemInfo.max_pages * B_PAGE_SIZE / 1024));
-	fCommitedMemory = float(int(systemInfo.used_pages * B_PAGE_SIZE / 1024));
+	fPhysicalMemory = float(int(systemInfo.max_pages * B_PAGE_SIZE / 1024));
+	fCommittedMemory = float(int(systemInfo.used_pages * B_PAGE_SIZE / 1024));
+	fCachedMemory = float(int(systemInfo.cached_pages * B_PAGE_SIZE / 1024));
 }
 
 
@@ -49,14 +49,11 @@ KernelMemoryBarMenuItem::DrawContent()
 
 
 void
-KernelMemoryBarMenuItem::UpdateSituation(float commitedMemory,
-	float totalWriteMemory)
+KernelMemoryBarMenuItem::UpdateSituation(float committedMemory,
+	float cachedMemory)
 {
-	if (commitedMemory < totalWriteMemory)
-		totalWriteMemory = commitedMemory;
-
-	fCommitedMemory = commitedMemory;
-	fTotalWriteMemory = totalWriteMemory;
+	fCommittedMemory = committedMemory;
+	fCachedMemory = cachedMemory;
 	DrawBar(false);
 }
 
@@ -71,8 +68,6 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	// draw the bar itself
 	BRect cadre (frame.right - kMargin - kBarWidth, frame.top + 5,
 		frame.right - kMargin, frame.top + 13);
-	if (fTotalWriteMemory < 0)
-		return;
 
 	if (fLastSum < 0)
 		force = true;
@@ -86,8 +81,8 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	cadre.InsetBy(1, 1);
 	BRect r = cadre;
 
-	float grenze1 = cadre.left + (cadre.right - cadre.left) * fTotalWriteMemory / fPhsysicalMemory;
-	float grenze2 = cadre.left + (cadre.right - cadre.left) * fCommitedMemory / fPhsysicalMemory;
+	float grenze1 = cadre.left + (cadre.right - cadre.left) * fCachedMemory / fPhysicalMemory;
+	float grenze2 = cadre.left + (cadre.right - cadre.left) * fCommittedMemory / fPhysicalMemory;
 	if (grenze1 > cadre.right)
 		grenze1 = cadre.right;
 	if (grenze2 > cadre.right)
@@ -135,7 +130,7 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 	fGrenze2 = grenze2;
 
 	// draw the value
-	double sum = fTotalWriteMemory * FLT_MAX + fCommitedMemory;
+	double sum = fCachedMemory * FLT_MAX + fCommittedMemory;
 	if (force || sum != fLastSum) {
 		if (selected) {
 			menu->SetLowColor(gMenuBackColorSelected);
@@ -150,11 +145,11 @@ KernelMemoryBarMenuItem::DrawBar(bool force)
 		menu->SetHighColor(kBlack);
 
 		char infos[128];
-		sprintf(infos, "%.1f MB", fTotalWriteMemory / 1024.f);
+		sprintf(infos, "%.1f MB", fCachedMemory / 1024.f);
 		BPoint loc(cadre.left - kMargin - gMemoryTextWidth / 2 - menu->StringWidth(infos),
 			cadre.bottom + 1);
 		menu->DrawString(infos, loc);
-		sprintf(infos, "%.1f MB", fCommitedMemory / 1024.f);
+		sprintf(infos, "%.1f MB", fCommittedMemory / 1024.f);
 		loc.x = cadre.left - kMargin - menu->StringWidth(infos);
 		menu->DrawString(infos, loc);
 		fLastSum = sum;

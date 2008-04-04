@@ -30,12 +30,12 @@ class KernelMemoryBarMenuItem : public BMenuItem {
 		virtual	void	GetContentSize(float* _width, float* _height);
 
 		void			DrawBar(bool force);
-		void			UpdateSituation(float commitedMemory, float totalWriteMemory);
+		void			UpdateSituation(float committedMemory, float fCachedMemory);
 
 	private:
-		float	fTotalWriteMemory;
-		float	fPhsysicalMemory;
-		float	fCommitedMemory;
+		float	fCachedMemory;
+		float	fPhysicalMemory;
+		float	fCommittedMemory;
 		double	fLastSum;
 		float	fGrenze1;
 		float	fGrenze2;

@@ -86,7 +86,8 @@ MemoryBarMenu::Pulse()
 {
 	system_info	sinfo;
 	get_system_info(&sinfo);
-	int commitedMemory = int(sinfo.used_pages * B_PAGE_SIZE / 1024);
+	int committedMemory = int(sinfo.used_pages * B_PAGE_SIZE / 1024);
+	int cachedMemory = int(sinfo.cached_pages * B_PAGE_SIZE / 1024);
 	Window()->BeginViewTransaction();
 
 	// create the list of items to remove, for their team is gone. Update the old teams.
@@ -96,7 +97,7 @@ MemoryBarMenu::Pulse()
 	MemoryBarMenuItem* item;
 	int	total = 0;
 	for (k = 1; (item = (MemoryBarMenuItem*)ItemAt(k)) != NULL; k++) {
-		int m = item->UpdateSituation(commitedMemory);
+		int m = item->UpdateSituation(committedMemory);
 		if (m < 0) {
 			if (lastRecycle == fRecycleCount) {
 				fRecycleCount += EXTRA;
@@ -157,7 +158,7 @@ MemoryBarMenu::Pulse()
 						infos.team_info.team, infos.team_icon, true, NULL));
 				}
 
-				int m = item->UpdateSituation(commitedMemory);
+				int m = item->UpdateSituation(committedMemory);
 				if (m >= 0) {
 					total += m;
 					item = NULL;
@@ -181,7 +182,7 @@ MemoryBarMenu::Pulse()
 	fLastTotalTime = system_time();
 	KernelMemoryBarMenuItem	*kernelItem;
 	if ((kernelItem = (KernelMemoryBarMenuItem*)ItemAt(0)) != NULL)
-		kernelItem->UpdateSituation(commitedMemory, total);
+		kernelItem->UpdateSituation(committedMemory, cachedMemory);
 
 	Window()->EndViewTransaction();
 	Window()->Flush();
