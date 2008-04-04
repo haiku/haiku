@@ -190,17 +190,18 @@ boot_splash_set_stage(int stage)
 
 	int iconsHalfHeight = kSplashIconsHeight / 2;
 	int width = min_c(kSplashIconsWidth, sInfo->width);
-	int height = min_c(iconsHalfHeight, sInfo->height);
+	int height = min_c(kSplashLogoHeight + iconsHalfHeight, sInfo->height);
 	int placementX = max_c(0, min_c(100, kSplashIconsPlacementX));
 	int placementY = max_c(0, min_c(100, kSplashIconsPlacementY));
 
 	int x = (sInfo->width - width) * placementX / 100;
-	int y = (sInfo->height - height) * placementY / 100;
+	int y = kSplashLogoHeight + (sInfo->height - height) * placementY / 100;
 
 	int stageLeftEdge = width * stage / BOOT_SPLASH_STAGE_MAX;
 	int stageRightEdge = width * (stage + 1) / BOOT_SPLASH_STAGE_MAX;
 
+	height = min_c(iconsHalfHeight, sInfo->height);
 	blit_cropped(kSplashIconsImage, NULL, stageLeftEdge, 0, stageRightEdge,
-		iconsHalfHeight, kSplashIconsWidth, NULL, x, y);
+		height, kSplashIconsWidth, NULL, x, y);
 }
 

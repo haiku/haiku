@@ -872,34 +872,40 @@ fallback:
 	// TODO: support compressed RGB image data (simple RLE?)
 
 	// render splash logo
+	uint16 iconsHalfHeight = kSplashIconsHeight / 2;
+
 	int width = min_c(kSplashLogoWidth, gKernelArgs.frame_buffer.width);
-	int height = min_c(kSplashLogoHeight, gKernelArgs.frame_buffer.height);
+	int height = min_c(kSplashLogoHeight + iconsHalfHeight,
+		gKernelArgs.frame_buffer.height);
 	int placementX = max_c(0, min_c(100, kSplashLogoPlacementX));
 	int placementY = max_c(0, min_c(100, kSplashLogoPlacementY));
 
 	int x = (gKernelArgs.frame_buffer.width - width) * placementX / 100;
 	int y = (gKernelArgs.frame_buffer.height - height) * placementY / 100;
 	
+	height = min_c(kSplashLogoHeight, gKernelArgs.frame_buffer.height);
 	blit_image(kSplashLogoImage, NULL, width, height, kSplashLogoWidth,
 		NULL, x, y);
 
 	// render initial (grayed out) icons
 	// the grayed out version is the lower half of the icons image
-	uint16 iconsHalfHeight = kSplashIconsHeight / 2;
 
 	width = min_c(kSplashIconsWidth, gKernelArgs.frame_buffer.width);
-	height = min_c(iconsHalfHeight, gKernelArgs.frame_buffer.height);
+	height = min_c(kSplashLogoHeight + iconsHalfHeight,
+		gKernelArgs.frame_buffer.height);
 	placementX = max_c(0, min_c(100, kSplashIconsPlacementX));
 	placementY = max_c(0, min_c(100, kSplashIconsPlacementY));
 
 	x = (gKernelArgs.frame_buffer.width - width) * placementX / 100;
-	y = (gKernelArgs.frame_buffer.height - height) * placementY / 100;
+	y = kSplashLogoHeight + (gKernelArgs.frame_buffer.height - height)
+		* placementY / 100;
 
 	// pointer into the lower half of the icons image data
 	const uint8* lowerHalfIconImage = kSplashIconsImage
 		+ (kSplashIconsWidth * iconsHalfHeight) * 3;
-	blit_image(lowerHalfIconImage, NULL, width, height, kSplashIconsWidth,
-		NULL, x, y);
+	height = min_c(iconsHalfHeight, gKernelArgs.frame_buffer.height);
+	blit_image(lowerHalfIconImage, NULL, width, height,
+		kSplashIconsWidth, NULL, x, y);
 }
 
 
