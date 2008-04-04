@@ -190,7 +190,7 @@ main(int argc, char *argv[])
 	sprintf(desc + strlen(desc),
 		"# Extent Description\n"
 		"RW %llu FLAT \"%s\" %llu\n",
-		imagesize / 512, name, headersize / 512);
+		actualImageSize / 512, name, headersize / 512);
 	sprintf(desc + strlen(desc), 
 		"# Disk Data Base\n"
 		"ddb.toolsVersion = \"0\"\n"
@@ -222,7 +222,7 @@ main(int argc, char *argv[])
 
 	if (!headerOnly) {
 		if (clearImage && ftruncate(fd, headersize) != 0
-			|| ftruncate(fd, actualImageSize)  != 0) {
+			|| ftruncate(fd, actualImageSize + headersize)  != 0) {
 			fprintf(stderr, "Error: resizing file %s failed (%s)\n", file,
 				strerror(errno));
 			exit(EXIT_FAILURE);
