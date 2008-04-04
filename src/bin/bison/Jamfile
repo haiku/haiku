@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src bin bison ;
-
-SubInclude HAIKU_TOP src bin bison data ;
-SubInclude HAIKU_TOP src bin bison lib ;
-SubInclude HAIKU_TOP src bin bison src ;
