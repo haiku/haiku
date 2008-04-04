@@ -1369,11 +1369,14 @@ wait_for_notifications(block_cache *cache)
 	cache_notification notification;
 	set_notification(NULL, notification, TRANSACTION_WRITTEN, notify_sync,
 		cache);
+
+	ConditionVariableEntry<block_cache> entry;
+	entry.Add(cache);
+
 	add_notification(cache, &notification, TRANSACTION_WRITTEN, false);
 
-	// wait for condition
-	ConditionVariableEntry<block_cache> entry;
-	entry.Wait(cache);
+	// wait for notification hook to be called
+	entry.Wait();
 }
 
 
