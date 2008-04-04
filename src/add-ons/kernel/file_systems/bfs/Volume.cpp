@@ -363,11 +363,21 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	if (fJournal == NULL)
 		return B_NO_MEMORY;
 
-	// replaying the log is the first thing we will do on this disk
 	status_t status = fJournal->InitCheck();
 	if (status < B_OK) {
 		FATAL(("could not initialize journal: %s!\n", strerror(status)));
 		return status;
+	}
+
+	// replaying the log is the first thing we will do on this disk
+	status = fJournal->ReplayLog();
+	if (status < B_OK) {
+		FATAL(("Replaying log failed, data may be corrupted, volume read-only.\n"));
+		fFlags |= VOLUME_READ_ONLY;
+			// TODO: if this is the boot volume, Bootscript will assume this
+			// is a CD...
+			// TODO: it would be nice to have a user visible alert instead
+			// of letting him just find this in the syslog.
 	}
 
 	status = fBlockAllocator.Initialize();

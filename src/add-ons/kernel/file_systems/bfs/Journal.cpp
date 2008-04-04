@@ -355,16 +355,7 @@ Journal::~Journal()
 status_t
 Journal::InitCheck()
 {
-	// TODO: this logic won't work whenever the size of the pending transaction
-	//	equals the size of the log (happens with the original BFS only)
-	if (fVolume->LogStart() != fVolume->LogEnd()) {
-		if (fVolume->SuperBlock().flags != SUPER_BLOCK_DISK_DIRTY)
-			FATAL(("log_start and log_end differ, but disk is marked clean - trying to replay log...\n"));
-
-		return ReplayLog();
-	}
-
-	return B_OK;
+	return fLock.InitCheck();
 }
 
 
@@ -493,7 +484,15 @@ Journal::_ReplayRunArray(int32 *_start)
 status_t
 Journal::ReplayLog()
 {
+	// TODO: this logic won't work whenever the size of the pending transaction
+	//	equals the size of the log (happens with the original BFS only)
+	if (fVolume->LogStart() == fVolume->LogEnd())
+		return B_OK;
+
 	INFORM(("Replay log, disk was not correctly unmounted...\n"));
+
+	if (fVolume->SuperBlock().flags != SUPER_BLOCK_DISK_DIRTY)
+		INFORM(("log_start and log_end differ, but disk is marked clean - trying to replay log...\n"));
 
 	int32 start = fVolume->LogStart();
 	int32 lastStart = -1;

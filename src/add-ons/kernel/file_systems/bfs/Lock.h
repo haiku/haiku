@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef LOCK_H
@@ -48,7 +48,7 @@ class Semaphore {
 		{
 			if (fSemaphore < B_OK)
 				return fSemaphore;
-			
+
 			return B_OK;
 		}
 
@@ -62,7 +62,7 @@ class Semaphore {
 			return B_OK;
 #endif
 		}
-	
+
 		status_t Unlock()
 		{
 #ifdef USE_BENAPHORE
@@ -109,7 +109,7 @@ class Locker {
 };
 
 
-//**** Recursive Lock
+//	#pragma mark - Recursive Lock
 
 class RecursiveLock {
 	public:
@@ -123,6 +123,14 @@ class RecursiveLock {
 #endif
 			fOwner(-1)
 		{
+		}
+
+		status_t InitCheck() const
+		{
+			if (fSemaphore < B_OK)
+				return fSemaphore;
+
+			return B_OK;
 		}
 
 		status_t LockWithTimeout(bigtime_t timeout)
@@ -277,7 +285,7 @@ class ReadWriteLock {
 		{
 			if (fSemaphore < B_OK)
 				return fSemaphore;
-			
+
 			return B_OK;
 		}
 
@@ -363,7 +371,7 @@ class ReadWriteLock {
 		{
 			if (fSemaphore < B_OK)
 				return fSemaphore;
-			
+
 			return B_OK;
 		}
 
@@ -543,7 +551,7 @@ class SimpleLock {
 					break;
 				if (current == thisThread)
 					break;
-					
+
 				snooze(time);
 			}
 
