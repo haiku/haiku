@@ -14,6 +14,7 @@
 
 #define REQUEST_MASS_STORAGE_RESET	0xff
 #define REQUEST_GET_MAX_LUN			0xfe
+#define MAX_LOGICAL_UNIT_NUMBER		15
 
 #define CBW_SIGNATURE				0x43425355
 #define CBW_DATA_OUTPUT				0x00
@@ -24,12 +25,14 @@
 #define CSW_STATUS_COMMAND_FAILED	0x01
 #define CSW_STATUS_PHASE_ERROR		0x02
 
+typedef struct device_lun_s device_lun;
+
+// holds common information about an attached device (pointed to by luns)
 typedef struct disk_device_s {
 	usb_device	device;
 	bool		removed;
 	uint32		open_count;
 	benaphore	lock;
-	char		name[32];
 	void *		link;
 
 	// device state
@@ -37,20 +40,33 @@ typedef struct disk_device_s {
 	usb_pipe	bulk_out;
 	uint8		interface;
 	uint32		current_tag;
-	bool		should_sync;
-	uint8		lun;
-
-	// device information through read capacity/inquiry
-	uint32		block_count;
-	uint32		block_size;
-	uint8		device_type;
-	bool		removable;
 
 	// used to store callback information
 	sem_id		notify;
 	status_t	status;
 	size_t		actual_length;
+
+	// logical units of this device
+	uint8		lun_count;
+	device_lun **luns;
 } disk_device;
+
+
+// represents a logical unit on the pointed to device - this gets published
+struct device_lun_s {
+	disk_device *device;
+	char		name[32];
+	uint8		logical_unit_number;
+	bool		should_sync;
+
+	// device information through read capacity/inquiry
+	bool		media_present;
+	bool		media_changed;
+	uint32		block_count;
+	uint32		block_size;
+	uint8		device_type;
+	bool		removable;
+};
 
 
 typedef struct command_block_wrapper_s {
