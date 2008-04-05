@@ -287,6 +287,7 @@ static DoublyLinkedList<block_cache> sCaches;
 static mutex sCachesLock;
 static sem_id sEventSemaphore;
 static mutex sNotificationsLock;
+static thread_id sWriterNotifyThread;
 static DoublyLinkedListLink<block_cache> sMarkCache;
 	// TODO: this only works if the link is the first entry of block_cache
 static object_cache *sBlockCache;
@@ -1353,33 +1354,6 @@ dump_caches(int argc, char **argv)
 #endif	// DEBUG_BLOCK_CACHE
 
 
-static void
-notify_sync(int32 transactionID, int32 event, void *_cache)
-{
-	block_cache *cache = (block_cache *)_cache;
-
-	cache->condition_variable.NotifyOne();
-}
-
-
-static void
-wait_for_notifications(block_cache *cache)
-{
-	// add sync notification
-	cache_notification notification;
-	set_notification(NULL, notification, TRANSACTION_WRITTEN, notify_sync,
-		cache);
-
-	ConditionVariableEntry<block_cache> entry;
-	entry.Add(cache);
-
-	add_notification(cache, &notification, TRANSACTION_WRITTEN, false);
-
-	// wait for notification hook to be called
-	entry.Wait();
-}
-
-
 static block_cache *
 get_next_locked_block_cache(block_cache *last)
 {
@@ -1559,6 +1533,40 @@ block_notifier_and_writer(void *)
 }
 
 
+static void
+notify_sync(int32 transactionID, int32 event, void *_cache)
+{
+	block_cache *cache = (block_cache *)_cache;
+
+	cache->condition_variable.NotifyOne();
+}
+
+
+static void
+wait_for_notifications(block_cache *cache)
+{
+	if (find_thread(NULL) == sWriterNotifyThread) {
+		// We're the notifier thread, don't wait, but flush all pending
+		// notifications directly.
+		flush_pending_notifications(cache);
+		return;
+	}
+
+	// add sync notification
+	cache_notification notification;
+	set_notification(NULL, notification, TRANSACTION_WRITTEN, notify_sync,
+		cache);
+
+	ConditionVariableEntry<block_cache> entry;
+	entry.Add(cache);
+
+	add_notification(cache, &notification, TRANSACTION_WRITTEN, false);
+
+	// wait for notification hook to be called
+	entry.Wait();
+}
+
+
 extern "C" status_t
 block_cache_init(void)
 {
@@ -1577,10 +1585,10 @@ block_cache_init(void)
 	if (sEventSemaphore < B_OK)
 		return sEventSemaphore;
 
-	thread_id thread = spawn_kernel_thread(&block_notifier_and_writer,
+	sWriterNotifyThread = spawn_kernel_thread(&block_notifier_and_writer,
 		"block writer/notifier", B_LOW_PRIORITY, NULL);
-	if (thread >= B_OK)
-		send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	if (sWriterNotifyThread >= B_OK)
+		send_signal_etc(sWriterNotifyThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 #ifdef DEBUG_BLOCK_CACHE
 	add_debugger_command_etc("block_caches", &dump_caches,
