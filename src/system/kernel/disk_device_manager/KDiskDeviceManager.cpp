@@ -117,17 +117,8 @@ class KDiskDeviceManager::DeviceWatcher : public NotificationListener {
 					ino_t directory = event->GetInt64("directory", -1);
 					ino_t node = event->GetInt64("node", -1);
 
-					// TODO: it would be nice if we could stat based on the
-					// node here instead of having to resolve the path
-					KPath path(B_PATH_NAME_LENGTH + 1);
-					if (path.InitCheck() != B_OK
-						|| vfs_entry_ref_to_path(device, directory, name,
-						path.LockBuffer(), path.BufferSize()) != B_OK)
-						break;
-					path.UnlockBuffer();
-
 					struct stat st;
-					if (lstat(path.Path(), &st) != 0)
+					if (vfs_stat_entry_ref(device, node, &st) != 0)
 						break;
 
 					if (S_ISDIR(st.st_mode)) {
@@ -139,6 +130,15 @@ class KDiskDeviceManager::DeviceWatcher : public NotificationListener {
 					} else {
 						if (strcmp(name, "raw") == 0) {
 							// a new raw device was added/removed
+							KPath path(B_PATH_NAME_LENGTH + 1);
+							if (path.InitCheck() != B_OK
+								|| vfs_entry_ref_to_path(device, directory,
+								name, path.LockBuffer(),
+								path.BufferSize()) != B_OK) {
+								break;
+							}
+							path.UnlockBuffer();
+
 							if (opCode == B_ENTRY_CREATED)
 								fManager->CreateDevice(path.Path());
 							else
@@ -204,6 +204,7 @@ KDiskDeviceManager::~KDiskDeviceManager()
 
 	// stop all node monitoring
 	_AddRemoveMonitoring("/dev/disk", false);
+	delete fDeviceWatcher;
 
 	// remove all devices
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie);) {
@@ -626,7 +627,7 @@ KDiskDeviceManager::DeleteDevice(const char *path)
 	if (device == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	PartitionRegistrar _(device, true);
+	PartitionRegistrar _(device, false);
 	if (DeviceWriteLocker locker = device) {
 		if (_RemoveDevice(device))
 			return B_OK;
@@ -1336,6 +1337,7 @@ KDiskDeviceManager::_CheckMediaStatus()
 	while (!fTerminating) {
 		int32 cookie = 0;
 		while (KDiskDevice* device = RegisterNextDevice(&cookie)) {
+			PartitionRegistrar _(device, true);
 			DeviceWriteLocker locker(device);
 
 			if (device->IsBusy(true))
