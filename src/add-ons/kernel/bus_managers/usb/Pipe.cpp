@@ -322,9 +322,9 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	}
 
 	// the sem will be released in the callback after the result data was
-	// filled into the provided struct. use a 5 seconds timeout to avoid
+	// filled into the provided struct. use a 1 second timeout to avoid
 	// hanging applications.
-	if (acquire_sem_etc(transferResult->notify_sem, 1, B_RELATIVE_TIMEOUT, 5000000) < B_OK) {
+	if (acquire_sem_etc(transferResult->notify_sem, 1, B_RELATIVE_TIMEOUT, 1000000) < B_OK) {
 		TRACE_ERROR(("USB ControlPipe: timeout waiting for queued request to complete\n"));
 
 		delete_sem(transferResult->notify_sem);
