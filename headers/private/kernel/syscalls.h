@@ -178,6 +178,7 @@ extern status_t		_kern_create_link(const char *path, const char *toPath);
 extern status_t		_kern_unlink(int fd, const char *path);
 extern status_t		_kern_rename(int oldDir, const char *oldpath, int newDir,
 						const char *newpath);
+extern status_t		_kern_create_fifo(const char *path, mode_t perms);
 extern status_t		_kern_access(const char *path, int mode);
 extern ssize_t		_kern_select(int numfds, struct fd_set *readSet,
 						struct fd_set *writeSet, struct fd_set *errorSet,

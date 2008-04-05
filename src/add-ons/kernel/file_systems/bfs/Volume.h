@@ -26,7 +26,7 @@ enum volume_initialize_flags {
 
 class Volume {
 	public:
-		Volume(dev_t id);
+		Volume(fs_volume *volume);
 		~Volume();
 
 		status_t			Mount(const char *device, uint32 flags);
@@ -48,7 +48,8 @@ class Volume {
 		vint32				&LogEnd() { return fLogEnd; }
 		int					Device() const { return fDevice; }
 
-		dev_t				ID() const { return fID; }
+		dev_t				ID() const { return fVolume ? fVolume->id : -1; }
+		fs_volume			*FSVolume() const { return fVolume; }
 		const char			*Name() const { return fSuperBlock.name; }
 
 		off_t				NumBlocks() const { return fSuperBlock.NumBlocks(); }
@@ -107,7 +108,7 @@ class Volume {
 		static status_t		Identify(int fd, disk_super_block *superBlock);
 
 	protected:
-		dev_t				fID;
+		fs_volume			*fVolume;
 		int					fDevice;
 		disk_super_block	fSuperBlock;
 

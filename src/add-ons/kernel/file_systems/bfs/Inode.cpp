@@ -169,7 +169,7 @@ InodeAllocator::~InodeAllocator()
 			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 				// this unblocks any pending bfs_read_vnode() calls
 			fInode->Free(*fTransaction);
-			remove_vnode(volume->ID(), fInode->ID());
+			remove_vnode(volume->FSVolume(), fInode->ID());
 		} else
 			volume->Free(*fTransaction, fRun);
 	}
@@ -199,7 +199,8 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
 		RETURN_ERROR(B_NO_MEMORY);
 
 	if (volume->ID() >= 0) {
-		status = new_vnode(volume->ID(), fInode->ID(), fInode);
+		status = new_vnode(volume->FSVolume(), fInode->ID(), fInode,
+			&gBFSVnodeOps);
 		if (status < B_OK) {
 			delete fInode;
 			fInode = NULL;
@@ -247,8 +248,10 @@ InodeAllocator::Keep()
 		return status;
 	}
 
-	if (!fInode->IsSymLink() && volume->ID() >= 0)
-		status = publish_vnode(volume->ID(), fInode->ID(), fInode);
+	if (!fInode->IsSymLink() && volume->ID() >= 0) {
+		status = publish_vnode(volume->FSVolume(), fInode->ID(), fInode,
+			&gBFSVnodeOps, fInode->Mode(), 0);
+	}
 
 	if (status == B_OK) {
 		cache_add_transaction_listener(volume->BlockCache(), fTransaction->ID(),
@@ -933,14 +936,14 @@ Inode::_RemoveAttribute(Transaction &transaction, const char *name,
 
 	if (attributes->IsEmpty()) {
 		// remove attribute directory (don't fail if that can't be done)
-		if (remove_vnode(fVolume->ID(), attributes->ID()) == B_OK) {
+		if (remove_vnode(fVolume->FSVolume(), attributes->ID()) == B_OK) {
 			// update the inode, so that no one will ever doubt it's deleted :-)
 			attributes->Node().flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DELETED);
 			if (attributes->WriteBack(transaction) == B_OK) {
 				Attributes().SetTo(0, 0, 0);
 				WriteBack(transaction);
 			} else
-				unremove_vnode(fVolume->ID(), attributes->ID());
+				unremove_vnode(fVolume->FSVolume(), attributes->ID());
 		}
 	}
 
@@ -1188,7 +1191,7 @@ Inode::ReleaseAttribute(Inode *attribute)
 	if (attribute == NULL)
 		return;
 
-	put_vnode(fVolume->ID(), attribute->ID());
+	put_vnode(fVolume->FSVolume(), attribute->ID());
 }
 
 
@@ -2240,12 +2243,12 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 	}
 
 	// remove_vnode() allows the inode to be accessed until the last put_vnode()
-	status = remove_vnode(fVolume->ID(), id);
+	status = remove_vnode(fVolume->FSVolume(), id);
 	if (status != B_OK)
 		return status;
 
 	if (tree->Remove(transaction, name, id) < B_OK) {
-		unremove_vnode(fVolume->ID(), id);
+		unremove_vnode(fVolume->FSVolume(), id);
 		RETURN_ERROR(B_ERROR);
 	}
 
@@ -2494,7 +2497,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 
 	// if either _id or _inode is passed, we will keep the inode locked
 	if (_id == NULL && _inode == NULL)
-		put_vnode(volume->ID(), inode->ID());
+		put_vnode(volume->FSVolume(), inode->ID());
 
 	return B_OK;
 }
@@ -2518,7 +2521,7 @@ AttributeIterator::AttributeIterator(Inode *inode)
 AttributeIterator::~AttributeIterator()
 {
 	if (fAttributes)
-		put_vnode(fAttributes->GetVolume()->ID(), fAttributes->ID());
+		put_vnode(fAttributes->GetVolume()->FSVolume(), fAttributes->ID());
 
 	delete fIterator;
 	fInode->_RemoveIterator(this);
@@ -2591,7 +2594,7 @@ AttributeIterator::GetNext(char *name, size_t *_length, uint32 *_type,
 
 	// if you haven't yet access to the attributes directory, get it
 	if (fAttributes == NULL) {
-		if (get_vnode(volume->ID(), volume->ToVnode(fInode->Attributes()),
+		if (get_vnode(volume->FSVolume(), volume->ToVnode(fInode->Attributes()),
 				(void **)&fAttributes) != B_OK) {
 			FATAL(("get_vnode() failed in AttributeIterator::GetNext(ino_t"
 				" = %Ld,name = \"%s\")\n",fInode->ID(),name));

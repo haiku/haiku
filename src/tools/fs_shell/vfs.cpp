@@ -50,6 +50,19 @@
 namespace FSShell {
 
 
+#define HAS_FS_CALL(vnode, op)			(vnode->ops->op != NULL)
+#define HAS_FS_MOUNT_CALL(mount, op)	(mount->volume->ops->op != NULL)
+
+#define FS_CALL(vnode, op, params...) \
+			vnode->ops->op(vnode->mount->volume, vnode, params)
+#define FS_CALL_NO_PARAMS(vnode, op) \
+			vnode->ops->op(vnode->mount->volume, vnode)
+#define FS_MOUNT_CALL(mount, op, params...) \
+			mount->volume->ops->op(mount->volume, params)
+#define FS_MOUNT_CALL_NO_PARAMS(mount, op) \
+			mount->volume->ops->op(mount->volume)
+
+
 const static uint32_t kMaxUnusedVnodes = 16;
 	// This is the maximum number of unused vnodes that the system
 	// will keep around (weak limit, if there is enough memory left,
@@ -57,20 +70,22 @@ const static uint32_t kMaxUnusedVnodes = 16;
 	// It may be chosen with respect to the available memory or enhanced
 	// by some timestamp/frequency heurism.
 
-struct vnode {
+struct vnode : fssh_fs_vnode {
 	struct vnode	*next;
 	vm_cache_ref	*cache;
 	fssh_mount_id	device;
 	list_link		mount_link;
 	list_link		unused_link;
 	fssh_vnode_id	id;
-	fssh_fs_vnode		private_node;
 	struct fs_mount	*mount;
 	struct vnode	*covered_by;
 	int32_t			ref_count;
-	uint8_t			remove : 1;
-	uint8_t			busy : 1;
-	uint8_t			unpublished : 1;
+	uint32_t		type : 29;
+						// TODO: S_INDEX_DIR actually needs another bit.
+						// Better combine this field with the following ones.
+	uint32_t		remove : 1;
+	uint32_t		busy : 1;
+	uint32_t		unpublished : 1;
 	struct file_descriptor *mandatory_locked_by;
 };
 
@@ -78,9 +93,6 @@ struct vnode_hash_key {
 	fssh_mount_id	device;
 	fssh_vnode_id	vnode;
 };
-
-#define FS_CALL(vnode, op) (vnode->mount->fs->op)
-#define FS_MOUNT_CALL(mount, op) (mount->fs->op)
 
 /**	\brief Structure to manage a mounted file system
 
@@ -98,6 +110,7 @@ struct fs_mount {
 	struct fs_mount	*next;
 	fssh_file_system_module_info *fs;
 	fssh_mount_id		id;
+	fssh_fs_volume		*volume;
 	void			*cookie;
 	char			*device_name;
 	char			*fs_name;
@@ -185,7 +198,7 @@ static fssh_status_t file_close(struct file_descriptor *);
 static fssh_status_t dir_read(struct file_descriptor *,
 			struct fssh_dirent *buffer, fssh_size_t bufferSize,
 			uint32_t *_count);
-static fssh_status_t dir_read(struct vnode *vnode, fssh_fs_cookie cookie,
+static fssh_status_t dir_read(struct vnode *vnode, void *cookie,
 			struct fssh_dirent *buffer, fssh_size_t bufferSize,
 			uint32_t *_count);
 static fssh_status_t dir_rewind(struct file_descriptor *);
@@ -231,7 +244,7 @@ static fssh_status_t common_write_stat(struct file_descriptor *,
 
 static fssh_status_t vnode_path_to_vnode(struct vnode *vnode, char *path,
 			bool traverseLeafLink, int count, struct vnode **_vnode,
-			fssh_vnode_id *_parentID, int *_type);
+			fssh_vnode_id *_parentID);
 static fssh_status_t dir_vnode_to_path(struct vnode *vnode, char *buffer,
 			fssh_size_t bufferSize);
 static fssh_status_t fd_and_path_to_vnode(int fd, char *path,
@@ -633,14 +646,14 @@ free_vnode(struct vnode *vnode, bool reenter)
 	// if the vnode won't be deleted, in which case the changes
 	// will be discarded
 
-	if (!vnode->remove && FS_CALL(vnode, fsync) != NULL)
-		FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
+	if (!vnode->remove && HAS_FS_CALL(vnode, fsync))
+		FS_CALL_NO_PARAMS(vnode, fsync);
 
 	if (!vnode->unpublished) {
 		if (vnode->remove)
-			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+			FS_CALL(vnode, remove_vnode, reenter);
 		else
-			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+			FS_CALL(vnode, put_vnode, reenter);
 	}
 
 	// The file system has removed the resources of the vnode now, so we can
@@ -808,7 +821,10 @@ restart:
 		vnode->busy = true;
 		mutex_unlock(&sVnodeMutex);
 
-		status = FS_CALL(vnode, get_vnode)(vnode->mount->cookie, vnodeID, &vnode->private_node, reenter);
+		int type;
+		uint32_t flags;
+		status = FS_MOUNT_CALL(vnode->mount, get_vnode, vnodeID, vnode, &type,
+			&flags, reenter);
 		if (status == FSSH_B_OK && vnode->private_node == NULL)
 			status = FSSH_B_BAD_VALUE;
 
@@ -817,6 +833,7 @@ restart:
 		if (status < FSSH_B_OK)
 			goto err1;
 
+		vnode->type = type;
 		vnode->busy = false;
 	}
 
@@ -1046,7 +1063,29 @@ entry_ref_to_vnode(fssh_mount_id mountID, fssh_vnode_id directoryID, const char 
 	if (status < 0)
 		return status;
 
-	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL, NULL);
+	return vnode_path_to_vnode(directory, clonedName, false, 0, _vnode, NULL);
+}
+
+
+static fssh_status_t
+lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
+{
+	fssh_ino_t id;
+	fssh_status_t status = FS_CALL(dir, lookup, name, &id);
+	if (status < FSSH_B_OK)
+		return status;
+
+	mutex_lock(&sVnodeMutex);
+	*_vnode = lookup_vnode(dir->device, id);
+	mutex_unlock(&sVnodeMutex);
+
+	if (*_vnode == NULL) {
+		fssh_panic("lookup_dir_entry(): could not lookup vnode (mountid 0x%x vnid "
+			"0x%Lx)\n", (int)dir->device, id);
+		return FSSH_B_ENTRY_NOT_FOUND;
+	}
+
+	return FSSH_B_OK;
 }
 
 
@@ -1060,11 +1099,10 @@ entry_ref_to_vnode(fssh_mount_id mountID, fssh_vnode_id directoryID, const char 
 */
 static fssh_status_t
 vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
-	int count, struct vnode **_vnode, fssh_vnode_id *_parentID, int *_type)
+	int count, struct vnode **_vnode, fssh_vnode_id *_parentID)
 {
 	fssh_status_t status = 0;
 	fssh_vnode_id lastParentID = vnode->id;
-	int type = 0;
 
 	FUNCTION(("vnode_path_to_vnode(vnode = %p, path = %s)\n", vnode, path));
 
@@ -1075,7 +1113,6 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 	while (true) {
 		struct vnode *nextVnode;
-		fssh_vnode_id vnodeID;
 		char *nextPath;
 
 		TRACE(("vnode_path_to_vnode: top of loop. p = %p, p = '%s'\n", path, path));
@@ -1109,37 +1146,22 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		// Check if we have the right to search the current directory vnode.
 		// If a file system doesn't have the access() function, we assume that
 		// searching a directory is always allowed
-		if (FS_CALL(vnode, access))
-			status = FS_CALL(vnode, access)(vnode->mount->cookie, vnode->private_node, FSSH_X_OK);
+		if (HAS_FS_CALL(vnode, access))
+			status = FS_CALL(vnode, access, FSSH_X_OK);
 
 		// Tell the filesystem to get the vnode of this path component (if we got the
 		// permission from the call above)
 		if (status >= FSSH_B_OK)
-			status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
+			status = lookup_dir_entry(vnode, path, &nextVnode);
 
 		if (status < FSSH_B_OK) {
 			put_vnode(vnode);
 			return status;
 		}
 
-		// Lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
-		// from inside the filesystem, thus the vnode would have to be in the list and it's
-		// ref count incremented at this point
-		mutex_lock(&sVnodeMutex);
-		nextVnode = lookup_vnode(vnode->device, vnodeID);
-		mutex_unlock(&sVnodeMutex);
-
-		if (!nextVnode) {
-			// pretty screwed up here - the file system found the vnode, but the hash
-			// lookup failed, so our internal structures are messed up
-			fssh_panic("vnode_path_to_vnode: could not lookup vnode (mountid 0x%x vnid 0x%llx)\n",
-				(int)vnode->device, vnodeID);
-			put_vnode(vnode);
-			return FSSH_B_ENTRY_NOT_FOUND;
-		}
-
 		// If the new node is a symbolic link, resolve it (if we've been told to do it)
-		if (FSSH_S_ISLNK(type) && !(!traverseLeafLink && nextPath[0] == '\0')) {
+		if (FSSH_S_ISLNK(vnode->type)
+			&& !(!traverseLeafLink && nextPath[0] == '\0')) {
 			fssh_size_t bufferSize;
 			char *buffer;
 
@@ -1157,9 +1179,8 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				goto resolve_link_error;
 			}
 
-			if (FS_CALL(nextVnode, read_symlink) != NULL) {
-				status = FS_CALL(nextVnode, read_symlink)(
-					nextVnode->mount->cookie, nextVnode->private_node, buffer,
+			if (HAS_FS_CALL(nextVnode, read_symlink)) {
+				status = FS_CALL(nextVnode, read_symlink, buffer,
 					&bufferSize);
 			} else
 				status = FSSH_B_BAD_VALUE;
@@ -1193,7 +1214,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				// of the vnode, no matter if we succeeded or not
 
 			status = vnode_path_to_vnode(vnode, path, traverseLeafLink, count + 1,
-				&nextVnode, &lastParentID, _type);
+				&nextVnode, &lastParentID);
 
 			free(buffer);
 
@@ -1219,8 +1240,6 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 	}
 
 	*_vnode = vnode;
-	if (_type)
-		*_type = type;
 	if (_parentID)
 		*_parentID = lastParentID;
 
@@ -1263,7 +1282,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode,
 			return FSSH_B_ERROR;
 	}
 
-	return vnode_path_to_vnode(start, path, traverseLink, 0, _vnode, _parentID, NULL);
+	return vnode_path_to_vnode(start, path, traverseLink, 0, _vnode, _parentID);
 }
 
 
@@ -1344,10 +1363,9 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 		vnodePutter.SetTo(vnode);
 	}
 
-	if (FS_CALL(vnode, get_vnode_name)) {
+	if (HAS_FS_CALL(vnode, get_vnode_name)) {
 		// The FS supports getting the name of a vnode.
-		return FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie,
-			vnode->private_node, buffer->d_name,
+		return FS_CALL(vnode, get_vnode_name, buffer->d_name,
 			(char*)buffer + bufferSize - buffer->d_name);
 	}
 
@@ -1357,10 +1375,9 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 	if (parent == NULL)
 		return FSSH_EOPNOTSUPP;
 
-	fssh_fs_cookie cookie;
+	void *cookie;
 
-	fssh_status_t status = FS_CALL(parent, open_dir)(parent->mount->cookie,
-		parent->private_node, &cookie);
+	fssh_status_t status = FS_CALL(parent, open_dir, &cookie);
 	if (status >= FSSH_B_OK) {
 		while (true) {
 			uint32_t num = 1;
@@ -1378,10 +1395,8 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 			}
 		}
 
-		FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node,
-			cookie);
-		FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie,
-			vnode->private_node, cookie);
+		FS_CALL(vnode, close_dir, cookie);
+		FS_CALL(vnode, free_dir_cookie, cookie);
 	}
 	return status;
 }
@@ -1459,24 +1474,11 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, fssh_size_t bufferSize)
 		char *name = &((struct fssh_dirent *)nameBuffer)->d_name[0];
 		struct vnode *parentVnode;
 		fssh_vnode_id parentID;
-		int type;
 
 		// lookup the parent vnode
-		status = FS_CALL(vnode, lookup)(vnode->mount->cookie, vnode->private_node, "..",
-			&parentID, &type);
+		status = lookup_dir_entry(vnode, "..", &parentVnode);
 		if (status < FSSH_B_OK)
 			goto out;
-
-		mutex_lock(&sVnodeMutex);
-		parentVnode = lookup_vnode(vnode->device, parentID);
-		mutex_unlock(&sVnodeMutex);
-
-		if (parentVnode == NULL) {
-			fssh_panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%x vnid 0x%llx)\n",
-				(int)vnode->device, parentID);
-			status = FSSH_B_ENTRY_NOT_FOUND;
-			goto out;
-		}
 
 		// get the node's name
 		status = get_vnode_name(vnode, parentVnode,
@@ -1653,7 +1655,7 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 
 	if (path != NULL) {
 		return vnode_path_to_vnode(vnode, path, traverseLeafLink, 0,
-			_vnode, _parentID, NULL);
+			_vnode, _parentID);
 	}
 
 	// there is no relative path to take into account
@@ -1668,7 +1670,7 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
 
 static int
 get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
-	fssh_fs_cookie cookie, int openMode, bool kernel)
+	void *cookie, int openMode, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	int fd;
@@ -1885,11 +1887,11 @@ common_file_io_vec_pages(int fd, const fssh_file_io_vec *fileVecs,
 
 
 extern "C" fssh_status_t
-fssh_new_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
-	fssh_fs_vnode privateNode)
+fssh_new_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
+	void *privateNode, fssh_fs_vnode_ops *ops)
 {
-	FUNCTION(("new_vnode(mountID = %ld, vnodeID = %Ld, node = %p)\n",
-		mountID, vnodeID, privateNode));
+	FUNCTION(("new_vnode(volume = %p (%ld), vnodeID = %Ld, node = %p)\n",
+		volume, volume->id, vnodeID, privateNode));
 
 	if (privateNode == NULL)
 		return FSSH_B_BAD_VALUE;
@@ -1902,13 +1904,16 @@ fssh_new_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 	// ToDo: the R5 implementation obviously checks for a different cookie
 	//	and doesn't panic if they are equal
 
-	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
-	if (vnode != NULL)
-		fssh_panic("vnode %d:%lld already exists (node = %p, vnode->node = %p)!", (int)mountID, vnodeID, privateNode, vnode->private_node);
+	struct vnode *vnode = lookup_vnode(volume->id, vnodeID);
+	if (vnode != NULL) {
+		fssh_panic("vnode %d:%Ld already exists (node = %p, vnode->node = %p)!",
+			(int)volume->id, vnodeID, privateNode, vnode->private_node);
+	}
 
-	fssh_status_t status = create_new_vnode(&vnode, mountID, vnodeID);
+	fssh_status_t status = create_new_vnode(&vnode, volume->id, vnodeID);
 	if (status == FSSH_B_OK) {
 		vnode->private_node = privateNode;
+		vnode->ops = ops;
 		vnode->busy = true;
 		vnode->unpublished = true;
 	}
@@ -1921,56 +1926,104 @@ fssh_new_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
 
 
 extern "C" fssh_status_t
-fssh_publish_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
-	fssh_fs_vnode privateNode)
+fssh_publish_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID,
+	void *privateNode, fssh_fs_vnode_ops *ops, int type, uint32_t flags)
 {
 	FUNCTION(("publish_vnode()\n"));
 
-	mutex_lock(&sVnodeMutex);
+	MutexLocker locker(sVnodeMutex);
 
-	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
+	struct vnode *vnode = lookup_vnode(volume->id, vnodeID);
 	fssh_status_t status = FSSH_B_OK;
 
 	if (vnode != NULL && vnode->busy && vnode->unpublished
 		&& vnode->private_node == privateNode) {
-		vnode->busy = false;
-		vnode->unpublished = false;
+		// already known, but not published
 	} else if (vnode == NULL && privateNode != NULL) {
-		status = create_new_vnode(&vnode, mountID, vnodeID);
-		if (status == FSSH_B_OK)
+		status = create_new_vnode(&vnode, volume->id, vnodeID);
+		if (status == FSSH_B_OK) {
 			vnode->private_node = privateNode;
+			vnode->ops = ops;
+			vnode->busy = true;
+			vnode->unpublished = true;
+		}
 	} else
 		status = FSSH_B_BAD_VALUE;
 
+	// create sub vnodes, if necessary
+	if (status == FSSH_B_OK && volume->sub_volume != NULL) {
+		locker.Unlock();
+
+		fssh_fs_volume *subVolume = volume;
+		while (status == FSSH_B_OK && subVolume->sub_volume != NULL) {
+			subVolume = subVolume->sub_volume;
+			status = subVolume->ops->create_sub_vnode(subVolume, vnodeID,
+				vnode);
+		}
+
+		if (status != FSSH_B_OK) {
+			// error -- clean up the created sub vnodes
+			while (subVolume->super_volume != volume) {
+				subVolume = subVolume->super_volume;
+				subVolume->ops->delete_sub_vnode(subVolume, vnode);
+			}
+		}
+
+		locker.Lock();
+	}
+
+	if (status == FSSH_B_OK) {
+		vnode->type = type;
+		vnode->busy = false;
+		vnode->unpublished = false;
+	}
+
 	TRACE(("returns: %s\n", strerror(status)));
 
-	mutex_unlock(&sVnodeMutex);
 	return status;
 }
 
 
 extern "C" fssh_status_t
-fssh_get_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID,
-	fssh_fs_vnode *_fsNode)
+fssh_get_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID, void **fsNode)
 {
 	struct vnode *vnode;
 
-	fssh_status_t status = get_vnode(mountID, vnodeID, &vnode, true);
+	if (volume == NULL)
+		return FSSH_B_BAD_VALUE;
+
+	fssh_status_t status = get_vnode(volume->id, vnodeID, &vnode, true);
 	if (status < FSSH_B_OK)
 		return status;
 
-	*_fsNode = vnode->private_node;
+	// If this is a layered FS, we need to get the node cookie for the requested
+	// layer.
+	if (HAS_FS_CALL(vnode, get_super_vnode)) {
+		fssh_fs_vnode resolvedNode;
+		fssh_status_t status = FS_CALL(vnode, get_super_vnode, volume,
+			&resolvedNode);
+		if (status != FSSH_B_OK) {
+			fssh_panic("get_vnode(): Failed to get super node for vnode %p, "
+				"volume: %p", vnode, volume);
+			put_vnode(vnode);
+			return status;
+		}
+
+		*fsNode = resolvedNode.private_node;
+	} else
+		*fsNode = vnode->private_node;
+
 	return FSSH_B_OK;
 }
 
 
 extern "C" fssh_status_t
-fssh_put_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID)
+fssh_put_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
 	mutex_lock(&sVnodeMutex);
-	vnode = lookup_vnode(mountID, vnodeID);
+	vnode = lookup_vnode(volume->id, vnodeID);
 	mutex_unlock(&sVnodeMutex);
 
 	if (vnode)
@@ -1981,30 +2034,31 @@ fssh_put_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID)
 
 
 extern "C" fssh_status_t
-fssh_remove_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID)
+fssh_remove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 {
 	struct vnode *vnode;
 	bool remove = false;
 
-	mutex_lock(&sVnodeMutex);
+	MutexLocker locker(sVnodeMutex);
 
-	vnode = lookup_vnode(mountID, vnodeID);
-	if (vnode != NULL) {
-		if (vnode->covered_by != NULL) {
-			// this vnode is in use
-			mutex_unlock(&sVnodeMutex);
-			return FSSH_B_BUSY;
-		}
+	vnode = lookup_vnode(volume->id, vnodeID);
+	if (vnode == NULL)
+		return FSSH_B_ENTRY_NOT_FOUND;
 
-		vnode->remove = true;
-		if (vnode->unpublished) {
-			// prepare the vnode for deletion
-			vnode->busy = true;
-			remove = true;
-		}
+	if (vnode->covered_by != NULL) {
+		// this vnode is in use
+		mutex_unlock(&sVnodeMutex);
+		return FSSH_B_BUSY;
 	}
 
-	mutex_unlock(&sVnodeMutex);
+	vnode->remove = true;
+	if (vnode->unpublished) {
+		// prepare the vnode for deletion
+		vnode->busy = true;
+		remove = true;
+	}
+
+	locker.Unlock();
 	
 	if (remove) {
 		// if the vnode hasn't been published yet, we delete it here
@@ -2017,13 +2071,13 @@ fssh_remove_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID)
 
 
 extern "C" fssh_status_t 
-fssh_unremove_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID)
+fssh_unremove_vnode(fssh_fs_volume *volume, fssh_vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
 	mutex_lock(&sVnodeMutex);
 
-	vnode = lookup_vnode(mountID, vnodeID);
+	vnode = lookup_vnode(volume->id, vnodeID);
 	if (vnode)
 		vnode->remove = false;
 
@@ -2033,14 +2087,13 @@ fssh_unremove_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID)
 
 
 extern "C" fssh_status_t 
-fssh_get_vnode_removed(fssh_mount_id mountID, fssh_vnode_id vnodeID,
-	bool* removed)
+fssh_get_vnode_removed(fssh_fs_volume *volume, fssh_vnode_id vnodeID, bool* removed)
 {
 	mutex_lock(&sVnodeMutex);
 
 	fssh_status_t result;
 
-	if (struct vnode* vnode = lookup_vnode(mountID, vnodeID)) {
+	if (struct vnode* vnode = lookup_vnode(volume->id, vnodeID)) {
 		if (removed)
 			*removed = vnode->remove;
 		result = FSSH_B_OK;
@@ -2248,7 +2301,7 @@ vfs_read_pages(void *_vnode, void *cookie, fssh_off_t pos,
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
-	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node,
+	return FS_CALL(vnode, read_pages,
 		cookie, pos, vecs, count, _numBytes, fsReenter);
 }
 
@@ -2260,7 +2313,7 @@ vfs_write_pages(void *_vnode, void *cookie, fssh_off_t pos,
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
-	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node,
+	return FS_CALL(vnode, write_pages,
 		cookie, pos, vecs, count, _numBytes, fsReenter);
 }
 
@@ -2307,7 +2360,7 @@ vfs_lookup_vnode(fssh_mount_id mountID, fssh_vnode_id vnodeID, void **_vnode)
 
 
 fssh_status_t
-vfs_get_fs_node_from_path(fssh_mount_id mountID, const char *path, bool kernel, void **_node)
+vfs_get_fs_node_from_path(fssh_fs_volume *volume, const char *path, bool kernel, void **_node)
 {
 	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n",
 		mountID, path, kernel));
@@ -2317,7 +2370,7 @@ vfs_get_fs_node_from_path(fssh_mount_id mountID, const char *path, bool kernel, 
 		return FSSH_B_NO_MEMORY;
 
 	fs_mount *mount;
-	fssh_status_t status = get_mount(mountID, &mount);
+	fssh_status_t status = get_mount(volume->id, &mount);
 	if (status < FSSH_B_OK)
 		return status;
 
@@ -2331,7 +2384,7 @@ vfs_get_fs_node_from_path(fssh_mount_id mountID, const char *path, bool kernel, 
 	else {
 		inc_vnode_ref_count(vnode);
 			// vnode_path_to_vnode() releases a reference to the starting vnode
-		status = vnode_path_to_vnode(vnode, buffer, true, 0, &vnode, NULL, NULL);
+		status = vnode_path_to_vnode(vnode, buffer, true, 0, &vnode, NULL);
 	}
 
 	put_mount(mount);
@@ -2339,13 +2392,16 @@ vfs_get_fs_node_from_path(fssh_mount_id mountID, const char *path, bool kernel, 
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (vnode->device != mountID) {
+	if (vnode->device != volume->id) {
 		// wrong mount ID - must not gain access on foreign file system nodes
 		put_vnode(vnode);
 		return FSSH_B_BAD_VALUE;
 	}
 
-	*_node = vnode->private_node;
+	// Use get_vnode() to resolve the cookie for the right layer.
+	status = fssh_get_vnode(volume, vnode->id, _node);
+	put_vnode(vnode);
+
 	return FSSH_B_OK;
 }
 
@@ -2383,8 +2439,6 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 	bufferSize -= length;
 
 	while (moduleName) {
-		int type;
-
 		char *nextPath = fssh_strchr(moduleName, '/');
 		if (nextPath == NULL)
 			length = fssh_strlen(moduleName);
@@ -2402,13 +2456,13 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 		path[length] = '\0';
 		moduleName = nextPath;
 
-		status = vnode_path_to_vnode(dir, path, true, 0, &file, NULL, &type);
+		status = vnode_path_to_vnode(dir, path, true, 0, &file, NULL);
 		if (status < FSSH_B_OK) {
 			// vnode_path_to_vnode() has already released the reference to dir
 			return status;
 		}
 
-		if (FSSH_S_ISDIR(type)) {
+		if (FSSH_S_ISDIR(file->type)) {
 			// goto the next directory
 			path[length] = '/';
 			path[length + 1] = '\0';
@@ -2416,13 +2470,13 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 			bufferSize -= length + 1;
 
 			dir = file;
-		} else if (FSSH_S_ISREG(type)) {
+		} else if (FSSH_S_ISREG(file->type)) {
 			// it's a file so it should be what we've searched for
 			put_vnode(file);
 
 			return FSSH_B_OK;
 		} else {
-			TRACE(("vfs_get_module_path(): something is strange here: %d...\n", type));
+			TRACE(("vfs_get_module_path(): something is strange here: %d...\n", file->type));
 			status = FSSH_B_ERROR;
 			dir = file;
 			goto err;
@@ -2493,7 +2547,7 @@ vfs_normalize_path(const char *path, char *buffer, fssh_size_t bufferSize,
 	// vnode and ignore the leaf later
 	bool isDir = (fssh_strcmp(leaf, ".") == 0 || fssh_strcmp(leaf, "..") == 0);
 	if (isDir)
-		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL, NULL);
+		error = vnode_path_to_vnode(dirNode, leaf, false, 0, &dirNode, NULL);
 	if (error != FSSH_B_OK) {
 		TRACE(("vfs_normalize_path(): failed to get dir vnode for \".\" or \"..\": %s\n",
 			strerror(error)));
@@ -2558,7 +2612,7 @@ vfs_get_file_map(void *_vnode, fssh_off_t offset, fssh_size_t size,
 
 	FUNCTION(("vfs_get_file_map: vnode %p, vecs %p, offset %lld, size = %u\n", vnode, vecs, offset, (unsigned)size));
 
-	return FS_CALL(vnode, get_file_map)(vnode->mount->cookie, vnode->private_node, offset, size, vecs, _count);
+	return FS_CALL(vnode, get_file_map, offset, size, vecs, _count);
 }
 
 
@@ -2567,8 +2621,7 @@ vfs_stat_vnode(void *_vnode, struct fssh_stat *stat)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
-	fssh_status_t status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
-		vnode->private_node, stat);
+	fssh_status_t status = FS_CALL(vnode, read_stat, stat);
 
 	// fill in the st_dev and st_ino fields
 	if (status == FSSH_B_OK) {
@@ -2831,14 +2884,14 @@ static int
 create_vnode(struct vnode *directory, const char *name, int openMode, int perms, bool kernel)
 {
 	struct vnode *vnode;
-	fssh_fs_cookie cookie;
+	void *cookie;
 	fssh_vnode_id newID;
 	int status;
 
-	if (FS_CALL(directory, create) == NULL)
+	if (!HAS_FS_CALL(directory, create))
 		return FSSH_EROFS;
 
-	status = FS_CALL(directory, create)(directory->mount->cookie, directory->private_node, name, openMode, perms, &cookie, &newID);
+	status = FS_CALL(directory, create, name, openMode, perms, &cookie, &newID);
 	if (status < FSSH_B_OK)
 		return status;
 
@@ -2856,11 +2909,11 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 
 	// something went wrong, clean up
 
-	FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
-	FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, close, cookie);
+	FS_CALL(vnode, free_cookie, cookie);
 	put_vnode(vnode);
 
-	FS_CALL(directory, unlink)(directory->mount->cookie, directory->private_node, name);
+	FS_CALL(directory, unlink, name);
 	
 	return status;
 }
@@ -2873,17 +2926,17 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 static int
 open_vnode(struct vnode *vnode, int openMode, bool kernel)
 {
-	fssh_fs_cookie cookie;
+	void *cookie;
 	int status;
 
-	status = FS_CALL(vnode, open)(vnode->mount->cookie, vnode->private_node, openMode, &cookie);
+	status = FS_CALL(vnode, open, openMode, &cookie);
 	if (status < 0)
 		return status;
 
 	status = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, openMode, kernel);
 	if (status < 0) {
-		FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
-		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+		FS_CALL(vnode, close, cookie);
+		FS_CALL(vnode, free_cookie, cookie);
 	}
 	return status;
 }
@@ -2896,10 +2949,10 @@ open_vnode(struct vnode *vnode, int openMode, bool kernel)
 static int
 open_dir_vnode(struct vnode *vnode, bool kernel)
 {
-	fssh_fs_cookie cookie;
+	void *cookie;
 	int status;
 
-	status = FS_CALL(vnode, open_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
+	status = FS_CALL(vnode, open_dir, &cookie);
 	if (status < FSSH_B_OK)
 		return status;
 
@@ -2908,8 +2961,8 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 	if (status >= 0)
 		return status;
 
-	FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
-	FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, close_dir, cookie);
+	FS_CALL(vnode, free_dir_cookie, cookie);
 
 	return status;
 }
@@ -2923,13 +2976,13 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 static int
 open_attr_dir_vnode(struct vnode *vnode, bool kernel)
 {
-	fssh_fs_cookie cookie;
+	void *cookie;
 	int status;
 
-	if (FS_CALL(vnode, open_attr_dir) == NULL)
+	if (!HAS_FS_CALL(vnode, open_attr_dir))
 		return FSSH_EOPNOTSUPP;
 
-	status = FS_CALL(vnode, open_attr_dir)(vnode->mount->cookie, vnode->private_node, &cookie);
+	status = FS_CALL(vnode, open_attr_dir, &cookie);
 	if (status < 0)
 		return status;
 
@@ -2938,8 +2991,8 @@ open_attr_dir_vnode(struct vnode *vnode, bool kernel)
 	if (status >= 0)
 		return status;
 
-	FS_CALL(vnode, close_attr_dir)(vnode->mount->cookie, vnode->private_node, cookie);
-	FS_CALL(vnode, free_attr_dir_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, close_attr_dir, cookie);
+	FS_CALL(vnode, free_attr_dir_cookie, cookie);
 
 	return status;
 }
@@ -3045,8 +3098,8 @@ file_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("file_close(descriptor = %p)\n", descriptor));
 
-	if (FS_CALL(vnode, close))
-		status = FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+	if (HAS_FS_CALL(vnode, close))
+		status = FS_CALL(vnode, close, descriptor->cookie);
 
 	return status;
 }
@@ -3058,7 +3111,7 @@ file_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	if (vnode != NULL) {
-		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		FS_CALL(vnode, free_cookie, descriptor->cookie);
 		put_vnode(vnode);
 	}
 }
@@ -3070,7 +3123,7 @@ file_read(struct file_descriptor *descriptor, fssh_off_t pos, void *buffer, fssh
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("file_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
-	return FS_CALL(vnode, read)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+	return FS_CALL(vnode, read, descriptor->cookie, pos, buffer, length);
 }
 
 
@@ -3080,7 +3133,7 @@ file_write(struct file_descriptor *descriptor, fssh_off_t pos, const void *buffe
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("file_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
-	return FS_CALL(vnode, write)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+	return FS_CALL(vnode, write, descriptor->cookie, pos, buffer, length);
 }
 
 
@@ -3105,10 +3158,10 @@ file_seek(struct file_descriptor *descriptor, fssh_off_t pos, int seekType)
 			struct fssh_stat stat;
 			fssh_status_t status;
 
-			if (FS_CALL(vnode, read_stat) == NULL)
+			if (!HAS_FS_CALL(vnode, read_stat))
 				return FSSH_EOPNOTSUPP;
 
-			status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+			status = FS_CALL(vnode, read_stat, &stat);
 			if (status < FSSH_B_OK)
 				return status;
 
@@ -3147,8 +3200,8 @@ dir_create_entry_ref(fssh_mount_id mountID, fssh_vnode_id parentID, const char *
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_CALL(vnode, create_dir))
-		status = FS_CALL(vnode, create_dir)(vnode->mount->cookie, vnode->private_node, name, perms, &newID);
+	if (HAS_FS_CALL(vnode, create_dir))
+		status = FS_CALL(vnode, create_dir, name, perms, &newID);
 	else
 		status = FSSH_EROFS;
 
@@ -3171,8 +3224,8 @@ dir_create(int fd, char *path, int perms, bool kernel)
 	if (status < 0)
 		return status;
 
-	if (FS_CALL(vnode, create_dir))
-		status = FS_CALL(vnode, create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &newID);
+	if (HAS_FS_CALL(vnode, create_dir))
+		status = FS_CALL(vnode, create_dir, filename, perms, &newID);
 	else
 		status = FSSH_EROFS;
 
@@ -3238,8 +3291,8 @@ dir_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("dir_close(descriptor = %p)\n", descriptor));
 
-	if (FS_CALL(vnode, close_dir))
-		return FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+	if (HAS_FS_CALL(vnode, close_dir))
+		return FS_CALL(vnode, close_dir, descriptor->cookie);
 
 	return FSSH_B_OK;
 }
@@ -3251,7 +3304,7 @@ dir_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	if (vnode != NULL) {
-		FS_CALL(vnode, free_dir_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		FS_CALL(vnode, free_dir_cookie, descriptor->cookie);
 		put_vnode(vnode);
 	}
 }
@@ -3283,7 +3336,7 @@ fix_dirent(struct vnode *parent, struct fssh_dirent *entry)
 		// ".." is guaranteed to to be clobbered by this call
 		struct vnode *vnode;
 		fssh_status_t status = vnode_path_to_vnode(parent, (char*)"..", false,
-			0, &vnode, NULL, NULL);
+			0, &vnode, NULL);
 
 		if (status == FSSH_B_OK) {
 			entry->d_dev = vnode->device;
@@ -3309,13 +3362,13 @@ fix_dirent(struct vnode *parent, struct fssh_dirent *entry)
 
 
 static fssh_status_t 
-dir_read(struct vnode *vnode, fssh_fs_cookie cookie, struct fssh_dirent *buffer,
+dir_read(struct vnode *vnode, void *cookie, struct fssh_dirent *buffer,
 	fssh_size_t bufferSize, uint32_t *_count)
 {
-	if (!FS_CALL(vnode, read_dir))
+	if (!HAS_FS_CALL(vnode, read_dir))
 		return FSSH_EOPNOTSUPP;
 
-	fssh_status_t error = FS_CALL(vnode, read_dir)(vnode->mount->cookie,vnode->private_node,cookie,buffer,bufferSize,_count);
+	fssh_status_t error = FS_CALL(vnode, read_dir,cookie,buffer,bufferSize,_count);
 	if (error != FSSH_B_OK)
 		return error;
 
@@ -3334,8 +3387,8 @@ dir_rewind(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
-	if (FS_CALL(vnode, rewind_dir))
-		return FS_CALL(vnode, rewind_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie);
+	if (HAS_FS_CALL(vnode, rewind_dir))
+		return FS_CALL(vnode, rewind_dir,descriptor->cookie);
 
 	return FSSH_EOPNOTSUPP;
 }
@@ -3374,9 +3427,8 @@ dir_remove(int fd, char *path, bool kernel)
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_CALL(directory, remove_dir)) {
-		status = FS_CALL(directory, remove_dir)(directory->mount->cookie,
-			directory->private_node, name);
+	if (HAS_FS_CALL(directory, remove_dir)) {
+		status = FS_CALL(directory, remove_dir, name);
 	} else
 		status = FSSH_EROFS;
 
@@ -3391,8 +3443,8 @@ common_ioctl(struct file_descriptor *descriptor, uint32_t op, void *buffer,
 {
 	struct vnode *vnode = descriptor->u.vnode;
 
-	if (FS_CALL(vnode, ioctl)) {
-		return FS_CALL(vnode, ioctl)(vnode->mount->cookie, vnode->private_node,
+	if (HAS_FS_CALL(vnode, ioctl)) {
+		return FS_CALL(vnode, ioctl,
 			descriptor->cookie, op, buffer, length);
 	}
 
@@ -3442,12 +3494,11 @@ common_fcntl(int fd, int op, uint32_t argument, bool kernel)
 
 		case FSSH_F_SETFL:
 			// Set file descriptor open mode
-			if (FS_CALL(vnode, set_flags)) {
+			if (HAS_FS_CALL(vnode, set_flags)) {
 				// we only accept changes to FSSH_O_APPEND and FSSH_O_NONBLOCK
 				argument &= FSSH_O_APPEND | FSSH_O_NONBLOCK;
 
-				status = FS_CALL(vnode, set_flags)(vnode->mount->cookie,
-					vnode->private_node, descriptor->cookie, (int)argument);
+				status = FS_CALL(vnode, set_flags, descriptor->cookie, (int)argument);
 				if (status == FSSH_B_OK) {
 					// update this descriptor's open_mode field
 					descriptor->open_mode = (descriptor->open_mode & ~(FSSH_O_APPEND | FSSH_O_NONBLOCK))
@@ -3507,8 +3558,8 @@ common_sync(int fd, bool kernel)
 	if (descriptor == NULL)
 		return FSSH_B_FILE_ERROR;
 
-	if (FS_CALL(vnode, fsync) != NULL)
-		status = FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
+	if (HAS_FS_CALL(vnode, fsync))
+		status = FS_CALL_NO_PARAMS(vnode, fsync);
 	else
 		status = FSSH_EOPNOTSUPP;
 
@@ -3584,9 +3635,8 @@ common_read_link(int fd, char *path, char *buffer, fssh_size_t *_bufferSize,
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_CALL(vnode, read_symlink) != NULL) {
-		status = FS_CALL(vnode, read_symlink)(vnode->mount->cookie,
-			vnode->private_node, buffer, _bufferSize);
+	if (HAS_FS_CALL(vnode, read_symlink)) {
+		status = FS_CALL(vnode, read_symlink, buffer, _bufferSize);
 	} else
 		status = FSSH_B_BAD_VALUE;
 
@@ -3610,8 +3660,8 @@ common_create_symlink(int fd, char *path, const char *toPath, int mode,
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_CALL(vnode, create_symlink) != NULL)
-		status = FS_CALL(vnode, create_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath, mode);
+	if (HAS_FS_CALL(vnode, create_symlink))
+		status = FS_CALL(vnode, create_symlink, name, toPath, mode);
 	else
 		status = FSSH_EROFS;
 
@@ -3644,8 +3694,8 @@ common_create_link(char *path, char *toPath, bool kernel)
 		goto err1;
 	}
 
-	if (FS_CALL(vnode, link) != NULL)
-		status = FS_CALL(vnode, link)(directory->mount->cookie, directory->private_node, name, vnode->private_node);
+	if (HAS_FS_CALL(directory, link))
+		status = FS_CALL(directory, link, name, vnode);
 	else
 		status = FSSH_EROFS;
 
@@ -3671,8 +3721,8 @@ common_unlink(int fd, char *path, bool kernel)
 	if (status < 0)
 		return status;
 
-	if (FS_CALL(vnode, unlink) != NULL)
-		status = FS_CALL(vnode, unlink)(vnode->mount->cookie, vnode->private_node, filename);
+	if (HAS_FS_CALL(vnode, unlink))
+		status = FS_CALL(vnode, unlink, filename);
 	else
 		status = FSSH_EROFS;
 
@@ -3692,8 +3742,8 @@ common_access(char *path, int mode, bool kernel)
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_CALL(vnode, access) != NULL)
-		status = FS_CALL(vnode, access)(vnode->mount->cookie, vnode->private_node, mode);
+	if (HAS_FS_CALL(vnode, access))
+		status = FS_CALL(vnode, access, mode);
 	else
 		status = FSSH_B_OK;
 
@@ -3726,8 +3776,8 @@ common_rename(int fd, char *path, int newFD, char *newPath, bool kernel)
 		goto err1;
 	}
 
-	if (FS_CALL(fromVnode, rename) != NULL)
-		status = FS_CALL(fromVnode, rename)(fromVnode->mount->cookie, fromVnode->private_node, fromName, toVnode->private_node, toName);
+	if (HAS_FS_CALL(fromVnode, rename))
+		status = FS_CALL(fromVnode, rename, fromName, toVnode, toName);
 	else
 		status = FSSH_EROFS;
 
@@ -3747,8 +3797,7 @@ common_read_stat(struct file_descriptor *descriptor, struct fssh_stat *stat)
 
 	FUNCTION(("common_read_stat: stat %p\n", stat));
 
-	fssh_status_t status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
-		vnode->private_node, stat);
+	fssh_status_t status = FS_CALL(vnode, read_stat, stat);
 
 	// fill in the st_dev and st_ino fields
 	if (status == FSSH_B_OK) {
@@ -3767,10 +3816,10 @@ common_write_stat(struct file_descriptor *descriptor,
 	struct vnode *vnode = descriptor->u.vnode;
 	
 	FUNCTION(("common_write_stat(vnode = %p, stat = %p, statMask = %d)\n", vnode, stat, statMask));
-	if (!FS_CALL(vnode, write_stat))
+	if (!HAS_FS_CALL(vnode, write_stat))
 		return FSSH_EROFS;
 
-	return FS_CALL(vnode, write_stat)(vnode->mount->cookie, vnode->private_node, stat, statMask);
+	return FS_CALL(vnode, write_stat, stat, statMask);
 }
 
 
@@ -3787,7 +3836,7 @@ common_path_read_stat(int fd, char *path, bool traverseLeafLink,
 	if (status < 0)
 		return status;
 
-	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, stat);
+	status = FS_CALL(vnode, read_stat, stat);
 
 	// fill in the st_dev and st_ino fields
 	if (status == FSSH_B_OK) {
@@ -3813,8 +3862,8 @@ common_path_write_stat(int fd, char *path, bool traverseLeafLink,
 	if (status < 0)
 		return status;
 
-	if (FS_CALL(vnode, write_stat))
-		status = FS_CALL(vnode, write_stat)(vnode->mount->cookie, vnode->private_node, stat, statMask);
+	if (HAS_FS_CALL(vnode, write_stat))
+		status = FS_CALL(vnode, write_stat, stat, statMask);
 	else
 		status = FSSH_EROFS;
 
@@ -3851,8 +3900,8 @@ attr_dir_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("attr_dir_close(descriptor = %p)\n", descriptor));
 
-	if (FS_CALL(vnode, close_attr_dir))
-		return FS_CALL(vnode, close_attr_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+	if (HAS_FS_CALL(vnode, close_attr_dir))
+		return FS_CALL(vnode, close_attr_dir, descriptor->cookie);
 
 	return FSSH_B_OK;
 }
@@ -3864,7 +3913,7 @@ attr_dir_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	if (vnode != NULL) {
-		FS_CALL(vnode, free_attr_dir_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		FS_CALL(vnode, free_attr_dir_cookie, descriptor->cookie);
 		put_vnode(vnode);
 	}
 }
@@ -3878,8 +3927,8 @@ attr_dir_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 
 	FUNCTION(("attr_dir_read(descriptor = %p)\n", descriptor));
 
-	if (FS_CALL(vnode, read_attr_dir))
-		return FS_CALL(vnode, read_attr_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, buffer, bufferSize, _count);
+	if (HAS_FS_CALL(vnode, read_attr_dir))
+		return FS_CALL(vnode, read_attr_dir, descriptor->cookie, buffer, bufferSize, _count);
 
 	return FSSH_EOPNOTSUPP;
 }
@@ -3892,8 +3941,8 @@ attr_dir_rewind(struct file_descriptor *descriptor)
 
 	FUNCTION(("attr_dir_rewind(descriptor = %p)\n", descriptor));
 
-	if (FS_CALL(vnode, rewind_attr_dir))
-		return FS_CALL(vnode, rewind_attr_dir)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+	if (HAS_FS_CALL(vnode, rewind_attr_dir))
+		return FS_CALL(vnode, rewind_attr_dir, descriptor->cookie);
 
 	return FSSH_EOPNOTSUPP;
 }
@@ -3903,7 +3952,7 @@ static int
 attr_create(int fd, const char *name, uint32_t type, int openMode, bool kernel)
 {
 	struct vnode *vnode;
-	fssh_fs_cookie cookie;
+	void *cookie;
 	int status;
 
 	if (name == NULL || *name == '\0')
@@ -3913,22 +3962,22 @@ attr_create(int fd, const char *name, uint32_t type, int openMode, bool kernel)
 	if (vnode == NULL)
 		return FSSH_B_FILE_ERROR;
 
-	if (FS_CALL(vnode, create_attr) == NULL) {
+	if (!HAS_FS_CALL(vnode, create_attr)) {
 		status = FSSH_EROFS;
 		goto err;
 	}
 
-	status = FS_CALL(vnode, create_attr)(vnode->mount->cookie, vnode->private_node, name, type, openMode, &cookie);
+	status = FS_CALL(vnode, create_attr, name, type, openMode, &cookie);
 	if (status < FSSH_B_OK)
 		goto err;
 
 	if ((status = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
-	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
-	FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, close_attr, cookie);
+	FS_CALL(vnode, free_attr_cookie, cookie);
 
-	FS_CALL(vnode, remove_attr)(vnode->mount->cookie, vnode->private_node, name);
+	FS_CALL(vnode, remove_attr, name);
 
 err:
 	put_vnode(vnode);
@@ -3941,7 +3990,7 @@ static int
 attr_open(int fd, const char *name, int openMode, bool kernel)
 {
 	struct vnode *vnode;
-	fssh_fs_cookie cookie;
+	void *cookie;
 	int status;
 
 	if (name == NULL || *name == '\0')
@@ -3951,12 +4000,12 @@ attr_open(int fd, const char *name, int openMode, bool kernel)
 	if (vnode == NULL)
 		return FSSH_B_FILE_ERROR;
 
-	if (FS_CALL(vnode, open_attr) == NULL) {
+	if (!HAS_FS_CALL(vnode, open_attr)) {
 		status = FSSH_EOPNOTSUPP;
 		goto err;
 	}
 
-	status = FS_CALL(vnode, open_attr)(vnode->mount->cookie, vnode->private_node, name, openMode, &cookie);
+	status = FS_CALL(vnode, open_attr, name, openMode, &cookie);
 	if (status < FSSH_B_OK)
 		goto err;
 
@@ -3964,8 +4013,8 @@ attr_open(int fd, const char *name, int openMode, bool kernel)
 	if ((status = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
-	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
-	FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
+	FS_CALL(vnode, close_attr, cookie);
+	FS_CALL(vnode, free_attr_cookie, cookie);
 
 err:
 	put_vnode(vnode);
@@ -3981,8 +4030,8 @@ attr_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("attr_close(descriptor = %p)\n", descriptor));
 
-	if (FS_CALL(vnode, close_attr))
-		return FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+	if (HAS_FS_CALL(vnode, close_attr))
+		return FS_CALL(vnode, close_attr, descriptor->cookie);
 
 	return FSSH_B_OK;
 }
@@ -3994,7 +4043,7 @@ attr_free_fd(struct file_descriptor *descriptor)
 	struct vnode *vnode = descriptor->u.vnode;
 
 	if (vnode != NULL) {
-		FS_CALL(vnode, free_attr_cookie)(vnode->mount->cookie, vnode->private_node, descriptor->cookie);
+		FS_CALL(vnode, free_attr_cookie, descriptor->cookie);
 		put_vnode(vnode);
 	}
 }
@@ -4006,10 +4055,10 @@ attr_read(struct file_descriptor *descriptor, fssh_off_t pos, void *buffer, fssh
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("attr_read: buf %p, pos %Ld, len %p = %ld\n", buffer, pos, length, *length));
-	if (!FS_CALL(vnode, read_attr))
+	if (!HAS_FS_CALL(vnode, read_attr))
 		return FSSH_EOPNOTSUPP;
 
-	return FS_CALL(vnode, read_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+	return FS_CALL(vnode, read_attr, descriptor->cookie, pos, buffer, length);
 }
 
 
@@ -4019,10 +4068,10 @@ attr_write(struct file_descriptor *descriptor, fssh_off_t pos, const void *buffe
 	struct vnode *vnode = descriptor->u.vnode;
 
 	FUNCTION(("attr_write: buf %p, pos %Ld, len %p\n", buffer, pos, length));
-	if (!FS_CALL(vnode, write_attr))
+	if (!HAS_FS_CALL(vnode, write_attr))
 		return FSSH_EOPNOTSUPP;
 
-	return FS_CALL(vnode, write_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, buffer, length);
+	return FS_CALL(vnode, write_attr, descriptor->cookie, pos, buffer, length);
 }
 
 
@@ -4044,10 +4093,10 @@ attr_seek(struct file_descriptor *descriptor, fssh_off_t pos, int seekType)
 			struct fssh_stat stat;
 			fssh_status_t status;
 
-			if (FS_CALL(vnode, read_stat) == NULL)
+			if (!HAS_FS_CALL(vnode, read_stat))
 				return FSSH_EOPNOTSUPP;
 
-			status = FS_CALL(vnode, read_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, &stat);
+			status = FS_CALL(vnode, read_attr_stat, descriptor->cookie, &stat);
 			if (status < FSSH_B_OK)
 				return status;
 
@@ -4077,10 +4126,10 @@ attr_read_stat(struct file_descriptor *descriptor, struct fssh_stat *stat)
 
 	FUNCTION(("attr_read_stat: stat 0x%p\n", stat));
 
-	if (!FS_CALL(vnode, read_attr_stat))
+	if (!HAS_FS_CALL(vnode, read_attr_stat))
 		return FSSH_EOPNOTSUPP;
 
-	return FS_CALL(vnode, read_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat);
+	return FS_CALL(vnode, read_attr_stat, descriptor->cookie, stat);
 }
 
 
@@ -4092,10 +4141,10 @@ attr_write_stat(struct file_descriptor *descriptor,
 
 	FUNCTION(("attr_write_stat: stat = %p, statMask %d\n", stat, statMask));
 
-	if (!FS_CALL(vnode, write_attr_stat))
+	if (!HAS_FS_CALL(vnode, write_attr_stat))
 		return FSSH_EROFS;
 
-	return FS_CALL(vnode, write_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, stat, statMask);
+	return FS_CALL(vnode, write_attr_stat, descriptor->cookie, stat, statMask);
 }
 
 
@@ -4115,8 +4164,8 @@ attr_remove(int fd, const char *name, bool kernel)
 	if (descriptor == NULL)
 		return FSSH_B_FILE_ERROR;
 
-	if (FS_CALL(vnode, remove_attr))
-		status = FS_CALL(vnode, remove_attr)(vnode->mount->cookie, vnode->private_node, name);
+	if (HAS_FS_CALL(vnode, remove_attr))
+		status = FS_CALL(vnode, remove_attr, name);
 	else
 		status = FSSH_EROFS;
 
@@ -4154,8 +4203,8 @@ attr_rename(int fromfd, const char *fromName, int tofd, const char *toName, bool
 		goto err1;
 	}
 
-	if (FS_CALL(fromVnode, rename_attr))
-		status = FS_CALL(fromVnode, rename_attr)(fromVnode->mount->cookie, fromVnode->private_node, fromName, toVnode->private_node, toName);
+	if (HAS_FS_CALL(fromVnode, rename_attr))
+		status = FS_CALL(fromVnode, rename_attr, fromName, toVnode, toName);
 	else
 		status = FSSH_EROFS;
 
@@ -4172,7 +4221,7 @@ static fssh_status_t
 index_dir_open(fssh_mount_id mountID, bool kernel)
 {
 	struct fs_mount *mount;
-	fssh_fs_cookie cookie;
+	void *cookie;
 
 	FUNCTION(("index_dir_open(mountID = %ld, kernel = %d)\n", mountID, kernel));
 
@@ -4180,12 +4229,12 @@ index_dir_open(fssh_mount_id mountID, bool kernel)
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_MOUNT_CALL(mount, open_index_dir) == NULL) {
+	if (!HAS_FS_MOUNT_CALL(mount, open_index_dir)) {
 		status = FSSH_EOPNOTSUPP;
 		goto out;
 	}
 
-	status = FS_MOUNT_CALL(mount, open_index_dir)(mount->cookie, &cookie);
+	status = FS_MOUNT_CALL(mount, open_index_dir, &cookie);
 	if (status < FSSH_B_OK)
 		goto out;
 
@@ -4195,8 +4244,8 @@ index_dir_open(fssh_mount_id mountID, bool kernel)
 		goto out;
 
 	// something went wrong
-	FS_MOUNT_CALL(mount, close_index_dir)(mount->cookie, cookie);
-	FS_MOUNT_CALL(mount, free_index_dir_cookie)(mount->cookie, cookie);
+	FS_MOUNT_CALL(mount, close_index_dir, cookie);
+	FS_MOUNT_CALL(mount, free_index_dir_cookie, cookie);
 
 out:
 	put_mount(mount);
@@ -4211,8 +4260,8 @@ index_dir_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("index_dir_close(descriptor = %p)\n", descriptor));
 
-	if (FS_MOUNT_CALL(mount, close_index_dir))
-		return FS_MOUNT_CALL(mount, close_index_dir)(mount->cookie, descriptor->cookie);
+	if (HAS_FS_MOUNT_CALL(mount, close_index_dir))
+		return FS_MOUNT_CALL(mount, close_index_dir, descriptor->cookie);
 
 	return FSSH_B_OK;
 }
@@ -4224,7 +4273,7 @@ index_dir_free_fd(struct file_descriptor *descriptor)
 	struct fs_mount *mount = descriptor->u.mount;
 
 	if (mount != NULL) {
-		FS_MOUNT_CALL(mount, free_index_dir_cookie)(mount->cookie, descriptor->cookie);
+		FS_MOUNT_CALL(mount, free_index_dir_cookie, descriptor->cookie);
 		// ToDo: find a replacement ref_count object - perhaps the root dir?
 		//put_vnode(vnode);
 	}
@@ -4237,8 +4286,8 @@ index_dir_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 {
 	struct fs_mount *mount = descriptor->u.mount;
 
-	if (FS_MOUNT_CALL(mount, read_index_dir))
-		return FS_MOUNT_CALL(mount, read_index_dir)(mount->cookie, descriptor->cookie, buffer, bufferSize, _count);
+	if (HAS_FS_MOUNT_CALL(mount, read_index_dir))
+		return FS_MOUNT_CALL(mount, read_index_dir, descriptor->cookie, buffer, bufferSize, _count);
 
 	return FSSH_EOPNOTSUPP;
 }
@@ -4249,8 +4298,8 @@ index_dir_rewind(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
 
-	if (FS_MOUNT_CALL(mount, rewind_index_dir))
-		return FS_MOUNT_CALL(mount, rewind_index_dir)(mount->cookie, descriptor->cookie);
+	if (HAS_FS_MOUNT_CALL(mount, rewind_index_dir))
+		return FS_MOUNT_CALL(mount, rewind_index_dir, descriptor->cookie);
 
 	return FSSH_EOPNOTSUPP;
 }
@@ -4266,12 +4315,12 @@ index_create(fssh_mount_id mountID, const char *name, uint32_t type, uint32_t fl
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_MOUNT_CALL(mount, create_index) == NULL) {
+	if (!HAS_FS_MOUNT_CALL(mount, create_index)) {
 		status = FSSH_EROFS;
 		goto out;
 	}
 
-	status = FS_MOUNT_CALL(mount, create_index)(mount->cookie, name, type, flags);
+	status = FS_MOUNT_CALL(mount, create_index, name, type, flags);
 
 out:
 	put_mount(mount);
@@ -4290,12 +4339,12 @@ index_name_read_stat(fssh_mount_id mountID, const char *name,
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_MOUNT_CALL(mount, read_index_stat) == NULL) {
+	if (!HAS_FS_MOUNT_CALL(mount, read_index_stat)) {
 		status = FSSH_EOPNOTSUPP;
 		goto out;
 	}
 
-	status = FS_MOUNT_CALL(mount, read_index_stat)(mount->cookie, name, stat);
+	status = FS_MOUNT_CALL(mount, read_index_stat, name, stat);
 
 out:
 	put_mount(mount);
@@ -4313,12 +4362,12 @@ index_remove(fssh_mount_id mountID, const char *name, bool kernel)
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_MOUNT_CALL(mount, remove_index) == NULL) {
+	if (!HAS_FS_MOUNT_CALL(mount, remove_index)) {
 		status = FSSH_EROFS;
 		goto out;
 	}
 
-	status = FS_MOUNT_CALL(mount, remove_index)(mount->cookie, name);
+	status = FS_MOUNT_CALL(mount, remove_index, name);
 
 out:
 	put_mount(mount);
@@ -4336,7 +4385,7 @@ query_open(fssh_dev_t device, const char *query, uint32_t flags,
 	fssh_port_id port, int32_t token, bool kernel)
 {
 	struct fs_mount *mount;
-	fssh_fs_cookie cookie;
+	void *cookie;
 
 	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", device, query, kernel));
 
@@ -4344,12 +4393,12 @@ query_open(fssh_dev_t device, const char *query, uint32_t flags,
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_MOUNT_CALL(mount, open_query) == NULL) {
+	if (!HAS_FS_MOUNT_CALL(mount, open_query)) {
 		status = FSSH_EOPNOTSUPP;
 		goto out;
 	}
 
-	status = FS_MOUNT_CALL(mount, open_query)(mount->cookie, query, flags, port, token, &cookie);
+	status = FS_MOUNT_CALL(mount, open_query, query, flags, port, token, &cookie);
 	if (status < FSSH_B_OK)
 		goto out;
 
@@ -4359,8 +4408,8 @@ query_open(fssh_dev_t device, const char *query, uint32_t flags,
 		goto out;
 
 	// something went wrong
-	FS_MOUNT_CALL(mount, close_query)(mount->cookie, cookie);
-	FS_MOUNT_CALL(mount, free_query_cookie)(mount->cookie, cookie);
+	FS_MOUNT_CALL(mount, close_query, cookie);
+	FS_MOUNT_CALL(mount, free_query_cookie, cookie);
 
 out:
 	put_mount(mount);
@@ -4375,8 +4424,8 @@ query_close(struct file_descriptor *descriptor)
 
 	FUNCTION(("query_close(descriptor = %p)\n", descriptor));
 
-	if (FS_MOUNT_CALL(mount, close_query))
-		return FS_MOUNT_CALL(mount, close_query)(mount->cookie, descriptor->cookie);
+	if (HAS_FS_MOUNT_CALL(mount, close_query))
+		return FS_MOUNT_CALL(mount, close_query, descriptor->cookie);
 
 	return FSSH_B_OK;
 }
@@ -4388,7 +4437,7 @@ query_free_fd(struct file_descriptor *descriptor)
 	struct fs_mount *mount = descriptor->u.mount;
 
 	if (mount != NULL) {
-		FS_MOUNT_CALL(mount, free_query_cookie)(mount->cookie, descriptor->cookie);
+		FS_MOUNT_CALL(mount, free_query_cookie, descriptor->cookie);
 		// ToDo: find a replacement ref_count object - perhaps the root dir?
 		//put_vnode(vnode);
 	}
@@ -4401,8 +4450,8 @@ query_read(struct file_descriptor *descriptor, struct fssh_dirent *buffer,
 {
 	struct fs_mount *mount = descriptor->u.mount;
 
-	if (FS_MOUNT_CALL(mount, read_query))
-		return FS_MOUNT_CALL(mount, read_query)(mount->cookie, descriptor->cookie, buffer, bufferSize, _count);
+	if (HAS_FS_MOUNT_CALL(mount, read_query))
+		return FS_MOUNT_CALL(mount, read_query, descriptor->cookie, buffer, bufferSize, _count);
 
 	return FSSH_EOPNOTSUPP;
 }
@@ -4413,8 +4462,8 @@ query_rewind(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
 
-	if (FS_MOUNT_CALL(mount, rewind_query))
-		return FS_MOUNT_CALL(mount, rewind_query)(mount->cookie, descriptor->cookie);
+	if (HAS_FS_MOUNT_CALL(mount, rewind_query))
+		return FS_MOUNT_CALL(mount, rewind_query, descriptor->cookie);
 
 	return FSSH_EOPNOTSUPP;
 }
@@ -4466,6 +4515,12 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 	if (mount == NULL)
 		return FSSH_B_NO_MEMORY;
 
+	mount->volume = (fssh_fs_volume*)malloc(sizeof(fssh_fs_volume));
+	if (mount->volume == NULL) {
+		free(mount);
+		return FSSH_B_NO_MEMORY;
+	}
+
 	list_init_etc(&mount->vnodes, fssh_offsetof(struct vnode, mount_link));
 
 	mount->fs_name = get_file_system_name(fsName);
@@ -4491,9 +4546,15 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 	mount->id = sNextMountID++;
 	mount->root_vnode = NULL;
 	mount->covers_vnode = NULL;
-	mount->cookie = NULL;
 	mount->unmounting = false;
 	mount->owns_file_device = false;
+
+	mount->volume->id = mount->id;
+	mount->volume->layer = 0;
+	mount->volume->private_volume = NULL;
+	mount->volume->ops = NULL;
+	mount->volume->sub_volume = NULL;
+	mount->volume->super_volume = NULL;
 
 	// insert mount struct into list before we call FS's mount() function
 	// so that vnodes can be created for this mount
@@ -4510,7 +4571,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 			goto err5;
 		}
 
-		status = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &rootID);
+		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
 		if (status < 0) {
 			// ToDo: why should we hide the error code from the file system here?
 			//status = ERR_VFS_GENERAL;
@@ -4524,8 +4585,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 
 		// make sure covered_vnode is a DIR
 		struct fssh_stat coveredNodeStat;
-		status = FS_CALL(coveredVnode, read_stat)(coveredVnode->mount->cookie,
-			coveredVnode->private_node, &coveredNodeStat);
+		status = FS_CALL(coveredVnode, read_stat, &coveredNodeStat);
 		if (status < FSSH_B_OK)
 			goto err5;
 
@@ -4543,7 +4603,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 		mount->covers_vnode = coveredVnode;
 
 		// mount it
-		status = FS_MOUNT_CALL(mount, mount)(mount->id, device, flags, args, &mount->cookie, &rootID);
+		status = mount->fs->mount(mount->volume, device, flags, args, &rootID);
 		if (status < FSSH_B_OK)
 			goto err6;
 	}
@@ -4570,7 +4630,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32_t flags,
 	return mount->id;
 
 err7:
-	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
+	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
 err6:
 	if (mount->covers_vnode)
 		put_vnode(mount->covers_vnode);
@@ -4586,6 +4646,7 @@ err4:
 err3:
 	free(mount->fs_name);
 err1:
+	free(mount->volume);
 	free(mount);
 
 	return status;
@@ -4714,7 +4775,7 @@ fs_unmount(char *path, uint32_t flags, bool kernel)
 
 	mountOpLocker.Unlock();
 
-	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
+	FS_MOUNT_CALL_NO_PARAMS(mount, unmount);
 
 	// release the file system
 	put_file_system(mount->fs);
@@ -4737,8 +4798,8 @@ fs_sync(fssh_dev_t device)
 
 	mutex_lock(&sMountMutex);
 
-	if (FS_MOUNT_CALL(mount, sync))
-		status = FS_MOUNT_CALL(mount, sync)(mount->cookie);
+	if (HAS_FS_MOUNT_CALL(mount, sync))
+		status = FS_MOUNT_CALL_NO_PARAMS(mount, sync);
 
 	mutex_unlock(&sMountMutex);
 
@@ -4765,8 +4826,8 @@ fs_sync(fssh_dev_t device)
 			if (previousVnode != NULL)
 				put_vnode(previousVnode);
 
-			if (FS_CALL(vnode, fsync) != NULL)
-				FS_CALL(vnode, fsync)(vnode->mount->cookie, vnode->private_node);
+			if (HAS_FS_CALL(vnode, fsync))
+				FS_CALL_NO_PARAMS(vnode, fsync);
 
 			// the next vnode might change until we lock the vnode list again,
 			// but this vnode won't go away since we keep a reference to it.
@@ -4795,8 +4856,8 @@ fs_read_info(fssh_dev_t device, struct fssh_fs_info *info)
 
 	fssh_memset(info, 0, sizeof(struct fssh_fs_info));
 
-	if (FS_MOUNT_CALL(mount, read_fs_info))
-		status = FS_MOUNT_CALL(mount, read_fs_info)(mount->cookie, info);
+	if (HAS_FS_MOUNT_CALL(mount, read_fs_info))
+		status = FS_MOUNT_CALL(mount, read_fs_info, info);
 
 	// fill in info the file system doesn't (have to) know about
 	if (status == FSSH_B_OK) {
@@ -4825,8 +4886,8 @@ fs_write_info(fssh_dev_t device, const struct fssh_fs_info *info, int mask)
 	if (status < FSSH_B_OK)
 		return status;
 
-	if (FS_MOUNT_CALL(mount, write_fs_info))
-		status = FS_MOUNT_CALL(mount, write_fs_info)(mount->cookie, info, mask);
+	if (HAS_FS_MOUNT_CALL(mount, write_fs_info))
+		status = FS_MOUNT_CALL(mount, write_fs_info, info, mask);
 	else
 		status = FSSH_EROFS;
 
@@ -4904,7 +4965,7 @@ set_cwd(int fd, char *path, bool kernel)
 	if (status < 0)
 		return status;
 
-	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+	status = FS_CALL(vnode, read_stat, &stat);
 	if (status < 0)
 		goto err;
 

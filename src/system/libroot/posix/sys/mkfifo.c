@@ -20,6 +20,7 @@
 int
 mkfifo(const char *path, mode_t mode)
 {
-	// ToDo: implement me for real!
-	RETURN_AND_SET_ERRNO(B_BAD_VALUE);
+	status_t error = _kern_create_fifo(path, mode);
+
+	RETURN_AND_SET_ERRNO(error);
 }

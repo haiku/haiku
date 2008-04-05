@@ -21,6 +21,11 @@ namespace BFS {
 // ToDo: temporary fix! (missing but public ioctls)
 #define IOCTL_FILE_UNCACHED_IO	10000
 
+#ifndef _BOOT_MODE
+extern fs_volume_ops gBFSVolumeOps;
+extern fs_vnode_ops gBFSVnodeOps;
+#endif
+
 struct block_run {
 	int32		allocation_group;
 	uint16		start;

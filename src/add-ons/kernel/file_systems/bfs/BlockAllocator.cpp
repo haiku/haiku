@@ -954,7 +954,7 @@ BlockAllocator::StopChecking(check_control *control)
 		cookie->iterator = NULL;
 
 		// the current directory inode is still locked in memory
-		put_vnode(fVolume->ID(), fVolume->ToVnode(cookie->current));
+		put_vnode(fVolume->FSVolume(), fVolume->ToVnode(cookie->current));
 	}
 
 	// if CheckNextNode() could completely work through, we can
@@ -1089,7 +1089,7 @@ BlockAllocator::CheckNextNode(check_control *control)
 			cookie->iterator = NULL;
 
 			// unlock the directory's inode from memory
-			put_vnode(fVolume->ID(), fVolume->ToVnode(cookie->current));
+			put_vnode(fVolume->FSVolume(), fVolume->ToVnode(cookie->current));
 
 			continue;
 		} else if (status == B_OK) {

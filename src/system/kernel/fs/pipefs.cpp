@@ -10,6 +10,8 @@
 #include <string.h>
 #include <sys/stat.h>
 
+#include <new>
+
 #include <KernelExport.h>
 #include <NodeMonitor.h>
 #include <Select.h>
@@ -25,6 +27,8 @@
 #include <util/ring_buffer.h>
 #include <vfs.h>
 #include <vm.h>
+
+#include "fifo.h"
 
 
 //#define TRACE_PIPEFS
@@ -111,11 +115,12 @@ typedef DoublyLinkedList<WriteRequest> WriteRequestList;
 
 class Volume {
 	public:
-		Volume(dev_t id);
+		Volume(fs_volume *volume);
 		~Volume();
 
 		status_t		InitCheck();
-		dev_t			ID() const { return fID; }
+		fs_volume		*FSVolume() const { return fVolume; }
+		dev_t			ID() const { return fVolume->id; }
 		Inode			&RootNode() const { return *fRootNode; }
 
 		void			Lock();
@@ -144,7 +149,7 @@ class Volume {
 		status_t		_InsertNode(Inode *inode);
 
 		mutex			fLock;
-		dev_t			fID;
+		fs_volume		*fVolume;
 		Inode 			*fRootNode;
 		ino_t			fNextNodeID;
 		hash_table		*fNodeHash;
@@ -158,7 +163,7 @@ class Volume {
 
 class Inode {
 	public:
-		Inode(Volume *volume, Inode *parent, const char *name, int32 type);
+		Inode(ino_t, Inode *parent, const char *name, int32 type);
 		~Inode();
 
 		status_t	InitCheck();
@@ -266,6 +271,10 @@ struct file_cookie {
 	int				open_mode;
 };
 
+// extern only to make forward declaration possible
+extern fs_volume_ops kVolumeOps;
+extern fs_vnode_ops kVnodeOps;
+
 
 //---------------------
 
@@ -327,9 +336,9 @@ RingBuffer::Writable() const
 //	#pragma mark -
 
 
-Volume::Volume(dev_t id)
+Volume::Volume(fs_volume *volume)
 	:
-	fID(id),
+	fVolume(volume),
 	fRootNode(NULL),
 	fNextNodeID(0),
 	fNodeHash(NULL),
@@ -361,7 +370,7 @@ Volume::~Volume()
 {
 	// put_vnode on the root to release the ref to it
 	if (fRootNode)
-		put_vnode(ID(), fRootNode->ID());
+		put_vnode(FSVolume(), fRootNode->ID());
 
 	if (fNameHash != NULL)
 		hash_uninit(fNameHash);
@@ -412,7 +421,7 @@ Volume::Unlock()
 Inode *
 Volume::CreateNode(Inode *parent, const char *name, int32 type)
 {
-	Inode *inode = new Inode(this, parent, name, type);
+	Inode *inode = new(std::nothrow) Inode(GetNextNodeID(), parent, name, type);
 	if (inode == NULL)
 		return NULL;
 
@@ -426,7 +435,8 @@ Volume::CreateNode(Inode *parent, const char *name, int32 type)
 
 	hash_insert(fNodeHash, inode);
 	hash_insert(fNameHash, inode);
-	publish_vnode(ID(), inode->ID(), inode);
+	publish_vnode(FSVolume(), inode->ID(), inode, &kVnodeOps, inode->Type(),
+		S_ISFIFO(type) ? B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE : 0);
 
 	if (fRootNode != NULL)
 		fRootNode->SetModificationTime(time(NULL));
@@ -544,7 +554,7 @@ status_t
 Volume::RemoveNode(Inode *inode)
 {
 	// schedule this vnode to be removed when it's ref goes to zero
-	status_t status = remove_vnode(ID(), inode->ID());
+	status_t status = remove_vnode(FSVolume(), inode->ID());
 	if (status < B_OK)
 		return status;
 
@@ -580,10 +590,12 @@ Volume::RemoveNode(Inode *directory, const char *name)
 //	#pragma mark -
 
 
-Inode::Inode(Volume *volume, Inode *parent, const char *name, int32 type)
+Inode::Inode(ino_t id, Inode *parent, const char *name, int32 type)
 	:
 	fNext(NULL),
 	fHashNext(NULL),
+	fID(id),
+	fType(type),
 	fReadRequests(),
 	fWriteRequests(),
 	fReaderCount(0),
@@ -594,9 +606,6 @@ Inode::Inode(Volume *volume, Inode *parent, const char *name, int32 type)
 	fName = strdup(name);
 	if (fName == NULL)
 		return;
-
-	fID = volume->GetNextNodeID();
-	fType = type;
 
 	if (S_ISFIFO(type)) {
 		fWriteCondition.Publish(this, "pipe");
@@ -1037,12 +1046,12 @@ Inode::Deselect(uint8 event, selectsync *sync, int openMode)
 
 
 static status_t
-pipefs_mount(dev_t id, const char *device, uint32 flags, const char *args,
-	fs_volume *_volume, ino_t *_rootVnodeID)
+pipefs_mount(fs_volume *_volume, const char *device, uint32 flags,
+	const char *args, ino_t *_rootVnodeID)
 {
 	TRACE(("pipefs_mount: entry\n"));
 
-	Volume *volume = new Volume(id);
+	Volume *volume = new Volume(_volume);
 	if (volume == NULL)
 		return B_NO_MEMORY;
 
@@ -1053,16 +1062,17 @@ pipefs_mount(dev_t id, const char *device, uint32 flags, const char *args,
 	}
 
 	*_rootVnodeID = volume->RootNode().ID();
-	*_volume = volume;
+	_volume->ops = &kVolumeOps;
+	_volume->private_volume = volume;
 
 	return B_OK;
 }
 
 
 static status_t
-pipefs_unmount(fs_volume _volume)
+pipefs_unmount(fs_volume *_volume)
 {
-	struct Volume *volume = (struct Volume *)_volume;
+	struct Volume *volume = (struct Volume *)_volume->private_volume;
 
 	TRACE(("pipefs_unmount: entry fs = %p\n", _volume));
 	delete volume;
@@ -1072,7 +1082,7 @@ pipefs_unmount(fs_volume _volume)
 
 
 static status_t
-pipefs_sync(fs_volume fs)
+pipefs_sync(fs_volume *_volume)
 {
 	TRACE(("pipefs_sync: entry\n"));
 
@@ -1081,15 +1091,15 @@ pipefs_sync(fs_volume fs)
 
 
 static status_t
-pipefs_lookup(fs_volume _volume, fs_vnode _dir, const char *name,
-	ino_t *_id, int *_type)
+pipefs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name,
+	ino_t *_id)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	status_t status;
 
 	TRACE(("pipefs_lookup: entry dir %p, name '%s'\n", _dir, name));
 
-	Inode *directory = (Inode *)_dir;
+	Inode *directory = (Inode *)_dir->private_node;
 	if (!S_ISDIR(directory->Type()))
 		return B_NOT_A_DIRECTORY;
 
@@ -1103,12 +1113,11 @@ pipefs_lookup(fs_volume _volume, fs_vnode _dir, const char *name,
 	}
 
 	Inode *dummy;
-	status = get_vnode(volume->ID(), inode->ID(), (fs_vnode *)&dummy);
+	status = get_vnode(volume->FSVolume(), inode->ID(), (void**)&dummy);
 	if (status < B_OK)
 		goto err;
 
 	*_id = inode->ID();
-	*_type = inode->Type();
 
 err:
 	volume->Unlock();
@@ -1118,10 +1127,10 @@ err:
 
 
 static status_t
-pipefs_get_vnode_name(fs_volume _volume, fs_vnode _node, char *buffer,
+pipefs_get_vnode_name(fs_volume *_volume, fs_vnode *_node, char *buffer,
 	size_t bufferSize)
 {
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_get_vnode_name(): inode = %p\n", inode));
 
@@ -1131,10 +1140,10 @@ pipefs_get_vnode_name(fs_volume _volume, fs_vnode _node, char *buffer,
 
 
 static status_t
-pipefs_get_vnode(fs_volume _volume, ino_t id, fs_vnode *_inode,
-	bool reenter)
+pipefs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_inode, int *_type,
+	uint32 *_flags, bool reenter)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	Inode *inode;
 
 	TRACE(("pipefs_getvnode: asking for vnode 0x%Lx, r %d\n", id, reenter));
@@ -1152,16 +1161,19 @@ pipefs_get_vnode(fs_volume _volume, ino_t id, fs_vnode *_inode,
 	if (inode == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	*_inode = inode;
+	_inode->private_node = inode;
+	_inode->ops = &kVnodeOps;
+	*_type = inode->Type();
+	*_flags = 0;
 	return B_OK;
 }
 
 
 static status_t
-pipefs_put_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
+pipefs_put_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 {
 #ifdef TRACE_PIPEFS
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 	TRACE(("pipefs_putvnode: entry on vnode 0x%Lx, r %d\n", inode->ID(),
 		reenter));
 #endif
@@ -1171,10 +1183,10 @@ pipefs_put_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 
 
 static status_t
-pipefs_remove_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
+pipefs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool reenter)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_removevnode: remove %p (0x%Lx), r %d\n", inode, inode->ID(),
 		reenter));
@@ -1198,10 +1210,10 @@ pipefs_remove_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 
 
 static status_t
-pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode,
-	int mode, fs_cookie *_cookie, ino_t *_newVnodeID)
+pipefs_create(fs_volume *_volume, fs_vnode *_dir, const char *name,
+	int openMode, int mode, void **_cookie, ino_t *_newVnodeID)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	bool wasCreated = true;
 
 	TRACE(("pipefs_create(): dir = %p, name = '%s', perms = %d, &id = %p\n",
@@ -1213,7 +1225,7 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode,
 
 	volume->Lock();
 
-	Inode *directory = (Inode *)_dir;
+	Inode *directory = (Inode *)_dir->private_node;
 	status_t status = B_OK;
 
 	Inode *inode = volume->Lookup(name);
@@ -1232,7 +1244,7 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode,
 	} else {
 		// we can just open the pipe again
 		void *dummy;
-		get_vnode(volume->ID(), inode->ID(), &dummy);
+		get_vnode(volume->FSVolume(), inode->ID(), &dummy);
 		wasCreated = false;
 	}
 
@@ -1259,10 +1271,10 @@ err:
 
 
 static status_t
-pipefs_open(fs_volume _volume, fs_vnode _node, int openMode,
-	fs_cookie *_cookie)
+pipefs_open(fs_volume *_volume, fs_vnode *_node, int openMode,
+	void **_cookie)
 {
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_open(): node = %p, openMode = %d\n", inode, openMode));
 
@@ -1281,11 +1293,11 @@ pipefs_open(fs_volume _volume, fs_vnode _node, int openMode,
 
 
 static status_t
-pipefs_close(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
+pipefs_close(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_close: entry vnode %p, cookie %p\n", _node, _cookie));
 
@@ -1300,7 +1312,7 @@ pipefs_close(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
 
 
 static status_t
-pipefs_free_cookie(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
+pipefs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
@@ -1313,21 +1325,23 @@ pipefs_free_cookie(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
 
 
 static status_t
-pipefs_fsync(fs_volume _volume, fs_vnode _v)
+pipefs_fsync(fs_volume *_volume, fs_vnode *_v)
 {
 	return B_OK;
 }
 
 
 static status_t
-pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
+pipefs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	off_t /*pos*/, void *buffer, size_t *_length)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n",
-		_node, cookie, *_length, cookie->open_mode));
+		inode, cookie, *_length, cookie->open_mode));
+//dprintf("[%ld] pipefs_read(vnode = %p, cookie = %p, length = %lu, mode = %d)\n",
+//find_thread(NULL), inode, cookie, *_length, cookie->open_mode);
 
 	if (!S_ISFIFO(inode->Type()))
 		return B_IS_A_DIRECTORY;
@@ -1355,6 +1369,10 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 	size_t length = *_length;
 	status_t status = inode->ReadDataFromBuffer(buffer, &length,
 		(cookie->open_mode & O_NONBLOCK) != 0, request);
+//if (status != B_OK) {
+//dprintf("[%ld] pipefs_read(): ReadDataFromBuffer() returned: 0x%lx\n",
+//find_thread(NULL), status);
+//}
 
 	inode->RemoveReadRequest(request);
 	inode->NotifyReadDone();
@@ -1368,11 +1386,11 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 
 
 static status_t
-pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
+pipefs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	off_t /*pos*/, const void *buffer, size_t *_length)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_write(vnode = %p, cookie = %p, length = %lu)\n",
 		_node, cookie, *_length));
@@ -1402,7 +1420,7 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
 
 
 static status_t
-pipefs_create_dir(fs_volume _volume, fs_vnode _dir, const char *name,
+pipefs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
 	int perms, ino_t *_newID)
 {
 	TRACE(("pipefs: create directory \"%s\" requested...\n", name));
@@ -1411,16 +1429,16 @@ pipefs_create_dir(fs_volume _volume, fs_vnode _dir, const char *name,
 
 
 static status_t
-pipefs_remove_dir(fs_volume _volume, fs_vnode _dir, const char *name)
+pipefs_remove_dir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 {
 	return EPERM;
 }
 
 
 static status_t
-pipefs_open_dir(fs_volume _volume, fs_vnode _node, fs_cookie *_cookie)
+pipefs_open_dir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 
 	TRACE(("pipefs_open_dir(): vnode = %p\n", _node));
 
@@ -1450,17 +1468,17 @@ pipefs_open_dir(fs_volume _volume, fs_vnode _node, fs_cookie *_cookie)
 
 
 static status_t
-pipefs_read_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie,
+pipefs_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 	status_t status = 0;
 
 	TRACE(("pipefs_read_dir: vnode %p, cookie %p, buffer = %p, bufferSize = %ld, num = %p\n",
 		_node, _cookie, dirent, bufferSize,_num));
 
-	if (_node != &volume->RootNode())
+	if (inode != &volume->RootNode())
 		return B_BAD_VALUE;
 
 	volume->Lock();
@@ -1525,9 +1543,9 @@ err:
 
 
 static status_t
-pipefs_rewind_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+pipefs_rewind_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 {
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 	volume->Lock();
 
 	dir_cookie *cookie = (dir_cookie *)_cookie;
@@ -1540,7 +1558,7 @@ pipefs_rewind_dir(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-pipefs_close_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
+pipefs_close_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
 	TRACE(("pipefs_close: entry vnode %p, cookie %p\n", _node, _cookie));
 
@@ -1549,10 +1567,10 @@ pipefs_close_dir(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
 
 
 static status_t
-pipefs_free_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+pipefs_free_dir_cookie(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 {
 	dir_cookie *cookie = (dir_cookie *)_cookie;
-	Volume *volume = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume->private_volume;
 
 	TRACE(("pipefs_freecookie: entry vnode %p, cookie %p\n", _vnode, cookie));
 
@@ -1566,7 +1584,7 @@ pipefs_free_dir_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-pipefs_ioctl(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, ulong op,
+pipefs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 	void *buffer, size_t length)
 {
 	TRACE(("pipefs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
@@ -1577,7 +1595,8 @@ pipefs_ioctl(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 
 
 static status_t
-pipefs_set_flags(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, int flags)
+pipefs_set_flags(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
+	int flags)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
@@ -1588,13 +1607,13 @@ pipefs_set_flags(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie, int flag
 
 
 static status_t
-pipefs_select(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, uint8 event,
-	uint32 ref, selectsync *sync)
+pipefs_select(fs_volume *_volume, fs_vnode *_node, void *_cookie,
+	uint8 event, uint32 ref, selectsync *sync)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
 	TRACE(("pipefs_select(vnode = %p)\n", _node));
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 	if (!inode)
 		return B_ERROR;
 
@@ -1604,13 +1623,13 @@ pipefs_select(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, uint8 event,
 
 
 static status_t
-pipefs_deselect(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, uint8 event,
-	selectsync *sync)
+pipefs_deselect(fs_volume *_volume, fs_vnode *_node, void *_cookie,
+	uint8 event, selectsync *sync)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
 	TRACE(("pipefs_deselect(vnode = %p)\n", _node));
-	Inode *inode = (Inode *)_node;
+	Inode *inode = (Inode *)_node->private_node;
 	if (!inode)
 		return B_ERROR;
 	
@@ -1620,14 +1639,14 @@ pipefs_deselect(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, uint8 event,
 
 
 static bool
-pipefs_can_page(fs_volume _volume, fs_vnode _v, fs_cookie cookie)
+pipefs_can_page(fs_volume *_volume, fs_vnode *_v, void *cookie)
 {
 	return false;
 }
 
 
 static status_t
-pipefs_read_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
+pipefs_read_pages(fs_volume *_volume, fs_vnode *_v, void *cookie, off_t pos,
 	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return B_NOT_ALLOWED;
@@ -1635,18 +1654,18 @@ pipefs_read_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
 
 
 static status_t
-pipefs_write_pages(fs_volume _volume, fs_vnode _v, fs_cookie cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+pipefs_write_pages(fs_volume *_volume, fs_vnode *_v, void *cookie,
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
 	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-pipefs_unlink(fs_volume _volume, fs_vnode _dir, const char *name)
+pipefs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *directory = (Inode *)_dir;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *directory = (Inode *)_dir->private_node;
 
 	TRACE(("pipefs_unlink: dir %p (0x%Lx), name '%s'\n",
 		_dir, directory->ID(), name));
@@ -1656,10 +1675,10 @@ pipefs_unlink(fs_volume _volume, fs_vnode _dir, const char *name)
 
 
 static status_t
-pipefs_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
+pipefs_read_stat(fs_volume *_volume, fs_vnode *_node, struct stat *stat)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_read_stat: vnode %p (0x%Lx), stat %p\n",
 		inode, inode->ID(), stat));
@@ -1687,11 +1706,11 @@ pipefs_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 
 
 static status_t
-pipefs_write_stat(fs_volume _volume, fs_vnode _node, const struct stat *stat,
+pipefs_write_stat(fs_volume *_volume, fs_vnode *_node, const struct stat *stat,
 	uint32 statMask)
 {
-	Volume *volume = (Volume *)_volume;
-	Inode *inode = (Inode *)_node;
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *inode = (Inode *)_node->private_node;
 
 	TRACE(("pipefs_write_stat: vnode %p (0x%Lx), stat %p\n",
 		inode, inode->ID(), stat));
@@ -1739,35 +1758,22 @@ pipefs_std_ops(int32 op, ...)
 	}
 }
 
-}	// namespace pipefs
 
-using namespace pipefs;
-
-file_system_module_info gPipeFileSystem = {
-	{
-		"file_systems/pipefs" B_CURRENT_FS_API_VERSION,
-		0,
-		pipefs_std_ops,
-	},
-
-	"Pipe File System",
-	0,	// DDM flags
-
-	NULL,	// identify_partition()
-	NULL,	// scan_partition()
-	NULL,	// free_identify_partition_cookie()
-	NULL,	// free_partition_content_cookie()
-
-	&pipefs_mount,
+fs_volume_ops kVolumeOps = {
 	&pipefs_unmount,
 	NULL,
 	NULL,
 	&pipefs_sync,
+	&pipefs_get_vnode,
 
+	// the other operations are not supported (indices, queries)
+	NULL,
+};
+
+fs_vnode_ops kVnodeOps = {
 	&pipefs_lookup,
 	&pipefs_get_vnode_name,
 
-	&pipefs_get_vnode,
 	&pipefs_put_vnode,
 	&pipefs_remove_vnode,
 
@@ -1788,7 +1794,7 @@ file_system_module_info gPipeFileSystem = {
 	NULL,	// fs_symlink()
 	NULL,	// fs_link()
 	&pipefs_unlink,
-	NULL,	// fs_rename()
+	NULL,	// rename()
 
 	NULL,	// fs_access()
 	&pipefs_read_stat,
@@ -1811,7 +1817,287 @@ file_system_module_info gPipeFileSystem = {
 	&pipefs_read_dir,
 	&pipefs_rewind_dir,
 
-	// the other operations are not supported (attributes, indices, queries)
+	// the other operations are not supported (attributes)
 	NULL,
 };
 
+}	// namespace pipefs
+
+using namespace pipefs;
+
+file_system_module_info gPipeFileSystem = {
+	{
+		"file_systems/pipefs" B_CURRENT_FS_API_VERSION,
+		0,
+		pipefs_std_ops,
+	},
+
+	"Pipe File System",
+	0,	// DDM flags
+
+	NULL,	// identify_partition()
+	NULL,	// scan_partition()
+	NULL,	// free_identify_partition_cookie()
+	NULL,	// free_partition_content_cookie()
+
+	&pipefs_mount,
+};
+
+
+// #pragma mark - FIFO
+
+
+class FIFOInode : public Inode {
+public:
+	FIFOInode(fs_vnode* vnode)
+		:
+		Inode(-1, NULL, "", S_IFIFO),
+		fSuperVnode(*vnode)
+	{
+	}
+
+	fs_vnode*	SuperVnode() { return &fSuperVnode; }
+
+private:
+	fs_vnode	fSuperVnode;
+};
+
+
+static status_t
+fifo_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
+{
+	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
+	fs_vnode* superVnode = fifo->SuperVnode();
+dprintf("[%ld] fifo_put_vnode(%p (%p), %p (%p), %d)\n", find_thread(NULL),
+volume, volume->private_volume, vnode, fifo, reenter);
+
+	status_t error = B_OK;
+	if (superVnode->ops->put_vnode != NULL)
+		error = superVnode->ops->put_vnode(volume, superVnode, reenter);
+
+	delete fifo;
+
+	return error;
+}
+
+
+static status_t
+fifo_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
+{
+	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
+	fs_vnode* superVnode = fifo->SuperVnode();
+dprintf("[%ld] fifo_remove_vnode(%p (%p), %p (%p), %d)\n", find_thread(NULL),
+volume, volume->private_volume, vnode, fifo, reenter);
+
+	status_t error = B_OK;
+	if (superVnode->ops->remove_vnode != NULL)
+		error = superVnode->ops->remove_vnode(volume, superVnode, reenter);
+
+	delete fifo;
+
+	return error;
+}
+
+
+status_t
+fifo_read_stat(fs_volume *volume, fs_vnode *vnode, struct ::stat *st)
+{
+	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
+	fs_vnode* superVnode = fifo->SuperVnode();
+dprintf("[%ld] fifo_read_stat(%p (%p), %p (%p), %p)\n", find_thread(NULL),
+volume, volume->private_volume, vnode, fifo, st);
+
+	if (superVnode->ops->read_stat == NULL)
+		return B_BAD_VALUE;
+
+	status_t error = superVnode->ops->read_stat(volume, superVnode, st);
+	if (error != B_OK)
+		return error;
+
+
+	BenaphoreLocker locker(fifo->RequestLock());
+
+	st->st_size = fifo->BytesAvailable();
+//	st->st_mode = inode->Type();
+
+//	st->st_nlink = 1;
+	st->st_blksize = 4096;
+
+//	st->st_uid = inode->UserID();
+//	st->st_gid = inode->GroupID();
+
+// TODO: Just pass the changes to our modification time on to the super node.
+	st->st_atime = time(NULL);
+	st->st_mtime = st->st_ctime = fifo->ModificationTime();
+//	st->st_crtime = inode->CreationTime();
+
+	return B_OK;
+}
+
+
+status_t
+fifo_write_stat(fs_volume *volume, fs_vnode *vnode, const struct ::stat *st,
+	uint32 statMask)
+{
+	// we cannot change the size of anything
+	if (statMask & B_STAT_SIZE)
+		return B_BAD_VALUE;
+
+	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
+	fs_vnode* superVnode = fifo->SuperVnode();
+dprintf("[%ld] fifo_write_stat(%p (%p), %p (%p), %p, 0x%lx)\n",
+find_thread(NULL), volume, volume->private_volume, vnode, fifo, st, statMask);
+
+	if (superVnode->ops->write_stat == NULL)
+		return B_BAD_VALUE;
+
+	status_t error = superVnode->ops->write_stat(volume, superVnode, st,
+		statMask);
+	if (error != B_OK)
+		return error;
+
+	return B_OK;
+}
+
+
+static status_t
+fifo_open(fs_volume *volume, fs_vnode *vnode, int openMode,
+	void **_cookie)
+{
+	file_cookie *cookie = (file_cookie *)_cookie;
+	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
+dprintf("[%ld] fifo_open(%p (%p), %p (%p), 0x%x, %p)\n",
+find_thread(NULL), volume, volume->private_volume, vnode, fifo, openMode, _cookie);
+
+	return pipefs_open(volume, vnode, openMode, _cookie);
+}
+
+
+static status_t
+fifo_close(fs_volume *volume, fs_vnode *vnode, void *_cookie)
+{
+	file_cookie *cookie = (file_cookie *)_cookie;
+	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
+dprintf("[%ld] fifo_close(%p (%p), %p (%p), %p)\n",
+find_thread(NULL), volume, volume->private_volume, vnode, fifo, _cookie);
+
+	fifo->Close(cookie->open_mode);
+
+	return B_OK;
+}
+
+
+status_t
+fifo_get_super_vnode(fs_volume *volume, fs_vnode *vnode, fs_volume *superVolume,
+	fs_vnode *_superVnode)
+{
+	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
+	fs_vnode* superVnode = fifo->SuperVnode();
+dprintf("[%ld] fifo_get_super_vnode(%p (%p), %p (%p), %p, %p)\n",
+find_thread(NULL), volume, volume->private_volume, vnode, fifo, superVolume,
+_superVnode);
+
+	if (superVnode->ops->get_super_vnode != NULL) {
+		return superVnode->ops->get_super_vnode(volume, superVnode, superVolume,
+			_superVnode);
+	}
+
+	*_superVnode = *superVnode;
+
+	return B_OK;
+}
+
+
+static fs_vnode_ops sFIFOVnodeOps = {
+	NULL,	// lookup()
+	NULL,	// get_vnode_name()
+					// TODO: This is suboptimal! We'd need to forward the
+					// super node's hook, if it has got one.
+
+	&fifo_put_vnode,
+	&fifo_remove_vnode,
+
+	&pipefs_can_page,
+	&pipefs_read_pages,
+	&pipefs_write_pages,
+
+	NULL,	// get_file_map()
+
+	/* common */
+	&pipefs_ioctl,
+	&pipefs_set_flags,
+	&pipefs_select,
+	&pipefs_deselect,
+	&pipefs_fsync,
+
+	NULL,	// fs_read_link()
+	NULL,	// fs_symlink()
+	NULL,	// fs_link()
+	NULL,	// unlink()
+	NULL,	// rename()
+
+	NULL,	// fs_access()
+	&fifo_read_stat,
+	&fifo_write_stat,
+
+	/* file */
+	NULL,	// &create()
+	&pipefs_open,
+	&fifo_close,
+	&pipefs_free_cookie,
+	&pipefs_read,
+	&pipefs_write,
+
+	/* directory */
+	NULL,	// &pipefs_create_dir,
+	NULL,	// &pipefs_remove_dir,
+	NULL,	// &pipefs_open_dir,
+	NULL,	// &pipefs_close_dir,
+	NULL,	// &pipefs_free_dir_cookie,
+	NULL,	// &pipefs_read_dir,
+	NULL,	// &pipefs_rewind_dir,
+
+	/* attribute directory operations */
+	NULL,	// open_attr_dir
+	NULL,	// close_attr_dir
+	NULL,	// free_attr_dir_cookie
+	NULL,	// read_attr_dir
+	NULL,	// rewind_attr_dir
+
+	/* attribute operations */
+	NULL,	// create_attr
+	NULL,	// open_attr
+	NULL,	// close_attr
+	NULL,	// free_attr_cookie
+	NULL,	// read_attr
+	NULL,	// write_attr
+
+	NULL,	// read_attr_stat
+	NULL,	// write_attr_stat
+	NULL,	// rename_attr
+	NULL,	// remove_attr
+
+	/* support for node and FS layers */
+	NULL,	// create_special_node
+	&fifo_get_super_vnode,
+};
+
+
+status_t
+create_fifo_vnode(fs_volume* superVolume, fs_vnode* vnode)
+{
+	FIFOInode *fifo = new(std::nothrow) FIFOInode(vnode);
+	if (fifo == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = fifo->InitCheck();
+	if (status != B_OK) {
+		delete fifo;
+		return status;
+	}
+
+	vnode->private_node = fifo;
+	vnode->ops = &sFIFOVnodeOps;
+
+	return B_OK;
+}

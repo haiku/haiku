@@ -98,12 +98,13 @@ struct devfs_vnode {
 #define DEVFS_HASH_SIZE 16
 
 struct devfs {
-	dev_t		id;
-	recursive_lock lock;
-	int32		next_vnode_id;
-	hash_table	*vnode_hash;
-	struct devfs_vnode *root_vnode;
-	hash_table	*driver_hash;
+	dev_t				id;
+	fs_volume			*volume;
+	recursive_lock		lock;
+	int32				next_vnode_id;
+	hash_table			*vnode_hash;
+	struct devfs_vnode	*root_vnode;
+	hash_table			*driver_hash;
 };
 
 struct devfs_dir_cookie {
@@ -157,6 +158,12 @@ class DriverWatcher : public NotificationListener {
 		virtual void EventOccured(NotificationService& service,
 			const KMessage* event);
 };
+
+// extern and in a private namespace only to make forward declaration possible
+namespace {
+	extern fs_volume_ops kVolumeOps;
+	extern fs_vnode_ops kVnodeOps;
+}
 
 
 static status_t get_node_for_path(struct devfs *fs, const char *path,
@@ -467,12 +474,12 @@ unpublish_driver(driver_entry *driver)
 			if (S_ISCHR(vnode->stream.type)
 				&& vnode->stream.u.dev.driver == driver) {
 				void *dummy;
-				get_vnode(sDeviceFileSystem->id, vnode->id, &dummy);
+				get_vnode(sDeviceFileSystem->volume, vnode->id, &dummy);
 					// We need to get/put the node, so that it is
 					// actually removed
 
 				unpublish_node(sDeviceFileSystem, vnode, S_IFCHR);
-				put_vnode(sDeviceFileSystem->id, vnode->id);
+				put_vnode(sDeviceFileSystem->volume, vnode->id);
 				break;
 			}
 		}
@@ -818,9 +825,10 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode,
 
 	if (S_ISCHR(vnode->stream.type)) {
 		// for partitions, we have to release the raw device
-		if (vnode->stream.u.dev.partition)
-			put_vnode(fs->id, vnode->stream.u.dev.partition->raw_device->id);
-		else
+		if (vnode->stream.u.dev.partition) {
+			put_vnode(fs->volume,
+				vnode->stream.u.dev.partition->raw_device->id);
+		} else
 			delete vnode->stream.u.dev.scheduler;
 
 		// remove API conversion from old to new drivers
@@ -973,7 +981,7 @@ add_partition(struct devfs *fs, struct devfs_vnode *device,
 
 	// increase reference count of raw device -
 	// the partition device really needs it
-	status = get_vnode(fs->id, device->id, (fs_vnode *)&partition->raw_device);
+	status = get_vnode(fs->volume, device->id, (void**)&partition->raw_device);
 	if (status < B_OK)
 		goto err1;
 
@@ -999,7 +1007,7 @@ add_partition(struct devfs *fs, struct devfs_vnode *device,
 	return B_OK;
 
 err2:
-	put_vnode(fs->id, device->id);
+	put_vnode(fs->volume, device->id);
 err1:
 	free(partition);
 	return status;
@@ -1063,7 +1071,7 @@ static status_t
 get_node_for_path(struct devfs *fs, const char *path,
 	struct devfs_vnode **_node)
 {
-	return vfs_get_fs_node_from_path(fs->id, path, true, (void **)_node);
+	return vfs_get_fs_node_from_path(fs->volume, path, true, (void **)_node);
 }
 
 
@@ -1079,7 +1087,7 @@ unpublish_node(struct devfs *fs, devfs_vnode *node, mode_t type)
 	if (status < B_OK)
 		goto out;
 
-	status = remove_vnode(fs->id, node->id);
+	status = remove_vnode(fs->volume, node->id);
 
 	if (status == B_OK && S_ISCHR(node->stream.type)
 		&& node->stream.u.dev.driver != NULL) {
@@ -1102,7 +1110,7 @@ unpublish_node(struct devfs *fs, const char *path, mode_t type)
 
 	status = unpublish_node(fs, node, type);
 
-	put_vnode(fs->id, node->id);
+	put_vnode(fs->volume, node->id);
 	return status;
 }
 
@@ -1484,8 +1492,8 @@ dump_driver(int argc, char **argv)
 
 
 static status_t
-devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
-	fs_volume *_fs, ino_t *root_vnid)
+devfs_mount(fs_volume *volume, const char *devfs, uint32 flags,
+	const char *args, ino_t *root_vnid)
 {
 	struct devfs_vnode *vnode;
 	struct devfs *fs;
@@ -1505,7 +1513,10 @@ devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
 		goto err;
 	}
 
-	fs->id = id;
+	volume->private_volume = fs;
+	volume->ops = &kVolumeOps;
+	fs->volume = volume;
+	fs->id = volume->id;
 	fs->next_vnode_id = 0;
 
 	err = recursive_lock_init(&fs->lock, "devfs lock");
@@ -1550,10 +1561,9 @@ devfs_mount(dev_t id, const char *devfs, uint32 flags, const char *args,
 	fs->root_vnode = vnode;
 
 	hash_insert(fs->vnode_hash, vnode);
-	publish_vnode(id, vnode->id, vnode);
+	publish_vnode(volume, vnode->id, vnode, &kVnodeOps, vnode->stream.type, 0);
 
 	*root_vnid = vnode->id;
-	*_fs = fs;
 	sDeviceFileSystem = fs;
 	return B_OK;
 
@@ -1571,9 +1581,9 @@ err:
 
 
 static status_t
-devfs_unmount(fs_volume _fs)
+devfs_unmount(fs_volume *_volume)
 {
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 	struct devfs_vnode *vnode;
 	struct hash_iterator i;
 
@@ -1592,7 +1602,7 @@ devfs_unmount(fs_volume _fs)
 	}
 
 	// release the reference to the root
-	put_vnode(fs->id, fs->root_vnode->id);
+	put_vnode(fs->volume, fs->root_vnode->id);
 
 	// delete all of the vnodes
 	hash_open(fs->vnode_hash, &i);
@@ -1612,7 +1622,7 @@ devfs_unmount(fs_volume _fs)
 
 
 static status_t
-devfs_sync(fs_volume fs)
+devfs_sync(fs_volume *_volume)
 {
 	TRACE(("devfs_sync: entry\n"));
 
@@ -1621,11 +1631,10 @@ devfs_sync(fs_volume fs)
 
 
 static status_t
-devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, ino_t *_id,
-	int *_type)
+devfs_lookup(fs_volume *_volume, fs_vnode *_dir, const char *name, ino_t *_id)
 {
-	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
+	struct devfs_vnode *dir = (struct devfs_vnode *)_dir->private_node;
 	struct devfs_vnode *vnode, *vdummy;
 	status_t status;
 
@@ -1647,21 +1656,21 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, ino_t *_id,
 		return B_ENTRY_NOT_FOUND;
 	}
 
-	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	status = get_vnode(fs->volume, vnode->id, (void**)&vdummy);
 	if (status < B_OK)
 		return status;
 
 	*_id = vnode->id;
-	*_type = vnode->stream.type;
 
 	return B_OK;
 }
 
 
 static status_t
-devfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
+devfs_get_vnode_name(fs_volume *_volume, fs_vnode *_vnode, char *buffer,
+	size_t bufferSize)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 
 	TRACE(("devfs_get_vnode_name: vnode = %p\n", vnode));
 
@@ -1671,9 +1680,10 @@ devfs_get_vnode_name(fs_volume _fs, fs_vnode _vnode, char *buffer, size_t buffer
 
 
 static status_t
-devfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
+devfs_get_vnode(fs_volume *_volume, ino_t id, fs_vnode *_vnode, int *_type,
+	uint32 *_flags, bool reenter)
 {
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 
 	TRACE(("devfs_get_vnode: asking for vnode id = %Ld, vnode = %p, r %d\n", id, _vnode, reenter));
 
@@ -1685,16 +1695,19 @@ devfs_get_vnode(fs_volume _fs, ino_t id, fs_vnode *_vnode, bool reenter)
 
 	TRACE(("devfs_get_vnode: looked it up at %p\n", *_vnode));
 
-	*_vnode = vnode;
+	_vnode->private_node = vnode;
+	_vnode->ops = &kVnodeOps;
+	*_type = vnode->stream.type;
+	*_flags = 0;
 	return B_OK;
 }
 
 
 static status_t
-devfs_put_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
+devfs_put_vnode(fs_volume *_volume, fs_vnode *_v, bool reenter)
 {
 #ifdef TRACE_DEVFS
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_v;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_v->private_node;
 
 	TRACE(("devfs_put_vnode: entry on vnode %p, id = %Ld, reenter %d\n",
 		vnode, vnode->id, reenter));
@@ -1705,10 +1718,10 @@ devfs_put_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 
 
 static status_t
-devfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
+devfs_remove_vnode(fs_volume *_volume, fs_vnode *_v, bool reenter)
 {
-	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_v;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_v->private_node;
 
 	TRACE(("devfs_removevnode: remove %p (%Ld), reenter %d\n", vnode, vnode->id, reenter));
 
@@ -1726,11 +1739,11 @@ devfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 
 
 static status_t
-devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int perms,
-	fs_cookie *_cookie, ino_t *_newVnodeID)
+devfs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int openMode,
+	int perms, void **_cookie, ino_t *_newVnodeID)
 {
-	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs_vnode *dir = (struct devfs_vnode *)_dir->private_node;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 	struct devfs_cookie *cookie;
 	struct devfs_vnode *vnode, *vdummy;
 	status_t status = B_OK;
@@ -1749,7 +1762,7 @@ devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int p
 	if (openMode & O_EXCL)
 		return B_FILE_EXISTS;
 
-	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	status = get_vnode(fs->volume, vnode->id, (void**)&vdummy);
 	if (status < B_OK)
 		goto err1;
 
@@ -1783,17 +1796,18 @@ devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int p
 err3:
 	free(cookie);
 err2:
-	put_vnode(fs->id, vnode->id);
+	put_vnode(fs->volume, vnode->id);
 err1:
 	return status;
 }
 
 
 static status_t
-devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
+devfs_open(fs_volume *_volume, fs_vnode *_vnode, int openMode,
+	void **_cookie)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 	struct devfs_cookie *cookie;
 	status_t status = B_OK;
 
@@ -1846,9 +1860,9 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 
 
 static status_t
-devfs_close(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
+devfs_close(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	TRACE(("devfs_close: entry vnode %p, cookie %p\n", vnode, cookie));
@@ -1863,11 +1877,11 @@ devfs_close(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-devfs_free_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
+devfs_free_cookie(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 
 	TRACE(("devfs_freecookie: entry vnode %p, cookie %p\n", vnode, cookie));
 
@@ -1887,16 +1901,17 @@ devfs_free_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-devfs_fsync(fs_volume _fs, fs_vnode _v)
+devfs_fsync(fs_volume *_volume, fs_vnode *_v)
 {
 	return B_OK;
 }
 
 
 static status_t
-devfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t *_bufferSize)
+devfs_read_link(fs_volume *_volume, fs_vnode *_link, char *buffer,
+	size_t *_bufferSize)
 {
-	struct devfs_vnode *link = (struct devfs_vnode *)_link;
+	struct devfs_vnode *link = (struct devfs_vnode *)_link->private_node;
 	size_t bufferSize = *_bufferSize;
 
 	if (!S_ISLNK(link->stream.type))
@@ -1911,10 +1926,10 @@ devfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t *_bufferSize
 
 
 static status_t
-devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
+devfs_read(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, off_t pos,
 	void *buffer, size_t *_length)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	//TRACE(("devfs_read: vnode %p, cookie %p, pos %Ld, len %p\n",
@@ -1953,10 +1968,10 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 
 
 static status_t
-devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
+devfs_write(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, off_t pos,
 	const void *buffer, size_t *_length)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	//TRACE(("devfs_write: vnode %p, cookie %p, pos %Ld, len %p\n",
@@ -1993,11 +2008,11 @@ devfs_write(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 
 
 static status_t
-devfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name,
+devfs_create_dir(fs_volume *_volume, fs_vnode *_dir, const char *name,
 	int perms, ino_t *_newVnodeID)
 {
-	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
+	struct devfs_vnode *dir = (struct devfs_vnode *)_dir->private_node;
 
 	struct devfs_vnode *vnode = devfs_find_in_dir(dir, name);
 	if (vnode != NULL) {
@@ -2023,10 +2038,10 @@ devfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name,
 
 
 static status_t
-devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
+devfs_open_dir(fs_volume *_volume, fs_vnode *_vnode, void **_cookie)
 {
-	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_dir_cookie *cookie;
 
 	TRACE(("devfs_open_dir: vnode %p\n", vnode));
@@ -2055,11 +2070,11 @@ devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
 
 
 static status_t
-devfs_free_dir_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
+devfs_free_dir_cookie(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_dir_cookie *cookie = (devfs_dir_cookie *)_cookie;
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 
 	TRACE(("devfs_free_dir_cookie: entry vnode %p, cookie %p\n", vnode, cookie));
 
@@ -2072,12 +2087,12 @@ devfs_free_dir_cookie(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie,
+devfs_read_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 	struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
-	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (devfs_vnode *)_vnode->private_node;
 	struct devfs_dir_cookie *cookie = (devfs_dir_cookie *)_cookie;
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 	status_t status = B_OK;
 	struct devfs_vnode *childNode = NULL;
 	const char *name = NULL;
@@ -2139,11 +2154,11 @@ devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie,
 
 
 static status_t
-devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
+devfs_rewind_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_dir_cookie *cookie = (devfs_dir_cookie *)_cookie;
-	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
 
 	TRACE(("devfs_rewind_dir: vnode %p, cookie %p\n", _vnode, _cookie));
 
@@ -2163,11 +2178,11 @@ devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 	specific functionality, like partitions.
 */
 static status_t
-devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
+devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 	void *buffer, size_t length)
 {
-	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
@@ -2268,9 +2283,10 @@ devfs_ioctl(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, ulong op,
 
 
 static status_t
-devfs_set_flags(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, int flags)
+devfs_set_flags(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
+	int flags)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	// we need to pass the O_NONBLOCK flag to the underlying device
@@ -2284,10 +2300,10 @@ devfs_set_flags(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, int flags)
 
 
 static status_t
-devfs_select(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
-	uint32 ref, selectsync *sync)
+devfs_select(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
+	uint8 event, uint32 ref, selectsync *sync)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	if (!S_ISCHR(vnode->stream.type))
@@ -2303,10 +2319,10 @@ devfs_select(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
 
 
 static status_t
-devfs_deselect(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
-	selectsync *sync)
+devfs_deselect(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
+	uint8 event, selectsync *sync)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	if (!S_ISCHR(vnode->stream.type))
@@ -2322,9 +2338,9 @@ devfs_deselect(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, uint8 event,
 
 
 static bool
-devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
+devfs_can_page(fs_volume *_volume, fs_vnode *_vnode, void *cookie)
 {
-	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (devfs_vnode *)_vnode->private_node;
 
 	//TRACE(("devfs_canpage: vnode %p\n", vnode));
 
@@ -2339,10 +2355,10 @@ devfs_can_page(fs_volume _fs, fs_vnode _vnode, fs_cookie cookie)
 
 
 static status_t
-devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+devfs_read_pages(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
-	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	//TRACE(("devfs_read_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
@@ -2398,10 +2414,10 @@ devfs_read_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 
 
 static status_t
-devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+devfs_write_pages(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
 {
-	struct devfs_vnode *vnode = (devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	//TRACE(("devfs_write_pages: vnode %p, vecs %p, count = %lu, pos = %Ld, size = %lu\n", vnode, vecs, count, pos, *_numBytes));
@@ -2457,9 +2473,9 @@ devfs_write_pages(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 
 
 static status_t
-devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
+devfs_read_stat(fs_volume *_volume, fs_vnode *_vnode, struct stat *stat)
 {
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 
 	TRACE(("devfs_read_stat: vnode %p (%Ld), stat %p\n", vnode, vnode->id,
 		stat));
@@ -2506,11 +2522,11 @@ devfs_read_stat(fs_volume _fs, fs_vnode _vnode, struct stat *stat)
 
 
 static status_t
-devfs_write_stat(fs_volume _fs, fs_vnode _vnode, const struct stat *stat,
+devfs_write_stat(fs_volume *_volume, fs_vnode *_vnode, const struct stat *stat,
 	uint32 statMask)
 {
-	struct devfs *fs = (struct devfs *)_fs;
-	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
+	struct devfs *fs = (struct devfs *)_volume->private_volume;
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 
 	TRACE(("devfs_write_stat: vnode %p (0x%Lx), stat %p\n", vnode, vnode->id,
 		stat));
@@ -2562,32 +2578,23 @@ devfs_std_ops(int32 op, ...)
 	}
 }
 
+namespace {
 
-file_system_module_info gDeviceFileSystem = {
-	{
-		"file_systems/devfs" B_CURRENT_FS_API_VERSION,
-		0,
-		devfs_std_ops,
-	},
-
-	"Device File System",
-	0,	// DDM flags
-
-	NULL,	// identify_partition()
-	NULL,	// scan_partition()
-	NULL,	// free_identify_partition_cookie()
-	NULL,	// free_partition_content_cookie()
-
-	&devfs_mount,
+fs_volume_ops kVolumeOps = {
 	&devfs_unmount,
 	NULL,
 	NULL,
 	&devfs_sync,
+	&devfs_get_vnode,
 
+	// the other operations are not supported (attributes, indices, queries)
+	NULL,
+};
+
+fs_vnode_ops kVnodeOps = {
 	&devfs_lookup,
 	&devfs_get_vnode_name,
 
-	&devfs_get_vnode,
 	&devfs_put_vnode,
 	&devfs_remove_vnode,
 
@@ -2632,8 +2639,28 @@ file_system_module_info gDeviceFileSystem = {
 	&devfs_read_dir,
 	&devfs_rewind_dir,
 
-	// the other operations are not supported (attributes, indices, queries)
+	// attributes operations are not supported
 	NULL,
+};
+
+}	// namespace
+
+file_system_module_info gDeviceFileSystem = {
+	{
+		"file_systems/devfs" B_CURRENT_FS_API_VERSION,
+		0,
+		devfs_std_ops,
+	},
+
+	"Device File System",
+	0,	// DDM flags
+
+	NULL,	// identify_partition()
+	NULL,	// scan_partition()
+	NULL,	// free_identify_partition_cookie()
+	NULL,	// free_partition_content_cookie()
+
+	&devfs_mount,
 };
 
 
@@ -2945,7 +2972,7 @@ devfs_publish_partition(const char *path, const partition_info *info)
 
 	status = add_partition(sDeviceFileSystem, device, lastPath + 1, *info);
 
-	put_vnode(sDeviceFileSystem->id, device->id);
+	put_vnode(sDeviceFileSystem->volume, device->id);
 	return status;
 }
 
@@ -2963,7 +2990,7 @@ devfs_unpublish_device(const char *path, bool disconnect)
 	if (status == B_OK && disconnect)
 		vfs_disconnect_vnode(sDeviceFileSystem->id, node->id);
 
-	put_vnode(sDeviceFileSystem->id, node->id);
+	put_vnode(sDeviceFileSystem->volume, node->id);
 	return status;
 }
 

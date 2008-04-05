@@ -272,9 +272,9 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks,
 //	#pragma mark -
 
 
-Volume::Volume(dev_t id)
+Volume::Volume(fs_volume *volume)
 	:
-	fID(id),
+	fVolume(volume),
 	fBlockAllocator(this),
 	fLock("bfs volume"),
 	fRootNode(NULL),
@@ -388,7 +388,8 @@ Volume::Mount(const char *deviceName, uint32 flags)
 
 	fRootNode = new Inode(this, ToVnode(Root()));
 	if (fRootNode && fRootNode->InitCheck() == B_OK) {
-		status = publish_vnode(fID, ToVnode(Root()), (void *)fRootNode);
+		status = publish_vnode(fVolume, ToVnode(Root()), (void *)fRootNode,
+			&gBFSVnodeOps, fRootNode->Mode(), 0);
 		if (status == B_OK) {
 			// try to get indices root dir
 
@@ -429,7 +430,7 @@ status_t
 Volume::Unmount()
 {
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
-	put_vnode(fID, ToVnode(Root()));
+	put_vnode(fVolume, ToVnode(Root()));
 
 	// This will also flush the log & all blocks to disk
 	delete fJournal;

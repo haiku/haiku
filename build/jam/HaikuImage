@@ -35,7 +35,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
 	keymap kill less lessecho lesskey link listarea listattr listdev listimage
 	listport listres listsem ln locate logger login logname ls lsindex m4 make
-	makebootable md5sum merge mimeset mkdos mkdir mkindex modifiers mount
+	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkindex modifiers mount
 	mount_nfs mountvolume mv nc netstat nl nohup od open paste patch pathchk pc
 	ping play playfile playsound playwav pr prio printenv printf ps ptx pwd
 	query quit readlink release renice rescan rlog rm rmattr rmindex rmdir roster route
@@ -134,7 +134,8 @@ BEOS_ADD_ONS_DRIVERS_NET = $(X86_ONLY)3com etherpci $(X86_ONLY)ipro1000
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)ps2 $(X86_ONLY)isa ide scsi
 	config_manager agp_gart usb firewire
 ;
-BEOS_ADD_ONS_FILE_SYSTEMS = bfs cdda fat googlefs iso9660 nfs $(GPL_ONLY)ntfs ;
+BEOS_ADD_ONS_FILE_SYSTEMS = bfs ;
+#cdda fat googlefs iso9660 nfs $(GPL_ONLY)ntfs ;
 
 
 # modules

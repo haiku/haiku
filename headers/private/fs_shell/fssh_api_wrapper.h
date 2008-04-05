@@ -870,11 +870,6 @@
 #define mount_id	fssh_mount_id
 #define vnode_id	fssh_vnode_id
 
-/* the file system's private data structures */
-#define fs_volume	fssh_fs_volume
-#define fs_cookie	fssh_fs_cookie
-#define fs_vnode	fssh_fs_vnode
-
 /* additional flags passed to write_stat() */
 #define B_STAT_SIZE_INSECURE	FSSH_B_STAT_SIZE_INSECURE
 
@@ -885,6 +880,14 @@
 
 #define B_CURRENT_FS_API_VERSION	FSSH_B_CURRENT_FS_API_VERSION
 
+// flags for publish_vnode() and fs_volume_ops::get_vnode()
+#define B_VNODE_PUBLISH_REMOVED					FSSH_B_VNODE_PUBLISH_REMOVED
+#define B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE	FSSH_B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE
+
+#define fs_volume				fssh_fs_volume
+#define fs_volume_ops			fssh_fs_volume_ops
+#define fs_vnode				fssh_fs_vnode
+#define fs_vnode_ops			fssh_fs_vnode_ops
 #define file_system_module_info	fssh_file_system_module_info
 
 

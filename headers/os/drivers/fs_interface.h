@@ -21,11 +21,6 @@ struct stat;
 struct fs_info;
 struct select_sync;
 
-/* the file system's private data structures */
-typedef void *fs_volume;
-typedef void *fs_cookie;
-typedef void *fs_vnode;
-
 /* additional flags passed to write_stat() (see NodeMonitor.h for the others) */
 // NOTE: Changing the constants here or in NodeMonitor.h will break
 // src/kits/storage/LibBeAdapter.cpp:_kern_write_stat().
@@ -42,9 +37,198 @@ struct file_io_vec {
 
 #define	B_CURRENT_FS_API_VERSION "/v1"
 
+// flags for publish_vnode() and fs_volume_ops::get_vnode()
+#define B_VNODE_PUBLISH_REMOVED					0x01
+#define B_VNODE_DONT_CREATE_SPECIAL_SUB_NODE	0x02
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct fs_volume fs_volume;
+typedef struct fs_volume_ops fs_volume_ops;
+typedef struct fs_vnode fs_vnode;
+typedef struct fs_vnode_ops fs_vnode_ops;
+
+
+struct fs_volume {
+	dev_t			id;
+	int32			layer;
+	void*			private_volume;
+	fs_volume_ops*	ops;
+	fs_volume*		sub_volume;
+	fs_volume*		super_volume;
+};
+
+struct fs_vnode {
+	void*			private_node;
+	fs_vnode_ops*	ops;
+};
+
+struct fs_volume_ops {
+	status_t (*unmount)(fs_volume *volume);
+
+	status_t (*read_fs_info)(fs_volume *volume, struct fs_info *info);
+	status_t (*write_fs_info)(fs_volume *volume, const struct fs_info *info,
+				uint32 mask);
+	status_t (*sync)(fs_volume *volume);
+
+	status_t (*get_vnode)(fs_volume *volume, ino_t id, fs_vnode *vnode,
+				int *_type, uint32 *_flags, bool reenter);
+
+	/* index directory & index operations */
+	status_t (*open_index_dir)(fs_volume *volume, void **cookie);
+	status_t (*close_index_dir)(fs_volume *volume, void *cookie);
+	status_t (*free_index_dir_cookie)(fs_volume *volume, void *cookie);
+	status_t (*read_index_dir)(fs_volume *volume, void *cookie,
+				struct dirent *buffer, size_t bufferSize, uint32 *_num);
+	status_t (*rewind_index_dir)(fs_volume *volume, void *cookie);
+
+	status_t (*create_index)(fs_volume *volume, const char *name, uint32 type,
+				uint32 flags);
+	status_t (*remove_index)(fs_volume *volume, const char *name);
+	status_t (*read_index_stat)(fs_volume *volume, const char *name,
+				struct stat *stat);
+
+	/* query operations */
+	status_t (*open_query)(fs_volume *volume, const char *query, uint32 flags,
+				port_id port, uint32 token, void **_cookie);
+	status_t (*close_query)(fs_volume *volume, void *cookie);
+	status_t (*free_query_cookie)(fs_volume *volume, void *cookie);
+	status_t (*read_query)(fs_volume *volume, void *cookie,
+				struct dirent *buffer, size_t bufferSize, uint32 *_num);
+	status_t (*rewind_query)(fs_volume *volume, void *cookie);
+
+	/* support for FS layers */
+	status_t (*create_sub_vnode)(fs_volume *volume, ino_t id, fs_vnode *vnode);
+	status_t (*delete_sub_vnode)(fs_volume *volume, fs_vnode *vnode);
+};
+
+struct fs_vnode_ops {
+	/* vnode operations */
+	status_t (*lookup)(fs_volume *volume, fs_vnode *dir, const char *name,
+				ino_t *_id);
+	status_t (*get_vnode_name)(fs_volume *volume, fs_vnode *vnode, char *buffer,
+				size_t bufferSize);
+
+	status_t (*put_vnode)(fs_volume *volume, fs_vnode *vnode, bool reenter);
+	status_t (*remove_vnode)(fs_volume *volume, fs_vnode *vnode, bool reenter);
+
+	/* VM file access */
+	bool (*can_page)(fs_volume *volume, fs_vnode *vnode, void *cookie);
+	status_t (*read_pages)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
+				bool reenter);
+	status_t (*write_pages)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie, off_t pos, const iovec *vecs, size_t count,
+				size_t *_numBytes, bool reenter);
+
+	/* cache file access */
+	status_t (*get_file_map)(fs_volume *volume, fs_vnode *vnode, off_t offset,
+				size_t size, struct file_io_vec *vecs, size_t *_count);
+
+	/* common operations */
+	status_t (*ioctl)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				ulong op, void *buffer, size_t length);
+	status_t (*set_flags)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				int flags);
+	status_t (*select)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				uint8 event, uint32 ref, selectsync *sync);
+	status_t (*deselect)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				uint8 event, selectsync *sync);
+	status_t (*fsync)(fs_volume *volume, fs_vnode *vnode);
+
+	status_t (*read_symlink)(fs_volume *volume, fs_vnode *link, char *buffer,
+				size_t *_bufferSize);
+	status_t (*create_symlink)(fs_volume *volume, fs_vnode *dir,
+				const char *name, const char *path, int mode);
+
+	status_t (*link)(fs_volume *volume, fs_vnode *dir, const char *name,
+				fs_vnode *vnode);
+	status_t (*unlink)(fs_volume *volume, fs_vnode *dir, const char *name);
+	status_t (*rename)(fs_volume *volume, fs_vnode *fromDir,
+				const char *fromName, fs_vnode *toDir, const char *toName);
+
+	status_t (*access)(fs_volume *volume, fs_vnode *vnode, int mode);
+	status_t (*read_stat)(fs_volume *volume, fs_vnode *vnode,
+				struct stat *stat);
+	status_t (*write_stat)(fs_volume *volume, fs_vnode *vnode,
+				const struct stat *stat, uint32 statMask);
+
+	/* file operations */
+	status_t (*create)(fs_volume *volume, fs_vnode *dir, const char *name,
+				int openMode, int perms, void **_cookie,
+				ino_t *_newVnodeID);
+	status_t (*open)(fs_volume *volume, fs_vnode *vnode, int openMode,
+				void **_cookie);
+	status_t (*close)(fs_volume *volume, fs_vnode *vnode, void *cookie);
+	status_t (*free_cookie)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+	status_t (*read)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				off_t pos, void *buffer, size_t *length);
+	status_t (*write)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				off_t pos, const void *buffer, size_t *length);
+
+	/* directory operations */
+	status_t (*create_dir)(fs_volume *volume, fs_vnode *parent,
+				const char *name, int perms, ino_t *_newVnodeID);
+	status_t (*remove_dir)(fs_volume *volume, fs_vnode *parent,
+				const char *name);
+	status_t (*open_dir)(fs_volume *volume, fs_vnode *vnode,
+				void **_cookie);
+	status_t (*close_dir)(fs_volume *volume, fs_vnode *vnode, void *cookie);
+	status_t (*free_dir_cookie)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+	status_t (*read_dir)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				struct dirent *buffer, size_t bufferSize, uint32 *_num);
+	status_t (*rewind_dir)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+
+	/* attribute directory operations */
+	status_t (*open_attr_dir)(fs_volume *volume, fs_vnode *vnode,
+				void **_cookie);
+	status_t (*close_attr_dir)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+	status_t (*free_attr_dir_cookie)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+	status_t (*read_attr_dir)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie, struct dirent *buffer, size_t bufferSize,
+				uint32 *_num);
+	status_t (*rewind_attr_dir)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+
+	/* attribute operations */
+	status_t (*create_attr)(fs_volume *volume, fs_vnode *vnode,
+				const char *name, uint32 type, int openMode,
+				void **_cookie);
+	status_t (*open_attr)(fs_volume *volume, fs_vnode *vnode, const char *name,
+				int openMode, void **_cookie);
+	status_t (*close_attr)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+	status_t (*free_attr_cookie)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie);
+	status_t (*read_attr)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				off_t pos, void *buffer, size_t *length);
+	status_t (*write_attr)(fs_volume *volume, fs_vnode *vnode, void *cookie,
+				off_t pos, const void *buffer, size_t *length);
+
+	status_t (*read_attr_stat)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie, struct stat *stat);
+	status_t (*write_attr_stat)(fs_volume *volume, fs_vnode *vnode,
+				void *cookie, const struct stat *stat, int statMask);
+	status_t (*rename_attr)(fs_volume *volume, fs_vnode *fromVnode,
+				const char *fromName, fs_vnode *toVnode, const char *toName);
+	status_t (*remove_attr)(fs_volume *volume, fs_vnode *vnode,
+				const char *name);
+
+	/* support for node and FS layers */
+	status_t (*create_special_node)(fs_volume *volume, fs_vnode *dir,
+				const char *name, fs_vnode *subVnode, mode_t mode, uint32 flags,
+				fs_vnode *_superVnode, ino_t *_nodeID);
+	status_t (*get_super_vnode)(fs_volume *volume, fs_vnode *vnode,
+				fs_volume *superVolume, fs_vnode *superVnode);
+};
 
 typedef struct file_system_module_info {
 	struct module_info	info;
@@ -61,142 +245,8 @@ typedef struct file_system_module_info {
 	void (*free_partition_content_cookie)(partition_data *partition);
 
 	/* general operations */
-	status_t (*mount)(dev_t id, const char *device, uint32 flags,
-				const char *args, fs_volume *_fs, ino_t *_rootVnodeID);
-	status_t (*unmount)(fs_volume fs);
-
-	status_t (*read_fs_info)(fs_volume fs, struct fs_info *info);
-	status_t (*write_fs_info)(fs_volume fs, const struct fs_info *info,
-				uint32 mask);
-	status_t (*sync)(fs_volume fs);
-
-	/* vnode operations */
-	status_t (*lookup)(fs_volume fs, fs_vnode dir, const char *name,
-				ino_t *_id, int *_type);
-	status_t (*get_vnode_name)(fs_volume fs, fs_vnode vnode, char *buffer,
-				size_t bufferSize);
-
-	status_t (*get_vnode)(fs_volume fs, ino_t id, fs_vnode *_vnode,
-				bool reenter);
-	status_t (*put_vnode)(fs_volume fs, fs_vnode vnode, bool reenter);
-	status_t (*remove_vnode)(fs_volume fs, fs_vnode vnode, bool reenter);
-
-	/* VM file access */
-	bool (*can_page)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*read_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-				bool reenter);
-	status_t (*write_pages)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
-				bool reenter);
-
-	/* cache file access */
-	status_t (*get_file_map)(fs_volume fs, fs_vnode vnode, off_t offset,
-				size_t size, struct file_io_vec *vecs, size_t *_count);
-
-	/* common operations */
-	status_t (*ioctl)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, ulong op,
-				void *buffer, size_t length);
-	status_t (*set_flags)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				int flags);
-	status_t (*select)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				uint8 event, uint32 ref, selectsync *sync);
-	status_t (*deselect)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				uint8 event, selectsync *sync);
-	status_t (*fsync)(fs_volume fs, fs_vnode vnode);
-
-	status_t (*read_symlink)(fs_volume fs, fs_vnode link, char *buffer,
-				size_t *_bufferSize);
-	status_t (*create_symlink)(fs_volume fs, fs_vnode dir, const char *name,
-				const char *path, int mode);
-
-	status_t (*link)(fs_volume fs, fs_vnode dir, const char *name,
-				fs_vnode vnode);
-	status_t (*unlink)(fs_volume fs, fs_vnode dir, const char *name);
-	status_t (*rename)(fs_volume fs, fs_vnode fromDir, const char *fromName,
-				fs_vnode toDir, const char *toName);
-
-	status_t (*access)(fs_volume fs, fs_vnode vnode, int mode);
-	status_t (*read_stat)(fs_volume fs, fs_vnode vnode, struct stat *stat);
-	status_t (*write_stat)(fs_volume fs, fs_vnode vnode,
-				const struct stat *stat, uint32 statMask);
-
-	/* file operations */
-	status_t (*create)(fs_volume fs, fs_vnode dir, const char *name,
-				int openMode, int perms, fs_cookie *_cookie,
-				ino_t *_newVnodeID);
-	status_t (*open)(fs_volume fs, fs_vnode vnode, int openMode,
-				fs_cookie *_cookie);
-	status_t (*close)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*free_cookie)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*read)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos,
-				void *buffer, size_t *length);
-	status_t (*write)(fs_volume fs, fs_vnode vnode, fs_cookie cookie, off_t pos,
-				const void *buffer, size_t *length);
-
-	/* directory operations */
-	status_t (*create_dir)(fs_volume fs, fs_vnode parent, const char *name,
-				int perms, ino_t *_newVnodeID);
-	status_t (*remove_dir)(fs_volume fs, fs_vnode parent, const char *name);
-	status_t (*open_dir)(fs_volume fs, fs_vnode vnode, fs_cookie *_cookie);
-	status_t (*close_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*free_dir_cookie)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*read_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				struct dirent *buffer, size_t bufferSize, uint32 *_num);
-	status_t (*rewind_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-
-	/* attribute directory operations */
-	status_t (*open_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie *_cookie);
-	status_t (*close_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*free_attr_dir_cookie)(fs_volume fs, fs_vnode vnode,
-				fs_cookie cookie);
-	status_t (*read_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				struct dirent *buffer, size_t bufferSize, uint32 *_num);
-	status_t (*rewind_attr_dir)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-
-	/* attribute operations */
-	status_t (*create_attr)(fs_volume fs, fs_vnode vnode, const char *name,
-				uint32 type, int openMode, fs_cookie *_cookie);
-	status_t (*open_attr)(fs_volume fs, fs_vnode vnode, const char *name,
-				int openMode, fs_cookie *_cookie);
-	status_t (*close_attr)(fs_volume fs, fs_vnode vnode, fs_cookie cookie);
-	status_t (*free_attr_cookie)(fs_volume fs, fs_vnode vnode,
-				fs_cookie cookie);
-	status_t (*read_attr)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				off_t pos, void *buffer, size_t *length);
-	status_t (*write_attr)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				off_t pos, const void *buffer, size_t *length);
-
-	status_t (*read_attr_stat)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				struct stat *stat);
-	status_t (*write_attr_stat)(fs_volume fs, fs_vnode vnode, fs_cookie cookie,
-				const struct stat *stat, int statMask);
-	status_t (*rename_attr)(fs_volume fs, fs_vnode fromVnode,
-				const char *fromName, fs_vnode toVnode, const char *toName);
-	status_t (*remove_attr)(fs_volume fs, fs_vnode vnode, const char *name);
-
-	/* index directory & index operations */
-	status_t (*open_index_dir)(fs_volume fs, fs_cookie *cookie);
-	status_t (*close_index_dir)(fs_volume fs, fs_cookie cookie);
-	status_t (*free_index_dir_cookie)(fs_volume fs, fs_cookie cookie);
-	status_t (*read_index_dir)(fs_volume fs, fs_cookie cookie,
-				struct dirent *buffer, size_t bufferSize, uint32 *_num);
-	status_t (*rewind_index_dir)(fs_volume fs, fs_cookie cookie);
-
-	status_t (*create_index)(fs_volume fs, const char *name, uint32 type,
-				uint32 flags);
-	status_t (*remove_index)(fs_volume fs, const char *name);
-	status_t (*read_index_stat)(fs_volume fs, const char *name,
-				struct stat *stat);
-
-	/* query operations */
-	status_t (*open_query)(fs_volume fs, const char *query, uint32 flags,
-				port_id port, uint32 token, fs_cookie *_cookie);
-	status_t (*close_query)(fs_volume fs, fs_cookie cookie);
-	status_t (*free_query_cookie)(fs_volume fs, fs_cookie cookie);
-	status_t (*read_query)(fs_volume fs, fs_cookie cookie,
-				struct dirent *buffer, size_t bufferSize, uint32 *_num);
-	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
+	status_t (*mount)(fs_volume *volume, const char *device, uint32 flags,
+				const char *args, ino_t *_rootVnodeID);
 
 	/* capability querying (the device is read locked) */
 	uint32 (*get_supported_operations)(partition_data* partition, uint32 mask);
@@ -233,17 +283,19 @@ typedef struct file_system_module_info {
 
 
 /* file system add-ons only prototypes */
-extern status_t new_vnode(dev_t mountID, ino_t vnodeID,
-					fs_vnode privateNode);
-extern status_t publish_vnode(dev_t mountID, ino_t vnodeID,
-					fs_vnode privateNode);
-extern status_t get_vnode(dev_t mountID, ino_t vnodeID,
-					fs_vnode *_privateNode);
-extern status_t put_vnode(dev_t mountID, ino_t vnodeID);
-extern status_t remove_vnode(dev_t mountID, ino_t vnodeID);
-extern status_t unremove_vnode(dev_t mountID, ino_t vnodeID);
-extern status_t get_vnode_removed(dev_t mountID, ino_t vnodeID,
-					bool* removed);
+extern status_t new_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
+					fs_vnode_ops *ops);
+extern status_t publish_vnode(fs_volume *volume, ino_t vnodeID,
+					void *privateNode, fs_vnode_ops *ops, int type,
+					uint32 flags);
+extern status_t get_vnode(fs_volume *volume, ino_t vnodeID,
+					void **_privateNode);
+extern status_t put_vnode(fs_volume *volume, ino_t vnodeID);
+extern status_t remove_vnode(fs_volume *volume, ino_t vnodeID);
+extern status_t unremove_vnode(fs_volume *volume, ino_t vnodeID);
+extern status_t get_vnode_removed(fs_volume *volume, ino_t vnodeID,
+					bool *removed);
+
 extern status_t read_pages(int fd, off_t pos, const struct iovec *vecs,
 					size_t count, size_t *_numBytes, bool fsReenter);
 extern status_t write_pages(int fd, off_t pos, const struct iovec *vecs,
@@ -256,10 +308,6 @@ extern status_t write_file_io_vec_pages(int fd,
 					const struct file_io_vec *fileVecs, size_t fileVecCount,
 					const struct iovec *vecs, size_t vecCount,
 					uint32 *_vecIndex, size_t *_vecOffset, size_t *_bytes);
-
-// Deprecated! Will disappear soon!
-extern status_t notify_listener(int op, dev_t device, ino_t parentNode,
-					ino_t toParentNode, ino_t node, const char *name);
 
 extern status_t notify_entry_created(dev_t device, ino_t directory,
 					const char *name, ino_t node);

@@ -104,7 +104,7 @@ status_t vfs_get_vnode_cache(struct vnode *vnode, struct vm_cache **_cache,
 			bool allocate);
 status_t vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,
 			struct file_io_vec *vecs, size_t *_count);
-status_t vfs_get_fs_node_from_path(dev_t mountID, const char *path,
+status_t vfs_get_fs_node_from_path(fs_volume *volume, const char *path,
 			bool kernel, void **_node);
 status_t vfs_stat_vnode(struct vnode *vnode, struct stat *stat);
 status_t vfs_stat_entry_ref(dev_t device, ino_t inode, struct stat *stat);
@@ -171,6 +171,7 @@ status_t _user_create_link(const char *path, const char *toPath);
 status_t _user_unlink(int fd, const char *path);
 status_t _user_rename(int oldFD, const char *oldpath, int newFD,
 			const char *newpath);
+status_t _user_create_fifo(const char *path, mode_t perms);
 status_t _user_access(const char *path, int mode);
 ssize_t _user_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 			bigtime_t timeout, const sigset_t *sigMask);
