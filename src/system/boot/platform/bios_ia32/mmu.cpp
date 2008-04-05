@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Based on code written by Travis Geiselbrecht for NewOS.
  *
  * Distributed under the terms of the MIT License.
@@ -22,25 +22,27 @@
 #include <string.h>
 
 
-/** The (physical) memory layout of the boot loader is currently as follows:
- *	  0x0500 - 0x10000	protected mode stack
- *	  0x0500 - 0x09000	real mode stack
- *	 0x10000 - ?		code (up to ~500 kB)
- *	 0x90000			1st temporary page table (identity maps 0-4 MB)
- *	 0x91000			2nd (4-8 MB)
- *	 0x92000 - 0x92000	further page tables
- *	 0x9e000 - 0xa0000	SMP trampoline code
- *	[0xa0000 - 0x100000	BIOS/ROM/reserved area]
- *	0x100000			page directory
- *	     ...			boot loader heap (32 kB)
- *	     ...			free physical memory
- *
- *	The first 8 MB are identity mapped (0x0 - 0x0800000); paging is turned
- *	on. The kernel is mapped at 0x80000000, all other stuff mapped by the
- *	loader (kernel args, modules, driver settings, ...) comes after
- *	0x81000000 which means that there is currently only 1 MB reserved for
- *	the kernel itself (see kMaxKernelSize).
- */
+/*!	The (physical) memory layout of the boot loader is currently as follows:
+	  0x0500 - 0x10000	protected mode stack
+	  0x0500 - 0x09000	real mode stack
+	 0x10000 - ?		code (up to ~500 kB)
+	 0x90000			1st temporary page table (identity maps 0-4 MB)
+	 0x91000			2nd (4-8 MB)
+	 0x92000 - 0x92000	further page tables
+	 0x9e000 - 0xa0000	SMP trampoline code
+	[0xa0000 - 0x100000	BIOS/ROM/reserved area]
+	0x100000			page directory
+	     ...			boot loader heap (32 kB)
+	     ...			free physical memory
+
+	The first 8 MB are identity mapped (0x0 - 0x0800000); paging is turned
+	on. The kernel is mapped at 0x80000000, all other stuff mapped by the
+	loader (kernel args, modules, driver settings, ...) comes after
+	0x80020000 which means that there is currently only 2 MB reserved for
+	the kernel itself (see kMaxKernelSize).
+
+	The layout in PXE mode differs a bit from this, see definitions below.
+*/
 
 //#define TRACE_MMU
 #ifdef TRACE_MMU
@@ -61,13 +63,14 @@ struct extended_memory {
 	uint32 type;
 };
 
-#ifdef _PXE_ENV
 
 static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
-static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
+static const size_t kMaxKernelSize = 0x200000;		// 2 MB for the kernel
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
+
+#ifdef _PXE_ENV
 
 static addr_t sNextPhysicalAddress = 0x112000;
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
@@ -78,12 +81,6 @@ static const uint32 kPageTableRegionEnd = 0x8b000;
 	// we need to reserve 2 pages for the SMP trampoline code
 
 #else
-
-static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
-static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
-
-// working page directory and page table
-static uint32 *sPageDirectory = 0;
 
 static addr_t sNextPhysicalAddress = 0x100000;
 static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
@@ -133,9 +130,9 @@ get_next_physical_page()
 static uint32 *
 get_next_page_table()
 {
-	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd %p\n", 
-		sNextPageTableAddress, kPageTableRegionEnd));
-	
+	TRACE(("get_next_page_table, sNextPageTableAddress %p, kPageTableRegionEnd "
+		"%p\n", sNextPageTableAddress, kPageTableRegionEnd));
+
 	addr_t address = sNextPageTableAddress;
 	if (address >= kPageTableRegionEnd)
 		return (uint32 *)get_next_physical_page();
@@ -145,8 +142,7 @@ get_next_page_table()
 }
 
 
-/**	Adds a new page table for the specified base address */
-
+/*!	Adds a new page table for the specified base address */
 static void
 add_page_table(addr_t base)
 {
@@ -154,16 +150,20 @@ add_page_table(addr_t base)
 
 	// Get new page table and clear it out
 	uint32 *pageTable = get_next_page_table();
-	if (pageTable > (uint32 *)(8 * 1024 * 1024))
-		panic("tried to add page table beyond the indentity mapped 8 MB region\n");
+	if (pageTable > (uint32 *)(8 * 1024 * 1024)) {
+		panic("tried to add page table beyond the indentity mapped 8 MB "
+			"region\n");
+	}
 
-	gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++] = (uint32)pageTable;
+	gKernelArgs.arch_args.pgtables[gKernelArgs.arch_args.num_pgtables++]
+		= (uint32)pageTable;
 
 	for (int32 i = 0; i < 1024; i++)
 		pageTable[i] = 0;
 
 	// put the new page table into the page directory
-	sPageDirectory[base/(4*1024*1024)] = (uint32)pageTable | kDefaultPageTableFlags;
+	sPageDirectory[base / (4 * 1024 * 1024)]
+		= (uint32)pageTable | kDefaultPageTableFlags;
 }
 
 
@@ -172,8 +172,10 @@ unmap_page(addr_t virtualAddress)
 {
 	TRACE(("unmap_page(virtualAddress = %p)\n", (void *)virtualAddress));
 
-	if (virtualAddress < KERNEL_BASE)
-		panic("unmap_page: asked to unmap invalid page %p!\n", (void *)virtualAddress);
+	if (virtualAddress < KERNEL_BASE) {
+		panic("unmap_page: asked to unmap invalid page %p!\n",
+			(void *)virtualAddress);
+	}
 
 	// unmap the page from the correct page table
 	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
@@ -184,19 +186,20 @@ unmap_page(addr_t virtualAddress)
 }
 
 
-/** Creates an entry to map the specified virtualAddress to the given
- *	physicalAddress.
- *	If the mapping goes beyond the current page table, it will allocate
- *	a new one. If it cannot map the requested page, it panics.
- */
-
+/*!	Creates an entry to map the specified virtualAddress to the given
+	physicalAddress.
+	If the mapping goes beyond the current page table, it will allocate
+	a new one. If it cannot map the requested page, it panics.
+*/
 static void
 map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 {
 	TRACE(("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress, physicalAddress));
 
-	if (virtualAddress < KERNEL_BASE)
-		panic("map_page: asked to map invalid page %p!\n", (void *)virtualAddress);
+	if (virtualAddress < KERNEL_BASE) {
+		panic("map_page: asked to map invalid page %p!\n",
+			(void *)virtualAddress);
+	}
 
 	if (virtualAddress >= sMaxVirtualAddress) {
 		// we need to add a new page table
@@ -204,8 +207,10 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 		add_page_table(sMaxVirtualAddress);
 		sMaxVirtualAddress += B_PAGE_SIZE * 1024;
 
-		if (virtualAddress >= sMaxVirtualAddress)
-			panic("map_page: asked to map a page to %p\n", (void *)virtualAddress);
+		if (virtualAddress >= sMaxVirtualAddress) {
+			panic("map_page: asked to map a page to %p\n",
+				(void *)virtualAddress);
+		}
 	}
 
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
@@ -214,9 +219,9 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	uint32 *pageTable = (uint32 *)(sPageDirectory[virtualAddress
 		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
 	uint32 tableEntry = (virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE;
-	
-	TRACE(("map_page: inserting pageTable %p, tableEntry %ld, physicalAddress %p\n", 
-		pageTable, tableEntry, physicalAddress));
+
+	TRACE(("map_page: inserting pageTable %p, tableEntry %ld, physicalAddress "
+		"%p\n", pageTable, tableEntry, physicalAddress));
 
 	pageTable[tableEntry] = physicalAddress | flags;
 
@@ -251,7 +256,7 @@ static uint32
 get_memory_map(extended_memory **_extendedMemory)
 {
 	extended_memory *block = (extended_memory *)kExtraSegmentScratch;
-	bios_regs regs = { 0, 0, sizeof(extended_memory), 0, 0, (uint32)block, 0, 0};
+	bios_regs regs = {0, 0, sizeof(extended_memory), 0, 0, (uint32)block, 0, 0};
 	uint32 count = 0;
 
 	TRACE(("get_memory_map()\n"));
@@ -273,7 +278,7 @@ get_memory_map(extended_memory **_extendedMemory)
 #ifdef TRACE_MMU
 	dprintf("extended memory info (from 0xe820):\n");
 	for (uint32 i = 0; i < count; i++) {
-		dprintf("    base 0x%Lx, len 0x%Lx, type %lu\n", 
+		dprintf("    base 0x%Lx, len 0x%Lx, type %lu\n",
 			block[i].base_addr, block[i].length, block[i].type);
 	}
 #endif
@@ -351,8 +356,8 @@ mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
 extern "C" void *
 mmu_allocate(void *virtualAddress, size_t size)
 {
-	TRACE(("mmu_allocate: requested vaddr: %p, next free vaddr: 0x%lx, size: %ld\n",
-		virtualAddress, sNextVirtualAddress, size));
+	TRACE(("mmu_allocate: requested vaddr: %p, next free vaddr: 0x%lx, size: "
+		"%ld\n", virtualAddress, sNextVirtualAddress, size));
 
 	size = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
 		// get number of pages to map
@@ -360,13 +365,14 @@ mmu_allocate(void *virtualAddress, size_t size)
 	if (virtualAddress != NULL) {
 		// This special path is almost only useful for loading the
 		// kernel into memory; it will only allow you to map the
-		// 1 MB following the kernel base address.
+		// 'kMaxKernelSize' bytes following the kernel base address.
 		// Also, it won't check for already mapped addresses, so
 		// you better know why you are here :)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE || address + size >= KERNEL_BASE + kMaxKernelSize)
+		if (address < KERNEL_BASE
+			|| address + size >= KERNEL_BASE + kMaxKernelSize)
 			return NULL;
 
 		for (uint32 i = 0; i < size; i++) {
@@ -380,18 +386,18 @@ mmu_allocate(void *virtualAddress, size_t size)
 	void *address = (void *)sNextVirtualAddress;
 
 	for (uint32 i = 0; i < size; i++) {
-		map_page(get_next_virtual_page(), get_next_physical_page(), kDefaultPageFlags);
+		map_page(get_next_virtual_page(), get_next_physical_page(),
+			kDefaultPageFlags);
 	}
 
 	return address;
 }
 
 
-/**	This will unmap the allocated chunk of memory from the virtual
- *	address space. It might not actually free memory (as its implementation
- *	is very simple), but it might.
- */
-
+/*!	This will unmap the allocated chunk of memory from the virtual
+	address space. It might not actually free memory (as its implementation
+	is very simple), but it might.
+*/
 extern "C" void
 mmu_free(void *virtualAddress, size_t size)
 {
@@ -421,11 +427,10 @@ mmu_free(void *virtualAddress, size_t size)
 }
 
 
-/** Sets up the final and kernel accessible GDT and IDT tables.
- *	BIOS calls won't work any longer after this function has
- *	been called.
- */
-
+/*!	Sets up the final and kernel accessible GDT and IDT tables.
+	BIOS calls won't work any longer after this function has
+	been called.
+*/
 extern "C" void
 mmu_init_for_kernel(void)
 {
@@ -488,7 +493,7 @@ mmu_init_for_kernel(void)
 		// seg 0x10 - kernel 4GB data
 		set_segment_descriptor(&virtualGDT[2], 0, 0xffffffff, DT_DATA_WRITEABLE,
 			DPL_KERNEL);
-		
+
 		// seg 0x1b - ring 3 user 4GB code
 		set_segment_descriptor(&virtualGDT[3], 0, 0xffffffff, DT_CODE_READABLE,
 			DPL_USER);
@@ -511,17 +516,23 @@ mmu_init_for_kernel(void)
 	}
 
 	// save the memory we've physically allocated
-	gKernelArgs.physical_allocated_range[0].size = sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
+	gKernelArgs.physical_allocated_range[0].size
+		= sNextPhysicalAddress - gKernelArgs.physical_allocated_range[0].start;
 
-	// save the memory we've virtually allocated (for the kernel and other stuff)
+	// Save the memory we've virtually allocated (for the kernel and other
+	// stuff)
 	gKernelArgs.virtual_allocated_range[0].start = KERNEL_BASE;
-	gKernelArgs.virtual_allocated_range[0].size = sNextVirtualAddress - KERNEL_BASE;
+	gKernelArgs.virtual_allocated_range[0].size
+		= sNextVirtualAddress - KERNEL_BASE;
 	gKernelArgs.num_virtual_allocated_ranges = 1;
 
 	// sort the address ranges
-	sort_addr_range(gKernelArgs.physical_memory_range, gKernelArgs.num_physical_memory_ranges);
-	sort_addr_range(gKernelArgs.physical_allocated_range, gKernelArgs.num_physical_allocated_ranges);
-	sort_addr_range(gKernelArgs.virtual_allocated_range, gKernelArgs.num_virtual_allocated_ranges);
+	sort_addr_range(gKernelArgs.physical_memory_range,
+		gKernelArgs.num_physical_memory_ranges);
+	sort_addr_range(gKernelArgs.physical_allocated_range,
+		gKernelArgs.num_physical_allocated_ranges);
+	sort_addr_range(gKernelArgs.virtual_allocated_range,
+		gKernelArgs.num_virtual_allocated_ranges);
 
 #ifdef TRACE_MMU
 	{
@@ -566,10 +577,12 @@ mmu_init(void)
 
 	// also map it on the next vpage
 	gKernelArgs.arch_args.vir_pgdir = get_next_virtual_page();
-	map_page(gKernelArgs.arch_args.vir_pgdir, (uint32)sPageDirectory, kDefaultPageFlags);
+	map_page(gKernelArgs.arch_args.vir_pgdir, (uint32)sPageDirectory,
+		kDefaultPageFlags);
 
 	// map in a kernel stack
-	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
+	gKernelArgs.cpu_kstack[0].start = (addr_t)mmu_allocate(NULL,
+		KERNEL_STACK_SIZE);
 	gKernelArgs.cpu_kstack[0].size = KERNEL_STACK_SIZE;
 
 	TRACE(("kernel stack at 0x%lx to 0x%lx\n", gKernelArgs.cpu_kstack[0].start,
@@ -587,16 +600,24 @@ mmu_init(void)
 			if (extMemoryBlock[i].type == 1) {
 				// round everything up to page boundaries, exclusive of pages
 				// it partially occupies
-				extMemoryBlock[i].length -= (extMemoryBlock[i].base_addr % B_PAGE_SIZE)
-					? (B_PAGE_SIZE - (extMemoryBlock[i].base_addr % B_PAGE_SIZE)) : 0;
-				extMemoryBlock[i].base_addr = ROUNDUP(extMemoryBlock[i].base_addr, B_PAGE_SIZE);
-				extMemoryBlock[i].length = ROUNDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
+				if ((extMemoryBlock[i].base_addr % B_PAGE_SIZE) != 0) {
+					extMemoryBlock[i].length -= B_PAGE_SIZE
+						- extMemoryBlock[i].base_addr % B_PAGE_SIZE;
+				}
+				extMemoryBlock[i].base_addr
+					= ROUNDUP(extMemoryBlock[i].base_addr, B_PAGE_SIZE);
+				extMemoryBlock[i].length
+					= ROUNDOWN(extMemoryBlock[i].length, B_PAGE_SIZE);
 
 				// we ignore all memory beyond 4 GB
 				if (extMemoryBlock[i].base_addr > 0xffffffffULL)
 					continue;
-				if (extMemoryBlock[i].base_addr + extMemoryBlock[i].length > 0xffffffffULL)
-					extMemoryBlock[i].length = 0x100000000ULL - extMemoryBlock[i].base_addr;
+
+				if (extMemoryBlock[i].base_addr + extMemoryBlock[i].length
+						> 0xffffffffULL) {
+					extMemoryBlock[i].length
+						= 0x100000000ULL - extMemoryBlock[i].base_addr;
+				}
 
 				if (gKernelArgs.num_physical_memory_ranges > 0) {
 					// we might want to extend a previous hole
@@ -606,14 +627,16 @@ mmu_init(void)
 							gKernelArgs.num_physical_memory_ranges - 1].size;
 					addr_t holeSize = extMemoryBlock[i].base_addr - previousEnd;
 
-					// if the hole is smaller than 1 MB, we try to mark the memory
-					// as allocated and extend the previous memory range
+					// If the hole is smaller than 1 MB, we try to mark the
+					// memory as allocated and extend the previous memory range
 					if (previousEnd <= extMemoryBlock[i].base_addr
 						&& holeSize < 0x100000
 						&& insert_physical_allocated_range(previousEnd,
-							extMemoryBlock[i].base_addr - previousEnd) == B_OK) {
+							extMemoryBlock[i].base_addr - previousEnd)
+								== B_OK) {
 						gKernelArgs.physical_memory_range[
-							gKernelArgs.num_physical_memory_ranges - 1].size += holeSize;
+							gKernelArgs.num_physical_memory_ranges - 1].size
+								+= holeSize;
 					}
 				}
 
@@ -622,19 +645,22 @@ mmu_init(void)
 			}
 		}
 	} else {
-		// ToDo: for now!
+		// TODO: for now!
 		dprintf("No extended memory block - using 32 MB (fix me!)\n");
 		uint32 memSize = 32 * 1024 * 1024;
 
-		// we dont have an extended map, assume memory is contiguously mapped at 0x0
+		// We dont have an extended map, assume memory is contiguously mapped
+		// at 0x0
 		gKernelArgs.physical_memory_range[0].start = 0;
 		gKernelArgs.physical_memory_range[0].size = memSize;
 		gKernelArgs.num_physical_memory_ranges = 1;
 
 		// mark the bios area allocated
-		gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].start = 0x9f000; // 640k - 1 page
-		gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = 0x61000;
-		gKernelArgs.num_physical_allocated_ranges++;
+		uint32 biosRange = gKernelArgs.num_physical_allocated_ranges++;
+
+		gKernelArgs.physical_allocated_range[biosRange].start = 0x9f000;
+			// 640k - 1 page
+		gKernelArgs.physical_allocated_range[biosRange].size = 0x61000;
 	}
 
 	gKernelArgs.arch_args.page_hole = 0xffc00000;
