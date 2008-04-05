@@ -632,12 +632,14 @@ usb_disk_device_removed(void *cookie)
 	}
 	gLunCount -= device->lun_count;
 	gDeviceCount--;
-	benaphore_unlock(&gDeviceListLock);
 
-	device->device = 0;
+	benaphore_lock(&device->lock);
 	device->removed = true;
+	benaphore_unlock(&device->lock);
 	if (device->open_count == 0)
 		usb_disk_free_device_and_luns(device);
+
+	benaphore_unlock(&gDeviceListLock);
 	return B_OK;
 }
 
@@ -799,12 +801,13 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
-	if (device->removed)
-		return B_DEV_NOT_READY;
-
 	benaphore_lock(&device->lock);
-	status_t result = B_DEV_INVALID_IOCTL;
+	if (device->removed) {
+		benaphore_unlock(&device->lock);
+		return B_DEV_NOT_READY;
+	}
 
+	status_t result = B_DEV_INVALID_IOCTL;
 	switch (op) {
 		case B_GET_MEDIA_STATUS: {
 			*(status_t *)buffer = usb_disk_test_unit_ready(lun);
@@ -852,18 +855,19 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 static status_t
 usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 {
-	TRACE("read(%lld, %ld)\n", position, *length);
-	device_lun *lun = (device_lun *)cookie;
-	disk_device *device = lun->device;
-	if (device->removed) {
-		*length = 0;
-		return B_DEV_NOT_READY;
-	}
-
 	if (buffer == NULL || length == NULL)
 		return B_BAD_VALUE;
 
+	TRACE("read(%lld, %ld)\n", position, *length);
+	device_lun *lun = (device_lun *)cookie;
+	disk_device *device = lun->device;
 	benaphore_lock(&device->lock);
+	if (device->removed) {
+		*length = 0;
+		benaphore_unlock(&device->lock);
+		return B_DEV_NOT_READY;
+	}
+
 	status_t result = B_ERROR;
 	uint32 blockPosition = 0;
 	uint16 blockCount = 0;
@@ -899,18 +903,19 @@ static status_t
 usb_disk_write(void *cookie, off_t position, const void *buffer,
 	size_t *length)
 {
-	TRACE("write(%lld, %ld)\n", position, *length);
-	device_lun *lun = (device_lun *)cookie;
-	disk_device *device = lun->device;
-	if (device->removed) {
-		*length = 0;
-		return B_DEV_NOT_READY;
-	}
-
 	if (buffer == NULL || length == NULL)
 		return B_BAD_VALUE;
 
+	TRACE("write(%lld, %ld)\n", position, *length);
+	device_lun *lun = (device_lun *)cookie;
+	disk_device *device = lun->device;
 	benaphore_lock(&device->lock);
+	if (device->removed) {
+		*length = 0;
+		benaphore_unlock(&device->lock);
+		return B_DEV_NOT_READY;
+	}
+
 	status_t result = B_ERROR;
 	uint32 blockPosition = 0;
 	uint16 blockCount = 0;
