@@ -7,8 +7,6 @@
  */
 
 
-#include <boot_splash.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,10 +14,15 @@
 
 #include <KernelExport.h>
 
+#define __BOOTSPLASH_KERNEL__
 #include <boot/images.h>
+
+
 #include <boot_item.h>
 #include <debug.h>
 #include <frame_buffer_console.h>
+
+#include <boot_splash.h>
 
 
 //#define TRACE_BOOT_SPLASH 1
@@ -31,7 +34,7 @@
 
 
 static struct frame_buffer_boot_info *sInfo;
-
+static uint8 *sUncompressedIcons;
 
 static void
 blit15_cropped(const uint8 *data, uint16 imageLeft, uint16 imageTop,
@@ -168,7 +171,7 @@ blit_cropped(const uint8* data, const uint8* indexedData,
 
 
 void
-boot_splash_init(void)
+boot_splash_init(uint8 *boot_splash)
 {
 	TRACE("boot_splash_init: enter\n");
 
@@ -177,6 +180,8 @@ boot_splash_init(void)
 
 	sInfo = (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO,
 		NULL);
+
+	sUncompressedIcons = boot_splash;
 }
 
 
@@ -201,7 +206,7 @@ boot_splash_set_stage(int stage)
 	int stageRightEdge = width * (stage + 1) / BOOT_SPLASH_STAGE_MAX;
 
 	height = min_c(iconsHalfHeight, sInfo->height);
-	blit_cropped(kSplashIconsImage, NULL, stageLeftEdge, 0, stageRightEdge,
+	blit_cropped(sUncompressedIcons, NULL, stageLeftEdge, 0, stageRightEdge,
 		height, kSplashIconsWidth, NULL, x, y);
 }
 

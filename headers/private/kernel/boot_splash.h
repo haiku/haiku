@@ -11,7 +11,6 @@
 
 #include <sys/types.h>
 
-
 enum {
 	BOOT_SPLASH_STAGE_1_INIT_MODULES = 0,
 	BOOT_SPLASH_STAGE_2_BOOTSTRAP_FS,
@@ -29,7 +28,7 @@ enum {
 extern "C" {
 #endif
 
-void boot_splash_init(void);
+void boot_splash_init(uint8 * boot_splash);
 void boot_splash_set_stage(int stage);
 
 #ifdef __cplusplus

@@ -79,6 +79,10 @@ typedef struct kernel_args {
 
 	platform_kernel_args platform_args;
 	arch_kernel_args arch_args;
+
+	// bootsplash data
+	uint8 		*boot_splash;
+
 } kernel_args;
 
 #endif	/* KERNEL_BOOT_KERNEL_ARGS_H */

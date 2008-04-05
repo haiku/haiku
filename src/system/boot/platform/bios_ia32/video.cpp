@@ -794,6 +794,18 @@ blit_image(const uint8 *data, const uint8* indexedData, uint16 width,
 	}
 }
 
+
+static void
+uncompress_RLE(const RLE_element *compressed, uint8 *uncompressed, uint32 size)
+{
+	uint32 cursor = 0;
+	for (uint32 i = 0; i < size; i++) {
+		memset(uncompressed + cursor, compressed[i].colorComponent,
+			compressed[i].count);
+		cursor += compressed[i].count;
+	} 
+}
+
 //	#pragma mark -
 
 extern "C" void
@@ -868,8 +880,14 @@ fallback:
 	memset((void *)sFrameBuffer, 0,
 		gKernelArgs.frame_buffer.physical_buffer.size);
 
+	uint8 *uncompressedLogo = (uint8 *)kernel_args_malloc(kSplashLogoWidth
+		* kSplashLogoHeight * 3);
+	if (uncompressedLogo == NULL)
+		return;
+	uncompress_RLE(kSplashLogoCompressedImage, uncompressedLogo,
+		kSplashLogoSize);
+
 	// TODO: support indexed versions of the images!
-	// TODO: support compressed RGB image data (simple RLE?)
 
 	// render splash logo
 	uint16 iconsHalfHeight = kSplashIconsHeight / 2;
@@ -884,8 +902,17 @@ fallback:
 	int y = (gKernelArgs.frame_buffer.height - height) * placementY / 100;
 
 	height = min_c(kSplashLogoHeight, gKernelArgs.frame_buffer.height);
-	blit_image(kSplashLogoImage, NULL, width, height, kSplashLogoWidth,
+	blit_image(uncompressedLogo, NULL, width, height, kSplashLogoWidth,
 		NULL, x, y);
+
+	kernel_args_free(uncompressedLogo);
+
+	gKernelArgs.boot_splash = (uint8 *)kernel_args_malloc(kSplashIconsWidth
+		* kSplashIconsHeight * 3);
+	if (gKernelArgs.boot_splash == NULL)
+		return;
+	uncompress_RLE(kSplashIconsCompressedImage, gKernelArgs.boot_splash,
+		kSplashIconsSize);
 
 	// render initial (grayed out) icons
 	// the grayed out version is the lower half of the icons image
@@ -901,7 +928,7 @@ fallback:
 		* placementY / 100;
 
 	// pointer into the lower half of the icons image data
-	const uint8* lowerHalfIconImage = kSplashIconsImage
+	const uint8* lowerHalfIconImage = gKernelArgs.boot_splash
 		+ (kSplashIconsWidth * iconsHalfHeight) * 3;
 	height = min_c(iconsHalfHeight, gKernelArgs.frame_buffer.height);
 	blit_image(lowerHalfIconImage, NULL, width, height,

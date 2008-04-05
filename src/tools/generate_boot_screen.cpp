@@ -12,6 +12,7 @@
 #include <iostream>
 #include <png.h>
 #include <string>
+#include <stdarg.h>
 
 // TODO: Generate the single optimal palette for all three images,
 // store palette versions of these images as well, so that they are
@@ -123,22 +124,43 @@ writeHeader(const char* baseName, int width, int height, png_bytep* rowPtrs)
 {
 	fprintf(sOutput, "static const uint16 %sWidth = %d;\n", baseName, width);
 	fprintf(sOutput, "static const uint16 %sHeight = %d;\n", baseName, height);
-	fprintf(sOutput, "static const uint8 %sImage[] = {\n\t", baseName);
+	fprintf(sOutput, "#ifndef __BOOTSPLASH_KERNEL__\n");
+	fprintf(sOutput, "static const RLE_element %sCompressedImage[] = {\n\t",
+		baseName);
 
 	int offset = 0;
+	int lastColor = -1;
+	int counter = 0;
 	for (int y = 0; y < height; y++) {
 		png_byte* row = rowPtrs[y];
 		for (int x = 0; x < width * 3; x++) {
-			offset++;
+			if (lastColor == row[x]) {
+				// if the currentColor is already being counted...
+				counter++;
+			} else {
+				// otherwise display what we had in memory, record that color
+				// and reset the counter...
+				if (lastColor != -1) {
+					offset++;
+					fprintf(sOutput, "{%d, 0x%02x}, ", counter, lastColor);
+					if (offset % 6 == 0) {
+						fprintf(sOutput, "\n\t");
+					}
+				}
+				lastColor = row[x];
+				counter = 1;
+			}
+
 			if (x == width * 3 - 1 && y == height - 1) {
-				fprintf(sOutput, "0x%02x\n};\n\n", row[x]);
+				// we have reach the end
+				fprintf(sOutput, "{%d, 0x%02x}\n};\n\n", counter, row[x]);
+				offset++;
 				break;
-			} else if ((offset % 12) == 0)
-				fprintf(sOutput, "0x%02x,\n\t", row[x]);
-			else
-				fprintf(sOutput, "0x%02x, ", row[x]);
+			}
 		}
 	}
+	fprintf(sOutput, "static const uint32 %sSize = %d;\n", baseName, offset);
+	fprintf(sOutput, "#endif\n\n");
 }
 
 
@@ -209,6 +231,9 @@ main(int argc, char* argv[])
 		iconPlacementX);
 	fprintf(sOutput, "static const int32 kSplashIconsPlacementY = %d;\n\n",
 		iconPlacementY);
+
+	fprintf(sOutput, "struct RLE_element \n{\n\tuint16 count; \n\tuint8 "
+		"colorComponent;\n};\n\n");
 
 	parseImage(argv[1], "kSplashLogo");
 	parseImage(argv[4], "kSplashIcons");

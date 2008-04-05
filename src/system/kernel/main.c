@@ -224,7 +224,7 @@ main2(void *unused)
 
 	TRACE("start of main2: initializing devices\n");
 
-	boot_splash_init();
+	boot_splash_init(sKernelArgs.boot_splash);
 
 	TRACE("Init modules\n");
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_1_INIT_MODULES);
@@ -282,6 +282,10 @@ main2(void *unused)
 	device_manager_init_post_modules(&sKernelArgs);
 
 	boot_splash_set_stage(BOOT_SPLASH_STAGE_7_RUN_BOOT_SCRIPT);
+//	kernel_args_free(sKernelArgs.boot_splash);
+// NOTE: We could introduce a syscall to draw more icons indicating
+// stages in the boot script itself. Then we should not free the image.
+
 	// start the init process
 	{
 		const char *args[] = {"/bin/sh", "/boot/beos/system/boot/Bootscript",
