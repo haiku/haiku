@@ -130,10 +130,10 @@ bfs_mount(dev_t mountID, const char *device, uint32 flags, const char *args,
 
 
 static status_t
-bfs_unmount(void *ns)
+bfs_unmount(void *_fs)
 {
 	FUNCTION();
-	Volume* volume = (Volume *)ns;
+	Volume* volume = (Volume *)_fs;
 
 	status_t status = volume->Unmount();
 	delete volume;
@@ -142,26 +142,20 @@ bfs_unmount(void *ns)
 }
 
 
-/**	Fill in bfs_info struct for device.
- */
-
 static status_t
-bfs_read_fs_stat(void *_ns, struct fs_info *info)
+bfs_read_fs_stat(void *_fs, struct fs_info *info)
 {
 	FUNCTION();
-	if (_ns == NULL || info == NULL)
-		return B_BAD_VALUE;
 
-	Volume *volume = (Volume *)_ns;
-
+	Volume *volume = (Volume *)_fs;
 	RecursiveLocker locker(volume->Lock());
 
 	// File system flags.
-	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME | B_FS_HAS_QUERY |
-			(volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
+	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
+		| B_FS_HAS_QUERY | (volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
 
 	info->io_size = BFS_IO_SIZE;
-		// whatever is appropriate here? Just use the same value as BFS (and iso9660) for now
+		// whatever is appropriate here?
 
 	info->block_size = volume->BlockSize();
 	info->total_blocks = volume->NumBlocks();
@@ -178,19 +172,23 @@ bfs_read_fs_stat(void *_ns, struct fs_info *info)
 
 
 static status_t
-bfs_write_fs_stat(void *_ns, const struct fs_info *info, uint32 mask)
+bfs_write_fs_stat(void *_fs, const struct fs_info *info, uint32 mask)
 {
 	FUNCTION_START(("mask = %ld\n", mask));
 
-	Volume *volume = (Volume *)_ns;
-	disk_super_block &superBlock = volume->SuperBlock();
+	Volume *volume = (Volume *)_fs;
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	RecursiveLocker locker(volume->Lock());
 
 	status_t status = B_BAD_VALUE;
 
 	if (mask & FS_WRITE_FSINFO_NAME) {
-		strncpy(superBlock.name, info->volume_name, sizeof(superBlock.name) - 1);
+		disk_super_block &superBlock = volume->SuperBlock();
+
+		strncpy(superBlock.name, info->volume_name,
+			sizeof(superBlock.name) - 1);
 		superBlock.name[sizeof(superBlock.name) - 1] = '\0';
 
 		status = volume->WriteSuperBlock();
@@ -200,14 +198,11 @@ bfs_write_fs_stat(void *_ns, const struct fs_info *info, uint32 mask)
 
 
 static status_t
-bfs_sync(void *_ns)
+bfs_sync(void *_fs)
 {
 	FUNCTION();
-	if (_ns == NULL)
-		return B_BAD_VALUE;
 
-	Volume *volume = (Volume *)_ns;
-
+	Volume *volume = (Volume *)_fs;
 	return volume->Sync();
 }
 
@@ -218,10 +213,10 @@ bfs_sync(void *_ns)
 /*!	Reads in the node from disk and creates an inode object from it.
 */
 static status_t
-bfs_get_vnode(void *_ns, ino_t id, void **_node, bool reenter)
+bfs_get_vnode(void *_fs, ino_t id, void **_node, bool reenter)
 {
 	//FUNCTION_START(("ino_t = %Ld\n", id));
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 
 	// first inode may be after the log area, we don't go through
 	// the hassle and try to load an earlier block from disk
@@ -284,14 +279,11 @@ bfs_put_vnode(void *_volume, void *_node, bool reenter)
 
 
 static status_t
-bfs_remove_vnode(void *_ns, void *_node, bool reenter)
+bfs_remove_vnode(void *_fs, void *_node, bool reenter)
 {
 	FUNCTION();
 
-	if (_ns == NULL || _node == NULL)
-		return B_BAD_VALUE;
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
 
 	// The "chkbfs" functionality uses this flag to prevent the space used
@@ -325,7 +317,7 @@ bfs_remove_vnode(void *_ns, void *_node, bool reenter)
 static bool
 bfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
-	// ToDo: we're obviously not even asked...
+	// TODO: we're obviously not even asked...
 	return false;
 }
 
@@ -382,6 +374,9 @@ bfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 {
 	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	if (inode->FileCache() == NULL)
 		RETURN_ERROR(B_BAD_VALUE);
@@ -452,8 +447,8 @@ bfs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
 			if (offset > inode->Size()) {
 				// make sure the extent ends with the last official file
 				// block (without taking any preallocations into account)
-				vecs[index].length = (inode->Size() - fileOffset + volume->BlockSize() - 1)
-					& ~(volume->BlockSize() - 1);
+				vecs[index].length = (inode->Size() - fileOffset
+					+ volume->BlockSize() - 1) & ~(volume->BlockSize() - 1);
 			}
 			*_count = index + 1;
 			return B_OK;
@@ -478,13 +473,12 @@ bfs_get_file_map(fs_volume _fs, fs_vnode _node, off_t offset, size_t size,
 
 
 static status_t
-bfs_lookup(void *_ns, void *_directory, const char *file, ino_t *_vnodeID, int *_type)
+bfs_lookup(void *_fs, void *_directory, const char *file, ino_t *_vnodeID,
+	int *_type)
 {
 	//FUNCTION_START(("file = %s\n", file));
-	if (_ns == NULL || _directory == NULL || file == NULL || _vnodeID == NULL)
-		return B_BAD_VALUE;
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *directory = (Inode *)_directory;
 
 	// check access permissions
@@ -496,7 +490,8 @@ bfs_lookup(void *_ns, void *_directory, const char *file, ino_t *_vnodeID, int *
 	if (directory->GetTree(&tree) != B_OK)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	if ((status = tree->Find((uint8 *)file, (uint16)strlen(file), _vnodeID)) < B_OK) {
+	status = tree->Find((uint8 *)file, (uint16)strlen(file), _vnodeID);
+	if (status < B_OK) {
 		//PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
 		return status;
 	}
@@ -506,7 +501,8 @@ bfs_lookup(void *_ns, void *_directory, const char *file, ino_t *_vnodeID, int *
 		// interfere with new_vnode() here
 
 	Inode *inode;
-	if ((status = get_vnode(volume->ID(), *_vnodeID, (void **)&inode)) != B_OK) {
+	status = get_vnode(volume->ID(), *_vnodeID, (void **)&inode);
+	if (status != B_OK) {
 		REPORT_ERROR(status);
 		return B_ENTRY_NOT_FOUND;
 	}
@@ -591,12 +587,14 @@ bfs_ioctl(void *_fs, void *_node, void *_cookie, ulong cmd, void *buffer,
 #ifdef DEBUG
 		case 56742:
 		{
-			// allocate all free blocks and zero them out (a test for the BlockAllocator)!
+			// allocate all free blocks and zero them out
+			// (a test for the BlockAllocator)!
 			BlockAllocator &allocator = volume->Allocator();
 			Transaction transaction(volume, 0);
 			CachedBlock cached(volume);
 			block_run run;
-			while (allocator.AllocateBlocks(transaction, 8, 0, 64, 1, run) == B_OK) {
+			while (allocator.AllocateBlocks(transaction, 8, 0, 64, 1, run)
+					== B_OK) {
 				PRINT(("write block_run(%ld, %d, %d)\n", run.allocation_group,
 					run.start, run.length));
 				for (int32 i = 0;i < run.length;i++) {
@@ -626,13 +624,12 @@ bfs_ioctl(void *_fs, void *_node, void *_cookie, ulong cmd, void *buffer,
 }
 
 
-/** Sets the open-mode flags for the open file cookie - only
- *	supports O_APPEND currently, but that should be sufficient
- *	for a file system.
- */
-
+/*!	Sets the open-mode flags for the open file cookie - only
+	supports O_APPEND currently, but that should be sufficient
+	for a file system.
+*/
 static status_t
-bfs_set_flags(void *_ns, void *_node, void *_cookie, int flags)
+bfs_set_flags(void *_fs, void *_node, void *_cookie, int flags)
 {
 	FUNCTION_START(("node = %p, flags = %d", _node, flags));
 
@@ -643,31 +640,10 @@ bfs_set_flags(void *_ns, void *_node, void *_cookie, int flags)
 }
 
 
-#if 0
 static status_t
-bfs_select(void *ns, void *node, void *cookie, uint8 event, uint32 ref, selectsync *sync)
-{
-	FUNCTION_START(("event = %d, ref = %lu, sync = %p\n", event, ref, sync));
-	notify_select_event(sync, ref);
-
-	return B_OK;
-}
-
-
-static status_t
-bfs_deselect(void *ns, void *node, void *cookie, uint8 event, selectsync *sync)
+bfs_fsync(void *_fs, void *_node)
 {
 	FUNCTION();
-	return B_OK;
-}
-#endif
-
-static status_t
-bfs_fsync(void *_ns, void *_node)
-{
-	FUNCTION();
-	if (_node == NULL)
-		return B_BAD_VALUE;
 
 	Inode *inode = (Inode *)_node;
 	ReadLocked locked(inode->Lock());
@@ -680,11 +656,8 @@ bfs_fsync(void *_ns, void *_node)
 }
 
 
-/**	Fills in the stat struct for a node
- */
-
 static status_t
-bfs_read_stat(void *_ns, void *_node, struct stat *stat)
+bfs_read_stat(void *_fs, void *_node, struct stat *stat)
 {
 	FUNCTION();
 
@@ -696,15 +669,15 @@ bfs_read_stat(void *_ns, void *_node, struct stat *stat)
 
 
 static status_t
-bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
+bfs_write_stat(void *_fs, void *_node, const struct stat *stat, uint32 mask)
 {
 	FUNCTION();
 
-	if (_ns == NULL || _node == NULL || stat == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	// TODO: we should definitely check a bit more if the new stats are
 	//	valid - or even better, the VFS should check this before calling us
@@ -788,17 +761,16 @@ bfs_write_stat(void *_ns, void *_node, const struct stat *stat, uint32 mask)
 
 
 status_t
-bfs_create(void *_ns, void *_directory, const char *name, int openMode,
+bfs_create(void *_fs, void *_directory, const char *name, int openMode,
 	int mode, void **_cookie, ino_t *_vnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d, openMode = %d\n", name, mode, openMode));
 
-	if (_ns == NULL || _directory == NULL || _cookie == NULL
-		|| name == NULL || *name == '\0')
-		RETURN_ERROR(B_BAD_VALUE);
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *directory = (Inode *)_directory;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	if (!directory->IsDirectory())
 		RETURN_ERROR(B_BAD_TYPE);
@@ -826,8 +798,10 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode,
 		// register the cookie
 		*_cookie = cookie;
 
-		if (created)
-			notify_entry_created(volume->ID(), directory->ID(), name, *_vnodeID);
+		if (created) {
+			notify_entry_created(volume->ID(), directory->ID(), name,
+				*_vnodeID);
+		}
 	} else
 		free(cookie);
 
@@ -836,17 +810,16 @@ bfs_create(void *_ns, void *_directory, const char *name, int openMode,
 
 
 static status_t
-bfs_create_symlink(void *_ns, void *_directory, const char *name,
+bfs_create_symlink(void *_fs, void *_directory, const char *name,
 	const char *path, int mode)
 {
 	FUNCTION_START(("name = \"%s\", path = \"%s\"\n", name, path));
 
-	if (_ns == NULL || _directory == NULL || path == NULL
-		|| name == NULL || *name == '\0')
-		RETURN_ERROR(B_BAD_VALUE);
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *directory = (Inode *)_directory;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	if (!directory->IsDirectory())
 		RETURN_ERROR(B_BAD_TYPE);
@@ -899,7 +872,7 @@ bfs_create_symlink(void *_ns, void *_directory, const char *name,
 
 
 status_t
-bfs_link(void *ns, void *dir, const char *name, void *node)
+bfs_link(void *_fs, void *dir, const char *name, void *node)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
@@ -910,16 +883,14 @@ bfs_link(void *ns, void *dir, const char *name, void *node)
 
 
 status_t
-bfs_unlink(void *_ns, void *_directory, const char *name)
+bfs_unlink(void *_fs, void *_directory, const char *name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
-	if (_ns == NULL || _directory == NULL || name == NULL || *name == '\0')
-		return B_BAD_VALUE;
 	if (!strcmp(name, "..") || !strcmp(name, "."))
 		return B_NOT_ALLOWED;
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *directory = (Inode *)_directory;
 
 	status_t status = directory->CheckPermissions(W_OK);
@@ -939,20 +910,18 @@ bfs_unlink(void *_ns, void *_directory, const char *name)
 
 
 status_t
-bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const char *newName)
+bfs_rename(void *_fs, void *_oldDir, const char *oldName, void *_newDir,
+	const char *newName)
 {
 	FUNCTION_START(("oldDir = %p, oldName = \"%s\", newDir = %p, newName = \"%s\"\n", _oldDir, oldName, _newDir, newName));
 
 	// there might be some more tests needed?!
-	if (_ns == NULL || _oldDir == NULL || _newDir == NULL
-		|| oldName == NULL || *oldName == '\0'
-		|| newName == NULL || *newName == '\0'
-		|| !strcmp(oldName, ".") || !strcmp(oldName, "..")
+	if (!strcmp(oldName, ".") || !strcmp(oldName, "..")
 		|| !strcmp(newName, ".") || !strcmp(newName, "..")
 		|| strchr(newName, '/') != NULL)
 		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *oldDirectory = (Inode *)_oldDir;
 	Inode *newDirectory = (Inode *)_newDir;
 
@@ -969,7 +938,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 
 	RecursiveLocker locker(volume->Lock());
 
-	// get the directory's tree, and a pointer to the inode which should be changed
+	// Get the directory's tree, and a pointer to the inode which should be
+	// changed
 	BPlusTree *tree;
 	status = oldDirectory->GetTree(&tree);
 	if (status < B_OK)
@@ -1023,12 +993,14 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			RETURN_ERROR(status);
 	}
 
-	status = newTree->Insert(transaction, (const uint8 *)newName, strlen(newName), id);
+	status = newTree->Insert(transaction, (const uint8 *)newName,
+		strlen(newName), id);
 	if (status == B_NAME_IN_USE) {
 		// If there is already a file with that name, we have to remove
 		// it, as long it's not a directory with files in it
 		off_t clobber;
-		if (newTree->Find((const uint8 *)newName, strlen(newName), &clobber) < B_OK)
+		if (newTree->Find((const uint8 *)newName, strlen(newName), &clobber)
+				< B_OK)
 			return B_NAME_IN_USE;
 		if (clobber == id)
 			return B_BAD_VALUE;
@@ -1038,13 +1010,16 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 		if (vnode.Get(&other) < B_OK)
 			return B_NAME_IN_USE;
 
-		status = newDirectory->Remove(transaction, newName, NULL, other->IsDirectory());
+		status = newDirectory->Remove(transaction, newName, NULL,
+			other->IsDirectory());
 		if (status < B_OK)
 			return status;
 
-		notify_entry_removed(volume->ID(), newDirectory->ID(), newName, clobber);
+		notify_entry_removed(volume->ID(), newDirectory->ID(), newName,
+			clobber);
 
-		status = newTree->Insert(transaction, (const uint8 *)newName, strlen(newName), id);
+		status = newTree->Insert(transaction, (const uint8 *)newName,
+			strlen(newName), id);
 	}
 	if (status < B_OK)
 		return status;
@@ -1065,7 +1040,8 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 	}
 
 	if (status == B_OK) {
-		status = tree->Remove(transaction, (const uint8 *)oldName, strlen(oldName), id);
+		status = tree->Remove(transaction, (const uint8 *)oldName,
+			strlen(oldName), id);
 		if (status == B_OK) {
 			inode->Parent() = newDirectory->BlockRun();
 
@@ -1074,8 +1050,10 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			BPlusTree *movedTree = NULL;
 			if (oldDirectory != newDirectory
 				&& inode->IsDirectory()
-				&& (status = inode->GetTree(&movedTree)) == B_OK)
-				status = movedTree->Replace(transaction, (const uint8 *)"..", 2, newDirectory->ID());
+				&& (status = inode->GetTree(&movedTree)) == B_OK) {
+				status = movedTree->Replace(transaction, (const uint8 *)"..",
+					2, newDirectory->ID());
+			}
 
 			if (status == B_OK)
 				status = inode->WriteBack(transaction);
@@ -1094,9 +1072,12 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 			// for us)
 			// Anyway, if we overwrote a file in the target directory
 			// this is lost now (only in-memory, not on-disk)...
-			bailStatus = tree->Insert(transaction, (const uint8 *)oldName, strlen(oldName), id);
-			if (movedTree != NULL)
-				movedTree->Replace(transaction, (const uint8 *)"..", 2, oldDirectory->ID());
+			bailStatus = tree->Insert(transaction, (const uint8 *)oldName,
+				strlen(oldName), id);
+			if (movedTree != NULL) {
+				movedTree->Replace(transaction, (const uint8 *)"..", 2,
+					oldDirectory->ID());
+			}
 		}
 	}
 
@@ -1111,8 +1092,10 @@ bfs_rename(void *_ns, void *_oldDir, const char *oldName, void *_newDir, const c
 		}
 	}
 
-	if (bailStatus == B_OK)
-		bailStatus = newTree->Remove(transaction, (const uint8 *)newName, strlen(newName), id);
+	if (bailStatus == B_OK) {
+		bailStatus = newTree->Remove(transaction, (const uint8 *)newName,
+			strlen(newName), id);
+	}
 
 	if (bailStatus < B_OK)
 		volume->Panic();
@@ -1133,7 +1116,7 @@ bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 	// any data from it.
 	if (inode->IsDirectory() && openMode & O_RWMASK) {
 		openMode = openMode & ~O_RWMASK;
-		// ToDo: for compatibility reasons, we don't return an error here...
+		// TODO: for compatibility reasons, we don't return an error here...
 		// e.g. "copyattr" tries to do that
 		//return B_IS_A_DIRECTORY;
 	}
@@ -1143,7 +1126,7 @@ bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
-	// we could actually use the cookie to keep track of:
+	// We could actually use the cookie to keep track of:
 	//	- the last block_run
 	//	- the location in the data_stream (indirect, double indirect,
 	//	  position in block_run array)
@@ -1185,7 +1168,7 @@ bfs_open(void *_fs, void *_node, int openMode, void **_cookie)
 
 
 static status_t
-bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer,
+bfs_read(void *_fs, void *_node, void *_cookie, off_t pos, void *buffer,
 	size_t *_length)
 {
 	//FUNCTION();
@@ -1201,12 +1184,15 @@ bfs_read(void *_ns, void *_node, void *_cookie, off_t pos, void *buffer,
 
 
 static status_t
-bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer,
+bfs_write(void *_fs, void *_node, void *_cookie, off_t pos, const void *buffer,
 	size_t *_length)
 {
 	//FUNCTION();
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	if (!inode->HasUserAccessableStream()) {
 		*_length = 0;
@@ -1233,9 +1219,10 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer,
 		ReadLocked locker(inode->Lock());
 
 		// periodically notify if the file size has changed
-		// ToDo: should we better test for a change in the last_modified time only?
+		// TODO: should we better test for a change in the last_modified time only?
 		if (!inode->IsDeleted() && cookie->last_size != inode->Size()
-			&& system_time() > cookie->last_notification + INODE_NOTIFICATION_INTERVAL) {
+			&& system_time() > cookie->last_notification
+					+ INODE_NOTIFICATION_INTERVAL) {
 			notify_stat_changed(volume->ID(), inode->ID(),
 				B_STAT_MODIFICATION_TIME | B_STAT_SIZE | B_STAT_INTERIM_UPDATE);
 			cookie->last_size = inode->Size();
@@ -1247,37 +1234,27 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer,
 }
 
 
-/**	Do whatever is necessary to close a file, EXCEPT for freeing
- *	the cookie!
- */
-
 static status_t
-bfs_close(void *_ns, void *_node, void *_cookie)
+bfs_close(void *_fs, void *_node, void *_cookie)
 {
 	FUNCTION();
-	if (_ns == NULL || _node == NULL || _cookie == NULL)
-		return B_BAD_VALUE;
-
 	return B_OK;
 }
 
 
 static status_t
-bfs_free_cookie(void *_ns, void *_node, void *_cookie)
+bfs_free_cookie(void *_fs, void *_node, void *_cookie)
 {
 	FUNCTION();
 
-	if (_ns == NULL || _node == NULL || _cookie == NULL)
-		return B_BAD_VALUE;
-
 	file_cookie *cookie = (file_cookie *)_cookie;
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
 
 	Transaction transaction;
-	bool needsTrimming;
+	bool needsTrimming = false;
 
-	{
+	if (!volume->IsReadOnly()) {
 		ReadLocked locker(inode->Lock());
 		needsTrimming = inode->NeedsTrimming();
 
@@ -1291,10 +1268,11 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 		}
 	}
 
-	WriteLocked locker(inode->Lock());
 	status_t status = transaction.IsStarted() ? B_OK : B_ERROR;
 
 	if (status == B_OK) {
+		WriteLocked locker(inode->Lock());
+
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
 		bool changedSize = false, changedTime = false;
@@ -1342,17 +1320,13 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 }
 
 
-/**	Checks access permissions, return B_NOT_ALLOWED if the action
- *	is not allowed.
- */
-
+/*!	Checks access permissions, return B_NOT_ALLOWED if the action
+	is not allowed.
+*/
 static status_t
-bfs_access(void *_ns, void *_node, int accessMode)
+bfs_access(void *_fs, void *_node, int accessMode)
 {
 	//FUNCTION();
-
-	if (_ns == NULL || _node == NULL)
-		return B_BAD_VALUE;
 
 	Inode *inode = (Inode *)_node;
 	status_t status = inode->CheckPermissions(accessMode);
@@ -1364,7 +1338,7 @@ bfs_access(void *_ns, void *_node, int accessMode)
 
 
 static status_t
-bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
+bfs_read_link(void *_fs, void *_node, char *buffer, size_t *_bufferSize)
 {
 	FUNCTION();
 
@@ -1399,17 +1373,16 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 
 
 static status_t
-bfs_create_dir(void *_ns, void *_directory, const char *name, int mode,
+bfs_create_dir(void *_fs, void *_directory, const char *name, int mode,
 	ino_t *_newVnodeID)
 {
 	FUNCTION_START(("name = \"%s\", perms = %d\n", name, mode));
 
-	if (_ns == NULL || _directory == NULL
-		|| name == NULL || *name == '\0')
-		RETURN_ERROR(B_BAD_VALUE);
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *directory = (Inode *)_directory;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	if (!directory->IsDirectory())
 		RETURN_ERROR(B_BAD_TYPE);
@@ -1438,14 +1411,11 @@ bfs_create_dir(void *_ns, void *_directory, const char *name, int mode,
 
 
 static status_t
-bfs_remove_dir(void *_ns, void *_directory, const char *name)
+bfs_remove_dir(void *_fs, void *_directory, const char *name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
-	if (_ns == NULL || _directory == NULL || name == NULL || *name == '\0')
-		return B_BAD_VALUE;
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 	Inode *directory = (Inode *)_directory;
 
 	Transaction transaction(volume, directory->BlockNumber());
@@ -1462,20 +1432,15 @@ bfs_remove_dir(void *_ns, void *_directory, const char *name)
 }
 
 
-/**	Opens a directory ready to be traversed.
- *	bfs_open_dir() is also used by bfs_open_index_dir().
- */
-
+/*!	Opens a directory ready to be traversed.
+	bfs_open_dir() is also used by bfs_open_index_dir().
+*/
 static status_t
-bfs_open_dir(void *_ns, void *_node, void **_cookie)
+bfs_open_dir(void *_fs, void *_node, void **_cookie)
 {
 	FUNCTION();
 
-	if (_ns == NULL || _node == NULL || _cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	Inode *inode = (Inode *)_node;
-
 	status_t status = inode->CheckPermissions(R_OK);
 	if (status < B_OK)
 		RETURN_ERROR(status);
@@ -1499,7 +1464,7 @@ bfs_open_dir(void *_ns, void *_node, void **_cookie)
 
 
 static status_t
-bfs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *dirent,
+bfs_read_dir(void *_fs, void *_node, void *_cookie, struct dirent *dirent,
 	size_t bufferSize, uint32 *_num)
 {
 	FUNCTION();
@@ -1510,14 +1475,15 @@ bfs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *dirent,
 
 	uint16 length;
 	ino_t id;
-	status_t status = iterator->GetNextEntry(dirent->d_name, &length, bufferSize, &id);
+	status_t status = iterator->GetNextEntry(dirent->d_name, &length,
+		bufferSize, &id);
 	if (status == B_ENTRY_NOT_FOUND) {
 		*_num = 0;
 		return B_OK;
 	} else if (status != B_OK)
 		RETURN_ERROR(status);
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 
 	dirent->d_dev = volume->ID();
 	dirent->d_ino = id;
@@ -1529,11 +1495,9 @@ bfs_read_dir(void *_ns, void *_node, void *_cookie, struct dirent *dirent,
 }
 
 
-/** Sets the TreeIterator back to the beginning of the directory
- */
-
+/*!	Sets the TreeIterator back to the beginning of the directory. */
 static status_t
-bfs_rewind_dir(void * /*ns*/, void * /*node*/, void *_cookie)
+bfs_rewind_dir(void * /*_fs*/, void * /*node*/, void *_cookie)
 {
 	FUNCTION();
 	TreeIterator *iterator = (TreeIterator *)_cookie;
@@ -1546,16 +1510,15 @@ bfs_rewind_dir(void * /*ns*/, void * /*node*/, void *_cookie)
 
 
 static status_t
-bfs_close_dir(void * /*ns*/, void * /*node*/, void * /*_cookie*/)
+bfs_close_dir(void * /*fs*/, void * /*node*/, void * /*_cookie*/)
 {
 	FUNCTION();
-	// Do whatever you need to to close a directory, but DON'T free the cookie!
 	return B_OK;
 }
 
 
 static status_t
-bfs_free_dir_cookie(void *ns, void *node, void *_cookie)
+bfs_free_dir_cookie(void *fs, void *node, void *_cookie)
 {
 	TreeIterator *iterator = (TreeIterator *)_cookie;
 
@@ -1572,7 +1535,7 @@ bfs_free_dir_cookie(void *ns, void *node, void *_cookie)
 
 
 static status_t
-bfs_open_attr_dir(void *_ns, void *_node, void **_cookie)
+bfs_open_attr_dir(void *_fs, void *_node, void **_cookie)
 {
 	Inode *inode = (Inode *)_node;
 
@@ -1588,7 +1551,7 @@ bfs_open_attr_dir(void *_ns, void *_node, void **_cookie)
 
 
 static status_t
-bfs_close_attr_dir(void *ns, void *node, void *cookie)
+bfs_close_attr_dir(void *_fs, void *node, void *cookie)
 {
 	FUNCTION();
 	return B_OK;
@@ -1596,7 +1559,7 @@ bfs_close_attr_dir(void *ns, void *node, void *cookie)
 
 
 static status_t
-bfs_free_attr_dir_cookie(void *ns, void *node, void *_cookie)
+bfs_free_attr_dir_cookie(void *_fs, void *node, void *_cookie)
 {
 	FUNCTION();
 	AttributeIterator *iterator = (AttributeIterator *)_cookie;
@@ -1610,7 +1573,7 @@ bfs_free_attr_dir_cookie(void *ns, void *node, void *_cookie)
 
 
 static status_t
-bfs_rewind_attr_dir(void *_ns, void *_node, void *_cookie)
+bfs_rewind_attr_dir(void *_fs, void *_node, void *_cookie)
 {
 	FUNCTION();
 
@@ -1623,18 +1586,16 @@ bfs_rewind_attr_dir(void *_ns, void *_node, void *_cookie)
 
 
 static status_t
-bfs_read_attr_dir(void *_ns, void *node, void *_cookie, struct dirent *dirent,
+bfs_read_attr_dir(void *_fs, void *node, void *_cookie, struct dirent *dirent,
 	size_t bufferSize, uint32 *_num)
 {
 	FUNCTION();
 	AttributeIterator *iterator = (AttributeIterator *)_cookie;
 
-	if (iterator == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	uint32 type;
 	size_t length;
-	status_t status = iterator->GetNext(dirent->d_name, &length, &type, &dirent->d_ino);
+	status_t status = iterator->GetNext(dirent->d_name, &length, &type,
+		&dirent->d_ino);
 	if (status == B_ENTRY_NOT_FOUND) {
 		*_num = 0;
 		return B_OK;
@@ -1642,7 +1603,7 @@ bfs_read_attr_dir(void *_ns, void *node, void *_cookie, struct dirent *dirent,
 		RETURN_ERROR(status);
 	}
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 
 	dirent->d_dev = volume->ID();
 	dirent->d_reclen = sizeof(struct dirent) + length;
@@ -1657,6 +1618,10 @@ bfs_create_attr(fs_volume _fs, fs_vnode _node, const char *name, uint32 type,
 	int openMode, fs_cookie *_cookie)
 {
 	FUNCTION();
+
+	Volume *volume = (Volume *)_fs;
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
 
 	Inode *inode = (Inode *)_node;
 	Attribute attribute(inode);
@@ -1721,12 +1686,14 @@ bfs_write_attr(fs_volume _fs, fs_vnode _file, fs_cookie _cookie, off_t pos,
 	Transaction transaction(volume, inode->BlockNumber());
 	Attribute attribute(inode, cookie);
 
-	status_t status = attribute.Write(transaction, cookie, pos, (const uint8 *)buffer, _length);
+	status_t status = attribute.Write(transaction, cookie, pos,
+		(const uint8 *)buffer, _length);
 	if (status == B_OK) {
 		transaction.Done();
 
-		notify_attribute_changed(volume->ID(), inode->ID(), cookie->name, B_ATTR_CHANGED);
-			// ToDo: B_ATTR_CREATED is not yet taken into account
+		notify_attribute_changed(volume->ID(), inode->ID(), cookie->name,
+			B_ATTR_CHANGED);
+			// TODO: B_ATTR_CREATED is not yet taken into account
 			// (we don't know what Attribute::Write() does exactly)
 	}
 
@@ -1735,7 +1702,8 @@ bfs_write_attr(fs_volume _fs, fs_vnode _file, fs_cookie _cookie, off_t pos,
 
 
 static status_t
-bfs_read_attr_stat(fs_volume _fs, fs_vnode _file, fs_cookie _cookie, struct stat *stat)
+bfs_read_attr_stat(fs_volume _fs, fs_vnode _file, fs_cookie _cookie,
+	struct stat *stat)
 {
 	FUNCTION();
 
@@ -1762,12 +1730,11 @@ bfs_rename_attr(fs_volume _fs, fs_vnode fromFile, const char *fromName,
 {
 	FUNCTION_START(("name = \"%s\", to = \"%s\"\n", fromName, toName));
 
-	// ToDo: implement bfs_rename_attr()!
-	// I'll skip the implementation here, and will do it for Haiku - at least
-	// there will be an API to move one attribute to another file, making that
-	// function much more complicated - oh joy ;-)
+	// TODO: implement bfs_rename_attr()!
+	// There will probably be an API to move one attribute to another file,
+	// making that function much more complicated - oh joy ;-)
 
-	RETURN_ERROR(B_ENTRY_NOT_FOUND);
+	return EOPNOTSUPP;
 }
 
 
@@ -1775,9 +1742,6 @@ static status_t
 bfs_remove_attr(fs_volume _fs, fs_vnode _node, const char *name)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
-
-	if (name == NULL)
-		return B_BAD_VALUE;
 
 	Volume *volume = (Volume *)_fs;
 	Inode *inode = (Inode *)_node;
@@ -1792,7 +1756,8 @@ bfs_remove_attr(fs_volume _fs, fs_vnode _node, const char *name)
 	if (status == B_OK) {
 		transaction.Done();
 
-		notify_attribute_changed(volume->ID(), inode->ID(), name, B_ATTR_REMOVED);
+		notify_attribute_changed(volume->ID(), inode->ID(), name,
+			B_ATTR_REMOVED);
 	}
 
 	return status;
@@ -1804,13 +1769,11 @@ bfs_remove_attr(fs_volume _fs, fs_vnode _node, const char *name)
 
 
 static status_t
-bfs_open_index_dir(void *_ns, void **_cookie)
+bfs_open_index_dir(void *_fs, void **_cookie)
 {
 	FUNCTION();
-	if (_ns == NULL || _cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 
 	if (volume->IndicesNode() == NULL)
 		RETURN_ERROR(B_ENTRY_NOT_FOUND);
@@ -1820,7 +1783,7 @@ bfs_open_index_dir(void *_ns, void **_cookie)
 	// traversal functions.
 	// In fact we're storing it in the Volume object for that reason.
 
-	RETURN_ERROR(bfs_open_dir(_ns, volume->IndicesNode(), _cookie));
+	RETURN_ERROR(bfs_open_dir(_fs, volume->IndicesNode(), _cookie));
 }
 
 
@@ -1828,8 +1791,6 @@ static status_t
 bfs_close_index_dir(fs_volume _fs, fs_cookie _cookie)
 {
 	FUNCTION();
-	if (_fs == NULL || _cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
 	Volume *volume = (Volume *)_fs;
 	RETURN_ERROR(bfs_close_dir(_fs, volume->IndicesNode(), _cookie));
@@ -1840,8 +1801,6 @@ static status_t
 bfs_free_index_dir_cookie(fs_volume _fs, fs_cookie _cookie)
 {
 	FUNCTION();
-	if (_fs == NULL || _cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
 	Volume *volume = (Volume *)_fs;
 	RETURN_ERROR(bfs_free_dir_cookie(_fs, volume->IndicesNode(), _cookie));
@@ -1852,8 +1811,6 @@ static status_t
 bfs_rewind_index_dir(fs_volume _fs, fs_cookie _cookie)
 {
 	FUNCTION();
-	if (_fs == NULL || _cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
 	Volume *volume = (Volume *)_fs;
 	RETURN_ERROR(bfs_rewind_dir(_fs, volume->IndicesNode(), _cookie));
@@ -1865,11 +1822,10 @@ bfs_read_index_dir(fs_volume _fs, fs_cookie _cookie, struct dirent *dirent,
 	size_t bufferSize, uint32 *_num)
 {
 	FUNCTION();
-	if (_fs == NULL || _cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
 	Volume *volume = (Volume *)_fs;
-	RETURN_ERROR(bfs_read_dir(_fs, volume->IndicesNode(), _cookie, dirent, bufferSize, _num));
+	RETURN_ERROR(bfs_read_dir(_fs, volume->IndicesNode(), _cookie, dirent,
+		bufferSize, _num));
 }
 
 
@@ -1877,8 +1833,6 @@ static status_t
 bfs_create_index(fs_volume _fs, const char *name, uint32 type, uint32 flags)
 {
 	FUNCTION_START(("name = \"%s\", type = %ld, flags = %ld\n", name, type, flags));
-	if (_fs == NULL || name == NULL || *name == '\0')
-		return B_BAD_VALUE;
 
 	Volume *volume = (Volume *)_fs;
 
@@ -1902,13 +1856,11 @@ bfs_create_index(fs_volume _fs, const char *name, uint32 type, uint32 flags)
 
 
 static status_t
-bfs_remove_index(void *_ns, const char *name)
+bfs_remove_index(void *_fs, const char *name)
 {
 	FUNCTION();
-	if (_ns == NULL || name == NULL || *name == '\0')
-		return B_BAD_VALUE;
 
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 
 	if (volume->IsReadOnly())
 		return B_READ_ONLY_DEVICE;
@@ -1935,10 +1887,9 @@ static status_t
 bfs_stat_index(fs_volume _fs, const char *name, struct stat *stat)
 {
 	FUNCTION_START(("name = %s\n", name));
-	if (_fs == NULL || name == NULL || stat == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
 	Volume *volume = (Volume *)_fs;
+
 	Index index(volume);
 	status_t status = index.SetTo(name);
 	if (status < B_OK)
@@ -1957,7 +1908,8 @@ bfs_stat_index(fs_volume _fs, const char *name, struct stat *stat)
 	stat->st_gid = node.GroupID();
 
 	stat->st_atime = time(NULL);
-	stat->st_mtime = stat->st_ctime = (time_t)(node.LastModifiedTime() >> INODE_TIME_SHIFT);
+	stat->st_mtime = stat->st_ctime
+		= (time_t)(node.LastModifiedTime() >> INODE_TIME_SHIFT);
 	stat->st_crtime = (time_t)(node.CreateTime() >> INODE_TIME_SHIFT);
 
 	return B_OK;
@@ -2016,8 +1968,6 @@ static status_t
 bfs_free_query_cookie(void *fs, void *cookie)
 {
 	FUNCTION();
-	if (cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
 
 	Query *query = (Query *)cookie;
 	Expression *expression = query->GetExpression();
@@ -2029,13 +1979,11 @@ bfs_free_query_cookie(void *fs, void *cookie)
 
 
 static status_t
-bfs_read_query(void */*fs*/, void *cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
+bfs_read_query(void */*fs*/, void *cookie, struct dirent *dirent,
+	size_t bufferSize, uint32 *_num)
 {
 	FUNCTION();
 	Query *query = (Query *)cookie;
-	if (query == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
-
 	status_t status = query->GetNextEntry(dirent, bufferSize);
 	if (status == B_OK)
 		*_num = 1;
@@ -2206,8 +2154,8 @@ static file_system_module_info sBeFileSystem = {
 
 	&bfs_ioctl,
 	&bfs_set_flags,
-	NULL,	// &bfs_select
-	NULL,	// &bfs_deselect
+	NULL,	// fs_select
+	NULL,	// fs_deselect
 	&bfs_fsync,
 
 	&bfs_read_link,
