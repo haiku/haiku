@@ -3803,6 +3803,21 @@ vfs_stat_vnode(struct vnode *vnode, struct stat *stat)
 
 
 status_t
+vfs_stat_entry_ref(dev_t device, ino_t inode, struct stat *stat)
+{
+	struct vnode *vnode;
+	status_t status = get_vnode(device, inode, &vnode, true, false);
+	if (status < B_OK)
+		return status;
+
+	status = FS_CALL(vnode, read_stat)(vnode->mount->cookie,
+		vnode->private_node, stat);
+	put_vnode(vnode);
+	return status;
+}
+
+
+status_t
 vfs_get_vnode_name(struct vnode *vnode, char *name, size_t nameSize)
 {
 	return get_vnode_name(vnode, NULL, name, nameSize, true);
