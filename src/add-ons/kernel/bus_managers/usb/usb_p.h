@@ -414,7 +414,7 @@ public:
 										Device(Object *parent, int8 hubPort,
 											usb_device_descriptor &desc,
 											int8 deviceAddress,
-											usb_speed speed);
+											usb_speed speed, bool isRootHub);
 virtual									~Device();
 
 		status_t						InitCheck();
@@ -469,6 +469,7 @@ protected:
 
 private:
 		bool							fAvailable;
+		bool							fIsRootHub;
 		usb_configuration_info			*fConfigurations;
 		usb_configuration_info			*fCurrentConfiguration;
 		usb_speed						fSpeed;

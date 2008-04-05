@@ -13,7 +13,7 @@
 
 Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 	int8 deviceAddress, usb_speed speed, bool isRootHub)
-	:	Device(parent, hubPort, desc, deviceAddress, speed),
+	:	Device(parent, hubPort, desc, deviceAddress, speed, isRootHub),
 		fInterruptPipe(NULL)
 {
 	TRACE(("USB Hub %d: creating hub\n", DeviceAddress()));

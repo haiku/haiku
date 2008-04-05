@@ -135,7 +135,7 @@ BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 	}
 
 	status_t result = B_ERROR;
-	for (int32 i = 0; i < 15; i++) {
+	for (int32 i = 0; i < 3; i++) {
 		// Set the address of the device USB 1.1 spec p202
 		result = defaultPipe->SendRequest(
 			USB_REQTYPE_STANDARD | USB_REQTYPE_DEVICE_OUT,	// type
@@ -223,7 +223,7 @@ BusManager::AllocateDevice(Hub *parent, uint8 port, usb_speed speed)
 
 	TRACE(("USB BusManager: creating new device\n"));
 	Device *device = new(std::nothrow) Device(parent, port, deviceDescriptor,
-		deviceAddress, speed);
+		deviceAddress, speed, false);
 	if (!device) {
 		TRACE_ERROR(("USB BusManager: no memory to allocate device\n"));
 		FreeAddress(deviceAddress);

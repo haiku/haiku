@@ -11,11 +11,12 @@
 
 
 Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
-	int8 deviceAddress, usb_speed speed)
+	int8 deviceAddress, usb_speed speed, bool isRootHub)
 	:	Object(parent),
 		fDeviceDescriptor(desc),
 		fInitOK(false),
 		fAvailable(true),
+		fIsRootHub(isRootHub),
 		fConfigurations(NULL),
 		fCurrentConfiguration(NULL),
 		fSpeed(speed),
@@ -372,7 +373,8 @@ Device::SetConfigurationAt(uint8 index)
 	InitEndpoints();
 
 	// Wait some for the configuration being finished
-	snooze(USB_DELAY_SET_CONFIGURATION);
+	if (!fIsRootHub)
+		snooze(USB_DELAY_SET_CONFIGURATION);
 	return B_OK;
 }
 
