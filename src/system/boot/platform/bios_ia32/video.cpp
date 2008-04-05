@@ -27,7 +27,7 @@
 #include <string.h>
 
 
-#define TRACE_VIDEO
+//#define TRACE_VIDEO
 #ifdef TRACE_VIDEO
 #	define TRACE(x) dprintf x
 #else
@@ -809,8 +809,8 @@ platform_switch_to_logo(void)
 	if (sVesaCompatible && sMode != NULL) {
 		if (!sModeChosen)
 			get_mode_from_settings();
-		
-		// On some BIOS / chipset / monitor combinations, there seems to be a timing issue between 
+
+		// On some BIOS / chipset / monitor combinations, there seems to be a timing issue between
 		// getting the EDID data and setting the video mode. As such we wait here briefly to give
 		// everything enough time to settle.
 		spin(1000);
@@ -882,7 +882,7 @@ fallback:
 
 	int x = (gKernelArgs.frame_buffer.width - width) * placementX / 100;
 	int y = (gKernelArgs.frame_buffer.height - height) * placementY / 100;
-	
+
 	height = min_c(kSplashLogoHeight, gKernelArgs.frame_buffer.height);
 	blit_image(kSplashLogoImage, NULL, width, height, kSplashLogoWidth,
 		NULL, x, y);
