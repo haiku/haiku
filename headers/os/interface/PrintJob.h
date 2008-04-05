@@ -1,7 +1,13 @@
-/*
- * Copyright 2008, Haiku Inc.
- * Distributed under the terms of the MIT License.
- */
+/*******************************************************************************
+/
+/	File:			PrintJob.h
+/
+/   Description:    BPrintJob runs a printing session.
+/
+/	Copyright 1996-98, Be Incorporated, All Rights Reserved
+/
+*******************************************************************************/
+
 #ifndef	_PRINTSESSION_H
 #define	_PRINTSESSION_H
 
@@ -14,6 +20,8 @@
 class BFile;
 class BView;
 
+/*----------------------------------------------------------------*/
+/*----- BPrintJob related structures -----------------------------*/
 
 struct	print_file_header {
 	int32	version;
@@ -27,10 +35,12 @@ struct	print_file_header {
 
 struct _page_header_;
 
+/*----------------------------------------------------------------*/
+/*----- BPrintJob class ------------------------------------------*/
 
 class BPrintJob {
 public:
-
+			// These values are returned by PrinterType()
 			enum {
 						B_BW_PRINTER = 0,
 						B_COLOR_PRINTER
