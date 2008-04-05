@@ -397,7 +397,7 @@ rule SharedLibraryFromObjects
 
 	MainFromObjects $(_lib) : $(2) ;
 	LINKFLAGS on $(_lib) = [ on $(_lib) return $(LINKFLAGS) ]
-						   -nostart -Xlinker -soname=\"$(_lib:G=)\" ;
+		-nostart -Xlinker --no-undefined -Xlinker -soname=\"$(_lib:G=)\" ;
 	LinkAgainst $(_lib) : $(3) ;
 
 	AddSharedObjectGlueCode $(_lib) : false ;
