@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src apps ;
 
 SubInclude HAIKU_TOP src apps 3dmov ;
 SubInclude HAIKU_TOP src apps aboutsystem ;
+SubInclude HAIKU_TOP src apps activitymonitor ;
 SubInclude HAIKU_TOP src apps bsnow ;
 SubInclude HAIKU_TOP src apps bootman ;
 SubInclude HAIKU_TOP src apps cdplayer ;
