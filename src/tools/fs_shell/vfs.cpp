@@ -2399,7 +2399,7 @@ vfs_get_fs_node_from_path(fssh_fs_volume *volume, const char *path, bool kernel,
 	}
 
 	// Use get_vnode() to resolve the cookie for the right layer.
-	status = fssh_get_vnode(volume, vnode->id, _node);
+	status = ::fssh_get_vnode(volume, vnode->id, _node);
 	put_vnode(vnode);
 
 	return FSSH_B_OK;
