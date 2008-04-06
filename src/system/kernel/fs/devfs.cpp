@@ -824,16 +824,19 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *vnode,
 	hash_remove(fs->vnode_hash, vnode);
 
 	if (S_ISCHR(vnode->stream.type)) {
-		// for partitions, we have to release the raw device
+		// for partitions, we have to release the raw device but must
+		// not free the device info as it was inherited from the raw
+		// device and is still in use there
 		if (vnode->stream.u.dev.partition) {
 			put_vnode(fs->volume,
 				vnode->stream.u.dev.partition->raw_device->id);
-		} else
+		} else {
 			delete vnode->stream.u.dev.scheduler;
 
-		// remove API conversion from old to new drivers
-		if (vnode->stream.u.dev.node == NULL)
-			free(vnode->stream.u.dev.info);
+			// remove API conversion from old to new drivers
+			if (vnode->stream.u.dev.node == NULL)
+				free(vnode->stream.u.dev.info);
+		}
 	}
 
 	free(vnode->name);
