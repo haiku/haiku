@@ -23,6 +23,7 @@ StdBinCommands
 	clear.c
 	clockconfig.c
 #	csplit.c
+	diff_zip.cpp
 	driveinfo.c
 #	echo.c
 	eject.c
