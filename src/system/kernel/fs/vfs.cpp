@@ -3897,7 +3897,7 @@ vfs_stat_vnode(struct vnode *vnode, struct stat *stat)
 
 
 status_t
-vfs_stat_entry_ref(dev_t device, ino_t inode, struct stat *stat)
+vfs_stat_node_ref(dev_t device, ino_t inode, struct stat *stat)
 {
 	struct vnode *vnode;
 	status_t status = get_vnode(device, inode, &vnode, true, false);

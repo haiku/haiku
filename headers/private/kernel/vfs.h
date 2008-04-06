@@ -107,7 +107,7 @@ status_t vfs_get_file_map(struct vnode *vnode, off_t offset, size_t size,
 status_t vfs_get_fs_node_from_path(fs_volume *volume, const char *path,
 			bool kernel, void **_node);
 status_t vfs_stat_vnode(struct vnode *vnode, struct stat *stat);
-status_t vfs_stat_entry_ref(dev_t device, ino_t inode, struct stat *stat);
+status_t vfs_stat_node_ref(dev_t device, ino_t inode, struct stat *stat);
 status_t vfs_get_vnode_name(struct vnode *vnode, char *name, size_t nameSize);
 status_t vfs_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
 	char *path, size_t pathLength);

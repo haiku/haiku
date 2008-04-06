@@ -118,7 +118,7 @@ class KDiskDeviceManager::DeviceWatcher : public NotificationListener {
 					ino_t node = event->GetInt64("node", -1);
 
 					struct stat st;
-					if (vfs_stat_entry_ref(device, node, &st) != 0)
+					if (vfs_stat_node_ref(device, node, &st) != 0)
 						break;
 
 					if (S_ISDIR(st.st_mode)) {
