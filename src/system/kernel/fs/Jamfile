@@ -7,15 +7,15 @@ UsePrivateHeaders shared storage ;
 
 KernelMergeObject kernel_fs.o : 
 	devfs.cpp
-	rootfs.cpp
-	pipefs.cpp
 	fd.cpp
+	fifo.cpp
+	IOScheduler.cpp
+	KPath.cpp
+	node_monitor.cpp
+	rootfs.cpp
 	vfs.cpp
 	vfs_boot.cpp
 	vfs_net_boot.cpp
-	node_monitor.cpp
-	IOScheduler.cpp
-	KPath.cpp
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
 ;
