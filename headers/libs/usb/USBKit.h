@@ -1,9 +1,6 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Michael Lotz <mmlr@mlotz.ch>
  */
 
 #ifndef _USBKIT_H
@@ -240,11 +237,24 @@ public:
 		uint32						CountEndpoints() const;
 		const BUSBEndpoint			*EndpointAt(uint32 index) const;
 
+		// Using CountAlternates() you can retrieve the number of alternate
+		// interfaces at this interface index. Note that this interface itself
+		// counts as an alternate so an alternate count of one really means
+		// that you are currently using the sole interface present.
+		// With SetAlternate() you can switch this BUSBInterface object to the
+		// alternate at the specified index. Note that all endpoints retrieved
+		// through EndpointAt() will become invalid and be deleted as soon as
+		// you set an alternate.
+		uint32						CountAlternates() const;
+		status_t					SetAlternate(uint32 alternateIndex);
+
 private:
 friend	class BUSBConfiguration;
 									BUSBInterface(BUSBConfiguration *config,
 										uint32 index, int rawFD);
 									~BUSBInterface();
+
+		void						_UpdateDescriptorAndEndpoints();
 
 		BUSBConfiguration			*fConfiguration;
 		uint32						fIndex;
@@ -305,6 +315,11 @@ public:
 										usb_iso_packet_descriptor *packetDescriptors,
 										uint32 packetCount)	const;
 
+		// These are convenience methods for getting and clearing the halt
+		// state of an endpoint. They use the control pipe of the device to
+		// send the corresponding requests.
+		bool						IsStalled() const;
+		status_t					ClearStall() const;
 private:
 friend	class BUSBInterface;
 									BUSBEndpoint(BUSBInterface *interface,

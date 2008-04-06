@@ -1,9 +1,10 @@
 /*
- * Copyright 2007, Haiku Inc. All rights reserved.
+ * Copyright 2007-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz <mmlr@mlotz.ch>
+ *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  */
 
 #include <USBKit.h>
@@ -19,18 +20,7 @@ BUSBInterface::BUSBInterface(BUSBConfiguration *config, uint32 index, int rawFD)
 		fEndpoints(NULL),
 		fInterfaceString(NULL)
 {
-	raw_command command;
-	command.interface.descriptor = &fDescriptor;
-	command.interface.config_index = fConfiguration->Index();
-	command.interface.interface_index = fIndex;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_INTERFACE_DESCRIPTOR, &command, sizeof(command))
-		|| command.interface.status != RAW_STATUS_SUCCESS) {
-		memset(&fDescriptor, 0, sizeof(fDescriptor));
-	}
-
-	fEndpoints = new BUSBEndpoint *[fDescriptor.num_endpoints];
-	for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
-		fEndpoints[i] = new BUSBEndpoint(this, i, fRawFD);
+	_UpdateDescriptorAndEndpoints();
 }
 
 
@@ -147,4 +137,63 @@ BUSBInterface::EndpointAt(uint32 index) const
 		return NULL;
 
 	return fEndpoints[index];
+}
+
+
+uint32
+BUSBInterface::CountAlternates() const
+{
+	uint32 alternateCount;
+	raw_command command;
+	command.alternate.alternate_count = &alternateCount;
+	command.alternate.config_index = fConfiguration->Index();
+	command.alternate.interface_index = fIndex;
+	if (ioctl(fRawFD, RAW_COMMAND_GET_ALT_INTERFACE_COUNT, &command, sizeof(command))
+		|| command.alternate.status != RAW_STATUS_SUCCESS) {
+		return 1;
+	}
+
+	return alternateCount;
+}
+
+
+status_t
+BUSBInterface::SetAlternate(uint32 alternateIndex)
+{
+	raw_command command;
+	command.alternate.config_index = fConfiguration->Index();
+	command.alternate.interface_index = fIndex;
+	command.alternate.alternate_index = alternateIndex;
+	if (ioctl(fRawFD, RAW_COMMAND_SET_ALT_INTERFACE, &command, sizeof(command))
+		|| command.alternate.status != RAW_STATUS_SUCCESS) {
+		return B_ERROR;
+	}
+
+	_UpdateDescriptorAndEndpoints();
+	return B_OK;
+}
+
+
+void
+BUSBInterface::_UpdateDescriptorAndEndpoints()
+{
+	raw_command command;
+	command.interface.descriptor = &fDescriptor;
+	command.interface.config_index = fConfiguration->Index();
+	command.interface.interface_index = fIndex;
+	if (ioctl(fRawFD, RAW_COMMAND_GET_INTERFACE_DESCRIPTOR, &command, sizeof(command))
+		|| command.interface.status != RAW_STATUS_SUCCESS) {
+		memset(&fDescriptor, 0, sizeof(fDescriptor));
+	}
+
+	if (fEndpoints) {
+		// Delete old endpoints
+		for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
+			delete fEndpoints[i];
+		delete fEndpoints;
+	}
+
+	fEndpoints = new BUSBEndpoint *[fDescriptor.num_endpoints];
+	for (int32 i = 0; i < fDescriptor.num_endpoints; i++)
+		fEndpoints[i] = new BUSBEndpoint(this, i, fRawFD);
 }
