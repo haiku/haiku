@@ -87,6 +87,8 @@ Server haiku_registrar
 	RecentApps.cpp
 	RecentEntries.cpp
 	Registrar.cpp
+	RegistrarThread.cpp
+	RegistrarThreadManager.cpp
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp
 	ShutdownProcess.cpp
