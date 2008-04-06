@@ -61,7 +61,7 @@ Stack::Stack()
 		bufferSize = sizeof(moduleName);
 		TRACE(("USB Stack: found module %s\n", moduleName));
 
-		host_controller_info *module = NULL;
+		usb_host_controller_info *module = NULL;
 		if (get_module(moduleName, (module_info **)&module) != B_OK)
 			continue;
 

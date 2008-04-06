@@ -36,7 +36,7 @@ uhci_std_ops(int32 op, ...)
 }
 
 
-host_controller_info uhci_module = {
+usb_host_controller_info uhci_module = {
 	{
 		"busses/usb/uhci",
 		0,

@@ -35,7 +35,7 @@ class Object;
 class PhysicalMemoryAllocator;
 
 
-struct host_controller_info {
+struct usb_host_controller_info {
 	module_info		info;
 	status_t		(*control)(uint32 op, void *data, size_t length);
 	status_t		(*add_to)(Stack *stack);

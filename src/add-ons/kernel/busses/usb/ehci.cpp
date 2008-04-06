@@ -32,7 +32,7 @@ ehci_std_ops(int32 op, ...)
 }
 
 
-host_controller_info ehci_module = {
+usb_host_controller_info ehci_module = {
 	{
 		"busses/usb/ehci",
 		0,
