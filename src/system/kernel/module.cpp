@@ -51,7 +51,6 @@ extern module_info gFrameBufferConsoleModule;
 // file systems
 extern module_info gRootFileSystem;
 extern module_info gDeviceFileSystem;
-extern module_info gPipeFileSystem;
 
 static module_info *sBuiltInModules[] = {
 	&gDeviceManagerModule,
@@ -61,7 +60,6 @@ static module_info *sBuiltInModules[] = {
 
 	&gRootFileSystem,
 	&gDeviceFileSystem,
-	&gPipeFileSystem,
 	NULL
 };
 
