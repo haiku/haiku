@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -42,10 +42,10 @@ typedef enum {
 #define SBC_SETPROPORTIONAL 2
 #define SBC_SETSTYLE 3
 
-// Quick constants for determining which arrow is down and are defined with respect
-// to double arrow mode. ARROW1 and ARROW4 refer to the outer pair of arrows and
-// ARROW2 and ARROW3 refer to the inner ones. ARROW1 points left/up and ARROW4
-// points right/down.
+// Quick constants for determining which arrow is down and are defined with
+// respect to double arrow mode. ARROW1 and ARROW4 refer to the outer pair of
+// arrows and ARROW2 and ARROW3 refer to the inner ones. ARROW1 points left/up
+// and ARROW4 points right/down.
 #define ARROW1 0
 #define ARROW2 1
 #define ARROW3 2
@@ -53,8 +53,9 @@ typedef enum {
 #define THUMB 4
 #define NOARROW -1
 
-// Because the R5 version kept a lot of data on server-side, we need to kludge our way
-// into binary compatibility
+
+// Because the R5 version kept a lot of data on server-side, we need to kludge
+// our way into binary compatibility
 class BScrollBar::Private {
 public:
 	Private(BScrollBar* scrollBar)
@@ -122,6 +123,7 @@ public:
 	int8				fButtonDown;
 };
 
+
 // This thread is spawned when a button is initially pushed and repeatedly scrolls
 // the scrollbar by a little bit after a short delay
 int32
@@ -130,6 +132,7 @@ BScrollBar::Private::button_repeater_thread(void *data)
 	BScrollBar::Private* privateData = (BScrollBar::Private*)data;
 	return privateData->ButtonRepeaterThread();
 }
+
 
 int32
 BScrollBar::Private::ButtonRepeaterThread()
@@ -238,7 +241,7 @@ BScrollBar::~BScrollBar()
 	free(fTargetName);
 }
 
-// Instantiate
+
 BArchivable*
 BScrollBar::Instantiate(BMessage *data)
 {
@@ -247,7 +250,7 @@ BScrollBar::Instantiate(BMessage *data)
 	return NULL;
 }
 
-// Archive
+
 status_t
 BScrollBar::Archive(BMessage *data, bool deep) const
 {
@@ -277,7 +280,7 @@ BScrollBar::Archive(BMessage *data, bool deep) const
 	return err;
 }
 
-// AttachedToWindow
+
 void
 BScrollBar::AttachedToWindow()
 {
@@ -314,7 +317,7 @@ an actual BView within the scroll bar's window.
 
 */
 
-// SetValue
+
 void
 BScrollBar::SetValue(float value)
 {
@@ -338,14 +341,14 @@ BScrollBar::SetValue(float value)
 	ValueChanged(fValue);
 }
 
-// Value
+
 float
 BScrollBar::Value() const
 {
 	return fValue;
 }
 
-// ValueChanged
+
 void
 BScrollBar::ValueChanged(float newValue)
 {
@@ -369,7 +372,7 @@ BScrollBar::ValueChanged(float newValue)
 	SetValue(newValue);
 }
 
-// SetProportion
+
 void
 BScrollBar::SetProportion(float value)
 {
@@ -396,14 +399,14 @@ BScrollBar::SetProportion(float value)
 	}
 }
 
-// Proportion
+
 float
 BScrollBar::Proportion() const
 {
 	return fProportion;
 }
 
-// SetRange
+
 void
 BScrollBar::SetRange(float min, float max)
 {
@@ -431,7 +434,7 @@ BScrollBar::SetRange(float min, float max)
 	}
 }
 
-// GetRange
+
 void
 BScrollBar::GetRange(float *min, float *max) const
 {
@@ -441,7 +444,7 @@ BScrollBar::GetRange(float *min, float *max) const
 		*max = fMax;
 }
 
-// SetSteps
+
 void
 BScrollBar::SetSteps(float smallStep, float largeStep)
 {
@@ -474,7 +477,7 @@ BScrollBar::SetSteps(float smallStep, float largeStep)
 	// they don't
 }
 
-// GetSteps
+
 void
 BScrollBar::GetSteps(float* smallStep, float* largeStep) const
 {
@@ -484,7 +487,7 @@ BScrollBar::GetSteps(float* smallStep, float* largeStep) const
 		*largeStep = fLargeStep;
 }
 
-// SetTarget
+
 void
 BScrollBar::SetTarget(BView *target)
 {
@@ -502,9 +505,9 @@ BScrollBar::SetTarget(BView *target)
 		fTargetName = NULL;
 }
 
-// SetTarget
+
 void
-BScrollBar::SetTarget(const char *targetName)
+BScrollBar::SetTarget(const char* targetName)
 {
 	if (!targetName)
 		return;
@@ -512,39 +515,39 @@ BScrollBar::SetTarget(const char *targetName)
 	if (!Window())
 		debugger("Method requires window and doesn't have one");
 
-	BView *target = Window()->FindView(targetName);
+	BView* target = Window()->FindView(targetName);
 	if (target)
 		SetTarget(target);
 }
 
-// Target
-BView *
+
+BView*
 BScrollBar::Target() const
 {
 	return fTarget;
 }
 
-// Orientation
+
 orientation
 BScrollBar::Orientation() const
 {
 	return fOrientation;
 }
 
-// MessageReceived
+
 void
-BScrollBar::MessageReceived(BMessage *msg)
+BScrollBar::MessageReceived(BMessage* message)
 {
-	switch(msg->what) {
+	switch(message->what) {
 		case B_VALUE_CHANGED:
 		{
 			int32 value;
-			if (msg->FindInt32("value", &value) == B_OK)
+			if (message->FindInt32("value", &value) == B_OK)
 				ValueChanged(value);
 			break;
 		}
 		default:
-			BView::MessageReceived(msg);
+			BView::MessageReceived(message);
 			break;
 	}
 }
@@ -633,7 +636,7 @@ BScrollBar::MouseDown(BPoint where)
 	}
 }
 
-// MouseUp
+
 void
 BScrollBar::MouseUp(BPoint pt)
 {
@@ -647,11 +650,12 @@ BScrollBar::MouseUp(BPoint pt)
 	fPrivateData->fDoRepeat = false;
 }
 
-// MouseMoved
+
 void
 BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 {
-	if (!fPrivateData->fEnabled || fMin >= fMax || fProportion >= 1.0 || fProportion < 0.0)
+	if (!fPrivateData->fEnabled || fMin >= fMax || fProportion >= 1.0
+		|| fProportion < 0.0)
 		return;
 
 	if (fPrivateData->fButtonDown != NOARROW) {
@@ -659,7 +663,8 @@ BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 			SetValue(_ValueFor(where + fPrivateData->fClickOffset));
 		} else {
 			// suspend the repeating if the mouse is not over the button
-			bool repeat = _ButtonRectFor(fPrivateData->fButtonDown).Contains(where);
+			bool repeat = _ButtonRectFor(fPrivateData->fButtonDown).Contains(
+				where);
 			if (fPrivateData->fDoRepeat != repeat) {
 				fPrivateData->fDoRepeat = repeat;
 				Invalidate(_ButtonRectFor(fPrivateData->fButtonDown));
@@ -670,21 +675,24 @@ BScrollBar::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 		if (fPrivateData->fDoRepeat) {
 			_UpdateTargetValue(where);
 			// we might have to turn arround
-			if ((fValue < fPrivateData->fStopValue && fPrivateData->fThumbInc < 0) ||
-				(fValue > fPrivateData->fStopValue && fPrivateData->fThumbInc > 0))
+			if ((fValue < fPrivateData->fStopValue
+					&& fPrivateData->fThumbInc < 0)
+				|| (fValue > fPrivateData->fStopValue
+					&& fPrivateData->fThumbInc > 0)) {
 				fPrivateData->fThumbInc = -fPrivateData->fThumbInc;
+			}
 		}
 	}
 }
 
-// DetachedFromWindow
+
 void
 BScrollBar::DetachedFromWindow()
 {
 	BView::DetachedFromWindow();
 }
 
-// Draw
+
 void
 BScrollBar::Draw(BRect updateRect)
 {
@@ -692,7 +700,8 @@ BScrollBar::Draw(BRect updateRect)
 
 	rgb_color normal = ui_color(B_PANEL_BACKGROUND_COLOR);
 
-	// stroke a dark frame arround the entire scrollbar (independent of enabled state)
+	// stroke a dark frame arround the entire scrollbar
+	// (independent of enabled state)
 	SetHighColor(tint_color(normal, B_DARKEN_2_TINT));
 	StrokeRect(bounds);
 	bounds.InsetBy(1.0, 1.0);
@@ -735,7 +744,8 @@ BScrollBar::Draw(BRect updateRect)
 			_DrawArrowButton(ARROW_RIGHT, doubleArrows, buttonFrame, updateRect,
 				enabled, fPrivateData->fButtonDown == ARROW2);
 
-			buttonFrame.OffsetTo(bounds.right - ((bounds.Height() * 2) + 1), bounds.top);
+			buttonFrame.OffsetTo(bounds.right - ((bounds.Height() * 2) + 1),
+				bounds.top);
 			_DrawArrowButton(ARROW_LEFT, doubleArrows, buttonFrame, updateRect,
 				enabled, fPrivateData->fButtonDown == ARROW3);
 
@@ -875,11 +885,13 @@ BScrollBar::Draw(BRect updateRect)
 		// fill and additional dark lines
 		thumbBG.InsetBy(1.0, 1.0);
 		if (fOrientation == B_HORIZONTAL) {
-			BRect leftOfThumb(thumbBG.left + 1, thumbBG.top, rect.left - 1, thumbBG.bottom);
+			BRect leftOfThumb(thumbBG.left + 1, thumbBG.top, rect.left - 1,
+				thumbBG.bottom);
 			if (leftOfThumb.IsValid())
 				FillRect(leftOfThumb);
 
-			BRect rightOfThumb(rect.right + 3, thumbBG.top, thumbBG.right, thumbBG.bottom);
+			BRect rightOfThumb(rect.right + 3, thumbBG.top, thumbBG.right,
+				thumbBG.bottom);
 			if (rightOfThumb.IsValid())
 				FillRect(rightOfThumb);
 
@@ -987,36 +999,36 @@ BScrollBar::Draw(BRect updateRect)
 	}
 }
 
-// FrameMoved
+
 void
 BScrollBar::FrameMoved(BPoint newPosition)
 {
 	BView::FrameMoved(newPosition);
 }
 
-// FrameResized
+
 void
-BScrollBar::FrameResized(float new_width, float new_height)
+BScrollBar::FrameResized(float newWidth, float newHeight)
 {
 	_UpdateThumbFrame();
 }
 
-// ResolveSpecifier
+
 BHandler*
-BScrollBar::ResolveSpecifier(BMessage *msg, int32 index,
-		BMessage *specifier, int32 form, const char *property)
+BScrollBar::ResolveSpecifier(BMessage* message, int32 index,
+	BMessage* specifier, int32 form, const char *property)
 {
-	return BView::ResolveSpecifier(msg, index, specifier, form, property);
+	return BView::ResolveSpecifier(message, index, specifier, form, property);
 }
 
-// ResizeToPreferred
+
 void
 BScrollBar::ResizeToPreferred()
 {
 	BView::ResizeToPreferred();
 }
 
-// GetPreferredSize
+
 void
 BScrollBar::GetPreferredSize(float* _width, float* _height)
 {
@@ -1033,40 +1045,41 @@ BScrollBar::GetPreferredSize(float* _width, float* _height)
 	}
 }
 
-// MakeFocus
+
 void
 BScrollBar::MakeFocus(bool state)
 {
 	BView::MakeFocus(state);
 }
 
-// AllAttached
+
 void
 BScrollBar::AllAttached()
 {
 	BView::AllAttached();
 }
 
-// AllDetached
+
 void
 BScrollBar::AllDetached()
 {
 	BView::AllDetached();
 }
 
-// GetSupportedSuites
+
 status_t
 BScrollBar::GetSupportedSuites(BMessage *message)
 {
 	return BView::GetSupportedSuites(message);
 }
 
-// Perform
+
 status_t
-BScrollBar::Perform(perform_code d, void *arg)
+BScrollBar::Perform(perform_code d, void* arg)
 {
 	return BView::Perform(d, arg);
 }
+
 
 #if DISABLES_ON_WINDOW_DEACTIVATION
 void
@@ -1077,19 +1090,21 @@ BScrollBar::WindowActivated(bool active)
 }
 #endif // DISABLES_ON_WINDOW_DEACTIVATION
 
+
 void BScrollBar::_ReservedScrollBar1() {}
 void BScrollBar::_ReservedScrollBar2() {}
 void BScrollBar::_ReservedScrollBar3() {}
 void BScrollBar::_ReservedScrollBar4() {}
 
-// operator=
-BScrollBar &
-BScrollBar::operator=(const BScrollBar &)
+
+
+BScrollBar&
+BScrollBar::operator=(const BScrollBar&)
 {
 	return *this;
 }
 
-// _DoubleArrows
+
 bool
 BScrollBar::_DoubleArrows() const
 {
@@ -1107,7 +1122,7 @@ BScrollBar::_DoubleArrows() const
 	}
 }
 
-// _UpdateThumbFrame
+
 void
 BScrollBar::_UpdateThumbFrame()
 {
@@ -1158,7 +1173,8 @@ BScrollBar::_UpdateThumbFrame()
 	thumbSize--;
 
 	// the thumb can be scrolled within the remaining area "maxSize - thumbSize"
-	float offset = floorf(((fValue - fMin) / (fMax - fMin + 1.0)) * (maxSize - thumbSize));
+	float offset = floorf(((fValue - fMin) / (fMax - fMin + 1.0))
+		* (maxSize - thumbSize));
 
 	if (_DoubleArrows()) {
 		offset += buttonSize * 2;
@@ -1169,15 +1185,18 @@ BScrollBar::_UpdateThumbFrame()
 	offset++;
 
 	if (fOrientation == B_VERTICAL) {
-		fPrivateData->fThumbFrame.bottom = fPrivateData->fThumbFrame.top + thumbSize;
+		fPrivateData->fThumbFrame.bottom = fPrivateData->fThumbFrame.top
+			+ thumbSize;
 		fPrivateData->fThumbFrame.OffsetBy(0.0, offset);
 	} else {
-		fPrivateData->fThumbFrame.right = fPrivateData->fThumbFrame.left + thumbSize;
+		fPrivateData->fThumbFrame.right = fPrivateData->fThumbFrame.left
+			+ thumbSize;
 		fPrivateData->fThumbFrame.OffsetBy(offset, 0.0);
 	}
 
 	if (Window()) {
-		BRect invalid = oldFrame.IsValid() ? oldFrame | fPrivateData->fThumbFrame
+		BRect invalid = oldFrame.IsValid() ?
+			oldFrame | fPrivateData->fThumbFrame
 			: fPrivateData->fThumbFrame;
 		// account for those two dark lines
 		if (fOrientation == B_HORIZONTAL)
@@ -1188,7 +1207,7 @@ BScrollBar::_UpdateThumbFrame()
 	}
 }
 
-// _ValueFor
+
 float
 BScrollBar::_ValueFor(BPoint where) const
 {
@@ -1234,7 +1253,7 @@ BScrollBar::_ValueFor(BPoint where) const
 		return ceilf(value - 0.5);
 }
 
-// _ButtonFor
+
 int32
 BScrollBar::_ButtonFor(BPoint where) const
 {
@@ -1284,7 +1303,7 @@ BScrollBar::_ButtonFor(BPoint where) const
 	return NOARROW;
 }
 
-// _ButtonRectFor
+
 BRect
 BScrollBar::_ButtonRectFor(int32 button) const
 {
@@ -1334,7 +1353,7 @@ BScrollBar::_ButtonRectFor(int32 button) const
 	return rect;
 }
 
-// _UpdateTargetValue
+
 void
 BScrollBar::_UpdateTargetValue(BPoint where)
 {
@@ -1347,7 +1366,7 @@ BScrollBar::_UpdateTargetValue(BPoint where)
 	}
 }
 
-// _UpdateArrowButtons
+
 void
 BScrollBar::_UpdateArrowButtons()
 {
@@ -1368,22 +1387,26 @@ BScrollBar::_UpdateArrowButtons()
 	}
 }
 
-// control_scrollbar
+
 status_t
 control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 {
 	if (!bar || !info)
 		return B_BAD_VALUE;
 
-	if (bar->fPrivateData->fScrollBarInfo.double_arrows != info->double_arrows) {
+	if (bar->fPrivateData->fScrollBarInfo.double_arrows
+		!= info->double_arrows) {
 		bar->fPrivateData->fScrollBarInfo.double_arrows = info->double_arrows;
 
 		int8 multiplier = (info->double_arrows) ? 1 : -1;
 
-		if (bar->fOrientation == B_VERTICAL)
-			bar->fPrivateData->fThumbFrame.OffsetBy(0, multiplier * B_H_SCROLL_BAR_HEIGHT);
-		else
-			bar->fPrivateData->fThumbFrame.OffsetBy(multiplier * B_V_SCROLL_BAR_WIDTH, 0);
+		if (bar->fOrientation == B_VERTICAL) {
+			bar->fPrivateData->fThumbFrame.OffsetBy(0, multiplier
+				* B_H_SCROLL_BAR_HEIGHT);
+		} else {
+			bar->fPrivateData->fThumbFrame.OffsetBy(multiplier
+				* B_V_SCROLL_BAR_WIDTH, 0);
+		}
 	}
 
 	bar->fPrivateData->fScrollBarInfo.proportional = info->proportional;
@@ -1406,7 +1429,7 @@ control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 	return B_OK;
 }
 
-// _DrawDisabledBackground
+
 void
 BScrollBar::_DrawDisabledBackground(BRect area,
 									const rgb_color& light,
@@ -1473,7 +1496,7 @@ BScrollBar::_DrawDisabledBackground(BRect area,
 	}
 }
 
-// _DrawArrowButton
+
 void
 BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 							 const BRect& updateRect, bool enabled, bool down)
@@ -1491,13 +1514,16 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 		arrow = tint_color(c, B_DARKEN_MAX_TINT);
 
 	} else {
-		// Add a usability perk - disable buttons if they would not do anything -
-		// like a left arrow if the value==fMin
+		// Add a usability perk - disable buttons if they would not do anything
+		// - like a left arrow if the value == fMin
 // NOTE: disabled because of too much visual noise/distraction
-/*		if ((direction == ARROW_LEFT || direction == ARROW_UP) && (fValue == fMin) )
+/*		if ((direction == ARROW_LEFT || direction == ARROW_UP)
+			&& (fValue == fMin)) {
 			use_enabled_colors = false;
-		else if ((direction == ARROW_RIGHT || direction == ARROW_DOWN) && (fValue == fMax) )
-			use_enabled_colors = false;*/
+		} else if ((direction == ARROW_RIGHT || direction == ARROW_DOWN)
+			&& (fValue == fMax)) {
+			use_enabled_colors = false;
+		}*/
 
 		if (enabled) {
 			light = tint_color(c, B_LIGHTEN_MAX_TINT);
