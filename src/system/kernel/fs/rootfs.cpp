@@ -278,20 +278,27 @@ rootfs_is_dir_empty(struct rootfs_vnode *dir)
 /** You must hold the FS lock when calling this function */
 
 static status_t
-remove_node(struct rootfs *fs, struct rootfs_vnode *directory, struct rootfs_vnode *vnode)
+remove_node(struct rootfs *fs, struct rootfs_vnode *directory,
+	struct rootfs_vnode *vnode)
 {
 	// schedule this vnode to be removed when it's ref goes to zero
-// TODO: This can fail, if the caller doesn't have a reference to the node
-// in question. And some code paths don't guarantee that (rootfs_remove_dir()
-// for example).
-	status_t status = remove_vnode(fs->volume, vnode->id);
-	if (status < B_OK)
-		return status;
 
-	rootfs_remove_from_dir(fs, directory, vnode);
-	notify_entry_removed(fs->id, directory->id, vnode->name, vnode->id);
+	void* dummy;
+	bool gotNode = (get_vnode(fs->volume, vnode->id, &dummy) == B_OK);
 
-	return B_OK;
+	status_t status = B_OK;
+	if (gotNode)
+		status = remove_vnode(fs->volume, vnode->id);
+
+	if (status == B_OK) {
+		rootfs_remove_from_dir(fs, directory, vnode);
+		notify_entry_removed(fs->id, directory->id, vnode->name, vnode->id);
+	}
+
+	if (gotNode)
+		put_vnode(fs->volume, vnode->id);
+
+	return status;
 }
 
 
