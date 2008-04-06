@@ -199,6 +199,24 @@ BScrollBar::BScrollBar(BRect frame, const char* name, BView *target,
 BScrollBar::BScrollBar(BMessage *data)
  : BView(data)
 {
+	if (data->FindFloat("_range", 0, &fMin) < B_OK)
+		fMin = 0.0;
+	if (data->FindFloat("_range", 1, &fMax) < B_OK)
+		fMax = 0.0;
+	if (data->FindFloat("_steps", 0, &fSmallStep) < B_OK)
+		fSmallStep = 1.0;
+	if (data->FindFloat("_steps", 1, &fLargeStep) < B_OK)
+		fSmallStep = 10.0;
+	if (data->FindFloat("_val", &fValue) < B_OK)
+		fValue = 0.0;
+	int32 orientation;
+	if (data->FindInt32("_orient", &orientation) < B_OK)
+		fOrientation = B_VERTICAL;
+	else
+		fOrientation = (enum orientation)orientation;
+
+	if (data->FindFloat("_prop", &fProportion) < B_OK)
+		fProportion = 0.0;
 }
 
 
@@ -248,7 +266,7 @@ BScrollBar::Archive(BMessage *data, bool deep) const
 	err = data->AddInt32("_orient", (int32)fOrientation);
 	if (err != B_OK)
 		return err;
-	err = data->AddInt32("_prop", (int32)fProportion);
+	err = data->AddFloat("_prop", fProportion);
 
 	return err;
 }

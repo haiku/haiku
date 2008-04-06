@@ -112,7 +112,7 @@ class BScrollBar : public BView {
 				float		fLargeStep;
 				float		fValue;
 				float		fProportion;
-				BView*		fTarget;	
+				BView*		fTarget;
 				orientation	fOrientation;
 				char*		fTargetName;
 
