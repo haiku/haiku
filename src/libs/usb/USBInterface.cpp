@@ -9,8 +9,10 @@
 
 #include <USBKit.h>
 #include <usb_raw.h>
-#include <unistd.h>
+
+#include <new>
 #include <string.h>
+#include <unistd.h>
 
 
 BUSBInterface::BUSBInterface(BUSBConfiguration *config, uint32 index, int rawFD)
@@ -160,7 +162,8 @@ BUSBInterface::CountAlternates() const
 usb_interface_descriptor *
 BUSBInterface::AlternateAt(uint32 alternateIndex)
 {
-	usb_interface_descriptor *descriptor = new usb_interface_descriptor;
+	usb_interface_descriptor *descriptor
+		= new(std::nothrow) usb_interface_descriptor;
 	if (descriptor == NULL)
 		return NULL;
 
