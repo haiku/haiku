@@ -35,6 +35,8 @@
 #include <MenuItem.h>
 #include <Messenger.h>
 #include <PopUpMenu.h>
+#include <RecentItems.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <String.h>
 #include <View.h>
@@ -347,8 +349,14 @@ MainWin::MessageReceived(BMessage *msg)
 			break;
 		case B_SIMPLE_DATA:
 			printf("MainWin::MessageReceived: B_SIMPLE_DATA\n");
-			if (msg->HasRef("refs"))
+			if (msg->HasRef("refs")) {
+				// add to recent documents as it's not done with drag-n-drop
+				entry_ref ref;
+				for (int32 i = 0; msg->FindRef("refs", i, &ref) == B_OK; i++) {
+					be_roster->AddToRecentDocuments(&ref, kAppSig);
+				}
 				_RefsReceived(msg);
+			}
 			break;
 
 		case M_MEDIA_SERVER_STARTED:
@@ -833,8 +841,17 @@ MainWin::_CreateMenu()
 	fFileMenu->AddItem(new BMenuItem("New Player"B_UTF8_ELLIPSIS,
 		new BMessage(M_FILE_NEWPLAYER), 'N'));
 	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS,
-		new BMessage(M_FILE_OPEN), 'O'));
+
+//	fFileMenu->AddItem(new BMenuItem("Open File"B_UTF8_ELLIPSIS,
+//		new BMessage(M_FILE_OPEN), 'O'));
+	// Add recent files
+	BRecentFilesList recentFiles(10, false, NULL, kAppSig);
+	BMenuItem *item = new BMenuItem(recentFiles.NewFileListMenu(
+		"Open File"B_UTF8_ELLIPSIS, new BMessage(B_REFS_RECEIVED), 
+		NULL, this, 10, false, NULL, 0, kAppSig), new BMessage(M_FILE_OPEN));
+	item->SetShortcut('O', 0);
+	fFileMenu->AddItem(item);
+
 	fFileMenu->AddItem(new BMenuItem("File Info"B_UTF8_ELLIPSIS,
 		new BMessage(M_FILE_INFO), 'I'));
 	fFileMenu->AddItem(fPlaylistMenu);

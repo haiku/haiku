@@ -4,6 +4,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
+# for BRecentItems
+UsePublicHeaders [ FDirName be_apps Tracker ] ;
+
 # source directories
 local sourceDirs =
 	playlist

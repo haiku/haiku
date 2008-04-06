@@ -56,5 +56,6 @@ private:
 };
 
 extern MainApp* gMainApp;
+extern const char* kAppSig;
 
 #endif

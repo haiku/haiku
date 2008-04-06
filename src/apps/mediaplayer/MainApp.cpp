@@ -32,13 +32,14 @@
 
 
 MainApp *gMainApp;
+const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
 
 static const char* kMediaServerSig = "application/x-vnd.Be.media-server";
 static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
 
 
 MainApp::MainApp()
-	: BApplication("application/x-vnd.Haiku-MediaPlayer"),
+	: BApplication(kAppSig),
 	  fPlayerCount(0),
 	  fFirstWindow(NewWindow()),
 
