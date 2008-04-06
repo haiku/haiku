@@ -1569,9 +1569,9 @@ BView::ScrollBy(float deltaX, float deltaY)
 	fBounds.OffsetBy(deltaX, deltaY);
 
 	// then set the new values of the scrollbars
-	if (fHorScroller)
+	if (fHorScroller && deltaX != 0.0)
 		fHorScroller->SetValue(fBounds.left);
-	if (fVerScroller)		
+	if (fVerScroller && deltaY != 0.0)
 		fVerScroller->SetValue(fBounds.top);
 }
 
