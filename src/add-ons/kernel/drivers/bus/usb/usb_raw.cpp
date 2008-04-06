@@ -290,6 +290,34 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			return B_OK;
 		}
 
+		case RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR: {
+			const usb_configuration_info *configurationInfo =
+				gUSBModule->get_nth_configuration(device->device,
+				command->alternate.config_index);
+			if (!configurationInfo) {
+				command->alternate.status = RAW_STATUS_INVALID_CONFIGURATION;
+				return B_OK;
+			}
+
+			if (command->alternate.interface_index >= configurationInfo->interface_count) {
+				command->alternate.status = RAW_STATUS_INVALID_INTERFACE;
+				return B_OK;
+			}
+
+			const usb_interface_list *interfaceList =
+				&configurationInfo->interface[command->alternate.interface_index];
+			if (command->alternate.alternate_index >= interfaceList->alt_count) {
+				command->alternate.status = RAW_STATUS_INVALID_INTERFACE;
+				return B_OK;
+			}
+
+			memcpy(command->alternate.descriptor,
+				&interfaceList->alt[command->alternate.alternate_index],
+				sizeof(usb_interface_descriptor));
+			command->alternate.status = RAW_STATUS_SUCCESS;
+			return B_OK;
+		}
+
 		case RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR: {
 			const usb_configuration_info *configurationInfo =
 				gUSBModule->get_nth_configuration(device->device,

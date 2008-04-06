@@ -157,6 +157,28 @@ BUSBInterface::CountAlternates() const
 }
 
 
+usb_interface_descriptor *
+BUSBInterface::AlternateAt(uint32 alternateIndex)
+{
+	usb_interface_descriptor *descriptor = new usb_interface_descriptor;
+	if (descriptor == NULL)
+		return NULL;
+
+	raw_command command;
+	command.alternate.descriptor = descriptor;
+	command.alternate.config_index = fConfiguration->Index();
+	command.alternate.interface_index = fIndex;
+	command.alternate.alternate_index = alternateIndex;
+	if (ioctl(fRawFD, RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR, &command,
+		sizeof(command)) || command.alternate.status != RAW_STATUS_SUCCESS) {
+		delete descriptor;
+		return NULL;
+	}
+
+	return descriptor;
+}
+
+
 status_t
 BUSBInterface::SetAlternate(uint32 alternateIndex)
 {

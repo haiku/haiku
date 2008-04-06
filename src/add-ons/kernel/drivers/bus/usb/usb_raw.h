@@ -24,6 +24,7 @@ typedef enum {
 	RAW_COMMAND_GET_STRING_DESCRIPTOR,
 	RAW_COMMAND_GET_GENERIC_DESCRIPTOR,
 	RAW_COMMAND_GET_ALT_INTERFACE_COUNT,
+	RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR,
 
 	RAW_COMMAND_SET_CONFIGURATION = 0x3000,
 	RAW_COMMAND_SET_FEATURE,
@@ -83,6 +84,7 @@ typedef union {
 	struct {
 		status_t						status;
 		uint32							*alternate_count;
+		usb_interface_descriptor		*descriptor;
 		uint32							config_index;
 		uint32							interface_index;
 		uint32							alternate_index;

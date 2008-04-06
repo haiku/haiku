@@ -11,14 +11,6 @@
 #include <USB_spec.h>
 
 
-// Keep compatibility with original USBKit classes
-#define USBRoster			BUSBRoster
-#define USBDevice			BUSBDevice
-#define USBConfiguration	BUSBConfiguration
-#define USBInterface		BUSBInterface
-#define USBEndpoint			BUSBEndpoint
-
-
 class BUSBRoster;
 class BUSBDevice;
 class BUSBConfiguration;
@@ -54,7 +46,14 @@ virtual	void						DeviceRemoved(BUSBDevice *device) = 0;
 		void						Stop();
 
 private:
+virtual	void						_ReservedUSBRoster1();
+virtual	void						_ReservedUSBRoster2();
+virtual	void						_ReservedUSBRoster3();
+virtual	void						_ReservedUSBRoster4();
+virtual	void						_ReservedUSBRoster5();
+
 		void						*fLooper;
+		uint32						fReserved[10];
 };
 
 
@@ -138,6 +137,12 @@ virtual	status_t					InitCheck();
 										void *data) const;
 
 private:
+virtual	void						_ReservedUSBDevice1();
+virtual	void						_ReservedUSBDevice2();
+virtual	void						_ReservedUSBDevice3();
+virtual	void						_ReservedUSBDevice4();
+virtual	void						_ReservedUSBDevice5();
+
 		char						*fPath;
 		int							fRawFD;
 
@@ -148,6 +153,8 @@ private:
 mutable	char						*fManufacturerString;
 mutable	char						*fProductString;
 mutable	char						*fSerialNumberString;
+
+		uint32						fReserved[10];
 };
 
 
@@ -195,6 +202,8 @@ friend	class BUSBDevice;
 		BUSBInterface				**fInterfaces;
 
 mutable	char						*fConfigurationString;
+
+		uint32						fReserved[10];
 };
 
 
@@ -238,14 +247,26 @@ public:
 		const BUSBEndpoint			*EndpointAt(uint32 index) const;
 
 		// Using CountAlternates() you can retrieve the number of alternate
-		// interfaces at this interface index. Note that this interface itself
+		// interfaces for this interface. Note that this interface itself
 		// counts as an alternate so an alternate count of one really means
 		// that you are currently using the sole interface present.
+		// AlternateAt() returns the interface descriptor of the alternate
+		// interface with the specified index. Using that you can peek at the
+		// information contained in the descriptor without having to switch
+		// to this alternate interface. Note that the alternate index set in
+		// the interface descriptor returned is not necessarily the same index
+		// you used to get the descriptor. Always use the zero based index you
+		// used to get the information with and not the values of the returned
+		// descriptor as the stack will handle that translation internally.
+		// The interface descriptor returned was allocated by new and is yours.
+		// You need to delete it when you're done with it.
 		// With SetAlternate() you can switch this BUSBInterface object to the
-		// alternate at the specified index. Note that all endpoints retrieved
-		// through EndpointAt() will become invalid and be deleted as soon as
-		// you set an alternate.
+		// alternate interface at the specified index. Note that all endpoints
+		// retrieved through EndpointAt() will become invalid and will be
+		// deleted as soon as you set an alternate interface (even if the
+		// resulting interface is the same you were using before).
 		uint32						CountAlternates() const;
+		usb_interface_descriptor	*AlternateAt(uint32 alternateIndex);
 		status_t					SetAlternate(uint32 alternateIndex);
 
 private:
@@ -264,6 +285,8 @@ friend	class BUSBConfiguration;
 		BUSBEndpoint				**fEndpoints;
 
 mutable	char						*fInterfaceString;
+
+		uint32						fReserved[10];
 };
 
 
@@ -331,6 +354,8 @@ friend	class BUSBInterface;
 		int							fRawFD;
 
 		usb_endpoint_descriptor		fDescriptor;
+
+		uint32						fReserved[10];
 };
 
 #endif
