@@ -141,10 +141,12 @@ rootfs_create_vnode(struct rootfs *fs, struct rootfs_vnode *parent,
 
 	memset(vnode, 0, sizeof(struct rootfs_vnode));
 
-	vnode->name = strdup(name);
-	if (vnode->name == NULL) {
-		free(vnode);
-		return NULL;
+	if (name != NULL) {
+		vnode->name = strdup(name);
+		if (vnode->name == NULL) {
+			free(vnode);
+			return NULL;
+		}
 	}
 
 	vnode->id = fs->next_vnode_id++;
@@ -1067,16 +1069,21 @@ rootfs_create_special_node(fs_volume *_volume, fs_vnode *_dir, const char *name,
 
 	MutexLocker _(fs->lock);
 
-// TODO: Support (NULL, NULL) (dir, name)!
-	vnode = rootfs_find_in_dir(dir, name);
-	if (vnode != NULL)
-		return B_FILE_EXISTS;
+	if (name != NULL) {
+		vnode = rootfs_find_in_dir(dir, name);
+		if (vnode != NULL)
+			return B_FILE_EXISTS;
+	}
 
 	vnode = rootfs_create_vnode(fs, dir, name, mode);
 	if (vnode == NULL)
 		return B_NO_MEMORY;
 
-	rootfs_insert_in_dir(fs, dir, vnode);
+	if (name != NULL)
+		rootfs_insert_in_dir(fs, dir, vnode);
+	else
+		flags |= B_VNODE_PUBLISH_REMOVED;
+
 	hash_insert(fs->vnode_list_hash, vnode);
 
 	_superVnode->private_node = vnode;
@@ -1089,12 +1096,14 @@ rootfs_create_special_node(fs_volume *_volume, fs_vnode *_dir, const char *name,
 	status_t status = publish_vnode(fs->volume, vnode->id,
 		subVnode->private_node, subVnode->ops, mode, flags);
 	if (status != B_OK) {
-		rootfs_remove_from_dir(fs, dir, vnode);
+		if (name != NULL)
+			rootfs_remove_from_dir(fs, dir, vnode);
 		rootfs_delete_vnode(fs, vnode, false);
 		return status;
 	}
 
-	notify_entry_created(fs->id, dir->id, name, vnode->id);
+	if (name != NULL)
+		notify_entry_created(fs->id, dir->id, name, vnode->id);
 
 	return B_OK;
 }
