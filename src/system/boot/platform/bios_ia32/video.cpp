@@ -1,5 +1,7 @@
 /*
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2008, Philippe Saint-Pierre <stpere@gmail.com>
  * Distributed under the terms of the MIT License.
  */
 
@@ -796,14 +798,41 @@ blit_image(const uint8 *data, const uint8* indexedData, uint16 width,
 
 
 static void
-uncompress_RLE(const RLE_element *compressed, uint8 *uncompressed, uint32 size)
+uncompress_RLE(const uint8 compressed[], uint8 *uncompressed)
 {
-	uint32 cursor = 0;
-	for (uint32 i = 0; i < size; i++) {
-		memset(uncompressed + cursor, compressed[i].colorComponent,
-			compressed[i].count);
-		cursor += compressed[i].count;
-	} 
+	uint32 cursorUncompressed = 0;
+	uint32 cursorCompressed = 0;
+	uint8 count = 0;
+	uint8 item = 0;
+	int i = 0;
+	for (uint8 c = 0; c < 3; c++) {
+		// for Red channel, then Green, then finally Blue...
+		cursorUncompressed = c;
+		while (compressed[cursorCompressed]) {
+			// at the end of the channel there is a terminating 0,
+			// so the loop will end... (ref: generate_boot_screen.cpp)
+			count = compressed[cursorCompressed++];
+			if (count < 128) {
+				// regular run, repeat "item" "count" times...
+				item = compressed[cursorCompressed++];
+				for (i = count - 1; i >= 0; --i) {
+					uncompressed[cursorUncompressed] = item;
+					cursorUncompressed += 3;
+				}
+			} else {
+				// enumeration, just write the next "count" items as is...
+				count = count - 128;
+				for (i = count - 1; i >= 0; --i) {
+					uncompressed[cursorUncompressed]
+						= compressed[cursorCompressed++];
+					cursorUncompressed += 3;
+				}
+			}
+		}
+		// the current position of compressed[cursor] is the end of channel,
+		// we skip it...
+		cursorCompressed++;
+	}
 }
 
 //	#pragma mark -
@@ -884,8 +913,7 @@ fallback:
 		* kSplashLogoHeight * 3);
 	if (uncompressedLogo == NULL)
 		return;
-	uncompress_RLE(kSplashLogoCompressedImage, uncompressedLogo,
-		kSplashLogoSize);
+	uncompress_RLE(kSplashLogoCompressedImage, uncompressedLogo);
 
 	// TODO: support indexed versions of the images!
 
@@ -911,8 +939,7 @@ fallback:
 		* kSplashIconsHeight * 3);
 	if (gKernelArgs.boot_splash == NULL)
 		return;
-	uncompress_RLE(kSplashIconsCompressedImage, gKernelArgs.boot_splash,
-		kSplashIconsSize);
+	uncompress_RLE(kSplashIconsCompressedImage, gKernelArgs.boot_splash );
 
 	// render initial (grayed out) icons
 	// the grayed out version is the lower half of the icons image

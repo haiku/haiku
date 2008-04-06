@@ -5,6 +5,7 @@
  *	Authors:
  *		Artur Wyszynski <harakash@gmail.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Philippe Saint-Pierre <stpere@gmail.com>
  */
 
 //! Haiku boot splash image generator/converter
@@ -13,6 +14,7 @@
 #include <png.h>
 #include <string>
 #include <stdarg.h>
+#include <stdint.h>
 
 // TODO: Generate the single optimal palette for all three images,
 // store palette versions of these images as well, so that they are
@@ -21,7 +23,7 @@
 
 
 FILE* sOutput = NULL;
-
+int sOffset = 0;
 
 static void
 error(const char *s, ...)
@@ -50,33 +52,33 @@ private:
 
 
 static void
-readPNG(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
+read_png(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 	png_structp& pngPtr, png_infop& infoPtr)
 {
 	char header[8];
 	FILE* input = fopen(filename, "rb");
 	if (!input)
-		error("[readPNG] File %s could not be opened for reading", filename);
+		error("[read_png] File %s could not be opened for reading", filename);
 
 	AutoFileCloser _(input);
 
 	fread(header, 1, 8, input);
 	if (png_sig_cmp((png_byte *)header, 0, 8 ))
-		error("[readPNG] File %s is not recognized as a PNG file", filename);
+		error("[read_png] File %s is not recognized as a PNG file", filename);
 	
 	pngPtr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
 		NULL, NULL, NULL);
 	if (!pngPtr)
-		error("[readPNG] png_create_read_struct failed");
+		error("[read_png] png_create_read_struct failed");
 	
 	infoPtr = png_create_info_struct(pngPtr);
 	if (!infoPtr)
-		error("[readPNG] png_create_info_struct failed");
+		error("[read_png] png_create_info_struct failed");
 
 // TODO: I don't know which version of libpng introduced this feature:
 #if PNG_LIBPNG_VER > 10005
 	if (setjmp(png_jmpbuf(pngPtr)))
-		error("[readPNG] Error during init_io");
+		error("[read_png] Error during init_io");
 #endif
 
 	png_init_io(pngPtr, input);
@@ -96,9 +98,9 @@ readPNG(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 	width = infoPtr->width;
 	height = infoPtr->height;
 	if (infoPtr->bit_depth != 8)
-		error("[readPNG] File %s has wrong bit depth\n", filename);
+		error("[read_png] File %s has wrong bit depth\n", filename);
 	if ((int)infoPtr->rowbytes < width * 3) {
-		error("[readPNG] File %s has wrong color type (RGB required)\n",
+		error("[read_png] File %s has wrong color type (RGB required)\n",
 			filename);
 	}
 
@@ -108,7 +110,7 @@ readPNG(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 
 #if PNG_LIBPNG_VER > 10005
 	if (setjmp(png_jmpbuf(pngPtr)))
-		error("[readPNG] Error during read_image");
+		error("[read_png] Error during read_image");
 #endif
 
 	rowPtrs = (png_bytep*)malloc(sizeof(png_bytep) * height);
@@ -120,60 +122,134 @@ readPNG(const char* filename, int& width, int& height, png_bytep*& rowPtrs,
 
 
 static void
-writeHeader(const char* baseName, int width, int height, png_bytep* rowPtrs)
+new_line_if_required()
+{
+	sOffset++;
+	if (sOffset % 12 == 0)
+		fprintf(sOutput, "\n\t");
+}
+
+
+static void
+write_image(const char* baseName, int width, int height, png_bytep* rowPtrs)
 {
 	fprintf(sOutput, "static const uint16 %sWidth = %d;\n", baseName, width);
 	fprintf(sOutput, "static const uint16 %sHeight = %d;\n", baseName, height);
 	fprintf(sOutput, "#ifndef __BOOTSPLASH_KERNEL__\n");
-	fprintf(sOutput, "static const RLE_element %sCompressedImage[] = {\n\t",
+	
+	int buffer[128];
+	// buffer[0] stores count, buffer[1..127] holds the actual values
+
+	fprintf(sOutput, "static uint8 %sCompressedImage[] = {\n\t",
 		baseName);
 
-	int offset = 0;
-	int lastColor = -1;
-	int counter = 0;
-	for (int y = 0; y < height; y++) {
-		png_byte* row = rowPtrs[y];
-		for (int x = 0; x < width * 3; x++) {
-			if (lastColor == row[x]) {
-				// if the currentColor is already being counted...
-				counter++;
-			} else {
-				// otherwise display what we had in memory, record that color
-				// and reset the counter...
-				if (lastColor != -1) {
-					offset++;
-					fprintf(sOutput, "{%d, 0x%02x}, ", counter, lastColor);
-					if (offset % 6 == 0) {
-						fprintf(sOutput, "\n\t");
-					}
-				}
-				lastColor = row[x];
-				counter = 1;
-			}
+	for (int c = 0; c < 3; c++) {
+		// for each component i.e. R, G, B ...
+		// NOTE : I don't care much about performance at this step,
+		// decoding however...
+		int currentValue = rowPtrs[0][c];
+		int count = 0;
 
-			if (x == width * 3 - 1 && y == height - 1) {
-				// we have reach the end
-				fprintf(sOutput, "{%d, 0x%02x}\n};\n\n", counter, row[x]);
-				offset++;
-				break;
+		// When bufferActive == true, we store the number rather than writing 
+		// them directly; we use this to store numbers until we find a pair..
+		bool bufferActive = false;
+
+		sOffset = 0;
+
+		for (int y = 0; y < height; y++) {
+			png_byte* row = rowPtrs[y];
+			for (int x = c; x < width * 3; x += 3) {
+				if (row[x] == currentValue) {
+					if (bufferActive) {
+						bufferActive = false;
+						count = 2;
+						if (buffer[0] > 1) {
+							fprintf (sOutput, "%d, ", 
+								128 + buffer[0] - 1);
+							new_line_if_required();
+							for (int i = 1; i < buffer[0] ; i++) {
+								fprintf( sOutput, "%d, ", 
+									buffer[i] );
+								new_line_if_required();
+							}
+						}
+					} else {
+						count++;
+						if (count == 127) {
+							fprintf(sOutput, "127, ");
+							new_line_if_required();
+							fprintf(sOutput, "%d, ", currentValue);
+							new_line_if_required();
+							count = 0;
+						}
+					}
+				} else {
+					if (bufferActive) {
+						if (buffer[0] == 127) {
+							// we don't have enough room, 
+							// flush the buffer
+							fprintf(sOutput, "%d, ", 
+								128 + buffer[0] - 1);
+							new_line_if_required();
+							for (int i = 1; i < buffer[0]; i++) {
+								fprintf(sOutput, "%d, ", buffer[i]);
+								new_line_if_required();
+							}
+							buffer[0] = 0;
+						}
+						buffer[0]++;
+						buffer[buffer[0]] = row[x];
+					} else if (count > 0) {
+						buffer[0] = 1;
+						buffer[1] = row[x];
+						bufferActive = true;
+						if (count > 1) {
+							fprintf(sOutput, "%d, ", count);
+							new_line_if_required();
+							fprintf(sOutput, "%d, ", currentValue);
+							new_line_if_required();
+						}
+					}
+					currentValue = row[x];
+				}
 			}
 		}
+		if (bufferActive) {
+			// I could have written 127 + buffer[0],
+			// but I think this is more readable...
+			fprintf(sOutput, "%d, ", 128 + buffer[0] - 1);
+			new_line_if_required();
+			for (int i = 1; i < buffer[0] ; i++) {
+				fprintf(sOutput, "%d, ", buffer[i]);
+				new_line_if_required();
+			}
+		} else {
+			fprintf(sOutput, "%d, %d, ", count, currentValue);
+			new_line_if_required();
+		}		
+		// we put a terminating zero for the next byte that indicates
+		// a "count", just to indicate the end of the channel
+		fprintf(sOutput, "0");
+		if (c != 2)
+			fprintf(sOutput, ",");
+
+		fprintf(sOutput, "\n\t");
 	}
-	fprintf(sOutput, "static const uint32 %sSize = %d;\n", baseName, offset);
+	fprintf(sOutput, "};\n");
 	fprintf(sOutput, "#endif\n\n");
 }
 
 
 static void
-parseImage(const char* filename, const char* baseName)
+parse_image(const char* filename, const char* baseName)
 {
 	int width;
 	int height;
 	png_bytep* rowPtrs = NULL;
 	png_structp pngPtr;
 	png_infop infoPtr;
-	readPNG(filename, width, height, rowPtrs, pngPtr, infoPtr);
-	writeHeader(baseName, width, height, rowPtrs);
+	read_png(filename, width, height, rowPtrs, pngPtr, infoPtr);
+	write_image(baseName, width, height, rowPtrs);
 
 	// free resources
 	png_destroy_read_struct(&pngPtr, &infoPtr, NULL);
@@ -232,11 +308,8 @@ main(int argc, char* argv[])
 	fprintf(sOutput, "static const int32 kSplashIconsPlacementY = %d;\n\n",
 		iconPlacementY);
 
-	fprintf(sOutput, "struct RLE_element \n{\n\tuint16 count; \n\tuint8 "
-		"colorComponent;\n};\n\n");
-
-	parseImage(argv[1], "kSplashLogo");
-	parseImage(argv[4], "kSplashIcons");
+	parse_image(argv[1], "kSplashLogo");
+	parse_image(argv[4], "kSplashIcons");
 
 	fclose(sOutput);
 	return 0;
