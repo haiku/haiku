@@ -102,8 +102,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 			: $(baseURL)/jam-haiku-gcc2-2008-03-27.zip
 			: home config bin
 		;
-		InstallOptionalHaikuImagePackage libtool-1.5.26-gcc2-2008-03-24
-			: $(baseURL)/libtool-1.5.26-gcc2-2008-03-24.zip
+		InstallOptionalHaikuImagePackage libtool-1.5.26-gcc2-2008-04-07
+			: $(baseURL)/libtool-1.5.26-gcc2-2008-04-07.zip
 			: home
 		;
 		InstallOptionalHaikuImagePackage texinfo-4.11-gcc2-2008-03-24
