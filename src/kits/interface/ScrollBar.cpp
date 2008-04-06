@@ -21,7 +21,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define TEST_MODE
+//#define TRACE_SCROLLBAR
+#ifdef TRACE_SCROLLBAR
+#	define TRACE(x...) printf(x)
+#else
+#	define TRACE(x...)
+#endif
+
 
 typedef enum {
 	ARROW_LEFT = 0,
@@ -38,7 +44,7 @@ typedef enum {
 
 // Quick constants for determining which arrow is down and are defined with respect
 // to double arrow mode. ARROW1 and ARROW4 refer to the outer pair of arrows and
-// ARROW2 and ARROW3 refer to the inner ones. ARROW1 points left/up and ARROW4 
+// ARROW2 and ARROW3 refer to the inner ones. ARROW1 points left/up and ARROW4
 // points right/down.
 #define ARROW1 0
 #define ARROW2 1
@@ -64,7 +70,7 @@ public:
 		fStopValue(0.0),
 		fUpArrowsEnabled(true),
 		fDownArrowsEnabled(true),
-		fButtonDown(NOARROW)		
+		fButtonDown(NOARROW)
 	{
 		#ifdef TEST_MODE
 			fScrollBarInfo.proportional = true;
@@ -75,7 +81,7 @@ public:
 			get_scroll_bar_info(&fScrollBarInfo);
 		#endif
 	}
-	
+
 	~Private()
 	{
 		if (fRepeaterThread >= 0) {
@@ -84,18 +90,18 @@ public:
 			wait_for_thread(fRepeaterThread, &dummy);
 		}
 	}
-	
-	void DrawScrollBarButton(BScrollBar *owner, arrow_direction direction, 
+
+	void DrawScrollBarButton(BScrollBar *owner, arrow_direction direction,
 							 BRect frame, bool down = false);
-	
+
 	static int32 button_repeater_thread(void* data);
 
 			int32 ButtonRepeaterThread();
 
 	BScrollBar*			fScrollBar;
 	bool				fEnabled;
-	
-	// TODO: This should be a static, initialized by 
+
+	// TODO: This should be a static, initialized by
 	// _init_interface_kit() at application startup-time,
 	// like BMenu::sMenuInfo
 	scroll_bar_info		fScrollBarInfo;
@@ -159,7 +165,7 @@ BScrollBar::Private::ButtonRepeaterThread()
 		fRepeaterThread = -1;
 		fScrollBar->UnlockLooper();
 	}
-	
+
 	return 0;
 }
 
@@ -279,32 +285,32 @@ BScrollBar::AttachedToWindow()
 
 /*
 	From the BeBook (on ValueChanged()):
-	
-Responds to a notification that the value of the scroll bar has changed to 
-newValue. For a horizontal scroll bar, this function interprets newValue 
-as the coordinate value that should be at the left side of the target 
-view's bounds rectangle. For a vertical scroll bar, it interprets 
-newValue as the coordinate value that should be at the top of the rectangle. 
-It calls ScrollTo() to scroll the target's contents into position, unless 
-they have already been scrolled. 
 
-ValueChanged() is called as the result both of user actions 
-(B_VALUE_CHANGED messages received from the Application Server) and of 
-programmatic ones. Programmatically, scrolling can be initiated by the 
-target view (calling ScrollTo()) or by the BScrollBar 
-(calling SetValue() or SetRange()). 
+Responds to a notification that the value of the scroll bar has changed to
+newValue. For a horizontal scroll bar, this function interprets newValue
+as the coordinate value that should be at the left side of the target
+view's bounds rectangle. For a vertical scroll bar, it interprets
+newValue as the coordinate value that should be at the top of the rectangle.
+It calls ScrollTo() to scroll the target's contents into position, unless
+they have already been scrolled.
 
-In all these cases, the target view and the scroll bars need to be kept 
-in synch. This is done by a chain of function calls: ValueChanged() calls 
-ScrollTo(), which in turn calls SetValue(), which then calls 
-ValueChanged() again. It's up to ValueChanged() to get off this 
-merry-go-round, which it does by checking the target view's bounds 
-rectangle. If newValue already matches the left or top side of the 
-bounds rectangle, if forgoes calling ScrollTo(). 
+ValueChanged() is called as the result both of user actions
+(B_VALUE_CHANGED messages received from the Application Server) and of
+programmatic ones. Programmatically, scrolling can be initiated by the
+target view (calling ScrollTo()) or by the BScrollBar
+(calling SetValue() or SetRange()).
 
-ValueChanged() does nothing if a target BView hasn't been set—or 
-if the target has been set by name, but the name doesn't correspond to 
-an actual BView within the scroll bar's window. 
+In all these cases, the target view and the scroll bars need to be kept
+in synch. This is done by a chain of function calls: ValueChanged() calls
+ScrollTo(), which in turn calls SetValue(), which then calls
+ValueChanged() again. It's up to ValueChanged() to get off this
+merry-go-round, which it does by checking the target view's bounds
+rectangle. If newValue already matches the left or top side of the
+bounds rectangle, if forgoes calling ScrollTo().
+
+ValueChanged() does nothing if a target BView hasn't been set—or
+if the target has been set by name, but the name doesn't correspond to
+an actual BView within the scroll bar's window.
 
 */
 
@@ -312,6 +318,8 @@ an actual BView within the scroll bar's window.
 void
 BScrollBar::SetValue(float value)
 {
+	TRACE("BScrollBar(%s)::SetValue(%.1f)\n", Name(), value);
+
 	if (value > fMax)
 		value = fMax;
 	else if (value < fMin)
@@ -341,6 +349,8 @@ BScrollBar::Value() const
 void
 BScrollBar::ValueChanged(float newValue)
 {
+	TRACE("BScrollBar(%s)::ValueChanged(%.1f)\n", Name(), newValue);
+
 	if (fTarget) {
 		// cache target bounds
 		BRect targetBounds = fTarget->Bounds();
@@ -354,6 +364,8 @@ BScrollBar::ValueChanged(float newValue)
 		}
 	}
 
+	TRACE(" -> %.1f\n", newValue);
+
 	SetValue(newValue);
 }
 
@@ -361,6 +373,8 @@ BScrollBar::ValueChanged(float newValue)
 void
 BScrollBar::SetProportion(float value)
 {
+	TRACE("BScrollBar(%s)::SetProportion(%.1f)\n", Name(), value);
+
 	if (value < 0.0)
 		value = 0.0;
 	if (value > 1.0)
@@ -374,7 +388,7 @@ BScrollBar::SetProportion(float value)
 
 		bool newEnabled = fPrivateData->fEnabled && fMin < fMax
 			&& fProportion < 1.0 && fProportion >= 0.0;
-		
+
 		_UpdateThumbFrame();
 
 		if (oldEnabled != newEnabled)
@@ -393,6 +407,8 @@ BScrollBar::Proportion() const
 void
 BScrollBar::SetRange(float min, float max)
 {
+	TRACE("BScrollBar(%s)::SetRange(min=%.1f, max=%.1f)\n", Name(), min, max);
+
 	if (min > max || isnanf(min) || isnanf(max) || isinff(min) || isinff(max)) {
 		min = 0;
 		max = 0;
@@ -431,7 +447,7 @@ BScrollBar::SetSteps(float smallStep, float largeStep)
 {
 	// Under R5, steps can be set only after being attached to a window, probably because
 	// the data is kept server-side. We'll just remove that limitation... :P
-	
+
 	// The BeBook also says that we need to specify an integer value even though the step
 	// values are floats. For the moment, we'll just make sure that they are integers
 	fSmallStep = roundf(smallStep);
@@ -456,10 +472,10 @@ BScrollBar::SetTarget(BView *target)
 {
 	fTarget = target;
 	free(fTargetName);
-	
+
 	if (fTarget) {
 		fTargetName = strdup(target->Name());
-		
+
 		if (fOrientation == B_VERTICAL)
 			fTarget->fVerScroller = this;
 		else
@@ -474,10 +490,10 @@ BScrollBar::SetTarget(const char *targetName)
 {
 	if (!targetName)
 		return;
-	
+
 	if (!Window())
 		debugger("Method requires window and doesn't have one");
-	
+
 	BView *target = Window()->FindView(targetName);
 	if (target)
 		SetTarget(target);
@@ -682,7 +698,7 @@ BScrollBar::Draw(BRect updateRect)
 		dark2 = tint_color(normal, B_LIGHTEN_1_TINT);
 		dark4 = tint_color(normal, B_DARKEN_3_TINT);
 	}
-	
+
 	SetDrawingMode(B_OP_OVER);
 
 	BRect thumbBG = bounds;
@@ -690,7 +706,8 @@ BScrollBar::Draw(BRect updateRect)
 
 	// Draw arrows
 	if (fOrientation == B_HORIZONTAL) {
-		BRect buttonFrame(bounds.left, bounds.top, bounds.left + bounds.Height(), bounds.bottom);
+		BRect buttonFrame(bounds.left, bounds.top,
+			bounds.left + bounds.Height(), bounds.bottom);
 
 		_DrawArrowButton(ARROW_LEFT, doubleArrows, buttonFrame, updateRect,
 			enabled, fPrivateData->fButtonDown == ARROW1);
@@ -703,7 +720,7 @@ BScrollBar::Draw(BRect updateRect)
 			buttonFrame.OffsetTo(bounds.right - ((bounds.Height() * 2) + 1), bounds.top);
 			_DrawArrowButton(ARROW_LEFT, doubleArrows, buttonFrame, updateRect,
 				enabled, fPrivateData->fButtonDown == ARROW3);
-		
+
 			thumbBG.left += bounds.Height() * 2 + 2;
 			thumbBG.right -= bounds.Height() * 2 + 2;
 		} else {
@@ -715,20 +732,22 @@ BScrollBar::Draw(BRect updateRect)
 		_DrawArrowButton(ARROW_RIGHT, doubleArrows, buttonFrame, updateRect,
 			enabled, fPrivateData->fButtonDown == ARROW4);
 	} else {
-		BRect buttonFrame(bounds.left, bounds.top, bounds.right, bounds.top + bounds.Width());
+		BRect buttonFrame(bounds.left, bounds.top, bounds.right,
+			bounds.top + bounds.Width());
 
 		_DrawArrowButton(ARROW_UP, doubleArrows, buttonFrame, updateRect,
 			enabled, fPrivateData->fButtonDown == ARROW1);
-		
+
 		if (doubleArrows) {
 			buttonFrame.OffsetBy(0.0, bounds.Width() + 1);
 			_DrawArrowButton(ARROW_DOWN, doubleArrows, buttonFrame, updateRect,
 				enabled, fPrivateData->fButtonDown == ARROW2);
 
-			buttonFrame.OffsetTo(bounds.left, bounds.bottom - ((bounds.Width() * 2) + 1));
+			buttonFrame.OffsetTo(bounds.left, bounds.bottom
+				- ((bounds.Width() * 2) + 1));
 			_DrawArrowButton(ARROW_UP, doubleArrows, buttonFrame, updateRect,
 				enabled, fPrivateData->fButtonDown == ARROW3);
-		
+
 			thumbBG.top += bounds.Width() * 2 + 2;
 			thumbBG.bottom -= bounds.Width() * 2 + 2;
 		} else {
@@ -773,7 +792,7 @@ BScrollBar::Draw(BRect updateRect)
 					AddLine(BPoint(rect.left - 1, thumbBG.bottom),
 							BPoint(thumbBG.left + 2, thumbBG.bottom), normal);
 				}
-		
+
 				if (rect.right < thumbBG.right - 1) {
 					AddLine(BPoint(rect.right + 2, thumbBG.top + 1),
 							BPoint(rect.right + 2, thumbBG.bottom), dark2);
@@ -814,7 +833,7 @@ BScrollBar::Draw(BRect updateRect)
 					AddLine(BPoint(thumbBG.right, rect.top - 1),
 							BPoint(thumbBG.right, thumbBG.top + 2), normal);
 				}
-		
+
 				if (rect.bottom < thumbBG.bottom - 1) {
 					AddLine(BPoint(thumbBG.left + 1, rect.bottom + 2),
 							BPoint(thumbBG.right, rect.bottom + 2), dark2);
@@ -841,7 +860,7 @@ BScrollBar::Draw(BRect updateRect)
 			BRect leftOfThumb(thumbBG.left + 1, thumbBG.top, rect.left - 1, thumbBG.bottom);
 			if (leftOfThumb.IsValid())
 				FillRect(leftOfThumb);
-	
+
 			BRect rightOfThumb(rect.right + 3, thumbBG.top, thumbBG.right, thumbBG.bottom);
 			if (rightOfThumb.IsValid())
 				FillRect(rightOfThumb);
@@ -849,29 +868,35 @@ BScrollBar::Draw(BRect updateRect)
 			// dark lines before and after thumb
 			if (rect.left > thumbBG.left) {
 				SetHighColor(dark);
-				StrokeLine(BPoint(rect.left - 1, rect.top), BPoint(rect.left - 1, rect.bottom));
+				StrokeLine(BPoint(rect.left - 1, rect.top),
+					BPoint(rect.left - 1, rect.bottom));
 			}
 			if (rect.right < thumbBG.right) {
 				SetHighColor(dark4);
-				StrokeLine(BPoint(rect.right + 1, rect.top), BPoint(rect.right + 1, rect.bottom));
+				StrokeLine(BPoint(rect.right + 1, rect.top),
+					BPoint(rect.right + 1, rect.bottom));
 			}
 		} else {
-			BRect topOfThumb(thumbBG.left, thumbBG.top + 1, thumbBG.right, rect.top - 1);
+			BRect topOfThumb(thumbBG.left, thumbBG.top + 1,
+				thumbBG.right, rect.top - 1);
 			if (topOfThumb.IsValid())
 				FillRect(topOfThumb);
-	
-			BRect bottomOfThumb(thumbBG.left, rect.bottom + 3, thumbBG.right, thumbBG.bottom);
+
+			BRect bottomOfThumb(thumbBG.left, rect.bottom + 3,
+				thumbBG.right, thumbBG.bottom);
 			if (bottomOfThumb.IsValid())
 				FillRect(bottomOfThumb);
 
 			// dark lines before and after thumb
 			if (rect.top > thumbBG.top) {
 				SetHighColor(dark);
-				StrokeLine(BPoint(rect.left, rect.top - 1), BPoint(rect.right, rect.top - 1));
+				StrokeLine(BPoint(rect.left, rect.top - 1),
+					BPoint(rect.right, rect.top - 1));
 			}
 			if (rect.bottom < thumbBG.bottom) {
 				SetHighColor(dark4);
-				StrokeLine(BPoint(rect.left, rect.bottom + 1), BPoint(rect.right, rect.bottom + 1));
+				StrokeLine(BPoint(rect.left, rect.bottom + 1),
+					BPoint(rect.right, rect.bottom + 1));
 			}
 		}
 
@@ -892,7 +917,7 @@ BScrollBar::Draw(BRect updateRect)
 			SetHighColor(tint_color(normal, (B_NO_TINT + B_DARKEN_1_TINT) / 2));
 		else*/
 			SetHighColor(normal);
-		
+
 		FillRect(rect);
 
 		// TODO: Add the other thumb styles - dots and lines
@@ -1286,10 +1311,13 @@ BScrollBar::_ButtonRectFor(int32 button) const
 void
 BScrollBar::_UpdateTargetValue(BPoint where)
 {
-	if (fOrientation == B_VERTICAL)
-		fPrivateData->fStopValue = _ValueFor(BPoint(where.x, where.y - fPrivateData->fThumbFrame.Height() / 2.0));
-	else
-		fPrivateData->fStopValue = _ValueFor(BPoint(where.x - fPrivateData->fThumbFrame.Width() / 2.0, where.y));
+	if (fOrientation == B_VERTICAL) {
+		fPrivateData->fStopValue = _ValueFor(BPoint(where.x, where.y
+			- fPrivateData->fThumbFrame.Height() / 2.0));
+	} else {
+		fPrivateData->fStopValue = _ValueFor(BPoint(where.x
+			- fPrivateData->fThumbFrame.Width() / 2.0, where.y));
+	}
 }
 
 // _UpdateArrowButtons
@@ -1322,9 +1350,9 @@ control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 
 	if (bar->fPrivateData->fScrollBarInfo.double_arrows != info->double_arrows) {
 		bar->fPrivateData->fScrollBarInfo.double_arrows = info->double_arrows;
-		
+
 		int8 multiplier = (info->double_arrows) ? 1 : -1;
-		
+
 		if (bar->fOrientation == B_VERTICAL)
 			bar->fPrivateData->fThumbFrame.OffsetBy(0, multiplier * B_H_SCROLL_BAR_HEIGHT);
 		else
@@ -1334,15 +1362,16 @@ control_scrollbar(scroll_bar_info *info, BScrollBar *bar)
 	bar->fPrivateData->fScrollBarInfo.proportional = info->proportional;
 
 	// TODO: Figure out how proportional relates to the size of the thumb
-		
+
 	// TODO: Add redraw code to reflect the changes
 
 	if (info->knob >= 0 && info->knob <= 2)
 		bar->fPrivateData->fScrollBarInfo.knob = info->knob;
 	else
 		return B_BAD_VALUE;
-	
-	if (info->min_knob_size >= SCROLL_BAR_MINIMUM_KNOB_SIZE && info->min_knob_size <= SCROLL_BAR_MAXIMUM_KNOB_SIZE)
+
+	if (info->min_knob_size >= SCROLL_BAR_MINIMUM_KNOB_SIZE
+			&& info->min_knob_size <= SCROLL_BAR_MAXIMUM_KNOB_SIZE)
 		bar->fPrivateData->fScrollBarInfo.min_knob_size = info->min_knob_size;
 	else
 		return B_BAD_VALUE;
@@ -1428,14 +1457,14 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 	rgb_color c = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color light, dark, darker, normal, arrow;
 
-	if (down && fPrivateData->fDoRepeat) {	
+	if (down && fPrivateData->fDoRepeat) {
 		light = tint_color(c, (B_DARKEN_1_TINT + B_DARKEN_2_TINT) / 2.0);
 		dark = darker = c;
 		normal = tint_color(c, B_DARKEN_1_TINT);
 		arrow = tint_color(c, B_DARKEN_MAX_TINT);
-	
+
 	} else {
-		// Add a usability perk - disable buttons if they would not do anything - 
+		// Add a usability perk - disable buttons if they would not do anything -
 		// like a left arrow if the value==fMin
 // NOTE: disabled because of too much visual noise/distraction
 /*		if ((direction == ARROW_LEFT || direction == ARROW_UP) && (fValue == fMin) )
@@ -1457,10 +1486,10 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 			arrow = tint_color(c, B_DARKEN_1_TINT);
 		}
 	}
-	
+
 	BPoint tri1, tri2, tri3;
 	r.InsetBy(4, 4);
-	
+
 	switch (direction) {
 		case ARROW_LEFT:
 			tri1.Set(r.right, r.top);
@@ -1494,7 +1523,7 @@ BScrollBar::_DrawArrowButton(int32 direction, bool doubleArrows, BRect r,
 	r.InsetBy(-3, -3);
 	SetHighColor(normal);
 	FillRect(r);
-	
+
 	BShape arrowShape;
 	arrowShape.MoveTo(tri1);
 	arrowShape.LineTo(tri2);
