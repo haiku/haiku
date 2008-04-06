@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TRACE_SCROLLBAR
+//#define TRACE_SCROLLBAR
 #ifdef TRACE_SCROLLBAR
 #	define TRACE(x...) printf(x)
 #else
@@ -321,8 +321,6 @@ an actual BView within the scroll bar's window.
 void
 BScrollBar::SetValue(float value)
 {
-	TRACE("BScrollBar(%s)::SetValue(%.1f)\n", Name(), value);
-
 	if (value > fMax)
 		value = fMax;
 	else if (value < fMin)
@@ -332,6 +330,8 @@ BScrollBar::SetValue(float value)
 
 	if (value == fValue)
 		return;
+
+	TRACE("BScrollBar(%s)::SetValue(%.1f)\n", Name(), value);
 
 	fValue = value;
 
@@ -376,27 +376,28 @@ BScrollBar::ValueChanged(float newValue)
 void
 BScrollBar::SetProportion(float value)
 {
-	TRACE("BScrollBar(%s)::SetProportion(%.1f)\n", Name(), value);
-
 	if (value < 0.0)
 		value = 0.0;
 	if (value > 1.0)
 		value = 1.0;
 
-	if (value != fProportion) {
-		bool oldEnabled = fPrivateData->fEnabled && fMin < fMax
-			&& fProportion < 1.0 && fProportion >= 0.0;
+	if (value == fProportion)
+		return;
+	TRACE("BScrollBar(%s)::SetProportion(%.1f)\n", Name(), value);
 
-		fProportion = value;
+	bool oldEnabled = fPrivateData->fEnabled && fMin < fMax
+		&& fProportion < 1.0 && fProportion >= 0.0;
 
-		bool newEnabled = fPrivateData->fEnabled && fMin < fMax
-			&& fProportion < 1.0 && fProportion >= 0.0;
+	fProportion = value;
 
-		_UpdateThumbFrame();
+	bool newEnabled = fPrivateData->fEnabled && fMin < fMax
+		&& fProportion < 1.0 && fProportion >= 0.0;
 
-		if (oldEnabled != newEnabled)
-			Invalidate();
-	}
+	_UpdateThumbFrame();
+
+	if (oldEnabled != newEnabled)
+		Invalidate();
+
 }
 
 
@@ -410,8 +411,6 @@ BScrollBar::Proportion() const
 void
 BScrollBar::SetRange(float min, float max)
 {
-	TRACE("BScrollBar(%s)::SetRange(min=%.1f, max=%.1f)\n", Name(), min, max);
-
 	if (min > max || isnanf(min) || isnanf(max) || isinff(min) || isinff(max)) {
 		min = 0;
 		max = 0;
@@ -422,6 +421,7 @@ BScrollBar::SetRange(float min, float max)
 
 	if (fMin == min && fMax == max)
 		return;
+	TRACE("BScrollBar(%s)::SetRange(min=%.1f, max=%.1f)\n", Name(), min, max);
 
 	fMin = min;
 	fMax = max;
@@ -448,9 +448,6 @@ BScrollBar::GetRange(float *min, float *max) const
 void
 BScrollBar::SetSteps(float smallStep, float largeStep)
 {
-	TRACE("BScrollBar(%s)::SetSteps(small=%.1f, large=%.1f)\n", Name(),
-		smallStep, largeStep);
-
 	// Under R5, steps can be set only after being attached to a window,
 	// probably because the data is kept server-side. We'll just remove
 	// that limitation... :P
@@ -462,6 +459,8 @@ BScrollBar::SetSteps(float smallStep, float largeStep)
 	largeStep = roundf(largeStep);
 	if (fSmallStep == smallStep && fLargeStep == largeStep)
 		return;
+	TRACE("BScrollBar(%s)::SetSteps(small=%.1f, large=%.1f)\n", Name(),
+		smallStep, largeStep);
 
 	fSmallStep = smallStep;
 	fLargeStep = largeStep;
