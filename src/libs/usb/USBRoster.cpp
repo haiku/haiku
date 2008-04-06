@@ -267,3 +267,11 @@ BUSBRoster::Stop()
 	((RosterLooper *)fLooper)->Stop();
 	fLooper = NULL;
 }
+
+
+// definition of reserved virtual functions
+void BUSBRoster::_ReservedUSBRoster1() {};
+void BUSBRoster::_ReservedUSBRoster2() {};
+void BUSBRoster::_ReservedUSBRoster3() {};
+void BUSBRoster::_ReservedUSBRoster4() {};
+void BUSBRoster::_ReservedUSBRoster5() {};

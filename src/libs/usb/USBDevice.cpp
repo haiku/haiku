@@ -369,3 +369,11 @@ BUSBDevice::ControlTransfer(uint8 requestType, uint8 request, uint16 value,
 
 	return command.control.length;
 }
+
+
+// definition of reserved virtual functions
+void BUSBDevice::_ReservedUSBDevice1() {};
+void BUSBDevice::_ReservedUSBDevice2() {};
+void BUSBDevice::_ReservedUSBDevice3() {};
+void BUSBDevice::_ReservedUSBDevice4() {};
+void BUSBDevice::_ReservedUSBDevice5() {};
