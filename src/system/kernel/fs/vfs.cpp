@@ -8175,8 +8175,14 @@ _user_create_fifo(const char *userPath, mode_t perms)
 	// create the entry	-- the FIFO sub node is set up automatically
 	fs_vnode superVnode;
 	ino_t nodeID;
-	return FS_CALL(dir, create_special_node, filename, NULL,
+	status = FS_CALL(dir, create_special_node, filename, NULL,
 		S_IFIFO | (perms & S_IUMSK), 0, &superVnode, &nodeID);
+
+	// create_special_node() acquired a reference for us that we don't need.
+	if (status == B_OK)
+		put_vnode(dir->mount->volume, nodeID);
+
+	return status;
 }
 
 
