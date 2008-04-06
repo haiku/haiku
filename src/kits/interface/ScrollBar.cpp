@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define TRACE_SCROLLBAR
+#define TRACE_SCROLLBAR
 #ifdef TRACE_SCROLLBAR
 #	define TRACE(x...) printf(x)
 #else
@@ -445,15 +445,33 @@ BScrollBar::GetRange(float *min, float *max) const
 void
 BScrollBar::SetSteps(float smallStep, float largeStep)
 {
-	// Under R5, steps can be set only after being attached to a window, probably because
-	// the data is kept server-side. We'll just remove that limitation... :P
+	TRACE("BScrollBar(%s)::SetSteps(small=%.1f, large=%.1f)\n", Name(),
+		smallStep, largeStep);
 
-	// The BeBook also says that we need to specify an integer value even though the step
-	// values are floats. For the moment, we'll just make sure that they are integers
-	fSmallStep = roundf(smallStep);
-	fLargeStep = roundf(largeStep);
+	// Under R5, steps can be set only after being attached to a window,
+	// probably because the data is kept server-side. We'll just remove
+	// that limitation... :P
 
-	// TODO: test use of fractional values and make them work properly if they don't
+	// The BeBook also says that we need to specify an integer value even
+	// though the step values are floats. For the moment, we'll just make
+	// sure that they are integers
+	smallStep = roundf(smallStep);
+	largeStep = roundf(largeStep);
+	if (fSmallStep == smallStep && fLargeStep == largeStep)
+		return;
+
+	fSmallStep = smallStep;
+	fLargeStep = largeStep;
+
+	if (fProportion == 0.0) {
+		// special case, proportion is based on fLargeStep if it was never
+		// set, so it means we need to invalidate here
+		_UpdateThumbFrame();
+		Invalidate();
+	}
+
+	// TODO: test use of fractional values and make them work properly if
+	// they don't
 }
 
 // GetSteps
@@ -1123,8 +1141,17 @@ BScrollBar::_UpdateThumbFrame()
 
 	float thumbSize = minSize;
 	float proportion = fProportion;
-	if (fMin == fMax || proportion > 1.0 || proportion < 0.0)
+	if (fMin >= fMax || proportion > 1.0 || proportion < 0.0)
 		proportion = 1.0;
+	if (proportion == 0.0) {
+		// Special case a proportion of 0.0, use the large step value
+		// in that case (NOTE: fMin == fMax already handled above)
+		// This calculation is based on the assumption that "large step"
+		// scrolls by one "page size".
+		proportion = fLargeStep / (2 * (fMax - fMin));
+		if (proportion > 1.0)
+			proportion = 1.0;
+	}
 	if (fPrivateData->fScrollBarInfo.proportional)
 		thumbSize += (maxSize - minSize) * proportion;
 	thumbSize = floorf(thumbSize + 0.5);
