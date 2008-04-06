@@ -8,6 +8,7 @@
 
 
 #include <Application.h>
+#include <String.h>
 #include <Window.h>
 #include <View.h>
 
