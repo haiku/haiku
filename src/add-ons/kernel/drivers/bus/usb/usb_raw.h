@@ -23,12 +23,14 @@ typedef enum {
 	RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR,
 	RAW_COMMAND_GET_STRING_DESCRIPTOR,
 	RAW_COMMAND_GET_GENERIC_DESCRIPTOR,
+	RAW_COMMAND_GET_ALT_INTERFACE_COUNT,
 
 	RAW_COMMAND_SET_CONFIGURATION = 0x3000,
 	RAW_COMMAND_SET_FEATURE,
 	RAW_COMMAND_CLEAR_FEATURE,
 	RAW_COMMAND_GET_STATUS,
 	RAW_COMMAND_GET_DESCRIPTOR,
+	RAW_COMMAND_SET_ALT_INTERFACE,
 
 	RAW_COMMAND_CONTROL_TRANSFER = 0x4000,
 	RAW_COMMAND_INTERRUPT_TRANSFER,
@@ -77,6 +79,14 @@ typedef union {
 		uint32							config_index;
 		uint32							interface_index;
 	} interface;
+
+	struct {
+		status_t						status;
+		uint32							*alternate_count;
+		uint32							config_index;
+		uint32							interface_index;
+		uint32							alternate_index;
+	} alternate;
 
 	struct {
 		status_t						status;

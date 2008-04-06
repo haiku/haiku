@@ -258,7 +258,7 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			const usb_interface_info *interfaceInfo =
-				configurationInfo->interface[command->endpoint.interface_index].active;
+				configurationInfo->interface[command->interface.interface_index].active;
 			if (!interfaceInfo) {
 				command->interface.status = RAW_STATUS_ABORTED;
 				return B_OK;
@@ -267,6 +267,26 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			memcpy(command->interface.descriptor, interfaceInfo->descr,
 				sizeof(usb_interface_descriptor));
 			command->interface.status = RAW_STATUS_SUCCESS;
+			return B_OK;
+		}
+
+		case RAW_COMMAND_GET_ALT_INTERFACE_COUNT: {
+			const usb_configuration_info *configurationInfo =
+				gUSBModule->get_nth_configuration(device->device,
+				command->alternate.config_index);
+			if (!configurationInfo) {
+				command->alternate.status = RAW_STATUS_INVALID_CONFIGURATION;
+				return B_OK;
+			}
+
+			if (command->alternate.interface_index >= configurationInfo->interface_count) {
+				command->alternate.status = RAW_STATUS_INVALID_INTERFACE;
+				return B_OK;
+			}
+
+			*command->alternate.alternate_count
+				= configurationInfo->interface[command->alternate.interface_index].alt_count;
+			command->alternate.status = RAW_STATUS_SUCCESS;
 			return B_OK;
 		}
 
@@ -443,6 +463,37 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			}
 
 			command->config.status = RAW_STATUS_SUCCESS;
+			return B_OK;
+		}
+
+		case RAW_COMMAND_SET_ALT_INTERFACE: {
+			const usb_configuration_info *configurationInfo =
+				gUSBModule->get_nth_configuration(device->device,
+				command->alternate.config_index);
+			if (!configurationInfo) {
+				command->alternate.status = RAW_STATUS_INVALID_CONFIGURATION;
+				return B_OK;
+			}
+
+			if (command->alternate.interface_index >= configurationInfo->interface_count) {
+				command->alternate.status = RAW_STATUS_INVALID_INTERFACE;
+				return B_OK;
+			}
+
+			const usb_interface_list *interfaceList =
+				&configurationInfo->interface[command->alternate.interface_index];
+			if (command->alternate.alternate_index >= interfaceList->alt_count) {
+				command->alternate.status = RAW_STATUS_INVALID_INTERFACE;
+				return B_OK;
+			}
+
+			if (gUSBModule->set_alt_interface(device->device,
+				&interfaceList->alt[command->alternate.alternate_index]) < B_OK) {
+				command->alternate.status = RAW_STATUS_FAILED;
+				return B_OK;
+			}
+
+			command->alternate.status = RAW_STATUS_SUCCESS;
 			return B_OK;
 		}
 
