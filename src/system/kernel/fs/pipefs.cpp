@@ -1921,8 +1921,8 @@ fifo_put_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
-dprintf("[%ld] fifo_put_vnode(%p (%p), %p (%p), %d)\n", find_thread(NULL),
-volume, volume->private_volume, vnode, fifo, reenter);
+//dprintf("[%ld] fifo_put_vnode(%p (%p), %p (%p), %d)\n", find_thread(NULL),
+//volume, volume->private_volume, vnode, fifo, reenter);
 
 	status_t error = B_OK;
 	if (superVnode->ops->put_vnode != NULL)
@@ -1939,8 +1939,8 @@ fifo_remove_vnode(fs_volume *volume, fs_vnode *vnode, bool reenter)
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
-dprintf("[%ld] fifo_remove_vnode(%p (%p), %p (%p), %d)\n", find_thread(NULL),
-volume, volume->private_volume, vnode, fifo, reenter);
+//dprintf("[%ld] fifo_remove_vnode(%p (%p), %p (%p), %d)\n", find_thread(NULL),
+//volume, volume->private_volume, vnode, fifo, reenter);
 
 	status_t error = B_OK;
 	if (superVnode->ops->remove_vnode != NULL)
@@ -1957,8 +1957,8 @@ fifo_read_stat(fs_volume *volume, fs_vnode *vnode, struct ::stat *st)
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
-dprintf("[%ld] fifo_read_stat(%p (%p), %p (%p), %p)\n", find_thread(NULL),
-volume, volume->private_volume, vnode, fifo, st);
+//dprintf("[%ld] fifo_read_stat(%p (%p), %p (%p), %p)\n", find_thread(NULL),
+//volume, volume->private_volume, vnode, fifo, st);
 
 	if (superVnode->ops->read_stat == NULL)
 		return B_BAD_VALUE;
@@ -1998,8 +1998,8 @@ fifo_write_stat(fs_volume *volume, fs_vnode *vnode, const struct ::stat *st,
 
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
-dprintf("[%ld] fifo_write_stat(%p (%p), %p (%p), %p, 0x%lx)\n",
-find_thread(NULL), volume, volume->private_volume, vnode, fifo, st, statMask);
+//dprintf("[%ld] fifo_write_stat(%p (%p), %p (%p), %p, 0x%lx)\n",
+//find_thread(NULL), volume, volume->private_volume, vnode, fifo, st, statMask);
 
 	if (superVnode->ops->write_stat == NULL)
 		return B_BAD_VALUE;
@@ -2019,8 +2019,8 @@ fifo_open(fs_volume *volume, fs_vnode *vnode, int openMode,
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
-dprintf("[%ld] fifo_open(%p (%p), %p (%p), 0x%x, %p)\n",
-find_thread(NULL), volume, volume->private_volume, vnode, fifo, openMode, _cookie);
+//dprintf("[%ld] fifo_open(%p (%p), %p (%p), 0x%x, %p)\n",
+//find_thread(NULL), volume, volume->private_volume, vnode, fifo, openMode, _cookie);
 
 	return pipefs_open(volume, vnode, openMode, _cookie);
 }
@@ -2031,8 +2031,8 @@ fifo_close(fs_volume *volume, fs_vnode *vnode, void *_cookie)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
-dprintf("[%ld] fifo_close(%p (%p), %p (%p), %p)\n",
-find_thread(NULL), volume, volume->private_volume, vnode, fifo, _cookie);
+//dprintf("[%ld] fifo_close(%p (%p), %p (%p), %p)\n",
+//find_thread(NULL), volume, volume->private_volume, vnode, fifo, _cookie);
 
 	fifo->Close(cookie->open_mode);
 
@@ -2046,9 +2046,9 @@ fifo_get_super_vnode(fs_volume *volume, fs_vnode *vnode, fs_volume *superVolume,
 {
 	FIFOInode* fifo = (FIFOInode*)vnode->private_node;
 	fs_vnode* superVnode = fifo->SuperVnode();
-dprintf("[%ld] fifo_get_super_vnode(%p (%p), %p (%p), %p, %p)\n",
-find_thread(NULL), volume, volume->private_volume, vnode, fifo, superVolume,
-_superVnode);
+//dprintf("[%ld] fifo_get_super_vnode(%p (%p), %p (%p), %p, %p)\n",
+//find_thread(NULL), volume, volume->private_volume, vnode, fifo, superVolume,
+//_superVnode);
 
 	if (superVnode->ops->get_super_vnode != NULL) {
 		return superVnode->ops->get_super_vnode(volume, superVnode, superVolume,
