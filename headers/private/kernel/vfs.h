@@ -172,6 +172,7 @@ status_t _user_unlink(int fd, const char *path);
 status_t _user_rename(int oldFD, const char *oldpath, int newFD,
 			const char *newpath);
 status_t _user_create_fifo(const char *path, mode_t perms);
+status_t _user_create_pipe(int *fds);
 status_t _user_access(const char *path, int mode);
 ssize_t _user_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 			bigtime_t timeout, const sigset_t *sigMask);

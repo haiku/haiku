@@ -453,12 +453,6 @@ vfs_bootstrap_file_systems(void)
 	if (status < B_OK)
 		panic("error mounting devfs\n");
 
-	// bootstrap the pipefs
-	_kern_create_dir(-1, "/pipe", 0755);
-	status = _kern_mount("/pipe", NULL, "pipefs", 0, NULL, 0);
-	if (status < B_OK)
-		panic("error mounting pipefs\n");
-
 	// create directory for the boot volume
 	_kern_create_dir(-1, "/boot", 0755);
 

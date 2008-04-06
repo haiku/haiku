@@ -8187,6 +8187,60 @@ _user_create_fifo(const char *userPath, mode_t perms)
 
 
 status_t
+_user_create_pipe(int *userFDs)
+{
+	// rootfs should support creating FIFOs, but let's be sure
+	if (!HAS_FS_CALL(sRoot, create_special_node))
+		return B_UNSUPPORTED;
+
+	// create the node	-- the FIFO sub node is set up automatically
+	fs_vnode superVnode;
+	ino_t nodeID;
+	status_t status = FS_CALL(sRoot, create_special_node, NULL, NULL,
+		S_IFIFO | S_IRUSR | S_IWUSR, 0, &superVnode, &nodeID);
+	if (status != B_OK)
+		return status;
+
+	// We've got one reference to the node and need another one.
+	struct vnode* vnode;
+	status = get_vnode(sRoot->mount->id, nodeID, &vnode, true, false);
+	if (status != B_OK) {
+		// that should not happen
+		dprintf("_user_create_pipe(): Failed to lookup vnode (%ld, %lld)\n",
+			sRoot->mount->id, sRoot->id);
+		return status;
+	}
+
+	// Everything looks good so far. Open two FDs for reading respectively
+	// writing.
+	int fds[2];
+	fds[0] = open_vnode(vnode, O_RDONLY, false);
+	fds[1] = open_vnode(vnode, O_WRONLY, false);
+
+	FDCloser closer0(fds[0], false);
+	FDCloser closer1(fds[1], false);
+
+	status = (fds[0] >= 0 ? (fds[1] >= 0 ? B_OK : fds[1]) : fds[0]);
+
+	// copy FDs to userland
+	if (status == B_OK) {
+		if (!IS_USER_ADDRESS(userFDs)
+			|| user_memcpy(userFDs, fds, sizeof(fds)) != B_OK) {
+			status = B_BAD_ADDRESS;
+		}
+	}
+
+	// keep FDs, if everything went fine
+	if (status == B_OK) {
+		closer0.Detach();
+		closer1.Detach();
+	}
+
+	return status;
+}
+
+
+status_t
 _user_access(const char *userPath, int mode)
 {
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
