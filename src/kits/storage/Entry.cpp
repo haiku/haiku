@@ -901,6 +901,16 @@ BEntry::set(int dirFD, const char *path, bool traverse)
 						return dirFD;
 					fdCloser.SetTo(dirFD);
 				}
+			} else if (strcmp(leafName, ".") == 0
+					|| strcmp(leafName, "..") == 0) {
+				// We have to resolve this to get the entry name. Just open
+				// the dir and let the next iteration deal with it.
+				dirFD = _kern_open_dir(-1, path);
+				if (dirFD < 0)
+					return dirFD;
+				fdCloser.SetTo(dirFD);
+				path = NULL;
+				continue;
 			} else {
 				int parentFD = _kern_open_dir(dirFD, dirPath);
 				if (parentFD < 0)
