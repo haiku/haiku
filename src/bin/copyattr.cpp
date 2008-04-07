@@ -559,7 +559,32 @@ copy_files(const char **sourcePaths, int sourceCount,
 	// iterate through the source files
 	for (int i = 0; i < sourceCount; i++) {
 		const char *sourcePath = sourcePaths[i];
+		// If the destination is a directory, we usually want to copy the
+		// sources into it. The user might have specified a source path ending
+		// in "/." or "/.." however, in which case we copy the contents of the
+		// given directory.
+		bool copySourceContentsOnly = false;
 		if (destIsDir) {
+			// skip trailing '/'s
+			int sourceLen = strlen(sourcePath);
+			while (sourceLen > 1 && sourcePath[sourceLen - 1] == '/')
+				sourceLen--;
+
+			// find the start of the leaf name
+			int leafStart = sourceLen;
+			while (leafStart > 0 && sourcePath[leafStart - 1] != '/')
+				leafStart--;
+
+			// If the path is the root directory or the leaf is "." or "..",
+			// we copy the contents only.
+			int leafLen = sourceLen - leafStart;
+			if (leafLen == 0 || leafLen <= 2
+					&& strncmp(sourcePath + leafStart, "..", leafLen) == 0) {
+				copySourceContentsOnly = true;
+			}
+		}
+
+		if (destIsDir && !copySourceContentsOnly) {
 			// construct a usable destination entry path
 			// normalize source path
 			BPath normalizedSourcePath;
@@ -640,10 +665,10 @@ main(int argc, const char *const *argv)
 					|| strcmp(arg, "--verbose") == 0) {
 				parameters.verbose = true;
 
- 			} else if (strcmp(arg, "-x") == 0 || strcmp(arg, "--type") == 0) {
+ 			} else if (strcmp(arg, "-x") == 0) {
  				parameters.entry_filter.AddExcludeFilter(next_arg(argi), true);
 
- 			} else if (strcmp(arg, "-X") == 0 || strcmp(arg, "--type") == 0) {
+ 			} else if (strcmp(arg, "-X") == 0) {
  				parameters.entry_filter.AddExcludeFilter(next_arg(argi), false);
 
 			} else if (strcmp(arg, "-") == 0 || strcmp(arg, "--") == 0) {
