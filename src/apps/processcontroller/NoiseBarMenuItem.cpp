@@ -25,7 +25,7 @@
 
 
 NoiseBarMenuItem::NoiseBarMenuItem()
-	: BMenuItem("Gone Teams...", NULL)
+	: BMenuItem("Gone Teams" B_UTF8_ELLIPSIS, NULL)
 {
 	fBusyWaiting = -1;
 	fLost = -1;

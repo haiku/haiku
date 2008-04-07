@@ -746,7 +746,7 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	aFrame.bottom -= kYBuffer;
 
 	fFtpSetupBox = new BBox(aFrame, "Ftp Setup", B_FOLLOW_ALL, B_WILL_DRAW);
-	fUploadClientMenu = new BPopUpMenu("Send to...");
+	fUploadClientMenu = new BPopUpMenu("Send to" B_UTF8_ELLIPSIS);
 	for (int i = 0; kUploadClient[i]; i++) {
 		BMessage *m = new BMessage(msg_upl_client);
 		m->AddInt32("client", i);
@@ -821,7 +821,7 @@ VideoWindow::_BuildCaptureControls(BView* theView)
 	aFrame = fStatusBox->Bounds();
 	aFrame.InsetBy(kXBuffer, kYBuffer);	
 
-	fStatusLine = new BStringView(aFrame, "Status Line", "Waiting ...");
+	fStatusLine = new BStringView(aFrame, "Status Line", "Waiting" B_UTF8_ELLIPSIS);
 	fStatusBox->AddChild(fStatusLine);
 }
 

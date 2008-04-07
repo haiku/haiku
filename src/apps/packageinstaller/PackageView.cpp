@@ -586,7 +586,7 @@ PackageView::_GroupChanged(int32 index)
 			}
 			fDestination->AddSeparatorItem();
 
-			item = new BMenuItem("Other...", new BMessage(P_MSG_OPEN_PANEL));
+			item = new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(P_MSG_OPEN_PANEL));
 			item->SetTarget(this);
 			fDestination->AddItem(item);
 

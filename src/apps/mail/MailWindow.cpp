@@ -2956,7 +2956,7 @@ TMailWindow::_RebuildQueryMenu(bool firstTime)
 		delete item;
 	}
 
-	fQueryMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE("Edit Queries...","???..."),
+	fQueryMenu->AddItem(new BMenuItem(MDR_DIALECT_CHOICE("Edit Queries" B_UTF8_ELLIPSIS,"???" B_UTF8_ELLIPSIS),
 		new BMessage(M_EDIT_QUERIES), 'E', B_SHIFT_KEY));
 
 	bool queryItemsAdded = false;

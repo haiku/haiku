@@ -647,7 +647,7 @@ VideoConsumer::LocalSave(char* filename, BBitmap* bitmap)
 {
 	BFile* output;
 
-	UpdateFtpStatus("Capturing Image ...");
+	UpdateFtpStatus("Capturing Image" B_UTF8_ELLIPSIS);
 
 	/* save a local copy of the image in the requested format */
 	output = new BFile();
@@ -695,14 +695,14 @@ VideoConsumer::FtpSave(char* filename)
 	ftp->SetPassive(fPassiveFtp);
 		// ftp the local file to our web site
 
-	UpdateFtpStatus("Logging in ...");
+	UpdateFtpStatus("Logging in" B_UTF8_ELLIPSIS);
 	if (ftp->Connect((string)fServerText, (string)fLoginText, (string)fPasswordText)) {
 		// connect to server
-		UpdateFtpStatus("Connected ...");
+		UpdateFtpStatus("Connected" B_UTF8_ELLIPSIS);
 
 		if (ftp->ChangeDir((string)fDirectoryText)) {
 			// cd to the desired directory
-			UpdateFtpStatus("Transmitting ...");
+			UpdateFtpStatus("Transmitting" B_UTF8_ELLIPSIS);
 
 			if (ftp->PutFile((string)filename, (string)"temp")) {
 				// send the file to the server
@@ -710,7 +710,7 @@ VideoConsumer::FtpSave(char* filename)
 				ftp->Chmod((string)"temp", (string)"644");
 				// make it world readable
 
-				UpdateFtpStatus("Renaming ...");
+				UpdateFtpStatus("Renaming" B_UTF8_ELLIPSIS);
 
 				if (ftp->MoveFile((string)"temp", (string)filename)) {
 					// change to the desired name

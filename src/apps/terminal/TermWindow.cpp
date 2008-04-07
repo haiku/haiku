@@ -142,7 +142,7 @@ TermWindow::_SetupMenu()
 	fFilemenu->AddItem(new BMenuItem("New Tab", new BMessage(kNewTab), 'T'));
 	
 	fFilemenu->AddSeparatorItem();
-	fFilemenu->AddItem(new BMenuItem("Page Setup...", new BMessage(MENU_PAGE_SETUP)));
+	fFilemenu->AddItem(new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, new BMessage(MENU_PAGE_SETUP)));
 	fFilemenu->AddItem(new BMenuItem("Print", new BMessage(MENU_PRINT),'P'));
 	fFilemenu->AddSeparatorItem();
 	fFilemenu->AddItem(new BMenuItem("About Terminal" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));

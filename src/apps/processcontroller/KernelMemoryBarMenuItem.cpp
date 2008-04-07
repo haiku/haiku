@@ -28,7 +28,7 @@
 
 
 KernelMemoryBarMenuItem::KernelMemoryBarMenuItem(system_info& systemInfo)
-	: BMenuItem("System Resources & Caches...", NULL)
+	: BMenuItem("System Resources & Caches" B_UTF8_ELLIPSIS, NULL)
 {
 	fLastSum = -1;
 	fGrenze1 = -1;
