@@ -10,6 +10,7 @@
  */
 
 #include <Application.h>
+#include <GroupLayout.h>
 
 #include "NetworkWindow.h"
 #include "EthernetSettingsView.h"
@@ -17,13 +18,12 @@
 
 NetworkWindow::NetworkWindow()
 	: BWindow(BRect(50, 50, 269, 302), "Network", B_TITLED_WINDOW,
-		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE)
+		B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
-			
-	fEthView = new EthernetSettingsView(Bounds());
-	ResizeTo(fEthView->Frame().Width(), fEthView->Frame().Height());
-
-	AddChild(fEthView);
+	SetLayout(new BGroupLayout(B_HORIZONTAL));
+	fEthView = new EthernetSettingsView();
+	GetLayout()->AddView(fEthView);
 }
 	
 
@@ -31,11 +31,8 @@ void
 NetworkWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgInfo:
-		fEthView->MessageReceived(message);
-		break;
-	default:
-		BWindow::MessageReceived(message);
+		default:
+			BWindow::MessageReceived(message);
 	}
 
 }

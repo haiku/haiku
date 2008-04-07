@@ -22,52 +22,56 @@ class BPath;
 class BTextControl;
 
 
-static const uint32 kMsgApply = 'aply';
-static const uint32 kMsgRevert = 'rvrt';
-static const uint32 kMsgClose = 'clse';
-static const uint32 kMsgField = 'fild';
-static const uint32 kMsgInfo = 'info';
-static const uint32 kMsgMode = 'mode';
-static const uint32	kMsgChange = 'chng';
-
-
 class EthernetSettingsView : public BView {
-	public:
-		EthernetSettingsView(BRect frame);
-		virtual ~EthernetSettingsView();
+public:
+								EthernetSettingsView();
+		virtual					~EthernetSettingsView();
 		
-		virtual void MessageReceived(BMessage* message);
-		virtual void AttachedToWindow();
-		virtual void DetachedFromWindow();
+		virtual	void			MessageReceived(BMessage* message);
+		virtual	void			AttachedToWindow();
+		virtual	void			DetachedFromWindow();
 		
-		void SaveProfile(BString profileName);
-		void LoadProfile(BString profileName);
-	private:
-		
-		BButton* fApplyButton;
-		BButton* fRevertButton;
-		BMenuField* fDeviceMenuField;
-		BMenuField* fTypeMenuField;
-		BTextControl* fIPTextControl;
-		BTextControl* fNetMaskTextControl;
-		BTextControl* fGatewayTextControl;
-		BTextControl* fPrimaryDNSTextControl;
-		BTextControl* fSecondaryDNSTextControl;
-		BObjectList<BString> fInterfaces;
-		BObjectList<Settings> fSettings;
-		Settings* fCurrentSettings;
+				void			SaveProfile(BString profileName);
+				void			LoadProfile(BString profileName);
 
-		int32	fStatus;
-		int		fSocket;
-		void	_GatherInterfaces();
-		bool	_PrepareRequest(struct ifreq& request, const char* name);
-		void 	_ShowConfiguration(Settings* settings);
-		void	_EnableTextControls(bool enable);
-		void 	_SaveConfiguration();
-		void 	_SaveDNSConfiguration();
-		void 	_SaveAdaptersConfiguration();
-		void	_ApplyControlsToConfiguration();
-		status_t _GetPath(const char* name, BPath& path);
+private:
+				void			_GatherInterfaces();
+				bool			_PrepareRequest(struct ifreq& request,
+									const char* name);
+				void 			_ShowConfiguration(Settings* settings);
+				void			_EnableTextControls(bool enable);
+				void			_SaveConfiguration();
+				void			_SaveDNSConfiguration();
+				void			_SaveAdaptersConfiguration();
+				void			_ApplyControlsToConfiguration();
+				status_t		_GetPath(const char* name, BPath& path);
+private:
+		
+				BButton*		fApplyButton;
+				BButton*		fRevertButton;
+					// TODO: buttons should be moved to window instead
+
+				BMenuField*		fDeviceMenuField;
+				BMenuField*		fTypeMenuField;
+				BTextControl*	fIPTextControl;
+				BTextControl*	fNetMaskTextControl;
+				BTextControl*	fGatewayTextControl;
+
+				BTextControl*	fPrimaryDNSTextControl;
+				BTextControl*	fSecondaryDNSTextControl;
+					// TODO: DNS settings do not belong here, do they?
+				BObjectList<BString> fInterfaces;
+					// TODO: the view should not know about the interfaces,
+					// it should only display the given interface, move
+					// one level up.
+				BObjectList<Settings> fSettings;
+					// TODO: the view should not know about a list
+					// of settings, instead it should be configured
+					// to a specific setting from the code one level up
+				Settings*		fCurrentSettings;
+
+				int32			fStatus;
+				int				fSocket;
 };
 
 #endif /* ETHERNET_SETTINGS_VIEW_H */
