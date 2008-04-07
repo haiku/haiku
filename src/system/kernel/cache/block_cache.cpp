@@ -293,40 +293,20 @@ static DoublyLinkedListLink<block_cache> sMarkCache;
 static object_cache *sBlockCache;
 
 
-//	#pragma mark - private transaction
+//	#pragma mark - notifications/listener
 
 
-cache_transaction::cache_transaction()
+static inline bool
+is_closing_event(int32 event)
 {
-	num_blocks = 0;
-	main_num_blocks = 0;
-	sub_num_blocks = 0;
-	first_block = NULL;
-	open = true;
-	last_used = system_time();
+	return (event & (TRANSACTION_ABORTED | TRANSACTION_ENDED)) != 0;
 }
 
 
-static int
-transaction_compare(void *_transaction, const void *_id)
+static inline bool
+is_written_event(int32 event)
 {
-	cache_transaction *transaction = (cache_transaction *)_transaction;
-	const int32 *id = (const int32 *)_id;
-
-	return transaction->id - *id;
-}
-
-
-static uint32
-transaction_hash(void *_transaction, const void *_id, uint32 range)
-{
-	cache_transaction *transaction = (cache_transaction *)_transaction;
-	const int32 *id = (const int32 *)_id;
-
-	if (transaction != NULL)
-		return transaction->id % range;
-
-	return (uint32)*id % range;
+	return (event & TRANSACTION_WRITTEN) != 0;
 }
 
 
@@ -399,25 +379,31 @@ add_notification(block_cache *cache, cache_notification *notification,
 
 
 /*!	Notifies all interested listeners of this transaction about the \a event.
-	If requested via \a removeListeners, the listeners will be removed
-	afterwards.
+	If \a event is a closing event (ie. TRANSACTION_ENDED, and
+	TRANSACTION_ABORTED), all listeners except those listening to
+	TRANSACTION_WRITTEN will be removed.
 */
 static void
 notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
-	int32 event, bool removeListeners)
+	int32 event)
 {
 	T(Action("notify", cache, transaction));
+
+	bool isClosing = is_closing_event(event);
+	bool isWritten = is_written_event(event);
 
 	ListenerList::Iterator iterator = transaction->listeners.GetIterator();
 	while (iterator.HasNext()) {
 		cache_listener *listener = iterator.Next();
 
-		if (removeListeners)
+		bool remove = isClosing && !is_written_event(listener->events)
+			|| isWritten && is_written_event(listener->events);
+		if (remove)
 			iterator.Remove();
 
 		if ((listener->events & event) != 0)
-			add_notification(cache, listener, event, removeListeners);
-		else if (removeListeners) {
+			add_notification(cache, listener, event, remove);
+		else if (remove) {
 			// we might need to defer the deletion if its currently in use
 			MutexLocker locker(sNotificationsLock);
 			if (listener->events_pending != 0)
@@ -425,6 +411,59 @@ notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
 			else
 				delete listener;
 		}
+	}
+}
+
+
+static void
+flush_pending_notifications(block_cache *cache)
+{
+	while (true) {
+		MutexLocker locker(sNotificationsLock);
+
+		cache_notification *notification = cache->pending_notifications.Head();
+		if (notification == NULL)
+			return;
+
+		bool deleteAfterEvent = false;
+		int32 event = -1;
+		if (!get_next_pending_event(notification, &event)) {
+			// remove the notification if this was the last pending event
+			cache->pending_notifications.Remove(notification);
+			deleteAfterEvent = notification->delete_after_event;
+		}
+
+		if (event >= 0) {
+			// Notify listener, we need to copy the notification, as it might
+			// be removed when we unlock the list.
+			cache_notification copy = *notification;
+			locker.Unlock();
+
+			copy.hook(copy.transaction_id, event, copy.data);
+
+			locker.Lock();
+		}
+
+		if (deleteAfterEvent)
+			delete notification;
+	}
+}
+
+
+/*!	Flushes all pending notifications by calling the appropriate hook
+	functions.
+	Must not be called with a cache lock held.
+*/
+static void
+flush_pending_notifications()
+{
+	MutexLocker _(sCachesLock);
+
+	DoublyLinkedList<block_cache>::Iterator iterator = sCaches.GetIterator();
+	while (iterator.HasNext()) {
+		block_cache *cache = iterator.Next();
+
+		flush_pending_notifications(cache);
 	}
 }
 
@@ -474,6 +513,43 @@ add_transaction_listener(block_cache *cache, cache_transaction *transaction,
 	set_notification(transaction, *listener, events, hookFunction, data);
 	transaction->listeners.Add(listener);
 	return B_OK;
+}
+
+
+//	#pragma mark - private transaction
+
+
+cache_transaction::cache_transaction()
+{
+	num_blocks = 0;
+	main_num_blocks = 0;
+	sub_num_blocks = 0;
+	first_block = NULL;
+	open = true;
+	last_used = system_time();
+}
+
+
+static int
+transaction_compare(void *_transaction, const void *_id)
+{
+	cache_transaction *transaction = (cache_transaction *)_transaction;
+	const int32 *id = (const int32 *)_id;
+
+	return transaction->id - *id;
+}
+
+
+static uint32
+transaction_hash(void *_transaction, const void *_id, uint32 range)
+{
+	cache_transaction *transaction = (cache_transaction *)_transaction;
+	const int32 *id = (const int32 *)_id;
+
+	if (transaction != NULL)
+		return transaction->id % range;
+
+	return (uint32)*id % range;
 }
 
 
@@ -1081,9 +1157,9 @@ write_cached_block(block_cache *cache, cached_block *block,
 		// Has the previous transation been finished with that write?
 		if (--previous->num_blocks == 0) {
 			TRACE(("cache transaction %ld finished!\n", previous->id));
+			T(Action("written", cache, previous));
 
-			notify_transaction_listeners(cache, previous, TRANSACTION_WRITTEN,
-				true);
+			notify_transaction_listeners(cache, previous, TRANSACTION_WRITTEN);
 
 			if (deleteTransaction) {
 				hash_remove(cache->transaction_hash, previous);
@@ -1396,59 +1472,6 @@ get_next_locked_block_cache(block_cache *last)
 }
 
 
-static void
-flush_pending_notifications(block_cache *cache)
-{
-	while (true) {
-		MutexLocker locker(sNotificationsLock);
-
-		cache_notification *notification = cache->pending_notifications.Head();
-		if (notification == NULL)
-			return;
-
-		bool deleteAfterEvent = false;
-		int32 event = -1;
-		if (!get_next_pending_event(notification, &event)) {
-			// remove the notification if this was the last pending event
-			cache->pending_notifications.Remove(notification);
-			deleteAfterEvent = notification->delete_after_event;
-		}
-
-		if (event >= 0) {
-			// Notify listener, we need to copy the notification, as it might
-			// be removed when we unlock the list.
-			cache_notification copy = *notification;
-			locker.Unlock();
-
-			copy.hook(copy.transaction_id, event, copy.data);
-
-			locker.Lock();
-		}
-
-		if (deleteAfterEvent)
-			delete notification;
-	}
-}
-
-
-/*!	Flushes all pending notifications by calling the appropriate hook
-	functions.
-	Must not be called with a cache lock held.
-*/
-static void
-flush_pending_notifications()
-{
-	MutexLocker _(sCachesLock);
-
-	DoublyLinkedList<block_cache>::Iterator iterator = sCaches.GetIterator();
-	while (iterator.HasNext()) {
-		block_cache *cache = iterator.Next();
-
-		flush_pending_notifications(cache);
-	}
-}
-
-
 static status_t
 block_notifier_and_writer(void *)
 {
@@ -1504,7 +1527,7 @@ block_notifier_and_writer(void *)
 								+ kTransactionIdleTime) {
 							// Transaction is open but idle
 							notify_transaction_listeners(cache, transaction,
-								TRANSACTION_IDLE, false);
+								TRANSACTION_IDLE);
 						}
 						continue;
 					}
@@ -1720,6 +1743,8 @@ cache_end_transaction(void *_cache, int32 id,
 		return B_BAD_VALUE;
 	}
 
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED);
+
 	if (add_transaction_listener(cache, transaction, TRANSACTION_WRITTEN, hook,
 			data) != B_OK) {
 		return B_NO_MEMORY;
@@ -1757,8 +1782,6 @@ cache_end_transaction(void *_cache, int32 id,
 	}
 
 	transaction->open = false;
-	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED, true);
-
 	return B_OK;
 }
 
@@ -1778,7 +1801,7 @@ cache_abort_transaction(void *_cache, int32 id)
 	}
 
 	T(Abort(cache, transaction));
-	notify_transaction_listeners(cache, transaction, TRANSACTION_ABORTED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ABORTED);
 
 	// iterate through all blocks and restore their original contents
 
@@ -1835,14 +1858,16 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	if (transaction == NULL)
 		return B_NO_MEMORY;
 
+	newTransaction->id = atomic_add(&cache->next_transaction_id, 1);
+	T(Detach(cache, transaction, newTransaction));
+
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED);
+
 	if (add_transaction_listener(cache, transaction, TRANSACTION_WRITTEN, hook,
 			data) != B_OK) {
 		delete newTransaction;
 		return B_NO_MEMORY;
 	}
-
-	newTransaction->id = atomic_add(&cache->next_transaction_id, 1);
-	T(Detach(cache, transaction, newTransaction));
 
 	// iterate through all blocks and free the unchanged original contents
 
@@ -1892,7 +1917,6 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	transaction->has_sub_transaction = false;
 	transaction->num_blocks = transaction->main_num_blocks;
 	transaction->sub_num_blocks = 0;
-	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED, true);
 
 	hash_insert_grow(cache->transaction_hash, newTransaction);
 	cache->last_transaction = newTransaction;
@@ -1918,7 +1942,7 @@ cache_abort_sub_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 
 	T(Abort(cache, transaction));
-	notify_transaction_listeners(cache, transaction, TRANSACTION_ABORTED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ABORTED);
 
 	// revert all changes back to the version of the parent
 
@@ -1966,7 +1990,7 @@ cache_start_sub_transaction(void *_cache, int32 id)
 		return B_BAD_VALUE;
 	}
 
-	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED, true);
+	notify_transaction_listeners(cache, transaction, TRANSACTION_ENDED);
 
 	// move all changed blocks up to the parent
 
