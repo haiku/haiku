@@ -163,6 +163,8 @@ extern void pthread_exit(void *value_ptr);
 extern int pthread_join(pthread_t thread, void **_value);
 extern pthread_t pthread_self(void);
 extern int pthread_kill(pthread_t thread, int sig);
+extern int pthread_getconcurrency(void);
+extern int pthread_setconcurrency(int newLevel);
 
 extern int pthread_cancel(pthread_t thread);
 extern int pthread_setcancelstate(int state, int *_oldState);

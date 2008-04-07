@@ -19,6 +19,7 @@ static const pthread_attr pthread_attr_default = {
 
 
 static int32 sPthreadSlot = -1;
+static int sConcurrencyLevel;
 
 
 struct pthread_thread *
@@ -157,3 +158,20 @@ pthread_detach(pthread_t thread)
 	return 0;
 }
 
+
+int
+pthread_getconcurrency(void)
+{
+	return sConcurrencyLevel;
+}
+
+
+int
+pthread_setconcurrency(int newLevel)
+{
+	if (newLevel < 0)
+		return EINVAL;
+
+	sConcurrencyLevel = newLevel;
+	return 0;
+}
