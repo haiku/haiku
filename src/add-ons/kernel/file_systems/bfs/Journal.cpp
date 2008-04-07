@@ -727,8 +727,13 @@ Journal::_WriteTransactionToLog()
 
 	// If necessary, flush the log, so that we have enough space for this
 	// transaction
-	if (runArrays.LogEntryLength() > FreeLogBlocks())
+	if (runArrays.LogEntryLength() > FreeLogBlocks()) {
 		cache_sync_transaction(fVolume->BlockCache(), fTransactionID);
+		if (runArrays.LogEntryLength() > FreeLogBlocks()) {
+			panic("no space in log after sync (%ld for %ld blocks)!",
+				(long)FreeLogBlocks(), (long)runArrays.LogEntryLength());
+		}
+	}
 
 	// Write log entries to disk
 
