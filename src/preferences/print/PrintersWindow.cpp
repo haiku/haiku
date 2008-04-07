@@ -194,15 +194,15 @@ void PrintersWindow::BuildGUI()
 
 		// Resize all buttons to maximum width and align them to the right
 	float xPos = printersBox->Bounds().Width()-boxInset-maxWidth;
-	addButton->MoveTo(xPos, boxInset +5);
+	addButton->MoveTo(xPos, boxInset +8);
 	addButton->ResizeTo(maxWidth, addButton->Bounds().Height());
 
-	fRemove->MoveTo(xPos, boxInset + addButton->Bounds().Height() + boxInset +5);
+	fRemove->MoveTo(xPos, boxInset + addButton->Bounds().Height() + boxInset +8);
 	fRemove->ResizeTo(maxWidth, fRemove->Bounds().Height());
 
 	fMakeDefault->MoveTo(xPos, boxInset + addButton->Bounds().Height() +
 									boxInset + fRemove->Bounds().Height() +
-									boxInset +5);
+									boxInset +8);
 	fMakeDefault->ResizeTo(maxWidth, fMakeDefault->Bounds().Height());
 
 		// Disable all selection-based buttons
@@ -210,8 +210,8 @@ void PrintersWindow::BuildGUI()
 	fMakeDefault->SetEnabled(false);
 
 		// Create listview with scroller
-	BRect listBounds(boxInset, boxInset+5, fMakeDefault->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
-					printersBox->Bounds().Height()-boxInset);
+	BRect listBounds(boxInset, boxInset+8, fMakeDefault->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
+					printersBox->Bounds().Height()-boxInset-3);
 	fPrinterListView = new PrinterListView(listBounds);
 	BScrollView* pscroller = new BScrollView("printer_scroller", fPrinterListView,
 								B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
@@ -243,10 +243,10 @@ void PrintersWindow::BuildGUI()
 
 		// Resize all buttons to maximum width and align them to the right
 	xPos = fJobsBox->Bounds().Width()-boxInset-maxWidth;
-	cancelButton->MoveTo(xPos, boxInset +5);
+	cancelButton->MoveTo(xPos, boxInset +8);
 	cancelButton->ResizeTo(maxWidth, cancelButton->Bounds().Height());
 
-	restartButton->MoveTo(xPos, boxInset + cancelButton->Bounds().Height() + boxInset +5);
+	restartButton->MoveTo(xPos, boxInset + cancelButton->Bounds().Height() + boxInset +8);
 	restartButton->ResizeTo(maxWidth, restartButton->Bounds().Height());
 
 		// Disable all selection-based buttons
@@ -254,8 +254,8 @@ void PrintersWindow::BuildGUI()
 	restartButton->SetEnabled(false);
 
 		// Create listview with scroller
-	listBounds = BRect(boxInset, boxInset+5, cancelButton->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
-					fJobsBox->Bounds().Height()-boxInset);
+	listBounds = BRect(boxInset, boxInset+8, cancelButton->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
+					fJobsBox->Bounds().Height()-boxInset-3);
 	fJobListView = new JobListView(listBounds);
 	BScrollView* jscroller = new BScrollView("jobs_scroller", fJobListView,
 								B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
