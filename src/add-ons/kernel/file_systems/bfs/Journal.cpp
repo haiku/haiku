@@ -65,13 +65,73 @@ class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
 		uint32 Start() const { return fStart; }
 		uint32 Length() const { return fLength; }
 
+#ifdef BFS_DEBUGGER_COMMANDS
+		void SetTransactionID(int32 id) { fTransactionID = id; }
+		int32 TransactionID() const { return fTransactionID; }
+#endif
+
 		Journal *GetJournal() { return fJournal; }
 
 	private:
 		Journal		*fJournal;
 		uint32		fStart;
 		uint32		fLength;
+#ifdef BFS_DEBUGGER_COMMANDS
+		int32		fTransactionID;
+#endif
 };
+
+
+#if defined(BFS_TRACING) && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
+namespace BFSJournalTracing {
+
+class LogEntry : public AbstractTraceEntry {
+	public:
+		LogEntry(::LogEntry* entry, off_t logPosition, bool started)
+			:
+			fEntry(entry),
+#ifdef BFS_DEBUGGER_COMMANDS
+			fTransactionID(entry->TransactionID()),
+#endif
+			fStart(entry->Start()),
+			fLength(entry->Length()),
+			fLogPosition(logPosition),
+			fStarted(started)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+#ifdef BFS_DEBUGGER_COMMANDS
+			out.Print("bfs:j:%s entry %p id %ld, start %lu, length %lu, log %s "
+				"%lu\n", fStarted ? "Started" : "Written", fEntry,
+				fTransactionID, fStart, fLength,
+				fStarted ? "end" : "start", fLogPosition);
+#else
+			out.Print("bfs:j:%s entry %p start %lu, length %lu, log %s %lu\n",
+				fStarted ? "Started" : "Written", fEntry, fStart, fLength,
+				fStarted ? "end" : "start", fLogPosition);
+#endif
+		}
+
+	private:
+		::LogEntry*	fEntry;
+#ifdef BFS_DEBUGGER_COMMANDS
+		int32		fTransactionID;
+#endif
+		uint32		fStart;
+		uint32		fLength;
+		uint32		fLogPosition;
+		bool		fStarted;
+};
+
+}	// namespace BFSJournalTracing
+
+#	define T(x) new(std::nothrow) BFSJournalTracing::x;
+#else
+#	define T(x) ;
+#endif
 
 
 //	#pragma mark -
@@ -516,8 +576,9 @@ Journal::ReplayLog()
 	}
 
 	PRINT(("replaying worked fine!\n"));
-	fVolume->SuperBlock().log_start = fVolume->LogEnd();
-	fVolume->LogStart() = fVolume->LogEnd();
+	fVolume->SuperBlock().log_start = HOST_ENDIAN_TO_BFS_INT64(
+		fVolume->LogEnd());
+	fVolume->LogStart() = HOST_ENDIAN_TO_BFS_INT64(fVolume->LogEnd());
 	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_CLEAN;
 
 	return fVolume->WriteSuperBlock();
@@ -543,19 +604,23 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 	bool update = false;
 
 	// Set log_start pointer if possible...
-	// TODO: this is not endian safe!
 
 	journal->fEntriesLock.Lock();
 
 	if (logEntry == journal->fEntries.First()) {
 		LogEntry *next = journal->fEntries.GetNext(logEntry);
-		if (next != NULL)
-			superBlock.log_start = next->Start() % journal->fLogSize;
-		else
-			superBlock.log_start = journal->fVolume->LogEnd();
+		if (next != NULL) {
+			superBlock.log_start = HOST_ENDIAN_TO_BFS_INT64(next->Start()
+				% journal->fLogSize);
+		} else {
+			superBlock.log_start = HOST_ENDIAN_TO_BFS_INT64(
+				journal->fVolume->LogEnd());
+		}
 
 		update = true;
 	}
+
+	T(LogEntry(logEntry, superBlock.LogStart(), false));
 
 	journal->fUsed -= logEntry->Length();
 	journal->fEntries.Remove(logEntry);
@@ -575,14 +640,14 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void *_logEntry)
 				strerror(status)));
 		}
 
-		journal->fVolume->LogStart() = superBlock.log_start;
+		journal->fVolume->LogStart() = superBlock.LogStart();
 	}
 }
 
 
 /*!	Listens to TRANSACTION_IDLE events, and flushes the log when that happens */
 /*static*/ void
-Journal::_TransactionListener(int32 transactionID, int32 event, void *_journal)
+Journal::_TransactionIdle(int32 transactionID, int32 event, void *_journal)
 {
 	// The current transaction seems to be idle - flush it
 
@@ -747,13 +812,19 @@ Journal::_WriteTransactionToLog()
 		return B_NO_MEMORY;
 	}
 
+#ifdef BFS_DEBUGGER_COMMANDS
+	logEntry->SetTransactionID(fTransactionID);
+#endif
+
 	// Update the log end pointer in the super block
 
 	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_DIRTY;
-	fVolume->SuperBlock().log_end = logPosition;
-	fVolume->LogEnd() = logPosition;
+	fVolume->SuperBlock().log_end = HOST_ENDIAN_TO_BFS_INT64(logPosition);
 
 	status = fVolume->WriteSuperBlock();
+
+	fVolume->LogEnd() = logPosition;
+	T(LogEntry(logEntry, fVolume->LogEnd(), true));
 
 	// We need to flush the drives own cache here to ensure
 	// disk consistency.
@@ -858,7 +929,7 @@ Journal::Lock(Transaction *owner)
 	}
 
 	cache_add_transaction_listener(fVolume->BlockCache(), fTransactionID,
-		TRANSACTION_IDLE, _TransactionListener, this);
+		TRANSACTION_IDLE, _TransactionIdle, this);
 
 	return B_OK;
 }
@@ -922,6 +993,48 @@ Journal::_TransactionDone(bool success)
 
 	return _WriteTransactionToLog();
 }
+
+
+//	#pragma mark - debugger commands
+
+
+#ifdef BFS_DEBUGGER_COMMANDS
+
+void
+Journal::Dump()
+{
+	kprintf("log start: %ld\n", fVolume->LogStart());
+	kprintf("log end:   %ld\n", fVolume->LogEnd());
+	kprintf("entries:\n");
+	kprintf("  address        id  start length\n");
+
+	LogEntryList::Iterator iterator = fEntries.GetIterator();
+
+	while (iterator.HasNext()) {
+		LogEntry *entry = iterator.Next();
+
+		kprintf("  %p %6ld %6lu %6lu\n", entry, entry->TransactionID(),
+			entry->Start(), entry->Length());
+	}
+}
+
+
+int
+dump_journal(int argc, char **argv)
+{
+	if (argc != 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: %s <ptr-to-volume>\n", argv[0]);
+		return 0;
+	}
+
+	Volume *volume = (Volume *)parse_expression(argv[1]);
+	Journal *journal = volume->GetJournal(0);
+
+	journal->Dump();
+	return 0;
+}
+
+#endif	// BFS_DEBUGGER_COMMANDS
 
 
 //	#pragma mark - Transaction

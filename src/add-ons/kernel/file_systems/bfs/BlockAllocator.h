@@ -46,7 +46,7 @@ class BlockAllocator {
 		size_t BitmapSize() const;
 
 #ifdef BFS_DEBUGGER_COMMANDS
-		void Dump();
+		void Dump(int32 index);
 #endif
 
 	private:

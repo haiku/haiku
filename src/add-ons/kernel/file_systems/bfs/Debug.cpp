@@ -10,6 +10,7 @@
 #include "BlockAllocator.h"
 #include "BPlusTree.h"
 #include "Inode.h"
+#include "Journal.h"
 
 #define Print __out
 
@@ -36,7 +37,8 @@ get_tupel(uint32 id)
 void
 dump_block_run(const char *prefix, const block_run &run)
 {
-	Print("%s(%d, %d, %d)\n", prefix, (int)run.allocation_group, run.start, run.length);
+	Print("%s(%d, %d, %d)\n", prefix, (int)run.allocation_group, run.start,
+		run.length);
 }
 
 
@@ -45,22 +47,33 @@ dump_super_block(const disk_super_block *superBlock)
 {
 	Print("disk_super_block:\n");
 	Print("  name           = %s\n", superBlock->name);
-	Print("  magic1         = %#08x (%s) %s\n", (int)superBlock->magic1, get_tupel(superBlock->magic1), (superBlock->magic1 == SUPER_BLOCK_MAGIC1 ? "valid" : "INVALID"));
-	Print("  fs_byte_order  = %#08x (%s)\n", (int)superBlock->fs_byte_order, get_tupel(superBlock->fs_byte_order));
-	Print("  block_size     = %u\n", (unsigned)superBlock->block_size);
-	Print("  block_shift    = %u\n", (unsigned)superBlock->block_shift);
-	Print("  num_blocks     = %Lu\n", superBlock->num_blocks);
-	Print("  used_blocks    = %Lu\n", superBlock->used_blocks);
-	Print("  inode_size     = %u\n", (unsigned)superBlock->inode_size);
-	Print("  magic2         = %#08x (%s) %s\n", (int)superBlock->magic2, get_tupel(superBlock->magic2), (superBlock->magic2 == (int)SUPER_BLOCK_MAGIC2 ? "valid" : "INVALID"));
-	Print("  blocks_per_ag  = %u\n", (unsigned)superBlock->blocks_per_ag);
-	Print("  ag_shift       = %u (%ld bytes)\n", (unsigned)superBlock->ag_shift, 1L << superBlock->ag_shift);
-	Print("  num_ags        = %u\n", (unsigned)superBlock->num_ags);
-	Print("  flags          = %#08x (%s)\n", (int)superBlock->flags, get_tupel(superBlock->flags));
+	Print("  magic1         = %#08x (%s) %s\n", (int)superBlock->Magic1(),
+		get_tupel(superBlock->magic1),
+		(superBlock->magic1 == SUPER_BLOCK_MAGIC1 ? "valid" : "INVALID"));
+	Print("  fs_byte_order  = %#08x (%s)\n", (int)superBlock->fs_byte_order,
+		get_tupel(superBlock->fs_byte_order));
+	Print("  block_size     = %u\n", (unsigned)superBlock->BlockSize());
+	Print("  block_shift    = %u\n", (unsigned)superBlock->BlockShift());
+	Print("  num_blocks     = %Lu\n", superBlock->NumBlocks());
+	Print("  used_blocks    = %Lu\n", superBlock->UsedBlocks());
+	Print("  inode_size     = %u\n", (unsigned)superBlock->InodeSize());
+	Print("  magic2         = %#08x (%s) %s\n", (int)superBlock->Magic2(),
+		get_tupel(superBlock->magic2),
+		(superBlock->magic2 == (int)SUPER_BLOCK_MAGIC2 ? "valid" : "INVALID"));
+	Print("  blocks_per_ag  = %u\n",
+		(unsigned)superBlock->BlocksPerAllocationGroup());
+	Print("  ag_shift       = %u (%ld bytes)\n",
+		(unsigned)superBlock->AllocationGroupShift(),
+		1L << superBlock->AllocationGroupShift());
+	Print("  num_ags        = %u\n", (unsigned)superBlock->AllocationGroups());
+	Print("  flags          = %#08x (%s)\n", (int)superBlock->Flags(),
+		get_tupel(superBlock->Flags()));
 	dump_block_run("  log_blocks     = ", superBlock->log_blocks);
-	Print("  log_start      = %Lu\n", superBlock->log_start);
-	Print("  log_end        = %Lu\n", superBlock->log_end);
-	Print("  magic3         = %#08x (%s) %s\n", (int)superBlock->magic3, get_tupel(superBlock->magic3), (superBlock->magic3 == SUPER_BLOCK_MAGIC3 ? "valid" : "INVALID"));
+	Print("  log_start      = %Lu\n", superBlock->LogStart());
+	Print("  log_end        = %Lu\n", superBlock->LogEnd());
+	Print("  magic3         = %#08x (%s) %s\n", (int)superBlock->Magic3(),
+		get_tupel(superBlock->magic3),
+		(superBlock->magic3 == SUPER_BLOCK_MAGIC3 ? "valid" : "INVALID"));
 	dump_block_run("  root_dir       = ", superBlock->root_dir);
 	dump_block_run("  indices        = ", superBlock->indices);
 }
@@ -72,22 +85,25 @@ dump_data_stream(const data_stream *stream)
 	Print("data_stream:\n");
 	for (int i = 0; i < NUM_DIRECT_BLOCKS; i++) {
 		if (!stream->direct[i].IsZero()) {
-			Print("  direct[%02d]                = ",i);
-			dump_block_run("",stream->direct[i]);
+			Print("  direct[%02d]                = ", i);
+			dump_block_run("", stream->direct[i]);
 		}
 	}
-	Print("  max_direct_range          = %Lu\n", stream->max_direct_range);
+	Print("  max_direct_range          = %Lu\n", stream->MaxDirectRange());
 
 	if (!stream->indirect.IsZero())
 		dump_block_run("  indirect                  = ", stream->indirect);
 
-	Print("  max_indirect_range        = %Lu\n", stream->max_indirect_range);
+	Print("  max_indirect_range        = %Lu\n", stream->MaxIndirectRange());
 
-	if (!stream->double_indirect.IsZero())
-		dump_block_run("  double_indirect           = ", stream->double_indirect);
+	if (!stream->double_indirect.IsZero()) {
+		dump_block_run("  double_indirect           = ",
+			stream->double_indirect);
+	}
 
-	Print("  max_double_indirect_range = %Lu\n", stream->max_double_indirect_range);
-	Print("  size                      = %Lu\n", stream->size);
+	Print("  max_double_indirect_range = %Lu\n",
+		stream->MaxDoubleIndirectRange());
+	Print("  size                      = %Lu\n", stream->Size());
 }
 
 
@@ -95,25 +111,26 @@ void
 dump_inode(const bfs_inode *inode)
 {
 	Print("inode:\n");
-	Print("  magic1             = %08x (%s) %s\n", (int)inode->magic1,
-		get_tupel(inode->magic1), (inode->magic1 == INODE_MAGIC1 ? "valid" : "INVALID"));
+	Print("  magic1             = %08x (%s) %s\n", (int)inode->Magic1(),
+		get_tupel(inode->magic1),
+		(inode->magic1 == INODE_MAGIC1 ? "valid" : "INVALID"));
 	dump_block_run(	"  inode_num          = ", inode->inode_num);
-	Print("  uid                = %u\n", (unsigned)inode->uid);
-	Print("  gid                = %u\n", (unsigned)inode->gid);
-	Print("  mode               = %08x\n", (int)inode->mode);
-	Print("  flags              = %08x\n", (int)inode->flags);
-	Print("  create_time        = %Ld (%Ld)\n", inode->create_time,
-		inode->create_time >> INODE_TIME_SHIFT);
-	Print("  last_modified_time = %Ld (%Ld)\n", inode->last_modified_time,
-		inode->last_modified_time >> INODE_TIME_SHIFT);
+	Print("  uid                = %u\n", (unsigned)inode->UserID());
+	Print("  gid                = %u\n", (unsigned)inode->GroupID());
+	Print("  mode               = %08x\n", (int)inode->Mode());
+	Print("  flags              = %08x\n", (int)inode->Flags());
+	Print("  create_time        = %Ld (%Ld)\n", inode->CreateTime(),
+		inode->CreateTime() >> INODE_TIME_SHIFT);
+	Print("  last_modified_time = %Ld (%Ld)\n", inode->LastModifiedTime(),
+		inode->LastModifiedTime() >> INODE_TIME_SHIFT);
 	dump_block_run(	"  parent             = ", inode->parent);
 	dump_block_run(	"  attributes         = ", inode->attributes);
-	Print("  type               = %u\n", (unsigned)inode->type);
-	Print("  inode_size         = %u\n", (unsigned)inode->inode_size);
+	Print("  type               = %u\n", (unsigned)inode->Type());
+	Print("  inode_size         = %u\n", (unsigned)inode->InodeSize());
 	Print("  etc                = %#08x\n", (int)inode->etc);
 	Print("  short_symlink      = %s\n",
-		S_ISLNK(inode->mode) && (inode->flags & INODE_LONG_SYMLINK) == 0 ?
-			inode->short_symlink : "-");
+		S_ISLNK(inode->Mode()) && (inode->Flags() & INODE_LONG_SYMLINK) == 0
+			? inode->short_symlink : "-");
 	dump_data_stream(&(inode->data));
 	Print("  --\n  pad[0]             = %08x\n", (int)inode->pad[0]);
 	Print("  pad[1]             = %08x\n", (int)inode->pad[1]);
@@ -126,14 +143,16 @@ void
 dump_bplustree_header(const bplustree_header *header)
 {
 	Print("bplustree_header:\n");
-	Print("  magic                = %#08x (%s) %s\n", (int)header->magic,
-		get_tupel(header->magic), (header->magic == BPLUSTREE_MAGIC ? "valid" : "INVALID"));
-	Print("  node_size            = %u\n", (unsigned)header->node_size);
-	Print("  max_number_of_levels = %u\n", (unsigned)header->max_number_of_levels);
-	Print("  data_type            = %u\n", (unsigned)header->data_type);
-	Print("  root_node_pointer    = %Ld\n", header->root_node_pointer);
-	Print("  free_node_pointer    = %Ld\n", header->free_node_pointer);
-	Print("  maximum_size         = %Lu\n", header->maximum_size);
+	Print("  magic                = %#08x (%s) %s\n", (int)header->Magic(),
+		get_tupel(header->magic),
+		(header->magic == BPLUSTREE_MAGIC ? "valid" : "INVALID"));
+	Print("  node_size            = %u\n", (unsigned)header->NodeSize());
+	Print("  max_number_of_levels = %u\n",
+		(unsigned)header->MaxNumberOfLevels());
+	Print("  data_type            = %u\n", (unsigned)header->DataType());
+	Print("  root_node_pointer    = %Ld\n", header->RootNode());
+	Print("  free_node_pointer    = %Ld\n", header->FreeNode());
+	Print("  maximum_size         = %Lu\n", header->MaximumSize());
 }
 
 
@@ -279,10 +298,15 @@ dump_volume(int argc, char **argv)
 
 	Volume *volume = (Volume *)parse_expression(argv[1]);
 
-	kprintf("root node: %p\n", volume->RootNode());
+	kprintf("block cache:  %p\n", volume->BlockCache());
+	kprintf("root node:    %p\n", volume->RootNode());
 	kprintf("indices node: %p\n", volume->IndicesNode());
 
 	dump_super_block(&volume->SuperBlock());
+
+	set_debug_variable("_cache", (addr_t)volume->BlockCache());
+	set_debug_variable("_root", (addr_t)volume->RootNode());
+	set_debug_variable("_indices", (addr_t)volume->IndicesNode());
 
 	return 0;
 }
@@ -332,6 +356,7 @@ remove_debugger_commands()
 {
 	remove_debugger_command("bfs_inode", dump_inode);
 	remove_debugger_command("bfs_allocator", dump_block_allocator);
+	remove_debugger_command("bfs_journal", dump_journal);
 	remove_debugger_command("bfs_btree_header", dump_bplustree_header);
 	remove_debugger_command("bfs_btree_node", dump_bplustree_node);
 	remove_debugger_command("bfs", dump_volume);
@@ -344,6 +369,8 @@ add_debugger_commands()
 	add_debugger_command("bfs_inode", dump_inode, "dump an Inode object");
 	add_debugger_command("bfs_allocator", dump_block_allocator,
 		"dump a BFS block allocator");
+	add_debugger_command("bfs_journal", dump_journal,
+		"dump the journal log entries");
 	add_debugger_command("bfs_btree_header", dump_bplustree_header,
 		"dump a BFS B+tree header");
 	add_debugger_command("bfs_btree_node", dump_bplustree_node,

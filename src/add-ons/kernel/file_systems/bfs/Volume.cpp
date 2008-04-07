@@ -509,7 +509,6 @@ Volume::AllocateForInode(Transaction &transaction, const Inode *parent,
 status_t
 Volume::WriteSuperBlock()
 {
-	// TODO: this assumes a block size of 512 bytes of the underlying device
 	if (write_pos(fDevice, 512, &fSuperBlock, sizeof(disk_super_block))
 			!= sizeof(disk_super_block))
 		return B_IO_ERROR;

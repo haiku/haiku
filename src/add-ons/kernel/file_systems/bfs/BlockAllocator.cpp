@@ -1412,14 +1412,16 @@ BlockAllocator::CheckInode(Inode *inode, check_control *control)
 
 #ifdef BFS_DEBUGGER_COMMANDS
 
-
 void
-BlockAllocator::Dump()
+BlockAllocator::Dump(int32 index)
 {
 	kprintf("allocation groups: %ld\n", fNumGroups);
 	kprintf("blocks per group: %ld\n", fBlocksPerGroup);
 
 	for (int32 i = 0; i < fNumGroups; i++) {
+		if (index != -1 && i != index)
+			continue;
+
 		AllocationGroup& group = fGroups[i];
 
 		kprintf("[%3ld] num bits:      %lu\n", i, group.NumBits());
@@ -1436,18 +1438,23 @@ BlockAllocator::Dump()
 int
 dump_block_allocator(int argc, char **argv)
 {
+	int32 group = -1;
+	if (argc == 3) {
+		group = parse_expression(argv[2]);
+		argc--;
+	}
+
 	if (argc != 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: %s <ptr-to-volume>\n", argv[0]);
+		kprintf("usage: %s <ptr-to-volume> [group]\n", argv[0]);
 		return 0;
 	}
 
 	Volume *volume = (Volume *)parse_expression(argv[1]);
 	BlockAllocator &allocator = volume->Allocator();
 
-	allocator.Dump();
+	allocator.Dump(group);
 	return 0;
 }
-
 
 #endif	// BFS_DEBUGGER_COMMANDS
 

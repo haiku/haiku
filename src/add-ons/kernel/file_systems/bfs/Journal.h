@@ -50,6 +50,10 @@ class Journal {
 
 		inline uint32 FreeLogBlocks() const;
 
+#ifdef BFS_DEBUGGER_COMMANDS
+		void Dump();
+#endif
+
 	private:
 		bool _HasSubTransaction() { return fHasSubtransaction; }
 		status_t _FlushLog(bool canWait, bool flushBlocks);
@@ -61,7 +65,7 @@ class Journal {
 
 		static void _TransactionWritten(int32 transactionID, int32 event,
 			void *_logEntry);
-		static void _TransactionListener(int32 transactionID, int32 event,
+		static void _TransactionIdle(int32 transactionID, int32 event,
 			void *_journal);
 
 		Volume			*fVolume;
@@ -175,5 +179,9 @@ class Transaction {
 
 		Journal	*fJournal;
 };
+
+#ifdef BFS_DEBUGGER_COMMANDS
+int dump_journal(int argc, char **argv);
+#endif
 
 #endif	/* JOURNAL_H */
