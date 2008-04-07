@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku Inc. All rights reserved.
+ * Copyright 2006-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,10 +9,7 @@
 #ifndef _USB_RAW_H_
 #define _USB_RAW_H_
 
-
-#include <lock.h>
 #include <USB3.h>
-
 
 typedef enum {
 	RAW_COMMAND_GET_VERSION = 0x1000,
@@ -151,19 +148,5 @@ typedef union {
 		uint32							packet_count;
 	} isochronous;
 } raw_command;
-
-
-typedef struct {
-	usb_device			device;
-	benaphore			lock;
-	uint32				reference_count;
-
-	char				name[32];
-	void				*link;
-
-	sem_id				notify;
-	status_t			status;
-	size_t				actual_length;
-} raw_device;
 
 #endif // _USB_RAW_H_

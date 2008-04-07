@@ -2,12 +2,9 @@ SubDir HAIKU_TOP src add-ons media media-add-ons usb_webcam ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-# for USBKit.h
-UseLibraryHeaders usb ;
-
-# Zeta has a libusb.so, we have a USBKit.a
+# Zeta has a libusb.so, we have it in libdevice.so
 if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	usbKitLibraryName = USBKit.a ;
+	usbKitLibraryName = libdevice.so ;
 } else {
 	usbKitLibraryName = usb ;
 }

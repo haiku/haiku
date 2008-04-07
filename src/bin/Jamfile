@@ -143,10 +143,10 @@ StdBinCommands
 	mail.cpp
 	: be libmail.so : $(haiku-utils_rsrc) ;
 
-# standard commands that need libbe.so, and the USB Kit
+# standard commands that need libbe.so, libdevice.so
 StdBinCommands
 	usb_dev_info.cpp
-	: be USBKit.a : $(haiku-utils_rsrc) ;
+	: be libdevice.so : $(haiku-utils_rsrc) ;
 
 # standard commands that need libbe.so, libtracker.so
 StdBinCommands
