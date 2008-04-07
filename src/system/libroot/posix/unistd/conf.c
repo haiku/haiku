@@ -58,6 +58,8 @@ sysconf(int name)
 			return MAX_GROUP_BUFFER_SIZE;
 		case _SC_GETPW_R_SIZE_MAX:
 			return MAX_PASSWD_BUFFER_SIZE;
+		case _SC_PAGE_SIZE:
+			return B_PAGE_SIZE;
 	}
 
 	return -1;

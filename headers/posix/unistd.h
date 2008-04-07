@@ -59,6 +59,8 @@
 #define _SC_VERSION				24
 #define _SC_GETGR_R_SIZE_MAX	25
 #define _SC_GETPW_R_SIZE_MAX	26
+#define _SC_PAGE_SIZE			27
+#define _SC_PAGESIZE			_SC_PAGE_SIZE
 
 /* lseek() constants */
 #ifndef SEEK_SET
