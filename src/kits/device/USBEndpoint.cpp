@@ -17,15 +17,14 @@ BUSBEndpoint::BUSBEndpoint(BUSBInterface *interface, uint32 index, int rawFD)
 		fIndex(index),
 		fRawFD(rawFD)
 {
-	raw_command command;
+	usb_raw_command command;
 	command.endpoint.descriptor = &fDescriptor;
 	command.endpoint.config_index = fInterface->Configuration()->Index();
 	command.endpoint.interface_index = fInterface->Index();
 	command.endpoint.endpoint_index = fIndex;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR, &command, sizeof(command))
-		|| command.config.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ENDPOINT_DESCRIPTOR, &command,
+		sizeof(command)) || command.config.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
-	}
 }
 
 
@@ -132,7 +131,7 @@ BUSBEndpoint::ControlTransfer(uint8 requestType, uint8 request, uint16 value,
 	if (length > 0 && data == NULL)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.control.request_type = requestType;
 	command.control.request = request;
 	command.control.value = value;
@@ -140,10 +139,9 @@ BUSBEndpoint::ControlTransfer(uint8 requestType, uint8 request, uint16 value,
 	command.control.length = length;
 	command.control.data = data;
 
-	if (ioctl(fRawFD, RAW_COMMAND_CONTROL_TRANSFER, &command, sizeof(command))
-		|| command.control.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_CONTROL_TRANSFER, &command,
+		sizeof(command)) || command.control.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	return command.control.length;
 }
@@ -155,16 +153,15 @@ BUSBEndpoint::InterruptTransfer(void *data, size_t length) const
 	if (length > 0 && data == NULL)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.transfer.interface = fInterface->Index();
 	command.transfer.endpoint = fIndex;
 	command.transfer.data = data;
 	command.transfer.length = length;
 
-	if (ioctl(fRawFD, RAW_COMMAND_INTERRUPT_TRANSFER, &command, sizeof(command))
-		|| command.transfer.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_INTERRUPT_TRANSFER, &command,
+		sizeof(command)) || command.transfer.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	return command.transfer.length;
 }
@@ -176,16 +173,15 @@ BUSBEndpoint::BulkTransfer(void *data, size_t length) const
 	if (length > 0 && data == NULL)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.transfer.interface = fInterface->Index();
 	command.transfer.endpoint = fIndex;
 	command.transfer.data = data;
 	command.transfer.length = length;
 
-	if (ioctl(fRawFD, RAW_COMMAND_BULK_TRANSFER, &command, sizeof(command))
-		|| command.transfer.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_BULK_TRANSFER, &command,
+		sizeof(command)) || command.transfer.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	return command.transfer.length;
 }
@@ -198,7 +194,7 @@ BUSBEndpoint::IsochronousTransfer(void *data, size_t length,
 	if (length > 0 && data == NULL)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.isochronous.interface = fInterface->Index();
 	command.isochronous.endpoint = fIndex;
 	command.isochronous.data = data;
@@ -206,10 +202,9 @@ BUSBEndpoint::IsochronousTransfer(void *data, size_t length,
 	command.isochronous.packet_descriptors = packetDescriptors;
 	command.isochronous.packet_count = packetCount;
 
-	if (ioctl(fRawFD, RAW_COMMAND_ISOCHRONOUS_TRANSFER, &command, sizeof(command))
-		|| command.isochronous.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_ISOCHRONOUS_TRANSFER, &command,
+		sizeof(command)) || command.isochronous.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	return command.isochronous.length;
 }

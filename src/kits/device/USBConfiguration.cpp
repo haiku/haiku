@@ -19,13 +19,12 @@ BUSBConfiguration::BUSBConfiguration(BUSBDevice *device, uint32 index, int rawFD
 		fInterfaces(NULL),
 		fConfigurationString(NULL)
 {
-	raw_command command;
+	usb_raw_command command;
 	command.config.descriptor = &fDescriptor;
 	command.config.config_index = fIndex;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR, &command, sizeof(command))
-		|| command.config.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_CONFIGURATION_DESCRIPTOR, &command,
+		sizeof(command)) || command.config.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
-	}
 
 	fInterfaces = new BUSBInterface *[fDescriptor.number_interfaces];
 	for (uint32 i = 0; i < fDescriptor.number_interfaces; i++)

@@ -110,16 +110,15 @@ BUSBInterface::OtherDescriptorAt(uint32 index, usb_descriptor *descriptor,
 	if (length > 0 && descriptor == NULL)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.generic.descriptor = descriptor;
 	command.generic.config_index = fConfiguration->Index();
 	command.generic.interface_index = fIndex;
 	command.generic.length = length;
 	command.generic.generic_index = index;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_GENERIC_DESCRIPTOR, &command, sizeof(command))
-		|| command.generic.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_GENERIC_DESCRIPTOR, &command,
+		sizeof(command)) || command.generic.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	return B_OK;
 }
@@ -146,14 +145,13 @@ uint32
 BUSBInterface::CountAlternates() const
 {
 	uint32 alternateCount;
-	raw_command command;
+	usb_raw_command command;
 	command.alternate.alternate_count = &alternateCount;
 	command.alternate.config_index = fConfiguration->Index();
 	command.alternate.interface_index = fIndex;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_ALT_INTERFACE_COUNT, &command, sizeof(command))
-		|| command.alternate.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ALT_INTERFACE_COUNT, &command,
+		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS)
 		return 1;
-	}
 
 	return alternateCount;
 }
@@ -167,13 +165,13 @@ BUSBInterface::AlternateAt(uint32 alternateIndex)
 	if (descriptor == NULL)
 		return NULL;
 
-	raw_command command;
+	usb_raw_command command;
 	command.alternate.descriptor = descriptor;
 	command.alternate.config_index = fConfiguration->Index();
 	command.alternate.interface_index = fIndex;
 	command.alternate.alternate_index = alternateIndex;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR, &command,
-		sizeof(command)) || command.alternate.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_ALT_INTERFACE_DESCRIPTOR, &command,
+		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS) {
 		delete descriptor;
 		return NULL;
 	}
@@ -185,14 +183,13 @@ BUSBInterface::AlternateAt(uint32 alternateIndex)
 status_t
 BUSBInterface::SetAlternate(uint32 alternateIndex)
 {
-	raw_command command;
+	usb_raw_command command;
 	command.alternate.config_index = fConfiguration->Index();
 	command.alternate.interface_index = fIndex;
 	command.alternate.alternate_index = alternateIndex;
-	if (ioctl(fRawFD, RAW_COMMAND_SET_ALT_INTERFACE, &command, sizeof(command))
-		|| command.alternate.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_SET_ALT_INTERFACE, &command,
+		sizeof(command)) || command.alternate.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	_UpdateDescriptorAndEndpoints();
 	return B_OK;
@@ -202,14 +199,13 @@ BUSBInterface::SetAlternate(uint32 alternateIndex)
 void
 BUSBInterface::_UpdateDescriptorAndEndpoints()
 {
-	raw_command command;
+	usb_raw_command command;
 	command.interface.descriptor = &fDescriptor;
 	command.interface.config_index = fConfiguration->Index();
 	command.interface.interface_index = fIndex;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_INTERFACE_DESCRIPTOR, &command, sizeof(command))
-		|| command.interface.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_INTERFACE_DESCRIPTOR, &command,
+		sizeof(command)) || command.interface.status != B_USB_RAW_STATUS_SUCCESS)
 		memset(&fDescriptor, 0, sizeof(fDescriptor));
-	}
 
 	if (fEndpoints) {
 		// Delete old endpoints

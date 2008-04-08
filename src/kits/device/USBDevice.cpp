@@ -55,16 +55,16 @@ BUSBDevice::SetTo(const char *path)
 		return B_ERROR;
 	}
 
-	raw_command command;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_VERSION, &command, sizeof(command))
-		|| command.version.status != 0x0015) {
+	usb_raw_command command;
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_VERSION, &command, sizeof(command))
+		|| command.version.status != B_USB_RAW_PROTOCOL_VERSION) {
 		Unset();
 		return B_ERROR;
 	}
 
 	command.device.descriptor = &fDescriptor;
-	if (ioctl(fRawFD, RAW_COMMAND_GET_DEVICE_DESCRIPTOR, &command, sizeof(command))
-		|| command.device.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_DEVICE_DESCRIPTOR, &command,
+		sizeof(command)) || command.device.status != B_USB_RAW_STATUS_SUCCESS) {
 		Unset();
 		return B_ERROR;
 	}
@@ -244,15 +244,14 @@ BUSBDevice::GetStringDescriptor(uint32 index,
 	if (!descriptor)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.string.descriptor = descriptor;
 	command.string.string_index = index;
 	command.string.length = length;
 
-	if (ioctl(fRawFD, RAW_COMMAND_GET_STRING_DESCRIPTOR, &command, sizeof(command))
-		|| command.string.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_STRING_DESCRIPTOR, &command,
+		sizeof(command)) || command.string.status != B_USB_RAW_STATUS_SUCCESS)
 		return 0;
-	}
 
 	return command.string.length;
 }
@@ -288,17 +287,16 @@ BUSBDevice::GetDescriptor(uint8 type, uint8 index, uint16 languageID,
 	if (length > 0 && data == NULL)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.descriptor.type = type;
 	command.descriptor.index = index;
 	command.descriptor.language_id = languageID;
 	command.descriptor.data = data;
 	command.descriptor.length = length;
 
-	if (ioctl(fRawFD, RAW_COMMAND_GET_DESCRIPTOR, &command, sizeof(command))
-		|| command.descriptor.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_GET_DESCRIPTOR, &command,
+		sizeof(command)) || command.descriptor.status != B_USB_RAW_STATUS_SUCCESS)
 		return 0;
-	}
 
 	return command.descriptor.length;
 }
@@ -334,13 +332,12 @@ BUSBDevice::SetConfiguration(const BUSBConfiguration *configuration)
 	if (!configuration || configuration->Index() >= fDescriptor.num_configurations)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.config.config_index = configuration->Index();
 
-	if (ioctl(fRawFD, RAW_COMMAND_SET_CONFIGURATION, &command, sizeof(command))
-		|| command.config.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_SET_CONFIGURATION, &command,
+		sizeof(command)) || command.config.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	fActiveConfiguration = configuration->Index();
 	return B_OK;
@@ -354,7 +351,7 @@ BUSBDevice::ControlTransfer(uint8 requestType, uint8 request, uint16 value,
 	if (length > 0 && data == NULL)
 		return B_BAD_VALUE;
 
-	raw_command command;
+	usb_raw_command command;
 	command.control.request_type = requestType;
 	command.control.request = request;
 	command.control.value = value;
@@ -362,10 +359,9 @@ BUSBDevice::ControlTransfer(uint8 requestType, uint8 request, uint16 value,
 	command.control.length = length;
 	command.control.data = data;
 
-	if (ioctl(fRawFD, RAW_COMMAND_CONTROL_TRANSFER, &command, sizeof(command))
-		|| command.control.status != RAW_STATUS_SUCCESS) {
+	if (ioctl(fRawFD, B_USB_RAW_COMMAND_CONTROL_TRANSFER, &command,
+		sizeof(command)) || command.control.status != B_USB_RAW_STATUS_SUCCESS)
 		return B_ERROR;
-	}
 
 	return command.control.length;
 }

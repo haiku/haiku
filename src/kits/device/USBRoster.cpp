@@ -7,7 +7,6 @@
  */
 
 #include <USBKit.h>
-#include <usb_raw.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <Looper.h>
