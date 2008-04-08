@@ -105,11 +105,12 @@ public:
 							{
 								if (fCursor == cursor)
 									return;
-								if (fCursor)
-									fCursor->Release();
+								if (cursor)
+									cursor->Acquire();
+								ServerCursor* oldCursor = fCursor;
 								fCursor = cursor;
-								if (fCursor)
-									fCursor->Acquire();
+								if (oldCursor)
+									oldCursor->Release();
 							}
 	ServerCursor*			Cursor() const
 							{
