@@ -1791,7 +1791,7 @@ bfs_open_index_dir(fs_volume *_volume, void **_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node != NULL)
+	if (indicesNode.private_node == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_open_dir(_volume, &indicesNode, _cookie));
@@ -1807,7 +1807,7 @@ bfs_close_index_dir(fs_volume *_volume, void *_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node != NULL)
+	if (indicesNode.private_node == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_close_dir(_volume, &indicesNode, _cookie));
@@ -1823,7 +1823,7 @@ bfs_free_index_dir_cookie(fs_volume *_volume, void *_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node != NULL)
+	if (indicesNode.private_node == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_free_dir_cookie(_volume, &indicesNode, _cookie));
@@ -1839,7 +1839,7 @@ bfs_rewind_index_dir(fs_volume *_volume, void *_cookie)
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node != NULL)
+	if (indicesNode.private_node == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_rewind_dir(_volume, &indicesNode, _cookie));
@@ -1856,7 +1856,7 @@ bfs_read_index_dir(fs_volume *_volume, void *_cookie, struct dirent *dirent,
 
 	fs_vnode indicesNode;
 	indicesNode.private_node = volume->IndicesNode();
-	if (indicesNode.private_node != NULL)
+	if (indicesNode.private_node == NULL)
 		return B_ENTRY_NOT_FOUND;
 
 	RETURN_ERROR(bfs_read_dir(_volume, &indicesNode, _cookie, dirent,
