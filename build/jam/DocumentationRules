@@ -8,28 +8,28 @@ rule Man2Doc
 	MakeLocate $(binary)
 		: [ FDirName $(HAIKU_DOCUMENTATION_OBJECT_DIR) Shell_Tools ] ;
 
-        Depends $(binary) : $(source) rman ;
+	Depends $(binary) : $(source) rman ;
 
 	LocalDepends doc_files : $(binary) ;
-        Man2Doc1 $(binary) : rman $(source) ;
-        LocalClean clean : $(binary) ;
+	Man2Doc1 $(binary) : rman $(source) ;
+	LocalClean clean : $(binary) ;
 }
 
 actions Man2Doc1
 {
-        $(2[1]) -f XML "$(2[2])" > "$(1)" ;
+	$(2[1]) -f XML "$(2[2])" > "$(1)" ;
 }
 
 rule Man2Docs
 {
-        # Man2Docs <sources> ;
-        local source ;
-        for source in [ FGristFiles $(1) ]
-        {
-                local target = $(source:S=.xml) ;
+	# Man2Docs <sources> ;
+	local source ;
+	for source in [ FGristFiles $(1) ]
+	{
+		local target = $(source:S=.xml) ;
 
-                Man2Doc $(target) : $(source) ;
-        }
+		Man2Doc $(target) : $(source) ;
+	}
 }
  
 rule Doc2HTML
