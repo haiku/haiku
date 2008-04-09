@@ -977,7 +977,7 @@ init_driver()
 	struct firewire_softc *sc = NULL;
 	uint32 i;
 	
-#if DEBUG
+#if DEBUG && !defined(__HAIKU__)
 	load_driver_symbols("fw_raw");
 #endif
 

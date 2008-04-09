@@ -582,7 +582,7 @@ init_driver(void)
 {
 	DPRINTF_INFO((ID "init_driver(), built %s %s\n", __DATE__, __TIME__));
 
-#if DEBUG_DRIVER
+#if DEBUG_DRIVER && !defined(__HAIKU__)
 	if (load_driver_symbols(kDriverName) == B_OK) {
 		DPRINTF_INFO((ID "loaded symbols\n"));
 	} else {

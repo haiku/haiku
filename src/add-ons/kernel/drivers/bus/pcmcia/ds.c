@@ -354,7 +354,7 @@ init_driver()
 	client_handle_t handle;
 	uint32 i;
 	
-#if DEBUG
+#if DEBUG && !defined(__HAIKU__)
 	load_driver_symbols("ds");
 #endif
 

@@ -242,10 +242,6 @@ device_open(const char *name, uint32 flags, void **cookie)
 	info = (struct sis_info *)*cookie;
 	memset(info, 0, sizeof(struct sis_info));
 
-#ifdef DEBUG
-	load_driver_symbols("sis900");
-#endif
-
 	info->cookieMagic = SiS_COOKIE_MAGIC;
 	info->thisArea = area;
 	info->id = id;

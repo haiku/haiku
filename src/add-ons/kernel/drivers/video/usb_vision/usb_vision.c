@@ -59,7 +59,6 @@ status_t init_driver (void){
         usb_vision_devices[i] = 0;
         
       usb_vision_names[0] = NULL;  
-      load_driver_symbols(DRIVER_NAME);
 
       (*usb->register_driver)(DRIVER_NAME, supported_devices, SIZEOF(supported_devices), DRIVER_NAME);
       (*usb->install_notify)(DRIVER_NAME, &notify_hooks);

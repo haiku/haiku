@@ -522,7 +522,6 @@ status_t
 init_driver(void)
 {
 	PRINT(("init_driver()\n"));
-	load_driver_symbols(DRIVER_NAME);
 
 	void *settings_handle;
 	// get driver settings

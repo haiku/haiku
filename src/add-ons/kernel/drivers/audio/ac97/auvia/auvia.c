@@ -55,7 +55,6 @@ void uninit_driver(void);
 const char ** publish_devices(void);
 device_hooks * find_device(const char *);
 
-static char pci_name[] = B_PCI_MODULE_NAME;
 pci_module_info	*pci;
 
 int32 num_cards;
@@ -567,15 +566,14 @@ auvia_setup(auvia_dev * card)
 status_t
 init_driver(void)
 {
-	int ix=0;
-	
 	pci_info info;
-	num_cards = 0;
-	
-	PRINT(("init_driver()\n"));
-	load_driver_symbols("auvia");
+	int ix = 0;
 
-	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
+	num_cards = 0;
+
+	PRINT(("init_driver()\n"));
+
+	if (get_module(B_PCI_MODULE_NAME, (module_info **)&pci))
 		return ENOSYS;
 		
 	while ((*pci->get_nth_pci_info)(ix, &info) == B_OK) {

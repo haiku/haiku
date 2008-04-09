@@ -511,17 +511,17 @@ debug_cmedia(
 status_t
 init_driver(void)
 {
-	int ix=0;
 	pci_info info;
+	int ix = 0;
+
 	num_cards = 0;
 
 	ddprintf(("cmedia_pci: init_driver()\n"));
-	load_driver_symbols("cmedia_pci");
 
-	if (get_module(pci_name, (module_info **) &pci))
+	if (get_module(pci_name, (module_info **)&pci))
 		return ENOSYS;
 
-	if (get_module(gameport_name, (module_info **) &gameport)) {
+	if (get_module(gameport_name, (module_info **)&gameport)) {
 		put_module(pci_name);
 		return ENOSYS;
 	}

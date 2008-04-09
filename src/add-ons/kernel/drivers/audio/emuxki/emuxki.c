@@ -2765,17 +2765,15 @@ emuxki_init(emuxki_dev * card)
 status_t
 init_driver(void)
 {
-	int ix=0;
 	void *settings_handle;
-	
 	pci_info info;
 	num_cards = 0;
+	int ix = 0;
 	
 	PRINT(("init_driver()\n"));
-	load_driver_symbols("emuxki");
 	
 	// get driver settings
-	settings_handle  = load_driver_settings ("emuxki.settings");
+	settings_handle = load_driver_settings("emuxki.settings");
 	if (settings_handle != NULL) {
 		const char *item;
 		char       *end;

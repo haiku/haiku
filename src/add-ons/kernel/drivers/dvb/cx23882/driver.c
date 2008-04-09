@@ -120,7 +120,7 @@ init_driver(void)
 	int index;
 	int cards;
 
-#ifdef DEBUG	
+#if defined(DEBUG) && !defined(__HAIKU__)
 	set_dprintf_enabled(true);
 	load_driver_symbols("cx23882");
 #endif

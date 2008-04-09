@@ -134,7 +134,6 @@ init_driver()
 		gSerialDevices[i] = 0;
 
 	gDeviceNames[0] = NULL;
-	//load_driver_symbols(DRIVER_NAME);
 
 	gDriverLock = create_sem(1, DRIVER_NAME"_devices_table_lock");
 	if (gDriverLock < B_OK) {

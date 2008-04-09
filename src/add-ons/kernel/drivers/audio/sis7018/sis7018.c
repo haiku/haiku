@@ -284,18 +284,18 @@ status_t init_hardware (void)
   return err;
 }
 
-/* init_driver - optional function - called every time the drive is loaded. */
-status_t init_driver (void)
+
+status_t
+init_driver(void)
 {
-  int ix=0, jx=0;
+  int ix = 0, jx = 0;
   pci_info info;
   num_cards = 0;
- 
+
   reload_sis7018_setting();
   create_log();
   
   TRACE("\n>>> init_driver()\n");
-  load_driver_symbols(CHIPNAME);
 
   if (get_module(B_PCI_MODULE_NAME, (module_info **) &pci))
     return ENOSYS;

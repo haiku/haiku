@@ -489,15 +489,13 @@ es1370_setup(es1370_dev * card)
 status_t
 init_driver(void)
 {
-	int ix=0;
 	void *settings_handle;
-	
 	pci_info info;
 	num_cards = 0;
-	
+	int ix = 0;
+
 	PRINT(("init_driver()\n"));
-	load_driver_symbols("es1370");
-	
+
 	// get driver settings
 	settings_handle  = load_driver_settings ("es1370.settings");
 	if (settings_handle != NULL) {
