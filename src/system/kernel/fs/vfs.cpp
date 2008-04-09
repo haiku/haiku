@@ -5370,16 +5370,16 @@ common_rename(int fd, char *path, int newFD, char *newPath, bool kernel)
 	FUNCTION(("common_rename(fd = %d, path = %s, newFD = %d, newPath = %s, kernel = %d)\n", fd, path, newFD, newPath, kernel));
 
 	status = fd_and_path_to_dir_vnode(fd, path, &fromVnode, fromName, kernel);
-	if (status < 0)
+	if (status < B_OK)
 		return status;
 
 	status = fd_and_path_to_dir_vnode(newFD, newPath, &toVnode, toName, kernel);
-	if (status < 0)
-		goto err;
+	if (status < B_OK)
+		goto err1;
 
 	if (fromVnode->device != toVnode->device) {
 		status = B_CROSS_DEVICE_LINK;
-		goto err1;
+		goto err2;
 	}
 
 	if (HAS_FS_CALL(fromVnode, rename))
@@ -5387,9 +5387,9 @@ common_rename(int fd, char *path, int newFD, char *newPath, bool kernel)
 	else
 		status = EROFS;
 
-err1:
+err2:
 	put_vnode(toVnode);
-err:
+err1:
 	put_vnode(fromVnode);
 
 	return status;

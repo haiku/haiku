@@ -1,12 +1,12 @@
-/* Policy info for timers */
-
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2008, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
+/*! Policy info for timers */
 
 
 #include <OS.h>
@@ -44,8 +44,7 @@ timer_init(kernel_args *args)
 }
 
 
-/** NOTE: expects interrupts to be off */
-
+/*! NOTE: expects interrupts to be off */
 static void
 add_event_to_list(timer *event, timer * volatile *list)
 {
@@ -53,16 +52,16 @@ add_event_to_list(timer *event, timer * volatile *list)
 	timer *last = NULL;
 
 	// stick it in the event list
-	for (next = *list; next; last = next, next = (timer *)next->entry.next) {
-		if ((bigtime_t)next->entry.key >= (bigtime_t)event->entry.key)
+	for (next = *list; next; last = next, next = (timer *)next->next) {
+		if ((bigtime_t)next->schedule_time >= (bigtime_t)event->schedule_time)
 			break;
 	}
 
 	if (last != NULL) {
-		event->entry.next = last->entry.next;
-		last->entry.next = (qent*)event;
+		event->next = last->next;
+		last->next = event;
 	} else {
-		event->entry.next = (qent*)next;
+		event->next = next;
 		*list = event;
 	}
 }
@@ -76,7 +75,8 @@ timer_interrupt()
 	int currentCPU = smp_get_current_cpu();
 	int32 rc = B_HANDLED_INTERRUPT;
 
-	TRACE(("timer_interrupt: time 0x%x 0x%x, cpu %d\n", system_time(), smp_get_current_cpu()));
+	TRACE(("timer_interrupt: time 0x%x 0x%x, cpu %d\n", system_time(),
+		smp_get_current_cpu()));
 
 	spinlock = &sTimerSpinlock[currentCPU];
 
@@ -84,25 +84,23 @@ timer_interrupt()
 
 restart_scan:
 	event = sEvents[currentCPU];
-	if (event != NULL && ((bigtime_t)event->entry.key < system_time())) {
+	if (event != NULL && ((bigtime_t)event->schedule_time < system_time())) {
 		// this event needs to happen
 		int mode = event->flags;
 
-		sEvents[currentCPU] = (timer *)event->entry.next;
-		event->entry.key = 0;
+		sEvents[currentCPU] = (timer *)event->next;
+		event->schedule_time = 0;
 
 		release_spinlock(spinlock);
 
-		TRACE(("timer_interrupt: calling hook %p for event %p\n", event->hook, event));
+		TRACE(("timer_interrupt: calling hook %p for event %p\n", event->hook,
+			event));
 
 		// call the callback
 		// note: if the event is not periodic, it is ok
 		// to delete the event structure inside the callback
-		if (event->hook) {
+		if (event->hook)
 			rc = event->hook(event);
-//			if (event->func(event->data) == INT_RESCHEDULE)
-//				rc = INT_RESCHEDULE;
-		}
 
 		acquire_spinlock(spinlock);
 
@@ -114,7 +112,7 @@ restart_scan:
 				// it to one, since zero represents not scheduled
 				scheduleTime = 1;
 			}
-			event->entry.key = (int64)scheduleTime;
+			event->schedule_time = (int64)scheduleTime;
 			add_event_to_list(event, &sEvents[currentCPU]);
 		}
 
@@ -122,8 +120,10 @@ restart_scan:
 	}
 
 	// setup the next hardware timer
-	if (sEvents[currentCPU] != NULL)
-		arch_timer_set_hardware_timer((bigtime_t)sEvents[currentCPU]->entry.key - system_time());
+	if (sEvents[currentCPU] != NULL) {
+		arch_timer_set_hardware_timer(
+			(bigtime_t)sEvents[currentCPU]->schedule_time - system_time());
+	}
 
 	release_spinlock(spinlock);
 
@@ -150,7 +150,7 @@ add_timer(timer *event, timer_hook hook, bigtime_t period, int32 flags)
 	if (scheduleTime == 0)
 		scheduleTime = 1;
 
-	event->entry.key = (int64)scheduleTime;
+	event->schedule_time = (int64)scheduleTime;
 	event->period = period;
 	event->hook = hook;
 	event->flags = flags;
@@ -173,11 +173,9 @@ add_timer(timer *event, timer_hook hook, bigtime_t period, int32 flags)
 }
 
 
-/** This is a fast path to be called from reschedule() and from
- *	cancel_timer().
- *	Must always be invoked with interrupts disabled.
- */
-
+/*!	This is a fast path to be called from reschedule() and from cancel_timer().
+	Must always be invoked with interrupts disabled.
+*/
 status_t
 _local_timer_cancel_event(int cpu, timer *event)
 {
@@ -190,21 +188,23 @@ _local_timer_cancel_event(int cpu, timer *event)
 		if (current == event) {
 			// we found it
 			if (current == sEvents[cpu])
-				sEvents[cpu] = (timer *)current->entry.next;
+				sEvents[cpu] = current->next;
 			else
-				last->entry.next = current->entry.next;
-			current->entry.next = NULL;
+				last->next = current->next;
+			current->next = NULL;
 			// break out of the whole thing
 			break;
 		}
 		last = current;
-		current = (timer *)current->entry.next;
+		current = current->next;
 	}
 
 	if (sEvents[cpu] == NULL)
 		arch_timer_clear_hardware_timer();
-	else
-		arch_timer_set_hardware_timer((bigtime_t)sEvents[cpu]->entry.key - system_time());
+	else {
+		arch_timer_set_hardware_timer(
+			(bigtime_t)sEvents[cpu]->schedule_time - system_time());
+	}
 
 	release_spinlock(&sTimerSpinlock[cpu]);
 
@@ -244,19 +244,19 @@ cancel_timer(timer *event)
 				if (current == event) {
 					// we found it
 					if (current == sEvents[cpu])
-						sEvents[cpu] = (timer *)current->entry.next;
+						sEvents[cpu] = current->next;
 					else
-						last->entry.next = current->entry.next;
-					current->entry.next = NULL;
+						last->next = current->next;
+					current->next = NULL;
 
 					// break out of the whole thing
 
 					release_spinlock(&sTimerSpinlock[cpu]);
 					restore_interrupts(state);
-					return (bigtime_t)event->entry.key < system_time();
+					return (bigtime_t)event->schedule_time < system_time();
 				}
 				last = current;
-				current = (timer *)current->entry.next;
+				current = current->next;
 			}
 			release_spinlock(&sTimerSpinlock[cpu]);
 		}
@@ -272,6 +272,7 @@ spin(bigtime_t microseconds)
 {
 	bigtime_t time = system_time();
 
-	while((system_time() - time) < microseconds)
+	while ((system_time() - time) < microseconds) {
 		PAUSE();
+	}
 }

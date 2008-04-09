@@ -785,7 +785,7 @@ set_alarm(bigtime_t time, uint32 mode)
 	TRACE(("set_alarm: thread = %p\n", thread));
 
 	if (thread->alarm.period)
-		remainingTime = (bigtime_t)thread->alarm.entry.key - system_time();
+		remainingTime = (bigtime_t)thread->alarm.schedule_time - system_time();
 
 	cancel_timer(&thread->alarm);
 

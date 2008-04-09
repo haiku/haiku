@@ -285,7 +285,7 @@ notify_sem_select_events(struct sem_entry* sem, uint16 events)
 static int32
 sem_timeout(timer *data)
 {
-	struct sem_timeout_args *args = (struct sem_timeout_args *)data->entry.prev;
+	struct sem_timeout_args *args = (struct sem_timeout_args *)data->user_data;
 	struct thread *thread;
 	int slot;
 	int state;
@@ -879,7 +879,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 	if ((sSems[slot].u.used.count -= count) < 0) {
 		// we need to block
 		struct thread *thread = thread_get_current_thread();
-		timer timeout_timer; // stick it on the stack, since we may be blocking here
+		timer timeoutTimer;
+			// stick it on the stack, since we may be blocking here
 		struct sem_timeout_args args;
 
 		TRACE(("switch_sem_etc(id = %ld): block name = %s, thread = %p,"
@@ -917,9 +918,8 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 			args.blocked_thread = thread->id;
 			args.sem_count = count;
 
-			// ToDo: another evil hack: pass the args into timer->entry.prev
-			timeout_timer.entry.prev = (qent *)&args;
-			add_timer(&timeout_timer, &sem_timeout, timeout,
+			timeoutTimer.user_data = &args;
+			add_timer(&timeoutTimer, &sem_timeout, timeout,
 				flags & B_RELATIVE_TIMEOUT ?
 					B_ONE_SHOT_RELATIVE_TIMER : B_ONE_SHOT_ABSOLUTE_TIMER);			
 		}
@@ -964,7 +964,7 @@ switch_sem_etc(sem_id semToBeReleased, sem_id id, int32 count,
 			if (thread->sem.acquire_status != B_TIMED_OUT) {
 				// cancel the timer event, the sem may have been deleted or interrupted
 				// with the timer still active
-				cancel_timer(&timeout_timer);
+				cancel_timer(&timeoutTimer);
 			}
 		}
 
