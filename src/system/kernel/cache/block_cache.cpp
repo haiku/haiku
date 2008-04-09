@@ -31,7 +31,6 @@
 //	   just read and write single blocks.
 //	2) the locking could be improved; getting a block should not need to
 //	   wait for blocks to be written
-//	3) dirty blocks are only written back if asked for
 // TODO: the retrieval/copy of the original data could be delayed until the
 //		new data must be written, ie. in low memory situations.
 
@@ -287,7 +286,7 @@ static DoublyLinkedList<block_cache> sCaches;
 static mutex sCachesLock;
 static sem_id sEventSemaphore;
 static mutex sNotificationsLock;
-static thread_id sWriterNotifyThread;
+static thread_id sNotifierWriterThread;
 static DoublyLinkedListLink<block_cache> sMarkCache;
 	// TODO: this only works if the link is the first entry of block_cache
 static object_cache *sBlockCache;
@@ -296,6 +295,7 @@ static object_cache *sBlockCache;
 //	#pragma mark - notifications/listener
 
 
+/*!	Checks wether or not this is an event that closes a transaction. */
 static inline bool
 is_closing_event(int32 event)
 {
@@ -310,6 +310,10 @@ is_written_event(int32 event)
 }
 
 
+/*!	From the specified \a notification, it will remove the lowest pending
+	event, and return that one in \a _event.
+	If there is no pending event anymore, it will return \c false.
+*/
 static bool
 get_next_pending_event(cache_notification *notification, int32 *_event)
 {
@@ -329,6 +333,7 @@ get_next_pending_event(cache_notification *notification, int32 *_event)
 }
 
 
+/*!	Initializes the \a notification as specified. */
 static void
 set_notification(cache_transaction *transaction,
 	cache_notification &notification, int32 events,
@@ -661,7 +666,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 }
 
 
-//! Should be called with the cache's lock held.
+/*! Should be called with the cache's lock held. */
 block_cache::~block_cache()
 {
 	deleting = true;
@@ -871,6 +876,11 @@ block_cache::LowMemoryHandler(void *data, int32 level)
 //	#pragma mark - private block functions
 
 
+/*!	Removes a reference from the specified \a block. If this was the last
+	reference, the block is moved into the unused list.
+	In low memory situations, it will also free some blocks from that list,
+	but not necessarily the \a block it just released.
+*/
 static void
 put_cached_block(block_cache *cache, cached_block *block)
 {
@@ -941,8 +951,7 @@ put_cached_block(block_cache *cache, off_t blockNumber)
 }
 
 
-/*!
-	Retrieves the block \a blockNumber from the hash table, if it's already
+/*!	Retrieves the block \a blockNumber from the hash table, if it's already
 	there, or reads it from the disk.
 
 	\param _allocated tells you wether or not a new block has been allocated
@@ -1002,8 +1011,7 @@ get_cached_block(block_cache *cache, off_t blockNumber, bool *_allocated,
 }
 
 
-/*!
-	Returns the writable block data for the requested blockNumber.
+/*!	Returns the writable block data for the requested blockNumber.
 	If \a cleared is true, the block is not read from disk; an empty block
 	is returned.
 
@@ -1115,6 +1123,12 @@ get_writable_cached_block(block_cache *cache, off_t blockNumber, off_t base,
 }
 
 
+/*!	Writes the specified \a block back to disk. It will always only write back
+	the oldest change of the block if it is part of more than one transaction.
+	It will automatically send out TRANSACTION_WRITTEN notices, as well as
+	delete transactions when they are no longer used, and \a deleteTransaction
+	is \c true.
+*/
 static status_t
 write_cached_block(block_cache *cache, cached_block *block,
 	bool deleteTransaction)
@@ -1178,6 +1192,7 @@ write_cached_block(block_cache *cache, cached_block *block,
 
 
 #ifdef DEBUG_BLOCK_CACHE
+
 static void
 dump_block(cached_block *block)
 {
@@ -1427,9 +1442,16 @@ dump_caches(int argc, char **argv)
 
 	return 0;
 }
+
 #endif	// DEBUG_BLOCK_CACHE
 
 
+/*!	Traverses through the block_cache list, and returns one cache after the
+	other. The cache returned is automatically locked when you get it, and
+	unlocked with the next call to this function. Ignores caches that are in
+	deletion state.
+	Returns \c NULL when the end of the list is reached.
+*/
 static block_cache *
 get_next_locked_block_cache(block_cache *last)
 {
@@ -1472,6 +1494,10 @@ get_next_locked_block_cache(block_cache *last)
 }
 
 
+/*!	Background thread that continuously checks for pending notifications of
+	all caches.
+	Every two seconds, it will also write back up to 64 blocks per cache.
+*/
 static status_t
 block_notifier_and_writer(void *)
 {
@@ -1556,6 +1582,7 @@ block_notifier_and_writer(void *)
 }
 
 
+/*!	Notify function for wait_for_notifications(). */
 static void
 notify_sync(int32 transactionID, int32 event, void *_cache)
 {
@@ -1565,10 +1592,14 @@ notify_sync(int32 transactionID, int32 event, void *_cache)
 }
 
 
+/*!	Waits until all pending notifications are carried out.
+	Safe to be called from the block writer/notifier thread.
+	You must not hold the \a cache lock when calling this function.
+*/
 static void
 wait_for_notifications(block_cache *cache)
 {
-	if (find_thread(NULL) == sWriterNotifyThread) {
+	if (find_thread(NULL) == sNotifierWriterThread) {
 		// We're the notifier thread, don't wait, but flush all pending
 		// notifications directly.
 		flush_pending_notifications(cache);
@@ -1608,10 +1639,10 @@ block_cache_init(void)
 	if (sEventSemaphore < B_OK)
 		return sEventSemaphore;
 
-	sWriterNotifyThread = spawn_kernel_thread(&block_notifier_and_writer,
-		"block writer/notifier", B_LOW_PRIORITY, NULL);
-	if (sWriterNotifyThread >= B_OK)
-		send_signal_etc(sWriterNotifyThread, SIGCONT, B_DO_NOT_RESCHEDULE);
+	sNotifierWriterThread = spawn_kernel_thread(&block_notifier_and_writer,
+		"block notifier/writer", B_LOW_PRIORITY, NULL);
+	if (sNotifierWriterThread >= B_OK)
+		send_signal_etc(sNotifierWriterThread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 #ifdef DEBUG_BLOCK_CACHE
 	add_debugger_command_etc("block_caches", &dump_caches,
@@ -2229,6 +2260,11 @@ block_cache_sync(void *_cache)
 	}
 
 	hash_close(cache->hash, &iterator, false);
+	locker.Unlock();
+
+	wait_for_notifications(cache);
+		// make sure that all pending TRANSACTION_WRITTEN notifications
+		// are handled after we return
 	return B_OK;
 }
 
@@ -2265,6 +2301,11 @@ block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
 		}
 	}
 
+	locker.Unlock();
+
+	wait_for_notifications(cache);
+		// make sure that all pending TRANSACTION_WRITTEN notifications
+		// are handled after we return
 	return B_OK;
 }
 
@@ -2359,8 +2400,7 @@ block_cache_get(void *_cache, off_t blockNumber)
 }
 
 
-/*!
-	Changes the internal status of a writable block to \a dirty. This can be
+/*!	Changes the internal status of a writable block to \a dirty. This can be
 	helpful in case you realize you don't need to change that block anymore
 	for whatever reason.
 
