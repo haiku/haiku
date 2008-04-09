@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2006, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -34,7 +34,7 @@ class BRect;
 #endif
 
 
-// key definitions
+// Key definitions
 
 struct key_info {
 	uint32	modifiers;
@@ -119,88 +119,6 @@ struct key_map {
 	uint32	tilde_tables;
 };
 
-struct mouse_map {
-	uint32	button[B_MAX_MOUSE_BUTTONS];
-};
-
-
-/*----------------------------------------------------------------*/
-
-enum border_style {
-	B_PLAIN_BORDER,
-	B_FANCY_BORDER,
-	B_NO_BORDER
-};
-
-/*----------------------------------------------------------------*/
-
-enum orientation {
-	B_HORIZONTAL,
-	B_VERTICAL
-};
-
-/*----------------------------------------------------------------*/
-
-enum button_width {
-	B_WIDTH_AS_USUAL,
-	B_WIDTH_FROM_WIDEST,
-	B_WIDTH_FROM_LABEL
-};
-
-/*----------------------------------------------------------------*/
-
-enum join_mode {
-	B_ROUND_JOIN = 0,
-	B_MITER_JOIN,
-	B_BEVEL_JOIN,
-	B_BUTT_JOIN,
-	B_SQUARE_JOIN
-};
-
-enum cap_mode {
-	B_ROUND_CAP=B_ROUND_JOIN,
-	B_BUTT_CAP=B_BUTT_JOIN,
-	B_SQUARE_CAP=B_SQUARE_JOIN
-};
-
-const float B_DEFAULT_MITER_LIMIT = 10.0F;
-
-/*----------------------------------------------------------------*/
-
-struct scroll_bar_info {
-	bool	proportional;
-	bool	double_arrows;
-	int32	knob;
-	int32	min_knob_size;
-};
-
-/*----------------------------------------------------------------*/
-
-enum alignment {
-	B_ALIGN_LEFT,
-    B_ALIGN_RIGHT,
-    B_ALIGN_CENTER,
-
-	B_ALIGN_HORIZONTAL_CENTER	= B_ALIGN_CENTER,
-
-	B_ALIGN_HORIZONTAL_UNSET	= -1L,
-	B_ALIGN_USE_FULL_WIDTH		= -2L
-};
-
-enum vertical_alignment {
-	B_ALIGN_TOP = 0x10L,
-	B_ALIGN_MIDDLE = 0x20,
-	B_ALIGN_BOTTOM = 0x30,
-
-	B_ALIGN_VERTICAL_CENTER		= B_ALIGN_MIDDLE,
-
-	B_ALIGN_VERTICAL_UNSET		= -1L,
-	B_ALIGN_NO_VERTICAL			= B_ALIGN_VERTICAL_UNSET,
-	B_ALIGN_USE_FULL_HEIGHT		= -2L
-};
-
-/*----------------------------------------------------------------*/
-
 enum {
 	B_CONTROL_TABLE				= 0x00000001,
 	B_OPTION_CAPS_SHIFT_TABLE	= 0x00000002,
@@ -213,8 +131,7 @@ enum {
 	B_NORMAL_TABLE				= 0x00000100
 };
 
-/*----------------------------------------------------------------*/
-
+// modifiers
 enum {
 	B_SHIFT_KEY			= 0x00000001,
 	B_COMMAND_KEY		= 0x00000002,
@@ -234,7 +151,91 @@ enum {
 	B_RIGHT_OPTION_KEY	= 0x00008000
 };
 
-/*----------------------------------------------------------------*/
+
+// Mouse definitions
+
+struct mouse_map {
+	uint32	button[B_MAX_MOUSE_BUTTONS];
+};
+
+enum mode_mouse {
+	B_NORMAL_MOUSE 			= 0,
+	B_FOCUS_FOLLOWS_MOUSE	= 1,
+	B_WARP_MOUSE			= 3,
+	B_INSTANT_WARP_MOUSE	= 7
+};
+
+
+// View orientation/alignment/style
+
+enum border_style {
+	B_PLAIN_BORDER,
+	B_FANCY_BORDER,
+	B_NO_BORDER
+};
+
+enum orientation {
+	B_HORIZONTAL,
+	B_VERTICAL
+};
+
+enum button_width {
+	B_WIDTH_AS_USUAL,
+	B_WIDTH_FROM_WIDEST,
+	B_WIDTH_FROM_LABEL
+};
+
+struct scroll_bar_info {
+	bool	proportional;
+	bool	double_arrows;
+	int32	knob;
+	int32	min_knob_size;
+};
+
+enum alignment {
+	B_ALIGN_LEFT,
+    B_ALIGN_RIGHT,
+    B_ALIGN_CENTER,
+
+	B_ALIGN_HORIZONTAL_CENTER	= B_ALIGN_CENTER,
+
+	B_ALIGN_HORIZONTAL_UNSET	= -1L,
+	B_ALIGN_USE_FULL_WIDTH		= -2L
+};
+
+enum vertical_alignment {
+	B_ALIGN_TOP					= 0x10L,
+	B_ALIGN_MIDDLE				= 0x20,
+	B_ALIGN_BOTTOM				= 0x30,
+
+	B_ALIGN_VERTICAL_CENTER		= B_ALIGN_MIDDLE,
+
+	B_ALIGN_VERTICAL_UNSET		= -1L,
+	B_ALIGN_NO_VERTICAL			= B_ALIGN_VERTICAL_UNSET,
+	B_ALIGN_USE_FULL_HEIGHT		= -2L
+};
+
+
+// Line join and cap modes
+
+enum join_mode {
+	B_ROUND_JOIN = 0,
+	B_MITER_JOIN,
+	B_BEVEL_JOIN,
+	B_BUTT_JOIN,
+	B_SQUARE_JOIN
+};
+
+enum cap_mode {
+	B_ROUND_CAP		= B_ROUND_JOIN,
+	B_BUTT_CAP		= B_BUTT_JOIN,
+	B_SQUARE_CAP	= B_SQUARE_JOIN
+};
+
+const float B_DEFAULT_MITER_LIMIT = 10.0F;
+
+
+// Bitmap and overlay constants
 
 enum bitmap_tiling {
 	B_TILE_BITMAP_X		= 0x00000001,
@@ -249,66 +250,8 @@ enum overlay_options {
 	B_OVERLAY_TRANSFER_CHANNEL	= 0x00080000
 };
 
-/*----------------------------------------------------------------*/
 
-status_t		get_deskbar_frame(BRect *frame);
-
-const color_map *system_colors();
-
-status_t		set_screen_space(int32 index, uint32 res,
-					bool stick = true);
-
-status_t		get_scroll_bar_info(scroll_bar_info *info);
-status_t		set_scroll_bar_info(scroll_bar_info *info);
-
-status_t		get_mouse_type(int32 *type);
-status_t		set_mouse_type(int32 type);
-status_t		get_mouse_map(mouse_map *map);
-status_t		set_mouse_map(mouse_map *map);
-status_t		get_click_speed(bigtime_t *speed);
-status_t		set_click_speed(bigtime_t speed);
-status_t		get_mouse_speed(int32 *speed);
-status_t		set_mouse_speed(int32 speed);
-status_t		get_mouse_acceleration(int32 *speed);
-status_t		set_mouse_acceleration(int32 speed);
-
-status_t		get_key_repeat_rate(int32 *rate);
-status_t		set_key_repeat_rate(int32 rate);
-status_t		get_key_repeat_delay(bigtime_t *delay);
-status_t		set_key_repeat_delay(bigtime_t  delay);
-
-uint32			modifiers();
-status_t		get_key_info(key_info *info);
-void			get_key_map(key_map **map, char **key_buffer);
-status_t		get_keyboard_id(uint16 *id);
-void			set_modifier_key(uint32 modifier, uint32 key);
-void			set_keyboard_locks(uint32 modifiers);
-
-rgb_color		keyboard_navigation_color();
-
-int32			count_workspaces();
-void			set_workspace_count(int32 count);
-int32			current_workspace();
-void			activate_workspace(int32 workspace);
-
-bigtime_t		idle_time();
-
-void			run_select_printer_panel();	
-void			run_add_printer_panel();	
-void			run_be_about();	
-
-void			set_focus_follows_mouse(bool follow);	
-bool			focus_follows_mouse();	
-
-enum mode_mouse {
-	B_NORMAL_MOUSE 			= 0,
-	B_FOCUS_FOLLOWS_MOUSE	= 1,
-	B_WARP_MOUSE			= 3,
-	B_INSTANT_WARP_MOUSE	= 7
-};
-
-void			set_mouse_mode(mode_mouse mode);	
-mode_mouse		mouse_mode();	
+// Default UI Colors
 
 enum color_which {
 	B_PANEL_BACKGROUND_COLOR = 1,
@@ -350,27 +293,85 @@ enum color_which {
 	B_WINDOW_INACTIVE_TEXT_COLOR = 24
 };
 
-rgb_color	ui_color(color_which which);
-void		set_ui_color(const color_which &which, 
-									 const rgb_color &color);
-rgb_color	tint_color(rgb_color color, float tint);
 
-extern "C" status_t	_init_interface_kit_();
-											/* effects on standard gray level */
-const float B_LIGHTEN_MAX_TINT	= 0.0F;		/* 216 --> 255.0 (255) */
-const float B_LIGHTEN_2_TINT	= 0.385F;	/* 216 --> 240.0 (240) */
-const float B_LIGHTEN_1_TINT	= 0.590F;	/* 216 --> 232.0 (232) */
+// Color tinting
 
-const float B_NO_TINT			= 1.0F;		/* 216 --> 216.0 (216) */
+const float B_LIGHTEN_MAX_TINT	= 0.0f;		// 216 --> 255.0 (255)
+const float B_LIGHTEN_2_TINT	= 0.385f;	// 216 --> 240.0 (240)
+const float B_LIGHTEN_1_TINT	= 0.590f;	// 216 --> 232.0 (232)
 
-const float B_DARKEN_1_TINT		= 1.147F;	/* 216 --> 184.2 (184) */
-const float B_DARKEN_2_TINT		= 1.295F;	/* 216 --> 152.3 (152) */
-const float B_DARKEN_3_TINT		= 1.407F;	/* 216 --> 128.1 (128) */
-const float B_DARKEN_4_TINT		= 1.555F;	/* 216 -->  96.1  (96) */
-const float B_DARKEN_MAX_TINT	= 2.0F;		/* 216 -->   0.0   (0) */
+const float B_NO_TINT			= 1.0f;		// 216 --> 216.0 (216)
+
+const float B_DARKEN_1_TINT		= 1.147f;	// 216 --> 184.2 (184)
+const float B_DARKEN_2_TINT		= 1.295f;	// 216 --> 152.3 (152)
+const float B_DARKEN_3_TINT		= 1.407f;	// 216 --> 128.1 (128)
+const float B_DARKEN_4_TINT		= 1.555f;	// 216 -->  96.1  (96)
+const float B_DARKEN_MAX_TINT	= 2.0f;		// 216 -->   0.0   (0)
+											// effects on standard gray level
 
 const float B_DISABLED_LABEL_TINT		= B_DARKEN_3_TINT;
 const float B_HIGHLIGHT_BACKGROUND_TINT	= B_DARKEN_2_TINT;
 const float B_DISABLED_MARK_TINT		= B_LIGHTEN_2_TINT;
+
+
+status_t		get_deskbar_frame(BRect* frame);
+
+const color_map* system_colors();
+
+status_t		set_screen_space(int32 index, uint32 resolution,
+					bool save = true);
+
+status_t		get_scroll_bar_info(scroll_bar_info* info);
+status_t		set_scroll_bar_info(scroll_bar_info* info);
+
+status_t		get_mouse_type(int32* type);
+status_t		set_mouse_type(int32 type);
+status_t		get_mouse_map(mouse_map* map);
+status_t		set_mouse_map(mouse_map* map);
+status_t		get_click_speed(bigtime_t* speed);
+status_t		set_click_speed(bigtime_t speed);
+status_t		get_mouse_speed(int32* speed);
+status_t		set_mouse_speed(int32 speed);
+status_t		get_mouse_acceleration(int32* speed);
+status_t		set_mouse_acceleration(int32 speed);
+
+status_t		get_key_repeat_rate(int32* rate);
+status_t		set_key_repeat_rate(int32 rate);
+status_t		get_key_repeat_delay(bigtime_t* delay);
+status_t		set_key_repeat_delay(bigtime_t delay);
+
+uint32			modifiers();
+status_t		get_key_info(key_info* info);
+void			get_key_map(key_map** _map, char** _keyBuffer);
+status_t		get_keyboard_id(uint16* _id);
+void			set_modifier_key(uint32 modifier, uint32 key);
+void			set_keyboard_locks(uint32 modifiers);
+
+rgb_color		keyboard_navigation_color();
+
+int32			count_workspaces();
+void			set_workspace_count(int32 count);
+int32			current_workspace();
+void			activate_workspace(int32 workspace);
+
+bigtime_t		idle_time();
+
+void			run_select_printer_panel();
+void			run_add_printer_panel();
+void			run_be_about();
+
+void			set_focus_follows_mouse(bool follow);
+bool			focus_follows_mouse();
+
+void			set_mouse_mode(mode_mouse mode);	
+mode_mouse		mouse_mode();	
+
+rgb_color		ui_color(color_which which);
+void			set_ui_color(const color_which& which, const rgb_color& color);
+rgb_color		tint_color(rgb_color color, float tint);
+
+extern "C" status_t _init_interface_kit_();
+	// for convenience, should be removed including the friend declarations
+	// in Menu.h, ...
 
 #endif	// _INTERFACE_DEFS_H

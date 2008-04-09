@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku. All Rights Reserved.
+ * Copyright 2002-2008, Haiku. All Rights Reserved.
  * Copyright 2002-2005,
  *		Marcus Overhagen, 
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com),
@@ -10,33 +10,33 @@
  */
 
 
-#include <Application.h>
-#include <Screen.h>
-#include <String.h>
 #include <WindowScreen.h>
 
+#include <new>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <new>
-
-#include <input_globals.h>
-#include <InputServerTypes.h> // For IS_SET_MOUSE_POSITION
-#include <interface_misc.h>
-#include <WindowPrivate.h>
+#include <Application.h>
+#include <Screen.h>
+#include <String.h>
 
 #include <AppServerLink.h>
+#include <input_globals.h>
+#include <InputServerTypes.h>
+#include <InterfacePrivate.h>
 #include <ServerProtocol.h>
+#include <WindowPrivate.h>
+
 
 using BPrivate::AppServerLink;
 
 
 //#define TRACE_WINDOWSCREEN 1
 #if TRACE_WINDOWSCREEN
-#define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
+#	define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 #else
-#define CALLED() ;
+#	define CALLED() ;
 #endif
 
 
@@ -902,7 +902,7 @@ BWindowScreen::_GetModeFromSpace(uint32 space, display_mode *dmode)
 
 	int32 width, height;
 	uint32 colorSpace;
-	if (!get_mode_parameter(space, width, height, colorSpace))
+	if (!BPrivate::get_mode_parameter(space, width, height, colorSpace))
 		return B_BAD_VALUE;
 
 	for (uint32 i = 0; i < fModeCount; i++) {

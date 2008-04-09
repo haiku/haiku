@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,23 +8,13 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
-/**	Global functions and variables for the Interface Kit */
+/*!	Global functions and variables for the Interface Kit */
 
-#include <interface_misc.h>
-#include <truncate_string.h>
-#include <utf8_functions.h>
+#include <InterfacePrivate.h>
 
-#include <ApplicationPrivate.h>
-#include <AppServerLink.h>
-#include <ColorConversion.h>
-#include <DefaultColors.h>
-#include <InputServerTypes.h>
-#include <input_globals.h>
-#include <pr_server.h>
-#include <ServerProtocol.h>
-#include <ServerReadOnlyMemory.h>
-#include <WidthBuffer.h>
-#include <WindowInfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Font.h>
 #include <InterfaceDefs.h>
@@ -35,9 +25,19 @@
 #include <String.h>
 #include <TextView.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <ApplicationPrivate.h>
+#include <AppServerLink.h>
+#include <ColorConversion.h>
+#include <DefaultColors.h>
+#include <InputServerTypes.h>
+#include <input_globals.h>
+#include <pr_server.h>
+#include <ServerProtocol.h>
+#include <ServerReadOnlyMemory.h>
+#include <truncate_string.h>
+#include <utf8_functions.h>
+#include <WidthBuffer.h>
+#include <WindowInfo.h>
 
 
 // Private definitions not placed in public headers
@@ -93,6 +93,8 @@ static const rgb_color _kDefaultColors[kNumColors] = {
 };
 const rgb_color* BPrivate::kDefaultColors = &_kDefaultColors[0];
 
+
+namespace BPrivate {
 
 /*!
 	Fills the \a width, \a height, and \a colorSpace parameters according
@@ -190,6 +192,8 @@ get_mode_parameter(uint32 mode, int32& width, int32& height, uint32& colorSpace)
 	return true;
 }
 
+}	// namespace BPrivate
+
 
 const color_map *
 system_colors()
@@ -204,7 +208,7 @@ set_screen_space(int32 index, uint32 space, bool stick)
 	int32 width;
 	int32 height;
 	uint32 depth;
-	if (!get_mode_parameter(space, width, height, depth))
+	if (!BPrivate::get_mode_parameter(space, width, height, depth))
 		return B_BAD_VALUE;
 		
 	BScreen screen(B_MAIN_SCREEN_ID);

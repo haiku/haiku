@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,29 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
+#include <Application.h>
+
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <Alert.h>
+#include <AppFileInfo.h>
+#include <Cursor.h>
+#include <Debug.h>
+#include <Entry.h>
+#include <File.h>
+#include <Locker.h>
+#include <MessageRunner.h>
+#include <Path.h>
+#include <PropertyInfo.h>
+#include <RegistrarDefs.h>
+#include <Resources.h>
+#include <Roster.h>
+#include <Window.h>
 
 #include <AppMisc.h>
 #include <AppServerLink.h>
@@ -20,29 +43,8 @@
 #include <ServerMemoryAllocator.h>
 #include <ServerProtocol.h>
 
-#include <Alert.h>
-#include <AppFileInfo.h>
-#include <Application.h>
-#include <MessageRunner.h>
-#include <Cursor.h>
-#include <Debug.h>
-#include <Entry.h>
-#include <File.h>
-#include <Locker.h>
-#include <Path.h>
-#include <PropertyInfo.h>
-#include <RegistrarDefs.h>
-#include <Resources.h>
-#include <Roster.h>
-#include <Window.h>
-
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 using namespace BPrivate;
+
 
 BApplication *be_app = NULL;
 BMessenger be_app_messenger;
@@ -1227,8 +1229,9 @@ BApplication::_InitGUIContext()
 	if (error != B_OK)
 		return error;
 
-	// Initialize the IK after we have set be_app because of a construction of a
-	// AppServerLink (which depends on be_app) nested inside the call to get_menu_info.
+	// Initialize the IK after we have set be_app because of a construction
+	// of a AppServerLink (which depends on be_app) nested inside the call
+	// to get_menu_info.
 	error = _init_interface_kit_();
 	if (error != B_OK)
 		return error;
