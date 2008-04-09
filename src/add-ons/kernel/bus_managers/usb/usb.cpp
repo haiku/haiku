@@ -33,7 +33,9 @@ bus_std_ops(int32 op, ...)
 
 #ifdef TRACE_USB
 			set_dprintf_enabled(true);
+#ifndef __HAIKU__
 			load_driver_symbols("usb");
+#endif
 			TRACE(("usb_module: init\n"));
 #endif
 			Stack *stack = new(std::nothrow) Stack();
