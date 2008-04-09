@@ -63,7 +63,7 @@ BFileInterface::HandleMessage(int32 message,
 			reply.duration = request->duration;
 
 			rv = SetRef(ref, request->create, &reply.duration);
-			reply.duration = request->duration;
+
 			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
