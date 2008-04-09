@@ -98,7 +98,10 @@ BMediaRosterEx::BMediaRosterEx(status_t * out_error)
 	request.team = team;
 	request.messenger = BMessenger(NULL, this);
 	rv = QueryServer(SERVER_REGISTER_APP, &request, sizeof(request), &reply, sizeof(reply));
-	*out_error = (rv != B_OK) ? B_MEDIA_SYSTEM_FAILURE : B_OK;
+	if (rv != B_OK)
+		*out_error = B_MEDIA_SYSTEM_FAILURE;
+	else
+		*out_error = B_OK;
 }
 
 status_t

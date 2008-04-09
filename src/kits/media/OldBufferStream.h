@@ -74,6 +74,9 @@ typedef BBufferStream* stream_id;  // for now
 class BAbstractBufferStream
 {
 public:
+#if __GNUC__ > 3
+	virtual				~BAbstractBufferStream();
+#endif
 
 	virtual	status_t	GetStreamParameters(size_t *bufferSize,
 											int32 *bufferCount,

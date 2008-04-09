@@ -9,6 +9,12 @@
 /*************************************************************
  * public BAbstractBufferStream
  *************************************************************/
+#if __GNUC__ > 3
+BAbstractBufferStream::~BAbstractBufferStream()
+{
+}
+#endif
+
 
 status_t
 BAbstractBufferStream::GetStreamParameters(size_t *bufferSize,
