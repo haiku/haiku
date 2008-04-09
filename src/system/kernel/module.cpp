@@ -120,6 +120,8 @@ typedef struct module_iterator {
 
 	char				*prefix;
 	size_t				prefix_length;
+	const char			*suffix;
+	size_t				suffix_length;
 	DIR					*current_dir;
 	status_t			status;
 	int32				module_offset;
@@ -570,7 +572,10 @@ init_module(module *module)
 			// init module
 
 			TRACE(("initializing module %s (at %p)... \n", module->name, module->info->std_ops));
-			status = module->info->std_ops(B_MODULE_INIT);
+
+			if (module->info->std_ops != NULL)
+				status = module->info->std_ops(B_MODULE_INIT);
+
 			TRACE(("...done (%s)\n", strerror(status)));
 
 			if (status >= B_OK)
@@ -626,17 +631,18 @@ uninit_module(module *module)
 
 		case MODULE_READY:
 		{
-			status_t status;
-
+			status_t status = B_OK;
 			module->state = MODULE_UNINIT;
 
 			TRACE(("uninitializing module %s...\n", module->name));
-			status = module->info->std_ops(B_MODULE_UNINIT);
+
+			if (module->info->std_ops != NULL)
+				status = module->info->std_ops(B_MODULE_UNINIT);
+
 			TRACE(("...done (%s)\n", strerror(status)));
 
-			if (status == B_NO_ERROR) {
+			if (status == B_OK) {
 				module->state = MODULE_LOADED;
-
 				put_dependent_modules(module);
 				return B_OK;
 			}
@@ -689,6 +695,21 @@ iterator_push_path_on_stack(module_iterator *iterator, const char *path, uint32 
 }
 
 
+static bool
+match_iterator_suffix(module_iterator *iterator, const char *name)
+{
+	if (iterator->suffix == NULL || iterator->suffix_length == 0)
+		return true;
+
+	size_t length = strlen(name);
+	if (length <= iterator->suffix_length)
+		return false;
+
+	return name[length - iterator->suffix_length - 1] == '/'
+		&& !strcmp(name + length - iterator->suffix_length, iterator->suffix);
+}
+
+
 static status_t
 iterator_get_next_module(module_iterator *iterator, char *buffer,
 	size_t *_bufferSize)
@@ -701,7 +722,8 @@ iterator_get_next_module(module_iterator *iterator, char *buffer,
 		for (int32 i = iterator->module_offset; sBuiltInModules[i] != NULL; i++) {
 			// the module name must fit the prefix
 			if (strncmp(sBuiltInModules[i]->name, iterator->prefix,
-					iterator->prefix_length))
+					iterator->prefix_length)
+				|| !match_iterator_suffix(iterator, sBuiltInModules[i]->name))
 				continue;
 
 			*_bufferSize = strlcpy(buffer, sBuiltInModules[i]->name,
@@ -722,7 +744,8 @@ iterator_get_next_module(module_iterator *iterator, char *buffer,
 		for (int32 i = 0; module != NULL; i++) {
 			if (i >= iterator->module_offset) {
 				if (!strncmp(module->name, iterator->prefix,
-						iterator->prefix_length)) {
+						iterator->prefix_length)
+					&& match_iterator_suffix(iterator, module->name)) {
 					*_bufferSize = strlcpy(buffer, module->name, *_bufferSize);
 					iterator->module_offset = i + 1;
 
@@ -740,7 +763,7 @@ iterator_get_next_module(module_iterator *iterator, char *buffer,
 		// prevent from falling into modules hash iteration again
 		iterator->loaded_modules = false; 
 	}
-	
+
 nextPath:
 	if (iterator->current_dir == NULL) {
 		// get next directory path from the stack
@@ -849,12 +872,14 @@ nextModuleImage:
 	while (*iterator->current_header != NULL) {
 		module_info *info = *iterator->current_header;
 
-		// ToDo: we might want to create a module here and cache it in the hash table
+		// TODO: we might want to create a module here and cache it in the
+		// hash table
 
 		iterator->current_header++;
 		iterator->module_offset++;
 
-		if (strncmp(info->name, iterator->prefix, iterator->prefix_length))
+		if (strncmp(info->name, iterator->prefix, iterator->prefix_length)
+			|| !match_iterator_suffix(iterator, info->name))
 			continue;
 
 		*_bufferSize = strlcpy(buffer, info->name, *_bufferSize);
@@ -1092,18 +1117,15 @@ module_init(kernel_args *args)
 
 /*! This returns a pointer to a structure that can be used to
 	iterate through a list of all modules available under
-	a given prefix.
+	a given prefix that adhere to the specified suffix.
 	All paths will be searched and the returned list will
 	contain all modules available under the prefix.
 	The structure is then used by read_next_module_name(), and
 	must be freed by calling close_module_list().
 */
 void *
-open_module_list(const char *prefix)
+open_module_list_etc(const char *prefix, const char *suffix)
 {
-	module_iterator *iterator;
-	uint32 i;
-
 	TRACE(("open_module_list(prefix = %s)\n", prefix));
 
 	if (sModulesHash == NULL) {
@@ -1111,7 +1133,8 @@ open_module_list(const char *prefix)
 		return NULL;
 	}
 
-	iterator = (module_iterator *)malloc(sizeof(module_iterator));
+	module_iterator *iterator = (module_iterator *)malloc(
+		sizeof(module_iterator));
 	if (!iterator)
 		return NULL;
 
@@ -1124,6 +1147,10 @@ open_module_list(const char *prefix)
 	}
 	iterator->prefix_length = strlen(iterator->prefix);
 
+	iterator->suffix = suffix;
+	if (suffix != NULL)
+		iterator->suffix_length = strlen(iterator->suffix);
+
 	if (gBootDevice > 0) {
 		// We do have a boot device to scan
 
@@ -1132,7 +1159,7 @@ open_module_list(const char *prefix)
 		iterator->loaded_modules = false;
 
 		// put all search paths on the stack
-		for (i = 0; i < kNumModulePaths; i++) {
+		for (uint32 i = 0; i < kNumModulePaths; i++) {
 			if (sDisableUserAddOns && i >= kFirstNonSystemModulePath)
 				break;
 
@@ -1180,6 +1207,13 @@ open_module_list(const char *prefix)
 	}
 
 	return (void *)iterator;
+}
+
+
+void *
+open_module_list(const char *prefix)
+{
+	return open_module_list_etc(prefix, NULL);
 }
 
 

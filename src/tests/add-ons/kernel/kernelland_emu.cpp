@@ -273,7 +273,8 @@ Module::Init()
 {
 	status_t error = (fInfo ? B_OK : B_NO_INIT);
 	if (error == B_OK && !fInitialized) {
-		error = fInfo->std_ops(B_MODULE_INIT);
+		if (fInfo->std_ops != NULL)
+			error = fInfo->std_ops(B_MODULE_INIT);
 		if (error == B_OK)
 			fInitialized = true;
 	}
@@ -286,7 +287,8 @@ Module::Uninit()
 {
 	status_t error = (fInfo ? B_OK : B_NO_INIT);
 	if (error == B_OK && fInitialized) {
-		error = fInfo->std_ops(B_MODULE_UNINIT);
+		if (fInfo->std_ops != NULL)
+			error = fInfo->std_ops(B_MODULE_UNINIT);
 		fInitialized = false;
 	}
 	return error;

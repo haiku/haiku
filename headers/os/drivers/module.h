@@ -1,8 +1,7 @@
-/* Modules Definitions
-** 
-** Distributed under the terms of the OpenBeOS License.
-*/
-
+/*
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _MODULE_H
 #define _MODULE_H
 
@@ -46,10 +45,13 @@ extern "C" {
 
 extern status_t get_module(const char *path, module_info **_info);
 extern status_t put_module(const char *path);
-extern status_t get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize);
+extern status_t get_next_loaded_module_name(uint32 *cookie, char *buffer,
+	size_t *_bufferSize);
+extern void *open_module_list_etc(const char *prefix, const char *suffix);
 extern void *open_module_list(const char *prefix);
 extern status_t close_module_list(void *cookie);
-extern status_t read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize);
+extern status_t read_next_module_name(void *cookie, char *buffer,
+	size_t *_bufferSize);
 
 #ifdef __cplusplus
 }
