@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BE_BUILD_H
@@ -20,6 +20,11 @@
 #	define _PACKED __attribute__((packed))
 #	define _PRINTFLIKE(_format_, _args_) \
 		__attribute__((format(__printf__, _format_, _args_)))
+#	define _EXPORT
+#else
+#	define _UNUSED(argument) argument
+#	error Define _PACKED for your compiler
+#	define _PRINTFLIKE(format, args)
 #	define _EXPORT
 #endif
 
