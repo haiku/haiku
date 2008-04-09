@@ -1600,7 +1600,9 @@ UHCI::AddTo(Stack *stack)
 {
 #ifdef TRACE_USB
 	set_dprintf_enabled(true); 
+#ifndef __HAIKU__
 	load_driver_symbols("uhci");
+#endif
 #endif
 
 	if (!sPCIModule) {
