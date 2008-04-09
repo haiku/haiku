@@ -1,4 +1,11 @@
-// kernelland_emu.cpp
+/*
+ * Copyright 2002-2008, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ *		Axel Dörfler, axeld@pinc-software.de.
+ */
 
 #include <lock.h>
 #include <fs/devfs.h>
@@ -112,7 +119,8 @@ public:
 	status_t GetNextLoadedModuleName(uint32 *cookie, char *buffer,
 		size_t *bufferSize);
 
-	module_name_list *OpenModuleList(const char *prefix);
+	module_name_list *OpenModuleList(const char *prefix,
+		const char *suffix = NULL);
 	status_t ReadNextModuleName(module_name_list *list, char *buffer,
 		size_t *bufferSize);
 	status_t CloseModuleList(module_name_list *list);
@@ -123,9 +131,11 @@ public:
 	void PutDependencies(image_id image);
 
 private:
+	bool _MatchSuffix(const char *name, const char *suffix);
 	void _FindModules(BDirectory &dir, const char *moduleDir,
+		const char *suffix, module_name_list *list);
+	void _FindBuiltInModules(const char *prefix, const char *suffix,
 		module_name_list *list);
-	void _FindBuiltInModules(const char *prefix, module_name_list *list);
 
 	status_t _GetAddOn(const char *path, ModuleAddOn **addon);
 	void _PutAddOn(ModuleAddOn *addon);
@@ -476,19 +486,19 @@ ModuleManager::GetNextLoadedModuleName(uint32 *cookie, char *buffer,
 
 // OpenModuleList
 module_name_list *
-ModuleManager::OpenModuleList(const char *prefix)
+ModuleManager::OpenModuleList(const char *prefix, const char *suffix)
 {
 	module_name_list *list = NULL;
 	if (prefix) {
 		list = new module_name_list;
-		_FindBuiltInModules(prefix, list);
+		_FindBuiltInModules(prefix, suffix, list);
 
 		for (int32 i = 0; gModuleDirs[i]; i++) {
 			BPath path;
 			BDirectory dir;
 			if (path.SetTo(gModuleDirs[i], prefix) == B_OK
 				&& dir.SetTo(path.Path()) == B_OK) {
-				_FindModules(dir, gModuleDirs[i], list);
+				_FindModules(dir, gModuleDirs[i], suffix, list);
 			}
 		}
 
@@ -578,9 +588,25 @@ ModuleManager::PutDependencies(image_id image)
 }
 
 
+bool
+ModuleManager::_MatchSuffix(const char *name, const char *suffix)
+{
+	if (suffix == NULL || suffix[0] == '\0')
+		return true;
+
+	size_t suffixLength = strlen(suffix);
+	size_t length = strlen(name);
+	if (length <= suffixLength)
+		return false;
+
+	return name[length - suffixLength - 1] == '/'
+		&& !strcmp(name + length - suffixLength, suffix);
+}
+
+
 void
 ModuleManager::_FindModules(BDirectory &dir, const char *moduleDir,
-	module_name_list *list)
+	const char *suffix, module_name_list *list)
 {
 	BEntry entry;
 	while (dir.GetNextEntry(&entry) == B_OK) {
@@ -591,28 +617,31 @@ ModuleManager::_FindModules(BDirectory &dir, const char *moduleDir,
 				&& addon.Load(path.Path(), moduleDir) == B_OK) {
 				module_info **infos = addon.ModuleInfos();
 				for (int32 i = 0; infos[i]; i++) {
-					if (infos[i]->name)
+					if (infos[i]->name
+						&& _MatchSuffix(infos[i]->name, suffix))
 						list->names.insert(infos[i]->name);
 				}
 			}
 		} else if (entry.IsDirectory()) {
 			BDirectory subdir;
 			if (subdir.SetTo(&entry) == B_OK)
-				_FindModules(subdir, moduleDir, list);
+				_FindModules(subdir, moduleDir, suffix, list);
 		}
 	}
 }
 
 
 void
-ModuleManager::_FindBuiltInModules(const char *prefix, module_name_list *list)
+ModuleManager::_FindBuiltInModules(const char *prefix, const char *suffix,
+	module_name_list *list)
 {
 	uint32 count = fModules.CountModules();
 	uint32 prefixLength = strlen(prefix);
 
 	for (uint32 i = 0; i < count; i++) {
 		Module *module = fModules.ModuleAt(i);
-		if (!strncmp(module->Info()->name, prefix, prefixLength))
+		if (!strncmp(module->Info()->name, prefix, prefixLength)
+			&& _MatchSuffix(module->Info()->name, suffix))
 			list->names.insert(module->Info()->name);
 	}
 }
@@ -740,13 +769,21 @@ get_next_loaded_module_name(uint32 *cookie, char *name, size_t *nameLength)
 
 
 void *
+open_module_list_etc(const char *prefix, const char *suffix)
+{
+	TRACE(("open_module_list_etc('%s', '%s')\n", prefix, suffix));
+	return (void*)ModuleManager::Default()->OpenModuleList(prefix, suffix);
+}
+
+
+void *
 open_module_list(const char *prefix)
 {
-	TRACE(("open_module_list(`%s')\n", prefix));
+	TRACE(("open_module_list('%s')\n", prefix));
 	return (void*)ModuleManager::Default()->OpenModuleList(prefix);
 }
 
-// read_next_module_name
+
 status_t
 read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 {
@@ -755,7 +792,7 @@ read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 		(module_name_list*)cookie, buf, bufsize);
 }
 
-// close_module_list
+
 status_t
 close_module_list(void *cookie)
 {
@@ -766,7 +803,8 @@ close_module_list(void *cookie)
 
 
 thread_id
-spawn_kernel_thread(thread_func func, const char *name, int32 priority, void *data)
+spawn_kernel_thread(thread_func func, const char *name, int32 priority,
+	void *data)
 {
 	return spawn_thread(func, name, priority, data);
 }
