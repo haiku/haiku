@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons kernel network protocols unix ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders net ;
+UsePrivateHeaders shared ;
+
+KernelAddon unix :
+	unix.cpp
+	UnixAddress.cpp
+	UnixEndpoint.cpp
+	UnixFifo.cpp
+
+	Referenceable.cpp
+;
+
+SEARCH on [ FGristFiles Referenceable.cpp ]
+	= [ FDirName $(HAIKU_TOP) src kits support ] ;
