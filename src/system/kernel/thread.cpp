@@ -2380,6 +2380,11 @@ getrlimit(int resource, struct rlimit * rlp)
 		case RLIMIT_NOVMON:
 			return vfs_getrlimit(resource, rlp);
 
+		case RLIMIT_STACK:
+			rlp->rlim_cur = USER_STACK_SIZE;
+			rlp->rlim_max = USER_STACK_SIZE;
+			return 0;
+
 		default:
 			return EINVAL;
 	}
