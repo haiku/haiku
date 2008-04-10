@@ -50,6 +50,7 @@ struct stat {
 
 /* standard file types */
 #define S_IFMT				00000170000 /* type of file */
+#define	S_IFSOCK			00000140000 /* socket */
 #define	S_IFLNK				00000120000 /* symbolic link */
 #define S_IFREG 			00000100000 /* regular */
 #define S_IFBLK 			00000060000 /* block special */
@@ -63,6 +64,7 @@ struct stat {
 #define S_ISDIR(mode)		(((mode) & S_IFMT) == S_IFDIR)
 #define S_ISCHR(mode)		(((mode) & S_IFMT) == S_IFCHR)
 #define S_ISFIFO(mode)		(((mode) & S_IFMT) == S_IFIFO)
+#define S_ISSOCK(mode)		(((mode) & S_IFMT) == S_IFSOCK)
 #define S_ISINDEX(mode)		(((mode) & S_INDEX_DIR) == S_INDEX_DIR)
 
 #define	S_IUMSK 07777		/* user settable bits */
