@@ -45,7 +45,6 @@
 
 static const char *UptimeToString(char string[], size_t size);
 static const char *MemUsageToString(char string[], size_t size, system_info *info);
-static const char *CacheUsageToString(char string[], size_t size, system_info *info);
 
 static const rgb_color kDarkGrey = { 100, 100, 100, 255 };
 static const rgb_color kHaikuGreen = { 42, 131, 36, 255 };
