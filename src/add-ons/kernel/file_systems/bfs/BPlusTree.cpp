@@ -2311,8 +2311,16 @@ compareKeys(type_code type, const void *key1, int keyLength1,
 	    case B_STRING_TYPE:
     	{
 			int result = memcmp(key1, key2, min_c(keyLength1, keyLength2));
-			if (result == 0)
+			if (result == 0) {
+				// ignore trailing null bytes
+				if ((keyLength1 == keyLength2 + 1
+						&& ((uint8 *)key1)[keyLength2] == '\0')
+					|| (keyLength2 == keyLength1 + 1
+						&& ((uint8 *)key2)[keyLength1] == '\0'))
+					return 0;
+
 				result = keyLength1 - keyLength2;
+			}
 
 			return result;
 		}
