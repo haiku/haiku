@@ -78,8 +78,6 @@ hash_grow(struct hash_table *table)
 	uint32 newSize = get_prime_table_size(table->num_elements);
 	struct hash_element **newTable;
 	uint32 index;
-	void *start;
-	bool status;
 
 	if (table->table_size >= newSize)
 		return B_OK;
