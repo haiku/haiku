@@ -300,8 +300,8 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 	while (fReaders.Head() != &request && !IsReadShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fReaderSem, 1, B_ABSOLUTE_TIMEOUT,
-			timeout);
+		status_t error = acquire_sem_etc(fReaderSem, 1,
+			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 
 		benaphore_lock(&fLock);
 
@@ -319,8 +319,8 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 	while (fBuffer.Readable() == 0 && !IsReadShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fReaderSem, 1, B_ABSOLUTE_TIMEOUT,
-			timeout);
+		status_t error = acquire_sem_etc(fReaderSem, 1,
+			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 
 		benaphore_lock(&fLock);
 
@@ -345,8 +345,8 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout)
 	while (fWriters.Head() != &request && !IsWriteShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fWriterSem, 1, B_ABSOLUTE_TIMEOUT,
-			timeout);
+		status_t error = acquire_sem_etc(fWriterSem, 1,
+			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 
 		benaphore_lock(&fLock);
 
@@ -364,8 +364,8 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout)
 	while (fBuffer.Writable() < request.size && !IsWriteShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fWriterSem, 1, B_ABSOLUTE_TIMEOUT,
-			timeout);
+		status_t error = acquire_sem_etc(fWriterSem, 1,
+			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
 
 		benaphore_lock(&fLock);
 
