@@ -89,7 +89,10 @@ UnixBufferQueue::Read(size_t size, net_buffer** _buffer)
 
 	// remove the part we've copied
 	gBufferModule->remove_header(buffer, size);
-	
+
+	fSize -= size;
+	*_buffer = newBuffer;
+
 	return B_OK;
 }
 
