@@ -20,6 +20,7 @@ bus_std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT: {
+			TRACE(("usb_module: init\n"));
 			if (gUSBStack)
 				return B_OK;
 
@@ -28,6 +29,7 @@ bus_std_ops(int32 op, ...)
 			if (shared >= B_OK && clone_area("usb stack clone", &address,
 				B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA, shared) >= B_OK) {
 				gUSBStack = *((Stack **)address);
+				TRACE(("usb_module: found shared stack at %p\n", gUSBStack));
 				return B_OK;
 			}
 
@@ -36,9 +38,9 @@ bus_std_ops(int32 op, ...)
 #ifndef __HAIKU__
 			load_driver_symbols("usb");
 #endif
-			TRACE(("usb_module: init\n"));
 #endif
 			Stack *stack = new(std::nothrow) Stack();
+			TRACE(("usb_module: stack created %p\n", stack));
 			if (!stack)
 				return B_NO_MEMORY;
 

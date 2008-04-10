@@ -6,14 +6,15 @@
  *		Michael Lotz <mmlr@mlotz.ch>
  */
 
+#include "BeOSCompatibility.h"
+#include "usb_raw.h"
+
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <lock.h>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
-#include "usb_raw.h"
-#include "BeOSCompatibility.h"
 
 //#define TRACE_USB_RAW
 #ifdef TRACE_USB_RAW

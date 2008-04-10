@@ -10,9 +10,9 @@
 #ifndef _USB_P_
 #define _USB_P_
 
-#include <lock.h>
-#include "usbspec_p.h"
 #include "BeOSCompatibility.h"
+#include "usbspec_p.h"
+#include <lock.h>
 
 
 #ifdef TRACE_USB

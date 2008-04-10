@@ -2,10 +2,12 @@
 #define _USB_BEOS_COMPATIBILITY_H_
 #ifndef HAIKU_TARGET_PLATFORM_HAIKU
 
-#include <lock.h>
+// prevent inclusion of original lock.h as it conflicts with what we have here
+#define _KERNEL_LOCK_H
+
 #include <stdarg.h>
 #include <stdio.h>
-
+#include <OS.h>
 
 #define IS_USER_ADDRESS(x)		(((uint32)x & 0x80000000) > 0)
 #define IS_KERNEL_ADDRESS(x)	(((uint32)x & 0x80000000) == 0)
@@ -26,6 +28,13 @@ enum {
 	B_DEV_TOO_LATE,
 };
 #endif
+
+
+typedef struct benaphore {
+	sem_id	sem;
+	int32	count;
+} benaphore;
+
 
 inline status_t
 benaphore_init(benaphore *ben, const char *name)
@@ -50,6 +59,24 @@ benaphore_destroy(benaphore *ben)
 }
 
 
+inline status_t
+benaphore_lock(benaphore *ben)
+{
+	if (atomic_add(&ben->count, -1) <= 0)
+		return acquire_sem(ben->sem);
+	return B_OK;
+}
+
+
+inline status_t
+benaphore_unlock(benaphore *ben)
+{
+	if (atomic_add(&ben->count, 1) < 0)
+		return release_sem(ben->sem);
+	return B_OK;
+}
+
+
 inline void
 load_driver_symbols(char *driver)
 {
@@ -66,6 +93,11 @@ snprintf(char *buffer, size_t bufferSize, const char *format, ...)
 	va_end(args);
 	return result;
 }
+
+#undef B_KERNEL_READ_AREA
+#define B_KERNEL_READ_AREA B_READ_AREA
+#undef B_KERNEL_WRITE_AREA
+#define B_KERNEL_WRITE_AREA B_WRITE_AREA
 
 #endif // !HAIKU_TARGET_PLATFORM_HAIKU
 #endif // !_USB_BEOS_COMPATIBILITY_H_
