@@ -8,6 +8,11 @@
 #include "unix.h"
 
 
+#define UNIX_FIFO_DEBUG_LEVEL	1
+#define UNIX_DEBUG_LEVEL		UNIX_FIFO_DEBUG_LEVEL
+#include "UnixDebug.h"
+
+
 UnixBufferQueue::UnixBufferQueue(size_t capacity)
 	:
 	fSize(0),
@@ -180,6 +185,9 @@ UnixFifo::Shutdown(uint32 shutdown)
 status_t
 UnixFifo::Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer)
 {
+	TRACE("[%ld] UnixFifo::Read(%lu, %lld)\n", find_thread(NULL), numBytes,
+		timeout);
+
 	if (IsReadShutdown())
 		return UNIX_FIFO_SHUTDOWN;
 
@@ -206,7 +214,7 @@ UnixFifo::Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer)
 		release_sem_etc(fWriterSem, 1, B_RELEASE_ALL);
 	}
 
-	return error;
+	RETURN_ERROR(error);
 }
 
 
@@ -239,7 +247,7 @@ UnixFifo::Write(net_buffer* buffer, bigtime_t timeout)
 		release_sem_etc(fReaderSem, 1, B_RELEASE_ALL);
 	}
 
-	return error;
+	RETURN_ERROR(error);
 }
 
 
@@ -287,18 +295,18 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 {
 	// wait for the request to reach the front of the queue
 	if (fReaders.Head() != &request && timeout == 0)
-		return B_WOULD_BLOCK;
+		RETURN_ERROR(B_WOULD_BLOCK);
 
 	while (fReaders.Head() != &request && !IsReadShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fReaderSem, 1, timeout,
-			B_ABSOLUTE_TIMEOUT);
+		status_t error = acquire_sem_etc(fReaderSem, 1, B_ABSOLUTE_TIMEOUT,
+			timeout);
 
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)
-			return error;
+			RETURN_ERROR(error);
 	}
 
 	if (IsReadShutdown())
@@ -306,24 +314,24 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 
 	// wait for any data to become available
 	if (fBuffer.Readable() == 0 && timeout == 0)
-		return B_WOULD_BLOCK;
+		RETURN_ERROR(B_WOULD_BLOCK);
 
 	while (fBuffer.Readable() == 0 && !IsReadShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fReaderSem, 1, timeout,
-			B_ABSOLUTE_TIMEOUT);
+		status_t error = acquire_sem_etc(fReaderSem, 1, B_ABSOLUTE_TIMEOUT,
+			timeout);
 
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)
-			return error;
+			RETURN_ERROR(error);
 	}
 
 	if (IsReadShutdown())
 		return UNIX_FIFO_SHUTDOWN;
 
-	return fBuffer.Read(numBytes, _buffer);
+	RETURN_ERROR(fBuffer.Read(numBytes, _buffer));
 }
 
 
@@ -332,18 +340,18 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout)
 {
 	// wait for the request to reach the front of the queue
 	if (fWriters.Head() != &request && timeout == 0)
-		return B_WOULD_BLOCK;
+		RETURN_ERROR(B_WOULD_BLOCK);
 
 	while (fWriters.Head() != &request && !IsWriteShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fWriterSem, 1, timeout,
-			B_ABSOLUTE_TIMEOUT);
+		status_t error = acquire_sem_etc(fWriterSem, 1, B_ABSOLUTE_TIMEOUT,
+			timeout);
 
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)
-			return error;
+			RETURN_ERROR(error);
 	}
 
 	if (IsWriteShutdown())
@@ -351,22 +359,22 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout)
 
 	// wait for any space to become available
 	if (fBuffer.Writable() < request.size && timeout == 0)
-		return B_WOULD_BLOCK;
+		RETURN_ERROR(B_WOULD_BLOCK);
 
 	while (fBuffer.Writable() < request.size && !IsWriteShutdown()) {
 		benaphore_unlock(&fLock);
 
-		status_t error = acquire_sem_etc(fWriterSem, 1, timeout,
-			B_ABSOLUTE_TIMEOUT);
+		status_t error = acquire_sem_etc(fWriterSem, 1, B_ABSOLUTE_TIMEOUT,
+			timeout);
 
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)
-			return error;
+			RETURN_ERROR(error);
 	}
 
 	if (IsWriteShutdown())
 		return UNIX_FIFO_SHUTDOWN;
 
-	return fBuffer.Write(buffer);
+	RETURN_ERROR(fBuffer.Write(buffer));
 }
