@@ -2381,9 +2381,14 @@ getrlimit(int resource, struct rlimit * rlp)
 			return vfs_getrlimit(resource, rlp);
 
 		case RLIMIT_STACK:
-			rlp->rlim_cur = USER_STACK_SIZE;
-			rlp->rlim_max = USER_STACK_SIZE;
+		{
+			struct thread *thread = thread_get_current_thread();
+			if (!thread)
+				return B_ERROR;
+			rlp->rlim_cur = thread->user_stack_size;
+			rlp->rlim_max = thread->user_stack_size;
 			return 0;
+		}
 
 		default:
 			return EINVAL;
