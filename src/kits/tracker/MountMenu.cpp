@@ -98,7 +98,7 @@ bool
 AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 {
 	if (!partition->ContainsFileSystem())
-		return NULL;
+		return false;
 
 	// get name (and eventually the type)
 	BString name = partition->ContentName();
@@ -107,7 +107,7 @@ AddMenuItemVisitor::Visit(BPartition *partition, int32 level)
 		if (name.Length() == 0) {
 			const char *type = partition->ContentType();
 			if (type == NULL)
-				return NULL;
+				return false;
 
 			name = "(unnamed ";
 			name << type;
