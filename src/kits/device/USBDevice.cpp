@@ -49,7 +49,7 @@ BUSBDevice::SetTo(const char *path)
 		return B_BAD_VALUE;
 
 	fPath = strdup(path);
-	fRawFD = open(path, O_RDWR);
+	fRawFD = open(path, O_RDWR|O_CLOEXEC);
 	if (fRawFD < 0) {
 		Unset();
 		return B_ERROR;
