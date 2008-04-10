@@ -3737,6 +3737,87 @@ vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 }
 
 
+/*!	\brief Creates a special node in the file system.
+
+	The caller gets a reference to the newly created node (which is passed
+	back through \a _createdVnode) and is responsible for releasing it.
+
+	\param path The path where to create the entry for the node. Can be \c NULL,
+		in which case the node is created without an entry in the root FS -- it
+		will automatically be deleted when the last reference has been released.
+	\param subVnode The definition of the subnode. Can be \c NULL, in which case
+		the target file system will just create the node with its standard
+		operations. Depending on the type of the node a subnode might be created
+		automatically, though.
+	\param mode The type and permissions for the node to be created.
+	\param flags Flags to be passed to the creating FS.
+	\param kernel \c true, if called in the kernel context (relevant only if
+		\a path is not \c NULL and not absolute).
+	\param _superVnode Pointer to a pre-allocated structure to be filled by the
+		file system creating the node, with the private data pointer and
+		operations for the super node. Can be \c NULL.
+	\param _createVnode Pointer to pre-allocated storage where to store the
+		pointer to the newly created node.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+vfs_create_special_node(const char *path, fs_vnode *subVnode, mode_t mode,
+	uint32 flags, bool kernel, fs_vnode *_superVnode,
+	struct vnode **_createdVnode)
+{
+	struct vnode* dirNode;
+	char _leaf[B_FILE_NAME_LENGTH];
+	char* leaf = NULL;
+
+	if (path) {
+		// We've got a path. Get the dir vnode and the leaf name.
+		KPath tmpPathBuffer(B_PATH_NAME_LENGTH + 1);
+		if (tmpPathBuffer.InitCheck() != B_OK)
+			return B_NO_MEMORY;
+
+		char* tmpPath = tmpPathBuffer.LockBuffer();
+		if (strlcpy(tmpPath, path, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
+			return B_NAME_TOO_LONG;
+
+		// get the dir vnode and the leaf name
+		leaf = _leaf;
+		status_t error = path_to_dir_vnode(tmpPath, &dirNode, leaf, kernel);
+		if (error != B_OK)
+			return error;
+	} else {
+		// No path. Create the node in the root FS.
+		dirNode = sRoot;
+		inc_vnode_ref_count(dirNode);
+	}
+
+	VNodePutter _(dirNode);
+
+	// check support for creating special nodes
+	if (!HAS_FS_CALL(dirNode, create_special_node))
+		return B_UNSUPPORTED;
+
+	// create the node
+	fs_vnode superVnode;
+	ino_t nodeID;
+	status_t status = FS_CALL(sRoot, create_special_node, leaf, subVnode,
+		mode, flags, _superVnode != NULL ? _superVnode : &superVnode, &nodeID);
+	if (status != B_OK)
+		return status;
+
+	// lookup the node
+	mutex_lock(&sVnodeMutex);
+	*_createdVnode = lookup_vnode(dirNode->mount->id, nodeID);
+	mutex_unlock(&sVnodeMutex);
+
+	if (*_createdVnode == NULL) {
+		panic("vfs_create_special_node(): lookup of node failed");
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
 extern "C" void
 vfs_put_vnode(struct vnode *vnode)
 {

@@ -128,6 +128,11 @@ status_t vfs_get_module_path(const char *basePath, const char *moduleName,
 status_t vfs_normalize_path(const char *path, char *buffer, size_t bufferSize,
 			bool kernel);
 
+/* service call for whoever wants to create a special node */
+status_t vfs_create_special_node(const char *path, fs_vnode *subVnode,
+			mode_t mode, uint32 flags, bool kernel, fs_vnode *_superVnode,
+			struct vnode **_createdVnode);
+
 /* service call for the node monitor */
 status_t resolve_mount_point_to_volume_root(dev_t mountID, ino_t nodeID,
 			dev_t *resolvedMountID, ino_t *resolvedNodeID);
