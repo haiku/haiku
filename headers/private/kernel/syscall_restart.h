@@ -130,13 +130,12 @@ struct SyscallRestartWrapper {
 
 	~SyscallRestartWrapper()
 	{
-		atomic_and(&fThread->flags, ~THREAD_FLAGS_SYSCALL);
-
 		if (fResult == B_INTERRUPTED) {
 			// interrupted -- set flag for syscall restart
-			if ((fThread->flags & THREAD_FLAGS_SYSCALL) != 0)
-				atomic_or(&fThread->flags, THREAD_FLAGS_RESTART_SYSCALL);
+			atomic_or(&fThread->flags, THREAD_FLAGS_RESTART_SYSCALL);
 		}
+
+		atomic_and(&fThread->flags, ~THREAD_FLAGS_SYSCALL);
 	}
 
 	SyscallRestartWrapper<Type>& operator=(const Type& other)
