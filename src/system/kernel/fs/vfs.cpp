@@ -6721,12 +6721,8 @@ fs_sync(dev_t device)
 
 	// And then, let the file systems do their synchronizing work
 
-	mutex_lock(&sMountMutex);
-
 	if (HAS_FS_MOUNT_CALL(mount, sync))
 		status = FS_MOUNT_CALL_NO_PARAMS(mount, sync);
-
-	mutex_unlock(&sMountMutex);
 
 	put_mount(mount);
 	return status;
