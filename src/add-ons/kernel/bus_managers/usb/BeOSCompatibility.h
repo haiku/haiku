@@ -95,9 +95,9 @@ snprintf(char *buffer, size_t bufferSize, const char *format, ...)
 }
 
 #undef B_KERNEL_READ_AREA
-#define B_KERNEL_READ_AREA B_READ_AREA
+#define B_KERNEL_READ_AREA 0
 #undef B_KERNEL_WRITE_AREA
-#define B_KERNEL_WRITE_AREA B_WRITE_AREA
+#define B_KERNEL_WRITE_AREA 0
 
 #endif // !HAIKU_TARGET_PLATFORM_HAIKU
 #endif // !_USB_BEOS_COMPATIBILITY_H_
