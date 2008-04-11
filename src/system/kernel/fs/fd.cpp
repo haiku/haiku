@@ -624,7 +624,7 @@ common_close(int fd, bool kernel)
 static ssize_t
 common_user_io(int fd, off_t pos, void *buffer, size_t length, bool write)
 {
-	if (IS_KERNEL_ADDRESS(buffer))
+	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
 	if (pos < -1)
@@ -814,7 +814,7 @@ _user_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
 	struct file_descriptor *descriptor;
 
-	if (IS_KERNEL_ADDRESS(buffer))
+	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
 	TRACE(("user_ioctl: fd %d\n", fd));
@@ -835,7 +835,7 @@ _user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount
 	struct file_descriptor *descriptor;
 	ssize_t retval;
 
-	if (IS_KERNEL_ADDRESS(buffer))
+	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
 
 	TRACE(("user_read_dir(fd = %d, buffer = %p, bufferSize = %ld, count = %lu)\n", fd, buffer, bufferSize, maxCount));
@@ -1120,15 +1120,9 @@ _kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
 	TRACE(("kern_ioctl: fd %d\n", fd));
 
-	struct thread *thread = thread_get_current_thread();
-	bool wasSyscall = atomic_and(&thread->flags, ~THREAD_FLAGS_IOCTL_SYSCALL);
+	IoctlSyscallFlagUnsetter _;
 
-	status_t status = fd_ioctl(true, fd, op, buffer, length);
-
-	if (wasSyscall)
-		atomic_or(&thread->flags, THREAD_FLAGS_IOCTL_SYSCALL);
-
-	return status;
+	return fd_ioctl(true, fd, op, buffer, length);
 }
 
 
