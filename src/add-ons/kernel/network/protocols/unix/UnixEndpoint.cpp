@@ -193,11 +193,10 @@ UnixEndpoint::Bind(const struct sockaddr *_address)
 		if (pathLen == 0 || pathLen == sizeof(address->sun_path))
 			RETURN_ERROR(B_BAD_VALUE);
 
-		bool kernel = false;
-			// TODO: We don't have the info at this point!
 		struct vnode* vnode;
 		status_t error = vfs_create_special_node(address->sun_path,
-			NULL, S_IFSOCK | 0644, 0, kernel, NULL, &vnode);
+			NULL, S_IFSOCK | 0644, 0, !gStackModule->is_syscall(), NULL,
+			&vnode);
 		if (error != B_OK)
 			RETURN_ERROR(error == B_FILE_EXISTS ? EADDRINUSE : error);
 
@@ -295,11 +294,9 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 		if (pathLen == 0 || pathLen == sizeof(address->sun_path))
 			RETURN_ERROR(B_BAD_VALUE);
 
-		bool kernel = false;
-			// TODO: We don't have the info at this point!
 		struct stat st;
 		status_t error = vfs_read_stat(-1, address->sun_path, true, &st,
-			kernel);
+			!gStackModule->is_syscall());
 		if (error != B_OK)
 			RETURN_ERROR(error);
 
