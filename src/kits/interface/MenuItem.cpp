@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku, Inc.
+ * Copyright 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -20,6 +20,8 @@
 #include <Shape.h>
 #include <String.h>
 #include <Window.h>
+
+#include <MenuPrivate.h>
 
 #include "utf8_functions.h"
 
@@ -69,6 +71,7 @@ const unsigned char kShiftBits[] = {
 
 const float kLightBGTint = (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3.0;
 
+using BPrivate::MenuPrivate;
 
 BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
 					 uint32 modifiers)
@@ -247,8 +250,10 @@ BMenuItem::SetMarked(bool state)
 {
 	fMark = state;
 
-	if (state && Menu() != NULL)
-		Menu()->_ItemMarked(this);
+	if (state && Menu() != NULL) {
+		MenuPrivate priv(Menu());
+		priv.ItemMarked(this);
+	}
 }
 
 
@@ -372,14 +377,18 @@ BMenuItem::Frame() const
 void
 BMenuItem::GetContentSize(float *width, float *height)
 {
-	fSuper->_CacheFontInfo();
+	// TODO: Get rid of this. BMenu should handle this
+	// automatically. Maybe it's not even needed, since our
+	// BFont::Height() caches the value locally
+	MenuPrivate(fSuper).CacheFontInfo();
 
 	fCachedWidth = fSuper->StringWidth(fLabel);
 
 	if (width)
 		*width = (float)ceil(fCachedWidth);
-	if (height)
-		*height = fSuper->fFontHeight;
+	if (height) {
+		*height = MenuPrivate(fSuper).FontHeight();
+	}
 }
 
 
@@ -399,9 +408,9 @@ BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 void
 BMenuItem::DrawContent()
 {
-	fSuper->_CacheFontInfo();
+	MenuPrivate(fSuper).CacheFontInfo();
 
-	fSuper->MovePenBy(0, fSuper->fAscent);
+	fSuper->MovePenBy(0, MenuPrivate(fSuper).Ascent());
 	BPoint lineStart = fSuper->PenLocation();
 
 	float labelWidth, labelHeight;
@@ -472,7 +481,8 @@ BMenuItem::Draw()
 	DrawContent();
 
 	// draw extra symbols
-	if (fSuper->Layout() == B_ITEMS_IN_COLUMN) {
+	const menu_layout layout = MenuPrivate(fSuper).Layout();
+	if (layout == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())
 			_DrawMarkSymbol(bgColor);
 
@@ -504,8 +514,10 @@ BMenuItem::IsSelected() const
 BPoint
 BMenuItem::ContentLocation() const
 {	
-	return BPoint(fBounds.left + Menu()->fPad.left,
-		fBounds.top + Menu()->fPad.top);
+	const BRect &padding = MenuPrivate(fSuper).Padding();
+	
+	return BPoint(fBounds.left + padding.left,
+		fBounds.top + padding.top);
 }
 
 
@@ -550,7 +562,8 @@ void
 BMenuItem::_InitMenuData(BMenu *menu)
 {
 	fSubmenu = menu;
-	fSubmenu->fSuperitem = this;
+	
+	MenuPrivate(fSubmenu).SetSuperItem(this);
 
 	BMenuItem *item = menu->FindMarked();
 
@@ -564,9 +577,10 @@ BMenuItem::_InitMenuData(BMenu *menu)
 void
 BMenuItem::Install(BWindow *window)
 {
-	if (fSubmenu)
-		fSubmenu->_Install(window);
-
+	if (fSubmenu) {
+		MenuPrivate(fSubmenu).Install(window);
+	}
+	
 	fWindow = window;
 
 	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
@@ -619,9 +633,10 @@ BMenuItem::Invoke(BMessage *message)
 void
 BMenuItem::Uninstall()
 {
-	if (fSubmenu != NULL)
-		fSubmenu->_Uninstall();
-
+	if (fSubmenu != NULL) {
+		MenuPrivate(fSubmenu).Uninstall();
+	}
+	
 	if (Target() == fWindow)
 		SetTarget(BMessenger());
 
@@ -640,7 +655,7 @@ BMenuItem::SetSuper(BMenu *super)
 		debugger("Error - can't add menu or menu item to more than 1 container (either menu or menubar).");
 
 	if (fSubmenu != NULL) {
-		fSubmenu->fSuper = super;
+		MenuPrivate(fSubmenu).SetSuper(super);
 	}
 
 	fSuper = super;
@@ -667,7 +682,7 @@ BMenuItem::_DrawMarkSymbol(rgb_color bgColor)
 
 	BRect r(fBounds);
 	float leftMargin;
-	fSuper->GetItemMargins(&leftMargin, NULL, NULL, NULL);
+	MenuPrivate(fSuper).GetItemMargins(&leftMargin, NULL, NULL, NULL);
 	r.right = r.left + leftMargin - 3;
 	r.left += 1;
 
@@ -715,28 +730,30 @@ BMenuItem::_DrawShortcutSymbol()
 	if (fSubmenu)	
 		where.x -= fBounds.Height() - 3;
 
+	const float ascent = MenuPrivate(fSuper).Ascent();
 	switch (fShortcutChar) {
 		case B_DOWN_ARROW:
 		case B_UP_ARROW:
 		case B_LEFT_ARROW:
 		case B_RIGHT_ARROW:
 		case B_ENTER:
-			_DrawControlChar(fShortcutChar, where + BPoint(0, fSuper->fAscent));
+			_DrawControlChar(fShortcutChar, where + BPoint(0, ascent));
 			break;
 
 		default:
-			fSuper->DrawChar(fShortcutChar, where + BPoint(0, fSuper->fAscent));
+			fSuper->DrawChar(fShortcutChar, where + BPoint(0, ascent));
 			break;
 	}
 
 	where.y += (fBounds.Height() - 11) / 2 - 1;
 	where.x -= 4;	
 	
+	const bool altCommandKey = MenuPrivate(fSuper).IsAltCommandKey();
 	if (fModifiers & B_COMMAND_KEY) {
 		BRect rect(0,0,16,10);
 		BBitmap control(rect, B_CMAP8);
 
-		if (BMenu::sAltAsCommandKey)
+		if (altCommandKey)
 			control.ImportBits(kAltBits, sizeof(kAltBits), 17, 0, B_CMAP8);
 		else
 			control.ImportBits(kCtrlBits, sizeof(kCtrlBits), 17, 0, B_CMAP8);
@@ -749,7 +766,7 @@ BMenuItem::_DrawShortcutSymbol()
 		BRect rect(0,0,16,10);
 		BBitmap control(rect, B_CMAP8);
 
-		if (BMenu::sAltAsCommandKey)
+		if (altCommandKey)
 			control.ImportBits(kCtrlBits, sizeof(kCtrlBits), 17, 0, B_CMAP8);
 		else	
 			control.ImportBits(kAltBits, sizeof(kAltBits), 17, 0, B_CMAP8);
@@ -774,7 +791,7 @@ BMenuItem::_DrawSubmenuSymbol(rgb_color bgColor)
 
 	BRect r(fBounds);
 	float rightMargin;
-	fSuper->GetItemMargins(NULL, NULL, &rightMargin, NULL);
+	MenuPrivate(fSuper).GetItemMargins(NULL, NULL, &rightMargin, NULL);
 	r.left = r.right - rightMargin + 3;
 	r.right -= 1;
 

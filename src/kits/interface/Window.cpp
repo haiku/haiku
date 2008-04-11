@@ -94,6 +94,7 @@ class BWindow::Shortcut {
 
 
 using BPrivate::gDefaultTokens;
+using BPrivate::MenuPrivate;
 
 static property_info sWindowPropInfo[] = {
 	{
@@ -359,8 +360,9 @@ BWindow::BWindow(BRect frame, int32 bitmapToken)
 
 BWindow::~BWindow()
 {
-	if (BMenu *menu = dynamic_cast<BMenu *>(fFocus))
-		menu->QuitTracking();
+	if (BMenu *menu = dynamic_cast<BMenu *>(fFocus)) {
+		MenuPrivate(menu).QuitTracking();
+	}
 
 	// The BWindow is locked when the destructor is called,
 	// we need to unlock because the menubar thread tries
@@ -1052,9 +1054,10 @@ FrameMoved(origin);
 			// Close an eventually opened menu
 			// unless the target is the menu itself
 			BMenu *menu = dynamic_cast<BMenu *>(fFocus);
+			MenuPrivate privMenu(menu);
 			if (menu != NULL && menu != view
-				&& menu->State() != MENU_STATE_CLOSED) {
-				menu->QuitTracking();
+				&& privMenu.State() != MENU_STATE_CLOSED) {
+				privMenu.QuitTracking();
 				return;			
 			}
 			
@@ -3260,8 +3263,10 @@ BWindow::_HandleKeyDown(BMessage* event)
 			//	example)
 			if (shortcut->MenuItem() != NULL) {
 				BMenu* menu = shortcut->MenuItem()->Menu();
-				if (menu != NULL)
-					menu->InvokeItem(shortcut->MenuItem(), true);
+				if (menu != NULL) {
+					MenuPrivate(menu).InvokeItem(shortcut->MenuItem(),
+												true);
+				}
 			} else {
 				BHandler* target = shortcut->Target();
 				if (target == NULL)

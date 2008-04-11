@@ -8,6 +8,41 @@ enum menu_states {
 	MENU_STATE_CLOSED = 5
 };
 
+class BMenu;
+class BWindow;
+
+namespace BPrivate {
+	
+class MenuPrivate {
+public:
+	MenuPrivate(BMenu *menu);
+	
+	menu_layout Layout() const;
+
+	void ItemMarked(BMenuItem *item);
+	void CacheFontInfo();
+	
+	float FontHeight() const;
+	float Ascent() const;
+	BRect Padding() const;
+	void GetItemMargins(float *, float *, float *, float *) const;
+
+	bool IsAltCommandKey() const;
+	int State(BMenuItem **item = NULL) const;
+	
+	void Install(BWindow *window);
+	void Uninstall();
+	void SetSuper(BMenu *menu);
+	void SetSuperItem(BMenuItem *item);
+	void InvokeItem(BMenuItem *item, bool now = false);	
+	void QuitTracking(bool thisMenuOnly = true);
+	
+private:
+	BMenu *fMenu;	
+};
+
+};
+
 extern const char *kEmptyMenuLabel;
 
 

@@ -2620,3 +2620,121 @@ get_menu_info(menu_info *info)
 
 	return status;
 }
+
+
+// MenuPrivate
+namespace BPrivate {
+	
+MenuPrivate::MenuPrivate(BMenu *menu)
+	:
+	fMenu(menu)
+{
+}
+
+
+menu_layout
+MenuPrivate::Layout() const
+{
+	return fMenu->Layout();
+}
+
+
+void
+MenuPrivate::ItemMarked(BMenuItem *item)
+{
+	fMenu->_ItemMarked(item);
+}
+
+
+void
+MenuPrivate::CacheFontInfo()
+{
+	fMenu->_CacheFontInfo();
+}
+
+	
+float
+MenuPrivate::FontHeight() const
+{
+	return fMenu->fFontHeight;
+}
+
+
+float
+MenuPrivate::Ascent() const
+{
+	return fMenu->fAscent;
+}
+
+
+BRect
+MenuPrivate::Padding() const
+{
+	return fMenu->fPad;
+}
+
+
+void
+MenuPrivate::GetItemMargins(float *left, float *top,
+					float *right, float *bottom) const
+{
+	fMenu->GetItemMargins(left, top, right, bottom);
+}
+
+
+bool
+MenuPrivate::IsAltCommandKey() const
+{
+	return fMenu->sAltAsCommandKey;
+}
+
+
+int
+MenuPrivate::State(BMenuItem **item) const
+{
+	return fMenu->State(item);
+}
+
+		
+void
+MenuPrivate::Install(BWindow *window)
+{
+	fMenu->_Install(window);
+}
+
+
+void
+MenuPrivate::Uninstall()
+{
+	fMenu->_Uninstall();
+}
+
+
+void
+MenuPrivate::SetSuper(BMenu *menu)
+{
+	fMenu->fSuper = menu;
+}
+
+
+void
+MenuPrivate::SetSuperItem(BMenuItem *item)
+{
+	fMenu->fSuperitem = item;
+}
+
+
+void
+MenuPrivate::InvokeItem(BMenuItem *item, bool now)
+{
+	fMenu->InvokeItem(item, now);
+}
+
+
+void
+MenuPrivate::QuitTracking(bool thisMenuOnly)
+{
+	fMenu->QuitTracking(thisMenuOnly);
+}
+
+} ;

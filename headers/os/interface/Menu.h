@@ -19,6 +19,7 @@ namespace BPrivate {
 	class BMenuWindow;
 	class ExtraMenuData;
 	class TriggerList;
+	class MenuPrivate;
 }
 
 enum menu_layout {
@@ -159,9 +160,8 @@ public:
 								void* state);
 
 private:
-	friend class BWindow;
 	friend class BMenuBar;
-	friend class BMenuItem;
+	friend class BPrivate::MenuPrivate;
 	friend status_t _init_interface_kit_();
 	friend status_t	set_menu_info(menu_info* info);
 	friend status_t	get_menu_info(menu_info* info);
