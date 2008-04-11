@@ -17,6 +17,7 @@ extern "C" {
 
 struct file_descriptor;
 struct io_context;
+struct net_socket;
 struct selectsync;
 struct select_info;
 
@@ -47,6 +48,7 @@ struct file_descriptor {
 	union {
 		struct vnode *vnode;
 		struct fs_mount *mount;
+		struct net_socket *socket;
 	} u;
 	void	*cookie;
 	int32	open_mode;
