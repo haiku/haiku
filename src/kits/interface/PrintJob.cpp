@@ -663,13 +663,13 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 	region.Set(BRect(rect.left, rect.top, rect.right, rect.bottom));
 
 	view->AppendToPicture(picture);
-	view->f_is_printing = true;
+	view->fIsPrinting = true;
 	view->PushState();
 	view->SetOrigin(origin);
 	view->ConstrainClippingRegion(&region);
 	view->Draw(rect);
 	view->PopState();
-	view->f_is_printing = false;
+	view->fIsPrinting = false;
 	view->EndPicture();
 
 	BView *child = view->ChildAt(0);
@@ -684,13 +684,13 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 
 	if (view->Flags() & B_DRAW_ON_CHILDREN)	{
 		view->AppendToPicture(picture);
-		view->f_is_printing = true;
+		view->fIsPrinting = true;
 		view->PushState();
 		view->SetOrigin(origin);
 		view->ConstrainClippingRegion(&region);
 		view->DrawAfterChildren(rect);
 		view->PopState();
-		view->f_is_printing = false;
+		view->fIsPrinting = false;
 		view->EndPicture();
 	}
 }

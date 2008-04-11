@@ -259,14 +259,12 @@ private:
 
 	friend class BApplication;
 	friend class BBitmap;
-	friend class BScrollBar;
 	friend class BView;
 	friend class BMenuItem;
 	friend class BWindowScreen;
 	friend class BDirectWindow;
 	friend class BFilePanel;
-	friend class BHandler;
-	friend class _BEventMask;
+	
 	friend void _set_menu_sem_(BWindow* w, sem_id sem);
 	friend status_t _safe_get_server_token_(const BLooper*, int32*);
 

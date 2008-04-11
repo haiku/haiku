@@ -966,7 +966,7 @@ BView::IsHidden() const
 bool
 BView::IsPrinting() const 
 {
-	return f_is_printing;
+	return fIsPrinting;
 }
 
 
@@ -3017,20 +3017,20 @@ BView::BeginLineArray(int32 count)
 
 	_CheckLock();
 
-	if (comm) {
+	if (fCommArray) {
 		debugger("Can't nest BeginLineArray calls");
 			// not fatal, but it helps during
 			// development of your app and is in
 			// line with R5...
-		delete [] comm->array;
-		delete comm;
+		delete [] fCommArray->array;
+		delete fCommArray;
 	}
 
-	comm = new _array_data_;
+	fCommArray = new _array_data_;
 
-	comm->maxCount = count;
-	comm->count = 0;
-	comm->array = new _array_hdr_[count];
+	fCommArray->maxCount = count;
+	fCommArray->count = 0;
+	fCommArray->array = new _array_hdr_[count];
 }
 
 
@@ -3040,19 +3040,20 @@ BView::AddLine(BPoint pt0, BPoint pt1, rgb_color col)
 	if (fOwner == NULL)
 		return;
 
-	if (!comm)
+	if (!fCommArray)
 		debugger("BeginLineArray must be called before using AddLine");
 
 	_CheckLock();
 
-	if (comm->count < comm->maxCount) {
-		comm->array[comm->count].startX = pt0.x;
-		comm->array[comm->count].startY = pt0.y;
-		comm->array[comm->count].endX = pt1.x;
-		comm->array[comm->count].endY = pt1.y;
-		comm->array[comm->count].color = col;
+	const uint32 &arrayCount = fCommArray->count;
+	if (arrayCount < fCommArray->maxCount) {
+		fCommArray->array[arrayCount].startX = pt0.x;
+		fCommArray->array[arrayCount].startY = pt0.y;
+		fCommArray->array[arrayCount].endX = pt1.x;
+		fCommArray->array[arrayCount].endY = pt1.y;
+		fCommArray->array[arrayCount].color = col;
 
-		comm->count++;
+		fCommArray->count++;
 	}
 }
 
@@ -3063,14 +3064,15 @@ BView::EndLineArray()
 	if (fOwner == NULL)
 		return;
 
-	if (!comm)
+	if (!fCommArray)
 		debugger("Can't call EndLineArray before BeginLineArray");
 
 	_CheckLockAndSwitchCurrent();
 
 	fOwner->fLink->StartMessage(AS_STROKE_LINEARRAY);
-	fOwner->fLink->Attach<int32>(comm->count);
-	fOwner->fLink->Attach(comm->array, comm->count * sizeof(_array_hdr_));
+	fOwner->fLink->Attach<int32>(fCommArray->count);
+	fOwner->fLink->Attach(fCommArray->array,
+			fCommArray->count * sizeof(_array_hdr_));
 
 	_FlushIfNotInTransaction();
 
@@ -3094,9 +3096,10 @@ BView::SetDiskMode(char* filename, long offset)
 void
 BView::BeginPicture(BPicture *picture)
 {
-	if (_CheckOwnerLockAndSwitchCurrent() && picture && picture->fUsurped == NULL) {
-		picture->Usurp(cpicture);
-		cpicture = picture;
+	if (_CheckOwnerLockAndSwitchCurrent() 
+		&& picture && picture->fUsurped == NULL) {
+		picture->Usurp(fCurrentPicture);
+		fCurrentPicture = picture;
 
 		fOwner->fLink->StartMessage(AS_VIEW_BEGIN_PICTURE);
 	}
@@ -3115,8 +3118,8 @@ BView::AppendToPicture(BPicture *picture)
 			BeginPicture(picture);
 		} else {
 			picture->SetToken(-1);
-			picture->Usurp(cpicture);
-			cpicture = picture;			
+			picture->Usurp(fCurrentPicture);
+			fCurrentPicture = picture;			
 			fOwner->fLink->StartMessage(AS_VIEW_APPEND_TO_PICTURE);
 			fOwner->fLink->Attach<int32>(token);
 		}
@@ -3127,7 +3130,7 @@ BView::AppendToPicture(BPicture *picture)
 BPicture *
 BView::EndPicture()
 {
-	if (_CheckOwnerLockAndSwitchCurrent() && cpicture) {
+	if (_CheckOwnerLockAndSwitchCurrent() && fCurrentPicture) {
 		int32 token;
 
 		fOwner->fLink->StartMessage(AS_VIEW_END_PICTURE);
@@ -3136,8 +3139,8 @@ BView::EndPicture()
 		if (fOwner->fLink->FlushWithReply(code) == B_OK
 			&& code == B_OK
 			&& fOwner->fLink->Read<int32>(&token) == B_OK) {
-			BPicture *picture = cpicture;
-			cpicture = picture->StepDown();
+			BPicture *picture = fCurrentPicture;
+			fCurrentPicture = picture->StepDown();
 			picture->SetToken(token);
 
 			return picture;
@@ -4223,13 +4226,13 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flag
 	fShowLevel = 0;
 	fTopLevelView = false;
 
-	cpicture = NULL;
-	comm = NULL;
+	fCurrentPicture = NULL;
+	fCommArray = NULL;
 
 	fVerScroller = NULL;
 	fHorScroller = NULL;
 
-	f_is_printing = false;
+	fIsPrinting = false;
 	fAttached = false;
 
 	fState = new BPrivate::ViewState;
@@ -4248,10 +4251,10 @@ BView::_InitData(BRect frame, const char *name, uint32 resizingMode, uint32 flag
 void
 BView::_RemoveCommArray()
 {
-	if (comm) {
-		delete [] comm->array;
-		delete comm;
-		comm = NULL;
+	if (fCommArray) {
+		delete [] fCommArray->array;
+		delete fCommArray;
+		fCommArray = NULL;
 	}
 }
 
@@ -4927,10 +4930,10 @@ BView::_PrintToStream()
 	fBounds.left, fBounds.top, fBounds.right, fBounds.bottom,
 	fShowLevel,
 	fTopLevelView ? "YES" : "NO",
-	cpicture? "YES" : "NULL",
+	fCurrentPicture? "YES" : "NULL",
 	fVerScroller? "YES" : "NULL",
 	fHorScroller? "YES" : "NULL",
-	f_is_printing? "YES" : "NO",
+	fIsPrinting? "YES" : "NO",
 	fShelf? "YES" : "NO",
 	fEventMask,
 	fEventOptions);

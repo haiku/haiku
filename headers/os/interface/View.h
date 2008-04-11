@@ -632,12 +632,12 @@ private:
 			int16 			fShowLevel;
 			bool			fTopLevelView;
 			bool			fNoISInteraction;
-			BPicture*		cpicture;
-			_array_data_*	comm;
+			BPicture*		fCurrentPicture;
+			_array_data_*	fCommArray;
 
 			BScrollBar*		fVerScroller;
 			BScrollBar*		fHorScroller;
-			bool			f_is_printing;
+			bool			fIsPrinting;
 			bool			fAttached;
 			bool			_unused_bool1;
 			bool			_unused_bool2;
