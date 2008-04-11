@@ -171,15 +171,6 @@ _user_restore_signal_frame()
 }
 
 
-// TODO: Replace when networking code is added to the build. 
-
-static inline int
-_user_socket(int family, int type, int proto)
-{
-	return 0;
-}
-
-
 //	#pragma mark -
 
 
