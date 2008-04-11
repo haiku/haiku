@@ -1,3 +1,11 @@
+/*
+ * Copyright 2006-2008, Haiku, Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ * 		Stefano Ceccherini (stefano.ceccherini@gmail.com)
+ */
+
 #ifndef __MENU_PRIVATE_H
 #define __MENU_PRIVATE_H
 
@@ -53,26 +61,6 @@ point_distance(const BPoint &pointA, const BPoint &pointB)
 {
 	return square(pointA.x - pointB.x) + square(pointA.y - pointB.y);
 }
-
-/*
-static float
-point_rect_distance(const BPoint &point, const BRect &rect)
-{
-	float horizontal = 0;
-	float vertical = 0;
-	if (point.x < rect.left)
-		horizontal = rect.left - point.x;
-	else if (point.x > rect.right)
-		horizontal = point.x - rect.right;
-
-	if (point.y < rect.top)
-		vertical = rect.top - point.y;
-	else if (point.y > rect.bottom)
-		vertical = point.y - rect.bottom;
-	
-	return square(horizontal) + square(vertical);
-}
-*/
 
 #undef square
 
