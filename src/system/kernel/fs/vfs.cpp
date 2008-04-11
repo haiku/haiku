@@ -292,6 +292,7 @@ static struct fd_ops sFileOps = {
 	file_write,
 	file_seek,
 	common_ioctl,
+	NULL,		// set_flags
 	file_select,
 	file_deselect,
 	NULL,		// read_dir()
@@ -307,6 +308,7 @@ static struct fd_ops sDirectoryOps = {
 	NULL,		// write()
 	NULL,		// seek()
 	common_ioctl,
+	NULL,		// set_flags
 	NULL,		// select()
 	NULL,		// deselect()
 	dir_read,
@@ -322,6 +324,7 @@ static struct fd_ops sAttributeDirectoryOps = {
 	NULL,		// write()
 	NULL,		// seek()
 	common_ioctl,
+	NULL,		// set_flags
 	NULL,		// select()
 	NULL,		// deselect()
 	attr_dir_read,
@@ -337,6 +340,7 @@ static struct fd_ops sAttributeOps = {
 	attr_write,
 	attr_seek,
 	common_ioctl,
+	NULL,		// set_flags
 	NULL,		// select()
 	NULL,		// deselect()
 	NULL,		// read_dir()
@@ -352,6 +356,7 @@ static struct fd_ops sIndexDirectoryOps = {
 	NULL,		// write()
 	NULL,		// seek()
 	NULL,		// ioctl()
+	NULL,		// set_flags
 	NULL,		// select()
 	NULL,		// deselect()
 	index_dir_read,
@@ -368,6 +373,7 @@ static struct fd_ops sIndexOps = {
 	NULL,		// write()
 	NULL,		// seek()
 	NULL,		// ioctl()
+	NULL,		// set_flags
 	NULL,		// select()
 	NULL,		// deselect()
 	NULL,		// dir_read()
@@ -384,6 +390,7 @@ static struct fd_ops sQueryOps = {
 	NULL,		// write()
 	NULL,		// seek()
 	NULL,		// ioctl()
+	NULL,		// set_flags
 	NULL,		// select()
 	NULL,		// deselect()
 	query_read,
@@ -2435,7 +2442,8 @@ get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
 	if (descriptor == NULL)
 		return NULL;
 
-	if (fd_vnode(descriptor) == NULL) {
+	struct vnode* vnode = fd_vnode(descriptor);
+	if (vnode == NULL) {
 		put_fd(descriptor);
 		return NULL;
 	}
@@ -2443,7 +2451,7 @@ get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
 	// ToDo: when we can close a file descriptor at any point, investigate
 	//	if this is still valid to do (accessing the vnode without ref_count
 	//	or locking)
-	*_vnode = descriptor->u.vnode;
+	*_vnode = vnode;
 	return descriptor;
 }
 
@@ -5121,16 +5129,17 @@ common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
 static status_t
 common_fcntl(int fd, int op, uint32 argument, bool kernel)
 {
-	struct file_descriptor *descriptor;
-	struct vnode *vnode;
 	struct flock flock;
 
 	FUNCTION(("common_fcntl(fd = %d, op = %d, argument = %lx, %s)\n",
 		fd, op, argument, kernel ? "kernel" : "user"));
 
-	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel),
+		fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
+
+	struct vnode* vnode = fd_vnode(descriptor);
 
 	status_t status = B_OK;
 
@@ -5175,19 +5184,23 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 
 		case F_SETFL:
 			// Set file descriptor open mode
-			if (HAS_FS_CALL(vnode, set_flags)) {
-				// we only accept changes to O_APPEND and O_NONBLOCK
-				argument &= O_APPEND | O_NONBLOCK;
 
+			// we only accept changes to O_APPEND and O_NONBLOCK
+			argument &= O_APPEND | O_NONBLOCK;
+			if (descriptor->ops->fd_set_flags != NULL) {
+				status = descriptor->ops->fd_set_flags(descriptor, argument);
+			} else if (vnode != NULL && HAS_FS_CALL(vnode, set_flags)) {
 				status = FS_CALL(vnode, set_flags, descriptor->cookie,
 					(int)argument);
-				if (status == B_OK) {
-					// update this descriptor's open_mode field
-					descriptor->open_mode = (descriptor->open_mode
-						& ~(O_APPEND | O_NONBLOCK)) | argument;
-				}
 			} else
 				status = EOPNOTSUPP;
+
+			if (status == B_OK) {
+				// update this descriptor's open_mode field
+				descriptor->open_mode = (descriptor->open_mode
+					& ~(O_APPEND | O_NONBLOCK)) | argument;
+			}
+
 			break;
 
 		case F_GETFL:
@@ -5211,12 +5224,15 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 		}
 
 		case F_GETLK:
-			status = get_advisory_lock(descriptor->u.vnode, &flock);
-			if (status == B_OK) {
-				// copy back flock structure
-				status = user_memcpy((struct flock *)argument, &flock,
-					sizeof(struct flock));
-			}
+			if (vnode != NULL) {
+				status = get_advisory_lock(vnode, &flock);
+				if (status == B_OK) {
+					// copy back flock structure
+					status = user_memcpy((struct flock *)argument, &flock,
+						sizeof(struct flock));
+				}
+			} else
+				status = B_BAD_VALUE;
 			break;
 
 		case F_SETLK:
@@ -5225,9 +5241,11 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 			if (status < B_OK)
 				break;
 
-			if (flock.l_type == F_UNLCK)
-				status = release_advisory_lock(descriptor->u.vnode, &flock);
-			else {
+			if (vnode == NULL) {
+				status = B_BAD_VALUE;
+			} else if (flock.l_type == F_UNLCK) {
+				status = release_advisory_lock(vnode, &flock);
+			} else {
 				// the open mode must match the lock type
 				if ((descriptor->open_mode & O_RWMASK) == O_RDONLY
 						&& flock.l_type == F_WRLCK
@@ -5235,7 +5253,7 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 						&& flock.l_type == F_RDLCK)
 					status = B_FILE_ERROR;
 				else {
-					status = acquire_advisory_lock(descriptor->u.vnode, -1,
+					status = acquire_advisory_lock(vnode, -1,
 						&flock, op == F_SETLKW);
 				}
 			}
@@ -8023,9 +8041,9 @@ _user_flock(int fd, int op)
 	flock.l_type = (op & LOCK_SH) != 0 ? F_RDLCK : F_WRLCK;
 
 	if ((op & LOCK_UN) != 0)
-		status = release_advisory_lock(descriptor->u.vnode, &flock);
+		status = release_advisory_lock(vnode, &flock);
 	else {
-		status = acquire_advisory_lock(descriptor->u.vnode,
+		status = acquire_advisory_lock(vnode,
 			thread_get_current_thread()->team->session_id, &flock,
 			(op & LOCK_NB) == 0);
 	}

@@ -215,6 +215,17 @@ socket_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
 
 
 static status_t
+socket_set_flags(struct file_descriptor *descriptor, int flags)
+{
+	// we ignore O_APPEND, but O_NONBLOCK we need to translate
+	uint32 op = (flags & O_NONBLOCK) != 0
+		? B_SET_NONBLOCKING_IO : B_SET_BLOCKING_IO;
+
+	return sStackInterface->ioctl(descriptor->u.socket, op, NULL, 0);
+}
+
+
+static status_t
 socket_select(struct file_descriptor *descriptor, uint8 event,
 	struct selectsync *sync)
 {
@@ -272,6 +283,7 @@ static struct fd_ops sSocketFDOps = {
 	&socket_write,
 	NULL,	// fd_seek
 	&socket_ioctl,
+	&socket_set_flags,
 	&socket_select,
 	&socket_deselect,
 	NULL,	// fd_read_dir

@@ -26,6 +26,7 @@ struct fd_ops {
 	status_t	(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
 	off_t		(*fd_seek)(struct file_descriptor *, off_t pos, int seekType);
 	status_t	(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
+	status_t	(*fd_set_flags)(struct file_descriptor *, int flags);
 	status_t	(*fd_select)(struct file_descriptor *, uint8 event,
 						struct selectsync *sync);
 	status_t	(*fd_deselect)(struct file_descriptor *, uint8 event,
