@@ -869,13 +869,13 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 		case B_ENTER:
 		case B_SPACE:
 			if (fSelected) {
-				InvokeItem(fSelected);
-				QuitTracking(false);			
+				_InvokeItem(fSelected);
+				_QuitTracking(false);			
 			}
 			break;
 
 		case B_ESCAPE:
-			QuitTracking();
+			_QuitTracking();
 			break;
 
 		default:
@@ -887,7 +887,7 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 				if (item->fTriggerIndex < 0 || item->fTrigger != trigger)
 					continue;
 
-				InvokeItem(item);
+				_InvokeItem(item);
 			}
 			break;
 		}
@@ -2135,20 +2135,20 @@ BMenu::_DrawItems(BRect updateRect)
 
 
 int
-BMenu::State(BMenuItem **item) const
+BMenu::_State(BMenuItem **item) const
 {
 	if (fState == MENU_STATE_TRACKING || fState == MENU_STATE_CLOSED)
 		return fState;
 
 	if (fSelected != NULL && fSelected->Submenu() != NULL)
-		return fSelected->Submenu()->State(item);
+		return fSelected->Submenu()->_State(item);
 
 	return fState;
 }
 
 
 void
-BMenu::InvokeItem(BMenuItem *item, bool now)
+BMenu::_InvokeItem(BMenuItem *item, bool now)
 {
 	if (!item->IsEnabled())
 		return;
@@ -2564,7 +2564,7 @@ BMenu::_CustomTrackingWantsToQuit()
 
 
 void
-BMenu::QuitTracking(bool onlyThis)
+BMenu::_QuitTracking(bool onlyThis)
 {
 	_SelectItem(NULL);
 	if (BMenuBar *menuBar = dynamic_cast<BMenuBar *>(this))
@@ -2692,7 +2692,7 @@ MenuPrivate::IsAltCommandKey() const
 int
 MenuPrivate::State(BMenuItem **item) const
 {
-	return fMenu->State(item);
+	return fMenu->_State(item);
 }
 
 		
@@ -2727,14 +2727,14 @@ MenuPrivate::SetSuperItem(BMenuItem *item)
 void
 MenuPrivate::InvokeItem(BMenuItem *item, bool now)
 {
-	fMenu->InvokeItem(item, now);
+	fMenu->_InvokeItem(item, now);
 }
 
 
 void
 MenuPrivate::QuitTracking(bool thisMenuOnly)
 {
-	fMenu->QuitTracking(thisMenuOnly);
+	fMenu->_QuitTracking(thisMenuOnly);
 }
 
 } ;

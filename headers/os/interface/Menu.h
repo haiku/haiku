@@ -236,10 +236,9 @@ private:
 
 			bool			_CustomTrackingWantsToQuit();
 
-			// private methods called by BWindow
-			int				State(BMenuItem** _item = NULL) const;
-			void			InvokeItem(BMenuItem* item, bool now = false);
-			void			QuitTracking(bool onlyThis = true);
+			int				_State(BMenuItem** _item = NULL) const;
+			void			_InvokeItem(BMenuItem* item, bool now = false);
+			void			_QuitTracking(bool onlyThis = true);
 
 	static	menu_info		sMenuInfo;
 	static	bool			sAltAsCommandKey;
