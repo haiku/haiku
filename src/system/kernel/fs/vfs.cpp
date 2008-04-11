@@ -4759,8 +4759,9 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 	// some kinds of files are not seekable
 	switch (stat.st_mode & S_IFMT) {
 		case S_IFIFO:
+		case S_IFSOCK:
 			return ESPIPE;
-// TODO: We don't catch sockets here, but they are not seekable either (ESPIPE)!
+
 		// The Open Group Base Specs don't mention any file types besides pipes,
 		// fifos, and sockets specially, so we allow seeking them.
 		case S_IFREG:
