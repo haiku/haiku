@@ -55,6 +55,10 @@ static	SerialDevice *			MakeDevice(usb_device device, uint16 vendorID,
 		status_t				Close();
 		status_t				Free();
 
+		bool					IsOpen() { return fDeviceOpen; };
+		void					Removed();
+		bool					IsRemoved() { return fDeviceRemoved; };
+
 		/* virtual interface to be overriden as necessary */
 virtual	status_t				AddDevice(const usb_configuration_info *config);
 
@@ -84,6 +88,8 @@ static	void					InterruptCallbackFunction(void *cookie,
 		uint16					fVendorID;
 		uint16					fProductID;
 		const char *			fDescription;	// informational description
+		bool					fDeviceOpen;
+		bool					fDeviceRemoved;
 
 		/* communication pipes */
 		usb_pipe				fControlPipe;

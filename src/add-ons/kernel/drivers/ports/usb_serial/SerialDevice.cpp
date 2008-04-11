@@ -19,6 +19,8 @@ SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 		fVendorID(vendorID),
 		fProductID(productID),
 		fDescription(description),
+		fDeviceOpen(false),
+		fDeviceRemoved(false),
 		fControlPipe(0),
 		fReadPipe(0),
 		fWritePipe(0),
@@ -43,18 +45,12 @@ SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 
 SerialDevice::~SerialDevice()
 {
-	fStopDeviceThread = true;
-	gUSBModule->cancel_queued_transfers(fReadPipe);
-	gUSBModule->cancel_queued_transfers(fWritePipe);
-	gUSBModule->cancel_queued_transfers(fControlPipe);
+	Removed();
 
 	if (fDoneRead >= B_OK)
 		delete_sem(fDoneRead);
 	if (fDoneWrite >= B_OK)
 		delete_sem(fDoneWrite);
-
-	int32 result = B_OK;
-	wait_for_thread(fDeviceThread, &result);
 
 	if (fBufferArea >= B_OK)
 		delete_area(fBufferArea);
@@ -250,6 +246,12 @@ SerialDevice::Service(struct tty *ptty, struct ddrover *ddr, uint flags)
 status_t
 SerialDevice::Open(uint32 flags)
 {
+	if (fDeviceOpen)
+		return B_BUSY;
+
+	if (fDeviceRemoved)
+		return B_DEV_NOT_READY;
+
 	gTTYModule->ttyinit(&fTTY, true);
 	fTTYFile.tty = &fTTY;
 	fTTYFile.flags = flags;
@@ -285,17 +287,18 @@ SerialDevice::Open(uint32 flags)
 		fInterruptBufferSize, InterruptCallbackFunction, this);
 	if (status < B_OK)
 		TRACE_ALWAYS("failed to queue initial interrupt\n");
-	return status;
+
+	fDeviceOpen = true;
+	return B_OK;
 }
 
 
 status_t
 SerialDevice::Read(char *buffer, size_t *numBytes)
 {
-	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
-	if (!ddr) {
+	if (fDeviceRemoved) {
 		*numBytes = 0;
-		return B_NO_MEMORY;
+		return B_DEV_NOT_READY;
 	}
 
 	status_t status = benaphore_lock(&fReadLock);
@@ -303,6 +306,13 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 		TRACE_ALWAYS("read: failed to get read lock\n");
 		*numBytes = 0;
 		return status;
+	}
+
+	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
+	if (!ddr) {
+		*numBytes = 0;
+		benaphore_unlock(&fReadLock);
+		return B_NO_MEMORY;
 	}
 
 	status = gTTYModule->ttyread(&fTTYFile, ddr, buffer, numBytes);
@@ -323,6 +333,11 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 	if (status != B_OK) {
 		TRACE_ALWAYS("write: failed to get write lock\n");
 		return status;
+	}
+
+	if (fDeviceRemoved) {
+		benaphore_unlock(&fWriteLock);
+		return B_DEV_NOT_READY;
 	}
 
 	while (bytesLeft > 0) {
@@ -367,6 +382,9 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 status_t
 SerialDevice::Control(uint32 op, void *arg, size_t length)
 {
+	if (fDeviceRemoved)
+		return B_DEV_NOT_READY;
+
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
@@ -380,6 +398,9 @@ SerialDevice::Control(uint32 op, void *arg, size_t length)
 status_t
 SerialDevice::Select(uint8 event, uint32 ref, selectsync *sync)
 {
+	if (fDeviceRemoved)
+		return B_DEV_NOT_READY;
+
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
@@ -393,6 +414,9 @@ SerialDevice::Select(uint8 event, uint32 ref, selectsync *sync)
 status_t
 SerialDevice::DeSelect(uint8 event, selectsync *sync)
 {
+	if (fDeviceRemoved)
+		return B_DEV_NOT_READY;
+
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
 		return B_NO_MEMORY;
@@ -408,9 +432,11 @@ SerialDevice::Close()
 {
 	OnClose();
 
-	gUSBModule->cancel_queued_transfers(fReadPipe);
-	gUSBModule->cancel_queued_transfers(fWritePipe);
-	gUSBModule->cancel_queued_transfers(fControlPipe);
+	if (!fDeviceRemoved) {
+		gUSBModule->cancel_queued_transfers(fReadPipe);
+		gUSBModule->cancel_queued_transfers(fWritePipe);
+		gUSBModule->cancel_queued_transfers(fControlPipe);
+	}
 
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr)
@@ -418,6 +444,8 @@ SerialDevice::Close()
 
 	status_t status = gTTYModule->ttyclose(&fTTYFile, ddr);
 	gTTYModule->ddrdone(ddr);
+
+	fDeviceOpen = false;
 	return status;
 }
 
@@ -432,6 +460,31 @@ SerialDevice::Free()
 	status_t status = gTTYModule->ttyfree(&fTTYFile, ddr);
 	gTTYModule->ddrdone(ddr);
 	return status;
+}
+
+
+void
+SerialDevice::Removed()
+{
+	if (fDeviceRemoved)
+		return;
+
+	// notifies us that the device was removed
+	fDeviceRemoved = true;
+
+	// we need to ensure that we do not use the device anymore
+	fStopDeviceThread = true;
+	fInputStopped = false;
+	gUSBModule->cancel_queued_transfers(fReadPipe);
+	gUSBModule->cancel_queued_transfers(fWritePipe);
+	gUSBModule->cancel_queued_transfers(fControlPipe);
+
+	int32 result = B_OK;
+	wait_for_thread(fDeviceThread, &result);
+	fDeviceThread = -1;
+
+	benaphore_lock(&fWriteLock);
+	benaphore_unlock(&fWriteLock);
 }
 
 
@@ -586,7 +639,7 @@ SerialDevice::InterruptCallbackFunction(void *cookie, int32 status,
 
 	// ToDo: maybe handle those somehow?
 
-	if (status == B_OK) {
+	if (status == B_OK && !device->fDeviceRemoved) {
 		status = gUSBModule->queue_interrupt(device->fControlPipe,
 			device->fInterruptBuffer, device->fInterruptBufferSize,
 			device->InterruptCallbackFunction, device);

@@ -87,8 +87,13 @@ usb_serial_device_removed(void *cookie)
 	SerialDevice *device = (SerialDevice *)cookie;
 	for (int32 i = 0; i < DEVICES_COUNT; i++) {
 		if (gSerialDevices[i] == device) {
-			delete device;
-			gSerialDevices[i] = NULL;
+			if (device->IsOpen()) {
+				// the device will be deleted upon being freed
+				device->Removed();
+			} else {
+				delete device;
+				gSerialDevices[i] = NULL;
+			}
 			break;
 		}
 	}
@@ -131,7 +136,7 @@ init_driver()
 	}
 
 	for (int32 i = 0; i < DEVICES_COUNT; i++)
-		gSerialDevices[i] = 0;
+		gSerialDevices[i] = NULL;
 
 	gDeviceNames[0] = NULL;
 
@@ -293,7 +298,22 @@ usb_serial_free(void *cookie)
 {
 	TRACE_FUNCALLS("> usb_serial_free(0x%08x)\n", cookie);
 	SerialDevice *device = (SerialDevice *)cookie;
-	return device->Free();
+	acquire_sem(gDriverLock);
+	status_t status = device->Free();
+	if (device->IsRemoved()) {
+		for (int32 i = 0; i < DEVICES_COUNT; i++) {
+			if (gSerialDevices[i] == device) {
+				// the device is removed already but as it was open the
+				// removed hook has not deleted the object
+				delete device;
+				gSerialDevices[i] = NULL;
+				break;
+			}
+		}
+	}
+
+	release_sem(gDriverLock);
+	return status;
 }
 
 
