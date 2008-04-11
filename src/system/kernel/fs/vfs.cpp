@@ -1750,15 +1750,24 @@ get_dir_path_and_leaf(char *path, char *filename)
 		strcpy(path, ".");
 	} else {
 		p++;
-		if (*p == '\0') {
-			// special case: the path ends in '/'
-			strcpy(filename, ".");
-		} else {
-			// normal leaf: replace the leaf portion of the path with a '.'
-			if (strlcpy(filename, p, B_FILE_NAME_LENGTH)
-				>= B_FILE_NAME_LENGTH) {
-				return B_NAME_TOO_LONG;
+		if (p[0] == '\0') {
+			// special case: the path ends in one or more '/' - remove them
+			while (*--p == '/' && p != path);
+			p[1] = '\0';
+
+			if (p == path && p[0] == '/') {
+				// This path points to the root of the file system
+				strcpy(filename, ".");
+				return B_OK;
 			}
+			for (; p != path && *(p - 1) != '/'; p--);
+				// rewind to the start of the leaf before the '/'
+		}
+
+		// normal leaf: replace the leaf portion of the path with a '.'
+		if (strlcpy(filename, p, B_FILE_NAME_LENGTH)
+				>= B_FILE_NAME_LENGTH) {
+			return B_NAME_TOO_LONG;
 		}
 		p[0] = '.';
 		p[1] = '\0';
