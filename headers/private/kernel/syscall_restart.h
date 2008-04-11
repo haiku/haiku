@@ -113,4 +113,47 @@ syscall_restart_ioctl_handle_post(status_t error)
 }
 
 
+struct IoctlSyscallFlagUnsetter {
+	IoctlSyscallFlagUnsetter()
+	{
+		struct thread *thread = thread_get_current_thread();
+		fWasSyscall = (atomic_and(&thread->flags, ~THREAD_FLAGS_IOCTL_SYSCALL)
+			& THREAD_FLAGS_IOCTL_SYSCALL) != 0;
+	}
+
+	~IoctlSyscallFlagUnsetter()
+	{
+		struct thread *thread = thread_get_current_thread();
+		if (fWasSyscall)
+			atomic_or(&thread->flags, THREAD_FLAGS_IOCTL_SYSCALL);
+	}
+
+private:
+	bool	fWasSyscall;
+};
+
+
+template<typename Type>
+struct IoctlSyscallRestartWrapper {
+	IoctlSyscallRestartWrapper(const Type& result)
+		: fResult(result)
+	{
+		struct thread *thread = thread_get_current_thread();
+		atomic_or(&thread->flags, THREAD_FLAGS_IOCTL_SYSCALL);
+	}
+
+	~IoctlSyscallRestartWrapper()
+	{
+		struct thread *thread = thread_get_current_thread();
+		atomic_and(&thread->flags, ~THREAD_FLAGS_IOCTL_SYSCALL);
+
+		if (fResult < 0)
+			syscall_restart_ioctl_handle_post(fResult);
+	}
+
+private:
+	const Type& fResult;
+};
+
+
 #endif	// _KERNEL_SYSCALL_RESTART_H
