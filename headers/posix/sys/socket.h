@@ -94,11 +94,11 @@ struct sockaddr_storage {
 };
 
 struct msghdr {
-	char		*msg_name;		/* address we're using (optional) */
+	void		*msg_name;		/* address we're using (optional) */
 	socklen_t	msg_namelen;	/* length of address */
 	struct iovec *msg_iov;		/* scatter/gather array we'll use */
 	int			msg_iovlen;		/* # elements in msg_iov */
-	char		*msg_control;	/* extra data */
+	void		*msg_control;	/* extra data */
 	socklen_t	msg_controllen;	/* length of extra data */
 	int			msg_flags;		/* flags */
 };
