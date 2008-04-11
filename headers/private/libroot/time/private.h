@@ -131,9 +131,7 @@ static char	privatehid[] = "@(#)private.h	8.2";
 ** (glibc 2.1 and later have stdint.h, even with pre-C99 compilers.)
 */
 #ifndef HAVE_STDINT_H
-#define HAVE_STDINT_H \
-	(199901 <= __STDC_VERSION__ || \
-	2 < (__GLIBC__ + (0 < __GLIBC_MINOR__)))
+#define HAVE_STDINT_H 1
 #endif /* !defined HAVE_STDINT_H */
 
 #if HAVE_STDINT_H
