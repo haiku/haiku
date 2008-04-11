@@ -102,6 +102,7 @@ status_t	init_timers(void);
 void		uninit_timers(void);
 
 // syscall restart
+bool		is_syscall(void);
 bool		is_restarted_syscall(void);
 void		store_syscall_restart_timeout(bigtime_t timeout);
 bigtime_t	restore_syscall_restart_timeout(void);

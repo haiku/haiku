@@ -311,7 +311,8 @@ struct thread_queue {
 #define	THREAD_FLAGS_RESTART_SYSCALL		0x0040
 #define	THREAD_FLAGS_DONT_RESTART_SYSCALL	0x0080
 #define	THREAD_FLAGS_SYSCALL_RESTARTED		0x0100
-#define	THREAD_FLAGS_IOCTL_SYSCALL			0x0200
+#define	THREAD_FLAGS_SYSCALL				0x0200
+	// Note: Set only for certain syscalls.
 
 
 #endif	/* _KERNEL_THREAD_TYPES_H */

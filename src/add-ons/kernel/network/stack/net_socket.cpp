@@ -30,6 +30,8 @@
 #include <net_stack.h>
 #include <net_stat.h>
 
+#include "utility.h"
+
 
 struct net_socket_private : net_socket {
 	struct list_link		link;
@@ -243,8 +245,7 @@ socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount,
 
 
 status_t
-socket_control(net_socket *socket, int32 op, void *data, size_t length,
-	bool kernel)
+socket_control(net_socket *socket, int32 op, void *data, size_t length)
 {
 	switch (op) {
 		case FIONBIO:
@@ -253,14 +254,14 @@ socket_control(net_socket *socket, int32 op, void *data, size_t length,
 				return B_BAD_VALUE;
 
 			int value;
-			if (kernel) {
-				value = *(int*)data;
-			} else {
+			if (is_syscall()) {
 				if (!IS_USER_ADDRESS(data)
 					|| user_memcpy(&value, data, sizeof(int)) != B_OK) {
 					return B_BAD_ADDRESS;
 				}
-			}
+			} else
+				value = *(int*)data;
+
 			return socket_setsockopt(socket, SOL_SOCKET, SO_NONBLOCK, &value,
 				sizeof(int));
 		}

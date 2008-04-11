@@ -29,29 +29,27 @@ struct net_stack_interface_module_info {
 	status_t (*free)(net_socket* socket);
 
 	status_t (*bind)(net_socket* socket, const struct sockaddr* address,
-					socklen_t addressLength, bool kernel);
+					socklen_t addressLength);
 	status_t (*shutdown)(net_socket* socket, int how);
 	status_t (*connect)(net_socket* socket, const struct sockaddr* address,
-					socklen_t addressLength, bool kernel);
+					socklen_t addressLength);
 	status_t (*listen)(net_socket* socket, int backlog);
 	status_t (*accept)(net_socket* socket, struct sockaddr* address,
 					socklen_t* _addressLength, net_socket** _acceptedSocket);
 
-	ssize_t (*recv)(net_socket* socket, void* data, size_t length, int flags,
-					bool kernel);
+	ssize_t (*recv)(net_socket* socket, void* data, size_t length, int flags);
 	ssize_t (*recvfrom)(net_socket* socket, void* data, size_t length,
 					int flags, struct sockaddr* address,
-					socklen_t* _addressLength, bool kernel);
-	ssize_t (*recvmsg)(net_socket* socket, struct msghdr* message, int flags,
-					bool kernel);
+					socklen_t* _addressLength);
+	ssize_t (*recvmsg)(net_socket* socket, struct msghdr* message, int flags);
 
 	ssize_t (*send)(net_socket* socket, const void* data, size_t length,
-					int flags, bool kernel);
+					int flags);
 	ssize_t (*sendto)(net_socket* socket, const void* data, size_t length,
 					int flags, const struct sockaddr* address,
-					socklen_t addressLength, bool kernel);
+					socklen_t addressLength);
 	ssize_t (*sendmsg)(net_socket* socket, const struct msghdr* message,
-					int flags, bool kernel);
+					int flags);
 
 	status_t (*getsockopt)(net_socket* socket, int level, int option,
 					void* value, socklen_t* _length);
@@ -69,7 +67,7 @@ struct net_stack_interface_module_info {
 					net_socket* _sockets[2]);
 
 	status_t (*ioctl)(net_socket* socket, uint32 op, void *buffer,
-					size_t length, bool kernel);
+					size_t length);
 	status_t (*select)(net_socket* socket, uint8 event,
 					struct selectsync *sync);
 	status_t (*deselect)(net_socket* socket, uint8 event,

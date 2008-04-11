@@ -189,7 +189,7 @@ socket_read(struct file_descriptor *descriptor, off_t pos, void *buffer,
 	size_t *_length)
 {
 	ssize_t bytesRead = sStackInterface->recv(descriptor->u.socket, buffer,
-		*_length, 0, !IS_USER_ADDRESS(buffer));
+		*_length, 0);
 	*_length = bytesRead >= 0 ? bytesRead : 0;
 	return bytesRead >= 0 ? B_OK : bytesRead;
 }
@@ -200,7 +200,7 @@ socket_write(struct file_descriptor *descriptor, off_t pos, const void *buffer,
 	size_t *_length)
 {
 	ssize_t bytesWritten = sStackInterface->send(descriptor->u.socket, buffer,
-		*_length, 0, !IS_USER_ADDRESS(buffer));
+		*_length, 0);
 	*_length = bytesWritten >= 0 ? bytesWritten : 0;
 	return bytesWritten >= 0 ? B_OK : bytesWritten;
 }
@@ -210,8 +210,7 @@ static status_t
 socket_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer,
 	size_t length)
 {
-	return sStackInterface->ioctl(descriptor->u.socket, op, buffer,
-		length, !IS_USER_ADDRESS(buffer));
+	return sStackInterface->ioctl(descriptor->u.socket, op, buffer, length);
 }
 
 
@@ -341,8 +340,7 @@ common_bind(int fd, const struct sockaddr *address, socklen_t addressLength,
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FDPutter _(descriptor);
 
-	return sStackInterface->bind(descriptor->u.socket, address, addressLength,
-		kernel);
+	return sStackInterface->bind(descriptor->u.socket, address, addressLength);
 }
 
 
@@ -366,7 +364,7 @@ common_connect(int fd, const struct sockaddr *address,
 	FDPutter _(descriptor);
 
 	return sStackInterface->connect(descriptor->u.socket, address,
-		addressLength, kernel);
+		addressLength);
 }
 
 
@@ -413,8 +411,7 @@ common_recv(int fd, void *data, size_t length, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FDPutter _(descriptor);
 
-	return sStackInterface->recv(descriptor->u.socket, data, length, flags,
-		kernel);
+	return sStackInterface->recv(descriptor->u.socket, data, length, flags);
 }
 
 
@@ -427,7 +424,7 @@ common_recvfrom(int fd, void *data, size_t length, int flags,
 	FDPutter _(descriptor);
 
 	return sStackInterface->recvfrom(descriptor->u.socket, data, length,
-		flags, address, _addressLength, kernel);
+		flags, address, _addressLength);
 }
 
 
@@ -438,8 +435,7 @@ common_recvmsg(int fd, struct msghdr *message, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FDPutter _(descriptor);
 
-	return sStackInterface->recvmsg(descriptor->u.socket, message, flags,
-		kernel);
+	return sStackInterface->recvmsg(descriptor->u.socket, message, flags);
 }
 
 
@@ -450,8 +446,7 @@ common_send(int fd, const void *data, size_t length, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FDPutter _(descriptor);
 
-	return sStackInterface->send(descriptor->u.socket, data, length, flags,
-		kernel);
+	return sStackInterface->send(descriptor->u.socket, data, length, flags);
 }
 
 
@@ -464,7 +459,7 @@ common_sendto(int fd, const void *data, size_t length, int flags,
 	FDPutter _(descriptor);
 
 	return sStackInterface->sendto(descriptor->u.socket, data, length, flags,
-		address, addressLength, kernel);
+		address, addressLength);
 }
 
 
@@ -475,8 +470,7 @@ common_sendmsg(int fd, const struct msghdr *message, int flags, bool kernel)
 	GET_SOCKET_FD_OR_RETURN(fd, kernel, descriptor);
 	FDPutter _(descriptor);
 
-	return sStackInterface->sendmsg(descriptor->u.socket, message, flags,
-		kernel);
+	return sStackInterface->sendmsg(descriptor->u.socket, message, flags);
 }
 
 
@@ -585,6 +579,7 @@ common_get_next_socket_stat(int family, uint32 *cookie, struct net_stat *stat)
 int
 socket(int family, int type, int protocol)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_socket(family, type, protocol, true));
 }
 
@@ -592,6 +587,7 @@ socket(int family, int type, int protocol)
 int
 bind(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_bind(socket, address, addressLength, true));
 }
 
@@ -599,6 +595,7 @@ bind(int socket, const struct sockaddr *address, socklen_t addressLength)
 int
 shutdown(int socket, int how)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_shutdown(socket, how, true));
 }
 
@@ -606,7 +603,7 @@ shutdown(int socket, int how)
 int
 connect(int socket, const struct sockaddr *address, socklen_t addressLength)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_connect(socket, address, addressLength, true));
 }
 
@@ -614,6 +611,7 @@ connect(int socket, const struct sockaddr *address, socklen_t addressLength)
 int
 listen(int socket, int backlog)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_listen(socket, backlog, true));
 }
 
@@ -621,7 +619,7 @@ listen(int socket, int backlog)
 int
 accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_accept(socket, address, _addressLength, true));
 }
 
@@ -629,7 +627,7 @@ accept(int socket, struct sockaddr *address, socklen_t *_addressLength)
 ssize_t
 recv(int socket, void *data, size_t length, int flags)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_recv(socket, data, length, flags, true));
 }
 
@@ -638,7 +636,7 @@ ssize_t
 recvfrom(int socket, void *data, size_t length, int flags,
 	struct sockaddr *address, socklen_t *_addressLength)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_recvfrom(socket, data, length, flags, address,
 		_addressLength, true));
 }
@@ -647,7 +645,7 @@ recvfrom(int socket, void *data, size_t length, int flags,
 ssize_t
 recvmsg(int socket, struct msghdr *message, int flags)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_recvmsg(socket, message, flags, true));
 }
 
@@ -655,7 +653,7 @@ recvmsg(int socket, struct msghdr *message, int flags)
 ssize_t
 send(int socket, const void *data, size_t length, int flags)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_send(socket, data, length, flags, true));
 }
 
@@ -664,7 +662,7 @@ ssize_t
 sendto(int socket, const void *data, size_t length, int flags,
 	const struct sockaddr *address, socklen_t addressLength)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_sendto(socket, data, length, flags, address,
 		addressLength, true));
 }
@@ -673,7 +671,7 @@ sendto(int socket, const void *data, size_t length, int flags,
 ssize_t
 sendmsg(int socket, const struct msghdr *message, int flags)
 {
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_sendmsg(socket, message, flags, true));
 }
 
@@ -681,6 +679,7 @@ sendmsg(int socket, const struct msghdr *message, int flags)
 int
 getsockopt(int socket, int level, int option, void *value, socklen_t *_length)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_getsockopt(socket, level, option, value,
 		_length, true));
 }
@@ -690,6 +689,7 @@ int
 setsockopt(int socket, int level, int option, const void *value,
 	socklen_t length)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_setsockopt(socket, level, option, value,
 		length, true));
 }
@@ -698,6 +698,7 @@ setsockopt(int socket, int level, int option, const void *value,
 int
 getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_getpeername(socket, address, _addressLength,
 		true));
 }
@@ -706,6 +707,7 @@ getpeername(int socket, struct sockaddr *address, socklen_t *_addressLength)
 int
 getsockname(int socket, struct sockaddr *address, socklen_t *_addressLength)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_getsockname(socket, address, _addressLength,
 		true));
 }
@@ -714,6 +716,7 @@ getsockname(int socket, struct sockaddr *address, socklen_t *_addressLength)
 int
 sockatmark(int socket)
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_sockatmark(socket, true));
 }
 
@@ -721,6 +724,7 @@ sockatmark(int socket)
 int
 socketpair(int family, int type, int protocol, int socketVector[2])
 {
+	SyscallFlagUnsetter _;
 	RETURN_AND_SET_ERRNO(common_socketpair(family, type, protocol,
 		socketVector, true));
 }
@@ -732,7 +736,8 @@ socketpair(int family, int type, int protocol, int socketVector[2])
 int
 _user_socket(int family, int type, int protocol)
 {
-	return common_socket(family, type, protocol, false);
+	SyscallRestartWrapper<int> result;
+	return result = common_socket(family, type, protocol, false);
 }
 
 
@@ -750,14 +755,17 @@ _user_bind(int socket, const struct sockaddr *userAddress,
 		return B_BAD_ADDRESS;
 	}
 
-	return common_bind(socket, (sockaddr*)address, addressLength, false);
+	SyscallRestartWrapper<status_t> error;
+	return error = common_bind(socket, (sockaddr*)address, addressLength,
+		false);
 }
 
 
 status_t
 _user_shutdown_socket(int socket, int how)
 {
-	return common_shutdown(socket, how, false);
+	SyscallRestartWrapper<status_t> error;
+	return error = common_shutdown(socket, how, false);
 }
 
 
@@ -775,19 +783,18 @@ _user_connect(int socket, const struct sockaddr *userAddress,
 		return B_BAD_ADDRESS;
 	}
 
-	status_t error;
-	IoctlSyscallRestartWrapper<status_t> restartWrapper(error);
+	SyscallRestartWrapper<status_t> error;
 
-	error = common_connect(socket, (sockaddr*)address, addressLength, false);
-
-	return error;
+	return error = common_connect(socket, (sockaddr*)address, addressLength,
+		false);
 }
 
 
 status_t
 _user_listen(int socket, int backlog)
 {
-	return common_listen(socket, backlog, false);
+	SyscallRestartWrapper<status_t> error;
+	return error = common_listen(socket, backlog, false);
 }
 
 
@@ -803,8 +810,7 @@ _user_accept(int socket, struct sockaddr *userAddress,
 		return error;
 
 	// accept()
-	int result;
-	IoctlSyscallRestartWrapper<int> restartWrapper(result);
+	SyscallRestartWrapper<int> result;
 
 	char address[MAX_SOCKET_ADDRESS_LEN];
 	result = common_accept(socket,
@@ -826,12 +832,8 @@ _user_accept(int socket, struct sockaddr *userAddress,
 ssize_t
 _user_recv(int socket, void *data, size_t length, int flags)
 {
-	ssize_t result;
-	IoctlSyscallRestartWrapper<ssize_t> restartWrapper(result);
-
-	result = common_recv(socket, data, length, flags, false);
-
-	return result;
+	SyscallRestartWrapper<ssize_t> result;
+	return result = common_recv(socket, data, length, flags, false);
 }
 
 
@@ -847,8 +849,7 @@ _user_recvfrom(int socket, void *data, size_t length, int flags,
 		return error;
 	
 	// recvfrom()
-	ssize_t result;
-	IoctlSyscallRestartWrapper<ssize_t> restartWrapper(result);
+	SyscallRestartWrapper<ssize_t> result;
 
 	char address[MAX_SOCKET_ADDRESS_LEN];
 	result = common_recvfrom(socket, data, length, flags,
@@ -884,8 +885,7 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 		return error;
 
 	// recvmsg()
-	ssize_t result;
-	IoctlSyscallRestartWrapper<ssize_t> restartWrapper(result);
+	SyscallRestartWrapper<ssize_t> result;
 
 	result = common_recvmsg(socket, &message, flags, false);
 	if (result < 0)
@@ -906,12 +906,8 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 ssize_t
 _user_send(int socket, const void *data, size_t length, int flags)
 {
-	ssize_t result;
-	IoctlSyscallRestartWrapper<ssize_t> restartWrapper(result);
-
-	result = common_send(socket, data, length, flags, false);
-
-	return result;
+	SyscallRestartWrapper<ssize_t> result;
+	return result = common_send(socket, data, length, flags, false);
 }
 
 
@@ -934,12 +930,10 @@ _user_sendto(int socket, const void *data, size_t length, int flags,
 	}
 
 	// sendto()
-	ssize_t result;
-	IoctlSyscallRestartWrapper<ssize_t> restartWrapper(result);
+	SyscallRestartWrapper<ssize_t> result;
 
-	result = common_sendto(socket, data, length, flags, (sockaddr*)address,
-		addressLength, false);
-	return result;
+	return result = common_sendto(socket, data, length, flags,
+		(sockaddr*)address, addressLength, false);
 }
 
 
@@ -965,11 +959,9 @@ _user_sendmsg(int socket, const struct msghdr *userMessage, int flags)
 	}
 
 	// sendmsg()
-	ssize_t result;
-	IoctlSyscallRestartWrapper<ssize_t> restartWrapper(result);
+	SyscallRestartWrapper<ssize_t> result;
 
-	result = common_sendmsg(socket, &message, flags, false);
-	return result;
+	return result = common_sendmsg(socket, &message, flags, false);
 }
 
 
@@ -993,7 +985,8 @@ _user_getsockopt(int socket, int level, int option, void *userValue,
 
 	// getsockopt()
 	char value[MAX_SOCKET_OPTION_LEN];
-	status_t error = common_getsockopt(socket, level, option, value, &length,
+	SyscallRestartWrapper<status_t> error;
+	error = common_getsockopt(socket, level, option, value, &length,
 		false);
 	if (error != B_OK)
 		return error;
@@ -1022,7 +1015,9 @@ _user_setsockopt(int socket, int level, int option, const void *userValue,
 	}
 
 	// setsockopt();
-	return common_setsockopt(socket, level, option, value, length, false);
+	SyscallRestartWrapper<status_t> error;
+	return error = common_setsockopt(socket, level, option, value, length,
+		false);
 }
 
 
@@ -1032,8 +1027,9 @@ _user_getpeername(int socket, struct sockaddr *userAddress,
 {
 	// check parameters
 	socklen_t addressLength = 0;
-	status_t error = prepare_userland_address_result(userAddress,
-		_addressLength, addressLength, true);
+	SyscallRestartWrapper<status_t> error;
+	error = prepare_userland_address_result(userAddress, _addressLength,
+		addressLength, true);
 	if (error != B_OK)
 		return error;
 	
@@ -1062,8 +1058,9 @@ _user_getsockname(int socket, struct sockaddr *userAddress,
 {
 	// check parameters
 	socklen_t addressLength = 0;
-	status_t error = prepare_userland_address_result(userAddress,
-		_addressLength, addressLength, true);
+	SyscallRestartWrapper<status_t> error;
+	error = prepare_userland_address_result(userAddress, _addressLength,
+		addressLength, true);
 	if (error != B_OK)
 		return error;
 	
@@ -1089,7 +1086,8 @@ _user_getsockname(int socket, struct sockaddr *userAddress,
 int
 _user_sockatmark(int socket)
 {
-	return common_sockatmark(socket, false);
+	SyscallRestartWrapper<status_t> error;
+	return error = common_sockatmark(socket, false);
 }
 
 
@@ -1104,8 +1102,8 @@ _user_socketpair(int family, int type, int protocol, int *userSocketVector)
 
 	// socketpair()
 	int socketVector[2];
-	status_t error = common_socketpair(family, type, protocol, socketVector,
-		false);
+	SyscallRestartWrapper<status_t> error;
+	error = common_socketpair(family, type, protocol, socketVector, false);
 	if (error != B_OK)
 		return error;
 
@@ -1135,7 +1133,8 @@ _user_get_next_socket_stat(int family, uint32 *_cookie, struct net_stat *_stat)
 	}
 
 	net_stat stat;
-	status_t error = common_get_next_socket_stat(family, &cookie, &stat);
+	SyscallRestartWrapper<status_t> error;
+	error = common_get_next_socket_stat(family, &cookie, &stat);
 	if (error != B_OK)
 		return error;
 

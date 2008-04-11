@@ -651,14 +651,15 @@ common_user_io(int fd, off_t pos, void *buffer, size_t length, bool write)
 		return B_BAD_VALUE;
 	}
 
-	status_t status;
+	SyscallRestartWrapper<status_t> status;
+
 	if (write)
 		status = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
 	else
 		status = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
 
 	if (status < B_OK)
-		return syscall_restart_handle_post(status);
+		return status;
 
 	if (movePosition)
 		descriptor->pos = pos + length;
@@ -710,10 +711,11 @@ common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
 		return B_BAD_VALUE;
 	}
 
+	SyscallRestartWrapper<status_t> status;
+
 	ssize_t bytesTransferred = 0;
 	for (uint32 i = 0; i < count; i++) {
 		size_t length = vecs[i].iov_len;
-		status_t status;
 		if (write) {
 			status = descriptor->ops->fd_write(descriptor, pos,
 				vecs[i].iov_base, &length);
@@ -724,7 +726,8 @@ common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
 
 		if (status < B_OK) {
 			if (bytesTransferred == 0)
-				return syscall_restart_handle_post(status);
+				return status;
+			status = B_OK;
 			break;
 		}
 
@@ -819,13 +822,9 @@ _user_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 	TRACE(("user_ioctl: fd %d\n", fd));
 
-	struct thread *thread = thread_get_current_thread();
-	atomic_or(&thread->flags, THREAD_FLAGS_IOCTL_SYSCALL);
+	SyscallRestartWrapper<status_t> status;
 
-	status_t status = fd_ioctl(false, fd, op, buffer, length);
-
-	atomic_and(&thread->flags, ~THREAD_FLAGS_IOCTL_SYSCALL);
-	return status;
+	return status = fd_ioctl(false, fd, op, buffer, length);
 }
 
 
@@ -908,19 +907,16 @@ _user_dup2(int ofd, int nfd)
 ssize_t
 _kern_read(int fd, off_t pos, void *buffer, size_t length)
 {
-	struct file_descriptor *descriptor;
-	ssize_t bytesRead;
-
 	if (pos < -1)
 		return B_BAD_VALUE;
 
-	descriptor = get_fd(get_current_io_context(true), fd);
+	FDGetter fdGetter;
+	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+
 	if (!descriptor)
 		return B_FILE_ERROR;
-	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY) {
-		put_fd(descriptor);
+	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY)
 		return B_FILE_ERROR;
-	}
 
 	bool movePosition = false;
 	if (pos == -1) {
@@ -928,21 +924,23 @@ _kern_read(int fd, off_t pos, void *buffer, size_t length)
 		movePosition = true;
 	}
 
-	if (descriptor->ops->fd_read) {
-		bytesRead = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
-		if (bytesRead >= B_OK) {
-			if (length > SSIZE_MAX)
-				bytesRead = SSIZE_MAX;
-			else
-				bytesRead = (ssize_t)length;
+	SyscallFlagUnsetter _;
 
-			if (movePosition)
-				descriptor->pos = pos + length;
-		}
-	} else
-		bytesRead = B_BAD_VALUE;
+	if (descriptor->ops->fd_read == NULL)
+		return B_BAD_VALUE;
 
-	put_fd(descriptor);
+	ssize_t bytesRead = descriptor->ops->fd_read(descriptor, pos, buffer,
+		&length);
+	if (bytesRead >= B_OK) {
+		if (length > SSIZE_MAX)
+			bytesRead = SSIZE_MAX;
+		else
+			bytesRead = (ssize_t)length;
+
+		if (movePosition)
+			descriptor->pos = pos + length;
+	}
+
 	return bytesRead;
 }
 
@@ -950,52 +948,53 @@ _kern_read(int fd, off_t pos, void *buffer, size_t length)
 ssize_t
 _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 {
-	struct file_descriptor *descriptor;
 	bool movePosition = false;
-	ssize_t bytesRead = 0;
 	status_t status;
 	uint32 i;
 
 	if (pos < -1)
 		return B_BAD_VALUE;
 
-	descriptor = get_fd(get_current_io_context(true), fd);
+	FDGetter fdGetter;
+	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+
 	if (!descriptor)
 		return B_FILE_ERROR;
-	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY) {
-		put_fd(descriptor);
+	if ((descriptor->open_mode & O_RWMASK) == O_WRONLY)
 		return B_FILE_ERROR;
-	}
 
 	if (pos == -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
 
-	if (descriptor->ops->fd_read) {
-		for (i = 0; i < count; i++) {
-			size_t length = vecs[i].iov_len;
-			status = descriptor->ops->fd_read(descriptor, pos, vecs[i].iov_base,
-				&length);
-			if (status < B_OK) {
-				bytesRead = status;
-				break;
-			}
+	if (descriptor->ops->fd_read == NULL)
+		return B_BAD_VALUE;
 
-			if ((uint64)bytesRead + length > SSIZE_MAX)
-				bytesRead = SSIZE_MAX;
-			else
-				bytesRead += (ssize_t)length;
+	SyscallFlagUnsetter _;
 
-			pos += vecs[i].iov_len;
+	ssize_t bytesRead = 0;
+
+	for (i = 0; i < count; i++) {
+		size_t length = vecs[i].iov_len;
+		status = descriptor->ops->fd_read(descriptor, pos, vecs[i].iov_base,
+			&length);
+		if (status < B_OK) {
+			bytesRead = status;
+			break;
 		}
-	} else
-		bytesRead = B_BAD_VALUE;
+
+		if ((uint64)bytesRead + length > SSIZE_MAX)
+			bytesRead = SSIZE_MAX;
+		else
+			bytesRead += (ssize_t)length;
+
+		pos += vecs[i].iov_len;
+	}
 
 	if (movePosition)
 		descriptor->pos = pos;
 
-	put_fd(descriptor);
 	return bytesRead;
 }
 
@@ -1003,19 +1002,16 @@ _kern_readv(int fd, off_t pos, const iovec *vecs, size_t count)
 ssize_t
 _kern_write(int fd, off_t pos, const void *buffer, size_t length)
 {
-	struct file_descriptor *descriptor;
-	ssize_t bytesWritten;
-
 	if (pos < -1)
 		return B_BAD_VALUE;
 
-	descriptor = get_fd(get_current_io_context(true), fd);
+	FDGetter fdGetter;
+	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
-	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY) {
-		put_fd(descriptor);
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
 		return B_FILE_ERROR;
-	}
 
 	bool movePosition = false;
 	if (pos == -1) {
@@ -1023,22 +1019,23 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t length)
 		movePosition = true;
 	}
 
-	if (descriptor->ops->fd_write) {
-		bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer,
-			&length);
-		if (bytesWritten >= B_OK) {
-			if (length > SSIZE_MAX)
-				bytesWritten = SSIZE_MAX;
-			else
-				bytesWritten = (ssize_t)length;
+	if (descriptor->ops->fd_write == NULL)
+		return B_BAD_VALUE;
 
-			if (movePosition)
-				descriptor->pos = pos + length;
-		}
-	} else
-		bytesWritten = B_BAD_VALUE;
+	SyscallFlagUnsetter _;
 
-	put_fd(descriptor);
+	ssize_t bytesWritten = descriptor->ops->fd_write(descriptor, pos, buffer,
+		&length);
+	if (bytesWritten >= B_OK) {
+		if (length > SSIZE_MAX)
+			bytesWritten = SSIZE_MAX;
+		else
+			bytesWritten = (ssize_t)length;
+
+		if (movePosition)
+			descriptor->pos = pos + length;
+	}
+
 	return bytesWritten;
 }
 
@@ -1046,52 +1043,53 @@ _kern_write(int fd, off_t pos, const void *buffer, size_t length)
 ssize_t
 _kern_writev(int fd, off_t pos, const iovec *vecs, size_t count)
 {
-	struct file_descriptor *descriptor;
 	bool movePosition = false;
-	ssize_t bytesWritten = 0;
 	status_t status;
 	uint32 i;
 
 	if (pos < -1)
 		return B_BAD_VALUE;
 
-	descriptor = get_fd(get_current_io_context(true), fd);
+	FDGetter fdGetter;
+	struct file_descriptor *descriptor = fdGetter.SetTo(fd, true);
+
 	if (!descriptor)
 		return B_FILE_ERROR;
-	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY) {
-		put_fd(descriptor);
+	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
 		return B_FILE_ERROR;
-	}
 
 	if (pos == -1) {
 		pos = descriptor->pos;
 		movePosition = true;
 	}
 
-	if (descriptor->ops->fd_write) {
-		for (i = 0; i < count; i++) {
-			size_t length = vecs[i].iov_len;
-			status = descriptor->ops->fd_write(descriptor, pos,
-				vecs[i].iov_base, &length);
-			if (status < B_OK) {
-				bytesWritten = status;
-				break;
-			}
+	if (descriptor->ops->fd_write == NULL)
+		return B_BAD_VALUE;
 
-			if ((uint64)bytesWritten + length > SSIZE_MAX)
-				bytesWritten = SSIZE_MAX;
-			else
-				bytesWritten += (ssize_t)length;
+	SyscallFlagUnsetter _;
 
-			pos += vecs[i].iov_len;
+	ssize_t bytesWritten = 0;
+
+	for (i = 0; i < count; i++) {
+		size_t length = vecs[i].iov_len;
+		status = descriptor->ops->fd_write(descriptor, pos,
+			vecs[i].iov_base, &length);
+		if (status < B_OK) {
+			bytesWritten = status;
+			break;
 		}
-	} else
-		bytesWritten = B_BAD_VALUE;
+
+		if ((uint64)bytesWritten + length > SSIZE_MAX)
+			bytesWritten = SSIZE_MAX;
+		else
+			bytesWritten += (ssize_t)length;
+
+		pos += vecs[i].iov_len;
+	}
 
 	if (movePosition)
 		descriptor->pos = pos;
 
-	put_fd(descriptor);
 	return bytesWritten;
 }
 
@@ -1120,7 +1118,7 @@ _kern_ioctl(int fd, ulong op, void *buffer, size_t length)
 {
 	TRACE(("kern_ioctl: fd %d\n", fd));
 
-	IoctlSyscallFlagUnsetter _;
+	SyscallFlagUnsetter _;
 
 	return fd_ioctl(true, fd, op, buffer, length);
 }

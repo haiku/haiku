@@ -918,6 +918,7 @@ net_stack_module_info gNetStackModule = {
 	cancel_timer,
 	is_timer_active,
 
+	is_syscall,
 	is_restarted_syscall,
 	store_syscall_restart_timeout,
 	restore_syscall_restart_timeout,

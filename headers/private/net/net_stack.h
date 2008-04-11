@@ -135,6 +135,7 @@ struct net_stack_module_info {
 	bool (*is_timer_active)(struct net_timer *timer);
 
 	// syscall restart
+	bool (*is_syscall)(void);
 	bool (*is_restarted_syscall)(void);
 	void (*store_syscall_restart_timeout)(bigtime_t timeout);
 	bigtime_t (*restore_syscall_restart_timeout)(void);

@@ -576,9 +576,17 @@ uninit_timers(void)
 
 
 bool
+is_syscall(void)
+{
+	struct thread* thread = thread_get_current_thread();
+	return (thread->flags & THREAD_FLAGS_SYSCALL) != 0;
+}
+
+
+bool
 is_restarted_syscall(void)
 {
-	return syscall_restart_ioctl_is_restarted();
+	return syscall_restart_is_restarted();
 }
 
 
@@ -586,7 +594,7 @@ void
 store_syscall_restart_timeout(bigtime_t timeout)
 {
 	struct thread* thread = thread_get_current_thread();
-	if ((thread->flags & THREAD_FLAGS_IOCTL_SYSCALL) != 0)
+	if ((thread->flags & THREAD_FLAGS_SYSCALL) != 0)
 		*(bigtime_t*)thread->syscall_restart.parameters = timeout;
 }
 

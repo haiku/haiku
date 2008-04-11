@@ -1,5 +1,7 @@
-
-
+/*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include "stack_private.h"
 
@@ -31,9 +33,8 @@ stack_interface_free(net_socket* socket)
 
 static status_t
 stack_interface_bind(net_socket* socket, const struct sockaddr* address,
-	socklen_t addressLength, bool kernel)
+	socklen_t addressLength)
 {
-// TODO: Pass kernel flag!
 	return gNetSocketModule.bind(socket, address, addressLength);
 }
 
@@ -47,9 +48,8 @@ stack_interface_shutdown(net_socket* socket, int how)
 
 static status_t
 stack_interface_connect(net_socket* socket, const struct sockaddr* address,
-	socklen_t addressLength, bool kernel)
+	socklen_t addressLength)
 {
-// TODO: Pass kernel flag!
 	return gNetSocketModule.connect(socket, address, addressLength);
 }
 
@@ -71,17 +71,15 @@ stack_interface_accept(net_socket* socket, struct sockaddr* address,
 
 
 static ssize_t
-stack_interface_recv(net_socket* socket, void* data, size_t length, int flags,
-	bool kernel)
+stack_interface_recv(net_socket* socket, void* data, size_t length, int flags)
 {
-// TODO: Pass kernel flag!
 	return gNetSocketModule.receive(socket, NULL, data, length, flags);
 }
 
 
 static ssize_t
 stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
-	int flags, struct sockaddr* address, socklen_t* _addressLength, bool kernel)
+	int flags, struct sockaddr* address, socklen_t* _addressLength)
 {
 	msghdr message;
 	iovec vecs[1] = { { data, length } };
@@ -93,7 +91,6 @@ stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
 	message.msg_controllen = 0;
 	message.msg_flags = 0;
 
-// TODO: Pass kernel flag!
 	status_t error = gNetSocketModule.receive(socket, &message, data, length,
 		flags);
 	if (error != B_OK)
@@ -105,8 +102,7 @@ stack_interface_recvfrom(net_socket* socket, void* data, size_t length,
 
 
 static ssize_t
-stack_interface_recvmsg(net_socket* socket, struct msghdr* message, int flags,
-	bool kernel)
+stack_interface_recvmsg(net_socket* socket, struct msghdr* message, int flags)
 {
 	void* buffer = NULL;
 	size_t len = 0;
@@ -115,24 +111,21 @@ stack_interface_recvmsg(net_socket* socket, struct msghdr* message, int flags,
 		len = message->msg_iov[0].iov_len;
 	}
 
-// TODO: Pass kernel flag!
 	return gNetSocketModule.receive(socket, message, buffer, len, flags);
 }
 
 
 static ssize_t
 stack_interface_send(net_socket* socket, const void* data, size_t length,
-	int flags, bool kernel)
+	int flags)
 {
-// TODO: Pass kernel flag!
 	return gNetSocketModule.send(socket, NULL, data, length, flags);
 }
 
 
 static ssize_t
 stack_interface_sendto(net_socket* socket, const void* data, size_t length,
-	int flags, const struct sockaddr* address, socklen_t addressLength,
-	bool kernel)
+	int flags, const struct sockaddr* address, socklen_t addressLength)
 {
 	msghdr message;
 	iovec vecs[1] = { { (void*)data, length } };
@@ -144,14 +137,13 @@ stack_interface_sendto(net_socket* socket, const void* data, size_t length,
 	message.msg_controllen = 0;
 	message.msg_flags = 0;
 
-// TODO: Pass kernel flag!
 	return gNetSocketModule.send(socket, &message, data, length, flags);
 }
 
 
 static ssize_t
 stack_interface_sendmsg(net_socket* socket, const struct msghdr* message,
-	int flags, bool kernel)
+	int flags)
 {
 	void* buffer = NULL;
 	size_t len = 0;
@@ -160,7 +152,6 @@ stack_interface_sendmsg(net_socket* socket, const struct msghdr* message,
 		len = message->msg_iov[0].iov_len;
 	}
 
-// TODO: Pass kernel flag!
 	return gNetSocketModule.send(socket, (msghdr*)message, buffer, len, flags);
 }
 
@@ -219,9 +210,9 @@ stack_interface_socketpair(int family, int type, int protocol,
 
 static status_t
 stack_interface_ioctl(net_socket* socket, uint32 op, void *buffer,
-	size_t length, bool kernel)
+	size_t length)
 {
-	return gNetSocketModule.control(socket, op, buffer, length, kernel);
+	return gNetSocketModule.control(socket, op, buffer, length);
 }
 
 

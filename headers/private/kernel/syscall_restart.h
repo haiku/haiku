@@ -90,69 +90,73 @@ syscall_restart_handle_post(status_t error)
 
 
 static inline bool
-syscall_restart_ioctl_is_restarted()
+syscall_restart_is_restarted()
 {
 	struct thread* thread = thread_get_current_thread();
 
-	return (thread->flags & THREAD_FLAGS_IOCTL_SYSCALL) != 0
+	return (thread->flags & THREAD_FLAGS_SYSCALL) != 0
 		&& (thread->flags & THREAD_FLAGS_SYSCALL_RESTARTED) != 0;
 }
 
 
-static inline status_t
-syscall_restart_ioctl_handle_post(status_t error)
-{
-	if (error == B_INTERRUPTED) {
-		// interrupted -- set flag for syscall restart
-		struct thread* thread = thread_get_current_thread();
-		if ((thread->flags & THREAD_FLAGS_IOCTL_SYSCALL) != 0)
-			atomic_or(&thread->flags, THREAD_FLAGS_RESTART_SYSCALL);
+struct SyscallFlagUnsetter {
+	SyscallFlagUnsetter()
+	{
+		fThread = thread_get_current_thread();
+		fWasSyscall = (atomic_and(&fThread->flags, ~THREAD_FLAGS_SYSCALL)
+			& THREAD_FLAGS_SYSCALL) != 0;
 	}
 
-	return error;
-}
-
-
-struct IoctlSyscallFlagUnsetter {
-	IoctlSyscallFlagUnsetter()
+	~SyscallFlagUnsetter()
 	{
-		struct thread *thread = thread_get_current_thread();
-		fWasSyscall = (atomic_and(&thread->flags, ~THREAD_FLAGS_IOCTL_SYSCALL)
-			& THREAD_FLAGS_IOCTL_SYSCALL) != 0;
-	}
-
-	~IoctlSyscallFlagUnsetter()
-	{
-		struct thread *thread = thread_get_current_thread();
 		if (fWasSyscall)
-			atomic_or(&thread->flags, THREAD_FLAGS_IOCTL_SYSCALL);
+			atomic_or(&fThread->flags, THREAD_FLAGS_SYSCALL);
 	}
 
 private:
-	bool	fWasSyscall;
+	struct thread*	fThread;
+	bool			fWasSyscall;
 };
 
 
 template<typename Type>
-struct IoctlSyscallRestartWrapper {
-	IoctlSyscallRestartWrapper(const Type& result)
-		: fResult(result)
+struct SyscallRestartWrapper {
+	SyscallRestartWrapper(Type initialValue = 0)
+		: fResult(initialValue)
 	{
-		struct thread *thread = thread_get_current_thread();
-		atomic_or(&thread->flags, THREAD_FLAGS_IOCTL_SYSCALL);
+		fThread = thread_get_current_thread();
+		atomic_or(&fThread->flags, THREAD_FLAGS_SYSCALL);
 	}
 
-	~IoctlSyscallRestartWrapper()
+	~SyscallRestartWrapper()
 	{
-		struct thread *thread = thread_get_current_thread();
-		atomic_and(&thread->flags, ~THREAD_FLAGS_IOCTL_SYSCALL);
+		atomic_and(&fThread->flags, ~THREAD_FLAGS_SYSCALL);
 
-		if (fResult < 0)
-			syscall_restart_ioctl_handle_post(fResult);
+		if (fResult == B_INTERRUPTED) {
+			// interrupted -- set flag for syscall restart
+			if ((fThread->flags & THREAD_FLAGS_SYSCALL) != 0)
+				atomic_or(&fThread->flags, THREAD_FLAGS_RESTART_SYSCALL);
+		}
 	}
+
+	SyscallRestartWrapper<Type>& operator=(const Type& other)
+	{
+		fResult = other;
+		return *this;
+	}
+
+	bool operator==(const Type& other) const	{ return fResult == other; }
+	bool operator!=(const Type& other) const	{ return fResult != other; }
+	bool operator<=(const Type& other) const	{ return fResult <= other; }
+	bool operator>=(const Type& other) const	{ return fResult >= other; }
+	bool operator<(const Type& other) const		{ return fResult < other; }
+	bool operator>(const Type& other) const		{ return fResult > other; }
+
+	operator Type() const	{ return fResult; }
 
 private:
-	const Type& fResult;
+	Type			fResult;
+	struct thread*	fThread;
 };
 
 
