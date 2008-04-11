@@ -31,7 +31,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  * 
- * $FreeBSD: src/sys/dev/firewire/firewirereg.h,v 1.49 2007/07/15 13:20:48 simokawa Exp $
+ * $FreeBSD: src/sys/dev/firewire/firewirereg.h,v 1.50 2007/07/20 03:42:57 simokawa Exp $
  *
  */
 #ifndef _FIREWIREREG_H
@@ -173,6 +173,11 @@ struct firewire_comm{
 		*arq, *atq, *ars, *ats, *it[FW_MAX_DMACH],*ir[FW_MAX_DMACH];
 	struct fw_xferlist tlabels[0x40];
 	u_char last_tlabel[0x40];
+#ifndef __HAIKU__
+	struct mtx tlabel_lock;
+#else
+	benaphore tlabel_lock;
+#endif
 	STAILQ_HEAD(, fw_bind) binds;
 	STAILQ_HEAD(, fw_device) devices;
 	u_int  sid_cnt;
