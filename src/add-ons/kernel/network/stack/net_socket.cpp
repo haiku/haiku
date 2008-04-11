@@ -9,21 +9,26 @@
 
 #include "stack_private.h"
 
-#include <net_protocol.h>
-#include <net_stack.h>
-#include <net_stat.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
 
+#include <new>
+
+#include <Drivers.h>
 #include <KernelExport.h>
 #include <Select.h>
 #include <team.h>
 #include <util/AutoLock.h>
 #include <util/list.h>
-#include <fs/select_sync_pool.h>
 
-#include <new>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/time.h>
+#include <fs/select_sync_pool.h>
+#include <kernel.h>
+
+#include <net_protocol.h>
+#include <net_stack.h>
+#include <net_stat.h>
 
 
 struct net_socket_private : net_socket {
@@ -42,6 +47,8 @@ struct net_socket_private : net_socket {
 void socket_delete(net_socket *socket);
 int socket_bind(net_socket *socket, const struct sockaddr *address,
 	socklen_t addressLength);
+int socket_setsockopt(net_socket *socket, int level, int option,
+	const void *value, int length);
 
 
 struct list sSocketList;
@@ -236,8 +243,37 @@ socket_writev(net_socket *socket, const iovec *vecs, size_t vecCount,
 
 
 status_t
-socket_control(net_socket *socket, int32 op, void *data, size_t length)
+socket_control(net_socket *socket, int32 op, void *data, size_t length,
+	bool kernel)
 {
+	switch (op) {
+		case FIONBIO:
+		{
+			if (data == NULL)
+				return B_BAD_VALUE;
+
+			int value;
+			if (kernel) {
+				value = *(int*)data;
+			} else {
+				if (!IS_USER_ADDRESS(data)
+					|| user_memcpy(&value, data, sizeof(int)) != B_OK) {
+					return B_BAD_ADDRESS;
+				}
+			}
+			return socket_setsockopt(socket, SOL_SOCKET, SO_NONBLOCK, &value,
+				sizeof(int));
+		}
+
+		case B_SET_BLOCKING_IO:
+		case B_SET_NONBLOCKING_IO:
+		{
+			int value = op == B_SET_NONBLOCKING_IO;
+			return socket_setsockopt(socket, SOL_SOCKET, SO_NONBLOCK, &value,
+				sizeof(int));
+		}
+	}
+
 	return socket->first_info->control(socket->first_protocol,
 		LEVEL_DRIVER_IOCTL, op, data, &length);
 }
@@ -499,8 +535,7 @@ socket_connected(net_socket *socket)
 
 
 status_t
-socket_request_notification(net_socket *_socket, uint8 event, uint32 ref,
-	selectsync *sync)
+socket_request_notification(net_socket *_socket, uint8 event, selectsync *sync)
 {
 	net_socket_private *socket = (net_socket_private *)_socket;
 
@@ -1177,6 +1212,59 @@ socket_shutdown(net_socket *socket, int direction)
 }
 
 
+status_t
+socket_socketpair(int family, int type, int protocol, net_socket* sockets[2])
+{
+	sockets[0] = NULL;
+	sockets[1] = NULL;
+
+	// create sockets
+	status_t error = socket_open(family, type, protocol, &sockets[0]);
+	if (error != B_OK)
+		return error;
+
+	if (error == B_OK)
+		error = socket_open(family, type, protocol, &sockets[1]);
+
+	// bind one
+	if (error == B_OK)
+		error = socket_bind(sockets[0], NULL, 0);
+
+	// start listening
+	if (error == B_OK)
+		error = socket_listen(sockets[0], 1);
+
+	// connect them	
+	if (error == B_OK) {
+		error = socket_connect(sockets[1], (sockaddr*)&sockets[0]->address,
+			sockets[0]->address.ss_len);
+	}
+
+	// accept a socket
+	net_socket* acceptedSocket = NULL;
+	if (error == B_OK)
+		error = socket_accept(sockets[0], NULL, NULL, &acceptedSocket);
+
+	if (error == B_OK) {
+		// everything worked: close the listener socket
+		socket_close(sockets[0]);
+		socket_free(sockets[0]);
+		sockets[0] = acceptedSocket;
+	} else {
+		// close sockets on error
+		for (int i = 0; i < 2; i++) {
+			if (sockets[i] != NULL) {
+				socket_close(sockets[i]);
+				socket_free(sockets[i]);
+				sockets[i] = NULL;
+			}
+		}
+	}
+
+	return error;
+}
+
+
 //	#pragma mark -
 
 
@@ -1254,5 +1342,6 @@ net_socket_module_info gNetSocketModule = {
 	socket_send,
 	socket_setsockopt,
 	socket_shutdown,
+	socket_socketpair
 };
 

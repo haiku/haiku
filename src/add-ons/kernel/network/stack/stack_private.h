@@ -15,15 +15,15 @@
 #include <net_protocol.h>
 #include <net_socket.h>
 #include <net_stack.h>
+#include <net_stack_interface.h>
 
-
-#define NET_STARTER_MODULE_NAME "network/stack/starter/v1"
 
 extern net_stack_module_info gNetStackModule;
 extern net_buffer_module_info gNetBufferModule;
 extern net_socket_module_info gNetSocketModule;
 extern net_datalink_module_info gNetDatalinkModule;
 extern net_datalink_protocol_module_info gDatalinkInterfaceProtocolModule;
+extern net_stack_interface_module_info gNetStackInterfaceModule;
 
 // stack.cpp
 status_t register_domain_datalink_protocols(int family, int type, ...);
@@ -32,5 +32,8 @@ status_t get_domain_protocols(net_socket *socket);
 status_t put_domain_protocols(net_socket *socket);
 status_t get_domain_datalink_protocols(net_interface *interface);
 status_t put_domain_datalink_protocols(net_interface *interface);
+
+status_t init_stack();
+status_t uninit_stack();
 
 #endif	// STACK_PRIVATE_H

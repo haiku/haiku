@@ -7,23 +7,21 @@
  *		James Woodcock
  */
 
-
-#include <SupportDefs.h>
-
-#include <net_stack_driver.h>
-#include <net_stat.h>
-
 #include <arpa/inet.h>
-#include <netdb.h>
-#include <net/if.h>
-#include <netinet/in.h>
-
 #include <errno.h>
+#include <getopt.h>
+#include <net/if.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h>
+
+#include <SupportDefs.h>
+
+#include <net_stat.h>
+#include <syscalls.h>
 
 
 extern const char* __progname;
@@ -110,22 +108,6 @@ usage(int status)
 }
 
 
-status_t
-get_next_stat(int stack, uint32& cookie, int family, net_stat& stat)
-{
-	get_next_stat_args args;
-	args.cookie = cookie;
-	args.family = family;
-
-	if (ioctl(stack, NET_STACK_GET_NEXT_STAT, &args, sizeof(args)) < 0)
-		return errno;
-
-	cookie = args.cookie;
-	memcpy(&stat, &args.stat, sizeof(net_stat));
-	return B_OK;
-}
-
-
 bool
 get_address_family(const char* argument, int32& familyIndex)
 {
@@ -177,13 +159,6 @@ main(int argc, char** argv)
 		}
 	} while (opt != -1);
 
-	int stack = open(NET_STACK_DRIVER_PATH, O_RDWR);
-	if (stack < 0) {
-		fprintf(stderr, "%s: The networking stack doesn't seem to be "
-			"available.\n", kProgramName);
-		return -1;
-	}
-
 	bool printProgram = true;
 		// TODO: add some more program options... :-)
 
@@ -193,7 +168,7 @@ main(int argc, char** argv)
 	uint32 cookie = 0;
 	int family = -1;
 	net_stat stat;
-	while (get_next_stat(stack, cookie, family, stat) == B_OK) {
+	while (_kern_get_next_socket_stat(family, &cookie, &stat) == B_OK) {
 		protoent* proto = getprotobynumber(stat.protocol);
 		if (proto != NULL)
 			printf("%-6s ", proto->p_name);
@@ -226,7 +201,6 @@ main(int argc, char** argv)
 			printf("%ld\n", stat.owner);
 	}
 
-	close(stack);
 	return 0;
 }
 

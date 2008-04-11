@@ -12,6 +12,7 @@
 #include <DiskDeviceDefs.h>
 
 #include <signal.h>
+#include <sys/socket.h>
 
 
 #ifdef __cplusplus
@@ -23,6 +24,7 @@ struct fd_info;
 struct fd_set;
 struct fs_info;
 struct iovec;
+struct net_stat;
 struct pollfd;
 struct rlimit;
 struct sigaction;
@@ -221,6 +223,44 @@ extern status_t		_kern_lock_node(int fd);
 extern status_t		_kern_unlock_node(int fd);
 extern status_t		_kern_get_next_fd_info(team_id team, uint32 *_cookie,
 						struct fd_info *info, size_t infoSize);
+
+// socket functions
+extern int			_kern_socket(int family, int type, int protocol);
+extern status_t		_kern_bind(int socket, const struct sockaddr *address,
+						socklen_t addressLength);
+extern status_t		_kern_shutdown_socket(int socket, int how);
+extern status_t		_kern_connect(int socket, const struct sockaddr *address,
+						socklen_t addressLength);
+extern status_t		_kern_listen(int socket, int backlog);
+extern int			_kern_accept(int socket, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern ssize_t		_kern_recv(int socket, void *data, size_t length,
+						int flags);
+extern ssize_t		_kern_recvfrom(int socket, void *data, size_t length,
+						int flags, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern ssize_t		_kern_recvmsg(int socket, struct msghdr *message,
+						int flags);
+extern ssize_t		_kern_send(int socket, const void *data, size_t length,
+						int flags);
+extern ssize_t		_kern_sendto(int socket, const void *data, size_t length,
+						int flags, const struct sockaddr *address,
+						socklen_t addressLength);
+extern ssize_t		_kern_sendmsg(int socket, const struct msghdr *message,
+						int flags);
+extern status_t		_kern_getsockopt(int socket, int level, int option,
+						void *value, socklen_t *_length);
+extern status_t		_kern_setsockopt(int socket, int level, int option,
+						const void *value, socklen_t length);
+extern status_t		_kern_getpeername(int socket, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern status_t		_kern_getsockname(int socket, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern int			_kern_sockatmark(int socket);
+extern status_t		_kern_socketpair(int family, int type, int protocol,
+						int *socketVector);
+extern status_t		_kern_get_next_socket_stat(int family, uint32 *cookie,
+						struct net_stat *stat);
 
 // node monitor functions
 extern status_t		_kern_stop_notifying(port_id port, uint32 token);

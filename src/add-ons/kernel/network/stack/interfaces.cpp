@@ -270,7 +270,7 @@ create_interface(net_domain *domain, const char *name, const char *baseName,
 	// Grab a reference to the networking stack, to make sure it won't be
 	// unloaded as long as an interface exists
 	module_info *module;
-	get_module(NET_STARTER_MODULE_NAME, &module);
+	get_module(gNetStackInterfaceModule.info.name, &module);
 
 	*_interface = interface;
 	return B_OK;
@@ -320,7 +320,7 @@ delete_interface(net_interface_private *interface)
 
 	// Release reference of the stack - at this point, our stack may be unloaded
 	// if no other interfaces or sockets are left
-	put_module(NET_STARTER_MODULE_NAME);
+	put_module(gNetStackInterfaceModule.info.name);
 }
 
 

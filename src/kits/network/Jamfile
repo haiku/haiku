@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src kits network ;
 
-UsePrivateHeaders libroot net ;
+UsePrivateHeaders libroot net shared ;
+UsePrivateKernelHeaders ;
 
 local services = [ FGristFiles services ] ;
 SEARCH on $(services) = [ FDirName $(SUBDIR) dns defaults ] ;

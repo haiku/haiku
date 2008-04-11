@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src bin network netstat ;
 
 UsePrivateHeaders net ;
+UsePrivateKernelHeaders ;	# for syscalls.h
 
 BinCommand netstat :
 	netstat.cpp

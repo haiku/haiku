@@ -24,6 +24,7 @@ KernelAddon stack :
 	radix.c
 	routes.cpp
 	stack.cpp
+	stack_interface.cpp
 	utility.cpp
 ;
 

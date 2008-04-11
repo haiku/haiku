@@ -737,7 +737,7 @@ scan_modules(const char *path)
 }
 
 
-static status_t
+status_t
 init_stack()
 {
 	status_t status = init_domains();
@@ -859,21 +859,6 @@ uninit_stack()
 
 
 static status_t
-starter_std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-			return init_stack();
-		case B_MODULE_UNINIT:
-			return uninit_stack();
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
-static status_t
 stack_std_ops(int32 op, ...)
 {
 	switch (op) {
@@ -938,18 +923,12 @@ net_stack_module_info gNetStackModule = {
 	restore_syscall_restart_timeout,
 };
 
-static module_info sNetStarterModule = {
-	NET_STARTER_MODULE_NAME,
-	0,
-	starter_std_ops
-};
-
 module_info *modules[] = {
 	(module_info *)&gNetStackModule,
-	(module_info *)&sNetStarterModule,
 	(module_info *)&gNetBufferModule,
 	(module_info *)&gNetSocketModule,
 	(module_info *)&gNetDatalinkModule,
 	(module_info *)&gLinkModule,
+	(module_info *)&gNetStackInterfaceModule,
 	NULL
 };

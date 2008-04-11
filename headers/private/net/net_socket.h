@@ -53,7 +53,7 @@ struct net_socket_module_info {
 	status_t	(*writev)(net_socket *socket, const iovec *vecs,
 					size_t vecCount, size_t *_length);
 	status_t	(*control)(net_socket *socket, int32 op, void *data,
-					size_t length);
+					size_t length, bool kernel);
 
 	ssize_t		(*read_avail)(net_socket *socket);
 	ssize_t		(*send_avail)(net_socket *socket);
@@ -81,7 +81,7 @@ struct net_socket_module_info {
 
 	// notifications
 	status_t	(*request_notification)(net_socket *socket, uint8 event,
-					uint32 ref, struct selectsync *sync);
+					struct selectsync *sync);
 	status_t	(*cancel_notification)(net_socket *socket, uint8 event,
 					struct selectsync *sync);
 	status_t	(*notify)(net_socket *socket, uint8 event, int32 value);
@@ -107,6 +107,8 @@ struct net_socket_module_info {
 	int			(*setsockopt)(net_socket *socket, int level, int option,
 					const void *optionValue, int optionLength);
 	int			(*shutdown)(net_socket *socket, int direction);
+	status_t	(*socketpair)(int family, int type, int protocol,
+					net_socket* _sockets[2]);
 };
 
 #endif	// NET_SOCKET_H

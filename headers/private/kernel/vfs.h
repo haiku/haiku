@@ -17,6 +17,7 @@
 
 #include <dirent.h>
 #include <signal.h>
+#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/select.h>
 
@@ -28,12 +29,13 @@
 
 #define B_UNMOUNT_BUSY_PARTITION	0x80000000
 
-struct kernel_args;
-struct vm_cache;
 struct file_descriptor;
+struct kernel_args;
+struct net_stat;
+struct pollfd;
 struct selectsync;
 struct select_info;
-struct pollfd;
+struct vm_cache;
 struct vnode;
 
 
@@ -197,7 +199,7 @@ status_t _user_change_root(const char *path);
 int _user_open_query(dev_t device, const char *query, size_t queryLength, uint32 flags,
 			port_id port, int32 token);
 
-/* fd user prototypes (implementation located in fd.c)  */
+/* fd user prototypes (implementation located in fd.cpp)  */
 extern ssize_t _user_read(int fd, off_t pos, void *buffer, size_t bufferSize);
 extern ssize_t _user_readv(int fd, off_t pos, const iovec *vecs, size_t count);
 extern ssize_t _user_write(int fd, off_t pos, const void *buffer, size_t bufferSize);
@@ -210,6 +212,44 @@ extern int _user_dup(int fd);
 extern int _user_dup2(int ofd, int nfd);
 extern status_t _user_lock_node(int fd);
 extern status_t _user_unlock_node(int fd);
+
+/* socket user prototypes (implementation in socket.cpp) */
+extern int			_user_socket(int family, int type, int protocol);
+extern status_t		_user_bind(int socket, const struct sockaddr *address,
+						socklen_t addressLength);
+extern status_t		_user_shutdown_socket(int socket, int how);
+extern status_t		_user_connect(int socket, const struct sockaddr *address,
+						socklen_t addressLength);
+extern status_t		_user_listen(int socket, int backlog);
+extern int			_user_accept(int socket, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern ssize_t		_user_recv(int socket, void *data, size_t length,
+						int flags);
+extern ssize_t		_user_recvfrom(int socket, void *data, size_t length,
+						int flags, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern ssize_t		_user_recvmsg(int socket, struct msghdr *message,
+						int flags);
+extern ssize_t		_user_send(int socket, const void *data, size_t length,
+						int flags);
+extern ssize_t		_user_sendto(int socket, const void *data, size_t length,
+						int flags, const struct sockaddr *address,
+						socklen_t addressLength);
+extern ssize_t		_user_sendmsg(int socket, const struct msghdr *message,
+						int flags);
+extern status_t		_user_getsockopt(int socket, int level, int option,
+						void *value, socklen_t *_length);
+extern status_t		_user_setsockopt(int socket, int level, int option,
+						const void *value, socklen_t length);
+extern status_t		_user_getpeername(int socket, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern status_t		_user_getsockname(int socket, struct sockaddr *address,
+						socklen_t *_addressLength);
+extern int			_user_sockatmark(int socket);
+extern status_t		_user_socketpair(int family, int type, int protocol,
+						int *socketVector);
+extern status_t		_user_get_next_socket_stat(int family, uint32 *cookie,
+						struct net_stat *stat);
 
 /* vfs entry points... */
 
