@@ -658,7 +658,7 @@ common_user_io(int fd, off_t pos, void *buffer, size_t length, bool write)
 	else
 		status = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
 
-	if (status.operator>(B_OK))
+	if (status.operator<(B_OK))
 		return status;
 
 	if (movePosition)
