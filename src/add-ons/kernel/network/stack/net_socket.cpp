@@ -133,6 +133,62 @@ err1:
 }
 
 
+static status_t
+attach_ancillary_data(net_socket *socket, net_buffer *buffer, void *data,
+	size_t dataLen)
+{
+	cmsghdr *header = (cmsghdr*)data;
+
+	while (dataLen > 0) {
+		if (header->cmsg_len < sizeof(cmsghdr) || header->cmsg_len > dataLen)
+			return B_BAD_VALUE;
+
+		if (socket->first_info->attach_ancillary_data == NULL)
+			return EOPNOTSUPP;
+
+		status_t status = socket->first_info->attach_ancillary_data(
+			socket->first_protocol, buffer, header);
+		if (status != B_OK)
+			return status;
+
+		dataLen -= _ALIGN(header->cmsg_len);
+		header = (cmsghdr*)((uint8*)header + _ALIGN(header->cmsg_len));
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+process_ancillary_data(net_socket *socket, net_buffer *buffer, msghdr *_header)
+{
+	uint8 *dataBuffer = (uint8*)_header->msg_control;
+	int dataBufferLen = _header->msg_controllen;
+
+	ancillary_data_header header;
+	void *data = NULL;
+
+	while ((data = gNetBufferModule.next_ancillary_data(buffer, data, &header))
+			!= NULL) {
+
+		if (socket->first_info->process_ancillary_data == NULL)
+			return EOPNOTSUPP;
+
+		ssize_t bytesWritten = socket->first_info->process_ancillary_data(
+			socket->first_protocol, &header, data, dataBuffer, dataBufferLen);
+		if (bytesWritten < 0)
+			return bytesWritten;
+
+		dataBuffer += bytesWritten;
+		dataBufferLen -= bytesWritten;		
+	}
+
+	_header->msg_controllen -= dataBufferLen;
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -891,6 +947,18 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 	if (status < B_OK)
 		return status;
 
+	// process ancillary data
+	if (header != NULL) {
+		if (buffer != NULL && header->msg_control != NULL) {
+			status = process_ancillary_data(socket, buffer, header);
+			if (status != B_OK) {
+				gNetBufferModule.free(buffer);
+				return status;
+			}
+		} else
+			header->msg_controllen = 0;
+	}
+
 	// TODO: - returning a NULL buffer when received 0 bytes
 	//         may not make much sense as we still need the address
 	//       - gNetBufferModule.read() uses memcpy() instead of user_memcpy
@@ -969,9 +1037,14 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 	// present, { data, length } would have been iovec[0] and is
 	// always considered like that
 
+	cmsghdr *ancillaryData = NULL;
+	size_t ancillaryDataLen = 0;
+
 	if (header != NULL) {
 		address = (const sockaddr *)header->msg_name;
 		addressLength = header->msg_namelen;
+		ancillaryData = (cmsghdr *)header->msg_control;
+		ancillaryDataLen = header->msg_controllen;
 
 		if (header->msg_iovlen <= 1)
 			header = NULL;
@@ -1060,13 +1133,23 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 			}
 		}
 
+		// attach ancillary data to the first buffer
+		status_t status = B_OK;
+		if (ancillaryData != NULL) {
+			status = attach_ancillary_data(socket, buffer, ancillaryData,
+				ancillaryDataLen);
+			ancillaryData = NULL;
+		}
+
 		size_t bufferSize = buffer->size;
 		buffer->flags = flags;
 		memcpy(buffer->source, &socket->address, socket->address.ss_len);
 		memcpy(buffer->destination, address, addressLength);
 
-		status_t status = socket->first_info->send_data(socket->first_protocol,
-			buffer);
+		if (status == B_OK) {
+			status = socket->first_info->send_data(socket->first_protocol,
+				buffer);
+		}
 		if (status < B_OK) {
 			size_t sizeAfterSend = buffer->size;
 			gNetBufferModule.free(buffer);
