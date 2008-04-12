@@ -117,7 +117,7 @@ main(int argc, char **argv)
 			} else if (operation == 'h') {
 		        Keymap keymap;
 				load_keymap_source(keymap, argv[i]);
-				keymap.SaveAsHeader(outputRef);
+				keymap.SaveAsHeader(outputRef, argv[i]);
 				return 0;
 			} else if (operation == 'b') {
 				entry_ref ref;

@@ -309,12 +309,12 @@ InputServer::_LoadSystemKeymap()
 	memcpy(fChars, kSystemKeyChars, fCharsSize);
 
 	// TODO: why are we doing this?
-	return _SaveKeymap();
+	return _SaveKeymap(true);
 }
 
 
 status_t
-InputServer::_SaveKeymap()
+InputServer::_SaveKeymap(bool isDefault)
 {
 	// we save this keymap to file
 	BPath path;
@@ -348,6 +348,12 @@ InputServer::_SaveKeymap()
 
 	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
 		return err;
+
+	// don't bother reporting an error if this fails, since this isn't fatal 
+	// the keymap will still be functional, and will just be identified as (Current) in prefs instead of its
+	// actual name
+	if (isDefault)
+		file.WriteAttr("keymap:name", B_STRING_TYPE, 0, kSystemKeymapName, strlen(kSystemKeymapName));
 
 	return B_OK;
 }

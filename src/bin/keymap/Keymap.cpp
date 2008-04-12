@@ -773,12 +773,21 @@ Keymap::Save(entry_ref &ref)
 	into the input_server, for example.
 */
 void
-Keymap::SaveAsHeader(entry_ref &ref)
+Keymap::SaveAsHeader(entry_ref &ref, const char *mapName)
 {
 	BPath path;
 	status_t err = path.SetTo(&ref);
 	if (err < B_OK)
 		return;
+
+	BString name = mapName;
+	int slashidx = name.FindLast('/');
+	if (slashidx > 0) {
+		// prune off path
+		name.Remove(0, slashidx + 1);
+	}
+	// prune ".keymap"
+	name.Remove(name.FindLast('.'), 7);
 
 	FILE* file = fopen(path.Path(), "w");
 
@@ -787,6 +796,7 @@ Keymap::SaveAsHeader(entry_ref &ref)
 		" * This file is generated automatically. Don't edit!\n"
 		" */\n\n");
 	fprintf(file, "#include <InterfaceDefs.h>\n\n");
+	fprintf(file, "const char *kSystemKeymapName = \"%s\";\n\n", name.String()); 
 	fprintf(file, "const key_map kSystemKeymap = {\n");
 	fprintf(file, "\tversion:%ld,\n", fKeys.version);
 	fprintf(file, "\tcaps_key:0x%lx,\n", fKeys.caps_key);

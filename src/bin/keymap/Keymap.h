@@ -27,7 +27,7 @@ class Keymap {
 		status_t LoadSource(FILE *f);
 		status_t LoadSourceFromRef(entry_ref &ref);
 		void SaveAsCurrent();
-		void SaveAsHeader(entry_ref &ref);
+		void SaveAsHeader(entry_ref &ref, const char *mapname);
 		status_t Use();
 		void Dump();
 		bool IsModifierKey(uint32 keyCode);
