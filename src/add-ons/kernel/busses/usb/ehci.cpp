@@ -200,14 +200,14 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	// disable interrupts
 	WriteOpReg(EHCI_USBINTR, 0);
 
-	// reset the segment register
-	WriteOpReg(EHCI_CTRDSSEGMENT, 0);
-
 	// reset the host controller
 	if (ControllerReset() < B_OK) {
 		TRACE_ERROR(("usb_ehci: host controller failed to reset\n"));
 		return;
 	}
+
+	// reset the segment register
+	WriteOpReg(EHCI_CTRDSSEGMENT, 0);
 
 	// create semaphores the finisher thread will wait for
 	fAsyncAdvanceSem = create_sem(0, "EHCI Async Advance");
@@ -359,10 +359,7 @@ EHCI::Start()
 	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD) | EHCI_USBCMD_RUNSTOP
 		| EHCI_USBCMD_ASENABLE | EHCI_USBCMD_PSENABLE
 		| (frameListSize << EHCI_USBCMD_FLS_SHIFT)
-		| (2 << EHCI_USBCMD_ITC_SHIFT));
-
-	// route all ports to us
-	WriteOpReg(EHCI_CONFIGFLAG, EHCI_CONFIGFLAG_FLAG);
+		| (1 << EHCI_USBCMD_ITC_SHIFT));
 
 	bool running = false;
 	for (int32 i = 0; i < 10; i++) {
@@ -377,14 +374,14 @@ EHCI::Start()
 		}
 	}
 
-	// set the interrupt threshold
-	WriteOpReg(EHCI_USBCMD, ReadOpReg(EHCI_USBCMD)
-		| (1 << EHCI_USBCMD_ITC_SHIFT));
-
 	if (!running) {
 		TRACE(("usb_ehci: Host Controller didn't start\n"));
 		return B_ERROR;
 	}
+
+	// route all ports to us
+	WriteOpReg(EHCI_CONFIGFLAG, EHCI_CONFIGFLAG_FLAG);
+	snooze(10000);
 
 	fRootHubAddress = AllocateAddress();
 	fRootHub = new(std::nothrow) EHCIRootHub(RootObject(), fRootHubAddress);
