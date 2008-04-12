@@ -3,7 +3,7 @@
 # parameters <haiku sourcedir> <buildtools dir> [ <haiku output dir> ]
 
 # get and check the parameters
-if [ $# \< 2 ]; then
+if [ $# -lt 2 ]; then
 	echo Usage: $0 '<haiku sourcedir> <buildtools dir> [ <haiku output dir> ]' >&2
 	exit 1
 fi
@@ -11,7 +11,7 @@ fi
 haikuSourceDir=$1
 buildToolsDir=$2/legacy
 
-if [ $# \< 3 ]; then
+if [ $# -lt 3 ]; then
 	haikuOutputDir=$haikuSourceDir/generated
 else
 	haikuOutputDir=$3
@@ -33,18 +33,18 @@ mkdir -p $haikuOutputDir || exit 1
 
 
 # get absolute paths
-currentDir=$(pwd)
+currentDir=`pwd`
 
 cd $haikuSourceDir
-haikuSourceDir=$(pwd)
+haikuSourceDir=`pwd`
 cd $currentDir
 
 cd $buildToolsDir
-buildToolsDir=$(pwd)
+buildToolsDir=`pwd`
 cd $currentDir
 
 cd $haikuOutputDir
-haikuOutputDir=$(pwd)
+haikuOutputDir=`pwd`
 
 
 # create the object and installation directories for the cross compilation tools
@@ -80,10 +80,10 @@ copy_headers()
 	sourceDir=$1
 	targetDir=$2
 
-	headers="$(find $sourceDir -name \*\.h | grep -v /.svn)"
-	headers="$(echo $headers | sed -e s@$sourceDir/@@g)"
+	headers="`find $sourceDir -name \*\.h | grep -v /.svn`"
+	headers="`echo $headers | sed -e s@$sourceDir/@@g`"
 	for f in $headers; do
-		headerTargetDir=$targetDir/$(dirname $f)
+		headerTargetDir=$targetDir/`dirname $f`
 		mkdir -p $headerTargetDir
 		cp $sourceDir/$f $headerTargetDir
 	done

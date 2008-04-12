@@ -187,9 +187,9 @@ get_build_tool_path()
 
 	if [ -f "$path" ]; then
 		# get absolute path
-		local oldPwd=$(pwd)
-		cd $(dirname "$path")
-		path="$(pwd)/$(basename "$path")"
+		local oldPwd="`pwd`"
+		cd "`dirname "$path"`"
+		path="`pwd`/`basename "$path"`"
 		cd $oldPwd
 	else
 		which "$path" &> /dev/null || {
@@ -232,7 +232,8 @@ buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsMachine=
 
-export haikuRequiredLegacyGCCVersion="2.95.3-haiku-080323"
+haikuRequiredLegacyGCCVersion="2.95.3-haiku-080323"
+export haikuRequiredLegacyGCCVersion
 	# version of legacy gcc required to build haiku
 
 set_default_value HAIKU_AR			ar
@@ -304,6 +305,7 @@ case "${platform}" in
 	FreeBSD) buildPlatform=freebsd ;;
 	Haiku)	buildPlatform=haiku_host ;;
 	Linux)	buildPlatform=linux ;;
+	SunOS)	buildPlatform=sunos ;;
 	*)		echo Unsupported platform: ${platform}
 			exit 1 ;;
 esac
