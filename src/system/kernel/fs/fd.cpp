@@ -31,6 +31,7 @@
 
 static struct file_descriptor* get_fd_locked(struct io_context* context,
 	int fd);
+static struct file_descriptor *remove_fd(struct io_context *context, int fd);
 static void deselect_select_infos(file_descriptor* descriptor,
 	select_info* infos);
 
@@ -233,6 +234,22 @@ close_fd(struct file_descriptor *descriptor)
 		if (descriptor->ops != NULL && descriptor->ops->fd_close != NULL)
 			descriptor->ops->fd_close(descriptor);
 	}
+}
+
+
+status_t
+close_fd_index(struct io_context *context, int fd)
+{
+	struct file_descriptor *descriptor = remove_fd(context, fd);
+
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	close_fd(descriptor);
+	put_fd(descriptor);
+		// the reference associated with the slot
+
+	return B_OK;
 }
 
 
@@ -602,22 +619,7 @@ fd_vnode(struct file_descriptor *descriptor)
 static status_t
 common_close(int fd, bool kernel)
 {
-	struct io_context *io = get_current_io_context(kernel);
-	struct file_descriptor *descriptor = remove_fd(io, fd);
-
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-#ifdef TRACE_FD
-	if (!kernel)
-		TRACE(("_user_close(descriptor = %p)\n", descriptor));
-#endif
-
-	close_fd(descriptor);
-	put_fd(descriptor);
-		// the reference associated with the slot
-
-	return B_OK;
+	return close_fd_index(get_current_io_context(kernel), fd);
 }
 
 
