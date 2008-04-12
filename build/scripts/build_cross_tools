@@ -69,7 +69,8 @@ CFLAGS="-O2" CXXFLAGS="-O2" $buildToolsDir/binutils/configure \
 make || exit 1
 make install || exit 1
 
-export PATH=$PATH:$installDir/bin
+PATH=$PATH:$installDir/bin
+export PATH
 
 
 # build gcc
