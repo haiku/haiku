@@ -29,6 +29,7 @@ private:
 	char *fChars;
 	key_map fKeys;
 	uint32 fCharsSize;
+	char fName[B_FILE_NAME_LENGTH];
 };
 
 

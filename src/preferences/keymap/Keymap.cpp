@@ -113,6 +113,7 @@ Keymap::Load(entry_ref &ref)
 	if (err < B_OK) {
 		fprintf(stderr, "error reading keymap chars: %s\n", strerror(err));
 	}
+	strlcpy(fName, ref.name, sizeof(fName));
 	return err;
 }
 
@@ -149,6 +150,8 @@ Keymap::Save(entry_ref &ref)
 	
 	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
 		return err;
+
+	err = file.WriteAttr("keymap:name", B_STRING_TYPE, 0, fName, strlen(fName));
 	
 	return B_OK;
 }

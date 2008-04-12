@@ -220,6 +220,11 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	
 	FillSystemMaps();
 	FillUserMaps();
+
+	// try and find the current map name in the two list views (if the name was read at all)
+	if (SelectCurrentMap(fSystemListView))
+		if (!SelectCurrentMap(fUserListView))
+			fUserListView->Select(0L);
 }
 
 
@@ -443,6 +448,17 @@ KeymapWindow::FillUserMaps()
 	
 	fUserListView->AddItem(new KeymapListItem(ref, "(Current)"));
 
+	BNode node(&ref);
+	char name[B_FILE_NAME_LENGTH];
+	name[0] = '\0';
+	if (node.InitCheck() == B_OK) {
+		ssize_t readSize = node.ReadAttr("keymap:name", B_STRING_TYPE, 0, name, sizeof(name) - 1);
+		if (readSize > 0) {
+			name[readSize] = '\0';
+			fCurrentMapName = name;
+		}
+	}	
+
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) != B_OK)
 		return;
 	
@@ -454,8 +470,25 @@ KeymapWindow::FillUserMaps()
 		while( directory.GetNextRef(&ref) == B_OK ) {
 			fUserListView->AddItem(new KeymapListItem(ref));
 		}
-	
-	fUserListView->Select(0);
+}
+
+
+bool
+KeymapWindow::SelectCurrentMap(BListView *view)
+{
+	bool found = false;
+	if (fCurrentMapName.Length() > 0) {
+		for (int32 i = 0; i < view->CountItems(); i++) {
+			BStringItem *current = dynamic_cast<BStringItem *>(view->ItemAt(i));
+			if (current && (fCurrentMapName == current->Text())) {
+				found = true;
+				view->Select(i);
+				view->ScrollToSelection();
+				break;
+			}
+		}
+	}	
+	return found;
 }
 
 

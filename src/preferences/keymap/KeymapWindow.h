@@ -14,10 +14,12 @@
 #include <Control.h>
 #include <FilePanel.h>
 #include <ListView.h>
-#include <Window.h>
 #include <MenuBar.h>
-#include "KeymapTextView.h"
+#include <String.h>
+#include <Window.h>
+
 #include "Keymap.h"
+#include "KeymapTextView.h"
 
 class KeymapListItem;
 class BBitmap;
@@ -82,7 +84,8 @@ protected:
 	
 	void 				FillSystemMaps();
 	void 				FillUserMaps();
-		
+	
+	bool				SelectCurrentMap(BListView *list);
 
 	BListView			*fSystemListView;
 	BListView			*fUserListView;
@@ -97,6 +100,7 @@ protected:
 	Keymap				fPreviousMap;
 	Keymap				fAppliedMap;
 	bool				fFirstTime;
+	BString				fCurrentMapName;
 			
 	BFilePanel 			*fOpenPanel;		// the file panel to open
 	BFilePanel 			*fSavePanel;		// the file panel to save
