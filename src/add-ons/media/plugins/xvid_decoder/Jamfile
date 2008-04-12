@@ -13,4 +13,4 @@ Addon xvid.decoder :
 	libmedia.so
 ;
 
-#SubInclude HAIKU_TOP src add-ons media plugins xvid_decoder libxvid ;
+#SubIncludeGPL HAIKU_TOP src add-ons media plugins xvid_decoder libxvid ;

@@ -50,10 +50,6 @@ class XvidDecoder : public Decoder {
 									bigtime_t inRequiredTime,
 									bigtime_t* _inOutTime);
 
- protected:
-			media_header		fHeader;
-			media_decode_info	fInfo;
-	
  private:
 			int					_XvidInit(int useAssembler, int debugLevel);
 			int					_XvidUninit();
@@ -73,6 +69,7 @@ class XvidDecoder : public Decoder {
 	int32						fIndexInCodecTable;
 
 	const void*					fChunkBuffer;
+	uint8*						fWrappedChunkBuffer;
 	const char*					fChunkBufferHandle;
 	size_t						fChunkBufferSize;
 	int32						fLeftInChunkBuffer;

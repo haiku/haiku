@@ -18,10 +18,17 @@
  *
  */
 #define DEBUG 0
+#define PROPER_SEEKING 0
+#define PRINT_FOURCC 0
+
+#define MIN_USEFUL_BYTES 1
 
 #include "XvidDecoder.h"
 
+//#include <fenv.h>
 #include <new>
+#include <setjmp.h>
+#include <signal.h>
 #include <string.h>
 
 #include <ByteOrder.h>
@@ -141,9 +148,6 @@ print_media_decode_info(media_decode_info *info)
 // #pragma mark -
 
 
-#define MIN_USEFUL_BYTES 1
-
-
 XvidDecoder::XvidDecoder()
 	: Decoder()
 	, fInputFormat()
@@ -156,6 +160,7 @@ XvidDecoder::XvidDecoder()
 	, fIndexInCodecTable(-1)
 
 	, fChunkBuffer(NULL)
+	, fWrappedChunkBuffer(NULL)
 	, fChunkBufferHandle(NULL)
 	, fChunkBufferSize(0)
 	, fLeftInChunkBuffer(0)
@@ -167,6 +172,7 @@ XvidDecoder::XvidDecoder()
 XvidDecoder::~XvidDecoder()
 {
 	_XvidUninit();
+	delete[] fWrappedChunkBuffer;
 }
 
 
@@ -202,7 +208,7 @@ XvidDecoder::Setup(media_format* inputFormat, const void* inInfo,
 	if (inputFormat->type != B_MEDIA_ENCODED_VIDEO)
 		return B_BAD_VALUE;
 
-	PRINT(("XvidDecoder::Sniff()\n"));
+//	PRINT(("%p->XvidDecoder::Sniff()\n", this));
 
 //#if DEBUG
 //	char buffer[1024];
@@ -235,18 +241,28 @@ XvidDecoder::Setup(media_format* inputFormat, const void* inInfo,
 			codecID = descr.u.quicktime.codec;
 			familyID = B_QUICKTIME_FORMAT_FAMILY;
 
-			#if DEBUG
+			#if PRINT_FOURCC
 			uint32 bigEndianID = B_HOST_TO_BENDIAN_INT32(codecID);
-			PRINT(("XvidDecoder::Sniff() - QT 4CC: %.4s\n", (const char*)&bigEndianID));
+			printf("%p->XvidDecoder::Setup() - QT 4CC: %.4s\n", this,
+				(const char*)&bigEndianID);
 			#endif
 		} else if (formats.GetCodeFor(*inputFormat, B_AVI_FORMAT_FAMILY,
 				&descr) == B_OK) {
 			codecID = descr.u.avi.codec;
 			familyID = B_AVI_FORMAT_FAMILY;
 
-			#if DEBUG
+			#if PRINT_FOURCC
 			uint32 bigEndianID = B_HOST_TO_BENDIAN_INT32(codecID);
-			PRINT(("XvidDecoder::Sniff() - AVI 4CC: %.4s\n", (const char*)&codecID));
+			printf("%p->XvidDecoder::Sniff() - AVI 4CC: %.4s\n", this,
+				(const char*)&bigEndianID);
+			#endif
+		} else if (formats.GetCodeFor(*inputFormat, B_MPEG_FORMAT_FAMILY,
+				&descr) == B_OK) {
+			codecID = descr.u.mpeg.id;
+			familyID = B_MPEG_FORMAT_FAMILY;
+
+			#if PRINT_FOURCC
+			printf("%p->XvidDecoder::Setup() - MPEG ID: %ld\n", this, codecID);
 			#endif
 		}
 	}
@@ -257,14 +273,18 @@ XvidDecoder::Setup(media_format* inputFormat, const void* inInfo,
 	for (int32 i = 0; i < gSupportedCodecsCount; i++) {
 		if (gCodecTable[i].family == familyID
 			&& gCodecTable[i].fourcc == codecID) {
-			PRINT(("XvidDecoder::Sniff() - found codec in the table at %ld.\n", i));
+			PRINT(("%p->XvidDecoder::Setup() - found codec in the table "
+				"at %ld.\n", this, i));
 			fIndexInCodecTable = i;
 			fInputFormat = *inputFormat;
 			return B_OK;
 		}
 	}
 
-	PRINT(("XvidDecoder::Sniff() - no matching codec found in the table.\n"));
+	#if PRINT_FOURCC
+	printf("%p->XvidDecoder::Setup() - no matching codec found in the "
+		"table.\n", this);
+	#endif
 
 	return B_ERROR;
 }
@@ -273,13 +293,14 @@ XvidDecoder::Setup(media_format* inputFormat, const void* inInfo,
 status_t
 XvidDecoder::NegotiateOutputFormat(media_format* _inoutFormat)
 {
-	PRINT((" XvidDecoder::NegotiateOutputFormat()\n"));
+	PRINT(("%p->XvidDecoder::NegotiateOutputFormat()\n", this));
 	
 	if (_inoutFormat == NULL)
 		return B_BAD_VALUE;
 
 #if DEBUG
 	char buffer[1024];
+	buffer[0] = 0;
 	if (string_for_format(*_inoutFormat, buffer, sizeof(buffer)) == B_OK)
 		PRINT(("  _inoutFormat = %s\n", buffer));
 #endif
@@ -353,8 +374,8 @@ XvidDecoder::NegotiateOutputFormat(media_format* _inoutFormat)
 	_inoutFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 
 #if DEBUG
-	string_for_format(*_inoutFormat, buffer, sizeof(buffer));
-	PRINT(("XvidDecoder: out_format=%s\n", buffer));
+	if (string_for_format(*_inoutFormat, buffer, sizeof(buffer)) == B_OK)
+		PRINT(("%p->XvidDecoder: out_format=%s\n", this, buffer));
 #endif
 
 	return _XvidInit(true, 0) == 0 ? B_OK : B_ERROR;
@@ -362,18 +383,20 @@ XvidDecoder::NegotiateOutputFormat(media_format* _inoutFormat)
 
 
 status_t
-XvidDecoder::Decode(void* outBuffer, int64 *outFrameCount, media_header *mh,
-	media_decode_info *info)
+XvidDecoder::Decode(void* outBuffer, int64* outFrameCount, media_header* mh,
+	media_decode_info* info)
 {
 	if (outBuffer == NULL || outFrameCount == NULL || mh == NULL)
 		return B_BAD_VALUE;
 	
-	PRINT(("XvidDecoder::Decode()\n"));
+//	PRINT((%p->"XvidDecoder::Decode()\n", this));
+
+	*outFrameCount = 0;
 	
 	// are we in a hurry ?
 	bool hurryUp = (!info || (info->time_to_decode > 0)) ? false : true;
 
-	mh->type = B_MEDIA_RAW_VIDEO;
+	mh->type = B_MEDIA_UNKNOWN_TYPE;
 	mh->start_time = 0;
 	mh->size_used = 0;
 	mh->file_pos = 0;
@@ -394,16 +417,58 @@ XvidDecoder::Decode(void* outBuffer, int64 *outFrameCount, media_header *mh,
 
 	do {
 		if (fLeftInChunkBuffer <= MIN_USEFUL_BYTES) {
+			uint8* leftOverBuffer = NULL;
+			size_t leftOverBufferSize = 0;
+			if (fLeftInChunkBuffer > 0) {
+				// we need to wrap the chunk buffer
+				// create a temporary buffer to hold the remaining data
+				leftOverBufferSize = fLeftInChunkBuffer;
+				leftOverBuffer = new (nothrow) uint8[leftOverBufferSize];
+				if (!leftOverBuffer)
+					ret = B_NO_MEMORY;
+				else {
+					memcpy(leftOverBuffer, fChunkBufferHandle,
+						leftOverBufferSize);
+				}
+			}
+			// we don't need the previous wrapped buffer anymore in
+			// case we had it
+			delete[] fWrappedChunkBuffer;
+			fWrappedChunkBuffer = NULL;
+
 			// read new data
-			ret = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, mh);
+			if (ret >= B_OK)
+				ret = GetNextChunk(&fChunkBuffer, &fChunkBufferSize, mh);
 			if (ret >= B_OK) {
-				fLeftInChunkBuffer = fChunkBufferSize;
-				fChunkBufferHandle = (const char*)fChunkBuffer;
-			} else {
+				if (leftOverBuffer) {
+					fWrappedChunkBuffer = new (nothrow) uint8[fChunkBufferSize
+						+ leftOverBufferSize];
+					if (!fWrappedChunkBuffer)
+						ret = B_NO_MEMORY;
+					else {
+						// copy the left over buffer to the beginning of the
+						// wrapped chunk buffer
+						memcpy(fWrappedChunkBuffer, leftOverBuffer,
+							leftOverBufferSize);
+						// copy the new chunk buffer after that
+						memcpy(fWrappedChunkBuffer + leftOverBufferSize,
+							fChunkBuffer, fChunkBufferSize);
+
+						fChunkBufferSize += leftOverBufferSize;
+						fLeftInChunkBuffer = fChunkBufferSize;
+						fChunkBufferHandle = (const char*)fWrappedChunkBuffer;
+					}
+				} else {
+					fLeftInChunkBuffer = fChunkBufferSize;
+					fChunkBufferHandle = (const char*)fChunkBuffer;
+				}
+			}
+			if (ret < B_OK) {
 				fChunkBufferSize = 0;
 				fChunkBuffer = NULL;
 				fChunkBufferHandle = NULL;
 			}
+			delete[] leftOverBuffer;
 		}
 
 		// Check if there is a negative number of useful bytes left in buffer
@@ -417,8 +482,9 @@ XvidDecoder::Decode(void* outBuffer, int64 *outFrameCount, media_header *mh,
 		// This loop is needed to handle VOL/NVOP reading
 		do {
 			// Decode frame
-			int usedBytes = _XvidDecode((uchar*)fChunkBufferHandle, (uchar*)outBuffer,
-				fLeftInChunkBuffer, &xvidDecoderStats, hurryUp);
+			int usedBytes = _XvidDecode((uchar*)fChunkBufferHandle,
+				(uchar*)outBuffer, fLeftInChunkBuffer, &xvidDecoderStats,
+				hurryUp);
 
 			// Resize image buffer if needed
 			if (xvidDecoderStats.type == XVID_TYPE_VOL) {
@@ -429,9 +495,10 @@ XvidDecoder::Decode(void* outBuffer, int64 *outFrameCount, media_header *mh,
 					< xvidDecoderStats.data.vol.width
 					* xvidDecoderStats.data.vol.height) {
 
-					PRINT(("XvidDecoder::Decode() - image size changed!\n",
+					fprintf(stderr, "XvidDecoder::Decode() - image size "
+						"changed: %dx%d\n",
 						xvidDecoderStats.data.vol.width,
-						xvidDecoderStats.data.vol.height));
+						xvidDecoderStats.data.vol.height);
 
 					return B_ERROR;
 				}
@@ -443,8 +510,9 @@ XvidDecoder::Decode(void* outBuffer, int64 *outFrameCount, media_header *mh,
 				fLeftInChunkBuffer -= usedBytes;
 			}
 
-			PRINT(("XvidDecoder::Decode() - chunk %d: %d bytes consumed, "
-				"%d bytes in buffer\n", chunk++, usedBytes, fLeftInChunkBuffer));
+//			PRINT((%p->"XvidDecoder::Decode() - chunk %d: %d bytes consumed, "
+//				"%d bytes in buffer\n", this, chunk++, usedBytes,
+//				fLeftInChunkBuffer));
 
 		} while (xvidDecoderStats.type <= 0
 			&& fLeftInChunkBuffer > MIN_USEFUL_BYTES);
@@ -458,26 +526,34 @@ XvidDecoder::Decode(void* outBuffer, int64 *outFrameCount, media_header *mh,
 
 	} while (fLeftInChunkBuffer > MIN_USEFUL_BYTES || ret >= B_OK);
 
-	if (ret != B_OK)
+	if (ret != B_OK) {
+		PRINT(("%p->XvidDecoder::Decode() - error: %s\n", this,
+			strerror(ret)));
 		return ret;
+	}
+
+	mh->type = B_MEDIA_RAW_VIDEO;
+	mh->start_time = (bigtime_t) (1000000.0 * fFrame
+		/ fOutputVideoFormat.field_rate);
+	mh->u.raw_video.field_sequence = fFrame;
+	mh->u.raw_video.first_active_line = 1;
+	mh->u.raw_video.line_count = fOutputVideoFormat.display.line_count;
+
+	*outFrameCount = 1;
 
 	fFrame++;
 
-	mh->start_time = (bigtime_t) (1000000.0 * fFrame / fOutputVideoFormat.field_rate);
-	mh->u.raw_video.field_sequence = fFrame;
-	mh->u.raw_video.line_count = fOutputVideoFormat.display.line_count;
-/**/
-	PRINT(("XvidDecoder::Decode() - start_time=%02d:%02d.%02d field_sequence=%u\n",
-			int((mh->start_time / 60000000) % 60),
-			int((mh->start_time / 1000000) % 60),
-			int((mh->start_time / 10000) % 100),
-			mh->u.raw_video.field_sequence));
-/**/			
+	PRINT(("%p->XvidDecoder::Decode() - start_time=%02d:%02d.%02d "
+		"field_sequence=%u\n", this,
+		int((mh->start_time / 60000000) % 60),
+		int((mh->start_time / 1000000) % 60),
+		int((mh->start_time / 10000) % 100),
+		mh->u.raw_video.field_sequence));
 
-#if DEBUG
-	print_media_header(mh);
-	print_media_decode_info(info);
-#endif
+//#if DEBUG
+//	print_media_header(mh);
+//	print_media_decode_info(info);
+//#endif
 
 	return B_OK;
 }
@@ -487,16 +563,19 @@ status_t
 XvidDecoder::Seek(uint32 inToWhat, int64 inRequiredFrame, int64 *_inOutFrame,
 	bigtime_t inRequiredTime, bigtime_t *_inOutTime)
 {
-	PRINT((" XvidDecoder::Seek(flags=%ld, inRequiredFrame=%lld, _inOutFrame=%lld, "
-		"inRequiredTime=%lld, _inOutTime=%lld)\n", inToWhat, inRequiredFrame,
-		*_inOutFrame, inRequiredTime, *_inOutTime));
+	PRINT(("%p->XvidDecoder::Seek(flags=%ld, inRequiredFrame=%lld, "
+		"_inOutFrame=%lld, inRequiredTime=%lld, _inOutTime=%lld)\n",
+		this, inToWhat, inRequiredFrame, *_inOutFrame, inRequiredTime,
+		*_inOutTime));
 
-//	printf(" XvidDecoder::Reset(flags=%ld, inRequiredFrame=%lld, _inOutFrame=%lld, "
-//		"inRequiredTime=%lld, _inOutTime=%lld)\n", inToWhat, inRequiredFrame,
-//		*_inOutFrame, inRequiredTime, *_inOutTime);
+#if PROPER_SEEKING
+	status_t ret = B_OK;
+	if (inToWhat == B_SEEK_BY_FRAME) {
 
-//	status_t ret = B_OK;
-//	if (inToWhat & B_MEDIA_SEEK_TO_FRAME) {
+printf("%p->XvidDecoder::Reset(B_SEEK_BY_FRAME, inRequiredFrame=%lld,\n"
+"    _inOutFrame=%lld, inRequiredTime=%lld, _inOutTime=%lld)\n",
+this, inRequiredFrame, *_inOutFrame, inRequiredTime, *_inOutTime);
+
 //		int64 wantedFrame = *_inOutFrame;
 //		ret = fTrack->FindKeyFrameForFrame(_inOutFrame, B_MEDIA_SEEK_CLOSEST_BACKWARD);
 //		if (ret == B_OK && *_inOutFrame != wantedFrame) {
@@ -504,7 +583,12 @@ XvidDecoder::Seek(uint32 inToWhat, int64 inRequiredFrame, int64 *_inOutFrame,
 //			// note, this might cause us to enter the function
 //			// again, but that's ok as long as we can seek to the frame
 //		}
-//	} else if (inToWhat & B_MEDIA_SEEK_TO_TIME) {
+	} else if (inToWhat == B_SEEK_BY_TIME) {
+
+printf("%p->XvidDecoder::Reset(B_SEEK_BY_TIME, inRequiredFrame=%lld,\n"
+"    _inOutFrame=%lld, inRequiredTime=%lld, _inOutTime=%lld)\n",
+this, inRequiredFrame, *_inOutFrame, inRequiredTime, *_inOutTime);
+
 //		bigtime_t wantedTime = *_inOutTime;
 //		ret = fTrack->FindKeyFrameForTime(_inOutTime, B_MEDIA_SEEK_CLOSEST_BACKWARD);
 //		if (ret == B_OK && *_inOutTime != wantedTime) {
@@ -513,14 +597,14 @@ XvidDecoder::Seek(uint32 inToWhat, int64 inRequiredFrame, int64 *_inOutFrame,
 //			// again, but that's ok as long as we can seek to the frame
 //			*_inOutFrame = fTrack->CurrentFrame();
 //		}
-//	}
-//
-//	if (ret != B_OK) {
-//		fprintf(stderr, "XvidDecoder::Seek() - failed to seek\n");
-//		return ret;
-//	}
-//
-	// TODO: reset xvid decode info?
+	}
+
+	if (ret != B_OK) {
+		fprintf(stderr, "%p->XvidDecoder::Reset() - failed to seek\n", this);
+		return ret;
+	}
+#endif // PROPER_SEEKING
+
 	fFrame = *_inOutFrame;
 
 	fChunkBuffer = NULL;
@@ -528,6 +612,7 @@ XvidDecoder::Seek(uint32 inToWhat, int64 inRequiredFrame, int64 *_inOutFrame,
 	fChunkBufferSize = 0;
 	fLeftInChunkBuffer = 0;
 
+	// this will cause the xvid core to discard any cached stuff
 	fDiscontinuity = true;
 
 	return B_OK;
@@ -541,11 +626,10 @@ XvidDecoder::Seek(uint32 inToWhat, int64 inRequiredFrame, int64 *_inOutFrame,
 int
 XvidDecoder::_XvidInit(int useAssembler, int debugLevel)
 {
-	int ret = _XvidUninit();
-	if (ret < 0)
-		return ret;
+	if (fXvidDecoderHandle != NULL)
+		return 0;
 
-	xvid_gbl_init_t   xvidGlobalInit;
+	xvid_gbl_init_t xvidGlobalInit;
 	xvid_dec_create_t xvidDecoderCreate;
 
 	// reset the structure with zeros
@@ -576,7 +660,7 @@ XvidDecoder::_XvidInit(int useAssembler, int debugLevel)
 	xvidDecoderCreate.width = 0;
 	xvidDecoderCreate.height = 0;
 
-	ret = xvid_decore(NULL, XVID_DEC_CREATE, &xvidDecoderCreate, NULL);
+	int ret = xvid_decore(NULL, XVID_DEC_CREATE, &xvidDecoderCreate, NULL);
 
 	if (ret == 0)
 		fXvidDecoderHandle = xvidDecoderCreate.handle;
@@ -599,15 +683,28 @@ XvidDecoder::_XvidUninit()
 	return ret;
 }
 
+// handle_fp_exeption
+static void
+handle_fp_exeption(int sig, void* opaque)
+{
+	printf("_XvidDecode(): WARNING: Xvid decoder raised SIGFPE exception.\n");
+
+// TODO: enable when fenv.h is available
+//	feclearexcept(FE_ALL_EXCEPT);
+
+	//jump back before xvid_decore() and take the other branch
+	siglongjmp((sigjmp_buf)opaque, 1);
+}
+
 // _XvidDecode
 int
-XvidDecoder::_XvidDecode(uchar *istream, uchar *ostream, int inStreamSize,
+XvidDecoder::_XvidDecode(uchar *inStream, uchar *outStream, int inStreamSize,
 	xvid_dec_stats_t* xvidDecoderStats, bool hurryUp)
 {
-	PRINT(("XvidDecoder::_XvidDecode(%p, %p, %d)\n", istream, ostream,
-		inStreamSize));
+	PRINT(("%p->XvidDecoder::_XvidDecode(%p, %p, %d)\n", this, inStream,
+		outStream, inStreamSize));
 
-	if (istream == NULL || inStreamSize == 0)
+	if (inStream == NULL || inStreamSize == 0)
 		return -1;
 
 	xvid_dec_frame_t xvid_dec_frame;
@@ -630,17 +727,43 @@ XvidDecoder::_XvidDecode(uchar *istream, uchar *ostream, int inStreamSize,
 	}
 
 	// input stream
-	xvid_dec_frame.bitstream = istream;
+	xvid_dec_frame.bitstream = inStream;
 	xvid_dec_frame.length = inStreamSize;
 
 	// output frame structure
-	xvid_dec_frame.output.plane[0] = ostream;
-	xvid_dec_frame.output.stride[0] = ostream ?
+	xvid_dec_frame.output.plane[0] = outStream;
+	xvid_dec_frame.output.stride[0] = outStream ?
 		fOutputVideoFormat.display.bytes_per_row : 0;
 	xvid_dec_frame.output.csp = fXvidColorspace;
 
-	return xvid_decore(fXvidDecoderHandle, XVID_DEC_DECODE, &xvid_dec_frame,
-		xvidDecoderStats);
+	// prepare for possible floating point exception
+	sigjmp_buf preDecoreEnv;
+
+    struct sigaction action;
+    struct sigaction oldAction;
+    memset(&action, 0, sizeof(struct sigaction));
+    action.sa_flags = 0;
+    action.sa_handler = (__signal_func_ptr)handle_fp_exeption;
+    action.sa_userdata = preDecoreEnv;
+ 
+    if (sigaction(SIGFPE, &action, &oldAction) != 0)
+    	return -1;
+
+	int usedBytes;
+	if (sigsetjmp(preDecoreEnv, 1) == 0) {
+		// decode
+		usedBytes = xvid_decore(fXvidDecoderHandle, XVID_DEC_DECODE,
+			&xvid_dec_frame, xvidDecoderStats);
+	} else {
+		// make sure the state changes before calling xvid_decore again
+		// or we'll cause the same exception
+		usedBytes = 1;
+	}
+
+	if (sigaction(SIGFPE, &oldAction, &action) != 0)
+		return -1;
+
+	return usedBytes;
 }
 
 // #pragma mark -
@@ -690,7 +813,7 @@ XvidPlugin::GetSupportedFormats(media_format** _mediaFormatArray, size_t *_count
 		if (err < B_OK) {
 			fprintf(stderr, "XvidDecoder: BMediaFormats::MakeFormatFor: "
 				"error %s\n", strerror(err));
-			return err;
+			continue;
 		}
 
 		gXvidFormats[i] = format;
