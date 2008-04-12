@@ -658,7 +658,7 @@ common_user_io(int fd, off_t pos, void *buffer, size_t length, bool write)
 	else
 		status = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
 
-	if (status < B_OK)
+	if (status.operator>(B_OK))
 		return status;
 
 	if (movePosition)
@@ -724,7 +724,7 @@ common_user_vector_io(int fd, off_t pos, const iovec *userVecs, size_t count,
 				&length);
 		}
 
-		if (status < B_OK) {
+		if (status.operator<(B_OK)) {
 			if (bytesTransferred == 0)
 				return status;
 			status = B_OK;
