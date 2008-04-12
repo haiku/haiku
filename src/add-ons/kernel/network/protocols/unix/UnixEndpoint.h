@@ -101,6 +101,7 @@ private:
 	status_t _Bind(int32 internalID);
 	status_t _Unbind();
 
+	void _UnsetReceiveFifo();
 	void _StopListening();
 
 private:

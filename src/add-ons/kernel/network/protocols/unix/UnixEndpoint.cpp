@@ -144,6 +144,10 @@ UnixEndpoint::Free()
 {
 	TRACE("[%ld] %p->UnixEndpoint::Free()\n", find_thread(NULL), this);
 
+	UnixEndpointLocker locker(this);
+
+	_UnsetReceiveFifo();
+
 	RETURN_ERROR(B_OK);
 }
 
@@ -248,6 +252,8 @@ UnixEndpoint::Listen(int backlog)
 	if (fAcceptSemaphore < 0)
 		RETURN_ERROR(ENOBUFS);
 
+	_UnsetReceiveFifo();
+
 	fState = UNIX_ENDPOINT_LISTENING;
 
 	RETURN_ERROR(B_OK);
@@ -347,6 +353,9 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 	UnixEndpointLocker connectedLocker(connectedEndpoint);
 
 	connectedEndpoint->_Spawn(this, peerFifo);
+
+	// update our attributes
+	_UnsetReceiveFifo();
 
 	fPeerEndpoint = connectedEndpoint;
 	PeerAddress().SetTo(&connectedEndpoint->socket->address);
@@ -459,23 +468,30 @@ UnixEndpoint::Send(net_buffer *buffer)
 	if (notifyWrite)
 		gSocketModule->notify(socket, B_SELECT_WRITE, writable);
 
-	if (error == UNIX_FIFO_SHUTDOWN) {
-		// This might either mean, that someone called shutdown() or close(),
-		// or our peer closed the connection.
-		if (fPeerEndpoint == peerEndpoint) {
-			// Orderly shutdown.
-			error = EPIPE;
-		} else if (fState == UNIX_ENDPOINT_CLOSED) {
-			// The FD has been closed.
-			error = EBADF;
-		} else {
-			// Peer closed the connection.
-			error = EPIPE;
-			send_signal(find_thread(NULL), SIGPIPE);
-		}
-	} else if (error == B_TIMED_OUT && timeout == 0) {
-		// translate non-blocking timeouts to the correct error code
-		error = B_WOULD_BLOCK;
+	switch (error) {
+		case UNIX_FIFO_SHUTDOWN:
+			if (fPeerEndpoint == peerEndpoint
+					&& fState == UNIX_ENDPOINT_CONNECTED) {
+				// Orderly write shutdown on our side.
+				// Note: Linux and Solaris also send a SIGPIPE, but according
+				// the send() specification that shouldn't be done.
+				error = EPIPE;
+			} else {
+				// The FD has been closed.
+				error = EBADF;
+			}
+			break;
+		case EPIPE:
+			// The peer closed connection or shutdown its read side. Reward
+			// the caller with a SIGPIPE.
+			if (gStackModule->is_syscall())
+				send_signal(find_thread(NULL), SIGPIPE);
+			break;
+		case B_TIMED_OUT:
+			// Translate non-blocking timeouts to the correct error code.
+			if (timeout == 0)
+				error = B_WOULD_BLOCK;
+			break;
 	}
 
 	RETURN_ERROR(error);
@@ -496,11 +512,10 @@ UnixEndpoint::Receive(size_t numBytes, uint32 flags, net_buffer **_buffer)
 
 	UnixEndpointLocker locker(this);
 
-	if (fState != UNIX_ENDPOINT_CONNECTED)
+	// We can read as long as we have a FIFO. I.e. we are still connected, or
+	// disconnected and not yet reconnected/listening/closed.
+	if (fReceiveFifo == NULL)
 		RETURN_ERROR(ENOTCONN);
-
-	UnixEndpoint* peerEndpoint = fPeerEndpoint;
-	Reference<UnixEndpoint> peerReference(peerEndpoint);
 
 	// lock our FIFO
 	UnixFifo* fifo = fReceiveFifo;
@@ -533,23 +548,28 @@ UnixEndpoint::Receive(size_t numBytes, uint32 flags, net_buffer **_buffer)
 	if (notifyWrite)
 		gSocketModule->notify(socket, B_SELECT_WRITE, writable);
 
-	if (error == UNIX_FIFO_SHUTDOWN) {
-		// This might either mean, that someone called shutdown() or close(),
-		// or our peer closed the connection.
-		if (fPeerEndpoint == peerEndpoint) {
-			// Orderly shutdown. Return B_OK, but a size of 0.
-			error = B_OK;
-			*_buffer = NULL;
-		} else if (fState == UNIX_ENDPOINT_CLOSED) {
-			// The FD has been closed.
-			error = EBADF;
-		} else {
-			// The connection has been closed by our peer.
-			error = ECONNRESET;
-		}
-	} else if (error == B_TIMED_OUT && timeout == 0) {
-		// translate non-blocking timeouts to the correct error code
-		error = B_WOULD_BLOCK;
+	switch (error) {
+		case UNIX_FIFO_SHUTDOWN:
+			// Either our socket was closed or read shutdown.
+			if (fState == UNIX_ENDPOINT_CLOSED) {
+				// The FD has been closed.
+				error = EBADF;
+			} else {
+				// if (fReceiveFifo == fifo) {
+				// 		Orderly shutdown or the peer closed the connection.
+				// } else {
+				//		Weird case: Peer closed connection and we are already
+				// 		reconnected (or listening).
+				// }
+				error = B_OK;
+				*_buffer = NULL;
+			}
+			break;
+		case B_TIMED_OUT:
+			// translate non-blocking timeouts to the correct error code
+			if (timeout == 0)
+				error = B_WOULD_BLOCK;
+			break;
 	}
 
 	RETURN_ERROR(error);
@@ -616,19 +636,19 @@ UnixEndpoint::Shutdown(int direction)
 	uint32 shutdown;
 	uint32 peerShutdown;
 
-	// translate the direction into shutdown flags
+	// translate the direction into shutdown flags for our and the peer fifo
 	switch (direction) {
 		case SHUT_RD:
 			shutdown = UNIX_FIFO_SHUTDOWN_READ;
-			peerShutdown = UNIX_FIFO_SHUTDOWN_WRITE;
+			peerShutdown = 0;
 			break;
 		case SHUT_WR:
-			shutdown = UNIX_FIFO_SHUTDOWN_WRITE;
-			peerShutdown = UNIX_FIFO_SHUTDOWN_READ;
+			shutdown = 0;
+			peerShutdown = UNIX_FIFO_SHUTDOWN_WRITE;
 			break;
 		case SHUT_RDWR:
-			shutdown = peerShutdown = UNIX_FIFO_SHUTDOWN_READ
-				| UNIX_FIFO_SHUTDOWN_WRITE;
+			shutdown = UNIX_FIFO_SHUTDOWN_READ;
+			peerShutdown = UNIX_FIFO_SHUTDOWN_WRITE;
 			break;
 		default:
 			RETURN_ERROR(B_BAD_VALUE);
@@ -649,7 +669,7 @@ UnixEndpoint::Shutdown(int direction)
 
 	// shutdown peer FIFO
 	fPeerEndpoint->fReceiveFifo->Lock();
-	fPeerEndpoint->fReceiveFifo->Shutdown(shutdown);
+	fPeerEndpoint->fReceiveFifo->Shutdown(peerShutdown);
 	fPeerEndpoint->fReceiveFifo->Unlock();
 
 	RETURN_ERROR(B_OK);
@@ -678,12 +698,10 @@ UnixEndpoint::_Disconnect()
 {
 	// Both endpoints must be locked.
 
-	// Shutdown and unset the receive FIFO.
+	// Write shutdown the receive FIFO.
 	fReceiveFifo->Lock();
-	fReceiveFifo->Shutdown(UNIX_FIFO_SHUTDOWN_READ | UNIX_FIFO_SHUTDOWN_WRITE);
+	fReceiveFifo->Shutdown(UNIX_FIFO_SHUTDOWN_WRITE);
 	fReceiveFifo->Unlock();
-	fReceiveFifo->RemoveReference();
-	fReceiveFifo = NULL;
 
 	// select() notification.
 	gSocketModule->notify(socket, B_SELECT_WRITE, ECONNRESET);
@@ -766,6 +784,16 @@ UnixEndpoint::_Unbind()
 	}
 
 	RETURN_ERROR(B_OK);
+}
+
+
+void
+UnixEndpoint::_UnsetReceiveFifo()
+{
+	if (fReceiveFifo) {
+		fReceiveFifo->RemoveReference();
+		fReceiveFifo = NULL;
+	}
 }
 
 

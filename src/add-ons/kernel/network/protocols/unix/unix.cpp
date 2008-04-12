@@ -8,6 +8,9 @@
 
 #include <new>
 
+#include <AutoDeleter.h>
+
+#include <fs/fd.h>
 #include <lock.h>
 #include <util/AutoLock.h>
 #include <vfs.h>
@@ -35,6 +38,23 @@ net_buffer_module_info *gBufferModule;
 UnixAddressManager gAddressManager;
 
 static struct net_domain *sDomain;
+
+
+void
+destroy_scm_rights_descriptors(const ancillary_data_header* header,
+	void* data)
+{
+	int count = header->len / sizeof(file_descriptor*);
+	file_descriptor** descriptors = (file_descriptor**)data;
+
+	for (int i = 0; i < count; i++) {
+		if (descriptors[i] != NULL)
+			put_fd(descriptors[i]);
+	}
+}
+
+
+// #pragma mark -
 
 
 net_protocol *
@@ -247,6 +267,119 @@ unix_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 }
 
 
+status_t
+unix_attach_ancillary_data(net_protocol *self, net_buffer *buffer,
+	const cmsghdr *header)
+{
+	TRACE("[%ld] unix_attach_ancillary_data(%p, %p, %p (level: %d, type: %d, "
+		"len: %d))\n", find_thread(NULL), self, buffer, header,
+		header->cmsg_level, header->cmsg_type, (int)header->cmsg_len);
+
+	// we support only SCM_RIGHTS
+	if (header->cmsg_level != SOL_SOCKET || header->cmsg_type != SCM_RIGHTS)
+		return B_BAD_VALUE;
+
+	int* fds = (int*)CMSG_DATA(header);
+	int count = (header->cmsg_len - CMSG_ALIGN(sizeof(cmsghdr))) / sizeof(int);
+	if (count == 0)
+		return B_BAD_VALUE;
+
+	file_descriptor** descriptors = new(std::nothrow) file_descriptor*[count];
+	if (descriptors == NULL)
+		return ENOBUFS;
+	ArrayDeleter<file_descriptor*> _(descriptors);
+	memset(descriptors, 0, sizeof(file_descriptor*) * count);
+
+	// get the file descriptors
+	io_context* ioContext = get_current_io_context(!gStackModule->is_syscall());
+
+	status_t error = B_OK;
+	for (int i = 0; i < count; i++) {
+		descriptors[i] = get_fd(ioContext, fds[i]);
+		if (descriptors[i] == NULL) {
+			error = EBADF;
+			break;
+		}
+	}
+
+	// attach the ancillary data to the buffer
+	if (error == B_OK) {
+		ancillary_data_header header;
+		header.level = SOL_SOCKET;
+		header.type = SCM_RIGHTS;
+		header.len = count * sizeof(file_descriptor*);
+
+		TRACE("[%ld] unix_attach_ancillary_data(): attaching %d FDs to "
+			"buffer\n", find_thread(NULL), count);
+
+		error = gBufferModule->attach_ancillary_data(buffer, &header,
+			descriptors, destroy_scm_rights_descriptors, NULL);
+	}
+
+	// cleanup on error
+	if (error != B_OK) {
+		for (int i = 0; i < count; i++) {
+			if (descriptors[i] != NULL)
+				put_fd(descriptors[i]);
+		}
+	}
+
+	return error;
+}
+
+
+ssize_t
+unix_process_ancillary_data(net_protocol *self,
+	const ancillary_data_header *header, const void *data, void *buffer,
+	size_t bufferSize)
+{
+	TRACE("[%ld] unix_process_ancillary_data(%p, %p (level: %d, type: %d, "
+		"len: %lu), %p, %p, %lu)\n", find_thread(NULL), self, header,
+		header->level, header->type, header->len, data, buffer, bufferSize);
+
+	// we support only SCM_RIGHTS
+	if (header->level != SOL_SOCKET || header->type != SCM_RIGHTS)
+		return B_BAD_VALUE;
+
+	int count = header->len / sizeof(file_descriptor*);
+	file_descriptor** descriptors = (file_descriptor**)data;
+
+	// check if there's enough space in the buffer
+	size_t neededBufferSpace = CMSG_SPACE(sizeof(int) * count);
+	if (bufferSize < neededBufferSpace)
+		return B_BAD_VALUE;
+
+	// init header
+	cmsghdr* messageHeader = (cmsghdr*)buffer;
+	messageHeader->cmsg_level = header->level;
+	messageHeader->cmsg_type = header->type;
+	messageHeader->cmsg_len = CMSG_LEN(sizeof(int) * count);
+
+	// create FDs for the current process
+	int* fds = (int*)CMSG_DATA(messageHeader);
+	io_context* ioContext = get_current_io_context(!gStackModule->is_syscall());
+
+	status_t error = B_OK;
+	for (int i = 0; i < count; i++) {
+		// get an additional reference which will go to the FD table index
+		inc_fd_ref_count(descriptors[i]);
+		fds[i] = new_fd(ioContext, descriptors[i]);
+
+		if (fds[i] < 0) {
+			error = fds[i];
+			put_fd(descriptors[i]);
+
+			// close FD indices
+			for (int k = i - 1; k >= 0; k--)
+				close_fd_index(ioContext, fds[k]);
+			break;
+		}
+	}
+
+	return error == B_OK ? neededBufferSpace : error;
+}
+
+
 // #pragma mark -
 
 
@@ -335,6 +468,8 @@ net_protocol_module_info gUnixModule = {
 	unix_deliver_data,
 	unix_error,
 	unix_error_reply,
+	unix_attach_ancillary_data,
+	unix_process_ancillary_data
 };
 
 module_dependency module_dependencies[] = {
