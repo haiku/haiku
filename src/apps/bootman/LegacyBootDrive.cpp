@@ -235,7 +235,7 @@ LegacyBootDrive::ReadPartitions(BMessage *settings)
 			settings->AddString("disk", path.Path());
 			diskFound = true;
 
-			#if not USE_SECOND_DISK
+			#if !USE_SECOND_DISK
 				// ignored in test build
 				off_t size = sizeof(kBootLoader);
 				if (!recorder.HasPartitions() || recorder.FirstOffset() < size)
