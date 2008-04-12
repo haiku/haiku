@@ -9,8 +9,19 @@
 
 #include "TestBootDrive.h"
 
-
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <ByteOrder.h>
+#include <DataIO.h>
+#include <File.h>
+#include <String.h>
+
+#include "BootLoader.h"
 
 
 TestBootDrive::TestBootDrive()
@@ -24,16 +35,16 @@ TestBootDrive::~TestBootDrive()
 
 
 bool
-TestBootDrive::IsBootMenuInstalled()
+TestBootDrive::IsBootMenuInstalled(BMessage* settings)
 {
 	return false;
 }
 
 
 status_t
-TestBootDrive::ReadPartitions(BMessage *message)
+TestBootDrive::ReadPartitions(BMessage *settings)
 {
-	message->AddString("disk", "/dev/disk/ide/ata/0/master/0/raw");
+	settings->AddString("disk", "bootcylinder");
 	
 	BMessage partition;
 	
@@ -42,7 +53,7 @@ TestBootDrive::ReadPartitions(BMessage *message)
 	partition.AddString("type", "bfs");
 	partition.AddString("path", "/dev/disk/ide/ata/0/master/0/0_0");
 	partition.AddInt64("size", 3 * (int64)1024 * 1024 * 1024);	
-	message->AddMessage("partition", &partition);
+	settings->AddMessage("partition", &partition);
 	
 
 	partition.MakeEmpty();	
@@ -51,7 +62,7 @@ TestBootDrive::ReadPartitions(BMessage *message)
 	partition.AddString("type", "dos");
 	partition.AddString("path", "/dev/disk/ide/ata/0/slave/0/0_0");
 	partition.AddInt64("size", 10 * (int64)1024 * 1024 * 1024);
-	message->AddMessage("partition", &partition);
+	settings->AddMessage("partition", &partition);
 
 	partition.MakeEmpty();
 	partition.AddBool("show", true);
@@ -59,21 +70,21 @@ TestBootDrive::ReadPartitions(BMessage *message)
 	partition.AddString("type", "unknown");
 	partition.AddString("path", "/dev/disk/ide/ata/0/slave/0/0_1");
 	partition.AddInt64("size", 250 * (int64)1024 * 1024 * 1024);	
-	message->AddMessage("partition", &partition);
+	settings->AddMessage("partition", &partition);
 	
 	return B_OK;
 }
 
 
 status_t
-TestBootDrive::WriteBootMenu(BMessage *message)
+TestBootDrive::WriteBootMenu(BMessage *settings)
 {
 	printf("WriteBootMenu:\n");
-	message->PrintToStream();
+	settings->PrintToStream();
 	
 	BMessage partition;
 	int32 index = 0;
-	for (; message->FindMessage("partition", index, &partition) == B_OK; index ++) {
+	for (; settings->FindMessage("partition", index, &partition) == B_OK; index ++) {
 		printf("Partition %d:\n", (int)index);
 		partition.PrintToStream();
 	}
@@ -83,14 +94,18 @@ TestBootDrive::WriteBootMenu(BMessage *message)
 
 
 status_t
-TestBootDrive::SaveMasterBootRecord(BFile *file)
-{
+TestBootDrive::SaveMasterBootRecord(BMessage* settings, BFile* file)
+{	
 	return B_OK;
 }
 
 
 status_t
-TestBootDrive::RestoreMasterBootRecord(BFile *file)
+TestBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 {
 	return B_OK;
 }
+
+
+
+

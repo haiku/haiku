@@ -23,17 +23,23 @@
 		"path" String (path to partition in /dev/...)
 		"size" long (size of partition in bytes)
  */
+
+enum {
+	// Not enough space free before first partition for boot loader
+	kErrorBootSectorTooSmall = B_ERRORS_END + 1,
+};
+
 class BootDrive 
 {
 public:
 	BootDrive() {}
 	virtual ~BootDrive() {}
 
-	virtual bool IsBootMenuInstalled() = 0;
-	virtual status_t ReadPartitions(BMessage *message) = 0;
-	virtual status_t WriteBootMenu(BMessage *message) = 0;
-	virtual status_t SaveMasterBootRecord(BFile *file) = 0;
-	virtual status_t RestoreMasterBootRecord(BFile *file) = 0;
+	virtual bool IsBootMenuInstalled(BMessage* settings) = 0;
+	virtual status_t ReadPartitions(BMessage* settings) = 0;
+	virtual status_t WriteBootMenu(BMessage* settings) = 0;
+	virtual status_t SaveMasterBootRecord(BMessage* settings, BFile* file) = 0;
+	virtual status_t RestoreMasterBootRecord(BMessage* settings, BFile* file) = 0;
 };
 
 #endif	// BOOT_DRIVE_H

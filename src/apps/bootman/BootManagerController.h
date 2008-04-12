@@ -25,9 +25,6 @@ class BRect;
    	"file" String (the file where the backup of the MBR is saved)
    	"defaultPartition" int32 (index of default partition)
    	"timeout" int32 (timeout in seconds, -1 for no timeout)
-   	"installStatus" int32 (status_t)
-   	"saveMBRStatus" int32 (status_t)
-   	"restoreMBRStatus" int32 (status_t)
  */
 
 class BootManagerController : public WizardController
@@ -45,6 +42,7 @@ private:
 
 	enum State {
 		kStateEntry,
+		kStateErrorEntry,
 		
 		// Install states
 		kStateSaveMBR,
@@ -64,6 +62,7 @@ private:
 	bool _SaveMBR();
 	bool _RestoreMBR();
 	
+	WizardPageView* _CreateErrorEntryPage(BRect frame);
 	WizardPageView* _CreateSaveMBRPage(BRect frame);
 	WizardPageView* _CreateMBRSavedPage(BRect frame);
 	WizardPageView* _CreateInstallSummaryPage(BRect frame);
@@ -73,6 +72,11 @@ private:
 	
 	BMessage fSettings;
 	BootDrive* fBootDrive;
+	
+	status_t fReadPartitionsStatus;
+	status_t fWriteBootMenuStatus;
+	status_t fSaveMBRStatus;
+	status_t fRestoreMBRStatus;
 };
 
 

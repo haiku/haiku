@@ -16,11 +16,11 @@ public:
 	TestBootDrive();
 	virtual ~TestBootDrive();
 
-	virtual bool IsBootMenuInstalled();
-	virtual status_t ReadPartitions(BMessage *message);
-	virtual status_t WriteBootMenu(BMessage *message);
-	virtual status_t SaveMasterBootRecord(BFile *file);
-	virtual status_t RestoreMasterBootRecord(BFile *file);
+	virtual bool IsBootMenuInstalled(BMessage* settings);
+	virtual status_t ReadPartitions(BMessage* settings);
+	virtual status_t WriteBootMenu(BMessage* settings);
+	virtual status_t SaveMasterBootRecord(BMessage* settings, BFile* file);
+	virtual status_t RestoreMasterBootRecord(BMessage* settings, BFile* file);
 };
 
 #endif	// TEST_BOOT_DRIVE_H
