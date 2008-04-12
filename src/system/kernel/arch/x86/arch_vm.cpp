@@ -169,6 +169,7 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 	if (sMemoryTypeRegisterCount == 0)
 		return B_NOT_SUPPORTED;
 
+#if 0
 	// check if it overlaps
 	if (type == IA32_MTR_WRITE_COMBINING
 		&& is_memory_overlapping(base, length, &index)) {
@@ -178,6 +179,7 @@ set_memory_type(int32 id, uint64 base, uint64 length, uint32 type)
 		}
 		// we replace an existing write-combining mtrr with a bigger one at the index position
 	}
+#endif
 
 	// length must be a power of 2; just round it up to the next value
 	length = nearest_power(length); 	
