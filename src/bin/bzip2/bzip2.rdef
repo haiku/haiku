@@ -2,10 +2,10 @@ resource app_version
 {
 	major = 1,
 	middle = 0,
-	minor = 3,
+	minor = 5,
 	variety = 5,
 	internal = 0,
-	short_info = "1.03", 
-    long_info  = "1.03 ©2005 Julian R Seward"
+	short_info = "1.0.5", 
+    long_info  = "1.0.5 ©2007 Julian R Seward"
 };
 
