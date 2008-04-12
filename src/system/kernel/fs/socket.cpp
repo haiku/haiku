@@ -894,7 +894,7 @@ _user_recvfrom(int socket, void *data, size_t length, int flags,
 	socklen_t userAddressBufferSize = addressLength;
 	result = common_recvfrom(socket, data, length, flags,
 		userAddress != NULL ? (sockaddr*)address : NULL, &addressLength, false);
-	if (result < (ssize_t)0)
+	if (result < 0)
 		return result;
 
 	// copy address size and address back to userland
@@ -945,7 +945,7 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 	SyscallRestartWrapper<ssize_t> result;
 
 	result = common_recvmsg(socket, &message, flags, false);
-	if (result < (ssize_t)0)
+	if (result < 0)
 		return result;
 
 	// copy the address, the ancillary data, and the message header back to
@@ -1072,7 +1072,7 @@ _user_getsockopt(int socket, int level, int option, void *userValue,
 	SyscallRestartWrapper<status_t> error;
 	error = common_getsockopt(socket, level, option, value, &length,
 		false);
-	if (error != (status_t)B_OK)
+	if (error != B_OK)
 		return error;
 
 	// copy value back to userland
@@ -1114,7 +1114,7 @@ _user_getpeername(int socket, struct sockaddr *userAddress,
 	SyscallRestartWrapper<status_t> error;
 	error = prepare_userland_address_result(userAddress, _addressLength,
 		addressLength, true);
-	if (error != (status_t)B_OK)
+	if (error != B_OK)
 		return error;
 	
 	// getpeername()
@@ -1122,7 +1122,7 @@ _user_getpeername(int socket, struct sockaddr *userAddress,
 	socklen_t userAddressBufferSize = addressLength;
 	error = common_getpeername(socket, (sockaddr*)address, &addressLength,
 		false);
-	if (error != (status_t)B_OK)
+	if (error != B_OK)
 		return error;
 
 	// copy address size and address back to userland
@@ -1144,7 +1144,7 @@ _user_getsockname(int socket, struct sockaddr *userAddress,
 	SyscallRestartWrapper<status_t> error;
 	error = prepare_userland_address_result(userAddress, _addressLength,
 		addressLength, true);
-	if (error != (status_t)B_OK)
+	if (error != B_OK)
 		return error;
 	
 	// getsockname()
@@ -1152,7 +1152,7 @@ _user_getsockname(int socket, struct sockaddr *userAddress,
 	socklen_t userAddressBufferSize = addressLength;
 	error = common_getsockname(socket, (sockaddr*)address, &addressLength,
 		false);
-	if (error != (status_t)B_OK)
+	if (error != B_OK)
 		return error;
 
 	// copy address size and address back to userland
@@ -1186,7 +1186,7 @@ _user_socketpair(int family, int type, int protocol, int *userSocketVector)
 	int socketVector[2];
 	SyscallRestartWrapper<status_t> error;
 	error = common_socketpair(family, type, protocol, socketVector, false);
-	if (error != (status_t)B_OK)
+	if (error != B_OK)
 		return error;
 
 	// copy FDs back to userland
@@ -1217,7 +1217,7 @@ _user_get_next_socket_stat(int family, uint32 *_cookie, struct net_stat *_stat)
 	net_stat stat;
 	SyscallRestartWrapper<status_t> error;
 	error = common_get_next_socket_stat(family, &cookie, &stat);
-	if (error != (status_t)B_OK)
+	if (error != B_OK)
 		return error;
 
 	// copy cookie and data back to userland

@@ -144,13 +144,6 @@ struct SyscallRestartWrapper {
 		return *this;
 	}
 
-	bool operator==(const Type& other) const	{ return fResult == other; }
-	bool operator!=(const Type& other) const	{ return fResult != other; }
-	bool operator<=(const Type& other) const	{ return fResult <= other; }
-	bool operator>=(const Type& other) const	{ return fResult >= other; }
-	bool operator<(const Type& other) const		{ return fResult < other; }
-	bool operator>(const Type& other) const		{ return fResult > other; }
-
 	operator Type() const	{ return fResult; }
 
 private:
