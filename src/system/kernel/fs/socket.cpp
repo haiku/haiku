@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 
 #include <errno.h>
+#include <limits.h>
 
 #include <module.h>
 
@@ -24,7 +25,7 @@
 
 #define MAX_SOCKET_ADDRESS_LEN	(sizeof(sockaddr_storage))
 #define MAX_SOCKET_OPTION_LEN	128
-#define MAX_IO_VEC_COUNT		128
+#define MAX_ANCILLARY_DATA_LEN	1024
 
 
 static net_stack_interface_module_info* sStackInterface = NULL;
@@ -112,7 +113,8 @@ prepare_userland_address_result(struct sockaddr* userAddress,
 
 static status_t
 prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
-	iovec*& userVecs, iovec* vecs, void*& userAddress, char* address)
+	iovec*& userVecs, MemoryDeleter& vecsDeleter, void*& userAddress,
+	char* address)
 {
 	if (userMessage == NULL)
 		return B_BAD_VALUE;
@@ -123,10 +125,18 @@ prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
 		return B_BAD_ADDRESS;
 	}
 
+	userVecs = message.msg_iov;
+	userAddress = message.msg_name;
+
 	// copy iovecs from userland
+	if (message.msg_iovlen < 0 || message.msg_iovlen > IOV_MAX)
+		return EMSGSIZE;
 	if (userVecs != NULL && message.msg_iovlen > 0) {
-		if (message.msg_iovlen > MAX_IO_VEC_COUNT || message.msg_iov == NULL)
-			return B_BAD_VALUE;
+		iovec* vecs = (iovec*)malloc(sizeof(iovec) * message.msg_iovlen);
+		if (vecs == NULL)
+			return B_NO_MEMORY;
+		vecsDeleter.SetTo(vecs);
+
 		if (!IS_USER_ADDRESS(message.msg_iov)
 				|| user_memcpy(vecs, message.msg_iov,
 					message.msg_iovlen * sizeof(iovec)) != B_OK) {
@@ -886,15 +896,34 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 {
 	// copy message from userland
 	msghdr message;
-	iovec* userVecs = message.msg_iov;
-	iovec vecs[MAX_IO_VEC_COUNT];
-	void* userAddress = message.msg_name;
+	iovec* userVecs;
+	MemoryDeleter vecsDeleter;
+	void* userAddress;
 	char address[MAX_SOCKET_ADDRESS_LEN];
 
 	status_t error = prepare_userland_msghdr(userMessage, message, userVecs,
-		vecs, userAddress, address);
+		vecsDeleter, userAddress, address);
 	if (error != B_OK)
 		return error;
+
+	// prepare a buffer for ancillary data
+	MemoryDeleter ancillaryDeleter;
+	void* ancillary = NULL;
+	void* userAncillary = message.msg_control;
+	if (userAncillary != NULL) {
+		if (!IS_USER_ADDRESS(userAncillary))
+			return B_BAD_ADDRESS;
+		if (message.msg_controllen < 0)
+			return B_BAD_VALUE;
+		if (message.msg_controllen > MAX_ANCILLARY_DATA_LEN)
+			message.msg_controllen > MAX_ANCILLARY_DATA_LEN;
+
+		message.msg_control = ancillary = malloc(message.msg_controllen);
+		if (message.msg_control == NULL)
+			return B_NO_MEMORY;
+
+		ancillaryDeleter.SetTo(ancillary);
+	}
 
 	// recvmsg()
 	SyscallRestartWrapper<ssize_t> result;
@@ -903,11 +932,16 @@ _user_recvmsg(int socket, struct msghdr *userMessage, int flags)
 	if (result < (ssize_t)0)
 		return result;
 
-	// copy the address and address length back to userland
+	// copy the address, the ancillary data, and the message header back to
+	// userland
+	message.msg_name = userAddress;
+	message.msg_iov = userVecs;
+	message.msg_control = userAncillary;
 	if (userAddress != NULL && user_memcpy(userAddress, address,
-			message.msg_namelen) != B_OK
-		|| user_memcpy(&userMessage->msg_namelen, &message.msg_namelen,
-			sizeof(message.msg_namelen)) != B_OK) {
+				message.msg_namelen) != B_OK
+		|| userAncillary != NULL && user_memcpy(userAncillary, ancillary,
+				message.msg_controllen) != B_OK
+		|| user_memcpy(userMessage, &message, sizeof(msghdr)) != B_OK) {
 		return B_BAD_ADDRESS;
 	}
 
@@ -954,13 +988,13 @@ _user_sendmsg(int socket, const struct msghdr *userMessage, int flags)
 {
 	// copy message from userland
 	msghdr message;
-	iovec* userVecs = message.msg_iov;
-	iovec vecs[MAX_IO_VEC_COUNT];
-	void* userAddress = message.msg_name;
+	iovec* userVecs;
+	MemoryDeleter vecsDeleter;
+	void* userAddress;
 	char address[MAX_SOCKET_ADDRESS_LEN];
 
 	status_t error = prepare_userland_msghdr(userMessage, message, userVecs,
-		vecs, userAddress, address);
+		vecsDeleter, userAddress, address);
 	if (error != B_OK)
 		return error;
 
@@ -968,6 +1002,28 @@ _user_sendmsg(int socket, const struct msghdr *userMessage, int flags)
 	if (userAddress != NULL
 			&& user_memcpy(address, userAddress, message.msg_namelen) != B_OK) {
 		return B_BAD_ADDRESS;
+	}
+
+	// copy ancillary data from userland
+	MemoryDeleter ancillaryDeleter;
+	void* userAncillary = message.msg_control;
+	if (userAncillary != NULL) {
+		if (!IS_USER_ADDRESS(userAncillary))
+			return B_BAD_ADDRESS;
+		if (message.msg_controllen < 0
+				|| message.msg_controllen > MAX_ANCILLARY_DATA_LEN) {
+			return B_BAD_VALUE;
+		}
+
+		message.msg_control = malloc(message.msg_controllen);
+		if (message.msg_control == NULL)
+			return B_NO_MEMORY;
+		ancillaryDeleter.SetTo(message.msg_control);
+
+		if (user_memcpy(message.msg_control, userAncillary,
+				message.msg_controllen) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
 	}
 
 	// sendmsg()
