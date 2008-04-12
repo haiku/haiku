@@ -222,7 +222,7 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	FillUserMaps();
 
 	// try and find the current map name in the two list views (if the name was read at all)
-	if (SelectCurrentMap(fSystemListView))
+	if (!SelectCurrentMap(fSystemListView))
 		if (!SelectCurrentMap(fUserListView))
 			fUserListView->Select(0L);
 }
