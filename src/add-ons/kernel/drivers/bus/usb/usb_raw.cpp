@@ -591,9 +591,25 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				return B_OK;
 			}
 
-			benaphore_lock(&device->lock);
+			size_t descriptorsSize = 0;
+			usb_iso_packet_descriptor *packetDescriptors = NULL;
+			if (op == B_USB_RAW_COMMAND_ISOCHRONOUS_TRANSFER) {
+				descriptorsSize = sizeof(usb_iso_packet_descriptor)
+					* command->isochronous.packet_count;
+				packetDescriptors
+					= (usb_iso_packet_descriptor *)malloc(descriptorsSize);
+				if (!packetDescriptors) {
+					command->transfer.status = B_USB_RAW_STATUS_NO_MEMORY;
+					command->transfer.length = 0;
+					return B_OK;
+				}
+
+				memcpy(packetDescriptors,
+					command->isochronous.packet_descriptors, descriptorsSize);
+			}
 
 			status_t status;
+			benaphore_lock(&device->lock);
 			if (op == B_USB_RAW_COMMAND_INTERRUPT_TRANSFER) {
 				status = gUSBModule->queue_interrupt(endpointInfo->handle,
 					command->transfer.data, command->transfer.length,
@@ -605,14 +621,14 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			} else {
 				status = gUSBModule->queue_isochronous(endpointInfo->handle,
 					command->isochronous.data, command->isochronous.length,
-					command->isochronous.packet_descriptors,
-					command->isochronous.packet_count, NULL, 0,
-					usb_raw_callback, device);
+					packetDescriptors, command->isochronous.packet_count, NULL,
+					0, usb_raw_callback, device);
 			}
 
 			if (status < B_OK) {
 				command->transfer.status = B_USB_RAW_STATUS_FAILED;
 				command->transfer.length = 0;
+				free(packetDescriptors);
 				benaphore_unlock(&device->lock);
 				return B_OK;
 			}
@@ -621,6 +637,13 @@ usb_raw_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			command->transfer.status = device->status;
 			command->transfer.length = device->actual_length;
 			benaphore_unlock(&device->lock);
+
+			if (op == B_USB_RAW_COMMAND_ISOCHRONOUS_TRANSFER) {
+				memcpy(command->isochronous.packet_descriptors,
+					packetDescriptors, descriptorsSize);
+				free(packetDescriptors);
+			}
+
 			return B_OK;
 		}
 	}
