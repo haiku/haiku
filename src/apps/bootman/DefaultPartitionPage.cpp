@@ -173,7 +173,7 @@ DefaultPartitionPage::_CreateWaitRadioButton(BRect rect, const char* name, const
 	return button;
 }
 
-#include <stdio.h>
+
 void
 DefaultPartitionPage::_Layout()
 {
@@ -181,7 +181,6 @@ DefaultPartitionPage::_Layout()
 	
 	float left = fDefaultPartition->Frame().left;
 	float top = fDescription->Frame().bottom + kTextDistance;
-	printf("top %f\n", top);
 	
 	BView* controls[] = {
 		fDefaultPartition,
@@ -192,11 +191,9 @@ DefaultPartitionPage::_Layout()
 	};
 	
 	for (int i = 0; i < 5; i ++) {
-		printf("*");
 		BView* view = controls[i];
 		view->MoveTo(left, top);
 		top = view->Frame().bottom + 3;
 	}
-	printf("\n");
 }
 
