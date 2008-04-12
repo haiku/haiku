@@ -1,376 +1,561 @@
 ;
 ; Copyright 2007, Dengg David, david-d@gmx.at. All rights reserved.
+; Copyright 2008, Michael Pfeiffer, laplace@users.sourceforge.net. All rights reserved.
+; Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
 ; Distributed under the terms of the MIT License.
-; 	
-%assign	BIOS_VIDEO_SERVICES			0x10
-%assign	BIOS_KEYBOARD_SERVICES		0x16
-%assign	WRITE_CHAR						0x0e	; al - char
+
+; Steps to create BootLoader.h
+; 1. nasm -f bin bootman.S -o bootman.bin
+; 2. cc MakeArray.cpp -o make_array -lstdc++
+; 3. ./make_array kBootLoader bootman.bin > BootLoader.h
+; or
+; nasm -f bin bootman.S -o bootman.bin && ./make_array kBootLoader bootman.bin > BootLoader.h
+
+%assign USE_TEST_MENU				0
+
+%assign BOOT_BLOCK_START_ADDRESS	0x7c00
+
+%assign MBR_SIGNATURE				0xAA55
+
+; BIOS calls
+
+%assign BIOS_VIDEO_SERVICES			0x10
+%assign BIOS_DISK_SERVICES			0x13
+%assign BIOS_KEYBOARD_SERVICES		0x16
+%assign BIOS_REBOOT					0x19
+%assign BIOS_TIME_SERVICES			0x1A
+
+; video services
+%assign SET_VIDEO_MODE					0x00	; al - mode
+
+%assign SET_CURSOR						0x02	; dl - column
+												; dh - row
+												; bh - page
+
+
+%assign GET_CURSOR						0x03	; bh - page
+												; -> dl - column
+												;	dh - row
+												;	Cursor shape:
+												;	ch - starting scan line
+												;	cl - ending scan line
+
+%assign	SCROLL_UP						0x06	; al - lines (0: clear screen)
+												; bh - attribute
+												; ch - upper line
+												; cl - left column
+												; dh - lower line
+												; dl - right column
+
+%assign WRITE_CHAR						0x09	; al - char
+												; bh - page
+												; bl - attribute
+												; cx - count
+
+;%assign WRITE_CHAR						0x0e	; al - char
 												; bh - page
 												; bl - foreground color (graphics mode only)
 
-[bits 16]						; Real Mode yeah
-start:
-; ======================= SCREEN SETUP =================================
-	mov ax, 0x07C0					; Segment Location 0x07C0
-	mov ds, ax					; Set Data Segment to 0x07C0
-	mov es, ax					; Set Extra Segment to 0x07C0
-	mov ss, ax					; Set Stack Segment to 0x07C0
-	mov sp, 0xFFFF 
+; disk services
+%assign READ_DISK_SECTORS				0x02	; dl	- drive
+												; es:bx - buffer
+												; dh	- head (0 - 15)
+												; ch	- track 7:0 (0 - 1023)
+												; cl	- track 9:8,
+												;		 sector (1 - 17)
+												; al	- sector count
+												; -> al - sectors read
+%assign READ_DRIVE_PARAMETERS			0x08	; dl - drive
+												; -> cl - max cylinder 9:8
+												;	   - sectors per track
+												;	ch - max cylinder 7:0
+												;	dh - max head
+												;	dl - number of drives (?)
+%assign CHECK_DISK_EXTENSIONS_PRESENT	0x41	; bx - 0x55aa
+												; dl - drive
+												; -> success: carry clear
+												;	ah - extension version
+												;	bx - 0xaa55
+												;	cx - support bit mask
+												; -> error: carry set
+%assign EXTENDED_READ					0x42	; dl - drive
+												; ds:si - address packet
+												; -> success: carry clear
+												; -> error: carry set
 
-	mov ah, 0x00					; Set Screen Resolution to 640x480
-	mov al, 0x12
-	mov bx, 0x0
-	mov cx, 0x1
-	int 0x10
+%assign FIXED_DISK_SUPPORT				0x1	 	; flag indicating fixed disk
+												; extension command subset
 
- 	mov ah, 0x02					; Set cursor position
- 	mov dx, 0x0120
- 	int 0x10
+; keyboard services
+%assign READ_CHAR						0x00	; -> al - ASCII char
+												;	ah - scan code
+
+%assign	PROBE_CHAR						0x01	; -> zf = 0
+												;	al - ASCII char
+												;	ah - scan code
+; timer services
+%assign READ_CLOCK						0x00	; -> cx	- high word
+												;	dx - low word
+												;	one tick = 1/18.2s
+
+%assign	TICKS_PER_SECOND				19
+
+; video modes
+%assign GRAPHIC_MODE_80x25				0x12	; 640 x 480 graphic mode
+
+%assign TEXT_COLUMNS					80		; Number of columns
+%assign TEXT_ROWS						25		; Number of rows
+
+; Colors
+%assign	BLACK							0
+%assign	BLUE							1
+%assign	GREEN							2
+%assign CYAN							3
+%assign RED								4
+%assign MAGENTA							5
+%assign BROWN							6
+%assign LIGHT_GRAY						7
+%assign	DARK_GRAY						8
+%assign	LIGHT_BLUE						9
+%assign	LIGHT_GREEN						10
+%assign	LIGHT_CYAN						11
+%assign	LIGHT_RED						12
+%assign	LIGHT_MAGENTA					13
+%assign	YELLOW							14
+%assign	WHITE							15
+
+%assign BRIGHT_COLOR_MASK				8
 
 
- 	mov si, signation				; Print "Haiku Bootmanager"
-	call printstr
+; Key codes
+%assign KEY_DOWN						0x50
+%assign KEY_UP							0x48
+%assign KEY_RETURN						0x1C
+
+; String constants with their length
+%define TITLE							'Haiku Boot Manager'
+%strlen TITLE_LENGTH					TITLE
+%define SELECT_OS_MESSAGE				'Select an OS from the menu'
+%strlen SELECT_OS_MESSAGE_LENGTH		SELECT_OS_MESSAGE 
+
+; 16 bit code
+SECTION
+BITS 16
 
 
- 	mov ah, 0x02					; Set cursor position
- 	mov dx, 0x1B1B
- 	int 0x10
+; nicer way to get the size of a structure
+%define sizeof(s)	s %+ _size
 
- 	mov si, select_os				; Print "Select Os..."
-	call printstr
+; using a structure in a another structure definition
+%macro  nstruc  1-2	 1
+					resb	sizeof(%1) * %2
+%endmacro
 
-	mov ah, 0
-	int 0x16
+%macro DEBUG_PAUSE 0
+	push	ax
+	mov		ah, READ_CHAR
+	int		BIOS_KEYBOARD_SERVICES
+	pop		ax
+%endmacro
 
-; ======================= LOAD 3 MORE SECTORS INTO MEM =================
-load_from_disk:						; load 3 more sectors into mem
-	mov ah, 0x42
-	mov dl, 0x80
-	mov si, DAP
-	int 0x13
-	mov si, error
-	jc printstr
-	jmp secsec					; Jump into the second sector
+%macro clearScreen 0
+	mov		ah, SCROLL_UP
+	xor		al, al
+	mov		bh, WHITE
+	xor		cx, cx
+	mov		dx, (TEXT_ROWS-1) * 0x100 + (TEXT_COLUMNS-1)
+	int		BIOS_VIDEO_SERVICES
+%endmacro
 
-ende:
-	mov ah, 0x0e				
-	mov al, 'F'
-	mov bx, 0x2
-	mov cx, 0x1
-	int 0x10
-	jmp $						; Final Loopy. Never reached
-
-%if 0
-printstr:						; Poor mans printf
-	lodsb
-	mov ah, 0x0E
-	mov bx, 0x0F
-	mov cx, 0x01
-	int 0x10
-	cmp al, 0x00
-	jnz printstr
-	ret
-%else
-printstr:
-	; page and foreground color
-	jmp .loop_condition
+; Prints a null terminated string
+; si ... offset to string
+%macro printString 0
+	push	cx
+	jmp		.loop_condition
 .loop
-	mov ah, WRITE_CHAR
-	mov bx, 0x0F
-	mov cx, 1
-	int BIOS_VIDEO_SERVICES
-.loop_condition	
+	mov		cx, 1
+	mov		ah, WRITE_CHAR
+	int		BIOS_VIDEO_SERVICES
+	mov		ah, GET_CURSOR
+	int		BIOS_VIDEO_SERVICES
+	inc		dl
+	mov		ah, SET_CURSOR
+	int		BIOS_VIDEO_SERVICES	
+.loop_condition 
 	lodsb
-	cmp al, 0
-	jnz .loop
+	cmp		al, 0
+	jnz		.loop
+	pop		cx
 	ret
-%endif
-		
-DAP:
-	db 0x10						; Size of DAP
-	db 0x00						; unused (zero)
-	db 0x03						; number of sectors to read
-	db 0x00						; unused (zero)
-	dw 0x0200					; segment:offset pointer to buffer
-	dw 0x07C0					; segment:offset pointer to buffer
-	dw 0x0001					; LBA address
-	dw 0x0000
-	dw 0x0000
-	dw 0x0000
-		
-WinDAP:
-	db 0x0B						; Size of DAP
-	db 0x00						; unused (zero)
-	db 0x01						; number of sectors to read
-	db 0x00						; unused (zero)
-	dw 0x0000					; segment:offset pointer to buffer
-	dw 0x07C0					; segment:offset pointer to buffer
-	dw 0x003F					; LBA address
-	dw 0x0000
+%endmacro
 
+; 64 bit value
+struc   quadword
+	.lower			resd	1
+	.upper			resd	1
+endstruc
 
-signation:
-	db 'Haiku Bootmanager', 0x00
-select_os:
-	db 'Select an OS from the menu', 0x00
+; address packet as required by the EXTENDED_READ BIOS call
+struc   AddressPacket
+	.packet_size	resb	1
+	.reserved1		resb	1
+	.block_count	resb	1
+	.reserved2		resb	1
+	.buffer			resd	1
+	.offset			nstruc	quadword
+endstruc
+
+; use code available in stage 1
+%define printstr printStringStage1
+
+stage1:
+	mov		ax, 0x07C0							; BOOT_BLOCK_START_ADDRESS / 16
+	mov		ds, ax								; Setup segment registers
+	mov		es, ax
+	mov		ss, ax
 	
-	times 510 -($-$$) db 'B'			; Fill the missing space to reach 510 byte and set the 
-	dw 0xAA55 					; magic marker "AA55" (to identify a valid bootrecord)
+	mov		sp, 0xFFFF							; Make stack empty
+	
+	cld											; String operations increment index registers
+	
+	clearScreen
+
+	mov		bh, 0								; Text output on page 0
+	
+	; Print title centered at row 2 
+	mov		ah, SET_CURSOR
+	mov		dx, 1 * 0x100 + (40 - TITLE_LENGTH / 2)
+	int		BIOS_VIDEO_SERVICES
+
+	mov		si, kTitle
+	mov		bl, WHITE
+	call	printstr
+
+	; Print message centered at second last row
+	mov		ah, SET_CURSOR
+	mov		dx, (TEXT_ROWS-2) * 0x100 + (40 - SELECT_OS_MESSAGE_LENGTH / 2)
+	mov		bl, LIGHT_GRAY 
+	int		BIOS_VIDEO_SERVICES
+
+	mov		si, kSelectOSMessage
+	call	printstr
+
+	; Chain load rest of boot loader 
+	mov		ah, EXTENDED_READ					; Load 3 more sectors
+	mov		dl, 0x80							; First HDD
+	mov		si, nextStageDAP
+	int		BIOS_DISK_SERVICES
+	jc		.error								; I/O error
+	jmp		stage2								; Continue in loaded stage 2
+
+.error: 
+	mov		si, kError
+	mov		bl, RED
+	call	printstr
+.halt
+	mov		ah, READ_CHAR
+	int		BIOS_KEYBOARD_SERVICES	
+	hlt
+	jmp		.halt
+
+printStringStage1:
+	printString
+		
+nextStageDAP: 
+	istruc AddressPacket
+		at AddressPacket.packet_size,	db		0x10
+		at AddressPacket.block_count,	db		0x03
+		at AddressPacket.buffer,		dw		0x0200, 0x07c0
+		at AddressPacket.offset,		dw		1
+	iend
+
+kTitle:
+	db		TITLE, 0x00
+kSelectOSMessage:
+	db		SELECT_OS_MESSAGE, 0x00
+kError:
+	db		'Error loading sectors!', 0x00
+
+	; Fill the missing space to reach 510 byte
+	times 510 -($-$$) db 'B'
+
+signature:
+	; Magic marker "AA55" (to identify a valid boot record)
+	dw		MBR_SIGNATURE
 
 ; ======================================================================
 ; ======================= SECOND SECTOR ================================
 ; ======================================================================
 
-secsec:
-; ======================= Center list ==================================
-	xor bx,bx					; Get ready for the Division
-	xor ax, ax					; Get ready for the Division
-	mov al, [list_items]
- 	mov bl, 2					; Divide by two
-	div bl						; Divide
+; Use code available in stage 1
+%define printstr printStringStage2
 
-	mov bl, 12
-	sub bl, al					; Substract from 12 (screen is 80x25)
-	mov dh, bl
-	mov [first_position], dx
+%assign	TIMEOUT_OFF	0xffff
 
-; ======================= Print the OS list ============================
-print_list:
-	mov dx, [first_position]
-	mov [position], dx
 
-	mov ah, 0x02					; Set cursor position
-	int 0x10
-	mov si, list					; Load the List
-	xor cx,cx					; Load listitems to CX
-	mov byte [colour], 0x0000	; Reset Colour
-print_list_loop:				
-	lodsb						; Get lenght of string from list into al
-							; Get the Text to be in the middle (40 - lenght/2)
-	xor bx,bx					; Get ready for the Division
-	mov ah, 0x00 
- 	mov bl, 2					; Divide by two
-	div bl						; Divide
-
-	mov bl, 40
-	sub bl, al					; Substract from 40 (screen is 80x25)
-	mov al, bl
-	mov dx, [position]				; Get last position
-	inc dh						; Next line
-	mov dl, al					; Move it to the place where the row should be for the interrupt (DL)
+stage2:
+	mov		ax, [defaultItem]					; Select default item
+	mov		[selection], ax
 	
-	mov ah, 0x02					; Set cursor position
-	mov [position], dx
-	int 0x10
+	mov		ax, TICKS_PER_SECOND				; Calculate timeout ticks
+	mul		word [timeout]
+	mov		bx, dx
+	push	ax
 	
-	mov dx, [selection]
-	mov byte bl, [colour]				; Load Colour
-	and bx, 0x03					; Just
-	inc bl						; Colours ... 1-4
-	cmp cx, [selection]
-	jnz no_highlight
-	xor bx, 0x08					; Highlight selected item
-no_highlight:
-	mov byte [colour], bl				; Store Colour
-	call print_list_item
-	inc cx
-	cmp cx, [list_items]
-	jne print_list_loop
+	mov		ah, READ_CLOCK
+	int		BIOS_TIME_SERVICES
+	
+	pop		ax									; Add current ticks
+	add		ax, dx
+	adc		bx, cx
+	mov		[timeoutTicks], ax
+	mov		[timeoutTicks + 2], bx
+	
+	mov		al, [listItemCount]					; Calculate start row for menu
+	shr		al, 1
+	mov		bl, TEXT_ROWS / 2
+	sub		bl, al								; y = TEXT_ROWS / 2 - number of items / 2
+	mov		[firstLine], bl
+
+	call	printMenu
+
+	cmp		word [timeout], TIMEOUT_OFF
+	je		inputLoop
+
+timeoutLoop:
+	mov		ah, PROBE_CHAR
+	int		BIOS_KEYBOARD_SERVICES
+	jnz		inputLoop							; cancel timeout if key is pressed
+	call	isTimeoutReached
+	jnc		timeoutLoop
+	jmp		bootSelectedPartition
+
+isTimeoutReached:
+	mov		ah, READ_CLOCK
+	int		BIOS_TIME_SERVICES
+	cmp		cx, [timeoutTicks + 2]
+	jb		.returnFalse
+	ja		.returnTrue
+	cmp		dx, [timeoutTicks]
+	ja		.returnTrue
+.returnFalse:
+	clc
+	ret
+.returnTrue:
+	stc
+	ret
 	
 ; ================== Wait for a key and do something with it ==================
+mainLoop:
+	call	printMenu
+	
+inputLoop:
+	mov		ah, READ_CHAR
+	int		BIOS_KEYBOARD_SERVICES				; AL = ASCII Code, AH = Scancode
 
-main_loopy:
-	mov ah, 0x02					; Set cursor position
- 	mov dx, 0x181C
- 	int 0x10
- 	
- 	mov ah, 0x00   					; Keyboard Read: wait for key
-	int 0x16      					; AL = ASCII Code, AH = Scancode
-	cmp	ah, 0x50
-	jz 	key_down				; Was it key_down, key_up... ?
-	cmp	ah, 0x48
-	jz 	key_up
-	cmp ah, 0x1C
-	jz 	key_enter
+	cmp		ah, KEY_DOWN
+	je		selectNextPartition			 
+	
+	cmp		ah, KEY_UP
+	je		selectPreviousPartition
+	
+	cmp		ah, KEY_RETURN
+	je		bootSelectedPartition
+	
+	jmp		inputLoop
 
- 	jmp main_loopy
+selectNextPartition:
+	mov		ax, [selection]
+	inc		ax
+	cmp		ax, [listItemCount]
+	jne		.done								; At end of list?
+	xor		ax, ax								; Then jump to first entry
+.done:
+	mov		[selection], ax
+	jmp		mainLoop
+	
+selectPreviousPartition:
+	mov		ax, [selection]
+	or		ax, ax
+	jnz		.done								; At top of list?
+	mov		ax, [listItemCount]					; Then jump to last entry		
+.done:
+	dec		ax
+	mov		[selection], ax
+	jmp		mainLoop   
 
-key_down:
-	mov ax, [selection]
-	mov bx, [list_items]
-	dec bx
-	cmp ax, bx
-	je	key_down_no				; Are we at the bottom of the list?
-	inc ax
-	mov [selection], ax
-key_down_no:
-	jmp print_list
-key_up:
-	mov ax, [selection]
-	mov bx, [list_items]
-	cmp ax, 0
-	je 	key_down_no				; Are we at the top of the list?
-	dec ax
-	mov [selection], ax
-key_up_no:
-	jmp print_list	
+
+; ======================= Print the OS list ============================
+printMenu:
+	mov		al, [firstLine]
+	mov		[currentLine], al
+	
+	mov		si, list							; Start at top of list
+	xor		cx, cx								; The index of the current item
+	
+.loop:
+	lodsb										; String length incl. 0-terminator
+	dec		al									; center menu item
+	shr		al, 1								; x = TEXT_COLUMNS / 2 - length / 2
+	mov		dl, TEXT_COLUMNS / 2
+	sub		dl, al
+	
+	mov		dh, [currentLine]
+	mov		ah, SET_CURSOR
+	int		BIOS_VIDEO_SERVICES
+
+	mov		di, cx
+	and		di, 3
+	mov		bl, [kColorTable + di]				; Text color
+
+	cmp		cx, [selection]
+	jne		.print								; Selected item reached?
+	xor		bl, BRIGHT_COLOR_MASK				; Highlight it
+
+.print:
+	call	printstr
+	add		si, sizeof(quadword)				; Skip start sector quad word
+
+	inc		byte [currentLine]
+	inc		cx
+
+	cmp		cx, [listItemCount]
+	jne		.loop
+	
+	mov		ah, SET_CURSOR						; Set cursor position
+	mov		dx, (TEXT_ROWS-4) * 0x100 + (TEXT_COLUMNS / 3)
+	mov		dx, 0x181C
+	int		BIOS_VIDEO_SERVICES
+	ret	
 
 
 ; ========================== Chainload ==========================
 
-key_enter:
-	mov cx, [selection]
-	mov si, list
-	inc cx
-load_LBA:
-	lodsb 
-	cmp al, 0x80
-	jne load_LBA
-	loop load_LBA
+bootSelectedPartition:
+
+	mov		si, list							; Search address of start sector  
+												; of the selected item.
+	mov		cx, [selection]
+	inc		cx									; Number of required iterations
 	
+	xor		ah, ah								; The high-byte of the string length
+												; see loop body
+	jmp		.search_loop_entry
+	
+.search_loop:
+	add		si, sizeof(quadword)				; Skip to begin of next menu item
+
+.search_loop_entry:
+	lodsb										; Length of menu item name
+	add		si, ax								; Skip name to address of start sector
+	loop	.search_loop
+	
+	mov		di, bootSectorDAP+AddressPacket.offset	; Copy start sector
+	mov		cx, 4								; It is stored in a quad word
+.copy_start_sector
 	lodsw
-	mov [LBA_selectionA], ax
-	lodsw
-	mov [LBA_selectionB], ax
+	stosw
+	loop .copy_start_sector
+
+	mov		ah, EXTENDED_READ					; Now read start sector from HD
+	mov		dl, 0x80							; overwriting our first stage
+	mov		si, bootSectorDAP
+	int		BIOS_DISK_SERVICES
+	mov		si, kReadError
+	jc		printAndHalt						; Failed to read sector
+
+	mov		ax, [signature]
+	cmp		ax, MBR_SIGNATURE
+	mov		si, kNoBootablePartitionError
+	jne		printAndHalt						; Missing signature
 	
-	mov si, ChainLoad_DAP				; Load the List
-	mov ax, [LBA_selectionA]
-	mov word [si+8], ax
-	mov ax, [LBA_selectionB]
-	mov word [si+10], ax
-
-	mov ah, 0x42
-	mov dl, 0x80
-	mov si, ChainLoad_DAP
-	int 0x13
-	mov si, error_lfd
-	jc print_debug
-
-	mov si, 0x0
-	xor ax, ax
-	mov si, error_nb
-	mov byte al, [0x01FE]
-	cmp al, 0x55
-	jne print_debug
-	
-	mov byte al, [0x01FF]
-	cmp al, 0xAA
-	jne print_debug
-
-	mov si, yeah					; Yeah
-	jmp print_debug
-
+	jmp		$$									; Start loaded boot loader
 	
 
+; ====================== THE printMenu function ================
 
-fin:
-	mov ah, 0x0e
-	mov al, 'F'
-	mov bx, 0x2
-	mov cx, 0x1
-	int 0x10
-	jmp $
+printStringStage2:
+	printString
 
-
-; ====================== THE print_list function ================
-
-print_list_item:
-print_list_item_loop:
-	lodsb
-	cmp al,0x80
-	jz print_list_item_end
-	mov ah, 0x0E
-	int 0x10
-	jmp print_list_item_loop
-print_list_item_end:
-	lodsw
-	lodsw
-	ret
-
-print_debug:						; Poor mans printf again
-	lodsb
-	mov ah, 0x0E
-	mov bx, 0x0F
-	mov cx, 0x01
-	int 0x10
-	cmp al, 0x00
-	jnz print_debug
-	jmp $
+printAndHalt:
+	mov		bx, 0x0F							; Page number and foreground color
+	call	printstr
+.halt
+	mov		ah, READ_CHAR
+	int		BIOS_KEYBOARD_SERVICES	
+	hlt
+	jmp		.halt
 	
 ; ================================ DATA ===========================
 
-error_lfd:
-	db 'Error loading Sectors', 0x00
-error_nb:
-	db 'Not a bootable partition', 0x00
-LBA_selectionA:
-	dw 0x0000	
-LBA_selectionB:
-	dw 0x0000
-selection:
-	dw 0x0000
-position:
-	dw 0x091D
-lenght:
-	dw 0x0000
-colour:
-	dw 0x0000
-first_position:
-	dw 0x091F
-nobots:
-	db 'Boot sector signature not found', 0x00
-error:
-	db 'Error loading sectors', 0x00
-yeah:
-	db 'Boot!', 0x00
+selection: 
+	dw		0x0000
+firstLine: 
+	db		0
+currentLine: 
+	db		0
+timeoutTicks:
+	dw		0, 0
+
+bootSectorDAP:
+	istruc AddressPacket
+		at AddressPacket.packet_size,	db		0x10
+		at AddressPacket.block_count,	db		0x01
+		at AddressPacket.buffer,		dw		0x0000, 0x07c0
+	iend
+
+kColorTable:
+	db BLUE, RED, CYAN, GREEN	
+kReadError:
+	db		'Error loading sectors', 0x00
+kNoBootablePartitionError:
+	db		'Not a bootable partition', 0x00
+kBootMessage:
+	db		'Boot!', 0x00
 
 
+listItemCount:
+defaultItem			equ		listItemCount + 2
+timeout				equ		defaultItem + 2
+list				equ		timeout + 2
+	
+; dw number of entries
+; dw the default entry
+; dw the timeout (-1 for none)
+; entry:
+; db size of partition name 0-terminated string
+; db 0-terminated string with partition name
+; quadword start sector
 
-list_items:
-	dw 0x06
-list:
-	db 0x05
-	db 'HAIKU' , 0x80
-	dw 0x003E
-	dw 0x0000
+%if USE_TEST_MENU
+	dw		0x06
+	
+	dw		2
+	
+	dw		5
 
-	db 0x07
-	db 'FreeBSD' , 0x80
-	dw 0x003F
-	dw 0x0000
+	db		0x06
+	db		'HAIKU', 0
+	dw		1, 0, 0, 0
 
-	db 0x03
-	db 'DOS' , 0x80
-	dw 0x003E
-	dw 0x0000
+	db		0x08
+	db		'FreeBSD', 0
+	dw		0x003F, 0, 0, 0
 
-	db 0x05
-	db 'LINUX' , 0x80
-	dw 0x003F
-	dw 0x0000
+	db		0x04
+	db		'DOS', 0
+	dw		0x003E, 0, 0, 0
 
-	db 0x07
-	db 'BeOS R5' , 0x80
-	dw 0x003F
-	dw 0x0000
+	db		0x06
+	db		'LINUX', 0
+	dw		0x003F, 0, 0, 0
 
-	db 0x07
-	db 'OpenBSD' , 0x80
-	dw 0xAAAA
-	dw 0x0000
+	db		0x08
+	db		'BeOS R5', 0
+	dw		0x003F, 0, 0, 0
 
-ChainLoad_DAP:
-	db 0x10						; Size of DAP
-	db 0x00						; unused (zero)
-	db 0x01						; number of sectors to read
-	db 0x00						; unused (zero)
-	dw 0x0000					; segment:offset pointer to buffer
-	dw 0x07C0					; segment:offset pointer to buffer
-	dw 0x003F					; LBA address
-	dw 0x0000
-	dw 0x0000
-	dw 0x0000
-
-
-
+	db		0x07
+	db		'OpenBSD', 0
+	dw		0xAAAA, 0, 0, 0
+%endif
 
