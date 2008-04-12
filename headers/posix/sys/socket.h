@@ -7,6 +7,7 @@
 
 
 #include <stdint.h>
+#include <sys/param.h>
 #include <sys/types.h>
 #include <sys/uio.h>
 
@@ -136,6 +137,12 @@ struct cmsghdr {
 	((mhdr)->msg_controllen >= sizeof(struct cmsghdr) \
 	? (struct cmsghdr *)(mhdr)->msg_control \
 	: (struct cmsghdr *)NULL)
+#define	CMSG_SPACE(len) (_ALIGN(sizeof(struct cmsghdr)) + _ALIGN(len))
+#define	CMSG_LEN(len)	(_ALIGN(sizeof(struct cmsghdr)) + (len))
+#define	CMSG_ALIGN(len)	_ALIGN(len)
+
+/* SOL_SOCKET control message types */
+#define SCM_RIGHTS	0x01
 
 
 #if __cplusplus
