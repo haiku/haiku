@@ -9,6 +9,8 @@
 #include <Window.h>
 
 class BFile;
+class BGroupLayout;
+class BMenuItem;
 class ActivityView;
 
 
@@ -25,9 +27,11 @@ private:
 	status_t _LoadSettings(BMessage& settings);
 	status_t _SaveSettings();
 
+	void _UpdateRemoveItem();
 	void _MessageDropped(BMessage *message);
 
-	ActivityView*	fActivityView;
+	BGroupLayout*	fLayout;
+	BMenuItem*		fRemoveItem;
 };
 
 #endif	// ACTIVITY_WINDOW_H

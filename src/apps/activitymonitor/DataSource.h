@@ -7,8 +7,8 @@
 
 
 #include <InterfaceDefs.h>
+#include <String.h>
 
-class BString;
 class SystemInfo;
 
 
@@ -20,6 +20,7 @@ public:
 	virtual				~DataSource();
 
 	virtual DataSource*	Copy() const;
+	virtual DataSource*	CopyForCPU(int32 cpu) const;
 
 			int64		Minimum() const;
 			int64		Maximum() const;
@@ -32,13 +33,19 @@ public:
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual void		Print(BString& text, int64 value) const;
 
+	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual const char*	Unit() const;
 	virtual rgb_color	Color() const;
 	virtual bool		AdaptiveScale() const;
+	virtual int32		CPU() const;
+	virtual bool		PerCPU() const;
+	virtual bool		MultiCPUOnly() const;
 
 	static int32		CountSources();
 	static const DataSource* SourceAt(int32 index);
+	static const DataSource* FindSource(const char* name);
+	static int32		IndexOf(const DataSource* source);
 
 protected:
 	int64				fMinimum;
@@ -95,20 +102,76 @@ public:
 };
 
 
-class CpuUsageDataSource : public DataSource {
+class CPUUsageDataSource : public DataSource {
 public:
-						CpuUsageDataSource();
-						CpuUsageDataSource(const CpuUsageDataSource& other);
-	virtual				~CpuUsageDataSource();
+						CPUUsageDataSource(int32 cpu = 0);
+						CPUUsageDataSource(const CPUUsageDataSource& other);
+	virtual				~CPUUsageDataSource();
+
+	virtual DataSource*	Copy() const;
+	virtual DataSource*	CopyForCPU(int32 cpu) const;
+
+	virtual void		Print(BString& text, int64 value) const;
+	virtual	int64		NextValue(SystemInfo& info);
+
+	virtual const char*	Name() const;
+	virtual const char*	Label() const;
+
+	virtual int32		CPU() const;
+	virtual bool		PerCPU() const;
+
+private:
+			void		_SetCPU(int32 cpu);
+
+	bigtime_t			fPreviousActive;
+	bigtime_t			fPreviousTime;
+	int32				fCPU;
+	BString				fLabel;
+};
+
+
+class CPUCombinedUsageDataSource : public DataSource {
+public:
+						CPUCombinedUsageDataSource();
+						CPUCombinedUsageDataSource(
+							const CPUCombinedUsageDataSource& other);
+	virtual				~CPUCombinedUsageDataSource();
 
 	virtual DataSource*	Copy() const;
 
 	virtual void		Print(BString& text, int64 value) const;
 	virtual	int64		NextValue(SystemInfo& info);
+
+	virtual const char*	Name() const;
 	virtual const char*	Label() const;
+
+	virtual bool		MultiCPUOnly() const;
 
 private:
 	bigtime_t			fPreviousActive;
+	bigtime_t			fPreviousTime;
+};
+
+
+class NetworkUsageDataSource : public DataSource {
+public:
+						NetworkUsageDataSource(bool in);
+						NetworkUsageDataSource(
+							const NetworkUsageDataSource& other);
+	virtual				~NetworkUsageDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual void		Print(BString& text, int64 value) const;
+	virtual	int64		NextValue(SystemInfo& info);
+
+	virtual const char*	Name() const;
+	virtual const char*	Label() const;
+	virtual bool		AdaptiveScale() const;
+
+private:
+	bool				fIn;
+	uint64				fPreviousBytes;
 	bigtime_t			fPreviousTime;
 };
 

@@ -11,6 +11,7 @@
 
 #include "CircularBuffer.h"
 
+class BBitmap;
 class BMessageRunner;
 class DataSource;
 struct data_item;
@@ -43,7 +44,9 @@ private:
 class ActivityView : public BView {
 public:
 						ActivityView(BRect frame, const char* name,
-							const BMessage& settings, uint32 resizingMode);
+							const BMessage* settings, uint32 resizingMode);
+						ActivityView(const char* name,
+							const BMessage* settings);
 						ActivityView(BMessage* archive);
 	virtual				~ActivityView();
 
@@ -52,14 +55,16 @@ public:
 
 			status_t	SaveState(BMessage& state) const;
 
-			DataSource*	FindDataSource(const char* name);
-			status_t	AddDataSource(DataSource* source);
-			status_t	RemoveDataSource(DataSource* source);
+			DataSource*	FindDataSource(const DataSource* source);
+			status_t	AddDataSource(const DataSource* source);
+			status_t	RemoveDataSource(const DataSource* source);
 			void		RemoveAllDataSources();
 
 protected:
 	virtual	void		AttachedToWindow();
 	virtual	void		DetachedFromWindow();
+
+	virtual	BSize		MinSize();
 
 	virtual void		FrameResized(float width, float height);
 	virtual void		MouseDown(BPoint where);
@@ -73,10 +78,16 @@ protected:
 private:
 			void		_Init(const BMessage* settings);
 			void		_Refresh();
+			void		_UpdateOffscreenBitmap();
+			BRect		_HistoryFrame() const;
+			BRect		_LegendFrame() const;
+			BRect		_LegendFrameAt(BRect frame, int32 index) const;
 			float		_PositionForValue(DataSource* source,
 							DataHistory* values, int64 value);
+			void		_DrawHistory();
 
 	rgb_color			fBackgroundColor;
+	BBitmap*			fOffscreen;
 	BObjectList<DataSource> fSources;
 	BObjectList<DataHistory> fValues;
 	BMessageRunner*		fRunner;
@@ -84,6 +95,7 @@ private:
 	bigtime_t			fLastRefresh;
 	bigtime_t			fDrawInterval;
 	int32				fDrawResolution;
+	bool				fShowLegend;
 };
 
 #endif	// ACTIVITY_VIEW_H

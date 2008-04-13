@@ -18,7 +18,10 @@ const DataSource* kSources[] = {
 	new UsedMemoryDataSource(),
 	new CachedMemoryDataSource(),
 	new ThreadsDataSource(),
-	new CpuUsageDataSource(),
+	new CPUUsageDataSource(),
+	new CPUCombinedUsageDataSource(),
+	new NetworkUsageDataSource(true),
+	new NetworkUsageDataSource(false)
 };
 const size_t kSourcesCount = sizeof(kSources) / sizeof(kSources[0]);
 
@@ -62,6 +65,13 @@ DataSource::Copy() const
 {
 	return NULL;
 		// this class cannot be copied
+}
+
+
+DataSource*
+DataSource::CopyForCPU(int32 cpu) const
+{
+	return Copy();
 }
 
 
@@ -124,6 +134,13 @@ DataSource::Print(BString& text, int64 value) const
 
 
 const char*
+DataSource::Name() const
+{
+	return Label();
+}
+
+
+const char*
 DataSource::Label() const
 {
 	return "";
@@ -151,6 +168,27 @@ DataSource::AdaptiveScale() const
 }
 
 
+int32
+DataSource::CPU() const
+{
+	return 0;
+}
+
+
+bool
+DataSource::PerCPU() const
+{
+	return false;
+}
+
+
+bool
+DataSource::MultiCPUOnly() const
+{
+	return false;
+}
+
+
 /*static*/ int32
 DataSource::CountSources()
 {
@@ -165,6 +203,33 @@ DataSource::SourceAt(int32 index)
 		return NULL;
 
 	return kSources[index];
+}
+
+
+/*static*/ const DataSource*
+DataSource::FindSource(const char* name)
+{
+	for (uint32 i = 0; i < kSourcesCount; i++) {
+		const DataSource* source = kSources[i];
+		if (!strcmp(source->Name(), name))
+			return source;
+	}
+
+	return NULL;
+}
+
+
+/*static*/ int32
+DataSource::IndexOf(const DataSource* source)
+{
+	const char* name = source->Name();
+
+	for (uint32 i = 0; i < kSourcesCount; i++) {
+		if (!strcmp(kSources[i]->Name(), name))
+			return i;
+	}
+
+	return -1;
 }
 
 
@@ -189,7 +254,7 @@ void
 MemoryDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%.1g MB", value / 1048576.0);
+	snprintf(buffer, sizeof(buffer), "%.1f MB", value / 1048576.0);
 
 	text = buffer;
 }
@@ -232,7 +297,7 @@ UsedMemoryDataSource::NextValue(SystemInfo& info)
 const char*
 UsedMemoryDataSource::Label() const
 {
-	return "Available Memory";
+	return "Used Memory";
 }
 
 
@@ -321,7 +386,134 @@ ThreadsDataSource::AdaptiveScale() const
 //	#pragma mark -
 
 
-CpuUsageDataSource::CpuUsageDataSource()
+CPUUsageDataSource::CPUUsageDataSource(int32 cpu)
+	:
+	fPreviousActive(0),
+	fPreviousTime(0)
+{
+	fMinimum = 0;
+	fMaximum = 1000;
+
+	_SetCPU(cpu);
+}
+
+
+CPUUsageDataSource::CPUUsageDataSource(const CPUUsageDataSource& other)
+	: DataSource(other)
+{
+	fPreviousActive = other.fPreviousActive;
+	fPreviousTime = other.fPreviousTime;
+	fCPU = other.fCPU;
+	fLabel = other.fLabel;
+}
+
+
+CPUUsageDataSource::~CPUUsageDataSource()
+{
+}
+
+
+DataSource*
+CPUUsageDataSource::Copy() const
+{
+	return new CPUUsageDataSource(*this);
+}
+
+
+DataSource*
+CPUUsageDataSource::CopyForCPU(int32 cpu) const
+{
+	CPUUsageDataSource* copy = new CPUUsageDataSource(*this);
+	copy->_SetCPU(cpu);
+
+	return copy;
+}
+
+
+void
+CPUUsageDataSource::Print(BString& text, int64 value) const
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%.1f%%", value / 10.0);
+
+	text = buffer;
+}
+
+
+int64
+CPUUsageDataSource::NextValue(SystemInfo& info)
+{
+	bigtime_t active = info.Info().cpu_infos[fCPU].active_time;
+
+	int64 percent = int64(1000.0 * (active - fPreviousActive)
+		/ (info.Time() - fPreviousTime));
+	if (percent < 0)
+		percent = 0;
+	if (percent > 1000)
+		percent = 1000;
+
+	fPreviousActive = active;
+	fPreviousTime = info.Time();
+
+	return percent;
+}
+
+
+const char*
+CPUUsageDataSource::Label() const
+{
+	return fLabel.String();
+}
+
+
+const char*
+CPUUsageDataSource::Name() const
+{
+	return "CPU Usage";
+}
+
+
+int32
+CPUUsageDataSource::CPU() const
+{
+	return fCPU;
+}
+
+
+bool
+CPUUsageDataSource::PerCPU() const
+{
+	return true;
+}
+
+
+void
+CPUUsageDataSource::_SetCPU(int32 cpu)
+{
+	fCPU = cpu;
+	fLabel = "CPU";
+	if (SystemInfo().CPUCount() > 1)
+		fLabel << " " << cpu;
+
+	fLabel << " Usage";
+
+	const rgb_color kColors[] = {
+		// TODO: find some better defaults...
+		{200, 0, 200},
+		{0, 200, 200},
+		{80, 80, 80},
+		{230, 150, 50},
+	};
+	const uint32 kNumColors = sizeof(kColors) / sizeof(kColors[0]);
+
+	fColor = kColors[cpu % kNumColors];
+}
+
+
+//	#pragma mark -
+
+
+CPUCombinedUsageDataSource::CPUCombinedUsageDataSource()
 	:
 	fPreviousActive(0),
 	fPreviousTime(0)
@@ -333,37 +525,39 @@ CpuUsageDataSource::CpuUsageDataSource()
 }
 
 
-CpuUsageDataSource::CpuUsageDataSource(const CpuUsageDataSource& other)
+CPUCombinedUsageDataSource::CPUCombinedUsageDataSource(
+		const CPUCombinedUsageDataSource& other)
+	: DataSource(other)
 {
 	fPreviousActive = other.fPreviousActive;
 	fPreviousTime = other.fPreviousTime;
 }
 
 
-CpuUsageDataSource::~CpuUsageDataSource()
+CPUCombinedUsageDataSource::~CPUCombinedUsageDataSource()
 {
 }
 
 
 DataSource*
-CpuUsageDataSource::Copy() const
+CPUCombinedUsageDataSource::Copy() const
 {
-	return new CpuUsageDataSource(*this);
+	return new CPUCombinedUsageDataSource(*this);
 }
 
 
 void
-CpuUsageDataSource::Print(BString& text, int64 value) const
+CPUCombinedUsageDataSource::Print(BString& text, int64 value) const
 {
 	char buffer[32];
-	snprintf(buffer, sizeof(buffer), "%.1g%%", value / 10.0);
+	snprintf(buffer, sizeof(buffer), "%.1f%%", value / 10.0);
 
 	text = buffer;
 }
 
 
 int64
-CpuUsageDataSource::NextValue(SystemInfo& info)
+CPUCombinedUsageDataSource::NextValue(SystemInfo& info)
 {
 	int32 running = 0;
 	bigtime_t active = 0;
@@ -389,7 +583,108 @@ CpuUsageDataSource::NextValue(SystemInfo& info)
 
 
 const char*
-CpuUsageDataSource::Label() const
+CPUCombinedUsageDataSource::Label() const
 {
 	return "CPU Usage";
+}
+
+
+const char*
+CPUCombinedUsageDataSource::Name() const
+{
+	return "CPU Usage (combined)";
+}
+
+
+bool
+CPUCombinedUsageDataSource::MultiCPUOnly() const
+{
+	return true;
+}
+
+
+//	#pragma mark -
+
+
+NetworkUsageDataSource::NetworkUsageDataSource(bool in)
+	:
+	fIn(in),
+	fPreviousBytes(0),
+	fPreviousTime(0)
+{
+	SystemInfo info;
+	NextValue(info);
+
+	fMinimum = 0;
+	fMaximum = 1000000000LL;
+
+	fColor = fIn ? (rgb_color){200, 150, 0} : (rgb_color){200, 220, 0};
+}
+
+
+NetworkUsageDataSource::NetworkUsageDataSource(
+		const NetworkUsageDataSource& other)
+	: DataSource(other)
+{
+	fIn = other.fIn;
+	fPreviousBytes = other.fPreviousBytes;
+	fPreviousTime = other.fPreviousTime;
+}
+
+
+NetworkUsageDataSource::~NetworkUsageDataSource()
+{
+}
+
+
+DataSource*
+NetworkUsageDataSource::Copy() const
+{
+	return new NetworkUsageDataSource(*this);
+}
+
+
+void
+NetworkUsageDataSource::Print(BString& text, int64 value) const
+{
+	char buffer[32];
+	snprintf(buffer, sizeof(buffer), "%.1f KB/s", value / 1024.0);
+
+	text = buffer;
+}
+
+
+int64
+NetworkUsageDataSource::NextValue(SystemInfo& info)
+{
+	uint64 transferred = fIn ? info.NetworkReceived() : info.NetworkSent();
+
+	int64 bytesPerSecond = uint64((transferred - fPreviousBytes)
+		/ ((info.Time() - fPreviousTime) / 1000000.0));
+
+	fPreviousBytes = transferred;
+	fPreviousTime = info.Time();
+
+	return bytesPerSecond;
+}
+
+
+const char*
+NetworkUsageDataSource::Label() const
+{
+	return fIn ? "Receiving" : "Sending";
+}
+
+
+const char*
+NetworkUsageDataSource::Name() const
+{
+	return fIn ? "Network Receive" : "Network Send";
+}
+
+
+bool
+NetworkUsageDataSource::AdaptiveScale() const
+{
+	return true;
 }

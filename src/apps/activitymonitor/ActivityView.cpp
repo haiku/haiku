@@ -32,6 +32,7 @@ const bigtime_t kInitialRefreshInterval = 500000LL;
 
 const uint32 kMsgRefresh = 'refr';
 const uint32 kMsgToggleDataSource = 'tgds';
+const uint32 kMsgToggleLegend = 'tglg';
 
 extern const char* kSignature;
 
@@ -123,12 +124,25 @@ DataHistory::SetRefreshInterval(bigtime_t interval)
 
 
 ActivityView::ActivityView(BRect frame, const char* name,
-		const BMessage& settings, uint32 resizingMode)
+		const BMessage* settings, uint32 resizingMode)
 	: BView(frame, name, resizingMode,
-		B_WILL_DRAW | B_SUBPIXEL_PRECISE | B_FULL_UPDATE_ON_RESIZE
-		| B_FRAME_EVENTS)
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
-	_Init(&settings);
+	_Init(settings);
+
+	BRect rect(Bounds());
+	rect.top = rect.bottom - 7;
+	rect.left = rect.right - 7;
+	BDragger* dragger = new BDragger(rect, this,
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	AddChild(dragger);
+}
+
+
+ActivityView::ActivityView(const char* name, const BMessage* settings)
+	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+{
+	_Init(settings);
 
 	BRect rect(Bounds());
 	rect.top = rect.bottom - 7;
@@ -148,6 +162,7 @@ ActivityView::ActivityView(BMessage* archive)
 
 ActivityView::~ActivityView()
 {
+	delete fOffscreen;
 }
 
 
@@ -155,17 +170,29 @@ void
 ActivityView::_Init(const BMessage* settings)
 {
 	fBackgroundColor = (rgb_color){255, 255, 240};
-	SetLowColor(fBackgroundColor);
+	fOffscreen = NULL;
+	SetViewColor(B_TRANSPARENT_COLOR);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fRefreshInterval = kInitialRefreshInterval;
 	fDrawInterval = kInitialRefreshInterval * 2;
 	fLastRefresh = 0;
 	fDrawResolution = 1;
 
-	AddDataSource(new UsedMemoryDataSource());
-	AddDataSource(new CachedMemoryDataSource());
-	AddDataSource(new ThreadsDataSource());
-	AddDataSource(new CpuUsageDataSource());
+	if (settings == NULL
+		|| settings->FindBool("show legend", &fShowLegend) != B_OK)
+		fShowLegend = true;
+
+	if (settings == NULL) {
+		AddDataSource(new UsedMemoryDataSource());
+		AddDataSource(new CachedMemoryDataSource());
+		return;
+	}
+
+	const char* name;
+	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++) {
+		AddDataSource(DataSource::FindSource(name));
+	}
 }
 
 
@@ -203,16 +230,30 @@ ActivityView::Instantiate(BMessage* archive)
 status_t
 ActivityView::SaveState(BMessage& state) const
 {
-	return B_ERROR;
+	status_t status = state.AddBool("show legend", fShowLegend);
+	if (status != B_OK)
+		return status;
+
+	for (int32 i = 0; i < fSources.CountItems(); i++) {
+		DataSource* source = fSources.ItemAt(i);
+
+		if (!source->PerCPU() || source->CPU() == 0)
+			status = state.AddString("source", source->Name());
+		if (status != B_OK)
+			return status;
+
+		// TODO: save and restore color as well
+	}
+	return B_OK;
 }
 
 
 DataSource*
-ActivityView::FindDataSource(const char* name)
+ActivityView::FindDataSource(const DataSource* search)
 {
 	for (int32 i = fSources.CountItems(); i-- > 0;) {
 		DataSource* source = fSources.ItemAt(i);
-		if (!strcmp(source->Label(), name))
+		if (!strcmp(source->Name(), search->Name()))
 			return source;
 	}
 
@@ -221,21 +262,50 @@ ActivityView::FindDataSource(const char* name)
 
 
 status_t
-ActivityView::AddDataSource(DataSource* source)
+ActivityView::AddDataSource(const DataSource* source)
 {
-	DataHistory* values = new(std::nothrow) DataHistory(10 * 60000000LL,
-		fRefreshInterval);
-	if (values == NULL)
-		return B_NO_MEMORY;
-	if (!fValues.AddItem(values)) {
-		delete values;
-		return B_NO_MEMORY;
+	if (source == NULL)
+		return B_BAD_VALUE;
+
+	int32 insert = DataSource::IndexOf(source);
+	for (int32 i = 0; i < fSources.CountItems() && i < insert; i++) {
+		DataSource* before = fSources.ItemAt(i);
+		if (DataSource::IndexOf(before) > insert) {
+			insert = i;
+			break;
+		}
+	}
+	if (insert > fSources.CountItems())
+		insert = fSources.CountItems();
+
+	uint32 count = 1;
+	if (source->PerCPU()) {
+		SystemInfo info;
+		count = info.CPUCount();
 	}
 
-	if (!fSources.AddItem(source)) {
-		fValues.RemoveItem(values);
-		delete values;
-		return B_NO_MEMORY;
+	for (uint32 i = 0; i < count; i++) {
+		DataHistory* values = new(std::nothrow) DataHistory(10 * 60000000LL,
+			fRefreshInterval);
+		if (values == NULL)
+			return B_NO_MEMORY;
+
+		if (!fValues.AddItem(values, insert + i)) {
+			delete values;
+			return B_NO_MEMORY;
+		}
+
+		DataSource* copy;
+		if (source->PerCPU())
+			copy = source->CopyForCPU(i);
+		else
+			copy = source->Copy();
+
+		if (!fSources.AddItem(copy, insert + i)) {
+			fValues.RemoveItem(values);
+			delete values;
+			return B_NO_MEMORY;
+		}
 	}
 
 	return B_OK;
@@ -243,16 +313,22 @@ ActivityView::AddDataSource(DataSource* source)
 
 
 status_t
-ActivityView::RemoveDataSource(DataSource* source)
+ActivityView::RemoveDataSource(const DataSource* remove)
 {
-	int32 index = fSources.IndexOf(source);
-	if (index < 0)
-		return B_ENTRY_NOT_FOUND;
+	while (true) {
+		DataSource* source = FindDataSource(remove);
+		if (source == NULL)
+			return B_OK;
 
-	fSources.RemoveItemAt(index);
-	delete source;
-	DataHistory* values = fValues.RemoveItemAt(index);
-	delete values;
+		int32 index = fSources.IndexOf(source);
+		if (index < 0)
+			return B_ENTRY_NOT_FOUND;
+
+		fSources.RemoveItemAt(index);
+		delete source;
+		DataHistory* values = fValues.RemoveItemAt(index);
+		delete values;
+	}
 
 	return B_OK;
 }
@@ -271,6 +347,8 @@ ActivityView::AttachedToWindow()
 {
 	BMessage refresh(kMsgRefresh);
 	fRunner = new BMessageRunner(this, &refresh, fRefreshInterval);
+
+	FrameResized(Bounds().Width(), Bounds().Height());
 }
 
 
@@ -281,9 +359,47 @@ ActivityView::DetachedFromWindow()
 }
 
 
+BSize
+ActivityView::MinSize()
+{
+	BSize size(32, 32);
+	if (fShowLegend)
+		size.height = _LegendFrame().Height();
+
+	return size;
+}
+
+
 void
 ActivityView::FrameResized(float /*width*/, float /*height*/)
 {
+	_UpdateOffscreenBitmap();
+}
+
+
+void
+ActivityView::_UpdateOffscreenBitmap()
+{
+	BRect frame = _HistoryFrame();
+	if (fOffscreen != NULL && frame == fOffscreen->Bounds())
+		return;
+
+	delete fOffscreen;
+
+	// create offscreen bitmap
+
+	fOffscreen = new(std::nothrow) BBitmap(frame, B_BITMAP_ACCEPTS_VIEWS,
+		B_RGB32);
+	if (fOffscreen == NULL || fOffscreen->InitCheck() != B_OK) {
+		delete fOffscreen;
+		fOffscreen = NULL;
+		return;
+	}
+
+	BView* view = new BView(frame, NULL, B_FOLLOW_NONE, B_SUBPIXEL_PRECISE);
+	view->SetViewColor(fBackgroundColor);
+	view->SetLowColor(view->ViewColor());
+	fOffscreen->AddChild(view);
 }
 
 
@@ -301,20 +417,29 @@ ActivityView::MouseDown(BPoint where)
 
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
+
+	SystemInfo info;
 	BMenuItem* item;
 
 	for (int32 i = 0; i < DataSource::CountSources(); i++) {
 		const DataSource* source = DataSource::SourceAt(i);
 
+		if (source->MultiCPUOnly() && info.CPUCount() == 1)
+			continue;
+
 		BMessage* message = new BMessage(kMsgToggleDataSource);
 		message->AddInt32("index", i);
 
-		item = new BMenuItem(source->Label(), message);
-		if (FindDataSource(source->Label()))
+		item = new BMenuItem(source->Name(), message);
+		if (FindDataSource(source))
 			item->SetMarked(true);
 
 		menu->AddItem(item);
 	}
+
+	menu->AddSeparatorItem();
+	menu->AddItem(new BMenuItem(fShowLegend ? "Hide Legend" : "Show Legend",
+		new BMessage(kMsgToggleLegend)));
 
 	menu->SetTargetForItems(this);
 
@@ -353,15 +478,20 @@ ActivityView::MessageReceived(BMessage* message)
 			if (baseSource == NULL)
 				break;
 
-			DataSource* source = FindDataSource(baseSource->Label());
+			DataSource* source = FindDataSource(baseSource);
 			if (source == NULL)
-				AddDataSource(baseSource->Copy());
+				AddDataSource(baseSource);
 			else
 				RemoveDataSource(source);
 
 			Invalidate();
 			break;
 		}
+
+		case kMsgToggleLegend:
+			fShowLegend = !fShowLegend;
+			Invalidate();
+			break;
 
 		case B_MOUSE_WHEEL_CHANGED:
 		{
@@ -391,6 +521,56 @@ ActivityView::MessageReceived(BMessage* message)
 }
 
 
+BRect
+ActivityView::_HistoryFrame() const
+{
+	if (!fShowLegend)
+		return Bounds();
+
+	BRect frame = Bounds();
+	BRect legendFrame = _LegendFrame();
+
+	frame.bottom = legendFrame.top - 1;
+
+	return frame;
+}
+
+
+BRect
+ActivityView::_LegendFrame() const
+{
+	BRect frame = Bounds();
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	int32 rows = (fSources.CountItems() + 1) / 2;
+	frame.top = frame.bottom - rows * (4 + ceilf(fontHeight.ascent)
+		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading));
+
+	return frame;
+}
+
+
+BRect
+ActivityView::_LegendFrameAt(BRect frame, int32 index) const
+{
+	int32 column = index & 1;
+	int32 row = index / 2;
+	if (column == 0)
+		frame.right = frame.left + floorf(frame.Width() / 2) - 5;
+	else
+		frame.left = frame.right - floorf(frame.Width() / 2) + 5;
+
+	int32 rows = (fSources.CountItems() + 1) / 2;
+	float height = floorf((frame.Height() - 5) / rows);
+
+	frame.top = frame.top + 5 + row * height;
+	frame.bottom = frame.top + height - 1;
+
+	return frame;
+}
+
+
 float
 ActivityView::_PositionForValue(DataSource* source, DataHistory* values,
 	int64 value)
@@ -408,14 +588,25 @@ ActivityView::_PositionForValue(DataSource* source, DataHistory* values,
 	if (value < min)
 		value = min;
 
-	float height = Bounds().Height();
+	float height = _HistoryFrame().Height();
 	return height - (value - min) * height / (max - min);
 }
 
 
 void
-ActivityView::Draw(BRect /*updateRect*/)
+ActivityView::_DrawHistory()
 {
+	_UpdateOffscreenBitmap();
+
+	BView* view = this;
+	if (fOffscreen != NULL) {
+		fOffscreen->Lock();
+		view = fOffscreen->ChildAt(0);
+	}
+
+	BRect frame = _HistoryFrame();
+	view->FillRect(frame, B_SOLID_LOW);
+
 	uint32 step = 2;
 	uint32 resolution = fDrawResolution;
 	if (fDrawResolution > 1) {
@@ -423,12 +614,19 @@ ActivityView::Draw(BRect /*updateRect*/)
 		resolution--;
 	}
 
-	uint32 width = Bounds().IntegerWidth() - 10;
+	uint32 width = frame.IntegerWidth() - 10;
 	uint32 steps = width / step;
 	bigtime_t timeStep = fRefreshInterval * resolution;
 	bigtime_t now = system_time();
 
-	SetPenSize(2);
+	view->SetPenSize(1);
+
+	view->SetHighColor(tint_color(view->ViewColor(), B_DARKEN_2_TINT));
+	view->StrokeRect(frame);
+	view->StrokeLine(BPoint(frame.left, frame.top + frame.Height() / 2),
+		BPoint(frame.right, frame.top + frame.Height() / 2));
+
+	view->SetPenSize(2);
 
 	for (uint32 i = fSources.CountItems(); i-- > 0;) {
 		DataSource* source = fSources.ItemAt(i);
@@ -436,8 +634,8 @@ ActivityView::Draw(BRect /*updateRect*/)
 		bigtime_t time = now - steps * timeStep;
 			// for now steps pixels per second
 
-		BeginLineArray(steps);
-		SetHighColor(source->Color());
+		view->BeginLineArray(steps);
+		view->SetHighColor(source->Color());
 
 		float lastY = FLT_MIN;
 		uint32 lastX = 0;
@@ -462,17 +660,72 @@ ActivityView::Draw(BRect /*updateRect*/)
 			}
 
 			float y = _PositionForValue(source, values, value);
-			if (lastY != FLT_MIN)
-				AddLine(BPoint(lastX, lastY), BPoint(x, y), source->Color());
+			if (lastY != FLT_MIN) {
+				view->AddLine(BPoint(lastX, lastY), BPoint(x, y),
+					source->Color());
+			}
 
 			lastX = x;
 			lastY = y;
 		}
 
-		EndLineArray();
+		view->EndLineArray();
 	}
 
 	// TODO: add marks when an app started or quit
+	view->Sync();
+	if (fOffscreen != NULL) {
+		fOffscreen->Unlock();
+		DrawBitmap(fOffscreen);
+	}
+}
+
+
+void
+ActivityView::Draw(BRect /*updateRect*/)
+{
+	_DrawHistory();
+
+	if (!fShowLegend)
+		return;
+
+	// draw legend
+
+	BRect legendFrame = _LegendFrame();
+	FillRect(legendFrame, B_SOLID_LOW);
+
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	for (int32 i = 0; i < fSources.CountItems(); i++) {
+		DataSource* source = fSources.ItemAt(i);
+		DataHistory* values = fValues.ItemAt(i);
+		BRect frame = _LegendFrameAt(legendFrame, i);
+
+		// draw color box
+		BRect colorBox = frame.InsetByCopy(2, 2);
+		colorBox.right = colorBox.left + colorBox.Height();
+		SetHighColor(tint_color(source->Color(), B_DARKEN_1_TINT));
+		StrokeRect(colorBox);
+		SetHighColor(source->Color());
+		colorBox.InsetBy(1, 1);
+		FillRect(colorBox);
+
+		// show current value and label
+		float y = frame.top + ceilf(fontHeight.ascent);
+		int64 value = values->ValueAt(values->End());
+		BString text;
+		source->Print(text, value);
+		float width = StringWidth(text.String());
+
+		BString label = source->Label();
+		TruncateString(&label, B_TRUNCATE_MIDDLE,
+			frame.right - colorBox.right - 12 - width);
+
+		SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+		DrawString(label.String(), BPoint(6 + colorBox.right, y));
+		DrawString(text.String(), BPoint(frame.right - width, y));
+	}
 }
 
 

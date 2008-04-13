@@ -11,6 +11,7 @@
 #include <Application.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <GroupLayout.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -19,6 +20,10 @@
 
 #include "ActivityMonitor.h"
 #include "ActivityView.h"
+
+
+const uint32 kMsgAddView = 'advw';
+const uint32 kMsgRemoveView = 'rmvw';
 
 
 ActivityWindow::ActivityWindow()
@@ -32,30 +37,45 @@ ActivityWindow::ActivityWindow()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
-		frame.OffsetTo(B_ORIGIN);
-	} else
-		frame = Bounds();
+	}
+
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	SetLayout(layout);
 
 	// create GUI
 
-	BMenuBar* menuBar = new BMenuBar(Bounds(), "menu");
-	AddChild(menuBar);
+	BMenuBar* menuBar = new BMenuBar("menu");
+	layout->AddView(menuBar);
 
-	frame.top = menuBar->Frame().bottom;
+	fLayout = new BGroupLayout(B_VERTICAL);
+	float inset = ceilf(be_plain_font->Size() * 0.7);
+	fLayout->SetInsets(inset, inset, inset, inset);
+	fLayout->SetSpacing(inset);
 
-	BView* top = new BView(frame, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
+	BView* top = new BView("top", 0, fLayout);
 	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(top);
+	layout->AddView(top);
 
-	fActivityView = new ActivityView(top->Bounds().InsetByCopy(10, 10),
-		"ActivityMonitor", settings, B_FOLLOW_ALL);
-	top->AddChild(fActivityView);
+	BMessage viewState;
+	int32 count = 0;
+	for (int32 i = 0; settings.FindMessage("activity view", i, &viewState)
+			== B_OK; i++) {
+		fLayout->AddView(new ActivityView("ActivityMonitor", &viewState));
+		count++;
+	}
+	if (count == 0)
+		fLayout->AddView(new ActivityView("ActivityMonitor", NULL));
 
 	// add menu
 
 	// "File" menu
 	BMenu* menu = new BMenu("File");
 	BMenuItem* item;
+
+	menu->AddItem(new BMenuItem("Add View", new BMessage(kMsgAddView)));
+	menu->AddItem(fRemoveItem = new BMenuItem("Remove View",
+		new BMessage(kMsgRemoveView)));
+	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new BMenuItem("About ActivityMonitor" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
@@ -65,6 +85,8 @@ ActivityWindow::ActivityWindow()
 	menu->SetTargetForItems(this);
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
+
+	_UpdateRemoveItem();
 }
 
 
@@ -109,10 +131,40 @@ ActivityWindow::_SaveSettings()
 
 	BMessage settings('actm');
 	status = settings.AddRect("window frame", Frame());
+	if (status != B_OK)
+		return status;
+
+	BView* top = GetLayout()->View();
+	int32 count = top->CountChildren();
+	for (int32 i = 0; i < count; i++) {
+		ActivityView* view = dynamic_cast<ActivityView*>(top->ChildAt(i));
+		if (view == NULL)
+			continue;
+
+		BMessage* viewState = new BMessage;
+		status = view->SaveState(*viewState);
+		if (status == B_OK)
+			status = settings.AddMessage("activity view", viewState);
+		if (status != B_OK) {
+			delete viewState;
+			break;
+		}
+	}
+
 	if (status == B_OK)
 		status = settings.Flatten(&file);
 
 	return status;
+}
+
+
+void
+ActivityWindow::_UpdateRemoveItem()
+{
+	BView* view = fLayout->View();
+	int32 count = view->CountChildren();
+
+	fRemoveItem->SetEnabled(count >= 2);
 }
 
 
@@ -139,6 +191,32 @@ ActivityWindow::MessageReceived(BMessage* message)
 		case B_SIMPLE_DATA:
 			_MessageDropped(message);
 			break;
+
+		case kMsgAddView:
+		{
+			BView* view = fLayout->View()->ChildAt(0);
+			fLayout->AddView(new ActivityView("ActivityMonitor", NULL));
+			if (view != NULL)
+				ResizeBy(0, view->Bounds().Height() + fLayout->Spacing());
+			_UpdateRemoveItem();
+			break;
+		}
+
+		case kMsgRemoveView:
+		{
+			BView* view = fLayout->View();
+			int32 count = view->CountChildren();
+			if (count == 1)
+				return;
+
+			BView* last = view->ChildAt(count - 1);
+			fLayout->RemoveView(last);
+			ResizeBy(0, -last->Bounds().Height() - fLayout->Spacing());
+			delete last;
+
+			_UpdateRemoveItem();
+			break;
+		}
 
 		default:
 			BWindow::MessageReceived(message);

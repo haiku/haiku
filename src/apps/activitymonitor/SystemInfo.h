@@ -25,11 +25,20 @@ public:
 			uint32		MaxTeams() const;
 
 			bigtime_t	Time() const { return fTime; }
+			uint32		CPUCount() const { return fSystemInfo.cpu_count; }
 			const system_info& Info() const { return fSystemInfo; }
 
+			uint64		NetworkReceived();
+			uint64		NetworkSent();
+
 private:
+			void		_RetrieveNetwork();
+
 	system_info			fSystemInfo;
 	bigtime_t			fTime;
+	bool				fRetrievedNetwork;
+	uint64				fBytesReceived;
+	uint64				fBytesSent;
 };
 
 #endif	// SYSTEM_INFO_H
