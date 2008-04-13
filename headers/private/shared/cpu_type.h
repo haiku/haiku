@@ -156,6 +156,8 @@ get_cpu_model_string(system_info *info)
 			return "Athlon 64";
 		case B_CPU_AMD_OPTERON:
 			return "Opteron";
+		case B_CPU_AMD_GEODE_LX:
+			return "Geode LX";
 
 		/* Transmeta */
 		case B_CPU_TRANSMETA_CRUSOE:

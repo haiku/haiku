@@ -507,6 +507,8 @@ typedef enum cpu_types {
 	B_CPU_AMD_ATHLON_64_MODEL_14		= 0x110f0e,
 	B_CPU_AMD_ATHLON_64_MODEL_15,
 
+	B_CPU_AMD_GEODE_LX				= 0x11050a,
+
 	/* VIA/Cyrix */
 	B_CPU_CYRIX_x86						= 0x120000,
 	B_CPU_VIA_CYRIX_x86					= 0x120000,
