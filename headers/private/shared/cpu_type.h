@@ -49,13 +49,6 @@ get_cpu_vendor_string(enum cpu_types type)
 				return "VIA";
 			return "IDT";
 		case B_CPU_RISE_x86:
-			// TODO(bga): There is a conflict between new Intel
-			// CPUs that sets extended model bits and the RISE
-			// CPUs. For now we check for it here but there is
-			// probably a better solution.
-			if (type == B_CPU_INTEL_PENTIUM_CORE_2_EXTREME)
-				return "Intel";
-			else 
 				return "Rise";
 		case B_CPU_TRANSMETA_x86:
 			return "Transmeta";
@@ -104,6 +97,7 @@ get_cpu_model_string(system_info *info)
 		case B_CPU_INTEL_PENTIUM_II_MODEL_5:
 			return "Pentium II";
 		case B_CPU_INTEL_CELERON:
+		case B_CPU_INTEL_CELERON_MODEL_22:
 			return "Celeron";
 		case B_CPU_INTEL_PENTIUM_III:
 		case B_CPU_INTEL_PENTIUM_III_MODEL_8:
@@ -117,14 +111,14 @@ get_cpu_model_string(system_info *info)
 			return "Core";
 		case B_CPU_INTEL_PENTIUM_CORE_2:
 			return "Core 2";
+		case B_CPU_INTEL_PENTIUM_CORE_2_EXTREME:
+			return "Core 2 Extreme";
 		case B_CPU_INTEL_PENTIUM_IV:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_1:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_2:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_3:		
 		case B_CPU_INTEL_PENTIUM_IV_MODEL_4:
 			return "Pentium 4";
-		case B_CPU_INTEL_PENTIUM_CORE_2_EXTREME:
-			return "Core 2 Extreme";
 
 		/* AMD */
 		case B_CPU_AMD_K5_MODEL_0:

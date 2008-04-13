@@ -115,9 +115,15 @@ arch_system_info_init(struct kernel_args *args)
 	}
 
 	if (base != B_CPU_x86)
-		model = (cpu->arch.extended_family << 14) +
-		(cpu->arch.extended_model << 10) + (cpu->arch.family << 4) +
-		cpu->arch.model;
+		if (base == B_CPU_INTEL_x86)
+			model = (cpu->arch.extended_family + cpu->arch.family << 8) +
+			(cpu->arch.extended_model << 4) + cpu->arch.model;
+		else
+			model = (cpu->arch.family << 8) +
+			cpu->arch.model;
+			/*  There isn't much useful information yet in the extended
+				family and extended model fields of AMD processors
+				and is probably undefined for others */
 
 	sCpuRevision = (cpu->arch.extended_family << 18)
 					| (cpu->arch.extended_model << 14)
