@@ -19,6 +19,7 @@
 
 #include <AutoDeleter.h>
 
+#include <fs/fd.h>
 #include <vm_address_space.h>
 #include <vm_priv.h>
 #include <vm_page.h>
@@ -1185,6 +1186,43 @@ insert_area(vm_address_space *addressSpace, void **_address,
 }
 
 
+/*!	Deletes all areas in the given address range.
+	The address space must be write-locked.
+	NOTE: At the moment deleting only complete areas is supported.
+*/
+static status_t
+unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size)
+{
+	// TODO: Support deleting partial areas!
+
+	addr_t lastAddress = address + (size - 1);
+
+	// check whether any areas are only partially covered
+	vm_area* area = vm_area_lookup(addressSpace, address);
+	if (area != NULL && area->base < address)
+		return B_UNSUPPORTED;
+
+	area = vm_area_lookup(addressSpace, lastAddress);
+	if (area != NULL && lastAddress - area->base < area->size - 1)
+		return B_UNSUPPORTED;
+
+	// all areas (if any) are fully covered; let's delete them
+	area = addressSpace->areas;
+	while (area != NULL) {
+		vm_area* nextArea = area->address_space_next;
+
+		if (area->id != RESERVED_AREA_ID) {
+			if (area->base >= address && area->base < lastAddress)
+				delete_area(addressSpace, area);
+		}
+
+		area = nextArea;
+	}
+
+	return B_OK;
+}
+
+
 /*! You need to hold the lock of the cache and the write lock of the address
 	space when calling this function.
 	Note, that in case of error your cache will be temporarily unlocked.
@@ -1193,7 +1231,7 @@ static status_t
 map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 	void **_virtualAddress, off_t offset, addr_t size, uint32 addressSpec,
 	int wiring, int protection, int mapping, vm_area **_area,
-	const char *areaName)
+	const char *areaName, bool unmapAddressRange)
 {
 	TRACE(("map_backing_store: aspace %p, cache %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
 		addressSpace, cache, *_virtualAddress, offset, size, addressSpec,
@@ -1252,6 +1290,13 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 		// insert the area, so back out
 		status = B_BAD_TEAM_ID;
 		goto err2;
+	}
+
+	if (addressSpec == B_EXACT_ADDRESS && unmapAddressRange) {
+		status = unmap_address_range(addressSpace, (addr_t)*_virtualAddress,
+			size);
+		if (status != B_OK)
+			goto err2;
 	}
 
 	status = insert_area(addressSpace, _virtualAddress, addressSpec, size, area);
@@ -1379,7 +1424,8 @@ vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec,
 
 area_id
 vm_create_anonymous_area(team_id team, const char *name, void **address,
-	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection)
+	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
+	bool unmapAddressRange)
 {
 	vm_area *area;
 	vm_cache *cache;
@@ -1482,7 +1528,8 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 	mutex_lock(&cache->lock);
 
 	status = map_backing_store(addressSpace, cache, address, 0, size,
-		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name);
+		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name,
+		unmapAddressRange);
 
 	mutex_unlock(&cache->lock);
 
@@ -1696,7 +1743,7 @@ vm_map_physical_memory(team_id team, const char *name, void **_address,
 
 	status_t status = map_backing_store(locker.AddressSpace(), cache, _address,
 		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
-		REGION_NO_PRIVATE_MAP, &area, name);
+		REGION_NO_PRIVATE_MAP, &area, name, false);
 
 	mutex_unlock(&cache->lock);
 
@@ -1777,7 +1824,8 @@ vm_create_null_area(team_id team, const char *name, void **address,
 	mutex_lock(&cache->lock);
 
 	status = map_backing_store(locker.AddressSpace(), cache, address, 0, size,
-		addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name);
+		addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name,
+		false);
 
 	mutex_unlock(&cache->lock);
 
@@ -1821,18 +1869,16 @@ err1:
 }
 
 
-/*!	Will map the file at the path specified by \a name to an area in memory.
-	The file will be mirrored beginning at the specified \a offset. The \a offset
-	and \a size arguments have to be page aligned.
+/*!	Will map the file specified by \a fd to an area in memory.
+	The file will be mirrored beginning at the specified \a offset. The
+	\a offset and \a size arguments have to be page aligned.
 */
 static area_id
 _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec,
-	size_t size, uint32 protection, uint32 mapping, const char *path,
-	off_t offset, bool kernel)
+	size_t size, uint32 protection, uint32 mapping, int fd, off_t offset,
+	bool kernel)
 {
-	// ToDo: maybe attach to an FD, not a path (or both, like VFS calls)
-	// ToDo: check file access permissions (would be already done if the above were true)
-	// ToDo: for binary files, we want to make sure that they get the
+	// TODO: for binary files, we want to make sure that they get the
 	//	copy of a file at a given time, ie. later changes should not
 	//	make it into the mapped copy -- this will need quite some changes
 	//	to be done in a nice way
@@ -1842,37 +1888,55 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	offset = ROUNDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
 
+	if (mapping == REGION_NO_PRIVATE_MAP)
+		protection |= B_SHARED_AREA;
+
+	if (fd < 0) {
+		return vm_create_anonymous_area(team, name, _address, addressSpec, size,
+			B_NO_LOCK, protection, addressSpec == B_EXACT_ADDRESS);
+	}
+
+	// get the open flags of the FD
+	file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
+	if (descriptor == NULL)
+		return EBADF;
+	int32 openMode = descriptor->open_mode;
+	put_fd(descriptor);
+
+	// The FD must open for reading at any rate. For shared mapping with write
+	// access, additionally the FD must be open for writing.
+	if ((openMode & O_ACCMODE) == O_WRONLY
+		|| mapping == REGION_NO_PRIVATE_MAP
+			&& (protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0
+			&& (openMode & O_ACCMODE) == O_RDONLY) {
+		return EACCES;
+	}
+
 	// get the vnode for the object, this also grabs a ref to it
-	struct vnode *vnode;
-	status_t status = vfs_get_vnode_from_path(path, kernel, &vnode);
+	struct vnode *vnode = NULL;
+	status_t status = vfs_get_vnode_from_fd(fd, kernel, &vnode);
 	if (status < B_OK)
 		return status;
+	CObjectDeleter<struct vnode> vnodePutter(vnode, vfs_put_vnode);
 
 	AddressSpaceWriteLocker locker(team);
-	if (!locker.IsLocked()) {
-		vfs_put_vnode(vnode);
+	if (!locker.IsLocked())
 		return B_BAD_TEAM_ID;
-	}
 
-	// ToDo: this only works for file systems that use the file cache
+	// TODO: this only works for file systems that use the file cache
 	vm_cache *cache;
 	status = vfs_get_vnode_cache(vnode, &cache, false);
-	if (status < B_OK) {
-		vfs_put_vnode(vnode);
+	if (status < B_OK)
 		return status;
-	}
 
 	mutex_lock(&cache->lock);
 
 	vm_area *area;
 	status = map_backing_store(locker.AddressSpace(), cache, _address,
-		offset, size, addressSpec, 0, protection, mapping, &area, name);
+		offset, size, addressSpec, 0, protection, mapping, &area, name,
+		addressSpec == B_EXACT_ADDRESS);
 
 	mutex_unlock(&cache->lock);
-
-	vfs_put_vnode(vnode);
-		// we don't need this vnode anymore - if the above call was
-		// successful, the store already has a ref to it
 
 	if (status < B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
@@ -1888,14 +1952,13 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 
 area_id
 vm_map_file(team_id aid, const char *name, void **address, uint32 addressSpec,
-	addr_t size, uint32 protection, uint32 mapping, const char *path,
-	off_t offset)
+	addr_t size, uint32 protection, uint32 mapping, int fd, off_t offset)
 {
 	if (!arch_vm_supports_protection(protection))
 		return B_NOT_SUPPORTED;
 
 	return _vm_map_file(aid, name, address, addressSpec, size, protection,
-		mapping, path, offset, true);
+		mapping, fd, offset, true);
 }
 
 
@@ -1973,7 +2036,7 @@ vm_clone_area(team_id team, const char *name, void **address,
 	else {
 		status = map_backing_store(targetAddressSpace, cache, address,
 			sourceArea->cache_offset, sourceArea->size, addressSpec,
-			sourceArea->wiring, protection, mapping, &newArea, name);
+			sourceArea->wiring, protection, mapping, &newArea, name, false);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
 		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
@@ -2227,22 +2290,33 @@ vm_copy_area(team_id team, const char *name, void **_address,
 		*_address = (void *)source->base;
 	}
 
-	// First, create a cache on top of the source area
+	bool sharedArea = (source->protection & B_SHARED_AREA) != 0;
+
+	// First, create a cache on top of the source area, respectively use the
+	// existing one, if this is a shared area.
 
 	vm_area *target;
 	status = map_backing_store(targetAddressSpace, cache, _address,
 		source->cache_offset, source->size, addressSpec, source->wiring,
-		protection, REGION_PRIVATE_MAP, &target, name);
-
+		protection, sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
+		&target, name, false);
 	if (status < B_OK)
 		return status;
 
+	if (sharedArea) {
+		// The new area uses the old area's cache, but map_backing_store()
+		// hasn't acquired a ref. So we have to do that now.
+		vm_cache_acquire_ref(cache);
+	}
+
 	// If the source area is writable, we need to move it one layer up as well
 
-	if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0) {
-		// ToDo: do something more useful if this fails!
-		if (vm_copy_on_write_area(cache) < B_OK)
-			panic("vm_copy_on_write_area() failed!\n");
+	if (!sharedArea) {
+		if ((source->protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0) {
+			// TODO: do something more useful if this fails!
+			if (vm_copy_on_write_area(cache) < B_OK)
+				panic("vm_copy_on_write_area() failed!\n");
+		}
 	}
 
 	// we return the ID of the newly created area
@@ -5075,7 +5149,7 @@ create_area_etc(struct team *team, const char *name, void **address, uint32 addr
 	fix_protection(&protection);
 
 	return vm_create_anonymous_area(team->id, (char *)name, address,
-		addressSpec, size, lock, protection);
+		addressSpec, size, lock, protection, false);
 }
 
 
@@ -5086,7 +5160,7 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 	fix_protection(&protection);
 
 	return vm_create_anonymous_area(vm_kernel_address_space_id(), (char *)name, _address,
-		addressSpec, size, lock, protection);
+		addressSpec, size, lock, protection, false);
 }
 
 
@@ -5319,7 +5393,7 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	fix_protection(&protection);
 
 	area_id area = vm_create_anonymous_area(vm_current_user_address_space_id(),
-		(char *)name, &address, addressSpec, size, lock, protection);
+		(char *)name, &address, addressSpec, size, lock, protection, false);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
 		delete_area(area);
@@ -5344,26 +5418,33 @@ _user_delete_area(area_id area)
 // ToDo: create a BeOS style call for this!
 
 area_id
-_user_vm_map_file(const char *userName, void **userAddress, int addressSpec,
-	addr_t size, int protection, int mapping, const char *userPath, off_t offset)
+_user_map_file(const char *userName, void **userAddress, int addressSpec,
+	addr_t size, int protection, int mapping, int fd, off_t offset)
 {
 	char name[B_OS_NAME_LENGTH];
-	char path[B_PATH_NAME_LENGTH];
 	void *address;
 	area_id area;
 
 	if (!IS_USER_ADDRESS(userName) || !IS_USER_ADDRESS(userAddress)
-		|| !IS_USER_ADDRESS(userPath)
 		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK
-		|| user_strlcpy(path, userPath, B_PATH_NAME_LENGTH) < B_OK
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
+	if (addressSpec == B_EXACT_ADDRESS) {
+		if ((addr_t)address + size < (addr_t)address)
+			return B_BAD_VALUE;
+		if (!IS_USER_ADDRESS(address)
+				|| !IS_USER_ADDRESS((addr_t)address + size)) {
+			return B_BAD_ADDRESS;
+		}
+	}
+
 	// userland created areas can always be accessed by the kernel
-	protection |= B_KERNEL_READ_AREA | (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
+	protection |= B_KERNEL_READ_AREA
+		| (protection & B_WRITE_AREA ? B_KERNEL_WRITE_AREA : 0);
 
 	area = _vm_map_file(vm_current_user_address_space_id(), name, &address,
-		addressSpec, size, protection, mapping, path, offset, false);
+		addressSpec, size, protection, mapping, fd, offset, false);
 	if (area < B_OK)
 		return area;
 
@@ -5373,3 +5454,25 @@ _user_vm_map_file(const char *userName, void **userAddress, int addressSpec,
 	return area;
 }
 
+
+status_t
+_user_unmap_memory(void *_address, addr_t size)
+{
+	addr_t address = (addr_t)_address;
+
+	// check params
+	if (size == 0 || (addr_t)address + size < (addr_t)address)
+		return B_BAD_VALUE;
+
+	if (!IS_USER_ADDRESS(address) || !IS_USER_ADDRESS((addr_t)address + size))
+		return B_BAD_ADDRESS;
+
+	// write lock the address space
+	AddressSpaceWriteLocker locker;
+	status_t status = locker.SetTo(team_get_current_team_id());
+	if (status != B_OK)
+		return status;
+
+	// unmap
+	return unmap_address_range(locker.AddressSpace(), address, size);
+}

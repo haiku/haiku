@@ -45,14 +45,17 @@ struct vnode;
 	| B_KERNEL_STACK_AREA)
 
 #define B_OVERCOMMITTING_AREA	0x1000
-	// ToDo: this is not really a protection flag, but since the "protection"
+#define B_SHARED_AREA			0x2000
+	// TODO: These aren't really a protection flags, but since the "protection"
 	//	field is the only flag field, we currently use it for this.
 	//	A cleaner approach would be appreciated - maybe just an official generic
 	//	flags region in the protection field.
 
+
 #define B_USER_AREA_FLAGS		(B_USER_PROTECTION)
 #define B_KERNEL_AREA_FLAGS \
-	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA)
+	(B_KERNEL_PROTECTION | B_USER_CLONEABLE_AREA | B_OVERCOMMITTING_AREA \
+		| B_SHARED_AREA)
 
 // flags for vm_get_physical_page()
 enum {
@@ -106,12 +109,13 @@ status_t vm_unreserve_address_range(team_id team, void *address, addr_t size);
 status_t vm_reserve_address_range(team_id team, void **_address,
 			uint32 addressSpec, addr_t size, uint32 flags);
 area_id vm_create_anonymous_area(team_id team, const char *name, void **address,
-			uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection);
+			uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
+			bool unmapAddressRange);
 area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr);
 area_id vm_map_file(team_id aid, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, uint32 mapping,
-			const char *path, off_t offset);
+			int fd, off_t offset);
 struct vm_cache *vm_area_get_locked_cache(struct vm_area *area);
 void vm_area_put_locked_cache(struct vm_cache *cache);
 area_id vm_create_null_area(team_id team, const char *name, void **address,
@@ -144,8 +148,9 @@ off_t vm_available_memory(void);
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
 status_t _user_delete_area(area_id area);
-area_id _user_vm_map_file(const char *uname, void **uaddress, int addr_type,
-			addr_t size, int lock, int mapping, const char *upath, off_t offset);
+area_id _user_map_file(const char *uname, void **uaddress, int addressSpec,
+			addr_t size, int protection, int mapping, int fd, off_t offset);
+status_t _user_unmap_memory(void *address, addr_t size);
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);
 status_t _user_get_area_info(area_id area, area_info *info);

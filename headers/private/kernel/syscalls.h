@@ -296,8 +296,10 @@ extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addre
 extern status_t		_kern_reserve_heap_address_range(addr_t* _address, uint32 addressSpec,
 						addr_t size);
 
-area_id sys_vm_map_file(const char *name, void **address, int addr_type,
-			addr_t size, int lock, int mapping, const char *path, off_t offset);
+extern area_id		_kern_map_file(const char *name, void **address,
+						int addressSpec, addr_t size, int protection,
+						int mapping, int fd, off_t offset);
+extern status_t		_kern_unmap_memory(void *address, addr_t size);
 
 /* kernel port functions */
 extern port_id		_kern_create_port(int32 queue_length, const char *name);

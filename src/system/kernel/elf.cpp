@@ -1406,7 +1406,7 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 				B_EXACT_ADDRESS,
 				fileUpperBound,
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
-				path, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file data: %s!\n", strerror(id));
 				status = B_NOT_AN_EXECUTABLE;
@@ -1453,7 +1453,7 @@ elf_load_user_image(const char *path, struct team *team, int flags, addr_t *entr
 				B_EXACT_ADDRESS,
 				ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
-				path, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
+				fd, ROUNDOWN(programHeaders[i].p_offset, B_PAGE_SIZE));
 			if (id < B_OK) {
 				dprintf("error mapping file text: %s!\n", strerror(id));
 				status = B_NOT_AN_EXECUTABLE;

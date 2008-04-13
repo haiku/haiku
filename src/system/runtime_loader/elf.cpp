@@ -794,9 +794,10 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
 			image->regions[i].vmstart = loadAddress;
 		} else {
-			image->regions[i].id = sys_vm_map_file(regionName, (void **)&loadAddress,
-				addressSpecifier, image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
-				REGION_PRIVATE_MAP, path, PAGE_BASE(image->regions[i].fdstart));
+			image->regions[i].id = _kern_map_file(regionName,
+				(void **)&loadAddress, addressSpecifier,
+				image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
+				REGION_PRIVATE_MAP, fd, PAGE_BASE(image->regions[i].fdstart));
 
 			if (image->regions[i].id < 0) {
 				status = image->regions[i].id;

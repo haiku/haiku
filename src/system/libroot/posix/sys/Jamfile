@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix sys ;
 
+UsePrivateHeaders shared ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 MergeObject posix_sys.o :
@@ -11,6 +12,7 @@ MergeObject posix_sys.o :
 	itimer.c
 	mkdir.c
 	mkfifo.c
+	mman.cpp
 	rlimit.c
  	select.c
 	stat.c
