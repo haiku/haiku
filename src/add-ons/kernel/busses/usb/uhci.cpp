@@ -292,14 +292,19 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		fStack(stack),
 		fFrameArea(-1),
 		fFrameList(NULL),
+		fFrameBandwidth(NULL),
+		fFirstIsochronousDescriptor(NULL),
+		fLastIsochronousDescriptor(NULL),
 		fQueueCount(0),
 		fQueues(NULL),
 		fFirstTransfer(NULL),
 		fLastTransfer(NULL),
+		fFinishTransfersSem(-1),
 		fFinishThread(-1),
 		fStopFinishThread(false),
 		fFirstIsochronousTransfer(NULL),
 		fLastIsochronousTransfer(NULL),
+		fFinishIsochronousTransfersSem(-1),
 		fFinishIsochronousThread(-1),
 		fStopFinishIsochronousThread(false),
 		fRootHub(NULL),
@@ -561,16 +566,17 @@ status_t
 UHCI::SubmitTransfer(Transfer *transfer)
 {
 	// Short circuit the root hub
-	if (transfer->TransferPipe()->DeviceAddress() == fRootHubAddress)
+	Pipe *pipe = transfer->TransferPipe();
+	if (pipe->DeviceAddress() == fRootHubAddress)
 		return fRootHub->ProcessTransfer(this, transfer);
 
 	TRACE(("usb_uhci: submit transfer called for device %d\n",
-		transfer->TransferPipe()->DeviceAddress()));
-	if (transfer->TransferPipe()->Type() & USB_OBJECT_CONTROL_PIPE)
+		pipe->DeviceAddress()));
+	if (pipe->Type() & USB_OBJECT_CONTROL_PIPE)
 		return SubmitRequest(transfer);
 
 	// Process isochronous transfers
-	if (transfer->TransferPipe()->Type() & USB_OBJECT_ISO_PIPE)
+	if (pipe->Type() & USB_OBJECT_ISO_PIPE)
 		return SubmitIsochronous(transfer);
 
 	uhci_td *firstDescriptor = NULL;
@@ -581,12 +587,10 @@ UHCI::SubmitTransfer(Transfer *transfer)
 		return result;
 
 	Queue *queue = NULL;
-	Pipe *pipe = transfer->TransferPipe();
-	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE) {
+	if (pipe->Type() & USB_OBJECT_INTERRUPT_PIPE)
 		queue = fQueues[UHCI_INTERRUPT_QUEUE];
-	} else {
+	else
 		queue = fQueues[UHCI_BULK_QUEUE];
-	}
 
 	bool directionIn = (pipe->Direction() == Pipe::In);
 	result = AddPendingTransfer(transfer, queue, transferQueue,
@@ -727,11 +731,10 @@ UHCI::SubmitRequest(Transfer *transfer)
 	}
 
 	Queue *queue = NULL;
-	if (pipe->Speed() == USB_SPEED_LOWSPEED) {
+	if (pipe->Speed() == USB_SPEED_LOWSPEED)
 		queue = fQueues[UHCI_LOW_SPEED_CONTROL_QUEUE];
-	} else {
+	else
 		queue = fQueues[UHCI_FULL_SPEED_CONTROL_QUEUE];
-	}
 
 	uhci_qh *transferQueue = CreateTransferQueue(setupDescriptor);
 	status_t result = AddPendingTransfer(transfer, queue, transferQueue,
@@ -844,8 +847,7 @@ UHCI::SubmitIsochronous(Transfer *transfer)
 	packetSize /= isochronousData->packet_count;
 	uint16 currentFrame;
 
-	if (packetSize > pipe->MaxPacketSize())
-	{
+	if (packetSize > pipe->MaxPacketSize()) {
 		TRACE_ERROR(("usb_uhci: isochronous packetSize is bigger"
 			" than pipe MaxPacketSize\n"));
 		return B_BAD_VALUE;
