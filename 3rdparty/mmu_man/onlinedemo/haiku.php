@@ -25,8 +25,10 @@ define("VNCCLASS", "VncViewer.class");
 define("MAX_QEMUS", 8);
 
 // size of the java applet, must match the default resolution of the image.
-define("APPLET_WIDTH", "800");
-define("APPLET_HEIGHT", "600");
+//define("APPLET_WIDTH", "800");
+//define("APPLET_HEIGHT", "600");
+define("APPLET_WIDTH", "1024");
+define("APPLET_HEIGHT", "768");
 // vnc protocol base port.
 define("VNCPORTBASE", 5900);
 
