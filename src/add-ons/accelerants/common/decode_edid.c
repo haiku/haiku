@@ -155,7 +155,7 @@ copy_str(char *dest, const uint8 *src, size_t len)
 	uint32 i;
 
 	// copy until 0xa
-	for (i = 0; i < len; ++i) {
+	for (i = 0; i < len; i++) {
 		if (*src == 0xa)
 			break;
 
@@ -163,12 +163,14 @@ copy_str(char *dest, const uint8 *src, size_t len)
 	}
 
 	// remove trailing spaces
-	for (i = i - 1; i >= 0; --i) {
-		if (*dest-- != ' ')
+	while (i-- > 0) {
+		if (*(dest - 1) != ' ')
 			break;
+
+		dest--;
 	}
 
-	*++dest = 0;
+	*dest = '\0';
 }
 
 

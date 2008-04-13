@@ -3,9 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*!
-	DDC communication
-*/
+/*!	DDC communication */
 
 
 #include "ddc_int.h"
@@ -18,38 +16,44 @@
 #include <stdlib.h>
 
 
-#define READ_RETRIES 4
-	// number of retries to read ddc data
+#define READ_RETRIES 4		// number of retries to read ddc data
 
-#if 0
-/*!	Verify checksum of ddc data
-	(some monitors have a broken checksum - bad luck for them)
-*/
+
+#define TRACE_DDC
+#ifdef TRACE_DDC
+extern void _sPrintf(const char* format, ...);
+#	define TRACE(x...) _sPrintf("DDC: " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
+
+//! Verify checksum of DDC data.
 static status_t
 verify_checksum(const uint8 *data, size_t len)
 {
 	uint32 index;
 	uint8 sum = 0;
-	uint8 all_or = 0;
-	
+	uint8 allOr = 0;
+
 	for (index = 0; index < len; ++index, ++data) {
 		sum += *data;
-		all_or |= *data;
+		allOr |= *data;
 	}
-	
-	if (all_or == 0) {
-		SHOW_ERROR0(2, "DDC information contains zeros only");
+
+	if (allOr == 0) {
+		TRACE("verify_checksum() DDC information contains zeros only\n");
 		return B_ERROR;
 	}
-	
+
 	if (sum != 0) {
-		SHOW_ERROR0(2, "Checksum error of DDC information");
+		TRACE("verify_checksum() Checksum error in DDC information\n");
 		return B_IO_ERROR;
 	}
-		
+
 	return B_OK;
 }
-#endif
 
 
 //!	Read ddc2 data from monitor
@@ -66,11 +70,17 @@ ddc2_read(const i2c_bus *bus, int start, uint8 *buffer, size_t length)
 	for (i = 0; i < READ_RETRIES; ++i) {
 		status = i2c_send_receive(bus, 0xa0, writeBuffer,
 			start < 0x100 ? 1 : 2, buffer, length);
-		// don't verify checksum - it's often broken
-		if (status == B_OK /*&& verify_checksum( buffer, len ) == B_OK*/)
-			break;
 
-		status = B_ERROR;
+		if (status != B_OK)
+			TRACE("ddc2_read(): DDC information read failure\n");
+
+		if (status == B_OK) {
+			status = verify_checksum(buffer, length);
+			if (status == B_OK)
+				break;
+
+			dprintf("DDC checksum incorrect!\n");
+		}
 	}
 
 	return status;
@@ -121,6 +131,9 @@ ddc2_read_vdif(const i2c_bus *bus, int start,
 #endif
 
 
+//	#pragma mark -
+
+
 void
 ddc2_init_timing(i2c_bus *bus)
 {
@@ -144,6 +157,11 @@ ddc2_read_edid1(const i2c_bus *bus, edid1_info *edid,
 	status_t status = ddc2_read(bus, 0, (uint8 *)&raw, sizeof(raw));
 	if (status != B_OK)
 		return status;
+
+	if (raw.version.version != 1 || raw.version.revision > 4) {
+		TRACE("ddc2_read_edid1() EDID version or revision out of range\n");
+		return B_ERROR;
+	}
 
 	edid_decode(edid, &raw);
 

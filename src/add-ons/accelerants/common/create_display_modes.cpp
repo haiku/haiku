@@ -112,10 +112,8 @@ using namespace BPrivate;
 static float
 get_refresh_rate(const display_mode& mode)
 {
-	// we have to be catious as refresh rate cannot be controlled directly,
-	// so it suffers under rounding errors and hardware restrictions
-	return rint(10 * float(mode.timing.pixel_clock * 1000) / 
-		float(mode.timing.h_total * mode.timing.v_total)) / 10.0;
+	return float(mode.timing.pixel_clock * 1000) / 
+		float(mode.timing.h_total * mode.timing.v_total);
 }
 
 
@@ -140,8 +138,7 @@ compare_mode(const void* _mode1, const void* _mode2)
 	if (mode1->space != mode2->space)
 		return mode1->space - mode2->space;
 
-	return (int)(10 * get_refresh_rate(*mode1)
-		-  10 * get_refresh_rate(*mode2));
+	return (int)(100 * (get_refresh_rate(*mode1) - get_refresh_rate(*mode2)));
 }
 
 
@@ -220,9 +217,13 @@ ModeList::AddModes(edid1_info* info)
 		if (info->detailed_monitor[i].monitor_desc_type != EDID1_IS_DETAILED_TIMING)
 			continue;
 
-		// TODO: handle sync and flags correctly!
+		// TODO: handle flags correctly!
 		const edid1_detailed_timing& timing = info->detailed_monitor[i].data.detailed_timing;
 		display_mode mode;
+		
+		if (timing.pixel_clock <= 0 || timing.sync != 3)
+			continue;
+			
 		mode.timing.pixel_clock = timing.pixel_clock * 10;
 		mode.timing.h_display = timing.h_active;
 		mode.timing.h_sync_start = timing.h_active + timing.h_sync_off;
@@ -232,7 +233,13 @@ ModeList::AddModes(edid1_info* info)
 		mode.timing.v_sync_start = timing.v_active + timing.v_sync_off;
 		mode.timing.v_sync_end = mode.timing.v_sync_start + timing.v_sync_width;
 		mode.timing.v_total = timing.v_active + timing.v_blank;
-		mode.timing.flags = POSITIVE_SYNC;
+		mode.timing.flags = 0;
+		if (timing.sync == 3) {
+			if (timing.misc & 1)
+				mode.timing.flags |= B_POSITIVE_HSYNC;
+			if (timing.misc & 2)
+				mode.timing.flags |= B_POSITIVE_VSYNC;
+		}
 		if (timing.interlaced)
 			mode.timing.flags |= B_TIMING_INTERLACED;
 		mode.space = B_RGB32;
@@ -241,6 +248,8 @@ ModeList::AddModes(edid1_info* info)
 		mode.h_display_start = 0;
 		mode.v_display_start = 0;
 		mode.flags = MODE_FLAGS;
+		
+		_AddMode(&mode);
 	}
 	
 	// TODO: add other modes from the base list that satisfy the display's
@@ -315,10 +324,15 @@ ModeList::_AddBaseMode(uint16 width, uint16 height, uint32 refresh)
 	for (uint32 i = 0; i < kNumBaseModes; i++) {
 		const display_mode& mode = kBaseModeList[i];
 
+		// Add mode if width and height match, and the computed refresh rate of
+		// the mode is within 1.2 percent of the refresh rate specified by the
+		// caller.  Note that refresh rates computed from mode parameters is
+		// not exact;  thus, the tolerance of 1.2% was obtained by testing the
+		// various established modes that can be selected by the EDID info.
+		
 		if (mode.timing.h_display == width && mode.timing.v_display == height
-			&& get_refresh_rate(mode) == refresh) {
+			&& fabs(get_refresh_rate(mode) - refresh) < refresh * 0.012) {
 			_AddMode(&mode);
-			return;
 		}
 	}
 }
