@@ -6,9 +6,10 @@
 #define _AUTO_DELETER_H
 
 /*!	Scope-based automatic deletion of objects/arrays.
-	ObjectDeleter - deletes an object
-	ArrayDeleter  - deletes an array
-	MemoryDeleter - free()s malloc()ed memory
+	ObjectDeleter  - deletes an object
+	ArrayDeleter   - deletes an array
+	MemoryDeleter  - free()s malloc()ed memory
+	CObjectDeleter - calls an arbitrary specified destructor function
 */
 
 #include <stdlib.h>
@@ -65,7 +66,7 @@ public:
 		return object;
 	}
 
-private:
+protected:
 	C			*fObject;
 	DeleteFunc	fDelete;
 };
@@ -125,10 +126,52 @@ struct MemoryDeleter : AutoDeleter<void, MemoryDelete >
 	MemoryDeleter(void *memory) : AutoDeleter<void, MemoryDelete >(memory) {}
 };
 
+
+// CObjectDeleter
+
+template<typename Type, typename DestructorReturnType>
+struct CObjectDelete
+{
+	inline void operator()(Type *object)
+	{
+		if (fDestructor != NULL)
+			fDestructor(object);
+	}
+
+	template<typename Destructor>
+	inline void operator=(Destructor destructor)
+	{
+		fDestructor = /*(void (*)(Type*))*/destructor;
+	}
+
+private:
+	DestructorReturnType (*fDestructor)(Type*);
+};
+
+template<typename Type, typename DestructorReturnType = void>
+struct CObjectDeleter
+	: AutoDeleter<Type, CObjectDelete<Type, DestructorReturnType> >
+{
+	typedef AutoDeleter<Type, CObjectDelete<Type, DestructorReturnType> > Base;
+
+	template<typename Destructor>
+	CObjectDeleter(Destructor destructor) : Base()
+	{
+		Base::fDelete = destructor;
+	}
+
+	template<typename Destructor>
+	CObjectDeleter(Type *object, Destructor destructor) : Base(object)
+	{
+		Base::fDelete = destructor;
+	}
+};
+
 }	// namespace BPrivate
 
 using BPrivate::ObjectDeleter;
 using BPrivate::ArrayDeleter;
 using BPrivate::MemoryDeleter;
+using BPrivate::CObjectDeleter;
 
 #endif	// _AUTO_DELETER_H
