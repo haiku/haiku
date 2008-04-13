@@ -1,11 +1,11 @@
 /*
- * Copyright 2004-2007 Haiku Inc. All rights reserved.
+ * Copyright 2004-2008 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * Author:
+ * Authors:
  *		Andre Alves Garzia, andre@andregarzia.com
- * With code from:
- *		Axel Dorfler
+ *		Stephan Assmuß
+ *		Axel Dörfler
  *		Hugo Santos
  */
 
@@ -79,12 +79,119 @@ SetupTextControl(BTextControl *control)
 }
 
 
+//	#pragma mark -
+
+
+EthernetSettingsView::EthernetSettingsView()
+	: BView("EthernetSettingsView", 0, NULL),
+	fCurrentSettings(NULL)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	_GatherInterfaces();
+
+	// build the GUI
+	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL);
+	SetLayout(rootLayout);
+
+	BGridView* controlsGroup = new BGridView();
+	BGridLayout* layout = controlsGroup->GridLayout();
+
+	// insets
+	float inset = ceilf(be_plain_font->Size() * 0.7);
+	rootLayout->SetInsets(inset, inset, inset, inset);
+	rootLayout->SetSpacing(inset);
+	layout->SetSpacing(inset, inset);
+
+	BPopUpMenu* deviceMenu = new BPopUpMenu("devices");
+	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
+		BString& name = *fInterfaces.ItemAt(i);
+		BString label = name;
+		BMessage* info = new BMessage(kMsgInfo);
+		info->AddString("interface", name.String());
+		BMenuItem* item = new BMenuItem(label.String(), info);
+		deviceMenu->AddItem(item);
+	}
+
+	BPopUpMenu* modeMenu = new  BPopUpMenu("modes");
+	modeMenu->AddItem(new BMenuItem("Static", new BMessage(kMsgMode)));
+	modeMenu->AddItem(new BMenuItem("DHCP", new BMessage(kMsgMode)));
+	//modeMenu->AddSeparatorItem();
+	//BMenuItem* offItem = new BMenuItem("Disabled", NULL);
+	//modeMenu->AddItem(offItem);
+
+	fDeviceMenuField = new BMenuField("Adapter:", deviceMenu);
+	layout->AddItem(fDeviceMenuField->CreateLabelLayoutItem(), 0, 0);
+	layout->AddItem(fDeviceMenuField->CreateMenuBarLayoutItem(), 1, 0);
+
+	fTypeMenuField = new BMenuField("Mode:", modeMenu);
+	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 1);
+	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
+
+	fIPTextControl = new BTextControl("IP Address:", "", NULL);
+	SetupTextControl(fIPTextControl);
+
+	BLayoutItem* layoutItem = fIPTextControl->CreateTextViewLayoutItem();
+	layoutItem->SetExplicitMinSize(BSize(
+		fIPTextControl->StringWidth("XXX.XXX.XXX.XXX") + inset,
+		B_SIZE_UNSET));
+
+	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 2);
+	layout->AddItem(layoutItem, 1, 2);
+
+	fNetMaskTextControl = new BTextControl("Netmask:", "", NULL);
+	SetupTextControl(fNetMaskTextControl);
+	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 3);
+	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 3);
+
+	fGatewayTextControl = new BTextControl("Gateway:", "", NULL);
+	SetupTextControl(fGatewayTextControl);
+	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 4);
+	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 4);
+
+	// TODO: Replace the DNS text controls by a BListView with add/remove
+	// functionality and so on...
+	fPrimaryDNSTextControl = new BTextControl("DNS #1:", "", NULL);
+	SetupTextControl(fPrimaryDNSTextControl);
+	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 5);
+	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 5);
+
+	fSecondaryDNSTextControl = new BTextControl("DNS #2:", "", NULL);
+	SetupTextControl(fSecondaryDNSTextControl);
+	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
+	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
+
+	// button group (TODO: move to window, but take care of
+	// enabling/disabling)
+	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL);
+
+	fRevertButton = new BButton("Revert", new BMessage(kMsgRevert));
+	fRevertButton->SetEnabled(false);
+	buttonGroup->GroupLayout()->AddView(fRevertButton);
+
+	buttonGroup->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
+
+	fApplyButton = new BButton("Apply", new BMessage(kMsgApply));
+	buttonGroup->GroupLayout()->AddView(fApplyButton);
+
+	rootLayout->AddView(controlsGroup);
+	rootLayout->AddView(buttonGroup);
+}
+
+
+EthernetSettingsView::~EthernetSettingsView()
+{
+	close(fSocket);
+}
+
+
 bool
 EthernetSettingsView::_PrepareRequest(struct ifreq& request, const char* name)
 {
-	// This function is used for talking direct to the stack. 
+	// This function is used for talking direct to the stack.
 	// It's used by _ShowConfiguration.
-	
+
 	if (strlen(name) > IF_NAMESIZE)
 		return false;
 
@@ -144,9 +251,9 @@ EthernetSettingsView::AttachedToWindow()
 	fGatewayTextControl->SetTarget(this);
 	fPrimaryDNSTextControl->SetTarget(this);
 	fSecondaryDNSTextControl->SetTarget(this);
-	fDeviceMenuField->Menu()->SetTargetForItems(this); 
-	fTypeMenuField->Menu()->SetTargetForItems(this); 
-	
+	fDeviceMenuField->Menu()->SetTargetForItems(this);
+	fTypeMenuField->Menu()->SetTargetForItems(this);
+
 	// display settigs of first adapter on startup
 	_ShowConfiguration(fSettings.ItemAt(0));
 }
@@ -157,110 +264,6 @@ EthernetSettingsView::DetachedFromWindow()
 {
 }
 
-
-EthernetSettingsView::EthernetSettingsView()
-	: BView("EthernetSettingsView", 0, NULL)
-	, fInterfaces()
-	, fSettings()
-	, fCurrentSettings(NULL)
-{
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
-	_GatherInterfaces();
-
-	// build the GUI	
-	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL);
-	SetLayout(rootLayout);
-
-	BGridView* controlsGroup = new BGridView();
-	BGridLayout* layout = controlsGroup->GridLayout();
-
-	// insets
-	float inset = ceilf(be_plain_font->Size() * 0.7);
-	rootLayout->SetInsets(inset, inset, inset, inset);
-	rootLayout->SetSpacing(inset);
-	layout->SetSpacing(inset, inset);
-
-	BPopUpMenu* deviceMenu = new BPopUpMenu("devices");
-	for (int32 i = 0; i < fInterfaces.CountItems(); i++) {
-		BString& name = *fInterfaces.ItemAt(i);
-		BString label = name;
-		BMessage* info = new BMessage(kMsgInfo);
-		info->AddString("interface", name.String());
-		BMenuItem* item = new BMenuItem(label.String(), info);
-		deviceMenu->AddItem(item);
-	}
-
-	BPopUpMenu* modeMenu = new  BPopUpMenu("modes");
-	modeMenu->AddItem(new BMenuItem("Static", new BMessage(kMsgMode)));
-	modeMenu->AddItem(new BMenuItem("DHCP", new BMessage(kMsgMode)));
-	//modeMenu->AddSeparatorItem();
-	//BMenuItem* offItem = new BMenuItem("Disabled", NULL);
-	//modeMenu->AddItem(offItem);
-	
-	fDeviceMenuField = new BMenuField("Adapter:", deviceMenu);
-	layout->AddItem(fDeviceMenuField->CreateLabelLayoutItem(), 0, 0);
-	layout->AddItem(fDeviceMenuField->CreateMenuBarLayoutItem(), 1, 0);
-	
-	fTypeMenuField = new BMenuField("Mode:", modeMenu);
-	layout->AddItem(fTypeMenuField->CreateLabelLayoutItem(), 0, 1);
-	layout->AddItem(fTypeMenuField->CreateMenuBarLayoutItem(), 1, 1);
-
-	fIPTextControl = new BTextControl("IP Address:", "", NULL);
-	SetupTextControl(fIPTextControl);
-
-	BLayoutItem* layoutItem = fIPTextControl->CreateTextViewLayoutItem();
-	layoutItem->SetExplicitMinSize(BSize(
-		fIPTextControl->StringWidth("XXX.XXX.XXX.XXX") + inset,
-		B_SIZE_UNSET));
-
-	layout->AddItem(fIPTextControl->CreateLabelLayoutItem(), 0, 2);
-	layout->AddItem(layoutItem, 1, 2);
-
-	fNetMaskTextControl = new BTextControl("Netmask:", "", NULL);
-	SetupTextControl(fNetMaskTextControl);
-	layout->AddItem(fNetMaskTextControl->CreateLabelLayoutItem(), 0, 3);
-	layout->AddItem(fNetMaskTextControl->CreateTextViewLayoutItem(), 1, 3);
-
-	fGatewayTextControl = new BTextControl("Gateway:", "", NULL);
-	SetupTextControl(fGatewayTextControl);
-	layout->AddItem(fGatewayTextControl->CreateLabelLayoutItem(), 0, 4);
-	layout->AddItem(fGatewayTextControl->CreateTextViewLayoutItem(), 1, 4);
-
-	// TODO: Replace the DNS text controls by a BListView with add/remove
-	// functionality and so on...
-	fPrimaryDNSTextControl = new BTextControl("DNS #1:", "", NULL);
-	SetupTextControl(fPrimaryDNSTextControl);
-	layout->AddItem(fPrimaryDNSTextControl->CreateLabelLayoutItem(), 0, 5);
-	layout->AddItem(fPrimaryDNSTextControl->CreateTextViewLayoutItem(), 1, 5);
-	
-	fSecondaryDNSTextControl = new BTextControl("DNS #2:", "", NULL);
-	SetupTextControl(fSecondaryDNSTextControl);
-	layout->AddItem(fSecondaryDNSTextControl->CreateLabelLayoutItem(), 0, 6);
-	layout->AddItem(fSecondaryDNSTextControl->CreateTextViewLayoutItem(), 1, 6);
-
-	// button group (TODO: move to window, but take care of
-	// enabling/disabling)
-	BGroupView* buttonGroup = new BGroupView(B_HORIZONTAL);
-
-	fRevertButton = new BButton("Revert", new BMessage(kMsgRevert));
-	fRevertButton->SetEnabled(false);
-	buttonGroup->GroupLayout()->AddView(fRevertButton);
-
-	buttonGroup->GroupLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
-
-	fApplyButton = new BButton("Apply", new BMessage(kMsgApply));
-	buttonGroup->GroupLayout()->AddView(fApplyButton);
-
-	rootLayout->AddView(controlsGroup);
-	rootLayout->AddView(buttonGroup);
-}
-
-EthernetSettingsView::~EthernetSettingsView()
-{
-	close(fSocket);
-}
 
 void
 EthernetSettingsView::_ShowConfiguration(Settings* settings)
@@ -299,7 +302,7 @@ EthernetSettingsView::_ShowConfiguration(Settings* settings)
 		if (settings->fNameservers.CountItems() >= 2) {
 			fSecondaryDNSTextControl->SetText(
 				settings->fNameservers.ItemAt(1)->String());
-		} 
+		}
 
 		if (settings->fNameservers.CountItems() >= 1) {
 			fPrimaryDNSTextControl->SetText(
@@ -340,9 +343,9 @@ EthernetSettingsView::_ApplyControlsToConfiguration()
 		fPrimaryDNSTextControl->Text()));
 	fCurrentSettings->fNameservers.AddItem(new BString(
 		fSecondaryDNSTextControl->Text()));
-	
+
 	fApplyButton->SetEnabled(false);
-	fRevertButton->SetEnabled(true);	
+	fRevertButton->SetEnabled(true);
 }
 
 
@@ -390,7 +393,7 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 	status_t status = _GetPath("interfaces", path);
 	if (status < B_OK)
 		return;
-		
+
 	FILE* fp = NULL;
 	// loop over all adapters. open the settings file only once,
 	// append the settins of each non-autoconfiguring adapter
@@ -410,11 +413,11 @@ EthernetSettingsView::_SaveAdaptersConfiguration()
 		fprintf(fp, "interface %s {\n\t\taddress {\n",
 			fSettings.ItemAt(i)->GetName());
 		fprintf(fp, "\t\t\tfamily\tinet\n");
-		fprintf(fp, "\t\t\taddress\t%s\n", 
+		fprintf(fp, "\t\t\taddress\t%s\n",
 			fSettings.ItemAt(i)->GetIP());
-		fprintf(fp, "\t\t\tgateway\t%s\n", 
+		fprintf(fp, "\t\t\tgateway\t%s\n",
 			fSettings.ItemAt(i)->GetGateway());
-		fprintf(fp, "\t\t\tmask\t%s\n", 
+		fprintf(fp, "\t\t\tmask\t%s\n",
 			fSettings.ItemAt(i)->GetNetmask());
 		fprintf(fp, "\t\t}\n}\n\n");
 	}

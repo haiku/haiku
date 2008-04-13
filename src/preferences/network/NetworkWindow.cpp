@@ -1,18 +1,16 @@
 /*
- * Copyright 2004-2007 Haiku Inc. All rights reserved.
+ * Copyright 2004-2008 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
  *		Andre Alves Garzia, andre@andregarzia.com
- * With code from:
- *		Axel Dorfler
- *		Hugo Santos
  */
+
+#include "NetworkWindow.h"
 
 #include <Application.h>
 #include <GroupLayout.h>
 
-#include "NetworkWindow.h"
 #include "EthernetSettingsView.h"
 
 
@@ -22,10 +20,15 @@ NetworkWindow::NetworkWindow()
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	fEthView = new EthernetSettingsView();
-	GetLayout()->AddView(fEthView);
+	fEthernetView = new EthernetSettingsView();
+	GetLayout()->AddView(fEthernetView);
 }
-	
+
+
+NetworkWindow::~NetworkWindow()
+{
+}
+
 
 void
 NetworkWindow::MessageReceived(BMessage* message)
@@ -35,10 +38,6 @@ NetworkWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 	}
 
-}
-
-NetworkWindow::~NetworkWindow()
-{
 }
 
 
