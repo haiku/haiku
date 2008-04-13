@@ -74,6 +74,10 @@ dlerror(void)
 
 // __libc_dl*** wrappers
 // We use a mixed glibc / bsd libc, and glibc wants these
+void *__libc_dlopen(const char *name);
+void *__libc_dlsym(void *handle, const char *name);
+void __libc_dlclose(void *handle);
+
 void *
 __libc_dlopen(const char *name)
 {
