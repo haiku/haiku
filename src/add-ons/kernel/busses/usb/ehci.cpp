@@ -813,11 +813,6 @@ EHCI::Interrupt()
 		acknowledge |= EHCI_USBSTS_PORTCHANGE;
 	}
 
-	if (status & EHCI_USBSTS_FLROLLOVER) {
-		TRACE(("usb_ehci: frame list rolled over\n"));
-		acknowledge |= EHCI_USBSTS_FLROLLOVER;
-	}
-
 	if (status & EHCI_USBSTS_INTONAA) {
 		TRACE(("usb_ehci: interrupt on async advance\n"));
 		acknowledge |= EHCI_USBSTS_INTONAA;
