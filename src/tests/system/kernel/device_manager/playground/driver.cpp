@@ -1,0 +1,178 @@
+/*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "bus.h"
+
+
+//	#pragma mark - driver
+
+
+static float
+supports_device(device_node *parent)
+{
+	const char* bus;
+	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
+			!= B_OK)
+		return -1;
+
+	if (bus == NULL || strcmp(bus, BUS_NAME))
+		return -1;
+
+	bus_device_module_info* module
+		= (bus_device_module_info*)gDeviceManager->driver_module(parent);
+	void* data = gDeviceManager->driver_data(parent);
+
+	bus_info info;
+	if (module->get_bus_info(data, &info) == B_OK
+		&& info.vendor_id == 0x1001
+		&& info.device_id == 0x0001)
+		return 1.0;
+
+	return 0.0;
+}
+
+
+static status_t
+register_device(device_node *parent)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+init_driver(device_node *node, void **_cookie)
+{
+	// also publishes any devices/nodes with dedicated calls
+	return B_ERROR;
+}
+
+
+static void
+uninit_driver(device_node *node)
+{
+}
+
+
+static status_t
+register_child_devices(device_node *node)
+{
+	return B_OK;
+}
+
+
+static void
+device_removed(device_node *node)
+{
+}
+
+
+//	#pragma mark - device
+
+
+static status_t
+init_device(void *deviceCookie)
+{
+	// called once before one or several open() calls
+	return B_ERROR;
+}
+
+
+static void
+uninit_device(void *deviceCookie)
+{
+	// supposed to free deviceCookie, called when the last reference to
+	// the device is closed
+}
+
+
+static status_t
+device_open(void *deviceCookie, int openMode, void **_cookie)
+{
+	// deviceCookie is an object attached to the published device
+	return B_ERROR;
+}
+
+
+static status_t
+device_close(void *cookie)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+device_free(void *cookie)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+device_read(void *cookie, off_t pos, void *buffer, size_t *_length)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+device_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+device_ioctl(void *cookie, int32 op, void *buffer, size_t length)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+device_io(void *cookie, io_request *request)
+{
+	// new function to deal with I/O requests directly.
+	return B_ERROR;
+}
+
+
+//	#pragma mark -
+
+
+struct driver_module_info gDriverModuleInfo = {
+	{
+		"sample_driver/driver_v1",
+		0,
+		NULL,
+	},
+	
+	supports_device,
+	register_device,
+	init_driver,
+	uninit_driver,
+	register_child_devices,
+	NULL,
+	device_removed,
+};
+
+struct device_module_info gDeviceModuleInfo = {
+	{
+		"sample_driver/device_v1",
+		0,
+		NULL,
+	},
+
+	init_device,
+	uninit_device,
+
+	device_open,
+	device_close,
+	device_free,
+	device_read,
+	device_write,
+	device_ioctl,
+	device_io,
+};

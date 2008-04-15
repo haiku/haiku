@@ -9,3 +9,4 @@ KernelAddon <test_driver>config :
         config.c
         ;
 
+SubInclude HAIKU_TOP src tests system kernel device_manager playground ;
