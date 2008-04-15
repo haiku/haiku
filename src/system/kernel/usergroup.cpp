@@ -43,6 +43,8 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 
 	bool privileged = kernel || is_privileged(team);
 
+	gid_t ssgid = team->saved_set_gid;
+
 	// real gid
 	if (rgid == (gid_t)-1) {
 		rgid = team->real_gid;
@@ -62,8 +64,17 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 			rgid = team->real_gid;
 		} else {
 			// setregid() semantics: set the real gid, if allowed to
-			if (!privileged && rgid != team->real_gid)
+			// Note: We allow setting the real gid to the effective gid. This
+			// is unspecified by the specs, but is common practice.
+			if (!privileged && rgid != team->real_gid
+				&& rgid != team->effective_gid) {
 				return EPERM;
+			}
+
+			// Note: Also common practice is to set the saved set-gid when the
+			// real gid is set.
+			if (rgid != team->real_gid)
+				ssgid = rgid;
 		}
 	}
 
@@ -80,6 +91,7 @@ common_setregid(gid_t rgid, gid_t egid, bool setAllIfPrivileged, bool kernel)
 	// Getting here means all checks were successful -- set the gids.
 	team->real_gid = rgid;
 	team->effective_gid = egid;
+	team->saved_set_gid = ssgid;
 
 	return B_OK;
 }
@@ -93,6 +105,8 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 	InterruptsSpinLocker _(team_spinlock);
 
 	bool privileged = kernel || is_privileged(team);
+
+	uid_t ssuid = team->saved_set_uid;
 
 	// real uid
 	if (ruid == (uid_t)-1) {
@@ -119,6 +133,11 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 				&& ruid != team->effective_uid) {
 				return EPERM;
 			}
+
+			// Note: Also common practice is to set the saved set-uid when the
+			// real uid is set.
+			if (ruid != team->real_uid)
+				ssuid = ruid;
 		}
 	}
 
@@ -135,6 +154,7 @@ common_setreuid(uid_t ruid, uid_t euid, bool setAllIfPrivileged, bool kernel)
 	// Getting here means all checks were successful -- set the uids.
 	team->real_uid = ruid;
 	team->effective_uid = euid;
+	team->saved_set_uid = ssuid;
 
 	return B_OK;
 }
