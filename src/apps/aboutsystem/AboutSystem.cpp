@@ -44,7 +44,8 @@
 
 
 static const char *UptimeToString(char string[], size_t size);
-static const char *MemUsageToString(char string[], size_t size, system_info *info);
+static const char *MemUsageToString(char string[], size_t size,
+	system_info *info);
 
 static const rgb_color kDarkGrey = { 100, 100, 100, 255 };
 static const rgb_color kHaikuGreen = { 42, 131, 36, 255 };
@@ -77,7 +78,8 @@ class AboutView : public BView {
 		virtual void MessageReceived(BMessage *msg);
 		virtual void MouseDown(BPoint pt);
 		
-		void	AddCopyrightEntry(const char *name, const char *text, const char *url=NULL);
+		void	AddCopyrightEntry(const char *name, const char *text,
+					const char *url = NULL);
 		void	PickRandomHaiku();
 
 	private:
@@ -164,7 +166,8 @@ AboutView::AboutView(const BRect &rect)
 	if (fLogo)
 		r.OffsetBy(0, fLogo->Bounds().Height());
 
-	fInfoView = new BView(r, "infoview", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW);
+	fInfoView = new BView(r, "infoview", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
+		B_WILL_DRAW);
 	fInfoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fInfoView->SetLowColor(fInfoView->ViewColor());
 	fInfoView->SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
@@ -200,7 +203,8 @@ AboutView::AboutView(const BRect &rect)
 		BFile file;
 		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
 			&& appFileInfo.SetTo(&file) == B_OK
-			&& appFileInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK
+			&& appFileInfo.GetVersionInfo(&versionInfo,
+				B_APP_VERSION_KIND) == B_OK
 			&& versionInfo.short_info[0] != '\0')
 			strcpy(string, versionInfo.short_info);
 	}
@@ -323,7 +327,8 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->SetWordWrap(true);
 
 	BScrollView *creditsScroller = new BScrollView("creditsScroller",
-		fCreditsView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_PLAIN_BORDER);
+		fCreditsView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true,
+		B_PLAIN_BORDER);
 	AddChild(creditsScroller);
 
 	BFont font(be_bold_font);
@@ -473,7 +478,8 @@ AboutView::AboutView(const BRect &rect)
 		"Gerald Zajac\n"
 		"Łukasz Zemczak\n"
 		"JiSheng Zhang\n"
-		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention (sorry!)"
+		"\n" B_UTF8_ELLIPSIS " and probably some more we forgot to mention "
+		"(sorry!)"
 		"\n\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
@@ -491,14 +497,34 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert("\nCopyrights\n\n");
 
 	// GNU copyrights
-	AddCopyrightEntry("The GNU Project", 
+	AddCopyrightEntry("The GNU Project",
 		"Contains software from the GNU Project, "
 		"released under the GPL and LGPL licences:\n"
-		"	- GNU C Library,\n"
-		"	- GNU coretools, diffutils, findutils, gawk, bison, m4, make,\n"
-		"	- Bourne Again Shell.\n"
-		"Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.", 
+		"GNU C Library, "
+		"GNU coretools, diffutils, findutils, "
+		"gawk, bison, m4, make, "
+		"gdb, wget, ncurses, termcap, "
+		"Bourne Again Shell.\n"
+		"Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.",
 		"www.gnu.org");
+
+	// FreeBSD copyrights
+	AddCopyrightEntry("The FreeBSD Project",
+		"Contains software from the FreeBSD Project, "
+		"released under the BSD licence:\n"
+		"ping, telnet, telnetd, traceroute\n"
+		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 The FreeBSD Project.  "
+		"All rights reserved.",
+		"www.freebsd.org");
+
+	// NetBSD copyrights
+	AddCopyrightEntry("The NetBSD Project",
+		"Contains software developed by the NetBSD, "
+		"Foundation, Inc. and its contributors:\n"
+		"ftp\n"
+		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 The NetBSD Foundation, Inc.  "
+		"All rights reserved.",
+		"www.netbsd.org");
 
 	// FFMpeg copyrights
 	AddCopyrightEntry("FFMpeg libavcodec", 
@@ -514,13 +540,13 @@ AboutView::AboutView(const BRect &rect)
 	AddCopyrightEntry("PDFLib", 
 		"Copyright " B_UTF8_COPYRIGHT " 1997-2006 PDFlib GmbH and Thomas Merz. "
 		"All rights reserved.\n"
-		"PDFlib and the PDFlib logo are registered trademarks of PDFlib GmbH.", 
+		"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.", 
 		"www.pdflib.com");
 
 	// FreeType copyrights
 	AddCopyrightEntry("FreeType2", 
-		"Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 The FreeType"
-		" Project.  All rights reserved.", 
+		"Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 "
+		"The FreeType Project.  All rights reserved.", 
 		"www.freetype.org");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
@@ -544,7 +570,8 @@ AboutView::AboutView(const BRect &rect)
 	// OpenGroup & DEC (BRegion backend) copyright
 	AddCopyrightEntry("BRegion backend (XFree86)", 
 		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988, 1998  The Open Group.\n"
-		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988 Digital Equipment Corporation, Maynard, Massachusetts.\n"
+		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988 Digital Equipment "
+		"Corporation, Maynard, Massachusetts.\n"
 		"All rights reserved.");
 
 	// Konatu font
@@ -554,12 +581,14 @@ AboutView::AboutView(const BRect &rect)
 
 	// expat copyrights
 	AddCopyrightEntry("expat", 
-		"Copyright " B_UTF8_COPYRIGHT " 1998, 1999, 2000 Thai Open Source Software Center Ltd and Clark Cooper.\n"
+		"Copyright " B_UTF8_COPYRIGHT " 1998, 1999, 2000 Thai Open Source "
+		"Software Center Ltd and Clark Cooper.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 2001, 2002, 2003 Expat maintainers.");
 
 	// zlib copyrights
 	AddCopyrightEntry("zlib", 
-		"Copyright " B_UTF8_COPYRIGHT " 1995-2004 Jean-loup Gailly and Mark Adler.");
+		"Copyright " B_UTF8_COPYRIGHT " 1995-2004 Jean-loup Gailly and Mark "
+		"Adler.");
 
 	// zip copyrights
 	AddCopyrightEntry("Info-ZIP", 
@@ -567,7 +596,8 @@ AboutView::AboutView(const BRect &rect)
 
 	// bzip2 copyrights
 	AddCopyrightEntry("bzip2", 
-		"Copyright " B_UTF8_COPYRIGHT " 1996-2005 Julian R Seward. All rights reserved.");
+		"Copyright " B_UTF8_COPYRIGHT " 1996-2005 Julian R Seward. All rights "
+		"reserved.");
 
 	// VIM copyrights
 	AddCopyrightEntry("Vi IMproved", 
@@ -581,12 +611,72 @@ AboutView::AboutView(const BRect &rect)
 
 	// OpenEXR copyrights
 	AddCopyrightEntry("OpenEXR", 
-		"Copyright " B_UTF8_COPYRIGHT " 2002-2005, Industrial Light & Magic, a division of Lucas Digital Ltd. LLC.");
+		"Copyright " B_UTF8_COPYRIGHT " 2002-2005 Industrial Light & Magic, "
+		"a division of Lucas Digital Ltd. LLC.");
 		
 	// Bullet copyrights
 	AddCopyrightEntry("Bullet", 
 		"Copyright " B_UTF8_COPYRIGHT " 2003-2008 Erwin Coumans",
 		"www.bulletphysics.com");
+
+	// atftp copyrights
+	AddCopyrightEntry("atftp",
+		"Copyright " B_UTF8_COPYRIGHT " 2000 Jean-Pierre Lefebvre and Remi "
+		"Lefebvre");
+ 
+	// Netcat copyrights
+	AddCopyrightEntry("Netcat",
+		"Copyright " B_UTF8_COPYRIGHT " 1996 Hobbit");
+
+	// acpica copyrights
+	AddCopyrightEntry("acpica",
+		"Copyright " B_UTF8_COPYRIGHT " 1999 - 2006 Intel Corp.");
+
+	// unrar copyrights
+	AddCopyrightEntry("unrar",
+		"Copyright " B_UTF8_COPYRIGHT " Alexander L. Roshal.");
+
+	// libpng copyrights
+	AddCopyrightEntry("libpng",
+		"Copyright " B_UTF8_COPYRIGHT " 2004, 2006-2008 Glenn "
+		"Randers-Pehrson.");
+
+	// libprint copyrights
+	AddCopyrightEntry("libprint",
+		"Copyright " B_UTF8_COPYRIGHT " 1999-2000 Y.Takagi. All Rights "
+		"Reserved.");
+
+	// cortex copyrights
+	AddCopyrightEntry("Cortex",
+		"Copyright " B_UTF8_COPYRIGHT " 1999-2000 Eric Moon.");
+
+	// FluidSynth copyrights
+	AddCopyrightEntry("FluidSynth",
+		"Copyright " B_UTF8_COPYRIGHT " 2003 Peter Hanappe and others.");
+
+	// CannaIM copyrights
+	AddCopyrightEntry("CannaIM",
+		"Copyright " B_UTF8_COPYRIGHT " 1999 Masao Kawamura.");
+
+	// libxml2, libxslt, libexslt copyrights
+	AddCopyrightEntry("libxml2, libxslt",
+		"Copyright " B_UTF8_COPYRIGHT " 1998-2003 Daniel Veillard.  All Rights "
+		"Reserved.");
+
+	AddCopyrightEntry("libexslt",
+		"Copyright " B_UTF8_COPYRIGHT " 2001-2002 Thomas Broyer, Charlie "
+		"Bozeman and Daniel Veillard.  All Rights Reserved.");
+
+	// Xiph.org Foundation copyrights
+	AddCopyrightEntry("Xiph.org Foundation",
+		"libvorbis, libogg, libtheora, libspeex"
+		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 Xiph.Org.  All rights "
+		"reserved.", "www.xiph.org");
+
+	// The Tcpdump Group
+	AddCopyrightEntry("The Tcpdump Group",
+		"tcpdump, libpcap",
+		"www.tcpdump.org");	     
 
 	// Build a list of installed applications and show their 
 	// long version info. Well-behaved apps usually give
@@ -600,8 +690,9 @@ AboutView::AboutView(const BRect &rect)
 	BVolume bootVolume;
 	BVolumeRoster().GetBootVolume(&bootVolume);
 	fAppsQuery.SetVolume(&bootVolume);
-	if (fAppsQuery.SetPredicate("((BEOS:APP_SIG==\"**\")&&(name!=\"*.so\")&&(name!=\"*.rsrc\")&&"
-								"(BEOS:TYPE==\"application/x-vnd.Be-elfexecutable\"))") >= B_OK) {
+	if (fAppsQuery.SetPredicate(
+			"((BEOS:APP_SIG==\"**\")&&(name!=\"*.so\")&&(name!=\"*.rsrc\")&&"
+			"(BEOS:TYPE==\"application/x-vnd.Be-elfexecutable\"))") >= B_OK) {
 		fAppsQuery.Fetch();
 	}
 }
@@ -710,7 +801,8 @@ AboutView::MessageReceived(BMessage *msg)
 					version_info version;
 					if (appFileInfo.InitCheck() >= B_OK && 
 						appFileInfo.GetAppFlags(&flags) >= B_OK && 
-						appFileInfo.GetVersionInfo(&version, B_APP_VERSION_KIND) >= B_OK) {
+						appFileInfo.GetVersionInfo(&version,
+							B_APP_VERSION_KIND) >= B_OK) {
 						//printf("AppFileInfo for %s :\n", path.Path());
 						//printf("flags: %08x\n", flags);
 						BString name;
@@ -752,7 +844,8 @@ AboutView::MessageReceived(BMessage *msg)
 
 
 void
-AboutView::AddCopyrightEntry(const char *name, const char *text, const char *url)
+AboutView::AddCopyrightEntry(const char *name, const char *text,
+	const char *url)
 {
 	BFont font(be_bold_font);
 	//font.SetSize(be_bold_font->Size());
