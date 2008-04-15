@@ -77,6 +77,7 @@ UnixBufferQueue::Read(size_t size, net_buffer** _buffer)
 			}
 
 			bytesLeft -= toCopy;
+			fSize -= toCopy;
 		}
 
 		return B_OK;
