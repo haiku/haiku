@@ -74,50 +74,49 @@ LocalDeviceHandler::ClearWantedEvent(BMessage* msg)
 
 
 void 
-LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode = 0)
+LocalDeviceHandler::ClearWantedEvent(BMessage* msg, uint16 event, uint16 opcode)
 {  
     // Remove the whole petition from queue
     fEventsWanted.Lock();
 
     int16 eventFound;
     int16 opcodeFound;
-	int32 eventIndex;
+	int32 eventIndex = 0;
 	   
-    for (int32 index = 0 ; index < fEventsWanted.CountMessages() ; index++) {
-        
-        BMessage* msg = fEventsWanted.FindMessage(index);
+    // for each Event    
+    while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK ) {
 
-       	eventIndex = 0; 
-        // for each Event    
-        while (msg->FindInt16("eventExpected", eventIndex, &eventFound) == B_OK ) {
-            if (eventFound == event) {
-                
-                // there is an opcode specified
-                if (opcode != 0) {
+   		printf("@ Event expected found @%ld\n", eventIndex);                
+
+        if (eventFound == event) {
+
+     		printf("@ Event matches %ld\n", eventIndex);                
+            // there is an opcode specified
+            if (opcode != 0) {
                 	
-                	// The opcode matches
-                	if ( (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) &&
-                	     ((uint16)opcodeFound != opcode) ) {
-                	     
-                	    // this should remove only the entry 
-                		(void)msg->RemoveData("eventExpected", eventIndex);
-                		(void)msg->RemoveData("opcodeExpected", eventIndex);                		
-                		goto bail;
-                	}                    
-                }  else {                
-                	// Event matches so far               	    
+              	// The opcode matches
+               	if ( (msg->FindInt16("opcodeExpected", eventIndex, &opcodeFound) == B_OK) &&
+               	     ((uint16)opcodeFound == opcode) ) {
+               	     
+               	    // this should remove only the entry
+               	    printf("@ Removed event %d and opcoce %d from message %p\n", event, opcode, msg); 
                		(void)msg->RemoveData("eventExpected", eventIndex);
+              		(void)msg->RemoveData("opcodeExpected", eventIndex);                		
                		goto bail;
-                }
+               	}                    
+            }  else {                
+               	// Event matches so far
+               	printf("@ Removed event %d from message %p\n", event, msg); 
+           		(void)msg->RemoveData("eventExpected", eventIndex);
+           		goto bail;
+            }
                 
-            } 
-            eventIndex++;
-        }
+        } 
+        eventIndex++;
     }
             
 bail:
 
-    fEventsWanted.RemoveMessage(msg);    
     fEventsWanted.Unlock();
 
 }

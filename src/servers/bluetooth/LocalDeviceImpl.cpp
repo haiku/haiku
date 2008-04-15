@@ -95,7 +95,7 @@ printf("### \n");
 	
 	} else if ( event->ecode == HCI_EVENT_CMD_STATUS ) {
 
-		(Output::Instance()->Post("Incoming Command Complete\n", BLACKBOARD_EVENTS));
+		(Output::Instance()->Post("Incoming Command Status\n", BLACKBOARD_EVENTS));
 		request = FindPetition(event->ecode, ((struct hci_ev_cmd_status*)(event+1))->opcode );
 
 	} else 
@@ -346,17 +346,15 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
     
     switch (opcodeExpected) {
         
-        case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR):
-        {    
-        	struct hci_ev_cmd_status* commandStatus = (struct hci_ev_cmd_status*)(event+1);
-        	       	
+        case PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY):
+        {            	        	       	
         	reply.what = BT_MSG_INQUIRY_STARTED;
-        	reply.AddInt8("status", commandStatus->status);
+        	reply.AddInt8("status", event->status);
         	
-            if (commandStatus->status == BT_OK) {                                
-			    Output::Instance()->Post("Positive reply for inquiry\n", BLACKBOARD_KIT);
+            if (event->status == BT_OK) {                                
+			    Output::Instance()->Post("Positive reply for inquiry status\n", BLACKBOARD_KIT);
             } else {
-			    Output::Instance()->Post("Negative reply for friendly name\n", BLACKBOARD_KIT);                
+			    Output::Instance()->Post("Negative reply for inquiry status\n", BLACKBOARD_KIT);                
             }
 
             printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
@@ -384,7 +382,6 @@ LocalDeviceImpl::InquiryResult(struct inquiry_info* event, BMessage* request)
 	
     printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));                                
 
-
 }
 
 
@@ -393,9 +390,11 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 {
 	BMessage reply(BT_MSG_INQUIRY_COMPLETED);
 	
-	reply.AddInt8("status", *status);	
+	reply.AddInt8("status", *status);
+	
     printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));	
-    
+
+    ClearWantedEvent(request);    
 }
 
 
