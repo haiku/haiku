@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -456,9 +456,12 @@ main(int argc, const char *const *argv)
 			
 			#else	// !HAIKU_HOST_PLATFORM_LINUX
 
+			// partitions are block devices under Haiku, but not under BeOS
+			#ifndef __HAIKU__
 				fprintf(stderr, "Error: Block devices not supported on this "
 					"platform!\n");
 				exit(1);
+			#endif	// __HAIKU__
 
 			#endif
 		} else {
@@ -482,7 +485,8 @@ main(int argc, const char *const *argv)
 				&& strlen(fileName) >= 3
 				&& strncmp("raw", fileName + strlen(fileName) - 3, 3)) {
 				partition_info partitionInfo;
-				if (ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo) == 0) {
+				if (ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo,
+						sizeof(partitionInfo)) == 0) {
 					partitionOffset = partitionInfo.offset;
 				} else {
 					fprintf(stderr, "Error: Failed to get partition info: %s\n",
