@@ -21,24 +21,22 @@ namespace Bluetooth {
 /* hooks */
 void 
 DiscoveryListener::DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
-{
-    
-    
+{    
+
 }
 
 
 void 
 DiscoveryListener::InquiryStarted(status_t status)
 {
-    
-}
 
+}
 
 
 void 
 DiscoveryListener::InquiryCompleted(int discType)
 {
-    
+
 }
 
 
@@ -120,7 +118,8 @@ DiscoveryListener::MessageReceived(BMessage* message)
 
 DiscoveryListener::DiscoveryListener() : BLooper()
 {
-
+	// TODO: Make a better handling of the running not running state
+	Run();
 }
 
 

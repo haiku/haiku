@@ -9,14 +9,12 @@
 #include <bluetooth/DiscoveryListener.h>
 #include <bluetooth/RemoteDevice.h>
 #include <bluetooth/LocalDevice.h>
-
 #include <bluetooth/bluetooth_error.h>
-
-#include <bluetooth/bluetoothserver_p.h>
-#include <bluetooth/CommandManager.h>
-
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
+
+#include <bluetoothserver_p.h>
+#include <CommandManager.h>
 
 
 #include "KitSupport.h"
@@ -128,9 +126,9 @@ DiscoveryAgent::SetLocalDeviceOwner(LocalDevice* ld)
     fLocalDevice = ld;
 }
 
-DiscoveryAgent::DiscoveryAgent()
+DiscoveryAgent::DiscoveryAgent(LocalDevice* ld)
 {
-    fLocalDevice = NULL;
+    fLocalDevice = ld;
 }
 
 

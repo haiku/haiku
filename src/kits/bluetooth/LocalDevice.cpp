@@ -113,8 +113,8 @@ LocalDevice::GetLocalDeviceCount()
 DiscoveryAgent*
 LocalDevice::GetDiscoveryAgent()
 {
-
-	return NULL;
+	/* TODO: Study a singleton here */
+	return new DiscoveryAgent(this);
 }
 
 
