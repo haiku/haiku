@@ -141,43 +141,41 @@ if [ ! $updateOnly ]; then
 	$mkdir -p $mimeDBDest
 	mkdir -p $tmpDir
 	mimeTmpDir=$tmpDir/mime
+	mimeDBTmpDir=$tmpDir/mime/db
 	mimeTmpIndex=0
+	mimeTmpFile=$mimeTmpDir/mimedb$$.rsrc
 
 	# create tmp dir for the MIME conversion stuff
-	mkdir -p $mimeTmpDir
+	mkdir -p $mimeDBTmpDir
 
 	echo "Installing MIME database ..."
 
 	for inSuperFile in $mimeDBSource/*.super; do
 		superType=$(basename $inSuperFile .super)
-		outSuperDir=$mimeDBDest/$superType
+		tmpSuperDir=$mimeDBTmpDir/$superType
 
 		# compile rdef to rsrc file and the rsrc file to attributes
-		mimeTmpIndex=$(($mimeTmpIndex + 1))
-		tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
-		tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
-		$rc -o $tmpFile $inSuperFile
-		mkdir -p $tmpFile2
-		$resattr -O -o $tmpFile2 $tmpFile
-		$cp -r ${sPrefix}$tmpFile2 $outSuperDir
+		$rc -o $mimeTmpFile $inSuperFile
+		mkdir -p $tmpSuperDir
+		$resattr -O -o $tmpSuperDir $mimeTmpFile
+		$rmAttrs $mimeTmpFile
 
 		# iterate through the sub types
 		for inSubFile in $mimeDBSource/$superType/*; do
 			# check, if the type exists
 			if test -f $inSubFile && grep META:TYPE $inSubFile > /dev/null 2>&1 ; then
 				subType=$(basename $inSubFile)
-				outSubFile=$outSuperDir/$subType
+				tmpSubFile=$mimeDBTmpDir/$superType/$subType
 
 				# compile rdef to rsrc file and the rsrc file to attributes
-				mimeTmpIndex=$(($mimeTmpIndex + 1))
-				tmpFile=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.rsrc
-				tmpFile2=$mimeTmpDir/mimedb$$_${mimeTmpIndex}.mime
-				$rc -o $tmpFile $inSubFile
-				$resattr -O -o $tmpFile2 $tmpFile
-				$cp ${sPrefix}$tmpFile2 $outSubFile
+				$rc -o $mimeTmpFile $inSubFile
+				$resattr -O -o $tmpSubFile $mimeTmpFile
+				$rmAttrs $mimeTmpFile
 			fi
 		done
 	done
+
+	$cp -r ${sPrefix}$mimeDBTmpDir/. $mimeDBDest
 
 	# cleanup tmp dir
 	$rmAttrs -rf $mimeTmpDir
