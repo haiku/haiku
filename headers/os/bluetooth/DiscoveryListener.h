@@ -52,8 +52,7 @@ class DiscoveryListener : public BLooper {
 		virtual void InquiryStarted(status_t status);
         
     private:                
-        DiscoveryListener();
-		void SetLocalDeviceOwner(LocalDevice* ld);
+
 		RemoteDevicesList GetRemoteDevicesList(void);
 		
         void MessageReceived(BMessage* msg);
@@ -62,8 +61,16 @@ class DiscoveryListener : public BLooper {
 		RemoteDevicesList fRemoteDevicesList;
 		
 		friend class DiscoveryAgent;
+
+	protected:
+	    DiscoveryListener();
+   		void SetLocalDeviceOwner(LocalDevice* ld);
 };
 
 }
+
+#ifndef _BT_USE_EXPLICIT_NAMESPACE
+using Bluetooth::DiscoveryListener;
+#endif
 
 #endif

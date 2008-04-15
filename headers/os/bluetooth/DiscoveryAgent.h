@@ -55,14 +55,20 @@ class DiscoveryAgent {
         */
         
     private:
-        DiscoveryAgent();
+        DiscoveryAgent(LocalDevice* ld);
         void SetLocalDeviceOwner(LocalDevice* ld);
 
         DiscoveryListener* fLastUsedListener;
         LocalDevice*       fLocalDevice;
+        
+        friend class LocalDevice;
 
 };
 
 }
+
+#ifndef _BT_USE_EXPLICIT_NAMESPACE
+using Bluetooth::DiscoveryAgent;
+#endif
 
 #endif

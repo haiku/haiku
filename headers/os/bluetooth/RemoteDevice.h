@@ -58,4 +58,8 @@ class RemoteDevice {
 
 }
 
+#ifndef _BT_USE_EXPLICIT_NAMESPACE
+using Bluetooth::RemoteDevice;
+#endif
+
 #endif

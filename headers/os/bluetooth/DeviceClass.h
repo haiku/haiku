@@ -57,4 +57,8 @@ class DeviceClass {
 
 }
 
+#ifndef _BT_USE_EXPLICIT_NAMESPACE
+using Bluetooth::DeviceClass;
+#endif
+
 #endif
