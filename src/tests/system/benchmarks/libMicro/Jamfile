@@ -1,0 +1,358 @@
+SubDir HAIKU_TOP src tests system benchmarks libMicro ;
+
+SEARCH_SOURCE = [ FDirName $(SUBDIR) ] ;
+
+# filter warnings we don't want here
+TARGET_WARNING_CCFLAGS = [ FFilter $(TARGET_WARNING_CCFLAGS)
+	: -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
+UseHeaders [ FDirName $(SUBDIR) $(SUBDIR) $(SUBDIR) $(SUBDIR) $(SUBDIR) headers posix ] : true ;
+UseHeaders [ FDirName $(SUBDIR) ] : true ;
+
+SubDirHdrs $(HAIKU_TOP) src tests system benchmarks libMicro ;
+SubDirCcFlags -nostdinc ;
+SubDirCcFlags -D_REENTRANT ;
+
+SubDirCcFlags -include $(SUBDIR)/config_libmicro.h ;
+
+StaticLibrary libmicro.a :
+	libmicro.c
+	libmicro_main.c
+	benchmark_init.c
+	benchmark_fini.c
+	benchmark_initrun.c
+	benchmark_finirun.c
+	benchmark_initbatch.c
+	benchmark_finibatch.c
+	benchmark_initworker.c
+	benchmark_finiworker.c
+	benchmark_optswitch.c
+	benchmark_result.c
+;
+
+StaticLibrary libelided.a :
+	elided.c ;
+
+BinCommand <libmicro>bind : 
+	bind.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand atomic : 
+	: libelided.a libroot.so ;
+
+BinCommand cachetocache : 
+	: libelided.a libroot.so ;
+
+BinCommand cascade_mutex : 
+	cascade_mutex.c
+	: libmicro.a libroot.so ;
+
+BinCommand cascade_cond : 
+	cascade_cond.c
+	: libmicro.a libroot.so ;
+
+BinCommand cascade_lockf : 
+	cascade_lockf.c
+	: libmicro.a libroot.so ;
+
+BinCommand cascade_fcntl : 
+	cascade_fcntl.c
+	: libmicro.a libroot.so ;
+
+BinCommand cascade_flock : 
+	cascade_flock.c
+	: libmicro.a libroot.so ;
+
+BinCommand chdir : 
+	chdir.c
+	: libmicro.a ;
+
+BinCommand close : 
+	close.c
+	: libmicro.a libroot.so ;
+
+BinCommand close_tcp : 
+	close_tcp.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand connection : 
+	connection.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand dup : 
+	dup.c
+	: libmicro.a libroot.so ;
+
+BinCommand exec_bin : 
+	exec_bin.c
+	: libmicro.a libroot.so ;
+
+BinCommand exec : 
+	exec.c
+	: libmicro.a libroot.so ;
+
+BinCommand exit : 
+	exit.c
+	: libmicro.a libroot.so ;
+
+BinCommand exp : 
+	exp.c
+	: libmicro.a libroot.so ;
+
+BinCommand fcntl : 
+	fcntl.c
+	: libmicro.a libroot.so ;
+
+BinCommand fcntl_ndelay : 
+	fcntl_ndelay.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand file_lock : 
+	file_lock.c
+	: libmicro.a libroot.so ;
+
+BinCommand fork : 
+	fork.c
+	: libmicro.a libroot.so ;
+
+# atm unsupported
+BinCommand getcontext : 
+	: libelided.a libroot.so ;
+
+BinCommand getenv : 
+	getenv.c
+	: libmicro.a libroot.so ;
+
+BinCommand gettimeofday : 
+	gettimeofday.c
+	: libmicro.a libroot.so ;
+
+BinCommand <libmicro>getpeername : 
+	getpeername.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand getpid : 
+	getpid.c
+	: libmicro.a libroot.so ;
+
+BinCommand getrusage : 
+	getrusage.c
+	: libmicro.a libroot.so ;
+
+BinCommand getsockname : 
+	getsockname.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand isatty : 
+	isatty.c
+	: libmicro.a libroot.so ;
+
+BinCommand listen : 
+	listen.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand localtime_r : 
+	localtime_r.c
+	: libmicro.a libroot.so ;
+
+BinCommand <libmicro>log : 
+	log.c
+	: libmicro.a libroot.so ;
+
+BinCommand longjmp : 
+	longjmp.c
+	: libmicro.a libroot.so ;
+
+BinCommand lrand48 : 
+	lrand48.c
+	: libmicro.a libroot.so ;
+
+BinCommand lseek : 
+	lseek.c
+	: libmicro.a libroot.so ;
+
+BinCommand malloc : 
+	malloc.c
+	: libmicro.a libroot.so ;
+
+BinCommand memcpy : 
+	memcpy.c
+	: libmicro.a libroot.so ;
+
+BinCommand memmove : 
+	memmove.c
+	: libmicro.a libroot.so ;
+
+BinCommand memrand : 
+	memrand.c
+	: libmicro.a libroot.so ;
+
+BinCommand memset : 
+	memset.c
+	: libmicro.a libroot.so ;
+
+BinCommand mktime : 
+	mktime.c
+	: libmicro.a libroot.so ;
+
+# atm unsupported
+BinCommand mprotect : 
+	: libelided.a libroot.so ;
+
+# atm unsupported
+BinCommand mmap : 
+	: libelided.a libroot.so ;
+
+# atm unsupported
+BinCommand msync : 
+	: libelided.a libroot.so ;
+
+# atm unsupported
+BinCommand munmap : 
+	: libelided.a libroot.so ;
+
+# atm unsupported
+BinCommand mutex : 
+	: libelided.a libroot.so ;
+
+BinCommand nop : 
+	nop.c
+	: libmicro.a libroot.so ;
+
+BinCommand <libmicro>open : 
+	open.c
+	: libmicro.a libroot.so ;
+
+BinCommand pipe : 
+	pipe.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand poll : 
+	poll.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand pread : 
+	pread.c
+	: libmicro.a libroot.so ;
+
+# atm unsupported
+# needs pthread_attr_setstacksize
+BinCommand pthread_create : 
+	: libelided.a libroot.so ;
+
+BinCommand pwrite : 
+	pwrite.c
+	: libmicro.a libroot.so ;
+
+BinCommand read : 
+	read.c
+	: libmicro.a libroot.so ;
+
+BinCommand realpath : 
+	realpath.c
+	: libmicro.a libroot.so ;
+
+BinCommand recurse : 
+	recurse.c
+	recurse2.c
+	: libmicro.a libroot.so ;
+
+BinCommand select : 
+	select.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+# atm unsupported
+BinCommand semop : 
+	: libelided.a libroot.so ;
+
+# atm unsupported
+BinCommand setcontext : 
+	: libelided.a libroot.so ;
+
+BinCommand setsockopt : 
+	setsockopt.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand sigaction : 
+	sigaction.c
+	: libmicro.a libroot.so ;
+
+BinCommand siglongjmp : 
+	siglongjmp.c
+	: libmicro.a libroot.so ;
+
+BinCommand signal : 
+	signal.c
+	: libmicro.a libroot.so ;
+
+BinCommand sigprocmask : 
+	sigprocmask.c
+	: libmicro.a libroot.so ;
+
+
+BinCommand <libmicro>socket :  
+	socket.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+search on socket.c = [ FDirName $(SUBDIR) ] ;
+
+
+BinCommand socketpair : 
+	socketpair.c
+	: libmicro.a $(TARGET_NETWORK_LIBS) ;
+
+BinCommand <libmicro>stat : 
+	stat.c
+	: libmicro.a libroot.so ;
+
+BinCommand strcasecmp : 
+	strcasecmp.c
+	: libmicro.a libroot.so ;
+
+BinCommand strchr : 
+	strchr.c
+	: libmicro.a libroot.so ;
+
+BinCommand strcmp : 
+	strcmp.c
+	: libmicro.a libroot.so ;
+
+BinCommand strcpy : 
+	strcpy.c
+	: libmicro.a libroot.so ;
+
+BinCommand strftime : 
+	strftime.c
+	: libmicro.a libroot.so ;
+
+BinCommand strlen : 
+	strlen.c
+	: libmicro.a libroot.so ;
+
+BinCommand strtol : 
+	strtol.c
+	: libmicro.a libroot.so ;
+
+BinCommand system : 
+	system.c
+	: libmicro.a libroot.so ;
+
+BinCommand time : 
+	time.c
+	: libmicro.a libroot.so ;
+
+BinCommand times : 
+	times.c
+	: libmicro.a libroot.so ;
+
+BinCommand write : 
+	write.c
+	: libmicro.a libroot.so ;
+
+BinCommand writev : 
+	writev.c
+	: libmicro.a libroot.so ;
+
+BinCommand tattle : 
+	tattle.c
+	: libmicro.a libroot.so ;

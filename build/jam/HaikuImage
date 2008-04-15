@@ -477,6 +477,39 @@ if $(HAIKU_ADD_POSIX_TEST_SUITE_TO_IMAGE) {
 }
 
 
+#pragma mark - Benchmarks
+
+
+# libMicro
+if $(HAIKU_ADD_LIBMICRO_BENCHMARKS_TO_IMAGE) {
+	# add scripts, tattle executable and README
+	SEARCH on bench = [ FDirName $(HAIKU_TOP) src tests system benchmarks libMicro ] ;
+	AddFilesToHaikuImage home benchmarks libmicro : bench ;
+	SEARCH on multiview = [ FDirName $(HAIKU_TOP) src tests system benchmarks libMicro ] ;
+	AddFilesToHaikuImage home benchmarks libmicro : multiview ;
+	AddFilesToHaikuImage home benchmarks libmicro bin-BePC : tattle ;
+	SEARCH on README = [ FDirName $(HAIKU_TOP) src tests system benchmarks libMicro ] ;
+	AddFilesToHaikuImage home benchmarks libmicro : README ;
+
+
+	# add libmicro benchmarks
+	AddFilesToHaikuImage home benchmarks libmicro bin-BePC
+		: atomic <libmicro>bind cachetocache cascade_cond cascade_fcntl cascade_flock
+		  cascade_lockf cascade_mutex chdir close close_tcp connection dup exec exec_bin
+		  exit exp fcntl fcntl_ndelay file_lock fork getcontext getenv <libmicro>getpeername
+		  getpid getrusage getsockname gettimeofday isatty listen localtime_r <libmicro>log
+		  longjmp lrand48 lseek malloc memcpy memmove memrand memset mktime mmap mprotect
+		  msync munmap mutex nop <libmicro>open pipe poll pread pthread_create pwrite read
+		  realpath recurse select semop setcontext setsockopt sigaction siglongjmp signal
+		  sigprocmask <libmicro>socket socketpair <libmicro>stat strcasecmp strchr strcmp
+		  strcpy strftime strlen strtol system time times write writev ;
+
+	AddSymlinkToHaikuImage home benchmarks libmicro : bin-BePC : bin ;
+
+}
+
+
+
 #pragma mark - Optional Packages
 
 
