@@ -19,7 +19,7 @@ mmap(void* address, size_t length, int protection, int flags, int fd,
 	off_t offset)
 {
 	// offset and length must be page-aligned
-	if (length == 0 || (offset | length) % B_PAGE_SIZE != 0) {
+	if (length == 0 || offset % B_PAGE_SIZE != 0) {
 		errno = B_BAD_VALUE;
 		return MAP_FAILED;
 	}
