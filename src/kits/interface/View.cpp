@@ -3939,7 +3939,7 @@ BView::PreferredSize()
 
 
 BAlignment
-BView::Alignment()
+BView::LayoutAlignment()
 {
 	return BLayoutUtils::ComposeAlignment(fLayoutData->fAlignment,
 		(fLayoutData->fLayout ? fLayoutData->fLayout->Alignment()

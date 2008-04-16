@@ -170,7 +170,7 @@ void
 BLayoutUtils::AlignInFrame(BView* view, BRect frame)
 {
  	BSize maxSize = view->MaxSize();
- 	BAlignment alignment = view->Alignment();
+ 	BAlignment alignment = view->LayoutAlignment();
  
  	if (view->HasHeightForWidth()) {
  		// The view has height for width, so we do the horizontal alignment

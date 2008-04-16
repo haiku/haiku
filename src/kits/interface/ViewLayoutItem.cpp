@@ -44,7 +44,7 @@ BViewLayoutItem::PreferredSize()
 BAlignment
 BViewLayoutItem::Alignment()
 {
-	return fView->Alignment();
+	return fView->LayoutAlignment();
 }
 
 // SetExplicitMinSize

@@ -509,7 +509,7 @@ public:
 	virtual	BSize			MinSize();
 	virtual	BSize			MaxSize();
 	virtual	BSize			PreferredSize();
-	virtual	BAlignment		Alignment();
+	virtual	BAlignment		LayoutAlignment();
 
 			void			SetExplicitMinSize(BSize size);
 			void			SetExplicitMaxSize(BSize size);
