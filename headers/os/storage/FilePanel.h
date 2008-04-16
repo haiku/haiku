@@ -18,6 +18,9 @@ struct stat;
 
 class BRefFilter {
 	public:
+#if (GCC_VERSION >= 3000)
+		virtual		 ~BRefFilter() {};
+#endif
 		virtual	bool Filter(const entry_ref* ref, BNode* node,
 						struct stat* stat, const char* mimeType) = 0;
 };
