@@ -9,4 +9,4 @@
 #define PF_UNIX	AF_UNIX
 #endif
 
-#endif CONFIG_LIBMICRO_H
+#endif /* CONFIG_LIBMICRO_H */
