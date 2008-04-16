@@ -29,10 +29,10 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 }
 
 
-BString
+bdaddr_t
 RemoteDevice::GetBluetoothAddress()
 {
-    return BString(bdaddrUtils::ToString(fBdaddr));
+    return fBdaddr;
 }
 
 
