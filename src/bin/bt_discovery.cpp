@@ -20,6 +20,7 @@ public:
 
 simpleDiscoveryListener(LocalDevice *ld) : DiscoveryListener()
 {
+    /* TODO: Should not be needed */
 	SetLocalDeviceOwner(ld);
 }
 
@@ -27,21 +28,23 @@ simpleDiscoveryListener(LocalDevice *ld) : DiscoveryListener()
 void
 DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
 {
-	printf("Device Discovered!!\n");
+	printf("\t%s: Device %s discovered.\n",__FUNCTION__, bdaddrUtils::ToString(btDevice->GetBluetoothAddress()));
 }
 
 
 void
 InquiryCompleted(int discType)
 {
-	printf("%s: Inquiry process has finished ...\n",__FUNCTION__);
+
+	printf("\t%s: Inquiry process has finished ...\n",__FUNCTION__);
+//	send_data(thread, discType, NULL, 0);
 }
 
 
 void
 InquiryStarted(status_t status)
 {
-	printf("%s: Inquiry process has started ...\n",__FUNCTION__);
+	printf("\t%s: Inquiry process has started ...\n",__FUNCTION__);
 }
 
 
@@ -57,24 +60,34 @@ DumpInfo(LocalDevice* device)
 		printf("DiscoveryAgent could not be located\n");
 		return;
 	}
-	
-/*	printf("Discovering for  [LocalDevice] %s\t%s\n", 
+
+	printf("Discovering for  [LocalDevice] %s\t%s\n\n",
          (device->GetFriendlyName()).String(),
           bdaddrUtils::ToString(device->GetBluetoothAddress()));
-*/	
+
 	simpleDiscoveryListener* sdl = new simpleDiscoveryListener(device);
 
 	da->StartInquiry(BT_GIAC, sdl);
-
+	
+    printf("Press any key to retrieve names ...\n");
 	getchar();
 	
+    for (int32 index = 0 ; index < da->RetrieveDevices(0).CountItems(); index++ ) {
+
+        RemoteDevice* rd = da->RetrieveDevices(0).ItemAt(index);
+	    printf("%s \t@ %s ...\n", rd->GetFriendlyName(false).String(), bdaddrUtils::ToString(rd->GetBluetoothAddress()));
+
+    }
+
+
+	getchar();	
 }
 
 static status_t
 LocalDeviceError(status_t status)
 {
     fprintf(stderr,"No Device/s found");
-    
+
     return status;
 }
 
