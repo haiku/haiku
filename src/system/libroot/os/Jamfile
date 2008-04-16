@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot os ;
 
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateKernelHeaders ;
 
 MergeObject os_main.o :
 	area.c
@@ -24,7 +24,12 @@ MergeObject os_main.o :
 	time.c
 	syscalls.S
 	wait_for_objects.cpp
+
+	KMessage.cpp
 ;
+
+SEARCH on [ FGristFiles KMessage.cpp ]
+	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
 # We need to specify the dependency on the generated syscalls file explicitly.
 Depends [ FGristFiles syscalls.o ] : <syscalls>syscalls.S.inc ;

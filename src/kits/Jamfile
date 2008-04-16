@@ -17,7 +17,6 @@ if $(RUN_WITHOUT_APP_SERVER) != 0 {
 	SubDirC++Flags $(defines) ;
 }
 
-UsePrivateHeaders [ FDirName kernel ]	# For KMessage.h
 UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
 
 # Build our libbe.so
@@ -25,7 +24,6 @@ UsePrivateHeaders syslog_daemon ;		# For syslog.cpp
 AddResources libbe.so : libbe_version.rdef ;
 
 SharedLibrary libbe.so :
-	KMessage.cpp
 	: 
 	<libbe>app_kit.o
 	<libbe>interface_kit.o
@@ -58,7 +56,6 @@ if $(TARGET_PLATFORM) = libbe_test {
 }
 
 SharedLibrary libbe_haiku.so :
-	KMessage.cpp
 	syslog.cpp
 	:
 	<libbe>app_kit.o
@@ -73,9 +70,6 @@ SharedLibrary libbe_haiku.so :
 	$(TARGET_NETWORK_LIBS)
 	$(TARGET_LIBSTDC++)
 ;
-
-SEARCH on [ FGristFiles KMessage.cpp ]
-	= [ FDirName $(HAIKU_TOP) src system kernel messaging ] ;
 
 SEARCH on [ FGristFiles syslog.cpp ]
 	= [ FDirName $(HAIKU_TOP) src system libroot posix ] ;
