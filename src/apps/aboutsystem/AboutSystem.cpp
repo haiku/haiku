@@ -410,6 +410,7 @@ AboutView::AboutView(const BRect &rect)
 		"Bruce Cameron\n"
 		"Greg Crain\n"
 		"Tyler Dauwalder\n"
+		"David Dengg\n"
 		"John Drinkwater\n"
 		"Cian Duffy\n"
 		"Marc Flerackers\n"
