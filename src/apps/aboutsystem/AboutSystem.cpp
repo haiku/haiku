@@ -605,10 +605,11 @@ AboutView::AboutView(const BRect &rect)
 		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.");
 
 	// lp_solve copyrights
-	// TODO: Fix!
 	AddCopyrightEntry("lp_solve", 
 		"Copyright " B_UTF8_COPYRIGHT
-		" ??? (http://lpsolve.sourceforge.net/).");
+			" Michel Berkelaar, Kjell Eikland, Peter Notebaert",
+		"http://lpsolve.sourceforge.net/");
+			// license: LGPL
 
 	// OpenEXR copyrights
 	AddCopyrightEntry("OpenEXR", 
