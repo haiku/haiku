@@ -47,10 +47,26 @@ typedef struct filecookie
 static CHECK_MAGIC(filecookie,struct filecookie, FILECOOKIE_MAGIC)
 
 
-status_t
-dosfs_get_vnode_name(void *_ns, void *_node, char *buffer, size_t bufferSize)
+mode_t
+make_mode(nspace *volume, vnode *node)
 {
-	vnode   *node = (vnode*)_node;
+	mode_t result = S_IFREG | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
+	if (node->mode & FAT_SUBDIR) {
+		result &= ~S_IFREG;
+		result |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+	}
+	if ((volume->flags & B_FS_IS_READONLY) || (node->mode & FAT_READ_ONLY))
+		result &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+
+	return result;
+}
+
+
+status_t
+dosfs_get_vnode_name(fs_volume *_ns, fs_vnode *_node, char *buffer,
+	size_t bufferSize)
+{
+	vnode   *node = (vnode*)_node->private_node;
 	strlcpy(buffer, node->filename, bufferSize);
 	return B_OK;
 }
@@ -105,7 +121,11 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 	diri_mark_dirty(&diri);
 	diri_free(&diri);
 
-	notify_listener(B_STAT_CHANGED, vol->id, 0, 0, node->vnid, NULL);
+	// TODO: figure out which stats have actually changed
+	notify_stat_changed(vol->id, node->vnid, B_STAT_MODE | B_STAT_UID
+		| B_STAT_GID | B_STAT_SIZE | B_STAT_ACCESS_TIME
+		| B_STAT_MODIFICATION_TIME | B_STAT_CREATION_TIME
+		| B_STAT_CHANGE_TIME);
 
 	return B_OK;
 }
@@ -114,10 +134,10 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 // called when fs is done with vnode
 // after close, etc. free vnode resources here
 status_t
-dosfs_release_vnode(void *_vol, void *_node, bool reenter)
+dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 {
-	nspace *vol = (nspace *)_vol;
-	vnode *node = (vnode *)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 
 	TOUCH(reenter);
 
@@ -126,7 +146,7 @@ dosfs_release_vnode(void *_vol, void *_node, bool reenter)
 		return EINVAL;
 	}
 
-	DPRINTF(0, ("dosfs_write_vnode (ino_t %Lx)\n", ((vnode *)_node)->vnid));
+	DPRINTF(0, ("dosfs_write_vnode (ino_t %Lx)\n", node->vnid));
 
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
 		LOCK_VOL(vol);
@@ -152,10 +172,10 @@ dosfs_release_vnode(void *_vol, void *_node, bool reenter)
 
 
 status_t
-dosfs_rstat(void *_vol, void *_node, struct stat *st)
+dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 {
-	nspace	*vol = (nspace*)_vol;
-	vnode	*node = (vnode*)_node;
+	nspace	*vol = (nspace*)_vol->private_volume;
+	vnode	*node = (vnode*)_node->private_node;
 
 	LOCK_VOL(vol);
 
@@ -169,13 +189,7 @@ dosfs_rstat(void *_vol, void *_node, struct stat *st)
 
 	st->st_dev = vol->id;
 	st->st_ino = node->vnid;
-	st->st_mode = S_IFREG | S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH;
-	if (node->mode & FAT_SUBDIR) {
-		st->st_mode &= ~S_IFREG;
-		st->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-	}
-	if ((vol->flags & B_FS_IS_READONLY) || (node->mode & FAT_READ_ONLY))
-		st->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
+	st->st_mode = make_mode(vol, node);
 
 	st->st_nlink = 1;
 	st->st_uid = 0;
@@ -191,11 +205,12 @@ dosfs_rstat(void *_vol, void *_node, struct stat *st)
 
 
 status_t
-dosfs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
+dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
+	uint32 mask)
 {
 	int err = B_OK;
-	nspace	*vol = (nspace*)_vol;
-	vnode	*node = (vnode*)_node;
+	nspace	*vol = (nspace*)_vol->private_volume;
+	vnode	*node = (vnode*)_node->private_node;
 	bool dirty = false;
 
 	LOCK_VOL(vol);
@@ -258,7 +273,6 @@ dosfs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
 
 	if (dirty) {
 		write_vnode_entry(vol, node);
-		notify_listener(B_STAT_CHANGED, vol->id, 0, 0, node->vnid, NULL);
 
 		if (vol->fs_flags & FS_FLAGS_OP_SYNC) {
 			// sync the filesystem
@@ -276,11 +290,11 @@ dosfs_wstat(void *_vol, void *_node, const struct stat *st, uint32 mask)
 
 
 status_t
-dosfs_open(void *_vol, void *_node, int omode, void **_cookie)
+dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 {
 	status_t	result = EINVAL;
-	nspace *vol = (nspace *)_vol;
-	vnode* 	node = (vnode*)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode* 	node = (vnode*)_node->private_node;
 	filecookie *cookie;
 
 	*_cookie = NULL;
@@ -349,11 +363,11 @@ error:
 
 
 status_t
-dosfs_read(void *_vol, void *_node, void *_cookie, off_t pos,
+dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 			void *buf, size_t *len)
 {
-	nspace	*vol = (nspace *)_vol;
-	vnode	*node = (vnode *)_node;
+	nspace	*vol = (nspace *)_vol->private_volume;
+	vnode	*node = (vnode *)_node->private_node;
 	filecookie *cookie = (filecookie *)_cookie;
 	//uint8 *buffer;
 	//struct csi iter;
@@ -505,11 +519,11 @@ bi:
 
 
 status_t
-dosfs_write(void *_vol, void *_node, void *_cookie, off_t pos,
+dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	const void *buf, size_t *len)
 {
-	nspace	*vol = (nspace *)_vol;
-	vnode	*node = (vnode *)_node;
+	nspace	*vol = (nspace *)_vol->private_volume;
+	vnode	*node = (vnode *)_node->private_node;
 	filecookie *cookie = (filecookie *)_cookie;
 	//uint8 *buffer;
 	//struct csi iter;
@@ -706,10 +720,10 @@ bi:
 
 
 status_t
-dosfs_close(void *_vol, void *_node, void *_cookie)
+dosfs_close(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	nspace	*vol = (nspace *)_vol;
-	vnode	*node = (vnode *)_node;
+	nspace	*vol = (nspace *)_vol->private_volume;
+	vnode	*node = (vnode *)_node->private_node;
 
 	LOCK_VOL(vol);
 
@@ -720,7 +734,7 @@ dosfs_close(void *_vol, void *_node, void *_cookie)
 		return EINVAL;
 	}
 
-	DPRINTF(0, ("dosfs_close (vnode id %Lx)\n", ((vnode *)_node)->vnid));
+	DPRINTF(0, ("dosfs_close (vnode id %Lx)\n", node->vnid));
 
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
 		_dosfs_sync(vol);
@@ -734,10 +748,10 @@ dosfs_close(void *_vol, void *_node, void *_cookie)
 
 
 status_t
-dosfs_free_cookie(void *_vol, void *_node, void *_cookie)
+dosfs_free_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	nspace *vol = _vol;
-	vnode *node = _node;
+	nspace *vol = _vol->private_volume;
+	vnode *node = _node->private_node;
 	filecookie *cookie = _cookie;
 	LOCK_VOL(vol);
 
@@ -760,11 +774,11 @@ dosfs_free_cookie(void *_vol, void *_node, void *_cookie)
 
 
 status_t
-dosfs_create(void *_vol, void *_dir, const char *name, int omode,
+dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 	int perms, void **_cookie, ino_t *vnid)
 {
-	nspace *vol = (nspace *)_vol;
-	vnode *dir = (vnode *)_dir, *file;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *dir = (vnode *)_dir->private_node, *file;
 	filecookie *cookie;
 	status_t result = EINVAL;
 	bool dups_exist;
@@ -815,21 +829,21 @@ dosfs_create(void *_vol, void *_dir, const char *name, int omode,
 	if (result == B_OK) {
 		if (omode & O_EXCL) {
 			dprintf("exclusive dosfs_create called on existing file %s\n", name);
-			put_vnode(vol->id, file->vnid);
+			put_vnode(_vol, file->vnid);
 			result = EEXIST;
 			goto bi;
 		}
 
 		if (file->mode & FAT_SUBDIR) {
 			dprintf("can't dosfs_create over an existing subdirectory\n");
-			put_vnode(vol->id, file->vnid);
+			put_vnode(_vol, file->vnid);
 			result = EPERM;
 			goto bi;
 		}
 
 		if (file->disk_image) {
 			dprintf("can't dosfs_create over a disk image\n");
-			put_vnode(vol->id, file->vnid);
+			put_vnode(_vol, file->vnid);
 			result = EPERM;
 			goto bi;
 		}
@@ -875,7 +889,7 @@ dosfs_create(void *_vol, void *_dir, const char *name, int omode,
 		*vnid = dummy.vnid;
 		dummy.magic = ~VNODE_MAGIC;
 
-		result = get_vnode(vol->id, *vnid, (void **)&file);
+		result = get_vnode(_vol, *vnid, (void **)&file);
 		if (result < B_OK) {
 			if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 				_dosfs_sync(vol);
@@ -892,7 +906,7 @@ dosfs_create(void *_vol, void *_dir, const char *name, int omode,
 	cookie->ccache.cluster = file->cluster;
 	*_cookie = cookie;
 
-	notify_listener(B_ENTRY_CREATED, vol->id, dir->vnid, 0, *vnid, name);
+	notify_entry_created(vol->id, dir->vnid, name, *vnid);
 
 	result = 0;
 
@@ -910,10 +924,11 @@ bi:	if (result != B_OK) free(cookie);
 
 
 status_t
-dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms, ino_t *_vnid)
+dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms,
+	ino_t *_vnid)
 {
-	nspace *vol = (nspace *)_vol;
-	vnode *dir = (vnode *)_dir, dummy;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *dir = (vnode *)_dir->private_node, dummy;
 	status_t result = EINVAL;
 	struct csi csi;
 	uchar *buffer;
@@ -1037,7 +1052,7 @@ dosfs_mkdir(void *_vol, void *_dir, const char *name, int perms, ino_t *_vnid)
 
 	free(buffer);
 
-	notify_listener(B_ENTRY_CREATED, vol->id, dir->vnid, 0, dummy.vnid, name);
+	notify_entry_created(vol->id, dir->vnid, name, dummy.vnid);
 
 	result = B_OK;
 
@@ -1062,12 +1077,14 @@ bi:	dummy.magic = ~VNODE_MAGIC;
 
 
 status_t
-dosfs_rename(void *_vol, void *_odir, const char *oldname,
-	void *_ndir, const char *newname)
+dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
+	fs_vnode *_ndir, const char *newname)
 {
 	status_t result = EINVAL;
-	nspace *vol = (nspace *)_vol;
-	vnode *odir = (vnode *)_odir, *ndir = (vnode *)_ndir, *file, *file2;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *odir = (vnode *)_odir->private_node;
+	vnode *ndir = (vnode *)_ndir->private_node;
+	vnode *file, *file2;
 	uint32 ns, ne;
 	bool dups_exist;
 	bool dirty = false;
@@ -1137,11 +1154,11 @@ dosfs_rename(void *_vol, void *_odir, const char *oldname,
 			if (vnid == vol->root_vnode.vnid)
 				break;
 
-			result = get_vnode(vol->id, vnid, (void **)&dir);
+			result = get_vnode(_vol, vnid, (void **)&dir);
 			if (result < B_OK)
 				goto bi1;
 			parent = dir->dir_vnid;
-			put_vnode(vol->id, vnid);
+			put_vnode(_vol, vnid);
 			vnid = parent;
 		}
 	}
@@ -1163,7 +1180,7 @@ dosfs_rename(void *_vol, void *_odir, const char *oldname,
 		ns = file2->sindex; ne = file2->eindex;
 
 		// let others know the old file is gone
-		notify_listener(B_ENTRY_REMOVED, vol->id, ndir->vnid, 0, file2->vnid, NULL);
+		notify_entry_removed(vol->id, ndir->vnid, oldname, file2->vnid);
 
 		// Make sure this vnode 1) is in the vcache and 2) no longer has a
 		// location associated with it. See discussion in dosfs_unlink()
@@ -1173,8 +1190,8 @@ dosfs_rename(void *_vol, void *_odir, const char *oldname,
 		// note we don't have to lock the file because the fat chain doesn't
 		// get wiped from the disk until dosfs_remove_vnode() is called; we'll
 		// have a phantom chain in effect until the last file is closed.
-		remove_vnode(vol->id, file2->vnid); // must be done in this order
-		put_vnode(vol->id, file2->vnid);
+		remove_vnode(_vol, file2->vnid); // must be done in this order
+		put_vnode(_vol, file2->vnid);
 
 		dirty = true;
 
@@ -1267,20 +1284,23 @@ dosfs_rename(void *_vol, void *_odir, const char *oldname,
 	if (file->filename) strcpy(file->filename, newname);
 #endif
 
-	notify_listener(B_ENTRY_MOVED, vol->id, odir->vnid, ndir->vnid, file->vnid, newname);
+	notify_entry_moved(vol->id, odir->vnid, oldname, ndir->vnid, newname,
+		file->vnid);
 
 	// update MIME information
 	if(!(file->mode & FAT_SUBDIR)) {
 		set_mime_type(file, newname);
-		notify_listener(B_ATTR_CHANGED, vol->id, 0, 0, file->vnid, "BEOS:TYPE");
+		notify_attribute_changed(vol->id, file->vnid, "BEOS:TYPE",
+			B_ATTR_CHANGED);
 	}
 
 	result = 0;
 
 bi2:
-	if (result != B_OK) put_vnode(vol->id, file2->vnid);
+	if (result != B_OK)
+		put_vnode(_vol, file2->vnid);
 bi1:
-	put_vnode(vol->id, file->vnid);
+	put_vnode(_vol, file->vnid);
 bi:
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && dirty)
 		_dosfs_sync(vol);
@@ -1291,10 +1311,10 @@ bi:
 
 
 status_t
-dosfs_remove_vnode(void *_vol, void *_node, bool reenter)
+dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 {
-	nspace *vol = (nspace *)_vol;
-	vnode *node = (vnode *)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 
 	if (!reenter) { LOCK_VOL(vol); }
 
@@ -1345,11 +1365,11 @@ dosfs_remove_vnode(void *_vol, void *_node, bool reenter)
 
 // get rid of node or directory
 static status_t
-do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
+do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 {
 	status_t result = EINVAL;
-	nspace *vol = (nspace *)_vol;
-	vnode *dir = (vnode *)_dir, *file;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *dir = (vnode *)_dir->private_node, *file;
 	ino_t vnid;
 
 	if (!strcmp(name, "."))
@@ -1426,7 +1446,7 @@ do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
 	// shrink the parent directory (errors here are not disastrous)
 	compact_directory(vol, dir);
 
-	notify_listener(B_ENTRY_REMOVED, vol->id, dir->vnid, 0, file->vnid, NULL);
+	notify_entry_removed(vol->id, dir->vnid, name, file->vnid);
 
 	/* Set the loc to a unique value. This effectively removes it from the
 	 * vcache without releasing its vnid for reuse. It also nicely reserves
@@ -1438,15 +1458,17 @@ do_unlink(void *_vol, void *_dir, const char *name, bool is_file)
 
 	// fsil doesn't call dosfs_write_vnode for us, so we have to free the
 	// vnode manually here.
-	remove_vnode(vol->id, file->vnid);
+	remove_vnode(_vol, file->vnid);
 
 	result = 0;
 
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
 
-bi1:put_vnode(vol->id, vnid);		// get 1 free
-bi:	UNLOCK_VOL(vol);
+bi1:
+	put_vnode(_vol, vnid);		// get 1 free
+bi:
+	UNLOCK_VOL(vol);
 
 	if (result != B_OK) DPRINTF(0, ("do_unlink (%s)\n", strerror(result)));
 
@@ -1454,7 +1476,7 @@ bi:	UNLOCK_VOL(vol);
 }
 
 status_t
-dosfs_unlink(void *vol, void *dir, const char *name)
+dosfs_unlink(fs_volume *vol, fs_vnode *dir, const char *name)
 {
 	DPRINTF(1, ("dosfs_unlink called\n"));
 
@@ -1463,7 +1485,7 @@ dosfs_unlink(void *vol, void *dir, const char *name)
 
 
 status_t
-dosfs_rmdir(void *vol, void *dir, const char *name)
+dosfs_rmdir(fs_volume *vol, fs_vnode *dir, const char *name)
 {
 	DPRINTF(1, ("dosfs_rmdir called\n"));
 
@@ -1472,7 +1494,7 @@ dosfs_rmdir(void *vol, void *dir, const char *name)
 
 
 bool
-dosfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
+dosfs_can_page(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
 	// ToDo: we're obviously not even asked...
 	return false;
@@ -1480,11 +1502,12 @@ dosfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 
 status_t
-dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
+	bool reenter)
 {
-	nspace *vol = (nspace *)_fs;
-	vnode *node = (vnode *)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
 	size_t bytesLeft = *_numBytes;
@@ -1532,11 +1555,12 @@ dosfs_read_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 
 status_t
-dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
-	const iovec *vecs, size_t count, size_t *_numBytes, bool reenter)
+dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie,
+	off_t pos, const iovec *vecs, size_t count, size_t *_numBytes,
+	bool reenter)
 {
-	nspace *vol = (nspace *)_fs;
-	vnode *node = (vnode *)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 	uint32 vecIndex = 0;
 	size_t vecOffset = 0;
 	size_t bytesLeft = *_numBytes;
@@ -1584,11 +1608,11 @@ dosfs_write_pages(fs_volume _fs, fs_vnode _node, fs_cookie _cookie, off_t pos,
 
 
 status_t
-dosfs_get_file_map(void *_fs, void *_node, off_t pos, size_t len,
+dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos, size_t len,
 	struct file_io_vec *vecs, size_t *_count)
 {
-	nspace	*vol = (nspace *)_fs;
-	vnode	*node = (vnode *)_node;
+	nspace	*vol = (nspace *)_vol->private_volume;
+	vnode	*node = (vnode *)_node->private_node;
 	struct csi iter;
 	int result = B_OK;
 	size_t bytes_read = 0;

@@ -116,7 +116,8 @@ struct vcache_entry;
 typedef struct _nspace
 {
 	uint32	magic;
-	dev_t			id;				// ID passed in to fs_mount
+	fs_volume		*volume;		// fs_volume passed in to fs_mount
+	dev_t			id;
 	int				fd;				// File descriptor
 	char			device[256];
 	uint32			flags;			// see <fcntl.be.h> for modes
@@ -196,6 +197,9 @@ int check_vnode_magic(struct vnode *t, char *funcname);
 int check_nspace_magic(struct _nspace *t, char *funcname);
 
 #define TOUCH(x) ((void)(x))
+
+extern fs_vnode_ops gFATVnodeOps;
+extern fs_volume_ops gFATVolumeOps;
 
 /* debug levels */
 extern int debug_attr, debug_dir, debug_dlist, debug_dosfs, debug_encodings,

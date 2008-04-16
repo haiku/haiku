@@ -21,6 +21,7 @@
 #include "fat.h"
 #include "util.h"
 #include "vcache.h"
+#include "file.h"
 
 #include "encodings.h"
 
@@ -432,7 +433,7 @@ findfile(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 		if (vnid)
 			*vnid = found_vnid;
 		if (node)
-			result = get_vnode(vol->id, found_vnid, (void **)node);
+			result = get_vnode(vol->volume, found_vnid, (void **)node);
 		result = B_OK;
 	} else {
 		result = ENOENT;
@@ -922,9 +923,10 @@ create_dir_entry(nspace *vol, vnode *dir, vnode *node, const char *name,
 
 
 status_t 
-dosfs_read_vnode(void *_vol, ino_t vnid, void **_node, bool reenter)
+dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
+	uint32 *_flags, bool reenter)
 {
-	nspace *vol = (nspace*)_vol;
+	nspace *vol = (nspace*)_vol->private_volume;
 	int result = B_NO_ERROR;
 	ino_t loc, dir_vnid;
 	vnode *entry;
@@ -936,7 +938,9 @@ dosfs_read_vnode(void *_vol, ino_t vnid, void **_node, bool reenter)
 		LOCK_VOL(vol);
 	}
 
-	*_node = NULL;
+	_node->private_node = NULL;
+	_node->ops = &gFATVnodeOps;
+	_flags = 0;
 
 	if (check_nspace_magic(vol, "dosfs_read_vnode")) {
 		if (!reenter) UNLOCK_VOL(vol);
@@ -947,7 +951,8 @@ dosfs_read_vnode(void *_vol, ino_t vnid, void **_node, bool reenter)
 
 	if (vnid == vol->root_vnode.vnid) {
 		dprintf("??? dosfs_read_vnode called on root node ???\n");
-		*_node = (void *)&(vol->root_vnode);
+		_node->private_node = (void *)&(vol->root_vnode);
+		*_type = make_mode(vol, &vol->root_vnode);
 		goto bi;
 	}
 
@@ -1043,7 +1048,8 @@ dosfs_read_vnode(void *_vol, ino_t vnid, void **_node, bool reenter)
 	if (!(entry->mode & FAT_SUBDIR))
 		set_mime_type(entry, filename);
 
-	*_node = entry;
+	_node->private_node = entry;
+	*_type = make_mode(vol, entry);
 
 bi2:
 	diri_free(&iter);
@@ -1059,12 +1065,12 @@ bi:
 
 
 status_t 
-dosfs_walk(void *_vol, void *_dir, const char *file, ino_t *_vnid, int *_type)
+dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 {
 	/* Starting at the base, find file in the subdir, and return path
 		string and vnode id of file. */
-	nspace	*vol = (nspace*)_vol;
-	vnode	*dir = (vnode*)_dir;
+	nspace	*vol = (nspace*)_vol->private_volume;
+	vnode	*dir = (vnode*)_dir->private_node;
 	vnode	*vnode = NULL;
 	status_t result = ENOENT;
 
@@ -1092,11 +1098,11 @@ dosfs_walk(void *_vol, void *_dir, const char *file, ino_t *_vnid, int *_type)
 
 
 status_t 
-dosfs_access(void *_vol, void *_node, int mode)
+dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 {
 	status_t result = B_OK;
-	nspace *vol = (nspace *)_vol;
-	vnode *node = (vnode *)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 
 	LOCK_VOL(vol);
 
@@ -1128,7 +1134,7 @@ dosfs_access(void *_vol, void *_node, int mode)
 
 
 status_t 
-dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize)
+dosfs_readlink(fs_volume *_vol, fs_vnode *_node, char *buf, size_t *bufsize)
 {
 	TOUCH(_vol); TOUCH(_node); TOUCH(buf); TOUCH(bufsize);
 
@@ -1140,10 +1146,10 @@ dosfs_readlink(void *_vol, void *_node, char *buf, size_t *bufsize)
 
 
 status_t 
-dosfs_opendir(void *_vol, void *_node, void **_cookie)
+dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {
-	nspace *vol = (nspace*)_vol;
-	vnode *node = (vnode*)_node;
+	nspace *vol = (nspace*)_vol->private_volume;
+	vnode *node = (vnode*)_node->private_node;
 	dircookie *cookie = NULL;
 	int result;
 
@@ -1198,12 +1204,12 @@ bi:
 
 
 status_t 
-dosfs_readdir(void *_vol, void *_dir, void *_cookie, 
+dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie, 
 	struct dirent *entry, size_t bufsize, uint32 *num)
 {
 	int 		result = ENOENT;
-	nspace* 	vol = (nspace*)_vol;
-	vnode		*dir = (vnode *)_dir;
+	nspace* 	vol = (nspace*)_vol->private_volume;
+	vnode		*dir = (vnode *)_dir->private_node;
 	dircookie* 	cookie = (dircookie*)_cookie;
 	struct		diri diri;
 
@@ -1279,10 +1285,10 @@ bi:
 			
 
 status_t
-dosfs_rewinddir(void *_vol, void *_node, void* _cookie)
+dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 {
-	nspace		*vol = _vol;
-	vnode		*node = _node;
+	nspace		*vol = (nspace *)_vol->private_volume;
+	vnode		*node = (vnode *)_node->private_node;
 	dircookie	*cookie = (dircookie*)_cookie;
 
 	LOCK_VOL(vol);
@@ -1305,7 +1311,7 @@ dosfs_rewinddir(void *_vol, void *_node, void* _cookie)
 
 
 status_t 
-dosfs_closedir(void *_vol, void *_node, void *_cookie)
+dosfs_closedir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
 	TOUCH(_vol); TOUCH(_node); TOUCH(_cookie);
 
@@ -1316,15 +1322,16 @@ dosfs_closedir(void *_vol, void *_node, void *_cookie)
 
 
 status_t 
-dosfs_free_dircookie(void *_vol, void *node, void *_cookie)
+dosfs_free_dircookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
-	nspace *vol = _vol;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 	dircookie *cookie = _cookie;
 
 	LOCK_VOL(vol);
 
 	if (check_nspace_magic(vol, "dosfs_free_dircookie")
-		|| check_vnode_magic((vnode *)node, "dosfs_free_dircookie")
+		|| check_vnode_magic(node, "dosfs_free_dircookie")
 		|| check_dircookie_magic((dircookie *)cookie, "dosfs_free_dircookie")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
@@ -1336,7 +1343,7 @@ dosfs_free_dircookie(void *_vol, void *node, void *_cookie)
 		return EINVAL;
 	}
 
-	DPRINTF(0, ("dosfs_free_dircookie (vnode id %Lx)\n", ((vnode*)node)->vnid));
+	DPRINTF(0, ("dosfs_free_dircookie (vnode id %Lx)\n", node->vnid));
 
 	cookie->magic = ~DIRCOOKIE_MAGIC;
 	free(cookie);

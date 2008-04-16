@@ -49,7 +49,7 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 int32 instances = 0;
 
 static int
-debug_fat(int argc, char **argv)
+debug_fat_nspace(int argc, char **argv)
 {
 	int i;
 	for (i = 1; i < argc; i++) {
@@ -154,8 +154,8 @@ lock_removable_device(int fd, bool state)
 
 
 static status_t
-mount_fat_disk(const char *path, dev_t nsid, const int flags, nspace** newVol,
-	int fs_flags, int op_sync_mode)
+mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
+	nspace** newVol, int fs_flags, int op_sync_mode)
 {
 	nspace		*vol = NULL;
 	uint8		buf[512];
@@ -432,7 +432,8 @@ mount_fat_disk(const char *path, dev_t nsid, const int flags, nspace** newVol,
 
 	// now we are convinced of the drive's validity
 
-	vol->id = nsid;
+	vol->volume = _vol;
+	vol->id = _vol->id;
 	strncpy(vol->device,path,256);
 
 	// this will be updated later if fsinfo exists
@@ -679,11 +680,11 @@ dosfs_free_identify_partition_cookie(partition_data *partition, void *_cookie)
 
 
 static status_t
-dosfs_mount(dev_t nsid, const char *device, uint32 flags,
-	const char *args, void **_data, ino_t *_rootID)
+dosfs_mount(fs_volume *_vol, const char *device, uint32 flags,
+	const char *args, ino_t *_rootID)
 {
 	int	result;
-	nspace	*vol;
+	nspace *vol;
 	void *handle;
 	int op_sync_mode = 0;
 	int fs_flags = 0;
@@ -722,22 +723,20 @@ dosfs_mount(dev_t nsid, const char *device, uint32 flags,
 	flags |= 1;
 #endif
 
-	if (_data == NULL) {
-		dprintf("dosfs_mount passed NULL data pointer\n");
-		return EINVAL;
-	}
-
 	// Try and mount volume as a FAT volume
-	if ((result = mount_fat_disk(device, nsid, flags, &vol, fs_flags, op_sync_mode)) == B_NO_ERROR) {
+	if ((result = mount_fat_disk(device, _vol, flags, &vol, fs_flags,
+		op_sync_mode)) == B_NO_ERROR) {
 		char name[32];
 
 		if (check_nspace_magic(vol, "dosfs_mount")) return EINVAL;
 		
 		*_rootID = vol->root_vnode.vnid;
-		*_data = (void*)vol;
+		_vol->private_volume = (void *)vol;
+		_vol->ops = &gFATVolumeOps;
 		
 		// You MUST do this. Create the vnode for the root.
-		result = publish_vnode(nsid, *_rootID, (void*)&(vol->root_vnode));
+		result = publish_vnode(_vol, *_rootID, (void*)&(vol->root_vnode),
+			&gFATVnodeOps, make_mode(vol, &vol->root_vnode), 0);
 		if (result != B_NO_ERROR) {
 			dprintf("error creating new vnode (%s)\n", strerror(result));
 			goto error;
@@ -749,10 +748,8 @@ dosfs_mount(dev_t nsid, const char *device, uint32 flags,
 		}
 
 #if DEBUG
-		load_driver_symbols("fat");
-
 		if (atomic_add(&instances, 1) == 0) {
-			add_debugger_command("fat", debug_fat, "dump a fat nspace structure");
+			add_debugger_command("fat", debug_fat_nspace, "dump a fat nspace structure");
 			add_debugger_command("dvnode", debug_dvnode, "dump a fat vnode structure");
 			add_debugger_command("dfvnid", debug_dfvnid, "find a vnid in the vnid cache");
 			add_debugger_command("dfloc", debug_dfloc, "find a loc in the vnid cache");
@@ -835,11 +832,11 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 
 
 static status_t 
-dosfs_unmount(void *_vol)
+dosfs_unmount(fs_volume *_vol)
 {
 	int result = B_NO_ERROR;
 
-	nspace* vol = (nspace*)_vol;
+	nspace* vol = (nspace*)_vol->private_volume;
 
 	LOCK_VOL(vol);
 	
@@ -853,12 +850,12 @@ dosfs_unmount(void *_vol)
 	update_fsinfo(vol);
 	
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
-	put_vnode(vol->id, vol->root_vnode.vnid);
+	put_vnode(_vol, vol->root_vnode.vnid);
 	block_cache_delete(vol->fBlockCache, true);
 
 #if DEBUG
 	if (atomic_add(&instances, -1) == 1) {
-		remove_debugger_command("fat", debug_fat);
+		remove_debugger_command("fat", debug_fat_nspace);
 		remove_debugger_command("dvnode", debug_dvnode);
 		remove_debugger_command("dfvnid", debug_dfvnid);
 		remove_debugger_command("dfloc", debug_dfloc);
@@ -885,9 +882,9 @@ dosfs_unmount(void *_vol)
 
 // dosfs_read_fs_stat - Fill in fs_info struct for device.
 static status_t 
-dosfs_read_fs_stat(void *_vol, struct fs_info * fss)
+dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 {
-	nspace* vol = (nspace*)_vol;
+	nspace* vol = (nspace*)_vol->private_volume;
 	int i;
 
 	LOCK_VOL(vol);
@@ -943,10 +940,10 @@ dosfs_read_fs_stat(void *_vol, struct fs_info * fss)
 }
 
 static status_t
-dosfs_write_fs_stat(void *_vol, const struct fs_info * fss, uint32 mask)
+dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 {
 	status_t result = B_ERROR;
-	nspace* vol = (nspace*)_vol;
+	nspace* vol = (nspace*)_vol->private_volume;
 
 	LOCK_VOL(vol);
 
@@ -1039,12 +1036,12 @@ bi:	UNLOCK_VOL(vol);
 
 
 static status_t 
-dosfs_ioctl(void *_vol, void *_node, void *cookie, ulong code, 
+dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code, 
 	void *buf, size_t len)
 {
 	status_t result = B_OK;
-	nspace *vol = (nspace *)_vol;
-	vnode *node = (vnode *)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 
 	TOUCH(cookie); TOUCH(buf); TOUCH(len);
 
@@ -1148,9 +1145,9 @@ _dosfs_sync(nspace *vol)
 
 
 static status_t 
-dosfs_sync(void *_vol)
+dosfs_sync(fs_volume *_vol)
 {
-	nspace *vol = (nspace *)_vol;
+	nspace *vol = (nspace *)_vol->private_volume;
 	status_t err;
 
 	DPRINTF(0, ("dosfs_sync called on volume %lx\n", vol->id));
@@ -1164,10 +1161,10 @@ dosfs_sync(void *_vol)
 
 
 static status_t 
-dosfs_fsync(void *_vol, void *_node)
+dosfs_fsync(fs_volume *_vol, fs_vnode *_node)
 {
-	nspace *vol = (nspace *)_vol;
-	vnode *node = (vnode *)_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 	status_t err = B_OK;
 
 	LOCK_VOL(vol);
@@ -1203,32 +1200,37 @@ dos_std_ops(int32 op, ...)
 }
 
 
-static file_system_module_info sFATFileSystem = {
-	{
-		"file_systems/fat" B_CURRENT_FS_API_VERSION,
-		0,
-		dos_std_ops,
-	},
-
-	"FAT32 File System",
-	0,	// DDM flags
-
-	// scanning
-	dosfs_identify_partition,
-	dosfs_scan_partition,
-	dosfs_free_identify_partition_cookie,
-	NULL,	// free_partition_content_cookie()
-
-	&dosfs_mount,
+fs_volume_ops gFATVolumeOps = {
 	&dosfs_unmount,
 	&dosfs_read_fs_stat,
 	&dosfs_write_fs_stat,
 	&dosfs_sync,
+	&dosfs_read_vnode,
 
+	/* index directory & index operations */
+	NULL,	//&fs_open_index_dir,
+	NULL,	//&fs_close_index_dir,
+	NULL,	//&fs_free_index_dir_cookie,
+	NULL,	//&fs_read_index_dir,
+	NULL,	//&fs_rewind_index_dir,
+
+	NULL,	//&fs_create_index,
+	NULL,	//&fs_remove_index,
+	NULL,	//&fs_stat_index,
+
+	/* query operations */
+	NULL,	//&fs_open_query,
+	NULL,	//&fs_close_query,
+	NULL, 	//&fs_free_query_cookie,
+	NULL, 	//&fs_read_query,
+	NULL, 	//&fs_rewind_query,
+};
+
+
+fs_vnode_ops gFATVnodeOps = {
 	/* vnode operations */
 	&dosfs_walk,
 	&dosfs_get_vnode_name,
-	&dosfs_read_vnode,
 	&dosfs_release_vnode,
 	&dosfs_remove_vnode,
 
@@ -1272,7 +1274,7 @@ static file_system_module_info sFATFileSystem = {
 	&dosfs_free_dircookie,
 	&dosfs_readdir,
 	&dosfs_rewinddir,
-	
+
 	/* attribute directory operations */
 	&dosfs_open_attrdir,
 	&dosfs_close_attrdir,
@@ -1292,24 +1294,26 @@ static file_system_module_info sFATFileSystem = {
 	NULL,	//&fs_write_attr_stat,
 	NULL,	//&fs_rename_attr,
 	NULL,	//&fs_remove_attr,
+};
 
-	/* index directory & index operations */
-	NULL,	//&fs_open_index_dir,
-	NULL,	//&fs_close_index_dir,
-	NULL,	//&fs_free_index_dir_cookie,
-	NULL,	//&fs_read_index_dir,
-	NULL,	//&fs_rewind_index_dir,
 
-	NULL,	//&fs_create_index,
-	NULL,	//&fs_remove_index,
-	NULL,	//&fs_stat_index,
+static file_system_module_info sFATFileSystem = {
+	{
+		"file_systems/fat" B_CURRENT_FS_API_VERSION,
+		0,
+		dos_std_ops,
+	},
 
-	/* query operations */
-	NULL,	//&fs_open_query,
-	NULL,	//&fs_close_query,
-	NULL, 	//&fs_free_query_cookie,
-	NULL, 	//&fs_read_query,
-	NULL, 	//&fs_rewind_query,
+	"FAT32 File System",
+	0,	// DDM flags
+
+	// scanning
+	dosfs_identify_partition,
+	dosfs_scan_partition,
+	dosfs_free_identify_partition_cookie,
+	NULL,	// free_partition_content_cookie()
+
+	&dosfs_mount,
 };
 
 module_info *modules[] = {
