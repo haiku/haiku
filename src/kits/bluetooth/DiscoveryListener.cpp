@@ -5,9 +5,11 @@
  *
  */
 
+#include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
 #include <bluetooth/RemoteDevice.h>
 #include <bluetooth/DeviceClass.h>
+#include <bluetooth/bdaddrUtils.h>
 
 #include <bluetooth/HCI/btHCI_event.h>
 
@@ -19,28 +21,28 @@ namespace Bluetooth {
 
 
 /* hooks */
-void 
+void
 DiscoveryListener::DeviceDiscovered(RemoteDevice* btDevice, DeviceClass cod)
-{    
+{
 
 }
 
 
-void 
+void
 DiscoveryListener::InquiryStarted(status_t status)
 {
 
 }
 
 
-void 
+void
 DiscoveryListener::InquiryCompleted(int discType)
 {
 
 }
 
 
-/* private */            
+/* private */
 
 /* A LocalDevice is always referenced in any request to the
    Bluetooth server therefore is going to be needed in any */
@@ -68,25 +70,46 @@ DiscoveryListener::MessageReceived(BMessage* message)
         case BT_MSG_INQUIRY_DEVICE:
         {
 			const struct inquiry_info* inquiryInfo;
-		 	ssize_t	size;   
-
+		 	ssize_t	size;
+			RemoteDevice* rd = NULL;
+			bool duplicatedFound = false;
+				
 			if (message->FindData("info", B_ANY_TYPE, 0, (const void**)&inquiryInfo, &size) == B_OK )
-			{			
-	            RemoteDevice* rd = new RemoteDevice(inquiryInfo->bdaddr);
-	            //  DeviceClass(inquiryInfo->dev_class[0] | inquiryInfo->dev_class[1]<<8 | inquiryInfo->dev_class[2]<<16 )
-				//  fRemoteDevicesList.AddItem(rd);
-	            rd->SetLocalDeviceOwner(fLocalDevice);	      
-	            DeviceDiscovered( rd, DeviceClass(inquiryInfo->dev_class[0] | inquiryInfo->dev_class[1]<<8 | inquiryInfo->dev_class[2]<<16 ));
+			{
 
+			    // Skip duplicated replies
+			    for (int32 index = 0 ; index < fRemoteDevicesList.CountItems(); index++) {
+			    
+			    	bdaddr_t b1 = fRemoteDevicesList.ItemAt(index)->GetBluetoothAddress();
+			    				     	                          
+			        if (bdaddrUtils::Compare( (bdaddr_t*) &inquiryInfo->bdaddr, &b1 )) {
+
+						duplicatedFound = true;		
+			            break;			        
+			        }
+			        
+			    }
+
+				if (!duplicatedFound) {
+
+		            //  DeviceClass(inquiryInfo->dev_class[0] | inquiryInfo->dev_class[1]<<8 | inquiryInfo->dev_class[2]<<16 )
+       	            rd = new RemoteDevice(inquiryInfo->bdaddr);			        
+					fRemoteDevicesList.AddItem(rd);
+	    	        rd->SetLocalDeviceOwner(fLocalDevice);
+	        	    DeviceDiscovered( rd, DeviceClass(inquiryInfo->dev_class[0] | 
+	            	                                  inquiryInfo->dev_class[1]<<8 | 
+	                	                              inquiryInfo->dev_class[2]<<16 ));
+	            }    	                              
   			}
         }
         break;
 
         case BT_MSG_INQUIRY_STARTED:
             if (message->FindInt8("status", &status) == B_OK){
+                fRemoteDevicesList.MakeEmpty();
 	            InquiryStarted(status);
             }
-            
+
         break;
 
         case BT_MSG_INQUIRY_COMPLETED:
@@ -116,7 +139,7 @@ DiscoveryListener::MessageReceived(BMessage* message)
 }
 
 
-DiscoveryListener::DiscoveryListener() : BLooper()
+DiscoveryListener::DiscoveryListener() : BLooper() , fRemoteDevicesList(BT_MAX_RESPONSES)
 {
 	// TODO: Make a better handling of the running not running state
 	Run();
