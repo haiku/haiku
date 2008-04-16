@@ -41,7 +41,7 @@ public:
 	void CommandStatus(struct hci_ev_cmd_status* event, BMessage* request);
 	
 	// Inquiry
-	void InquiryResult(struct inquiry_info* event, BMessage* request);
+	void InquiryResult(uint8* numberOfResponses, BMessage* request);
 	void InquiryComplete(uint8* status, BMessage* request);
 	
 };

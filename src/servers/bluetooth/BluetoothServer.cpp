@@ -362,6 +362,7 @@ BluetoothServer::HandleSimpleRequest(BMessage* message, BMessage* reply)
 	
 	// we are gonna need issue the command ...
 	if (ldi->ProcessSimpleRequest(DetachCurrentMessage()) == B_OK)
+//	if (ldi->ProcessSimpleRequest(message) == B_OK)
 		return B_WOULD_BLOCK;
 	else
 		return B_ERROR;

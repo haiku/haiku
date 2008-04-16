@@ -115,7 +115,7 @@ printf("### \n");
     	break;
     	
     	case HCI_EVENT_INQUIRY_RESULT:
-    		InquiryResult((struct inquiry_info*)(event+1), request);
+    		InquiryResult((uint8*)(event+1), request);
 		break;
  	
 		case HCI_EVENT_CONN_COMPLETE:
@@ -357,7 +357,7 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 			    Output::Instance()->Post("Negative reply for inquiry status\n", BLACKBOARD_KIT);                
             }
 
-            printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
+            printf("Sending reply ... %ld\n", request->SendReply(&reply));                                
             reply.PrintToStream();
                         
             ClearWantedEvent(request, HCI_EVENT_CMD_STATUS, PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
@@ -373,12 +373,14 @@ LocalDeviceImpl::CommandStatus(struct hci_ev_cmd_status* event, BMessage* reques
 
 
 void 
-LocalDeviceImpl::InquiryResult(struct inquiry_info* event, BMessage* request)
+LocalDeviceImpl::InquiryResult(uint8* numberOfResponses, BMessage* request)
 {
 
 	BMessage reply(BT_MSG_INQUIRY_DEVICE);
+
 	
-    reply.AddData("info", B_ANY_TYPE, &event, sizeof(struct inquiry_info));
+    reply.AddData("info", B_ANY_TYPE, numberOfResponses+1 // skiping here the number of responses
+                        , (*numberOfResponses) * sizeof(struct inquiry_info) );
 	
     printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));                                
 
@@ -392,8 +394,10 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 	
 	reply.AddInt8("status", *status);
 	
-    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));	
 
+    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));                                
+//    (request->ReturnAddress()).SendMessage(&reply);
+    
     ClearWantedEvent(request);    
 }
 
