@@ -558,6 +558,7 @@ UHCI::Start()
 
 	TRACE(("usb_uhci: controller is started. status: %u curframe: %u\n",
 		ReadReg16(UHCI_USBSTS), ReadReg16(UHCI_FRNUM)));
+	dprintf("usb_uhci: successfully started the controller\n");
 	return BusManager::Start();
 }
 

@@ -181,7 +181,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 				fPCIInfo->function, extendedCapPointer + 3, 1, 1);
 
-			for (int32 i = 0; i < 10; i++) {
+			for (int32 i = 0; i < 20; i++) {
 				legacySupport = sPCIModule->read_pci_config(fPCIInfo->bus,
 					fPCIInfo->device, fPCIInfo->function, extendedCapPointer, 4);
 
@@ -193,6 +193,9 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			}
 
 			if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
+				// in any case disable interrupts so we do not flood the system
+				// if the BIOS still decides to give up control
+				WriteOpReg(EHCI_USBINTR, 0);
 				TRACE_ERROR(("usb_ehci: bios won't give up control over the host controller\n"));
 				return;
 			} else if (legacySupport & EHCI_LEGSUP_OSOWNED) {
@@ -404,7 +407,7 @@ EHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
-	TRACE(("usb_ehci: Host Controller started\n"));
+	dprintf("usb_ehci: successfully started the controller\n");
 	return BusManager::Start();
 }
 
