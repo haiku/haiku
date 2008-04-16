@@ -21,6 +21,7 @@ SubDirCcFlags -D_GNU_SOURCE -D_IEEE_LIBM ;
 
 local genericSources =
 	cmp.c dbl2mpn.c divrem.c 
+	memrchr.c
 	mpn2dbl.c mpn2flt.c mpn2ldbl.c
 	mul.c mul_n.c
 	e_cosh.c e_coshf.c # e_coshl.c
