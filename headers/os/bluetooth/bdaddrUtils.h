@@ -38,6 +38,12 @@ class bdaddrUtils {
 		}
 		
 		
+		static bool Compare(bdaddr_t* ba1, bdaddr_t* ba2)
+		{
+			return (memcmp(ba1, ba2, sizeof(bdaddr_t)) == 0);
+		}
+		
+		
 		static char* ToString(const bdaddr_t bdaddr) 
 		{
 			// TODO: not safe

@@ -30,7 +30,7 @@ class RemoteDevice {
                 
         bool IsTrustedDevice();
         BString GetFriendlyName(bool alwaysAsk); /* Throwing */
-        BString GetBluetoothAddress();
+        bdaddr_t GetBluetoothAddress();
         bool Equals(RemoteDevice* obj);
         
         /*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
