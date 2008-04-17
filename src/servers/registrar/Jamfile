@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src servers registrar ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
+UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 UsePrivateHeaders tracker ;
@@ -13,6 +14,7 @@ Server registrar
  	:
 	AppInfoList.cpp
 	AppInfoListMessagingTargetSet.cpp
+	AuthenticationManager.cpp
 	Clipboard.cpp
 	ClipboardHandler.cpp
 	Event.cpp

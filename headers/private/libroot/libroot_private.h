@@ -34,6 +34,14 @@
 	// MAX_GROUP_NAME_LEN and MAX_GROUP_PASSWORD_LEN are char* aligned
 
 
+#define	MAX_SHADOW_PWD_NAME_LEN			(32)
+#define	MAX_SHADOW_PWD_PASSWORD_LEN		(128)
+
+#define MAX_SHADOW_PWD_BUFFER_SIZE	(	\
+	MAX_SHADOW_PWD_NAME_LEN				\
+	+ MAX_SHADOW_PWD_PASSWORD_LEN)
+
+
 struct user_space_program_args;
 struct real_time_data;
 

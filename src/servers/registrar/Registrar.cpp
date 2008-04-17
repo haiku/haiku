@@ -19,6 +19,7 @@
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 
+#include "AuthenticationManager.h"
 #include "ClipboardHandler.h"
 #include "Debug.h"
 #include "EventQueue.h"
@@ -60,7 +61,8 @@ Registrar::Registrar(status_t *error)
 	fEventQueue(NULL),
 	fMessageRunnerManager(NULL),
 	fSanityEvent(NULL),
-	fShutdownProcess(NULL)
+	fShutdownProcess(NULL),
+	fAuthenticationManager(NULL)
 {
 	FUNCTION_START();
 }
@@ -76,6 +78,7 @@ Registrar::~Registrar()
 	FUNCTION_START();
 	Lock();
 	fEventQueue->Die();
+	delete fAuthenticationManager;
 	delete fMessageRunnerManager;
 	delete fEventQueue;
 	delete fSanityEvent;
@@ -129,6 +132,10 @@ Registrar::ReadyToRun()
 
 	// create event queue
 	fEventQueue = new EventQueue(kEventQueueName);
+
+	// create authentication manager
+	fAuthenticationManager = new AuthenticationManager;
+	fAuthenticationManager->Init();
 
 	// create roster
 	fRoster = new TRoster;

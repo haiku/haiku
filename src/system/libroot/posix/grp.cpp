@@ -14,111 +14,109 @@
 #include <OS.h>
 
 #include <libroot_private.h>
+#include <RegistrarDefs.h>
+#include <user_group.h>
 
-#include "user_group_common.h"
+#include <util/KMessage.h>
 
 
-using BPrivate::GroupDB;
-using BPrivate::GroupDBReader;
-using BPrivate::GroupEntryHandler;
 using BPrivate::UserGroupLocker;
+using BPrivate::relocate_pointer;
 
-static GroupDB* sGroupDB = NULL;
+
+static KMessage sGroupDBReply;
+static group** sGroupEntries = NULL;
+static size_t sGroupEntryCount = 0;
+static size_t sIterationIndex = 0;
 
 static struct group sGroupBuffer;
 static char sGroupStringBuffer[MAX_GROUP_BUFFER_SIZE];
 
 
-namespace {
+static status_t
+query_group_entry(const char* name, gid_t _gid, struct group *group,
+	char *buffer, size_t bufferSize, struct group **_result)
+{
+	*_result = NULL;
 
-class GroupEntryFindHandler : public GroupEntryHandler {
-public:
-	GroupEntryFindHandler(const char* name, uid_t gid,
-			group* entry, char* buffer, size_t bufferSize)
-		:
-		fName(name),
-		fGID(gid),
-		fEntry(entry),
-		fBuffer(buffer),
-		fBufferSize(bufferSize)
-	{
+	KMessage message(BPrivate::B_REG_GET_GROUP);
+	if (name)
+		message.AddString("name", name);
+	else
+		message.AddInt32("gid", _gid);
+
+	KMessage reply;
+	status_t error = BPrivate::send_authentication_request_to_registrar(message,
+		reply);
+	if (error != B_OK)
+		return error;
+
+	int32 gid;
+	const char* password;
+
+	if ((error = reply.FindInt32("gid", &gid)) != B_OK
+		|| (error = reply.FindString("name", &name)) != B_OK
+		|| (error = reply.FindString("password", &password)) != B_OK) {
+		return error;
 	}
 
-	virtual status_t HandleEntry(const char* name, const char* password,
-		gid_t gid, const char* const* members, int memberCount)
-	{
-		if (fName != NULL ? strcmp(fName, name) != 0 : fGID != gid)
-			return 0;
-
-		// found
-		status_t error = BPrivate::copy_group_to_buffer(name, password, gid,
-			members, memberCount, fEntry, fBuffer, fBufferSize);
-
-		return error == B_OK ? 1 : error;
+	const char* members[MAX_GROUP_MEMBER_COUNT];
+	int memberCount = 0;
+	for (int memberCount = 0; memberCount < MAX_GROUP_MEMBER_COUNT;) {
+		if (reply.FindString("members", members + memberCount) != B_OK)
+			break;
+		memberCount++;
 	}
 
-private:
-	const char*	fName;
-	gid_t		fGID;
-	group*		fEntry;
-	char*		fBuffer;
-	size_t		fBufferSize;
-};
+	error = BPrivate::copy_group_to_buffer(name, password, gid, members,
+		memberCount, group, buffer, bufferSize);
+	if (error == B_OK)
+		*_result = group;
+
+	return error;
+}
 
 
-class UserGroupEntryHandler : public BPrivate::GroupEntryHandler {
-public:
-	UserGroupEntryHandler(const char* user, gid_t* groupList, int maxGroupCount,
-			int* groupCount)
-		:
-		fUser(user),
-		fGroupList(groupList),
-		fMaxGroupCount(maxGroupCount),
-		fGroupCount(groupCount)
-	{
-	}
-
-	virtual status_t HandleEntry(const char* name, const char* password,
-		gid_t gid, const char* const* members, int memberCount)
-	{
-		for (int i = 0; i < memberCount; i++) {
-			const char* member = members[i];
-			if (*member != '\0' && strcmp(member, fUser) == 0) {
-				if (*fGroupCount < fMaxGroupCount)
-					fGroupList[*fGroupCount] = gid;
-				++*fGroupCount;
-			}
-		}
-
-		return 0;
-	}
-
-private:
-	const char*	fUser;
-	gid_t*		fGroupList;
-	int			fMaxGroupCount;
-	int*		fGroupCount;
-};
-
-}	// empty namespace
-
-
-static GroupDB*
+static status_t
 init_group_db()
 {
-	if (sGroupDB != NULL)
-		return sGroupDB;
+	if (sGroupEntries != NULL)
+		return B_OK;
 
-	sGroupDB = new(std::nothrow) GroupDB;
-	if (sGroupDB == NULL)
-		return NULL;
+	// ask the registrar
+	KMessage message(BPrivate::B_REG_GET_GROUP_DB);
+	status_t error = BPrivate::send_authentication_request_to_registrar(message,
+		sGroupDBReply);
+	if (error != B_OK)
+		return error;
 
-	if (sGroupDB->Init() != B_OK) {
-		delete sGroupDB;
-		sGroupDB = NULL;
+	// unpack the reply
+	int32 count;
+	group** entries;
+	int32 numBytes;
+	if ((error = sGroupDBReply.FindInt32("count", &count)) != B_OK
+		|| (error = sGroupDBReply.FindData("entries", B_RAW_TYPE,
+				(const void**)&entries, &numBytes)) != B_OK) {
+		return error;
 	}
 
-	return sGroupDB;
+	// relocate the entries
+	addr_t baseAddress = (addr_t)entries;
+	for (int32 i = 0; i < count; i++) {
+		group* entry = relocate_pointer(baseAddress, entries[i]);
+		relocate_pointer(baseAddress, entry->gr_name);
+		relocate_pointer(baseAddress, entry->gr_passwd);
+		relocate_pointer(baseAddress, entry->gr_mem);
+		int32 k = 0;
+		for (; entry->gr_mem[k] != (void*)-1; k++)
+			relocate_pointer(baseAddress, entry->gr_mem[k]);
+		entry->gr_mem[k] = NULL;
+	}
+
+	sGroupEntries = entries;
+	sGroupEntryCount = count;
+
+	return B_OK;
 }
 
 
@@ -147,11 +145,17 @@ getgrent_r(struct group* group, char* buffer, size_t bufferSize,
 
 	*_result = NULL;
 
-	if (GroupDB* db = init_group_db()) {
-		status = db->GetNextEntry(group, buffer, bufferSize);
-		if (status == 0)
-			*_result = group;
+	if ((status = init_group_db()) == B_OK) {
+		if (sIterationIndex >= sGroupEntryCount)
+			return ENOENT;
 
+		status = BPrivate::copy_group_to_buffer(
+			sGroupEntries[sIterationIndex], group, buffer, bufferSize);
+
+		if (status == B_OK) {
+			sIterationIndex++;
+			*_result = group;
+		}
 	}
 
 	return status;
@@ -163,8 +167,7 @@ setgrent(void)
 {
 	UserGroupLocker _;
 
-	if (GroupDB* db = init_group_db())
-		db->RewindEntries();
+	sIterationIndex = 0;
 }
 
 
@@ -173,12 +176,10 @@ endgrent(void)
 {
 	UserGroupLocker locker;
 
-	GroupDB* db = sGroupDB;
-	sGroupDB = NULL;
-
-	locker.Unlock();
-
-	delete db;
+	sGroupDBReply.Unset();
+	sGroupEntries = NULL;
+	sGroupEntryCount = 0;
+	sIterationIndex = 0;
 }
 
 
@@ -198,11 +199,7 @@ int
 getgrnam_r(const char *name, struct group *group, char *buffer,
 	size_t bufferSize, struct group **_result)
 {
-	GroupEntryFindHandler handler(name, 0, group, buffer, bufferSize);
-	status_t status = GroupDBReader(&handler).Read(BPrivate::kGroupFile);
-
-	*_result = (status == 1 ? group : NULL);
-	return (status == 1 ? 0 : (status == 0 ? ENOENT : status));
+	return query_group_entry(name, 0, group, buffer, bufferSize, _result);
 }
 
 
@@ -222,11 +219,7 @@ int
 getgrgid_r(gid_t gid, struct group *group, char *buffer,
 	size_t bufferSize, struct group **_result)
 {
-	GroupEntryFindHandler handler(NULL, gid, group, buffer, bufferSize);
-	status_t status = GroupDBReader(&handler).Read(BPrivate::kGroupFile);
-
-	*_result = (status == 1 ? group : NULL);
-	return (status == 1 ? 0 : (status == 0 ? ENOENT : status));
+	return query_group_entry(NULL, gid, group, buffer, bufferSize, _result);
 }
 
 
@@ -237,10 +230,35 @@ getgrouplist(const char* user, gid_t baseGroup, gid_t* groupList,
 	int maxGroupCount = *groupCount;
 	*groupCount = 0;
 
-	UserGroupEntryHandler handler(user, groupList, maxGroupCount, groupCount);
-	BPrivate::GroupDBReader(&handler).Read(BPrivate::kGroupFile);
+	status_t error = B_OK;
 
-	// put in the base group
+	// prepare request
+	KMessage message(BPrivate::B_REG_GET_USER_GROUPS);
+	if (message.AddString("name", user) != B_OK
+		|| message.AddInt32("max count", maxGroupCount) != B_OK) {
+		return -1;
+	}
+
+	// send request
+	KMessage reply;
+	error = BPrivate::send_authentication_request_to_registrar(message, reply);
+	if (error != B_OK)
+		return -1;
+
+	// unpack reply
+	int32 count;
+	const int32* groups;
+	int32 groupsSize;
+	if (reply.FindInt32("count", &count) != B_OK
+		|| reply.FindData("groups", B_INT32_TYPE, (const void**)&groups,
+				&groupsSize) != B_OK) {
+		return -1;
+	}
+
+	memcpy(groupList, groups, groupsSize);
+	*groupCount = count;
+
+	// add the base group
 	if (*groupCount < maxGroupCount)
 		groupList[*groupCount] = baseGroup;
 	++*groupCount;

@@ -3,42 +3,33 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include "user_group_common.h"
+#include <user_group.h>
 
 #include <ctype.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #include <new>
 
 #include <libroot_lock.h>
 #include <libroot_private.h>
+#include <RegistrarDefs.h>
+
+#include <util/KMessage.h>
 
 
-using BPrivate::FileLineReader;
 using BPrivate::Tokenizer;
-using BPrivate::FileDBEntry;
-using BPrivate::FileDBReader;
-using BPrivate::FileDB;
-using BPrivate::PasswdDBEntry;
-using BPrivate::PasswdEntryHandler;
-using BPrivate::PasswdDBReader;
-using BPrivate::PasswdDB;
-using BPrivate::GroupDBEntry;
-using BPrivate::GroupEntryHandler;
-using BPrivate::GroupDBReader;
-using BPrivate::GroupDB;
 
 
 const char* BPrivate::kPasswdFile = "/etc/passwd";
 const char* BPrivate::kGroupFile = "/etc/group";
+const char* BPrivate::kShadowPwdFile = "/etc/shadow";
 
 static benaphore sUserGroupLock;
+static port_id sRegistrarPort = -1;
 
 
 status_t
@@ -55,83 +46,27 @@ BPrivate::user_group_unlock()
 }
 
 
-class FileLineReader {
-public:
-	FileLineReader(int fd)
-		: fFD(fd),
-		  fSize(0),
-		  fOffset(0)
-	{
-	}
+port_id
+BPrivate::get_registrar_authentication_port()
+{
+	if (sRegistrarPort < 0)
+		sRegistrarPort = find_port(REGISTRAR_AUTHENTICATION_PORT_NAME);
 
-	char* NextLine()
-	{
-		char* eol;
-		if (fOffset >= fSize
-			|| (eol = strchr(fBuffer + fOffset, '\n')) == NULL) {
-			_ReadBuffer();
-			if (fOffset >= fSize)
-				return NULL;
+	return sRegistrarPort;
+}
 
-			eol = strchr(fBuffer + fOffset, '\n');
-			if (eol == NULL)
-				eol = fBuffer + fSize;
-		}
 
-		char* result = fBuffer + fOffset;
-		*eol = '\0';
-		fOffset = eol + 1 - fBuffer;
-		return result;
-	}
+status_t
+BPrivate::send_authentication_request_to_registrar(KMessage& request,
+	KMessage& reply)
+{
+	status_t error = request.SendTo(get_registrar_authentication_port(), 0,
+		&reply);
+	if (error != B_OK)
+		return error;
 
-	char* NextNonEmptyLine()
-	{
-		while (char* line = NextLine()) {
-			while (*line != '\0' && isspace(*line))
-				line++;
-
-			if (*line != '\0' && *line != '#')
-				return line;
-		}
-
-		return NULL;
-	}
-
-private:
-	void _ReadBuffer()
-	{
-		// catch special cases: full buffer or already done with the file
-		if (fSize == LINE_MAX || fFD < 0)
-			return;
-
-		// move buffered bytes to the beginning of the buffer
-		int leftBytes = 0;
-		if (fOffset < fSize) {
-			leftBytes = fSize - fOffset;
-			memmove(fBuffer, fBuffer + fOffset, leftBytes);
-		}
-
-		fOffset = 0;
-		fSize = leftBytes;
-
-		// read
-		ssize_t bytesRead = read(fFD, fBuffer + leftBytes,
-			LINE_MAX - leftBytes);
-		if (bytesRead > 0)
-			fSize += bytesRead;
-		else
-			fFD = -1;
-
-		// null-terminate
-		fBuffer[fSize] = '\0';
-	}
-
-private:
-	int		fFD;
-	char	fBuffer[LINE_MAX + 1];
-	int		fSize;
-	int		fOffset;
-};
+	return (status_t)reply.What();
+}
 
 
 class Tokenizer {
@@ -215,170 +150,6 @@ buffer_allocate(size_t size, size_t align, char*& buffer, size_t& bufferSize)
 }
 
 
-// #pragma mark - FileDBEntry
-
-
-FileDBEntry::FileDBEntry()
-	:
-	fName(NULL),
-	fID(-1),
-	fNext(NULL)
-{
-}
-
-
-FileDBEntry::~FileDBEntry()
-{
-}
-
-
-// #pragma mark - FileDBReader
-
-
-FileDBReader::FileDBReader()
-{
-}
-
-
-FileDBReader::~FileDBReader()
-{
-}
-
-
-status_t
-FileDBReader::Read(const char* path)
-{
-	// read file
-	int fd = open(path, O_RDONLY);
-	if (fd < 0)
-		return errno;
-
-	FileLineReader reader(fd);	
-
-	status_t error = B_OK;
-
-	while (char* line = reader.NextNonEmptyLine()) {
-		Tokenizer tokenizer(line);
-		error = ParseEntryLine(tokenizer);
-		if (error != B_OK)
-			break;
-	}
-
-	close(fd);
-
-	return error;
-}
-
-
-// #pragma mark - FileDB
-
-
-FileDB::FileDB()
-	:
-	fEntries(NULL),
-	fLastEntry(NULL)
-{
-}
-
-
-FileDB::~FileDB()
-{
-	while (FileDBEntry* entry = fEntries) {
-		fEntries = entry->Next();
-		delete entry;
-	}
-	fLastEntry = NULL;
-}
-
-
-int
-FileDB::GetNextEntry(void* entryBuffer, char* buffer, size_t bufferSize)
-{
-	FileDBEntry* entry = NULL;
-
-	if (fLastEntry == NULL) {
-		// rewound
-		entry = fEntries;
-	} else if (fLastEntry->Next() != NULL) {
-		// get next entry
-		entry = fLastEntry->Next();
-	}
-
-	// copy the entry, if we found one
-	if (entry != NULL) {
-		int result = entry->CopyToBuffer(entryBuffer, buffer, bufferSize);
-		if (result == 0)
-			fLastEntry = entry;
-		return result;
-	}
-
-	return ENOENT;
-}
-
-
-void
-FileDB::RewindEntries()
-{
-	fLastEntry = NULL;
-}
-
-
-FileDBEntry*
-FileDB::FindEntry(const char* name) const
-{
-	// find the entry
-	FileDBEntry* entry = fEntries;
-	while (entry != NULL && strcmp(entry->Name(), name) != 0)
-		entry = entry->Next();
-
-	return entry;
-}
-
-
-FileDBEntry*
-FileDB::FindEntry(int32 id) const
-{
-	// find the entry
-	FileDBEntry* entry = fEntries;
-	while (entry != NULL && entry->ID() != id)
-		entry = entry->Next();
-
-	return entry;
-}
-
-
-int
-FileDB::GetEntry(const char* name, void* entryBuffer, char* buffer,
-	size_t bufferSize) const
-{
-	FileDBEntry* entry = FindEntry(name);
-	if (entry == NULL)
-		return ENOENT;
-
-	return entry->CopyToBuffer(entryBuffer, buffer, bufferSize);
-}
-
-
-int
-FileDB::GetEntry(int32 id, void* entryBuffer, char* buffer,
-	size_t bufferSize) const
-{
-	FileDBEntry* entry = FindEntry(id);
-	if (entry == NULL)
-		return ENOENT;
-
-	return entry->CopyToBuffer(entryBuffer, buffer, bufferSize);
-}
-
-
-void
-FileDB::AddEntry(FileDBEntry* entry)
-{
-	entry->SetNext(fEntries);
-	fEntries = entry;
-}
-
-
 // #pragma mark - passwd support
 
 
@@ -405,86 +176,29 @@ BPrivate::copy_passwd_to_buffer(const char* name, const char* password,
 }
 
 
-// #pragma mark - PasswdDBEntry
-
-
-PasswdDBEntry::PasswdDBEntry()
-	: FileDBEntry(),
-	fPassword(NULL),
-	fHome(NULL),
-	fShell(NULL),
-	fRealName(NULL)
+status_t
+BPrivate::copy_passwd_to_buffer(const passwd* from, passwd* entry, char* buffer,
+	size_t bufferSize)
 {
-}
-
-
-PasswdDBEntry::~PasswdDBEntry()
-{
-	free(fName);
-}
-
-
-bool
-PasswdDBEntry::Init(const char* name, const char* password, uid_t uid,
-	gid_t gid, const char* home, const char* shell, const char* realName)
-{
-	size_t bufferSize = strlen(name) + 1
-		+ strlen(password) + 1
-		+ strlen(home) + 1
-		+ strlen(shell) + 1
-		+ strlen(realName) + 1;
-
-	char* buffer = (char*)malloc(bufferSize);
-	if (buffer == NULL)
-		return false;
-
-	fID = uid;
-	fGID = gid;
-	fName = buffer_dup_string(name, buffer, bufferSize);
-	fPassword = buffer_dup_string(password, buffer, bufferSize);
-	fHome = buffer_dup_string(home, buffer, bufferSize);
-	fShell = buffer_dup_string(shell, buffer, bufferSize);
-	fRealName = buffer_dup_string(realName, buffer, bufferSize);
-
-	return true;
-}
-
-
-int
-PasswdDBEntry::CopyToBuffer(void* entryBuffer, char* buffer, size_t bufferSize)
-{
-	return copy_passwd_to_buffer(fName, fPassword, fID, fGID, fHome, fShell,
-		fRealName, (passwd*)entryBuffer, buffer, bufferSize);
-}
-
-
-// #pragma mark - PasswdEntryHandler
-
-
-PasswdEntryHandler::~PasswdEntryHandler()
-{
-}
-
-
-// #pragma mark - PasswdDBReader
-
-
-PasswdDBReader::PasswdDBReader(PasswdEntryHandler* handler)
-	: fHandler(handler)
-{
+	return copy_passwd_to_buffer(from->pw_name, from->pw_passwd, from->pw_uid,
+		from->pw_gid, from->pw_dir, from->pw_shell, from->pw_gecos, entry,
+		buffer, bufferSize);
 }
 
 
 status_t
-PasswdDBReader::ParseEntryLine(Tokenizer& tokenizer)
+BPrivate::parse_passwd_line(char* line, char*& name, char*& password,
+	uid_t& uid, gid_t& gid, char*& home, char*& shell, char*& realName)
 {
-	char* name = tokenizer.NextTrimmedToken(':');
-	char* password = tokenizer.NextTrimmedToken(':');
+	Tokenizer tokenizer(line);
+
+	name = tokenizer.NextTrimmedToken(':');
+	password = tokenizer.NextTrimmedToken(':');
 	char* userID = tokenizer.NextTrimmedToken(':');
 	char* groupID = tokenizer.NextTrimmedToken(':');
-	char* realName = tokenizer.NextTrimmedToken(':');
-	char* home = tokenizer.NextTrimmedToken(':');
-	char* shell = tokenizer.NextTrimmedToken(':');
+	realName = tokenizer.NextTrimmedToken(':');
+	home = tokenizer.NextTrimmedToken(':');
+	shell = tokenizer.NextTrimmedToken(':');
 
 	// skip if invalid
 	size_t nameLen;
@@ -495,44 +209,17 @@ PasswdDBReader::ParseEntryLine(Tokenizer& tokenizer)
 		|| strlen(realName) >= MAX_PASSWD_REAL_NAME_LEN
 		|| strlen(home) >= MAX_PASSWD_HOME_DIR_LEN
 		|| strlen(shell) >= MAX_PASSWD_SHELL_LEN) {
-		return B_OK;
+		return B_BAD_VALUE;
 	}
 
-	gid_t uid = atoi(userID);
-	gid_t gid = atoi(groupID);
+	uid = atoi(userID);
+	gid = atoi(groupID);
 
-	return fHandler->HandleEntry(name, password, uid, gid, home, shell,
-		realName);
-}
-
-
-// #pragma mark - PasswdDB
-
-
-status_t
-PasswdDB::Init()
-{
-	return PasswdDBReader(this).Read(kPasswdFile);
-}
-
-
-status_t
-PasswdDB::HandleEntry(const char* name, const char* password, uid_t uid,
-	gid_t gid, const char* home, const char* shell, const char* realName)
-{
-	PasswdDBEntry* entry = new(std::nothrow) PasswdDBEntry();
-	if (entry == NULL || !entry->Init(name, password, uid, gid, home, shell,
-			realName)) {
-		delete entry;
-		return B_NO_MEMORY;
-	}
-
-	AddEntry(entry);
 	return B_OK;
 }
 
 
-// #pragma mark - passwd support
+// #pragma mark - group support
 
 
 status_t
@@ -566,87 +253,27 @@ BPrivate::copy_group_to_buffer(const char* name, const char* password,
 }
 
 
-// #pragma mark - GroupDBEntry
-
-
-GroupDBEntry::GroupDBEntry()
-	: FileDBEntry(),
-	fPassword(NULL),
-	fMembers(NULL),
-	fMemberCount(0)
+status_t
+BPrivate::copy_group_to_buffer(const group* from, group* entry, char* buffer,
+	size_t bufferSize)
 {
-}
+	int memberCount = 0;
+	while (from->gr_mem[memberCount] != NULL)
+		memberCount++;
 
-
-GroupDBEntry::~GroupDBEntry()
-{
-	free(fMembers);
-}
-
-
-bool
-GroupDBEntry::Init(const char* name, const char* password, gid_t gid,
-	const char* const* members, int memberCount)
-{
-	size_t bufferSize = sizeof(char*) * (memberCount + 1)
-		+ strlen(name) + 1
-		+ strlen(password) + 1;
-
-	for (int i = 0; i < memberCount; i++)
-		bufferSize += strlen(members[i]) + 1;
-
-	char* buffer = (char*)malloc(bufferSize);
-	if (buffer == NULL)
-		return false;
-
-	// allocate member array first (for alignment reasons)
-	fMembers = (char**)buffer_allocate(sizeof(char*) * (memberCount + 1),
-		sizeof(char*), buffer, bufferSize);
-
-	fID = gid;
-	fName = buffer_dup_string(name, buffer, bufferSize);
-	fPassword = buffer_dup_string(password, buffer, bufferSize);
-
-	// copy members
-	for (int i = 0; i < memberCount; i++)
-		fMembers[i] = buffer_dup_string(members[i], buffer, bufferSize);
-	fMembers[memberCount] = NULL;
-	fMemberCount = memberCount;
-
-	return true;
-}
-
-
-int
-GroupDBEntry::CopyToBuffer(void* entryBuffer, char* buffer, size_t bufferSize)
-{
-	return copy_group_to_buffer(fName, fPassword, fID, fMembers, fMemberCount,
-		(group*)entryBuffer, buffer, bufferSize);
-}
-
-
-// #pragma mark - GroupEntryHandler
-
-
-GroupEntryHandler::~GroupEntryHandler()
-{
-}
-
-
-// #pragma mark - GroupDBReader
-
-
-GroupDBReader::GroupDBReader(GroupEntryHandler* handler)
-	: fHandler(handler)
-{
+	return copy_group_to_buffer(from->gr_name, from->gr_passwd,
+		from->gr_gid, from->gr_mem, memberCount, entry, buffer, bufferSize);
 }
 
 
 status_t
-GroupDBReader::ParseEntryLine(Tokenizer& tokenizer)
+BPrivate::parse_group_line(char* line, char*& name, char*& password, gid_t& gid,
+	char** members, int& memberCount)
 {
-	char* name = tokenizer.NextTrimmedToken(':');
-	char* password = tokenizer.NextTrimmedToken(':');
+	Tokenizer tokenizer(line);
+
+	name = tokenizer.NextTrimmedToken(':');
+	password = tokenizer.NextTrimmedToken(':');
 	char* groupID = tokenizer.NextTrimmedToken(':');
 
 	// skip if invalid
@@ -654,13 +281,12 @@ GroupDBReader::ParseEntryLine(Tokenizer& tokenizer)
 	if (groupID == NULL || (nameLen = strlen(name)) == 0 || !isdigit(*groupID)
 		|| nameLen >= MAX_GROUP_NAME_LEN
 		|| strlen(password) >= MAX_GROUP_PASSWORD_LEN) {
-		return B_OK;
+		return B_BAD_VALUE;
 	}
 
-	gid_t gid = atol(groupID);
+	gid = atol(groupID);
 
-	const char* members[MAX_GROUP_MEMBER_COUNT];
-	int memberCount = 0;
+	memberCount = 0;
 
 	while (char* groupUser = tokenizer.NextTrimmedToken(',')) {
 		// ignore invalid members
@@ -674,32 +300,78 @@ GroupDBReader::ParseEntryLine(Tokenizer& tokenizer)
 			break;
 	}
 
-	return fHandler->HandleEntry(name, password, gid, members, memberCount);
+	return B_OK;
 }
 
 
-// #pragma mark - GroupDB
+// #pragma mark - shadow password support
 
 
 status_t
-GroupDB::Init()
+BPrivate::copy_shadow_pwd_to_buffer(const char* name, const char* password,
+	int min, int max, int warn, int inactive, int expiration, int flags,
+	spwd* entry, char* buffer, size_t bufferSize)
 {
-	return GroupDBReader(this).Read(kGroupFile);
+	entry->sp_min = min;
+	entry->sp_max = max;
+	entry->sp_warn = warn;
+	entry->sp_inact = inactive;
+	entry->sp_expire = expiration;
+	entry->sp_flag = flags;
+
+	entry->sp_namp = buffer_dup_string(name, buffer, bufferSize);
+	entry->sp_pwdp = buffer_dup_string(password, buffer, bufferSize);
+
+	if (entry->sp_namp && entry->sp_pwdp)
+		return 0;
+
+	return ERANGE;
 }
 
 
 status_t
-GroupDB::HandleEntry(const char* name, const char* password, gid_t gid,
-	const char* const* members, int memberCount)
+BPrivate::copy_shadow_pwd_to_buffer(const spwd* from, spwd* entry,
+	char* buffer, size_t bufferSize)
 {
-	GroupDBEntry* entry = new(std::nothrow) GroupDBEntry();
-	if (entry == NULL || !entry->Init(name, password, gid, members,
-			memberCount)) {
-		delete entry;
-		return B_NO_MEMORY;
+	return copy_shadow_pwd_to_buffer(from->sp_namp, from->sp_pwdp,
+		from->sp_min, from->sp_max, from->sp_warn, from->sp_inact,
+		from->sp_expire, from->sp_flag, entry, buffer, bufferSize);
+}
+
+
+status_t
+BPrivate::parse_shadow_pwd_line(char* line, char*& name, char*& password,
+	int& lastChanged, int& min, int& max, int& warn, int& inactive,
+	int& expiration, int& flags)
+{
+	Tokenizer tokenizer(line);
+
+	name = tokenizer.NextTrimmedToken(':');
+	password = tokenizer.NextTrimmedToken(':');
+	char* lastChangedString = tokenizer.NextTrimmedToken(':');
+	char* minString = tokenizer.NextTrimmedToken(':');
+	char* maxString = tokenizer.NextTrimmedToken(':');
+	char* warnString = tokenizer.NextTrimmedToken(':');
+	char* inactiveString = tokenizer.NextTrimmedToken(':');
+	char* expirationString = tokenizer.NextTrimmedToken(':');
+	char* flagsString = tokenizer.NextTrimmedToken(':');
+
+	// skip if invalid
+	size_t nameLen;
+	if (flagsString == NULL || (nameLen = strlen(name)) == 0
+		|| nameLen >= MAX_SHADOW_PWD_NAME_LEN
+		|| strlen(password) >= MAX_SHADOW_PWD_PASSWORD_LEN) {
+		return B_BAD_VALUE;
 	}
 
-	AddEntry(entry);
+	lastChanged = atoi(lastChangedString);
+	min = minString[0] != '\0' ? atoi(minString) : -1;
+	max = maxString[0] != '\0' ? atoi(maxString) : -1;
+	warn = warnString[0] != '\0' ? atoi(warnString) : -1;
+	inactive = inactiveString[0] != '\0' ? atoi(inactiveString) : -1;
+	expiration = expirationString[0] != '\0' ? atoi(expirationString) : -1;
+	flags = atoi(flagsString);
+
 	return B_OK;
 }
 

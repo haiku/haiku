@@ -28,6 +28,8 @@
 
 #include <Server.h>
 
+
+class AuthenticationManager;
 class ClipboardHandler;
 class DiskDeviceManager;
 class EventQueue;
@@ -37,6 +39,7 @@ class MIMEManager;
 class ShutdownProcess;
 
 class TRoster;
+
 
 class Registrar : public BServer {
 public:
@@ -62,6 +65,7 @@ private:
 	MessageRunnerManager	*fMessageRunnerManager;
 	MessageEvent			*fSanityEvent;
 	ShutdownProcess			*fShutdownProcess;
+	AuthenticationManager	*fAuthenticationManager;
 };
 
 #endif	// REGISTRAR_H

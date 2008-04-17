@@ -24,6 +24,9 @@ extern const char *kRAppLooperPortName;
 
 extern const char *get_roster_port_name();
 
+#define REGISTRAR_AUTHENTICATION_PORT_NAME	"registrar: auth manager"
+
+
 // message constants
 enum {
 	// replies
@@ -107,6 +110,16 @@ enum {
 
 	// debug_server notifications
 	B_REG_TEAM_DEBUGGER_ALERT				= 'rtda',
+
+	// authentication requests
+	B_REG_GET_PASSWD_DB						= 'rpdb',
+	B_REG_GET_GROUP_DB						= 'rgdb',
+	B_REG_GET_SHADOW_PASSWD_DB				= 'rsdb',
+	B_REG_GET_USER							= 'rgus',
+	B_REG_GET_GROUP							= 'rggr',
+	B_REG_GET_USER_GROUPS					= 'rgug',
+	B_REG_UPDATE_USER						= 'ruus',
+	B_REG_UPDATE_GROUP						= 'rugr',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 

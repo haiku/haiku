@@ -14,76 +14,107 @@
 #include <OS.h>
 
 #include <libroot_private.h>
+#include <RegistrarDefs.h>
+#include <user_group.h>
 
-#include "user_group_common.h"
+#include <util/KMessage.h>
 
 
-using BPrivate::PasswdDB;
-using BPrivate::PasswdDBReader;
-using BPrivate::PasswdEntryHandler;
 using BPrivate::UserGroupLocker;
+using BPrivate::relocate_pointer;
 
-static PasswdDB* sPasswdDB = NULL;
+
+static KMessage sPasswdDBReply;
+static passwd** sPasswdEntries = NULL;
+static size_t sPasswdEntryCount = 0;
+static size_t sIterationIndex = 0;
 
 static struct passwd sPasswdBuffer;
 static char sPasswdStringBuffer[MAX_PASSWD_BUFFER_SIZE];
 
 
-namespace {
+static status_t
+query_passwd_entry(const char* name, uid_t _uid, struct passwd *passwd,
+	char *buffer, size_t bufferSize, struct passwd **_result)
+{
+	*_result = NULL;
 
-class PasswdEntryFindHandler : public PasswdEntryHandler {
-public:
-	PasswdEntryFindHandler(const char* name, uid_t uid,
-			passwd* entry, char* buffer, size_t bufferSize)
-		:
-		fName(name),
-		fUID(uid),
-		fEntry(entry),
-		fBuffer(buffer),
-		fBufferSize(bufferSize)
-	{
+	KMessage message(BPrivate::B_REG_GET_USER);
+	if (name)
+		message.AddString("name", name);
+	else
+		message.AddInt32("uid", _uid);
+
+	KMessage reply;
+	status_t error = BPrivate::send_authentication_request_to_registrar(message,
+		reply);
+	if (error != B_OK)
+		return error;
+
+	int32 uid;
+	int32 gid;
+	const char* password;
+	const char* home;
+	const char* shell;
+	const char* realName;
+
+	if ((error = reply.FindInt32("uid", &uid)) != B_OK
+		|| (error = reply.FindInt32("gid", &gid)) != B_OK
+		|| (error = reply.FindString("name", &name)) != B_OK
+		|| (error = reply.FindString("password", &password)) != B_OK
+		|| (error = reply.FindString("home", &home)) != B_OK
+		|| (error = reply.FindString("shell", &shell)) != B_OK
+		|| (error = reply.FindString("real name", &realName)) != B_OK) {
+		return error;
 	}
 
-	virtual status_t HandleEntry(const char* name, const char* password,
-		uid_t uid, gid_t gid, const char* home, const char* shell,
-		const char* realName)
-	{
-		if (fName != NULL ? strcmp(fName, name) != 0 : fUID != uid)
-			return 0;
+	error = BPrivate::copy_passwd_to_buffer(name, password, uid, gid, home,
+		shell, realName, passwd, buffer, bufferSize);
+	if (error == B_OK)
+		*_result = passwd;
 
-		// found
-		status_t error = BPrivate::copy_passwd_to_buffer(name, password, uid,
-			gid, home, shell, realName, fEntry, fBuffer, fBufferSize);
-		return error == B_OK ? 1 : error;
-	}
-
-private:
-	const char*	fName;
-	uid_t		fUID;
-	passwd*		fEntry;
-	char*		fBuffer;
-	size_t		fBufferSize;
-};
-
-}	// empty namespace
+	return error;
+}
 
 
-static PasswdDB*
+static status_t
 init_passwd_db()
 {
-	if (sPasswdDB != NULL)
-		return sPasswdDB;
+	if (sPasswdEntries != NULL)
+		return B_OK;
 
-	sPasswdDB = new(std::nothrow) PasswdDB;
-	if (sPasswdDB == NULL)
-		return NULL;
+	// ask the registrar
+	KMessage message(BPrivate::B_REG_GET_PASSWD_DB);
+	status_t error = BPrivate::send_authentication_request_to_registrar(message,
+		sPasswdDBReply);
+	if (error != B_OK)
+		return error;
 
-	if (sPasswdDB->Init() != B_OK) {
-		delete sPasswdDB;
-		sPasswdDB = NULL;
+	// unpack the reply
+	int32 count;
+	passwd** entries;
+	int32 numBytes;
+	if ((error = sPasswdDBReply.FindInt32("count", &count)) != B_OK
+		|| (error = sPasswdDBReply.FindData("entries", B_RAW_TYPE,
+				(const void**)&entries, &numBytes)) != B_OK) {
+		return error;
 	}
 
-	return sPasswdDB;
+	// relocate the entries
+	addr_t baseAddress = (addr_t)entries;
+	for (int32 i = 0; i < count; i++) {
+		passwd* entry = relocate_pointer(baseAddress, entries[i]);
+		relocate_pointer(baseAddress, entry->pw_name);
+		relocate_pointer(baseAddress, entry->pw_passwd);
+		relocate_pointer(baseAddress, entry->pw_dir);
+		relocate_pointer(baseAddress, entry->pw_shell);
+		relocate_pointer(baseAddress, entry->pw_gecos);
+	}
+
+	sPasswdEntries = entries;
+	sPasswdEntryCount = count;
+
+	return B_OK;
 }
 
 
@@ -112,11 +143,17 @@ getpwent_r(struct passwd* passwd, char* buffer, size_t bufferSize,
 
 	*_result = NULL;
 
-	if (PasswdDB* db = init_passwd_db()) {
-		status = db->GetNextEntry(passwd, buffer, bufferSize);
-		if (status == 0)
-			*_result = passwd;
+	if ((status = init_passwd_db()) == B_OK) {
+		if (sIterationIndex >= sPasswdEntryCount)
+			return ENOENT;
 
+		status = BPrivate::copy_passwd_to_buffer(
+			sPasswdEntries[sIterationIndex], passwd, buffer, bufferSize);
+
+		if (status == B_OK) {
+			sIterationIndex++;
+			*_result = passwd;
+		}
 	}
 
 	return status;
@@ -128,8 +165,7 @@ setpwent(void)
 {
 	UserGroupLocker _;
 
-	if (PasswdDB* db = init_passwd_db())
-		db->RewindEntries();
+	sIterationIndex = 0;
 }
 
 
@@ -138,12 +174,10 @@ endpwent(void)
 {
 	UserGroupLocker locker;
 
-	PasswdDB* db = sPasswdDB;
-	sPasswdDB = NULL;
-
-	locker.Unlock();
-
-	delete db;
+	sPasswdDBReply.Unset();
+	sPasswdEntries = NULL;
+	sPasswdEntryCount = 0;
+	sIterationIndex = 0;
 }
 
 
@@ -163,11 +197,7 @@ int
 getpwnam_r(const char *name, struct passwd *passwd, char *buffer,
 	size_t bufferSize, struct passwd **_result)
 {
-	PasswdEntryFindHandler handler(name, 0, passwd, buffer, bufferSize);
-	status_t status = PasswdDBReader(&handler).Read(BPrivate::kPasswdFile);
-
-	*_result = (status == 1 ? passwd : NULL);
-	return (status == 1 ? 0 : (status == 0 ? ENOENT : status));
+	return query_passwd_entry(name, 0, passwd, buffer, bufferSize, _result);
 }
 
 
@@ -187,9 +217,5 @@ int
 getpwuid_r(uid_t uid, struct passwd *passwd, char *buffer,
 	size_t bufferSize, struct passwd **_result)
 {
-	PasswdEntryFindHandler handler(NULL, uid, passwd, buffer, bufferSize);
-	status_t status = PasswdDBReader(&handler).Read(BPrivate::kPasswdFile);
-
-	*_result = (status == 1 ? passwd : NULL);
-	return (status == 1 ? 0 : (status == 0 ? ENOENT : status));
+	return query_passwd_entry(NULL, uid, passwd, buffer, bufferSize, _result);
 }
