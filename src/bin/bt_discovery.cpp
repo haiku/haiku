@@ -14,14 +14,17 @@
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
 
+
+thread_id mainThread;
+
 class simpleDiscoveryListener : public DiscoveryListener {
 
 public:
 
-simpleDiscoveryListener(LocalDevice *ld) : DiscoveryListener()
+simpleDiscoveryListener(LocalDevice *device) : DiscoveryListener()
 {
     /* TODO: Should not be needed */
-	SetLocalDeviceOwner(ld);
+	SetLocalDeviceOwner(device);
 }
 
 
@@ -37,7 +40,8 @@ InquiryCompleted(int discType)
 {
 
 	printf("\t%s: Inquiry process has finished ...\n",__FUNCTION__);
-//	send_data(thread, discType, NULL, 0);
+	(void)send_data(mainThread, discType, NULL, 0);
+
 }
 
 
@@ -54,9 +58,9 @@ InquiryStarted(status_t status)
 void
 DumpInfo(LocalDevice* device)
 {
-	DiscoveryAgent* da = device->GetDiscoveryAgent();
+	DiscoveryAgent* dAgent = device->GetDiscoveryAgent();
 
-	if (da == NULL) {
+	if (dAgent == NULL) {
 		printf("DiscoveryAgent could not be located\n");
 		return;
 	}
@@ -65,22 +69,21 @@ DumpInfo(LocalDevice* device)
          (device->GetFriendlyName()).String(),
           bdaddrUtils::ToString(device->GetBluetoothAddress()));
 
-	simpleDiscoveryListener* sdl = new simpleDiscoveryListener(device);
+	simpleDiscoveryListener* dListener = new simpleDiscoveryListener(device);
 
-	da->StartInquiry(BT_GIAC, sdl);
+	dAgent->StartInquiry(BT_GIAC, dListener);
+		
+	(void)receive_data(NULL, NULL, 0);
 	
-    printf("Press any key to retrieve names ...\n");
-	getchar();
+    printf("Retrieving names ...\n");
 	
-    for (int32 index = 0 ; index < da->RetrieveDevices(0).CountItems(); index++ ) {
+    for (int32 index = 0 ; index < dAgent->RetrieveDevices(0).CountItems(); index++ ) {
 
-        RemoteDevice* rd = da->RetrieveDevices(0).ItemAt(index);
-	    printf("%s \t@ %s ...\n", rd->GetFriendlyName(false).String(), bdaddrUtils::ToString(rd->GetBluetoothAddress()));
+        RemoteDevice* rDevice = dAgent->RetrieveDevices(0).ItemAt(index);
+	    printf("\t%s \t@ %s ...\n", rDevice->GetFriendlyName(false).String(), bdaddrUtils::ToString(rDevice->GetBluetoothAddress()));
 
     }
 
-
-	getchar();	
 }
 
 static status_t
@@ -95,28 +98,31 @@ LocalDeviceError(status_t status)
 int
 main(int argc, char *argv[])
 {
-        if(argc == 2) {
+
+	mainThread = find_thread(NULL);
+
+        if (argc == 2) {
             // device specified
-            LocalDevice* ld = LocalDevice::GetLocalDevice(atoi(argv[0]));
-            if (ld == NULL)
+            LocalDevice* device = LocalDevice::GetLocalDevice(atoi(argv[0]));
+            if (device == NULL)
                return LocalDeviceError(ENODEV);
 
-            DumpInfo(ld);
+            DumpInfo(device);
 
         } else if (argc == 1) {
             // show all devices
-            LocalDevice* ld = NULL;
+            LocalDevice* device = NULL;
 
             printf("Performing discovery for %ld Bluetooth Local Devices ...\n", LocalDevice::GetLocalDeviceCount());
 
             for (uint32 index = 0 ; index < LocalDevice::GetLocalDeviceCount() ; index++) {
 
-               ld = LocalDevice::GetLocalDevice();
-               if (ld == NULL) {
+               device = LocalDevice::GetLocalDevice();
+               if (device == NULL) {
                     LocalDeviceError(ENODEV);
                     continue;
                }
-               DumpInfo(ld);
+               DumpInfo(device);
 
             }
 
