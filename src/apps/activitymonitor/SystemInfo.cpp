@@ -5,6 +5,7 @@
 
 
 #include "SystemInfo.h"
+#include "SystemInfoHandler.h"
 
 #include <net/if.h>
 #include <stdlib.h>
@@ -14,12 +15,17 @@
 #include <sys/sockio.h>
 
 
-SystemInfo::SystemInfo()
+SystemInfo::SystemInfo(SystemInfoHandler *handler)
 	:
 	fTime(system_time()),
-	fRetrievedNetwork(false)
+	fRetrievedNetwork(false),
+	fRunningApps(0)
 {
 	get_system_info(&fSystemInfo);
+	
+	if (handler) {
+		fRunningApps = handler->RunningApps();
+	}
 }
 
 
@@ -104,6 +110,20 @@ SystemInfo::UsedTeams() const
 
 uint32
 SystemInfo::MaxTeams() const
+{
+	return fSystemInfo.max_teams;
+}
+
+
+uint32
+SystemInfo::UsedRunningApps() const
+{
+	return fRunningApps;
+}
+
+
+uint32
+SystemInfo::MaxRunningApps() const
 {
 	return fSystemInfo.max_teams;
 }

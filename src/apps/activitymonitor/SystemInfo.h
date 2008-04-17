@@ -8,10 +8,12 @@
 
 #include <OS.h>
 
+class SystemInfoHandler;
+
 
 class SystemInfo {
 public:
-						SystemInfo();
+						SystemInfo(SystemInfoHandler *handler=NULL);
 						~SystemInfo();
 
 			uint64		CachedMemory() const;
@@ -30,6 +32,9 @@ public:
 			uint32		UsedTeams() const;
 			uint32		MaxTeams() const;
 
+			uint32		UsedRunningApps() const;
+			uint32		MaxRunningApps() const;
+
 			bigtime_t	Time() const { return fTime; }
 			uint32		CPUCount() const { return fSystemInfo.cpu_count; }
 			const system_info& Info() const { return fSystemInfo; }
@@ -45,6 +50,7 @@ private:
 	bool				fRetrievedNetwork;
 	uint64				fBytesReceived;
 	uint64				fBytesSent;
+	uint32				fRunningApps;
 };
 
 #endif	// SYSTEM_INFO_H

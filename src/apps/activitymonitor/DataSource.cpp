@@ -21,6 +21,7 @@ const DataSource* kSources[] = {
 	new PortsDataSource(),
 	new ThreadsDataSource(),
 	new TeamsDataSource(),
+	new RunningAppsDataSource(),
 	new CPUUsageDataSource(),
 	new CPUCombinedUsageDataSource(),
 	new NetworkUsageDataSource(true),
@@ -522,6 +523,53 @@ TeamsDataSource::Label() const
 
 bool
 TeamsDataSource::AdaptiveScale() const
+{
+	return true;
+}
+
+
+//	#pragma mark -
+
+
+RunningAppsDataSource::RunningAppsDataSource()
+{
+	SystemInfo info;
+
+	fMinimum = 0;
+	fMaximum = info.MaxRunningApps();
+
+	fColor = (rgb_color){100, 150, 255};
+}
+
+
+RunningAppsDataSource::~RunningAppsDataSource()
+{
+}
+
+
+DataSource*
+RunningAppsDataSource::Copy() const
+{
+	return new RunningAppsDataSource(*this);
+}
+
+
+int64
+RunningAppsDataSource::NextValue(SystemInfo& info)
+{
+	return info.UsedRunningApps();
+}
+
+
+const char*
+RunningAppsDataSource::Label() const
+{
+	return "Running Applications";
+}
+
+
+bool
+RunningAppsDataSource::AdaptiveScale() const
 {
 	return true;
 }

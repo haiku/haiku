@@ -14,6 +14,7 @@
 class BBitmap;
 class BMessageRunner;
 class DataSource;
+class SystemInfoHandler;
 struct data_item;
 
 
@@ -98,6 +99,7 @@ private:
 	bigtime_t			fDrawInterval;
 	int32				fDrawResolution;
 	bool				fShowLegend;
+	SystemInfoHandler*	fSystemInfoHandler;
 };
 
 #endif	// ACTIVITY_VIEW_H

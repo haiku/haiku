@@ -141,6 +141,19 @@ public:
 };
 
 
+class RunningAppsDataSource : public DataSource {
+public:
+						RunningAppsDataSource();
+	virtual				~RunningAppsDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	Label() const;
+	virtual bool		AdaptiveScale() const;
+};
+
+
 class CPUUsageDataSource : public DataSource {
 public:
 						CPUUsageDataSource(int32 cpu = 0);

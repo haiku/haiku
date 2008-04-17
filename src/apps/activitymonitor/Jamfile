@@ -11,6 +11,7 @@ Application ActivityMonitor :
 	ActivityWindow.cpp
 	DataSource.cpp
 	SystemInfo.cpp
+	SystemInfoHandler.cpp
 
 	: be tracker $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS)
 	: ActivityMonitor.rdef

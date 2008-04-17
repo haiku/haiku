@@ -21,6 +21,7 @@
 #include "ActivityMonitor.h"
 #include "DataSource.h"
 #include "SystemInfo.h"
+#include "SystemInfoHandler.h"
 
 
 struct data_item {
@@ -167,6 +168,7 @@ ActivityView::ActivityView(BMessage* archive)
 ActivityView::~ActivityView()
 {
 	delete fOffscreen;
+	delete fSystemInfoHandler;
 }
 
 
@@ -182,6 +184,8 @@ ActivityView::_Init(const BMessage* settings)
 	fDrawInterval = kInitialRefreshInterval * 2;
 	fLastRefresh = 0;
 	fDrawResolution = 1;
+	
+	fSystemInfoHandler = new SystemInfoHandler;
 
 	if (settings == NULL
 		|| settings->FindBool("show legend", &fShowLegend) != B_OK)
@@ -349,6 +353,8 @@ ActivityView::RemoveAllDataSources()
 void
 ActivityView::AttachedToWindow()
 {
+	Looper()->AddHandler(fSystemInfoHandler);
+	fSystemInfoHandler->StartWatchingStuff();
 	BMessage refresh(kMsgRefresh);
 	fRunner = new BMessageRunner(this, &refresh, fRefreshInterval);
 
@@ -359,6 +365,8 @@ ActivityView::AttachedToWindow()
 void
 ActivityView::DetachedFromWindow()
 {
+	fSystemInfoHandler->StopWatchingStuff();
+	Looper()->RemoveHandler(fSystemInfoHandler);
 	delete fRunner;
 }
 
@@ -738,7 +746,7 @@ ActivityView::Draw(BRect /*updateRect*/)
 void
 ActivityView::_Refresh()
 {
-	SystemInfo info;
+	SystemInfo info(fSystemInfoHandler);
 
 	// TODO: run refresh in another thread to decouple it from the UI!
 
