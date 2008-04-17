@@ -165,7 +165,8 @@ typedef struct attrfilemap {
 
 typedef struct nspace {
 	// Start of members other drivers will definitely want.
-	dev_t			id;				// ID passed in to fs_mount
+	fs_volume		*volume;			// volume passed fo fs_mount
+	dev_t			id;
 	int				fd;				// File descriptor
 	int				fdOfSession;	// File descriptor of the (mounted) session
 	//unsigned int 	blockSize;  	// usually need this, but it's part of ISO
