@@ -542,7 +542,8 @@ AuthenticationManager::_RequestThread()
 	// request loop
 	while (true) {
 		KMessage message;
-		status_t error = message.ReceiveFrom(fRequestPort);
+		port_message_info messageInfo;
+		status_t error = message.ReceiveFrom(fRequestPort, -1, &messageInfo);
 		if (error != B_OK)
 			return B_OK;
 
@@ -612,10 +613,13 @@ AuthenticationManager::_RequestThread()
 
 			case B_REG_GET_SHADOW_PASSWD_DB:
 			{
-// TODO: Check permissions!
+				// only root may see the shadow passwd
+				if (messageInfo.sender != 0)
+					error = EPERM;
+
 				// lazily build the reply
 				try {
-					if (fShadowPwdDBReply->What() == 1) {
+					if (error == B_OK && fShadowPwdDBReply->What() == 1) {
 						FlatStore store;
 						int32 count = fUserDB->WriteFlatShadowDB(store);
 						if (fShadowPwdDBReply->AddInt32("count", count) != B_OK
@@ -661,8 +665,11 @@ AuthenticationManager::_RequestThread()
 				if (error == B_OK && user == NULL)
 					error = ENOENT;
 
-				// TODO: Check permissions!
 				bool getShadowPwd = message.GetBool("shadow", false);
+
+				// only root may see the shadow passwd
+				if (error == B_OK && getShadowPwd && messageInfo.sender != 0)
+					error = EPERM;
 
 				// add user to message
 				KMessage reply;
