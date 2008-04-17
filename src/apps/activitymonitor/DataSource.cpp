@@ -17,6 +17,8 @@
 const DataSource* kSources[] = {
 	new UsedMemoryDataSource(),
 	new CachedMemoryDataSource(),
+	new SemaphoresDataSource(),
+	new PortsDataSource(),
 	new ThreadsDataSource(),
 	new TeamsDataSource(),
 	new CPUUsageDataSource(),
@@ -334,6 +336,100 @@ const char*
 CachedMemoryDataSource::Label() const
 {
 	return "Cached Memory";
+}
+
+
+//	#pragma mark -
+
+
+SemaphoresDataSource::SemaphoresDataSource()
+{
+	SystemInfo info;
+
+	fMinimum = 0;
+	fMaximum = info.MaxSemaphores();
+
+	fColor = (rgb_color){100, 200, 100};
+}
+
+
+SemaphoresDataSource::~SemaphoresDataSource()
+{
+}
+
+
+DataSource*
+SemaphoresDataSource::Copy() const
+{
+	return new SemaphoresDataSource(*this);
+}
+
+
+int64
+SemaphoresDataSource::NextValue(SystemInfo& info)
+{
+	return info.UsedSemaphores();
+}
+
+
+const char*
+SemaphoresDataSource::Label() const
+{
+	return "Semaphores";
+}
+
+
+bool
+SemaphoresDataSource::AdaptiveScale() const
+{
+	return true;
+}
+
+
+//	#pragma mark -
+
+
+PortsDataSource::PortsDataSource()
+{
+	SystemInfo info;
+
+	fMinimum = 0;
+	fMaximum = info.MaxPorts();
+
+	fColor = (rgb_color){180, 200, 180};
+}
+
+
+PortsDataSource::~PortsDataSource()
+{
+}
+
+
+DataSource*
+PortsDataSource::Copy() const
+{
+	return new PortsDataSource(*this);
+}
+
+
+int64
+PortsDataSource::NextValue(SystemInfo& info)
+{
+	return info.UsedPorts();
+}
+
+
+const char*
+PortsDataSource::Label() const
+{
+	return "Ports";
+}
+
+
+bool
+PortsDataSource::AdaptiveScale() const
+{
+	return true;
 }
 
 

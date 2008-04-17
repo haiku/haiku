@@ -54,6 +54,34 @@ SystemInfo::MaxMemory() const
 
 
 uint32
+SystemInfo::UsedSemaphores() const
+{
+	return fSystemInfo.used_sems;
+}
+
+
+uint32
+SystemInfo::MaxSemaphores() const
+{
+	return fSystemInfo.max_sems;
+}
+
+
+uint32
+SystemInfo::UsedPorts() const
+{
+	return fSystemInfo.used_ports;
+}
+
+
+uint32
+SystemInfo::MaxPorts() const
+{
+	return fSystemInfo.max_ports;
+}
+
+
+uint32
 SystemInfo::UsedThreads() const
 {
 	return fSystemInfo.used_threads;

@@ -18,6 +18,12 @@ public:
 			uint64		UsedMemory() const;
 			uint64		MaxMemory() const;
 
+			uint32		UsedSemaphores() const;
+			uint32		MaxSemaphores() const;
+
+			uint32		UsedPorts() const;
+			uint32		MaxPorts() const;
+
 			uint32		UsedThreads() const;
 			uint32		MaxThreads() const;
 

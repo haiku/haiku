@@ -89,6 +89,32 @@ public:
 };
 
 
+class SemaphoresDataSource : public DataSource {
+public:
+						SemaphoresDataSource();
+	virtual				~SemaphoresDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	Label() const;
+	virtual bool		AdaptiveScale() const;
+};
+
+
+class PortsDataSource : public DataSource {
+public:
+						PortsDataSource();
+	virtual				~PortsDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	Label() const;
+	virtual bool		AdaptiveScale() const;
+};
+
+
 class ThreadsDataSource : public DataSource {
 public:
 						ThreadsDataSource();
