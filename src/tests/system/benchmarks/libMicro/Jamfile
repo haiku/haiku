@@ -199,17 +199,17 @@ BinCommand mktime :
 BinCommand mprotect : 
 	: libelided.a libroot.so ;
 
-# atm unsupported
-BinCommand mmap : 
-	: libelided.a libroot.so ;
+BinCommand mmap :
+	mmap.c
+	: libmicro.a libroot.so ;
 
 # atm unsupported
 BinCommand msync : 
 	: libelided.a libroot.so ;
 
-# atm unsupported
-BinCommand munmap : 
-	: libelided.a libroot.so ;
+BinCommand munmap :
+	munmap.c 
+	: libmicro.a libroot.so ;
 
 # atm unsupported
 BinCommand mutex : 
