@@ -27,8 +27,10 @@ __pthread_cleanup_pop_handler(void)
 		return NULL;
 
 	__pthread_cleanup_handler* handler = thread->cleanup_handlers;
-	thread->cleanup_handlers = handler->previous;
+	if (handler == NULL)
+		return NULL;
 
+	thread->cleanup_handlers = handler->previous;
 	return handler;
 }
 
