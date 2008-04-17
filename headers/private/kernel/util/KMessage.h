@@ -134,6 +134,8 @@ public:
 		team_id senderTeam = -1);
 	status_t ReceiveFrom(port_id fromPort, bigtime_t timeout = -1);
 
+	void Dump(void (*printFunc)(const char*,...));
+
 private:
 	friend class KMessageField;
 	friend class MessageAdapter;

@@ -585,6 +585,25 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout)
 #endif	// !KMESSAGE_CONTAINER_ONLY
 
 
+void
+KMessage::Dump(void (*printFunc)(const char*,...))
+{
+	Header* header = _Header();
+	printFunc("KMessage: buffer: %p (size/capacity: %ld/%ld), flags: 0x0lx\n",
+		fBuffer, header->size, fBufferCapacity, fFlags);
+
+	KMessageField field;
+	while (GetNextField(&field) == B_OK) {
+		type_code type = field.TypeCode();
+		int32 count = field.CountElements();
+		printFunc("  field: %-20s: type: 0x%lx ('%c%c%c%c'), %ld element%s\n",
+			field.Name(), type, (char)(type >> 24), (char)(type >> 16),
+			(char)(type >> 8), (char)type, count, count == 1 ? "" : "s");
+	}
+
+}
+
+
 // _Header
 KMessage::Header *
 KMessage::_Header() const
