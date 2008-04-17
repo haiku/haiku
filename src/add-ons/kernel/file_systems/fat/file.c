@@ -1363,6 +1363,7 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	return B_OK;
 }
 
+
 // get rid of node or directory
 static status_t
 do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
@@ -1474,6 +1475,7 @@ bi:
 
 	return result;
 }
+
 
 status_t
 dosfs_unlink(fs_volume *vol, fs_vnode *dir, const char *name)

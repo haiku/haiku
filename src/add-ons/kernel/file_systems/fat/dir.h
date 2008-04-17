@@ -12,13 +12,13 @@ status_t 	findfile_case(nspace *vol, vnode *dir, const char *file,
 status_t 	findfile_nocase(nspace *vol, vnode *dir, const char *file,
 				ino_t *vnid, vnode **node);
 status_t 	findfile_nocase_duplicates(nspace *vol, vnode *dir, const char *file,
-				ino_t *vnid, vnode **node, bool *dups_exist);				
+				ino_t *vnid, vnode **node, bool *dups_exist);
 status_t 	findfile_case_duplicates(nspace *vol, vnode *dir, const char *file,
-				ino_t *vnid, vnode **node, bool *dups_exist);				
+				ino_t *vnid, vnode **node, bool *dups_exist);
 status_t	erase_dir_entry(nspace *vol, vnode *node);
 status_t	compact_directory(nspace *vol, vnode *dir);
 status_t	create_volume_label(nspace *vol, const char name[11], uint32 *index);
-status_t	create_dir_entry(nspace *vol, vnode *dir, vnode *node, 
+status_t	create_dir_entry(nspace *vol, vnode *dir, vnode *node,
 				const char *name, uint32 *ns, uint32 *ne);
 
 status_t	dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node,

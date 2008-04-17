@@ -1,7 +1,7 @@
 /*
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
-	
+
 	extended: 2001-12-11 by Marcus Overhagen
 */
 

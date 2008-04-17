@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 */
 
-#include <KernelExport.h> 
+#include <KernelExport.h>
 
 #include <stdlib.h>
 #include <dirent.h>
@@ -90,7 +90,7 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 			}
 			return ENOENT;
 		}
-	
+
 		if (buffer[0] == 0xe5) { // skip erased entries
 			if (start_index != 0xffff) {
 				dprintf("lfn entry (%s) with intervening erased entries\n", filename);
@@ -99,9 +99,9 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 			DPRINTF(2, ("entry erased, skipping...\n"));
 			continue;
 		}
-		
+
 		if (buffer[0xb] == 0xf) { // long file name
-			if ((buffer[0xc] != 0) || 
+			if ((buffer[0xc] != 0) ||
 				(buffer[0x1a] != 0) || (buffer[0x1b] != 0)) {
 				dprintf("invalid long file name: reserved fields munged\n");
 				continue;
@@ -118,7 +118,7 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 				for (i = 1; i < 0x20; i += 2) {
 					if (*(uint16 *)&buffer[i] == 0xffff)
 						break;
-					*puni++ = *(uint16 *)&buffer[i]; 
+					*puni++ = *(uint16 *)&buffer[i];
 					if (i == 0x9) i+=3;
 					if (i == 0x18) i+=2;
 				}
@@ -163,7 +163,7 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 	// process long name
 	if (start_index != 0xffff) {
 		if (lfn_count != 1) {
-			dprintf("unfinished lfn in directory\n"); 
+			dprintf("unfinished lfn in directory\n");
 			start_index = 0xffff;
 		} else {
 			if (unicode_to_utf8(uni, filename_len, (uint8*)filename, len)) {
@@ -311,7 +311,7 @@ check_dir_empty(nspace *vol, vnode *dir)
 			break;
 		}
 
-		result = ENOTEMPTY;		
+		result = ENOTEMPTY;
 	}
 
 	diri_free(&iter);
@@ -458,7 +458,7 @@ erase_dir_entry(nspace *vol, vnode *node)
 	uint8 *buffer;
 	struct _dirent_info_ info;
 	struct diri diri;
-	
+
 	DPRINTF(0, ("erasing directory entries %lx through %lx\n",
 		node->sindex, node->eindex));
 	buffer = diri_init(vol,VNODE_PARENT_DIR_CLUSTER(node), node->sindex, &diri);
@@ -474,7 +474,7 @@ erase_dir_entry(nspace *vol, vnode *node)
 
 	if (result < 0)
 		return result;
-	
+
 	if (info.sindex != node->sindex || info.eindex != node->eindex) {
 		// any other attributes may be in a state of flux due to wstat calls
 		dprintf("erase_dir_entry: directory entry doesn't match\n");
@@ -564,7 +564,7 @@ find_short_name(nspace *vol, vnode *dir, const uchar *name)
 	struct diri diri;
 	uint8 *buffer;
 	status_t result = ENOENT;
-	
+
 	buffer = diri_init(vol, dir->cluster, 0, &diri);
 	while (buffer) {
 		if (buffer[0] == 0)
@@ -669,7 +669,7 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	// if at end of directory, last_entry flag will be true as it should be
 
 	diri_free(&diri);
-	
+
 	if (error != B_OK && error != ENOENT)
 		return error;
 
@@ -691,7 +691,7 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 			DPRINTF(0, ("_create_dir_entry_: out of space in root directory\n"));
 			return ENOSPC;
 		}
-	
+
 		// otherwise grow directory to fit
 		clusters_needed = ((*ne + 1) * 0x20 +
 			vol->bytes_per_sector*vol->sectors_per_cluster - 1) /
@@ -759,7 +759,7 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	buffer[0x1e] = (i >> 16) & 0xff;
 	buffer[0x1f] = (i >> 24) & 0xff;
 	diri_mark_dirty(&diri);
-	
+
 	if (last_entry) {
 		// add end of directory markers to the rest of the
 		// cluster; need to clear all the other entries or else
@@ -769,7 +769,7 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 			diri_mark_dirty(&diri);
 		}
 	}
-	
+
 	diri_free(&diri);
 
 	return 0;
@@ -804,10 +804,10 @@ is_filename_legal(const char *name)
 {
 	unsigned int i;
 	unsigned int len = strlen(name);
-	
+
 	if (len <= 0)
 		return false;
-	
+
 	// names ending with a dot are not allowed
 	if (name[len - 1] == '.')
 		return false;
@@ -883,7 +883,7 @@ create_dir_entry(nspace *vol, vnode *dir, vnode *node, const char *name,
 			error = B_OK;
 		else
 			error = find_short_name(vol, dir, nshort);
-			
+
 		if (error == B_OK) {
 			do {
 				memcpy(nshort, tshort, 11);
@@ -922,7 +922,7 @@ create_dir_entry(nspace *vol, vnode *dir, vnode *node, const char *name,
 }
 
 
-status_t 
+status_t
 dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	uint32 *_flags, bool reenter)
 {
@@ -980,7 +980,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		result = ENOENT;
 		goto bi;
 	}
-	
+
 	while (1) {
 		result = _next_dirent_(&iter, &info, filename, 512);
 		if (result < 0) {
@@ -1033,7 +1033,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 			* vol->sectors_per_cluster * vol->bytes_per_sector;
 	}
 	if (entry->cluster) {
-		entry->end_cluster = get_nth_fat_entry(vol, info.cluster, 
+		entry->end_cluster = get_nth_fat_entry(vol, info.cluster,
 			(entry->st_size + vol->bytes_per_sector * vol->sectors_per_cluster - 1) /
 			vol->bytes_per_sector / vol->sectors_per_cluster - 1);
 	} else
@@ -1064,7 +1064,7 @@ bi:
 }
 
 
-status_t 
+status_t
 dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 {
 	/* Starting at the base, find file in the subdir, and return path
@@ -1097,7 +1097,7 @@ dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 }
 
 
-status_t 
+status_t
 dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 {
 	status_t result = B_OK;
@@ -1133,7 +1133,7 @@ dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 }
 
 
-status_t 
+status_t
 dosfs_readlink(fs_volume *_vol, fs_vnode *_node, char *buf, size_t *bufsize)
 {
 	TOUCH(_vol); TOUCH(_node); TOUCH(buf); TOUCH(bufsize);
@@ -1145,7 +1145,7 @@ dosfs_readlink(fs_volume *_vol, fs_vnode *_node, char *buf, size_t *bufsize)
 }
 
 
-status_t 
+status_t
 dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 {
 	nspace *vol = (nspace*)_vol->private_volume;
@@ -1190,7 +1190,7 @@ dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 	cookie->current_index = 0;
 
 	result = B_NO_ERROR;
-	
+
 bi:
 	*_cookie = (void*)cookie;
 
@@ -1203,8 +1203,8 @@ bi:
 }
 
 
-status_t 
-dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie, 
+status_t
+dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	struct dirent *entry, size_t bufsize, uint32 *num)
 {
 	int 		result = ENOENT;
@@ -1214,7 +1214,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 	struct		diri diri;
 
 	LOCK_VOL(vol);
-	
+
 	if (check_nspace_magic(vol, "dosfs_readdir") ||
 		check_vnode_magic(dir, "dosfs_readdir") ||
 		check_dircookie_magic(cookie, "dosfs_readdir")) {
@@ -1260,7 +1260,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 
 	if (dir->vnid == vol->root_vnode.vnid)
 		cookie->current_index += 2;
-	
+
 	if (result == B_NO_ERROR) {
 		*num = 1;
 		entry->d_dev = vol->id;
@@ -1282,7 +1282,7 @@ bi:
 
 	return result;
 }
-			
+
 
 status_t
 dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
@@ -1310,7 +1310,7 @@ dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 }
 
 
-status_t 
+status_t
 dosfs_closedir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
 	TOUCH(_vol); TOUCH(_node); TOUCH(_cookie);
@@ -1321,7 +1321,7 @@ dosfs_closedir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 }
 
 
-status_t 
+status_t
 dosfs_free_dircookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 {
 	nspace *vol = (nspace *)_vol->private_volume;

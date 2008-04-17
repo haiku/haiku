@@ -49,8 +49,8 @@ csi_to_block(struct csi *csi)
 	if (IS_FIXED_ROOT(csi->cluster))
 		return csi->vol->root_start + csi->sector;
 
-	return csi->vol->data_start + 
-		(off_t)(csi->cluster - 2)* csi->vol->sectors_per_cluster + 
+	return csi->vol->data_start +
+		(off_t)(csi->cluster - 2)* csi->vol->sectors_per_cluster +
 		csi->sector;
 }
 
@@ -61,9 +61,9 @@ init_csi(nspace *vol, uint32 cluster, uint32 sector, struct csi *csi)
 	int ret;
 	if ((ret = _validate_cs_(vol,cluster,sector)) != 0)
 		return ret;
-	
+
 	csi->vol = vol; csi->cluster = cluster; csi->sector = sector;
-	
+
 	return 0;
 }
 
@@ -76,13 +76,13 @@ iter_csi(struct csi *csi, int sectors)
 
 	if (sectors < 0)
 		return EINVAL;
-	
+
 	if (sectors == 0)
 		return 0;
-		
+
 	if (IS_FIXED_ROOT(csi->cluster)) {
 		csi->sector += sectors;
-		if (csi->sector < csi->vol->root_sectors) 
+		if (csi->sector < csi->vol->root_sectors)
 			return 0;
 	} else {
 		csi->sector += sectors;
@@ -103,7 +103,7 @@ iter_csi(struct csi *csi, int sectors)
 	}
 
 	csi->sector = 0xffff;
-	
+
 	return -1;
 }
 
@@ -147,7 +147,7 @@ csi_mark_block_dirty(struct csi *csi, int32 tid)
 
 	// TODO : block_cache doesn't implement this
 	//block_cache_set_dirty(csi->vol->fBlockCache, csi_to_block(csi), true, tid);
-	
+
 	return B_OK;
 }
 
@@ -162,7 +162,7 @@ csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	status_t err;
 	char *buf = buffer;
 	int32 i;
-		
+
 	ASSERT(len >= csi->vol->bytes_per_sector);
 
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
@@ -247,13 +247,13 @@ csi_write_block(struct csi *csi, uint8 *buffer)
 	off_t block;
 	int32 tid;
 	char *blockData;
-	
+
 	block = csi_to_block(csi);
 
 	ASSERT(_validate_cs_(csi->vol, csi->cluster, csi->sector) == 0);
 	if (_validate_cs_(csi->vol, csi->cluster, csi->sector) != 0)
 		return EINVAL;
-		
+
 	tid = cache_start_transaction(csi->vol->fBlockCache);
 	blockData = block_cache_get_writable_etc(csi->vol->fBlockCache, block, 0, 1, tid);
 	memcpy(blockData, buffer, csi->vol->bytes_per_sector);
@@ -293,7 +293,7 @@ diri_init(nspace *vol, uint32 cluster, uint32 index, struct diri *diri)
 		&& iter_csi(&(diri->csi), diri->current_index
 				/ (vol->bytes_per_sector / 0x20)) != 0)
 		return NULL;
-	
+
 	diri->tid = cache_start_transaction(diri->csi.vol->fBlockCache);
 	if (diri->tid < B_OK)
 		return NULL;
@@ -322,7 +322,7 @@ diri_free(struct diri *diri)
 
 	if (diri->current_block)
 		_diri_release_current_block_(diri);
-		
+
 	cache_end_transaction(diri->csi.vol->fBlockCache, diri->tid, NULL, NULL);
 
 	return 0;
@@ -333,7 +333,7 @@ uint8 *
 diri_current_entry(struct diri *diri)
 {
 	if (check_diri_magic(diri, "diri_current_entry")) return NULL;
-	
+
 	if (diri->current_block == NULL)
 		return NULL;
 
@@ -346,7 +346,7 @@ uint8 *
 diri_next_entry(struct diri *diri)
 {
 	if (check_diri_magic(diri, "diri_next_entry")) return NULL;
-	
+
 	if (diri->current_block == NULL)
 		return NULL;
 
@@ -358,7 +358,7 @@ diri_next_entry(struct diri *diri)
 		if (diri->current_block == NULL)
 			return NULL;
 	}
-	
+
 	return diri->current_block
 		+ (diri->current_index % (diri->csi.vol->bytes_per_sector / 0x20))*0x20;
 }

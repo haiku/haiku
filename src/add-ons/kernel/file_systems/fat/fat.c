@@ -2,7 +2,7 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-#include <KernelExport.h> 
+#include <KernelExport.h>
 
 #include <fs_cache.h>
 #include <stdlib.h>
@@ -21,16 +21,17 @@
 
 #define DPRINTF(a,b) if (debug_fat > (a)) dprintf b
 
-static status_t mirror_fats(nspace *vol, uint32 sector, uint8 *buffer, int32 tid)
+static status_t
+mirror_fats(nspace *vol, uint32 sector, uint8 *buffer, int32 tid)
 {
 	uint32 i;
 	char *buf = buffer;
 
 	if (!vol->fat_mirrored)
 		return B_OK;
-	
+
 	sector -= vol->active_fat * vol->sectors_per_fat;
-	
+
 	for (i=0;i<vol->fat_count;i++) {
 		char *blockData;
 		if (i == vol->active_fat)
@@ -40,11 +41,13 @@ static status_t mirror_fats(nspace *vol, uint32 sector, uint8 *buffer, int32 tid
 		buf += vol->bytes_per_sector;
 		block_cache_put(vol->fBlockCache, sector + i*vol->sectors_per_fat);
 	}
-	
+
 	return B_OK;
 }
 
-static int32 _count_free_clusters_fat32(nspace *vol)
+
+static int32
+_count_free_clusters_fat32(nspace *vol)
 {
 	int32 count = 0;
 	const uint8 *block;
@@ -53,7 +56,7 @@ static int32 _count_free_clusters_fat32(nspace *vol)
 	uint32 cur_sector;
 
 	cur_sector = vol->reserved_sectors + vol->active_fat * vol->sectors_per_fat;
-	
+
 	for(fat_sector = 0; fat_sector < vol->sectors_per_fat; fat_sector++) {
 		block = (uint8 *)block_cache_get(vol->fBlockCache, cur_sector);
 		if(block == NULL) {
@@ -79,7 +82,8 @@ static int32 _count_free_clusters_fat32(nspace *vol)
 
 enum { _IOCTL_COUNT_FREE_, _IOCTL_GET_ENTRY_, _IOCTL_SET_ENTRY_, _IOCTL_ALLOCATE_N_ENTRIES_ };
 
-static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
+static int32
+_fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, int32 _tid)
 {
 	int32 result = 0;
 	uint32 n = 0, first = 0, last = 0;
@@ -97,15 +101,15 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 	if (check_nspace_magic(vol, "_fat_ioctl_")) return EINVAL;
 
 	DPRINTF(3, ("_fat_ioctl_: action %lx, cluster %lx, N %lx\n", action, cluster, N));
-	
+
 	if (action == _IOCTL_COUNT_FREE_) {
 		if(vol->fat_bits == 32)
 			// use a optimized version of the cluster counting algorithms
 			return _count_free_clusters_fat32(vol);
-		else 
+		else
 			cluster = 2;
 	}
-	
+
 	if (action == _IOCTL_ALLOCATE_N_ENTRIES_)
 		cluster = vol->last_allocated;
 
@@ -120,7 +124,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 	sector = vol->reserved_sectors + vol->active_fat * vol->sectors_per_fat +
 		off / vol->bytes_per_sector;
 	off %= vol->bytes_per_sector;
-	
+
 	if (action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_) {
 		block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
 	} else {
@@ -128,12 +132,12 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 			tid = cache_start_transaction(vol->fBlockCache);
 		block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache, sector, tid);
 	}
-	
+
 	if (block1 == NULL) {
 		DPRINTF(0, ("_fat_ioctl_: error reading fat (sector %lx)\n", sector));
 		return EIO;
 	}
-	
+
 	for (i=0;i<vol->total_clusters;i++) {
 		ASSERT(IS_DATA_CLUSTER(cluster));
 		ASSERT(off == ((cluster * vol->fat_bits / 8) % vol->bytes_per_sector));
@@ -144,7 +148,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 					block2 = (uint8 *)block_cache_get(vol->fBlockCache, ++sector);
 				else
 					block2 = (uint8 *)block_cache_get_writable(vol->fBlockCache, ++sector, tid);
-				
+
 				if (block2 == NULL) {
 					DPRINTF(0, ("_fat_ioctl_: error reading fat (sector %lx)\n", sector));
 					result = EIO;
@@ -186,7 +190,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 					block1[off+1] |= (ormask >> 8);
 				}
 			}
-			
+
 			if (off == vol->bytes_per_sector - 1) {
 				off = (cluster & 1) ? 1 : 0;
 				block_cache_put(vol->fBlockCache, sector - 1);
@@ -216,7 +220,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 			}
 			if (((action == _IOCTL_ALLOCATE_N_ENTRIES_) && (val == 0)) ||
 				(action == _IOCTL_SET_ENTRY_)) {
-				ASSERT((V & 0xf0000000) == 0);				
+				ASSERT((V & 0xf0000000) == 0);
 				*(uint32 *)&block1[off] = B_HOST_TO_LENDIAN_INT32(V);
 //				block1[off] = V & 0xff;
 //				block1[off+1] = (V >> 8) & 0xff;
@@ -265,7 +269,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 		// iterate cluster and sector if needed
 		if (++cluster == vol->total_clusters + 2) {
 			block_cache_put(vol->fBlockCache, sector);
-			
+
 			cluster = 2;
 			off = 2 * vol->fat_bits / 8;
 			sector = vol->reserved_sectors + vol->active_fat * vol->sectors_per_fat;
@@ -278,17 +282,17 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 
 		if (off >= vol->bytes_per_sector) {
 			block_cache_put(vol->fBlockCache, sector);
-			
-			off -= vol->bytes_per_sector; 
+
+			off -= vol->bytes_per_sector;
 			sector++;
 			ASSERT(sector < vol->reserved_sectors + (vol->active_fat + 1) * vol->sectors_per_fat);
-			
+
 			if (action != _IOCTL_SET_ENTRY_ && action != _IOCTL_ALLOCATE_N_ENTRIES_)
 				block1 = (uint8 *)block_cache_get(vol->fBlockCache, sector);
 			else
 				block1 = (uint8 *)block_cache_get_writable(vol->fBlockCache, sector, tid);
 		}
-		
+
 		if (block1 == NULL) {
 			DPRINTF(0, ("_fat_ioctl_: error reading fat (sector %lx)\n", sector));
 			result = EIO;
@@ -297,7 +301,7 @@ static int32 _fat_ioctl_(nspace *vol, uint32 action, uint32 cluster, int32 N, in
 	}
 
 bi:
-	if (block1) 
+	if (block1)
 		block_cache_put(vol->fBlockCache, sector);
 	if (_tid == -1 && tid > 0)
 		cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
@@ -323,12 +327,16 @@ bi:
 	return result;
 }
 
-int32 count_free_clusters(nspace *vol)
+
+int32
+count_free_clusters(nspace *vol)
 {
 	return _fat_ioctl_(vol, _IOCTL_COUNT_FREE_, 0, 0, -1);
 }
 
-static int32 get_fat_entry(nspace *vol, uint32 cluster)
+
+static int32
+get_fat_entry(nspace *vol, uint32 cluster)
 {
 	int32 value = _fat_ioctl_(vol, _IOCTL_GET_ENTRY_, cluster, 0, -1);
 
@@ -340,7 +348,7 @@ static int32 get_fat_entry(nspace *vol, uint32 cluster)
 
 	if (value > 0x0ffffff7)
 		return END_FAT_ENTRY;
-	
+
 	if (value > 0x0ffffff0)
 		return BAD_FAT_ENTRY;
 
@@ -348,13 +356,17 @@ static int32 get_fat_entry(nspace *vol, uint32 cluster)
 	return BAD_FAT_ENTRY;
 }
 
-static status_t set_fat_entry(nspace *vol, uint32 cluster, int32 value)
+
+static status_t
+set_fat_entry(nspace *vol, uint32 cluster, int32 value)
 {
 	return _fat_ioctl_(vol, _IOCTL_SET_ENTRY_, cluster, value, -1);
 }
 
+
 // traverse n fat entries
-int32 get_nth_fat_entry(nspace *vol, int32 cluster, uint32 n)
+int32
+get_nth_fat_entry(nspace *vol, int32 cluster, uint32 n)
 {
 	if (check_nspace_magic(vol, "get_nth_fat_entry")) return EINVAL;
 
@@ -366,19 +378,21 @@ int32 get_nth_fat_entry(nspace *vol, int32 cluster, uint32 n)
 	}
 
 	ASSERT(cluster != 0);
-	
+
 	return cluster;
 }
+
 
 // count number of clusters in fat chain starting at given cluster
 // should only be used for calculating directory sizes because it doesn't
 // return proper error codes
-uint32 count_clusters(nspace *vol, int32 cluster)
+uint32
+count_clusters(nspace *vol, int32 cluster)
 {
 	int32 count = 0;
 
 	DPRINTF(2, ("count_clusters %lx\n", cluster));
-	
+
 	if (check_nspace_magic(vol, "count_clusters")) return 0;
 
 	// not intended for use on root directory
@@ -408,7 +422,9 @@ uint32 count_clusters(nspace *vol, int32 cluster)
 	return 0;
 }
 
-status_t clear_fat_chain(nspace *vol, uint32 cluster)
+
+status_t
+clear_fat_chain(nspace *vol, uint32 cluster)
 {
 	int32 c;
 	status_t result;
@@ -442,7 +458,9 @@ status_t clear_fat_chain(nspace *vol, uint32 cluster)
 	return 0;
 }
 
-status_t allocate_n_fat_entries(nspace *vol, int32 n, int32 *start)
+
+status_t
+allocate_n_fat_entries(nspace *vol, int32 n, int32 *start)
 {
 	int32 c;
 
@@ -463,13 +481,15 @@ status_t allocate_n_fat_entries(nspace *vol, int32 n, int32 *start)
 	return 0;
 }
 
-status_t set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters)
+
+status_t
+set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters)
 {
 	status_t result;
 	int32 i, c, n;
 
 	DPRINTF(1, ("set_fat_chain_length: %Lx to %lx clusters (%lx)\n", node->vnid, clusters, node->cluster));
-	
+
 	if (IS_FIXED_ROOT(node->cluster) || (!IS_DATA_CLUSTER(node->cluster) && (node->cluster != 0))) {
 		DPRINTF(0, ("set_fat_chain_length called on invalid cluster (%lx)\n", node->cluster));
 		return EINVAL;
@@ -570,7 +590,9 @@ status_t set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters)
 	return clear_fat_chain(vol, n);
 }
 
-void dump_fat_chain(nspace *vol, uint32 cluster)
+
+void
+dump_fat_chain(nspace *vol, uint32 cluster)
 {
 	dprintf("fat chain: %lx", cluster);
 	while (IS_DATA_CLUSTER(cluster)) {

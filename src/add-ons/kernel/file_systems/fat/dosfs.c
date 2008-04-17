@@ -335,12 +335,12 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 			  of sectors.  They say that they have 196576 sectors but they
 			  really only have 196192.  This check is a work-around for their
 			  brain-deadness.
-			*/  
+			*/
 			unsigned char bogus_zip_data[] = {
 				0x00, 0x02, 0x04, 0x01, 0x00, 0x02, 0x00, 0x02, 0x00, 0x00,
 				0xf8, 0xc0, 0x00, 0x20, 0x00, 0x40, 0x00, 0x20, 0x00, 0x00
 			};
-			
+
 			if (memcmp(buf+0x0b, bogus_zip_data, sizeof(bogus_zip_data)) == 0 &&
 				vol->total_sectors == 196576 &&
 				((off_t)geo.sectors_per_track *
@@ -370,8 +370,8 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		vol->root_vnode.st_size = vol->root_sectors * vol->bytes_per_sector;
 
 		vol->data_start = vol->root_start + vol->root_sectors;
-		vol->total_clusters = (vol->total_sectors - vol->data_start) / vol->sectors_per_cluster;	
-		
+		vol->total_clusters = (vol->total_sectors - vol->data_start) / vol->sectors_per_cluster;
+
 		// XXX: uncertain about border cases; win32 sdk says cutoffs are at
 		//      at ff6/ff7 (or fff6/fff7), but that doesn't make much sense
 		if (vol->total_clusters > 0xff1)
@@ -389,7 +389,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	}
 
 	// perform sanity checks on the FAT
-		
+
 	// the media descriptor in active FAT should match the one in the BPB
 	if ((err = read_pos(vol->fd, vol->bytes_per_sector*(vol->reserved_sectors + vol->active_fat * vol->sectors_per_fat), (void *)buf, 0x200)) != 0x200) {
 		dprintf("dosfs: error reading FAT\n");
@@ -417,7 +417,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 					dprintf("dosfs error: media descriptor mismatch in fat # %ld (%x != %x)\n", i, buf2[0], vol->media_descriptor);
 					goto error;
 				}
-#if 0			
+#if 0
 				// checking for exact matches of fats is too
 				// restrictive; allow these to go through in
 				// case the fat is corrupted for some reason
@@ -474,13 +474,13 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 		uint32 free_count, last_allocated;
 		err = get_fsinfo(vol, &free_count, &last_allocated);
 		if (err >= 0) {
-			if (free_count < vol->total_clusters) 
+			if (free_count < vol->total_clusters)
 				vol->free_clusters = free_count;
 			else {
 				dprintf("free cluster count from fsinfo block invalid %lx\n", free_count);
 				err = -1;
 			}
-			if (last_allocated < vol->total_clusters) 
+			if (last_allocated < vol->total_clusters)
 				vol->last_allocated = last_allocated; //update to a closer match
 		}
 		if (err < 0) {
@@ -541,7 +541,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	if (!memcmp(vol->vol_label, "__RO__     ", 11)) {
 		vol->flags |= B_FS_IS_READONLY;
 	}
-	
+
 	*newVol = vol;
 	return B_NO_ERROR;
 
@@ -584,7 +584,7 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	uint32 sectors_per_fat;
 	char name[12];
 	identify_cookie *cookie;
-	
+
 	// read in the boot sector
 	if (read_pos(fd, 0, (void*)buf, 512) != 512) {
 		return -1;
@@ -638,7 +638,7 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 			}
 		}
 	}
-	
+
 	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
 	if (!cookie)
 		return -1;
@@ -729,11 +729,11 @@ dosfs_mount(fs_volume *_vol, const char *device, uint32 flags,
 		char name[32];
 
 		if (check_nspace_magic(vol, "dosfs_mount")) return EINVAL;
-		
+
 		*_rootID = vol->root_vnode.vnid;
 		_vol->private_volume = (void *)vol;
 		_vol->ops = &gFATVolumeOps;
-		
+
 		// You MUST do this. Create the vnode for the root.
 		result = publish_vnode(_vol, *_rootID, (void*)&(vol->root_vnode),
 			&gFATVnodeOps, make_mode(vol, &vol->root_vnode), 0);
@@ -776,7 +776,7 @@ update_fsinfo(nspace *vol)
 		&& (vol->flags & B_FS_IS_READONLY) == 0) {
 		uchar *buffer;
 		int32 tid = cache_start_transaction(vol->fBlockCache);
-		if ((buffer = (uchar *)block_cache_get_writable_etc(vol->fBlockCache, 
+		if ((buffer = (uchar *)block_cache_get_writable_etc(vol->fBlockCache,
 				vol->fsinfo_sector, 0, vol->bytes_per_sector, tid)) != NULL) {
 			if ((read32(buffer,0) == 0x41615252) && (read32(buffer,0x1e4) == 0x61417272) && (read16(buffer,0x1fe) == 0xaa55)) {
 				//number of free clusters
@@ -784,7 +784,7 @@ update_fsinfo(nspace *vol)
 				buffer[0x1e9] = ((vol->free_clusters >> 8) & 0xff);
 				buffer[0x1ea] = ((vol->free_clusters >> 16) & 0xff);
 				buffer[0x1eb] = ((vol->free_clusters >> 24) & 0xff);
-				//cluster number of most recently allocated cluster 
+				//cluster number of most recently allocated cluster
 				buffer[0x1ec] = (vol->last_allocated & 0xff);
 				buffer[0x1ed] = ((vol->last_allocated >> 8) & 0xff);
 				buffer[0x1ee] = ((vol->last_allocated >> 16) & 0xff);
@@ -804,19 +804,21 @@ update_fsinfo(nspace *vol)
 	}
 }
 
-static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocated)
+
+static status_t
+get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocated)
 {
 	uchar *buffer;
 	int32 result;
 
 	if ((vol->fat_bits != 32) || (vol->fsinfo_sector == 0xffff))
 		return B_ERROR;
-		
+
 	if ((buffer = (uchar *)block_cache_get_etc(vol->fBlockCache, vol->fsinfo_sector, 0, vol->bytes_per_sector)) == NULL) {
 		dprintf("get_fsinfo: error getting fsinfo sector %x\n", vol->fsinfo_sector);
 		return EIO;
 	}
-	
+
 	if ((read32(buffer,0) == 0x41615252) && (read32(buffer,0x1e4) == 0x61417272) && (read16(buffer,0x1fe) == 0xaa55)) {
 		*free_count = read32(buffer,0x1e8);
 		*last_allocated = read32(buffer,0x1ec);
@@ -831,7 +833,7 @@ static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocat
 }
 
 
-static status_t 
+static status_t
 dosfs_unmount(fs_volume *_vol)
 {
 	int result = B_NO_ERROR;
@@ -839,16 +841,16 @@ dosfs_unmount(fs_volume *_vol)
 	nspace* vol = (nspace*)_vol->private_volume;
 
 	LOCK_VOL(vol);
-	
+
 	if (check_nspace_magic(vol, "dosfs_unmount")) {
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
-	
+
 	DPRINTF(0, ("dosfs_unmount volume %lx\n", vol->id));
 
 	update_fsinfo(vol);
-	
+
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
 	put_vnode(_vol, vol->root_vnode.vnid);
 	block_cache_delete(vol->fBlockCache, true);
@@ -880,8 +882,9 @@ dosfs_unmount(fs_volume *_vol)
 	return result;
 }
 
+
 // dosfs_read_fs_stat - Fill in fs_info struct for device.
-static status_t 
+static status_t
 dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 {
 	nspace* vol = (nspace*)_vol->private_volume;
@@ -897,16 +900,16 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 	DPRINTF(1, ("dosfs_read_fs_stat called\n"));
 
 	// fss->dev and fss->root filled in by kernel
-	
+
 	// File system flags.
 	fss->flags = vol->flags;
-	
+
 	// FS block size.
 	fss->block_size = vol->bytes_per_sector * vol->sectors_per_cluster;
 
 	// IO size - specifies buffer size for file copying
 	fss->io_size = 65536;
-	
+
 	// Total blocks
 	fss->total_blocks = vol->total_clusters;
 
@@ -933,11 +936,12 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 
 	// File system name
 	strcpy(fss->fsh_name, "fat");
-	
+
 	UNLOCK_VOL(vol);
 
 	return B_OK;
 }
+
 
 static status_t
 dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
@@ -1025,18 +1029,18 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 		if (result == 0)
 			memcpy(vol->vol_label, name, 11);
 	}
-	
+
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
-	
+
 bi:	UNLOCK_VOL(vol);
 
 	return result;
 }
 
 
-static status_t 
-dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code, 
+static status_t
+dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 	void *buf, size_t len)
 {
 	status_t result = B_OK;
@@ -1079,7 +1083,7 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 			dprintf("root vnode id = %Lx\n", vol->root_vnode.vnid);
 			dprintf("volume label [%11.11s]\n", vol->vol_label);
 			break;
-			
+
 		case 100001 :
 			dprintf("vnode id %Lx, dir vnid = %Lx\n", node->vnid, node->dir_vnid);
 			dprintf("si = %lx, ei = %lx\n", node->sindex, node->eindex);
@@ -1131,12 +1135,12 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 }
 
 
-status_t 
+status_t
 _dosfs_sync(nspace *vol)
 {
 	if (check_nspace_magic(vol, "dosfs_sync"))
 		return EINVAL;
-	
+
 	update_fsinfo(vol);
 	block_cache_sync(vol->fBlockCache);
 
@@ -1144,14 +1148,14 @@ _dosfs_sync(nspace *vol)
 }
 
 
-static status_t 
+static status_t
 dosfs_sync(fs_volume *_vol)
 {
 	nspace *vol = (nspace *)_vol->private_volume;
 	status_t err;
 
 	DPRINTF(0, ("dosfs_sync called on volume %lx\n", vol->id));
-	
+
 	LOCK_VOL(vol);
 	err = _dosfs_sync(vol);
 	UNLOCK_VOL(vol);
@@ -1160,7 +1164,7 @@ dosfs_sync(fs_volume *_vol)
 }
 
 
-static status_t 
+static status_t
 dosfs_fsync(fs_volume *_vol, fs_vnode *_node)
 {
 	nspace *vol = (nspace *)_vol->private_volume;

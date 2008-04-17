@@ -14,7 +14,7 @@ status_t dosfs_close_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie);
 status_t dosfs_free_attrdir_cookie(fs_volume *_vol, fs_vnode *_node,
 	void *_cookie);
 status_t dosfs_rewind_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie);
-status_t dosfs_read_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie, 
+status_t dosfs_read_attrdir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	struct dirent *buf, size_t bufsize, uint32 *num);
 status_t dosfs_open_attr(fs_volume *_vol, fs_vnode *_node, const char *name,
 	int openMode, void **_cookie);

@@ -570,7 +570,7 @@ const uint16 sjis81tou[] = {
 0x6DC6, 0x6DEC, 0x6DDE, 0x6DCC, 0x6DE8, 0x6DD2, 0x6DC5, 0x6DFA, 0x6DD9, 0x6DE4, 0x6DD5, 0x6DEA, 0x6DEE, 0x6E2D, 0x6E6E, 0x6E2E,
 0x6E19, 0x6E72, 0x6E5F, 0x6E3E, 0x6E23, 0x6E6B, 0x6E2B, 0x6E76, 0x6E4D, 0x6E1F, 0x6E43, 0x6E3A, 0x6E4E, 0x6E24, 0x6EFF, 0x6E1D,
 0x6E38, 0x6E82, 0x6EAA, 0x6E98, 0x6EC9, 0x6EB7, 0x6ED3, 0x6EBD, 0x6EAF, 0x6EC4, 0x6EB2, 0x6ED4, 0x6ED5, 0x6E8F, 0x6EA5, 0x6EC2,
-0x6E9F, 0x6F41, 0x6F11, 0x704C, 0x6EEC, 0x6EF8, 0x6EFE, 0x6F3F, 0x6EF2, 0x6F31, 0x6EEF, 0x6F32, 0x6ECC, 0x0000, 0x0000, 0x0000, 
+0x6E9F, 0x6F41, 0x6F11, 0x704C, 0x6EEC, 0x6EF8, 0x6EFE, 0x6F3F, 0x6EF2, 0x6F31, 0x6EEF, 0x6F32, 0x6ECC, 0x0000, 0x0000, 0x0000,
 0xFFFF
 };
 
@@ -830,7 +830,7 @@ const uint16 sjise0tou[] = {
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 0xFFFF
 };
 
@@ -871,7 +871,7 @@ const table_segment	sjistables[] = { {sjis00tou, 0x0000},
 		str[3] = 0x80 | (val&0x3f);\
 		uni_str += 2; str += 4;\
 	}\
-}	
+}
 
 // Pierre's Uber Macro
 #define u_hostendian_to_utf8(str, uni_str)\
@@ -925,7 +925,7 @@ const table_segment	sjistables[] = { {sjis00tou, 0x0000},
 }
 
 // Count the number of bytes of a UTF-8 character
-#define utf8_char_len(c) ((((int32)0xE5000000 >> ((c >> 3) & 0x1E)) & 3) + 1) 
+#define utf8_char_len(c) ((((int32)0xE5000000 >> ((c >> 3) & 0x1E)) & 3) + 1)
 
 // converts LENDIAN unicode to utf8
 static status_t
@@ -939,7 +939,7 @@ _lendian_unicode_to_utf8(
 	int32 dstLimit = *dstLen;
 	int32 srcCount = 0;
 	int32 dstCount = 0;
-	
+
 	for (srcCount = 0; srcCount < srcLimit; srcCount += 2) {
 		uint16  *UNICODE = (uint16 *)&src[srcCount];
 		uchar	utf8[4];
@@ -965,7 +965,7 @@ _lendian_unicode_to_utf8(
 }
 
 // utf8 to LENDIAN unicode
-static status_t 
+static status_t
 _utf8_to_lendian_unicode(
 	const char	*src,
 	int32		*srcLen,
@@ -984,7 +984,7 @@ _utf8_to_lendian_unicode(
 		int     err_flag;
 
 		if ((srcCount + utf8_char_len(src[srcCount])) > srcLimit)
-			break; 
+			break;
 
 		utf8_to_u_hostendian(UTF8, UNICODE, err_flag);
 		if(err_flag == 1)
@@ -1023,10 +1023,10 @@ _one_to_utf8(
 		uint16	*UNICODE = &unicode;
 		uchar	utf8[4];
 		uchar	*UTF8 = utf8;
-		
+	
 		*(uint32 *)utf8 = 0;
 		u_hostendian_to_utf8(UTF8, UNICODE);
-		
+	
 		int32 utf8Len = UTF8 - utf8;
 		if ((dstCount + utf8Len) > dstLimit)
 			break;
@@ -1057,13 +1057,13 @@ _utf8_to_sjis_bendian(
 
 	while ((srcCount < srcLimit) && (dstCount < dstLimit)) {
 		if ((srcCount + utf8_char_len(src[srcCount])) > srcLimit)
-			break; 
+			break;
 
 		uint16 unicode;
 		uint16 *UNICODE = &unicode;
 		int				err_flag;
 		bool			multibyte = false;
-		const uint16	*table = NULL;	
+		const uint16	*table = NULL;
 		uchar			*UTF8 = (uchar *)src + srcCount;
 
 		utf8_to_u_hostendian(UTF8, UNICODE, err_flag);
@@ -1077,7 +1077,7 @@ _utf8_to_sjis_bendian(
 					uint16 offset = sjistables[t].offset;
 
 					if (offset == 0x0000)
-						dst[dstCount] = i; 
+						dst[dstCount] = i;
 					else {
 						if ((dstCount + 1) < dstLimit) {
 							uint16 sjis = offset + i;
@@ -1127,7 +1127,7 @@ inline bool is_initial_sjis_byte(uchar c)
 
 // takes a unicode name of unilen uchar's and converts to a utf8 name of at
 // most utf8len uint8's
-status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8, 
+status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
 	uint32 utf8len)
 {
 	status_t result;
@@ -1259,7 +1259,7 @@ status_t munge_short_name_sjis(uchar nshort[11], uint64 value)
 		if (nshort[i] == ' ') break;
 		if (is_initial_sjis_byte(nshort[i])) i++;
 	}
-	
+
 	memcpy(nshort + last, buffer, len);
 	memset(nshort + last + len, ' ', 8 - (last + len));
 
@@ -1459,8 +1459,8 @@ bi:
 		dprintf("generate_short_name_sjis error: %lx (%s)\n", result, strerror(result));
 	}
 
-	free(sjis);	
-	
+	free(sjis);
+
 	return result;
 }
 
@@ -1514,7 +1514,7 @@ status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len, bool toLower)
 	pos = 0;
 	for (i=0;i<8;i++) {
 		if (msdos[i] == ' ') break;
-		normalized[pos++] = ((i == 0) && (msdos[i] == 5)) ? 0xe5 : 
+		normalized[pos++] = ((i == 0) && (msdos[i] == 5)) ? 0xe5 :
 			(toLower ? tolower(msdos[i]) : msdos[i]);
 	}
 
@@ -1539,24 +1539,24 @@ bool requires_munged_short_name(const uchar *utf8name, const uchar nshort[11], i
 	int i, len;
 
 	if (encoding != MS_DOS_CONVERSION) return true;
-	
+
 	for ( ; *utf8name != 0; utf8name++) {
 		if (!BEGINS_UTF8CHAR(*utf8name)) continue;
 		if (*utf8name == '.') break;
 		leading++;
 		if (leading > 8) return true;
-		if ((nshort[leading - 1] == '_') && (*utf8name != '_')) return true; 
+		if ((nshort[leading - 1] == '_') && (*utf8name != '_')) return true;
 	}
-	
+
 	if (*utf8name != 0) {
 		utf8name++;
-	
+
 		for ( ; *utf8name != 0; utf8name++) {
 			if (!BEGINS_UTF8CHAR(*utf8name)) continue;
 			if (*utf8name == '.') return true;
 			trailing++;
 			if (trailing > 3) return true;
-			if ((nshort[leading + trailing - 1] == '_') && (*utf8name != '_')) return true; 
+			if ((nshort[leading + trailing - 1] == '_') && (*utf8name != '_')) return true;
 		}
 	}
 
@@ -1567,7 +1567,7 @@ bool requires_munged_short_name(const uchar *utf8name, const uchar nshort[11], i
 	for (i = 8, len = 0; i < 11; i++)
 		if (nshort[i] != ' ') len++;
 	if (len != trailing) return true;
-	
+
 	return false;
 }
 

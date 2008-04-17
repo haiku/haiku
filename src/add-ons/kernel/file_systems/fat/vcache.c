@@ -16,7 +16,7 @@ There are three ways to encode a vnode id:
    directory it appears in. This is used for files with data.
 2. Combine the starting cluster of the directory the entry appears in with the
    index of the entry in the directory. This is used for 0-byte files.
-3. A unique number that doesn't match any possible values from encodings 1 or 
+3. A unique number that doesn't match any possible values from encodings 1 or
    2.
 
 With the first encoding, the vnode id is invalidated (i.e. no longer describes
@@ -73,7 +73,7 @@ void dump_vcache(nspace *vol)
 	uint32 i;
 	struct vcache_entry *c;
 	dprintf("vnid cache size %lx, cur vnid = %Lx\n"
-			"vnid             loc\n", 
+			"vnid             loc\n",
 			vol->vcache.cache_size, vol->vcache.cur_vnid);
 	for (i=0;i<vol->vcache.cache_size;i++)
 		for (c = vol->vcache.by_vnid[i];c;c=c->next_vnid)
@@ -118,7 +118,9 @@ status_t init_vcache(nspace *vol)
 	return 0;
 }
 
-status_t uninit_vcache(nspace *vol)
+
+status_t
+uninit_vcache(nspace *vol)
 {
 	uint32 i, count = 0;
 	struct vcache_entry *c, *n;
@@ -147,7 +149,9 @@ status_t uninit_vcache(nspace *vol)
 	return 0;
 }
 
-ino_t generate_unique_vnid(nspace *vol)
+
+ino_t
+generate_unique_vnid(nspace *vol)
 {
 	DPRINTF(0, ("generate_unique_vnid\n"));
 	/* only one thread per volume will be in here at any given time anyway
@@ -155,7 +159,9 @@ ino_t generate_unique_vnid(nspace *vol)
 	return vol->vcache.cur_vnid++;
 }
 
-static status_t _add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
+
+static status_t
+_add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 {
 	int hash1 = hash(vnid), hash2 = hash(loc);
 	struct vcache_entry *e, *c, *p;
@@ -205,7 +211,9 @@ static status_t _add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 	return B_OK;
 }
 
-static status_t _remove_from_vcache_(nspace *vol, ino_t vnid)
+
+static status_t
+_remove_from_vcache_(nspace *vol, ino_t vnid)
 {
 	int hash1 = hash(vnid), hash2;
 	struct vcache_entry *c, *p, *e;
@@ -252,7 +260,9 @@ static status_t _remove_from_vcache_(nspace *vol, ino_t vnid)
 	return 0;
 }
 
-static struct vcache_entry *_find_vnid_in_vcache_(nspace *vol, ino_t vnid)
+
+static struct vcache_entry *
+_find_vnid_in_vcache_(nspace *vol, ino_t vnid)
 {
 	int hash1 = hash(vnid);
 	struct vcache_entry *c;
@@ -268,7 +278,9 @@ static struct vcache_entry *_find_vnid_in_vcache_(nspace *vol, ino_t vnid)
 	return c;
 }
 
-static struct vcache_entry *_find_loc_in_vcache_(nspace *vol, ino_t loc)
+
+static struct vcache_entry *
+_find_loc_in_vcache_(nspace *vol, ino_t loc)
 {
 	int hash2 = hash(loc);
 	struct vcache_entry *c;
@@ -284,7 +296,9 @@ static struct vcache_entry *_find_loc_in_vcache_(nspace *vol, ino_t loc)
 	return c;
 }
 
-status_t add_to_vcache(nspace *vol, ino_t vnid, ino_t loc)
+
+status_t
+add_to_vcache(nspace *vol, ino_t vnid, ino_t loc)
 {
 	status_t result;
 
@@ -296,8 +310,10 @@ status_t add_to_vcache(nspace *vol, ino_t vnid, ino_t loc)
 	return result;
 }
 
+
 /* XXX: do this in a smarter fashion */
-static status_t _update_loc_in_vcache_(nspace *vol, ino_t vnid, ino_t loc)
+static status_t
+_update_loc_in_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 {
 	status_t result;
 
@@ -308,7 +324,9 @@ static status_t _update_loc_in_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 	return result;
 }
 
-status_t remove_from_vcache(nspace *vol, ino_t vnid)
+
+status_t
+remove_from_vcache(nspace *vol, ino_t vnid)
 {
 	status_t result;
 
@@ -320,7 +338,9 @@ status_t remove_from_vcache(nspace *vol, ino_t vnid)
 	return result;
 }
 
-status_t vcache_vnid_to_loc(nspace *vol, ino_t vnid, ino_t *loc)
+
+status_t
+vcache_vnid_to_loc(nspace *vol, ino_t vnid, ino_t *loc)
 {
 	struct vcache_entry *e;
 
@@ -335,7 +355,9 @@ status_t vcache_vnid_to_loc(nspace *vol, ino_t vnid, ino_t *loc)
 	return (e) ? B_OK : ENOENT;
 }
 
-status_t vcache_loc_to_vnid(nspace *vol, ino_t loc, ino_t *vnid)
+
+status_t
+vcache_loc_to_vnid(nspace *vol, ino_t loc, ino_t *vnid)
 {
 	struct vcache_entry *e;
 
@@ -350,7 +372,9 @@ status_t vcache_loc_to_vnid(nspace *vol, ino_t loc, ino_t *vnid)
 	return (e) ? B_OK : ENOENT;
 }
 
-status_t vcache_set_entry(nspace *vol, ino_t vnid, ino_t loc)
+
+status_t
+vcache_set_entry(nspace *vol, ino_t vnid, ino_t loc)
 {
 	struct vcache_entry *e;
 	status_t result = B_OK;
@@ -385,7 +409,8 @@ status_t vcache_set_entry(nspace *vol, ino_t vnid, ino_t loc)
 
 #if DEBUG
 
-int debug_dfvnid(int argc, char **argv)
+int
+debug_dfvnid(int argc, char **argv)
 {
 	int i;
 	nspace *vol;

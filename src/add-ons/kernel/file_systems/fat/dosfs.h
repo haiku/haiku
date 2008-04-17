@@ -84,7 +84,7 @@ typedef struct vnode {
 	 * on the disk (or at least in the cache) so that get_next_dirent continues
 	 * to function properly
 	 */
-	uint32		sindex, eindex;	// starting and ending index of directory entry	
+	uint32		sindex, eindex;	// starting and ending index of directory entry
 	uint32		cluster;		// starting cluster of the data
 	uint32		mode;			// dos-style attributes
 	off_t		st_size;		// in bytes
@@ -98,7 +98,7 @@ typedef struct vnode {
 
 #if TRACK_FILENAME
 	char		*filename;
-#endif	
+#endif
 } vnode;
 
 // mode bits
@@ -122,7 +122,7 @@ typedef struct _nspace
 	char			device[256];
 	uint32			flags;			// see <fcntl.be.h> for modes
 	void			*fBlockCache;
-	
+
 	// info from bpb
 	uint32	bytes_per_sector;
 	uint32	sectors_per_cluster;

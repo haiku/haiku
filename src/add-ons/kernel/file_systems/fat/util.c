@@ -19,7 +19,8 @@ static int32 tzoffset = -1; /* in minutes */
 
 #ifdef DEBUG
 
-int _assert_(char *a, int b, char *c)
+int
+_assert_(char *a, int b, char *c)
 {
 	dprintf("tripped assertion in %s/%d (%s)\n", a, b, c);
 	kernel_debugger("tripped assertion");
@@ -28,12 +29,15 @@ int _assert_(char *a, int b, char *c)
 
 #endif
 
-static void print_byte(uint8 c)
+static void
+print_byte(uint8 c)
 {
 	dprintf("%c", ((c >= ' ') && (c <= '~')) ? c : '.');
 }
 
-void dump_bytes(uint8 *buffer, uint32 count)
+
+void
+dump_bytes(uint8 *buffer, uint32 count)
 {
 	uint32 i, j, k;
 	for (i=0;i<0x10;i++)
@@ -52,16 +56,20 @@ void dump_bytes(uint8 *buffer, uint32 count)
 	}
 }
 
-void dump_directory(uint8 *buffer)
+
+void
+dump_directory(uint8 *buffer)
 {
 	dump_bytes(buffer, 32);
 }
 
-static void get_tzoffset()
+
+static void
+get_tzoffset()
 {
 	rtc_info info;
 
-	if (tzoffset != -1) 
+	if (tzoffset != -1)
 		return;
 
 	if (get_rtc_info(&info) < 0) {
@@ -70,6 +78,7 @@ static void get_tzoffset()
 		tzoffset = info.tz_minuteswest;
 	}
 }
+
 
 // If divisible by 4, but not divisible by 100, but divisible by 400, it's a leap year
 // 1996 is leap, 1900 is not, 2000 is, 2100 is not
@@ -88,7 +97,8 @@ static int leaps(int yr, int mon)
 
 static int daze[] = { 0,0,31,59,90,120,151,181,212,243,273,304,334,0,0,0 };
 
-time_t dos2time_t(uint32 t)
+time_t
+dos2time_t(uint32 t)
 {
 	time_t days;
 
@@ -103,7 +113,9 @@ time_t dos2time_t(uint32 t)
 	return (((days * 24) + ((t>>11)&31)) * 60 + ((t>>5)&63) + tzoffset) * 60 + 2*(t&31);
 }
 
-uint32 time_t2dos(time_t s)
+
+uint32
+time_t2dos(time_t s)
 {
 	uint32 t, d, y;
 	int days;
@@ -141,7 +153,9 @@ bi:
 	return t + (d << 16) + (y << 25);
 }
 
-uint8 hash_msdos_name(const char *name)
+
+uint8
+hash_msdos_name(const char *name)
 {
 	const uint8 *p = (const uint8 *)name;
 	int i;
