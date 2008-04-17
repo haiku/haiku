@@ -626,6 +626,12 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	sectors_per_fat = read16(buf,0x16);
 	if (sectors_per_fat == 0) {
 		total_sectors = read32(buf,0x20);
+
+		if (buf[0x42] == 0x29) {
+			// fill in FAT32 volume label
+			if (memcmp(buf + 0x47, "           ", 11) != 0)
+				memcpy(name, buf + 0x47, 11);
+		}
 	} else {
 		total_sectors = read16(buf,0x13); // partition size
 		if (total_sectors == 0)
@@ -633,9 +639,8 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 
 		if (buf[0x26] == 0x29) {
 			// fill in the volume label
-			if (memcmp(buf+0x2b, "           ", 11)) {
-				memcpy(name, buf+0x2b, 11);
-			}
+			if (memcmp(buf + 0x2b, "           ", 11) != 0)
+				memcpy(name, buf + 0x2b, 11);
 		}
 	}
 
