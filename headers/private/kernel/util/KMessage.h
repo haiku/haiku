@@ -132,7 +132,8 @@ public:
 	status_t SendReply(KMessage* message, KMessage* reply,
 		bigtime_t deliveryTimeout = -1, bigtime_t replyTimeout = -1,
 		team_id senderTeam = -1);
-	status_t ReceiveFrom(port_id fromPort, bigtime_t timeout = -1);
+	status_t ReceiveFrom(port_id fromPort, bigtime_t timeout = -1,
+		port_message_info* messageInfo = NULL);
 
 	void Dump(void (*printFunc)(const char*,...));
 

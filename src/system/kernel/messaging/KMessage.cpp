@@ -553,32 +553,43 @@ KMessage::SendReply(KMessage* message, KMessage* reply,
 		replyTimeout, senderTeam);
 }
 
+
 // ReceiveFrom
 status_t
-KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout)
+KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
+	port_message_info* messageInfo)
 {
+	port_message_info _messageInfo;
+	if (messageInfo == NULL)
+		messageInfo = &_messageInfo;
+
 	// get the port buffer size
-	ssize_t size;
-	if (timeout < 0)
-		size = port_buffer_size(fromPort);
-	else
-		size = port_buffer_size_etc(fromPort, B_RELATIVE_TIMEOUT, timeout);
-	if (size < 0)
-		return size;
+	status_t error;
+	if (timeout < 0) {
+		error = get_port_message_info_etc(fromPort, messageInfo, 0, 0);
+	} else {
+		error = get_port_message_info_etc(fromPort, messageInfo,
+			B_RELATIVE_TIMEOUT, timeout);
+	}
+	if (error != B_OK)
+		return error;
+
 	// allocate a buffer
-	uint8* buffer = (uint8*)malloc(size);
+	uint8* buffer = (uint8*)malloc(messageInfo->size);
 	if (!buffer)
 		return B_NO_MEMORY;
+
 	// read the message
 	int32 what;
-	ssize_t realSize = read_port_etc(fromPort, &what, buffer, size,
+	ssize_t realSize = read_port_etc(fromPort, &what, buffer, messageInfo->size,
 		B_RELATIVE_TIMEOUT, 0);
 	if (realSize < 0)
 		return realSize;
-	if (size != realSize)
+	if (messageInfo->size != (size_t)realSize)
 		return B_ERROR;
+
 	// init the message
-	return SetTo(buffer, size, 0,
+	return SetTo(buffer, messageInfo->size, 0,
 		KMESSAGE_OWNS_BUFFER | KMESSAGE_INIT_FROM_BUFFER);
 }
 
@@ -600,7 +611,6 @@ KMessage::Dump(void (*printFunc)(const char*,...))
 			field.Name(), type, (char)(type >> 24), (char)(type >> 16),
 			(char)(type >> 8), (char)type, count, count == 1 ? "" : "s");
 	}
-
 }
 
 
