@@ -49,10 +49,8 @@ static int cpus;	/* how many cpus we are runing on */
 /*
  * Grow the list to add just one more entry
  */
-void
-grow(
-	 thread_time_list_t *times
-	 )
+static void
+grow(thread_time_list_t *times)
 {
 	int i;
 
@@ -69,10 +67,8 @@ grow(
 	times->nthreads++;
 }
 
-void
-init_times(
-		   thread_time_list_t *times
-		   )
+static void
+init_times(thread_time_list_t *times)
 {
 	int i;
 
@@ -86,10 +82,8 @@ init_times(
 	fprintf(stderr, "This can't happen\n");
 }
 
-void
-free_times(
-		   thread_time_list_t *times
-		   )
+static void
+free_times(thread_time_list_t *times)
 {
 	int i;
 
@@ -106,11 +100,8 @@ free_times(
 /*
  * Compare two thread snapshots (for qsort)
  */
-int
-comparetime(
-			const void *a,
-			const void *b
-			)
+static int
+comparetime(const void *a, const void *b)
 {
 	thread_times_t *ta = (thread_times_t *)a;
 	thread_times_t *tb = (thread_times_t *)b;
@@ -124,11 +115,8 @@ comparetime(
  * Remember: for multiple CPUs, multiply the interval by # cpus
  * when calculating
  */
-float
-cpu_perc(
-		 bigtime_t spent,
-		 bigtime_t interval
-		 )
+static float
+cpu_perc(bigtime_t spent, bigtime_t interval)
 {
 	return ((100.0 * spent) / (cpus * interval));
 }
@@ -136,7 +124,7 @@ cpu_perc(
 /*
  * Clear the screen
  */
-void
+static void
 clear(void)
 {
 	if (clear_string) {
@@ -148,7 +136,7 @@ clear(void)
 /*
  * Compare an old snapshot with the new one
  */
-void
+static void
 compare(
 		thread_time_list_t *old,
 		thread_time_list_t *new,
@@ -171,11 +159,11 @@ compare(
 	bigtime_t ktotal;
 	bigtime_t gtotal;
 	bigtime_t idletime;
-	thread_times_t ttime;
+	//thread_times_t ttime;
 	int newthread;
 	int ignore;
 	int linecount;
-	system_info info;
+	//system_info info;
 	char *p;
 
 	/*
@@ -256,7 +244,7 @@ compare(
 			if (get_team_info(t.team, &tm) < B_NO_ERROR) {
 				strcpy(tm.args, "(unknown)");
 			} else {
-				if (p = strrchr(tm.args, '/')) {
+				if ((p = strrchr(tm.args, '/'))) {
 					strcpy(tm.args, p + 1);
 				}
 			}
@@ -275,7 +263,7 @@ compare(
 		}
 		if (!ignore && (!refresh || (linecount < (rows - 1)))) {
 
-			printf("%6d %7.2f %7.2f %7.2f %4.1f %16s %16s\n",
+			printf("%6ld %7.2f %7.2f %7.2f %4.1f %16s %16s\n",
 				   times.thread_times[i].thid,
 				   total / 1000.0,
 				   (double)(times.thread_times[i].user_time / 1000),
@@ -335,7 +323,7 @@ setup_term(void)
 /*
  * Gather up thread data for uinterval microseconds
  */
-thread_time_list_t
+static thread_time_list_t
 gather(
 	   thread_time_list_t *old,
 	   bigtime_t *busy_wait_time,
@@ -378,7 +366,7 @@ gather(
 /*
  * print usage message and exit
  */
-void
+static void
 usage(const char *myname)
 {
 	fprintf(stderr, "usage: %s [-d] [-i interval] [-n ntimes]\n", myname);
@@ -401,7 +389,7 @@ main(int argc, char **argv)
 	int interval = 5;
 	int refresh = 1;
 	system_info sysinfo;
-	bigtime_t now;
+	//bigtime_t now;
 	bigtime_t then;
 	bigtime_t uinterval;
 	bigtime_t elapsed;
