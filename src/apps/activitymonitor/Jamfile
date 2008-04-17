@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src apps activitymonitor ;
 
+# XXX: Temporary only
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 UsePrivateHeaders shared ;
 
 Application ActivityMonitor :
@@ -9,6 +12,6 @@ Application ActivityMonitor :
 	DataSource.cpp
 	SystemInfo.cpp
 
-	: be tracker $(TARGET_LIBSTDC++) libnetwork.so
+	: be tracker $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS)
 	: ActivityMonitor.rdef
 	;

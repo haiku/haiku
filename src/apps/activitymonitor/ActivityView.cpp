@@ -140,7 +140,11 @@ ActivityView::ActivityView(BRect frame, const char* name,
 
 
 ActivityView::ActivityView(const char* name, const BMessage* settings)
+#ifdef __HAIKU__
 	: BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+#else
+	: BView(BRect(0,0,300,200), name, B_FOLLOW_NONE, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+#endif
 {
 	_Init(settings);
 
@@ -359,6 +363,7 @@ ActivityView::DetachedFromWindow()
 }
 
 
+#ifdef __HAIKU__
 BSize
 ActivityView::MinSize()
 {
@@ -368,6 +373,7 @@ ActivityView::MinSize()
 
 	return size;
 }
+#endif
 
 
 void

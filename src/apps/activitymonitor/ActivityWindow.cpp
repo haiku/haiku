@@ -11,7 +11,9 @@
 #include <Application.h>
 #include <File.h>
 #include <FindDirectory.h>
+#ifdef __HAIKU__
 #include <GroupLayout.h>
+#endif
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -39,6 +41,7 @@ ActivityWindow::ActivityWindow()
 		ResizeTo(frame.Width(), frame.Height());
 	}
 
+#ifdef __HAIKU__
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 
@@ -66,6 +69,41 @@ ActivityWindow::ActivityWindow()
 	if (count == 0)
 		fLayout->AddView(new ActivityView("ActivityMonitor", NULL));
 
+#else
+	BView *layout = new BView(Bounds(), "topmost", B_FOLLOW_NONE, 0);
+	AddChild(layout);
+	
+	// create GUI
+	BRect mbRect(Bounds());
+	mbRect.bottom = 10;
+	BMenuBar* menuBar = new BMenuBar(mbRect, "menu");
+	layout->AddChild(menuBar);
+
+	BRect topRect(Bounds());
+	topRect.top = menuBar->Bounds().bottom + 1;
+
+	BView* top = new BView(topRect, "top", B_FOLLOW_ALL, 0);
+	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	layout->AddChild(top);
+
+	BMessage viewState;
+	int32 count = 0;
+	ActivityView *aview;
+	BRect rect;
+	for (int32 i = 0; settings.FindMessage("activity view", i, &viewState)
+			== B_OK; i++) {
+		aview = new ActivityView("ActivityMonitor", &viewState);
+		if (!rect.IsValid())
+			rect = aview->Bounds();
+		else
+			rect.OffsetBySelf(0.0, aview->Bounds().Height());
+		top->AddChild(aview);
+		count++;
+	}
+	if (count == 0)
+		top->AddChild(new ActivityView("ActivityMonitor", NULL));
+
+#endif
 	// add menu
 
 	// "File" menu
@@ -134,7 +172,11 @@ ActivityWindow::_SaveSettings()
 	if (status != B_OK)
 		return status;
 
+#ifdef __HAIKU__
 	BView* top = GetLayout()->View();
+#else
+	BView *top = ChildAt(0);
+#endif
 	int32 count = top->CountChildren();
 	for (int32 i = 0; i < count; i++) {
 		ActivityView* view = dynamic_cast<ActivityView*>(top->ChildAt(i));
@@ -161,10 +203,12 @@ ActivityWindow::_SaveSettings()
 void
 ActivityWindow::_UpdateRemoveItem()
 {
+#ifdef __HAIKU__
 	BView* view = fLayout->View();
 	int32 count = view->CountChildren();
 
 	fRemoveItem->SetEnabled(count >= 2);
+#endif
 }
 
 
@@ -194,16 +238,19 @@ ActivityWindow::MessageReceived(BMessage* message)
 
 		case kMsgAddView:
 		{
+#ifdef __HAIKU__
 			BView* view = fLayout->View()->ChildAt(0);
 			fLayout->AddView(new ActivityView("ActivityMonitor", NULL));
 			if (view != NULL)
 				ResizeBy(0, view->Bounds().Height() + fLayout->Spacing());
+#endif
 			_UpdateRemoveItem();
 			break;
 		}
 
 		case kMsgRemoveView:
 		{
+#ifdef __HAIKU__
 			BView* view = fLayout->View();
 			int32 count = view->CountChildren();
 			if (count == 1)
@@ -213,6 +260,7 @@ ActivityWindow::MessageReceived(BMessage* message)
 			fLayout->RemoveView(last);
 			ResizeBy(0, -last->Bounds().Height() - fLayout->Spacing());
 			delete last;
+#endif
 
 			_UpdateRemoveItem();
 			break;

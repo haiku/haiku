@@ -64,7 +64,9 @@ protected:
 	virtual	void		AttachedToWindow();
 	virtual	void		DetachedFromWindow();
 
+#ifdef __HAIKU__
 	virtual	BSize		MinSize();
+#endif
 
 	virtual void		FrameResized(float width, float height);
 	virtual void		MouseDown(BPoint where);

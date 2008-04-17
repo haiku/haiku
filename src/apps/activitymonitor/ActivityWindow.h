@@ -30,7 +30,9 @@ private:
 	void _UpdateRemoveItem();
 	void _MessageDropped(BMessage *message);
 
+#ifdef __HAIKU__
 	BGroupLayout*	fLayout;
+#endif
 	BMenuItem*		fRemoveItem;
 };
 

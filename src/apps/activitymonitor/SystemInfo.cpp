@@ -9,6 +9,7 @@
 #include <net/if.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/sockio.h>
 
@@ -30,7 +31,11 @@ SystemInfo::~SystemInfo()
 uint64
 SystemInfo::CachedMemory() const
 {
+#ifdef __HAIKU__
 	return fSystemInfo.cached_pages * B_PAGE_SIZE;
+#else
+	return 0LL;
+#endif
 }
 
 
@@ -122,10 +127,12 @@ SystemInfo::_RetrieveNetwork()
 		ifreq request;
 		strlcpy(request.ifr_name, interface->ifr_name, IF_NAMESIZE);
 
+#ifdef __HAIKU__
 		if (ioctl(socket, SIOCGIFSTATS, &request, sizeof(struct ifreq)) == 0) {
 			fBytesReceived += request.ifr_stats.receive.bytes;
 			fBytesSent += request.ifr_stats.send.bytes;
 		}
+#endif
 
 		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
 			+ interface->ifr_addr.sa_len);
