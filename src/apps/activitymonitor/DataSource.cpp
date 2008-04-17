@@ -18,6 +18,7 @@ const DataSource* kSources[] = {
 	new UsedMemoryDataSource(),
 	new CachedMemoryDataSource(),
 	new ThreadsDataSource(),
+	new TeamsDataSource(),
 	new CPUUsageDataSource(),
 	new CPUCombinedUsageDataSource(),
 	new NetworkUsageDataSource(true),
@@ -378,6 +379,53 @@ ThreadsDataSource::Label() const
 
 bool
 ThreadsDataSource::AdaptiveScale() const
+{
+	return true;
+}
+
+
+//	#pragma mark -
+
+
+TeamsDataSource::TeamsDataSource()
+{
+	SystemInfo info;
+
+	fMinimum = 0;
+	fMaximum = info.MaxTeams();
+
+	fColor = (rgb_color){0, 150, 255};
+}
+
+
+TeamsDataSource::~TeamsDataSource()
+{
+}
+
+
+DataSource*
+TeamsDataSource::Copy() const
+{
+	return new TeamsDataSource(*this);
+}
+
+
+int64
+TeamsDataSource::NextValue(SystemInfo& info)
+{
+	return info.UsedTeams();
+}
+
+
+const char*
+TeamsDataSource::Label() const
+{
+	return "Teams";
+}
+
+
+bool
+TeamsDataSource::AdaptiveScale() const
 {
 	return true;
 }
