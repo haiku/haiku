@@ -55,6 +55,9 @@ status_t	_user_write_port_etc(port_id port, int32 msgCode,
 status_t	_user_writev_port_etc(port_id id, int32 msgCode,
 				const iovec *msgVecs, size_t vecCount,
 				size_t bufferSize, uint32 flags, bigtime_t timeout);
+status_t	_user_get_port_message_info_etc(port_id port,
+				port_message_info *info, size_t infoSize, uint32 flags,
+				bigtime_t timeout);
 
 #ifdef __cplusplus
 }

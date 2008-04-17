@@ -110,3 +110,11 @@ _get_port_info(port_id port, port_info *info, size_t size)
 	return _kern_get_port_info(port, info);
 }
 
+
+status_t
+_get_port_message_info_etc(port_id port, port_message_info *info,
+	size_t infoSize, uint32 flags, bigtime_t timeout)
+{
+	return _kern_get_port_message_info_etc(port, info, infoSize, flags,
+		timeout);
+}

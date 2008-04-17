@@ -40,6 +40,9 @@ typedef struct port_msg {
 	int32		code;
 	cbuf		*buffer_chain;
 	size_t		size;
+	uid_t		sender;
+	gid_t		sender_group;
+	team_id		sender_team;
 } port_msg;
 
 struct port_entry {
@@ -811,11 +814,22 @@ port_buffer_size(port_id id)
 ssize_t
 port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 {
+	port_message_info info;
+	status_t error = get_port_message_info_etc(id, &info, flags, timeout);
+	return error != B_OK ? error : info.size;
+}
+
+status_t
+_get_port_message_info_etc(port_id id, port_message_info *info,
+	size_t infoSize, uint32 flags, bigtime_t timeout)
+{
+	if (info == NULL || infoSize != sizeof(port_message_info))
+		return B_BAD_VALUE;
+
 	cpu_status state;
 	sem_id cachedSem;
 	status_t status;
 	port_msg *msg;
-	ssize_t size;
 	int32 slot;
 
 	if (!sPortsActive || id < 0)
@@ -860,14 +874,19 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	}
 
 	// determine tail & get the length of the message
+	status_t error = B_OK;
 	msg = (port_msg*)list_get_first_item(&sPorts[slot].msg_queue);
 	if (msg == NULL) {
 		if (status == B_OK)
 			panic("port %ld: no messages found\n", sPorts[slot].id);
 
-		size = B_BAD_PORT_ID;
-	} else
-		size = msg->size;
+		error = B_BAD_PORT_ID;
+	} else {
+		info->size = msg->size;
+		info->sender = msg->sender;
+		info->sender_group = msg->sender_group;
+		info->sender_team = msg->sender_team;
+	}
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
@@ -876,7 +895,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	release_sem(cachedSem);
 
 	// return length of item at end of queue
-	return size;
+	return error;
 }
 
 
@@ -1118,6 +1137,11 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 	msg = get_port_msg(msgCode, bufferSize);
 	if (msg == NULL)
 		return B_NO_MEMORY;
+
+	// sender credentials
+	msg->sender = geteuid();
+	msg->sender_group = getegid();
+	msg->sender_team = team_get_current_team_id();
 
 	if (bufferSize > 0) {
 		uint32 i;
@@ -1417,4 +1441,27 @@ _user_writev_port_etc(port_id port, int32 messageCode, const iovec *userVecs,
 
 	free(vecs);
 	return syscall_restart_handle_timeout_post(status, timeout);
+}
+
+
+status_t
+_user_get_port_message_info_etc(port_id port, port_message_info *userInfo,
+	size_t infoSize, uint32 flags, bigtime_t timeout)
+{
+	if (userInfo == NULL || infoSize != sizeof(port_message_info))
+		return B_BAD_VALUE;
+
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
+	port_message_info info;
+	status_t error = _get_port_message_info_etc(port, &info, sizeof(info),
+		flags | B_CAN_INTERRUPT, timeout);
+
+	// copy info to userland
+	if (error == B_OK && (!IS_USER_ADDRESS(userInfo)
+			|| user_memcpy(userInfo, &info, sizeof(info)) != B_OK)) {
+		error = B_BAD_ADDRESS;
+	}
+
+	return syscall_restart_handle_timeout_post(error, timeout);
 }

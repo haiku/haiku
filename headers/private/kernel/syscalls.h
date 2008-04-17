@@ -318,6 +318,9 @@ extern status_t		_kern_write_port_etc(port_id port, int32 msgCode, const void *m
 extern status_t		_kern_writev_port_etc(port_id id, int32 msgCode,
 						const struct iovec *msgVecs, size_t vecCount,
 						size_t bufferSize, uint32 flags, bigtime_t timeout);
+extern status_t		_kern_get_port_message_info_etc(port_id port,
+						port_message_info *info, size_t infoSize, uint32 flags,
+						bigtime_t timeout);
 
 // debug support functions
 extern void			_kern_debugger(const char *message);
