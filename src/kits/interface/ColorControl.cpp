@@ -236,9 +236,6 @@ BColorControl::SetLayout(BLayout* layout)
 void
 BColorControl::SetValue(int32 value)
 {
-	if (Value() == value)
-		return;
-
 	rgb_color c1 = ValueAsColor();
 	rgb_color c2;
 	c2.red = (value & 0xFF000000) >> 24;
@@ -255,15 +252,8 @@ BColorControl::SetValue(int32 value)
 				//here SetValue hasn't been called by mouse tracking
 			fSelectedPaletteColorIndex = BScreen(Window()).IndexForColor(c2);
 		}				
-				
-		c2 = BScreen(Window()).ColorForIndex(fSelectedPaletteColorIndex);	
 		
-		sprintf(string, "%d", c2.red);
-		fRedText->SetText(string);
-		sprintf(string, "%d", c2.green);
-		fGreenText->SetText(string);
-		sprintf(string, "%d", c2.blue);
-		fBlueText->SetText(string);
+		c2 = BScreen(Window()).ColorForIndex(fSelectedPaletteColorIndex);	
 		
 		Invalidate(_PaletteSelectorFrame(fPreviousSelectedPaletteColorIndex));
 		Invalidate(_PaletteSelectorFrame(fSelectedPaletteColorIndex));		
@@ -274,9 +264,6 @@ BColorControl::SetValue(int32 value)
 		BPoint p;
 		
 		if (c1.red != c2.red) {
-			sprintf(string, "%d", c2.red);
-			fRedText->SetText(string);
-			
 			p = _SelectorPosition(_RampFrame(1), c1.red);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
 				 p.x + invalidateRadius, p.y + invalidateRadius));	
@@ -285,11 +272,7 @@ BColorControl::SetValue(int32 value)
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
 				 p.x + invalidateRadius, p.y + invalidateRadius));	
 		}
-	
 		if (c1.green != c2.green) {
-			sprintf(string, "%d", c2.green);
-			fGreenText->SetText(string);
-	
 			p = _SelectorPosition(_RampFrame(2), c1.green);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
 				 p.x + invalidateRadius, p.y + invalidateRadius));
@@ -299,9 +282,6 @@ BColorControl::SetValue(int32 value)
 				 p.x + invalidateRadius, p.y + invalidateRadius));		
 		}
 		if (c1.blue != c2.blue) {
-			sprintf(string, "%d", c2.blue);
-			fBlueText->SetText(string);
-			
 			p = _SelectorPosition(_RampFrame(3), c1.blue);
 			Invalidate(BRect(p.x - invalidateRadius, p.y - invalidateRadius,
 				 p.x + invalidateRadius, p.y + invalidateRadius));
@@ -311,6 +291,19 @@ BColorControl::SetValue(int32 value)
 				 p.x + invalidateRadius, p.y + invalidateRadius));				
 		} 
 	}
+	
+	// the textcontrols have to be updated even when the color
+	// hasn't changed since the value is clamped upstream
+	// and the textcontrols would still show the unclamped value
+	sprintf(string, "%d", c2.red);
+	fRedText->SetText(string);
+	sprintf(string, "%d", c2.green);
+	fGreenText->SetText(string);
+	sprintf(string, "%d", c2.blue);
+	fBlueText->SetText(string);
+
+	if (Value() == value)
+		return;
 
 	BControl::SetValueNoUpdate(value);
 
@@ -373,13 +366,10 @@ BColorControl::MessageReceived(BMessage *message)
 		case kMsgColorEntered:
 		{
 			rgb_color color;
-			color.red = /*min_c(*/strtol(fRedText->Text(), NULL, 10), 255/*)*/;
-			color.green = /*min_c(*/strtol(fGreenText->Text(), NULL, 10), 255/*)*/;
-			color.blue = /*min_c(*/strtol(fBlueText->Text(), NULL, 10), 255/*)*/;
-			color.alpha = 255;
-				
-			//TODO: text is not updated if the clamping
-			// 		gives the same value next time
+			color.red = min_c(strtol(fRedText->Text(), NULL, 10), 255);
+			color.green = min_c(strtol(fGreenText->Text(), NULL, 10), 255);
+			color.blue = min_c(strtol(fBlueText->Text(), NULL, 10), 255);
+			color.alpha = 255;			
 					
 			SetValue(color);
 			Invoke();
