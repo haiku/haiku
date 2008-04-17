@@ -46,6 +46,20 @@ typedef struct _pthread_attr {
 	int32		sched_priority;
 } pthread_attr;
 
+typedef void (*pthread_key_destructor)(void *data);
+
+struct pthread_key {
+	vint32		sequence;
+	pthread_key_destructor destructor;
+};
+
+struct pthread_key_data {
+	vint32		sequence;
+	void		*value;
+};
+
+#define PTHREAD_KEYS_MAX		256
+#define PTHREAD_UNUSED_SEQUENCE	0
 
 // This structure is used internally only, it has no public equivalent
 struct pthread_thread {
@@ -54,6 +68,7 @@ struct pthread_thread {
 	int			cancel_state;
 	int			cancel_type;
 	bool		cancelled;
+	struct pthread_key_data specific[PTHREAD_KEYS_MAX];
 	struct __pthread_cleanup_handler *cleanup_handlers;
 	// TODO: move pthread keys in here, too
 };
@@ -63,7 +78,7 @@ struct pthread_thread {
 extern "C" {
 #endif
 
-void __pthread_key_call_destructors(void);
+void __pthread_key_call_destructors(struct pthread_thread *thread);
 struct pthread_thread *__get_pthread(void);
 
 #ifdef __cplusplus

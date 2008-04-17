@@ -10,7 +10,7 @@ MergeObject posix_pthread.o :
 	pthread_cleanup.cpp
 	pthread_cond.c
 	pthread_condattr.c
-	pthread_key.c
+	pthread_key.cpp
 	pthread_mutex.c
 	pthread_mutexattr.c
 	pthread_once.c

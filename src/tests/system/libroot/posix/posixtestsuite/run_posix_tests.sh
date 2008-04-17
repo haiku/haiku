@@ -2,7 +2,7 @@
 
 usage()
 {
-    cat <<EOF 
+    cat <<EOF
 Usage: $0 all
 	to run all the available tests
 
@@ -13,7 +13,7 @@ Usage: $0 all
 	functionality areas as specified by the
 	letter tag in the posix spec
 	$0 [AIO|MEM|MSG|SEM|SIG|THR|TMR|TPS]
-	
+
 EOF
 }
 
@@ -62,8 +62,7 @@ threads_tests()
 	echo "pthread_key_delete()"
 	conformance/interfaces/pthread_key_delete/pthread_key_delete_1-1
 	conformance/interfaces/pthread_key_delete/pthread_key_delete_1-2
-#	conformance/interfaces/pthread_key_delete/pthread_key_delete_2-1
-	echo "pthread_key_delete_2-1: FIXME: test blocks, see bug #1642"
+	conformance/interfaces/pthread_key_delete/pthread_key_delete_2-1
 	echo
 	echo "pthread_once()"
 	conformance/interfaces/pthread_once/pthread_once_1-1

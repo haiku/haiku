@@ -18,6 +18,7 @@ static const pthread_attr pthread_attr_default = {
 };
 
 
+static struct pthread_thread sMainThread;
 static int32 sPthreadSlot = -1;
 static int sConcurrencyLevel;
 
@@ -25,7 +26,16 @@ static int sConcurrencyLevel;
 struct pthread_thread *
 __get_pthread(void)
 {
-	return (struct pthread_thread *)tls_get(sPthreadSlot);
+	struct pthread_thread *thread;
+
+	if (sPthreadSlot == -1)
+		return &sMainThread;
+
+	thread = (struct pthread_thread *)tls_get(sPthreadSlot);
+	if (thread == NULL)
+		return &sMainThread;
+
+	return thread;
 }
 
 
@@ -36,14 +46,15 @@ pthread_destroy_thread(void *data)
 
 	// call cleanup handlers
 	while (true) {
-		struct __pthread_cleanup_handler *handler = __pthread_cleanup_pop_handler();
+		struct __pthread_cleanup_handler *handler
+			= __pthread_cleanup_pop_handler();
 		if (handler == NULL)
 			break;
 
 		handler->function(handler->argument);
 	}
 
-	__pthread_key_call_destructors();
+	__pthread_key_call_destructors(thread);
 	free(thread);
 }
 
@@ -100,9 +111,10 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 
 	threadID = spawn_thread(pthread_thread_entry, "pthread func",
 		attr->sched_priority, thread);
-	if (threadID < B_OK)
-		return B_WOULD_BLOCK;
+	if (threadID < B_OK) {
 		// stupid error code (EAGAIN) but demanded by POSIX
+		return B_WOULD_BLOCK;
+	}
 
 	resume_thread(threadID);
 	*_thread = threadID;
