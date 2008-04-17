@@ -84,6 +84,12 @@ DiscoveryListener::MessageReceived(BMessage* message)
 			    				     	                          
 			        if (bdaddrUtils::Compare( (bdaddr_t*) &inquiryInfo->bdaddr, &b1 )) {
 
+						// update these values
+						fRemoteDevicesList.ItemAt(index)->fPageRepetitionMode = inquiryInfo->pscan_rep_mode;
+						fRemoteDevicesList.ItemAt(index)->fScanPeriodMode = inquiryInfo->pscan_period_mode;
+						fRemoteDevicesList.ItemAt(index)->fScanMode = inquiryInfo->pscan_mode;
+						fRemoteDevicesList.ItemAt(index)->fClockOffset = inquiryInfo->clock_offset;
+
 						duplicatedFound = true;		
 			            break;			        
 			        }
@@ -92,10 +98,16 @@ DiscoveryListener::MessageReceived(BMessage* message)
 
 				if (!duplicatedFound) {
 
-		            //  DeviceClass(inquiryInfo->dev_class[0] | inquiryInfo->dev_class[1]<<8 | inquiryInfo->dev_class[2]<<16 )
+		            //  TODO: DeviceClass(inquiryInfo->dev_class[0] | inquiryInfo->dev_class[1]<<8 | inquiryInfo->dev_class[2]<<16 )
        	            rd = new RemoteDevice(inquiryInfo->bdaddr);			        
 					fRemoteDevicesList.AddItem(rd);
+					// keep all inquiry reported data
 	    	        rd->SetLocalDeviceOwner(fLocalDevice);
+					rd->fPageRepetitionMode = inquiryInfo->pscan_rep_mode;
+					rd->fScanPeriodMode = inquiryInfo->pscan_period_mode;
+					rd->fScanMode = inquiryInfo->pscan_mode;
+					rd->fClockOffset = inquiryInfo->clock_offset;
+
 	        	    DeviceDiscovered( rd, DeviceClass(inquiryInfo->dev_class[0] | 
 	            	                                  inquiryInfo->dev_class[1]<<8 | 
 	                	                              inquiryInfo->dev_class[2]<<16 ));

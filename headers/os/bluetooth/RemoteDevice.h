@@ -53,6 +53,11 @@ class RemoteDevice {
 		
     	bdaddr_t	 fBdaddr;
     	LocalDevice* fDiscovererLocalDevice;
+    	
+    	uint8		 fPageRepetitionMode;
+    	uint8		 fScanPeriodMode;
+    	uint8		 fScanMode;    	
+ 		uint16       fClockOffset;   	
         
 };
 
