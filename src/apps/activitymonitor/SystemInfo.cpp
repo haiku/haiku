@@ -10,12 +10,12 @@
 #include <net/if.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/sockio.h>
+#include <unistd.h>
 
 
-SystemInfo::SystemInfo(SystemInfoHandler *handler)
+SystemInfo::SystemInfo(SystemInfoHandler* handler)
 	:
 	fTime(system_time()),
 	fRetrievedNetwork(false),
@@ -24,8 +24,8 @@ SystemInfo::SystemInfo(SystemInfoHandler *handler)
 	fClipboardTextSize(0)
 {
 	get_system_info(&fSystemInfo);
-	
-	if (handler) {
+
+	if (handler != NULL) {
 		fRunningApps = handler->RunningApps();
 		fClipboardSize = handler->ClipboardSize();
 		fClipboardTextSize = handler->ClipboardTextSize();

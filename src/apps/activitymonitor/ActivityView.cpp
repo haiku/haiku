@@ -184,7 +184,7 @@ ActivityView::_Init(const BMessage* settings)
 	fDrawInterval = kInitialRefreshInterval * 2;
 	fLastRefresh = 0;
 	fDrawResolution = 1;
-	
+
 	fSystemInfoHandler = new SystemInfoHandler;
 
 	if (settings == NULL
@@ -354,7 +354,8 @@ void
 ActivityView::AttachedToWindow()
 {
 	Looper()->AddHandler(fSystemInfoHandler);
-	fSystemInfoHandler->StartWatchingStuff();
+	fSystemInfoHandler->StartWatching();
+
 	BMessage refresh(kMsgRefresh);
 	fRunner = new BMessageRunner(this, &refresh, fRefreshInterval);
 
@@ -365,8 +366,9 @@ ActivityView::AttachedToWindow()
 void
 ActivityView::DetachedFromWindow()
 {
-	fSystemInfoHandler->StopWatchingStuff();
+	fSystemInfoHandler->StopWatching();
 	Looper()->RemoveHandler(fSystemInfoHandler);
+
 	delete fRunner;
 }
 

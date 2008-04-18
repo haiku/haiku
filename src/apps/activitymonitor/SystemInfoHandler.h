@@ -1,27 +1,25 @@
 /*
- * Copyright 2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2008, François Revol, revol@free.fr. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SYSTEM_INFO_HANDLER_H
 #define SYSTEM_INFO_HANDLER_H
 
 
-#include <OS.h>
 #include <Handler.h>
 
 
 class SystemInfoHandler : public BHandler {
 public:
 						SystemInfoHandler();
-						//SystemInfoHandler(BMessage *data);
 	virtual				~SystemInfoHandler();
 
-	virtual	status_t	Archive(BMessage *data, bool deep = true) const;
+	virtual	status_t	Archive(BMessage* data, bool deep = true) const;
 
-			void		StartWatchingStuff();
-			void		StopWatchingStuff();
+			void		StartWatching();
+			void		StopWatching();
 
-			void		MessageReceived(BMessage *message);
+			void		MessageReceived(BMessage* message);
 
 			uint32		RunningApps() const;
 			uint32		ClipboardSize() const;
