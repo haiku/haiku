@@ -72,7 +72,7 @@ ActivityWindow::ActivityWindow()
 #else
 	BView *layout = new BView(Bounds(), "topmost", B_FOLLOW_NONE, 0);
 	AddChild(layout);
-	
+
 	// create GUI
 	BRect mbRect(Bounds());
 	mbRect.bottom = 10;
@@ -173,9 +173,9 @@ ActivityWindow::_SaveSettings()
 		return status;
 
 #ifdef __HAIKU__
-	BView* top = GetLayout()->View();
+	BView* top = fLayout->View();
 #else
-	BView *top = ChildAt(0);
+	BView* top = ChildAt(0);
 #endif
 	int32 count = top->CountChildren();
 	for (int32 i = 0; i < count; i++) {
