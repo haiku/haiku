@@ -97,35 +97,11 @@ static uint32	visible_mask_bottom[6] = {
 };
 			
 /* Private functions used only internally. */
-float		b_sqrt(float x);
 bool		ProjectStar(star *s, geometry *geo);
 bool		CheckClipping(star *s, buffer *buf, bool reset_clipping);
 void		DrawStar(star *s, buffer *buf);
 void		EraseStar(star *s, buffer *buf);
 
-/* Good approximation of square root, for x > 0.0  That resolves
-   the problem of having a dependency with the math library, and
-   it's good enough for what we need. */
-float b_sqrt(float x) {
-	uint32			val;
-	float			y,z,t;
-	float	        flottant, tampon;
-	
-	flottant = x;
-	val = *((uint32*)&flottant);
-	val >>= 1;
-	val += 0x1FC00000L;
-	*((uint32*)&tampon) = val;
-	y = tampon;
-	z = y*y+x;
-	t = y*y-x;
-	y *= (float)4.0;
-	x = z*z;
-	t = t*t;
-	y = z*y;
-	t = (float)2.0*x-t;
-	return t/y;
-}
 
 /* This function initialise the 32 sizes of anti-aliased star, each one
    represented in 4 different half-pixel alignement :
@@ -159,7 +135,7 @@ void InitPatterns()
 				x = ((float)pattern_dh[k] + ROUNDING) - x0;
 				y = ((float)pattern_dv[k] + ROUNDING) - y0;
 				
-				dist = b_sqrt(x*x + y*y);
+				dist = sqrt(x*x + y*y);
 				/* process non source pixel */
 				if (dist > 0.5) {
 					delta = radius - dist + 0.5;
