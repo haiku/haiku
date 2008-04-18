@@ -48,7 +48,6 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	zipcloak zipgrep zipnote zipsplit zmore znew
 ;
 
-
 BEOS_APPS = AboutSystem ActivityMonitor CodyCam DeskCalc DiskProbe DriveSetup
 	CDPlayer Expander Icon-O-Matic Installer LaunchBox Magnify Mail MediaPlayer
 	MidiPlayer NetworkStatus PackageInstaller People PowerStatus
@@ -217,6 +216,8 @@ AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Deskbar Application links
 AddDirectoryToHaikuImage home config be Applications ;
+AddSymlinkToHaikuImage home config be Applications
+					: /boot/beos/apps/ActivityMonitor : ActivityMonitor ;
 AddSymlinkToHaikuImage home config be Applications
 					: /boot/beos/apps/CodyCam : CodyCam ;
 AddSymlinkToHaikuImage home config be Applications
