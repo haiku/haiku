@@ -618,10 +618,10 @@ ActivityView::FrameResized(float /*width*/, float /*height*/)
 
 
 void
-ActivityView::_UpdateOffscreenBitmap()
+ActivityView::_UpdateOffscreenBitmap(bool force)
 {
 	BRect frame = _HistoryFrame();
-	if (fOffscreen != NULL && frame == fOffscreen->Bounds())
+	if (!force && fOffscreen != NULL && frame == fOffscreen->Bounds())
 		return;
 
 	delete fOffscreen;
@@ -716,6 +716,28 @@ ActivityView::MouseMoved(BPoint where, uint32 transit,
 void
 ActivityView::MessageReceived(BMessage* message)
 {
+	// if a color is dropped, use it as background
+	if (message->WasDropped()) {
+		rgb_color *color;
+		ssize_t size;
+		if ((message->FindData("RGBColor", 
+			B_RGB_COLOR_TYPE, 0, (const void **)&color, &size) == B_OK) && 
+			size == sizeof(rgb_color)) {
+			//message->PrintToStream();
+			BPoint dropPoint, dropOffset;
+			dropPoint = message->DropPoint(&dropOffset);
+			ConvertFromScreen(&dropPoint);
+			dropPoint += dropOffset;
+			if (_HistoryFrame().Contains(dropPoint)) {
+				fBackgroundColor = *color;
+				_UpdateOffscreenBitmap(true);
+			} else {
+				// XXX: check each legend color box ?
+				SetLowColor(*color);
+			}
+			return;
+		} // else try the switch or BView::
+	}
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
 			ActivityMonitor::ShowAbout();

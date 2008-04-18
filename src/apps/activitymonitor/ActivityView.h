@@ -86,7 +86,7 @@ protected:
 private:
 			void		_Init(const BMessage* settings);
 			void		_Refresh();
-			void		_UpdateOffscreenBitmap();
+			void		_UpdateOffscreenBitmap(bool force=false);
 			void		_UpdateFrame();
 			BRect		_HistoryFrame() const;
 			float		_LegendHeight() const;
