@@ -104,7 +104,17 @@ static property_info sViewPropInfo[] = {
 static inline uint32
 get_uint32_color(rgb_color color)
 {
-	return *(uint32 *)&color;
+	return B_BENDIAN_TO_HOST_INT32(*(uint32 *)&color);
+		// rgb_color is always in rgba format, no matter what endian;
+		// we always return the int32 value in host endian.
+}
+
+
+static inline rgb_color
+get_rgb_color(uint32 value)
+{
+	value = B_HOST_TO_BENDIAN_INT32(value);
+	return *(rgb_color *)&value;
 }
 
 
@@ -406,13 +416,13 @@ BView::BView(BMessage *archive)
 			| B_FONT_SHEAR | B_FONT_ROTATION);
 	}
 
-	rgb_color color;
-	if (archive->FindInt32("_color", 0, (int32 *)&color) == B_OK)
-		SetHighColor(color);
-	if (archive->FindInt32("_color", 1, (int32 *)&color) == B_OK)
-		SetLowColor(color);
-	if (archive->FindInt32("_color", 2, (int32 *)&color) == B_OK)
-		SetViewColor(color);
+	int32 color;
+	if (archive->FindInt32("_color", 0, &color) == B_OK)
+		SetHighColor(get_rgb_color(color));
+	if (archive->FindInt32("_color", 1, &color) == B_OK)
+		SetLowColor(get_rgb_color(color));
+	if (archive->FindInt32("_color", 2, &color) == B_OK)
+		SetViewColor(get_rgb_color(color));
 
 	uint32 evMask;
 	uint32 options;
@@ -512,10 +522,8 @@ BView::Archive(BMessage *data, bool deep) const
 	// colors
 	if (ret == B_OK)
 		ret = data->AddInt32("_color", get_uint32_color(HighColor()));
-
 	if (ret == B_OK)
 		ret = data->AddInt32("_color", get_uint32_color(LowColor()));
-
 	if (ret == B_OK)
 		ret = data->AddInt32("_color", get_uint32_color(ViewColor()));
 
