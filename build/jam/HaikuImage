@@ -216,51 +216,25 @@ AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
 
 # Deskbar Application links
 AddDirectoryToHaikuImage home config be Applications ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/ActivityMonitor : ActivityMonitor ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/CodyCam : CodyCam ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/CDPlayer : CDPlayer ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/DeskCalc : DeskCalc ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/DiskProbe : DiskProbe ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/DriveSetup : DriveSetup ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/Icon-O-Matic : Icon-O-Matic ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/Magnify : Magnify ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/Mail : Mail ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/MediaPlayer : MediaPlayer ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/MidiPlayer : MidiPlayer ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/People : People ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/SoundRecorder : SoundRecorder ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/StyledEdit : StyledEdit ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/Terminal : Terminal ;
-AddSymlinkToHaikuImage home config be Applications
-					: /boot/beos/apps/TV : TV ;
+DESKBAR_APPLICATIONS = ActivityMonitor CodyCam CDPlayer DeskCalc DiskProbe
+	DriveSetup Icon-O-Matic Magnify Mail MediaPlayer MidiPlayer People
+	SoundRecorder StyledEdit Terminal TV
+;
+local app ;
+for app in $(DESKBAR_APPLICATIONS) {
+	AddSymlinkToHaikuImage home config be Applications
+		: /boot/beos/apps/$(app) : $(app) ;
+}
 
 # Deskbar Desktop Applets links
 AddDirectoryToHaikuImage home config be Desktop\ Applets ;
-AddSymlinkToHaikuImage home config be Desktop\ Applets
-					: /boot/beos/apps/LaunchBox : LaunchBox ;
-AddSymlinkToHaikuImage home config be Desktop\ Applets
-					: /boot/beos/apps/NetworkStatus : NetworkStatus ;
-AddSymlinkToHaikuImage home config be Desktop\ Applets
-					: /boot/beos/apps/PowerStatus : PowerStatus ;
-AddSymlinkToHaikuImage home config be Desktop\ Applets
-					: /boot/beos/apps/ProcessController : ProcessController ;
-AddSymlinkToHaikuImage home config be Desktop\ Applets
-					: /boot/beos/apps/Workspaces : Workspaces ;
+DESKBAR_DESKTOP_APPLETS = LaunchBox NetworkStatus PowerStatus ProcessController
+	Workspaces
+;
+for app in $(DESKBAR_DESKTOP_APPLETS) {
+	AddSymlinkToHaikuImage home config be Desktop\ Applets
+		: /boot/beos/apps/$(app) : $(app) ;
+}
 
 # Deskbar Preferences and Demos links
 AddSymlinkToHaikuImage home config be : /boot/beos/preferences : Preferences ;
