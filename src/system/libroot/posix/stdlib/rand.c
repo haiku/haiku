@@ -10,10 +10,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
  * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
@@ -33,12 +29,14 @@
  * Posix rand_r function added May 1999 by Wes Peters <wes@softweyr.com>.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)rand.c	8.1 (Berkeley) 6/14/93";
-#endif /* LIBC_SCCS and not lint */
 
+//#include "namespace.h"
+//#include <sys/time.h>          /* for sranddev() */
 #include <sys/types.h>
+//#include <fcntl.h>             /* for sranddev() */
 #include <stdlib.h>
+//#include <unistd.h>            /* for sranddev() */
+//#include "un-namespace.h"
 
 #ifdef TEST
 #include <stdio.h>
@@ -47,7 +45,34 @@ static char sccsid[] = "@(#)rand.c	8.1 (Berkeley) 6/14/93";
 static int
 do_rand(unsigned long *ctx)
 {
+#ifdef  USE_WEAK_SEEDING
+/*
+ * Historic implementation compatibility.
+ * The random sequences do not vary much with the seed,
+ * even with overflowing.
+ */
 	return ((*ctx = *ctx * 1103515245 + 12345) % ((u_long)RAND_MAX + 1));
+#else   /* !USE_WEAK_SEEDING */
+/*
+ * Compute x = (7^5 * x) mod (2^31 - 1)
+ * without overflowing 31 bits:
+ *      (2^31 - 1) = 127773 * (7^5) + 2836
+ * From "Random number generators: good ones are hard to find",
+ * Park and Miller, Communications of the ACM, vol. 31, no. 10,
+ * October 1988, p. 1195.
+ */
+	long hi, lo, x;
+
+	/* Can't be initialized with 0, so use another value. */
+	if (*ctx == 0)
+		*ctx = 123459876;
+	hi = *ctx / 127773;
+	lo = *ctx % 127773;
+	x = 16807 * lo - 2836 * hi;
+	if (x < 0)
+		x += 0x7fffffff;
+	return ((*ctx = x) % ((u_long)RAND_MAX + 1));
+#endif  /* !USE_WEAK_SEEDING */
 }
 
 
@@ -55,8 +80,10 @@ int
 rand_r(unsigned int *ctx)
 {
 	u_long val = (u_long) *ctx;
-	*ctx = do_rand(&val);
-	return (int) *ctx;
+	int r = do_rand(&val);
+
+	*ctx = (unsigned int) val;
+	return (r);
 }
 
 
@@ -65,7 +92,7 @@ static u_long next = 1;
 int
 rand()
 {
-	return do_rand(&next);
+	return (do_rand(&next));
 }
 
 void
@@ -74,6 +101,39 @@ u_int seed;
 {
 	next = seed;
 }
+
+
+#if 0
+/*
+ * sranddev:
+ *
+ * Many programs choose the seed value in a totally predictable manner.
+ * This often causes problems.  We seed the generator using the much more
+ * secure random(4) interface.
+ */
+void
+sranddev()
+{
+	int fd, done;
+
+	done = 0;
+	fd = _open("/dev/random", O_RDONLY, 0);
+	if (fd >= 0) {
+		if (_read(fd, (void *) &next, sizeof(next)) == sizeof(next))
+			done = 1;
+		_close(fd);
+	}
+
+	if (!done) {
+		struct timeval tv;
+		unsigned long junk;
+
+		gettimeofday(&tv, NULL);
+		srand((getpid() << 16) ^ tv.tv_sec ^ tv.tv_usec ^ junk);
+	}
+}
+#endif	// 0
+
 
 #ifdef TEST
 
