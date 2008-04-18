@@ -13,6 +13,6 @@ Application ActivityMonitor :
 	SystemInfo.cpp
 	SystemInfoHandler.cpp
 
-	: be tracker $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS)
+	: be tracker media $(TARGET_LIBSTDC++) $(TARGET_NETWORK_LIBS)
 	: ActivityMonitor.rdef
 	;

@@ -28,7 +28,8 @@ const DataSource* kSources[] = {
 	new NetworkUsageDataSource(true),
 	new NetworkUsageDataSource(false),
 	new ClipboardSizeDataSource(false),
-	new ClipboardSizeDataSource(true)
+	new ClipboardSizeDataSource(true),
+	new MediaNodesDataSource()
 };
 const size_t kSourcesCount = sizeof(kSources) / sizeof(kSources[0]);
 
@@ -985,6 +986,53 @@ ClipboardSizeDataSource::Unit() const
 
 bool
 ClipboardSizeDataSource::AdaptiveScale() const
+{
+	return true;
+}
+
+
+//	#pragma mark -
+
+
+MediaNodesDataSource::MediaNodesDataSource()
+{
+	SystemInfo info;
+
+	fMinimum = 0;
+	fMaximum = INT32_MAX;
+
+	fColor = (rgb_color){255, 150, 225};
+}
+
+
+MediaNodesDataSource::~MediaNodesDataSource()
+{
+}
+
+
+DataSource*
+MediaNodesDataSource::Copy() const
+{
+	return new MediaNodesDataSource(*this);
+}
+
+
+int64
+MediaNodesDataSource::NextValue(SystemInfo& info)
+{
+	return info.MediaNodes();
+}
+
+
+const char*
+MediaNodesDataSource::Label() const
+{
+	return "Media Nodes";
+}
+
+
+bool
+MediaNodesDataSource::AdaptiveScale() const
 {
 	return true;
 }

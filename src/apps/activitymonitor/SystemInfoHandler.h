@@ -24,6 +24,9 @@ public:
 			uint32		RunningApps() const;
 			uint32		ClipboardSize() const;
 			uint32		ClipboardTextSize() const;
+			uint32		MediaNodes() const;
+			uint32		MediaConnections() const;
+			uint32		MediaBuffers() const;
 
 private:
 			void		_UpdateClipboardData();
@@ -31,6 +34,9 @@ private:
 	uint32				fRunningApps;
 	uint32				fClipboardSize;
 	uint32				fClipboardTextSize;
+	uint32				fMediaNodes;
+	uint32				fMediaConnections;
+	uint32				fMediaBuffers;
 };
 
 #endif	// SYSTEM_INFO_HANDLER_H

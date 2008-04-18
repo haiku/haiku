@@ -21,7 +21,10 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 	fRetrievedNetwork(false),
 	fRunningApps(0),
 	fClipboardSize(0),
-	fClipboardTextSize(0)
+	fClipboardTextSize(0),
+	fMediaNodes(0),
+	fMediaConnections(0),
+	fMediaBuffers(0)
 {
 	get_system_info(&fSystemInfo);
 
@@ -29,6 +32,9 @@ SystemInfo::SystemInfo(SystemInfoHandler* handler)
 		fRunningApps = handler->RunningApps();
 		fClipboardSize = handler->ClipboardSize();
 		fClipboardTextSize = handler->ClipboardTextSize();
+		fMediaNodes = handler->MediaNodes();
+		fMediaConnections = handler->MediaConnections();
+		fMediaBuffers = handler->MediaBuffers();
 	}
 }
 
@@ -222,6 +228,27 @@ uint32
 SystemInfo::ClipboardTextSize() const
 {
 	return fClipboardTextSize;
+}
+
+
+uint32
+SystemInfo::MediaNodes() const
+{
+	return fMediaNodes;
+}
+
+
+uint32
+SystemInfo::MediaConnections() const
+{
+	return fMediaConnections;
+}
+
+
+uint32
+SystemInfo::MediaBuffers() const
+{
+	return fMediaBuffers;
 }
 
 

@@ -45,6 +45,10 @@ public:
 			uint32		ClipboardSize() const;
 			uint32		ClipboardTextSize() const;
 
+			uint32		MediaNodes() const;
+			uint32		MediaConnections() const;	// UNIMPLEMENTED
+			uint32		MediaBuffers() const;		// UNIMPLEMENTED
+
 private:
 			void		_RetrieveNetwork();
 
@@ -56,6 +60,9 @@ private:
 	uint32				fRunningApps;
 	uint32				fClipboardSize;
 	uint32				fClipboardTextSize;
+	uint32				fMediaNodes;
+	uint32				fMediaConnections;
+	uint32				fMediaBuffers;
 };
 
 #endif	// SYSTEM_INFO_H

@@ -253,4 +253,17 @@ private:
 	bool				fText;
 };
 
+
+class MediaNodesDataSource : public DataSource {
+public:
+						MediaNodesDataSource();
+	virtual				~MediaNodesDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual	int64		NextValue(SystemInfo& info);
+	virtual const char*	Label() const;
+	virtual bool		AdaptiveScale() const;
+};
+
 #endif	// DATA_SOURCE_H

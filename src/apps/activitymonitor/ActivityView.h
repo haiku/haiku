@@ -56,8 +56,10 @@ public:
 
 			status_t	SaveState(BMessage& state) const;
 
+#ifdef __HAIKU__
 			BLayoutItem* CreateHistoryLayoutItem();
 			BLayoutItem* CreateLegendLayoutItem();
+#endif
 
 			DataSource*	FindDataSource(const DataSource* source);
 			status_t	AddDataSource(const DataSource* source);
@@ -102,8 +104,10 @@ private:
 
 	rgb_color			fBackgroundColor;
 	BBitmap*			fOffscreen;
+#ifdef __HAIKU__
 	BLayoutItem*		fHistoryLayoutItem;
 	BLayoutItem*		fLegendLayoutItem;
+#endif
 	BObjectList<DataSource> fSources;
 	BObjectList<DataHistory> fValues;
 	BMessageRunner*		fRunner;

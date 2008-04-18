@@ -10,7 +10,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __HAIKU__
 #include <AbstractLayoutItem.h>
+#endif
 #include <Application.h>
 #include <Bitmap.h>
 #include <Dragger.h>
@@ -30,6 +32,7 @@ struct data_item {
 	int64		value;
 };
 
+#ifdef __HAIKU__
 class ActivityView::HistoryLayoutItem : public BAbstractLayoutItem {
 public:
 							HistoryLayoutItem(ActivityView* parent);
@@ -70,6 +73,7 @@ private:
 	ActivityView*			fParent;
 	BRect					fFrame;
 };
+#endif
 
 const bigtime_t kInitialRefreshInterval = 500000LL;
 
@@ -166,6 +170,7 @@ DataHistory::SetRefreshInterval(bigtime_t interval)
 //	#pragma mark -
 
 
+#ifdef __HAIKU__
 ActivityView::HistoryLayoutItem::HistoryLayoutItem(ActivityView* parent)
 	:
 	fParent(parent),
@@ -299,6 +304,7 @@ ActivityView::LegendLayoutItem::BaseAlignment()
 {
 	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
 }
+#endif
 
 
 //	#pragma mark -
@@ -357,8 +363,10 @@ ActivityView::_Init(const BMessage* settings)
 {
 	fBackgroundColor = (rgb_color){255, 255, 240};
 	fOffscreen = NULL;
+#ifdef __HAIKU__
 	fHistoryLayoutItem = NULL;
 	fLegendLayoutItem = NULL;
+#endif
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -438,6 +446,7 @@ ActivityView::SaveState(BMessage& state) const
 }
 
 
+#ifdef __HAIKU__
 BLayoutItem*
 ActivityView::CreateHistoryLayoutItem()
 {
@@ -456,7 +465,7 @@ ActivityView::CreateLegendLayoutItem()
 
 	return fLegendLayoutItem;
 }
-
+#endif
 
 DataSource*
 ActivityView::FindDataSource(const DataSource* search)
@@ -518,7 +527,9 @@ ActivityView::AddDataSource(const DataSource* source)
 		}
 	}
 
+#ifdef __HAIKU__
 	InvalidateLayout();
+#endif
 	return B_OK;
 }
 
@@ -547,7 +558,9 @@ ActivityView::RemoveDataSource(const DataSource* remove)
 		removed = true;
 	}
 
+#ifdef __HAIKU__
 	InvalidateLayout();
+#endif
 	return B_OK;
 }
 
@@ -645,6 +658,8 @@ ActivityView::MouseDown(BPoint where)
 	menu->SetFont(be_plain_font);
 
 	BMenu* additionalMenu = new BMenu("Additional Items");
+	additionalMenu->SetFont(be_plain_font);
+
 	SystemInfo info;
 	BMenuItem* item;
 
@@ -673,6 +688,7 @@ ActivityView::MouseDown(BPoint where)
 		new BMessage(kMsgToggleLegend)));
 
 	menu->SetTargetForItems(this);
+	additionalMenu->SetTargetForItems(this);
 
 	ConvertToScreen(&where);
 	menu->Go(where, true, false, true);
@@ -755,11 +771,18 @@ ActivityView::MessageReceived(BMessage* message)
 void
 ActivityView::_UpdateFrame()
 {
+#ifdef __HAIKU__
 	if (fLegendLayoutItem == NULL || fHistoryLayoutItem == NULL)
 		return;
 
 	BRect historyFrame = fHistoryLayoutItem->Frame();
 	BRect legendFrame = fLegendLayoutItem->Frame();
+#else
+	BRect historyFrame = Bounds();
+	BRect legendFrame = Bounds();
+	historyFrame.bottom -= 2 * Bounds().Height() / 3;
+	legendFrame.top += Bounds().Height() / 3;
+#endif
 	MoveTo(historyFrame.left, historyFrame.top);
 	ResizeTo(legendFrame.left + legendFrame.Width() - historyFrame.left,
 		legendFrame.top + legendFrame.Height() - historyFrame.top);
@@ -797,9 +820,11 @@ BRect
 ActivityView::_LegendFrame() const
 {
 	float height;
+#ifdef __HAIKU__
 	if (fLegendLayoutItem != NULL)
 		height = fLegendLayoutItem->Frame().Height();
 	else
+#endif
 		height = _LegendHeight();
 
 	BRect frame = Bounds();
