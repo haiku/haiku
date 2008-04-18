@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <AbstractLayoutItem.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Dragger.h>
@@ -27,6 +28,47 @@
 struct data_item {
 	bigtime_t	time;
 	int64		value;
+};
+
+class ActivityView::HistoryLayoutItem : public BAbstractLayoutItem {
+public:
+							HistoryLayoutItem(ActivityView* parent);
+
+	virtual	bool			IsVisible();
+	virtual	void			SetVisible(bool visible);
+
+	virtual	BRect			Frame();
+	virtual	void			SetFrame(BRect frame);
+
+	virtual	BView*			View();
+
+	virtual	BSize			BasePreferredSize();
+
+private:
+	ActivityView*			fParent;
+	BRect					fFrame;
+};
+
+class ActivityView::LegendLayoutItem : public BAbstractLayoutItem {
+public:
+							LegendLayoutItem(ActivityView* parent);
+
+	virtual	bool			IsVisible();
+	virtual	void			SetVisible(bool visible);
+
+	virtual	BRect			Frame();
+	virtual	void			SetFrame(BRect frame);
+
+	virtual	BView*			View();
+
+	virtual	BSize			BaseMinSize();
+	virtual	BSize			BaseMaxSize();
+	virtual	BSize			BasePreferredSize();
+	virtual	BAlignment		BaseAlignment();
+
+private:
+	ActivityView*			fParent;
+	BRect					fFrame;
 };
 
 const bigtime_t kInitialRefreshInterval = 500000LL;
@@ -124,6 +166,144 @@ DataHistory::SetRefreshInterval(bigtime_t interval)
 //	#pragma mark -
 
 
+ActivityView::HistoryLayoutItem::HistoryLayoutItem(ActivityView* parent)
+	:
+	fParent(parent),
+	fFrame()
+{
+}
+
+
+bool
+ActivityView::HistoryLayoutItem::IsVisible()
+{
+	return !fParent->IsHidden(fParent);
+}
+
+
+void
+ActivityView::HistoryLayoutItem::SetVisible(bool visible)
+{
+	// not allowed
+}
+
+
+BRect
+ActivityView::HistoryLayoutItem::Frame()
+{
+	return fFrame;
+}
+
+
+void
+ActivityView::HistoryLayoutItem::SetFrame(BRect frame)
+{
+	fFrame = frame;
+	fParent->_UpdateFrame();
+}
+
+
+BView*
+ActivityView::HistoryLayoutItem::View()
+{
+	return fParent;
+}
+
+
+BSize
+ActivityView::HistoryLayoutItem::BasePreferredSize()
+{
+	BSize size(BaseMaxSize());
+	return size;
+}
+
+
+//	#pragma mark -
+
+
+ActivityView::LegendLayoutItem::LegendLayoutItem(ActivityView* parent)
+	:
+	fParent(parent),
+	fFrame()
+{
+}
+
+
+bool
+ActivityView::LegendLayoutItem::IsVisible()
+{
+	return !fParent->IsHidden(fParent);
+}
+
+
+void
+ActivityView::LegendLayoutItem::SetVisible(bool visible)
+{
+	// not allowed
+}
+
+
+BRect
+ActivityView::LegendLayoutItem::Frame()
+{
+	return fFrame;
+}
+
+
+void
+ActivityView::LegendLayoutItem::SetFrame(BRect frame)
+{
+	fFrame = frame;
+	fParent->_UpdateFrame();
+}
+
+
+BView*
+ActivityView::LegendLayoutItem::View()
+{
+	return fParent;
+}
+
+
+BSize
+ActivityView::LegendLayoutItem::BaseMinSize()
+{
+	// TODO: Cache the info. Might be too expensive for this call.
+	BSize size;
+	size.width = 80;
+	size.height = fParent->_LegendHeight();
+
+	return size;
+}
+
+
+BSize
+ActivityView::LegendLayoutItem::BaseMaxSize()
+{
+	BSize size(BaseMinSize());
+	size.width = B_SIZE_UNLIMITED;
+	return size;
+}
+
+
+BSize
+ActivityView::LegendLayoutItem::BasePreferredSize()
+{
+	BSize size(BaseMinSize());
+	return size;
+}
+
+
+BAlignment
+ActivityView::LegendLayoutItem::BaseAlignment()
+{
+	return BAlignment(B_ALIGN_USE_FULL_WIDTH, B_ALIGN_USE_FULL_HEIGHT);
+}
+
+
+//	#pragma mark -
+
+
 ActivityView::ActivityView(BRect frame, const char* name,
 		const BMessage* settings, uint32 resizingMode)
 	: BView(frame, name, resizingMode,
@@ -177,6 +357,8 @@ ActivityView::_Init(const BMessage* settings)
 {
 	fBackgroundColor = (rgb_color){255, 255, 240};
 	fOffscreen = NULL;
+	fHistoryLayoutItem = NULL;
+	fLegendLayoutItem = NULL;
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -256,6 +438,26 @@ ActivityView::SaveState(BMessage& state) const
 }
 
 
+BLayoutItem*
+ActivityView::CreateHistoryLayoutItem()
+{
+	if (fHistoryLayoutItem == NULL)
+		fHistoryLayoutItem = new HistoryLayoutItem(this);
+
+	return fHistoryLayoutItem;
+}
+
+
+BLayoutItem*
+ActivityView::CreateLegendLayoutItem()
+{
+	if (fLegendLayoutItem == NULL)
+		fLegendLayoutItem = new LegendLayoutItem(this);
+
+	return fLegendLayoutItem;
+}
+
+
 DataSource*
 ActivityView::FindDataSource(const DataSource* search)
 {
@@ -316,6 +518,7 @@ ActivityView::AddDataSource(const DataSource* source)
 		}
 	}
 
+	InvalidateLayout();
 	return B_OK;
 }
 
@@ -323,10 +526,15 @@ ActivityView::AddDataSource(const DataSource* source)
 status_t
 ActivityView::RemoveDataSource(const DataSource* remove)
 {
+	bool removed = false;
+
 	while (true) {
 		DataSource* source = FindDataSource(remove);
-		if (source == NULL)
-			return B_OK;
+		if (source == NULL) {
+			if (removed)
+				break;
+			return B_ENTRY_NOT_FOUND;
+		}
 
 		int32 index = fSources.IndexOf(source);
 		if (index < 0)
@@ -336,8 +544,10 @@ ActivityView::RemoveDataSource(const DataSource* remove)
 		delete source;
 		DataHistory* values = fValues.RemoveItemAt(index);
 		delete values;
+		removed = true;
 	}
 
+	InvalidateLayout();
 	return B_OK;
 }
 
@@ -537,6 +747,20 @@ ActivityView::MessageReceived(BMessage* message)
 }
 
 
+void
+ActivityView::_UpdateFrame()
+{
+	if (fLegendLayoutItem == NULL || fHistoryLayoutItem == NULL)
+		return;
+
+	BRect historyFrame = fHistoryLayoutItem->Frame();
+	BRect legendFrame = fLegendLayoutItem->Frame();
+	MoveTo(historyFrame.left, historyFrame.top);
+	ResizeTo(legendFrame.left + legendFrame.Width() - historyFrame.left,
+		legendFrame.top + legendFrame.Height() - historyFrame.top);
+}
+
+
 BRect
 ActivityView::_HistoryFrame() const
 {
@@ -552,16 +776,29 @@ ActivityView::_HistoryFrame() const
 }
 
 
-BRect
-ActivityView::_LegendFrame() const
+float
+ActivityView::_LegendHeight() const
 {
-	BRect frame = Bounds();
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
 	int32 rows = (fSources.CountItems() + 1) / 2;
-	frame.top = frame.bottom - rows * (4 + ceilf(fontHeight.ascent)
+	return rows * (4 + ceilf(fontHeight.ascent)
 		+ ceilf(fontHeight.descent) + ceilf(fontHeight.leading));
+}
+
+
+BRect
+ActivityView::_LegendFrame() const
+{
+	float height;
+	if (fLegendLayoutItem != NULL)
+		height = fLegendLayoutItem->Frame().Height();
+	else
+		height = _LegendHeight();
+
+	BRect frame = Bounds();
+	frame.top = frame.bottom - height;
 
 	return frame;
 }

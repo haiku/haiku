@@ -63,11 +63,16 @@ ActivityWindow::ActivityWindow()
 	int32 count = 0;
 	for (int32 i = 0; settings.FindMessage("activity view", i, &viewState)
 			== B_OK; i++) {
-		fLayout->AddView(new ActivityView("ActivityMonitor", &viewState));
+		ActivityView* view = new ActivityView("ActivityMonitor", &viewState);
+		fLayout->AddItem(view->CreateHistoryLayoutItem());
+		fLayout->AddItem(view->CreateLegendLayoutItem());
 		count++;
 	}
-	if (count == 0)
-		fLayout->AddView(new ActivityView("ActivityMonitor", NULL));
+	if (count == 0) {
+		ActivityView* view = new ActivityView("ActivityMonitor", NULL);
+		fLayout->AddItem(view->CreateHistoryLayoutItem());
+		fLayout->AddItem(view->CreateLegendLayoutItem());
+	}
 
 #else
 	BView *layout = new BView(Bounds(), "topmost", B_FOLLOW_NONE, 0);
@@ -239,10 +244,14 @@ ActivityWindow::MessageReceived(BMessage* message)
 		case kMsgAddView:
 		{
 #ifdef __HAIKU__
-			BView* view = fLayout->View()->ChildAt(0);
-			fLayout->AddView(new ActivityView("ActivityMonitor", NULL));
-			if (view != NULL)
-				ResizeBy(0, view->Bounds().Height() + fLayout->Spacing());
+			BView* firstView = fLayout->View()->ChildAt(0);
+
+			ActivityView* view = new ActivityView("ActivityMonitor", NULL);
+			fLayout->AddItem(view->CreateHistoryLayoutItem());
+			fLayout->AddItem(view->CreateLegendLayoutItem());
+
+			if (firstView != NULL)
+				ResizeBy(0, firstView->Bounds().Height() + fLayout->Spacing());
 #endif
 			_UpdateRemoveItem();
 			break;

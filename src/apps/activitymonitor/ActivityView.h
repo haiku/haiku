@@ -56,6 +56,9 @@ public:
 
 			status_t	SaveState(BMessage& state) const;
 
+			BLayoutItem* CreateHistoryLayoutItem();
+			BLayoutItem* CreateLegendLayoutItem();
+
 			DataSource*	FindDataSource(const DataSource* source);
 			status_t	AddDataSource(const DataSource* source);
 			status_t	RemoveDataSource(const DataSource* source);
@@ -82,15 +85,25 @@ private:
 			void		_Init(const BMessage* settings);
 			void		_Refresh();
 			void		_UpdateOffscreenBitmap();
+			void		_UpdateFrame();
 			BRect		_HistoryFrame() const;
+			float		_LegendHeight() const;
 			BRect		_LegendFrame() const;
 			BRect		_LegendFrameAt(BRect frame, int32 index) const;
 			float		_PositionForValue(DataSource* source,
 							DataHistory* values, int64 value);
 			void		_DrawHistory();
 
+	class HistoryLayoutItem;
+	class LegendLayoutItem;
+
+	friend class HistoryLayoutItem;
+	friend class LegendLayoutItem;
+
 	rgb_color			fBackgroundColor;
 	BBitmap*			fOffscreen;
+	BLayoutItem*		fHistoryLayoutItem;
+	BLayoutItem*		fLegendLayoutItem;
 	BObjectList<DataSource> fSources;
 	BObjectList<DataHistory> fValues;
 	BMessageRunner*		fRunner;
