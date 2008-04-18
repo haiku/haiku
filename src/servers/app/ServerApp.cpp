@@ -2312,9 +2312,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				LockedDesktopSettings settings(fDesktop);
 				settings.SetUIColor(which, color);
 			}
-
-			fLink.StartMessage(B_OK);
-			fLink.Flush();
 			break;
 		}
 
