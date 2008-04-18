@@ -736,10 +736,9 @@ ActivityView::MessageReceived(BMessage* message)
 			B_RGB_COLOR_TYPE, 0, (const void **)&color, &size) == B_OK) && 
 			size == sizeof(rgb_color)) {
 			//message->PrintToStream();
-			BPoint dropPoint, dropOffset;
-			dropPoint = message->DropPoint(&dropOffset);
+			BPoint dropPoint;
+			dropPoint = message->DropPoint();
 			ConvertFromScreen(&dropPoint);
-			dropPoint += dropOffset;
 			if (_HistoryFrame().Contains(dropPoint)) {
 				fBackgroundColor = *color;
 				_UpdateOffscreenBitmap(true);
