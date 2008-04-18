@@ -744,7 +744,17 @@ ActivityView::MessageReceived(BMessage* message)
 				fBackgroundColor = *color;
 				_UpdateOffscreenBitmap(true);
 			} else {
-				// XXX: check each legend color box ?
+				// check each legend color box
+				BRect legendFrame = _LegendFrame();
+				int32 i;
+				for (i = 0; i < fSources.CountItems(); i++) {
+					BRect r = _LegendFrameAt(legendFrame, i);
+					if (r.Contains(dropPoint)) {
+						fSources.ItemAt(i)->SetColor(*color);
+						return;
+					}
+				}
+				// background
 				SetLowColor(*color);
 			}
 			return;
