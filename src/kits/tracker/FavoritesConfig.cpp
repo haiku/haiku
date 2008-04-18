@@ -1326,7 +1326,7 @@ TContentsMenu::Draw(BRect updateRect)
 	BRect iconFrame, textFrame, itemFrame;
 	
 	int32 max = fContentsList->CountItems() - fFirstItem;
-	int32 count = count = (max > kMaxItemCount) ? kMaxItemCount : max;
+	int32 count = (max > kMaxItemCount) ? kMaxItemCount : max;
 	count += fFirstItem;
 
 	for (int32 index = fFirstItem ; index < count ; index++) {
