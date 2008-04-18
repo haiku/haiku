@@ -16,24 +16,27 @@ class ActivityView;
 
 class ActivityWindow : public BWindow {
 public:
-	ActivityWindow();
-	virtual ~ActivityWindow();
+						ActivityWindow();
+	virtual				~ActivityWindow();
 
-	virtual void MessageReceived(BMessage* message);
-	virtual bool QuitRequested();
+	virtual void		MessageReceived(BMessage* message);
+	virtual bool		QuitRequested();
+
+			int32		ActivityViewCount();
 
 private:
-	status_t _OpenSettings(BFile& file, uint32 mode);
-	status_t _LoadSettings(BMessage& settings);
-	status_t _SaveSettings();
+			status_t	_OpenSettings(BFile& file, uint32 mode);
+			status_t	_LoadSettings(BMessage& settings);
+			status_t	_SaveSettings();
 
-	void _UpdateRemoveItem();
-	void _MessageDropped(BMessage *message);
+			void		_UpdateRemoveItem();
+			void		_MessageDropped(BMessage *message);
 
 #ifdef __HAIKU__
 	BGroupLayout*	fLayout;
 #endif
-	BMenuItem*		fRemoveItem;
 };
+
+static const uint32 kMsgRemoveView = 'rmvw';
 
 #endif	// ACTIVITY_WINDOW_H

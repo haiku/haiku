@@ -24,8 +24,7 @@
 #include "ActivityView.h"
 
 
-const uint32 kMsgAddView = 'advw';
-const uint32 kMsgRemoveView = 'rmvw';
+static const uint32 kMsgAddView = 'advw';
 
 
 ActivityWindow::ActivityWindow()
@@ -116,8 +115,6 @@ ActivityWindow::ActivityWindow()
 	BMenuItem* item;
 
 	menu->AddItem(new BMenuItem("Add View", new BMessage(kMsgAddView)));
-	menu->AddItem(fRemoveItem = new BMenuItem("Remove View",
-		new BMessage(kMsgRemoveView)));
 	menu->AddSeparatorItem();
 
 	menu->AddItem(item = new BMenuItem("About ActivityMonitor" B_UTF8_ELLIPSIS,
@@ -128,8 +125,6 @@ ActivityWindow::ActivityWindow()
 	menu->SetTargetForItems(this);
 	item->SetTarget(be_app);
 	menuBar->AddItem(menu);
-
-	_UpdateRemoveItem();
 }
 
 
@@ -205,14 +200,13 @@ ActivityWindow::_SaveSettings()
 }
 
 
-void
-ActivityWindow::_UpdateRemoveItem()
+int32
+ActivityWindow::ActivityViewCount()
 {
 #ifdef __HAIKU__
-	BView* view = fLayout->View();
-	int32 count = view->CountChildren();
-
-	fRemoveItem->SetEnabled(count >= 2);
+	return fLayout->View()->CountChildren();
+#else
+	return 1;
 #endif
 }
 
@@ -253,25 +247,20 @@ ActivityWindow::MessageReceived(BMessage* message)
 			if (firstView != NULL)
 				ResizeBy(0, firstView->Bounds().Height() + fLayout->Spacing());
 #endif
-			_UpdateRemoveItem();
 			break;
 		}
 
 		case kMsgRemoveView:
 		{
 #ifdef __HAIKU__
-			BView* view = fLayout->View();
-			int32 count = view->CountChildren();
-			if (count == 1)
-				return;
+			BView* view;
+			if (message->FindPointer("view", (void**)&view) != B_OK)
+				break;
 
-			BView* last = view->ChildAt(count - 1);
-			fLayout->RemoveView(last);
-			ResizeBy(0, -last->Bounds().Height() - fLayout->Spacing());
-			delete last;
+			view->RemoveSelf();
+			ResizeBy(0, -view->Bounds().Height() - fLayout->Spacing());
+			delete view;
 #endif
-
-			_UpdateRemoveItem();
 			break;
 		}
 

@@ -22,6 +22,7 @@
 #include <String.h>
 
 #include "ActivityMonitor.h"
+#include "ActivityWindow.h"
 #include "DataSource.h"
 #include "SystemInfo.h"
 #include "SystemInfoHandler.h"
@@ -689,6 +690,15 @@ ActivityView::MouseDown(BPoint where)
 
 	menu->SetTargetForItems(this);
 	additionalMenu->SetTargetForItems(this);
+
+	ActivityWindow* window = dynamic_cast<ActivityWindow*>(Window());
+	if (window != NULL && window->ActivityViewCount() > 1) {
+		menu->AddSeparatorItem();
+		BMessage* message = new BMessage(kMsgRemoveView);
+		message->AddPointer("view", this);
+		menu->AddItem(item = new BMenuItem("Remove View", message));
+		item->SetTarget(window);
+	}
 
 	ConvertToScreen(&where);
 	menu->Go(where, true, false, true);
