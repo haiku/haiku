@@ -227,4 +227,24 @@ private:
 	bigtime_t			fPreviousTime;
 };
 
+
+class ClipboardSizeDataSource : public DataSource {
+public:
+						ClipboardSizeDataSource(bool text);
+						ClipboardSizeDataSource(
+							const ClipboardSizeDataSource& other);
+	virtual				~ClipboardSizeDataSource();
+
+	virtual DataSource*	Copy() const;
+
+	virtual	int64		NextValue(SystemInfo& info);
+
+	virtual const char*	Label() const;
+	virtual const char*	Unit() const;
+	virtual bool		AdaptiveScale() const;
+
+private:
+	bool				fText;
+};
+
 #endif	// DATA_SOURCE_H

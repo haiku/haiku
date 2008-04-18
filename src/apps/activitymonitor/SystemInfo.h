@@ -32,15 +32,18 @@ public:
 			uint32		UsedTeams() const;
 			uint32		MaxTeams() const;
 
-			uint32		UsedRunningApps() const;
-			uint32		MaxRunningApps() const;
-
 			bigtime_t	Time() const { return fTime; }
 			uint32		CPUCount() const { return fSystemInfo.cpu_count; }
 			const system_info& Info() const { return fSystemInfo; }
 
 			uint64		NetworkReceived();
 			uint64		NetworkSent();
+
+			uint32		UsedRunningApps() const;
+			uint32		MaxRunningApps() const;
+
+			uint32		ClipboardSize() const;
+			uint32		ClipboardTextSize() const;
 
 private:
 			void		_RetrieveNetwork();
@@ -51,6 +54,8 @@ private:
 	uint64				fBytesReceived;
 	uint64				fBytesSent;
 	uint32				fRunningApps;
+	uint32				fClipboardSize;
+	uint32				fClipboardTextSize;
 };
 
 #endif	// SYSTEM_INFO_H

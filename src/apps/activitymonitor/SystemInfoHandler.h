@@ -24,10 +24,15 @@ public:
 			void		MessageReceived(BMessage *message);
 
 			uint32		RunningApps() const;
+			uint32		ClipboardSize() const;
+			uint32		ClipboardTextSize() const;
 
 private:
+			void		_UpdateClipboardData();
 
 	uint32				fRunningApps;
+	uint32				fClipboardSize;
+	uint32				fClipboardTextSize;
 };
 
 #endif	// SYSTEM_INFO_HANDLER_H

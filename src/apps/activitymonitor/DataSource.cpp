@@ -7,6 +7,7 @@
 #include "DataSource.h"
 
 #include <stdio.h>
+#include <stdint.h>
 
 #include <OS.h>
 #include <String.h>
@@ -25,7 +26,9 @@ const DataSource* kSources[] = {
 	new CPUUsageDataSource(),
 	new CPUCombinedUsageDataSource(),
 	new NetworkUsageDataSource(true),
-	new NetworkUsageDataSource(false)
+	new NetworkUsageDataSource(false),
+	new ClipboardSizeDataSource(false),
+	new ClipboardSizeDataSource(true)
 };
 const size_t kSourcesCount = sizeof(kSources) / sizeof(kSources[0]);
 
@@ -880,3 +883,68 @@ NetworkUsageDataSource::AdaptiveScale() const
 {
 	return true;
 }
+
+
+//	#pragma mark -
+
+
+ClipboardSizeDataSource::ClipboardSizeDataSource(bool text)
+{
+	fMinimum = 0;
+	fMaximum = UINT32_MAX;
+	fText = text;
+
+	fColor = (rgb_color){0, 150, 255};
+}
+
+
+ClipboardSizeDataSource::ClipboardSizeDataSource(
+		const ClipboardSizeDataSource& other)
+	: DataSource(other)
+{
+	fText = other.fText;
+}
+
+
+ClipboardSizeDataSource::~ClipboardSizeDataSource()
+{
+}
+
+
+DataSource*
+ClipboardSizeDataSource::Copy() const
+{
+	return new ClipboardSizeDataSource(*this);
+}
+
+
+int64
+ClipboardSizeDataSource::NextValue(SystemInfo& info)
+{
+	if (fText)
+		return info.ClipboardTextSize()/* / 1024*/;
+	return info.ClipboardSize()/* / 1024*/;
+}
+
+
+const char*
+ClipboardSizeDataSource::Label() const
+{
+	return fText ? "Text Clipboard Size" : "Raw Clipboard Size";
+}
+
+
+const char*
+ClipboardSizeDataSource::Unit() const
+{
+	return "bytes"/*"KB"*/;
+}
+
+
+bool
+ClipboardSizeDataSource::AdaptiveScale() const
+{
+	return true;
+}
+
+

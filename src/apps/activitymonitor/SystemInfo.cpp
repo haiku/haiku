@@ -19,12 +19,16 @@ SystemInfo::SystemInfo(SystemInfoHandler *handler)
 	:
 	fTime(system_time()),
 	fRetrievedNetwork(false),
-	fRunningApps(0)
+	fRunningApps(0),
+	fClipboardSize(0),
+	fClipboardTextSize(0)
 {
 	get_system_info(&fSystemInfo);
 	
 	if (handler) {
 		fRunningApps = handler->RunningApps();
+		fClipboardSize = handler->ClipboardSize();
+		fClipboardTextSize = handler->ClipboardTextSize();
 	}
 }
 
@@ -115,20 +119,6 @@ SystemInfo::MaxTeams() const
 }
 
 
-uint32
-SystemInfo::UsedRunningApps() const
-{
-	return fRunningApps;
-}
-
-
-uint32
-SystemInfo::MaxRunningApps() const
-{
-	return fSystemInfo.max_teams;
-}
-
-
 void
 SystemInfo::_RetrieveNetwork()
 {
@@ -205,3 +195,33 @@ SystemInfo::NetworkSent()
 	_RetrieveNetwork();
 	return fBytesSent;
 }
+
+
+uint32
+SystemInfo::UsedRunningApps() const
+{
+	return fRunningApps;
+}
+
+
+uint32
+SystemInfo::MaxRunningApps() const
+{
+	return fSystemInfo.max_teams;
+}
+
+
+uint32
+SystemInfo::ClipboardSize() const
+{
+	return fClipboardSize;
+}
+
+
+uint32
+SystemInfo::ClipboardTextSize() const
+{
+	return fClipboardTextSize;
+}
+
+
