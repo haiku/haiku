@@ -32,7 +32,6 @@ rule Link
 		
 	MODE on $(<) = $(EXEMODE) ;
 	on $(1) XRes $(1) : $(RESFILES) ;
-	Chmod $(<) ;
 	if ! [ on $(1) return $(DONT_USE_BEOS_RULES) ] {
 		SetType $(1) ;
 		MimeSet $(1) ;
@@ -44,6 +43,7 @@ rule Link
 			Depends $(1) : $(HOST_RM_ATTRS_TARGET) ;
 		}
 	}
+	Chmod $(<) ;
 }
 
 actions Link bind NEEDLIBS LINK_BEGIN_GLUE LINK_END_GLUE
