@@ -45,7 +45,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	translate true tsort tty uname unchop unexpand unmount uniq unrar unshar
 	unzip unzipsfx <bin>updatedb uptime urlwrapper usb_dev_info uudecode uuencode vdir
 	version vim waitfor wc wget whoami xargs xres yes zdiff zforce zgrep zip
-	zipcloak zipgrep zipnote zipsplit zmore znew
+	zipcloak <bin>zipgrep zipnote zipsplit zmore znew
 ;
 
 BEOS_APPS = AboutSystem ActivityMonitor CodyCam DeskCalc DiskProbe DriveSetup
