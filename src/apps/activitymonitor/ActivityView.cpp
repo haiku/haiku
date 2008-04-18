@@ -644,6 +644,7 @@ ActivityView::MouseDown(BPoint where)
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
 
+	BMenu* additionalMenu = new BMenu("Additional Items");
 	SystemInfo info;
 	BMenuItem* item;
 
@@ -660,9 +661,13 @@ ActivityView::MouseDown(BPoint where)
 		if (FindDataSource(source))
 			item->SetMarked(true);
 
-		menu->AddItem(item);
+		if (source->Primary())
+			menu->AddItem(item);
+		else
+			additionalMenu->AddItem(item);
 	}
 
+	menu->AddItem(new BMenuItem(additionalMenu));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(fShowLegend ? "Hide Legend" : "Show Legend",
 		new BMessage(kMsgToggleLegend)));

@@ -41,6 +41,7 @@ public:
 	virtual int32		CPU() const;
 	virtual bool		PerCPU() const;
 	virtual bool		MultiCPUOnly() const;
+	virtual bool		Primary() const;
 
 	static int32		CountSources();
 	static const DataSource* SourceAt(int32 index);
@@ -74,6 +75,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
+	virtual bool		Primary() const;
 };
 
 
@@ -86,6 +88,7 @@ public:
 
 	virtual	int64		NextValue(SystemInfo& info);
 	virtual const char*	Label() const;
+	virtual bool		Primary() const;
 };
 
 
@@ -171,6 +174,7 @@ public:
 
 	virtual int32		CPU() const;
 	virtual bool		PerCPU() const;
+	virtual bool		Primary() const;
 
 private:
 			void		_SetCPU(int32 cpu);
@@ -198,6 +202,7 @@ public:
 	virtual const char*	Label() const;
 
 	virtual bool		MultiCPUOnly() const;
+	virtual bool		Primary() const;
 
 private:
 	bigtime_t			fPreviousActive;
@@ -220,6 +225,7 @@ public:
 	virtual const char*	Name() const;
 	virtual const char*	Label() const;
 	virtual bool		AdaptiveScale() const;
+	virtual bool		Primary() const;
 
 private:
 	bool				fIn;

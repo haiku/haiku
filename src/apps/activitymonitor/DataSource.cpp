@@ -196,6 +196,13 @@ DataSource::MultiCPUOnly() const
 }
 
 
+bool
+DataSource::Primary() const
+{
+	return false;
+}
+
+
 /*static*/ int32
 DataSource::CountSources()
 {
@@ -308,6 +315,13 @@ UsedMemoryDataSource::Label() const
 }
 
 
+bool
+UsedMemoryDataSource::Primary() const
+{
+	return true;
+}
+
+
 //	#pragma mark -
 
 
@@ -340,6 +354,13 @@ const char*
 CachedMemoryDataSource::Label() const
 {
 	return "Cached Memory";
+}
+
+
+bool
+CachedMemoryDataSource::Primary() const
+{
+	return true;
 }
 
 
@@ -682,6 +703,13 @@ CPUUsageDataSource::PerCPU() const
 }
 
 
+bool
+CPUUsageDataSource::Primary() const
+{
+	return true;
+}
+
+
 void
 CPUUsageDataSource::_SetCPU(int32 cpu)
 {
@@ -798,6 +826,13 @@ CPUCombinedUsageDataSource::MultiCPUOnly() const
 }
 
 
+bool
+CPUCombinedUsageDataSource::Primary() const
+{
+	return true;
+}
+
+
 //	#pragma mark -
 
 
@@ -880,6 +915,13 @@ NetworkUsageDataSource::Name() const
 
 bool
 NetworkUsageDataSource::AdaptiveScale() const
+{
+	return true;
+}
+
+
+bool
+NetworkUsageDataSource::Primary() const
 {
 	return true;
 }
