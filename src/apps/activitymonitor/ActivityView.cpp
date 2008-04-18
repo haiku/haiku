@@ -334,6 +334,7 @@ ActivityView::ActivityView(const char* name, const BMessage* settings)
 	: BView(BRect(0,0,300,200), name, B_FOLLOW_NONE, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 #endif
 {
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	_Init(settings);
 
 	BRect rect(Bounds());
@@ -369,7 +370,6 @@ ActivityView::_Init(const BMessage* settings)
 	fLegendLayoutItem = NULL;
 #endif
 	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fRefreshInterval = kInitialRefreshInterval;
 	fDrawInterval = kInitialRefreshInterval * 2;
@@ -387,6 +387,14 @@ ActivityView::_Init(const BMessage* settings)
 		AddDataSource(new CachedMemoryDataSource());
 		return;
 	}
+
+	rgb_color *color;
+	ssize_t colorLen;
+	if (settings->FindData("background color", B_RGB_COLOR_TYPE, 
+		(const void **)&color, &colorLen) == B_OK && 
+		colorLen == sizeof(rgb_color))
+		fBackgroundColor = *color;
+
 
 	const char* name;
 	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++) {
@@ -430,6 +438,10 @@ status_t
 ActivityView::SaveState(BMessage& state) const
 {
 	status_t status = state.AddBool("show legend", fShowLegend);
+	if (status != B_OK)
+		return status;
+
+	status = state.AddData("background color", B_RGB_COLOR_TYPE, &fBackgroundColor, sizeof(rgb_color));
 	if (status != B_OK)
 		return status;
 
