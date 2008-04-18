@@ -67,7 +67,7 @@ BLayout::AddItem(int32 index, BLayoutItem* item)
 {
 	if (!fView || !item || fItems.HasItem(item))
 		return false;
-	
+
 	// if the item refers to a BView, we make sure, it is added to the parent
 	// view
 	BView* view = item->View();
@@ -90,15 +90,21 @@ BLayout::AddItem(int32 index, BLayoutItem* item)
 bool
 BLayout::RemoveView(BView* child)
 {
-	int32 index = IndexOfView(child);
-	if (index >= 0) {
-		if (BLayoutItem* item = RemoveItem(index)) {
-			delete item;
-			return true;
-		}
+	bool removed = false;
+
+	// a view can have any number of layout items - we need to remove them all
+	for (int32 i = fItems.CountItems(); i-- > 0;) {
+		BLayoutItem* item = ItemAt(i);
+
+		if (item->View() != child)
+			continue;
+
+		RemoveItem(i);
+		removed = true;
+		delete item;
 	}
 
-	return false;
+	return removed;
 }
 
 // RemoveItem
