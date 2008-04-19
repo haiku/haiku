@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -59,13 +59,7 @@ BackgroundsWindow::BackgroundsWindow(BRect frame, bool standalone)
 {
 	fBackgroundsView = new BackgroundsView(Bounds(), "BackgroundsView",
 		B_FOLLOW_ALL, B_WILL_DRAW);
-	fBackgroundsView->ResizeToPreferred();
-	ResizeTo(fBackgroundsView->Bounds().Width(), fBackgroundsView->Bounds().Height());
-
 	AddChild(fBackgroundsView);
-
-	// TODO: center on screen
-	// TODO: save window position?
 }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,10 +55,10 @@ const uint8 kHandCursorData[68] = {
 
 	0, 0,		// 0000000000000000
 	7, 128,		// 0000011110000000
-	61, 112,		// 0011110101110000
+	61, 112,	// 0011110101110000
 	37, 40,		// 0010010100101000
-	36, 168,		// 0010010010101000
-	18, 148,		// 0001001010010100
+	36, 168,	// 0010010010101000
+	18, 148,	// 0001001010010100
 	18, 84,		// 0001001001010100
 	9, 42,		// 0000100100101010
 	8, 1,		// 0000100000000001
@@ -72,18 +72,18 @@ const uint8 kHandCursorData[68] = {
 
 	0, 0,		// 0000000000000000
 	7, 128,		// 0000011110000000
-	63, 240,		// 0011111111110000
-	63, 248,		// 0011111111111000
-	63, 248,		// 0011111111111000
-	31, 252,		// 0001111111111100
-	31, 252,		// 0001111111111100
-	15, 254,		// 0000111111111110
-	15, 255,		// 0000111111111111
-	63, 255,		// 0011111111111111
+	63, 240,	// 0011111111110000
+	63, 248,	// 0011111111111000
+	63, 248,	// 0011111111111000
+	31, 252,	// 0001111111111100
+	31, 252,	// 0001111111111100
+	15, 254,	// 0000111111111110
+	15, 255,	// 0000111111111111
+	63, 255,	// 0011111111111111
 	127, 255,	// 0111111111111111
 	127, 255,	// 0111111111111111
-	63, 255,		// 0011111111111111
-	15, 255,		// 0000111111111111
+	63, 255,	// 0011111111111111
+	15, 255,	// 0000111111111111
 	3, 254,		// 0000001111111110
 	1, 248		// 0000000111111000
 };
@@ -231,22 +231,18 @@ BackgroundsView::BackgroundsView(BRect frame, const char *name, int32 resize,
 	fXPlacementText->MoveBy(0, delta);
 	fYPlacementText->MoveBy(0, delta);
 
-	fRevert = new BButton(BRect(fPreview->Frame().left, fPreview->Frame().bottom + 10,
-		fPreview->Frame().left + 80, Frame().bottom - 10), "RevertButton",
-		"Revert", new BMessage(kMsgRevertSettings), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
-		B_WILL_DRAW | B_NAVIGABLE);
-	fRevert->ResizeToPreferred();
+	rect = fPreview->Frame();
+	rect.top = rect.bottom + 10.0;
+	fRevert = new BButton(rect, "revert", "Revert", new BMessage(kMsgRevertSettings));
 	AddChild(fRevert);
+	fRevert->ResizeToPreferred();
 
-	fApply = new BButton(BRect(rightbox->Frame().right, fPreview->Frame().bottom
-		+ 10, rightbox->Frame().right, 110), "ApplyButton", "Apply",
-		new BMessage(kMsgApplySettings), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM,
-		B_WILL_DRAW | B_NAVIGABLE);
+	rect.left = rightbox->Frame().right;
+	fApply = new BButton(rect, "apply", "Apply", new BMessage(kMsgApplySettings));
+	AddChild(fApply);
 	fApply->ResizeToPreferred();
 	fApply->MoveBy(-fApply->Bounds().Width(), 0);
-	AddChild(fApply);
-
-	ResizeTo(rightbox->Frame().right + 10, fApply->Frame().bottom + 10);
+	fApply->MakeDefault(true);
 }
 
 
@@ -280,7 +276,14 @@ BackgroundsView::AllAttached()
 	fApply->SetTarget(this);
 	fRevert->SetTarget(this);
 
-	fPanel = new ImageFilePanel(B_OPEN_PANEL, new BMessenger(this), NULL,
+	BPath path;
+	entry_ref ref;
+	if (find_directory(B_BEOS_ETC_DIRECTORY, &path) == B_OK) {
+		path.Append("artwork");
+		get_ref_for_path(path.Path(), &ref);
+	}
+
+	fPanel = new ImageFilePanel(B_OPEN_PANEL, new BMessenger(this), &ref,
 		B_FILE_NODE, false, NULL, new CustomRefFilter(true));
 	fPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 
@@ -288,10 +291,24 @@ BackgroundsView::AllAttached()
 		B_DIRECTORY_NODE, false, NULL, new CustomRefFilter(false));
 	fFolderPanel->SetButtonLabel(B_DEFAULT_BUTTON, "Select");
 
-	Window()->ResizeTo(Frame().Width(), Frame().Height());
-
 	LoadSettings();
 	LoadDesktopFolder();
+
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	BPoint point;
+	if (fSettings.FindPoint("pos", &point) != B_OK) {
+		BRect frame(BScreen().Frame());
+		point.Set((frame.right - width) / 2, (frame.bottom - height) / 2);
+	}
+
+	ResizeTo(width, height);
+	Window()->MoveTo(point);
+	Window()->ResizeTo(width, height);
+
+	fApply->SetEnabled(false);
+	fRevert->SetEnabled(false);
 }
 
 
@@ -796,10 +813,6 @@ BackgroundsView::LoadSettings()
 	}
 
 	PRINT_OBJECT(fSettings);
-
-	BPoint point;
-	if (fSettings.FindPoint("pos", &point) == B_OK)
-		Window()->MoveTo(point);
 
 	BString string;
 	if (fSettings.FindString("paneldir", &string) == B_OK)
