@@ -373,8 +373,7 @@ AddSymlinkToHaikuImage beos system add-ons Tracker
 AddFilesToHaikuImage beos system add-ons input_server devices
 	: <input>keyboard <input>mouse <input>wacom ;
 AddFilesToHaikuImage beos system add-ons input_server filters : screen_saver ;
-AddFilesToHaikuImage beos system add-ons kernel network
-	: stack socket ;
+AddFilesToHaikuImage beos system add-ons kernel network : stack ;
 AddFilesToHaikuImage beos system add-ons kernel network devices
 	: $(BEOS_NETWORK_DEVICES) ;
 AddFilesToHaikuImage beos system add-ons kernel network datalink_protocols
