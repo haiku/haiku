@@ -406,6 +406,11 @@ AddDirectoryToHaikuImage home config settings printers Preview
 AddDirectoryToHaikuImage home config settings printers "Save as PDF"
       : home-config-settings-printers-save-as-pdf.rdef ;
 
+# licenses
+CopyDirectoryToHaikuImage beos etc
+	: [ FDirName $(HAIKU_TOP) data etc licenses ]
+	: licenses : -x .svn ;
+
 
 #pragma mark - Optional Packages
 
@@ -456,6 +461,7 @@ AddVariableToScript $(script) : addBuildCompatibilityLibDir
 	: $(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR) ;
 AddVariableToScript $(script) : dontClearImage : $(HAIKU_DONT_CLEAR_IMAGE) ;
 AddVariableToScript $(script) : updateOnly : [ IsUpdateHaikuImageOnly ] ;
+AddTargetVariableToScript $(script) : <build>addattr ;
 AddTargetVariableToScript $(script) : <build>bfs_shell : bfsShell ;
 AddTargetVariableToScript $(script) : <build>fs_shell_command : fsShellCommand ;
 AddTargetVariableToScript $(script) : <build>copyattr ;

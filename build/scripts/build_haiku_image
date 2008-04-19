@@ -13,6 +13,7 @@
 # dontClearImage
 # isVMwareImage
 # 
+# addattr
 # bfsShell
 # copyattr
 # fsShellCommand
@@ -66,19 +67,27 @@ unzipFile()
 
 	echo "Unzipping $zipFile ..."
 
-	if [ $isImage ]; then
-		unzipDir=$tmpDir/unzip
-		$rmAttrs -rf "$unzipDir"
-		mkdir -p "$unzipDir"
+	unzipDir=$tmpDir/unzip
+	$rmAttrs -rf "$unzipDir"
+	mkdir -p "$unzipDir"
 
-		$unzip -q -d "$unzipDir" "$zipFile"
-		$cp -r "${sPrefix}$unzipDir/." "${tPrefix}$targetUnzipDir"
+	$unzip -q -d "$unzipDir" "$zipFile"
 
-		$rmAttrs -rf "$unzipDir"
-	else
-		$unzip -q -o -d "${tPrefix}$targetUnzipDir" "${sPrefix}$zipFile"
+	if [ -f $unzipDir/.OptionalPackageDescription ]; then
+		cat $unzipDir/.OptionalPackageDescription >> $copyrightsFile
+		echo >> $copyrightsFile
+		rm $unzipDir/.OptionalPackageDescription
 	fi
+
+	$cp -r "${sPrefix}$unzipDir/." "${tPrefix}$targetUnzipDir"
+
+	$rmAttrs -rf "$unzipDir"
 }
+
+
+mkdir -p $tmpDir
+copyrightsFile=$tmpDir/copyrights
+$rmAttrs -f $copyrightsFile
 
 
 # create the image and mount it
@@ -139,7 +148,6 @@ if [ ! $updateOnly ]; then
 
 	$rm -rf $mimeDBDest
 	$mkdir -p $mimeDBDest
-	mkdir -p $tmpDir
 	mimeTmpDir=$tmpDir/mime
 	mimeDBTmpDir=$tmpDir/mime/db
 	mimeTmpIndex=0
@@ -180,6 +188,19 @@ if [ ! $updateOnly ]; then
 	# cleanup tmp dir
 	$rmAttrs -rf $mimeTmpDir
 fi	# ! updateOnly
+
+
+# add the concatenated copyrights as an attribute to AboutSystem
+
+if [ ! $updateOnly ]; then
+	if [ -f $copyrightsFile ]; then
+		copyrightAttrs=$tmpDir/copyrightAttrs
+		$rmAttrs -f $copyrightAttrs
+		touch $copyrightAttrs
+		$addattr -f $copyrightsFile COPYRIGHTS $copyrightAttrs
+		$copyAttrs ${sPrefix}$copyrightAttrs ${tPrefix}beos/apps/AboutSystem
+	fi
+fi
 
 
 # unmount
