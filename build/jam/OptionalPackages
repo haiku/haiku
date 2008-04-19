@@ -86,8 +86,8 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 			: $(baseURL)/autoconf-2.61-gcc2-2008-03-24.zip
 			: home
 		;
-		InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-03-24
-			: $(baseURL)/automake-1.10.1-gcc2-2008-03-24.zip
+		InstallOptionalHaikuImagePackage automake-1.10.1-gcc2-2008-03-24-1
+			: $(baseURL)/automake-1.10.1-gcc2-2008-03-24-1.zip
 			: home
 		;
 		InstallOptionalHaikuImagePackage bison-2.3-gcc2-2008-03-28
@@ -98,9 +98,9 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 			: $(baseURL)/flex-2.5.35-gcc2-2008-03-28.zip
 			: home
 		;
-		InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27
-			: $(baseURL)/jam-haiku-gcc2-2008-03-27.zip
-			: home config bin
+		InstallOptionalHaikuImagePackage jam-haiku-gcc2-2008-03-27-1
+			: $(baseURL)/jam-haiku-gcc2-2008-03-27-1.zip
+			: .
 		;
 		InstallOptionalHaikuImagePackage libtool-1.5.26-gcc2-2008-04-07
 			: $(baseURL)/libtool-1.5.26-gcc2-2008-04-07.zip
