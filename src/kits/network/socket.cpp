@@ -8,7 +8,6 @@
 	via the networking stack driver.
 */
 
-#include <net_stack_driver.h>
 #include <r5_compatibility.h>
 
 #include <errno.h>
