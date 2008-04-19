@@ -32,40 +32,27 @@
 
 #elif defined(__HAIKU__)
 
-/* Haiku socket module */
-#include <os/drivers/socket_interface.h>
+/* Haiku now has kernel calls for those, no need for a socket module anymore. */
 
-extern struct socket_module_info *gSocket;
-#define ksocket (gSocket->socket)
-#define kbind (gSocket->bind)
-#define kconnect (gSocket->connect)
-#define kgetsockname (gSocket->getsockname)
-#define kgetpeername (gSocket->getpeername)
-#define kaccept (gSocket->accept)
-//#define kaccept(_fd, _addr, _sz) ({int thesock; thesock = (gSocket->accept)(_fd, _addr, _sz); dprintf("kaccept(%d, , ) = %d\n", _fd, thesock); thesock; })
-#define ksendmsg (gSocket->sendmsg)
-#define krecvmsg (gSocket->recvmsg)
-#define krecvfrom (gSocket->recvfrom)
-#define ksendto (gSocket->sendto)
-#define krecv (gSocket->recv)
-#define ksend (gSocket->send)
-#define klisten (gSocket->listen)
-#define kshutdown (gSocket->shutdown)
+#define ksocket socket
+#define kbind bind
+#define kconnect connect
+#define kgetsockname getsockname
+#define kgetpeername getpeername
+#define kaccept accept
+#define ksendmsg sendmsg
+#define krecvmsg recvmsg
+#define krecvfrom recvfrom
+#define ksendto sendto
+#define krecv recv
+#define ksend send
+#define klisten listen
+#define kshutdown shutdown
 #define kclosesocket close
-#define kmessage(fmt, ...) dprintf("ksocket: " fmt "\n", ##__VA_ARGS__)
-
-extern status_t ksocket_init (void);
-extern status_t ksocket_cleanup (void);
-
-#define KSOCKET_MODULE_DECL \
-struct socket_module_info *gSocket; \
-status_t ksocket_init (void) { \
-	return get_module(B_SOCKET_MODULE_NAME, (module_info **)&gSocket); \
-} \
- \
-status_t ksocket_cleanup (void) { \
-	return put_module(B_SOCKET_MODULE_NAME); \
-}
+#define ksocket_init() ({B_OK;})
+#define ksocket_cleanup() ({B_OK;})
+#define kmessage(fmt, ...) dprintf(fmt "\n", ##__VA_ARGS__)
+#define KSOCKET_MODULE_DECL /* nothing */
 
 #elif defined(BONE_VERSION)
 
