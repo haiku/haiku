@@ -18,7 +18,7 @@ struct stat;
 
 class BRefFilter {
 	public:
-#if (GCC_VERSION >= 3000)
+#if __GNUC__ > 2
 		virtual		 ~BRefFilter() {};
 #endif
 		virtual	bool Filter(const entry_ref* ref, BNode* node,
