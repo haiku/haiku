@@ -335,6 +335,7 @@ ActivityView::ActivityView(const char* name, const BMessage* settings)
 #endif
 {
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
 	_Init(settings);
 
 	BRect rect(Bounds());
@@ -363,7 +364,9 @@ ActivityView::~ActivityView()
 void
 ActivityView::_Init(const BMessage* settings)
 {
-	fBackgroundColor = (rgb_color){255, 255, 240};
+	fHistoryBackgroundColor = (rgb_color){255, 255, 240};
+	fLegendBackgroundColor = LowColor();
+		// the low color is restored by the BView unarchiving
 	fOffscreen = NULL;
 #ifdef __HAIKU__
 	fHistoryLayoutItem = NULL;
@@ -388,13 +391,12 @@ ActivityView::_Init(const BMessage* settings)
 		return;
 	}
 
+	ssize_t colorLength;
 	rgb_color *color;
-	ssize_t colorLen;
-	if (settings->FindData("background color", B_RGB_COLOR_TYPE, 
-		(const void **)&color, &colorLen) == B_OK && 
-		colorLen == sizeof(rgb_color))
-		fBackgroundColor = *color;
-
+	if (settings->FindData("history background color", B_RGB_COLOR_TYPE,
+			(const void **)&color, &colorLength) == B_OK
+		&& colorLength == sizeof(rgb_color))
+		fHistoryBackgroundColor = *color;
 
 	const char* name;
 	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++) {
@@ -441,7 +443,8 @@ ActivityView::SaveState(BMessage& state) const
 	if (status != B_OK)
 		return status;
 
-	status = state.AddData("background color", B_RGB_COLOR_TYPE, &fBackgroundColor, sizeof(rgb_color));
+	status = state.AddData("history background color", B_RGB_COLOR_TYPE,
+		&fHistoryBackgroundColor, sizeof(rgb_color));
 	if (status != B_OK)
 		return status;
 
@@ -453,7 +456,11 @@ ActivityView::SaveState(BMessage& state) const
 		if (status != B_OK)
 			return status;
 
-		// TODO: save and restore color as well
+		BString name = source->Name();
+		name << " color";
+		rgb_color color = source->Color();
+		state.AddData(name.String(), B_RGB_COLOR_TYPE, &color,
+			sizeof(rgb_color));
 	}
 	return B_OK;
 }
@@ -480,6 +487,7 @@ ActivityView::CreateLegendLayoutItem()
 }
 #endif
 
+
 DataSource*
 ActivityView::FindDataSource(const DataSource* search)
 {
@@ -494,7 +502,7 @@ ActivityView::FindDataSource(const DataSource* search)
 
 
 status_t
-ActivityView::AddDataSource(const DataSource* source)
+ActivityView::AddDataSource(const DataSource* source, const BMessage* state)
 {
 	if (source == NULL)
 		return B_BAD_VALUE;
@@ -533,6 +541,17 @@ ActivityView::AddDataSource(const DataSource* source)
 		else
 			copy = source->Copy();
 
+		BString colorName = source->Name();
+		colorName << " color";
+		if (state != NULL) {
+			const rgb_color* color = NULL;
+			ssize_t colorLength;
+			if (state->FindData(colorName.String(), B_RGB_COLOR_TYPE, i,
+					(const void**)&color, &colorLength) == B_OK
+				&& colorLength == sizeof(rgb_color))
+				copy->SetColor(*color);
+		}
+
 		if (!fSources.AddItem(copy, insert + i)) {
 			fValues.RemoveItem(values);
 			delete values;
@@ -554,6 +573,7 @@ ActivityView::RemoveDataSource(const DataSource* remove)
 
 	while (true) {
 		DataSource* source = FindDataSource(remove);
+debug_printf("SEARCH %s, found %p\n", remove->Name(), source);
 		if (source == NULL) {
 			if (removed)
 				break;
@@ -615,7 +635,7 @@ ActivityView::MinSize()
 {
 	BSize size(32, 32);
 	if (fShowLegend)
-		size.height = _LegendFrame().Height();
+		size.height = _LegendHeight();
 
 	return size;
 }
@@ -630,10 +650,10 @@ ActivityView::FrameResized(float /*width*/, float /*height*/)
 
 
 void
-ActivityView::_UpdateOffscreenBitmap(bool force)
+ActivityView::_UpdateOffscreenBitmap()
 {
 	BRect frame = _HistoryFrame();
-	if (!force && fOffscreen != NULL && frame == fOffscreen->Bounds())
+	if (fOffscreen != NULL && frame == fOffscreen->Bounds())
 		return;
 
 	delete fOffscreen;
@@ -649,9 +669,19 @@ ActivityView::_UpdateOffscreenBitmap(bool force)
 	}
 
 	BView* view = new BView(frame, NULL, B_FOLLOW_NONE, B_SUBPIXEL_PRECISE);
-	view->SetViewColor(fBackgroundColor);
+	view->SetViewColor(fHistoryBackgroundColor);
 	view->SetLowColor(view->ViewColor());
 	fOffscreen->AddChild(view);
+}
+
+
+BView*
+ActivityView::_OffscreenView()
+{
+	if (fOffscreen == NULL)
+		return NULL;
+
+	return fOffscreen->ChildAt(0);
 }
 
 
@@ -732,33 +762,37 @@ ActivityView::MessageReceived(BMessage* message)
 	if (message->WasDropped()) {
 		rgb_color *color;
 		ssize_t size;
-		if ((message->FindData("RGBColor", 
-			B_RGB_COLOR_TYPE, 0, (const void **)&color, &size) == B_OK) && 
-			size == sizeof(rgb_color)) {
-			//message->PrintToStream();
-			BPoint dropPoint;
-			dropPoint = message->DropPoint();
+		if ((message->FindData("RGBColor", B_RGB_COLOR_TYPE, 0,
+				(const void **)&color, &size) == B_OK)
+			&& size == sizeof(rgb_color)) {
+			BPoint dropPoint = message->DropPoint();
 			ConvertFromScreen(&dropPoint);
+
 			if (_HistoryFrame().Contains(dropPoint)) {
-				fBackgroundColor = *color;
-				_UpdateOffscreenBitmap(true);
+				fHistoryBackgroundColor = *color;
+				Invalidate(_HistoryFrame());
 			} else {
 				// check each legend color box
 				BRect legendFrame = _LegendFrame();
-				int32 i;
-				for (i = 0; i < fSources.CountItems(); i++) {
-					BRect r = _LegendFrameAt(legendFrame, i);
-					if (r.Contains(dropPoint)) {
+				for (int32 i = 0; i < fSources.CountItems(); i++) {
+					BRect frame = _LegendFrameAt(legendFrame, i);
+					if (frame.Contains(dropPoint)) {
 						fSources.ItemAt(i)->SetColor(*color);
+						Invalidate(_HistoryFrame());
 						return;
 					}
 				}
-				// background
-				SetLowColor(*color);
+
+				if (dynamic_cast<ActivityMonitor*>(be_app) == NULL) {
+					// allow background color change in the replicant only
+					fLegendBackgroundColor = *color;
+					Invalidate(legendFrame);
+				}
 			}
 			return;
-		} // else try the switch or BView::
+		}
 	}
+
 	switch (message->what) {
 		case B_ABOUT_REQUESTED:
 			ActivityMonitor::ShowAbout();
@@ -937,10 +971,11 @@ ActivityView::_DrawHistory()
 	BView* view = this;
 	if (fOffscreen != NULL) {
 		fOffscreen->Lock();
-		view = fOffscreen->ChildAt(0);
+		view = _OffscreenView();
 	}
 
 	BRect frame = _HistoryFrame();
+	SetLowColor(fHistoryBackgroundColor);
 	view->FillRect(frame, B_SOLID_LOW);
 
 	uint32 step = 2;
@@ -1028,6 +1063,8 @@ ActivityView::Draw(BRect /*updateRect*/)
 	// draw legend
 
 	BRect legendFrame = _LegendFrame();
+
+	SetLowColor(fLegendBackgroundColor);
 	FillRect(legendFrame, B_SOLID_LOW);
 
 	font_height fontHeight;

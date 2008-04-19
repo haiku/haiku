@@ -62,7 +62,8 @@ public:
 #endif
 
 			DataSource*	FindDataSource(const DataSource* source);
-			status_t	AddDataSource(const DataSource* source);
+			status_t	AddDataSource(const DataSource* source,
+							const BMessage* state = NULL);
 			status_t	RemoveDataSource(const DataSource* source);
 			void		RemoveAllDataSources();
 
@@ -86,7 +87,8 @@ protected:
 private:
 			void		_Init(const BMessage* settings);
 			void		_Refresh();
-			void		_UpdateOffscreenBitmap(bool force=false);
+			void		_UpdateOffscreenBitmap();
+			BView*		_OffscreenView();
 			void		_UpdateFrame();
 			BRect		_HistoryFrame() const;
 			float		_LegendHeight() const;
@@ -102,7 +104,8 @@ private:
 	friend class HistoryLayoutItem;
 	friend class LegendLayoutItem;
 
-	rgb_color			fBackgroundColor;
+	rgb_color			fHistoryBackgroundColor;
+	rgb_color			fLegendBackgroundColor;
 	BBitmap*			fOffscreen;
 #ifdef __HAIKU__
 	BLayoutItem*		fHistoryLayoutItem;

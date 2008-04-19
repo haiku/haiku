@@ -13,7 +13,7 @@ class SystemInfoHandler;
 
 class SystemInfo {
 public:
-						SystemInfo(SystemInfoHandler *handler=NULL);
+						SystemInfo(SystemInfoHandler* handler = NULL);
 						~SystemInfo();
 
 			uint64		CachedMemory() const;
