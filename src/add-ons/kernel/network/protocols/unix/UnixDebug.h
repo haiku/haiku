@@ -42,7 +42,7 @@
 #else
 #	define	TRACE(args...)	do {} while (false)
 #	define	REPORT_ERROR(error)
-#	define	RETURN_ERROR(error)
+#	define	RETURN_ERROR(error)	return (error)
 #endif
 
 
