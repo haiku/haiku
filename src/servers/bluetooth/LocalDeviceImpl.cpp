@@ -128,6 +128,7 @@ printf("### \n");
 		break;
  			
 		case HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE:
+			RemoteNameRequestComplete((struct hci_remote_name_request_complete_reply*)(event+1), request);		
 		break;
  	
 		case HCI_EVENT_ENCRYPT_CHANGE:
@@ -149,11 +150,11 @@ printf("### \n");
 		break;
 
 		case HCI_EVENT_CMD_COMPLETE:    				
- 				CommandComplete((struct hci_ev_cmd_complete*)(event+1), request);
+			CommandComplete((struct hci_ev_cmd_complete*)(event+1), request);
  		break;
  	
  		case HCI_EVENT_CMD_STATUS:
- 				CommandStatus((struct hci_ev_cmd_status*)(event+1), request); 		
+ 			CommandStatus((struct hci_ev_cmd_status*)(event+1), request); 		
 		break;
 
 		case HCI_EVENT_FLUSH_OCCUR:
@@ -399,6 +400,34 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 //    (request->ReturnAddress()).SendMessage(&reply);
     
     ClearWantedEvent(request);    
+}
+
+
+void
+LocalDeviceImpl::RemoteNameRequestComplete(struct hci_remote_name_request_complete_reply* remotename, BMessage* request)
+{
+	BMessage reply;
+	        	
+  	reply.AddInt8("status", remotename->status);
+        	
+    if (remotename->status == BT_OK) {
+                                
+        reply.AddString("friendlyname", (const char*)remotename->remote_name );                    
+	    Output::Instance()->Post("Positive reply for remote friendly name\n", BLACKBOARD_KIT);
+
+    } else {
+
+	    Output::Instance()->Post("Negative reply for remote friendly name\n", BLACKBOARD_KIT);                
+
+    }
+
+    printf("Sending reply ... %ld\n", request->SendReply(&reply));                                
+    reply.PrintToStream();
+            
+	// This request is not genna be used anymore
+	// Although there are many middle events that should be tracked
+    ClearWantedEvent(request);
+
 }
 
 

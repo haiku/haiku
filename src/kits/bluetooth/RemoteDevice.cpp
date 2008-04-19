@@ -9,8 +9,18 @@
 #include <bluetooth/DiscoveryAgent.h>
 #include <bluetooth/DiscoveryListener.h>
 #include <bluetooth/bdaddrUtils.h>
+#include <bluetooth/LocalDevice.h>
 
 #include <bluetooth/RemoteDevice.h>
+
+#include <bluetoothserver_p.h>
+#include <bluetooth/HCI/btHCI_command.h>
+#include <bluetooth/HCI/btHCI_event.h>
+#include <CommandManager.h>
+
+#include "KitSupport.h"
+
+
 
 namespace Bluetooth {
 
@@ -21,11 +31,54 @@ RemoteDevice::IsTrustedDevice(void)
     return true;
 }
 
-
 BString
 RemoteDevice::GetFriendlyName(bool alwaysAsk)
 {
-    return BString("Not implemented");
+
+    if (!alwaysAsk) {
+        // Check if the name is already retrieved
+        return BString("Not implemented");
+
+        // TODO: Check if It is known from a KnownDevicesList
+    }
+
+    if (fDiscovererLocalDevice == NULL)
+        return BString("#NoOwnerError#Not Valid name");
+
+    BMessenger* btsm = NULL;
+	size_t size;
+
+    if ((btsm = _RetrieveBluetoothMessenger()) == NULL)
+        return BString("#ServerNotReady#Not Valid name");
+
+    void*  remoteNameCommand = NULL;
+
+    /* Issue inquiry command */
+    BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
+    BMessage reply;
+
+    request.AddInt32("hci_id", fDiscovererLocalDevice->GetID());
+
+    // Fill the request
+	remoteNameCommand = buildRemoteNameRequest(fBdaddr, fPageRepetitionMode, fClockOffset, &size); // Fill correctily
+
+	request.AddData("raw command", B_ANY_TYPE, remoteNameCommand, size);
+
+    request.AddInt16("eventExpected",  HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE);
+    //request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_REMOTE_NAME_REQUEST));
+
+    if (btsm->SendMessage(&request, &reply) == B_OK)
+    {
+        BString name;
+        int8 status;
+        
+        if (reply.FindInt8("status", &status) == B_OK &&
+            reply.FindString("friendlyname", &name) == B_OK ) {
+                    return name;
+            }
+    }
+
+    return BString("#NotCompletedRequestr#Not Valid name");
 }
 
 
@@ -39,7 +92,9 @@ RemoteDevice::GetBluetoothAddress()
 bool
 RemoteDevice::Equals(RemoteDevice* obj)
 {
-    return true;
+    bdaddr_t ba = obj->GetBluetoothAddress();
+
+    return bdaddrUtils::Compare(&fBdaddr, &ba);
 }
 
 //  static RemoteDevice* GetRemoteDevice(Connection conn);
@@ -87,7 +142,7 @@ RemoteDevice::RemoteDevice(bdaddr_t address)
 RemoteDevice::RemoteDevice(BString address)
 {
    /* TODO */
-   
+
 }
 
 }

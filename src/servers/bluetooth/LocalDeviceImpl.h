@@ -43,7 +43,7 @@ public:
 	// Inquiry
 	void InquiryResult(uint8* numberOfResponses, BMessage* request);
 	void InquiryComplete(uint8* status, BMessage* request);
-	
+	void RemoteNameRequestComplete(struct hci_remote_name_request_complete_reply* remotename, BMessage* request);
 };
 
 #endif

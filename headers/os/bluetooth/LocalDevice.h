@@ -60,6 +60,7 @@ class LocalDevice {
 		hci_id		GetID(void) {return hid;}
 		
 		friend class DiscoveryAgent;
+		friend class RemoteDevice;
 };
     
 }
