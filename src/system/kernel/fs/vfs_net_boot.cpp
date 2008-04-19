@@ -19,8 +19,6 @@
 
 #include <disk_device_manager/KDiskDevice.h>
 
-#include <socket_interface.h>
-
 #include <KPath.h>
 
 
@@ -62,14 +60,14 @@ compare_partitions_net_devices(const void *_a, const void *_b)
 class NetStackInitializer {
 public:
 	NetStackInitializer(uint64 clientMAC, uint32 clientIP, uint32 netMask)
-		: fSocketModule(NULL),
-		  fSocket(-1),
-		  fLinkSocket(-1),
-		  fClientMAC(clientMAC),
-		  fClientIP(clientIP),
-		  fNetMask(netMask),
-		  fFoundInterface(false),
-		  fConfiguredInterface(false)
+		:
+		fSocket(-1),
+		fLinkSocket(-1),
+		fClientMAC(clientMAC),
+		fClientIP(clientIP),
+		fNetMask(netMask),
+		fFoundInterface(false),
+		fConfiguredInterface(false)
 	{
 	}
 
@@ -81,25 +79,12 @@ public:
 
 		if (fLinkSocket >= 0)
 			close(fLinkSocket);
-
-		// put socket module
-		if (fSocketModule)
-			put_module(fSocketModule->info.name);
 	}
 
 	status_t Init()
 	{
-		// get the socket module
-		status_t error = get_module(B_SOCKET_MODULE_NAME,
-			(module_info**)&fSocketModule);
-		if (error != B_OK) {
-			dprintf("NetStackInitializer: Failed to load socket module: %s\n",
-				strerror(error));
-			return error;
-		}
-
 		// open a control socket for playing with the stack
-		fSocket = fSocketModule->socket(AF_INET, SOCK_DGRAM, 0);
+		fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 		if (fSocket < 0) {
 			dprintf("NetStackInitializer: Failed to open socket: %s\n",
 				strerror(errno));
@@ -107,7 +92,7 @@ public:
 		}
 
 		// ... and a link level socket
-		fLinkSocket = fSocketModule->socket(AF_LINK, SOCK_DGRAM, 0);
+		fLinkSocket = socket(AF_LINK, SOCK_DGRAM, 0);
 		if (fLinkSocket < 0) {
 			dprintf("NetStackInitializer: Failed to open link level socket:"
 				" %s\n", strerror(errno));
@@ -117,13 +102,13 @@ public:
 
 		// now iterate through the existing network devices
 		KPath path;
-		error = path.SetTo("/dev/net");
+		status_t error = path.SetTo("/dev/net");
 		if (error != B_OK)
 			return error;
 
 		_ScanDevices(path);
 
-		return (fConfiguredInterface ? B_OK : B_ERROR);
+		return fConfiguredInterface ? B_OK : B_ERROR;
 	}
 
 private:
@@ -299,7 +284,6 @@ private:
 	}
 
 private:
-	socket_module_info*	fSocketModule;
 	int					fSocket;
 	int					fLinkSocket;
 	uint64				fClientMAC;
