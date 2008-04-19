@@ -77,6 +77,10 @@ StdBinCommands
 	yes.c
 	: libfetish.a : $(coreutils_rsrc) ;
 
+# set set-uid bit on su
+MODE on su = 04755 ;
+
+
 # commands requiring select, uname, etc.
 
 StdBinCommands

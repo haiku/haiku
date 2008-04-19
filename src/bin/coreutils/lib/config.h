@@ -638,10 +638,10 @@
 #define HAVE_GETOPT_LONG_ONLY 1
 
 /* Define to 1 if you have the `getpagesize' function. */
-/* #undef HAVE_GETPAGESIZE */
+#define HAVE_GETPAGESIZE 1
 
 /* Define to 1 if you have the `getspnam' function. */
-/* #undef HAVE_GETSPNAM */
+#define HAVE_GETSPNAM 1
 
 /* Define to 1 if you have the `getsysinfo' function. */
 /* #undef HAVE_GETSYSINFO */
@@ -937,7 +937,7 @@
 /* #undef HAVE_SETTIMEOFDAY */
 
 /* Define to 1 if you have the <shadow.h> header file. */
-/* #undef HAVE_SHADOW_H */
+#define HAVE_SHADOW_H 1
 
 /* Define to 1 if you have the `sig2str' function. */
 /* #undef HAVE_SIG2STR */
@@ -1042,7 +1042,7 @@
 /* #undef HAVE_STRUCT_NLIST_N_UN_N_NAME */
 
 /* Define to 1 if `sp_pwdp' is member of `struct spwd'. */
-/* #undef HAVE_STRUCT_SPWD_SP_PWDP */
+#define HAVE_STRUCT_SPWD_SP_PWDP 1
 
 /* Define to 1 if `f_fstypename' is member of `struct statfs'. */
 /* #undef HAVE_STRUCT_STATFS_F_FSTYPENAME */
