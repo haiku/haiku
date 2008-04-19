@@ -80,7 +80,7 @@ DumpInfo(LocalDevice* device)
     for (int32 index = 0 ; index < dAgent->RetrieveDevices(0).CountItems(); index++ ) {
 
         RemoteDevice* rDevice = dAgent->RetrieveDevices(0).ItemAt(index);
-	    printf("\t%s \t@ %s ...\n", rDevice->GetFriendlyName(false).String(), bdaddrUtils::ToString(rDevice->GetBluetoothAddress()));
+	    printf("\t%s \t@ %s ...\n", rDevice->GetFriendlyName(true).String(), bdaddrUtils::ToString(rDevice->GetBluetoothAddress()));
 
     }
 
