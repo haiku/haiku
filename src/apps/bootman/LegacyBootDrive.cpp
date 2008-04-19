@@ -10,6 +10,7 @@
 #include "LegacyBootDrive.h"
 
 
+#include <Drivers.h>
 #include <DiskDevice.h>
 #include <DiskDeviceRoster.h>
 #include <DiskDeviceVisitor.h>
@@ -33,6 +34,7 @@
 
 
 #define USE_SECOND_DISK 0
+#define GET_FIRST_BIOS_DRIVE 1
 
 
 class Buffer : public BMallocIO 
@@ -109,7 +111,7 @@ Buffer::Fill(int16 size, int8 fillByte)
 class PartitionRecorder : public BDiskDeviceVisitor
 {
 public:
-	PartitionRecorder(BMessage* settings);
+	PartitionRecorder(BMessage* settings, int8 drive);
 
 	virtual bool Visit(BDiskDevice* device);	
 	virtual bool Visit(BPartition* partition, int32 level);
@@ -121,15 +123,17 @@ private:
 	bool _Record(BPartition* partition);
 
 	BMessage* fSettings;
+	int8 fDrive;
 	int32 fIndex;
 	off_t fFirstOffset;
 };
 
 
-PartitionRecorder::PartitionRecorder(BMessage* settings)
+PartitionRecorder::PartitionRecorder(BMessage* settings, int8 drive)
 	: fSettings(settings)
+	, fDrive(drive)
 	, fIndex(0)
-	, fFirstOffset((off_t)-1)
+	, fFirstOffset(LONGLONG_MAX)
 {
 }
 
@@ -151,7 +155,7 @@ PartitionRecorder::Visit(BPartition* partition, int32 level)
 bool
 PartitionRecorder::HasPartitions() const
 {
-	return fFirstOffset != (off_t)-1;
+	return fFirstOffset != LONGLONG_MAX;
 }
 
 
@@ -186,14 +190,16 @@ PartitionRecorder::_Record(BPartition* partition)
 	message.AddString("name", name);
 	message.AddString("type", type);
 	message.AddString("path", partitionPath.Path());
+	message.AddInt8("drive", fDrive);
 	message.AddInt64("size", partition->ContentSize());	
 	// Specific data
-	message.AddInt64("offset", partition->Offset());
+	off_t offset = partition->Offset();
+	message.AddInt64("offset", offset);
 	
 	fSettings->AddMessage("partition", &message);
 
-	if (partition->Offset() < fFirstOffset)
-		fFirstOffset = partition->Offset();
+	if (offset < fFirstOffset)
+		fFirstOffset = offset;
 	
 	return false;
 }
@@ -224,24 +230,35 @@ LegacyBootDrive::ReadPartitions(BMessage *settings)
 	BDiskDevice device;
 	bool diskFound = false;
 	while (diskDeviceRoster.GetNextDevice(&device) == B_OK) {
-		BPath path;
-		if (device.GetPath(&path) != B_OK)
-			return B_ERROR;
 		
-		PartitionRecorder recorder(settings);
+		BPath path;
+		status_t status = device.GetPath(&path); 
+		if (status != B_OK)
+			return status;
+				
+		// skip not from BIOS bootable drives
+		int8 drive;
+		if (!_GetBiosDrive(path.Path(), &drive))
+			continue;
+		
+		PartitionRecorder recorder(settings, drive);
 		device.VisitEachDescendant(&recorder);
 
 		if (!diskFound) {
 			settings->AddString("disk", path.Path());
 			diskFound = true;
-
+			
 			#if !USE_SECOND_DISK
-				// ignored in test build
+				// Enough space to write boot menu to drive?
+				// (ignored in test build)
 				off_t size = sizeof(kBootLoader);
 				if (!recorder.HasPartitions() || recorder.FirstOffset() < size)
 					return kErrorBootSectorTooSmall;
 			#endif
 		}
+		
+		// TODO remove when booting from all drives works
+		break;
 	}	
 
 	#if USE_SECOND_DISK
@@ -260,7 +277,8 @@ status_t
 LegacyBootDrive::WriteBootMenu(BMessage *settings)
 {
 	printf("WriteBootMenu:\n");
-	settings->PrintToStream();
+	// TODO fix crash since AddInt8("drive", ...)
+	// settings->PrintToStream();
 
 	BString path;
 	if (settings->FindString("disk", &path) != B_OK)
@@ -320,15 +338,18 @@ LegacyBootDrive::WriteBootMenu(BMessage *settings)
 		BString name;
 		BString path;
 		int64 offset;
+		int8 drive;
 		partition.FindBool("show", &show);
 		partition.FindString("name", &name);
 		partition.FindString("path", &path);
-		// LegacyBootDrive provides offset in message as well
+		// LegacyBootDrive specific data
 		partition.FindInt64("offset", &offset);
+		partition.FindInt8("drive", &drive);
 		if (!show)
 			continue;
 		
 		newBootLoader.WriteString(name.String());
+		newBootLoader.WriteInt8(drive);
 		newBootLoader.WriteInt64(offset / kBlockSize);
 	}	
 
@@ -435,6 +456,23 @@ LegacyBootDrive::RestoreMasterBootRecord(BMessage* settings, BFile* file)
 	delete buffer;		
 	close(fd);
 	return status;
+}
+
+
+bool
+LegacyBootDrive::_GetBiosDrive(const char* device, int8* drive)
+{
+	#if !GET_FIRST_BIOS_DRIVE
+		int fd = open(device, O_RDONLY);
+		if (fd < 0)
+			return false;
+		bool isBootableDrive = ioctl(fd, B_GET_BIOS_DRIVE_ID, drive, 1) == B_OK;
+		close(fd);
+		return isBootableDrive;
+	#else
+		*drive = 0x80;
+		return true;
+	#endif
 }
 
 

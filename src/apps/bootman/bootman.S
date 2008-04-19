@@ -126,6 +126,9 @@
 
 %assign BRIGHT_COLOR_MASK				8
 
+; Characters
+%assign	TRIANGLE_TO_RIGHT				16
+%assign	TRIANGLE_TO_LEFT				17
 
 ; Key codes
 %assign KEY_DOWN						0x50
@@ -203,6 +206,11 @@ struc   AddressPacket
 	.reserved2		resb	1
 	.buffer			resd	1
 	.offset			nstruc	quadword
+endstruc
+
+struc	BootLoaderAddress
+	.device			resb	1			; hard drive number
+	.offset			nstruc	quadword	; LBA of start start sector
 endstruc
 
 ; use code available in stage 1
@@ -414,7 +422,7 @@ printMenu:
 
 .print:
 	call	printstr
-	add		si, sizeof(quadword)				; Skip start sector quad word
+	add		si, sizeof(BootLoaderAddress)
 
 	inc		byte [currentLine]
 	inc		cx
@@ -443,12 +451,15 @@ bootSelectedPartition:
 	jmp		.search_loop_entry
 	
 .search_loop:
-	add		si, sizeof(quadword)				; Skip to begin of next menu item
+	add		si, sizeof(BootLoaderAddress)
 
 .search_loop_entry:
 	lodsb										; Length of menu item name
-	add		si, ax								; Skip name to address of start sector
+	add		si, ax								; Skip name to BootLoaderAddess
 	loop	.search_loop
+	
+	lodsb										; Set boot drive
+	mov		dl, al
 	
 	mov		di, bootSectorDAP+AddressPacket.offset	; Copy start sector
 	mov		cx, 4								; It is stored in a quad word
@@ -458,7 +469,6 @@ bootSelectedPartition:
 	loop .copy_start_sector
 
 	mov		ah, EXTENDED_READ					; Now read start sector from HD
-	mov		dl, 0x80							; overwriting our first stage
 	mov		si, bootSectorDAP
 	int		BIOS_DISK_SERVICES
 	mov		si, kReadError
@@ -525,6 +535,7 @@ list				equ		timeout + 2
 ; entry:
 ; db size of partition name 0-terminated string
 ; db 0-terminated string with partition name
+; db hard drive number
 ; quadword start sector
 
 %if USE_TEST_MENU
@@ -536,26 +547,32 @@ list				equ		timeout + 2
 
 	db		0x06
 	db		'HAIKU', 0
+	db		0x80
 	dw		1, 0, 0, 0
 
 	db		0x08
 	db		'FreeBSD', 0
+	db		0x80
 	dw		0x003F, 0, 0, 0
 
 	db		0x04
 	db		'DOS', 0
+	db		0x80
 	dw		0x003E, 0, 0, 0
 
 	db		0x06
 	db		'LINUX', 0
+	db		0x80
 	dw		0x003F, 0, 0, 0
 
 	db		0x08
 	db		'BeOS R5', 0
+	db		0x80
 	dw		0x003F, 0, 0, 0
 
 	db		0x07
 	db		'OpenBSD', 0
+	db		0x80
 	dw		0xAAAA, 0, 0, 0
 %endif
 

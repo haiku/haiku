@@ -40,6 +40,7 @@ public:
 	virtual status_t RestoreMasterBootRecord(BMessage* settings, BFile* file);
 
 private:
+	bool _GetBiosDrive(const char* device, int8* drive);
 	status_t _ReadBlocks(int fd, uint8* buffer, size_t size);
 	status_t _WriteBlocks(int fd, const uint8* buffer, size_t size);
 	void _CopyPartitionTable(MasterBootRecord* destination,
