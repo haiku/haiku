@@ -130,8 +130,8 @@ RemoteDisk::FindAnyRemoteDisk()
 
 	// set SO_BROADCAST on socket
 	int soBroadcastValue = 1;
-	if (fSocketModule->setsockopt(fSocket, SOL_SOCKET, SO_BROADCAST,
-		&soBroadcastValue, sizeof(soBroadcastValue)) < 0) {
+	if (setsockopt(fSocket, SOL_SOCKET, SO_BROADCAST, &soBroadcastValue,
+			sizeof(soBroadcastValue)) < 0) {
 		dprintf("RemoteDisk::Init(): Failed to set SO_BROADCAST on socket: "
 			"%s\n", strerror(errno));
 	}
@@ -149,8 +149,8 @@ RemoteDisk::FindAnyRemoteDisk()
 
 	// unset SO_BROADCAST on socket
 	soBroadcastValue = 0;
-	if (fSocketModule->setsockopt(fSocket, SOL_SOCKET, SO_BROADCAST,
-		&soBroadcastValue, sizeof(soBroadcastValue)) < 0) {
+	if (setsockopt(fSocket, SOL_SOCKET, SO_BROADCAST, &soBroadcastValue,
+			sizeof(soBroadcastValue)) < 0) {
 		dprintf("RemoteDisk::Init(): Failed to unset SO_BROADCAST on socket: "
 			"%s\n", strerror(errno));
 	}
@@ -293,17 +293,8 @@ RemoteDisk::WriteAt(off_t pos, const void *_buffer, size_t bufferSize)
 status_t
 RemoteDisk::_Init()
 {
-	// get the socket module
-	status_t error = get_module(B_SOCKET_MODULE_NAME,
-		(module_info**)&fSocketModule);
-	if (error != B_OK) {
-		dprintf("RemoteDisk::Init(): Failed to load socket module: %s\n",
-			strerror(error));
-		return error;
-	}
-
 	// open a control socket for playing with the stack
-	fSocket = fSocketModule->socket(AF_INET, SOCK_DGRAM, 0);
+	fSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	if (fSocket < 0) {
 		dprintf("RemoteDisk::Init(): Failed to open socket: %s\n",
 			strerror(errno));
@@ -315,8 +306,7 @@ RemoteDisk::_Init()
 	fSocketAddress.sin_port = 0;
 	fSocketAddress.sin_addr.s_addr = INADDR_ANY;
 	fSocketAddress.sin_len = sizeof(sockaddr_in);
-	if (fSocketModule->bind(fSocket, (sockaddr*)&fSocketAddress,
-			sizeof(fSocketAddress)) < 0) {
+	if (bind(fSocket, (sockaddr*)&fSocketAddress, sizeof(fSocketAddress)) < 0) {
 		dprintf("RemoteDisk::Init(): Failed to bind socket: %s\n",
 			strerror(errno));
 		return errno;
@@ -324,8 +314,7 @@ RemoteDisk::_Init()
 
    // get the port
     socklen_t addrSize = sizeof(fSocketAddress);
-    if (fSocketModule->getsockname(fSocket, (sockaddr*)&fSocketAddress,
-			&addrSize) < 0) {
+    if (getsockname(fSocket, (sockaddr*)&fSocketAddress, &addrSize) < 0) {
 		dprintf("RemoteDisk::Init(): Failed to get socket address: %s\n",
 			strerror(errno));
         return errno;
@@ -335,8 +324,8 @@ RemoteDisk::_Init()
 	timeval timeout;
 	timeout.tv_sec = time_t(kReceiveTimeout / 1000000LL);
 	timeout.tv_usec = suseconds_t(kReceiveTimeout % 1000000LL);
-	if (fSocketModule->setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, &timeout,
-			sizeof(timeout)) < 0) {
+	if (setsockopt(fSocket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout))
+			< 0) {
 		dprintf("RemoteDisk::Init(): Failed to set socket receive timeout: "
 			"%s\n", strerror(errno));
         return errno;
@@ -411,8 +400,8 @@ RemoteDisk::_SendRequest(remote_disk_header *request, size_t size,
 		// send request
 		ssize_t bytesSent;
 		do {
-			bytesSent = fSocketModule->sendto(fSocket, request, size,
-        		0, (sockaddr*)&fServerAddress, sizeof(fServerAddress));
+			bytesSent = sendto(fSocket, request, size, 0,
+				(sockaddr*)&fServerAddress, sizeof(fServerAddress));
 		} while (bytesSent < 0 && errno == B_INTERRUPTED);
 
 		if (bytesSent < 0) {
@@ -431,8 +420,8 @@ RemoteDisk::_SendRequest(remote_disk_header *request, size_t size,
 		do {
 			*_bytesReceived = 0;
 			socklen_t addrSize = sizeof(sockaddr_in);
-			ssize_t bytesReceived = fSocketModule->recvfrom(fSocket,
-				receiveBuffer, receiveBufferSize, 0, (sockaddr*)peerAddress,
+			ssize_t bytesReceived = recvfrom(fSocket, receiveBuffer,
+				receiveBufferSize, 0, (sockaddr*)peerAddress,
 				(peerAddress ? &addrSize : 0));
 			if (bytesReceived < 0) {
 				status_t error = errno;

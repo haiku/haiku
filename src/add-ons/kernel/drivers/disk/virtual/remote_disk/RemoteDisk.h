@@ -2,15 +2,12 @@
  * Copyright 2005-2007, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef _BOOT_REMOTE_DISK_H
 #define _BOOT_REMOTE_DISK_H
 
 #include <netinet/in.h>
 
 #include <SupportDefs.h>
-
-#include <socket_interface.h>
 
 #include <boot/net/RemoteDiskDefs.h>
 
@@ -58,7 +55,6 @@ private:
 									int32* bytesReceived);
 
 private:
-			socket_module_info*	fSocketModule;
 			sockaddr_in			fSocketAddress;
 			sockaddr_in			fServerAddress;
 			off_t				fImageSize;
