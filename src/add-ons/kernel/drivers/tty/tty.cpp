@@ -147,7 +147,7 @@ class TTYReferenceLocking {
 		{
 			MutexLocker _(gTTYCookieLock);
 
-			if (cookie->closed || cookie->other_tty->open_count == 0)
+			if (cookie->closed)
 				return false;
 
 			cookie->thread_count++;
@@ -626,7 +626,8 @@ WriterLocker::_CheckBackgroundWrite() const
 	}
 
 	pid_t processGroup = getpgid(0);
-	if (processGroup != fSource->settings->pgrp_id) {
+	if (fSource->settings->pgrp_id != 0
+			&& processGroup != fSource->settings->pgrp_id) {
 		if (team_get_controlling_tty() == fSource->index)
 			send_signal(-processGroup, SIGTTOU);
 		return EIO;
@@ -730,7 +731,8 @@ ReaderLocker::_CheckBackgroundRead() const
 		return B_OK;
 
 	pid_t processGroup = getpgid(0);
-	if (processGroup != fTTY->settings->pgrp_id) {
+	if (fTTY->settings->pgrp_id != 0
+			&& processGroup != fTTY->settings->pgrp_id) {
 		if (team_get_controlling_tty() == fTTY->index)
 			send_signal(-processGroup, SIGTTIN);
 		return EIO;
