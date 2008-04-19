@@ -6,12 +6,14 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 #UsePrivateHeaders tracker ;
 #SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
+
 Application Login :
 	LoginApp.cpp
 	LoginWindow.cpp
 	LoginView.cpp
 	main.cpp
-	: be tracker
+	: be tracker libmultiuser_utils.a
 	: Login.rdef
-	;
+;
 

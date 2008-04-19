@@ -3,9 +3,13 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <pwd.h>
+#include <shadow.h>
 
 #include "LoginApp.h"
 #include "LoginWindow.h"
+
+#include "multiuser_utils.h"
+
 
 const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
 
@@ -98,11 +102,9 @@ LoginApp::ValidateLogin(const char *login, const char *password/*, bool force = 
 		return B_OK;
 	}
 
-	// XXX: check for shadow pass
-	if (strcmp(crypt(password, pwd->pw_passwd), pwd->pw_passwd))
-		return B_NOT_ALLOWED;
-	
-	return B_OK;
+	if (verify_password(pwd, getspnam(login), password))
+		return B_OK;
+	return B_NOT_ALLOWED;
 }
 
 
