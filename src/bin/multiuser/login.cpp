@@ -19,6 +19,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "multiuser_utils.h"
+
 
 extern const char* __progname;
 const char* kProgramName = __progname;
@@ -118,11 +120,12 @@ login(const char* user, struct passwd** _passwd)
 		return status;
 
 	struct passwd* passwd = getpwnam(user);
-	if (passwd == NULL || passwd->pw_passwd == NULL)
-		return B_ERROR;
+	struct spwd* spwd = getspnam(user);
 
-	// TODO: do a real password check!
-	if (strcmp(password, passwd->pw_passwd))
+	bool ok = verify_password(passwd, spwd, password);
+	memset(password, 0, sizeof(password));
+
+	if (!ok)
 		return B_PERMISSION_DENIED;
 
 	*_passwd = passwd;

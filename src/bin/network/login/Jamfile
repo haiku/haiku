@@ -1,5 +1,0 @@
-SubDir HAIKU_TOP src bin network login ;
-
-BinCommand login :
-	login.cpp
-;

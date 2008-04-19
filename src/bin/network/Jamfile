@@ -5,7 +5,6 @@ SubInclude HAIKU_TOP src bin network atftpd ;
 SubInclude HAIKU_TOP src bin network ftp ;
 SubInclude HAIKU_TOP src bin network ftpd ;
 SubInclude HAIKU_TOP src bin network ifconfig ;
-SubInclude HAIKU_TOP src bin network login ;
 SubInclude HAIKU_TOP src bin network mount_nfs ;
 SubInclude HAIKU_TOP src bin network nc ;
 SubInclude HAIKU_TOP src bin network netstat ;
