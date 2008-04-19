@@ -11,6 +11,41 @@
 
 #include <OS.h>
 
+
+#define MAX_PASSWD_NAME_LEN			(32)
+#define MAX_PASSWD_PASSWORD_LEN		(32)
+#define MAX_PASSWD_REAL_NAME_LEN	(128)
+#define MAX_PASSWD_HOME_DIR_LEN		(B_PATH_NAME_LENGTH)
+#define MAX_PASSWD_SHELL_LEN		(B_PATH_NAME_LENGTH)
+
+#define MAX_PASSWD_BUFFER_SIZE	(	\
+	MAX_PASSWD_NAME_LEN				\
+	+ MAX_PASSWD_PASSWORD_LEN		\
+	+ MAX_PASSWD_REAL_NAME_LEN		\
+	+ MAX_PASSWD_HOME_DIR_LEN		\
+	+ MAX_PASSWD_SHELL_LEN)
+
+#define	MAX_GROUP_NAME_LEN			(32)
+#define	MAX_GROUP_PASSWORD_LEN		(32)
+#define	MAX_GROUP_MEMBER_COUNT		(32)
+
+#define MAX_GROUP_BUFFER_SIZE	(	\
+	MAX_GROUP_NAME_LEN				\
+	+ MAX_GROUP_PASSWORD_LEN		\
+	+ ((MAX_GROUP_MEMBER_COUNT + 1) * sizeof(char*)))
+	// MAX_GROUP_NAME_LEN and MAX_GROUP_PASSWORD_LEN are char* aligned
+
+
+#define	MAX_SHADOW_PWD_NAME_LEN			(32)
+#define	MAX_SHADOW_PWD_PASSWORD_LEN		(128)
+
+#define MAX_SHADOW_PWD_BUFFER_SIZE	(	\
+	MAX_SHADOW_PWD_NAME_LEN				\
+	+ MAX_SHADOW_PWD_PASSWORD_LEN)
+
+
+#ifdef __cplusplus
+
 #include <AutoLocker.h>
 
 
@@ -105,5 +140,7 @@ status_t parse_shadow_pwd_line(char* line, char*& name, char*& password,
 
 }	// namespace BPrivate
 
+
+#endif	// __cplusplus
 
 #endif	// _LIBROOT_USER_GROUP_COMMON_H

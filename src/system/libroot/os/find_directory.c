@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <libroot_private.h>
+#include <user_group.h>
 
 /* use pwents to find home */
 #define USE_PWENTS

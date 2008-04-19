@@ -15,6 +15,7 @@
 #include <SupportDefs.h>
 
 #include <libroot_private.h>
+#include <user_group.h>
 
 
 int

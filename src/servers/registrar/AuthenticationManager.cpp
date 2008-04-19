@@ -103,6 +103,20 @@ private:
 
 class AuthenticationManager::User {
 public:
+	User()
+		:
+		fUID(0),
+		fGID(0),
+		fLastChanged(0),
+		fMin(-1),
+		fMax(-1),
+		fWarn(-1),
+		fInactive(-1),
+		fExpiration(-1),
+		fFlags(0)
+	{
+	}
+
 	User(const char* name, const char* password, uid_t uid, gid_t gid,
 		const char* home, const char* shell, const char* realName)
 		:
@@ -123,6 +137,26 @@ public:
 	{
 	}
 
+	User(const User& other)
+		:
+		fUID(other.fUID),
+		fGID(other.fGID),
+		fName(other.fName),
+		fPassword(other.fPassword),
+		fHome(other.fHome),
+		fShell(other.fShell),
+		fRealName(other.fRealName),
+		fShadowPassword(other.fShadowPassword),
+		fLastChanged(other.fLastChanged),
+		fMin(other.fMin),
+		fMax(other.fMax),
+		fWarn(other.fWarn),
+		fInactive(other.fInactive),
+		fExpiration(other.fExpiration),
+		fFlags(other.fFlags)
+	{
+	}
+
 	const string& Name() const	{ return fName; }
 	const uid_t UID() const		{ return fUID; }
 
@@ -139,6 +173,56 @@ public:
 		fFlags = flags;
 	}
 
+	void UpdateFromMessage(const KMessage& message)
+	{
+		int32 intValue;
+		const char* stringValue;
+
+		if (message.FindInt32("uid", &intValue) == B_OK)
+			fUID = intValue;
+			
+		if (message.FindInt32("gid", &intValue) == B_OK)
+			fGID = intValue;
+
+		if (message.FindString("name", &stringValue) == B_OK)
+			fName = stringValue;
+
+		if (message.FindString("password", &stringValue) == B_OK)
+			fPassword = stringValue;
+
+		if (message.FindString("home", &stringValue) == B_OK)
+			fHome = stringValue;
+
+		if (message.FindString("shell", &stringValue) == B_OK)
+			fShell = stringValue;
+
+		if (message.FindString("real name", &stringValue) == B_OK)
+			fRealName = stringValue;
+
+		if (message.FindString("shadow password", &stringValue) == B_OK) {
+			fShadowPassword = stringValue;
+			// TODO:
+			// fLastChanged = now;
+		}
+
+		if (message.FindInt32("min", &intValue) == B_OK)
+			fMin = intValue;
+			
+		if (message.FindInt32("max", &intValue) == B_OK)
+			fMax = intValue;
+			
+		if (message.FindInt32("warn", &intValue) == B_OK)
+			fWarn = intValue;
+			
+		if (message.FindInt32("inactive", &intValue) == B_OK)
+			fInactive = intValue;
+			
+		if (message.FindInt32("expiration", &intValue) == B_OK)
+			fExpiration = intValue;
+			
+		if (message.FindInt32("flags", &intValue) == B_OK)
+			fFlags = intValue;
+	}
 
 	passwd* WriteFlatPasswd(FlatStore& store) const
 	{
@@ -202,6 +286,30 @@ public:
 		}
 
 		return B_OK;
+	}
+
+	void WritePasswdLine(FILE* file)
+	{
+		fprintf(file, "%s:%s:%d:%d:%s:%s:%s\n",
+			fName.c_str(), fPassword.c_str(), (int)fUID, (int)fGID,
+			fRealName.c_str(), fHome.c_str(), fShell.c_str());
+	}
+
+	void WriteShadowPwdLine(FILE* file)
+	{
+		fprintf(file, "%s:%s:%d:", fName.c_str(), fShadowPassword.c_str(),
+			fLastChanged);
+
+		// The following values are supposed to be printed as empty strings,
+		// if negative.
+		int values[5] = { fMin, fMax, fWarn, fInactive, fExpiration };
+		for (int i = 0; i < 5; i++) {
+			if (values[i] >= 0)
+				fprintf(file, "%d", values[i]);
+			fprintf(file, ":");
+		}
+
+		fprintf(file, "%d\n", fFlags);
 	}
 
 private:
@@ -373,6 +481,42 @@ public:
 		store.WriteData(offset, entries, entriesSpace);
 
 		return count;
+	}
+
+	void WriteToDisk()
+	{
+		// rename the old files
+		string passwdBackup(kPasswdFile);
+		string shadowBackup(kShadowPwdFile);
+		passwdBackup += ".old";
+		shadowBackup += ".old";
+
+		rename(kPasswdFile, passwdBackup.c_str());
+		rename(kShadowPwdFile, shadowBackup.c_str());
+			// Don't check errors. We can't do anything anyway.
+
+		// open files
+		FILE* passwdFile = fopen(kPasswdFile, "w");
+		if (passwdFile == NULL) {
+			debug_printf("REG: Failed to open passwd file \"%s\" for "
+				"writing: %s\n", kPasswdFile, strerror(errno));
+		}
+		CObjectDeleter<FILE, int> _1(passwdFile, fclose);
+
+		FILE* shadowFile = fopen(kShadowPwdFile, "w");
+		if (shadowFile == NULL) {
+			debug_printf("REG: Failed to open shadow passwd file \"%s\" for "
+				"writing: %s\n", kShadowPwdFile, strerror(errno));
+		}
+		CObjectDeleter<FILE, int> _2(shadowFile, fclose);
+
+		// write users
+		for (map<uid_t, User*>::const_iterator it = fUsersByID.begin();
+			 it != fUsersByID.end(); ++it) {
+			User* user = it->second;
+			user->WritePasswdLine(passwdFile);
+			user->WriteShadowPwdLine(shadowFile);
+		}
 	}
 
 private:
@@ -547,6 +691,8 @@ AuthenticationManager::_RequestThread()
 		if (error != B_OK)
 			return B_OK;
 
+		bool isRoot = (messageInfo.sender == 0);
+
 		switch (message.What()) {
 			case B_REG_GET_PASSWD_DB:
 			{
@@ -614,7 +760,7 @@ AuthenticationManager::_RequestThread()
 			case B_REG_GET_SHADOW_PASSWD_DB:
 			{
 				// only root may see the shadow passwd
-				if (messageInfo.sender != 0)
+				if (!isRoot)
 					error = EPERM;
 
 				// lazily build the reply
@@ -668,7 +814,7 @@ AuthenticationManager::_RequestThread()
 				bool getShadowPwd = message.GetBool("shadow", false);
 
 				// only root may see the shadow passwd
-				if (error == B_OK && getShadowPwd && messageInfo.sender != 0)
+				if (error == B_OK && getShadowPwd && !isRoot)
 					error = EPERM;
 
 				// add user to message
@@ -751,8 +897,82 @@ AuthenticationManager::_RequestThread()
 			}
 
 			case B_REG_UPDATE_USER:
-			case B_REG_UPDATE_GROUP:
+			{
+				// find user
+				User* user = NULL;
+				int32 uid;
+				const char* name;
+
+				if (message.FindInt32("uid", &uid) == B_OK) {
+					user = fUserDB->UserByID(uid);
+				} else if (message.FindString("name", &name) == B_OK) {
+					user = fUserDB->UserByName(name);
+				} else {
+					error = B_BAD_VALUE;
+				}
+
+				// only can change anything
+				if (error == B_OK && !isRoot)
+					error = EPERM;
+
+				// check addUser vs. existing user
+				bool addUser = message.GetBool("add user", false);
+				if (error == B_OK) {
+					if (addUser) {
+						if (user != NULL)
+							error = EEXIST;
+					} else if (user == NULL)
+						error = ENOENT;
+				}
+
+				// apply all changes
+				if (error == B_OK) {
+					// clone the user object and update it from the message
+					User* oldUser = user;
+					user = NULL;
+					try {
+						user = (oldUser != NULL ? new User(*oldUser)
+							: new User);
+						user->UpdateFromMessage(message);
+
+						// uid and name should remain the same
+						if (oldUser != NULL) {
+							if (oldUser->UID() != user->UID()
+								|| oldUser->Name() != user->Name()) {
+								error = B_BAD_VALUE;
+							}
+						}
+
+						// replace the old user and write DBs to disk 
+						if (error == B_OK) {
+							fUserDB->AddUser(user);
+							fUserDB->WriteToDisk();
+							fPasswdDBReply->SetTo(1);
+							fShadowPwdDBReply->SetTo(1);
+						}
+					} catch (...) {
+						error = B_NO_MEMORY;
+					}
+
+					if (error == B_OK)
+						delete oldUser;
+					else
+						delete user;
+				}
+
+				// send reply
+				KMessage reply;
+				reply.SetWhat(error);
+				message.SendReply(&reply, -1, -1, 0, registrarTeam);
+
 				break;
+			}
+			case B_REG_UPDATE_GROUP:
+				debug_printf("B_REG_UPDATE_GROUP done: currently unsupported!\n");
+				break;
+			default:
+				debug_printf("REG: invalid message: %lu\n", message.What());
+
 		}
 	}
 }
