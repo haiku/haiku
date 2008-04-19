@@ -969,44 +969,6 @@ add_node_listener(dev_t device, dev_t node, uint32 flags,
 //	#pragma mark - public kernel API
 
 
-status_t
-notify_listener(int op, dev_t device, ino_t parentNode, ino_t toParentNode,
-	ino_t node, const char *name)
-{
-	TRACE(("notify_listener(op = %d, device = %ld, node = %Ld, parent = %Ld, toParent = %Ld"
-		", name = \"%s\"\n", op, device, node, parentNode, toParentNode, name));
-
-	switch (op) {
-		case B_ENTRY_CREATED:
-			return notify_entry_created(device, parentNode, name, node);
-
-		case B_ENTRY_REMOVED:
-			return notify_entry_removed(device, parentNode, name, node);
-
-		case B_ENTRY_MOVED:
-			// no fromName -- use an empty string
-			return notify_entry_moved(device, parentNode, "", toParentNode,
-				name, node);
-
-		case B_STAT_CHANGED:
-		{
-			// no statFields -- consider all stat fields changed
-			uint32 statFields = B_STAT_MODE | B_STAT_UID | B_STAT_GID
-				| B_STAT_SIZE | B_STAT_ACCESS_TIME | B_STAT_MODIFICATION_TIME
-				| B_STAT_CREATION_TIME | B_STAT_CHANGE_TIME;
-			return notify_stat_changed(device, node, statFields);
-		}
-
-		case B_ATTR_CHANGED:
-			// no cause -- use B_ATTR_CHANGED
-			return notify_attribute_changed(device, node, name, B_ATTR_CHANGED);
-
-		default:
-			return B_BAD_VALUE;
-	}
-}
-
-
 /*!	\brief Notifies all interested listeners that an entry has been created.
   	\param device The ID of the mounted FS, the entry lives in.
   	\param directory The entry's parent directory ID.
