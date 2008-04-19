@@ -7,6 +7,10 @@
  *		René Gollent
  */
 
+#include <ctype.h>
+#include <stdio.h>
+#include <sys/utsname.h>
+#include <time.h>
 
 #include <AppFileInfo.h>
 #include <Application.h>
@@ -14,6 +18,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <Font.h>
+#include <fs_attr.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
 #include <OS.h>
@@ -24,7 +29,6 @@
 #include <ScrollView.h>
 #include <String.h>
 #include <StringView.h>
-#include <TextView.h>
 #include <TranslationUtils.h>
 #include <TranslatorFormats.h>
 #include <View.h>
@@ -32,11 +36,13 @@
 #include <VolumeRoster.h>
 #include <Window.h>
 
+#include <AppMisc.h>
+#include <AutoDeleter.h>
 #include <cpu_type.h>
 
-#include <stdio.h>
-#include <time.h>
-#include <sys/utsname.h>
+#include "HyperTextActions.h"
+#include "HyperTextView.h"
+#include "Utilities.h"
 
 
 #define SCROLL_CREDITS_VIEW 'mviv'
@@ -79,14 +85,19 @@ class AboutView : public BView {
 		virtual void MouseDown(BPoint pt);
 		
 		void	AddCopyrightEntry(const char *name, const char *text,
+					const Licenses& licenses, const char *url);
+		void	AddCopyrightEntry(const char *name, const char *text,
 					const char *url = NULL);
+		void	AddCopyrightEntry(const BMessage& packageDescription);
 		void	PickRandomHaiku();
 
 	private:
+		void	_AddCopyrightsFromAttribute();
+
 		BStringView		*fMemView;
 		BStringView		*fUptimeView;
 		BView			*fInfoView;
-		BTextView		*fCreditsView;
+		HyperTextView	*fCreditsView;
 		
 		BBitmap			*fLogo;
 		
@@ -318,7 +329,7 @@ AboutView::AboutView(const BRect &rect)
 	r.left += fInfoView->Bounds().right + 1;
 	r.right -= B_V_SCROLL_BAR_WIDTH;
 
-	fCreditsView = new BTextView(r, "credits",
+	fCreditsView = new HyperTextView(r, "credits",
 		r.OffsetToCopy(0, 0).InsetByCopy(5, 5), B_FOLLOW_ALL);
 	fCreditsView->SetFlags(fCreditsView->Flags() | B_FRAME_EVENTS );
 	fCreditsView->SetStylable(true);
@@ -352,7 +363,9 @@ AboutView::AboutView(const BRect &rect)
 	fCreditsView->Insert(string);
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-	fCreditsView->Insert("http://haiku-os.org\n\n");
+	fCreditsView->InsertHyperText("http://haiku-os.org",
+		new URLAction("http://haiku-os.org"));
+	fCreditsView->Insert("\n\n");
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert("Team Leads:\n");
@@ -507,7 +520,8 @@ AboutView::AboutView(const BRect &rect)
 		"gdb, wget, ncurses, termcap, "
 		"Bourne Again Shell.\n"
 		"Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.",
-		"www.gnu.org");
+		Licenses("GNU LGPL v2.1", "GNU GPL v2", "GNU GPL v3", NULL),
+		"http://www.gnu.org");
 
 	// FreeBSD copyrights
 	AddCopyrightEntry("The FreeBSD Project",
@@ -516,7 +530,7 @@ AboutView::AboutView(const BRect &rect)
 		"ping, telnet, telnetd, traceroute\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 The FreeBSD Project.  "
 		"All rights reserved.",
-		"www.freebsd.org");
+		"http://www.freebsd.org");
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
@@ -525,36 +539,36 @@ AboutView::AboutView(const BRect &rect)
 		"ftp\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 The NetBSD Foundation, Inc.  "
 		"All rights reserved.",
-		"www.netbsd.org");
+		"http://www.netbsd.org");
 
 	// FFMpeg copyrights
 	AddCopyrightEntry("FFMpeg libavcodec", 
 		"Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.", 
-		"www.ffmpeg.org");
+		"http://www.ffmpeg.org");
 
 	// AGG copyrights
 	AddCopyrightEntry("AntiGrain Geometry", 
 		"Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).", 
-		"www.antigrain.com");
+		"http://www.antigrain.com");
 
 	// PDFLib copyrights
 	AddCopyrightEntry("PDFLib", 
 		"Copyright " B_UTF8_COPYRIGHT " 1997-2006 PDFlib GmbH and Thomas Merz. "
 		"All rights reserved.\n"
 		"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.", 
-		"www.pdflib.com");
+		"http://www.pdflib.com");
 
 	// FreeType copyrights
 	AddCopyrightEntry("FreeType2", 
 		"Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 "
 		"The FreeType Project.  All rights reserved.", 
-		"www.freetype.org");
+		"http://www.freetype.org");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
 	AddCopyrightEntry("Mesa", 
 		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Brian Paul. "
 		"Mesa3D project.  All rights reserved.", 
-		"www.mesa3d.org");
+		"http://www.mesa3d.org");
 
 	// SGI's GLU implementation copyrights
 	AddCopyrightEntry("GLU", 
@@ -619,7 +633,7 @@ AboutView::AboutView(const BRect &rect)
 	// Bullet copyrights
 	AddCopyrightEntry("Bullet", 
 		"Copyright " B_UTF8_COPYRIGHT " 2003-2008 Erwin Coumans",
-		"www.bulletphysics.com");
+		"http://www.bulletphysics.com");
 
 	// atftp copyrights
 	AddCopyrightEntry("atftp",
@@ -673,12 +687,14 @@ AboutView::AboutView(const BRect &rect)
 	AddCopyrightEntry("Xiph.org Foundation",
 		"libvorbis, libogg, libtheora, libspeex"
 		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 Xiph.Org.  All rights "
-		"reserved.", "www.xiph.org");
+		"reserved.", "http://www.xiph.org");
 
 	// The Tcpdump Group
 	AddCopyrightEntry("The Tcpdump Group",
 		"tcpdump, libpcap",
-		"www.tcpdump.org");	     
+		"http://www.tcpdump.org");	     
+
+	_AddCopyrightsFromAttribute();
 
 	// Build a list of installed applications and show their 
 	// long version info. Well-behaved apps usually give
@@ -849,6 +865,14 @@ void
 AboutView::AddCopyrightEntry(const char *name, const char *text,
 	const char *url)
 {
+	AddCopyrightEntry(name, text, NULL, url);
+}
+
+
+void
+AboutView::AddCopyrightEntry(const char *name, const char *text,
+	const Licenses& licenses, const char *url)
+{
 	BFont font(be_bold_font);
 	//font.SetSize(be_bold_font->Size());
 	font.SetFace(B_BOLD_FACE | B_ITALIC_FACE);
@@ -859,13 +883,60 @@ AboutView::AddCopyrightEntry(const char *name, const char *text,
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(text);
 	fCreditsView->Insert("\n");
+
+	if (licenses.CountLicenses() > 0) {
+		if (licenses.CountLicenses() > 1)
+			fCreditsView->Insert("Licenses: ");
+		else
+			fCreditsView->Insert("License: ");
+
+		for (int32 i = 0; i < licenses.CountLicenses(); i++) {
+			const char* license = licenses.LicenseAt(i);
+			BString licensePath("/etc/licenses/");
+			licensePath += license;
+
+			if (i > 0)
+				fCreditsView->Insert(", ");
+
+			fCreditsView->InsertHyperText(license,
+				new OpenFileAction(licensePath));
+		}
+
+		fCreditsView->Insert("\n");
+	}
+
 	if (url) {
 		fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-		fCreditsView->Insert(url);
+		fCreditsView->InsertHyperText(url, new URLAction(url));
 		fCreditsView->Insert("\n");
 	}
 	fCreditsView->Insert("\n");
 }
+
+
+void
+AboutView::AddCopyrightEntry(const BMessage& packageDescription)
+{
+	const char* package;
+	const char* copyright;
+	const char* url;
+
+	// package and copyright are mandatory
+	if (packageDescription.FindString("Package", &package) != B_OK
+		|| packageDescription.FindString("Copyright", &copyright) != B_OK) {
+		return;
+	}
+
+	// URL is optional
+	if (packageDescription.FindString("URL", &url) != B_OK)
+		url = NULL;
+
+	BString copyrightLine("Copyright " B_UTF8_COPYRIGHT " ");
+	copyrightLine += copyright;
+
+	AddCopyrightEntry(package, copyrightLine.String(), packageDescription, url);
+}
+
 
 void
 AboutView::PickRandomHaiku()
@@ -915,6 +986,91 @@ AboutView::PickRandomHaiku()
 	while ((s = (BString *)haikuList.RemoveItem((int32)0))) {
 		delete s;
 	}
+}
+
+
+void
+AboutView::_AddCopyrightsFromAttribute()
+{
+	// open the app executable file
+	char appPath[B_PATH_NAME_LENGTH];
+	int appFD;
+	if (BPrivate::get_app_path(appPath) != B_OK
+		|| (appFD = open(appPath, O_RDONLY)) < 0) {
+		return;
+	}
+
+	// open the attribute
+	int attrFD = fs_open_attr(appFD, "COPYRIGHTS", B_STRING_TYPE, O_RDONLY);
+	close(appFD);
+	if (attrFD < 0)
+		return;
+
+	// attach it to a FILE
+	FILE* attrFile = fdopen(attrFD, "r");
+	if (attrFile == NULL) {
+		close(attrFD);
+		return;
+	}
+	CObjectDeleter<FILE, int> _(attrFile, fclose);
+
+	// read and parse the copyrights
+	BMessage package;
+	BString fieldName;
+	BString fieldValue;
+	char lineBuffer[LINE_MAX];
+	while (char* line = fgets(lineBuffer, sizeof(lineBuffer), attrFile)) {
+		// chop off line break
+		size_t lineLen = strlen(line);
+		if (lineLen > 0 && line[lineLen - 1] == '\n')
+			line[--lineLen] = '\0';
+
+		// flush previous field, if a new field begins, otherwise append
+		if (lineLen == 0 || !isspace(line[0])) {
+			// new field -- flush the previous one
+			if (fieldName.Length() > 0) {
+				fieldValue = trim_string(fieldValue.String(),
+					fieldValue.Length());
+				package.AddString(fieldName.String(), fieldValue);
+				fieldName = "";
+			}
+		} else if (fieldName.Length() > 0) {
+			// append to current field
+			fieldValue += line;
+			continue;
+		} else {
+			// bogus line -- ignore
+			continue;
+		}
+
+		if (lineLen == 0)
+			continue;
+
+		// parse new field
+		char* colon = strchr(line, ':');
+		if (colon == NULL) {
+			// bogus line -- ignore
+			continue;
+		}
+
+		fieldName.SetTo(line, colon - line);
+		fieldName = trim_string(line, colon - line);
+		if (fieldName.Length() == 0) {
+			// invalid field name
+			continue;
+		}
+
+		fieldValue = colon + 1;
+
+		if (fieldName == "Package") {
+			// flush the current package
+			AddCopyrightEntry(package);
+			package.MakeEmpty();
+		}
+	}
+
+	// flush current package
+	AddCopyrightEntry(package);
 }
 
 

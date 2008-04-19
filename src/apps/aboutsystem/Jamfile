@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps aboutsystem ;
 
-UsePrivateHeaders shared ;
+UsePrivateHeaders app shared ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
@@ -16,6 +16,9 @@ if $(TARGET_PLATFORM) = dano {
 
 Application AboutSystem :
 	AboutSystem.cpp
+	HyperTextActions.cpp
+	HyperTextView.cpp
+	Utilities.cpp
 	: be translation
 	: AboutSystem.rdef
 ;
