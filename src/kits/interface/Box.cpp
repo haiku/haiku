@@ -81,7 +81,8 @@ BBox::BBox(border_style border, BView* child)
 
 
 BBox::BBox(BMessage *archive)
-	: BView(archive)
+	: BView(archive),
+	  fStyle(B_FANCY_BORDER)
 {
 	_InitObject(archive);
 }
@@ -538,7 +539,6 @@ BBox::_InitObject(BMessage* archive)
 {
 	fBounds = Bounds();
 	
-	fStyle = B_FANCY_BORDER;
 	fLabel = NULL;
 	fLabelView = NULL;
 	fLayoutData = new LayoutData;
