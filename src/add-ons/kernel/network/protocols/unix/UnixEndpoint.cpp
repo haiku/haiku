@@ -462,9 +462,12 @@ UnixEndpoint::Send(net_buffer *buffer)
 	fifoLocker.Unlock();
 	locker.Lock();
 
+	bool peerLocked = (fPeerEndpoint == peerEndpoint
+		&& _LockConnectedEndpoints(locker, peerLocker) == B_OK);
+
 	// send notifications
-	if (notifyRead)
-		gSocketModule->notify(socket, B_SELECT_READ, readable);
+	if (peerLocked && notifyRead)
+		gSocketModule->notify(peerEndpoint->socket, B_SELECT_READ, readable);
 	if (notifyWrite)
 		gSocketModule->notify(socket, B_SELECT_WRITE, writable);
 
@@ -517,6 +520,9 @@ UnixEndpoint::Receive(size_t numBytes, uint32 flags, net_buffer **_buffer)
 	if (fReceiveFifo == NULL)
 		RETURN_ERROR(ENOTCONN);
 
+	UnixEndpoint* peerEndpoint = fPeerEndpoint;
+	Reference<UnixEndpoint> peerReference(peerEndpoint);
+
 	// lock our FIFO
 	UnixFifo* fifo = fReceiveFifo;
 	Reference<UnixFifo> _(fifo);
@@ -542,11 +548,15 @@ UnixEndpoint::Receive(size_t numBytes, uint32 flags, net_buffer **_buffer)
 	fifoLocker.Unlock();
 	locker.Lock();
 
+	UnixEndpointLocker peerLocker;
+	bool peerLocked = (peerEndpoint != NULL && fPeerEndpoint == peerEndpoint
+		&& _LockConnectedEndpoints(locker, peerLocker) == B_OK);
+
 	// send notifications
 	if (notifyRead)
 		gSocketModule->notify(socket, B_SELECT_READ, readable);
-	if (notifyWrite)
-		gSocketModule->notify(socket, B_SELECT_WRITE, writable);
+	if (peerLocked && notifyWrite)
+		gSocketModule->notify(peerEndpoint->socket, B_SELECT_WRITE, writable);
 
 	switch (error) {
 		case UNIX_FIFO_SHUTDOWN:
@@ -630,7 +640,7 @@ UnixEndpoint::SetReceiveBufferSize(size_t size)
 status_t
 UnixEndpoint::Shutdown(int direction)
 {
-	TRACE("[%ld] %p->UnixEndpoint::SetReceiveBufferSize(%d)\n",
+	TRACE("[%ld] %p->UnixEndpoint::Shutdown(%d)\n",
 		find_thread(NULL), this, direction);
 
 	uint32 shutdown;
