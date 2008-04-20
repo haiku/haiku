@@ -1034,13 +1034,8 @@ _dump_thread_info(struct thread *thread)
 	kprintf("  sem.acquire_status: %#lx\n", thread->sem.acquire_status);
 	kprintf("  sem.flags:        %#lx\n", thread->sem.flags);
 
-	kprintf("condition variables:");
 	PrivateConditionVariableEntry* entry = thread->condition_variable_entry;
-	while (entry != NULL) {
-		kprintf(" %p", entry->Variable());
-		entry = entry->ThreadNext();
-	}
-	kprintf("\n");
+	kprintf("condition variable: %p\n", entry ? entry->Variable() : NULL);
 
 	kprintf("fault_handler:      %p\n", (void *)thread->fault_handler);
 	kprintf("args:               %p %p\n", thread->args1, thread->args2);

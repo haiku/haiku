@@ -883,11 +883,7 @@ create_team_struct(const char *name, bool kernel)
 
 	// publish dead/stopped/continued children condition vars
 	team->dead_children->condition_variable.Publish(team->dead_children,
-		"dead children");
-	team->stopped_children->condition_variable.Publish(team->stopped_children,
-		"stopped children");
-	team->continued_children->condition_variable.Publish(
-		team->continued_children, "continued children");
+		"team children");
 
 	// keep all allocated structures
 	jobControlEntryDeleter.Detach();
@@ -903,9 +899,6 @@ create_team_struct(const char *name, bool kernel)
 static void
 delete_team_struct(struct team *team)
 {
-	team->stopped_children->condition_variable.Unpublish();
-	team->continued_children->condition_variable.Unpublish();
-
 	team->dead_children->condition_variable.Unpublish();
 
 	while (death_entry* threadDeathEntry = (death_entry*)list_remove_head_item(
@@ -1748,22 +1741,11 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 		}
 
 		// If we haven't got anything yet, add prepare for waiting for the
-		// condition variables.
+		// condition variable.
 		ConditionVariableEntry<team_dead_children> deadWaitEntry;
-		ConditionVariableEntry<team_job_control_children> continuedWaitEntry;
-		ConditionVariableEntry<team_job_control_children> stoppedWaitEntry;
 
-		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0) {
+		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0)
 			deadWaitEntry.Add(team->dead_children);
-
-			if ((flags & WCONTINUED) != 0) {
-				continuedWaitEntry.Add(team->continued_children,
-					&deadWaitEntry);
-			}
-
-			if ((flags & WUNTRACED) != 0)
-				stoppedWaitEntry.Add(team->stopped_children, &deadWaitEntry);
-		}
 
 		locker.Unlock();
 
@@ -2453,13 +2435,6 @@ team_set_job_control_state(struct team* team, job_control_state newState,
 		case JOB_CONTROL_STATE_DEAD:
 			childList = team->parent->dead_children;
 			team->parent->dead_children->count++;
-			// When a child dies, we need to notify all lists, since that might
-			// have been the last of the parent's children, and a waiting
-			// parent thread wouldn't wake up otherwise.
-			team->parent->stopped_children->condition_variable.NotifyAll(
-				threadsLocked);
-			team->parent->continued_children->condition_variable.NotifyAll(
-				threadsLocked);
 			break;
 		case JOB_CONTROL_STATE_STOPPED:
 			childList = team->parent->stopped_children;
@@ -2471,7 +2446,8 @@ team_set_job_control_state(struct team* team, job_control_state newState,
 
 	if (childList != NULL) {
 		childList->entries.Add(entry);
-		childList->condition_variable.NotifyAll(threadsLocked);
+		team->parent->dead_children->condition_variable.NotifyAll(
+			threadsLocked);
 	}
 }
 
@@ -3059,11 +3035,8 @@ _user_setpgid(pid_t processID, pid_t groupID)
 
 	// Changing the process group might have changed the situation for a parent
 	// waiting in wait_for_child(). Hence we notify it.
-	if (status == B_OK) {
+	if (status == B_OK)
 		team->parent->dead_children->condition_variable.NotifyAll(false);
-		team->parent->stopped_children->condition_variable.NotifyAll(false);
-		team->parent->continued_children->condition_variable.NotifyAll(false);
-	}
 
 	locker.Unlock();
 

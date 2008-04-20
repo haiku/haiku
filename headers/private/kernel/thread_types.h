@@ -138,11 +138,11 @@ struct job_control_entry : DoublyLinkedListLinkImpl<job_control_entry> {
 typedef DoublyLinkedList<job_control_entry> JobControlEntryList;
 
 struct team_job_control_children {
-	ConditionVariable<team_job_control_children>	condition_variable;
-	JobControlEntryList								entries;
+	JobControlEntryList		entries;
 };
 
 struct team_dead_children : team_job_control_children {
+	ConditionVariable<team_dead_children>	condition_variable;
 	uint32		count;
 	bigtime_t	kernel_time;
 	bigtime_t	user_time;
