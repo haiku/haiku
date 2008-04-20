@@ -6,7 +6,6 @@
  *		Hugo Santos <hugosantos@gmail.com>
  */
 
-#include <net_stack_driver.h>
 #include <sys/sockio.h>
 #include <termios.h>
 
@@ -27,25 +26,6 @@ struct ioctl_info {
 	{ name, #name, TypeHandlerFactory<type>::Create() }
 
 static const ioctl_info kIOCtls[] = {
-	// network stack ioctls
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_SOCKET, struct socket_args *),
-	IOCTL_INFO_ENTRY(NET_STACK_GET_COOKIE),
-	IOCTL_INFO_ENTRY(NET_STACK_CONTROL_NET_MODULE),
-	IOCTL_INFO_ENTRY(NET_STACK_GET_NEXT_STAT),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_BIND, struct sockaddr_args *),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_RECEIVE, struct message_args *),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_SEND, struct message_args *),
-	IOCTL_INFO_ENTRY(NET_STACK_LISTEN),
-	IOCTL_INFO_ENTRY(NET_STACK_ACCEPT),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_CONNECT, struct sockaddr_args *),
-	IOCTL_INFO_ENTRY(NET_STACK_SHUTDOWN),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_GETSOCKOPT, struct sockopt_args *),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_SETSOCKOPT, struct sockopt_args *),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_GETSOCKNAME, struct sockaddr_args *),
-	IOCTL_INFO_ENTRY_TYPE(NET_STACK_GETPEERNAME, struct sockaddr_args *),
-	IOCTL_INFO_ENTRY(NET_STACK_SOCKETPAIR),
-	IOCTL_INFO_ENTRY(NET_STACK_NOTIFY_SOCKET_EVENT),
-
 	// <sys/sockio.h>
 	IOCTL_INFO_ENTRY(SIOCADDRT),
 	IOCTL_INFO_ENTRY(SIOCDELRT),
