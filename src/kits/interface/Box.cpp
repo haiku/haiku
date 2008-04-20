@@ -537,7 +537,8 @@ void
 BBox::_InitObject(BMessage* archive)
 {
 	fBounds = Bounds();
-
+	
+	fStyle = B_FANCY_BORDER;
 	fLabel = NULL;
 	fLabelView = NULL;
 	fLayoutData = new LayoutData;
