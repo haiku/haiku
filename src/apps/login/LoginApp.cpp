@@ -10,6 +10,7 @@
 
 #include "LoginApp.h"
 #include "LoginWindow.h"
+#include "DesktopWindow.h"
 
 #ifdef __HAIKU__
 #include <RosterPrivate.h>
@@ -20,13 +21,10 @@
 
 const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
 
-const window_feel kPrivateDesktopWindowFeel = window_feel(1024);
-const window_look kPrivateDesktopWindowLook = window_look(4);
-	// this is a mirror of an app server private values
-
 
 LoginApp::LoginApp()
-	: BApplication(kLoginAppSig)
+	: BApplication(kLoginAppSig),
+	  fEditShelfMode(false)
 {
 }
 
@@ -39,25 +37,23 @@ LoginApp::~LoginApp()
 void
 LoginApp::ReadyToRun()
 {
-	BScreen s;
-	BRect frame(0, 0, 400, 150);
-	frame.OffsetBySelf(s.Frame().Width()/2 - frame.Width()/2, 
-						s.Frame().Height()/2 - frame.Height()/2);
-	fLoginWindow = new LoginWindow(frame);
-	fLoginWindow->Show();
-	
 	BScreen screen;
-	fDesktopWindow = new BWindow(screen.Frame(), "Desktop", 
-		kPrivateDesktopWindowLook, 
-		kPrivateDesktopWindowFeel, 
-		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
-		 | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
-		 | B_ASYNCHRONOUS_CONTROLS,
-		B_ALL_WORKSPACES);
-	BView *desktop = new BView(fDesktopWindow->Bounds(), "desktop", 
-		B_FOLLOW_NONE, 0);
-	desktop->SetViewColor(screen.DesktopColor());
-	fDesktopWindow->AddChild(desktop);
+
+	if (fEditShelfMode) {
+		(new BAlert("Info", "You can customize the desktop shown "
+			"behind the Login app by dropping replicants onto it.\n"
+			"\n"
+			"When you are finished just quit the application (Alt-Q).", 
+			"Ok"))->Go(NULL);
+	} else {
+		BRect frame(0, 0, 400, 150);
+		frame.OffsetBySelf(screen.Frame().Width()/2 - frame.Width()/2, 
+			screen.Frame().Height()/2 - frame.Height()/2);
+		fLoginWindow = new LoginWindow(frame);
+		fLoginWindow->Show();
+	}
+	
+	fDesktopWindow = new DesktopWindow(screen.Frame(), fEditShelfMode);
 	fDesktopWindow->Show();
 	// TODO: add a shelf with Activity Monitor replicant :)
 }
@@ -101,6 +97,18 @@ LoginApp::MessageReceived(BMessage *message)
 
 
 void
+LoginApp::ArgvReceived(int32 argc, char **argv)
+{
+	int i;
+	for (i = 1; i < argc; i++) {
+		printf("[%d]: %s\n", i, argv[i]);
+		if (argv[i] == BString("--edit"))
+			fEditShelfMode = true;
+	}
+}
+
+
+void
 LoginApp::TryLogin(BMessage *message)
 {
 	status_t err;
@@ -137,7 +145,7 @@ LoginApp::TryLogin(BMessage *message)
 
 
 status_t
-LoginApp::ValidateLogin(const char *login, const char *password/*, bool force = false*/)
+LoginApp::ValidateLogin(const char *login, const char *password)
 {
 	struct passwd *pwd;
 	

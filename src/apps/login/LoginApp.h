@@ -12,25 +12,25 @@ const uint32 kLoginBad = 'lgba';
 const uint32 kLoginOk = 'lgok';
 
 class LoginWindow;
+class DesktopWindow;
 
 class LoginApp : public BApplication {
 public:
-	LoginApp();
-	virtual ~LoginApp();
-	void ReadyToRun();
-	void MessageReceived(BMessage *message);
+					LoginApp();
+	virtual			~LoginApp();
+	void			ReadyToRun();
+	void			MessageReceived(BMessage *message);
+	void			ArgvReceived(int32 argc, char **argv);
 
 private:
-	void TryLogin(BMessage *message);
-	status_t ValidateLogin(const char *login, const char *password/*, bool force = false*/);
-	status_t StartUserSession(const char *login);
-	int getpty(char *pty, char *tty);
+	void			TryLogin(BMessage *message);
+	status_t		ValidateLogin(const char *login, const char *password);
+	status_t		StartUserSession(const char *login);
+	int				getpty(char *pty, char *tty);
 	
-	BWindow*		fDesktopWindow;
+	DesktopWindow*	fDesktopWindow;
 	LoginWindow*	fLoginWindow;
-
-	//TODO:
-	//BShelf*			fDesktopShelf;
+	bool			fEditShelfMode;
 };
 
 #endif	// _LOGINAPP_H_

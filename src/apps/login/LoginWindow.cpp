@@ -9,7 +9,8 @@ LoginWindow::LoginWindow(BRect frame)
 		WINDOW_FEEL, 
 		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | 
 		B_NOT_MINIMIZABLE | B_NOT_RESIZABLE | 
-		B_ASYNCHRONOUS_CONTROLS)
+		B_ASYNCHRONOUS_CONTROLS,
+		B_ALL_WORKSPACES)
 {
 	LoginView *v = new LoginView(Bounds());
 	AddChild(v);

@@ -14,6 +14,7 @@ if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
 
 Application Login :
+	DesktopWindow.cpp
 	LoginApp.cpp
 	LoginWindow.cpp
 	LoginView.cpp
