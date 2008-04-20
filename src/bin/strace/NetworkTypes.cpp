@@ -7,7 +7,6 @@
  * 		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
-// headers required for network structures
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,14 +14,13 @@
 #include <map>
 #include <utility>
 
-#include <net_stack_driver.h>
-
 #include "Context.h"
 #include "MemoryReader.h"
 #include "TypeHandler.h"
 
 using std::map;
 using std::pair;
+
 
 template<typename Type>
 static bool
@@ -40,6 +38,7 @@ obtain_pointer_data(Context &context, Type *data, void *address, uint32 what)
 	return true;
 }
 
+
 static string
 format_number(uint32 value)
 {
@@ -47,6 +46,7 @@ format_number(uint32 value)
 	snprintf(tmp, sizeof(tmp), "%u", (unsigned int)value);
 	return tmp;
 }
+
 
 static string
 read_fdset(Context &context, void *data)
@@ -89,10 +89,11 @@ read_fdset(Context &context, void *data)
 	return r;
 }
 
+
 template<>
 string
 TypeHandlerImpl<fd_set *>::GetParameterValue(Context &context, Parameter *,
-						    const void *address)
+	const void *address)
 {
 	void *data = *(void **)address;
 	if (data != NULL && context.GetContents(Context::SIMPLE_STRUCTS))
@@ -100,12 +101,14 @@ TypeHandlerImpl<fd_set *>::GetParameterValue(Context &context, Parameter *,
 	return context.FormatPointer(data);
 }
 
+
 template<>
 string
 TypeHandlerImpl<fd_set *>::GetReturnValue(Context &context, uint64 value)
 {
 	return context.FormatPointer((void *)value);
 }
+
 
 template<typename Type>
 static string
@@ -119,6 +122,7 @@ format_pointer_value(Context &context, void *address)
 	return context.FormatPointer(address);
 }
 
+
 static string
 get_ipv4_address(in_addr *addr)
 {
@@ -131,6 +135,7 @@ get_ipv4_address(in_addr *addr)
 	return tmp;
 }
 
+
 static string
 format_socket_family(Context &context, int family)
 {
@@ -140,56 +145,61 @@ format_socket_family(Context &context, int family)
 			return #family
 
 		switch (family) {
-		SOCKET_FAMILY(AF_UNSPEC);
-		SOCKET_FAMILY(AF_INET);
-		SOCKET_FAMILY(AF_APPLETALK);
-		SOCKET_FAMILY(AF_ROUTE);
-		SOCKET_FAMILY(AF_LINK);
-		SOCKET_FAMILY(AF_INET6);
-		SOCKET_FAMILY(AF_LOCAL);
+			SOCKET_FAMILY(AF_UNSPEC);
+			SOCKET_FAMILY(AF_INET);
+			SOCKET_FAMILY(AF_APPLETALK);
+			SOCKET_FAMILY(AF_ROUTE);
+			SOCKET_FAMILY(AF_LINK);
+			SOCKET_FAMILY(AF_INET6);
+			SOCKET_FAMILY(AF_LOCAL);
 		}
 	}
 
 	return "family = " + context.FormatSigned(family);
 }
 
+
+#if 0
 static string
 format_socket_type(Context &context, int type)
 {
 	if (context.GetContents(Context::ENUMERATIONS)) {
 		switch (type) {
-		case SOCK_RAW:
-			return "SOCK_RAW";
-		case SOCK_DGRAM:
-			return "SOCK_DGRAM";
-		case SOCK_STREAM:
-			return "SOCK_STREAM";
+			case SOCK_RAW:
+				return "SOCK_RAW";
+			case SOCK_DGRAM:
+				return "SOCK_DGRAM";
+			case SOCK_STREAM:
+				return "SOCK_STREAM";
 		}
 	}
 
 	return "type = " + context.FormatSigned(type);
 }
 
+
 static string
 format_socket_protocol(Context &context, int protocol)
 {
 	if (context.GetContents(Context::ENUMERATIONS)) {
 		switch (protocol) {
-		case IPPROTO_IP:
-			return "IPPROTO_IP";
-		case IPPROTO_RAW:
-			return "IPPROTO_RAW";
-		case IPPROTO_ICMP:
-			return "IPPROTO_ICMP";
-		case IPPROTO_UDP:
-			return "IPPROTO_UDP";
-		case IPPROTO_TCP:
-			return "IPPROTO_TCP";
+			case IPPROTO_IP:
+				return "IPPROTO_IP";
+			case IPPROTO_RAW:
+				return "IPPROTO_RAW";
+			case IPPROTO_ICMP:
+				return "IPPROTO_ICMP";
+			case IPPROTO_UDP:
+				return "IPPROTO_UDP";
+			case IPPROTO_TCP:
+				return "IPPROTO_TCP";
 		}
 	}
 
 	return "protocol = " + context.FormatSigned(protocol);
 }
+#endif
+
 
 static string
 format_pointer(Context &context, sockaddr *saddr)
@@ -201,20 +211,22 @@ format_pointer(Context &context, sockaddr *saddr)
 	r = format_socket_family(context, saddr->sa_family) + ", ";
 
 	switch (saddr->sa_family) {
-	case AF_INET:
-		r += get_ipv4_address(&sin->sin_addr);
-		r += "/";
-		r += format_number(ntohs(sin->sin_port));
-		break;
+		case AF_INET:
+			r += get_ipv4_address(&sin->sin_addr);
+			r += "/";
+			r += format_number(ntohs(sin->sin_port));
+			break;
 
-	default:
-		r += "...";
-		break;
+		default:
+			r += "...";
+			break;
 	}
 
 	return r;
 }
 
+
+#if 0
 static string
 format_pointer(Context &context, sockaddr_args *args)
 {
@@ -225,6 +237,7 @@ format_pointer(Context &context, sockaddr_args *args)
 
 	return r;
 }
+
 
 struct socket_option_info {
 	int level;
@@ -306,6 +319,7 @@ private:
 
 static const SocketOptionsMap kSocketOptionsMap;
 
+
 static string
 format_pointer(Context &context, sockopt_args *args)
 {
@@ -344,6 +358,7 @@ format_pointer(Context &context, sockopt_args *args)
 	return level + ", " + option + ", " + value;
 }
 
+
 static string
 format_pointer(Context &context, socket_args *args)
 {
@@ -355,6 +370,7 @@ format_pointer(Context &context, socket_args *args)
 
 	return r;
 }
+
 
 static string
 get_iovec(Context &context, iovec *iov, int iovlen)
@@ -368,6 +384,7 @@ get_iovec(Context &context, iovec *iov, int iovlen)
 	return r + "}";
 }
 
+
 static string
 format_pointer(Context &context, message_args *msg)
 {
@@ -380,6 +397,7 @@ format_pointer(Context &context, message_args *msg)
 
 	return r;
 }
+
 
 static string
 format_pointer(Context &context, msghdr *h)
@@ -397,12 +415,14 @@ format_pointer(Context &context, msghdr *h)
 
 	return r;
 }
+#endif
 
 static string
 format_pointer(Context &context, ifreq *ifr)
 {
 	return string(ifr->ifr_name) + ", ...";
 }
+
 
 static string
 format_pointer(Context &context, ifconf *conf)
@@ -452,10 +472,11 @@ format_pointer(Context &context, ifconf *conf)
 	return r + "]";
 }
 
+
 template<typename Type>
 class SpecializedPointerTypeHandler : public TypeHandler {
 	string GetParameterValue(Context &context, Parameter *,
-				 const void *address)
+		const void *address)
 	{
 		return format_pointer_value<Type>(context, *(void **)address);
 	}
@@ -481,8 +502,11 @@ class SpecializedPointerTypeHandler : public TypeHandler {
 DEFINE_TYPE(fdset_ptr, fd_set *);
 POINTER_TYPE(ifconf_ptr, ifconf);
 POINTER_TYPE(ifreq_ptr, ifreq);
+#if 0
 POINTER_TYPE(message_args_ptr, message_args);
 POINTER_TYPE(msghdr_ptr, msghdr);
 POINTER_TYPE(sockaddr_args_ptr, sockaddr_args);
 POINTER_TYPE(sockopt_args_ptr, sockopt_args);
 POINTER_TYPE(socket_args_ptr, socket_args);
+#endif
+
