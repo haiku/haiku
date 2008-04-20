@@ -11,6 +11,8 @@ const uint32 kSuspendAction = 'susp';
 const uint32 kLoginBad = 'lgba';
 const uint32 kLoginOk = 'lgok';
 
+class LoginWindow;
+
 class LoginApp : public BApplication {
 public:
 	LoginApp();
@@ -23,7 +25,12 @@ private:
 	status_t ValidateLogin(const char *login, const char *password/*, bool force = false*/);
 	status_t StartUserSession(const char *login);
 	int getpty(char *pty, char *tty);
+	
+	BWindow*		fDesktopWindow;
+	LoginWindow*	fLoginWindow;
 
+	//TODO:
+	//BShelf*			fDesktopShelf;
 };
 
 #endif	// _LOGINAPP_H_

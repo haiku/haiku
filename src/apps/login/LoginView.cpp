@@ -1,4 +1,5 @@
 #include <ScrollView.h>
+#include <String.h>
 #include <Window.h>
 
 #include <pwd.h>

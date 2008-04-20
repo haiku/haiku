@@ -34,7 +34,5 @@ private:
 	BButton*		fRebootButton;
 	BButton*		fLoginButton;
 	BStringView*	fInfoView;
-	//TODO:
-	//BShelf*			fShelf;
 };
 

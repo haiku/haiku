@@ -1,6 +1,7 @@
 #include <Alert.h>
 #include <Screen.h>
 #include <String.h>
+#include <View.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -18,6 +19,10 @@
 
 
 const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
+
+const window_feel kPrivateDesktopWindowFeel = window_feel(1024);
+const window_look kPrivateDesktopWindowLook = window_look(4);
+	// this is a mirror of an app server private values
 
 
 LoginApp::LoginApp()
@@ -38,8 +43,23 @@ LoginApp::ReadyToRun()
 	BRect frame(0, 0, 400, 150);
 	frame.OffsetBySelf(s.Frame().Width()/2 - frame.Width()/2, 
 						s.Frame().Height()/2 - frame.Height()/2);
-	LoginWindow *w = new LoginWindow(frame);
-	w->Show();
+	fLoginWindow = new LoginWindow(frame);
+	fLoginWindow->Show();
+	
+	BScreen screen;
+	fDesktopWindow = new BWindow(screen.Frame(), "Desktop", 
+		kPrivateDesktopWindowLook, 
+		kPrivateDesktopWindowFeel, 
+		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
+		 | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
+		 | B_ASYNCHRONOUS_CONTROLS,
+		B_ALL_WORKSPACES);
+	BView *desktop = new BView(fDesktopWindow->Bounds(), "desktop", 
+		B_FOLLOW_NONE, 0);
+	desktop->SetViewColor(screen.DesktopColor());
+	fDesktopWindow->AddChild(desktop);
+	fDesktopWindow->Show();
+	// TODO: add a shelf with Activity Monitor replicant :)
 }
 
 
