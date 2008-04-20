@@ -254,11 +254,11 @@ LegacyBootDrive::ReadPartitions(BMessage *settings)
 				off_t size = sizeof(kBootLoader);
 				if (!recorder.HasPartitions() || recorder.FirstOffset() < size)
 					return kErrorBootSectorTooSmall;
+	
+				// TODO remove when booting from all drives works
+				break;
 			#endif
 		}
-		
-		// TODO remove when booting from all drives works
-		break;
 	}	
 
 	#if USE_SECOND_DISK
@@ -514,7 +514,8 @@ void
 LegacyBootDrive::_CopyPartitionTable(MasterBootRecord* destination,
 		const MasterBootRecord* source)
 {
-	memcpy(destination->partition, source->partition, sizeof(source->partition));
+	memcpy(destination->diskSignature, source->diskSignature, 
+		sizeof(source->diskSignature) + sizeof(source->reserved) + sizeof(source->partition));
 }
 
 
