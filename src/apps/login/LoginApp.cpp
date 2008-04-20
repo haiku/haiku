@@ -1,6 +1,9 @@
+#include <Alert.h>
 #include <Screen.h>
+#include <String.h>
 
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <pwd.h>
 
@@ -8,6 +11,7 @@
 #include "LoginWindow.h"
 
 #ifdef __HAIKU__
+#include <RosterPrivate.h>
 #include <shadow.h>
 #include "multiuser_utils.h"
 #endif
@@ -31,7 +35,7 @@ void
 LoginApp::ReadyToRun()
 {
 	BScreen s;
-	BRect frame(0, 0, 300, 100);
+	BRect frame(0, 0, 400, 150);
 	frame.OffsetBySelf(s.Frame().Width()/2 - frame.Width()/2, 
 						s.Frame().Height()/2 - frame.Height()/2);
 	LoginWindow *w = new LoginWindow(frame);
@@ -42,16 +46,39 @@ LoginApp::ReadyToRun()
 void
 LoginApp::MessageReceived(BMessage *message)
 {
+	bool reboot = false;
+
 	switch (message->what) {
-	case kAttemptLogin:
-		break;
+		case kAttemptLogin:
+			message->PrintToStream();
+			TryLogin(message);
+			// TODO
+			break;
+#ifdef __HAIKU__
+		case kHaltAction:
+			reboot = false;
+			// FALLTHROUGH
+		case kRebootAction:
+		{
+			BRoster roster;
+			BRoster::Private rosterPrivate(roster);
+			status_t error = rosterPrivate.ShutDown(reboot, false, false);
+			if (error < B_OK) {
+				BString msg("Error: ");
+				msg << strerror(error);
+				(new BAlert("Error", msg.String(), "Ok"))->Go();
+			}
+			break;
+		}
+		case kSuspendAction:
+			(new BAlert("Error", "Unimplemented", "Ok"))->Go();
+			break;
+#endif
 	default:
 		BApplication::MessageReceived(message);
 	}
 }
 
-	void TryLogin(BMessage *message);
-	status_t ValidateLogin(const char *login, const char *password/*, bool force = false*/);
 
 void
 LoginApp::TryLogin(BMessage *message)
@@ -59,13 +86,14 @@ LoginApp::TryLogin(BMessage *message)
 	status_t err;
 	const char *login;
 	const char *password;
-	BMessage reply(B_REPLY);
+	BMessage reply(kLoginBad);
 	if (message->FindString("login", &login) == B_OK) {
 		if (message->FindString("password", &password) < B_OK)
 			password = NULL;
 		err = ValidateLogin(login, password);
+		printf("ValidateLogin: %s\n", strerror(err));
 		if (err == B_OK) {
-			reply.AddInt32("error", B_OK);
+			reply.what = kLoginOk;
 			message->SendReply(&reply);
 			
 			if (password == NULL)
@@ -109,11 +137,11 @@ LoginApp::ValidateLogin(const char *login, const char *password/*, bool force = 
 		return B_OK;
 #else
 	// for testing
-	if (strcmp(crypt(password, pwd->pw_passwd), pwd->pw_passwd))
-		return B_NOT_ALLOWED;
+	if (strcmp(crypt(password, pwd->pw_passwd), pwd->pw_passwd) == 0)
+		return B_OK;
 #endif
 
-	return B_NOT_ALLOWED;
+	return B_PERMISSION_DENIED;
 }
 
 
