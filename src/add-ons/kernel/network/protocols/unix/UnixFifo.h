@@ -24,6 +24,9 @@
 #define UNIX_FIFO_MAXIMAL_CAPACITY	(128 * 1024)
 
 
+#define TRACE_BUFFER_QUEUE	1
+
+
 class UnixBufferQueue {
 public:
 	UnixBufferQueue(size_t capacity);
@@ -39,6 +42,11 @@ public:
 	size_t Capacity() const		{ return fCapacity; }
 	void SetCapacity(size_t capacity);
 
+#if TRACE_BUFFER_QUEUE
+	void ParanoiaReadCheck(net_buffer* buffer);
+	void PostReadWrite();
+#endif
+
 private:
 	typedef DoublyLinkedList<net_buffer, DoublyLinkedListCLink<net_buffer> >
 		BufferList;
@@ -46,6 +54,12 @@ private:
 	BufferList	fBuffers;
 	size_t		fSize;
 	size_t		fCapacity;
+#if TRACE_BUFFER_QUEUE
+	off_t		fWritten;
+	off_t		fRead;
+	uint8*		fParanoiaCheckBuffer;
+	uint8*		fParanoiaCheckBuffer2;
+#endif
 };
 
 
