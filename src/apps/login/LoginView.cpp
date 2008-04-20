@@ -22,6 +22,7 @@ LoginView::LoginView(BRect frame)
 	AddChild(fLoginControl);
 	r.OffsetBySelf(0, CSEP + CSEP);
 	fPasswordControl = new BTextControl(r, "password", "password:", "", new BMessage(kPasswordEdited));
+	fPasswordControl->TextView()->HideTyping(true);
 	AddChild(fPasswordControl);
 	
 }

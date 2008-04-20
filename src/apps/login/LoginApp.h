@@ -1,7 +1,7 @@
 #include <Application.h>
 
 /* try loging in a user */
-const uint32 kMsgOpenFilePanel = 'logi';
+const uint32 kAttemptLogin = 'logi';
 
 class LoginApp : public BApplication {
 public:

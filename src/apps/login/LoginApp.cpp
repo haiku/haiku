@@ -3,12 +3,14 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <pwd.h>
-#include <shadow.h>
 
 #include "LoginApp.h"
 #include "LoginWindow.h"
 
+#ifdef __HAIKU__
+#include <shadow.h>
 #include "multiuser_utils.h"
+#endif
 
 
 const char *kLoginAppSig = "application/x-vnd.Haiku-Login";
@@ -41,7 +43,7 @@ void
 LoginApp::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-	case kMsgOpenFilePanel:
+	case kAttemptLogin:
 		break;
 	default:
 		BApplication::MessageReceived(message);
@@ -102,8 +104,15 @@ LoginApp::ValidateLogin(const char *login, const char *password/*, bool force = 
 		return B_OK;
 	}
 
+#ifdef __HAIKU__
 	if (verify_password(pwd, getspnam(login), password))
 		return B_OK;
+#else
+	// for testing
+	if (strcmp(crypt(password, pwd->pw_passwd), pwd->pw_passwd))
+		return B_NOT_ALLOWED;
+#endif
+
 	return B_NOT_ALLOWED;
 }
 
