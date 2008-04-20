@@ -141,7 +141,7 @@ struct CObjectDelete
 	template<typename Destructor>
 	inline void operator=(Destructor destructor)
 	{
-		fDestructor = /*(void (*)(Type*))*/destructor;
+		fDestructor = destructor;
 	}
 
 private:
@@ -167,11 +167,54 @@ struct CObjectDeleter
 	}
 };
 
+
+// MethodDeleter
+
+template<typename Type, typename DestructorReturnType>
+struct MethodDelete
+{
+	inline void operator()(Type *object)
+	{
+		if (fDestructor)
+			(object->*fDestructor)();
+	}
+
+	template<typename Destructor>
+	inline void operator=(Destructor destructor)
+	{
+		fDestructor = destructor;
+	}
+
+private:
+	DestructorReturnType (Type::*fDestructor)();
+};
+
+
+template<typename Type, typename DestructorReturnType = void>
+struct MethodDeleter
+	: AutoDeleter<Type, MethodDelete<Type, DestructorReturnType> >
+{
+	typedef AutoDeleter<Type, MethodDelete<Type, DestructorReturnType> > Base;
+
+	template<typename Destructor>
+	MethodDeleter(Destructor destructor) : Base()
+	{
+		Base::fDelete = destructor;
+	}
+
+	template<typename Destructor>
+	MethodDeleter(Type *object, Destructor destructor) : Base(object)
+	{
+		Base::fDelete = destructor;
+	}
+};
+
 }	// namespace BPrivate
 
 using BPrivate::ObjectDeleter;
 using BPrivate::ArrayDeleter;
 using BPrivate::MemoryDeleter;
 using BPrivate::CObjectDeleter;
+using BPrivate::MethodDeleter;
 
 #endif	// _AUTO_DELETER_H
