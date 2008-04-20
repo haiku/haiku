@@ -1350,7 +1350,6 @@ BApplication::write_drag(_BSession_ *session, BMessage *message)
 bool
 BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 {
-	bool canQuit = true;
 	int32 index = 0;
 	while (true) {
 		 BWindow *window = WindowAt(index);
@@ -1365,8 +1364,7 @@ BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 			continue;
 
 		// don't quit file panels if we haven't been asked for it
-		if (quitFilePanels ^ window->IsFilePanel()) {
-			canQuit = false;
+		if (!quitFilePanels && window->IsFilePanel()) {
 			window->Unlock();
 			index++;
 			continue;
@@ -1389,7 +1387,7 @@ BApplication::_WindowQuitLoop(bool quitFilePanels, bool force)
 			// we need to continue at the start of the list again - it
 			// might have changed
 	}
-	return canQuit;
+	return true;
 }
 
 
@@ -1403,7 +1401,7 @@ BApplication::_QuitAllWindows(bool force)
 	Unlock();
 
 	bool quit = _WindowQuitLoop(false, force);
-	if (!quit)
+	if (quit)
 		quit = _WindowQuitLoop(true, force);
 
 	Lock();
