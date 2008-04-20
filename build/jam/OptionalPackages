@@ -161,7 +161,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 # OpenSSL
 if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 	if $(HAIKU_GCC_VERSION[1]) >= 4 {
-		Echo "No optional package Pe available for gcc4" ;
+		Echo "No optional package OpenSSL available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage openssl-0.9.8g-gcc2-2008-03-28
