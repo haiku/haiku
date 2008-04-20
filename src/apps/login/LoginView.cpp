@@ -117,7 +117,7 @@ LoginView::MessageReceived(BMessage *message)
 			break;
 		case kHidePassword:
 			fPasswordControl->TextView()->HideTyping(
-				fHidePasswordCheckBox->Value() == 0);
+				fHidePasswordCheckBox->Value());
 			break;
 		case kAttemptLogin:
 		{
