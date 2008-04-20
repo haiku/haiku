@@ -22,3 +22,10 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
 	return 0;
 }
 
+
+int
+pthread_sigmask(int how, const sigset_t *set, sigset_t *oldSet)
+{
+	return sigprocmask(how, set, oldSet);
+}
+
