@@ -12,13 +12,15 @@
 
 #ifdef __cplusplus
 
+#include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
 
 class PrivateConditionVariable;
 
 
-struct PrivateConditionVariableEntry {
+struct PrivateConditionVariableEntry
+	: DoublyLinkedListLinkImpl<PrivateConditionVariableEntry> {
 public:
 #if KDEBUG
 	inline PrivateConditionVariableEntry()
@@ -38,16 +40,10 @@ public:
 	inline	PrivateConditionVariable* Variable() const
 		{ return fVariable; }
 
-	inline	PrivateConditionVariableEntry* ThreadNext() const
-		{ return fThreadNext; }
-	inline	PrivateConditionVariableEntry* ThreadPrevious() const
-		{ return fThreadPrevious; }
-
 	class Private;
 
 protected:
-			bool				Add(const void* object,
-									PrivateConditionVariableEntry* threadNext);
+			bool				Add(const void* object);
 			status_t			Wait(uint32 flags);
 			status_t			Wait(const void* object, uint32 flags);
 
@@ -55,14 +51,10 @@ private:
 			void				_Remove();
 
 protected:
-			PrivateConditionVariableEntry* fVariableNext;
 			PrivateConditionVariable* fVariable;
 			struct thread*		fThread;
 			uint32				fFlags;
 			status_t			fResult;
-
-			PrivateConditionVariableEntry* fThreadPrevious;
-			PrivateConditionVariableEntry* fThreadNext;
 
 			friend class PrivateConditionVariable;
 			friend class Private;
@@ -85,9 +77,11 @@ private:
 			void				_Notify(bool all, status_t result);
 
 protected:
+			typedef DoublyLinkedList<PrivateConditionVariableEntry> EntryList;
+
 			const void*			fObject;
 			const char*			fObjectType;
-			PrivateConditionVariableEntry* fEntries;
+			EntryList			fEntries;
 
 			friend class PrivateConditionVariableEntry;
 			friend class ConditionVariableHashDefinition;
@@ -109,9 +103,7 @@ public:
 template<typename Type = void>
 class ConditionVariableEntry : public PrivateConditionVariableEntry {
 public:
-	inline	bool				Add(const Type* object,
-									PrivateConditionVariableEntry* threadNext
-										= NULL);
+	inline	bool				Add(const Type* object);
 	inline	status_t			Wait(uint32 flags = 0);
 	inline	status_t			Wait(const Type* object, uint32 flags = 0);
 };
@@ -151,10 +143,9 @@ ConditionVariable<Type>::NotifyAll(bool threadsLocked)
 
 template<typename Type>
 inline bool
-ConditionVariableEntry<Type>::Add(const Type* object,
-	PrivateConditionVariableEntry* threadNext)
+ConditionVariableEntry<Type>::Add(const Type* object)
 {
-	return PrivateConditionVariableEntry::Add(object, threadNext);
+	return PrivateConditionVariableEntry::Add(object);
 }
 
 

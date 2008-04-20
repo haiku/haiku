@@ -92,8 +92,7 @@ dump_condition_variable(int argc, char** argv)
 
 
 bool
-PrivateConditionVariableEntry::Add(const void* object,
-	PrivateConditionVariableEntry* threadNext)
+PrivateConditionVariableEntry::Add(const void* object)
 {
 	ASSERT(object != NULL);
 
@@ -104,22 +103,11 @@ PrivateConditionVariableEntry::Add(const void* object,
 	InterruptsLocker _;
 	SpinLocker locker(sConditionVariablesLock);
 
-	// add to the list of entries for this thread
-	fThreadNext = threadNext;
-	if (threadNext) {
-		fThreadPrevious = threadNext->fThreadPrevious;
-		threadNext->fThreadPrevious = this;
-		if (fThreadPrevious)
-			fThreadPrevious->fThreadNext = this;
-	} else
-		fThreadPrevious = NULL;
-
 	// add to the queue for the variable
 	fVariable = sConditionVariableHash.Lookup(object);
-	if (fVariable) {
-		fVariableNext = fVariable->fEntries;
-		fVariable->fEntries = this;
-	} else
+	if (fVariable)
+		fVariable->fEntries.Add(this);
+	else
 		fResult = B_ENTRY_NOT_FOUND;
 
 	return (fVariable != NULL);
@@ -139,22 +127,11 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 	SpinLocker threadLocker(thread_spinlock);
 	SpinLocker locker(sConditionVariablesLock);
 
-	// get first entry for this thread
-	PrivateConditionVariableEntry* firstEntry = this;
-	while (firstEntry->fThreadPrevious)
-		firstEntry = firstEntry->fThreadPrevious;
-
-	// check whether any entry has already been notified
+	// check whether this entry has already been notified
 	// (set the flags while at it)
-	PrivateConditionVariableEntry* entry = firstEntry;
-	while (entry) {
-		if (entry->fVariable == NULL)
-			return entry->fResult;
-
-		entry->fFlags = flags;
-
-		entry = entry->fThreadNext;
-	}
+	if (fVariable == NULL)
+		return fResult;
+	fFlags = flags;
 
 	// When interruptable, check pending signals first
 	struct thread* thread = thread_get_current_thread();
@@ -162,32 +139,28 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 			&& (thread->sig_pending & ~thread->sig_block_mask) != 0)
 		|| ((flags & B_KILL_CAN_INTERRUPT)
 			&& (thread->sig_pending & KILL_SIGNALS))) {
-		// remove all of the thread's entries from their variables
-		entry = firstEntry;
-		while (entry) {
-			entry->_Remove();
-			entry = entry->fThreadNext;
-		}
+		// remove entry from the variables
+		_Remove();
 		return B_INTERRUPTED;
 	}
 
 	// wait
 	thread->next_state = B_THREAD_WAITING;
-	thread->condition_variable_entry = firstEntry;
+	thread->condition_variable_entry = this;
 	thread->sem.blocking = -1;
 
 	locker.Unlock();
 	scheduler_reschedule();
 	threadLocker.Unlock();
 
-	return firstEntry->fResult;
+	return fResult;
 }
 
 
 status_t
 PrivateConditionVariableEntry::Wait(const void* object, uint32 flags)
 {
-	if (Add(object, NULL))
+	if (Add(object))
 		return Wait(flags);
 	return B_ENTRY_NOT_FOUND;
 }
@@ -199,28 +172,9 @@ PrivateConditionVariableEntry::Wait(const void* object, uint32 flags)
 void
 PrivateConditionVariableEntry::_Remove()
 {
-	if (!fVariable)
-		return;
-
-	// fast path, if we're first in queue
-	if (this == fVariable->fEntries) {
-		fVariable->fEntries = fVariableNext;
-		fVariableNext = NULL;
+	if (fVariable) {
+		fVariable->fEntries.Remove(this);
 		fVariable = NULL;
-		return;
-	}
-
-	// we're not the first entry -- find our previous entry
-	PrivateConditionVariableEntry* entry = fVariable->fEntries;
-	while (entry->fVariableNext) {
-		if (this == entry->fVariableNext) {
-			entry->fVariableNext = fVariableNext;
-			fVariableNext = NULL;
-			fVariable = NULL;
-			return;
-		}
-
-		entry = entry->fVariableNext;
 	}
 }
 
@@ -252,12 +206,7 @@ PrivateConditionVariable::ListAll()
 	ConditionVariableHash::Iterator it(&sConditionVariableHash);
 	while (PrivateConditionVariable* variable = it.Next()) {
 		// count waiting threads
-		int count = 0;
-		PrivateConditionVariableEntry* entry = variable->fEntries;
-		while (entry) {
-			count++;
-			entry = entry->fVariableNext;
-		}
+		int count = variable->fEntries.Size();
 
 		kprintf("%p  %p  %-20s %15d\n", variable, variable->fObject,
 			variable->fObjectType, count);
@@ -271,10 +220,10 @@ PrivateConditionVariable::Dump() const
 	kprintf("condition variable %p\n", this);
 	kprintf("  object:  %p (%s)\n", fObject, fObjectType);
 	kprintf("  threads:");
-	PrivateConditionVariableEntry* entry = fEntries;
-	while (entry) {
+
+	for (EntryList::ConstIterator it = fEntries.GetIterator();
+		 PrivateConditionVariableEntry* entry = it.Next();) {
 		kprintf(" %ld", entry->fThread->id);
-		entry = entry->fVariableNext;
 	}
 	kprintf("\n");
 }
@@ -287,7 +236,7 @@ PrivateConditionVariable::Publish(const void* object, const char* objectType)
 
 	fObject = object;
 	fObjectType = objectType;
-	fEntries = NULL;
+	new(&fEntries) EntryList;
 
 	InterruptsLocker _;
 	SpinLocker locker(sConditionVariablesLock);
@@ -320,7 +269,7 @@ PrivateConditionVariable::Unpublish(bool threadsLocked)
 	fObject = NULL;
 	fObjectType = NULL;
 
-	if (fEntries)
+	if (!fEntries.IsEmpty())
 		_Notify(true, B_ENTRY_NOT_FOUND);
 }
 
@@ -342,7 +291,7 @@ PrivateConditionVariable::Notify(bool all, bool threadsLocked)
 	}
 #endif
 
-	if (fEntries)
+	if (!fEntries.IsEmpty())
 		_Notify(all, B_OK);
 }
 
@@ -354,28 +303,13 @@ void
 PrivateConditionVariable::_Notify(bool all, status_t result)
 {
 	// dequeue and wake up the blocked threads
-	while (PrivateConditionVariableEntry* entry = fEntries) {
-		fEntries = entry->fVariableNext;
-		entry->fVariableNext = NULL;
+	while (PrivateConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		entry->fVariable = NULL;
 
 		struct thread* thread = entry->fThread;
 
 		if (thread->condition_variable_entry != NULL)
 			thread->condition_variable_entry->fResult = result;
-
-		// remove other entries of this thread from their respective variables
-		PrivateConditionVariableEntry* otherEntry = entry->fThreadPrevious;
-		while (otherEntry) {
-			otherEntry->_Remove();
-			otherEntry = otherEntry->fThreadPrevious;
-		}
-
-		otherEntry = entry->fThreadNext;
-		while (otherEntry) {
-			otherEntry->_Remove();
-			otherEntry = otherEntry->fThreadNext;
-		}
 
 		// wake up the thread
 		thread->condition_variable_entry = NULL;
@@ -415,12 +349,8 @@ condition_variable_interrupt_thread(struct thread* thread)
 
 	PrivateConditionVariableEntry::Private(*entry).SetResult(B_INTERRUPTED);
 
-	// remove all of the thread's entries from their variables
-	ASSERT(entry->ThreadPrevious() == NULL);
-	while (entry) {
-		PrivateConditionVariableEntry::Private(*entry).Remove();
-		entry = entry->ThreadNext();
-	}
+	// remove entry from its variable
+	PrivateConditionVariableEntry::Private(*entry).Remove();
 
 	// wake up the thread
 	thread->condition_variable_entry = NULL;
