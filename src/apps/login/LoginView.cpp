@@ -7,9 +7,30 @@
 #include "LoginApp.h"
 #include "LoginView.h"
 
+#define LW 120
 #define CSEP 15
 #define BH 20
 #define BW 60
+
+class PwdItem : public BStringItem {
+public:
+					PwdItem(struct passwd *pwd, uint32 level = 0, 
+						bool expanded = true)
+						 : BStringItem("", level, expanded)
+						{
+							if (pwd) {
+								BString name(pwd->pw_gecos);
+								// TODO: truncate at first ;
+								fLogin = pwd->pw_name;
+								SetText(name.String());
+							}
+						};
+	virtual			~PwdItem() {};
+	const char*		Login() const { return fLogin.String(); };
+private:
+	BString			fLogin;
+};
+
 
 LoginView::LoginView(BRect frame)
 	: BView(frame, "LoginView", B_FOLLOW_ALL, B_PULSE_NEEDED)
@@ -19,7 +40,7 @@ LoginView::LoginView(BRect frame)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 	BRect r;
-	r.Set(CSEP, CSEP, 90, Bounds().Height() - 3 * CSEP - BH);
+	r.Set(CSEP, CSEP, LW, Bounds().Height() - 3 * CSEP - BH);
 	fUserList = new BListView(r, "users");
 	BScrollView *sv = new BScrollView("userssv", fUserList, 
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
@@ -27,7 +48,7 @@ LoginView::LoginView(BRect frame)
 	fUserList->SetSelectionMessage(new BMessage(kUserSelected));
 	fUserList->SetInvocationMessage(new BMessage(kUserInvoked));
 	
-	r.Set(140, Bounds().top + CSEP, 
+	r.Set(LW + 30, Bounds().top + CSEP, 
 		Bounds().right - CSEP, Bounds().top + CSEP + CSEP);
 	fLoginControl = new BTextControl(r, "login", "login:", "", 
 		new BMessage(kLoginEdited));
@@ -112,10 +133,10 @@ LoginView::MessageReceived(BMessage *message)
 		{
 			int32 selection = fUserList->CurrentSelection();
 			if (selection > -1) {
-				BStringItem *item = dynamic_cast<BStringItem *>(
+				PwdItem *item = dynamic_cast<PwdItem *>(
 					fUserList->ItemAt(selection));
 				if (item)
-					fLoginControl->SetText(item->Text());
+					fLoginControl->SetText(item->Login());
 			}
 			break;
 		}
@@ -194,7 +215,7 @@ LoginView::AddNextUser()
 		strcmp(pwd->pw_shell, "/bin/false") && 
 		strcmp(pwd->pw_shell, "/bin/true")) {
 		// not disabled
-		BStringItem *item = new BStringItem(pwd->pw_name);
+		PwdItem *item = new PwdItem(pwd);
 		fUserList->AddItem(item);
 	}
 	if (pwd)
