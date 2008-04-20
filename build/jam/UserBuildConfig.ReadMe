@@ -139,6 +139,10 @@ HAIKU_IMAGE_LATE_USER_SCRIPTS	= $(HAIKU_TOP)/../late-image-script.sh ;
 HAIKU_ROOT_USER_NAME = bond  ;
 HAIKU_ROOT_USER_REAL_NAME = "James Bond" ;
 
+# Set host name to "mybox". By default the installation doesn't have a host
+# name.
+HAIKU_IMAGE_HOST_NAME = mybox ;
+
 # Add user "walter" with user ID 1000 and group ID 100 (note, that a group with
 # that ID should exist -- 100 already exists and is the "users" group), home
 # directory "/boot/home", shell "/bin/bash", and real name "Just Walter" to the

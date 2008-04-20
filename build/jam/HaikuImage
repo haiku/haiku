@@ -429,6 +429,23 @@ AddGroupToHaikuImage root : 0 : ;
 AddGroupToHaikuImage users : 100 : ;
 
 
+#pragma mark - Host Name
+
+
+if $(HAIKU_IMAGE_HOST_NAME) {
+	actions BuildHaikuImageHostnameFile
+	{
+		echo "$(HAIKU_IMAGE_HOST_NAME)" > $(1) 
+	}
+
+	local file = <haiku-image>hostname ;
+	Always $(file) ;
+	MakeLocate $(file) : $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
+	BuildHaikuImageHostnameFile $(file) ;
+	AddFilesToHaikuImage common settings network : $(file) ;
+}
+
+
 #pragma mark - Build The Image
 
 
