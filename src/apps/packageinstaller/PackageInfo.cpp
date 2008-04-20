@@ -572,6 +572,8 @@ PackageInfo::Parse()
 					fPackageFile->Read(pathname, length);
 					pathname[length] = 0;
 					BString *path = new BString(pathname);
+					if (length > 0 && pathname[length - 1] == '/')
+						path->Remove(length - 1, 1);
 					userPaths.AddItem(path);
 					delete pathname;
 				}
@@ -1025,8 +1027,10 @@ PackageInfo::Parse()
 						}
 					}
 
-					parser_debug("Adding link: %s!\n", dest.String());
-					item = new PkgLink(fPackageFile, dest, linkString, pathType,
+					parser_debug("Adding link: %s! (type %s)\n", dest.String(), 
+						pathType == P_SYSTEM_PATH ? "System"
+							: (localType == P_INSTALL_PATH ? "Install" : "User"));
+					item = new PkgLink(fPackageFile, dest, linkString, localType,
 						ctime, mtime, mode, offset, size);
 				}
 			}
