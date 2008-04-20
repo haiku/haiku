@@ -5,7 +5,9 @@
 #ifndef _PTHREAD_H_
 #define _PTHREAD_H_
 
+
 #include <time.h>
+
 
 typedef int							pthread_t;
 typedef struct  _pthread_attr		*pthread_attr_t;
@@ -108,30 +110,41 @@ extern pthread_cond_t _pthread_cond_static_initializer(void);
 
 /* mutex functions */
 extern int pthread_mutex_destroy(pthread_mutex_t *mutex);
-extern int pthread_mutex_getprioceiling(pthread_mutex_t *mutex, int *_priorityCeiling);
-extern int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *attr);
+extern int pthread_mutex_getprioceiling(pthread_mutex_t *mutex,
+	int *_priorityCeiling);
+extern int pthread_mutex_init(pthread_mutex_t *mutex,
+	const pthread_mutexattr_t *attr);
 extern int pthread_mutex_lock(pthread_mutex_t *mutex);
-extern int pthread_mutex_setprioceiling(pthread_mutex_t *mutex, int newPriorityCeiling,
-				int *_oldPriorityCeiling);
-extern int pthread_mutex_timedlock(pthread_mutex_t *mutex, const struct timespec *spec);
+extern int pthread_mutex_setprioceiling(pthread_mutex_t *mutex,
+	int newPriorityCeiling, int *_oldPriorityCeiling);
+extern int pthread_mutex_timedlock(pthread_mutex_t *mutex,
+	const struct timespec *spec);
 extern int pthread_mutex_trylock(pthread_mutex_t *mutex);
 extern int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 /* mutex attribute functions */
 extern int pthread_mutexattr_destroy(pthread_mutexattr_t *mutexAttr);
-extern int pthread_mutexattr_getprioceiling(pthread_mutexattr_t *mutexAttr, int *_priorityCeiling);
-extern int pthread_mutexattr_getprotocol(pthread_mutexattr_t *mutexAttr, int *_protocol);
-extern int pthread_mutexattr_getpshared(pthread_mutexattr_t *mutexAttr, int *_processShared);
-extern int pthread_mutexattr_gettype(pthread_mutexattr_t *mutexAttr, int *_type);
+extern int pthread_mutexattr_getprioceiling(pthread_mutexattr_t *mutexAttr,
+	int *_priorityCeiling);
+extern int pthread_mutexattr_getprotocol(pthread_mutexattr_t *mutexAttr,
+	int *_protocol);
+extern int pthread_mutexattr_getpshared(pthread_mutexattr_t *mutexAttr,
+	int *_processShared);
+extern int pthread_mutexattr_gettype(pthread_mutexattr_t *mutexAttr,
+	int *_type);
 extern int pthread_mutexattr_init(pthread_mutexattr_t *mutexAttr);
-extern int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *mutexAttr, int priorityCeiling);
-extern int pthread_mutexattr_setprotocol(pthread_mutexattr_t *mutexAttr, int protocol);
-extern int pthread_mutexattr_setpshared(pthread_mutexattr_t *mutexAttr, int processShared);
+extern int pthread_mutexattr_setprioceiling(pthread_mutexattr_t *mutexAttr,
+	int priorityCeiling);
+extern int pthread_mutexattr_setprotocol(pthread_mutexattr_t *mutexAttr,
+	int protocol);
+extern int pthread_mutexattr_setpshared(pthread_mutexattr_t *mutexAttr,
+	int processShared);
 extern int pthread_mutexattr_settype(pthread_mutexattr_t *mutexAttr, int type);
 
 /* condition variable functions */
 extern int pthread_cond_destroy(pthread_cond_t *cond);
-extern int pthread_cond_init(pthread_cond_t *cond, const pthread_condattr_t *attr);
+extern int pthread_cond_init(pthread_cond_t *cond,
+	const pthread_condattr_t *attr);
 extern int pthread_cond_broadcast(pthread_cond_t *cond);
 extern int pthread_cond_signal(pthread_cond_t *cond);
 extern int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mutex,
@@ -141,17 +154,21 @@ extern int pthread_cond_wait(pthread_cond_t *cond, pthread_mutex_t *mutex);
 /* condition variable attribute functions */
 extern int pthread_condattr_destroy(pthread_condattr_t *condAttr);
 extern int pthread_condattr_init(pthread_condattr_t *condAttr);
-extern int pthread_condattr_getpshared(const pthread_condattr_t *condAttr, int *processShared);
-extern int pthread_condattr_setpshared(pthread_condattr_t *condAttr, int processShared);
+extern int pthread_condattr_getpshared(const pthread_condattr_t *condAttr,
+	int *processShared);
+extern int pthread_condattr_setpshared(pthread_condattr_t *condAttr,
+	int processShared);
 
 /* misc. functions */
-extern int pthread_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void));
+extern int pthread_atfork(void (*prepare)(void), void (*parent)(void),
+	void (*child)(void));
 extern int pthread_once(pthread_once_t *once_control, void (*init_routine)());
 
 /* thread attributes functions */
 extern int pthread_attr_destroy(pthread_attr_t *attr);
 extern int pthread_attr_init(pthread_attr_t *attr);
-extern int pthread_attr_getdetachstate(const pthread_attr_t *attr, int *detachstate);
+extern int pthread_attr_getdetachstate(const pthread_attr_t *attr,
+	int *detachstate);
 extern int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
 
 /* thread functions */
@@ -172,7 +189,8 @@ extern int pthread_setcanceltype(int type, int *_oldType);
 extern void pthread_testcancel(void);
 
 /* thread specific data functions */
-extern int pthread_key_create(pthread_key_t *key, void (*destructor)(void*));
+extern int pthread_key_create(pthread_key_t *key,
+	void (*destructorFunc)(void*));
 extern int pthread_key_delete(pthread_key_t key);
 extern void *pthread_getspecific(pthread_key_t key);
 extern int pthread_setspecific(pthread_key_t key, const void *value);
