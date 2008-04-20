@@ -11,14 +11,14 @@
 #define BW 60
 
 LoginView::LoginView(BRect frame)
-	: BView(frame, "LoginView", B_FOLLOW_ALL, 0)
+	: BView(frame, "LoginView", B_FOLLOW_ALL, B_PULSE_NEEDED)
 {
 	// TODO: when I don't need to test in BeOS anymore, 
 	// rewrite to use layout engine.
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());
 	BRect r;
-	r.Set(CSEP, CSEP, 80, Bounds().Height() - 3 * CSEP - BH);
+	r.Set(CSEP, CSEP, 90, Bounds().Height() - 3 * CSEP - BH);
 	fUserList = new BListView(r, "users");
 	BScrollView *sv = new BScrollView("userssv", fUserList, 
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true);
@@ -59,12 +59,20 @@ LoginView::LoginView(BRect frame)
 		new BMessage(kRebootAction));
 	AddChild(fRebootButton);
 
+	BRect infoRect(buttonRect);
+	infoRect.OffsetBySelf(buttonWidth + CSEP, 0);
+
 	buttonRect.OffsetToSelf(Bounds().Width() - CSEP - buttonWidth, 
 		Bounds().Height() - CSEP - BH);
 	fLoginButton = new BButton(buttonRect, "ok", "Ok", 
 		new BMessage(kAttemptLogin));
 	AddChild(fLoginButton);
 
+	infoRect.right = buttonRect.left - CSEP + 5;
+	BString info;
+	//info << hostname;
+	fInfoView = new BStringView(infoRect, "info", info.String());
+	AddChild(fInfoView);
 }
 
 
@@ -130,6 +138,7 @@ LoginView::MessageReceived(BMessage *message)
 		case kLoginBad:
 			fPasswordControl->SetText("");
 			EnableControls(false);
+			fInfoView->SetText("Invalid login!");
 			if (Window()) {
 				BPoint savedPos = Window()->Frame().LeftTop();
 				for (int i = 0; i < 10; i++) {
@@ -153,6 +162,19 @@ LoginView::MessageReceived(BMessage *message)
 			message->PrintToStream();
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+LoginView::Pulse()
+{
+	BString info;
+	time_t now = time(NULL);
+	struct tm *t = localtime(&now);
+	// TODO: use strftime and locale settings
+	info << asctime(t);
+	info.RemoveSet("\r\n");
+	fInfoView->SetText(info.String());
 }
 
 
@@ -184,6 +206,10 @@ LoginView::AddNextUser()
 void
 LoginView::EnableControls(bool enable)
 {
+	int32 i;
+	for (i = 0; i < fUserList->CountItems(); i++) {
+		fUserList->ItemAt(i)->SetEnabled(enable);
+	}
 	fLoginControl->SetEnabled(enable);
 	fPasswordControl->SetEnabled(enable);
 	fHidePasswordCheckBox->SetEnabled(enable);

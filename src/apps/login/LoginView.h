@@ -3,6 +3,7 @@
 #include <View.h>
 #include <ListItem.h>
 #include <ListView.h>
+#include <StringView.h>
 #include <TextControl.h>
 
 const uint32 kUserSelected = 'usel';
@@ -19,6 +20,7 @@ public:
 	virtual		~LoginView();
 	void		AttachedToWindow();
 	void		MessageReceived(BMessage *message);
+	void		Pulse();
 
 private:
 	void		AddNextUser();
@@ -31,5 +33,8 @@ private:
 	BButton*		fHaltButton;
 	BButton*		fRebootButton;
 	BButton*		fLoginButton;
+	BStringView*	fInfoView;
+	//TODO:
+	//BShelf*			fShelf;
 };
 
