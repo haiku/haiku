@@ -9,12 +9,16 @@
 #include <Drivers.h>
 
 
+//#define UNIX_DEBUG_PRINT	dprintf
+#define UNIX_DEBUG_PRINT	ktrace_printf
+
 #if UNIX_DEBUG_LEVEL
-#	define	TRACE(args...)	dprintf(args)
+#	define	TRACE(args...)	UNIX_DEBUG_PRINT(args)
 #	define	PRINT_ERROR(error)										\
 		do {														\
-			dprintf("[%ld] l. %d: %s: %s\n", find_thread(NULL),		\
-				__LINE__, __PRETTY_FUNCTION__, strerror(error));	\
+			UNIX_DEBUG_PRINT("[%ld] l. %d: %s: %s\n",				\
+				find_thread(NULL), __LINE__, __PRETTY_FUNCTION__,	\
+				strerror(error));									\
 		} while (false)
 #	if	UNIX_DEBUG_LEVEL >= 2
 #		define	REPORT_ERROR(error)	PRINT_ERROR(error)
