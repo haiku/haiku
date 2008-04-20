@@ -1000,7 +1000,13 @@ dump_tracing(int argc, char** argv)
 				continue;
 			}
 
-			kprintf("%5ld. %s\n", index, out.DumpEntry(entry));
+			// don't print trailing new line
+			const char* dump = out.DumpEntry(entry);
+			int len = strlen(dump);
+			if (len > 0 && dump[len - 1] == '\n')
+				len--;
+
+			kprintf("%5ld. %.*s\n", index, len, dump);
 		} else if (!hasFilter)
 			kprintf("%5ld. ** uninitialized entry **\n", index);
 
