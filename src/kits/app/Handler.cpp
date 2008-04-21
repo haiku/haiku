@@ -178,6 +178,8 @@ BHandler::Archive(BMessage *data, bool deep) const
 	if (status < B_OK)
 		return status;
 
+	if (!fName)
+		return B_OK;
 	return data->AddString(kArchiveNameField, fName);
 }
 
