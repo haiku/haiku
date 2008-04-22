@@ -638,7 +638,7 @@ BShelf::Save()
 {
 	status_t status = B_ERROR;
 	if (fEntry != NULL) {
-		BFile *file = new BFile(fEntry, B_READ_WRITE);
+		BFile *file = new BFile(fEntry, B_READ_WRITE | B_ERASE_FILE);
 		status = file->InitCheck();
 		if (status < B_OK) {
 			delete file;
