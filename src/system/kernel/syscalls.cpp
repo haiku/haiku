@@ -58,6 +58,9 @@ static struct mutex sGenericSyscallLock;
 static struct list sGenericSyscalls;
 
 
+static int dump_syscall_tracing(int argc, char** argv);
+
+
 static generic_syscall *
 find_generic_syscall(const char *subsystem)
 {
@@ -206,7 +209,23 @@ status_t
 generic_syscall_init(void)
 {
 	list_init(&sGenericSyscalls);
-	return mutex_init(&sGenericSyscallLock, "generic syscall");
+	if (mutex_init(&sGenericSyscallLock, "generic syscall") != B_OK) {
+		panic("generic_syscall_init(): mutex init failed");
+		return B_ERROR;
+	}
+
+#if	ENABLE_TRACING && defined(SYSCALL_TRACING)
+	add_debugger_command_etc("straced", &dump_syscall_tracing,
+		"Dump recorded syscall trace entries",
+		"Prints recorded trace entries. It is wrapper for the \"traced\"\n"
+		"command and supports all of its command line options (though\n"
+		"backward tracing doesn't really work). The difference is that if a\n"
+		"pre syscall trace entry is encountered, the corresponding post\n"
+		"syscall traced entry is also printed, even if it doesn't match the\n"
+		"given filter.\n", 0);
+#endif	// ENABLE_TRACING
+
+	return B_OK;
 }
 
 
@@ -460,6 +479,139 @@ trace_post_syscall(int syscallNumber, uint64 returnValue)
 		new(std::nothrow) SyscallTracing::PostSyscall(syscallNumber,
 			returnValue);
 	}
+}
+
+
+using namespace SyscallTracing;
+
+class SyscallWrapperTraceFilter : public WrapperTraceFilter {
+public:
+	virtual void Init(TraceFilter* filter, int direction, bool continued)
+	{
+		fFilter = filter;
+		fHitThreadLimit = false;
+		fDirection = direction;
+
+		if (!continued)
+			fPendingThreadCount = 0;
+	}
+
+	virtual bool Filter(const TraceEntry* _entry, LazyTraceOutput& out)
+	{
+		if (fFilter == NULL)
+			return true;
+
+		if (fDirection < 0)
+			return fFilter->Filter(_entry, out);
+
+		if (const PreSyscall* entry = dynamic_cast<const PreSyscall*>(_entry)) {
+			_RemovePendingThread(entry->Thread());
+
+			bool accepted = fFilter->Filter(entry, out);
+			if (accepted)
+				_AddPendingThread(entry->Thread());
+			return accepted;
+
+		} else if (const PostSyscall* entry
+				= dynamic_cast<const PostSyscall*>(_entry)) {
+			bool wasPending = _RemovePendingThread(entry->Thread());
+
+			return wasPending || fFilter->Filter(entry, out);
+
+		} else if (const AbstractTraceEntry* entry
+				= dynamic_cast<const AbstractTraceEntry*>(_entry)) {
+			bool isPending = _IsPendingThread(entry->Thread());
+
+			return isPending || fFilter->Filter(entry, out);
+
+		} else {
+			return fFilter->Filter(_entry, out);
+		}
+	}
+
+	bool HitThreadLimit() const
+	{
+		return fHitThreadLimit;
+	}
+
+	int Direction() const
+	{
+		return fDirection;
+	}
+
+private:
+	enum {
+		MAX_PENDING_THREADS = 32
+	};
+
+	bool _AddPendingThread(thread_id thread)
+	{
+		int32 index = _PendingThreadIndex(thread);
+		if (index >= 0)
+			return true;
+
+		if (fPendingThreadCount == MAX_PENDING_THREADS) {
+			fHitThreadLimit = true;
+			return false;
+		}
+
+		fPendingThreads[fPendingThreadCount++] = thread;
+		return true;
+	}
+
+	bool _RemovePendingThread(thread_id thread)
+	{
+		int32 index = _PendingThreadIndex(thread);
+		if (index < 0)
+			return false;
+
+		if (index + 1 < fPendingThreadCount) {
+			memmove(fPendingThreads + index, fPendingThreads + index + 1,
+				fPendingThreadCount - index - 1);
+		}
+
+		fPendingThreadCount--;
+		return true;
+	}
+
+	bool _IsPendingThread(thread_id thread)
+	{
+		return _PendingThreadIndex(thread) >= 0;
+	}
+
+	int32 _PendingThreadIndex(thread_id thread)
+	{
+		for (int32 i = 0; i < fPendingThreadCount; i++) {
+			if (fPendingThreads[i] == thread)
+				return i;
+		}
+		return -1;
+	}
+
+	TraceFilter*	fFilter;
+	thread_id		fPendingThreads[MAX_PENDING_THREADS];
+	int32			fPendingThreadCount;
+	int				fDirection;
+	bool			fHitThreadLimit;
+};
+
+
+static SyscallWrapperTraceFilter sFilter;
+
+static int
+dump_syscall_tracing(int argc, char** argv)
+{
+	new(&sFilter) SyscallWrapperTraceFilter;
+	int result = dump_tracing(argc, argv, &sFilter);
+
+	if (sFilter.HitThreadLimit()) {
+		kprintf("Warning: The thread buffer was too small to track all "
+			"threads!\n");
+	} else if (sFilter.HitThreadLimit()) {
+		kprintf("Warning: Can't track syscalls backwards!\n");
+	}
+
+	return result;
 }
 
 
