@@ -76,14 +76,14 @@ BColorControl::_InitData(color_control_layout layout, float size,
 	fFocusedComponent = 0;
 		
 	if (archive) {
+		fRedText = (BTextControl*)FindView("_red");
+		fGreenText = (BTextControl*)FindView("_green");
+		fBlueText = (BTextControl*)FindView("_blue");
+
 		int32 value = 0;
 		archive->FindInt32("_val", &value);
 
 		SetValue(value);
-
-		fRedText = (BTextControl*)FindView("_red");
-		fGreenText = (BTextControl*)FindView("_green");
-		fBlueText = (BTextControl*)FindView("_blue");
 	} else {
 		BRect rect(0.0f, 0.0f, 70.0f, 15.0f);
 		float labelWidth = StringWidth("Green:") + 5;
