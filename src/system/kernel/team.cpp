@@ -1740,9 +1740,9 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 			}
 		}
 
-		// If we haven't got anything yet, add prepare for waiting for the
+		// If we haven't got anything yet, prepare for waiting for the
 		// condition variable.
-		ConditionVariableEntry<team_dead_children> deadWaitEntry;
+		ConditionVariableEntry deadWaitEntry;
 
 		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0)
 			deadWaitEntry.Add(team->dead_children, B_CAN_INTERRUPT);

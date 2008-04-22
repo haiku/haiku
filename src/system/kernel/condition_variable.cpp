@@ -22,16 +22,15 @@ static const int kConditionVariableHashSize = 512;
 
 struct ConditionVariableHashDefinition {
 	typedef const void* KeyType;
-	typedef	PrivateConditionVariable ValueType;
+	typedef	ConditionVariable ValueType;
 
 	size_t HashKey(const void* key) const
 		{ return (size_t)key; }
-	size_t Hash(PrivateConditionVariable* variable) const
+	size_t Hash(ConditionVariable* variable) const
 		{ return (size_t)variable->fObject; }
-	bool Compare(const void* key, PrivateConditionVariable* variable) const
+	bool Compare(const void* key, ConditionVariable* variable) const
 		{ return key == variable->fObject; }
-	HashTableLink<PrivateConditionVariable>* GetLink(
-			PrivateConditionVariable* variable) const
+	HashTableLink<ConditionVariable>* GetLink(ConditionVariable* variable) const
 		{ return variable; }
 };
 
@@ -43,7 +42,7 @@ static spinlock sConditionVariablesLock;
 static int
 list_condition_variables(int argc, char** argv)
 {
-	PrivateConditionVariable::ListAll();
+	ConditionVariable::ListAll();
 	return 0;
 }
 
@@ -60,14 +59,13 @@ dump_condition_variable(int argc, char** argv)
 	if (address == 0)
 		return 0;
 
-	PrivateConditionVariable* variable = sConditionVariableHash.Lookup(
-		(void*)address);
+	ConditionVariable* variable = sConditionVariableHash.Lookup((void*)address);
 
 	if (variable == NULL) {
 		// It might be a direct pointer to a condition variable. Search the
 		// hash.
 		ConditionVariableHash::Iterator it(&sConditionVariableHash);
-		while (PrivateConditionVariable* hashVariable = it.Next()) {
+		while (ConditionVariable* hashVariable = it.Next()) {
 			if (hashVariable == (void*)address) {
 				variable = hashVariable;
 				break;
@@ -88,11 +86,11 @@ dump_condition_variable(int argc, char** argv)
 }
 
 
-// #pragma mark - PrivateConditionVariableEntry
+// #pragma mark - ConditionVariableEntry
 
 
 bool
-PrivateConditionVariableEntry::Add(const void* object, uint32 flags)
+ConditionVariableEntry::Add(const void* object, uint32 flags)
 {
 	ASSERT(object != NULL);
 
@@ -121,7 +119,7 @@ PrivateConditionVariableEntry::Add(const void* object, uint32 flags)
 
 
 status_t
-PrivateConditionVariableEntry::Wait()
+ConditionVariableEntry::Wait()
 {
 	if (!are_interrupts_enabled()) {
 		panic("wait_for_condition_variable_entry() called with interrupts "
@@ -148,7 +146,7 @@ PrivateConditionVariableEntry::Wait()
 
 
 status_t
-PrivateConditionVariableEntry::Wait(const void* object, uint32 flags)
+ConditionVariableEntry::Wait(const void* object, uint32 flags)
 {
 	if (Add(object, flags))
 		return Wait();
@@ -156,42 +154,11 @@ PrivateConditionVariableEntry::Wait(const void* object, uint32 flags)
 }
 
 
-// #pragma mark - PrivateConditionVariable
-
-
-/*static*/ void
-PrivateConditionVariable::ListAll()
-{
-	kprintf("  variable      object (type)                waiting threads\n");
-	kprintf("------------------------------------------------------------\n");
-	ConditionVariableHash::Iterator it(&sConditionVariableHash);
-	while (PrivateConditionVariable* variable = it.Next()) {
-		// count waiting threads
-		int count = variable->fEntries.Size();
-
-		kprintf("%p  %p  %-20s %15d\n", variable, variable->fObject,
-			variable->fObjectType, count);
-	}
-}
+// #pragma mark - ConditionVariable
 
 
 void
-PrivateConditionVariable::Dump() const
-{
-	kprintf("condition variable %p\n", this);
-	kprintf("  object:  %p (%s)\n", fObject, fObjectType);
-	kprintf("  threads:");
-
-	for (EntryList::ConstIterator it = fEntries.GetIterator();
-		 PrivateConditionVariableEntry* entry = it.Next();) {
-		kprintf(" %ld", entry->fThread->id);
-	}
-	kprintf("\n");
-}
-
-
-void
-PrivateConditionVariable::Publish(const void* object, const char* objectType)
+ConditionVariable::Publish(const void* object, const char* objectType)
 {
 	ASSERT(object != NULL);
 
@@ -210,7 +177,7 @@ PrivateConditionVariable::Publish(const void* object, const char* objectType)
 
 
 void
-PrivateConditionVariable::Unpublish(bool threadsLocked)
+ConditionVariable::Unpublish(bool threadsLocked)
 {
 	ASSERT(fObject != NULL);
 
@@ -219,7 +186,7 @@ PrivateConditionVariable::Unpublish(bool threadsLocked)
 	SpinLocker locker(sConditionVariablesLock);
 
 #if KDEBUG
-	PrivateConditionVariable* variable = sConditionVariableHash.Lookup(fObject);
+	ConditionVariable* variable = sConditionVariableHash.Lookup(fObject);
 	if (variable != this) {
 		panic("Condition variable %p not published, found: %p", this, variable);
 		return;
@@ -231,12 +198,43 @@ PrivateConditionVariable::Unpublish(bool threadsLocked)
 	fObjectType = NULL;
 
 	if (!fEntries.IsEmpty())
-		_Notify(true, B_ENTRY_NOT_FOUND);
+		_NotifyChecked(true, B_ENTRY_NOT_FOUND);
+}
+
+
+/*static*/ void
+ConditionVariable::ListAll()
+{
+	kprintf("  variable      object (type)                waiting threads\n");
+	kprintf("------------------------------------------------------------\n");
+	ConditionVariableHash::Iterator it(&sConditionVariableHash);
+	while (ConditionVariable* variable = it.Next()) {
+		// count waiting threads
+		int count = variable->fEntries.Size();
+
+		kprintf("%p  %p  %-20s %15d\n", variable, variable->fObject,
+			variable->fObjectType, count);
+	}
 }
 
 
 void
-PrivateConditionVariable::Notify(bool all, bool threadsLocked)
+ConditionVariable::Dump() const
+{
+	kprintf("condition variable %p\n", this);
+	kprintf("  object:  %p (%s)\n", fObject, fObjectType);
+	kprintf("  threads:");
+
+	for (EntryList::ConstIterator it = fEntries.GetIterator();
+		 ConditionVariableEntry* entry = it.Next();) {
+		kprintf(" %ld", entry->fThread->id);
+	}
+	kprintf("\n");
+}
+
+
+void
+ConditionVariable::_Notify(bool all, bool threadsLocked)
 {
 	ASSERT(fObject != NULL);
 
@@ -245,7 +243,7 @@ PrivateConditionVariable::Notify(bool all, bool threadsLocked)
 	SpinLocker locker(sConditionVariablesLock);
 
 #if KDEBUG
-	PrivateConditionVariable* variable = sConditionVariableHash.Lookup(fObject);
+	ConditionVariable* variable = sConditionVariableHash.Lookup(fObject);
 	if (variable != this) {
 		panic("Condition variable %p not published, found: %p", this, variable);
 		return;
@@ -253,7 +251,7 @@ PrivateConditionVariable::Notify(bool all, bool threadsLocked)
 #endif
 
 	if (!fEntries.IsEmpty())
-		_Notify(all, B_OK);
+		_NotifyChecked(all, B_OK);
 }
 
 
@@ -261,10 +259,10 @@ PrivateConditionVariable::Notify(bool all, bool threadsLocked)
 	thread lock held.
 */
 void
-PrivateConditionVariable::_Notify(bool all, status_t result)
+ConditionVariable::_NotifyChecked(bool all, status_t result)
 {
 	// dequeue and wake up the blocked threads
-	while (PrivateConditionVariableEntry* entry = fEntries.RemoveHead()) {
+	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		entry->fVariable = NULL;
 
 		thread_unblock_locked(entry->fThread, B_OK);

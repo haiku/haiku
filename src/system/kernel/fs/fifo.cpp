@@ -84,10 +84,10 @@ class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
 			}
 		}
 
-		ConditionVariable<>& WaitCondition() { return fWaitCondition; }
+		ConditionVariable& WaitCondition() { return fWaitCondition; }
 
 	private:
-		ConditionVariable<>	fWaitCondition;
+		ConditionVariable	fWaitCondition;
 		bool				fNotified;
 };
 
@@ -167,7 +167,7 @@ class Inode {
 
 		benaphore	fRequestLock;
 
-		ConditionVariable<> fWriteCondition;
+		ConditionVariable fWriteCondition;
 
 		int32		fReaderCount;
 		int32		fWriterCount;
@@ -358,7 +358,7 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 			if (nonBlocking)
 				return B_WOULD_BLOCK;
 
-			ConditionVariableEntry<> entry;
+			ConditionVariableEntry entry;
 			entry.Add(this, B_CAN_INTERRUPT);
 
 			WriteRequest request(minToWrite);
@@ -468,11 +468,11 @@ Inode::WaitForReadRequest(ReadRequest &request)
 	request.SetUnnotified();
 
 	// publish the condition variable
-	ConditionVariable<>& conditionVariable = request.WaitCondition();
+	ConditionVariable& conditionVariable = request.WaitCondition();
 	conditionVariable.Publish(&request, "pipe request");
 
 	// add the entry to wait on
-	ConditionVariableEntry<> entry;
+	ConditionVariableEntry entry;
 	entry.Add(&request, B_CAN_INTERRUPT);
 
 	// wait

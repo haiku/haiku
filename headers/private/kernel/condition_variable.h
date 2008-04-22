@@ -16,151 +16,97 @@
 #include <util/OpenHashTable.h>
 
 
-class PrivateConditionVariable;
+class ConditionVariable;
 
 
-struct PrivateConditionVariableEntry
-	: DoublyLinkedListLinkImpl<PrivateConditionVariableEntry> {
+struct ConditionVariableEntry
+	: DoublyLinkedListLinkImpl<ConditionVariableEntry> {
 public:
 #if KDEBUG
-	inline PrivateConditionVariableEntry()
-		: fVariable(NULL)
-	{
-	}
-
-	inline ~PrivateConditionVariableEntry()
-	{
-		if (fVariable != NULL) {
-			panic("Destroying condition variable entry %p, but it's still "
-				"attached to variable %p\n", this, fVariable);
-		}
-	}
+	inline						ConditionVariableEntry();
+	inline						~ConditionVariableEntry();
 #endif
 
-	inline	PrivateConditionVariable* Variable() const
-		{ return fVariable; }
-
-protected:
-			bool				Add(const void* object, uint32 flags);
+			bool				Add(const void* object, uint32 flags = 0);
 			status_t			Wait();
-			status_t			Wait(const void* object, uint32 flags);
+			status_t			Wait(const void* object, uint32 flags = 0);
 
-protected:
-			PrivateConditionVariable* fVariable;
+	inline	ConditionVariable* Variable() const		{ return fVariable; }
+
+private:
+			ConditionVariable*	fVariable;
 			struct thread*		fThread;
 
-			friend class PrivateConditionVariable;
+			friend class ConditionVariable;
 };
 
 
-class PrivateConditionVariable
-	: protected HashTableLink<PrivateConditionVariable> {
+class ConditionVariable : protected HashTableLink<ConditionVariable> {
 public:
-	static	void				ListAll();
-			void				Dump() const;
-			const void*			Object() const	{ return fObject; }
-protected:
 			void				Publish(const void* object,
 									const char* objectType);
-			void				Unpublish(bool threadsLocked);
-			void				Notify(bool all, bool threadsLocked);
+			void				Unpublish(bool threadsLocked = false);
+
+	inline	void				NotifyOne(bool threadsLocked = false);
+	inline	void				NotifyAll(bool threadsLocked = false);
+
+			const void*			Object() const	{ return fObject; }
+
+	static	void				ListAll();
+			void				Dump() const;
 
 private:
-			void				_Notify(bool all, status_t result);
+			void				_Notify(bool all, bool threadsLocked);
+			void				_NotifyChecked(bool all, status_t result);
 
 protected:
-			typedef DoublyLinkedList<PrivateConditionVariableEntry> EntryList;
+			typedef DoublyLinkedList<ConditionVariableEntry> EntryList;
 
 			const void*			fObject;
 			const char*			fObjectType;
 			EntryList			fEntries;
 
-			friend class PrivateConditionVariableEntry;
+			friend class ConditionVariableEntry;
 			friend class ConditionVariableHashDefinition;
 };
 
 
-template<typename Type = void>
-class ConditionVariable : private PrivateConditionVariable {
-public:
-	inline	void				Publish(const Type* object,
-									const char* objectType);
+#if KDEBUG
 
-	inline	void				Unpublish(bool threadsLocked = false);
-	inline	void				NotifyOne(bool threadsLocked = false);
-	inline	void				NotifyAll(bool threadsLocked = false);
-};
+inline
+ConditionVariableEntry::ConditionVariableEntry()
+	: fVariable(NULL)
+{
+}
+
+inline
+ConditionVariableEntry::~ConditionVariableEntry()
+{
+	if (fVariable != NULL) {
+		panic("Destroying condition variable entry %p, but it's still "
+			"attached to variable %p\n", this, fVariable);
+	}
+}
+
+#endif
 
 
-template<typename Type = void>
-class ConditionVariableEntry : public PrivateConditionVariableEntry {
-public:
-	inline	bool				Add(const Type* object, uint32 flags = 0);
-	inline	status_t			Wait();
-	inline	status_t			Wait(const Type* object, uint32 flags = 0);
-};
-
-
-template<typename Type>
 inline void
-ConditionVariable<Type>::Publish(const Type* object, const char* objectType)
+ConditionVariable::NotifyOne(bool threadsLocked)
 {
-	PrivateConditionVariable::Publish(object, objectType);
+	_Notify(false, threadsLocked);
 }
 
 
-template<typename Type>
 inline void
-ConditionVariable<Type>::Unpublish(bool threadsLocked)
+ConditionVariable::NotifyAll(bool threadsLocked)
 {
-	PrivateConditionVariable::Unpublish(threadsLocked);
-}
-
-
-template<typename Type>
-inline void
-ConditionVariable<Type>::NotifyOne(bool threadsLocked)
-{
-	PrivateConditionVariable::Notify(false, threadsLocked);
-}
-
-
-template<typename Type>
-inline void
-ConditionVariable<Type>::NotifyAll(bool threadsLocked)
-{
-	PrivateConditionVariable::Notify(true, threadsLocked);
-}
-
-
-template<typename Type>
-inline bool
-ConditionVariableEntry<Type>::Add(const Type* object, uint32 flags)
-{
-	return PrivateConditionVariableEntry::Add(object, flags);
-}
-
-
-template<typename Type>
-inline status_t
-ConditionVariableEntry<Type>::Wait()
-{
-	return PrivateConditionVariableEntry::Wait();
-}
-
-
-template<typename Type>
-inline status_t
-ConditionVariableEntry<Type>::Wait(const Type* object, uint32 flags)
-{
-	return PrivateConditionVariableEntry::Wait(object, flags);
+	_Notify(true, threadsLocked);
 }
 
 
 extern "C" {
 #endif	// __cplusplus
-
-struct thread;
 
 extern void condition_variable_init();
 

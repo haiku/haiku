@@ -666,12 +666,12 @@ get_thread_wait_sem(struct thread* thread)
 }
 
 
-static PrivateConditionVariable*
+static ConditionVariable*
 get_thread_wait_cvar(struct thread* thread)
 {
 	if (thread->state == B_THREAD_WAITING
 		&& thread->wait.type == THREAD_BLOCK_TYPE_CONDITION_VARIABLE) {
-		return (PrivateConditionVariable*)thread->wait.object;
+		return (ConditionVariable*)thread->wait.object;
 	}
 	return NULL;
 }

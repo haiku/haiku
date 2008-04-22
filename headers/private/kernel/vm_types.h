@@ -131,7 +131,7 @@ enum {
 };
 
 struct vm_dummy_page : vm_page {
-	ConditionVariable<vm_page>	busy_condition;
+	ConditionVariable	busy_condition;
 };
 
 struct vm_cache {

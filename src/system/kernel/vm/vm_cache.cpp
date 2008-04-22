@@ -507,7 +507,7 @@ vm_cache_resize(vm_cache* cache, off_t newSize)
 						page = next;
 					} else {
 						// wait for page to become unbusy
-						ConditionVariableEntry<vm_page> entry;
+						ConditionVariableEntry entry;
 						entry.Add(page);
 						mutex_unlock(&cache->lock);
 						entry.Wait();
@@ -569,7 +569,7 @@ vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 		// to, so we need to check if this cache is really the last
 		// consumer of the cache we want to merge it with.
 
-		ConditionVariable<vm_cache> busyCondition;
+		ConditionVariable busyCondition;
 
 		if (merge) {
 			// But since we need to keep the locking order upper->lower cache, we

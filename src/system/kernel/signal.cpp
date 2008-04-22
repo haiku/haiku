@@ -15,7 +15,6 @@
 #include <OS.h>
 #include <KernelExport.h>
 
-#include <condition_variable.h>
 #include <debug.h>
 #include <kernel.h>
 #include <kscheduler.h>
@@ -786,22 +785,14 @@ int
 sigwait(const sigset_t *set, int *_signal)
 {
 	struct thread *thread = thread_get_current_thread();
-	int signalsPending = 0;
 
-	ConditionVariable<sigset_t> conditionVar;
-	conditionVar.Publish(set, "sigwait");
-
-	while (true) {
-		ConditionVariableEntry<sigset_t> entry;
-		entry.Wait(set, B_CAN_INTERRUPT);
-
-		if (has_signals_pending(thread)) {
-			signalsPending = atomic_get(&thread->sig_pending) & *set;
-			break;
-		}
+	while (!has_signals_pending(thread)) {
+		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
+			THREAD_BLOCK_TYPE_SIGNAL, NULL);
+		thread_block();
 	}
 
-	conditionVar.Unpublish();
+	int signalsPending = atomic_get(&thread->sig_pending) & *set;
 
 	update_current_thread_signals_flag();
 
@@ -828,23 +819,15 @@ sigsuspend(const sigset_t *mask)
 	struct thread *thread = thread_get_current_thread();
 	sigset_t oldMask = atomic_get(&thread->sig_block_mask);
 
-	// Set the new block mask and interuptably block wait for a condition
-	// variable no one will ever notify.
+	// Set the new block mask and block until interrupted.
 
 	atomic_set(&thread->sig_block_mask, *mask & BLOCKABLE_SIGNALS);
 
-	ConditionVariable<sigset_t> conditionVar;
-	conditionVar.Publish(mask, "sigsuspend");
-
-	while (true) {
-		ConditionVariableEntry<sigset_t> entry;
-		entry.Wait(mask, B_CAN_INTERRUPT);
-
-		if (has_signals_pending(thread))
-			break;
+	while (!has_signals_pending(thread)) {
+		thread_prepare_to_block(thread, B_CAN_INTERRUPT,
+			THREAD_BLOCK_TYPE_SIGNAL, NULL);
+		thread_block();
 	}
-
-	conditionVar.Unpublish();
 
 	// restore the original block mask
 	atomic_set(&thread->sig_block_mask, oldMask);

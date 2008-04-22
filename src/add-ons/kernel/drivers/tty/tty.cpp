@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
+ * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -402,12 +402,12 @@ RequestOwner::Wait(bool interruptable)
 		// not yet done
 
 		// publish the condition variable
-		ConditionVariable<> conditionVariable;
+		ConditionVariable conditionVariable;
 		conditionVariable.Publish(this, "tty request");
 		fConditionVariable = &conditionVariable;
 
 		// add an entry to wait on
-		ConditionVariableEntry<> entry;
+		ConditionVariableEntry entry;
 		entry.Add(this, interruptable ? B_CAN_INTERRUPT : 0);
 
 		locker.Unlock();

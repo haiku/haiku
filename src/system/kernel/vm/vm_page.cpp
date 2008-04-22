@@ -60,7 +60,7 @@ static size_t sReservedPages;
 static vint32 sPageDeficit;
 static size_t sModifiedTemporaryPages;
 
-static ConditionVariable<page_queue> sFreePageCondition;
+static ConditionVariable sFreePageCondition;
 static spinlock sPageLock;
 
 static sem_id sWriterWaitSem;
@@ -966,7 +966,7 @@ page_writer(void* /*unused*/)
 		}
 
 		const uint32 kNumPages = 32;
-		ConditionVariable<vm_page> busyConditions[kNumPages];
+		ConditionVariable busyConditions[kNumPages];
 		union {
 			vm_page *pages[kNumPages];
 			vm_cache *caches[kNumPages];
@@ -1278,7 +1278,7 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 
 		// we need to wait for pages to become inactive
 
-		ConditionVariableEntry<page_queue> freeConditionEntry;
+		ConditionVariableEntry freeConditionEntry;
 		sPageDeficit++;
 		freeConditionEntry.Add(&sFreePageQueue);
 		locker.Unlock();
@@ -1324,7 +1324,7 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 		page->state = PAGE_STATE_BUSY;
 		page->busy_writing = true;
 
-		ConditionVariable<vm_page> busyCondition;
+		ConditionVariable busyCondition;
 		busyCondition.Publish(page, "page");
 
 		// We have a modified page - however, while we're writing it back,
@@ -1482,7 +1482,7 @@ vm_page_init_post_area(kernel_args *args)
 status_t
 vm_page_init_post_thread(kernel_args *args)
 {
-	new (&sFreePageCondition) ConditionVariable<page_queue>;
+	new (&sFreePageCondition) ConditionVariable;
 	sFreePageCondition.Publish(&sFreePageQueue, "free page");
 
 	// create a kernel thread to clear out pages
@@ -1613,7 +1613,7 @@ vm_page_reserve_pages(uint32 count)
 vm_page *
 vm_page_allocate_page(int pageState, bool reserved)
 {
-	ConditionVariableEntry<page_queue> freeConditionEntry;
+	ConditionVariableEntry freeConditionEntry;
 	page_queue *queue;
 	page_queue *otherQueue;
 

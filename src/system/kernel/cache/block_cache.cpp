@@ -114,7 +114,7 @@ struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	bool			read_only;
 
 	NotificationList pending_notifications;
-	ConditionVariable<block_cache> condition_variable;
+	ConditionVariable condition_variable;
 	bool			deleting;
 
 	block_cache(int fd, off_t numBlocks, size_t blockSize, bool readOnly);
@@ -1611,7 +1611,7 @@ wait_for_notifications(block_cache *cache)
 	set_notification(NULL, notification, TRANSACTION_WRITTEN, notify_sync,
 		cache);
 
-	ConditionVariableEntry<block_cache> entry;
+	ConditionVariableEntry entry;
 	entry.Add(cache);
 
 	add_notification(cache, &notification, TRANSACTION_WRITTEN, false);

@@ -61,6 +61,7 @@ enum {
 	THREAD_BLOCK_TYPE_SEMAPHORE				= 0,
 	THREAD_BLOCK_TYPE_CONDITION_VARIABLE	= 1,
 	THREAD_BLOCK_TYPE_SNOOZE				= 2,
+	THREAD_BLOCK_TYPE_SIGNAL				= 3,
 	THREAD_BLOCK_TYPE_USER_BASE				= 10000
 };
 
@@ -151,10 +152,10 @@ struct team_job_control_children {
 };
 
 struct team_dead_children : team_job_control_children {
-	ConditionVariable<team_dead_children>	condition_variable;
-	uint32		count;
-	bigtime_t	kernel_time;
-	bigtime_t	user_time;
+	ConditionVariable	condition_variable;
+	uint32				count;
+	bigtime_t			kernel_time;
+	bigtime_t			user_time;
 };
 
 

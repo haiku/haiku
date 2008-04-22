@@ -3952,7 +3952,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 			// page must be busy -- wait for it to become unbusy
 			{
-				ConditionVariableEntry<vm_page> entry;
+				ConditionVariableEntry entry;
 				entry.Add(page);
 				mutex_unlock(&cache->lock);
 				entry.Wait();
@@ -3963,7 +3963,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// The cache became busy, which means, it is about to be
 				// removed by vm_cache_remove_consumer(). We start again with
 				// the top cache.
-				ConditionVariableEntry<vm_cache> entry;
+				ConditionVariableEntry entry;
 				entry.Add(cache);
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
@@ -3986,7 +3986,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			page = vm_page_allocate_page(PAGE_STATE_FREE, true);
 			vm_cache_insert_page(cache, page, cacheOffset);
 
-			ConditionVariable<vm_page> busyCondition;
+			ConditionVariable busyCondition;
 			busyCondition.Publish(page, "page");
 
 			mutex_unlock(&cache->lock);
@@ -4045,7 +4045,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// The cache became busy, which means, it is about to be
 				// removed by vm_cache_remove_consumer(). We start again with
 				// the top cache.
-				ConditionVariableEntry<vm_cache> entry;
+				ConditionVariableEntry entry;
 				entry.Add(cache);
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
@@ -4079,7 +4079,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// The cache became busy, which means, it is about to be
 				// removed by vm_cache_remove_consumer(). We start again with
 				// the top cache.
-				ConditionVariableEntry<vm_cache> entry;
+				ConditionVariableEntry entry;
 				entry.Add(cache);
 				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
@@ -4249,7 +4249,7 @@ if (cacheOffset == 0x12000)
 				break;
 
 			// The page is busy, wait till it becomes unbusy.
-			ConditionVariableEntry<vm_page> entry;
+			ConditionVariableEntry entry;
 			entry.Add(newPage);
 			mutex_unlock(&topCache->lock);
 			entry.Wait();

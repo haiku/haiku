@@ -101,7 +101,7 @@ class RequestOwner {
 		status_t Error() const	{ return fError; }
 
 	private:
-		ConditionVariable<>*	fConditionVariable;
+		ConditionVariable*		fConditionVariable;
 		tty_cookie*				fCookie;
 		status_t				fError;
 		RequestQueue*			fRequestQueues[2];

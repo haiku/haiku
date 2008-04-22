@@ -184,7 +184,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 
 	size_t numBytes = PAGE_ALIGN(pageOffset + bufferSize);
 	vm_page *pages[MAX_IO_VECS];
-	ConditionVariable<vm_page> busyConditions[MAX_IO_VECS];
+	ConditionVariable busyConditions[MAX_IO_VECS];
 	int32 pageIndex = 0;
 
 	// allocate pages for the cache and mark them busy
@@ -324,7 +324,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	vm_page *pages[MAX_IO_VECS];
 	int32 pageIndex = 0;
 	status_t status = B_OK;
-	ConditionVariable<vm_page> busyConditions[MAX_IO_VECS];
+	ConditionVariable busyConditions[MAX_IO_VECS];
 
 	// ToDo: this should be settable somewhere
 	bool writeThrough = false;
@@ -622,7 +622,7 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 				return status;
 
 			if (page->state == PAGE_STATE_BUSY) {
-				ConditionVariableEntry<vm_page> entry;
+				ConditionVariableEntry entry;
 				entry.Add(page);
 				locker.Unlock();
 				entry.Wait();
@@ -790,7 +790,7 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 		if (page != NULL) {
 			if (page->state == PAGE_STATE_BUSY) {
 				// if busy retry again later
-				ConditionVariableEntry<vm_page> entry;
+				ConditionVariableEntry entry;
 				entry.Add(page);
 				mutex_unlock(&cache->lock);
 				entry.Wait();
