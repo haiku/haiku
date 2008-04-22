@@ -34,10 +34,13 @@ extern "C" status_t _get_builtin_dependencies(void);
 extern bool gDebugOutputEnabled;
 	// from libkernelland_emu.so
 
+status_t dm_get_attr_uint8(const device_node* node, const char* name, uint8* _value,
+	bool recursive);
 status_t dm_get_attr_uint32(device_node* node, const char* name, uint32* _value,
 	bool recursive);
+status_t dm_get_attr_string(device_node* node, const char* name,
+	const char** _value, bool recursive);
 
-device_manager_info *gDeviceManager;
 
 struct device_attr_private : device_attr,
 		DoublyLinkedListLinkImpl<device_attr_private> {
@@ -85,6 +88,7 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 			const char*		ModuleName() const { return fModuleName; }
 			device_node*	Parent() const { return fParent; }
 			AttributeList&	Attributes() { return fAttributes; }
+			const AttributeList& Attributes() const { return fAttributes; }
 
 			status_t		InitDriver();
 			void			UninitDriver();
@@ -95,6 +99,8 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 			void*			DriverData() const { return fDriverData; }
 
 			void			AddChild(device_node *node);
+			void			RemoveChild(device_node *node);
+			const NodeList&	Children() const { return fChildren; }
 
 			status_t		Register();
 			bool			IsRegistered() const { return fRegistered; }
@@ -102,6 +108,7 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 private:
 			status_t		_RegisterFixed(uint32& registered);
 			status_t		_RegisterDynamic();
+			bool			_IsBus() const;
 
 	device_node*			fParent;
 	NodeList				fChildren;
@@ -116,6 +123,8 @@ private:
 	AttributeList			fAttributes;
 };
 
+
+device_manager_info *gDeviceManager;
 
 static device_node *sRootNode;
 
@@ -258,11 +267,12 @@ device_attr_private::Compare(const device_attr* attrA, const device_attr *attrB)
 
 
 device_attr_private*
-dm_find_attr(device_node* node, const char* name, bool recursive,
+dm_find_attr(const device_node* node, const char* name, bool recursive,
 	type_code type)
 {
 	do {
-		AttributeList::Iterator iterator = node->Attributes().GetIterator();
+		AttributeList::ConstIterator iterator
+			= node->Attributes().GetIterator();
 
 		while (iterator.HasNext()) {
 			device_attr_private* attr = iterator.Next();
@@ -281,14 +291,78 @@ dm_find_attr(device_node* node, const char* name, bool recursive,
 }
 
 
+static void
+put_level(int32 level)
+{
+	while (level-- > 0)
+		dprintf("   ");
+}
+
+
+static void
+dump_attribute(device_attr* attr, int32 level)
+{
+	if (attr == NULL)
+		return;
+
+	put_level(level + 2);
+	dprintf("\"%s\" : ", attr->name);
+	switch (attr->type) {
+		case B_STRING_TYPE:
+			dprintf("string : \"%s\"", attr->value.string);
+			break;
+		case B_INT8_TYPE:
+		case B_UINT8_TYPE:
+			dprintf("uint8 : %u (%#x)", attr->value.ui8, attr->value.ui8);
+			break;
+		case B_INT16_TYPE:
+		case B_UINT16_TYPE:
+			dprintf("uint16 : %u (%#x)", attr->value.ui16, attr->value.ui16);
+			break;
+		case B_INT32_TYPE:
+		case B_UINT32_TYPE:
+			dprintf("uint32 : %lu (%#lx)", attr->value.ui32, attr->value.ui32);
+			break;
+		case B_INT64_TYPE:
+		case B_UINT64_TYPE:
+			dprintf("uint64 : %Lu (%#Lx)", attr->value.ui64, attr->value.ui64);
+			break;
+		default:
+			dprintf("raw data");
+	}
+	dprintf("\n");
+}
+
+
+void
+dm_dump_node(device_node* node, int32 level)
+{
+	if (node == NULL)
+		return;
+
+	put_level(level);
+	dprintf("(%ld) @%p \"%s\"\n", level, node, node->ModuleName());
+	
+	AttributeList::Iterator attribute = node->Attributes().GetIterator();
+	while (attribute.HasNext()) {
+		dump_attribute(attribute.Next(), level);
+	}
+
+	NodeList::ConstIterator iterator = node->Children().GetIterator();
+	while (iterator.HasNext()) {
+		dm_dump_node(iterator.Next(), level + 1);
+	}
+}
+
+
 //	#pragma mark -
 
 
 /*!	Allocate device node info structure;
 	initially, ref_count is one to make sure node won't get destroyed by mistake
 */
-device_node::device_node(const char *moduleName, const device_attr *attrs,
-	const io_resource *resources)
+device_node::device_node(const char* moduleName, const device_attr* attrs,
+	const io_resource* resources)
 {
 	fModuleName = strdup(moduleName);
 	if (fModuleName == NULL)
@@ -373,12 +447,22 @@ device_node::UninitDriver()
 
 
 void
-device_node::AddChild(device_node *node)
+device_node::AddChild(device_node* node)
 {
 	// we must not be destroyed	as long as we have children
 	fRefCount++;
 	node->fParent = this;
 	fChildren.Add(node);
+}
+
+
+void
+device_node::RemoveChild(device_node* node)
+{
+	fRefCount--;
+		// TODO: we may need to destruct ourselves here!
+	node->fParent = NULL;
+	fChildren.Remove(node);
 }
 
 
@@ -396,21 +480,35 @@ device_node::Register()
 
 	// Register the children the driver wants
 
-	if (DriverModule()->register_child_devices != NULL)
-		DriverModule()->register_child_devices(this);
+	if (DriverModule()->register_child_devices != NULL) {
+		status = DriverModule()->register_child_devices(this);
+		if (status != B_OK)
+			return status;
+
+		if (!fChildren.IsEmpty())
+			return B_OK;
+	}
 
 	// Register all possible child device nodes
 
-	uint32 findFlags;
-	if (dm_get_attr_uint32(this, B_DRIVER_FIND_CHILD_FLAGS, &findFlags, false) != B_OK)
-		return B_OK;
+	uint32 findFlags = 0;
+	dm_get_attr_uint32(this, B_DRIVER_FIND_CHILD_FLAGS, &findFlags, false);
 
-#if 0
 	if ((findFlags & B_FIND_CHILD_ON_DEMAND) != 0)
 		return B_OK;
-#endif
 
 	return _RegisterDynamic();
+}
+
+
+bool
+device_node::_IsBus() const
+{
+	uint8 isBus;
+	if (dm_get_attr_uint8(this, B_DRIVER_IS_BUS, &isBus, false) != B_OK)
+		return false;
+
+	return isBus;
 }
 
 
@@ -436,14 +534,8 @@ device_node::_RegisterFixed(uint32& registered)
 		if (status != B_OK)
 			return status;
 
-		if (driver->supports_device != NULL
-			&& driver->register_device != NULL) {
-			float support = driver->supports_device(this);
-			if (support <= 0.0)
-				status = B_ERROR;
-
-			if (status == B_OK)
-				status = driver->register_device(this);
+		if (driver->register_device != NULL) {
+			status = driver->register_device(this);
 			if (status == B_OK)
 				registered++;
 		}
@@ -469,7 +561,23 @@ device_node::_RegisterDynamic()
 	driver_module_info* bestDriver = NULL;
 	float best = 0.0;
 
-	void* list = open_module_list_etc("bus", "driver_v1");
+	char path[64];
+	if (!_IsBus()) {
+		strlcpy(path, "drivers", sizeof(path));
+
+		const char *type;
+		if (dm_get_attr_string(this, B_DRIVER_DEVICE_TYPE, &type, false)
+				== B_OK) {
+			strlcat(path, "/", sizeof(path));
+			strlcat(path, type, sizeof(path));
+		}
+	} else {
+		// TODO: we might want to allow bus* specifiers as well, ie.
+		// busses/usb
+		strlcpy(path, "bus", sizeof(path));
+	}
+
+	void* list = open_module_list_etc(path, "driver_v1");
 	while (true) {
 		char name[B_FILE_NAME_LENGTH];
 		size_t nameLength = sizeof(name);
@@ -525,27 +633,29 @@ printf("  register best module \"%s\", support %f\n", bestDriver->info.name, bes
 
 
 static status_t
-rescan_device(device_node *node)
+rescan_device(device_node* node)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-register_device(device_node *parent, const char *moduleName,
-	const device_attr *attrs, const io_resource *ioResources,
-	device_node **_node)
+register_device(device_node* parent, const char* moduleName,
+	const device_attr* attrs, const io_resource* ioResources,
+	device_node** _node)
 {
 	if ((parent == NULL && sRootNode != NULL) || moduleName == NULL)
 		return B_BAD_VALUE;
 
-	TRACE(("register device \"%s\", parent %p\n", moduleName, parent));
 	// TODO: handle I/O resources!
 
 	device_node *newNode = new(std::nothrow) device_node(moduleName, attrs,
 		ioResources);
 	if (newNode == NULL)
 		return B_NO_MEMORY;
+
+	TRACE(("%p: register device \"%s\", parent %p\n", newNode, moduleName,
+		parent));
 
 	status_t status = newNode->InitCheck();
 	if (status != B_OK)
@@ -576,8 +686,10 @@ register_device(device_node *parent, const char *moduleName,
 #endif
 
 	status = newNode->Register();
-	if (status < B_OK)
-		return status;
+	if (status < B_OK) {
+		parent->RemoveChild(newNode);
+		goto err1;
+	}
 
 	if (_node)
 		*_node = newNode;
@@ -591,27 +703,27 @@ err1:
 
 
 static status_t
-unregister_device(device_node *node)
+unregister_device(device_node* node)
 {
 	return B_ERROR;
 }
 
 
 static driver_module_info*
-driver_module(device_node *node)
+driver_module(device_node* node)
 {
 	return node->DriverModule();
 }
 
 
 static void*
-driver_data(device_node *node)
+driver_data(device_node* node)
 {
 	return node->DriverData();
 }
 
 
-static device_node *
+static device_node*
 device_root(void)
 {
 	return sRootNode;
@@ -619,31 +731,31 @@ device_root(void)
 
 
 static status_t
-get_next_child_device(device_node *parent, device_node *_node,
-	const device_attr *attrs)
+get_next_child_device(device_node* parent, device_node* _node,
+	const device_attr* attrs)
 {
 	return B_ERROR;
 }
 
 
-static device_node *
-get_parent(device_node *node)
+static device_node*
+get_parent(device_node* node)
 {
 	return NULL;
 }
 
 
 static void
-put_device_node(device_node *node)
+put_device_node(device_node* node)
 {
 }
 
 
 status_t
-dm_get_attr_uint8(device_node* node, const char* name, uint8* _value,
+dm_get_attr_uint8(const device_node* node, const char* name, uint8* _value,
 	bool recursive)
 {
-	if (name == NULL || _value == NULL)
+	if (node == NULL || name == NULL || _value == NULL)
 		return B_BAD_VALUE;
 
 	device_attr_private* attr = dm_find_attr(node, name, recursive,
@@ -660,7 +772,7 @@ status_t
 dm_get_attr_uint16(device_node* node, const char* name, uint16* _value,
 	bool recursive)
 {
-	if (name == NULL || _value == NULL)
+	if (node == NULL || name == NULL || _value == NULL)
 		return B_BAD_VALUE;
 
 	device_attr_private* attr = dm_find_attr(node, name, recursive,
@@ -677,7 +789,7 @@ status_t
 dm_get_attr_uint32(device_node* node, const char* name, uint32* _value,
 	bool recursive)
 {
-	if (name == NULL || _value == NULL)
+	if (node == NULL || name == NULL || _value == NULL)
 		return B_BAD_VALUE;
 
 	device_attr_private* attr = dm_find_attr(node, name, recursive,
@@ -694,7 +806,7 @@ status_t
 dm_get_attr_uint64(device_node* node, const char* name,
 	uint64* _value, bool recursive)
 {
-	if (name == NULL || _value == NULL)
+	if (node == NULL || name == NULL || _value == NULL)
 		return B_BAD_VALUE;
 
 	device_attr_private* attr = dm_find_attr(node, name, recursive,
@@ -711,7 +823,7 @@ status_t
 dm_get_attr_string(device_node* node, const char* name, const char** _value,
 	bool recursive)
 {
-	if (name == NULL || _value == NULL)
+	if (node == NULL || name == NULL || _value == NULL)
 		return B_BAD_VALUE;
 
 	device_attr_private* attr = dm_find_attr(node, name, recursive,
@@ -728,7 +840,7 @@ status_t
 dm_get_attr_raw(device_node* node, const char* name, const void** _data,
 	size_t* _length, bool recursive)
 {
-	if (name == NULL || (_data == NULL && _length == NULL))
+	if (node == NULL || name == NULL || (_data == NULL && _length == NULL))
 		return B_BAD_VALUE;
 
 	device_attr_private* attr = dm_find_attr(node, name, recursive, B_RAW_TYPE);
@@ -746,6 +858,9 @@ dm_get_attr_raw(device_node* node, const char* name, const void** _data,
 status_t
 dm_get_next_attr(device_node* node, device_attr** _attr)
 {
+	if (node == NULL)
+		return B_BAD_VALUE;
+
 	device_attr_private* next;
 	device_attr_private* attr = *(device_attr_private**)_attr;
 
@@ -800,6 +915,7 @@ dm_init_root_node(void)
 {
 	device_attr attrs[] = {
 		{B_DRIVER_PRETTY_NAME, B_STRING_TYPE, {string: "Devices Root"}},
+		{B_DRIVER_IS_BUS, B_UINT8_TYPE, {ui8: true}},
 		{B_DRIVER_BUS, B_STRING_TYPE, {string: "root"}},
 		{B_DRIVER_FIND_CHILD_FLAGS, B_UINT32_TYPE,
 			{ui32: B_FIND_MULTIPLE_CHILDREN}},
@@ -829,12 +945,12 @@ static driver_module_info sDeviceRootModule = {
 int
 main(int argc, char** argv)
 {
-	_add_builtin_module((module_info *)&sDeviceManagerModule);
-	_add_builtin_module((module_info *)&sDeviceRootModule);
-	_add_builtin_module((module_info *)&gDeviceModuleInfo);
-	_add_builtin_module((module_info *)&gDriverModuleInfo);
-	_add_builtin_module((module_info *)&gBusModuleInfo);
-	_add_builtin_module((module_info *)&gBusDriverModuleInfo);
+	_add_builtin_module((module_info*)&sDeviceManagerModule);
+	_add_builtin_module((module_info*)&sDeviceRootModule);
+	_add_builtin_module((module_info*)&gDeviceModuleInfo);
+	_add_builtin_module((module_info*)&gDriverModuleInfo);
+	_add_builtin_module((module_info*)&gBusModuleInfo);
+	_add_builtin_module((module_info*)&gBusDriverModuleInfo);
 
 	gDeviceManager = &sDeviceManagerModule;
 
@@ -846,6 +962,7 @@ main(int argc, char** argv)
 	}
 
 	dm_init_root_node();
+	dm_dump_node(sRootNode, 0);
 
 	return 0;
 }

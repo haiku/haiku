@@ -6,6 +6,11 @@
 
 #include "bus.h"
 
+#include <KernelExport.h>
+
+
+#define DRIVER_MODULE_NAME "drivers/net/sample_driver/driver_v1"
+
 
 //	#pragma mark - driver
 
@@ -13,6 +18,7 @@
 static float
 supports_device(device_node *parent)
 {
+#if 0
 	const char* bus;
 	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
 			!= B_OK)
@@ -20,9 +26,13 @@ supports_device(device_node *parent)
 
 	if (bus == NULL || strcmp(bus, BUS_NAME))
 		return -1;
+#endif
 
-	bus_device_module_info* module
-		= (bus_device_module_info*)gDeviceManager->driver_module(parent);
+	bus_for_driver_module_info* module
+		= (bus_for_driver_module_info*)gDeviceManager->driver_module(parent);
+	if (strcmp(module->info.info.name, BUS_FOR_DRIVER_NAME))
+		return -1;
+
 	void* data = gDeviceManager->driver_data(parent);
 
 	bus_info info;
@@ -38,7 +48,8 @@ supports_device(device_node *parent)
 static status_t
 register_device(device_node *parent)
 {
-	return B_ERROR;
+	return gDeviceManager->register_device(parent, DRIVER_MODULE_NAME, NULL,
+		NULL, NULL);
 }
 
 
@@ -46,7 +57,7 @@ static status_t
 init_driver(device_node *node, void **_cookie)
 {
 	// also publishes any devices/nodes with dedicated calls
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -144,7 +155,7 @@ device_io(void *cookie, io_request *request)
 
 struct driver_module_info gDriverModuleInfo = {
 	{
-		"sample_driver/driver_v1",
+		DRIVER_MODULE_NAME,
 		0,
 		NULL,
 	},
@@ -160,7 +171,7 @@ struct driver_module_info gDriverModuleInfo = {
 
 struct device_module_info gDeviceModuleInfo = {
 	{
-		"sample_driver/device_v1",
+		"drivers/net/sample_driver/device_v1",
 		0,
 		NULL,
 	},

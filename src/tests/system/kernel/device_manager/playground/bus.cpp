@@ -6,6 +6,8 @@
 
 #include "bus.h"
 
+#include <KernelExport.h>
+
 
 #define BUS_MODULE_NAME "bus_managers/sample_bus/driver_v1"
 
@@ -34,7 +36,7 @@ register_device(device_node *parent)
 	device_attr attrs[] = {
 		{B_DRIVER_PRETTY_NAME,	B_STRING_TYPE,	{string: "My Bus"}},
 		{B_DRIVER_BUS,			B_STRING_TYPE,	{string: BUS_NAME}},
-		{B_DRIVER_IS_BUS,		B_INT8_TYPE,	{ui8: true}},
+		{B_DRIVER_IS_BUS,		B_UINT8_TYPE,	{ui8: true}},
 		{NULL}
 	};
 
@@ -46,6 +48,7 @@ register_device(device_node *parent)
 static status_t
 init_driver(device_node *node, void **_cookie)
 {
+	*_cookie = node;
 	return B_OK;
 }
 
@@ -74,18 +77,28 @@ register_child_devices(device_node *node)
 	for (uint32 i = 0; i < kNumDevices; i++) {
 		device_attr attrs[] = {
 			// info about the device
-			{ "bus/vendor", B_UINT16_TYPE, { ui16: kDevices[i].vendor }},
-			{ "bus/device", B_UINT16_TYPE, { ui16: kDevices[i].device }},
+			{"bus/vendor", B_UINT16_TYPE, {ui16: kDevices[i].vendor}},
+			{"bus/device", B_UINT16_TYPE, {ui16: kDevices[i].device}},
 
-			{ B_DRIVER_BUS, B_STRING_TYPE, { string: "pci" }},
-			{ B_DRIVER_DEVICE_TYPE, B_STRING_TYPE, { string: kDevices[i].type}},
-			{ NULL }
+			{B_DRIVER_BUS, B_STRING_TYPE, {string: BUS_NAME}},
+			{B_DRIVER_DEVICE_TYPE, B_STRING_TYPE, {string: kDevices[i].type}},
+			{NULL}
 		};
 
-		gDeviceManager->register_device(node, BUS_DEVICE_NAME, attrs, NULL,
+		gDeviceManager->register_device(node, BUS_FOR_DRIVER_NAME, attrs, NULL,
 			NULL);
 	}
 
+	device_attr attrs[] = {
+		{B_DRIVER_FIXED_CHILD, B_STRING_TYPE, {string: "non_existing/driver_v1"}},
+		{NULL}
+	};
+
+#if 1
+	// this is supposed to fail
+	dprintf("non-existing child: %ld\n", gDeviceManager->register_device(node,
+		BUS_FOR_DRIVER_NAME, attrs, NULL, NULL));
+#endif
 	return B_OK;
 }
 
@@ -100,6 +113,20 @@ rescan_child_devices(device_node *node)
 static void
 device_removed(device_node *node)
 {
+}
+
+
+//	#pragma mark - for driver
+
+
+static status_t
+get_bus_info(void* cookie, bus_info* info)
+{
+	gDeviceManager->get_attr_uint16((device_node*)cookie, "bus/vendor",
+		&info->vendor_id, false);
+	gDeviceManager->get_attr_uint16((device_node*)cookie, "bus/device",
+		&info->device_id, false);
+	return B_OK;
 }
 
 
@@ -123,19 +150,19 @@ struct driver_module_info gBusModuleInfo = {
 	device_removed,
 };
 
-struct driver_module_info gBusDriverModuleInfo = {
+struct bus_for_driver_module_info gBusDriverModuleInfo = {
 	{
-		BUS_DEVICE_NAME,
-		0,
-		NULL,
-	},
+		{
+			BUS_FOR_DRIVER_NAME,
+			0,
+			NULL,
+		},
 
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+		NULL,
+		NULL,
+
+		init_driver,
+	},
+	get_bus_info
 };
 
