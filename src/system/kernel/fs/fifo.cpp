@@ -22,6 +22,7 @@
 #include <lock.h>
 #include <select_sync_pool.h>
 #include <team.h>
+#include <thread.h>
 #include <util/DoublyLinkedList.h>
 #include <util/AutoLock.h>
 #include <util/ring_buffer.h>
@@ -74,20 +75,23 @@ class RingBuffer {
 
 class ReadRequest : public DoublyLinkedListLinkImpl<ReadRequest> {
 	public:
+		ReadRequest()
+			: fThread(find_thread(NULL))
+		{
+		}
+
 		void SetUnnotified()	{ fNotified = false; }
 
 		void Notify()
 		{
 			if (!fNotified) {
-				fWaitCondition.NotifyOne();
+				thread_unblock(fThread, B_OK);
 				fNotified = true;
 			}
 		}
 
-		ConditionVariable& WaitCondition() { return fWaitCondition; }
-
 	private:
-		ConditionVariable	fWaitCondition;
+		thread_id			fThread;
 		bool				fNotified;
 };
 
@@ -467,21 +471,14 @@ Inode::WaitForReadRequest(ReadRequest &request)
 {
 	request.SetUnnotified();
 
-	// publish the condition variable
-	ConditionVariable& conditionVariable = request.WaitCondition();
-	conditionVariable.Publish(&request, "pipe request");
-
 	// add the entry to wait on
-	ConditionVariableEntry entry;
-	entry.Add(&request, B_CAN_INTERRUPT);
+	thread_prepare_to_block(thread_get_current_thread(), B_CAN_INTERRUPT,
+		THREAD_BLOCK_TYPE_OTHER, "fifo read request");
 
 	// wait
 	benaphore_unlock(&fRequestLock);
-	status_t status = entry.Wait();
+	status_t status = thread_block();
 	benaphore_lock(&fRequestLock);
-
-	// unpublish the condition variable
-	conditionVariable.Unpublish();
 
 	return status;
 }
