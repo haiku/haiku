@@ -400,7 +400,7 @@ ActivityView::_Init(const BMessage* settings)
 
 	const char* name;
 	for (int32 i = 0; settings->FindString("source", i, &name) == B_OK; i++) {
-		AddDataSource(DataSource::FindSource(name));
+		AddDataSource(DataSource::FindSource(name), settings);
 	}
 }
 
@@ -760,10 +760,10 @@ ActivityView::MessageReceived(BMessage* message)
 {
 	// if a color is dropped, use it as background
 	if (message->WasDropped()) {
-		rgb_color *color;
+		rgb_color* color;
 		ssize_t size;
-		if ((message->FindData("RGBColor", B_RGB_COLOR_TYPE, 0,
-				(const void **)&color, &size) == B_OK)
+		if (message->FindData("RGBColor", B_RGB_COLOR_TYPE, 0,
+				(const void**)&color, &size) == B_OK
 			&& size == sizeof(rgb_color)) {
 			BPoint dropPoint = message->DropPoint();
 			ConvertFromScreen(&dropPoint);
@@ -775,10 +775,11 @@ ActivityView::MessageReceived(BMessage* message)
 				// check each legend color box
 				BRect legendFrame = _LegendFrame();
 				for (int32 i = 0; i < fSources.CountItems(); i++) {
-					BRect frame = _LegendFrameAt(legendFrame, i);
+					BRect frame = _LegendColorFrameAt(legendFrame, i);
 					if (frame.Contains(dropPoint)) {
 						fSources.ItemAt(i)->SetColor(*color);
 						Invalidate(_HistoryFrame());
+						Invalidate(frame);
 						return;
 					}
 				}
@@ -786,6 +787,7 @@ ActivityView::MessageReceived(BMessage* message)
 				if (dynamic_cast<ActivityMonitor*>(be_app) == NULL) {
 					// allow background color change in the replicant only
 					fLegendBackgroundColor = *color;
+					SetLowColor(fLegendBackgroundColor);
 					Invalidate(legendFrame);
 				}
 			}
@@ -941,6 +943,17 @@ ActivityView::_LegendFrameAt(BRect frame, int32 index) const
 }
 
 
+BRect
+ActivityView::_LegendColorFrameAt(BRect frame, int32 index) const
+{
+	frame = _LegendFrameAt(frame, index);
+	frame.InsetBy(1, 1);
+	frame.right = frame.left + frame.Height();
+
+	return frame;
+}
+
+
 float
 ActivityView::_PositionForValue(DataSource* source, DataHistory* values,
 	int64 value)
@@ -975,7 +988,7 @@ ActivityView::_DrawHistory()
 	}
 
 	BRect frame = _HistoryFrame();
-	SetLowColor(fHistoryBackgroundColor);
+	view->SetLowColor(fHistoryBackgroundColor);
 	view->FillRect(frame, B_SOLID_LOW);
 
 	uint32 step = 2;
@@ -990,12 +1003,24 @@ ActivityView::_DrawHistory()
 	bigtime_t timeStep = fRefreshInterval * resolution;
 	bigtime_t now = system_time();
 
+	// Draw scale
+	// TODO: add second markers?
+
 	view->SetPenSize(1);
 
-	view->SetHighColor(tint_color(view->ViewColor(), B_DARKEN_2_TINT));
+	rgb_color scaleColor = view->LowColor();
+	uint32 average = (scaleColor.red + scaleColor.green + scaleColor.blue) / 3;
+	if (average < 96)
+		scaleColor = tint_color(scaleColor, B_LIGHTEN_2_TINT);
+	else
+		scaleColor = tint_color(scaleColor, B_DARKEN_2_TINT);
+
+	view->SetHighColor(scaleColor);
 	view->StrokeRect(frame);
 	view->StrokeLine(BPoint(frame.left, frame.top + frame.Height() / 2),
 		BPoint(frame.right, frame.top + frame.Height() / 2));
+
+	// Draw values
 
 	view->SetPenSize(2);
 
@@ -1076,8 +1101,7 @@ ActivityView::Draw(BRect /*updateRect*/)
 		BRect frame = _LegendFrameAt(legendFrame, i);
 
 		// draw color box
-		BRect colorBox = frame.InsetByCopy(2, 2);
-		colorBox.right = colorBox.left + colorBox.Height();
+		BRect colorBox = _LegendColorFrameAt(legendFrame, i);
 		SetHighColor(tint_color(source->Color(), B_DARKEN_1_TINT));
 		StrokeRect(colorBox);
 		SetHighColor(source->Color());

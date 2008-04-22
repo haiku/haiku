@@ -94,6 +94,7 @@ private:
 			float		_LegendHeight() const;
 			BRect		_LegendFrame() const;
 			BRect		_LegendFrameAt(BRect frame, int32 index) const;
+			BRect		_LegendColorFrameAt(BRect frame, int32 index) const;
 			float		_PositionForValue(DataSource* source,
 							DataHistory* values, int64 value);
 			void		_DrawHistory();
