@@ -109,6 +109,10 @@ enum {
 	C_ERROR_STALE = B_ERRORS_END + 1
 };
 
+
+extern fs_volume_ops sNFSVolumeOps;
+extern fs_vnode_ops sNFSVnodeOps;
+
 #define USE_SYSTEM_AUTHENTICATION 1
 
 #endif	/* _NFS_ADD_ON_H */

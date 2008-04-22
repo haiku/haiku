@@ -1,7 +1,7 @@
 #include <posix/stdlib.h>
 
 #include "nfs_add_on.h"
-#include "ksocket.h"
+#include <sys/socket.h>
 
 #include "rpc.h"
 #include "pmap.h"
@@ -22,10 +22,7 @@
 #endif
 #define B_UDP_MAX_SIZE UDP_SIZE_MAX
 
-/* declare gSocket and others */
-KSOCKET_MODULE_DECL;
-
-static int fs_rmdir(fs_nspace *ns, fs_node *dir, const char *name);
+static status_t fs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name);
 
 /* *** configuration *** */
 
@@ -53,12 +50,7 @@ static unsigned long conf_call_tries = 3;
 /* don't check who the answers come from for requests */
 bool conf_no_check_ip_xid = false;
 
-/* *** DEBUG stuff *** */
-//#define my_notify_listener(p_a, p_b, p_c, p_d, p_e, p_f) ({dprintf("nfs: notify_listener(%08lx)\n", p_a); notify_listener(p_a, p_b, p_c, p_d, p_e, p_f); })
-#define my_notify_listener notify_listener
-
 static vint32 refcount = 0; /* we only want to read the config once ? */
-
 
 static status_t
 read_config(void)
@@ -110,7 +102,7 @@ create_socket(fs_nspace *ns)
 	struct sockaddr_in addr;
 	uint16 port=conf_high_port;
 	
-	ns->s=ksocket(AF_INET,SOCK_DGRAM,0);
+	ns->s=socket(AF_INET,SOCK_DGRAM,0);
 	
 	if (ns->s<0)
 		return errno;
@@ -123,19 +115,19 @@ create_socket(fs_nspace *ns)
 		addr.sin_port=htons(port);
 		memset (addr.sin_zero,0,sizeof(addr.sin_zero));
 		
-		if (kbind(ns->s,(const struct sockaddr *)&addr,sizeof(addr))<0)
+		if (bind(ns->s,(const struct sockaddr *)&addr,sizeof(addr))<0)
 		{
 			if (errno!=EADDRINUSE)
 			{
 				int result=errno;
-				kclosesocket(ns->s);
+				close(ns->s);
 				return result;
 			}
 
 			port--;
 			if (port==conf_low_port)
 			{
-				kclosesocket(ns->s);
+				close(ns->s);
 				return B_ERROR;
 			}
 		}
@@ -206,7 +198,7 @@ shutdown_postoffice(fs_nspace *ns)
 	status_t result;
 	
 	ns->quit=true;
-	kclosesocket(ns->s);
+	close(ns->s);
 	
 	wait_for_thread (ns->tid,&result);
 }
@@ -222,7 +214,7 @@ postoffice_func(fs_nspace *ns)
 		struct sockaddr_in from;
 		socklen_t fromLen=sizeof(from);
 
-		ssize_t bytes=krecvfrom (ns->s,buffer,B_UDP_MAX_SIZE,0,(struct sockaddr *)&from,&fromLen);
+		ssize_t bytes=recvfrom (ns->s,buffer,B_UDP_MAX_SIZE,0,(struct sockaddr *)&from,&fromLen);
 		
 		if (bytes>=4)
 		{
@@ -302,7 +294,7 @@ send_rpc_call(fs_nspace *ns, const struct sockaddr_in *addr, int32 prog,
 	do {
 		ssize_t bytes;
 		do {
-			bytes = ksendto(ns->s,(const void *)XDROutPacketBuffer(&rpc_call),
+			bytes = sendto(ns->s,(const void *)XDROutPacketBuffer(&rpc_call),
 				XDROutPacketLength(&rpc_call), 0,
 				(const struct sockaddr *)addr, sizeof(*addr));
 		}
@@ -332,7 +324,7 @@ send_rpc_call(fs_nspace *ns, const struct sockaddr_in *addr, int32 prog,
 
 	call = RPCPendingCallsFindAndRemovePendingCall(&ns->pendingCalls, xid, addr);	
 
-	kmessage("nfs: xid %ld timed out, removing from queue", xid);
+	dprintf("nfs: xid %ld timed out, removing from queue", xid);
 
 #if 0
 	if (call==NULL)
@@ -388,11 +380,11 @@ is_successful_reply(struct XDRInPacket *reply)
 			int32 low=XDRInPacketGetInt32(reply);
 			int32 high=XDRInPacketGetInt32(reply);
 
-			kmessage ("RPC_MISMATCH (%ld,%ld)", low, high);
+			dprintf ("nfs: RPC_MISMATCH (%ld,%ld)", low, high);
 		} else {
 			rpc_auth_stat authStat = (rpc_auth_stat)XDRInPacketGetInt32(reply);
 
-			kmessage ("RPC_AUTH_ERROR (%d)", authStat);
+			dprintf  ("nfs: RPC_AUTH_ERROR (%d)", authStat);
 		}
 	} else {
 		rpc_auth_flavor flavor = (rpc_auth_flavor)XDRInPacketGetInt32(reply);
@@ -407,9 +399,9 @@ is_successful_reply(struct XDRInPacket *reply)
 			int32 low = XDRInPacketGetInt32(reply);
 			int32 high = XDRInPacketGetInt32(reply);
 
-			kmessage ("RPC_PROG_MISMATCH (%ld,%ld)", low, high);				
+			dprintf ("nfs: RPC_PROG_MISMATCH (%ld,%ld)", low, high);				
 		} else if (acceptStat != RPC_SUCCESS)
-			kmessage ("Accepted but failed (%d)", acceptStat);
+			dprintf ("nfs: Accepted but failed (%d)", acceptStat);
 		else
 			success = true;
 	}
@@ -821,14 +813,15 @@ remove_node(fs_nspace *ns, ino_t vnid)
 //	#pragma mark -
 
 
-static int 
-#ifdef __HAIKU__
-fs_read_vnode(fs_nspace *ns, ino_t vnid, fs_node **node, char r)
-#else
-fs_read_vnode(fs_nspace *ns, ino_t vnid, char r, fs_node **node)
-#endif
+static status_t 
+fs_read_vnode(fs_volume *_volume, ino_t vnid, fs_vnode *_node, int *_type,
+		uint32 *_flags, bool r)
+
 {
+	fs_nspace *ns;
 	fs_node *current;
+
+	ns = _volume->private_volume;
 	
 	if (!r)
 	{
@@ -843,7 +836,11 @@ fs_read_vnode(fs_nspace *ns, ino_t vnid, char r, fs_node **node)
 	if (!current)
 		return EINVAL;
 		
-	*node=current;
+	current->vnid = vnid;
+	_node->private_node = current;
+	_node->ops = &sNFSVnodeOps;
+	*_type = 0;
+	*_flags = 0;
 	
 	if (!r)	
 	{
@@ -854,38 +851,32 @@ fs_read_vnode(fs_nspace *ns, ino_t vnid, char r, fs_node **node)
 }
 
 
-static int 
-#ifdef __HAIKU__
-fs_release_vnode(fs_nspace *ns, fs_node *node, char r)
-#else
-fs_write_vnode(fs_nspace *ns, fs_node *node, char r)
-#endif
+static status_t 
+fs_release_vnode(fs_volume *_volume, fs_vnode *node, bool r)
 {
-	(void) ns;
+	(void) _volume;
 	(void) node;
 	(void) r;
 	return B_OK;
 }
 
 
-static int 
-#ifdef __HAIKU__
-fs_walk(fs_nspace *ns, fs_node *base, const char *file, ino_t *vnid, int *type)
-#else
-fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, ino_t *vnid)
-#endif
+static status_t 
+fs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *vnid)
 {
 	bool isLink;
 	fs_node *dummy;
 	status_t result;
+	fs_nspace *ns;
+	fs_node *base;
 	//dprintf("nfs: walk(%s)\n", file);//XXX:mmu_man:debug
+
+	ns = _volume->private_volume;
+	base = _base->private_node;
 	
 	if (!strcmp(".",file))
 	{
 		*vnid=base->vnid;
-#ifdef __HAIKU__
-		*type = S_IFDIR;
-#endif
 		isLink=false;
 	}
 	else
@@ -901,54 +892,33 @@ fs_walk(fs_nspace *ns, fs_node *base, const char *file, char **newpath, ino_t *v
 		
 		newNode->vnid=st.st_ino;
 		*vnid=newNode->vnid;
-#ifdef __HAIKU__
-		*type = st.st_mode & S_IFMT;
-#endif
 		
 		insert_node (ns,newNode);
 		
 		isLink=S_ISLNK(st.st_mode);
 	}
 	
-	if ((result=get_vnode (ns->nsid,*vnid,(void **)&dummy))<B_OK)
+	if ((result=get_vnode (_volume,*vnid,(void **)&dummy))<B_OK)
 		return result;
 
-#ifndef __HAIKU__
-	if ((isLink)&&(newpath))
-	{
-		char path[NFS_MAXPATHLEN+1];
-		size_t pathLen=NFS_MAXPATHLEN;
-		
-		if ((result=fs_readlink(ns,dummy,path,&pathLen))<B_OK)
-		{
-			put_vnode (ns->nsid,*vnid);
-			return result;
-		}
-			
-		path[pathLen]=0;
-		
-		result=new_path(path,newpath);
-		
-		if (result<B_OK)
-		{
-			put_vnode (ns->nsid,*vnid);
-			return result;
-		}
-			
-		return put_vnode (ns->nsid,*vnid);
-	}
-#endif
-	
 	return B_OK;
 }
 
 
-static int 
-fs_opendir(fs_nspace *ns, fs_node *node, nfs_cookie **cookie)
+static status_t 
+fs_opendir(fs_volume *_volume, fs_vnode *_node, void **_cookie)
 {
+	fs_nspace *ns;
+	fs_node *node;
+	nfs_cookie **cookie;
+
 	struct stat st;
-	
 	status_t result;
+
+	ns = _volume->private_volume;
+	node = _node->private_node;
+	cookie = (nfs_cookie **)_cookie;
+
 	if ((result=nfs_getattr(ns,&node->fhandle,&st))<B_OK)
 		return result;
 	
@@ -962,41 +932,46 @@ fs_opendir(fs_nspace *ns, fs_node *node, nfs_cookie **cookie)
 }
 
 
-static int 
-fs_closedir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
+static status_t 
+fs_closedir(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
-	(void) ns;
-	(void) node;
+	(void) _volume;
+	(void) _node;
 	(void) cookie;
 	return B_OK;
 }
 
 
-static int 
-fs_rewinddir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
+static status_t 
+fs_rewinddir(fs_volume *_volume, fs_vnode *_node, void *_cookie)
 {
-	(void) ns;
-	(void) node;
+	nfs_cookie *cookie = (nfs_cookie *)_cookie;
+	(void) _volume;
+	(void) _node;
 	memset (cookie->opaque,0,NFS_COOKIESIZE);
 	
 	return B_OK;
 }
 
 
-static int
-#ifdef __HAIKU__
-fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, struct dirent *buf, size_t bufsize, uint32 *num)
-#else
-fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, long *num, struct dirent *buf, size_t bufsize)
-#endif
+static status_t
+fs_readdir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
+		struct dirent *buf, size_t bufsize, uint32 *num)
 {
+	nfs_cookie *cookie = (nfs_cookie *)_cookie;
 	int32 max=*num;
 	int32 eof;
-	
+
+	fs_nspace *ns;
+	fs_node *node;
+
 	size_t count=min_c(6000,max*300);
 	
 	*num=0;
 
+	ns = _volume->private_volume;
+	node = _node->private_node;
+	
 	do
 	{
 		ino_t vnid;
@@ -1118,20 +1093,26 @@ fs_readdir(fs_nspace *ns, fs_node *node, nfs_cookie *cookie, long *num, struct d
 }
 
 
-static int 
-fs_free_dircookie(fs_nspace *ns, fs_node *node, nfs_cookie *cookie)
+static status_t 
+fs_free_dircookie(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
-	(void) ns;
-	(void) node;
+	(void) _volume;
+	(void) _node;
 	free(cookie);
 	return B_OK;
 }
 
 
-static int 
-fs_rstat(fs_nspace *ns, fs_node *node, struct stat *st)
+static status_t 
+fs_rstat(fs_volume *_volume, fs_vnode *_node, struct stat *st)
 {
+	fs_nspace *ns;
+	fs_node *node;
 	status_t result;
+
+	ns = _volume->private_volume;
+	node = _node->private_node;
+
 	//dprintf("nfs: rstat()\n");//XXX:mmu_man:debug
 	if ((result=nfs_getattr(ns,&node->fhandle,st))<B_OK)
 		return result;
@@ -1156,7 +1137,7 @@ fs_nspaceDestroy(struct fs_nspace *nspace)
 }
 
 
-static int
+static status_t
 parse_nfs_params(const char *str, struct mount_nfs_params *params)
 {
 	const char *p, *e;
@@ -1243,36 +1224,24 @@ dprintf("nfs:gid!\n");
 }
 
 
-static int 
-#ifdef __HAIKU__
-fs_mount(dev_t nsid, const char *devname, uint32 flags, const char *_parms,
-	fs_volume *_data, ino_t *vnid)
-#else
-fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms,
-	size_t len, fs_nspace **_data, ino_t *vnid)
-#endif
+static status_t 
+fs_mount(fs_volume *_vol, const char *devname, uint32 flags, const char *_parms, ino_t *vnid)
 {
 	status_t result;
 	fs_nspace *ns;
 	fs_node *rootNode;
 	struct stat st;
-#ifndef __HAIKU__
-	(void) len;
-#endif
 
 	if (_parms == NULL)
 		return EINVAL;
 
-	dprintf("nfs: mount(%ld, %s, %08lx)\n", nsid, devname, flags);
+	dprintf("nfs: mount(%ld, %s, %08lx)\n", _vol->id, devname, flags);
 	dprintf("nfs: nfs_params: %s\n", _parms);
 
 	// HAIKU: this should go to std_ops
 	if (!refcount)
 		read_config();
 
-	result = ksocket_init();
-	if (result < B_OK)
-		return result;
 
 	result = ENOMEM;
 	ns = (fs_nspace *)malloc(sizeof(fs_nspace));
@@ -1280,7 +1249,7 @@ fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms,
 		goto err_nspace;
 	fs_nspaceInit(ns);
 
-	ns->nsid = nsid;
+	ns->nsid = _vol->id;
 
 	ns->params.server = NULL;
 	ns->params._export = NULL;
@@ -1293,14 +1262,23 @@ fs_mount(nspace_id nsid, const char *devname, ulong flags, const char *_parms,
 	memset(ns->mountAddr.sin_zero, 0, sizeof(ns->mountAddr.sin_zero));
 
 	if ((result = create_socket(ns)) < B_OK)
+	{
+		dprintf( "nfs: could not create socket (%d)\n", (int)result );
 		goto err_socket;
+	}
 
 	if ((result = init_postoffice(ns)) < B_OK)
+	{
+		dprintf( "nfs: could not init_postoffice() (%d)\n", (int)result );
 		goto err_postoffice;
+	}
 
 	if ((result = get_remote_address(ns, MOUNT_PROGRAM, MOUNT_VERSION,
 			PMAP_IPPROTO_UDP, &ns->mountAddr)) < B_OK)
+	{
+		dprintf( "could not get_remote_address() (%d)\n", (int)result );
 		goto err_sem;
+	}
 
 	memcpy(&ns->nfsAddr, &ns->mountAddr, sizeof(ns->mountAddr));
 dprintf("nfs: mountd at %08x:%d\n", ns->mountAddr.sin_addr.s_addr, ntohs(ns->mountAddr.sin_port));
@@ -1336,10 +1314,15 @@ dprintf("nfs: nfsd at %08x:%d\n", ns->nfsAddr.sin_addr.s_addr, ntohs(ns->nfsAddr
 
 	*vnid = ns->rootid;
 
-	if ((result = publish_vnode(nsid, *vnid, rootNode)) < B_OK)
+	_vol->private_volume = ns;
+	_vol->ops = &sNFSVolumeOps;
+
+	// TODO: set right mode
+	if ((result = publish_vnode(_vol, *vnid, rootNode, &sNFSVnodeOps,
+					S_IFDIR, 0)) < B_OK)
 		goto err_publish;
 
-	*_data = ns;
+	_vol->private_volume = ns;
 
 	ns->first=rootNode;
 
@@ -1355,7 +1338,7 @@ err_sem:
 	shutdown_postoffice(ns);
 	goto err_socket;
 err_postoffice:
-	kclosesocket(ns->s);
+	close(ns->s);
 err_socket:
 err_params:
 	free (ns->params.hostname);
@@ -1366,7 +1349,6 @@ err_params:
 	free(ns);
 err_nspace:
 
-	ksocket_cleanup();
 	if (result >= 0) {
 		dprintf("nfs:bad error from mount!\n");
 		result = EINVAL;
@@ -1376,10 +1358,10 @@ err_nspace:
 }
 
 
-static int 
-fs_unmount(fs_volume _volume)
+static status_t 
+fs_unmount(fs_volume *_volume)
 {
-	fs_nspace *ns = (fs_nspace *)_volume;
+	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	free(ns->params.hostname);
 	free(ns->params._export);
 	free(ns->params.server);
@@ -1390,28 +1372,30 @@ fs_unmount(fs_volume _volume)
 		ns->first = next;
 	}
 
-	// Unlike in BeOS, we need to put the reference to our root node ourselves
-#ifdef __HAIKU__
-	put_vnode(ns->nsid, ns->rootid);
-#endif
+	// We need to put the reference to our root node ourselves
+	put_vnode(_volume, ns->rootid);
 
 	delete_sem(ns->sem);
 	shutdown_postoffice(ns);
 	fs_nspaceDestroy(ns);
 	free(ns);
-	ksocket_cleanup();
 	return B_OK;
 }
 
 
-static int 
-fs_rfsstat(fs_nspace *ns, struct fs_info *info)
+static status_t 
+fs_rfsstat(fs_volume *_volume, struct fs_info *info)
 {
+	fs_nspace *ns;
 	struct XDROutPacket call;
 	struct XDRInPacket reply;
-	nfs_fhandle rootHandle=handle_from_vnid (ns,ns->rootid);
+	nfs_fhandle rootHandle;
 	uint8 *replyBuf;
 	int32 status;
+
+	ns = (fs_nspace *)_volume->private_volume;
+	
+	rootHandle = handle_from_vnid (ns,ns->rootid);
 	//dprintf("nfs: rfsstat()\n");//XXX:mmu_man:debug
 
 	XDROutPacketInit(&call);
@@ -1466,12 +1450,19 @@ fs_rfsstat(fs_nspace *ns, struct fs_info *info)
 }
 
 
-static int 
-fs_open(fs_nspace *ns, fs_node *node, int omode, fs_file_cookie **cookie)
+static status_t 
+fs_open(fs_volume *_volume, fs_vnode *_node, int omode, void **_cookie)
 {
+	fs_nspace *ns;
+	fs_node *node;
 	struct stat st;
-	
 	status_t result;
+	fs_file_cookie **cookie;
+
+	ns = _volume->private_volume;
+	node = _node->private_node;
+	cookie = (fs_file_cookie **)_cookie;
+
 	if ((result=nfs_getattr(ns,&node->fhandle,&st))<B_OK)
 		return result;
 	
@@ -1493,11 +1484,11 @@ fs_open(fs_nspace *ns, fs_node *node, int omode, fs_file_cookie **cookie)
 }
 
 
-static int
-fs_close(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie)
+static status_t
+fs_close(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
-	(void) ns;
-	(void) node;
+	(void) _volume;
+	(void) _node;
 	(void) cookie;
 /*	//XXX:mmu_man:why that ?? makes Tracker go nuts updating the stats
 	if ((cookie->omode & O_RDWR)||(cookie->omode & O_WRONLY))
@@ -1507,22 +1498,29 @@ fs_close(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie)
 }
 
 
-static int
-fs_free_cookie(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie)
+static status_t
+fs_free_cookie(fs_volume *_volume, fs_vnode *_node, void *cookie)
 {
-	(void) ns;
-	(void) node;
+	(void) _volume;
+	(void) _node;
 	free(cookie);
 	return B_OK;
 }
 
 
-static int
-fs_read(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie, off_t pos,
+static status_t
+fs_read(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 	void *buf, size_t *len)
 {
+	fs_nspace *ns;
+	fs_node *node;
+	fs_file_cookie *cookie;
 	size_t max = *len;
 	*len = 0;
+
+	ns = _volume->private_volume;
+	node = _node->private_node;
+	cookie = (fs_file_cookie *)_cookie;
 
 	if (!cookie)
 		return EISDIR; /* do not permit reading of directories */
@@ -1587,11 +1585,18 @@ fs_read(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie, off_t pos,
 }
 
 
-static int
-fs_write(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie, off_t pos,
+static status_t
+fs_write(fs_volume *_volume, fs_vnode *_node, void *_cookie, off_t pos,
 	const void *buf, size_t *len)
 {
+	fs_nspace *ns;
+	fs_node *node;
+	fs_file_cookie *cookie;
 	size_t bytesWritten = 0;
+
+	ns = _volume->private_volume;
+	node = _node->private_node;
+	cookie = (fs_file_cookie *)_cookie;
 	
 	if (!cookie)
 		return EISDIR; /* do not permit reading of directories */
@@ -1656,14 +1661,19 @@ fs_write(fs_nspace *ns, fs_node *node, fs_file_cookie *cookie, off_t pos,
 	return B_OK;
 }
 
-static int 
-fs_wstat(fs_nspace *ns, fs_node *node, struct stat *st, long mask)
+static status_t 
+fs_wstat(fs_volume *_volume, fs_vnode *_node, const struct stat *st, uint32 mask)
 {
+	fs_nspace *ns;
+	fs_node *node;
 	struct XDROutPacket call;
 	struct XDRInPacket reply;
 	
 	uint8 *replyBuf;
 	int32 status;
+
+	ns = _volume->private_volume;
+	node = _node->private_node;
 	
 	XDROutPacketInit (&call);
 	XDRInPacketInit (&reply);
@@ -1704,29 +1714,35 @@ fs_wstat(fs_nspace *ns, fs_node *node, struct stat *st, long mask)
 	
 	XDRInPacketDestroy (&reply);
 	XDROutPacketDestroy (&call);
-	return my_notify_listener (B_STAT_CHANGED,ns->nsid,0,0,node->vnid,NULL);
+
+	return notify_stat_changed (_volume->id, node->vnid, mask);
 }
 
-static int 
-fs_wfsstat(fs_nspace *ns, struct fs_info *info, long mask)
+static status_t 
+fs_wfsstat(fs_volume *_volume, const struct fs_info *info, uint32 mask)
 {
-	(void) ns;
+	(void) _volume;
 	(void) info;
 	(void) mask;
 	return B_OK;
 }
 
-static int 
-#ifdef __HAIKU__
-fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, fs_file_cookie **cookie, ino_t *vnid)
-#else
-fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, ino_t *vnid, fs_file_cookie **cookie)
-#endif
+static status_t 
+fs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int omode, int perms, void **_cookie, ino_t *vnid)
 {
 	nfs_fhandle fhandle;
 	struct stat st;
+	fs_file_cookie **cookie;
+	
+	fs_nspace *ns;
+	fs_node *dir;
 	
 	status_t result;
+
+	ns = _volume->private_volume;
+	dir = _dir->private_node;
+	cookie = (fs_file_cookie **)_cookie;
+
 	result=nfs_lookup(ns,&dir->fhandle,name,&fhandle,&st);
 	
 	if (result==B_OK)
@@ -1739,7 +1755,7 @@ fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, i
 
 		*vnid=st.st_ino;
 
-		if ((result=get_vnode(ns->nsid,*vnid,&dummy))<B_OK)
+		if ((result=get_vnode(_volume,*vnid,&dummy))<B_OK)
 			return result;
 
 		if (S_ISDIR(st.st_mode))
@@ -1833,7 +1849,7 @@ fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, i
 		(*cookie)->original_size=st.st_size;
 		(*cookie)->st=st;
 					
-		result=new_vnode (ns->nsid,*vnid,newNode);
+		result=new_vnode (_volume,*vnid,newNode,&sNFSVnodeOps);
 		
 		if (result<B_OK)
 		{
@@ -1844,14 +1860,16 @@ fs_create(fs_nspace *ns, fs_node *dir, const char *name, int omode, int perms, i
 				
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);
-		return my_notify_listener (B_ENTRY_CREATED,ns->nsid,dir->vnid,0,*vnid,name);
+		return notify_entry_created (_volume->id, dir->vnid, name, *vnid);
 	}	
 }
 
-static int 
-fs_unlink(fs_nspace *ns, fs_node *dir, const char *name)
+static status_t 
+fs_unlink(fs_volume *_volume, fs_vnode *_dir, const char *name)
 {
 	status_t result;
+	fs_nspace *ns;
+	fs_node *dir;
 	fs_node *newNode;
 	fs_node *dummy;
 
@@ -1863,6 +1881,9 @@ fs_unlink(fs_nspace *ns, fs_node *dir, const char *name)
 	uint8 *replyBuf;
 
 	int32 status;
+
+	ns = _volume->private_volume;
+	dir = _dir->private_node;
 	
 	XDROutPacketInit (&call);	
 	XDRInPacketInit (&reply);
@@ -1880,7 +1901,7 @@ fs_unlink(fs_nspace *ns, fs_node *dir, const char *name)
 
 	insert_node (ns,newNode);
 
-	if ((result=get_vnode(ns->nsid,st.st_ino,(void **)&dummy))<B_OK)
+	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy))<B_OK)
 	{
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);	
@@ -1894,14 +1915,14 @@ fs_unlink(fs_nspace *ns, fs_node *dir, const char *name)
 		return EISDIR;
 	}
 	
-	if ((result=remove_vnode(ns->nsid,st.st_ino))<B_OK)
+	if ((result=remove_vnode(_volume,st.st_ino))<B_OK)
 	{
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);	
 		return result;
 	}
 	
-	if ((result=put_vnode(ns->nsid,st.st_ino))<B_OK)
+	if ((result=put_vnode(_volume,st.st_ino))<B_OK)
 	{
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);	
@@ -1941,31 +1962,28 @@ fs_unlink(fs_nspace *ns, fs_node *dir, const char *name)
 	XDRInPacketDestroy (&reply);
 	XDROutPacketDestroy (&call);	
 	
-	return my_notify_listener (B_ENTRY_REMOVED,ns->nsid,dir->vnid,0,st.st_ino,name);
+	return notify_entry_removed (_volume->id, dir->vnid, name, st.st_ino);
 }
 
-static int 
-fs_remove_vnode(fs_nspace *ns, fs_node *node, char r)
+static status_t 
+fs_remove_vnode(fs_volume *_volume, fs_vnode *_node, bool r)
 {
+	fs_nspace *ns = _volume->private_volume;
+	fs_node *node = _node->private_node;
+
 	(void) r;
+
 	remove_node (ns,node->vnid);
 
 	return B_OK;
 }
 
-#ifndef __HAIKU__
-static int 
-fs_secure_vnode(fs_nspace *ns, fs_node *node)
+static status_t 
+fs_mkdir(fs_volume *_volume, fs_vnode *_dir, const char *name, int perms, ino_t *_newVnodeID)
 {
-	(void) ns;
-	(void) node;
-	return B_OK;
-}
-#endif
+	fs_nspace *ns;
+	fs_node *dir;
 
-static int 
-fs_mkdir(fs_nspace *ns, fs_node *dir, const char *name, int perms)
-{
 	nfs_fhandle fhandle;
 	struct stat st;
 	fs_node *newNode;
@@ -1976,6 +1994,9 @@ fs_mkdir(fs_nspace *ns, fs_node *dir, const char *name, int perms)
 	
 	struct XDROutPacket call;
 	struct XDRInPacket reply;
+
+	ns = _volume->private_volume;
+	dir = _dir->private_node;
 
 	XDROutPacketInit (&call);
 	XDRInPacketInit (&reply);
@@ -1989,7 +2010,7 @@ fs_mkdir(fs_nspace *ns, fs_node *dir, const char *name, int perms)
 		XDRInPacketDestroy (&reply);
 		XDROutPacketDestroy (&call);
 		// XXX: either OK or not get_vnode !!! ??
-		//if ((result=get_vnode(ns->nsid,st.st_ino,&dummy))<B_OK)
+		//if ((result=get_vnode(_volume,st.st_ino,&dummy))<B_OK)
 		//	return result;
 		return EEXIST;
 	}
@@ -2045,16 +2066,19 @@ fs_mkdir(fs_nspace *ns, fs_node *dir, const char *name, int perms)
 	newNode->fhandle=fhandle;
 	newNode->vnid=st.st_ino;
 
+	*_newVnodeID = newNode->vnid;
+
 	insert_node (ns,newNode);
 
 	XDRInPacketDestroy (&reply);
 	XDROutPacketDestroy (&call);
 
-	return my_notify_listener (B_ENTRY_CREATED,ns->nsid,dir->vnid,0,st.st_ino,name);		
+	return notify_entry_created( _volume->id, dir->vnid, name, st.st_ino );
 }
 
-static int 
-fs_rename(fs_nspace *ns, fs_node *olddir, const char *oldname, fs_node *newdir, const char *newname)
+static status_t 
+fs_rename(fs_volume *_volume, fs_vnode *_olddir, const char *oldname,
+		fs_vnode *_newdir, const char *newname)
 {
 	struct stat st;
 	nfs_fhandle fhandle;
@@ -2063,6 +2087,13 @@ fs_rename(fs_nspace *ns, fs_node *olddir, const char *oldname, fs_node *newdir, 
 	struct XDRInPacket reply;
 	int32 status;
 	uint8 *replyBuf;
+	fs_nspace *ns;
+	fs_node *olddir;
+	fs_node *newdir;
+
+	ns = _volume->private_volume;
+	olddir = _olddir->private_node;
+	newdir = _newdir->private_node;
 		
 	XDROutPacketInit (&call);
 	XDRInPacketInit (&reply);
@@ -2070,9 +2101,9 @@ fs_rename(fs_nspace *ns, fs_node *olddir, const char *oldname, fs_node *newdir, 
 	if ((result=nfs_lookup(ns,&newdir->fhandle,newname,&fhandle,&st))==B_OK)
 	{
 		if (S_ISREG(st.st_mode))
-			result=fs_unlink (ns,newdir,newname);
+			result=fs_unlink (_volume,_newdir,newname);
 		else
-			result=fs_rmdir (ns,newdir,newname);
+			result=fs_rmdir (_volume,_newdir,newname);
 			
 		if (result<B_OK)
 		{
@@ -2124,13 +2155,16 @@ fs_rename(fs_nspace *ns, fs_node *olddir, const char *oldname, fs_node *newdir, 
 	XDRInPacketDestroy (&reply);
 	XDROutPacketDestroy (&call);
 
-	return my_notify_listener (B_ENTRY_MOVED,ns->nsid,olddir->vnid,newdir->vnid,st.st_ino,newname);			
+	return notify_entry_moved (_volume->id, olddir->vnid, oldname, newdir->vnid, newname, st.st_ino);
 }
 
 
-static int 
-fs_rmdir(fs_nspace *ns, fs_node *dir, const char *name)
+static status_t 
+fs_rmdir(fs_volume *_volume, fs_vnode *_dir, const char *name)
 {
+	fs_nspace *ns;
+	fs_node *dir;
+
 	status_t result;
 	fs_node *newNode;
 	fs_node *dummy;
@@ -2141,6 +2175,9 @@ fs_rmdir(fs_nspace *ns, fs_node *dir, const char *name)
 		
 	struct stat st;
 	nfs_fhandle fhandle;
+
+	ns = _volume->private_volume;
+	dir = _dir->private_node;
 
 	XDROutPacketInit(&call);
 	XDRInPacketInit(&reply);
@@ -2158,7 +2195,7 @@ fs_rmdir(fs_nspace *ns, fs_node *dir, const char *name)
 
 	insert_node (ns,newNode);
 
-	if ((result=get_vnode(ns->nsid,st.st_ino,(void **)&dummy))<B_OK)
+	if ((result=get_vnode(_volume,st.st_ino,(void **)&dummy))<B_OK)
 	{
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
@@ -2172,14 +2209,14 @@ fs_rmdir(fs_nspace *ns, fs_node *dir, const char *name)
 		return ENOTDIR;
 	}
 	
-	if ((result=remove_vnode(ns->nsid,st.st_ino))<B_OK)
+	if ((result=remove_vnode(_volume,st.st_ino))<B_OK)
 	{
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
 		return result;
 	}
 	
-	if ((result=put_vnode(ns->nsid,st.st_ino))<B_OK)
+	if ((result=put_vnode(_volume,st.st_ino))<B_OK)
 	{
 		XDRInPacketDestroy(&reply);
 		XDROutPacketDestroy(&call);
@@ -2218,11 +2255,11 @@ fs_rmdir(fs_nspace *ns, fs_node *dir, const char *name)
 	
 	XDRInPacketDestroy(&reply);
 	XDROutPacketDestroy(&call);
-	return my_notify_listener (B_ENTRY_REMOVED,ns->nsid,dir->vnid,0,st.st_ino,name);
+	return notify_entry_removed (_volume->id, dir->vnid, name, st.st_ino);
 }
 
-static int 
-fs_readlink(fs_nspace *ns, fs_node *node, char *buf, size_t *bufsize)
+static status_t 
+fs_readlink(fs_volume *_volume, fs_vnode *_node, char *buf, size_t *bufsize)
 {
 	struct XDROutPacket call;
 	uint8 *replyBuf;
@@ -2230,6 +2267,11 @@ fs_readlink(fs_nspace *ns, fs_node *node, char *buf, size_t *bufsize)
 	size_t length;
 	char data[NFS_MAXPATHLEN];
 	struct XDRInPacket reply;
+	fs_nspace *ns;
+	fs_node *node;
+
+	ns = _volume->private_volume;
+	node = _node->private_node;
 	
 	XDROutPacketInit (&call);
 	XDRInPacketInit(&reply);
@@ -2274,13 +2316,11 @@ fs_readlink(fs_nspace *ns, fs_node *node, char *buf, size_t *bufsize)
 	return B_OK;
 }
 
-static int 
-#ifdef __HAIKU__
-fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path, int mode)
-#else
-fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
-#endif
+static status_t 
+fs_symlink(fs_volume *_volume, fs_vnode *_dir, const char *name, const char *path, int mode)
 {
+	fs_nspace *ns;
+	fs_node *dir;
 	nfs_fhandle fhandle;
 	struct stat st;
 	struct XDROutPacket call;	
@@ -2290,6 +2330,9 @@ fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
 	int32 status;
 	fs_node *newNode;
 
+	ns = _volume->private_volume;
+	dir = _dir->private_node;
+
 	XDROutPacketInit (&call);
 	XDRInPacketInit (&reply);
 			
@@ -2298,7 +2341,7 @@ fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
 	if (result==B_OK)
 	{
 		void *dummy;
-		if ((result=get_vnode(ns->nsid,st.st_ino,&dummy))<B_OK)
+		if ((result=get_vnode(_volume,st.st_ino,&dummy))<B_OK)
 			return result;
 
 		XDRInPacketDestroy (&reply);
@@ -2365,7 +2408,7 @@ fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
 
 	insert_node (ns,newNode);
 
-	result=my_notify_listener (B_ENTRY_CREATED,ns->nsid,dir->vnid,0,st.st_ino,name);
+	result = notify_entry_created (_volume->id, dir->vnid, name, st.st_ino);
 	
 	XDRInPacketDestroy (&reply);
 	XDROutPacketDestroy (&call);
@@ -2373,18 +2416,16 @@ fs_symlink(fs_nspace *ns, fs_node *dir, const char *name, const char *path)
 }
 
 
-static int
-fs_access(void *ns, void *node, int mode)
+static status_t
+fs_access(fs_volume *_volume, fs_vnode *node, int mode)
 {
-	(void) ns;
+	(void) _volume;
 	(void) node;
 	(void) mode;
 	/* XXX */
 	return B_OK;
 }
 
-
-#ifdef __HAIKU__
 
 static status_t
 nfs_std_ops(int32 op, ...)
@@ -2400,33 +2441,36 @@ nfs_std_ops(int32 op, ...)
 	}
 }
 
-
-static file_system_module_info sNFSModule = {
-	{
-		"file_systems/nfs" B_CURRENT_FS_API_VERSION,
-		0,
-		nfs_std_ops,
-	},
-
-	"Network File System v2",
-	0,	// DDM flags
-
-	// scanning
-	NULL,	// fs_identify_partition,
-	NULL,	// fs_scan_partition,
-	NULL,	// fs_free_identify_partition_cookie,
-	NULL,	// free_partition_content_cookie()
-
-	&fs_mount,
+fs_volume_ops sNFSVolumeOps = {
 	&fs_unmount,
 	&fs_rfsstat,
 	&fs_wfsstat,
-	NULL,	// &fs_sync,
+	NULL,			// no sync!
+	&fs_read_vnode,
+	
+	/* index directory & index operations */
+	NULL,	// &fs_open_index_dir
+	NULL,	// &fs_close_index_dir
+	NULL,	// &fs_free_index_dir_cookie
+	NULL,	// &fs_read_index_dir
+	NULL,	// &fs_rewind_index_dir
 
+	NULL,	// &fs_create_index
+	NULL,	// &fs_remove_index
+	NULL,	// &fs_stat_index
+
+	/* query operations */
+	NULL,	// &fs_open_query,
+	NULL,	// &fs_close_query,
+	NULL,	// &fs_free_query_cookie,
+	NULL,	// &fs_read_query,
+	NULL,	// &fs_rewind_query,
+};
+
+fs_vnode_ops sNFSVnodeOps = {
 	/* vnode operations */
 	&fs_walk,
 	NULL, // fs_get_vnode_name
-	&fs_read_vnode,
 	&fs_release_vnode,
 	&fs_remove_vnode,
 
@@ -2490,99 +2534,28 @@ static file_system_module_info sNFSModule = {
 	NULL,	// &fs_write_attr_stat
 	NULL,	// &fs_rename_attr
 	NULL,	// &fs_remove_attr
+};
 
-	/* index directory & index operations */
-	NULL,	// &fs_open_index_dir
-	NULL,	// &fs_close_index_dir
-	NULL,	// &fs_free_index_dir_cookie
-	NULL,	// &fs_read_index_dir
-	NULL,	// &fs_rewind_index_dir
+file_system_module_info sNFSFileSystem = {
+	{
+		"file_systems/nfs" B_CURRENT_FS_API_VERSION,
+		0,
+		nfs_std_ops,
+	},
+	"Network File System v2",
+	0,	// DDM flags
 
-	NULL,	// &fs_create_index
-	NULL,	// &fs_remove_index
-	NULL,	// &fs_stat_index
+	// scanning
+	NULL,	// fs_identify_partition,
+	NULL,	// fs_scan_partition,
+	NULL,	// fs_free_identify_partition_cookie,
+	NULL,	// free_partition_content_cookie()
 
-	/* query operations */
-	NULL,	// &fs_open_query,
-	NULL,	// &fs_close_query,
-	NULL,	// &fs_free_query_cookie,
-	NULL,	// &fs_read_query,
-	NULL,	// &fs_rewind_query,
+	&fs_mount,
 };
 
 module_info *modules[] = {
-	(module_info *)&sNFSModule,
+	(module_info *)&sNFSFileSystem,
 	NULL,
 };
 
-#else	// !__HAIKU__
-
-_EXPORT vnode_ops fs_entry =
-{
-	(op_read_vnode *)&fs_read_vnode,
-	(op_write_vnode *)&fs_write_vnode,
-	(op_remove_vnode *)&fs_remove_vnode,
-	(op_secure_vnode *)&fs_secure_vnode,
-	(op_walk *)&fs_walk,
-	(op_access *)&fs_access,
-	(op_create *)&fs_create,
-	(op_mkdir *)&fs_mkdir,
-	(op_symlink *)&fs_symlink,
-	NULL, //	&fs_link,
-	(op_rename *)&fs_rename,
-	(op_unlink *)&fs_unlink,
-	(op_rmdir *)&fs_rmdir,
-	(op_readlink *)&fs_readlink,
-	(op_opendir *)&fs_opendir,
-	(op_closedir *)&fs_closedir,
-	(op_free_cookie *)&fs_free_dircookie,
-	(op_rewinddir *)&fs_rewinddir,
-	(op_readdir *)&fs_readdir,
-	(op_open *)&fs_open,
-	(op_close *)&fs_close,
-	(op_free_cookie *)&fs_free_cookie,
-	(op_read *)&fs_read,
-	(op_write *)&fs_write,
-	NULL, //	&fs_readv,
-	NULL, //	&fs_writev,
-	NULL, //	&fs_ioctl,
-	NULL, //	&fs_setflags,
-	(op_rstat *)&fs_rstat,
-	(op_wstat *)&fs_wstat,
-	NULL, //	&fs_fsync,
-	NULL, //	&fs_initialize,
-	(op_mount *)&fs_mount,
-	(op_unmount *)&fs_unmount,
-	NULL, //	&fs_sync,
-	(op_rfsstat *)&fs_rfsstat,
-	(op_wfsstat *)&fs_wfsstat,
-	NULL, //	&fs_select,
-	NULL, //	&fs_deselect,
-	NULL, //	&fs_open_indexdir,
-	NULL, //	&fs_close_indexdir,
-	NULL, //	&fs_free_indexdircookie,
-	NULL, //	&fs_rewind_indexdir,
-	NULL, //	&fs_read_indexdir,
-	NULL, //	&fs_create_index,
-	NULL, //	&fs_remove_index,
-	NULL, //	&fs_rename_index,
-	NULL, //	&fs_stat_index,
-	NULL, //	&fs_open_attrdir,
-	NULL, //	&fs_close_attrdir,
-	NULL, //	&fs_free_attrdircookie,
-	NULL, //	&fs_rewind_attrdir,
-	NULL, //	&fs_read_attrdir,
-	NULL, //	&fs_write_attr,
-	NULL, //	&fs_read_attr,
-	NULL, //	&fs_remove_attr,
-	NULL, //	&fs_rename_attr,
-	NULL, //	&fs_stat_attr,
-	NULL, //	&fs_open_query,
-	NULL, //	&fs_close_query,
-	NULL, //	&fs_free_querycookie,
-	NULL, //	&fs_read_query	
-};
-
-_EXPORT int32 api_version=B_CUR_FS_API_VERSION;
-
-#endif
