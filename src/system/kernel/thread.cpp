@@ -2110,6 +2110,14 @@ thread_unblock(status_t threadID, status_t status)
 
 
 status_t
+thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout)
+{
+	InterruptsSpinLocker _(thread_spinlock);
+	return thread_block_with_timeout_locked(timeoutFlags, timeout);
+}
+
+
+status_t
 thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 {
 	struct thread* thread = thread_get_current_thread();
@@ -2117,24 +2125,29 @@ thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 	if (thread->wait.status != 1)
 		return thread->wait.status;
 
-	// Timer flags: absolute/relative + "acquire thread lock". The latter
-	// avoids nasty race conditions and deadlock problems that could otherwise
-	// occur between our cancel_timer() and a concurrently executing
-	// thread_block_timeout().
-	uint32 timerFlags = (timeoutFlags & B_RELATIVE_TIMEOUT)
-		? B_ONE_SHOT_RELATIVE_TIMER : B_ONE_SHOT_ABSOLUTE_TIMER;
-	timerFlags |= B_TIMER_ACQUIRE_THREAD_LOCK;
+	bool useTimer = (timeoutFlags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT))
+		&& timeout != B_INFINITE_TIMEOUT;
 
-	// install the timer
-	thread->wait.unblock_timer.user_data = thread;
-	add_timer(&thread->wait.unblock_timer, &thread_block_timeout, timeout,
-		timerFlags);
+	if (useTimer) {
+		// Timer flags: absolute/relative + "acquire thread lock". The latter
+		// avoids nasty race conditions and deadlock problems that could
+		// otherwise occur between our cancel_timer() and a concurrently
+		// executing thread_block_timeout().
+		uint32 timerFlags = (timeoutFlags & B_RELATIVE_TIMEOUT)
+			? B_ONE_SHOT_RELATIVE_TIMER : B_ONE_SHOT_ABSOLUTE_TIMER;
+		timerFlags |= B_TIMER_ACQUIRE_THREAD_LOCK;
+
+		// install the timer
+		thread->wait.unblock_timer.user_data = thread;
+		add_timer(&thread->wait.unblock_timer, &thread_block_timeout, timeout,
+			timerFlags);
+	}
 
 	// block
 	status_t error = thread_block_locked(thread);
 
 	// cancel timer, if it didn't fire
-	if (error != B_TIMED_OUT)
+	if (error != B_TIMED_OUT && useTimer)
 		cancel_timer(&thread->wait.unblock_timer);
 
 	return error;
