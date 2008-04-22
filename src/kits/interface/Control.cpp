@@ -114,7 +114,7 @@ BControl::Archive(BMessage *archive, bool deep) const
 	status_t status = BView::Archive(archive, deep);
 
 	if (status == B_OK && Message())
-		status = archive->AddMessage("_msg", Message ());
+		status = archive->AddMessage("_msg", Message());
 
 	if (status == B_OK && fLabel)
 		status = archive->AddString("_label", fLabel);

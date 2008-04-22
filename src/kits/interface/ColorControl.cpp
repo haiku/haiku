@@ -132,13 +132,13 @@ BColorControl::_InitData(color_control_layout layout, float size,
 			fBlueText->TextView()->AllowChar(i);
 		fBlueText->TextView()->SetMaxBytes(3);
 		
-		_LayoutView();
-	
 		AddChild(fRedText);
 		AddChild(fGreenText);
 		AddChild(fBlueText);
 	}
 
+	_LayoutView();
+	
 	if (useOffscreen) {
 		BRect bounds = fPaletteFrame;
 		bounds.InsetBy(-2.0f, -2.0f); 
