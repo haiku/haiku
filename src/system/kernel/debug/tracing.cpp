@@ -386,48 +386,17 @@ class UserTraceEntry : public AbstractTraceEntry {
 //	#pragma mark - trace filters
 
 
-class LazyTraceOutput : public TraceOutput {
-public:
-	LazyTraceOutput(char* buffer, size_t bufferSize, uint32 flags)
-		: TraceOutput(buffer, bufferSize, flags)
-	{
-	}
-
-	const char* DumpEntry(const TraceEntry* entry)
-	{
-		if (Size() == 0) {
-			const_cast<TraceEntry*>(entry)->Dump(*this);
-				// Dump() should probably be const
-		}
-
-		return Buffer();
-	}
-};
+TraceFilter::~TraceFilter()
+{
+}
 
 
-class TraceFilter {
-public:
-	virtual ~TraceFilter()
-	{
-	}
+bool
+TraceFilter::Filter(const TraceEntry* entry, LazyTraceOutput& out)
+{
+	return false;
+}
 
-	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
-	{
-		return false;
-	}
-
-public:
-	union {
-		thread_id	fThread;
-		team_id		fTeam;
-		const char*	fString;
-		uint64		fValue;
-		struct {
-			TraceFilter*	first;
-			TraceFilter*	second;
-		} fSubFilters;
-	};
-};
 
 
 class ThreadTraceFilter : public TraceFilter {
@@ -544,9 +513,9 @@ public:
 		return fTokenIndex == fTokenCount && filter != NULL;
 	}
 
-	bool Filter(const TraceEntry* entry, LazyTraceOutput& out)
+	TraceFilter* Filter()
 	{
-		return fFilters[0].Filter(entry, out);
+		return &fFilters[0];
 	}
 
 private:
@@ -782,7 +751,7 @@ private:
 
 
 int
-dump_tracing(int argc, char** argv)
+dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 {
 	int argi = 1;
 
@@ -934,7 +903,16 @@ dump_tracing(int argc, char** argv)
 	int32 firstToDump = firstToCheck;
 	int32 lastToDump = lastToCheck;
 
-	if (direction < 0 && hasFilter && lastToCheck - firstToCheck >= count) {
+	TraceFilter* filter = NULL;
+	if (hasFilter)
+		filter = TraceFilterParser::Default()->Filter();
+
+	if (wrapperFilter != NULL) {
+		wrapperFilter->Init(filter, direction, cont != 0);
+		filter = wrapperFilter;
+	}
+
+	if (direction < 0 && filter && lastToCheck - firstToCheck >= count) {
 		// iteration direction is backwards
 		markedMatching = true;
 
@@ -952,7 +930,7 @@ dump_tracing(int argc, char** argv)
 			TraceEntry* entry = iterator.Previous();
 			if ((entry->flags & ENTRY_INITIALIZED) != 0) {
 				out.Clear();
-				if (TraceFilterParser::Default()->Filter(entry, out)) {
+				if (filter->Filter(entry, out)) {
 					entry->flags |= FILTER_MATCH;
 					if (lastToDump == -1)
 						lastToDump = iterator.Index();
@@ -994,9 +972,9 @@ dump_tracing(int argc, char** argv)
 
 		if ((entry->flags & ENTRY_INITIALIZED) != 0) {
 			out.Clear();
-			if (hasFilter &&  (markedMatching
+			if (filter &&  (markedMatching
 					? (entry->flags & FILTER_MATCH) == 0
-					: !TraceFilterParser::Default()->Filter(entry, out))) {
+					: !filter->Filter(entry, out))) {
 				continue;
 			}
 
@@ -1007,7 +985,7 @@ dump_tracing(int argc, char** argv)
 				len--;
 
 			kprintf("%5ld. %.*s\n", index, len, dump);
-		} else if (!hasFilter)
+		} else if (!filter)
 			kprintf("%5ld. ** uninitialized entry **\n", index);
 
 		dumped++;
@@ -1029,6 +1007,13 @@ dump_tracing(int argc, char** argv)
 	_previousOutputFlags = outputFlags;
 
 	return cont != 0 ? B_KDEBUG_CONT : 0;
+}
+
+
+static int
+dump_tracing_command(int argc, char** argv)
+{
+	return dump_tracing_internal(argc, argv, NULL);
 }
 
 
@@ -1104,6 +1089,17 @@ alloc_tracing_buffer_strcpy(const char* source, size_t maxSize, bool user)
 }
 
 
+int
+dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
+{
+#if	ENABLE_TRACING
+	return dump_tracing_internal(argc, argv, wrapperFilter);
+#else
+	return 0;
+#endif
+}
+
+
 extern "C" status_t
 tracing_init(void)
 {
@@ -1117,7 +1113,7 @@ tracing_init(void)
 	sFirstEntry = sBuffer;
 	sAfterLastEntry = sBuffer;
 
-	add_debugger_command_etc("traced", &dump_tracing,
+	add_debugger_command_etc("traced", &dump_tracing_command,
 		"Dump recorded trace entries",
 		"[ \"--printteam\" ] [ \"--difftime\" ] (\"forward\" | \"backward\") "
 			"| ([ <start> [ <count> [ <range> ] ] ] "

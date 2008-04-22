@@ -88,6 +88,48 @@ class AbstractTraceEntry : public TraceEntry {
 		bigtime_t	fTime;
 };
 
+class LazyTraceOutput : public TraceOutput {
+public:
+	LazyTraceOutput(char* buffer, size_t bufferSize, uint32 flags)
+		: TraceOutput(buffer, bufferSize, flags)
+	{
+	}
+
+	const char* DumpEntry(const TraceEntry* entry)
+	{
+		if (Size() == 0) {
+			const_cast<TraceEntry*>(entry)->Dump(*this);
+				// Dump() should probably be const
+		}
+
+		return Buffer();
+	}
+};
+
+class TraceFilter {
+public:
+	virtual ~TraceFilter();
+
+	virtual bool Filter(const TraceEntry* entry, LazyTraceOutput& out);
+
+public:
+	union {
+		thread_id	fThread;
+		team_id		fTeam;
+		const char*	fString;
+		uint64		fValue;
+		struct {
+			TraceFilter*	first;
+			TraceFilter*	second;
+		} fSubFilters;
+	};
+};
+
+class WrapperTraceFilter : public TraceFilter {
+public:
+	virtual void Init(TraceFilter* filter, int direction, bool continued) = 0;
+};
+
 #endif	// __cplusplus
 
 #ifdef __cplusplus
@@ -98,6 +140,7 @@ uint8* alloc_tracing_buffer(size_t size);
 uint8* alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user);
 char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
 			bool user);
+int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
 status_t tracing_init(void);
 
 void _user_ktrace_output(const char *message);
