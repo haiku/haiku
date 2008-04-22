@@ -42,7 +42,7 @@ KernelMergeObject kernel_core.o :
 	syscalls.cpp
 	team.cpp
 	thread.cpp
-	timer.c
+	timer.cpp
 	usergroup.cpp
 	wait_for_objects.cpp
 

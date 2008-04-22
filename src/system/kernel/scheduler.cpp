@@ -275,10 +275,11 @@ scheduler_reschedule(void)
 		timer *quantumTimer = &oldThread->cpu->quantum_timer;
 
 		if (!oldThread->cpu->preempted)
-			_local_timer_cancel_event(oldThread->cpu->cpu_num, quantumTimer);
+			cancel_timer(quantumTimer);
 
 		oldThread->cpu->preempted = 0;
-		add_timer(quantumTimer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
+		add_timer(quantumTimer, &reschedule_event, quantum,
+			B_ONE_SHOT_RELATIVE_TIMER | B_TIMER_ACQUIRE_THREAD_LOCK);
 
 		if (nextThread != oldThread)
 			context_switch(oldThread, nextThread);
