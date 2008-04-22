@@ -18,6 +18,7 @@
 #include <thread.h>
 #include <util/AutoLock.h>
 
+
 struct per_cpu_timer_data {
 	spinlock		lock;
 	timer* volatile	events;
@@ -26,13 +27,6 @@ struct per_cpu_timer_data {
 };
 
 static per_cpu_timer_data sPerCPU[B_MAX_CPU_COUNT];
-
-/*
-static timer * volatile sEvents[B_MAX_CPU_COUNT] = { NULL, };
-static timer * volatile sCurrentEvents[B_MAX_CPU_COUNT] = { NULL, };
-static spinlock sCurrentEventsCompletion[B_MAX_CPU_COUNT];
-static spinlock sTimerSpinlock[B_MAX_CPU_COUNT] = { 0, };
-*/
 
 
 //#define TRACE_TIMER
@@ -290,7 +284,7 @@ cancel_timer(timer *event)
 			spinLocker.Unlock();
 
 			while (cpuData.current_event_in_progress == 1) {
-				// spin
+				PAUSE();
 			}
 		}
 
