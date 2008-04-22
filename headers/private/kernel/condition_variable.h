@@ -28,10 +28,16 @@ public:
 #endif
 
 			bool				Add(const void* object, uint32 flags = 0);
-			status_t			Wait();
-			status_t			Wait(const void* object, uint32 flags = 0);
+			status_t			Wait(uint32 timeoutFlags = 0,
+									bigtime_t timeout = 0);
+			status_t			Wait(const void* object, uint32 flags = 0,
+									bigtime_t timeout = 0);
 
 	inline	ConditionVariable* Variable() const		{ return fVariable; }
+
+private:
+	inline	void				AddToVariable(ConditionVariable* variable,
+									uint32 flags);
 
 private:
 			ConditionVariable*	fVariable;
@@ -43,12 +49,19 @@ private:
 
 class ConditionVariable : protected HashTableLink<ConditionVariable> {
 public:
+			void				Init(const void* object,
+									const char* objectType);
+									// for anonymous (unpublished) cvars
+
 			void				Publish(const void* object,
 									const char* objectType);
 			void				Unpublish(bool threadsLocked = false);
 
 	inline	void				NotifyOne(bool threadsLocked = false);
 	inline	void				NotifyAll(bool threadsLocked = false);
+
+			void				Add(ConditionVariableEntry* entry,
+									uint32 flags = 0);
 
 			const void*			Object() const	{ return fObject; }
 

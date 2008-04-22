@@ -96,18 +96,16 @@ ConditionVariableEntry::Add(const void* object, uint32 flags)
 
 	fThread = thread_get_current_thread();
 
-	InterruptsLocker _;
-	SpinLocker locker(sConditionVariablesLock);
+	InterruptsSpinLocker _(sConditionVariablesLock);
 
 	fVariable = sConditionVariableHash.Lookup(object);
 
-	struct thread* thread = thread_get_current_thread();
-	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_CONDITION_VARIABLE,
-		fVariable);
+	thread_prepare_to_block(fThread, flags,
+		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, fVariable);
 
 	if (fVariable == NULL) {
 		SpinLocker threadLocker(thread_spinlock);
-		thread_unblock_locked(thread, B_ENTRY_NOT_FOUND);
+		thread_unblock_locked(fThread, B_ENTRY_NOT_FOUND);
 		return false;
 	}
 
@@ -119,7 +117,7 @@ ConditionVariableEntry::Add(const void* object, uint32 flags)
 
 
 status_t
-ConditionVariableEntry::Wait()
+ConditionVariableEntry::Wait(uint32 timeoutFlags, bigtime_t timeout)
 {
 	if (!are_interrupts_enabled()) {
 		panic("wait_for_condition_variable_entry() called with interrupts "
@@ -130,7 +128,11 @@ ConditionVariableEntry::Wait()
 	InterruptsLocker _;
 
 	SpinLocker threadLocker(thread_spinlock);
-	status_t error = thread_block_locked(thread_get_current_thread());
+	status_t error;
+	if ((timeoutFlags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
+		error = thread_block_with_timeout_locked(timeoutFlags, timeout);
+	else
+		error = thread_block_locked(thread_get_current_thread());
 	threadLocker.Unlock();
 
 	SpinLocker locker(sConditionVariablesLock);
@@ -146,15 +148,43 @@ ConditionVariableEntry::Wait()
 
 
 status_t
-ConditionVariableEntry::Wait(const void* object, uint32 flags)
+ConditionVariableEntry::Wait(const void* object, uint32 flags,
+	bigtime_t timeout)
 {
 	if (Add(object, flags))
-		return Wait();
+		return Wait(flags, timeout);
 	return B_ENTRY_NOT_FOUND;
 }
 
 
+inline void
+ConditionVariableEntry::AddToVariable(ConditionVariable* variable, uint32 flags)
+{
+	fThread = thread_get_current_thread();
+
+	thread_prepare_to_block(fThread, flags,
+		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, fVariable);
+
+	// add to the variable
+	InterruptsSpinLocker _(sConditionVariablesLock);
+
+	fVariable = variable;
+	fVariable->fEntries.Add(this);
+}
+
+
 // #pragma mark - ConditionVariable
+
+
+/*!	Initialization method for anonymous (unpublished) condition variables.
+*/
+void
+ConditionVariable::Init(const void* object, const char* objectType)
+{
+	fObject = object;
+	fObjectType = objectType;
+	new(&fEntries) EntryList;
+}
 
 
 void
@@ -202,6 +232,13 @@ ConditionVariable::Unpublish(bool threadsLocked)
 }
 
 
+void
+ConditionVariable::Add(ConditionVariableEntry* entry, uint32 flags)
+{
+	entry->AddToVariable(this, flags);
+}
+
+
 /*static*/ void
 ConditionVariable::ListAll()
 {
@@ -241,14 +278,6 @@ ConditionVariable::_Notify(bool all, bool threadsLocked)
 	InterruptsLocker _;
 	SpinLocker threadLocker(threadsLocked ? NULL : &thread_spinlock);
 	SpinLocker locker(sConditionVariablesLock);
-
-#if KDEBUG
-	ConditionVariable* variable = sConditionVariableHash.Lookup(fObject);
-	if (variable != this) {
-		panic("Condition variable %p not published, found: %p", this, variable);
-		return;
-	}
-#endif
 
 	if (!fEntries.IsEmpty())
 		_NotifyChecked(all, B_OK);
