@@ -12,6 +12,7 @@
 #include <Locker.h>
 #include <SupportDefs.h>
 
+#include "support_kit_config.h"
 
 //
 // Data Member Documentation:
@@ -188,7 +189,7 @@ BLocker::InitLocker(const char *name, bool benaphore)
 	if (name == NULL)
 		name = "some BLocker";
 
-	if (benaphore) {
+	if (benaphore && !BLOCKER_ALWAYS_SEMAPHORE_STYLE) {
 		// Because this is a benaphore, initialize the benaphore count and
 		// create the semaphore.  Because this is a benaphore, the semaphore
 		// count starts at 0 (ie acquired).
