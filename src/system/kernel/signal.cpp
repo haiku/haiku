@@ -490,13 +490,19 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 
 			mainThread->sig_pending |= SIGNAL_TO_MASK(SIGKILLTHR);
 			// Wake up main thread
-			thread_interrupt(mainThread, true);
+			if (mainThread->state == B_THREAD_SUSPENDED)
+				scheduler_enqueue_in_run_queue(mainThread);
+			else
+				thread_interrupt(mainThread, true);
 
 			// Supposed to fall through
 		}
 		case SIGKILLTHR:
 			// Wake up suspended threads and interrupt waiting ones
-			thread_interrupt(thread, true);
+			if (thread->state == B_THREAD_SUSPENDED)
+				scheduler_enqueue_in_run_queue(thread);
+			else
+				thread_interrupt(thread, true);
 			break;
 
 		case SIGCONT:
