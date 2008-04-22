@@ -55,6 +55,15 @@ typedef enum job_control_state {
 #define THREAD_STOPPED				0x3
 #define THREAD_CONTINUED			0x4
 
+// The type of object a thread blocks on (thread::wait::type, set by
+// thread_prepare_to_block()).
+enum {
+	THREAD_BLOCK_TYPE_SEMAPHORE				= 0,
+	THREAD_BLOCK_TYPE_CONDITION_VARIABLE	= 1,
+	THREAD_BLOCK_TYPE_SNOOZE				= 2,
+	THREAD_BLOCK_TYPE_USER_BASE				= 10000
+};
+
 struct image;
 	// defined in image.c
 struct select_info;
@@ -233,12 +242,12 @@ struct thread {
 	bool			was_yielded;
 
 	struct {
-		sem_id		blocking;
-		int32		count;
-		int32		acquire_count;
-		status_t	acquire_status;
-		int32		flags;
-	} sem;
+		status_t	status;				// current wait status
+		uint32		flags;				// interrupable flags
+		uint32		type;				// type of the object waited on
+		void*		object;				// pointer to the object waited on
+		timer		unblock_timer;		// timer for block with timeout
+	} wait;
 
 	struct PrivateConditionVariableEntry *condition_variable_entry;
 

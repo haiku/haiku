@@ -359,13 +359,13 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 				return B_WOULD_BLOCK;
 
 			ConditionVariableEntry<> entry;
-			entry.Add(this);
+			entry.Add(this, B_CAN_INTERRUPT);
 
 			WriteRequest request(minToWrite);
 			fWriteRequests.Add(&request);
 
 			benaphore_unlock(&fRequestLock);
-			status_t status = entry.Wait(B_CAN_INTERRUPT);
+			status_t status = entry.Wait();
 			benaphore_lock(&fRequestLock);
 
 			fWriteRequests.Remove(&request);
@@ -473,11 +473,11 @@ Inode::WaitForReadRequest(ReadRequest &request)
 
 	// add the entry to wait on
 	ConditionVariableEntry<> entry;
-	entry.Add(&request);
+	entry.Add(&request, B_CAN_INTERRUPT);
 
 	// wait
 	benaphore_unlock(&fRequestLock);
-	status_t status = entry.Wait(B_CAN_INTERRUPT);
+	status_t status = entry.Wait();
 	benaphore_lock(&fRequestLock);
 
 	// unpublish the condition variable

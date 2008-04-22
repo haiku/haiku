@@ -2366,12 +2366,13 @@ _user_debug_thread(thread_id threadID)
 				scheduler_enqueue_in_run_queue(thread);
 				break;
 
-			case B_THREAD_WAITING:
-				// thread waiting: interrupt it
-				if (thread->sem.blocking >= 0)
-					sem_interrupt_thread(thread);
-				else if (thread->condition_variable_entry)
-					condition_variable_interrupt_thread(thread);
+			default:
+				// thread may be waiting: interrupt it
+				thread_interrupt(thread, false);
+					// TODO: If the thread is already in the kernel and e.g.
+					// about to acquire a semaphore (before
+					// thread_prepare_to_block()), we won't interrupt it.
+					// Maybe we should rather send a signal (SIGTRAP).
 				break;
 		}
 	}

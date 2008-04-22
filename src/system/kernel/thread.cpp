@@ -78,8 +78,6 @@ static thread_id sNextThreadID = 1;
 static int32 sMaxThreads = 4096;
 static int32 sUsedThreads = 0;
 
-static sem_id sSnoozeSem = -1;
-
 // death stacks - used temporarily as a thread cleans itself up
 struct death_stack {
 	area_id	area;
@@ -226,8 +224,6 @@ create_thread_struct(struct thread *inthread, const char *name,
 	thread->id = threadID >= 0 ? threadID : allocate_thread_id();
 	thread->team = NULL;
 	thread->cpu = cpu;
-	thread->sem.blocking = -1;
-	thread->condition_variable_entry = NULL;
 	thread->fault_handler = 0;
 	thread->page_faults_allowed = 1;
 	thread->kernel_stack_area = -1;
@@ -659,6 +655,28 @@ thread_exit2(void *_args)
 }
 
 
+static sem_id
+get_thread_wait_sem(struct thread* thread)
+{
+	if (thread->state == B_THREAD_WAITING
+		&& thread->wait.type == THREAD_BLOCK_TYPE_SEMAPHORE) {
+		return (sem_id)(addr_t)thread->wait.object;
+	}
+	return -1;
+}
+
+
+static PrivateConditionVariable*
+get_thread_wait_cvar(struct thread* thread)
+{
+	if (thread->state == B_THREAD_WAITING
+		&& thread->wait.type == THREAD_BLOCK_TYPE_CONDITION_VARIABLE) {
+		return (PrivateConditionVariable*)thread->wait.object;
+	}
+	return NULL;
+}
+
+
 /*!
 	Fills the thread_info structure with information from the specified
 	thread.
@@ -673,24 +691,36 @@ fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 	strlcpy(info->name, thread->name, B_OS_NAME_LENGTH);
 
 	if (thread->state == B_THREAD_WAITING) {
-		if (thread->sem.blocking == sSnoozeSem)
-			info->state = B_THREAD_ASLEEP;
-		else if (thread->sem.blocking == thread->msg.read_sem)
-			info->state = B_THREAD_RECEIVING;
-		else
-			info->state = B_THREAD_WAITING;
+		info->state = B_THREAD_WAITING;
+
+		switch (thread->wait.type) {
+			case THREAD_BLOCK_TYPE_SNOOZE:
+				info->state = B_THREAD_ASLEEP;
+				break;
+
+			case THREAD_BLOCK_TYPE_SEMAPHORE:
+			{
+				sem_id sem = (sem_id)(addr_t)thread->wait.object;
+				if (sem == thread->msg.read_sem)
+					info->state = B_THREAD_RECEIVING;
+				break;
+			}
+
+			case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+			default:
+				break;
+		}
 	} else
 		info->state = (thread_state)thread->state;
 
 	info->priority = thread->priority;
-	info->sem = thread->sem.blocking;
 	info->user_time = thread->user_time;
 	info->kernel_time = thread->kernel_time;
 	info->stack_base = (void *)thread->user_stack_base;
 	info->stack_end = (void *)(thread->user_stack_base
 		+ thread->user_stack_size);
+	info->sem = get_thread_wait_sem(thread);
 }
-
 
 static status_t
 send_data_etc(thread_id id, int32 code, const void *buffer,
@@ -989,12 +1019,26 @@ state_to_text(struct thread *thread, int32 state)
 			return "running";
 
 		case B_THREAD_WAITING:
-			if (thread->sem.blocking == sSnoozeSem)
-				return "zzz";
-			if (thread->sem.blocking == thread->msg.read_sem)
-				return "receive";
+		{
+			switch (thread->wait.type) {
+				case THREAD_BLOCK_TYPE_SNOOZE:
+					return "zzz";
+	
+				case THREAD_BLOCK_TYPE_SEMAPHORE:
+				{
+					sem_id sem = (sem_id)(addr_t)thread->wait.object;
+					if (sem == thread->msg.read_sem)
+						return "receive";
+					break;
+				}
+	
+				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+				default:
+					break;
+			}
 
 			return "waiting";
+		}
 
 		case B_THREAD_SUSPENDED:
 			return "suspended";
@@ -1029,14 +1073,8 @@ _dump_thread_info(struct thread *thread)
 	kprintf("sig_pending:        %#lx (blocked: %#lx)\n", thread->sig_pending,
 		thread->sig_block_mask);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
-	kprintf("  sem.blocking:     %ld\n", thread->sem.blocking);
-	kprintf("  sem.count:        %ld\n", thread->sem.count);
-	kprintf("  sem.acquire_status: %#lx\n", thread->sem.acquire_status);
-	kprintf("  sem.flags:        %#lx\n", thread->sem.flags);
-
-	PrivateConditionVariableEntry* entry = thread->condition_variable_entry;
-	kprintf("condition variable: %p\n", entry ? entry->Variable() : NULL);
-
+	kprintf("sem blocking:       %ld\n", get_thread_wait_sem(thread));
+	kprintf("condition variable: %p\n", get_thread_wait_cvar(thread));
 	kprintf("fault_handler:      %p\n", (void *)thread->fault_handler);
 	kprintf("args:               %p %p\n", thread->args1, thread->args2);
 	kprintf("entry:              %p\n", (void *)thread->entry);
@@ -1165,7 +1203,7 @@ dump_thread_list(int argc, char **argv)
 		if ((requiredState && thread->state != requiredState)
 			|| (calling && !arch_debug_contains_call(thread, callSymbol,
 					callStart, callEnd))
-			|| (sem > 0 && thread->sem.blocking != sem)
+			|| (sem > 0 && get_thread_wait_sem(thread) != sem)
 			|| (team > 0 && thread->team->id != team)
 			|| (realTimeOnly && thread->priority < B_REAL_TIME_DISPLAY_PRIORITY))
 			continue;
@@ -1175,10 +1213,10 @@ dump_thread_list(int argc, char **argv)
 
 		// does it block on a semaphore or a condition variable?
 		if (thread->state == B_THREAD_WAITING) {
-			if (thread->condition_variable_entry)
-				kprintf("%p  ", thread->condition_variable_entry->Variable());
+			if (get_thread_wait_cvar(thread))
+				kprintf("%p  ", get_thread_wait_cvar(thread));
 			else
-				kprintf("%10ld  ", thread->sem.blocking);
+				kprintf("%10ld  ", get_thread_wait_sem(thread));
 		} else
 			kprintf("      -     ");
 
@@ -1881,13 +1919,6 @@ thread_init(kernel_args *args)
 	// zero out the dead thread structure q
 	memset(&dead_q, 0, sizeof(dead_q));
 
-	// allocate snooze sem
-	sSnoozeSem = create_sem(0, "snooze sem");
-	if (sSnoozeSem < 0) {
-		panic("error creating snooze sem\n");
-		return sSnoozeSem;
-	}
-
 	if (arch_thread_init(args) < B_OK)
 		panic("arch_thread_init() failed!\n");
 
@@ -2038,6 +2069,77 @@ thread_preboot_init_percpu(struct kernel_args *args, int32 cpuNum)
 	arch_thread_set_current_thread(&sIdleThreads[cpuNum]);
 	return B_OK;
 }
+
+
+//	#pragma mark - thread blocking API
+
+
+static status_t
+thread_block_timeout(timer* timer)
+{
+	// The timer has been installed with B_TIMER_ACQUIRE_THREAD_LOCK, so
+	// we're holding the thread lock already. This makes things comfortably
+	// easy.
+
+	struct thread* thread = (struct thread*)timer->user_data;
+	if (thread_unblock_locked(thread, B_TIMED_OUT))
+		return B_INVOKE_SCHEDULER;
+
+	return B_HANDLED_INTERRUPT;
+}
+
+
+status_t
+thread_block()
+{
+	InterruptsSpinLocker _(thread_spinlock);
+	return thread_block_locked(thread_get_current_thread());
+}
+
+
+bool
+thread_unblock(status_t threadID, status_t status)
+{
+	InterruptsSpinLocker _(thread_spinlock);
+
+	struct thread* thread = thread_get_thread_struct_locked(threadID);
+	if (thread == NULL)
+		return false;
+	return thread_unblock_locked(thread, status);
+}
+
+
+status_t
+thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
+{
+	struct thread* thread = thread_get_current_thread();
+
+	if (thread->wait.status != 1)
+		return thread->wait.status;
+
+	// Timer flags: absolute/relative + "acquire thread lock". The latter
+	// avoids nasty race conditions and deadlock problems that could otherwise
+	// occur between our cancel_timer() and a concurrently executing
+	// thread_block_timeout().
+	uint32 timerFlags = (timeoutFlags & B_RELATIVE_TIMEOUT)
+		? B_ONE_SHOT_RELATIVE_TIMER : B_ONE_SHOT_ABSOLUTE_TIMER;
+	timerFlags |= B_TIMER_ACQUIRE_THREAD_LOCK;
+
+	// install the timer
+	thread->wait.unblock_timer.user_data = thread;
+	add_timer(&thread->wait.unblock_timer, &thread_block_timeout, timeout,
+		timerFlags);
+
+	// block
+	status_t error = thread_block_locked(thread);
+
+	// cancel timer, if it didn't fire
+	if (error != B_TIMED_OUT)
+		cancel_timer(&thread->wait.unblock_timer);
+
+	return error;
+}
+
 
 //	#pragma mark - public kernel API
 
@@ -2297,7 +2399,12 @@ snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 	if (timebase != B_SYSTEM_TIMEBASE)
 		return B_BAD_VALUE;
 
-	status = acquire_sem_etc(sSnoozeSem, 1, flags, timeout);
+	InterruptsSpinLocker _(thread_spinlock);
+	struct thread* thread = thread_get_current_thread();
+
+	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_SNOOZE, NULL);
+	status = thread_block_with_timeout_locked(flags, timeout);
+
 	if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 		return B_OK;
 

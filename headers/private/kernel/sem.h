@@ -22,7 +22,6 @@ extern "C" {
 
 extern status_t sem_init(struct kernel_args *args);
 extern int sem_delete_owned_sems(team_id owner);
-extern status_t	sem_interrupt_thread(struct thread *t);
 extern int32 sem_used_sems(void);
 extern int32 sem_max_sems(void);
 

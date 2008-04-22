@@ -13,6 +13,11 @@
 #include <thread_types.h>
 #include <arch/thread.h>
 
+// For the thread blocking inline functions only.
+#include <kscheduler.h>
+#include <ksignal.h>
+
+
 struct kernel_args;
 struct select_info;
 
@@ -72,6 +77,12 @@ status_t deselect_thread(int32 object, struct select_info *info, bool kernel);
 
 #define syscall_64_bit_return_value() arch_syscall_64_bit_return_value()
 
+status_t thread_block();
+status_t thread_block_with_timeout(uint32 timeoutFlags, bigtime_t timeout);
+status_t thread_block_with_timeout_locked(uint32 timeoutFlags,
+			bigtime_t timeout);
+bool thread_unblock(status_t threadID, status_t status);
+
 // used in syscalls.c
 status_t _user_set_thread_priority(thread_id thread, int32 newPriority);
 status_t _user_rename_thread(thread_id thread, const char *name);
@@ -99,5 +110,88 @@ int _user_setrlimit(int resource, const struct rlimit * rlp);
 #ifdef __cplusplus
 }
 #endif
+
+
+/*!
+	\a thread must be the current thread.
+	Thread lock can be, but doesn't need to be held.
+*/
+static inline bool
+thread_is_interrupted(struct thread* thread, uint32 flags)
+{
+	return ((flags & B_CAN_INTERRUPT)
+			&& (thread->sig_pending & ~thread->sig_block_mask) != 0)
+		|| ((flags & B_KILL_CAN_INTERRUPT)
+			&& (thread->sig_pending & KILL_SIGNALS));
+}
+
+
+static inline bool
+thread_is_blocked(struct thread* thread)
+{
+	return thread->wait.status == 1;
+}
+
+
+/*!
+	\a thread must be the current thread.
+	Thread lock can be, but doesn't need to be locked.
+*/
+static inline void
+thread_prepare_to_block(struct thread* thread, uint32 flags, uint32 type,
+	void* object)
+{
+	thread->wait.flags = flags;
+	thread->wait.type = type;
+	thread->wait.object = object;
+	atomic_set(&thread->wait.status, 1);
+		// Set status last to guarantee that the other fields are initialized
+		// when a thread is waiting.
+}
+
+
+static inline status_t
+thread_block_locked(struct thread* thread)
+{
+	if (thread->wait.status == 1) {
+		// check for signals, if interruptable
+		if (thread_is_interrupted(thread, thread->wait.flags)) {
+			thread->wait.status = B_INTERRUPTED;
+		} else {
+			thread->next_state = B_THREAD_WAITING;
+			scheduler_reschedule();
+		}
+	}
+
+	return thread->wait.status;
+}
+
+
+static inline bool
+thread_unblock_locked(struct thread* thread, status_t status)
+{
+	if (atomic_test_and_set(&thread->wait.status, status, 1) != 1)
+		return false;
+
+	// wake up the thread, if it is sleeping
+	if (thread->state == B_THREAD_WAITING)
+		scheduler_enqueue_in_run_queue(thread);
+
+	return true;
+}
+
+
+static inline status_t
+thread_interrupt(struct thread* thread, bool kill)
+{
+	if ((thread->wait.flags & B_CAN_INTERRUPT) != 0
+		|| (kill && (thread->wait.flags & B_KILL_CAN_INTERRUPT) != 0)) {
+		thread_unblock_locked(thread, B_INTERRUPTED);
+		return B_OK;
+	}
+
+	return B_NOT_ALLOWED;
+}
+
 
 #endif /* _THREAD_H */

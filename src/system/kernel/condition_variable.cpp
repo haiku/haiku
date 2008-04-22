@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -92,30 +92,36 @@ dump_condition_variable(int argc, char** argv)
 
 
 bool
-PrivateConditionVariableEntry::Add(const void* object)
+PrivateConditionVariableEntry::Add(const void* object, uint32 flags)
 {
 	ASSERT(object != NULL);
 
 	fThread = thread_get_current_thread();
-	fFlags = 0;
-	fResult = B_OK;
 
 	InterruptsLocker _;
 	SpinLocker locker(sConditionVariablesLock);
 
-	// add to the queue for the variable
 	fVariable = sConditionVariableHash.Lookup(object);
-	if (fVariable)
-		fVariable->fEntries.Add(this);
-	else
-		fResult = B_ENTRY_NOT_FOUND;
 
-	return (fVariable != NULL);
+	struct thread* thread = thread_get_current_thread();
+	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_CONDITION_VARIABLE,
+		fVariable);
+
+	if (fVariable == NULL) {
+		SpinLocker threadLocker(thread_spinlock);
+		thread_unblock_locked(thread, B_ENTRY_NOT_FOUND);
+		return false;
+	}
+
+	// add to the queue for the variable
+	fVariable->fEntries.Add(this);
+
+	return true;
 }
 
 
 status_t
-PrivateConditionVariableEntry::Wait(uint32 flags)
+PrivateConditionVariableEntry::Wait()
 {
 	if (!are_interrupts_enabled()) {
 		panic("wait_for_condition_variable_entry() called with interrupts "
@@ -124,75 +130,30 @@ PrivateConditionVariableEntry::Wait(uint32 flags)
 	}
 
 	InterruptsLocker _;
+
 	SpinLocker threadLocker(thread_spinlock);
-	SpinLocker locker(sConditionVariablesLock);
-
-	// check whether this entry has already been notified
-	// (set the flags while at it)
-	if (fVariable == NULL)
-		return fResult;
-	fFlags = flags;
-
-	// When interruptable, check pending signals first
-	struct thread* thread = thread_get_current_thread();
-	if (((flags & B_CAN_INTERRUPT)
-			&& (thread->sig_pending & ~thread->sig_block_mask) != 0)
-		|| ((flags & B_KILL_CAN_INTERRUPT)
-			&& (thread->sig_pending & KILL_SIGNALS))) {
-		// remove entry from the variables
-		_Remove();
-		return B_INTERRUPTED;
-	}
-
-	// wait
-	thread->next_state = B_THREAD_WAITING;
-	thread->condition_variable_entry = this;
-	thread->sem.blocking = -1;
-
-	locker.Unlock();
-	scheduler_reschedule();
+	status_t error = thread_block_locked(thread_get_current_thread());
 	threadLocker.Unlock();
 
-	return fResult;
+	SpinLocker locker(sConditionVariablesLock);
+
+	// remove entry from variable, if not done yet
+	if (fVariable != NULL) {
+		fVariable->fEntries.Remove(this);
+		fVariable = NULL;
+	}
+
+	return error;
 }
 
 
 status_t
 PrivateConditionVariableEntry::Wait(const void* object, uint32 flags)
 {
-	if (Add(object))
-		return Wait(flags);
+	if (Add(object, flags))
+		return Wait();
 	return B_ENTRY_NOT_FOUND;
 }
-
-
-/*! Removes the entry from its variable.
-	Interrupts must be disabled, sConditionVariablesLock must be held.
-*/
-void
-PrivateConditionVariableEntry::_Remove()
-{
-	if (fVariable) {
-		fVariable->fEntries.Remove(this);
-		fVariable = NULL;
-	}
-}
-
-
-class PrivateConditionVariableEntry::Private {
-public:
-	inline Private(PrivateConditionVariableEntry& entry)
-		: fEntry(entry)
-	{
-	}
-
-	inline uint32 Flags() const				{ return fEntry.fFlags; }
-	inline void Remove() const				{ fEntry._Remove(); }
-	inline void SetResult(status_t result)	{ fEntry.fResult = result; }
-
-private:
-	PrivateConditionVariableEntry&	fEntry;
-};
 
 
 // #pragma mark - PrivateConditionVariable
@@ -306,15 +267,7 @@ PrivateConditionVariable::_Notify(bool all, status_t result)
 	while (PrivateConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		entry->fVariable = NULL;
 
-		struct thread* thread = entry->fThread;
-
-		if (thread->condition_variable_entry != NULL)
-			thread->condition_variable_entry->fResult = result;
-
-		// wake up the thread
-		thread->condition_variable_entry = NULL;
-		if (thread->state == B_THREAD_WAITING)
-			scheduler_enqueue_in_run_queue(thread);
+		thread_unblock_locked(entry->fThread, B_OK);
 
 		if (!all)
 			break;
@@ -323,41 +276,6 @@ PrivateConditionVariable::_Notify(bool all, status_t result)
 
 
 // #pragma mark -
-
-
-/*!	Interrupts must be disabled, thread lock must be held.
-*/
-status_t
-condition_variable_interrupt_thread(struct thread* thread)
-{
-	SpinLocker locker(sConditionVariablesLock);
-
-	if (thread == NULL || thread->state != B_THREAD_WAITING
-		|| thread->condition_variable_entry == NULL) {
-		return B_BAD_VALUE;
-	}
-
-	PrivateConditionVariableEntry* entry = thread->condition_variable_entry;
-	uint32 flags = PrivateConditionVariableEntry::Private(*entry).Flags();
-
-	// interruptable?
-	if ((flags & B_CAN_INTERRUPT) == 0
-		&& ((flags & B_KILL_CAN_INTERRUPT) == 0
-			|| (thread->sig_pending & KILL_SIGNALS) == 0)) {
-		return B_NOT_ALLOWED;
-	}
-
-	PrivateConditionVariableEntry::Private(*entry).SetResult(B_INTERRUPTED);
-
-	// remove entry from its variable
-	PrivateConditionVariableEntry::Private(*entry).Remove();
-
-	// wake up the thread
-	thread->condition_variable_entry = NULL;
-	scheduler_enqueue_in_run_queue(thread);
-
-	return B_OK;
-}
 
 
 void
@@ -383,4 +301,3 @@ condition_variable_init()
 		"\n"
 		"Lists all existing condition variables\n", 0);
 }
-

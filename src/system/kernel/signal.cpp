@@ -459,20 +459,6 @@ is_signal_blocked(int signal)
 }
 
 
-/*!	Tries to interrupt a thread waiting for a semaphore or a condition variable.
-	Interrupts must be disabled, the thread lock be held.
-*/
-static status_t
-signal_interrupt_thread(struct thread* thread)
-{
-	if (thread->sem.blocking >= 0)
-		return sem_interrupt_thread(thread);
-	else if (thread->condition_variable_entry)
-		return condition_variable_interrupt_thread(thread);
-	return B_BAD_VALUE;
-}
-
-
 /*!	Delivers the \a signal to the \a thread, but doesn't handle the signal -
 	it just makes sure the thread gets the signal, ie. unblocks it if needed.
 	This function must be called with interrupts disabled and the
@@ -505,19 +491,13 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 
 			mainThread->sig_pending |= SIGNAL_TO_MASK(SIGKILLTHR);
 			// Wake up main thread
-			if (mainThread->state == B_THREAD_SUSPENDED)
-				scheduler_enqueue_in_run_queue(mainThread);
-			else if (mainThread->state == B_THREAD_WAITING)
-				signal_interrupt_thread(mainThread);
+			thread_interrupt(mainThread, true);
 
 			// Supposed to fall through
 		}
 		case SIGKILLTHR:
 			// Wake up suspended threads and interrupt waiting ones
-			if (thread->state == B_THREAD_SUSPENDED)
-				scheduler_enqueue_in_run_queue(thread);
-			else if (thread->state == B_THREAD_WAITING)
-				signal_interrupt_thread(thread);
+			thread_interrupt(thread, true);
 			break;
 
 		case SIGCONT:
@@ -536,8 +516,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 			if (thread->sig_pending
 				& (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
 				// Interrupt thread if it was waiting
-				if (thread->state == B_THREAD_WAITING)
-					signal_interrupt_thread(thread);
+				thread_interrupt(thread, false);
 			}
 			break;
 	}

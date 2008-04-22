@@ -408,14 +408,14 @@ RequestOwner::Wait(bool interruptable)
 
 		// add an entry to wait on
 		ConditionVariableEntry<> entry;
-		entry.Add(this);
+		entry.Add(this, interruptable ? B_CAN_INTERRUPT : 0);
 
 		locker.Unlock();
 
 		// wait
 		TRACE(("%p->RequestOwner::Wait(): waiting for condition...\n", this));
 
-		error = entry.Wait(interruptable ? B_CAN_INTERRUPT : 0);
+		error = entry.Wait();
 
 		TRACE(("%p->RequestOwner::Wait(): condition occurred: %lx\n", this,
 			error));

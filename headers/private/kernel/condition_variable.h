@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _KERNEL_CONDITION_VARIABLE_H
@@ -40,24 +40,16 @@ public:
 	inline	PrivateConditionVariable* Variable() const
 		{ return fVariable; }
 
-	class Private;
-
 protected:
-			bool				Add(const void* object);
-			status_t			Wait(uint32 flags);
+			bool				Add(const void* object, uint32 flags);
+			status_t			Wait();
 			status_t			Wait(const void* object, uint32 flags);
-
-private:
-			void				_Remove();
 
 protected:
 			PrivateConditionVariable* fVariable;
 			struct thread*		fThread;
-			uint32				fFlags;
-			status_t			fResult;
 
 			friend class PrivateConditionVariable;
-			friend class Private;
 };
 
 
@@ -103,8 +95,8 @@ public:
 template<typename Type = void>
 class ConditionVariableEntry : public PrivateConditionVariableEntry {
 public:
-	inline	bool				Add(const Type* object);
-	inline	status_t			Wait(uint32 flags = 0);
+	inline	bool				Add(const Type* object, uint32 flags = 0);
+	inline	status_t			Wait();
 	inline	status_t			Wait(const Type* object, uint32 flags = 0);
 };
 
@@ -143,17 +135,17 @@ ConditionVariable<Type>::NotifyAll(bool threadsLocked)
 
 template<typename Type>
 inline bool
-ConditionVariableEntry<Type>::Add(const Type* object)
+ConditionVariableEntry<Type>::Add(const Type* object, uint32 flags)
 {
-	return PrivateConditionVariableEntry::Add(object);
+	return PrivateConditionVariableEntry::Add(object, flags);
 }
 
 
 template<typename Type>
 inline status_t
-ConditionVariableEntry<Type>::Wait(uint32 flags)
+ConditionVariableEntry<Type>::Wait()
 {
-	return PrivateConditionVariableEntry::Wait(flags);
+	return PrivateConditionVariableEntry::Wait();
 }
 
 
@@ -169,8 +161,6 @@ extern "C" {
 #endif	// __cplusplus
 
 struct thread;
-
-extern status_t condition_variable_interrupt_thread(struct thread* thread);
 
 extern void condition_variable_init();
 
