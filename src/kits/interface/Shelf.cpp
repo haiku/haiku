@@ -247,13 +247,14 @@ status_t
 replicant_data::Archive(BMessage* msg)
 {
 	status_t result = B_ERROR;
-	if (message) {
-		msg->AddMessage("message", message);
+	BMessage archive;
+	if (view && (view->Archive(&archive) == B_OK)) {
 		msg->AddInt32("uniqueid", id);
 		BPoint pos (0,0);
-		if (view) 
+		if (view) { 
+			msg->AddMessage("message", &archive);
 			pos = view->Frame().LeftTop();
-		else if (zombie_view)
+		} else if (zombie_view)
 			pos = zombie_view->Frame().LeftTop();
 		msg->AddPoint("position", pos);
 		result = B_OK;
