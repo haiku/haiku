@@ -61,12 +61,15 @@ class PrinterListView : public BListView, public FolderListener {
 	
 		void BuildPrinterList();
 		PrinterItem *SelectedItem();
-			
 		void UpdateItem(PrinterItem *item);
+
+		PrinterItem* ActivePrinter() const;
+		void SetActivePrinter(PrinterItem* item);
 
 	private:
 		BDirectory fNode;
 		FolderWatcher *fFolder;		
+		PrinterItem *fActivePrinter;
 };
 
 class BBitmap;

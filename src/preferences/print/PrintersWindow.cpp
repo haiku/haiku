@@ -107,27 +107,21 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 			}
 			break;
 
-		case kMsgMakeDefaultPrinter:
-			{
-				int32 prIndex = fPrinterListView->CurrentSelection();
-				if (prIndex >= 0)
-				{
-					PrinterItem* printer = dynamic_cast<PrinterItem*>(fPrinterListView->ItemAt(prIndex));
-					BMessenger msgr;
-					if (printer != NULL && ::GetPrinterServerMessenger(msgr) == B_OK)
-					{
-						BMessage setActivePrinter(B_SET_PROPERTY);
-						setActivePrinter.AddSpecifier("ActivePrinter");
-						setActivePrinter.AddString("data", printer->Name());
-						msgr.SendMessage(&setActivePrinter);
-						
-						fPrinterListView->Invalidate();
-						UpdatePrinterButtons();
-					}
-				}
-			}
-			break;
+                case kMsgMakeDefaultPrinter:
+                {
+                        PrinterItem* printer = fPrinterListView->SelectedItem();
+                        if (printer && printer == fPrinterListView->ActivePrinter())
+                                break;
 
+                        BMessenger msgr;
+                        if (printer && GetPrinterServerMessenger(msgr) == B_OK) {
+                                BMessage setActivePrinter(B_SET_PROPERTY);
+                                setActivePrinter.AddSpecifier("ActivePrinter");
+                                setActivePrinter.AddString("data", printer->Name());
+                                msgr.SendMessage(&setActivePrinter);
+                                UpdatePrinterButtons();
+                        }
+                }       break;
 
 		case kMsgCancelJob: fJobListView->CancelJob();
 			break;
@@ -139,10 +133,23 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case B_PRINTER_CHANGED:
-				// active printer could have been changed
-			fPrinterListView->Invalidate();
-			break;
-			
+		{
+			// active printer could have been changed, even outside of prefs
+			BString activePrinterName(ActivePrinterName());
+			PrinterItem* item = fPrinterListView->ActivePrinter();
+			if (item && item->Name() != activePrinterName)
+				fPrinterListView->UpdateItem(item);
+
+			for (int32 i = 0; i < fPrinterListView->CountItems(); ++i) {
+				item = dynamic_cast<PrinterItem*>(fPrinterListView->ItemAt(i));
+				if (item && item->Name() == activePrinterName) {
+					fPrinterListView->UpdateItem(item);
+					fPrinterListView->SetActivePrinter(item);
+					break;
+				}
+			}
+		}	break;
+
 		default:
 			Inherited::MessageReceived(msg);
 	}

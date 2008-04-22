@@ -30,7 +30,10 @@
 #define GLOBALS_H
 
 #include <Messenger.h>
+#include <String.h>
 
+BString ActivePrinterName();
 status_t GetPrinterServerMessenger(BMessenger& msgr);
 
 #endif
+

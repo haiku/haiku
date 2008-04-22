@@ -45,7 +45,8 @@
 
 PrinterListView::PrinterListView(BRect frame)
 	: Inherited(frame, "printers_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL),
-	fFolder(NULL)
+	fFolder(NULL),
+	fActivePrinter(NULL)
 {
 }
 
@@ -99,10 +100,13 @@ PrinterListView::AttachedToWindow()
 	BuildPrinterList();
 
 	// Select active printer
+	BString activePrinterName(ActivePrinterName());
 	for (int32 i = 0; i < CountItems(); i ++) {
 		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
-		if (item != NULL && item->IsActivePrinter()) {
-			Select(i); break;
+		if (item != NULL && item->Name() == activePrinterName) {
+			Select(i);
+			fActivePrinter = item;
+			break;
 		}
 	}
 
@@ -173,6 +177,9 @@ void PrinterListView::EntryRemoved(node_ref* node)
 {
 	PrinterItem* item = FindItem(node);
 	if (item) {
+		if (item == fActivePrinter)
+			fActivePrinter = NULL;
+
 		RemoveItem(item);
 		delete item;
 	}
@@ -196,6 +203,20 @@ PrinterItem* PrinterListView::SelectedItem()
 {
 	BListItem* item = ItemAt(CurrentSelection());
 	return dynamic_cast<PrinterItem*>(item);
+}
+
+
+PrinterItem*
+PrinterListView::ActivePrinter() const
+{
+	return fActivePrinter;
+}
+
+
+void
+PrinterListView::SetActivePrinter(PrinterItem* item)
+{
+	fActivePrinter = item;
 }
 
 
@@ -368,18 +389,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 bool 
 PrinterItem::IsActivePrinter()
 {
-	BMessenger msgr;
-	if (::GetPrinterServerMessenger(msgr) != B_OK)
-		return false;
-		
-	BMessage getNameOfActivePrinter(B_GET_PROPERTY);
-	getNameOfActivePrinter.AddSpecifier("ActivePrinter");
-
-	BString activePrinterName;
-	BMessage reply;
-	return msgr.SendMessage(&getNameOfActivePrinter, &reply) == B_OK 
-		&& reply.FindString("result", &activePrinterName) == B_OK
-		&& fName == activePrinterName;
+	return fName == ActivePrinterName();
 }
 
 
