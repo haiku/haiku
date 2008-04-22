@@ -230,7 +230,11 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
 	fNode(node)
 {
 	if (sIcon == NULL) {
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		sIcon = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_RGBA32);
+#else
 		sIcon = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
+#endif
 		BMimeType type(PSRV_PRINTER_FILETYPE);
 		type.GetIcon(sIcon, B_LARGE_ICON);
 	}
@@ -368,7 +372,11 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	BPoint transportPt(bounds.right - width -8, driverPt.y);
 	
 	drawing_mode mode = owner->DrawingMode();
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	owner->SetDrawingMode(B_OP_ALPHA);
+#else
 	owner->SetDrawingMode(B_OP_OVER);
+#endif
 	owner->DrawBitmap(IsActivePrinter() ? sSelectedIcon : sIcon, iconPt);
 	
 	// left of item
