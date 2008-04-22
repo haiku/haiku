@@ -139,7 +139,7 @@ thread_is_blocked(struct thread* thread)
 */
 static inline void
 thread_prepare_to_block(struct thread* thread, uint32 flags, uint32 type,
-	void* object)
+	const void* object)
 {
 	thread->wait.flags = flags;
 	thread->wait.type = type;

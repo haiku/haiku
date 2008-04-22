@@ -62,6 +62,8 @@ enum {
 	THREAD_BLOCK_TYPE_CONDITION_VARIABLE	= 1,
 	THREAD_BLOCK_TYPE_SNOOZE				= 2,
 	THREAD_BLOCK_TYPE_SIGNAL				= 3,
+
+	THREAD_BLOCK_TYPE_OTHER					= 9999,
 	THREAD_BLOCK_TYPE_USER_BASE				= 10000
 };
 
@@ -246,7 +248,7 @@ struct thread {
 		status_t	status;				// current wait status
 		uint32		flags;				// interrupable flags
 		uint32		type;				// type of the object waited on
-		void*		object;				// pointer to the object waited on
+		const void*	object;				// pointer to the object waited on
 		timer		unblock_timer;		// timer for block with timeout
 	} wait;
 
