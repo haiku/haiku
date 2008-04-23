@@ -55,6 +55,7 @@ MainWindow::MainWindow()
 	rect = Bounds();
 	rect.top += 5;
 	rect.bottom -= 20 + buttonHeight;
+	rect.left += 5;
 	BTabView *tabView = new BTabView(rect, "tabview", B_WIDTH_FROM_LABEL); 
 
 	rect = tabView->ContainerView()->Bounds().InsetByCopy(5, 8);
@@ -82,7 +83,7 @@ MainWindow::MainWindow()
 		tabView->ContainerView()->ResizeBy(0, heightDiff);
 	}
 
-	ResizeTo(tabView->Bounds().Width(), tabView->Frame().bottom + 20 + buttonHeight);
+	ResizeTo(tabView->Bounds().Width() + 10, tabView->Frame().bottom + 20 + buttonHeight);
 	view->AddChild(tabView);
 	fFontsView->ResizeToPreferred();
 
