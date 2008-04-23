@@ -60,7 +60,7 @@ BEOS_PREFERENCES = Appearance Backgrounds DataTranslations E-mail
 	ScreenSaver Sounds Time VirtualMemory
 ;
 BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
-	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot PictureTest
+	$(X86_ONLY)GLDirectMode $(X86_ONLY)GLTeapot Mandelbrot Pairs PictureTest
 	Playground Pulse Sudoku
 ;
 BEOS_SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
