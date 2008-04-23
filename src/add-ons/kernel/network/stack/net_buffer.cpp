@@ -14,6 +14,7 @@
 #include <util/list.h>
 
 #include <ByteOrder.h>
+#include <debug.h>
 #include <KernelExport.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -33,6 +34,8 @@
 
 #define BUFFER_SIZE 2048
 	// maximum implementation derived buffer size is 65536
+
+//#define ENABLE_DEBUGGER_COMMANDS	1
 
 struct data_node {
 	struct list_link link;
@@ -101,6 +104,13 @@ static status_t trim_data(net_buffer *_buffer, size_t newSize);
 static status_t remove_header(net_buffer *_buffer, size_t bytes);
 static status_t remove_trailer(net_buffer *_buffer, size_t bytes);
 
+#if ENABLE_DEBUGGER_COMMANDS
+static vint32 sAllocatedDataHeaderCount = 0;
+static vint32 sAllocatedNetBufferCount = 0;
+static vint32 sEverAllocatedDataHeaderCount = 0;
+static vint32 sEverAllocatedNetBufferCount = 0;
+#endif
+
 
 #if 1
 static void
@@ -120,9 +130,28 @@ dump_buffer(net_buffer *_buffer)
 #endif
 
 
+#if ENABLE_DEBUGGER_COMMANDS
+
+static int
+dump_net_buffer_stats(int argc, char** argv)
+{
+	kprintf("allocated data headers: %7ld / %7ld\n", sAllocatedDataHeaderCount,
+		sEverAllocatedDataHeaderCount);
+	kprintf("allocated net buffers:  %7ld / %7ld\n", sAllocatedNetBufferCount,
+		sEverAllocatedNetBufferCount);
+	return 0;
+}
+
+#endif	// ENABLE_DEBUGGER_COMMANDS
+
+
 static inline data_header *
 allocate_data_header()
 {
+#if ENABLE_DEBUGGER_COMMANDS
+	atomic_add(&sAllocatedDataHeaderCount, 1);
+	atomic_add(&sEverAllocatedDataHeaderCount, 1);
+#endif
 	return (data_header *)object_cache_alloc(sDataNodeCache, CACHE_DONT_SLEEP);
 }
 
@@ -130,6 +159,10 @@ allocate_data_header()
 static inline net_buffer_private *
 allocate_net_buffer()
 {
+#if ENABLE_DEBUGGER_COMMANDS
+	atomic_add(&sAllocatedNetBufferCount, 1);
+	atomic_add(&sEverAllocatedNetBufferCount, 1);
+#endif
 	return (net_buffer_private *)object_cache_alloc(sNetBufferCache,
 		CACHE_DONT_SLEEP);
 }
@@ -138,6 +171,10 @@ allocate_net_buffer()
 static inline void
 free_data_header(data_header *header)
 {
+#if ENABLE_DEBUGGER_COMMANDS
+	if (header != NULL)
+		atomic_add(&sAllocatedDataHeaderCount, -1);
+#endif
 	object_cache_free(sDataNodeCache, header);
 }
 
@@ -145,6 +182,10 @@ free_data_header(data_header *header)
 static inline void
 free_net_buffer(net_buffer_private *buffer)
 {
+#if ENABLE_DEBUGGER_COMMANDS
+	if (buffer != NULL)
+		atomic_add(&sAllocatedNetBufferCount, -1);
+#endif
 	object_cache_free(sNetBufferCache, buffer);
 }
 
@@ -747,6 +788,10 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 				init_first_data_node(node);
 
 				list_insert_item_before(&buffer->buffers, previous, node);
+
+				// Release the initial reference to the header, so that it will
+				// be deleted when the node is removed.
+				release_data_header(header);
 			}
 
 			size_t willConsume = min_c(bytesLeft, node->header_space);
@@ -868,6 +913,10 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 			sizeAdded += sizeUsed;
 
 			list_add_item(&buffer->buffers, node);
+
+			// Release the initial reference to the header, so that it will
+			// be deleted when the node is removed.
+			release_data_header(header);
 		}
 
 		if (_contiguousBuffer)
@@ -1400,9 +1449,18 @@ std_ops(int32 op, ...)
 				return B_NO_MEMORY;
 			}
 
+#if ENABLE_DEBUGGER_COMMANDS
+			add_debugger_command_etc("net_buffer_stats", &dump_net_buffer_stats,
+				"Print net buffer statistics",
+				"\nPrint net buffer statistics.\n", 0);
+#endif
+
 			return B_OK;
 
 		case B_MODULE_UNINIT:
+#if ENABLE_DEBUGGER_COMMANDS
+			remove_debugger_command("net_buffer_stats", &dump_net_buffer_stats);
+#endif
 			delete_object_cache(sNetBufferCache);
 			delete_object_cache(sDataNodeCache);
 			return B_OK;
