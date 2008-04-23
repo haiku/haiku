@@ -1,0 +1,5 @@
+SubDir HAIKU_TOP src tests add-ons kernel file_systems fragmenter ;
+
+BinCommand fragmenter :
+	fragmenter.cpp
+;
