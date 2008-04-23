@@ -28,6 +28,7 @@ SubInclude HAIKU_TOP src apps mediaplayer ;
 SubInclude HAIKU_TOP src apps midiplayer ;
 SubInclude HAIKU_TOP src apps networkstatus ;
 SubInclude HAIKU_TOP src apps packageinstaller ;
+SubInclude HAIKU_TOP src apps pairs ;
 SubInclude HAIKU_TOP src apps people ;
 SubInclude HAIKU_TOP src apps poorman ;
 SubInclude HAIKU_TOP src apps powerstatus ;

@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src apps pairs ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders shared ;
+
+Application Pairs :
+	Pairs.cpp
+	PairsWindow.cpp
+	PairsView.cpp
+	PairsTopButton.cpp
+
+	: be $(TARGET_LIBSTDC++)
+	: Pairs.rdef
+	;
