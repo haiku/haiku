@@ -286,23 +286,17 @@ UnixFifo::UnixFifo(size_t capacity)
 	fWriters(),
 	fReadRequested(0),
 	fWriteRequested(0),
-	fReaderSem(-1),
-	fWriterSem(-1),
 	fShutdown(0)
 
 {
+	fReadCondition.Init(this, "unix fifo read");
+	fWriteCondition.Init(this, "unix fifo write");
 	fLock.sem = -1;
 }
 
 
 UnixFifo::~UnixFifo()
 {
-	if (fReaderSem >= 0)
-		delete_sem(fReaderSem);
-
-	if (fWriterSem >= 0)
-		delete_sem(fWriterSem);
-
 	if (fLock.sem >= 0)
 		benaphore_destroy(&fLock);
 }
@@ -311,15 +305,7 @@ UnixFifo::~UnixFifo()
 status_t
 UnixFifo::Init()
 {
-	status_t error = benaphore_init(&fLock, "unix fifo");
-
-	fReaderSem = create_sem(0, "unix fifo readers");
-	fWriterSem = create_sem(0, "unix fifo writers");
-
-	if (error != B_OK || fReaderSem < 0 || fWriterSem < 0)
-		return ENOBUFS;
-
-	return B_OK;
+	return benaphore_init(&fLock, "unix fifo");
 }
 
 
@@ -330,8 +316,8 @@ UnixFifo::Shutdown(uint32 shutdown)
 
 	if (shutdown != 0) {
 		// Shutting down either end also effects the other, so notify both.
-		release_sem_etc(fWriterSem, 1, B_RELEASE_ALL);
-		release_sem_etc(fReaderSem, 1, B_RELEASE_ALL);
+		fReadCondition.NotifyAll();
+		fWriteCondition.NotifyAll();
 	}
 }
 
@@ -359,13 +345,13 @@ UnixFifo::Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer)
 			&& !IsReadShutdown()) {
 		// There's more to read, other readers, and we were first in the queue.
 		// So we need to notify the others.
-		release_sem_etc(fReaderSem, 1, B_RELEASE_ALL);
+		fReadCondition.NotifyAll();
 	}
 
 	if (error == B_OK && *_buffer != NULL && (*_buffer)->size > 0
 			&& !fWriters.IsEmpty() && !IsWriteShutdown()) {
 		// We read something and there are writers. Notify them
-		release_sem_etc(fWriterSem, 1, B_RELEASE_ALL);
+		fWriteCondition.NotifyAll();
 	}
 
 	RETURN_ERROR(error);
@@ -392,13 +378,13 @@ UnixFifo::Write(net_buffer* buffer, bigtime_t timeout)
 			&& !IsWriteShutdown()) {
 		// There's more space for writing, other writers, and we were first in
 		// the queue. So we need to notify the others.
-		release_sem_etc(fWriterSem, 1, B_RELEASE_ALL);
+		fWriteCondition.NotifyAll();
 	}
 
 	if (error == B_OK && request.size > 0 && !fReaders.IsEmpty()
 			&& !IsReadShutdown()) {
 		// We've written something and there are readers. Notify them
-		release_sem_etc(fReaderSem, 1, B_RELEASE_ALL);
+		fReadCondition.NotifyAll();
 	}
 
 	RETURN_ERROR(error);
@@ -439,7 +425,7 @@ UnixFifo::SetBufferCapacity(size_t capacity)
 
 	// wake up waiting writers, if the capacity increased
 	if (!fWriters.IsEmpty() && !IsWriteShutdown())
-		release_sem_etc(fWriterSem, 1, B_RELEASE_ALL);
+		fWriteCondition.NotifyAll();
 }
 
 
@@ -452,11 +438,11 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 		RETURN_ERROR(B_WOULD_BLOCK);
 
 	while (fReaders.Head() != &request && !IsReadShutdown()) {
+		ConditionVariableEntry entry;
+		fReadCondition.Add(&entry, B_CAN_INTERRUPT);
+
 		benaphore_unlock(&fLock);
-
-		status_t error = acquire_sem_etc(fReaderSem, 1,
-			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
-
+		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)
@@ -480,11 +466,11 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 // TODO: Support low water marks!
 	while (fBuffer.Readable() == 0
 			&& !IsReadShutdown() && !IsWriteShutdown()) {
+		ConditionVariableEntry entry;
+		fReadCondition.Add(&entry, B_CAN_INTERRUPT);
+
 		benaphore_unlock(&fLock);
-
-		status_t error = acquire_sem_etc(fReaderSem, 1,
-			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
-
+		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)
@@ -511,11 +497,11 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout)
 		RETURN_ERROR(B_WOULD_BLOCK);
 
 	while (fWriters.Head() != &request && !IsWriteShutdown()) {
+		ConditionVariableEntry entry;
+		fWriteCondition.Add(&entry, B_CAN_INTERRUPT);
+
 		benaphore_unlock(&fLock);
-
-		status_t error = acquire_sem_etc(fWriterSem, 1,
-			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
-
+		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)
@@ -534,11 +520,11 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout)
 
 	while (fBuffer.Writable() < request.size && !IsWriteShutdown()
 			&& !IsReadShutdown()) {
+		ConditionVariableEntry entry;
+		fWriteCondition.Add(&entry, B_CAN_INTERRUPT);
+
 		benaphore_unlock(&fLock);
-
-		status_t error = acquire_sem_etc(fWriterSem, 1,
-			B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
-
+		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
 		benaphore_lock(&fLock);
 
 		if (error != B_OK)

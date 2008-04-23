@@ -7,6 +7,7 @@
 
 #include <Referenceable.h>
 
+#include <condition_variable.h>
 #include <lock.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -126,8 +127,8 @@ private:
 	RequestList			fWriters;
 	size_t				fReadRequested;
 	size_t				fWriteRequested;
-	sem_id				fReaderSem;
-	sem_id				fWriterSem;
+	ConditionVariable	fReadCondition;
+	ConditionVariable	fWriteCondition;
 	uint32				fShutdown;
 };
 
