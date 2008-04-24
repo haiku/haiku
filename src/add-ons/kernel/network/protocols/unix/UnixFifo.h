@@ -38,7 +38,7 @@ public:
 		{ return fCapacity >= fSize ? fCapacity - fSize : 0; }
 
 	status_t Read(size_t size, net_buffer** _buffer);
-	status_t Write(net_buffer* buffer);
+	status_t Write(net_buffer* buffer, size_t maxSize);
 
 	size_t Capacity() const		{ return fCapacity; }
 	void SetCapacity(size_t capacity);
@@ -118,7 +118,10 @@ private:
 private:
 	status_t _Read(Request& request, size_t numBytes, bigtime_t timeout,
 		net_buffer** _buffer);
-	status_t _Write(Request& request, net_buffer* buffer, bigtime_t timeout);
+	status_t _Write(Request& request, net_buffer* buffer, bigtime_t timeout,
+		size_t& bytesWritten);
+	status_t _WriteNonBlocking(Request& request, net_buffer* buffer,
+		size_t& bytesWritten);
 
 private:
 	benaphore			fLock;
