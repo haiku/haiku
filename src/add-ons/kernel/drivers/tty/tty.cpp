@@ -10,14 +10,19 @@
 
 
 #include <ctype.h>
+#include <errno.h>
 #include <signal.h>
+#include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include <util/AutoLock.h>
 #include <util/kernel_cpp.h>
 
 #include <team.h>
+
+#include <tty.h>
 
 #include "tty_private.h"
 
@@ -765,11 +770,11 @@ reset_termios(struct termios &termios)
 {
 	memset(&termios, 0, sizeof(struct termios));
 
-	termios.c_iflag = 0;
-	termios.c_oflag = 0;
+	termios.c_iflag = ICRNL;
+	termios.c_oflag = OPOST | ONLCR;
 	termios.c_cflag = B19200 | CS8 | CREAD | HUPCL;
 		// enable receiver, hang up on last close
-	termios.c_lflag = 0;
+	termios.c_lflag = ECHO | ISIG | ICANON;
 
 	// control characters	
 	termios.c_cc[VINTR] = CTRL('C');
@@ -1386,6 +1391,31 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 					|| oldRows != tty->settings->window_size.ws_row)
 				&& tty->settings->pgrp_id != 0) {
 				send_signal(-tty->settings->pgrp_id, SIGWINCH);
+			}
+
+			return B_OK;
+		}
+
+		case B_IOCTL_GET_TTY_INDEX:
+			if (user_memcpy(buffer, &tty->index, sizeof(int32)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return B_OK;
+
+		case B_IOCTL_GRANT_TTY:
+		{
+			if (!tty->is_master)
+				return B_BAD_VALUE;
+
+			// get slave path
+			char path[64];
+			snprintf(path, sizeof(path), "/dev/%s",
+				gDeviceNames[kNumTTYs + tty->index]);
+
+			// set owner and permissions respectively
+			if (chown(path, getuid(), getgid()) != 0
+				|| chmod(path, S_IRUSR | S_IWUSR | S_IWGRP) != 0) {
+				return errno;
 			}
 
 			return B_OK;

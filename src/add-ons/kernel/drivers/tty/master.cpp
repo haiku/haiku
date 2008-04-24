@@ -65,15 +65,27 @@ create_master_cookie(master_cookie *&cookie, struct tty *master,
 static status_t
 master_open(const char *name, uint32 flags, void **_cookie)
 {
-	int32 index = get_tty_index(name);
-	if (index >= (int32)kNumTTYs)
-		return B_ERROR;
+	bool findUnusedTTY = strcmp(name, "ptmx") == 0;
+
+	int32 index = -1;
+	if (!findUnusedTTY) {
+		index = get_tty_index(name);
+		if (index >= (int32)kNumTTYs)
+			return B_ERROR;
+	}
 
 	TRACE(("master_open: TTY index = %ld (name = %s)\n", index, name));
 
 	MutexLocker globalLocker(gGlobalTTYLock);
 
-	if (gMasterTTYs[index].open_count > 0) {
+	if (findUnusedTTY) {
+		for (index = 0; index < (int32)kNumTTYs; index++) {
+			if (gMasterTTYs[index].open_count == 0)
+				break;
+		}
+		if (index >= (int32)kNumTTYs)
+			return ENOENT;
+	} else if (gMasterTTYs[index].open_count > 0) {
 		// we're already open!
 		return B_BUSY;
 	}

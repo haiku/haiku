@@ -1,7 +1,7 @@
 /* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the Haiku License.
+ */
 
 #include <new>
 
@@ -27,9 +27,9 @@ static const int kMaxCachedSemaphores = 8;
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-static char *sDeviceNames[kNumTTYs * 2 + 2];
-	// reserve space for "pt/" and "tt/" entries, "tty", and the terminating
-	// NULL
+char *gDeviceNames[kNumTTYs * 2 + 3];
+	// reserve space for "pt/" and "tt/" entries, "ptmx", "tty", and the
+	// terminating NULL
 
 struct mutex gGlobalTTYLock;
 struct mutex gTTYCookieLock;
@@ -49,7 +49,7 @@ init_driver(void)
 {
 	TRACE((DRIVER_NAME ": init_driver()\n"));
 
-	memset(sDeviceNames, 0, sizeof(sDeviceNames));
+	memset(gDeviceNames, 0, sizeof(gDeviceNames));
 
 	// create the global mutex
 	status_t error = mutex_init(&gGlobalTTYLock, "tty global");
@@ -77,16 +77,20 @@ init_driver(void)
 	int8 digit = 0;
 
 	for (uint32 i = 0; i < kNumTTYs; i++) {
-		// For compatibility, we have to create the same mess in /dev/pt and /dev/tt
-		// as BeOS does: we publish devices p0, p1, ..., pf, r1, ..., sf.
-		// It would be nice if we could drop compatibility and create something better.
+		// For compatibility, we have to create the same mess in /dev/pt and
+		// /dev/tt as BeOS does: we publish devices p0, p1, ..., pf, r1, ...,
+		// sf. It would be nice if we could drop compatibility and create
+		// something better. In fact we already don't need the master devices
+		// anymore, since "/dev/ptmx" does the job. The slaves entries could
+		// be published on the fly when a master is opened (e.g via
+		// vfs_create_special_node()).
 		char buffer[64];
 
 		snprintf(buffer, sizeof(buffer), "pt/%c%x", letter, digit);
-		sDeviceNames[i] = strdup(buffer);
+		gDeviceNames[i] = strdup(buffer);
 
 		snprintf(buffer, sizeof(buffer), "tt/%c%x", letter, digit);
-		sDeviceNames[i + kNumTTYs] = strdup(buffer);
+		gDeviceNames[i + kNumTTYs] = strdup(buffer);
 
 		if (++digit > 15)
 			digit = 0, letter++;
@@ -95,13 +99,14 @@ init_driver(void)
 		reset_tty(&gSlaveTTYs[i], i, false);
 		reset_tty_settings(&gTTYSettings[i], i);
 
-		if (!sDeviceNames[i] || !sDeviceNames[i + kNumTTYs]) {
+		if (!gDeviceNames[i] || !gDeviceNames[i + kNumTTYs]) {
 			uninit_driver();
 			return B_NO_MEMORY;
 		}
 	}
 
-	sDeviceNames[2 * kNumTTYs] = "tty";
+	gDeviceNames[2 * kNumTTYs] = "ptmx";
+	gDeviceNames[2 * kNumTTYs + 1] = "tty";
 
 	tty_add_debugger_commands();
 
@@ -117,7 +122,7 @@ uninit_driver(void)
 	tty_remove_debugger_commands();
 
 	for (int32 i = 0; i < (int32)kNumTTYs * 2; i++)
-		free(sDeviceNames[i]);
+		free(gDeviceNames[i]);
 
 	recursive_lock_destroy(&gTTYRequestLock);
 	mutex_destroy(&gTTYCookieLock);
@@ -129,7 +134,7 @@ const char **
 publish_devices(void)
 {
 	TRACE((DRIVER_NAME ": publish_devices()\n"));
-	return const_cast<const char **>(sDeviceNames);
+	return const_cast<const char **>(gDeviceNames);
 }
 
 
@@ -138,9 +143,11 @@ find_device(const char *name)
 {
 	TRACE((DRIVER_NAME ": find_device(\"%s\")\n", name));
 
-	for (uint32 i = 0; sDeviceNames[i] != NULL; i++)
-		if (!strcmp(name, sDeviceNames[i]))
-			return i < kNumTTYs ? &gMasterTTYHooks : &gSlaveTTYHooks;
+	for (uint32 i = 0; gDeviceNames[i] != NULL; i++)
+		if (!strcmp(name, gDeviceNames[i])) {
+			return i < kNumTTYs || i == (2 * kNumTTYs)
+				? &gMasterTTYHooks : &gSlaveTTYHooks;
+		}
 
 	return NULL;
 }

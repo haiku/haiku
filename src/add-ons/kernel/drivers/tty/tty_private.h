@@ -145,6 +145,8 @@ struct tty {
 
 static const uint32 kNumTTYs = 64;
 
+extern char *gDeviceNames[kNumTTYs * 2 + 3];
+
 extern tty gMasterTTYs[kNumTTYs];
 extern tty gSlaveTTYs[kNumTTYs];
 extern tty_settings gTTYSettings[kNumTTYs];
