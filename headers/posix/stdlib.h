@@ -166,6 +166,13 @@ extern size_t	wcstombs(char *string, const wchar_t *pwcs, size_t maxSize);
 /* crypt */
 extern void 	setkey(const char *key);	
 
+
+/* pty functions */
+extern int		posix_openpt(int openFlags);
+extern int		grantpt(int masterFD);
+extern char*	ptsname(int masterFD);
+extern int		unlockpt(int masterFD);
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

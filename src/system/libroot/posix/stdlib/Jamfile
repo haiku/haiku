@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix stdlib ;
 
-UsePrivateHeaders libroot ;
+UsePrivateHeaders drivers libroot ;
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 
 MergeObject posix_stdlib.o :
@@ -15,6 +15,7 @@ MergeObject posix_stdlib.o :
 	heapsort.c 
 	merge.c
 	mktemp.c
+	pty.cpp
 	qsort.c 
 	radixsort.c 
 	rand.c 
