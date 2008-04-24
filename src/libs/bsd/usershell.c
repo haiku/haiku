@@ -9,17 +9,21 @@
 
 #include <unistd.h>
 
-
+static const char* const kShells[] = {
+	"/bin/sh",
+	"/bin/bash",
+	NULL
+};
 static int sShellIndex;
 
 
 char *
 getusershell(void)
 {
-	if (sShellIndex++ == 0)
-		return "/bin/sh";
+	if (kShells[sShellIndex] == NULL)
+		return NULL;
 
-	return NULL;
+	return (char*)kShells[sShellIndex++];
 }
 
 
