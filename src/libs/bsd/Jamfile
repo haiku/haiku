@@ -11,6 +11,7 @@ SharedLibrary libbsd.so :
 	getpass.c
 	issetugid.c
 	progname.c
+	pty.cpp
 	signal.c
 	stringlist.c
 	unvis.c
