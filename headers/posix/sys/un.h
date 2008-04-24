@@ -12,7 +12,7 @@
 struct sockaddr_un {
 	uint8_t		sun_len;	
 	uint8_t		sun_family;
-	char		sun_path[128];
+	char		sun_path[126];
 };
 
 #endif	/* _SYS_UN_H */
