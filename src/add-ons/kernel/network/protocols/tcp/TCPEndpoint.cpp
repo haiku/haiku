@@ -417,6 +417,15 @@ TCPEndpoint::Connect(const sockaddr *address)
 	} else if (fState != CLOSED)
 		return EINPROGRESS;
 
+	// consider destination address INADDR_ANY as INADDR_LOOPBACK
+	sockaddr_in _address;
+	if (((sockaddr_in*)address)->sin_addr.s_addr == INADDR_ANY) {
+		memcpy(&_address, address, sizeof(sockaddr_in));
+		_address.sin_len = sizeof(sockaddr_in);
+		_address.sin_addr.s_addr = INADDR_LOOPBACK;
+		address = (sockaddr*)&_address;
+	}
+
 	status_t status = _PrepareSendPath(address);
 	if (status < B_OK)
 		return status;
