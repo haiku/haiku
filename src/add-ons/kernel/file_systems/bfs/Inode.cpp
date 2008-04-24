@@ -1754,6 +1754,8 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 				do {
 					// do we need a new array block?
 					if (array[indirectIndex % runsPerBlock].IsZero()) {
+						cached.MakeWritable(transaction);
+
 						status = _AllocateBlockArray(transaction,
 							array[indirectIndex % runsPerBlock]);
 						if (status < B_OK)
