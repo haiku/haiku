@@ -917,6 +917,8 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 		flags |= B_RELEASE_IF_WAITING_ONLY;
 	}
 
+	bool unblockedAny = false;
+
 	SpinLocker threadLocker(thread_spinlock);
 
 	while (count > 0) {
@@ -944,6 +946,7 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 			sSems[slot].u.used.count += delta;
 			sSems[slot].u.used.net_count += delta - entry->count;
 			count -= delta;
+			unblockedAny = true;
 		} else {
 			// The thread is no longer waiting, but still queued, which
 			// means acquiration failed and we can just remove it.
@@ -959,8 +962,9 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 	if (sSems[slot].u.used.count > 0)
 		notify_sem_select_events(&sSems[slot], B_EVENT_ACQUIRE_SEMAPHORE);
 
-	// reschedule, if we've not explicitly been told not to
-	if ((flags & B_DO_NOT_RESCHEDULE) == 0) {
+	// If we've unblocked another thread reschedule, if we've not explicitly
+	// been told not to.
+	if (unblockedAny && (flags & B_DO_NOT_RESCHEDULE) == 0) {
 		semLocker.Unlock();
 		threadLocker.Lock();
 		scheduler_reschedule();
