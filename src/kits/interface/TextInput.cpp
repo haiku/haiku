@@ -7,6 +7,9 @@
  *		Marc Flerackers (mflerackers@androme.be)
  */
 
+
+#include "TextInput.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,24 +20,22 @@
 #include <TextView.h>
 #include <Window.h>
 
-#include "TextInput.h"
-
 
 namespace BPrivate {
 
 
 _BTextInput_::_BTextInput_(BRect frame, BRect textRect, uint32 resizeMask,
 		uint32 flags)
-	: BTextView(frame, "_input_", textRect, resizeMask, flags)
-	, fPreviousText(NULL)
+	: BTextView(frame, "_input_", textRect, resizeMask, flags),
+	fPreviousText(NULL)
 {
 	MakeResizable(true);
 }
 
 
 _BTextInput_::_BTextInput_(BMessage* archive)
-	: BTextView(archive)
-	, fPreviousText(NULL)
+	: BTextView(archive),
+	fPreviousText(NULL)
 {
 	MakeResizable(true);
 }
@@ -46,8 +47,8 @@ _BTextInput_::~_BTextInput_()
 }
 
 
-BArchivable *
-_BTextInput_::Instantiate(BMessage *archive)
+BArchivable*
+_BTextInput_::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "_BTextInput_"))
 		return new _BTextInput_(archive);
@@ -57,7 +58,7 @@ _BTextInput_::Instantiate(BMessage *archive)
 
 
 status_t
-_BTextInput_::Archive(BMessage *data, bool deep) const
+_BTextInput_::Archive(BMessage* data, bool deep) const
 {
 	return BTextView::Archive(data, true);
 }
@@ -173,7 +174,7 @@ _BTextInput_::SetInitialText()
 
 
 void
-_BTextInput_::Paste(BClipboard *clipboard)
+_BTextInput_::Paste(BClipboard* clipboard)
 {
 	BTextView::Paste(clipboard);
 	Invalidate();
@@ -181,13 +182,13 @@ _BTextInput_::Paste(BClipboard *clipboard)
 
 
 void
-_BTextInput_::InsertText(const char *inText, int32 inLength,
-	int32 inOffset, const text_run_array *inRuns)
+_BTextInput_::InsertText(const char* inText, int32 inLength,
+	int32 inOffset, const text_run_array* inRuns)
 {
-	char *buffer = NULL;
+	char* buffer = NULL;
 
 	if (strpbrk(inText, "\r\n") && inLength <= 1024) {
-		buffer = (char *)malloc(inLength);
+		buffer = (char*)malloc(inLength);
 
 		if (buffer) {
 			strcpy(buffer, inText);
@@ -219,10 +220,10 @@ _BTextInput_::DeleteText(int32 fromOffset, int32 toOffset)
 }
 
 
-BTextControl *
+BTextControl*
 _BTextInput_::TextControl()
 {
-	BTextControl *textControl = NULL;
+	BTextControl* textControl = NULL;
 
 	if (Parent())
 		textControl = dynamic_cast<BTextControl*>(Parent());

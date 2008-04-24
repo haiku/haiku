@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,7 +8,7 @@
  *		Ingo Weinhold <bonefish@cs.tu-berlin.de>
  */
 
-/**	BTextControl displays text that can act like a control. */
+/*!	BTextControl displays text that can act like a control. */
 
 
 #include <stdio.h>
@@ -72,9 +72,8 @@ private:
 // #pragma mark -
 
 
-BTextControl::BTextControl(BRect frame, const char *name, const char *label,
-						   const char *text, BMessage *message, uint32 mask,
-						   uint32 flags)
+BTextControl::BTextControl(BRect frame, const char* name, const char* label,
+		const char* text, BMessage* message, uint32 mask, uint32 flags)
 	: BControl(frame, name, label, message, mask, flags | B_FRAME_EVENTS)
 {
 	_InitData(label, text);
@@ -82,21 +81,20 @@ BTextControl::BTextControl(BRect frame, const char *name, const char *label,
 }
 
 
-BTextControl::BTextControl(const char *name, const char *label,
-						   const char *text, BMessage *message,
-						   uint32 flags)
+BTextControl::BTextControl(const char* name, const char* label,
+		const char* text, BMessage* message, uint32 flags)
 	: BControl(BRect(0, 0, -1, -1), name, label, message, B_FOLLOW_NONE,
-			flags | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+		flags | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
 {
 	_InitData(label, text);
 	_ValidateLayout();
 }
 
 
-BTextControl::BTextControl(const char *label,
-						   const char *text, BMessage *message)
+BTextControl::BTextControl(const char* label, const char* text,
+		BMessage* message)
 	: BControl(BRect(0, 0, -1, -1), NULL, label, message, B_FOLLOW_NONE,
-			B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
+		B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS | B_SUPPORTS_LAYOUT)
 {
 	_InitData(label, text);
 	_ValidateLayout();
@@ -136,13 +134,13 @@ BTextControl::BTextControl(BMessage* archive)
 }
 
 
-BArchivable *
-BTextControl::Instantiate(BMessage *archive)
+BArchivable*
+BTextControl::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BTextControl"))
 		return new BTextControl(archive);
-	else
-		return NULL;
+
+	return NULL;
 }
 
 
@@ -731,7 +729,8 @@ BTextControl::_InitData(const char* label, const char* initialText,
 
 	if (archive)
 		fText = static_cast<BPrivate::_BTextInput_*>(FindView("_input_"));
-	else {
+
+	if (fText == NULL) {
 		BRect frame(fDivider, bounds.top,
 					bounds.right, bounds.bottom);
 		// we are stroking the frame around the text view, which
