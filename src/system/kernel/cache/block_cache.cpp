@@ -348,6 +348,21 @@ set_notification(cache_transaction *transaction,
 }
 
 
+/*!	Makes sure the notification is deleted. It either deletes it directly,
+	when possible, or marks it for deletion if the notification is pending.
+*/
+static void
+delete_notification(cache_notification *notification)
+{
+	MutexLocker locker(sNotificationsLock);
+
+	if (notification->events_pending != 0)
+		notification->delete_after_event = true;
+	else
+		delete notification;
+}
+
+
 /*!	Adds the notification to the pending notifications list, or, if it's
 	already part of it, updates its events_pending field.
 	Also marks the notification to be deleted if \a deleteNotification
@@ -370,11 +385,7 @@ add_notification(block_cache *cache, cache_notification *notification,
 		cache->pending_notifications.Add(notification);
 	} else if (deleteNotification) {
 		// we might need to delete it ourselves if we're late
-		MutexLocker locker(sNotificationsLock);
-		if (notification->events_pending != 0)
-			notification->delete_after_event = true;
-		else
-			delete notification;
+		delete_notification(notification);
 	}
 
 	release_sem_etc(sEventSemaphore, 1, B_DO_NOT_RESCHEDULE);
@@ -408,14 +419,8 @@ notify_transaction_listeners(block_cache *cache, cache_transaction *transaction,
 
 		if ((listener->events & event) != 0)
 			add_notification(cache, listener, event, remove);
-		else if (remove) {
-			// we might need to defer the deletion if its currently in use
-			MutexLocker locker(sNotificationsLock);
-			if (listener->events_pending != 0)
-				listener->delete_after_event = true;
-			else
-				delete listener;
-		}
+		else if (remove)
+			delete_notification(listener);
 	}
 }
 
@@ -473,6 +478,9 @@ flush_pending_notifications()
 }
 
 
+/*!	Removes and deletes all listeners that are still monitoring this
+	transaction.
+*/
 static void
 remove_transaction_listeners(block_cache *cache, cache_transaction *transaction)
 {
@@ -481,17 +489,7 @@ remove_transaction_listeners(block_cache *cache, cache_transaction *transaction)
 		cache_listener *listener = iterator.Next();
 		iterator.Remove();
 
-		if (listener->events_pending != 0) {
-			// This listener is already in the notification list - just
-			// mark it to be deleted.
-			MutexLocker _(sNotificationsLock);
-			if (listener->events_pending != 0) {
-				listener->delete_after_event = true;
-				continue;
-			}
-		}
-
-		delete listener;
+		delete_notification(listener);
 	}
 }
 
