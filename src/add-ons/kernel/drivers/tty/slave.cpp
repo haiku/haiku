@@ -70,8 +70,16 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 		// If already open, we allow only processes from the same session
 		// to open the tty again.
 		pid_t ttySession = gSlaveTTYs[index].settings->session_id;
-		if (ttySession < 0 || ttySession != sessionID)
-			return B_NOT_ALLOWED;
+		if (ttySession >= 0) {
+			if (ttySession != sessionID)
+				return B_NOT_ALLOWED;
+			makeControllingTTY = false;
+		} else {
+			// The tty is not associated with a session yet. The process needs
+			// to be a session leader.
+			if (makeControllingTTY && processID != sessionID)
+				return B_NOT_ALLOWED;
+		}
 	}
 
  	slave_cookie *cookie = (slave_cookie *)malloc(sizeof(struct slave_cookie));
@@ -95,12 +103,14 @@ slave_open(const char *name, uint32 flags, void **_cookie)
 
 	if (gSlaveTTYs[index].open_count == 0) {
 		gSlaveTTYs[index].lock = gMasterTTYs[index].lock;
+		gSlaveTTYs[index].settings->session_id = -1;
+		gSlaveTTYs[index].settings->pgrp_id = -1;
+	}
 
-		if (makeControllingTTY) {
-			gSlaveTTYs[index].settings->session_id = sessionID;
-			team_set_controlling_tty(gSlaveTTYs[index].index);
-		} else
-			gSlaveTTYs[index].settings->session_id = -1;
+	if (makeControllingTTY) {
+		gSlaveTTYs[index].settings->session_id = sessionID;
+		gSlaveTTYs[index].settings->pgrp_id = sessionID;
+		team_set_controlling_tty(gSlaveTTYs[index].index);
 	}
 
 	add_tty_cookie(cookie);
