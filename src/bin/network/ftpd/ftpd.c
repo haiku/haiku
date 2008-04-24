@@ -99,6 +99,10 @@ __FBSDID("$FreeBSD: src/libexec/ftpd/ftpd.c,v 1.212 2007/04/18 22:43:39 yar Exp 
 #include <security/pam_appl.h>
 #endif
 
+#ifdef __HAIKU__
+#include <shadow.h>
+#endif
+
 #include "pathnames.h"
 #include "extern.h"
 
@@ -968,9 +972,18 @@ sgetpwnam(char *name)
 {
 	static struct passwd save;
 	struct passwd *p;
+#ifdef __HAIKU__
+	struct spwd *sp = NULL;
+#endif
 
 	if ((p = getpwnam(name)) == NULL)
 		return (p);
+#ifdef __HAIKU__
+	if (strcmp(p->pw_passwd, "x") == 0) {
+		if ((sp = getspnam(name)) == NULL)
+			return (p);
+	}
+#endif
 	if (save.pw_name) {
 		free(save.pw_name);
 		free(save.pw_passwd);
@@ -980,6 +993,11 @@ sgetpwnam(char *name)
 	}
 	save = *p;
 	save.pw_name = sgetsave(p->pw_name);
+#ifdef __HAIKU__
+	if (sp)
+		save.pw_passwd = sgetsave(sp->sp_pwdp);
+	else
+#endif
 	save.pw_passwd = sgetsave(p->pw_passwd);
 	save.pw_gecos = sgetsave(p->pw_gecos);
 	save.pw_dir = sgetsave(p->pw_dir);
