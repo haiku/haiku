@@ -1154,7 +1154,7 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 			size_t sizeAfterSend = buffer->size;
 			gNetBufferModule.free(buffer);
 
-			if (sizeAfterSend != bufferSize
+			if ((sizeAfterSend != bufferSize || bytesSent > 0)
 				&& (status == B_INTERRUPTED || status == B_WOULD_BLOCK)) {
 				// this appears to be a partial write
 				return bytesSent + (bufferSize - sizeAfterSend);
