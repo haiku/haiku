@@ -283,44 +283,23 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 	signal(SIGTTOU, SIG_IGN);
 	
-	/*
-	 * Get a pseudo-tty. We do this by cycling through files in the
-	 * directory. The operating system will not allow us to open a master
-	 * which is already in use, so we simply go until the open succeeds.
-	 */
-	char ttyName[B_PATH_NAME_LENGTH];
-	int master = -1;	
-	DIR *dir = opendir("/dev/pt/");
-	if (dir != NULL) {
-		struct dirent *dirEntry;
-		while ((dirEntry = readdir(dir)) != NULL) { 
-			// skip '.' and '..'
-			if (dirEntry->d_name[0] == '.')
-				continue;
-
-			char ptyName[B_PATH_NAME_LENGTH];
-			snprintf(ptyName, sizeof(ptyName), "/dev/pt/%s", dirEntry->d_name);
-
-			master = open(ptyName, O_RDWR);
-			if (master >= 0) {
-				// Set the tty that corresponds to the pty we found
-				snprintf(ttyName, sizeof(ttyName), "/dev/tt/%s", dirEntry->d_name);
-				break;
-			} else {
-				// B_BUSY is a normal case
-				if (errno != B_BUSY) 
-					fprintf(stderr, "could not open %s: %s\n", ptyName, strerror(errno));
-			}
-		}
-		closedir(dir);
-	}
+	// get a pseudo-tty
+	int master = posix_openpt(O_RDWR | O_NOCTTY);
+	const char *ttyName;
 
 	if (master < 0) {
-    		fprintf(stderr, "didn't find any available pseudo ttys.");
-    		return B_ERROR;
+    	fprintf(stderr, "Didn't find any available pseudo ttys.");
+    	return errno;
 	}
 
-       	/*
+	if (grantpt(master) != 0 || unlockpt(master) != 0
+		|| (ttyName = ptsname(master)) == NULL) {
+		close(master);
+    	fprintf(stderr, "Failed to init pseudo tty.");
+		return errno;
+	}
+
+	/*
 	 * Get the modes of the current terminal. We will duplicates these
 	 * on the pseudo terminal.
 	 */
@@ -351,10 +330,6 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 			send_handshake_message(terminalThread, handshake);
 			exit(1);
 		}
-
-		/* change pty owner and access mode. */
-		chown(ttyName, getuid(), getgid());
-		chmod(ttyName, S_IRUSR | S_IWUSR);
 
 		/* open slave pty */
 		int slave = -1;
