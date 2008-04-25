@@ -995,60 +995,6 @@ BView::LeftTop() const
 
 
 void
-BView::SetOrigin(BPoint pt)
-{
-	SetOrigin(pt.x, pt.y);
-}
-
-
-void
-BView::SetOrigin(float x, float y)
-{
-	if (fState->IsValid(B_VIEW_ORIGIN_BIT)
-		&& x == fState->origin.x && y == fState->origin.y)
-		return;
-
-	fState->origin.x = x;
-	fState->origin.y = y;
-
-	if (_CheckOwnerLockAndSwitchCurrent()) {
-		fOwner->fLink->StartMessage(AS_VIEW_SET_ORIGIN);
-		fOwner->fLink->Attach<float>(x);
-		fOwner->fLink->Attach<float>(y);
-
-		fState->valid_flags |= B_VIEW_ORIGIN_BIT;
-	}
-
-	// our local coord system origin has changed, so when archiving we'll add
-	// this too
-	fState->archiving_flags |= B_VIEW_ORIGIN_BIT;
-}
-
-
-BPoint
-BView::Origin() const
-{
-	if (!fState->IsValid(B_VIEW_ORIGIN_BIT)) {
-		// we don't keep graphics state information, therefor
-		// we need to ask the server for the origin after PopState()
-		_CheckOwnerLockAndSwitchCurrent();
-
-		fOwner->fLink->StartMessage(AS_VIEW_GET_ORIGIN);
-
-		int32 code;
-		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK) {
-			fOwner->fLink->Read<BPoint>(&fState->origin);
-
-			fState->valid_flags |= B_VIEW_ORIGIN_BIT;
-		}
-	}
-
-	return fState->origin;
-}
-
-
-void
 BView::SetResizingMode(uint32 mode)
 {
 	if (fOwner) {
@@ -1660,6 +1606,126 @@ BView::SetMouseEventMask(uint32 mask, uint32 options)
 
 
 void
+BView::PushState()
+{
+	_CheckOwnerLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_VIEW_PUSH_STATE);
+
+	// initialize origin and scale
+	fState->valid_flags |= B_VIEW_SCALE_BIT | B_VIEW_ORIGIN_BIT;
+	fState->scale = 1.0f;
+	fState->origin.Set(0, 0);
+}
+
+
+void
+BView::PopState()
+{
+	_CheckOwnerLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_VIEW_POP_STATE);
+
+	// invalidate all flags (except those that are not part of pop/push)
+	fState->valid_flags = B_VIEW_VIEW_COLOR_BIT;
+}
+
+
+void
+BView::SetOrigin(BPoint pt)
+{
+	SetOrigin(pt.x, pt.y);
+}
+
+
+void
+BView::SetOrigin(float x, float y)
+{
+	if (fState->IsValid(B_VIEW_ORIGIN_BIT)
+		&& x == fState->origin.x && y == fState->origin.y)
+		return;
+
+	fState->origin.x = x;
+	fState->origin.y = y;
+
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_SET_ORIGIN);
+		fOwner->fLink->Attach<float>(x);
+		fOwner->fLink->Attach<float>(y);
+
+		fState->valid_flags |= B_VIEW_ORIGIN_BIT;
+	}
+
+	// our local coord system origin has changed, so when archiving we'll add
+	// this too
+	fState->archiving_flags |= B_VIEW_ORIGIN_BIT;
+}
+
+
+BPoint
+BView::Origin() const
+{
+	if (!fState->IsValid(B_VIEW_ORIGIN_BIT)) {
+		// we don't keep graphics state information, therefor
+		// we need to ask the server for the origin after PopState()
+		_CheckOwnerLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_ORIGIN);
+
+		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK
+			&& code == B_OK) {
+			fOwner->fLink->Read<BPoint>(&fState->origin);
+
+			fState->valid_flags |= B_VIEW_ORIGIN_BIT;
+		}
+	}
+
+	return fState->origin;
+}
+
+
+void
+BView::SetScale(float scale) const
+{
+	if (fState->IsValid(B_VIEW_SCALE_BIT) && scale == fState->scale)
+		return;
+
+	if (fOwner) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_SET_SCALE);
+		fOwner->fLink->Attach<float>(scale);
+
+		fState->valid_flags |= B_VIEW_SCALE_BIT;
+	}
+
+	fState->scale = scale;
+	fState->archiving_flags |= B_VIEW_SCALE_BIT;
+}
+
+
+float
+BView::Scale() const
+{
+	if (!fState->IsValid(B_VIEW_SCALE_BIT) && fOwner) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_SCALE);
+
+ 		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK
+			&& code == B_OK)
+			fOwner->fLink->Read<float>(&fState->scale);
+
+		fState->valid_flags |= B_VIEW_SCALE_BIT;
+	}
+
+	return fState->scale;
+}
+
+
+void
 BView::SetLineMode(cap_mode lineCap, join_mode lineJoin, float miterLimit)
 {
 	if (fState->IsValid(B_VIEW_LINE_MODES_BIT)
@@ -1732,72 +1798,6 @@ BView::LineMiterLimit() const
 	}
 
 	return fState->miter_limit;
-}
-
-
-void
-BView::PushState()
-{
-	_CheckOwnerLockAndSwitchCurrent();
-
-	fOwner->fLink->StartMessage(AS_VIEW_PUSH_STATE);
-
-	// initialize origin and scale
-	fState->valid_flags |= B_VIEW_SCALE_BIT | B_VIEW_ORIGIN_BIT;
-	fState->scale = 1.0f;
-	fState->origin.Set(0, 0);
-}
-
-
-void
-BView::PopState()
-{
-	_CheckOwnerLockAndSwitchCurrent();
-
-	fOwner->fLink->StartMessage(AS_VIEW_POP_STATE);
-
-	// invalidate all flags (except those that are not part of pop/push)
-	fState->valid_flags = B_VIEW_VIEW_COLOR_BIT;
-}
-
-
-void
-BView::SetScale(float scale) const
-{
-	if (fState->IsValid(B_VIEW_SCALE_BIT) && scale == fState->scale)
-		return;
-
-	if (fOwner) {
-		_CheckLockAndSwitchCurrent();
-
-		fOwner->fLink->StartMessage(AS_VIEW_SET_SCALE);
-		fOwner->fLink->Attach<float>(scale);
-
-		fState->valid_flags |= B_VIEW_SCALE_BIT;
-	}
-
-	fState->scale = scale;
-	fState->archiving_flags |= B_VIEW_SCALE_BIT;
-}
-
-
-float
-BView::Scale() const
-{
-	if (!fState->IsValid(B_VIEW_SCALE_BIT) && fOwner) {
-		_CheckLockAndSwitchCurrent();
-
-		fOwner->fLink->StartMessage(AS_VIEW_GET_SCALE);
-
- 		int32 code;
-		if (fOwner->fLink->FlushWithReply(code) == B_OK
-			&& code == B_OK)
-			fOwner->fLink->Read<float>(&fState->scale);
-
-		fState->valid_flags |= B_VIEW_SCALE_BIT;
-	}
-
-	return fState->scale;
 }
 
 
