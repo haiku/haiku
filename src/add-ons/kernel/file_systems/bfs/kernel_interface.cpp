@@ -1770,6 +1770,53 @@ bfs_remove_attr(fs_volume *_volume, fs_vnode *_node, const char *name)
 }
 
 
+//	#pragma mark - Special Nodes
+
+
+status_t
+bfs_create_special_node(fs_volume *_volume, fs_vnode *_directory,
+	const char *name, fs_vnode *subVnode, mode_t mode, uint32 flags,
+	fs_vnode *_superVnode, ino_t *_nodeID)
+{
+	// no need to support entry-less nodes
+	if (name == NULL)
+		return B_UNSUPPORTED;
+
+	FUNCTION_START(("name = \"%s\", mode = %d, flags = 0x%lx, subVnode: %p\n",
+		name, mode, flags, subVnode));
+
+	Volume *volume = (Volume *)_volume->private_volume;
+	Inode *directory = (Inode *)_directory->private_node;
+
+	if (volume->IsReadOnly())
+		return B_READ_ONLY_DEVICE;
+
+	if (!directory->IsDirectory())
+		RETURN_ERROR(B_BAD_TYPE);
+
+	status_t status = directory->CheckPermissions(W_OK);
+	if (status < B_OK)
+		RETURN_ERROR(status);
+
+	Transaction transaction(volume, directory->BlockNumber());
+
+	off_t id;
+	Inode *inode;
+	status = Inode::Create(transaction, directory, name, mode, O_EXCL, 0, NULL,
+		&id, &inode, subVnode ? subVnode->ops : NULL, flags);
+	if (status == B_OK) {
+		_superVnode->private_node = inode;
+		_superVnode->ops = &gBFSVnodeOps;
+		*_nodeID = id;
+		transaction.Done();
+
+		notify_entry_created(volume->ID(), directory->ID(), name, id);
+	}
+
+	return status;
+}
+
+
 //	#pragma mark -
 //	Index functions
 
@@ -2224,7 +2271,10 @@ fs_vnode_ops gBFSVnodeOps = {
 	&bfs_read_attr_stat,
 	&bfs_write_attr_stat,
 	&bfs_rename_attr,
-	&bfs_remove_attr
+	&bfs_remove_attr,
+
+	/* special nodes */
+	&bfs_create_special_node
 };
 
 static file_system_module_info sBeFileSystem = {

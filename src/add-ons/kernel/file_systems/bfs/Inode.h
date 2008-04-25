@@ -50,12 +50,9 @@ class Inode {
 		status_t WriteBack(Transaction &transaction);
 
 		bool IsContainer() const
-			{ return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
-				// note, that this test will also be true for S_IFBLK
-				// (not that it's used in the fs :)
+			{ return (Mode() & (S_INDEX_DIR | S_ATTR_DIR)) || S_ISDIR(Mode()); }
 		bool IsDirectory() const
-			{ return (Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR))
-				== S_DIRECTORY; }
+			{ return S_ISDIR(Mode()); }
 		bool IsIndex() const
 			{ return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
 				// that's a stupid check, but AFAIK the only possible method...
@@ -141,7 +138,8 @@ class Inode {
 			ino_t *_id = NULL, bool isDirectory = false);
 		static status_t Create(Transaction &transaction, Inode *parent,
 			const char *name, int32 mode, int openMode, uint32 type,
-			bool *_created = NULL, ino_t *_id = NULL, Inode **_inode = NULL);
+			bool *_created = NULL, ino_t *_id = NULL, Inode **_inode = NULL,
+			fs_vnode_ops *vnodeOps = NULL, uint32 publishFlags = 0);
 
 		// index maintaining helper
 		void UpdateOldSize()

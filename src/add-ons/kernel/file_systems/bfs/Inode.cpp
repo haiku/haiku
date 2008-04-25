@@ -139,9 +139,9 @@ class InodeAllocator {
 		~InodeAllocator();
 
 		status_t New(block_run *parentRun, mode_t mode, block_run &run,
-			Inode **_inode);
+			fs_vnode_ops *vnodeOps, Inode **_inode);
 		status_t CreateTree();
-		status_t Keep();
+		status_t Keep(fs_vnode_ops *vnodeOps, uint32 publishFlags);
 
 	private:
 		static void _TransactionListener(int32 id, int32 event, void *_inode);
@@ -180,7 +180,7 @@ InodeAllocator::~InodeAllocator()
 
 status_t
 InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
-	Inode **_inode)
+	fs_vnode_ops *vnodeOps, Inode **_inode)
 {
 	Volume *volume = fTransaction->GetVolume();
 
@@ -200,7 +200,7 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run,
 
 	if (volume->ID() >= 0) {
 		status = new_vnode(volume->FSVolume(), fInode->ID(), fInode,
-			&gBFSVnodeOps);
+			vnodeOps != NULL ? vnodeOps : &gBFSVnodeOps);
 		if (status < B_OK) {
 			delete fInode;
 			fInode = NULL;
@@ -237,7 +237,7 @@ InodeAllocator::CreateTree()
 
 
 status_t
-InodeAllocator::Keep()
+InodeAllocator::Keep(fs_vnode_ops *vnodeOps, uint32 publishFlags)
 {
 	ASSERT(fInode != NULL && fTransaction != NULL);
 	Volume *volume = fTransaction->GetVolume();
@@ -250,7 +250,8 @@ InodeAllocator::Keep()
 
 	if (!fInode->IsSymLink() && volume->ID() >= 0) {
 		status = publish_vnode(volume->FSVolume(), fInode->ID(), fInode,
-			&gBFSVnodeOps, fInode->Mode(), 0);
+			vnodeOps != NULL ? vnodeOps : &gBFSVnodeOps, fInode->Mode(),
+			publishFlags);
 	}
 
 	if (status == B_OK) {
@@ -2302,7 +2303,7 @@ Inode::Remove(Transaction &transaction, const char *name, ino_t *_id,
 status_t
 Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	int32 mode, int openMode, uint32 type, bool *_created, ino_t *_id,
-	Inode **_inode)
+	Inode **_inode, fs_vnode_ops *vnodeOps, uint32 publishFlags)
 {
 	FUNCTION_START(("name = %s, mode = %ld\n", name, mode));
 
@@ -2388,7 +2389,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	InodeAllocator allocator(transaction);
 	block_run run;
 	Inode *inode;
-	status = allocator.New(&parentRun, mode, run, &inode);
+	status = allocator.New(&parentRun, mode, run, vnodeOps, &inode);
 	if (status < B_OK)
 		return status;
 
@@ -2481,7 +2482,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 
 	// Everything worked well until this point, we have a fully
 	// initialized inode, and we want to keep it
-	allocator.Keep();
+	allocator.Keep(vnodeOps, publishFlags);
 
 	if (inode->IsFile() || inode->IsAttribute()) {
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(),
