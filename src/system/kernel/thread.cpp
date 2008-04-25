@@ -11,6 +11,7 @@
 
 #include <thread.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -832,6 +833,65 @@ receive_data_etc(thread_id *_sender, void *buffer, size_t bufferSize,
 	release_sem(thread->msg.write_sem);
 
 	return code;
+}
+
+
+static status_t
+common_getrlimit(int resource, struct rlimit * rlp)
+{
+	if (!rlp)
+		return B_BAD_ADDRESS;
+
+	switch (resource) {
+		case RLIMIT_NOFILE:
+		case RLIMIT_NOVMON:
+			return vfs_getrlimit(resource, rlp);
+
+		case RLIMIT_CORE:
+			rlp->rlim_cur = 0;
+			rlp->rlim_max = 0;
+			return B_OK;
+
+		case RLIMIT_STACK:
+		{
+			struct thread *thread = thread_get_current_thread();
+			if (!thread)
+				return B_ERROR;
+			rlp->rlim_cur = thread->user_stack_size;
+			rlp->rlim_max = thread->user_stack_size;
+			return B_OK;
+		}
+
+		default:
+			return EINVAL;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+common_setrlimit(int resource, const struct rlimit * rlp)
+{
+	if (!rlp)
+		return B_BAD_ADDRESS;
+
+	switch (resource) {
+		case RLIMIT_NOFILE:
+		case RLIMIT_NOVMON:
+			return vfs_setrlimit(resource, rlp);
+
+		case RLIMIT_CORE:
+			// We don't support core file, so allow settings to 0/0 only.
+			if (rlp->rlim_cur != 0 || rlp->rlim_max != 0)
+				return EINVAL;
+			return B_OK;
+
+		default:
+			return EINVAL;
+	}
+
+	return B_OK;
 }
 
 
@@ -2483,53 +2543,29 @@ spawn_kernel_thread(thread_func function, const char *name, int32 priority,
 }
 
 
-/* TODO: split this; have kernel version set kerrno */
 int
 getrlimit(int resource, struct rlimit * rlp)
 {
-	if (!rlp)
-		return B_BAD_ADDRESS;
-
-	switch (resource) {
-		case RLIMIT_NOFILE:
-		case RLIMIT_NOVMON:
-			return vfs_getrlimit(resource, rlp);
-
-		case RLIMIT_STACK:
-		{
-			struct thread *thread = thread_get_current_thread();
-			if (!thread)
-				return B_ERROR;
-			rlp->rlim_cur = thread->user_stack_size;
-			rlp->rlim_max = thread->user_stack_size;
-			return 0;
-		}
-
-		default:
-			return EINVAL;
+	status_t error = common_getrlimit(resource, rlp);
+	if (error != B_OK) {
+		errno = error;
+		return -1;
 	}
 
-	return 0;
+	return 0;	
 }
 
 
-/* TODO: split this; have kernel version set kerrno */
 int
 setrlimit(int resource, const struct rlimit * rlp)
 {
-	if (!rlp)
-		return B_BAD_ADDRESS;
-
-	switch (resource) {
-		case RLIMIT_NOFILE:
-		case RLIMIT_NOVMON:
-			return vfs_setrlimit(resource, rlp);
-
-		default:
-			return EINVAL;
+	status_t error = common_setrlimit(resource, rlp);
+	if (error != B_OK) {
+		errno = error;
+		return -1;
 	}
 
-	return 0;
+	return 0;	
 }
 
 
@@ -2760,7 +2796,7 @@ _user_getrlimit(int resource, struct rlimit *urlp)
 	if (!IS_USER_ADDRESS(urlp))
 		return B_BAD_ADDRESS;
 
-	ret = getrlimit(resource, &rl);
+	ret = common_getrlimit(resource, &rl);
 
 	if (ret == 0) {
 		ret = user_memcpy(urlp, &rl, sizeof(struct rlimit));
@@ -2787,6 +2823,6 @@ _user_setrlimit(int resource, const struct rlimit *userResourceLimit)
 			sizeof(struct rlimit)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	return setrlimit(resource, &resourceLimit);
+	return common_setrlimit(resource, &resourceLimit);
 }
 
