@@ -1015,6 +1015,10 @@ bfs_rename(fs_volume *_volume, fs_vnode *_oldDir, const char *oldName,
 		if (vnode.Get(&other) < B_OK)
 			return B_NAME_IN_USE;
 
+		// only allowed, if either both nodes are directories or neither is
+		if (inode->IsDirectory() != other->IsDirectory())
+			return other->IsDirectory() ? B_IS_A_DIRECTORY : B_NOT_A_DIRECTORY;
+
 		status = newDirectory->Remove(transaction, newName, NULL,
 			other->IsDirectory());
 		if (status < B_OK)
