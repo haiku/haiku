@@ -168,11 +168,10 @@ BNode::BNode(const BNode &node)
 }
 
 
-/*!	\brief Unlocks the BNode and frees all resources associated with it.
+/*!	\brief Frees all resources associated with the BNode.
 */
 BNode::~BNode()
 {
-	Unlock();
 	Unset();
 }
 
@@ -840,4 +839,3 @@ BNode::InitAttrDir()
 /*!	\var BNode::fCStatus
 	The object's initialization status.
 */
-
