@@ -157,10 +157,12 @@ HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : haiku_app_server
 } # if $(TARGET_PLATFORM) = libbe_test
 
 SubInclude HAIKU_TOP src tests servers app archived_view ;
+SubInclude HAIKU_TOP src tests servers app async_drawing ;
 SubInclude HAIKU_TOP src tests servers app avoid_focus ;
 SubInclude HAIKU_TOP src tests servers app bitmap_bounds ;
 SubInclude HAIKU_TOP src tests servers app bitmap_drawing ;
 SubInclude HAIKU_TOP src tests servers app code_to_name ;
+SubInclude HAIKU_TOP src tests servers app constrain_clipping_region ;
 SubInclude HAIKU_TOP src tests servers app copy_bits ;
 SubInclude HAIKU_TOP src tests servers app cursor_test ;
 SubInclude HAIKU_TOP src tests servers app desktop_window ;
@@ -176,6 +178,7 @@ SubInclude HAIKU_TOP src tests servers app painter ;
 SubInclude HAIKU_TOP src tests servers app playground ;
 SubInclude HAIKU_TOP src tests servers app regularapps ;
 SubInclude HAIKU_TOP src tests servers app resize_limits ;
+SubInclude HAIKU_TOP src tests servers app scrollbar ;
 SubInclude HAIKU_TOP src tests servers app scrolling ;
 SubInclude HAIKU_TOP src tests servers app stress_test ;
 SubInclude HAIKU_TOP src tests servers app textview ;
