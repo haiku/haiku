@@ -16,7 +16,19 @@ launch() {
 		echo There is no "$1"
 	fi
 	return 0
-}
+}	
+
+launch_param_1() {
+	if [ -f "/boot/$1" ]
+	then
+		"/boot/$1" $2 &
+		[ "$3" != "" ] && waitfor "$3"
+		return 1
+	else
+		echo There is no "$1"
+	fi
+	return 0
+}	
 
 # launchscript <script path>
 
@@ -78,7 +90,7 @@ launch $SERVERS/debug_server				# launch debug_server
 
 # Init Network
 if [ "$SAFEMODE" != "yes" ]; then
-	launch $SERVERS/net_server				# launch net_server
+	launch $SERVERS/net_server			# launch net_server
 fi
 
 if [ "$SAFEMODE" != "yes" ]; then
@@ -117,6 +129,11 @@ fi
 # Launch Print Server 
 if [ "$SAFEMODE" != "yes" ]; then
 	launch $SERVERS/print_server
+fi
+
+# Launch Mail Daemon (if enabled on startup)
+if [ "$SAFEMODE" != "yes" ]; then
+	launch_param_1 $SERVERS/mail_daemon -E
 fi
 
 # Check for daily saving time
