@@ -1625,6 +1625,7 @@ BView::PopState()
 	_CheckOwnerLockAndSwitchCurrent();
 
 	fOwner->fLink->StartMessage(AS_VIEW_POP_STATE);
+	_FlushIfNotInTransaction();
 
 	// invalidate all flags (except those that are not part of pop/push)
 	fState->valid_flags = B_VIEW_VIEW_COLOR_BIT;
