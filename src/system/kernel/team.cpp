@@ -1306,8 +1306,6 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	TRACE(("exec_team(path = \"%s\", argc = %ld, envCount = %ld): team %ld\n",
 		args[0], argCount, envCount, team->id));
 
-	T(ExecTeam(path, argCount, args, envCount, env));
-
 	// switching the kernel at run time is probably not a good idea :)
 	if (team == team_get_kernel_team())
 		return B_NOT_ALLOWED;
@@ -1347,6 +1345,9 @@ exec_team(const char *path, int32 argCount, char * const *args,
 		-1, 0, false);
 	if (status != B_OK)
 		return status;
+
+	T(ExecTeam(path, teamArgs->arg_count, teamArgs->args, envCount, env));
+		// trace here, so we don't have to deal with the user addresses
 
 	// replace args[0] with the path argument, just to be on the safe side
 	free(teamArgs->args[0]);
