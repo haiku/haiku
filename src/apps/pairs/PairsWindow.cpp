@@ -98,8 +98,6 @@ PairsWindow::MessageReceived(BMessage* message)
 				} else {
 					fPairsView->fDeckCard[fButton]->Show();
 					fPairsView->fDeckCard[fButtonTmp]->Show();
-// TODO: remove when app_server is fixed: (Could this be the Firefox problem?)
-fPairsView->Invalidate();
 				}
 
 				//game end and results
