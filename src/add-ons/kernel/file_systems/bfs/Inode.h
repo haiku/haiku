@@ -50,9 +50,10 @@ class Inode {
 		status_t WriteBack(Transaction &transaction);
 
 		bool IsContainer() const
-			{ return (Mode() & (S_INDEX_DIR | S_ATTR_DIR)) || S_ISDIR(Mode()); }
-		bool IsDirectory() const
 			{ return S_ISDIR(Mode()); }
+		bool IsDirectory() const
+			{ return (Mode() & (S_INDEX_DIR | S_ATTR_DIR | S_IFDIR))
+					== S_IFDIR; }
 		bool IsIndex() const
 			{ return (Mode() & (S_INDEX_DIR | 0777)) == S_INDEX_DIR; }
 				// that's a stupid check, but AFAIK the only possible method...
