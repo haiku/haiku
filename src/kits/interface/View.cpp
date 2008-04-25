@@ -881,6 +881,7 @@ BView::SetFlags(uint32 flags)
 
 			fOwner->fLink->StartMessage(AS_VIEW_SET_FLAGS);
 			fOwner->fLink->Attach<uint32>(flags);
+			fOwner->fLink->Flush();
 		}
 	}
 
@@ -912,6 +913,7 @@ BView::Hide()
 	if (fOwner && fShowLevel == 0) {
 		_CheckLockAndSwitchCurrent();
 		fOwner->fLink->StartMessage(AS_VIEW_HIDE);
+		fOwner->fLink->Flush();
 	}
 	fShowLevel++;
 
@@ -927,6 +929,7 @@ BView::Show()
 	if (fOwner && fShowLevel == 0) {
 		_CheckLockAndSwitchCurrent();
 		fOwner->fLink->StartMessage(AS_VIEW_SHOW);
+		fOwner->fLink->Flush();
 	}
 
 	if (fShowLevel == 0 && fParent)
@@ -1165,12 +1168,7 @@ BView::Draw(BRect updateRect)
 void
 BView::DrawAfterChildren(BRect r)
 {
-	// HOOK function
-
-	// NOTE: DrawAfterChildren is called if the corresponding
-	// flag is set, but it will currently not work as expected,
-	// since the app_server does not allow views to draw *on*
-	// their children
+	// Hook function
 	STRACE(("\tHOOK: BView(%s)::DrawAfterChildren()\n", Name()));
 }
 
@@ -1293,6 +1291,7 @@ BView::BeginRectTracking(BRect startRect, uint32 style)
 		fOwner->fLink->StartMessage(AS_VIEW_BEGIN_RECT_TRACK);
 		fOwner->fLink->Attach<BRect>(startRect);
 		fOwner->fLink->Attach<uint32>(style);
+		fOwner->fLink->Flush();
 	}
 }
 
@@ -1300,8 +1299,10 @@ BView::BeginRectTracking(BRect startRect, uint32 style)
 void
 BView::EndRectTracking()
 {
-	if (_CheckOwnerLockAndSwitchCurrent())
+	if (_CheckOwnerLockAndSwitchCurrent()) {
 		fOwner->fLink->StartMessage(AS_VIEW_END_RECT_TRACK);
+		fOwner->fLink->Flush();
+	}
 }
 
 
@@ -2101,6 +2102,7 @@ BView::SetViewColor(rgb_color color)
 
 		fOwner->fLink->StartMessage(AS_VIEW_SET_VIEW_COLOR);
 		fOwner->fLink->Attach<rgb_color>(color);
+		fOwner->fLink->Flush();
 
 		fState->valid_flags |= B_VIEW_VIEW_COLOR_BIT;
 	}
@@ -2277,7 +2279,7 @@ BView::GetClippingRegion(BRegion* region) const
 		return;
 
 	// NOTE: the client has no idea when the clipping in the server
-	// changed, so it is always read from the serber
+	// changed, so it is always read from the server
 	region->MakeEmpty();
 
 	if (fOwner) {
