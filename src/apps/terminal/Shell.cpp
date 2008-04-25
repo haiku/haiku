@@ -274,7 +274,7 @@ receive_handshake_message(handshake_t& handshake)
 status_t
 Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **argv)
 {
-	const char *kDefaultShellCommand[] = { "/bin/sh", "--login" };
+	const char *kDefaultShellCommand[] = { "/bin/sh", "--login", NULL };
 	
 	if (argv == NULL || argc == 0) {
 		argv = kDefaultShellCommand;
