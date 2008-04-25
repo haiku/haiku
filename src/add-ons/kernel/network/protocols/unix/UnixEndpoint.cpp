@@ -613,6 +613,9 @@ UnixEndpoint::Receivable()
 
 	UnixEndpointLocker locker(this);
 
+	if (fState == UNIX_ENDPOINT_LISTENING)
+		return gSocketModule->count_connected(socket);
+
 	if (fState != UNIX_ENDPOINT_CONNECTED)
 		RETURN_ERROR(ENOTCONN);
 
