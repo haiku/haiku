@@ -4,28 +4,20 @@
 ## Some functions used by the main script
 ##
 
-# launch <executable path> [thread to wait for]
+# launch <executable path> [ <thread to wait for> [ <program args> ] ]
 
 launch() {
-	if [ -f "/boot/$1" ]
+	toLaunch="$1"
+	shift
+	toWaitFor="$1"
+	shift
+	if [ -f "/boot/$toLaunch" ]
 	then
-		"/boot/$1" &
-		[ "$2" != "" ] && waitfor "$2"
+		"/boot/$toLaunch" $* &
+		[ "$toWaitFor" != "" ] && waitfor "$toWaitFor"
 		return 1
 	else
-		echo There is no "$1"
-	fi
-	return 0
-}	
-
-launch_param_1() {
-	if [ -f "/boot/$1" ]
-	then
-		"/boot/$1" $2 &
-		[ "$3" != "" ] && waitfor "$3"
-		return 1
-	else
-		echo There is no "$1"
+		echo There is no "$toLaunch"
 	fi
 	return 0
 }	
@@ -133,7 +125,7 @@ fi
 
 # Launch Mail Daemon (if enabled on startup)
 if [ "$SAFEMODE" != "yes" ]; then
-	launch_param_1 $SERVERS/mail_daemon -E
+	launch $SERVERS/mail_daemon "" -E
 fi
 
 # Check for daily saving time
@@ -155,5 +147,3 @@ if [ -e $FRESH_INSTALL_INDICATOR_FILE ]; then
 #	mimeset -all -f /boot/apps
 	rm $FRESH_INSTALL_INDICATOR_FILE
 fi
-
-
