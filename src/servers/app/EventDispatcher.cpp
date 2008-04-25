@@ -239,6 +239,7 @@ EventDispatcher::EventDispatcher()
 	fNextLatestMouseMoved(NULL),
 	fLastButtons(0),
 	fLastUpdate(system_time()),
+	fDragBitmap(NULL),
 	fCursorLock("cursor loop lock"),
 	fHWInterface(NULL),
 	fDesktop(NULL)
@@ -568,10 +569,9 @@ EventDispatcher::SetDragMessage(BMessage& message,
 	if (fDragBitmap != bitmap) {
 		if (fDragBitmap)
 			gBitmapManager->DeleteBitmap(fDragBitmap);
-
 		fDragBitmap = bitmap;
-	
-		if (fDragBitmap)
+
+		if (fDragBitmap != NULL)
 			fDragBitmap->Acquire();
 	}
 
@@ -705,8 +705,7 @@ EventDispatcher::_DeliverDragMessage()
 	fDraggingMessage = false;
 
 	fHWInterface->SetDragBitmap(NULL, B_ORIGIN);
-	if (fDragBitmap)
-		gBitmapManager->DeleteBitmap(fDragBitmap);
+	gBitmapManager->DeleteBitmap(fDragBitmap);
 	fDragBitmap = NULL;
 }
 
