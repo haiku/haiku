@@ -3816,7 +3816,7 @@ vfs_create_special_node(const char *path, fs_vnode *subVnode, mode_t mode,
 	// create the node
 	fs_vnode superVnode;
 	ino_t nodeID;
-	status_t status = FS_CALL(sRoot, create_special_node, leaf, subVnode,
+	status_t status = FS_CALL(dirNode, create_special_node, leaf, subVnode,
 		mode, flags, _superVnode != NULL ? _superVnode : &superVnode, &nodeID);
 	if (status != B_OK)
 		return status;
