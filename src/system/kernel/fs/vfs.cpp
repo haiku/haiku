@@ -2523,13 +2523,10 @@ get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
 	struct file_descriptor *descriptor;
 	int fd;
 
-	// if the vnode is locked, we don't allow creating a new file descriptor for it
-        // unless it is an attribute that is being created as, in this case,
-        // the caller is guaranteed to be the lock holder.
-        // TODO(bga): Is this really true? If I understand this correctly, only
-        // the lock owner would be able to reach the code here, but I am not
-        // 100% sure.
-	if (vnode && vnode->mandatory_locked_by != NULL && type != FDTYPE_ATTR)
+	// If the vnode is locked, we don't allow creating a new file/directory
+	// file_descriptor for it
+	if (vnode && vnode->mandatory_locked_by != NULL
+		&& (type == FDTYPE_FILE || type == FDTYPE_DIR))
 		return B_BUSY;
 
 	descriptor = alloc_fd();
