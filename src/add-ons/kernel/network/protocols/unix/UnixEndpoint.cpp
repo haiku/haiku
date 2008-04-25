@@ -685,6 +685,16 @@ UnixEndpoint::Shutdown(int direction)
 	fPeerEndpoint->fReceiveFifo->Shutdown(peerShutdown);
 	fPeerEndpoint->fReceiveFifo->Unlock();
 
+	// send select notifications
+	if (direction == SHUT_RD || direction == SHUT_RDWR) {
+		gSocketModule->notify(socket, B_SELECT_READ, B_OK);
+		gSocketModule->notify(fPeerEndpoint->socket, B_SELECT_WRITE, B_OK);
+	}
+	if (direction == SHUT_WR || direction == SHUT_RDWR) {
+		gSocketModule->notify(socket, B_SELECT_WRITE, B_OK);
+		gSocketModule->notify(fPeerEndpoint->socket, B_SELECT_READ, B_OK);
+	}
+
 	RETURN_ERROR(B_OK);
 }
 
@@ -717,8 +727,8 @@ UnixEndpoint::_Disconnect()
 	fReceiveFifo->Unlock();
 
 	// select() notification.
+	gSocketModule->notify(socket, B_SELECT_READ, ECONNRESET);
 	gSocketModule->notify(socket, B_SELECT_WRITE, ECONNRESET);
-	gSocketModule->notify(socket, B_SELECT_ERROR, ECONNRESET);
 
 	// Unset the peer endpoint.
 	fPeerEndpoint->RemoveReference();
