@@ -168,10 +168,11 @@ BNode::BNode(const BNode &node)
 }
 
 
-/*!	\brief Frees all resources associated with this BNode.
+/*!	\brief Unlocks the BNode and frees all resources associated with it.
 */
 BNode::~BNode()
 {
+	Unlock();
 	Unset();
 }
 
