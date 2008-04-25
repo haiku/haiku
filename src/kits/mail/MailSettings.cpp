@@ -55,14 +55,11 @@ NewMailChain()
 	BDirectory chain_dir(path.Path());
 	BDirectory outbound_dir(&chain_dir,"outbound"), inbound_dir(&chain_dir,"inbound");
 
-	// TODO(bga): We should lock the directory before reading its contents
-	// and updating the last_issued_chain_id to avoid race conditions in
-	// case 2 Chains are being created at the same time. Unfortunately,
-	// calling BNode::Lock() in the directory is preventing the attribute to
-	// written (and it should not). Add the locking back when this is fixed.
-
 	// TODO(bga): A better way to do all this anyway is to write the chain
 	// information to the settings message (a new field would be added).
+
+	// Lock Chain directory to avoid concurrent access.
+        chain_dir.Lock();
 
 	int32 id = -1; //-----When inc'ed, we start with 0----
 	chain_dir.ReadAttr("last_issued_chain_id",B_INT32_TYPE,0,&id,sizeof(id));
