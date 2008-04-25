@@ -40,6 +40,7 @@
 #define	_LIBUTIL_H_
 
 #include <stdint.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
 
 #define PROPERTY_MAX_NAME	64
