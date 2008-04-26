@@ -346,7 +346,7 @@ void fw_rcv (struct fw_rcv_buf *);
 void fw_xfer_unload ( struct fw_xfer*);
 void fw_xfer_free_buf ( struct fw_xfer*);
 void fw_xfer_free ( struct fw_xfer*);
-struct fw_xfer *fw_xfer_alloc ();
+struct fw_xfer *fw_xfer_alloc (void);
 struct fw_xfer *fw_xfer_alloc_buf (int, int);
 void fw_init (struct firewire_comm *);
 int fw_tbuf_update (struct firewire_comm *, int, int);
