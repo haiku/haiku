@@ -77,7 +77,7 @@ BMediaFiles::RewindTypes()
 BMediaFiles::GetNextType(BString *out_type)
 {
 	CALLED();
-	if(m_type_index < 0 || m_type_index >= m_types.CountItems()) {
+	if (m_type_index < 0 || m_type_index >= m_types.CountItems()) {
 		m_type_index = -1;
 		return B_BAD_INDEX;
 	}
@@ -111,7 +111,7 @@ BMediaFiles::RewindRefs(const char *type)
 		return rv;
 	}
 
-	if(reply.count>0) {
+	if (reply.count>0) {
 		char *items;
 		area_id clone;
 	
@@ -142,7 +142,7 @@ BMediaFiles::GetNextRef(BString *out_type,
 						entry_ref *out_ref)
 {
 	CALLED();
-	if(m_item_index < 0 || m_item_index >= m_items.CountItems()) {
+	if (m_item_index < 0 || m_item_index >= m_items.CountItems()) {
 		m_item_index = -1;
 		return B_BAD_INDEX;
 	}

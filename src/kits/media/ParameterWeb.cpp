@@ -600,20 +600,15 @@ BParameterWeb::Unflatten(type_code code, const void *buffer, ssize_t size)
 	}
 
 #if 0	
-	if(mGroups != NULL)
-	{
-		for (int32 i = 0; i < mGroups->CountItems(); i++)
-		{
+	if (mGroups != NULL) {
+		for (int32 i = 0; i < mGroups->CountItems(); i++) {
 			BParameterGroup *CurrentItem = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
-			if(CurrentItem != NULL)
-			{
+			if (CurrentItem != NULL) {
 				delete CurrentItem;
 			}
 		}
 		mGroups->MakeEmpty();
-	}
-	else
-	{
+	} else {
 		mGroups = new BList();
 	}
 #endif
@@ -930,13 +925,11 @@ BParameterGroup::FlattenedSize() const
 	//13 guaranteed bytes, variable after that.
 	ssize_t size = 13;
 
-	if(mFlags != 0)
-	{
+	if (mFlags != 0) {
 		size += 4;
 	}
 	
-	if(mName != NULL)
-	{
+	if (mName != NULL) {
 		size += min_c(strlen(mName),255);
 	}
 	
@@ -944,22 +937,18 @@ BParameterGroup::FlattenedSize() const
 	int limit;
 	
 	limit = mControls->CountItems();
-	for(i = 0; i < limit; i++)
-	{
+	for (i = 0; i < limit; i++) {
 		BParameter *CurrentParameter = static_cast<BParameter *>(mControls->ItemAt(i));
-		if(CurrentParameter != NULL)
-		{
+		if (CurrentParameter != NULL) {
 			//overhead for each parameter flattened
 			size += 16 + CurrentParameter->FlattenedSize();
 		}
 	}
 
 	limit = mGroups->CountItems();
-	for(i = 0; i < limit; i++)
-	{
+	for (i = 0; i < limit; i++) {
 		BParameterGroup *CurrentGroup = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
-		if(CurrentGroup != NULL)
-		{
+		if (CurrentGroup != NULL) {
 			//overhead for each group flattened
 			size += 16 + CurrentGroup->FlattenedSize();
 		}
@@ -1107,37 +1096,27 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 #if 0
 	//Clear all existing parameters/subgroups
 	int i;
-	if(mControls != NULL)
-	{
-		for(i = 0; i < mControls->CountItems(); i++)
-		{
+	if (mControls != NULL) {
+		for(i = 0; i < mControls->CountItems(); i++) {
 			BParameter *CurrentItem = static_cast<BParameter *>(mControls->ItemAt(i));
-			if(CurrentItem != NULL)
-			{
+			if (CurrentItem != NULL) {
 				delete CurrentItem;
 			}
 		}
 		mControls->MakeEmpty();
-	}
-	else
-	{
+	} else {
 		mControls = new BList();
 	}
 	
-	if(mGroups != NULL)
-	{
-		for(i = 0; i < mGroups->CountItems(); i++)
-		{
+	if (mGroups != NULL) {
+		for (i = 0; i < mGroups->CountItems(); i++) {
 			BParameterGroup *CurrentItem = static_cast<BParameterGroup *>(mGroups->ItemAt(i));
-			if(CurrentItem != NULL)
-			{
+			if (CurrentItem != NULL) {
 				delete CurrentItem;
 			}
 		}
 		mGroups->MakeEmpty();
-	}
-	else
-	{
+	} else {
 		mGroups = new BList();
 	}
 #endif

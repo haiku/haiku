@@ -172,7 +172,7 @@ BMediaEventLooper::SetRunMode(run_mode mode)
 	priority = (mode == B_OFFLINE) ? min_c(B_NORMAL_PRIORITY, fSetPriority) : fSetPriority;
 	if (priority != fCurrentPriority) {
 		fCurrentPriority = priority;
-		if(fControlThread > 0) {
+		if (fControlThread > 0) {
 			set_thread_priority(fControlThread, fCurrentPriority);
 			fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
 			printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);
@@ -355,7 +355,7 @@ BMediaEventLooper::SetPriority(int32 priority)
 	fSetPriority = priority;
 	fCurrentPriority = (RunMode() == B_OFFLINE) ? min_c(B_NORMAL_PRIORITY, fSetPriority) : fSetPriority;
 
-	if(fControlThread > 0) {
+	if (fControlThread > 0) {
 		set_thread_priority(fControlThread, fCurrentPriority);
 		fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
 		printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);

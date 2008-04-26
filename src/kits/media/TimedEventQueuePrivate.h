@@ -10,6 +10,7 @@
 
 #include <MediaDefs.h>
 #include <Locker.h>
+#include "debug.h"
 
 struct _event_queue_imp
 {

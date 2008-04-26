@@ -2858,7 +2858,7 @@ BMediaRoster::GetInstancesFor(media_addon_id addon,
 		return rv;
 	}
 
-	if(io_count)
+	if (io_count)
 		*io_count = reply.count;
 	if (reply.count > 0)
 		memcpy(out_id, reply.node_id, sizeof(media_node_id) * reply.count);
