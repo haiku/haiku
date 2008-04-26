@@ -1,3 +1,9 @@
+/*
+ * Copyright 2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include <Alert.h>
 #include <Screen.h>
 #include <String.h>

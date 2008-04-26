@@ -1,6 +1,13 @@
+/*
+ * Copyright 2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #include <ScrollView.h>
 #include <String.h>
 #include <Window.h>
+#ifdef __HAIKU__
+#include <Layout.h>
+#endif
 
 #include <pwd.h>
 

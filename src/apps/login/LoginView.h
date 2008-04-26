@@ -1,3 +1,10 @@
+/*
+ * Copyright 2008, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _LOGINVIEW_H_
+#define _LOGINVIEW_H_
+
 #include <Button.h>
 #include <CheckBox.h>
 #include <View.h>
@@ -36,3 +43,5 @@ private:
 	BStringView*	fInfoView;
 };
 
+
+#endif	// _LOGINVIEW_H_
