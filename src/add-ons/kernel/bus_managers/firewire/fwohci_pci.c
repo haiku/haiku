@@ -178,8 +178,8 @@ fwohci_pci_attach(int index)
 		gPci->write_pci_config(info->bus, info->device, info->function, 
 				PCI_line_size, 1, cache_line);
 	}
-	TRACE("latency timer %x -> %x.\n", olatency, latency);
-	TRACE("cache size %x -> %x.\n",	ocache_line, cache_line);
+	TRACE("latency timer %lx -> %lx.\n", olatency, latency);
+	TRACE("cache size %lx -> %lx.\n", ocache_line, cache_line);
 
 	// get IRQ
 	sc->irq = gPci->read_pci_config(info->bus, info->device, info->function, 
@@ -194,8 +194,8 @@ fwohci_pci_attach(int index)
 //	val = gPci->read_pci_config(info->bus, info->device, info->function, 0x14, 4);
 //	val &= PCI_address_memory_32_mask;
 //	TRACE("hardware register address %p\n", (void *) val);
-	TRACE("hardware register address %x\n", info->u.h0.base_registers[0]);
-	sc->regArea = map_mem(&sc->regAddr, info->u.h0.base_registers[0], 0x800, 
+	TRACE("hardware register address %lx\n", info->u.h0.base_registers[0]);
+	sc->regArea = map_mem(&sc->regAddr, (void *)info->u.h0.base_registers[0], 0x800, 
 			B_READ_AREA | B_WRITE_AREA, "fw ohci register");
 	if (sc->regArea < B_OK) {
 		ERROR("can't map hardware registers\n");

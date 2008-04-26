@@ -340,7 +340,7 @@ struct fw_rcv_buf {
 	u_int nvec;
 	uint8_t spd;
 };
-//#ifndef __HAIKU__
+
 void fw_sidrcv (struct firewire_comm *, uint32_t *, u_int);
 void fw_rcv (struct fw_rcv_buf *);
 void fw_xfer_unload ( struct fw_xfer*);
@@ -372,7 +372,7 @@ void fw_drain_txq (struct firewire_comm *);
 //int fwdev_destroydev (struct firewire_softc *);
 //void fwdev_clone (void *, struct ucred *, char *, int, struct cdev **);
 int fw_open_isodma(struct firewire_comm *, int);
-//#endif
+
 extern int firewire_debug;
 #ifndef __HAIKU__
 extern devclass_t firewire_devclass;
@@ -414,5 +414,11 @@ extern int firewire_phydma_enable;
 MALLOC_DECLARE(M_FW);
 MALLOC_DECLARE(M_FWXFER);
 #endif /*__HAIKU__*/
+#ifdef __HAIKU__
+int firewire_attach(struct firewire_comm *fc, struct firewire_softc *sc);
+void firewire_detach(struct firewire_softc *sc);
 
+status_t fwohci_pci_attach(int index);
+status_t fwohci_pci_detach(int index);
+#endif
 #endif

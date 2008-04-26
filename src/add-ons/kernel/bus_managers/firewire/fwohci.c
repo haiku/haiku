@@ -333,7 +333,7 @@ again:
 	return((fun >> PHYDEV_RDDATA )& 0xff);
 }
 /* Device specific ioctl. */
-int
+static int
 fwohci_ioctl (void *cookie, u_long cmd, void *data, size_t len)
 {
 //	struct firewire_softc *sc;
@@ -1040,7 +1040,7 @@ kick:
 		OWRITE(sc, OHCI_DMACTL(off), OHCI_CNTL_DMA_WAKE);
 	} else {
 		if (firewire_debug)
-			device_printf(sc->fc.dev, "start AT DMA status=%x\n",
+			device_printf(sc->fc.dev, "start AT DMA status=%lx\n",
 					OREAD(sc, OHCI_DMACTL(off)));
 		OWRITE(sc, OHCI_DMACMD(off), dbch->top->bus_addr | fsegment);
 		OWRITE(sc, OHCI_DMACTL(off), OHCI_CNTL_DMA_RUN);
@@ -1665,7 +1665,7 @@ fwohci_irx_enable(struct firewire_comm *fc, int dmach)
 	unsigned short tag, ich;
 	uint32_t stat;
 	struct fwohci_dbch *dbch;
-	struct fwohcidb_tr *db_tr;
+//	struct fwohcidb_tr *db_tr;
 	struct fw_bulkxfer *first, *prev, *chunk;
 	struct fw_xferq *ir;
 
@@ -2896,7 +2896,7 @@ fwohci_arcv(struct fwohci_softc *sc, struct fwohci_dbch *dbch, int count)
 			default:
 				device_printf(sc->fc.dev,
 				    "Async DMA Receive error err=%02x %s"
-				    " plen=%d offset=%d len=%d status=0x%08x"
+				    " plen=%d offset=%d len=%d status=0x%08lx"
 				    " tcode=0x%x, stat=0x%08x\n",
 				    event, fwohcicode[event], plen,
 				    dbch->buf_offset, len,
@@ -2945,7 +2945,7 @@ out:
 	return;
 
 err:
-	device_printf(sc->fc.dev, "AR DMA status=%x, ",
+	device_printf(sc->fc.dev, "AR DMA status=%lx, ",
 					OREAD(sc, OHCI_DMACTL(off)));
 	dbch->pdb_tr = NULL;
 	/* skip until resCount != 0 */

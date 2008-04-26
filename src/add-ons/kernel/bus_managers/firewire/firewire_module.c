@@ -89,6 +89,7 @@ find_device_name(pci_info *info)
 }
 
 
+#if 0
 static status_t
 fw_add_child(const char *childname, 
 		const struct firewire_notify_hooks *hooks)
@@ -120,6 +121,7 @@ fw_remove_child(const char *childname)
 	
 	return B_OK;
 }
+#endif
 
 
 static int 

@@ -354,6 +354,7 @@ firewire_watchdog(void *arg)
 			hz/WATCHDOG_HZ, B_ONE_SHOT_RELATIVE_TIMER);
 }
 
+#if 0//to do
 status_t
 firewire_add_child(struct firewire_softc *sc, const char *childname, 
 		struct firewire_notify_hooks *hooks)
@@ -420,6 +421,7 @@ firewire_remove_child(struct firewire_softc *sc, const char *childname)
 
 	return B_NAME_NOT_FOUND;
 }
+#endif
 
 /*
  * The attach routine.
@@ -1962,7 +1964,7 @@ fw_rcv(struct fw_rcv_buf *rb)
 			fp->mode.rreqq.dest_lo);
 		if(bind == NULL){
 			printf("Unknown service addr 0x%04x:0x%08x %s(%x)"
-			    " src=0x%x data=%x\n",
+			    " src=0x%x data=%lx\n",
 			    fp->mode.wreqq.dest_hi, fp->mode.wreqq.dest_lo,
 			    tcode_str[tcode], tcode,
 			    fp->mode.hdr.src, ntohl(fp->mode.wreqq.data));
