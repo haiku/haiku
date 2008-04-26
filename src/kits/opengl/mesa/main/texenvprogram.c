@@ -199,8 +199,8 @@ static void make_state_key( GLcontext *ctx,  struct state_key *key )
 
    for (i=0;i<MAX_TEXTURE_UNITS;i++) {
       const struct gl_texture_unit *texUnit = &ctx->Texture.Unit[i];
-		
-      if (!texUnit->_ReallyEnabled)
+
+      if (!texUnit->_ReallyEnabled || !texUnit->Enabled)
          continue;
 
       key->unit[i].enabled = 1;

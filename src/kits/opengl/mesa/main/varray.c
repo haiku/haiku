@@ -443,7 +443,7 @@ void GLAPIENTRY
 _mesa_VertexAttribPointerNV(GLuint index, GLint size, GLenum type,
                             GLsizei stride, const GLvoid *ptr)
 {
-   const GLboolean normalized = GL_FALSE;
+   GLboolean normalized = GL_FALSE;
    GLsizei elementSize;
    GET_CURRENT_CONTEXT(ctx);
    ASSERT_OUTSIDE_BEGIN_END(ctx);
@@ -471,6 +471,7 @@ _mesa_VertexAttribPointerNV(GLuint index, GLint size, GLenum type,
    /* check for valid 'type' and compute StrideB right away */
    switch (type) {
       case GL_UNSIGNED_BYTE:
+         normalized = GL_TRUE;
          elementSize = size * sizeof(GLubyte);
          break;
       case GL_SHORT:

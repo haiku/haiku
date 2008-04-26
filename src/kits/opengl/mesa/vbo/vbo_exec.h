@@ -162,4 +162,7 @@ void vbo_exec_do_EvalCoord2f( struct vbo_exec_context *exec,
 void vbo_exec_do_EvalCoord1f( struct vbo_exec_context *exec,
 				     GLfloat u);
 
+extern GLboolean 
+vbo_validate_shaders(GLcontext *ctx);
+
 #endif

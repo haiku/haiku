@@ -302,7 +302,7 @@ test_attachment_completeness(const GLcontext *ctx, GLenum format,
             /* OK */
          }
          else if (ctx->Extensions.EXT_packed_depth_stencil &&
-                  att->Renderbuffer->_BaseFormat == GL_DEPTH_STENCIL_EXT) {
+                  texImage->TexFormat->BaseFormat == GL_DEPTH_STENCIL_EXT) {
             /* OK */
          }
          else {

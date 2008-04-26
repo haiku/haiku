@@ -140,6 +140,13 @@ _swrast_Accum(GLcontext *ctx, GLenum op, GLfloat value);
 extern void
 _swrast_ResetLineStipple( GLcontext *ctx );
 
+/**
+ * Indicates front/back facing for subsequent points/lines when drawing
+ * unfilled polygons.  Needed for two-side stencil.
+ */
+extern void
+_swrast_SetFacing(GLcontext *ctx, GLuint facing);
+
 /* These will always render the correct point/line/triangle for the
  * current state.
  *

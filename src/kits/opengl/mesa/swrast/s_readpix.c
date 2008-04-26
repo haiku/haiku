@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.0.3
  *
  * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
@@ -129,7 +129,8 @@ read_depth_pixels( GLcontext *ctx,
          rb->GetRow(ctx, rb, width, x, y, dest);
          /* convert range from 24-bit to 32-bit */
          for (k = 0; k < width; k++) {
-            dest[k] = (dest[k] << 8) | (dest[k] >> 24);
+            /* Note: put MSByte of 24-bit value into LSByte */
+            dest[k] = (dest[k] << 8) | ((dest[k] >> 16) & 0xff);
          }
       }
    }
@@ -569,7 +570,8 @@ _swrast_ReadPixels( GLcontext *ctx,
    /* Do all needed clipping here, so that we can forget about it later */
    if (!_mesa_clip_readpixels(ctx, &x, &y, &width, &height, &clippedPacking)) {
       /* The ReadPixels region is totally outside the window bounds */
-      goto end;
+      RENDER_FINISH(swrast, ctx);
+      return;
    }
 
    if (clippedPacking.BufferObj->Name) {
@@ -579,7 +581,8 @@ _swrast_ReadPixels( GLcontext *ctx,
                                      format, type, pixels)) {
          _mesa_error(ctx, GL_INVALID_OPERATION,
                      "glReadPixels(invalid PBO access)");
-         goto end;
+	 RENDER_FINISH(swrast, ctx);
+	 return;
       }
       buf = (GLubyte *) ctx->Driver.MapBuffer(ctx, GL_PIXEL_PACK_BUFFER_EXT,
                                               GL_WRITE_ONLY_ARB,
@@ -587,7 +590,8 @@ _swrast_ReadPixels( GLcontext *ctx,
       if (!buf) {
          /* buffer is already mapped - that's an error */
          _mesa_error(ctx, GL_INVALID_OPERATION, "glReadPixels(PBO is mapped)");
-         goto end;
+	 RENDER_FINISH(swrast, ctx);
+	 return;
       }
       pixels = ADD_POINTERS(buf, pixels);
    }
@@ -628,8 +632,6 @@ _swrast_ReadPixels( GLcontext *ctx,
          /* don't return yet, clean-up */
    }
 
-
-end:
    RENDER_FINISH(swrast, ctx);
 
    if (clippedPacking.BufferObj->Name) {

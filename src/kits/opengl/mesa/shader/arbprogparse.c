@@ -1609,8 +1609,6 @@ parse_attrib_binding(GLcontext * ctx, const GLubyte ** inst,
       program_error(ctx, Program->Position, "Bad attribute binding");
    }
 
-   Program->Base.InputsRead |= (1 << *inputReg);
-
    return err;
 }
 
@@ -1759,7 +1757,7 @@ parse_param_elements (GLcontext * ctx, const GLubyte ** inst,
 {
    GLint idx;
    GLuint err = 0;
-   gl_state_index state_tokens[STATE_LENGTH];
+   gl_state_index state_tokens[STATE_LENGTH] = {0, 0, 0, 0, 0};
    GLfloat const_values[4];
 
    switch (*(*inst)++) {
@@ -2564,6 +2562,11 @@ parse_src_reg (GLcontext * ctx, const GLubyte ** inst,
                        "Unknown token in parse_src_reg");
          return 1;
    }
+
+   /* Add attributes to InputsRead only if they are used the program.
+    * This avoids the handling of unused ATTRIB declarations in the drivers. */
+   if (*File == PROGRAM_INPUT)
+      Program->Base.InputsRead |= (1 << *Index);
 
    return 0;
 }
@@ -3916,7 +3919,7 @@ _mesa_parse_arb_vertex_program(GLcontext *ctx, GLenum target,
    ASSERT(target == GL_VERTEX_PROGRAM_ARB);
 
    if (!_mesa_parse_arb_program(ctx, target, (const GLubyte*) str, len, &ap)) {
-      /* Error in the program. Just return. */
+      _mesa_error(ctx, GL_INVALID_OPERATION, "glProgramString(bad program)");
       return;
    }
 

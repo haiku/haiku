@@ -272,10 +272,10 @@ do {									\
    (((CTX)->Light.Enabled &&						\
      (CTX)->Light.Model.ColorControl == GL_SEPARATE_SPECULAR_COLOR)	\
     || (CTX)->Fog.ColorSumEnabled					\
-    || ((CTX)->VertexProgram._Enabled &&				\
-        ((CTX)->VertexProgram.Current->Base.InputsRead & VERT_BIT_COLOR1)) \
-    || ((CTX)->FragmentProgram._Enabled &&				\
-        ((CTX)->FragmentProgram.Current->Base.InputsRead & FRAG_BIT_COL1)) \
+    || ((CTX)->VertexProgram._Current &&				\
+        ((CTX)->VertexProgram._Current->Base.InputsRead & VERT_BIT_COLOR1)) \
+    || ((CTX)->FragmentProgram._Current &&				\
+        ((CTX)->FragmentProgram._Current->Base.InputsRead & FRAG_BIT_COL1)) \
    )
 
 

@@ -229,7 +229,7 @@ _mesa_ProgramStringARB(GLenum target, GLenum format, GLsizei len,
       struct gl_vertex_program *prog = ctx->VertexProgram.Current;
       _mesa_parse_arb_vertex_program(ctx, target, string, len, prog);
       
-      if (ctx->Driver.ProgramStringNotify)
+      if (ctx->Program.ErrorPos == -1 && ctx->Driver.ProgramStringNotify)
 	 ctx->Driver.ProgramStringNotify( ctx, target, &prog->Base );
    }
    else if (target == GL_FRAGMENT_PROGRAM_ARB
@@ -237,7 +237,7 @@ _mesa_ProgramStringARB(GLenum target, GLenum format, GLsizei len,
       struct gl_fragment_program *prog = ctx->FragmentProgram.Current;
       _mesa_parse_arb_fragment_program(ctx, target, string, len, prog);
 
-      if (ctx->Driver.ProgramStringNotify)
+      if (ctx->Program.ErrorPos == -1 && ctx->Driver.ProgramStringNotify)
 	 ctx->Driver.ProgramStringNotify( ctx, target, &prog->Base );
    }
    else {

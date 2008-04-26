@@ -141,6 +141,7 @@ NAME(line)(GLcontext *ctx, const SWvertex *v0, const SWvertex *v1)
       return;
 
    INIT_SPAN(line.span, GL_LINE, 0, 0, SPAN_XY | SPAN_COVERAGE);
+   line.span.facing = swrast->PointLineFacing;
 
    line.xAdj = line.dx / line.len * line.halfWidth;
    line.yAdj = line.dy / line.len * line.halfWidth;

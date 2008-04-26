@@ -809,6 +809,7 @@ _mesa_swizzle_ubyte_image(GLcontext *ctx,
 /*    _mesa_printf("map %d %d %d %d\n", map[0], map[1], map[2], map[3]);  */
 
    if (srcRowStride == dstRowStride &&
+       srcComponents == dstComponents &&
        srcRowStride == srcWidth * srcComponents &&
        dimensions < 3) {
       /* 1 and 2D images only */

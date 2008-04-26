@@ -155,10 +155,6 @@ static void TAG(triangle)( GLcontext *ctx, GLuint e0, GLuint e1, GLuint e2 )
       {
 	 facing = AREA_IS_CCW( cc ) ^ ctx->Polygon._FrontBit;
 
-         if (DO_TWOSTENCIL && ctx->Stencil.TestTwoSide) {
-            ctx->_Facing = facing; /* mixed mode rendering: for 2-sided stencil test */
-         }
-
 	 if (DO_UNFILLED) {
 	    if (facing) {
 	       mode = ctx->Polygon.BackMode;
@@ -420,10 +416,6 @@ static void TAG(quad)( GLcontext *ctx,
       if (DO_TWOSIDE || DO_UNFILLED || DO_TWOSTENCIL)
       {
 	 facing = AREA_IS_CCW( cc ) ^ ctx->Polygon._FrontBit;
-
-         if (DO_TWOSTENCIL && ctx->Stencil.TestTwoSide) {
-            ctx->_Facing = facing; /* mixed mode rendering: for 2-sided stencil test */
-         }
 
 	 if (DO_UNFILLED) {
 	    if (facing) {

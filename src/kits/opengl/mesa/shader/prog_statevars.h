@@ -1,8 +1,8 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.2
+ * Version:  7.1
  *
- * Copyright (C) 1999-2006  Brian Paul   All Rights Reserved.
+ * Copyright (C) 1999-2007  Brian Paul   All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -124,6 +124,10 @@ _mesa_program_state_flags(const gl_state_index state[STATE_LENGTH]);
 
 extern const char *
 _mesa_program_state_string(const gl_state_index state[STATE_LENGTH]);
+
+
+extern void
+_mesa_load_tracked_matrices(GLcontext *ctx);
 
 
 #endif /* PROG_STATEVARS_H */

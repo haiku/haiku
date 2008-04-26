@@ -317,6 +317,9 @@ NAME( GLcontext *ctx, const SWvertex *vert0, const SWvertex *vert1 )
    span.attrStepX[FRAG_ATTRIB_WPOS][3] = 0.0F;
    span.attrStepY[FRAG_ATTRIB_WPOS][3] = 0.0F;
 
+   span.facing = swrast->PointLineFacing;
+
+
    /*
     * Draw
     */

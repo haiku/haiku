@@ -640,7 +640,12 @@ delete_framebuffer_cb(GLuint id, void *data, void *userData)
     */
    /*assert(fb->RefCount == 1);*/
    fb->RefCount = 0;
-   fb->Delete(fb);
+
+   /* NOTE: Delete should always be defined but there are two reports
+    * of it being NULL (bugs 13507, 14293).  Work-around for now.
+    */
+   if (fb->Delete)
+      fb->Delete(fb);
 }
 
 /**
@@ -682,10 +687,10 @@ free_shared_state( GLcontext *ctx, struct gl_shared_state *ss )
    _mesa_DeleteHashTable(ss->Programs);
 #endif
 #if FEATURE_ARB_vertex_program
-   _mesa_delete_program(ctx, ss->DefaultVertexProgram);
+   ctx->Driver.DeleteProgram(ctx, ss->DefaultVertexProgram);
 #endif
 #if FEATURE_ARB_fragment_program
-   _mesa_delete_program(ctx, ss->DefaultFragmentProgram);
+   ctx->Driver.DeleteProgram(ctx, ss->DefaultFragmentProgram);
 #endif
 
 #if FEATURE_ATI_fragment_shader
@@ -749,7 +754,7 @@ _mesa_init_current(GLcontext *ctx)
    }
 
    /* redo special cases: */
-   ASSIGN_4V( ctx->Current.Attrib[VERT_ATTRIB_WEIGHT], 1.0, 0.0, 0.0, 1.0 );
+   ASSIGN_4V( ctx->Current.Attrib[VERT_ATTRIB_WEIGHT], 1.0, 0.0, 0.0, 0.0 );
    ASSIGN_4V( ctx->Current.Attrib[VERT_ATTRIB_NORMAL], 0.0, 0.0, 1.0, 1.0 );
    ASSIGN_4V( ctx->Current.Attrib[VERT_ATTRIB_COLOR0], 1.0, 1.0, 1.0, 1.0 );
    ASSIGN_4V( ctx->Current.Attrib[VERT_ATTRIB_COLOR1], 0.0, 0.0, 0.0, 1.0 );
@@ -977,7 +982,6 @@ init_attrib_groups(GLcontext *ctx)
    /* Miscellaneous */
    ctx->NewState = _NEW_ALL;
    ctx->ErrorValue = (GLenum) GL_NO_ERROR;
-   ctx->_Facing = 0;
 
    return GL_TRUE;
 }

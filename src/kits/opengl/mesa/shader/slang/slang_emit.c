@@ -1,6 +1,6 @@
 /*
  * Mesa 3-D graphics library
- * Version:  6.5.3
+ * Version:  7.0.3
  *
  * Copyright (C) 2005-2007  Brian Paul   All Rights Reserved.
  *
@@ -677,6 +677,7 @@ static struct prog_instruction *
 emit_clamp(slang_emit_info *emitInfo, slang_ir_node *n)
 {
    struct prog_instruction *inst;
+   slang_ir_node tmpNode;
 
    assert(n->Opcode == IR_CLAMP);
    /* ch[0] = value
@@ -722,17 +723,26 @@ emit_clamp(slang_emit_info *emitInfo, slang_ir_node *n)
    emit(emitInfo, n->Children[1]);
    emit(emitInfo, n->Children[2]);
 
+   /* Some GPUs don't allow reading from output registers.  So if the
+    * dest for this clamp() is an output reg, we can't use that reg for
+    * the intermediate result.  Use a temp register instead.
+    */
+   _mesa_bzero(&tmpNode, sizeof(tmpNode));
+   alloc_temp_storage(emitInfo, &tmpNode, n->Store->Size);
+
    /* tmp = max(ch[0], ch[1]) */
    inst = new_instruction(emitInfo, OPCODE_MAX);
-   storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
+   storage_to_dst_reg(&inst->DstReg, tmpNode.Store, n->Writemask);
    storage_to_src_reg(&inst->SrcReg[0], n->Children[0]->Store);
    storage_to_src_reg(&inst->SrcReg[1], n->Children[1]->Store);
 
-   /* tmp = min(tmp, ch[2]) */
+   /* n->dest = min(tmp, ch[2]) */
    inst = new_instruction(emitInfo, OPCODE_MIN);
    storage_to_dst_reg(&inst->DstReg, n->Store, n->Writemask);
-   storage_to_src_reg(&inst->SrcReg[0], n->Store);
+   storage_to_src_reg(&inst->SrcReg[0], tmpNode.Store);
    storage_to_src_reg(&inst->SrcReg[1], n->Children[2]->Store);
+
+   free_temp_storage(emitInfo->vt, &tmpNode);
 
    return inst;
 }
@@ -859,12 +869,18 @@ emit_return(slang_emit_info *emitInfo, slang_ir_node *n)
 static struct prog_instruction *
 emit_kill(slang_emit_info *emitInfo)
 {
+   struct gl_fragment_program *fp;
    struct prog_instruction *inst;
    /* NV-KILL - discard fragment depending on condition code.
     * Note that ARB-KILL depends on sign of vector operand.
     */
    inst = new_instruction(emitInfo, OPCODE_KIL_NV);
    inst->DstReg.CondMask = COND_TR;  /* always branch */
+
+   assert(emitInfo->prog->Target == GL_FRAGMENT_PROGRAM_ARB);
+   fp = (struct gl_fragment_program *) emitInfo->prog;
+   fp->UsesKill = GL_TRUE;
+
    return inst;
 }
 
@@ -1486,6 +1502,10 @@ emit_struct_field(slang_emit_info *emitInfo, slang_ir_node *n)
 {
    if (n->Store->File == PROGRAM_STATE_VAR) {
       n->Store->Index = _slang_alloc_statevar(n, emitInfo->prog->Parameters);
+      if (n->Store->Index < 0) {
+         slang_info_log_error(emitInfo->log, "Error parsing state variable");
+         return NULL;
+      }
    }
    else {
       GLint offset = n->FieldOffset / 4;

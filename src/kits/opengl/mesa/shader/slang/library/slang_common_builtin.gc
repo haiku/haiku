@@ -343,6 +343,7 @@ vec4 asin(const vec4 v)
    __retVal.x = asin(v.x);
    __retVal.y = asin(v.y);
    __retVal.z = asin(v.z);
+   __retVal.w = asin(v.w);
 }
 
 float acos(const float x)

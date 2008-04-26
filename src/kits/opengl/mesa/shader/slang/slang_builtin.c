@@ -250,7 +250,7 @@ lookup_statevar(const char *var, GLint index1, GLint index2, const char *field,
       }
    }
    else if (strcmp(var, "gl_FrontLightModelProduct") == 0) {
-      if (strcmp(field, "ambient") == 0) {
+      if (strcmp(field, "sceneColor") == 0) {
          tokens[0] = STATE_LIGHTMODEL_SCENECOLOR;
          tokens[1] = 0;
       }
@@ -259,7 +259,7 @@ lookup_statevar(const char *var, GLint index1, GLint index2, const char *field,
       }
    }
    else if (strcmp(var, "gl_BackLightModelProduct") == 0) {
-      if (strcmp(field, "ambient") == 0) {
+      if (strcmp(field, "sceneColor") == 0) {
          tokens[0] = STATE_LIGHTMODEL_SCENECOLOR;
          tokens[1] = 1;
       }
@@ -397,6 +397,8 @@ lookup_statevar(const char *var, GLint index1, GLint index2, const char *field,
  *   var.field
  *   var[i].field
  *   var[i][j]
+ *
+ * \return -1 upon error, else position in paramList of the state var/data
  */
 GLint
 _slang_alloc_statevar(slang_ir_node *n,
@@ -414,9 +416,13 @@ _slang_alloc_statevar(slang_ir_node *n,
 
    if (n->Opcode == IR_ELEMENT) {
       /* XXX can only handle constant indexes for now */
-      assert(n->Children[1]->Opcode == IR_FLOAT);
-      index1 = (GLint) n->Children[1]->Value[0];
-      n = n->Children[0];
+      if (n->Children[1]->Opcode == IR_FLOAT) {
+         index1 = (GLint) n->Children[1]->Value[0];
+         n = n->Children[0];
+      }
+      else {
+         return -1;
+      }
    }
 
    if (n->Opcode == IR_ELEMENT) {

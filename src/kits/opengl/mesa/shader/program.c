@@ -343,7 +343,7 @@ _mesa_clone_program(GLcontext *ctx, const struct gl_program *prog)
    clone->Format = prog->Format;
    clone->Instructions = _mesa_alloc_instructions(prog->NumInstructions);
    if (!clone->Instructions) {
-      _mesa_delete_program(ctx, clone);
+      ctx->Driver.DeleteProgram(ctx, clone);
       return NULL;
    }
    _mesa_copy_instructions(clone->Instructions, prog->Instructions,
