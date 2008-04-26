@@ -212,6 +212,9 @@ AddFilesToHaikuImage beos apps			: $(BEOS_APPS) ;
 AddFilesToHaikuImage beos preferences	: $(BEOS_PREFERENCES) ;
 AddFilesToHaikuImage beos demos			: $(BEOS_DEMOS) ;
 
+SEARCH on which = [ FDirName $(HAIKU_TOP) data bin ] ;
+AddFilesToHaikuImage beos bin			: which ;
+
 AddSymlinkToHaikuImage beos bin : sh : bash ;
 
 AddSymlinkToHaikuImage home Desktop : /boot/home : Home ;
