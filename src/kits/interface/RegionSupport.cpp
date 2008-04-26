@@ -105,13 +105,13 @@ using std::nothrow;
  *  update region fBounds
  */
 #define EXTENTS(r,idRect){\
-            if((r)->left < (idRect)->fBounds.left)\
+            if ((r)->left < (idRect)->fBounds.left)\
               (idRect)->fBounds.left = (r)->left;\
-            if((r)->top < (idRect)->fBounds.top)\
+            if ((r)->top < (idRect)->fBounds.top)\
               (idRect)->fBounds.top = (r)->top;\
-            if((r)->right > (idRect)->fBounds.right)\
+            if ((r)->right > (idRect)->fBounds.right)\
               (idRect)->fBounds.right = (r)->right;\
-            if((r)->bottom > (idRect)->fBounds.bottom)\
+            if ((r)->bottom > (idRect)->fBounds.bottom)\
               (idRect)->fBounds.bottom = (r)->bottom;\
         }
 

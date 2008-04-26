@@ -277,7 +277,7 @@ get_mouse_type(int32 *type)
 	
 	_control_input_server_(&command, &reply);
 	
-	if(reply.FindInt32("mouse_type", type) != B_OK)
+	if (reply.FindInt32("mouse_type", type) != B_OK)
 		return B_ERROR;
 	
 	return B_OK;

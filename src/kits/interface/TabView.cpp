@@ -674,7 +674,7 @@ BTabView::Select(int32 index)
 
 	tab = TabAt(index);
 	if (tab && ContainerView()) {
-		if(index == 0)
+		if (index == 0)
 			fTabOffset = 0.0f;
 		tab->Select(ContainerView());
 		fSelection = index;
@@ -682,8 +682,8 @@ BTabView::Select(int32 index)
 
 	Invalidate();
 	
-	if(index != 0 && !Bounds().Contains(TabFrame(index))){
-		if(!Bounds().Contains(TabFrame(index).LeftTop()))
+	if (index != 0 && !Bounds().Contains(TabFrame(index))){
+		if (!Bounds().Contains(TabFrame(index).LeftTop()))
 			fTabOffset += TabFrame(index).left - Bounds().left - 20.0f;
 		else
 			fTabOffset += TabFrame(index).right - Bounds().right + 20.0f;
@@ -719,7 +719,7 @@ BTabView::SetFocusTab(int32 tab, bool focused)
 	if (tab >= CountTabs())
 		tab = 0;
 
-	if(tab < 0)
+	if (tab < 0)
 		tab = CountTabs() - 1;
 
 	if (focused) {
@@ -727,11 +727,11 @@ BTabView::SetFocusTab(int32 tab, bool focused)
 			return;
 
 		if (fFocus != -1){
-			if(TabAt (fFocus) != NULL)
+			if (TabAt (fFocus) != NULL)
 				TabAt(fFocus)->MakeFocus(false);
 			Invalidate(TabFrame(fFocus));
 		}
-		if(TabAt(tab) != NULL){
+		if (TabAt(tab) != NULL){
 			TabAt(tab)->MakeFocus(true);
 			Invalidate(TabFrame(tab));
 			fFocus = tab;
@@ -977,7 +977,7 @@ BTabView::RemoveTab(int32 index)
 	if (index <= fSelection && fSelection != 0)
 		fSelection--;
 
-	if(CountTabs() == 0)
+	if (CountTabs() == 0)
 		fFocus = -1;
 	else
 		Select(fSelection);
