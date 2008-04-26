@@ -42,19 +42,7 @@ const int32 FUNC_NAME_LEN = 1024;
 //	of just NS::ClassName)
 
 
-static int
-GetNumber(const char*& name)
-{
-	int val = atoi(name);
-	while (isdigit(*name)) {
-		++name;
-	}
-
-	return val;
-}
-
-
-static void
+static status_t
 demangle_class_name(const char* name, BString& out)
 {
 // TODO: add support for template classes
@@ -62,40 +50,38 @@ demangle_class_name(const char* name, BString& out)
 
 	out = "";
 
-	// Are we in a namespace?
-	if (*name == 'Q') {
-		// Yessir, we are; how many deep are we?
-		int nsCount = 0;
-		++name;
-		if (*name == '_') {
-			// more than 10 deep
-			++name;
-			if (!isdigit(*name))
-				;	// TODO: error handling
+	if (name[0] == 'Q') {
+		// The name is in a namespace
+		int namespaceCount = 0;
+		name++;
+		if (name[0] == '_') {
+			// more than 10 namespaces deep
+			if (!isdigit(*++name))
+				return B_BAD_VALUE;
 
-			nsCount = GetNumber(name);
-			if (*name == '_')	// more than 10 deep
-				++name;
-			else
-				;	// this should be an error condition
-		} else {
-			nsCount = *name - '0';
-			++name;
-		}
+			namespaceCount = strtoul(name, (char**)&name, 10);
+			if (name[0] != '_')
+				return B_BAD_VALUE;	
+		} else
+			namespaceCount = name[0] - '0';
 
-		int nameLen = 0;
-		for (int i = 0; i < nsCount - 1; ++i) {
-			if (!isdigit(*name))
-				;	// TODO: error handling
+		name++;
 
-			nameLen = GetNumber(name);
-			out.Append(name, nameLen);
+		for (int i = 0; i < namespaceCount - 1; i++) {
+			if (!isdigit(name[0]))
+				return B_BAD_VALUE;	
+
+			int nameLength = strtoul(name, (char**)&name, 10);
+			out.Append(name, nameLength);
 			out += "::";
-			name += nameLen;
+			name += nameLength;
 		}
 	}
 
-	out.Append(name, GetNumber(name));
+	int nameLength = strtoul(name, (char**)&name, 10);
+	out.Append(name, nameLength);
+
+	return B_OK;
 }
 
 
@@ -240,7 +226,9 @@ BArchivable::Archive(BMessage* into, bool deep) const
 	}
 
 	BString name;
-	demangle_class_name(typeid(*this).name(), name);
+	status_t status = demangle_class_name(typeid(*this).name(), name);
+	if (status != B_OK)
+		return status;
 
 	return into->AddString(B_CLASS_FIELD, name);
 }
@@ -393,11 +381,17 @@ validate_instantiation(BMessage* from, const char* className)
 		return false;
 	}
 
-	const char* data;
-	for (int32 index = 0; from->FindString(B_CLASS_FIELD, index, &data) == B_OK;
-			++index) {
-		if (!strcmp(data, className))
-			return true;
+	BString name = className;
+	for (int32 pass = 0; pass < 2; pass++) {
+		const char* archiveClassName;
+		for (int32 index = 0; from->FindString(B_CLASS_FIELD, index,
+				&archiveClassName) == B_OK; ++index) {
+			if (name == archiveClassName)
+				return true;
+		}
+
+		if (!add_private_namespace(name))
+			break;
 	}
 
 	errno = B_MISMATCHED_VALUES;
