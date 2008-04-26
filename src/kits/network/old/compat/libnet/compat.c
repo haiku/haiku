@@ -171,7 +171,7 @@ struct utsname {
 int uname(struct utsname *name);
 _EXPORT int uname(struct utsname *name)
 {
-	if(!name)
+	if (!name)
 		return B_ERROR;
 	
 	strcpy(name->sysname, "BeOS");

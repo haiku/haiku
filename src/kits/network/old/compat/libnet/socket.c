@@ -77,9 +77,9 @@ _EXPORT int socket(int family, int type, int protocol)
 		/* also convert AF_INET */
 		if (family == 1)
 			family = AF_INET;
-	} else if(type == SOCK_DGRAM)
+	} else if (type == SOCK_DGRAM)
 		type = SOCK_NATIVE_DGRAM;
-	else if(type == SOCK_STREAM)
+	else if (type == SOCK_STREAM)
 		type = SOCK_NATIVE_STREAM;
 	
 	args.u.socket.family = family;
