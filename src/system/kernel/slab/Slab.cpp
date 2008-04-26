@@ -19,6 +19,7 @@
 #include <kernel.h>
 #include <Slab.h>
 #include <smp.h>
+#include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
@@ -170,6 +171,173 @@ static status_t object_cache_reserve_internal(object_cache *cache,
 static status_t object_depot_init_locks(object_depot *depot);
 static depot_magazine *alloc_magazine();
 static void free_magazine(depot_magazine *magazine);
+
+
+
+#ifdef OBJECT_CACHE_TRACING
+
+namespace ObjectCacheTracing {
+
+/*
+object_cache *create_object_cache(const char *name, size_t object_size,
+    size_t alignment, void *cookie, object_cache_constructor constructor,
+    object_cache_destructor);
+object_cache *create_object_cache_etc(const char *name, size_t object_size,
+    size_t alignment, size_t max_byte_usage, uint32 flags, void *cookie,
+    object_cache_constructor constructor, object_cache_destructor destructor,
+    object_cache_reclaimer reclaimer);
+
+void delete_object_cache(object_cache *cache);
+
+void *object_cache_alloc(object_cache *cache, uint32 flags);
+void object_cache_free(object_cache *cache, void *object);
+
+status_t object_cache_reserve(object_cache *cache, size_t object_count,
+    uint32 flags);
+*/
+
+class ObjectCacheTraceEntry : public AbstractTraceEntry {
+	public:
+		ObjectCacheTraceEntry(object_cache* cache)
+			:
+			fCache(cache)
+		{
+		}
+
+	protected:
+		object_cache*	fCache;
+};
+
+
+class Create : public ObjectCacheTraceEntry {
+	public:
+		Create(const char* name, size_t objectSize, size_t alignment,
+				size_t maxByteUsage, uint32 flags, void *cookie,
+				object_cache *cache)
+			:
+			ObjectCacheTraceEntry(cache),
+			fObjectSize(objectSize),
+			fAlignment(alignment),
+			fMaxByteUsage(maxByteUsage),
+			fFlags(flags),
+			fCookie(cookie)
+		{
+			fName = alloc_tracing_buffer_strcpy(name, 64, false);
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("object cache create: name: \"%s\", object size: %lu, "
+				"alignment: %lu, max usage: %lu, flags: 0x%lx, cookie: %p "
+				"-> cache: %p", fName, fObjectSize, fAlignment, fMaxByteUsage,
+					fFlags, fCookie, fCache);
+		}
+
+	private:
+		const char*	fName;
+		size_t		fObjectSize;
+		size_t		fAlignment;
+		size_t		fMaxByteUsage;
+		uint32		fFlags;
+		void*		fCookie;
+};
+
+
+class Delete : public ObjectCacheTraceEntry {
+	public:
+		Delete(object_cache *cache)
+			:
+			ObjectCacheTraceEntry(cache)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("object cache delete: %p", fCache);
+		}
+};
+
+
+class Alloc : public ObjectCacheTraceEntry {
+	public:
+		Alloc(object_cache *cache, uint32 flags, void* object)
+			:
+			ObjectCacheTraceEntry(cache),
+			fFlags(flags),
+			fObject(object)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("object cache alloc: cache: %p, flags: 0x%lx -> "
+				"object: %p", fCache, fFlags, fObject);
+		}
+
+	private:
+		uint32		fFlags;
+		void*		fObject;
+};
+
+
+class Free : public ObjectCacheTraceEntry {
+	public:
+		Free(object_cache *cache, void* object)
+			:
+			ObjectCacheTraceEntry(cache),
+			fObject(object)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("object cache free: cache: %p, object: %p", fCache,
+				fObject);
+		}
+
+	private:
+		void*		fObject;
+};
+
+
+class Reserve : public ObjectCacheTraceEntry {
+	public:
+		Reserve(object_cache *cache, size_t count, uint32 flags)
+			:
+			ObjectCacheTraceEntry(cache),
+			fCount(count),
+			fFlags(flags)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("object cache reserve: cache: %p, count: %lu, "
+				"flags: 0x%lx", fCache, fCount, fFlags);
+		}
+
+	private:
+		uint32		fCount;
+		uint32		fFlags;
+};
+
+
+}	// namespace ObjectCacheTracing
+
+#	define T(x)	new(std::nothrow) ObjectCacheTracing::x
+
+#else
+#	define T(x)
+#endif	// OBJECT_CACHE_TRACING
+
+
+// #pragma mark -
+
 
 template<typename Type> static Type *
 _pop(Type* &head)
@@ -598,25 +766,33 @@ create_object_cache(const char *name, size_t object_size, size_t alignment,
 
 
 object_cache *
-create_object_cache_etc(const char *name, size_t object_size, size_t alignment,
+create_object_cache_etc(const char *name, size_t objectSize, size_t alignment,
 	size_t maximum, uint32 flags, void *cookie,
 	object_cache_constructor constructor, object_cache_destructor destructor,
 	object_cache_reclaimer reclaimer)
 {
-	if (object_size == 0)
-		return NULL;
-	else if (object_size <= 256)
-		return create_small_object_cache(name, object_size, alignment,
-			maximum, flags, cookie, constructor, destructor, reclaimer);
+	object_cache *cache;
 
-	return create_hashed_object_cache(name, object_size, alignment,
-		maximum, flags, cookie, constructor, destructor, reclaimer);
+	if (objectSize == 0) {
+		cache = NULL;
+	} else if (objectSize <= 256) {
+		cache = create_small_object_cache(name, objectSize, alignment, maximum,
+			flags, cookie, constructor, destructor, reclaimer);
+	} else {
+		cache = create_hashed_object_cache(name, objectSize, alignment,
+			maximum, flags, cookie, constructor, destructor, reclaimer);
+	}
+
+	T(Create(name, objectSize, alignment, maximum, flags, cookie, cache));
+	return cache;
 }
 
 
 void
 delete_object_cache(object_cache *cache)
 {
+	T(Delete(cache));
+
 	{
 		BenaphoreLocker _(sObjectCacheListLock);
 		sObjectCaches.Remove(cache);
@@ -648,8 +824,10 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 {
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
 		void *object = object_depot_obtain(&cache->depot);
-		if (object)
+		if (object) {
+			T(Alloc(cache, flags, object));
 			return object;
+		}
 	}
 
 	BenaphoreLocker _(cache->lock);
@@ -657,8 +835,10 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 
 	if (cache->partial.IsEmpty()) {
 		if (cache->empty.IsEmpty()) {
-			if (object_cache_reserve_internal(cache, 1, flags) < B_OK)
+			if (object_cache_reserve_internal(cache, 1, flags) < B_OK) {
+				T(Alloc(cache, flags, NULL));
 				return NULL;
+			}
 
 			cache->pressure++;
 		}
@@ -682,7 +862,9 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 		cache->full.Add(source);
 	}
 
-	return link_to_object(link, cache->object_size);
+	void *object = link_to_object(link, cache->object_size);
+	T(Alloc(cache, flags, object));
+	return object;
 }
 
 
@@ -724,6 +906,8 @@ object_cache_free(object_cache *cache, void *object)
 	if (object == NULL)
 		return;
 
+	T(Free(cache, object));
+
 	if (!(cache->flags & CACHE_NO_DEPOT)) {
 		if (object_depot_store(&cache->depot, object))
 			return;
@@ -756,13 +940,15 @@ object_cache_reserve_internal(object_cache *cache, size_t object_count,
 
 
 status_t
-object_cache_reserve(object_cache *cache, size_t object_count, uint32 flags)
+object_cache_reserve(object_cache *cache, size_t objectCount, uint32 flags)
 {
-	if (object_count == 0)
+	if (objectCount == 0)
 		return B_OK;
 
+	T(Reserve(cache, objectCount, flags));
+
 	BenaphoreLocker _(cache->lock);
-	return object_cache_reserve_internal(cache, object_count, flags);
+	return object_cache_reserve_internal(cache, objectCount, flags);
 }
 
 
