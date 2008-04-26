@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src add-ons kernel bus_managers tty ;
+
+UsePrivateHeaders kernel shared ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+
+KernelAddon <bus_manager>tty :
+	tty.cpp
+	kernel_cpp.cpp
+	: 
+	;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp 
+	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+

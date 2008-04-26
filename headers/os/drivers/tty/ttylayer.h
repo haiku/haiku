@@ -11,6 +11,14 @@
 #include <module.h>
 #include <termios.h>
 
+
+// XXX: should go away or be opacised
+struct str {
+	uchar	*buffer;
+	uint	bufsize, count, tail;
+	bool	allocated;
+};
+
 struct ddrover {
 	
 };
