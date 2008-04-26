@@ -419,7 +419,9 @@
 
 /* #undef HAVE_STD_PUTENV */
 
+#if __HAIKU__
 #define HAVE_STD_UNSETENV 1
+#endif
 
 /* #undef HAVE_PRINTF_A_FORMAT */
 
