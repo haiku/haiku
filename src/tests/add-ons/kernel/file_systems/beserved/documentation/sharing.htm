@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+<head>
+
+<title>BeServed File Sharing Instructions</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table border="0" width="600">
+    <tr>
+        <td valign="top" width="170" height="400"><br><br></td>
+        <td valign="top" width="430">
+	<img src="images/beserved_title.gif" width="217" height="72" border="0">
+        <table border="0" width="430">
+        <tr> 
+          <td>&nbsp; 
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>Using the Preferences Application</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <font face="verdana, arial, helvetica" size="2"><br>
+            BeOS and Windows systems support the BeServed File Sharing Preferences application
+            intended to make sharing folders on your computer easy and centralized in one
+            location.  This graphical utility has the same capabilities as editing the
+            configuration file manually.<br><br>
+            In BeOS, you will find the File Sharing preferences application by navigating through
+            your Be menu (the Deskbar) to the "Preferences" item, then locating and selecting
+            "File Sharing."  On Windows systems, a program group should have been created in your
+            start menu for BeServed, which contains a shortcut to the preferences application.
+            Navigate through your start menu and select this shortcut.<br><br>
+            The preferences application should look relatively similar on all supported systems.
+            BeOS screenshots are provided herein, but other versions of the interface are
+            virtually identical.<br><br>
+            <a href="images/FileSharing.jpg"><img src="images/FileSharing_thm.jpg" border="0"></a><br><br>
+            All the folders that are shared on this computer are listed in the main panel.
+            You can share an additional folder by clicking on the <i>New</i> button.  You can
+            also edit the properties of an existing shared folder by highlighting it in the
+            list and clicking on the <i>Edit</i> button, or simply double-clicking on it.
+            If you have an existing shared folder that you no longer wish to share, highlight
+            it in the list and click on the <i>Remove</i> button.<br><br>
+            When adding a new shared folder, or changing the properties of an existing one,
+            you will use the shared folder properties panel, shown below.  This panel allows
+            you to select the folder you wish to share, to choose a friendly name by which
+            others will reference the folder, and to choose the security options that will
+            govern what users who access this folder will be permitted to do.<br><br>
+            <a href="images/ShareProperties.jpg"><img src="images/ShareProperties_thm.jpg" border="0"></a><br><br>
+            Basic access control is provided by the global setting <i>"Users can make changes to
+            files and folders."</i>  When this option is enabled, users that access this shared
+            folder are able to add new files or sub-folders, modify the content of existing
+            files, delete files, and change BeOS attributes and indexes.  You should only enable
+            this option if the files within your shared folder are not irreplaceable.<br><br>
+            Beginning with version 1.2.0, you can optionally define different permission
+            levels for users and groups of users on your network.  Users and groups are
+            defined and administered through the BeSure authentication server that comes
+            with BeServed.  This is useful if you want some users to have permission to 
+            change files, but not all users.  It is also useful for requiring users to enter
+            passwords when your computer is connected to the Internet.  You may not want any
+            BeServed user on the Internet to find and access your files.  Securing your
+            public shared folder is the job of the authentication server.<br><br>
+            To grant access to a specific user, you must have a BeSure authentication server
+            on your network, and you must have this computer configured to recognize its
+            authority to administer users.  See the documentation on BeSure for more
+            information on setting up security for your BeServed-powered network.<br><br>
+            The <i>Domain User Access</i> section of the share properties panel lists the
+            users and groups that have been granted specific permission levels for your
+            shared folder.  To specify permission for an additional user or group, click on
+            the <i>Add</i> button.  To remove the specific permissions granted to a user or
+            group, highlight the desired one in the list and click on the <i>Remove</i> button.
+            You cannot edit the permission granted to a specific user.  If you wish to change
+            the permission level that user is granted, you need to remove the current entry
+            and add the user again, this time with the desired permission level.  The Domain Users
+            panel shown below is displayed when assigning specific permission levels to a
+            user or group.<br><br>
+            <a href="images/DomainUsers.jpg"><img src="images/DomainUsers_thm.jpg" border="0"></a><br><br>
+            When you are finished editing the properties of your shared folder(s), click the <i>Save</i>
+            button to write your changes into the configuration file.  Note that your changes
+            will not immediately take affect.  There may be instances where you do not want to
+            interrupt services to users currently making use of file shares you may have edited
+            or completely removed.  When you want to roll your changes out to users, click on
+            the <i>Deploy</i> button.<br><br>
+          </td>
+        </tr>
+        <tr> 
+          <td>&nbsp; 
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>Using the Configuration File</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <font face="verdana, arial, helvetica" size="2"><br>
+            On systems that do not support the preferences application, you configure a computer to
+            share files by editing the BeServed-Settings script in the shared
+            configuration directory (/boot/home/config/settings).<br><br>
+            This script can specify one or more folders you would like to make available
+            to other users on your network.  Specifically, the "share" command accepts the
+            folder to be shared and a friendly alias for the folder.  The command is written
+            as follows:<br><br>
+            <pre>share <i>directory</i> as <i>alias</i><br></pre>
+            If the directory or alias names contain spaces, you will need to enclose
+            them in quotation marks.  Additionally, the command must reside on a single
+            line in the configuration file.<br><br>
+            <u>Examples:</u><br>
+<pre>share /boot/home as HomeDir
+share "/boot/home/My Projects" as "My Projects"</pre><br>
+            You may leave comments in the file by beginning the line with a # character.
+            For example:<br><br>
+<pre># Share my home directory
+share /boot/home as HomeDir</pre><br>
+            If you need to enable security using the BeSure authentication server, you will
+            use the authenticate command and provide the host name or IP address of a computer
+            on your network that will run the BeSure server.  This single computer will grant
+            or reject all login attempts to file shares on the network.  The authenticate command
+            looks like this:<br><br>
+<pre>authenticate with 192.168.0.4</pre><br>
+            This command instructs the BeServed file server to consult the authentication server
+            to verify a user's credentials before granting access to file shares defined on that
+            server.<br><br>
+            Once you have enabled security, you'll need to grant the specific permissions you
+            want each account to have.  The currently available permissions are <i>read</i> and
+            <i>write</i>.  These permissions are granted to users defined on the BeSure authentication
+            server using the grant command, as in:<br><br>
+<pre>grant read on "My Projects" to group everyone
+grant read,write on "My Projects" to johndoe</pre><br>
+            The first command grants read-only access to all users in the standard <i>everyone</i>
+            group (notice the <i>group</i> keyword).  The second command grants read and write
+            access to the specific user <i>johndoe</i>.<br><br>
+            The settings file must be saved as a plain text.  Be cafeful when using editors
+            that provide formatting, such as StyledEdit or Gobe Productive, that you save
+            the file in plain text format.  Otherwise, an editor will insert font, paragraph
+            and other formatting information into the file that BeServed will be unable to
+            interpret.<br><br>
+            When you change the settings, you will need to stop and restart the server
+            application.  The application is called <i>beserved_server</i> and resides in
+            the /boot/home/config/servers folder.  You can force the server to review the
+            changed configuration by sending it the hangup, or HUP, signal in tradtional
+            Unix fashion.  The signal is sent using the <i>kill</i> command, as in:<br><br>
+<pre># kill -HUP <i>process_id</i>
+</pre><br>
+            where <i>process_id</i> is the process ID of the beserved server.<br><br>
+            You can place this command in your startup sequence if you would like to have
+            file sharing automatically enabled upon system startup.  Refer to your BeOS
+            documentation for information on editing startup scripts.<br><br>
+            From the command prompt, you may type:<br><br>
+            <pre>/boot/home/config/servers/beserved_server</pre><br>
+            Note:  The ampersand (&) character is not needed at the end of the line, as in earlier
+            versions of the server.  The server now runs as a proper Unix daemon, detaching
+            itself from the controlling terminal.  Alternatively, you may open a Tracker
+            window for the /boot/home/config/servers folder and double-click on the beserved_server entry.<br><br>
+            </font> 
+          </td>
+        </tr>
+      </table>
+      </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td valign="top"><hr>
+
+      <p><font size="1" face="verdana, arial, helvetica">Copyright © 2001-2002 Teldar Corporation. 
+        All rights reserved.<br>
+        If you experience difficulties using this site, please contact <a href="mailto:webmaster@teldar.com">webmaster@teldar.com</a>.</font></p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

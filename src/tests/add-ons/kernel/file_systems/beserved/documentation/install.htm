@@ -1,0 +1,161 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+<head>
+
+<title>BeServed Installation Instructions</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table border="0" width="600">
+    <tr>
+        <td valign="top" width="170" height="400"><br><br></td>
+        <td valign="top" width="430">
+	<img src="images/beserved_title.gif" width="217" height="72" border="0">
+        <table border="0" width="430">
+        <tr> 
+          <td>&nbsp; 
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>BeServed for BeOS Systems</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <font face="verdana, arial, helvetica" size="2"><br><br>
+            The BeOS verions of BeServed are provided in standard SoftwareValet-compatible
+            packages.  Simply double-click on the downloaded file to perform the installation.
+            You may select whether you are installing the entire package, or client-only
+            utilities.  Selecting client-only should be used when you want to browse files
+            on other computers, but not share any local files with others.
+            <br><br>
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>BeServed for Linux</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <br>
+            The Linux file you will receive is called <i>bs-linux-rh-i386.tar.gz</i>.  Once
+            downloaded, create a folder in which you wish to have BeServed installed, as in:<br>
+            <pre>mkdir /usr/local/BeServed</pre>
+            Then, move the installation file into that folder and change the current working folder
+            to that location.
+            <pre>mv bs-linux-rh-i386.tar.gz /usr/local/BeServed
+cd /usr/local/BeServed</pre>
+            Now, uncompress the installation files using the Linux tar command.  Since the file you
+            download will be both archived and compress, you'll need to specify the -z and -x options,
+            or run <i>gunzip</i> before running tar.<br>
+            <pre>tar -zxf bs-linux-rh-i386.tar.gz</pre>
+            Several files will be uncompressed.  Run the install.sh file to perform the necessary
+            installation procedures.<br>
+            <pre>./install.sh</pre>
+            BeServed should now be installed as a default daemon on your Linux system, it should
+            be running, and will be started each time the system is booted.  You can now delete the
+            original file you downloaded.<br>
+            <pre>rm -f bs-linux-rh-i386.tar.gz</pre>
+            <br>
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>BeServed for FreeBSD</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <br>
+            The FreeBSD file you will receive is called <i>bs-freebsd-i386.tar.gz</i>.  Once
+            downloaded, create a folder in which you wish to have BeServed installed, as in:<br>
+            <pre>mkdir /usr/local/BeServed</pre>
+            Then, move the installation file into that folder and change the current working folder
+            to that location.
+            <pre>mv bs-freebsd-i386.tar.gz /usr/local/BeServed
+cd /usr/local/BeServed</pre>
+            Now, uncompress the installation files using the FreeBSD tar command.  Since the file you
+            download will be both archived and compressed, you'll need to specify the -z and -x options,
+            or run <i>gunzip</i> before running tar.<br>
+            <pre>tar -zxf bs-freebsd-i386.tar.gz</pre>
+            Several files will be uncompressed.  Run the install.sh file to perform the necessary
+            installation procedures.<br>
+            <pre>./install.sh</pre>
+            BeServed should now be installed as a default daemon on your FreeBSD system, it should
+            be running, and will be started each time the system is booted.  You can now delete the
+            original file you downloaded.<br>
+            <pre>rm -f bs-freebsd-i386.tar.gz</pre>
+            <br>
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>BeServed for Solaris</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <br>
+            The Solaris file you will receive is called <i>bs-solaris-i386.tar.gz</i>.  Once
+            downloaded, create a folder in which you wish to have BeServed installed, as in:<br>
+            <pre>mkdir /usr/local/BeServed</pre>
+            Then, move the installation file into that folder and change the current working folder
+            to that location.
+            <pre>mv bs-solaris-i386.tar.gz /usr/local/BeServed
+cd /usr/local/BeServed</pre>
+            Now, uncompress the installation files using the gunzip command.<br>
+            <pre>gunzip bs-solaris-i386.tar.gz</pre>
+            You should now have a file without the .gz extension, ending in .tar.  You can use the
+            Solaris tar command to expand this archive.  This is done using the -x tar option.<br>
+            <pre>tar -xf bs-solaris-i386.tar</pre>
+            Several files will be uncompressed.  Run the install.sh file to perform the necessary
+            installation procedures.<br>
+            <pre>./install.sh</pre>
+            BeServed should now be installed as a default daemon on your Solaris system, it should
+            be running, and will be started each time the system is booted.  You can now delete the
+            tar file that still remains.<br>
+            <pre>rm -f bs-solaris-i386.tar</pre>
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>BeServed for Windows</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <br>
+            The compressed file you will receive is called <i>bs-win32-nt-i386.zip</i>.  Once
+            downloaded, you will need to uncompress it into a temporary folder with WinZip or
+            another PKZIP-compatible extraction utility.  From the temporary folder, simply run
+            <i>setup.exe</i> to perform the installation.  The server can be started from the
+            Start menu.  The File Sharing preferences application is also available from the
+            Start menu and allows you to specify the folders that will be shared with other
+            users without manually editing the settings file.<br><br>
+            Once installed, you do not need to retain the original compressed file you downloaded.
+            </font> 
+          </td>
+        </tr>
+      </table>
+        </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td valign="top"><hr>
+
+      <p><font size="1" face="verdana, arial, helvetica">Copyright © 2001-2002 Teldar Corporation. 
+        All rights reserved.<br>
+        If you experience difficulties using this site, please contact <a href="mailto:webmaster@teldar.com">webmaster@teldar.com</a>.</font></p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

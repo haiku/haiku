@@ -1,0 +1,17 @@
+# If BeSure authentication is desired, the command below can be used
+# to specify the network name or address of the server.
+# authenticate with 10.1.6.15
+
+# Define a shared folder "c:\temp" that will be called "Temp Folder"
+# and will have read-write access.
+share c:\temp as "Temp Folder"
+set "Temp Folder" read-write
+
+# If BeSure authentication is configured, specific rights can be granted
+# to users and/or groups using the grant command, as illustrated below.
+#grant read on "Temp Folder" to everyone
+
+# Shared printers can be configured using the printer command.  Various
+# details need to be supplied regarding the printer and a location to
+# temporarily spool print jobs being submitted by other users.
+# printer "Okidata OL-1200" is type PCL3 device "Okidata OL-1200" spooled to c:\temp

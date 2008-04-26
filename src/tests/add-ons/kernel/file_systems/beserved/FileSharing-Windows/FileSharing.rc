@@ -1,0 +1,466 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif\r\n"
+    "#include ""res\\scanappl.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\FileSharing.ico"
+IDI_GLOBE               ICON                    "res\\idi_globe.ico"
+IDI_LIGHTBULB           ICON                    "res\\lightbulb.ico"
+IDI_OPTIONS             ICON                    "res\\options.ico"
+IDI_PADLOCK             ICON                    "res\\padlock.ico"
+IDI_SHARING             ICON                    "res\\sharing.ico"
+IDI_VOLUME              ICON                    "res\\icon1.ico"
+IDI_PRINTER             ICON                    "res\\printer.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DOMAIN_USERS DIALOG  70, 20, 258, 229
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Domain Users"
+FONT 8, "Tahoma"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,147,208,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,201,208,50,14
+    LTEXT           "Select a user or group from the list below, select the desired access rights, then click the OK button.  Click the Cancel button to abort the selection.",
+                    IDC_STATIC,7,7,244,19
+    CONTROL         "List1",IDC_DOMAIN_USERS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    WS_BORDER | WS_TABSTOP,7,31,244,119
+    COMBOBOX        IDC_DOMAIN_RIGHTS,61,155,98,61,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Access Rights:",IDC_STATIC,7,157,48,8
+    ICON            IDI_LIGHTBULB,IDC_STATIC,9,177,20,20
+    LTEXT           "When granting write access to a shared volume, you are by definition also granting the ability to rename and delete files.",
+                    IDC_STATIC,37,178,216,19
+END
+
+IDD_FILESHARING_DIALOG DIALOGEX 0, 0, 320, 252
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "File Sharing"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_SHARE_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | 
+                    WS_BORDER | WS_TABSTOP,7,67,306,149
+    LTEXT           "File Sharing Preferences",IDC_MAIN_HEADING,40,7,116,8
+    LTEXT           "Normally, remote BeOS computers on your network do not have access to files on this computer.  You grant them access by explicitly sharing specific folders.",
+                    IDC_STATIC,39,17,256,18
+    PUSHBUTTON      "&New",IDC_SHARE_NEW,7,49,50,14
+    PUSHBUTTON      "&Edit",IDC_SHARE_EDIT,61,49,50,14
+    PUSHBUTTON      "&Remove",IDC_SHARE_REMOVE,115,49,50,14
+    LTEXT           "Save your changes to file sharing preferences by clicking the OK button.  This will not have an effect on users until you manually restart the BeServed file serving application.",
+                    IDC_STATIC,7,221,306,19
+    ICON            IDI_SHARING,IDC_STATIC,9,8,20,20
+    PUSHBUTTON      "Se&curity",IDC_SECURITY,263,49,50,14
+END
+
+IDD_SECURITY DIALOG  0, 0, 248, 106
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Security"
+FONT 8, "Tahoma"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,136,85,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,191,85,50,14
+    LTEXT           "When users connect to this computer to access shared files, the settings here will be used to determine how those users are authenticated.",
+                    IDC_STATIC,39,7,202,29
+    LTEXT           "Authentication Method:",IDC_STATIC,7,44,76,8
+    LTEXT           "Server Name:",IDC_STATIC,7,60,45,8
+    COMBOBOX        IDC_SECURITY_TYPE,92,41,149,50,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SECURITY_SERVER,92,57,149,14,ES_AUTOHSCROLL | 
+                    WS_DISABLED
+    ICON            IDI_PADLOCK,IDC_STATIC,10,8,20,20
+END
+
+IDD_SHARE_PROPERTIES DIALOG  35, 5, 303, 292
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Sample Share"
+FONT 8, "Tahoma"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,192,271,50,14,WS_DISABLED
+    PUSHBUTTON      "Cancel",IDCANCEL,246,271,50,14
+    LTEXT           "Sample Share",IDC_SHARE_HEADING,35,7,254,8
+    LTEXT           "Use this properties window to define the parameters under which you will allow users to share files on this computer.",
+                    IDC_STATIC,36,18,260,18
+    EDITTEXT        IDC_SHARE_NAME,35,44,116,14,ES_AUTOHSCROLL
+    LTEXT           "Name:",IDC_STATIC,7,47,22,8
+    LTEXT           "Path:",IDC_STATIC,7,64,18,8
+    EDITTEXT        IDC_SHARE_PATH,35,61,205,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Browse...",IDC_SHARE_BROWSE,246,61,50,14
+    CONTROL         "Users can make changes to files and folders",
+                    IDC_SHARE_WRITE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
+                    117,156,10
+    CONTROL         "Follow links leading outside the path",IDC_SHARE_LINKS,
+                    "Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,7,
+                    130,131,10
+    ICON            IDI_VOLUME,IDC_STATIC,7,7,20,20
+    ICON            IDI_OPTIONS,IDC_STATIC,7,91,20,20
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,7,83,289,1
+    LTEXT           "General Options",IDC_OPTIONS_HEADING,35,96,261,8
+    ICON            IDI_GLOBE,IDC_STATIC,9,154,20,20
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,7,149,288,1
+    LTEXT           "Domain User Access",IDC_DOMAIN_HEADING,35,159,261,8
+    CONTROL         "List1",IDC_DOMAIN_USERS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SORTASCENDING | WS_BORDER | 
+                    WS_TABSTOP,7,178,234,83
+    PUSHBUTTON      "&Add",IDC_SHARE_ADD,246,178,50,14
+    PUSHBUTTON      "&Remove",IDC_SHARE_REMOVE,246,195,50,14,WS_DISABLED
+END
+
+IDD_BROWSER DIALOGEX 0, 0, 210, 167
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Folder"
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,101,146,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,156,146,50,14
+    CONTROL         "",IDC_FOLDERVIEW,"{FBF52F2D-9B93-11D2-B482-0020AFD69DE6}",
+                    WS_TABSTOP,4,2,202,139
+END
+
+IDD_MAINPANEL DIALOGEX 0, 0, 344, 249
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "BeServed File and Print Services"
+FONT 8, "Tahoma", 400, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,233,228,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,287,228,50,14
+END
+
+IDD_MANAGE_QUEUE DIALOG  35, 40, 356, 201
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION "Manage Print Queue"
+FONT 8, "Tahoma"
+BEGIN
+    PUSHBUTTON      "Close",IDCANCEL,298,180,50,14
+    CONTROL         "List1",IDC_QUEUE_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | 
+                    WS_TABSTOP,0,0,356,175
+    PUSHBUTTON      "&Remove",IDC_REMOVE_JOB,241,180,52,14
+    PUSHBUTTON      "&Pause",IDC_PAUSE_JOB,187,180,50,14
+END
+
+IDD_PRINTER_PROPERTIES DIALOGEX 45, 5, 303, 332
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Sample Printer"
+FONT 8, "Tahoma", 0, 0, 0x0
+BEGIN
+    LTEXT           "Name:",IDC_STATIC,7,47,22,8
+    EDITTEXT        IDC_PRINTER_NAME,40,44,116,14,ES_AUTOHSCROLL
+    LTEXT           "Device:",IDC_STATIC,7,64,25,8
+    COMBOBOX        IDC_PRINTER_DEVICE,40,61,200,82,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Type:",IDC_STATIC,7,79,20,8
+    COMBOBOX        IDC_PRINTER_TYPE,40,76,155,65,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Model:",IDC_STATIC,7,94,22,8
+    COMBOBOX        IDC_PRINTER_MODEL,40,91,155,99,CBS_DROPDOWNLIST | 
+                    CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Queue:",IDC_STATIC,7,147,25,8
+    EDITTEXT        IDC_QUEUE_PATH,40,143,200,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Browse...",IDC_PRINTER_BROWSE,246,143,50,14
+    PUSHBUTTON      "&Manage Queue",IDC_MANAGE,40,160,71,14
+    CONTROL         "List1",IDC_DOMAIN_USERS,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | LVS_SORTASCENDING | WS_BORDER | 
+                    WS_TABSTOP,7,210,234,83
+    PUSHBUTTON      "&Add",IDC_PRINTER_ADD,246,210,50,14
+    PUSHBUTTON      "&Remove",IDC_PRINTER_REMOVE,246,227,50,14,WS_DISABLED
+    DEFPUSHBUTTON   "OK",IDOK,192,311,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,246,311,50,14
+    LTEXT           "Sample Printer",IDC_PRINTER_HEADING,35,7,254,8
+    LTEXT           "Use this properties window to define the parameters under which you will allow users to access this printer from this computer.",
+                    IDC_STATIC,36,18,260,18
+    ICON            IDI_PRINTER,IDC_STATIC,7,7,20,20
+    ICON            IDI_GLOBE,IDC_STATIC,9,186,20,20
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,7,181,287,1
+    LTEXT           "Domain User Access",IDC_DOMAIN_HEADING,35,191,261,8
+    LTEXT           "You must also specify a location on this computer where documents can be stored in preparation for printing.  Since some of these documents may be large, and may be submitted by multiple users, you should select a location with ample storage.",
+                    IDC_STATIC,7,113,289,27
+END
+
+IDD_PRINTERSHARING_DIALOG DIALOGEX 0, 0, 320, 252
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_VISIBLE | 
+    WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Printer Sharing"
+FONT 8, "Tahoma", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_PRINTERS,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | WS_BORDER | 
+                    WS_TABSTOP,7,67,306,149
+    LTEXT           "Printer Sharing Preferences",IDC_MAIN_HEADING,40,7,116,
+                    8
+    LTEXT           "Normally, remote BeOS computers on your network do not have permission to use printers available from this computer.  You may permit others to share the printers you have access to.",
+                    IDC_STATIC,39,17,256,25
+    ICON            IDI_SHARING,IDC_STATIC,9,8,20,20
+    PUSHBUTTON      "&New",IDC_NEW_PRINTER,7,49,50,14
+    PUSHBUTTON      "&Edit",IDC_EDIT_PRINTER,61,49,50,14
+    PUSHBUTTON      "&Remove",IDC_REMOVE_PRINTER,115,49,50,14
+    PUSHBUTTON      "Se&curity",IDC_SECURITY,263,49,50,14
+    LTEXT           "Save your changes to file sharing preferences by clicking the OK button.  This will not have an effect on users until you manually restart the BeServed file serving application.",
+                    IDC_STATIC,7,221,306,19
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,4
+ PRODUCTVERSION 1,0,0,4
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "BeServed Control Panel Applet"
+            VALUE "FileVersion", "1, 0, 0, 5"
+            VALUE "InternalName", "BeServed"
+            VALUE "LegalCopyright", "Copyright (C) 2001-2003"
+            VALUE "OriginalFilename", "BeServed.exe"
+            VALUE "ProductName", "BeServed"
+            VALUE "ProductVersion", "1, 0, 0, 5"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DOMAIN_USERS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 251
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 222
+    END
+
+    IDD_FILESHARING_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 313
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 245
+    END
+
+    IDD_SECURITY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 241
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 99
+    END
+
+    IDD_SHARE_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 296
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 285
+    END
+
+    IDD_BROWSER, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 206
+        TOPMARGIN, 2
+        BOTTOMMARGIN, 160
+    END
+
+    IDD_MAINPANEL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 337
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 242
+    END
+
+    IDD_MANAGE_QUEUE, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 194
+    END
+
+    IDD_PRINTER_PROPERTIES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 296
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 325
+    END
+
+    IDD_PRINTERSHARING_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 313
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 245
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_FILESHARING         BITMAP                  "res\\filesharing.bmp"
+IDB_GROUP               BITMAP                  "res\\group.bmp"
+IDB_USER                BITMAP                  "res\\user.bmp"
+IDB_VOLUME              BITMAP                  "res\\volume.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_DOMAIN_USERS DLGINIT
+BEGIN
+    IDC_DOMAIN_RIGHTS, 0x403, 10, 0
+0x6552, 0x6461, 0x6f2d, 0x6c6e, 0x0079, 
+    IDC_DOMAIN_RIGHTS, 0x403, 11, 0
+0x6552, 0x6461, 0x772d, 0x6972, 0x6574, "\000" 
+    0
+END
+
+IDD_SECURITY DLGINIT
+BEGIN
+    IDC_SECURITY_TYPE, 0x403, 27, 0
+0x6f4e, 0x4120, 0x7475, 0x6568, 0x746e, 0x6369, 0x7461, 0x6f69, 0x206e, 
+0x6552, 0x7571, 0x7269, 0x6465, "\000" 
+    IDC_SECURITY_TYPE, 0x403, 29, 0
+0x6542, 0x7553, 0x6572, 0x4120, 0x7475, 0x6568, 0x746e, 0x6369, 0x7461, 
+0x6f69, 0x206e, 0x6553, 0x7672, 0x7265, "\000" 
+    0
+END
+
+IDD_BROWSER DLGINIT
+BEGIN
+    IDC_FOLDERVIEW, 0x376, 150, 0
+0x0008, 0x0000, 0x0031, 0x0039, 0x0039, 0x0039, 0x0030, 0x0037, 0x0037, 
+0x0030, 0x0300, 0x0000, 0x1f51, 0x0000, 0x175c, 0x0000, 0x0003, 0x0001, 
+0x0000, 0x0003, 0x0000, 0x0000, 0x0013, 0x0009, 0x8000, 0x0013, 0x0000, 
+0x0000, 0x000b, 0xffff, 0x000b, 0xffff, 0x000b, 0x0000, 0x000b, 0xffff, 
+0x000b, 0x0000, 0x000b, 0x0000, 0x000b, 0xffff, 0x000b, 0xffff, 0x000b, 
+0x0000, 0x000b, 0xffff, 0x0009, 0x5203, 0x0be3, 0x8f91, 0x11ce, 0xe39d, 
+0xaa00, 0x4b00, 0x51b8, 0x0001, 0x0000, 0x0190, 0x4244, 0x0001, 0x4105, 
+0x6972, 0x6c61, 0x000b, 0xffff, 0x000b, 0xffff, 0x0008, 0x0002, 0x0000, 
+0x0000, 0x000b, 0x0000, 
+    0
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif
+#include "res\scanappl.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,4 @@
+authenticate with 10.1.6.15
+share e:\temp as "Temp Folder"
+grant read,write on "Temp Folder" to kmusick
+grant read on "Temp Folder" to group everyone

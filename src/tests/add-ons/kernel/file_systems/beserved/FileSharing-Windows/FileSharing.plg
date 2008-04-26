@@ -1,0 +1,42 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: scanappl - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x409 /fo"Release/scanappl.res" /d "NDEBUG" "D:\PROJECTS\scanappl\scanappl.rc"" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP4355.TMP" with contents
+[
+/nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "_WINDLL" /Fp"Release/scanappl.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\PROJECTS\scanappl\scanDlg.cpp"
+]
+Creating command line "cl.exe @C:\WINDOWS\TEMP\RSP4355.TMP" 
+Creating temporary file "C:\WINDOWS\TEMP\RSP4356.TMP" with contents
+[
+/nologo /subsystem:windows /dll /incremental:no /pdb:"Release/scanappl.pdb" /machine:I386 /def:"scanappl.def" /out:"Release/scanappl.cpl" /implib:"Release/scanappl.lib" 
+.\Release\ctrlpan.obj
+.\Release\scanappl.obj
+.\Release\scanDlg.obj
+.\Release\scanpan.obj
+.\Release\StdAfx.obj
+.\Release\scanappl.res
+]
+Creating command line "link.exe @C:\WINDOWS\TEMP\RSP4356.TMP"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+scanDlg.cpp
+Linking...
+   Creating library Release/scanappl.lib and object Release/scanappl.exp
+LINK : warning LNK4089: all references to "SHELL32.dll" discarded by /OPT:REF
+LINK : warning LNK4089: all references to "comdlg32.dll" discarded by /OPT:REF
+
+
+
+<h3>Results</h3>
+scanappl.cpl - 0 error(s), 2 warning(s)
+</pre>
+</body>
+</html>

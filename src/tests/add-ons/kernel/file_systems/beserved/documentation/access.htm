@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+
+<head>
+
+<title>BeServed File Access Instructions</title>
+</head>
+
+<body bgcolor="#FFFFFF">
+<table border="0" width="600">
+    <tr>
+        <td valign="top" width="170" height="400"><br><br></td>
+        <td valign="top" width="430">
+	<img src="images/beserved_title.gif" width="217" height="72" border="0">
+        <table border="0" width="430">
+        <tr> 
+          <td>&nbsp; 
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>Using the My Network Application</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <font face="verdana, arial, helvetica" size="2"><br><br>
+            The My Network application is installed by default into your applications folder.
+            It is used to view the computers on your network that are sharing their files using
+            BeServed.<br><br>
+            To access the files on a remote computer, launch the My Network application by
+            double-clicking the icon in the applications folder.  When the program appears, you
+            should see a list of the other computers on your network running the BeServed server.
+            If you do not see the computer(s) you expect, make sure it is running the server
+            application described in <a href="sharing.htm">Sharing Your Files with Others</a>.<br><br>
+            Once you find the computer you're looking for, double-click its entry in the list
+            to display the list of shared folders that computer is making available.  If you do
+            not see the shared folder you are looking for, check the settings on the remote
+            computer to ensure it is properly configured to share its files.<br><br>
+            <a href="images/mynetwork.jpg"><img src="images/mynetwork_thm.jpg" width="250" height="291" border="0"></a>
+            <br><br>
+            The My Network application is shown above.  Several remote computers are
+            displayed.  One computer is displayed with a fully qualified domain name, others have
+            simple host names, and one computer is shown with an IP address only.  The address is
+            shown when a host name cannot be determined by consulting a DNS server or the local
+            /etc/hosts file.<br><br>
+            <a href="images/mynetworkshares.jpg"><img src="images/mynetworkshares_thm.jpg" width="250" height="255" border="0"></a>
+            <br><br>
+            Double-clicking on a specific computer opens another window displaying the folders
+            that are shared on that computer.  The window above shows a single shared folder
+            called <i>Linux Home Folders</i>.<br><br>
+            Once you have the shared folder you're looking for, double-click on it.  That folder
+            will open in a Tracker window just as though the files were local to your machine.
+            At this point, you can browse through the remote file share using Tracker or the command
+            terminal.  Aside from performance, it should be transparent that you are accessing files
+            on another computer.<br><br>
+            If the remote computer has been configured to authenticate users against the BeSure
+            authentication server, you will be prompted for a user name and password before being
+            allowed to work with any of the files, and consequently, before the Tracker window
+            appears.<br><br>
+            <a href="images/loginpanel.jpg"><img src="images/loginpanel_thm.jpg" width="150" height="87" border="0"></a>
+            <br><br>
+            You can obtain information on any of the computers listed in the MyNetwork window, including
+            other names (aliases) that computer can be referenced by, the IP address(es) of the computer,
+            the type of hardware platform, the operating system, and number of active connections.  To
+            view this information on a computer in the list, simply highlight the desired computer, then
+            click the <i>About this Computer</i> button.<br><br>
+            <a href="images/AboutComputer.jpg"><img src="images/AboutComputer_thm.jpg" width="170" height="214" border="0"></a>
+            <br><br>
+            </font> 
+          </td>
+        </tr>
+        <tr> 
+          <td>&nbsp; 
+            <table width="430" cellspacing="0" cellpadding="3" border="0" bgcolor="#EEEEEE">
+              <tr> 
+                <td><font face="verdana, arial, helvetica" size="2">&nbsp;<b>Using Terminal</b></font></td>
+              </tr>
+            </table>
+            <table width="430" cellspacing="0" cellpadding="0" border="0" bgcolor="#CCCCCC">
+              <tr> 
+                <td><img src="/images/pixel.gif" width="1" height="1" border="0"></td>
+              </tr>
+            </table>
+            <font face="verdana, arial, helvetica" size="2"><br><br>
+            You can also find computers and mount remote shared folders from the command line.
+            Two programs, <i>lshosts</i> and <i>mounthost</i> are provided for that purpose.
+            Both are installed in the BeOS shared bin folder (typically /boot/home/config/bin),
+            and should consequently be in your path.<br><br>
+            To obtain a list of computers on your network running the BeServed server application,
+            type <pre>lshosts</pre> on the command line and press Enter.  A list of computers will
+            be displayed by their network host name.  The computers are listed in the order they
+            respond to your query.  To view the shared folders exported on any host, simply append
+            the host name to the lshost command.  For example, to view the shared folders on a
+            remote computer named "beos" you would type <pre>lshosts beos</pre><br>
+            To mount a shared folder to a folder on your local computer, you use the mounthost command.
+            The syntax of this command is:<br><br>
+<pre>mounthost [-t] <i>host:shared_folder</i> [on] <i>path</i></pre><br>
+            Example:
+<pre>mounthost beos:BootDir /boot/home/bootdir</pre><br>
+            The <i>-t</i> option is used only when the server you access requires authentication.
+            Normally, you will receive a simple prompt at the terminal window asking for your user name,
+            then your password.  However, if you are using the mounthost command from within a shell
+            script, you may not have a terminal window in which to type.  In this case, using the <i>-t</i>
+            option displays the Tracker login panel displayed above.<br>
+            </font> 
+          </td>
+        </tr>
+      </table>
+        </td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+        <td valign="top"><hr>
+
+      <p><font size="1" face="verdana, arial, helvetica">Copyright © 2001 Teldar Corporation. 
+        All rights reserved.<br>
+        If you experience difficulties using this site, please contact <a href="mailto:webmaster@teldar.com">webmaster@teldar.com</a>.</font></p>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
