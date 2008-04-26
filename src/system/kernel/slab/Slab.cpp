@@ -178,24 +178,6 @@ static void free_magazine(depot_magazine *magazine);
 
 namespace ObjectCacheTracing {
 
-/*
-object_cache *create_object_cache(const char *name, size_t object_size,
-    size_t alignment, void *cookie, object_cache_constructor constructor,
-    object_cache_destructor);
-object_cache *create_object_cache_etc(const char *name, size_t object_size,
-    size_t alignment, size_t max_byte_usage, uint32 flags, void *cookie,
-    object_cache_constructor constructor, object_cache_destructor destructor,
-    object_cache_reclaimer reclaimer);
-
-void delete_object_cache(object_cache *cache);
-
-void *object_cache_alloc(object_cache *cache, uint32 flags);
-void object_cache_free(object_cache *cache, void *object);
-
-status_t object_cache_reserve(object_cache *cache, size_t object_count,
-    uint32 flags);
-*/
-
 class ObjectCacheTraceEntry : public AbstractTraceEntry {
 	public:
 		ObjectCacheTraceEntry(object_cache* cache)
