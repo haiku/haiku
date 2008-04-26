@@ -12,6 +12,7 @@
 #include "gdb.h"
 
 #include <debug.h>
+#include <debug_paranoia.h>
 #include <driver_settings.h>
 #include <frame_buffer_console.h>
 #include <int.h>
@@ -977,6 +978,7 @@ debug_early_boot_message(const char *string)
 status_t
 debug_init(kernel_args *args)
 {
+	debug_paranoia_init();
 	return arch_debug_console_init(args);
 }
 

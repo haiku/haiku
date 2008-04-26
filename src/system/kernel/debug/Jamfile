@@ -7,6 +7,7 @@ KernelMergeObject kernel_debug.o :
 	blue_screen.cpp
 	debug.cpp
 	debug_commands.cpp
+	debug_paranoia.cpp
 	debug_parser.cpp
 	debug_variables.cpp
 	frame_buffer_console.cpp
