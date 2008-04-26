@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku. All rights reserved.
+ * Copyright 2006-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  */
@@ -21,7 +21,7 @@ class BIconUtils {
 								BIconUtils(const BIconUtils&);
 			BIconUtils&			operator=(const BIconUtils&);
 
- public:
+public:
 
 	// Utility function to import an icon from the node that
 	// has either of the provided attribute names. Which icon type
@@ -30,11 +30,10 @@ class BIconUtils {
 	// is B_CMAP8, B_CMAP8 icons are preferred. In that case, the
 	// bitmap size must also match the provided icon_size "size"!
 	static	status_t			GetIcon(BNode* node,
-										const char* vectorIconAttrName,
-										const char* smallIconAttrName,
-										const char* largeIconAttrName,
-										icon_size size,
-										BBitmap* result);
+									const char* vectorIconAttrName,
+									const char* smallIconAttrName,
+									const char* largeIconAttrName,
+									icon_size size, BBitmap* result);
 
 	// Utility functions to import a vector icon in "flat icon"
 	// format from a BNode attribute or from a flat buffer in
@@ -46,12 +45,10 @@ class BIconUtils {
 	// width, the bitmap should have square dimension, or the
 	// icon will be cut off at the bottom (or have room left).
 	static	status_t			GetVectorIcon(BNode* node,
-											  const char* attrName,
-											  BBitmap* result);
+									const char* attrName, BBitmap* result);
 
 	static	status_t			GetVectorIcon(const uint8* buffer,
-											  size_t size,
-											  BBitmap* result);
+									size_t size, BBitmap* result);
 
 	// Utility function to import an "old" BeOS icon in B_CMAP8
 	// colorspace from either the small icon attribute or the
@@ -59,26 +56,23 @@ class BIconUtils {
 	// "largeIconAttrName". Which icon is loaded depends on
 	// the given "size".
 	static	status_t			GetCMAP8Icon(BNode* node,
-											 const char* smallIconAttrName,
-											 const char* largeIconAttrName,
-											 icon_size size,
-											 BBitmap* icon);
+									const char* smallIconAttrName,
+									const char* largeIconAttrName,
+									icon_size size, BBitmap* icon);
 
 	// Utility functions to convert from old icon colorspace
 	// into colorspace of BBitmap "result" (should be B_RGBA32
 	// to make any sense).
 	static	status_t			ConvertFromCMAP8(BBitmap* source,
-												 BBitmap* result);
+									BBitmap* result);
 
 	static	status_t			ConvertFromCMAP8(const uint8* data,
-												 uint32 width, uint32 height,
-												 uint32 bytesPerRow,
-												 BBitmap* result);
+									uint32 width, uint32 height,
+									uint32 bytesPerRow, BBitmap* result);
 
 	static	status_t			ConvertToCMAP8(const uint8* data,
-											   uint32 width, uint32 height,
-											   uint32 bytesPerRow,
-											   BBitmap* result);
+									uint32 width, uint32 height,
+									uint32 bytesPerRow, BBitmap* result);
 };
 
 #endif // ICON_UTILS_H
