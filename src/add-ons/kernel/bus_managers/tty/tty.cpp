@@ -14,6 +14,16 @@
 
 #include "tty.h"
 
+//#define TTY_TRACE
+#ifdef TTY_TRACE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
+
+
 status_t
 tty_open(struct ttyfile *, struct ddrover *, tty_service_func)
 {
