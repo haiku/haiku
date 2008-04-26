@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers tty ;
 
+UsePrivateKernelHeaders ;
+UsePrivateHeaders drivers ;
 UsePrivateHeaders kernel shared ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 

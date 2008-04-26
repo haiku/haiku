@@ -1,18 +1,32 @@
 /*
- * Copyright 2008, Haiku.
+ * Copyright 2008, François Revol, <revol@free.fr>.
+ * Copyright 2007-2008, Ingo Weinhold, bonefish@cs.tu-berlin.de.
+ * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		François Revol <revol@free.fr>
  */
 
+
+#include <ctype.h>
+#include <errno.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+#include <util/AutoLock.h>
+#include <util/kernel_cpp.h>
+
+#include <team.h>
+
+#include <tty.h>
 
 #include <KernelExport.h>
 #include <device_manager.h>
 #include <bus_manager.h>
 #include <tty/ttylayer.h>
 
-#include "tty.h"
+#include "tty_private.h"
 
 //#define TTY_TRACE
 #ifdef TTY_TRACE
@@ -61,6 +75,20 @@ tty_write(struct ttyfile *, struct ddrover *, const char *, size_t *)
 
 status_t
 tty_control(struct ttyfile *, struct ddrover *, ulong, void *, size_t)
+{
+	return B_OK;
+}
+
+
+status_t
+tty_select(struct ttyfile *, struct ddrover *, uint8, uint32, selectsync *)
+{
+	return B_OK;
+}
+
+
+status_t
+tty_deselect(struct ttyfile *, struct ddrover *, uint8, selectsync *)
 {
 	return B_OK;
 }
@@ -192,7 +220,36 @@ static struct tty_module_info sTTYModule = {
 	&tty_ddr_acquire
 };
 
+static struct tty_module_info_dano sDanoTTYModule = {
+	// ! this is *NOT* a real bus manager (no rescan call!)
+	//{
+		{
+			B_TTY_MODULE_NAME_DANO,
+			0, //B_KEEP_LOADED,
+			tty_module_std_ops
+		},
+		//NULL
+	//},
+	&tty_open,
+	&tty_close,
+	&tty_free,
+	&tty_read,
+	&tty_write,
+	&tty_control,
+	&tty_select,
+	&tty_deselect,
+	&tty_init,
+	&tty_ilock,
+	&tty_hwsignal,
+	&tty_in,
+	&tty_out,
+	&tty_ddr_start,
+	&tty_ddr_done,
+	&tty_ddr_acquire
+};
+
 module_info *modules[] = {
 	(module_info *)&sTTYModule,
+	(module_info *)&sDanoTTYModule,
 	NULL
 };
