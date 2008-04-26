@@ -446,7 +446,7 @@ sigint_sighandler (sig)
   if (interrupt_immediately)
     {
       interrupt_immediately = 0;
-#ifdef __BEOS__
+#if defined (__BEOS__) && !defined (__HAIKU__)
       /* XXXdbg -- throw_to_top_level() calls longjmp() which leaves our
 	 sigmask in a screwed up state so we reset it here. */
       /* FIXME - fnf: Is this a generic problem with bash, or something

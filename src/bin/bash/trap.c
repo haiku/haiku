@@ -140,7 +140,7 @@ initialize_traps ()
   set_signal_handler (SIGINT, original_signals[SIGINT]);
   sigmodes[SIGINT] |= SIG_SPECIAL;
 
-#if defined (__BEOS__)
+#if defined (__BEOS__) && !defined (__HAIKU__)
   /* BeOS sets SIGINT to SIG_IGN! */
   original_signals[SIGINT] = SIG_DFL;
 #endif

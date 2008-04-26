@@ -3137,7 +3137,7 @@ execute_builtin_or_function (words, builtin, var, redirects,
 void
 setup_async_signals ()
 {
-#if defined (__BEOS__)
+#if defined (__BEOS__) && !defined (__HAIKU__)
   set_signal_handler (SIGHUP, SIG_IGN);	/* they want csh-like behavior */
 #endif
 

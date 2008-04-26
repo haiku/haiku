@@ -335,7 +335,7 @@ sh_validfd (fd)
 /* There is a bug in the NeXT 2.1 rlogind that causes opens
    of /dev/tty to fail. */
 
-#if defined (__BEOS__)
+#if defined (__BEOS__) && !defined (__HAIKU__)
 /* On BeOS, opening in non-blocking mode exposes a bug in BeOS, so turn it
    into a no-op.  This should probably go away in the future. */
 #  undef O_NONBLOCK
