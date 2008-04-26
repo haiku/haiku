@@ -24,6 +24,8 @@
 #include <string.h>
 #include <sys/uio.h>
 
+#include "paranoia_config.h"
+
 
 //#define TRACE_BUFFER
 #ifdef TRACE_BUFFER
@@ -36,6 +38,11 @@
 	// maximum implementation derived buffer size is 65536
 
 //#define ENABLE_DEBUGGER_COMMANDS	1
+#define PARANOID_BUFFER_CHECK	NET_BUFFER_PARANOIA
+
+#define ENABLE_PARANOIA_CHECK_COMPONENT	NET_BUFFER_PARANOIA
+#include <debug_paranoia.h>
+
 
 struct data_node {
 	struct list_link link;
@@ -143,6 +150,34 @@ dump_net_buffer_stats(int argc, char** argv)
 }
 
 #endif	// ENABLE_DEBUGGER_COMMANDS
+
+
+#if PARANOID_BUFFER_CHECK
+
+static void
+check_buffer(net_buffer *_buffer)
+{
+	net_buffer_private *buffer = (net_buffer_private*)_buffer;
+
+	// sum up the size of all nodes
+	size_t size = 0;
+
+	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+	while (node != NULL) {
+		size += node->used;
+		node = (data_node *)list_get_next_item(&buffer->buffers, node);
+	}
+
+	if (size != buffer->size) {
+		panic("net_buffer %p size != sum of its data node sizes (%lu vs. %lu)",
+			buffer, buffer->size, size);
+	}
+}
+
+# 	define CHECK_BUFFER(buffer)	check_buffer(buffer)
+#else
+# 	define CHECK_BUFFER(buffer)	do {} while (false)
+#endif	// !PARANOID_BUFFER_CHECK
 
 
 static inline data_header *
@@ -430,6 +465,10 @@ create_buffer(size_t headerSpace)
 
 	buffer->type = -1;
 
+	CHECK_BUFFER(buffer);
+	CREATE_PARANOIA_CHECK_SET(buffer, "net_buffer");
+	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+
 	return buffer;
 }
 
@@ -440,6 +479,9 @@ free_buffer(net_buffer *_buffer)
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
 	TRACE(("%ld: free buffer %p\n", find_thread(NULL), buffer));
+
+	CHECK_BUFFER(buffer);
+	DELETE_PARANOIA_CHECK_SET(buffer);
 
 	data_node *node;
 	while ((node = (data_node *)list_remove_head_item(&buffer->buffers)) != NULL) {
@@ -464,6 +506,8 @@ duplicate_buffer(net_buffer *_buffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
+	ParanoiaChecker _(buffer);
+
 	TRACE(("%ld: duplicate_buffer(buffer %p)\n", find_thread(NULL), buffer));
 
 	net_buffer *duplicate = create_buffer(buffer->first_node.header_space);
@@ -478,6 +522,7 @@ duplicate_buffer(net_buffer *_buffer)
 	while (true) {
 		if (append_data(duplicate, node->start, node->used) < B_OK) {
 			free_buffer(duplicate);
+			CHECK_BUFFER(buffer);
 			return NULL;
 		}
 
@@ -487,6 +532,10 @@ duplicate_buffer(net_buffer *_buffer)
 	}
 
 	copy_metadata(duplicate, buffer);
+
+	CHECK_BUFFER(buffer);
+	CHECK_BUFFER(duplicate);
+	RUN_PARANOIA_CHECKS(duplicate);
 
 	return duplicate;
 }
@@ -504,6 +553,8 @@ static net_buffer *
 clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+
+	ParanoiaChecker _(buffer);
 
 	TRACE(("%ld: clone_buffer(buffer %p)\n", find_thread(NULL), buffer));
 
@@ -566,6 +617,11 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 
 	copy_metadata(clone, buffer);
 
+	CREATE_PARANOIA_CHECK_SET(clone, "net_buffer");
+	SET_PARANOIA_CHECK(clone, &clone->size, sizeof(clone->size));
+	CHECK_BUFFER(buffer);
+	CHECK_BUFFER(clone);
+
 	return clone;
 }
 
@@ -582,15 +638,22 @@ split_buffer(net_buffer *from, uint32 offset)
 	if (buffer == NULL)
 		return NULL;
 
+	ParanoiaChecker _(from);
+	ParanoiaChecker _2(buffer);
+
 	TRACE(("%ld: split_buffer(buffer %p -> %p, offset %ld)\n",
 		find_thread(NULL), from, buffer, offset));
 
 	if (trim_data(buffer, offset) == B_OK) {
-		if (remove_header(from, offset) == B_OK)
+		if (remove_header(from, offset) == B_OK) {
+			CHECK_BUFFER(from);
+			CHECK_BUFFER(buffer);
 			return buffer;
+		}
 	}
 
 	free_buffer(buffer);
+	CHECK_BUFFER(from);
 	return NULL;
 }
 
@@ -614,6 +677,10 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 	//dump_buffer(buffer);
 	//dprintf("with:\n");
 	//dump_buffer(with);
+
+	ParanoiaChecker _(buffer);
+	CHECK_BUFFER(buffer);
+	CHECK_BUFFER(with);
 
 	// TODO: this is currently very simplistic, I really need to finish the
 	//	harder part of this implementation (data_node management per header)
@@ -672,11 +739,15 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 		buffer->size += node->used;
 	}
 
+	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+
 	// the data has been merged completely at this point
 	free_buffer(with);
 
 	//dprintf(" merge result:\n");
 	//dump_buffer(buffer);
+	CHECK_BUFFER(buffer);
+
 	return B_OK;
 }
 
@@ -689,6 +760,8 @@ static status_t
 write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+
+	ParanoiaChecker _(buffer);
 
 	if (offset + size > buffer->size)
 		return B_BAD_VALUE;
@@ -718,6 +791,8 @@ write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 			return B_BAD_VALUE;
 	}
 
+	CHECK_BUFFER(buffer);
+
 	return B_OK;
 }
 
@@ -726,6 +801,8 @@ static status_t
 read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+
+	ParanoiaChecker _(buffer);
 
 	if (offset + size > buffer->size)
 		return B_BAD_VALUE;
@@ -755,6 +832,8 @@ read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 			return B_BAD_VALUE;
 	}
 
+	CHECK_BUFFER(buffer);
+
 	return B_OK;
 }
 
@@ -764,6 +843,8 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+
+	ParanoiaChecker _(buffer);
 
 	TRACE(("%ld: prepend_size(buffer %p, size %ld) [has %u]\n",
 		find_thread(NULL), buffer, size, node->header_space));
@@ -833,6 +914,9 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 	//dprintf(" prepend_size result:\n");
 	//dump_buffer(buffer);
+	CHECK_BUFFER(buffer);
+	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+
 	return B_OK;
 }
 
@@ -863,6 +947,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_last_item(&buffer->buffers);
 
+	ParanoiaChecker _(buffer);
+
 	TRACE(("%ld: append_size(buffer %p, size %ld)\n", find_thread(NULL),
 		buffer, size));
 	//dump_buffer(buffer);
@@ -885,6 +971,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		node->tail_space = 0;
 		node->used += previousTailSpace;
 		buffer->size += previousTailSpace;
+		SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
 
 		// allocate all buffers
 
@@ -911,6 +998,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 			buffer->size += sizeUsed;
 			sizeAdded += sizeUsed;
+			SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
 
 			list_add_item(&buffer->buffers, node);
 
@@ -924,6 +1012,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 		//dprintf(" append result 1:\n");
 		//dump_buffer(buffer);
+		CHECK_BUFFER(buffer);
+
 		return B_OK;
 	}
 
@@ -935,9 +1025,12 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 	node->used += size;
 	buffer->size += size;
+	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
 
 	//dprintf(" append result 2:\n");
 	//dump_buffer(buffer);
+	CHECK_BUFFER(buffer);
+
 	return B_OK;
 }
 
@@ -969,6 +1062,8 @@ remove_header(net_buffer *_buffer, size_t bytes)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
+	ParanoiaChecker _(buffer);
+
 	if (bytes > buffer->size)
 		return B_BAD_VALUE;
 
@@ -984,6 +1079,7 @@ remove_header(net_buffer *_buffer, size_t bytes)
 		if (node == NULL) {
 			if (left == 0)
 				break;
+			CHECK_BUFFER(buffer);
 			return B_ERROR;
 		}
 
@@ -1016,9 +1112,12 @@ remove_header(net_buffer *_buffer, size_t bytes)
 	}
 
 	buffer->size -= bytes;
+	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
 
 	//dprintf(" remove result:\n");
 	//dump_buffer(buffer);
+	CHECK_BUFFER(buffer);
+
 	return B_OK;
 }
 
@@ -1044,6 +1143,8 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	TRACE(("%ld: trim_data(buffer %p, newSize = %ld, buffer size = %ld)\n",
 		find_thread(NULL), buffer, newSize, buffer->size));
 	//dump_buffer(buffer);
+
+	ParanoiaChecker _(buffer);
 
 	if (newSize > buffer->size)
 		return B_BAD_VALUE;
@@ -1072,9 +1173,12 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	}
 
 	buffer->size = newSize;
+	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
 
 	//dprintf(" trim result:\n");
 	//dump_buffer(buffer);
+	CHECK_BUFFER(buffer);
+
 	return B_OK;
 }
 
@@ -1094,6 +1198,9 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 	net_buffer_private *source = (net_buffer_private *)_source;
 	TRACE(("%ld: append_cloned_data(buffer %p, source %p, offset = %ld, "
 		"bytes = %ld)\n", find_thread(NULL), buffer, source, offset, bytes));
+
+	ParanoiaChecker _(buffer);
+	ParanoiaChecker _2(source);
 
 	if (source->size < offset + bytes || source->size < offset)
 		return B_BAD_VALUE;
@@ -1141,6 +1248,10 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 
 	//dprintf(" append cloned result:\n");
 	//dump_buffer(buffer);
+	CHECK_BUFFER(source);
+	CHECK_BUFFER(buffer);
+	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+
 	return B_OK;
 }
 
@@ -1312,6 +1423,8 @@ direct_access(net_buffer *_buffer, uint32 offset, size_t size,
 	void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+
+	ParanoiaChecker _(buffer);
 
 	//TRACE(("direct_access(buffer %p, offset %ld, size %ld)\n", buffer, offset, size));
 
