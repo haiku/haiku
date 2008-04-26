@@ -82,18 +82,18 @@ BControl::BControl(BMessage *archive)
 		SetMessage(new BMessage(message));
 
 	const char *label;
-	if (archive->FindString("_label", &label) != B_OK)
+	if (archive->FindString("_label", &label) == B_OK)
 		SetLabel(label);
 
 	int32 value;
-	if (archive->FindInt32("_val", &value) != B_OK)
+	if (archive->FindInt32("_val", &value) == B_OK)
 		SetValue(value);
 
 	bool toggle;
-	if (archive->FindBool("_disable", &toggle) != B_OK)
+	if (archive->FindBool("_disable", &toggle) == B_OK)
 		SetEnabled(!toggle);
 
-	if (archive->FindBool("be:wants_nav", &toggle) != B_OK)
+	if (archive->FindBool("be:wants_nav", &toggle) == B_OK)
 		fWantsNav = toggle;
 }
 
