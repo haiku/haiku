@@ -344,7 +344,7 @@ BParameterWeb::~BParameterWeb()
 	CALLED();
 
 	if (mGroups != NULL) {
-		for(int32 i = mGroups->CountItems(); i-- > 0;) {
+		for (int32 i = mGroups->CountItems(); i-- > 0;) {
 			delete static_cast<BParameterGroup *>(mGroups->ItemAt(i));
 		}
 
@@ -1097,7 +1097,7 @@ BParameterGroup::Unflatten(type_code code, const void *buffer, ssize_t size)
 	//Clear all existing parameters/subgroups
 	int i;
 	if (mControls != NULL) {
-		for(i = 0; i < mControls->CountItems(); i++) {
+		for (i = 0; i < mControls->CountItems(); i++) {
 			BParameter *CurrentItem = static_cast<BParameter *>(mControls->ItemAt(i));
 			if (CurrentItem != NULL) {
 				delete CurrentItem;
@@ -2135,7 +2135,7 @@ BDiscreteParameter::MakeItemsFromInputs()
 	ASSERT(mInputs != NULL);
 
 	int32 count = mInputs->CountItems();
-	for(int32 i = 0; i < count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		BParameter *parameter = static_cast<BParameter *>(mInputs->ItemAt(i));
 		AddItem(i, parameter->Name());
 	}
@@ -2153,7 +2153,7 @@ BDiscreteParameter::MakeItemsFromOutputs()
 	ASSERT(mOutputs != NULL);
 
 	int32 count = mOutputs->CountItems();
-	for(int32 i = 0; i < count; i++) {
+	for (int32 i = 0; i < count; i++) {
 		BParameter *parameter = static_cast<BParameter *>(mOutputs->ItemAt(i));
 		AddItem(i, parameter->Name());
 	}
@@ -2174,7 +2174,7 @@ BDiscreteParameter::MakeEmpty()
 	}
 	mValues->MakeEmpty();
 
-	for(int32 i = mSelections->CountItems(); i-- > 0;) {
+	for (int32 i = mSelections->CountItems(); i-- > 0;) {
 		free(static_cast<char *>(mSelections->ItemAt(i)));
 	}
 	mSelections->MakeEmpty();

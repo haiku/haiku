@@ -54,7 +54,7 @@ void
 BCommandPipe::FlushArgs()
 {
 	// Delete all arguments from the list
-	for(int32 i = 0; i < fArgList.CountItems(); i++)
+	for (int32 i = 0; i < fArgList.CountItems(); i++)
 		free(fArgList.RemoveItem(0L));
 
 	fArgList.MakeEmpty();

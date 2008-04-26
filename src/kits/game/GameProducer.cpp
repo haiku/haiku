@@ -217,59 +217,55 @@ GameProducer::Connect(status_t error, const media_source& source, const media_de
 	// If something earlier failed, Connect() might still be called, but with a non-zero
 	// error code.  When that happens we simply unreserve the connection and do
 	// nothing else.
-	if (error)
-	{
+	if (error) {
 		fOutput.destination = media_destination::null;
 		fOutput.format = fPreferredFormat;
+		return;
 	}
-	else
-	{
-		// Okay, the connection has been confirmed.  Record the destination and format
-		// that we agreed on, and report our connection name again.
-		fOutput.destination = destination;
-		fOutput.format = format;
-		strncpy(io_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 
-		// Now that we're connected, we can determine our downstream latency.
-		// Do so, then make sure we get our events early enough.
-		media_node_id id;
-		FindLatencyFor(fOutput.destination, &fLatency, &id);
+	// Okay, the connection has been confirmed.  Record the destination and format
+	// that we agreed on, and report our connection name again.
+	fOutput.destination = destination;
+	fOutput.format = format;
+	strncpy(io_name, fOutput.name, B_MEDIA_NAME_LENGTH);
 
-		// Use a dry run to see how long it takes me to fill a buffer of data
+	// Now that we're connected, we can determine our downstream latency.
+	// Do so, then make sure we get our events early enough.
+	media_node_id id;
+	FindLatencyFor(fOutput.destination, &fLatency, &id);
+
+	// Use a dry run to see how long it takes me to fill a buffer of data
 		
-		// The first step to setup the buffer
-		bigtime_t start, produceLatency;
-		int32 frames = int32(fOutput.format.u.raw_audio.buffer_size / fFrameSize);
-		float* data = new float[frames * 2];
+	// The first step to setup the buffer
+	bigtime_t start, produceLatency;
+	int32 frames = int32(fOutput.format.u.raw_audio.buffer_size / fFrameSize);
+	float* data = new float[frames * 2];
 	
-		// Second, fill the buffer
-		start = ::system_time();
-		for(int32 i = 0; i < frames; i++)
-		{
-			data[i*2] = 0.8 * float(i/frames);
-			data[i*2+1] = 0.8 * float(i/frames);
-		}
-		produceLatency = ::system_time();
+	// Second, fill the buffer
+	start = ::system_time();
+	for (int32 i = 0; i < frames; i++) {
+		data[i*2] = 0.8 * float(i/frames);
+		data[i*2+1] = 0.8 * float(i/frames);
+	}
+	produceLatency = ::system_time();
 		
-		// Thid, calculate the latency
-		fInternalLatency = produceLatency - start;
-		SetEventLatency(fLatency + fInternalLatency);
+	// Third, calculate the latency
+	fInternalLatency = produceLatency - start;
+	SetEventLatency(fLatency + fInternalLatency);
 			
-		// Finaily, clean up
-		delete [] data;
+	// Finaily, clean up
+	delete [] data;
 		
-		// reset our buffer duration, etc. to avoid later calculations
-		bigtime_t duration = bigtime_t(1000000) * frames / bigtime_t(fOutput.format.u.raw_audio.frame_rate);
-		SetBufferDuration(duration);
+	// reset our buffer duration, etc. to avoid later calculations
+	bigtime_t duration = bigtime_t(1000000) * frames / bigtime_t(fOutput.format.u.raw_audio.frame_rate);
+	SetBufferDuration(duration);
 
-		// Set up the buffer group for our connection, as long as nobody handed us a
-		// buffer group (via SetBufferGroup()) prior to this.  
-		if (!fBufferGroup)
-		{
-			size_t size = fOutput.format.u.raw_audio.buffer_size;
-			int32 count = int32(fLatency / BufferDuration() + 2);
-			fBufferGroup = new BBufferGroup(size, count);
-		}
+	// Set up the buffer group for our connection, as long as nobody handed us a
+	// buffer group (via SetBufferGroup()) prior to this.  
+	if (!fBufferGroup) {
+		size_t size = fOutput.format.u.raw_audio.buffer_size;
+		int32 count = int32(fLatency / BufferDuration() + 2);
+		fBufferGroup = new BBufferGroup(size, count);
 	}
 }
 
@@ -278,8 +274,7 @@ void
 GameProducer::Disconnect(const media_source& what, const media_destination& where)
 {
 	// Make sure that our connection is the one being disconnected
-	if ((where == fOutput.destination) && (what == fOutput.source))
-	{
+	if ((where == fOutput.destination) && (what == fOutput.source)) {
 		fOutput.destination = media_destination::null;
 		fOutput.format = fPreferredFormat;
 		delete fBufferGroup;
@@ -300,10 +295,12 @@ status_t
 GameProducer::SetBufferGroup(const media_source& for_source, BBufferGroup* newGroup)
 {
 	// verify that we didn't get bogus arguments before we proceed
-	if (for_source != fOutput.source) return B_MEDIA_BAD_SOURCE;
+	if (for_source != fOutput.source)
+		return B_MEDIA_BAD_SOURCE;
 
 	// Are we being passed the buffer group we're already using?
-	if (newGroup == fBufferGroup) return B_OK;
+	if (newGroup == fBufferGroup)
+		return B_OK;
 
 	// Ahh, someone wants us to use a different buffer group.  At this point we delete
 	// the one we are using and use the specified one instead.  If the specified group is
@@ -312,13 +309,10 @@ GameProducer::SetBufferGroup(const media_source& for_source, BBufferGroup* newGr
 	// *before* deleting the buffer group, otherwise we'll deadlock waiting for that
 	// buffer to be recycled!
 	delete fBufferGroup;		// waits for all buffers to recycle
-	if (newGroup != NULL)
-	{
+	if (newGroup != NULL) {
 		// we were given a valid group; just use that one from now on
 		fBufferGroup = newGroup;
-	}
-	else
-	{
+	} else {
 		// we were passed a NULL group pointer; that means we construct
 		// our own buffer group to use from now on
 		size_t size = fOutput.format.u.raw_audio.buffer_size;
@@ -344,17 +338,13 @@ GameProducer::LateNoticeReceived(const media_source& what, bigtime_t how_much, b
 {
 	// If we're late, we need to catch up.  Respond in a manner appropriate to our
 	// current run mode.
-	if (what == fOutput.source)
-	{
-		if (RunMode() == B_RECORDING)
-		{
+	if (what == fOutput.source) {
+		if (RunMode() == B_RECORDING) {
 			// A hardware capture node can't adjust; it simply emits buffers at
 			// appropriate points.  We (partially) simulate this by not adjusting
 			// our behavior upon receiving late notices -- after all, the hardware
 			// can't choose to capture "sooner"....
-		}
-		else if (RunMode() == B_INCREASE_LATENCY)
-		{
+		} else if (RunMode() == B_INCREASE_LATENCY) {
 			// We're late, and our run mode dictates that we try to produce buffers
 			// earlier in order to catch up.  This argues that the downstream nodes are
 			// not properly reporting their latency, but there's not much we can do about
@@ -362,9 +352,7 @@ GameProducer::LateNoticeReceived(const media_source& what, bigtime_t how_much, b
 			// compensate.
 			fInternalLatency += how_much;
 			SetEventLatency(fLatency + fInternalLatency);
-		}
-		else
-		{
+		} else {
 			// The other run modes dictate various strategies for sacrificing data quality
 			// in the interests of timely data delivery.  The way *we* do this is to skip
 			// a buffer, which catches us up in time by one buffer duration.
@@ -382,8 +370,7 @@ GameProducer::LatencyChanged(const media_source& source, const media_destination
 	// buffers earlier (or later) than we were previously.  Make sure that the
 	// connection that changed is ours, and adjust to the new downstream
 	// latency if so.
-	if ((source == fOutput.source) && (destination == fOutput.destination))
-	{
+	if ((source == fOutput.source) && (destination == fOutput.destination)) {
 		fLatency = new_latency;
 		SetEventLatency(fLatency + fInternalLatency);
 	}
@@ -435,8 +422,7 @@ GameProducer::SetRunMode(run_mode mode)
 {
 	// We don't support offline run mode, so broadcast an error if we're set to
 	// B_OFFLINE.  Unfortunately, we can't actually reject the mode change...
-	if (B_OFFLINE == mode)
-	{
+	if (B_OFFLINE == mode) {
 		ReportError(B_NODE_FAILED_SET_RUN_MODE);
 	}
 }
@@ -450,8 +436,7 @@ GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 	{
 	case BTimedEventQueue::B_START:
 		// don't do anything if we're already running
-		if (RunState() != B_STARTED)
-		{
+		if (RunState() != B_STARTED) {
 			// We are going to start sending buffers so setup the needed bookkeeping
 			fFramesSent = 0;
 			fStartTime = event->event_time;
@@ -476,17 +461,16 @@ GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 	case BTimedEventQueue::B_HANDLE_BUFFER:
 		{
 			// make sure we're both started *and* connected before delivering a buffer
-			if ((RunState() == BMediaEventLooper::B_STARTED) && (fOutput.destination != media_destination::null))
-			{
+			if ((RunState() == BMediaEventLooper::B_STARTED) 
+				&& (fOutput.destination != media_destination::null)) {
 				// Get the next buffer of data
 				BBuffer* buffer = FillNextBuffer(event->event_time);
-				if (buffer)
-				{
+				if (buffer) {
 					// send the buffer downstream if and only if output is enabled
 					status_t err = B_ERROR;
-					if (fOutputEnabled) err = SendBuffer(buffer, fOutput.destination);
-					if (err)
-					{
+					if (fOutputEnabled)
+						err = SendBuffer(buffer, fOutput.destination);
+					if (err) {
 						// we need to recycle the buffer ourselves if output is disabled or
 						// if the call to SendBuffer() fails
 						buffer->Recycle();
@@ -511,8 +495,6 @@ GameProducer::HandleEvent(const media_timed_event* event, bigtime_t lateness, bo
 }
 
 
-// --------------------------------
-//  GameProducer		
 BBuffer* 
 GameProducer::FillNextBuffer(bigtime_t event_time)
 {	
@@ -521,7 +503,8 @@ GameProducer::FillNextBuffer(bigtime_t event_time)
 
 	// if we fail to get a buffer (for example, if the request times out), we skip this
 	// buffer and go on to the next, to avoid locking up the control thread
-	if (!buf) return NULL;
+	if (!buf) 
+		return NULL;
 
 	// we need to discribe the buffer
 	int64 frames = int64(fOutput.format.u.raw_audio.buffer_size / fFrameSize);
@@ -537,15 +520,12 @@ GameProducer::FillNextBuffer(bigtime_t event_time)
 	hdr->time_source = TimeSource()->ID();
 	
 	bigtime_t stamp;
-	if (RunMode() == B_RECORDING)
-	{
+	if (RunMode() == B_RECORDING) {
 		// In B_RECORDING mode, we stamp with the capture time.  We're not
 		// really a hardware capture node, but we simulate it by using the (precalculated)
 		// time at which this buffer "should" have been created.
 		stamp = event_time;
-	}
-	else
-	{
+	} else {
 		// okay, we're in one of the "live" performance run modes.  in these modes, we
 		// stamp the buffer with the time at which the buffer should be rendered to the
 		// output, not with the capture time.  fStartTime is the cached value of the
@@ -558,5 +538,4 @@ GameProducer::FillNextBuffer(bigtime_t event_time)
 
 	return buf;
 }
-
 

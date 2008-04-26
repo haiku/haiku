@@ -61,8 +61,7 @@ void ReleaseDevice()
 {
 	deviceCount--;
 	
-	if (deviceCount <= 0)
-	{
+	if (deviceCount <= 0) {
 		delete theDevice;
 		theDevice = NULL;
 	}
@@ -79,7 +78,7 @@ BGameSoundDevice::BGameSoundDevice()
 	fInitError = Connect();
 	
 	fSounds = new GameSoundBuffer*[kInitSoundCount];
-	for(int32 i = 0; i < kInitSoundCount; i++)
+	for (int32 i = 0; i < kInitSoundCount; i++)
 		fSounds[i] = NULL;	
 }
 
@@ -89,14 +88,13 @@ BGameSoundDevice::~BGameSoundDevice()
 	BMediaRoster* r = BMediaRoster::Roster();
 
 	// We need to stop all the sounds before we stop the mixer
-	for(int32 i = 0; i < fSoundCount; i++)
-	{
-		if (fSounds[i]) fSounds[i]->StopPlaying();
+	for (int32 i = 0; i < fSoundCount; i++) {
+		if (fSounds[i])
+			fSounds[i]->StopPlaying();
 		delete fSounds[i];
 	}
 	
-	if (fIsConnected)
-	{
+	if (fIsConnected) {
 		// stop the nodes if they are running
 		r->StopNode(fConnection->producer, 0, true);		// synchronous stop
 	
@@ -150,13 +148,13 @@ BGameSoundDevice::CreateBuffer(gs_id * sound,
 								const void * data,
 								int64 frames)
 {
-	if (frames <= 0 || !sound) return B_BAD_VALUE;
+	if (frames <= 0 || !sound) 
+		return B_BAD_VALUE;
 	
 	status_t err = B_MEDIA_TOO_MANY_BUFFERS;	
 	int32 position = AllocateSound();
 	
-	if (position >= 0)
-	{
+	if (position >= 0) {
 		fSounds[position] = new SimpleSoundBuffer(format, data, frames);
 		err = fSounds[position]->Connect(&fConnection->producer);
 	}	
@@ -171,13 +169,13 @@ BGameSoundDevice::CreateBuffer(gs_id * sound,
 								const void * object,
 								const gs_audio_format * format)
 {
-	if (!object || !sound) return B_BAD_VALUE;
+	if (!object || !sound) 
+		return B_BAD_VALUE;
 	
 	status_t err = B_MEDIA_TOO_MANY_BUFFERS;	
 	int32 position = AllocateSound();
 	
-	if (position >= 0)
-	{
+	if (position >= 0) {
 		fSounds[position] = new StreamingSoundBuffer(format, object);
 		err = fSounds[position]->Connect(&fConnection->producer);
 	}	
@@ -193,8 +191,7 @@ BGameSoundDevice::ReleaseBuffer(gs_id sound)
 	if (sound <= 0)
 		return;
 
-	if (fSounds[sound-1])
-	{
+	if (fSounds[sound-1]) {
 		// We must stop playback befor destroying the sound or else
 		// we may recieve fatel errors.
 		fSounds[sound-1]->StopPlaying();
@@ -218,8 +215,8 @@ BGameSoundDevice::Buffer(gs_id sound,
 	if (fSounds[sound-1]->Data()) {
 		data = malloc(format->buffer_size);
 		memcpy(data, fSounds[sound-1]->Data(), format->buffer_size);
-	}
-	else data = NULL;
+	} else
+		data = NULL;
 	
 	return B_OK;	
 }
@@ -270,7 +267,8 @@ BGameSoundDevice::GetAttributes(gs_id sound,
 								gs_attribute * attributes,
 								size_t attributeCount)
 {
-	if (!fSounds[sound-1]) return B_ERROR;
+	if (!fSounds[sound-1]) 
+		return B_ERROR;
 		
 	return fSounds[sound-1]->GetAttributes(attributes, attributeCount); 
 }
@@ -281,7 +279,8 @@ BGameSoundDevice::SetAttributes(gs_id sound,
 								gs_attribute * attributes,
 								size_t attributeCount)
 {
-	if (!fSounds[sound-1]) return B_ERROR;
+	if (!fSounds[sound-1]) 
+		return B_ERROR;
 	
 	return fSounds[sound-1]->SetAttributes(attributes, attributeCount);
 }				
@@ -297,29 +296,35 @@ BGameSoundDevice::Connect()
 	dormant_node_info mixer_dormant_info;
 	int32 mixer_count = 1; // for now, we only care about the first  we find.
 	err = r->GetDormantNodes(&mixer_dormant_info, &mixer_count, 0, 0, 0, B_SYSTEM_MIXER, 0);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	//fMixer = new media_node;
 	err = r->InstantiateDormantNode(mixer_dormant_info, &fConnection->producer);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	// retieve the system's audio mixer
 	err = r->GetAudioMixer(&fConnection->consumer);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	int32 count = 1;
 	media_input mixerInput;
 	err = r->GetFreeInputsFor(fConnection->consumer, &mixerInput, 1, &count);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	count = 1;
 	media_output mixerOutput;
 	err = r->GetFreeOutputsFor(fConnection->producer, &mixerOutput, 1, &count);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	media_format format(mixerOutput.format);
 	err = r->Connect(mixerOutput.source, mixerInput.destination, &format, &mixerOutput, &mixerInput);
-	if (err != B_OK) return err;	
+	if (err != B_OK) 
+		return err;	
 	
 	// set the producer's time source to be the "default" time source, which
 	// the Mixer uses too.
@@ -329,13 +334,12 @@ BGameSoundDevice::Connect()
 	// Start our mixer's time source if need be. Chances are, it won't need to be, 
 	// but if we forget to do this, our mixer might not do anything at all.
 	BTimeSource* mixerTimeSource = r->MakeTimeSourceFor(fConnection->producer);
-	if (! mixerTimeSource) return B_ERROR;
+	if (!mixerTimeSource) 
+		return B_ERROR;
 
-	if (!mixerTimeSource->IsRunning()) 
-	{
+	if (!mixerTimeSource->IsRunning()) {
 		status_t err = r->StartNode(mixerTimeSource->Node(), BTimeSource::RealTime());
-		if (err != B_OK) 
-		{
+		if (err != B_OK) {
 			mixerTimeSource->Release();
 			return err;
 		}
@@ -345,7 +349,8 @@ BGameSoundDevice::Connect()
 	bigtime_t tpNow = mixerTimeSource->Now();
 	err = r->StartNode(fConnection->producer, tpNow + 10000);
 	mixerTimeSource->Release();
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	// the inputs and outputs might have been reassigned during the
 	// nodes' negotiation of the Connect().  That's why we wait until
@@ -366,16 +371,16 @@ BGameSoundDevice::Connect()
 int32
 BGameSoundDevice::AllocateSound()
 {
-	for(int32 i = 0; i < fSoundCount; i++)
+	for (int32 i = 0; i < fSoundCount; i++)
 		if (!fSounds[i])
 			return i;
 	
 	// we need to allocate new space for the sound
 	GameSoundBuffer ** sounds = new GameSoundBuffer*[fSoundCount + kGrowth];
-	for(int32 i = 0; i < fSoundCount; i++)
+	for (int32 i = 0; i < fSoundCount; i++)
 		sounds[i] = fSounds[i];
 		
-	for(int32 i	= fSoundCount; i < fSoundCount + kGrowth; i++)
+	for (int32 i = fSoundCount; i < fSoundCount + kGrowth; i++)
 		sounds[i] = NULL;
 	
 	// replace the old list	

@@ -93,8 +93,7 @@ GameSoundBuffer::~GameSoundBuffer()
 {
 	BMediaRoster* r = BMediaRoster::Roster();
 	
-	if (fIsConnected)
-	{
+	if (fIsConnected) {
 		// Ordinarily we'd stop *all* of the nodes in the chain at this point.  However,
 		// one of the nodes is the System Mixer, and stopping the Mixer is a Bad Idea (tm).
 		// So, we just disconnect from it, and release our references to the nodes that
@@ -172,24 +171,21 @@ GameSoundBuffer::SetPan(float pan, bigtime_t duration)
 	if (pan < -1.0 || pan > 1.0)
 		return B_BAD_VALUE;
 	
-	if (fPanRamp) delete fPanRamp;
+	if (fPanRamp) 
+		delete fPanRamp;
 	
-	if (duration < 100000)
-	{
+	if (duration < 100000) {
 		fPan = pan;
 		
-		if (fPan < 0.0)
-		{
+		if (fPan < 0.0) {
 			fPanLeft = 1.0;
 			fPanRight = 1.0 + fPan;
-		}
-		else
-		{
+		} else {
 			fPanRight = 1.0;
 			fPanLeft = 1.0 - fPan;
 		}	
-	}	
-	else fPanRamp = InitRamp(&fPan, pan, fFormat.frame_rate, duration);
+	} else 
+		fPanRamp = InitRamp(&fPan, pan, fFormat.frame_rate, duration);
 		
 	return B_OK;
 }	
@@ -199,18 +195,18 @@ status_t
 GameSoundBuffer::GetAttributes(gs_attribute * attributes,
 							   size_t attributeCount)
 {
-	for(size_t i = 0; i < attributeCount; i++)
-	{
-		switch(attributes[i].attribute)
-		{
+	for (size_t i = 0; i < attributeCount; i++) {
+		switch(attributes[i].attribute) {
 			case B_GS_GAIN:
 				attributes[i].value = fGain;
-				if (fGainRamp) attributes[i].duration = fGainRamp->duration;
+				if (fGainRamp) 
+					attributes[i].duration = fGainRamp->duration;
 				break;
 			
 			case B_GS_PAN:
 				attributes[i].value = fPan;
-				if (fPanRamp) attributes[i].duration = fGainRamp->duration;
+				if (fPanRamp) 
+					attributes[i].duration = fGainRamp->duration;
 			
 			case B_GS_LOOPING:
 				attributes[i].value = (fLooping) ? -1.0 : 0.0;
@@ -232,10 +228,8 @@ GameSoundBuffer::SetAttributes(gs_attribute * attributes,
 {
 	status_t error = B_OK;
 
-	for(size_t i = 0; i < attributeCount; i++)
-	{	
-		switch(attributes[i].attribute)
-		{
+	for (size_t i = 0; i < attributeCount; i++) {
+		switch(attributes[i].attribute) {
 			case B_GS_GAIN:
 				error = SetGain(attributes[i].value, attributes[i].duration);
 				break;
@@ -264,12 +258,10 @@ GameSoundBuffer::Play(void * data, int64 frames)
 			
 	FillBuffer(buffer, frames);
 	
-	switch(fFormat.format)
-	{
+	switch(fFormat.format) {
 		case gs_audio_format::B_GS_U8:
 		{
-			for(int64 i = 0; i < frames; i++)
-			{
+			for (int64 i = 0; i < frames; i++) {
 				ApplyMod((uint8*)data, (uint8*)buffer, i, fGain, pan);
 				UpdateMods();
 			}
@@ -279,8 +271,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 		
 		case gs_audio_format::B_GS_S16:
 		{		
-			for(int64 i = 0; i < frames; i++)
-			{
+			for (int64 i = 0; i < frames; i++) {
 				ApplyMod((int16*)data, (int16*)buffer, i, fGain, pan);
 				UpdateMods();
 			}
@@ -290,8 +281,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
 		
 		case gs_audio_format::B_GS_S32:
 		{
-			for(int64 i = 0; i < frames; i++)
-			{
+			for (int64 i = 0; i < frames; i++) {
 				ApplyMod((int32*)data, (int32*)buffer, i, fGain, pan);
 				UpdateMods();
 			}
@@ -301,8 +291,7 @@ GameSoundBuffer::Play(void * data, int64 frames)
  		
  		case gs_audio_format::B_GS_F:
  		{
-			for(int64 i = 0; i < frames; i++)
-			{
+			for (int64 i = 0; i < frames; i++) {
 				ApplyMod((float*)data, (float*)buffer, i, fGain, pan);
 				UpdateMods();
 			}
@@ -320,32 +309,23 @@ void
 GameSoundBuffer::UpdateMods()
 {		
 	// adjust the gain if needed		
-	if (fGainRamp)
-	{
-		if (ChangeRamp(fGainRamp))
-		{
+	if (fGainRamp) {
+		if (ChangeRamp(fGainRamp)) {
 			delete fGainRamp;
 			fGainRamp = NULL;
 		}
 	}
 		
 	// adjust the ramp if needed
-	if (fPanRamp)
-	{
-		if (ChangeRamp(fPanRamp))
-		{
+	if (fPanRamp) {
+		if (ChangeRamp(fPanRamp)) {
 			delete fPanRamp;
 			fPanRamp = NULL;
-		}
-		else
-		{
-			if (fPan < 0.0)
-			{
+		} else {
+			if (fPan < 0.0) {
 				fPanLeft = 1.0;
 				fPanRight = 1.0 + fPan;
-			}
-			else
-			{
+			} else {
 				fPanRight = 1.0;
 				fPanLeft = 1.0 - fPan;
 			}
@@ -378,14 +358,16 @@ GameSoundBuffer::Connect(media_node * consumer)
 	status_t err;
 	
 	err = r->RegisterNode(fNode);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	// make sure the Media Roster knows that we're using the node
 	r->GetNodeFor(fNode->Node().node, &fConnection->producer);
 
 	// connect to the mixer
 	fConnection->consumer = *consumer;
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	// set the producer's time source to be the "default" time source, which
 	// the Mixer uses too.
@@ -397,17 +379,20 @@ GameSoundBuffer::Connect(media_node * consumer)
 	media_output soundOutput;
 	int32 count = 1;
 	err = r->GetFreeOutputsFor(fConnection->producer, &soundOutput, 1, &count);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	count = 1;
 	err = r->GetFreeInputsFor(fConnection->consumer, &mixerInput, 1, &count);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 
 	// got the endpoints; now we connect it!
 	media_format format;
 	format.type = B_MEDIA_RAW_AUDIO;	
 	format.u.raw_audio = media_raw_audio_format::wildcard;
 	err = r->Connect(soundOutput.source, mixerInput.destination, &format, &soundOutput, &mixerInput);
-	if (err != B_OK) return err;
+	if (err != B_OK) 
+		return err;
 	
 	// the inputs and outputs might have been reassigned during the
 	// nodes' negotiation of the Connect().  That's why we wait until
@@ -424,7 +409,8 @@ GameSoundBuffer::Connect(media_node * consumer)
 status_t
 GameSoundBuffer::StartPlaying()
 {
-	if (fIsPlaying) return EALREADY;
+	if (fIsPlaying) 
+		return EALREADY;
 	
 	BMediaRoster* r = BMediaRoster::Roster();
 	BTimeSource* ts = r->MakeTimeSourceFor(fConnection->producer);
@@ -445,7 +431,8 @@ GameSoundBuffer::StartPlaying()
 status_t
 GameSoundBuffer::StopPlaying()
 {
-	if (!fIsPlaying) return EALREADY;
+	if (!fIsPlaying) 
+		return EALREADY;
 	
 	BMediaRoster* r = BMediaRoster::Roster();
 	r->StopNode(fConnection->producer, 0, true);		// synchronous stop
@@ -499,27 +486,22 @@ SimpleSoundBuffer::FillBuffer(void * data, int64 frames)
 	char * buffer = (char*)data;
 	size_t bytes = fFrameSize * frames;
 	
-	if (fPosition + bytes >= fBufferSize)
-	{
-		if (fPosition < fBufferSize)
-		{
+	if (fPosition + bytes >= fBufferSize) {
+		if (fPosition < fBufferSize) {
 			// copy the remaining frames
 			size_t remainder = fBufferSize - fPosition;
 			memcpy(buffer, &fBuffer[fPosition], remainder);
 		
-			if (fLooping) 
-			{
+			if (fLooping) {
 				// restart the sound from the begging
 				memcpy(&buffer[remainder], fBuffer, bytes - remainder);
 				fPosition = bytes - remainder;
-			}
-			else fPosition = fBufferSize;
-		}
-		else memset(data, 0, bytes);
+			} else
+				fPosition = fBufferSize;
+		} else
+			memset(data, 0, bytes);
 			// there is nothing left to play
-	}
-	else 
-	{
+	} else {
 		memcpy(buffer, &fBuffer[fPosition], bytes);
 		fPosition += bytes;
 	}
@@ -549,3 +531,4 @@ StreamingSoundBuffer::FillBuffer(void * buffer,
 	size_t bytes = fFrameSize * frames;	
 	object->FillBuffer(buffer, bytes);
 }
+

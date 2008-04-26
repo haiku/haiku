@@ -235,8 +235,10 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 				fBitmap = new BBitmap(fHeader.bounds, fHeader.colors);
 				if (!fBitmap)
 					return B_ERROR;
-				if ((uint32)fBitmap->BytesPerRow() != fHeader.rowBytes)
+				if ((uint32)fBitmap->BytesPerRow() != fHeader.rowBytes) {
+					fprintf(stderr, "BitmapStream %ld %ld\n", fBitmap->BytesPerRow(), fHeader.rowBytes);
 					return B_MISMATCHED_VALUES;
+				}
 			}
 			if (fBitmap)
 				fSize = sizeof(TranslatorBitmap) + fBitmap->BitsLength();

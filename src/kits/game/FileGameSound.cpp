@@ -33,13 +33,11 @@ bool FillBuffer(_gs_ramp * ramp, uint8 * data, uint8 * buffer, size_t * bytes)
 {
 	int32 samples = *bytes / sizeof(int16);
 	
-	for(int32 byte = 0; byte < samples; byte++)
-	{
+	for (int32 byte = 0; byte < samples; byte++) {
 		float gain = *ramp->value;
 		data[byte] = uint8(float(buffer[byte]) * gain);
 				
-		if (ChangeRamp(ramp))
-		{
+		if (ChangeRamp(ramp)) {
 			*bytes = byte * sizeof(int16);
 			return true;
 		}
@@ -52,13 +50,11 @@ bool FillBuffer(_gs_ramp * ramp, int16 * data, int16 * buffer, size_t * bytes)
 {
 	int32 samples = *bytes / sizeof(int16);
 	
-	for(int32 byte = 0; byte < samples; byte++)
-	{
+	for (int32 byte = 0; byte < samples; byte++) {
 		float gain = *ramp->value;
 		data[byte] = int16(float(buffer[byte]) * gain);
 				
-		if (ChangeRamp(ramp))
-		{
+		if (ChangeRamp(ramp)) {
 			*bytes = byte * sizeof(int16);
 			return true;
 		}
@@ -72,13 +68,11 @@ bool FillBuffer(_gs_ramp * ramp, int32 * data, int32 * buffer, size_t * bytes)
 	size_t byte = 0;
 	bool bytesAreReady = (*bytes > 0);
 
-	while(bytesAreReady)
-	{
+	while (bytesAreReady) {
 		float gain = *ramp->value;
 		data[byte] = int32(float(buffer[byte]) * gain);
 		
-		if (ChangeRamp(ramp))
-		{
+		if (ChangeRamp(ramp)) {
 			*bytes = byte;
 			return true;
 		}
@@ -95,13 +89,11 @@ bool FillBuffer(_gs_ramp * ramp, float * data, float * buffer, size_t * bytes)
 	size_t byte = 0;
 	bool bytesAreReady = (*bytes > 0);
 
-	while(bytesAreReady)
-	{
+	while (bytesAreReady) {
 		float gain = *ramp->value;
 		data[byte] = buffer[byte] * gain;
 		
-		if (ChangeRamp(ramp))
-		{
+		if (ChangeRamp(ramp)) {
 			*bytes = byte;
 			return true;
 		}
@@ -145,8 +137,7 @@ BFileGameSound::BFileGameSound(const char *file,
  		fPaused(false),
  		fPauseGain(1.0)
 {
-	if (InitCheck() == B_OK)
-	{
+	if (InitCheck() == B_OK) {
 		entry_ref node;
 	
 		if (get_ref_for_path(file, &node) != B_OK)
@@ -159,10 +150,10 @@ BFileGameSound::BFileGameSound(const char *file,
 
 BFileGameSound::~BFileGameSound()
 {
-	if (fReadThread >= 0) kill_thread(fReadThread);
+	if (fReadThread >= 0) 
+		kill_thread(fReadThread);
 	
-	if (fAudioStream)
-	{	
+	if (fAudioStream) {
 		if (fAudioStream->stream) 
 			fAudioStream->file->ReleaseTrack(fAudioStream->stream);
 	
@@ -307,16 +298,14 @@ status_t
 BFileGameSound::SetPaused(bool isPaused,
 						  bigtime_t rampTime)
 {
-	if (fPaused != isPaused)
-	{
+	if (fPaused != isPaused) {
 		Lock();
 	
 		// Clear any old ramping	
 		delete fPausing;
 		fPausing = NULL;
 	
-		if (rampTime > 100000) 
-		{
+		if (rampTime > 100000) {
 			// Setup for ramping
 			if (isPaused)
 				fPausing = InitRamp(&fPauseGain, 0.0, Format().frame_rate, rampTime);
@@ -335,9 +324,11 @@ BFileGameSound::SetPaused(bool isPaused,
 int32
 BFileGameSound::IsPaused()
 {
-	if (fPausing) return B_PAUSE_IN_PROGRESS;
+	if (fPausing)
+		return B_PAUSE_IN_PROGRESS;
 	
-	if (fPaused) return B_PAUSED;
+	if (fPaused)
+		return B_PAUSED;
 	
 	return B_NOT_PAUSED;
 }
@@ -403,7 +394,6 @@ BFileGameSound::Init(const entry_ref* file)
 bool
 BFileGameSound::Load()
 {
-	
 	if (fPlayPosition != 0) {
 		if (fBufferSize > fPlayPosition)
 			memcpy(fBuffer, fBuffer + fPlayPosition, fBufferSize - fPlayPosition);
