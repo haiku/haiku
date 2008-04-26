@@ -41,6 +41,10 @@ status_t arch_cpu_user_memset(void *s, char c, size_t count,
 void arch_cpu_idle(void);
 void arch_cpu_sync_icache(void *address, size_t length);
 
+void arch_cpu_memory_read_barrier(void);
+void arch_cpu_memory_write_barrier(void);
+
+
 #ifdef __cplusplus
 }
 #endif 

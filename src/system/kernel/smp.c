@@ -681,3 +681,17 @@ call_all_cpus_sync(void (*func)(void *, int), void *cookie)
 	restore_interrupts(state);
 }
 
+
+void
+memory_read_barrier(void)
+{
+	arch_cpu_memory_read_barrier();
+}
+
+
+void
+memory_write_barrier(void)
+{
+	arch_cpu_memory_write_barrier();
+}
+

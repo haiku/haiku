@@ -110,6 +110,22 @@ arch_cpu_sync_icache(void *address, size_t len)
 }
 
 
+void
+arch_cpu_memory_read_barrier(void)
+{
+	asm volatile ("nop;" : : : "memory");
+#warning M68k: check arch_cpu_memory_read_barrier
+}
+
+
+void
+arch_cpu_memory_write_barrier(void)
+{
+	asm volatile ("nop;" : : : "memory");
+#warning M68k: check arch_cpu_memory_write_barrier
+}
+
+
 void 
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {

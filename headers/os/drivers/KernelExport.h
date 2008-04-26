@@ -154,6 +154,8 @@ extern status_t		unregister_kernel_daemon(daemon_hook hook, void *arg);
 
 extern void			call_all_cpus(void (*func)(void *, int), void *cookie);
 extern void			call_all_cpus_sync(void (*func)(void *, int), void *cookie);
+extern void			memory_read_barrier(void);
+extern void			memory_write_barrier(void);
 
 /* safe methods to access user memory without having to lock it */
 extern status_t		user_memcpy(void *to, const void *from, size_t size);
