@@ -88,12 +88,14 @@ send_external_command(const char *command, int *result)
 		if (bytesRead == 0) {
 			fprintf(stderr, "Error: Unexpected end of fs_shell reply. Was "
 				"still expecting %d bytes\n", toRead);
+			close(fd);
 			return false;
 		}
 		
 		replyBuffer += bytesRead;
 		toRead -= bytesRead;
 	}
+	close(fd);
 
 	*result = reply.error;
 	return true;
