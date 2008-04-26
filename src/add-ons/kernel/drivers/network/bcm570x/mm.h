@@ -44,8 +44,12 @@ typedef vint32 MM_ATOMIC_T;
 #ifdef __INTEL__
 #define mb()    __asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory") 
 #else
+#ifdef __HAIKU__
+#define mb()	memory_write_barrier()
+#else
 #warning no memory barrier function defined.
 #define mb()	
+#endif
 #endif
 #define wmb()    mb()
 #define rmb()    mb()
