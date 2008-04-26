@@ -24,8 +24,11 @@ struct ddrover {
 };
 
 struct ddomain {
-	
+	struct ddrover	*r;
+	bool	bg;
+	bool	locked;
 };
+
 
 typedef bool (*tty_service_func)(struct tty *tty, struct ddrover *rover, uint op);
 
@@ -82,7 +85,8 @@ struct ttyfile {
 
 typedef struct tty_module_info tty_module_info;
 
-struct tty_module_info {
+// this version is compatible with BeOS R5
+struct tty_module_info_r5 {
 	// not a real bus manager... no rescan() !
 	module_info	mi;
 	status_t	(*ttyopen)(struct ttyfile *, struct ddrover *, tty_service_func);
@@ -91,10 +95,6 @@ struct tty_module_info {
 	status_t	(*ttyread)(struct ttyfile *, struct ddrover *, char *, size_t *);
 	status_t	(*ttywrite)(struct ttyfile *, struct ddrover *, const char *, size_t *);
 	status_t	(*ttycontrol)(struct ttyfile *, struct ddrover *, ulong, void *, size_t);
-#if 0 /* Dano! */
-	status_t	(*ttyselect)(struct ttyfile *, struct ddrover *, uint8, uint32, selectsync *);
-	status_t	(*ttydeselect)(struct ttyfile *, struct ddrover *, uint8, selectsync *);
-#endif
 	void	(*ttyinit)(struct tty *, bool);
 	void	(*ttyilock)(struct tty *, struct ddrover *, bool );
 	void	(*ttyhwsignal)(struct tty *, struct ddrover *, int, bool);
@@ -102,7 +102,7 @@ struct tty_module_info {
 	int	(*ttyout)(struct tty *, struct ddrover *);
 	struct ddrover	*(*ddrstart)(struct ddrover *);
 	void	(*ddrdone)(struct ddrover *);
-	void	(*ddracquire)(struct ddrover *, struct ddomain *);
+	void	(*ddacquire)(struct ddrover *, struct ddomain *);
 };
 
 // BeOS R5.1d0 has a different module with the same version...
@@ -116,7 +116,6 @@ struct tty_module_info_dano {
 	status_t	(*ttyread)(struct ttyfile *, struct ddrover *, char *, size_t *);
 	status_t	(*ttywrite)(struct ttyfile *, struct ddrover *, const char *, size_t *);
 	status_t	(*ttycontrol)(struct ttyfile *, struct ddrover *, ulong, void *, size_t);
-
 	status_t	(*ttyselect)(struct ttyfile *, struct ddrover *, uint8, uint32, selectsync *);
 	status_t	(*ttydeselect)(struct ttyfile *, struct ddrover *, uint8, selectsync *);
 
@@ -127,10 +126,13 @@ struct tty_module_info_dano {
 	int	(*ttyout)(struct tty *, struct ddrover *);
 	struct ddrover	*(*ddrstart)(struct ddrover *);
 	void	(*ddrdone)(struct ddrover *);
-	void	(*ddracquire)(struct ddrover *, struct ddomain *);
+	void	(*ddacquire)(struct ddrover *, struct ddomain *);
 };
 
-#define B_TTY_MODULE_NAME		"bus_managers/tty/v1"
+#define B_TTY_MODULE_NAME_R5		"bus_managers/tty/v1"
 #define B_TTY_MODULE_NAME_DANO		"bus_managers/tty/v1.1"
+
+#define B_TTY_MODULE_NAME			B_TTY_MODULE_NAME_DANO
+#define tty_module_info				tty_module_info_dano
 
 #endif /* _TTY_TTYLAYER_H */

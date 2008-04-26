@@ -130,19 +130,19 @@ tty_out(struct tty *, struct ddrover *)
 
 
 struct ddrover *
-tty_ddr_start(struct ddrover *)
+tty_dd_rstart(struct ddrover *)
 {
 	return NULL;
 }
 
 
 void
-tty_ddr_done(struct ddrover *)
+tty_dd_rdone(struct ddrover *)
 {
 }
 
 void
-tty_ddr_acquire(struct ddrover *, struct ddomain *)
+tty_dd_acquire(struct ddrover *, struct ddomain *)
 {
 }
 
@@ -190,7 +190,7 @@ tty_module_std_ops(int32 op, ...)
 }
 
 
-static struct tty_module_info sTTYModule = {
+static struct tty_module_info_r5 sR5TTYModule = {
 	// ! this is *NOT* a real bus manager (no rescan call!)
 	//{
 		{
@@ -206,18 +206,14 @@ static struct tty_module_info sTTYModule = {
 	&tty_read,
 	&tty_write,
 	&tty_control,
-#if 0 /* Dano! */
-	&tty_select,
-	&tty_deselect,
-#endif
 	&tty_init,
 	&tty_ilock,
 	&tty_hwsignal,
 	&tty_in,
 	&tty_out,
-	&tty_ddr_start,
-	&tty_ddr_done,
-	&tty_ddr_acquire
+	&tty_dd_rstart,
+	&tty_dd_rdone,
+	&tty_dd_acquire
 };
 
 static struct tty_module_info_dano sDanoTTYModule = {
@@ -243,13 +239,13 @@ static struct tty_module_info_dano sDanoTTYModule = {
 	&tty_hwsignal,
 	&tty_in,
 	&tty_out,
-	&tty_ddr_start,
-	&tty_ddr_done,
-	&tty_ddr_acquire
+	&tty_dd_rstart,
+	&tty_dd_rdone,
+	&tty_dd_acquire
 };
 
 module_info *modules[] = {
-	(module_info *)&sTTYModule,
+	(module_info *)&sR5TTYModule,
 	(module_info *)&sDanoTTYModule,
 	NULL
 };
