@@ -43,3 +43,10 @@ atomic_get(vint32 *value)
 }
 
 
+status_t
+_get_port_message_info_etc(port_id id, port_message_info *info,
+	size_t infoSize, uint32 flags, bigtime_t timeout)
+{
+	return B_ERROR;
+}
+
