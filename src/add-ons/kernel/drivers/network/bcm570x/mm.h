@@ -41,7 +41,12 @@ typedef vint32 MM_ATOMIC_T;
 #define MM_MEMWRITEL(ptr, val) __raw_writel(val, ptr)
 #define MM_MEMREADL(ptr) __raw_readl(ptr)
 
+#ifdef __INTEL__
 #define mb()    __asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory") 
+#else
+#warning no memory barrier function defined.
+#define mb()	
+#endif
 #define wmb()    mb()
 #define rmb()    mb()
 
