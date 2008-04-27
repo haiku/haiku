@@ -248,6 +248,7 @@ TraceOutput::Print(const char* format,...)
 	va_end(args);
 }
 
+#if ENABLE_TRACING
 
 void
 TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
@@ -272,6 +273,7 @@ TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
 			Print("  %p\n", (void*)address);
 	}
 }
+#endif // ENABLE_TRACING
 
 
 void
