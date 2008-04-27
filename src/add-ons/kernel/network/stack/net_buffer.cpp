@@ -509,6 +509,7 @@ class ReleaseDataHeader : public DataHeaderTraceEntry {
 
 #else
 #	define T(x)
+#	define T2(x)
 #endif	// NET_BUFFER_TRACING
 
 
