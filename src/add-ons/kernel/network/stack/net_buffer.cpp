@@ -426,6 +426,83 @@ class Write : public NetBufferTraceEntry {
 };
 
 
+#if NET_BUFFER_TRACING >= 2
+
+class DataHeaderTraceEntry : public AbstractTraceEntry {
+	public:
+		DataHeaderTraceEntry(data_header* header)
+			:
+			fHeader(header)
+		{
+		}
+
+	protected:
+		data_header*	fHeader;
+};
+
+
+class CreateDataHeader : public DataHeaderTraceEntry {
+	public:
+		CreateDataHeader(data_header* header)
+			:
+			DataHeaderTraceEntry(header)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer data header create:  header: %p", fHeader);
+		}
+};
+
+
+class AcquireDataHeader : public DataHeaderTraceEntry {
+	public:
+		AcquireDataHeader(data_header* header, int32 refCount)
+			:
+			DataHeaderTraceEntry(header),
+			fRefCount(refCount)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer data header acquire: header: %p "
+				"-> ref count: %ld", fHeader, fRefCount);
+		}
+
+	private:
+		int32			fRefCount;
+};
+
+
+class ReleaseDataHeader : public DataHeaderTraceEntry {
+	public:
+		ReleaseDataHeader(data_header* header, int32 refCount)
+			:
+			DataHeaderTraceEntry(header),
+			fRefCount(refCount)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer data header release: header: %p "
+				"-> ref count: %ld", fHeader, fRefCount);
+		}
+
+	private:
+		int32			fRefCount;
+};
+
+#	define T2(x)	new(std::nothrow) NetBufferTracing::x
+#else
+#	define T2(x)
+#endif	// NET_BUFFER_TRACING >= 2
+
 }	// namespace NetBufferTracing
 
 #	define T(x)	new(std::nothrow) NetBufferTracing::x
@@ -557,6 +634,7 @@ create_data_header(size_t headerSpace)
 	header->first_node = NULL;
 
 	TRACE(("%ld:   create new data header %p\n", find_thread(NULL), header));
+	T2(CreateDataHeader(header));
 	return header;
 }
 
@@ -564,7 +642,9 @@ create_data_header(size_t headerSpace)
 static void
 release_data_header(data_header *header)
 {
-	if (atomic_add(&header->ref_count, -1) != 1)
+	int32 refCount = atomic_add(&header->ref_count, -1);
+	T2(ReleaseDataHeader(header, refCount - 1));
+	if (refCount != 1)
 		return;
 
 	TRACE(("%ld:   free header %p\n", find_thread(NULL), header));
@@ -575,7 +655,9 @@ release_data_header(data_header *header)
 inline void
 acquire_data_header(data_header *header)
 {
-	atomic_add(&header->ref_count, 1);
+	int32 refCount = atomic_add(&header->ref_count, 1);
+	(void)refCount;
+	T2(AcquireDataHeader(header, refCount + 1));
 }
 
 
