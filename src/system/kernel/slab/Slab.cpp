@@ -39,6 +39,11 @@
 #define TRACE_CACHE(cache, format, bananas...) do { } while (0)
 #endif
 
+#define OBJECT_CACHE_PARANOIA 1
+#define ENABLE_PARANOIA_CHECK_COMPONENT	OBJECT_CACHE_PARANOIA
+#include <debug_paranoia.h>
+
+
 #define CACHE_ALIGN_ON_SIZE	(30 << 1)
 
 static const int kMagazineCapacity = 32;
@@ -173,8 +178,8 @@ static depot_magazine *alloc_magazine();
 static void free_magazine(depot_magazine *magazine);
 
 
-
 #ifdef OBJECT_CACHE_TRACING
+
 
 namespace ObjectCacheTracing {
 
@@ -832,9 +837,13 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 		source = cache->partial.Head();
 	}
 
+	ParanoiaChecker _2(source);
+
 	object_link *link = _pop(source->free);
 	source->count--;
 	cache->used_count++;
+
+	REMOVE_PARANOIA_CHECK(source, &link->next, sizeof(void*));
 
 	TRACE_CACHE(cache, "allocate %p (%p) from %p, %lu remaining.",
 		link_to_object(link, cache->object_size), link, source, source->count);
@@ -856,6 +865,8 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 	if (source == NULL)
 		panic("object_cache: free'd object has no slab");
 
+	ParanoiaChecker _(source);
+
 	object_link *link = object_to_link(object, cache->object_size);
 
 	TRACE_CACHE(cache, "returning %p (%p) to %p, %lu used (%lu empty slabs).",
@@ -865,6 +876,8 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 	_push(source->free, link);
 	source->count++;
 	cache->used_count--;
+
+	ADD_PARANOIA_CHECK(source, &link->next, sizeof(void*));
 
 	if (source->count == source->size) {
 		cache->partial.Remove(source);
@@ -957,6 +970,8 @@ object_cache::InitSlab(slab *slab, void *pages, size_t byteCount)
 
 	uint8 *data = ((uint8 *)pages) + slab->offset;
 
+	CREATE_PARANOIA_CHECK_SET(slab, "slab");
+
 	for (size_t i = 0; i < slab->size; i++) {
 		bool failedOnFirst = false;
 
@@ -978,10 +993,16 @@ object_cache::InitSlab(slab *slab, void *pages, size_t byteCount)
 				data += object_size;
 			}
 
+			DELETE_PARANOIA_CHECK_SET(slab);
+
 			return NULL;
 		}
 
 		_push(slab->free, object_to_link(data, object_size));
+
+		ADD_PARANOIA_CHECK(slab, &object_to_link(data, object_size)->next,
+			sizeof(void*));
+
 		data += object_size;
 	}
 
@@ -996,6 +1017,8 @@ object_cache::UninitSlab(slab *slab)
 
 	if (slab->count != slab->size)
 		panic("cache: destroying a slab which isn't empty.");
+
+	DELETE_PARANOIA_CHECK_SET(slab);
 
 	uint8 *data = ((uint8 *)slab->pages) + slab->offset;
 
