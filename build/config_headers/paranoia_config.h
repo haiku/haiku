@@ -9,7 +9,7 @@
 
 // number of check slots (should depend on the components for which checks
 // are enabled)
-#define PARANOIA_SLOT_COUNT	1024
+#define PARANOIA_SLOT_COUNT	(32 * 1024)
 
 
 // macros that enable paranoia checks for individual components
