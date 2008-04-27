@@ -20,6 +20,12 @@
 #include <util/AutoLock.h>
 
 
+struct tracing_stack_trace {
+	int32	depth;
+	addr_t	return_addresses[0];
+};
+
+
 #if ENABLE_TRACING
 
 //#define TRACE_TRACING
@@ -35,11 +41,6 @@ enum {
 	ENTRY_INITIALIZED	= 0x02,
 	BUFFER_ENTRY		= 0x04,
 	FILTER_MATCH		= 0x08
-};
-
-struct tracing_stack_trace {
-	int32	depth;
-	addr_t	return_addresses[0];
 };
 
 
@@ -239,6 +240,7 @@ TraceOutput::Clear()
 void
 TraceOutput::Print(const char* format,...)
 {
+#if ENABLE_TRACING
 	if (IsFull())
 		return;
 
@@ -246,13 +248,14 @@ TraceOutput::Print(const char* format,...)
 	va_start(args, format);
 	fSize += vsnprintf(fBuffer + fSize, fCapacity - fSize, format, args);
 	va_end(args);
+#endif
 }
 
-#if ENABLE_TRACING
 
 void
 TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
 {
+#if ENABLE_TRACING
 	if (stackTrace == NULL || stackTrace->depth <= 0)
 		return;
 
@@ -272,8 +275,8 @@ TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
 		} else
 			Print("  %p\n", (void*)address);
 	}
+#endif
 }
-#endif // ENABLE_TRACING
 
 
 void
