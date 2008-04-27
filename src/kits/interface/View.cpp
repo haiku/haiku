@@ -405,11 +405,13 @@ BView::BView(BMessage *archive)
 			font.SetSize(size);
 
 		float shear;
-		if (archive->FindFloat("_fflt", 1, &shear) == B_OK)
+		if (archive->FindFloat("_fflt", 1, &shear) == B_OK
+			&& shear >= 45.0 && shear <= 135.0)
 			font.SetShear(shear);
 
 		float rotation;
-		if (archive->FindFloat("_fflt", 2, &rotation) == B_OK)
+		if (archive->FindFloat("_fflt", 2, &rotation) == B_OK
+			&& rotation >=0 && rotation <= 360)
 			font.SetRotation(rotation);
 
 		SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
