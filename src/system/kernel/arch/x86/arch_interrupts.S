@@ -133,7 +133,7 @@
 	movl	%dr3, %edi;				/* thread pointer */				\
 	movl	$0, THREAD_fault_handler(%edi)
 
-#ifdef SYSCALL_TRACING
+#if SYSCALL_TRACING
 #	define TRACE_PRE_SYSCALL()	\
 		movl	%esp, %eax;						/* syscall parameters */	\
 		push	%eax;														\
@@ -512,7 +512,7 @@ FUNCTION(i386_return_from_signal):
 	movl	$SYSCALL_RESTORE_SIGNAL_FRAME, %eax
 		// This syscall will restore the cpu context to the
 		// one existing before calling the signal handler
-	movl	$0, %ecx	
+	movl	$0, %ecx
 	lea		4(%esp), %edx
 	int		$99
 	ret
