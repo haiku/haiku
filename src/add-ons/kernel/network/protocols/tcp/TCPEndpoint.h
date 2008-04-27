@@ -87,13 +87,14 @@ private:
 
 	void _StartPersistTimer();
 	void _EnterTimeWait();
+	void _CancelConnectionTimers();
 	uint8 _CurrentFlags();
 	bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
 		uint32 segmentMaxSize, uint32 flightSize);
 	status_t _SendQueued(bool force = false);
 	status_t _SendQueued(bool force, uint32 sendWindow);
 	int _MaxSegmentSize(const struct sockaddr *) const;
-	status_t _ShutdownEgress(bool closing);
+	status_t _Shutdown(bool closing);
 	ssize_t _AvailableData() const;
 	void _NotifyReader();
 	bool _ShouldReceive() const;

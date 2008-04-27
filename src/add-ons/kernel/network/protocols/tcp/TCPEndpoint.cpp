@@ -56,8 +56,9 @@
 
 #ifdef TRACE_TCP
 // the space before ', ##args' is important in order for this to work with cpp 2.95
-#	define TRACE(format, args...)	dprintf("TCP [%llu] %p (%12s) " format "\n", \
-		system_time(), this, name_for_state(fState) , ##args)
+#	define TRACE(format, args...)	dprintf("%ld: TCP [%llu] %p (%12s) " \
+		format "\n", find_thread(NULL), system_time(), this, \
+		name_for_state(fState) , ##args)
 #else
 #	define TRACE(args...)			do { } while (0)
 #endif
@@ -280,9 +281,7 @@ TCPEndpoint::~TCPEndpoint()
 {
 	mutex_lock(&fLock);
 
-	gStackModule->cancel_timer(&fRetransmitTimer);
-	gStackModule->cancel_timer(&fPersistTimer);
-	gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
+	_CancelConnectionTimers();
 	gStackModule->cancel_timer(&fTimeWaitTimer);
 
 	if (fManager) {
@@ -345,7 +344,7 @@ TCPEndpoint::Close()
 		return B_OK;
 	}
 
-	status_t status = _ShutdownEgress(true);
+	status_t status = _Shutdown(true);
 	if (status != B_OK)
 		return status;
 
@@ -366,7 +365,6 @@ TCPEndpoint::Close()
 			fSendQueue.Used());
 	}
 
-	// TODO: do i need to wait until fState returns to CLOSED?
 	return B_OK;
 }
 
@@ -564,7 +562,7 @@ TCPEndpoint::Shutdown(int direction)
 		fFlags |= FLAG_NO_RECEIVE;
 
 	if (direction == SHUT_WR || direction == SHUT_RDWR)
-		_ShutdownEgress(false);
+		_Shutdown(false);
 
 	return B_OK;
 }
@@ -848,6 +846,15 @@ TCPEndpoint::UpdateTimeWait()
 }
 
 
+void
+TCPEndpoint::_CancelConnectionTimers()
+{
+	gStackModule->cancel_timer(&fRetransmitTimer);
+	gStackModule->cancel_timer(&fPersistTimer);
+	gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
+}
+
+
 //	#pragma mark - receive
 
 
@@ -955,7 +962,7 @@ TCPEndpoint::DumpInternalState() const
 void
 TCPEndpoint::_HandleReset(status_t error)
 {
-	gStackModule->cancel_timer(&fRetransmitTimer);
+	_CancelConnectionTimers();
 
 	socket->error = error;
 	fState = CLOSED;
@@ -1088,8 +1095,10 @@ TCPEndpoint::_SegmentReceived(tcp_segment_header &segment, net_buffer *buffer)
 	// The fast path was not applicable, so we continue with the standard
 	// processing of the incoming segment
 
-	if (fState != SYNCHRONIZE_SENT && fState != LISTEN && fState != CLOSED) {
-		// 1. check sequence number
+	ASSERT(fState != SYNCHRONIZE_SENT && fState != LISTEN);
+
+	if (fState != CLOSED && fState != TIME_WAIT) {
+		// Check sequence number
 		if (!segment_in_sequence(segment, buffer->size, fReceiveNext,
 				fReceiveWindow)) {
 			TRACE("  Receive(): segment out of window, next: %lu wnd: %lu",
@@ -1382,8 +1391,11 @@ TCPEndpoint::_MaxSegmentSize(const sockaddr *address) const
 }
 
 
+/*!	Sends the FIN flag to the peer when the connection is still open.
+	Moves the endpoint to the next state depending on where it was.
+*/
 status_t
-TCPEndpoint::_ShutdownEgress(bool closing)
+TCPEndpoint::_Shutdown(bool closing)
 {
 	tcp_state previousState = fState;
 
@@ -1452,15 +1464,16 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 	size_t segmentLength = buffer->size;
 
 	if (segment.flags & TCP_FLAG_RESET) {
-		// is this a valid reset?
+		// Is this a valid reset?
+		// We generally ignore resets in time wait state (see RFC 1337)
 		if (fLastAcknowledgeSent <= segment.sequence
 			&& tcp_sequence(segment.sequence) < (fLastAcknowledgeSent
-				+ fReceiveWindow)) {
+				+ fReceiveWindow)
+			&& fState != TIME_WAIT) {
 			status_t error;
 			if (fState == SYNCHRONIZE_RECEIVED)
 				error = ECONNREFUSED;
-			else if (fState == CLOSING || fState == TIME_WAIT
-				|| fState == WAIT_FOR_FINISH_ACKNOWLEDGE)
+			else if (fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE)
 				error = ENOTCONN;
 			else
 				error = ECONNRESET;
@@ -1582,6 +1595,7 @@ TCPEndpoint::_Receive(tcp_segment_header &segment, net_buffer *buffer)
 						_EnterTimeWait();
 						return DROP;
 					case WAIT_FOR_FINISH_ACKNOWLEDGE:
+						_CancelConnectionTimers();
 						fState = CLOSED;
 						break;
 
@@ -1924,6 +1938,10 @@ TCPEndpoint::_PersistTimer(net_timer *timer, void *data)
 	if (!locker.IsLocked())
 		return;
 
+	// the timer might not have been canceled early enough
+	if (endpoint->State() == CLOSED)
+		return;
+
 	endpoint->_SendQueued(true);
 }
 
@@ -1935,6 +1953,10 @@ TCPEndpoint::_DelayedAcknowledgeTimer(struct net_timer *timer, void *data)
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
+		return;
+
+	// the timer might not have been canceled early enough
+	if (endpoint->State() == CLOSED)
 		return;
 
 	endpoint->SendAcknowledge(true);
