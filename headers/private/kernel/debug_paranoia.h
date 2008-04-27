@@ -12,15 +12,21 @@
 #include "paranoia_config.h"
 
 
-// How to use: Include the header only from source files. Define
-// ENABLE_PARANOIA_CHECK_COMPONENT (to 1 to enable) before. Use the macros
-// defined below and the ParanoiaChecker class.
+// How to use: Include the header only from source files. Set
+// COMPONENT_PARANOIA_LEVEL before. Use the macros defined below and the
+// ParanoiaChecker class.
 
+// paranoia levels
+#define PARANOIA_NAIVE		0	/* don't do any checks */
+#define PARANOIA_SUSPICIOUS	1	/* do some checks */
+#define PARANOIA_OBSESSIVE	2	/* do a lot of checks */
+#define PARANOIA_INSANE		3	/* do all checks, also very expensive ones */
 
+// mode for set_paranoia_check()
 enum paranoia_set_check_mode {
-	PARANOIA_DONT_FAIL,
-	PARANOIA_FAIL_IF_EXISTS,
-	PARANOIA_FAIL_IF_MISSING
+	PARANOIA_DONT_FAIL,			// succeed, if check for address exists or not
+	PARANOIA_FAIL_IF_EXISTS,	// fail, if check for address already exists
+	PARANOIA_FAIL_IF_MISSING	// fail, if check for address doesn't exist yet
 };
 
 
@@ -45,10 +51,15 @@ void		debug_paranoia_init();
 __END_DECLS
 
 
-#if ENABLE_PARANOIA_CHECK_COMPONENT
+#if COMPONENT_PARANOIA_LEVEL
 #	define PARANOIA_ONLY(x)	x
+#	define PARANOIA_ONLY_LEVEL(level, x)				\
+		if ((level) <= (COMPONENT_PARANOIA_LEVEL)) {	\
+			x;											\
+		}
 #else
 #	define PARANOIA_ONLY(x)
+#	define PARANOIA_ONLY_LEVEL(level, x)
 #endif
 
 #define	CREATE_PARANOIA_CHECK_SET(object, description)	\
@@ -57,17 +68,22 @@ __END_DECLS
 			PARANOIA_ONLY(delete_paranoia_check_set((object)))
 #define	RUN_PARANOIA_CHECKS(object)	\
 			PARANOIA_ONLY(run_paranoia_checks((object)))
-#define	ADD_PARANOIA_CHECK(object, address, size)	\
-			PARANOIA_ONLY(set_paranoia_check((object), (address), (size), \
-				PARANOIA_FAIL_IF_EXISTS))
-#define	UPDATE_PARANOIA_CHECK(object, address, size)	\
-			PARANOIA_ONLY(set_paranoia_check((object), (address), (size), \
-				PARANOIA_FAIL_IF_MISSING))
-#define	SET_PARANOIA_CHECK(object, address, size)	\
-			PARANOIA_ONLY(set_paranoia_check((object), (address), (size), \
-				PARANOIA_DONT_FAIL))
-#define	REMOVE_PARANOIA_CHECK(object, address, size)	\
-			PARANOIA_ONLY(remove_paranoia_check((object), (address), (size)))
+
+#define	ADD_PARANOIA_CHECK(level, object, address, size)		\
+			PARANOIA_ONLY_LEVEL((level),						\
+				set_paranoia_check((object), (address), (size), \
+					PARANOIA_FAIL_IF_EXISTS))
+#define	UPDATE_PARANOIA_CHECK(level, object, address, size)		\
+			PARANOIA_ONLY_LEVEL((level),						\
+				set_paranoia_check((object), (address), (size), \
+					PARANOIA_FAIL_IF_MISSING))
+#define	SET_PARANOIA_CHECK(level, object, address, size)		\
+			PARANOIA_ONLY_LEVEL((level),						\
+				set_paranoia_check((object), (address), (size), \
+					PARANOIA_DONT_FAIL))
+#define	REMOVE_PARANOIA_CHECK(level, object, address, size)		\
+			PARANOIA_ONLY_LEVEL((level),						\
+				remove_paranoia_check((object), (address), (size)))
 
 
 #ifdef __cplusplus

@@ -40,7 +40,7 @@
 //#define ENABLE_DEBUGGER_COMMANDS	1
 #define PARANOID_BUFFER_CHECK	NET_BUFFER_PARANOIA
 
-#define ENABLE_PARANOIA_CHECK_COMPONENT	NET_BUFFER_PARANOIA
+#define COMPONENT_PARANOIA_LEVEL	NET_BUFFER_PARANOIA
 #include <debug_paranoia.h>
 
 
@@ -467,7 +467,8 @@ create_buffer(size_t headerSpace)
 
 	CHECK_BUFFER(buffer);
 	CREATE_PARANOIA_CHECK_SET(buffer, "net_buffer");
-	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+		sizeof(buffer->size));
 
 	return buffer;
 }
@@ -618,7 +619,8 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 	copy_metadata(clone, buffer);
 
 	CREATE_PARANOIA_CHECK_SET(clone, "net_buffer");
-	SET_PARANOIA_CHECK(clone, &clone->size, sizeof(clone->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, clone, &clone->size,
+		sizeof(clone->size));
 	CHECK_BUFFER(buffer);
 	CHECK_BUFFER(clone);
 
@@ -739,7 +741,8 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 		buffer->size += node->used;
 	}
 
-	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+		sizeof(buffer->size));
 
 	// the data has been merged completely at this point
 	free_buffer(with);
@@ -915,7 +918,8 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	//dprintf(" prepend_size result:\n");
 	//dump_buffer(buffer);
 	CHECK_BUFFER(buffer);
-	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+		sizeof(buffer->size));
 
 	return B_OK;
 }
@@ -971,7 +975,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		node->tail_space = 0;
 		node->used += previousTailSpace;
 		buffer->size += previousTailSpace;
-		SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+		SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+			sizeof(buffer->size));
 
 		// allocate all buffers
 
@@ -998,7 +1003,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 			buffer->size += sizeUsed;
 			sizeAdded += sizeUsed;
-			SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+			SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+				sizeof(buffer->size));
 
 			list_add_item(&buffer->buffers, node);
 
@@ -1025,7 +1031,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 	node->used += size;
 	buffer->size += size;
-	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+		sizeof(buffer->size));
 
 	//dprintf(" append result 2:\n");
 	//dump_buffer(buffer);
@@ -1112,7 +1119,8 @@ remove_header(net_buffer *_buffer, size_t bytes)
 	}
 
 	buffer->size -= bytes;
-	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+		sizeof(buffer->size));
 
 	//dprintf(" remove result:\n");
 	//dump_buffer(buffer);
@@ -1173,7 +1181,8 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	}
 
 	buffer->size = newSize;
-	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+		sizeof(buffer->size));
 
 	//dprintf(" trim result:\n");
 	//dump_buffer(buffer);
@@ -1250,7 +1259,8 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 	//dump_buffer(buffer);
 	CHECK_BUFFER(source);
 	CHECK_BUFFER(buffer);
-	SET_PARANOIA_CHECK(buffer, &buffer->size, sizeof(buffer->size));
+	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
+		sizeof(buffer->size));
 
 	return B_OK;
 }

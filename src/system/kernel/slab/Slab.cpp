@@ -39,8 +39,7 @@
 #define TRACE_CACHE(cache, format, bananas...) do { } while (0)
 #endif
 
-#define OBJECT_CACHE_PARANOIA 1
-#define ENABLE_PARANOIA_CHECK_COMPONENT	OBJECT_CACHE_PARANOIA
+#define COMPONENT_PARANOIA_LEVEL	OBJECT_CACHE_PARANOIA
 #include <debug_paranoia.h>
 
 
@@ -843,7 +842,8 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 	source->count--;
 	cache->used_count++;
 
-	REMOVE_PARANOIA_CHECK(source, &link->next, sizeof(void*));
+	REMOVE_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, source, &link->next,
+		sizeof(void*));
 
 	TRACE_CACHE(cache, "allocate %p (%p) from %p, %lu remaining.",
 		link_to_object(link, cache->object_size), link, source, source->count);
@@ -877,7 +877,7 @@ object_cache_return_to_slab(object_cache *cache, slab *source, void *object)
 	source->count++;
 	cache->used_count--;
 
-	ADD_PARANOIA_CHECK(source, &link->next, sizeof(void*));
+	ADD_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, source, &link->next, sizeof(void*));
 
 	if (source->count == source->size) {
 		cache->partial.Remove(source);
@@ -1000,8 +1000,8 @@ object_cache::InitSlab(slab *slab, void *pages, size_t byteCount)
 
 		_push(slab->free, object_to_link(data, object_size));
 
-		ADD_PARANOIA_CHECK(slab, &object_to_link(data, object_size)->next,
-			sizeof(void*));
+		ADD_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, slab,
+			&object_to_link(data, object_size)->next, sizeof(void*));
 
 		data += object_size;
 	}
