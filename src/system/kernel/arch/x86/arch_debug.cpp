@@ -582,12 +582,48 @@ arch_debug_contains_call(struct thread *thread, const char *symbol,
 void *
 arch_debug_get_caller(void)
 {
-	// It looks like you would get the wrong stack frame here, but
-	// since read_ebp() is an assembler inline macro, GCC seems to
-	// be smart enough to save its original value.
 	struct stack_frame *frame = (struct stack_frame *)x86_read_ebp();
-
 	return (void *)frame->previous->return_address;
+}
+
+
+int32
+arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+	int32 skipFrames, bool userOnly)
+{
+	// always skip our own frame
+	skipFrames++;
+
+	struct thread* thread = thread_get_current_thread();
+	int32 count = 0;
+	addr_t ebp = x86_read_ebp();
+	bool onKernelStack = true;
+
+	while (ebp != 0 && count < maxCount) {
+		onKernelStack = onKernelStack
+			&& is_kernel_stack_address(thread, ebp);
+
+		addr_t eip;
+		addr_t nextEbp;
+
+		if (onKernelStack && is_iframe(thread, ebp)) {
+			struct iframe *frame = (struct iframe*)ebp;
+			eip = frame->eip;
+ 			nextEbp = frame->ebp;
+		} else {
+			if (get_next_frame(ebp, &nextEbp, &eip) != B_OK)
+				break;
+		}
+
+		if (skipFrames <= 0 && (!userOnly || IS_USER_ADDRESS(ebp)))
+			returnAddresses[count++] = eip;
+		else
+			skipFrames--;
+
+		ebp = nextEbp;
+	}
+
+	return count;
 }
 
 
