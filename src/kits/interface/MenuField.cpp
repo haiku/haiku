@@ -157,6 +157,8 @@ BMenuField::BMenuField(BMessage *data)
 	InitObject(label);
 
 	fMenuBar = (BMenuBar*)FindView("_mc_mb_");
+	if (!fMenuBar)
+		_InitMenuBar(new BMenu(""), BRect(0, 0, 100, 15), false);
 	fMenu = fMenuBar->SubmenuAt(0);
 
 	InitObject2();
