@@ -101,9 +101,10 @@ class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
 		typedef OpenHashTable<ConnectionHashDefinition> ConnectionTable;
 		typedef MultiHashTable<EndpointHashDefinition> EndpointTable;
 
-		ConnectionTable fConnectionHash;
-		EndpointTable fEndpointHash;
-		benaphore fLock;
+		ConnectionTable	fConnectionHash;
+		EndpointTable	fEndpointHash;
+		uint16			fLastPort;
+		benaphore		fLock;
 };
 
 #endif	// ENDPOINT_MANAGER_H

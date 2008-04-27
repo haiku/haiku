@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,12 +10,14 @@
 
 #include "EndpointManager.h"
 
+#include <new>
 #include <unistd.h>
 
 #include <KernelExport.h>
 
 #include <NetUtilities.h>
 #include <util/AutoLock.h>
+#include <tracing.h>
 
 #include "TCPEndpoint.h"
 
@@ -26,6 +28,49 @@
 #else
 #	define TRACE(x)
 #endif
+
+//#define ENDPOINT_TRACING
+#ifdef ENDPOINT_TRACING
+namespace EndpointTracing {
+
+class Unbind : public AbstractTraceEntry {
+	public:
+		Unbind(TCPEndpoint* endpoint)
+			:
+			fEndpoint(endpoint)
+		{
+			fStackTrace = capture_tracing_stack_trace(10, 0, false);
+
+			endpoint->LocalAddress().AsString(fLocal, sizeof(fLocal), true);
+			endpoint->PeerAddress().AsString(fPeer, sizeof(fPeer), true);
+			Initialized();
+		}
+
+		virtual void DumpStackTrace(TraceOutput& out)
+		{
+			out.PrintStackTrace(fStackTrace);
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("tcp:e:unbind: %p, local %s, peer %s"
+				"%lu", fEndpoint, fLocal, fPeer);
+		}
+
+	protected:
+		TCPEndpoint*	fEndpoint;
+		tracing_stack_trace* fStackTrace;
+		char			fLocal[32];
+		char			fPeer[32];
+};
+
+}	// namespace EndpointTracing
+
+#	define T(x)	new(std::nothrow) EndpointTracing::x
+
+#else
+#	define T(x)
+#endif	// ENDPOINT_TRACING
 
 
 static const uint16 kLastReservedPort = 1023;
@@ -70,6 +115,9 @@ ConnectionHashDefinition::GetLink(TCPEndpoint *endpoint) const
 }
 
 
+//	#pragma mark -
+
+
 size_t
 EndpointHashDefinition::HashKey(uint16 port) const
 {
@@ -106,8 +154,14 @@ EndpointHashDefinition::GetLink(TCPEndpoint *endpoint) const
 }
 
 
+//	#pragma mark -
+
+
 EndpointManager::EndpointManager(net_domain *domain)
-	: fDomain(domain), fConnectionHash(this)
+	:
+	fDomain(domain),
+	fConnectionHash(this),
+	fLastPort(kFirstEphemeralPort)
 {
 	benaphore_init(&fLock, "endpoint manager");
 }
@@ -138,8 +192,7 @@ EndpointManager::InitCheck() const
 //	#pragma mark - connections
 
 
-/*!
-	Returns the endpoint matching the connection.
+/*!	Returns the endpoint matching the connection.
 	You must hold the manager's lock when calling this method.
 */
 TCPEndpoint *
@@ -236,7 +289,7 @@ EndpointManager::FindConnection(sockaddr *local, sockaddr *peer)
 		return endpoint;
 	}
 
-	// no matching endpoint exists	
+	// no matching endpoint exists
 	TRACE(("TCP: no matching endpoint!\n"));
 
 	return NULL;
@@ -310,28 +363,30 @@ EndpointManager::_BindToEphemeral(TCPEndpoint *endpoint,
 {
 	TRACE(("EndpointManager::BindToEphemeral(%p)\n", endpoint));
 
-	uint32 max = kFirstEphemeralPort + 65536;
+	uint32 max = fLastPort + 65536;
 
 	for (int32 i = 1; i < 5; i++) {
 		// try to retrieve a more or less random port
-		uint32 counter = kFirstEphemeralPort;
 		uint32 step = i == 4 ? 1 : (system_time() & 0x1f) + 1;
+		uint32 counter = fLastPort + step;
 
 		while (counter < max) {
 			uint16 port = counter & 0xffff;
 			if (port <= kLastReservedPort)
 				port += kLastReservedPort;
 
+			fLastPort = port;
 			port = htons(port);
 
 			if (!fEndpointHash.Lookup(port).HasNext()) {
+				// found a port
 				SocketAddressStorage newAddress(AddressModule());
 				newAddress.SetTo(address);
 				newAddress.SetPort(port);
 
-				// found a port
-				TRACE(("   EndpointManager::BindToEphemeral(%p) -> %s\n", endpoint,
-					AddressString(Domain(), *newAddress, true).Data()));
+				TRACE(("   EndpointManager::BindToEphemeral(%p) -> %s\n",
+					endpoint, AddressString(Domain(), *newAddress,
+					true).Data()));
 
 				return _Bind(endpoint, *newAddress);
 			}
@@ -364,6 +419,7 @@ status_t
 EndpointManager::Unbind(TCPEndpoint *endpoint)
 {
 	TRACE(("EndpointManager::Unbind(%p)\n", endpoint));
+	T(Unbind(endpoint));
 
 	if (endpoint == NULL || !endpoint->IsBound()) {
 		TRACE(("  endpoint is unbound.\n"));
@@ -429,10 +485,10 @@ EndpointManager::DumpEndpoints() const
 	kprintf("%10s %20s %20s %8s %8s %12s\n", "address", "local", "peer",
 		"recv-q", "send-q", "state");
 
-	ConnectionTable::Iterator it = fConnectionHash.GetIterator();
+	ConnectionTable::Iterator iterator = fConnectionHash.GetIterator();
 
-	while (it.HasNext()) {
-		TCPEndpoint *endpoint = it.Next();
+	while (iterator.HasNext()) {
+		TCPEndpoint *endpoint = iterator.Next();
 
 		char localBuf[64], peerBuf[64];
 		endpoint->LocalAddress().AsString(localBuf, sizeof(localBuf), true);
