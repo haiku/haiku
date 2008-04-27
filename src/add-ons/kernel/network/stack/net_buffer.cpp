@@ -11,6 +11,7 @@
 
 #include <net_buffer.h>
 #include <slab/Slab.h>
+#include <tracing.h>
 #include <util/list.h>
 
 #include <ByteOrder.h>
@@ -117,6 +118,321 @@ static vint32 sAllocatedNetBufferCount = 0;
 static vint32 sEverAllocatedDataHeaderCount = 0;
 static vint32 sEverAllocatedNetBufferCount = 0;
 #endif
+
+
+#if NET_BUFFER_TRACING
+
+
+namespace NetBufferTracing {
+
+
+class NetBufferTraceEntry : public AbstractTraceEntry {
+	public:
+		NetBufferTraceEntry(net_buffer* buffer)
+			:
+			fBuffer(buffer)
+		{
+		}
+
+	protected:
+		net_buffer*	fBuffer;
+};
+
+
+class Create : public NetBufferTraceEntry {
+	public:
+		Create(size_t headerSpace, net_buffer* buffer)
+			:
+			NetBufferTraceEntry(buffer),
+			fHeaderSpace(headerSpace)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer create: header space: %lu -> buffer: %p",
+				fHeaderSpace, fBuffer);
+		}
+
+	private:
+		size_t		fHeaderSpace;
+};
+
+
+class Free : public NetBufferTraceEntry {
+	public:
+		Free(net_buffer* buffer)
+			:
+			NetBufferTraceEntry(buffer)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer free: buffer: %p", fBuffer);
+		}
+};
+
+
+class Duplicate : public NetBufferTraceEntry {
+	public:
+		Duplicate(net_buffer* buffer, net_buffer* clone)
+			:
+			NetBufferTraceEntry(buffer),
+			fClone(clone)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer dup: buffer: %p -> %p", fBuffer, fClone);
+		}
+
+	private:
+		net_buffer*		fClone;
+};
+
+
+class Clone : public NetBufferTraceEntry {
+	public:
+		Clone(net_buffer* buffer, bool shareFreeSpace, net_buffer* clone)
+			:
+			NetBufferTraceEntry(buffer),
+			fClone(clone),
+			fShareFreeSpace(shareFreeSpace)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer clone: buffer: %p, share free space: %s "
+				"-> %p", fBuffer, fShareFreeSpace ? "true" : "false", fClone);
+		}
+
+	private:
+		net_buffer*		fClone;
+		bool			fShareFreeSpace;
+};
+
+
+class Split : public NetBufferTraceEntry {
+	public:
+		Split(net_buffer* buffer, uint32 offset, net_buffer* newBuffer)
+			:
+			NetBufferTraceEntry(buffer),
+			fNewBuffer(newBuffer),
+			fOffset(offset)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer split: buffer: %p, offset: %lu "
+				"-> %p", fBuffer, fOffset, fNewBuffer);
+		}
+
+	private:
+		net_buffer*		fNewBuffer;
+		uint32			fOffset;
+};
+
+
+class Merge : public NetBufferTraceEntry {
+	public:
+		Merge(net_buffer* buffer, net_buffer* otherBuffer, bool after)
+			:
+			NetBufferTraceEntry(buffer),
+			fOtherBuffer(otherBuffer),
+			fAfter(after)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer merge: buffers: %p + %p, after: %s "
+				"-> %p", fBuffer, fOtherBuffer, fAfter ? "true" : "false",
+				fOtherBuffer);
+		}
+
+	private:
+		net_buffer*		fOtherBuffer;
+		bool			fAfter;
+};
+
+
+class AppendCloned : public NetBufferTraceEntry {
+	public:
+		AppendCloned(net_buffer* buffer, net_buffer* source, uint32 offset,
+			size_t size)
+			:
+			NetBufferTraceEntry(buffer),
+			fSource(source),
+			fOffset(offset),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer append cloned: buffer: %p, from: %p, "
+				"offset: %lu, size: %lu", fBuffer, fSource, fOffset, fSize);
+		}
+
+	private:
+		net_buffer*		fSource;
+		uint32			fOffset;
+		size_t			fSize;
+};
+
+
+class PrependSize : public NetBufferTraceEntry {
+	public:
+		PrependSize(net_buffer* buffer, size_t size)
+			:
+			NetBufferTraceEntry(buffer),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer prepend size: buffer: %p, size: %lu", fBuffer,
+				fSize);
+		}
+
+	private:
+		size_t			fSize;
+};
+
+
+class AppendSize : public NetBufferTraceEntry {
+	public:
+		AppendSize(net_buffer* buffer, size_t size)
+			:
+			NetBufferTraceEntry(buffer),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer append size: buffer: %p, size: %lu", fBuffer,
+				fSize);
+		}
+
+	private:
+		size_t			fSize;
+};
+
+
+class RemoveHeader : public NetBufferTraceEntry {
+	public:
+		RemoveHeader(net_buffer* buffer, size_t size)
+			:
+			NetBufferTraceEntry(buffer),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer remove header: buffer: %p, size: %lu",
+				fBuffer, fSize);
+		}
+
+	private:
+		size_t			fSize;
+};
+
+
+class Trim : public NetBufferTraceEntry {
+	public:
+		Trim(net_buffer* buffer, size_t size)
+			:
+			NetBufferTraceEntry(buffer),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer trim: buffer: %p, size: %lu",
+				fBuffer, fSize);
+		}
+
+	private:
+		size_t			fSize;
+};
+
+
+class Read : public NetBufferTraceEntry {
+	public:
+		Read(net_buffer* buffer, uint32 offset, void* data, size_t size)
+			:
+			NetBufferTraceEntry(buffer),
+			fData(data),
+			fOffset(offset),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer read: buffer: %p, offset: %lu, size: %lu, "
+				"data: %p", fBuffer, fOffset, fSize, fData);
+		}
+
+	private:
+		void*			fData;
+		uint32			fOffset;
+		size_t			fSize;
+};
+
+
+class Write : public NetBufferTraceEntry {
+	public:
+		Write(net_buffer* buffer, uint32 offset, const void* data, size_t size)
+			:
+			NetBufferTraceEntry(buffer),
+			fData(data),
+			fOffset(offset),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("net buffer write: buffer: %p, offset: %lu, size: %lu, "
+				"data: %p", fBuffer, fOffset, fSize, fData);
+		}
+
+	private:
+		const void*		fData;
+		uint32			fOffset;
+		size_t			fSize;
+};
+
+
+}	// namespace NetBufferTracing
+
+#	define T(x)	new(std::nothrow) NetBufferTracing::x
+
+#else
+#	define T(x)
+#endif	// NET_BUFFER_TRACING
 
 
 #if 1
@@ -470,6 +786,8 @@ create_buffer(size_t headerSpace)
 	SET_PARANOIA_CHECK(PARANOIA_SUSPICIOUS, buffer, &buffer->size,
 		sizeof(buffer->size));
 
+	T(Create(headerSpace, buffer));
+
 	return buffer;
 }
 
@@ -480,6 +798,7 @@ free_buffer(net_buffer *_buffer)
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
 	TRACE(("%ld: free buffer %p\n", find_thread(NULL), buffer));
+	T(Free(buffer));
 
 	CHECK_BUFFER(buffer);
 	DELETE_PARANOIA_CHECK_SET(buffer);
@@ -537,6 +856,8 @@ duplicate_buffer(net_buffer *_buffer)
 	CHECK_BUFFER(buffer);
 	CHECK_BUFFER(duplicate);
 	RUN_PARANOIA_CHECKS(duplicate);
+
+	T(Duplicate(buffer, duplicate));
 
 	return duplicate;
 }
@@ -624,6 +945,8 @@ clone_buffer(net_buffer *_buffer, bool shareFreeSpace)
 	CHECK_BUFFER(buffer);
 	CHECK_BUFFER(clone);
 
+	T(Clone(buffer, shareFreeSpace, clone));
+
 	return clone;
 }
 
@@ -650,6 +973,7 @@ split_buffer(net_buffer *from, uint32 offset)
 		if (remove_header(from, offset) == B_OK) {
 			CHECK_BUFFER(from);
 			CHECK_BUFFER(buffer);
+			T(Split(from, offset, buffer));
 			return buffer;
 		}
 	}
@@ -676,6 +1000,7 @@ merge_buffer(net_buffer *_buffer, net_buffer *_with, bool after)
 
 	TRACE(("%ld: merge buffer %p with %p (%s)\n", find_thread(NULL), buffer,
 		with, after ? "after" : "before"));
+	T(Merge(buffer, with, after));
 	//dump_buffer(buffer);
 	//dprintf("with:\n");
 	//dump_buffer(with);
@@ -764,6 +1089,8 @@ write_data(net_buffer *_buffer, size_t offset, const void *data, size_t size)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
+	T(Write(buffer, offset, data, size));
+
 	ParanoiaChecker _(buffer);
 
 	if (offset + size > buffer->size)
@@ -804,6 +1131,8 @@ static status_t
 read_data(net_buffer *_buffer, size_t offset, void *data, size_t size)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
+
+	T(Read(buffer, offset, data, size));
 
 	ParanoiaChecker _(buffer);
 
@@ -846,6 +1175,8 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_first_item(&buffer->buffers);
+
+	T(PrependSize(buffer, size));
 
 	ParanoiaChecker _(buffer);
 
@@ -950,6 +1281,8 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	data_node *node = (data_node *)list_get_last_item(&buffer->buffers);
+
+	T(AppendSize(buffer, size));
 
 	ParanoiaChecker _(buffer);
 
@@ -1069,6 +1402,8 @@ remove_header(net_buffer *_buffer, size_t bytes)
 {
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 
+	T(RemoveHeader(buffer, bytes));
+
 	ParanoiaChecker _(buffer);
 
 	if (bytes > buffer->size)
@@ -1150,6 +1485,7 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	net_buffer_private *buffer = (net_buffer_private *)_buffer;
 	TRACE(("%ld: trim_data(buffer %p, newSize = %ld, buffer size = %ld)\n",
 		find_thread(NULL), buffer, newSize, buffer->size));
+	T(Trim(buffer, newSize));
 	//dump_buffer(buffer);
 
 	ParanoiaChecker _(buffer);
@@ -1207,6 +1543,7 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 	net_buffer_private *source = (net_buffer_private *)_source;
 	TRACE(("%ld: append_cloned_data(buffer %p, source %p, offset = %ld, "
 		"bytes = %ld)\n", find_thread(NULL), buffer, source, offset, bytes));
+	T(AppendCloned(buffer, source, offset, bytes));
 
 	ParanoiaChecker _(buffer);
 	ParanoiaChecker _2(source);
