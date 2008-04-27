@@ -66,7 +66,7 @@ static spinlock sPageLock;
 static sem_id sWriterWaitSem;
 
 
-#ifdef PAGE_ALLOCATION_TRACING
+#if PAGE_ALLOCATION_TRACING
 
 namespace PageAllocationTracing {
 

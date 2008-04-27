@@ -196,7 +196,7 @@ union paranoia_slot {
 // #pragma mark - Tracing
 
 
-#ifdef PARANOIA_TRACING
+#if PARANOIA_TRACING
 
 
 namespace ParanoiaTracing {

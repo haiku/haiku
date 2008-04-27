@@ -100,7 +100,7 @@ static spinlock sDeferredFreeListLock;
 
 // #pragma mark - Tracing
 
-#ifdef KERNEL_HEAP_TRACING
+#if KERNEL_HEAP_TRACING
 namespace KernelHeapTracing {
 
 class Allocate : public AbstractTraceEntry {

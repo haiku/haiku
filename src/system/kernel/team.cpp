@@ -88,7 +88,7 @@ spinlock team_spinlock = 0;
 // #pragma mark - Tracing
 
 
-#ifdef TEAM_TRACING
+#if TEAM_TRACING
 namespace TeamTracing {
 
 class TeamForked : public AbstractTraceEntry {

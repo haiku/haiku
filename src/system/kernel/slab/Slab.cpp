@@ -178,7 +178,7 @@ static depot_magazine *alloc_magazine();
 static void free_magazine(depot_magazine *magazine);
 
 
-#ifdef OBJECT_CACHE_TRACING
+#if OBJECT_CACHE_TRACING
 
 
 namespace ObjectCacheTracing {

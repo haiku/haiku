@@ -125,7 +125,7 @@ atoi(const char* num)
 }
 
 
-#ifdef RUNTIME_LOADER_TRACING
+#if RUNTIME_LOADER_TRACING
 
 void
 ktrace_printf(const char *format, ...)

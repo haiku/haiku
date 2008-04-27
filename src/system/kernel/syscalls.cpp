@@ -58,7 +58,9 @@ static struct mutex sGenericSyscallLock;
 static struct list sGenericSyscalls;
 
 
+#if SYSCALL_TRACING
 static int dump_syscall_tracing(int argc, char** argv);
+#endif
 
 
 static generic_syscall *
@@ -214,7 +216,7 @@ generic_syscall_init(void)
 		return B_ERROR;
 	}
 
-#if	ENABLE_TRACING && defined(SYSCALL_TRACING)
+#if	SYSCALL_TRACING
 	add_debugger_command_etc("straced", &dump_syscall_tracing,
 		"Dump recorded syscall trace entries",
 		"Prints recorded trace entries. It is wrapper for the \"traced\"\n"
@@ -311,7 +313,7 @@ unregister_generic_syscall(const char *subsystem, uint32 version)
 // #pragma mark - syscall tracing
 
 
-#ifdef SYSCALL_TRACING
+#if SYSCALL_TRACING
 
 namespace SyscallTracing {
 
@@ -458,7 +460,7 @@ extern "C" void trace_pre_syscall(uint32 syscallNumber, const void* parameters);
 void
 trace_pre_syscall(uint32 syscallNumber, const void* parameters)
 {
-#ifdef SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT
+#if SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT
 	if (syscallNumber != SYSCALL_KTRACE_OUTPUT)
 #endif
 	{
@@ -472,7 +474,7 @@ extern "C" void trace_post_syscall(int syscallNumber, uint64 returnValue);
 void
 trace_post_syscall(int syscallNumber, uint64 returnValue)
 {
-#ifdef SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT
+#if SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT
 	if (syscallNumber != SYSCALL_KTRACE_OUTPUT)
 #endif
 	{

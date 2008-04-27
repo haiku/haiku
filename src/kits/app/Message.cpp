@@ -40,7 +40,7 @@
 #define DEBUG_FUNCTION_ENTER2	//debug_printf("thread: 0x%x;                                                                             line: %04ld: func: %s\n", find_thread(NULL), __LINE__, __PRETTY_FUNCTION__);
 
 
-#ifdef BMESSAGE_TRACING
+#if BMESSAGE_TRACING
 #	define KTRACE(format...)	ktrace_printf(format)
 #else
 #	define KTRACE(format...)

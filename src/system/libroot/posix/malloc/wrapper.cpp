@@ -34,7 +34,7 @@
 using namespace BPrivate;
 
 
-#ifdef USER_MALLOC_TRACING
+#if USER_MALLOC_TRACING
 #	define KTRACE(format...)	ktrace_printf(format)
 #else
 #	define KTRACE(format...)	do {} while (false)
