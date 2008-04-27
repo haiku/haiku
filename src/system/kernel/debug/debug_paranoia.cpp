@@ -11,6 +11,7 @@
 
 #include <OS.h>
 
+#include <tracing.h>
 #include <util/AutoLock.h>
 
 
@@ -192,10 +193,152 @@ union paranoia_slot {
 };
 
 
+// #pragma mark - Tracing
+
+
+#ifdef PARANOIA_TRACING
+
+
+namespace ParanoiaTracing {
+
+class ParanoiaTraceEntry : public AbstractTraceEntry {
+	public:
+		ParanoiaTraceEntry(const void* object)
+			:
+			fObject(object)
+		{
+#if PARANOIA_TRACING_STACK_TRACE
+		fStackTrace = capture_tracing_stack_trace(PARANOIA_TRACING_STACK_TRACE,
+			1, false);
+#endif
+		}
+
+#if PARANOIA_TRACING_STACK_TRACE
+		virtual void DumpStackTrace(TraceOutput& out)
+		{
+			out.PrintStackTrace(fStackTrace);
+		}
+#endif
+
+	protected:
+		const void*	fObject;
+#if PARANOIA_TRACING_STACK_TRACE
+		tracing_stack_trace* fStackTrace;
+#endif
+};
+
+
+class CreateCheckSet : public ParanoiaTraceEntry {
+	public:
+		CreateCheckSet(const void* object, const char* description)
+			:
+			ParanoiaTraceEntry(object)
+		{
+			fDescription = alloc_tracing_buffer_strcpy(description, 64, false);
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("paranoia create check set: object: %p, "
+				"description: \"%s\"", fObject, fDescription);
+		}
+
+	private:
+		const char*	fDescription;
+};
+
+
+class DeleteCheckSet : public ParanoiaTraceEntry {
+	public:
+		DeleteCheckSet(const void* object)
+			:
+			ParanoiaTraceEntry(object)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("paranoia delete check set: object: %p", fObject);
+		}
+};
+
+
+class SetCheck : public ParanoiaTraceEntry {
+	public:
+		SetCheck(const void* object, const void* address, size_t size,
+				paranoia_set_check_mode mode)
+			:
+			ParanoiaTraceEntry(object),
+			fAddress(address),
+			fSize(size),
+			fMode(mode)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			const char* mode = "??? op:";
+			switch (fMode) {
+				case PARANOIA_DONT_FAIL:
+					mode = "set:   ";
+					break;
+				case PARANOIA_FAIL_IF_EXISTS:
+					mode = "add:   ";
+					break;
+				case PARANOIA_FAIL_IF_MISSING:
+					mode = "update:";
+					break;
+			}
+			out.Print("paranoia check %s object: %p, address: %p, size: %lu",
+				mode, fObject, fAddress, fSize);
+		}
+
+	private:
+		const void*				fAddress;
+		size_t					fSize;
+		paranoia_set_check_mode	fMode;
+};
+
+
+class RemoveCheck : public ParanoiaTraceEntry {
+	public:
+		RemoveCheck(const void* object, const void* address, size_t size)
+			:
+			ParanoiaTraceEntry(object),
+			fAddress(address),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("paranoia check remove: object: %p, address: %p, size: "
+				"%lu", fObject, fAddress, fSize);
+		}
+
+	private:
+		const void*				fAddress;
+		size_t					fSize;
+		paranoia_set_check_mode	fMode;
+};
+
+
+}	// namespace ParanoiaTracing
+
+#	define T(x)	new(std::nothrow) ParanoiaTracing::x
+
+#else
+#	define T(x)
+#endif	// PARANOIA_TRACING
+
+
 // #pragma mark -
 
 
-#define PARANOIA_SLOT_COUNT	1024
 #define PARANOIA_HASH_SIZE	PARANOIA_SLOT_COUNT
 
 static paranoia_slot		sSlots[PARANOIA_SLOT_COUNT];
@@ -268,6 +411,8 @@ lookup_check_set(const void* object)
 status_t
 create_paranoia_check_set(const void* object, const char* description)
 {
+	T(CreateCheckSet(object, description));
+
 	if (object == NULL) {
 		panic("create_paranoia_check_set(): NULL object");
 		return B_BAD_VALUE;
@@ -300,6 +445,8 @@ create_paranoia_check_set(const void* object, const char* description)
 status_t
 delete_paranoia_check_set(const void* object)
 {
+	T(DeleteCheckSet(object));
+
 	InterruptsSpinLocker _(sParanoiaLock);
 
 	// get check set
@@ -354,8 +501,11 @@ run_paranoia_checks(const void* object)
 
 
 status_t
-set_paranoia_check(const void* object, const void* address, size_t size)
+set_paranoia_check(const void* object, const void* address, size_t size,
+	paranoia_set_check_mode mode)
 {
+	T(SetCheck(object, address, size, mode));
+
 	InterruptsSpinLocker _(sParanoiaLock);
 
 	// get check set
@@ -369,6 +519,12 @@ set_paranoia_check(const void* object, const void* address, size_t size)
 	// update check, if already existing
 	ParanoiaCheck* check = set->FindCheck(address);
 	if (check != NULL) {
+		if (mode == PARANOIA_FAIL_IF_EXISTS) {
+			panic("set_paranoia_check(): object %p already has a check for "
+				"address %p", object, address);
+			return B_BAD_VALUE;
+		}
+
 		if (check->Size() != size) {
 			panic("set_paranoia_check(): changing check sizes not supported");
 			return B_BAD_VALUE;
@@ -376,6 +532,12 @@ set_paranoia_check(const void* object, const void* address, size_t size)
 
 		check->Update();
 		return B_OK;
+	}
+
+	if (mode == PARANOIA_FAIL_IF_MISSING) {
+		panic("set_paranoia_check(): object %p doesn't have a check for "
+			"address %p yet", object, address);
+		return B_BAD_VALUE;
 	}
 
 	// allocate slot
@@ -395,6 +557,8 @@ set_paranoia_check(const void* object, const void* address, size_t size)
 status_t
 remove_paranoia_check(const void* object, const void* address, size_t size)
 {
+	T(RemoveCheck(object, address, size));
+
 	InterruptsSpinLocker _(sParanoiaLock);
 
 	// get check set
@@ -407,15 +571,16 @@ remove_paranoia_check(const void* object, const void* address, size_t size)
 
 	// get check
 	ParanoiaCheck* check = set->FindCheck(address);
-	if (check != NULL) {
-		if (check->Size() != size) {
-			panic("remove_paranoia_check(): changing check sizes not "
-				"supported");
-			return B_BAD_VALUE;
-		}
+	if (check == NULL) {
+		panic("remove_paranoia_check(): no check for address %p "
+			"(object %p (%s))", address, object, set->Description());
+		return B_BAD_VALUE;
+	}
 
-		check->Update();
-		return B_OK;
+	if (check->Size() != size) {
+		panic("remove_paranoia_check(): changing check sizes not "
+			"supported");
+		return B_BAD_VALUE;
 	}
 
 	set->RemoveCheck(check);

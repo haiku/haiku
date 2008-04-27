@@ -17,6 +17,13 @@
 // defined below and the ParanoiaChecker class.
 
 
+enum paranoia_set_check_mode {
+	PARANOIA_DONT_FAIL,
+	PARANOIA_FAIL_IF_EXISTS,
+	PARANOIA_FAIL_IF_MISSING
+};
+
+
 __BEGIN_DECLS
 
 #if ENABLE_PARANOIA_CHECKS
@@ -27,7 +34,7 @@ status_t	delete_paranoia_check_set(const void* object);
 status_t	run_paranoia_checks(const void* object);
 
 status_t	set_paranoia_check(const void* object, const void* address,
-				size_t size);
+				size_t size, paranoia_set_check_mode mode);
 status_t	remove_paranoia_check(const void* object, const void* address,
 				size_t size);
 
@@ -50,8 +57,15 @@ __END_DECLS
 			PARANOIA_ONLY(delete_paranoia_check_set((object)))
 #define	RUN_PARANOIA_CHECKS(object)	\
 			PARANOIA_ONLY(run_paranoia_checks((object)))
+#define	ADD_PARANOIA_CHECK(object, address, size)	\
+			PARANOIA_ONLY(set_paranoia_check((object), (address), (size), \
+				PARANOIA_FAIL_IF_EXISTS))
+#define	UPDATE_PARANOIA_CHECK(object, address, size)	\
+			PARANOIA_ONLY(set_paranoia_check((object), (address), (size), \
+				PARANOIA_FAIL_IF_MISSING))
 #define	SET_PARANOIA_CHECK(object, address, size)	\
-			PARANOIA_ONLY(set_paranoia_check((object), (address), (size)))
+			PARANOIA_ONLY(set_paranoia_check((object), (address), (size), \
+				PARANOIA_DONT_FAIL))
 #define	REMOVE_PARANOIA_CHECK(object, address, size)	\
 			PARANOIA_ONLY(remove_paranoia_check((object), (address), (size)))
 
