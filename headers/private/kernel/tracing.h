@@ -16,6 +16,8 @@ struct trace_entry {
 	uint32	flags			: 4;
 };
 
+struct tracing_stack_trace;
+
 #ifdef __cplusplus
 
 #include <new>
@@ -35,6 +37,7 @@ class TraceOutput {
 
 		void Clear();
 		void Print(const char* format,...);
+		void PrintStackTrace(tracing_stack_trace* stackTrace);
 		bool IsFull() const	{ return fSize >= fCapacity; }
 
 		char* Buffer() const	{ return fBuffer; }
@@ -60,6 +63,7 @@ class TraceEntry : public trace_entry {
 		virtual ~TraceEntry();
 
 		virtual void Dump(TraceOutput& out);
+		virtual void DumpStackTrace(TraceOutput& out);
 
 		size_t Size() const { return size; }
 		uint16 Flags() const { return flags; }
@@ -140,6 +144,8 @@ uint8* alloc_tracing_buffer(size_t size);
 uint8* alloc_tracing_buffer_memcpy(const void* source, size_t size, bool user);
 char* alloc_tracing_buffer_strcpy(const char* source, size_t maxSize,
 			bool user);
+tracing_stack_trace* capture_tracing_stack_trace(int32 maxCount,
+			int32 skipFrames, bool userOnly);
 int dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter);
 status_t tracing_init(void);
 

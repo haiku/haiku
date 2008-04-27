@@ -10,7 +10,10 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
+#include <arch/debug.h>
 #include <debug.h>
+#include <elf.h>
+#include <int.h>
 #include <kernel.h>
 #include <team.h>
 #include <thread.h>
@@ -34,6 +37,13 @@ enum {
 	FILTER_MATCH		= 0x08
 };
 
+struct tracing_stack_trace {
+	int32	depth;
+	addr_t	return_addresses[0];
+};
+
+
+static const size_t kTraceOutputBufferSize = 10240;
 static const size_t kBufferSize = MAX_TRACE_SIZE / 4;
 
 static trace_entry* sBuffer;
@@ -42,6 +52,7 @@ static trace_entry* sAfterLastEntry;
 static uint32 sEntries;
 static uint32 sWritten;
 static spinlock sLock;
+static char* sTraceOutputBuffer;
 
 
 static trace_entry*
@@ -239,6 +250,31 @@ TraceOutput::Print(const char* format,...)
 
 
 void
+TraceOutput::PrintStackTrace(tracing_stack_trace* stackTrace)
+{
+	if (stackTrace == NULL || stackTrace->depth <= 0)
+		return;
+
+	for (int32 i = 0; i < stackTrace->depth; i++) {
+		addr_t address = stackTrace->return_addresses[i];
+
+		const char* symbol;
+		const char* imageName;
+		bool exactMatch;
+		addr_t baseAddress;
+
+		if (elf_debug_lookup_symbol_address(address, &baseAddress, &symbol,
+				&imageName, &exactMatch) == B_OK) {
+			Print("  %p  %s + 0x%lx (%s)%s\n", (void*)address, symbol,
+				address - baseAddress, imageName,
+				exactMatch ? "" : " (nearest)");
+		} else
+			Print("  %p\n", (void*)address);
+	}
+}
+
+
+void
 TraceOutput::SetLastEntryTime(bigtime_t time)
 {
 	fLastEntryTime = time;
@@ -272,6 +308,12 @@ TraceEntry::Dump(TraceOutput& out)
 	// to be overridden by subclasses
 	out.Print("ENTRY %p", this);
 #endif
+}
+
+
+void
+TraceEntry::DumpStackTrace(TraceOutput& out)
+{
 }
 
 
@@ -758,6 +800,7 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 	// variables in which we store our state to be continuable
 	static int32 _previousCount = 0;
 	static bool _previousHasFilter = false;
+	static bool _previousPrintStackTrace = false;
 	static int32 _previousMaxToCheck = 0;
 	static int32 _previousFirstChecked = 1;
 	static int32 _previousLastChecked = -1;
@@ -775,14 +818,18 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 	int32 cont = 0;
 
 	bool hasFilter = false;
+	bool printStackTrace = false;
 
 	uint32 outputFlags = 0;
 	while (argi < argc) {
-		if (strcmp(argv[argi], "--printteam") == 0) {
+		if (strcmp(argv[argi], "--difftime") == 0) {
+			outputFlags |= TRACE_OUTPUT_DIFF_TIME;
+			argi++;
+		} else if (strcmp(argv[argi], "--printteam") == 0) {
 			outputFlags |= TRACE_OUTPUT_TEAM_ID;
 			argi++;
-		} else if (strcmp(argv[argi], "--difftime") == 0) {
-			outputFlags |= TRACE_OUTPUT_DIFF_TIME;
+		} else if (strcmp(argv[argi], "--stacktrace") == 0) {
+			printStackTrace = true;
 			argi++;
 		} else
 			break;
@@ -850,6 +897,7 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 		maxToCheck = _previousMaxToCheck;
 		hasFilter = _previousHasFilter;
 		outputFlags = _previousOutputFlags;
+		printStackTrace = _previousPrintStackTrace;
 
 		if (direction < 0)
 			start = _previousFirstChecked - 1;
@@ -896,8 +944,8 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 		iterator.Reset();
 	}
 
-	char buffer[256];
-	LazyTraceOutput out(buffer, sizeof(buffer), outputFlags);
+	LazyTraceOutput out(sTraceOutputBuffer, kTraceOutputBufferSize,
+		outputFlags);
 
 	bool markedMatching = false;
 	int32 firstToDump = firstToCheck;
@@ -985,6 +1033,13 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 				len--;
 
 			kprintf("%5ld. %.*s\n", index, len, dump);
+
+			if (printStackTrace) {
+				out.Clear();
+				entry->DumpStackTrace(out);
+				if (out.Size() > 0)
+					kputs(out.Buffer());
+			}
 		} else if (!filter)
 			kprintf("%5ld. ** uninitialized entry **\n", index);
 
@@ -999,6 +1054,7 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 	_previousCount = count;
 	_previousMaxToCheck = maxToCheck;
 	_previousHasFilter = hasFilter;
+	_previousPrintStackTrace = printStackTrace;
 	_previousFirstChecked = firstToCheck;
 	_previousLastChecked = lastToCheck;
 	_previousDirection = direction;
@@ -1089,6 +1145,31 @@ alloc_tracing_buffer_strcpy(const char* source, size_t maxSize, bool user)
 }
 
 
+tracing_stack_trace*
+capture_tracing_stack_trace(int32 maxCount, int32 skipFrames, bool userOnly)
+{
+#if	ENABLE_TRACING
+	// TODO: page_fault_exception() doesn't allow us to gracefully handle
+	// a bad address in the stack trace, if interrupts are disabled.
+	if (!are_interrupts_enabled())
+		return NULL;
+
+	tracing_stack_trace* stackTrace
+		= (tracing_stack_trace*)alloc_tracing_buffer(
+			sizeof(tracing_stack_trace) + maxCount * sizeof(addr_t));
+
+	if (stackTrace != NULL) {
+		stackTrace->depth = arch_debug_get_stack_trace(
+			stackTrace->return_addresses, maxCount, skipFrames + 1, userOnly);
+	}
+
+	return stackTrace;
+#else
+	return NULL;
+#endif
+}
+
+
 int
 dump_tracing(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 {
@@ -1104,12 +1185,13 @@ extern "C" status_t
 tracing_init(void)
 {
 #if	ENABLE_TRACING
-	area_id area = create_area("tracing log", (void**)&sBuffer,
-		B_ANY_KERNEL_ADDRESS, MAX_TRACE_SIZE, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	area_id area = create_area("tracing log", (void**)&sTraceOutputBuffer,
+		B_ANY_KERNEL_ADDRESS, MAX_TRACE_SIZE + kTraceOutputBufferSize,
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (area < B_OK)
 		return area;
 
+	sBuffer = (trace_entry*)(sTraceOutputBuffer + kTraceOutputBufferSize);
 	sFirstEntry = sBuffer;
 	sAfterLastEntry = sBuffer;
 
@@ -1125,8 +1207,9 @@ tracing_init(void)
 		"afterwards entering an empty line in the debugger will reinvoke it.\n"
 		"If no arguments are given, the command continues in the direction\n"
 		"of the last invocation.\n"
-		"\"--printteam\" enables printing the entries' team IDs.\n"
-		"\"--difftime\"  print difference times for all but the first entry.\n"
+		"\"--printteam\"  enables printing the entries' team IDs.\n"
+		"\"--difftime\"   print difference times for all but the first entry.\n"
+		"\"--stacktrace\" print stack traces for entries that captured one.\n"
 		"  <start>    - The base index of the entries to print. Depending on\n"
 		"               whether the iteration direction is forward or\n"
 		"               backward this will be the first or last entry printed\n"
