@@ -6,6 +6,7 @@
  *		Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
+ *		Philippe Saint-Pierre <stpere@gmail.com>
  */
 #ifndef DATE_TIME_VIEW_H
 #define DATE_TIME_VIEW_H
@@ -19,6 +20,7 @@ class TTimeEdit;
 class BCalendarView;
 class BRadioButton;
 class TAnalogClock;
+class BButton;
 
 
 class DateTimeView : public BView {
@@ -30,12 +32,16 @@ class DateTimeView : public BView {
 		virtual void 	Draw(BRect updaterect);
 		virtual void 	MessageReceived(BMessage *message);
 
+				void	CheckCanRevert();
+
 	private:
 		void 			_InitView();
 		void 			_ReadRTCSettings();
 		void			_WriteRTCSettings();
 		void			_UpdateGmtSettings();
 		void 			_UpdateDateTime(BMessage *message);
+		void			_Revert();
+		time_t			_PrefletUptime() const;
 
 	private:
 		BRadioButton 	*fLocalTime;
@@ -45,8 +51,14 @@ class DateTimeView : public BView {
 		BCalendarView 	*fCalendarView;
 		TAnalogClock 	*fClock;
 
+		BButton			*fRevertButton;
+
 		bool 			fUseGmtTime;
+		bool			fOldUseGmtTime;
 		bool			fInitialized;
+
+		time_t			fTimeAtStart;
+		bigtime_t		fSystemTimeAtStart;
 };
 
 #endif	// DATE_TIME_VIEW_H

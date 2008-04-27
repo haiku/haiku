@@ -6,6 +6,7 @@
  *		Andrew McCall, mccall@digitalparadise.co.uk
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
+ *		Philippe Saint-Pierre <stpere@gmail.com>
  */
 #ifndef TIME_MESSAGES_H
 #define TIME_MESSAGES_H
@@ -39,6 +40,9 @@ const uint32 kWeekStart = '_kws';
 
 // clicked on day in calendar
 const uint32 kDayChanged = '_kdc';
+
+// clicked on revert button
+const uint32 kMsgRevert = 'rvrt';
 
 #endif //TIME_MESSAGES_H
 

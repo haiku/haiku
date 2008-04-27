@@ -6,6 +6,7 @@
  *		Andrew McCall <mccall@@digitalparadise.co.uk>
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
+ *		Philippe Saint-Pierre <stpere@gmail.com>
  */
 
 #include "DateTimeView.h"
@@ -13,8 +14,10 @@
 #include "CalendarView.h"
 #include "DateTimeEdit.h"
 #include "TimeMessages.h"
+#include "DateTime.h"
 
 
+#include <Button.h>
 #include <CheckBox.h>
 #include <Entry.h>
 #include <File.h>
@@ -25,6 +28,7 @@
 #include <String.h>
 #include <StringView.h>
 #include <Window.h>
+#include <time.h>
 
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -39,10 +43,14 @@ DateTimeView::DateTimeView(BRect frame)
 	: BView(frame, "dateTimeView", B_FOLLOW_NONE, B_WILL_DRAW | B_NAVIGABLE_JUMP),
 	  fGmtTime(NULL),
 	  fUseGmtTime(false),
-	  fInitialized(false)
+	  fInitialized(false),
+	  fSystemTimeAtStart(system_time())
 {
 	_ReadRTCSettings();
 	_InitView();
+
+	// record the current time to enable revert.
+	time(&fTimeAtStart);
 }
 
 
@@ -63,7 +71,8 @@ DateTimeView::AttachedToWindow()
 
 		fGmtTime->SetTarget(this);
 		fLocalTime->SetTarget(this);
-		fCalendarView->SetTarget(this);		
+		fCalendarView->SetTarget(this);
+		fRevertButton->SetTarget(this);
 	}
 }
 
@@ -102,11 +111,11 @@ DateTimeView::MessageReceived(BMessage *message)
 			switch(change) {
 				case H_TM_CHANGED:
 					_UpdateDateTime(message);
-				break;
+					break;
 
 				default:
 					BView::MessageReceived(message);
-				break;
+					break;
 			}
 		break;
 
@@ -116,17 +125,80 @@ DateTimeView::MessageReceived(BMessage *message)
 			msg.what = H_USER_CHANGE;
 			msg.AddBool("time", false);
 			Window()->PostMessage(&msg);
-		}	break;
+			break;
+		}
 
 		case kRTCUpdate:
-			fUseGmtTime = !fUseGmtTime;
+			fUseGmtTime = fGmtTime->Value() == B_CONTROL_ON;
 			_UpdateGmtSettings();
+			CheckCanRevert();
 			break;
 
+		case kMsgRevert:
+			_Revert();
+			fRevertButton->SetEnabled(false);
+			break;
+	
 		default:
 			BView::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+DateTimeView::CheckCanRevert()
+{
+	// check GMT vs Local setting
+	bool enable = fUseGmtTime != fOldUseGmtTime;
+
+	// check for changed time
+	time_t unchangedNow = fTimeAtStart + _PrefletUptime();
+	time_t changedNow;
+	time(&changedNow);
+
+	enable = enable || (changedNow != unchangedNow);
+
+	fRevertButton->SetEnabled(enable);
+}
+
+
+void
+DateTimeView::_Revert()
+{
+	// Set the clock and calendar as they were at launch time + 
+	// time ellapsed since application launch.
+
+	fUseGmtTime = fOldUseGmtTime;
+	_UpdateGmtSettings();
+
+	if (fUseGmtTime)
+		fGmtTime->SetValue(B_CONTROL_ON);
+	else
+		fLocalTime->SetValue(B_CONTROL_ON);
+
+	time_t timeNow = fTimeAtStart + _PrefletUptime();
+	struct tm result;
+	struct tm* timeInfo;
+	timeInfo = localtime_r(&timeNow, &result);
+
+	BDateTime dateTime = BDateTime::CurrentDateTime(B_LOCAL_TIME);
+	BTime time = dateTime.Time();
+	BDate date = dateTime.Date();
+	time.SetTime(timeInfo->tm_hour, timeInfo->tm_min, timeInfo->tm_sec % 60);
+	date.SetDate(timeInfo->tm_year + 1900, timeInfo->tm_mon + 1,
+		timeInfo->tm_mday); 
+	dateTime.SetTime(time);
+	dateTime.SetDate(date);
+	
+	set_real_time_clock(dateTime.Time_t());
+}
+
+
+time_t
+DateTimeView::_PrefletUptime() const
+{
+	return (time_t)((system_time() - fSystemTimeAtStart) / 1000000);
 }
 
 
@@ -191,6 +263,22 @@ DateTimeView::_InitView()
 		fGmtTime->SetValue(B_CONTROL_ON);
 	else
 		fLocalTime->SetValue(B_CONTROL_ON);
+
+	fOldUseGmtTime = fUseGmtTime;
+
+	BRect rect = Bounds();
+
+	rect.left = 10;
+	rect.top = rect.bottom - 10;
+
+	fRevertButton = new BButton(rect, "revert", "Revert",
+		new BMessage(kMsgRevert), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
+	
+	fRevertButton->ResizeToPreferred();
+	fRevertButton->SetEnabled(false);
+	float buttonHeight = fRevertButton->Bounds().Height();
+	fRevertButton->MoveBy(0, -buttonHeight);
+	AddChild(fRevertButton);
 
 	ResizeTo(fClock->Frame().right + 10.0, fGmtTime->Frame().bottom + 10.0);
 }

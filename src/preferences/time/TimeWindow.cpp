@@ -43,6 +43,7 @@ TTimeWindow::MessageReceived(BMessage *message)
 	switch(message->what) {
 		case H_USER_CHANGE:
 			fBaseView->ChangeTime(message);
+			fDateTimeView->CheckCanRevert();
 			break;
 		
 		case B_ABOUT_REQUESTED:
