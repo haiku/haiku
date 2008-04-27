@@ -602,7 +602,8 @@ BackgroundsView::Save()
 
 		if (fCurrentInfo != NULL) {
 			if (fWorkspaceMenu->FindItem(kMsgCurrentWorkspace)->IsMarked()) {
-				if (fCurrentInfo->fWorkspace != workspaceMask) {
+				if (fCurrentInfo->fWorkspace & workspaceMask
+					&& fCurrentInfo->fWorkspace != workspaceMask) {
 					fCurrentInfo->fWorkspace = fCurrentInfo->fWorkspace
 						^ workspaceMask;
 					if (fLastImageIndex > -1) {
@@ -612,7 +613,7 @@ BackgroundsView::Save()
 							fCurrentInfo->fCacheMode);
 						fCurrent->Add(fCurrentInfo);
 					}
-				} else {
+				} else if (fCurrentInfo->fWorkspace == workspaceMask) {
 					if (fLastImageIndex > -1) {
 						fCurrentInfo->fTextWidgetLabelOutline =
 							textWidgetLabelOutline;
