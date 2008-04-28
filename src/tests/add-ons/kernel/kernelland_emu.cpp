@@ -848,6 +848,13 @@ atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst)
 }
 
 
+extern "C" uint64
+parse_expression(const char* arg)
+{
+	return strtoull(arg, NULL, 0);
+}
+
+
 extern "C" int
 add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 {
