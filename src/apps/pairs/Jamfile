@@ -1,8 +1,6 @@
 SubDir HAIKU_TOP src apps pairs ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
-
-UsePrivateHeaders shared ;
+UseLibraryHeaders icon ;
 
 Application Pairs :
 	Pairs.cpp

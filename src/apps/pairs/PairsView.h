@@ -25,7 +25,7 @@ public:
 					
 private:
 			void				_SetPairsBoard();
-			void				_PairsCards();
+			void				_ReadRandomIcons();
 			void				_GenarateCardPos();
 
 			BMessage*			fButtonMessage;

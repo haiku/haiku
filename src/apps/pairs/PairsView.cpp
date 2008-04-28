@@ -2,39 +2,37 @@
  * Copyright 2008, Ralf Schülke, teammaui@web.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-
+#include "PairsView.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <iostream>
-#include <cstdlib> 
-#include <ctime>
-
+#include <Alert.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <Directory.h>
+#include <Entry.h>
+#include <FindDirectory.h>
+#include <IconUtils.h>
+#include <List.h>
+#include <Node.h>
+#include <NodeInfo.h>
+#include <Path.h>
 
-#include "PairsTopButton.h"
-#include "PairsView.h"
-#include "PairsGlobal.h"
 #include "Pairs.h"
-
-#include "bitmaps/appearance.h"
-#include "bitmaps/cortex.h"
-#include "bitmaps/joystick.h"
-#include "bitmaps/kernel.h"
-#include "bitmaps/launchbox.h"
-#include "bitmaps/people.h"
-#include "bitmaps/teapot.h"
-#include "bitmaps/tracker.h"
+#include "PairsGlobal.h"
+#include "PairsTopButton.h"
 
 // TODO: support custom board sizes
 
 PairsView::PairsView(BRect frame, const char* name, uint32 resizingMode)
 	: BView(frame, name, resizingMode, B_WILL_DRAW)
 {
-	_PairsCards();
+	// init bitmap pointers
+	for (int i = 0; i < 8; i++)
+		fCard[i] = NULL;
+
 	CreateGameBoard();
 	_SetPairsBoard();
 }
@@ -71,23 +69,88 @@ PairsView::AttachedToWindow()
 
 
 void
-PairsView::_PairsCards()
+PairsView::_ReadRandomIcons()
 {
+	// TODO: maybe read the icons only once at startup
+
+	// clean out any previous icons
 	for (int i = 0; i < 8; i++) {
-		fCard[i] = new BBitmap(BRect(0, 0, kBitmapSize - 1, kBitmapSize - 1),
-			B_RGBA32);
+		delete fCard[i];
+		fCard[i] = NULL;
 	}
-		
-	// TODO: read random icons from the files in /boot/beos/apps
-	// and /boot/beos/preferences...
-	memcpy(fCard[0]->Bits(), kappearanceBits, fCard[0]->BitsLength());
-	memcpy(fCard[1]->Bits(), kcortexBits, fCard[1]->BitsLength());
-	memcpy(fCard[2]->Bits(), kjoystickBits, fCard[2]->BitsLength());
-	memcpy(fCard[3]->Bits(), kkernelBits, fCard[3]->BitsLength());
-	memcpy(fCard[4]->Bits(), klaunchboxBits, fCard[4]->BitsLength());
-	memcpy(fCard[5]->Bits(), kpeopleBits, fCard[5]->BitsLength());
-	memcpy(fCard[6]->Bits(), kteapotBits, fCard[6]->BitsLength());
-	memcpy(fCard[7]->Bits(), ktrackerBits, fCard[7]->BitsLength());
+
+	BDirectory appsDirectory;
+	BDirectory prefsDirectory;
+
+	BPath path;
+	if (find_directory(B_BEOS_APPS_DIRECTORY, &path) == B_OK)
+		appsDirectory.SetTo(path.Path());
+	if (find_directory(B_BEOS_PREFERENCES_DIRECTORY, &path) == B_OK)
+		prefsDirectory.SetTo(path.Path());
+
+	// read vector icons from apps and prefs folder and put them
+	// into a BList as BBitmaps
+	BList bitmaps;
+
+	BEntry entry;
+	while (appsDirectory.GetNextEntry(&entry) == B_OK
+		|| prefsDirectory.GetNextEntry(&entry) == B_OK) {
+
+		BNode node(&entry);
+		BNodeInfo nodeInfo(&node);
+
+		if (nodeInfo.InitCheck() < B_OK)
+			continue;
+
+		uint8* data;
+		size_t size;
+		type_code type;
+
+		if (nodeInfo.GetIcon(&data, &size, &type) < B_OK)
+			continue;
+
+		if (type != B_VECTOR_ICON_TYPE) {
+			delete[] data;
+			continue;
+		}
+
+		BBitmap* bitmap = new BBitmap(
+			BRect(0, 0, kBitmapSize - 1, kBitmapSize - 1), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(data, size, bitmap) < B_OK) {
+			delete[] data;
+			delete bitmap;
+			continue;
+		}
+
+		delete[] data;
+
+		if (!bitmaps.AddItem(bitmap))
+			delete bitmap;
+
+		if (bitmaps.CountItems() >= 128) {
+			// this is enough to choose from, stop eating memory...
+			break;
+		}
+	}
+
+	// pick eight random bitmaps from the ones we got in the list	
+	srand((unsigned)time(0)); 
+
+	for (int i = 0; i < 8; i++) {
+		int32 index = rand() % bitmaps.CountItems();
+		fCard[i] = (BBitmap*)bitmaps.RemoveItem(index);
+		if (fCard[i] == NULL) {
+			BAlert* alert = new BAlert("fatal", "Pairs did not find enough "
+				"vector icons in the system, it needs at least eight.",
+				"Oh!", NULL, NULL, B_WIDTH_FROM_WIDEST, B_STOP_ALERT);
+			alert->Go();
+			exit(1);
+		}
+	}
+
+	// delete the remaining bitmaps from the list
+	while (BBitmap* bitmap = (BBitmap*)bitmaps.RemoveItem(0L))
+		delete bitmap;
 }
 
 
@@ -96,7 +159,7 @@ PairsView::_SetPairsBoard()
 {	
 	for (int i = 0; i < 16; i++) {
 		fButtonMessage = new BMessage(kMsgCardButton);
-		fButtonMessage->AddInt32("ButtonNum",i);
+		fButtonMessage->AddInt32("ButtonNum", i);
 		
 		int x =  i % 4 * (kBitmapSize + 10) + 10;
 		int y =  i / 4 * (kBitmapSize + 10) + 10;
@@ -110,9 +173,7 @@ PairsView::_SetPairsBoard()
 void
 PairsView::_GenarateCardPos()
 {
-	// TODO: when loading random icons, the would also have to be
-	// loaded here (or at least somewhere in the code path that creates
-	// a new game after one finished)
+	_ReadRandomIcons();
 
 	srand((unsigned)time(0)); 
 	
@@ -125,14 +186,13 @@ PairsView::_GenarateCardPos()
 
 		fRandPos[16-i] = positions[index];
 		
-		for (int j = index; j < i - 1; j++) {
+		for (int j = index; j < i - 1; j++)
 			positions[j] = positions[j + 1];
-		}
 	}
 	
 	for (int i = 0; i < 16; i++) {
-		fPosX[i] =  (fRandPos[i]) % 4 * (kBitmapSize+10) + 10;
-		fPosY[i] =  (fRandPos[i]) / 4 * (kBitmapSize+10) + 10;
+		fPosX[i] = (fRandPos[i]) % 4 * (kBitmapSize + 10) + 10;
+		fPosY[i] = (fRandPos[i]) / 4 * (kBitmapSize + 10) + 10;
 	}
 }
 
@@ -143,9 +203,8 @@ PairsView::Draw(BRect updateRect)
 	SetDrawingMode(B_OP_ALPHA);
 	
 	// draw rand pair 1 & 2
-	for (int i = 0; i < 16; i++) {
+	for (int i = 0; i < 16; i++)
 		DrawBitmap(fCard[i % 8], BPoint(fPosX[i], fPosY[i]));	
-	}
 }
 
 
