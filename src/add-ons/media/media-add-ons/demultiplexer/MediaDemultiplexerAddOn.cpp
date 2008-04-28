@@ -62,10 +62,6 @@ status_t MediaDemultiplexerAddOn::GetFlavorAt(
 	const flavor_info ** out_info)
 {
 	fprintf(stderr,"MediaDemultiplexerAddOn::GetFlavorAt\n");
-	if (out_info == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}	
 	if (n != 0) {
 		fprintf(stderr,"<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
@@ -82,10 +78,6 @@ BMediaNode * MediaDemultiplexerAddOn::InstantiateNodeFor(
 				status_t * out_error)
 {
 	fprintf(stderr,"MediaDemultiplexerAddOn::InstantiateNodeFor\n");
-	if (out_error == 0) {
-		fprintf(stderr,"<- NULL\n");
-		return 0; // we refuse to crash because you were stupid
-	}
 	MediaDemultiplexerNode * node
 		= new MediaDemultiplexerNode(info,config,this);
 	if (node == 0) {
@@ -102,10 +94,6 @@ status_t MediaDemultiplexerAddOn::GetConfigurationFor(
 				BMessage * into_message)
 {
 	fprintf(stderr,"MediaDemultiplexerAddOn::GetConfigurationFor\n");
-	if (into_message == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}	
 	MediaDemultiplexerNode * node
 		= dynamic_cast<MediaDemultiplexerNode*>(your_node);
 	if (node == 0) {

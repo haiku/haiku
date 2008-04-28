@@ -267,10 +267,6 @@ status_t ESDSinkNode::AcceptFormat(
 		return B_MEDIA_BAD_DESTINATION; // we only have one input so that better be it
 	}
 	
-	if (format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 /*	media_format * myFormat = GetFormat();
 	fprintf(stderr,"proposed format: ");
 	print_media_format(format);
@@ -316,12 +312,6 @@ status_t ESDSinkNode::GetNextInput(
 				media_input * out_input)
 {
 	CALLED();
-	// let's not crash even if they are stupid
-	if (out_input == 0) {
-		// no place to write!
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
-	}
 	
 	if ((*cookie < 1) && (*cookie >= 0)) {
 		*out_input = fInput;
@@ -436,10 +426,6 @@ status_t ESDSinkNode::Connected(
 				media_input * out_input)
 {
 	CALLED();
-	if (out_input == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	
 	if(fInput.destination != where) {
 		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
@@ -1401,9 +1387,6 @@ ESDSinkNode::GetConfigurationFor(BMessage * into_message)
 	bigtime_t last_change;
 	status_t err;
 	
-	if(!into_message)
-		return B_BAD_VALUE;
-	
 	buffer = malloc(size);
 	
 	for(int32 i=0; i<fWeb->CountParameters(); i++) {
@@ -1438,9 +1421,6 @@ ESDSinkNode::GetConfigurationFor(BMessage * into_message)
 void ESDSinkNode::GetFlavor(flavor_info * outInfo, int32 id)
 {
 	CALLED();
-	if (outInfo == 0) {
-		return;
-	}
 
 	outInfo->flavor_flags = B_FLAVOR_IS_GLOBAL;
 //	outInfo->possible_count = 0;	// any number
@@ -1475,9 +1455,7 @@ void ESDSinkNode::GetFlavor(flavor_info * outInfo, int32 id)
 void ESDSinkNode::GetFormat(media_format * outFormat)
 {
 	CALLED();
-	if (outFormat == 0) {
-		return;
-	}
+
 	outFormat->type = B_MEDIA_RAW_AUDIO;
 	outFormat->require_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;
 	outFormat->deny_flags = B_MEDIA_MAUI_UNDEFINED_FLAGS;	

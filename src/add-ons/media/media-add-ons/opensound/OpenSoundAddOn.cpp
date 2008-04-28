@@ -98,10 +98,6 @@ status_t OpenSoundAddOn::GetFlavorAt(
 	const flavor_info ** out_info)
 {
 	CALLED();
-	if (out_info == 0) {
-		fprintf(stderr, "<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}
 	if (n < 0 || n > fDevices.CountItems() - 1) {
 		fprintf(stderr, "<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
@@ -122,17 +118,7 @@ BMediaNode * OpenSoundAddOn::InstantiateNodeFor(
 	status_t * out_error)
 {
 	CALLED();
-	if (out_error == 0) {
-		fprintf(stderr, "<- NULL\n");
-		return 0; // we refuse to crash because you were stupid
-	}
 	
-	BMessage fakeConfig;
-	if (config == 0) {
-		fprintf(stderr, "<- config == NULL\n");
-		config = &fakeConfig; // we refuse to crash because you were stupid
-	}
-
 	OpenSoundDevice *device = (OpenSoundDevice*)fDevices.ItemAt(info->internal_id);
 	if (device == NULL) {
 		*out_error = B_ERROR;
@@ -165,7 +151,7 @@ OpenSoundAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_mess
 {
 	CALLED();
 #ifdef MULTI_SAVE
-	if (into_message == 0) {
+	{
 		into_message = new BMessage();
 		OpenSoundNode * node = dynamic_cast<OpenSoundNode*>(your_node);
 		if (node == 0) {
@@ -179,10 +165,6 @@ OpenSoundAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_mess
 	}
 #endif
 	// currently never called by the media kit. Seems it is not implemented.
-	if (into_message == 0) {
-		fprintf(stderr, "<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}
 	OpenSoundNode * node = dynamic_cast<OpenSoundNode*>(your_node);
 	if (node == 0) {
 		fprintf(stderr, "<- B_BAD_TYPE\n");

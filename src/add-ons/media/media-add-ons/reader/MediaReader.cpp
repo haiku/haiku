@@ -221,11 +221,6 @@ status_t MediaReader::FormatSuggestionRequested(
 {
 	CALLED();
 
-	if (format == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
-
 	if ((type != B_MEDIA_MULTISTREAM) && (type != B_MEDIA_UNKNOWN_TYPE)) {
 		PRINT("\t<- B_MEDIA_BAD_FORMAT\n");
 		return B_MEDIA_BAD_FORMAT;
@@ -246,10 +241,6 @@ status_t MediaReader::FormatProposal(
 {
 	CALLED();
 
-	if (format == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	if (output.source != output_source) {
 		PRINT("\t<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE; // we only have one output so that better be it
@@ -286,10 +277,6 @@ status_t MediaReader::FormatChangeRequested(
 {
 	CALLED();
 
-	if (io_format == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	if (output.source != source) {
 		PRINT("\t<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
@@ -311,21 +298,13 @@ status_t MediaReader::GetNextOutput(	/* cookie starts as 0 */
 {
 	CALLED();
 
-	// let's not crash even if they are stupid
-	if (out_output == 0) {
-		// no place to write!
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
+	if (*cookie != 0) {
+		PRINT("\t<- B_ERROR (no more outputs)\n");
+		return B_ERROR;
 	}
-	if (cookie != 0) {
-		// it's valid but they already got our 1 output
-		if (*cookie != 0) {
-			PRINT("\t<- B_ERROR (no more outputs)\n");
-			return B_ERROR;
-		}
-		// so next time they won't get the same output again
-		*cookie = 1;
-	}
+
+	// so next time they won't get the same output again
+	*cookie = 1;
 	*out_output = output;
 	return B_OK;
 }
@@ -417,10 +396,6 @@ status_t MediaReader::GetLatency(
 {
 	CALLED();
 
-	if (out_latency == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
-	}
 	*out_latency = EventLatency() + SchedulingLatency();
 	return B_OK;
 }
@@ -434,11 +409,6 @@ status_t MediaReader::PrepareToConnect(
 				char * out_name)
 {
 	CALLED();
-
-	if ((format == 0) || (out_source == 0) || (out_name == 0)) {
-		PRINT("\ŧ<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashes...
-	}
 
 	if (output.source != what) {
 		PRINT("\t<- B_MEDIA_BAD_SOURCE\n");
@@ -773,9 +743,6 @@ void MediaReader::GetFormat(media_format * outFormat)
 {
 	CALLED();
 
-	if (outFormat == 0)
-		return;
-
 	AbstractFileInterfaceNode::GetFormat(outFormat);
 	return;
 }
@@ -784,9 +751,6 @@ void MediaReader::GetFormat(media_format * outFormat)
 void MediaReader::GetFileFormat(media_file_format * outFileFormat)
 {
 	CALLED();
-
-	if (outFileFormat == 0)
-		return;
 
 	AbstractFileInterfaceNode::GetFileFormat(outFileFormat);
 	outFileFormat->capabilities |= media_file_format::B_READABLE;

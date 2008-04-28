@@ -60,10 +60,6 @@ status_t AbstractFileInterfaceAddOn::GetFlavorAt(
 {
 	CALLED();
 
-	if (out_info == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}
 	if (n != 0) {
 		PRINT("\t<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
@@ -81,10 +77,6 @@ status_t AbstractFileInterfaceAddOn::GetConfigurationFor(
 				BMessage * into_message)
 {
 	CALLED();
-	if (into_message == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}	
 	AbstractFileInterfaceNode * node
 		= dynamic_cast<AbstractFileInterfaceNode*>(your_node);
 	if (node == 0) {
@@ -124,11 +116,6 @@ status_t AbstractFileInterfaceAddOn::SniffRef(
 {
 	CALLED();
 
-	if ((io_mime_type == 0) || (out_quality == 0) || (out_internal_id == 0)) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}
-
 	*out_internal_id = 0; // only one flavor
 	char mime_string[B_MIME_TYPE_LENGTH+1];
 	status_t status =  AbstractFileInterfaceNode::StaticSniffRef(file,mime_string,out_quality);
@@ -146,23 +133,12 @@ status_t AbstractFileInterfaceAddOn::SniffType(
 {
 	CALLED();
 
-	if ((out_quality == 0) || (out_internal_id == 0)) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}
-
 	*out_quality = 1.0;
 	*out_internal_id = 0;
 	return B_OK;	
 }
 
 
-// This function treats null pointers slightly differently than the others.
-// This is because a program could reasonably call this function with just
-// about any junk, get the out_read_items or out_write_items and then use
-// that to create an array of sufficient size to hold the result, and then
-// call us again.  So we won't punish them if they supply us with null
-// pointers the first time around.
 status_t AbstractFileInterfaceAddOn::GetFileFormatList(
 				int32 flavor_id,
 				media_file_format * out_writable_formats,
@@ -180,13 +156,9 @@ status_t AbstractFileInterfaceAddOn::GetFileFormatList(
 		PRINT("\t<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
 	}
-	// see null check comment above
-	if (out_write_items != 0)
-		*out_write_items = 0;
 
-	// see null check comment above
-	if (out_read_items != 0)
-		*out_read_items = 0;
+	*out_write_items = 0;
+	*out_read_items = 0;
 
 	return B_OK;
 }
@@ -202,10 +174,6 @@ status_t AbstractFileInterfaceAddOn::SniffTypeKind(
 {
 	CALLED();
 
-	if ((out_quality == 0) || (out_internal_id == 0)) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}
 	if (in_kinds & (io_kind | B_FILE_INTERFACE | B_CONTROLLABLE)) {
 		return SniffType(type,out_quality,out_internal_id);
 	} else {

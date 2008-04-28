@@ -304,23 +304,14 @@ status_t AbstractFileInterfaceNode::GetNextFileFormat(
 {
 	CALLED();
 
-	// avoid crashes
-	if (out_format == 0) {
-		// no place to write!
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
+	// it's valid but they already got our 1 file format
+	if (*cookie != 0) {
+		PRINT("\t<- B_ERROR\n");
+		return B_ERROR;
 	}
 
-	if (cookie != 0) {
-		// it's valid but they already got our 1 file format
-		if (*cookie != 0) {
-			PRINT("\t<- B_ERROR\n");
-			return B_ERROR;
-		}
-		// so next time they won't get the same format again
-		*cookie = 1;
-	}
-
+	// so next time they won't get the same format again
+	*cookie = 1;
 	GetFileFormat(out_format);
 	return B_OK;
 }
@@ -370,11 +361,6 @@ status_t AbstractFileInterfaceNode::SetRef(
 {
 	CALLED();
 
-	if (out_time == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashes today thanks
-	}
-
 	status_t status;
 	f_current_ref = file;
 	if (fCurrentFile == 0) {
@@ -402,11 +388,6 @@ status_t AbstractFileInterfaceNode::GetRef(
 {
 	CALLED();
 
-	if ((out_ref == 0) || (out_mime_type == 0)) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}
-
 	if (fCurrentFile == 0) {
 		PRINT("\t<- B_NO_INIT\n");
 		return B_NO_INIT; // the input_ref isn't valid yet either
@@ -426,11 +407,6 @@ status_t AbstractFileInterfaceNode::StaticSniffRef(
 				float * out_quality)
 {
 	CALLED();
-
-	if ((out_mime_type == 0) || (out_quality == 0)) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}
 
 	BNode node(&file);
 	status_t initCheck = node.InitCheck();
@@ -461,9 +437,6 @@ status_t AbstractFileInterfaceNode::GetParameterValue(
 				size_t * ioSize)
 {
 	CALLED();
-
-	if ((last_change == 0) || (value == 0) || (ioSize == 0))
-		return B_BAD_VALUE; // no crashing
 
 	switch (id) {
 		case DEFAULT_CHUNK_SIZE_PARAM:

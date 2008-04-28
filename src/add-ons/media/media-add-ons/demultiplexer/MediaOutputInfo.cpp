@@ -53,10 +53,6 @@ status_t MediaOutputInfo::SetBufferGroup(BBufferGroup * group) {
 // that.  We leave wildcards for anything that we don't care about.
 status_t MediaOutputInfo::FormatProposal(media_format * format)
 {
-	if (format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	// Be's format_is_compatible doesn't work,
 	// so use our format_is_acceptible instead
 	if (!format_is_acceptible(*format,generalFormat)) {
@@ -75,10 +71,6 @@ status_t MediaOutputInfo::FormatProposal(media_format * format)
 status_t MediaOutputInfo::FormatChangeRequested(const media_destination & destination,
 							   media_format * io_format)
 {
-	if (io_format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	status_t status = FormatProposal(io_format);
 	if (status != B_OK) {
 		fprintf(stderr,"<- MediaOutputInfo::FormatProposal failed\n");
@@ -115,10 +107,6 @@ status_t MediaOutputInfo::Connect(const media_destination & destination,
 				 char * io_name,
 				 bigtime_t _downstreamLatency)
 {
-	if (io_name == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
-	}
 	output.destination = destination;
 	output.format = format;
 	strncpy(io_name,output.name,B_MEDIA_NAME_LENGTH-1);

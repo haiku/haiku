@@ -84,8 +84,6 @@ status_t
 MultiAudioAddOn::GetFlavorAt(int32 index, const flavor_info** _info)
 {
 	CALLED();
-	if (_info == NULL)
-		return B_BAD_VALUE;
 
 	MultiAudioDevice* device = (MultiAudioDevice*)fDevices.ItemAt(index);
 	if (device == NULL)
@@ -108,8 +106,6 @@ MultiAudioAddOn::InstantiateNodeFor(const flavor_info* info, BMessage* config,
 	status_t* _error)
 {
 	CALLED();
-	if (_error == NULL)
-		return NULL;
 
 	MultiAudioDevice* device = (MultiAudioDevice*)fDevices.ItemAt(
 		info->internal_id);
@@ -155,8 +151,6 @@ MultiAudioAddOn::GetConfigurationFor(BMediaNode* _node, BMessage* message)
 #endif
 
 	// currently never called by the media kit. Seems it is not implemented.
-	if (message == NULL)
-		return B_BAD_VALUE;
 
 	return node->GetConfigurationFor(message);
 }

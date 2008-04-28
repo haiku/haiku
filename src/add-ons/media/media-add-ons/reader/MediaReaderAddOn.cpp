@@ -51,10 +51,6 @@ status_t MediaReaderAddOn::GetFlavorAt(
 {
 	CALLED();
 
-	if (out_info == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}	
 	if (n != 0) {
 		PRINT("\t<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
@@ -73,11 +69,6 @@ BMediaNode * MediaReaderAddOn::InstantiateNodeFor(
 				status_t * out_error)
 {
 	CALLED();
-
-	if (out_error == 0) {
-		PRINT("\t<- NULL\n");
-		return 0; // avoid crash
-	}
 
 	// XXX: read from add-on's attributes
 	size_t defaultChunkSize = size_t(8192); // 8192 bytes = 8 Kilobytes
@@ -103,11 +94,6 @@ status_t MediaReaderAddOn::GetConfigurationFor(
 {
 	CALLED();
 
-	if (into_message == 0) {
-		PRINT("\t<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // avoid crash
-	}
-
 	MediaReader * node
 		= dynamic_cast<MediaReader*>(your_node);
 	if (node == 0) {
@@ -122,17 +108,6 @@ status_t MediaReaderAddOn::GetConfigurationFor(
 // BMediaAddOn impl for B_FILE_INTERFACE nodes
 // -------------------------------------------------------- //
 
-// This function treats null pointers slightly differently than the others.
-// This is because a program could reasonably call this function with just
-// about any junk, get the out_read_items or out_write_items and then use
-// that to create an array of sufficient size to hold the result, and then
-// call us again.  So we won't punish them if they supply us with null
-// pointers the first time around.
-//
-// A stupid program might not supply an out_read_items, but actually supply
-// an out_readable_formats and then try to do something useful with it. As
-// an extreme gesture of nicety we will fill the out_readable_formats with
-// a valid entry, although they could easily read into garbage after that...
 status_t MediaReaderAddOn::GetFileFormatList(
 				int32 flavor_id,
 				media_file_format * out_writable_formats,
@@ -150,20 +125,10 @@ status_t MediaReaderAddOn::GetFileFormatList(
 		PRINT("\t<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
 	}
-	// see null check comment above
-	if (out_write_items != 0) {
-		*out_write_items = 0;
-	}
-	// see null check comment above
-	if (out_read_items != 0) {
-		*out_read_items = 1;
-	}
-	if (out_readable_formats != 0) {
 		// don't go off the end
 		if (in_read_items > 0) {
 			MediaReader::GetFileFormat(&out_readable_formats[0]);
 		}
-	}
 	return B_OK;
 }
 

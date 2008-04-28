@@ -113,10 +113,6 @@ status_t ESDSinkAddOn::GetFlavorAt(
 	const flavor_info ** out_info)
 {
 	CALLED();
-	if (out_info == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}
 	//if (n < 0 || n > fDevices.CountItems() - 1) {
 	if (n < 0 || n > 1) {
 		fprintf(stderr,"<- B_BAD_INDEX\n");
@@ -139,14 +135,6 @@ BMediaNode * ESDSinkAddOn::InstantiateNodeFor(
 				status_t * out_error)
 {
 	CALLED();
-	if (out_error == 0) {
-		fprintf(stderr,"<- NULL\n");
-		return 0; // we refuse to crash because you were stupid
-	}
-	
-	BMessage defaults;
-	if (!config)
-		config = &defaults;
 		
 #ifdef MULTI_SAVE
 	if(fSettings.FindMessage(device->MD.friendly_name, config)==B_OK) {
@@ -173,7 +161,6 @@ ESDSinkAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_messag
 {
 	CALLED();
 #ifdef MULTI_SAVE
-	if (into_message == 0) {
 		into_message = new BMessage();
 		ESDSinkNode * node = dynamic_cast<ESDSinkNode*>(your_node);
 		if (node == 0) {
@@ -184,13 +171,9 @@ ESDSinkAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_messag
 			fSettings.AddMessage(your_node->Name(), into_message);
 		}		
 		return B_OK;
-	}
 #endif	
 	// currently never called by the media kit. Seems it is not implemented.
-	if (into_message == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}	
+
 	ESDSinkNode * node = dynamic_cast<ESDSinkNode*>(your_node);
 	if (node == 0) {
 		fprintf(stderr,"<- B_BAD_TYPE\n");

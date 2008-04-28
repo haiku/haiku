@@ -50,10 +50,6 @@ status_t MediaWriterAddOn::GetFlavorAt(
 	const flavor_info ** out_info)
 {
 	fprintf(stderr,"MediaWriterAddOn::GetFlavorAt\n");
-	if (out_info == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}	
 	if (n != 0) {
 		fprintf(stderr,"<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
@@ -70,10 +66,6 @@ BMediaNode * MediaWriterAddOn::InstantiateNodeFor(
 				status_t * out_error)
 {
 	fprintf(stderr,"MediaWriterAddOn::InstantiateNodeFor\n");
-	if (out_error == 0) {
-		fprintf(stderr,"<- NULL\n");
-		return 0; // we refuse to crash because you were stupid
-	}
 	size_t defaultChunkSize = size_t(8192); // XXX: read from add-on's attributes
 	float defaultBitRate = 800000;
 	MediaWriter * node
@@ -94,10 +86,6 @@ status_t MediaWriterAddOn::GetConfigurationFor(
 				BMessage * into_message)
 {
 	fprintf(stderr,"MediaWriterAddOn::GetConfigurationFor\n");
-	if (into_message == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}	
 	MediaWriter * node
 		= dynamic_cast<MediaWriter*>(your_node);
 	if (node == 0) {
@@ -111,17 +99,6 @@ status_t MediaWriterAddOn::GetConfigurationFor(
 // BMediaAddOn impl for B_FILE_INTERFACE nodes
 // -------------------------------------------------------- //
 
-// This function treats null pointers slightly differently than the others.
-// This is because a program could reasonably call this function with just
-// about any junk, get the out_read_items or out_write_items and then use
-// that to create an array of sufficient size to hold the result, and then
-// call us again.  So we won't punish them if they supply us with null
-// pointers the first time around.
-//
-// A stupid program might not supply an out_read_items, but actually supply
-// an out_readable_formats and then try to do something useful with it. As
-// an extreme gesture of nicety we will fill the out_readable_formats with
-// a valid entry, although they could easily read into garbage after that...
 status_t MediaWriterAddOn::GetFileFormatList(
 				int32 flavor_id,
 				media_file_format * out_writable_formats,
@@ -138,20 +115,10 @@ status_t MediaWriterAddOn::GetFileFormatList(
 		fprintf(stderr,"<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
 	}
-	// see null check comment above
-	if (out_write_items != 0) {
-		*out_write_items = 0;
-	}	
-	// see null check comment above
-	if (out_read_items != 0) {
-		*out_read_items = 1;
-	}
-	if (out_writable_formats != 0) {
 		// don't go off the end
 		if (in_write_items > 0) {
 			MediaWriter::GetFileFormat(&out_writable_formats[0]);
 		}
-	}
 	return B_OK;
 }
 

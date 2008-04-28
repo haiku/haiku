@@ -243,10 +243,6 @@ status_t MediaDemultiplexerNode::AcceptFormat(
 				media_format * format)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::AcceptFormat\n");
-	if (format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	if (input.destination != dest) {
 		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION");
 		return B_MEDIA_BAD_DESTINATION; // we only have one input so that better be it
@@ -268,21 +264,13 @@ status_t MediaDemultiplexerNode::GetNextInput(
 				media_input * out_input)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::GetNextInput\n");
-	// let's not crash even if they are stupid
-	if (out_input == 0) {
-		// no place to write!
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
+	if (*cookie != 0) {
+		fprintf(stderr,"<- B_ERROR (no more inputs)\n");
+		return B_ERROR;
 	}
-	if (cookie != 0) {
-		// it's valid but they already got our 1 input
-		if (*cookie != 0) {
-			fprintf(stderr,"<- B_ERROR (no more inputs)\n");
-			return B_ERROR;
-		}
-		// so next time they won't get the same input again
-		*cookie = 1;
-	}
+
+	// so next time they won't get the same input again
+	*cookie = 1;
 	*out_input = input;
 	return B_OK;
 }
@@ -372,10 +360,6 @@ status_t MediaDemultiplexerNode::Connected(
 				media_input * out_input)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::Connected\n");
-	if (out_input == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	if (input.destination != where) {
 		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
@@ -473,10 +457,6 @@ status_t MediaDemultiplexerNode::FormatSuggestionRequested(
 				media_format * format)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::FormatSuggestionRequested\n");
-	if (format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
-	}
 	// XXX: how do I pick which stream to supply here?....
 	//      answer?: get the first compatible stream that is available
 	fprintf(stderr,"  format suggestion requested not implemented\n");
@@ -544,12 +524,6 @@ status_t MediaDemultiplexerNode::GetNextOutput(	/* cookie starts as 0 */
 				media_output * out_output)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::GetNextOutput\n");
-	// let's not crash even if they are stupid
-	if ((out_output == 0) || (cookie == 0)) {
-		// no place to write!
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE;
-	}
 	// they want a clean start
 	if (*cookie == 0) {
 		*cookie = (int32)outputs.begin();
@@ -637,10 +611,6 @@ status_t MediaDemultiplexerNode::PrepareToConnect(
 				char * out_name)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::PrepareToConnect\n");
-	if ((format == 0) || (out_source == 0) || (out_name == 0)) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashes...
-	}
 	// find the information for this output
 	vector<MediaOutputInfo>::iterator itr;
 	for(itr = outputs.begin() ; (itr != outputs.end()) ; itr++) {
