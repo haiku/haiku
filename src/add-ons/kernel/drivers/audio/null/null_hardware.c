@@ -59,7 +59,7 @@ null_fake_interrupt(void* cookie)
 	// exchange the buffer pointer and update the
 	// time information. Instead of exiting, we wait
 	// until the next fake interrupt appears.
-	int sleepTime;
+	bigtime_t sleepTime;
 	device_t* device = (device_t*) cookie;
 	int sampleRate;
 
@@ -75,7 +75,7 @@ null_fake_interrupt(void* cookie)
 
 	// The time between until we get a new valid buffer
 	// from our soundcard: buffer_length / samplerate
-	sleepTime = (device->playback_stream.buffer_length*1000) / sampleRate;
+	sleepTime = (device->playback_stream.buffer_length*1000000LL) / sampleRate;
 
 	while (device->running) {
 		cpu_status status;
