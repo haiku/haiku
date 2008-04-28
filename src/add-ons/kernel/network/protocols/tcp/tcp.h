@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -72,24 +72,28 @@ struct tcp_header {
 } _PACKED;
 
 class tcp_sequence {
-	public:
-		tcp_sequence() {}
-		tcp_sequence(uint32 sequence) : number(sequence) {}
+public:
+					tcp_sequence() {}
+					tcp_sequence(uint32 sequence) : fNumber(sequence) {}
 
-		operator uint32() const { return number; }
+					operator uint32() const { return fNumber; }
 
-		void operator=(uint32 sequence) { number = sequence; }
-		bool operator>(uint32 sequence) const { return (int32)(number - sequence) > 0; }
-		bool operator>=(uint32 sequence) const { return (int32)(number - sequence) >= 0; }
-		bool operator<(uint32 sequence) const { return (int32)(number - sequence) < 0; }
-		bool operator<=(uint32 sequence) const { return (int32)(number - sequence) <= 0; }
+			void	operator=(uint32 sequence) { fNumber = sequence; }
+			bool	operator>(uint32 sequence) const
+						{ return (int32)(fNumber - sequence) > 0; }
+			bool	operator>=(uint32 sequence) const
+						{ return (int32)(fNumber - sequence) >= 0; }
+			bool	operator<(uint32 sequence) const
+						{ return (int32)(fNumber - sequence) < 0; }
+			bool	operator<=(uint32 sequence) const
+						{ return (int32)(fNumber - sequence) <= 0; }
 
-		uint32& operator+=(uint32 sequence) { return number += sequence; }
-		uint32& operator++() { return ++number; }
-		uint32 operator++(int _) { return number++; }
+			uint32&	operator+=(uint32 sequence) { return fNumber += sequence; }
+			uint32&	operator++() { return ++fNumber; }
+			uint32	operator++(int _) { return fNumber++; }
 
-	private:
-		uint32 number;
+private:
+	uint32	fNumber;
 };
 
 // TCP flag constants
@@ -179,27 +183,28 @@ struct tcp_segment_header {
 };
 
 enum tcp_segment_action {
-	KEEP		= 0x00,
-	DROP		= 0x01,
-	RESET		= 0x02,
-	ACKNOWLEDGE	= 0x04,
+	KEEP			= 0x00,
+	DROP			= 0x01,
+	RESET			= 0x02,
+	ACKNOWLEDGE		= 0x04,
 	IMMEDIATE_ACKNOWLEDGE = 0x08,
+	DELETE_ENDPOINT	= 0x10,
 };
 
 
-extern net_buffer_module_info *gBufferModule;
-extern net_datalink_module_info *gDatalinkModule;
-extern net_socket_module_info *gSocketModule;
-extern net_stack_module_info *gStackModule;
+extern net_buffer_module_info* gBufferModule;
+extern net_datalink_module_info* gDatalinkModule;
+extern net_socket_module_info* gSocketModule;
+extern net_stack_module_info* gStackModule;
 
 
-status_t add_tcp_header(net_address_module_info *addressModule,
-	tcp_segment_header &segment, net_buffer *buffer);
-size_t tcp_options_length(tcp_segment_header &segment);
+EndpointManager* get_endpoint_manager(net_domain* domain);
+void put_endpoint_manager(EndpointManager* manager);
 
-const char *name_for_state(tcp_state state);
+status_t add_tcp_header(net_address_module_info* addressModule,
+	tcp_segment_header& segment, net_buffer* buffer);
+size_t tcp_options_length(tcp_segment_header& segment);
 
-EndpointManager *create_endpoint_manager(net_domain *domain);
-void return_endpoint_manager(EndpointManager *);
+const char* name_for_state(tcp_state state);
 
 #endif	// TCP_H

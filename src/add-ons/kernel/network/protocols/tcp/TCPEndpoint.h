@@ -43,94 +43,101 @@ private:
 
 class TCPEndpoint : public net_protocol, public ProtocolSocket {
 public:
-	TCPEndpoint(net_socket *socket);
-	~TCPEndpoint();
+						TCPEndpoint(net_socket* socket);
+						~TCPEndpoint();
 
-	status_t InitCheck() const;
+			status_t	InitCheck() const;
 
-	status_t Open();
-	status_t Close();
-	status_t Free();
-	status_t Connect(const struct sockaddr *address);
-	status_t Accept(struct net_socket **_acceptedSocket);
-	status_t Bind(const sockaddr *address);
-	status_t Unbind(struct sockaddr *address);
-	status_t Listen(int count);
-	status_t Shutdown(int direction);
-	status_t SendData(net_buffer *buffer);
-	ssize_t SendAvailable();
-	status_t ReadData(size_t numBytes, uint32 flags, net_buffer **_buffer);
-	ssize_t ReadAvailable();
+			status_t	Open();
+			status_t	Close();
+			status_t	Free();
+			status_t	Connect(const struct sockaddr* address);
+			status_t	Accept(struct net_socket** _acceptedSocket);
+			status_t	Bind(const sockaddr* address);
+			status_t	Unbind(struct sockaddr* address);
+			status_t	Listen(int count);
+			status_t	Shutdown(int direction);
+			status_t	SendData(net_buffer* buffer);
+			ssize_t		SendAvailable();
+			status_t	ReadData(size_t numBytes, uint32 flags,
+							net_buffer** _buffer);
+			ssize_t		ReadAvailable();
 
-	status_t FillStat(struct net_stat *stat);
+			status_t	FillStat(struct net_stat* stat);
 
-	status_t SetSendBufferSize(size_t length);
-	status_t SetReceiveBufferSize(size_t length);
+			status_t	SetSendBufferSize(size_t length);
+			status_t	SetReceiveBufferSize(size_t length);
 
-	status_t SetOption(int option, const void *value, int length);
+			status_t	SetOption(int option, const void* value, int length);
 
-	tcp_state State() const { return fState; }
-	bool IsBound() const;
+			tcp_state	State() const { return fState; }
+			bool		IsBound() const;
 
-	status_t DelayedAcknowledge();
-	status_t SendAcknowledge(bool force);
-	status_t UpdateTimeWait();
+			status_t	DelayedAcknowledge();
+			status_t	SendAcknowledge(bool force);
 
-	int32 SegmentReceived(tcp_segment_header& segment, net_buffer *buffer);
-	int32 Spawn(TCPEndpoint *parent, tcp_segment_header& segment,
-		net_buffer *buffer);
+			int32		SegmentReceived(tcp_segment_header& segment,
+							net_buffer* buffer);
 
-	void DumpInternalState() const;
+			void		Dump() const;
 
 private:
-	friend class EndpointManager;
+			void		_StartPersistTimer();
+			void		_EnterTimeWait();
+			status_t	_UpdateTimeWait();
+			void		_CancelConnectionTimers();
+			uint8		_CurrentFlags();
+			bool		_ShouldSendSegment(tcp_segment_header& segment,
+							uint32 length, uint32 segmentMaxSize,
+							uint32 flightSize);
+			status_t	_SendQueued(bool force = false);
+			status_t	_SendQueued(bool force, uint32 sendWindow);
+			int			_MaxSegmentSize(const struct sockaddr* address) const;
+			status_t	_Disconnect(bool closing);
+			ssize_t		_AvailableData() const;
+			void		_NotifyReader();
+			bool		_ShouldReceive() const;
+			void		_HandleReset(status_t error);
+			int32		_Spawn(TCPEndpoint* parent, tcp_segment_header& segment,
+							net_buffer* buffer);
+			int32		_ListenReceive(tcp_segment_header& segment,
+							net_buffer* buffer);
+			int32		_SynchronizeSentReceive(tcp_segment_header& segment,
+							net_buffer* buffer);
+			int32		_SegmentReceived(tcp_segment_header& segment,
+							net_buffer* buffer);
+			int32		_Receive(tcp_segment_header& segment,
+							net_buffer* buffer);
+			void		_UpdateTimestamps(tcp_segment_header& segment,
+							size_t segmentLength);
+			void		_MarkEstablished();
+			status_t	_WaitForEstablished(MutexLocker& lock,
+							bigtime_t timeout);
+			bool		_AddData(tcp_segment_header& segment,
+							net_buffer* buffer);
+			void		_PrepareReceivePath(tcp_segment_header& segment);
+			status_t	_PrepareSendPath(const sockaddr* peer);
+			void		_Acknowledged(tcp_segment_header& segment);
+			void		_Retransmit();
+			void		_UpdateRoundTripTime(int32 roundTripTime);
+			void		_ResetSlowStart();
+			void		_DuplicateAcknowledge(tcp_segment_header& segment);
 
-	void _StartPersistTimer();
-	void _EnterTimeWait();
-	void _CancelConnectionTimers();
-	uint8 _CurrentFlags();
-	bool _ShouldSendSegment(tcp_segment_header &segment, uint32 length,
-		uint32 segmentMaxSize, uint32 flightSize);
-	status_t _SendQueued(bool force = false);
-	status_t _SendQueued(bool force, uint32 sendWindow);
-	int _MaxSegmentSize(const struct sockaddr *) const;
-	status_t _Shutdown(bool closing);
-	ssize_t _AvailableData() const;
-	void _NotifyReader();
-	bool _ShouldReceive() const;
-	void _HandleReset(status_t error);
-	int32 _ListenReceive(tcp_segment_header& segment, net_buffer *buffer);
-	int32 _SynchronizeSentReceive(tcp_segment_header& segment,
-		net_buffer *buffer);
-	int32 _SegmentReceived(tcp_segment_header& segment, net_buffer *buffer);
-	int32 _Receive(tcp_segment_header& segment, net_buffer *buffer);
-	void _UpdateTimestamps(tcp_segment_header& segment,
-		size_t segmentLength);
-	void _MarkEstablished();
-	status_t _WaitForEstablished(MutexLocker &lock, bigtime_t timeout);
-	bool _AddData(tcp_segment_header &segment, net_buffer *buffer);
-	void _PrepareReceivePath(tcp_segment_header &segment);
-	status_t _PrepareSendPath(const sockaddr *peer);
-	void _Acknowledged(tcp_segment_header &segment);
-	void _Retransmit();
-	void _UpdateSRTT(int32 roundTripTime);
-	void _ResetSlowStart();
-	void _DuplicateAcknowledge(tcp_segment_header &segment);
+	static	void		_TimeWaitTimer(net_timer* timer, void* _endpoint);
+	static	void		_RetransmitTimer(net_timer* timer, void* _endpoint);
+	static	void		_PersistTimer(net_timer* timer, void* _endpoint);
+	static	void		_DelayedAcknowledgeTimer(net_timer* timer,
+							void* _endpoint);
 
-	static void _TimeWaitTimer(net_timer *timer, void *data);
-	static void _RetransmitTimer(net_timer *timer, void *data);
-	static void _PersistTimer(net_timer *timer, void *data);
-	static void _DelayedAcknowledgeTimer(net_timer *timer, void *data);
-
-	EndpointManager *fManager;
-
+private:
 	HashTableLink<TCPEndpoint> fConnectionHashLink;
 	HashTableLink<TCPEndpoint> fEndpointHashLink;
-
+	friend class EndpointManager;
 	friend class ConnectionHashDefinition;
 	friend class EndpointHashDefinition;
 
 	mutex			fLock;
+	EndpointManager* fManager;
 	WaitList		fReceiveList;
 	WaitList		fSendList;
 	sem_id			fAcceptSemaphore;

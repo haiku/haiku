@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,25 +27,27 @@ struct net_domain;
 class EndpointManager;
 class TCPEndpoint;
 
+
 struct ConnectionHashDefinition {
 public:
-	typedef std::pair<const sockaddr *, const sockaddr *> KeyType;
+	typedef std::pair<const sockaddr*, const sockaddr*> KeyType;
 	typedef TCPEndpoint ValueType;
 
-	ConnectionHashDefinition(EndpointManager *manager);
+							ConnectionHashDefinition(EndpointManager* manager);
+							ConnectionHashDefinition(
+									const ConnectionHashDefinition& definition)
+								: fManager(definition.fManager)
+							{
+							}
 
-	ConnectionHashDefinition(const ConnectionHashDefinition& definition)
-		: fManager(definition.fManager)
-	{
-	}
-
-	size_t HashKey(const KeyType &key) const;
-	size_t Hash(TCPEndpoint *endpoint) const;
-	bool Compare(const KeyType &key, TCPEndpoint *endpoint) const;
-	HashTableLink<TCPEndpoint> *GetLink(TCPEndpoint *endpoint) const;
+			size_t			HashKey(const KeyType& key) const;
+			size_t			Hash(TCPEndpoint* endpoint) const;
+			bool			Compare(const KeyType& key,
+								TCPEndpoint* endpoint) const;
+			HashTableLink<TCPEndpoint>* GetLink(TCPEndpoint* endpoint) const;
 
 private:
-	EndpointManager *fManager;
+	EndpointManager*		fManager;
 };
 
 
@@ -54,57 +56,61 @@ public:
 	typedef uint16 KeyType;
 	typedef TCPEndpoint ValueType;
 
-	size_t HashKey(uint16 port) const;
-	size_t Hash(TCPEndpoint *endpoint) const;
-	bool Compare(uint16 port, TCPEndpoint *endpoint) const;
-	bool CompareValues(TCPEndpoint *first, TCPEndpoint *second) const;
-	HashTableLink<TCPEndpoint> *GetLink(TCPEndpoint *endpoint) const;
+			size_t			HashKey(uint16 port) const;
+			size_t			Hash(TCPEndpoint* endpoint) const;
+			bool			Compare(uint16 port, TCPEndpoint* endpoint) const;
+			bool			CompareValues(TCPEndpoint* first,
+								TCPEndpoint* second) const;
+			HashTableLink<TCPEndpoint>* GetLink(TCPEndpoint* endpoint) const;
 };
 
 
 class EndpointManager : public DoublyLinkedListLinkImpl<EndpointManager> {
-	public:
-		EndpointManager(net_domain *domain);
-		~EndpointManager();
+public:
+							EndpointManager(net_domain* domain);
+							~EndpointManager();
 
-		status_t InitCheck() const;
+			status_t		InitCheck() const;
 
-		TCPEndpoint *FindConnection(sockaddr *local, sockaddr *peer);
+			TCPEndpoint*	FindConnection(sockaddr* local, sockaddr* peer);
 
-		status_t SetConnection(TCPEndpoint *endpoint, const sockaddr *local,
-			const sockaddr *peer, const sockaddr *interfaceLocal);
-		status_t SetPassive(TCPEndpoint *endpoint);
+			status_t		SetConnection(TCPEndpoint* endpoint,
+								const sockaddr* local, const sockaddr* peer,
+								const sockaddr* interfaceLocal);
+			status_t		SetPassive(TCPEndpoint* endpoint);
 
-		status_t Bind(TCPEndpoint *endpoint, const sockaddr *address);
-		status_t BindChild(TCPEndpoint *endpoint);
-		status_t Unbind(TCPEndpoint *endpoint);
+			status_t		Bind(TCPEndpoint* endpoint,
+								const sockaddr* address);
+			status_t		BindChild(TCPEndpoint* endpoint);
+			status_t		Unbind(TCPEndpoint* endpoint);
 
-		status_t ReplyWithReset(tcp_segment_header &segment,
-			net_buffer *buffer);
+			status_t		ReplyWithReset(tcp_segment_header& segment,
+								net_buffer* buffer);
 
-		void DumpEndpoints() const;
+			net_domain*		Domain() const { return fDomain; }
+			net_address_module_info* AddressModule() const
+								{ return Domain()->address_module; }
 
-		net_domain *Domain() const { return fDomain; }
-		net_address_module_info *AddressModule() const
-			{ return Domain()->address_module; }
+			void			Dump() const;
 
-	private:
-		TCPEndpoint *_LookupConnection(const sockaddr *local,
-			const sockaddr *peer);
-		status_t _Bind(TCPEndpoint *endpoint, const sockaddr *address);
-		status_t _BindToAddress(TCPEndpoint *endpoint, const sockaddr *address);
-		status_t _BindToEphemeral(TCPEndpoint *endpoint,
-			const sockaddr *address);
+private:
+			TCPEndpoint*	_LookupConnection(const sockaddr* local,
+								const sockaddr* peer);
+			status_t		_Bind(TCPEndpoint* endpoint,
+								const sockaddr* address);
+			status_t		_BindToAddress(TCPEndpoint* endpoint,
+								const sockaddr* address);
+			status_t		_BindToEphemeral(TCPEndpoint* endpoint,
+								const sockaddr* address);
 
-		net_domain *fDomain;
+	typedef OpenHashTable<ConnectionHashDefinition> ConnectionTable;
+	typedef MultiHashTable<EndpointHashDefinition> EndpointTable;
 
-		typedef OpenHashTable<ConnectionHashDefinition> ConnectionTable;
-		typedef MultiHashTable<EndpointHashDefinition> EndpointTable;
-
-		ConnectionTable	fConnectionHash;
-		EndpointTable	fEndpointHash;
-		uint16			fLastPort;
-		benaphore		fLock;
+	benaphore				fLock;
+	net_domain*				fDomain;
+	ConnectionTable			fConnectionHash;
+	EndpointTable			fEndpointHash;
+	uint16					fLastPort;
 };
 
 #endif	// ENDPOINT_MANAGER_H

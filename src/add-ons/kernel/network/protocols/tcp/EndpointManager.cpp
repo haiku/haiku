@@ -479,7 +479,7 @@ EndpointManager::ReplyWithReset(tcp_segment_header &segment,
 
 
 void
-EndpointManager::DumpEndpoints() const
+EndpointManager::Dump() const
 {
 	kprintf("-------- TCP Domain %p ---------\n", this);
 	kprintf("%10s %20s %20s %8s %8s %12s\n", "address", "local", "peer",

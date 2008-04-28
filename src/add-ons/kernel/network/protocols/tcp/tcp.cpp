@@ -77,30 +77,6 @@ endpoint_manager_for(net_domain *domain)
 }
 
 
-EndpointManager *
-create_endpoint_manager(net_domain *domain)
-{
-	EndpointManager *endpointManager = endpoint_manager_for(domain);
-	if (endpointManager)
-		return endpointManager;
-
-	endpointManager = new (std::nothrow) EndpointManager(domain);
-	if (endpointManager)
-		sEndpointManagers.Add(endpointManager);
-
-	return endpointManager;
-}
-
-
-void
-return_endpoint_manager(EndpointManager *endpointManager)
-{
-	// TODO when the connection and endpoint count reach zero
-	//      we should remove the endpoint manager from the endpoints
-	//      list and delete it.
-}
-
-
 static inline void
 bump_option(tcp_option *&option, size_t &length)
 {
@@ -189,8 +165,181 @@ add_options(tcp_segment_header &segment, uint8 *buffer, size_t bufferSize)
 }
 
 
-/*!
-	Constructs a TCP header on \a buffer with the specified values
+static void
+process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
+{
+	if (size == 0)
+		return;
+
+	tcp_option *option;
+
+	uint8 optionsBuffer[kMaxOptionSize];
+	if (gBufferModule->direct_access(buffer, sizeof(tcp_header), size,
+			(void **)&option) != B_OK) {
+		if (size > sizeof(optionsBuffer)) {
+			dprintf("Ignoring TCP options larger than expected.\n");
+			return;
+		}
+
+		gBufferModule->read(buffer, sizeof(tcp_header), optionsBuffer, size);
+		option = (tcp_option *)optionsBuffer;
+	}
+
+	while (size > 0) {
+		int32 length = -1;
+
+		switch (option->kind) {
+			case TCP_OPTION_END:
+			case TCP_OPTION_NOP:
+				length = 1;
+				break;
+			case TCP_OPTION_MAX_SEGMENT_SIZE:
+				if (option->length == 4 && (size - 4) >= 0)
+					segment.max_segment_size = ntohs(option->max_segment_size);
+				break;
+			case TCP_OPTION_WINDOW_SHIFT:
+				if (option->length == 3 && (size - 3) >= 0) {
+					segment.options |= TCP_HAS_WINDOW_SCALE;
+					segment.window_shift = option->window_shift;
+				}
+				break;
+			case TCP_OPTION_TIMESTAMP:
+				if (option->length == 10 && (size - 10) >= 0) {
+					segment.options |= TCP_HAS_TIMESTAMPS;
+					segment.timestamp_value = option->timestamp.value;
+					segment.timestamp_reply =
+						ntohl(option->timestamp.reply);
+				}
+				break;
+			case TCP_OPTION_SACK_PERMITTED:
+				if (option->length == 2 && (size - 2) >= 0)
+					segment.options |= TCP_SACK_PERMITTED;
+		}
+
+		if (length < 0) {
+			length = option->length;
+			if (length == 0)
+				break;
+		}
+
+		size -= length;
+		option = (tcp_option *)((uint8 *)option + length);
+	}
+}
+
+
+#if 0
+static void
+dump_tcp_header(tcp_header &header)
+{
+	dprintf("  source port: %u\n", ntohs(header.source_port));
+	dprintf("  dest port: %u\n", ntohs(header.destination_port));
+	dprintf("  sequence: %lu\n", header.Sequence());
+	dprintf("  ack: %lu\n", header.Acknowledge());
+	dprintf("  flags: %s%s%s%s%s%s\n", (header.flags & TCP_FLAG_FINISH) ? "FIN " : "",
+		(header.flags & TCP_FLAG_SYNCHRONIZE) ? "SYN " : "",
+		(header.flags & TCP_FLAG_RESET) ? "RST " : "",
+		(header.flags & TCP_FLAG_PUSH) ? "PUSH " : "",
+		(header.flags & TCP_FLAG_ACKNOWLEDGE) ? "ACK " : "",
+		(header.flags & TCP_FLAG_URGENT) ? "URG " : "");
+	dprintf("  window: %u\n", header.AdvertisedWindow());
+	dprintf("  urgent offset: %u\n", header.UrgentOffset());
+}
+#endif
+
+
+static int
+dump_endpoints(int argc, char** argv)
+{
+	EndpointManagerList::Iterator iterator = sEndpointManagers.GetIterator();
+
+	while (iterator.HasNext())
+		iterator.Next()->Dump();
+
+	return 0;
+}
+
+
+static int
+dump_endpoint(int argc, char** argv)
+{
+	if (argc < 2) {
+		kprintf("usage: tcp_endpoint [address]\n");
+		return 0;
+	}
+
+	TCPEndpoint* endpoint = (TCPEndpoint*)parse_expression(argv[1]);
+	endpoint->Dump();
+
+	return 0;
+}
+
+
+//	#pragma mark - internal API
+
+
+EndpointManager*
+get_endpoint_manager(net_domain* domain)
+{
+	EndpointManager *endpointManager = endpoint_manager_for(domain);
+	if (endpointManager)
+		return endpointManager;
+
+	endpointManager = new (std::nothrow) EndpointManager(domain);
+	if (endpointManager)
+		sEndpointManagers.Add(endpointManager);
+
+	return endpointManager;
+}
+
+
+void
+put_endpoint_manager(EndpointManager* endpointManager)
+{
+	// TODO: when the connection and endpoint count reach zero
+	// we should remove the endpoint manager from the endpoints
+	// list and delete it.
+}
+
+
+const char*
+name_for_state(tcp_state state)
+{
+	switch (state) {
+		case CLOSED:
+			return "closed";
+		case LISTEN:
+			return "listen";
+		case SYNCHRONIZE_SENT:
+			return "syn-sent";
+		case SYNCHRONIZE_RECEIVED:
+			return "syn-received";
+		case ESTABLISHED:
+			return "established";
+
+		// peer closes the connection
+		case FINISH_RECEIVED:
+			return "close-wait";
+		case WAIT_FOR_FINISH_ACKNOWLEDGE:
+			return "last-ack";
+
+		// we close the connection
+		case FINISH_SENT:
+			return "fin-wait1";
+		case FINISH_ACKNOWLEDGED:
+			return "fin-wait2";
+		case CLOSING:
+			return "closing";
+
+		case TIME_WAIT:
+			return "time-wait";
+	}
+	
+	return "-";
+}
+
+
+/*!	Constructs a TCP header on \a buffer with the specified values
 	for \a flags, \a seq \a ack and \a advertisedWindow.
 */
 status_t
@@ -265,153 +414,6 @@ tcp_options_length(tcp_segment_header &segment)
 		return length;
 
 	return (length + 3) & ~3;
-}
-
-
-void
-process_options(tcp_segment_header &segment, net_buffer *buffer, size_t size)
-{
-	if (size == 0)
-		return;
-
-	tcp_option *option;
-
-	uint8 optionsBuffer[kMaxOptionSize];
-	if (gBufferModule->direct_access(buffer, sizeof(tcp_header), size,
-			(void **)&option) != B_OK) {
-		if (size > sizeof(optionsBuffer)) {
-			dprintf("Ignoring TCP options larger than expected.\n");
-			return;
-		}
-
-		gBufferModule->read(buffer, sizeof(tcp_header), optionsBuffer, size);
-		option = (tcp_option *)optionsBuffer;
-	}
-
-	while (size > 0) {
-		int32 length = -1;
-
-		switch (option->kind) {
-			case TCP_OPTION_END:
-			case TCP_OPTION_NOP:
-				length = 1;
-				break;
-			case TCP_OPTION_MAX_SEGMENT_SIZE:
-				if (option->length == 4 && (size - 4) >= 0)
-					segment.max_segment_size = ntohs(option->max_segment_size);
-				break;
-			case TCP_OPTION_WINDOW_SHIFT:
-				if (option->length == 3 && (size - 3) >= 0) {
-					segment.options |= TCP_HAS_WINDOW_SCALE;
-					segment.window_shift = option->window_shift;
-				}
-				break;
-			case TCP_OPTION_TIMESTAMP:
-				if (option->length == 10 && (size - 10) >= 0) {
-					segment.options |= TCP_HAS_TIMESTAMPS;
-					segment.timestamp_value = option->timestamp.value;
-					segment.timestamp_reply =
-						ntohl(option->timestamp.reply);
-				}
-				break;
-			case TCP_OPTION_SACK_PERMITTED:
-				if (option->length == 2 && (size - 2) >= 0)
-					segment.options |= TCP_SACK_PERMITTED;
-		}
-
-		if (length < 0) {
-			length = option->length;
-			if (length == 0)
-				break;
-		}
-
-		size -= length;
-		option = (tcp_option *)((uint8 *)option + length);
-	}
-}
-
-
-const char *
-name_for_state(tcp_state state)
-{
-	switch (state) {
-		case CLOSED:
-			return "closed";
-		case LISTEN:
-			return "listen";
-		case SYNCHRONIZE_SENT:
-			return "syn-sent";
-		case SYNCHRONIZE_RECEIVED:
-			return "syn-received";
-		case ESTABLISHED:
-			return "established";
-
-		// peer closes the connection
-		case FINISH_RECEIVED:
-			return "close-wait";
-		case WAIT_FOR_FINISH_ACKNOWLEDGE:
-			return "last-ack";
-
-		// we close the connection
-		case FINISH_SENT:
-			return "fin-wait1";
-		case FINISH_ACKNOWLEDGED:
-			return "fin-wait2";
-		case CLOSING:
-			return "closing";
-
-		case TIME_WAIT:
-			return "time-wait";
-	}
-	
-	return "-";
-}
-
-
-#if 0
-static void
-dump_tcp_header(tcp_header &header)
-{
-	dprintf("  source port: %u\n", ntohs(header.source_port));
-	dprintf("  dest port: %u\n", ntohs(header.destination_port));
-	dprintf("  sequence: %lu\n", header.Sequence());
-	dprintf("  ack: %lu\n", header.Acknowledge());
-	dprintf("  flags: %s%s%s%s%s%s\n", (header.flags & TCP_FLAG_FINISH) ? "FIN " : "",
-		(header.flags & TCP_FLAG_SYNCHRONIZE) ? "SYN " : "",
-		(header.flags & TCP_FLAG_RESET) ? "RST " : "",
-		(header.flags & TCP_FLAG_PUSH) ? "PUSH " : "",
-		(header.flags & TCP_FLAG_ACKNOWLEDGE) ? "ACK " : "",
-		(header.flags & TCP_FLAG_URGENT) ? "URG " : "");
-	dprintf("  window: %u\n", header.AdvertisedWindow());
-	dprintf("  urgent offset: %u\n", header.UrgentOffset());
-}
-#endif
-
-
-static int
-dump_endpoints(int argc, char *argv[])
-{
-	EndpointManagerList::Iterator it = sEndpointManagers.GetIterator();
-
-	while (it.HasNext())
-		it.Next()->DumpEndpoints();
-
-	return 0;
-}
-
-
-static int
-dump_endpoint(int argc, char *argv[])
-{
-	if (argc < 2) {
-		kprintf("usage: tcp_endpoint [address]\n");
-		return 0;
-	}
-
-	TCPEndpoint *endpoint = (TCPEndpoint *)strtoul(argv[1], NULL, 16);
-	endpoint->DumpInternalState();
-
-	return 0;
 }
 
 
