@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007 Haiku, Inc.
+ * Copyright 2001-2008 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * PS/2 mouse device driver
@@ -64,6 +64,10 @@
 #define MOUSE_HISTORY_SIZE	256
 	// we record that many mouse packets before we start to drop them
 
+#define F_MOUSE_TYPE_STANDARD			0x1
+#define F_MOUSE_TYPE_INTELLIMOUSE		0x2
+#define F_MOUSE_TYPE_MASK				0xf
+
 typedef struct
 {
 	ps2_dev *		dev;
@@ -74,7 +78,7 @@ typedef struct
 	bigtime_t		click_speed;
 	int				click_count;
 	int				buttons_state;
-	
+	int				flags;
 	size_t			packet_size;
 	size_t			packet_index;
 	uint8			packet_buffer[PS2_MAX_PACKET_SIZE];
@@ -120,11 +124,11 @@ static void
 ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos)
 {
 	int buttons = packet[0] & 7;
-	int xDelta = ((packet[0] & 0x10) ? 0xFFFFFF00 : 0) | packet[1];
-	int yDelta = ((packet[0] & 0x20) ? 0xFFFFFF00 : 0) | packet[2];
+	int xDelta = ((packet[0] & 0x10) ? ~0xff : 0) | packet[1];
+	int yDelta = ((packet[0] & 0x20) ? ~0xff : 0) | packet[2];
+	int xDeltaWheel = 0;
+	int yDeltaWheel = 0;
 	bigtime_t currentTime = system_time();
-	int8 wheel_ydelta = 0;
-	int8 wheel_xdelta = 0;
 
 	if (buttons != 0 && cookie->buttons_state == 0) {
 		if (cookie->click_last_time + cookie->click_speed > currentTime)
@@ -137,18 +141,25 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 
 	cookie->buttons_state = buttons;
 
-	if (cookie->packet_size == PS2_PACKET_INTELLIMOUSE) { 
+	if (cookie->flags & F_MOUSE_TYPE_INTELLIMOUSE) {
+		yDeltaWheel = packet[3] & 0x07; 
+ 		if (packet[3] & 0x08) 
+			yDeltaWheel |= ~0x07; 
+	}
+/*
+	if (cookie->flags & F_MOUSE_TYPE_2WHEELS) {
 		switch (packet[3] & 0x0F) {
-			case 0x01: wheel_ydelta = +1; break; // wheel 1 down
-			case 0x0F: wheel_ydelta = -1; break; // wheel 1 up
-			case 0x02: wheel_xdelta = +1; break; // wheel 2 down
-			case 0x0E: wheel_xdelta = -1; break; // wheel 2 up
+			case 0x01: yDeltaWheel = +1; break; // wheel 1 down
+			case 0x0F: yDeltaWheel = -1; break; // wheel 1 up
+			case 0x02: xDeltaWheel = +1; break; // wheel 2 down
+			case 0x0E: xDeltaWheel = -1; break; // wheel 2 up
 		}
 	}
+*/
 
 // 	TRACE("packet: %02x %02x %02x %02x: xd %d, yd %d, 0x%x (%d), w-xd %d, w-yd %d\n", 
 //		packet[0], packet[1], packet[2], packet[3],
-//		xDelta, yDelta, buttons, cookie->click_count, wheel_xdelta, wheel_ydelta);
+//		xDelta, yDelta, buttons, cookie->click_count, xDeltaWheel, yDeltaWheel);
 
 	if (pos) {
 		pos->xdelta = xDelta;
@@ -157,8 +168,8 @@ ps2_packet_to_movement(mouse_cookie *cookie, uint8 packet[], mouse_movement *pos
 		pos->clicks = cookie->click_count;
 		pos->modifiers = 0;
 		pos->timestamp = currentTime;
-		pos->wheel_ydelta = (int)wheel_ydelta;
-		pos->wheel_xdelta = (int)wheel_xdelta;
+		pos->wheel_ydelta = yDeltaWheel;
+		pos->wheel_xdelta = xDeltaWheel;
 
 		TRACE("ps2: ps2_packet_to_movement xdelta: %d, ydelta: %d, buttons %x, clicks: %d, timestamp %Ld\n",
 			xDelta, yDelta, buttons, cookie->click_count, currentTime);
@@ -272,10 +283,12 @@ mouse_handle_int(ps2_dev *dev)
 
 
 static status_t
-probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
+probe_mouse(mouse_cookie *cookie)
 {
 	status_t status;
 	uint8 deviceId = 0;
+
+	cookie->flags = 0;
 	
 	status = ps2_reset_mouse(cookie);
 	if (status != B_OK) {
@@ -307,14 +320,12 @@ probe_mouse(mouse_cookie *cookie, size_t *probed_packet_size)
 
 	if (deviceId == PS2_DEV_ID_STANDARD) {
 		INFO("ps2: probe_mouse Standard PS/2 mouse found\n");
-		if (probed_packet_size)
-			*probed_packet_size = PS2_PACKET_STANDARD;
+		cookie->flags |= F_MOUSE_TYPE_STANDARD;
 	} else if (deviceId == PS2_DEV_ID_INTELLIMOUSE) {
 		INFO("ps2: probe_mouse Extended PS/2 mouse found\n");
-		if (probed_packet_size)
-			*probed_packet_size = PS2_PACKET_INTELLIMOUSE;
+		cookie->flags |= F_MOUSE_TYPE_INTELLIMOUSE;
 	} else {
-		INFO("ps2: probe_mouse Something's wrong.\n");
+		INFO("ps2: probe_mouse Error unknown device id.\n");
 		return B_ERROR;
 	}
 
@@ -363,12 +374,18 @@ mouse_open(const char *name, uint32 flags, void **_cookie)
 	dev->disconnect = &ps2_mouse_disconnect;
 	dev->handle_int = &mouse_handle_int;
 		
-	status = probe_mouse(cookie, &cookie->packet_size);
+	// probe mouse also sets cookie->flags
+	status = probe_mouse(cookie);
 	if (status != B_OK) {
 		INFO("ps2: probing mouse %s failed\n", name);
 		ps2_service_notify_device_removed(dev);
 		goto err1;
 	}
+
+	if (cookie->flags & F_MOUSE_TYPE_INTELLIMOUSE)
+		cookie->packet_size = PS2_PACKET_INTELLIMOUSE;
+	else
+		cookie->packet_size = PS2_PACKET_STANDARD;
 
 	cookie->mouse_buffer = create_packet_buffer(MOUSE_HISTORY_SIZE * cookie->packet_size);
 	if (cookie->mouse_buffer == NULL) {
