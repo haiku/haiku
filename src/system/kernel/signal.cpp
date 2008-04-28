@@ -60,7 +60,7 @@ static status_t deliver_signal(struct thread *thread, uint signal,
 // #pragma mark - signal tracing
 
 
-#if SIGNAL_TRACING
+#ifdef SIGNAL_TRACING
 
 namespace SignalTracing {
 
