@@ -1,11 +1,14 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
+#define _KERNEL_DEBUG_H
+	// avoid including the private kernel debug.h header
 
 #include "argv.h"
 #include "tcp.h"
@@ -93,6 +96,8 @@ static bigtime_t sStartTime;
 static double sRandomReorder = 0.0;
 static set<uint32> sReorderList;
 static bool sSimultaneousConnect = false;
+static bool sSimultaneousClose = false;
+static bool sServerActiveClose = false;
 
 static struct net_domain sDomain = {
 	"ipv4",
@@ -103,23 +108,36 @@ static struct net_domain sDomain = {
 };
 
 
-bool
+static bool
 is_server(const sockaddr* addr)
 {
 	return ((sockaddr_in*)addr)->sin_port == htons(1024);
 }
 
 
-bool
-is_syn(net_buffer* buffer)
+static uint8
+tcp_segment_flags(net_buffer* buffer)
 {
 	NetBufferHeaderReader<tcp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
 	tcp_header &header = bufferHeader.Data();
+	return header.flags;
+}
 
-	return (header.flags & TCP_FLAG_SYNCHRONIZE) != 0;
+
+static bool
+is_syn(net_buffer* buffer)
+{
+	return (tcp_segment_flags(buffer) & TCP_FLAG_SYNCHRONIZE) != 0;
+}
+
+
+static bool
+is_fin(net_buffer* buffer)
+{
+	return (tcp_segment_flags(buffer) & TCP_FLAG_FINISH) != 0;
 }
 
 
@@ -151,6 +169,12 @@ create_object_cache(const char *name, size_t objectSize,
 
 void
 delete_object_cache(object_cache *cache)
+{
+}
+
+
+extern "C" void
+scheduler_enqueue_in_run_queue(struct thread *thread)
 {
 }
 
@@ -193,33 +217,53 @@ register_domain_receiving_protocol(int family, int type, const char *moduleName)
 }
 
 
+static bool
+dummy_is_syscall(void)
+{
+	return false;
+}
+
+
+static bool
+dummy_is_restarted_syscall(void)
+{
+	return false;
+}
+
+
+static void
+dummy_store_syscall_restart_timeout(bigtime_t timeout)
+{
+}
+
+
 static net_stack_module_info gNetStackModule = {
 	{
 		NET_STACK_MODULE_NAME,
 		0,
 		std_ops
 	},
-	NULL, //register_domain,
-	NULL, //unregister_domain,
+	NULL, // register_domain,
+	NULL, // unregister_domain,
 	get_domain,
 
 	register_domain_protocols,
 	register_domain_datalink_protocols,
 	register_domain_receiving_protocol,
 
-	NULL, //get_domain_receiving_protocol,
-	NULL, //put_domain_receiving_protocol,
+	NULL, // get_domain_receiving_protocol,
+	NULL, // put_domain_receiving_protocol,
 
-	NULL, //register_device_deframer,
-	NULL, //unregister_device_deframer,
-	NULL, //register_domain_device_handler,
-	NULL, //register_device_handler,
-	NULL, //unregister_device_handler,
-	NULL, //register_device_monitor,
-	NULL, //unregister_device_monitor,
-	NULL, //device_link_changed,
-	NULL, //device_removed,
-	NULL, //device_enqueue_buffer,
+	NULL, // register_device_deframer,
+	NULL, // unregister_device_deframer,
+	NULL, // register_domain_device_handler,
+	NULL, // register_device_handler,
+	NULL, // unregister_device_handler,
+	NULL, // register_device_monitor,
+	NULL, // unregister_device_monitor,
+	NULL, // device_link_changed,
+	NULL, // device_removed,
+	NULL, // device_enqueue_buffer,
 
 	notify_socket,
 
@@ -236,6 +280,11 @@ static net_stack_module_info gNetStackModule = {
 	set_timer,
 	cancel_timer,
 	is_timer_active,
+
+	dummy_is_syscall,
+	dummy_is_restarted_syscall,
+	dummy_store_syscall_restart_timeout,
+	NULL, // restore_syscall_restart_timeout
 };
 
 
@@ -621,23 +670,23 @@ net_socket_module_info gNetSocketModule = {
 		0,
 		std_ops
 	},
-	NULL, //socket_open,
-	NULL, //socket_close,
-	NULL, //socket_free,
+	NULL, // open,
+	NULL, // close,
+	NULL, // free,
 
-	NULL, //socket_readv,
-	NULL, //socket_writev,
-	NULL, //socket_control,
+	NULL, // readv,
+	NULL, // writev,
+	NULL, // control,
 
-	NULL, //socket_read_avail,
-	NULL, //socket_send_avail,
+	NULL, // read_avail,
+	NULL, // send_avail,
 
-	NULL, //socket_send_data,
-	NULL, //socket_receive_data,
+	NULL, // send_data,
+	NULL, // receive_data,
 
-	NULL, //get_option,
-	NULL, //set_option,
-	NULL, //socket_get_next_stat,
+	NULL, // get_option,
+	NULL, // set_option,
+	NULL, // get_next_stat,
 
 	// connections
 	socket_spawn_pending,
@@ -648,22 +697,23 @@ net_socket_module_info gNetSocketModule = {
 	socket_connected,
 
 	// notifications
-	NULL, //socket_request_notification,
-	NULL, //socket_cancel_notification,
+	NULL, // request_notification,
+	NULL, // cancel_notification,
 	socket_notify,
 
 	// standard socket API
-	NULL, //socket_accept,
-	NULL, //socket_bind,
-	NULL, //socket_connect,
-	NULL, //socket_getpeername,
-	NULL, //socket_getsockname,
-	NULL, //socket_getsockopt,
-	NULL, //socket_listen,
-	NULL, //socket_recv,
-	NULL, //socket_send,
-	NULL, //socket_setsockopt,
-	NULL, //socket_shutdown,
+	NULL, // accept,
+	NULL, // bind,
+	NULL, // connect,
+	NULL, // getpeername,
+	NULL, // getsockname,
+	NULL, // getsockopt,
+	NULL, // listen,
+	NULL, // receive,
+	NULL, // send,
+	NULL, // setsockopt,
+	NULL, // shutdown,
+	NULL, // socketpair
 };
 
 
@@ -1046,6 +1096,8 @@ net_protocol_module_info gDomainModule = {
 		0,
 		std_ops
 	},
+	NET_PROTOCOL_ATOMIC_MESSAGES,
+
 	NULL, // init
 	NULL, // uninit
 	domain_open,
@@ -1071,6 +1123,8 @@ net_protocol_module_info gDomainModule = {
 	NULL, // deliver_data
 	domain_error,
 	domain_error_reply,
+	NULL, // attach_ancillary_data
+	NULL, // process_ancillary_data
 };
 
 
@@ -1094,7 +1148,8 @@ receiving_thread(void* _data)
 
 		while (true) {
 			context->lock.Lock();
-			net_buffer* buffer = (net_buffer*)list_remove_head_item(&context->list);
+			net_buffer* buffer = (net_buffer*)list_remove_head_item(
+				&context->list);
 			context->lock.Unlock();
 
 			if (buffer == NULL)
@@ -1108,12 +1163,16 @@ receiving_thread(void* _data)
 				address.sin_port = htons(1023);
 				address.sin_addr.s_addr = htonl(0xc0a80001);
 
-				status_t status = socket_connect(gServerSocket, (struct sockaddr *)&address,
-					sizeof(struct sockaddr));
+				status_t status = socket_connect(gServerSocket,
+					(struct sockaddr *)&address, sizeof(struct sockaddr));
 				if (status < B_OK)
 					fprintf(stderr, "tcp_tester: simultaneous connect failed: %s\n", strerror(status));
 
 				sSimultaneousConnect = false;
+			}
+			if (sSimultaneousClose && !context->server && is_fin(buffer)) {
+				close_protocol(gClientSocket->first_protocol);
+				sSimultaneousClose = false;
 			}
 			if ((sRandomReorder > 0.0
 					|| sReorderList.find(sPacketNumber) != sReorderList.end())
@@ -1159,6 +1218,12 @@ server_thread(void*)
 		while ((bytesRead = socket_recv(connectionSocket, buffer,
 				sizeof(buffer), 0)) > 0) {
 			printf("server: received %ld bytes\n", bytesRead);
+
+			if (sServerActiveClose) {
+				printf("server: active close\n");
+				close_protocol(connectionSocket->first_protocol);
+				return 0;
+			}
 		}
 		if (bytesRead < 0)
 			printf("server: receiving failed: %s\n", strerror(bytesRead));
@@ -1183,7 +1248,7 @@ setup_server()
 	address.sin_port = htons(1024);
 	address.sin_addr.s_addr = INADDR_ANY;
 
-	status_t status = socket_bind(gServerSocket, (struct sockaddr *)&address,
+	status_t status = socket_bind(gServerSocket, (struct sockaddr*)&address,
 		sizeof(struct sockaddr));
 	if (status < B_OK) {
 		fprintf(stderr, "tcp_tester: cannot bind server: %s\n", strerror(status));
@@ -1330,6 +1395,32 @@ do_send(int argc, char** argv)
 	}
 
 	ssize_t bytesWritten = socket_send(gClientSocket, buffer, size, 0);
+	if (bytesWritten < B_OK) {
+		fprintf(stderr, "failed sending buffer: %s\n", strerror(bytesWritten));
+		return;
+	}
+}
+
+
+static void
+do_close(int argc, char** argv)
+{
+	sSimultaneousClose = false;
+	sServerActiveClose = true;
+
+	if (argc > 1) {
+		if (!strcmp(argv[1], "-s"))
+			sSimultaneousClose = true;
+		else {
+			fprintf(stderr, "usage: close [-s]\n");
+			return;
+		}
+	}
+
+	gClientSocket->send.timeout = 0;
+
+	char buffer[32767] = {'q'};
+	ssize_t bytesWritten = socket_send(gClientSocket, buffer, sizeof(buffer), 0);
 	if (bytesWritten < B_OK) {
 		fprintf(stderr, "failed sending buffer: %s\n", strerror(bytesWritten));
 		return;
@@ -1493,6 +1584,7 @@ do_dprintf(int argc, char** argv)
 static cmd_entry sBuiltinCommands[] = {
 	{"connect", do_connect, "Connects the client"},
 	{"send", do_send, "Sends data from the client to the server"},
+	{"close", do_close, "Performs an active or simultaneous close"},
 	{"dprintf", do_dprintf, "Toggles debug output"},
 	{"drop", do_drop, "Lets you drop packets during transfer"},
 	{"reorder", do_reorder, "Lets you reorder packets during transfer"},
@@ -1514,6 +1606,9 @@ do_help(int argc, char** argv)
 }
 
 
+//	#pragma mark -
+
+
 int
 main(int argc, char** argv)
 {
@@ -1524,10 +1619,10 @@ main(int argc, char** argv)
 		return 1;
 	}
 
-	_add_builtin_module((module_info *)&gNetStackModule);
-	_add_builtin_module((module_info *)&gNetBufferModule);
-	_add_builtin_module((module_info *)&gNetSocketModule);
-	_add_builtin_module((module_info *)&gNetDatalinkModule);
+	_add_builtin_module((module_info*)&gNetStackModule);
+	_add_builtin_module((module_info*)&gNetBufferModule);
+	_add_builtin_module((module_info*)&gNetSocketModule);
+	_add_builtin_module((module_info*)&gNetDatalinkModule);
 	_add_builtin_module(modules[0]);
 	if (_get_builtin_dependencies() < B_OK) {
 		fprintf(stderr, "tcp_tester: Could not initialize modules: %s\n",
