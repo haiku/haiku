@@ -10,6 +10,7 @@
 
 #include <string>
 #include <vector>
+#include <Entry.h>
 
 namespace Locale{
 
