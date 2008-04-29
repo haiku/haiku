@@ -221,12 +221,6 @@ status_t
 socket_close(net_socket *_socket)
 {
 	net_socket_private *socket = (net_socket_private *)_socket;
-
-	if (socket->select_pool) {
-		// notify all pending selects
-		notify_select_event_pool(socket->select_pool, ~0);
-	}
-
 	return socket->first_info->close(socket->first_protocol);
 }
 
@@ -478,7 +472,6 @@ socket_delete(net_socket *_socket)
 
 	put_domain_protocols(socket);
 	benaphore_destroy(&socket->lock);
-	delete_select_sync_pool(socket->select_pool);
 	delete socket;
 }
 
