@@ -343,19 +343,21 @@ name_for_state(tcp_state state)
 	for \a flags, \a seq \a ack and \a advertisedWindow.
 */
 status_t
-add_tcp_header(net_address_module_info *addressModule,
-	tcp_segment_header &segment, net_buffer *buffer)
+add_tcp_header(net_address_module_info* addressModule,
+	tcp_segment_header& segment, net_buffer* buffer)
 {
 	buffer->protocol = IPPROTO_TCP;
 
 	uint8 optionsBuffer[kMaxOptionSize];
-	uint32 optionsLength = add_options(segment, optionsBuffer, sizeof(optionsBuffer));
+	uint32 optionsLength = add_options(segment, optionsBuffer,
+		sizeof(optionsBuffer));
 
-	NetBufferPrepend<tcp_header> bufferHeader(buffer, sizeof(tcp_header) + optionsLength);
+	NetBufferPrepend<tcp_header> bufferHeader(buffer,
+		sizeof(tcp_header) + optionsLength);
 	if (bufferHeader.Status() != B_OK)
 		return bufferHeader.Status();
 
-	tcp_header &header = bufferHeader.Data();
+	tcp_header& header = bufferHeader.Data();
 
 	header.source_port = addressModule->get_port(buffer->source);
 	header.destination_port = addressModule->get_port(buffer->destination);
@@ -367,17 +369,20 @@ add_tcp_header(net_address_module_info *addressModule,
 	header.flags = segment.flags;
 	header.advertised_window = htons(segment.advertised_window);
 	header.checksum = 0;
-	header.urgent_offset = segment.urgent_offset;
+	header.urgent_offset = htons(segment.urgent_offset);
 
 	// we must detach before calculating the checksum as we may
 	// not have a contiguous buffer.
 	bufferHeader.Sync();
 
-	if (optionsLength > 0)
-		gBufferModule->write(buffer, sizeof(tcp_header), optionsBuffer, optionsLength);
+	if (optionsLength > 0) {
+		gBufferModule->write(buffer, sizeof(tcp_header), optionsBuffer,
+			optionsLength);
+	}
 
-	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, win %u\n", buffer,
-		segment.flags, segment.sequence, segment.acknowledge, segment.advertised_window));
+	TRACE(("add_tcp_header(): buffer %p, flags 0x%x, seq %lu, ack %lu, up %lu, "
+		"win %u\n", buffer, segment.flags, segment.sequence,
+		segment.acknowledge, segment.urgent_offset, segment.advertised_window));
 
 	*TCPChecksumField(buffer) = Checksum::PseudoHeader(addressModule,
 		gBufferModule, buffer, IPPROTO_TCP);
@@ -387,7 +392,7 @@ add_tcp_header(net_address_module_info *addressModule,
 
 
 size_t
-tcp_options_length(tcp_segment_header &segment)
+tcp_options_length(tcp_segment_header& segment)
 {
 	size_t length = 0;
 
@@ -420,13 +425,13 @@ tcp_options_length(tcp_segment_header &segment)
 //	#pragma mark - protocol API
 
 
-net_protocol *
-tcp_init_protocol(net_socket *socket)
+net_protocol*
+tcp_init_protocol(net_socket* socket)
 {
 	socket->send.buffer_size = 32768;
 		// override net_socket default
 
-	TCPEndpoint *protocol = new (std::nothrow) TCPEndpoint(socket);
+	TCPEndpoint* protocol = new (std::nothrow) TCPEndpoint(socket);
 	if (protocol == NULL)
 		return NULL;
 
@@ -442,58 +447,58 @@ tcp_init_protocol(net_socket *socket)
 
 
 status_t
-tcp_uninit_protocol(net_protocol *protocol)
+tcp_uninit_protocol(net_protocol* protocol)
 {
 	TRACE(("Deleting TCPEndpoint: %p\n", protocol));
-	delete (TCPEndpoint *)protocol;
+	delete (TCPEndpoint*)protocol;
 	return B_OK;
 }
 
 
 status_t
-tcp_open(net_protocol *protocol)
+tcp_open(net_protocol* protocol)
 {
-	return ((TCPEndpoint *)protocol)->Open();
+	return ((TCPEndpoint*)protocol)->Open();
 }
 
 
 status_t
-tcp_close(net_protocol *protocol)
+tcp_close(net_protocol* protocol)
 {
-	return ((TCPEndpoint *)protocol)->Close();
+	return ((TCPEndpoint*)protocol)->Close();
 }
 
 
 status_t
-tcp_free(net_protocol *protocol)
+tcp_free(net_protocol* protocol)
 {
-	return ((TCPEndpoint *)protocol)->Free();
+	return ((TCPEndpoint*)protocol)->Free();
 }
 
 
 status_t
-tcp_connect(net_protocol *protocol, const struct sockaddr *address)
+tcp_connect(net_protocol* protocol, const struct sockaddr* address)
 {
-	return ((TCPEndpoint *)protocol)->Connect(address);
+	return ((TCPEndpoint*)protocol)->Connect(address);
 }
 
 
 status_t
-tcp_accept(net_protocol *protocol, struct net_socket **_acceptedSocket)
+tcp_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
-	return ((TCPEndpoint *)protocol)->Accept(_acceptedSocket);
+	return ((TCPEndpoint*)protocol)->Accept(_acceptedSocket);
 }
 
 
 status_t
-tcp_control(net_protocol *_protocol, int level, int option, void *value,
-	size_t *_length)
+tcp_control(net_protocol* _protocol, int level, int option, void* value,
+	size_t* _length)
 {
-	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
+	TCPEndpoint* protocol = (TCPEndpoint*)_protocol;
 
 	if ((level & LEVEL_MASK) == IPPROTO_TCP) {
 		if (option == NET_STAT_SOCKET)
-			return protocol->FillStat((net_stat *)value);
+			return protocol->FillStat((net_stat*)value);
 	}
 
 	return protocol->next->module->control(protocol->next, level, option,
@@ -502,10 +507,10 @@ tcp_control(net_protocol *_protocol, int level, int option, void *value,
 
 
 status_t
-tcp_getsockopt(net_protocol *_protocol, int level, int option, void *value,
-	int *_length)
+tcp_getsockopt(net_protocol* _protocol, int level, int option, void* value,
+	int* _length)
 {
-	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
+	TCPEndpoint* protocol = (TCPEndpoint*)_protocol;
 
 	if (level == IPPROTO_TCP)
 		return protocol->GetOption(option, value, _length);
@@ -516,10 +521,10 @@ tcp_getsockopt(net_protocol *_protocol, int level, int option, void *value,
 
 
 status_t
-tcp_setsockopt(net_protocol *_protocol, int level, int option,
-	const void *_value, int length)
+tcp_setsockopt(net_protocol* _protocol, int level, int option,
+	const void* _value, int length)
 {
-	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
+	TCPEndpoint* protocol = (TCPEndpoint*)_protocol;
 
 	if (level == SOL_SOCKET) {
 		if (option == SO_SNDBUF || option == SO_RCVBUF) {
@@ -527,7 +532,7 @@ tcp_setsockopt(net_protocol *_protocol, int level, int option,
 				return B_BAD_VALUE;
 
 			status_t status;
-			const int *value = (const int *)_value;
+			const int* value = (const int*)_value;
 
 			if (option == SO_SNDBUF)
 				status = protocol->SetSendBufferSize(*value);
@@ -546,43 +551,43 @@ tcp_setsockopt(net_protocol *_protocol, int level, int option,
 
 
 status_t
-tcp_bind(net_protocol *protocol, const struct sockaddr *address)
+tcp_bind(net_protocol* protocol, const struct sockaddr* address)
 {
-	return ((TCPEndpoint *)protocol)->Bind(address);
+	return ((TCPEndpoint*)protocol)->Bind(address);
 }
 
 
 status_t
-tcp_unbind(net_protocol *protocol, struct sockaddr *address)
+tcp_unbind(net_protocol* protocol, struct sockaddr* address)
 {
-	return ((TCPEndpoint *)protocol)->Unbind(address);
+	return ((TCPEndpoint*)protocol)->Unbind(address);
 }
 
 
 status_t
-tcp_listen(net_protocol *protocol, int count)
+tcp_listen(net_protocol* protocol, int count)
 {
-	return ((TCPEndpoint *)protocol)->Listen(count);
+	return ((TCPEndpoint*)protocol)->Listen(count);
 }
 
 
 status_t
-tcp_shutdown(net_protocol *protocol, int direction)
+tcp_shutdown(net_protocol* protocol, int direction)
 {
-	return ((TCPEndpoint *)protocol)->Shutdown(direction);
+	return ((TCPEndpoint*)protocol)->Shutdown(direction);
 }
 
 
 status_t
-tcp_send_data(net_protocol *protocol, net_buffer *buffer)
+tcp_send_data(net_protocol* protocol, net_buffer* buffer)
 {
-	return ((TCPEndpoint *)protocol)->SendData(buffer);
+	return ((TCPEndpoint*)protocol)->SendData(buffer);
 }
 
 
 status_t
-tcp_send_routed_data(net_protocol *protocol, struct net_route *route,
-	net_buffer *buffer)
+tcp_send_routed_data(net_protocol* protocol, struct net_route* route,
+	net_buffer* buffer)
 {
 	// TCP never sends routed data
 	return B_ERROR;
@@ -590,57 +595,57 @@ tcp_send_routed_data(net_protocol *protocol, struct net_route *route,
 
 
 ssize_t
-tcp_send_avail(net_protocol *protocol)
+tcp_send_avail(net_protocol* protocol)
 {
-	return ((TCPEndpoint *)protocol)->SendAvailable();
+	return ((TCPEndpoint*)protocol)->SendAvailable();
 }
 
 
 status_t
-tcp_read_data(net_protocol *protocol, size_t numBytes, uint32 flags,
-	net_buffer **_buffer)
+tcp_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
+	net_buffer** _buffer)
 {
-	return ((TCPEndpoint *)protocol)->ReadData(numBytes, flags, _buffer);
+	return ((TCPEndpoint*)protocol)->ReadData(numBytes, flags, _buffer);
 }
 
 
 ssize_t
-tcp_read_avail(net_protocol *protocol)
+tcp_read_avail(net_protocol* protocol)
 {
-	return ((TCPEndpoint *)protocol)->ReadAvailable();
+	return ((TCPEndpoint*)protocol)->ReadAvailable();
 }
 
 
-struct net_domain *
-tcp_get_domain(net_protocol *protocol)
+struct net_domain*
+tcp_get_domain(net_protocol* protocol)
 {
 	return protocol->next->module->get_domain(protocol->next);
 }
 
 
 size_t
-tcp_get_mtu(net_protocol *protocol, const struct sockaddr *address)
+tcp_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 {
 	return protocol->next->module->get_mtu(protocol->next, address);
 }
 
 
 status_t
-tcp_receive_data(net_buffer *buffer)
+tcp_receive_data(net_buffer* buffer)
 {
 	TRACE(("TCP: Received buffer %p\n", buffer));
 
 	if (buffer->interface == NULL || buffer->interface->domain == NULL)
 		return B_ERROR;
 
-	net_domain *domain = buffer->interface->domain;
-	net_address_module_info *addressModule = domain->address_module;
+	net_domain* domain = buffer->interface->domain;
+	net_address_module_info* addressModule = domain->address_module;
 
 	NetBufferHeaderReader<tcp_header> bufferHeader(buffer);
 	if (bufferHeader.Status() < B_OK)
 		return bufferHeader.Status();
 
-	tcp_header &header = bufferHeader.Data();
+	tcp_header& header = bufferHeader.Data();
 
 	uint16 headerLength = header.HeaderLength();
 	if (headerLength < sizeof(tcp_header))
@@ -671,13 +676,13 @@ tcp_receive_data(net_buffer *buffer)
 
 	MutexLocker _(sEndpointManagersLock);
 
-	EndpointManager *endpointManager = endpoint_manager_for(domain);
+	EndpointManager* endpointManager = endpoint_manager_for(domain);
 	if (endpointManager == NULL)
 		return B_ERROR;
 
 	int32 segmentAction = DROP;
 
-	TCPEndpoint *endpoint = endpointManager->FindConnection(
+	TCPEndpoint* endpoint = endpointManager->FindConnection(
 		buffer->destination, buffer->source);
 	if (endpoint != NULL)
 		segmentAction = endpoint->SegmentReceived(segment, buffer);
@@ -696,15 +701,15 @@ tcp_receive_data(net_buffer *buffer)
 
 
 status_t
-tcp_error(uint32 code, net_buffer *data)
+tcp_error(uint32 code, net_buffer* data)
 {
 	return B_ERROR;
 }
 
 
 status_t
-tcp_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
-	void *errorData)
+tcp_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
+	void* errorData)
 {
 	return B_ERROR;
 }
@@ -729,15 +734,16 @@ tcp_init()
 	if (status < B_OK)
 		return status;
 
-	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, IPPROTO_TCP,
+	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM,
+		IPPROTO_TCP,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);
 	if (status < B_OK)
 		return status;
 
-	status = gStackModule->register_domain_receiving_protocol(AF_INET, IPPROTO_TCP,
-		"network/protocols/tcp/v1");
+	status = gStackModule->register_domain_receiving_protocol(AF_INET,
+		IPPROTO_TCP, "network/protocols/tcp/v1");
 	if (status < B_OK)
 		return status;
 
