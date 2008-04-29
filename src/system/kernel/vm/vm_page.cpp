@@ -792,8 +792,7 @@ page_scrubber(void *unused)
 
 			// get some pages from the free queue
 
-			state = disable_interrupts();
-			acquire_spinlock(&sPageLock);
+			InterruptsSpinLocker locker(sPageLock);
 
 			// Since we temporarily remove pages from the free pages reserve,
 			// we must make sure we don't cause a violation of the page
@@ -820,8 +819,7 @@ page_scrubber(void *unused)
 				T(ScrubbingPages(scrubCount));
 			}
 
-			release_spinlock(&sPageLock);
-			restore_interrupts(state);
+			locker.Unlock();
 
 			// clear them
 
@@ -829,8 +827,7 @@ page_scrubber(void *unused)
 				clear_page(page[i]);
 			}
 
-			state = disable_interrupts();
-			acquire_spinlock(&sPageLock);
+			locker.Lock();
 
 			// and put them into the clear queue
 
@@ -842,9 +839,6 @@ page_scrubber(void *unused)
 			if (scrubCount > 0) {
 				T(ScrubbedPages(scrubCount));
 			}
-
-			release_spinlock(&sPageLock);
-			restore_interrupts(state);
 		}
 	}
 
@@ -885,15 +879,20 @@ write_page(vm_page *page, bool fsReenter)
 }
 
 
+static inline bool
+is_marker_page(struct vm_page *page)
+{
+	return page->type == PAGE_TYPE_DUMMY;
+}
+
+
 static void
 remove_page_marker(struct vm_page &marker)
 {
 	if (marker.state == PAGE_STATE_UNUSED)
 		return;
 
-	InterruptsSpinLocker locker(sPageLock);
 	page_queue *queue;
-	vm_page *page;
 
 	switch (marker.state) {
 		case PAGE_STATE_ACTIVE:
@@ -910,7 +909,9 @@ remove_page_marker(struct vm_page &marker)
 			return;
 	}
 
+	InterruptsSpinLocker locker(sPageLock);
 	remove_page_from_queue(queue, &marker);
+
 	marker.state = PAGE_STATE_UNUSED;
 }
 
@@ -929,7 +930,7 @@ next_modified_page(struct vm_page &marker)
 		page = sModifiedPageQueue.head;
 
 	for (; page != NULL; page = page->queue_next) {
-		if (page->type != PAGE_TYPE_DUMMY && page->state != PAGE_STATE_BUSY) {
+		if (!is_marker_page(page) && page->state != PAGE_STATE_BUSY) {
 			// insert marker
 			marker.state = PAGE_STATE_MODIFIED;
 			insert_page_after(&sModifiedPageQueue, page, &marker);
@@ -1094,36 +1095,38 @@ find_page_candidate(struct vm_page &marker, bool stealActive)
 	page_queue *queue;
 	vm_page *page;
 
-	switch (marker.state) {
-		case PAGE_STATE_ACTIVE:
+	if (marker.state == PAGE_STATE_UNUSED) {
+		// Get the first free pages of the (in)active queue
+		queue = &sInactivePageQueue;
+		page = sInactivePageQueue.head;
+		if (page == NULL && stealActive) {
 			queue = &sActivePageQueue;
-			page = marker.queue_next;
-			remove_page_from_queue(queue, &marker);
-			marker.state = PAGE_STATE_UNUSED;
-			break;
-		case PAGE_STATE_INACTIVE:
+			page = sActivePageQueue.head;
+		}
+	} else {
+		// Get the next page of the current queue
+		if (marker.state == PAGE_STATE_INACTIVE)
 			queue = &sInactivePageQueue;
-			page = marker.queue_next;
-			remove_page_from_queue(queue, &marker);
-			marker.state = PAGE_STATE_UNUSED;
-			break;
-		default:
-			queue = &sInactivePageQueue;
-			page = sInactivePageQueue.head;
-			if (page == NULL && stealActive) {
-				queue = &sActivePageQueue;
-				page = sActivePageQueue.head;
-			}
-			break;
+		else if (marker.state == PAGE_STATE_ACTIVE)
+			queue = &sActivePageQueue;
+		else {
+			panic("invalid marker %p state", &marker);
+			queue = NULL;
+		}
+
+		page = marker.queue_next;
+		remove_page_from_queue(queue, &marker);
+		marker.state = PAGE_STATE_UNUSED;
 	}
 
 	while (page != NULL) {
-		if (page->type != PAGE_TYPE_DUMMY
+		if (!is_marker_page(page)
 			&& (page->state == PAGE_STATE_INACTIVE
 				|| (stealActive && page->state == PAGE_STATE_ACTIVE
 					&& page->wired_count == 0))) {
-			// insert marker
-			marker.state = queue == &sActivePageQueue ? PAGE_STATE_ACTIVE : PAGE_STATE_INACTIVE;
+			// we found a candidate, insert marker
+			marker.state = queue == &sActivePageQueue
+				? PAGE_STATE_ACTIVE : PAGE_STATE_INACTIVE;
 			insert_page_after(queue, page, &marker);
 			return page;
 		}
@@ -1209,6 +1212,8 @@ steal_page(vm_page *page, bool stealActive)
 	//	page->state == PAGE_STATE_INACTIVE ? "" : " (ACTIVE)");
 
 	vm_cache_remove_page(page->cache, page);
+
+	InterruptsSpinLocker _(sPageLock);
 	remove_page_from_queue(page->state == PAGE_STATE_ACTIVE
 		? &sActivePageQueue : &sInactivePageQueue, page);
 	return true;
