@@ -723,7 +723,9 @@ TCPEndpoint::SendData(net_buffer *buffer)
 	if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
 		|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
 		|| fState == TIME_WAIT) {
-		send_signal(find_thread(NULL), SIGPIPE);
+		// we only send signals when called from userland
+		if (gStackModule->is_syscall)
+			send_signal(find_thread(NULL), SIGPIPE);
 		return EPIPE;
 	}
 
