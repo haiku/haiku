@@ -84,7 +84,7 @@ public:
 private:
 			void		_StartPersistTimer();
 			void		_EnterTimeWait();
-			status_t	_UpdateTimeWait();
+			void		_UpdateTimeWait();
 			void		_CancelConnectionTimers();
 			uint8		_CurrentFlags();
 			bool		_ShouldSendSegment(tcp_segment_header& segment,
