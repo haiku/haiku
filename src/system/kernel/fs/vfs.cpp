@@ -2626,7 +2626,7 @@ _dump_mount(struct fs_mount *mount)
 		volume = volume->super_volume;
 	}
 
-	set_debug_variable("_cookie", (addr_t)mount->volume->private_volume);
+	set_debug_variable("_volume", (addr_t)mount->volume->private_volume);
 	set_debug_variable("_root", (addr_t)mount->root_vnode);
 	set_debug_variable("_covers", (addr_t)mount->covers_vnode);
 	set_debug_variable("_partition", (addr_t)mount->partition);
@@ -4495,7 +4495,7 @@ create_vnode(struct vnode *directory, const char *name, int openMode,
 		status = lookup_dir_entry(directory, name, &vnode);
 		if (status == B_OK) {
 			VNodePutter putter(vnode);
-	
+
 			if ((openMode & O_EXCL) != 0)
 				return B_FILE_EXISTS;
 
