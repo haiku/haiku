@@ -27,27 +27,26 @@
 #include <OS.h>
 #include <StorageDefs.h>
 
-#include <util/AutoLock.h>
-
 #include <block_cache.h>
-#include <fd.h>
-#include <file_cache.h>
-#include <khash.h>
-#include <KPath.h>
-#include <lock.h>
-#include <syscalls.h>
-#include <syscall_restart.h>
-#include <vfs.h>
-#include <vm.h>
-#include <vm_cache.h>
-#include <vm_low_memory.h>
-
 #include <boot/kernel_args.h>
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
 #include <disk_device_manager/KDiskDeviceUtils.h>
 #include <disk_device_manager/KDiskSystem.h>
+#include <fd.h>
+#include <file_cache.h>
 #include <fs/node_monitor.h>
+#include <khash.h>
+#include <KPath.h>
+#include <lock.h>
+#include <syscalls.h>
+#include <syscall_restart.h>
+#include <util/AutoLock.h>
+#include <util/atomic.h>
+#include <vfs.h>
+#include <vm.h>
+#include <vm_cache.h>
+#include <vm_low_memory.h>
 
 #include "fifo.h"
 
@@ -1144,8 +1143,8 @@ create_advisory_locking(struct vnode *vnode)
 	// We need to set the locking structure atomically - someone
 	// else might set one at the same time
 	do {
-		if (atomic_test_and_set((vint32 *)&vnode->advisory_locking,
-				(addr_t)locking, (addr_t)NULL) == (addr_t)NULL)
+		if (atomic_pointer_test_and_set(&vnode->advisory_locking, locking,
+				(advisory_locking*)NULL) == NULL)
 			return B_OK;
 	} while (get_advisory_locking(vnode) == NULL);
 
@@ -5309,8 +5308,8 @@ common_lock_node(int fd, bool kernel)
 
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
-	if (atomic_test_and_set((vint32 *)&vnode->mandatory_locked_by,
-			(addr_t)descriptor, (addr_t)NULL) != (addr_t)NULL)
+	if (atomic_pointer_test_and_set(&vnode->mandatory_locked_by, descriptor,
+			(file_descriptor*)NULL) != NULL)
 		status = B_BUSY;
 
 	put_fd(descriptor);
@@ -5332,8 +5331,8 @@ common_unlock_node(int fd, bool kernel)
 
 	// We need to set the locking atomically - someone
 	// else might set one at the same time
-	if (atomic_test_and_set((vint32 *)&vnode->mandatory_locked_by,
-			(addr_t)NULL, (addr_t)descriptor) != (int32)descriptor)
+	if (atomic_pointer_test_and_set(&vnode->mandatory_locked_by,
+			(file_descriptor*)NULL, descriptor) != descriptor)
 		status = B_BAD_VALUE;
 
 	put_fd(descriptor);
