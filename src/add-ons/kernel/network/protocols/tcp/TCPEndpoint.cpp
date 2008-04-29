@@ -217,7 +217,8 @@ enum {
 	//       That is, what is expected from accept() after a shutdown()
 	//       is performed on a listen()ing socket.
 	FLAG_NO_RECEIVE				= 0x04,
-	FLAG_CLOSED					= 0x08
+	FLAG_CLOSED					= 0x08,
+	FLAG_DELETE					= 0x10,
 };
 
 
@@ -970,13 +971,14 @@ TCPEndpoint::_EnterTimeWait()
 {
 	TRACE("_EnterTimeWait()\n");
 
-	_CancelConnectionTimers();
-#if 0
 	if (fState == TIME_WAIT && fRoute != NULL
-		&& (fRoute->flags & RTF_LOCAL) != 0)
+		&& (fRoute->flags & RTF_LOCAL) != 0) {
+		// we do not use TIME_WAIT state for local connections
+		fFlags |= FLAG_DELETE;
 		return;
-#endif
+	}
 
+	_CancelConnectionTimers();
 	_UpdateTimeWait();
 }
 
@@ -1621,7 +1623,8 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 	else if (segmentAction & ACKNOWLEDGE)
 		DelayedAcknowledge();
 
-	if (fState == CLOSED && (fFlags & FLAG_CLOSED) != 0) {
+	if ((fState == CLOSED && (fFlags & FLAG_CLOSED) != 0)
+		|| (fFlags & FLAG_DELETE) != 0) {
 		locker.Unlock();
 		gSocketModule->delete_socket(socket);
 			// this will also delete us
