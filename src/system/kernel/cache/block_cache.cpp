@@ -162,7 +162,7 @@ struct cache_transaction {
 	bigtime_t		last_used;
 };
 
-#ifdef BLOCK_CACHE_TRANSACTION_TRACING
+#if BLOCK_CACHE_TRANSACTION_TRACING
 namespace TransactionTracing {
 
 class Action : public AbstractTraceEntry {
