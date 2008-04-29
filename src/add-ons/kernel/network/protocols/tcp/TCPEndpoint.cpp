@@ -570,8 +570,7 @@ TCPEndpoint::Connect(const sockaddr* address)
 	// send SYN
 	status = _SendQueued();
 	if (status != B_OK) {
-		fState = CLOSED;
-		T(State(this));
+		_Close();
 		return status;
 	}
 
@@ -1062,13 +1061,25 @@ TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 
 
 void
-TCPEndpoint::_HandleReset(status_t error)
+TCPEndpoint::_Close()
 {
 	_CancelConnectionTimers();
-
-	socket->error = error;
 	fState = CLOSED;
 	T(State(this));
+
+	if ((fFlags & FLAG_CLOSED) != 0) {
+		// this socket has been closed already, we don't need to keep
+		// it around anymore
+		fFlags |= FLAG_DELETE;
+	}
+}
+
+
+void
+TCPEndpoint::_HandleReset(status_t error)
+{
+	socket->error = error;
+	_Close();
 
 	fSendList.Signal();
 	_NotifyReader();
@@ -1486,6 +1497,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 				switch (fState) {
 					case FINISH_SENT:
 						fState = FINISH_ACKNOWLEDGED;
+						T(State(this));
 						break;
 					case CLOSING:
 						fState = TIME_WAIT;
@@ -1493,15 +1505,12 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 						_EnterTimeWait();
 						return DROP;
 					case WAIT_FOR_FINISH_ACKNOWLEDGE:
-						_CancelConnectionTimers();
-						fState = CLOSED;
+						_Close();
 						break;
 
 					default:
 						break;
 				}
-
-				T(State(this));
 			}
 
 			if (fState != CLOSED)
@@ -1623,8 +1632,7 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 	else if (segmentAction & ACKNOWLEDGE)
 		DelayedAcknowledge();
 
-	if ((fState == CLOSED && (fFlags & FLAG_CLOSED) != 0)
-		|| (fFlags & FLAG_DELETE) != 0) {
+	if ((fFlags & FLAG_DELETE) != 0) {
 		locker.Unlock();
 		gSocketModule->delete_socket(socket);
 			// this will also delete us
