@@ -1,23 +1,25 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 /*! BStatusBar displays a "percentage-of-completion" gauge. */
+#include <StatusBar.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include <Message.h>
 #include <Region.h>
-#include <StatusBar.h>
 
 #include <Layout.h>
 #include <LayoutUtils.h>
-
-#include <stdlib.h>
-#include <string.h>
 
 
 static const rgb_color kDefaultBarColor = {50, 150, 255, 255};
@@ -80,14 +82,11 @@ BStatusBar::~BStatusBar()
 void
 BStatusBar::_InitObject()
 {
-	fMax = 100.0f;
-	fCurrent = 0.0f;
+	fMax = 100.0;
+	fCurrent = 0.0;
 
-	fBarHeight = -1.0f;
-	fTextWidth = 0.0f;
-	fLabelWidth = 0.0f;
-	fTrailingTextWidth = 0.0f;
-	fTrailingLabelWidth = 0.0f;
+	fBarHeight = -1.0;
+	fTextDivider = Bounds().Width();
 
 	fBarColor = kDefaultBarColor;
 	fCustomBarHeight = false;
@@ -119,9 +118,9 @@ BStatusBar::Archive(BMessage *archive, bool deep) const
 	if (err == B_OK && fBarColor != kDefaultBarColor)
 		err = archive->AddInt32("_bcolor", (const uint32 &)fBarColor);
 
-	if (err == B_OK && fCurrent != 0.0f)
+	if (err == B_OK && fCurrent != 0)
 		err = archive->AddFloat("_val", fCurrent);
-	if (err == B_OK && fMax != 100.0f )
+	if (err == B_OK && fMax != 100 )
 		err = archive->AddFloat("_max", fMax);
 
 	if (err == B_OK && fText.Length())
@@ -151,10 +150,7 @@ BStatusBar::AttachedToWindow()
 	if (Parent())
 		SetLowColor(Parent()->ViewColor());
 
-	fLabelWidth = ceilf(StringWidth(fLabel.String()));
-	fTrailingLabelWidth = ceilf(StringWidth(fTrailingLabel.String()));
-	fTextWidth = ceilf(StringWidth(fText.String()));
-	fTrailingTextWidth = ceilf(StringWidth(fTrailingText.String()));
+	fTextDivider = Bounds().Width();
 }
 
 
@@ -207,7 +203,7 @@ BStatusBar::Draw(BRect updateRect)
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	BRect barFrame = _BarFrame(&fontHeight);
-	BRect outerFrame = barFrame.InsetByCopy(-2.0f, -2.0f);
+	BRect outerFrame = barFrame.InsetByCopy(-2, -2);
 
 	BRegion background(updateRect);
 	background.Exclude(outerFrame);
@@ -216,29 +212,41 @@ BStatusBar::Draw(BRect updateRect)
 	// Draw labels/texts
 
 	BRect rect = outerFrame;
-	rect.top = 0.0f;
-	rect.bottom = outerFrame.top - 1.0f;
+	rect.top = 0;
+	rect.bottom = outerFrame.top - 1;
 
 	if (updateRect.Intersects(rect)) {
 		// update labels
-		SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
-		MovePenTo(0.0f, ceilf(fontHeight.ascent) + 1.0f);
+		BString leftText;
+		leftText << fLabel << fText;
 
-		if (fLabel.Length())
-			DrawString(fLabel.String());
-		if (fText.Length())
-			DrawString(fText.String());
+		BString rightText;
+		rightText << fTrailingText << fTrailingLabel;
 
-		if (fTrailingText.Length() || fTrailingLabel.Length()) {
-			MovePenTo(rect.right - fTrailingTextWidth - fTrailingLabelWidth,
-				ceilf(fontHeight.ascent) + 1.0f);
+		float baseLine = ceilf(fontHeight.ascent) + 1;
+		fTextDivider = rect.right;
 
-			if (fTrailingText.Length())
-				DrawString(fTrailingText.String());
+		BFont font;
+		GetFont(&font);
 
-			if (fTrailingLabel.Length())
-				DrawString(fTrailingLabel.String());
+		if (rightText.Length()) {
+			font.TruncateString(&rightText, B_TRUNCATE_BEGINNING, rect.Width());
+			fTextDivider -= StringWidth(rightText.String());
 		}
+
+		if (leftText.Length()) {
+			float width = max_c(0.0, fTextDivider - rect.left);
+			font.TruncateString(&leftText, B_TRUNCATE_END, width);
+		}
+
+		SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+
+		if (leftText.Length())
+			DrawString(leftText.String(), BPoint(rect.left, baseLine));
+
+		if (rightText.Length())
+			DrawString(rightText.String(), BPoint(fTextDivider, baseLine));
+
 	}
 
 	// Draw bar
@@ -254,10 +262,10 @@ BStatusBar::Draw(BRect updateRect)
 	StrokeLine(rect.RightTop());
 
 	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
-	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
-	StrokeLine(BPoint(rect.right, rect.top + 1.0f));
+	StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
+	StrokeLine(BPoint(rect.right, rect.top + 1));
 
-	rect.InsetBy(1.0f, 1.0f);
+	rect.InsetBy(1, 1);
 
 	// Second bevel
 	SetHighColor(tint_color(ui_color ( B_PANEL_BACKGROUND_COLOR ), B_DARKEN_4_TINT));
@@ -265,8 +273,8 @@ BStatusBar::Draw(BRect updateRect)
 	StrokeLine(rect.RightTop());
 
 	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
-	StrokeLine(BPoint(rect.right, rect.top + 1.0f));
+	StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
+	StrokeLine(BPoint(rect.right, rect.top + 1));
 
 	rect = barFrame;
 	rect.right = _BarPosition(barFrame);
@@ -280,17 +288,17 @@ BStatusBar::Draw(BRect updateRect)
 		StrokeLine(rect.RightTop());
 
 		SetHighColor(tint_color(fBarColor, B_DARKEN_2_TINT));
-		StrokeLine(BPoint(rect.left + 1.0f, rect.bottom), rect.RightBottom());
-		StrokeLine(BPoint(rect.right, rect.top + 1.0f));
+		StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
+		StrokeLine(BPoint(rect.right, rect.top + 1));
 
 		// filling
 		SetHighColor(fBarColor);
-		FillRect(rect.InsetByCopy(1.0f, 1.0f));
+		FillRect(rect.InsetByCopy(1, 1));
 	}
 
 	if (rect.right < barFrame.right) {
 		// empty space
-		rect.left = rect.right + 1.0f;
+		rect.left = rect.right + 1;
 		rect.right = barFrame.right;
 		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_MAX_TINT));
 		FillRect(rect);
@@ -328,15 +336,14 @@ BStatusBar::SetBarHeight(float barHeight)
 void
 BStatusBar::SetText(const char* string)
 {
-	_SetTextData(fText, fTextWidth, string, fLabelWidth, false);
+	_SetTextData(fText, string, fLabel, false);
 }
 
 
 void
 BStatusBar::SetTrailingText(const char* string)
 {
-	_SetTextData(fTrailingText, fTrailingTextWidth, string,
-		fTrailingLabelWidth, true);
+	_SetTextData(fTrailingText, string, fTrailingLabel, true);
 }
 
 
@@ -366,8 +373,8 @@ BStatusBar::SetTo(float value, const char* text, const char* trailingText)
 
 	if (value > fMax)
 		value = fMax;
-	else if (value < 0.0f)
-		value = 0.0f;
+	else if (value < 0)
+		value = 0;
 	if (value == fCurrent)
 		return;
 
@@ -375,23 +382,19 @@ BStatusBar::SetTo(float value, const char* text, const char* trailingText)
 	float oldPosition = _BarPosition(barFrame);
 
 	fCurrent = value;
+
 	float newPosition = _BarPosition(barFrame);
-
-	// update only the part of the status bar with actual changes
-
 	if (oldPosition == newPosition)
 		return;
 
+	// update only the part of the status bar with actual changes
 	BRect update = barFrame;
-	update.InsetBy(-1, -1);
-		// TODO: this shouldn't be necessary, investigate - app_server bug?!
-
 	if (oldPosition < newPosition) {
-		update.left = max_c(oldPosition - 1, update.left);
-		update.right = newPosition;
+		update.left = floorf(max_c(oldPosition - 1, update.left));
+		update.right = ceilf(newPosition);
 	} else {
-		update.left = max_c(newPosition - 1, update.left);
-		update.right = oldPosition;
+		update.left = floorf(max_c(newPosition - 1, update.left));
+		update.right = ceilf(oldPosition);
 	}
 
 	Invalidate(update);
@@ -404,15 +407,15 @@ BStatusBar::Reset(const char *label, const char *trailingLabel)
 	// Reset replaces the label and trailing label with copies of the
 	// strings passed as arguments. If either argument is NULL, the
 	// label or trailing label will be deleted and erased.
-	_SetTextData(fLabel, fLabelWidth, label, 0.0f, false);
-	_SetTextData(fTrailingLabel, fTrailingLabelWidth, trailingLabel, 0.0f, true);
+	fLabel = label ? label : "";
+	fTrailingLabel = trailingLabel ? trailingLabel : "";
 
 	// Reset deletes and erases any text or trailing text
-	_SetTextData(fText, fTextWidth, NULL, fLabelWidth, false);
-	_SetTextData(fTrailingText, fTrailingTextWidth, NULL, fTrailingLabelWidth, true);
+	fText = "";
+	fTrailingText = "";
 
-	fCurrent = 0.0f;
-	fMax = 100.0f;
+	fCurrent = 0;
+	fMax = 100;
 
 	Invalidate();
 }
@@ -442,15 +445,15 @@ BStatusBar::BarColor() const
 float
 BStatusBar::BarHeight() const
 {
-	if (!fCustomBarHeight && fBarHeight == -1.0f) {
+	if (!fCustomBarHeight && fBarHeight == -1) {
 		// the default bar height is as height as the label
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 		const_cast<BStatusBar *>(this)->fBarHeight = fontHeight.ascent
-			+ fontHeight.descent + 5.0f;
+			+ fontHeight.descent + 5;
 	}
 
-	return fBarHeight;
+	return ceilf(fBarHeight);
 }
 
 
@@ -556,14 +559,15 @@ BStatusBar::GetPreferredSize(float* _width, float* _height)
 			+ ceilf(StringWidth(fTrailingLabel.String()))
 			+ ceilf(StringWidth(fText.String()))
 			+ ceilf(StringWidth(fTrailingText.String()))
-			+ 5.0f;
+			+ 5;
 	}
 
 	if (_height) {
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		*_height = ceilf(fontHeight.ascent + fontHeight.descent) + 6.0f + BarHeight();
+		*_height = ceilf(fontHeight.ascent + fontHeight.descent) + 6
+			+ BarHeight();
 	}
 }
 
@@ -655,8 +659,8 @@ BStatusBar::operator=(const BStatusBar& other)
 
 
 void
-BStatusBar::_SetTextData(BString& text, float& width, const char* source,
-	float position, bool rightAligned)
+BStatusBar::_SetTextData(BString& text, const char* source,
+	const BString& combineWith, bool rightAligned)
 {
 	if (source == NULL)
 		source = "";
@@ -665,27 +669,41 @@ BStatusBar::_SetTextData(BString& text, float& width, const char* source,
 	if (text == source)
 		return;
 
-	float oldWidth = width;
+	float oldWidth;
+	if (rightAligned)
+		oldWidth = Bounds().right - fTextDivider;
+	else
+		oldWidth = fTextDivider;
+
 	text = source;
-	width = ceilf(StringWidth(text.String()));
+
+	BString newString;
+	if (rightAligned)
+		newString << text << combineWith;
+	else
+		newString << combineWith << text;
+
+	float newWidth = ceilf(StringWidth(newString.String()));
+		// might still be smaller in Draw(), but we use it
+		// only for the invalidation rect here
 
 	// determine which part of the view needs an update
+	float invalidateWidth = max_c(newWidth, oldWidth);
 
-	// if a label changed, we also need to update the texts
-	float invalidateWidth = max_c(width, oldWidth);
-	if (&text == &fLabel)
-		invalidateWidth += fTextWidth;
-	if (&text == &fTrailingLabel)
-		invalidateWidth += fTrailingTextWidth;
-
+	float position = 0.0;
 	if (rightAligned)
-		position = Bounds().Width() - position - invalidateWidth;
+		position = Bounds().right - invalidateWidth;
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	Invalidate(BRect(position, 1.0f, position + invalidateWidth,
-		ceilf(fontHeight.ascent + fontHeight.descent)));
+//	Invalidate(BRect(position, 0, position + invalidateWidth,
+//		ceilf(fontHeight.ascent) + ceilf(fontHeight.descent)));
+// TODO: redrawing the entire area takes care of the edge case
+// where the left side string changes because of truncation and
+// part of it needs to be redrawn as well.
+	Invalidate(BRect(0, 0, Bounds().right,
+		ceilf(fontHeight.ascent) + ceilf(fontHeight.descent)));
 }
 
 
@@ -699,19 +717,19 @@ BStatusBar::_BarFrame(const font_height* fontHeight) const
 	if (fontHeight == NULL) {
 		font_height height;
 		GetFontHeight(&height);
-		top = ceilf(height.ascent + height.descent) + 6.0f;
+		top = ceilf(height.ascent + height.descent) + 6;
 	} else
-		top = ceilf(fontHeight->ascent + fontHeight->descent) + 6.0f;
+		top = ceilf(fontHeight->ascent + fontHeight->descent) + 6;
 
-	return BRect(2.0f, top, Bounds().right - 2.0f, top + BarHeight() - 4.0f);
+	return BRect(2, top, Bounds().right - 2, top + BarHeight() - 4);
 }
 
 
 float
 BStatusBar::_BarPosition(const BRect& barFrame) const
 {
-	if (fCurrent == 0.0f)
-		return barFrame.left - 1.0f;
+	if (fCurrent == 0)
+		return barFrame.left - 1;
 
 	return roundf(barFrame.left + ceilf(fCurrent * barFrame.Width() / fMax));
 }

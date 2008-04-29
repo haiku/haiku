@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STATUS_BAR_H
@@ -84,8 +84,8 @@ class BStatusBar : public BView {
 		BStatusBar &operator=(const BStatusBar& other);
 
 		void _InitObject();
-		void _SetTextData(BString& text, float& width, const char* string, float pos,
-			bool rightAligned);
+		void _SetTextData(BString& text, const char* string,
+			const BString& combineWith, bool rightAligned);
 		BRect _BarFrame(const font_height* fontHeight = NULL) const;
 		float _BarPosition(const BRect& barFrame) const;
 
@@ -96,14 +96,11 @@ class BStatusBar : public BView {
 		float fMax;
 		float fCurrent;
 		float fBarHeight;
-		float fLabelWidth;
-		float fTrailingLabelWidth;
-		float fTextWidth;
-		float fTrailingTextWidth;
+		float fTextDivider;
 		rgb_color fBarColor;
 		bool fCustomBarHeight;
 
-		uint32 _reserved[2];
+		uint32 _reserved[5];
 };
 
 #endif	// _STATUS_BAR_H
