@@ -334,7 +334,7 @@ name_for_state(tcp_state state)
 		case TIME_WAIT:
 			return "time-wait";
 	}
-	
+
 	return "-";
 }
 
@@ -507,7 +507,9 @@ tcp_getsockopt(net_protocol *_protocol, int level, int option, void *value,
 {
 	TCPEndpoint *protocol = (TCPEndpoint *)_protocol;
 
-	/* TODO getting IPPROTO_TCP options is missing */
+	if (level == IPPROTO_TCP)
+		return protocol->GetOption(option, value, _length);
+
 	return protocol->next->module->getsockopt(protocol->next, level, option,
 		value, _length);
 }

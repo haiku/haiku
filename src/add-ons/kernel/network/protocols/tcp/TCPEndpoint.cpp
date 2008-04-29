@@ -906,7 +906,33 @@ TCPEndpoint::SetReceiveBufferSize(size_t length)
 
 
 status_t
-TCPEndpoint::SetOption(int option, const void *_value, int length)
+TCPEndpoint::GetOption(int option, void* _value, int* _length)
+{
+	if (*_length != sizeof(int))
+		return B_BAD_VALUE;
+
+	int* value = (int*)_value;
+
+	switch (option) {
+		case TCP_NODELAY:
+			if ((fOptions & TCP_NODELAY) != 0)
+				*value = 1;
+			else
+				*value = 0;
+			return B_OK;
+
+		case TCP_MAXSEG:
+			*value = fReceiveMaxSegmentSize;
+			return B_OK;
+
+		default:
+			return B_BAD_VALUE;
+	}
+}
+
+
+status_t
+TCPEndpoint::SetOption(int option, const void* _value, int length)
 {
 	if (option != TCP_NODELAY)
 		return B_BAD_VALUE;
@@ -914,7 +940,7 @@ TCPEndpoint::SetOption(int option, const void *_value, int length)
 	if (length != sizeof(int))
 		return B_BAD_VALUE;
 
-	const int *value = (const int *)_value;
+	const int* value = (const int*)_value;
 
 	MutexLocker _(fLock);
 	if (*value)

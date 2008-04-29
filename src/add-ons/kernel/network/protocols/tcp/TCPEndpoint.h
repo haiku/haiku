@@ -68,6 +68,7 @@ public:
 			status_t	SetSendBufferSize(size_t length);
 			status_t	SetReceiveBufferSize(size_t length);
 
+			status_t	GetOption(int option, void* value, int* _length);
 			status_t	SetOption(int option, const void* value, int length);
 
 			tcp_state	State() const { return fState; }
