@@ -18,8 +18,9 @@
 
 // macros specifying the tracing level for individual components (0 is disabled)
 
-#define BMESSAGE_TRACING						0
+#define BFS_TRACING								0
 #define BLOCK_CACHE_TRANSACTION_TRACING			0
+#define BMESSAGE_TRACING						0
 #define KERNEL_HEAP_TRACING						0
 #define PAGE_ALLOCATION_TRACING					0
 #define PARANOIA_TRACING						0

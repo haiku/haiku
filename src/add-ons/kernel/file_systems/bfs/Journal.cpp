@@ -82,7 +82,7 @@ class LogEntry : public DoublyLinkedListLinkImpl<LogEntry> {
 };
 
 
-#if defined(BFS_TRACING) && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
+#if BFS_TRACING && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
 namespace BFSJournalTracing {
 
 class LogEntry : public AbstractTraceEntry {

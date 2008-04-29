@@ -12,7 +12,7 @@
 #include "Index.h"
 
 
-#if defined(BFS_TRACING) && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
+#if BFS_TRACING && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
 namespace BFSInodeTracing {
 
 class Create : public AbstractTraceEntry {
@@ -1733,7 +1733,7 @@ Inode::_GrowStream(Transaction &transaction, off_t size)
 			off_t start = data->MaxDoubleIndirectRange()
 				- data->MaxIndirectRange();
 			int32 indirectIndex = start / indirectSize;
-			int32 index = start / directSize;
+			int32 index = (start % indirectSize) / directSize;
 
 			// distribute the blocks to the array and allocate
 			// new array blocks when needed

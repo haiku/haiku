@@ -11,7 +11,6 @@ SubDir HAIKU_TOP src add-ons kernel file_systems bfs ;
 {
 	local defines =
 		BFS_DEBUGGER_COMMANDS
-		#BFS_TRACING
 		#BFS_BIG_ENDIAN_ONLY
 		;
 
@@ -47,6 +46,6 @@ KernelAddon bfs :
 	;
 
 SEARCH on [ FGristFiles
-		kernel_cpp.cpp 
+		kernel_cpp.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
 

@@ -36,7 +36,7 @@
 // be improved a lot. Furthermore, the allocation policies used here should
 // have some real world tests.
 
-#if defined(BFS_TRACING) && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
+#if BFS_TRACING && !defined(BFS_SHELL) && !defined(_BOOT_MODE)
 namespace BFSBlockTracing {
 
 class Allocate : public AbstractTraceEntry {
