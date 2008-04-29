@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,8 +32,7 @@ enum modes {
 	ARP_LIST = 0,
 	ARP_DELETE,
 	ARP_SET,
-	ARP_SET_FROM_FILE,
-	ARP_FLUSH,
+	ARP_SET_FROM_FILE
 };
 
 
@@ -62,7 +61,7 @@ parse_inet_address(const char* string, sockaddr_in& address)
 	if (inet_aton(string, &inetAddress) != 1)
 		return false;
 
-	address.sin_family = AF_INET; 
+	address.sin_family = AF_INET;
 	address.sin_len = sizeof(struct sockaddr_in);
 	address.sin_port = 0;
 	address.sin_addr = inetAddress;
@@ -85,7 +84,7 @@ check_for_arp_syscall(void)
 }
 
 
-void
+static void
 usage(int status)
 {
 	printf("usage: %s [<command>] [<hostname>] [<ethernet-address>] [temp] [pub]\n"
@@ -95,6 +94,7 @@ usage(int status)
 		"  -d  - deletes the specified ARP cache entry\n"
 		"  -a  - list all entries [default]\n"
 		"  -f  - read ARP entries from file\n"
+		"  -F  - flush all temporary ARP entries\n"
 		"The ethernet address is specified by six hex bytes separated by colons.\n"
 		"When setting a new ARP cache entry, \"temp\" creates a temporary entry\n"
 		"that will be removed after a timeout, and \"pub\" will cause ARP to\n"
@@ -107,7 +107,7 @@ usage(int status)
 }
 
 
-bool
+static bool
 set_flags(uint32 &flags, const char *argument)
 {
 	if (!strcmp(argument, "temp") || !strcmp(argument, "temporary"))
@@ -153,7 +153,7 @@ next_argument(char **_line)
 //	#pragma mark -
 
 
-void
+static void
 list_entry(arp_control &control)
 {
 	in_addr address;
@@ -190,7 +190,7 @@ list_entry(arp_control &control)
 }
 
 
-void
+static void
 list_entries(sockaddr_in *address)
 {
 	arp_control control;
@@ -217,7 +217,7 @@ list_entries(sockaddr_in *address)
 }
 
 
-void
+static void
 delete_entry(sockaddr_in *address)
 {
 	arp_control control;
@@ -233,7 +233,7 @@ delete_entry(sockaddr_in *address)
 }
 
 
-status_t
+static status_t
 set_entry(sockaddr_in *address, uint8 *ethernetAddress, uint32 flags)
 {
 	arp_control control;
@@ -246,7 +246,7 @@ set_entry(sockaddr_in *address, uint8 *ethernetAddress, uint32 flags)
 }
 
 
-int
+static int
 set_entries_from_file(const char *filename)
 {
 	FILE *file = fopen(filename, "r");
@@ -333,6 +333,16 @@ set_entries_from_file(const char *filename)
 }
 
 
+static void
+flush_entries()
+{
+	arp_control control;
+
+	_kern_generic_syscall(ARP_SYSCALLS, ARP_FLUSH_ENTRIES,
+		&control, sizeof(arp_control));
+}
+
+
 //	#pragma mark -
 
 
@@ -369,7 +379,9 @@ main(int argc, char** argv)
 			if (argc != 2)
 				usage(1);
 
-			mode = ARP_FLUSH;
+			check_for_arp_syscall();
+			flush_entries();
+			return 0;
 		} else if (!strcmp(argv[1], "-f")) {
 			// set from file
 			if (argc != 3)
