@@ -891,6 +891,7 @@ remove_page_marker(struct vm_page &marker)
 	if (marker.state == PAGE_STATE_UNUSED)
 		return;
 
+	InterruptsSpinLocker locker(sPageLock);
 	page_queue *queue;
 	vm_page *page;
 
@@ -1249,8 +1250,9 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 				tried = true;
 		}
 
-		InterruptsSpinLocker locker(sPageLock);
 		remove_page_marker(marker);
+
+		InterruptsSpinLocker locker(sPageLock);
 
 		if (reserve && sReservedPages <= free_page_queue_count()
 			|| count == 0
