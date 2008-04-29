@@ -278,7 +278,7 @@ MediaWindow::InitMedia(bool first)
 			return B_ERROR;
 		
 		fAlert = new MediaAlert(BRect(0, 0, 300, 60), 
-			"restart_alert", "Restarting Media Services\nStarting Media Server...\n");
+			"restart_alert", "Restarting Media Services\nStarting Media Server" B_UTF8_ELLIPSIS "\n");
 		fAlert->Show();
 		
 		Show();
@@ -295,7 +295,7 @@ MediaWindow::InitMedia(bool first)
 	if ((!first || (first && err) ) && fAlert) {
 		BAutolock locker(fAlert);
 		if (locker.IsLocked())
-			fAlert->TextView()->SetText("Ready For Use...");
+			fAlert->TextView()->SetText("Ready For Use" B_UTF8_ELLIPSIS);
 	}
 	
 	void *listItem;
@@ -653,7 +653,7 @@ MediaWindow::MessageReceived (BMessage *message)
 					&& (strcmp(mimeSig, "application/x-vnd.Be.addon-host")==0 
 						|| strcmp(mimeSig, "application/x-vnd.Be.media-server")==0)) {
 					fAlert->Lock();
-					fAlert->TextView()->SetText("Starting Media Server...");
+					fAlert->TextView()->SetText("Starting Media Server" B_UTF8_ELLIPSIS);
 					fAlert->Unlock();
 				}
 			}
@@ -693,7 +693,7 @@ MediaWindow::RestartMediaServices(void *data)
 	{
 		BAutolock locker(window->fAlert);
 		if (locker.IsLocked())
-			window->fAlert->TextView()->SetText("Starting Media Server...");
+			window->fAlert->TextView()->SetText("Starting Media Server" B_UTF8_ELLIPSIS);
 	}
 	launch_media_server();
 	
@@ -708,7 +708,7 @@ MediaWindow::UpdateProgress(int stage, const char * message, void * cookie)
 	char *string = "Unknown stage"; 
 	switch (stage) {
 		case 10:
-			string = "Stopping Media Server...";
+			string = "Stopping Media Server" B_UTF8_ELLIPSIS;
 			break;
 		case 20:
 			string = "Telling media_addon_server to quit.";

@@ -53,9 +53,9 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
 	}
 	
 	BMenu *menu = new BMenu("File");
-	menu->AddItem(new BMenuItem("New…", new BMessage(M_NEW_FILE), 'N'));
+	menu->AddItem(new BMenuItem("New" B_UTF8_ELLIPSIS, new BMessage(M_NEW_FILE), 'N'));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Open…", new BMessage(M_OPEN_FILE), 'O'));
+	menu->AddItem(new BMenuItem("Open" B_UTF8_ELLIPSIS, new BMessage(M_OPEN_FILE), 'O'));
 	menu->AddItem(new BMenuItem("Quit", new BMessage(M_QUIT), 'Q'));
 	
 	BRect r(Bounds());

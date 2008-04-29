@@ -173,7 +173,7 @@ int32 ScopeView::Thread()
 
 void ScopeView::DrawLoading()
 {
-	DrawText("Loading instruments...");
+	DrawText("Loading instruments" B_UTF8_ELLIPSIS);
 }
 
 //------------------------------------------------------------------------------

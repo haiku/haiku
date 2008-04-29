@@ -124,7 +124,7 @@ HWindow::InitGUI()
 	menu->AddSeparatorItem();
 	
 	menu->AddItem(new BMenuItem("<none>", new BMessage(M_NONE_MESSAGE)));
-	menu->AddItem(new BMenuItem("Other…", new BMessage(M_OTHER_MESSAGE)));
+	menu->AddItem(new BMenuItem("Other" B_UTF8_ELLIPSIS, new BMessage(M_OTHER_MESSAGE)));
 	BMenuField *menuField = new BMenuField(rect
 										,"filemenu"
 										,"Sound File:"

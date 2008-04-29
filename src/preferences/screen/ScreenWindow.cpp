@@ -635,7 +635,7 @@ ScreenWindow::_UpdateRefreshControl()
 			item->SetMarked(true);
 
 		// "Other…" items only contains a refresh rate when active
-		fOtherRefresh->SetLabel("Other…");
+		fOtherRefresh->SetLabel("Other" B_UTF8_ELLIPSIS);
 		return;
 	}
 

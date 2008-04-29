@@ -238,7 +238,7 @@ SGIView::AttachedToWindow()
 				}
 
 				// The same with "Info..." button, except redrawing, which isn't needed
-				view = window->FindView("Info…");
+				view = window->FindView("Info" B_UTF8_ELLIPSIS);
 				if (view)
 					view->SetResizingMode(B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 

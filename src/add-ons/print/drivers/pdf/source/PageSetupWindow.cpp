@@ -318,7 +318,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	panel->AddChild(button);
 
 	// add a "Fonts" button	
-	button 	= new BButton(r, NULL, "Fonts…", new BMessage(FONTS_MSG), 
+	button 	= new BButton(r, NULL, "Fonts" B_UTF8_ELLIPSIS, new BMessage(FONTS_MSG), 
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();
@@ -327,7 +327,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 
 	// add a "Fonts" button	
 	BButton* font = button;
-	button 	= new BButton(r, NULL, "Advanced…", new BMessage(ADVANCED_MSG), 
+	button 	= new BButton(r, NULL, "Advanced" B_UTF8_ELLIPSIS, new BMessage(ADVANCED_MSG), 
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	button->GetPreferredSize(&w, &h);
 	button->ResizeToPreferred();

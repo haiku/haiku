@@ -38,7 +38,7 @@ CannaLooper::CannaLooper( CannaMethod *method )
 
 	theMenu = new BMenu( B_EMPTY_STRING );
 	theMenu->SetFont( be_plain_font );
-	theMenu->AddItem( new BMenuItem( "About CannaIM…", new BMessage( B_ABOUT_REQUESTED )));
+	theMenu->AddItem( new BMenuItem( "About CannaIM" B_UTF8_ELLIPSIS, new BMessage( B_ABOUT_REQUESTED )));
 	theMenu->AddSeparatorItem();
 	theMenu->AddItem( new BMenuItem( "Convert arrow keys", new BMessage( ARROW_KEYS_FLIPPED )));
 	theMenu->AddItem( new BMenuItem( "Reload Init file", new BMessage( RELOAD_INIT_FILE )));

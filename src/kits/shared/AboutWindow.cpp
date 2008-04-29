@@ -55,7 +55,7 @@ BAboutWindow::~BAboutWindow()
 void
 BAboutWindow::Show()
 {
-	BAlert *alert = new BAlert("About...", fText->String(), "Close");
+	BAlert *alert = new BAlert("About" B_UTF8_ELLIPSIS, fText->String(), "Close");
 	BTextView *view = alert->TextView();
 	BFont font;
 	view->SetStylable(true);

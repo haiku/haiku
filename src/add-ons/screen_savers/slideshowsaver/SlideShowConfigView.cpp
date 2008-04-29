@@ -128,7 +128,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 	// Choose Image Folder button
 	pMsg = new BMessage(CHOOSE_DIRECTORY);
 	fChooseFolder = new BButton(BRect(50, 160, 180, 180),
-		"Choose Folder", "Choose Image Folder...", pMsg);
+		"Choose Folder", "Choose Image Folder" B_UTF8_ELLIPSIS, pMsg);
 	AddChild(fChooseFolder);
 	
 	// Setup choose folder file panel

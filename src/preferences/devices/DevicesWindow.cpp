@@ -476,7 +476,7 @@ DevicesWindow::UpdateDeviceInfo()
 				}
 				if (text.Length()>70) {
 					text.Truncate(70);
-					text += "...";
+					text += B_UTF8_ELLIPSIS;
 				}
 				stvIORanges->SetText(text.String());
 			}
@@ -496,7 +496,7 @@ DevicesWindow::UpdateDeviceInfo()
 				}
 				if (text.Length()>70) {
 					text.Truncate(70);
-					text += "...";
+					text += B_UTF8_ELLIPSIS;
 				}
 				stvMemoryRanges->SetText(text.String());
 			}
