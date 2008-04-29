@@ -22,9 +22,10 @@
 #define KERNEL_HEAP_TRACING						0
 #define PAGE_ALLOCATION_TRACING					0
 #define PARANOIA_TRACING						0
-#define PARANOIA_TRACING_STACK_TRACE			0	/* stack traced depth */
+#define PARANOIA_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define OBJECT_CACHE_TRACING					0
 #define NET_BUFFER_TRACING						0
+#define NET_BUFFER_TRACING_STACK_TRACE			0	/* stack trace depth */
 #define RUNTIME_LOADER_TRACING					0
 #define SIGNAL_TRACING							0
 #define SYSCALL_TRACING							0
