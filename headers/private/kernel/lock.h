@@ -68,15 +68,6 @@ extern void mutex_unlock(mutex *m);
 extern status_t benaphore_init(benaphore *ben, const char *name);
 extern void benaphore_destroy(benaphore *ben);
 
-static inline status_t
-benaphore_lock_etc(benaphore *ben, uint32 flags, bigtime_t timeout)
-{
-	if (atomic_add(&ben->count, -1) <= 0)
-		return acquire_sem_etc(ben->sem, 1, flags, timeout);
-
-	return B_OK;
-}
-
 
 static inline status_t
 benaphore_lock(benaphore *ben)
