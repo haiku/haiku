@@ -376,6 +376,28 @@ read_line(char *buffer, int32 maxLength,
 					length = position;
 				}
 				break;
+			case 0x1f & 'L':	// CTRL-L -- clear screen
+				if (sBlueScreenOutput) {
+					// All the following needs to be transparent for the
+					// serial debug output. I.e. after clearing the screen
+					// we have to get the on-screen line into the visual state
+					// it should have.
+
+					// clear screen
+					blue_screen_clear_screen();
+
+					// reprint line
+					buffer[length] = '\0';
+					blue_screen_puts(kKDLPrompt);
+					blue_screen_puts(buffer);
+
+					// reposition cursor
+					if (position < length) {
+						for (int i = length; i > position; i--)
+							blue_screen_puts("\x1b[1D");
+					}
+				}
+				break;
 			case 27: // escape sequence
 				c = readChar();
 				if (c != '[') {

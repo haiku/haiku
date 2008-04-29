@@ -16,6 +16,7 @@ extern "C" {
 status_t blue_screen_init(void);
 status_t blue_screen_enter(bool debugOutput);
 
+void blue_screen_clear_screen(void);
 char blue_screen_getchar(void);
 void blue_screen_putchar(char c);
 void blue_screen_puts(const char *text);

@@ -595,6 +595,14 @@ blue_screen_enter(bool debugOutput)
 }
 
 
+void
+blue_screen_clear_screen(void)
+{
+	sModule->clear(sScreen.attr);
+	move_cursor(0, 0);
+}
+
+
 char
 blue_screen_getchar(void)
 {
