@@ -15,6 +15,7 @@
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <new>
+#include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -375,6 +376,7 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	fSendUnacknowledged(0),
 	fSendNext(0),
 	fSendMax(0),
+	fSendUrgentOffset(0),
 	fSendWindow(0),
 	fSendMaxWindow(0),
 	fSendMaxSegmentSize(TCP_DEFAULT_MAX_SEGMENT_SIZE),
@@ -721,7 +723,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 	if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
 		|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
 		|| fState == TIME_WAIT) {
-		// TODO: send SIGPIPE signal to app?
+		send_signal(find_thread(NULL), SIGPIPE);
 		return EPIPE;
 	}
 
@@ -749,8 +751,17 @@ TCPEndpoint::SendData(net_buffer *buffer)
 
 	TRACE("  SendData(): %lu bytes used.", fSendQueue.Used());
 
+	bool force = false;
+	if ((buffer->flags & MSG_OOB) != 0) {
+		fSendUrgentOffset = fSendQueue.LastSequence();
+			// RFC 961 specifies that the urgent offset points to the last
+			// byte of urgent data. However, this is commonly implemented as
+			// here, ie. it points to the first byte after the urgent data.
+		force = true;
+	}
+
 	if (fState == ESTABLISHED || fState == FINISH_RECEIVED)
-		_SendQueued();
+		_SendQueued(force);
 
 	return B_OK;
 }
@@ -1710,7 +1721,8 @@ TCPEndpoint::_ShouldSendSegment(tcp_segment_header& segment, uint32 length,
 		// Avoid the silly window syndrome - we only send a segment in case:
 		// - we have a full segment to send, or
 		// - we're at the end of our buffer queue, or
-		// - the buffer is at least larger than half of the maximum send window, or
+		// - the buffer is at least larger than half of the maximum send window,
+		//   or
 		// - we're retransmitting data
 		if (length == segmentMaxSize
 			|| (fOptions & TCP_NODELAY) != 0
@@ -1734,6 +1746,10 @@ TCPEndpoint::_ShouldSendSegment(tcp_segment_header& segment, uint32 length,
 
 	if ((segment.flags & (TCP_FLAG_SYNCHRONIZE | TCP_FLAG_FINISH
 			| TCP_FLAG_RESET)) != 0)
+		return true;
+
+	// We do have urgent data pending
+	if (fSendUrgentOffset > fSendNext)
 		return true;
 
 	// there is no reason to send a segment just now
@@ -1788,7 +1804,17 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		segment.advertised_window = min_c(TCP_MAX_WINDOW, availableBytes);
 
 	segment.acknowledge = fReceiveNext;
-	segment.urgent_offset = 0;
+
+	// Process urgent data
+	if (fSendUrgentOffset > fSendNext) {
+		segment.flags |= TCP_FLAG_URGENT;
+		segment.urgent_offset = fSendUrgentOffset - fSendNext;
+	} else {
+		fSendUrgentOffset = fSendUnacknowledged;
+			// Keep urgent offset updated, so that it doesn't reach into our
+			// send window on overlap
+		segment.urgent_offset = 0;
+	}
 
 	if (fCongestionWindow > 0 && fCongestionWindow < sendWindow)
 		sendWindow = fCongestionWindow;
@@ -1964,6 +1990,7 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 	fSendNext = fInitialSendSequence;
 	fSendUnacknowledged = fInitialSendSequence;
 	fSendMax = fInitialSendSequence;
+	fSendUrgentOffset = fInitialSendSequence;
 
 	// we are counting the SYN here
 	fSendQueue.SetInitialSequence(fSendNext + 1);
@@ -2152,6 +2179,7 @@ TCPEndpoint::Dump() const
 	kprintf("    unacknowledged: %lu\n", (uint32)fSendUnacknowledged);
 	kprintf("    next: %lu\n", (uint32)fSendNext);
 	kprintf("    max: %lu\n", (uint32)fSendMax);
+	kprintf("    urgent offset: %lu\n", (uint32)fSendUrgentOffset);
 	kprintf("    window: %lu\n", fSendWindow);
 	kprintf("    max window: %lu\n", fSendMaxWindow);
 	kprintf("    max segment size: %lu\n", fSendMaxSegmentSize);

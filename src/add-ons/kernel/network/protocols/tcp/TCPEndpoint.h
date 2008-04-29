@@ -151,6 +151,7 @@ private:
 	tcp_sequence	fSendUnacknowledged;
 	tcp_sequence	fSendNext;
 	tcp_sequence	fSendMax;
+	tcp_sequence	fSendUrgentOffset;
 	uint32			fSendWindow;
 	uint32			fSendMaxWindow;
 	uint32			fSendMaxSegmentSize;
