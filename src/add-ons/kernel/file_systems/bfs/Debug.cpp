@@ -15,7 +15,7 @@
 #define Print __out
 
 
-char *
+char*
 get_tupel(uint32 id)
 {
 	static unsigned char tupel[5];
@@ -30,12 +30,12 @@ get_tupel(uint32 id)
 			tupel[i] = '.';
 	}
 
-	return (char *)tupel;
+	return (char*)tupel;
 }
 
 
 void
-dump_block_run(const char *prefix, const block_run &run)
+dump_block_run(const char* prefix, const block_run& run)
 {
 	Print("%s(%d, %d, %d)\n", prefix, (int)run.allocation_group, run.start,
 		run.length);
@@ -43,7 +43,7 @@ dump_block_run(const char *prefix, const block_run &run)
 
 
 void
-dump_super_block(const disk_super_block *superBlock)
+dump_super_block(const disk_super_block* superBlock)
 {
 	Print("disk_super_block:\n");
 	Print("  name           = %s\n", superBlock->name);
@@ -80,7 +80,7 @@ dump_super_block(const disk_super_block *superBlock)
 
 
 void
-dump_data_stream(const data_stream *stream)
+dump_data_stream(const data_stream* stream)
 {
 	Print("data_stream:\n");
 	for (int i = 0; i < NUM_DIRECT_BLOCKS; i++) {
@@ -108,7 +108,7 @@ dump_data_stream(const data_stream *stream)
 
 
 void
-dump_inode(const bfs_inode *inode)
+dump_inode(const bfs_inode* inode)
 {
 	Print("inode:\n");
 	Print("  magic1             = %08x (%s) %s\n", (int)inode->Magic1(),
@@ -140,7 +140,7 @@ dump_inode(const bfs_inode *inode)
 
 
 void
-dump_bplustree_header(const bplustree_header *header)
+dump_bplustree_header(const bplustree_header* header)
 {
 	Print("bplustree_header:\n");
 	Print("  magic                = %#08x (%s) %s\n", (int)header->Magic(),
@@ -159,30 +159,30 @@ dump_bplustree_header(const bplustree_header *header)
 #define DUMPED_BLOCK_SIZE 16
 
 void
-dump_block(const char *buffer,int size)
+dump_block(const char* buffer,int size)
 {
-	for(int i = 0;i < size;) {
+	for (int i = 0; i < size;) {
 		int start = i;
 
-		for(;i < start+DUMPED_BLOCK_SIZE;i++) {
+		for (; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (!(i % 4))
 				Print(" ");
 
 			if (i >= size)
 				Print("  ");
 			else
-				Print("%02x",*(unsigned char *)(buffer+i));
+				Print("%02x", *(unsigned char *)(buffer + i));
 		}
 		Print("  ");
 
-		for(i = start;i < start + DUMPED_BLOCK_SIZE;i++) {
+		for (i = start; i < start + DUMPED_BLOCK_SIZE; i++) {
 			if (i < size) {
-				char c = *(buffer+i);
+				char c = *(buffer + i);
 
 				if (c < 30)
 					Print(".");
 				else
-					Print("%c",c);
+					Print("%c", c);
 			} else
 				break;
 		}
@@ -192,8 +192,8 @@ dump_block(const char *buffer,int size)
 
 
 void
-dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
-	Volume *volume)
+dump_bplustree_node(const bplustree_node* node, const bplustree_header* header,
+	Volume* volume)
 {
 	Print("bplustree_node:\n");
 	Print("  left_link      = %Ld\n", node->left_link);
@@ -225,20 +225,24 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 		memcpy(buffer, key, length);
 		buffer[length] = '\0';
 
-		off_t *value = node->Values() + i;
-		if ((addr_t)value < (addr_t)node || (addr_t)value > (addr_t)node + header->node_size)
+		off_t* value = node->Values() + i;
+		if ((addr_t)value < (addr_t)node
+			|| (addr_t)value > (addr_t)node + header->node_size)
 			Print("  %2d. Invalid Offset!!\n", (int)i);
 		else {
 			Print("  %2d. ", (int)i);
 			if (header->data_type == BPLUSTREE_STRING_TYPE)
 				Print("\"%s\"", buffer);
-			else if (header->data_type == BPLUSTREE_INT32_TYPE)
-				Print("int32 = %d (0x%x)", (int)*(int32 *)&buffer, (int)*(int32 *)&buffer);
-			else if (header->data_type == BPLUSTREE_UINT32_TYPE)
-				Print("uint32 = %u (0x%x)", (unsigned)*(uint32 *)&buffer, (unsigned)*(uint32 *)&buffer);
-			else if (header->data_type == BPLUSTREE_INT64_TYPE)
-				Print("int64 = %Ld (0x%Lx)", *(int64 *)&buffer, *(int64 *)&buffer);
-			else
+			else if (header->data_type == BPLUSTREE_INT32_TYPE) {
+				Print("int32 = %d (0x%x)", (int)*(int32 *)&buffer,
+					(int)*(int32 *)&buffer);
+			} else if (header->data_type == BPLUSTREE_UINT32_TYPE) {
+				Print("uint32 = %u (0x%x)", (unsigned)*(uint32 *)&buffer,
+					(unsigned)*(uint32 *)&buffer);
+			} else if (header->data_type == BPLUSTREE_INT64_TYPE) {
+				Print("int64 = %Ld (0x%Lx)", *(int64 *)&buffer,
+					*(int64 *)&buffer);
+			} else
 				Print("???");
 
 			off_t offset = *value & 0x3fffffffffffffffLL;
@@ -247,9 +251,11 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 				block_run run = volume->ToBlockRun(offset);
 				Print(" (%d, %d)", (int)run.allocation_group, run.start);
 			}
-			if (bplustree_node::LinkType(*value) == BPLUSTREE_DUPLICATE_FRAGMENT)
+			if (bplustree_node::LinkType(*value)
+					== BPLUSTREE_DUPLICATE_FRAGMENT)
 				Print(" (duplicate fragment %Ld)\n", *value & 0x3ff);
-			else if (bplustree_node::LinkType(*value) == BPLUSTREE_DUPLICATE_NODE)
+			else if (bplustree_node::LinkType(*value)
+					== BPLUSTREE_DUPLICATE_NODE)
 				Print(" (duplicate node)\n");
 			else
 				Print("\n");
@@ -265,23 +271,25 @@ dump_bplustree_node(const bplustree_node *node, const bplustree_header *header,
 
 
 static int
-dump_inode(int argc, char **argv)
+dump_inode(int argc, char** argv)
 {
 	bool block = false;
 	if (argc == 3 && !strcmp(argv[1], "-b"))
 		block = true;
 
 	if (argc != 2 + (block ? 1 : 0) || !strcmp(argv[1], "--help")) {
-		kprintf("usage: bfsinode [-b] <ptr-to-inode>\n");
+		kprintf("usage: bfsinode [-b] <ptr-to-inode>\n"
+			"  -b the address is regarded as pointer to a block instead of one "
+			"to an inode.\n");
 		return 0;
 	}
 
 	addr_t address = parse_expression(argv[argc - 1]);
-	bfs_inode *node;
+	bfs_inode* node;
 	if (block)
-		node = (bfs_inode *)address;
+		node = (bfs_inode*)address;
 	else
-		node = &((Inode *)address)->Node();
+		node = &((Inode*)address)->Node();
 
 	dump_inode(node);
 	return 0;
@@ -289,14 +297,42 @@ dump_inode(int argc, char **argv)
 
 
 static int
-dump_volume(int argc, char **argv)
+dump_volume(int argc, char** argv)
 {
-	if (argc != 2 || !strcmp(argv[1], "--help")) {
-		kprintf("usage: bfs <ptr-to-volume>\n");
+	if (argc < 2 || !strcmp(argv[1], "--help")) {
+		kprintf("usage: bfs <ptr-to-volume> [<block-run>]\n"
+			"Dumps a BFS volume - <block-run> is given, it is converted to a "
+			"block offset instead (and vice versa).\n");
 		return 0;
 	}
 
-	Volume *volume = (Volume *)parse_expression(argv[1]);
+	Volume* volume = (Volume*)parse_expression(argv[1]);
+
+	if (argc > 2) {
+		// convert block_runs/offsets
+		for (int i = 2; i < argc; i++) {
+			char* arg = argv[i];
+			if (strchr(arg, '.') != NULL) {
+				// block_run to offset
+				block_run run;
+				run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(
+					strtoul(arg, &arg, 0));
+				run.start = HOST_ENDIAN_TO_BFS_INT16(strtoul(arg, NULL, 0));
+				run.length = 0;
+
+				kprintf("%ld.%u -> block %Ld\n", run.AllocationGroup(),
+					run.Start(), volume->ToBlock(run));
+			} else {
+				// offset to block_run
+				off_t offset = parse_expression(arg);
+				block_run run = volume->ToBlockRun(offset);
+
+				kprintf("block %Ld -> %ld.%u\n", offset, run.AllocationGroup(),
+					run.Start());
+			}
+		}
+		return 0;
+	}
 
 	kprintf("block cache:  %p\n", volume->BlockCache());
 	kprintf("root node:    %p\n", volume->RootNode());
@@ -313,7 +349,7 @@ dump_volume(int argc, char **argv)
 
 
 static int
-dump_bplustree_node(int argc, char **argv)
+dump_bplustree_node(int argc, char** argv)
 {
 	if (argc < 2 || argc > 4 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: %s <ptr-to-node> [ptr-to-header] [ptr-to-volume]\n",
@@ -321,14 +357,14 @@ dump_bplustree_node(int argc, char **argv)
 		return 0;
 	}
 
-	bplustree_node *node = (bplustree_node *)parse_expression(argv[1]);
-	bplustree_header *header = NULL;
-	Volume *volume = NULL;
+	bplustree_node* node = (bplustree_node*)parse_expression(argv[1]);
+	bplustree_header* header = NULL;
+	Volume* volume = NULL;
 
 	if (argc > 2)
-		header = (bplustree_header *)parse_expression(argv[2]);
+		header = (bplustree_header*)parse_expression(argv[2]);
 	if (argc > 3)
-		volume = (Volume *)parse_expression(argv[3]);
+		volume = (Volume*)parse_expression(argv[3]);
 
 	dump_bplustree_node(node, header, volume);
 
@@ -337,14 +373,14 @@ dump_bplustree_node(int argc, char **argv)
 
 
 static int
-dump_bplustree_header(int argc, char **argv)
+dump_bplustree_header(int argc, char** argv)
 {
 	if (argc != 2 || !strcmp(argv[1], "--help")) {
 		kprintf("usage: %s <ptr-to-header>\n", argv[0]);
 		return 0;
 	}
 
-	bplustree_header *header = (bplustree_header *)parse_expression(argv[1]);
+	bplustree_header* header = (bplustree_header*)parse_expression(argv[1]);
 	dump_bplustree_header(header);
 
 	return 0;
@@ -380,4 +416,3 @@ add_debugger_commands()
 
 
 #endif	// BFS_DEBUGGER_COMMANDS
-
