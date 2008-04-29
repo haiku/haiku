@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,7 @@
 #include <NetBufferUtilities.h>
 
 #include <generic_syscall.h>
+#include <util/atomic.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <util/khash.h>
@@ -68,7 +69,6 @@ struct arp_entry {
 	sockaddr_dl	hardware_address;
 	uint32		flags;
 	net_buffer	*request_buffer;
-	int32		request_buffer_ref_count;
 	net_timer	timer;
 	uint32		timer_state;
 	bigtime_t	timestamp;
@@ -110,6 +110,8 @@ struct arp_protocol : net_datalink_protocol {
 };
 
 
+static const net_buffer* kDeletedBuffer = (net_buffer*)~0;
+
 static void arp_timer(struct net_timer *timer, void *data);
 
 net_buffer_module_info *gBufferModule;
@@ -120,24 +122,40 @@ static bool sIgnoreReplies;
 
 
 static net_buffer*
-get_request_buffer_reference(arp_entry* entry)
+get_request_buffer(arp_entry* entry)
 {
-	if (atomic_test_and_set(&entry->request_buffer_ref_count, 2, 1) == 1)
-		return entry->request_buffer;
+	net_buffer* buffer = entry->request_buffer;
+	if (buffer == NULL || buffer == kDeletedBuffer)
+		return NULL;
 
-	return NULL;
+	buffer = atomic_pointer_test_and_set(&entry->request_buffer,
+		(net_buffer*)NULL, buffer);
+	if (buffer == kDeletedBuffer)
+		return NULL;
+
+	return buffer;
 }
 
 
 static void
-put_request_buffer_reference(arp_entry* entry)
+put_request_buffer(arp_entry* entry, net_buffer* buffer)
 {
-	if (atomic_add(&entry->request_buffer_ref_count, -1) == 0) {
-		if (entry->request_buffer != NULL) {
-			gBufferModule->free(entry->request_buffer);
-			entry->request_buffer = NULL;
-		}
+	net_buffer* requestBuffer = atomic_pointer_test_and_set(
+		&entry->request_buffer, buffer, (net_buffer*)NULL);
+	if (requestBuffer != NULL) {
+		// someone else took over ownership of the request buffer
+		gBufferModule->free(buffer);
 	}
+}
+
+
+static void
+delete_request_buffer(arp_entry* entry)
+{
+	net_buffer* buffer = atomic_pointer_set(&entry->request_buffer,
+		kDeletedBuffer);
+	if (buffer != NULL && buffer != kDeletedBuffer)
+		gBufferModule->free(buffer);
 }
 
 
@@ -164,7 +182,7 @@ arp_entry::Hash(void *_entry, const void *_key, uint32 range)
 #define HASH(o) ((((o) >> 24) ^ ((o) >> 16) ^ ((o) >> 8) ^ (o)) % range)
 
 #if 0
-	in_addr_t a = entry ? entry->protocol_address : *key; 
+	in_addr_t a = entry ? entry->protocol_address : *key;
 	dprintf("%ld.%ld.%ld.%ld: Hash: %lu\n", a >> 24, (a >> 16) & 0xff,
 		(a >> 8) & 0xff, a & 0xff, HASH(a));
 #endif
@@ -197,7 +215,6 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	entry->timestamp = system_time();
 	entry->protocol = NULL;
 	entry->request_buffer = NULL;
-	entry->request_buffer_ref_count = 0;
 	entry->timer_state = ARP_NO_STATE;
 	sStackModule->init_timer(&entry->timer, arp_timer, entry);
 
@@ -319,13 +336,13 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 {
 	arp_entry *entry = arp_entry::Lookup(protocolAddress);
 	if (entry != NULL) {
-		// We disallow updating of entries that had been resolved before, 
+		// We disallow updating of entries that had been resolved before,
 		// but to a different address (only for those that belong to a
 		// specific address - redefining INADDR_ANY is always allowed).
 		// Right now, you have to manually purge the ARP entries (or wait some
 		// time) to let us switch to the new address.
 		if (protocolAddress != INADDR_ANY
-			&& entry->hardware_address.sdl_alen != 0 
+			&& entry->hardware_address.sdl_alen != 0
 			&& memcmp(LLADDR(&entry->hardware_address),
 				LLADDR(hardwareAddress), ETHER_ADDRESS_LENGTH)) {
 			dprintf("ARP host %08x updated with different hardware address "
@@ -344,7 +361,7 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 			return B_NO_MEMORY;
 	}
 
-	put_request_buffer_reference(entry);
+	delete_request_buffer(entry);
 
 	if ((entry->flags & ARP_FLAG_PERMANENT) == 0) {
 		// (re)start the stale timer
@@ -559,30 +576,22 @@ arp_timer(struct net_timer *timer, void *data)
 
 			TRACE(("  send request for ARP entry %p!\n", entry));
 
-			net_buffer *request = get_request_buffer_reference(entry);
+			net_buffer *request = get_request_buffer(entry);
 			if (request == NULL)
 				break;
-			// TODO: The reference counting does still not solve request_buffer
-			// access problem completely: A duplicate reply between this point
-			// and the "entry->request_buffer = NULL" will release two
-			// references in arp_update_entry() and thus delete the buffer.
 
 			if (entry->timer_state < ARP_STATE_LAST_REQUEST) {
 				// we'll still need our buffer, so in order to prevent it being
 				// freed by a successful send, we need to clone it
-				request = gBufferModule->clone(request, true);
-				if (request == NULL) {
+				net_buffer* clone = gBufferModule->clone(request, true);
+				if (clone == NULL) {
 					// cloning failed - that means we won't be able to send as
 					// many requests as originally planned
-					request = entry->request_buffer;
 					entry->timer_state = ARP_STATE_LAST_REQUEST;
-				} else
-					put_request_buffer_reference(entry);
-			}
-
-			if (entry->timer_state == ARP_STATE_LAST_REQUEST) {
-				// the request buffer will be deleted, detach it
-				entry->request_buffer = NULL;
+				} else {
+					put_request_buffer(entry, request);
+					request = clone;
+				}
 			}
 
 			// we're trying to resolve the address, so keep sending requests
@@ -599,8 +608,7 @@ arp_timer(struct net_timer *timer, void *data)
 }
 
 
-/*!
-	Address resolver function: prepares and sends the ARP request necessary
+/*!	Address resolver function: prepares and triggers the ARP request necessary
 	to retrieve the hardware address for \a address.
 	You need to have the sCacheLock held when calling this function - but
 	note that the lock will be interrupted here if everything goes well.
@@ -621,7 +629,6 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 		// TODO: do something with the entry
 		return B_NO_MEMORY;
 	}
-	entry->request_buffer_ref_count = 1;
 
 	NetBufferPrepend<arp_header> bufferHeader(entry->request_buffer);
 	status_t status = bufferHeader.Status();
@@ -642,9 +649,10 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 	header.opcode = htons(ARP_OPCODE_REQUEST);
 
 	memcpy(header.hardware_sender, device->address.data, ETHER_ADDRESS_LENGTH);
-	if (protocol->interface->address != NULL)
-		header.protocol_sender = ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
-	else
+	if (protocol->interface->address != NULL) {
+		header.protocol_sender
+			= ((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr;
+	} else
 		header.protocol_sender = 0;
 			// TODO: test if this actually works - maybe we should use INADDR_BROADCAST instead
 	memset(header.hardware_target, 0, ETHER_ADDRESS_LENGTH);
@@ -714,8 +722,12 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 			if (entry == NULL || !(entry->flags & ARP_FLAG_VALID))
 				return B_ENTRY_NOT_FOUND;
 
-			memcpy(control.ethernet_address, entry->hardware_address.sdl_data,
-				ETHER_ADDRESS_LENGTH);
+			if (entry->hardware_address.sdl_alen == ETHER_ADDRESS_LENGTH) {
+				memcpy(control.ethernet_address,
+					entry->hardware_address.sdl_data, ETHER_ADDRESS_LENGTH);
+			} else
+				memset(control.ethernet_address, 0, ETHER_ADDRESS_LENGTH);
+
 			control.flags = entry->flags;
 			return user_memcpy(buffer, &control, sizeof(struct arp_control));
 		}
@@ -738,8 +750,11 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 
 			control.cookie++;
 			control.address = entry->protocol_address;
-			memcpy(control.ethernet_address, entry->hardware_address.sdl_data,
-				ETHER_ADDRESS_LENGTH);
+			if (entry->hardware_address.sdl_alen == ETHER_ADDRESS_LENGTH) {
+				memcpy(control.ethernet_address,
+					entry->hardware_address.sdl_data, ETHER_ADDRESS_LENGTH);
+			} else
+				memset(control.ethernet_address, 0, ETHER_ADDRESS_LENGTH);
 			control.flags = entry->flags;
 
 			return user_memcpy(buffer, &control, sizeof(struct arp_control));

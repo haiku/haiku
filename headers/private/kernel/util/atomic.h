@@ -14,8 +14,8 @@
 #ifdef __cplusplus
 
 template<typename PointerType> PointerType*
-atomic_pointer_test_and_set(PointerType** _pointer, PointerType* set,
-	PointerType* test)
+atomic_pointer_test_and_set(PointerType** _pointer, const PointerType* set,
+	const PointerType* test)
 {
 #if LONG_MAX == INT_MAX
 	return (PointerType*)atomic_test_and_set((vint32*)_pointer, (int32)set,
@@ -23,6 +23,17 @@ atomic_pointer_test_and_set(PointerType** _pointer, PointerType* set,
 #else
 	return (PointerType*)atomic_test_and_set64((vint64*)_pointer, (int64)set,
 		(int64)test);
+#endif
+}
+
+
+template<typename PointerType> PointerType*
+atomic_pointer_set(PointerType** _pointer, const PointerType* set)
+{
+#if LONG_MAX == INT_MAX
+	return (PointerType*)atomic_set((vint32*)_pointer, (int32)set);
+#else
+	return (PointerType*)atomic_set64((vint64*)_pointer, (int64)set);
 #endif
 }
 
