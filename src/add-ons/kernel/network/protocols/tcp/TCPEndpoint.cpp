@@ -55,7 +55,7 @@
 #define PrintAddress(address) \
 	AddressString(Domain(), address, true).Data()
 
-#define TRACE_TCP
+//#define TRACE_TCP
 //#define PROBE_TCP
 
 #ifdef TRACE_TCP
@@ -1620,6 +1620,12 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 		SendAcknowledge(true);
 	else if (segmentAction & ACKNOWLEDGE)
 		DelayedAcknowledge();
+
+	if (fState == CLOSED && (fFlags & FLAG_CLOSED) != 0) {
+		locker.Unlock();
+		gSocketModule->delete_socket(socket);
+			// this will also delete us
+	}
 
 	return segmentAction;
 }
