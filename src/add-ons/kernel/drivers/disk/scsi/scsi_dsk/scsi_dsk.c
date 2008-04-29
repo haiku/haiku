@@ -7,7 +7,7 @@
 	Part of Open SCSI Disk Driver
 
 	Main file.
-	
+
 	You'll find das_... all over the place. This stands for
 	"Direct Access Storage" which is the official SCSI name for
 	normal (floppy/hard/ZIP)-disk drives.
@@ -62,7 +62,7 @@ update_capacity(das_device_info *device)
 
 	device->scsi->free_ccb(ccb);
 
-	return res;	
+	return res;
 }
 
 
@@ -104,9 +104,9 @@ get_geometry(das_handle_info *handle, void *buf, size_t len)
 		geometry->removable,
 		geometry->read_only,
 		geometry->write_once);
-	
+
 	SHOW_FLOW0(3, "done");
-	
+
 	return B_OK;
 }
 
@@ -121,7 +121,7 @@ load_eject(das_device_info *device, bool load)
 
 	ccb = device->scsi->alloc_ccb(device->scsi_device);
 
-	res = scsi_periph->send_start_stop(device->scsi_periph_device, 
+	res = scsi_periph->send_start_stop(device->scsi_periph_device,
 		ccb, load, true);
 
 	device->scsi->free_ccb(ccb);
@@ -135,17 +135,18 @@ synchronize_cache(das_device_info *device)
 {
 	scsi_ccb *ccb;
 	err_res res;
-	
-	SHOW_FLOW0( 0, "" );
-		
+
+	SHOW_FLOW0(0, "");
+
 	ccb = device->scsi->alloc_ccb(device->scsi_device);
 
 	res = scsi_periph->synchronize_cache(device->scsi_periph_device, ccb);
-		
+
 	device->scsi->free_ccb(ccb);
-	
+
 	return res.error_code;
 }
+
 
 static int
 log2(uint32 x)
@@ -166,7 +167,7 @@ das_set_capacity(das_device_info *device, uint64 capacity,
 {
 	uint32 ld_block_size;
 
-	SHOW_FLOW(3, "device=%p, capacity=%Ld, block_size=%ld", 
+	SHOW_FLOW(3, "device=%p, capacity=%Ld, block_size=%ld",
 		device, capacity, block_size);
 
 	// get log2, if possible
@@ -178,7 +179,7 @@ das_set_capacity(das_device_info *device, uint64 capacity,
 	device->capacity = capacity;
 	device->block_size = block_size;
 
-	gBlockIO->set_media_params(device->block_io_device, block_size, 
+	gBlockIO->set_media_params(device->block_io_device, block_size,
 		ld_block_size, capacity);
 }
 
@@ -218,7 +219,7 @@ das_ioctl(das_handle_info *handle, int op, void *buf, size_t len)
 			break;
 
 		case B_GET_ICON:
-			res = scsi_periph->get_icon(device->removable ? icon_type_floppy : icon_type_disk, 
+			res = scsi_periph->get_icon(device->removable ? icon_type_floppy : icon_type_disk,
 				(device_icon *)buf);
 			break;
 
@@ -231,9 +232,9 @@ das_ioctl(das_handle_info *handle, int op, void *buf, size_t len)
 			res = load_eject(device, true);
 			break;
 
-	case B_FLUSH_DRIVE_CACHE:
-		res = synchronize_cache(device);
-		break;
+		case B_FLUSH_DRIVE_CACHE:
+			res = synchronize_cache(device);
+			break;
 
 		default:
 			res = scsi_periph->ioctl(handle->scsi_periph_handle, op, buf, len);
@@ -265,7 +266,7 @@ das_supports_device(device_node_handle parent, bool *_noConnection)
 		|| device_type != scsi_dev_direct_access) {
 		free(bus);
 		return 0.0;
-	}	
+	}
 
 	free(bus);
 	return 0.6;
@@ -333,7 +334,7 @@ block_device_interface scsi_dsk_module = {
 };
 
 #if !_BUILDING_kernel && !BOOT
-_EXPORT 
+_EXPORT
 module_info *modules[] = {
 	(module_info *)&scsi_dsk_module,
 	NULL

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -8,7 +8,7 @@
 /*
 	Part of Open IDE bus manager
 
-	Converts SCSI commands to ATA commands. 
+	Converts SCSI commands to ATA commands.
 */
 
 
@@ -18,8 +18,8 @@
 
 #include <string.h>
 
-#define TRACE	dprintf
-#define FLOW	dprintf
+#define TRACE	dprintf_no_syslog
+#define FLOW	dprintf_no_syslog
 
 
 
@@ -80,7 +80,7 @@ scsi_mode_sense_10(ide_device_info *device, ata_request *request)
 	copy_sg_data(ccb, 0, allocationLength, &param_header,
 		sizeof(param_header), false);
 
-	/*block_desc = (scsi_mode_param_block_desc *)(ccb->data 
+	/*block_desc = (scsi_mode_param_block_desc *)(ccb->data
 		+ sizeof(*param_header));*/
 	memset(&block_desc, 0, sizeof(block_desc));
 	// density is reserved (0), descriptor apply to entire medium (num_blocks=0)
@@ -92,16 +92,16 @@ scsi_mode_sense_10(ide_device_info *device, ata_request *request)
 	copy_sg_data(ccb, sizeof(param_header), allocationLength,
 		&block_desc, sizeof(block_desc), false);
 
-	/*contr = (scsi_modepage_contr *)(ccb->data 
+	/*contr = (scsi_modepage_contr *)(ccb->data
 		+ sizeof(*param_header)
-		+ ((uint16)param_header->high_block_desc_len << 8) 
+		+ ((uint16)param_header->high_block_desc_len << 8)
 		+ param_header->low_block_desc_len);*/
 
 	memset(&control, 0, sizeof(control));
 	control.RLEC = false;
 	control.DQue = 1;//!device->CQ_enabled;
 	control.QErr = false;
-		// when a command fails we requeue all 
+		// when a command fails we requeue all
 		// lost commands automagically
 	control.QAM = SCSI_QAM_UNRESTRICTED;
 
@@ -167,7 +167,7 @@ scsi_mode_select_10(ide_device_info *device, ata_request *request)
 	modepageOffset = sizeof(param_header)
 		+ B_BENDIAN_TO_HOST_INT16(param_header.block_desc_length);
 
-	// go through list of pages		
+	// go through list of pages
 	while (modepageOffset < totalLength) {
 		uint32 pageLength;
 
@@ -226,7 +226,7 @@ scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 		|| device->infoblock._127_RMSN_support != 1)
 		return;
 
-	// ask device about status		
+	// ask device about status
 	device->tf_param_mask = 0;
 	device->tf.write.command = IDE_CMD_GET_MEDIA_STATUS;
 
@@ -238,7 +238,7 @@ scsi_test_unit_ready(ide_device_info *device, ata_request *request)
 	// bits ide_error_mcr | ide_error_mc | ide_error_wp are also valid
 	// but not requested by TUR; ide_error_wp can safely be ignored, but
 	// we don't want to loose media change (request) reports
-	ata_finish_command(device, request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED, 
+	ata_finish_command(device, request, ATA_WAIT_FINISH | ATA_DRDY_REQUIRED,
 		ide_error_nm | ide_error_abrt | ide_error_mcr | ide_error_mc);
 		// SCSI spec is unclear here: we shouldn't report "media change (request)"
 		// but what to do if there is one? anyway - we report them
@@ -258,7 +258,7 @@ scsi_synchronize_cache(ide_device_info *device, ata_request *request)
 		return true;
 
 	device->tf_param_mask = 0;
-	device->tf.lba.command = device->use_48bits ? IDE_CMD_FLUSH_CACHE_EXT 
+	device->tf.lba.command = device->use_48bits ? IDE_CMD_FLUSH_CACHE_EXT
 		: IDE_CMD_FLUSH_CACHE;
 
 	// spec says that this may take more then 30s, how much more?
@@ -350,9 +350,9 @@ scsi_inquiry(ide_device_info *device, ata_request *request)
 	data.relative_address = false;
 
 	// the following fields are *much* to small, sigh...
-	memcpy(data.vendor_ident, device->infoblock.model_number, 
+	memcpy(data.vendor_ident, device->infoblock.model_number,
 		sizeof(data.vendor_ident));
-	memcpy(data.product_ident, device->infoblock.model_number + 8, 
+	memcpy(data.product_ident, device->infoblock.model_number + 8,
 		sizeof(data.product_ident));
 	memcpy(data.product_rev, "    ", sizeof(data.product_rev));
 
@@ -428,9 +428,9 @@ void
 ata_exec_io(ide_device_info *device, ata_request *request)
 {
 	scsi_ccb *ccb = request->ccb;
-	
+
 	//FLOW("ata_exec_io: scsi command 0x%02x\n", ccb->cdb[0]);
-		
+
 	// ATA devices have one LUN only
 	if (ccb->target_lun != 0) {
 		FLOW("ata_exec_io: wrong target lun\n");
@@ -463,7 +463,7 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 			ata_request_set_sense(request, SCSIS_KEY_ILLEGAL_REQUEST, SCSIS_ASC_INV_OPCODE);
 			break;
 
-		case SCSI_OP_INQUIRY: 
+		case SCSI_OP_INQUIRY:
  			scsi_inquiry(device, request);
 			break;
 
@@ -523,7 +523,7 @@ ata_exec_io(ide_device_info *device, ata_request *request)
 			break;
 
 		case SCSI_OP_SYNCHRONIZE_CACHE:
-			// we ignore range and immediate bit, we always immediately flush everything 
+			// we ignore range and immediate bit, we always immediately flush everything
 			scsi_synchronize_cache(device, request);
 			break;
 

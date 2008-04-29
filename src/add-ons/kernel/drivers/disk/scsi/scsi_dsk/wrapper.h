@@ -17,7 +17,7 @@
 #ifdef DEBUG_WAIT_ON_MSG
 #	define DEBUG_WAIT snooze( DEBUG_WAIT_ON_MSG );
 #else
-#	define DEBUG_WAIT 
+#	define DEBUG_WAIT
 #endif
 
 #ifdef DEBUG_WAIT_ON_ERROR
@@ -58,12 +58,12 @@
 
 #define SHOW_FLOW(seriousness, format, param...) \
 	do { if( seriousness <= debug_level_flow && seriousness <= DEBUG_MAX_LEVEL_FLOW ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME, param ); DEBUG_WAIT \
+		dprintf_no_syslog( "%s%s: "format"\n", FUNC_NAME, param ); DEBUG_WAIT \
 	}} while( 0 )
 
 #define SHOW_FLOW0(seriousness, format) \
 	do { if( seriousness <= debug_level_flow && seriousness <= DEBUG_MAX_LEVEL_FLOW ) { \
-		dprintf( "%s%s: "format"\n", FUNC_NAME); DEBUG_WAIT \
+		dprintf_no_syslog( "%s%s: "format"\n", FUNC_NAME); DEBUG_WAIT \
 	}} while( 0 )
 
 #define SHOW_INFO(seriousness, format, param...) \
