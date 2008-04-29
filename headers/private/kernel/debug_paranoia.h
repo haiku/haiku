@@ -51,7 +51,7 @@ void		debug_paranoia_init();
 __END_DECLS
 
 
-#if COMPONENT_PARANOIA_LEVEL
+#if ENABLE_PARANOIA_CHECKS && COMPONENT_PARANOIA_LEVEL
 #	define PARANOIA_ONLY(x)	x
 #	define PARANOIA_ONLY_LEVEL(level, x)				\
 		if ((level) <= (COMPONENT_PARANOIA_LEVEL)) {	\
