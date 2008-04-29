@@ -26,6 +26,9 @@ KernelAddon stack :
 	stack.cpp
 	stack_interface.cpp
 	utility.cpp
+
+	# for test purposes
+	#simple_net_buffer.cpp
 ;
 
 # Installation
