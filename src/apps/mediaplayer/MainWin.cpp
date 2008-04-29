@@ -660,7 +660,7 @@ void
 MainWin::WindowActivated(bool active)
 {
 	if (active) {
-		BScreen screen;
+		BScreen screen(this);
 		BRect screenFrame = screen.Frame();
 		BRect frame = Frame();
 		float diffX = 0.0;
