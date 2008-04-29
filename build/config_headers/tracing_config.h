@@ -10,7 +10,7 @@
 
 // tracing buffer size (in bytes)
 #ifndef MAX_TRACE_SIZE
-#	define MAX_TRACE_SIZE (1024 * 1024)
+#	define MAX_TRACE_SIZE (20 * 1024 * 1024)
 #endif
 
 
@@ -30,6 +30,7 @@
 #define SIGNAL_TRACING							0
 #define SYSCALL_TRACING							0
 #define SYSCALL_TRACING_IGNORE_KTRACE_OUTPUT	1
+#define TCP_TRACING								0
 #define TEAM_TRACING							0
 #define USER_MALLOC_TRACING						0
 

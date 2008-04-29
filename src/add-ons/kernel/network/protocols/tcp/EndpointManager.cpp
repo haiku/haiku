@@ -29,45 +29,103 @@
 #	define TRACE(x)
 #endif
 
-//#define ENDPOINT_TRACING
+#if TCP_TRACING
+#	define ENDPOINT_TRACING
+#endif
 #ifdef ENDPOINT_TRACING
 namespace EndpointTracing {
 
+class Bind : public AbstractTraceEntry {
+public:
+	Bind(TCPEndpoint* endpoint, ConstSocketAddress& address, bool ephemeral)
+		:
+		fEndpoint(endpoint),
+		fEphemeral(ephemeral)
+	{
+		address.AsString(fAddress, sizeof(fAddress), true);
+		Initialized();
+	}
+
+	Bind(TCPEndpoint* endpoint, SocketAddress& address, bool ephemeral)
+		:
+		fEndpoint(endpoint),
+		fEphemeral(ephemeral)
+	{
+		address.AsString(fAddress, sizeof(fAddress), true);
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:e:%p bind%s address %s", fEndpoint,
+			fEphemeral ? " ephemeral" : "", fAddress);
+	}
+
+protected:
+	TCPEndpoint*	fEndpoint;
+	char			fAddress[32];
+	bool			fEphemeral;
+};
+
+class Connect : public AbstractTraceEntry {
+public:
+	Connect(TCPEndpoint* endpoint)
+		:
+		fEndpoint(endpoint)
+	{
+		endpoint->LocalAddress().AsString(fLocal, sizeof(fLocal), true);
+		endpoint->PeerAddress().AsString(fPeer, sizeof(fPeer), true);
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:e:%p connect local %s, peer %s", fEndpoint, fLocal,
+			fPeer);
+	}
+
+protected:
+	TCPEndpoint*	fEndpoint;
+	char			fLocal[32];
+	char			fPeer[32];
+};
+
 class Unbind : public AbstractTraceEntry {
-	public:
-		Unbind(TCPEndpoint* endpoint)
-			:
-			fEndpoint(endpoint)
-		{
-			fStackTrace = capture_tracing_stack_trace(10, 0, false);
+public:
+	Unbind(TCPEndpoint* endpoint)
+		:
+		fEndpoint(endpoint)
+	{
+		//fStackTrace = capture_tracing_stack_trace(10, 0, false);
 
-			endpoint->LocalAddress().AsString(fLocal, sizeof(fLocal), true);
-			endpoint->PeerAddress().AsString(fPeer, sizeof(fPeer), true);
-			Initialized();
-		}
+		endpoint->LocalAddress().AsString(fLocal, sizeof(fLocal), true);
+		endpoint->PeerAddress().AsString(fPeer, sizeof(fPeer), true);
+		Initialized();
+	}
 
-		virtual void DumpStackTrace(TraceOutput& out)
-		{
-			out.PrintStackTrace(fStackTrace);
-		}
+#if 0
+	virtual void DumpStackTrace(TraceOutput& out)
+	{
+		out.PrintStackTrace(fStackTrace);
+	}
+#endif
 
-		virtual void AddDump(TraceOutput& out)
-		{
-			out.Print("tcp:e:unbind: %p, local %s, peer %s"
-				"%lu", fEndpoint, fLocal, fPeer);
-		}
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:e:%p unbind, local %s, peer %s", fEndpoint, fLocal,
+			fPeer);
+	}
 
-	protected:
-		TCPEndpoint*	fEndpoint;
-		tracing_stack_trace* fStackTrace;
-		char			fLocal[32];
-		char			fPeer[32];
+protected:
+	TCPEndpoint*	fEndpoint;
+	//tracing_stack_trace* fStackTrace;
+	char			fLocal[32];
+	char			fPeer[32];
 };
 
 }	// namespace EndpointTracing
 
 #	define T(x)	new(std::nothrow) EndpointTracing::x
-
 #else
 #	define T(x)
 #endif	// ENDPOINT_TRACING
@@ -77,7 +135,7 @@ static const uint16 kLastReservedPort = 1023;
 static const uint16 kFirstEphemeralPort = 40000;
 
 
-ConnectionHashDefinition::ConnectionHashDefinition(EndpointManager *manager)
+ConnectionHashDefinition::ConnectionHashDefinition(EndpointManager* manager)
 	:
 	fManager(manager)
 {
@@ -85,7 +143,7 @@ ConnectionHashDefinition::ConnectionHashDefinition(EndpointManager *manager)
 
 
 size_t
-ConnectionHashDefinition::HashKey(const KeyType &key) const
+ConnectionHashDefinition::HashKey(const KeyType& key) const
 {
 	return ConstSocketAddress(fManager->AddressModule(),
 		key.first).HashPair(key.second);
@@ -93,23 +151,23 @@ ConnectionHashDefinition::HashKey(const KeyType &key) const
 
 
 size_t
-ConnectionHashDefinition::Hash(TCPEndpoint *endpoint) const
+ConnectionHashDefinition::Hash(TCPEndpoint* endpoint) const
 {
 	return endpoint->LocalAddress().HashPair(*endpoint->PeerAddress());
 }
 
 
 bool
-ConnectionHashDefinition::Compare(const KeyType &key,
-	TCPEndpoint *endpoint) const
+ConnectionHashDefinition::Compare(const KeyType& key,
+	TCPEndpoint* endpoint) const
 {
 	return endpoint->LocalAddress().EqualTo(key.first, true)
 		&& endpoint->PeerAddress().EqualTo(key.second, true);
 }
 
 
-HashTableLink<TCPEndpoint> *
-ConnectionHashDefinition::GetLink(TCPEndpoint *endpoint) const
+HashTableLink<TCPEndpoint>*
+ConnectionHashDefinition::GetLink(TCPEndpoint* endpoint) const
 {
 	return &endpoint->fConnectionHashLink;
 }
@@ -126,29 +184,29 @@ EndpointHashDefinition::HashKey(uint16 port) const
 
 
 size_t
-EndpointHashDefinition::Hash(TCPEndpoint *endpoint) const
+EndpointHashDefinition::Hash(TCPEndpoint* endpoint) const
 {
 	return endpoint->LocalAddress().Port();
 }
 
 
 bool
-EndpointHashDefinition::Compare(uint16 port, TCPEndpoint *endpoint) const
+EndpointHashDefinition::Compare(uint16 port, TCPEndpoint* endpoint) const
 {
 	return endpoint->LocalAddress().Port() == port;
 }
 
 
 bool
-EndpointHashDefinition::CompareValues(TCPEndpoint *first,
-	TCPEndpoint *second) const
+EndpointHashDefinition::CompareValues(TCPEndpoint* first,
+	TCPEndpoint* second) const
 {
 	return first->LocalAddress().Port() == second->LocalAddress().Port();
 }
 
 
-HashTableLink<TCPEndpoint> *
-EndpointHashDefinition::GetLink(TCPEndpoint *endpoint) const
+HashTableLink<TCPEndpoint>*
+EndpointHashDefinition::GetLink(TCPEndpoint* endpoint) const
 {
 	return &endpoint->fEndpointHashLink;
 }
@@ -157,7 +215,7 @@ EndpointHashDefinition::GetLink(TCPEndpoint *endpoint) const
 //	#pragma mark -
 
 
-EndpointManager::EndpointManager(net_domain *domain)
+EndpointManager::EndpointManager(net_domain* domain)
 	:
 	fDomain(domain),
 	fConnectionHash(this),
@@ -195,16 +253,16 @@ EndpointManager::InitCheck() const
 /*!	Returns the endpoint matching the connection.
 	You must hold the manager's lock when calling this method.
 */
-TCPEndpoint *
-EndpointManager::_LookupConnection(const sockaddr *local, const sockaddr *peer)
+TCPEndpoint*
+EndpointManager::_LookupConnection(const sockaddr* local, const sockaddr* peer)
 {
 	return fConnectionHash.Lookup(std::make_pair(local, peer));
 }
 
 
 status_t
-EndpointManager::SetConnection(TCPEndpoint *endpoint,
-	const sockaddr *_local, const sockaddr *peer, const sockaddr *interfaceLocal)
+EndpointManager::SetConnection(TCPEndpoint* endpoint, const sockaddr* _local,
+	const sockaddr* peer, const sockaddr* interfaceLocal)
 {
 	TRACE(("EndpointManager::SetConnection(%p)\n", endpoint));
 
@@ -224,6 +282,7 @@ EndpointManager::SetConnection(TCPEndpoint *endpoint,
 
 	endpoint->LocalAddress().SetTo(*local);
 	endpoint->PeerAddress().SetTo(peer);
+	T(Connect(endpoint));
 
 	fConnectionHash.Insert(endpoint);
 	return B_OK;
@@ -231,7 +290,7 @@ EndpointManager::SetConnection(TCPEndpoint *endpoint,
 
 
 status_t
-EndpointManager::SetPassive(TCPEndpoint *endpoint)
+EndpointManager::SetPassive(TCPEndpoint* endpoint)
 {
 	BenaphoreLocker _(fLock);
 
@@ -257,8 +316,8 @@ EndpointManager::SetPassive(TCPEndpoint *endpoint)
 }
 
 
-TCPEndpoint *
-EndpointManager::FindConnection(sockaddr *local, sockaddr *peer)
+TCPEndpoint*
+EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 {
 	BenaphoreLocker _(fLock);
 
@@ -300,7 +359,7 @@ EndpointManager::FindConnection(sockaddr *local, sockaddr *peer)
 
 
 status_t
-EndpointManager::Bind(TCPEndpoint *endpoint, const sockaddr *address)
+EndpointManager::Bind(TCPEndpoint* endpoint, const sockaddr* address)
 {
 	// TODO check the family:
 	//
@@ -317,7 +376,7 @@ EndpointManager::Bind(TCPEndpoint *endpoint, const sockaddr *address)
 
 
 status_t
-EndpointManager::BindChild(TCPEndpoint *endpoint)
+EndpointManager::BindChild(TCPEndpoint* endpoint)
 {
 	BenaphoreLocker _(fLock);
 	return _Bind(endpoint, *endpoint->LocalAddress());
@@ -325,13 +384,13 @@ EndpointManager::BindChild(TCPEndpoint *endpoint)
 
 
 status_t
-EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *_address)
+EndpointManager::_BindToAddress(TCPEndpoint* endpoint, const sockaddr* _address)
 {
-	TRACE(("EndpointManager::BindToAddress(%p)\n", endpoint));
-
 	ConstSocketAddress address(AddressModule(), _address);
-
 	uint16 port = address.Port();
+
+	TRACE(("EndpointManager::BindToAddress(%p)\n", endpoint));
+	T(Bind(endpoint, address, false));
 
 	// TODO this check follows very typical UNIX semantics
 	//      and generally should be improved.
@@ -358,8 +417,8 @@ EndpointManager::_BindToAddress(TCPEndpoint *endpoint, const sockaddr *_address)
 
 
 status_t
-EndpointManager::_BindToEphemeral(TCPEndpoint *endpoint,
-	const sockaddr *address)
+EndpointManager::_BindToEphemeral(TCPEndpoint* endpoint,
+	const sockaddr* address)
 {
 	TRACE(("EndpointManager::BindToEphemeral(%p)\n", endpoint));
 
@@ -387,6 +446,7 @@ EndpointManager::_BindToEphemeral(TCPEndpoint *endpoint,
 				TRACE(("   EndpointManager::BindToEphemeral(%p) -> %s\n",
 					endpoint, AddressString(Domain(), *newAddress,
 					true).Data()));
+				T(Bind(endpoint, newAddress, true));
 
 				return _Bind(endpoint, *newAddress);
 			}
@@ -401,7 +461,7 @@ EndpointManager::_BindToEphemeral(TCPEndpoint *endpoint,
 
 
 status_t
-EndpointManager::_Bind(TCPEndpoint *endpoint, const sockaddr *address)
+EndpointManager::_Bind(TCPEndpoint* endpoint, const sockaddr* address)
 {
 	// Thus far we have checked if the Bind() is allowed
 
@@ -416,7 +476,7 @@ EndpointManager::_Bind(TCPEndpoint *endpoint, const sockaddr *address)
 
 
 status_t
-EndpointManager::Unbind(TCPEndpoint *endpoint)
+EndpointManager::Unbind(TCPEndpoint* endpoint)
 {
 	TRACE(("EndpointManager::Unbind(%p)\n", endpoint));
 	T(Unbind(endpoint));
@@ -440,12 +500,11 @@ EndpointManager::Unbind(TCPEndpoint *endpoint)
 
 
 status_t
-EndpointManager::ReplyWithReset(tcp_segment_header &segment,
-	net_buffer *buffer)
+EndpointManager::ReplyWithReset(tcp_segment_header& segment, net_buffer* buffer)
 {
 	TRACE(("TCP: Sending RST...\n"));
 
-	net_buffer *reply = gBufferModule->create(512);
+	net_buffer* reply = gBufferModule->create(512);
 	if (reply == NULL)
 		return B_NO_MEMORY;
 
