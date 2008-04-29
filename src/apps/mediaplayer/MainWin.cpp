@@ -656,6 +656,36 @@ MainWin::MessageReceived(BMessage *msg)
 }
 
 
+void
+MainWin::WindowActivated(bool active)
+{
+	if (active) {
+		BScreen screen;
+		BRect screenFrame = screen.Frame();
+		BRect frame = Frame();
+		float diffX = 0.0;
+		float diffY = 0.0;
+
+		// If the frame if off the edge of the screen at all
+		// we will move it so all the window is on the screen.
+		if (frame.left < screenFrame.left)
+			// Move right
+			diffX = screenFrame.left - frame.left; 
+		if (frame.top < screenFrame.top)
+			// Move down
+			diffY = screenFrame.top - frame.top; 
+		if (frame.right > screenFrame.right)
+			// Move left
+			diffX = screenFrame.right - frame.right; 
+		if (frame.bottom > screenFrame.bottom)
+			// Move up
+			diffY = screenFrame.bottom - frame.bottom; 
+
+		MoveBy(diffX, diffY);
+	}
+}
+
+
 bool
 MainWin::QuitRequested()
 {

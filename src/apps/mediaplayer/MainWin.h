@@ -48,6 +48,7 @@ public:
 	virtual	void				DispatchMessage(BMessage* message,
 									BHandler* handler);
 	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				WindowActivated(bool active);
 	virtual	bool				QuitRequested();
 
 			void				OpenFile(const entry_ref& ref);
