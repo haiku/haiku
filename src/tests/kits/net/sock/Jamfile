@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tests kits net sock ;
+
+UseHeaders $(SUBDIR) : true ;
+
+SimpleTest sock :
+	buffers.c cliopen.c crlf.c error.c looptcp.c
+	loopudp.c main.c multicast.c pattern.c servopen.c
+	sleepus.c sockopts.c sourceroute.c sourcetcp.c
+	sourceudp.c sinktcp.c sinkudp.c tellwait.c write.c writen.c
+	: $(TARGET_NETWORK_LIBS)
+;

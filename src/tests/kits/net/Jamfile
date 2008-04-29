@@ -18,5 +18,6 @@ SubInclude HAIKU_TOP src tests kits net DialUpPreflet ;
 SubInclude HAIKU_TOP src tests kits net multicast ;
 SubInclude HAIKU_TOP src tests kits net netperf ;
 SubInclude HAIKU_TOP src tests kits net preflet ;
+SubInclude HAIKU_TOP src tests kits net sock ;
 SubInclude HAIKU_TOP src tests kits net tcp_shell ;
 SubInclude HAIKU_TOP src tests kits net tcptester ;
