@@ -505,13 +505,9 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 		return notify_select_events(info, info->selected_events);
 	}
 
-	// add the info to the IO context
-	info->next = context->select_infos[fd];
-	context->select_infos[fd] = info;
-
-	// as long as the info is in the list, we keep a reference to the sync
-	// object
-	atomic_add(&info->sync->ref_count, 1);
+	// We need the FD to stay open while we're doing this, so no select()/
+	// deselect() will be called on it after it is closed.
+	atomic_add(&descriptor->open_count, 1);
 
 	locker.Unlock();
 
@@ -527,9 +523,37 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 	}
 	info->selected_events = selectedEvents;
 
-	// if nothing has been selected, we deselect immediately
-	if (selectedEvents == 0)
-		deselect_fd(fd, info, kernel);
+	// If any event has been selected, add the info to the IO context.
+	if (selectedEvents != 0) {
+		locker.Lock();
+		if (context->fds[fd] != descriptor) {
+			// Someone close()d the index in the meantime. deselect() all
+			// events.
+			info->next = NULL;
+			deselect_select_infos(descriptor, info);
+
+			// Release our open reference of the descriptor.
+			close_fd(descriptor);
+			return B_FILE_ERROR;
+		}
+
+		// The FD index hasn't changed, so we add the select info to the table.
+
+		info->next = context->select_infos[fd];
+		context->select_infos[fd] = info;
+
+		// As long as the info is in the list, we keep a reference to the sync
+		// object.
+		atomic_add(&info->sync->ref_count, 1);
+
+		// Finally release our open reference. It is safe just to decrement,
+		// since as long as the descriptor is associated with the slot,
+		// someone else still has it open.
+		atomic_add(&descriptor->open_count, -1);
+	} else {
+		// Release our open reference.
+		close_fd(descriptor);
+	}
 
 	return B_OK;
 }
