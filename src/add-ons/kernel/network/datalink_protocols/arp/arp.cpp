@@ -68,6 +68,7 @@ struct arp_entry {
 	sockaddr_dl	hardware_address;
 	uint32		flags;
 	net_buffer	*request_buffer;
+	int32		request_buffer_ref_count;
 	net_timer	timer;
 	uint32		timer_state;
 	bigtime_t	timestamp;
@@ -116,6 +117,28 @@ static net_stack_module_info *sStackModule;
 static hash_table *sCache;
 static benaphore sCacheLock;
 static bool sIgnoreReplies;
+
+
+static net_buffer*
+get_request_buffer_reference(arp_entry* entry)
+{
+	if (atomic_test_and_set(&entry->request_buffer_ref_count, 2, 1) == 1)
+		return entry->request_buffer;
+
+	return NULL;
+}
+
+
+static void
+put_request_buffer_reference(arp_entry* entry)
+{
+	if (atomic_add(&entry->request_buffer_ref_count, -1) == 0) {
+		if (entry->request_buffer != NULL) {
+			gBufferModule->free(entry->request_buffer);
+			entry->request_buffer = NULL;
+		}
+	}
+}
 
 
 /*static*/ int
@@ -174,6 +197,7 @@ arp_entry::Add(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 	entry->timestamp = system_time();
 	entry->protocol = NULL;
 	entry->request_buffer = NULL;
+	entry->request_buffer_ref_count = 0;
 	entry->timer_state = ARP_NO_STATE;
 	sStackModule->init_timer(&entry->timer, arp_timer, entry);
 
@@ -320,10 +344,7 @@ arp_update_entry(in_addr_t protocolAddress, sockaddr_dl *hardwareAddress,
 			return B_NO_MEMORY;
 	}
 
-	if (entry->request_buffer != NULL) {
-		gBufferModule->free(entry->request_buffer);
-		entry->request_buffer = NULL;
-	}
+	put_request_buffer_reference(entry);
 
 	if ((entry->flags & ARP_FLAG_PERMANENT) == 0) {
 		// (re)start the stale timer
@@ -537,7 +558,15 @@ arp_timer(struct net_timer *timer, void *data)
 				break;
 
 			TRACE(("  send request for ARP entry %p!\n", entry));
-			net_buffer *request = entry->request_buffer;
+
+			net_buffer *request = get_request_buffer_reference(entry);
+			if (request == NULL)
+				break;
+			// TODO: The reference counting does still not solve request_buffer
+			// access problem completely: A duplicate reply between this point
+			// and the "entry->request_buffer = NULL" will release two
+			// references in arp_update_entry() and thus delete the buffer.
+
 			if (entry->timer_state < ARP_STATE_LAST_REQUEST) {
 				// we'll still need our buffer, so in order to prevent it being
 				// freed by a successful send, we need to clone it
@@ -547,7 +576,13 @@ arp_timer(struct net_timer *timer, void *data)
 					// many requests as originally planned
 					request = entry->request_buffer;
 					entry->timer_state = ARP_STATE_LAST_REQUEST;
-				}
+				} else
+					put_request_buffer_reference(entry);
+			}
+
+			if (entry->timer_state == ARP_STATE_LAST_REQUEST) {
+				// the request buffer will be deleted, detach it
+				entry->request_buffer = NULL;
 			}
 
 			// we're trying to resolve the address, so keep sending requests
@@ -555,11 +590,6 @@ arp_timer(struct net_timer *timer, void *data)
 				entry->protocol->next, request);
 			if (status < B_OK)
 				gBufferModule->free(request);
-
-			if (entry->timer_state == ARP_STATE_LAST_REQUEST) {
-				// buffer has been freed on send
-				entry->request_buffer = NULL;
-			}
 
 			entry->timer_state++;
 			sStackModule->set_timer(&entry->timer, ARP_REQUEST_TIMEOUT);
@@ -591,6 +621,7 @@ arp_start_resolve(net_datalink_protocol *protocol, in_addr_t address,
 		// TODO: do something with the entry
 		return B_NO_MEMORY;
 	}
+	entry->request_buffer_ref_count = 1;
 
 	NetBufferPrepend<arp_header> bufferHeader(entry->request_buffer);
 	status_t status = bufferHeader.Status();
