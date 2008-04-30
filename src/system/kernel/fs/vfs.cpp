@@ -4498,6 +4498,25 @@ create_vnode(struct vnode *directory, const char *name, int openMode,
 			if ((openMode & O_EXCL) != 0)
 				return B_FILE_EXISTS;
 
+			// If the node is a symlink, we have to follow it, unless
+			// O_NOTRAVERSE is set.
+			if (S_ISLNK(vnode->type) && (openMode & O_NOTRAVERSE) == 0) {
+				putter.Put();
+				char clonedName[B_FILE_NAME_LENGTH + 1];
+				if (strlcpy(clonedName, name, B_FILE_NAME_LENGTH)
+						>= B_FILE_NAME_LENGTH) {
+					return B_NAME_TOO_LONG;
+				}
+
+				inc_vnode_ref_count(directory);
+				status = vnode_path_to_vnode(directory, clonedName, true, 0,
+					kernel, &vnode, NULL);
+				if (status != B_OK)
+					return status;
+
+				putter.SetTo(vnode);
+			}
+
 			status = open_vnode(vnode, openMode & ~O_CREAT, kernel);
 			// on success keep the vnode reference for the FD
 			if (status >= 0)
