@@ -44,38 +44,11 @@
 #define COMPONENT_PARANOIA_LEVEL	NET_BUFFER_PARANOIA
 #include <debug_paranoia.h>
 
+#define DATA_NODE_READ_ONLY		0x1
 
 struct header_space {
 	uint16	size;
 	uint16	free;
-};
-
-struct data_node {
-	struct list_link link;
-	struct data_header *header;
-	struct data_header *located;
-	size_t		offset;			// the net_buffer-wide offset of this node
-	uint8		*start;			// points to the start of the data
-	uint16		used;			// defines how much memory is used by this node
-	uint16		tail_space;
-	header_space	own_header_space;
-	header_space	*used_header_space;	// For the "first node" this points to
-										// the header's space otherwise to
-										// own_header_space.
-
-	uint16	HeaderSpace() const	{ return used_header_space->free; }
-
-	void AddHeaderSpace(uint16 toAdd)
-	{
-		used_header_space->size += toAdd;
-		used_header_space->free += toAdd;
-	}
-
-	void SubtractHeaderSpace(uint16 toSubtract)
-	{
-		used_header_space->size -= toSubtract;
-		used_header_space->free -= toSubtract;
-	}
 };
 
 struct free_data {
@@ -89,6 +62,63 @@ struct data_header {
 	free_data	*first_free;
 	uint8		*data_end;
 	header_space	space;
+	uint16		tail_space;
+};
+
+struct data_node {
+	struct list_link link;
+	struct data_header *header;
+	struct data_header *located;
+	size_t		offset;			// the net_buffer-wide offset of this node
+	uint8		*start;			// points to the start of the data
+	uint16		flags;
+	uint16		used;			// defines how much memory is used by this node
+
+	uint16 HeaderSpace() const
+	{
+		if ((flags & DATA_NODE_READ_ONLY) != 0)
+			return 0;
+		return header->space.free;
+	}
+
+	void AddHeaderSpace(uint16 toAdd)
+	{
+		if ((flags & DATA_NODE_READ_ONLY) == 0) {
+			header->space.size += toAdd;
+			header->space.free += toAdd;
+		}
+	}
+
+	void SubtractHeaderSpace(uint16 toSubtract)
+	{
+		if ((flags & DATA_NODE_READ_ONLY) == 0) {
+			header->space.size -= toSubtract;
+			header->space.free -= toSubtract;
+		}
+	}
+
+	uint16 TailSpace() const
+	{
+		if ((flags & DATA_NODE_READ_ONLY) != 0)
+			return 0;
+		return header->tail_space;
+	}
+
+	void SetTailSpace(uint16 space)
+	{
+		if ((flags & DATA_NODE_READ_ONLY) == 0)
+			header->tail_space = space;
+	}
+
+	void FreeSpace()
+	{
+		if ((flags & DATA_NODE_READ_ONLY) == 0) {
+			uint16 space = used + header->tail_space;
+			header->space.size += space;
+			header->space.free += space;
+			header->tail_space = 0;
+		}
+	}
 };
 
 #define MAX_ANCILLARY_DATA_SIZE	128
@@ -567,7 +597,7 @@ dump_buffer(net_buffer *_buffer)
 	data_node *node = NULL;
 	while ((node = (data_node *)list_get_next_item(&buffer->buffers, node)) != NULL) {
 		dprintf("  node %p, offset %lu, used %u, header %u, tail %u, header %p\n",
-			node, node->offset, node->used, node->HeaderSpace(), node->tail_space, node->header);
+			node, node->offset, node->used, node->HeaderSpace(), node->TailSpace(), node->header);
 		//dump_block((char *)node->start, node->used, "    ");
 		dump_block((char *)node->start, min_c(node->used, 32), "    ");
 	}
@@ -730,6 +760,8 @@ create_data_header(size_t headerSpace)
 	header->space.size = headerSpace;
 	header->space.free = headerSpace;
 	header->data_end = (uint8 *)header + DATA_HEADER_SIZE;
+	header->tail_space = (uint8 *)header + BUFFER_SIZE - header->data_end
+		- headerSpace;
 	header->first_free = NULL;
 
 	TRACE(("%ld:   create new data header %p\n", find_thread(NULL), header));
@@ -872,8 +904,7 @@ add_first_data_node(data_header *header)
 	node->offset = 0;
 	node->start = header->data_end + header->space.free;
 	node->used = 0;
-	node->used_header_space = &header->space;
-	node->tail_space = (uint8 *)header + BUFFER_SIZE - node->start;
+	node->flags = 0;
 
 	return node;
 }
@@ -898,7 +929,7 @@ add_data_node(net_buffer_private *buffer, data_header *header)
 	memset(node, 0, sizeof(struct data_node));
 	node->located = located;
 	node->header = header;
-	node->used_header_space = &node->own_header_space;
+	node->flags = 0;
 	return node;
 }
 
@@ -914,7 +945,7 @@ remove_data_node(data_node *node)
 	// Move all used and tail space to the header space, which is useful in case
 	// this is the first node of a buffer (i.e. the header is an allocation
 	// header).
-	node->used_header_space->size += node->used + node->tail_space;
+	node->FreeSpace();
 
 	if (located != node->header)
 		release_data_header(node->header);
@@ -1434,7 +1465,7 @@ prepend_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	ParanoiaChecker _(buffer);
 
 	TRACE(("%ld: prepend_size(buffer %p, size %ld) [has %u]\n",
-		find_thread(NULL), buffer, size, node->used_header_space.free));
+		find_thread(NULL), buffer, size, node->HeaderSpace()));
 	//dump_buffer(buffer);
 
 	if (node->HeaderSpace() < size) {
@@ -1544,14 +1575,14 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 		buffer, size));
 	//dump_buffer(buffer);
 
-	if (node->tail_space < size) {
+	if (node->TailSpace() < size) {
 		// we need to append at least one new buffer
-		uint32 previousTailSpace = node->tail_space;
+		uint32 previousTailSpace = node->TailSpace();
 		uint32 headerSpace = DATA_NODE_SIZE;
 		uint32 sizeUsed = MAX_FREE_BUFFER_SIZE - headerSpace;
 
 		// allocate space left in the node
-		node->tail_space = 0;
+		node->SetTailSpace(0);
 		node->used += previousTailSpace;
 		buffer->size += previousTailSpace;
 		uint32 sizeAdded = previousTailSpace;
@@ -1574,7 +1605,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 
 			node = add_first_data_node(header);
 
-			node->tail_space -= sizeUsed;
+			node->SetTailSpace(node->TailSpace() - sizeUsed);
 			node->used = sizeUsed;
 			node->offset = buffer->size;
 
@@ -1601,7 +1632,7 @@ append_size(net_buffer *_buffer, size_t size, void **_contiguousBuffer)
 	}
 
 	// the data fits into this buffer
-	node->tail_space -= size;
+	node->SetTailSpace(node->TailSpace() - size);
 
 	if (_contiguousBuffer)
 		*_contiguousBuffer = node->start + node->used;
@@ -1746,7 +1777,7 @@ trim_data(net_buffer *_buffer, size_t newSize)
 	}
 
 	int32 diff = node->used + node->offset - newSize;
-	node->tail_space += diff;
+	node->SetTailSpace(node->TailSpace() + diff);
 	node->used -= diff;
 
 	if (node->used > 0)
@@ -1817,9 +1848,7 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 		clone->offset = buffer->size;
 		clone->start = node->start + offset;
 		clone->used = min_c(bytes, node->used - offset);
-		clone->used_header_space->size = 0;
-		clone->used_header_space->free = 0;
-		clone->tail_space = 0;
+		clone->flags |= DATA_NODE_READ_ONLY;
 
 		list_add_item(&buffer->buffers, clone);
 
