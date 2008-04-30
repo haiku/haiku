@@ -14,6 +14,8 @@
 #endif
 
 
+#if ENABLE_TRACING
+
 // macros specifying the tracing level for individual components (0 is disabled)
 
 #define BFS_TRACING								0
@@ -33,5 +35,7 @@
 #define TCP_TRACING								0
 #define TEAM_TRACING							0
 #define USER_MALLOC_TRACING						0
+
+#endif	// ENABLE_TRACING
 
 #endif	// KERNEL_TRACING_CONFIG_H
