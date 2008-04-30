@@ -26,6 +26,7 @@
 #include <syscalls.h>
 #include <syscall_restart.h>
 #include <thread.h>
+#include <tracing.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
 #include <vfs.h>
@@ -92,6 +93,146 @@ static const select_ops kSelectOps[] = {
 static const uint32 kSelectOpsCount = sizeof(kSelectOps) / sizeof(select_ops);
 
 
+
+#if WAIT_FOR_OBJECTS_TRACING
+
+
+namespace WaitForObjectsTracing {
+
+
+class SelectTraceEntry : public AbstractTraceEntry {
+	protected:
+		SelectTraceEntry(int count, fd_set* readSet, fd_set* writeSet,
+			fd_set* errorSet)
+			:
+			fReadSet(NULL),
+			fWriteSet(NULL),
+			fErrorSet(NULL),
+			fCount(count)
+		{
+			int sets = (readSet != NULL ? 1 : 0) + (writeSet != NULL ? 1 : 0)
+				+ (errorSet != NULL ? 1 : 0);
+			if (sets > 0 && count > 0) {
+				uint32 bytes = _howmany(count, NFDBITS) * sizeof(fd_mask);
+				uint8* allocated = (uint8*)alloc_tracing_buffer(bytes * sets);
+				if (allocated != NULL) {
+					if (readSet != NULL) {
+						fReadSet = (fd_set*)allocated;
+						memcpy(fReadSet, readSet, bytes);
+						allocated += bytes;
+					}
+					if (writeSet != NULL) {
+						fWriteSet = (fd_set*)allocated;
+						memcpy(fWriteSet, writeSet, bytes);
+						allocated += bytes;
+					}
+					if (errorSet != NULL) {
+						fErrorSet = (fd_set*)allocated;
+						memcpy(fErrorSet, errorSet, bytes);
+					}
+				}
+			}
+		}
+
+		void AddDump(TraceOutput& out, const char* name)
+		{
+			out.Print(name);
+
+			_PrintSet(out, "read", fReadSet);
+			_PrintSet(out, ", write", fWriteSet);
+			_PrintSet(out, ", error", fErrorSet);
+		}
+
+	private:
+		void _PrintSet(TraceOutput& out, const char* name, fd_set* set)
+		{
+
+			out.Print("%s: <", name);
+
+			if (set != NULL) {
+				bool first = true;
+				for (int i = 0; i < fCount; i++) {
+					if (!FD_ISSET(i, set))
+						continue;
+	
+					if (first) {
+						out.Print("%d", i);
+						first = false;
+					} else
+						out.Print(", %d", i);
+				}
+			}
+
+			out.Print(">");
+		}
+
+	protected:
+		fd_set*	fReadSet;
+		fd_set*	fWriteSet;
+		fd_set*	fErrorSet;
+		int		fCount;
+};
+
+
+class SelectBegin : public SelectTraceEntry {
+	public:
+		SelectBegin(int count, fd_set* readSet, fd_set* writeSet,
+			fd_set* errorSet, bigtime_t timeout)
+			:
+			SelectTraceEntry(count, readSet, writeSet, errorSet),
+			fTimeout(timeout)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			SelectTraceEntry::AddDump(out, "select begin: ");
+			out.Print(", timeout: %lld", fTimeout);
+		}
+
+	private:
+		bigtime_t	fTimeout;
+};
+
+
+class SelectDone : public SelectTraceEntry {
+	public:
+		SelectDone(int count, fd_set* readSet, fd_set* writeSet,
+			fd_set* errorSet, status_t status)
+			:
+			SelectTraceEntry(status == B_OK ? count : 0, readSet, writeSet,
+				errorSet),
+			fStatus(status)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			if (fStatus == B_OK)
+				SelectTraceEntry::AddDump(out, "select done:  ");
+			else
+				out.Print("select done:  error: 0x%lx", fStatus);
+		}
+
+	private:
+		status_t	fStatus;
+};
+
+
+}	// namespace WaitForObjectsTracing
+
+#	define T(x)	new(std::nothrow) WaitForObjectsTracing::x
+
+#else
+#	define T(x)
+#endif	// WAIT_FOR_OBJECTS_TRACING
+
+
+// #pragma mark -
+
+
 /*!
 	Clears all bits in the fd_set - since we are using variable sized
 	arrays in the kernel, we can't use the FD_ZERO() macro provided by
@@ -126,13 +267,6 @@ create_select_sync(int numFDs, select_sync*& _sync)
 	if (sync->sem < 0)
 		return sync->sem;
 
-	// create lock
-	status_t error = benaphore_init(&sync->lock, "select sync");
-	if (error != B_OK) {
-		delete_sem(sync->sem);
-		return error;
-	}
-
 	sync->count = numFDs;
 	sync->ref_count = 1;
 
@@ -156,7 +290,6 @@ put_select_sync(select_sync* sync)
 
 	if (atomic_add(&sync->ref_count, -1) == 1) {
 		delete_sem(sync->sem);
-		benaphore_destroy(&sync->lock);
 		delete[] sync->set;
 		delete sync;
 	}
@@ -190,9 +323,9 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	if (status != B_OK)
 		return status;
 
-	// start selecting file descriptors
+	T(SelectBegin(numFDs, readSet, writeSet, errorSet, timeout));
 
-	BenaphoreLocker locker(sync->lock);
+	// start selecting file descriptors
 
 	for (fd = 0; fd < numFDs; fd++) {
 		sync->set[fd].selected_events = 0;
@@ -211,8 +344,6 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 		}
 	}
 
-	locker.Unlock();
-
 	// set new signal mask
 	sigset_t oldSigMask;
 	if (sigMask != NULL)
@@ -230,8 +361,6 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// deselect file descriptors
 
-	locker.Lock();
-
 	for (fd = 0; fd < numFDs; fd++)
 		deselect_fd(fd, sync->set + fd, kernel);
 
@@ -244,8 +373,8 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	if (status == B_INTERRUPTED) {
 		// We must not clear the sets in this case, as applications may
 		// rely on the contents of them.
-		locker.Unlock();
 		put_select_sync(sync);
+		T(SelectDone(numFDs, readSet, writeSet, errorSet, status));
 		return B_INTERRUPTED;
 	}
 
@@ -277,8 +406,9 @@ common_select(int numFDs, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	// B_TIMED_OUT and B_WOULD_BLOCK are supposed to return 0
 
-	locker.Unlock();
 	put_select_sync(sync);
+
+	T(SelectDone(numFDs, readSet, writeSet, errorSet, status));
 
 	return count;
 }
@@ -298,8 +428,6 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 		return status;
 
 	// start polling file descriptors (by selecting them)
-
-	BenaphoreLocker locker(sync->lock);
 
 	for (i = 0; i < numFDs; i++) {
 		int fd = fds[i].fd;
@@ -322,14 +450,10 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 		goto err;
 	}
 
-	locker.Unlock();
-
 	status = acquire_sem_etc(sync->sem, 1,
 		B_CAN_INTERRUPT | (timeout >= 0 ? B_ABSOLUTE_TIMEOUT : 0), timeout);
 
 	// deselect file descriptors
-
-	locker.Lock();
 
 	for (i = 0; i < numFDs; i++)
 		deselect_fd(fds[i].fd, sync->set + i, kernel);
@@ -358,7 +482,6 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 	}
 
 err:
-	locker.Unlock();
 	put_select_sync(sync);
 
 	return count;
@@ -378,8 +501,6 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 		return status;
 
 	// start selecting objects
-
-	BenaphoreLocker locker(sync->lock);
 
 	ssize_t count = 0;
 	bool invalid = false;
@@ -404,8 +525,6 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 		}
 	}
 
-	locker.Unlock();
-
 	if (count < 1) {
 		put_select_sync(sync);
 		return B_BAD_VALUE;
@@ -417,8 +536,6 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 	}
 
 	// deselect objects
-
-	locker.Lock();
 
 	for (int i = 0; i < numInfos; i++) {
 		uint16 type = infos[i].type;
@@ -445,7 +562,6 @@ common_wait_for_objects(object_wait_info* infos, int numInfos, uint32 flags,
 			break;
 	}
 
-	locker.Unlock();
 	put_select_sync(sync);
 
 	return count;
@@ -466,7 +582,7 @@ notify_select_events(select_info* info, uint16 events)
 		|| info->sync->sem < B_OK)
 		return B_BAD_VALUE;
 
-	info->events |= events;
+	atomic_or(&info->events, events);
 
 	// only wake up the waiting select()/poll() call if the events
 	// match one of the selected ones
