@@ -35,6 +35,7 @@
 #define TCP_TRACING								0
 #define TEAM_TRACING							0
 #define USER_MALLOC_TRACING						0
+#define WAIT_FOR_OBJECTS_TRACING				0
 
 #endif	// ENABLE_TRACING
 
