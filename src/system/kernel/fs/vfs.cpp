@@ -4828,7 +4828,7 @@ file_select(struct file_descriptor *descriptor, uint8 event,
 	if (!HAS_FS_CALL(vnode, select))
 		return notify_select_event(sync, event);
 
-	return FS_CALL(vnode, select, descriptor->cookie, event, 0, sync);
+	return FS_CALL(vnode, select, descriptor->cookie, event, sync);
 }
 
 

@@ -156,8 +156,7 @@ class Inode {
 		int32		ReaderCount() const { return fReaderCount; }
 		int32		WriterCount() const { return fWriterCount; }
 
-		status_t	Select(uint8 event, uint32 ref, selectsync *sync,
-						int openMode);
+		status_t	Select(uint8 event, selectsync *sync, int openMode);
 		status_t	Deselect(uint8 event, selectsync *sync, int openMode);
 
 	private:
@@ -611,7 +610,7 @@ Inode::Close(int openMode)
 
 
 status_t
-Inode::Select(uint8 event, uint32 ref, selectsync *sync, int openMode)
+Inode::Select(uint8 event, selectsync *sync, int openMode)
 {
 	bool writer = true;
 	select_sync_pool** pool;
@@ -901,7 +900,7 @@ fifo_set_flags(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 
 static status_t
 fifo_select(fs_volume *_volume, fs_vnode *_node, void *_cookie,
-	uint8 event, uint32 ref, selectsync *sync)
+	uint8 event, selectsync *sync)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
 
@@ -911,7 +910,7 @@ fifo_select(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		return B_ERROR;
 
 	BenaphoreLocker locker(inode->RequestLock());
-	return inode->Select(event, ref, sync, cookie->open_mode);
+	return inode->Select(event, sync, cookie->open_mode);
 }
 
 

@@ -2304,7 +2304,7 @@ devfs_set_flags(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 
 static status_t
 devfs_select(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
-	uint8 event, uint32 ref, selectsync *sync)
+	uint8 event, selectsync *sync)
 {
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode->private_node;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
@@ -2316,7 +2316,7 @@ devfs_select(fs_volume *_volume, fs_vnode *_vnode, void *_cookie,
 	if (!vnode->stream.u.dev.info->select)
 		return notify_select_event((selectsync*)sync, event);
 
-	return vnode->stream.u.dev.info->select(cookie->device_cookie, event, ref,
+	return vnode->stream.u.dev.info->select(cookie->device_cookie, event, 0,
 		(selectsync*)sync);
 }
 
