@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Updated by Sikosis (beos@gravity24hr.com)
@@ -1777,8 +1777,11 @@ TOSMagnify::TOSMagnify(BRect r, TMagnify* parent, color_space space)
 		case B_RGB15_BIG:
 		case B_RGBA15_BIG:
 		case B_RGB16:
-        	case B_RGB16_BIG:
+		case B_RGB16_BIG:
 			fBytesPerPixel = 2;
+			break;
+		case B_RGB24:
+			fBytesPerPixel = 3;
 			break;
 		case B_RGB32:
 		case B_RGBA32:
@@ -1829,18 +1832,16 @@ TOSMagnify::InitObject()
 	fOldBits = (char*)malloc(fBitmap->BitsLength());
 
 	if (!fPixel) {
-		#if B_HOST_IS_BENDIAN
-		#define native B_RGBA32_BIG
-		#else
-		#define native B_RGBA32_LITTLE
-		#endif
-		fPixel = new BBitmap(BRect(0,0,0,0), native, true);
-		#undef native
-		fPixelView = new BView(BRect(0,0,0,0),NULL,0,0);
+#if B_HOST_IS_BENDIAN
+		fPixel = new BBitmap(BRect(0,0,0,0), B_RGBA32_BIG, true);
+#else
+		fPixel = new BBitmap(BRect(0,0,0,0), B_RGBA32, true);
+#endif
+		fPixelView = new BView(BRect(0,0,0,0), NULL, 0, 0);
 		fPixel->Lock();
 		fPixel->AddChild(fPixelView);
 		fPixel->Unlock();
-	};
+	}
 }
 
 
