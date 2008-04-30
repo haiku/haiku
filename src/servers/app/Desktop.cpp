@@ -173,25 +173,6 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 				return B_SKIP_MESSAGE;
 			}
 		}
-
-		// TODO: this should be moved client side!
-		// (that's how it is done in BeOS, clients could need this key for
-		// different purposes - also, it's preferrable to let the client
-		// write the dump within his own environment)
-		if (key == 0xe) {
-			// screen dump, PrintScreen
-			char filename[128];
-			BEntry entry;
-
-			int32 index = 1;
-			do {
-				sprintf(filename, "/boot/home/screen%ld.png", index++);
-				entry.SetTo(filename);
-			} while(entry.Exists());
-
-			fDesktop->GetDrawingEngine()->DumpToFile(filename);
-			return B_SKIP_MESSAGE;
-		}
 	}
 
 	if (message->what == B_KEY_DOWN

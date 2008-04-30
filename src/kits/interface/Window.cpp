@@ -17,6 +17,7 @@
 
 #include <Application.h>
 #include <Autolock.h>
+#include <Bitmap.h>
 #include <Button.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -40,6 +41,8 @@
 #include <TokenSpace.h>
 #include <tracker_private.h>
 #include <WindowPrivate.h>
+
+#include "PNGDump.h"
 
 
 //#define DEBUG_WIN
@@ -3238,6 +3241,39 @@ BWindow::_HandleKeyDown(BMessage* event)
 
 		PostMessage(&message);
 		return true;
+	}
+
+	if (key == B_FUNCTION_KEY) {
+		// Check for Print Screen
+		int32 rawKey;
+		if (event->FindInt32("key", &rawKey) == B_OK && rawKey == B_PRINT_KEY) {
+			// Get filename
+			char filename[128];
+			BEntry entry;
+
+			int32 index = 1;
+			do {
+				// TODO: Use find_directory(B_USER_DIRECTORY, ...)
+				sprintf(filename, "/boot/home/screen%ld.png", index++);
+				entry.SetTo(filename);
+			} while(entry.Exists());
+
+			// Get the screen bitmap
+			BScreen screen(this);
+			BBitmap* screenDump;
+			screen.GetBitmap(&screenDump, false);
+
+			// Dump to PNG
+			SaveToPNG(filename, screen.Frame(), screenDump->ColorSpace(),
+				screenDump->Bits(),
+				screenDump->BitsLength(),
+				screenDump->BytesPerRow());
+
+			// Free the bitmap allocated by BScreen.GetBitmap
+			delete screenDump;
+
+			return true;
+		}
 	}
 	
 	// Handle shortcuts

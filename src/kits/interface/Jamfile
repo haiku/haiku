@@ -26,7 +26,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UsePrivateHeaders app input interface shared tracker ;
-UseLibraryHeaders icon ;
+UseLibraryHeaders icon png zlib ;
 
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) textview_support ] ;
@@ -78,6 +78,7 @@ MergeObject <libbe>interface_kit.o :
 	PictureButton.cpp
 	PictureDataWriter.cpp
 	PicturePlayer.cpp
+	PNGDump.cpp
 	Point.cpp
 	Polygon.cpp
 	PopUpMenu.cpp

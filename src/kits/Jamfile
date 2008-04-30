@@ -35,6 +35,7 @@ SharedLibrary libbe.so :
 	libagg.a
 
 	libroot.so	# make sure it links against our libroot.so
+	libpng.so libz.so # For dumping the screen to PNG in the Interface Kit
 	$(TARGET_LIBSTDC++)
 ;
 
