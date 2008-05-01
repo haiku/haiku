@@ -28,6 +28,7 @@
 #include <kmodule.h>
 #include <kscheduler.h>
 #include <ksyscalls.h>
+#include <lock.h>
 #include <messaging.h>
 #include <Notifications.h>
 #include <port.h>
@@ -117,6 +118,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 		// now we can use the heap and create areas
 		arch_platform_init_post_vm(&sKernelArgs);
+		lock_debug_init();
 		TRACE("init driver_settings\n");
 		boot_item_init();
 		driver_settings_init(&sKernelArgs);

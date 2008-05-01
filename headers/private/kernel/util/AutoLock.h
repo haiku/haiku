@@ -67,6 +67,24 @@ public:
 // BenaphoreLocker
 typedef AutoLocker<benaphore, BenaphoreLocking> BenaphoreLocker;
 
+// CutexLocking
+class CutexLocking {
+public:
+	inline bool Lock(cutex *lockable)
+	{
+		cutex_lock(lockable);
+		return true;
+	}
+
+	inline void Unlock(cutex *lockable)
+	{
+		cutex_unlock(lockable);
+	}
+};
+
+// CutexLocker
+typedef AutoLocker<cutex, CutexLocking> CutexLocker;
+
 // InterruptsLocking
 class InterruptsLocking {
 public:
@@ -153,6 +171,7 @@ using BPrivate::AutoLocker;
 using BPrivate::MutexLocker;
 using BPrivate::RecursiveLocker;
 using BPrivate::BenaphoreLocker;
+using BPrivate::CutexLocker;
 using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
 using BPrivate::InterruptsSpinLocker;

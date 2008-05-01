@@ -667,17 +667,6 @@ get_thread_wait_sem(struct thread* thread)
 }
 
 
-static ConditionVariable*
-get_thread_wait_cvar(struct thread* thread)
-{
-	if (thread->state == B_THREAD_WAITING
-		&& thread->wait.type == THREAD_BLOCK_TYPE_CONDITION_VARIABLE) {
-		return (ConditionVariable*)thread->wait.object;
-	}
-	return NULL;
-}
-
-
 /*!
 	Fills the thread_info structure with information from the specified
 	thread.
@@ -1091,10 +1080,6 @@ state_to_text(struct thread *thread, int32 state)
 						return "receive";
 					break;
 				}
-	
-				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
-				default:
-					break;
 			}
 
 			return "waiting";
@@ -1133,8 +1118,47 @@ _dump_thread_info(struct thread *thread)
 	kprintf("sig_pending:        %#lx (blocked: %#lx)\n", thread->sig_pending,
 		thread->sig_block_mask);
 	kprintf("in_kernel:          %d\n", thread->in_kernel);
-	kprintf("sem blocking:       %ld\n", get_thread_wait_sem(thread));
-	kprintf("condition variable: %p\n", get_thread_wait_cvar(thread));
+
+	kprintf("waiting for:        ");
+
+	if (thread->state == B_THREAD_WAITING) {
+		switch (thread->wait.type) {
+			case THREAD_BLOCK_TYPE_SEMAPHORE:
+			{
+				sem_id sem = (sem_id)(addr_t)thread->wait.object;
+				if (sem == thread->msg.read_sem)
+					kprintf("data\n");
+				else
+					kprintf("semaphore %ld\n", sem);
+				break;
+			}
+
+			case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+				kprintf("condition variable %p\n", thread->wait.object);
+				break;
+
+			case THREAD_BLOCK_TYPE_SNOOZE:
+				kprintf("snooze()\n");
+				break;
+
+			case THREAD_BLOCK_TYPE_SIGNAL:
+				kprintf("signal\n");
+				break;
+
+			case THREAD_BLOCK_TYPE_CUTEX:
+				kprintf("cutex %p\n", thread->wait.object);
+				break;
+
+			case THREAD_BLOCK_TYPE_OTHER:
+				kprintf("other (%s)\n", (char*)thread->wait.object);
+				break;
+
+			default:
+				kprintf("unknown (%p)\n", thread->wait.object);
+				break;
+		}
+	}
+
 	kprintf("fault_handler:      %p\n", (void *)thread->fault_handler);
 	kprintf("args:               %p %p\n", thread->args1, thread->args2);
 	kprintf("entry:              %p\n", (void *)thread->entry);
@@ -1254,8 +1278,8 @@ dump_thread_list(int argc, char **argv)
 			kprintf("ignoring invalid team argument.\n");
 	}
 
-	kprintf("thread         id  state        sem/cv cpu pri  stack      team  "
-		"name\n");
+	kprintf("thread         id  state     wait for  object  cpu pri  stack    "
+		"  team  name\n");
 
 	hash_open(sThreadHash, &i);
 	while ((thread = (struct thread*)hash_next(sThreadHash, &i)) != NULL) {
@@ -1268,17 +1292,48 @@ dump_thread_list(int argc, char **argv)
 			|| (realTimeOnly && thread->priority < B_REAL_TIME_DISPLAY_PRIORITY))
 			continue;
 
-		kprintf("%p %6ld  %-9s", thread, thread->id, state_to_text(thread,
+		kprintf("%p %6ld  %-10s", thread, thread->id, state_to_text(thread,
 			thread->state));
 
 		// does it block on a semaphore or a condition variable?
 		if (thread->state == B_THREAD_WAITING) {
-			if (get_thread_wait_cvar(thread))
-				kprintf("%p  ", get_thread_wait_cvar(thread));
-			else
-				kprintf("%10ld  ", get_thread_wait_sem(thread));
+			switch (thread->wait.type) {
+				case THREAD_BLOCK_TYPE_SEMAPHORE:
+				{
+					sem_id sem = (sem_id)(addr_t)thread->wait.object;
+					if (sem == thread->msg.read_sem)
+						kprintf("                   ");
+					else
+						kprintf("sem %12ld   ", sem);
+					break;
+				}
+
+				case THREAD_BLOCK_TYPE_CONDITION_VARIABLE:
+					kprintf("cvar  %p   ", thread->wait.object);
+					break;
+
+				case THREAD_BLOCK_TYPE_SNOOZE:
+					kprintf("                   ");
+					break;
+
+				case THREAD_BLOCK_TYPE_SIGNAL:
+					kprintf("signal             ");
+					break;
+
+				case THREAD_BLOCK_TYPE_CUTEX:
+					kprintf("cutex %p   ", thread->wait.object);
+					break;
+
+				case THREAD_BLOCK_TYPE_OTHER:
+					kprintf("other              ");
+					break;
+
+				default:
+					kprintf("???   %p   ", thread->wait.object);
+					break;
+			}
 		} else
-			kprintf("      -     ");
+			kprintf("       -           ");
 
 		// on which CPU does it run?
 		if (thread->cpu)

@@ -27,7 +27,7 @@ KernelMergeObject kernel_core.o :
 	int.c
 	kernel_daemon.c
 	linkhack.c
-	lock.c
+	lock.cpp
 	main.c
 	module.cpp
 	Notifications.cpp

@@ -39,13 +39,29 @@ typedef struct rw_lock {
 
 #define RW_MAX_READERS 1000000
 
+struct cutex_waiter;
+
+typedef struct cutex {
+	const char*				name;
+	struct cutex_waiter*	waiters;
+#ifdef KDEBUG
+	thread_id				holder;
+#else
+	int32					count;
+#endif
+	int32					release_count;
+} cutex;
+
+
 #if 0 && KDEBUG // XXX disable this for now, it causes problems when including thread.h here
 #	include <thread.h>
 #define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
 #define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
+#define ASSERT_LOCKED_CUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
 #else
 #define ASSERT_LOCKED_RECURSIVE(r)
 #define ASSERT_LOCKED_MUTEX(m)
+#define ASSERT_LOCKED_CUTEX(m)
 #endif
 
 
@@ -102,6 +118,54 @@ extern status_t rw_lock_read_lock(rw_lock *lock);
 extern status_t rw_lock_read_unlock(rw_lock *lock);
 extern status_t rw_lock_write_lock(rw_lock *lock);
 extern status_t rw_lock_write_unlock(rw_lock *lock);
+
+extern void cutex_init(cutex* lock, const char *name);
+	// name is *not* cloned nor freed in cutex_destroy()
+extern void cutex_destroy(cutex* lock);
+
+// implementation private:
+extern void _cutex_lock(cutex* lock);
+extern void _cutex_unlock(cutex* lock);
+extern status_t _cutex_trylock(cutex* lock);
+
+
+static inline void
+cutex_lock(cutex* lock)
+{
+#ifdef KDEBUG
+	_cutex_lock(lock);
+#else
+	if (atomic_add(&lock->count, -1) < 0)
+		_cutex_lock(lock);
+#endif
+}
+
+
+static inline status_t
+cutex_trylock(cutex* lock)
+{
+#ifdef KDEBUG
+	return _cutex_trylock(lock);
+#else
+	if (atomic_test_and_set(&lock->count, -1, 0) != 0)
+		return B_WOULD_BLOCK;
+#endif
+}
+
+
+static inline void
+cutex_unlock(cutex* lock)
+{
+#ifdef KDEBUG
+	_cutex_unlock(lock);
+#else
+	if (atomic_add(&lock->count, 1) < -1)
+		_cutex_unlock(lock);
+#endif
+}
+
+
+extern void lock_debug_init();
 
 #ifdef __cplusplus
 }
