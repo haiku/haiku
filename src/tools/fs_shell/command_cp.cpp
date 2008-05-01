@@ -45,6 +45,7 @@ struct Options {
 		  attributesOnly(false),
 		  ignoreAttributes(false),
 		  dereference(true),
+		  alwaysDereference(false),
 		  force(false),
 		  recursive(false)
 	{
@@ -54,6 +55,7 @@ struct Options {
 	bool		attributesOnly;
 	bool		ignoreAttributes;
 	bool		dereference;
+	bool		alwaysDereference;
 	bool		force;
 	bool		recursive;
 };
@@ -966,7 +968,7 @@ copy_dir_contents(FSDomain *sourceDomain, const char *source,
 		PathDeleter targetDeleter(targetEntry);
 
 		fssh_status_t error = copy_entry(sourceDomain, sourceEntry,
-			targetDomain, targetEntry, options, false);
+			targetDomain, targetEntry, options, options.alwaysDereference);
 		if (error != FSSH_B_OK)
 			return error;
 	}
@@ -1259,6 +1261,10 @@ command_cp(int argc, const char* const* argv)
 							break;
 						case 'f':
 							options.force = true;
+							break;
+						case 'L':
+							options.dereference = true;
+							options.alwaysDereference = true;
 							break;
 						case 'r':
 							options.recursive = true;
