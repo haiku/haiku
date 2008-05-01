@@ -657,7 +657,8 @@ driver_settings_init(kernel_args *args)
 status_t
 driver_settings_init_post_sem(kernel_args *args)
 {
-	return mutex_init(&sLock, "driver settings");
+	mutex_init(&sLock, "driver settings");
+	return B_OK;
 }
 #endif
 

@@ -211,10 +211,7 @@ status_t
 generic_syscall_init(void)
 {
 	list_init(&sGenericSyscalls);
-	if (mutex_init(&sGenericSyscallLock, "generic syscall") != B_OK) {
-		panic("generic_syscall_init(): mutex init failed");
-		return B_ERROR;
-	}
+	mutex_init(&sGenericSyscallLock, "generic syscall");
 
 #if	SYSCALL_TRACING
 	add_debugger_command_etc("straced", &dump_syscall_tracing,

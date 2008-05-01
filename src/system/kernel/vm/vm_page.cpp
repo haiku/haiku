@@ -1043,7 +1043,7 @@ page_writer(void* /*unused*/)
 
 		for (uint32 i = 0; i < numPages; i++) {
 			vm_cache *cache = u.pages[i]->cache;
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 
 			if (writeStatus[i] == B_OK) {
 				// put it into the active queue
@@ -1069,7 +1069,7 @@ page_writer(void* /*unused*/)
 			busyConditions[i].Unpublish();
 
 			u.caches[i] = cache;
-			cutex_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 		}
 
 		for (uint32 i = 0; i < numPages; i++) {
@@ -1156,7 +1156,7 @@ steal_page(vm_page *page, bool stealActive)
 		{
 			fCache = vm_cache_acquire_page_cache_ref(page);
 			if (fCache != NULL) {
-				if (cutex_trylock(&fCache->lock) != B_OK)
+				if (mutex_trylock(&fCache->lock) != B_OK)
 					return;
 
 				fOwnsLock = true;
@@ -1169,7 +1169,7 @@ steal_page(vm_page *page, bool stealActive)
 		~PageCacheTryLocker()
 		{
 			if (fOwnsLock)
-				cutex_unlock(&fCache->lock);
+				mutex_unlock(&fCache->lock);
 			if (fCache != NULL)
 				vm_cache_release_ref(fCache);
 		}
@@ -1345,9 +1345,9 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 		// clear the modified flag
 		vm_clear_map_flags(page, PAGE_MODIFIED);
 
-		cutex_unlock(&cache->lock);
+		mutex_unlock(&cache->lock);
 		status_t status = write_page(page, fsReenter);
-		cutex_lock(&cache->lock);
+		mutex_lock(&cache->lock);
 
 		InterruptsSpinLocker locker(&sPageLock);
 

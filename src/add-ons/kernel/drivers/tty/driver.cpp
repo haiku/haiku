@@ -51,25 +51,16 @@ init_driver(void)
 
 	memset(gDeviceNames, 0, sizeof(gDeviceNames));
 
-	// create the global mutex
-	status_t error = mutex_init(&gGlobalTTYLock, "tty global");
+	// create the request mutex
+	status_t error = recursive_lock_init(&gTTYRequestLock, "tty requests");
 	if (error != B_OK)
 		return error;
 
-	// create the cookie mutex
-	error = mutex_init(&gTTYCookieLock, "tty cookies");
-	if (error != B_OK) {
-		mutex_destroy(&gGlobalTTYLock);
-		return error;
-	}
+	// create the global mutex
+	mutex_init(&gGlobalTTYLock, "tty global");
 
-	// create the request mutex
-	error = recursive_lock_init(&gTTYRequestLock, "tty requests");
-	if (error != B_OK) {
-		mutex_destroy(&gTTYCookieLock);
-		mutex_destroy(&gGlobalTTYLock);
-		return error;
-	}
+	// create the cookie mutex
+	mutex_init(&gTTYCookieLock, "tty cookies");
 
 	// create driver name array and initialize basic TTY structures
 

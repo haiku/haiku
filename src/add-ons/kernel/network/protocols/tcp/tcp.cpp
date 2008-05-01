@@ -721,13 +721,10 @@ tcp_error_reply(net_protocol* protocol, net_buffer* causedError, uint32 code,
 static status_t
 tcp_init()
 {
-	status_t status = mutex_init(&sEndpointManagersLock,
-		"endpoint managers lock");
+	mutex_init(&sEndpointManagersLock, "endpoint managers lock");
 
-	if (status < B_OK)
-		return status;
-
-	status = gStackModule->register_domain_protocols(AF_INET, SOCK_STREAM, 0,
+	status_t status = gStackModule->register_domain_protocols(AF_INET,
+		SOCK_STREAM, 0,
 		"network/protocols/tcp/v1",
 		"network/protocols/ipv4/v1",
 		NULL);

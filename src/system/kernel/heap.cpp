@@ -469,8 +469,8 @@ heap_validate_heap(heap_allocator *heap)
 // #pragma mark - Heap functions
 
 
-heap_allocator *
-heap_attach(addr_t base, size_t size, bool postSem)
+static heap_allocator *
+heap_attach(addr_t base, size_t size)
 {
 	heap_allocator *heap = (heap_allocator *)base;
 	base += sizeof(heap_allocator);
@@ -517,16 +517,7 @@ heap_attach(addr_t base, size_t size, bool postSem)
 	heap->free_pages = &heap->page_table[0];
 	heap->page_table[0].prev = NULL;
 
-	if (postSem) {
-		if (mutex_init(&heap->lock, "heap_mutex") < 0) {
-			panic("heap_attach(): error creating heap mutex\n");
-			return NULL;
-		}
-	} else {
-		// pre-init the mutex to at least fall through any semaphore calls
-		heap->lock.sem = -1;
-		heap->lock.holder = -1;
-	}
+	mutex_init(&heap->lock, "heap_mutex");
 
 	heap->next = NULL;
 	dprintf("heap_attach: attached to %p - usable range 0x%08lx - 0x%08lx\n",
@@ -1014,7 +1005,7 @@ heap_grow_thread(void *)
 		}
 
 		heap_allocator *newHeap = heap_attach((addr_t)heapAddress,
-			HEAP_GROW_SIZE, true);
+			HEAP_GROW_SIZE);
 		if (newHeap == NULL) {
 			panic("heap_grower: could not attach additional heap!\n");
 			delete_area(heapArea);
@@ -1038,7 +1029,7 @@ heap_grow_thread(void *)
 status_t
 heap_init(addr_t base, size_t size)
 {
-	sHeapList = heap_attach(base, size, false);
+	sHeapList = heap_attach(base, size);
 
 	// set up some debug commands
 	add_debugger_command_etc("heap", &dump_heap_list,
@@ -1063,12 +1054,6 @@ heap_init(addr_t base, size_t size)
 status_t
 heap_init_post_sem()
 {
-	// create the lock for the initial heap
-	if (mutex_init(&sHeapList->lock, "heap_mutex") < B_OK) {
-		panic("heap_init_post_sem(): error creating heap mutex\n");
-		return B_ERROR;
-	}
-
 	sHeapGrowSem = create_sem(0, "heap_grow_sem");
 	if (sHeapGrowSem < 0) {
 		panic("heap_init_post_sem(): failed to create heap grow sem\n");
@@ -1097,7 +1082,7 @@ heap_init_post_thread()
 		return area;
 	}
 
-	sGrowHeap = heap_attach((addr_t)dedicated, HEAP_DEDICATED_GROW_SIZE, true);
+	sGrowHeap = heap_attach((addr_t)dedicated, HEAP_DEDICATED_GROW_SIZE);
 	if (sGrowHeap == NULL) {
 		panic("heap_init_post_thread(): failed to attach dedicated grow heap\n");
 		delete_area(area);

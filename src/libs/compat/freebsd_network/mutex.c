@@ -20,8 +20,7 @@ void
 mtx_init(struct mtx *m, const char *name, const char *type, int opts)
 {
 	if (opts == MTX_DEF) {
-		if (mutex_init(&m->u.mutex, name) < B_OK)
-			panic("Panic! Dance like it's 1979, we ran out of semaphores");
+		mutex_init_etc(&m->u.mutex, name, MUTEX_FLAG_CLONE_NAME);
 	} else if (opts == MTX_RECURSE) {
 		if (recursive_lock_init(&m->u.recursive, name) < B_OK)
 			panic("Hell just froze as someone was trying to init a recursive mutex.");

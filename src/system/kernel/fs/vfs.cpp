@@ -1514,12 +1514,12 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 
 	while (true) {
 		struct io_context *context = NULL;
-		sem_id contextMutex = -1;
+		bool contextLocked = false;
 		struct team *team = NULL;
 		team_id lastTeamID;
 
 		cpu_status state = disable_interrupts();
-		GRAB_TEAM_LOCK();
+		SpinLocker teamsLock(team_spinlock);
 
 		lastTeamID = peek_next_thread_id();
 		if (nextTeamID < lastTeamID) {
@@ -1531,12 +1531,20 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 
 			if (team) {
 				context = (io_context *)team->io_context;
-				contextMutex = context->io_mutex.sem;
+
+				// Some acrobatics to lock the context in a safe way
+				// (cf. _kern_get_next_fd_info() for details).
+				GRAB_THREAD_LOCK();
+				teamsLock.Unlock();
+				contextLocked = mutex_lock_threads_locked(&context->io_mutex)
+					== B_OK;
+				RELEASE_THREAD_LOCK();
+
 				nextTeamID++;
 			}
 		}
 
-		RELEASE_TEAM_LOCK();
+		teamsLock.Unlock();
 		restore_interrupts(state);
 
 		if (context == NULL)
@@ -1546,15 +1554,13 @@ disconnect_mount_or_vnode_fds(struct fs_mount *mount,
 		// safe access to the team structure, we now need to lock the mutex
 		// manually
 
-		if (acquire_sem(contextMutex) != B_OK) {
+		if (!contextLocked) {
 			// team seems to be gone, go over to the next team
 			continue;
 		}
 
 		// the team cannot be deleted completely while we're owning its
 		// io_context mutex, so we can safely play with it now
-
-		context->io_mutex.holder = thread_get_current_thread_id();
 
 		replace_vnode_if_disconnected(mount, vnodeToDisconnect, context->root,
 			sRoot, true);
@@ -4141,11 +4147,7 @@ vfs_new_io_context(void *_parentContext)
 		+ sizeof(struct select_sync*) * tableSize
 		+ (tableSize + 7) / 8);
 
-	if (mutex_init(&context->io_mutex, "I/O context") < 0) {
-		free(context->fds);
-		free(context);
-		return NULL;
-	}
+	mutex_init(&context->io_mutex, "I/O context");
 
 	// Copy all parent file descriptors
 
@@ -4403,20 +4405,14 @@ vfs_init(kernel_args *args)
 
 	sRoot = NULL;
 
-	if (mutex_init(&sFileSystemsMutex, "vfs_lock") < 0)
-		panic("vfs_init: error allocating file systems lock\n");
+	mutex_init(&sFileSystemsMutex, "vfs_lock");
 
 	if (recursive_lock_init(&sMountOpLock, "vfs_mount_op_lock") < 0)
 		panic("vfs_init: error allocating mount op lock\n");
 
-	if (mutex_init(&sMountMutex, "vfs_mount_lock") < 0)
-		panic("vfs_init: error allocating mount lock\n");
-
-	if (mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock") < 0)
-		panic("vfs_init: error allocating vnode::covered_by lock\n");
-
-	if (mutex_init(&sVnodeMutex, "vfs_vnode_lock") < 0)
-		panic("vfs_init: error allocating vnode lock\n");
+	mutex_init(&sMountMutex, "vfs_mount_lock");
+	mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock");
+	mutex_init(&sVnodeMutex, "vfs_vnode_lock");
 
 	if (benaphore_init(&sIOContextRootLock, "io_context::root lock") < 0)
 		panic("vfs_init: error allocating io_context::root lock\n");
@@ -7000,34 +6996,37 @@ _kern_get_next_fd_info(team_id teamID, uint32 *_cookie, fd_info *info,
 		return B_BAD_VALUE;
 
 	struct io_context *context = NULL;
-	sem_id contextMutex = -1;
 	struct team *team = NULL;
 
 	cpu_status state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
+	bool contextLocked = false;
 	team = team_get_team_struct_locked(teamID);
 	if (team) {
+		// We cannot lock the IO context while holding the team lock, nor can
+		// we just drop the team lock, since it might be deleted in the
+		// meantime. team_remove_team() acquires the thread lock when removing
+		// the team from the team hash table, though. Hence we switch to the
+		// thread lock and use mutex_lock_threads_locked().
 		context = (io_context *)team->io_context;
-		contextMutex = context->io_mutex.sem;
-	}
 
-	RELEASE_TEAM_LOCK();
+		GRAB_THREAD_LOCK();
+		RELEASE_TEAM_LOCK();
+		contextLocked = mutex_lock_threads_locked(&context->io_mutex) == B_OK;
+		RELEASE_THREAD_LOCK();
+	} else
+		RELEASE_TEAM_LOCK();
+
 	restore_interrupts(state);
 
-	// we now have a context - since we couldn't lock it while having
-	// safe access to the team structure, we now need to lock the mutex
-	// manually
-
-	if (context == NULL || acquire_sem(contextMutex) != B_OK) {
+	if (!contextLocked) {
 		// team doesn't exit or seems to be gone
 		return B_BAD_TEAM_ID;
 	}
 
 	// the team cannot be deleted completely while we're owning its
 	// io_context mutex, so we can safely play with it now
-
-	context->io_mutex.holder = thread_get_current_thread_id();
 
 	uint32 slot = *_cookie;
 

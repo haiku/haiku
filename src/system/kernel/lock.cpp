@@ -23,14 +23,14 @@
 #include <util/AutoLock.h>
 
 
-struct cutex_waiter {
+struct mutex_waiter {
 	struct thread*	thread;
-	cutex_waiter*	next;		// next in queue
-	cutex_waiter*	last;		// last in queue (valid for the first in queue)
+	mutex_waiter*	next;		// next in queue
+	mutex_waiter*	last;		// last in queue (valid for the first in queue)
 };
 
-#define CUTEX_FLAG_OWNS_NAME	CUTEX_FLAG_CLONE_NAME
-#define CUTEX_FLAG_RELEASED		0x2
+#define MUTEX_FLAG_OWNS_NAME	MUTEX_FLAG_CLONE_NAME
+#define MUTEX_FLAG_RELEASED		0x2
 
 
 int32
@@ -104,106 +104,6 @@ recursive_lock_unlock(recursive_lock *lock)
 		lock->holder = -1;
 		release_sem_etc(lock->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
 	}
-}
-
-
-//	#pragma mark -
-
-
-status_t
-mutex_init(mutex *m, const char *name)
-{
-	if (m == NULL)
-		return EINVAL;
-
-	if (name == NULL)
-		name = "mutex_sem";
-
-	m->holder = -1;
-
-	m->sem = create_sem(1, name);
-	if (m->sem >= B_OK)
-		return B_OK;
-
-	return m->sem;
-}
-
-
-void
-mutex_destroy(mutex *mutex)
-{
-	if (mutex == NULL)
-		return;
-
-	if (mutex->sem >= 0) {
-		delete_sem(mutex->sem);
-		mutex->sem = -1;
-	}
-	mutex->holder = -1;
-}
-
-
-status_t
-mutex_trylock(mutex *mutex)
-{
-	thread_id me = thread_get_current_thread_id();
-	status_t status;
-
-	if (kernel_startup)
-		return B_OK;
-
-	status = acquire_sem_etc(mutex->sem, 1, B_RELATIVE_TIMEOUT, 0);
-	if (status < B_OK)
-		return status;
-
-	if (me == mutex->holder) {
-		panic("mutex_trylock failure: mutex %p (sem = 0x%lx) acquired twice by"
-			" thread 0x%lx\n", mutex, mutex->sem, me);
-	}
-
-	mutex->holder = me;
-	return B_OK;
-}
-
-
-status_t
-mutex_lock(mutex *mutex)
-{
-	thread_id me = thread_get_current_thread_id();
-	status_t status;
-
-	if (kernel_startup)
-		return B_OK;
-
-	status = acquire_sem(mutex->sem);
-	if (status < B_OK)
-		return status;
-
-	if (me == mutex->holder) {
-		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by"
-			" thread 0x%lx\n", mutex, mutex->sem, me);
-	}
-
-	mutex->holder = me;
-	return B_OK;
-}
-
-
-void
-mutex_unlock(mutex *mutex)
-{
-	thread_id me = thread_get_current_thread_id();
-
-	if (kernel_startup)
-		return;
-
-	if (me != mutex->holder) {
-		panic("mutex_unlock failure: thread 0x%lx is trying to release mutex %p"
-			" (current holder 0x%lx)\n", me, mutex, mutex->holder);
-	}
-
-	mutex->holder = -1;
-	release_sem_etc(mutex->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
 }
 
 
@@ -299,7 +199,7 @@ rw_lock_write_unlock(rw_lock *lock)
 
 
 void
-cutex_init(cutex* lock, const char *name)
+mutex_init(mutex* lock, const char *name)
 {
 	lock->name = name;
 	lock->waiters = NULL;
@@ -313,23 +213,23 @@ cutex_init(cutex* lock, const char *name)
 
 
 void
-cutex_init_etc(cutex* lock, const char *name, uint32 flags)
+mutex_init_etc(mutex* lock, const char *name, uint32 flags)
 {
-	lock->name = (flags & CUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
+	lock->name = (flags & MUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
 	lock->waiters = NULL;
 #ifdef KDEBUG
 	lock->holder = -1;
 #else
 	lock->count = 0;
 #endif
-	lock->flags = flags & CUTEX_FLAG_CLONE_NAME;
+	lock->flags = flags & MUTEX_FLAG_CLONE_NAME;
 }
 
 
 void
-cutex_destroy(cutex* lock)
+mutex_destroy(mutex* lock)
 {
-	char* name = (lock->flags & CUTEX_FLAG_CLONE_NAME) != 0
+	char* name = (lock->flags & MUTEX_FLAG_CLONE_NAME) != 0
 		? (char*)lock->name : NULL;
 
 	// unblock all waiters
@@ -338,16 +238,14 @@ cutex_destroy(cutex* lock)
 #ifdef KDEBUG
 	if (lock->waiters != NULL && thread_get_current_thread_id()
 		!= lock->holder) {
-		panic("cutex_destroy(): there are blocking threads, but caller doesn't "
+		panic("mutex_destroy(): there are blocking threads, but caller doesn't "
 			"hold the lock (%p)", lock);
-		locker.Unlock();
-		if (_cutex_lock(lock) != B_OK)
+		if (_mutex_lock(lock, true) != B_OK)
 			return;
-		locker.Lock();
 	}
 #endif
 
-	while (cutex_waiter* waiter = lock->waiters) {
+	while (mutex_waiter* waiter = lock->waiters) {
 		// dequeue
 		lock->waiters = waiter->next;
 
@@ -364,16 +262,17 @@ cutex_destroy(cutex* lock)
 
 
 status_t
-_cutex_lock(cutex* lock)
+_mutex_lock(mutex* lock, bool threadsLocked)
 {
 #ifdef KDEBUG
-	if (!kernel_startup && !are_interrupts_enabled()) {
-		panic("_cutex_unlock(): called with interrupts disabled for lock %p",
+	if (!kernel_startup && !threadsLocked && !are_interrupts_enabled()) {
+		panic("_mutex_unlock(): called with interrupts disabled for lock %p",
 			lock);
 	}
 #endif
 
-	InterruptsSpinLocker _(thread_spinlock);
+	// lock only, if !threadsLocked
+	InterruptsSpinLocker locker(thread_spinlock, false, !threadsLocked);
 
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
@@ -383,14 +282,14 @@ _cutex_lock(cutex* lock)
 		return B_OK;
 	}
 #else
-	if ((lock->flags & CUTEX_FLAG_RELEASED) != 0) {
-		lock->flags &= ~CUTEX_FLAG_RELEASED;
+	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
+		lock->flags &= ~MUTEX_FLAG_RELEASED;
 		return B_OK;
 	}
 #endif
 
 	// enqueue in waiter list
-	cutex_waiter waiter;
+	mutex_waiter waiter;
 	waiter.thread = thread_get_current_thread();
 	waiter.next = NULL;
 
@@ -402,7 +301,7 @@ _cutex_lock(cutex* lock)
 	lock->waiters->last = &waiter;
 
 	// block
-	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_CUTEX, lock);
+	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
 	status_t error = thread_block_locked(waiter.thread);
 
 #ifdef KDEBUG
@@ -415,20 +314,20 @@ _cutex_lock(cutex* lock)
 
 
 void
-_cutex_unlock(cutex* lock)
+_mutex_unlock(mutex* lock)
 {
 	InterruptsSpinLocker _(thread_spinlock);
 
 #ifdef KDEBUG
 	if (thread_get_current_thread_id() != lock->holder) {
-		panic("_cutex_unlock() failure: thread %ld is trying to release "
-			"cutex %p (current holder %ld)\n", thread_get_current_thread_id(),
+		panic("_mutex_unlock() failure: thread %ld is trying to release "
+			"mutex %p (current holder %ld)\n", thread_get_current_thread_id(),
 			lock, lock->holder);
 		return;
 	}
 #endif
 
-	cutex_waiter* waiter = lock->waiters;
+	mutex_waiter* waiter = lock->waiters;
 	if (waiter != NULL) {
 		// dequeue the first waiter
 		lock->waiters = waiter->next;
@@ -451,14 +350,14 @@ _cutex_unlock(cutex* lock)
 #ifdef KDEBUG
 		lock->holder = -1;
 #else
-		lock->flags |= CUTEX_FLAG_RELEASED;
+		lock->flags |= MUTEX_FLAG_RELEASED;
 #endif
 	}
 }
 
 
 status_t
-_cutex_trylock(cutex* lock)
+_mutex_trylock(mutex* lock)
 {
 #ifdef KDEBUG
 	InterruptsSpinLocker _(thread_spinlock);
@@ -473,21 +372,21 @@ _cutex_trylock(cutex* lock)
 
 
 static int
-dump_cutex_info(int argc, char** argv)
+dump_mutex_info(int argc, char** argv)
 {
 	if (argc < 2) {
 		print_debugger_command_usage(argv[0]);
 		return 0;
 	}
 
-	cutex* lock = (cutex*)strtoul(argv[1], NULL, 0);
+	mutex* lock = (mutex*)strtoul(argv[1], NULL, 0);
 
 	if (!IS_KERNEL_ADDRESS(lock)) {
 		kprintf("invalid address: %p\n", lock);
 		return 0;
 	}
 
-	kprintf("cutex %p:\n", lock);
+	kprintf("mutex %p:\n", lock);
 	kprintf("  name:            %s\n", lock->name);
 	kprintf("  flags:           0x%x\n", lock->flags);
 #ifdef KDEBUG
@@ -497,7 +396,7 @@ dump_cutex_info(int argc, char** argv)
 #endif
 
 	kprintf("  waiting threads:");
-	cutex_waiter* waiter = lock->waiters;
+	mutex_waiter* waiter = lock->waiters;
 	while (waiter != NULL) {
 		kprintf(" %ld", waiter->thread->id);
 		waiter = waiter->next;
@@ -514,9 +413,9 @@ dump_cutex_info(int argc, char** argv)
 void
 lock_debug_init()
 {
-	add_debugger_command_etc("cutex", &dump_cutex_info,
-		"Dump info about a cutex",
-		"<cutex>\n"
-		"Prints info about the specified cutex.\n"
-		"  <cutex>  - pointer to the cutex to print the info for.\n", 0);
+	add_debugger_command_etc("mutex", &dump_mutex_info,
+		"Dump info about a mutex",
+		"<mutex>\n"
+		"Prints info about the specified mutex.\n"
+		"  <mutex>  - pointer to the mutex to print the info for.\n", 0);
 }

@@ -274,7 +274,8 @@ image_init(void)
 	add_debugger_command("team_images", &dump_images_list, "Dump all registered images from the current team");
 #endif
 
-	return mutex_init(&sImageMutex, "image");
+	mutex_init(&sImageMutex, "image");
+	return B_OK;
 }
 
 

@@ -184,8 +184,7 @@ vm_low_memory_init(void)
 status_t
 vm_low_memory_init_post_thread(void)
 {
-	if (mutex_init(&sLowMemoryMutex, "low memory") < B_OK)
-		return B_ERROR;
+	mutex_init(&sLowMemoryMutex, "low memory");
 	
 	sLowMemoryWaitSem = create_sem(0, "low memory wait");
 	if (sLowMemoryWaitSem < B_OK)

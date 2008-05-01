@@ -1236,7 +1236,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 	TRACE(("map_backing_store: aspace %p, cache %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
 		addressSpace, cache, *_virtualAddress, offset, size, addressSpec,
 		wiring, protection, _area, areaName));
-	ASSERT_LOCKED_CUTEX(&cache->lock);
+	ASSERT_LOCKED_MUTEX(&cache->lock);
 
 	vm_area *area = create_area_struct(addressSpace, areaName, wiring,
 		protection);
@@ -1267,7 +1267,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 			goto err1;
 		}
 
-		cutex_lock(&newCache->lock);
+		mutex_lock(&newCache->lock);
 		newCache->type = CACHE_TYPE_RAM;
 		newCache->temporary = 1;
 		newCache->scan_skip = cache->scan_skip;
@@ -1310,7 +1310,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 	// point the cache back to the area
 	vm_cache_insert_area_locked(cache, area);
 	if (mapping == REGION_PRIVATE_MAP)
-		cutex_unlock(&cache->lock);
+		mutex_unlock(&cache->lock);
 
 	// insert the area in the global area hash table
 	acquire_sem_etc(sAreaHashLock, WRITE_COUNT, 0 ,0);
@@ -1328,10 +1328,10 @@ err2:
 		// We created this cache, so we must delete it again. Note, that we
 		// need to temporarily unlock the source cache or we'll otherwise
 		// deadlock, since vm_cache_remove_consumer will try to lock it too.
-		cutex_unlock(&cache->lock);
-		cutex_unlock(&sourceCache->lock);
+		mutex_unlock(&cache->lock);
+		mutex_unlock(&sourceCache->lock);
 		vm_cache_release_ref(cache);
-		cutex_lock(&sourceCache->lock);
+		mutex_lock(&sourceCache->lock);
 	}
 err1:
 	free(area->name);
@@ -1525,13 +1525,13 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			break;
 	}
 
-	cutex_lock(&cache->lock);
+	mutex_lock(&cache->lock);
 
 	status = map_backing_store(addressSpace, cache, address, 0, size,
 		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name,
 		unmapAddressRange);
 
-	cutex_unlock(&cache->lock);
+	mutex_unlock(&cache->lock);
 
 	if (status < B_OK) {
 		vm_cache_release_ref(cache);
@@ -1554,7 +1554,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			vm_page_reserve_pages(reservePages);
 
 			// Allocate and map all pages for this area
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 
 			off_t offset = 0;
 			for (addr_t address = area->base; address < area->base + (area->size - 1);
@@ -1579,7 +1579,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 				vm_map_page(area, page, address, protection);
 			}
 
-			cutex_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 			vm_page_unreserve_pages(reservePages);
 			break;
 		}
@@ -1595,7 +1595,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			if (!kernel_startup)
 				panic("ALREADY_WIRED flag used outside kernel startup\n");
 
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 			map->ops->lock(map);
 
 			for (addr_t virtualAddress = area->base; virtualAddress < area->base
@@ -1622,7 +1622,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			}
 
 			map->ops->unlock(map);
-			cutex_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 			break;
 		}
 
@@ -1638,7 +1638,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			off_t offset = 0;
 
 			vm_page_reserve_pages(reservePages);
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 			map->ops->lock(map);
 
 			for (virtualAddress = area->base; virtualAddress < area->base
@@ -1660,7 +1660,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 			}
 
 			map->ops->unlock(map);
-			cutex_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 			vm_page_unreserve_pages(reservePages);
 			break;
 		}
@@ -1739,13 +1739,13 @@ vm_map_physical_memory(team_id team, const char *name, void **_address,
 	cache->type = CACHE_TYPE_DEVICE;
 	cache->virtual_size = size;
 
-	cutex_lock(&cache->lock);
+	mutex_lock(&cache->lock);
 
 	status_t status = map_backing_store(locker.AddressSpace(), cache, _address,
 		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
 		REGION_NO_PRIVATE_MAP, &area, name, false);
 
-	cutex_unlock(&cache->lock);
+	mutex_unlock(&cache->lock);
 
 	if (status < B_OK)
 		vm_cache_release_ref(cache);
@@ -1821,13 +1821,13 @@ vm_create_null_area(team_id team, const char *name, void **address,
 	cache->type = CACHE_TYPE_NULL;
 	cache->virtual_size = size;
 
-	cutex_lock(&cache->lock);
+	mutex_lock(&cache->lock);
 
 	status = map_backing_store(locker.AddressSpace(), cache, address, 0, size,
 		addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name,
 		false);
 
-	cutex_unlock(&cache->lock);
+	mutex_unlock(&cache->lock);
 
 	if (status < B_OK) {
 		vm_cache_release_ref(cache);
@@ -1929,14 +1929,14 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	if (status < B_OK)
 		return status;
 
-	cutex_lock(&cache->lock);
+	mutex_lock(&cache->lock);
 
 	vm_area *area;
 	status = map_backing_store(locker.AddressSpace(), cache, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name,
 		addressSpec == B_EXACT_ADDRESS);
 
-	cutex_unlock(&cache->lock);
+	mutex_unlock(&cache->lock);
 
 	if (status < B_OK || mapping == REGION_PRIVATE_MAP) {
 		// map_backing_store() cannot know we no longer need the ref
@@ -1971,14 +1971,14 @@ vm_area_get_locked_cache(vm_area *area)
 		vm_cache_acquire_ref(cache);
 		locker.Unlock();
 
-		cutex_lock(&cache->lock);
+		mutex_lock(&cache->lock);
 
 		locker.Lock();
 		if (cache == area->cache)
 			return cache;
 
 		// the cache changed in the meantime
-		cutex_unlock(&cache->lock);
+		mutex_unlock(&cache->lock);
 		vm_cache_release_ref(cache);
 	}
 }
@@ -1987,7 +1987,7 @@ vm_area_get_locked_cache(vm_area *area)
 void
 vm_area_put_locked_cache(vm_cache *cache)
 {
-	cutex_unlock(&cache->lock);
+	mutex_unlock(&cache->lock);
 	vm_cache_release_ref(cache);
 }
 
@@ -2207,7 +2207,7 @@ vm_copy_on_write_area(vm_cache* lowerCache)
 		return B_NO_MEMORY;
 	}
 
-	cutex_lock(&upperCache->lock);
+	mutex_lock(&upperCache->lock);
 
 	upperCache->type = CACHE_TYPE_RAM;
 	upperCache->temporary = 1;
@@ -3852,10 +3852,10 @@ retry:
 
 	vm_cache_acquire_ref(source);
 
-	cutex_lock(&source->lock);
+	mutex_lock(&source->lock);
 
 	if (source->busy) {
-		cutex_unlock(&source->lock);
+		mutex_unlock(&source->lock);
 		vm_cache_release_ref(source);
 		goto retry;
 	}
@@ -3889,7 +3889,7 @@ fault_remove_dummy_page(vm_dummy_page &dummyPage, bool isLocked)
 {
 	vm_cache *cache = dummyPage.cache;
 	if (!isLocked)
-		cutex_lock(&cache->lock);
+		mutex_lock(&cache->lock);
 
 	if (dummyPage.state == PAGE_STATE_BUSY) {
 		vm_cache_remove_page(cache, &dummyPage);
@@ -3898,7 +3898,7 @@ fault_remove_dummy_page(vm_dummy_page &dummyPage, bool isLocked)
 	}
 
 	if (!isLocked)
-		cutex_unlock(&cache->lock);
+		mutex_unlock(&cache->lock);
 
 	vm_cache_release_ref(cache);
 }
@@ -3923,7 +3923,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 	vm_page *page = NULL;
 
 	vm_cache_acquire_ref(cache);
-	cutex_lock(&cache->lock);
+	mutex_lock(&cache->lock);
 		// we release this later in the loop
 
 	while (cache != NULL) {
@@ -3947,9 +3947,9 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			{
 				ConditionVariableEntry entry;
 				entry.Add(page);
-				cutex_unlock(&cache->lock);
+				mutex_unlock(&cache->lock);
 				entry.Wait();
-				cutex_lock(&cache->lock);
+				mutex_lock(&cache->lock);
 			}
 
 			if (cache->busy) {
@@ -3958,7 +3958,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// the top cache.
 				ConditionVariableEntry entry;
 				entry.Add(cache);
-				cutex_unlock(&cache->lock);
+				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
 				entry.Wait();
 				*_restart = true;
@@ -3982,7 +3982,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			ConditionVariable busyCondition;
 			busyCondition.Publish(page, "page");
 
-			cutex_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 
 			// get a virtual address for the page
 			iovec vec;
@@ -3997,7 +3997,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 
 			map->ops->put_physical_page((addr_t)vec.iov_base);
 
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 
 			if (status < B_OK) {
 				// on error remove and free the page
@@ -4008,7 +4008,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				vm_cache_remove_page(cache, page);
 				vm_page_set_state(page, PAGE_STATE_FREE);
 
-				cutex_unlock(&cache->lock);
+				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
 				return status;
 			}
@@ -4031,16 +4031,16 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 			// the source cache is currently in the process of being merged
 			// with his only consumer (cacheRef); since its pages are moved
 			// upwards, too, we try this cache again
-			cutex_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 			thread_yield(true);
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 			if (cache->busy) {
 				// The cache became busy, which means, it is about to be
 				// removed by vm_cache_remove_consumer(). We start again with
 				// the top cache.
 				ConditionVariableEntry entry;
 				entry.Add(cache);
-				cutex_unlock(&cache->lock);
+				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
 				entry.Wait();
 				*_restart = true;
@@ -4051,7 +4051,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 		} else if (status < B_OK)
 			nextCache = NULL;
 
-		cutex_unlock(&cache->lock);
+		mutex_unlock(&cache->lock);
 			// at this point, we still hold a ref to this cache (through lastCacheRef)
 
 		cache = nextCache;
@@ -4066,7 +4066,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// Read-only pages come in the deepest cache - only the
 				// top most cache may have direct write access.
 			vm_cache_acquire_ref(cache);
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 
 			if (cache->busy) {
 				// The cache became busy, which means, it is about to be
@@ -4074,7 +4074,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 				// the top cache.
 				ConditionVariableEntry entry;
 				entry.Add(cache);
-				cutex_unlock(&cache->lock);
+				mutex_unlock(&cache->lock);
 				vm_cache_release_ref(cache);
 				entry.Wait();
 				*_restart = true;
@@ -4085,7 +4085,7 @@ fault_find_page(vm_translation_map *map, vm_cache *topCache,
 					// for, but it could as well be a dummy page from someone
 					// else or an otherwise busy page. We can't really handle
 					// that here. Hence we completely restart this functions.
-					cutex_unlock(&cache->lock);
+					mutex_unlock(&cache->lock);
 					vm_cache_release_ref(cache);
 					*_restart = true;
 				}
@@ -4128,7 +4128,7 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 			break;
 
 		// Remove the dummy page, if it has been inserted.
-		cutex_lock(&topCache->lock);
+		mutex_lock(&topCache->lock);
 
 		if (dummyPage.state == PAGE_STATE_BUSY) {
 			ASSERT_PRINT(dummyPage.cache == topCache, "dummy page: %p\n",
@@ -4136,7 +4136,7 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 			fault_remove_dummy_page(dummyPage, true);
 		}
 
-		cutex_unlock(&topCache->lock);
+		mutex_unlock(&topCache->lock);
 	}
 
 	if (page == NULL) {
@@ -4175,9 +4175,9 @@ fault_get_page(vm_translation_map *map, vm_cache *topCache, off_t cacheOffset,
 			// This is not the top cache into which we inserted the dummy page,
 			// let's remove it from there. We need to temporarily unlock our
 			// cache to comply with the cache locking policy.
-			cutex_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 			fault_remove_dummy_page(dummyPage, false);
-			cutex_lock(&cache->lock);
+			mutex_lock(&cache->lock);
 		}
 	}
 
@@ -4225,8 +4225,8 @@ if (cacheOffset == 0x12000)
 		if (sourcePage->state != PAGE_STATE_MODIFIED)
 			vm_page_set_state(sourcePage, PAGE_STATE_ACTIVE);
 
-		cutex_unlock(&cache->lock);
-		cutex_lock(&topCache->lock);
+		mutex_unlock(&cache->lock);
+		mutex_lock(&topCache->lock);
 
 		// Since the top cache has been unlocked for a while, someone else
 		// (vm_cache_remove_consumer()) might have replaced our dummy page.
@@ -4244,9 +4244,9 @@ if (cacheOffset == 0x12000)
 			// The page is busy, wait till it becomes unbusy.
 			ConditionVariableEntry entry;
 			entry.Add(newPage);
-			cutex_unlock(&topCache->lock);
+			mutex_unlock(&topCache->lock);
 			entry.Wait();
-			cutex_lock(&topCache->lock);
+			mutex_lock(&topCache->lock);
 		}
 
 		if (newPage) {
@@ -4358,7 +4358,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		}
 	}
 
-	cutex_unlock(&topCache->lock);
+	mutex_unlock(&topCache->lock);
 
 	// The top most cache has no fault handler, so let's see if the cache or its sources
 	// already have the page we're searching for (we're going from top to bottom)
@@ -4408,7 +4408,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		vm_map_page(area, page, address, newProtection);
 
-		cutex_unlock(&pageSource->lock);
+		mutex_unlock(&pageSource->lock);
 		vm_cache_release_ref(pageSource);
 	}
 

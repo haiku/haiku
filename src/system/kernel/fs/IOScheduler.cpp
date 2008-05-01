@@ -66,9 +66,6 @@ IOScheduler::~IOScheduler()
 status_t
 IOScheduler::InitCheck() const
 {
-	if (fLock.sem < B_OK)
-		return fLock.sem;
-
 	if (fThread < B_OK)
 		return fThread;
 

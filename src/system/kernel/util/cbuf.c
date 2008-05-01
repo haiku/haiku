@@ -950,10 +950,7 @@ cbuf_init(void)
 	// add the debug command
 	add_debugger_command("cbuf_freelist", &dbg_dump_cbuf_freelists, "Dumps the cbuf free lists");
 
-	if (mutex_init(&sFreeBufferListMutex, "cbuf_free_list") < B_OK) {
-		panic("cbuf_init: error creating cbuf_free_list mutex\n");
-		return B_NO_MEMORY;
-	}
+	mutex_init(&sFreeBufferListMutex, "cbuf_free_list");
 
 	// errors are fatal, that's why we don't clean up here
 

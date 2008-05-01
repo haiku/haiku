@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -18,11 +19,6 @@ typedef struct recursive_lock {
 	int			recursion;
 } recursive_lock;
 
-typedef struct mutex {
-	sem_id		sem;
-	thread_id	holder;
-} mutex;
-
 typedef struct benaphore {
 	sem_id	sem;
 	int32	count;
@@ -39,31 +35,29 @@ typedef struct rw_lock {
 
 #define RW_MAX_READERS 1000000
 
-struct cutex_waiter;
+struct mutex_waiter;
 
-typedef struct cutex {
+typedef struct mutex {
 	const char*				name;
-	struct cutex_waiter*	waiters;
+	struct mutex_waiter*	waiters;
 #ifdef KDEBUG
 	thread_id				holder;
 #else
 	int32					count;
 #endif
 	uint8					flags;
-} cutex;
+} mutex;
 
-#define CUTEX_FLAG_CLONE_NAME	0x1
+#define MUTEX_FLAG_CLONE_NAME	0x1
 
 
 #if 0 && KDEBUG // XXX disable this for now, it causes problems when including thread.h here
 #	include <thread.h>
 #define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
 #define ASSERT_LOCKED_MUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
-#define ASSERT_LOCKED_CUTEX(m) { ASSERT(thread_get_current_thread_id() == (m)->holder); }
 #else
 #define ASSERT_LOCKED_RECURSIVE(r)
 #define ASSERT_LOCKED_MUTEX(m)
-#define ASSERT_LOCKED_CUTEX(m)
 #endif
 
 
@@ -76,12 +70,6 @@ extern void recursive_lock_destroy(recursive_lock *lock);
 extern status_t recursive_lock_lock(recursive_lock *lock);
 extern void recursive_lock_unlock(recursive_lock *lock);
 extern int32 recursive_lock_get_recursion(recursive_lock *lock);
-
-extern status_t	mutex_init(mutex *m, const char *name);
-extern void mutex_destroy(mutex *m);
-extern status_t mutex_trylock(mutex *mutex);
-extern status_t mutex_lock(mutex *m);
-extern void mutex_unlock(mutex *m);
 
 extern status_t benaphore_init(benaphore *ben, const char *name);
 extern void benaphore_destroy(benaphore *ben);
@@ -121,35 +109,48 @@ extern status_t rw_lock_read_unlock(rw_lock *lock);
 extern status_t rw_lock_write_lock(rw_lock *lock);
 extern status_t rw_lock_write_unlock(rw_lock *lock);
 
-extern void cutex_init(cutex* lock, const char *name);
-	// name is *not* cloned nor freed in cutex_destroy()
-extern void cutex_init_etc(cutex* lock, const char *name, uint32 flags);
-extern void cutex_destroy(cutex* lock);
+extern void mutex_init(mutex* lock, const char *name);
+	// name is *not* cloned nor freed in mutex_destroy()
+extern void mutex_init_etc(mutex* lock, const char *name, uint32 flags);
+extern void mutex_destroy(mutex* lock);
 
 // implementation private:
-extern status_t _cutex_lock(cutex* lock);
-extern void _cutex_unlock(cutex* lock);
-extern status_t _cutex_trylock(cutex* lock);
+extern status_t _mutex_lock(mutex* lock, bool threadsLocked);
+extern void _mutex_unlock(mutex* lock);
+extern status_t _mutex_trylock(mutex* lock);
 
 
 static inline status_t
-cutex_lock(cutex* lock)
+mutex_lock(mutex* lock)
 {
 #ifdef KDEBUG
-	return _cutex_lock(lock);
+	return _mutex_lock(lock, false);
 #else
 	if (atomic_add(&lock->count, -1) < 0)
-		return _cutex_lock(lock);
+		return _mutex_lock(lock, false);
 	return B_OK;
 #endif
 }
 
 
 static inline status_t
-cutex_trylock(cutex* lock)
+mutex_lock_threads_locked(mutex* lock)
 {
 #ifdef KDEBUG
-	return _cutex_trylock(lock);
+	return _mutex_lock(lock, true);
+#else
+	if (atomic_add(&lock->count, -1) < 0)
+		return _mutex_lock(lock, true);
+	return B_OK;
+#endif
+}
+
+
+static inline status_t
+mutex_trylock(mutex* lock)
+{
+#ifdef KDEBUG
+	return _mutex_trylock(lock);
 #else
 	if (atomic_test_and_set(&lock->count, -1, 0) != 0)
 		return B_WOULD_BLOCK;
@@ -159,13 +160,13 @@ cutex_trylock(cutex* lock)
 
 
 static inline void
-cutex_unlock(cutex* lock)
+mutex_unlock(mutex* lock)
 {
 #ifdef KDEBUG
-	_cutex_unlock(lock);
+	_mutex_unlock(lock);
 #else
 	if (atomic_add(&lock->count, 1) < -1)
-		_cutex_unlock(lock);
+		_mutex_unlock(lock);
 #endif
 }
 

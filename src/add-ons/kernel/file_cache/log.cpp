@@ -386,14 +386,12 @@ init_log(void)
 
 	sLogEntrySem = create_sem(kNumLogEntries, "cache log entries");
 	if (sLogEntrySem >= B_OK) {
-		if (mutex_init(&sLock, "log cache module") >= B_OK) {
-			register_kernel_daemon(log_writer_daemon, NULL, kLogWriterFrequency);
-			register_generic_syscall(CACHE_LOG_SYSCALLS, log_control, 1, 0);
+		mutex_init(&sLock, "log cache module");
+		register_kernel_daemon(log_writer_daemon, NULL, kLogWriterFrequency);
+		register_generic_syscall(CACHE_LOG_SYSCALLS, log_control, 1, 0);
 
-			TRACE(("** - log init\n"));
-			return B_OK;
-		}
-		delete_sem(sLogEntrySem);
+		TRACE(("** - log init\n"));
+		return B_OK;
 	}
 
 	close(sLogFile);

@@ -429,9 +429,6 @@ TCPEndpoint::~TCPEndpoint()
 status_t
 TCPEndpoint::InitCheck() const
 {
-	if (fLock.sem < B_OK)
-		return fLock.sem;
-
 	if (fReceiveList.InitCheck() < B_OK)
 		return fReceiveList.InitCheck();
 
@@ -2175,7 +2172,9 @@ TCPEndpoint::Dump() const
 	kprintf("TCP endpoint %p\n", this);
 	kprintf("  state: %s\n", name_for_state(fState));
 	kprintf("  flags: 0x%lx\n", fFlags);
-	kprintf("  lock: { sem: %ld, holder: %ld }\n", fLock.sem, fLock.holder);
+#ifdef KDEBUG
+	kprintf("  lock: { %p, holder: %ld }\n", &fLock, fLock.holder);
+#endif
 	kprintf("  accept sem: %ld\n", fAcceptSemaphore);
 	kprintf("  options: 0x%lx\n", (uint32)fOptions);
 	kprintf("  send\n");

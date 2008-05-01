@@ -265,8 +265,7 @@ keyboard_open(const char *name, uint32 flags, void **cookie)
 	if (keyboard_sem < 0)
 		panic("could not create keyboard sem!\n");
 
-	if (mutex_init(&keyboard_read_mutex, "keyboard_read_mutex") < 0)
-		panic("could not create keyboard read mutex!\n");
+	mutex_init(&keyboard_read_mutex, "keyboard_read_mutex");
 
 	shift = false;
 	sControl = false;

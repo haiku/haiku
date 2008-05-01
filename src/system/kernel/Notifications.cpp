@@ -154,9 +154,7 @@ NotificationManager::~NotificationManager()
 status_t
 NotificationManager::_Init()
 {
-	status_t status = mutex_init(&fLock, "notification manager");
-	if (status < B_OK)
-		return status;
+	mutex_init(&fLock, "notification manager");
 
 	return fServiceHash.InitCheck();
 }

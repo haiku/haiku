@@ -45,10 +45,7 @@ _taskqueue_create(const char *name, int mflags, int fast,
 	if (fast) {
 		tq->tq_spinlock = 0;
 	} else {
-		if (mutex_init(&tq->tq_mutex, name) < B_OK) {
-			free(tq);
-			return NULL;
-		}
+		mutex_init_etc(&tq->tq_mutex, name, MUTEX_FLAG_CLONE_NAME);
 	}
 
 	strlcpy(tq->tq_name, name, sizeof(tq->tq_name));

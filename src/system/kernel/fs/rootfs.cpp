@@ -357,9 +357,7 @@ rootfs_mount(fs_volume *volume, const char *device, uint32 flags,
 	fs->id = volume->id;
 	fs->next_vnode_id = 1;
 
-	err = mutex_init(&fs->lock, "rootfs_mutex");
-	if (err < B_OK)
-		goto err1;
+	mutex_init(&fs->lock, "rootfs_mutex");
 
 	fs->vnode_list_hash = hash_init(ROOTFS_HASH_SIZE, (addr_t)&vnode->all_next - (addr_t)vnode,
 		&rootfs_vnode_compare_func, &rootfs_vnode_hash_func);
@@ -388,7 +386,6 @@ err3:
 	hash_uninit(fs->vnode_list_hash);
 err2:
 	mutex_destroy(&fs->lock);
-err1:
 	free(fs);
 
 	return err;

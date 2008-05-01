@@ -42,13 +42,9 @@ create_master_cookie(master_cookie *&cookie, struct tty *master,
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	status_t error = mutex_init(&cookie->lock, "tty lock");
-	if (error != B_OK) {
-		free(cookie);
-		return error;
-	}
+	mutex_init(&cookie->lock, "tty lock");
 
-	error = init_tty_cookie(cookie, master, slave, openMode);
+	status_t error = init_tty_cookie(cookie, master, slave, openMode);
 	if (error != B_OK) {
 		mutex_destroy(&cookie->lock);
 		free(cookie);

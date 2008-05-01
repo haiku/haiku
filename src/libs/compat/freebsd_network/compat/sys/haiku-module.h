@@ -9,7 +9,7 @@
 #include <Drivers.h>
 #include <KernelExport.h>
 
-#include <lock.h>
+#include <kernel/lock.h>
 #include <net_stack.h>
 
 #undef ASSERT

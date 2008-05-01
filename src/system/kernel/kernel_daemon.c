@@ -127,8 +127,7 @@ kernel_daemon_init(void)
 {
 	thread_id thread;
 
-	if (mutex_init(&sDaemonMutex, "kernel daemon") < B_OK)
-		return B_ERROR;
+	mutex_init(&sDaemonMutex, "kernel daemon");
 
 	list_init(&sDaemons);
 

@@ -1145,8 +1145,8 @@ _dump_thread_info(struct thread *thread)
 				kprintf("signal\n");
 				break;
 
-			case THREAD_BLOCK_TYPE_CUTEX:
-				kprintf("cutex %p\n", thread->wait.object);
+			case THREAD_BLOCK_TYPE_MUTEX:
+				kprintf("mutex %p\n", thread->wait.object);
 				break;
 
 			case THREAD_BLOCK_TYPE_OTHER:
@@ -1320,8 +1320,8 @@ dump_thread_list(int argc, char **argv)
 					kprintf("signal             ");
 					break;
 
-				case THREAD_BLOCK_TYPE_CUTEX:
-					kprintf("cutex %p   ", thread->wait.object);
+				case THREAD_BLOCK_TYPE_MUTEX:
+					kprintf("mutex %p   ", thread->wait.object);
 					break;
 
 				case THREAD_BLOCK_TYPE_OTHER:
