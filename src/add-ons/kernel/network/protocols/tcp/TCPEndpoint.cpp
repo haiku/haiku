@@ -219,7 +219,7 @@ enum {
 	//       is performed on a listen()ing socket.
 	FLAG_NO_RECEIVE				= 0x04,
 	FLAG_CLOSED					= 0x08,
-	FLAG_DELETE					= 0x10,
+	FLAG_DELETE_ON_CLOSE		= 0x10,
 };
 
 
@@ -500,7 +500,6 @@ TCPEndpoint::Close()
 			fSendQueue.Used());
 	}
 
-	fFlags |= FLAG_CLOSED;
 	return B_OK;
 }
 
@@ -512,11 +511,16 @@ TCPEndpoint::Free()
 
 	MutexLocker _(fLock);
 
-	if (fState <= SYNCHRONIZE_SENT || fState == TIME_WAIT)
+	if (fState <= SYNCHRONIZE_SENT)
 		return B_OK;
 
 	// we are only interested in the timer, not in changing state
 	_EnterTimeWait();
+
+	fFlags |= FLAG_CLOSED;
+	if ((fFlags & FLAG_DELETE_ON_CLOSE) != 0)
+		return B_OK;
+
 	return B_BUSY;
 		// we'll be freed later when the 2MSL timer expires
 }
@@ -1009,14 +1013,15 @@ TCPEndpoint::_EnterTimeWait()
 {
 	TRACE("_EnterTimeWait()\n");
 
+	_CancelConnectionTimers();
+
 	if (fState == TIME_WAIT && fRoute != NULL
 		&& (fRoute->flags & RTF_LOCAL) != 0) {
 		// we do not use TIME_WAIT state for local connections
-		fFlags |= FLAG_DELETE;
+		fFlags |= FLAG_DELETE_ON_CLOSE;
 		return;
 	}
 
-	_CancelConnectionTimers();
 	_UpdateTimeWait();
 }
 
@@ -1106,11 +1111,7 @@ TCPEndpoint::_Close()
 	fState = CLOSED;
 	T(State(this));
 
-	if ((fFlags & FLAG_CLOSED) != 0) {
-		// this socket has been closed already, we don't need to keep
-		// it around anymore
-		fFlags |= FLAG_DELETE;
-	}
+	fFlags |= FLAG_DELETE_ON_CLOSE;
 }
 
 
@@ -1671,7 +1672,8 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 	else if (segmentAction & ACKNOWLEDGE)
 		DelayedAcknowledge();
 
-	if ((fFlags & FLAG_DELETE) != 0) {
+	if ((fFlags & (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE))
+			== (FLAG_CLOSED | FLAG_DELETE_ON_CLOSE)) {
 		locker.Unlock();
 		gSocketModule->delete_socket(socket);
 			// this will also delete us
