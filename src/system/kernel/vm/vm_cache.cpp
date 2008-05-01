@@ -159,7 +159,7 @@ delete_cache(vm_cache* cache)
 	if (cache->source)
 		vm_cache_remove_consumer(cache->source, cache);
 
-	mutex_destroy(&cache->lock);
+	cutex_destroy(&cache->lock);
 	free(cache);
 }
 
@@ -194,14 +194,7 @@ vm_cache_create(vm_store* store)
 	if (cache == NULL)
 		return NULL;
 
-	status_t status = mutex_init(&cache->lock, "vm_cache");
-	if (status < B_OK && (!kernel_startup || status != B_NO_MORE_SEMS)) {
-		// During early boot, we cannot create semaphores - they are
-		// created later in vm_init_post_sem()
-		free(cache);
-		return NULL;
-	}
-
+	cutex_init(&cache->lock, "vm_cache");
 	list_init_etc(&cache->consumers, offsetof(vm_cache, consumer_link));
 	cache->page_list = NULL;
 	cache->areas = NULL;
@@ -272,7 +265,7 @@ vm_cache_release_ref(vm_cache* cache)
 	vm_cache* c;
 	bool locked = false;
 	if (cacheRef->lock.holder != find_thread(NULL)) {
-		mutex_lock(&cacheRef->lock);
+		cutex_lock(&cacheRef->lock);
 		locked = true;
 	}
 	for (a = cacheRef->areas; a != NULL; a = a->cache_next)
@@ -285,7 +278,7 @@ vm_cache_release_ref(vm_cache* cache)
 	if (cacheRef->ref_count < min)
 		panic("cache_ref %p has too little ref_count!!!!", cacheRef);
 	if (locked)
-		mutex_unlock(&cacheRef->lock);
+		cutex_unlock(&cacheRef->lock);
 }
 #endif
 		return;
@@ -317,7 +310,7 @@ vm_cache_acquire_page_cache_ref(vm_page* page)
 vm_page*
 vm_cache_lookup_page(vm_cache* cache, off_t offset)
 {
-	ASSERT_LOCKED_MUTEX(&cache->lock);
+	ASSERT_LOCKED_CUTEX(&cache->lock);
 
 	struct page_lookup_key key;
 	key.offset = (uint32)(offset >> PAGE_SHIFT);
@@ -343,7 +336,7 @@ vm_cache_insert_page(vm_cache* cache, vm_page* page, off_t offset)
 {
 	TRACE(("vm_cache_insert_page: cache %p, page %p, offset %Ld\n",
 		cache, page, offset));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
+	ASSERT_LOCKED_CUTEX(&cache->lock);
 
 	if (page->cache != NULL) {
 		panic("insert page %p into cache %p: page cache is set to %p\n",
@@ -390,7 +383,7 @@ void
 vm_cache_remove_page(vm_cache* cache, vm_page* page)
 {
 	TRACE(("vm_cache_remove_page: cache %p, page %p\n", cache, page));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
+	ASSERT_LOCKED_CUTEX(&cache->lock);
 
 	if (page->cache != cache) {
 		panic("remove page %p from cache %p: page cache is set to %p\n", page,
@@ -428,9 +421,9 @@ vm_cache_write_modified(vm_cache* cache, bool fsReenter)
 	if (cache->temporary)
 		return B_OK;
 
-	mutex_lock(&cache->lock);
+	cutex_lock(&cache->lock);
 	status_t status = vm_page_write_modified_pages(cache, fsReenter);
-	mutex_unlock(&cache->lock);
+	cutex_unlock(&cache->lock);
 
 	return status;
 }
@@ -445,7 +438,7 @@ vm_cache_set_minimal_commitment_locked(vm_cache* cache, off_t commitment)
 {
 	TRACE(("vm_cache_set_minimal_commitment_locked(cache %p, commitment %Ld)\n",
 		cache, commitment));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
+	ASSERT_LOCKED_CUTEX(&cache->lock);
 
 	vm_store* store = cache->store;
 	status_t status = B_OK;
@@ -478,7 +471,7 @@ vm_cache_resize(vm_cache* cache, off_t newSize)
 {
 	TRACE(("vm_cache_resize(cache %p, newSize %Ld) old size %Ld\n",
 		cache, newSize, cache->virtual_size));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
+	ASSERT_LOCKED_CUTEX(&cache->lock);
 
 	status_t status = cache->store->ops->commit(cache->store, newSize);
 	if (status != B_OK)
@@ -509,9 +502,9 @@ vm_cache_resize(vm_cache* cache, off_t newSize)
 						// wait for page to become unbusy
 						ConditionVariableEntry entry;
 						entry.Add(page);
-						mutex_unlock(&cache->lock);
+						cutex_unlock(&cache->lock);
 						entry.Wait();
-						mutex_lock(&cache->lock);
+						cutex_lock(&cache->lock);
 
 						// restart from the start of the list
 						page = cache->page_list;
@@ -541,7 +534,7 @@ void
 vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 {
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
-	ASSERT_LOCKED_MUTEX(&consumer->lock);
+	ASSERT_LOCKED_CUTEX(&consumer->lock);
 
 	// Remove the store ref before locking the cache. Otherwise we'd call into
 	// the VFS while holding the cache lock, which would reverse the usual
@@ -550,7 +543,7 @@ vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 		cache->store->ops->release_ref(cache->store);
 
 	// remove the consumer from the cache, but keep its reference until later
-	mutex_lock(&cache->lock);
+	cutex_lock(&cache->lock);
 	list_remove_item(&cache->consumers, consumer);
 	consumer->source = NULL;
 
@@ -576,10 +569,10 @@ vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 			// need to unlock our cache now
 			busyCondition.Publish(cache, "cache");
 			cache->busy = true;
-			mutex_unlock(&cache->lock);
+			cutex_unlock(&cache->lock);
 
-			mutex_lock(&consumer->lock);
-			mutex_lock(&cache->lock);
+			cutex_lock(&consumer->lock);
+			cutex_lock(&cache->lock);
 
 			if (cache->areas != NULL || cache->source == NULL
 				|| list_is_empty(&cache->consumers)
@@ -590,7 +583,7 @@ vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 				merge = false;
 				cache->busy = false;
 				busyCondition.Unpublish();
-				mutex_unlock(&consumer->lock);
+				cutex_unlock(&consumer->lock);
 				vm_cache_release_ref(consumer);
 			}
 		}
@@ -644,14 +637,14 @@ vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 			vm_cache* newSource = cache->source;
 
 			// The remaining consumer has gotten a new source
-			mutex_lock(&newSource->lock);
+			cutex_lock(&newSource->lock);
 
 			list_remove_item(&newSource->consumers, cache);
 			list_add_item(&newSource->consumers, consumer);
 			consumer->source = newSource;
 			cache->source = NULL;
 
-			mutex_unlock(&newSource->lock);
+			cutex_unlock(&newSource->lock);
 
 			// Release the other reference to the cache - we take over
 			// its reference of its source cache; we can do this here
@@ -661,7 +654,7 @@ if (cache->ref_count < 2)
 panic("cacheRef %p ref count too low!\n", cache);
 			vm_cache_release_ref(cache);
 
-			mutex_unlock(&consumer->lock);
+			cutex_unlock(&consumer->lock);
 			vm_cache_release_ref(consumer);
 		}
 
@@ -669,7 +662,7 @@ panic("cacheRef %p ref count too low!\n", cache);
 			busyCondition.Unpublish();
 	}
 
-	mutex_unlock(&cache->lock);
+	cutex_unlock(&cache->lock);
 	vm_cache_release_ref(cache);
 }
 
@@ -683,8 +676,8 @@ void
 vm_cache_add_consumer_locked(vm_cache* cache, vm_cache* consumer)
 {
 	TRACE(("add consumer vm cache %p to cache %p\n", consumer, cache));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
-	ASSERT_LOCKED_MUTEX(&consumer->lock);
+	ASSERT_LOCKED_CUTEX(&cache->lock);
+	ASSERT_LOCKED_CUTEX(&consumer->lock);
 
 	consumer->source = cache;
 	list_add_item(&cache->consumers, consumer);
@@ -703,7 +696,7 @@ status_t
 vm_cache_insert_area_locked(vm_cache* cache, vm_area* area)
 {
 	TRACE(("vm_cache_insert_area_locked(cache %p, area %p)\n", cache, area));
-	ASSERT_LOCKED_MUTEX(&cache->lock);
+	ASSERT_LOCKED_CUTEX(&cache->lock);
 
 	area->cache_next = cache->areas;
 	if (area->cache_next)
@@ -723,7 +716,7 @@ vm_cache_remove_area(vm_cache* cache, vm_area* area)
 {
 	TRACE(("vm_cache_remove_area(cache %p, area %p)\n", cache, area));
 
-	MutexLocker locker(cache->lock);
+	CutexLocker locker(cache->lock);
 
 	if (area->cache_prev)
 		area->cache_prev->cache_next = area->cache_next;

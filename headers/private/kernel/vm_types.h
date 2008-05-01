@@ -135,7 +135,7 @@ struct vm_dummy_page : vm_page {
 };
 
 struct vm_cache {
-	mutex				lock;
+	cutex				lock;
 	struct vm_area		*areas;
 	vint32				ref_count;
 	struct list_link	consumer_link;

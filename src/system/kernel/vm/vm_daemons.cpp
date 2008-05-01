@@ -66,15 +66,15 @@ PageCacheLocker::Lock(vm_page* page, bool dontWait)
 		return false;
 
 	if (dontWait) {
-		if (mutex_trylock(&cache->lock) != B_OK) {
+		if (cutex_trylock(&cache->lock) != B_OK) {
 			vm_cache_release_ref(cache);
 			return false;
 		}
 	} else
-		mutex_lock(&cache->lock);
+		cutex_lock(&cache->lock);
 
 	if (cache != page->cache || _IgnorePage(page)) {
-		mutex_unlock(&cache->lock);
+		cutex_unlock(&cache->lock);
 		vm_cache_release_ref(cache);
 		return false;
 	}
@@ -91,7 +91,7 @@ PageCacheLocker::Unlock()
 		return;
 
 	vm_cache* cache = fPage->cache;
-	mutex_unlock(&cache->lock);
+	cutex_unlock(&cache->lock);
 	vm_cache_release_ref(cache);
 
 	fPage = NULL;

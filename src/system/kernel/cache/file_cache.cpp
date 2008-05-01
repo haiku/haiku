@@ -119,7 +119,7 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 {
 	if (vm_low_memory_state() != B_NO_LOW_MEMORY) {
 		vm_cache *cache = ref->cache;
-		mutex_lock(&cache->lock);
+		cutex_lock(&cache->lock);
 
 		if (list_is_empty(&cache->consumers) && cache->areas == NULL
 			&& access_is_sequential(ref)) {
@@ -153,7 +153,7 @@ reserve_pages(file_cache_ref *ref, size_t reservePages, bool isWrite)
 				}
 			}
 		}
-		mutex_unlock(&cache->lock);
+		cutex_unlock(&cache->lock);
 	}
 
 	vm_page_reserve_pages(reservePages);
@@ -208,7 +208,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	}
 
 	push_access(ref, offset, bufferSize, false);
-	mutex_unlock(&cache->lock);
+	cutex_unlock(&cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
 	// read file into reserved pages
@@ -229,7 +229,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 			}
 		}
 
-		mutex_lock(&cache->lock);
+		cutex_lock(&cache->lock);
 
 		for (int32 i = 0; i < pageIndex; i++) {
 			busyConditions[i].Unpublish();
@@ -263,7 +263,7 @@ read_into_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	}
 
 	reserve_pages(ref, reservePages, false);
-	mutex_lock(&cache->lock);
+	cutex_lock(&cache->lock);
 
 	// make the pages accessible in the cache
 	for (int32 i = pageIndex; i-- > 0;) {
@@ -292,7 +292,7 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 	vec.iov_len = bufferSize;
 
 	push_access(ref, offset, bufferSize, false);
-	mutex_unlock(&ref->cache->lock);
+	cutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
 	status_t status = vfs_read_pages(ref->vnode, cookie, offset + pageOffset,
@@ -300,7 +300,7 @@ read_from_file(file_cache_ref *ref, void *cookie, off_t offset,
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, false);
 
-	mutex_lock(&ref->cache->lock);
+	cutex_lock(&ref->cache->lock);
 
 	return status;
 }
@@ -351,7 +351,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	}
 
 	push_access(ref, offset, bufferSize, true);
-	mutex_unlock(&ref->cache->lock);
+	cutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
 	// copy contents (and read in partially written pages first)
@@ -433,7 +433,7 @@ write_to_cache(file_cache_ref *ref, void *cookie, off_t offset,
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, true);
 
-	mutex_lock(&ref->cache->lock);
+	cutex_lock(&ref->cache->lock);
 
 	// unmap the pages again
 
@@ -482,7 +482,7 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 	vec.iov_len = bufferSize;
 
 	push_access(ref, offset, bufferSize, true);
-	mutex_unlock(&ref->cache->lock);
+	cutex_unlock(&ref->cache->lock);
 	vm_page_unreserve_pages(lastReservedPages);
 
 	status_t status = B_OK;
@@ -508,7 +508,7 @@ write_to_file(file_cache_ref *ref, void *cookie, off_t offset, int32 pageOffset,
 	if (status == B_OK)
 		reserve_pages(ref, reservePages, true);
 
-	mutex_lock(&ref->cache->lock);
+	cutex_lock(&ref->cache->lock);
 
 	return status;
 }
@@ -604,7 +604,7 @@ cache_io(void *_cacheRef, void *cookie, off_t offset, addr_t buffer,
 	size_t reservePages = 0;
 
 	reserve_pages(ref, lastReservedPages, doWrite);
-	MutexLocker locker(cache->lock);
+	CutexLocker locker(cache->lock);
 
 	while (bytesLeft > 0) {
 		// check if this page is already in memory
@@ -780,7 +780,7 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 	off_t lastOffset = offset;
 	size_t lastSize = 0;
 
-	mutex_lock(&cache->lock);
+	cutex_lock(&cache->lock);
 
 	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
 		// check if this page is already in memory
@@ -792,9 +792,9 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 				// if busy retry again later
 				ConditionVariableEntry entry;
 				entry.Add(page);
-				mutex_unlock(&cache->lock);
+				cutex_unlock(&cache->lock);
 				entry.Wait();
-				mutex_lock(&cache->lock);
+				cutex_lock(&cache->lock);
 
 				goto restart;
 			}
@@ -825,7 +825,7 @@ cache_prefetch_vnode(struct vnode *vnode, off_t offset, size_t size)
 	read_into_cache(ref, lastOffset, lastLeft, NULL, 0);
 
 out:
-	mutex_unlock(&cache->lock);
+	cutex_unlock(&cache->lock);
 	vm_cache_release_ref(cache);
 #endif
 }
@@ -985,7 +985,7 @@ file_cache_set_size(void *_cacheRef, off_t newSize)
 	if (ref == NULL)
 		return B_OK;
 
-	MutexLocker _(ref->cache->lock);
+	CutexLocker _(ref->cache->lock);
 
 	off_t offset = ref->cache->virtual_size;
 	off_t size = newSize;
