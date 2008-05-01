@@ -11,6 +11,9 @@
 
 #include <lock.h>
 
+#include <stdlib.h>
+#include <string.h>
+
 #include <OS.h>
 
 #include <debug.h>
@@ -25,6 +28,9 @@ struct cutex_waiter {
 	cutex_waiter*	next;		// next in queue
 	cutex_waiter*	last;		// last in queue (valid for the first in queue)
 };
+
+#define CUTEX_FLAG_OWNS_NAME	CUTEX_FLAG_CLONE_NAME
+#define CUTEX_FLAG_RELEASED		0x2
 
 
 int32
@@ -302,23 +308,67 @@ cutex_init(cutex* lock, const char *name)
 #else
 	lock->count = 0;
 #endif
-	lock->release_count = 0;
+	lock->flags = 0;
+}
+
+
+void
+cutex_init_etc(cutex* lock, const char *name, uint32 flags)
+{
+	lock->name = (flags & CUTEX_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
+	lock->waiters = NULL;
+#ifdef KDEBUG
+	lock->holder = -1;
+#else
+	lock->count = 0;
+#endif
+	lock->flags = flags & CUTEX_FLAG_CLONE_NAME;
 }
 
 
 void
 cutex_destroy(cutex* lock)
 {
-	// no-op
+	char* name = (lock->flags & CUTEX_FLAG_CLONE_NAME) != 0
+		? (char*)lock->name : NULL;
+
+	// unblock all waiters
+	InterruptsSpinLocker locker(thread_spinlock);
+
+#ifdef KDEBUG
+	if (lock->waiters != NULL && thread_get_current_thread_id()
+		!= lock->holder) {
+		panic("cutex_destroy(): there are blocking threads, but caller doesn't "
+			"hold the lock (%p)", lock);
+		locker.Unlock();
+		if (_cutex_lock(lock) != B_OK)
+			return;
+		locker.Lock();
+	}
+#endif
+
+	while (cutex_waiter* waiter = lock->waiters) {
+		// dequeue
+		lock->waiters = waiter->next;
+
+		// unblock thread
+		thread_unblock_locked(waiter->thread, B_ERROR);
+	}
+
+	lock->name = NULL;
+
+	locker.Unlock();
+
+	free(name);
 }
 
 
-void
+status_t
 _cutex_lock(cutex* lock)
 {
 #ifdef KDEBUG
 	if (!kernel_startup && !are_interrupts_enabled()) {
-		panic("_cutex_unlock: called with interrupts disabled for lock %p",
+		panic("_cutex_unlock(): called with interrupts disabled for lock %p",
 			lock);
 	}
 #endif
@@ -328,14 +378,16 @@ _cutex_lock(cutex* lock)
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
 #ifdef KDEBUG
-	if (lock->release_count >= 0) {
+	if (lock->holder <= 0) {
 		lock->holder = thread_get_current_thread_id();
-#else
-	if (lock->release_count > 0) {
-#endif
-		lock->release_count--;
-		return;
+		return B_OK;
 	}
+#else
+	if ((lock->flags & CUTEX_FLAG_RELEASED) != 0) {
+		lock->flags &= ~CUTEX_FLAG_RELEASED;
+		return B_OK;
+	}
+#endif
 
 	// enqueue in waiter list
 	cutex_waiter waiter;
@@ -351,11 +403,14 @@ _cutex_lock(cutex* lock)
 
 	// block
 	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_CUTEX, lock);
-	thread_block_locked(waiter.thread);
+	status_t error = thread_block_locked(waiter.thread);
 
 #ifdef KDEBUG
-	lock->holder = waiter.thread->id;
+	if (error == B_OK)
+		lock->holder = waiter.thread->id;
 #endif
+
+	return error;
 }
 
 
@@ -371,8 +426,6 @@ _cutex_unlock(cutex* lock)
 			lock, lock->holder);
 		return;
 	}
-
-	lock->holder = -1;
 #endif
 
 	cutex_waiter* waiter = lock->waiters;
@@ -384,10 +437,22 @@ _cutex_unlock(cutex* lock)
 
 		// unblock thread
 		thread_unblock_locked(waiter->thread, B_OK);
+
+#ifdef KDEBUG
+		// Already set the holder to the unblocked thread. Besides that this
+		// actually reflects the current situation, setting it to -1 would
+		// cause a race condition, since another locker could think the lock
+		// is not held by anyone.
+		lock->holder = waiter->thread->id;
+#endif
 	} else {
-		// We acquired the spinlock before the locker that is going to wait.
-		// Just increment the release count.
-		lock->release_count++;
+		// We've acquired the spinlock before the locker that is going to wait.
+		// Just mark the lock as released.
+#ifdef KDEBUG
+		lock->holder = -1;
+#else
+		lock->flags |= CUTEX_FLAG_RELEASED;
+#endif
 	}
 }
 
@@ -398,9 +463,8 @@ _cutex_trylock(cutex* lock)
 #ifdef KDEBUG
 	InterruptsSpinLocker _(thread_spinlock);
 
-	if (lock->release_count >= 0) {
+	if (lock->holder <= 0) {
 		lock->holder = thread_get_current_thread_id();
-		lock->release_count--;
 		return B_OK;
 	}
 #endif
@@ -425,7 +489,7 @@ dump_cutex_info(int argc, char** argv)
 
 	kprintf("cutex %p:\n", lock);
 	kprintf("  name:            %s\n", lock->name);
-	kprintf("  release count:   %ld\n", lock->release_count);
+	kprintf("  flags:           0x%x\n", lock->flags);
 #ifdef KDEBUG
 	kprintf("  holder:          %ld\n", lock->holder);
 #else

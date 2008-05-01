@@ -49,8 +49,10 @@ typedef struct cutex {
 #else
 	int32					count;
 #endif
-	int32					release_count;
+	uint8					flags;
 } cutex;
+
+#define CUTEX_FLAG_CLONE_NAME	0x1
 
 
 #if 0 && KDEBUG // XXX disable this for now, it causes problems when including thread.h here
@@ -121,22 +123,24 @@ extern status_t rw_lock_write_unlock(rw_lock *lock);
 
 extern void cutex_init(cutex* lock, const char *name);
 	// name is *not* cloned nor freed in cutex_destroy()
+extern void cutex_init_etc(cutex* lock, const char *name, uint32 flags);
 extern void cutex_destroy(cutex* lock);
 
 // implementation private:
-extern void _cutex_lock(cutex* lock);
+extern status_t _cutex_lock(cutex* lock);
 extern void _cutex_unlock(cutex* lock);
 extern status_t _cutex_trylock(cutex* lock);
 
 
-static inline void
+static inline status_t
 cutex_lock(cutex* lock)
 {
 #ifdef KDEBUG
-	_cutex_lock(lock);
+	return _cutex_lock(lock);
 #else
 	if (atomic_add(&lock->count, -1) < 0)
-		_cutex_lock(lock);
+		return _cutex_lock(lock);
+	return B_OK;
 #endif
 }
 
@@ -149,6 +153,7 @@ cutex_trylock(cutex* lock)
 #else
 	if (atomic_test_and_set(&lock->count, -1, 0) != 0)
 		return B_WOULD_BLOCK;
+	return B_OK;
 #endif
 }
 
