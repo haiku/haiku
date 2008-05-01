@@ -2159,7 +2159,14 @@ team_remove_team(struct team *team)
 	parent->dead_children->user_time += team->dead_threads_user_time
 		+ team->dead_children->user_time;
 
+	// Also grab the thread spinlock while removing the team from the hash.
+	// This makes the following sequence safe: grab teams lock, lookup team,
+	// grab threads lock, unlock teams lock,
+	// mutex_lock_threads_lock(<team related lock>), as used in the VFS code to
+	// lock another team's IO context.
+	GRAB_THREAD_LOCK();
 	hash_remove(sTeamHash, team);
+	RELEASE_THREAD_LOCK();
 	sUsedTeams--;
 
 	team->state = TEAM_STATE_DEATH;
