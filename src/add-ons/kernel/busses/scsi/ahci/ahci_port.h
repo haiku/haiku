@@ -52,6 +52,7 @@ private:
 	status_t	FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const physical_entry *sgTable, int sgCount, size_t dataSize);
 
 private:
+	AHCIController*			fController;
 	int						fIndex;
 	volatile ahci_port *	fRegs;
 	area_id					fArea;

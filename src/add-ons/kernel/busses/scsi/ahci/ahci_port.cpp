@@ -15,6 +15,7 @@
 #include <new>
 #include <stdio.h>
 #include <string.h>
+#include <tracing.h>
 
 #define TRACE(a...) dprintf("\33[34mahci:\33[0m " a)
 //#define FLOW(a...)	dprintf("ahci: " a)
@@ -22,9 +23,66 @@
 #define FLOW(a...)
 #define RWTRACE(a...)
 
+#if AHCI_PORT_TRACING
+
+namespace AHCIPortTracing {
+
+class AHCIPortTraceEntry : public AbstractTraceEntry {
+	protected:
+		AHCIPortTraceEntry(AHCIController* controller, int index)
+		: fController(controller)
+		, fIndex(index)
+		{
+		}
+
+		void AddDump(TraceOutput& out, const char* name)
+		{
+			out.Print(name);
+			out.Print("controller: %p", fController);
+			out.Print(", index: %d", fIndex);			
+		}
+	
+		AHCIController* fController;
+		int fIndex;
+};
+
+
+class AHCIPortPrdTable : public AHCIPortTraceEntry {
+	public:
+		AHCIPortPrdTable(AHCIController* controller, int index, void* address,
+			size_t size)
+		: AHCIPortTraceEntry(controller, index)
+		, fAddress(address)
+		, fSize(size)
+		{
+			Initialized();
+		}
+
+		void AddDump(TraceOutput& out)
+		{
+			AHCIPortTraceEntry::AddDump(out, " - prd table: ");
+
+			out.Print("address: %p", fAddress);
+			out.Print(", size: %lu", fSize);
+		}
+
+		void* fAddress;
+		int fSize;
+};
+
+
+}	// namespace AHCIPortTracing
+
+#	define T(x)	new(std::nothrow) AHCIPortTracing::x
+
+#else
+#	define T(x)
+#endif	// AHCI_PORT_TRACING
+
 
 AHCIPort::AHCIPort(AHCIController *controller, int index)
-	: fIndex(index)
+	: fController(controller)
+	, fIndex(index)
 	, fRegs(&controller->fRegs->port[index])
 	, fArea(-1)
 	, fSpinlock(0)
@@ -322,6 +380,7 @@ AHCIPort::FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const 
 	while (sgCount > 0 && dataSize > 0) {
 		size_t size = min_c(sgTable->size, dataSize);
 		void *address = sgTable->address;
+		T(AHCIPortPrdTable(fController, fIndex, address, size));
 		FLOW("FillPrdTable: sg-entry addr %p, size %lu\n", address, size);
 		if ((uint32)address & 1) {
 			TRACE("AHCIPort::FillPrdTable: data alignment error\n");
