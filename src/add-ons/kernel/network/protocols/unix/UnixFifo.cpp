@@ -10,7 +10,7 @@
 #include "unix.h"
 
 
-#define UNIX_FIFO_DEBUG_LEVEL	2
+#define UNIX_FIFO_DEBUG_LEVEL	0
 #define UNIX_DEBUG_LEVEL		UNIX_FIFO_DEBUG_LEVEL
 #include "UnixDebug.h"
 
@@ -359,6 +359,9 @@ UnixFifo::Init()
 void
 UnixFifo::Shutdown(uint32 shutdown)
 {
+	TRACE("[%ld] %p->UnixFifo::Shutdown(0x%lx)\n", find_thread(NULL), this,
+		shutdown);
+
 	fShutdown |= shutdown;
 
 	if (shutdown != 0) {
@@ -372,8 +375,8 @@ UnixFifo::Shutdown(uint32 shutdown)
 status_t
 UnixFifo::Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer)
 {
-	TRACE("[%ld] UnixFifo::Read(%lu, %lld)\n", find_thread(NULL), numBytes,
-		timeout);
+	TRACE("[%ld] %p->UnixFifo::Read(%lu, %lld)\n", find_thread(NULL), this,
+		numBytes, timeout);
 
 	if (IsReadShutdown())
 		return UNIX_FIFO_SHUTDOWN;
@@ -408,6 +411,9 @@ UnixFifo::Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer)
 status_t
 UnixFifo::Write(net_buffer* buffer, bigtime_t timeout)
 {
+	TRACE("[%ld] %p->UnixFifo::Write(%p (%lu), %lld)\n", find_thread(NULL),
+		this, buffer, buffer->size, timeout);
+
 	if (IsWriteShutdown())
 		return UNIX_FIFO_SHUTDOWN;
 

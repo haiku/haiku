@@ -16,7 +16,7 @@
 #include "UnixFifo.h"
 
 
-#define UNIX_ENDPOINT_DEBUG_LEVEL	2
+#define UNIX_ENDPOINT_DEBUG_LEVEL	0
 #define UNIX_DEBUG_LEVEL			UNIX_ENDPOINT_DEBUG_LEVEL
 #include "UnixDebug.h"
 

@@ -24,7 +24,7 @@
 #include "UnixEndpoint.h"
 
 
-#define UNIX_MODULE_DEBUG_LEVEL	2
+#define UNIX_MODULE_DEBUG_LEVEL	0
 #define UNIX_DEBUG_LEVEL		UNIX_MODULE_DEBUG_LEVEL
 #include "UnixDebug.h"
 

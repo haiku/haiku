@@ -25,7 +25,7 @@
 #define UNIX_FIFO_MAXIMAL_CAPACITY	(128 * 1024)
 
 
-#define TRACE_BUFFER_QUEUE	1
+#define TRACE_BUFFER_QUEUE	0
 
 
 class UnixBufferQueue {
