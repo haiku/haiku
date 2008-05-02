@@ -127,7 +127,7 @@ ShowImageStatusView::MouseDown(BPoint where)
 		entry_ref ref;
 		get_ref_for_path(path.Path(), &ref);
 		msg.AddRef("refs", &ref);
-		tracker.SendMessage(msg);
+		tracker.SendMessage(&msg);
 	}
 }
 
