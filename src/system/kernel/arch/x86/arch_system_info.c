@@ -1,19 +1,20 @@
 /*
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
+#include <arch/system_info.h>
+
+#include <string.h>
+
 #include <KernelExport.h>
 #include <OS.h>
 
+#include <boot/kernel_args.h>
+#include <cpu.h>
 #include <kernel.h>
 #include <smp.h>
-#include <cpu.h>
-#include <arch/system_info.h>
-#include <boot/kernel_args.h>
-
-#include <string.h>
 
 
 uint32 sCpuType;
@@ -22,7 +23,8 @@ int64 sCpuClockSpeed;
 
 
 static bool
-get_cpuid_for(cpuid_info *info, uint32 currentCPU, uint32 eaxRegister, uint32 forCPU)
+get_cpuid_for(cpuid_info *info, uint32 currentCPU, uint32 eaxRegister,
+	uint32 forCPU)
 {
 	if (currentCPU != forCPU)
 		return false;
@@ -81,7 +83,7 @@ arch_system_info_init(struct kernel_args *args)
 	uint32 base;
 	uint32 model = 0;
 	cpu_ent *cpu = get_cpu_struct();
-	
+
 	switch (cpu->arch.vendor) {
 		case VENDOR_INTEL:
 			base = B_CPU_INTEL_x86;
@@ -114,28 +116,29 @@ arch_system_info_init(struct kernel_args *args)
 			base = B_CPU_x86;
 	}
 
-	if (base != B_CPU_x86)
-		if (base == B_CPU_INTEL_x86)
-			model = (cpu->arch.extended_family << 20) + (cpu->arch.extended_model << 16) +
-			(cpu->arch.family << 4) + cpu->arch.model;
-		else
+	if (base != B_CPU_x86) {
+		if (base == B_CPU_INTEL_x86) {
+			model = (cpu->arch.extended_family << 20)
+				+ (cpu->arch.extended_model << 16)
+				+ (cpu->arch.family << 4) + cpu->arch.model;
+		} else {
 			model = (cpu->arch.family << 4) +
 			cpu->arch.model;
-			/*  There isn't much useful information yet in the extended
-				family and extended model fields of AMD processors
-				and is probably undefined for others */
+			// There isn't much useful information yet in the extended
+			// family and extended model fields of AMD processors
+			// and is probably undefined for others
+		}
+	}
 
 	sCpuRevision = (cpu->arch.extended_family << 18)
-					| (cpu->arch.extended_model << 14)
-					| (cpu->arch.type << 12)
-					| (cpu->arch.family << 8)
-					| (cpu->arch.model << 4)
-					| cpu->arch.stepping;
+		| (cpu->arch.extended_model << 14) | (cpu->arch.type << 12)
+		| (cpu->arch.family << 8) | (cpu->arch.model << 4) | cpu->arch.stepping;
 
 	sCpuType = base + model;
 	sCpuClockSpeed = args->arch_args.cpu_clock_speed;
 	return B_OK;
 }
+
 
 //	#pragma mark -
 
