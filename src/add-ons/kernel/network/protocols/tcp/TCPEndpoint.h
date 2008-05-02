@@ -32,7 +32,7 @@ public:
 
 	status_t InitCheck() const;
 
-	status_t Wait(MutexLocker &, bigtime_t timeout, bool wakeNext = true);
+	status_t Wait(MutexLocker &, bigtime_t timeout);
 	void Signal();
 
 private:
