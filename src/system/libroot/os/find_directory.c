@@ -280,10 +280,6 @@ find_directory(directory_which which, dev_t device, bool createIt,
 	err = B_OK;
 	if (template) {
 		if (!strncmp(template, "$h", 2)) {
-			struct passwd pwBuffer;
-			char pwStringBuffer[MAX_PASSWD_BUFFER_SIZE];
-			struct passwd *pw;
-
 			if (bootDevice > -1 && device != bootDevice) {
 				int l = pathLength - strlen(buffer);
 				if (l > 5)
@@ -291,6 +287,10 @@ find_directory(directory_which which, dev_t device, bool createIt,
 			} else {
 #ifndef _KERNEL_MODE
 #ifdef USE_PWENTS
+				struct passwd pwBuffer;
+				char pwStringBuffer[MAX_PASSWD_BUFFER_SIZE];
+				struct passwd *pw;
+
 				if (getpwuid_r(geteuid(), &pwBuffer, pwStringBuffer,
 						sizeof(pwStringBuffer), &pw) == 0) {
 					home = pw->pw_dir;
@@ -309,9 +309,9 @@ find_directory(directory_which which, dev_t device, bool createIt,
 		} else
 			strlcat(buffer, "/", pathLength);
 
-		if (!err && strlen(buffer) + 2 + strlen(template) < (uint32)pathLength) {
+		if (!err && strlen(buffer) + 2 + strlen(template) < (uint32)pathLength)
 			strcat(buffer, template);
-		} else
+		else
 			err = err ? err : E2BIG;
 	} else
 		err = err ? err : ENOENT;
