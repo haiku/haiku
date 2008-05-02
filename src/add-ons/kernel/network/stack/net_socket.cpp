@@ -30,6 +30,7 @@
 #include <net_stack.h>
 #include <net_stat.h>
 
+#include "ancillary_data.h"
 #include "utility.h"
 
 
@@ -134,8 +135,8 @@ err1:
 
 
 static status_t
-attach_ancillary_data(net_socket *socket, net_buffer *buffer, void *data,
-	size_t dataLen)
+add_ancillary_data(net_socket *socket, ancillary_data_container* container,
+	void *data, size_t dataLen)
 {
 	cmsghdr *header = (cmsghdr*)data;
 
@@ -143,11 +144,11 @@ attach_ancillary_data(net_socket *socket, net_buffer *buffer, void *data,
 		if (header->cmsg_len < sizeof(cmsghdr) || header->cmsg_len > dataLen)
 			return B_BAD_VALUE;
 
-		if (socket->first_info->attach_ancillary_data == NULL)
+		if (socket->first_info->add_ancillary_data == NULL)
 			return EOPNOTSUPP;
 
-		status_t status = socket->first_info->attach_ancillary_data(
-			socket->first_protocol, buffer, header);
+		status_t status = socket->first_info->add_ancillary_data(
+			socket->first_protocol, container, header);
 		if (status != B_OK)
 			return status;
 
@@ -160,17 +161,20 @@ attach_ancillary_data(net_socket *socket, net_buffer *buffer, void *data,
 
 
 static status_t
-process_ancillary_data(net_socket *socket, net_buffer *buffer, msghdr *_header)
+process_ancillary_data(net_socket *socket, ancillary_data_container* container,
+	msghdr *_header)
 {
+	if (container == NULL)
+		return B_OK;
+
 	uint8 *dataBuffer = (uint8*)_header->msg_control;
 	int dataBufferLen = _header->msg_controllen;
 
 	ancillary_data_header header;
 	void *data = NULL;
 
-	while ((data = gNetBufferModule.next_ancillary_data(buffer, data, &header))
-			!= NULL) {
 
+	while ((data = next_ancillary_data(container, data, &header)) != NULL) {
 		if (socket->first_info->process_ancillary_data == NULL)
 			return EOPNOTSUPP;
 
@@ -943,7 +947,8 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 	// process ancillary data
 	if (header != NULL) {
 		if (buffer != NULL && header->msg_control != NULL) {
-			status = process_ancillary_data(socket, buffer, header);
+			status = process_ancillary_data(socket,
+				gNetBufferModule.get_ancillary_data(buffer), header);
 			if (status != B_OK) {
 				gNetBufferModule.free(buffer);
 				return status;
@@ -1129,8 +1134,15 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 		// attach ancillary data to the first buffer
 		status_t status = B_OK;
 		if (ancillaryData != NULL) {
-			status = attach_ancillary_data(socket, buffer, ancillaryData,
-				ancillaryDataLen);
+			ancillary_data_container *container
+				= create_ancillary_data_container();
+			if (container != NULL) {
+				gNetBufferModule.set_ancillary_data(buffer, container);
+				status = add_ancillary_data(socket, container, ancillaryData,
+					ancillaryDataLen);
+			} else
+				status = B_NO_MEMORY;
+
 			ancillaryData = NULL;
 		}
 

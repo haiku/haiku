@@ -7,6 +7,7 @@
  */
 
 
+#include "ancillary_data.h"
 #include "domains.h"
 #include "interfaces.h"
 #include "link.h"
@@ -922,6 +923,13 @@ net_stack_module_info gNetStackModule = {
 	is_restarted_syscall,
 	store_syscall_restart_timeout,
 	restore_syscall_restart_timeout,
+
+	create_ancillary_data_container,
+	delete_ancillary_data_container,
+	add_ancillary_data,
+	remove_ancillary_data,
+	move_ancillary_data,
+	next_ancillary_data
 };
 
 module_info *modules[] = {

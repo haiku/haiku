@@ -25,6 +25,8 @@
 #include <sys/param.h>
 #include <sys/uio.h>
 
+#include "ancillary_data.h"
+
 #include "paranoia_config.h"
 
 
@@ -121,30 +123,11 @@ struct data_node {
 	}
 };
 
-#define MAX_ANCILLARY_DATA_SIZE	128
-
-struct ancillary_data : DoublyLinkedListLinkImpl<ancillary_data> {
-	void* Data()
-	{
-		return (char*)this + _ALIGN(sizeof(ancillary_data));
-	}
-
-	static ancillary_data* FromData(void* data)
-	{
-		return (ancillary_data*)((char*)data - _ALIGN(sizeof(ancillary_data)));
-	}
-
-	ancillary_data_header	header;
-	void (*destructor)(const ancillary_data_header*, void*);
-};
-
-typedef DoublyLinkedList<ancillary_data> ancillary_data_list;
-
 struct net_buffer_private : net_buffer {
 	struct list			buffers;
 	data_header			*allocation_header;	// the current place where we
 											// allocate header space (nodes,...)
-	ancillary_data_list	ancillary_data;
+	ancillary_data_container*	ancillary_data;
 
 	struct {
 		struct sockaddr_storage source;
@@ -1021,7 +1004,7 @@ create_buffer(size_t headerSpace)
 	list_init(&buffer->buffers);
 	list_add_item(&buffer->buffers, node);
 
-	new(&buffer->ancillary_data) ancillary_data_list;
+	buffer->ancillary_data = NULL;
 
 	buffer->source = (sockaddr *)&buffer->storage.source;
 	buffer->destination = (sockaddr *)&buffer->storage.destination;
@@ -1063,11 +1046,7 @@ free_buffer(net_buffer *_buffer)
 		remove_data_node(node);
 	}
 
-	while (ancillary_data* data = buffer->ancillary_data.RemoveHead()) {
-		if (data->destructor != NULL)
-			data->destructor(&data->header, data->Data());
-		free(data);
-	}
+	delete_ancillary_data_container(buffer->ancillary_data);
 
 	release_data_header(buffer->allocation_header);
 
@@ -1873,89 +1852,17 @@ append_cloned_data(net_buffer *_buffer, net_buffer *_source, uint32 offset,
 }
 
 
-/*!
-	Attaches ancillary data to the given buffer. The data are completely
-	orthogonal to the data the buffer stores.
-
-	\param buffer The buffer.
-	\param header Description of the data.
-	\param data If not \c NULL, the data are copied into the allocated storage.
-	\param destructor If not \c NULL, this function will be invoked with the
-		data as parameter when the buffer is destroyed.
-	\param _allocatedData Will be set to the storage allocated for the data.
-	\return \c B_OK when everything goes well, another error code otherwise.
-*/
-static status_t
-attach_ancillary_data(net_buffer *_buffer, const ancillary_data_header *header,
-	const void *data, void (*destructor)(const ancillary_data_header*, void*),
-	void **_allocatedData)
+void
+set_ancillary_data(net_buffer *buffer, ancillary_data_container *container)
 {
-	// TODO: Obviously it would be nice to allocate the memory for the
-	// ancillary data in the buffer.
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-
-	// check parameters
-	if (header == NULL)
-		return B_BAD_VALUE;
-
-	if (header->len > MAX_ANCILLARY_DATA_SIZE)
-		return ENOBUFS;
-
-	// allocate buffer
-	void *dataBuffer = malloc(_ALIGN(sizeof(ancillary_data)) + header->len);
-	if (dataBuffer == NULL)
-		return B_NO_MEMORY;
-
-	// init and attach the structure
-	ancillary_data *ancillaryData = new(dataBuffer) ancillary_data;
-	ancillaryData->header = *header;
-	ancillaryData->destructor = destructor;
-
-	buffer->ancillary_data.Add(ancillaryData);
-
-	if (data != NULL)
-		memcpy(ancillaryData->Data(), data, header->len);
-
-	if (_allocatedData != NULL)
-		*_allocatedData = ancillaryData->Data();
-
-	return B_OK;
+	((net_buffer_private*)buffer)->ancillary_data = container;
 }
 
 
-/*!
-	Detaches ancillary data from the given buffer. The associated memory is
-	free, i.e. the \a data pointer must no longer be used after calling this
-	function. Depending on \a destroy, the destructor is invoked before freeing
-	the data.
-
-	\param buffer The buffer.
-	\param data Pointer to the data to be removed (as returned by
-		attach_ancillary_data() or next_ancillary_data()).
-	\param destroy If \c true, the destructor, if one was passed to
-		attach_ancillary_data(), is invoked for the data.
-	\return \c B_OK when everything goes well, another error code otherwise.
-*/
-static status_t
-detach_ancillary_data(net_buffer *_buffer, void *data, bool destroy)
+ancillary_data_container*
+get_ancillary_data(net_buffer *buffer)
 {
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-
-	if (data == NULL)
-		return B_BAD_VALUE;
-
-	ancillary_data *ancillaryData = ancillary_data::FromData(data);
-
-	buffer->ancillary_data.Remove(ancillaryData);
-
-	if (destroy && ancillaryData->destructor != NULL) {
-		ancillaryData->destructor(&ancillaryData->header,
-			ancillaryData->Data());
-	}
-
-	free(ancillaryData);
-
-	return B_OK;
+	return ((net_buffer_private*)buffer)->ancillary_data;
 }
 
 
@@ -1965,7 +1872,7 @@ detach_ancillary_data(net_buffer *_buffer, void *data, bool destroy)
 	transfers or copies ancillary data from one buffer to another.
 
 	\param from The buffer from which to remove the ancillary data.
-	\param to The buffer to which to add teh ancillary data.
+	\param to The buffer to which to add the ancillary data.
 	\return A pointer to the first of the moved ancillary data, if any, \c NULL
 		otherwise.
 */
@@ -1978,52 +1885,23 @@ transfer_ancillary_data(net_buffer *_from, net_buffer *_to)
 	if (from == NULL || to == NULL)
 		return NULL;
 
-	ancillary_data *ancillaryData = from->ancillary_data.Head();
-	to->ancillary_data.MoveFrom(&from->ancillary_data);
-
-	return ancillaryData != NULL ? ancillaryData->Data() : NULL;
-}
-
-
-/*!
-	Returns the next ancillary data. When iterating over the data, initially
-	a \c NULL pointer shall be passed as \a previousData, subsequently the
-	previously returned data pointer. After the last item, \c NULL is returned.
-
-	Note, that it is not safe to call detach_ancillary_data() for a data item
-	and then pass that pointer to this function. First get the next item, then
-	detach the previous one.
-
-	\param buffer The buffer.
-	\param previousData The pointer to the previous data returned by this
-		function. Initially \c NULL shall be passed.
-	\param header Pointer to allocated storage into which the data description
-		is written. May be \c NULL.
-	\return A pointer to the next ancillary data in the buffer. \c NULL after
-		the last one.
-*/
-static void*
-next_ancillary_data(net_buffer *_buffer, void *previousData,
-	ancillary_data_header *_header)
-{
-	net_buffer_private *buffer = (net_buffer_private *)_buffer;
-
-	ancillary_data *ancillaryData;
-
-	if (previousData == NULL) {
-		ancillaryData = buffer->ancillary_data.Head();
-	} else {
-		ancillaryData = ancillary_data::FromData(previousData);
-		ancillaryData = buffer->ancillary_data.GetNext(ancillaryData);
-	}
-
-	if (ancillaryData == NULL)
+	if (from->ancillary_data == NULL)
 		return NULL;
 
-	if (_header != NULL)
-		*_header = ancillaryData->header;
+	if (to->ancillary_data == NULL) {
+		// no ancillary data in the target buffer
+		to->ancillary_data = from->ancillary_data;
+		from->ancillary_data = NULL;
+		return next_ancillary_data(to->ancillary_data, NULL, NULL);
+	}
 
-	return ancillaryData->Data();
+	// both have ancillary data
+	void *data = move_ancillary_data(from->ancillary_data,
+		to->ancillary_data);
+	delete_ancillary_data_container(from->ancillary_data);
+	from->ancillary_data = NULL;
+
+	return data;
 }
 
 
@@ -2228,10 +2106,9 @@ net_buffer_module_info gNetBufferModule = {
 
 	NULL,	// associate_data
 
-	attach_ancillary_data,
-	detach_ancillary_data,
+	set_ancillary_data,
+	get_ancillary_data,
 	transfer_ancillary_data,
-	next_ancillary_data,
 
 	direct_access,
 	read_data,

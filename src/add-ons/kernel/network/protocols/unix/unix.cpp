@@ -268,11 +268,11 @@ unix_error_reply(net_protocol *protocol, net_buffer *causedError, uint32 code,
 
 
 status_t
-unix_attach_ancillary_data(net_protocol *self, net_buffer *buffer,
+unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 	const cmsghdr *header)
 {
-	TRACE("[%ld] unix_attach_ancillary_data(%p, %p, %p (level: %d, type: %d, "
-		"len: %d))\n", find_thread(NULL), self, buffer, header,
+	TRACE("[%ld] unix_add_ancillary_data(%p, %p, %p (level: %d, type: %d, "
+		"len: %d))\n", find_thread(NULL), self, container, header,
 		header->cmsg_level, header->cmsg_type, (int)header->cmsg_len);
 
 	// we support only SCM_RIGHTS
@@ -302,17 +302,17 @@ unix_attach_ancillary_data(net_protocol *self, net_buffer *buffer,
 		}
 	}
 
-	// attach the ancillary data to the buffer
+	// attach the ancillary data to the container
 	if (error == B_OK) {
 		ancillary_data_header header;
 		header.level = SOL_SOCKET;
 		header.type = SCM_RIGHTS;
 		header.len = count * sizeof(file_descriptor*);
 
-		TRACE("[%ld] unix_attach_ancillary_data(): attaching %d FDs to "
-			"buffer\n", find_thread(NULL), count);
+		TRACE("[%ld] unix_add_ancillary_data(): adding %d FDs to "
+			"container\n", find_thread(NULL), count);
 
-		error = gBufferModule->attach_ancillary_data(buffer, &header,
+		error = gStackModule->add_ancillary_data(container, &header,
 			descriptors, destroy_scm_rights_descriptors, NULL);
 	}
 
@@ -468,7 +468,7 @@ net_protocol_module_info gUnixModule = {
 	unix_deliver_data,
 	unix_error,
 	unix_error_reply,
-	unix_attach_ancillary_data,
+	unix_add_ancillary_data,
 	unix_process_ancillary_data
 };
 

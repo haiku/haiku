@@ -37,11 +37,7 @@ typedef struct net_buffer {
 	uint8	protocol;
 } net_buffer;
 
-typedef struct ancillary_data_header {
-	int		level;
-	int		type;
-	size_t	len;
-} ancillary_data_header;
+struct ancillary_data_container;
 
 struct net_buffer_module_info {
 	module_info info;
@@ -74,16 +70,11 @@ struct net_buffer_module_info {
 
 	status_t		(*associate_data)(net_buffer *buffer, void *data);
 
-	status_t		(*attach_ancillary_data)(net_buffer *buffer,
-						const ancillary_data_header *header, const void *data,
-						void (*destructor)(const ancillary_data_header*, void*),
-						void **_allocatedData);
-	status_t		(*detach_ancillary_data)(net_buffer *buffer, void *data,
-						bool destroy);
+	void			(*set_ancillary_data)(net_buffer *buffer,
+						ancillary_data_container *container);
+	ancillary_data_container* (*get_ancillary_data)(net_buffer *buffer);
 	void *			(*transfer_ancillary_data)(net_buffer *from,
 						net_buffer *to);
-	void *			(*next_ancillary_data)(net_buffer *buffer,
-						void *previousData, ancillary_data_header *_header);
 
 	status_t		(*direct_access)(net_buffer *buffer, uint32 offset,
 						size_t bytes, void **_data);

@@ -24,6 +24,8 @@ struct net_domain;
 struct net_socket;
 struct net_timer;
 
+typedef struct ancillary_data_container ancillary_data_container;
+
 struct net_fifo {
 	benaphore	lock;
 	sem_id		notify;
@@ -63,6 +65,12 @@ struct net_device_monitor {
 		struct net_buffer *buffer);
 	void (*event)(struct net_device_monitor *monitor, int32 event);
 };
+
+typedef struct ancillary_data_header {
+	int		level;
+	int		type;
+	size_t	len;
+} ancillary_data_header;
 
 struct net_stack_module_info {
 	module_info info;
@@ -139,6 +147,21 @@ struct net_stack_module_info {
 	bool (*is_restarted_syscall)(void);
 	void (*store_syscall_restart_timeout)(bigtime_t timeout);
 	bigtime_t (*restore_syscall_restart_timeout)(void);
+
+	// ancillary data
+	ancillary_data_container* (*create_ancillary_data_container)();
+	void (*delete_ancillary_data_container)(
+					ancillary_data_container* container);
+	status_t (*add_ancillary_data)(ancillary_data_container *container,
+					const ancillary_data_header *header, const void *data,
+					void (*destructor)(const ancillary_data_header*, void*),
+					void **_allocatedData);
+	status_t (*remove_ancillary_data)(ancillary_data_container *container,
+					void *data, bool destroy);
+	void* (*move_ancillary_data)(ancillary_data_container *from,
+					ancillary_data_container *to);
+	void* (*next_ancillary_data)(ancillary_data_container *container,
+					void *previousData, ancillary_data_header *_header);
 };
 
 #endif	// NET_STACK_H

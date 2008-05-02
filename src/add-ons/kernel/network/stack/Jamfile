@@ -15,6 +15,7 @@ UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
 UsePrivateHeaders net ;
 
 KernelAddon stack :
+	ancillary_data.cpp
 	datalink.cpp
 	domains.cpp
 	interfaces.cpp

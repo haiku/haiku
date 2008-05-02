@@ -16,6 +16,9 @@
 #define LEVEL_DRIVER_IOCTL		0x0f000000
 #define LEVEL_MASK				0x0fffffff
 
+struct ancillary_data_container;
+struct ancillary_data_header;
+
 typedef struct net_protocol {
 	struct net_protocol				*next;
 	struct net_protocol_module_info	*module;
@@ -69,8 +72,8 @@ struct net_protocol_module_info {
 	status_t	(*error_reply)(net_protocol *self, net_buffer *causedError,
 					uint32 code, void *errorData);
 
-	status_t	(*attach_ancillary_data)(net_protocol *self, net_buffer *buffer,
-					const cmsghdr *header);
+	status_t	(*add_ancillary_data)(net_protocol *self,
+					ancillary_data_container *container, const cmsghdr *header);
 	ssize_t		(*process_ancillary_data)(net_protocol *self,
 					const ancillary_data_header *header, const void *data,
 					void *buffer, size_t bufferSize);
