@@ -323,8 +323,13 @@ status_t
 link_getsockopt(net_protocol *protocol, int level, int option, void *value,
 	int *length)
 {
-	return protocol->next->module->getsockopt(protocol, level, option,
-		value, length);
+	if (protocol->next != NULL) {
+		return protocol->next->module->getsockopt(protocol, level, option,
+			value, length);
+	}
+
+	return gNetSocketModule.get_option(protocol->socket, level, option, value,
+		length);
 }
 
 
@@ -332,7 +337,12 @@ status_t
 link_setsockopt(net_protocol *protocol, int level, int option,
 	const void *value, int length)
 {
-	return protocol->next->module->setsockopt(protocol, level, option,
+	if (protocol->next != NULL) {
+		return protocol->next->module->setsockopt(protocol, level, option,
+			value, length);
+	}
+
+	return gNetSocketModule.set_option(protocol->socket, level, option,
 		value, length);
 }
 
