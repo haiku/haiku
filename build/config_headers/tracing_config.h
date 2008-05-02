@@ -18,6 +18,7 @@
 
 // macros specifying the tracing level for individual components (0 is disabled)
 
+#define AHCI_PORT_TRACING						0
 #define BFS_TRACING								0
 #define BLOCK_CACHE_TRANSACTION_TRACING			0
 #define BMESSAGE_TRACING						0
@@ -36,7 +37,6 @@
 #define TEAM_TRACING							0
 #define USER_MALLOC_TRACING						0
 #define WAIT_FOR_OBJECTS_TRACING				0
-#define AHCI_PORT_TRACING						0
 
 #endif	// ENABLE_TRACING
 

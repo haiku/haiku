@@ -37,7 +37,8 @@ class AHCIPortTraceEntry : public AbstractTraceEntry {
 
 		void AddDump(TraceOutput& out, const char* name)
 		{
-			out.Print(name);
+			out.Print("ahci port");
+			out.Print(" - %s - ", name);
 			out.Print("controller: %p", fController);
 			out.Print(", index: %d", fIndex);			
 		}
@@ -60,9 +61,9 @@ class AHCIPortPrdTable : public AHCIPortTraceEntry {
 
 		void AddDump(TraceOutput& out)
 		{
-			AHCIPortTraceEntry::AddDump(out, " - prd table: ");
+			AHCIPortTraceEntry::AddDump(out, "prd table");
 
-			out.Print("address: %p", fAddress);
+			out.Print(", address: %p", fAddress);
 			out.Print(", size: %lu", fSize);
 		}
 
