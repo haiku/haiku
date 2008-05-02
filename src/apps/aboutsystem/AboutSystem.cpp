@@ -516,7 +516,7 @@ AboutView::AboutView(const BRect &rect)
 		"released under the GPL and LGPL licences:\n"
 		"GNU C Library, "
 		"GNU coretools, diffutils, findutils, "
-		"gawk, bison, m4, make, "
+		"shareutils, gawk, bison, m4, make, "
 		"gdb, wget, ncurses, termcap, "
 		"Bourne Again Shell.\n"
 		"Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.",
@@ -527,7 +527,8 @@ AboutView::AboutView(const BRect &rect)
 	AddCopyrightEntry("The FreeBSD Project",
 		"Contains software from the FreeBSD Project, "
 		"released under the BSD licence:\n"
-		"ping, telnet, telnetd, traceroute\n"
+		"cal, ftpd, ping, telnet, "
+		"telnetd, traceroute\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 The FreeBSD Project.  "
 		"All rights reserved.",
 		"http://www.freebsd.org");
@@ -536,7 +537,7 @@ AboutView::AboutView(const BRect &rect)
 	AddCopyrightEntry("The NetBSD Project",
 		"Contains software developed by the NetBSD, "
 		"Foundation, Inc. and its contributors:\n"
-		"ftp\n"
+		"ftp, tput\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 The NetBSD Foundation, Inc.  "
 		"All rights reserved.",
 		"http://www.netbsd.org");
@@ -646,11 +647,24 @@ AboutView::AboutView(const BRect &rect)
 
 	// acpica copyrights
 	AddCopyrightEntry("acpica",
-		"Copyright " B_UTF8_COPYRIGHT " 1999 - 2006 Intel Corp.");
+		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Intel Corp.");
 
 	// unrar copyrights
 	AddCopyrightEntry("unrar",
-		"Copyright " B_UTF8_COPYRIGHT " Alexander L. Roshal.");
+		"Copyright " B_UTF8_COPYRIGHT " 2002-2008 Alexander L. Roshal. "
+		"All rights reserved.",
+		"http://www.rarlab.com");
+
+// p7zip copyrights
+//	AddCopyrightEntry("p7zip",
+//		"Copyright " B_UTF8_COPYRIGHT " 2008 Igor Pavlov. "
+//		"All rights reserved.");
+
+// libMicros copyrights
+//	AddCopyrightEntry("libMicro",
+//		"Copyright " B_UTF8_COPYRIGHT " 2007 Sun Microsystems, Inc. "
+//		"All rights reserved.");
+		// Open Solaris License
 
 	// libpng copyrights
 	AddCopyrightEntry("libpng",
@@ -659,8 +673,8 @@ AboutView::AboutView(const BRect &rect)
 
 	// libprint copyrights
 	AddCopyrightEntry("libprint",
-		"Copyright " B_UTF8_COPYRIGHT " 1999-2000 Y.Takagi. All Rights "
-		"Reserved.");
+		"Copyright " B_UTF8_COPYRIGHT " 1999-2000 Y.Takagi. All rights "
+		"reserved.");
 
 	// cortex copyrights
 	AddCopyrightEntry("Cortex",
@@ -676,23 +690,36 @@ AboutView::AboutView(const BRect &rect)
 
 	// libxml2, libxslt, libexslt copyrights
 	AddCopyrightEntry("libxml2, libxslt",
-		"Copyright " B_UTF8_COPYRIGHT " 1998-2003 Daniel Veillard.  All Rights "
-		"Reserved.");
+		"Copyright " B_UTF8_COPYRIGHT " 1998-2003 Daniel Veillard. "
+		"All rights reserved.");
 
 	AddCopyrightEntry("libexslt",
 		"Copyright " B_UTF8_COPYRIGHT " 2001-2002 Thomas Broyer, Charlie "
-		"Bozeman and Daniel Veillard.  All Rights Reserved.");
+		"Bozeman and Daniel Veillard.  All rights reserved.");
 
 	// Xiph.org Foundation copyrights
 	AddCopyrightEntry("Xiph.org Foundation",
 		"libvorbis, libogg, libtheora, libspeex"
-		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 Xiph.Org.  All rights "
-		"reserved.", "http://www.xiph.org");
+		"Copyright " B_UTF8_COPYRIGHT " 1994-2008 Xiph.Org. "
+		"All rights reserved.",
+		"http://www.xiph.org");
 
 	// The Tcpdump Group
 	AddCopyrightEntry("The Tcpdump Group",
 		"tcpdump, libpcap",
 		"http://www.tcpdump.org");	     
+
+	// Matroska
+	AddCopyrightEntry("libmatroska",
+		"Copyright " B_UTF8_COPYRIGHT " 2002-2003 Steve Lhomme. "
+		"All rights reserved.",
+		"http://www.matroska.org");
+
+// OpenSound
+//	AddCopyrightEntry("OpenSound",
+//		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 4Front Technologies ",
+//		"http://www.opensound.com");
+// BSD license		
 
 	_AddCopyrightsFromAttribute();
 
