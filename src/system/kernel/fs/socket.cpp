@@ -326,6 +326,15 @@ static struct fd_ops sSocketFDOps = {
 static int
 create_socket_fd(net_socket* socket, bool kernel)
 {
+	// Get the socket's non-blocking flag, so we can set the respective
+	// open mode flag.
+	int32 nonBlock;
+	socklen_t nonBlockLen = sizeof(int32);
+	status_t error = sStackInterface->getsockopt(socket, SOL_SOCKET,
+		SO_NONBLOCK, &nonBlock, &nonBlockLen);
+	if (error != B_OK)
+		return error;
+
 	// allocate a file descriptor
 	file_descriptor* descriptor = alloc_fd();
 	if (descriptor == NULL)
@@ -335,7 +344,7 @@ create_socket_fd(net_socket* socket, bool kernel)
 	descriptor->type = FDTYPE_SOCKET;
 	descriptor->ops = &sSocketFDOps;
 	descriptor->u.socket = socket;
-	descriptor->open_mode = O_RDWR;
+	descriptor->open_mode = O_RDWR | (nonBlock ? O_NONBLOCK : 0);
 
 	// publish it
 	int fd = new_fd(get_current_io_context(kernel), descriptor);
