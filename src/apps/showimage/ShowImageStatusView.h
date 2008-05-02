@@ -38,6 +38,8 @@ public:
 		uint32 flags);
 	
 	virtual void Draw(BRect updateRect);
+
+	virtual void MouseDown(BPoint where);
 	
 	void SetText(BString &text);
 	

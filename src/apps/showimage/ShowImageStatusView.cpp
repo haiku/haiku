@@ -27,6 +27,14 @@
 /*****************************************************************************/
 
 #include "ShowImageStatusView.h"
+#include "ShowImageView.h"
+#include "ShowImageWindow.h"
+
+#include <Entry.h>
+#include <MenuItem.h>
+#include <Path.h>
+#include <PopUpMenu.h>
+
 
 ShowImageStatusView::ShowImageStatusView(BRect rect, const char* name,
 	uint32 resizingMode, uint32 flags)
@@ -41,6 +49,7 @@ ShowImageStatusView::ShowImageStatusView(BRect rect, const char* name,
 	font.SetSize(10.0);
 	SetFont(&font);
 }
+
 
 void
 ShowImageStatusView::Draw(BRect updateRect)
@@ -82,9 +91,51 @@ ShowImageStatusView::Draw(BRect updateRect)
 										  		+ fh.ascent / 2.0)));
 }
 
+
+void
+ShowImageStatusView::MouseDown(BPoint where)
+{
+	ShowImageWindow *window = dynamic_cast<ShowImageWindow *>(Window());
+	if (!window || window->GetShowImageView() == NULL)
+		return;
+
+	BPath path;
+	path.SetTo(window->GetShowImageView()->Image());
+
+	BPopUpMenu popup("no title");
+	popup.SetFont(be_plain_font);
+
+	while (path.GetParent(&path) == B_OK && path != "/") {
+		popup.AddItem(new BMenuItem(path.Leaf(), NULL));
+	}
+
+	BRect bounds(Bounds());
+	ConvertToScreen(&bounds);
+	where = bounds.LeftBottom();
+
+	BMenuItem *item;
+	item = popup.Go(where, true, false, ConvertToScreen(Bounds()));
+
+	if (item) {
+		path.SetTo(window->GetShowImageView()->Image());
+		path.GetParent(&path);
+		int index = popup.IndexOf(item);
+		while (index--)
+			path.GetParent(&path);
+		BMessenger tracker("application/x-vnd.Be-TRAK");
+		BMessage msg(B_REFS_RECEIVED);
+		entry_ref ref;
+		get_ref_for_path(path.Path(), &ref);
+		msg.AddRef("refs", &ref);
+		tracker.SendMessage(msg);
+	}
+}
+
+
 void
 ShowImageStatusView::SetText(BString &text)
 {
 	fText = text;
 	Invalidate();
 }
+
