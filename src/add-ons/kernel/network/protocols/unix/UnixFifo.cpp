@@ -338,21 +338,20 @@ UnixFifo::UnixFifo(size_t capacity)
 {
 	fReadCondition.Init(this, "unix fifo read");
 	fWriteCondition.Init(this, "unix fifo write");
-	fLock.sem = -1;
+	mutex_init(&fLock, "unix fifo");
 }
 
 
 UnixFifo::~UnixFifo()
 {
-	if (fLock.sem >= 0)
-		benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
 status_t
 UnixFifo::Init()
 {
-	return benaphore_init(&fLock, "unix fifo");
+	return B_OK;
 }
 
 
@@ -498,9 +497,9 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 		ConditionVariableEntry entry;
 		fReadCondition.Add(&entry, B_CAN_INTERRUPT);
 
-		benaphore_unlock(&fLock);
+		mutex_unlock(&fLock);
 		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
-		benaphore_lock(&fLock);
+		mutex_lock(&fLock);
 
 		if (error != B_OK)
 			RETURN_ERROR(error);
@@ -526,9 +525,9 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 		ConditionVariableEntry entry;
 		fReadCondition.Add(&entry, B_CAN_INTERRUPT);
 
-		benaphore_unlock(&fLock);
+		mutex_unlock(&fLock);
 		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
-		benaphore_lock(&fLock);
+		mutex_lock(&fLock);
 
 		if (error != B_OK)
 			RETURN_ERROR(error);
@@ -558,9 +557,9 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout,
 		ConditionVariableEntry entry;
 		fWriteCondition.Add(&entry, B_CAN_INTERRUPT);
 
-		benaphore_unlock(&fLock);
+		mutex_unlock(&fLock);
 		status_t error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
-		benaphore_lock(&fLock);
+		mutex_lock(&fLock);
 
 		if (error != B_OK)
 			RETURN_ERROR(error);
@@ -585,9 +584,9 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout,
 			ConditionVariableEntry entry;
 			fWriteCondition.Add(&entry, B_CAN_INTERRUPT);
 	
-			benaphore_unlock(&fLock);
+			mutex_unlock(&fLock);
 			error = entry.Wait(B_ABSOLUTE_TIMEOUT, timeout);
-			benaphore_lock(&fLock);
+			mutex_lock(&fLock);
 
 			if (error != B_OK)
 				RETURN_ERROR(error);

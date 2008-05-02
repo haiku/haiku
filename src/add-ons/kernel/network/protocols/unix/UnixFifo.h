@@ -74,12 +74,12 @@ public:
 
 	bool Lock()
 	{
-		return benaphore_lock(&fLock) == B_OK;
+		return mutex_lock(&fLock) == B_OK;
 	}
 
 	void Unlock()
 	{
-		benaphore_unlock(&fLock);
+		mutex_unlock(&fLock);
 	}
 
 	void Shutdown(uint32 shutdown);
@@ -124,7 +124,7 @@ private:
 		size_t& bytesWritten);
 
 private:
-	benaphore			fLock;
+	mutex				fLock;
 	UnixBufferQueue		fBuffer;
 	RequestList			fReaders;
 	RequestList			fWriters;
