@@ -687,12 +687,12 @@ UnixEndpoint::Shutdown(int direction)
 
 	// send select notifications
 	if (direction == SHUT_RD || direction == SHUT_RDWR) {
-		gSocketModule->notify(socket, B_SELECT_READ, B_OK);
-		gSocketModule->notify(fPeerEndpoint->socket, B_SELECT_WRITE, B_OK);
+		gSocketModule->notify(socket, B_SELECT_READ, EPIPE);
+		gSocketModule->notify(fPeerEndpoint->socket, B_SELECT_WRITE, EPIPE);
 	}
 	if (direction == SHUT_WR || direction == SHUT_RDWR) {
-		gSocketModule->notify(socket, B_SELECT_WRITE, B_OK);
-		gSocketModule->notify(fPeerEndpoint->socket, B_SELECT_READ, B_OK);
+		gSocketModule->notify(socket, B_SELECT_WRITE, EPIPE);
+		gSocketModule->notify(fPeerEndpoint->socket, B_SELECT_READ, EPIPE);
 	}
 
 	RETURN_ERROR(B_OK);
