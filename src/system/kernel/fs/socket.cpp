@@ -161,6 +161,11 @@ prepare_userland_msghdr(const msghdr* userMessage, msghdr& message,
 			return B_BAD_ADDRESS;
 		}
 
+		for (int i = 0; i < message.msg_iovlen; i++) {
+			if (!IS_USER_ADDRESS(vecs[i].iov_base))
+				return B_BAD_ADDRESS;
+		}
+
 		message.msg_iov = vecs;
 	} else {
 		message.msg_iov = NULL;
