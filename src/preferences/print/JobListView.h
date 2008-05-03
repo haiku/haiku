@@ -46,6 +46,8 @@ class JobListView : public BListView
 	typedef BListView Inherited;
 public:
 	JobListView(BRect frame);
+	~JobListView();
+
 	void AttachedToWindow();
 	void SetSpoolFolder(SpoolFolder* folder);
 
@@ -53,13 +55,13 @@ public:
 	void RemoveJob(Job* job);
 	void UpdateJob(Job* job);
 
-	JobItem* SelectedItem();
+	JobItem* SelectedItem() const;
 
 	void RestartJob();
 	void CancelJob();
 
 private:
-	JobItem* Find(Job* job);
+	JobItem* FindJob(Job* job) const;
 };
 
 
@@ -74,7 +76,7 @@ public:
 	void Update(BView *owner, const BFont *font);
 	void DrawItem(BView *owner, BRect bounds, bool complete);
 
-	Job* GetJob() { return fJob; }
+	Job* GetJob() const { return fJob; }
 
 private:
 	Job*		fJob;

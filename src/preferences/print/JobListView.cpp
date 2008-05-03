@@ -51,6 +51,13 @@ JobListView::JobListView(BRect frame)
 }
 
 
+JobListView::~JobListView()
+{
+	while (!IsEmpty())
+		delete RemoveItem(0L);
+}
+
+
 void
 JobListView::AttachedToWindow()
 {
@@ -64,31 +71,24 @@ JobListView::AttachedToWindow()
 void
 JobListView::SetSpoolFolder(SpoolFolder* folder)
 {
-	BPath path;
-
 	// clear list
-	const BListItem** items = Items();
-	for (int i = CountItems() - 1; i >= 0; i --) {
-		delete items[i];
-	}
-	MakeEmpty();
+	while (!IsEmpty())
+		delete RemoveItem(0L);
 
 	if (folder == NULL)
 		return;
 
 	// Find directory containing printer definition nodes
-	for (int32 i = 0; i < folder->CountJobs(); i ++) {
-		Job* job = folder->JobAt(i);
-		AddJob(job);
-	}
+	for (int32 i = 0; i < folder->CountJobs(); i++)
+		AddJob(folder->JobAt(i));
 }
 
 
 JobItem*
-JobListView::Find(Job* job)
+JobListView::FindJob(Job* job) const
 {
 	const int32 n = CountItems();
-	for (int32 i = 0; i < n; i ++) {
+	for (int32 i = 0; i < n; i++) {
 		JobItem* item = dynamic_cast<JobItem*>(ItemAt(i));
 		if (item && item->GetJob() == job)
 			return item;
@@ -98,18 +98,16 @@ JobListView::Find(Job* job)
 
 
 JobItem*
-JobListView::SelectedItem()
+JobListView::SelectedItem() const
 {
-	BListItem* item = ItemAt(CurrentSelection());
-	return dynamic_cast<JobItem*>(item);
+	return dynamic_cast<JobItem*>(ItemAt(CurrentSelection()));
 }
 
 
 void
 JobListView::AddJob(Job* job)
 {
-	JobItem* item = new JobItem(job);
-	AddItem(item);
+	AddItem(new JobItem(job));
 	Invalidate();
 }
 
@@ -117,7 +115,7 @@ JobListView::AddJob(Job* job)
 void
 JobListView::RemoveJob(Job* job)
 {
-	JobItem* item = Find(job);
+	JobItem* item = FindJob(job);
 	if (item) {
 		RemoveItem(item);
 		delete item;
@@ -129,7 +127,7 @@ JobListView::RemoveJob(Job* job)
 void
 JobListView::UpdateJob(Job* job)
 {
-	JobItem* item = Find(job);
+	JobItem* item = FindJob(job);
 	if (item) {
 		item->Update();
 		InvalidateItem(IndexOf(item));
@@ -176,6 +174,7 @@ JobItem::JobItem(Job* job)
 JobItem::~JobItem()
 {
 	fJob->Release();
+	delete fIcon;
 }
 
 
@@ -193,7 +192,17 @@ JobItem::Update()
 
 	entry_ref ref;
 	if (fIcon == NULL && be_roster->FindApp(mimeType.String(), &ref) == B_OK) {
-		fIcon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_CMAP8);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		font_height fontHeight;
+		be_plain_font->GetHeight(&fontHeight);
+		float height = (fontHeight.ascent + fontHeight.descent
+			+ fontHeight.leading) * 2.0;
+		BRect rect(0.0, 0.0, height, height);
+		fIcon = new BBitmap(rect, B_RGBA32);
+#else
+		BRect rect(0.0, 0.0, B_MINI_ICON - 1, B_MINI_ICON - 1);
+		fIcon = new BBitmap(rect, B_CMAP8);
+#endif
 		BMimeType type(mimeType.String());
 		if (type.GetIcon(fIcon, B_MINI_ICON) != B_OK) {
 			delete fIcon;
@@ -254,7 +263,7 @@ JobItem::Update(BView *owner, const BFont *font)
 	font_height height;
 	font->GetHeight(&height);
 
-	SetHeight((height.ascent + height.descent + height.leading) * 2.0 + 4.0);
+	SetHeight((height.ascent + height.descent + height.leading) * 2.0 + 8.0);
 }
 
 
@@ -263,40 +272,52 @@ JobItem::DrawItem(BView *owner, BRect, bool complete)
 {
 	BListView* list = dynamic_cast<BListView*>(owner);
 	if (list) {
-		font_height height;
 		BFont font;
 		owner->GetFont(&font);
+
+		font_height height;
 		font.GetHeight(&height);
-		float fntheight = height.ascent+height.descent+height.leading;
+		float fntheight = height.ascent + height.descent + height.leading;
 
 		BRect bounds = list->ItemFrame(list->IndexOf(this));
 
 		rgb_color color = owner->ViewColor();
+		rgb_color oldViewColor = color;
+		rgb_color oldLowColor = owner->LowColor();
+		rgb_color oldHighColor = owner->HighColor();
+
 		if (IsSelected())
 			color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
 
-		rgb_color oldviewcolor = owner->ViewColor();
-		rgb_color oldlowcolor = owner->LowColor();
-		rgb_color oldcolor = owner->HighColor();
 		owner->SetViewColor(color);
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
+
 		owner->FillRect(bounds);
-		owner->SetLowColor(oldlowcolor);
-		owner->SetHighColor(oldcolor);
 
-		BPoint iconPt(bounds.LeftTop() + BPoint(2, 2));
-		BPoint leftTop(bounds.LeftTop() + BPoint(12 + B_MINI_ICON, 2));
-		BPoint namePt(leftTop + BPoint(0, fntheight));
-		BPoint statusPt(leftTop + BPoint(0, fntheight*2));
+		owner->SetLowColor(oldLowColor);
+		owner->SetHighColor(oldHighColor);
 
-		float width = owner->StringWidth(fPages.String());
-		BPoint pagePt(bounds.RightTop() + BPoint(-width - 32, fntheight));
-		width = owner->StringWidth(fSize.String());
-		BPoint sizePt(bounds.RightTop() + BPoint(-width - 32, fntheight * 2));
+		BPoint iconPt(bounds.LeftTop() + BPoint(2.0, 2.0));
+		float iconHeight = B_MINI_ICON;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		if (fIcon)
+			iconHeight = fIcon->Bounds().Height();
+#endif
+		BPoint leftTop(bounds.LeftTop() + BPoint(12.0 + iconHeight, 2.0));
+		BPoint namePt(leftTop + BPoint(0.0, fntheight));
+		BPoint statusPt(leftTop + BPoint(0.0, fntheight * 2.0));
+
+		float x = owner->StringWidth(fPages.String()) + 32.0;
+		BPoint pagePt(bounds.RightTop() + BPoint(-x, fntheight));
+		BPoint sizePt(bounds.RightTop() + BPoint(-x, fntheight * 2.0));
 
 		drawing_mode mode = owner->DrawingMode();
-		owner->SetDrawingMode(B_OP_OVER);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	owner->SetDrawingMode(B_OP_ALPHA);
+#else
+	owner->SetDrawingMode(B_OP_OVER);
+#endif
 
 		if (fIcon)
 			owner->DrawBitmap(fIcon, iconPt);
@@ -310,6 +331,6 @@ JobItem::DrawItem(BView *owner, BRect, bool complete)
 		owner->DrawString(fSize.String(), fSize.Length(), sizePt);
 
 		owner->SetDrawingMode(mode);
-		owner->SetViewColor(oldviewcolor);
+		owner->SetViewColor(oldViewColor);
 	}
 }
