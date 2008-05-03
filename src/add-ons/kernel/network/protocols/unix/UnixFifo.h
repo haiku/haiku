@@ -18,14 +18,40 @@
 #define UNIX_FIFO_SHUTDOWN_READ		1
 #define UNIX_FIFO_SHUTDOWN_WRITE	2
 
-#define UNIX_FIFO_SHUTDOWN			1
+#define UNIX_FIFO_SHUTDOWN			(B_ERRORS_END + 1)
 	// error code returned by Read()/Write()
 
 #define UNIX_FIFO_MINIMAL_CAPACITY	1024
 #define UNIX_FIFO_MAXIMAL_CAPACITY	(128 * 1024)
 
 
-#define TRACE_BUFFER_QUEUE	0
+struct ring_buffer;
+
+class UnixRequest : public DoublyLinkedListLinkImpl<UnixRequest> {
+public:
+	UnixRequest(const iovec* vecs, size_t count,
+			ancillary_data_container* ancillaryData);
+
+	off_t TotalSize() const			{ return fTotalSize; }
+	off_t BytesTransferred() const	{ return fBytesTransferred; }
+	off_t BytesRemaining() const	{ return fTotalSize - fBytesTransferred; }
+
+	void AddBytesTransferred(size_t size);
+	bool GetCurrentChunk(void*& data, size_t& size);
+
+	ancillary_data_container* AncillaryData() const	 { return fAncillaryData; }
+	void SetAncillaryData(ancillary_data_container* data);
+	void AddAncillaryData(ancillary_data_container* data);
+
+private:
+	const iovec*				fVecs;
+	size_t						fVecCount;
+	ancillary_data_container*	fAncillaryData;
+	off_t						fTotalSize;
+	off_t						fBytesTransferred;
+	size_t						fVecIndex;
+	size_t						fVecOffset;
+};
 
 
 class UnixBufferQueue {
@@ -33,36 +59,29 @@ public:
 	UnixBufferQueue(size_t capacity);
 	~UnixBufferQueue();
 
-	size_t	Readable() const	{ return fSize; }
-	size_t	Writable() const
-		{ return fCapacity >= fSize ? fCapacity - fSize : 0; }
+	status_t Init();
 
-	status_t Read(size_t size, net_buffer** _buffer);
-	status_t Write(net_buffer* buffer, size_t maxSize);
+	size_t	Readable() const;
+	size_t	Writable() const;
 
-	size_t Capacity() const		{ return fCapacity; }
-	void SetCapacity(size_t capacity);
+	status_t Read(UnixRequest& request);
+	status_t Write(UnixRequest& request);
 
-#if TRACE_BUFFER_QUEUE
-	void ParanoiaReadCheck(net_buffer* buffer);
-	void PostReadWrite();
-#endif
+	size_t Capacity() const				{ return fCapacity; }
+	status_t SetCapacity(size_t capacity);
 
 private:
-	typedef DoublyLinkedList<net_buffer, DoublyLinkedListCLink<net_buffer> >
-		BufferList;
+	struct AncillaryDataEntry : DoublyLinkedListLinkImpl<AncillaryDataEntry> {
+		ancillary_data_container*	data;
+		size_t						offset;
+	};
 
-	BufferList	fBuffers;
-	size_t		fSize;
-	size_t		fCapacity;
-#if TRACE_BUFFER_QUEUE
-	off_t		fWritten;
-	off_t		fRead;
-	uint8*		fParanoiaCheckBuffer;
-	uint8*		fParanoiaCheckBuffer2;
-#endif
+	typedef DoublyLinkedList<AncillaryDataEntry> AncillaryDataList;
+
+	ring_buffer*		fBuffer;
+	size_t				fCapacity;
+	AncillaryDataList	fAncillaryData;
 };
-
 
 
 class UnixFifo : public Referenceable {
@@ -94,42 +113,31 @@ public:
 		return (fShutdown & UNIX_FIFO_SHUTDOWN_WRITE);
 	}
 
-	status_t Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer);
-	status_t Write(net_buffer* buffer, bigtime_t timeout);
+	ssize_t Read(const iovec* vecs, size_t vecCount,
+		ancillary_data_container** _ancillaryData, bigtime_t timeout);
+	ssize_t Write(const iovec* vecs, size_t vecCount,
+		ancillary_data_container* ancillaryData, bigtime_t timeout);
 
 	size_t Readable() const;
 	size_t Writable() const;
 
-	void SetBufferCapacity(size_t capacity);
+	status_t SetBufferCapacity(size_t capacity);
 
 private:
-	struct Request : DoublyLinkedListLinkImpl<Request> {
-		Request(size_t size)
-			:
-			size(size)
-		{
-		}
-
-		size_t		size;
-	};
-
-	typedef DoublyLinkedList<Request> RequestList;
+	typedef DoublyLinkedList<UnixRequest> RequestList;
 
 private:
-	status_t _Read(Request& request, size_t numBytes, bigtime_t timeout,
-		net_buffer** _buffer);
-	status_t _Write(Request& request, net_buffer* buffer, bigtime_t timeout,
-		size_t& bytesWritten);
-	status_t _WriteNonBlocking(Request& request, net_buffer* buffer,
-		size_t& bytesWritten);
+	status_t _Read(UnixRequest& request, bigtime_t timeout);
+	status_t _Write(UnixRequest& request, bigtime_t timeout);
+	status_t _WriteNonBlocking(UnixRequest& request);
 
 private:
 	mutex				fLock;
 	UnixBufferQueue		fBuffer;
 	RequestList			fReaders;
 	RequestList			fWriters;
-	size_t				fReadRequested;
-	size_t				fWriteRequested;
+	off_t				fReadRequested;
+	off_t				fWriteRequested;
 	ConditionVariable	fReadCondition;
 	ConditionVariable	fWriteCondition;
 	uint32				fShutdown;

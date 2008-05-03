@@ -148,7 +148,9 @@ unix_setsockopt(net_protocol *protocol, int level, int option,
 			if (length != sizeof(int))
 				return B_BAD_VALUE;
 
-			endpoint->SetReceiveBufferSize(*(int*)_value);
+			status_t error = endpoint->SetReceiveBufferSize(*(int*)_value);
+			if (error != B_OK)
+				return error;
 		} else if (option == SO_SNDBUF) {
 			// We don't have a receive buffer, so silently ignore this one.
 		}
@@ -198,7 +200,7 @@ unix_send_routed_data(net_protocol *_protocol, struct net_route *route,
 status_t
 unix_send_data(net_protocol *_protocol, net_buffer *buffer)
 {
-	return ((UnixEndpoint*)_protocol)->Send(buffer);
+	return B_ERROR;
 }
 
 
@@ -213,7 +215,7 @@ status_t
 unix_read_data(net_protocol *_protocol, size_t numBytes, uint32 flags,
 	net_buffer **_buffer)
 {
-	return ((UnixEndpoint*)_protocol)->Receive(numBytes, flags, _buffer);
+	return B_ERROR;
 }
 
 
@@ -380,6 +382,25 @@ unix_process_ancillary_data(net_protocol *self,
 }
 
 
+ssize_t
+unix_send_data_no_buffer(net_protocol *_protocol, const iovec *vecs,
+	size_t vecCount, ancillary_data_container *ancillaryData,
+	const struct sockaddr *address, socklen_t addressLength)
+{
+	return ((UnixEndpoint*)_protocol)->Send(vecs, vecCount, ancillaryData);
+}
+
+
+ssize_t
+unix_read_data_no_buffer(net_protocol *_protocol, const iovec *vecs,
+	size_t vecCount, ancillary_data_container **_ancillaryData,
+	struct sockaddr *_address, socklen_t *_addressLength)
+{
+	return ((UnixEndpoint*)_protocol)->Receive(vecs, vecCount, _ancillaryData,
+		_address, _addressLength);
+}
+
+
 // #pragma mark -
 
 
@@ -469,7 +490,9 @@ net_protocol_module_info gUnixModule = {
 	unix_error,
 	unix_error_reply,
 	unix_add_ancillary_data,
-	unix_process_ancillary_data
+	unix_process_ancillary_data,
+	unix_send_data_no_buffer,
+	unix_read_data_no_buffer
 };
 
 module_dependency module_dependencies[] = {

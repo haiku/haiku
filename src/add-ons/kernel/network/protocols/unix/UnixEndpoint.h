@@ -66,13 +66,16 @@ public:
 	status_t Connect(const struct sockaddr *address);
 	status_t Accept(net_socket **_acceptedSocket);
 
-	status_t Send(net_buffer *buffer);
-	status_t Receive(size_t numBytes, uint32 flags, net_buffer **_buffer);
+	ssize_t Send(const iovec *vecs, size_t vecCount,
+		ancillary_data_container *ancillaryData);
+	ssize_t Receive(const iovec *vecs, size_t vecCount,
+		ancillary_data_container **_ancillaryData, struct sockaddr *_address,
+		socklen_t *_addressLength);
 
 	ssize_t Sendable();
 	ssize_t Receivable();
 
-	void SetReceiveBufferSize(size_t size);
+	status_t SetReceiveBufferSize(size_t size);
 
 	status_t Shutdown(int direction);
 

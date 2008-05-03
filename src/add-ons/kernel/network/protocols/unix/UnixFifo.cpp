@@ -5,7 +5,12 @@
 
 #include "UnixFifo.h"
 
+#include <new>
+
 #include <AutoDeleter.h>
+
+#include <net_stack.h>
+#include <util/ring_buffer.h>
 
 #include "unix.h"
 
@@ -15,312 +20,240 @@
 #include "UnixDebug.h"
 
 
-#if TRACE_BUFFER_QUEUE
-#	define TRACEBQ(x...)	ktrace_printf(x)
-#	define TRACEBQ_ONLY(x)	x
-#else
-#	define TRACEBQ(x...)	do {} while (false)
-#	define TRACEBQ_ONLY(x)
-#endif
+// #pragma mark - UnixRequest
+
+
+UnixRequest::UnixRequest(const iovec* vecs, size_t count,
+		ancillary_data_container* ancillaryData)
+	:
+	fVecs(vecs),
+	fVecCount(count),
+	fAncillaryData(ancillaryData),
+	fTotalSize(0),
+	fBytesTransferred(0),
+	fVecIndex(0),
+	fVecOffset(0)
+{
+	for (size_t i = 0; i < fVecCount; i++)
+		fTotalSize += fVecs[i].iov_len;
+}
+
+
+void
+UnixRequest::AddBytesTransferred(size_t size)
+{
+	fBytesTransferred += size;
+
+	// also adjust the current iovec index/offset
+	while (fVecIndex < fVecCount
+			&& fVecs[fVecIndex].iov_len - fVecOffset <= size) {
+		size -= fVecs[fVecIndex].iov_len - fVecOffset;
+		fVecIndex++;
+		fVecOffset = 0;
+	}
+
+	if (fVecIndex < fVecCount)
+		fVecOffset += size;
+}
+
+
+bool
+UnixRequest::GetCurrentChunk(void*& data, size_t& size)
+{
+	while (fVecIndex < fVecCount
+			&& fVecOffset >= fVecs[fVecIndex].iov_len) {
+		fVecIndex++;
+		fVecOffset = 0;
+	}
+	if (fVecIndex >= fVecCount)
+		return false;
+
+	data = (uint8*)fVecs[fVecIndex].iov_base + fVecOffset;
+	size = fVecs[fVecIndex].iov_len - fVecOffset;
+	return true;
+}
+
+
+void
+UnixRequest::SetAncillaryData(ancillary_data_container* data)
+{
+	fAncillaryData = data;
+}
+
+
+void
+UnixRequest::AddAncillaryData(ancillary_data_container* data)
+{
+	if (fAncillaryData != NULL) {
+		gStackModule->move_ancillary_data(data, fAncillaryData);
+		gStackModule->delete_ancillary_data_container(data);
+	} else
+		fAncillaryData = data;
+}
+
+
+// #pragma mark - UnixBufferQueue
 
 
 UnixBufferQueue::UnixBufferQueue(size_t capacity)
 	:
-	fSize(0),
+	fBuffer(NULL),
 	fCapacity(capacity)
-#if TRACE_BUFFER_QUEUE
-	, fWritten(0)
-	, fRead(0)
-#endif
 {
-	TRACEBQ_ONLY(
-		fParanoiaCheckBuffer = (uint8*)malloc(UNIX_FIFO_MAXIMAL_CAPACITY);
-		fParanoiaCheckBuffer2 = (uint8*)malloc(UNIX_FIFO_MAXIMAL_CAPACITY);
-	)
 }
 
 
 UnixBufferQueue::~UnixBufferQueue()
 {
-	while (net_buffer* buffer = fBuffers.RemoveHead())
-		gBufferModule->free(buffer);
+	while (AncillaryDataEntry* entry = fAncillaryData.RemoveHead()) {
+		gStackModule->delete_ancillary_data_container(entry->data);
+		delete entry;
+	}
 
-	TRACEBQ_ONLY(
-		free(fParanoiaCheckBuffer);
-		free(fParanoiaCheckBuffer2);
-	)
+	delete_ring_buffer(fBuffer);
 }
 
 
 status_t
-UnixBufferQueue::Read(size_t size, net_buffer** _buffer)
+UnixBufferQueue::Init()
 {
-	if (size > fSize)
-		size = fSize;
-
-	TRACEBQ("unix: UnixBufferQueue::Read(%lu): fSize: %lu, fRead: %lld, "
-		"fWritten: %lld", size, fSize, fRead, fWritten);
-
-	TRACEBQ_ONLY(
-		MethodDeleter<UnixBufferQueue> _(this, &UnixBufferQueue::PostReadWrite);
-	)
-
-	if (size == 0)
-		return B_BAD_VALUE;
-
-TRACEBQ_ONLY(
-	if (fParanoiaCheckBuffer) {
-		size_t bufferSize = 0;
-		for (BufferList::Iterator it = fBuffers.GetIterator();
-			net_buffer* buffer = it.Next();) {
-			size_t toWrite = min_c(buffer->size, size - bufferSize);
-			if (toWrite == 0)
-				break;
-
-			gBufferModule->read(buffer, 0,
-				fParanoiaCheckBuffer + bufferSize, toWrite);
-			bufferSize += toWrite;
-		}
-	}
-	*_buffer = NULL;
-)
-
-	// If the first buffer has the right size or is smaller, we can just
-	// dequeue it.
-	net_buffer* buffer = fBuffers.Head();
-	if (buffer->size <= size) {
-		fBuffers.RemoveHead();
-		fSize -= buffer->size;
-		TRACEBQ_ONLY(fRead += buffer->size);
-		*_buffer = buffer;
-
-		if (buffer->size == size)
-{
-TRACEBQ("unix:   read full buffer %p (%lu)", buffer, buffer->size);
-TRACEBQ_ONLY(ParanoiaReadCheck(*_buffer));
-			return B_OK;
+	fBuffer = create_ring_buffer(fCapacity);
+	if (fBuffer == NULL)
+		return B_NO_MEMORY;
+	return B_OK;
 }
 
-		// buffer is too small
 
- 		size_t bytesLeft = size - buffer->size;
-TRACEBQ("unix:   read short buffer %p (%lu/%lu)", buffer, size, buffer->size);
-
-		// Append from the following buffers, until we've read as much as we're
-		// supposed to.
-		while (bytesLeft > 0) {
-			net_buffer* nextBuffer = fBuffers.Head();
-			size_t toCopy = min_c(bytesLeft, nextBuffer->size);
-
-TRACEBQ("unix:   read next buffer %p (%lu/%lu)", nextBuffer, bytesLeft, nextBuffer->size);
-#if 0
-			if (gBufferModule->append_cloned(buffer, nextBuffer, 0, toCopy)
-					!= B_OK) {
-				// Too bad, but we've got some data, so we don't fail.
-TRACEBQ_ONLY(ParanoiaReadCheck(*_buffer));
-				return B_OK;
-			}
-#endif
-
-// TODO: Temporary work-around for the append_cloned() call above, which
-// doesn't seem to work right. Or maybe that's just in combination with the
-// remove_header() below.
+size_t
+UnixBufferQueue::Readable() const
 {
-	void* tmpBuffer = malloc(toCopy);
-	if (tmpBuffer == NULL)
-		return B_OK;
-	MemoryDeleter tmpBufferDeleter(tmpBuffer);
-
-	size_t offset = buffer->size;
-	if (gBufferModule->read(nextBuffer, 0, tmpBuffer, toCopy) != B_OK
-		|| gBufferModule->append_size(buffer, toCopy, NULL) != B_OK) {
-		return B_OK;
-	}
-
-	if (gBufferModule->write(buffer, offset, tmpBuffer, toCopy) != B_OK) {
-		gBufferModule->remove_trailer(buffer, toCopy);
-		return B_OK;
-	}
+	return ring_buffer_readable(fBuffer);
 }
 
-			// transfer the ancillary data
-			gBufferModule->transfer_ancillary_data(nextBuffer, buffer);
 
-			if (nextBuffer->size > toCopy) {
-				// remove the part we've copied
-//gBufferModule->read(nextBuffer, toCopy, fParanoiaCheckBuffer,
-//nextBuffer->size - toCopy);
-				gBufferModule->remove_header(nextBuffer, toCopy);
-//TRACEBQ_ONLY(ParanoiaReadCheck(nextBuffer));
-			} else {
-				// get rid of the buffer completely
-				fBuffers.RemoveHead();
-				gBufferModule->free(nextBuffer);
+size_t
+UnixBufferQueue::Writable() const
+{
+	return ring_buffer_writable(fBuffer);
+}
+
+
+status_t
+UnixBufferQueue::Read(UnixRequest& request)
+{
+	bool user = gStackModule->is_syscall();
+
+	size_t readable = Readable();
+	void* data;
+	size_t size;
+
+	while (readable > 0 && request.GetCurrentChunk(data, size)) {
+		if (size > readable)
+			size = readable;
+
+		ssize_t bytesRead;
+		if (user)
+			bytesRead = ring_buffer_user_read(fBuffer, (uint8*)data, size);
+		else
+			bytesRead = ring_buffer_read(fBuffer, (uint8*)data, size);
+
+		if (bytesRead < 0)
+			return bytesRead;
+		if (bytesRead == 0)
+			return B_ERROR;
+
+		// Adjust ancillary data entry offsets, respectively attach the ones
+		// that belong to the read data to the request.
+		if (AncillaryDataEntry* entry = fAncillaryData.Head()) {
+			size_t offsetDelta = bytesRead;
+			while (entry != NULL && offsetDelta > entry->offset) {
+				// entry data have been read -- add ancillary data to request
+				fAncillaryData.RemoveHead();
+				offsetDelta -= entry->offset;
+				request.AddAncillaryData(entry->data);
+				delete entry;
+
+				entry = fAncillaryData.Head();
 			}
 
-			bytesLeft -= toCopy;
-			fSize -= toCopy;
-			TRACEBQ_ONLY(fRead += toCopy);
+			if (entry != NULL)
+				entry->offset -= offsetDelta;
 		}
 
-TRACEBQ_ONLY(ParanoiaReadCheck(*_buffer));
-		return B_OK;
+		request.AddBytesTransferred(bytesRead);
+		readable -= bytesRead;
 	}
 
-	// buffer is too big
-
-	// Create a new buffer, and copy into it, as much as we need.
-	net_buffer* newBuffer = gBufferModule->create(256);
-	if (newBuffer == NULL)
-		return ENOBUFS;
-
-	status_t error = gBufferModule->append_cloned(newBuffer, buffer, 0, size);
-	if (error != B_OK) {
-		gBufferModule->free(newBuffer);
-		return error;
-	}
-
-	// transfer the ancillary data
-	gBufferModule->transfer_ancillary_data(buffer, newBuffer);
-
-	// remove the part we've copied
-TRACEBQ("unix:   read long buffer %p (%lu/%lu)", buffer, size, buffer->size);
-	gBufferModule->remove_header(buffer, size);
-
-	fSize -= size;
-	TRACEBQ_ONLY(fRead += size);
-	*_buffer = newBuffer;
-
-TRACEBQ_ONLY(ParanoiaReadCheck(*_buffer));
 	return B_OK;
 }
 
 
 status_t
-UnixBufferQueue::Write(net_buffer* buffer, size_t maxSize)
+UnixBufferQueue::Write(UnixRequest& request)
 {
-	TRACEBQ("unix: UnixBufferQueue::Write(%lu/%lu): fSize: %lu, fRead: %lld, "
-		"fWritten: %lld", buffer->size, maxSize, fSize, fRead, fWritten);
+	bool user = gStackModule->is_syscall();
 
-	TRACEBQ_ONLY(
-		MethodDeleter<UnixBufferQueue> _(this, &UnixBufferQueue::PostReadWrite);
-	)
+	size_t writable = Writable();
+	void* data;
+	size_t size;
 
-	maxSize = min_c(buffer->size, maxSize);
-	if (maxSize > Writable())
-		RETURN_ERROR(ENOBUFS);
+	// If the request has ancillary data create an entry first.
+	AncillaryDataEntry* ancillaryEntry = NULL;
+	ObjectDeleter<AncillaryDataEntry> ancillaryEntryDeleter;
+	if (writable > 0 && request.AncillaryData() != NULL) {
+		ancillaryEntry = new(std::nothrow) AncillaryDataEntry;
+		if (ancillaryEntry == NULL)
+			return B_NO_MEMORY;
 
-	// If we shall write the complete buffer, things are easy.
-	if (maxSize == buffer->size) {
-		fBuffers.Add(buffer);
-		fSize += buffer->size;
-		TRACEBQ_ONLY(fWritten += buffer->size);
+		ancillaryEntryDeleter.SetTo(ancillaryEntry);
+		ancillaryEntry->data = request.AncillaryData();
+		ancillaryEntry->offset = Readable();
 
-		return B_OK;
+		// The offsets are relative to the previous entry.
+		AncillaryDataList::Iterator it = fAncillaryData.GetIterator();
+		while (AncillaryDataEntry* entry = it.Next())
+			ancillaryEntry->offset -= entry->offset;
+			// TODO: This is inefficient when the list is long. Rather also
+			// store and maintain the absolute offset of the last queued entry.
 	}
 
-	// We shall write only a partial buffer. We need to create a new one and
-	// cut of the head of the old one.
-// TODO: This implementation obviously sucks, but we can't use the split method,
-// since it would split off the wrong buffer. The socket module requires us
-// to cut off the head of the given one.
+	// write as much as we can
+	while (writable > 0 && request.GetCurrentChunk(data, size)) {
+		if (size > writable)
+			size = writable;
 
-	// create a temporary buffer
-	void* tmpBuffer = malloc(maxSize);
-	if (tmpBuffer == NULL)
-		return B_OK;
-	MemoryDeleter tmpBufferDeleter(tmpBuffer);
+		ssize_t bytesWritten;
+		if (user)
+			bytesWritten = ring_buffer_user_write(fBuffer, (uint8*)data, size);
+		else
+			bytesWritten = ring_buffer_write(fBuffer, (uint8*)data, size);
 
-	// read the data to append into the temporary buffer
-	status_t error = gBufferModule->read(buffer, 0, tmpBuffer, maxSize);
-	if (error != B_OK)
-		return error;
+		if (bytesWritten < 0)
+			return bytesWritten;
+		if (bytesWritten == 0)
+			return B_ERROR;
 
-	// create the new buffer and append the data
-	net_buffer* newBuffer = gBufferModule->create(256);
-	if (newBuffer == NULL)
-		return ENOBUFS;
+		if (ancillaryEntry != NULL) {
+			fAncillaryData.Add(ancillaryEntry);
+			ancillaryEntryDeleter.Detach();
+			request.SetAncillaryData(NULL);
+			ancillaryEntry = NULL;
+		}
 
-	error = gBufferModule->append(newBuffer, tmpBuffer, maxSize);
-
-	// remove the header from the old buffer
-	if (error == B_OK)
-		error = gBufferModule->remove_header(buffer, maxSize);
-
-	if (error != B_OK) {
-		gBufferModule->free(newBuffer);
-		return error;
+		request.AddBytesTransferred(bytesWritten);
+		writable -= bytesWritten;
 	}
-
-	// transfer the ancillary data
-	gBufferModule->transfer_ancillary_data(buffer, newBuffer);
-
-	// Everything went fine. Append the new buffer.
-	fBuffers.Add(newBuffer);
-	fSize += newBuffer->size;
-	TRACEBQ_ONLY(fWritten += newBuffer->size);
 
 	return B_OK;
 }
 
 
-void
+status_t
 UnixBufferQueue::SetCapacity(size_t capacity)
 {
-	fCapacity = capacity;
+// TODO:...
+return B_ERROR;
 }
-
-
-#if TRACE_BUFFER_QUEUE
-
-void
-UnixBufferQueue::ParanoiaReadCheck(net_buffer* buffer)
-{
-	if (!buffer || !fParanoiaCheckBuffer || !fParanoiaCheckBuffer2)
-		return;
-
-	gBufferModule->read(buffer, 0, fParanoiaCheckBuffer2, buffer->size);
-
-	if (memcmp(fParanoiaCheckBuffer, fParanoiaCheckBuffer2, buffer->size)
-			!= 0) {
-		// find offset of first difference
-		size_t i = 0;
-		for (; i < buffer->size; i++) {
-			if (fParanoiaCheckBuffer[i] != fParanoiaCheckBuffer2[i])
-				break;
-		}
-
-		panic("unix: UnixBufferQueue::ParanoiaReadCheck(): incorrect read! "
-			"offset of first difference: %lu", i);
-	}
-}
-
-
-void
-UnixBufferQueue::PostReadWrite()
-{
-	TRACEBQ("unix: post read/write: fSize: %lu, fRead: %lld, fWritten: %lld",
-		fSize, fRead, fWritten);
-
-	if (fWritten - fRead != fSize) {
-		panic("UnixBufferQueue::PostReadWrite(): fSize: %lu, fRead: %lld, "
-			"fWritten: %lld", fSize, fRead, fWritten);
-	}
-
-	// check buffer size sum
-	size_t bufferSize = 0;
-	for (BufferList::Iterator it = fBuffers.GetIterator();
-		 net_buffer* buffer = it.Next();) {
-		bufferSize += buffer->size;
-	}
-
-	if (bufferSize != fSize) {
-		panic("UnixBufferQueue::PostReadWrite(): fSize: %lu, bufferSize: %lu",
-			fSize, bufferSize);
-	}
-}
-
-#endif	// TRACE_BUFFER_QUEUE
 
 
 // #pragma mark -
@@ -351,7 +284,7 @@ UnixFifo::~UnixFifo()
 status_t
 UnixFifo::Init()
 {
-	return B_OK;
+	return fBuffer.Init();
 }
 
 
@@ -371,24 +304,25 @@ UnixFifo::Shutdown(uint32 shutdown)
 }
 
 
-status_t
-UnixFifo::Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer)
+ssize_t
+UnixFifo::Read(const iovec* vecs, size_t vecCount,
+	ancillary_data_container** _ancillaryData, bigtime_t timeout)
 {
-	TRACE("[%ld] %p->UnixFifo::Read(%lu, %lld)\n", find_thread(NULL), this,
-		numBytes, timeout);
+	TRACE("[%ld] %p->UnixFifo::Read(%p, %ld, %lld)\n", find_thread(NULL),
+		this, vecs, vecCount, timeout);
 
 	if (IsReadShutdown())
 		return UNIX_FIFO_SHUTDOWN;
 
-	Request request(numBytes);
+	UnixRequest request(vecs, vecCount, NULL);
 	fReaders.Add(&request);
-	fReadRequested += request.size;
+	fReadRequested += request.TotalSize();
 
-	status_t error = _Read(request, numBytes, timeout, _buffer);
+	status_t error = _Read(request, timeout);
 
 	bool firstInQueue = fReaders.Head() == &request;
 	fReaders.Remove(&request);
-	fReadRequested -= request.size;
+	fReadRequested -= request.TotalSize();
 
 	if (firstInQueue && !fReaders.IsEmpty() && fBuffer.Readable() > 0
 			&& !IsReadShutdown()) {
@@ -397,21 +331,30 @@ UnixFifo::Read(size_t numBytes, bigtime_t timeout, net_buffer** _buffer)
 		fReadCondition.NotifyAll();
 	}
 
-	if (error == B_OK && *_buffer != NULL && (*_buffer)->size > 0
-			&& !fWriters.IsEmpty() && !IsWriteShutdown()) {
+	if (request.BytesTransferred() > 0 && !fWriters.IsEmpty()
+			&& !IsWriteShutdown()) {
 		// We read something and there are writers. Notify them
 		fWriteCondition.NotifyAll();
+	}
+
+	*_ancillaryData = request.AncillaryData();
+
+	if (request.BytesTransferred() > 0) {
+		if (request.BytesTransferred() > SSIZE_MAX)
+			RETURN_ERROR(SSIZE_MAX);
+		RETURN_ERROR((ssize_t)request.BytesTransferred());
 	}
 
 	RETURN_ERROR(error);
 }
 
 
-status_t
-UnixFifo::Write(net_buffer* buffer, bigtime_t timeout)
+ssize_t
+UnixFifo::Write(const iovec* vecs, size_t vecCount,
+	ancillary_data_container* ancillaryData, bigtime_t timeout)
 {
-	TRACE("[%ld] %p->UnixFifo::Write(%p (%lu), %lld)\n", find_thread(NULL),
-		this, buffer, buffer->size, timeout);
+	TRACE("[%ld] %p->UnixFifo::Write(%p, %ld, %p, %lld)\n", find_thread(NULL),
+		this, vecs, vecCount, ancillaryData, timeout);
 
 	if (IsWriteShutdown())
 		return UNIX_FIFO_SHUTDOWN;
@@ -419,16 +362,15 @@ UnixFifo::Write(net_buffer* buffer, bigtime_t timeout)
 	if (IsReadShutdown())
 		return EPIPE;
 
-	Request request(buffer->size);
+	UnixRequest request(vecs, vecCount, ancillaryData);
 	fWriters.Add(&request);
-	fWriteRequested += request.size;
-	size_t bytesWritten = 0;
+	fWriteRequested += request.TotalSize();
 
-	status_t error = _Write(request, buffer, timeout, bytesWritten);
+	status_t error = _Write(request, timeout);
 
 	bool firstInQueue = fWriters.Head() == &request;
 	fWriters.Remove(&request);
-	fWriteRequested -= request.size;
+	fWriteRequested -= request.TotalSize();
 
 	if (firstInQueue && !fWriters.IsEmpty() && fBuffer.Writable() > 0
 			&& !IsWriteShutdown()) {
@@ -437,10 +379,16 @@ UnixFifo::Write(net_buffer* buffer, bigtime_t timeout)
 		fWriteCondition.NotifyAll();
 	}
 
-	if (bytesWritten > 0 && request.size > 0 && !fReaders.IsEmpty()
+	if (request.BytesTransferred() > 0 && !fReaders.IsEmpty()
 			&& !IsReadShutdown()) {
 		// We've written something and there are readers. Notify them.
 		fReadCondition.NotifyAll();
+	}
+
+	if (request.BytesTransferred() > 0) {
+		if (request.BytesTransferred() > SSIZE_MAX)
+			RETURN_ERROR(SSIZE_MAX);
+		RETURN_ERROR((ssize_t)request.BytesTransferred());
 	}
 
 	RETURN_ERROR(error);
@@ -463,7 +411,7 @@ UnixFifo::Writable() const
 }
 
 
-void
+status_t
 UnixFifo::SetBufferCapacity(size_t capacity)
 {
 	// check against allowed minimal/maximal value
@@ -474,20 +422,23 @@ UnixFifo::SetBufferCapacity(size_t capacity)
 
 	size_t oldCapacity = fBuffer.Capacity();
 	if (capacity == oldCapacity)
-		return;
+		return B_OK;
 
 	// set capacity
-	fBuffer.SetCapacity(capacity);
+	status_t error = fBuffer.SetCapacity(capacity);
+	if (error != B_OK)
+		return error;
 
 	// wake up waiting writers, if the capacity increased
 	if (!fWriters.IsEmpty() && !IsWriteShutdown())
 		fWriteCondition.NotifyAll();
+
+	return B_OK;
 }
 
 
 status_t
-UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
-	net_buffer** _buffer)
+UnixFifo::_Read(UnixRequest& request, bigtime_t timeout)
 {
 	// wait for the request to reach the front of the queue
 	if (fReaders.Head() != &request && timeout == 0)
@@ -509,10 +460,8 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 		return UNIX_FIFO_SHUTDOWN;
 
 	if (fBuffer.Readable() == 0) {
-		if (IsWriteShutdown()) {
-			*_buffer = NULL;
-			RETURN_ERROR(B_OK);
-		}
+		if (IsWriteShutdown())
+			RETURN_ERROR(0);
 
 		if (timeout == 0)
 			RETURN_ERROR(B_WOULD_BLOCK);
@@ -536,21 +485,18 @@ UnixFifo::_Read(Request& request, size_t numBytes, bigtime_t timeout,
 	if (IsReadShutdown())
 		return UNIX_FIFO_SHUTDOWN;
 
-	if (fBuffer.Readable() == 0 && IsWriteShutdown()) {
-		*_buffer = NULL;
-		RETURN_ERROR(B_OK);
-	}
+	if (fBuffer.Readable() == 0 && IsWriteShutdown())
+		RETURN_ERROR(0);
 
-	RETURN_ERROR(fBuffer.Read(numBytes, _buffer));
+	RETURN_ERROR(fBuffer.Read(request));
 }
 
 
 status_t
-UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout,
-	size_t& bytesWritten)
+UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 {
 	if (timeout == 0)
-		RETURN_ERROR(_WriteNonBlocking(request, buffer, bytesWritten));
+		RETURN_ERROR(_WriteNonBlocking(request));
 
 	// wait for the request to reach the front of the queue
 	while (fWriters.Head() != &request && !IsWriteShutdown()) {
@@ -571,13 +517,12 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout,
 	if (IsReadShutdown())
 		return EPIPE;
 
-	if (request.size == 0)
-		return B_OK;
+	if (request.TotalSize() == 0)
+		return 0;
 
 	status_t error = B_OK;
-	size_t bytesLeft = buffer->size;
 
-	while (error == B_OK && bytesLeft > 0) {
+	while (error == B_OK && request.BytesRemaining() > 0) {
 		// wait for any space to become available
 		while (error == B_OK && fBuffer.Writable() == 0 && !IsWriteShutdown()
 				&& !IsReadShutdown()) {
@@ -599,14 +544,11 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout,
 			return EPIPE;
 
 		// write as much as we can
-		size_t toWrite = min_c(fBuffer.Writable(), bytesLeft);
-		error = fBuffer.Write(buffer, toWrite);
+		error = fBuffer.Write(request);
 
 		if (error == B_OK) {
 // TODO: Whenever we've successfully written a part, we should reset the
 // timeout!
-			bytesWritten += toWrite;
-			bytesLeft -= toWrite;
 		}
 	}
 
@@ -615,35 +557,16 @@ UnixFifo::_Write(Request& request, net_buffer* buffer, bigtime_t timeout,
 
 
 status_t
-UnixFifo::_WriteNonBlocking(Request& request, net_buffer* buffer,
-	size_t& bytesWritten)
+UnixFifo::_WriteNonBlocking(UnixRequest& request)
 {
 	// We need to be first in queue and space should be available right now,
 	// otherwise we need to fail.
 	if (fWriters.Head() != &request || fBuffer.Writable() == 0)
 		RETURN_ERROR(B_WOULD_BLOCK);
 
-	if (request.size == 0)
-		return B_OK;
+	if (request.TotalSize() == 0)
+		return 0;
 
 	// Write as much as we can.
-	size_t toWrite = min_c(fBuffer.Writable(), buffer->size);
-	status_t error;
-
-	if (buffer->size <= fBuffer.Writable()) {
-		// enough space available
-		error = fBuffer.Write(buffer, toWrite);
-		if (error == B_OK)
-			bytesWritten = toWrite;
-	} else {
-		// not enough space available -- write what we can, but return
-		// B_WOULD_BLOCK nevertheless
-		error = fBuffer.Write(buffer,toWrite);
-		if (error == B_OK) {
-			bytesWritten = toWrite;
-			error = B_WOULD_BLOCK;
-		}
-	}
-
-	RETURN_ERROR(error);
+	RETURN_ERROR(fBuffer.Write(request));
 }
