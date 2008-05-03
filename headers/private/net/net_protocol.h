@@ -19,6 +19,8 @@
 struct ancillary_data_container;
 struct ancillary_data_header;
 
+struct iovec;
+
 typedef struct net_protocol {
 	struct net_protocol				*next;
 	struct net_protocol_module_info	*module;
@@ -77,6 +79,13 @@ struct net_protocol_module_info {
 	ssize_t		(*process_ancillary_data)(net_protocol *self,
 					const ancillary_data_header *header, const void *data,
 					void *buffer, size_t bufferSize);
+
+	ssize_t		(*send_data_no_buffer)(net_protocol *self, const iovec *vecs,
+					size_t vecCount, ancillary_data_container *ancillaryData,
+					const struct sockaddr *address, socklen_t addressLength);
+	ssize_t		(*read_data_no_buffer)(net_protocol *self, const iovec *vecs,
+					size_t vecCount, ancillary_data_container **_ancillaryData,
+					struct sockaddr *_address, socklen_t *_addressLength);
 };
 
 #endif	// NET_PROTOCOL_H

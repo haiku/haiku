@@ -16,6 +16,7 @@
 
 #include <new>
 
+#include <AutoDeleter.h>
 #include <Drivers.h>
 #include <KernelExport.h>
 #include <Select.h>
@@ -162,17 +163,18 @@ add_ancillary_data(net_socket *socket, ancillary_data_container* container,
 
 static status_t
 process_ancillary_data(net_socket *socket, ancillary_data_container* container,
-	msghdr *_header)
+	msghdr *messageHeader)
 {
-	if (container == NULL)
-		return B_OK;
+	uint8 *dataBuffer = (uint8*)messageHeader->msg_control;
+	int dataBufferLen = messageHeader->msg_controllen;
 
-	uint8 *dataBuffer = (uint8*)_header->msg_control;
-	int dataBufferLen = _header->msg_controllen;
+	if (container == NULL || dataBuffer == NULL) {
+		messageHeader->msg_controllen = 0;
+		return B_OK;
+	}
 
 	ancillary_data_header header;
 	void *data = NULL;
-
 
 	while ((data = next_ancillary_data(container, data, &header)) != NULL) {
 		if (socket->first_info->process_ancillary_data == NULL)
@@ -187,9 +189,42 @@ process_ancillary_data(net_socket *socket, ancillary_data_container* container,
 		dataBufferLen -= bytesWritten;		
 	}
 
-	_header->msg_controllen -= dataBufferLen;
+	messageHeader->msg_controllen -= dataBufferLen;
 
 	return B_OK;
+}
+
+
+static ssize_t
+socket_receive_no_buffer(net_socket *socket, msghdr *header, void *data,
+	size_t length, int flags)
+{
+	iovec stackVec = { data, length };
+	iovec* vecs = header ? header->msg_iov : &stackVec;
+	int vecCount = header ? header->msg_iovlen : 1;
+	sockaddr* address = header ? (sockaddr*)header->msg_name : NULL;
+	socklen_t* addressLen = header ? &header->msg_namelen : NULL;
+
+	ancillary_data_container* ancillaryData = NULL;
+	ssize_t bytesRead = socket->first_info->read_data_no_buffer(
+		socket->first_protocol, vecs, vecCount, &ancillaryData, address,
+		addressLen);
+	if (bytesRead < 0)
+		return bytesRead;
+
+	CObjectDeleter<ancillary_data_container> ancillaryDataDeleter(ancillaryData,
+		&delete_ancillary_data_container);
+
+	// process ancillary data
+	if (header != NULL) {
+		status_t status = process_ancillary_data(socket, ancillaryData, header);
+		if (status != B_OK)
+			return status;
+
+		header->msg_flags = 0;
+	}
+
+	return bytesRead;
 }
 
 
@@ -919,9 +954,12 @@ ssize_t
 socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 	int flags)
 {
+	// If the protocol sports read_data_no_buffer() we use it.
+	if (socket->first_info->read_data_no_buffer != NULL)
+		return socket_receive_no_buffer(socket, header, data, length, flags);
+
 	size_t totalLength = length;
 	net_buffer *buffer;
-	iovec tmp;
 	int i;
 
 	// the convention to this function is that have header been
@@ -930,13 +968,8 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 
 	if (header) {
 		// calculate the length considering all of the extra buffers
-		for (i = 1; i < header->msg_iovlen; i++) {
-			if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
-				return B_BAD_ADDRESS;
-			if (tmp.iov_len > 0 && tmp.iov_base == NULL)
-				return B_BAD_ADDRESS;
-			totalLength += tmp.iov_len;
-		}
+		for (i = 1; i < header->msg_iovlen; i++)
+			totalLength += header->msg_iov[i].iov_len;
 	}
 
 	status_t status = socket->first_info->read_data(
@@ -989,13 +1022,12 @@ socket_receive(net_socket *socket, msghdr *header, void *data, size_t length,
 		// we only start considering at iovec[1]
 		// as { data, length } is iovec[0]
 		for (i = 1; i < header->msg_iovlen && bytesCopied < bytesReceived; i++) {
-			if (user_memcpy(&tmp, header->msg_iov + i, sizeof(iovec)) < B_OK)
+			iovec& vec = header->msg_iov[i];
+			size_t toRead = min_c(bytesReceived - bytesCopied, vec.iov_len);
+			if (gNetBufferModule.read(buffer, bytesCopied, vec.iov_base,
+					toRead) < B_OK) {
 				break;
-
-			size_t toRead = min_c(bytesReceived - bytesCopied, tmp.iov_len);
-			if (gNetBufferModule.read(buffer, bytesCopied, tmp.iov_base,
-										toRead) < B_OK)
-				break;
+			}
 
 			bytesCopied += toRead;
 		}
@@ -1031,24 +1063,25 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 	if (length > SSIZE_MAX)
 		return B_BAD_VALUE;
 
-	// the convention to this function is that have header been
-	// present, { data, length } would have been iovec[0] and is
-	// always considered like that
-
-	cmsghdr *ancillaryData = NULL;
-	size_t ancillaryDataLen = 0;
+	ancillary_data_container *ancillaryData = NULL;
+	CObjectDeleter<ancillary_data_container> ancillaryDataDeleter(NULL,
+		&delete_ancillary_data_container);
 
 	if (header != NULL) {
 		address = (const sockaddr *)header->msg_name;
 		addressLength = header->msg_namelen;
-		ancillaryData = (cmsghdr *)header->msg_control;
-		ancillaryDataLen = header->msg_controllen;
 
-		if (header->msg_iovlen <= 1)
-			header = NULL;
-		else {
-			bytesLeft += compute_user_iovec_length(header->msg_iov + 1,
-				header->msg_iovlen - 1);
+		// get the ancillary data
+		if (header->msg_control != NULL) {
+			ancillaryData = create_ancillary_data_container();
+			if (ancillaryData == NULL)
+				return B_NO_MEMORY;
+			ancillaryDataDeleter.SetTo(ancillaryData);
+
+			status_t status = add_ancillary_data(socket, ancillaryData,
+				(cmsghdr *)header->msg_control, header->msg_controllen);
+			if (status != B_OK)
+				return status;
 		}
 	}
 
@@ -1080,6 +1113,33 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 		status_t status = socket_bind(socket, NULL, 0);
 		if (status < B_OK)
 			return status;
+	}
+
+	// If the protocol has a send_data_no_buffer() hook, we use that one.
+	if (socket->first_info->send_data_no_buffer != NULL) {
+		iovec stackVec = { (void*)data, length };
+		iovec* vecs = header ? header->msg_iov : &stackVec;
+		int vecCount = header ? header->msg_iovlen : 1;
+
+		ssize_t written = socket->first_info->send_data_no_buffer(
+			socket->first_protocol, vecs, vecCount, ancillaryData, address,
+			addressLength);
+		if (written > 0)
+			ancillaryDataDeleter.Detach();
+		return written;
+	}
+
+	// By convention, if a header is given, the (data, length) equals the first
+	// iovec. So drop the header, if it is the only iovec. Otherwise compute
+	// the size of the remaining ones.
+	if (header != NULL) {
+		if (header->msg_iovlen <= 1)
+			header = NULL;
+		else {
+// TODO: The iovecs have already been copied to kernel space. Simplify!
+			bytesLeft += compute_user_iovec_length(header->msg_iov + 1,
+				header->msg_iovlen - 1);
+		}
 	}
 
 	ssize_t bytesSent = 0;
@@ -1134,15 +1194,8 @@ socket_send(net_socket *socket, msghdr *header, const void *data, size_t length,
 		// attach ancillary data to the first buffer
 		status_t status = B_OK;
 		if (ancillaryData != NULL) {
-			ancillary_data_container *container
-				= create_ancillary_data_container();
-			if (container != NULL) {
-				gNetBufferModule.set_ancillary_data(buffer, container);
-				status = add_ancillary_data(socket, container, ancillaryData,
-					ancillaryDataLen);
-			} else
-				status = B_NO_MEMORY;
-
+			gNetBufferModule.set_ancillary_data(buffer, ancillaryData);
+			ancillaryDataDeleter.Detach();
 			ancillaryData = NULL;
 		}
 

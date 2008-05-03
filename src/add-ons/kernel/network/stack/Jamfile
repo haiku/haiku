@@ -12,7 +12,7 @@ if $(TARGET_PLATFORM) != haiku {
 
 
 UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
-UsePrivateHeaders net ;
+UsePrivateHeaders net shared ;
 
 KernelAddon stack :
 	ancillary_data.cpp
