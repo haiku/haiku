@@ -660,12 +660,6 @@ AboutView::AboutView(const BRect &rect)
 //		"Copyright " B_UTF8_COPYRIGHT " 2008 Igor Pavlov. "
 //		"All rights reserved.");
 
-// libMicros copyrights
-//	AddCopyrightEntry("libMicro",
-//		"Copyright " B_UTF8_COPYRIGHT " 2007 Sun Microsystems, Inc. "
-//		"All rights reserved.");
-		// Open Solaris License
-
 	// libpng copyrights
 	AddCopyrightEntry("libpng",
 		"Copyright " B_UTF8_COPYRIGHT " 2004, 2006-2008 Glenn "

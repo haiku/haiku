@@ -32,6 +32,12 @@ if [ IsOptionalHaikuImagePackageAdded libMicro ] {
 		write writev ;
 
 	AddSymlinkToHaikuImage home benchmarks libmicro : bin-BePC : bin ;
+
+	AddOptionalPackageDescriptionToHaikuImage
+		<libmicro>.OptionalPackageDescription
+		: $(HAIKU_TOP) src tests system benchmarks libMicro ;
+	AddLicenseToHaikuImage <libmicro>OPENSOLARIS.LICENSE : OpenSolaris
+		: $(HAIKU_TOP) src tests system benchmarks libMicro ;
 }
 
 
