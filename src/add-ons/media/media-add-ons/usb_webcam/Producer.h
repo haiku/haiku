@@ -23,6 +23,7 @@ virtual					~VideoProducer();
 
 virtual	status_t		InitCheck() const { return fInitStatus; }
 
+
 /* BMediaNode */
 public:
 virtual port_id		ControlPort() const;

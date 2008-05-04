@@ -32,6 +32,10 @@ class CamSensor
 	virtual status_t	SetVideoFrame(BRect rect);
 	virtual BRect		VideoFrame() const { return fVideoFrame; };
 	virtual status_t	SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue);
+
+	virtual void		AddParameters(BParameterGroup *group, int32 &index);
+	virtual status_t	GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size);
+	virtual status_t	SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size);
 	
 	CamDevice			*Device();
 	
@@ -50,6 +54,8 @@ class CamSensor
 		status_t		fInitStatus;
 		bool			fTransferEnabled;
 		BRect			fVideoFrame;
+		int32			fFirstParameterID;
+		bigtime_t		fLastParameterChanges;
 	private:
 		CamDevice		*fCamDevice;
 };

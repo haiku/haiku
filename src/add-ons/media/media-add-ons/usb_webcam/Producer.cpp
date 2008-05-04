@@ -18,6 +18,7 @@
 #include <interface/Bitmap.h>
 
 #include "CamDevice.h"
+#include "CamSensor.h"
 
 #define TOUCH(x) ((void)(x))
 
@@ -138,11 +139,24 @@ VideoProducer::NodeRegistered()
 		return;
 	}
 
+	int32 id = P_COLOR;
 	/* Set up the parameter web */
+	
+	//TODO: remove and put sensible stuff there
 	BParameterWeb *web = new BParameterWeb();
 	BParameterGroup *main = web->MakeGroup(Name());
 	BDiscreteParameter *state = main->MakeDiscreteParameter(
 			P_COLOR, B_MEDIA_RAW_VIDEO, "Color", "Color");
+
+	id++;
+	if (fCamDevice) {
+		BParameterGroup *dev = web->MakeGroup("Device");
+		fCamDevice->AddParameters(dev, id);
+		if (fCamDevice->Sensor()) {
+			BParameterGroup *sensor = web->MakeGroup("Sensor");
+			fCamDevice->Sensor()->AddParameters(sensor, id);
+		}
+	}
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x00ff0000), "Red");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x0000ff00), "Green");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x000000ff), "Blue");
@@ -385,12 +399,20 @@ VideoProducer::PrepareToConnect(const media_source &source,
 	}
 
 //XXX:FIXME
+#if 1
 //	if (format->u.raw_video.display.line_width == 0)
 		format->u.raw_video.display.line_width = 352;//320;
 		format->u.raw_video.display.line_width = 320;
 //	if (format->u.raw_video.display.line_count == 0)
 		format->u.raw_video.display.line_count = 288;//240;
 		format->u.raw_video.display.line_count = 240;
+#endif
+
+	if (fCamDevice) {
+		format->u.raw_video.display.line_width = fCamDevice->VideoFrame().IntegerWidth() + 1;
+		format->u.raw_video.display.line_count = fCamDevice->VideoFrame().IntegerHeight() + 1;
+	}
+
 	if (format->u.raw_video.field_rate == 0)
 		format->u.raw_video.field_rate = 29.97f;
 
@@ -494,7 +516,7 @@ VideoProducer::Disconnect(const media_source &source,
 		return;
 	}
 
-#if 0
+#if 1
 	/* Some dumb apps don't stop nodes before disconnecting... */
 	if (fRunning)
 		HandleStop();
@@ -560,31 +582,58 @@ status_t
 VideoProducer::GetParameterValue(
 	int32 id, bigtime_t *last_change, void *value, size_t *size)
 {
-	if (id != P_COLOR)
-		return B_BAD_VALUE;
+	status_t err;
 
-	*last_change = fLastColorChange;
-	*size = sizeof(uint32);
-	*((uint32 *)value) = fColor;
+	if (id == P_COLOR) {
+		//return B_BAD_VALUE;
 
-	return B_OK;
+		*last_change = fLastColorChange;
+		*size = sizeof(uint32);
+		*((uint32 *)value) = fColor;
+		return B_OK;
+	}
+
+	if (fCamDevice) {
+		BAutolock lock(fCamDevice->Locker());
+		err = fCamDevice->GetParameterValue(id, last_change, value, size);
+		if (err >= B_OK)
+			return err;
+		if (fCamDevice->Sensor()) {
+			err = fCamDevice->Sensor()->GetParameterValue(id, last_change, value, size);
+			if (err >= B_OK)
+				return err;
+		}
+	}
+
+	return B_BAD_VALUE;
 }
 
 void
 VideoProducer::SetParameterValue(
 	int32 id, bigtime_t when, const void *value, size_t size)
 {
-	if ((id != P_COLOR) || !value || (size != sizeof(uint32)))
-		return;
+	status_t err = B_OK;
 
-	if (*(uint32 *)value == fColor)
-		return;
+	if (id == P_COLOR) {
+		if (!value || (size != sizeof(uint32)))
+			return;
 
-	fColor = *(uint32 *)value;
-	fLastColorChange = when;
+		if (*(uint32 *)value == fColor)
+			return;
 
-	BroadcastNewParameterValue(
-			fLastColorChange, P_COLOR, &fColor, sizeof(fColor));
+		fColor = *(uint32 *)value;
+		fLastColorChange = when;
+
+	} else if (fCamDevice) {
+		BAutolock lock(fCamDevice->Locker());
+		err = fCamDevice->SetParameterValue(id, when, value, size);
+		if ((err < B_OK) && (fCamDevice->Sensor())) {
+			err = fCamDevice->Sensor()->SetParameterValue(id, when, value, size);
+		}
+	}
+
+	if (err >= B_OK)
+		BroadcastNewParameterValue(when, id, (void *)value, size);
 }
 
 status_t

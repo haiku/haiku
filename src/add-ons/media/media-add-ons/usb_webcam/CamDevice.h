@@ -19,6 +19,7 @@
 class BBitmap;
 class BBuffer;
 class BDataIO;
+class BParameterGroup;
 class CamRoster;
 class CamDeviceAddon;
 class CamSensor;
@@ -57,6 +58,11 @@ class CamDevice {
 	virtual BRect		VideoFrame() const { return fVideoFrame; };
 	virtual status_t	SetScale(float scale);
 	virtual status_t	SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue);
+
+	virtual void		AddParameters(BParameterGroup *group, int32 &index);
+	virtual status_t	GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size);
+	virtual status_t	SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size);
+
 
 	// for use by deframer
 	virtual size_t		MinRawFrameSize();
@@ -108,8 +114,10 @@ class CamDevice {
 		CamDeframer*	fDeframer;
 		BDataIO*		fDataInput; // where data from usb goes, likely fDeframer
 		const BUSBEndpoint*	fBulkIn;
+		int32			fFirstParameterID;
+		bigtime_t		fLastParameterChanges;
 
-	private:
+	protected:
 		friend class CamDeviceAddon;
 		CamDeviceAddon&	fCamDeviceAddon;
 		BUSBDevice*		fDevice;

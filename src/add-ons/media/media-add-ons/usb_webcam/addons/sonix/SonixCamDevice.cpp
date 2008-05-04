@@ -4,6 +4,7 @@
 #include "CamBufferingDeframer.h"
 #include "CamStreamingDeframer.h"
 
+#include <ParameterWeb.h>
 #include <interface/Bitmap.h>
 #include <media/Buffer.h>
 
@@ -35,6 +36,8 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	uchar data[8]; /* store bytes returned from sonix commands */
 	status_t err;
 	fFrameTagState = 0;
+	
+	fRGain = fGGain = fBGain = 0;
 	
 	memset(fCachedRegs, 0, SN9C102_REG_COUNT);
 	fChipVersion = 2;
@@ -88,6 +91,7 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	if (Sensor()) {
 		PRINT((CH ": CamSensor: %s" CT, Sensor()->Name()));
 		fInitStatus = Sensor()->Setup();
+		fVideoFrame = BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1);
 //		SetVideoFrame(BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1));
 //		SetVideoFrame(BRect(0, 0, 320-1, 240-1));
 	}
@@ -127,7 +131,7 @@ SonixCamDevice::StartTransfer()
 	if (Sensor())
 		SetVideoFrame(BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1));
 	
-	SetVideoFrame(BRect(0, 0, 320-1, 240-1));
+	//SetVideoFrame(BRect(0, 0, 320-1, 240-1));
 
 DumpRegs();
 	err = ReadReg(SN9C102_CHIP_CTRL, &r, 1, true);
@@ -363,6 +367,76 @@ SonixCamDevice::SetVideoParams(float brightness, float contrast, float hue, floa
 {
 	return B_OK;
 }
+
+void
+SonixCamDevice::AddParameters(BParameterGroup *group, int32 &index)
+{
+	BContinuousParameter *p;
+	CamDevice::AddParameters(group, index);
+	
+	p = group->MakeContinuousParameter(index++, 
+		B_MEDIA_RAW_VIDEO, "RGB gain", 
+		B_GAIN, "", 1.0, 1.0+(float)(SN9C102_RGB_GAIN_MAX)/8, (float)1.0/8);
+
+	p->SetChannelCount(3);
+
+
+}
+
+status_t
+SonixCamDevice::GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size)
+{
+	float *gains;
+	switch (id - fFirstParameterID) {
+		case 0:
+			*size = 3 * sizeof(float);
+			gains = ((float *)value);
+			gains[0] = 1.0 + (float)fRGain / 8;
+			gains[1] = 1.0 + (float)fGGain / 8;
+			gains[2] = 1.0 + (float)fBGain / 8;
+			*last_change = fLastParameterChanges;
+			return B_OK;
+	}
+	return B_BAD_VALUE;
+}
+
+status_t
+SonixCamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
+{
+	float *gains;
+	switch (id - fFirstParameterID) {
+		case 0:
+			if (!value || (size != 3 * sizeof(float)))
+				return B_BAD_VALUE;
+			gains = ((float *)value);
+			if ((gains[0] == 1.0 + (float)fRGain / 8)
+				&& (gains[1] == 1.0 + (float)fGGain / 8)
+				&& (gains[2] == 1.0 + (float)fBGain / 8))
+				return B_OK;
+
+			fRGain = (int)(8 * (gains[0] - 1.0)) & SN9C102_RGB_GAIN_MAX;
+			fGGain = (int)(8 * (gains[1] - 1.0)) & SN9C102_RGB_GAIN_MAX;
+			fBGain = (int)(8 * (gains[2] - 1.0)) & SN9C102_RGB_GAIN_MAX;
+			fLastParameterChanges = when;
+			PRINT((CH ": gain: %d,%d,%d" CT, fRGain, fGGain, fBGain));
+			//WriteReg8(SN9C102_R_B_GAIN, (fBGain << 4) | fRGain);	/* red, blue gain = 1+0/8 = 1 */
+			/* Datasheet says:
+			 * reg 0x10 [0:3] is rgain, [4:7] is bgain and 0x11 [0:3] is ggain
+			 * according to sn9c102-1.15 linux driver it's wrong for reg 0x10,
+			 * but it doesn't seem to work any better for a rev 2 chip.
+			 * XXX
+			 */
+			WriteReg8(SN9C102_R_GAIN, fRGain);
+			WriteReg8(SN9C102_B_GAIN, fBGain);
+			if (fChipVersion >= 3)
+				WriteReg8(SN9C103_G_GAIN, fGGain);
+			else
+				WriteReg8(SN9C102_G_GAIN, (fGGain / 16));
+			return B_OK;
+	}
+	return B_BAD_VALUE;
+}
+
 
 // -----------------------------------------------------------------------------
 size_t

@@ -8,6 +8,9 @@
 #define SN9C102_ASIC_ID		0x00
 #define SN9C102_CHIP_CTRL	0x01
 #define SN9C102_GPIO			0x02
+#define SN9C103_G_GAIN		0x04	/* chip version dependant! */
+#define SN9C102_R_GAIN		0x05
+#define SN9C102_B_GAIN		0x06
 #define SN9C102_I2C_SETUP	0x08
 #define SN9C102_I2C_SLAVE_ID	0x09 
 #define SN9C102_I2C_DATA0	0x0a
@@ -16,7 +19,7 @@
 #define SN9C102_I2C_DATA3	0x0d
 #define SN9C102_I2C_DATA4	0x0e
 #define SN9C102_CONTROL_STAT	0x0f /*I2C ??*/
-#define SN9C102_R_B_GAIN		0x10
+#define SN9C102_R_B_GAIN		0x10	/* datasheet says so but it's WRONG */
 #define SN9C102_G_GAIN		0x11 /* Green channel gain control. -> Gain = (1+G_GAIN/8) 
 							    Note: It is sync with VSYNC */
 #define SN9C102_H_START		0x12 /* Start active pixel number after H­sync of sensor 
@@ -36,6 +39,8 @@
 #define SN9C102_AE_STRY		0x1d
 #define SN9C102_AE_ENDX		0x1e
 #define SN9C102_AE_ENDY		0x1f
+
+#define SN9C102_RGB_GAIN_MAX	0x7f
 
 // This class represents each webcam
 class SonixCamDevice : public CamDevice
@@ -62,6 +67,11 @@ class SonixCamDevice : public CamDevice
 	virtual status_t	SetScale(float scale);
 	virtual status_t	SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue);
 
+	virtual void		AddParameters(BParameterGroup *group, int32 &index);
+	virtual status_t	GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size);
+	virtual status_t	SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size);
+
+
 	// for use by deframer
 	virtual size_t		MinRawFrameSize();
 	virtual size_t		MaxRawFrameSize();
@@ -81,6 +91,10 @@ class SonixCamDevice : public CamDevice
 	int					fChipVersion;
 
 	int					fFrameTagState;
+	
+	uint8				fRGain;
+	uint8				fGGain;
+	uint8				fBGain;
 };
 
 // the addon itself, that instanciate

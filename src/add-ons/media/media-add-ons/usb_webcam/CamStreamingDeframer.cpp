@@ -34,7 +34,7 @@ CamStreamingDeframer::Write(const void *buffer, size_t size)
 	int bufsize = size;
 	bool detach = false;
 	bool discard = false;
-	PRINT((CH "(%p, %d); state=%s framesz=%u queued=%u" CT, buffer, size, (fState==ST_SYNC)?"sync":"frame", (size_t)(fCurrentFrame?(fCurrentFrame->Position()):-1), (size_t)fInputBuff.Position()));
+	//PRINT((CH "(%p, %d); state=%s framesz=%u queued=%u" CT, buffer, size, (fState==ST_SYNC)?"sync":"frame", (size_t)(fCurrentFrame?(fCurrentFrame->Position()):-1), (size_t)fInputBuff.Position()));
 	if (!fCurrentFrame) {
 		BAutolock l(fLocker);
 		if (fFrames.CountItems() < MAXFRAMEBUF)

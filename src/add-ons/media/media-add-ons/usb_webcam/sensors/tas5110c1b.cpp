@@ -1,9 +1,13 @@
 /*
 */
 
+#include <ParameterWeb.h>
+
 #include "CamSensor.h"
 #include "CamDebug.h"
 #include "addons/sonix/SonixCamDevice.h"
+
+#define ENABLE_GAIN 1
 
 class TAS5110C1BSensor : public CamSensor {
 public:
@@ -18,8 +22,13 @@ public:
 	virtual int			MaxWidth() const { return 352; };
 	virtual int			MaxHeight() const { return 288; };
 	virtual status_t	SetVideoFrame(BRect rect);
+	virtual void		AddParameters(BParameterGroup *group, int32 &firstID);
+	virtual status_t	GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size);
+	virtual status_t	SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size);
+
 private:
 	bool	fIsSonix;
+	float	fGain;
 };
 
 // -----------------------------------------------------------------------------
@@ -33,6 +42,7 @@ TAS5110C1BSensor::TAS5110C1BSensor(CamDevice *_camera)
 		PRINT((CH ": unknown camera device!" CT));
 		fInitStatus = ENODEV;
 	}
+	fGain = (float)0x40; // default
 }
 
 // -----------------------------------------------------------------------------
@@ -108,6 +118,53 @@ TAS5110C1BSensor::SetVideoFrame(BRect rect)
 	
 	return B_OK;
 }
+
+void
+TAS5110C1BSensor::AddParameters(BParameterGroup *group, int32 &index)
+{
+	BContinuousParameter *p;
+	CamSensor::AddParameters(group, index);
+
+#ifdef ENABLE_GAIN
+	p = group->MakeContinuousParameter(index++, 
+		B_MEDIA_RAW_VIDEO, "global gain", 
+		B_GAIN, "", (float)0x00, (float)0xf6, (float)1);
+#endif
+}
+
+
+status_t
+TAS5110C1BSensor::GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size)
+{
+#ifdef ENABLE_GAIN
+	if (id == fFirstParameterID) {
+		*size = sizeof(float);
+		*((float *)value) = fGain;
+		*last_change = fLastParameterChanges;
+	}
+#endif
+	return B_BAD_VALUE;
+}
+
+status_t
+TAS5110C1BSensor::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
+{
+#ifdef ENABLE_GAIN
+	if (id == fFirstParameterID) {
+		if (!value || (size != sizeof(float)))
+			return B_BAD_VALUE;
+		if (*(float *)value == fGain)
+			return B_OK;
+		fGain = *(float *)value;
+		fLastParameterChanges = when;
+		PRINT((CH ": gain: %f (%d)" CT, fGain, (unsigned)(0xf6-fGain)));
+		Device()->WriteIIC8(0x20, (uint8)0xf6 - (uint8)fGain);
+		return B_OK;
+	}
+#endif
+	return B_BAD_VALUE;
+}
+
 
 // -----------------------------------------------------------------------------
 B_WEBCAM_DECLARE_SENSOR(TAS5110C1BSensor, tas5110c1b)

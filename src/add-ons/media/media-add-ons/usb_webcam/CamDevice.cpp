@@ -30,6 +30,7 @@ struct { const char *name; SensorInstFunc instfunc; } kSensorTable[] = {
 CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	: fInitStatus(B_NO_INIT),
 	  fSensor(NULL),
+	  fLastParameterChanges(0),
 	  fCamDeviceAddon(_addon),
 	  fDevice(_device),
 	  fSupportedDeviceIndex(-1),
@@ -202,6 +203,26 @@ CamDevice::SetVideoParams(float brightness, float contrast, float hue, float red
 {
 	return B_OK;
 }
+
+// -----------------------------------------------------------------------------
+void
+CamDevice::AddParameters(BParameterGroup *group, int32 &index)
+{
+	fFirstParameterID = index;
+}
+
+status_t
+CamDevice::GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size)
+{
+	return B_BAD_VALUE;
+}
+
+status_t
+CamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
+{
+	return B_BAD_VALUE;
+}
+
 
 // -----------------------------------------------------------------------------
 size_t
