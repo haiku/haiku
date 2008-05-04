@@ -421,8 +421,28 @@ CopyDirectoryToHaikuImage beos etc
 #pragma mark - Optional Packages
 
 
+HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS = ;
+
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalPackages ] ;
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) OptionalTestPackages ] ;
+
+local optionalPackageDescriptions ;
+if $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) {
+	optionalPackageDescriptions = <haiku-image>optional_package_descriptions ;
+	MakeLocate $(optionalPackageDescriptions)
+		: $(HAIKU_COMMON_PLATFORM_OBJECT_DIR) ;
+
+	Depends $(optionalPackageDescriptions)
+		: $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) ;
+
+	actions together BuildOptionalPackageDescriptions
+	{
+		cat $(2) > $(1)
+	}
+
+	BuildOptionalPackageDescriptions $(optionalPackageDescriptions)
+		: $(HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS) ;
+}
 
 
 #pragma mark - User/Group Setup
@@ -497,6 +517,10 @@ if $(HOST_RM_ATTRS_TARGET) {
 	AddTargetVariableToScript $(script) : $(HOST_RM_ATTRS_TARGET) : rmAttrs ;
 } else {
 	AddVariableToScript $(script) : rmAttrs : rm ;
+}
+if $(optionalPackageDescriptions) {
+	AddTargetVariableToScript $(script) : $(optionalPackageDescriptions)
+		: optionalPackageDescriptions ;
 }
 
 

@@ -12,6 +12,7 @@
 # updateOnly
 # dontClearImage
 # isVMwareImage
+# optionalPackageDescriptions
 # 
 # addattr
 # bfsShell
@@ -88,6 +89,9 @@ unzipFile()
 mkdir -p $tmpDir
 copyrightsFile=$tmpDir/copyrights
 $rmAttrs -f $copyrightsFile
+if [ "$optionalPackageDescriptions" ]; then
+	cp "$optionalPackageDescriptions" $copyrightsFile
+fi
 
 
 # create the image and mount it

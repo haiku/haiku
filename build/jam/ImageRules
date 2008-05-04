@@ -723,6 +723,28 @@ rule AddGroupToHaikuImage group : gid : members
 	AddEntryToHaikuImageUserGroupFile <haiku-image>group : $(entry) ;
 }
 
+rule AddOptionalPackageDescriptionToHaikuImage file : searchPath
+{
+	if $(searchPath) {
+		SEARCH on $(file) = [ FDirName $(searchPath) ] ;
+	}
+
+	HAIKU_IMAGE_OPTIONAL_PACKAGE_DESCRIPTIONS += $(file) ;
+}
+
+rule AddLicenseToHaikuImage file : name : searchPath
+{
+	if $(searchPath) {
+		SEARCH on $(file) = [ FDirName $(searchPath) ] ;
+	}
+
+	if $(name) && $(file:BS) = $(name) {
+		name = ;
+	}
+
+	AddFilesToHaikuImage beos etc licenses : $(file) : $(name) ;
+}
+
 
 rule CreateHaikuImageMakeDirectoriesScript script
 {
