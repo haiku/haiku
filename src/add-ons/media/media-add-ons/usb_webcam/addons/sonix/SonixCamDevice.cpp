@@ -9,9 +9,49 @@
 #include <media/Buffer.h>
 
 const usb_named_support_descriptor kSupportedDevices[] = {
-{{ 0, 0, 0, 0x0c45, 0x6005 }, "Sonix", "Sonix"},
+{{ 0, 0, 0, 0x0c45, 0x6005 }, "Sonix", "Sonix"}, // mine
 {{ 0, 0, 0, 0x0c45, 0x6009 }, "Trust", "spacec@m 120" },
-{{ 0, 0, 0, 0x0c45, 0x600D }, "Trust", "spacec@m 120" },
+{{ 0, 0, 0, 0x0c45, 0x600d }, "Trust", "spacec@m 120" },
+
+/* other devices that should be supported,
+ * cf. sn9c102-1.15 linux driver, sn9c102_sensor.h
+ * for IDs and sensors
+ */
+{{ 0, 0, 0, 0x0c45, 0x6001 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6024 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6025 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6028 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6029 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x602a }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x602b }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x602c }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6030 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6080 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6082 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6083 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x6088 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x608a }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x608b }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x608c }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x608e }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x608f }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60a0 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60a2 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60a3 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60a8 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60aa }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60ab }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60ac }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60ae }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60af }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60b0 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60b2 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60b3 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60b8 }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60ba }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60bb }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60bc }, "Sonix", "Sonix generic" },
+{{ 0, 0, 0, 0x0c45, 0x60be }, "Sonix", "Sonix generic" },
 {{ 0, 0, 0, 0, 0}, NULL, NULL }
 };
 
@@ -49,6 +89,10 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	case 0x6005:
 	case 0x60ab:
 		fSensor = CreateSensor("tas5110c1b");
+		break;
+	case 0x6025:
+		fSensor = CreateSensor("tas5110c1b");
+		//XXX:probe!
 		break;
 	default:
 		break;
