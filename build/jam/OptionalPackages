@@ -29,8 +29,7 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 
 	# library symlinks
 	local lib ;
-	for lib in $(BEOS_SYSTEM_LIBS)
-		$(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) libglut.so {
+	for lib in $(BEOS_SYSTEM_LIBS) libglut.so {
 		AddSymlinkToHaikuImage develop lib x86 : /system/lib/$(lib:BS) ;
 	}
 
