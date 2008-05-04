@@ -132,6 +132,17 @@ status_t
 unix_getsockopt(net_protocol *protocol, int level, int option, void *value,
 	int *_length)
 {
+	UnixEndpoint* endpoint = (UnixEndpoint*)protocol;
+
+	if (level == SOL_SOCKET && option == SO_PEERCRED) {
+		if (*_length < (int)sizeof(ucred))
+			return B_BAD_VALUE;
+
+		*_length = sizeof(ucred);
+
+		return endpoint->GetPeerCredentials((ucred*)value);
+	}
+
 	return gSocketModule->get_option(protocol->socket, level, option, value,
 		_length);
 }

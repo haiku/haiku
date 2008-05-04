@@ -254,6 +254,10 @@ UnixEndpoint::Listen(int backlog)
 
 	_UnsetReceiveFifo();
 
+	fCredentials.pid = getpid();
+	fCredentials.uid = geteuid();
+	fCredentials.gid = getegid();
+
 	fState = UNIX_ENDPOINT_LISTENING;
 
 	RETURN_ERROR(B_OK);
@@ -352,7 +356,7 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 
 	UnixEndpointLocker connectedLocker(connectedEndpoint);
 
-	connectedEndpoint->_Spawn(this, peerFifo);
+	connectedEndpoint->_Spawn(this, listeningEndpoint, peerFifo);
 
 	// update our attributes
 	_UnsetReceiveFifo();
@@ -361,6 +365,10 @@ UnixEndpoint::Connect(const struct sockaddr *_address)
 	PeerAddress().SetTo(&connectedEndpoint->socket->address);
 	fPeerEndpoint->AddReference();
 	fReceiveFifo = fifo;
+
+	fCredentials.pid = getpid();
+	fCredentials.uid = geteuid();
+	fCredentials.gid = getegid();
 
 	fifoDeleter.Detach();
 	peerFifoDeleter.Detach();
@@ -651,6 +659,22 @@ UnixEndpoint::SetReceiveBufferSize(size_t size)
 
 
 status_t
+UnixEndpoint::GetPeerCredentials(ucred* credentials)
+{
+	UnixEndpointLocker locker(this);
+	UnixEndpointLocker peerLocker;
+
+	status_t error = _LockConnectedEndpoints(locker, peerLocker);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	*credentials = fPeerEndpoint->fCredentials;
+
+	return B_OK;
+}
+
+
+status_t
 UnixEndpoint::Shutdown(int direction)
 {
 	TRACE("[%ld] %p->UnixEndpoint::Shutdown(%d)\n",
@@ -710,7 +734,8 @@ UnixEndpoint::Shutdown(int direction)
 
 
 void
-UnixEndpoint::_Spawn(UnixEndpoint* connectingEndpoint, UnixFifo* fifo)
+UnixEndpoint::_Spawn(UnixEndpoint* connectingEndpoint,
+	UnixEndpoint* listeningEndpoint, UnixFifo* fifo)
 {
 	ProtocolSocket::Open();
 
@@ -721,6 +746,8 @@ UnixEndpoint::_Spawn(UnixEndpoint* connectingEndpoint, UnixFifo* fifo)
 	fReceiveFifo = fifo;
 
 	PeerAddress().SetTo(&connectingEndpoint->socket->address);
+
+	fCredentials = listeningEndpoint->fCredentials;
 
 	fState = UNIX_ENDPOINT_CONNECTED;
 }

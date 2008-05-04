@@ -76,6 +76,7 @@ public:
 	ssize_t Receivable();
 
 	status_t SetReceiveBufferSize(size_t size);
+	status_t GetPeerCredentials(ucred* credentials);
 
 	status_t Shutdown(int direction);
 
@@ -95,7 +96,8 @@ public:
 	}
 
 private:
-	void _Spawn(UnixEndpoint* connectingEndpoint, UnixFifo* fifo);
+	void _Spawn(UnixEndpoint* connectingEndpoint,
+		UnixEndpoint* listeningEndpoint, UnixFifo* fifo);
 	void _Disconnect();
 	status_t _LockConnectedEndpoints(UnixEndpointLocker& locker,
 		UnixEndpointLocker& peerLocker);
@@ -115,8 +117,8 @@ private:
 	UnixFifo*						fReceiveFifo;
 	unix_endpoint_state				fState;
 	sem_id							fAcceptSemaphore;
+	ucred							fCredentials;
 	bool							fIsChild;
 };
-
 
 #endif	// UNIX_ENDPOINT_H
