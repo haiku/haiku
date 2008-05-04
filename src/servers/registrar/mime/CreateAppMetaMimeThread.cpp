@@ -49,6 +49,13 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	if (status < B_OK)
 		return status;
 
+	bool isDir = file.IsDirectory();
+	if (_entryIsDir != NULL)
+		*_entryIsDir = isDir;
+
+	if (isDir)
+		return B_OK;
+
 	BAppFileInfo appInfo(&file);
 	status = appInfo.InitCheck();
 	if (status < B_OK)
@@ -142,9 +149,6 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 		if (status == B_OK && appInfo.GetIconForType(type, &largeIcon, B_LARGE_ICON) == B_OK)
 			status = mime.SetIconForType(type, &largeIcon, B_LARGE_ICON);
 	}
-
-	if (status == B_OK && _entryIsDir != NULL)
-		*_entryIsDir = file.IsDirectory();
 
 	return status;
 }
