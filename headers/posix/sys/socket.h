@@ -67,6 +67,7 @@ typedef uint32_t socklen_t;
 #define	SO_TYPE			0x40000008	/* get socket type */
 #define SO_NONBLOCK		0x40000009
 #define SO_BINDTODEVICE	0x4000000a
+#define SO_PEERCRED		0x4000000b	/* get peer credentials, param: ucred */
 
 /* Shutdown options */
 #define SHUT_RD			0
@@ -143,6 +144,13 @@ struct cmsghdr {
 
 /* SOL_SOCKET control message types */
 #define SCM_RIGHTS	0x01
+
+/* parameter to SO_PEERCRED */
+struct ucred {
+	pid_t	pid;	/* PID of sender */
+	uid_t	uid;	/* UID of sender */
+	gid_t	gid;	/* GID of sender */
+};
 
 
 #if __cplusplus
