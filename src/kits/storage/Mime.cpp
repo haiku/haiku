@@ -111,11 +111,13 @@ update_mime_info(const char *path, int recursive, int synchronous, int force)
 
 // create_app_meta_mime
 /*!	Creates a MIME database entry for one or more applications.
-	\a path should either point to an application file or should be \c NULL.
-	In the first case a MIME database entry for that application is created,
-	in the second case entries for all applications are created.
-	\param path The path to an application file, or \c NULL.
-	\param recursive Currently unused.
+	If \a path points to an application file, a MIME DB entry is create for the
+	application. If it points to a directory and \a recursive is non-null,
+	entries are created for all application files in the given directory
+	tree. If path is \c NULL all files are considered; \a recursive is
+	ignored in this case.
+	\param path The path to an application file, a directory, or \c NULL.
+	\param recursive Non-null to trigger recursive behavior.
 	\param synchronous If non-null create_app_meta_mime() waits until the
 		   operation is finished, otherwise it returns immediately and the
 		   operation is done asynchronously.
@@ -129,8 +131,9 @@ status_t
 create_app_meta_mime(const char *path, int recursive, int synchronous,
 	int force)
 {
-	// If path is NULL, we are recursive, otherwise no.
-	recursive = !path;
+	// Force recursion when given a NULL path
+	if (!path)
+		recursive = true;
 
 	return do_mime_update(B_REG_MIME_CREATE_APP_META_MIME, path, recursive,
 		synchronous, force);
