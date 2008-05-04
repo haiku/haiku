@@ -138,12 +138,21 @@ if [ "$SAFEMODE" != "yes" ]; then
 	fi
 fi
 
-# Check for fresh install and register all bundled app mimetypes
-FRESH_INSTALL_INDICATOR_FILE=$HOME/config/settings/fresh_install
-if [ -e $FRESH_INSTALL_INDICATOR_FILE ]; then
-#	mimeset -all -f /boot/beos/apps
-#	mimeset -all -f /boot/beos/preferences
-#	mimeset -all -f /boot/beos/system/servers
-#	mimeset -all -f /boot/apps
-	rm $FRESH_INSTALL_INDICATOR_FILE
+# Check for fresh install and run post install scripts.
+postInstallDir=/boot/beos/etc/post_install
+freshInstallIndicator=$postInstallDir/fresh_install
+if [ -e $freshInstallIndicator ]; then
+	# wait a moment for things to calm down a bit
+	sleep 3
+
+	# execute scripts
+	for f in $postInstallDir/*.sh; do
+		if [ -f $f ]; then
+			echo "Running post install script $f ..." > /dev/dprintf
+			$f
+		fi
+	done
+
+	sync
+	rm $freshInstallIndicator
 fi
