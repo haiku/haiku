@@ -17,6 +17,7 @@
 
 # package dependencies
 OptionalPackageDependencies Development : Perl ;
+OptionalPackageDependencies OpenSSH : OpenSSL ;
 
 
 # Development
@@ -157,6 +158,23 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 		;
 	}
 	#UnzipArchiveToHaikuImage home : data/vv.mp3.zip : 0 ;
+}
+
+
+# OpenSSH
+if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package OpenSSH available for gcc4" ;
+	} else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage openssh-5.0p1-gcc2-2008-05-04
+			: $(baseURL)/openssh-5.0p1-gcc2-2008-05-04.zip
+			:
+		;
+
+		AddUserToHaikuImage sshd : 1001 : 100 : /var/empty : /bin/true
+			: "sshd user" ;
+	}
 }
 
 
