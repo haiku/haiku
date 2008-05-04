@@ -51,6 +51,13 @@
 #	define TRACE(x) ;
 #endif
 
+
+//#define TRACE_MEMORY_MAP
+	// Define this to print the memory map to serial debug,
+	// You also need to define ENABLE_SERIAL in serial.cpp
+	// for output to work.
+
+
 struct gdt_idt_descr {
 	uint16 limit;
 	uint32 *base;
@@ -252,6 +259,22 @@ sort_addr_range(addr_range *range, int count)
 }
 
 
+
+#ifdef TRACE_MEMORY_MAP
+static const char *
+e820_memory_type(uint32 type)
+{
+	switch (type) {
+		case 1: return "memory";
+		case 2: return "reserved";
+		case 3: return "ACPI reclaim";
+		case 4: return "ACPI NVS";
+		default: return "unknown/reserved";
+	}
+}
+#endif
+
+
 static uint32
 get_memory_map(extended_memory **_extendedMemory)
 {
@@ -275,11 +298,12 @@ get_memory_map(extended_memory **_extendedMemory)
 
 	*_extendedMemory = block;
 
-#ifdef TRACE_MMU
+#ifdef TRACE_MEMORY_MAP
 	dprintf("extended memory info (from 0xe820):\n");
 	for (uint32 i = 0; i < count; i++) {
-		dprintf("    base 0x%Lx, len 0x%Lx, type %lu\n",
-			block[i].base_addr, block[i].length, block[i].type);
+		dprintf("    base 0x%08Lx, len 0x%08Lx, type %lu (%s)\n",
+			block[i].base_addr, block[i].length, 
+			block[i].type, e820_memory_type(block[i].type));
 	}
 #endif
 
@@ -534,7 +558,7 @@ mmu_init_for_kernel(void)
 	sort_addr_range(gKernelArgs.virtual_allocated_range,
 		gKernelArgs.num_virtual_allocated_ranges);
 
-#ifdef TRACE_MMU
+#ifdef TRACE_MEMORY_MAP
 	{
 		uint32 i;
 
