@@ -64,19 +64,36 @@ http://www.mnementh.co.uk/sonix/sn9c102.pdf
 * some of the (many!) linux quickcam drivers:
 http://www.lrr.in.tum.de/~acher/quickcam/quickcam.html
 http://www.seismo.ethz.ch/linux/webcam.html
+
+* NW80x based:
+http://nw802.cvs.sourceforge.net NW80x based (like the QuickCam I have here)
 http://tuukkat.awardspace.com/quickcam/quickcam.html for PID 0xd001
+http://blognux.free.fr/sources/EasyCam2/04032006_11:11/drivers/nw802/
+datasheets:
+http://www.digchip.com/datasheets/parts/datasheet/132/NW800.php
 
 * Creative's own list of linux drivers:
 http://connect.creativelabs.com/opensource/Lists/Webcam%20Support/AllItems.aspx
 
 * Other webcam drivers:
-http://nw802.cvs.sourceforge.net NW80x based (like the QuickCam I have here)
 http://zc0302.sourceforge.net/zc0302.php?page=cams
+http://www.smcc.demon.nl/webcam/ (philips)
 http://www.medias.ne.jp/~takam/bsd/NetBSD.html
+http://blognux.free.fr/sources/EasyCam2/04032006_19:49/
+http://www.wifi.com.ar/english/doc/webcam/ov511cameras.html
 
 * CMOS Sensor datasheets (rather, marketing buzz):
 http://www.tascorp.com.tw/product_file/TAS5110C1B_Brief_V0.3.pdf
 http://www.tascorp.com.tw/product_file/TAS5130D1B_Brief_V0.3.pdf
+Divio NW80x:
+http://www.digchip.com/datasheets/parts/datasheet/132/NW800.php
+http://www.digchip.com/datasheets/parts/datasheet/132/NW802.php
+http://web.archive.org/web/*/divio.com/*
+All from eTOMS (ET31X110 would be == NW800 but isn't there):
+http://www.etomscorp.com/english/webdesign/product_search.asp
+http://web.archive.org/web/*re_pd_sr_1nr_50/http://etomscorp.com/*
+Agilent HDCS:
+http://www.ortodoxism.ro/datasheets2/2/05jj45dcrga6zr0zjg7hrde83cpy.pdf
 
 * Linux USB stack:
 http://www.iglu.org.il/lxr/source/include/linux/usb.h

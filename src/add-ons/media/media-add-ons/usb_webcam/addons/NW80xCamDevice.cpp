@@ -2,20 +2,45 @@
 #include "CamDebug.h"
 #include "CamSensor.h"
 
-// reference: http://nw802.cvs.sourceforge.net
+// reference drivers:
+// http://nw802.cvs.sourceforge.net
+// http://nw802.cvs.sourceforge.net/nw802/nw802-2.4/
+// http://www.medias.ne.jp/~takam/bsd/NetBSD.html#nw802
+// https://dev.openwrt.org/attachment/ticket/2319/nw802-patch.txt
+// win binary driver template, readme has interesting info:
+// http://www.bulgar-bg.com/Downloads/drivers/PCAMDriver/
+// http://www.bulgar-bg.com/Downloads/drivers/PCAMDriver/Readme.txt
 
 const usb_webcam_support_descriptor kSupportedDevices[] = {
 {{ 0, 0, 0, 0x046d, 0xd001 }, "Logitech", "QuickCam Pro", "??" }, // Alan's
 // other IDs according to nw802 linux driver:
 {{ 0, 0, 0, 0x052b, 0xd001 }, "Ezonics", "EZCam Pro", "??" },
 {{ 0, 0, 0, 0x055f, 0xd001 }, "Mustek"/*"PCLine"*/, "WCam 300"/*"PCL-W300"*/, "??" },
-{{ 0, 0, 0, 0x06a5, 0xd001 }, "Generic", "NW802", "??" },
-{{ 0, 0, 0, 0x06a5, 0x0000 }, "Generic", "NW800", "??" },
+{{ 0, 0, 0, 0x06a5, 0xd001 }, "Divio", "NW802", "??" },
+{{ 0, 0, 0, 0x06a5, 0x0000 }, "Divio", "NW800", "??" },
 {{ 0, 0, 0, 0, 0}, NULL, NULL, NULL }
 };
 
 
 #warning TODO!
+
+// datasheets: (scarce)
+// http://www.digchip.com/datasheets/parts/datasheet/132/NW800.php
+// http://www.digchip.com/datasheets/parts/datasheet/132/NW802.php
+// http://web.archive.org/web/*/divio.com/*
+// http://web.archive.org/web/20020217173519/divio.com/NW802.html
+//
+// supported sensors:
+// Sensor        Model # Data Width Voltage Timing
+// Conexant     CN0352     10 bits   3.3 V  Master
+// Elecvision   EVS110K     8 bits   3.3 V  Slave
+// HP (Agilent) HDC1000    10 bits   3.3 V  Master
+// Hyundai      HB7121B     8 bits   3.3 V  Master
+// Pixart       PAS006AC    9 bits   3.3 V  Master
+// TASC         TAS5110A    9 bits   3.8 V  Slave
+//
+// http://www.wifi.com.ar/english/doc/webcam/ov511cameras.html says:
+// 06a5 (Divio)  	d800   Etoms ET31X110 (A.K.A Divio NW800)
 
 NW80xCamDevice::NW80xCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
           :CamDevice(_addon, _device)
