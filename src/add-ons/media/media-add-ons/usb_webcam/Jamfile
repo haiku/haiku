@@ -6,7 +6,10 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	usbKitLibraryName = libdevice.so ;
 } else {
-	usbKitLibraryName = usb ;
+#	usbKitLibraryName = usb ;
+	usbKitLibraryName = USBKit.a ;
+	UsePublicHeaders [ FDirName drivers ] ;
+	UsePublicHeaders [ FDirName device ] ;
 }
 
 # source directories

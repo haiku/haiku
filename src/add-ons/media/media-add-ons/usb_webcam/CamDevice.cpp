@@ -413,8 +413,48 @@ CamDevice::DataPumpThread()
 			//snooze(2000);
 		}
 	}
-	if (SupportsIsochronous()) {
-		;//XXX: TODO
+#ifdef SUPPORT_ISO
+	else if (SupportsIsochronous()) {
+		int numPacketDescriptors = 20;
+		usb_iso_packet_descriptor packetDescriptors[numPacketDescriptors];
+		while (fTransferEnabled) {
+			ssize_t len = -1;
+			BAutolock lock(fLocker);
+			if (!lock.IsLocked())
+				break;
+			if (!fIsoIn)
+				break;
+#ifndef DEBUG_DISCARD_INPUT
+			len = fIsoIn->IsochronousTransfer(fBuffer, fBufferLen, packetDescriptors, numPacketDescriptors);
+#endif
+			
+			//PRINT((CH ": got %d bytes" CT, len));
+#ifdef DEBUG_WRITE_DUMP
+			write(fDumpFD, fBuffer, len);
+#endif
+#ifdef DEBUG_READ_DUMP
+			if ((len = read(fDumpFD, fBuffer, fBufferLen)) < fBufferLen)
+				lseek(fDumpFD, 0LL, SEEK_SET);
+#endif
+
+			if (len <= 0) {
+				PRINT((CH ": BulkIn: %s" CT, strerror(len)));
+				break;
+			}
+
+#ifndef DEBUG_DISCARD_DATA
+			if (fDataInput) {
+				fDataInput->Write(fBuffer, len);
+				// else drop
+			}
+#endif
+			//snooze(2000);
+		}
+	}
+#endif
+	else {
+		PRINT((CH ": No supported transport." CT));
+		return B_UNSUPPORTED;
 	}
 	return B_OK;
 }
@@ -431,6 +471,22 @@ CamDevice::_DataPumpThread(void *_this)
 void
 CamDevice::DumpRegs()
 {
+}
+
+// -----------------------------------------------------------------------------
+status_t
+CamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
+							uint16 index, uint16 length, void* data)
+{
+	size_t ret;
+	if (!GetDevice())
+		return ENODEV;
+	if (length > GetDevice()->MaxEndpoint0PacketSize())
+		return EINVAL;
+	ret = GetDevice()->ControlTransfer(
+				USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir, 
+				request, value, index, length, data);
+	return ret;
 }
 
 // -----------------------------------------------------------------------------

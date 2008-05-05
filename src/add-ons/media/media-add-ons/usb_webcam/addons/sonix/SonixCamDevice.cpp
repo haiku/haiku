@@ -470,12 +470,20 @@ SonixCamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, s
 			 * but it doesn't seem to work any better for a rev 2 chip.
 			 * XXX
 			 */
+#if 1
 			WriteReg8(SN9C102_R_GAIN, fRGain);
 			WriteReg8(SN9C102_B_GAIN, fBGain);
 			if (fChipVersion >= 3)
 				WriteReg8(SN9C103_G_GAIN, fGGain);
 			else
 				WriteReg8(SN9C102_G_GAIN, (fGGain / 16));
+#endif
+#if 0
+			uint8 buf[2];
+			buf[0] = (fBGain << 4) | fRGain;
+			buf[1] = fGGain;
+			WriteReg(SN9C102_R_B_GAIN, buf, 2);
+#endif
 			return B_OK;
 	}
 	return B_BAD_VALUE;
@@ -616,21 +624,23 @@ SonixCamDevice::DumpRegs()
 			regs[24], regs[25], regs[26], regs[27], regs[28], regs[29], regs[30], regs[31]);
 }
 
+#if 0
 // -----------------------------------------------------------------------------
 status_t
 SonixCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 							uint16 index, uint16 length, void* data)
 {
 	size_t ret;
-	if (length > 64)
-		return EINVAL;
 	if (!GetDevice())
 		return ENODEV;
+	if (length > GetDevice()->MaxEndpoint0PacketSize())
+		return EINVAL;
 	ret = GetDevice()->ControlTransfer(
 				USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT | dir, 
 				request, value, index, length, data);
 	return ret;
 }
+#endif
 
 // -----------------------------------------------------------------------------
 SonixCamDeviceAddon::SonixCamDeviceAddon(WebCamMediaAddOn* webcam)

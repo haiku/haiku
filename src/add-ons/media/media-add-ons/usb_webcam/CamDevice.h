@@ -5,8 +5,10 @@
 #include <OS.h>
 #include <image.h>
 #ifdef __HAIKU__
+//#if 1
 #	include <USB3.h>
 #	include <USBKit.h>
+#	define SUPPORT_ISO
 #else
 #	include <USB.h>
 #	include <usb/USBKit.h>
@@ -104,6 +106,8 @@ class CamDevice {
 	virtual void		DumpRegs();
 	
 	protected:
+	virtual status_t	SendCommand(uint8 dir, uint8 request, uint16 value,
+									uint16 index, uint16 length, void* data);
 	CamSensor			*CreateSensor(const char *name);
 		status_t		fInitStatus;
 		flavor_info		fFlavorInfo;
@@ -114,6 +118,7 @@ class CamDevice {
 		CamDeframer*	fDeframer;
 		BDataIO*		fDataInput; // where data from usb goes, likely fDeframer
 		const BUSBEndpoint*	fBulkIn;
+		const BUSBEndpoint*	fIsoIn;
 		int32			fFirstParameterID;
 		bigtime_t		fLastParameterChanges;
 

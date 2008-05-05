@@ -85,8 +85,8 @@ class SonixCamDevice : public CamDevice
 	void				DumpRegs();
 
 	private:
-	status_t			SendCommand(uint8 dir, uint8 request, uint16 value,
-									uint16 index, uint16 length, void* data);
+//	status_t			SendCommand(uint8 dir, uint8 request, uint16 value,
+//									uint16 index, uint16 length, void* data);
 	uint8				fCachedRegs[SN9C102_REG_COUNT];
 	int					fChipVersion;
 
