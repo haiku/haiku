@@ -303,6 +303,21 @@ get_fd(struct io_context *context, int fd)
 }
 
 
+struct file_descriptor *
+get_open_fd(struct io_context *context, int fd)
+{
+	MutexLocker(context->io_mutex);
+
+	file_descriptor *descriptor = get_fd_locked(context, fd);
+	if (descriptor == NULL)
+		return NULL;
+
+	atomic_add(&descriptor->open_count, 1);
+
+	return descriptor;
+}
+
+
 /**	Removes the file descriptor from the specified slot.
  */
 

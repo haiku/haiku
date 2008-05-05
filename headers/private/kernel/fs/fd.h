@@ -79,6 +79,7 @@ extern struct file_descriptor *alloc_fd(void);
 extern int new_fd_etc(struct io_context *, struct file_descriptor *, int firstIndex);
 extern int new_fd(struct io_context *, struct file_descriptor *);
 extern struct file_descriptor *get_fd(struct io_context *, int);
+extern struct file_descriptor *get_open_fd(struct io_context *, int);
 extern void close_fd(struct file_descriptor *descriptor);
 extern status_t close_fd_index(struct io_context *context, int fd);
 extern void put_fd(struct file_descriptor *descriptor);
