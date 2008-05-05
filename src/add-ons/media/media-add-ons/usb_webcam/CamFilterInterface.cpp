@@ -2,6 +2,7 @@
 #include "CamDevice.h"
 #include "CamDebug.h"
 
+
 CamFilterInterface::CamFilterInterface(CamDevice *device)
 : BPositionIO(),
 fDevice(device),
@@ -11,9 +12,11 @@ fNextOfKin(NULL)
 	
 }
 
+
 CamFilterInterface::~CamFilterInterface()
 {
 }
+
 
 status_t
 CamFilterInterface::ChainFilter(CamFilterInterface *to)
@@ -24,6 +27,7 @@ CamFilterInterface::ChainFilter(CamFilterInterface *to)
 	return B_OK;
 }
 
+
 status_t
 CamFilterInterface::DetachFilter(CamFilterInterface *from)
 {
@@ -33,11 +37,13 @@ CamFilterInterface::DetachFilter(CamFilterInterface *from)
 	return B_OK;
 }
 
+
 CamFilterInterface*
 CamFilterInterface::ChainFilter()
 {
 	return fNextOfKin;
 }
+
 
 ssize_t
 CamFilterInterface::Read(void *buffer, size_t size)
@@ -46,6 +52,7 @@ CamFilterInterface::Read(void *buffer, size_t size)
 	(void)size;
 	return EINVAL;
 }
+
 
 ssize_t
 CamFilterInterface::ReadAt(off_t pos, void *buffer, size_t size)
@@ -56,6 +63,7 @@ CamFilterInterface::ReadAt(off_t pos, void *buffer, size_t size)
 	return EINVAL;
 }
 
+
 ssize_t
 CamFilterInterface::Write(const void *buffer, size_t size)
 {
@@ -63,6 +71,7 @@ CamFilterInterface::Write(const void *buffer, size_t size)
 	(void)size;
 	return EINVAL;
 }
+
 
 ssize_t
 CamFilterInterface::WriteAt(off_t pos, const void *buffer, size_t size)
@@ -73,6 +82,7 @@ CamFilterInterface::WriteAt(off_t pos, const void *buffer, size_t size)
 	return EINVAL;
 }
 
+
 off_t
 CamFilterInterface::Seek(off_t position, uint32 seek_mode)
 {
@@ -81,11 +91,13 @@ CamFilterInterface::Seek(off_t position, uint32 seek_mode)
 	return EINVAL;
 }
 
+
 off_t
 CamFilterInterface::Position() const
 {
 	return 0LL;
 }
+
 
 status_t
 CamFilterInterface::SetSize(off_t size)
@@ -94,11 +106,13 @@ CamFilterInterface::SetSize(off_t size)
 	return EINVAL;
 }
 
+
 size_t
 CamFilterInterface::FrameSize()
 {
 	return 0;
 }
+
 
 status_t
 CamFilterInterface::WaitFrame(bigtime_t timeout)
@@ -108,6 +122,7 @@ CamFilterInterface::WaitFrame(bigtime_t timeout)
 	return EINVAL;
 }
 
+
 status_t
 CamFilterInterface::DropFrame()
 {
@@ -115,6 +130,7 @@ CamFilterInterface::DropFrame()
 		return fNextOfKin->DropFrame();
 	return B_OK;
 }
+
 
 status_t
 CamFilterInterface::SetVideoFrame(BRect frame)
@@ -124,3 +140,4 @@ CamFilterInterface::SetVideoFrame(BRect frame)
 	fVideoFrame = frame;
 	return B_OK;
 }
+

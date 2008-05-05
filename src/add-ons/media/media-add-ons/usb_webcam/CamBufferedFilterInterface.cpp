@@ -2,15 +2,18 @@
 #include "CamDevice.h"
 #include "CamDebug.h"
 
+
 CamBufferedFilterInterface::CamBufferedFilterInterface(CamDevice *device, bool allowWrite)
 : CamFilterInterface(device),
 fAllowWrite(allowWrite)
 {
 }
 
+
 CamBufferedFilterInterface::~CamBufferedFilterInterface()
 {
 }
+
 
 ssize_t
 CamBufferedFilterInterface::Read(void *buffer, size_t size)
@@ -18,11 +21,13 @@ CamBufferedFilterInterface::Read(void *buffer, size_t size)
 	return fInternalBuffer.Read(buffer, size);
 }
 
+
 ssize_t
 CamBufferedFilterInterface::ReadAt(off_t pos, void *buffer, size_t size)
 {
 	return fInternalBuffer.ReadAt(pos, buffer, size);
 }
+
 
 ssize_t
 CamBufferedFilterInterface::Write(const void *buffer, size_t size)
@@ -32,6 +37,7 @@ CamBufferedFilterInterface::Write(const void *buffer, size_t size)
 	return fInternalBuffer.Write(buffer, size);
 }
 
+
 ssize_t
 CamBufferedFilterInterface::WriteAt(off_t pos, const void *buffer, size_t size)
 {
@@ -40,17 +46,20 @@ CamBufferedFilterInterface::WriteAt(off_t pos, const void *buffer, size_t size)
 	return fInternalBuffer.WriteAt(pos, buffer, size);
 }
 
+
 off_t
 CamBufferedFilterInterface::Seek(off_t position, uint32 seek_mode)
 {
 	return fInternalBuffer.Seek(position, seek_mode);
 }
 
+
 off_t
 CamBufferedFilterInterface::Position() const
 {
 	return fInternalBuffer.Position();
 }
+
 
 status_t
 CamBufferedFilterInterface::SetSize(off_t size)
@@ -60,12 +69,14 @@ CamBufferedFilterInterface::SetSize(off_t size)
 	return fInternalBuffer.SetSize(size);
 }
 
+
 size_t
 CamBufferedFilterInterface::FrameSize()
 {
 	return fInternalBuffer.BufferLength(); // XXX: really ??
 	return 0;
 }
+
 
 status_t
 CamBufferedFilterInterface::DropFrame()
@@ -75,6 +86,7 @@ CamBufferedFilterInterface::DropFrame()
 		return fNextOfKin->DropFrame();
 	return B_OK;
 }
+
 
 status_t
 CamBufferedFilterInterface::SetVideoFrame(BRect frame)

@@ -11,6 +11,7 @@
 #include "CamDebug.h"
 #include "CamDevice.h"
 
+
 WebCamMediaAddOn::WebCamMediaAddOn(image_id imid)
 	: BMediaAddOn(imid),
 	fInitStatus(B_NO_INIT),
@@ -34,6 +35,7 @@ WebCamMediaAddOn::WebCamMediaAddOn(image_id imid)
 		fInitStatus = B_OK;
 }
 
+
 WebCamMediaAddOn::~WebCamMediaAddOn()
 {
 	delete fRoster;
@@ -51,6 +53,7 @@ WebCamMediaAddOn::InitCheck(const char **out_failure_text)
 	return B_OK;
 }
 
+
 int32 
 WebCamMediaAddOn::CountFlavors()
 {
@@ -66,6 +69,7 @@ WebCamMediaAddOn::CountFlavors()
 	count = fRoster->CountCameras();
 	return count;//(count > 0)?count:1;//1;
 }
+
 
 /*
  * The pointer to the flavor received only needs to be valid between 
@@ -96,6 +100,7 @@ WebCamMediaAddOn::GetFlavorAt(int32 n, const flavor_info **out_info)
 	PRINT((CH ": returning flavor for %d, internal_id %d" CT, n, (*out_info)->internal_id));
 	return B_OK;
 }
+
 
 BMediaNode *
 WebCamMediaAddOn::InstantiateNodeFor(
@@ -142,6 +147,7 @@ WebCamMediaAddOn::InstantiateNodeFor(
 	return node;
 }
 
+
 status_t
 WebCamMediaAddOn::CameraAdded(CamDevice* device)
 {
@@ -150,6 +156,7 @@ WebCamMediaAddOn::CameraAdded(CamDevice* device)
 	return B_OK;
 }
 
+
 status_t
 WebCamMediaAddOn::CameraRemoved(CamDevice* device)
 {
@@ -157,6 +164,7 @@ WebCamMediaAddOn::CameraRemoved(CamDevice* device)
 	NotifyFlavorChange();
 	return B_OK;
 }
+
 
 void
 WebCamMediaAddOn::FillDefaultFlavorInfo(flavor_info* info)
@@ -174,6 +182,7 @@ WebCamMediaAddOn::FillDefaultFlavorInfo(flavor_info* info)
 	info->out_format_flags = 0;
 	info->out_formats = &fMediaFormat;
 }
+
 
 BMediaAddOn *
 make_media_addon(image_id imid)

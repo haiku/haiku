@@ -13,7 +13,7 @@ extern "C" status_t get_webcam_addon_##modname(WebCamMediaAddOn* webcam, CamDevi
 #undef B_WEBCAM_MKINTFUNC
 
 
-// ---------------------------------------------------------------------------
+
 CamRoster::CamRoster(WebCamMediaAddOn* _addon)
 	: BUSBRoster(),
 	fLocker("WebcamRosterLock"),
@@ -24,12 +24,12 @@ CamRoster::CamRoster(WebCamMediaAddOn* _addon)
 	LoadExternalAddons();
 }
 
-// ---------------------------------------------------------------------------
+
 CamRoster::~CamRoster()
 {
 }
 
-// ---------------------------------------------------------------------------
+
 status_t
 CamRoster::DeviceAdded(BUSBDevice* _device)
 {
@@ -56,7 +56,7 @@ CamRoster::DeviceAdded(BUSBDevice* _device)
 	return B_ERROR;
 }
 
-// ---------------------------------------------------------------------------
+
 void
 CamRoster::DeviceRemoved(BUSBDevice* _device)
 {
@@ -77,7 +77,7 @@ CamRoster::DeviceRemoved(BUSBDevice* _device)
 	}
 }	
 
-// ---------------------------------------------------------------------------
+
 uint32
 CamRoster::CountCameras()
 {
@@ -89,7 +89,7 @@ CamRoster::CountCameras()
 	return count;
 }
 
-// ---------------------------------------------------------------------------
+
 bool
 CamRoster::Lock()
 {
@@ -97,7 +97,7 @@ CamRoster::Lock()
 	return fLocker.Lock();
 }
 
-// ---------------------------------------------------------------------------
+
 void
 CamRoster::Unlock()
 {
@@ -106,7 +106,7 @@ CamRoster::Unlock()
 	return;
 }
 
-// ---------------------------------------------------------------------------
+
 CamDevice*
 CamRoster::CameraAt(int32 index)
 {
@@ -114,7 +114,7 @@ CamRoster::CameraAt(int32 index)
 	return (CamDevice *)fCameras.ItemAt(index);
 }
 
-// ---------------------------------------------------------------------------
+
 status_t
 CamRoster::LoadInternalAddons()
 {
@@ -137,7 +137,7 @@ CamRoster::LoadInternalAddons()
 	return B_OK;
 }
 
-// ---------------------------------------------------------------------------
+
 status_t
 CamRoster::LoadExternalAddons()
 {
@@ -162,5 +162,5 @@ CamRoster::LoadExternalAddons()
 	return B_OK;
 }
 
-// ---------------------------------------------------------------------------
-// ---------------------------------------------------------------------------
+
+

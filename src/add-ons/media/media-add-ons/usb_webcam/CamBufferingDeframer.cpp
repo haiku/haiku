@@ -15,15 +15,18 @@
 
 #define IB fInputBuffs[fInputBuffIndex]
 
+
 CamBufferingDeframer::CamBufferingDeframer(CamDevice *device)
 : CamDeframer(device),
 fInputBuffIndex(0)
 {
 }
 
+
 CamBufferingDeframer::~CamBufferingDeframer()
 {
 }
+
 
 ssize_t
 CamBufferingDeframer::Write(const void *buffer, size_t size)
@@ -99,6 +102,7 @@ CamBufferingDeframer::Write(const void *buffer, size_t size)
 	}
 	return size;
 }
+
 
 size_t
 CamBufferingDeframer::DiscardFromInput(size_t size)

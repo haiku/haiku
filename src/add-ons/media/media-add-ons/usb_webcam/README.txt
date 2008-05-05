@@ -21,10 +21,6 @@ easily.
 For now you should be able to build it under Zeta with the
 makefile provided.
 
-Making a Jamfile might get tricky as several source files are
-created by the makefile itself to include addons and censors
-in the build.
-
 There are 3 kinds of device-specific folders :
 addons/ contains actual usb chip support code for each device.
 sensors/ contains code to handle CMOS sensors, as each model 
@@ -56,7 +52,7 @@ ParameterWeb or forward ParameterWeb changes right to the
 device-specific addon and provide default handlers for usual 
 controls ?
 
-References:
+References and other drivers of interest:
 
 * Sonix linux drivers (several of them):
 http://sourceforge.net/projects/sonix/ -- http://sonix.sourceforge.net/
@@ -64,6 +60,13 @@ http://freshmeat.net/projects/sonic-snap/?branch_id=55324&release_id=183982
 http://tgnard.free.fr/linux/
 (datasheet)
 http://www.mnementh.co.uk/sonix/sn9c102.pdf
+
+* some of the (many!) linux quickcam drivers:
+http://www.lrr.in.tum.de/~acher/quickcam/quickcam.html
+http://www.seismo.ethz.ch/linux/webcam.html
+
+* Creative's own list of linux drivers:
+http://connect.creativelabs.com/opensource/Lists/Webcam%20Support/AllItems.aspx
 
 * Other webcam drivers:
 http://zc0302.sourceforge.net/zc0302.php?page=cams
@@ -79,6 +82,13 @@ http://www.iglu.org.il/lxr/source/include/linux/usb.h
 * Linux V4L webcam list:
 http://linuxtv.org/v4lwiki/index.php/Webcams
 
+* Linux source code crossref:
+http://lxr.linux.no/linux
+
 * Fuji FinePix BeOS driver, should probably be merged at some point:
 http://bebits.com/app/4185
 
+* Macam generic OSX webcam driver (interesting but sadly GPL and in ObjC):
+http://webcam-osx.sourceforge.net/index.html
+http://webcam-osx.sourceforge.net/cameras/index.php list of supported cams in OSX
+http://sourceforge.net/projects/webcam-osx

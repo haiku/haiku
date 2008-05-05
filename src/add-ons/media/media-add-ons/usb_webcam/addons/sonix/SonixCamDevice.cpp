@@ -8,51 +8,51 @@
 #include <interface/Bitmap.h>
 #include <media/Buffer.h>
 
-const usb_named_support_descriptor kSupportedDevices[] = {
-{{ 0, 0, 0, 0x0c45, 0x6005 }, "Sonix", "Sonix"}, // mine
-{{ 0, 0, 0, 0x0c45, 0x6009 }, "Trust", "spacec@m 120" },
-{{ 0, 0, 0, 0x0c45, 0x600d }, "Trust", "spacec@m 120" },
+const usb_webcam_support_descriptor kSupportedDevices[] = {
+{{ 0, 0, 0, 0x0c45, 0x6005 }, "Sonix", "Sonix", "foo,bar,tas5110c1b" }, // mine
+{{ 0, 0, 0, 0x0c45, 0x6009 }, "Trust", "spacec@m 120", NULL },
+{{ 0, 0, 0, 0x0c45, 0x600d }, "Trust", "spacec@m 120", NULL },
 
 /* other devices that should be supported,
  * cf. sn9c102-1.15 linux driver, sn9c102_sensor.h
  * for IDs and sensors
  */
-{{ 0, 0, 0, 0x0c45, 0x6001 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6024 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6025 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6028 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6029 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x602a }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x602b }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x602c }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6030 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6080 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6082 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6083 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x6088 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x608a }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x608b }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x608c }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x608e }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x608f }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60a0 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60a2 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60a3 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60a8 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60aa }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60ab }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60ac }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60ae }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60af }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60b0 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60b2 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60b3 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60b8 }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60ba }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60bb }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60bc }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0x0c45, 0x60be }, "Sonix", "Sonix generic" },
-{{ 0, 0, 0, 0, 0}, NULL, NULL }
+{{ 0, 0, 0, 0x0c45, 0x6001 }, "Sonix", "Sonix generic", "tas5110c1b" },
+{{ 0, 0, 0, 0x0c45, 0x6024 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x6025 }, "Sonix", "Sonix generic", "tas5110c1b,XXX" },
+{{ 0, 0, 0, 0x0c45, 0x6028 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x6029 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x602a }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x602b }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x602c }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x6030 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x6080 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x6082 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x6083 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x6088 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x608a }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x608b }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x608c }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x608e }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x608f }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60a0 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60a2 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60a3 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60a8 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60aa }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60ab }, "Sonix", "Sonix generic", "tas5110c1b" },
+{{ 0, 0, 0, 0x0c45, 0x60ac }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60ae }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60af }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60b0 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60b2 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60b3 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60b8 }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60ba }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60bb }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60bc }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0x0c45, 0x60be }, "Sonix", "Sonix generic", NULL },
+{{ 0, 0, 0, 0, 0}, NULL, NULL, NULL }
 };
 
 // 12 bytes actually
@@ -69,7 +69,7 @@ static const uint8 *eof_marks[] = { eof_mark_1, eof_mark_2, eof_mark_3, eof_mark
 void bayer2rgb24(unsigned char *dst, unsigned char *src, long int WIDTH, long int HEIGHT);
 void bayer2rgb32le(unsigned char *dst, unsigned char *src, long int WIDTH, long int HEIGHT);
 
-// -----------------------------------------------------------------------------
+
 SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
           :CamDevice(_addon, _device)
 {
@@ -84,19 +84,7 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	if ((GetDevice()->ProductID() & ~0x3F) == 0x6080) {
 		fChipVersion = 3; // says V4L2
 	}
-	switch (GetDevice()->ProductID()) {
-	case 0x6001:
-	case 0x6005:
-	case 0x60ab:
-		fSensor = CreateSensor("tas5110c1b");
-		break;
-	case 0x6025:
-		fSensor = CreateSensor("tas5110c1b");
-		//XXX:probe!
-		break;
-	default:
-		break;
-	}
+	err = ProbeSensor();
 	
 //	fDeframer = new CamBufferingDeframer(this);
 	fDeframer = new CamStreamingDeframer(this);
@@ -142,7 +130,7 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	//SetScale(1);
 }
 
-// -----------------------------------------------------------------------------
+
 SonixCamDevice::~SonixCamDevice()
 {
 	if (Sensor())
@@ -150,21 +138,21 @@ SonixCamDevice::~SonixCamDevice()
 	fSensor = NULL;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 SonixCamDevice::SupportsBulk()
 {
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 SonixCamDevice::SupportsIsochronous()
 {
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::StartTransfer()
 {
@@ -188,7 +176,7 @@ DumpRegs();
 	return CamDevice::StartTransfer();
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::StopTransfer()
 {
@@ -209,7 +197,7 @@ DumpRegs();
 	return err;
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 SonixCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
@@ -222,7 +210,7 @@ SonixCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 	return SendCommand(USB_REQTYPE_DEVICE_OUT, 0x08, address, 0, count, data);
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 SonixCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
@@ -238,7 +226,7 @@ SonixCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 	return SendCommand(USB_REQTYPE_DEVICE_IN, 0x00, address, 0, count, data);
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::GetStatusIIC()
 {
@@ -251,7 +239,7 @@ SonixCamDevice::GetStatusIIC()
 	return (status&0x08)?EIO:0;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::WaitReadyIIC()
 {
@@ -271,7 +259,7 @@ SonixCamDevice::WaitReadyIIC()
 	return EBUSY;
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 SonixCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
@@ -307,7 +295,7 @@ SonixCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 {
@@ -358,7 +346,7 @@ SonixCamDevice::ReadIIC(uint8 address, uint8 *data)
 	return 1;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::SetVideoFrame(BRect frame)
 {
@@ -379,7 +367,7 @@ SonixCamDevice::SetVideoFrame(BRect frame)
 	return CamDevice::SetVideoFrame(frame);
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::SetScale(float scale)
 {
@@ -405,7 +393,7 @@ SonixCamDevice::SetScale(float scale)
 	return err;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue)
 {
@@ -490,7 +478,7 @@ SonixCamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, s
 }
 
 
-// -----------------------------------------------------------------------------
+
 size_t
 SonixCamDevice::MinRawFrameSize()
 {
@@ -502,7 +490,7 @@ SonixCamDevice::MinRawFrameSize()
 	return (size_t)(w*h);
 }
 
-// -----------------------------------------------------------------------------
+
 size_t
 SonixCamDevice::MaxRawFrameSize()
 {
@@ -510,7 +498,7 @@ SonixCamDevice::MaxRawFrameSize()
 	return MinRawFrameSize()+1024*0; // fixed size frame (uncompressed)
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 SonixCamDevice::ValidateStartOfFrameTag(const uint8 *tag, size_t taglen)
 {
@@ -523,7 +511,7 @@ SonixCamDevice::ValidateStartOfFrameTag(const uint8 *tag, size_t taglen)
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 SonixCamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t datalen)
 {
@@ -537,7 +525,7 @@ SonixCamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t da
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp /* = NULL */)
 {
@@ -567,7 +555,7 @@ SonixCamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp /* = NULL */)
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 {
@@ -602,7 +590,7 @@ SonixCamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 void
 /* DEBUG: dump the SN regs */
 SonixCamDevice::DumpRegs()
@@ -625,7 +613,7 @@ SonixCamDevice::DumpRegs()
 }
 
 #if 0
-// -----------------------------------------------------------------------------
+
 status_t
 SonixCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 							uint16 index, uint16 length, void* data)
@@ -642,26 +630,26 @@ SonixCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 }
 #endif
 
-// -----------------------------------------------------------------------------
+
 SonixCamDeviceAddon::SonixCamDeviceAddon(WebCamMediaAddOn* webcam)
 	: CamDeviceAddon(webcam)
 {
 	SetSupportedDevices(kSupportedDevices);
 }
 
-// -----------------------------------------------------------------------------
+
 SonixCamDeviceAddon::~SonixCamDeviceAddon()
 {
 }
 
-// -----------------------------------------------------------------------------
+
 const char *
 SonixCamDeviceAddon::BrandName()
 {
 	return "Sonix";
 }
 
-// -----------------------------------------------------------------------------
+
 SonixCamDevice *
 SonixCamDeviceAddon::Instantiate(CamRoster &roster, BUSBDevice *from)
 {

@@ -33,7 +33,8 @@ typedef struct {
 	usb_support_descriptor desc;
 	const char *vendor;
 	const char *product;
-} usb_named_support_descriptor;
+	const char *sensors; // possible sensors this cam uses (comma separated)
+} usb_webcam_support_descriptor;
 
 // This class represents each webcam
 class CamDevice {
@@ -96,6 +97,7 @@ class CamDevice {
 	//virtual status_t	WaitReadyIIC();
 	virtual ssize_t		WriteIIC(uint8 address, uint8 *data, size_t count);
 	virtual ssize_t		WriteIIC8(uint8 address, uint8 data);
+	virtual ssize_t		WriteIIC16(uint8 address, uint16 data);
 	virtual ssize_t		ReadIIC(uint8 address, uint8 *data);
 	
 	
@@ -108,6 +110,7 @@ class CamDevice {
 	protected:
 	virtual status_t	SendCommand(uint8 dir, uint8 request, uint16 value,
 									uint16 index, uint16 length, void* data);
+	virtual status_t	ProbeSensor();
 	CamSensor			*CreateSensor(const char *name);
 		status_t		fInitStatus;
 		flavor_info		fFlavorInfo;
@@ -127,6 +130,7 @@ class CamDevice {
 		CamDeviceAddon&	fCamDeviceAddon;
 		BUSBDevice*		fDevice;
 		int				fSupportedDeviceIndex;
+		bool			fChipIsBigEndian;
 		bool			fTransferEnabled;
 		thread_id		fPumpThread;
 		BLocker			fLocker;
@@ -147,14 +151,14 @@ class CamDeviceAddon {
 	virtual status_t	Sniff(BUSBDevice *device);
 	virtual CamDevice*	Instantiate(CamRoster &roster, BUSBDevice *from);
 
-	void				SetSupportedDevices(const usb_named_support_descriptor *devs);
-	const usb_named_support_descriptor*	SupportedDevices() const
+	void				SetSupportedDevices(const usb_webcam_support_descriptor *devs);
+	const usb_webcam_support_descriptor*	SupportedDevices() const
 		{ return fSupportedDevices; };
 	WebCamMediaAddOn*	WebCamAddOn() const { return fWebCamAddOn; };
 
 	private:
 	WebCamMediaAddOn*	fWebCamAddOn;
-	const usb_named_support_descriptor*	fSupportedDevices; // last is {{0,0,0,0,0}, NULL, NULL}
+	const usb_webcam_support_descriptor*	fSupportedDevices; // last is {{0,0,0,0,0}, NULL, NULL, NULL }
 };
 
 // internal modules

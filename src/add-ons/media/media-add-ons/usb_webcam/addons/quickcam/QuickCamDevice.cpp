@@ -2,45 +2,43 @@
 #include "CamDebug.h"
 #include "CamSensor.h"
 
-// see http://www.lrr.in.tum.de/~acher/quickcam/quickcam.html
 
-
-const usb_named_support_descriptor kSupportedDevices[] = {
-{{ 0, 0, 0, 0x046d, 0x0840 }, "Logitech", "QuickCam Express"},
-{{ 0, 0, 0, 0x046d, 0x0850 }, "Logitech", "QuickCam Express LEGO"},
-{{ 0, 0, 0, 0x046d, 0xd001 }, "Logitech", "QuickCam Express"}, // Alan's
-{{ 0, 0, 0, 0, 0}, NULL, NULL }
+const usb_webcam_support_descriptor kSupportedDevices[] = {
+{{ 0, 0, 0, 0x046d, 0x0840 }, "Logitech", "QuickCam Express", NULL },
+{{ 0, 0, 0, 0x046d, 0x0850 }, "Logitech", "QuickCam Express LEGO", NULL },
+{{ 0, 0, 0, 0x046d, 0xd001 }, "Logitech", "QuickCam Express", NULL }, // Alan's
+{{ 0, 0, 0, 0, 0}, NULL, NULL, NULL }
 };
 
 
-// -----------------------------------------------------------------------------
+
 QuickCamDevice::QuickCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
           :CamDevice(_addon, _device)
 {
 	fInitStatus = B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 QuickCamDevice::~QuickCamDevice()
 {
 	
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 QuickCamDevice::SupportsBulk()
 {
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 QuickCamDevice::SupportsIsochronous()
 {
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 QuickCamDevice::StartTransfer()
 {
@@ -66,7 +64,7 @@ DumpRegs();
 	return CamDevice::StartTransfer();
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 QuickCamDevice::StopTransfer()
 {
@@ -89,7 +87,7 @@ DumpRegs();
 	return err;
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 QuickCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
@@ -97,7 +95,7 @@ QuickCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 	return SendCommand(USB_REQTYPE_DEVICE_OUT, 0x04, address, 0, count, data);
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 QuickCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
@@ -105,7 +103,7 @@ QuickCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 	return SendCommand(USB_REQTYPE_DEVICE_IN, 0x04, address, 0, count, data);
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 QuickCamDevice::GetStatusIIC()
 {
@@ -118,7 +116,7 @@ QuickCamDevice::GetStatusIIC()
 	return (status&0x08)?EIO:0;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 QuickCamDevice::WaitReadyIIC()
 {
@@ -127,7 +125,7 @@ QuickCamDevice::WaitReadyIIC()
 	return EBUSY;
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 QuickCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
@@ -147,7 +145,7 @@ QuickCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 	return SendCommand(USB_REQTYPE_DEVICE_OUT, 0x04, STV_I2C_WRITE, 0, 0x23, data);
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 QuickCamDevice::ReadIIC(uint8 address, uint8 *data)
 {
@@ -156,7 +154,7 @@ QuickCamDevice::ReadIIC(uint8 address, uint8 *data)
 }
 
 
-// -----------------------------------------------------------------------------
+
 status_t
 QuickCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 							uint16 index, uint16 length, void* data)
@@ -172,31 +170,32 @@ QuickCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 	return ret;
 }
 
-// -----------------------------------------------------------------------------
+
 QuickCamDeviceAddon::QuickCamDeviceAddon(WebCamMediaAddOn* webcam)
 	: CamDeviceAddon(webcam)
 {
 	SetSupportedDevices(kSupportedDevices);
 }
 
-// -----------------------------------------------------------------------------
+
 QuickCamDeviceAddon::~QuickCamDeviceAddon()
 {
 }
 
-// -----------------------------------------------------------------------------
+
 const char *
 QuickCamDeviceAddon::BrandName()
 {
 	return "QuickCam";
 }
 
-// -----------------------------------------------------------------------------
+
 QuickCamDevice *
 QuickCamDeviceAddon::Instantiate(CamRoster &roster, BUSBDevice *from)
 {
 	return new QuickCamDevice(*this, from);
 }
+
 
 extern "C" status_t
 B_WEBCAM_MKINTFUNC(quickcam)

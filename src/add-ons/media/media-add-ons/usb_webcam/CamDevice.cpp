@@ -26,7 +26,7 @@ struct { const char *name; SensorInstFunc instfunc; } kSensorTable[] = {
 };
 #undef B_WEBCAM_DECLARE_SENSOR
 
-// -----------------------------------------------------------------------------
+
 CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	: fInitStatus(B_NO_INIT),
 	  fSensor(NULL),
@@ -34,6 +34,7 @@ CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	  fCamDeviceAddon(_addon),
 	  fDevice(_device),
 	  fSupportedDeviceIndex(-1),
+	  fChipIsBigEndian(false),
 	  fTransferEnabled(false),
 	  fLocker("WebcamDeviceLock")
 {
@@ -62,7 +63,7 @@ CamDevice::CamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	fBuffer = (uint8 *)malloc(fBufferLen);
 }
 
-// -----------------------------------------------------------------------------
+
 CamDevice::~CamDevice()
 {
 	close(fDumpFD);
@@ -71,28 +72,28 @@ CamDevice::~CamDevice()
 		delete fDeframer;
 }
 					
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::InitCheck()
 {
 	return fInitStatus;
 }
 					
-// -----------------------------------------------------------------------------
+
 bool 
 CamDevice::Matches(BUSBDevice* _device)
 {
 	return (_device) == (fDevice);
 }
 
-// -----------------------------------------------------------------------------
+
 BUSBDevice*
 CamDevice::GetDevice()
 {
 	return fDevice;
 }
 
-// -----------------------------------------------------------------------------
+
 void
 CamDevice::Unplugged()
 {
@@ -100,14 +101,14 @@ CamDevice::Unplugged()
 	fBulkIn = NULL;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 CamDevice::IsPlugged()
 {
 	return (fDevice != NULL);
 }
 
-// -----------------------------------------------------------------------------
+
 const char *
 CamDevice::BrandName()
 {
@@ -116,7 +117,7 @@ CamDevice::BrandName()
 	return "<unknown>";
 }
 
-// -----------------------------------------------------------------------------
+
 const char *
 CamDevice::ModelName()
 {
@@ -125,21 +126,21 @@ CamDevice::ModelName()
 	return "<unknown>";
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 CamDevice::SupportsBulk()
 {
 	return false;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 CamDevice::SupportsIsochronous()
 {
 	return false;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::StartTransfer()
 {
@@ -160,7 +161,7 @@ CamDevice::StartTransfer()
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::StopTransfer()
 {
@@ -182,7 +183,7 @@ CamDevice::StopTransfer()
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::SetVideoFrame(BRect frame)
 {
@@ -190,21 +191,21 @@ CamDevice::SetVideoFrame(BRect frame)
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::SetScale(float scale)
 {
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue)
 {
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 void
 CamDevice::AddParameters(BParameterGroup *group, int32 &index)
 {
@@ -224,35 +225,35 @@ CamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t
 }
 
 
-// -----------------------------------------------------------------------------
+
 size_t
 CamDevice::MinRawFrameSize()
 {
 	return 0;
 }
 
-// -----------------------------------------------------------------------------
+
 size_t
 CamDevice::MaxRawFrameSize()
 {
 	return 0;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 CamDevice::ValidateStartOfFrameTag(const uint8 *tag, size_t taglen)
 {
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 CamDevice::ValidateEndOfFrameTag(const uint8 *tag, size_t taglen, size_t datalen)
 {
 	return true;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::WaitFrame(bigtime_t timeout)
 {
@@ -261,64 +262,60 @@ CamDevice::WaitFrame(bigtime_t timeout)
 	return EINVAL;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::GetFrameBitmap(BBitmap **bm, bigtime_t *stamp)
 {
 	return EINVAL;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::FillFrameBuffer(BBuffer *buffer, bigtime_t *stamp)
 {
 	return EINVAL;
 }
 
-// -----------------------------------------------------------------------------
+
 bool
 CamDevice::Lock()
 {
 	return fLocker.Lock();
 }
 
-// -----------------------------------------------------------------------------
-void
-CamDevice::Unlock()
-{
-	fLocker.Unlock();
-}
 
-// -----------------------------------------------------------------------------
 ssize_t
 CamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
 	return ENOSYS;
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 CamDevice::WriteReg8(uint16 address, uint8 data)
 {
 	return WriteReg(address, &data, sizeof(uint8));
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 CamDevice::WriteReg16(uint16 address, uint16 data)
 {
-	// XXX: ENDIAN???
+	if (fChipIsBigEndian)
+		data = B_HOST_TO_BENDIAN_INT16(data);
+	else
+		data = B_HOST_TO_LENDIAN_INT16(data);
 	return WriteReg(address, (uint8 *)&data, sizeof(uint16));
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 CamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
 	return ENOSYS;
 }
 
-// -----------------------------------------------------------------------------
+
 /*
 status_t
 CamDevice::GetStatusIIC()
@@ -326,35 +323,98 @@ CamDevice::GetStatusIIC()
 	return ENOSYS;
 }
 */
-// -----------------------------------------------------------------------------
+
 /*status_t
 CamDevice::WaitReadyIIC()
 {
 	return ENOSYS;
 }
 */
-// -----------------------------------------------------------------------------
+
 ssize_t
 CamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
 	return ENOSYS;
 }
 
-// -----------------------------------------------------------------------------
+
 ssize_t
 CamDevice::WriteIIC8(uint8 address, uint8 data)
 {
 	return WriteIIC(address, &data, 1);
 }
 
-// -----------------------------------------------------------------------------
+ssize_t
+CamDevice::WriteIIC16(uint8 address, uint16 data)
+{
+	if (Sensor() && Sensor()->IsBigEndian())
+		data = B_HOST_TO_BENDIAN_INT16(data);
+	else
+		data = B_HOST_TO_LENDIAN_INT16(data);
+	return WriteIIC(address, (uint8 *)&data, 2);
+}
+
+
+
+
 ssize_t
 CamDevice::ReadIIC(uint8 address, uint8 *data)
 {
 	return ENOSYS;
 }
 
-// -----------------------------------------------------------------------------
+
+status_t
+CamDevice::ProbeSensor()
+{
+	const usb_webcam_support_descriptor *devs;
+	const usb_webcam_support_descriptor *dev = NULL;
+	status_t err;
+	int32 i;
+
+	PRINT((CH ": probing sensors..." CT));
+	if (fCamDeviceAddon.SupportedDevices() == NULL)
+		return B_ERROR;
+	devs = fCamDeviceAddon.SupportedDevices();
+	for (i = 0; devs[i].vendor; i++)
+	{
+		if (GetDevice()->VendorID() != devs[i].desc.vendor)
+			continue;
+		if (GetDevice()->ProductID() != devs[i].desc.product)
+			continue;
+		dev = &devs[i];
+		break;
+	}
+	if (!dev)
+		return ENODEV;
+	if (!dev->sensors) // no usable sensor
+		return ENOENT;
+	BString sensors(dev->sensors);
+	for (i = 0; i > -1 && i < sensors.Length(); ) {
+		BString name;
+		sensors.CopyInto(name, i, sensors.FindFirst(',', i) - i);
+		PRINT((CH ": probing sensor '%s'..." CT, name.String()));
+		
+		fSensor = CreateSensor(name.String());
+		if (fSensor) {
+			err = fSensor->Probe();
+			if (err >= B_OK)
+				return B_OK;
+
+			PRINT((CH ": sensor '%s' Probe: %s" CT, name.String(), strerror(err)));
+
+			delete fSensor;
+			fSensor = NULL;
+		}
+
+		i = sensors.FindFirst(',', i+1);
+		if (i > - 1)
+			i++;
+	}
+	return ENOENT;
+}
+
+
 CamSensor *
 CamDevice::CreateSensor(const char *name)
 {
@@ -363,17 +423,18 @@ CamDevice::CreateSensor(const char *name)
 		if (!strcmp(kSensorTable[i].name, name))
 			return kSensorTable[i].instfunc(this);
 	}
+	PRINT((CH ": sensor '%s' not found" CT, name));
 	return NULL;
 }
 
-// -----------------------------------------------------------------------------
+
 void
 CamDevice::SetDataInput(BDataIO *input)
 {
 	fDataInput = input;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::DataPumpThread()
 {
@@ -459,7 +520,7 @@ CamDevice::DataPumpThread()
 	return B_OK;
 }
 
-// -----------------------------------------------------------------------------
+
 int32
 CamDevice::_DataPumpThread(void *_this)
 {
@@ -467,13 +528,13 @@ CamDevice::_DataPumpThread(void *_this)
 	return dev->DataPumpThread();
 }
 
-// -----------------------------------------------------------------------------
+
 void
 CamDevice::DumpRegs()
 {
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 							uint16 index, uint16 length, void* data)
@@ -489,26 +550,26 @@ CamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 	return ret;
 }
 
-// -----------------------------------------------------------------------------
+
 CamDeviceAddon::CamDeviceAddon(WebCamMediaAddOn* webcam)
 	: fWebCamAddOn(webcam),
 	  fSupportedDevices(NULL)
 {
 }
 
-// -----------------------------------------------------------------------------
+
 CamDeviceAddon::~CamDeviceAddon()
 {
 }
 
-// -----------------------------------------------------------------------------
+
 const char *
 CamDeviceAddon::BrandName()
 {
 	return "<unknown>";
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamDeviceAddon::Sniff(BUSBDevice *device)
 {
@@ -537,16 +598,16 @@ CamDeviceAddon::Sniff(BUSBDevice *device)
 	return ENODEV;
 }
 
-// -----------------------------------------------------------------------------
+
 CamDevice *
 CamDeviceAddon::Instantiate(CamRoster &roster, BUSBDevice *from)
 {
 	return NULL;
 }
 
-// -----------------------------------------------------------------------------
+
 void
-CamDeviceAddon::SetSupportedDevices(const usb_named_support_descriptor *devs)
+CamDeviceAddon::SetSupportedDevices(const usb_webcam_support_descriptor *devs)
 {
 	fSupportedDevices = devs;
 }

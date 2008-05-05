@@ -6,6 +6,7 @@
 #define MAX_TAG_LEN CAMDEFRAMER_MAX_TAG_LEN
 #define MAXFRAMEBUF CAMDEFRAMER_MAX_QUEUED_FRAMES
 
+
 CamDeframer::CamDeframer(CamDevice *device)
 : CamFilterInterface(device),
 fDevice(device),
@@ -21,12 +22,14 @@ fNumEOFTags(0)
 	fCurrentFrame = AllocFrame();
 }
 
+
 CamDeframer::~CamDeframer()
 {
 	delete_sem(fFrameSem);
 	BAutolock l(fLocker);
 	delete fCurrentFrame;
 }
+
 
 ssize_t
 CamDeframer::Read(void *buffer, size_t size)
@@ -38,6 +41,7 @@ CamDeframer::Read(void *buffer, size_t size)
 	return f->Read(buffer, size);
 }
 
+
 ssize_t
 CamDeframer::ReadAt(off_t pos, void *buffer, size_t size)
 {
@@ -47,6 +51,7 @@ CamDeframer::ReadAt(off_t pos, void *buffer, size_t size)
 		return EIO;
 	return f->ReadAt(pos, buffer, size);
 }
+
 
 off_t
 CamDeframer::Seek(off_t position, uint32 seek_mode)
@@ -58,6 +63,7 @@ CamDeframer::Seek(off_t position, uint32 seek_mode)
 	return f->Seek(position, seek_mode);
 }
 
+
 off_t
 CamDeframer::Position() const
 {
@@ -68,12 +74,14 @@ CamDeframer::Position() const
 	return f->Position();
 }
 
+
 status_t
 CamDeframer::SetSize(off_t size)
 {
 	(void)size;
 	return EINVAL;
 }
+
 
 ssize_t
 CamDeframer::Write(const void *buffer, size_t size)
@@ -82,6 +90,7 @@ CamDeframer::Write(const void *buffer, size_t size)
 	(void)size;
 	return EINVAL;
 }
+
 
 ssize_t
 CamDeframer::WriteAt(off_t pos, const void *buffer, size_t size)
@@ -92,11 +101,13 @@ CamDeframer::WriteAt(off_t pos, const void *buffer, size_t size)
 	return EINVAL;
 }
 
+
 status_t
 CamDeframer::WaitFrame(bigtime_t timeout)
 {
 	return acquire_sem_etc(fFrameSem, 1, B_RELATIVE_TIMEOUT, timeout);
 }
+
 
 status_t
 CamDeframer::GetFrame(CamFrame **frame, bigtime_t *stamp)
@@ -111,6 +122,7 @@ CamDeframer::GetFrame(CamFrame **frame, bigtime_t *stamp)
 	return B_OK;
 }
 
+
 status_t
 CamDeframer::DropFrame()
 {
@@ -122,6 +134,7 @@ CamDeframer::DropFrame()
 	delete f;
 	return B_OK;
 }
+
 
 status_t
 CamDeframer::RegisterSOFTags(const uint8 **tags, int count, size_t len, size_t skip)
@@ -139,6 +152,7 @@ CamDeframer::RegisterSOFTags(const uint8 **tags, int count, size_t len, size_t s
 	return B_OK;
 }
 
+
 status_t
 CamDeframer::RegisterEOFTags(const uint8 **tags, int count, size_t len, size_t skip)
 {
@@ -154,6 +168,7 @@ CamDeframer::RegisterEOFTags(const uint8 **tags, int count, size_t len, size_t s
 	fSkipEOFTags = skip;
 	return B_OK;
 }
+
 
 int
 CamDeframer::FindTags(const uint8 *buf, size_t buflen, const uint8 **tags, int tagcount, size_t taglen, size_t skiplen, int *which)
@@ -171,11 +186,13 @@ CamDeframer::FindTags(const uint8 *buf, size_t buflen, const uint8 **tags, int t
 	return -1;
 }
 
+
 int
 CamDeframer::FindSOF(const uint8 *buf, size_t buflen, int *which)
 {
 	return FindTags(buf, buflen, fSOFTags, fNumSOFTags, fLenSOFTags, fSkipSOFTags, which);
 }
+
 
 int
 CamDeframer::FindEOF(const uint8 *buf, size_t buflen, int *which)
@@ -183,10 +200,10 @@ CamDeframer::FindEOF(const uint8 *buf, size_t buflen, int *which)
 	return FindTags(buf, buflen, fEOFTags, fNumEOFTags, fLenEOFTags, fSkipEOFTags, which);
 }
 
+
 CamFrame *
 CamDeframer::AllocFrame()
 {
 	return new CamFrame();
 }
-
 

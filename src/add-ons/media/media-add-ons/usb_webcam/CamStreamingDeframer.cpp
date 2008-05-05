@@ -14,14 +14,17 @@
 #define MAX_TAG_LEN CAMDEFRAMER_MAX_TAG_LEN
 #define MAXFRAMEBUF CAMDEFRAMER_MAX_QUEUED_FRAMES
 
+
 CamStreamingDeframer::CamStreamingDeframer(CamDevice *device)
 : CamDeframer(device)
 {
 }
 
+
 CamStreamingDeframer::~CamStreamingDeframer()
 {
 }
+
 
 ssize_t
 CamStreamingDeframer::Write(const void *buffer, size_t size)

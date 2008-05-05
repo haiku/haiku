@@ -11,6 +11,8 @@ class CamSensor
 						CamSensor(CamDevice *_camera);
 	virtual				~CamSensor();
 
+	virtual status_t	Probe(); // returns B_OK if found.
+
 	virtual status_t	InitCheck();
 	
 	virtual status_t	Setup();
@@ -21,6 +23,7 @@ class CamSensor
 	virtual status_t	StopTransfer();
 	virtual bool		TransferEnabled() const { return fTransferEnabled; };
 	
+	virtual bool		IsBigEndian() const { return fIsBigEndian; };
 	virtual bool		Use400kHz() const { return false; };
 	virtual bool		UseRealIIC() const { return true; };
 	virtual uint8		IICReadAddress() const { return 0; };
@@ -52,6 +55,7 @@ class CamSensor
 #endif
 	protected:
 		status_t		fInitStatus;
+		bool			fIsBigEndian;
 		bool			fTransferEnabled;
 		BRect			fVideoFrame;
 		int32			fFirstParameterID;

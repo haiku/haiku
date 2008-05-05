@@ -17,7 +17,7 @@ struct { const char *name; TransformInstFunc instfunc; } kTransformTable[] = {
 };
 #undef B_WEBCAM_DECLARE_CSTRANSFORM
 
-// -----------------------------------------------------------------------------
+
 CamColorSpaceTransform::CamColorSpaceTransform()
 	: fInitStatus(B_NO_INIT),
 	  fVideoFrame()
@@ -25,41 +25,41 @@ CamColorSpaceTransform::CamColorSpaceTransform()
 	
 }
 
-// -----------------------------------------------------------------------------
+
 CamColorSpaceTransform::~CamColorSpaceTransform()
 {
 	
 }
 					
-// -----------------------------------------------------------------------------
+
 status_t
 CamColorSpaceTransform::InitCheck()
 {
 	return fInitStatus;
 }
 					
-// -----------------------------------------------------------------------------
+
 const char *
 CamColorSpaceTransform::Name()
 {
 	return "<unknown>";
 }
 
-// -----------------------------------------------------------------------------
+
 color_space
 CamColorSpaceTransform::OutputSpace()
 {
 	return B_RGB32;
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 CamColorSpaceTransform::SetVideoFrame(BRect rect)
 {
 	return ENOSYS;
 }
 
-// -----------------------------------------------------------------------------
+
 CamColorSpaceTransform *
 CamColorSpaceTransform::Create(const char *name)
 {
