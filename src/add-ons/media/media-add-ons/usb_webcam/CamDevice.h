@@ -99,6 +99,9 @@ class CamDevice {
 	virtual ssize_t		WriteIIC8(uint8 address, uint8 data);
 	virtual ssize_t		WriteIIC16(uint8 address, uint16 data);
 	virtual ssize_t		ReadIIC(uint8 address, uint8 *data);
+	virtual ssize_t		ReadIIC8(uint8 address, uint8 *data);
+	virtual ssize_t		ReadIIC16(uint8 address, uint16 *data);
+	virtual status_t	SetIICBitsMode(size_t bits=8);
 	
 	
 	void				SetDataInput(BDataIO *input);

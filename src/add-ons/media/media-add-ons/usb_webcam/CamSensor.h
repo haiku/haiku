@@ -27,7 +27,7 @@ class CamSensor
 	virtual bool		Use400kHz() const { return false; };
 	virtual bool		UseRealIIC() const { return true; };
 	virtual uint8		IICReadAddress() const { return 0; };
-	virtual uint8		IICWriteAddress() const { return 0; };;
+	virtual uint8		IICWriteAddress() const { return 0; };
 	virtual int			MaxWidth() const { return -1; };
 	virtual int			MaxHeight() const { return -1; };
 	

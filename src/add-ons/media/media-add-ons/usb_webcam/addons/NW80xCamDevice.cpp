@@ -1,17 +1,23 @@
-#include "QuickCamDevice.h"
+#include "NW80xCamDevice.h"
 #include "CamDebug.h"
 #include "CamSensor.h"
 
+// reference: http://nw802.cvs.sourceforge.net
 
 const usb_webcam_support_descriptor kSupportedDevices[] = {
-{{ 0, 0, 0, 0x046d, 0x0840 }, "Logitech", "QuickCam Express", NULL },
-{{ 0, 0, 0, 0x046d, 0x0850 }, "Logitech", "QuickCam Express LEGO", NULL },
+{{ 0, 0, 0, 0x046d, 0xd001 }, "Logitech", "QuickCam Pro", "??" }, // Alan's
+// other IDs according to nw802 linux driver:
+{{ 0, 0, 0, 0x052b, 0xd001 }, "Ezonics", "EZCam Pro", "??" },
+{{ 0, 0, 0, 0x055f, 0xd001 }, "Mustek"/*"PCLine"*/, "WCam 300"/*"PCL-W300"*/, "??" },
+{{ 0, 0, 0, 0x06a5, 0xd001 }, "Generic", "NW802", "??" },
+{{ 0, 0, 0, 0x06a5, 0x0000 }, "Generic", "NW800", "??" },
 {{ 0, 0, 0, 0, 0}, NULL, NULL, NULL }
 };
 
 
+#warning TODO!
 
-QuickCamDevice::QuickCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
+NW80xCamDevice::NW80xCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
           :CamDevice(_addon, _device)
 {
 	status_t err;
@@ -30,28 +36,28 @@ QuickCamDevice::QuickCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 }
 
 
-QuickCamDevice::~QuickCamDevice()
+NW80xCamDevice::~NW80xCamDevice()
 {
 	
 }
 
 
 bool
-QuickCamDevice::SupportsBulk()
+NW80xCamDevice::SupportsBulk()
 {
 	return true;
 }
 
 
 bool
-QuickCamDevice::SupportsIsochronous()
+NW80xCamDevice::SupportsIsochronous()
 {
 	return true;
 }
 
 
 status_t
-QuickCamDevice::StartTransfer()
+NW80xCamDevice::StartTransfer()
 {
 	status_t err;
 	uint8 r;
@@ -77,7 +83,7 @@ DumpRegs();
 
 
 status_t
-QuickCamDevice::StopTransfer()
+NW80xCamDevice::StopTransfer()
 {
 	status_t err;
 	uint8 r;
@@ -100,7 +106,7 @@ DumpRegs();
 
 
 ssize_t
-QuickCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
+NW80xCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 {
 	PRINT((CH "(%u, @%p, %u)" CT, address, data, count));
 	return SendCommand(USB_REQTYPE_DEVICE_OUT, 0x04, address, 0, count, data);
@@ -108,7 +114,7 @@ QuickCamDevice::WriteReg(uint16 address, uint8 *data, size_t count)
 
 
 ssize_t
-QuickCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
+NW80xCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 {
 	PRINT((CH "(%u, @%p, %u, %d)" CT, address, data, count, cached));
 	memset(data, 0xaa, count); // linux drivers do that without explaining why !?
@@ -117,7 +123,7 @@ QuickCamDevice::ReadReg(uint16 address, uint8 *data, size_t count, bool cached)
 
 
 status_t
-QuickCamDevice::GetStatusIIC()
+NW80xCamDevice::GetStatusIIC()
 {
 	status_t err;
 	uint8 status = 0;
@@ -130,7 +136,7 @@ QuickCamDevice::GetStatusIIC()
 
 
 status_t
-QuickCamDevice::WaitReadyIIC()
+NW80xCamDevice::WaitReadyIIC()
 {
 	status_t err;
 #warning WRITEME
@@ -139,7 +145,7 @@ QuickCamDevice::WaitReadyIIC()
 
 
 ssize_t
-QuickCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
+NW80xCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 {
 	status_t err;
 	int i;
@@ -159,14 +165,14 @@ QuickCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 
 
 ssize_t
-QuickCamDevice::ReadIIC(uint8 address, uint8 *data)
+NW80xCamDevice::ReadIIC(uint8 address, uint8 *data)
 {
 	return ReadIIC(address, data);
 }
 
 
 ssize_t
-QuickCamDevice::ReadIIC8(uint8 address, uint8 *data)
+NW80xCamDevice::ReadIIC8(uint8 address, uint8 *data)
 {
 	status_t err;
 	int i;
@@ -194,7 +200,7 @@ QuickCamDevice::ReadIIC8(uint8 address, uint8 *data)
 
 
 ssize_t
-QuickCamDevice::ReadIIC16(uint8 address, uint16 *data)
+NW80xCamDevice::ReadIIC16(uint8 address, uint16 *data)
 {
 	status_t err;
 	int i;
@@ -225,7 +231,7 @@ QuickCamDevice::ReadIIC16(uint8 address, uint16 *data)
 
 
 status_t
-QuickCamDevice::SetIICBitsMode(size_t bits)
+NW80xCamDevice::SetIICBitsMode(size_t bits)
 {
 	switch (bits) {
 		case 8:
@@ -242,7 +248,7 @@ QuickCamDevice::SetIICBitsMode(size_t bits)
 
 
 status_t
-QuickCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
+NW80xCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 							uint16 index, uint16 length, void* data)
 {
 	size_t ret;
@@ -257,36 +263,36 @@ QuickCamDevice::SendCommand(uint8 dir, uint8 request, uint16 value,
 }
 
 
-QuickCamDeviceAddon::QuickCamDeviceAddon(WebCamMediaAddOn* webcam)
+NW80xCamDeviceAddon::NW80xCamDeviceAddon(WebCamMediaAddOn* webcam)
 	: CamDeviceAddon(webcam)
 {
 	SetSupportedDevices(kSupportedDevices);
 }
 
 
-QuickCamDeviceAddon::~QuickCamDeviceAddon()
+NW80xCamDeviceAddon::~NW80xCamDeviceAddon()
 {
 }
 
 
 const char *
-QuickCamDeviceAddon::BrandName()
+NW80xCamDeviceAddon::BrandName()
 {
-	return "QuickCam";
+	return "NW80x-based";
 }
 
 
-QuickCamDevice *
-QuickCamDeviceAddon::Instantiate(CamRoster &roster, BUSBDevice *from)
+NW80xCamDevice *
+NW80xCamDeviceAddon::Instantiate(CamRoster &roster, BUSBDevice *from)
 {
-	return new QuickCamDevice(*this, from);
+	return new NW80xCamDevice(*this, from);
 }
 
 
 extern "C" status_t
-B_WEBCAM_MKINTFUNC(quickcam)
+B_WEBCAM_MKINTFUNC(nw80xcam)
 (WebCamMediaAddOn* webcam, CamDeviceAddon **addon)
 {
-	*addon = new QuickCamDeviceAddon(webcam);
+	*addon = new NW80xCamDeviceAddon(webcam);
 	return B_OK;
 }

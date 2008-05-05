@@ -64,11 +64,13 @@ http://www.mnementh.co.uk/sonix/sn9c102.pdf
 * some of the (many!) linux quickcam drivers:
 http://www.lrr.in.tum.de/~acher/quickcam/quickcam.html
 http://www.seismo.ethz.ch/linux/webcam.html
+http://tuukkat.awardspace.com/quickcam/quickcam.html for PID 0xd001
 
 * Creative's own list of linux drivers:
 http://connect.creativelabs.com/opensource/Lists/Webcam%20Support/AllItems.aspx
 
 * Other webcam drivers:
+http://nw802.cvs.sourceforge.net NW80x based (like the QuickCam I have here)
 http://zc0302.sourceforge.net/zc0302.php?page=cams
 http://www.medias.ne.jp/~takam/bsd/NetBSD.html
 

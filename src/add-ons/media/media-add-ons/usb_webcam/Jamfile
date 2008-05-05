@@ -16,6 +16,7 @@ if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 local sourceDirs =
 	addons/quickcam
 	addons/sonix
+	addons
 	cstransforms
 	sensors
 ;
@@ -28,7 +29,7 @@ for sourceDir in $(sourceDirs) {
 
 ## addon sources
 local addonSources ;
-addonSources = QuickCamDevice.cpp SonixCamDevice.cpp ;
+addonSources = QuickCamDevice.cpp SonixCamDevice.cpp NW80xCamDevice.cpp ;
 
 ## colorspace transforms sources
 local csTransformsSources ;

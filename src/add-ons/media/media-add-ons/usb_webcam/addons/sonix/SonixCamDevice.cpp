@@ -9,7 +9,7 @@
 #include <media/Buffer.h>
 
 const usb_webcam_support_descriptor kSupportedDevices[] = {
-{{ 0, 0, 0, 0x0c45, 0x6005 }, "Sonix", "Sonix", "foo,bar,tas5110c1b" }, // mine
+{{ 0, 0, 0, 0x0c45, 0x6005 }, "Sonix", "Sonix", "tas5110c1b" }, // mine
 {{ 0, 0, 0, 0x0c45, 0x6009 }, "Trust", "spacec@m 120", NULL },
 {{ 0, 0, 0, 0x0c45, 0x600d }, "Trust", "spacec@m 120", NULL },
 

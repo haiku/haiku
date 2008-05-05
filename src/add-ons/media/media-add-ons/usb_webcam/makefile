@@ -34,6 +34,7 @@ TYPE := ADDON
 #	in folder names do not work well with this makefile.
 SRCS := $(wildcard *.cpp) \
 $(wildcard addons/*/*.cpp) \
+$(wildcard addons/*.cpp) \
 $(wildcard sensors/*.cpp) \
 $(wildcard cstransforms/*.cpp) 
 
@@ -193,8 +194,8 @@ CamRoster.cpp: CamInternalAddons.h
 CamDevice.cpp: CamInternalSensors.h
 CamColorSpaceTransform.cpp: CamInternalColorSpaceTransforms.h
 
-CamInternalAddons.h: $(wildcard addons/*/*CamDevice.cpp)
-	grep -h B_WEBCAM_MKINTFUNC $(CURDIR)/addons/*/*CamDevice.cpp > $@
+CamInternalAddons.h: $(wildcard addons/*/*CamDevice.cpp) $(wildcard addons/*CamDevice.cpp)
+	grep -h B_WEBCAM_MKINTFUNC $(CURDIR)/addons/*/*CamDevice.cpp $(CURDIR)/addons/*CamDevice.cpp > $@
 
 CamInternalSensors.h: $(wildcard sensors/*.cpp)
 	grep -h B_WEBCAM_DECLARE_SENSOR $(CURDIR)/sensors/*.cpp > $@

@@ -1,5 +1,5 @@
-#ifndef _QUICK_CAM_DEVICE_H
-#define _QUICK_CAM_DEVICE_H
+#ifndef _NW80X_CAM_DEVICE_H
+#define _NW80X_CAM_DEVICE_H
 
 #include "CamDevice.h"
 
@@ -22,11 +22,11 @@
 
 
 // This class represents each webcam
-class QuickCamDevice : public CamDevice
+class NW80xCamDevice : public CamDevice
 {
 	public: 
-						QuickCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device);
-						~QuickCamDevice();
+						NW80xCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device);
+						~NW80xCamDevice();
 	virtual bool		SupportsBulk();
 	virtual bool		SupportsIsochronous();
 	virtual status_t	StartTransfer();
@@ -52,15 +52,15 @@ class QuickCamDevice : public CamDevice
 
 // the addon itself, that instanciate
 
-class QuickCamDeviceAddon : public CamDeviceAddon
+class NW80xCamDeviceAddon : public CamDeviceAddon
 {
 	public:
-						QuickCamDeviceAddon(WebCamMediaAddOn* webcam);
-	virtual 			~QuickCamDeviceAddon();
+						NW80xCamDeviceAddon(WebCamMediaAddOn* webcam);
+	virtual 			~NW80xCamDeviceAddon();
 						
 	virtual const char	*BrandName();
-	virtual QuickCamDevice	*Instantiate(CamRoster &roster, BUSBDevice *from);
+	virtual NW80xCamDevice	*Instantiate(CamRoster &roster, BUSBDevice *from);
 	
 };
 
-#endif /* _QUICK_CAM_CAM_DEVICE_H */
+#endif /* _NW80X_CAM_CAM_DEVICE_H */

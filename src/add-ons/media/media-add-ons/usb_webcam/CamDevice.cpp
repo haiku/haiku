@@ -360,6 +360,28 @@ CamDevice::WriteIIC16(uint8 address, uint16 data)
 ssize_t
 CamDevice::ReadIIC(uint8 address, uint8 *data)
 {
+	//TODO: make it mode generic
+	return ENOSYS;
+}
+
+
+ssize_t
+CamDevice::ReadIIC8(uint8 address, uint8 *data)
+{
+	return ReadIIC(address, data);
+}
+
+
+ssize_t
+CamDevice::ReadIIC16(uint8 address, uint16 *data)
+{
+	return ENOSYS;
+}
+
+
+status_t
+CamDevice::SetIICBitsMode(size_t bits)
+{
 	return ENOSYS;
 }
 
