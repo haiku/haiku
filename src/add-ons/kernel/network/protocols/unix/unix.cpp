@@ -48,8 +48,10 @@ destroy_scm_rights_descriptors(const ancillary_data_header* header,
 	file_descriptor** descriptors = (file_descriptor**)data;
 
 	for (int i = 0; i < count; i++) {
-		if (descriptors[i] != NULL)
+		if (descriptors[i] != NULL) {
+			close_fd(descriptors[i]);
 			put_fd(descriptors[i]);
+		}
 	}
 }
 
@@ -308,7 +310,7 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 
 	status_t error = B_OK;
 	for (int i = 0; i < count; i++) {
-		descriptors[i] = get_fd(ioContext, fds[i]);
+		descriptors[i] = get_open_fd(ioContext, fds[i]);
 		if (descriptors[i] == NULL) {
 			error = EBADF;
 			break;
@@ -332,8 +334,10 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 	// cleanup on error
 	if (error != B_OK) {
 		for (int i = 0; i < count; i++) {
-			if (descriptors[i] != NULL)
+			if (descriptors[i] != NULL) {
+				close_fd(descriptors[i]);
 				put_fd(descriptors[i]);
+			}
 		}
 	}
 
@@ -374,7 +378,9 @@ unix_process_ancillary_data(net_protocol *self,
 
 	status_t error = B_OK;
 	for (int i = 0; i < count; i++) {
-		// get an additional reference which will go to the FD table index
+		// Get an additional reference which will go to the FD table index. The
+		// reference and open reference acquired in unix_add_ancillary_data()
+		// will be released when the container is destroyed.
 		inc_fd_ref_count(descriptors[i]);
 		fds[i] = new_fd(ioContext, descriptors[i]);
 
