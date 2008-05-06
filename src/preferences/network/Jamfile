@@ -8,5 +8,6 @@ Preference Network :
 	EthernetSettingsView.cpp
 	settings.cpp
 	: be root $(HAIKU_NETWORK_LIBS)
+	: Network.rdef
 	;
 
