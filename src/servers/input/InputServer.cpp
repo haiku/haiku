@@ -10,6 +10,8 @@
 #include "kb_mouse_driver.h"
 #include "MethodReplicant.h"
 
+#include <safemode.h>
+
 #include <AppServerLink.h>
 #include <MessagePrivate.h>
 
@@ -25,7 +27,6 @@
 #include <Path.h>
 #include <Roster.h>
 #include <String.h>
-#include <driver_settings.h>
 
 #include <stdio.h>
 
@@ -162,6 +163,19 @@ InputServer::InputServer()
 			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
 			fSafeMode = true;
 	}
+
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
+#else
+	if (_kget_safemode_option_(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
+#endif
+	{
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
+			fSafeMode = true;
+	}
+
 
 	gDeviceManager.LoadState();
 
