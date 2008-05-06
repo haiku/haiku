@@ -139,8 +139,8 @@ if [ "$SAFEMODE" != "yes" ]; then
 fi
 
 # Check for fresh install and run post install scripts.
-postInstallDir=/boot/beos/etc/post_install
-freshInstallIndicator=$postInstallDir/fresh_install
+postInstallDir=/boot/common/boot/post_install
+freshInstallIndicator=/boot/common/settings/fresh_install
 if [ -e $freshInstallIndicator ]; then
 	# wait a moment for things to calm down a bit
 	sleep 3

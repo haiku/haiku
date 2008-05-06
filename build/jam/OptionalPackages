@@ -167,8 +167,8 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 		Echo "No optional package OpenSSH available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage openssh-5.0p1-gcc2-2008-05-04
-			: $(baseURL)/openssh-5.0p1-gcc2-2008-05-04.zip
+		InstallOptionalHaikuImagePackage openssh-5.0p1-gcc2-2008-05-04-1
+			: $(baseURL)/openssh-5.0p1-gcc2-2008-05-04-1.zip
 			:
 		;
 

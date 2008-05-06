@@ -338,11 +338,14 @@ SEARCH on $(networkSettingsFiles)
 AddFilesToHaikuImage common settings network : $(networkSettingsFiles) ;
 
 # post install scripts and fresh install indicator file
-local postInstallFiles = fresh_install mime_update.sh ;
+local postInstallFiles = mime_update.sh ;
 postInstallFiles = $(postInstallFiles:G=post-install) ;
 SEARCH on $(postInstallFiles)
-	= [ FDirName $(HAIKU_TOP) data etc post_install ] ;
-AddFilesToHaikuImage beos etc post_install : $(postInstallFiles) ;
+	= [ FDirName $(HAIKU_TOP) data common boot post_install ] ;
+SEARCH on <post-install>fresh_install
+	= [ FDirName $(HAIKU_TOP) data common settings ] ;
+AddFilesToHaikuImage common boot post_install : $(postInstallFiles) ;
+AddFilesToHaikuImage common settings : <post-install>fresh_install ;
 
 # boot loader
 AddFilesToHaikuImage beos system : zbeos ;
