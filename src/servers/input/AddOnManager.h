@@ -51,6 +51,7 @@ class AddOnManager : public BLooper {
 		status_t HandleNodeMonitor(BMessage*);
 		
 		void LoadReplicant();
+		void UnloadReplicant();
 		int32 GetReplicantAt(BMessenger target, int32 index) const;
 		status_t GetReplicantName(BMessenger target, int32 uid, BMessage *reply) const;
 		status_t GetReplicantView(BMessenger target, int32 uid, BMessage *reply) const;

@@ -477,6 +477,13 @@ AddOnManager::RegisterMethod(BInputServerMethod* method, const entry_ref& ref,
 
 
 void
+AddOnManager::UnloadReplicant()
+{
+	BDeskbar().RemoveItem(REPLICANT_CTL_NAME);
+}
+
+
+void
 AddOnManager::LoadReplicant()
 {
 	CALLED();
@@ -756,6 +763,12 @@ status_t
 AddOnManager::HandleMethodReplicant(BMessage* message, BMessage* reply)
 {
 	CALLED();
+	
+	if (InputServer::gInputMethodList.CountItems() == 0) {
+		UnloadReplicant();
+		return B_OK;
+	}
+	
 	LoadReplicant();
 	
 	BAutolock lock(InputServer::gInputMethodListLocker);
