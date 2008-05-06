@@ -291,7 +291,7 @@ apm_init(kernel_args *args)
 
 	handle = load_driver_settings(B_SAFEMODE_DRIVER_SETTINGS);
 	if (handle != NULL) {
-		apm = !get_driver_boolean_parameter(handle, "disable_apm", !apm, !apm);
+		apm = !get_driver_boolean_parameter(handle, B_SAFEMODE_DISABLE_APM, !apm, !apm);
 		unload_driver_settings(handle);
 	}
 
