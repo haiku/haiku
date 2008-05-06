@@ -33,7 +33,6 @@ KernelMergeObject kernel_core.o :
 	Notifications.cpp
 	port.cpp
 	real_time_clock.c
-	realtime_sem.cpp
 	scheduler.cpp
 	sem.cpp
 	shutdown.c
@@ -64,16 +63,17 @@ KernelLd linkhack.so :
 ;
 
 KernelLd kernel_$(TARGET_ARCH) :
-	kernel_core.o
-	kernel_fs.o
-	kernel_vm.o
 	kernel_cache.o
+	kernel_core.o
+	kernel_debug.o
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
-	kernel_util.o
+	kernel_fs.o
 	kernel_messaging.o
-	kernel_debug.o
+	kernel_posix.o
 	kernel_slab.o
+	kernel_util.o
+	kernel_vm.o
 
 	lib$(TARGET_ARCH).a
 	kernel_platform_$(TARGET_BOOT_PLATFORM).o
@@ -83,8 +83,8 @@ KernelLd kernel_$(TARGET_ARCH) :
 	# kernel parts borrowed from libroot and others
 	kernel_os_main.o
 	kernel_os_arch_$(TARGET_ARCH).o
-	kernel_posix.o
-	kernel_posix_arch_$(TARGET_ARCH).o
+	kernel_lib_posix.o
+	kernel_lib_posix_arch_$(TARGET_ARCH).o
 	kernel_misc.o
 
 	$(HAIKU_STATIC_LIBSUPC++)
@@ -96,16 +96,17 @@ KernelLd kernel_$(TARGET_ARCH) :
 ;
 
 KernelLd kernel.so :
-	kernel_core.o
-	kernel_fs.o
-	kernel_vm.o
 	kernel_cache.o
+	kernel_core.o
+	kernel_debug.o
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
-	kernel_util.o
+	kernel_fs.o
 	kernel_messaging.o
-	kernel_debug.o
+	kernel_posix.o
 	kernel_slab.o
+	kernel_util.o
+	kernel_vm.o
 
 	lib$(TARGET_ARCH).a
 	kernel_platform_$(TARGET_BOOT_PLATFORM).o
@@ -115,8 +116,8 @@ KernelLd kernel.so :
 	# kernel libroot parts
 	kernel_os_main.o
 	kernel_os_arch_$(TARGET_ARCH).o
-	kernel_posix.o
-	kernel_posix_arch_$(TARGET_ARCH).o
+	kernel_lib_posix.o
+	kernel_lib_posix_arch_$(TARGET_ARCH).o
 
 	$(HAIKU_STATIC_LIBSUPC++)
 
@@ -153,6 +154,7 @@ SubInclude HAIKU_TOP src system kernel disk_device_manager ;
 SubInclude HAIKU_TOP src system kernel fs ;
 SubInclude HAIKU_TOP src system kernel lib ;
 SubInclude HAIKU_TOP src system kernel messaging ;
+SubInclude HAIKU_TOP src system kernel posix ;
 SubInclude HAIKU_TOP src system kernel slab ;
 SubInclude HAIKU_TOP src system kernel util ;
 SubInclude HAIKU_TOP src system kernel vm ;

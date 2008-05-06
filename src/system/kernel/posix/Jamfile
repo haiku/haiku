@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src system kernel posix ;
+
+UsePrivateHeaders shared ;
+
+KernelMergeObject kernel_posix.o : 
+	realtime_sem.cpp
+
+	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused
+;

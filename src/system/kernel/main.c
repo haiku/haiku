@@ -32,8 +32,8 @@
 #include <messaging.h>
 #include <Notifications.h>
 #include <port.h>
+#include <posix/realtime_sem.h>
 #include <real_time_clock.h>
-#include <realtime_sem.h>
 #include <sem.h>
 #include <smp.h>
 #include <system_info.h>

@@ -31,7 +31,7 @@ SEARCH_SOURCE += [ FDirName $(posixSources) sys ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) time ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) unistd ] ;
 
-KernelMergeObject kernel_posix.o :
+KernelMergeObject kernel_lib_posix.o :
 	# main
  	kernel_errno.c
  	dirent.c
@@ -129,7 +129,7 @@ KernelMergeObject kernel_os_arch_$(TARGET_ARCH).o :
 SEARCH_SOURCE += [ FDirName $(posixSources) arch $(TARGET_ARCH) ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) string arch $(TARGET_ARCH) ] ;
 
-KernelMergeObject kernel_posix_arch_$(TARGET_ARCH).o :
+KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	setjmp.S
 	siglongjmp.S
 	sigsetjmp.S

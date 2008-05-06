@@ -13,7 +13,7 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
-#include <realtime_sem.h>
+#include <posix/realtime_sem.h>
 #include <syscall_utils.h>
 #include <syscalls.h>
 

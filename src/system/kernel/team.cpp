@@ -26,7 +26,7 @@
 #include <kscheduler.h>
 #include <ksignal.h>
 #include <port.h>
-#include <realtime_sem.h>
+#include <posix/realtime_sem.h>
 #include <sem.h>
 #include <syscall_process_info.h>
 #include <syscall_restart.h>

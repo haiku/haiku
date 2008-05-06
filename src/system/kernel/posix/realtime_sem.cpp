@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <realtime_sem.h>
+#include <posix/realtime_sem.h>
 
 #include <string.h>
 
