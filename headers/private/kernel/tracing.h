@@ -1,3 +1,8 @@
+/*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef KERNEL_TRACING_H
 #define KERNEL_TRACING_H
 
