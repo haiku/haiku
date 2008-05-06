@@ -33,6 +33,7 @@ KernelMergeObject kernel_core.o :
 	Notifications.cpp
 	port.cpp
 	real_time_clock.c
+	realtime_sem.cpp
 	scheduler.cpp
 	sem.cpp
 	shutdown.c

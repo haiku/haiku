@@ -301,7 +301,7 @@ fill_sem_info(struct sem_entry *sem, sem_info *info, size_t size)
 
 
 status_t
-sem_init(kernel_args *args)
+haiku_sem_init(kernel_args *args)
 {
 	area_id area;
 	int32 i;

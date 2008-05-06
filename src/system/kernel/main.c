@@ -33,6 +33,7 @@
 #include <Notifications.h>
 #include <port.h>
 #include <real_time_clock.h>
+#include <realtime_sem.h>
 #include <sem.h>
 #include <smp.h>
 #include <system_info.h>
@@ -137,7 +138,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		rtc_init(&sKernelArgs);
 
 		TRACE("init semaphores\n");
-		sem_init(&sKernelArgs);
+		haiku_sem_init(&sKernelArgs);
 		condition_variable_init();
 
 		// now we can create and use semaphores
@@ -158,6 +159,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		TRACE("init kernel daemons\n");
 		kernel_daemon_init();
 		arch_platform_init_post_thread(&sKernelArgs);
+		realtime_sem_init();
 
 		TRACE("init VM threads\n");
 		vm_init_post_thread(&sKernelArgs);

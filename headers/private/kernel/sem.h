@@ -20,7 +20,7 @@ struct select_info;
 extern "C" {
 #endif
 
-extern status_t sem_init(struct kernel_args *args);
+extern status_t haiku_sem_init(struct kernel_args *args);
 extern int sem_delete_owned_sems(team_id owner);
 extern int32 sem_used_sems(void);
 extern int32 sem_max_sems(void);

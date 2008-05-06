@@ -26,6 +26,7 @@
 #include <kscheduler.h>
 #include <ksignal.h>
 #include <port.h>
+#include <realtime_sem.h>
 #include <sem.h>
 #include <syscall_process_info.h>
 #include <syscall_restart.h>
@@ -822,6 +823,7 @@ create_team_struct(const char *name, bool kernel)
 	team->num_threads = 0;
 	team->io_context = NULL;
 	team->address_space = NULL;
+	team->realtime_sem_context = NULL;
 	team->thread_list = NULL;
 	team->main_thread = NULL;
 	team->loading_info = NULL;
@@ -1365,6 +1367,8 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	sem_delete_owned_sems(team->id);
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
+	delete_realtime_sem_context(team->realtime_sem_context);
+	team->realtime_sem_context = NULL;
 
 	user_debug_finish_after_exec();
 
@@ -1485,6 +1489,16 @@ fork_team(void)
 		goto err2;
 	}
 
+	// duplicate the realtime sem context
+	if (parentTeam->realtime_sem_context) {
+		team->realtime_sem_context = clone_realtime_sem_context(
+			parentTeam->realtime_sem_context);
+		if (team->realtime_sem_context == NULL) {
+			status = B_NO_MEMORY;
+			goto err25;
+		}
+	}
+
 	// create an address space for this team
 	status = vm_create_address_space(team->id, USER_BASE, USER_SIZE, false,
 		&team->address_space);
@@ -1540,6 +1554,8 @@ fork_team(void)
 err4:
 	vm_delete_address_space(team->address_space);
 err3:
+	delete_realtime_sem_context(team->realtime_sem_context);
+err25:
 	vfs_free_io_context(team->io_context);
 err2:
 	free(forkArgs);
@@ -2327,6 +2343,7 @@ team_delete_team(struct team *team)
 	// free team resources
 
 	vfs_free_io_context(team->io_context);
+	delete_realtime_sem_context(team->realtime_sem_context);
 	delete_owned_ports(teamID);
 	sem_delete_owned_sems(teamID);
 	remove_images(team);

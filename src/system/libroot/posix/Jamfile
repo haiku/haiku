@@ -18,6 +18,7 @@ MergeObject posix_main.o :
  	inttypes.c
  	poll.c
  	$(PWD_BACKEND)
+	semaphore.cpp
  	syslog.cpp
  	termios.c
  	utime.c

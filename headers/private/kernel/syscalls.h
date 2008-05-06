@@ -11,6 +11,7 @@
 #include <OS.h>
 #include <DiskDeviceDefs.h>
 
+#include <semaphore.h>
 #include <signal.h>
 #include <sys/socket.h>
 
@@ -74,6 +75,18 @@ extern status_t		_kern_get_sem_info(sem_id semaphore, struct sem_info *info, siz
 extern status_t		_kern_get_next_sem_info(team_id team, int32 *cookie,
 						struct sem_info *info, size_t size);
 extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
+
+/* POSIX realtime sem syscalls */
+extern status_t		_kern_realtime_sem_open(const char* name, int openFlags,
+						mode_t mode, uint32 semCount, sem_t* userSem,
+						sem_t** _usedUserSem);
+extern status_t		_kern_realtime_sem_close(sem_id semID,
+						sem_t** _deleteUserSem);
+extern status_t		_kern_realtime_sem_unlink(const char* name);
+
+extern status_t		_kern_realtime_sem_get_value(sem_id semID, int* value);
+extern status_t		_kern_realtime_sem_post(sem_id semID);
+extern status_t		_kern_realtime_sem_wait(sem_id semID, bigtime_t timeout);
 
 /* team & thread syscalls */
 

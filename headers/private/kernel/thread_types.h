@@ -68,8 +68,8 @@ enum {
 	THREAD_BLOCK_TYPE_USER_BASE				= 10000
 };
 
-struct image;
-	// defined in image.c
+struct image;					// defined in image.c
+struct realtime_sem_context;	// defined in realtime_sem.cpp
 struct select_info;
 
 struct death_entry {
@@ -181,6 +181,7 @@ struct team {
 	int				state;			// current team state, see above
 	int32			flags;
 	void			*io_context;
+	struct realtime_sem_context	*realtime_sem_context;
 	sem_id			death_sem;		// semaphore to wait on for dying threads
 	struct list		dead_threads;
 	int				dead_threads_count;
