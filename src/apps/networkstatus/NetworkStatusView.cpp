@@ -5,6 +5,7 @@
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Hugo Santos, hugosantos@gmail.com
+ *		Dario Casalinuovo
  */
 
 
@@ -61,6 +62,8 @@ const uint32 kMsgShowConfiguration = 'shcf';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
+
+const uint32 kOpenNetworkPref = 'onwp';
 
 const bigtime_t kUpdateInterval = 1000000;
 	// every second
@@ -232,6 +235,10 @@ NetworkStatusView::MessageReceived(BMessage* message)
 			_ShowConfiguration(message);
 			break;
 
+		case kOpenNetworkPref:
+			_OpenNetworksPreferences();
+			break;
+
 		case B_ABOUT_REQUESTED:
 			_AboutRequested();
 			break;
@@ -354,6 +361,9 @@ NetworkStatusView::MouseDown(BPoint point)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("About NetworkStatus" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
+	menu->AddItem(new BMenuItem("Open Networks Preferences" B_UTF8_ELLIPSIS,
+		new BMessage(kOpenNetworkPref)));
+
 	if (fInDeskbar)
 		menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
 	menu->SetTargetForItems(this);
@@ -463,6 +473,23 @@ NetworkStatusView::_Update(bool force)
 
 	if (fStatus != oldStatus)
 		Invalidate();
+}
+
+
+void
+NetworkStatusView::_OpenNetworksPreferences()
+{
+	status_t ret = be_roster->Launch("application/x-vnd.Haiku-Network");
+	if (ret < B_OK) {
+		BString errorMessage("Launching the Network preflet failed.\n\n"
+			"Error: ");
+		errorMessage << strerror(ret);
+		BAlert* alert = new BAlert("launch error", errorMessage.String(),
+			"Ok");
+		// asynchronous alert in order to not block replicant host
+		// application
+		alert->Go(NULL);
+	}
 }
 
 

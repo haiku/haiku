@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Dario Casalinuovo
  */
 #ifndef NETWORK_STATUS_VIEW_H
 #define NETWORK_STATUS_VIEW_H
@@ -53,6 +54,7 @@ class NetworkStatusView : public BView {
 							const char* name);
 		int32			_DetermineInterfaceStatus(const char* name);
 		void			_Update(bool force = false);
+		void			_OpenNetworksPreferences();
 
 		BMessageRunner*	fMessageRunner;
 		BObjectList<BString> fInterfaces;
