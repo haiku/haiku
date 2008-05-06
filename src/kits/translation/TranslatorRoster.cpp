@@ -17,12 +17,13 @@
 #include "FuncTranslator.h"
 #include "TranslatorRosterPrivate.h"
 
+#include <image.h>
+#include <safemode.h>
+
 #include <Application.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <FindDirectory.h>
-#include <driver_settings.h>
-#include <image.h>
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <String.h>
@@ -145,6 +146,18 @@ BTranslatorRoster::Private::Private()
 	if (_kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
 #else
 	if (_kget_safemode_option_(B_SAFEMODE_SAFE_MODE, parameter, &parameterLength) == B_OK)
+#endif
+	{
+		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
+			|| !strcasecmp(parameter, "true") || !strcasecmp(parameter, "yes")
+			|| !strcasecmp(parameter, "enable") || !strcmp(parameter, "1"))
+			fSafeMode = true;
+	}
+	
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	if (_kern_get_safemode_option(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
+#else
+	if (_kget_safemode_option_(B_SAFEMODE_DISABLE_USER_ADD_ONS, parameter, &parameterLength) == B_OK)
 #endif
 	{
 		if (!strcasecmp(parameter, "enabled") || !strcasecmp(parameter, "on")
