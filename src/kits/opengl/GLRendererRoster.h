@@ -35,6 +35,7 @@ class GLRendererRoster {
 		int32		fNextID;
 		BGLView 	*fView;
 		ulong		fOptions;
+		bool		fSafeMode;
 };
 
 #endif	/* _GLRENDERER_ROSTER_H */
