@@ -78,6 +78,8 @@ SonixCamDevice::SonixCamDevice(CamDeviceAddon &_addon, BUSBDevice* _device)
 	fFrameTagState = 0;
 	
 	fRGain = fGGain = fBGain = 0;
+	// unknown
+	fBrightness = 0.5;
 	
 	memset(fCachedRegs, 0, SN9C102_REG_COUNT);
 	fChipVersion = 2;
@@ -271,13 +273,16 @@ SonixCamDevice::WriteIIC(uint8 address, uint8 *data, size_t count)
 	count++; // includes address
 	if (count > 5)
 		return EINVAL;
-	buffer[0] = (count << 4) | Sensor()->Use400kHz()?0x01:0
-							 | Sensor()->UseRealIIC()?0x80:0;
+	buffer[0] = ((count) << 4) | (Sensor()->Use400kHz()?0x01:0)
+							 | (Sensor()->UseRealIIC()?0x80:0);
 	buffer[1] = Sensor()->IICWriteAddress();
 	buffer[2] = address;
 	memset(&buffer[3], 0, 5);
-	memcpy(&buffer[3], data, count);
-	buffer[7] = 0x14; /* absolutely no idea why V4L2 driver use that value */
+	memcpy(&buffer[3], data, count-1);
+	buffer[7] = 0x10; /*0x14;*/ /* absolutely no idea why V4L2 driver use that value */
+	for (int i = 0; i < 8; i++) {
+		PRINT(("[%d] = %02x\n", i, buffer[i]));
+	}
 	err = WriteReg(SN9C102_I2C_SETUP, buffer, 8);
 	//dprintf(ID "sonix_i2c_write_multi: set_regs error 0x%08lx\n", err);
 	//PRINT((CH ": WriteReg: %s" CT, strerror(err)));
@@ -403,16 +408,31 @@ SonixCamDevice::SetVideoParams(float brightness, float contrast, float hue, floa
 void
 SonixCamDevice::AddParameters(BParameterGroup *group, int32 &index)
 {
+	BParameterGroup *g;
 	BContinuousParameter *p;
 	CamDevice::AddParameters(group, index);
 	
-	p = group->MakeContinuousParameter(index++, 
+	// R,G,B gains
+	g = group->MakeGroup("RGB gain");
+	p = g->MakeContinuousParameter(index++, 
 		B_MEDIA_RAW_VIDEO, "RGB gain", 
 		B_GAIN, "", 1.0, 1.0+(float)(SN9C102_RGB_GAIN_MAX)/8, (float)1.0/8);
 
 	p->SetChannelCount(3);
+#if 0
+	// Contrast - NON FUNCTIONAL
+	g = group->MakeGroup("Contrast");
+	p = g->MakeContinuousParameter(index++, 
+		B_MEDIA_RAW_VIDEO, "Contrast", 
+		B_GAIN, "", 0.0, 1.0, 1.0/256);
 
+	// Brightness - NON FUNCTIONAL
+	g = group->MakeGroup("Brightness");
+	p = g->MakeContinuousParameter(index++, 
+		B_MEDIA_RAW_VIDEO, "Brightness", 
+		B_GAIN, "", 0.0, 1.0, 1.0/256);
 
+#endif
 }
 
 status_t
@@ -428,6 +448,20 @@ SonixCamDevice::GetParameterValue(int32 id, bigtime_t *last_change, void *value,
 			gains[2] = 1.0 + (float)fBGain / 8;
 			*last_change = fLastParameterChanges;
 			return B_OK;
+#if 0
+		case 1:
+			*size = sizeof(float);
+			gains = ((float *)value);
+			gains[0] = fContrast;
+			*last_change = fLastParameterChanges;
+			return B_OK;
+		case 2:
+			*size = sizeof(float);
+			gains = ((float *)value);
+			gains[0] = fBrightness;
+			*last_change = fLastParameterChanges;
+			return B_OK;
+#endif
 	}
 	return B_BAD_VALUE;
 }
@@ -473,6 +507,24 @@ SonixCamDevice::SetParameterValue(int32 id, bigtime_t when, const void *value, s
 			WriteReg(SN9C102_R_B_GAIN, buf, 2);
 #endif
 			return B_OK;
+#if 0
+		case 1:
+			if (!value || (size != sizeof(float)))
+				return B_BAD_VALUE;
+			gains = ((float *)value);
+			fContrast = gains[0];
+			WriteReg8(SN9C10x_CONTRAST, ((uint8)(fContrast * 256)));
+			return B_OK;
+		case 2:
+			if (!value || (size != sizeof(float)))
+				return B_BAD_VALUE;
+			gains = ((float *)value);
+			fBrightness = gains[0];
+			// it actually ends up writing to SN9C102_V_SIZE...
+			WriteReg8(SN9C10x_BRIGHTNESS, ((uint8)(fBrightness * 256)));
+			
+			return B_OK;
+#endif
 	}
 	return B_BAD_VALUE;
 }

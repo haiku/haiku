@@ -18,7 +18,7 @@ public:
 	virtual bool		Use400kHz() const { return false; };
 	virtual bool		UseRealIIC() const { return false; };
 	virtual uint8		IICReadAddress() const { return 0x00; };
-	virtual uint8		IICWriteAddress() const { return 0xff; };
+	virtual uint8		IICWriteAddress() const { return 0x11; /*0xff;*/ };
 	virtual int			MaxWidth() const { return 352; };
 	virtual int			MaxHeight() const { return 288; };
 	virtual status_t	SetVideoFrame(BRect rect);
@@ -71,10 +71,11 @@ TAS5110C1BSensor::Setup()
 		Device()->WriteReg8(SN9C102_PIX_CLK, 0xfb);	/* pixclk = 2 * masterclk, sensor is slave mode */
 	}
 	
-	//sonix_i2c_write_multi(dev, dev->sensor->i2c_wid, 2, 0xc0, 0x80, 0, 0, 0); /* AEC = 0x203 ??? */
-	Device()->WriteIIC8(0xc0, 0x80); /* AEC = 0x203 ??? */
 	
 	if (fIsSonix) {
+		//sonix_i2c_write_multi(dev, dev->sensor->i2c_wid, 2, 0xc0, 0x80, 0, 0, 0); /* AEC = 0x203 ??? */
+		Device()->WriteIIC8(0xc0, 0x80); /* AEC = 0x203 ??? */
+
 		// set crop
 		Device()->WriteReg8(SN9C102_H_SIZE, 69);
 		Device()->WriteReg8(SN9C102_V_SIZE, 9);
@@ -126,6 +127,7 @@ TAS5110C1BSensor::AddParameters(BParameterGroup *group, int32 &index)
 	CamSensor::AddParameters(group, index);
 
 #ifdef ENABLE_GAIN
+	// NON-FUNCTIONAL
 	p = group->MakeContinuousParameter(index++, 
 		B_MEDIA_RAW_VIDEO, "global gain", 
 		B_GAIN, "", (float)0x00, (float)0xf6, (float)1);
@@ -157,8 +159,19 @@ TAS5110C1BSensor::SetParameterValue(int32 id, bigtime_t when, const void *value,
 			return B_OK;
 		fGain = *(float *)value;
 		fLastParameterChanges = when;
-		PRINT((CH ": gain: %f (%d)" CT, fGain, (unsigned)(0xf6-fGain)));
-		Device()->WriteIIC8(0x20, (uint8)0xf6 - (uint8)fGain);
+		PRINT((CH ": gain: %f" CT, fGain));
+
+		if (fIsSonix) {
+			// some drivers do:
+			//Device()->WriteIIC8(0x20, (uint8)0xf6 - (uint8)fGain);
+			// but it doesn't seem to work
+		
+			// works, not sure why yet, XXX check datasheet for AEG/AEC
+			uint8 buf[2] = { 0x20, 0x70 };
+			buf[1] = (uint8)0xff - (uint8)fGain;
+			Device()->WriteIIC(0x02, buf, 2);
+		}
+
 		return B_OK;
 	}
 #endif

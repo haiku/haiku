@@ -81,10 +81,13 @@ http://www.smcc.demon.nl/webcam/ (philips)
 http://www.medias.ne.jp/~takam/bsd/NetBSD.html
 http://blognux.free.fr/sources/EasyCam2/04032006_19:49/
 http://www.wifi.com.ar/english/doc/webcam/ov511cameras.html
+http://mxhaard.free.fr/spca5xx.html
 
 * CMOS Sensor datasheets (rather, marketing buzz):
+http://mxhaard.free.fr/spca50x/Doc/ many
 http://www.tascorp.com.tw/product_file/TAS5110C1B_Brief_V0.3.pdf
 http://www.tascorp.com.tw/product_file/TAS5130D1B_Brief_V0.3.pdf
+http://www.mnementh.co.uk/sonix/hv7131e1.pdf
 Divio NW80x:
 http://www.digchip.com/datasheets/parts/datasheet/132/NW800.php
 http://www.digchip.com/datasheets/parts/datasheet/132/NW802.php

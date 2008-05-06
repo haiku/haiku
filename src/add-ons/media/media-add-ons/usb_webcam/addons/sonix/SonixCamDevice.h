@@ -40,6 +40,13 @@
 #define SN9C102_AE_ENDX		0x1e
 #define SN9C102_AE_ENDY		0x1f
 
+// extra regs ? maybe 103 or later only ? used by gspcav1
+#define SN9C10x_CONTRAST	0x84
+#define SN9C10x_BRIGHTNESS	0x96
+#undef SN9C102_REG_COUNT
+#define SN9C102_REG_COUNT	0x100
+
+
 #define SN9C102_RGB_GAIN_MAX	0x7f
 
 // This class represents each webcam
@@ -95,6 +102,8 @@ class SonixCamDevice : public CamDevice
 	uint8				fRGain;
 	uint8				fGGain;
 	uint8				fBGain;
+	float				fContrast;
+	float				fBrightness;
 };
 
 // the addon itself, that instanciate
