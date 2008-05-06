@@ -37,6 +37,17 @@ atomic_pointer_set(PointerType** _pointer, const PointerType* set)
 #endif
 }
 
+
+template<typename PointerType> PointerType*
+atomic_pointer_get(PointerType** _pointer)
+{
+#if LONG_MAX == INT_MAX
+	return (PointerType*)atomic_get((vint32*)_pointer);
+#else
+	return (PointerType*)atomic_get64((vint64*)_pointer);
+#endif
+}
+
 #endif	// __cplusplus
 
 #endif	/* _KERNEL_UTIL_ATOMIC_H */
