@@ -1,5 +1,7 @@
 #include "constants.h"
 
+#include <InterfaceDefs.h>
+
 // ------------------------------------------------------
 // PoorMan Window
 extern const char* STR_APP_SIG
