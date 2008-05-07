@@ -230,6 +230,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 				SetStatusMessage(status);
 			} else
 				SetStatusMessage(fLastStatus.String());
+			break;
 		}
 		case INSTALL_FINISHED:
 			DisableInterface(false);
