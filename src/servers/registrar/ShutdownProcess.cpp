@@ -1306,6 +1306,10 @@ ShutdownProcess::_WorkerDoShutdown()
 
 	// we're through: do the shutdown
 	_SetPhase(DONE_PHASE);
+	if (fReboot)
+		_SetShutdownWindowText("Restarting" B_UTF8_ELLIPSIS);
+	else
+		_SetShutdownWindowText("Shutting down" B_UTF8_ELLIPSIS);
 	_ShutDown();
 	_SetShutdownWindowWaitForShutdown();
 
