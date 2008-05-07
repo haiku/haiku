@@ -185,6 +185,19 @@ CamDevice::StopTransfer()
 
 
 status_t
+CamDevice::AcceptVideoFrame(uint32 &width, uint32 &height)
+{
+	status_t err = ENOSYS;
+	if (Sensor())
+		err = Sensor()->AcceptVideoFrame(width, height);
+	if (err < B_OK)
+		return err;
+	fVideoFrame = BRect(0, 0, width - 1, height - 1);
+	return B_OK;
+}
+
+
+status_t
 CamDevice::SetVideoFrame(BRect frame)
 {
 	fVideoFrame = frame;

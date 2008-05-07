@@ -28,10 +28,11 @@ class CamSensor
 	virtual bool		UseRealIIC() const { return true; };
 	virtual uint8		IICReadAddress() const { return 0; };
 	virtual uint8		IICWriteAddress() const { return 0; };
+
 	virtual int			MaxWidth() const { return -1; };
 	virtual int			MaxHeight() const { return -1; };
-	
-	
+
+	virtual status_t	AcceptVideoFrame(uint32 &width, uint32 &height);
 	virtual status_t	SetVideoFrame(BRect rect);
 	virtual BRect		VideoFrame() const { return fVideoFrame; };
 	virtual status_t	SetVideoParams(float brightness, float contrast, float hue, float red, float green, float blue);

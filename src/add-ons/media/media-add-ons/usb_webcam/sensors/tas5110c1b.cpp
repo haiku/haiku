@@ -19,8 +19,11 @@ public:
 	virtual bool		UseRealIIC() const { return false; };
 	virtual uint8		IICReadAddress() const { return 0x00; };
 	virtual uint8		IICWriteAddress() const { return 0x11; /*0xff;*/ };
+
 	virtual int			MaxWidth() const { return 352; };
 	virtual int			MaxHeight() const { return 288; };
+
+	virtual status_t	AcceptVideoFrame(uint32 &width, uint32 &height);
 	virtual status_t	SetVideoFrame(BRect rect);
 	virtual void		AddParameters(BParameterGroup *group, int32 &firstID);
 	virtual status_t	GetParameterValue(int32 id, bigtime_t *last_change, void *value, size_t *size);
@@ -31,7 +34,7 @@ private:
 	float	fGain;
 };
 
-// -----------------------------------------------------------------------------
+
 TAS5110C1BSensor::TAS5110C1BSensor(CamDevice *_camera)
 : CamSensor(_camera)
 {
@@ -45,12 +48,12 @@ TAS5110C1BSensor::TAS5110C1BSensor(CamDevice *_camera)
 	fGain = (float)0x40; // default
 }
 
-// -----------------------------------------------------------------------------
+
 TAS5110C1BSensor::~TAS5110C1BSensor()
 {
 }
 
-// -----------------------------------------------------------------------------
+
 status_t
 TAS5110C1BSensor::Setup()
 {
@@ -93,14 +96,30 @@ TAS5110C1BSensor::Setup()
 	return B_OK;
 }
 					
-// -----------------------------------------------------------------------------
+
 const char *
 TAS5110C1BSensor::Name()
 {
 	return "TASC tas5110c1b";
 }
 
-// -----------------------------------------------------------------------------
+
+status_t
+TAS5110C1BSensor::AcceptVideoFrame(uint32 &width, uint32 &height)
+{
+	// default sanity checks
+	status_t err = CamSensor::AcceptVideoFrame(width, height);
+	if (err < B_OK)
+		return err;
+	// must be modulo 16
+	width /= 16;
+	width *= 16;
+	height /= 16;
+	height *= 16;
+	return B_OK;
+}
+
+
 status_t
 TAS5110C1BSensor::SetVideoFrame(BRect rect)
 {
@@ -120,6 +139,7 @@ TAS5110C1BSensor::SetVideoFrame(BRect rect)
 	return B_OK;
 }
 
+
 void
 TAS5110C1BSensor::AddParameters(BParameterGroup *group, int32 &index)
 {
@@ -128,7 +148,8 @@ TAS5110C1BSensor::AddParameters(BParameterGroup *group, int32 &index)
 
 #ifdef ENABLE_GAIN
 	// NON-FUNCTIONAL
-	p = group->MakeContinuousParameter(index++, 
+	BParameterGroup *g = group->MakeGroup("global gain");
+	p = g->MakeContinuousParameter(index++, 
 		B_MEDIA_RAW_VIDEO, "global gain", 
 		B_GAIN, "", (float)0x00, (float)0xf6, (float)1);
 #endif
@@ -147,6 +168,7 @@ TAS5110C1BSensor::GetParameterValue(int32 id, bigtime_t *last_change, void *valu
 #endif
 	return B_BAD_VALUE;
 }
+
 
 status_t
 TAS5110C1BSensor::SetParameterValue(int32 id, bigtime_t when, const void *value, size_t size)
@@ -179,6 +201,6 @@ TAS5110C1BSensor::SetParameterValue(int32 id, bigtime_t when, const void *value,
 }
 
 
-// -----------------------------------------------------------------------------
+
 B_WEBCAM_DECLARE_SENSOR(TAS5110C1BSensor, tas5110c1b)
 

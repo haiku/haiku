@@ -20,6 +20,14 @@
 #include "CamDevice.h"
 #include "CamSensor.h"
 
+// don't separate parameters from addon, device and sensor
+#define SINGLE_PARAMETER_GROUP 1
+
+// CodyCam and eXposer prefer 320x240
+//#define FORCE_320_240 1
+//#define FORCE_160_120 1
+//#define FORCE_MAX_FRAME 1
+
 #define TOUCH(x) ((void)(x))
 
 #define PRINTF(a,b) \
@@ -32,7 +40,9 @@
 
 #include "Producer.h"
 
-#define FIELD_RATE 30.f
+//#define FIELD_RATE 30.f
+//#define FIELD_RATE 29.97f
+#define FIELD_RATE 5.f
 
 int32 VideoProducer::fInstances = 0;
 
@@ -139,27 +149,40 @@ VideoProducer::NodeRegistered()
 		return;
 	}
 
-	int32 id = P_COLOR;
 	/* Set up the parameter web */
 	
 	//TODO: remove and put sensible stuff there
 	BParameterWeb *web = new BParameterWeb();
 	BParameterGroup *main = web->MakeGroup(Name());
-	BDiscreteParameter *state = main->MakeDiscreteParameter(
-			P_COLOR, B_MEDIA_RAW_VIDEO, "Color", "Color");
+	BParameterGroup *g;
 
-	id++;
-	if (fCamDevice) {
-		BParameterGroup *dev = web->MakeGroup("Device");
-		fCamDevice->AddParameters(dev, id);
-		if (fCamDevice->Sensor()) {
-			BParameterGroup *sensor = web->MakeGroup("Sensor");
-			fCamDevice->Sensor()->AddParameters(sensor, id);
-		}
-	}
+	/*
+	g = main->MakeGroup("Color");
+	BDiscreteParameter *state = g->MakeDiscreteParameter(
+			P_COLOR, B_MEDIA_RAW_VIDEO, "Color", "Color");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x00ff0000), "Red");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x0000ff00), "Green");
 	state->AddItem(B_HOST_TO_LENDIAN_INT32(0x000000ff), "Blue");
+	*/
+
+	BParameter *p;
+	g = main->MakeGroup("Info");
+	p = g->MakeTextParameter(
+		P_INFO, B_MEDIA_RAW_VIDEO, "", "Info", 256);
+
+	int32 id = P_LAST;
+	if (fCamDevice) {
+#ifndef SINGLE_PARAMETER_GROUP
+		main = web->MakeGroup("Device");
+#endif
+		fCamDevice->AddParameters(main, id);
+		if (fCamDevice->Sensor()) {
+#ifndef SINGLE_PARAMETER_GROUP
+			main = web->MakeGroup("Sensor");
+#endif
+			fCamDevice->Sensor()->AddParameters(main, id);
+		}
+	}
 
 	fColor = B_HOST_TO_LENDIAN_INT32(0x00ff0000);
 	fLastColorChange = system_time();
@@ -179,7 +202,7 @@ VideoProducer::NodeRegistered()
 	fOutput.format.u.raw_video = media_raw_video_format::wildcard;
 	fOutput.format.u.raw_video.interlace = 1;
 	fOutput.format.u.raw_video.display.format = B_RGB32;
-	fOutput.format.u.raw_video.field_rate = 29.97f; // XXX: mmu
+	fOutput.format.u.raw_video.field_rate = FIELD_RATE; // XXX: mmu
 
 	/* Start the BMediaEventLooper control loop running */
 	Run();
@@ -285,8 +308,16 @@ VideoProducer::FormatSuggestionRequested(
 
 	TOUCH(quality);
 
+	PRINTF(1, ("FormatSuggestionRequested() %ldx%ld\n", \
+			format->u.raw_video.display.line_width, \
+			format->u.raw_video.display.line_count));
+
 	*format = fOutput.format;
-	format->u.raw_video.field_rate = 29.97f;
+	if (fCamDevice && fCamDevice->Sensor()) {
+		format->u.raw_video.display.line_width = fCamDevice->Sensor()->MaxWidth();
+		format->u.raw_video.display.line_count = fCamDevice->Sensor()->MaxHeight();
+	}
+	format->u.raw_video.field_rate = FIELD_RATE;
 	return B_OK;
 }
 
@@ -301,9 +332,30 @@ VideoProducer::FormatProposal(const media_source &output, media_format *format)
 	if (output != fOutput.source)
 		return B_MEDIA_BAD_SOURCE;
 
+	PRINTF(1, ("FormatProposal() %ldx%ld\n", \
+			format->u.raw_video.display.line_width, \
+			format->u.raw_video.display.line_count));
+
 	err = format_is_compatible(*format, fOutput.format) ?
 			B_OK : B_MEDIA_BAD_FORMAT;
+
+	uint32 width = format->u.raw_video.display.line_width; 
+	uint32 height = format->u.raw_video.display.line_count;
+
 	*format = fOutput.format;
+
+	if (err == B_OK && fCamDevice) {
+		err = fCamDevice->AcceptVideoFrame(width, height);
+		if (err >= B_OK) {
+			format->u.raw_video.display.line_width = width;
+			format->u.raw_video.display.line_count = height;
+		}
+	}
+
+	PRINTF(1, ("FormatProposal: %ldx%ld\n", \
+			format->u.raw_video.display.line_width, \
+			format->u.raw_video.display.line_count));
+
 	return err;
 		
 }
@@ -374,7 +426,7 @@ VideoProducer::PrepareToConnect(const media_source &source,
 		const media_destination &destination, media_format *format,
 		media_source *out_source, char *out_name)
 {
-//	status_t err;
+	status_t err;
 
 	PRINTF(1, ("PrepareToConnect() %ldx%ld\n", \
 			format->u.raw_video.display.line_width, \
@@ -399,7 +451,7 @@ VideoProducer::PrepareToConnect(const media_source &source,
 	}
 
 //XXX:FIXME
-#if 1
+#if 0
 //	if (format->u.raw_video.display.line_width == 0)
 		format->u.raw_video.display.line_width = 352;//320;
 		format->u.raw_video.display.line_width = 320;
@@ -408,13 +460,34 @@ VideoProducer::PrepareToConnect(const media_source &source,
 		format->u.raw_video.display.line_count = 240;
 #endif
 
+#ifdef FORCE_320_240
+	{
+		format->u.raw_video.display.line_width = 320;
+		format->u.raw_video.display.line_count = 240;
+	}
+#endif
+#ifdef FORCE_160_120
+	{
+		format->u.raw_video.display.line_width = 160;
+		format->u.raw_video.display.line_count = 120;
+	}
+#endif
+#ifdef FORCE_MAX_FRAME
+	{
+		format->u.raw_video.display.line_width = 0;
+		format->u.raw_video.display.line_count = 0;
+	}
+#endif
 	if (fCamDevice) {
-		format->u.raw_video.display.line_width = fCamDevice->VideoFrame().IntegerWidth() + 1;
-		format->u.raw_video.display.line_count = fCamDevice->VideoFrame().IntegerHeight() + 1;
+		err = fCamDevice->AcceptVideoFrame(
+			format->u.raw_video.display.line_width,
+			format->u.raw_video.display.line_count);
+		if (err < B_OK)
+			return err;
 	}
 
 	if (format->u.raw_video.field_rate == 0)
-		format->u.raw_video.field_rate = 29.97f;
+		format->u.raw_video.field_rate = FIELD_RATE;
 
 	*out_source = fOutput.source;
 	strcpy(out_name, fOutput.name);
@@ -584,13 +657,21 @@ VideoProducer::GetParameterValue(
 {
 	status_t err;
 
-	if (id == P_COLOR) {
-		//return B_BAD_VALUE;
+	switch (id) {
+		case P_COLOR:
+			//return B_BAD_VALUE;
 
-		*last_change = fLastColorChange;
-		*size = sizeof(uint32);
-		*((uint32 *)value) = fColor;
-		return B_OK;
+			*last_change = fLastColorChange;
+			*size = sizeof(uint32);
+			*((uint32 *)value) = fColor;
+			return B_OK;
+		case P_INFO:
+			if (*size < fInfoString.Length() + 1)
+				return EINVAL;
+			*last_change = fLastColorChange;
+			*size = fInfoString.Length() + 1;
+			memcpy(value, fInfoString.String(), *size);
+			return B_OK;
 	}
 
 	if (fCamDevice) {
@@ -614,22 +695,29 @@ VideoProducer::SetParameterValue(
 {
 	status_t err = B_OK;
 
-	if (id == P_COLOR) {
-		if (!value || (size != sizeof(uint32)))
+	switch (id) {
+		case P_COLOR:
+			if (!value || (size != sizeof(uint32)))
+				return;
+
+			if (*(uint32 *)value == fColor)
+				return;
+
+			fColor = *(uint32 *)value;
+			fLastColorChange = when;
+			break;
+		case P_INFO:
+			// forbidden
 			return;
+		default:
+			if (fCamDevice == NULL)
+				return;
 
-		if (*(uint32 *)value == fColor)
-			return;
-
-		fColor = *(uint32 *)value;
-		fLastColorChange = when;
-
-	} else if (fCamDevice) {
-		BAutolock lock(fCamDevice->Locker());
-		err = fCamDevice->SetParameterValue(id, when, value, size);
-		if ((err < B_OK) && (fCamDevice->Sensor())) {
-			err = fCamDevice->Sensor()->SetParameterValue(id, when, value, size);
-		}
+			BAutolock lock(fCamDevice->Locker());
+			err = fCamDevice->SetParameterValue(id, when, value, size);
+			if ((err < B_OK) && (fCamDevice->Sensor())) {
+				err = fCamDevice->Sensor()->SetParameterValue(id, when, value, size);
+			}
 	}
 
 	if (err >= B_OK)
@@ -724,6 +812,24 @@ VideoProducer::HandleSeek(bigtime_t performance_time)
 	release_sem(fFrameSync);
 }
 
+void
+VideoProducer::_UpdateStats()
+{
+	float fps = (fStats[0].frames - fStats[1].frames) * 1000000LL
+				/ (double)(fStats[0].stamp - fStats[1].stamp);
+	float rfps = (fStats[0].actual - fStats[1].actual) * 1000000LL
+				/ (double)(fStats[0].stamp - fStats[1].stamp);
+	fInfoString = "FPS: ";
+	fInfoString << fps << " virt, "
+		<< rfps << " real, missed: " << fStats[0].missed;
+	memcpy(&fStats[1], &fStats[0], sizeof(fStats[0]));
+	fLastColorChange = system_time();
+	BroadcastNewParameterValue(fLastColorChange, P_INFO, 
+		(void *)fInfoString.String(), fInfoString.Length()+1);
+}
+
+
+
 /* The following functions form the thread that generates frames. You should
  * replace this with the code that interfaces to your hardware. */
 int32 
@@ -752,6 +858,7 @@ VideoProducer::FrameGenerator()
 						((fFrame - fFrameBase) *
 						(1000000 / fConnectedFormat.field_rate)) -
 				fProcessingLatency;
+PRINT(("PS: %Ld\n", fProcessingLatency));
 
 		/* Drop frame if it's at least a frame late */
 		if (wait_until < system_time())
@@ -822,11 +929,13 @@ VideoProducer::FrameGenerator()
 		//NO! must be called without lock!
 		//BAutolock lock(fCamDevice->Locker());
 		
+		bigtime_t now = system_time();
 		bigtime_t stamp;
 //#ifdef UseFillFrameBuffer
 		err = fCamDevice->FillFrameBuffer(buffer, &stamp);
 		if (err < B_OK) {
 			;//XXX handle error
+			fStats[0].missed++;
 		}
 //#endif
 #ifdef UseGetFrameBitmap
@@ -834,12 +943,23 @@ VideoProducer::FrameGenerator()
 		err = fCamDevice->GetFrameBitmap(&bm, &stamp);
 		if (err >= B_OK) {
 			;//XXX handle error
+			fStats[0].missed++;
 		}
 #endif
+		fStats[0].frames = fFrame;
+		fStats[0].actual++;;
+		fStats[0].stamp = system_time();
+
 		//PRINTF(1, ("FrameGenerator: stamp %Ld vs %Ld\n", stamp, h->start_time));
 		//XXX: that's what we should be doing, but CodyCam drops all frames as they are late. (maybe add latency ??)
 		//h->start_time = TimeSource()->PerformanceTimeFor(stamp);
 		h->start_time = TimeSource()->PerformanceTimeFor(system_time());
+
+
+		// update processing latency
+		// XXX: should I ??
+		fProcessingLatency = system_time() - now;
+		fProcessingLatency /= 10;
 
 		PRINTF(1, ("FrameGenerator: SendBuffer...\n"));
 		/* Send the buffer on down to the consumer */
@@ -849,6 +969,8 @@ VideoProducer::FrameGenerator()
 			 * buffer group. */
 			buffer->Recycle();
 		}
+
+		_UpdateStats();
 	}
 
 	PRINTF(1, ("FrameGenerator: thread existed.\n"));

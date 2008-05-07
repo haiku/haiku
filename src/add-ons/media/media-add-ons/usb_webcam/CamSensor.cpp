@@ -66,6 +66,22 @@ CamSensor::StopTransfer()
 
 
 status_t
+CamSensor::AcceptVideoFrame(uint32 &width, uint32 &height)
+{
+	// minimum sanity
+	if (width < 1)
+		width = MaxWidth();
+	if (height < 1)
+		height = MaxHeight();
+	if (width > MaxWidth())
+		width = MaxWidth();
+	if (height > MaxHeight())
+		height = MaxHeight();
+	return B_OK;
+}
+
+
+status_t
 CamSensor::SetVideoFrame(BRect rect)
 {
 	return ENOSYS;

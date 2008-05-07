@@ -8,8 +8,11 @@
 #include <media/MediaEventLooper.h>
 #include <media/MediaNode.h>
 #include <support/Locker.h>
+#include <support/String.h>
 
 class CamDevice;
+class BParameter;
+class BTextParameter;
 
 class VideoProducer :
 	public virtual BMediaEventLooper,
@@ -106,6 +109,8 @@ private:
 		void				HandleTimeWarp(bigtime_t performance_time);
 		void				HandleSeek(bigtime_t performance_time);
 
+		void				_UpdateStats();
+
 static	int32				fInstances;
 
 		status_t			fInitStatus;
@@ -134,9 +139,21 @@ static	int32				_frame_generator_(void *data);
 		bool				fConnected;
 		bool				fEnabled;
 
-		enum				{ P_COLOR };
+		enum {
+			 P_COLOR,
+			 P_INFO,
+			 P_LAST			// first available for addons
+		};
 		uint32				fColor;
-		bigtime_t			fLastColorChange;
+		BString				fInfoString;
+		bigtime_t			fLastColorChange;	// TODO: rename
+
+		struct {
+			uint32 frames;
+			uint32 actual;
+			uint32 missed;
+			bigtime_t stamp;
+		}					fStats[2];
 };
 
 #endif

@@ -54,6 +54,9 @@ controls ?
 
 References and other drivers of interest:
 
+* Logitech opensource effort:
+http://www.quickcamteam.net/
+
 * Sonix linux drivers (several of them):
 http://sourceforge.net/projects/sonix/ -- http://sonix.sourceforge.net/
 http://freshmeat.net/projects/sonic-snap/?branch_id=55324&release_id=183982

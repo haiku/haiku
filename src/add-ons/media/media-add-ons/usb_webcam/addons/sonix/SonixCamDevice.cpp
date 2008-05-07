@@ -163,7 +163,7 @@ SonixCamDevice::StartTransfer()
 	
 	SetScale(1);
 	if (Sensor())
-		SetVideoFrame(BRect(0, 0, Sensor()->MaxWidth()-1, Sensor()->MaxHeight()-1));
+		SetVideoFrame(fVideoFrame);
 	
 	//SetVideoFrame(BRect(0, 0, 320-1, 240-1));
 
