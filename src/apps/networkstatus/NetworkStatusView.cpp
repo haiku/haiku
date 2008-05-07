@@ -59,11 +59,10 @@ extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 
 const uint32 kMsgUpdate = 'updt';
 const uint32 kMsgShowConfiguration = 'shcf';
+const uint32 kMsgOpenNetworkPreferences = 'onwp';
 
 const uint32 kMinIconWidth = 16;
 const uint32 kMinIconHeight = 16;
-
-const uint32 kOpenNetworkPref = 'onwp';
 
 const bigtime_t kUpdateInterval = 1000000;
 	// every second
@@ -235,7 +234,7 @@ NetworkStatusView::MessageReceived(BMessage* message)
 			_ShowConfiguration(message);
 			break;
 
-		case kOpenNetworkPref:
+		case kMsgOpenNetworkPreferences:
 			_OpenNetworksPreferences();
 			break;
 
@@ -362,7 +361,7 @@ NetworkStatusView::MouseDown(BPoint point)
 	menu->AddItem(new BMenuItem("About NetworkStatus" B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddItem(new BMenuItem("Open Networks Preferences" B_UTF8_ELLIPSIS,
-		new BMessage(kOpenNetworkPref)));
+		new BMessage(kMsgOpenNetworkPreferences)));
 
 	if (fInDeskbar)
 		menu->AddItem(new BMenuItem("Quit", new BMessage(B_QUIT_REQUESTED)));
