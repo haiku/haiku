@@ -572,7 +572,7 @@ VideoConsumer::HandleEvent(const media_timed_event* event, bigtime_t lateness,
 								*p = (*p >> 3) & 0x1f1f1f1f;									
 						}
 
-						fView->DrawBitmap(fBitmap[index]);
+						fView->DrawBitmap(fBitmap[index], fView->Bounds());
 						fWindow->Unlock();
 					}
 				}
