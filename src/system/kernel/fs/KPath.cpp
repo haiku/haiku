@@ -25,7 +25,7 @@ KPath::KPath(size_t bufferSize)
 	fPathLength(0),
 	fLocked(false)
 {
-	SetTo(NULL, bufferSize);
+	SetTo(NULL, false, bufferSize);
 }
 
 
