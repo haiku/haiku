@@ -553,8 +553,13 @@ Rule::Dump()
 
 
 RuleMatcher::RuleMatcher(team_id team, const char *name)
+	:
+	fRules(NULL)
 {
 	recursive_lock_lock(&sLock);
+
+	if (name == NULL)
+		return;
 
 	fRules = (team_rules *)hash_lookup(sTeamHash, &team);
 	if (fRules != NULL)
