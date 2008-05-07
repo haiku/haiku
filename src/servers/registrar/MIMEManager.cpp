@@ -205,7 +205,7 @@ MIMEManager::MessageReceived(BMessage *message)
 			
 			status_t threadStatus = B_NO_INIT;
 			bool messageIsDetached = false;
-			bool stillOwnThread = true;
+			bool stillOwnsThread = true;
 			
 			// Gather our arguments
 			err = message->FindRef("entry", &root);
@@ -253,7 +253,7 @@ MIMEManager::MessageReceived(BMessage *message)
 			if (!err) {
 				err = fThreadManager.LaunchThread(thread);
 				if (!err) {
-					stillOwnThread = false;
+					stillOwnsThread = false;
 				}
 			}
 				
@@ -272,7 +272,7 @@ MIMEManager::MessageReceived(BMessage *message)
 			if (messageIsDetached && threadStatus != B_OK)
 				delete message;
 			// Delete the thread if necessary
-			if (stillOwnThread)
+			if (stillOwnsThread)
 				delete thread;
 			break;
 		}
