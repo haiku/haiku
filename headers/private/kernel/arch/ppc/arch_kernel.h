@@ -20,9 +20,10 @@
 ** region wont be placed there. The 64kb region assures a user space thread cannot pass
 ** a buffer into the kernel as part of a syscall that would cross into kernel space.
 */
-#define USER_BASE   0x100000
-#define USER_SIZE   (0x80000000 - (0x10000 + 0x100000))
-#define USER_TOP    (USER_BASE + USER_SIZE)
+#define USER_BASE     0x100000
+#define USER_BASE_ANY USER_BASE
+#define USER_SIZE     (0x80000000 - (0x10000 + 0x100000))
+#define USER_TOP      (USER_BASE + USER_SIZE)
 
 #define USER_STACK_REGION 0x70000000
 #define USER_STACK_REGION_SIZE (USER_BASE + (USER_SIZE - USER_STACK_REGION))

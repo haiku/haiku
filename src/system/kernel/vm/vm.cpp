@@ -1139,12 +1139,11 @@ second_chance:
 }
 
 
-/**	This inserts the area you pass into the specified address space.
- *	It will also set the "_address" argument to its base address when
- *	the call succeeds.
- *	You need to hold the vm_address_space semaphore.
- */
-
+/*!	This inserts the area you pass into the specified address space.
+	It will also set the "_address" argument to its base address when
+	the call succeeds.
+	You need to hold the vm_address_space semaphore.
+*/
 static status_t
 insert_area(vm_address_space *addressSpace, void **_address,
 	uint32 addressSpec, addr_t size, vm_area *area)
@@ -1167,6 +1166,10 @@ insert_area(vm_address_space *addressSpace, void **_address,
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 			searchBase = addressSpace->base;
+			// TODO: remove this again when vm86 mode is moved into the kernel
+			// completely (currently needs a userland address space!)
+			if (searchBase == USER_BASE)
+				searchBase = USER_BASE_ANY;
 			searchEnd = addressSpace->base + (addressSpace->size - 1);
 			break;
 
@@ -1175,7 +1178,7 @@ insert_area(vm_address_space *addressSpace, void **_address,
 	}
 
 	status = find_and_insert_area_slot(addressSpace, searchBase, size,
-				searchEnd, addressSpec, area);
+		searchEnd, addressSpec, area);
 	if (status == B_OK) {
 		// ToDo: do we have to do anything about B_ANY_KERNEL_ADDRESS
 		//		vs. B_ANY_KERNEL_BLOCK_ADDRESS here?
