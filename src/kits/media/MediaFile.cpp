@@ -12,7 +12,7 @@
  *    and/or other materials provided with the distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
  * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
  * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
@@ -82,7 +82,7 @@ BMediaFile::BMediaFile(const entry_ref *ref,
 	InitWriter(new BFile(ref, O_WRONLY), mfi, flags);
 }
 
-					   
+
 BMediaFile::BMediaFile(BDataIO	*destination,
 					   const media_file_format * mfi,
 					   int32 flags)
@@ -121,7 +121,7 @@ BMediaFile::SetTo(BDataIO *destination)
 BMediaFile::~BMediaFile()
 {
 	CALLED();
-	
+
 	ReleaseAllTracks();
 	delete[] fTrackList;
 	delete fExtractor;
@@ -130,7 +130,7 @@ BMediaFile::~BMediaFile()
 }
 
 
-status_t 
+status_t
 BMediaFile::InitCheck() const
 {
 	CALLED();
@@ -139,7 +139,7 @@ BMediaFile::InitCheck() const
 
 
 // Get info about the underlying file format.
-status_t 
+status_t
 BMediaFile::GetFileFormatInfo(media_file_format *mfi) const
 {
 	CALLED();
@@ -153,8 +153,7 @@ BMediaFile::GetFileFormatInfo(media_file_format *mfi) const
 const char *
 BMediaFile::Copyright(void) const
 {
-	UNIMPLEMENTED();
-	return "";
+	return fExtractor->Copyright();
 }
 
 
@@ -205,7 +204,7 @@ BMediaFile::ReleaseTrack(BMediaTrack *track)
 }
 
 
-status_t 
+status_t
 BMediaFile::ReleaseAllTracks(void)
 {
 	CALLED();
@@ -224,7 +223,7 @@ BMediaFile::ReleaseAllTracks(void)
 
 // Create and add a track to the media file
 BMediaTrack	*
-BMediaFile::CreateTrack(media_format *mf, 
+BMediaFile::CreateTrack(media_format *mf,
 						const media_codec_info *mci,
 						uint32 flags)
 {
@@ -244,7 +243,7 @@ BMediaFile::CreateTrack(media_format *mf, uint32 flags)
 // For BeOS R5 compatibility
 extern "C" BMediaTrack * CreateTrack__10BMediaFileP12media_formatPC16media_codec_info(
 	BMediaFile *self, media_format *mf, const media_codec_info *mci);
-BMediaTrack * 
+BMediaTrack *
 CreateTrack__10BMediaFileP12media_formatPC16media_codec_info(
 		BMediaFile *self,
 		media_format *mf,
@@ -257,7 +256,7 @@ CreateTrack__10BMediaFileP12media_formatPC16media_codec_info(
 // For BeOS R5 compatibility
 extern "C" BMediaTrack * CreateTrack__10BMediaFileP12media_format(
 	BMediaFile *self, media_format *mf);
-BMediaTrack * 
+BMediaTrack *
 CreateTrack__10BMediaFileP12media_format(
 		BMediaFile *self,
 		media_format *mf)
@@ -345,7 +344,7 @@ BMediaFile::GetParameterView()
 }
 
 
-/* virtual */ status_t 
+/* virtual */ status_t
 BMediaFile::Perform(int32 selector, void * data)
 {
 	UNIMPLEMENTED();
@@ -366,7 +365,7 @@ BMediaFile::ControlFile(int32 selector, void * io_data, size_t size)
  *************************************************************/
 
 
-void 
+void
 BMediaFile::Init()
 {
 	CALLED();
@@ -386,18 +385,18 @@ BMediaFile::Init()
 }
 
 
-void 
+void
 BMediaFile::InitReader(BDataIO *source, int32 flags)
 {
 	CALLED();
-	
+
 	fSource = source;
-	
+
 	fExtractor = new MediaExtractor(source, flags);
 	fErr = fExtractor->InitCheck();
 	if (fErr)
 		return;
-		
+
 	fExtractor->GetFileFormatInfo(&fMFI);
 	fTrackNum = fExtractor->StreamCount();
 	fTrackList = new BMediaTrack *[fTrackNum];

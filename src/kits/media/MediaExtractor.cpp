@@ -1,5 +1,6 @@
-/* 
+/*
 ** Copyright 2004-2007, Marcus Overhagen. All rights reserved.
+** Copyright 2008, Maurice Kalinowski. All rights reserved.
 ** Distributed under the terms of the MIT License.
 */
 #include "MediaExtractor.h"
@@ -71,7 +72,7 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 				"stream %ld failed\n", i);
 		}
 	}
-	
+
 #if DISABLE_CHUNK_CACHE == 0
 	// start extractor thread
 	fExtractorWaitSem = create_sem(1, "media extractor thread sem");
@@ -85,7 +86,7 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 MediaExtractor::~MediaExtractor()
 {
 	CALLED();
-	
+
 	// terminate extractor thread
 	fTerminateExtractor = true;
 	release_sem(fExtractorWaitSem);
@@ -132,6 +133,13 @@ MediaExtractor::StreamCount()
 }
 
 
+const char*
+MediaExtractor::Copyright()
+{
+	return fReader->Copyright();
+}
+
+
 const media_format *
 MediaExtractor::EncodedFormat(int32 stream)
 {
@@ -148,7 +156,7 @@ MediaExtractor::CountFrames(int32 stream) const
 	media_format format;
 	const void *infoBuffer;
 	size_t infoSize;
-	
+
 	fReader->GetStreamInfo(fStreamInfo[stream].cookie, &frameCount, &duration,
 		&format, &infoBuffer, &infoSize);
 
@@ -165,7 +173,7 @@ MediaExtractor::Duration(int32 stream) const
 	media_format format;
 	const void *infoBuffer;
 	size_t infoSize;
-	
+
 	fReader->GetStreamInfo(fStreamInfo[stream].cookie, &frameCount, &duration,
 		&format, &infoBuffer, &infoSize);
 
@@ -180,16 +188,16 @@ MediaExtractor::Seek(int32 stream, uint32 seekTo,
 	CALLED();
 	if (fStreamInfo[stream].status != B_OK)
 		return fStreamInfo[stream].status;
-	
+
 	status_t result;
 	result = fReader->Seek(fStreamInfo[stream].cookie, seekTo, frame, time);
 	if (result != B_OK)
 		return result;
-	
+
 	// clear buffered chunks
 	fStreamInfo[stream].chunkCache->MakeEmpty();
 	release_sem(fExtractorWaitSem);
-	
+
 	return B_OK;
 }
 
@@ -201,7 +209,7 @@ MediaExtractor::FindKeyFrame(int32 stream, uint32 seekTo, int64 *frame,
 	CALLED();
 	if (fStreamInfo[stream].status != B_OK)
 		return fStreamInfo[stream].status;
-	
+
 	return fReader->FindKeyFrame(fStreamInfo[stream].cookie,
 		seekTo, frame, time);
 }
@@ -219,7 +227,7 @@ MediaExtractor::GetNextChunk(int32 stream,
 	static BLocker locker;
 	BAutolock lock(locker);
 	return fReader->GetNextChunk(fStreamInfo[stream].cookie, chunkBuffer,
-		chunkSize, mediaHeader); 
+		chunkSize, mediaHeader);
 #endif
 
 	status_t err;
@@ -240,7 +248,7 @@ public:
 		fExtractor = extractor;
 		fStream = stream;
 	}
-	
+
 	virtual status_t GetNextChunk(const void **chunkBuffer, size_t *chunkSize,
 	                              media_header *mediaHeader)
 	{
@@ -264,7 +272,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder,
 			"stream %ld\n", stream);
 		return res;
 	}
-	
+
 	res = _plugin_manager.CreateDecoder(&decoder,
 		fStreamInfo[stream].encodedFormat);
 	if (res != B_OK) {
@@ -283,7 +291,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder,
 	}
 
 	decoder->SetChunkProvider(chunkProvider);
-	
+
 	res = decoder->Setup(&fStreamInfo[stream].encodedFormat,
 		fStreamInfo[stream].infoBuffer, fStreamInfo[stream].infoBufferSize);
 	if (res != B_OK) {
@@ -321,7 +329,7 @@ MediaExtractor::ExtractorThread()
 		acquire_sem(fExtractorWaitSem);
 		if (fTerminateExtractor)
 			return;
-		
+
 		bool refill_done;
 		do {
 			refill_done = false;
