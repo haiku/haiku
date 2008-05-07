@@ -39,8 +39,6 @@ const int32 kMenuHeight = 15;
 const int32 kButtonHeight = 15;
 const int32 kSliderViewRectHeight = 40;
 
-const rgb_color kViewGray = {216, 216, 216, 255};
-
 static void ErrorAlert(const char* message, status_t err);
 static status_t AddTranslationItems(BMenu* intoMenu, uint32 fromType);
 
@@ -477,7 +475,7 @@ VideoWindow::VideoWindow (BRect frame, const char* title, window_type type, uint
 	aRect.OffsetTo(B_ORIGIN);
 	aRect.top += menuBar->Frame().Height() + 1;
 	fView	= new BView(aRect, "Background View", B_FOLLOW_ALL, B_WILL_DRAW);
-	fView->SetViewColor(kViewGray);
+	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(fView);
 	
 	/* add some controls */

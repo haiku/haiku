@@ -322,6 +322,8 @@ VideoConsumer::CreateBuffers(const media_format& withFormat)
 	else
 		ERROR("VideoConsumer::CreateBuffers ERROR IN GET BUFFER LIST\n");
 
+	fFtpBitmap = new BBitmap(BRect(0, 0, xSize - 1, ySize - 1), B_RGB32, false, false);
+
 	FUNCTION("VideoConsumer::CreateBuffers - EXIT\n");
 	return status;
 }
@@ -368,7 +370,6 @@ VideoConsumer::Connected(const media_source& producer, const media_destination& 
 		return B_ERROR;
 	}
 
-	fFtpBitmap = new BBitmap(BRect(0, 0, 320 - 1, 240 - 1), B_RGB32, false, false);
 	fConnectionActive = true;
 
 	FUNCTION("VideoConsumer::Connected - EXIT\n");
