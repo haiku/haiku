@@ -10,14 +10,18 @@ SimpleTest flock_test
 	: flock_test.cpp
 ;
 
-SimpleTest signal_test
-	: signal_test.cpp
+SimpleTest realtime_sem_test1
+	: realtime_sem_test1.cpp
 ;
 
 SimpleTest setpgid_test : setpgid_test.cpp ;
 
 SimpleTest setjmp_test
 	: setjmp_test.c
+;
+
+SimpleTest signal_test
+	: signal_test.cpp
 ;
 
 SimpleTest sigsetjmp_test
