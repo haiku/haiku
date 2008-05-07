@@ -14,9 +14,17 @@
 
 
 #define MAKE_RATE(base, multiply, divide) \
-	((base == 44100 ? FMT_44_1_BASE_RATE : 0) \
-		| ((multiply - 1) << FMT_MULTIPLY_RATE_SHIFT) \
-		| ((divide - 1) << FMT_DIVIDE_RATE_SHIFT))
+	((base == 44100 ? FORMAT_44_1_BASE_RATE : 0) \
+		| ((multiply - 1) << FORMAT_MULTIPLY_RATE_SHIFT) \
+		| ((divide - 1) << FORMAT_DIVIDE_RATE_SHIFT))
+
+#define HDAC_INPUT_STREAM_OFFSET(controller, index) \
+	((index) * HDAC_STREAM_SIZE)
+#define HDAC_OUTPUT_STREAM_OFFSET(controller, index) \
+	(((controller)->num_input_streams + (index)) * HDAC_STREAM_SIZE)
+#define HDAC_BIDIR_STREAM_OFFSET(controller, index) \
+	(((controller)->num_input_streams + (controller)->num_output_streams \
+		+ (index)) * HDAC_STREAM_SIZE)
 
 static const struct {
 	uint32 multi_rate;
@@ -67,13 +75,13 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 	if (!stream->running)
 		return;
 
-	status = OREG8(controller, stream->off, STS);
+	status = stream->Read8(HDAC_STREAM_STATUS);
 	if (status == 0)
 		return;
 
-	OREG8(controller, stream->off, STS) = status;
+	stream->Write8(HDAC_STREAM_STATUS, status);
 
-	if ((status & STS_BCIS) != 0) {
+	if ((status & STATUS_BUFFER_COMPLETED) != 0) {
 		// Buffer Completed Interrupt
 		acquire_spinlock(&stream->lock);
 
@@ -86,38 +94,38 @@ stream_handle_interrupt(hda_controller* controller, hda_stream* stream)
 
 		release_sem_etc(stream->buffer_ready_sem, 1, B_DO_NOT_RESCHEDULE);
 	} else
-		dprintf("HDA: stream status %x\n", status);
+		dprintf("hda: stream status %x\n", status);
 }
 
 
 static int32
 hda_interrupt_handler(hda_controller* controller)
 {
-	int32 rc = B_HANDLED_INTERRUPT;
+	int32 handled = B_HANDLED_INTERRUPT;
 
 	/* Check if this interrupt is ours */
-	uint32 intsts = REG32(controller, INTSTS);
-	if ((intsts & INTSTS_GIS) == 0)
+	uint32 intrStatus = controller->Read32(HDAC_INTR_STATUS);
+	if ((intrStatus & INTR_STATUS_GLOBAL) == 0)
 		return B_UNHANDLED_INTERRUPT;
 
 	/* Controller or stream related? */
-	if (intsts & INTSTS_CIS) {
-		uint32 stateStatus = REG16(controller, STATESTS);
-		uint8 rirbStatus = REG8(controller, RIRBSTS);
-		uint8 corbStatus = REG8(controller, CORBSTS);
+	if (intrStatus & INTR_STATUS_CONTROLLER) {
+		uint32 stateStatus = controller->Read16(HDAC_STATE_STATUS);
+		uint8 rirbStatus = controller->Read8(HDAC_RIRB_STATUS);
+		uint8 corbStatus = controller->Read8(HDAC_CORB_STATUS);
 
 		if (stateStatus) {
 			/* Detected Codec state change */
-			REG16(controller, STATESTS) = stateStatus;
+			controller->Write16(HDAC_STATE_STATUS, stateStatus);
 			controller->codec_status = stateStatus;
 		}
 
 		/* Check for incoming responses */			
 		if (rirbStatus) {
-			REG8(controller, RIRBSTS) = rirbStatus;
+			controller->Write8(HDAC_RIRB_STATUS, rirbStatus);
 
-			if (rirbStatus & RIRBSTS_RINTFL) {
-				uint16 writePos = (REG16(controller, RIRBWP) + 1)
+			if ((rirbStatus & RIRB_STATUS_RESPONSE) != 0) {
+				uint16 writePos = (controller->Read16(HDAC_RIRB_WRITE_POS) + 1)
 					% controller->rirb_length;
 
 				for (; controller->rirb_read_pos != writePos;
@@ -146,26 +154,26 @@ hda_interrupt_handler(hda_controller* controller)
 					/* Store response in codec */
 					codec->responses[codec->response_count++] = response;
 					release_sem_etc(codec->response_sem, 1, B_DO_NOT_RESCHEDULE);
-					rc = B_INVOKE_SCHEDULER;
+					handled = B_INVOKE_SCHEDULER;
 				}			
 			}
 
-			if (rirbStatus & RIRBSTS_OIS)
+			if ((rirbStatus & RIRB_STATUS_OVERRUN) != 0)
 				dprintf("hda: RIRB Overflow\n");
 		}
 
 		/* Check for sending errors */
 		if (corbStatus) {
-			REG8(controller, CORBSTS) = corbStatus;
+			controller->Write8(HDAC_CORB_STATUS, corbStatus);
 
-			if (corbStatus & CORBSTS_MEI)
+			if ((corbStatus & CORB_STATUS_MEMORY_ERROR) != 0)
 				dprintf("hda: CORB Memory Error!\n");
 		}
 	}
 
-	if (intsts & ~(INTSTS_CIS | INTSTS_GIS)) {
+	if ((intrStatus & INTR_STATUS_STREAM_MASK) != 0) {
 		for (uint32 index = 0; index < HDA_MAX_STREAMS; index++) {
-			if ((intsts & (1 << index)) != 0) {
+			if ((intrStatus & (1 << index)) != 0) {
 				if (controller->streams[index]) {
 					stream_handle_interrupt(controller,
 						controller->streams[index]);
@@ -179,25 +187,80 @@ hda_interrupt_handler(hda_controller* controller)
 
 	/* NOTE: See HDA001 => CIS/GIS cannot be cleared! */
 
-	return rc;
+	return handled;
 }
 
 
 static status_t
-hda_hw_start(hda_controller* controller)
+reset_controller(hda_controller* controller)
 {
-	int timeout = 10;
+	// stop streams
 
-	// TODO: reset controller first? (we currently reset on uninit only)
+	for (uint32 i = 0; i < controller->num_input_streams; i++) {
+		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
+			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
+			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+	}
+	for (uint32 i = 0; i < controller->num_output_streams; i++) {
+		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
+			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
+			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+	}
+	for (uint32 i = 0; i < controller->num_bidir_streams; i++) {
+		controller->Write8(HDAC_STREAM_CONTROL0 + HDAC_STREAM_BASE
+			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+		controller->Write8(HDAC_STREAM_STATUS + HDAC_STREAM_BASE
+			+ HDAC_INPUT_STREAM_OFFSET(controller, i), 0);
+	}
 
-	/* Put controller out of reset mode */
-	REG32(controller, GCTL) |= GCTL_CRST;
+	// stop DMA
+	controller->Write8(HDAC_CORB_CONTROL, 0);
+	controller->Write8(HDAC_RIRB_CONTROL, 0);
 
-	do {
+	// reset DMA position buffer
+	controller->Write32(HDAC_DMA_POSITION_BASE_LOWER, 0);
+	controller->Write32(HDAC_DMA_POSITION_BASE_UPPER, 0);
+
+	// Set reset bit - it must be asserted for at least 100us
+
+	uint32 control = controller->Read32(HDAC_GLOBAL_CONTROL);
+	controller->Write32(HDAC_GLOBAL_CONTROL, control & ~GLOBAL_CONTROL_RESET);
+
+	for (int timeout = 0; timeout < 10; timeout++) {
 		snooze(100);
-	} while (--timeout && !(REG32(controller, GCTL) & GCTL_CRST));	
 
-	return timeout ? B_OK : B_TIMED_OUT;
+		control = controller->Read32(HDAC_GLOBAL_CONTROL);
+		if ((control & GLOBAL_CONTROL_RESET) == 0)
+			break;
+	}
+	if ((control & GLOBAL_CONTROL_RESET) != 0) {
+		dprintf("hda: unable to reset controller\n");
+		return B_BUSY;
+	}
+
+	// Unset reset bit
+
+	control = controller->Read32(HDAC_GLOBAL_CONTROL);
+	controller->Write32(HDAC_GLOBAL_CONTROL, control | GLOBAL_CONTROL_RESET);
+
+	for (int timeout = 0; timeout < 10; timeout++) {
+		snooze(100);
+
+		control = controller->Read32(HDAC_GLOBAL_CONTROL);
+		if ((control & GLOBAL_CONTROL_RESET) != 0)
+			break;
+	}
+	if ((control & GLOBAL_CONTROL_RESET) == 0) {
+		dprintf("hda: unable to exit reset\n");
+		return B_BUSY;
+	}
+
+	// Wait for codecs to finish their own reset (apparently needs more
+	// time than documented in the specs)
+	snooze(1000);
+	return B_OK;
 }
 
 
@@ -217,29 +280,29 @@ init_corb_rirb_pos(hda_controller* controller)
 	physical_entry pe;
 
 	/* Determine and set size of CORB */
-	corbSize = REG8(controller, CORBSIZE);
-	if (corbSize & CORBSIZE_CAP_256E) {
+	corbSize = controller->Read8(HDAC_CORB_SIZE);
+	if ((corbSize & CORB_SIZE_CAP_256_ENTRIES) != 0) {
 		controller->corb_length = 256;
-		REG8(controller, CORBSIZE) = CORBSIZE_SZ_256E;
-	} else if (corbSize & CORBSIZE_CAP_16E) {
+		controller->Write8(HDAC_CORB_SIZE, CORB_SIZE_256_ENTRIES);
+	} else if (corbSize & CORB_SIZE_CAP_16_ENTRIES) {
 		controller->corb_length = 16;
-		REG8(controller, CORBSIZE) = CORBSIZE_SZ_16E;
-	} else if (corbSize & CORBSIZE_CAP_2E) {
+		controller->Write8(HDAC_CORB_SIZE, CORB_SIZE_16_ENTRIES);
+	} else if (corbSize & CORB_SIZE_CAP_2_ENTRIES) {
 		controller->corb_length = 2;
-		REG8(controller, CORBSIZE) = CORBSIZE_SZ_2E;
+		controller->Write8(HDAC_CORB_SIZE, CORB_SIZE_2_ENTRIES);
 	}
 
 	/* Determine and set size of RIRB */
-	rirbSize = REG8(controller, RIRBSIZE);
-	if (rirbSize & RIRBSIZE_CAP_256E) {
+	rirbSize = controller->Read8(HDAC_RIRB_SIZE);
+	if (rirbSize & RIRB_SIZE_CAP_256_ENTRIES) {
 		controller->rirb_length = 256;
-		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_256E;
-	} else if (rirbSize & RIRBSIZE_CAP_16E) {
+		controller->Write8(HDAC_RIRB_SIZE, RIRB_SIZE_256_ENTRIES);
+	} else if (rirbSize & RIRB_SIZE_CAP_16_ENTRIES) {
 		controller->rirb_length = 16;
-		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_16E;
-	} else if (rirbSize & RIRBSIZE_CAP_2E) {
+		controller->Write8(HDAC_RIRB_SIZE, RIRB_SIZE_16_ENTRIES);
+	} else if (rirbSize & RIRB_SIZE_CAP_2_ENTRIES) {
 		controller->rirb_length = 2;
-		REG8(controller, RIRBSIZE) = RIRBSIZE_SZ_2E;
+		controller->Write8(HDAC_RIRB_SIZE, RIRB_SIZE_2_ENTRIES);
 	}
 
 	/* Determine rirb offset in memory and total size of corb+alignment+rirb */
@@ -267,39 +330,43 @@ init_corb_rirb_pos(hda_controller* controller)
 	}
 
 	/* Program CORB/RIRB for these locations */
-	REG32(controller, CORBLBASE) = (uint32)pe.address;
-	REG32(controller, CORBUBASE) = 0;
-	REG32(controller, RIRBLBASE) = (uint32)pe.address + rirbOffset;
-	REG32(controller, RIRBUBASE) = 0;
+	controller->Write32(HDAC_CORB_BASE_LOWER, (uint32)pe.address);
+	controller->Write32(HDAC_CORB_BASE_UPPER, 0);
+	controller->Write32(HDAC_RIRB_BASE_LOWER, (uint32)pe.address + rirbOffset);
+	controller->Write32(HDAC_RIRB_BASE_UPPER, 0);
 
 	/* Program DMA position update */
-	REG32(controller, DMA_POSITION_BASE_LOWER) = (uint32)pe.address + posOffset;
-	REG32(controller, DMA_POSITION_BASE_UPPER) = 0;
+	controller->Write32(HDAC_DMA_POSITION_BASE_LOWER,
+		(uint32)pe.address + posOffset);
+	controller->Write32(HDAC_DMA_POSITION_BASE_UPPER, 0);
 
 	controller->stream_positions = (uint32*)
 		((uint8*)controller->corb + posOffset);
 
 	/* Reset CORB read pointer */
 	/* NOTE: See HDA011 for corrected procedure! */
-	REG16(controller, CORBRP) = CORBRP_RST;
+	controller->Write16(HDAC_CORB_READ_POS, CORB_READ_POS_RESET);
 	do {
 		spin(10);
-	} while ( !(REG16(controller, CORBRP) & CORBRP_RST) );
-	REG16(controller, CORBRP) = 0;
+	} while ((controller->Read16(HDAC_CORB_READ_POS)
+		& CORB_READ_POS_RESET) == 0);
+	controller->Write16(HDAC_CORB_READ_POS, 0);
 
 	/* Reset RIRB write pointer */
-	REG16(controller, RIRBWP) = RIRBWP_RST;
+	controller->Write16(HDAC_RIRB_WRITE_POS, RIRB_WRITE_POS_RESET);
 
 	/* Generate interrupt for every response */
-	REG16(controller, RINTCNT) = 1;
+	controller->Write16(HDAC_RESPONSE_INTR_COUNT, 1);
 
 	/* Setup cached read/write indices */
 	controller->rirb_read_pos = 1;
 	controller->corb_write_pos = 0;
 
 	/* Gentlemen, start your engines... */
-	REG8(controller, CORBCTL) = CORBCTL_RUN | CORBCTL_MEIE;
-	REG8(controller, RIRBCTL) = RIRBCTL_DMAEN | RIRBCTL_OIC | RIRBCTL_RINTCTL;
+	controller->Write8(HDAC_CORB_CONTROL,
+		CORB_CONTROL_RUN | CORB_CONTROL_MEMORY_ERROR_INTR);
+	controller->Write8(HDAC_RIRB_CONTROL, RIRB_CONTROL_DMA_ENABLE
+		| RIRB_CONTROL_OVERRUN_INTR | RIRB_CONTROL_RESPONSE_INTR);
 
 	return B_OK;
 }
@@ -337,17 +404,18 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 	stream->buffer_area = B_ERROR;
 	stream->buffer_descriptors_area = B_ERROR;
 	stream->type = type;
+	stream->controller = controller;
 
 	switch (type) {
 		case STREAM_PLAYBACK:
 			stream->id = 1;
-			stream->off = controller->num_input_streams * HDAC_SDSIZE;
+			stream->offset = HDAC_OUTPUT_STREAM_OFFSET(controller, 0);
 			controller->streams[controller->num_input_streams] = stream;
 			break;
 
 		case STREAM_RECORD:
 			stream->id = 2;
-			stream->off = 0;
+			stream->offset = HDAC_INPUT_STREAM_OFFSET(controller, 0);
 			controller->streams[0] = stream;
 			break;
 
@@ -374,22 +442,18 @@ hda_stream_new(hda_audio_group* audioGroup, int type)
 status_t
 hda_stream_start(hda_controller* controller, hda_stream* stream)
 {
-	stream->buffer_ready_sem = create_sem(0,
-		stream->type == STREAM_PLAYBACK ? "hda_playback_sem" : "hda_record_sem");
+	stream->buffer_ready_sem = create_sem(0, stream->type == STREAM_PLAYBACK
+		? "hda_playback_sem" : "hda_record_sem");
 	if (stream->buffer_ready_sem < B_OK)
 		return stream->buffer_ready_sem;
 
-	REG32(controller, INTCTL) |= 1 << (stream->off / HDAC_SDSIZE);
-	OREG8(controller, stream->off, CTL0) |= CTL0_IOCE | CTL0_FEIE | CTL0_DEIE
-		| CTL0_RUN;
-
-#if 0
-	while (!(OREG8(controller, stream->off, CTL0) & CTL0_RUN))
-		snooze(1);
-#endif
+	controller->Write32(HDAC_INTR_CONTROL, controller->Read32(HDAC_INTR_CONTROL)
+		| (1 << (stream->offset / HDAC_STREAM_SIZE)));
+	stream->Write8(HDAC_STREAM_CONTROL0, stream->Read8(HDAC_STREAM_CONTROL0)
+		| CONTROL0_BUFFER_COMPLETED_INTR | CONTROL0_FIFO_ERROR_INTR
+		| CONTROL0_DESCRIPTOR_ERROR_INTR | CONTROL0_RUN);
 
 	stream->running = true;
-
 	return B_OK;
 }
 
@@ -400,14 +464,11 @@ hda_stream_start(hda_controller* controller, hda_stream* stream)
 status_t
 hda_stream_stop(hda_controller* controller, hda_stream* stream)
 {
-	OREG8(controller, stream->off, CTL0) &= ~(CTL0_IOCE | CTL0_FEIE | CTL0_DEIE
-		| CTL0_RUN);
-	REG32(controller, INTCTL) &= ~(1 << (stream->off / HDAC_SDSIZE));
-
-#if 0
-	while ((OREG8(controller, stream->off, CTL0) & CTL0_RUN) != 0)
-		snooze(1);
-#endif
+	stream->Write8(HDAC_STREAM_CONTROL0, stream->Read8(HDAC_STREAM_CONTROL0)
+		& ~(CONTROL0_BUFFER_COMPLETED_INTR | CONTROL0_FIFO_ERROR_INTR
+			| CONTROL0_DESCRIPTOR_ERROR_INTR | CONTROL0_RUN));
+	controller->Write32(HDAC_INTR_CONTROL, controller->Read32(HDAC_INTR_CONTROL)
+		& ~(1 << (stream->offset / HDAC_STREAM_SIZE)));
 
 	stream->running = false;
 	delete_sem(stream->buffer_ready_sem);
@@ -513,14 +574,14 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 	/* Configure stream registers */
 	format = stream->num_channels - 1;
 	switch (stream->sample_format) {
-		case B_FMT_8BIT_S:	format |= FMT_8BIT; stream->bps = 8; break;
-		case B_FMT_16BIT:	format |= FMT_16BIT; stream->bps = 16; break;
-		case B_FMT_20BIT:	format |= FMT_20BIT; stream->bps = 20; break;
-		case B_FMT_24BIT:	format |= FMT_24BIT; stream->bps = 24; break;
-		case B_FMT_32BIT:	format |= FMT_32BIT; stream->bps = 32; break;
+		case B_FMT_8BIT_S:	format |= FORMAT_8BIT; stream->bps = 8; break;
+		case B_FMT_16BIT:	format |= FORMAT_16BIT; stream->bps = 16; break;
+		case B_FMT_20BIT:	format |= FORMAT_20BIT; stream->bps = 20; break;
+		case B_FMT_24BIT:	format |= FORMAT_24BIT; stream->bps = 24; break;
+		case B_FMT_32BIT:	format |= FORMAT_32BIT; stream->bps = 32; break;
 
 		default:
-			dprintf("%s: Invalid sample format: 0x%lx\n", __func__,
+			dprintf("hda: Invalid sample format: 0x%lx\n",
 				stream->sample_format);
 			break;
 	}
@@ -536,27 +597,27 @@ dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld *************
 	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld\n", __func__, stream->id,
 		stream->rate, stream->bps);
 
-	OREG16(audioGroup->codec->controller, stream->off, FMT) = format;
-	OREG32(audioGroup->codec->controller, stream->off, BDPL)
-		= stream->physical_buffer_descriptors;
-	OREG32(audioGroup->codec->controller, stream->off, BDPU) = 0;
-	OREG16(audioGroup->codec->controller, stream->off, LVI)
-		= stream->num_buffers - 1;
+	stream->Write16(HDAC_STREAM_FORMAT, format);
+	stream->Write32(HDAC_STREAM_BUFFERS_BASE_LOWER,
+		stream->physical_buffer_descriptors);
+	stream->Write32(HDAC_STREAM_BUFFERS_BASE_UPPER, 0);
+	stream->Write16(HDAC_STREAM_LAST_VALID, stream->num_buffers - 1);
 	/* total cyclic buffer size in _bytes_ */
-	OREG32(audioGroup->codec->controller, stream->off, CBL)
-		= stream->sample_size * stream->num_channels * stream->num_buffers
-		* stream->buffer_length;
-	OREG8(audioGroup->codec->controller, stream->off, CTL2) = stream->id << 4;
+	stream->Write32(HDAC_STREAM_BUFFER_SIZE, stream->sample_size
+		* stream->num_channels * stream->num_buffers * stream->buffer_length);
+	stream->Write8(HDAC_STREAM_CONTROL2, stream->id << 4);
 
-	REG32(audioGroup->codec->controller, DMA_POSITION_BASE_LOWER)
-		|= DMA_POSITION_ENABLED;
+	stream->controller->Write32(HDAC_DMA_POSITION_BASE_LOWER,
+		stream->controller->Read32(HDAC_DMA_POSITION_BASE_LOWER)
+		| DMA_POSITION_ENABLED);
 
+	hda_codec* codec = audioGroup->codec;
 	for (uint32 i = 0; i < stream->num_io_widgets; i++) {
-		verb[0] = MAKE_VERB(audioGroup->codec->addr, stream->io_widgets[i],
+		verb[0] = MAKE_VERB(codec->addr, stream->io_widgets[i],
 			VID_SET_CONVERTER_FORMAT, format);
-		verb[1] = MAKE_VERB(audioGroup->codec->addr, stream->io_widgets[i],
+		verb[1] = MAKE_VERB(codec->addr, stream->io_widgets[i],
 			VID_SET_CONVERTER_STREAM_CHANNEL, stream->id << 4);
-		hda_send_verbs(audioGroup->codec, verb, response, 2);
+		hda_send_verbs(codec, verb, response, 2);
 	}
 
 	snooze(1000);
@@ -572,12 +633,11 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 {
 	hda_controller *controller = codec->controller;
 	uint32 sent = 0;
-	status_t rc;
 
 	codec->response_count = 0;
 
 	while (sent < count) {
-		uint32 readPos = REG16(controller, CORBRP);
+		uint32 readPos = controller->Read16(HDAC_CORB_READ_POS);
 		uint32 queued = 0;
 
 		while (sent < count) {
@@ -594,11 +654,11 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 			queued++;
 		}
 
-		REG16(controller, CORBWP) = controller->corb_write_pos;
-		rc = acquire_sem_etc(codec->response_sem, queued, B_RELATIVE_TIMEOUT,
-			1000ULL * 50);
-		if (rc < B_OK)
-			return rc;
+		controller->Write16(HDAC_CORB_WRITE_POS, controller->corb_write_pos);
+		status_t status = acquire_sem_etc(codec->response_sem, queued,
+			B_RELATIVE_TIMEOUT, 50000ULL);
+		if (status < B_OK)
+			return status;
 	}
 
 	if (responses != NULL)
@@ -612,9 +672,8 @@ hda_send_verbs(hda_codec* codec, corb_t* verbs, uint32* responses, uint32 count)
 status_t
 hda_hw_init(hda_controller* controller)
 {
-	status_t rc;
-	uint16 gcap;
-	uint32 index;
+	uint16 capabilities;
+	status_t status;
 
 	/* Map MMIO registers */
 	controller->regs_area = map_physical_memory("hda_hw_regs",
@@ -622,58 +681,58 @@ hda_hw_init(hda_controller* controller)
 		controller->pci_info.u.h0.base_register_sizes[0], B_ANY_KERNEL_ADDRESS,
 		0, (void**)&controller->regs);
 	if (controller->regs_area < B_OK) {
-		rc = controller->regs_area;
+		status = controller->regs_area;
 		goto error;
 	}
 
 	/* Absolute minimum hw is online; we can now install interrupt handler */
 	controller->irq = controller->pci_info.u.h0.interrupt_line;
-	rc = install_io_interrupt_handler(controller->irq,
+	status = install_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller, 0);
-	if (rc != B_OK)
+	if (status != B_OK)
 		goto no_irq;
 
-	/* show some hw features */
-	gcap = REG16(controller, GCAP);
-	dprintf("HDA: HDA v%d.%d, O:%d/I:%d/B:%d, #SDO:%d, 64bit:%s\n", 
-		REG8(controller, VMAJ), REG8(controller, VMIN),
-		GCAP_OSS(gcap), GCAP_ISS(gcap), GCAP_BSS(gcap),
-		GCAP_NSDO(gcap) ? GCAP_NSDO(gcap) *2 : 1, 
-		gcap & GCAP_64OK ? "yes" : "no" );
+	capabilities = controller->Read16(HDAC_GLOBAL_CAP);
+	controller->num_input_streams = GLOBAL_CAP_INPUT_STREAMS(capabilities);
+	controller->num_output_streams = GLOBAL_CAP_OUTPUT_STREAMS(capabilities);
+	controller->num_bidir_streams = GLOBAL_CAP_BIDIR_STREAMS(capabilities);
 
-	controller->num_input_streams = GCAP_OSS(gcap);
-	controller->num_output_streams = GCAP_ISS(gcap);
-	controller->num_bidir_streams = GCAP_BSS(gcap);
+	/* show some hw features */
+	dprintf("hda: HDA v%d.%d, O:%ld/I:%ld/B:%ld, #SDO:%d, 64bit:%s\n", 
+		controller->Read8(HDAC_VERSION_MAJOR),
+		controller->Read8(HDAC_VERSION_MINOR),
+		controller->num_output_streams, controller->num_input_streams,
+		controller->num_bidir_streams,
+		GLOBAL_CAP_NUM_SDO(capabilities),
+		GLOBAL_CAP_64BIT(capabilities) ? "yes" : "no");
 
 	/* Get controller into valid state */
-	rc = hda_hw_start(controller);
-	if (rc != B_OK)
+	status = reset_controller(controller);
+	if (status != B_OK)
 		goto reset_failed;
 
 	/* Setup CORB/RIRB/DMA POS */
-	rc = init_corb_rirb_pos(controller);
-	if (rc != B_OK)
+	status = init_corb_rirb_pos(controller);
+	if (status != B_OK)
 		goto corb_rirb_failed;
 
-	REG16(controller, WAKEEN) = 0x7fff;
+	controller->Write16(HDAC_WAKE_ENABLE, 0x7fff);
 
 	/* Enable controller interrupts */
-	REG32(controller, INTCTL) = INTCTL_GIE | INTCTL_CIE;
-
-	/* Wait for codecs to warm up */
-	snooze(1000);
+	controller->Write32(HDAC_INTR_CONTROL, INTR_CONTROL_GLOBAL_ENABLE
+		| INTR_CONTROL_CONTROLLER_ENABLE);
 
 	if (!controller->codec_status) {	
-		rc = ENODEV;
+		status = ENODEV;
 		goto corb_rirb_failed;
 	}
 
-	for (index = 0; index < HDA_MAX_CODECS; index++) {
+	// Create codecs
+	for (uint32 index = 0; index < HDA_MAX_CODECS; index++) {
 		if ((controller->codec_status & (1 << index)) != 0)
 			hda_codec_new(controller, index);
 	}
-
-	for (index = 0; index < HDA_MAX_CODECS; index++) {
+	for (uint32 index = 0; index < HDA_MAX_CODECS; index++) {
 		if (controller->codecs[index]
 			&& controller->codecs[index]->num_audio_groups > 0) {
 			controller->active_codec = controller->codecs[index];
@@ -684,10 +743,10 @@ hda_hw_init(hda_controller* controller)
 	if (controller->active_codec != NULL)
 		return B_OK;
 
-	rc = ENODEV;
+	status = ENODEV;
 
 corb_rirb_failed:
-	REG32(controller, INTCTL) = 0;
+	controller->Write32(HDAC_INTR_CONTROL, 0);
 
 reset_failed:
 	remove_io_interrupt_handler(controller->irq,
@@ -699,9 +758,9 @@ no_irq:
 	controller->regs = NULL;
 
 error:
-	dprintf("ERROR: %s(%ld)\n", strerror(rc), rc);
+	dprintf("hda: ERROR: %s(%ld)\n", strerror(status), status);
 
-	return rc;
+	return status;
 }
 
 
@@ -731,17 +790,11 @@ hda_hw_uninit(hda_controller* controller)
 	/* Stop all audio streams */
 	hda_hw_stop(controller);
 
-	/* Stop CORB/RIRB */
-	REG8(controller, CORBCTL) = 0;
-	REG8(controller, RIRBCTL) = 0;
+	reset_controller(controller);
 
-	REG32(controller, CORBLBASE) = 0;
-	REG32(controller, RIRBLBASE) = 0;
-	REG32(controller, DMA_POSITION_BASE_LOWER) = 0;
+	/* Disable interrupts, and remove interrupt handler */
+	controller->Write32(HDAC_INTR_CONTROL, 0);
 
-	/* Disable interrupts, reset controller, and remove interrupt handler */
-	REG32(controller, INTCTL) = 0;
-	REG32(controller, GCTL) &= ~GCTL_CRST;
 	remove_io_interrupt_handler(controller->irq,
 		(interrupt_handler)hda_interrupt_handler, controller);
 

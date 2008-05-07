@@ -4,135 +4,132 @@
  *
  * Authors:
  *		Ithamar Adema, ithamar AT unet DOT nl
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef HDAC_REGS_H
 #define HDAC_REGS_H
 
+
 #include <SupportDefs.h>
 
-/* Accessors for HDA controller registers */
-#define REG32(controller, reg)	(*(vuint32*)((controller)->regs + HDAC_##reg))
-#define REG16(controller, reg)	(*(vuint16*)((controller)->regs + HDAC_##reg))
-#define REG8(controller, reg)	(*((controller)->regs + HDAC_##reg))
 
-#define OREG32(controller, stream, reg) \
-	(*(vuint32*)((controller)->regs + HDAC_SDBASE + (stream) + HDAC_SD_##reg))
-#define OREG16(controller, stream, reg) \
-	(*(vuint16*)((controller)->regs + HDAC_SDBASE + (stream) + HDAC_SD_##reg))
-#define OREG8(controller, stream, reg) \
-	(*((controller)->regs + HDAC_SDBASE + (stream) + HDAC_SD_##reg))
+/* Controller register definitions */
+#define HDAC_GLOBAL_CAP					0x00	// 16bits, GCAP
+#define GLOBAL_CAP_OUTPUT_STREAMS(cap)	(((cap) >> 12) & 15)
+#define GLOBAL_CAP_INPUT_STREAMS(cap)	(((cap) >> 8) & 15)
+#define GLOBAL_CAP_BIDIR_STREAMS(cap)	(((cap) >> 3) & 15)
+#define GLOBAL_CAP_NUM_SDO(cap)			((((cap) >> 1) & 3) ? (cap & 6) : 1)
+#define GLOBAL_CAP_64BIT(cap)			(((cap) & 1) != 0)
 
-/* Register definitions */
-#define HDAC_GCAP			0x00		/* 16bits */
-#define GCAP_OSS(gcap)		(((gcap) >> 12) & 15)
-#define GCAP_ISS(gcap)		(((gcap) >> 8) & 15)
-#define GCAP_BSS(gcap)		(((gcap) >> 3) & 15)
-#define GCAP_NSDO(gcap)		(((gcap) >> 1) & 3)
-#define GCAP_64OK			((gcap) & 1)
+#define HDAC_VERSION_MINOR				0x02	// 8bits, VMIN
+#define HDAC_VERSION_MAJOR				0x03	// 8bits, VMAJ
 
-#define HDAC_VMIN			0x02		/* 8bits */
-#define HDAC_VMAJ			0x03		/* 8bits */
+#define HDAC_GLOBAL_CONTROL				0x08	// 32bits, GCTL
+#define GLOBAL_CONTROL_UNSOLICITED		(1 << 8)
+	// accept unsolicited responses
+#define GLOBAL_CONTROL_FLUSH			(1 << 1)
+#define GLOBAL_CONTROL_RESET			(1 << 0)
 
-#define HDAC_GCTL			0x08		/* 32bits */
-#define GCTL_UNSOL			(1 << 8)	/* Accept Unsolicited responses */
-#define GCTL_FCNTRL			(1 << 1)	/* Flush Control */
-#define GCTL_CRST			(1 << 0)	/* Controller Reset */
+#define HDAC_WAKE_ENABLE				0x0c	// 16bits, WAKEEN
+#define HDAC_STATE_STATUS				0x0e	// 16bits, STATESTS
 
-#define HDAC_WAKEEN			0x0c		/* 16bits */
-#define HDAC_STATESTS		0x0e		/* 16bits */
+#define HDAC_INTR_CONTROL				0x20	// 32bits, INTCTL
+#define INTR_CONTROL_GLOBAL_ENABLE		(1 << 31)
+#define INTR_CONTROL_CONTROLLER_ENABLE	(1 << 30)
 
-#define HDAC_INTCTL			0x20		/* 32bits */
-#define INTCTL_GIE			(1 << 31)	/* Global Interrupt Enable */
-#define INTCTL_CIE			(1 << 30)	/* Controller Interrupt Enable */
+#define HDAC_INTR_STATUS				0x24	// 32bits, INTSTS
+#define INTR_STATUS_GLOBAL				(1 << 31)
+#define INTR_STATUS_CONTROLLER			(1 << 30)
+#define INTR_STATUS_STREAM_MASK			0x3fffffff
 
-#define HDAC_INTSTS			0x24		/* 32bits */
-#define INTSTS_GIS			(1 << 31)	/* Global Interrupt Status */
-#define INTSTS_CIS			(1 << 30)	/* Controller Interrupt Status */
+#define HDAC_CORB_BASE_LOWER			0x40	// 32bits, CORBLBASE
+#define HDAC_CORB_BASE_UPPER			0x44	// 32bits, CORBUBASE
+#define HDAC_CORB_WRITE_POS				0x48	// 16bits, CORBWP
 
-#define HDAC_CORBLBASE		0x40		/* 32bits */
-#define HDAC_CORBUBASE		0x44		/* 32bits */
-#define HDAC_CORBWP			0x48		/* 16bits */
+#define HDAC_CORB_READ_POS				0x4a	// 16bits, CORBRP
+#define CORB_READ_POS_RESET				(1 << 15)
 
-#define HDAC_CORBRP			0x4a		/* 16bits */
-#define CORBRP_RST			(1 << 15)
+#define HDAC_CORB_CONTROL				0x4c	// 8bits, CORBCTL
+#define CORB_CONTROL_RUN				(1 << 1)
+#define CORB_CONTROL_MEMORY_ERROR_INTR	(1 << 0)
 
-#define HDAC_CORBCTL		0x4c		/* 8bits */
-#define CORBCTL_RUN			(1 << 1)
-#define CORBCTL_MEIE		(1 << 0)
+#define HDAC_CORB_STATUS				0x4d	// 8bits, CORBSTS
+#define CORB_STATUS_MEMORY_ERROR		(1 << 0)
 
-#define HDAC_CORBSTS		0x4d		/* 8bits */
-#define CORBSTS_MEI			(1 << 0)
+#define HDAC_CORB_SIZE					0x4e	// 8bits, CORBSIZE
+#define CORB_SIZE_CAP_2_ENTRIES			(1 << 4)
+#define CORB_SIZE_CAP_16_ENTRIES		(1 << 5)
+#define CORB_SIZE_CAP_256_ENTRIES		(1 << 6)
+#define CORB_SIZE_2_ENTRIES				0x00	// 8 byte
+#define CORB_SIZE_16_ENTRIES			0x01	// 64 byte
+#define CORB_SIZE_256_ENTRIES			0x02	// 1024 byte
 
-#define HDAC_CORBSIZE		0x4e		/* 8bits */
-#define CORBSIZE_CAP_2E		(1 << 4)
-#define CORBSIZE_CAP_16E	(1 << 5)
-#define CORBSIZE_CAP_256E	(1 << 6)
-#define CORBSIZE_SZ_2E		0
-#define CORBSIZE_SZ_16E		(1 << 0)
-#define CORBSIZE_SZ_256E	(1 << 1)
+#define HDAC_RIRB_BASE_LOWER			0x50	// 32bits, RIRBLBASE
+#define HDAC_RIRB_BASE_UPPER			0x54	// 32bits, RIRBUBASE
 
-#define HDAC_RIRBLBASE		0x50		/* 32bits */
-#define HDAC_RIRBUBASE		0x54		/* 32bits */
+#define HDAC_RIRB_WRITE_POS				0x58	// 16bits, RIRBWP
+#define RIRB_WRITE_POS_RESET			(1 << 15)
 
-#define HDAC_RIRBWP			0x58		/* 16bits */
-#define RIRBWP_RST			(1 << 15)
+#define HDAC_RESPONSE_INTR_COUNT		0x5a	// 16bits, RINTCNT
 
-#define HDAC_RINTCNT		0x5a		/* 16bits */
+#define HDAC_RIRB_CONTROL				0x5c	// 8bits, RIRBCTL
+#define RIRB_CONTROL_OVERRUN_INTR		(1 << 2)
+#define RIRB_CONTROL_DMA_ENABLE			(1 << 1)
+#define RIRB_CONTROL_RESPONSE_INTR		(1 << 0)
 
-#define HDAC_RIRBCTL		0x5c		/* 8bits */
-#define RIRBCTL_OIC			(1 << 2)
-#define RIRBCTL_DMAEN		(1 << 1)
-#define RIRBCTL_RINTCTL		(1 << 0)
+#define HDAC_RIRB_STATUS				0x5d	// 8bits, RIRBSTS
+#define RIRB_STATUS_OVERRUN				(1 << 2)
+#define RIRB_STATUS_RESPONSE			(1 << 0)
 
-#define HDAC_RIRBSTS		0x5d
-#define RIRBSTS_OIS			(1 << 2)
-#define RIRBSTS_RINTFL		(1 << 0)
+#define HDAC_RIRB_SIZE					0x5e	// 8bits, RIRBSIZE
+#define RIRB_SIZE_CAP_2_ENTRIES			(1 << 4)
+#define RIRB_SIZE_CAP_16_ENTRIES		(1 << 5)
+#define RIRB_SIZE_CAP_256_ENTRIES		(1 << 6)
+#define RIRB_SIZE_2_ENTRIES				0x00
+#define RIRB_SIZE_16_ENTRIES			0x01
+#define RIRB_SIZE_256_ENTRIES			0x02
 
-#define HDAC_RIRBSIZE		0x5e		/* 8bits */
-#define RIRBSIZE_CAP_2E		(1 << 4)
-#define RIRBSIZE_CAP_16E	(1 << 5)
-#define RIRBSIZE_CAP_256E	(1 << 6)
-#define RIRBSIZE_SZ_2E		0
-#define RIRBSIZE_SZ_16E		(1 << 0)
-#define RIRBSIZE_SZ_256E	(1 << 1)
-
-#define HDAC_DMA_POSITION_BASE_LOWER	0x70	/* 32bits */
-#define HDAC_DMA_POSITION_BASE_UPPER	0x74	/* 32bits */
+#define HDAC_DMA_POSITION_BASE_LOWER	0x70	// 32bits, DPLBASE
+#define HDAC_DMA_POSITION_BASE_UPPER	0x74	// 32bits, DPUBASE
 #define DMA_POSITION_ENABLED			1
 
-#define HDAC_SDBASE			0x80
-#define HDAC_SDSIZE			0x20
+/* Stream Descriptor Registers */
+#define HDAC_STREAM_BASE				0x80
+#define HDAC_STREAM_SIZE				0x20
 
-#define HDAC_SD_CTL0		0x00		/* 8bits */
-#define CTL0_SRST			(1 << 0)
-#define CTL0_RUN			(1 << 1)
-#define CTL0_IOCE			(1 << 2)
-#define CTL0_FEIE			(1 << 3)
-#define CTL0_DEIE			(1 << 4)
-#define HDAC_SD_CTL1		0x01		/* 8bits */
-#define HDAC_SD_CTL2		0x02		/* 8bits */
-#define CTL2_DIR			(1 << 3)
-#define CTL2_TP				(1 << 2)
-#define HDAC_SD_STS			0x03		/* 8bits */
-#define STS_BCIS			(1 << 2)
-#define STS_FIFOE			(1 << 3)
-#define STS_DESE			(1 << 4)
-#define STS_FIFORDY			(1 << 5)
-#define HDAC_SD_LPIB		0x04		/* 32bits */
-#define HDAC_SD_CBL			0x08		/* 32bits */
-#define HDAC_SD_LVI			0x0C		/* 16bits */
-#define HDAC_SD_FIFOS		0x10		/* 16bits */
-#define HDAC_SD_FMT			0x12		/* 16bits */
-#define FMT_8BIT			(0 << 4)
-#define FMT_16BIT			(1 << 4)
-#define FMT_20BIT			(2 << 4)
-#define FMT_24BIT			(3 << 4)
-#define FMT_32BIT			(4 << 4)
-#define FMT_44_1_BASE_RATE		(1 << 14)
-#define FMT_MULTIPLY_RATE_SHIFT	11
-#define FMT_DIVIDE_RATE_SHIFT	8
-#define HDAC_SD_BDPL		0x18		/* 32bits */
-#define HDAC_SD_BDPU		0x1C		/* 32bits */
+#define HDAC_STREAM_CONTROL0			0x00	// 8bits, CTL0
+#define CONTROL0_RESET					(1 << 0)
+#define CONTROL0_RUN					(1 << 1)
+#define CONTROL0_BUFFER_COMPLETED_INTR	(1 << 2)
+#define CONTROL0_FIFO_ERROR_INTR		(1 << 3)
+#define CONTROL0_DESCRIPTOR_ERROR_INTR	(1 << 4)
+#define HDAC_STREAM_CONTROL1			0x01	// 8bits, CTL1
+#define HDAC_STREAM_CONTROL2			0x02	// 8bits, CTL2
+#define CONTROL2_STREAM_MASK			0xf0
+#define CONTROL2_STREAM_SHIFT			4
+#define CONTROL2_BIDIR					(1 << 3)
+#define CONTROL2_TRAFFIC_PRIORITY		(1 << 2)
+#define CONTROL2_STRIPE_SDO_MASK		0x03
+#define HDAC_STREAM_STATUS				0x03	// 8bits, STS
+#define STATUS_BUFFER_COMPLETED			(1 << 2)
+#define STATUS_FIFO_ERROR				(1 << 3)
+#define STATUS_DESCRIPTOR_ERROR			(1 << 4)
+#define STATUS_FIFO_READY				(1 << 5)
+#define HDAC_STREAM_POSITION			0x04	// 32bits, LPIB
+#define HDAC_STREAM_BUFFER_SIZE			0x08	// 32bits, CBL
+#define HDAC_STREAM_LAST_VALID			0x0c	// 16bits, LVI
+#define HDAC_STREAM_FIFO_SIZE			0x10	// 16bits, FIFOS
+#define HDAC_STREAM_FORMAT				0x12	// 16bits, FMT
+#define FORMAT_8BIT						(0 << 4)
+#define FORMAT_16BIT					(1 << 4)
+#define FORMAT_20BIT					(2 << 4)
+#define FORMAT_24BIT					(3 << 4)
+#define FORMAT_32BIT					(4 << 4)
+#define FORMAT_44_1_BASE_RATE			(1 << 14)
+#define FORMAT_MULTIPLY_RATE_SHIFT		11
+#define FORMAT_DIVIDE_RATE_SHIFT		8
+#define HDAC_STREAM_BUFFERS_BASE_LOWER	0x18	// 32bits, BDPL
+#define HDAC_STREAM_BUFFERS_BASE_UPPER	0x1c	// 32bits, BDPU
 
 typedef uint32 corb_t;
 typedef struct {
@@ -140,8 +137,8 @@ typedef struct {
 	uint32 flags;
 } rirb_t;
 
-#define RESPONSE_FLAGS_CODEC_MASK	0x0000000f
-#define RESPONSE_FLAGS_UNSOLICITED	(1 << 4)
+#define RESPONSE_FLAGS_CODEC_MASK		0x0000000f
+#define RESPONSE_FLAGS_UNSOLICITED		(1 << 4)
 
 typedef struct {
 	uint64	address;

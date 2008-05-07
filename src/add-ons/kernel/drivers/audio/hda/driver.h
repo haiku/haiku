@@ -51,16 +51,84 @@ enum {
 };
 
 struct hda_codec;
+struct hda_stream;
+
+/*!	This structure describes a single HDA compliant 
+	controller. It contains a list of available streams
+	for use by the codecs contained, and the messaging queue
+	(verb/response) buffers for communication.
+*/
+struct hda_controller {
+	struct pci_info	pci_info;
+	vint32			opened;
+	const char*		devfs_path;
+
+	area_id			regs_area;
+	vuint8*			regs;
+	uint32			irq;
+
+	uint16			codec_status;
+	uint32			num_input_streams;
+	uint32			num_output_streams;
+	uint32			num_bidir_streams;
+
+	uint32			corb_length;
+	uint32			rirb_length;
+	uint32			rirb_read_pos;
+	uint32			corb_write_pos;
+	area_id			corb_rirb_pos_area;
+	corb_t*			corb;
+	rirb_t*			rirb;
+	uint32*			stream_positions;
+
+	hda_codec*		codecs[HDA_MAX_CODECS + 1];
+	hda_codec*		active_codec;
+	uint32			num_codecs;
+
+	hda_stream*		streams[HDA_MAX_STREAMS];
+
+	uint8 Read8(uint32 reg)
+	{
+		return *(regs + reg);
+	}
+
+	uint16 Read16(uint32 reg)
+	{
+		return *(vuint16*)(regs + reg);
+	}
+
+	uint32 Read32(uint32 reg)
+	{
+		return *(vuint32*)(regs + reg);
+	}
+
+	void Write8(uint32 reg, uint8 value)
+	{
+		*(regs + reg) = value;
+	}
+
+	void Write16(uint32 reg, uint16 value)
+	{
+		*(vuint16*)(regs + reg) = value;
+	}
+
+	void Write32(uint32 reg, uint32 value)
+	{
+		*(vuint32*)(regs + reg) = value;
+	}
+};
 
 /*!	This structure describes a single stream of audio data,
 	which is can have multiple channels (for stereo or better).
 */
 struct hda_stream {
 	uint32		id;					/* HDA controller stream # */
-	uint32		off;				/* HDA I/O/B descriptor offset */
-	bool		running;			/* Is this stream active? */
+	uint32		offset;				/* HDA I/O/B descriptor offset */
+	bool		running;
 	spinlock	lock;				/* Write lock */
 	uint32		type;
+
+	hda_controller* controller;
 
 	uint32		pin_widget;			/* PIN Widget ID */
 	uint32		io_widgets[MAX_IO_WIDGETS];	/* Input/Output Converter Widget ID */
@@ -87,6 +155,36 @@ struct hda_stream {
 	area_id		buffer_area;
 	area_id		buffer_descriptors_area;
 	uint32		physical_buffer_descriptors;	/* BDL physical address */
+
+	uint8 Read8(uint32 reg)
+	{
+		return controller->Read8(HDAC_STREAM_BASE + offset + reg);
+	}
+
+	uint16 Read16(uint32 reg)
+	{
+		return controller->Read16(HDAC_STREAM_BASE + offset + reg);
+	}
+
+	uint8 Read32(uint32 reg)
+	{
+		return controller->Read32(HDAC_STREAM_BASE + offset + reg);
+	}
+
+	void Write8(uint32 reg, uint8 value)
+	{
+		*(controller->regs + HDAC_STREAM_BASE + offset + reg) = value;
+	}
+
+	void Write16(uint32 reg, uint8 value)
+	{
+		*(vuint16*)(controller->regs + HDAC_STREAM_BASE + offset + reg) = value;
+	}
+
+	void Write32(uint32 reg, uint8 value)
+	{
+		*(vuint32*)(controller->regs + HDAC_STREAM_BASE + offset + reg) = value;
+	}
 };
 
 struct hda_widget {
@@ -174,40 +272,6 @@ struct hda_codec {
 	struct hda_controller* controller;
 };
 
-/*!	This structure describes a single HDA compliant 
-	controller. It contains a list of available streams
-	for use by the codecs contained, and the messaging queue
-	(verb/response) buffers for communication.
-*/
-struct hda_controller {
-	struct pci_info	pci_info;
-	vint32			opened;
-	const char*		devfs_path;
-
-	area_id			regs_area;
-	vuint8*			regs;
-	uint32			irq;
-
-	uint16			codec_status;
-	uint32			num_input_streams;
-	uint32			num_output_streams;
-	uint32			num_bidir_streams;
-	
-	uint32			corb_length;
-	uint32			rirb_length;
-	uint32			rirb_read_pos;
-	uint32			corb_write_pos;
-	area_id			corb_rirb_pos_area;
-	corb_t*			corb;
-	rirb_t*			rirb;
-	uint32*			stream_positions;
-
-	hda_codec*		codecs[HDA_MAX_CODECS + 1];
-	hda_codec*		active_codec;
-	uint32			num_codecs;
-	
-	hda_stream*		streams[HDA_MAX_STREAMS];
-};
 
 /* driver.c */
 extern device_hooks gDriverHooks;
