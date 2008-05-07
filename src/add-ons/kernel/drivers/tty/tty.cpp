@@ -1866,7 +1866,7 @@ dump_tty_struct(struct tty& tty)
 	kprintf("  open_count:   %ld\n", tty.open_count);
 	kprintf("  select_pool:  %p\n", tty.select_pool);
 	kprintf("  pending_eof:  %lu\n", tty.pending_eof);
-	kprintf("  lock:         %ld\n", &tty.lock);
+	kprintf("  lock:         %p\n", tty.lock);
 
 	kprintf("  input_buffer:\n");
 	kprintf("    first:      %ld\n", tty.input_buffer.first);
