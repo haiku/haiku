@@ -36,6 +36,9 @@ sem_open(const char* name, int openFlags,...)
 		mode = va_arg(args, mode_t);
 		semCount = va_arg(args, unsigned);
 		va_end(args);
+	} else {
+		// clear O_EXCL, if O_CREAT is not given
+		openFlags &= ~O_EXCL;
 	}
 
 	// Allocate a sem_t structure -- we don't know, whether this is the first
