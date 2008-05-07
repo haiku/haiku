@@ -15,6 +15,7 @@
 #include <fs/KPath.h>
 #include <kernel.h>
 #include <lock.h>
+#include <real_time_clock.h>
 #include <syscall_restart.h>
 #include <team.h>
 #include <thread.h>
@@ -46,9 +47,11 @@ public:
 
 	status_t Init(const char* name, mode_t mode, int32 semCount)
 	{
-		fName = strdup(name);
-		if (fName == NULL)
-			return B_NO_MEMORY;
+		if (name != NULL) {
+			fName = strdup(name);
+			if (fName == NULL)
+				return B_NO_MEMORY;
+		}
 
 		fID = create_sem(semCount, name);
 		if (fID < 0)
@@ -171,6 +174,7 @@ public:
 			return ENOENT;
 
 		// does not exist yet -- create
+// TODO: Enforce per team semaphore limit!
 		sem = new(std::nothrow) SemInfo;
 		if (sem == NULL)
 			return B_NO_MEMORY;
@@ -362,16 +366,15 @@ struct realtime_sem_context {
 
 	status_t CreateAnonymousSem(uint32 semCount, int& _id)
 	{
+// TODO: Enforce per team semaphore limit!
 		SemInfo* sem = new(std::nothrow) SemInfo;
 		if (sem == NULL)
 			return B_NO_MEMORY;
 		ObjectDeleter<SemInfo> semDeleter(sem);
 
 		status_t error = sem->Init(NULL, 0, semCount);
-		if (error != B_OK) {
-			delete sem;
+		if (error != B_OK)
 			return error;
-		}
 
 		TeamSemInfo* teamSem = new(std::nothrow) TeamSemInfo(sem, NULL);
 		if (teamSem == NULL)
@@ -414,15 +417,19 @@ struct realtime_sem_context {
 		}
 
 		// not open yet -- create a new team sem
-		teamSem = new(std::nothrow) TeamSemInfo(sem, NULL);
+		teamSem = new(std::nothrow) TeamSemInfo(sem, userSem);
 		if (teamSem == NULL) {
 			sem->ReleaseReference();
+			if (_created)
+				sSemTable.UnlinkSem(name);
 			return B_NO_MEMORY;
 		}
 
 		error = fSemaphores.Insert(teamSem);
 		if (error != B_OK) {
 			delete teamSem;
+			if (_created)
+				sSemTable.UnlinkSem(name);
 			return error;
 		}
 
@@ -469,7 +476,8 @@ struct realtime_sem_context {
 			error = acquire_sem_etc(id, 1, B_CAN_INTERRUPT, 0);
 		} else {
 			error = acquire_sem_etc(id, 1, B_CAN_INTERRUPT | B_ABSOLUTE_TIMEOUT,
-				timeout);
+				timeout - rtc_boot_time());
+					// The given absolute timeout is relative to the Epoch.
 		}
 
 		return error == B_BAD_SEM_ID ? B_BAD_VALUE : error;
