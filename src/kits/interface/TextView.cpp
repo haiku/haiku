@@ -3576,7 +3576,16 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset
 				} while ((tabChars + numTabs) < numBytes);
 			}
 
-			if (inputRegion.CountRects() > 0) {
+			drawing_mode textRenderingMode = B_OP_COPY;
+
+			if (inputRegion.CountRects() > 0
+				&& ((offset <= fInline->Offset()
+					&& fInline->Offset() < offset + tabChars)
+				|| (fInline->Offset() <= offset
+					&& offset < fInline->Offset() + fInline->Length()))) {
+
+				textRenderingMode = B_OP_OVER;
+
 				BRegion textRegion;
 				GetTextRegion(offset, offset + length, &textRegion);
 
@@ -3608,6 +3617,7 @@ BTextView::_DrawLine(BView *view, const int32 &lineNum, const int32 &startOffset
 			const char *stringToDraw = fText->GetString(offset,
 				&returnedBytes);
 
+			view->SetDrawingMode(textRenderingMode);
 			view->DrawString(stringToDraw, returnedBytes);
 			if (foundTab) {
 				float penPos = PenLocation().x - fTextRect.left;
