@@ -11,6 +11,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <semaphore.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/wait.h>
@@ -124,6 +125,13 @@ _assert_posix_bool_error(const char* test, int expectedError, bool success,
 
 
 static void
+test_set(const char* testSet)
+{
+	printf("\nTEST SET: %s\n", testSet);
+}
+
+
+static void
 test_ok(const char* test)
 {
 	if (test != NULL)
@@ -138,10 +146,24 @@ _wait_for_child(const char* test, pid_t child, int lineNumber)
 	pid_t result = wait(&status);
 	_assert_posix_bool_success(test, result >= 0, lineNumber);
 	_assert_equals(test, child, result, lineNumber);
+	_assert_equals(test, 0, status, lineNumber);
 }
 
 
-#define TEST(test)	test_ok(currentTest); currentTest = (test);
+#if 0
+static void
+dump_sem(const char* name, sem_t* sem)
+{
+	printf("%s, %p: ", name, sem);
+	for (size_t i = 0; i < sizeof(sem_t); i++)
+		printf("%02x", ((char*)sem)[i]);
+	printf("\n");
+}
+#endif
+
+
+#define TEST_SET(testSet)	test_set(testSet)
+#define TEST(test)	test_ok(currentTest); currentTest = (test)
 
 #define assert_equals(expected, actual) \
 	_assert_equals(currentTest, (expected), (actual), __LINE__)
@@ -175,6 +197,8 @@ static const char* const kSemName1 = "/test_sem1";
 static void
 test_open_close_unlink()
 {
+	TEST_SET("sem_{open,close,unlink}()");
+
 	const char* currentTest = NULL;
 
 	// open non-existing with O_CREAT
@@ -257,6 +281,8 @@ test_open_close_unlink()
 static void
 test_init_destroy()
 {
+	TEST_SET("sem_{init,destroy}()");
+
 	const char* currentTest = NULL;
 
 	// init
@@ -292,6 +318,8 @@ test_init_destroy()
 static void
 test_open_close_fork()
 {
+	TEST_SET("sem_{open,close}() with fork()");
+
 	const char* currentTest = NULL;
 
 	// open non-existing with O_CREAT
@@ -336,6 +364,8 @@ test_open_close_fork()
 static void
 test_init_destroy_fork()
 {
+	TEST_SET("sem_{init,destroy}() with fork()");
+
 	const char* currentTest = NULL;
 
 	// init
@@ -365,6 +395,8 @@ test_init_destroy_fork()
 static void
 test_post_wait_named()
 {
+	TEST_SET("sem_{post,wait,trywait,timedwait}() named semaphore");
+
 	const char* currentTest = NULL;
 
 	// make sure the sem doesn't exist yet
@@ -513,6 +545,8 @@ test_post_wait_named()
 static void
 test_post_wait_unnamed()
 {
+	TEST_SET("sem_{post,wait,trywait,timedwait}() unnamed semaphore");
+
 	const char* currentTest = NULL;
 
 	// init
@@ -646,6 +680,8 @@ test_post_wait_unnamed()
 static void
 test_post_wait_named_fork()
 {
+	TEST_SET("sem_{post,wait,trywait,timedwait}() named semaphore with fork()");
+
 	const char* currentTest = NULL;
 
 	// make sure the sem doesn't exist yet
@@ -769,6 +805,9 @@ test_post_wait_named_fork()
 static void
 test_post_wait_named_fork2()
 {
+	TEST_SET("sem_{post,wait,trywait,timedwait}() named semaphore open after "
+		"fork");
+
 	const char* currentTest = NULL;
 
 	// make sure the sem doesn't exist yet
@@ -898,18 +937,101 @@ test_post_wait_named_fork2()
 }
 
 
-#ifdef __HAIKU__
-
 static void
 test_post_wait_unnamed_fork()
 {
+	TEST_SET("sem_{post,wait,trywait,timedwait}() unnamed semaphore with "
+		"fork()");
+
 	const char* currentTest = NULL;
 
 	// init
 	TEST("sem_init()");
 	sem_t _sem;
-	assert_posix_success(sem_init(&_sem, 1, 0));
+	assert_posix_success(sem_init(&_sem, 1, 1));
 	sem_t* sem = &_sem;
+
+	TEST("sem_getvalue()");
+	int value;
+	assert_posix_success(sem_getvalue(sem, &value));
+	assert_equals(1, value);
+
+	TEST("sem_wait() on fork()ed unnamed sem in parent and child");
+	pid_t child = fork();
+	assert_posix_bool_success(child >= 0);
+
+	if (child == 0) {
+		// child
+		sleep(1);
+		assert_posix_success(sem_wait(sem));
+
+		assert_posix_success(sem_getvalue(sem, &value));
+		assert_equals(0, value);
+
+		exit(0);
+	} else {
+		// parent
+		assert_posix_success(sem_wait(sem));
+		assert_posix_success(sem_getvalue(sem, &value));
+		assert_equals(0, value);
+
+		wait_for_child(child);
+	}
+
+	TEST("sem_getvalue()");
+	assert_posix_success(sem_getvalue(sem, &value));
+	assert_equals(0, value);
+
+	TEST("sem_post() on fork()ed unnamed sem in parent and child");
+	child = fork();
+	assert_posix_bool_success(child >= 0);
+
+	if (child == 0) {
+		// child
+		assert_posix_success(sem_post(sem));
+
+		assert_posix_success(sem_getvalue(sem, &value));
+		assert_equals(1, value);
+
+		exit(0);
+	} else {
+		// parent
+		assert_posix_success(sem_post(sem));
+		assert_posix_success(sem_getvalue(sem, &value));
+		assert_equals(1, value);
+
+		wait_for_child(child);
+	}
+
+	TEST("sem_getvalue()");
+	assert_posix_success(sem_getvalue(sem, &value));
+	assert_equals(1, value);
+
+	// destroy
+	TEST("sem_destroy()");
+	assert_posix_success(sem_destroy(sem));
+
+	TEST("done");
+}
+
+
+static void
+test_post_wait_unnamed_fork_shared()
+{
+	TEST_SET("sem_{post,wait,trywait,timedwait}() unnamed semaphore with "
+		"fork() in shared memory");
+
+	const char* currentTest = NULL;
+
+	// create shared memory area
+	void* address = mmap(NULL, 4096, PROT_READ | PROT_WRITE,
+		MAP_SHARED | MAP_ANON, -1, 0);
+	assert_posix_bool_success(address != MAP_FAILED);
+
+	// init
+	TEST("sem_init()");
+	sem_t* sem = (sem_t*)address;
+	assert_posix_success(sem_init(sem, 1, 0));
 
 	TEST("sem_getvalue()");
 	int value;
@@ -1017,10 +1139,11 @@ test_post_wait_unnamed_fork()
 	TEST("sem_destroy()");
 	assert_posix_success(sem_destroy(sem));
 
+	// unmap memory
+	assert_posix_success(munmap(address, 4096));
+
 	TEST("done");
 }
-
-#endif	// __HAIKU__
 
 
 int
@@ -1034,10 +1157,8 @@ main()
 	test_post_wait_unnamed();
 	test_post_wait_named_fork();
 	test_post_wait_named_fork2();
-#ifdef __HAIKU__
 	test_post_wait_unnamed_fork();
-// TODO: Check whether Linux and Solaris actually create an
-// independent clone of an unnamed semaphore on fork(). Check what happens when
-// putting the semaphore in anonymously mmap()ed memory.
-#endif
+	test_post_wait_unnamed_fork_shared();
+
+	printf("\nall tests OK\n");
 }
