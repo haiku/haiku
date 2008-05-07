@@ -89,10 +89,7 @@ public:
 	bigtime_t	getMaxDuration();
 
 	// The no of frames in the video track indexed by streamIndex
-	// 1 frame = 1 chunk
-	uint32		getVideoFrameCount(uint32 streamIndex);
-	// The no of frames in the audio track indexed by streamIndex
-	uint32		getAudioFrameCount(uint32 streamIndex);
+	uint32		getFrameCount(uint32 streamIndex);
 	// The no of chunks in the audio track indexed by streamIndex
 	uint32		getAudioChunkCount(uint32 streamIndex);
 	// Is stream (track) a video track

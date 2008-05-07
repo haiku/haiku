@@ -41,6 +41,17 @@ AtomBase::~AtomBase()
 	parentAtom = NULL;
 }
 
+char	*AtomBase::getAtomTypeAsFourcc()
+{
+	fourcc[0] = (char)((atomType >> 24) & 0xff);
+	fourcc[1] = (char)((atomType >> 16) & 0xff);
+	fourcc[2] = (char)((atomType >> 8) & 0xff);
+	fourcc[3] = (char)((atomType >> 0) & 0xff);
+	fourcc[4] = '\0';
+
+	return fourcc;
+}
+
 char *AtomBase::getAtomName()
 {
 	char *_result;
@@ -207,6 +218,36 @@ void	AtomBase::Read(uint8 *value, uint32 maxread)
 	bytes_read = getStream()->Read(value,maxread);
 
 	// Assert((bytes_read == maxread,"Read Error");
+}
+
+uint64	AtomBase::GetBits(uint64 buffer, uint8 startBit, uint8 totalBits)
+{
+	// startBit should range from 0-63, totalBits should range from 1-64
+	if ((startBit < 64) && (totalBits > 0) && (totalBits <= 64) && (startBit + totalBits <= 64)) {
+		// Ok pull from the buffer the bits wanted.
+		buffer = buffer << startBit;
+		buffer = buffer >> (64 - (totalBits + startBit) + startBit);
+		
+		printf("buffer = %Ld\n",buffer);
+		
+		return buffer;
+	}
+	
+	return 0L;
+}
+
+uint32	AtomBase::GetBits(uint32 buffer, uint8 startBit, uint8 totalBits)
+{
+	// startBit should range from 0-31, totalBits should range from 1-32
+	if ((startBit < 32) && (totalBits > 0) && (totalBits <= 32) && (startBit + totalBits <= 32)) {
+		// Ok pull from the buffer the bits wanted.
+		buffer = buffer << startBit;
+		buffer = buffer >> (32 - (startBit + totalBits) + startBit);
+		
+		return buffer;
+	}
+
+	return 0;
 }
 
 FullAtom::FullAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)

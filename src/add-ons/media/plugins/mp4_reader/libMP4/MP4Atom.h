@@ -101,17 +101,18 @@ public:
 	
 	uint64	getAtomSize() {return atomSize;};
 	uint32	getAtomType() {return atomType;};
-	off_t	getAtomOffset() {return atomOffset;};
-	off_t	getStreamOffset() {return streamOffset;};
+	char	*getAtomTypeAsFourcc();
+	off_t	getAtomOffset() { return atomOffset; };
+	off_t	getStreamOffset() { return streamOffset; };
 	
-	uint64	getDataSize() {return atomSize - 8;};
+	uint64	getDataSize() { return atomSize - 8;};
 	
 	uint64	getBytesRemaining();
 	
-	bool	IsType(uint32 patomType) {return patomType == atomType;};
+	bool	IsType(uint32 patomType) { return patomType == atomType; };
 	
-	void	setAtomOffset(off_t patomOffset) {atomOffset = patomOffset;};
-	void	setStreamOffset(off_t pstreamOffset) {streamOffset = pstreamOffset;};
+	void	setAtomOffset(off_t patomOffset) { atomOffset = patomOffset; };
+	void	setStreamOffset(off_t pstreamOffset) { streamOffset = pstreamOffset; };
 	
 	char 	*getAtomName();
 	
@@ -142,6 +143,9 @@ public:
 	void	Read(uint8	*value);
 	void	Read(char	*value, uint32 maxread);
 	void	Read(uint8	*value, uint32 maxread);
+	
+	uint64	GetBits(uint64 buffer, uint8 startBit, uint8 totalBits);
+	uint32	GetBits(uint32 buffer, uint8 startBit, uint8 totalBits);
 };
 
 class FullAtom : public AtomBase {

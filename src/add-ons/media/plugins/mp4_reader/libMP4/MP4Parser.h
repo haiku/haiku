@@ -171,15 +171,18 @@ public:
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
 	
-	uint64	getSUMCounts() {return SUMCounts;};
-	uint64	getSUMDurations() {return SUMDurations;};
-	uint32	getSampleForTime(uint32 pTime);
+	uint64	getSUMCounts() { return SUMCounts; };
+	uint64	getSUMDurations() { return SUMDurations; };
+	uint32	getSampleForTime(bigtime_t pTime);
 	uint32	getSampleForFrame(uint32 pFrame);
+	void	setFrameRate(float pFrameRate) { FrameRate = pFrameRate; };
+	
 private:
 	array_header		theHeader;
 	TimeToSampleArray	theTimeToSampleArray;
-	uint64	SUMDurations;
+	bigtime_t	SUMDurations;
 	uint64	SUMCounts;
+	float	FrameRate;
 };
 
 // Atom class for reading the composition time to sample atom
@@ -300,22 +303,72 @@ public:
 	off_t	getEOF();
 };
 
-class ESDSAtom : public FullAtom {
+// Subclass for handling special decoder config atoms like ESDS, ALAC, AVCC, AMR
+// ESDS is actually a FullAtom but others are not :-(
+class DecoderConfigAtom : public AtomBase {
+public:
+			DecoderConfigAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~DecoderConfigAtom();
+	virtual	void	OnProcessMetaData();
+	virtual	char	*OnGetAtomName();
+
+	// The decoder config is what the decoder uses for it's setup
+	// The values SHOULD mirror the Container values but often don't
+	// So we have to parse the config and use the values as container overrides
+	void			OverrideAudioDescription(AudioDescription *pAudioDescription);
+	virtual void	OnOverrideAudioDescription(AudioDescription *pAudioDescription) {} ;
+	void			OverrideVideoDescription(VideoDescription *pVideoDescription);
+	virtual void	OnOverrideVideoDescription(VideoDescription *pVideoDescription) {} ;
+	bool 			SkipTag(uint8 *ESDS, uint8 Tag, uint32 *offset);
+	
+	uint8	*getDecoderConfig();
+	size_t	getDecoderConfigSize() { return DecoderConfigSize; } ;
+private:
+	uint8	*theDecoderConfig;
+	size_t	DecoderConfigSize;
+};
+
+// Atom class for reading the ESDS decoder config atom
+class ESDSAtom : public DecoderConfigAtom {
 public:
 			ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
 	virtual	~ESDSAtom();
 	void	OnProcessMetaData();
 	char	*OnGetAtomName();
-	
-	uint8	*getVOL(bool forAudio);
-	size_t	getVOLSize(bool forAudio);
+	void	OnOverrideAudioDescription(AudioDescription *pAudioDescription);
+	void	OnOverrideVideoDescription(VideoDescription *pVideoDescription);
 private:
-	bool SkipTag(uint8 Tag, uint32 *offset);
-	uint8	*theVOL;
-	size_t	VOLSize;
+	uint8		ESDSType;
+	uint8		StreamType;
+	uint32		NeededBufferSize;
+	uint32		MaxBitRate;
+	uint32		AvgBitRate;
+	AACHeader	theAACHeader;
 };
 
-// Atom class for reading the sdst atom
+// Atom class for reading the ALAC decoder config atom
+class ALACAtom : public DecoderConfigAtom {
+public:
+			ALACAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~ALACAtom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+	void	OnOverrideAudioDescription(AudioDescription *pAudioDescription);
+	void	OnOverrideVideoDescription(VideoDescription *pVideoDescription);
+};
+
+// Atom class for reading the WAVE atom for mp3 decoder config
+class WAVEAtom : public DecoderConfigAtom {
+public:
+			WAVEAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
+	virtual	~WAVEAtom();
+	void	OnProcessMetaData();
+	char	*OnGetAtomName();
+	void	OnOverrideAudioDescription(AudioDescription *pAudioDescription);
+	void	OnOverrideVideoDescription(VideoDescription *pVideoDescription);
+};
+
+// Atom class for reading the Sample Description atom
 class STSDAtom : public FullAtom {
 public:
 			STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize);
@@ -329,10 +382,10 @@ public:
 private:
 	uint32	getMediaHandlerType();
 
-	void	ReadESDS(uint8 **VOL, size_t *VOLSize, bool forAudio);
+	void	ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigSize, AudioDescription *pAudioDescription, VideoDescription *pVideoDescription);
 	void	ReadSoundDescription();
 	void	ReadVideoDescription();
-
+	void	ReadHintDescription();
 	
 	uint32	codecid;
 	
@@ -416,14 +469,15 @@ public:
 	void	OnChildProcessingComplete();
 
 	bigtime_t	Duration(uint32 TimeScale);	// Return duration of track
-	uint32		FrameCount() {return framecount;};
+	bigtime_t	Duration() { return Duration(timescale); }
+	uint32		FrameCount() { return framecount; };
 	bool		IsVideo();	// Is this a video track
 	bool		IsAudio();	// Is this a audio track
 	// GetAudioMetaData()	// If this is a audio track get the audio meta data
 	// GetVideoMetaData()	// If this is a video track get the video meta data	
 	
-	uint32	getTimeForFrame(uint32 pFrame, uint32 pTimeScale);
-	uint32	getSampleForTime(uint32 pTime);
+	bigtime_t	getTimeForFrame(uint32 pFrame);
+	uint32	getSampleForTime(bigtime_t pTime);
 	uint32	getSampleForFrame(uint32 pFrame);
 	uint32	getChunkForSample(uint32 pSample, uint32 *pOffsetInChunk);
 	uint64	getOffsetForChunk(uint32 pChunkID);
@@ -431,6 +485,9 @@ public:
 	uint32	getSizeForSample(uint32 pSample);
 	uint32	getNoSamplesInChunk(uint32 pChunkID);
 	uint32	getTotalChunks();
+	
+	float	getSampleRate();
+	float	getFrameRate();
 	
 	bool	IsSyncSample(uint32 pSampleNo);
 	bool	IsSingleSampleSize();
@@ -446,6 +503,7 @@ private:
 	
 	uint32		framecount;
 	uint32		bytespersample;
+	uint32		timescale;
 };
 
 // Atom class for reading the media container atom

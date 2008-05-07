@@ -189,6 +189,14 @@ AtomBase *getAtom(BPositionIO *pStream)
 		return new ESDSAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	}
 
+	if (aAtomType == uint32('alac')) {
+		return new ALACAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+	
+	if (aAtomType == uint32('wave')) {
+		return new WAVEAtom(pStream, aStreamOffset, aAtomType, aRealAtomSize);
+	}
+
 	return new AtomBase(pStream, aStreamOffset, aAtomType, aRealAtomSize);
 	
 }
@@ -477,6 +485,8 @@ TimeToSample	*aTimeToSample;
 
 	ReadArrayHeader(&theHeader);
 
+//	printf("STTS:: Entries %ld\n",theHeader.NoEntries);
+
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aTimeToSample = new TimeToSample;
 		
@@ -486,7 +496,11 @@ TimeToSample	*aTimeToSample;
 		theTimeToSampleArray[i] = aTimeToSample;
 		SUMDurations += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
 		SUMCounts += theTimeToSampleArray[i]->Count;
+
+//		printf("(%ld,%ld)",aTimeToSample->Count,aTimeToSample->Duration);
+
 	}
+//	printf("\n");
 }
 
 char *STTSAtom::OnGetAtomName()
@@ -494,24 +508,30 @@ char *STTSAtom::OnGetAtomName()
 	return "Time to Sample Atom";
 }
 
-uint32	STTSAtom::getSampleForTime(uint32 pTime)
+uint32	STTSAtom::getSampleForTime(bigtime_t pTime)
 {
-// TODO this is too slow.  PreCalc when loading this?
-	uint64 Duration = 0;
+	// Sample for time is this calc, how does STTS help us?
+	return uint32((pTime * FrameRate + 50) / 1000000.0);
 
+
+// TODO this is too slow.  PreCalc when loading this?
+/*	bigtime_t TotalDuration = 0;
+	uint64 TotalCount = 0;
+	
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
-		Duration += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
-		if (Duration > pTime) {
-			return i;
+		TotalDuration += (theTimeToSampleArray[i]->Duration * theTimeToSampleArray[i]->Count);
+		TotalCount += theTimeToSampleArray[i]->Count;
+		if ((TotalDuration * 44100) > pTime) {
+			return uint32((pTime * FrameRate + 50) / 1000000.0);
 		}
 	}
 
-	return 0;
+	return 0; */
 }
 
 uint32	STTSAtom::getSampleForFrame(uint32 pFrame)
 {
-// Hmm Sample is Frame really, this Atom is more usefull for time->sample calcs
+	// Convert frame to time and call getSampleForTime()
 	return pFrame;
 }
 
@@ -573,6 +593,8 @@ SampleToChunk	*aSampleToChunk;
 	ReadArrayHeader(&theHeader);
 	
 	uint32	TotalPrevSamples = 0;
+	
+//	printf("STSC:: Entries %ld\n",theHeader.NoEntries);
 
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aSampleToChunk = new SampleToChunk;
@@ -588,8 +610,11 @@ SampleToChunk	*aSampleToChunk;
 			aSampleToChunk->TotalPrevSamples = 0;
 		}
 
+//		printf("(%ld,%ld)",aSampleToChunk->SamplesPerChunk, aSampleToChunk->TotalPrevSamples);
+
 		theSampleToChunkArray[i] = aSampleToChunk;
 	}
+//	printf("\n");
 }
 
 char *STSCAtom::OnGetAtomName()
@@ -665,7 +690,7 @@ SyncSample	*aSyncSample;
 	FullAtom::OnProcessMetaData();
 
 	ReadArrayHeader(&theHeader);
-	
+
 	for (uint32 i=0;i<theHeader.NoEntries;i++) {
 		aSyncSample = new SyncSample;
 		
@@ -688,7 +713,7 @@ bool	STSSAtom::IsSyncSample(uint32 pSampleNo)
 			return true;
 		}
 		
-		if (pSampleNo > theSyncSampleArray[i]->SyncSampleNo) {
+		if (pSampleNo < theSyncSampleArray[i]->SyncSampleNo) {
 			return false;
 		}
 	}
@@ -908,28 +933,42 @@ uint64	STCOAtom::getOffsetForChunk(uint32 pChunkID)
 	return 0LL;
 }
 
-ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
+DecoderConfigAtom::DecoderConfigAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomBase(pStream, pstreamOffset, patomType, patomSize)
 {
-	theVOL = NULL;
+	theDecoderConfig = NULL;
+	DecoderConfigSize = 0;
 }
 
-ESDSAtom::~ESDSAtom()
+DecoderConfigAtom::~DecoderConfigAtom()
 {
-	if (theVOL) {
-		free(theVOL);
+	if (theDecoderConfig) {
+		free(theDecoderConfig);
 	}
 }
 
-bool ESDSAtom::SkipTag(uint8 Tag, uint32 *offset) {
+void DecoderConfigAtom::OnProcessMetaData()
+{
+	DecoderConfigSize = getBytesRemaining();
+	
+	theDecoderConfig = (uint8 *)(malloc(DecoderConfigSize));
+	Read(theDecoderConfig,DecoderConfigSize);
+}
+
+uint8 *DecoderConfigAtom::getDecoderConfig()
+{
+	return theDecoderConfig;
+}
+
+bool DecoderConfigAtom::SkipTag(uint8 *ESDS, uint8 Tag, uint32 *offset) {
 	uint8 byte;
 
-	byte = theVOL[(*offset)++];
+	byte = ESDS[(*offset)++];
 	if (byte == Tag) {
 		uint8 numBytes = 0;
 		unsigned int length = 0;
 
 		do {
-			byte = theVOL[(*offset)++];
+			byte = ESDS[(*offset)++];
 			numBytes++;
 			length = (length << 7) | (byte & 0x7F);
 		} while ((byte & 0x80) && numBytes < 4);
@@ -937,99 +976,51 @@ bool ESDSAtom::SkipTag(uint8 Tag, uint32 *offset) {
 	} else {
 		// go back Tag not found
 		(*offset)--;
-		printf("No Tag %d\n",Tag);
 		return false;
 	}
 	
 	return true;
 }
 
+char *DecoderConfigAtom::OnGetAtomName()
+{
+	return "Decoder Config Atom - Unknown type";
+}
+
+void DecoderConfigAtom::OverrideAudioDescription(AudioDescription *pAudioDescription)
+{
+	if (pAudioDescription) {
+		pAudioDescription->DecoderConfigSize = DecoderConfigSize;
+		pAudioDescription->theDecoderConfig = (uint8 *)(malloc(DecoderConfigSize));
+		memcpy(pAudioDescription->theDecoderConfig, theDecoderConfig, DecoderConfigSize);
+		OnOverrideAudioDescription(pAudioDescription);
+	}
+}
+
+void DecoderConfigAtom::OverrideVideoDescription(VideoDescription *pVideoDescription)
+{
+	if (pVideoDescription) {
+		pVideoDescription->DecoderConfigSize = DecoderConfigSize;
+		pVideoDescription->theDecoderConfig = (uint8 *)(malloc(DecoderConfigSize));
+		memcpy(pVideoDescription->theDecoderConfig, theDecoderConfig, DecoderConfigSize);
+		OnOverrideVideoDescription(pVideoDescription);
+	}
+}
+
+ESDSAtom::ESDSAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : DecoderConfigAtom(pStream, pstreamOffset, patomType, patomSize)
+{
+}
+
+ESDSAtom::~ESDSAtom()
+{
+}
+
 void ESDSAtom::OnProcessMetaData()
 {
-	FullAtom::OnProcessMetaData();
-
-	VOLSize = getBytesRemaining();
-	uint32 offset = 0;
-	
-	theVOL = (uint8 *)(malloc(VOLSize));
-	Read(theVOL,VOLSize);
-	
-	// Display the VOL
-	if (VOLSize > 0) {
-		if (SkipTag(0x03,&offset)) {
-			offset += 3;
-		} else {
-			offset += 2;
-		}
-
-		if (SkipTag(0x04,&offset)) {
-			printf("type id is %d", theVOL[offset]);
-			switch (theVOL[offset]) {
-				case 1: printf("system v1"); break;
-				case 2: printf("system v2"); break;
-				case 32: printf("MPEG-4 video"); break;
-				case 33: printf("MPEG-4 AVC SPS"); break;
-				case 34: printf("MPEG-4 AVC PPS"); break;
-				case 64: printf("MPEG-4 audio"); break;
-			}
-			
-			offset+=2;
-			
-			uint32 a,b,c;
-			uint32 buff;
-			
-			a = theVOL[offset];
-			b = theVOL[offset+1];
-			c = theVOL[offset+2];
-
-			buff = (a << 16) | (b << 8) | c;
-
-			printf(" buf size %ld ",buff);
-			printf(" max bit rate %ld",uint32(theVOL[offset+4]));
-			printf(" avg bit rate %ld\n",uint32(theVOL[offset+8]));
-		}
-	} else {
-		printf("VOL size is 0\n");
-	}
-	
-}
-
-size_t ESDSAtom::getVOLSize(bool forAudio) 
-{
-	uint32 offset = 0;
-	if (forAudio) {
-		if (SkipTag(0x03,&offset)) {
-			offset += 3;
-		} else {
-			offset += 2;
-		}
-		if (SkipTag(0x04,&offset)) {
-			offset += 13;
-		}
-
-		SkipTag(0x05,&offset);
-	}
-	
-	return ( VOLSize - offset);
-}
-
-uint8 *ESDSAtom::getVOL(bool forAudio)
-{
-	uint32 offset = 0;
-	if (forAudio) {
-		if (SkipTag(0x03,&offset)) {
-			offset += 3;
-		} else {
-			offset += 2;
-		}
-		if (SkipTag(0x04,&offset)) {
-			offset += 13;
-		}
-
-		SkipTag(0x05,&offset);
-	}
-	
-	return &theVOL[offset];
+	// Read 4 bytes because this is really a FullAtom
+	uint32 version;
+	Read(&version);
+	DecoderConfigAtom::OnProcessMetaData();
 }
 
 char *ESDSAtom::OnGetAtomName()
@@ -1037,23 +1028,191 @@ char *ESDSAtom::OnGetAtomName()
 	return "Extended Sample Description Atom";
 }
 
+char *obj_type_names[]=
+{
+	"Unknown",
+	"Main-AAC",
+	"LC-AAC",
+	"SSR-AAC",
+	"LTP-AAC",
+	"HE-AAC",
+	"HE-AAC(disabled)"
+};
+
+int aac_sampling_rate[16] = 
+{
+	96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050,
+	16000, 12000, 11025, 8000, 7350, 0, 0, 0
+};
+
+void	ESDSAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+{
+	// decode for aac and check for HE-AAC which uses a framesize of 2048
+	// also check for MP3 which has an ESDS
+	uint32 offset = 0;
+
+	if (SkipTag(pAudioDescription->theDecoderConfig, 0x03, &offset)) {
+		offset += 3;
+	} else {
+		offset += 2;
+	}
+
+	if (SkipTag(pAudioDescription->theDecoderConfig, 0x04, &offset)) {
+		ESDSType = pAudioDescription->theDecoderConfig[offset];
+		StreamType = pAudioDescription->theDecoderConfig[offset+1]/4;
+		NeededBufferSize = uint32(pAudioDescription->theDecoderConfig[offset+2]) * 256 * 256 +
+		pAudioDescription->theDecoderConfig[offset+3] * 256 + pAudioDescription->theDecoderConfig[offset+4];
+		MaxBitRate = uint32(pAudioDescription->theDecoderConfig[offset+5]) * 256 * 256 * 256 +
+		pAudioDescription->theDecoderConfig[offset+6] * 256 * 256 +
+		pAudioDescription->theDecoderConfig[offset+7] * 256 +
+		pAudioDescription->theDecoderConfig[offset+8];
+		AvgBitRate = uint32(pAudioDescription->theDecoderConfig[offset+9]) * 256 * 256 * 256 +
+		pAudioDescription->theDecoderConfig[offset+10] * 256 * 256 +
+		pAudioDescription->theDecoderConfig[offset+11] * 256 +
+		pAudioDescription->theDecoderConfig[offset+12];
+		printf("obj type id is %d \n", ESDSType);
+		printf("stream type is %d\n", StreamType);
+		printf("Buffer Size is %ld\n", NeededBufferSize);
+		printf("max Bitrate is %ld\n", MaxBitRate);
+		printf("avg Bitrate is %ld\n", AvgBitRate);
+		
+		pAudioDescription->BitRate = AvgBitRate;
+		
+		offset+=13;
+	}
+
+	SkipTag(pAudioDescription->theDecoderConfig, 0x05, &offset);
+	uint32 buffer;
+	uint32 temp;
+
+	switch (ESDSType) {
+		case 64:	// AAC
+		// Attempt to read AAC Header
+		buffer = pAudioDescription->theDecoderConfig[offset];
+		buffer = buffer * 256 + pAudioDescription->theDecoderConfig[offset+1] ;
+		buffer = buffer * 256 + pAudioDescription->theDecoderConfig[offset+2] ;
+		buffer = buffer * 256 + pAudioDescription->theDecoderConfig[offset+3] ;
+	
+		// Bits 0-5 are decoder type
+		temp = GetBits(buffer,0,5);
+		theAACHeader.objTypeIndex = temp;
+		// Bits 6-9 are frequency index
+		temp = GetBits(buffer,6,3);
+		theAACHeader.sampleRateIndex = temp;
+		// Bits 10-12 are channels
+		temp = GetBits(buffer,10,3);
+		theAACHeader.totalChannels = temp;
+	
+		if (theAACHeader.objTypeIndex < 3) {
+			pAudioDescription->codecSubType = 'mp4a';
+			pAudioDescription->FrameSize = 1024;
+		} else {
+			pAudioDescription->codecSubType = 'haac';
+			pAudioDescription->FrameSize = 2048;
+		}
+	
+		// SampleRate is in 16.16 format
+		pAudioDescription->theAudioSampleEntry.SampleRate = aac_sampling_rate[theAACHeader.sampleRateIndex] * 65536 ;
+		pAudioDescription->theAudioSampleEntry.ChannelCount = theAACHeader.totalChannels;
+		break;
+		
+		case 107:	// MP3
+			pAudioDescription->codecSubType = 'mp3';
+			
+			// Only set this for mp3, we calc it normally
+			if (NeededBufferSize > pAudioDescription->BufferSize) {
+				pAudioDescription->BufferSize = NeededBufferSize;
+			}
+
+			break;
+	}
+}
+
+void	ESDSAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+{
+	// Nothing to override
+}
+
+ALACAtom::ALACAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : DecoderConfigAtom(pStream, pstreamOffset, patomType, patomSize)
+{
+}
+
+ALACAtom::~ALACAtom()
+{
+}
+
+void ALACAtom::OnProcessMetaData()
+{
+	DecoderConfigAtom::OnProcessMetaData();
+}
+
+char *ALACAtom::OnGetAtomName()
+{
+	return "ALAC Decoder Config Atom";
+}
+
+void ALACAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+{
+	pAudioDescription->codecSubType = 'alac';
+	pAudioDescription->FrameSize = 4096;
+}
+
+void	ALACAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+{
+	// Nothing to override
+}
+
+WAVEAtom::WAVEAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : DecoderConfigAtom(pStream, pstreamOffset, patomType, patomSize)
+{
+}
+
+WAVEAtom::~WAVEAtom()
+{
+}
+
+void WAVEAtom::OnProcessMetaData()
+{
+
+}
+
+char *WAVEAtom::OnGetAtomName()
+{
+	return "WAVE Decoder Config Atom";
+}
+
+void WAVEAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
+{
+	pAudioDescription->codecSubType = 'alac';
+	pAudioDescription->FrameSize = 4096;
+}
+
+void	WAVEAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)
+{
+	// Nothing to override
+}
+
 STSDAtom::STSDAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : FullAtom(pStream, pstreamOffset, patomType, patomSize)
 {
 	theHeader.NoEntries = 0;
-	theAudioDescription.theVOL = NULL;
-	theVideoDescription.theVOL = NULL;
+	theAudioDescription.codecid = 0;
+	theAudioDescription.codecSubType = 0;
+	theAudioDescription.FrameSize = 0;
+	theAudioDescription.BufferSize = 0;
+	theAudioDescription.BitRate = 0;
+	theAudioDescription.theDecoderConfig = NULL;
+	theVideoDescription.theDecoderConfig = NULL;
 }
 
 STSDAtom::~STSDAtom()
 {
-	if (theAudioDescription.theVOL) {
-		free(theAudioDescription.theVOL);
-		theAudioDescription.theVOL = NULL;
+	if (theAudioDescription.theDecoderConfig) {
+		free(theAudioDescription.theDecoderConfig);
+		theAudioDescription.theDecoderConfig = NULL;
 	}
 	
-	if (theVideoDescription.theVOL) {
-		free(theVideoDescription.theVOL);
-		theVideoDescription.theVOL = NULL;
+	if (theVideoDescription.theDecoderConfig) {
+		free(theVideoDescription.theDecoderConfig);
+		theVideoDescription.theDecoderConfig = NULL;
 	}
 }
 
@@ -1062,12 +1221,14 @@ uint32	STSDAtom::getMediaHandlerType()
 	return dynamic_cast<STBLAtom *>(getParent())->getMediaHandlerType();
 }
 
-void STSDAtom::ReadESDS(uint8 **VOL, size_t *VOLSize, bool forAudio)
+void STSDAtom::ReadDecoderConfig(uint8 **pDecoderConfig, size_t *pDecoderConfigSize, AudioDescription *pAudioDescription, VideoDescription *pVideoDescription)
 {
-	// Check for a esds and if it exists read it into the VOL buffer
-	// MPEG-4 video/audio use the esds to store the VOL (STUPID COMMITTEE IDEA)
+	// Check for a Decoder Config and if it exists copy it back to the caller
+	// MPEG-4 video/audio use the various decoder config structures to pass additional
+	// decoder information to the decoder.  The extractor sometimes needs to decode the data
+	// to work out how to properly construct the decoder
 	
-	// First make sure we have a esds
+	// First make sure we have a something
 	if (getBytesRemaining() > 0) {
 		// Well something is there so read it as an atom
 		AtomBase *aAtomBase = getAtom(theStream);
@@ -1075,11 +1236,11 @@ void STSDAtom::ReadESDS(uint8 **VOL, size_t *VOLSize, bool forAudio)
 		aAtomBase->ProcessMetaData();
 		printf("%s [%Ld]\n",aAtomBase->getAtomName(),aAtomBase->getAtomSize());
 
-		if (dynamic_cast<ESDSAtom *>(aAtomBase)) {
-			// ESDS atom good
-			*VOLSize = dynamic_cast<ESDSAtom *>(aAtomBase)->getVOLSize(forAudio);
-			*VOL = (uint8 *)(malloc(*VOLSize));
-			memcpy(*VOL,dynamic_cast<ESDSAtom *>(aAtomBase)->getVOL(forAudio),*VOLSize);
+		if (dynamic_cast<DecoderConfigAtom *>(aAtomBase)) {
+			// DecoderConfig atom good
+			DecoderConfigAtom *aDecoderConfigAtom = dynamic_cast<DecoderConfigAtom *>(aAtomBase);
+			aDecoderConfigAtom->OverrideAudioDescription(pAudioDescription);
+			aDecoderConfigAtom->OverrideVideoDescription(pVideoDescription);
 
 			delete aAtomBase;
 		} else {
@@ -1099,7 +1260,7 @@ void STSDAtom::ReadSoundDescription()
 	Read(&theAudioDescription.theAudioSampleEntry.reserved);
 	Read(&theAudioDescription.theAudioSampleEntry.SampleRate);
 	
-	ReadESDS(&theAudioDescription.theVOL,&theAudioDescription.VOLSize,true);
+	ReadDecoderConfig(&theAudioDescription.theDecoderConfig, &theAudioDescription.DecoderConfigSize, &theAudioDescription, NULL);
 }
 
 void STSDAtom::ReadVideoDescription()
@@ -1129,7 +1290,7 @@ void STSDAtom::ReadVideoDescription()
 	Read(&theVideoDescription.theVideoSampleEntry.Depth);
 	Read(&theVideoDescription.theVideoSampleEntry.pre_defined3);
 
-	ReadESDS(&theVideoDescription.theVOL,&theVideoDescription.VOLSize, false);
+	ReadDecoderConfig(&theVideoDescription.theDecoderConfig, &theVideoDescription.DecoderConfigSize, NULL, &theVideoDescription);
 }
 
 void STSDAtom::OnProcessMetaData()
@@ -1331,13 +1492,13 @@ void MDATAtom::OnProcessMetaData()
 
 char *MDATAtom::OnGetAtomName()
 {
-	printf("Offset %lld, Size %lld ",getStreamOffset(),getAtomSize());
+	printf("Offset %lld, Size %lld ",getAtomOffset(),getAtomSize() - 8);
 	return "Media Data Atom";
 }
 
 off_t	MDATAtom::getEOF()
 {
-	return getStreamOffset() + getAtomSize();
+	return getAtomOffset() + getAtomSize() - 8;
 }
 
 MINFAtom::MINFAtom(BPositionIO *pStream, off_t pstreamOffset, uint32 patomType, uint64 patomSize) : AtomContainer(pStream, pstreamOffset, patomType, patomSize)
@@ -1549,7 +1710,7 @@ char *MDHDAtom::OnGetAtomName()
 
 bigtime_t	MDHDAtom::getDuration() 
 {
-	return bigtime_t((uint64(theHeader.Duration) * 1000000L) / theHeader.TimeScale);
+	return bigtime_t((theHeader.Duration * 1000000.0) / theHeader.TimeScale);
 }
 
 uint32		MDHDAtom::getTimeScale()

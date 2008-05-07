@@ -38,7 +38,7 @@
 #include <string.h>
 
 
-//#define TRACE_MP4_READER
+#define TRACE_MP4_READER
 #ifdef TRACE_MP4_READER
 #	define TRACE printf
 #else
@@ -60,8 +60,6 @@ struct mp4_cookie {
 	bool		audio;
 
 	// audio only:
-	off_t		byte_pos;
-	uint32		chunk_pos;
 	uint32		bytes_per_sec_rate;
 	uint32		bytes_per_sec_scale;
 
@@ -145,6 +143,9 @@ mp4Reader::GetFileFormatInfo(media_file_format *mff)
 status_t
 mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 {
+	size_t size;
+	const void *data;
+
 	mp4_cookie *cookie = new mp4_cookie;
 	*_cookie = cookie;
 	
@@ -181,12 +182,10 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			return B_ERROR;
 		}
 
-		cookie->frame_count = theFileReader->getAudioFrameCount(cookie->stream);
+		cookie->frame_count = theFileReader->getFrameCount(cookie->stream);
 		cookie->duration = theFileReader->getAudioDuration(cookie->stream);
 		
 		cookie->audio = true;
-		cookie->byte_pos = 0;
-		cookie->chunk_pos = 1;
 
 		if (stream_header->scale && stream_header->rate) {
 			cookie->bytes_per_sec_rate = stream_header->rate *
@@ -196,6 +195,8 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			cookie->frames_per_sec_scale = stream_header->scale;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using both)\n",
 				cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using both)\n",
+				cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
 		} else if (stream_header->rate) {
 			cookie->bytes_per_sec_rate = stream_header->rate * audio_format->SampleSize
 				* audio_format->NoOfChannels / 8;
@@ -204,14 +205,8 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			cookie->frames_per_sec_scale = 1;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n",
 				cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
-		} else if (audio_format->PacketSize) {
-			cookie->bytes_per_sec_rate = audio_format->PacketSize;
-			cookie->bytes_per_sec_scale = 1;
-			cookie->frames_per_sec_rate = audio_format->PacketSize * 8
-				/ audio_format->SampleSize / audio_format->NoOfChannels;
-			cookie->frames_per_sec_scale = 1;
-			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using PacketSize)\n",
-				cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
+			TRACE("frames_per_sec_rate %ld, frames_per_sec_scale %ld (using rate)\n",
+				cookie->frames_per_sec_rate, cookie->frames_per_sec_scale);
 		} else {
 			cookie->bytes_per_sec_rate = 128000;
 			cookie->bytes_per_sec_scale = 8;
@@ -294,10 +289,32 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
 					break;
 				case 'mp4a':
-					TRACE("AAC Audio (mp4a)\n");
-					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
-					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
+				case 'alac':
+					TRACE("AAC audio (mp4a) or ALAC audio\n");
+		
+					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;;
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					format->u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_SHORT;
+					format->u.encoded_audio.output.byte_order =	B_HOST_IS_LENDIAN ? B_MEDIA_LITTLE_ENDIAN : B_MEDIA_BIG_ENDIAN;
+
+					// AAC is 1024 samples per frame
+					// HE-AAC is 2048 samples per frame
+					// ALAC is 4096 samples per frame
+
+					format->u.encoded_audio.frame_size = audio_format->FrameSize;
+					format->u.encoded_audio.output.buffer_size = audio_format->BufferSize;
+			
+					// Average BitRate = (TotalBytes * 8 * (SampleRate / FrameSize)) / TotalFrames
+					// Setting a bitrate seems to cause more problems than it solves
+					format->u.encoded_audio.bit_rate = audio_format->BitRate;	// usually 128000 for AAC
+
+					printf("Audio NoOfChannels %d, SampleSize %d, SampleRate %f, FrameSize %ld\n",audio_format->NoOfChannels, audio_format->SampleSize, audio_format->SampleRate, audio_format->FrameSize);
+
+					printf("Audio frame_rate %f, channel_count %ld, format %ld, buffer_size %ld, frame_size %ld, bit_rate %f\n",
+						format->u.encoded_audio.output.frame_rate, format->u.encoded_audio.output.channel_count, format->u.encoded_audio.output.format,format->u.encoded_audio.output.buffer_size, format->u.encoded_audio.frame_size, format->u.encoded_audio.bit_rate);
+
+					printf("Track %d MP4 Audio FrameCount %ld\n",cookie->stream,theFileReader->getFrameCount(cookie->stream));
+			
 					break;
 				default:
 					char cc1,cc2,cc3,cc4;
@@ -315,49 +332,18 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			}
 		}
 
-/*		if (audio_format->compression == 0x0001) {
-			// a raw PCM format
-			description.family = B_BEOS_FORMAT_FAMILY;
-			description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
-			if (B_OK != formats.GetFormatFor(description, format)) 
-				format->type = B_MEDIA_RAW_AUDIO;
-			format->u.raw_audio.frame_rate = audio_format->SampleRate;
-			format->u.raw_audio.channel_count = audio_format->NoOfChannels;
-			if (audio_format->bits_per_sample <= 8)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_UINT8;
-			else if (audio_format->bits_per_sample <= 16)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_INT16;
-			else if (audio_format->bits_per_sample <= 24)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_INT24;
-			else if (audio_format->bits_per_sample <= 32)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
-			else {
-				ERROR("movReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->bits_per_sample);
-				return B_ERROR;
-			}
-			format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
-			format->u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
-			format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
-		} else {
-			// some encoded format
-			description.family = B_WAV_FORMAT_FAMILY;
-			description.u.wav.codec = audio_format->compression;
-			if (B_OK != formats.GetFormatFor(description, format)) 
-				format->type = B_MEDIA_ENCODED_AUDIO;
-			format->u.encoded_audio.bit_rate = 8 * audio_format->PacketSize;
-			TRACE("bit_rate %.3f\n", format->u.encoded_audio.bit_rate);
-			format->u.encoded_audio.output.frame_rate = audio_format->SampleRate;
-			format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
-		}
-		*/
 		// this doesn't seem to work (it's not even a fourcc)
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = audio_format->compression; format->user_data[4] = 0;
 		
-		// Set the VOL
-		size_t size = audio_format->VOLSize;
-		const void *data = audio_format->theVOL;
-		format->SetMetaData(data, size);
+		// Set the DecoderConfigSize
+		size = audio_format->DecoderConfigSize;
+		data = audio_format->theDecoderConfig;
+		if (size > 0) {
+			if (format->SetMetaData(data, size) != B_OK) {
+				printf("Failed to set Decoder Config\n");
+			}
+		}
 
 #ifdef TRACE_MP4_READER
 		if (data) {
@@ -463,13 +449,13 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		TRACE("max_bit_rate %.3f\n", format->u.encoded_video.max_bit_rate);
 		TRACE("field_rate   %.3f\n", format->u.encoded_video.output.field_rate);
 
-		// Set the VOL
-		if (video_format->VOLSize > 0) {
-			TRACE("VOL Found Size is %ld\n",video_format->VOLSize);
-			size_t size = video_format->VOLSize;
-			const void *data = video_format->theVOL;
+		// Set the Decoder Config
+		size = video_format->DecoderConfigSize;
+		data = video_format->theDecoderConfig;
+		if (size > 0) {
+			TRACE("Decoder Config Found Size is %ld\n",size);
 			if (format->SetMetaData(data, size) != B_OK) {
-				ERROR("Failed to set VOL\n %d %d",(16 << 20),32000);
+				printf("Failed to set Decoder Config\n");
 			}
 
 #ifdef TRACE_MP4_READER
@@ -514,12 +500,12 @@ mp4Reader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 	// Copy metadata to infoBuffer
 	if (theFileReader->IsVideo(cookie->stream)) {
 		const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
-		*infoBuffer = video_format->theVOL;
-		*infoSize = video_format->VOLSize;
+		*infoBuffer = video_format->theDecoderConfig;
+		*infoSize = video_format->DecoderConfigSize;
 	} else {
 		const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
-		*infoBuffer = audio_format->theVOL;
-		*infoSize = audio_format->VOLSize;
+		*infoBuffer = audio_format->theDecoderConfig;
+		*infoSize = audio_format->DecoderConfigSize;
 	}
 	return B_OK;
 }
@@ -538,16 +524,16 @@ mp4Reader::Seek(void *cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
 		// frame = (time * rate) / fps / 1000000LL
 		*frame = ((*time * mp4cookie->frames_per_sec_rate) / (int64)mp4cookie->frames_per_sec_scale) / 1000000LL;
 		TRACE("Time %Ld to Frame %Ld\n",*time, *frame);
-//		movcookie->frame_pos = *frame;
-//		return B_ERROR;
+		mp4cookie->frame_pos = *frame;
+		return B_OK;
 	}
 	
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
 		// time = frame * 1000000LL * fps / rate
 		TRACE("Frame %Ld to Time %Ld\n", *frame, *time);
 		*time = (*frame * 1000000LL * (int64)mp4cookie->frames_per_sec_scale) / mp4cookie->frames_per_sec_rate;
-//		movcookie->frame_pos = *frame;
-//		return B_ERROR;
+		mp4cookie->frame_pos = *frame;
+		return B_OK;
 	}
 
 	TRACE("mp4Reader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
@@ -570,16 +556,9 @@ mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 	uint32 size;
 	bool keyframe;
 
-	if (cookie->audio) {
-		// use chunk position
-		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->chunk_pos,
-				&start, &size, &keyframe))
-			return B_LAST_BUFFER_ERROR;
-	} else {
-		// use frame position
-		if (!theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos,
-				&start, &size, &keyframe))
-			return B_LAST_BUFFER_ERROR;
+	if (theFileReader->GetNextChunkInfo(cookie->stream, cookie->frame_pos,	&start, &size, &keyframe) == false) {
+		TRACE("LAST BUFFER ERROR\n");
+		return B_LAST_BUFFER_ERROR;
 	}
 
 	if (cookie->buffer_size < size) {
@@ -589,36 +568,23 @@ mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
 	}
 	
 	if (cookie->audio) {
-		TRACE("Audio stream %d: chunk %ld expected start time %lld output size %ld key %d\n",cookie->stream, cookie->chunk_pos, start, size, keyframe);
+//		TRACE("Audio stream %d: frame %ld expected start time %lld output size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
 		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
 		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
-
-		// This will only work with raw audio I think.
-		mediaHeader->start_time = (cookie->byte_pos * 1000000LL * cookie->bytes_per_sec_scale) / cookie->bytes_per_sec_rate;
-		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using byte_pos\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->chunk_pos),mediaHeader->start_time);
-		
-		// We should find the current frame position (ie first frame in chunk) then compute using fps
-		cookie->frame_pos = theFileReader->getFirstFrameInChunk(cookie->stream,cookie->chunk_pos);
-		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
-		TRACE("Audio - Frames in Chunk %ld / Actual Start Time %Ld using frame_no %ld\n",theFileReader->getNoFramesInChunk(cookie->stream,cookie->chunk_pos),mediaHeader->start_time, cookie->frame_pos);
-
-		cookie->byte_pos += size;
-		// frame_pos is chunk No for audio
-		cookie->chunk_pos++;
 	} else {
-		TRACE("Video stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
-		mediaHeader->start_time = (cookie->frame_pos * 1000000LL * (int64)cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
+//		TRACE("Video stream %d: frame %ld start %lld Size %ld key %d\n",cookie->stream, cookie->frame_pos, start, size, keyframe);
 		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
 		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
 		mediaHeader->u.encoded_video.first_active_line = 0;
 		mediaHeader->u.encoded_video.line_count = cookie->line_count;
 		mediaHeader->u.encoded_video.field_number = 0;
 		mediaHeader->u.encoded_video.field_sequence = cookie->frame_pos;
-	
-		cookie->frame_pos++;
 	}
+
+	mediaHeader->start_time = bigtime_t(cookie->frame_pos * 1000000.0 * cookie->frames_per_sec_scale) / cookie->frames_per_sec_rate;
+	cookie->frame_pos++;
 	
-	TRACE("stream %d: start_time %.6f\n", cookie->stream, mediaHeader->start_time / 1000000.0);
+//	TRACE("stream %d: start_time %.6f\n", cookie->stream, mediaHeader->start_time / 1000000.0);
 
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;

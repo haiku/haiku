@@ -62,11 +62,15 @@ MP4FileReader::IsEndOfData(off_t pPosition)
 {
 	AtomBase* aAtomBase;
 
+	// check all mdat atoms to make sure pPosition is within one of them
+
 	for (uint32 index=0;index<CountChildAtoms('mdat');index++) {
 		aAtomBase = GetChildAtom(uint32('mdat'),index);
 		if ((aAtomBase) && (aAtomBase->getAtomSize() > 8)) {
-			MDATAtom *aMdatAtom = dynamic_cast<MDATAtom *>(aAtomBase);
-			return pPosition >= aMdatAtom->getEOF();
+			MDATAtom *aMDATAtom = dynamic_cast<MDATAtom *>(aAtomBase);
+			if (pPosition >= aMDATAtom->getAtomOffset() && pPosition <= aMDATAtom->getEOF()) {
+				return false;
+			}
 		}
 	}
 
@@ -187,8 +191,7 @@ MP4FileReader::getMovieTimeScale()
 bigtime_t
 MP4FileReader::getMovieDuration()
 {
-	return (bigtime_t(getMVHDAtom()->getDuration()) * 1000000L)
-		/ getMovieTimeScale();
+	return bigtime_t((getMVHDAtom()->getDuration() * 1000000.0) / getMovieTimeScale());
 }
 
 
@@ -261,24 +264,13 @@ MP4FileReader::getMaxDuration()
 
 
 uint32
-MP4FileReader::getVideoFrameCount(uint32 streamIndex)
+MP4FileReader::getFrameCount(uint32 streamIndex)
 {
 	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
 
-	if (aAtomBase && dynamic_cast<TRAKAtom *>(aAtomBase)->IsVideo())
+	if (aAtomBase) {
 		return dynamic_cast<TRAKAtom *>(aAtomBase)->FrameCount();
-
-	return 1;
-}
-
-
-uint32
-MP4FileReader::getAudioFrameCount(uint32 streamIndex)
-{
-	AtomBase *aAtomBase = GetChildAtom(uint32('trak'), streamIndex);
-
-	if (aAtomBase && dynamic_cast<TRAKAtom *>(aAtomBase)->IsAudio())
-		return dynamic_cast<TRAKAtom *>(aAtomBase)->FrameCount();
+	}
 
 	return 1;
 }
@@ -368,8 +360,12 @@ MP4FileReader::getOffsetForFrame(uint32 streamIndex, uint32 pFrameNo)
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
 		if (pFrameNo < aTrakAtom->FrameCount()) {
-			// Get Sample for Frame
-			uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
+			// Get time for Frame
+			bigtime_t Time = aTrakAtom->getTimeForFrame(pFrameNo);
+			
+			// Get Sample for Time
+			uint32 SampleNo = aTrakAtom->getSampleForTime(Time);
+			
 			// Get Chunk For Sample and the offset for the frame within that chunk
 			uint32 OffsetInChunk;
 			uint32 ChunkNo = aTrakAtom->getChunkForSample(SampleNo, &OffsetInChunk);
@@ -391,6 +387,8 @@ MP4FileReader::getOffsetForFrame(uint32 streamIndex, uint32 pFrameNo)
 				}
 			}
 		
+//			printf("frame %ld, time %Ld, sample %ld, Chunk %ld, OffsetInChunk %ld, Offset %Ld\n",pFrameNo, Time, SampleNo, ChunkNo, OffsetInChunk, OffsetNo);
+
 			return OffsetNo;
 		}
 	}
@@ -458,7 +456,7 @@ MP4FileReader::MovMainHeader()
 	} else {
 		theMainHeader.width = VideoFormat(videoStream)->width;
 		theMainHeader.height = VideoFormat(videoStream)->height;
-		theMainHeader.total_frames = getVideoFrameCount(videoStream);
+		theMainHeader.total_frames = getFrameCount(videoStream);
 		theMainHeader.suggested_buffer_size = theMainHeader.width * theMainHeader.height * VideoFormat(videoStream)->bit_count / 8;
 		theMainHeader.micro_sec_per_frame = uint32(1000000.0 / VideoFormat(videoStream)->FrameRate);
 	}
@@ -483,18 +481,33 @@ MP4FileReader::AudioFormat(uint32 streamIndex, size_t *size)
 			if (aAtomBase) {
 				STSDAtom *aSTSDAtom = dynamic_cast<STSDAtom *>(aAtomBase);
 
-				// Fill In a wave_format_ex structure
+				// Fill in the AudioMetaData structure
 				AudioDescription aAudioDescription = aSTSDAtom->getAsAudio();
 
 				theAudio.compression = aAudioDescription.codecid;
+				theAudio.codecSubType = aAudioDescription.codecSubType;
 				
 				theAudio.NoOfChannels = aAudioDescription.theAudioSampleEntry.ChannelCount;
-				theAudio.SampleSize = aAudioDescription.theAudioSampleEntry.SampleSize;
+				
+				// Fix for broken mp4's with 0 SampleSize, default to 16 bits
+				if (aAudioDescription.theAudioSampleEntry.SampleSize == 0) {
+					theAudio.SampleSize = 16;
+				} else {
+					theAudio.SampleSize = aAudioDescription.theAudioSampleEntry.SampleSize;
+				}
+				
 				theAudio.SampleRate = aAudioDescription.theAudioSampleEntry.SampleRate / 65536;	// Convert from fixed point decimal to float
-				theAudio.PacketSize = uint32((theAudio.SampleSize * theAudio.NoOfChannels * 1024) / 8);
+				theAudio.FrameSize = aAudioDescription.FrameSize;
+				if (aAudioDescription.BufferSize == 0) {
+					theAudio.BufferSize = uint32((theAudio.SampleSize * theAudio.NoOfChannels * theAudio.FrameSize) / 8);
+				} else {
+					theAudio.BufferSize = aAudioDescription.BufferSize;
+				}
+				
+				theAudio.BitRate = aAudioDescription.BitRate;
 
-				theAudio.theVOL = aAudioDescription.theVOL;
-				theAudio.VOLSize = aAudioDescription.VOLSize;
+				theAudio.theDecoderConfig = aAudioDescription.theDecoderConfig;
+				theAudio.DecoderConfigSize = aAudioDescription.DecoderConfigSize;
 
 				return &theAudio;
 			}
@@ -519,25 +532,26 @@ MP4FileReader::VideoFormat(uint32 streamIndex)
 				VideoDescription aVideoDescription = aSTSDAtom->getAsVideo();
 
 				theVideo.compression = aVideoDescription.codecid;
+				theVideo.codecSubType = aVideoDescription.codecSubType;
 
 				theVideo.width = aVideoDescription.theVideoSampleEntry.Width;
 				theVideo.height = aVideoDescription.theVideoSampleEntry.Height;
 				theVideo.planes = aVideoDescription.theVideoSampleEntry.Depth;
-				theVideo.size = aVideoDescription.theVideoSampleEntry.Width * aVideoDescription.theVideoSampleEntry.Height * aVideoDescription.theVideoSampleEntry.Depth / 8;
+				theVideo.BufferSize = aVideoDescription.theVideoSampleEntry.Width * aVideoDescription.theVideoSampleEntry.Height * aVideoDescription.theVideoSampleEntry.Depth / 8;
 				theVideo.bit_count = aVideoDescription.theVideoSampleEntry.Depth;
 				theVideo.image_size = aVideoDescription.theVideoSampleEntry.Height * aVideoDescription.theVideoSampleEntry.Width;
 				theVideo.HorizontalResolution = aVideoDescription.theVideoSampleEntry.HorizontalResolution;
 				theVideo.VerticalResolution = aVideoDescription.theVideoSampleEntry.VerticalResolution;
 				theVideo.FrameCount = aVideoDescription.theVideoSampleEntry.FrameCount;
 
-				theVideo.theVOL = aVideoDescription.theVOL;
-				theVideo.VOLSize = aVideoDescription.VOLSize;
+				theVideo.theDecoderConfig = aVideoDescription.theDecoderConfig;
+				theVideo.DecoderConfigSize = aVideoDescription.DecoderConfigSize;
 
 				aAtomBase = aTrakAtom->GetChildAtom(uint32('stts'),0);
 				if (aAtomBase) {
 					STTSAtom *aSTTSAtom = dynamic_cast<STTSAtom *>(aAtomBase);
 
-					theVideo.FrameRate = ((aSTTSAtom->getSUMCounts() * 1000000.0L) / aTrakAtom->Duration(1));
+					theVideo.FrameRate = ((aSTTSAtom->getSUMCounts() * 1000000.0) / aTrakAtom->Duration(1));
 
 					return &theVideo;
 				}
@@ -552,25 +566,25 @@ MP4FileReader::VideoFormat(uint32 streamIndex)
 const mp4_stream_header*
 MP4FileReader::StreamFormat(uint32 streamIndex)
 {
-	// Fill In a Stream Header
-	theStreamHeader.length = 0;
-	
 	if (IsActive(streamIndex) == false) {
 		return NULL;
 	}
 
+	// Fill In a Stream Header
+	theStreamHeader.length = 0;
+
 	if (IsVideo(streamIndex)) {
-		theStreamHeader.rate = uint32(1000000L*VideoFormat(streamIndex)->FrameRate);
+		theStreamHeader.rate = uint32(1000000.0*VideoFormat(streamIndex)->FrameRate);
 		theStreamHeader.scale = 1000000L;
-		theStreamHeader.length = getVideoFrameCount(streamIndex);
+		theStreamHeader.length = getFrameCount(streamIndex);
 	}
 
 	if (IsAudio(streamIndex)) {
 		theStreamHeader.rate = uint32(AudioFormat(streamIndex)->SampleRate);
 		theStreamHeader.scale = 1;
-		theStreamHeader.length = getAudioFrameCount(streamIndex);
+		theStreamHeader.length = getFrameCount(streamIndex);
 		theStreamHeader.sample_size = AudioFormat(streamIndex)->SampleSize;
-		theStreamHeader.suggested_buffer_size =	theStreamHeader.rate * theStreamHeader.sample_size;
+		theStreamHeader.suggested_buffer_size =	AudioFormat(streamIndex)->BufferSize;
 	}
 
 	return &theStreamHeader;
@@ -601,8 +615,7 @@ MP4FileReader::IsKeyFrame(uint32 streamIndex, uint32 pFrameNo)
 	if (aAtomBase) {
 		TRAKAtom *aTrakAtom = dynamic_cast<TRAKAtom *>(aAtomBase);
 
-		uint32 SampleNo = aTrakAtom->getSampleForFrame(pFrameNo);
-		return aTrakAtom->IsSyncSample(SampleNo);
+		return aTrakAtom->IsSyncSample(pFrameNo);
 	}
 
 	return false;
@@ -619,6 +632,8 @@ MP4FileReader::GetNextChunkInfo(uint32 streamIndex, uint32 pFrameNo,
 	if ((*start > 0) && (*size > 0)) {
 		*keyframe = IsKeyFrame(streamIndex, pFrameNo);
 	}
+
+//	printf("start %Ld, size %ld, eof %s, eod %s\n",*start,*size, IsEndOfFile(*start + *size) ? "true" : "false", IsEndOfData(*start + *size) ? "true" : "false");
 
 	// TODO need a better method for detecting End of Data Note ChunkSize of 0 seems to be it.
 	return *start > 0 && *size > 0 && !IsEndOfFile(*start + *size)
@@ -647,11 +662,18 @@ MP4FileReader::IsSupported(BPositionIO *source)
 	if (aAtom) {
 		if (dynamic_cast<FTYPAtom *>(aAtom)) {
 			aAtom->ProcessMetaData();
-			printf("ftyp atom found checking brands\n");
+			printf("ftyp atom found checking brands...");
 			// MP4 files start with a ftyp atom that does not contain a qt brand
-			return !(dynamic_cast<FTYPAtom *>(aAtom)->HasBrand(uint32('qt  ')));
+			if (!dynamic_cast<FTYPAtom *>(aAtom)->HasBrand(uint32('qt  '))) {
+				printf("no quicktime brand found must be mp4\n");
+				return true;
+			} else {
+				printf("quicktime brand found\n");
+			}
 		}
 	}
+
+	printf("NO ftyp atom found, cannot be mp4\n");
 	
 	return false;
 }

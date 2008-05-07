@@ -76,7 +76,8 @@ struct mp4_stream_header
 struct VideoMetaData
 {
 	uint32 compression;
-	uint32 size;
+	uint32 codecSubType;
+	uint32 BufferSize;
 	uint32 width;
 	uint32 height;
 	uint16 planes;
@@ -85,20 +86,23 @@ struct VideoMetaData
 	uint32 HorizontalResolution;
 	uint32 VerticalResolution;
 	uint32 FrameCount;
-	float FrameRate;
-	uint8 *theVOL;
-	size_t VOLSize;
+	float FrameRate;		// Frames per second
+	uint8 *theDecoderConfig;
+	size_t DecoderConfigSize;
 };
 
 struct AudioMetaData
 {
-	uint32 compression;		// compression used
+	uint32 compression;		// compression used (ie codecid)
+	uint32 codecSubType;	// Additional codecid
 	uint16 NoOfChannels;	// 1 = mono, 2 = stereo
 	uint16 SampleSize;		// bits per sample
-	float SampleRate;		// Samples per second (OR Frames per second)
-	uint32 PacketSize;		// (Sample Rate * NoOfchannels * SampleSize)/8 = bytes per second
-	uint8 *theVOL;
-	size_t VOLSize;
+	float SampleRate;		// Samples per second
+	uint32 BufferSize;		// (Sample Rate * NoOfchannels * SampleSize * SamplesPerFrame) / 8 = bytes per second
+	uint32 FrameSize;		// No Of Samples in 1 frame of audio (SamplesPerFrame)
+	uint32 BitRate;			// Average Bitrate
+	uint8 *theDecoderConfig;
+	size_t DecoderConfigSize;
 };
 
 struct TimeToSample {
@@ -125,7 +129,7 @@ struct ChunkToOffset {
 };
 
 struct SyncSample {
-	uint64	SyncSampleNo;
+	uint32	SyncSampleNo;
 };
 
 struct SampleSizeEntry {
@@ -235,8 +239,6 @@ struct SampleEntry {
 	uint16	DataReference;
 };
 
-#define SampleEntrySize sizeof(SampleEntry)
-
 struct AudioSampleEntry {
 	uint32	Reserved[2];
 	uint16	ChannelCount;
@@ -246,13 +248,15 @@ struct AudioSampleEntry {
 	uint32	SampleRate;		// 16.16
 };
 
-#define AudioSampleEntrySize sizeof(AudioSampleEntry)
-
 struct AudioDescription {
 	AudioSampleEntry	theAudioSampleEntry;
 	uint32				codecid;
-	uint8				*theVOL;
-	size_t				VOLSize;
+	uint32				codecSubType;
+	uint32				FrameSize;
+	uint32				BufferSize;
+	uint32				BitRate;
+	uint8				*theDecoderConfig;
+	size_t				DecoderConfigSize;
 };
 
 struct VideoSampleEntry {
@@ -270,13 +274,22 @@ struct VideoSampleEntry {
 	uint16	pre_defined3;
 };
 
-#define VideoSampleEntrySize 70
-
 struct VideoDescription {
 	VideoSampleEntry	theVideoSampleEntry;
 	uint32				codecid;
-	uint8				*theVOL;
-	size_t				VOLSize;
+	uint32				codecSubType;
+	uint8				*theDecoderConfig;
+	size_t				DecoderConfigSize;
+};
+
+// The parts of the AAC ESDS we care about
+struct AACHeader {
+	uint8	objTypeIndex;
+	uint8	sampleRateIndex;
+	uint8	totalChannels;
+	uint16	frameSize;
+	uint16	adtsBuffer;
+	uint8	totalDataBlocksInFrame;
 };
 
 #endif	// MP4_STRUCTS_H
