@@ -317,12 +317,22 @@ FontManager::_LoadRecentFontMappings()
 	// default known mappings
 	// TODO: load them for real, and use these as a fallback
 
-	_AddDefaultMapping("Bitstream Vera Sans", "Roman",
-		"/boot/beos/etc/fonts/ttfonts/Vera.ttf");
-	_AddDefaultMapping("Bitstream Vera Sans", "Bold",
-		"/boot/beos/etc/fonts/ttfonts/VeraBd.ttf");
-	_AddDefaultMapping("Bitstream Vera Sans Mono", "Roman",
-		"/boot/beos/etc/fonts/ttfonts/VeraMono.ttf");
+	BPath ttfontsPath;
+	if (find_directory(B_BEOS_FONTS_DIRECTORY, &ttfontsPath) == B_OK) {
+		ttfontsPath.Append("ttfonts");
+
+		BPath veraFontPath = ttfontsPath;
+		veraFontPath.Append("Vera.ttf");
+		_AddDefaultMapping("Bitstream Vera Sans", "Roman", veraFontPath.Path());
+
+		veraFontPath.SetTo(ttfontsPath.Path());
+		veraFontPath.Append("VeraBd.ttf");
+		_AddDefaultMapping("Bitstream Vera Sans", "Bold", veraFontPath.Path());
+
+		veraFontPath.SetTo(ttfontsPath.Path());
+		veraFontPath.Append("VeraMono.ttf");
+		_AddDefaultMapping("Bitstream Vera Sans Mono", "Roman", veraFontPath.Path());
+	}
 
 	return false;
 }
