@@ -197,7 +197,7 @@ static mutex sMappingLock;
 static mutex sAreaCacheLock;
 
 static off_t sAvailableMemory;
-static benaphore sAvailableMemoryLock;
+static mutex sAvailableMemoryLock;
 
 // function declarations
 static void delete_area(vm_address_space *addressSpace, vm_area *area);
@@ -3583,7 +3583,6 @@ vm_init(kernel_args *args)
 	// initialize some globals
 	sNextAreaID = 1;
 	sAreaHashLock = -1;
-	sAvailableMemoryLock.sem = -1;
 
 	vm_page_init_num_pages(args);
 	sAvailableMemory = vm_page_num_pages() * B_PAGE_SIZE;
@@ -3690,7 +3689,7 @@ vm_init_post_sem(kernel_args *args)
 	// since we're still single threaded and only the kernel address space exists,
 	// it isn't that hard to find all of the ones we need to create
 
-	benaphore_init(&sAvailableMemoryLock, "available memory lock");
+	mutex_init(&sAvailableMemoryLock, "available memory lock");
 	arch_vm_translation_map_init_post_sem(args);
 	vm_address_space_init_post_sem();
 
@@ -4484,11 +4483,11 @@ vm_put_physical_page(addr_t vaddr)
 void
 vm_unreserve_memory(size_t amount)
 {
-	benaphore_lock(&sAvailableMemoryLock);
+	mutex_lock(&sAvailableMemoryLock);
 
 	sAvailableMemory += amount;
 
-	benaphore_unlock(&sAvailableMemoryLock);
+	mutex_unlock(&sAvailableMemoryLock);
 }
 
 
@@ -4496,7 +4495,7 @@ status_t
 vm_try_reserve_memory(size_t amount)
 {
 	status_t status;
-	benaphore_lock(&sAvailableMemoryLock);
+	mutex_lock(&sAvailableMemoryLock);
 
 	//dprintf("try to reserve %lu bytes, %Lu left\n", amount, sAvailableMemory);
 
@@ -4506,7 +4505,7 @@ vm_try_reserve_memory(size_t amount)
 	} else
 		status = B_NO_MEMORY;
 
-	benaphore_unlock(&sAvailableMemoryLock);
+	mutex_unlock(&sAvailableMemoryLock);
 	return status;
 }
 
