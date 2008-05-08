@@ -1064,6 +1064,7 @@ FontManager::AttachUser(uid_t userID)
 
 #if !TEST_MODE
 	// TODO: actually, find_directory() cannot know which user ID we want here
+	// TODO: avoids user fonts in safe mode
 	BPath path;
 	if (find_directory(B_USER_FONTS_DIRECTORY, &path, true) != B_OK)
 		return;
