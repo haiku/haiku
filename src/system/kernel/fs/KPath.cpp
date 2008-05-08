@@ -86,6 +86,18 @@ KPath::SetTo(const char* path, bool normalize, size_t bufferSize)
 }
 
 
+void
+KPath::Adopt(KPath& other)
+{
+	free(fBuffer);
+
+	fBuffer = other.fBuffer;
+	fBufferSize = other.fBufferSize;
+
+	other.fBuffer = NULL;	
+}
+
+
 status_t
 KPath::InitCheck() const
 {
@@ -257,7 +269,7 @@ KPath::Append(const char *component, bool isComponent)
 KPath&
 KPath::operator=(const KPath& other)
 {
-	SetTo(other.fBuffer, other.fBufferSize);
+	SetTo(other.fBuffer, false, other.fBufferSize);
 	return *this;
 }
 

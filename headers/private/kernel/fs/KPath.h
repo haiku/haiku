@@ -22,6 +22,7 @@ class KPath {
 
 		status_t SetTo(const char *path, bool normalize = false,
 			size_t bufferSize = B_PATH_NAME_LENGTH);
+		void Adopt(KPath& other);
 
 		status_t InitCheck() const;
 
