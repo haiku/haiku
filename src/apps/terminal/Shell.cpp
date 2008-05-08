@@ -283,21 +283,57 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 	signal(SIGTTOU, SIG_IGN);
 	
+#ifdef __HAIKU__
 	// get a pseudo-tty
 	int master = posix_openpt(O_RDWR | O_NOCTTY);
 	const char *ttyName;
+#else /* __HAIKU__ */
+	/*
+	 * Get a pseudo-tty. We do this by cycling through files in the
+	 * directory. The operating system will not allow us to open a master
+	 * which is already in use, so we simply go until the open succeeds.
+	 */
+	char ttyName[B_PATH_NAME_LENGTH];
+	int master = -1;	
+	DIR *dir = opendir("/dev/pt/");
+	if (dir != NULL) {
+		struct dirent *dirEntry;
+		while ((dirEntry = readdir(dir)) != NULL) { 
+			// skip '.' and '..'
+			if (dirEntry->d_name[0] == '.')
+				continue;
+
+			char ptyName[B_PATH_NAME_LENGTH];
+			snprintf(ptyName, sizeof(ptyName), "/dev/pt/%s", dirEntry->d_name);
+
+			master = open(ptyName, O_RDWR);
+			if (master >= 0) {
+				// Set the tty that corresponds to the pty we found
+				snprintf(ttyName, sizeof(ttyName), "/dev/tt/%s", dirEntry->d_name);
+				break;
+			} else {
+				// B_BUSY is a normal case
+				if (errno != B_BUSY) 
+					fprintf(stderr, "could not open %s: %s\n", ptyName, strerror(errno));
+			}
+		}
+		closedir(dir);
+	}
+#endif /* __HAIKU__ */
 
 	if (master < 0) {
     	fprintf(stderr, "Didn't find any available pseudo ttys.");
     	return errno;
 	}
 
+#ifdef __HAIKU__
 	if (grantpt(master) != 0 || unlockpt(master) != 0
 		|| (ttyName = ptsname(master)) == NULL) {
 		close(master);
     	fprintf(stderr, "Failed to init pseudo tty.");
 		return errno;
 	}
+#endif /* __HAIKU__ */
 
 	/*
 	 * Get the modes of the current terminal. We will duplicates these
