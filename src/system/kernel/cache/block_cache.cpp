@@ -99,7 +99,7 @@ typedef DoublyLinkedList<cache_notification> NotificationList;
 
 struct block_cache : DoublyLinkedListLinkImpl<block_cache> {
 	hash_table		*hash;
-	benaphore		lock;
+	mutex			lock;
 	int				fd;
 	off_t			max_blocks;
 	size_t			block_size;
@@ -657,9 +657,7 @@ block_cache::block_cache(int _fd, off_t numBlocks, size_t blockSize,
 	if (transaction_hash == NULL)
 		return;
 
-	if (benaphore_init(&lock, "block cache") < B_OK)
-		return;
-
+	mutex_init(&lock, "block cache");
 	register_low_memory_handler(&block_cache::LowMemoryHandler, this, 0);
 }
 
@@ -671,7 +669,7 @@ block_cache::~block_cache()
 
 	unregister_low_memory_handler(&block_cache::LowMemoryHandler, this);
 
-	benaphore_destroy(&lock);
+	mutex_destroy(&lock);
 
 	condition_variable.Unpublish();
 
@@ -689,9 +687,6 @@ block_cache::~block_cache()
 status_t
 block_cache::InitCheck()
 {
-	if (lock.sem < B_OK)
-		return lock.sem;
-
 	if (buffer_cache == NULL || hash == NULL || transaction_hash == NULL)
 		return B_NO_MEMORY;
 
@@ -834,7 +829,7 @@ void
 block_cache::LowMemoryHandler(void *data, int32 level)
 {
 	block_cache *cache = (block_cache *)data;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	if (!locker.IsLocked()) {
 		// If our block_cache were deleted, it could be that we had
@@ -1457,7 +1452,7 @@ get_next_locked_block_cache(block_cache *last)
 
 	block_cache *cache;
 	if (last != NULL) {
-		benaphore_unlock(&last->lock);
+		mutex_unlock(&last->lock);
 
 		cache = sCaches.GetNext((block_cache *)&sMarkCache);
 		sCaches.Remove((block_cache *)&sMarkCache);
@@ -1471,14 +1466,14 @@ get_next_locked_block_cache(block_cache *last)
 		if (cache == NULL)
 			break;
 
-		status_t status = benaphore_lock(&cache->lock);
+		status_t status = mutex_lock(&cache->lock);
 		if (status != B_OK) {
 			// can only happen if the cache is being deleted right now
 			continue;
 		}
 
 		if (cache->deleting) {
-			benaphore_unlock(&cache->lock);
+			mutex_unlock(&cache->lock);
 			continue;
 		}
 
@@ -1667,7 +1662,7 @@ extern "C" int32
 cache_start_transaction(void *_cache)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	if (cache->last_transaction && cache->last_transaction->open) {
 		panic("last transaction (%ld) still open!\n",
@@ -1694,7 +1689,7 @@ extern "C" status_t
 cache_sync_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 	status_t status = B_ENTRY_NOT_FOUND;
 
 	TRACE(("cache_sync_transaction(id %ld)\n", id));
@@ -1762,7 +1757,7 @@ cache_end_transaction(void *_cache, int32 id,
 	transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_end_transaction(id = %ld)\n", id));
 
@@ -1819,7 +1814,7 @@ extern "C" status_t
 cache_abort_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_transaction(id = %ld)\n", id));
 
@@ -1870,7 +1865,7 @@ cache_detach_sub_transaction(void *_cache, int32 id,
 	transaction_notification_hook hook, void *data)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_detach_sub_transaction(id = %ld)\n", id));
 
@@ -1958,7 +1953,7 @@ extern "C" status_t
 cache_abort_sub_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_abort_sub_transaction(id = %ld)\n", id));
 
@@ -2009,7 +2004,7 @@ extern "C" status_t
 cache_start_sub_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("cache_start_sub_transaction(id = %ld)\n", id));
 
@@ -2060,7 +2055,7 @@ cache_add_transaction_listener(void *_cache, int32 id, int32 events,
 {
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -2076,7 +2071,7 @@ cache_remove_transaction_listener(void *_cache, int32 id,
 {
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -2109,7 +2104,7 @@ cache_next_block_in_transaction(void *_cache, int32 id, bool mainOnly,
 	cached_block *block = (cached_block *)*_cookie;
 	block_cache *cache = (block_cache *)_cache;
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL || !transaction->open)
@@ -2145,7 +2140,7 @@ extern "C" int32
 cache_blocks_in_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -2159,7 +2154,7 @@ extern "C" int32
 cache_blocks_in_main_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -2173,7 +2168,7 @@ extern "C" int32
 cache_blocks_in_sub_transaction(void *_cache, int32 id)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cache_transaction *transaction = lookup_transaction(cache, id);
 	if (transaction == NULL)
@@ -2194,7 +2189,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 	if (allowWrites)
 		block_cache_sync(cache);
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	// free all blocks
 
@@ -2243,7 +2238,7 @@ block_cache_sync(void *_cache)
 	// we will sync all dirty blocks to disk that have a completed
 	// transaction or no transaction only
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 	hash_iterator iterator;
 	hash_open(cache->hash, &iterator);
 
@@ -2281,7 +2276,7 @@ block_cache_sync_etc(void *_cache, off_t blockNumber, size_t numBlocks)
 		return B_BAD_VALUE;
 	}
 
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	for (; numBlocks > 0; numBlocks--, blockNumber++) {
 		cached_block *block = (cached_block *)hash_lookup(cache->hash,
@@ -2312,7 +2307,7 @@ extern "C" status_t
 block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	if (cache->read_only)
 		panic("tried to make block writable on a read-only cache!");
@@ -2334,7 +2329,7 @@ block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
 	off_t length, int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_writable_etc(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
@@ -2358,7 +2353,7 @@ extern "C" void *
 block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	TRACE(("block_cache_get_empty(block = %Ld, transaction = %ld)\n",
 		blockNumber, transaction));
@@ -2374,7 +2369,7 @@ extern "C" const void *
 block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 	bool allocated;
 
 	cached_block *block = get_cached_block(cache, blockNumber, &allocated);
@@ -2410,7 +2405,7 @@ block_cache_set_dirty(void *_cache, off_t blockNumber, bool dirty,
 	int32 transaction)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	cached_block *block = (cached_block *)hash_lookup(cache->hash,
 		&blockNumber);
@@ -2433,7 +2428,7 @@ extern "C" void
 block_cache_put(void *_cache, off_t blockNumber)
 {
 	block_cache *cache = (block_cache *)_cache;
-	BenaphoreLocker locker(&cache->lock);
+	MutexLocker locker(&cache->lock);
 
 	put_cached_block(cache, blockNumber);
 }

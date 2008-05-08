@@ -133,7 +133,7 @@ class Inode {
 		void		SetModificationTime(time_t modificationTime)
 						{ fModificationTime = modificationTime; }
 
-		benaphore	*RequestLock() { return &fRequestLock; }
+		mutex		*RequestLock() { return &fRequestLock; }
 
 		status_t	WriteDataToBuffer(const void *data, size_t *_length,
 						bool nonBlocking);
@@ -168,7 +168,7 @@ class Inode {
 		ReadRequestList		fReadRequests;
 		WriteRequestList	fWriteRequests;
 
-		benaphore	fRequestLock;
+		mutex		fRequestLock;
 
 		ConditionVariable fWriteCondition;
 
@@ -306,7 +306,7 @@ Inode::Inode()
 	fWriteSelectSyncPool(NULL)
 {
 	fWriteCondition.Publish(this, "pipe");
-	benaphore_init(&fRequestLock, "pipe request");
+	mutex_init(&fRequestLock, "pipe request");
 
 	fCreationTime = fModificationTime = time(NULL);
 }
@@ -315,22 +315,18 @@ Inode::Inode()
 Inode::~Inode()
 {
 	fWriteCondition.Unpublish();
-	benaphore_destroy(&fRequestLock);
+	mutex_destroy(&fRequestLock);
 }
 
 
 status_t 
 Inode::InitCheck()
 {
-	if (fRequestLock.sem < B_OK)
-		return B_ERROR;
-
 	return B_OK;
 }
 
 
-/*!
-	Writes the specified data bytes to the inode's ring buffer. The
+/*!	Writes the specified data bytes to the inode's ring buffer. The
 	request lock must be held when calling this method.
 	Notifies readers if necessary, so that blocking readers will get started.
 	Returns B_OK for success, B_BAD_ADDRESS if copying from the buffer failed,
@@ -367,9 +363,9 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 			WriteRequest request(minToWrite);
 			fWriteRequests.Add(&request);
 
-			benaphore_unlock(&fRequestLock);
+			mutex_unlock(&fRequestLock);
 			status_t status = entry.Wait();
-			benaphore_lock(&fRequestLock);
+			mutex_lock(&fRequestLock);
 
 			fWriteRequests.Remove(&request);
 
@@ -475,9 +471,9 @@ Inode::WaitForReadRequest(ReadRequest &request)
 		THREAD_BLOCK_TYPE_OTHER, "fifo read request");
 
 	// wait
-	benaphore_unlock(&fRequestLock);
+	mutex_unlock(&fRequestLock);
 	status_t status = thread_block();
-	benaphore_lock(&fRequestLock);
+	mutex_lock(&fRequestLock);
 
 	return status;
 }
@@ -567,7 +563,7 @@ Inode::NotifyEndClosed(bool writer)
 void
 Inode::Open(int openMode)
 {
-	BenaphoreLocker locker(RequestLock());
+	MutexLocker locker(RequestLock());
 
 	if ((openMode & O_ACCMODE) == O_WRONLY)
 		fWriterCount++;
@@ -592,7 +588,7 @@ Inode::Close(int openMode)
 {
 	TRACE(("Inode::Close(openMode = %d)\n", openMode));
 
-	BenaphoreLocker locker(RequestLock());
+	MutexLocker locker(RequestLock());
 
 	if ((openMode & O_ACCMODE) == O_WRONLY && --fWriterCount == 0)
 		NotifyEndClosed(true);
@@ -761,7 +757,7 @@ fifo_read(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
 		return B_NOT_ALLOWED;
 
-	BenaphoreLocker locker(inode->RequestLock());
+	MutexLocker locker(inode->RequestLock());
 
 	if (inode->IsActive() && inode->WriterCount() == 0) {
 		// as long there is no writer, and the pipe is empty,
@@ -805,7 +801,7 @@ fifo_write(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if ((cookie->open_mode & O_RWMASK) != O_WRONLY)
 		return B_NOT_ALLOWED;
 
-	BenaphoreLocker locker(inode->RequestLock());
+	MutexLocker locker(inode->RequestLock());
 
 	size_t length = *_length;
 	if (length == 0)
@@ -837,7 +833,7 @@ fifo_read_stat(fs_volume *volume, fs_vnode *vnode, struct ::stat *st)
 		return error;
 
 
-	BenaphoreLocker locker(fifo->RequestLock());
+	MutexLocker locker(fifo->RequestLock());
 
 	st->st_size = fifo->BytesAvailable();
 
@@ -909,7 +905,7 @@ fifo_select(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if (!inode)
 		return B_ERROR;
 
-	BenaphoreLocker locker(inode->RequestLock());
+	MutexLocker locker(inode->RequestLock());
 	return inode->Select(event, sync, cookie->open_mode);
 }
 
@@ -925,7 +921,7 @@ fifo_deselect(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 	if (!inode)
 		return B_ERROR;
 	
-	BenaphoreLocker locker(inode->RequestLock());
+	MutexLocker locker(inode->RequestLock());
 	return inode->Deselect(event, sync, cookie->open_mode);
 }
 

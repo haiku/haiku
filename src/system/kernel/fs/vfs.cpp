@@ -207,7 +207,7 @@ static mutex sVnodeMutex;
 	The only operation allowed while holding this lock besides getting or
 	setting the field is inc_vnode_ref_count() on io_context::root.
 */
-static benaphore sIOContextRootLock;
+static mutex sIOContextRootLock;
 
 #define VNODE_HASH_TABLE_SIZE 1024
 static hash_table *sVnodeTable;
@@ -1468,7 +1468,7 @@ replace_vnode_if_disconnected(struct fs_mount* mount,
 	struct vnode* fallBack, bool lockRootLock)
 {
 	if (lockRootLock)
-		benaphore_lock(&sIOContextRootLock);
+		mutex_lock(&sIOContextRootLock);
 
 	struct vnode* obsoleteVnode = NULL;
 
@@ -1487,7 +1487,7 @@ replace_vnode_if_disconnected(struct fs_mount* mount,
 	}
 
 	if (lockRootLock)
-		benaphore_unlock(&sIOContextRootLock);
+		mutex_unlock(&sIOContextRootLock);
 
 	if (obsoleteVnode != NULL)
 		put_vnode(obsoleteVnode);
@@ -1601,13 +1601,13 @@ get_root_vnode(bool kernel)
 		// Get current working directory from io context
 		struct io_context* context = get_current_io_context(kernel);
 
-		benaphore_lock(&sIOContextRootLock);
+		mutex_lock(&sIOContextRootLock);
 
 		struct vnode* root = context->root;
 		if (root != NULL)
 			inc_vnode_ref_count(root);
 
-		benaphore_unlock(&sIOContextRootLock);
+		mutex_unlock(&sIOContextRootLock);
 
 		if (root != NULL)
 			return root;
@@ -1971,10 +1971,10 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				while (*++path == '/')
 					;
 
-				benaphore_lock(&sIOContextRootLock);
+				mutex_lock(&sIOContextRootLock);
 				vnode = ioContext->root;
 				inc_vnode_ref_count(vnode);
-				benaphore_unlock(&sIOContextRootLock);
+				mutex_unlock(&sIOContextRootLock);
 
 				absoluteSymlink = true;
 			}
@@ -4156,11 +4156,11 @@ vfs_new_io_context(void *_parentContext)
 
 		mutex_lock(&parentContext->io_mutex);
 
-		benaphore_lock(&sIOContextRootLock);
+		mutex_lock(&sIOContextRootLock);
 		context->root = parentContext->root;
 		if (context->root)
 			inc_vnode_ref_count(context->root);
-		benaphore_unlock(&sIOContextRootLock);
+		mutex_unlock(&sIOContextRootLock);
 
 		context->cwd = parentContext->cwd;
 		if (context->cwd)
@@ -4413,9 +4413,7 @@ vfs_init(kernel_args *args)
 	mutex_init(&sMountMutex, "vfs_mount_lock");
 	mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock");
 	mutex_init(&sVnodeMutex, "vfs_vnode_lock");
-
-	if (benaphore_init(&sIOContextRootLock, "io_context::root lock") < 0)
-		panic("vfs_init: error allocating io_context::root lock\n");
+	mutex_init(&sIOContextRootLock, "io_context::root lock");
 
 	if (block_cache_init() != B_OK)
 		return B_ERROR;
@@ -6470,9 +6468,9 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	if (!sRoot) {
 		sRoot = mount->root_vnode;
-		benaphore_lock(&sIOContextRootLock);
+		mutex_lock(&sIOContextRootLock);
 		get_current_io_context(true)->root = sRoot;
-		benaphore_unlock(&sIOContextRootLock);
+		mutex_unlock(&sIOContextRootLock);
 		inc_vnode_ref_count(sRoot);
 	}
 
@@ -8705,10 +8703,10 @@ _user_change_root(const char *userPath)
 
 	// set the new root
 	struct io_context* context = get_current_io_context(false);
-	benaphore_lock(&sIOContextRootLock);
+	mutex_lock(&sIOContextRootLock);
 	struct vnode* oldRoot = context->root;
 	context->root = vnode;
-	benaphore_unlock(&sIOContextRootLock);
+	mutex_unlock(&sIOContextRootLock);
 
 	put_vnode(oldRoot);
 
