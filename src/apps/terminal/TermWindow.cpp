@@ -536,11 +536,10 @@ TermWindow::_DoPrint()
     
 			if (!job.CanContinue()){
 				// It is likely that the only way that the job was cancelled is
-			      	// because the user hit 'Cancel' in the page setup window, in which
-			      	// case, the user does *not* need to be told that it was cancelled.
-			      	// He/she will simply expect that it was done.
-				// (new BAlert("Cancel", "Print job cancelled", "OK"))->Go();
-			        return;
+			    // because the user hit 'Cancel' in the page setup window, in which
+			    // case, the user does *not* need to be told that it was cancelled.
+			    // He/she will simply expect that it was done.
+				    return;
 			}
 		}
 	}
@@ -610,6 +609,8 @@ TermWindow::_AddTab(Arguments *args)
 			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
 					viewHeight + fMenubar->Bounds().Height());
 		}
+		// TODO: No fTabView->Select(tab); ?
+		fTabView->Select(fTabView->CountTabs() - 1);
 	} catch (...) {
 		// most probably out of memory. That's bad.
 		// TODO: Should cleanup, I guess
