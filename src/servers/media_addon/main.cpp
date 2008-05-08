@@ -689,7 +689,8 @@ MediaAddonServer::MessageReceived(BMessage *msg)
 			}
 
 			PlayMediaFile(type, name);
-			msg->SendReply(B_OK); // XXX don't know which reply is expected
+			msg->SendReply((uint32)B_OK);
+				// XXX don't know which reply is expected
 			return;
 		}
 

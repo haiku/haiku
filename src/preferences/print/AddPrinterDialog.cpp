@@ -233,7 +233,8 @@ AddPrinterDialog::BuildGUI(int stage)
 	transportMenuField->SetDivider(divider);
 	
 	// add a "OK" button, and make it default
-	fOk = new BButton(r, NULL, "Add", new BMessage(B_OK), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	fOk = new BButton(r, NULL, "Add", new BMessage((uint32)B_OK),
+		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fOk->ResizeToPreferred();
 	fOk->GetPreferredSize(&w, &h);
 	// put the ok bottom at bottom right corner

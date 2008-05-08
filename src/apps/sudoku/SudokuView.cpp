@@ -411,7 +411,7 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 				delete view;
 				bitmap->Unlock();
 			}
-			BMessage msg(B_OK);
+			BMessage msg((uint32)B_OK);
 			status = bitmap->Archive(&msg);
 			if (status >= B_OK) {
 				status = msg.Flatten(&stream);
