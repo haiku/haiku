@@ -5,12 +5,14 @@
 #ifndef _SEMAPHORE_H_
 #define _SEMAPHORE_H_
 
+#include <stdint.h>
 #include <sys/cdefs.h>
 #include <time.h>
 
 
 typedef struct {
-	int	id;
+	int32_t	id;
+	int32_t	_padding[3];
 } sem_t;
 
 #define SEM_FAILED	((sem_t*)(long)-1)

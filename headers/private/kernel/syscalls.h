@@ -77,9 +77,9 @@ extern status_t		_kern_get_next_sem_info(team_id team, int32 *cookie,
 extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
 
 /* POSIX realtime sem syscalls */
-extern status_t		_kern_realtime_sem_open(const char* name, int openFlags,
-						mode_t mode, uint32 semCount, sem_t* userSem,
-						sem_t** _usedUserSem);
+extern status_t		_kern_realtime_sem_open(const char* name,
+						int openFlagsOrShared, mode_t mode, uint32 semCount,
+						sem_t* userSem, sem_t** _usedUserSem);
 extern status_t		_kern_realtime_sem_close(sem_id semID,
 						sem_t** _deleteUserSem);
 extern status_t		_kern_realtime_sem_unlink(const char* name);

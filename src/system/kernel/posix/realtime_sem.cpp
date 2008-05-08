@@ -29,33 +29,61 @@ class SemInfo {
 public:
 	SemInfo()
 		:
-		fName(NULL),
-		fRefCount(1),
-		fID(-1)
+		fSemaphoreID(-1)
 	{
 	}
 
-	~SemInfo()
+	virtual ~SemInfo()
+	{
+		if (fSemaphoreID >= 0)
+			delete_sem(fSemaphoreID);
+	}
+
+	sem_id SemaphoreID() const			{ return fSemaphoreID; }
+
+	status_t Init(int32 semCount, const char* name)
+	{
+		fSemaphoreID = create_sem(semCount, name);
+		if (fSemaphoreID < 0)
+			return fSemaphoreID;
+
+		return B_OK;
+	}
+
+	virtual sem_id ID() const = 0;
+	virtual SemInfo* Clone() = 0;
+	virtual void Delete() = 0;
+
+private:
+	sem_id	fSemaphoreID;
+};
+
+
+class NamedSem : public SemInfo {
+public:
+	NamedSem()
+		:
+		fName(NULL),
+		fRefCount(1)
+	{
+	}
+
+	virtual ~NamedSem()
 	{
 		free(fName);
-		if (fID >= 0)
-			delete_sem(fID);
 	}
 
 	const char* Name() const		{ return fName; }
-	sem_id ID() const				{ return fID; }
 
 	status_t Init(const char* name, mode_t mode, int32 semCount)
 	{
-		if (name != NULL) {
-			fName = strdup(name);
-			if (fName == NULL)
-				return B_NO_MEMORY;
-		}
+		status_t error = SemInfo::Init(semCount, name);
+		if (error != B_OK)
+			return error;
 
-		fID = create_sem(semCount, name);
-		if (fID < 0)
-			return fID;
+		fName = strdup(name);
+		if (fName == NULL)
+			return B_NO_MEMORY;
 
 		fUID = geteuid();
 		fGID = getegid();
@@ -91,7 +119,23 @@ public:
 		return false;
 	}
 
-	HashTableLink<SemInfo>* HashTableLink()
+	virtual sem_id ID() const
+	{
+		return SemaphoreID();
+	}
+
+	virtual SemInfo* Clone()
+	{
+		AcquireReference();
+		return this;
+	}
+
+	virtual void Delete()
+	{
+		ReleaseReference();
+	}
+
+	HashTableLink<NamedSem>* HashTableLink()
 	{
 		return &fHashLink;
 	}
@@ -99,64 +143,192 @@ public:
 private:
 	char*	fName;
 	vint32	fRefCount;
-	sem_id	fID;
 	uid_t	fUID;
 	gid_t	fGID;
 	mode_t	fPermissions;
 
-	::HashTableLink<SemInfo>	fHashLink;
+	::HashTableLink<NamedSem>	fHashLink;
+};
+
+
+class UnnamedSem : public SemInfo {
+public:
+	UnnamedSem()
+		:
+		fID(0)
+	{
+	}
+
+	virtual ~UnnamedSem()
+	{
+	}
+
+	status_t Init(int32 semCount, const char* name)
+	{
+		return SemInfo::Init(semCount, name);
+	}
+
+	void SetID(sem_id id)
+	{
+		fID = id;
+	}
+
+	virtual sem_id ID() const
+	{
+		return fID;
+	}
+
+	virtual SemInfo* Clone()
+	{
+		sem_info info;
+		if (get_sem_info(SemaphoreID(), &info) != B_OK)
+			return NULL;
+
+		UnnamedSem* clone = new(std::nothrow) UnnamedSem;
+		if (clone == NULL)
+			return NULL;
+
+		if (clone->Init(info.count, info.name) != B_OK) {
+			delete clone;
+			return NULL;
+		}
+
+		clone->SetID(fID);
+
+		return clone;
+	}
+
+	virtual void Delete()
+	{
+		delete this;
+	}
+
+private:
+	sem_id	fID;
+};
+
+
+class UnnamedSharedSem : public SemInfo {
+public:
+	UnnamedSharedSem()
+	{
+	}
+
+	virtual ~UnnamedSharedSem()
+	{
+	}
+
+	status_t Init(int32 semCount, const char* name)
+	{
+		return SemInfo::Init(semCount, name);
+	}
+
+	virtual sem_id ID() const
+	{
+		return SemaphoreID();
+	}
+
+	virtual SemInfo* Clone()
+	{
+		// Can't be cloned.
+		return NULL;
+	}
+
+	virtual void Delete()
+	{
+		delete this;
+	}
+
+	HashTableLink<UnnamedSharedSem>* HashTableLink()
+	{
+		return &fHashLink;
+	}
+
+private:
+	::HashTableLink<UnnamedSharedSem>	fHashLink;
 };
 
 
 struct NamedSemHashDefinition {
 	typedef const char*	KeyType;
-	typedef SemInfo		ValueType;
+	typedef NamedSem	ValueType;
 
 	size_t HashKey(const KeyType& key) const
 	{
 		return hash_hash_string(key);
 	}
 
-	size_t Hash(SemInfo* semaphore) const
+	size_t Hash(NamedSem* semaphore) const
 	{
 		return HashKey(semaphore->Name());
 	}
 
-	bool Compare(const KeyType& key, SemInfo* semaphore) const
+	bool Compare(const KeyType& key, NamedSem* semaphore) const
 	{
 		return strcmp(key, semaphore->Name()) == 0;
 	}
 
-	HashTableLink<SemInfo>* GetLink(SemInfo* semaphore) const
+	HashTableLink<NamedSem>* GetLink(NamedSem* semaphore) const
 	{
 		return semaphore->HashTableLink();
 	}
 };
 
 
-class GlobalRealtimeSemTable {
-public:
-	GlobalRealtimeSemTable()
+struct UnnamedSemHashDefinition {
+	typedef sem_id				KeyType;
+	typedef UnnamedSharedSem	ValueType;
+
+	size_t HashKey(const KeyType& key) const
 	{
-		mutex_init(&fLock, "global realtime sem table");
+		return (size_t)key;
 	}
 
-	~GlobalRealtimeSemTable()
+	size_t Hash(UnnamedSharedSem* semaphore) const
+	{
+		return HashKey(semaphore->SemaphoreID());
+	}
+
+	bool Compare(const KeyType& key, UnnamedSharedSem* semaphore) const
+	{
+		return key == semaphore->SemaphoreID();
+	}
+
+	HashTableLink<UnnamedSharedSem>* GetLink(UnnamedSharedSem* semaphore) const
+	{
+		return semaphore->HashTableLink();
+	}
+};
+
+
+class GlobalSemTable {
+public:
+	GlobalSemTable()
+		:
+		fSemaphoreCount(0)
+	{
+		mutex_init(&fLock, "global named sem table");
+	}
+
+	~GlobalSemTable()
 	{
 		mutex_destroy(&fLock);
 	}
 
 	status_t Init()
 	{
-		return fSemaphores.InitCheck();
+		status_t error = fNamedSemaphores.InitCheck();
+		if (error != B_OK)
+			return error;
+		return fUnnamedSemaphores.InitCheck();
 	}
 
-	status_t OpenSem(const char* name, int openFlags, mode_t mode,
-		uint32 semCount, SemInfo*& _sem, bool& _created)
+	status_t OpenNamedSem(const char* name, int openFlags, mode_t mode,
+		uint32 semCount, NamedSem*& _sem, bool& _created)
 	{
 		MutexLocker _(fLock);
 
-		SemInfo* sem = fSemaphores.Lookup(name);
+		NamedSem* sem = fNamedSemaphores.Lookup(name);
 		if (sem != NULL) {
 			if ((openFlags & O_EXCL) != 0)
 				return EEXIST;
@@ -174,8 +346,10 @@ public:
 			return ENOENT;
 
 		// does not exist yet -- create
-// TODO: Enforce per team semaphore limit!
-		sem = new(std::nothrow) SemInfo;
+		if (fSemaphoreCount >= MAX_POSIX_SEMS)
+			return ENOSPC;
+
+		sem = new(std::nothrow) NamedSem;
 		if (sem == NULL)
 			return B_NO_MEMORY;
 
@@ -185,7 +359,7 @@ public:
 			return error;
 		}
 
-		error = fSemaphores.Insert(sem);
+		error = fNamedSemaphores.Insert(sem);
 		if (error != B_OK) {
 			delete sem;
 			return error;
@@ -194,38 +368,92 @@ public:
 		// add one reference for the table
 		sem->AcquireReference();
 
+		fSemaphoreCount++;
+
 		_sem = sem;
 		_created = true;
 		return B_OK;
 	}
 
-	status_t UnlinkSem(const char* name)
+	status_t UnlinkNamedSem(const char* name)
 	{
 		MutexLocker _(fLock);
 
-		SemInfo* sem = fSemaphores.Lookup(name);
+		NamedSem* sem = fNamedSemaphores.Lookup(name);
 		if (sem == NULL)
 			return ENOENT;
 
 		if (!sem->HasPermissions())
 			return EACCES;
 
-		fSemaphores.Remove(sem);
+		fNamedSemaphores.Remove(sem);
 		sem->ReleaseReference();
 			// release the table reference
+		fSemaphoreCount--;
 
 		return B_OK;
 	}
 
-private:
-	typedef OpenHashTable<NamedSemHashDefinition, true> SemTable;
+	status_t CreateUnnamedSem(uint32 semCount, int32_t& _id)
+	{
+		MutexLocker _(fLock);
 
-	mutex		fLock;
-	SemTable	fSemaphores;
+		if (fSemaphoreCount >= MAX_POSIX_SEMS)
+			return ENOSPC;
+
+		UnnamedSharedSem* sem = new(std::nothrow) UnnamedSharedSem;
+		if (sem == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = sem->Init(semCount, "unnamed shared sem");
+		if (error == B_OK)
+			error = fUnnamedSemaphores.Insert(sem);
+		if (error != B_OK) {
+			delete sem;
+			return error;
+		}
+
+		fSemaphoreCount++;
+
+		_id = sem->SemaphoreID();
+		return B_OK;
+	}
+
+	status_t DeleteUnnamedSem(sem_id id)
+	{
+		MutexLocker _(fLock);
+
+		UnnamedSharedSem* sem = fUnnamedSemaphores.Lookup(id);
+		if (sem == NULL)
+			return B_BAD_VALUE;
+
+		fUnnamedSemaphores.Remove(sem);
+		delete sem;
+
+		fSemaphoreCount--;
+
+		return B_OK;
+	}
+
+	bool IsUnnamedValidSem(sem_id id)
+	{
+		MutexLocker _(fLock);
+
+		return fUnnamedSemaphores.Lookup(id) != NULL;
+	}
+
+private:
+	typedef OpenHashTable<NamedSemHashDefinition, true> NamedSemTable;
+	typedef OpenHashTable<UnnamedSemHashDefinition, true> UnnamedSemTable;
+
+	mutex			fLock;
+	NamedSemTable	fNamedSemaphores;
+	UnnamedSemTable	fUnnamedSemaphores;
+	int32			fSemaphoreCount;
 };
 
 
-static GlobalRealtimeSemTable sSemTable;
+static GlobalSemTable sSemTable;
 
 
 class TeamSemInfo {
@@ -241,10 +469,11 @@ public:
 	~TeamSemInfo()
 	{
 		if (fSemaphore != NULL)
-			fSemaphore->ReleaseReference();
+			fSemaphore->Delete();
 	}
 
-	SemInfo* Semaphore() const		{ return fSemaphore; }
+	sem_id ID() const				{ return fSemaphore->ID(); }
+	sem_id SemaphoreID() const		{ return fSemaphore->SemaphoreID(); }
 	sem_t* UserSemaphore() const	{ return fUserSemaphore; }
 
 	void Open()
@@ -259,15 +488,19 @@ public:
 
 	TeamSemInfo* Clone() const
 	{
-		TeamSemInfo* sem = new(std::nothrow) TeamSemInfo(fSemaphore,
-			fUserSemaphore);
+		SemInfo* sem = fSemaphore->Clone();
 		if (sem == NULL)
 			return NULL;
 
-		sem->fOpenCount = fOpenCount;
-		fSemaphore->AcquireReference();
+		TeamSemInfo* clone = new(std::nothrow) TeamSemInfo(sem, fUserSemaphore);
+		if (clone == NULL) {
+			sem->Delete();
+			return NULL;
+		}
 
-		return sem;
+		clone->fOpenCount = fOpenCount;
+
+		return clone;
 	}
 
 	HashTableLink<TeamSemInfo>* HashTableLink()
@@ -295,12 +528,12 @@ struct TeamSemHashDefinition {
 
 	size_t Hash(TeamSemInfo* semaphore) const
 	{
-		return HashKey(semaphore->Semaphore()->ID());
+		return HashKey(semaphore->ID());
 	}
 
 	bool Compare(const KeyType& key, TeamSemInfo* semaphore) const
 	{
-		return key == semaphore->Semaphore()->ID();
+		return key == semaphore->ID();
 	}
 
 	HashTableLink<TeamSemInfo>* GetLink(TeamSemInfo* semaphore) const
@@ -312,6 +545,8 @@ struct TeamSemHashDefinition {
 
 struct realtime_sem_context {
 	realtime_sem_context()
+		:
+		fSemaphoreCount(0)
 	{
 		mutex_init(&fLock, "realtime sem context");
 	}
@@ -334,6 +569,7 @@ struct realtime_sem_context {
 
 	status_t Init()
 	{
+		fNextPrivateSemID = -1;
 		return fSemaphores.InitCheck();
 	}
 
@@ -347,6 +583,8 @@ struct realtime_sem_context {
 
 		MutexLocker _(fLock);
 
+		context->fNextPrivateSemID = fNextPrivateSemID;
+
 		// clone all semaphores
 		SemTable::Iterator it = fSemaphores.GetIterator();
 		while (TeamSemInfo* sem = it.Next()) {
@@ -358,21 +596,24 @@ struct realtime_sem_context {
 				delete clonedSem;
 				return NULL;
 			}
+			context->fSemaphoreCount++;
 		}
 
 		contextDeleter.Detach();
 		return context;
 	}
 
-	status_t CreateAnonymousSem(uint32 semCount, int& _id)
+	status_t CreateUnnamedSem(uint32 semCount, bool shared, int32_t& _id)
 	{
-// TODO: Enforce per team semaphore limit!
-		SemInfo* sem = new(std::nothrow) SemInfo;
+		if (shared)
+			return sSemTable.CreateUnnamedSem(semCount, _id);
+
+		UnnamedSem* sem = new(std::nothrow) UnnamedSem;
 		if (sem == NULL)
 			return B_NO_MEMORY;
-		ObjectDeleter<SemInfo> semDeleter(sem);
+		ObjectDeleter<UnnamedSem> semDeleter(sem);
 
-		status_t error = sem->Init(NULL, 0, semCount);
+		status_t error = sem->Init(semCount, "unnamed sem");
 		if (error != B_OK)
 			return error;
 
@@ -383,23 +624,31 @@ struct realtime_sem_context {
 
 		MutexLocker _(fLock);
 
+		if (fSemaphoreCount >= MAX_POSIX_SEMS_PER_TEAM) {
+			delete teamSem;
+			return ENOSPC;
+		}
+
+		sem->SetID(_NextPrivateSemID());
+
 		error = fSemaphores.Insert(teamSem);
 		if (error != B_OK) {
 			delete teamSem;
 			return error;
 		}
 
-		_id = teamSem->Semaphore()->ID();
+		fSemaphoreCount++;
 
+		_id = teamSem->ID();
 		return B_OK;
 	}
 
 	status_t OpenSem(const char* name, int openFlags, mode_t mode,
-		uint32 semCount, sem_t* userSem, sem_t*& _usedUserSem, int& _id,
+		uint32 semCount, sem_t* userSem, sem_t*& _usedUserSem, int32_t& _id,
 		bool& _created)
 	{
-		SemInfo* sem;
-		status_t error = sSemTable.OpenSem(name, openFlags, mode, semCount,
+		NamedSem* sem;
+		status_t error = sSemTable.OpenNamedSem(name, openFlags, mode, semCount,
 			sem, _created);
 		if (error != B_OK)
 			return error;
@@ -412,16 +661,25 @@ struct realtime_sem_context {
 			teamSem->Open();
 			sem->ReleaseReference();
 			_usedUserSem = teamSem->UserSemaphore();
-			_id = teamSem->Semaphore()->ID();
+			_id = teamSem->ID();
 			return B_OK;
 		}
 
 		// not open yet -- create a new team sem
+
+		// first check the semaphore limit, though
+		if (fSemaphoreCount >= MAX_POSIX_SEMS_PER_TEAM) {
+			sem->ReleaseReference();
+			if (_created)
+				sSemTable.UnlinkNamedSem(name);
+			return ENOSPC;
+		}
+
 		teamSem = new(std::nothrow) TeamSemInfo(sem, userSem);
 		if (teamSem == NULL) {
 			sem->ReleaseReference();
 			if (_created)
-				sSemTable.UnlinkSem(name);
+				sSemTable.UnlinkNamedSem(name);
 			return B_NO_MEMORY;
 		}
 
@@ -429,12 +687,14 @@ struct realtime_sem_context {
 		if (error != B_OK) {
 			delete teamSem;
 			if (_created)
-				sSemTable.UnlinkSem(name);
+				sSemTable.UnlinkNamedSem(name);
 			return error;
 		}
 
+		fSemaphoreCount++;
+
 		_usedUserSem = teamSem->UserSemaphore();
-		_id = teamSem->Semaphore()->ID();
+		_id = teamSem->ID();
 
 		return B_OK;
 	}
@@ -447,11 +707,12 @@ struct realtime_sem_context {
 
 		TeamSemInfo* sem = fSemaphores.Lookup(id);
 		if (sem == NULL)
-			return B_BAD_VALUE;
+			return sSemTable.DeleteUnnamedSem(id);
 
 		if (sem->Close()) {
 			// last reference closed
 			fSemaphores.Remove(sem);
+			fSemaphoreCount--;
 			deleteUserSem = sem->UserSemaphore();
 			delete sem;
 		}
@@ -463,8 +724,12 @@ struct realtime_sem_context {
 	{
 		MutexLocker locker(fLock);
 
-		if (fSemaphores.Lookup(id) == NULL)
-			return B_BAD_VALUE;
+		TeamSemInfo* sem = fSemaphores.Lookup(id);
+		if (sem == NULL) {
+			if (!sSemTable.IsUnnamedValidSem(id))
+				return B_BAD_VALUE;
+		} else
+			id = sem->SemaphoreID();
 
 		locker.Unlock();
 
@@ -487,8 +752,12 @@ struct realtime_sem_context {
 	{
 		MutexLocker locker(fLock);
 
-		if (fSemaphores.Lookup(id) == NULL)
-			return B_BAD_VALUE;
+		TeamSemInfo* sem = fSemaphores.Lookup(id);
+		if (sem == NULL) {
+			if (!sSemTable.IsUnnamedValidSem(id))
+				return B_BAD_VALUE;
+		} else
+			id = sem->SemaphoreID();
 
 		locker.Unlock();
 
@@ -500,8 +769,12 @@ struct realtime_sem_context {
 	{
 		MutexLocker locker(fLock);
 
-		if (fSemaphores.Lookup(id) == NULL)
-			return B_BAD_VALUE;
+		TeamSemInfo* sem = fSemaphores.Lookup(id);
+		if (sem == NULL) {
+			if (!sSemTable.IsUnnamedValidSem(id))
+				return B_BAD_VALUE;
+		} else
+			id = sem->SemaphoreID();
 
 		locker.Unlock();
 
@@ -515,10 +788,25 @@ struct realtime_sem_context {
 	}
 
 private:
+	sem_id _NextPrivateSemID()
+	{
+		while (true) {
+			if (fNextPrivateSemID >= 0)
+				fNextPrivateSemID = -1;
+
+			sem_id id = fNextPrivateSemID--;
+			if (fSemaphores.Lookup(id) == NULL)
+				return id;
+		}
+	}
+
+private:
 	typedef OpenHashTable<TeamSemHashDefinition, true> SemTable;
 
 	mutex		fLock;
 	SemTable	fSemaphores;
+	int32		fSemaphoreCount;
+	sem_id		fNextPrivateSemID;
 };
 
 
@@ -585,9 +873,9 @@ copy_sem_name_to_kernel(const char* userName, KPath& buffer, char*& name)
 void
 realtime_sem_init()
 {
-	new(&sSemTable) GlobalRealtimeSemTable;
+	new(&sSemTable) GlobalSemTable;
 	if (sSemTable.Init() != B_OK)
-		panic("realtime_sem_init() failed to init global table");
+		panic("realtime_sem_init() failed to init global sem table");
 }
 
 
@@ -612,12 +900,15 @@ clone_realtime_sem_context(realtime_sem_context* context)
 
 
 status_t
-_user_realtime_sem_open(const char* userName, int openFlags, mode_t mode,
-	uint32 semCount, sem_t* userSem, sem_t** _usedUserSem)
+_user_realtime_sem_open(const char* userName, int openFlagsOrShared,
+	mode_t mode, uint32 semCount, sem_t* userSem, sem_t** _usedUserSem)
 {
 	realtime_sem_context* context = get_current_team_context();
 	if (context == NULL)
 		return B_NO_MEMORY;
+
+	if (semCount > MAX_POSIX_SEM_VALUE)
+		return B_BAD_VALUE;
 
 	// userSem must always be given
 	if (userSem == NULL)
@@ -625,10 +916,11 @@ _user_realtime_sem_open(const char* userName, int openFlags, mode_t mode,
 	if (!IS_USER_ADDRESS(userSem))
 		return B_BAD_ADDRESS;
 
-	// anonymous semaphores are less work -- deal with them first
+	// unnamed semaphores are less work -- deal with them first
 	if (userName == NULL) {
-		int id;
-		status_t error = context->CreateAnonymousSem(semCount, id);
+		int32_t id;
+		status_t error = context->CreateUnnamedSem(semCount, openFlagsOrShared,
+			id);
 		if (error != B_OK)
 			return error;
 
@@ -657,8 +949,8 @@ _user_realtime_sem_open(const char* userName, int openFlags, mode_t mode,
 	// open the semaphore
 	sem_t* usedUserSem;
 	bool created;
-	int id;
-	error = context->OpenSem(name, openFlags, mode, semCount, userSem,
+	int32_t id;
+	error = context->OpenSem(name, openFlagsOrShared, mode, semCount, userSem,
 		usedUserSem, id, created);
 	if (error != B_OK)
 		return error;
@@ -667,7 +959,7 @@ _user_realtime_sem_open(const char* userName, int openFlags, mode_t mode,
 	if (user_memcpy(&userSem->id, &id, sizeof(int)) != B_OK
 		|| user_memcpy(_usedUserSem, &usedUserSem, sizeof(sem_t*)) != B_OK) {
 		if (created)
-			sSemTable.UnlinkSem(name);
+			sSemTable.UnlinkNamedSem(name);
 		sem_t* dummy;
 		context->CloseSem(id, dummy);
 		return B_BAD_ADDRESS;
@@ -714,7 +1006,7 @@ _user_realtime_sem_unlink(const char* userName)
 	if (error != B_OK)
 		return error;
 
-	return sSemTable.UnlinkSem(name);
+	return sSemTable.UnlinkNamedSem(name);
 }
 
 

@@ -89,8 +89,8 @@ sem_unlink(const char* name)
 int
 sem_init(sem_t* semaphore, int shared, unsigned value)
 {
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_open(NULL, 0, 0, value, semaphore,
-		NULL));
+	RETURN_AND_SET_ERRNO(_kern_realtime_sem_open(NULL, shared, 0, value,
+		semaphore, NULL));
 }
 
 
