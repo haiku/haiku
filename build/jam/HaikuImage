@@ -269,6 +269,8 @@ local logoArtwork = "HAIKU logo - white on blue - big.png"
 SEARCH on $(logoArtwork) = [ FDirName $(HAIKU_TOP) data artwork ] ;
 AddFilesToHaikuImage beos etc artwork : $(logoArtwork) ;
 
+AddDirectoryToHaikuImage beos etc sounds ;
+
 # Mail spell check dictionaries
 local spellFiles = words geekspeak ;
 spellFiles = $(spellFiles:G=spell) ;
