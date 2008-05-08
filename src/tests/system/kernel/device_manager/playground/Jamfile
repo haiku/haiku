@@ -8,10 +8,10 @@ UsePrivateHeaders shared ;
 
 SimpleTest device_manager :
 	device_manager.cpp
+	KPath.cpp
 
 	bus.cpp
 	driver.cpp
 
 	: be libkernelland_emu.so
 ;
-

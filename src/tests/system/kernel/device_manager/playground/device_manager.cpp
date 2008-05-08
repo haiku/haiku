@@ -6,18 +6,20 @@
 
 #include "device_manager.h"
 
-#include <util/AutoLock.h>
-#include <util/DoublyLinkedList.h>
-
-#include <KernelExport.h>
-#include <module.h>
-#include <Locker.h>
-
 #include <new>
 #include <set>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <KernelExport.h>
+#include <module.h>
+#include <Locker.h>
+
+#include <fs/KPath.h>
+#include <util/AutoLock.h>
+#include <util/DoublyLinkedList.h>
+#include <util/Stack.h>
 
 
 #define TRACE(a) dprintf a
@@ -107,6 +109,13 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 
 private:
 			status_t		_RegisterFixed(uint32& registered);
+			status_t		_GetNextDriverPath(void*& cookie, KPath& _path);
+			status_t		_GetNextDriver(void* list,
+								driver_module_info*& driver);
+			status_t		_FindBestDriver(const char* path,
+								driver_module_info*& bestDriver,
+								float& bestSupport);
+			status_t		_RegisterPath(const char* path);
 			status_t		_RegisterDynamic();
 			bool			_IsBus() const;
 
@@ -123,10 +132,12 @@ private:
 	AttributeList			fAttributes;
 };
 
-
 device_manager_info *gDeviceManager;
 
 static device_node *sRootNode;
+
+
+//	#pragma mark - device_attr
 
 
 device_attr_private::device_attr_private()
@@ -355,7 +366,7 @@ dm_dump_node(device_node* node, int32 level)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - device_node
 
 
 /*!	Allocate device node info structure;
@@ -551,6 +562,150 @@ device_node::_RegisterFixed(uint32& registered)
 
 
 status_t
+device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
+{
+	Stack<KPath*>* stack = NULL;
+
+	if (cookie == NULL) {
+		// find all paths and add them
+		stack = new(std::nothrow) Stack<KPath*>();
+		if (stack == NULL)
+			return B_NO_MEMORY;
+
+		StackDeleter<KPath*> stackDeleter(stack);
+
+		if (!_IsBus()) {
+			// add driver paths
+			KPath* path = new(std::nothrow) KPath;
+			if (path == NULL)
+				return B_NO_MEMORY;
+
+			status_t status = path->SetTo("drivers");
+			if (status != B_OK) {
+				delete path;
+				return status;
+			}
+
+			// TODO: this might be more than one path!
+			const char *type;
+			if (dm_get_attr_string(this, B_DRIVER_DEVICE_TYPE, &type, false)
+					== B_OK)
+				path->Append(type);
+
+			stack->Push(path);
+		}
+
+		// add bus paths
+		KPath* path = new(std::nothrow) KPath;
+		if (path == NULL)
+			return B_NO_MEMORY;
+
+		status_t status = path->SetTo("bus");
+		if (status != B_OK) {
+			delete path;
+			return status;
+		}
+
+		stack->Push(path);
+		stackDeleter.Detach();
+
+		cookie = (void*)stack;
+	} else
+		stack = static_cast<Stack<KPath*>*>(cookie);
+
+	KPath* path;
+	if (stack->Pop(&path)) {
+		_path.Adopt(*path);
+		delete path;
+		return B_OK;
+	}
+
+	delete stack;
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+device_node::_GetNextDriver(void* list, driver_module_info*& driver)
+{
+	while (true) {
+		char name[B_FILE_NAME_LENGTH];
+		size_t nameLength = sizeof(name);
+
+		status_t status = read_next_module_name(list, name, &nameLength);
+		if (status != B_OK)
+			return status;
+
+		if (!strcmp(fModuleName, name))
+			continue;
+
+		if (get_module(name, (module_info**)&driver) != B_OK)
+			continue;
+
+		if (driver->supports_device == NULL
+			|| driver->register_device == NULL) {
+			put_module(name);
+			continue;
+		}
+
+		return B_OK;
+	}
+}
+
+
+status_t
+device_node::_FindBestDriver(const char* path, driver_module_info*& bestDriver,
+	float& bestSupport)
+{
+	if (bestDriver == NULL)
+		bestSupport = 0.0f;
+
+	void* list = open_module_list_etc(path, "driver_v1");
+	driver_module_info* driver;
+	while (_GetNextDriver(list, driver) == B_OK) {
+		float support = driver->supports_device(this);
+		if (support > bestSupport) {
+			if (bestDriver != NULL)
+				put_module(bestDriver->info.name);
+
+			bestDriver = driver;
+			bestSupport = support;
+			continue;
+				// keep reference to best module around
+		}
+
+		put_module(driver->info.name);
+	}
+	close_module_list(list);
+
+	return bestDriver != NULL ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+device_node::_RegisterPath(const char* path)
+{
+	void* list = open_module_list_etc(path, "driver_v1");
+	driver_module_info* driver;
+	uint32 count = 0;
+
+	while (_GetNextDriver(list, driver) == B_OK) {
+		float support = driver->supports_device(this);
+		if (support > 0.0) {
+printf("  register module \"%s\", support %f\n", driver->info.name, support);
+			if (driver->register_device(this) == B_OK)
+				count++;
+		}
+
+		put_module(driver->info.name);
+	}
+	close_module_list(list);
+
+	return count > 0 ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
 device_node::_RegisterDynamic()
 {
 	uint32 findFlags;
@@ -558,70 +713,31 @@ device_node::_RegisterDynamic()
 			!= B_OK)
 		findFlags = 0;
 
-	driver_module_info* bestDriver = NULL;
-	float best = 0.0;
+	KPath path;
 
-	char path[64];
-	if (!_IsBus()) {
-		strlcpy(path, "drivers", sizeof(path));
+	if ((findFlags & B_FIND_MULTIPLE_CHILDREN) == 0) {
+		// find the one driver
+		driver_module_info* bestDriver = NULL;
+		float bestSupport = 0.0;
+		void* cookie = NULL;
 
-		const char *type;
-		if (dm_get_attr_string(this, B_DRIVER_DEVICE_TYPE, &type, false)
-				== B_OK) {
-			strlcat(path, "/", sizeof(path));
-			strlcat(path, type, sizeof(path));
+		while (_GetNextDriverPath(cookie, path) == B_OK) {
+			_FindBestDriver(path.Path(), bestDriver, bestSupport);
+		}
+
+		if (bestDriver != NULL) {
+printf("  register best module \"%s\", support %f\n", bestDriver->info.name, bestSupport);
+			bestDriver->register_device(this);
+			put_module(bestDriver->info.name);
 		}
 	} else {
-		// TODO: we might want to allow bus* specifiers as well, ie.
-		// busses/usb
-		strlcpy(path, "bus", sizeof(path));
-	}
-
-	void* list = open_module_list_etc(path, "driver_v1");
-	while (true) {
-		char name[B_FILE_NAME_LENGTH];
-		size_t nameLength = sizeof(name);
-
-		if (read_next_module_name(list, name, &nameLength) != B_OK)
-			break;
-
-		if (!strcmp(fModuleName, name))
-			continue;
-
-		driver_module_info* driver;
-		if (get_module(name, (module_info**)&driver) != B_OK)
-			continue;
-
-		if (driver->supports_device != NULL
-			&& driver->register_device != NULL) {
-			float support = driver->supports_device(this);
-
-			if ((findFlags & B_FIND_MULTIPLE_CHILDREN) == 0) {
-				if (support > best) {
-					if (bestDriver != NULL)
-						put_module(bestDriver->info.name);
-
-					bestDriver = driver;
-					best = support;
-					continue;
-						// keep reference to best module around
-				}
-			} else if (support > 0.0) {
-printf("  register module \"%s\", support %f\n", name, support);
-				driver->register_device(this);
-			}
+		// register all drivers that match
+		void* cookie = NULL;
+		while (_GetNextDriverPath(cookie, path) == B_OK) {
+			_RegisterPath(path.Path());
 		}
-
-		put_module(name);
 	}
-	close_module_list(list);
 
-	if (bestDriver != NULL) {
-printf("  register best module \"%s\", support %f\n", bestDriver->info.name, best);
-		bestDriver->register_device(this);
-		put_module(bestDriver->info.name);
-	}
-	
 	return B_OK;
 }
 
