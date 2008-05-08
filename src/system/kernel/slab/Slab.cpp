@@ -63,7 +63,7 @@ typedef DoublyLinkedList<slab> SlabList;
 
 struct object_cache : DoublyLinkedListLinkImpl<object_cache> {
 	char name[32];
-	benaphore lock;
+	mutex lock;
 	size_t object_size;
 	size_t cache_color_cycle;
 	SlabList empty, partial, full;
@@ -164,7 +164,7 @@ struct depot_cpu_store {
 
 
 static ObjectCacheList sObjectCaches;
-static benaphore sObjectCacheListLock;
+static mutex sObjectCacheListLock;
 
 static uint8 *sInitialBegin, *sInitialLimit, *sInitialPointer;
 static kernel_args *sKernelArgs;
@@ -420,19 +420,6 @@ recursive_lock_boot_init(recursive_lock *lock, const char *name, uint32 flags)
 
 
 static status_t
-benaphore_boot_init(benaphore *lock, const char *name, uint32 flags)
-{
-	if (flags & CACHE_DURING_BOOT) {
-		lock->sem = -1;
-		lock->count = 1;
-		return B_OK;
-	}
-
-	return benaphore_init(lock, name);
-}
-
-
-static status_t
 area_allocate_pages(object_cache *cache, void **pages, uint32 flags)
 {
 	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", cache->slab_size, flags);
@@ -521,7 +508,7 @@ object_cache_low_memory(void *_self, int32 level)
 	if (cache->reclaimer)
 		cache->reclaimer(cache->cookie, level);
 
-	BenaphoreLocker _(cache->lock);
+	MutexLocker _(cache->lock);
 	size_t minimumAllowed;
 
 	switch (level) {
@@ -571,9 +558,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 {
 	strlcpy(cache->name, name, sizeof(cache->name));
 
-	status_t status = benaphore_boot_init(&cache->lock, name, flags);
-	if (status < B_OK)
-		return status;
+	mutex_init(&cache->lock, cache->name);
 
 	if (objectSize < sizeof(object_link))
 		objectSize = sizeof(object_link);
@@ -606,7 +591,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 		status_t status = object_depot_init(&cache->depot, flags,
 			object_cache_return_object_wrapper);
 		if (status < B_OK) {
-			benaphore_destroy(&cache->lock);
+			mutex_destroy(&cache->lock);
 			return status;
 		}
 	}
@@ -626,7 +611,7 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 
 	register_low_memory_handler(object_cache_low_memory, cache, 5);
 
-	BenaphoreLocker _(sObjectCacheListLock);
+	MutexLocker _(sObjectCacheListLock);
 	sObjectCaches.Add(cache);
 
 	return B_OK;
@@ -636,10 +621,6 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 static status_t
 object_cache_init_locks(object_cache *cache)
 {
-	status_t status = benaphore_init(&cache->lock, cache->name);
-	if (status < B_OK)
-		return status;
-
 	if (cache->flags & CACHE_NO_DEPOT)
 		return B_OK;
 
@@ -780,11 +761,11 @@ delete_object_cache(object_cache *cache)
 	T(Delete(cache));
 
 	{
-		BenaphoreLocker _(sObjectCacheListLock);
+		MutexLocker _(sObjectCacheListLock);
 		sObjectCaches.Remove(cache);
 	}
 
-	benaphore_lock(&cache->lock);
+	mutex_lock(&cache->lock);
 
 	if (!(cache->flags & CACHE_NO_DEPOT))
 		object_depot_destroy(&cache->depot);
@@ -800,7 +781,7 @@ delete_object_cache(object_cache *cache)
 	while (!cache->empty.IsEmpty())
 		cache->ReturnSlab(cache->empty.RemoveHead());
 
-	benaphore_destroy(&cache->lock);
+	mutex_destroy(&cache->lock);
 	delete_cache(cache);
 }
 
@@ -816,7 +797,7 @@ object_cache_alloc(object_cache *cache, uint32 flags)
 		}
 	}
 
-	BenaphoreLocker _(cache->lock);
+	MutexLocker _(cache->lock);
 	slab *source;
 
 	if (cache->partial.IsEmpty()) {
@@ -908,7 +889,7 @@ object_cache_free(object_cache *cache, void *object)
 			return;
 	}
 
-	BenaphoreLocker _(cache->lock);
+	MutexLocker _(cache->lock);
 	object_cache_return_to_slab(cache, cache->ObjectSlab(object), object);
 }
 
@@ -942,7 +923,7 @@ object_cache_reserve(object_cache *cache, size_t objectCount, uint32 flags)
 
 	T(Reserve(cache, objectCount, flags));
 
-	BenaphoreLocker _(cache->lock);
+	MutexLocker _(cache->lock);
 	return object_cache_reserve_internal(cache, objectCount, flags);
 }
 
@@ -1477,8 +1458,7 @@ dump_cache_info(int argc, char *argv[])
 	object_cache *cache = (object_cache *)strtoul(argv[1], NULL, 16);
 
 	kprintf("name: %s\n", cache->name);
-	kprintf("lock: { count: %ld, sem: %ld }\n", cache->lock.count,
-		cache->lock.sem);
+	kprintf("lock: %p\n", &cache->lock);
 	kprintf("object_size: %lu\n", cache->object_size);
 	kprintf("cache_color_cycle: %lu\n", cache->cache_color_cycle);
 	kprintf("used_count: %lu\n", cache->used_count);
@@ -1518,9 +1498,7 @@ slab_init(kernel_args *args, addr_t initialBase, size_t initialSize)
 void
 slab_init_post_sem()
 {
-	status_t status = benaphore_init(&sObjectCacheListLock, "object cache list");
-	if (status < B_OK)
-		panic("slab_init: failed to create object cache list lock");
+	mutex_init(&sObjectCacheListLock, "object cache list");
 
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
