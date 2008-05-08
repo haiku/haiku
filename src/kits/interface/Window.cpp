@@ -19,10 +19,12 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <FindDirectory.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <MessageQueue.h>
 #include <MessageRunner.h>
+#include <Path.h>
 #include <PropertyInfo.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -3248,15 +3250,23 @@ BWindow::_HandleKeyDown(BMessage* event)
 		int32 rawKey;
 		if (event->FindInt32("key", &rawKey) == B_OK && rawKey == B_PRINT_KEY) {
 			// Get filename
-			char filename[128];
-			BEntry entry;
+			BPath homePath;
 
+			if (find_directory(B_USER_DIRECTORY, &homePath) != B_OK) {
+				fprintf(stderr, "failed to find user home directory\n");
+				return true;
+			}
+
+			BPath path;
+			BEntry entry;
 			int32 index = 1;
 			do {
-				// TODO: Use find_directory(B_USER_DIRECTORY, ...)
-				sprintf(filename, "/boot/home/screen%ld.png", index++);
-				entry.SetTo(filename);
-			} while(entry.Exists());
+				char filename[32];
+				sprintf(filename, "screen%ld.png", index++);
+				path = homePath;
+				path.Append(filename);
+				entry.SetTo(path.Path());
+			} while (entry.Exists());
 
 			// Get the screen bitmap
 			BScreen screen(this);
@@ -3264,7 +3274,7 @@ BWindow::_HandleKeyDown(BMessage* event)
 			screen.GetBitmap(&screenDump, false);
 
 			// Dump to PNG
-			SaveToPNG(filename, screen.Frame(), screenDump->ColorSpace(),
+			SaveToPNG(path.Path(), screen.Frame(), screenDump->ColorSpace(),
 				screenDump->Bits(),
 				screenDump->BitsLength(),
 				screenDump->BytesPerRow());
