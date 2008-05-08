@@ -26,7 +26,7 @@
 #include <string>
 
 #ifdef TRACE
-#undef TRACE
+#	undef TRACE
 #endif
 #define TRACE(x)
 //#define TRACE(x) printf x
@@ -1081,22 +1081,35 @@ recursive_lock_unlock(recursive_lock *lock)
 //	#pragma mark -
 
 
-status_t
+void
 mutex_init(mutex *m, const char *name)
 {
 	if (m == NULL)
-		return EINVAL;
+		return;
 
 	if (name == NULL)
 		name = "mutex_sem";
 
-	m->holder = -1;
+	// We need to store the semaphore in "waiters", as it is no sem anymore
+	// Also, kernel mutex creation cannot fail anymore, but we could...
+	m->waiters = (struct mutex_waiter *)create_sem(1, name);
+	if ((sem_id)m->waiters < B_OK)
+		debugger("semaphore creation failed");
+}
 
-	m->sem = create_sem(1, name);
-	if (m->sem >= B_OK)
-		return B_OK;
 
-	return m->sem;
+void
+mutex_init_etc(mutex *m, const char *name, uint32 flags)
+{
+	if (m == NULL)
+		return;
+
+	if (name == NULL)
+		name = "mutex_sem";
+
+	m->waiters = (struct mutex_waiter *)create_sem(1, name);
+	if ((sem_id)m->waiters < B_OK)
+		debugger("semaphore creation failed");
 }
 
 
@@ -1106,44 +1119,31 @@ mutex_destroy(mutex *mutex)
 	if (mutex == NULL)
 		return;
 
-	if (mutex->sem >= 0) {
-		delete_sem(mutex->sem);
-		mutex->sem = -1;
+	if ((sem_id)mutex->waiters >= 0) {
+		delete_sem((sem_id)mutex->waiters);
+		mutex->waiters = (struct mutex_waiter *)-1;
 	}
-	mutex->holder = -1;
 }
 
 
 status_t
-mutex_lock(mutex *mutex)
+_mutex_trylock(mutex *mutex)
 {
-	thread_id me = find_thread(NULL);
+	return acquire_sem_etc((sem_id)mutex->waiters, 1, B_RELATIVE_TIMEOUT, 0);
+}
 
-	// ToDo: if acquire_sem() fails, we shouldn't panic - but we should definitely
-	//	change the mutex API to actually return the status code
-	status_t status = acquire_sem(mutex->sem);
-	if (status < B_OK)
-		return status;
 
-	if (me == mutex->holder)
-		panic("mutex_lock failure: mutex %p (sem = 0x%lx) acquired twice by thread 0x%lx\n", mutex, mutex->sem, me);
-
-	mutex->holder = me;
-	return B_OK;
+status_t
+_mutex_lock(mutex *mutex, bool threadsLocked)
+{
+	return acquire_sem((sem_id)mutex->waiters);
 }
 
 
 void
-mutex_unlock(mutex *mutex)
+_mutex_unlock(mutex *mutex)
 {
-	thread_id me = find_thread(NULL);
-
-	if (me != mutex->holder)
-		panic("mutex_unlock failure: thread 0x%lx is trying to release mutex %p (current holder 0x%lx)\n",
-			me, mutex, mutex->holder);
-
-	mutex->holder = -1;
-	release_sem(mutex->sem);
+	release_sem((sem_id)mutex->waiters);
 }
 
 
