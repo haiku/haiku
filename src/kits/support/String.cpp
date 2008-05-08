@@ -17,6 +17,7 @@
 #include <String.h>
 
 #include <ctype.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -259,6 +260,8 @@ BString::operator=(char c)
 BString&
 BString::SetTo(const char* string, int32 maxLength)
 {
+	if (maxLength < 0)
+		maxLength = INT32_MAX;
 	maxLength = strlen_clamp(safestr(string), maxLength);
 	if (_DetachWith("", maxLength) == B_OK)
 		memcpy(fPrivateData, string, maxLength);
@@ -309,6 +312,8 @@ BString::Adopt(BString& from)
 BString&
 BString::SetTo(const BString& string, int32 maxLength)
 {
+	if (maxLength < 0)
+		maxLength = INT32_MAX;
 	if (fPrivateData != string.fPrivateData
 		// make sure we reassing in case length is different
 		|| (fPrivateData == string.fPrivateData && Length() > maxLength)) {
