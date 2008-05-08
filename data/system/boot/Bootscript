@@ -57,6 +57,12 @@ exec >/dev/null 2>&1
 SCRIPTS=beos/system/boot
 SERVERS=beos/system/servers
 
+# clean the shared memory dir
+shmDir=/boot/var/shared_memory
+rm -rf $shmDir
+mkdir $shmDir
+chmod 777 $shmDir
+
 # Set up the environment
 
 export SAFEMODE=`/bin/safemode`

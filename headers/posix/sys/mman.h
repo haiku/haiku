@@ -5,6 +5,7 @@
 #ifndef _SYS_MMAN_H
 #define _SYS_MMAN_H
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 
 
@@ -24,19 +25,17 @@
 // mmap() error return code
 #define MAP_FAILED		((void*)-1)
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
+__BEGIN_DECLS
 
-extern void*	mmap(void* address, size_t length, int protection, int flags,
-					int fd, off_t offset);
-extern int		munmap(void* address, size_t length);
+void*	mmap(void* address, size_t length, int protection, int flags,
+			int fd, off_t offset);
+int		munmap(void* address, size_t length);
 
+int		shm_open(const char* name, int openMode, mode_t permissions);
+int		shm_unlink(const char* name);
 
-#ifdef __cplusplus
-}
-#endif
+__END_DECLS
 
 
 #endif	// _SYS_MMAN_H

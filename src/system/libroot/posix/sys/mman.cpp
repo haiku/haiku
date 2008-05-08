@@ -6,12 +6,81 @@
 #include <sys/mman.h>
 
 #include <errno.h>
+#include <fcntl.h>
+#include <string.h>
 
 #include <OS.h>
 
 #include <syscall_utils.h>
 #include <syscalls.h>
 #include <vm.h>
+
+
+static const char* kSharedMemoryDir = "/boot/var/shared_memory/";
+
+
+static bool
+append_string(char*& path, size_t& bytesLeft, const char* toAppend, size_t size)
+{
+	if (bytesLeft <= size)
+		return false;
+
+	memcpy(path, toAppend, size);
+	path += size;
+	path[0] = '\0';
+	bytesLeft -= size;
+
+	return true;
+}
+
+
+static bool
+append_string(char*& path, size_t& bytesLeft, const char* toAppend)
+{
+	return append_string(path, bytesLeft, toAppend, strlen(toAppend));
+}
+
+
+static status_t
+shm_name_to_path(const char* name, char* path, size_t pathSize)
+{
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	// skip leading slashes
+	while (*name == '/')
+		name++;
+
+	if (*name == '\0')
+		return B_BAD_VALUE;
+
+	// create the path; replace occurrences of '/' by "%s" and '%' by "%%"
+	if (!append_string(path, pathSize, kSharedMemoryDir))
+		return ENAMETOOLONG;
+
+	while (const char* found = strpbrk(name, "%/")) {
+		// append section that doesn't need escaping
+		if (found != name) {
+			if (!append_string(path, pathSize, name, found - name))
+				return ENAMETOOLONG;
+		}
+
+		// append escaped char
+		const char* append = (*found == '%' ? "%%" : "%s");
+		if (!append_string(path, pathSize, append, 2))
+			return ENAMETOOLONG;
+		name = found + 1;
+	}
+
+	// append remaining string
+	if (!append_string(path, pathSize, name))
+		return ENAMETOOLONG;
+
+	return B_OK;
+}
+
+
+// #pragma mark -
 
 
 void*
@@ -70,4 +139,28 @@ int
 munmap(void* address, size_t length)
 {
 	RETURN_AND_SET_ERRNO(_kern_unmap_memory(address, length));
+}
+
+
+int
+shm_open(const char* name, int openMode, mode_t permissions)
+{
+	char path[PATH_MAX];
+	status_t error = shm_name_to_path(name, path, sizeof(path));
+	if (error != B_OK)
+		RETURN_AND_SET_ERRNO(error);
+
+	return open(path, openMode, permissions);
+}
+
+
+int
+shm_unlink(const char* name)
+{
+	char path[PATH_MAX];
+	status_t error = shm_name_to_path(name, path, sizeof(path));
+	if (error != B_OK)
+		RETURN_AND_SET_ERRNO(error);
+
+	return unlink(path);
 }
