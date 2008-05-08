@@ -1,11 +1,12 @@
-/* Stack - a template stack class (plus some handy methods)
- *
- * Copyright 2001-2005, Axel Dörfler, axeld@pinc-software.de.
+/*
+ * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef KERNEL_UTIL_STACK_H
 #define KERNEL_UTIL_STACK_H
 
+
+#include <stdlib.h>
 
 #include <SupportDefs.h>
 
@@ -73,6 +74,35 @@ template<class T> class Stack {
 		T		*fArray;
 		int32	fUsed;
 		int32	fMax;
+};
+
+template<typename T> class StackDeleter {
+public:
+	StackDeleter(Stack<T>* stack)
+		: fStack(stack)
+	{
+	}
+
+	~StackDeleter()
+	{
+		if (fStack == NULL)
+			return;
+		
+		T item;
+		while (fStack->Pop(&item)) {
+			delete item;
+		}
+
+		delete fStack;
+	}
+
+	void Detach()
+	{
+		fStack = NULL;
+	}
+
+private:
+	Stack<T>*	fStack;
 };
 
 #endif	/* KERNEL_UTIL_STACK_H */
