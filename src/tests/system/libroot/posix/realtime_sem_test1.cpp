@@ -82,9 +82,9 @@ static void
 _assert_time_equals(const char* test, bigtime_t expected,
 	bigtime_t actual, int lineNumber)
 {
-	// allow 2% deviation
+	// allow 5% deviation
 	bigtime_t diff = actual > expected ? actual - expected : expected - actual;
-	if (diff <= expected / 50)
+	if (diff <= expected / 20)
 		return;
 
 	fprintf(stderr, "%s FAILED in line %d: expected time: %lld, actual: %lld\n",
@@ -948,7 +948,7 @@ test_post_wait_unnamed_fork()
 	// init
 	TEST("sem_init()");
 	sem_t _sem;
-	assert_posix_success(sem_init(&_sem, 1, 1));
+	assert_posix_success(sem_init(&_sem, 0, 1));
 	sem_t* sem = &_sem;
 
 	TEST("sem_getvalue()");
