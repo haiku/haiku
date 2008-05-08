@@ -475,7 +475,7 @@ SudokuView::CopyToClipboard()
 
 			// flattened BPicture, anyone handles that ?
 			if (SaveTo(mio, kExportAsPicture) >= B_OK) {
-				clip->AddData("text/x-vnd.Be-picture", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
+				clip->AddData("image/x-vnd.Be-picture", B_MIME_TYPE, mio.Buffer(), mio.BufferLength());
 				
 			}
 			mio.SetSize(0LL);
