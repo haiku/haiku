@@ -15,6 +15,7 @@
 #include <SupportDefs.h>
 
 #include <libroot_private.h>
+#include <posix/realtime_sem.h>
 #include <user_group.h>
 
 
@@ -61,6 +62,12 @@ sysconf(int name)
 			return MAX_PASSWD_BUFFER_SIZE;
 		case _SC_PAGE_SIZE:
 			return B_PAGE_SIZE;
+		case _SC_SEM_NSEMS_MAX:
+			return MAX_POSIX_SEMS;
+		case _SC_SEM_VALUE_MAX:
+			return MAX_POSIX_SEM_VALUE;
+		case _SC_SEMAPHORES:
+			return _POSIX_SEMAPHORES;
 	}
 
 	return -1;
@@ -71,10 +78,8 @@ long
 fpathconf(int fd, int name)
 {
 	switch (name) {
-		// ToDo: out of what stupidity have those been defined differently?
 		case _PC_CHOWN_RESTRICTED:
-		case _POSIX_CHOWN_RESTRICTED:
-			return 1;
+			return _POSIX_CHOWN_RESTRICTED;
 
 		case _PC_MAX_CANON:
 			return MAX_CANON;
@@ -86,8 +91,7 @@ fpathconf(int fd, int name)
 			return NAME_MAX;
 
 		case _PC_NO_TRUNC:
-		case _POSIX_NO_TRUNC:
-			return 0;
+			return _POSIX_NO_TRUNC;
 
 		case _PC_PATH_MAX:
 			return PATH_MAX;
@@ -98,10 +102,8 @@ fpathconf(int fd, int name)
 		case _PC_LINK_MAX:
 			return LINK_MAX;
 
-		// _PC_VDISABLE
-		// _POSIX_VDISABLE
-		// _POSIX_JOB_CONTROL
-		// _POSIX_SAVED_IDS
+		case _PC_VDISABLE:
+			return _POSIX_VDISABLE;
 	}
 
 	return -1;

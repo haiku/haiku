@@ -28,7 +28,14 @@
 #define F_TEST		3	/* test a section for locks by other processes */
 
 /* POSIX version support */
-#define _POSIX_VERSION			(199009L)
+#define _POSIX_VERSION			(199009L)	/* TODO: Update! */
+
+#define _POSIX_CHOWN_RESTRICTED	1
+#define _POSIX_JOB_CONTROL		1
+#define _POSIX_NO_TRUNC			0
+#define _POSIX_SAVED_IDS		1
+#define _POSIX_VDISABLE			((char)-2)	/* TODO: Check this! */
+#define _POSIX_SEMAPHORES		(200112L)
 
 /* pathconf() constants */
 #define _PC_CHOWN_RESTRICTED	1
@@ -40,11 +47,6 @@
 #define _PC_PIPE_BUF			7
 #define _PC_VDISABLE			8
 #define _PC_LINK_MAX			25
-#define _POSIX_CHOWN_RESTRICTED	9
-#define _POSIX_JOB_CONTROL		10
-#define _POSIX_NO_TRUNC			11
-#define _POSIX_SAVED_IDS		12
-#define _POSIX_VDISABLE			((cc_t) - 2)
 
 /* sysconf() constants */
 #define _SC_ARG_MAX				15
@@ -61,6 +63,9 @@
 #define _SC_GETPW_R_SIZE_MAX	26
 #define _SC_PAGE_SIZE			27
 #define _SC_PAGESIZE			_SC_PAGE_SIZE
+#define _SC_SEM_NSEMS_MAX		28
+#define _SC_SEM_VALUE_MAX		29
+#define _SC_SEMAPHORES			30
 
 /* lseek() constants */
 #ifndef SEEK_SET

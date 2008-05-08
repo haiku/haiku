@@ -15,6 +15,11 @@
 struct realtime_sem_context;
 
 
+#define MAX_POSIX_SEMS_PER_TEAM	128
+#define MAX_POSIX_SEMS			1024
+#define MAX_POSIX_SEM_VALUE		INT_MAX
+
+
 __BEGIN_DECLS
 
 void		realtime_sem_init();
@@ -22,7 +27,7 @@ void		delete_realtime_sem_context(struct realtime_sem_context* context);
 struct realtime_sem_context* clone_realtime_sem_context(
 					struct realtime_sem_context* context);
 
-status_t	_user_realtime_sem_open(const char* name, int openFlags,
+status_t	_user_realtime_sem_open(const char* name, int openFlagsOrShared,
 					mode_t mode, uint32 semCount, sem_t* userSem,
 					sem_t** _usedUserSem);
 status_t	_user_realtime_sem_close(sem_id semID, sem_t** _deleteUserSem);
