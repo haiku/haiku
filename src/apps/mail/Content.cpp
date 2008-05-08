@@ -89,13 +89,18 @@ const rgb_color kSpellTextColor = {255, 0, 0, 255};
 const rgb_color kHyperLinkColor = {0, 0, 255, 255};
 const rgb_color kHeaderColor = {72, 72, 72, 255};
 
-const rgb_color kQuoteColors[] =
-{
-	{0, 0, 0x80, 0},		// 3rd, 6th, ... quote level color
-	{0, 0x80, 0, 0},		// 1st, 4th, ... quote level color
-	{0x80, 0, 0, 0}			// 2nd, ...
+const rgb_color kQuoteColors[] = {
+	{0, 0, 0x80, 0},		// 3rd, 6th, ... quote level color (blue)
+	{0, 0x80, 0, 0},		// 1st, 4th, ... quote level color (green)
+	{0x80, 0, 0, 0}			// 2nd, ... (red)
 };
 const int32 kNumQuoteColors = 3;
+
+const rgb_color kDiffColors[] = {
+	{0xb0, 0, 0, 0},		// '-', red
+	{0, 0x90, 0, 0},		// '+', green
+	{0x6a, 0x6a, 0x6a, 0}	// '@@', dark grey
+};
 
 void Unicode2UTF8(int32 c, char **out);
 
@@ -422,6 +427,23 @@ CopyQuotes(const char *text, size_t length, char *outText, size_t &outLength)
 }
 
 
+int32
+diff_mode(char c)
+{
+	if (c == '+')
+		return 2;
+	if (c == '-')
+		return 1;
+	if (c == '@')
+		return 3;
+	if (c == ' ')
+		return 0;
+
+	// everything else ends the diff mode
+	return -1;
+}
+
+
 bool
 is_quote_char(char c)
 {
@@ -429,33 +451,42 @@ is_quote_char(char c)
 }
 
 
-/** Fills the specified text_run_array with the correct values for the
- *	specified text.
- *	If "view" is NULL, it will assume that "line" lies on a line break,
- *	if not, it will correctly retrieve the number of quotes the current
- *	line already has.
- */
-
+/*!	Fills the specified text_run_array with the correct values for the
+	specified text.
+	If "view" is NULL, it will assume that "line" lies on a line break,
+	if not, it will correctly retrieve the number of quotes the current
+	line already has.
+*/
 void
-FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont &font,
-	text_run_array *style, int32 maxStyles)
+FillInQuoteTextRuns(BTextView* view, quote_context* context, const char* line,
+	int32 length, const BFont& font, text_run_array* style, int32 maxStyles)
 {
-	text_run *runs = style->runs;
+	text_run* runs = style->runs;
 	int32 index = style->count;
 	bool begin; 
 	int32 pos = 0;
+	int32 diffMode = 0;
+	bool inDiff = false;
+	bool wasDiff = false;
 	int32 level = 0;
 
 	// get index to the beginning of the current line
 
-	if (view != NULL) {
+	if (context != NULL) {
+		level = context->level;
+		diffMode = context->diff_mode;
+		begin = context->begin;
+		inDiff = context->in_diff;
+		wasDiff = context->was_diff;
+	} else if (view != NULL) {
 		int32 start, end;
 		view->GetSelection(&end, &end);
 
-		begin = view->TextLength() == 0 || view->ByteAt(view->TextLength() - 1) == '\n';
+		begin = view->TextLength() == 0
+			|| view->ByteAt(view->TextLength() - 1) == '\n';
 
-		// the following line works only reliable when text wrapping is set to off;
-		// so the complicated version actually used here is necessary:
+		// the following line works only reliable when text wrapping is set to
+		// off; so the complicated version actually used here is necessary:
 		// start = view->OffsetAt(view->CurrentLine());
 
 		const char *text = view->Text();
@@ -472,19 +503,28 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 		// get number of nested qoutes for current line
 
 		if (!begin && start < end) {
-			begin = true;	// if there was no text in this line, there may come more nested quotes
+			begin = true;
+				// if there was no text in this line, there may come
+				// more nested quotes
 
-			for (int32 i = start; i < end; i++) {
-				if (is_quote_char(text[i]))
-					level++;
-				else if (text[i] != ' ' && text[i] != '\t') {
-					begin = false;
-					break;
+			diffMode = diff_mode(text[start]);
+			if (diffMode == 0) {
+				for (int32 i = start; i < end; i++) {
+					if (is_quote_char(text[i]))
+						level++;
+					else if (text[i] != ' ' && text[i] != '\t') {
+						begin = false;
+						break;
+					}
 				}
-			}
-			if (begin)	// skip leading spaces (tabs & newlines aren't allowed here)
+			} else
+				inDiff = true;
+
+			if (begin) {
+				// skip leading spaces (tabs & newlines aren't allowed here)
 				while (line[pos] == ' ')
 					pos++;
+			}
 		}
 	} else
 		begin = true;
@@ -494,7 +534,10 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 	for (int32 pos = 0; pos < length;) {
 		int32 next;
 		if (begin && is_quote_char(line[pos])) {
+			begin = false;
+
 			while (pos < length && line[pos] != '\n') {
+				// insert style for each quote level
 				level++;
 
 				bool search = true;
@@ -502,46 +545,84 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 					if (search && is_quote_char(line[next])
 						|| line[next] == '\n')
 						break;
-					else if (line[next] != ' ' && line[next] != '\t')
+					else if (search && line[next] != ' ' && line[next] != '\t')
 						search = false;
 				}
 
 				runs[index].offset = pos;
 				runs[index].font = font;
-				runs[index].color = level > 0 ? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
+				runs[index].color = level > 0
+					? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
 
 				pos = next;
 				if (++index >= maxStyles)
 					break;
 			}
 		} else {
+			if (begin) {
+				if (!inDiff) {
+					inDiff = !strncmp(&line[pos], "--- ", 4);
+					wasDiff = false;
+				}
+				if (inDiff) {
+					diffMode = diff_mode(line[pos]);
+					if (diffMode < 0) {
+						inDiff = false;
+						wasDiff = true;
+					}
+				}
+			}
+
 			runs[index].offset = pos;
 			runs[index].font = font;
-			runs[index].color = level > 0 ? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
-			index++;
+			if (wasDiff)
+				runs[index].color = kDiffColors[diff_mode('@') - 1];
+			else if (diffMode <= 0) {
+				runs[index].color = level > 0
+					? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
+			} else
+				runs[index].color = kDiffColors[diffMode - 1];
+
+			begin = false;
 
 			for (next = pos; next < length; next++) {
-				if (line[next] == '\n')
+				if (line[next] == '\n') {
+					begin = true;
+					wasDiff = false;
 					break;
+				}
 			}
+
 			pos = next;
+			index++;
+		}
+
+		if (pos < length)
+			begin = line[pos] == '\n';
+
+		if (begin) {
+			pos++;
+			level = 0;
+			wasDiff = false;
+
+			// skip one leading space (tabs & newlines aren't allowed here)
+			if (!inDiff && pos < length && line[pos] == ' ')
+				pos++;
 		}
 
 		if (index >= maxStyles)
 			break;
-
-		level = 0;
-
-		if (pos < length && line[pos] == '\n') {
-			pos++;
-			begin = true;
-
-			// skip leading spaces (tabs & newlines aren't allowed here)
-			while (pos < length && line[pos] == ' ')
-				pos++;
-		}
 	}
 	style->count = index;
+
+	if (context) {
+		// update context for next run
+		context->level = level;
+		context->diff_mode = diffMode;
+		context->begin = begin;
+		context->in_diff = inDiff;
+		context->was_diff = wasDiff;
+	}
 }
 
 
@@ -2171,12 +2252,12 @@ TTextView::AddAsContent(BEmailMessage *mail, bool wrap, uint32 charset, mail_enc
 }
 
 
-//--------------------------------------------------------------------
 //	#pragma mark -
 
 
-TTextView::Reader::Reader(bool header, bool raw, bool quote, bool incoming, bool stripHeader,
-	bool mime, TTextView *view, BEmailMessage *mail, BList *list, sem_id sem)
+TTextView::Reader::Reader(bool header, bool raw, bool quote, bool incoming,
+		bool stripHeader, bool mime, TTextView *view, BEmailMessage *mail,
+		BList *list, sem_id sem)
 	:
 	fHeader(header),
 	fRaw(raw),
@@ -2193,7 +2274,8 @@ TTextView::Reader::Reader(bool header, bool raw, bool quote, bool incoming, bool
 
 
 bool
-TTextView::Reader::ParseMail(BMailContainer *container, BTextMailComponent *ignore)
+TTextView::Reader::ParseMail(BMailContainer *container,
+	BTextMailComponent *ignore)
 {
 	int32 count = 0;
 	for (int32 i = 0; i < container->CountComponents(); i++) {
@@ -2337,7 +2419,8 @@ TTextView::Reader::Process(const char *data, int32 data_len, bool isHeader)
 
 
 bool
-TTextView::Reader::Insert(const char *line, int32 count, bool isHyperLink, bool isHeader)
+TTextView::Reader::Insert(const char *line, int32 count, bool isHyperLink,
+	bool isHeader)
 {
 	if (!count)
 		return true;
@@ -2345,17 +2428,20 @@ TTextView::Reader::Insert(const char *line, int32 count, bool isHyperLink, bool 
 	BFont font(fView->Font());
 	TextRunArray style(count / 8 + 8);
 
-	if (fView->fColoredQuotes && !isHeader && !isHyperLink)
-		FillInQuoteTextRuns(fView, line, count, font, &style.Array(), style.MaxEntries());
-	else {
+	if (fView->fColoredQuotes && !isHeader && !isHyperLink) {
+		FillInQuoteTextRuns(fView, &fQuoteContext, line, count, font,
+			&style.Array(), style.MaxEntries());
+	} else {
 		text_run_array &array = style.Array();
 		array.count = 1;
 		array.runs[0].offset = 0;
 		if (isHeader) {
 			array.runs[0].color = isHyperLink ? kHyperLinkColor : kHeaderColor;
 			font.SetSize(font.Size() * 0.9);
-		} else
-			array.runs[0].color = isHyperLink ? kHyperLinkColor : kNormalTextColor;
+		} else {
+			array.runs[0].color = isHyperLink
+				? kHyperLinkColor : kNormalTextColor;
+		}
 		array.runs[0].font = font;
 	}
 
@@ -3061,7 +3147,8 @@ TTextView::AddQuote(int32 start, int32 finish)
 		const BFont *font = Font();
 		TextRunArray style(targetLength / 8 + 8);
 
-		FillInQuoteTextRuns(NULL, target, targetLength, font, &style.Array(), style.MaxEntries());
+		FillInQuoteTextRuns(NULL, NULL, target, targetLength, font,
+			&style.Array(), style.MaxEntries());
 		Insert(target, targetLength, &style.Array());
 	} else
 		Insert(target, targetLength);
@@ -3138,7 +3225,8 @@ TTextView::RemoveQuote(int32 start, int32 finish)
 			const BFont *font = Font();
 			TextRunArray style(length / 8 + 8);
 
-			FillInQuoteTextRuns(NULL, target, length, font, &style.Array(), style.MaxEntries());
+			FillInQuoteTextRuns(NULL, NULL, target, length, font,
+				&style.Array(), style.MaxEntries());
 			Insert(target, length, &style.Array());
 		} else
 			Insert(target, length);

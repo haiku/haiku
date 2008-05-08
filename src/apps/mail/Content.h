@@ -31,13 +31,6 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//--------------------------------------------------------------------
-//	
-//	Content.h
-//	
-//--------------------------------------------------------------------
-
 #ifndef _CONTENT_H
 #define _CONTENT_H
 
@@ -72,8 +65,7 @@ class BPopupMenu;
 
 struct text_run_array;
 
-typedef struct
-{
+typedef struct {
 	bool header;
 	bool raw;
 	bool quote;
@@ -86,8 +78,7 @@ typedef struct
 	sem_id *stop_sem;
 } reader_info;
 
-enum ENCLOSURE_TYPE
-{
+enum ENCLOSURE_TYPE {
 	TYPE_ENCLOSURE = 100,
 	TYPE_BE_ENCLOSURE,
 	TYPE_URL,
@@ -113,8 +104,7 @@ class TSavePanel;
 
 //====================================================================
 
-class TContentView : public BView
-{
+class TContentView : public BView {
 	public:
 		TContentView(BRect, bool incoming, BEmailMessage *mail, BFont*,
 			bool showHeader, bool coloredQuotes); 
@@ -138,8 +128,25 @@ enum {
 	S_SHOW_ERRORS = 2
 };
 
-class TTextView : public BTextView
-{
+struct quote_context {
+	quote_context()
+		:
+		level(0),
+		diff_mode(0),
+		begin(true),
+		in_diff(false),
+		was_diff(false)
+	{
+	}
+
+	int32	level;
+	int32	diff_mode;
+	bool	begin;
+	bool	in_diff;
+	bool	was_diff;
+};
+
+class TTextView : public BTextView {
 	public:
 		TTextView(BRect, BRect, bool incoming, BEmailMessage *mail,
 			TContentView *, BFont *, bool showHeader, bool coloredQuotes);
@@ -220,8 +227,7 @@ class TTextView : public BTextView
 		bool fRaw;
 		bool fCursor;
 
-		struct spell_mark
-		{
+		struct spell_mark {
 			spell_mark *next;
 			int32	start;
 			int32	end;
@@ -230,18 +236,21 @@ class TTextView : public BTextView
 
 		spell_mark *fFirstSpellMark;
 
-		class Reader
-		{
+		class Reader {
 			public:
-				Reader(bool header,bool raw,bool quote,bool incoming,bool stripHeaders,bool mime,
-					TTextView *view,BEmailMessage *mail,BList *list,sem_id sem);
+				Reader(bool header, bool raw, bool quote, bool incoming,
+					bool stripHeaders, bool mime, TTextView* view,
+					BEmailMessage* mail, BList* list, sem_id sem);
 
-				static status_t Run(void *);
+				static status_t Run(void* _dummy);
 
 			private:
-				bool ParseMail(BMailContainer *container,BTextMailComponent *ignore);
-				bool Process(const char *data, int32 len, bool isHeader = false);
-				bool Insert(const char *line, int32 count, bool isHyperLink, bool isHeader = false);
+				bool ParseMail(BMailContainer* container,
+					BTextMailComponent* ignore);
+				bool Process(const char* data, int32 length,
+					bool isHeader = false);
+				bool Insert(const char* line, int32 count, bool isHyperLink,
+					bool isHeader = false);
 
 				bool Lock();
 				status_t Unlock();
@@ -249,11 +258,12 @@ class TTextView : public BTextView
 				bool fHeader;
 				bool fRaw;
 				bool fQuote;
+				quote_context fQuoteContext;
 				bool fIncoming;
 				bool fStripHeader;
 				bool fMime;
-				TTextView *fView;
-				BEmailMessage *fMail;
+				TTextView* fView;
+				BEmailMessage* fMail;
 				BList *fEnclosures;
 				sem_id fStopSem;
 		};
@@ -288,7 +298,8 @@ class TextRunArray {
 		size_t fNumEntries;
 };
 
-extern void FillInQuoteTextRuns(BTextView *view, const char *line, int32 length,
-				const BFont &font, text_run_array *style, int32 maxStyles = 5);
+extern void FillInQuoteTextRuns(BTextView* view, quote_context* context,
+	const char* line, int32 length, const BFont& font, text_run_array* style,
+	int32 maxStyles = 5);
 
 #endif	/* #ifndef _CONTENT_H */
