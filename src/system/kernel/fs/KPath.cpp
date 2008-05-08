@@ -5,12 +5,13 @@
 
 /** A simple class wrapping a path. Has a fixed-sized buffer. */
 
-#include <KPath.h>
-#include <team.h>
-#include <vfs.h>
+#include <fs/KPath.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <team.h>
+#include <vfs.h>
 
 
 // debugging
