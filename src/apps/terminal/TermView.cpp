@@ -23,6 +23,7 @@
 #include <Beep.h>
 #include <Clipboard.h>
 #include <Debug.h>
+#include <Dragger.h>
 #include <Input.h>
 #include <Message.h>
 #include <MessageRunner.h>
@@ -183,6 +184,14 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 {	
 	_InitObject(argc, argv);
 	SetTermSize(fTermRows, fTermColumns, true);
+	
+	BRect rect(0, 0, 16, 16);
+	rect.OffsetTo(Bounds().right - rect.Width(),
+				Bounds().bottom - rect.Height());
+	
+	SetFlags(Flags() | B_DRAW_ON_CHILDREN | B_FOLLOW_ALL);
+	AddChild(new BDragger(rect, this,
+		B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW));
 }
 
 
@@ -325,6 +334,9 @@ TermView::Archive(BMessage* data, bool deep) const
 		status = data->AddInt32("columns", (int32)fTermColumns);
 	if (status == B_OK)
 		status = data->AddInt32("rows", (int32)fTermRows);
+	
+	if (data->ReplaceString("class", "TermView") != B_OK)
+		data->AddString("class", "TermView");
 	
 	return status;
 }
