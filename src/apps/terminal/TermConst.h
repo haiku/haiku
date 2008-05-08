@@ -99,6 +99,15 @@ const char* const PREF_IM_FORE_COLOR = "IM Foreground Color";
 const char* const PREF_IM_BACK_COLOR = "IM Background Color";
 const char* const PREF_IM_SELECT_COLOR = "IM Selection Color";
 
+const char* const PREF_ANSI_BLACK_COLOR = "ANSI Black Color";
+const char* const PREF_ANSI_RED_COLOR = "ANSI Red Color";
+const char* const PREF_ANSI_GREEN_COLOR = "ANSI Green Color";
+const char* const PREF_ANSI_YELLOW_COLOR = "ANSI Yellow Color";
+const char* const PREF_ANSI_BLUE_COLOR = "ANSI Blue Color";
+const char* const PREF_ANSI_MAGENTA_COLOR = "ANSI Magenta Color";
+const char* const PREF_ANSI_CYAN_COLOR = "ANSI Cyan Color";
+const char* const PREF_ANSI_WHITE_COLOR = "ANSI White Color";
+
 const char* const PREF_HISTORY_SIZE = "History Size";
 const char* const PREF_CURSOR_BLINKING = "Cursor Blinking rate";
 

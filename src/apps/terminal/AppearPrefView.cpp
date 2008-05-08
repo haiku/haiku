@@ -33,6 +33,21 @@ AppearancePrefView::AppearancePrefView(BRect frame, const char *name,
 	    	PREF_CURSOR_BACK_COLOR,
 	    	PREF_SELECT_FORE_COLOR,
 	    	PREF_SELECT_BACK_COLOR,
+#if 0
+	    	"",
+	    	PREF_IM_FORE_COLOR,
+	    	PREF_IM_BACK_COLOR,
+	    	PREF_IM_SELECT_COLOR,
+	    	"",
+	    	PREF_ANSI_BLACK_COLOR,
+	    	PREF_ANSI_RED_COLOR,
+	    	PREF_ANSI_GREEN_COLOR,
+	    	PREF_ANSI_YELLOW_COLOR,
+	    	PREF_ANSI_BLUE_COLOR,
+	    	PREF_ANSI_MAGENTA_COLOR,
+	    	PREF_ANSI_CYAN_COLOR,
+	    	PREF_ANSI_WHITE_COLOR,
+#endif
 	    	NULL
   	};
 

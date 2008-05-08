@@ -28,7 +28,10 @@ MakeMenu(ulong msg, const char **items, const char *defaultItemName)
 
 	int32 i = 0;
 	while (*items) {
-		menu->AddItem(new BMenuItem(*items, new BMessage(msg)));
+		if (!strcmp(*items, ""))
+			menu->AddSeparatorItem();
+		else
+			menu->AddItem(new BMenuItem(*items, new BMessage(msg)));
 		if (!strcmp(*items, defaultItemName))
 			menu->ItemAt(i)->SetMarked(true);
 
