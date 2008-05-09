@@ -1319,6 +1319,7 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 	TRACE(("tty_ioctl: tty %p, op %lu, buffer %p, length %lu\n", tty, op, buffer, length));
 	MutexLocker locker(tty->lock);
 
+	// values marked BeOS are non-standard codes we support for legacy apps
 	switch (op) {
 		/* blocking/non-blocking mode */
 
@@ -1352,8 +1353,9 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 		case TIOCGPGRP:
 			TRACE(("tty: get pgrp_id\n"));
 			return user_memcpy(buffer, &tty->settings->pgrp_id, sizeof(pid_t));
+
 		case TIOCSPGRP:
-		case 'pgid':
+		case 'pgid':			// BeOS
 		{
 			TRACE(("tty: set pgrp_id\n"));
 			pid_t groupID;
@@ -1376,6 +1378,7 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 				sizeof(struct winsize));
 
 		case TIOCSWINSZ:
+		case 'wsiz':			// BeOS
 		{
 			uint16 oldColumns = tty->settings->window_size.ws_col;
 			uint16 oldRows = tty->settings->window_size.ws_row;
@@ -1420,6 +1423,60 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 
 			return B_OK;
 		}
+
+		case 'ichr':			// BeOS (int *) (pre- select() support)
+		{
+			int wanted;
+			int toRead;
+
+			// help identify apps using it
+			//dprintf("tty: warning: legacy BeOS opcode 'ichr'\n");
+
+			if (user_memcpy(&wanted, buffer, sizeof(int)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			// release the mutex and grab a read lock
+			locker.Unlock();
+			ReaderLocker readLocker(cookie);
+
+			do {
+				status_t status = readLocker.AcquireReader(wanted == 0);
+				if (status != B_OK)
+					return status;
+
+				toRead = readLocker.AvailableBytes();
+			} while (toRead < wanted);
+
+			if (user_memcpy(buffer, &toRead, sizeof(int)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			return B_OK;
+		}
+
+		case TCWAITEVENT:		// BeOS (uint *)
+								// wait for event (timeout if !NULL)
+		case TCVTIME:			// BeOS (bigtime_t *) set highrez VTIME
+			dprintf("tty: unsupported legacy opcode %lu\n", op);
+			// TODO;
+			break;
+
+		case TCXONC:			// Unix, but even Linux doesn't handle it
+			dprintf("tty: unsupported TCXONC\n");
+			break;
+
+		case TCQUERYCONNECTED:	// BeOS
+		case 'ochr':			// BeOS (int *) same as ichr for write
+			dprintf("tty: unsupported legacy opcode %lu\n", op);
+			// BeOS didn't implement them anyway
+			break;
+
+		case TCSETDTR:
+		case TCSETRTS:
+		case TCGETBITS:
+			// TODO: should call the driver service func here,
+			// for non-virtual tty.
+			// return tty->driver->service();
+			break;
 	}
 
 	TRACE(("tty: unsupported opcode %lu\n", op));
