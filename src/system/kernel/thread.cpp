@@ -364,8 +364,7 @@ _create_kernel_thread_kentry(void)
 		  \code < 0 \endcode a fresh one is allocated.
 */
 static thread_id
-create_thread(const char *name, team_id teamID, thread_entry_func entry,
-	void *args1, void *args2, int32 priority, bool kernel, thread_id threadID)
+create_thread(thread_creation_attributes& attributes, bool kernel)
 {
 	struct thread *thread, *currentThread;
 	struct team *team;
@@ -375,14 +374,16 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	bool abort = false;
 	bool debugNewThread = false;
 
-	TRACE(("create_thread(%s, id = %ld, %s)\n", name, threadID,
-		kernel ? "kernel" : "user"));
+	TRACE(("create_thread(%s, id = %ld, %s)\n", attributes.name,
+		attributes.thread, kernel ? "kernel" : "user"));
 
-	thread = create_thread_struct(NULL, name, threadID, NULL);
+	thread = create_thread_struct(NULL, attributes.name, attributes.thread,
+		NULL);
 	if (thread == NULL)
 		return B_NO_MEMORY;
 
-	thread->priority = priority == -1 ? B_NORMAL_PRIORITY : priority;
+	thread->priority = attributes.priority == -1
+		? B_NORMAL_PRIORITY : attributes.priority;
 	thread->next_priority = thread->priority;
 	// ToDo: this could be dangerous in case someone calls resume_thread() on us
 	thread->state = B_THREAD_SUSPENDED;
@@ -391,7 +392,8 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	// init debug structure
 	clear_thread_debug_info(&thread->debug_info, false);
 
-	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_kstack", name, thread->id);
+	snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_kstack", attributes.name,
+		thread->id);
 	thread->kernel_stack_area = create_area(stack_name,
 		(void **)&thread->kernel_stack_base, B_ANY_KERNEL_ADDRESS,
 		KERNEL_STACK_SIZE, B_FULL_LOCK,
@@ -416,7 +418,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	// If the new thread belongs to the same team as the current thread,
 	// it may inherit some of the thread debug flags.
 	currentThread = thread_get_current_thread();
-	if (currentThread && currentThread->team->id == teamID) {
+	if (currentThread && currentThread->team->id == attributes.team) {
 		// inherit all user flags...
 		int32 debugFlags = currentThread->debug_info.flags
 			& B_THREAD_DEBUG_USER_FLAG_MASK;
@@ -440,7 +442,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 
 	GRAB_TEAM_LOCK();
 	// look at the team, make sure it's not being deleted
-	team = team_get_team_struct_locked(teamID);
+	team = team_get_team_struct_locked(attributes.team);
 	if (team != NULL && team->state != TEAM_STATE_DEATH) {
 		// Debug the new thread, if the parent thread required that (see above),
 		// or the respective global team debug flag is set. But only, if a
@@ -470,9 +472,9 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		return B_BAD_TEAM_ID;
 	}
 
-	thread->args1 = args1;
-	thread->args2 = args2;
-	thread->entry = entry;
+	thread->args1 = attributes.args1;
+	thread->args2 = attributes.args2;
+	thread->entry = attributes.entry;
 	status = thread->id;
 
 	if (kernel) {
@@ -485,22 +487,33 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	} else {
 		// create user stack
 
-		// the stack will be between USER_STACK_REGION and the main thread stack area
-		// (the user stack of the main thread is created in team_create_team())
-		thread->user_stack_base = USER_STACK_REGION;
-		thread->user_stack_size = USER_STACK_SIZE;
+		// the stack will be between USER_STACK_REGION and the main thread stack
+		// area (the user stack of the main thread is created in
+		// team_create_team())
+		if (attributes.stack_address == NULL) {
+			thread->user_stack_base = USER_STACK_REGION;
+			if (attributes.stack_size <= 0)
+				thread->user_stack_size = USER_STACK_SIZE;
+			else
+				thread->user_stack_size = PAGE_ALIGN(attributes.stack_size);
 
-		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_stack", name, thread->id);
-		thread->user_stack_area = create_area_etc(team, stack_name,
-				(void **)&thread->user_stack_base, B_BASE_ADDRESS,
-				thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
-				B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
-		if (thread->user_stack_area < B_OK
-			|| arch_thread_init_tls(thread) < B_OK) {
-			// great, we have a fully running thread without a (usable) stack
-			dprintf("create_thread: unable to create proper user stack!\n");
-			status = thread->user_stack_area;
-			kill_thread(thread->id);
+			snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%ld_stack",
+				attributes.name, thread->id);
+			thread->user_stack_area = create_area_etc(team, stack_name,
+					(void **)&thread->user_stack_base, B_BASE_ADDRESS,
+					thread->user_stack_size + TLS_SIZE, B_NO_LOCK,
+					B_READ_AREA | B_WRITE_AREA | B_STACK_AREA);
+			if (thread->user_stack_area < B_OK
+				|| arch_thread_init_tls(thread) < B_OK) {
+				// great, we have a fully running thread without a (usable)
+				// stack
+				dprintf("create_thread: unable to create proper user stack!\n");
+				status = thread->user_stack_area;
+				kill_thread(thread->id);
+			}
+		} else {
+			thread->user_stack_base = (addr_t)attributes.stack_address;
+			thread->user_stack_size = attributes.stack_size;
 		}
 
 		user_debug_update_new_thread_flags(thread->id);
@@ -1829,8 +1842,18 @@ thread_id
 spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
 	void *arg, team_id team, thread_id threadID)
 {
-	return create_thread(name, team, (thread_entry_func)function, arg, NULL,
-		priority, true, threadID);
+	thread_creation_attributes attributes;
+	attributes.entry = (thread_entry_func)function;
+	attributes.name = name;
+	attributes.priority = priority;
+	attributes.args1 = arg;
+	attributes.args2 = NULL;
+	attributes.stack_address = NULL;
+	attributes.stack_size = 0;
+	attributes.team = team;
+	attributes.thread = threadID;
+
+	return create_thread(attributes, true);
 }
 
 
@@ -2593,8 +2616,18 @@ thread_id
 spawn_kernel_thread(thread_func function, const char *name, int32 priority,
 	void *arg)
 {
-	return create_thread(name, team_get_kernel_team()->id,
-		(thread_entry_func)function, arg, NULL, priority, true, -1);
+	thread_creation_attributes attributes;
+	attributes.entry = (thread_entry_func)function;
+	attributes.name = name;
+	attributes.priority = priority;
+	attributes.args1 = arg;
+	attributes.args2 = NULL;
+	attributes.stack_address = NULL;
+	attributes.stack_size = 0;
+	attributes.team = team_get_kernel_team()->id;
+	attributes.thread = -1;
+
+	return create_thread(attributes, true);
 }
 
 
@@ -2677,22 +2710,39 @@ _user_set_thread_priority(thread_id thread, int32 newPriority)
 
 
 thread_id
-_user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName,
-	int32 priority, void *data1, void *data2)
+_user_spawn_thread(thread_creation_attributes* userAttributes)
 {
+	thread_creation_attributes attributes;
+	if (userAttributes == NULL || !IS_USER_ADDRESS(userAttributes)
+		|| user_memcpy(&attributes, userAttributes,
+				sizeof(attributes)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	if (attributes.stack_size != 0
+		&& (attributes.stack_size < MIN_USER_STACK_SIZE
+			|| attributes.stack_size > MAX_USER_STACK_SIZE)) {
+		return B_BAD_VALUE;
+	}
+
 	char name[B_OS_NAME_LENGTH];
 	thread_id threadID;
 
-	if (!IS_USER_ADDRESS(entry) || entry == NULL
-		|| (userName != NULL && (!IS_USER_ADDRESS(userName)
-			|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)))
+	if (!IS_USER_ADDRESS(attributes.entry) || attributes.entry == NULL
+		|| attributes.stack_address != NULL
+			&& !IS_USER_ADDRESS(attributes.stack_address)
+		|| (attributes.name != NULL && (!IS_USER_ADDRESS(attributes.name)
+			|| user_strlcpy(name, attributes.name, B_OS_NAME_LENGTH) < 0)))
 		return B_BAD_ADDRESS;
 
-	threadID = create_thread(userName != NULL ? name : "user thread",
-		thread_get_current_thread()->team->id, entry,
-		data1, data2, priority, false, -1);
+	attributes.name = attributes.name != NULL ? name : "user thread";
+	attributes.team = thread_get_current_thread()->team->id;
+	attributes.thread = -1;
 
-	user_debug_thread_created(threadID);
+	threadID = create_thread(attributes, false);
+
+	if (threadID >= 0)
+		user_debug_thread_created(threadID);
 
 	return threadID;
 }

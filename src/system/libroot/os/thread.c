@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <thread.h>
+
 #include "libroot_private.h"
 #include "tls.h"
 #include "syscalls.h"
@@ -42,10 +44,20 @@ thread_entry(thread_func entry, void *data)
 thread_id
 spawn_thread(thread_func entry, const char *name, int32 priority, void *data)
 {
+	struct thread_creation_attributes attributes;
+
 	_single_threaded = false;
 		// used for I/O locking - BeOS compatibility issue
 
-	return _kern_spawn_thread(thread_entry, name, priority, entry, data);
+	attributes.entry = &thread_entry;
+	attributes.name = name;
+	attributes.priority = priority;
+	attributes.args1 = entry;
+	attributes.args2 = data;
+	attributes.stack_address = NULL;
+	attributes.stack_size = 0;
+
+	return _kern_spawn_thread(&attributes);
 }
 
 

@@ -20,6 +20,21 @@
 
 struct kernel_args;
 struct select_info;
+struct thread_creation_attributes;
+
+struct thread_creation_attributes {
+	int32 (*entry)(thread_func, void *);
+	const char*	name;
+	int32		priority;
+	void*		args1;
+	void*		args2;
+	void*		stack_address;
+	size_t		stack_size;
+
+	// when calling kernel only
+	team_id		team;
+	thread_id	thread;
+};
 
 
 #ifdef __cplusplus
@@ -89,7 +104,7 @@ status_t _user_rename_thread(thread_id thread, const char *name);
 status_t _user_suspend_thread(thread_id thread);
 status_t _user_resume_thread(thread_id thread);
 status_t _user_rename_thread(thread_id thread, const char *name);
-thread_id _user_spawn_thread(thread_entry_func entry, const char *name, int32 priority, void *arg1, void *arg2);
+thread_id _user_spawn_thread(struct thread_creation_attributes* attributes);
 status_t _user_wait_for_thread(thread_id id, status_t *_returnCode);
 status_t _user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags);
 status_t _user_kill_thread(thread_id thread);

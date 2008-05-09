@@ -33,6 +33,7 @@ struct stat;
 
 struct disk_device_job_progress_info;
 struct partitionable_space_data;
+struct thread_creation_attributes;
 struct user_disk_device_data;
 struct user_disk_device_job_info;
 struct user_disk_system_info;
@@ -107,8 +108,8 @@ extern pid_t		_kern_setpgid(pid_t process, pid_t group);
 extern pid_t		_kern_setsid(void);
 extern status_t		_kern_change_root(const char *path);
 
-extern thread_id	_kern_spawn_thread(int32 (*func)(thread_func, void *),
-						const char *name, int32 priority, void *data1, void *data2);
+extern thread_id	_kern_spawn_thread(
+						struct thread_creation_attributes* attributes);
 extern thread_id	_kern_find_thread(const char *name);
 extern status_t		_kern_suspend_thread(thread_id thread);
 extern status_t		_kern_resume_thread(thread_id thread);
