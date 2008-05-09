@@ -1638,6 +1638,37 @@ TermView::MessageReceived(BMessage *msg)
 	entry_ref ref;
 	char *ctrl_l = "";
 
+	// first check for any dropped message
+	if (msg->WasDropped()) {
+		char *text;
+		int32 numBytes;
+		//rgb_color *color;
+	
+		int32 i = 0;
+
+		if (msg->FindRef("refs", i++, &ref) == B_OK) {
+			_DoFileDrop(ref);
+
+			while (msg->FindRef("refs", i++, &ref) == B_OK) {
+				_WritePTY((const uchar*)" ", 1);
+				_DoFileDrop(ref);
+			}
+			return;
+#if 0
+		} else if (msg->FindData("RGBColor", B_RGB_COLOR_TYPE, 
+				(const void **)&color, &numBytes) == B_OK
+				 && numBytes == sizeof(color)) {
+			// TODO: handle color drop
+			// maybe only on replicants ?
+			return;
+#endif
+		} else if (msg->FindData("text/plain", B_MIME_TYPE, 
+			 	(const void **)&text, &numBytes) == B_OK) {
+			_WritePTY((uchar *)text, numBytes);
+			return;
+		}
+	}
+
 	switch (msg->what){
 		case B_ABOUT_REQUESTED:
 			// (replicant) about box requested 
@@ -1645,7 +1676,9 @@ TermView::MessageReceived(BMessage *msg)
 			break;
 
 		case B_SIMPLE_DATA:
+		case B_REFS_RECEIVED:
 		{
+			// handle refs if they weren't dropped
 			int32 i = 0;
 			if (msg->FindRef("refs", i++, &ref) == B_OK) {
 				_DoFileDrop(ref);
@@ -1656,23 +1689,6 @@ TermView::MessageReceived(BMessage *msg)
 				}
 			} else
 				BView::MessageReceived(msg);
-			break;
-		}
-
-		case B_MIME_DATA:
-		{
-			char *text;
-			int32 numBytes;
-			status_t sts;
-
-			if (msg->WasDropped()) {
-				sts = msg->FindData("text/plain",
-					B_MIME_TYPE, (const void **)&text, &numBytes);
-				if (sts != B_OK)
-					break;
-
-				_WritePTY((uchar *)text, numBytes);
-			}
 			break;
 		}
 
