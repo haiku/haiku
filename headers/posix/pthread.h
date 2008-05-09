@@ -170,6 +170,47 @@ extern int pthread_attr_init(pthread_attr_t *attr);
 extern int pthread_attr_getdetachstate(const pthread_attr_t *attr,
 	int *detachstate);
 extern int pthread_attr_setdetachstate(pthread_attr_t *attr, int detachstate);
+extern int pthread_attr_getstacksize(const pthread_attr_t *attr,
+	size_t *stacksize);
+extern int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
+
+#if 0	/* Unimplemented attribute functions: */
+
+// mandatory!
+extern int pthread_attr_getschedparam(const pthread_attr_t *attr,
+	struct sched_param *param);
+extern int pthread_attr_setschedparam(pthread_attr_t *attr,
+	const struct sched_param *param);
+
+// [TPS]
+extern int pthread_attr_getinheritsched(const pthread_attr_t *attr,
+	int *inheritsched);
+extern int pthread_attr_setinheritsched(pthread_attr_t *attr, int inheritsched);
+
+extern int pthread_attr_getschedpolicy(const pthread_attr_t *attr,
+	int *policy);
+extern int pthread_attr_setschedpolicy(pthread_attr_t *attr, int policy);
+extern int pthread_attr_getscope(const pthread_attr_t *attr,
+	int *contentionscope);
+extern int pthread_attr_setscope(pthread_attr_t *attr, int contentionscope);
+
+// [XSI]
+extern int pthread_attr_getguardsize(const pthread_attr_t *attr,
+	size_t *guardsize);
+extern int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
+
+// [TSA]
+extern int pthread_attr_getstackaddr(const pthread_attr_t *attr,
+	void **stackaddr);
+extern int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr);
+
+// [TSA TSS]
+extern int pthread_attr_getstack(const pthread_attr_t *attr,
+	void **stackaddr, size_t *stacksize);
+extern int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize);
+
+#endif	/* 0 */
+
 
 /* thread functions */
 extern int pthread_create(pthread_t *thread, const pthread_attr_t *attr,

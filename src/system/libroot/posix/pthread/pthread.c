@@ -11,10 +11,15 @@
 
 #include <TLS.h>
 
+#include <kernel.h>
+#include <syscalls.h>
+#include <thread.h>
+
 
 static const pthread_attr pthread_attr_default = {
 	PTHREAD_CREATE_JOINABLE,
-	B_NORMAL_PRIORITY
+	B_NORMAL_PRIORITY,
+	USER_STACK_SIZE
 };
 
 
@@ -60,7 +65,7 @@ pthread_destroy_thread(void *data)
 
 
 static int32
-pthread_thread_entry(void *_thread)
+pthread_thread_entry(thread_func _unused, void *_thread)
 {
 	struct pthread_thread *thread = (struct pthread_thread *)_thread;
 
@@ -84,6 +89,7 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	const pthread_attr *attr = NULL;
 	struct pthread_thread *thread;
 	thread_id threadID;
+	struct thread_creation_attributes attributes;
 
 	if (_thread == NULL)
 		return B_BAD_VALUE;
@@ -109,8 +115,15 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 		sPthreadSlot = tls_allocate();
 	}
 
-	threadID = spawn_thread(pthread_thread_entry, "pthread func",
-		attr->sched_priority, thread);
+	attributes.entry = pthread_thread_entry;
+	attributes.name = "pthread func";
+	attributes.priority = attr->sched_priority;
+	attributes.args1 = thread;
+	attributes.args2 = NULL;
+	attributes.stack_address = NULL;
+	attributes.stack_size = attr->stack_size;
+
+	threadID = _kern_spawn_thread(&attributes);
 	if (threadID < B_OK) {
 		// stupid error code (EAGAIN) but demanded by POSIX
 		return B_WOULD_BLOCK;

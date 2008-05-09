@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix pthread ;
 
+UsePrivateKernelHeaders ;
 UsePrivateHeaders libroot ;
 
 MergeObject posix_pthread.o :

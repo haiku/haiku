@@ -1,13 +1,15 @@
 /* 
-** Copyright 2006, Jérôme Duval. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
-
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2006, Jérôme Duval. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <pthread.h>
 #include "pthread_private.h"
 
 #include <stdlib.h>
+
+#include <kernel.h>
 
 
 int 
@@ -24,6 +26,7 @@ pthread_attr_init(pthread_attr_t *_attr)
 
 	attr->detach_state = PTHREAD_CREATE_JOINABLE;
 	attr->sched_priority = B_NORMAL_PRIORITY;
+	attr->stack_size = USER_STACK_SIZE;
 
 	*_attr = attr;
 	return B_OK;
@@ -75,3 +78,33 @@ pthread_attr_setdetachstate(pthread_attr_t *_attr, int state)
 	return B_OK;
 }
 
+
+int
+pthread_attr_getstacksize(const pthread_attr_t *_attr, size_t *stacksize)
+{
+	pthread_attr *attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL || stacksize == NULL)
+		return B_BAD_VALUE;
+
+	*stacksize = attr->stack_size;
+
+	return 0;
+}
+
+
+int
+pthread_attr_setstacksize(pthread_attr_t *_attr, size_t stacksize)
+{
+	pthread_attr *attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL)
+		return B_BAD_VALUE;
+
+	if (stacksize < MIN_USER_STACK_SIZE || stacksize > MAX_USER_STACK_SIZE)
+		return B_BAD_VALUE;
+
+	attr->stack_size = stacksize;
+
+	return 0;
+}

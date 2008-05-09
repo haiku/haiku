@@ -44,6 +44,7 @@ typedef struct _pthread_mutex {
 typedef struct _pthread_attr {
 	int32		detach_state;
 	int32		sched_priority;
+	size_t		stack_size;
 } pthread_attr;
 
 typedef void (*pthread_key_destructor)(void *data);
