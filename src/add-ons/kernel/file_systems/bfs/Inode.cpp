@@ -2320,6 +2320,15 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name,
 	WriteLocked locker(parent != NULL ? &parent->Lock() : NULL);
 		// the parent directory is locked during the whole inode creation
 
+	if (parent != NULL && parent->IsDirectory()) {
+		// don't create anything in removed directories
+		bool removed;
+		if (get_vnode_removed(volume->FSVolume(), parent->ID(), &removed)
+				!= B_OK || removed) {
+			RETURN_ERROR(B_ENTRY_NOT_FOUND);
+		}
+	}
+
 	if (tree != NULL) {
 		// Does the file already exist?
 		off_t offset;
