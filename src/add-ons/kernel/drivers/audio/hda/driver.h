@@ -30,7 +30,9 @@
 #define MAX_CARDS				4
 
 /* values for the class_sub field for class_base = 0x04 (multimedia device) */
-#define PCI_hd_audio			3
+#ifndef __HAIKU__
+#	define PCI_hd_audio			3
+#endif
 
 #define HDA_MAX_AUDIO_GROUPS	15
 #define HDA_MAX_CODECS			15

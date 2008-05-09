@@ -326,7 +326,7 @@ struct pci_module_info {
 
 #define PCI_vga				0x00			/* VGA controller */
 #define PCI_xga				0x01			/* XGA controller */
-#define PCI_3d              0x02            /* £d controller */
+#define PCI_3d              0x02            /* 3d controller */
 #define PCI_display_other	0x80			/* other display controller */
 
 
@@ -334,10 +334,11 @@ struct pci_module_info {
 	values for the class_sub field for class_base = 0x04 (multimedia device)
 --- */
 
-#define PCI_video			 0x00			/* video */
-#define PCI_audio			 0x01			/* audio */
-#define PCI_telephony        0x02           /* computer telephony device */
-#define PCI_multimedia_other 0x80			/* other multimedia device */
+#define PCI_video				0x00		/* video */
+#define PCI_audio				0x01		/* audio */
+#define PCI_telephony			0x02		/* computer telephony device */
+#define PCI_hd_audio			0x03		/* HD audio */
+#define PCI_multimedia_other	0x80		/* other multimedia device */
 
 
 /* ---
@@ -403,7 +404,7 @@ struct pci_module_info {
 	system peripherals)
 --- */
 
-#define PCI_pic						0x00	/* periperal interrupt controller */
+#define PCI_pic						0x00	/* peripheral interrupt controller */
 #define PCI_dma						0x01	/* dma controller */
 #define PCI_timer					0x02	/* timers */
 #define PCI_rtc						0x03	/* real time clock */
