@@ -7,6 +7,7 @@
 #include "bus.h"
 
 #include <KernelExport.h>
+#include <PCI.h>
 
 
 #define BUS_MODULE_NAME "bus_managers/sample_bus/driver_v1"
@@ -19,7 +20,7 @@ static float
 supports_device(device_node *parent)
 {
 	const char* bus;
-	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
+	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false)
 			!= B_OK)
 		return -1;
 
@@ -34,9 +35,8 @@ static status_t
 register_device(device_node *parent)
 {
 	device_attr attrs[] = {
-		{B_DRIVER_PRETTY_NAME,	B_STRING_TYPE,	{string: "My Bus"}},
-		{B_DRIVER_BUS,			B_STRING_TYPE,	{string: BUS_NAME}},
-		{B_DRIVER_IS_BUS,		B_UINT8_TYPE,	{ui8: true}},
+		{B_DEVICE_PRETTY_NAME,	B_STRING_TYPE,	{string: "My Bus"}},
+		{B_DEVICE_BUS,			B_STRING_TYPE,	{string: BUS_NAME}},
 		{NULL}
 	};
 
@@ -65,23 +65,32 @@ register_child_devices(device_node *node)
 	const struct device_info {
 		uint16		vendor;
 		uint16		device;
-		const char	*type;
+		uint16		type;
+		uint16		sub_type;
+		uint16		interface;
 	} kDevices[] = {
-		{0x1000, 0x0001, B_DISK_DRIVER_TYPE},
-		{0x1001, 0x0001, B_NETWORK_DRIVER_TYPE},
-		{0x1002, 0x0001, B_AUDIO_DRIVER_TYPE},
-		{0x1002, 0x0002, B_BUS_DRIVER_TYPE},
+		{0x1000, 0x0001, PCI_mass_storage, PCI_sata, PCI_sata_ahci},
+		{0x1001, 0x0001, PCI_network, PCI_ethernet, 0},
+		{0x1002, 0x0001, PCI_multimedia, PCI_audio, 0},
+		{0x1002, 0x0002, PCI_serial_bus, PCI_usb, PCI_usb_ehci},
 	};
 	const size_t kNumDevices = sizeof(kDevices) / sizeof(kDevices[0]);
 
 	for (uint32 i = 0; i < kNumDevices; i++) {
 		device_attr attrs[] = {
 			// info about the device
-			{"bus/vendor", B_UINT16_TYPE, {ui16: kDevices[i].vendor}},
-			{"bus/device", B_UINT16_TYPE, {ui16: kDevices[i].device}},
+			{B_DEVICE_VENDOR_ID, B_UINT16_TYPE, {ui16: kDevices[i].vendor}},
+			{B_DEVICE_ID, B_UINT16_TYPE, {ui16: kDevices[i].device}},
 
-			{B_DRIVER_BUS, B_STRING_TYPE, {string: BUS_NAME}},
-			{B_DRIVER_DEVICE_TYPE, B_STRING_TYPE, {string: kDevices[i].type}},
+			{B_DEVICE_BUS, B_STRING_TYPE, {string: BUS_NAME}},
+			{B_DEVICE_TYPE, B_UINT16_TYPE, {ui16: kDevices[i].type}},
+			{B_DEVICE_SUB_TYPE, B_UINT16_TYPE,
+				{ui16: kDevices[i].sub_type}},
+			{B_DEVICE_INTERFACE, B_UINT16_TYPE,
+				{ui16: kDevices[i].interface}},
+
+			{B_DEVICE_FIND_CHILD_FLAGS, B_UINT32_TYPE,
+				{ui32: B_FIND_CHILD_ON_DEMAND}},
 			{NULL}
 		};
 
@@ -90,7 +99,8 @@ register_child_devices(device_node *node)
 	}
 
 	device_attr attrs[] = {
-		{B_DRIVER_FIXED_CHILD, B_STRING_TYPE, {string: "non_existing/driver_v1"}},
+		{B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
+			{string: "non_existing/driver_v1"}},
 		{NULL}
 	};
 
@@ -122,9 +132,9 @@ device_removed(device_node *node)
 static status_t
 get_bus_info(void* cookie, bus_info* info)
 {
-	gDeviceManager->get_attr_uint16((device_node*)cookie, "bus/vendor",
+	gDeviceManager->get_attr_uint16((device_node*)cookie, B_DEVICE_VENDOR_ID,
 		&info->vendor_id, false);
-	gDeviceManager->get_attr_uint16((device_node*)cookie, "bus/device",
+	gDeviceManager->get_attr_uint16((device_node*)cookie, B_DEVICE_ID,
 		&info->device_id, false);
 	return B_OK;
 }

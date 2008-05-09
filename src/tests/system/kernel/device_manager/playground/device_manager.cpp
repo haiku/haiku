@@ -13,8 +13,9 @@
 #include <string.h>
 
 #include <KernelExport.h>
-#include <module.h>
 #include <Locker.h>
+#include <module.h>
+#include <PCI.h>
 
 #include <fs/KPath.h>
 #include <util/AutoLock.h>
@@ -36,11 +37,13 @@ extern "C" status_t _get_builtin_dependencies(void);
 extern bool gDebugOutputEnabled;
 	// from libkernelland_emu.so
 
-status_t dm_get_attr_uint8(const device_node* node, const char* name, uint8* _value,
-	bool recursive);
-status_t dm_get_attr_uint32(device_node* node, const char* name, uint32* _value,
-	bool recursive);
-status_t dm_get_attr_string(device_node* node, const char* name,
+status_t dm_get_attr_uint8(const device_node* node, const char* name,
+	uint8* _value, bool recursive);
+status_t dm_get_attr_uint16(const device_node* node, const char* name,
+	uint16* _value, bool recursive);
+status_t dm_get_attr_uint32(const device_node* node, const char* name,
+	uint32* _value, bool recursive);
+status_t dm_get_attr_string(const device_node* node, const char* name,
 	const char** _value, bool recursive);
 
 
@@ -109,6 +112,9 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 
 private:
 			status_t		_RegisterFixed(uint32& registered);
+			bool			_AlwaysRegisterDynamic();
+			status_t		_AddPath(Stack<KPath*>& stack, const char* path,
+								const char* subPath = NULL);
 			status_t		_GetNextDriverPath(void*& cookie, KPath& _path);
 			status_t		_GetNextDriver(void* list,
 								driver_module_info*& driver);
@@ -117,7 +123,6 @@ private:
 								float& bestSupport);
 			status_t		_RegisterPath(const char* path);
 			status_t		_RegisterDynamic();
-			bool			_IsBus() const;
 
 	device_node*			fParent;
 	NodeList				fChildren;
@@ -496,30 +501,19 @@ device_node::Register()
 		if (status != B_OK)
 			return status;
 
-		if (!fChildren.IsEmpty())
+		if (!fChildren.IsEmpty()) {
+			fRegistered = true;
 			return B_OK;
+		}
 	}
 
 	// Register all possible child device nodes
 
-	uint32 findFlags = 0;
-	dm_get_attr_uint32(this, B_DRIVER_FIND_CHILD_FLAGS, &findFlags, false);
+	status = _RegisterDynamic();
+	if (status == B_OK)
+		fRegistered = true;
 
-	if ((findFlags & B_FIND_CHILD_ON_DEMAND) != 0)
-		return B_OK;
-
-	return _RegisterDynamic();
-}
-
-
-bool
-device_node::_IsBus() const
-{
-	uint8 isBus;
-	if (dm_get_attr_uint8(this, B_DRIVER_IS_BUS, &isBus, false) != B_OK)
-		return false;
-
-	return isBus;
+	return status;
 }
 
 
@@ -536,7 +530,7 @@ device_node::_RegisterFixed(uint32& registered)
 
 	while (iterator.HasNext()) {
 		device_attr_private* attr = iterator.Next();
-		if (strcmp(attr->name, B_DRIVER_FIXED_CHILD))
+		if (strcmp(attr->name, B_DEVICE_FIXED_CHILD))
 			continue;
 
 		driver_module_info* driver;
@@ -562,6 +556,27 @@ device_node::_RegisterFixed(uint32& registered)
 
 
 status_t
+device_node::_AddPath(Stack<KPath*>& stack, const char* basePath,
+	const char* subPath)
+{
+	KPath* path = new(std::nothrow) KPath;
+	if (path == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = path->SetTo(basePath);
+	if (status == B_OK && subPath != NULL && subPath[0])
+		status = path->Append(subPath);
+	if (status == B_OK)
+		status = stack.Push(path);
+
+	if (status != B_OK)
+		delete path;
+
+	return status;
+}
+
+
+status_t
 device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 {
 	Stack<KPath*>* stack = NULL;
@@ -573,40 +588,73 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 			return B_NO_MEMORY;
 
 		StackDeleter<KPath*> stackDeleter(stack);
+		uint16 type = 0;
+		uint16 subType = 0;
+		uint16 interface = 0;
+		dm_get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
+		dm_get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
+		dm_get_attr_uint16(this, B_DEVICE_INTERFACE, &interface, false);
 
-		if (!_IsBus()) {
-			// add driver paths
-			KPath* path = new(std::nothrow) KPath;
-			if (path == NULL)
-				return B_NO_MEMORY;
-
-			status_t status = path->SetTo("drivers");
-			if (status != B_OK) {
-				delete path;
-				return status;
-			}
-
-			// TODO: this might be more than one path!
-			const char *type;
-			if (dm_get_attr_string(this, B_DRIVER_DEVICE_TYPE, &type, false)
-					== B_OK)
-				path->Append(type);
-
-			stack->Push(path);
+		// TODO: maybe make this extendible via settings file?
+		switch (type) {
+			case PCI_mass_storage:
+				switch (subType) {
+					case PCI_scsi:
+						_AddPath(*stack, "busses", "scsi");
+						break;
+					case PCI_ide:
+						_AddPath(*stack, "busses", "ide");
+						break;
+					case PCI_sata:
+						_AddPath(*stack, "busses", "sata");
+						break;
+					default:
+						_AddPath(*stack, "busses", "disk");
+						break;
+				}
+				break;
+			case PCI_serial_bus:
+				switch (subType) {
+					case PCI_firewire:
+						_AddPath(*stack, "busses", "firewire");
+						break;
+					case PCI_usb:
+						_AddPath(*stack, "busses", "usb");
+						break;
+					default:
+						_AddPath(*stack, "busses");
+						break;
+				}
+				break;
+			case PCI_network:
+				_AddPath(*stack, "drivers", "net");
+				break;
+			case PCI_display:
+				_AddPath(*stack, "drivers", "graphics");
+				break;
+			case PCI_multimedia:
+				switch (subType) {
+					case PCI_audio:
+					case PCI_hd_audio:
+						_AddPath(*stack, "drivers", "audio");
+						break;
+					case PCI_video:
+						_AddPath(*stack, "drivers", "video");
+						break;
+					default:
+						_AddPath(*stack, "drivers");
+						break;					
+				}
+				break;
+			default:
+				if (sRootNode == this) {
+					_AddPath(*stack, "busses/pci");
+					_AddPath(*stack, "bus_managers");
+				} else
+					_AddPath(*stack, "drivers");
+				break;
 		}
 
-		// add bus paths
-		KPath* path = new(std::nothrow) KPath;
-		if (path == NULL)
-			return B_NO_MEMORY;
-
-		status_t status = path->SetTo("bus");
-		if (status != B_OK) {
-			delete path;
-			return status;
-		}
-
-		stack->Push(path);
 		stackDeleter.Detach();
 
 		cookie = (void*)stack;
@@ -705,13 +753,30 @@ printf("  register module \"%s\", support %f\n", driver->info.name, support);
 }
 
 
+bool
+device_node::_AlwaysRegisterDynamic()
+{
+	uint16 type = 0;
+	uint16 subType = 0;
+	dm_get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
+	dm_get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
+
+	return type == PCI_serial_bus || type == PCI_bridge;
+		// TODO: we may want to be a bit more specific in the future
+}
+
+
 status_t
 device_node::_RegisterDynamic()
 {
-	uint32 findFlags;
-	if (dm_get_attr_uint32(this, B_DRIVER_FIND_CHILD_FLAGS, &findFlags, false)
-			!= B_OK)
-		findFlags = 0;
+	uint32 findFlags = 0;
+	dm_get_attr_uint32(this, B_DEVICE_FIND_CHILD_FLAGS, &findFlags, false);
+
+	// If this is our initial registration, we honour the B_FIND_CHILD_ON_DEMAND
+	// requirements
+	if (!fRegistered && (findFlags & B_FIND_CHILD_ON_DEMAND) != 0
+		&& !_AlwaysRegisterDynamic())
+		return B_OK;
 
 	KPath path;
 
@@ -825,17 +890,13 @@ unregister_device(device_node* node)
 }
 
 
-static driver_module_info*
-driver_module(device_node* node)
+static void
+get_driver(device_node* node, driver_module_info** _module, void** _data)
 {
-	return node->DriverModule();
-}
-
-
-static void*
-driver_data(device_node* node)
-{
-	return node->DriverData();
+	if (_module != NULL)
+		*_module = node->DriverModule();
+	if (_data != NULL)
+		*_data = node->DriverData();
 }
 
 
@@ -885,7 +946,7 @@ dm_get_attr_uint8(const device_node* node, const char* name, uint8* _value,
 
 
 status_t
-dm_get_attr_uint16(device_node* node, const char* name, uint16* _value,
+dm_get_attr_uint16(const device_node* node, const char* name, uint16* _value,
 	bool recursive)
 {
 	if (node == NULL || name == NULL || _value == NULL)
@@ -902,7 +963,7 @@ dm_get_attr_uint16(device_node* node, const char* name, uint16* _value,
 
 
 status_t
-dm_get_attr_uint32(device_node* node, const char* name, uint32* _value,
+dm_get_attr_uint32(const device_node* node, const char* name, uint32* _value,
 	bool recursive)
 {
 	if (node == NULL || name == NULL || _value == NULL)
@@ -919,7 +980,7 @@ dm_get_attr_uint32(device_node* node, const char* name, uint32* _value,
 
 
 status_t
-dm_get_attr_uint64(device_node* node, const char* name,
+dm_get_attr_uint64(const device_node* node, const char* name,
 	uint64* _value, bool recursive)
 {
 	if (node == NULL || name == NULL || _value == NULL)
@@ -936,8 +997,8 @@ dm_get_attr_uint64(device_node* node, const char* name,
 
 
 status_t
-dm_get_attr_string(device_node* node, const char* name, const char** _value,
-	bool recursive)
+dm_get_attr_string(const device_node* node, const char* name,
+	const char** _value, bool recursive)
 {
 	if (node == NULL || name == NULL || _value == NULL)
 		return B_BAD_VALUE;
@@ -953,7 +1014,7 @@ dm_get_attr_string(device_node* node, const char* name, const char** _value,
 
 
 status_t
-dm_get_attr_raw(device_node* node, const char* name, const void** _data,
+dm_get_attr_raw(const device_node* node, const char* name, const void** _data,
 	size_t* _length, bool recursive)
 {
 	if (node == NULL || name == NULL || (_data == NULL && _length == NULL))
@@ -1005,8 +1066,7 @@ static struct device_manager_info sDeviceManagerModule = {
 	rescan_device,
 	register_device,
 	unregister_device,
-	driver_module,
-	driver_data,
+	get_driver,
 	device_root,
 	get_next_child_device,
 	get_parent,
@@ -1030,10 +1090,9 @@ void
 dm_init_root_node(void)
 {
 	device_attr attrs[] = {
-		{B_DRIVER_PRETTY_NAME, B_STRING_TYPE, {string: "Devices Root"}},
-		{B_DRIVER_IS_BUS, B_UINT8_TYPE, {ui8: true}},
-		{B_DRIVER_BUS, B_STRING_TYPE, {string: "root"}},
-		{B_DRIVER_FIND_CHILD_FLAGS, B_UINT32_TYPE,
+		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Devices Root"}},
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "root"}},
+		{B_DEVICE_FIND_CHILD_FLAGS, B_UINT32_TYPE,
 			{ui32: B_FIND_MULTIPLE_CHILDREN}},
 		{NULL}
 	};

@@ -69,8 +69,8 @@ typedef struct device_manager_info {
 					device_node **_node);
 	status_t (*unregister_device)(device_node *node);
 
-	driver_module_info *(*driver_module)(device_node *node);
-	void *(*driver_data)(device_node *node);
+	void (*get_driver)(device_node *node, driver_module_info **_module,
+					void **_cookie);
 
 	device_node *(*root_device)();
 	status_t (*get_next_child_device)(device_node *parent, device_node *node,
@@ -86,17 +86,17 @@ typedef struct device_manager_info {
 	status_t (*free_id)(const char *generator, uint32 id);
 #endif
 
-	status_t (*get_attr_uint8)(device_node *node, const char *name,
+	status_t (*get_attr_uint8)(const device_node *node, const char *name,
 					uint8 *value, bool recursive);
-	status_t (*get_attr_uint16)(device_node *node, const char *name,
+	status_t (*get_attr_uint16)(const device_node *node, const char *name,
 					uint16 *value, bool recursive);
-	status_t (*get_attr_uint32)(device_node *node, const char *name,
+	status_t (*get_attr_uint32)(const device_node *node, const char *name,
 					uint32 *value, bool recursive);
-	status_t (*get_attr_uint64)(device_node *node, const char *name,
+	status_t (*get_attr_uint64)(const device_node *node, const char *name,
 					uint64 *value, bool recursive);
-	status_t (*get_attr_string)(device_node *node, const char *name,
+	status_t (*get_attr_string)(const device_node *node, const char *name,
 					const char **_value, bool recursive);
-	status_t (*get_attr_raw)(device_node *node, const char *name,
+	status_t (*get_attr_raw)(const device_node *node, const char *name,
 					const void **_data, size_t *_size, bool recursive);
 
 	status_t (*get_next_attr)(device_node *node, device_attr **_attr);
@@ -122,31 +122,28 @@ struct driver_module_info {
 };
 
 
-// standard device node attributes
+/* standard device node attributes */
 
-#define B_DRIVER_PRETTY_NAME		"driver/pretty name"	// string
-#define B_DRIVER_MAPPING			"driver/mapping"		// string
-#define B_DRIVER_IS_BUS				"driver/is_bus"			// uint8
-#define B_DRIVER_BUS				"driver/bus"			// string
-#define B_DRIVER_FIXED_CHILD		"fixed child"			// string
-#define B_DRIVER_FIND_CHILD_FLAGS	"find child flags"		// uint32
-#define B_DRIVER_UNIQUE_DEVICE_ID	"unique id"				// string
-#define B_DRIVER_DEVICE_TYPE		"device type"			// string
+#define B_DEVICE_PRETTY_NAME		"device/pretty name"		/* string */
+#define B_DEVICE_MAPPING			"device/mapping"			/* string */
+#define B_DEVICE_BUS				"device/bus"				/* string */
+#define B_DEVICE_FIXED_CHILD		"device/fixed child"		/* string */
+#define B_DEVICE_FIND_CHILD_FLAGS	"device/find child flags"	/* uint32 */
+
+#define B_DEVICE_VENDOR_ID			"device/vendor"				/* uint16 */
+#define B_DEVICE_ID					"device/id"					/* uint16 */
+#define B_DEVICE_TYPE				"device/type"
+	/* uint16, PCI base class */
+#define B_DEVICE_SUB_TYPE			"device/subtype"
+	/* uint16, PCI sub type */
+#define B_DEVICE_INTERFACE			"device/interface"
+	/* uint16, PCI class API */
+
+#define B_DEVICE_UNIQUE_ID			"device/unique id"			/* string */
 
 // find child flags
 #define B_FIND_CHILD_ON_DEMAND		0x01
 #define B_FIND_MULTIPLE_CHILDREN	0x02
-
-// driver types
-#define B_AUDIO_DRIVER_TYPE			"audio"
-#define B_BUS_DRIVER_TYPE			"bus"
-#define B_DISK_DRIVER_TYPE			"disk"
-#define B_GRAPHICS_DRIVER_TYPE		"graphics"
-#define B_INPUT_DRIVER_TYPE			"input"
-#define B_MISC_DRIVER_TYPE			"misc"
-#define B_NETWORK_DRIVER_TYPE		"net"
-#define B_VIDEO_DRIVER_TYPE			"video"
-#define B_INTERRUPT_CONTROLLER_DRIVER_TYPE	"interrupt controller"
 
 
 // interface of device

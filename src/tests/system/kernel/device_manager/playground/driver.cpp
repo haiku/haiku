@@ -28,12 +28,12 @@ supports_device(device_node *parent)
 		return -1;
 #endif
 
-	bus_for_driver_module_info* module
-		= (bus_for_driver_module_info*)gDeviceManager->driver_module(parent);
+	bus_for_driver_module_info* module;
+	void* data;
+	gDeviceManager->get_driver(parent, (driver_module_info**)&module, &data);
+
 	if (strcmp(module->info.info.name, BUS_FOR_DRIVER_NAME))
 		return -1;
-
-	void* data = gDeviceManager->driver_data(parent);
 
 	bus_info info;
 	if (module->get_bus_info(data, &info) == B_OK
