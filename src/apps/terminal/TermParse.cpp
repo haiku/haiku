@@ -27,19 +27,19 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-extern int utf8_groundtable[];		/* UTF8 Ground table */
-extern int cs96_groundtable[];		/* CS96 Ground table */
-extern int iso8859_groundtable[];	/* ISO8859 & EUC Ground table */
-extern int sjis_groundtable[];		/* Shift-JIS Ground table */
+extern int gUTF8GroundTable[];		/* UTF8 Ground table */
+extern int gCS96GroundTable[];		/* CS96 Ground table */
+extern int gISO8859GroundTable[];	/* ISO8859 & EUC Ground table */
+extern int gSJISGroundTable[];		/* Shift-JIS Ground table */
 
-extern int esctable[];		/* ESC */
-extern int csitable[];		/* ESC [ */
-extern int dectable[];		/* ESC [ ? */
-extern int scrtable[];		/* ESC # */
-extern int igntable[];		/* ignore table */
-extern int iestable[];		/* ignore ESC table */
-extern int eigtable[];		/* ESC ignore table */
-extern int mbcstable[];		/* ESC $ */
+extern int gEscTable[];		/* ESC */
+extern int gCsiTable[];		/* ESC [ */
+extern int gDecTable[];		/* ESC [ ? */
+extern int gScrTable[];		/* ESC # */
+extern int gIgnoreTable[];		/* ignore table */
+extern int gIesTable[];		/* ignore ESC table */
+extern int gEscIgnoreTable[];		/* ESC ignore table */
+extern int gMbcsTable[];		/* ESC $ */
 
 
 
@@ -302,7 +302,7 @@ TermParse::EscParse()
 	int row, col;
 
 	/* default coding system is UTF8 */
-	int *groundtable = utf8_groundtable;
+	int *groundtable = gUTF8GroundTable;
 	int *parsestate = groundtable;
 
 	while (!fQuitting) {
@@ -325,19 +325,19 @@ TermParse::EscParse()
 				case B_ISO8_CONVERSION:
 				case B_ISO9_CONVERSION:
 				case B_ISO10_CONVERSION:
-					groundtable = iso8859_groundtable;
+					groundtable = gISO8859GroundTable;
 					break;
 				case B_SJIS_CONVERSION:
-					groundtable = sjis_groundtable;
+					groundtable = gSJISGroundTable;
 					break;
 				case B_EUC_CONVERSION:
 				case B_EUC_KR_CONVERSION:
 				case B_JIS_CONVERSION:
-					groundtable = iso8859_groundtable;
+					groundtable = gISO8859GroundTable;
 					break;
 				case M_UTF8:
 				default:
-					groundtable = utf8_groundtable;
+					groundtable = gUTF8GroundTable;
 					break;
 			}
 			parsestate = groundtable;
@@ -452,12 +452,12 @@ TermParse::EscParse()
 
 			case CASE_MBCS:
 				/* ESC $ */
-				parsestate = mbcstable;
+				parsestate = gMbcsTable;
 				break;
 
 			case CASE_GSETS:
 				/* ESC $ ? */
-				parsestate = cs96_groundtable;
+				parsestate = gCS96GroundTable;
 				cs96 = 1;
 				break;
 
@@ -490,17 +490,17 @@ TermParse::EscParse()
 
 			case CASE_ESC:
 				/* escape */
-				parsestate = esctable;
+				parsestate = gEscTable;
 				break;
 
 			case CASE_IGNORE_STATE:
 				/* Ies: ignore anything else */
-				parsestate = igntable;
+				parsestate = gIgnoreTable;
 				break;
 
 			case CASE_IGNORE_ESC:
 				/* Ign: escape */
-				parsestate = iestable;
+				parsestate = gIesTable;
 				break;
 
 			case CASE_IGNORE:
@@ -515,12 +515,12 @@ TermParse::EscParse()
 
 			case CASE_SCR_STATE:	// ESC #
 				/* enter scr state */
-				parsestate = scrtable;
+				parsestate = gScrTable;
 				break;
 
 			case CASE_ESC_IGNORE:
 				/* unknown escape sequence */
-				parsestate = eigtable;
+				parsestate = gEscIgnoreTable;
 				break;
 
 			case CASE_ESC_DIGIT:	// ESC [ number
@@ -538,7 +538,7 @@ TermParse::EscParse()
 
 			case CASE_DEC_STATE:
 				/* enter dec mode */
-				parsestate = dectable;
+				parsestate = gDecTable;
 				break;
 
 			case CASE_ICH:		// ESC [@ insert charactor
@@ -810,7 +810,7 @@ TermParse::EscParse()
 					/* enter csi state */
 					nparam = 1;
 					param[0] = DEFAULT;
-					parsestate = csitable;
+					parsestate = gCsiTable;
 					break;
 
 				case CASE_OSC:

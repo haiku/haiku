@@ -33,7 +33,7 @@
 #define USE_MBCS
 #define USE_ISO2022
 
-int utf8_groundtable[] =	/* UTF8 coding ground table */
+int gUTF8GroundTable[] =	/* UTF8 coding ground table */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -357,7 +357,7 @@ CASE_UTF8_3BYTE,
 CASE_UTF8_3BYTE,
 };
 
-int cs96_groundtable[] =	/* charset 96 table */
+int gCS96GroundTable[] =	/* charset 96 table */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -681,7 +681,7 @@ CASE_IGNORE,
 CASE_IGNORE,
 };
 
-int iso8859_groundtable[] =
+int gISO8859GroundTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -1005,7 +1005,7 @@ CASE_PRINT_GR,
 CASE_PRINT_GR,
 };
 
-int csitable[] =		/* ESC [ */
+int gCsiTable[] =		/* ESC [ */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -1329,7 +1329,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int dectable[] =		/* ESC [ ? */
+int gDecTable[] =		/* ESC [ ? */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -1670,7 +1670,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int eigtable[] =		/* CASE_ESC_IGNORE */
+int gEscIgnoreTable[] =		/* CASE_ESC_IGNORE */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -1995,7 +1995,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int esctable[] =		/* ESC */
+int gEscTable[] =		/* ESC */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -2337,7 +2337,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int iestable[] =		/* CASE_IGNORE_ESC */
+int gIesTable[] =		/* CASE_IGNORE_ESC */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE_STATE,
@@ -2661,7 +2661,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int igntable[] =		/* CASE_IGNORE_STATE */
+int gIgnoreTable[] =		/* CASE_IGNORE_STATE */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -2985,7 +2985,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int scrtable[] =		/* ESC # */
+int gScrTable[] =		/* ESC # */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -3309,7 +3309,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int scstable[] =		/* ESC ( etc. */
+int gScsTable[] =		/* ESC ( etc. */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -3737,7 +3737,7 @@ CASE_GROUND_STATE,
 };
 
 #ifdef USE_MBCS
-int mbcstable[] = {
+int gMbcsTable[] = {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
 CASE_IGNORE,
@@ -4060,7 +4060,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int smbcstable[] = {
+int gSmbcsTable[] = {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
 CASE_IGNORE,
@@ -4385,7 +4385,7 @@ CASE_GROUND_STATE,
 
 #endif
 
-int sjis_groundtable[] =	/* Shift-JIS ground table. */
+int gSJISGroundTable[] =	/* Shift-JIS ground table. */
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
