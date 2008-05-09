@@ -1198,6 +1198,7 @@ unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size)
 {
 	// TODO: Support deleting partial areas!
 
+	size = PAGE_ALIGN(size);
 	addr_t lastAddress = address + (size - 1);
 
 	// check whether any areas are only partially covered
