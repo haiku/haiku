@@ -883,6 +883,26 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
+				case CASE_VPA:		// ESC [...d move cursor absolute vertical
+					/* VPA (CV) */
+					if ((row = param[0]) < 1)
+						row = 1;
+
+					// note beterm wants it 1-based unlike usual terminals
+					fView->SetCurY(row - 1);
+					parsestate = groundtable;
+					break;
+
+				case CASE_HPA:		// ESC [...G move cursor absolute horizontal
+					/* HPA (CH) */
+					if ((col = param[0]) < 1)
+						col = 1;
+
+					// note beterm wants it 1-based unlike usual terminals
+					fView->SetCurX(col - 1);
+					parsestate = groundtable;
+					break;
+
 				default:
 					break;
 		}

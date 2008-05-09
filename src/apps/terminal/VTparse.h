@@ -116,3 +116,6 @@
 #define CASE_SJIS_KANA 84
 #define CASE_PRINT_GR 85
 #define CASE_PRINT_CS96 86
+// additions, maybe reorder/reuse older ones ?
+#define CASE_VPA 87
+#define CASE_HPA 88

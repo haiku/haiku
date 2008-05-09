@@ -838,7 +838,7 @@ TermView::SetCurPos(int x, int y)
 void
 TermView::SetCurX(int x)
 {
-	if (x >= 0 && x < fTermRows) {
+	if (x >= 0 && x < fTermColumns) {
 		UpdateLine();
 		fCurPos.x = x;
 	}
@@ -849,7 +849,7 @@ TermView::SetCurX(int x)
 void
 TermView::SetCurY(int y)
 {
-	if (y >= 0 && y < fTermColumns) {
+	if (y >= 0 && y < fTermRows) {
 		UpdateLine();
 		fCurPos.y = y;
 	}
