@@ -118,8 +118,8 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	attributes.entry = pthread_thread_entry;
 	attributes.name = "pthread func";
 	attributes.priority = attr->sched_priority;
-	attributes.args1 = thread;
-	attributes.args2 = NULL;
+	attributes.args1 = NULL;
+	attributes.args2 = thread;
 	attributes.stack_address = NULL;
 	attributes.stack_size = attr->stack_size;
 
