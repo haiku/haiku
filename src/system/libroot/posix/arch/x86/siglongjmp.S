@@ -19,6 +19,12 @@ FUNCTION(_longjmp):
 	mov		4(%esp), %ecx
 	mov		8(%esp), %eax
 
+	/* If value is 0, setjmp() must return 1. */
+	test	%eax, %eax
+	mov		$1, %eax
+	jnz		1f
+1:
+
 	// restore registers
 	mov		JMP_REGS_EBX(%ecx), %ebx
 	mov		JMP_REGS_ESI(%ecx), %esi
