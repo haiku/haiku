@@ -69,7 +69,7 @@ typedef struct device_manager_info {
 					device_node **_node);
 	status_t (*unregister_device)(device_node *node);
 
-	void (*get_driver)(device_node *node, driver_module_info **_module,
+	status_t (*get_driver)(device_node *node, driver_module_info **_module,
 					void **_cookie);
 
 	device_node *(*root_device)();

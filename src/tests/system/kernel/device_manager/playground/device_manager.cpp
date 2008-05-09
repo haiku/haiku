@@ -96,7 +96,7 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 			const AttributeList& Attributes() const { return fAttributes; }
 
 			status_t		InitDriver();
-			void			UninitDriver();
+			bool			UninitDriver();
 
 			// The following two are only valid, if the node's driver is
 			// initialized
@@ -106,9 +106,12 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 			void			AddChild(device_node *node);
 			void			RemoveChild(device_node *node);
 			const NodeList&	Children() const { return fChildren; }
+			void			UninitUnusedChildren();
 
 			status_t		Register();
+			status_t		Probe(const char* devicePath);
 			bool			IsRegistered() const { return fRegistered; }
+			bool			IsInitialized() const { return fInitialized > 0; }
 
 private:
 			status_t		_RegisterFixed(uint32& registered);
@@ -123,12 +126,15 @@ private:
 								float& bestSupport);
 			status_t		_RegisterPath(const char* path);
 			status_t		_RegisterDynamic();
+			status_t		_RemoveChildren();
+			bool			_UninitUnusedChildren();
 
 	device_node*			fParent;
 	NodeList				fChildren;
 	int32					fRefCount;
 	int32					fInitialized;
 	bool					fRegistered;
+	uint32					fFlags;
 
 	const char*				fModuleName;
 	driver_module_info*		fDriver;
@@ -137,9 +143,14 @@ private:
 	AttributeList			fAttributes;
 };
 
+enum node_flags {
+	NODE_FLAG_REMOVE_ON_UNINIT	= 0x01
+};
+
 device_manager_info *gDeviceManager;
 
 static device_node *sRootNode;
+static recursive_lock sLock;
 
 
 //	#pragma mark - device_attr
@@ -371,6 +382,22 @@ dm_dump_node(device_node* node, int32 level)
 }
 
 
+static void
+uninit_unused()
+{
+	RecursiveLocker _(sLock);
+	sRootNode->UninitUnusedChildren();
+}
+
+
+static status_t
+probe_path(const char* path)
+{
+	RecursiveLocker _(sLock);
+	return sRootNode->Probe(path);
+}
+
+
 //	#pragma mark - device_node
 
 
@@ -407,12 +434,22 @@ device_node::device_node(const char* moduleName, const device_attr* attrs,
 
 device_node::~device_node()
 {
-	AttributeList::Iterator iterator = fAttributes.GetIterator();
-	while (iterator.HasNext()) {
-		device_attr_private* attr = iterator.Next();
-		iterator.Remove();
+	// Delete children
+	NodeList::Iterator nodeIterator = fChildren.GetIterator();
+	while (nodeIterator.HasNext()) {
+		device_node* child = nodeIterator.Next();
+		nodeIterator.Remove();
+		delete child;
+	}
+
+	// Delete attributes
+	AttributeList::Iterator attrIterator = fAttributes.GetIterator();
+	while (attrIterator.HasNext()) {
+		device_attr_private* attr = attrIterator.Next();
+		attrIterator.Remove();
 		delete attr;
 	}
+
 	free((char*)fModuleName);
 }
 
@@ -448,17 +485,24 @@ device_node::InitDriver()
 }
 
 
-void
+bool
 device_node::UninitDriver()
 {
 	if (fInitialized-- > 1)
-		return;
+		return false;
 
 	if (fDriver->uninit_driver != NULL)
 		fDriver->uninit_driver(this);
+
+	fDriver = NULL;
 	fDriverData = NULL;
 
 	put_module(ModuleName());
+
+	if ((fFlags & NODE_FLAG_REMOVE_ON_UNINIT) != 0)
+		delete this;
+
+	return true;
 }
 
 
@@ -807,7 +851,118 @@ printf("  register best module \"%s\", support %f\n", bestDriver->info.name, bes
 }
 
 
-//	#pragma mark -
+status_t
+device_node::_RemoveChildren()
+{
+	NodeList::Iterator iterator = fChildren.GetIterator();
+	while (iterator.HasNext()) {
+		device_node* child = iterator.Next();
+
+		if (!child->IsInitialized()) {
+			// this child is not used currently, and can be removed safely
+			iterator.Remove();
+			fRefCount--;
+			child->fParent = NULL;
+			delete child;
+		} else
+			child->fFlags |= NODE_FLAG_REMOVE_ON_UNINIT;
+	}
+
+	return fChildren.IsEmpty() ? B_OK : B_BUSY;
+}
+
+
+status_t
+device_node::Probe(const char* devicePath)
+{
+	uint16 type = 0;
+	uint16 subType = 0;
+	if (dm_get_attr_uint16(this, B_DEVICE_TYPE, &type, false) == B_OK
+		&& dm_get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false)
+			== B_OK) {
+		// Check if this node matches the device path
+		// TODO: maybe make this extendible via settings file?
+		bool matches = false;
+		if (!strcmp(devicePath, "disk")) {
+			matches = type == PCI_mass_storage;
+		} else if (!strcmp(devicePath, "audio")) {
+			matches = type == PCI_multimedia
+				&& (subType == PCI_audio || subType == PCI_hd_audio);
+		} else if (!strcmp(devicePath, "net")) {
+			matches = type == PCI_network;
+		} else if (!strcmp(devicePath, "graphics")) {
+			matches = type == PCI_display;
+		} else if (!strcmp(devicePath, "video")) {
+			matches = type == PCI_multimedia && subType == PCI_video;
+		}
+
+		if (matches) {
+			if (!fChildren.IsEmpty()) {
+				// We already have a driver that claims this node.
+				// Try to remove uninitialized children, so that this node
+				// can be re-evaluated
+				// TODO: try first if there is a better child!
+				// TODO: publish both devices, make new one busy as long
+				// as the old one is in use!
+				if (_RemoveChildren() != B_OK)
+					return B_OK;
+			}
+			return _RegisterDynamic();
+		}
+
+		return B_OK;
+	}
+
+	NodeList::Iterator iterator = fChildren.GetIterator();
+	while (iterator.HasNext()) {
+		device_node* child = iterator.Next();
+		
+		status_t status = child->Probe(devicePath);
+		if (status != B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
+bool
+device_node::_UninitUnusedChildren()
+{
+	// First, we need to go to the leaf, and go back from there
+
+	bool uninit = true;
+
+	NodeList::Iterator iterator = fChildren.GetIterator();
+
+	while (iterator.HasNext()) {
+		device_node* child = iterator.Next();
+
+		if (!child->_UninitUnusedChildren())
+			uninit = false;
+	}
+
+	// Not all of our children could be uninitialized
+	if (!uninit)
+		return false;
+
+	if (!IsInitialized())
+		return true;
+
+	if ((DriverModule()->info.flags & B_KEEP_LOADED) != 0) {
+		// We must not get unloaded
+		return false;
+	}
+
+	return UninitDriver();
+}
+
+
+void
+device_node::UninitUnusedChildren()
+{
+	_UninitUnusedChildren();
+}
 
 
 //	#pragma mark - Device Manager module API
@@ -837,6 +992,8 @@ register_device(device_node* parent, const char* moduleName,
 
 	TRACE(("%p: register device \"%s\", parent %p\n", newNode, moduleName,
 		parent));
+
+	RecursiveLocker _(sLock);
 
 	status_t status = newNode->InitCheck();
 	if (status != B_OK)
@@ -890,13 +1047,18 @@ unregister_device(device_node* node)
 }
 
 
-static void
+static status_t
 get_driver(device_node* node, driver_module_info** _module, void** _data)
 {
+	if (node->DriverModule() == NULL)
+		return B_NO_INIT;
+
 	if (_module != NULL)
 		*_module = node->DriverModule();
 	if (_data != NULL)
 		*_data = node->DriverData();
+
+	return B_OK;
 }
 
 
@@ -1136,8 +1298,14 @@ main(int argc, char** argv)
 		return 1;
 	}
 
+	recursive_lock_init(&sLock, "device manager");
+
 	dm_init_root_node();
 	dm_dump_node(sRootNode, 0);
 
+	probe_path("net");
+	uninit_unused();
+
+	recursive_lock_destroy(&sLock);
 	return 0;
 }
