@@ -91,7 +91,7 @@ class RequestOwner {
 		void SetBytesNeeded(size_t bytesNeeded);
 		size_t BytesNeeded() const	{ return fBytesNeeded; }
 
-		status_t Wait(bool interruptable);
+		status_t Wait(bool interruptable, bigtime_t timeout=B_INFINITE_TIMEOUT);
 
 		bool IsFirstInQueues();
 

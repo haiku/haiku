@@ -135,6 +135,7 @@ class ReaderLocker : public AbstractLocker {
 		ReaderLocker(tty_cookie *cookie);
 		~ReaderLocker();
 
+		status_t AcquireReader(bigtime_t timeout);
 		status_t AcquireReader(bool dontBlock);
 
 	private:
@@ -393,7 +394,7 @@ RequestOwner::SetBytesNeeded(size_t bytesNeeded)
  *	The request lock MUST NOT be held!
  */
 status_t
-RequestOwner::Wait(bool interruptable)
+RequestOwner::Wait(bool interruptable, bigtime_t timeout)
 {
 	TRACE(("%p->RequestOwner::Wait(%d)\n", this, interruptable));
 
@@ -420,7 +421,7 @@ RequestOwner::Wait(bool interruptable)
 		// wait
 		TRACE(("%p->RequestOwner::Wait(): waiting for condition...\n", this));
 
-		error = entry.Wait();
+		error = entry.Wait(B_RELATIVE_TIMEOUT, timeout);
 
 		TRACE(("%p->RequestOwner::Wait(): condition occurred: %lx\n", this,
 			error));
@@ -677,7 +678,7 @@ ReaderLocker::~ReaderLocker()
 
 
 status_t 
-ReaderLocker::AcquireReader(bool dontBlock)
+ReaderLocker::AcquireReader(bigtime_t timeout)
 {
 	if (fCookie->closed)
 		return B_FILE_ERROR;
@@ -695,12 +696,12 @@ ReaderLocker::AcquireReader(bool dontBlock)
 
 	// We are not the first in queue or currently there's nothing to read:
 	// bail out, if we shall not block.
-	if (dontBlock)
+	if (timeout <= 0)
 		return B_WOULD_BLOCK;
 
 	// block until something happens
 	Unlock();
-	status = fRequestOwner.Wait(true);
+	status = fRequestOwner.Wait(true, timeout);
 	Lock();
 
 	if (status == B_OK)
@@ -710,6 +711,13 @@ ReaderLocker::AcquireReader(bool dontBlock)
 		fBytes = _CheckAvailableBytes();
 
 	return status;
+}
+
+
+status_t 
+ReaderLocker::AcquireReader(bool dontBlock)
+{
+	return AcquireReader(dontBlock ? 0 : B_INFINITE_TIMEOUT);
 }
 
 
@@ -1456,8 +1464,9 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 		case TCWAITEVENT:		// BeOS (uint *)
 								// wait for event (timeout if !NULL)
 		case TCVTIME:			// BeOS (bigtime_t *) set highrez VTIME
+		case 'ochr':			// BeOS (int *) same as ichr for write
 			dprintf("tty: unsupported legacy opcode %lu\n", op);
-			// TODO;
+			// TODO ?
 			break;
 
 		case TCXONC:			// Unix, but even Linux doesn't handle it
@@ -1465,7 +1474,6 @@ tty_ioctl(tty_cookie *cookie, uint32 op, void *buffer, size_t length)
 			break;
 
 		case TCQUERYCONNECTED:	// BeOS
-		case 'ochr':			// BeOS (int *) same as ichr for write
 			dprintf("tty: unsupported legacy opcode %lu\n", op);
 			// BeOS didn't implement them anyway
 			break;
@@ -1492,6 +1500,9 @@ tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 	bool dontBlock = (mode & O_NONBLOCK) != 0;
 	size_t length = *_length;
 	ssize_t bytesRead = 0;
+	bigtime_t timeout = dontBlock ? 0 : B_INFINITE_TIMEOUT;
+	bigtime_t vtime = 0LL;
+	size_t vmin = 0;
 
 	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
 
@@ -1506,7 +1517,7 @@ tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 	ReaderLocker locker(cookie);
 
 	while (bytesRead == 0) {
-		status_t status = locker.AcquireReader(dontBlock);
+		status_t status = locker.AcquireReader(timeout);
 		if (status != B_OK) {
 			*_length = 0;
 			return status;
@@ -1619,6 +1630,8 @@ tty_write_to_tty_master_unsafe(tty_cookie *sourceCookie, const char *data,
 			}
 
 			writable = locker.AvailableBytes();
+
+			// XXX: do we need to support VMIN & VTIME for write() ?
 
 			// We need to restart the loop, since the termios flags might have
 			// changed in the meantime (while we've unlocked the tty). Note,
@@ -1911,8 +1924,9 @@ dump_tty_settings(struct tty_settings& settings)
 	kprintf("  pgrp_id:      %ld\n", settings.pgrp_id);
 	kprintf("  session_id:   %ld\n", settings.session_id);
 	// struct termios		termios;
-	// struct winsize		window_size;
-
+	kprintf("  wsize:        %u x %u c, %u x %u pxl\n", 
+		settings.window_size.ws_row, settings.window_size.ws_col, 
+		settings.window_size.ws_xpixel, settings.window_size.ws_ypixel);
 }
 
 static void
