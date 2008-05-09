@@ -10,6 +10,8 @@
 
 #include <SupportDefs.h>
 
+#include <AutoDeleter.h>
+
 
 template<class T> class Stack {
 	public:
@@ -76,33 +78,34 @@ template<class T> class Stack {
 		int32	fMax;
 };
 
-template<typename T> class StackDeleter {
-public:
-	StackDeleter(Stack<T>* stack)
-		: fStack(stack)
-	{
-	}
 
-	~StackDeleter()
+template<typename T> class StackDelete {
+public:
+	inline void operator()(Stack<T>* stack)
 	{
-		if (fStack == NULL)
+		if (stack == NULL)
 			return;
-		
+
 		T item;
-		while (fStack->Pop(&item)) {
+		while (stack->Pop(&item)) {
 			delete item;
 		}
-
-		delete fStack;
+	
+		delete stack;
 	}
+};
 
-	void Detach()
+template<typename T> class StackDeleter
+	: public BPrivate::AutoDeleter<Stack<T>, StackDelete<T> > {
+public:
+	StackDeleter()
 	{
-		fStack = NULL;
 	}
 
-private:
-	Stack<T>*	fStack;
+	StackDeleter(Stack<T>* stack)
+		: BPrivate::AutoDeleter<Stack<T>, StackDelete<T> >(stack)
+	{
+	}
 };
 
 #endif	/* KERNEL_UTIL_STACK_H */
