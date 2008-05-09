@@ -1471,6 +1471,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	currentMessage->FindInt32("key", &key);
 	currentMessage->FindInt32("raw_char", &rawChar);
 
+#ifndef __HAIKU__
 	// If bytes[0] equal intr character,
 	// send signal to shell process group.
 	struct termios tio;
@@ -1479,6 +1480,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 		if (tio.c_lflag & ISIG)
 			fShell->Signal(SIGINT);
 	}
+#endif
 
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
 	// TODO: Cleanup

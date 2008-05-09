@@ -194,16 +194,24 @@ Shell::UpdateWindowSize(int rows, int columns)
 	struct winsize winSize;
 	winSize.ws_row = rows;
 	winSize.ws_col = columns;
+#ifdef __HAIKU__
+	if (ioctl(fFd, TIOCSWINSZ, &winSize) != 0)
+		return errno;
+	return B_OK;
+#else
 	ioctl(fFd, TIOCSWINSZ, &winSize);
 	return Signal(SIGWINCH);
+#endif
 }
 
 
+#ifndef __HAIKU__
 status_t
 Shell::Signal(int signal)
 {
 	return send_signal(-fProcessID, signal);
 }
+#endif
 
 
 status_t
