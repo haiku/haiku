@@ -65,16 +65,23 @@
 
 
 
-#define LEFT_ARROW_KEY_CODE "[D"
-#define RIGHT_ARROW_KEY_CODE "[C"
-#define UP_ARROW_KEY_CODE "[A"
-#define DOWN_ARROW_KEY_CODE "[B"
+#define LEFT_ARROW_KEY_CODE "\033[D"
+#define RIGHT_ARROW_KEY_CODE "\033[C"
+#define UP_ARROW_KEY_CODE "\033[A"
+#define DOWN_ARROW_KEY_CODE "\033[B"
 
-#define HOME_KEY_CODE "[@"
-#define INSERT_KEY_CODE "[2~"
-#define END_KEY_CODE "[["
-#define PAGE_UP_KEY_CODE "[5~"
-#define PAGE_DOWN_KEY_CODE "[6~"
+#define CTRL_LEFT_ARROW_KEY_CODE "\033[5D"
+#define CTRL_RIGHT_ARROW_KEY_CODE "\033[5C"
+#define CTRL_UP_ARROW_KEY_CODE "\033[5A"
+#define CTRL_DOWN_ARROW_KEY_CODE "\033[5B"
+
+//#define HOME_KEY_CODE "\033[@"
+#define HOME_KEY_CODE "\033[1~"
+#define INSERT_KEY_CODE "\033[2~"
+//#define END_KEY_CODE "\033[["
+#define END_KEY_CODE "\033[4~"
+#define PAGE_UP_KEY_CODE "\033[5~"
+#define PAGE_DOWN_KEY_CODE "\033[6~"
 
 //#define IS_DOWN_KEY(x) (info.key_states[(x) / 8] & key_state_table[(x) % 8])
 #define IS_DOWN_KEY(x) \

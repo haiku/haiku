@@ -72,7 +72,7 @@ CodeConv::ConvertFromInternal(const char *src, int32 srclen, char *dst, int codi
 	// system api for code conversion... check if this (which looks a lot like a workaround)
 	// applies to haiku, and if not, get rid of this class and just use the system api directly.
 	if (coding == B_EUC_CONVERSION && state != 0) {
-		const char *end_of_jis = "(B";
+		const char *end_of_jis = "\033(B";
 		strncpy((char *)dst + dstlen, end_of_jis, 3);
 		dstlen += 3;
 	}

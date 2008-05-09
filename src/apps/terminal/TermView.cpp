@@ -1483,26 +1483,28 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
 	// TODO: Cleanup
 	if (numBytes == 1) {
+		const char *toWrite = NULL;
 		switch (*bytes) {
 			case B_RETURN:
-				if (rawChar == B_RETURN) {
-					char c = 0x0d;
-					fShell->Write(&c, 1);
-					return;
-				}
+				if (rawChar == B_RETURN)
+					toWrite = "\r";
 				break;
 			
 			case B_LEFT_ARROW:
 				if (rawChar == B_LEFT_ARROW) {
-					fShell->Write(LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE) - 1);
-					return;
+					if (mod & B_CONTROL_KEY)
+						toWrite = CTRL_LEFT_ARROW_KEY_CODE;
+					else
+						toWrite = LEFT_ARROW_KEY_CODE;
 				}
 				break;
 
 			case B_RIGHT_ARROW:
 				if (rawChar == B_RIGHT_ARROW) {
-					fShell->Write(RIGHT_ARROW_KEY_CODE, sizeof(RIGHT_ARROW_KEY_CODE) - 1);
-					return;
+					if (mod & B_CONTROL_KEY)
+						toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
+					else
+						toWrite = RIGHT_ARROW_KEY_CODE;
 				}
 				break;
 
@@ -1515,8 +1517,10 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 				if (rawChar == B_UP_ARROW) {
-					fShell->Write(UP_ARROW_KEY_CODE, sizeof(UP_ARROW_KEY_CODE) - 1);
-					return;
+					if (mod & B_CONTROL_KEY)
+						toWrite = CTRL_UP_ARROW_KEY_CODE;
+					else
+						toWrite = UP_ARROW_KEY_CODE;
 				}
 				break;
 	 
@@ -1528,30 +1532,26 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				}
 
 				if (rawChar == B_DOWN_ARROW) {
-					fShell->Write(DOWN_ARROW_KEY_CODE, sizeof(DOWN_ARROW_KEY_CODE) - 1);
-					return;
+					if (mod & B_CONTROL_KEY)
+						toWrite = CTRL_DOWN_ARROW_KEY_CODE;
+					else
+						toWrite = DOWN_ARROW_KEY_CODE;
 				}
 				break;
 
 			case B_INSERT:
-				if (rawChar == B_INSERT) {
-					fShell->Write(INSERT_KEY_CODE, sizeof(INSERT_KEY_CODE) - 1);
-					return;
-				}
+				if (rawChar == B_INSERT)
+					toWrite = INSERT_KEY_CODE;
 				break;
 
 			case B_HOME:
-				if (rawChar == B_HOME) {
-					fShell->Write(HOME_KEY_CODE, sizeof(HOME_KEY_CODE) - 1);
-					return;
-				}
+				if (rawChar == B_HOME)
+					toWrite = HOME_KEY_CODE;
 				break;
 
 			case B_END:
-				if (rawChar == B_END) {
-					fShell->Write(END_KEY_CODE, sizeof(END_KEY_CODE) - 1);
-					return;
-				}
+				if (rawChar == B_END)
+					toWrite = END_KEY_CODE;
 				break;
 
 			case B_PAGE_UP:
@@ -1562,10 +1562,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					}					
 					return;
 				}
-				if (rawChar == B_PAGE_UP) {
-					fShell->Write(PAGE_UP_KEY_CODE, sizeof(PAGE_UP_KEY_CODE) - 1);
-					return;
-				}
+				if (rawChar == B_PAGE_UP)
+					toWrite = PAGE_UP_KEY_CODE;
 				break;
 
 			case B_PAGE_DOWN:
@@ -1575,10 +1573,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 					return;
 				}
 	 
-				if (rawChar == B_PAGE_DOWN) {
-					fShell->Write(PAGE_DOWN_KEY_CODE, sizeof(PAGE_DOWN_KEY_CODE) - 1);
-					return;
-				}
+				if (rawChar == B_PAGE_DOWN)
+					toWrite = PAGE_DOWN_KEY_CODE;
 				break;
 
 			case B_FUNCTION_KEY:
@@ -1592,6 +1588,10 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 			default:
 				break;
+		}
+		if (toWrite) {
+			fShell->Write(toWrite, strlen(toWrite));
+			return;
 		}
 	} else {
 		// input multibyte character
@@ -1636,7 +1636,7 @@ void
 TermView::MessageReceived(BMessage *msg)
 {
 	entry_ref ref;
-	char *ctrl_l = "";
+	char *ctrl_l = "\x0c";
 
 	// first check for any dropped message
 	if (msg->WasDropped()) {
