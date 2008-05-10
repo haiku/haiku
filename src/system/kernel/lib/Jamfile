@@ -132,6 +132,7 @@ SEARCH_SOURCE += [ FDirName $(posixSources) string arch $(TARGET_ARCH) ] ;
 KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
 	siglongjmp.S
 	sigsetjmp.S
+	kernel_longjmp_return.c
 	kernel_setjmp_save_sigs.c
 	arch_string.S				# TODO: Not needed for X86!
 

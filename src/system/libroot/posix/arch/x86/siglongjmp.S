@@ -3,7 +3,6 @@
 ** Distributed under the terms of the Haiku License.
 */
 
-
 #include "setjmp_internal.h"
 
 
@@ -19,12 +18,6 @@ FUNCTION(_longjmp):
 	mov		4(%esp), %ecx
 	mov		8(%esp), %eax
 
-	/* If value is 0, setjmp() must return 1. */
-	test	%eax, %eax
-	jnz		1f
-	mov		$1, %eax
-1:
-
 	// restore registers
 	mov		JMP_REGS_EBX(%ecx), %ebx
 	mov		JMP_REGS_ESI(%ecx), %esi
@@ -32,8 +25,17 @@ FUNCTION(_longjmp):
 	mov		JMP_REGS_EBP(%ecx), %ebp
 	mov		JMP_REGS_ESP(%ecx), %esp
 
-	// jump back to the old program location
+	// prepare the stack so that we will return to the setjmp() program location
 	mov		JMP_REGS_PC(%ecx), %edx
-	jmp		*%edx
+	push	%edx				// return address
+
+	// let __setjmp_save_sigs deal with the signal mask and the return value
+	push	%eax				// value
+	push	%ecx				// buffer
+	call	__longjmp_return
+	add		$8, %esp
+
+	ret
+
 
 #pragma weak longjmp=siglongjmp
