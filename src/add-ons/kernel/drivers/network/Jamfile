@@ -7,6 +7,7 @@ SubInclude HAIKU_TOP src add-ons kernel drivers network pegasus ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8139 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network rtl8169 ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network sis900 ;
+SubInclude HAIKU_TOP src add-ons kernel drivers network usb_ecm ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network via_rhine ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network vlance ;
 SubInclude HAIKU_TOP src add-ons kernel drivers network wb840 ;

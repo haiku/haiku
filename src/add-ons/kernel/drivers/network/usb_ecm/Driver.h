@@ -1,0 +1,61 @@
+/*
+	Driver for USB Ethernet Control Model devices
+	Copyright (C) 2008 Michael Lotz <mmlr@mlotz.ch>
+	Distributed under the terms of the MIT license.
+*/
+#ifndef _USB_ECM_DRIVER_H_
+#define _USB_ECM_DRIVER_H_
+
+#include <Drivers.h>
+#include <KernelExport.h>
+#include <OS.h>
+#include <USB3.h>
+
+#include "kernel_cpp.h"
+
+#define DRIVER_NAME	"usb_ecm"
+#define MAX_DEVICES	8
+
+/* class and subclass codes */
+#define USB_INTERFACE_CLASS_CDC			0x02
+#define USB_INTERFACE_SUBCLASS_ECM		0x06
+#define USB_INTERFACE_CLASS_CDC_DATA	0x0a
+#define USB_INTERFACE_SUBCLASS_DATA		0x00
+
+/* communication device descriptor subtypes */
+#define FUNCTIONAL_SUBTYPE_UNION		0x06
+#define FUNCTIONAL_SUBTYPE_ETHERNET		0x0f
+
+typedef struct ethernet_functional_descriptor_s {
+	uint8	functional_descriptor_subtype;
+	uint8	mac_address_index;
+	uint32	ethernet_statistics;
+	uint16	max_segment_size;
+	uint16	num_multi_cast_filters;
+	uint8	num_wakeup_pattern_filters;
+} _PACKED ethernet_functional_descriptor;
+
+extern usb_module_info *gUSBModule;
+
+extern "C" {
+status_t	usb_ecm_device_added(usb_device device, void **cookie);
+status_t	usb_ecm_device_removed(void *cookie);
+
+status_t	init_hardware();
+void		uninit_driver();
+
+status_t	usb_ecm_open(const char *name, uint32 flags, void **cookie);
+status_t	usb_ecm_read(void *cookie, off_t position, void *buffer, size_t *numBytes);
+status_t	usb_ecm_write(void *cookie, off_t position, const void *buffer, size_t *numBytes);
+status_t	usb_ecm_control(void *cookie, uint32 op, void *buffer, size_t length);
+status_t	usb_ecm_close(void *cookie);
+status_t	usb_ecm_free(void *cookie);
+
+const char **publish_devices();
+device_hooks *find_device(const char *name);
+}
+
+#define	TRACE(x...)			/*dprintf(DRIVER_NAME ": " x)*/
+#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
+
+#endif //_USB_ECM_DRIVER_H_
