@@ -1619,7 +1619,8 @@ static file_system_module_info sGoogleFSModule = {
 		googlefs_std_ops,
 	},
 
-	GOOGLEFS_PRETTY_NAME,
+	"googlefs",					// short_name
+	GOOGLEFS_PRETTY_NAME,		// pretty_name
 	0,	// DDM flags
 
 	// scanning

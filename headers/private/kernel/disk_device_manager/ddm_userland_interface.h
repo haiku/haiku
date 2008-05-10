@@ -1,5 +1,10 @@
-// ddm_userland_interface.h
-
+/*
+ * Copyright 2003-2008, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
 #ifndef _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
 #define _DISK_DEVICE_MANAGER_USERLAND_INTERFACE_H
 
@@ -49,6 +54,7 @@ typedef struct user_disk_device_data {
 typedef struct user_disk_system_info {
 	disk_system_id	id;
 	char			name[B_FILE_NAME_LENGTH];	// better B_PATH_NAME_LENGTH?
+	char			short_name[B_OS_NAME_LENGTH];
 	char			pretty_name[B_OS_NAME_LENGTH];
 	uint32			flags;
 } user_disk_system_info;

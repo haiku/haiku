@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -399,6 +399,7 @@ partition_module_info gEFIPartitionModule = {
 		0,
 		efi_gpt_std_ops
 	},
+	"efi",									// short_name
 	EFI_PARTITION_NAME,						// pretty_name
 	0,										// flags
 

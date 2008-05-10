@@ -1,7 +1,11 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Ingo Weinhold, bonefish@cs.tu-berlin.de
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
 
 #include <new>
 
@@ -82,7 +86,7 @@ BDiskDeviceRoster::GetNextDevice(BDiskDevice *device)
 		return B_BAD_VALUE;
 	size_t neededSize = 0;
 	partition_id id = _kern_get_next_disk_device_id(&fDeviceCookie,
-													&neededSize);
+		&neededSize);
 	if (id < 0)
 		return id;
 	return device->_SetTo(id, true, neededSize);
@@ -99,21 +103,21 @@ BDiskDeviceRoster::RewindDevices()
 	return B_OK;
 }
 
-// GetNextDiskSystem
+
 status_t
-BDiskDeviceRoster::GetNextDiskSystem(BDiskSystem *system)
+BDiskDeviceRoster::GetNextDiskSystem(BDiskSystem* system)
 {
 	if (!system)
 		return B_BAD_VALUE;
 	user_disk_system_info info;
 	status_t error = _kern_get_next_disk_system_info(&fDiskSystemCookie,
-													 &info);
+		&info);
 	if (error == B_OK)
 		error = system->_SetTo(&info);
 	return error;
 }
 
-// RewindDiskSystems
+
 status_t
 BDiskDeviceRoster::RewindDiskSystems()
 {
@@ -122,7 +126,25 @@ BDiskDeviceRoster::RewindDiskSystems()
 }
 
 
-// RegisterFileDevice
+status_t
+BDiskDeviceRoster::GetDiskSystem(BDiskSystem* system, const char* name)
+{
+	if (!system)
+		return B_BAD_VALUE;
+
+	int32 cookie = 0;
+	user_disk_system_info info;
+	while (_kern_get_next_disk_system_info(&fDiskSystemCookie, &info) == B_OK) {
+		if (!strcmp(name, info.name)
+			|| !strcmp(name, info.short_name)
+			|| !strcmp(name, info.pretty_name))
+			return system->_SetTo(&info);
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 partition_id
 BDiskDeviceRoster::RegisterFileDevice(const char *filename)
 {

@@ -649,8 +649,9 @@ static file_system_module_info sReiserFSModuleInfo = {
 		reiserfs_std_ops,
 	},
 
-	"Reiser File System",
-	0,	// DDM flags
+	"reiserfs",					// short_name
+	"Reiser File System",		// pretty_name
+	0,							// DDM flags
 
 	// scanning
 	NULL,	// identify_partition()

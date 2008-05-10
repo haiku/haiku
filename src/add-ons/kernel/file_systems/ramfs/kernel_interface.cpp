@@ -2069,8 +2069,9 @@ static file_system_module_info sRamFSModuleInfo = {
 		ramfs_std_ops,
 	},
 
-	"RAM File System",
-	0,	// DDM flags
+	"ramfs",				// short_name
+	"RAM File System",		// pretty_name
+	0,						// DDM flags
 
 	// scanning
 	NULL,	// identify_partition()

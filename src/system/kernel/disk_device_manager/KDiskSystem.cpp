@@ -22,6 +22,7 @@
 KDiskSystem::KDiskSystem(const char *name)
 	: fID(_NextID()),
 	  fName(NULL),
+	  fShortName(NULL),
 	  fPrettyName(NULL),
 	  fLoadCounter(0)
 {
@@ -33,6 +34,8 @@ KDiskSystem::KDiskSystem(const char *name)
 KDiskSystem::~KDiskSystem()
 {
 	free(fName);
+	free(fShortName);
+	free(fPrettyName);
 }
 
 
@@ -40,7 +43,7 @@ KDiskSystem::~KDiskSystem()
 status_t
 KDiskSystem::Init()
 {
-	return (fName ? B_OK : B_NO_MEMORY);
+	return fName ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -68,9 +71,17 @@ KDiskSystem::Name() const
 }
 
 
+// ShortName
+const char *
+KDiskSystem::ShortName() const
+{
+	return fShortName;
+}
+
+
 // PrettyName
 const char *
-KDiskSystem::PrettyName()
+KDiskSystem::PrettyName() const
 {
 	return fPrettyName;
 }
@@ -106,9 +117,11 @@ KDiskSystem::GetInfo(user_disk_system_info *info)
 {
 	if (!info)
 		return;
+
 	info->id = ID();
-	strcpy(info->name, Name());
-	strcpy(info->pretty_name, PrettyName());
+	strlcpy(info->name, Name(), sizeof(info->name));
+	strlcpy(info->short_name, ShortName(), sizeof(info->short_name));
+	strlcpy(info->pretty_name, PrettyName(), sizeof(info->pretty_name));
 	info->flags = Flags();
 }
 
@@ -336,6 +349,14 @@ void
 KDiskSystem::UnloadModule()
 {
 	// to be implemented by derived classes
+}
+
+
+// SetShortName
+status_t
+KDiskSystem::SetShortName(const char *name)
+{
+	return set_string(fShortName, name);
 }
 
 

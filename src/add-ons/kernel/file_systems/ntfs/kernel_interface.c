@@ -84,8 +84,9 @@ static file_system_module_info sNTFSFileSystem = {
 		ntfs_std_ops,
 	},
 
-	"ntfs File System",
-	0,	// DDM flags
+	"ntfs",						// short_name
+	"Windows NT File System",	// pretty_name
+	0,							// DDM flags
 
 	// scanning
 	fs_identify_partition,

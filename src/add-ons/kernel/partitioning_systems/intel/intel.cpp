@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -427,6 +427,7 @@ static partition_module_info intel_partition_map_module =
 		0,
 		pm_std_ops
 	},
+	"intel",							// short_name
 	INTEL_PARTITION_NAME,				// pretty_name
 
 	// flags
@@ -513,6 +514,7 @@ static partition_module_info intel_extended_partition_module =
 		0,
 		ep_std_ops
 	},
+	"intel_extended",					// short_name
 	INTEL_EXTENDED_PARTITION_NAME,		// pretty_name
 
 	// flags

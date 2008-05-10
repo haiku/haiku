@@ -1,9 +1,11 @@
-// ddm_modules.h
-//
-// Interface to be implemented by partitioning modules.
-
+/*
+ * Copyright 2003-2008, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _K_DISK_DEVICE_MODULES_H
 #define _K_DISK_DEVICE_MODULES_H
+
+//! Interface to be implemented by partitioning modules.
 
 #include <disk_device_manager.h>
 #include <module.h>
@@ -12,6 +14,7 @@
 
 typedef struct partition_module_info {
 	module_info									module;
+	const char*									short_name;
 	const char*									pretty_name;
 	uint32										flags;
 

@@ -1313,7 +1313,8 @@ static file_system_module_info sFATFileSystem = {
 		dos_std_ops,
 	},
 
-	"FAT32 File System",
+	"fat",					// short_name
+	"FAT32 File System",	// pretty_name
 	0,	// DDM flags
 
 	// scanning

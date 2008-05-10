@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -1216,8 +1216,9 @@ file_system_module_info gRootFileSystem = {
 		rootfs_std_ops,
 	},
 
-	"Root File System",
-	0,	// DDM flags
+	"rootfs",				// short_name
+	"Root File System",		// pretty_name
+	0,						// DDM flags
 
 	NULL,	// identify_partition()
 	NULL,	// scan_partition()

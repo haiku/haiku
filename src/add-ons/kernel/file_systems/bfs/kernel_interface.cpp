@@ -2288,7 +2288,8 @@ static file_system_module_info sBeFileSystem = {
 		bfs_std_ops,
 	},
 
-	"Be File System",
+	"bfs",						// short_name
+	"Be File System",			// pretty_name
 
 	// DDM flags
 	0

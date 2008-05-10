@@ -2655,8 +2655,9 @@ file_system_module_info gDeviceFileSystem = {
 		devfs_std_ops,
 	},
 
-	"Device File System",
-	0,	// DDM flags
+	"devfs",					// short_name
+	"Device File System",		// pretty_name
+	0,							// DDM flags
 
 	NULL,	// identify_partition()
 	NULL,	// scan_partition()

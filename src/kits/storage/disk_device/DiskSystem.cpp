@@ -16,20 +16,21 @@
 
 // constructor
 BDiskSystem::BDiskSystem()
-	: fID(B_NO_INIT),
-	  fName(),
-	  fPrettyName(),
-	  fFlags(0)
+	:
+	fID(B_NO_INIT),
+	fFlags(0)
 {
 }
 
 
 // copy constructor
 BDiskSystem::BDiskSystem(const BDiskSystem& other)
-	: fID(other.fID),
-	  fName(other.fName),
-	  fPrettyName(other.fPrettyName),
-	  fFlags(other.fFlags)
+	:
+	fID(other.fID),
+	fName(other.fName),
+	fShortName(other.fShortName),
+	fPrettyName(other.fPrettyName),
+	fFlags(other.fFlags)
 {
 }
 
@@ -44,7 +45,7 @@ BDiskSystem::~BDiskSystem()
 status_t
 BDiskSystem::InitCheck() const
 {
-	return (fID > 0 ? B_OK : fID);
+	return fID > 0 ? B_OK : fID;
 }
 
 
@@ -53,6 +54,14 @@ const char*
 BDiskSystem::Name() const
 {
 	return fName.String();
+}
+
+
+// ShortName
+const char*
+BDiskSystem::ShortName() const
+{
+	return fShortName.String();
 }
 
 
@@ -76,8 +85,8 @@ BDiskSystem::SupportsDefragmenting(bool* whileMounted) const
 	}
 
 	if (whileMounted) {
-		*whileMounted = (IsFileSystem()
-			&& (fFlags & B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED));
+		*whileMounted = IsFileSystem() && (fFlags
+				& B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED) != 0;
 	}
 
 	return true;
@@ -310,7 +319,7 @@ BDiskSystem::GetTypeForContentType(const char* contentType, BString* type) const
 bool
 BDiskSystem::IsPartitioningSystem() const
 {
-	return (InitCheck() == B_OK && !(fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM));
+	return InitCheck() == B_OK && !(fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM);
 }
 
 
@@ -318,7 +327,7 @@ BDiskSystem::IsPartitioningSystem() const
 bool
 BDiskSystem::IsFileSystem() const
 {
-	return (InitCheck() == B_OK && (fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM));
+	return InitCheck() == B_OK && (fFlags & B_DISK_SYSTEM_IS_FILE_SYSTEM);
 }
 
 
@@ -328,6 +337,7 @@ BDiskSystem::operator=(const BDiskSystem& other)
 {
 	fID = other.fID;
 	fName = other.fName;
+	fShortName = other.fShortName;
 	fPrettyName = other.fPrettyName;
 	fFlags = other.fFlags;
 
@@ -364,6 +374,7 @@ BDiskSystem::_SetTo(const user_disk_system_info* info)
 
 	fID = info->id;
 	fName = info->name;
+	fShortName = info->short_name;
 	fPrettyName = info->pretty_name;
 	fFlags = info->flags;
 

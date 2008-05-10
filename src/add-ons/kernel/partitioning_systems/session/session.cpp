@@ -114,6 +114,7 @@ static partition_module_info sSessionModule = {
 		0,
 		standard_operations
 	},
+	"session",							// short_name
 	SESSION_PARTITION_NAME,				// pretty_name
 	0,									// flags
 

@@ -745,8 +745,9 @@ static file_system_module_info sISO660FileSystem = {
 		iso_std_ops,
 	},
 
-	"ISO9660 File System",
-	0,	// DDM flags
+	"iso9660",					// short_name
+	"ISO9660 File System",		// pretty_name
+	0,							// DDM flags
 
 	// scanning
 	fs_identify_partition,

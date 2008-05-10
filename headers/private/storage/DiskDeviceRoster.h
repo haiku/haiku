@@ -1,8 +1,7 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-
+/*
+ * Copyright 2003-2008, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _DISK_DEVICE_ROSTER_H
 #define _DISK_DEVICE_ROSTER_H
 
@@ -85,44 +84,51 @@ enum {
 
 class BDiskDeviceRoster {
 public:
-	BDiskDeviceRoster();
-	~BDiskDeviceRoster();
-	
-	status_t GetNextDevice(BDiskDevice *device);
-	status_t RewindDevices();
-	
-	status_t GetNextDiskSystem(BDiskSystem *system);
-	status_t RewindDiskSystems();
+							BDiskDeviceRoster();
+							~BDiskDeviceRoster();
 
-	partition_id RegisterFileDevice(const char *filename);
-		// publishes: /dev/disk/virtual/files/<disk device ID>/raw
-	status_t UnregisterFileDevice(const char *filename);
-	status_t UnregisterFileDevice(partition_id device);
+			status_t		GetNextDevice(BDiskDevice* device);
+			status_t		RewindDevices();
 
-	bool VisitEachDevice(BDiskDeviceVisitor *visitor,
-						 BDiskDevice *device = NULL);
-	bool VisitEachPartition(BDiskDeviceVisitor *visitor,
-							BDiskDevice *device = NULL,
-							BPartition **partition = NULL);
+			status_t		GetNextDiskSystem(BDiskSystem* system);
+			status_t		RewindDiskSystems();
 
-	bool VisitEachMountedPartition(BDiskDeviceVisitor *visitor,
-								   BDiskDevice *device = NULL,
-								   BPartition **partition = NULL);
-	bool VisitEachMountablePartition(BDiskDeviceVisitor *visitor,
-									 BDiskDevice *device = NULL,
-									 BPartition **partition = NULL);
-									 
-	status_t GetDeviceWithID(partition_id id, BDiskDevice *device) const;
-	status_t GetPartitionWithID(partition_id id, BDiskDevice *device,
-								BPartition **partition) const;
+			status_t		GetDiskSystem(BDiskSystem* system, const char* name);
 
-	status_t GetDeviceForPath(const char *filename, BDiskDevice *device);
-	status_t GetPartitionForPath(const char *filename, BDiskDevice *device,
-								 BPartition **partition);
+			partition_id	RegisterFileDevice(const char* filename);
+				// publishes: /dev/disk/virtual/files/<disk device ID>/raw
+			status_t		UnregisterFileDevice(const char* filename);
+			status_t		UnregisterFileDevice(partition_id device);
 
-	status_t StartWatching(BMessenger target,
-						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
-	status_t StopWatching(BMessenger target);
+			bool			VisitEachDevice(BDiskDeviceVisitor* visitor,
+								BDiskDevice* device = NULL);
+			bool			VisitEachPartition(BDiskDeviceVisitor* visitor,
+								BDiskDevice* device = NULL,
+								BPartition** _partition = NULL);
+
+			bool			VisitEachMountedPartition(
+								BDiskDeviceVisitor* visitor,
+								BDiskDevice* device = NULL,
+								BPartition** _partition = NULL);
+			bool			VisitEachMountablePartition(
+								BDiskDeviceVisitor* visitor,
+								BDiskDevice* device = NULL,
+								BPartition** _partition = NULL);
+
+			status_t		GetDeviceWithID(partition_id id,
+								BDiskDevice* device) const;
+			status_t		GetPartitionWithID(partition_id id,
+								BDiskDevice* device,
+								BPartition** _partition) const;
+
+			status_t		GetDeviceForPath(const char* filename,
+								BDiskDevice* device);
+			status_t		GetPartitionForPath(const char* filename,
+								BDiskDevice* device, BPartition** _partition);
+
+			status_t		StartWatching(BMessenger target,
+								uint32 eventMask = B_DEVICE_REQUEST_ALL);
+			status_t		StopWatching(BMessenger target);
 
 private:
 #if 0
@@ -146,9 +152,9 @@ private:
 										BDiskScannerPartitionAddOn **addOn);
 #endif	// 0
 private:
-	int32		fDeviceCookie;
-	int32		fDiskSystemCookie;
-	int32		fJobCookie;
+	int32					fDeviceCookie;
+	int32					fDiskSystemCookie;
+	int32					fJobCookie;
 //	BDirectory	*fPartitionAddOnDir;
 //	BDirectory	*fFSAddOnDir;
 //	int32		fPartitionAddOnDirIndex;

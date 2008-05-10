@@ -232,6 +232,7 @@ struct fs_vnode_ops {
 
 typedef struct file_system_module_info {
 	struct module_info	info;
+	const char*			short_name;
 	const char*			pretty_name;
 	uint32				flags;	// DDM flags
 

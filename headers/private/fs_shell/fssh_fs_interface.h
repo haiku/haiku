@@ -266,6 +266,7 @@ struct fssh_fs_vnode_ops {
 
 typedef struct fssh_file_system_module_info {
 	struct fssh_module_info	info;
+	const char*				short_name;
 	const char*				pretty_name;
 	uint32_t				flags;	// DDM flags
 

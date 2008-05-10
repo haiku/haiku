@@ -203,6 +203,7 @@ partition_module_info gApplePartitionModule = {
 		0,
 		apple_std_ops
 	},
+	"apple",							// short_name
 	APPLE_PARTITION_NAME,				// pretty_name
 	0,									// flags
 

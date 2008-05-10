@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  */
 #ifndef _K_DISK_DEVICE_SYSTEM_H
 #define _K_DISK_DEVICE_SYSTEM_H
+
 
 #include "disk_device_manager.h"
 
@@ -33,7 +34,8 @@ public:
 			disk_system_id		ID() const;
 
 			const char*			Name() const;
-			const char*			PrettyName();
+			const char*			ShortName() const;
+			const char*			PrettyName() const;
 			uint32				Flags() const;
 
 			bool				IsFileSystem() const;
@@ -97,6 +99,7 @@ protected:
 	virtual	status_t			LoadModule();
 	virtual	void				UnloadModule();
 
+			status_t			SetShortName(const char* name);
 			status_t			SetPrettyName(const char* name);
 			void				SetFlags(uint32 flags);
 
@@ -105,6 +108,7 @@ protected:
 private:
 			disk_system_id		fID;
 			char*				fName;
+			char*				fShortName;
 			char*				fPrettyName;
 			uint32				fFlags;
 			int32				fLoadCounter;

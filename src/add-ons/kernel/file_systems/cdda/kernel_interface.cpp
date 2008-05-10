@@ -2006,7 +2006,8 @@ static file_system_module_info sCDDAFileSystem = {
 		cdda_std_ops,
 	},
 
-	"CDDA File System",
+	"cdda",					// short_name
+	"CDDA File System",		// pretty_name
 	0,	// DDM flags
 
 	cdda_identify_partition,

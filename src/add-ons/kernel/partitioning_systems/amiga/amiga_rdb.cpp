@@ -218,6 +218,7 @@ partition_module_info gAmigaPartitionModule = {
 		0,
 		amiga_rdb_std_ops
 	},
+	"amiga",							// short_name
 	AMIGA_PARTITION_NAME,				// pretty_name
 	0,									// flags
 
