@@ -11,13 +11,6 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the NetBSD
- *	Foundation, Inc. and its contributors.
- * 4. Neither the name of The NetBSD Foundation nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -411,7 +404,7 @@ auich_int(void *arg)
 	// TRACE(("auich_int(%p)\n", card));
 	
 	sta = auich_reg_read_16(&card->config, AUICH_REG_GLOB_STA);
-	if(sta & card->interrupt_mask) {
+	if (sta & card->interrupt_mask) {
 		
 		if (sta & (STA_S0RI | STA_S1RI | STA_S2RI)) {
 			// ignore and clear resume interrupt(s)
@@ -422,9 +415,9 @@ auich_int(void *arg)
 		
 		//TRACE(("interrupt !! %x\n", sta));
 		
-		LIST_FOREACH(stream, &card->streams, next) 
+		LIST_FOREACH(stream, &card->streams, next)
 			if (sta & stream->sta) {
-				sr = auich_reg_read_16(&card->config, 
+				sr = auich_reg_read_16(&card->config,
 					stream->base + GET_REG_SR(&stream->card->config));
 				sr &= SR_MASK;
 				
@@ -436,7 +429,7 @@ auich_int(void *arg)
 				if (sr & SR_BCIS) {
 					curblk = auich_stream_curaddr(stream);
 									
-					auich_reg_write_8(&card->config, stream->base + AUICH_REG_X_LVI, 
+					auich_reg_write_8(&card->config, stream->base + AUICH_REG_X_LVI,
 						(curblk + 2) % AUICH_DMALIST_MAX);
 							
 					stream->trigblk = (curblk) % stream->blkmod;
@@ -448,14 +441,14 @@ auich_int(void *arg)
 				}
 								
 				auich_reg_write_16(&card->config, 
-					stream->base + GET_REG_SR(&stream->card->config), sr);		
+					stream->base + GET_REG_SR(&stream->card->config), sr);
 			}
 	} else {
 		TRACE(("interrupt masked %x, ", card->interrupt_mask));
 		TRACE(("sta %x\n", sta));
 	}
 	
-	if(gotone)
+	if (gotone)
 		return B_INVOKE_SCHEDULER;
 
 	TRACE(("Got unhandled interrupt\n"));

@@ -33,8 +33,6 @@
 #include <MediaDefs.h>
 #include "ac97.h"
 
-#define REVERSE_EAMP_POLARITY 0
-
 #include "debug.h"
 #include "io.h"
 
@@ -277,12 +275,20 @@ void ad1981b_init(device_config *config)
 
 void default_amp_enable(device_config *config, bool yesno)
 {
+	uint32 id;
 	LOG(("default_amp_enable\n"));
 	LOG(("powerdown register was = %#04x\n",auich_codec_read(config, AC97_POWERDOWN)));
-	#if REVERSE_EAMP_POLARITY
+	id = (config->subvendor_id << 16) | config->subsystem_id;
+	if (id == 0x161f202f
+		|| id == 0x161f203a
+		|| id == 0x161f204c
+		|| id == 0x104d8144
+		|| id == 0x104d8197
+		|| id == 0x104d81c0
+		|| id == 0x104d81c5) {
 		yesno = !yesno;
 		LOG(("using reverse eamp polarity\n"));
-	#endif
+	}
 	if (yesno)
 		auich_codec_write(config, AC97_POWERDOWN, auich_codec_read(config, AC97_POWERDOWN) & ~0x8000); /* switch on (low active) */
 	else
