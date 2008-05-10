@@ -7,7 +7,6 @@ local genericSources =
 ;
 
 MergeObject posix_arch_$(TARGET_ARCH).o :
-	setjmp.S
 	sigsetjmp.S
 	siglongjmp.S
 
