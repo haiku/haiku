@@ -69,20 +69,21 @@ SetLabel(BStringView *label, const char *text)
 //	#pragma mark -
 
 
-CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
+CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask,
+		uint32 flags)
 	: BView(frame, name, resizeMask, flags | B_FRAME_EVENTS),
  	fCDQuery("freedb.freedb.org")
 {
-	SetViewColor(216,216,216);
+	SetViewColor(216, 216, 216);
 
 	fVolume = 255;
 
 	BuildGUI();
 
 	if (fCDDrive.CountDrives() < 1) {
-		BAlert *alert = new BAlert("CDPlayer", "It appears that there are no CD drives"
-									" on your computer or there is no system software"
-									" to support one. Sorry.", "OK");
+		BAlert *alert = new BAlert("CDPlayer", "It appears that there are no CD"
+			" drives on your computer or there is no system software to "
+			"support one. Sorry.", "OK");
 		alert->Go();
 		be_app->PostMessage(B_QUIT_REQUESTED);
 	}
@@ -124,7 +125,8 @@ CDPlayer::BuildGUI()
 	r.bottom = 25;
 
 	float labelWidth, labelHeight;
-	fCDTitle = new BStringView(r, "CDTitle", "CD drive is empty", B_FOLLOW_LEFT_RIGHT);
+	fCDTitle = new BStringView(r, "CDTitle", "CD drive is empty",
+		B_FOLLOW_LEFT_RIGHT);
 	fCDTitle->GetPreferredSize(&labelWidth, &labelHeight);
 	fCDTitle->ResizeTo(r.Width(), labelHeight);
 	box->AddChild(fCDTitle);
@@ -137,11 +139,13 @@ CDPlayer::BuildGUI()
 
 	r.OffsetBy(0, r.Height() + 5);
 	r.right = r.left + (r.Width() / 2);
-	fTrackTime = new BStringView(r, "TrackTime", "Track: --:-- / --:--", B_FOLLOW_LEFT_RIGHT);
+	fTrackTime = new BStringView(r, "TrackTime", "Track: --:-- / --:--",
+		B_FOLLOW_LEFT_RIGHT);
 	box->AddChild(fTrackTime);
 
 	r.OffsetTo(box->Bounds().right / 2, r.top);
-	fDiscTime = new BStringView(r, "DiscTime", "Disc: --:-- / --:--", B_FOLLOW_RIGHT);
+	fDiscTime = new BStringView(r, "DiscTime", "Disc: --:-- / --:--",
+		B_FOLLOW_RIGHT);
 	fDiscTime->ResizeToPreferred();
 	fDiscTime->ResizeBy(10, 0);
 	box->AddChild(fDiscTime);
@@ -154,7 +158,8 @@ CDPlayer::BuildGUI()
 		new BMessage(M_STOP), B_FOLLOW_BOTTOM, B_WILL_DRAW);
 	fStop->ResizeToPreferred();
 	fStop->MoveTo(10, box->Frame().bottom + 15);
-	fStop->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT, "stop_disabled"));
+	fStop->SetDisabled(BTranslationUtils::GetBitmap(B_PNG_FORMAT,
+		"stop_disabled"));
 	AddChild(fStop);
 	float stopTop = fStop->Frame().top;
 
@@ -254,7 +259,8 @@ CDPlayer::MessageReceived(BMessage *msg)
 
 		case M_STOP:
 			if (fWindowState == kPaused) {
-				fPlay->SetBitmaps(0, BTranslationUtils::GetBitmap(B_PNG_FORMAT, "play_up"),
+				fPlay->SetBitmaps(0, BTranslationUtils::GetBitmap(B_PNG_FORMAT,
+					"play_up"),
 					BTranslationUtils::GetBitmap(B_PNG_FORMAT, "play_down"));
 				fPlay->SetState(1);
 			}
@@ -268,12 +274,14 @@ CDPlayer::MessageReceived(BMessage *msg)
 			if (fWindowState == kPlaying) {
 				fWindowState = kPaused;
 				fCDDrive.Pause();
-				fPlay->SetBitmaps(0, BTranslationUtils::GetBitmap(B_PNG_FORMAT, "paused_up"),
+				fPlay->SetBitmaps(0, BTranslationUtils::GetBitmap(B_PNG_FORMAT,
+					"paused_up"),
 					BTranslationUtils::GetBitmap(B_PNG_FORMAT, "play_down"));
 			} else if (fWindowState == kPaused) {
 				fWindowState = kPlaying;
 				fCDDrive.Resume();
-				fPlay->SetBitmaps(0, BTranslationUtils::GetBitmap(B_PNG_FORMAT, "play_up"),
+				fPlay->SetBitmaps(0, BTranslationUtils::GetBitmap(B_PNG_FORMAT,
+					"play_up"),
 					BTranslationUtils::GetBitmap(B_PNG_FORMAT, "play_down"));
 			} else {
 				fWindowState = kPlaying;
@@ -447,7 +455,8 @@ CDPlayer::_WatchCDState()
 			// We have just discovered that we have no bananas
 			fWindowState = kNoCD;
 
-			// Because we are changing play states, we will need to update the GUI
+			// Because we are changing play states, we will need to update
+			// the GUI
 			fCDData.SetDiscID(-1);
 			SetLabel(fCDTitle, "CD drive is empty");
 
@@ -470,8 +479,8 @@ CDPlayer::_WatchCDState()
 		if (fWindowState == kPlaying) {
 			internalTrackChange = true;
 
-			// This means that the drive finished playing the song, so get the next one
-			// from the list and play it
+			// This means that the drive finished playing the song, so get
+			// the next one from the list and play it
 			int16 next = fPlayList.GetNextTrack();
 			if (next > 0)
 				fCDDrive.Play(next);
@@ -485,8 +494,8 @@ CDPlayer::_WatchCDState()
 	} else if (playState == kPaused)
 		fPlay->SetState(0);
 
-	// If we got this far, then there must be a CD in the drive. The next order on the agenda
-	// is to find out which CD it is
+	// If we got this far, then there must be a CD in the drive. The next order
+	// on the agenda is to find out which CD it is
 	int32 discId = fCDDrive.GetDiscID();
 	bool updateTrackGui = false;
 
@@ -498,8 +507,8 @@ CDPlayer::_WatchCDState()
 			fCDQuery.SetToCD(fCDDrive.GetDrivePath());
 
 		if (fCDQuery.Ready()) {
-			// Note that we only update the CD title for now. We still need a track number
-			// in order to update the display for the selected track
+			// Note that we only update the CD title for now. We still need a
+			// track number in order to update the display for the selected track
 			if (fCDQuery.GetData(&fCDData, 1000000)) {
 				BString display(fCDData.Artist());
 				display << " - " << fCDData.Album();
@@ -521,8 +530,9 @@ CDPlayer::_WatchCDState()
 			playlistTrack = driveTrack;
 
 			if (!internalTrackChange) {
-				// The main thing is that we need to make sure that the playlist and the drive's track
-				// stay in sync. The CD's track may have been changed by an outside source, so if
+				// The main thing is that we need to make sure that the
+				// playlist and the drive's track stay in sync. The CD's
+				// track may have been changed by an outside source, so if
 				// the drive is playing, check for playlist sync.
 				fPlayList.SetTrackCount(driveCount);
 				fPlayList.SetCurrentTrack(driveTrack);
@@ -533,16 +543,16 @@ CDPlayer::_WatchCDState()
 		if (playlistCount != driveCount) {
 			// This happens only when CDs are changed
 			if (driveCount < 0) {
-				// There is no CD in the drive. The playlist needs to have its track
-				// count set to 0 and it also needs to be rewound.
+				// There is no CD in the drive. The playlist needs to have its
+				// track count set to 0 and it also needs to be rewound.
 				fPlayList.SetStartingTrack(1);
 				fPlayList.SetTrackCount(0);
 				playlistTrack = 1;
 				playlistCount = 0;
 			} else {
-				// Two possible cases here: playlist is empty or playlist has a different
-				// number of tracks. In either case, the playlist needs to be reinitialized
-				// to the current track data
+				// Two possible cases here: playlist is empty or playlist has a
+				// different number of tracks. In either case, the playlist
+				// needs to be reinitialized to the current track data
 				fPlayList.SetStartingTrack(1);
 				fPlayList.SetTrackCount(driveCount);
 				playlistTrack = fPlayList.GetCurrentTrack();
@@ -564,7 +574,8 @@ CDPlayer::_WatchCDState()
 			if (whichTrack == 0)
 				whichTrack++;
 
-			currentTrackName << "Track " << whichTrack << ": " << fCDData.TrackAt(whichTrack - 1);
+			currentTrackName << "Track " << whichTrack << ": "
+				<< fCDData.TrackAt(whichTrack - 1);
 
 			SetLabel(fCurrentTrack, currentTrackName.String());
 
@@ -581,13 +592,15 @@ CDPlayer::_WatchCDState()
 
 	if (fCDDrive.GetTime(trackTime, discTime)) {
 		fCDDrive.GetTimeForDisc(discTotal);
-		sprintf(timeString, "Disc: %ld:%.2ld / %ld:%.2ld", discTime.GetMinutes(),
-			discTime.GetSeconds(), discTotal.GetMinutes(), discTotal.GetSeconds());
+		sprintf(timeString, "Disc: %ld:%.2ld / %ld:%.2ld",
+			discTime.GetMinutes(), discTime.GetSeconds(),
+			discTotal.GetMinutes(), discTotal.GetSeconds());
 		SetLabel(fDiscTime, timeString);
 
 		fCDDrive.GetTimeForTrack(playlistTrack, trackTotal);
-		sprintf(timeString, "Track: %ld:%.2ld / %ld:%.2ld", trackTime.GetMinutes(),
-			trackTime.GetSeconds(), trackTotal.GetMinutes(), trackTotal.GetSeconds());
+		sprintf(timeString, "Track: %ld:%.2ld / %ld:%.2ld",
+			trackTime.GetMinutes(), trackTime.GetSeconds(),
+			trackTotal.GetMinutes(), trackTotal.GetSeconds());
 		SetLabel(fTrackTime, timeString);
 	} else {
 		SetLabel(fTrackTime, "Track: --:-- / --:--");
@@ -600,8 +613,8 @@ CDPlayer::_WatchCDState()
 
 
 CDPlayerWindow::CDPlayerWindow()
-	: BWindow(BRect (100, 100, 405, 280), "CDPlayer", B_TITLED_WINDOW, B_NOT_RESIZABLE |
-		B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(BRect (100, 100, 405, 280), "CDPlayer", B_TITLED_WINDOW,
+		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 }
 
