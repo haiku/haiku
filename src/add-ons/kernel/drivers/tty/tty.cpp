@@ -135,7 +135,7 @@ class ReaderLocker : public AbstractLocker {
 		ReaderLocker(tty_cookie *cookie);
 		~ReaderLocker();
 
-		status_t AcquireReader(bigtime_t timeout);
+		status_t AcquireReader(bigtime_t timeout, size_t minBytes);
 		status_t AcquireReader(bool dontBlock);
 
 	private:
@@ -678,7 +678,7 @@ ReaderLocker::~ReaderLocker()
 
 
 status_t 
-ReaderLocker::AcquireReader(bigtime_t timeout)
+ReaderLocker::AcquireReader(bigtime_t timeout, size_t minBytes)
 {
 	if (fCookie->closed)
 		return B_FILE_ERROR;
@@ -690,7 +690,7 @@ ReaderLocker::AcquireReader(bigtime_t timeout)
 	// check, if we're first in queue, and if there is something to read
 	if (fRequestOwner.IsFirstInQueues()) {
 		fBytes = _CheckAvailableBytes();
-		if (fBytes > 0)
+		if (fBytes > minBytes)
 			return B_OK;
 	}
 
@@ -717,7 +717,7 @@ ReaderLocker::AcquireReader(bigtime_t timeout)
 status_t 
 ReaderLocker::AcquireReader(bool dontBlock)
 {
-	return AcquireReader(dontBlock ? 0 : B_INFINITE_TIMEOUT);
+	return AcquireReader(dontBlock ? 0 : B_INFINITE_TIMEOUT, 0);
 }
 
 
@@ -1500,9 +1500,11 @@ tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 	bool dontBlock = (mode & O_NONBLOCK) != 0;
 	size_t length = *_length;
 	ssize_t bytesRead = 0;
+	bool canon = true;
 	bigtime_t timeout = dontBlock ? 0 : B_INFINITE_TIMEOUT;
-	bigtime_t vtime = 0LL;
+	bigtime_t vtime = timeout;
 	size_t vmin = 0;
+	size_t minRead = 0;
 
 	TRACE(("tty_input_read(tty = %p, length = %lu, mode = %lu)\n", tty, length, mode));
 
@@ -1516,21 +1518,55 @@ tty_input_read(tty_cookie *cookie, void *buffer, size_t *_length)
 
 	ReaderLocker locker(cookie);
 
+	// handle raw mode
+	if ((!tty->is_master) && ((tty->settings->termios.c_lflag & ICANON) == 0)) {
+		canon = false;
+		vmin = tty->settings->termios.c_cc[VMIN];
+		// for now behaviour is undefined when nonblocking is enabled
+		//if (!dontBlock) // XXX does it take precedence or not ?
+		vtime = tty->settings->termios.c_cc[VTIME] * 100000LL;
+		TRACE(("tty_input_read: -icanon vmin %lu, vtime %Ldus\n", vmin, vtime));
+
+		// yes it's weird but termios is!
+		if (vmin && vtime == 0LL)
+			vtime = B_INFINITE_TIMEOUT;
+		if (!vmin)
+			timeout = vtime;
+		// timeout starts at 1st char when vmin > 0
+		// so we first wait for 1 char only
+		minRead = 0;
+	}
+
 	while (bytesRead == 0) {
-		status_t status = locker.AcquireReader(timeout);
+		TRACE(("tty_input_read: AcquireReader(%Ldus, %ld)\n", timeout, minRead));
+		status_t status = locker.AcquireReader(timeout, minRead);
+		if (status == B_WOULD_BLOCK) {
+			*_length = 0;
+			return 0;
+		}
 		if (status != B_OK) {
 			*_length = 0;
 			return status;
 		}
 
 		size_t toRead = locker.AvailableBytes();
-		if (toRead == 0)
+
+		if (toRead) {
+			// raw mode: we have something, now retry with vmin and vtime
+			minRead = MAX(vmin-1, 0);
+			timeout = vtime;
+		}
+
+		if (toRead < vmin && timeout == B_INFINITE_TIMEOUT)
 			continue;
 		if (toRead > length)
 			toRead = length;
 
 		bool _hitEOF = false;
-		bool* hitEOF = (tty->pending_eof > 0 ? &_hitEOF : NULL);
+		bool* hitEOF = NULL;
+
+		if (canon && tty->pending_eof > 0)
+			hitEOF = &_hitEOF;
 
 		bytesRead = line_buffer_user_read(tty->input_buffer, (char *)buffer,
 			toRead, tty->settings->termios.c_cc[VEOF], hitEOF);
@@ -1923,7 +1959,18 @@ dump_tty_settings(struct tty_settings& settings)
 {
 	kprintf("  pgrp_id:      %ld\n", settings.pgrp_id);
 	kprintf("  session_id:   %ld\n", settings.session_id);
-	// struct termios		termios;
+
+	kprintf("  termios:\n");
+	kprintf("    c_iflag:    0x%08lx\n", settings.termios.c_iflag);
+	kprintf("    c_oflag:    0x%08lx\n", settings.termios.c_oflag);
+	kprintf("    c_cflag:    0x%08lx\n", settings.termios.c_cflag);
+	kprintf("    c_lflag:    0x%08lx\n", settings.termios.c_lflag);
+	kprintf("    c_line:     %d\n", settings.termios.c_line);
+	kprintf("    c_ispeed:   %u\n", settings.termios.c_ispeed);
+	kprintf("    c_ospeed:   %u\n", settings.termios.c_ospeed);
+	for (int i = 0; i < NCCS; i++)
+		kprintf("    c_cc[%02d]:   %d\n", i, settings.termios.c_cc[i]);
+
 	kprintf("  wsize:        %u x %u c, %u x %u pxl\n", 
 		settings.window_size.ws_row, settings.window_size.ws_col, 
 		settings.window_size.ws_xpixel, settings.window_size.ws_ypixel);
@@ -1932,6 +1979,7 @@ dump_tty_settings(struct tty_settings& settings)
 static void
 dump_tty_struct(struct tty& tty)
 {
+	kprintf("  tty @:        %p\n", &tty);
 	kprintf("  index:        %ld\n", tty.index);
 	kprintf("  is_master:    %s\n", tty.is_master ? "true" : "false");
 	kprintf("  open_count:   %ld\n", tty.open_count);
