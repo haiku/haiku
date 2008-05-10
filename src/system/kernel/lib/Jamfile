@@ -130,7 +130,6 @@ SEARCH_SOURCE += [ FDirName $(posixSources) arch $(TARGET_ARCH) ] ;
 SEARCH_SOURCE += [ FDirName $(posixSources) string arch $(TARGET_ARCH) ] ;
 
 KernelMergeObject kernel_lib_posix_arch_$(TARGET_ARCH).o :
-	setjmp.S
 	siglongjmp.S
 	sigsetjmp.S
 	kernel_setjmp_save_sigs.c
