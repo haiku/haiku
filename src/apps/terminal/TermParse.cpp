@@ -675,6 +675,18 @@ TermParse::EscParse()
 							attr |= INVERSE;
 							break;
 
+						case 22:	/* Not Bold	*/
+							attr &= ~BOLD;
+							break;
+
+						case 24:	/* Not Underline	*/
+							attr &= ~UNDERLINE;
+							break;
+
+						case 27:	/* Not Inverse	*/
+							attr &= ~INVERSE;
+							break;
+
 						case 30:
 						case 31:
 						case 32:

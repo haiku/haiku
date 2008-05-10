@@ -33,7 +33,8 @@
 #define USE_MBCS
 #define USE_ISO2022
 
-int gUTF8GroundTable[] =	/* UTF8 coding ground table */
+// #pragma mark UTF8 coding ground table
+int gUTF8GroundTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -357,7 +358,8 @@ CASE_UTF8_3BYTE,
 CASE_UTF8_3BYTE,
 };
 
-int gCS96GroundTable[] =	/* charset 96 table */
+// #pragma mark charset 96 table
+int gCS96GroundTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -681,6 +683,7 @@ CASE_IGNORE,
 CASE_IGNORE,
 };
 
+// #pragma mark ISO8859 table
 int gISO8859GroundTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
@@ -1005,7 +1008,8 @@ CASE_PRINT_GR,
 CASE_PRINT_GR,
 };
 
-int gCsiTable[] =		/* ESC [ */
+// #pragma mark ESC [ - CSI table
+int gCsiTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -1329,7 +1333,8 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int gDecTable[] =		/* ESC [ ? */
+// #pragma mark ESC [ ? - DEC table
+int gDecTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -1670,7 +1675,8 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int gEscIgnoreTable[] =		/* CASE_ESC_IGNORE */
+// #pragma mark CASE_ESC_IGNORE table
+int gEscIgnoreTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -1995,7 +2001,8 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int gEscTable[] =		/* ESC */
+// #pragma mark ESC table
+int gEscTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -2337,7 +2344,8 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int gIesTable[] =		/* CASE_IGNORE_ESC */
+// #pragma mark CASE_IGNORE_ESC table
+int gIesTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE_STATE,
@@ -2661,7 +2669,8 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int gIgnoreTable[] =		/* CASE_IGNORE_STATE */
+// #pragma mark CASE_IGNORE_STATE table
+int gIgnoreTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -2985,7 +2994,8 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int gScrTable[] =		/* ESC # */
+// #pragma mark ESC # - SCR table
+int gScrTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -3309,7 +3319,8 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
-int gScsTable[] =		/* ESC ( etc. */
+// #pragma mark ESC ( - SCS table
+int gScsTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -3737,6 +3748,7 @@ CASE_GROUND_STATE,
 };
 
 #ifdef USE_MBCS
+// #pragma mark MBCS table
 int gMbcsTable[] = {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -4060,6 +4072,7 @@ CASE_GROUND_STATE,
 CASE_GROUND_STATE,
 };
 
+// #pragma mark SMBCS table
 int gSmbcsTable[] = {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
@@ -4385,7 +4398,8 @@ CASE_GROUND_STATE,
 
 #endif
 
-int gSJISGroundTable[] =	/* Shift-JIS ground table. */
+// #pragma mark Shift-JIS ground table
+int gSJISGroundTable[] =
 {
 /*	NUL		SOH		STX		ETX	*/
 CASE_IGNORE,
