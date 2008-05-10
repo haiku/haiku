@@ -221,6 +221,135 @@ class SelectDone : public SelectTraceEntry {
 };
 
 
+class PollTraceEntry : public AbstractTraceEntry {
+	protected:
+		PollTraceEntry(pollfd* fds, int count, bool resultEvents)
+			:
+			fEntries(NULL),
+			fCount(0)
+		{
+			if (fds != NULL && count > 0) {
+				for (int i = 0; i < count; i++) {
+					if (resultEvents ? fds[i].revents : fds[i].events)
+						fCount++;
+				}
+			}
+
+			if (fCount == 0)
+				return;
+
+			fEntries = (FDEntry*)alloc_tracing_buffer(fCount * sizeof(FDEntry));
+			if (fEntries != NULL) {
+				for (int i = 0; i < fCount; fds++) {
+					uint16 events = resultEvents ? fds->revents : fds->events;
+					if (events != 0) {
+						fEntries[i].fd = fds->fd;
+						fEntries[i].events = events;
+						i++;
+					}
+				}
+			}
+		}
+
+		void AddDump(TraceOutput& out)
+		{
+			if (fEntries == NULL)
+				return;
+
+			static const struct {
+				const char*	name;
+				uint16		event;
+			} kEventNames[] = {
+				{ "r", POLLIN },
+				{ "w", POLLOUT },
+				{ "rb", POLLRDBAND },
+				{ "wb", POLLWRBAND },
+				{ "rp", POLLPRI },
+				{ "err", POLLERR },
+				{ "hup", POLLHUP },
+				{ "inv", POLLNVAL },
+				{ NULL, 0 }
+			};
+
+			bool firstFD = true;
+			for (int i = 0; i < fCount; i++) {
+				if (firstFD) {
+					out.Print("<%u: ", fEntries[i].fd);
+					firstFD = false;
+				} else
+					out.Print(", <%u: ", fEntries[i].fd);
+
+				bool firstEvent = true;
+				for (int k = 0; kEventNames[k].name != NULL; k++) {
+					if ((fEntries[i].events & kEventNames[k].event) != 0) {
+						if (firstEvent) {	
+							out.Print("%s", kEventNames[k].name);
+							firstEvent = false;
+						} else
+							out.Print(", %s", kEventNames[k].name);
+					}
+				}
+
+				out.Print(">");
+			}
+		}
+
+	protected:
+		struct FDEntry {
+			uint16	fd;
+			uint16	events;
+		};
+
+		FDEntry*	fEntries;
+		int			fCount;
+};
+
+
+class PollBegin : public PollTraceEntry {
+	public:
+		PollBegin(pollfd* fds, int count, bigtime_t timeout)
+			:
+			PollTraceEntry(fds, count, false),
+			fTimeout(timeout)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("poll begin: ");
+			PollTraceEntry::AddDump(out);
+			out.Print(", timeout: %lld", fTimeout);
+		}
+
+	private:
+		bigtime_t	fTimeout;
+};
+
+
+class PollDone : public PollTraceEntry {
+	public:
+		PollDone(pollfd* fds, int count, int result)
+			:
+			PollTraceEntry(fds, result >= 0 ? count : 0, true),
+			fResult(result)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			if (fResult >= 0) {
+				out.Print("poll done:  count: %d: ", fResult);
+				PollTraceEntry::AddDump(out);
+			} else
+				out.Print("poll done:  error: 0x%x", fResult);
+		}
+
+	private:
+		int		fResult;
+};
+
 }	// namespace WaitForObjectsTracing
 
 #	define T(x)	new(std::nothrow) WaitForObjectsTracing::x
@@ -427,6 +556,8 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 	if (status != B_OK)
 		return status;
 
+	T(PollBegin(fds, numFDs, timeout));
+
 	// start polling file descriptors (by selecting them)
 
 	for (i = 0; i < numFDs; i++) {
@@ -483,6 +614,8 @@ common_poll(struct pollfd *fds, nfds_t numFDs, bigtime_t timeout, bool kernel)
 
 err:
 	put_select_sync(sync);
+
+	T(PollDone(fds, numFDs, count));
 
 	return count;
 }
