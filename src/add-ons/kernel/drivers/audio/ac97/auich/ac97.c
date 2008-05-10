@@ -285,7 +285,11 @@ void default_amp_enable(device_config *config, bool yesno)
 		|| id == 0x104d8144
 		|| id == 0x104d8197
 		|| id == 0x104d81c0
-		|| id == 0x104d81c5) {
+		|| id == 0x104d81c5
+		|| id == 0x103c3089
+		|| id == 0x103c309a
+		|| id == 0x10338213
+		|| id == 0x103382be) {
 		yesno = !yesno;
 		LOG(("using reverse eamp polarity\n"));
 	}
