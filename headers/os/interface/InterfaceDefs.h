@@ -62,7 +62,10 @@ enum {
 	B_PAGE_UP			= 0x0b,
 	B_PAGE_DOWN			= 0x0c,
 
-	B_FUNCTION_KEY		= 0x10
+	B_FUNCTION_KEY		= 0x10,
+	
+	B_KATAKANA_HIRAGANA	= 0xf2,
+	B_ZENKAKU_HANKAKU	= 0xf3
 };
 
 enum {
