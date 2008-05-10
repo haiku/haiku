@@ -298,7 +298,7 @@ check_pending(void)
 	if (poll(fds, 1, 0) > 0) {
 	    have_pending = TRUE;
 	}
-#elif defined(__BEOS__)
+#elif defined(__BEOS__) && !defined(__HAIKU__)
 	/*
 	 * BeOS's select() is declared in socket.h, so the configure script does
 	 * not see it.  That's just as well, since that function works only for

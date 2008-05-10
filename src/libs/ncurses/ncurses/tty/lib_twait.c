@@ -157,7 +157,7 @@ _nc_timed_wait(int mode,
 #if USE_FUNC_POLL
     struct pollfd fd_list[2];
     struct pollfd *fds = fd_list;
-#elif defined(__BEOS__)
+#elif defined(__BEOS__) && !defined(__HAIKU__)
 #elif HAVE_SELECT
     static fd_set set;
 #endif
@@ -258,7 +258,7 @@ _nc_timed_wait(int mode,
 
 #endif
 
-#elif defined(__BEOS__)
+#elif defined(__BEOS__) && !defined(__HAIKU__)
     /*
      * BeOS's select() is declared in socket.h, so the configure script does
      * not see it.  That's just as well, since that function works only for
@@ -424,7 +424,7 @@ _nc_timed_wait(int mode,
 		    result |= (1 << count);
 		}
 	    }
-#elif defined(__BEOS__)
+#elif defined(__BEOS__) && !defined(__HAIKU__)
 	    result = 1;		/* redundant, but simple */
 #elif HAVE_SELECT
 	    if ((mode & 2)
