@@ -74,7 +74,7 @@ CDPlayer::CDPlayer(BRect frame, const char *name, uint32 resizeMask,
 	: BView(frame, name, resizeMask, flags | B_FRAME_EVENTS),
  	fCDQuery("freedb.freedb.org")
 {
-	SetViewColor(216, 216, 216);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fVolume = 255;
 
@@ -139,18 +139,22 @@ CDPlayer::BuildGUI()
 
 	r.OffsetBy(0, r.Height() + 5);
 	r.right = r.left + (r.Width() / 2);
-	fTrackTime = new BStringView(r, "TrackTime", "Track: --:-- / --:--",
+	fTrackTime = new BStringView(r, "TrackTime", "Track: 88:88 / 88:88",
 		B_FOLLOW_LEFT_RIGHT);
+	fTrackTime->ResizeToPreferred();
+	fTrackTime->SetText("Track: --:-- / --:--");
 	box->AddChild(fTrackTime);
 
-	r.OffsetTo(box->Bounds().right / 2, r.top);
-	fDiscTime = new BStringView(r, "DiscTime", "Disc: --:-- / --:--",
+	r.OffsetTo(fTrackTime->Frame().right + 5, r.top);
+	fDiscTime = new BStringView(r, "DiscTime", "Disc: 88:88 / 88:88",
 		B_FOLLOW_RIGHT);
 	fDiscTime->ResizeToPreferred();
-	fDiscTime->ResizeBy(10, 0);
+	fDiscTime->SetText("Disc: --:-- / --:--");
 	box->AddChild(fDiscTime);
 
-	box->ResizeTo(fCDTitle->Frame().right + 5, fDiscTime->Frame().bottom + 10);
+	float maxWidth = max_c(fDiscTime->Frame().right, fCDTitle->Frame().right);
+
+	box->ResizeTo(maxWidth + 5, fDiscTime->Frame().bottom + 10);
 
 	fStop = new DrawButton(BRect(0, 0, 1, 1), "Stop",
 		BTranslationUtils::GetBitmap(B_PNG_FORMAT, "stop_up"),
