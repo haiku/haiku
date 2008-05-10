@@ -25,9 +25,9 @@ typedef void (*__signal_func_ptr)(int);
 #define SIG_ERR		((sighandler_t)-1)	/* an error occurred during signal processing */
 #define SIG_HOLD	((sighandler_t)3)	/* the signal was hold */
 
-// TODO: Support this structure, or more precisely the SA_SIGINFO flag. To do
-// this properly we need real-time signal support. Both are commented out for
-// the time being to not make "configure" scripts think we do support them.
+/* TODO: Support this structure, or more precisely the SA_SIGINFO flag. To do
+ * this properly we need real-time signal support. Both are commented out for
+ * the time being to not make "configure" scripts think we do support them. */
 #if 0
 typedef struct {
 	int		si_signo;	/* signal number */
@@ -61,7 +61,7 @@ struct sigaction {
 #define SA_NODEFER		0x08
 #define SA_RESTART		0x10
 #define SA_ONSTACK		0x20
-//#define SA_SIGINFO		0x40
+/* #define SA_SIGINFO		0x40 */
 #define SA_NOMASK		SA_NODEFER
 #define SA_STACK		SA_ONSTACK
 #define SA_ONESHOT		SA_RESETHAND
@@ -248,7 +248,7 @@ int		pthread_sigmask(int how, const sigset_t *set, sigset_t *oset);
 
 typedef struct vregs vregs;
 
-// include architecture specific definitions
+/* include architecture specific definitions */
 #ifdef __INTEL__
         #include <arch/x86/signal.h>
 #elif __POWERPC__

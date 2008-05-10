@@ -22,7 +22,7 @@ typedef uint32_t in_addr_t;
  * and we are not allowed to import all the BeOS types here.
  */
 #ifndef htonl
-//	extern uint32_t __swap_int32(uint32_t);	/* private */
+/*	extern uint32_t __swap_int32(uint32_t); */	/* private */
 	extern unsigned long __swap_int32(unsigned long);	/* private */
 	extern uint16_t __swap_int16(uint16_t);	/* private */
 	#if 	BYTE_ORDER == LITTLE_ENDIAN

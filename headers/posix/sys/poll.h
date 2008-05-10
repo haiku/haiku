@@ -7,7 +7,7 @@
 
 
 #include <poll.h>
-	// for compatibility with legacy applications
+	/* for compatibility with legacy applications */
 
 
 #endif	/* _SYS_POLL_H */

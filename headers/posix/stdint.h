@@ -131,7 +131,7 @@ typedef unsigned long long uintmax_t;
 
 #if !defined(__cplusplus) || defined(__STDC_CONSTANT_MACROS)
 
-// Macros of Integer Constant Expressions
+/* Macros of Integer Constant Expressions */
 #define INT8_C(value) 	value
 #define INT16_C(value) 	value
 #define INT32_C(value) 	value
@@ -142,7 +142,7 @@ typedef unsigned long long uintmax_t;
 #define UINT32_C(value) value ## U
 #define UINT64_C(value) value ## ULL
 
-// Macros for greatest-width integer constant expressions
+/* Macros for greatest-width integer constant expressions */
 #define INTMAX_C(value) 	value ## LL
 #define UINTMAX_C(value) 	value ## ULL
 

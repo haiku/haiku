@@ -17,7 +17,7 @@ struct rlimit {
 	rlim_t	rlim_max;		/* hard limit */
 };
 
-// ToDo: the only supported mode is RLIMIT_NOFILE right now
+/* ToDo: the only supported mode is RLIMIT_NOFILE right now */
 #define RLIMIT_CORE		0	/* size of the core file */
 #define RLIMIT_CPU		1	/* CPU time per team */
 #define	RLIMIT_DATA		2	/* data segment size */
@@ -62,9 +62,9 @@ extern int getrusage(int who, struct rusage *rusage);
 extern int getrlimit(int resource, struct rlimit * rlp);
 extern int setrlimit(int resource, const struct rlimit * rlp);
 
-// ToDo: The following POSIX calls are missing (in BeOS as well):
-//int getpriority(int which, id_t who);
-//int setpriority(int which, id_t who, int priority);
+/* ToDo: The following POSIX calls are missing (in BeOS as well):
+ * int getpriority(int which, id_t who);
+ * int setpriority(int which, id_t who, int priority); */
 
 #ifdef __cplusplus
 }

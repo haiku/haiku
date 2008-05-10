@@ -7,7 +7,7 @@
 
 #include <signal.h>
 
-// include architecture specific definitions
+/* include architecture specific definitions */
 #ifdef __INTEL__
 	#include <arch/x86/arch_setjmp.h>
 #elif __POWERPC__

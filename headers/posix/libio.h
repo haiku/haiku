@@ -138,7 +138,7 @@ typedef struct _IO_FILE {
 	struct _IO_FILE *_chain;
 
 	int		_fileno;
-//	int		_blksize;
+/*	int		_blksize; */
 	int		_flags2;
 	off_t	_old_offset; /* This used to be _offset but it's too small. */
 		/* -> not true on BeOS, but who cares */
@@ -151,14 +151,14 @@ typedef struct _IO_FILE {
 	_IO_lock_t *_lock;
 
 	off_t	_offset;
-//#if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T
+/* #if defined _LIBC || defined _GLIBCPP_USE_WCHAR_T */
 	/* Wide character stream stuff.  */
 	struct _IO_codecvt *_codecvt;
 	struct _IO_wide_data *_wide_data;
-//#else
-//	void	*__pad1;
-//	void	*__pad2;
-//#endif
+/* #else
+ *	void	*__pad1;
+ *	void	*__pad2;
+ * #endif */
 	int _mode;
 	/* Make sure we don't get into trouble again.  */
 	char _unused2[15 * sizeof (int) - 2 * sizeof (void *)];

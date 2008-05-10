@@ -204,8 +204,8 @@ extern imaxdiv_t	imaxdiv(intmax_t numer, intmax_t denom);
 
 extern intmax_t		strtoimax(const char *string, char **_end, int base);
 extern uintmax_t	strtoumax(const char *string, char **_end, int base);
-//extern intmax_t		wcstoimax(const __wchar_t *, __wchar_t **, int);
-//extern uintmax_t	wcstoumax(const __wchar_t *, __wchar_t **, int);
+/* extern intmax_t		wcstoimax(const __wchar_t *, __wchar_t **, int); */
+/* extern uintmax_t	wcstoumax(const __wchar_t *, __wchar_t **, int); */
 
 #ifdef __cplusplus
 }

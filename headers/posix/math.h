@@ -34,7 +34,7 @@
 #define __huge_valf_t	union { unsigned char __c[4]; long __l; float __f; }
 #define HUGE_VALF		(((__huge_valf_t) { __l: __HUGE_VALF_v }).__f)
 
-// ToDo: define HUGE_VALL for long doubles
+/* ToDo: define HUGE_VALL for long doubles */
 
 #define __NAN_VALF_v	0x7fc00000L
 #define NAN				(((__huge_valf_t) { __l: __NAN_VALF_v }).__f)
@@ -146,7 +146,7 @@ extern double	trunc(double x);
 extern long double	roundl(long double x);
 extern long		lroundl(long double x);
 
-// TODO: add and fix those!
+/* TODO: add and fix those! */
 extern /*long*/ double	lgamma(/*long*/ double x);
 
 /* some BSD non-ANSI or POSIX math functions */

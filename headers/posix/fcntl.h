@@ -53,7 +53,7 @@
 #define O_RSYNC			0x00020000	/* read synchronized I/O file integrity */
 #define O_DSYNC			0x00040000	/* write synchronized I/O data integrity */
 
-// TODO: currently not implemented additions:
+/* TODO: currently not implemented additions: */
 #define O_NOFOLLOW		0x00080000
 	/* should we implement this? it's similar to O_NOTRAVERSE but will fail on symlinks */
 #define O_NOCACHE		0x00100000	/* doesn't use the file system cache if possible */

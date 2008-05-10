@@ -49,4 +49,4 @@ extern int fgetspent_r(FILE* file, struct spwd* spwd, char* buffer,
 #endif
 
 
-#endif	// _SHADOW_H_
+#endif	/* _SHADOW_H_ */

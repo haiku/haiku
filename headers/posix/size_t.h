@@ -7,7 +7,7 @@
 
 #include <stddef.h>
 
-// TODO: ATM gcc's stddef.h defines ssize_t for BeOS.h. We should fix this.
-//typedef long signed int		ssize_t;
+/* TODO: ATM gcc's stddef.h defines ssize_t for BeOS.h. We should fix this.
+ * typedef long signed int		ssize_t; */
 
 #endif /* _SIZE_T_H_ */

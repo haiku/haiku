@@ -72,7 +72,7 @@ enum pthread_process_shared {
 #define PTHREAD_PRIO_INHERIT		1
 #define PTHREAD_PRIO_PROTECT		2
 
-//extern pthread_mutexattr_t pthread_mutexattr_default;
+/* extern pthread_mutexattr_t pthread_mutexattr_default; */
 
 /* private structure */
 struct __pthread_cleanup_handler {
@@ -176,13 +176,13 @@ extern int pthread_attr_setstacksize(pthread_attr_t *attr, size_t stacksize);
 
 #if 0	/* Unimplemented attribute functions: */
 
-// mandatory!
+/* mandatory! */
 extern int pthread_attr_getschedparam(const pthread_attr_t *attr,
 	struct sched_param *param);
 extern int pthread_attr_setschedparam(pthread_attr_t *attr,
 	const struct sched_param *param);
 
-// [TPS]
+/* [TPS] */
 extern int pthread_attr_getinheritsched(const pthread_attr_t *attr,
 	int *inheritsched);
 extern int pthread_attr_setinheritsched(pthread_attr_t *attr, int inheritsched);
@@ -194,17 +194,17 @@ extern int pthread_attr_getscope(const pthread_attr_t *attr,
 	int *contentionscope);
 extern int pthread_attr_setscope(pthread_attr_t *attr, int contentionscope);
 
-// [XSI]
+/* [XSI] */
 extern int pthread_attr_getguardsize(const pthread_attr_t *attr,
 	size_t *guardsize);
 extern int pthread_attr_setguardsize(pthread_attr_t *attr, size_t guardsize);
 
-// [TSA]
+/* [TSA] */
 extern int pthread_attr_getstackaddr(const pthread_attr_t *attr,
 	void **stackaddr);
 extern int pthread_attr_setstackaddr(pthread_attr_t *attr, void *stackaddr);
 
-// [TSA TSS]
+/* [TSA TSS] */
 extern int pthread_attr_getstack(const pthread_attr_t *attr,
 	void **stackaddr, size_t *stacksize);
 extern int pthread_attr_setstack(pthread_attr_t *attr, void *stackaddr, size_t stacksize);

@@ -4,11 +4,11 @@
 #ifndef _STDIO_POST_H_
 #define _STDIO_POST_H_
 
-// "Private"/inline functions of our BeOS compatible stdio implementation
+/* "Private"/inline functions of our BeOS compatible stdio implementation */
 
-// ToDo: this is a work in progress to make our stdio
-//		BeOS' GNU/libio (almost) binary compatible
-//		We may not yet be compatible!
+/* ToDo: this is a work in progress to make our stdio
+ *		BeOS' GNU/libio (almost) binary compatible
+ *		We may not yet be compatible! */
 
 #ifndef _STDIO_H_
 #	error "This file must be included from stdio.h!"
@@ -19,9 +19,9 @@ extern "C" {
 #endif
 
 extern char _single_threaded;
-	// this boolean value is true (1) if there is only the main thread
-	// running - as soon as you spawn the first thread, it's set to
-	// false (0)
+	/* this boolean value is true (1) if there is only the main thread
+	 * running - as soon as you spawn the first thread, it's set to
+	 * false (0) */
 
 #ifdef __cplusplus
 }

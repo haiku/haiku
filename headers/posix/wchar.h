@@ -10,8 +10,8 @@
 #include <stddef.h>
 #include <stdio.h>
 
-// stddef.h is not supposed to define wint_t, but gcc 2.95.3's one does.
-// In all other cases we will do that.
+/* stddef.h is not supposed to define wint_t, but gcc 2.95.3's one does.
+ * In all other cases we will do that. */
 #ifndef _WINT_T
 #define _WINT_T
 
@@ -21,7 +21,7 @@
 
 typedef __WINT_TYPE__ wint_t;
 
-#endif	// _WINT_T
+#endif	/* _WINT_T */
 
 typedef int wctype_t;
 

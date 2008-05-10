@@ -20,8 +20,8 @@
 #define RTF_BLACKHOLE	0x00001000
 #define RTF_LOCAL		0x00200000
 
-// This structure is used to pass routes to and from the network stack
-// (via struct ifreq)
+/* This structure is used to pass routes to and from the network stack
+ * (via struct ifreq) */
 
 struct route_entry {
 	struct sockaddr	*destination;

@@ -1,6 +1,6 @@
 #ifndef _LIBC_LIMITS_H_
 #define _LIBC_LIMITS_H_
-	// Note: The header guard is checked in gcc's limits.h.
+	/* Note: The header guard is checked in gcc's limits.h. */
 
 #include <float.h>		/* for DBL_DIG, FLT_DIG, etc */
 

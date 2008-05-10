@@ -10,8 +10,8 @@
 #include <stdarg.h>
 
 
-// Dodge gcc 2.95.3's fixincludes hack stdio_va_list by including this string:
-// __gnuc_va_list
+/* Dodge gcc 2.95.3's fixincludes hack stdio_va_list by including this string:
+ * __gnuc_va_list */
 
 
 #define BUFSIZ			1024

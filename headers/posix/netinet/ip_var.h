@@ -138,7 +138,7 @@ struct  ipstat {
         int32_t  ips_outhwcsum;          /* hardware checksummed on output */
 };
 
-//#ifdef _KERNEL_MODE
+/* #ifdef _KERNEL_MODE */
 
 #define IP_FORWARDING			0x1				/* most of ip header exists */
 #define IP_ALLOWBROADCAST		SO_BROADCAST	/* can send broadcast packets */
@@ -147,7 +147,7 @@ struct  ipstat {
 #define IP_MTUDISC				0x10			/* pmtu discovery, set DF */
 
 #if 0
-//struct ipstat ipstat;
+/* struct ipstat ipstat; */
 
 void  ipv4_input(struct mbuf *, int);
 int   ipv4_output(struct mbuf *, struct mbuf *, struct route *, int, void *);

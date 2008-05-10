@@ -208,7 +208,7 @@ extern void 	swab(const void *src, void *dest, ssize_t nbytes);
 extern char *optarg;
 extern int optind, opterr, optopt;
 
-// ToDo: should be moved to stdlib.h
+/* ToDo: should be moved to stdlib.h */
 extern char **environ;
 
 #ifdef __cplusplus

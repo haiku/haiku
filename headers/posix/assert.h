@@ -7,7 +7,7 @@
 #undef assert
 
 #ifndef NDEBUG
-	// defining NDEBUG disables assert() functionality
+	/* defining NDEBUG disables assert() functionality */
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,8 +26,8 @@ extern void __assert_perror_fail(int error, const char *file,
 #define assert(assertion) \
 	((assertion) ? (void)0 : __assert_fail(#assertion, __FILE__, __LINE__, __PRETTY_FUNCTION__))
 
-#else	// NDEBUG
-#	define assert(condition) ;
+#else	/* NDEBUG */
+#	define assert(condition) ((void)0)
 #endif
 
 #endif	/* _ASSERT_H_ */
