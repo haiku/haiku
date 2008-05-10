@@ -516,7 +516,7 @@ AboutView::AboutView(const BRect &rect)
 		"released under the GPL and LGPL licences:\n"
 		"GNU C Library, "
 		"GNU coretools, diffutils, findutils, "
-		"shareutils, gawk, bison, m4, make, "
+		"sharutils, gawk, bison, m4, make, "
 		"gdb, wget, ncurses, termcap, "
 		"Bourne Again Shell.\n"
 		"Copyright " B_UTF8_COPYRIGHT " The Free Software Foundation.",
