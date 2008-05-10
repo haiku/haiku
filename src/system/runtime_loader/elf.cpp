@@ -82,15 +82,13 @@ static image_queue_t sDisposableImages = {0, 0};
 static uint32 sLoadedImageCount = 0;
 static image_t *sProgramImage;
 static KMessage sErrorMessage;
+static bool sProgramLoaded = false;
 
 // a recursive lock
 static sem_id rld_sem;
 static thread_id rld_sem_owner;
 static int32 rld_sem_count;
 
-
-#ifdef TRACE_RLD
-#	define FATAL(x...) dprintf("runtime_loader: " x);
 
 void
 dprintf(const char *format, ...)
@@ -105,9 +103,13 @@ dprintf(const char *format, ...)
 
 	va_end(list);
 }
-#else
-#	define FATAL(x...) printf("runtime_loader: " x);
-#endif
+
+#define FATAL(x...)							\
+	do {									\
+		dprintf("runtime_loader: " x);		\
+		if (!sProgramLoaded)				\
+			printf("runtime_loader: " x);	\
+	} while (false)
 
 
 /*!	Mini atoi(), so we don't have to include the libroot dependencies.
@@ -1606,6 +1608,8 @@ load_program(char const *path, void **_entry)
 	*_entry = (void *)(sProgramImage->entry_point);
 
 	rld_unlock();
+
+	sProgramLoaded = true;
 
 	KTRACE("rld: load_program(\"%s\") done: entry: %p, id: %ld", path,
 		*_entry, sProgramImage->id);
