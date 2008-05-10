@@ -21,8 +21,8 @@ FUNCTION(_longjmp):
 
 	/* If value is 0, setjmp() must return 1. */
 	test	%eax, %eax
-	mov		$1, %eax
 	jnz		1f
+	mov		$1, %eax
 1:
 
 	// restore registers
