@@ -27,6 +27,7 @@
 #include <OS.h>
 #include <StorageDefs.h>
 
+#include <AutoDeleter.h>
 #include <block_cache.h>
 #include <boot/kernel_args.h>
 #include <disk_device_manager/KDiskDevice.h>
@@ -151,6 +152,21 @@ struct advisory_locking {
 	sem_id			lock;
 	sem_id			wait_sem;
 	LockList		locks;
+
+	advisory_locking()
+		:
+		lock(-1),
+		wait_sem(-1)
+	{
+	}
+
+	~advisory_locking()
+	{
+		if (lock >= 0)
+			delete_sem(lock);
+		if (wait_sem >= 0)
+			delete_sem(wait_sem);
+	}
 };
 
 static mutex sFileSystemsMutex;
@@ -189,7 +205,7 @@ static mutex sVnodeCoveredByMutex;
 
 /*!	\brief Guards sVnodeTable.
 
-	The holder is allowed to read/write access sVnodeTable and to
+	The holder is allowed read/write access to sVnodeTable and to
 	any unbusy vnode in that table, save to the immutable fields (device, id,
 	private_node, mount) to which
 	only read-only access is allowed, and to the field covered_by, which is
@@ -1122,42 +1138,38 @@ create_advisory_locking(struct vnode *vnode)
 	if (vnode == NULL)
 		return B_FILE_ERROR;
 
-	struct advisory_locking *locking = new(std::nothrow) advisory_locking;
-	if (locking == NULL)
-		return B_NO_MEMORY;
+	ObjectDeleter<advisory_locking> lockingDeleter;
+	struct advisory_locking *locking = NULL;
 
-	status_t status;
+	while (get_advisory_locking(vnode) == NULL) {
+		// no locking object set on the vnode yet, create one
+		if (locking == NULL) {
+			locking = new(std::nothrow) advisory_locking;
+			if (locking == NULL)
+				return B_NO_MEMORY;
+			lockingDeleter.SetTo(locking);
 
-	locking->wait_sem = create_sem(0, "advisory lock");
-	if (locking->wait_sem < B_OK) {
-		status = locking->wait_sem;
-		goto err1;
-	}
+			locking->wait_sem = create_sem(0, "advisory lock");
+			if (locking->wait_sem < B_OK)
+				return locking->wait_sem;
 
-	locking->lock = create_sem(0, "advisory locking");
-	if (locking->lock < B_OK) {
-		status = locking->lock;
-		goto err2;
-	}
+			locking->lock = create_sem(0, "advisory locking");
+			if (locking->lock < B_OK)
+				return locking->lock;
+		}
 
-	// We need to set the locking structure atomically - someone
-	// else might set one at the same time
-	do {
-		if (atomic_pointer_test_and_set(&vnode->advisory_locking, locking,
-				(advisory_locking*)NULL) == NULL)
+		// set our newly created locking object
+		MutexLocker _(sVnodeMutex);
+		if (vnode->advisory_locking == NULL) {
+			vnode->advisory_locking = locking;
+			lockingDeleter.Detach();
 			return B_OK;
-	} while (get_advisory_locking(vnode) == NULL);
+		}
+	}
 
-	status = B_OK;
-		// we delete the one we've just created, but nevertheless, the vnode
-		// does have a locking structure now
+	// The vnode already had a locking object. That's just as well.
 
-	delete_sem(locking->lock);
-err2:
-	delete_sem(locking->wait_sem);
-err1:
-	delete locking;
-	return status;
+	return B_OK;
 }
 
 
@@ -1287,9 +1299,12 @@ release_advisory_lock(struct vnode *vnode, struct flock *flock)
 		// longer used
 		locking = get_advisory_locking(vnode);
 		if (locking != NULL) {
+			MutexLocker locker(sVnodeMutex);
+
 			// the locking could have been changed in the mean time
 			if (locking->locks.IsEmpty()) {
 				vnode->advisory_locking = NULL;
+				locker.Unlock();
 
 				// we've detached the locking from the vnode, so we can
 				// safely delete it
@@ -1298,6 +1313,7 @@ release_advisory_lock(struct vnode *vnode, struct flock *flock)
 				delete locking;
 			} else {
 				// the locking is in use again
+				locker.Unlock();
 				release_sem_etc(locking->lock, 1, B_DO_NOT_RESCHEDULE);
 			}
 		}
@@ -1328,19 +1344,25 @@ acquire_advisory_lock(struct vnode *vnode, pid_t session, struct flock *flock,
 
 	// TODO: do deadlock detection!
 
-restart:
-	// if this vnode has an advisory_locking structure attached,
-	// lock that one and search for any colliding file lock
-	struct advisory_locking *locking = get_advisory_locking(vnode);
-	team_id team = team_get_current_team_id();
-	sem_id waitForLock = -1;
+	struct advisory_locking *locking;
+	sem_id waitForLock;
 
-	if (locking != NULL) {
+	while (true) {
+		// if this vnode has an advisory_locking structure attached,
+		// lock that one and search for any colliding file lock
+		status = create_advisory_locking(vnode);
+		if (status != B_OK)
+			return status;
+
+		locking = vnode->advisory_locking;
+		team_id team = team_get_current_team_id();
+		waitForLock = -1;
+
 		// test for collisions
 		LockList::Iterator iterator = locking->locks.GetIterator();
 		while (iterator.HasNext()) {
 			struct advisory_lock *lock = iterator.Next();
-
+	
 			// TODO: locks from the same team might be joinable!
 			if (lock->team != team && advisory_lock_intersects(lock, flock)) {
 				// locks do overlap
@@ -1352,40 +1374,26 @@ restart:
 			}
 		}
 
-		if (waitForLock < B_OK || !wait)
+		if (waitForLock < 0)
+			break;
+
+		// We need to wait. Do that or fail now, if we've been asked not to.
+
+		if (!wait) {
 			put_advisory_locking(locking);
-	}
-
-	// wait for the lock if we have to, or else return immediately
-
-	if (waitForLock >= B_OK) {
-		if (!wait)
-			status = session != -1 ? B_WOULD_BLOCK : B_PERMISSION_DENIED;
-		else {
-			status = switch_sem_etc(locking->lock, waitForLock, 1,
-				B_CAN_INTERRUPT, 0);
-			if (status == B_OK) {
-				// see if we're still colliding
-				goto restart;
-			}
+			return session != -1 ? B_WOULD_BLOCK : B_PERMISSION_DENIED;
 		}
-	}
 
-	if (status < B_OK)
-		return status;
-
-	// install new lock
-
-	locking = get_advisory_locking(vnode);
-	if (locking == NULL) {
-		// we need to create a new locking object
-		status = create_advisory_locking(vnode);
-		if (status < B_OK)
+		status = switch_sem_etc(locking->lock, waitForLock, 1,
+			B_CAN_INTERRUPT, 0);
+		if (status != B_OK && status != B_BAD_SEM_ID)
 			return status;
 
-		locking = vnode->advisory_locking;
-			// we own the locking object, so it can't go away
+		// We have been notified, but we need to re-lock the locking object. So
+		// go another round...
 	}
+
+	// install new lock
 
 	struct advisory_lock *lock = (struct advisory_lock *)malloc(
 		sizeof(struct advisory_lock));
