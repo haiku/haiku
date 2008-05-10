@@ -40,3 +40,12 @@ FUNCTION(sigsetjmp):
 	stw		%r0, JMP_REGS_CR(3)
 
 	b		__setjmp_save_sigs
+
+
+/* int setjmp(jmp_buf buffer) */
+FUNCTION(setjmp):
+	// call __sigsetjmp with saveMask = 0
+	addi	%r4, 0, 0
+	b		__sigsetjmp
+
+#pragma weak _setjmp=setjmp
