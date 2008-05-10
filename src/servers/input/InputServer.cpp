@@ -1527,8 +1527,8 @@ InputServer::_SanitizeEvents(EventList& events)
 
 				int8 byte = 0;
 				event->FindInt8("byte", &byte);
-				if ((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 
-					&& (byte == ' ' || static_cast<uint8>(byte) == B_ZENKAKU_HANKAKU)) {
+				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
+					|| static_cast<uint8>(byte) == B_ZENKAKU_HANKAKU) {
 					SetNextMethod(!fKeyInfo.modifiers & B_SHIFT_KEY);
 
 					// this event isn't sent to the user
