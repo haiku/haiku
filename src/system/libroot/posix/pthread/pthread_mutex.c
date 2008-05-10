@@ -147,7 +147,9 @@ mutex_lock(pthread_mutex *mutex, bigtime_t timeout)
 	if (!mutex->attr.process_shared || atomic_add(&mutex->count, 1) > 0) {
 		// this mutex is already locked by someone else, so we need
 		// to wait
-		status = acquire_sem_etc(mutex->sem, 1, timeout == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_TIMEOUT, timeout);
+		status = acquire_sem_etc(mutex->sem, 1,
+			timeout == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_REAL_TIME_TIMEOUT,
+			timeout);
 	}
 
 	if (status == B_OK) {

@@ -108,7 +108,8 @@ cond_wait(pthread_cond *cond, pthread_mutex_t *_mutex, bigtime_t timeout)
 
 	do {
 		status = acquire_sem_etc(cond->sem, 1,
-			timeout == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_TIMEOUT, timeout);
+			timeout == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_REAL_TIME_TIMEOUT,
+			timeout);
 	} while (status == B_OK && atomic_get(&cond->event_counter) == event);
 
 	pthread_mutex_lock(_mutex);

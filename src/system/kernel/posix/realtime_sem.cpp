@@ -15,7 +15,6 @@
 #include <fs/KPath.h>
 #include <kernel.h>
 #include <lock.h>
-#include <real_time_clock.h>
 #include <syscall_restart.h>
 #include <team.h>
 #include <thread.h>
@@ -740,9 +739,8 @@ struct realtime_sem_context {
 		} else if (timeout == B_INFINITE_TIMEOUT) {
 			error = acquire_sem_etc(id, 1, B_CAN_INTERRUPT, 0);
 		} else {
-			error = acquire_sem_etc(id, 1, B_CAN_INTERRUPT | B_ABSOLUTE_TIMEOUT,
-				timeout - rtc_boot_time());
-					// The given absolute timeout is relative to the Epoch.
+			error = acquire_sem_etc(id, 1,
+				B_CAN_INTERRUPT | B_ABSOLUTE_REAL_TIME_TIMEOUT, timeout);
 		}
 
 		return error == B_BAD_SEM_ID ? B_BAD_VALUE : error;
