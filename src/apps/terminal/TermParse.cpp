@@ -281,12 +281,48 @@ TermParse::PtyReader()
 }
 
 
+void
+TermParse::DumpState(int *groundtable, int *parsestate, uchar c)
+{
+	static const struct {
+		int *p;
+		const char *name;
+	} tables[] = {
+#define T(t) \
+	{ t, #t }
+	T(gUTF8GroundTable),
+	T(gCS96GroundTable),
+	T(gISO8859GroundTable),
+	T(gSJISGroundTable),
+	T(gEscTable),
+	T(gCsiTable),
+	T(gDecTable),
+	T(gScrTable),
+	T(gIgnoreTable),
+	T(gIesTable),
+	T(gEscIgnoreTable),
+	T(gMbcsTable),
+	{ NULL, NULL }
+	};
+	int i;
+	fprintf(stderr, "groundtable: ");
+	for (i = 0; tables[i].p; i++)
+		if (tables[i].p == groundtable)
+			fprintf(stderr, "%s\t", tables[i].name);
+	fprintf(stderr, "parsestate: ");
+	for (i = 0; tables[i].p; i++)
+		if (tables[i].p == parsestate)
+			fprintf(stderr, "%s\t", tables[i].name);
+	fprintf(stderr, "char: 0x%02x (%d)\n", c, c);
+}
+
+
 int32
 TermParse::EscParse()
 {
 	int tmp;
 	int top, bot;
-	int cs96;
+	int cs96 = 0;
 	uchar curess = 0;
 	
 	uchar cbuf[4], dstbuf[4];
@@ -309,6 +345,8 @@ TermParse::EscParse()
 		uchar c;
 		if (GetReaderBuf(c) < B_OK)
 			break;
+
+		//DumpState(groundtable, parsestate, c);
 
 		if (now_coding != fView->Encoding()) {
 			/*

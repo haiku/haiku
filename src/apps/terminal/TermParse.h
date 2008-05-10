@@ -60,6 +60,8 @@ private:
 	int32 EscParse();
 	int32 PtyReader();
 
+	void DumpState(int *groundtable, int *parsestate, uchar c);
+
 	static int32 _ptyreader_thread(void *);
 	static int32 _escparse_thread(void *);
 
