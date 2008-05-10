@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -42,11 +42,13 @@ SudokuView::SudokuView(BRect frame, const char* name,
 {
 	InitObject(&settings);
 
+#if 0
 	BRect rect(Bounds());
 	rect.top = rect.bottom - 7;
 	rect.left = rect.right - 7;
-	BDragger *dw = new BDragger(rect, this);
-	AddChild(dw);
+	BDragger* dragger = new BDragger(rect, this);
+	AddChild(dragger);
+#endif
 }
 
 
@@ -254,40 +256,35 @@ SudokuView::SetTo(SudokuField* field)
 
 
 status_t
-SudokuView::SaveTo(entry_ref& ref, uint32 as)
+SudokuView::SaveTo(entry_ref& ref, uint32 exportAs)
 {
 	BFile file;
-
 	status_t status = file.SetTo(&ref, B_WRITE_ONLY | B_CREATE_FILE
 		| B_ERASE_FILE);
 	if (status < B_OK)
 		return status;
 
-	status = SaveTo(file, as);
-	
-	return status;
+	return SaveTo(file, exportAs);
 }
 
 
 status_t
-SudokuView::SaveTo(BDataIO &stream, uint32 as)
+SudokuView::SaveTo(BDataIO& stream, uint32 exportAs)
 {
-	BString text;
-	BFile *file = dynamic_cast<BFile *>(&stream);
-	char *line;
+	BFile* file = dynamic_cast<BFile*>(&stream);
 	uint32 i = 0;
-	status_t status = EINVAL;
 	BNodeInfo nodeInfo;
 
 	if (file)
 		nodeInfo.SetTo(file);
 
-	switch (as) {
+	switch (exportAs) {
 		case kExportAsText:
-			text = "# Written by Sudoku\n\n";
+		{
+			BString text = "# Written by Sudoku\n\n";
 			stream.Write(text.String(), text.Length());
 
-			line = text.LockBuffer(1024);
+			char* line = text.LockBuffer(1024);
 			memset(line, 0, 1024);
 			for (uint32 y = 0; y < fField->Size(); y++) {
 				for (uint32 x = 0; x < fField->Size(); x++) {
@@ -303,36 +300,49 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 			if (file)
 				nodeInfo.SetType("text/plain");
 			return B_OK;
+		}
+
 		case kExportAsHTML:
 		{
 			bool netPositiveFriendly = false;
-			text = "<html>\n<head>\n<!-- Written by Sudoku -->\n"
+			BString text = "<html>\n<head>\n<!-- Written by Sudoku -->\n"
 				"<style type=\"text/css\">\n"
-				"table.sudoku { background: #000000; border:0; border-collapse: collapse; cellpadding: 10px; cellspacing: 10px; width: 300px; height: 300px; }\n"
-				"td.sudoku { background: #ffffff; border-color: black; border-left: none ; border-top: none ; /*border: none;*/ text-align: center; }\n"
+				"table.sudoku { background: #000000; border:0; border-collapse: "
+					"collapse; cellpadding: 10px; cellspacing: 10px; width: "
+					"300px; height: 300px; }\n"
+				"td.sudoku { background: #ffffff; border-color: black; "
+					"border-left: none ; border-top: none ; /*border: none;*/ "
+					"text-align: center; }\n"
 				"td.sudoku_initial {  }\n"
 				"td.sudoku_filled { color: blue; }\n"
-				"td.sudoku_empty {  }\n"
-				// border styles: right bottom (none, solid or large)
-#define BS_N "none"
-#define BS_S "solid 1px black"
-#define BS_L "solid 3px black"
-				"td.sudoku_nn { border-right: " BS_N "; border-bottom: " BS_N "; }\n"
-				"td.sudoku_sn { border-right: " BS_S "; border-bottom: " BS_N "; }\n"
-				"td.sudoku_ns { border-right: " BS_N "; border-bottom: " BS_S "; }\n"
-				"td.sudoku_ss { border-right: " BS_S "; border-bottom: " BS_S "; }\n"
-				"td.sudoku_nl { border-right: " BS_N "; border-bottom: " BS_L "; }\n"
-				"td.sudoku_sl { border-right: " BS_S "; border-bottom: " BS_L "; }\n"
-				"td.sudoku_ln { border-right: " BS_L "; border-bottom: " BS_N "; }\n"
-				"td.sudoku_ls { border-right: " BS_L "; border-bottom: " BS_S "; }\n"
-				"td.sudoku_ll { border-right: " BS_L "; border-bottom: " BS_L "; }\n"
-				"</style>\n"
+				"td.sudoku_empty {  }\n";
+
+			// border styles: right bottom (none, small or large)
+			const char* kStyles[] = {"none", "small", "large"};
+			const char* kCssStyles[] = {"none", "solid 1px black",
+				"solid 3px black"};
+			enum style_type { kNone = 0, kSmall, kLarge };
+
+			for (int32 right = 0; right < 3; right++) {
+				for (int32 bottom = 0; bottom < 3; bottom++) {
+					text << "td.sudoku_";
+					if (right != bottom)
+						text << kStyles[right] << "_" << kStyles[bottom];
+					else
+						text << kStyles[right];
+
+					text << " { border-right: " << kCssStyles[right]
+						<< "; border-bottom: " << kCssStyles[bottom] << "; }\n";
+				}
+			}
+
+			text << "</style>\n"
 				"</head>\n<body>\n\n";
 			stream.Write(text.String(), text.Length());
 
 			text = "<table";
 			if (netPositiveFriendly)
-			text << " border=\"1\"";
+				text << " border=\"1\"";
 			text << " class=\"sudoku\">";
 			stream.Write(text.String(), text.Length());
 
@@ -345,24 +355,31 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 					char buff[2];
 					_SetText(buff, fField->ValueAt(x, y));
 
-					char border_right = 's';
-					char border_bottom = 's';
-					if ((x+1) % fField->BlockSize() == 0)
-						border_right = 'l';
-					if ((y+1) % fField->BlockSize() == 0)
-						border_bottom = 'l';
+					BString style = "sudoku_";
+					style_type right = kSmall;
+					style_type bottom = kSmall;
+					if ((x + 1) % fField->BlockSize() == 0)
+						right = kLarge;
+					if ((y + 1) % fField->BlockSize() == 0)
+						bottom = kLarge;
 					if (x == fField->Size() - 1)
-						border_right = 'n';
+						right = kNone;
 					if (y == fField->Size() - 1)
-						border_bottom = 'n';
+						bottom = kNone;
+
+					if (right != bottom)
+						style << kStyles[right] << "_" << kStyles[bottom];
+					else
+						style << kStyles[right];
 
 					if (fField->ValueAt(x, y) == 0) {
 						text << "<td width=\"" << divider << "\" ";
-						text << "class=\"sudoku sudoku_empty sudoku_" << border_right << border_bottom << "\">\n";
-						text << "&nbsp;";
+						text << "class=\"sudoku sudoku_empty " << style;
+						text << "\">\n&nbsp;";
 					} else if (fField->FlagsAt(x, y) & kInitialValue) {
 						text << "<td width=\"" << divider << "\" ";
-						text << "class=\"sudoku sudoku_initial sudoku_" << border_right << border_bottom << "\">\n";
+						text << "class=\"sudoku sudoku_initial " << style
+							<< "\">\n";
 						if (netPositiveFriendly)
 							text << "<font color=\"#000000\">";
 						text << buff;
@@ -370,7 +387,8 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 							text << "</font>";
 					} else {
 						text << "<td width=\"" << divider << "\" ";
-						text << "class=\"sudoku sudoku_filled sudoku_" << border_right << border_bottom << "\">\n";
+						text << "class=\"sudoku sudoku_filled sudoku_" << style
+							<< "\">\n";
 						if (netPositiveFriendly)
 							text << "<font color=\"#0000ff\">";
 						text << buff;
@@ -390,50 +408,61 @@ SudokuView::SaveTo(BDataIO &stream, uint32 as)
 				nodeInfo.SetType("text/html");
 			return B_OK;
 		}
+
 		case kExportAsBitmap:
 		{
-			BMallocIO mio;
-			status = SaveTo(mio, kExportAsPicture);
+			BMallocIO mallocIO;
+			status_t status = SaveTo(mallocIO, kExportAsPicture);
 			if (status < B_OK)
 				return status;
-			mio.Seek(0LL, SEEK_SET);
+
+			mallocIO.Seek(0LL, SEEK_SET);
 			BPicture picture;
-			status = picture.Unflatten(&mio);
+			status = picture.Unflatten(&mallocIO);
 			if (status < B_OK)
 				return status;
-			BBitmap *bitmap = new BBitmap(Bounds(), B_BITMAP_ACCEPTS_VIEWS, B_RGB32);
-			BView *view = new BView(Bounds(), "bitmap", B_FOLLOW_NONE, B_WILL_DRAW);
+
+			BBitmap* bitmap = new BBitmap(Bounds(), B_BITMAP_ACCEPTS_VIEWS,
+				B_RGB32);
+			BView* view = new BView(Bounds(), "bitmap", B_FOLLOW_NONE,
+				B_WILL_DRAW);
 			bitmap->AddChild(view);
+
 			if (bitmap->Lock()) {
 				view->DrawPicture(&picture);
 				view->Sync();
+
 				view->RemoveSelf();
 				delete view;
+					// it should not become part of the archive
 				bitmap->Unlock();
 			}
-			BMessage msg((uint32)B_OK);
-			status = bitmap->Archive(&msg);
-			if (status >= B_OK) {
-				status = msg.Flatten(&stream);
-			}
+
+			BMessage archive;
+			status = bitmap->Archive(&archive);
+			if (status >= B_OK)
+				status = archive.Flatten(&stream);
+
 			delete bitmap;
 			return status;
 		}
+
 		case kExportAsPicture:
 		{
 			BPicture picture;
 			BeginPicture(&picture);
 			Draw(Bounds());
-			if (EndPicture()) {
+
+			status_t status = B_ERROR;
+			if (EndPicture())
 				status = picture.Flatten(&stream);
-			}
+
 			return status;
 		}
+
 		default:
-			return EINVAL;
+			return B_BAD_VALUE;
 	}
-	
-	return status;
 }
 
 
