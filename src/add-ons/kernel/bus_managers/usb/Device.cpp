@@ -370,7 +370,7 @@ Device::SetConfigurationAt(uint8 index)
 	fCurrentConfiguration = &fConfigurations[index];
 
 	// Initialize all the endpoints that are now active
-	InitEndpoints();
+	InitEndpoints(-1);
 
 	// Wait some for the configuration being finished
 	if (!fIsRootHub)
@@ -380,13 +380,16 @@ Device::SetConfigurationAt(uint8 index)
 
 
 void
-Device::InitEndpoints()
+Device::InitEndpoints(int32 interfaceIndex)
 {
 	int8 hubAddress = 0;
 	if (Parent() && (Parent()->Type() & USB_OBJECT_HUB))
 		hubAddress = ((Hub *)Parent())->DeviceAddress();
 
 	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
+		if (interfaceIndex >= 0 && j != (size_t)interfaceIndex)
+			continue;
+
 		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
 		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
 			usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
@@ -424,6 +427,7 @@ Device::InitEndpoints()
 	}
 }
 
+
 status_t
 Device::Unconfigure(bool atDeviceLevel)
 {
@@ -450,17 +454,20 @@ Device::Unconfigure(bool atDeviceLevel)
 
 	if (!fCurrentConfiguration)
 		return B_OK;
-	ClearEndpoints();
 
+	ClearEndpoints(-1);
 	fCurrentConfiguration = NULL;
 	return B_OK;
 }
 
 
 void
-Device::ClearEndpoints()
+Device::ClearEndpoints(int32 interfaceIndex)
 {
 	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
+		if (interfaceIndex >= 0 && j != (size_t)interfaceIndex)
+			continue;
+
 		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
 		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
 			usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
@@ -474,12 +481,13 @@ Device::ClearEndpoints()
 status_t
 Device::SetAltInterface(const usb_interface_info *interface)
 {
+	uint8 interfaceNumber = interface->descr->interface_number;
 	// Tell the device to set the alternate settings
 	status_t result = fDefaultPipe->SendRequest(
 		USB_REQTYPE_INTERFACE_OUT | USB_REQTYPE_STANDARD,	// type
 		USB_REQUEST_SET_INTERFACE,							// request
 		interface->descr->alternate_setting,				// value
-		interface->descr->interface_number,					// index
+		interfaceNumber,									// index
 		0,													// length
 		NULL,												// buffer
 		0,													// buffer length
@@ -488,15 +496,17 @@ Device::SetAltInterface(const usb_interface_info *interface)
 	if (result < B_OK)
 		return result;
 
-	// Update descriptor
+	// Clear the no longer active endpoints
+	ClearEndpoints(interfaceNumber);
+
+	// Update the active pointer of the interface list
 	usb_interface_list *interfaceList
-		= &fCurrentConfiguration->interface[interface->descr->interface_number];
+		= &fCurrentConfiguration->interface[interfaceNumber];
 	interfaceList->active
 		= &interfaceList->alt[interface->descr->alternate_setting];
 
-	ClearEndpoints();
-	InitEndpoints();
-
+	// Initialize the new endpoints
+	InitEndpoints(interfaceNumber);
 	return result;
 }
 

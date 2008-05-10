@@ -443,8 +443,8 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 
 		status_t						SetAltInterface(const usb_interface_info *interface);
 
-		void							InitEndpoints();
-		void							ClearEndpoints();
+		void							InitEndpoints(int32 interfaceIndex);
+		void							ClearEndpoints(int32 interfaceIndex);
 
 virtual	status_t						ReportDevice(
 											usb_support_descriptor *supportDescriptors,
