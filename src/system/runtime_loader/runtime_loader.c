@@ -326,7 +326,7 @@ test_executable(const char *name, char *invoker)
 		}
 	} else if (status == B_OK) {
 		struct Elf32_Ehdr *elfHeader = (struct Elf32_Ehdr *)buffer;
-		if (elfHeader->e_entry == NULL) {
+		if (elfHeader->e_entry == 0) {
 			// we don't like to open shared libraries
 			status = B_NOT_AN_EXECUTABLE;
 		} else if (invoker)
