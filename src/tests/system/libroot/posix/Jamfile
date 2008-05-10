@@ -20,6 +20,10 @@ SimpleTest setjmp_test
 	: setjmp_test.c
 ;
 
+SimpleTest setjmp_test2
+	: setjmp_test2.S
+;
+
 SimpleTest signal_test
 	: signal_test.cpp
 ;
