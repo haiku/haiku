@@ -30,6 +30,7 @@
 #include <kimage.h>
 #include <kscheduler.h>
 #include <ksignal.h>
+#include <real_time_clock.h>
 #include <smp.h>
 #include <syscalls.h>
 #include <syscall_restart.h>
@@ -2271,8 +2272,14 @@ thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 		// avoids nasty race conditions and deadlock problems that could
 		// otherwise occur between our cancel_timer() and a concurrently
 		// executing thread_block_timeout().
-		uint32 timerFlags = (timeoutFlags & B_RELATIVE_TIMEOUT)
-			? B_ONE_SHOT_RELATIVE_TIMER : B_ONE_SHOT_ABSOLUTE_TIMER;
+		uint32 timerFlags;
+		if ((timeoutFlags & B_RELATIVE_TIMEOUT) != 0) {
+			timerFlags = B_ONE_SHOT_RELATIVE_TIMER;
+		} else {
+			timerFlags = B_ONE_SHOT_ABSOLUTE_TIMER;
+			if ((timeoutFlags & B_TIMEOUT_REAL_TIME_BASE) != 0)
+				timeout -= rtc_boot_time();
+		}
 		timerFlags |= B_TIMER_ACQUIRE_THREAD_LOCK;
 
 		// install the timer

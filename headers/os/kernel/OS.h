@@ -25,9 +25,16 @@ extern "C" {
 #define B_INFINITE_TIMEOUT	(9223372036854775807LL)
 
 enum {
-	B_TIMEOUT			= 8,	/* relative timeout */
-	B_RELATIVE_TIMEOUT	= 8,	/* fails after a relative timeout with B_WOULD_BLOCK */
-	B_ABSOLUTE_TIMEOUT	= 16	/* fails after an absolute timeout with B_WOULD BLOCK */
+	B_TIMEOUT						= 0x8,	/* relative timeout */
+	B_RELATIVE_TIMEOUT				= 0x8,	/* fails after a relative timeout
+												with B_TIMED_OUT */
+	B_ABSOLUTE_TIMEOUT				= 0x10,	/* fails after an absolute timeout
+												with B_TIMED_OUT */
+
+	/* experimental Haiku only API */
+	B_TIMEOUT_REAL_TIME_BASE		= 0x40,
+	B_ABSOLUTE_REAL_TIME_TIMEOUT	= B_ABSOLUTE_TIMEOUT
+										| B_TIMEOUT_REAL_TIME_BASE
 };
 
 /*-------------------------------------------------------------*/
