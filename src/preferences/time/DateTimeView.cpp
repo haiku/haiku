@@ -15,9 +15,9 @@
 #include "DateTimeEdit.h"
 #include "TimeMessages.h"
 #include "DateTime.h"
+#include "TimeWindow.h"
 
 
-#include <Button.h>
 #include <CheckBox.h>
 #include <Entry.h>
 #include <File.h>
@@ -69,10 +69,7 @@ DateTimeView::AttachedToWindow()
 	if (!fInitialized) {
 		fInitialized = true;
 
-		fGmtTime->SetTarget(this);
-		fLocalTime->SetTarget(this);
 		fCalendarView->SetTarget(this);
-		fRevertButton->SetTarget(this);
 	}
 }
 
@@ -131,12 +128,10 @@ DateTimeView::MessageReceived(BMessage *message)
 		case kRTCUpdate:
 			fUseGmtTime = fGmtTime->Value() == B_CONTROL_ON;
 			_UpdateGmtSettings();
-			CheckCanRevert();
 			break;
 
 		case kMsgRevert:
 			_Revert();
-			fRevertButton->SetEnabled(false);
 			break;
 	
 		default:
@@ -146,7 +141,7 @@ DateTimeView::MessageReceived(BMessage *message)
 }
 
 
-void
+bool
 DateTimeView::CheckCanRevert()
 {
 	// check GMT vs Local setting
@@ -157,9 +152,7 @@ DateTimeView::CheckCanRevert()
 	time_t changedNow;
 	time(&changedNow);
 
-	enable = enable || (changedNow != unchangedNow);
-
-	fRevertButton->SetEnabled(enable);
+	return enable || (changedNow != unchangedNow);
 }
 
 
@@ -265,20 +258,6 @@ DateTimeView::_InitView()
 		fLocalTime->SetValue(B_CONTROL_ON);
 
 	fOldUseGmtTime = fUseGmtTime;
-
-	BRect rect = Bounds();
-
-	rect.left = 10;
-	rect.top = rect.bottom - 10;
-
-	fRevertButton = new BButton(rect, "revert", "Revert",
-		new BMessage(kMsgRevert), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
-	
-	fRevertButton->ResizeToPreferred();
-	fRevertButton->SetEnabled(false);
-	float buttonHeight = fRevertButton->Bounds().Height();
-	fRevertButton->MoveBy(0, -buttonHeight);
-	AddChild(fRevertButton);
 
 	ResizeTo(fClock->Frame().right + 10.0, fGmtTime->Frame().bottom + 10.0);
 }

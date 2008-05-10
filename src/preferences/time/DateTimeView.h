@@ -20,7 +20,6 @@ class TTimeEdit;
 class BCalendarView;
 class BRadioButton;
 class TAnalogClock;
-class BButton;
 
 
 class DateTimeView : public BView {
@@ -32,7 +31,8 @@ class DateTimeView : public BView {
 		virtual void 	Draw(BRect updaterect);
 		virtual void 	MessageReceived(BMessage *message);
 
-				void	CheckCanRevert();
+		bool			CheckCanRevert();
+		bool			GetUseGmtTime();
 
 	private:
 		void 			_InitView();
@@ -51,9 +51,7 @@ class DateTimeView : public BView {
 		BCalendarView 	*fCalendarView;
 		TAnalogClock 	*fClock;
 
-		BButton			*fRevertButton;
-
-		bool 			fUseGmtTime;
+		bool			fUseGmtTime;
 		bool			fOldUseGmtTime;
 		bool			fInitialized;
 

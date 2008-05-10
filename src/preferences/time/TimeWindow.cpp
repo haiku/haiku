@@ -20,6 +20,7 @@
 #include <Message.h>
 #include <Screen.h>
 #include <TabView.h>
+#include <Button.h>
 
 
 TTimeWindow::TTimeWindow(BRect rect)
@@ -37,17 +38,36 @@ TTimeWindow::~TTimeWindow()
 }
 
 
+void
+TTimeWindow::SetRevertStatus()
+{
+	fRevertButton->SetEnabled(fDateTimeView->CheckCanRevert() 
+		|| fTimeZoneView->CheckCanRevert());
+}
+
+
 void 
 TTimeWindow::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
 		case H_USER_CHANGE:
 			fBaseView->ChangeTime(message);
-			fDateTimeView->CheckCanRevert();
+			SetRevertStatus();
 			break;
 		
 		case B_ABOUT_REQUESTED:
 			be_app->PostMessage(B_ABOUT_REQUESTED);
+			break;
+
+		case kMsgRevert:
+			fDateTimeView->MessageReceived(message);
+			fTimeZoneView->MessageReceived(message);
+			fRevertButton->SetEnabled(false);
+			break;
+
+		case kRTCUpdate:
+			fDateTimeView->MessageReceived(message);
+			SetRevertStatus();
 			break;
 
 		default:
@@ -101,8 +121,24 @@ TTimeWindow::_InitWindow()
 
 	fBaseView->AddChild(tabView);
 	tabView->ResizeBy(0.0, tabView->TabHeight());
+
+	BRect rect = Bounds();
+
+	rect.left = 10;
+	rect.top = rect.bottom - 10;
+
+	fRevertButton = new BButton(rect, "revert", "Revert",
+		new BMessage(kMsgRevert), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW);
+	
+	fRevertButton->ResizeToPreferred();
+	fRevertButton->SetEnabled(false);
+	float buttonHeight = fRevertButton->Bounds().Height();
+	fRevertButton->MoveBy(0, -buttonHeight);
+	fBaseView->AddChild(fRevertButton);
+	fRevertButton->SetTarget(this);
+
 	fBaseView->ResizeTo(tabView->Bounds().Width() + 10.0, 
-		tabView->Bounds().Height() + 10.0);
+		tabView->Bounds().Height() + buttonHeight + 30.0);
 
 	ResizeTo(fBaseView->Bounds().Width(), fBaseView->Bounds().Height());
 }

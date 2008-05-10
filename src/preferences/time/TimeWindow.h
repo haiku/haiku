@@ -27,6 +27,7 @@ class TTimeWindow : public BWindow {
 
 		virtual bool	QuitRequested();
 		virtual void	MessageReceived(BMessage *message);
+		void				SetRevertStatus();
 
 	private:
 		void 			_InitWindow();
@@ -36,6 +37,7 @@ class TTimeWindow : public BWindow {
 		TTimeBaseView 	*fBaseView;
 		DateTimeView 	*fDateTimeView;
 		TimeZoneView 	*fTimeZoneView;
+		BButton			*fRevertButton;
 };
 
 #endif	// TIME_WINDOW_H

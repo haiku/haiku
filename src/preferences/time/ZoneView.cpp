@@ -1,10 +1,11 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Mike Berg <mike@berg-net.us>
  *		Julun <host.haiku@gmx.de>
+ *		Philippe Saint-Pierre <stpere@gmail.com>
  */
 
 /*
@@ -21,6 +22,7 @@
 #include "ZoneView.h"
 #include "TimeMessages.h"
 #include "TZDisplay.h"
+#include "TimeWindow.h"
 
 
 #include <Button.h>
@@ -37,6 +39,7 @@
 #include <StorageDefs.h>
 #include <String.h>
 #include <View.h>
+#include <Window.h>
 
 
 #include <stdio.h>
@@ -67,6 +70,42 @@ TimeZoneView::TimeZoneView(BRect frame)
 }
 
 
+bool
+TimeZoneView::CheckCanRevert()
+{
+	return fCurrentZone != fOldZone;
+}
+
+
+void
+TimeZoneView::_Revert()
+{
+	BPath parent;
+
+	fCurrentZone = fOldZone;
+	int32 czone;
+
+	if (strcmp(fCurrentZone.Leaf(), "Greenwich") == 0) {
+		if (BMenuItem* item = fRegionPopUp->FindItem("Others"))
+			item->SetMarked(true);
+		czone = FillCityList("Others");
+	} else {
+		fCurrentZone.GetParent(&parent);
+		if (BMenuItem* item = fRegionPopUp->FindItem(parent.Leaf()))
+			item->SetMarked(true);
+		czone = FillCityList(parent.Path());
+	}
+
+	if (czone > -1) {
+		fCityList->Select(czone);
+		fCityList->ScrollToSelection();
+		fCurrent->SetText(((TZoneItem *)fCityList->ItemAt(czone))->Text());
+		SetPreview();
+	}
+	SetTimeZone();
+}
+
+
 TimeZoneView::~TimeZoneView()
 {
 }
@@ -87,11 +126,19 @@ TimeZoneView::AttachedToWindow()
 
 		// update displays	
 		BPath parent;
-		fCurrentZone.GetParent(&parent);
-		int32 czone = FillCityList(parent.Path());
-		if (czone > -1) {
-			fCityList->Select(czone);
-			fCurrent->SetText(((TZoneItem *)fCityList->ItemAt(czone))->Text());
+		if (strcmp(fCurrentZone.Leaf(), "Greenwich") != 0) {
+			fCurrentZone.GetParent(&parent);
+			int32 czone = FillCityList(parent.Path());
+			if (czone > -1) {
+				fCityList->Select(czone);
+				fCurrent->SetText(((TZoneItem *)fCityList->ItemAt(czone))->Text());
+			}
+		} else {
+			int32 czone = FillCityList("Others");
+			if (czone > -1) {
+				fCityList->Select(czone);
+				fCurrent->SetText(((TZoneItem *)fCityList->ItemAt(czone))->Text());
+			}
 		}
 	}
 	fCityList->ScrollToSelection();
@@ -120,9 +167,19 @@ TimeZoneView::MessageReceived(BMessage *message)
 			break;
 		
 		case H_SET_TIME_ZONE:
+		{
 			SetTimeZone();
+			BMessage msg(*message);
+			msg.what = kRTCUpdate;
+			Window()->PostMessage(&msg);
+			((TTimeWindow*)Window())->SetRevertStatus();
 			break;
-		
+		}
+
+		case kMsgRevert:
+			_Revert();
+			break;
+
 		case H_CITY_CHANGED:
 			SetPreview();
 			break;	
@@ -242,7 +299,7 @@ TimeZoneView::BuildRegionMenu()
 			
 			// skip Etc directory
 			if (itemtext.Compare("Etc", 3) == 0)
-			 	continue;
+				continue;
 			 
 			markit = itemtext.Compare(region.Leaf()) == 0;
 			
@@ -263,6 +320,12 @@ TimeZoneView::BuildRegionMenu()
 			fRegionPopUp->AddItem(item);
 		}
 	}
+	BMessage *msg = new BMessage(H_REGION_CHANGED);
+	msg->AddString("region", "Others");
+
+	item = new BMenuItem("Others", msg);
+	item->SetMarked(strcmp(fCurrentZone.Leaf(), "Greenwich") == 0);
+	fRegionPopUp->AddItem(item);
 }
 
 
@@ -277,43 +340,53 @@ TimeZoneView::FillCityList(const char *area)
 		fCityList->MakeEmpty();
 	}
 
-	// Enter time zones directory. Find subdir with name that matches string
-	// stored in area. Enter subdirectory and count the items. For each item,
-	// add a StringItem to fCityList Time zones directory 
-
-	BPath path;
-	if (find_directory(B_BEOS_ETC_DIRECTORY, &path) != B_OK)
-		return 0;
-
-	path.Append("timezones");
-
-	BPath Area(area);
- 	BDirectory zoneDir(path.Path()); 
- 	BDirectory cityDir;
  	BStringItem *city;
- 	BString city_name;
- 	BEntry entry;
 	int32 index = -1; 
-	
-	//locate subdirectory:
-	if (zoneDir.Contains(Area.Leaf(), B_DIRECTORY_NODE)) {
-		cityDir.SetTo(&zoneDir, Area.Leaf());  
+	if (strcmp(area, "Others") != 0) {
 
-		// There is a subdir with a name that matches 'area'. That's the one!!
-		// Iterate over the items in the subdir, fill listview with TZoneItems
-		while(cityDir.GetNextEntry(&entry) == B_NO_ERROR) {
-			if (!entry.IsDirectory()) {
-				BPath zone(&entry);
-				city_name = zone.Leaf();
-				city_name.ReplaceAll("_IN", ", Indiana");
-				city_name.ReplaceAll("__Calif", ", Calif");
-				city_name.ReplaceAll("__", ", ");
-				city_name.ReplaceAll("_", " ");
-				city = new TZoneItem(city_name.String(), zone.Path());
-				fCityList->AddItem(city);
-				if (strcmp(fCurrentZone.Leaf(), zone.Leaf()) == 0)
-					index = fCityList->IndexOf(city);
+		// Enter time zones directory. Find subdir with name that matches string
+		// stored in area. Enter subdirectory and count the items. For each item,
+		// add a StringItem to fCityList Time zones directory 
+
+		BPath path;
+		if (find_directory(B_BEOS_ETC_DIRECTORY, &path) != B_OK)
+			return 0;
+
+		path.Append("timezones");
+
+		BPath Area(area);
+	 	BDirectory zoneDir(path.Path()); 
+	 	BDirectory cityDir;
+	 	BString city_name;
+	 	BEntry entry;
+
+	
+		//locate subdirectory:
+		if (zoneDir.Contains(Area.Leaf(), B_DIRECTORY_NODE)) {
+			cityDir.SetTo(&zoneDir, Area.Leaf());  
+
+			// There is a subdir with a name that matches 'area'. That's the one!!
+			// Iterate over the items in the subdir, fill listview with TZoneItems
+			while(cityDir.GetNextEntry(&entry) == B_NO_ERROR) {
+				if (!entry.IsDirectory()) {
+					BPath zone(&entry);
+					city_name = zone.Leaf();
+					city_name.ReplaceAll("_IN", ", Indiana");
+					city_name.ReplaceAll("__Calif", ", Calif");
+					city_name.ReplaceAll("__", ", ");
+					city_name.ReplaceAll("_", " ");
+					city = new TZoneItem(city_name.String(), zone.Path());
+					fCityList->AddItem(city);
+					if (strcmp(fCurrentZone.Leaf(), zone.Leaf()) == 0)
+						index = fCityList->IndexOf(city);
+				}
 			}
+		}
+	} else {
+		city = new TZoneItem("Greenwich", "/boot/beos/etc/timezones/Greenwich");
+		fCityList->AddItem(city);
+		if (strcmp(fCurrentZone.Leaf(), "Greenwich") == 0) {
+			index = fCityList->IndexOf(city);
 		}
 	}
 	return index;
@@ -363,13 +436,17 @@ TimeZoneView::ReadTimeZoneLink()
 			tzLink.SetTo("/boot/beos/etc/timezones/Pacific/fiji");
 			// do something like set to a default GMT???
 		}
+		else if (!tzLink.Exists()) { // link doesn't exists
+			tzLink.SetTo("/boot/beos/etc/timezones/Greenwich");
+		}
  	} else {
- 		// set tzlink to a default
+ 		// directory doesn't exist
  		tzLink.SetTo("/boot/beos/etc/timezones/EST");
  	}
 #endif
 	// we need something in the current zone
 	fCurrentZone.SetTo(&tzLink);
+	fOldZone.SetTo(&tzLink);
 }
 
 
@@ -449,7 +526,7 @@ TimeZoneView::SetTimeZone()
 
 	// update environment
 	SetTimeZone(target.Path());
-
+	
 	// update display
 	time_t current = time(0);
 	struct tm *ltime = localtime(&current);

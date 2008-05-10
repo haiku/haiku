@@ -28,6 +28,7 @@ class TimeZoneView : public BView {
 		
 		virtual void 	AttachedToWindow();
 		virtual void 	MessageReceived(BMessage *message);
+		bool			CheckCanRevert();
 
 	private:
 		void 			UpdateDateTime(BMessage *message);
@@ -39,6 +40,7 @@ class TimeZoneView : public BView {
 		void 			InitView();
 		void 			ReadTimeZoneLink();
 		void 			BuildRegionMenu();
+		void			_Revert();
 
 		// returns index of current zone
 		int32 			FillCityList(const char *area);
@@ -53,6 +55,7 @@ class TimeZoneView : public BView {
 		int32 			fHour;
 		int32 			fMinute;
 		BPath 			fCurrentZone;
+		BPath				fOldZone;
 		bool 			fInitialized;
 };
 
