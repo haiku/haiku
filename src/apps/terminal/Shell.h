@@ -32,9 +32,6 @@ public:
 	ssize_t		Write(const void *buffer, size_t numBytes);
 
 	status_t	UpdateWindowSize(int row, int columns);
-#ifndef __HAIKU__
-	status_t	Signal(int signal);
-#endif
 
 	status_t	GetAttr(struct termios &attr);
 	status_t	SetAttr(struct termios &attr);

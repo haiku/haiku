@@ -194,24 +194,10 @@ Shell::UpdateWindowSize(int rows, int columns)
 	struct winsize winSize;
 	winSize.ws_row = rows;
 	winSize.ws_col = columns;
-#ifdef __HAIKU__
 	if (ioctl(fFd, TIOCSWINSZ, &winSize) != 0)
 		return errno;
 	return B_OK;
-#else
-	ioctl(fFd, TIOCSWINSZ, &winSize);
-	return Signal(SIGWINCH);
-#endif
 }
-
-
-#ifndef __HAIKU__
-status_t
-Shell::Signal(int signal)
-{
-	return send_signal(-fProcessID, signal);
-}
-#endif
 
 
 status_t
@@ -496,6 +482,9 @@ Shell::_Spawn(int row, int col, const char *encoding, int argc, const char **arg
 
 		tcsetpgrp(0, getpgrp());
 			// set this process group ID as the controlling terminal
+#ifndef __HAIKU__
+		ioctl(0, 'pgid', getpid());
+#endif
 
 		/* pty open and set termios successful. */
 		handshake.status = PTY_OK;
