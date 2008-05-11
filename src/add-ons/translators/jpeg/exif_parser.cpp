@@ -15,6 +15,7 @@
 
 #include <ReadHelper.h>
 
+using std::set;
 
 enum {
 	TAG_EXIF_OFFSET		= 0x8769,
