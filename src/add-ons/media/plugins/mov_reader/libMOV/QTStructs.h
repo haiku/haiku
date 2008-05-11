@@ -105,11 +105,13 @@ struct VideoMetaData
 
 struct AudioMetaData
 {
-	uint32 compression;		// compression used
+	uint32 compression;		// compression type used
 	uint16 NoOfChannels;	// 1 = mono, 2 = stereo
 	uint16 SampleSize;		// bits per sample
-	float SampleRate;		// Samples per second (OR Frames per second)
-	uint32 PacketSize;		// (Sample Rate * NoOfchannels * SampleSize)/8 = bytes per second
+	float SampleRate;		// Samples per second
+	uint32 BufferSize;		// (Sample Rate * NoOfchannels * SampleSize) / 8 = bytes per second
+	uint32 FrameSize;		// Size of a Frame (NoOfChannels * SampleSize) / 8
+	float BitRate;			// Bitrate of audio
 	uint8 *theVOL;
 	size_t VOLSize;
 };

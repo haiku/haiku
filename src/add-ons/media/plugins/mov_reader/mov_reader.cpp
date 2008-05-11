@@ -34,7 +34,7 @@
 
 #include "mov_reader.h"
 
-//#define TRACE_MOV_READER
+#define TRACE_MOV_READER
 #ifdef TRACE_MOV_READER
   #define TRACE printf
 #else
@@ -136,6 +136,8 @@ movReader::GetFileFormatInfo(media_file_format *mff)
 status_t
 movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 {
+	uint32 codecID;
+
 	mov_cookie *cookie = new mov_cookie;
 	*_cookie = cookie;
 	
@@ -172,6 +174,8 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			return B_ERROR;
 		}
 
+		codecID = B_BENDIAN_TO_HOST_INT32(audio_format->compression);
+
 		cookie->frame_count = theFileReader->getAudioFrameCount(cookie->stream);
 		cookie->duration = theFileReader->getAudioDuration(cookie->stream);
 		
@@ -191,10 +195,10 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			cookie->frames_per_sec_rate = stream_header->rate;
 			cookie->frames_per_sec_scale = 1;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using rate)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
-		} else if (audio_format->PacketSize) {
-			cookie->bytes_per_sec_rate = audio_format->PacketSize;
+		} else if (audio_format->BufferSize) {
+			cookie->bytes_per_sec_rate = audio_format->BufferSize;
 			cookie->bytes_per_sec_scale = 1;
-			cookie->frames_per_sec_rate = audio_format->PacketSize * 8 / audio_format->SampleSize / audio_format->NoOfChannels;
+			cookie->frames_per_sec_rate = audio_format->BufferSize * 8 / audio_format->SampleSize / audio_format->NoOfChannels;
 			cookie->frames_per_sec_scale = 1;
 			TRACE("bytes_per_sec_rate %ld, bytes_per_sec_scale %ld (using PacketSize)\n", cookie->bytes_per_sec_rate, cookie->bytes_per_sec_scale);
 		} else {
@@ -259,6 +263,26 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 				format->type = B_MEDIA_ENCODED_AUDIO;
 			}
 			
+			format->u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
+
+			if (audio_format->SampleSize <= 8)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_UINT8;
+			else if (audio_format->SampleSize <= 16)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_INT16;
+			else if (audio_format->SampleSize <= 24)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_INT24;
+			else if (audio_format->SampleSize <= 32)
+				format->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
+			else {
+				ERROR("movReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->SampleSize);
+				return B_ERROR;
+			}
+
+			format->u.encoded_audio.frame_size = audio_format->FrameSize;
+			format->u.encoded_audio.output.buffer_size = audio_format->BufferSize;
+
+			TRACE("compression ");
+
 			switch (audio_format->compression) {
 				case AUDIO_MS_PCM02:
 					TRACE("MS PCM02\n");
@@ -280,9 +304,13 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
 					break;
 				case AUDIO_IMA4:
-				
+					TRACE("IMA4\n");
+					format->u.encoded_audio.bit_rate = audio_format->BitRate;
+					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;;
+					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
+					break;
 				default:
-					TRACE("OTHER\n");
+					TRACE("OTHER %s\n",(char *)(&codecID));
 					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
@@ -290,22 +318,18 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			}
 		}
 
-		// this doesn't seem to work (it's not even a fourcc)
-		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32 *)format->user_data = audio_format->compression; format->user_data[4] = 0;
+		TRACE("Audio NoOfChannels %d, SampleSize %d, SampleRate %f, FrameSize %ld\n",audio_format->NoOfChannels, audio_format->SampleSize, audio_format->SampleRate, audio_format->FrameSize);
+
+		TRACE("Audio frame_rate %f, channel_count %ld, format %ld, buffer_size %ld, frame_size %ld, bit_rate %f\n",
+				format->u.encoded_audio.output.frame_rate, format->u.encoded_audio.output.channel_count, format->u.encoded_audio.output.format,format->u.encoded_audio.output.buffer_size, format->u.encoded_audio.frame_size, format->u.encoded_audio.bit_rate);
 		
 		// Some codecs have additional setup data that they need, put it in metadata
 		size_t size = audio_format->VOLSize;
 		const void *data = audio_format->theVOL;
 		if (size > 0) {
+			TRACE("VOL SIZE %ld\n", size);
 			format->SetMetaData(data, size);
 		}
-
-#ifdef TRACE_MOV_READER
-		uint8 *p = 18 + (uint8 *)data;
-		TRACE("extra_data: %ld: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-			size - 18, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
-#endif
 	
 		return B_OK;
 	}
@@ -317,6 +341,8 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			delete cookie;
 			return B_ERROR;
 		}
+		
+		codecID = B_BENDIAN_TO_HOST_INT32(video_format->compression);
 		
 		cookie->audio = false;
 		cookie->line_count = theFileReader->MovMainHeader()->height;
@@ -340,7 +366,7 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
-		TRACE("compression %s\n", (char *)(&video_format->compression));
+		TRACE("compression %s\n", (char *)(&codecID));
 
 		description.family = B_QUICKTIME_FORMAT_FAMILY;
 		if (stream_header->fourcc_handler == 'ekaf' || stream_header->fourcc_handler == 0) // 'fake' or 0 fourcc => used compression id

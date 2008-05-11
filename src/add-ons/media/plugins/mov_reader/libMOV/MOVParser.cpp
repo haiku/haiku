@@ -816,7 +816,8 @@ void STSDAtom::ReadSoundDescription()
 	Read(&aSoundDescriptionV1->desc.PacketSize);
 	Read(&aSoundDescriptionV1->desc.SampleRate);
 
-	if (aSoundDescriptionV1->desc.Version == 1) {
+	if ((aSoundDescriptionV1->desc.Version == 1) && (aSoundDescriptionV1->basefields.DataFormat != AUDIO_IMA4)) {
+		printf("V1 Sound Description Found\n");
 		Read(&(aSoundDescriptionV1->samplesPerPacket));
 		Read(&(aSoundDescriptionV1->bytesPerPacket));
 		Read(&(aSoundDescriptionV1->bytesPerFrame));
@@ -824,14 +825,20 @@ void STSDAtom::ReadSoundDescription()
 	
 	} else {
 		// Calculate?
-		aSoundDescriptionV1->bytesPerSample = aSoundDescriptionV1->desc.SampleSize / 8;
-		if (aSoundDescriptionV1->basefields.DataFormat == 'ima4') {
-			aSoundDescriptionV1->bytesPerFrame = aSoundDescriptionV1->desc.NoOfChannels * 64 / 34;
+		if (aSoundDescriptionV1->basefields.DataFormat == AUDIO_IMA4) {
+			printf("Calculating IMA4 Sound Description\n");
+			aSoundDescriptionV1->samplesPerPacket = 64;
+			aSoundDescriptionV1->bytesPerFrame = aSoundDescriptionV1->desc.NoOfChannels * 34;
+
+			aSoundDescriptionV1->bytesPerSample = aSoundDescriptionV1->desc.SampleSize / 8;
+			aSoundDescriptionV1->bytesPerPacket = 64 * aSoundDescriptionV1->bytesPerFrame;
 		} else {
+			printf("Calculating Sound Description\n");
+			aSoundDescriptionV1->bytesPerSample = aSoundDescriptionV1->desc.SampleSize / 8;
 			aSoundDescriptionV1->bytesPerFrame = aSoundDescriptionV1->desc.NoOfChannels * aSoundDescriptionV1->bytesPerSample;
+			aSoundDescriptionV1->bytesPerPacket = aSoundDescriptionV1->desc.PacketSize;
+			aSoundDescriptionV1->samplesPerPacket = aSoundDescriptionV1->desc.PacketSize / aSoundDescriptionV1->bytesPerFrame;
 		}
-		aSoundDescriptionV1->bytesPerPacket = aSoundDescriptionV1->desc.PacketSize;
-		aSoundDescriptionV1->samplesPerPacket = aSoundDescriptionV1->desc.PacketSize / aSoundDescriptionV1->bytesPerFrame;
 	}
 
 	// 0 means we dont have one

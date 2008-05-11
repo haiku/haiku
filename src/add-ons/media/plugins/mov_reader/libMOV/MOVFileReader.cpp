@@ -457,12 +457,25 @@ const 	AudioMetaData 		*MOVFileReader::AudioFormat(uint32 stream_index)
 
 				// Hmm 16bit format 32 bit FourCC.
 				theAudio.compression = aSoundDescription.basefields.DataFormat;
-//				theAudio.compression = aSoundDescription.desc.CompressionID;
 
 				theAudio.NoOfChannels = aSoundDescription.desc.NoOfChannels;
 				theAudio.SampleSize = aSoundDescription.desc.SampleSize;
 				theAudio.SampleRate = aSoundDescription.desc.SampleRate / 65536;	// Convert from fixed point decimal to float
-				theAudio.PacketSize = uint32((theAudio.SampleRate * theAudio.NoOfChannels * theAudio.SampleSize) / 8);
+
+				if (aSoundDescription.bytesPerFrame == 0) {
+					// XXX probably not right
+					theAudio.FrameSize = aSoundDescription.desc.SampleSize / 8;
+				} else {
+					theAudio.FrameSize = aSoundDescription.bytesPerFrame;
+				}
+				
+				if (aSoundDescription.bytesPerPacket == 0) {
+					theAudio.BufferSize = uint32((theAudio.SampleSize * theAudio.NoOfChannels * theAudio.FrameSize) / 8);
+				} else {
+					theAudio.BufferSize = aSoundDescription.bytesPerPacket;
+				}
+				
+				theAudio.BitRate = theAudio.SampleSize * theAudio.NoOfChannels * theAudio.SampleRate;
 
 				theAudio.theVOL = aSoundDescription.theVOL;
 				theAudio.VOLSize = aSoundDescription.VOLSize;
