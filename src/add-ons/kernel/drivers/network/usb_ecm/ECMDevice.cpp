@@ -4,6 +4,7 @@
 	Distributed under the terms of the MIT license.
 */
 #include <ether_driver.h>
+#include <net/if_media.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -20,9 +21,17 @@ ECMDevice::ECMDevice(usb_device device)
 		fDataInterfaceIndex(0),
 		fMACAddressIndex(0),
 		fMaxSegmentSize(0),
-		fControlEndpoint(0),
+		fNotifyEndpoint(0),
 		fReadEndpoint(0),
-		fWriteEndpoint(0)
+		fWriteEndpoint(0),
+		fNotifyReadSem(-1),
+		fNotifyWriteSem(-1),
+		fNotifyBuffer(NULL),
+		fNotifyBufferLength(0),
+		fLinkStateChangeSem(-1),
+		fHasConnection(false),
+		fDownstreamSpeed(0),
+		fUpstreamSpeed(0)
 {
 	const usb_device_descriptor *deviceDescriptor
 		= gUSBModule->get_device_descriptor(device);
@@ -50,6 +59,7 @@ ECMDevice::ECMDevice(usb_device device)
 			&& interface->generic_count > 0) {
 			// try to find and interpret the union and ethernet functional
 			// descriptors
+			foundUnionDescriptor = foundEthernetDescriptor = false;
 			for (size_t j = 0; j < interface->generic_count; j++) {
 				usb_generic_descriptor *generic = &interface->generic[j]->generic;
 				if (generic->length >= 5
@@ -103,7 +113,23 @@ ECMDevice::ECMDevice(usb_device device)
 	}
 
 	fControlInterfaceIndex = controlIndex;
-	fControlEndpoint = interface->endpoint[0].handle;
+	fNotifyEndpoint = interface->endpoint[0].handle;
+
+	// setup notify buffer and try to schedule a notification transfer
+	fNotifyBufferLength = 64;
+	fNotifyBuffer = (uint8 *)malloc(fNotifyBufferLength);
+	if (fNotifyBuffer == NULL) {
+		TRACE_ALWAYS("out of memory for notify buffer allocation\n");
+		return;
+	}
+
+	if (gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
+		fNotifyBufferLength, _NotifyCallback, this) != B_OK) {
+		// we cannot use notifications - hardcode to active connection
+		fHasConnection = true;
+		fDownstreamSpeed = 1000 * 1000 * 10; // 10Mbps
+		fUpstreamSpeed = 1000 * 1000 * 10; // 10Mbps
+	}
 
 	if (dataIndex >= config->interface_count) {
 		TRACE_ALWAYS("data interface index invalid\n");
@@ -126,16 +152,15 @@ ECMDevice::ECMDevice(usb_device device)
 	}
 
 	fDataInterfaceIndex = dataIndex;
-	fNotifyRead = create_sem(0, DRIVER_NAME"_notify_read");
-	if (fNotifyRead < B_OK) {
+	fNotifyReadSem = create_sem(0, DRIVER_NAME"_notify_read");
+	if (fNotifyReadSem < B_OK) {
 		TRACE_ALWAYS("failed to create read notify sem\n");
 		return;
 	}
 
-	fNotifyWrite = create_sem(0, DRIVER_NAME"_notify_write");
-	if (fNotifyWrite < B_OK) {
+	fNotifyWriteSem = create_sem(0, DRIVER_NAME"_notify_write");
+	if (fNotifyWriteSem < B_OK) {
 		TRACE_ALWAYS("failed to create write notify sem\n");
-		delete_sem(fNotifyRead);
 		return;
 	}
 
@@ -145,8 +170,13 @@ ECMDevice::ECMDevice(usb_device device)
 
 ECMDevice::~ECMDevice()
 {
-	delete_sem(fNotifyRead);
-	delete_sem(fNotifyWrite);
+	if (fNotifyReadSem >= B_OK)
+		delete_sem(fNotifyReadSem);
+	if (fNotifyWriteSem >= B_OK)
+		delete_sem(fNotifyWriteSem);
+
+	gUSBModule->cancel_queued_transfers(fNotifyEndpoint);
+	free(fNotifyBuffer);
 }
 
 
@@ -244,13 +274,13 @@ ECMDevice::Read(uint8 *buffer, size_t *numBytes)
 		return result;
 	}
 
-	result = acquire_sem_etc(fNotifyRead, 1, B_CAN_INTERRUPT, 0);
+	result = acquire_sem_etc(fNotifyReadSem, 1, B_CAN_INTERRUPT, 0);
 	if (result < B_OK) {
 		*numBytes = 0;
 		return result;
 	}
 
-	if (fStatusRead != B_OK) {
+	if (fStatusRead != B_OK && fStatusRead != B_CANCELED) {
 		TRACE_ALWAYS("device status error 0x%08lx\n", fStatusRead);
 		result = gUSBModule->clear_feature(fReadEndpoint,
 			USB_FEATURE_ENDPOINT_HALT);
@@ -281,13 +311,13 @@ ECMDevice::Write(const uint8 *buffer, size_t *numBytes)
 		return result;
 	}
 
-	result = acquire_sem_etc(fNotifyWrite, 1, B_CAN_INTERRUPT, 0);
+	result = acquire_sem_etc(fNotifyWriteSem, 1, B_CAN_INTERRUPT, 0);
 	if (result < B_OK) {
 		*numBytes = 0;
 		return result;
 	}
 
-	if (fStatusWrite != B_OK) {
+	if (fStatusWrite != B_OK && fStatusWrite != B_CANCELED) {
 		TRACE_ALWAYS("device status error 0x%08lx\n", fStatusWrite);
 		result = gUSBModule->clear_feature(fWriteEndpoint,
 			USB_FEATURE_ENDPOINT_HALT);
@@ -317,6 +347,22 @@ ECMDevice::Control(uint32 op, void *buffer, size_t length)
 		case ETHER_GETFRAMESIZE:
 			*(uint32 *)buffer = fMaxSegmentSize;
 			return B_OK;
+
+#if HAIKU_TARGET_PLATFORM_HAIKU
+		case ETHER_SET_LINK_STATE_SEM:
+			fLinkStateChangeSem = *(sem_id *)buffer;
+			return B_OK;
+
+		case ETHER_GET_LINK_STATE:
+		{
+			ether_link_state *state = (ether_link_state *)buffer;
+			state->media = IFM_ETHER | IFM_FULL_DUPLEX
+				| (fHasConnection ? IFM_ACTIVE : 0);
+			state->quality = 1000;
+			state->speed = fDownstreamSpeed / 1000;
+			return B_OK;
+		}
+#endif
 
 		default:
 			TRACE_ALWAYS("unsupported ioctl %lu\n", op);
@@ -367,7 +413,7 @@ ECMDevice::_ReadCallback(void *cookie, int32 status, void *data,
 	ECMDevice *device = (ECMDevice *)cookie;
 	device->fActualLengthRead = actualLength;
 	device->fStatusRead = status;
-	release_sem_etc(device->fNotifyRead, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(device->fNotifyReadSem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -378,5 +424,68 @@ ECMDevice::_WriteCallback(void *cookie, int32 status, void *data,
 	ECMDevice *device = (ECMDevice *)cookie;
 	device->fActualLengthWrite = actualLength;
 	device->fStatusWrite = status;
-	release_sem_etc(device->fNotifyWrite, 1, B_DO_NOT_RESCHEDULE);
+	release_sem_etc(device->fNotifyWriteSem, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
+void
+ECMDevice::_NotifyCallback(void *cookie, int32 status, void *data,
+	uint32 actualLength)
+{
+	if (status == B_CANCELED)
+		return;
+
+	ECMDevice *device = (ECMDevice *)cookie;
+	if (status == B_OK && actualLength >= sizeof(cdc_notification)) {
+		bool linkStateChange = false;
+		cdc_notification *notification
+			= (cdc_notification *)device->fNotifyBuffer;
+
+		switch (notification->notification_code) {
+			case CDC_NOTIFY_NETWORK_CONNECTION:
+				TRACE("connection state change to %d\n", notification->value);
+				device->fHasConnection = notification->value > 0;
+				linkStateChange = true;
+				break;
+
+			case CDC_NOTIFY_CONNECTION_SPEED_CHANGE:
+			{
+				if (notification->data_length < sizeof(cdc_connection_speed)
+					|| actualLength < sizeof(cdc_notification)
+					+ sizeof(cdc_connection_speed)) {
+					TRACE_ALWAYS("not enough data in connection speed change\n");
+					break;
+				}
+
+				cdc_connection_speed *speed;
+				speed = (cdc_connection_speed *)&notification->data[0];
+				device->fUpstreamSpeed = speed->upstream_speed;
+				device->fDownstreamSpeed = speed->downstream_speed;
+				device->fHasConnection = true;
+				TRACE("connection speed change to %ld/%ld\n",
+					speed->downstream_speed, speed->upstream_speed);
+				linkStateChange = true;
+				break;
+			}
+
+			default:
+				TRACE_ALWAYS("unsupported notification 0x%02x\n",
+					notification->notification_code);
+				break;
+		}
+
+		if (linkStateChange && device->fLinkStateChangeSem >= B_OK)
+			release_sem_etc(device->fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
+	}
+
+	if (status != B_OK) {
+		TRACE_ALWAYS("device status error 0x%08lx\n", status);
+		if (gUSBModule->clear_feature(device->fNotifyEndpoint,
+			USB_FEATURE_ENDPOINT_HALT) != B_OK)
+			TRACE_ALWAYS("failed to clear halt state\n");
+	}
+
+	// schedule next notification buffer
+	gUSBModule->queue_interrupt(device->fNotifyEndpoint, device->fNotifyBuffer,
+		device->fNotifyBufferLength, _NotifyCallback, device);
 }

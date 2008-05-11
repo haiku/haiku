@@ -35,6 +35,24 @@ typedef struct ethernet_functional_descriptor_s {
 	uint8	num_wakeup_pattern_filters;
 } _PACKED ethernet_functional_descriptor;
 
+/* notification definitions */
+#define CDC_NOTIFY_NETWORK_CONNECTION		0x00
+#define CDC_NOTIFY_CONNECTION_SPEED_CHANGE	0x2a
+
+typedef struct cdc_notification_s {
+	uint8	request_type;
+	uint8	notification_code;
+	uint16	value;
+	uint16	index;
+	uint16	data_length;
+	uint8	data[0];
+} _PACKED cdc_notification;
+
+typedef struct cdc_connection_speed_s {
+	uint32	upstream_speed; /* in bits/s */
+	uint32	downstream_speed; /* in bits/s */
+} _PACKED cdc_connection_speed;
+
 extern usb_module_info *gUSBModule;
 
 extern "C" {
