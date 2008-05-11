@@ -24,6 +24,10 @@ SimpleTest setjmp_test2
 	: setjmp_test2.S
 ;
 
+SimpleTest signal_in_allocator_test
+	: signal_in_allocator_test.cpp
+;
+
 SimpleTest signal_test
 	: signal_test.cpp
 ;
