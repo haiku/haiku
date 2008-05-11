@@ -1766,7 +1766,7 @@ TermView::MessageReceived(BMessage *msg)
     //  }
    // }
 		case kBlinkCursor:
-			_BlinkCursor();
+			BlinkCursor();
 			break;
 		case kUpdateSigWinch:
 			_UpdateSIGWINCH();
