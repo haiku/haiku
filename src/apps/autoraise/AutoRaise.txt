@@ -1,0 +1,41 @@
+AutoRaise : beyond FocusFollowsMouse, for BeOS
+(c) 2002, mmu_man, revol@free.fr
+Released under MIT licence, 
+usual disclaimer applies, blah blah blah...
+
+
+This tiny Deskbar replicant is a window autoraiser. It will bring to front whatever window is under the mouse after a selectable delay.
+
+
+Installation:
+- put the AutoRaise folder where you want (I suggest /boot/apps),
+- you can delete the src/ folder if you aren't interested in the sources,
+- double-click on either the 'Put me in Deskbar', or 'Put me in Deskbar (persistant)', the later will keep it in between boots.
+
+
+Alternately, you can run it in a Terminal:
+AutoRaise --deskbar
+
+or, if you want it to be reloaded on each boot:
+AutoRaise --deskbar --persist
+
+
+Customisation:
+* Left-click will toggles activation.
+
+* right-click brings a menu:
+	* Active: check it to activate auto raising
+	* Mode: The default mode (option 1) is to raise every window. You can also set it so it only raises the Deskbar, whenever you have the mouse on top of it, even if you have a window over it (option 2), or rather only when your mouse is over a visible part of it (option 3).
+	* Inactive behaviour: This sets up the mouse behaviour when AutoRaise is NOT active. This takes effects only when it's not active (either immediately or when you disables it). It's the same control as the "Focus follows mouse" in the Mouse preferences panel, however I recommend you don't run the preference panel while AutoRaise is active, as it will conflict, and you will get funky behaviour :))
+	* Delay: allows you to change the delay before the focused window is brought to front.
+
+Informations:
+There is a special version for Dano, since it provides some helpful API...
+To get it just recompile it, it will detect itself it is compiled under R5.1.
+I'm not sure the Dano version still compiles however, as I begun this proggy under Dano, but finished it in R5, and didn't check back, since I don't use it much.
+
+The R5 version has a problem on tabs, because there isn't any mean to know the window tab position and size. So it acts as if the tab was as wide as the window,  (it uses the outer region).
+
+
+The code was based on parts of Deskscope, 2000 Shamyl Zakariya
+Sorry it's really ugly, but it does the job :)
