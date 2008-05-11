@@ -1,0 +1,20 @@
+
+resource app_signature "application/x-vnd.mahlzeit.webwatch";
+
+resource app_version {
+	major      = 1,
+	middle     = 5,
+	minor      = 0,
+	variety    = B_APPV_FINAL,
+	internal   = 0,
+	short_info = "WebWatch",
+	long_info  = "WebWatch 1.5.0 ©1999-2003 Matthijs Hollemans.,\n"
+		"©2008 Haiku, Inc.\n"
+		"A port of Swatch Internet Time "
+};
+
+resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;
+
+/*resource file_types message {
+};*/
+

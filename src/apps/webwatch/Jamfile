@@ -1,0 +1,16 @@
+SubDir HAIKU_TOP src apps webwatch ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+#UsePrivateHeaders app ;
+#UsePrivateHeaders shared ;
+#UsePrivateHeaders tracker ;
+#SubDirHdrs $(HAIKU_TOP) src kits tracker ;
+
+Application WebWatch :
+	WatchApp.cpp
+	WatchView.cpp
+	: be
+	: WebWatch.rdef
+;
+
