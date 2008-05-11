@@ -27,8 +27,9 @@ process_exif(uint8* data, uint32 length)
 	BMemoryIO source(data + 8, length - 8);
 	BMessage exif;
 	status_t status = convert_exif_to_message(source, exif);
-	if (status == B_OK)
-		exif.PrintToStream();
+
+	exif.PrintToStream();
+		// even if it failed, some data might end up in the message
 
 	return status;
 }

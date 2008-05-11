@@ -1,18 +1,19 @@
 /*
- * Copyright 2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2007-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "exif_parser.h"
 
-#include <ReadHelper.h>
+#include <ctype.h>
+#include <set>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <Message.h>
 
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ReadHelper.h>
 
 
 enum {
@@ -37,8 +38,8 @@ static const size_t kNumDefaultTags = sizeof(kDefaultTags)
 	/ sizeof(kDefaultTags[0]);
 
 
-static status_t parse_tiff_directory(TReadHelper& read, BMessage& target,
-	const convert_tag* tags, size_t tagCount);
+static status_t parse_tiff_directory(TReadHelper& read, set<off_t>& visited,
+	BMessage& target, const convert_tag* tags, size_t tagCount);
 
 
 static status_t
@@ -226,10 +227,16 @@ parse_tiff_tag(TReadHelper& read, tiff_tag& tag, off_t& offset)
 
 
 static status_t
-parse_tiff_directory(TReadHelper& read, off_t offset, BMessage& target,
-	const convert_tag* convertTags, size_t convertTagCount)
+parse_tiff_directory(TReadHelper& read, set<off_t>& visited, off_t offset,
+	BMessage& target, const convert_tag* convertTags, size_t convertTagCount)
 {
+	if (visited.find(offset) != visited.end()) {
+		// The EXIF data is obviously corrupt
+		return B_BAD_DATA;
+	}
+
 	read.Seek(offset, SEEK_SET);
+	visited.insert(offset);
 
 	uint16 tags;
 	read(tags);
@@ -247,7 +254,7 @@ parse_tiff_directory(TReadHelper& read, off_t offset, BMessage& target,
 			case TAG_EXIF_OFFSET:
 			case TAG_SUB_DIR_OFFSET:
 			{
-				status_t status = parse_tiff_directory(read, target,
+				status_t status = parse_tiff_directory(read, visited, target,
 					convertTags, convertTagCount);
 				if (status < B_OK)
 					return status;
@@ -263,7 +270,12 @@ parse_tiff_directory(TReadHelper& read, off_t offset, BMessage& target,
 				}
 				break;
 		}
+
+		if (visited.find(nextOffset) != visited.end())
+			return B_BAD_DATA;
+
 		read.Seek(nextOffset, SEEK_SET);
+		visited.insert(nextOffset);
 	}
 
 	return B_OK;
@@ -271,7 +283,7 @@ parse_tiff_directory(TReadHelper& read, off_t offset, BMessage& target,
 
 
 static status_t
-parse_tiff_directory(TReadHelper& read, BMessage& target,
+parse_tiff_directory(TReadHelper& read, set<off_t>& visited, BMessage& target,
 	const convert_tag* tags, size_t tagCount)
 {
 	while (true) {
@@ -280,7 +292,7 @@ parse_tiff_directory(TReadHelper& read, BMessage& target,
 		if (offset == 0)
 			break;
 
-		status_t status = parse_tiff_directory(read, offset, target,
+		status_t status = parse_tiff_directory(read, visited, offset, target,
 			tags, tagCount);
 		if (status < B_OK)
 			return status;
@@ -293,6 +305,11 @@ parse_tiff_directory(TReadHelper& read, BMessage& target,
 //	#pragma mark -
 
 
+/*!	Converts the EXIF data that starts in \a source to a BMessage in \a target.
+	If the EXIF data is corrupt, this function will return an appropriate error
+	code. Nevertheless, there might be some data ending up in \a target that
+	was parsed until this point.
+*/
 status_t
 convert_exif_to_message(BPositionIO& source, BMessage& target,
 	const convert_tag* tags, size_t tagCount)
@@ -315,7 +332,8 @@ convert_exif_to_message(BPositionIO& source, BMessage& target,
 	if (magic != 42)
 		return B_BAD_TYPE;
 
-	return parse_tiff_directory(read, target, tags, tagCount);
+	set<off_t> visitedOffsets;
+	return parse_tiff_directory(read, visitedOffsets, target, tags, tagCount);
 }
 
 
