@@ -444,7 +444,16 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 	GRAB_TEAM_LOCK();
 	// look at the team, make sure it's not being deleted
 	team = team_get_team_struct_locked(attributes.team);
-	if (team != NULL && team->state != TEAM_STATE_DEATH) {
+
+	if (team == NULL || team->state == TEAM_STATE_DEATH)
+		abort = true;
+
+	if (!abort && !kernel) {
+		thread->user_thread = team_allocate_user_thread(team);
+		abort = thread->user_thread == NULL;
+	}
+
+	if (!abort) {
 		// Debug the new thread, if the parent thread required that (see above),
 		// or the respective global team debug flag is set. But only, if a
 		// debugger is installed for the team.
@@ -457,8 +466,7 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 		}
 
 		insert_thread_into_team(team, thread);
-	} else
-		abort = true;
+	}
 
 	RELEASE_TEAM_LOCK();
 	if (abort) {
@@ -1407,8 +1415,10 @@ thread_exit(void)
 		if (team->main_thread == thread) {
 			// this was the main thread in this team, so we will delete that as well
 			deleteTeam = true;
-		} else
+		} else {
 			threadDeathEntry = (death_entry*)malloc(sizeof(death_entry));
+			team_free_user_thread(thread);
+		}
 
 		// remove this thread from the current team and add it to the kernel
 		// put the thread into the kernel team until it dies
@@ -2937,4 +2947,3 @@ _user_setrlimit(int resource, const struct rlimit *userResourceLimit)
 
 	return common_setrlimit(resource, &resourceLimit);
 }
-

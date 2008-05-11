@@ -47,6 +47,9 @@ status_t start_watching_team(team_id team, void (*hook)(team_id, void *),
 status_t stop_watching_team(team_id team, void (*hook)(team_id, void *),
 			void *data);
 
+struct user_thread* team_allocate_user_thread(struct team* team);
+void team_free_user_thread(struct thread* thread);
+
 // used in syscalls.c
 thread_id _user_load_image(int32 argCount, const char **args, int32 envCount,
 			const char **env, int32 priority, uint32 flags,

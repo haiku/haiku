@@ -24,6 +24,7 @@
 #include <thread.h>
 #include <tracing.h>
 #include <user_debugger.h>
+#include <user_thread.h>
 #include <util/AutoLock.h>
 
 
@@ -42,6 +43,11 @@
 #define DEFAULT_IGNORE_SIGNALS \
 	(SIGNAL_TO_MASK(SIGCHLD) | SIGNAL_TO_MASK(SIGWINCH) \
 	| SIGNAL_TO_MASK(SIGCONT))
+#define NON_DEFERRABLE_SIGNALS	\
+	(KILL_SIGNALS				\
+	| SIGNAL_TO_MASK(SIGILL)	\
+	| SIGNAL_TO_MASK(SIGFPE)	\
+	| SIGNAL_TO_MASK(SIGSEGV))
 
 
 const char * const sigstr[NSIG] = {
@@ -269,6 +275,14 @@ handle_signals(struct thread *thread)
 
 	if (signalMask == 0)
 		return 0;
+
+	if (thread->user_thread->defer_signals > 0
+		&& (signalMask & NON_DEFERRABLE_SIGNALS) == 0) {
+		thread->user_thread->pending_signals = signalMask;
+		return 0;
+	}
+
+	thread->user_thread->pending_signals = 0;
 
 	bool restart = (atomic_and(&thread->flags,
 			~THREAD_FLAGS_DONT_RESTART_SYSCALL)

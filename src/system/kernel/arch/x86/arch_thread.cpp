@@ -309,15 +309,17 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 status_t
 arch_thread_init_tls(struct thread *thread)
 {
-	uint32 tls[TLS_THREAD_ID_SLOT + 1];
+	uint32 tls[TLS_USER_THREAD_SLOT + 1];
 	int32 i;
 
 	thread->user_local_storage = thread->user_stack_base
 		+ thread->user_stack_size;
 
 	// initialize default TLS fields
+	memset(tls, 0, sizeof(tls));
 	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
 	tls[TLS_THREAD_ID_SLOT] = thread->id;
+	tls[TLS_USER_THREAD_SLOT] = (addr_t)thread->user_thread;
 
 	return user_memcpy((void *)thread->user_local_storage, tls, sizeof(tls));
 }

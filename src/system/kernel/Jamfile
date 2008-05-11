@@ -10,6 +10,7 @@ SubDir HAIKU_TOP src system kernel ;
 	SubDirC++Flags $(defines) ;
 }
 
+UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders runtime_loader ;
 

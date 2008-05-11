@@ -71,6 +71,7 @@ enum {
 struct image;					// defined in image.c
 struct realtime_sem_context;	// defined in realtime_sem.cpp
 struct select_info;
+struct user_thread;				// defined in libroot/user_thread.h
 
 struct death_entry {
 	struct list_link	link;
@@ -165,6 +166,11 @@ struct team_dead_children : team_job_control_children {
 #endif	// __cplusplus
 
 
+struct free_user_thread {
+	struct free_user_thread*	next;
+	struct user_thread*			thread;
+};
+
 struct team {
 	struct team		*next;			// next in hash
 	struct team		*siblings_next;
@@ -198,6 +204,12 @@ struct team {
 	struct list		image_list;
 	struct list		watcher_list;
 	struct arch_team arch_info;
+
+	addr_t			user_data;
+	area_id			user_data_area;
+	size_t			user_data_size;
+	size_t			used_user_data;
+	struct free_user_thread* free_user_threads;
 
 	struct team_debug_info debug_info;
 
@@ -239,12 +251,14 @@ struct thread {
 	size_t			signal_stack_size;
 	bool			signal_stack_enabled;
 
+	bool			in_kernel;
+	bool			was_yielded;
+
+	struct user_thread*	user_thread;
+
 	struct {
 		uint8		parameters[32];
 	} syscall_restart;
-
-	bool			in_kernel;
-	bool			was_yielded;
 
 	struct {
 		status_t	status;				// current wait status

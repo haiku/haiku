@@ -1,4 +1,5 @@
 /*
+ * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -35,6 +36,7 @@
 #include <tls.h>
 #include <tracing.h>
 #include <user_runtime.h>
+#include <user_thread.h>
 #include <usergroup.h>
 #include <vfs.h>
 #include <vm.h>
@@ -69,6 +71,7 @@ struct fork_arg {
 	size_t		user_stack_size;
 	addr_t		user_local_storage;
 	sigset_t	sig_block_mask;
+	struct user_thread* user_thread;
 
 	struct arch_fork_arg arch_info;
 };
@@ -830,6 +833,11 @@ create_team_struct(const char *name, bool kernel)
 	team->state = TEAM_STATE_BIRTH;
 	team->flags = 0;
 	team->death_sem = -1;
+	team->user_data_area = -1;
+	team->user_data = 0;
+	team->used_user_data = 0;
+	team->user_data_size = 0;
+	team->free_user_threads = NULL;
 
 	team->supplementary_groups = NULL;
 	team->supplementary_group_count = 0;
@@ -911,6 +919,11 @@ delete_team_struct(struct team *team)
 	while (job_control_entry* entry = team->dead_children->entries.RemoveHead())
 		delete entry;
 
+	while (free_user_thread* entry = team->free_user_threads) {
+		team->free_user_threads = entry->next;
+		free(entry);
+	}
+
 	malloc_referenced_release(team->supplementary_groups);
 
 	delete team->job_control_entry;
@@ -932,6 +945,42 @@ get_arguments_data_size(char **args, int32 argc)
 		size += strlen(args[count]) + 1;
 
 	return size + (argc + 1) * sizeof(char *) + sizeof(struct user_space_program_args);
+}
+
+
+static status_t
+create_team_user_data(struct team* team)
+{
+	void* address = (void*)KERNEL_USER_DATA_BASE;
+	size_t size = 4 * B_PAGE_SIZE;
+	team->user_data_area = create_area_etc(team, "user area", &address,
+		B_BASE_ADDRESS, size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (team->user_data_area < 0)
+		return team->user_data_area;
+
+	team->user_data = (addr_t)address;
+	team->used_user_data = 0;
+	team->user_data_size = size;
+	team->free_user_threads = NULL;
+
+	return B_OK;
+}
+
+
+static void
+delete_team_user_data(struct team* team)
+{
+	if (team->user_data_area >= 0) {
+		delete_area_etc(team, team->user_data_area);
+		team->user_data = 0;
+		team->used_user_data = 0;
+		team->user_data_size = 0;
+		team->user_data_area = -1;
+		while (free_user_thread* entry = team->free_user_threads) {
+			team->free_user_threads = entry->next;
+			free(entry);
+		}
+	}
 }
 
 
@@ -1003,6 +1052,9 @@ team_create_thread_start(void *args)
 	cache_node_launched(teamArgs->arg_count, teamArgs->args);
 
 	TRACE(("team_create_thread_start: entry thread %ld\n", t->id));
+
+	// get a user thread for the main thread
+	t->user_thread = team_allocate_user_thread(team);
 
 	// create an initial primary stack area
 
@@ -1216,13 +1268,18 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 	else
 		threadName = args[0];
 
+	// create the user data area
+	status = create_team_user_data(team);
+	if (status != B_OK)
+		goto err4;
+
 	// Create a kernel thread, but under the context of the new team
 	// The new thread will take over ownership of teamArgs
 	thread = spawn_kernel_thread_etc(team_create_thread_start, threadName,
 		B_NORMAL_PRIORITY, teamArgs, team->id, team->id);
 	if (thread < 0) {
 		status = thread;
-		goto err4;
+		goto err5;
 	}
 
 	// wait for the loader of the new team to finish its work
@@ -1264,6 +1321,8 @@ load_image_etc(int32 argCount, char * const *args, int32 envCount,
 
 	return thread;
 
+err5:
+	delete_team_user_data(team);
 err4:
 	vm_put_address_space(team->address_space);
 err3:
@@ -1362,6 +1421,7 @@ exec_team(const char *path, int32 argCount, char * const *args,
 
 	user_debug_prepare_for_exec();
 
+	delete_team_user_data(team);
 	vm_delete_areas(team->address_space);
 	delete_owned_ports(team->id);
 	sem_delete_owned_sems(team->id);
@@ -1369,6 +1429,14 @@ exec_team(const char *path, int32 argCount, char * const *args,
 	vfs_exec_io_context(team->io_context);
 	delete_realtime_sem_context(team->realtime_sem_context);
 	team->realtime_sem_context = NULL;
+
+	status = create_team_user_data(team);
+	if (status != B_OK) {
+		// creating the user data failed -- we're toast
+		// TODO: We should better keep the old user area in the first place.
+		exit_thread(status);
+		return status;
+	}
 
 	user_debug_finish_after_exec();
 
@@ -1422,6 +1490,7 @@ fork_team_thread_start(void *_args)
 	thread->user_stack_size = forkArgs->user_stack_size;
 	thread->user_local_storage = forkArgs->user_local_storage;
 	thread->sig_block_mask = forkArgs->sig_block_mask;
+	thread->user_thread = forkArgs->user_thread;
 
 	arch_thread_init_tls(thread);
 
@@ -1509,6 +1578,8 @@ fork_team(void)
 	// ToDo: should be able to handle stack areas differently (ie. don't have them copy-on-write)
 	// ToDo: all stacks of other threads than the current one could be left out
 
+	forkArgs->user_thread = NULL;
+
 	cookie = 0;
 	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
 		void *address;
@@ -1519,12 +1590,29 @@ fork_team(void)
 			break;
 		}
 
-		if (info.area == parentThread->user_stack_area)
+		if (info.area == parentThread->user_stack_area) {
 			forkArgs->user_stack_area = area;
+		} else if (info.area == parentTeam->user_data_area) {
+			team->user_data = (addr_t)address;
+			team->used_user_data = 0;
+			team->user_data_size = info.size;
+			team->user_data_area = area;
+			team->free_user_threads = NULL;
+			forkArgs->user_thread = team_allocate_user_thread(team);
+		}
 	}
 
 	if (status < B_OK)
 		goto err4;
+
+	if (forkArgs->user_thread == NULL) {
+#if KDEBUG
+		panic("user data area not found, parent area is %ld",
+			parentTeam->user_data_area);
+#endif
+		status = B_ERROR;
+		goto err4;
+	}
 
 	forkArgs->user_stack_base = parentThread->user_stack_base;
 	forkArgs->user_stack_size = parentThread->user_stack_size;
@@ -2555,6 +2643,68 @@ stop_watching_team(team_id teamID, void (*hook)(team_id, void *), void *data)
 
 	free(watcher);
 	return B_OK;
+}
+
+
+/*!	The team lock must be held or the team must still be single threaded.
+*/
+struct user_thread*
+team_allocate_user_thread(struct team* team)
+{
+	if (team->user_data == 0)
+		return NULL;
+
+	user_thread* thread = NULL;
+
+	// take an entry from the free list, if any
+	if (struct free_user_thread* entry = team->free_user_threads) {
+		thread = entry->thread;
+		team->free_user_threads = entry->next;
+		deferred_free(entry);
+		return thread;
+	} else {
+		// enough space left?
+		size_t needed = _ALIGN(sizeof(user_thread));
+		if (team->user_data_size - team->used_user_data < needed)
+			return NULL;
+		// TODO: This imposes a per team thread limit! We should resize the
+		// area, if necessary. That's problematic at this point, though, since
+		// we've got the team lock.
+
+		thread = (user_thread*)(team->user_data + team->used_user_data);
+		team->used_user_data += needed;
+	}
+
+	thread->defer_signals = 0;
+	thread->pending_signals = 0;
+	thread->wait_status = B_OK;
+
+	return thread;
+}
+
+
+/*!	The team lock must not be held. \a thread must be the current thread.
+*/
+void
+team_free_user_thread(struct thread* thread)
+{
+	user_thread* userThread = thread->user_thread;
+	if (userThread == NULL)
+		return;
+
+	// create a free list entry
+	free_user_thread* entry
+		= (free_user_thread*)malloc(sizeof(free_user_thread));
+	if (entry == NULL) {
+		// we have to leak the user thread :-/
+		return;
+	}
+
+	InterruptsSpinLocker _(team_spinlock);
+
+	entry->thread = userThread;
+	entry->next = thread->team->free_user_threads;
+	thread->team->free_user_threads = entry;
 }
 
 
