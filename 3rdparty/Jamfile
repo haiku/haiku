@@ -1,3 +1,10 @@
 SubDir HAIKU_TOP 3rdparty ;
 
-SubInclude HAIKU_TOP 3rdparty mmu_man ;
+# automatically pick any subdir that contains a Jamfile
+# this should allow hooking projects locally
+# without having to touch this file and get conflicts when it is updated.
+for subdir in [ GLOB $(SUBDIR) : [^.]* ] {
+	if [ GLOB $(subdir:G=) : Jamfile ] {
+		SubInclude HAIKU_TOP 3rdparty $(subdir:D=) ;
+	}
+}
