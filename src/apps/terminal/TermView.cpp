@@ -84,17 +84,18 @@ static property_info sPropList[] = {
 
 
 const static uint32 kUpdateSigWinch = 'Rwin';
+const static uint32 kBlinkCursor = 'BlCr';
 
 const static rgb_color kBlackColor = { 0, 0, 0, 255 };
 const static rgb_color kWhiteColor = { 255, 255, 255, 255 };
 
 
-
 TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize)
 	: BView(frame, "termview", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
 	fShell(NULL),
 	fWinchRunner(NULL),
+	fCursorBlinkRunner(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
 	fFontAscent(0),
@@ -140,9 +141,10 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 
 TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 historySize)
 	: BView(BRect(0, 0, 0, 0), "termview", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE| B_PULSE_NEEDED),
+		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
 	fShell(NULL),
 	fWinchRunner(NULL),
+	fCursorBlinkRunner(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
 	fFontAscent(0),
@@ -185,13 +187,16 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	_InitObject(argc, argv);
 	SetTermSize(fTermRows, fTermColumns, true);
 	
+	// TODO: Don't show the dragger, since replicant capabilities
+	// don't work very well ATM.
+	/*
 	BRect rect(0, 0, 16, 16);
 	rect.OffsetTo(Bounds().right - rect.Width(),
 				Bounds().bottom - rect.Height());
 	
 	SetFlags(Flags() | B_DRAW_ON_CHILDREN | B_FOLLOW_ALL);
 	AddChild(new BDragger(rect, this,
-		B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW));
+		B_FOLLOW_RIGHT|B_FOLLOW_BOTTOM, B_WILL_DRAW));*/
 }
 
 
@@ -200,6 +205,7 @@ TermView::TermView(BMessage *archive)
 	BView(archive),
 	fShell(NULL),
 	fWinchRunner(NULL),
+	fCursorBlinkRunner(NULL),
 	fFontWidth(0),
 	fFontHeight(0),
 	fFontAscent(0),
@@ -1311,14 +1317,16 @@ TermView::AttachedToWindow()
 	if (fScrollBar)
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
 	
+	BMessenger thisMessenger(this);
 	BMessage message(kUpdateSigWinch);
-	fWinchRunner = new (std::nothrow) BMessageRunner(BMessenger(this), &message, 500000);
+	fWinchRunner = 
+		new (std::nothrow) BMessageRunner(thisMessenger,
+											&message, 500000);
 
-	// TODO: Since we can also be a replicant, messing
-	// with the window, which is not ours, is not nice:
-	// Switch to using a BMessageRunner for the
-	// blinking caret too.
-	Window()->SetPulseRate(1000000);
+	BMessage blinkMessage(kBlinkCursor);
+	fCursorBlinkRunner = 
+		new (std::nothrow) BMessageRunner(thisMessenger,
+											&blinkMessage, 1000000);
 }
 
 
@@ -1327,14 +1335,9 @@ TermView::DetachedFromWindow()
 {
 	delete fWinchRunner;
 	fWinchRunner = NULL;
-}
-
-
-void
-TermView::Pulse()
-{
-	//if (system_time() > fLastCursorTime + 1000000)
-		BlinkCursor();
+	
+	delete fCursorBlinkRunner;
+	fCursorBlinkRunner = NULL;
 }
 
 
@@ -1762,6 +1765,9 @@ TermView::MessageReceived(BMessage *msg)
 //	break;
     //  }
    // }
+		case kBlinkCursor:
+			_BlinkCursor();
+			break;
 		case kUpdateSigWinch:
 			_UpdateSIGWINCH();
 			break;

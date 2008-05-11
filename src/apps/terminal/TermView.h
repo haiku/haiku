@@ -123,7 +123,6 @@ public:
 protected:
 	virtual void	AttachedToWindow();
 	virtual void	DetachedFromWindow();
-	virtual void	Pulse();
 	virtual void	Draw(BRect updateRect);
 	virtual void	WindowActivated(bool active);
 	virtual void	KeyDown(const char*, int32);
@@ -194,6 +193,7 @@ private:
 	Shell *fShell;
 
 	BMessageRunner *fWinchRunner;
+	BMessageRunner *fCursorBlinkRunner;
 
 	// Font and Width
 	BFont fHalfFont;
