@@ -29,6 +29,8 @@
 #include <errno.h>
 #include <string.h>
 
+#include <user_thread.h>
+
 #include "tracing_config.h"
 
 using namespace BPrivate;
@@ -265,8 +267,11 @@ malloc(size_t size)
 	size += 2 * HEAP_WALL_SIZE;
 #endif
 
+	defer_signals();
+
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (addr == NULL) {
+		undefer_signals();
 		errno = B_NO_MEMORY;
 		KTRACE("malloc(%lu) -> NULL", size);
 		return NULL;
@@ -275,6 +280,9 @@ malloc(size_t size)
 #if HEAP_LEAK_CHECK
 	add_address(addr, size);
 #endif
+
+	undefer_signals();
+
 #if HEAP_WALL
 	addr = set_wall(addr, size);
 #endif
@@ -295,8 +303,11 @@ calloc(size_t nelem, size_t elsize)
 	size += 2 * HEAP_WALL_SIZE;
 #endif
 
+	defer_signals();
+
 	void *ptr = pHeap->getHeap(pHeap->getHeapIndex()).malloc(size);
 	if (ptr == NULL) {
+		undefer_signals();
 		errno = B_NO_MEMORY;
 		KTRACE("calloc(%lu, %lu) -> NULL", nelem, elsize);
 		return NULL;
@@ -305,6 +316,9 @@ calloc(size_t nelem, size_t elsize)
 #if HEAP_LEAK_CHECK
 	add_address(ptr, size);
 #endif
+
+	undefer_signals();
+
 #if HEAP_WALL
 	ptr = set_wall(ptr, size);
 	size -= 2 * HEAP_WALL_SIZE;
@@ -321,17 +335,23 @@ extern "C" void
 free(void *ptr)
 {
 	static processHeap *pHeap = getAllocator();
+
 #if HEAP_WALL
 	if (ptr == NULL)
 		return;
 	KTRACE("free(%p)", ptr);
 	ptr = check_wall((uint8*)ptr);
 #endif
+
+	defer_signals();
+
 #if HEAP_LEAK_CHECK
 	if (ptr != NULL)
 		remove_address(ptr);
 #endif
 	pHeap->free(ptr);
+
+	undefer_signals();
 }
 
 
@@ -344,9 +364,13 @@ memalign(size_t alignment, size_t size)
 	debug_printf("memalign() is not yet supported by the wall code.\n");
 	return NULL;
 #endif
+
+	defer_signals();
+
 	void *addr = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
 		size);
 	if (addr == NULL) {
+		undefer_signals();
 		errno = B_NO_MEMORY;
 		KTRACE("memalign(%lu, %lu) -> NULL", alignment, size);
 		return NULL;
@@ -355,6 +379,8 @@ memalign(size_t alignment, size_t size)
 #if HEAP_LEAK_CHECK
 	add_address(addr, size);
 #endif
+
+	undefer_signals();
 
 	KTRACE("memalign(%lu, %lu) -> %p", alignment, size, addr);
 	return addr;
@@ -372,9 +398,11 @@ posix_memalign(void **_pointer, size_t alignment, size_t size)
 	return -1;
 #endif
 	static processHeap *pHeap = getAllocator();
+	defer_signals();
 	void *pointer = pHeap->getHeap(pHeap->getHeapIndex()).memalign(alignment,
 		size);
 	if (pointer == NULL) {
+		undefer_signals();
 		KTRACE("posix_memalign(%p, %lu, %lu) -> NULL", _pointer, alignment,
 			size);
 		return B_NO_MEMORY;
@@ -383,6 +411,8 @@ posix_memalign(void **_pointer, size_t alignment, size_t size)
 #if HEAP_LEAK_CHECK
 	add_address(pointer, size);
 #endif
+
+	undefer_signals();
 
 	*_pointer = pointer;
 	KTRACE("posix_memalign(%p, %lu, %lu) -> %p", _pointer, alignment, size,
