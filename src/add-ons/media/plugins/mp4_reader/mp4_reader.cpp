@@ -38,7 +38,7 @@
 #include <string.h>
 
 
-#define TRACE_MP4_READER
+//#define TRACE_MP4_READER
 #ifdef TRACE_MP4_READER
 #	define TRACE printf
 #else
@@ -308,12 +308,12 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 					// Setting a bitrate seems to cause more problems than it solves
 					format->u.encoded_audio.bit_rate = audio_format->BitRate;	// usually 128000 for AAC
 
-					printf("Audio NoOfChannels %d, SampleSize %d, SampleRate %f, FrameSize %ld\n",audio_format->NoOfChannels, audio_format->SampleSize, audio_format->SampleRate, audio_format->FrameSize);
+					TRACE("Audio NoOfChannels %d, SampleSize %d, SampleRate %f, FrameSize %ld\n",audio_format->NoOfChannels, audio_format->SampleSize, audio_format->SampleRate, audio_format->FrameSize);
 
-					printf("Audio frame_rate %f, channel_count %ld, format %ld, buffer_size %ld, frame_size %ld, bit_rate %f\n",
+					TRACE("Audio frame_rate %f, channel_count %ld, format %ld, buffer_size %ld, frame_size %ld, bit_rate %f\n",
 						format->u.encoded_audio.output.frame_rate, format->u.encoded_audio.output.channel_count, format->u.encoded_audio.output.format,format->u.encoded_audio.output.buffer_size, format->u.encoded_audio.frame_size, format->u.encoded_audio.bit_rate);
 
-					printf("Track %d MP4 Audio FrameCount %ld\n",cookie->stream,theFileReader->getFrameCount(cookie->stream));
+					TRACE("Track %d MP4 Audio FrameCount %ld\n",cookie->stream,theFileReader->getFrameCount(cookie->stream));
 			
 					break;
 				default:
@@ -341,7 +341,9 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		data = audio_format->theDecoderConfig;
 		if (size > 0) {
 			if (format->SetMetaData(data, size) != B_OK) {
-				printf("Failed to set Decoder Config\n");
+				ERROR("Failed to set Decoder Config\n");
+				delete cookie;
+				return B_ERROR;
 			}
 		}
 
@@ -455,7 +457,9 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		if (size > 0) {
 			TRACE("Decoder Config Found Size is %ld\n",size);
 			if (format->SetMetaData(data, size) != B_OK) {
-				printf("Failed to set Decoder Config\n");
+				ERROR("Failed to set Decoder Config\n");
+				delete cookie;
+				return B_ERROR;
 			}
 
 #ifdef TRACE_MP4_READER
