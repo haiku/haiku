@@ -372,6 +372,18 @@ ECMDevice::Control(uint32 op, void *buffer, size_t length)
 }
 
 
+void
+ECMDevice::Removed()
+{
+	fRemoved = true;
+	fHasConnection = false;
+	fDownstreamSpeed = fUpstreamSpeed = 0;
+
+	if (fLinkStateChangeSem >= B_OK)
+		release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
 status_t
 ECMDevice::_ReadMACAddress()
 {
@@ -432,10 +444,10 @@ void
 ECMDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 	uint32 actualLength)
 {
-	if (status == B_CANCELED)
+	ECMDevice *device = (ECMDevice *)cookie;
+	if (status == B_CANCELED || device->fRemoved)
 		return;
 
-	ECMDevice *device = (ECMDevice *)cookie;
 	if (status == B_OK && actualLength >= sizeof(cdc_notification)) {
 		bool linkStateChange = false;
 		cdc_notification *notification

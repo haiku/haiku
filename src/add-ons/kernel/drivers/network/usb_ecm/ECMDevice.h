@@ -25,7 +25,7 @@ public:
 		status_t			Write(const uint8 *buffer, size_t *numBytes);
 		status_t			Control(uint32 op, void *buffer, size_t length);
 
-		void				Removed() { fRemoved = true; };
+		void				Removed();
 		bool				IsRemoved() { return fRemoved; };
 
 private:
