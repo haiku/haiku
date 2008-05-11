@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src apps autoraise ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+Application AutoRaise :
+	AutoRaiseApp.cpp
+	AutoRaiseIcon.cpp
+	settings.cpp
+	: be $(TARGET_LIBSTDC++)
+	: AutoRaise.rdef
+;
+
