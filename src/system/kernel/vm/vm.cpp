@@ -1194,7 +1194,8 @@ insert_area(vm_address_space *addressSpace, void **_address,
 	NOTE: At the moment deleting only complete areas is supported.
 */
 static status_t
-unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size)
+unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size,
+	bool kernel)
 {
 	// TODO: Support deleting partial areas!
 
@@ -1210,7 +1211,24 @@ unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size)
 	if (area != NULL && lastAddress - area->base < area->size - 1)
 		return B_UNSUPPORTED;
 
-	// all areas (if any) are fully covered; let's delete them
+	// all areas (if any) are fully covered; we can delete them,
+	// but first we need to check, whether the caller is allowed to do that
+	if (!kernel) {
+		area = addressSpace->areas;
+		while (area != NULL) {
+			vm_area* nextArea = area->address_space_next;
+	
+			if (area->id != RESERVED_AREA_ID) {
+				if (area->base >= address && area->base < lastAddress) {
+					if ((area->protection & B_KERNEL_AREA) != 0)
+						return B_NOT_ALLOWED;
+				}
+			}
+	
+			area = nextArea;
+		}
+	}
+
 	area = addressSpace->areas;
 	while (area != NULL) {
 		vm_area* nextArea = area->address_space_next;
@@ -1235,7 +1253,7 @@ static status_t
 map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 	void **_virtualAddress, off_t offset, addr_t size, uint32 addressSpec,
 	int wiring, int protection, int mapping, vm_area **_area,
-	const char *areaName, bool unmapAddressRange)
+	const char *areaName, bool unmapAddressRange, bool kernel)
 {
 	TRACE(("map_backing_store: aspace %p, cache %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
 		addressSpace, cache, *_virtualAddress, offset, size, addressSpec,
@@ -1298,7 +1316,7 @@ map_backing_store(vm_address_space *addressSpace, vm_cache *cache,
 
 	if (addressSpec == B_EXACT_ADDRESS && unmapAddressRange) {
 		status = unmap_address_range(addressSpace, (addr_t)*_virtualAddress,
-			size);
+			size, kernel);
 		if (status != B_OK)
 			goto err2;
 	}
@@ -1429,7 +1447,7 @@ vm_reserve_address_range(team_id team, void **_address, uint32 addressSpec,
 area_id
 vm_create_anonymous_area(team_id team, const char *name, void **address,
 	uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
-	bool unmapAddressRange)
+	bool unmapAddressRange, bool kernel)
 {
 	vm_area *area;
 	vm_cache *cache;
@@ -1533,7 +1551,7 @@ vm_create_anonymous_area(team_id team, const char *name, void **address,
 
 	status = map_backing_store(addressSpace, cache, address, 0, size,
 		addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name,
-		unmapAddressRange);
+		unmapAddressRange, kernel);
 
 	mutex_unlock(&cache->lock);
 
@@ -1747,7 +1765,7 @@ vm_map_physical_memory(team_id team, const char *name, void **_address,
 
 	status_t status = map_backing_store(locker.AddressSpace(), cache, _address,
 		0, size, addressSpec & ~B_MTR_MASK, B_FULL_LOCK, protection,
-		REGION_NO_PRIVATE_MAP, &area, name, false);
+		REGION_NO_PRIVATE_MAP, &area, name, false, true);
 
 	mutex_unlock(&cache->lock);
 
@@ -1829,7 +1847,7 @@ vm_create_null_area(team_id team, const char *name, void **address,
 
 	status = map_backing_store(locker.AddressSpace(), cache, address, 0, size,
 		addressSpec, 0, B_KERNEL_READ_AREA, REGION_NO_PRIVATE_MAP, &area, name,
-		false);
+		false, true);
 
 	mutex_unlock(&cache->lock);
 
@@ -1897,7 +1915,7 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 
 	if (fd < 0) {
 		return vm_create_anonymous_area(team, name, _address, addressSpec, size,
-			B_NO_LOCK, protection, addressSpec == B_EXACT_ADDRESS);
+			B_NO_LOCK, protection, addressSpec == B_EXACT_ADDRESS, kernel);
 	}
 
 	// get the open flags of the FD
@@ -1938,7 +1956,7 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	vm_area *area;
 	status = map_backing_store(locker.AddressSpace(), cache, _address,
 		offset, size, addressSpec, 0, protection, mapping, &area, name,
-		addressSpec == B_EXACT_ADDRESS);
+		addressSpec == B_EXACT_ADDRESS, kernel);
 
 	mutex_unlock(&cache->lock);
 
@@ -1998,7 +2016,8 @@ vm_area_put_locked_cache(vm_cache *cache)
 
 area_id
 vm_clone_area(team_id team, const char *name, void **address,
-	uint32 addressSpec, uint32 protection, uint32 mapping, area_id sourceID)
+	uint32 addressSpec, uint32 protection, uint32 mapping, area_id sourceID,
+	bool kernel)
 {
 	vm_area *newArea = NULL;
 	vm_area *sourceArea;
@@ -2022,6 +2041,9 @@ vm_clone_area(team_id team, const char *name, void **address,
 	if (sourceArea == NULL)
 		return B_BAD_VALUE;
 
+	if (!kernel && (sourceArea->protection & B_KERNEL_AREA) != 0)
+		return B_NOT_ALLOWED;
+
 	vm_cache *cache = vm_area_get_locked_cache(sourceArea);
 
 	// ToDo: for now, B_USER_CLONEABLE is disabled, until all drivers
@@ -2040,7 +2062,8 @@ vm_clone_area(team_id team, const char *name, void **address,
 	else {
 		status = map_backing_store(targetAddressSpace, cache, address,
 			sourceArea->cache_offset, sourceArea->size, addressSpec,
-			sourceArea->wiring, protection, mapping, &newArea, name, false);
+			sourceArea->wiring, protection, mapping, &newArea, name, false,
+			kernel);
 	}
 	if (status == B_OK && mapping != REGION_PRIVATE_MAP) {
 		// If the mapping is REGION_PRIVATE_MAP, map_backing_store() needed
@@ -2164,7 +2187,7 @@ delete_area(vm_address_space *addressSpace, vm_area *area)
 
 
 status_t
-vm_delete_area(team_id team, area_id id)
+vm_delete_area(team_id team, area_id id, bool kernel)
 {
 	TRACE(("vm_delete_area(team = 0x%lx, area = 0x%lx)\n", team, id));
 
@@ -2173,6 +2196,9 @@ vm_delete_area(team_id team, area_id id)
 	status_t status = locker.SetFromArea(team, id, area);
 	if (status < B_OK)
 		return status;
+
+	if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
+		return B_NOT_ALLOWED;
 
 	delete_area(locker.AddressSpace(), area);
 	return B_OK;
@@ -2303,7 +2329,7 @@ vm_copy_area(team_id team, const char *name, void **_address,
 	status = map_backing_store(targetAddressSpace, cache, _address,
 		source->cache_offset, source->size, addressSpec, source->wiring,
 		protection, sharedArea ? REGION_NO_PRIVATE_MAP : REGION_PRIVATE_MAP,
-		&target, name, false);
+		&target, name, false, true);
 	if (status < B_OK)
 		return status;
 
@@ -2346,7 +2372,8 @@ count_writable_areas(vm_cache *cache, vm_area *ignoreArea)
 
 
 static status_t
-vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection)
+vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection,
+	bool kernel)
 {
 	TRACE(("vm_set_area_protection(team = %#lx, area = %#lx, protection = %#lx)\n",
 		team, areaID, newProtection));
@@ -2361,6 +2388,9 @@ vm_set_area_protection(team_id team, area_id areaID, uint32 newProtection)
 	status_t status = locker.AddAreaCacheAndLock(areaID, true, false, area,
 		&cache, true);
 	AreaCacheLocker cacheLocker(cache);	// already locked
+
+	if (!kernel && (area->protection & B_KERNEL_AREA) != 0)
+		return B_NOT_ALLOWED;
 
 	if (area->protection == newProtection)
 		return B_OK;
@@ -4597,6 +4627,112 @@ test_lock_memory(vm_address_space *addressSpace, addr_t address,
 }
 
 
+static status_t
+vm_resize_area(area_id areaID, size_t newSize, bool kernel)
+{
+	// is newSize a multiple of B_PAGE_SIZE?
+	if (newSize & (B_PAGE_SIZE - 1))
+		return B_BAD_VALUE;
+
+	// lock all affected address spaces and the cache
+	vm_area* area;
+	vm_cache* cache;
+
+	MultiAddressSpaceLocker locker;
+	status_t status = locker.AddAreaCacheAndLock(areaID, true, true, area,
+		&cache);
+	if (status != B_OK)
+		return status;
+	AreaCacheLocker cacheLocker(cache);	// already locked
+
+	// enforce restrictions
+	if (!kernel) {
+		if ((area->protection & B_KERNEL_AREA) != 0)
+			return B_NOT_ALLOWED;
+		// TODO: Enforce all restrictions (team, etc.)!
+	}
+
+	size_t oldSize = area->size;
+	if (newSize == oldSize)
+		return B_OK;
+
+	// Resize all areas of this area's cache
+
+	if (cache->type != CACHE_TYPE_RAM)
+		return B_NOT_ALLOWED;
+
+	if (oldSize < newSize) {
+		// We need to check if all areas of this cache can be resized
+
+		for (vm_area* current = cache->areas; current != NULL;
+				current = current->cache_next) {
+			if (current->address_space_next
+				&& current->address_space_next->base <= (current->base
+					+ newSize)) {
+				// If the area was created inside a reserved area, it can
+				// also be resized in that area
+				// ToDo: if there is free space after the reserved area, it could be used as well...
+				vm_area *next = current->address_space_next;
+				if (next->id == RESERVED_AREA_ID
+					&& next->cache_offset <= current->base
+					&& next->base - 1 + next->size >= current->base - 1 + newSize)
+					continue;
+
+				return B_ERROR;
+			}
+		}
+	}
+
+	// Okay, looks good so far, so let's do it
+
+	for (vm_area* current = cache->areas; current != NULL;
+			current = current->cache_next) {
+		if (current->address_space_next
+			&& current->address_space_next->base <= (current->base + newSize)) {
+			vm_area *next = current->address_space_next;
+			if (next->id == RESERVED_AREA_ID
+				&& next->cache_offset <= current->base
+				&& next->base - 1 + next->size >= current->base - 1 + newSize) {
+				// resize reserved area
+				addr_t offset = current->base + newSize - next->base;
+				if (next->size <= offset) {
+					current->address_space_next = next->address_space_next;
+					free(next);
+				} else {
+					next->size -= offset;
+					next->base += offset;
+				}
+			} else {
+				status = B_ERROR;
+				break;
+			}
+		}
+
+		current->size = newSize;
+
+		// we also need to unmap all pages beyond the new size, if the area has shrinked
+		if (newSize < oldSize) {
+			vm_unmap_pages(current, current->base + newSize, oldSize - newSize,
+				false);
+		}
+	}
+
+	if (status == B_OK)
+		status = vm_cache_resize(cache, newSize);
+
+	if (status < B_OK) {
+		// This shouldn't really be possible, but hey, who knows
+		for (vm_area* current = cache->areas; current != NULL;
+				current = current->cache_next) {
+			current->size = oldSize;
+		}
+	}
+
+	// TODO: we must honour the lock restrictions of this area
+	return status;
+}
+
+
 //	#pragma mark - kernel public API
 
 
@@ -4980,106 +5116,14 @@ set_area_protection(area_id area, uint32 newProtection)
 	fix_protection(&newProtection);
 
 	return vm_set_area_protection(vm_kernel_address_space_id(), area,
-		newProtection);
+		newProtection, true);
 }
 
 
 status_t
 resize_area(area_id areaID, size_t newSize)
 {
-	// is newSize a multiple of B_PAGE_SIZE?
-	if (newSize & (B_PAGE_SIZE - 1))
-		return B_BAD_VALUE;
-
-	// lock all affected address spaces and the cache
-	vm_area* area;
-	vm_cache* cache;
-
-	MultiAddressSpaceLocker locker;
-	status_t status = locker.AddAreaCacheAndLock(areaID, true, true, area,
-		&cache);
-	if (status != B_OK)
-		return status;
-	AreaCacheLocker cacheLocker(cache);	// already locked
-
-	size_t oldSize = area->size;
-	if (newSize == oldSize)
-		return B_OK;
-
-	// Resize all areas of this area's cache
-
-	if (cache->type != CACHE_TYPE_RAM)
-		return B_NOT_ALLOWED;
-
-	if (oldSize < newSize) {
-		// We need to check if all areas of this cache can be resized
-
-		for (vm_area* current = cache->areas; current != NULL;
-				current = current->cache_next) {
-			if (current->address_space_next
-				&& current->address_space_next->base <= (current->base
-					+ newSize)) {
-				// If the area was created inside a reserved area, it can
-				// also be resized in that area
-				// ToDo: if there is free space after the reserved area, it could be used as well...
-				vm_area *next = current->address_space_next;
-				if (next->id == RESERVED_AREA_ID
-					&& next->cache_offset <= current->base
-					&& next->base - 1 + next->size >= current->base - 1 + newSize)
-					continue;
-
-				return B_ERROR;
-			}
-		}
-	}
-
-	// Okay, looks good so far, so let's do it
-
-	for (vm_area* current = cache->areas; current != NULL;
-			current = current->cache_next) {
-		if (current->address_space_next
-			&& current->address_space_next->base <= (current->base + newSize)) {
-			vm_area *next = current->address_space_next;
-			if (next->id == RESERVED_AREA_ID
-				&& next->cache_offset <= current->base
-				&& next->base - 1 + next->size >= current->base - 1 + newSize) {
-				// resize reserved area
-				addr_t offset = current->base + newSize - next->base;
-				if (next->size <= offset) {
-					current->address_space_next = next->address_space_next;
-					free(next);
-				} else {
-					next->size -= offset;
-					next->base += offset;
-				}
-			} else {
-				status = B_ERROR;
-				break;
-			}
-		}
-
-		current->size = newSize;
-
-		// we also need to unmap all pages beyond the new size, if the area has shrinked
-		if (newSize < oldSize) {
-			vm_unmap_pages(current, current->base + newSize, oldSize - newSize,
-				false);
-		}
-	}
-
-	if (status == B_OK)
-		status = vm_cache_resize(cache, newSize);
-
-	if (status < B_OK) {
-		// This shouldn't really be possible, but hey, who knows
-		for (vm_area* current = cache->areas; current != NULL;
-				current = current->cache_next) {
-			current->size = oldSize;
-		}
-	}
-
-	// ToDo: we must honour the lock restrictions of this area
-	return status;
+	return vm_resize_area(areaID, newSize, true);
 }
 
 
@@ -5090,7 +5134,8 @@ resize_area(area_id areaID, size_t newSize)
  */
 
 static area_id
-transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
+transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target,
+	bool kernel)
 {
 	area_info info;
 	status_t status = get_area_info(id, &info);
@@ -5098,13 +5143,13 @@ transfer_area(area_id id, void **_address, uint32 addressSpec, team_id target)
 		return status;
 
 	area_id clonedArea = vm_clone_area(target, info.name, _address,
-		addressSpec, info.protection, REGION_NO_PRIVATE_MAP, id);
+		addressSpec, info.protection, REGION_NO_PRIVATE_MAP, id, kernel);
 	if (clonedArea < B_OK)
 		return clonedArea;
 
-	status = vm_delete_area(info.team, id);
+	status = vm_delete_area(info.team, id, kernel);
 	if (status < B_OK) {
-		vm_delete_area(target, clonedArea);
+		vm_delete_area(target, clonedArea, kernel);
 		return status;
 	}
 
@@ -5134,7 +5179,7 @@ clone_area(const char *name, void **_address, uint32 addressSpec,
 		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
 	return vm_clone_area(vm_kernel_address_space_id(), name, _address,
-		addressSpec, protection, REGION_NO_PRIVATE_MAP, source);
+		addressSpec, protection, REGION_NO_PRIVATE_MAP, source, true);
 }
 
 
@@ -5145,7 +5190,7 @@ create_area_etc(struct team *team, const char *name, void **address, uint32 addr
 	fix_protection(&protection);
 
 	return vm_create_anonymous_area(team->id, (char *)name, address,
-		addressSpec, size, lock, protection, false);
+		addressSpec, size, lock, protection, false, true);
 }
 
 
@@ -5156,21 +5201,21 @@ create_area(const char *name, void **_address, uint32 addressSpec, size_t size, 
 	fix_protection(&protection);
 
 	return vm_create_anonymous_area(vm_kernel_address_space_id(), (char *)name, _address,
-		addressSpec, size, lock, protection, false);
+		addressSpec, size, lock, protection, false, true);
 }
 
 
 status_t
 delete_area_etc(struct team *team, area_id area)
 {
-	return vm_delete_area(team->id, area);
+	return vm_delete_area(team->id, area, true);
 }
 
 
 status_t
 delete_area(area_id area)
 {
-	return vm_delete_area(vm_kernel_address_space_id(), area);
+	return vm_delete_area(vm_kernel_address_space_id(), area, true);
 }
 
 
@@ -5283,7 +5328,7 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 	fix_protection(&newProtection);
 
 	return vm_set_area_protection(vm_current_user_address_space_id(), area,
-		newProtection);
+		newProtection, false);
 }
 
 
@@ -5292,7 +5337,7 @@ _user_resize_area(area_id area, size_t newSize)
 {
 	// ToDo: Since we restrict deleting of areas to those owned by the team,
 	// we should also do that for resizing (check other functions, too).
-	return resize_area(area, newSize);
+	return vm_resize_area(area, newSize, false);
 }
 
 
@@ -5311,7 +5356,7 @@ _user_transfer_area(area_id area, void **userAddress, uint32 addressSpec, team_i
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	area_id newArea = transfer_area(area, &address, addressSpec, target);
+	area_id newArea = transfer_area(area, &address, addressSpec, target, false);
 	if (newArea < B_OK)
 		return newArea;
 
@@ -5347,7 +5392,7 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 	fix_protection(&protection);
 
 	area_id clonedArea = vm_clone_area(vm_current_user_address_space_id(), name, &address,
-		addressSpec, protection, REGION_NO_PRIVATE_MAP, sourceArea);
+		addressSpec, protection, REGION_NO_PRIVATE_MAP, sourceArea, false);
 	if (clonedArea < B_OK)
 		return clonedArea;
 
@@ -5389,7 +5434,8 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	fix_protection(&protection);
 
 	area_id area = vm_create_anonymous_area(vm_current_user_address_space_id(),
-		(char *)name, &address, addressSpec, size, lock, protection, false);
+		(char *)name, &address, addressSpec, size, lock, protection, false,
+		false);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
 		delete_area(area);
@@ -5407,7 +5453,7 @@ _user_delete_area(area_id area)
 	// that you have created yourself from userland.
 	// The documentation to delete_area() explicetly states that this
 	// will be restricted in the future, and so it will.
-	return vm_delete_area(vm_current_user_address_space_id(), area);
+	return vm_delete_area(vm_current_user_address_space_id(), area, false);
 }
 
 
@@ -5470,5 +5516,5 @@ _user_unmap_memory(void *_address, addr_t size)
 		return status;
 
 	// unmap
-	return unmap_address_range(locker.AddressSpace(), address, size);
+	return unmap_address_range(locker.AddressSpace(), address, size, false);
 }

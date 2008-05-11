@@ -44,13 +44,15 @@ struct vnode;
 	(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA \
 	| B_KERNEL_STACK_AREA)
 
+// TODO: These aren't really a protection flags, but since the "protection"
+//	field is the only flag field, we currently use it for this.
+//	A cleaner approach would be appreciated - maybe just an official generic
+//	flags region in the protection field.
 #define B_OVERCOMMITTING_AREA	0x1000
 #define B_SHARED_AREA			0x2000
-	// TODO: These aren't really a protection flags, but since the "protection"
-	//	field is the only flag field, we currently use it for this.
-	//	A cleaner approach would be appreciated - maybe just an official generic
-	//	flags region in the protection field.
-
+#define B_KERNEL_AREA			0x4000
+	// Usable from userland according to its protection flags, but the area
+	// itself is not deletable, resizable, etc from userland.
 
 #define B_USER_AREA_FLAGS		(B_USER_PROTECTION)
 #define B_KERNEL_AREA_FLAGS \
@@ -110,7 +112,7 @@ status_t vm_reserve_address_range(team_id team, void **_address,
 			uint32 addressSpec, addr_t size, uint32 flags);
 area_id vm_create_anonymous_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 wiring, uint32 protection,
-			bool unmapAddressRange);
+			bool unmapAddressRange, bool kernel);
 area_id vm_map_physical_memory(team_id team, const char *name, void **address,
 			uint32 addressSpec, addr_t size, uint32 protection, addr_t phys_addr);
 area_id vm_map_file(team_id aid, const char *name, void **address,
@@ -124,8 +126,8 @@ area_id vm_copy_area(team_id team, const char *name, void **_address,
 			uint32 addressSpec, uint32 protection, area_id sourceID);
 area_id vm_clone_area(team_id team, const char *name, void **address,
 			uint32 addressSpec, uint32 protection, uint32 mapping,
-			area_id sourceArea);
-status_t vm_delete_area(team_id teamID, area_id areaID);
+			area_id sourceArea, bool kernel);
+status_t vm_delete_area(team_id teamID, area_id areaID, bool kernel);
 status_t vm_create_vnode_cache(struct vnode *vnode, struct vm_cache **_cache);
 struct vm_area *vm_area_lookup(struct vm_address_space *addressSpace,
 			addr_t address);
