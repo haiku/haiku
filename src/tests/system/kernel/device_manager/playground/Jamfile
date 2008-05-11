@@ -12,6 +12,8 @@ SimpleTest device_manager :
 
 	bus.cpp
 	driver.cpp
+	generic_video_driver.cpp
+	specific_video_driver.cpp
 
 	: be libkernelland_emu.so
 ;

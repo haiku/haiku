@@ -71,6 +71,7 @@ register_child_devices(device_node *node)
 	} kDevices[] = {
 		{0x1000, 0x0001, PCI_mass_storage, PCI_sata, PCI_sata_ahci},
 		{0x1001, 0x0001, PCI_network, PCI_ethernet, 0},
+		{0x1001, 0x0002, PCI_display, 0, 0},
 		{0x1002, 0x0001, PCI_multimedia, PCI_audio, 0},
 		{0x1002, 0x0002, PCI_serial_bus, PCI_usb, PCI_usb_ehci},
 	};

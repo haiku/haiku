@@ -7,9 +7,10 @@
 #include "bus.h"
 
 #include <KernelExport.h>
+#include <PCI.h>
 
 
-#define DRIVER_MODULE_NAME "drivers/net/sample_driver/driver_v1"
+#define DRIVER_MODULE_NAME "drivers/graphics/generic_driver/driver_v1"
 
 
 //	#pragma mark - driver
@@ -18,16 +19,6 @@
 static float
 supports_device(device_node *parent)
 {
-#if 0
-	const char* bus;
-	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus, false)
-			!= B_OK)
-		return -1;
-
-	if (bus == NULL || strcmp(bus, BUS_NAME))
-		return -1;
-#endif
-
 	bus_for_driver_module_info* module;
 	void* data;
 	gDeviceManager->get_driver(parent, (driver_module_info**)&module, &data);
@@ -35,11 +26,13 @@ supports_device(device_node *parent)
 	if (strcmp(module->info.info.name, BUS_FOR_DRIVER_NAME))
 		return -1;
 
-	bus_info info;
-	if (module->get_bus_info(data, &info) == B_OK
-		&& info.vendor_id == 0x1001
-		&& info.device_id == 0x0001)
-		return 1.0;
+	uint16 type;
+	if (gDeviceManager->get_attr_uint16(parent, B_DEVICE_TYPE, &type, false)
+			!= B_OK)
+		return -1;
+
+	if (type == PCI_display)
+		return 0.1;
 
 	return 0.0;
 }
@@ -153,7 +146,7 @@ device_io(void *cookie, io_request *request)
 //	#pragma mark -
 
 
-struct driver_module_info gDriverModuleInfo = {
+struct driver_module_info gGenericVideoDriverModuleInfo = {
 	{
 		DRIVER_MODULE_NAME,
 		0,
@@ -169,9 +162,9 @@ struct driver_module_info gDriverModuleInfo = {
 	device_removed,
 };
 
-struct device_module_info gDeviceModuleInfo = {
+struct device_module_info gGenericVideoDeviceModuleInfo = {
 	{
-		"drivers/net/sample_driver/device_v1",
+		"drivers/graphics/generic_driver/device_v1",
 		0,
 		NULL,
 	},

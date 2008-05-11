@@ -29,6 +29,10 @@
 
 extern struct device_module_info gDeviceModuleInfo;
 extern struct driver_module_info gDriverModuleInfo;
+extern struct device_module_info gGenericVideoDeviceModuleInfo;
+extern struct driver_module_info gGenericVideoDriverModuleInfo;
+extern struct device_module_info gSpecificVideoDeviceModuleInfo;
+extern struct driver_module_info gSpecificVideoDriverModuleInfo;
 extern struct driver_module_info gBusModuleInfo;
 extern struct driver_module_info gBusDriverModuleInfo;
 
@@ -112,6 +116,14 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 			status_t		Probe(const char* devicePath);
 			bool			IsRegistered() const { return fRegistered; }
 			bool			IsInitialized() const { return fInitialized > 0; }
+
+			void			Acquire();
+			bool			Release();
+
+			int				CompareTo(const device_attr* attributes) const;
+			device_node*	FindChild(const device_attr* attributes) const;
+
+			void			Dump(int32 level = 0);
 
 private:
 			status_t		_RegisterFixed(uint32& registered);
@@ -361,27 +373,6 @@ dump_attribute(device_attr* attr, int32 level)
 }
 
 
-void
-dm_dump_node(device_node* node, int32 level)
-{
-	if (node == NULL)
-		return;
-
-	put_level(level);
-	dprintf("(%ld) @%p \"%s\"\n", level, node, node->ModuleName());
-	
-	AttributeList::Iterator attribute = node->Attributes().GetIterator();
-	while (attribute.HasNext()) {
-		dump_attribute(attribute.Next(), level);
-	}
-
-	NodeList::ConstIterator iterator = node->Children().GetIterator();
-	while (iterator.HasNext()) {
-		dm_dump_node(iterator.Next(), level + 1);
-	}
-}
-
-
 static void
 uninit_unused()
 {
@@ -434,6 +425,8 @@ device_node::device_node(const char* moduleName, const device_attr* attrs,
 
 device_node::~device_node()
 {
+	TRACE(("delete node %p\n", this));
+
 	// Delete children
 	NodeList::Iterator nodeIterator = fChildren.GetIterator();
 	while (nodeIterator.HasNext()) {
@@ -464,10 +457,20 @@ device_node::InitCheck()
 status_t
 device_node::InitDriver()
 {
-	if (fInitialized++ > 0)
+	if (fInitialized++ > 0) {
+		if (Parent() != NULL) {
+			Parent()->InitDriver();
+				// acquire another reference to our parent as well
+		}
+		Acquire();
 		return B_OK;
+	}
 
 	status_t status = get_module(ModuleName(), (module_info**)&fDriver);
+	if (status == B_OK && Parent() != NULL) {
+		// our parent always have to be initialized
+		status = Parent()->InitDriver();
+	}
 	if (status < B_OK) {
 		fInitialized--;
 		return status;
@@ -475,12 +478,17 @@ device_node::InitDriver()
 
 	if (fDriver->init_driver != NULL)
 		status = fDriver->init_driver(this, &fDriverData);
+
 	if (status < B_OK) {
 		fInitialized--;
+
 		put_module(ModuleName());
+		fDriver = NULL;
+		fDriverData = NULL;
 		return status;
 	}
 
+	Acquire();
 	return B_OK;
 }
 
@@ -488,8 +496,11 @@ device_node::InitDriver()
 bool
 device_node::UninitDriver()
 {
-	if (fInitialized-- > 1)
+	if (fInitialized-- > 1) {
+		Release();
 		return false;
+	}
+	TRACE(("uninit driver for node %p\n", this));
 
 	if (fDriver->uninit_driver != NULL)
 		fDriver->uninit_driver(this);
@@ -499,8 +510,12 @@ device_node::UninitDriver()
 
 	put_module(ModuleName());
 
+	Release();
+	if (Parent() != NULL)
+		Parent()->UninitDriver();
+
 	if ((fFlags & NODE_FLAG_REMOVE_ON_UNINIT) != 0)
-		delete this;
+		Release();
 
 	return true;
 }
@@ -510,7 +525,7 @@ void
 device_node::AddChild(device_node* node)
 {
 	// we must not be destroyed	as long as we have children
-	fRefCount++;
+	Acquire();
 	node->fParent = this;
 	fChildren.Add(node);
 }
@@ -519,10 +534,9 @@ device_node::AddChild(device_node* node)
 void
 device_node::RemoveChild(device_node* node)
 {
-	fRefCount--;
-		// TODO: we may need to destruct ourselves here!
 	node->fParent = NULL;
 	fChildren.Remove(node);
+	Release();
 }
 
 
@@ -784,7 +798,8 @@ device_node::_RegisterPath(const char* path)
 	while (_GetNextDriver(list, driver) == B_OK) {
 		float support = driver->supports_device(this);
 		if (support > 0.0) {
-printf("  register module \"%s\", support %f\n", driver->info.name, support);
+			TRACE(("  register module \"%s\", support %f\n", driver->info.name,
+				support));
 			if (driver->register_device(this) == B_OK)
 				count++;
 		}
@@ -835,7 +850,8 @@ device_node::_RegisterDynamic()
 		}
 
 		if (bestDriver != NULL) {
-printf("  register best module \"%s\", support %f\n", bestDriver->info.name, bestSupport);
+			TRACE(("  register best module \"%s\", support %f\n",
+				bestDriver->info.name, bestSupport));
 			bestDriver->register_device(this);
 			put_module(bestDriver->info.name);
 		}
@@ -861,9 +877,10 @@ device_node::_RemoveChildren()
 		if (!child->IsInitialized()) {
 			// this child is not used currently, and can be removed safely
 			iterator.Remove();
-			fRefCount--;
 			child->fParent = NULL;
 			delete child;
+			if (Release())
+				panic("died early");
 		} else
 			child->fFlags |= NODE_FLAG_REMOVE_ON_UNINIT;
 	}
@@ -875,6 +892,12 @@ device_node::_RemoveChildren()
 status_t
 device_node::Probe(const char* devicePath)
 {
+	status_t status = InitDriver();
+	if (status < B_OK)
+		return status;
+
+	MethodDeleter<device_node, bool> uninit(this, &device_node::UninitDriver);
+
 	uint16 type = 0;
 	uint16 subType = 0;
 	if (dm_get_attr_uint16(this, B_DEVICE_TYPE, &type, false) == B_OK
@@ -917,7 +940,7 @@ device_node::Probe(const char* devicePath)
 	while (iterator.HasNext()) {
 		device_node* child = iterator.Next();
 		
-		status_t status = child->Probe(devicePath);
+		status = child->Probe(devicePath);
 		if (status != B_OK)
 			return status;
 	}
@@ -965,6 +988,91 @@ device_node::UninitUnusedChildren()
 }
 
 
+void
+device_node::Acquire()
+{
+	atomic_add(&fRefCount, 1);
+}
+
+
+bool
+device_node::Release()
+{
+	if (atomic_add(&fRefCount, -1) > 1)
+		return false;
+
+	if (Parent() != NULL)
+		Parent()->RemoveChild(this);
+	delete this;
+	return true;
+}
+
+
+int
+device_node::CompareTo(const device_attr* attributes) const
+{
+	if (attributes == NULL)
+		return -1;
+
+	for (; attributes->name != NULL; attributes++) {
+		// find corresponding attribute
+		AttributeList::ConstIterator iterator = Attributes().GetIterator();
+		device_attr_private* attr = NULL;
+		while (iterator.HasNext()) {
+			attr = iterator.Next();
+
+			if (!strcmp(attr->name, attributes->name))
+				break;
+		}
+		if (!iterator.HasNext())
+			return -1;
+
+		int compare = device_attr_private::Compare(attr, attributes);
+		if (compare != 0)
+			return compare;
+	}
+
+	return 0;
+}
+
+
+device_node*
+device_node::FindChild(const device_attr* attributes) const
+{
+	if (attributes == NULL)
+		return NULL;
+
+	NodeList::ConstIterator iterator = Children().GetIterator();
+	while (iterator.HasNext()) {
+		device_node* child = iterator.Next();
+
+		if (!child->CompareTo(attributes))
+			return child;
+	}
+
+	return NULL;
+}
+
+
+void
+device_node::Dump(int32 level = 0)
+{
+	put_level(level);
+	dprintf("(%ld) @%p \"%s\" (ref %ld, init %ld)\n", level, this, ModuleName(),
+		fRefCount, fInitialized);
+
+	AttributeList::Iterator attribute = Attributes().GetIterator();
+	while (attribute.HasNext()) {
+		dump_attribute(attribute.Next(), level);
+	}
+
+	NodeList::ConstIterator iterator = Children().GetIterator();
+	while (iterator.HasNext()) {
+		iterator.Next()->Dump(level + 1);
+	}
+}
+
+
 //	#pragma mark - Device Manager module API
 
 
@@ -983,6 +1091,11 @@ register_device(device_node* parent, const char* moduleName,
 	if ((parent == NULL && sRootNode != NULL) || moduleName == NULL)
 		return B_BAD_VALUE;
 
+	if (parent != NULL && parent->FindChild(attrs) != NULL) {
+		// A node like this one already exists for this parent
+		return B_NAME_IN_USE;
+	}
+
 	// TODO: handle I/O resources!
 
 	device_node *newNode = new(std::nothrow) device_node(moduleName, attrs,
@@ -999,15 +1112,15 @@ register_device(device_node* parent, const char* moduleName,
 	if (status != B_OK)
 		goto err1;
 
-	status = newNode->InitDriver();
-	if (status != B_OK)
-		goto err1;
-
 	// make it public
 	if (parent != NULL)
 		parent->AddChild(newNode);
 	else
 		sRootNode = newNode;
+
+	status = newNode->InitDriver();
+	if (status != B_OK)
+		goto err1;
 
 #if 0
 	// The following is done to reduce the stack usage of deeply nested
@@ -1063,8 +1176,11 @@ get_driver(device_node* node, driver_module_info** _module, void** _data)
 
 
 static device_node*
-device_root(void)
+get_device_root(void)
 {
+	if (sRootNode != NULL)
+		sRootNode->Acquire();
+
 	return sRootNode;
 }
 
@@ -1080,13 +1196,23 @@ get_next_child_device(device_node* parent, device_node* _node,
 static device_node*
 get_parent(device_node* node)
 {
-	return NULL;
+	if (node == NULL)
+		return NULL;
+
+	RecursiveLocker _(sLock);
+
+	device_node* parent = node->Parent();
+	parent->Acquire();
+
+	return parent;
 }
 
 
 static void
 put_device_node(device_node* node)
 {
+	RecursiveLocker _(sLock);
+	node->Release();
 }
 
 
@@ -1229,7 +1355,7 @@ static struct device_manager_info sDeviceManagerModule = {
 	register_device,
 	unregister_device,
 	get_driver,
-	device_root,
+	get_device_root,
 	get_next_child_device,
 	get_parent,
 	put_device_node,
@@ -1284,10 +1410,18 @@ main(int argc, char** argv)
 {
 	_add_builtin_module((module_info*)&sDeviceManagerModule);
 	_add_builtin_module((module_info*)&sDeviceRootModule);
-	_add_builtin_module((module_info*)&gDeviceModuleInfo);
-	_add_builtin_module((module_info*)&gDriverModuleInfo);
+
+	// bus
 	_add_builtin_module((module_info*)&gBusModuleInfo);
 	_add_builtin_module((module_info*)&gBusDriverModuleInfo);
+
+	// sample driver
+	_add_builtin_module((module_info*)&gDriverModuleInfo);
+	_add_builtin_module((module_info*)&gDeviceModuleInfo);
+
+	// generic video driver
+	_add_builtin_module((module_info*)&gGenericVideoDriverModuleInfo);
+	_add_builtin_module((module_info*)&gGenericVideoDeviceModuleInfo);
 
 	gDeviceManager = &sDeviceManagerModule;
 
@@ -1301,9 +1435,21 @@ main(int argc, char** argv)
 	recursive_lock_init(&sLock, "device manager");
 
 	dm_init_root_node();
-	dm_dump_node(sRootNode, 0);
+	sRootNode->Dump();
 
 	probe_path("net");
+	probe_path("graphics");
+	// TODO: opened devices need to keep a "initialized" reference of the
+	// device_node
+
+	sRootNode->Dump();
+	uninit_unused();
+
+	// add specific video driver - ie. simulate installing it
+	_add_builtin_module((module_info*)&gSpecificVideoDriverModuleInfo);
+	_add_builtin_module((module_info*)&gSpecificVideoDeviceModuleInfo);
+	probe_path("graphics");
+
 	uninit_unused();
 
 	recursive_lock_destroy(&sLock);
