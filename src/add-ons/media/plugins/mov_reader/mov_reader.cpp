@@ -252,6 +252,7 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 
 			format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
 		} else {
+		
 			description.family = B_QUICKTIME_FORMAT_FAMILY;
 			description.u.quicktime.codec = audio_format->compression;
 			if (B_OK != formats.GetFormatFor(description, format)) {
@@ -278,6 +279,8 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 					format->u.encoded_audio.output.frame_rate = cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
 					break;
+				case AUDIO_IMA4:
+				
 				default:
 					TRACE("OTHER\n");
 					format->u.encoded_audio.bit_rate = 8 * cookie->frames_per_sec_rate / cookie->frames_per_sec_scale;
@@ -287,49 +290,16 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			}
 		}
 
-/*		if (audio_format->compression == 0x0001) {
-			// a raw PCM format
-			description.family = B_BEOS_FORMAT_FAMILY;
-			description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
-			if (B_OK != formats.GetFormatFor(description, format)) 
-				format->type = B_MEDIA_RAW_AUDIO;
-			format->u.raw_audio.frame_rate = audio_format->SampleRate;
-			format->u.raw_audio.channel_count = audio_format->NoOfChannels;
-			if (audio_format->bits_per_sample <= 8)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_UINT8;
-			else if (audio_format->bits_per_sample <= 16)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_INT16;
-			else if (audio_format->bits_per_sample <= 24)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_INT24;
-			else if (audio_format->bits_per_sample <= 32)
-				format->u.raw_audio.format = B_AUDIO_FORMAT_INT32;
-			else {
-				ERROR("movReader::AllocateCookie: unhandled bits per sample %d\n", audio_format->bits_per_sample);
-				return B_ERROR;
-			}
-			format->u.raw_audio.format |= B_AUDIO_FORMAT_CHANNEL_ORDER_WAVE;
-			format->u.raw_audio.byte_order = B_MEDIA_BIG_ENDIAN;
-			format->u.raw_audio.buffer_size = stream_header->suggested_buffer_size;
-		} else {
-			// some encoded format
-			description.family = B_WAV_FORMAT_FAMILY;
-			description.u.wav.codec = audio_format->compression;
-			if (B_OK != formats.GetFormatFor(description, format)) 
-				format->type = B_MEDIA_ENCODED_AUDIO;
-			format->u.encoded_audio.bit_rate = 8 * audio_format->PacketSize;
-			TRACE("bit_rate %.3f\n", format->u.encoded_audio.bit_rate);
-			format->u.encoded_audio.output.frame_rate = audio_format->SampleRate;
-			format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
-		}
-		*/
 		// this doesn't seem to work (it's not even a fourcc)
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = audio_format->compression; format->user_data[4] = 0;
 		
-		// put the Audio struct, including extra data, into the format meta data.
-		size_t size;
-		const void *data = theFileReader->AudioFormat(cookie->stream, &size);
-		format->SetMetaData(data, size);
+		// Some codecs have additional setup data that they need, put it in metadata
+		size_t size = audio_format->VOLSize;
+		const void *data = audio_format->theVOL;
+		if (size > 0) {
+			format->SetMetaData(data, size);
+		}
 
 #ifdef TRACE_MOV_READER
 		uint8 *p = 18 + (uint8 *)data;
@@ -382,6 +352,7 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = description.u.quicktime.codec; format->user_data[4] = 0;
+		
 		format->u.encoded_video.max_bit_rate = 8 * theFileReader->MovMainHeader()->max_bytes_per_sec;
 		format->u.encoded_video.avg_bit_rate = format->u.encoded_video.max_bit_rate / 2; // XXX fix this
 		format->u.encoded_video.output.field_rate = cookie->frames_per_sec_rate / (float)cookie->frames_per_sec_scale;
@@ -391,7 +362,6 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		format->u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
 		format->u.encoded_video.output.pixel_width_aspect = 1;
 		format->u.encoded_video.output.pixel_height_aspect = 1;
-		// format->u.encoded_video.output.display.format = 0;
 		format->u.encoded_video.output.display.line_width = theFileReader->MovMainHeader()->width;
 		format->u.encoded_video.output.display.line_count = cookie->line_count;
 		format->u.encoded_video.output.display.bytes_per_row = 0; // format->u.encoded_video.output.display.line_width * 4;
@@ -402,11 +372,11 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		TRACE("max_bit_rate %.3f\n", format->u.encoded_video.max_bit_rate);
 		TRACE("field_rate   %.3f\n", format->u.encoded_video.output.field_rate);
 
-		// Set the VOL
-		if (video_format->VOLSize > 0) {
-			TRACE("VOL SIZE  %ld\n", video_format->VOLSize);
-			size_t size = video_format->VOLSize;
-			const void *data = video_format->theVOL;
+		// Some decoders need additional metadata passed via a special Atom
+		size_t size = video_format->VOLSize;
+		const void *data = video_format->theVOL;
+		if (size > 0) {
+			TRACE("VOL SIZE  %ld\n", size);
 			format->SetMetaData(data, size);
 		}
 
@@ -439,8 +409,18 @@ movReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 	*frameCount = cookie->frame_count;
 	*duration = cookie->duration;
 	*format = cookie->format;
-	*infoBuffer = 0;
-	*infoSize = 0;
+	
+	// Copy metadata to infoBuffer
+	if (theFileReader->IsVideo(cookie->stream)) {
+		const VideoMetaData *video_format = theFileReader->VideoFormat(cookie->stream);
+		*infoBuffer = video_format->theVOL;
+		*infoSize = video_format->VOLSize;
+	} else {
+		const AudioMetaData *audio_format = theFileReader->AudioFormat(cookie->stream);
+		*infoBuffer = audio_format->theVOL;
+		*infoSize = audio_format->VOLSize;
+	}
+
 	return B_OK;
 }
 

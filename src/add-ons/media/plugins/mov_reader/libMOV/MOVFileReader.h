@@ -113,7 +113,7 @@ public:
 	bool	GetNextChunkInfo(uint32 stream_index, uint32 pFrameNo, off_t *start, uint32 *size, bool *keyframe);
 	
 	// Return all Audio Meta Data
-	const 	AudioMetaData 		*AudioFormat(uint32 stream_index, size_t *size = 0);
+	const 	AudioMetaData 		*AudioFormat(uint32 stream_index);
 	// Return all Video Meta Data
 	const 	VideoMetaData		*VideoFormat(uint32 stream_index);
 	

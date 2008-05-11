@@ -439,7 +439,7 @@ const 	mov_main_header		*MOVFileReader::MovMainHeader()
 	return &theMainHeader;
 }
 
-const 	AudioMetaData 		*MOVFileReader::AudioFormat(uint32 stream_index, size_t *size)
+const 	AudioMetaData 		*MOVFileReader::AudioFormat(uint32 stream_index)
 {
 	if (IsAudio(stream_index)) {
 
