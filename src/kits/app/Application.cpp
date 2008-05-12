@@ -895,7 +895,7 @@ BApplication::AppResources()
 	
 	BFile file(&ref, B_READ_ONLY);
 	if (file.InitCheck() == B_OK) {
-		sAppResources = new (nothrow) BResources(&file, false);
+		sAppResources = new (std::nothrow) BResources(&file, false);
 		if (sAppResources != NULL
 			&& sAppResources->InitCheck() != B_OK) {
 			delete sAppResources;
