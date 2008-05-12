@@ -195,8 +195,7 @@ LinkSender::AdjustBuffer(size_t newSize, char **_oldBuffer)
 		return B_BUFFER_OVERFLOW;
 	else if (newSize > kInitialBufferSize)
 		newSize = (newSize + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-
-	char *buffer = NULL;
+	
 	if (newSize == fBufferSize) {
 		// keep existing buffer
 		if (_oldBuffer)
@@ -205,7 +204,7 @@ LinkSender::AdjustBuffer(size_t newSize, char **_oldBuffer)
 	}
 
 	// create new larger buffer
-	buffer = (char *)malloc(newSize);
+	char *buffer = (char *)malloc(newSize);
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 

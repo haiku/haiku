@@ -58,11 +58,9 @@ LinkReceiver::SetPort(port_id port)
 status_t
 LinkReceiver::GetNextMessage(int32 &code, bigtime_t timeout)
 {
-	int32 remaining;
-
 	fReadError = B_OK;
 
-	remaining = fDataSize - (fRecvStart + fReplySize);
+	int32 remaining = fDataSize - (fRecvStart + fReplySize);
 	STRACE(("info: LinkReceiver GetNextReply() reports %ld bytes remaining in buffer.\n", remaining));
 
 	// find the position of the next message header in the buffer
@@ -277,14 +275,12 @@ status_t
 LinkReceiver::ReadString(char** _string, size_t* _length)
 {
 	int32 length = 0;
-	status_t status;
+	status_t status = Read<int32>(&length);
 
-	status = Read<int32>(&length);
 	if (status < B_OK)
 		return status;
 
 	char *string;
-
 	if (length < 0) {
 		status = B_ERROR;
 		goto err;
@@ -309,6 +305,7 @@ LinkReceiver::ReadString(char** _string, size_t* _length)
 
 	if (_length)
 		*_length = length;
+	
 	*_string = string;
 
 	return B_OK;
@@ -324,9 +321,8 @@ status_t
 LinkReceiver::ReadString(BString &string, size_t* _length)
 {
 	int32 length = 0;
-	status_t status;
+	status_t status = Read<int32>(&length);
 
-	status = Read<int32>(&length);
 	if (status < B_OK)
 		return status;
 
@@ -370,9 +366,8 @@ status_t
 LinkReceiver::ReadString(char *buffer, size_t bufferLength)
 {
 	int32 length = 0;
-	status_t status;
+	status_t status = Read<int32>(&length);
 
-	status = Read<int32>(&length);
 	if (status < B_OK)
 		return status;
 

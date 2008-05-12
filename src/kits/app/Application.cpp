@@ -208,7 +208,6 @@ BApplication::BApplication(BMessage *data)
 	bigtime_t pulseRate;
 	if (data->FindInt64("_pulse", &pulseRate) == B_OK)
 		SetPulseRate(pulseRate);
-
 }
 
 
@@ -861,6 +860,8 @@ BApplication::IsLaunching() const
 status_t
 BApplication::GetAppInfo(app_info *info) const
 {
+	if (be_app == NULL || be_roster == NULL)
+		return B_NO_INIT;
 	return be_roster->GetRunningAppInfo(be_app->Team(), info);
 }
 
@@ -879,9 +880,9 @@ BApplication::AppResources()
 	bool found = false;
 
 	// App is already running. Get its entry ref with
-	// GetRunningAppInfo()	
+	// GetAppInfo()	
 	app_info appInfo;
-	if (be_app && be_roster->GetRunningAppInfo(be_app->Team(), &appInfo) == B_OK) {
+	if (be_app && be_app->GetAppInfo(&appInfo) == B_OK) {
 		ref = appInfo.ref;
 		found = true;
 	} else {
@@ -889,14 +890,16 @@ BApplication::AppResources()
 		found = BPrivate::get_app_ref(&ref) == B_OK;
 	}
 
-	if (found) {
-		BFile file(&ref, B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			BResources *resources = new BResources();
-			if (resources->SetTo(&file, false) < B_OK)
-				delete resources;
-			else
-				sAppResources = resources;			
+	if (!found)
+		return NULL;
+	
+	BFile file(&ref, B_READ_ONLY);
+	if (file.InitCheck() == B_OK) {
+		sAppResources = new (nothrow) BResources(&file, false);
+		if (sAppResources != NULL
+			&& sAppResources->InitCheck() != B_OK) {
+			delete sAppResources;
+			sAppResources = NULL;
 		}
 	}
 
