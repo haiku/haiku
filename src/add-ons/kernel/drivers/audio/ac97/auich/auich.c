@@ -404,7 +404,7 @@ auich_int(void *arg)
 	
 	// TRACE(("auich_int(%p)\n", card));
 	
-	sta = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA);
+	sta = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA) & STA_INTMASK;
 	if (sta & card->interrupt_mask) {
 		
 		if (sta & (STA_S0RI | STA_S1RI | STA_S2RI)) {
