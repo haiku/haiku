@@ -399,16 +399,17 @@ auich_int(void *arg)
 	bool 			gotone 	= false;
 	uint8       	curblk;
 	auich_stream 	*stream = NULL;
-	uint16 			sr, sta;
+	uint32			sta;
+	uint16 			sr;
 	
 	// TRACE(("auich_int(%p)\n", card));
 	
-	sta = auich_reg_read_16(&card->config, AUICH_REG_GLOB_STA);
+	sta = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA);
 	if (sta & card->interrupt_mask) {
 		
 		if (sta & (STA_S0RI | STA_S1RI | STA_S2RI)) {
 			// ignore and clear resume interrupt(s)
-			auich_reg_write_16(&card->config, AUICH_REG_GLOB_STA, sta & (STA_S0RI | STA_S1RI | STA_S2RI));
+			auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, sta & (STA_S0RI | STA_S1RI | STA_S2RI));
 			TRACE(("interrupt !! %x\n", sta));
 			gotone = true;
 		}
@@ -442,10 +443,17 @@ auich_int(void *arg)
 								
 				auich_reg_write_16(&card->config, 
 					stream->base + GET_REG_SR(&stream->card->config), sr);
+				auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, stream->sta);
+				sta &= ~stream->sta;
 			}
+		
+		if (sta != 0) {
+			dprintf("global status not fully handled %lx!\n", sta);
+			auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, sta);
+		}
 	} else {
-		TRACE(("interrupt masked %x, ", card->interrupt_mask));
-		TRACE(("sta %x\n", sta));
+		TRACE(("interrupt masked %lx, ", card->interrupt_mask));
+		TRACE(("sta %lx\n", sta));
 	}
 	
 	if (gotone)
