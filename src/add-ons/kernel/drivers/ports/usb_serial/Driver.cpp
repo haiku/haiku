@@ -329,7 +329,7 @@ publish_devices()
 	acquire_sem(gDriverLock);
 	for(int32 i = 0; i < DEVICES_COUNT; i++) {
 		if (gSerialDevices[i]) {
-			gDeviceNames[j] = (char *)malloc(strlen(sDeviceBaseName + 4));
+			gDeviceNames[j] = (char *)malloc(strlen(sDeviceBaseName) + 4);
 			if (gDeviceNames[j]) {
 				sprintf(gDeviceNames[j], "%s%ld", sDeviceBaseName, i);
 				j++;
