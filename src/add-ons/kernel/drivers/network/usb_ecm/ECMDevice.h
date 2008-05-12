@@ -15,7 +15,7 @@ public:
 
 		status_t			InitCheck() { return fStatus; };
 
-		status_t			Open(uint32 flags);
+		status_t			Open();
 		bool				IsOpen() { return fOpen; };
 
 		status_t			Close();
@@ -28,6 +28,8 @@ public:
 		void				Removed();
 		bool				IsRemoved() { return fRemoved; };
 
+		status_t			CompareAndReattach(usb_device device);
+
 private:
 static	void				_ReadCallback(void *cookie, int32 status,
 								void *data, uint32 actualLength);
@@ -36,13 +38,17 @@ static	void				_WriteCallback(void *cookie, int32 status,
 static	void				_NotifyCallback(void *cookie, int32 status,
 								void *data, uint32 actualLength);
 
-		status_t			_ReadMACAddress();
+		status_t			_SetupDevice();
+		status_t			_ReadMACAddress(usb_device device, uint8 *buffer);
 
 		// state tracking
 		status_t			fStatus;
 		bool				fOpen;
 		bool				fRemoved;
+		vint32				fInsideNotify;
 		usb_device			fDevice;
+		uint16				fVendorID;
+		uint16				fProductID;
 
 		// interface and device infos
 		uint8				fControlInterfaceIndex;

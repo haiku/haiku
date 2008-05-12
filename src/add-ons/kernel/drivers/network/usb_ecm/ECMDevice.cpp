@@ -16,6 +16,7 @@ ECMDevice::ECMDevice(usb_device device)
 	:	fStatus(B_ERROR),
 		fOpen(false),
 		fRemoved(false),
+		fInsideNotify(0),
 		fDevice(device),
 		fControlInterfaceIndex(0),
 		fDataInterfaceIndex(0),
@@ -35,87 +36,15 @@ ECMDevice::ECMDevice(usb_device device)
 {
 	const usb_device_descriptor *deviceDescriptor
 		= gUSBModule->get_device_descriptor(device);
-	const usb_configuration_info *config
-		= gUSBModule->get_nth_configuration(device, 0);
 
-	if (deviceDescriptor == NULL || config == NULL) {
-		TRACE_ALWAYS("failed to get basic device info\n");
+	if (deviceDescriptor == NULL) {
+		TRACE_ALWAYS("failed to get device descriptor\n");
 		return;
 	}
 
-	TRACE_ALWAYS("creating device: vendor: 0x%04x; device: 0x%04x\n",
-		deviceDescriptor->vendor_id, deviceDescriptor->product_id);
+	fVendorID = deviceDescriptor->vendor_id;
+	fProductID = deviceDescriptor->product_id;
 
-	uint8 controlIndex = 0;
-	uint8 dataIndex = 0;
-	bool foundUnionDescriptor = false;
-	bool foundEthernetDescriptor = false;
-	for (size_t i = 0; i < config->interface_count
-		&& (!foundUnionDescriptor || !foundEthernetDescriptor); i++) {
-		usb_interface_info *interface = config->interface[i].active;
-		usb_interface_descriptor *descriptor = interface->descr;
-		if (descriptor->interface_class == USB_INTERFACE_CLASS_CDC
-			&& descriptor->interface_subclass == USB_INTERFACE_SUBCLASS_ECM
-			&& interface->generic_count > 0) {
-			// try to find and interpret the union and ethernet functional
-			// descriptors
-			foundUnionDescriptor = foundEthernetDescriptor = false;
-			for (size_t j = 0; j < interface->generic_count; j++) {
-				usb_generic_descriptor *generic = &interface->generic[j]->generic;
-				if (generic->length >= 5
-					&& generic->data[0] == FUNCTIONAL_SUBTYPE_UNION) {
-					controlIndex = generic->data[1];
-					dataIndex = generic->data[2];
-					foundUnionDescriptor = true;
-				} else if (generic->length >= sizeof(ethernet_functional_descriptor)
-					&& generic->data[0] == FUNCTIONAL_SUBTYPE_ETHERNET) {
-					ethernet_functional_descriptor *ethernet
-						= (ethernet_functional_descriptor *)generic->data;
-					fMACAddressIndex = ethernet->mac_address_index;
-					fMaxSegmentSize = ethernet->max_segment_size;
-					foundEthernetDescriptor = true;
-				}
-
-				if (foundUnionDescriptor && foundEthernetDescriptor)
-					break;
-			}
-		}
-	}
-
-	if (!foundUnionDescriptor) {
-		TRACE_ALWAYS("did not find a union descriptor\n");
-		return;
-	}
-
-	if (!foundEthernetDescriptor) {
-		TRACE_ALWAYS("did not find an ethernet descriptor\n");
-		return;
-	}
-
-	if (_ReadMACAddress() != B_OK) {
-		TRACE_ALWAYS("failed to read mac address\n");
-		return;
-	}
-
-	if (controlIndex >= config->interface_count) {
-		TRACE_ALWAYS("control interface index invalid\n");
-		return;
-	}
-
-	// check that the indicated control interface fits our needs
-	usb_interface_info *interface = config->interface[controlIndex].active;
-	usb_interface_descriptor *descriptor = interface->descr;
-	if ((descriptor->interface_class != USB_INTERFACE_CLASS_CDC
-		|| descriptor->interface_subclass != USB_INTERFACE_SUBCLASS_ECM)
-		|| interface->endpoint_count == 0) {
-		TRACE_ALWAYS("control interface invalid\n");
-		return;
-	}
-
-	fControlInterfaceIndex = controlIndex;
-	fNotifyEndpoint = interface->endpoint[0].handle;
-
-	// setup notify buffer and try to schedule a notification transfer
 	fNotifyBufferLength = 64;
 	fNotifyBuffer = (uint8 *)malloc(fNotifyBufferLength);
 	if (fNotifyBuffer == NULL) {
@@ -123,35 +52,6 @@ ECMDevice::ECMDevice(usb_device device)
 		return;
 	}
 
-	if (gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
-		fNotifyBufferLength, _NotifyCallback, this) != B_OK) {
-		// we cannot use notifications - hardcode to active connection
-		fHasConnection = true;
-		fDownstreamSpeed = 1000 * 1000 * 10; // 10Mbps
-		fUpstreamSpeed = 1000 * 1000 * 10; // 10Mbps
-	}
-
-	if (dataIndex >= config->interface_count) {
-		TRACE_ALWAYS("data interface index invalid\n");
-		return;
-	}
-
-	// check that the indicated data interface fits our needs
-	if (config->interface[dataIndex].alt_count < 2) {
-		TRACE_ALWAYS("data interface does not provide two alternate interfaces\n");
-		return;
-	}
-
-	// alternate 0 is the disabled, endpoint-less default interface
-	interface = &config->interface[dataIndex].alt[1];
-	descriptor = interface->descr;
-	if (descriptor->interface_class != USB_INTERFACE_CLASS_CDC_DATA
-		|| interface->endpoint_count < 2) {
-		TRACE_ALWAYS("data interface invalid\n");
-		return;
-	}
-
-	fDataInterfaceIndex = dataIndex;
 	fNotifyReadSem = create_sem(0, DRIVER_NAME"_notify_read");
 	if (fNotifyReadSem < B_OK) {
 		TRACE_ALWAYS("failed to create read notify sem\n");
@@ -161,6 +61,16 @@ ECMDevice::ECMDevice(usb_device device)
 	fNotifyWriteSem = create_sem(0, DRIVER_NAME"_notify_write");
 	if (fNotifyWriteSem < B_OK) {
 		TRACE_ALWAYS("failed to create write notify sem\n");
+		return;
+	}
+
+	if (_SetupDevice() != B_OK) {
+		TRACE_ALWAYS("failed to setup device\n");
+		return;
+	}
+
+	if (_ReadMACAddress(fDevice, fMACAddress) != B_OK) {
+		TRACE_ALWAYS("failed to read mac address\n");
 		return;
 	}
 
@@ -175,16 +85,20 @@ ECMDevice::~ECMDevice()
 	if (fNotifyWriteSem >= B_OK)
 		delete_sem(fNotifyWriteSem);
 
-	gUSBModule->cancel_queued_transfers(fNotifyEndpoint);
+	if (!fRemoved)
+		gUSBModule->cancel_queued_transfers(fNotifyEndpoint);
+
 	free(fNotifyBuffer);
 }
 
 
 status_t
-ECMDevice::Open(uint32 flags)
+ECMDevice::Open()
 {
 	if (fOpen)
 		return B_BUSY;
+	if (fRemoved)
+		return B_ERROR;
 
 	// reset the device by switching the data interface to the disabled first
 	// interface and then enable it by setting the second actual data interface
@@ -280,12 +194,12 @@ ECMDevice::Read(uint8 *buffer, size_t *numBytes)
 		return result;
 	}
 
-	if (fStatusRead != B_OK && fStatusRead != B_CANCELED) {
+	if (fStatusRead != B_OK && fStatusRead != B_CANCELED && !fRemoved) {
 		TRACE_ALWAYS("device status error 0x%08lx\n", fStatusRead);
 		result = gUSBModule->clear_feature(fReadEndpoint,
 			USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
-			TRACE_ALWAYS("failed to clear halt state\n");
+			TRACE_ALWAYS("failed to clear halt state on read\n");
 			*numBytes = 0;
 			return result;
 		}
@@ -317,12 +231,12 @@ ECMDevice::Write(const uint8 *buffer, size_t *numBytes)
 		return result;
 	}
 
-	if (fStatusWrite != B_OK && fStatusWrite != B_CANCELED) {
+	if (fStatusWrite != B_OK && fStatusWrite != B_CANCELED && !fRemoved) {
 		TRACE_ALWAYS("device status error 0x%08lx\n", fStatusWrite);
 		result = gUSBModule->clear_feature(fWriteEndpoint,
 			USB_FEATURE_ENDPOINT_HALT);
 		if (result != B_OK) {
-			TRACE_ALWAYS("failed to clear halt state\n");
+			TRACE_ALWAYS("failed to clear halt state on write\n");
 			*numBytes = 0;
 			return result;
 		}
@@ -379,13 +293,186 @@ ECMDevice::Removed()
 	fHasConnection = false;
 	fDownstreamSpeed = fUpstreamSpeed = 0;
 
+	// the notify hook is different from the read and write hooks as it does
+	// itself schedule traffic (while the other hooks only release a semaphore
+	// to notify another thread which in turn safly checks for the removed
+	// case) - so we must ensure that we are not inside the notify hook anymore
+	// before returning, as we would otherwise violate the promise not to use
+	// any of the pipes after returning from the removed hook
+	while (atomic_add(&fInsideNotify, 0) != 0)
+		snooze(100);
+
+	gUSBModule->cancel_queued_transfers(fNotifyEndpoint);
+	gUSBModule->cancel_queued_transfers(fReadEndpoint);
+	gUSBModule->cancel_queued_transfers(fWriteEndpoint);
+
 	if (fLinkStateChangeSem >= B_OK)
 		release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
 status_t
-ECMDevice::_ReadMACAddress()
+ECMDevice::CompareAndReattach(usb_device device)
+{
+	const usb_device_descriptor *deviceDescriptor
+		= gUSBModule->get_device_descriptor(device);
+
+	if (deviceDescriptor == NULL) {
+		TRACE_ALWAYS("failed to get device descriptor\n");
+		return B_ERROR;
+	}
+
+	if (deviceDescriptor->vendor_id != fVendorID
+		&& deviceDescriptor->product_id != fProductID) {
+		// this certainly isn't the same device
+		return B_BAD_VALUE;
+	}
+
+	// this might be the same device that was replugged - read the MAC address
+	// (which should be at the same index) to make sure
+	uint8 macBuffer[6];
+	if (_ReadMACAddress(device, macBuffer) != B_OK
+		|| memcmp(macBuffer, fMACAddress, sizeof(macBuffer)) != 0) {
+		// reading the MAC address failed or they are not the same
+		return B_BAD_VALUE;
+	}
+
+	// this is the same device that was replugged - clear the removed state,
+	// re-setup the endpoints and transfers and open the device if it was
+	// previously opened
+	fDevice = device;
+	fRemoved = false;
+	status_t result = _SetupDevice();
+	if (result != B_OK) {
+		fRemoved = true;
+		return result;
+	}
+
+	// in case notifications do not work we will have a hardcoded connection
+	// need to register that and notify the network stack ourselfs if this is
+	// the case as the open will not result in a corresponding notification
+	bool noNotifications = fHasConnection;
+
+	if (fOpen) {
+		fOpen = false;
+		result = Open();
+		if (result == B_OK && noNotifications && fLinkStateChangeSem >= B_OK)
+			release_sem_etc(fLinkStateChangeSem, 1, B_DO_NOT_RESCHEDULE);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ECMDevice::_SetupDevice()
+{
+	const usb_configuration_info *config
+		= gUSBModule->get_nth_configuration(fDevice, 0);
+
+	if (config == NULL) {
+		TRACE_ALWAYS("failed to get device configuration\n");
+		return B_ERROR;
+	}
+
+	uint8 controlIndex = 0;
+	uint8 dataIndex = 0;
+	bool foundUnionDescriptor = false;
+	bool foundEthernetDescriptor = false;
+	for (size_t i = 0; i < config->interface_count
+		&& (!foundUnionDescriptor || !foundEthernetDescriptor); i++) {
+		usb_interface_info *interface = config->interface[i].active;
+		usb_interface_descriptor *descriptor = interface->descr;
+		if (descriptor->interface_class == USB_INTERFACE_CLASS_CDC
+			&& descriptor->interface_subclass == USB_INTERFACE_SUBCLASS_ECM
+			&& interface->generic_count > 0) {
+			// try to find and interpret the union and ethernet functional
+			// descriptors
+			foundUnionDescriptor = foundEthernetDescriptor = false;
+			for (size_t j = 0; j < interface->generic_count; j++) {
+				usb_generic_descriptor *generic = &interface->generic[j]->generic;
+				if (generic->length >= 5
+					&& generic->data[0] == FUNCTIONAL_SUBTYPE_UNION) {
+					controlIndex = generic->data[1];
+					dataIndex = generic->data[2];
+					foundUnionDescriptor = true;
+				} else if (generic->length >= sizeof(ethernet_functional_descriptor)
+					&& generic->data[0] == FUNCTIONAL_SUBTYPE_ETHERNET) {
+					ethernet_functional_descriptor *ethernet
+						= (ethernet_functional_descriptor *)generic->data;
+					fMACAddressIndex = ethernet->mac_address_index;
+					fMaxSegmentSize = ethernet->max_segment_size;
+					foundEthernetDescriptor = true;
+				}
+
+				if (foundUnionDescriptor && foundEthernetDescriptor)
+					break;
+			}
+		}
+	}
+
+	if (!foundUnionDescriptor) {
+		TRACE_ALWAYS("did not find a union descriptor\n");
+		return B_ERROR;
+	}
+
+	if (!foundEthernetDescriptor) {
+		TRACE_ALWAYS("did not find an ethernet descriptor\n");
+		return B_ERROR;
+	}
+
+	if (controlIndex >= config->interface_count) {
+		TRACE_ALWAYS("control interface index invalid\n");
+		return B_ERROR;
+	}
+
+	// check that the indicated control interface fits our needs
+	usb_interface_info *interface = config->interface[controlIndex].active;
+	usb_interface_descriptor *descriptor = interface->descr;
+	if ((descriptor->interface_class != USB_INTERFACE_CLASS_CDC
+		|| descriptor->interface_subclass != USB_INTERFACE_SUBCLASS_ECM)
+		|| interface->endpoint_count == 0) {
+		TRACE_ALWAYS("control interface invalid\n");
+		return B_ERROR;
+	}
+
+	fControlInterfaceIndex = controlIndex;
+	fNotifyEndpoint = interface->endpoint[0].handle;
+	if (gUSBModule->queue_interrupt(fNotifyEndpoint, fNotifyBuffer,
+		fNotifyBufferLength, _NotifyCallback, this) != B_OK) {
+		// we cannot use notifications - hardcode to active connection
+		fHasConnection = true;
+		fDownstreamSpeed = 1000 * 1000 * 10; // 10Mbps
+		fUpstreamSpeed = 1000 * 1000 * 10; // 10Mbps
+	}
+
+	if (dataIndex >= config->interface_count) {
+		TRACE_ALWAYS("data interface index invalid\n");
+		return B_ERROR;
+	}
+
+	// check that the indicated data interface fits our needs
+	if (config->interface[dataIndex].alt_count < 2) {
+		TRACE_ALWAYS("data interface does not provide two alternate interfaces\n");
+		return B_ERROR;
+	}
+
+	// alternate 0 is the disabled, endpoint-less default interface
+	interface = &config->interface[dataIndex].alt[1];
+	descriptor = interface->descr;
+	if (descriptor->interface_class != USB_INTERFACE_CLASS_CDC_DATA
+		|| interface->endpoint_count < 2) {
+		TRACE_ALWAYS("data interface invalid\n");
+		return B_ERROR;
+	}
+
+	fDataInterfaceIndex = dataIndex;
+	return B_OK;
+}
+
+
+status_t
+ECMDevice::_ReadMACAddress(usb_device device, uint8 *buffer)
 {
 	if (fMACAddressIndex == 0)
 		return B_BAD_VALUE;
@@ -393,7 +480,7 @@ ECMDevice::_ReadMACAddress()
 	size_t actualLength = 0;
 	size_t macStringLength = 26;
 	uint8 macString[macStringLength];
-	status_t result = gUSBModule->get_descriptor(fDevice, USB_DESCRIPTOR_STRING,
+	status_t result = gUSBModule->get_descriptor(device, USB_DESCRIPTOR_STRING,
 		fMACAddressIndex, 0, macString, macStringLength, &actualLength);
 	if (result != B_OK)
 		return result;
@@ -408,12 +495,11 @@ ECMDevice::_ReadMACAddress()
 	for (int32 i = 0; i < 6; i++) {
 		macPart[0] = macString[2 + i * 4 + 0];
 		macPart[1] = macString[2 + i * 4 + 2];
-		fMACAddress[i] = strtol(macPart, NULL, 16);
+		buffer[i] = strtol(macPart, NULL, 16);
 	}
 
 	TRACE_ALWAYS("read mac address: %02x:%02x:%02x:%02x:%02x:%02x\n",
-		fMACAddress[0], fMACAddress[1], fMACAddress[2], fMACAddress[3],
-		fMACAddress[4], fMACAddress[5]);
+		buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5]);
 	return B_OK;
 }
 
@@ -445,8 +531,11 @@ ECMDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 	uint32 actualLength)
 {
 	ECMDevice *device = (ECMDevice *)cookie;
-	if (status == B_CANCELED || device->fRemoved)
+	atomic_add(&device->fInsideNotify, 1);
+	if (status == B_CANCELED || device->fRemoved) {
+		atomic_add(&device->fInsideNotify, -1);
 		return;
+	}
 
 	if (status == B_OK && actualLength >= sizeof(cdc_notification)) {
 		bool linkStateChange = false;
@@ -494,10 +583,11 @@ ECMDevice::_NotifyCallback(void *cookie, int32 status, void *data,
 		TRACE_ALWAYS("device status error 0x%08lx\n", status);
 		if (gUSBModule->clear_feature(device->fNotifyEndpoint,
 			USB_FEATURE_ENDPOINT_HALT) != B_OK)
-			TRACE_ALWAYS("failed to clear halt state\n");
+			TRACE_ALWAYS("failed to clear halt state in notify hook\n");
 	}
 
 	// schedule next notification buffer
 	gUSBModule->queue_interrupt(device->fNotifyEndpoint, device->fNotifyBuffer,
 		device->fNotifyBufferLength, _NotifyCallback, device);
+	atomic_add(&device->fInsideNotify, -1);
 }

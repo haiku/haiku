@@ -28,14 +28,30 @@ usb_ecm_device_added(usb_device device, void **cookie)
 {
 	*cookie = NULL;
 
+	// check if this is a replug of an existing device first
+	mutex_lock(&gDriverLock);
+	for (int32 i = 0; i < MAX_DEVICES; i++) {
+		if (gECMDevices[i] == NULL)
+			continue;
+
+		if (gECMDevices[i]->CompareAndReattach(device) != B_OK)
+			continue;
+
+		TRACE_ALWAYS("ecm device %ld replugged\n", i);
+		*cookie = gECMDevices[i];
+		mutex_unlock(&gDriverLock);
+		return B_OK;
+	}
+
+	// no such device yet, create a new one
 	ECMDevice *ecmDevice = new ECMDevice(device);
 	status_t status = ecmDevice->InitCheck();
 	if (status < B_OK) {
 		delete ecmDevice;
+		mutex_unlock(&gDriverLock);
 		return status;
 	}
 
-	mutex_lock(&gDriverLock);
 	for (int32 i = 0; i < MAX_DEVICES; i++) {
 		if (gECMDevices[i] != NULL)
 			continue;
@@ -156,7 +172,7 @@ usb_ecm_open(const char *name, uint32 flags, void **cookie)
 	status_t status = ENODEV;
 	int32 index = strtol(name + strlen(sDeviceBaseName), NULL, 10);
 	if (index >= 0 && index < MAX_DEVICES && gECMDevices[index]) {
-		status = gECMDevices[index]->Open(flags);
+		status = gECMDevices[index]->Open();
 		*cookie = gECMDevices[index];
 	}
 
