@@ -36,6 +36,7 @@ All rights reserved.
 // add code to initialize a subset of the mime database, including
 // important sniffer rules
 
+#include <Alert.h>
 #include <Directory.h>
 #include <InterfaceDefs.h>
 #include <Message.h>
@@ -459,8 +460,18 @@ TTracker::InstallTemporaryBackgroundImages()
 {
 	// make the large Haiku Logo the default background
 
-//	BPath path;
-	BPath path("/boot/beos/etc/artwork");
+	BPath path;
+	status_t status = find_directory(B_BEOS_ETC_DIRECTORY, &path);
+	if (status < B_OK) {
+		BString errorMessage;
+		errorMessage << "At " << __PRETTY_FUNCTION__ << "\n";
+		errorMessage << "find_directory() failed. \nReason: ";
+		errorMessage << strerror(status);
+		(new BAlert("AlertError", errorMessage.String(), "OK", NULL, NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		return;
+	}
+	path.Append("artwork");
 //	FSFindTrackerSettingsDir(&path, false);
 //	path.Append(kDefaultFolderTemplate);
 
