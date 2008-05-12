@@ -209,6 +209,12 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 				else if (!strcmp(attr.name, PCI_DEVICE_DEVICE_ID_ITEM)
 					&& attr.type == B_UINT16_TYPE)
 					pci_device_id = attr.value.ui16;
+				else if (!strcmp(attr.name, PCI_DEVICE_SUBVENDOR_ID_ITEM)
+					&& attr.type == B_UINT16_TYPE)
+					pci_subsystem_vendor_id = attr.value.ui16;
+				else if (!strcmp(attr.name, PCI_DEVICE_SUBSYSTEM_ID_ITEM)
+					&& attr.type == B_UINT16_TYPE)
+					pci_subsystem_id = attr.value.ui16;
 				break;
 			case BUS_SCSI:
 				if (!strcmp(attr.name, SCSI_DEVICE_TARGET_LUN_ITEM)
@@ -273,7 +279,7 @@ display_device(uint32 *node, uint8 level, int parent_bus, int *bus)
 			if (!devShort && !devFull) {
 				printf("device %04x: Unknown\n", pci_device_id);
 			} else if (devShort && devFull) {
-				printf("device %04x: %s - %s\n", pci_device_id, devShort, devFull);
+				printf("device %04x: %s (%s)\n", pci_device_id, devShort, devFull);
 			} else {
 				printf("device %04x: %s\n", pci_device_id, devShort ? devShort : devFull);
 			}
