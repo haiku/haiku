@@ -226,7 +226,7 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 		if (fCursorObscured) {
 			SetCursorVisible(true);
 		}
-		BRect oldFrame = _CursorFrame();
+		IntRect oldFrame = _CursorFrame();
 		fCursorLocation = p;
 		if (fCursorVisible) {
 			// Invalidate and _DrawCursor would not draw
@@ -238,8 +238,13 @@ HWInterface::MoveCursorTo(const float& x, const float& y)
 				_RestoreCursorArea();
 				_DrawCursor(_CursorFrame());
 			}
-			Invalidate(oldFrame);
-			Invalidate(_CursorFrame());
+			IntRect newFrame = _CursorFrame();
+			if (newFrame.Intersects(oldFrame))
+				Invalidate(oldFrame | newFrame);
+			else {
+				Invalidate(oldFrame);
+				Invalidate(newFrame);
+			}
 		}
 	}
 	fFloatingOverlaysLock.Unlock();
@@ -334,16 +339,18 @@ HWInterface::CopyBackToFront(const BRect& frame)
 		uint32 srcBPR = backBuffer->BytesPerRow();
 		uint8* src = (uint8*)backBuffer->Bits();
 
-		// convert to integer coordinates
-		int32 left = (int32)floorf(area.left);
-		int32 top = (int32)floorf(area.top);
-		int32 right = (int32)ceilf(area.right);
-		int32 bottom = (int32)ceilf(area.bottom);
+		BRegion region((BRect)area);
+		if (IsDoubleBuffered())
+			region.Exclude((clipping_rect)_CursorFrame());
+		
+		int32 count = region.CountRects();
+		for (int32 i = 0; i < count; i++) {
+			clipping_rect r = region.RectAtInt(i);
+			// offset to left top pixel in source buffer (always B_RGBA32)
+			uint8* srcOffset = src + r.top * srcBPR + r.left * 4;
+			_CopyToFront(srcOffset, srcBPR, r.left, r.top, r.right, r.bottom);
+		}
 
-		// offset to left top pixel in source buffer (always B_RGBA32)
-		src += top * srcBPR + left * 4;
-
-		_CopyToFront(src, srcBPR, left, top, right, bottom);
 		_DrawCursor(area);
 
 		return B_OK;
@@ -415,6 +422,8 @@ HWInterface::HideOverlay(Overlay* overlay)
 bool
 HWInterface::HideFloatingOverlays(const BRect& area)
 {
+	if (IsDoubleBuffered())
+		return false;
 	if (!fFloatingOverlaysLock.Lock())
 		return false;
 	if (fCursorAreaBackup && !fCursorAreaBackup->cursor_hidden) {
@@ -436,6 +445,8 @@ HWInterface::HideFloatingOverlays(const BRect& area)
 bool
 HWInterface::HideFloatingOverlays()
 {
+	if (IsDoubleBuffered())
+		return false;
 	if (!fFloatingOverlaysLock.Lock())
 		return false;
 
@@ -505,6 +516,7 @@ HWInterface::_DrawCursor(IntRect area) const
 
 		// blending buffer
 		uint8* buffer = new uint8[width * height * 4];
+			// TODO: cache this buffer
 
 		// offset into back buffer
 		uint8* src = (uint8*)backBuffer->Bits();
