@@ -2189,7 +2189,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 	if (allowWrites)
 		block_cache_sync(cache);
 
-	MutexLocker locker(&cache->lock);
+	mutex_lock(&cache->lock);
 
 	// free all blocks
 
@@ -2209,7 +2209,6 @@ block_cache_delete(void *_cache, bool allowWrites)
 		delete transaction;
 	}
 
-	locker.Unlock();
 	delete cache;
 }
 
