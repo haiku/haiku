@@ -95,6 +95,9 @@ struct LocalRWLock {
 	int32_t		lock_count;
 	int32_t		reader_count;
 	int32_t		writer_count;
+		// Note, that reader_count and writer_count are not used the same way.
+		// writer_count includes the write lock owner as well as waiting
+		// writers. reader_count includes read lock owners only.
 	WaiterList	waiters;
 
 	status_t Init()
@@ -245,6 +248,7 @@ private:
 				if (waiter->userThread->wait_status > 0) {
 					waiter->userThread->wait_status = B_OK;
 					readers[readerCount++] = waiter->thread;
+					reader_count++;
 				}
 			}
 
