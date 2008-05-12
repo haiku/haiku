@@ -616,7 +616,7 @@ add_driver(const char *path, image_id image)
 /*!	This is no longer part of the public kernel API, so we just export the
 	symbol
 */
-status_t load_driver_symbols(const char *driverName);
+extern "C" status_t load_driver_symbols(const char *driverName);
 status_t
 load_driver_symbols(const char *driverName)
 {
