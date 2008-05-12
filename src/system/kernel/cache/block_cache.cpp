@@ -2209,6 +2209,7 @@ block_cache_delete(void *_cache, bool allowWrites)
 		delete transaction;
 	}
 
+	locker.Unlock();
 	delete cache;
 }
 
