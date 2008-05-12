@@ -6,6 +6,7 @@
 #define _PTHREAD_H_
 
 
+#include <stdint.h>
 #include <time.h>
 
 
@@ -17,8 +18,8 @@ typedef struct  _pthread_cond		*pthread_cond_t;
 typedef struct  _pthread_condattr	*pthread_condattr_t;
 typedef int							pthread_key_t;
 typedef struct  _pthread_once		pthread_once_t;
-typedef struct  _pthread_rwlock		*pthread_rwlock_t;
-typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
+typedef struct  _pthread_rwlock		pthread_rwlock_t;
+typedef struct  _pthread_rwlockattr	pthread_rwlockattr_t;
 typedef struct  _pthread_barrier	*pthread_barrier_t;
 typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
 typedef struct  _pthread_spinlock	*pthread_spinlock_t;
@@ -28,6 +29,26 @@ struct _pthread_once {
 	pthread_mutex_t mutex;
 };
 
+struct _pthread_rwlock {
+	uint32_t	flags;
+	int32_t		owner;
+	union {
+		struct {
+			int32_t		sem;
+		} shared;
+		struct {
+			int32_t		lock_sem;
+			int32_t		lock_count;
+			int32_t		reader_count;
+			int32_t		writer_count;
+			void*		waiters[2];
+		} local;
+	};
+};
+
+struct _pthread_rwlockattr {
+	uint32_t	flags;
+};
 
 enum pthread_mutex_type {
 	PTHREAD_MUTEX_DEFAULT,
@@ -158,6 +179,28 @@ extern int pthread_condattr_getpshared(const pthread_condattr_t *condAttr,
 	int *processShared);
 extern int pthread_condattr_setpshared(pthread_condattr_t *condAttr,
 	int processShared);
+
+/* rwlock functions */
+extern int pthread_rwlock_init(pthread_rwlock_t *lock,
+	const pthread_rwlockattr_t *attr);
+extern int pthread_rwlock_destroy(pthread_rwlock_t *lock);
+extern int pthread_rwlock_rdlock(pthread_rwlock_t *lock);
+extern int pthread_rwlock_tryrdlock(pthread_rwlock_t *lock);
+extern int pthread_rwlock_timedrdlock(pthread_rwlock_t *lock,
+	const struct timespec *timeout);
+extern int pthread_rwlock_wrlock(pthread_rwlock_t *lock);
+extern int pthread_rwlock_trywrlock(pthread_rwlock_t *lock);
+extern int pthread_rwlock_timedwrlock(pthread_rwlock_t *lock,
+	const struct timespec *timeout);
+extern int pthread_rwlock_unlock(pthread_rwlock_t *lock);
+
+/* rwlock attribute functions */
+extern int pthread_rwlockattr_init(pthread_rwlockattr_t *attr);
+extern int pthread_rwlockattr_destroy(pthread_rwlockattr_t *attr);
+extern int pthread_rwlockattr_getpshared(const pthread_rwlockattr_t *attr,
+	int *shared);
+extern int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr,
+	int shared);
 
 /* misc. functions */
 extern int pthread_atfork(void (*prepare)(void), void (*parent)(void),
