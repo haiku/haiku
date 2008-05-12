@@ -23,6 +23,7 @@
 	return err;
 
 
+// TODO: Use benaphore!
 static sem_id sEnvLock;
 static bool sCopied;
 
@@ -212,9 +213,11 @@ unsetenv(const char *name)
 
 	env = find_variable(name, length, &index);
 	if (env != NULL) {
-		// we don't free the memory for the slot, we just move the array contents
+		// we don't free the memory for the slot, we just move the array
+		// contents
 		free(env);
-		memmove(environ + index, environ + index + 1, sizeof(char *) * (count_variables() + 1));
+		memmove(environ + index, environ + index + 1,
+			sizeof(char *) * (count_variables() - index));
 	}
 
 	release_sem(sEnvLock);
