@@ -1054,10 +1054,10 @@ CalcView::_ShowKeypad(bool show)
 void
 CalcView::_FetchAppIcon(BBitmap* into)
 {
-	app_info info;
-	be_roster->GetAppInfo(kAppSig, &info);
-	BFile file(&info.ref, B_READ_ONLY);
+	entry_ref appRef;
+	be_roster->FindApp(kAppSig, &appRef);
+	BFile file(&appRef, B_READ_ONLY);
 	BAppFileInfo appInfo(&file);
-	if (appInfo.GetIcon(into, B_MINI_ICON) < B_OK)
+	if (appInfo.GetIcon(into, B_MINI_ICON) != B_OK)
 		memset(into->Bits(), 0, into->BitsLength());
 }
