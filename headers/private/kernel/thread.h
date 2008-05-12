@@ -117,6 +117,11 @@ thread_id _user_find_thread(const char *name);
 status_t _user_get_thread_info(thread_id id, thread_info *info);
 status_t _user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
 
+status_t _user_block_thread(uint32 flags, bigtime_t timeout);
+status_t _user_unblock_thread(thread_id thread, status_t status);
+status_t _user_unblock_threads(thread_id* threads, uint32 count,
+	status_t status);
+
 // ToDo: these don't belong here
 struct rlimit;
 int _user_getrlimit(int resource, struct rlimit * rlp);

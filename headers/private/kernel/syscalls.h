@@ -130,6 +130,11 @@ extern status_t		_kern_get_team_info(team_id id, team_info *info);
 extern status_t		_kern_get_next_team_info(int32 *cookie, team_info *info);
 extern status_t		_kern_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size);
 
+extern status_t		_kern_block_thread(uint32 flags, bigtime_t timeout);
+extern status_t		_kern_unblock_thread(thread_id thread, status_t status);
+extern status_t		_kern_unblock_threads(thread_id* threads, uint32 count,
+						status_t status);
+
 // user/group functions
 extern gid_t		_kern_getgid(bool effective);
 extern uid_t		_kern_getuid(bool effective);

@@ -37,6 +37,7 @@
 #include <team.h>
 #include <tls.h>
 #include <user_runtime.h>
+#include <user_thread.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_address_space.h>
@@ -2309,6 +2310,23 @@ thread_block_with_timeout_locked(uint32 timeoutFlags, bigtime_t timeout)
 }
 
 
+/*!	Thread spinlock must be held.
+*/
+static status_t
+user_unblock_thread(thread_id threadID, status_t status)
+{
+	struct thread* thread = thread_get_thread_struct_locked(threadID);
+	if (thread == NULL)
+		return B_BAD_THREAD_ID;
+	if (thread->user_thread == NULL)
+		return B_NOT_ALLOWED;
+
+	thread_unblock_locked(thread, status);
+
+	return B_OK;
+}
+
+
 //	#pragma mark - public kernel API
 
 
@@ -2903,7 +2921,61 @@ _user_receive_data(thread_id *_userSender, void *buffer, size_t bufferSize)
 }
 
 
-// ToDo: the following two functions don't belong here
+status_t
+_user_block_thread(uint32 flags, bigtime_t timeout)
+{
+	syscall_restart_handle_timeout_pre(flags, timeout);
+	flags |= B_CAN_INTERRUPT;
+
+	struct thread* thread = thread_get_current_thread();
+
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	// check, if already done
+	if (thread->user_thread->wait_status <= 0)
+		return thread->user_thread->wait_status;
+
+	// nope, so wait
+	thread_prepare_to_block(thread, flags, THREAD_BLOCK_TYPE_OTHER, "user");
+	status_t status = thread_block_with_timeout_locked(flags, timeout);
+	thread->user_thread->wait_status = status;
+
+	return syscall_restart_handle_timeout_post(status, timeout);
+}
+
+
+status_t
+_user_unblock_thread(thread_id threadID, status_t status)
+{
+	InterruptsSpinLocker locker(thread_spinlock);
+	return user_unblock_thread(threadID, status);
+}
+
+
+status_t
+_user_unblock_threads(thread_id* userThreads, uint32 count, status_t status)
+{
+	enum {
+		MAX_USER_THREADS_TO_UNBLOCK	= 128
+	};
+
+	if (userThreads == NULL || !IS_USER_ADDRESS(userThreads))
+		return B_BAD_ADDRESS;
+	if (count > MAX_USER_THREADS_TO_UNBLOCK)
+		return B_BAD_VALUE;
+
+	thread_id threads[MAX_USER_THREADS_TO_UNBLOCK];
+	if (user_memcpy(threads, userThreads, count * sizeof(thread_id)) != B_OK)
+		return B_BAD_ADDRESS;
+
+	for (uint32 i = 0; i < count; i++)
+		user_unblock_thread(threads[i], status);
+
+	return B_OK;
+}
+
+
+// TODO: the following two functions don't belong here
 
 
 int
