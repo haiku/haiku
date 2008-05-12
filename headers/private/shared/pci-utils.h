@@ -69,8 +69,9 @@ get_device_info(uint16 vendorID, uint16 deviceID,
 	// search for the device
 	for (i = 0; i < (int)PCI_DEVTABLE_LEN; i++) {
 		if (PciDevTable[i].VenId == vendorID && PciDevTable[i].DevId == deviceID ) {
-			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
-			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
+			*devShort = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
+			if (PciDevTable[i].SubVenId == 0 || PciDevTable[i].SubDevId == 0)
+				i++;
 			break;
 		}
 	}
@@ -80,7 +81,6 @@ get_device_info(uint16 vendorID, uint16 deviceID,
 		if (PciDevTable[i].VenId != vendorID || PciDevTable[i].DevId != deviceID)
 			break;
 		if (PciDevTable[i].SubVenId == subvendorID && PciDevTable[i].SubDevId == subsystemID ) {
-			*devShort = PciDevTable[i].Chip && PciDevTable[i].Chip[0] ? PciDevTable[i].Chip : NULL;
 			*devFull = PciDevTable[i].ChipDesc && PciDevTable[i].ChipDesc[0] ? PciDevTable[i].ChipDesc : NULL;
 			break;
 		}

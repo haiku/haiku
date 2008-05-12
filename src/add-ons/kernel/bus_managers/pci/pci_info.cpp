@@ -178,13 +178,13 @@ print_info_basic(const pci_info *info, bool verbose)
 		if (!devShort && !devFull) {
 			TRACE(("PCI:   device %04x: Unknown\n", info->device_id));
 		} else if (devShort && devFull) {
-			TRACE(("PCI:   device %04x: %s - %s\n", info->device_id, devShort, devFull));
+			TRACE(("PCI:   device %04x: %s (%s)\n", info->device_id, devShort, devFull));
 		} else {
 			TRACE(("PCI:   device %04x: %s\n", info->device_id, devShort ? devShort : devFull));
 		}
 #endif
 		char classInfo[64];
-		get_class_info(info->class_base, info->class_sub, info->class_api, classInfo, 64);
+		get_class_info(info->class_base, info->class_sub, info->class_api, classInfo, sizeof(classInfo));
 		TRACE(("PCI:   info: %s\n", classInfo));
 	}
 	TRACE(("PCI:   line_size %02x, latency %02x, header_type %02x, BIST %02x\n",
