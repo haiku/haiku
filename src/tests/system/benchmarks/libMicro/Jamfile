@@ -211,9 +211,9 @@ BinCommand munmap :
 	munmap.c 
 	: libmicro.a libroot.so ;
 
-# atm unsupported
-BinCommand mutex : 
-	: libelided.a libroot.so ;
+BinCommand mutex :
+	mutex.c
+	: libmicro.a libroot.so ;
 
 BinCommand nop : 
 	nop.c
@@ -235,10 +235,9 @@ BinCommand pread :
 	pread.c
 	: libmicro.a libroot.so ;
 
-# atm unsupported
-# needs pthread_attr_setstacksize
-BinCommand pthread_create : 
-	: libelided.a libroot.so ;
+BinCommand pthread_create :
+	pthread_create.c
+	: libmicro.a libroot.so ;
 
 BinCommand pwrite : 
 	pwrite.c
