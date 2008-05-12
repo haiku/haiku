@@ -74,8 +74,10 @@ CopyEngine::MessageReceived(BMessage*msg)
 		{
 			status_t err = Start(fWindow->GetSourceMenu(),
 				fWindow->GetTargetMenu());
-			if (err != B_OK)
+			if (err != B_OK) {
 				ERR("Start failed");
+				BMessenger(fWindow).SendMessage(RESET_INSTALL);
+			}
 			break;
 		}
 	}
@@ -123,6 +125,9 @@ status_t
 CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 {
 	CALLED();
+
+	fControl->Reset();
+
 	status_t err = B_OK;
 	PartitionMenuItem *targetItem = (PartitionMenuItem *)targetMenu->FindMarked();
 	PartitionMenuItem *srcItem = (PartitionMenuItem *)srcMenu->FindMarked();
@@ -182,6 +187,7 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 			"Try choosing a different disk or choose to not install optional "
 			"items.", "Try installing anyway", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
+		BMessenger(fWindow).SendMessage(RESET_INSTALL);
 		return B_OK;
 	}
 
@@ -203,6 +209,7 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	if (strcmp(srcDirectory.Path(), targetDirectory.Path()) == 0) {
 		SetStatusMessage("You can't install the contents of a disk onto "
 			"itself. Please choose a different disk.");
+		BMessenger(fWindow).SendMessage(RESET_INSTALL);
 		return B_OK;
 	}
 
@@ -213,6 +220,7 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 			"machine if you proceed.", "OK", "Cancel", 0,
 			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0)) {
 		SetStatusMessage("Installation stopped.");
+		BMessenger(fWindow).SendMessage(RESET_INSTALL);
 		return B_OK;
 	}
 
@@ -230,16 +238,20 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 		BDirectory packageDir;
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
+			if (fControl->CheckUserCanceled())
+				return B_OK;
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
 			packageDir.SetTo(&srcDir, p->Folder());
 			CopyFolder(packageDir, targetDir);
 		}
 	}
 
-	LaunchFinishScript(targetDirectory);
+	if (!fControl->CheckUserCanceled()) {
+		LaunchFinishScript(targetDirectory);
 
-	BMessage msg(INSTALL_FINISHED);
-	BMessenger(fWindow).SendMessage(&msg);
+		BMessage msg(INSTALL_FINISHED);
+		BMessenger(fWindow).SendMessage(&msg);
+	}
 
 	return B_OK;
 }
@@ -250,7 +262,8 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 {
 	BEntry entry;
 	status_t err;
-	while (srcDir.GetNextEntry(&entry) == B_OK) {
+	while (srcDir.GetNextEntry(&entry) == B_OK
+		&& !fControl->CheckUserCanceled()) {
 		StatStruct statbuf;
 		entry.GetStat(&statbuf);
 		
@@ -296,6 +309,13 @@ CopyEngine::SetPackagesList(BList *list)
 {
 	delete fPackages;
 	fPackages = list;
+}
+
+
+bool
+CopyEngine::Cancel()
+{
+	return fControl->Cancel();
 }
 
 

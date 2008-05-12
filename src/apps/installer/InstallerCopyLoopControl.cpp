@@ -9,7 +9,8 @@
 
 InstallerCopyLoopControl::InstallerCopyLoopControl(InstallerWindow *window)
 	: fWindow(window),
-	fMessenger(window)
+	fMessenger(window),
+	fUserCanceled(false)
 {
 }
 
@@ -48,7 +49,7 @@ InstallerCopyLoopControl::UpdateStatus(const char *name, entry_ref ref, int32 co
 bool
 InstallerCopyLoopControl::CheckUserCanceled()
 {
-	return false;
+	return fUserCanceled;
 }
 
 
@@ -95,5 +96,23 @@ bool
 InstallerCopyLoopControl::PreserveAttribute(const char *attributeName)
 {
 	return false;
+}
+
+
+bool
+InstallerCopyLoopControl::Cancel()
+{
+	fUserCanceled = (new BAlert("", 
+			"Are you sure you want to to stop the installation?", 
+			"Continue", "Stop", 0,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go() != 0;
+	return fUserCanceled;
+}
+
+
+void
+InstallerCopyLoopControl::Reset()
+{
+	fUserCanceled = false;
 }
 

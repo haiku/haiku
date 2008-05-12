@@ -35,10 +35,13 @@ class InstallerCopyLoopControl : public CopyLoopControl
 		virtual bool ChecksumFile(const entry_ref *);
 		virtual bool SkipAttribute(const char *attributeName);
 		virtual bool PreserveAttribute(const char *attributeName);
+		bool Cancel();
+		void Reset();
 
 	private:
 		InstallerWindow *fWindow;
 		BMessenger fMessenger;
+		bool fUserCanceled;
 };
 
 #endif

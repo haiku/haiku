@@ -28,6 +28,7 @@ class CopyEngine : public BLooper {
 		void ScanDisksPartitions(BMenu *srcMenu, BMenu *targetMenu);
 		void SetPackagesList(BList *list);
 		void SetSpaceRequired(off_t bytes) { fSpaceRequired = bytes; };
+		bool Cancel();
 	private:
 		void LaunchInitScript(BPath &path);
 		void LaunchFinishScript(BPath &path);

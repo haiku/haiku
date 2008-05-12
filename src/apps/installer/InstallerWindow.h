@@ -20,8 +20,16 @@
 
 #define INSTALLER_RIGHT 402
 
+enum InstallStatus {
+	kReadyForInstall,
+	kInstalling,
+	kFinished,
+	kCancelled
+};
+
 const uint32 STATUS_MESSAGE = 'iSTM';
 const uint32 INSTALL_FINISHED = 'iIFN';
+const uint32 RESET_INSTALL = 'iRSI';
 const char PACKAGES_DIRECTORY[] = "_packages_";
 
 class InstallerWindow : public BWindow {
@@ -46,6 +54,7 @@ class InstallerWindow : public BWindow {
 		BButton *fBeginButton, *fSetupButton;
 		DrawButton *fDrawButton;
 		bool fDriveSetupLaunched;
+		InstallStatus fInstallStatus;
 		BTextView *fStatusView;
 		BMenu* fSrcMenu, *fDestMenu;
 		BMenuField* fSrcMenuField, *fDestMenuField;

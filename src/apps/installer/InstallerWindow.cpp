@@ -71,6 +71,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	: BWindow(frame_rect, "Installer", B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE),
 	fDriveSetupLaunched(false),
+	fInstallStatus(kReadyForInstall),
 	fLastSrcItem(NULL),
 	fLastTargetItem(NULL)
 {
@@ -110,6 +111,7 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 		"begin_button", "Begin", new BMessage(BEGIN_MESSAGE),
 		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
 	fBeginButton->MakeDefault(true);
+	fBeginButton->SetEnabled(false);
 	fBackBox->AddChild(fBeginButton);
 
 	fSetupButton = new BButton(BRect(bounds.left + 11, bounds.bottom - 35,
@@ -135,18 +137,18 @@ InstallerWindow::InstallerWindow(BRect frame_rect)
 	fDestMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 	fSrcMenu = new BPopUpMenu("scanning" B_UTF8_ELLIPSIS, true, false);
 
-	BRect fieldRect(bounds.left + 50, bounds.top + 70, bounds.right - 13,
+	BRect fieldRect(bounds.left + 13, bounds.top + 70, bounds.right - 13,
 		bounds.top + 90);
 	fSrcMenuField = new BMenuField(fieldRect, "srcMenuField",
 		"Install from: ", fSrcMenu);
-	fSrcMenuField->SetDivider(bounds.right - 274);
+	fSrcMenuField->SetDivider(bounds.right - 300);
 	fSrcMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fSrcMenuField);
 
 	fieldRect.OffsetBy(0, 23);
 	fDestMenuField = new BMenuField(fieldRect, "destMenuField",
 		"Onto: ", fDestMenu);
-	fDestMenuField->SetDivider(bounds.right - 274);
+	fDestMenuField->SetDivider(bounds.right - 300);
 	fDestMenuField->SetAlignment(B_ALIGN_RIGHT);
 	fBackBox->AddChild(fDestMenuField);
 
@@ -182,20 +184,45 @@ void
 InstallerWindow::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
+		case RESET_INSTALL:
+			fInstallStatus = kReadyForInstall;
+			fBeginButton->SetEnabled(true);
+			DisableInterface(false);
+			fBeginButton->SetLabel("Begin");
+			break;
 		case START_SCAN:
 			StartScan();
+			fBeginButton->SetEnabled(true);
 			break;
 		case BEGIN_MESSAGE:
-		{
-			BList *list = new BList();
-			int32 size = 0;
-			fPackagesView->GetPackagesToInstall(list, &size);
-			fCopyEngine->SetPackagesList(list);
-			fCopyEngine->SetSpaceRequired(size);
-			BMessenger(fCopyEngine).SendMessage(ENGINE_START);
-			DisableInterface(true);
+			switch (fInstallStatus) {
+				case kReadyForInstall:
+				{
+					BList *list = new BList();
+					int32 size = 0;
+					fPackagesView->GetPackagesToInstall(list, &size);
+					fCopyEngine->SetPackagesList(list);
+					fCopyEngine->SetSpaceRequired(size);
+					BMessenger(fCopyEngine).SendMessage(ENGINE_START);
+					fBeginButton->SetLabel("Stop");
+					DisableInterface(true);
+					fInstallStatus = kInstalling;
+					break;
+				}
+				case kInstalling:
+					if (fCopyEngine->Cancel()) {
+						fInstallStatus = kCancelled;
+						SetStatusMessage("Installation cancelled.");
+						PostMessage(RESET_INSTALL);
+					}
+					break;
+				case kFinished:
+					PostMessage(B_QUIT_REQUESTED);
+					break;
+				case kCancelled:
+					break;
+			}
 			break;
-		}
 		case SHOW_BOTTOM_MESSAGE:
 			ShowBottom();
 			break;
@@ -224,6 +251,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			break;
 		}
 		case STATUS_MESSAGE: {
+			if (fInstallStatus != kInstalling)
+				break;
 			const char *status;
 			if (msg->FindString("status", &status) == B_OK) {
 				fLastStatus = fStatusView->Text();
@@ -233,6 +262,8 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			break;
 		}
 		case INSTALL_FINISHED:
+			fBeginButton->SetLabel("Quit");
+			fInstallStatus = kFinished;
 			DisableInterface(false);
 			break;
 		case B_SOME_APP_LAUNCHED:
@@ -242,6 +273,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 			if (msg->FindString("be:signature", &signature) == B_OK
 				&& strcasecmp(signature, DRIVESETUP_SIG) == 0) {
 				fDriveSetupLaunched = msg->what == B_SOME_APP_LAUNCHED;
+				fBeginButton->SetEnabled(!fDriveSetupLaunched);
 				DisableInterface(fDriveSetupLaunched);
 				if (fDriveSetupLaunched)
 					SetStatusMessage("Running DriveSetup" B_UTF8_ELLIPSIS
@@ -307,7 +339,6 @@ InstallerWindow::LaunchDriveSetup()
 void
 InstallerWindow::DisableInterface(bool disable)
 {
-	fBeginButton->SetEnabled(!disable);
 	fSetupButton->SetEnabled(!disable);
 	fSrcMenuField->SetEnabled(!disable);
 	fDestMenuField->SetEnabled(!disable);
