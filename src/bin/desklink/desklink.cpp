@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Haiku. All rights reserved.
+ * Copyright 2003-2008, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,6 +51,7 @@ const char *kAppSignature = "application/x-vnd.Haiku-desklink";
 	// the application signature used by the replicant to find the
 	// supporting code
 
+
 class _EXPORT MediaReplicant;
 	// the dragger part has to be exported
 
@@ -75,10 +76,11 @@ public:
 	virtual void MessageReceived(BMessage* message);
 
 private:
-	status_t LaunchByPath(const char *path);
-	status_t LaunchBySig(const char *sig);
-	void LoadSettings();
-	void SaveSettings();
+	void _AlertFindDirectory(status_t status, const char *where);
+	status_t _LaunchByPath(const char *path);
+	status_t _LaunchBySig(const char *sig);
+	void _LoadSettings();
+	void _SaveSettings();
 
 	BBitmap*		fSegments;
 	VolumeSlider*	fVolumeSlider;
@@ -109,7 +111,7 @@ MediaReplicant::MediaReplicant(BRect frame, const char *name,
 	// Background Bitmap
 	fSegments = new BBitmap(BRect(0, 0, kSpeakerWidth - 1, kSpeakerHeight - 1), B_CMAP8);
 	fSegments->SetBits(kSpeakerBits, kSpeakerWidth*kSpeakerHeight, 0, B_CMAP8);
-	LoadSettings();
+	_LoadSettings();
 }
 
 
@@ -120,14 +122,14 @@ MediaReplicant::MediaReplicant(BMessage *message)
 	// Background Bitmap
 	fSegments = new BBitmap(BRect(0, 0, 16 - 1, 16 - 1), B_CMAP8);
 	fSegments->SetBits(kSpeakerBits, 16*16, 0, B_CMAP8);
-	LoadSettings();
+	_LoadSettings();
 }
 
 
 MediaReplicant::~MediaReplicant()
 {
 	delete fSegments;
-	SaveSettings();
+	_SaveSettings();
 }
 
 
@@ -159,41 +161,79 @@ MediaReplicant::MessageReceived(BMessage *message)
 	case B_ABOUT_REQUESTED:
 		(new BAlert("About Volume Control", "Volume Control (Replicant)\n"
 			    "  Brought to you by Jérôme DUVAL.\n\n"
-			    "Copyright " B_UTF8_COPYRIGHT "2003-2007, Haiku","OK"))->Go();
+			    "Copyright " B_UTF8_COPYRIGHT "2003-2008, Haiku","OK"))->Go(NULL);
 		break;
+
 	case OPEN_MEDIA_PLAYER:
+	{
+		BPath mediaPlayerPath;
+		status_t status = find_directory(B_BEOS_APPS_DIRECTORY, &mediaPlayerPath);
+		if (status != B_OK) {
+			_AlertFindDirectory(status, __PRETTY_FUNCTION__);
+			break;
+		}
+		mediaPlayerPath.Append("MediaPlayer");
+
 		// launch the media player app
-		if (LaunchBySig("application/x-vnd.Haiku-MediaPlayer") == B_OK
-			|| LaunchBySig("application/x-vnd.Be.MediaPlayer") == B_OK
-			|| LaunchByPath("/boot/beos/apps/MediaPlayer") == B_OK)
+		if (_LaunchBySig("application/x-vnd.Haiku-MediaPlayer") == B_OK
+			|| _LaunchBySig("application/x-vnd.Be.MediaPlayer") == B_OK
+			|| _LaunchByPath(mediaPlayerPath.Path()) == B_OK)
 			break;
 
 		(new BAlert("desklink", "Couldn't launch MediaPlayer", "OK"))->Go();
 		break;
+	}
+
 	case MEDIA_SETTINGS:
+	{
+		BPath mediaPrefsPath;
+		status_t status = find_directory(B_BEOS_PREFERENCES_DIRECTORY,
+			&mediaPrefsPath);
+		if (status != B_OK) {
+			_AlertFindDirectory(status, __PRETTY_FUNCTION__);
+			break;
+		}
+		mediaPrefsPath.Append("Media");
+
 		// launch the media prefs app
-		if (LaunchBySig("application/x-vnd.Haiku-Media") == B_OK
-			|| LaunchBySig("application/x-vnd.Be.MediaPrefs") == B_OK
-			|| LaunchByPath("/boot/home/config/be/Preferences/Media") == B_OK)
+		if (_LaunchBySig("application/x-vnd.Haiku-Media") == B_OK
+			|| _LaunchBySig("application/x-vnd.Be.MediaPrefs") == B_OK
+			|| _LaunchByPath(mediaPrefsPath.Path()) == B_OK)
 			break;
 
 		(new BAlert("desklink", "Couldn't launch Media Preferences", "OK"))->Go();
 		break;
+	}
+
 	case SOUND_SETTINGS:
+	{
+		BPath soundsPrefsPath;
+		status_t status = find_directory(B_BEOS_PREFERENCES_DIRECTORY,
+			&soundsPrefsPath);
+		if (status != B_OK) {
+			_AlertFindDirectory(status, __PRETTY_FUNCTION__);
+			break;
+		}
+		soundsPrefsPath.Append("Sounds");
+		
 		// launch the sounds prefs app
-		if (LaunchBySig("application/x-vnd.Haiku-Sounds") == B_OK
-			|| LaunchBySig("application/x-vnd.Be.SoundsPrefs") == B_OK
-			|| LaunchByPath("/boot/home/config/be/Preferences/Sounds") == B_OK)
+		if (_LaunchBySig("application/x-vnd.Haiku-Sounds") == B_OK
+			|| _LaunchBySig("application/x-vnd.Be.SoundsPrefs") == B_OK
+			|| _LaunchByPath(soundsPrefsPath.Path()) == B_OK)
 			break;
 
 		(new BAlert("desklink", "Couldn't launch Sounds Preferences", "OK"))->Go();
 		break;
+	}
+
 	case TOGGLE_DONT_BEEP:
 		fDontBeep = !fDontBeep;
 		break;
+
 	case SET_VOLUME_WHICH:
 		message->FindInt32("volwhich", &fVolumeWhich);
 		break;
+
 	default:
 		BView::MessageReceived(message);
 		break;		
@@ -202,7 +242,7 @@ MediaReplicant::MessageReceived(BMessage *message)
 
 
 status_t
-MediaReplicant::LaunchByPath(const char *path)
+MediaReplicant::_LaunchByPath(const char *path)
 {
 	BEntry ent;
 	entry_ref ref;
@@ -226,7 +266,7 @@ MediaReplicant::LaunchByPath(const char *path)
 
 
 status_t
-MediaReplicant::LaunchBySig(const char *sig)
+MediaReplicant::_LaunchBySig(const char *sig)
 {
 	app_info appInfo;
 	status_t err;
@@ -296,7 +336,12 @@ MediaReplicant::MouseDown(BPoint point)
 		volMenu->AddItem(tmpItem);
 		tmpItem->SetMarked(fVolumeWhich == VOLUME_USE_PHYS_OUTPUT);
 		menu->AddItem(volMenu);
-		
+
+		menu->AddSeparatorItem();
+		menu->SetFont(be_plain_font);
+		menu->AddItem(new BMenuItem("About" B_UTF8_ELLIPSIS,
+			new BMessage(B_ABOUT_REQUESTED)));
+
 		menu->SetTargetForItems(this);
 		volMenu->SetTargetForItems(this);
 		menu->Go(where, true, true, BRect(where - BPoint(4, 4), 
@@ -318,7 +363,7 @@ MediaReplicant::MouseUp(BPoint point)
 
 
 void
-MediaReplicant::LoadSettings()
+MediaReplicant::_LoadSettings()
 {
 	fDontBeep = false;
 	fVolumeWhich = VOLUME_USE_MIXER;
@@ -339,7 +384,7 @@ MediaReplicant::LoadSettings()
 
 
 void
-MediaReplicant::SaveSettings()
+MediaReplicant::_SaveSettings()
 {
 	BPath p;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &p, false) < B_OK)
@@ -354,6 +399,18 @@ MediaReplicant::SaveSettings()
 	ssize_t len=0;
 	if (msg.Flatten(&settings, &len) < B_OK)
 		return;
+}
+
+
+void 
+MediaReplicant::_AlertFindDirectory(status_t status, const char *where)
+{
+	BString errorMessage;
+	errorMessage << "At " << where << "\n";
+	errorMessage << "find_directory() failed. \nReason: ";
+	errorMessage << strerror(status);
+	(new BAlert("AlertError", errorMessage.String(), "OK", NULL, NULL,
+		B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 }
 
 
