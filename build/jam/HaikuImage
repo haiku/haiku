@@ -64,9 +64,9 @@ BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
 	Playground Pulse Sudoku
 ;
 BEOS_SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
-	libtranslation.so libnetwork.so libdebug.so libbsd.so libmail.so
-	libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so libmidi2.so
-	libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
+	libtranslation.so libnetapi.so libnetwork.so libdebug.so libbsd.so
+	libmail.so libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so
+	libmidi2.so libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
 	$(X86_ONLY)libGL.so libfluidsynth.so liblpsolve55.so liblinprog.so libalm.so
 	libilmimf.so
 ;
@@ -190,7 +190,7 @@ AddFilesToHaikuImage beos system lib : $(BEOS_SYSTEM_LIBS) ;
 
 # libnetwork.so replaces quite a few libraries
 BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES
-	= libsocket.so libbind.so libnet.so libnetapi.so libbnetapi.so ;
+	= libsocket.so libbind.so libnet.so ;
 
 local lib ;
 for lib in $(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) {

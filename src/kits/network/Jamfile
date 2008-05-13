@@ -3,18 +3,12 @@ SubDir HAIKU_TOP src kits network ;
 UsePrivateHeaders libroot net shared ;
 UsePrivateKernelHeaders ;
 
-local services = [ FGristFiles services ] ;
-SEARCH on $(services) = [ FDirName $(SUBDIR) dns defaults ] ;
-AddFileDataResource libnetwork.so : CSTR:201:services : $(services) ;
-
 SharedLibrary libnetwork.so :
 	init.cpp
 	interfaces.cpp
 	socket.cpp
 	r5_compatibility.cpp
 	:
-	<libnetwork_netapi>netapi.o
-
 	<libnetwork_dns>dns_dst.o
 	<libnetwork_dns>dns_inet.o
 	<libnetwork_dns>dns_irs.o
@@ -22,9 +16,11 @@ SharedLibrary libnetwork.so :
 	<libnetwork_dns>dns_nameser.o
 	<libnetwork_dns>dns_resolv.o
 	<libnetwork_dns>dns_private.o
-
-	be
 ;
+
+local services = [ FGristFiles services ] ;
+SEARCH on $(services) = [ FDirName $(SUBDIR) dns defaults ] ;
+AddFileDataAttribute libnetwork.so : services : string : $(services) ;
 
 SubInclude HAIKU_TOP src kits network dns ;
 SubInclude HAIKU_TOP src kits network libnetapi ;

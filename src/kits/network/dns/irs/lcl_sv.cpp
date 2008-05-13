@@ -63,10 +63,6 @@
 
 #include "port_after.h"
 
-#include <File.h>
-#include <Resources.h>
-#include <TypeConstants.h>
-
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -80,15 +76,16 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <fs_attr.h>
+#include <image.h>
+#include <TypeConstants.h>
+
 
 #define IRS_SV_MAXALIASES	35
 
 struct service_private {
 	FILE*	file;
 	char	line[BUFSIZ+1];
-	char*	resource_file;
-	char*	resource_end;
-	char*	resource_line;
 	struct servent servent;
 	char*	aliases[IRS_SV_MAXALIASES];
 };
@@ -115,26 +112,9 @@ find_own_image(image_info* _info)
 char *
 get_next_line(struct service_private* service)
 {
-	if (service->file != NULL)
-		return fgets(service->line, BUFSIZ, service->file);
-	if (service->resource_file == NULL)
+	if (service->file == NULL)
 		return NULL;
-
-	char* line = service->resource_line;
-	while (line < service->resource_end
-		&& line[0]
-		&& line[0] != '\n')
-		line++;
-
-	if (service->resource_line >= service->resource_end
-		|| service->resource_line == line)
-		return NULL;
-
-	strlcpy(service->line, service->resource_line,
-		min_c(line + 1 - service->resource_line, BUFSIZ));
-	service->resource_line = line + 1;
-
-	return service->line;
+	return fgets(service->line, BUFSIZ, service->file);
 }
 
 
@@ -149,7 +129,6 @@ sv_close(struct irs_sv *sv)
 	if (service->file)
 		fclose(service->file);
 
-	free(service->resource_file);
 	memput(service, sizeof *service);
 	memput(sv, sizeof *sv);
 }
@@ -168,44 +147,55 @@ sv_rewind(struct irs_sv *sv)
 	}
 
 	if ((service->file = fopen(_PATH_SERVICES, "r")) != NULL) {
-		if (fcntl(fileno(service->file), F_SETFD, 1) == 0)
+		if (fcntl(fileno(service->file), F_SETFD, FD_CLOEXEC) == 0)
 			return;
 
 		fclose(service->file);
 		service->file = NULL;
 	}
 
-	// opening the standard file has file has failed, use resources
+	// opening the standard file has file has failed, use the attribute
 
-	if (service->resource_file != NULL) {
-		service->resource_line = service->resource_file;
+	// find our library image
+	addr_t addressInImage = (addr_t)&sv_rewind;
+	const char* path = NULL;
+	image_info info;
+	int32 cookie;
+
+	while (get_next_image_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
+		if (addressInImage >= (addr_t)info.text
+			&& addressInImage < (addr_t)info.text + info.text_size) {
+			path = info.name;
+			break;
+		}
+	}
+
+	if (path == NULL)
+		return;
+
+	// open the library
+	int libraryFD = open(path, O_RDONLY);
+	if (libraryFD < 0)
+		return;
+
+	// open the attribute
+	int attrFD = fs_open_attr(libraryFD, "services", B_STRING_TYPE, O_RDONLY);
+	close(libraryFD);
+	if (attrFD < 0)
+		return;
+
+	// attach it to a FILE
+	service->file = fdopen(attrFD, "r");
+	if (service->file == NULL) {
+		close(attrFD);
 		return;
 	}
 
-	image_info info;
-	if (find_own_image(&info) < B_OK)
+	if (fcntl(fileno(service->file), F_SETFD, FD_CLOEXEC) == 0)
 		return;
 
-	BFile file;
-	if (file.SetTo(info.name, B_READ_ONLY) < B_OK)
-		return;
-
-	BResources resources(&file);
-	if (resources.InitCheck() < B_OK)
-		return;
-
-	size_t size;
-	const void* data = resources.LoadResource(B_STRING_TYPE, "services", &size);
-	if (data == NULL)
-		return;
-
-	service->resource_file = (char *)malloc(size);
-	if (service->resource_file == NULL)
-		return;
-
-	memcpy(service->resource_file, data, size);
-	service->resource_line = service->resource_file;
-	service->resource_end = service->resource_file + size;
+	fclose(service->file);
+	service->file = NULL;
 }
 
 
@@ -215,10 +205,10 @@ sv_next(struct irs_sv *sv)
 	struct service_private *service = (struct service_private *)sv->private_data;
 	char *p, *cp, **q;
 
-	if (service->file == NULL && service->resource_file == NULL)
+	if (service->file == NULL)
 		sv_rewind(sv);
 
-	if (service->file == NULL && service->resource_file == NULL)
+	if (service->file == NULL)
 		return NULL;
 
 again:

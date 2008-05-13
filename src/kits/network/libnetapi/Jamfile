@@ -43,7 +43,8 @@ if $(TARGET_PLATFORM) != haiku {
 	#	boot home config lib ;
 		boot home Desktop haiku-networkingkit lib ;
 } else {
-	MergeObject <libnetwork_netapi>netapi.o :
+	SharedLibrary libnetapi.so :
 		$(netapi_sources)
+		: be $(TARGET_NETWORK_LIBS)
 	;
 }
