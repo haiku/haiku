@@ -81,30 +81,30 @@ pthread_cond_destroy(pthread_cond_t *_cond)
 
 
 static status_t
-cond_wait(pthread_cond *cond, pthread_mutex_t *_mutex, bigtime_t timeout)
+cond_wait(pthread_cond *cond, pthread_mutex_t *mutex, bigtime_t timeout)
 {
 	status_t status;
 	int32 event;
 
-	if (cond == NULL || *_mutex == NULL)
+	if (cond == NULL || mutex == NULL)
 		return B_BAD_VALUE;
 
-	if ((*_mutex)->owner != find_thread(NULL))
+	if (mutex->owner != find_thread(NULL))
 		// POSIX suggests EPERM (= B_NOT_ALLOWED) to be returned
 		// if this thread does not own the mutex
 		return B_NOT_ALLOWED;
 
-	if (cond->mutex && cond->mutex != _mutex)
+	if (cond->mutex && cond->mutex != mutex)
 		// POSIX suggests EINVAL (= B_BAD_VALUE) to be returned if
 		// the same condition variable is used with multiple mutexes
 		return B_BAD_VALUE;
 
-	cond->mutex = _mutex;
+	cond->mutex = mutex;
 	cond->waiter_count++;
 
 	event = atomic_get(&cond->event_counter);
 
-	pthread_mutex_unlock(_mutex);
+	pthread_mutex_unlock(mutex);
 
 	do {
 		status = acquire_sem_etc(cond->sem, 1,
@@ -112,7 +112,7 @@ cond_wait(pthread_cond *cond, pthread_mutex_t *_mutex, bigtime_t timeout)
 			timeout);
 	} while (status == B_OK && atomic_get(&cond->event_counter) == event);
 
-	pthread_mutex_lock(_mutex);
+	pthread_mutex_lock(mutex);
 
 	cond->waiter_count--;
 	// If there are no more waiters, we can change mutexes

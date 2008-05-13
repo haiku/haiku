@@ -14,7 +14,7 @@ MergeObject posix_pthread.o :
 	pthread_key.cpp
 	pthread_mutex.c
 	pthread_mutexattr.c
-	pthread_once.c
+	pthread_once.cpp
 	pthread_rwlock.cpp
 ;
 

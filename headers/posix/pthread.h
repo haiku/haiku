@@ -12,7 +12,7 @@
 
 typedef int							pthread_t;
 typedef struct  _pthread_attr		*pthread_attr_t;
-typedef struct  _pthread_mutex		*pthread_mutex_t;
+typedef struct  _pthread_mutex		pthread_mutex_t;
 typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;
 typedef struct  _pthread_cond		*pthread_cond_t;
 typedef struct  _pthread_condattr	*pthread_condattr_t;
@@ -24,9 +24,16 @@ typedef struct  _pthread_barrier	*pthread_barrier_t;
 typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
 typedef struct  _pthread_spinlock	*pthread_spinlock_t;
 
+struct _pthread_mutex {
+	uint32_t	flags;
+	int32_t		count;
+	int32_t		sem;
+	int32_t		owner;
+	int32_t		owner_count;
+};
+
 struct _pthread_once {
-	int	state;
-	pthread_mutex_t mutex;
+	int32_t		state;
 };
 
 struct _pthread_rwlock {
@@ -84,9 +91,7 @@ enum pthread_process_shared {
 #define PTHREAD_CANCEL_ASYNCHRONOUS	2
 #define PTHREAD_CANCELED			((void *) 1)
 
-#define PTHREAD_NEEDS_INIT			0
-#define PTHREAD_DONE_INIT			1
-#define PTHREAD_ONCE_INIT 			{ PTHREAD_NEEDS_INIT, NULL }
+#define PTHREAD_ONCE_INIT 			{ -1 }
 
 #define PTHREAD_BARRIER_SERIAL_THREAD -1
 #define PTHREAD_PRIO_NONE			0
@@ -120,14 +125,13 @@ struct __pthread_cleanup_handler {
 extern "C" {
 #endif
 
-extern pthread_mutex_t _pthread_mutex_static_initializer(void);
-extern pthread_mutex_t _pthread_recursive_mutex_static_initializer(void);
-#define PTHREAD_MUTEX_INITIALIZER NULL
+#define PTHREAD_MUTEX_INITIALIZER \
+	{ PTHREAD_MUTEX_DEFAULT, 0, -42, -1, 0 }
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER \
-	pthread_recursive_mutex_static_initializer();
+	{ PTHREAD_MUTEX_RECURSIVE, 0, -42, -1, 0 }
 
 extern pthread_cond_t _pthread_cond_static_initializer(void);
-#define PTHREAD_COND_INITIALIZER _pthread_cond_static_initializer();
+#define PTHREAD_COND_INITIALIZER _pthread_cond_static_initializer()
 
 /* mutex functions */
 extern int pthread_mutex_destroy(pthread_mutex_t *mutex);
@@ -205,7 +209,8 @@ extern int pthread_rwlockattr_setpshared(pthread_rwlockattr_t *attr,
 /* misc. functions */
 extern int pthread_atfork(void (*prepare)(void), void (*parent)(void),
 	void (*child)(void));
-extern int pthread_once(pthread_once_t *once_control, void (*init_routine)());
+extern int pthread_once(pthread_once_t *once_control,
+	void (*init_routine)(void));
 
 /* thread attributes functions */
 extern int pthread_attr_destroy(pthread_attr_t *attr);
