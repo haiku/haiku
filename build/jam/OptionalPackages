@@ -20,6 +20,20 @@ OptionalPackageDependencies Development : Perl ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
 
 
+# APR
+if [ IsOptionalHaikuImagePackageAdded APR ] {
+	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+		Echo "No optional package APR available for gcc4" ;
+	} else {
+		local baseURL = http://haiku-files.org/files/optional-packages ;
+		InstallOptionalHaikuImagePackage apr-0.9.17-gcc2-2008-05-13
+			: $(baseURL)/apr-0.9.17-gcc2-2008-05-13.zip
+			:
+		;
+	}
+}
+
+
 # Development
 if [ IsOptionalHaikuImagePackageAdded Development ]
 		&& $(TARGET_ARCH) = x86 {
