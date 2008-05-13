@@ -292,13 +292,13 @@
 #define PACKAGE_NAME "GNU make"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU make 3.80"
+#define PACKAGE_STRING "GNU make 3.81"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "make"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "3.80"
+#define PACKAGE_VERSION "3.81"
 
 /* Define to 1 if the C compiler supports function prototypes. */
 #define PROTOTYPES 1
@@ -351,7 +351,7 @@
 /* #undef UMAX4_3 */
 
 /* Version number of package */
-#define VERSION "3.80"
+#define VERSION "3.81"
 
 /* Define if using the dmalloc debugging malloc package */
 /* #undef WITH_DMALLOC */
