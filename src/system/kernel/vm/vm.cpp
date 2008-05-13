@@ -1904,8 +1904,8 @@ _vm_map_file(team_id team, const char *name, void **_address, uint32 addressSpec
 	//	copy of a file at a given time, ie. later changes should not
 	//	make it into the mapped copy -- this will need quite some changes
 	//	to be done in a nice way
-	TRACE(("_vm_map_file(\"%s\", offset = %Ld, size = %lu, mapping %ld)\n",
-		path, offset, size, mapping));
+	TRACE(("_vm_map_file(fd = %d, offset = %Ld, size = %lu, mapping %ld)\n",
+		fd, offset, size, mapping));
 
 	offset = ROUNDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
