@@ -1447,6 +1447,11 @@ BApplication::_ArgvReceived(BMessage *message)
 	if (error == B_OK && argc > 0)
 		ArgvReceived(argc, argv);
 
+	if (error != B_OK) {
+		fprintf(stderr, "Error parsing B_ARGV_RECEIVED message. Message:\n");
+		message->PrintToStream();
+	}
+
 	// cleanup
 	if (argv) {
 		for (int32 i = 0; i < argc; i++)
