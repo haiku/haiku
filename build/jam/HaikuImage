@@ -64,7 +64,7 @@ BEOS_DEMOS = BSnow Chart Clock $(X86_ONLY)Cortex FontDemo
 	Playground Pulse Sudoku
 ;
 BEOS_SYSTEM_LIBS = libbe.so $(HAIKU_LIBSTDC++) libmedia.so libtracker.so
-	libtranslation.so libnetapi.so libnetwork.so libdebug.so libbsd.so
+	libtranslation.so libbnetapi.so libnetwork.so libdebug.so libbsd.so
 	libmail.so libtextencoding.so libz.so libfreetype.so libpng.so libmidi.so
 	libmidi2.so libdevice.so libgame.so libscreensaver.so <revisioned>libroot.so
 	$(X86_ONLY)libGL.so libfluidsynth.so liblpsolve55.so liblinprog.so libalm.so
@@ -196,6 +196,8 @@ local lib ;
 for lib in $(BEOS_SYSTEM_LIBS_LIBNETWORK_ALIASES) {
 	AddSymlinkToHaikuImage beos system lib : libnetwork.so : $(lib) ;
 }
+
+AddSymlinkToHaikuImage beos system lib : libbnetapi.so : libnetapi.so ;
 
 # libGL.so has GLUT built-in
 if $(TARGET_ARCH) = x86 {

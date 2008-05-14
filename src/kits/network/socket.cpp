@@ -38,8 +38,12 @@ check_r5_compatibility()
 	};
 
 	stack_frame* frame = (stack_frame*)get_stack_frame();
-	if (frame->return_address >= __gNetworkStart && frame->return_address < __gNetworkEnd)
+	if (frame->return_address >= __gNetworkStart
+			&& frame->return_address < __gNetworkEnd
+		|| frame->return_address >= __gNetAPIStart
+			&& frame->return_address < __gNetAPIEnd) {
 		return false;
+	}
 
 	return true;
 #endif

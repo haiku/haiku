@@ -359,7 +359,7 @@ if $(HAIKU_SHARED_LIBSUPC++) {
 
 # network libraries
 HAIKU_NETWORK_LIBS = network ;
-HAIKU_NETAPI_LIB = netapi ;
+HAIKU_NETAPI_LIB = bnetapi ;
 HAIKU_SELECT_UNAME_ETC_LIB = ;	# libroot, against which we link anyway
 
 # library and executable glue code
@@ -408,8 +408,8 @@ HAIKU_BUILD_DESCRIPTION ?= "Unknown Build" ;
 # init library name map
 {
 	local i ;
-	for i in be game GL mail media midi midi2 network netapi opengl screensaver root z
-			textencoding tracker translation {
+	for i in be game GL mail media midi midi2 network bnetapi opengl
+			screensaver root z textencoding tracker translation {
 		HAIKU_LIBRARY_NAME_MAP_$(i) = lib$(i).so ;
 	}
 	HAIKU_LIBRARY_NAME_MAP_libstdc++ = $(HAIKU_LIBSTDC++) ;
@@ -658,7 +658,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 # network libraries
 if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_NETWORK_LIBS = network ;
-	HOST_NETAPI_LIB = netapi ;
+	HOST_NETAPI_LIB = bnetapi ;
 	HOST_SELECT_UNAME_ETC_LIB = ;	# libroot
 } else if $(HOST_PLATFORM_BONE_COMPATIBLE) {
 	HOST_NETWORK_LIBS = socket bind ;

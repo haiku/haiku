@@ -5,6 +5,7 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders net ;
 
 local netapi_sources =
+	init.cpp
 	NetEndpoint.cpp
 	NetAddress.cpp 
 	NetBuffer.cpp
@@ -43,7 +44,7 @@ if $(TARGET_PLATFORM) != haiku {
 	#	boot home config lib ;
 		boot home Desktop haiku-networkingkit lib ;
 } else {
-	SharedLibrary libnetapi.so :
+	SharedLibrary libbnetapi.so :
 		$(netapi_sources)
 		: be $(TARGET_NETWORK_LIBS)
 	;

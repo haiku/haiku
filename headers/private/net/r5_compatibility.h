@@ -41,5 +41,7 @@ struct r5_sockaddr_in {
 extern bool __gR5Compatibility;
 extern addr_t __gNetworkStart;
 extern addr_t __gNetworkEnd;
+extern addr_t __gNetAPIStart;
+extern addr_t __gNetAPIEnd;
 
 #endif	// NET_R5_COMPATIBILITY_H

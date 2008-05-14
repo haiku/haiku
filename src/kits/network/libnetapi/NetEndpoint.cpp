@@ -3,9 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
-#include <r5_compatibility.h>
-
 #include <Message.h>
 #include <NetEndpoint.h>
 
@@ -28,7 +25,7 @@ BNetEndpoint::BNetEndpoint(int type)
 	fTimeout(B_INFINITE_TIMEOUT),
 	fLastError(0)
 {
-	if ((fSocket = socket(__gR5Compatibility ? R5_AF_INET : AF_INET, type, 0)) < 0)
+	if ((fSocket = socket(AF_INET, type, 0)) < 0)
 		fLastError = errno;
 	else
 		fInit = B_OK;

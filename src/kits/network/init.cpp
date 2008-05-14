@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,6 +18,8 @@
 bool __gR5Compatibility = false;
 addr_t __gNetworkStart;
 addr_t __gNetworkEnd;
+addr_t __gNetAPIStart;
+addr_t __gNetAPIEnd;
 
 
 static void
