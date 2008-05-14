@@ -1424,8 +1424,9 @@ BApplication::_ArgvReceived(BMessage *message)
 	char **argv = NULL;
 	if (message->FindInt32("argc", &argc) == B_OK && argc > 0) {
 		// allocate a NULL terminated array
-		argv = new char*[argc + 1];
-		memset(argv, 0, sizeof(char*) * (argc + 1));
+		argv = new(std::nothrow) char*[argc + 1];
+		if (argv == NULL)
+			return;
 
 		// copy the arguments
 		for (int32 i = 0; error == B_OK && i < argc; i++) {
@@ -1435,8 +1436,11 @@ BApplication::_ArgvReceived(BMessage *message)
 				argv[i] = strdup(arg);
 				if (argv[i] == NULL)
 					error = B_NO_MEMORY;
-			}
+			} else
+				argc = i;
 		}
+
+		argv[argc] = NULL;
 	}
 
 	// call the hook
@@ -1562,8 +1566,10 @@ fill_argv_message(BMessage &message)
 	message.AddInt32("argc", argc);
 
 	// add argv
-	for (int32 i = 0; i < argc; i++)
-		message.AddString("argv", argv[i]);
+	for (int32 i = 0; i < argc; i++) {
+		if (argv[i] != NULL)
+			message.AddString("argv", argv[i]);
+	}
 
 	// add current working directory
 	char cwd[B_PATH_NAME_LENGTH];
