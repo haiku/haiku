@@ -359,7 +359,7 @@ if $(HAIKU_SHARED_LIBSUPC++) {
 
 # network libraries
 HAIKU_NETWORK_LIBS = network ;
-HAIKU_NETAPI_LIB = network ;
+HAIKU_NETAPI_LIB = netapi ;
 HAIKU_SELECT_UNAME_ETC_LIB = ;	# libroot, against which we link anyway
 
 # library and executable glue code
@@ -453,7 +453,7 @@ HOST_UNARFLAGS		?= x ;
 
 # check the host platform compatibility
 SetPlatformCompatibilityFlagVariables HOST_PLATFORM : HOST : host
-	: linux freebsd darwin ;
+	: linux freebsd darwin sunos ;
 
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd
 	|| $(HOST_PLATFORM) = darwin {
@@ -527,8 +527,8 @@ switch $(HOST_PLATFORM) {
 	case haiku	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case haiku_host	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case linux	: HOST_DEBUG_FLAGS ?= -ggdb ;
-	case freebsd    : HOST_DEBUG_FLAGS ?= -ggdb ;
-	case darwin : HOST_DEBUG_FLAGS ?= -ggdb ;
+	case freebsd	: HOST_DEBUG_FLAGS ?= -ggdb ;
+	case darwin	: HOST_DEBUG_FLAGS ?= -ggdb ;
 	case *		: HOST_DEBUG_FLAGS ?= -g ;
 }
 
@@ -658,7 +658,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 # network libraries
 if $(HOST_PLATFORM_HAIKU_COMPATIBLE) {
 	HOST_NETWORK_LIBS = network ;
-	HOST_NETAPI_LIB = network ;
+	HOST_NETAPI_LIB = netapi ;
 	HOST_SELECT_UNAME_ETC_LIB = ;	# libroot
 } else if $(HOST_PLATFORM_BONE_COMPATIBLE) {
 	HOST_NETWORK_LIBS = socket bind ;
