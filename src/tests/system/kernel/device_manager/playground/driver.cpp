@@ -10,6 +10,7 @@
 
 
 #define DRIVER_MODULE_NAME "drivers/net/sample_driver/driver_v1"
+#define DRIVER_DEVICE_MODULE_NAME "drivers/net/sample_driver/device_v1"
 
 
 //	#pragma mark - driver
@@ -48,7 +49,7 @@ supports_device(device_node *parent)
 static status_t
 register_device(device_node *parent)
 {
-	return gDeviceManager->register_device(parent, DRIVER_MODULE_NAME, NULL,
+	return gDeviceManager->register_node(parent, DRIVER_MODULE_NAME, NULL,
 		NULL, NULL);
 }
 
@@ -56,7 +57,6 @@ register_device(device_node *parent)
 static status_t
 init_driver(device_node *node, void **_cookie)
 {
-	// also publishes any devices/nodes with dedicated calls
 	return B_OK;
 }
 
@@ -70,6 +70,8 @@ uninit_driver(device_node *node)
 static status_t
 register_child_devices(device_node *node)
 {
+	gDeviceManager->publish_device(node, "net/sample/0",
+		DRIVER_DEVICE_MODULE_NAME);
 	return B_OK;
 }
 
@@ -84,7 +86,7 @@ device_removed(device_node *node)
 
 
 static status_t
-init_device(void *deviceCookie)
+init_device(device_node *node, void **_deviceCookie)
 {
 	// called once before one or several open() calls
 	return B_ERROR;
@@ -171,7 +173,7 @@ struct driver_module_info gDriverModuleInfo = {
 
 struct device_module_info gDeviceModuleInfo = {
 	{
-		"drivers/net/sample_driver/device_v1",
+		DRIVER_DEVICE_MODULE_NAME,
 		0,
 		NULL,
 	},

@@ -10,7 +10,27 @@
 #include <PCI.h>
 
 
-#define BUS_MODULE_NAME "bus_managers/sample_bus/driver_v1"
+void
+bus_trigger_device_removed(device_node* node)
+{
+	// the network device
+	device_attr attrs[] = {
+		{B_DEVICE_VENDOR_ID, B_UINT16_TYPE, {ui16: 0x1001}},
+		{B_DEVICE_ID, B_UINT16_TYPE, {ui16: 0x0001}},
+		{NULL}
+	};
+
+	device_node* child = NULL;
+	while (gDeviceManager->get_next_child_node(node, attrs, &child) == B_OK) {
+		gDeviceManager->unregister_node(child);
+	}
+}
+
+
+void
+bus_trigger_device_added(device_node* node)
+{
+}
 
 
 //	#pragma mark - bus
@@ -40,7 +60,7 @@ register_device(device_node *parent)
 		{NULL}
 	};
 
-	return gDeviceManager->register_device(parent, BUS_MODULE_NAME, attrs, NULL,
+	return gDeviceManager->register_node(parent, BUS_MODULE_NAME, attrs, NULL,
 		NULL);
 }
 
@@ -90,12 +110,11 @@ register_child_devices(device_node *node)
 			{B_DEVICE_INTERFACE, B_UINT16_TYPE,
 				{ui16: kDevices[i].interface}},
 
-			{B_DEVICE_FIND_CHILD_FLAGS, B_UINT32_TYPE,
-				{ui32: B_FIND_CHILD_ON_DEMAND}},
+			{B_DEVICE_FLAGS, B_UINT32_TYPE, {ui32: B_FIND_CHILD_ON_DEMAND}},
 			{NULL}
 		};
 
-		gDeviceManager->register_device(node, BUS_FOR_DRIVER_NAME, attrs, NULL,
+		gDeviceManager->register_node(node, BUS_FOR_DRIVER_NAME, attrs, NULL,
 			NULL);
 	}
 
@@ -107,7 +126,7 @@ register_child_devices(device_node *node)
 
 #if 1
 	// this is supposed to fail
-	dprintf("non-existing child: %ld\n", gDeviceManager->register_device(node,
+	dprintf("non-existing child: %ld\n", gDeviceManager->register_node(node,
 		BUS_FOR_DRIVER_NAME, attrs, NULL, NULL));
 #endif
 	return B_OK;

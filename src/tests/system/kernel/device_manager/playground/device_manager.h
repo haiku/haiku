@@ -11,7 +11,7 @@
 #include <module.h>
 
 
-// type of I/O resource
+/* type of I/O resource */
 enum {
 	IO_MEM = 1,
 	IO_PORT = 2,
@@ -19,33 +19,35 @@ enum {
 };
 
 
-// I/O resource description
+/* I/O resource description */
 typedef struct {
 	uint32	type;
-		// type of I/O resource
+		/* type of I/O resource */
 
 	uint32	base;
-		// I/O memory: first physical address (32 bit)
-		// I/O port: first port address (16 bit)
-		// ISA DMA channel: channel number (0-7)
+		/* I/O memory: first physical address (32 bit)
+		 * I/O port: first port address (16 bit)
+		 * ISA DMA channel: channel number (0-7)
+		 */
 
 	uint32	length;
-		// I/O memory: size of address range (32 bit)
-		// I/O port: size of port range (16 bit)
-		// ISA DMA channel: must be 1
+		/* I/O memory: size of address range (32 bit)
+		 * I/O port: size of port range (16 bit)
+		 * ISA DMA channel: must be 1
+		 */
 } io_resource;
 
-// attribute of a device node
+/* attribute of a device node */
 typedef struct {
 	const char		*name;
-	type_code		type;			// for supported types, see value
+	type_code		type;			/* for supported types, see value */
 	union {
-		uint8		ui8;			// B_UINT8_TYPE
-		uint16		ui16;			// B_UINT16_TYPE
-		uint32		ui32;			// B_UINT32_TYPE
-		uint64		ui64;			// B_UINT64_TYPE
-		const char	*string;		// B_STRING_TYPE
-		struct {					// B_RAW_TYPE
+		uint8		ui8;			/* B_UINT8_TYPE */
+		uint16		ui16;			/* B_UINT16_TYPE */
+		uint32		ui32;			/* B_UINT32_TYPE */
+		uint64		ui64;			/* B_UINT64_TYPE */
+		const char	*string;		/* B_STRING_TYPE */
+		struct {					/* B_RAW_TYPE */
 			const void *data;
 			size_t	length;
 		} raw;
@@ -57,26 +59,30 @@ typedef struct device_node device_node;
 typedef struct driver_module_info driver_module_info;
 
 
-// interface of the device manager
+/* interface of the device manager */
 
 typedef struct device_manager_info {
 	module_info info;
 
-	status_t (*rescan)(device_node *node);
+	status_t (*rescan_node)(device_node *node);
 
-	status_t (*register_device)(device_node *parent, const char *moduleName,
+	status_t (*register_node)(device_node *parent, const char *moduleName,
 					const device_attr *attrs, const io_resource *ioResources,
 					device_node **_node);
-	status_t (*unregister_device)(device_node *node);
+	status_t (*unregister_node)(device_node *node);
 
 	status_t (*get_driver)(device_node *node, driver_module_info **_module,
 					void **_cookie);
 
-	device_node *(*get_root_device)();
-	status_t (*get_next_child_device)(device_node *parent, device_node *node,
-					const device_attr *attrs);
-	device_node *(*get_parent)(device_node *node);
-	void (*put_device_node)(device_node *node);
+	device_node *(*get_root_node)();
+	status_t (*get_next_child_node)(device_node *parent,
+					const device_attr *attrs, device_node **node);
+	device_node *(*get_parent_node)(device_node *node);
+	void (*put_node)(device_node *node);
+
+	status_t (*publish_device)(device_node *node, const char *path,
+					const char *deviceModuleName);
+	status_t (*unpublish_device)(device_node *node, const char *path);
 
 #if 0
 	status_t (*acquire_io_resources)(io_resource *resources);
@@ -106,7 +112,7 @@ typedef struct device_manager_info {
 #define B_DEVICE_MANAGER_MODULE_NAME "system/device_manager/v1"
 
 
-// interface of device driver
+/* interface of device driver */
 
 struct driver_module_info {
 	module_info info;
@@ -128,7 +134,7 @@ struct driver_module_info {
 #define B_DEVICE_MAPPING			"device/mapping"			/* string */
 #define B_DEVICE_BUS				"device/bus"				/* string */
 #define B_DEVICE_FIXED_CHILD		"device/fixed child"		/* string */
-#define B_DEVICE_FIND_CHILD_FLAGS	"device/find child flags"	/* uint32 */
+#define B_DEVICE_FLAGS				"device/flags"				/* uint32 */
 
 #define B_DEVICE_VENDOR_ID			"device/vendor"				/* uint16 */
 #define B_DEVICE_ID					"device/id"					/* uint16 */
@@ -141,20 +147,21 @@ struct driver_module_info {
 
 #define B_DEVICE_UNIQUE_ID			"device/unique id"			/* string */
 
-// find child flags
+/* device flags */
 #define B_FIND_CHILD_ON_DEMAND		0x01
 #define B_FIND_MULTIPLE_CHILDREN	0x02
+#define B_KEEP_DRIVER_LOADED		0x04
 
 
-// interface of device
+/* interface of device */
 
 typedef struct io_request io_request;
 
 struct device_module_info {
 	module_info info;
 
-	status_t (*init_device)(void *cookie);
-	void (*uninit_device)(void *cookie);
+	status_t (*init_device)(device_node *node, void **_deviceCookie);
+	void (*uninit_device)(void *deviceCookie);
 
 	status_t (*device_open)(void *deviceCookie, int openMode, void **_cookie);
 	status_t (*device_close)(void *cookie);
