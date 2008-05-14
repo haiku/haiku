@@ -1425,7 +1425,7 @@ BApplication::_ArgvReceived(BMessage *message)
 	if (message->FindInt32("argc", &argc) == B_OK && argc > 0) {
 		// allocate a NULL terminated array
 		argv = new char*[argc + 1];
-		argv[argc] = NULL;
+		memset(argv, 0, sizeof(char*) * argc + 1);
 
 		// copy the arguments
 		for (int32 i = 0; error == B_OK && i < argc; i++) {
