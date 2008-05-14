@@ -219,12 +219,12 @@ auich_stream_commit_parms(auich_stream *stream)
 		(uint32)stream->dmaops_phy_base);
 		
 	if(stream->use & AUICH_USE_RECORD)
-		auich_codec_write(&stream->card->config, AC97_PCM_LR_ADC_RATE, (uint16)stream->sample_rate);
+		auich_codec_write(&stream->card->config, AC97_PCM_L_R_ADC_RATE, (uint16)stream->sample_rate);
 	else
 		auich_codec_write(&stream->card->config, AC97_PCM_FRONT_DAC_RATE, (uint16)stream->sample_rate);
 	
 	if(stream->use & AUICH_USE_RECORD)
-		LOG(("rate : %d\n", auich_codec_read(&stream->card->config, AC97_PCM_LR_ADC_RATE)));
+		LOG(("rate : %d\n", auich_codec_read(&stream->card->config, AC97_PCM_L_R_ADC_RATE)));
 	else
 		LOG(("rate : %d\n", auich_codec_read(&stream->card->config, AC97_PCM_FRONT_DAC_RATE)));
 	return B_OK;
@@ -604,7 +604,7 @@ auich_setup(auich_dev * card)
 	status_t err = B_OK;
 	status_t rv;
 	unsigned char cmd;
-	
+
 	PRINT(("auich_setup(%p)\n", card));
 
 	make_device_names(card);
@@ -664,12 +664,11 @@ auich_setup(auich_dev * card)
 		LOG(("cold reset failed\n"));
 	}
 
-	/* reset the codec */	
-	PRINT(("codec reset\n"));
-	auich_codec_write(&card->config, 0x00, 0x0000);
-	snooze(50000); // 50 ms
-
-	ac97_init(&card->config);
+	/* attach the codec */	
+	PRINT(("codec attach\n"));
+	ac97_attach(&card->config.ac97, (codec_reg_read)auich_codec_read, 
+		(codec_reg_write)auich_codec_write, &card->config,
+		card->config.subvendor_id, card->config.subsystem_id);
 	
 	rv = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA);
 	if (!(rv & STA_S0CR)) { /* reset failure */
@@ -687,9 +686,9 @@ auich_setup(auich_dev * card)
 		LOG(("6ch PCM output support\n"));
 	}
 
-	PRINT(("codec vendor id      = %#08lx\n",ac97_get_vendor_id(&card->config)));
-	PRINT(("codec description     = %s\n",ac97_get_vendor_id_description(&card->config)));
-	PRINT(("codec 3d enhancement = %s\n",ac97_get_3d_stereo_enhancement(&card->config)));
+	PRINT(("codec vendor id      = %#08lx\n", card->config.ac97->codec_id));
+	PRINT(("codec description     = %s\n", card->config.ac97->codec_info));
+	PRINT(("codec 3d enhancement = %s\n", card->config.ac97->codec_3d_stereo_enhancement));
 	
 	if (current_settings.use_thread) {
 		int_thread_id = spawn_kernel_thread(auich_int_thread, "auich interrupt poller", B_REAL_TIME_PRIORITY, card);
@@ -698,42 +697,6 @@ auich_setup(auich_dev * card)
 		PRINT(("installing interrupt : %lx\n", card->config.irq));
 		install_io_interrupt_handler(card->config.irq, auich_int, card, 0);
 	}
-		
-	/*PRINT(("codec master output = %#04x\n",auich_codec_read(&card->config, 0x02)));
-	PRINT(("codec aux output    = %#04x\n",auich_codec_read(&card->config, 0x04)));
-	PRINT(("codec mono output   = %#04x\n",auich_codec_read(&card->config, 0x06)));
-	PRINT(("codec pcm output    = %#04x\n",auich_codec_read(&card->config, 0x18)));
-	PRINT(("codec line in	    = %#04x\n",auich_codec_read(&card->config, 0x10)));
-	PRINT(("codec record line in= %#04x\n",auich_codec_read(&card->config, 0x1a)));
-	PRINT(("codec record gain   = %#04x\n",auich_codec_read(&card->config, 0x1c)));*/
-	
-	PRINT(("writing codec registers\n"));
-
-	// TODO : to move with AC97
-	/* enable master output */
-	auich_codec_write(&card->config, AC97_MASTER_VOLUME, 0x0000);
-	/* enable aux output */
-	auich_codec_write(&card->config, AC97_AUX_OUT_VOLUME, 0x0000);
-	/* enable mono output */
-	//auich_codec_write(&card->config, AC97_MONO_VOLUME, 0x0004);
-	/* enable pcm output */
-	auich_codec_write(&card->config, AC97_PCM_OUT_VOLUME, 0x0808);
-	/* enable line in */
-	//auich_codec_write(&card->config, AC97_LINE_IN_VOLUME, 0x8808);
-	/* set record line in */
-	auich_codec_write(&card->config, AC97_RECORD_SELECT, 0x0404);
-	/* set record gain */
-	//auich_codec_write(&card->config, AC97_RECORD_GAIN, 0x0000);
-
-	ac97_amp_enable(&card->config, true);
-
-	PRINT(("codec master output = %#04x\n",auich_codec_read(&card->config, AC97_MASTER_VOLUME)));
-	PRINT(("codec aux output    = %#04x\n",auich_codec_read(&card->config, AC97_AUX_OUT_VOLUME)));
-	PRINT(("codec mono output   = %#04x\n",auich_codec_read(&card->config, AC97_MONO_VOLUME)));
-	PRINT(("codec pcm output    = %#04x\n",auich_codec_read(&card->config, AC97_PCM_OUT_VOLUME)));
-	PRINT(("codec line in	    = %#04x\n",auich_codec_read(&card->config, AC97_LINE_IN_VOLUME)));
-	PRINT(("codec record line in= %#04x\n",auich_codec_read(&card->config, AC97_RECORD_SELECT)));
-	PRINT(("codec record gain   = %#04x\n",auich_codec_read(&card->config, AC97_RECORD_GAIN)));
 		
 	if ((err = auich_init(card)))
 		return (err);
@@ -846,7 +809,8 @@ static void
 auich_shutdown(auich_dev *card)
 {
 	PRINT(("shutdown(%p)\n", card));
-	ac97_amp_enable(&card->config, false);
+	ac97_detach(card->config.ac97);
+	
 	card->interrupt_mask = 0;
 	
 	if (current_settings.use_thread) {

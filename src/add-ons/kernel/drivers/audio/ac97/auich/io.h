@@ -33,15 +33,15 @@
 
 #include "config.h"
 
-uint8  auich_reg_read_8(device_config *config, int regno);
-uint16 auich_reg_read_16(device_config *config, int regno);
-uint32 auich_reg_read_32(device_config *config, int regno);
+uint8  auich_reg_read_8(device_config *config, uint8 regno);
+uint16 auich_reg_read_16(device_config *config, uint8 regno);
+uint32 auich_reg_read_32(device_config *config, uint8 regno);
 
-void auich_reg_write_8(device_config *config, int regno, uint8 value);
-void auich_reg_write_16(device_config *config, int regno, uint16 value);
-void auich_reg_write_32(device_config *config, int regno, uint32 value);
+void auich_reg_write_8(device_config *config, uint8 regno, uint8 value);
+void auich_reg_write_16(device_config *config, uint8 regno, uint16 value);
+void auich_reg_write_32(device_config *config, uint8 regno, uint32 value);
 
-uint16 auich_codec_read(device_config *config, int regno);
-void auich_codec_write(device_config *config, int regno, uint16 value);
-	       
+uint16 auich_codec_read(device_config *config, uint8 regno);
+void auich_codec_write(device_config *config, uint8 regno, uint16 value);
+
 #endif
