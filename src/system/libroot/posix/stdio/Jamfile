@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix stdio ;
 
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateSystemHeaders ;
 
 MergeObject posix_stdio.o :
 	_fseek.c

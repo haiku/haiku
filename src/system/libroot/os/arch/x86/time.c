@@ -17,7 +17,8 @@ __arch_init_time(struct real_time_data *data, bool setDefaults)
 		data->arch_data.system_time_conversion_factor = 100000;
 	}
 
-	// ToDo: this should only store a pointer to that value
+	// TODO: this should only store a pointer to that value
+	// When resolving this TODO, also resolve the one in the Jamfile.
 	__x86_setup_system_time(data->arch_data.system_time_conversion_factor);
 }
 

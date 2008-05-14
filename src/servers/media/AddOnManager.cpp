@@ -20,7 +20,7 @@
 #include <Autolock.h>
 #include <image.h>
 
-#include <safemode.h>
+#include <safemode_defs.h>
 #include <syscalls.h>
 
 #include "FormatManager.h"

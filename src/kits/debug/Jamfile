@@ -1,10 +1,11 @@
 SubDir HAIKU_TOP src kits debug ;
 
-UseArchHeaders $(TARGET_ARCH) ;
 UsePrivateHeaders debug ;
 UsePrivateHeaders kernel ;
+	# for <util/DoublyLinkedList.h>
 UsePrivateHeaders runtime_loader ;
 UsePrivateHeaders shared ;
+UsePrivateSystemHeaders ;
 SubDirHdrs [ FDirName $(SUBDIR) arch ] ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
@@ -15,8 +16,4 @@ SharedLibrary libdebug.so :
 
 	# architecture specific
 	arch_debug_support.cpp
-;
-
-LinkAgainst libdebug.so :
-	libroot.so
 ;

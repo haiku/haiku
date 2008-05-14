@@ -11,8 +11,8 @@
 #include "PowerStatus.h"
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	include <arch/x86/apm.h>
-#	include <generic_syscall.h>
+#	include <arch/x86/apm_defs.h>
+#	include <generic_syscall_defs.h>
 #	include <syscalls.h>
 	// temporary, as long as there is no real power state API
 #endif

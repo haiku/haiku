@@ -7,7 +7,8 @@ if $(TARGET_PLATFORM) != haiku {
 	UsePublicHeaders translation ;
 }
 
-UsePrivateHeaders kernel translation textencoding ;
+UsePrivateHeaders translation textencoding ;
+UsePrivateSystemHeaders ;
 
 SharedLibrary libtranslation.so :
 	BitmapStream.cpp

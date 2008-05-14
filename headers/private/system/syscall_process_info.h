@@ -2,8 +2,8 @@
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
-#ifndef _KERNEL_SYSCALL_PROCESS_INFO_H
-#define _KERNEL_SYSCALL_PROCESS_INFO_H
+#ifndef _SYSTEM_SYSCALL_PROCESS_INFO_H
+#define _SYSTEM_SYSCALL_PROCESS_INFO_H
 
 enum which_process_info {
 	SESSION_ID = 1,
@@ -11,4 +11,4 @@ enum which_process_info {
 	PARENT_ID,
 };
 
-#endif	/* _KRENEL_SYSCALL_PROCESS_INFO_H */
+#endif	/* _SYSTEM_SYSCALL_PROCESS_INFO_H */

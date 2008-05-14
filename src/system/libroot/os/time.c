@@ -4,7 +4,7 @@
  */
 
 
-#include <commpage.h>
+#include <commpage_defs.h>
 #include <libroot_private.h>
 #include <real_time_data.h>
 #include <syscalls.h>

@@ -11,13 +11,10 @@
 
 #include <OS.h>
 
+#include <posix/realtime_sem_defs.h>
+
 
 struct realtime_sem_context;
-
-
-#define MAX_POSIX_SEMS_PER_TEAM	128
-#define MAX_POSIX_SEMS			1024
-#define MAX_POSIX_SEM_VALUE		INT_MAX
 
 
 __BEGIN_DECLS

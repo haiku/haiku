@@ -1,7 +1,10 @@
 SubDir HAIKU_TOP src system libroot posix ;
 
 UsePrivateHeaders app shared [ FDirName syslog_daemon ] ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateSystemHeaders ;
+UsePrivateHeaders kernel ;
+	# For util/KMessage.h
+UsePrivateHeaders libroot ;
 
 if $(HAIKU_MULTIUSER_QUERY) = 1 {
 	PWD_BACKEND = pwd_query.c ;

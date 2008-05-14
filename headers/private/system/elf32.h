@@ -12,7 +12,7 @@
 #include <SupportDefs.h>
 #include <ByteOrder.h>
 
-#include <arch/elf.h>
+#include <arch_elf.h>
 
 
 typedef uint32 Elf32_Addr;

@@ -2,11 +2,12 @@ SubDir HAIKU_TOP src servers registrar ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders kernel ;
+	# for <util/KMessage.h>
 UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 UsePrivateHeaders tracker ;
-UseArchHeaders $(TARGET_ARCH) ;
+UsePrivateSystemHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 

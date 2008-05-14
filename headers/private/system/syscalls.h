@@ -2,8 +2,8 @@
  * Copyright 2004-2008, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _KERNEL_SYSCALLS_H
-#define _KERNEL_SYSCALLS_H
+#ifndef _SYSTEM_SYSCALLS_H
+#define _SYSTEM_SYSCALLS_H
 
 
 #include <arch_config.h>
@@ -487,4 +487,4 @@ status_t stop_disk_device_watching(port_id, int32 token);
 }
 #endif
 
-#endif	/* _KERNEL_SYSCALLS_H */
+#endif	/* _SYSTEM_SYSCALLS_H */

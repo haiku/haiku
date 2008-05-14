@@ -1,7 +1,9 @@
 SubDir HAIKU_TOP src bin multiuser ;
 
-UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
 UsePrivateHeaders app ;
+UsePrivateHeaders kernel ;
+	# for <util/KMessage.h>
 UsePrivateHeaders libroot ;
 UsePrivateHeaders shared ;
 

@@ -323,11 +323,17 @@ if $(HAIKU_GCC_VERSION[1]) >= 3 {
 	HAIKU_DEFINES += _BEOS_R5_COMPATIBLE_ ;
 }
 
+# private shared kernel/libroot headers
+HAIKU_PRIVATE_SYSTEM_HEADERS =
+	[ PrivateHeaders $(DOT) system system/arch/$(HAIKU_ARCH) ]
+;
+
 # private kernel headers to be used when compiling kernel code
 HAIKU_PRIVATE_KERNEL_HEADERS =
 	[ PrivateHeaders $(DOT) kernel libroot
 		kernel/boot/platform/$(HAIKU_BOOT_PLATFORM) ]
 	[ ArchHeaders $(HAIKU_ARCH) ]
+	$(HAIKU_PRIVATE_SYSTEM_HEADERS)
 ;
 
 # Add some grist to the libgcc objects
@@ -550,6 +556,9 @@ if $(HOST_ARCH) = x86 && $(HAIKU_HOST_USE_32BIT) = 1 {
 # private kernel headers do be used when compiling kernel code
 HOST_PRIVATE_KERNEL_HEADERS = ;
 
+# private shared kernel/libroot headers
+HOST_PRIVATE_SYSTEM_HEADERS = ;
+
 # under BeOS use copyattr instead of cp
 if $(HOST_PLATFORM_BEOS_COMPATIBLE)
 {
@@ -748,6 +757,7 @@ local buildVars =
 	KERNEL_DEBUG_$(HAIKU_DEBUG_LEVELS)_C++FLAGS
 
 	PRIVATE_KERNEL_HEADERS
+	PRIVATE_SYSTEM_HEADERS
 
 	LIBSTDC++ LIBSUPC++
 

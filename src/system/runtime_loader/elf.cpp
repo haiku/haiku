@@ -10,7 +10,6 @@
 
 
 #include "runtime_loader_private.h"
-#include "vm.h"
 
 #include <OS.h>
 
@@ -19,13 +18,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <arch/cpu.h>
 #include <elf32.h>
 #include <runtime_loader.h>
-#include <sem.h>
 #include <syscalls.h>
 #include <user_runtime.h>
-#include <vm_types.h>
+#include <util/KMessage.h>
+#include <vm_defs.h>
 
 #include "tracing_config.h"
 

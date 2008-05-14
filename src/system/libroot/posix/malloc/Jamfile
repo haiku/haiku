@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix malloc ;
 
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateSystemHeaders ;
 UsePrivateHeaders libroot ;
 
 MergeObject posix_malloc.o :

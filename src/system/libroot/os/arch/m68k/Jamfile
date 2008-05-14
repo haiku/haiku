@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot os arch m68k ;
 
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateSystemHeaders ;
 
 MergeObject os_arch_$(TARGET_ARCH).o :
 	atomic.S

@@ -22,20 +22,6 @@ struct kernel_args;
 struct select_info;
 struct thread_creation_attributes;
 
-struct thread_creation_attributes {
-	int32 (*entry)(thread_func, void *);
-	const char*	name;
-	int32		priority;
-	void*		args1;
-	void*		args2;
-	void*		stack_address;
-	size_t		stack_size;
-
-	// when calling kernel only
-	team_id		team;
-	thread_id	thread;
-};
-
 
 #ifdef __cplusplus
 extern "C" {

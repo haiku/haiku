@@ -17,7 +17,7 @@ rule PreprocessSyscalls
 
 	local headers = [ on $(1) return $(SEARCH_SOURCE) $(SUBDIRHDRS) $(HDRS) ] ;
 	local sysHeaders =
-		[ PrivateHeaders kernel ]
+		$(TARGET_PRIVATE_SYSTEM_HEADERS)
 		[ ArchHeaders $(TARGET_ARCH) ]
 		[ on $(1) return $(SUBDIRSYSHDRS) $(SYSHDRS) ]
 		$(HAIKU_HDRS) ;
@@ -45,7 +45,7 @@ actions PreprocessSyscalls
 }
 
 local syscallsHeader = [ FGristFiles syscalls.h ] ;
-SEARCH on $(syscallsHeader) = [ FDirName $(HAIKU_TOP) headers private kernel ] ;
+SEARCH on $(syscallsHeader) = [ FDirName $(HAIKU_TOP) headers private system ] ;
 
 # We generate two preprocessed headers. One for parsing by gensyscallinfos
 # (it contains #pragmas) and one for inclusion by the generated

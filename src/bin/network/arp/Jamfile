@@ -9,7 +9,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 }
 
 UsePrivateHeaders net ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateSystemHeaders ;
 
 BinCommand arp :
 	arp.cpp

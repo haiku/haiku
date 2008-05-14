@@ -7,7 +7,7 @@
 	// TODO: This should not even be compiled for the kernel. Fix the TODO in
 	// src/system/kernel/lib/Jamfile!
 
-#include <commpage.h>
+#include <commpage_defs.h>
 
 #define FUNCTION(x) .global x; .type x,@function; x
 

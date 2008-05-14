@@ -17,8 +17,9 @@
 #include "FuncTranslator.h"
 #include "TranslatorRosterPrivate.h"
 
+#include <driver_settings.h>
 #include <image.h>
-#include <safemode.h>
+#include <safemode_defs.h>
 
 #include <Application.h>
 #include <Autolock.h>

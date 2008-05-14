@@ -1,8 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel bus_managers ide ;
 
-UsePrivateHeaders drivers kernel ;
-UsePrivateHeaders [ FDirName kernel arch $(TARGET_ARCH) ] ;
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateHeaders drivers ;
+UsePrivateKernelHeaders ;
 
 KernelAddon ide :
 	ata.c

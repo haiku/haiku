@@ -9,7 +9,7 @@
 
 #include <stdlib.h>
 
-#include <kernel.h>
+#include <thread_defs.h>
 
 
 int 

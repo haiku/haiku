@@ -10,7 +10,7 @@
 #include "kb_mouse_driver.h"
 #include "MethodReplicant.h"
 
-#include <safemode.h>
+#include <safemode_defs.h>
 
 #include <AppServerLink.h>
 #include <MessagePrivate.h>
@@ -18,6 +18,7 @@
 #include <Autolock.h>
 #include <Deskbar.h>
 #include <Directory.h>
+#include <driver_settings.h>
 #include <Entry.h>
 #include <File.h>
 #include <FindDirectory.h>

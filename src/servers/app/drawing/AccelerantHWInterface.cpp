@@ -24,10 +24,11 @@
 #include "SystemPalette.h"
 
 #include <edid.h>
-#include <safemode.h>
+#include <safemode_defs.h>
 
 #include <Accelerant.h>
 #include <Cursor.h>
+#include <driver_settings.h>
 #include <FindDirectory.h>
 #include <graphic_driver.h>
 #include <image.h>

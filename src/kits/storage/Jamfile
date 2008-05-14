@@ -4,9 +4,8 @@ SetSubDirSupportedPlatforms haiku libbe_test ;
 
 UseLibraryHeaders icon ;
 
-UsePrivateHeaders shared app kernel storage ;
-UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UseArchHeaders $(TARGET_ARCH) ;
+UsePrivateHeaders shared app storage ;
+UsePrivateSystemHeaders ;
 
 # for libbe_test
 UsePublicHeaders [ FDirName add-ons registrar ] ;

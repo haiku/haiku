@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src system libroot posix sys ;
 
 UsePrivateHeaders shared ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateSystemHeaders ;
 
 MergeObject posix_sys.o :
 	chmod.c

@@ -21,6 +21,8 @@
 #include <sys/stat.h>
 #include <sys/select.h>
 
+#include <vfs_defs.h>
+
 
 #define DEFAULT_FD_TABLE_SIZE	256
 #define MAX_FD_TABLE_SIZE		8192
@@ -53,13 +55,6 @@ typedef struct io_context {
 	uint32		num_monitors;
 	uint32		max_monitors;
 } io_context;
-
-struct fd_info {
-	int		number;
-	int32	open_mode;
-	dev_t	device;
-	ino_t	node;
-};
 
 /* macro to allocate a iovec array on the stack */
 #define IOVECS(name, size) \

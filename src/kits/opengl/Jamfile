@@ -2,7 +2,8 @@ SubDir HAIKU_TOP src kits opengl ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-UsePrivateHeaders kernel opengl ;
+UsePrivateHeaders opengl ;
+UsePrivateSystemHeaders ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers os opengl ] : true ;

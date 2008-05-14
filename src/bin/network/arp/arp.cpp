@@ -9,7 +9,7 @@
 
 #include <arp_control.h>
 
-#include <generic_syscall.h>
+#include <generic_syscall_defs.h>
 #include <syscalls.h>
 
 #include <arpa/inet.h>

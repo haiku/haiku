@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers random ;
 
-UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
-UseArchHeaders $(TARGET_ARCH) ;
+UsePrivateKernelHeaders ;
 
 KernelAddon random :
 	driver.c

@@ -11,9 +11,8 @@
 
 #include <TLS.h>
 
-#include <kernel.h>
 #include <syscalls.h>
-#include <thread.h>
+#include <thread_defs.h>
 
 
 static const pthread_attr pthread_attr_default = {

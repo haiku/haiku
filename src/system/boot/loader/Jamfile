@@ -4,10 +4,10 @@ SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems efi ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems intel ;
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+UsePrivateKernelHeaders ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
-UsePrivateHeaders [ FDirName kernel util ] [ FDirName kernel arch $(TARGET_ARCH) ] ;
-UsePrivateHeaders kernel shared storage ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders shared storage ;
 
 {
 	local defines =

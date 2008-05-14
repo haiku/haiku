@@ -8,15 +8,8 @@
 #include <OS.h>
 #include <TLS.h>
 
-#include <tls.h>		/* kernel header */
-
-
-struct user_thread {
-	int32			defer_signals;		// counter; 0 == signals allowed
-	uint32			pending_signals;	// signals that are pending, when
-										// signals are deferred
-	status_t		wait_status;
-};
+#include <tls.h>
+#include <user_thread_defs.h>
 
 
 static inline user_thread*

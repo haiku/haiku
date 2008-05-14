@@ -5,8 +5,10 @@
 #ifndef KERNEL_APM_H
 #define KERNEL_APM_H
 
-
 #include <SupportDefs.h>
+
+#include <apm_defs.h>
+
 
 struct kernel_args;
 
@@ -45,17 +47,6 @@ typedef struct apm_info {
 	uint16	data_segment_base;
 	uint16	data_segment_length;
 } apm_info;
-
-
-// temporary generic syscall interface
-#define APM_SYSCALLS "apm"
-#define APM_GET_BATTERY_INFO	1
-
-struct battery_info {
-	bool	online;
-	int32	percent;
-	time_t	time_left;
-};
 
 
 #ifndef _BOOT_MODE

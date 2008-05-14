@@ -9,11 +9,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include <thread.h>
-
-#include "libroot_private.h"
-#include "tls.h"
-#include "syscalls.h"
+#include <libroot_private.h>
+#include <thread_defs.h>
+#include <tls.h>
+#include <syscalls.h>
 
 
 #undef thread_entry

@@ -1,7 +1,9 @@
 SubDir HAIKU_TOP src system runtime_loader ;
 
 UsePrivateHeaders runtime_loader ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateHeaders kernel ;
+	# for <util/KMessage.h>
+UsePrivateSystemHeaders ;
 
 # Don't let gcc inject built-in function code. This will cause dependencies
 # to libroot, which we don't link against.

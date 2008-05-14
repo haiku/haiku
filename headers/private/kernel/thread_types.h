@@ -12,6 +12,7 @@
 #include <cbuf.h>
 #include <smp.h>
 #include <signal.h>
+#include <thread_defs.h>
 #include <timer.h>
 #include <user_debugger.h>
 #include <util/list.h>
@@ -49,11 +50,6 @@ typedef enum job_control_state {
 	JOB_CONTROL_STATE_CONTINUED,
 	JOB_CONTROL_STATE_DEAD
 } job_control_state;
-
-#define THREAD_RETURN_EXIT			0x1
-#define THREAD_RETURN_INTERRUPTED	0x2
-#define THREAD_STOPPED				0x3
-#define THREAD_CONTINUED			0x4
 
 // The type of object a thread blocks on (thread::wait::type, set by
 // thread_prepare_to_block()).

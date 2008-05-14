@@ -3,13 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <sys/wait.h>
+
+#include <errno.h>
+#include <stdio.h>
 
 #include <syscalls.h>
-#include <thread_types.h>
-
-#include <sys/wait.h>
-#include <stdio.h>
-#include <errno.h>
+#include <thread_defs.h>
 
 
 // ToDo: properly implement waitpid(), and waitid()

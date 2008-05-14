@@ -8,7 +8,6 @@
 
 
 #include <SupportDefs.h>
-#include <kernel.h>
 
 #include <stdarg.h>
 #include <string.h>

@@ -10,7 +10,7 @@
 #include <arch/x86/arch_cpu.h>
 #include <arch/x86/arch_kernel.h>
 #include <arch/x86/descriptors.h>
-#include <commpage.h>
+#include <commpage_defs.h>
 #include <thread_types.h>
 
 #include "tracing_config.h"

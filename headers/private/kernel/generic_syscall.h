@@ -8,17 +8,14 @@
 
 #include <SupportDefs.h>
 
+#include <generic_syscall_defs.h>
+
 
 /* If we decide to make this API public, the contents of this file
  * should be moved to KernelExport.h
  */
 
 typedef status_t (*syscall_hook)(const char *subsystem, uint32 function, void *buffer, size_t bufferSize);
-
-/* predefined functions */
-#define B_RESERVED_SYSCALL_BASE		0x80000000
-#define B_SYSCALL_INFO				(B_RESERVED_SYSCALL_BASE)
-	// gets a minimum version uint32, and fills it with the current version on return
 
 /* syscall flags */
 #define B_SYSCALL_NOT_REPLACEABLE	1

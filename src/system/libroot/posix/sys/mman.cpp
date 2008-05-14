@@ -13,7 +13,7 @@
 
 #include <syscall_utils.h>
 #include <syscalls.h>
-#include <vm.h>
+#include <vm_defs.h>
 
 
 static const char* kSharedMemoryDir = "/boot/var/shared_memory/";

@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include <drivers/device_manager.h>
-#include <generic_syscall.h>
+#include <generic_syscall_defs.h>
 #include <string.h>
 #include <syscalls.h>
 

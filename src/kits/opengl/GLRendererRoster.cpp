@@ -5,8 +5,9 @@
  * Authors:
  */
 
+#include <driver_settings.h>
 #include <image.h>
-#include <safemode.h>
+#include <safemode_defs.h>
 
 #include <Directory.h>
 #include <FindDirectory.h>

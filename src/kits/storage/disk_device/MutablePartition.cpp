@@ -12,7 +12,7 @@
 
 #include <Partition.h>
 
-#include <disk_device_manager/ddm_userland_interface.h>
+#include <ddm_userland_interface_defs.h>
 
 #include "DiskDeviceUtils.h"
 #include "PartitionDelegate.h"

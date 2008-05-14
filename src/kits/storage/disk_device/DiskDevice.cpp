@@ -21,7 +21,7 @@
 #include <Path.h>
 
 #include <syscalls.h>
-#include <disk_device_manager/ddm_userland_interface.h>
+#include <ddm_userland_interface_defs.h>
 
 #include "DiskDeviceJob.h"
 #include "DiskDeviceJobGenerator.h"

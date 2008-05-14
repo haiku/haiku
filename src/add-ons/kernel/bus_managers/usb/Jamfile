@@ -5,12 +5,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 SubDirC++Flags -fno-rtti ;
 
 SubDirSysHdrs $(SUBDIR) ;
-UsePrivateHeaders [ FDirName kernel ] ;
 if $(TARGET_PLATFORM) != haiku {
-	UsePublicHeaders [ FDirName drivers ] ;
+	UsePrivateHeaders kernel ;
+	UsePublicHeaders drivers ;
 } else {
-	UseArchHeaders $(TARGET_ARCH) ;
-	UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
+	UsePrivateKernelHeaders ;
 }
 
 KernelStaticLibrary libusb.a :

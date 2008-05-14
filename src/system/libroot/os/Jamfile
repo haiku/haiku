@@ -1,6 +1,9 @@
 SubDir HAIKU_TOP src system libroot os ;
 
-UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
+UsePrivateHeaders kernel ;
+	# for util/KMessage.h
+UsePrivateHeaders libroot ;
 
 MergeObject os_main.o :
 	area.c

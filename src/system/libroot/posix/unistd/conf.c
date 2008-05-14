@@ -15,7 +15,7 @@
 #include <SupportDefs.h>
 
 #include <libroot_private.h>
-#include <posix/realtime_sem.h>
+#include <posix/realtime_sem_defs.h>
 #include <user_group.h>
 
 

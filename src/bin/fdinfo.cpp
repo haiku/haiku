@@ -10,8 +10,8 @@
 #include <OS.h>
 #include <fs_info.h>
 
-#include <vfs.h>
 #include <syscalls.h>
+#include <vfs_defs.h>
 
 #include <ctype.h>
 #include <errno.h>
