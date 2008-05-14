@@ -185,6 +185,7 @@ SubInclude HAIKU_TOP src bin make ;
 SubInclude HAIKU_TOP src bin makebootable ;
 #SubInclude HAIKU_TOP src bin makeudfimage ;
 SubInclude HAIKU_TOP src bin mkdos ;
+SubInclude HAIKU_TOP src bin mkfs ;
 SubInclude HAIKU_TOP src bin multiuser ;
 SubInclude HAIKU_TOP src bin patch ;
 SubInclude HAIKU_TOP src bin pc ;

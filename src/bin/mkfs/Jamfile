@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src bin mkfs ;
+
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+
+BinCommand mkfs :
+	   main.cpp
+	   FsCreator.cpp
+	   : be $(TARGET_LIBSTDC++) ;
