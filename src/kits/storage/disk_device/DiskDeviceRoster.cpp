@@ -134,7 +134,7 @@ BDiskDeviceRoster::GetDiskSystem(BDiskSystem* system, const char* name)
 
 	int32 cookie = 0;
 	user_disk_system_info info;
-	while (_kern_get_next_disk_system_info(&fDiskSystemCookie, &info) == B_OK) {
+	while (_kern_get_next_disk_system_info(&cookie, &info) == B_OK) {
 		if (!strcmp(name, info.name)
 			|| !strcmp(name, info.short_name)
 			|| !strcmp(name, info.pretty_name))
