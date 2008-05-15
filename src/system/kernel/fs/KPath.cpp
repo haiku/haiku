@@ -253,7 +253,8 @@ KPath::Append(const char *component, bool isComponent)
 	// compute the result path len
 	bool insertSlash = isComponent && fBuffer[fPathLength - 1] != '/'
 		&& component[0] != '/';
-	size_t resultPathLength = fPathLength + componentLength + (insertSlash ? 1 : 0);
+	size_t resultPathLength = fPathLength + componentLength
+		+ (insertSlash ? 1 : 0);
 	if (resultPathLength >= fBufferSize)
 		return B_BUFFER_OVERFLOW;
 
