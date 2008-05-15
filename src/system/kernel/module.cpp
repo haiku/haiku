@@ -950,7 +950,8 @@ register_preloaded_module_image(struct preloaded_image *image)
 	// that module). Also helpful for recurse_directory().
 	{
 		// ToDo: this is kind of a hack to have the full path in the hash
-		//	(it always assumes the preloaded add-ons to be in the system directory)
+		//	(it always assumes the preloaded add-ons to be in the system
+		//	directory)
 		char path[B_FILE_NAME_LENGTH];
 		const char *name, *suffix;
 		if (moduleImage->info[0]
@@ -958,12 +959,31 @@ register_preloaded_module_image(struct preloaded_image *image)
 					image->name)) != NULL) {
 			// even if strlcpy() is used here, it's by no means safe
 			// against buffer overflows
-			size_t length = strlcpy(path, "/boot/beos/system/add-ons/kernel/",
-				sizeof(path));
-			strlcpy(path + length, name, strlen(image->name)
-				+ 1 + (suffix - name));
+			KPath addonsKernelPath;
+			status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY,
+				gBootDevice, false, addonsKernelPath.LockBuffer(),
+				addonsKernelPath.BufferSize());
+			if (status != B_OK) {
+				dprintf("register_preloaded_module_image: find_directory() "
+					"failed: %s\n", strerror(status));
+			}
+			addonsKernelPath.UnlockBuffer();
+			if (status == B_OK) {
+				status = addonsKernelPath.Append("kernel/");
+					// KPath does not remove the trailing '/'
+			}
+			if (status == B_OK) {
+				size_t length = strlcpy(path, addonsKernelPath.Path(),
+					sizeof(path));
+				strlcpy(path + length, name, strlen(image->name)
+					+ 1 + (suffix - name));
 
-			moduleImage->path = strdup(path);
+				moduleImage->path = strdup(path);
+			} else {
+				moduleImage->path = NULL;
+					// this will trigger B_NO_MEMORY, which is the only
+					// reason to get here anyways...
+			}
 		} else
 			moduleImage->path = strdup(image->name);
 	}
