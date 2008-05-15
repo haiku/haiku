@@ -311,8 +311,8 @@ UnixFifo::Read(const iovec* vecs, size_t vecCount,
 	TRACE("[%ld] %p->UnixFifo::Read(%p, %ld, %lld)\n", find_thread(NULL),
 		this, vecs, vecCount, timeout);
 
-	if (IsReadShutdown())
-		return UNIX_FIFO_SHUTDOWN;
+	if (IsReadShutdown() && fBuffer.Readable() == 0)
+		RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
 
 	UnixRequest request(vecs, vecCount, NULL);
 	fReaders.Add(&request);
@@ -357,10 +357,10 @@ UnixFifo::Write(const iovec* vecs, size_t vecCount,
 		this, vecs, vecCount, ancillaryData, timeout);
 
 	if (IsWriteShutdown())
-		return UNIX_FIFO_SHUTDOWN;
+		RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
 
 	if (IsReadShutdown())
-		return EPIPE;
+		RETURN_ERROR(EPIPE);
 
 	UnixRequest request(vecs, vecCount, ancillaryData);
 	fWriters.Add(&request);
@@ -444,7 +444,8 @@ UnixFifo::_Read(UnixRequest& request, bigtime_t timeout)
 	if (fReaders.Head() != &request && timeout == 0)
 		RETURN_ERROR(B_WOULD_BLOCK);
 
-	while (fReaders.Head() != &request && !IsReadShutdown()) {
+	while (fReaders.Head() != &request
+		&& !(IsReadShutdown() && fBuffer.Readable() == 0)) {
 		ConditionVariableEntry entry;
 		fReadCondition.Add(&entry, B_CAN_INTERRUPT);
 
@@ -456,10 +457,10 @@ UnixFifo::_Read(UnixRequest& request, bigtime_t timeout)
 			RETURN_ERROR(error);
 	}
 
-	if (IsReadShutdown())
-		return UNIX_FIFO_SHUTDOWN;
-
 	if (fBuffer.Readable() == 0) {
+		if (IsReadShutdown())
+			RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
+
 		if (IsWriteShutdown())
 			RETURN_ERROR(0);
 
@@ -482,11 +483,12 @@ UnixFifo::_Read(UnixRequest& request, bigtime_t timeout)
 			RETURN_ERROR(error);
 	}
 
-	if (IsReadShutdown())
-		return UNIX_FIFO_SHUTDOWN;
-
-	if (fBuffer.Readable() == 0 && IsWriteShutdown())
-		RETURN_ERROR(0);
+	if (fBuffer.Readable() == 0) {
+		if (IsReadShutdown())
+			RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
+		if (IsWriteShutdown())
+			RETURN_ERROR(0);
+	}
 
 	RETURN_ERROR(fBuffer.Read(request));
 }
@@ -512,10 +514,10 @@ UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 	}
 
 	if (IsWriteShutdown())
-		return UNIX_FIFO_SHUTDOWN;
+		RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
 
 	if (IsReadShutdown())
-		return EPIPE;
+		RETURN_ERROR(EPIPE);
 
 	if (request.TotalSize() == 0)
 		return 0;
@@ -538,10 +540,10 @@ UnixFifo::_Write(UnixRequest& request, bigtime_t timeout)
 		}
 	
 		if (IsWriteShutdown())
-			return UNIX_FIFO_SHUTDOWN;
+			RETURN_ERROR(UNIX_FIFO_SHUTDOWN);
 	
 		if (IsReadShutdown())
-			return EPIPE;
+			RETURN_ERROR(EPIPE);
 
 		// write as much as we can
 		error = fBuffer.Write(request);
