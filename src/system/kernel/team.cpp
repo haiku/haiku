@@ -17,9 +17,12 @@
 #include <OS.h>
 
 #include <AutoDeleter.h>
+#include <FindDirectory.h>
 
+#include <boot_device.h>
 #include <elf.h>
 #include <file_cache.h>
+#include <fs/KPath.h>
 #include <heap.h>
 #include <int.h>
 #include <kernel.h>
@@ -1168,14 +1171,28 @@ team_create_thread_start(void *args)
 	}
 
 	free_team_arg(teamArgs);
-		// the arguments are already on the user stack, we no longer need them in this form
+		// the arguments are already on the user stack, we no longer need
+		// them in this form
 
-	// ToDo: don't use fixed paths!
-	err = elf_load_user_image("/boot/beos/system/runtime_loader", team, 0, &entry);
+	// find runtime_loader path
+	KPath runtimeLoaderPath;
+	err = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice, false,
+		runtimeLoaderPath.LockBuffer(), runtimeLoaderPath.BufferSize());
+	if (err < B_OK) {
+		TRACE(("team_create_thread_start: find_directory() failed: %s\n",
+			strerror(err))); 
+		return err;
+	}
+	runtimeLoaderPath.UnlockBuffer();
+	err = runtimeLoaderPath.Append("runtime_loader");
+
+	if (err == B_OK)
+		err = elf_load_user_image(runtimeLoaderPath.Path(), team, 0, &entry);
 	if (err < B_OK) {
 		// Luckily, we don't have to clean up the mess we created - that's
 		// done for us by the normal team deletion process
-		TRACE(("team_create_thread_start: error when elf_load_user_image() %s\n", strerror(err))); 
+		TRACE(("team_create_thread_start: elf_load_user_image() failed: "
+			"%s\n", strerror(err))); 
 		return err;
 	}
 
