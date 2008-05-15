@@ -162,7 +162,7 @@ uninit_driver()
 }
 
 
-static status_t
+extern "C" status_t
 usb_ecm_open(const char *name, uint32 flags, void **cookie)
 {
 	TRACE("open(%s, %lu, %p)\n", name, flags, cookie);
@@ -181,7 +181,7 @@ usb_ecm_open(const char *name, uint32 flags, void **cookie)
 }
 
 
-static status_t
+extern "C" status_t
 usb_ecm_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
 	TRACE("read(%p, %Ld, %p, %lu)\n", cookie, position, buffer, *numBytes);
@@ -190,7 +190,7 @@ usb_ecm_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 }
 
 
-static status_t
+extern "C" status_t
 usb_ecm_write(void *cookie, off_t position, const void *buffer,
 	size_t *numBytes)
 {
@@ -200,7 +200,7 @@ usb_ecm_write(void *cookie, off_t position, const void *buffer,
 }
 
 
-static status_t
+extern "C" status_t
 usb_ecm_control(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	TRACE("control(%p, %lu, %p, %lu)\n", cookie, op, buffer, length);
@@ -209,7 +209,7 @@ usb_ecm_control(void *cookie, uint32 op, void *buffer, size_t length)
 }
 
 
-static status_t
+extern "C" status_t
 usb_ecm_close(void *cookie)
 {
 	TRACE("close(%p)\n", cookie);
@@ -218,7 +218,7 @@ usb_ecm_close(void *cookie)
 }
 
 
-static status_t
+extern "C" status_t
 usb_ecm_free(void *cookie)
 {
 	TRACE("free(%p)\n", cookie);
