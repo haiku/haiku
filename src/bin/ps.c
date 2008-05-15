@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 	int32 thcookie;
 	sem_info sinfo;
 	char *thstate;
-	char *states[] = {"run", "rdy", "msg", "zzz", "sus", "sem" };
+	char *states[] = {"run", "rdy", "msg", "zzz", "sus", "wait" };
 	system_info sysinfo;
 	char *string_to_match; // match this in team name
 
@@ -50,12 +50,12 @@ int main(int argc, char **argv)
 		printf("%s (team %ld) (uid %d) (gid %d)\n", teaminfo.args, teaminfo.team, teaminfo.uid, teaminfo.gid);
 		thcookie = 0;
 		while (get_next_thread_info(teaminfo.team, &thcookie, &thinfo) >= B_OK) {
-			if (thinfo.state < B_THREAD_RUNNING || thinfo.state >B_THREAD_WAITING)
+			if (thinfo.state < B_THREAD_RUNNING || thinfo.state > B_THREAD_WAITING)
 				thstate = "???";
 			else
 				thstate = states[thinfo.state-1];
-			printf("%7ld %20s  %3s %3ld %7lli %7lli ", thinfo.thread, thinfo.name, thstate, thinfo.priority, thinfo.user_time/1000, thinfo.kernel_time/1000);
-			if (thinfo.state == B_THREAD_WAITING) {
+			printf("%7ld %20s %4s %3ld %7lli %7lli ", thinfo.thread, thinfo.name, thstate, thinfo.priority, thinfo.user_time/1000, thinfo.kernel_time/1000);
+			if (thinfo.state == B_THREAD_WAITING && thinfo.sem != -1) {
 				status_t err = get_sem_info(thinfo.sem, &sinfo);
 				if (!err)
 					printf("%s(%ld)\n", sinfo.name, sinfo.sem);
