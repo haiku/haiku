@@ -25,6 +25,7 @@
 #include <boot_device.h>
 #include <debug.h>
 #include <elf.h>
+#include <FindDirectory.h>
 #include <kdevice_manager.h>
 #include <KPath.h>
 #include <lock.h>
@@ -490,14 +491,26 @@ unpublish_driver(driver_entry *driver)
 
 
 static int32
-get_priority(const char *path)
+get_priority(const char* path)
 {
-	// TODO: use find_directory()
-	const char *kPaths[] = {"/boot/beos", "/boot/common", "/boot/home", NULL};
+	// TODO: would it be better to initialize a static structure here
+	// using find_directory()?
+	const directory_which whichPath[] = {
+		B_BEOS_DIRECTORY,
+		B_COMMON_DIRECTORY,
+		B_USER_DIRECTORY
+	};
+	KPath pathBuffer;
 
-	for (int32 i = 0; kPaths[i] != NULL; i++) {
-		if (!strncmp(kPaths[i], path, strlen(kPaths[i])))
-			return i;
+	for (uint32 index = 0; index < sizeof(whichPath) / sizeof(whichPath[0]);
+			index++) {
+		if (find_directory(whichPath[index], gBootDevice, false,
+			pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
+			pathBuffer.UnlockBuffer();
+			if (!strncmp(pathBuffer.Path(), path, pathBuffer.BufferSize()))
+				return index;
+		} else
+			pathBuffer.UnlockBuffer();
 	}
 
 	return -1;
@@ -2835,21 +2848,45 @@ driver_module_info gDeviceForDriversModule = {
 extern "C" void
 devfs_add_preloaded_drivers(kernel_args* args)
 {
+	// NOTE: This function does not exit in case of error, since it
+	// needs to unload the images then. Also the return code of
+	// the path operations is kept separate from the add_driver()
+	// success, so that even if add_driver() fails for one driver, it
+	// is still tried for the other drivers.
+	// NOTE: The initialization success of the path objects is implicitely
+	// checked by the immediately following functions.
+	KPath basePath;
+	status_t pathStatus = find_directory(B_BEOS_ADDONS_DIRECTORY,
+		gBootDevice, false, basePath.LockBuffer(), basePath.BufferSize());
+	if (pathStatus != B_OK) {
+		dprintf("devfs_add_preloaded_drivers: find_directory() failed: "
+			"%s\n", strerror(pathStatus));
+	}
+	basePath.UnlockBuffer();
+	if (pathStatus == B_OK)
+		pathStatus = basePath.Append("kernel");
+	if (pathStatus != B_OK) {
+		dprintf("devfs_add_preloaded_drivers: constructing base driver "
+			"path failed: %s\n", strerror(pathStatus));
+	}
+
 	struct preloaded_image* image;
 	for (image = args->preloaded_images; image != NULL; image = image->next) {
-		if (!image->is_module && image->id >= 0) {
-			// fake an absolute path
-			char path[B_PATH_NAME_LENGTH];
-			strlcpy(path, "/boot/beos/system/add-ons/kernel/", sizeof(path));
-			strlcat(path, image->name, sizeof(path));
+		if (image->is_module || image->id < 0)
+			continue;
 
-			// try to add the driver
-			status_t error = add_driver(path, image->id);
-			if (error != B_OK) {
-				dprintf("devfs_add_preloaded_drivers: Failed to add \"%s\"\n",
-					image->name);
-				unload_kernel_add_on(image->id);
-			}
+		KPath imagePath(basePath);
+		if (pathStatus == B_OK)
+			pathStatus = imagePath.Append(image->name);
+
+		// try to add the driver
+		status_t addStatus = pathStatus;
+		if (pathStatus == B_OK)
+			addStatus = add_driver(imagePath.Path(), image->id);
+		if (addStatus != B_OK) {
+			dprintf("devfs_add_preloaded_drivers: Failed to add \"%s\"\n",
+				image->name);
+			unload_kernel_add_on(image->id);
 		}
 	}
 }
