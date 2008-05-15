@@ -14,4 +14,4 @@ extern "C"
 #endif
 status_t kernel_daemon_init(void);
 
-#endif	/* _KRENEL_DAEMON_H */
+#endif	/* _KERNEL_DAEMON_H */
