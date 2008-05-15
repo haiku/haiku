@@ -132,7 +132,7 @@ FsCreator::_ReadLine()
 {
 	char line[255];
 
-	cin.getline(line, sizeof(line), '\n');
+	std::cin.getline(line, sizeof(line), '\n');
 
 	return line;
 }
