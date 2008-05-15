@@ -4568,12 +4568,13 @@ BTextView::_CancelInputMethod()
 	_BInlineInput_ *inlineInput = fInline;
 	fInline = NULL;
 
-	if (inlineInput->IsActive() && Window())
+	if (inlineInput->IsActive() && Window()) {
 		_Refresh(inlineInput->Offset(), fText->Length() - inlineInput->Offset(), true, false);
 
-	BMessage message(B_INPUT_METHOD_EVENT);
-	message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
-	inlineInput->Method()->SendMessage(&message);
+		BMessage message(B_INPUT_METHOD_EVENT);
+		message.AddInt32("be:opcode", B_INPUT_METHOD_STOPPED);
+		inlineInput->Method()->SendMessage(&message);
+	}
 
 	delete inlineInput;
 }
