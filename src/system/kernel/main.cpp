@@ -12,6 +12,7 @@
 #include <OS.h>
 
 #include <arch/platform.h>
+#include <boot_device.h>
 #include <boot_item.h>
 #include <boot_splash.h>
 #include <cbuf.h>
@@ -21,6 +22,8 @@
 #include <debug.h>
 #include <elf.h>
 #include <fs/devfs.h>
+#include <fs/KPath.h>
+#include <FindDirectory.h>
 #include <int.h>
 #include <kdevice_manager.h>
 #include <kdriver_settings.h>
@@ -61,8 +64,17 @@ static uint32 sCpuRendezvous;
 static uint32 sCpuRendezvous2;
 
 static int32 main2(void *);
-int _start(kernel_args *bootKernelArgs, int cpu);	/* keep compiler happy */
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
+extern int _start(kernel_args *bootKernelArgs, int cpu);
+	/* keep compiler happy */
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 int
 _start(kernel_args *bootKernelArgs, int currentCPU)
@@ -292,8 +304,19 @@ main2(void *unused)
 
 	// start the init process
 	{
-		const char *args[] = {"/bin/sh", "/boot/beos/system/boot/Bootscript",
-			NULL};
+		KPath bootScriptPath;
+		status_t status = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice,
+			false, bootScriptPath.LockBuffer(), bootScriptPath.BufferSize());
+		if (status != B_OK)
+			dprintf("main2: find_directory() failed: %s\n", strerror(status)); 
+		bootScriptPath.UnlockBuffer();
+		status = bootScriptPath.Append("boot/Bootscript");
+		if (status != B_OK) {
+			dprintf("main2: constructing path to Bootscript failed: "
+				"%s\n", strerror(status));
+		}
+		
+		const char *args[] = { "/bin/sh", bootScriptPath.Path(), NULL };
 		int32 argc = 2;
 		thread_id thread;
 

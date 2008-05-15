@@ -29,7 +29,7 @@ KernelMergeObject kernel_core.o :
 	kernel_daemon.cpp
 	linkhack.c
 	lock.cpp
-	main.c
+	main.cpp
 	module.cpp
 	Notifications.cpp
 	port.cpp
