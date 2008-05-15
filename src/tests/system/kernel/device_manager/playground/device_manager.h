@@ -120,11 +120,11 @@ struct driver_module_info {
 	float (*supports_device)(device_node *parent);
 	status_t (*register_device)(device_node *parent);
 
-	status_t (*init_driver)(device_node *node, void **_driverData);
-	void (*uninit_driver)(device_node *node);
-	status_t (*register_child_devices)(device_node *node);
-	status_t (*rescan_child_devices)(device_node *node);
-	void (*device_removed)(device_node *node);
+	status_t (*init_driver)(device_node *node, void **_driverCookie);
+	void (*uninit_driver)(void *driverCookie);
+	status_t (*register_child_devices)(void *driverCookie);
+	status_t (*rescan_child_devices)(void *driverCookie);
+	void (*device_removed)(void *driverCookie);
 };
 
 
@@ -160,8 +160,9 @@ typedef struct io_request io_request;
 struct device_module_info {
 	module_info info;
 
-	status_t (*init_device)(device_node *node, void **_deviceCookie);
+	status_t (*init_device)(void *driverCookie, void **_deviceCookie);
 	void (*uninit_device)(void *deviceCookie);
+	void (*device_removed)(void *deviceCookie);
 
 	status_t (*device_open)(void *deviceCookie, int openMode, void **_cookie);
 	status_t (*device_close)(void *cookie);

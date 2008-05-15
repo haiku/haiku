@@ -17,7 +17,7 @@
 
 
 static float
-supports_device(device_node *parent)
+supports_device(device_node* parent)
 {
 #if 0
 	const char* bus;
@@ -47,7 +47,7 @@ supports_device(device_node *parent)
 
 
 static status_t
-register_device(device_node *parent)
+register_device(device_node* parent)
 {
 	return gDeviceManager->register_node(parent, DRIVER_MODULE_NAME, NULL,
 		NULL, NULL);
@@ -55,21 +55,24 @@ register_device(device_node *parent)
 
 
 static status_t
-init_driver(device_node *node, void **_cookie)
+init_driver(device_node* node, void** _cookie)
 {
+	*_cookie = node;
 	return B_OK;
 }
 
 
 static void
-uninit_driver(device_node *node)
+uninit_driver(void* cookie)
 {
 }
 
 
 static status_t
-register_child_devices(device_node *node)
+register_child_devices(void* cookie)
 {
+	device_node* node = (device_node*)cookie;
+
 	gDeviceManager->publish_device(node, "net/sample/0",
 		DRIVER_DEVICE_MODULE_NAME);
 	return B_OK;
@@ -77,7 +80,7 @@ register_child_devices(device_node *node)
 
 
 static void
-device_removed(device_node *node)
+driver_device_removed(void* cookie)
 {
 }
 
@@ -86,23 +89,30 @@ device_removed(device_node *node)
 
 
 static status_t
-init_device(device_node *node, void **_deviceCookie)
+init_device(void* driverCookie, void** _deviceCookie)
 {
 	// called once before one or several open() calls
-	return B_ERROR;
+	return B_OK;
 }
 
 
 static void
-uninit_device(void *deviceCookie)
+uninit_device(void* deviceCookie)
 {
 	// supposed to free deviceCookie, called when the last reference to
 	// the device is closed
 }
 
 
+static void
+device_removed(void* deviceCookie)
+{
+	dprintf("network device removed!\n");
+}
+
+
 static status_t
-device_open(void *deviceCookie, int openMode, void **_cookie)
+device_open(void* deviceCookie, int openMode, void** _cookie)
 {
 	// deviceCookie is an object attached to the published device
 	return B_ERROR;
@@ -110,42 +120,42 @@ device_open(void *deviceCookie, int openMode, void **_cookie)
 
 
 static status_t
-device_close(void *cookie)
+device_close(void* cookie)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-device_free(void *cookie)
+device_free(void* cookie)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-device_read(void *cookie, off_t pos, void *buffer, size_t *_length)
+device_read(void* cookie, off_t pos, void* buffer, size_t* _length)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-device_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
+device_write(void* cookie, off_t pos, const void* buffer, size_t* _length)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-device_ioctl(void *cookie, int32 op, void *buffer, size_t length)
+device_ioctl(void* cookie, int32 op, void* buffer, size_t length)
 {
 	return B_ERROR;
 }
 
 
 static status_t
-device_io(void *cookie, io_request *request)
+device_io(void* cookie, io_request* request)
 {
 	// new function to deal with I/O requests directly.
 	return B_ERROR;
@@ -168,7 +178,7 @@ struct driver_module_info gDriverModuleInfo = {
 	uninit_driver,
 	register_child_devices,
 	NULL,
-	device_removed,
+	driver_device_removed,
 };
 
 struct device_module_info gDeviceModuleInfo = {
@@ -180,6 +190,7 @@ struct device_module_info gDeviceModuleInfo = {
 
 	init_device,
 	uninit_device,
+	device_removed,
 
 	device_open,
 	device_close,

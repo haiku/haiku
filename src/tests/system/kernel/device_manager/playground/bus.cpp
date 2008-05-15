@@ -37,7 +37,7 @@ bus_trigger_device_added(device_node* node)
 
 
 static float
-supports_device(device_node *parent)
+supports_device(device_node* parent)
 {
 	const char* bus;
 	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false)
@@ -52,7 +52,7 @@ supports_device(device_node *parent)
 
 
 static status_t
-register_device(device_node *parent)
+register_device(device_node* parent)
 {
 	device_attr attrs[] = {
 		{B_DEVICE_PRETTY_NAME,	B_STRING_TYPE,	{string: "My Bus"}},
@@ -66,7 +66,7 @@ register_device(device_node *parent)
 
 
 static status_t
-init_driver(device_node *node, void **_cookie)
+init_driver(device_node* node, void** _cookie)
 {
 	*_cookie = node;
 	return B_OK;
@@ -74,14 +74,16 @@ init_driver(device_node *node, void **_cookie)
 
 
 static void
-uninit_driver(device_node *node)
+uninit_driver(void* cookie)
 {
 }
 
 
 static status_t
-register_child_devices(device_node *node)
+register_child_devices(void* cookie)
 {
+	device_node* node = (device_node*)cookie;
+
 	const struct device_info {
 		uint16		vendor;
 		uint16		device;
@@ -134,14 +136,14 @@ register_child_devices(device_node *node)
 
 
 static status_t
-rescan_child_devices(device_node *node)
+rescan_child_devices(void* cookie)
 {
 	return B_ERROR;
 }
 
 
 static void
-device_removed(device_node *node)
+device_removed(void* cookie)
 {
 }
 
