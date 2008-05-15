@@ -62,13 +62,6 @@ status_t	usb_ecm_device_removed(void *cookie);
 status_t	init_hardware();
 void		uninit_driver();
 
-status_t	usb_ecm_open(const char *name, uint32 flags, void **cookie);
-status_t	usb_ecm_read(void *cookie, off_t position, void *buffer, size_t *numBytes);
-status_t	usb_ecm_write(void *cookie, off_t position, const void *buffer, size_t *numBytes);
-status_t	usb_ecm_control(void *cookie, uint32 op, void *buffer, size_t length);
-status_t	usb_ecm_close(void *cookie);
-status_t	usb_ecm_free(void *cookie);
-
 const char **publish_devices();
 device_hooks *find_device(const char *name);
 }
