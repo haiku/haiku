@@ -702,8 +702,11 @@ TCPEndpoint::Shutdown(int direction)
 	if (direction == SHUT_RD || direction == SHUT_RDWR)
 		fFlags |= FLAG_NO_RECEIVE;
 
-	if (direction == SHUT_WR || direction == SHUT_RDWR)
+	if (direction == SHUT_WR || direction == SHUT_RDWR) {
+		// TODO: That's not correct. After read/write shutting down the socket
+		// one should still be able to read previously arrived data.
 		_Disconnect(false);
+	}
 
 	return B_OK;
 }
@@ -882,6 +885,9 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 
 		if ((flags & MSG_DONTWAIT) != 0 || socket->receive.timeout == 0)
 			return B_WOULD_BLOCK;
+
+		if ((fFlags & FLAG_NO_RECEIVE) != 0)
+			return B_OK;
 
 		status_t status = fReceiveList.Wait(locker, timeout);
 		if (status < B_OK) {
