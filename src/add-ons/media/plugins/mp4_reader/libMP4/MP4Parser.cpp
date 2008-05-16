@@ -1182,8 +1182,8 @@ char *WAVEAtom::OnGetAtomName()
 
 void WAVEAtom::OnOverrideAudioDescription(AudioDescription *pAudioDescription)
 {
-	pAudioDescription->codecSubType = 'alac';
-	pAudioDescription->FrameSize = 4096;
+	pAudioDescription->codecSubType = 'mp3';
+	pAudioDescription->FrameSize = 0;
 }
 
 void	WAVEAtom::OnOverrideVideoDescription(VideoDescription *pVideoDescription)

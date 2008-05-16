@@ -89,7 +89,7 @@ mp4Reader::~mp4Reader()
 const char *
 mp4Reader::Copyright()
 {
-	return "MPEG4 & libMP4, " B_UTF8_COPYRIGHT " by David McPaul";
+	return "mp4_reader & libMP4, " B_UTF8_COPYRIGHT " by David McPaul";
 }
 	
 
@@ -143,6 +143,8 @@ mp4Reader::GetFileFormatInfo(media_file_format *mff)
 status_t
 mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 {
+	uint32 codecID = 0;
+
 	size_t size;
 	const void *data;
 
@@ -181,6 +183,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			delete cookie;
 			return B_ERROR;
 		}
+		codecID = B_BENDIAN_TO_HOST_INT32(audio_format->compression);
 
 		cookie->frame_count = theFileReader->getFrameCount(cookie->stream);
 		cookie->duration = theFileReader->getAudioDuration(cookie->stream);
@@ -289,6 +292,7 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 					format->u.encoded_audio.output.channel_count = audio_format->NoOfChannels;
 					break;
 				case 'mp4a':
+					codecID = B_BENDIAN_TO_HOST_INT32('aac ');
 				case 'alac':
 					TRACE("AAC audio (mp4a) or ALAC audio\n");
 		
@@ -332,10 +336,6 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			}
 		}
 
-		// this doesn't seem to work (it's not even a fourcc)
-		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32 *)format->user_data = audio_format->compression; format->user_data[4] = 0;
-		
 		// Set the DecoderConfigSize
 		size = audio_format->DecoderConfigSize;
 		data = audio_format->theDecoderConfig;
@@ -355,6 +355,12 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		}
 #endif
 	
+		if (codecID != 0) {
+			// Put the codeid in the user data in case someone wants it
+			format->user_data_type = B_CODEC_TYPE_INFO;
+			*(uint32 *)format->user_data = codecID; format->user_data[4] = 0;
+		}
+
 		return B_OK;
 	}
 
@@ -366,6 +372,8 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 			return B_ERROR;
 		}
 		
+		codecID = B_BENDIAN_TO_HOST_INT32(video_format->compression);
+
 		cookie->audio = false;
 		cookie->line_count = theFileReader->MovMainHeader()->height;
 		
@@ -406,9 +414,6 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 		if (B_OK != formats.GetFormatFor(description, format)) 
 			format->type = B_MEDIA_ENCODED_VIDEO;
 			
-		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32 *)format->user_data = description.u.quicktime.codec; format->user_data[4] = 0;
-		
 //		format->u.encoded_video.max_bit_rate = 8 * theFileReader->MovMainHeader()->max_bytes_per_sec;
 //		format->u.encoded_video.avg_bit_rate = format->u.encoded_video.max_bit_rate / 2; // XXX fix this
 		format->u.encoded_video.output.field_rate = cookie->frames_per_sec_rate / (float)cookie->frames_per_sec_scale;
@@ -469,6 +474,12 @@ mp4Reader::AllocateCookie(int32 streamNumber, void **_cookie)
 					size, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
 			}
 #endif
+		}
+
+		if (codecID != 0) {
+			// Put the codeid in the user data in case someone wants it
+			format->user_data_type = B_CODEC_TYPE_INFO;
+			*(uint32 *)format->user_data = codecID; format->user_data[4] = 0;
 		}
 
 		return B_OK;

@@ -34,7 +34,7 @@
 
 #include "mov_reader.h"
 
-#define TRACE_MOV_READER
+//#define TRACE_MOV_READER
 #ifdef TRACE_MOV_READER
   #define TRACE printf
 #else
@@ -85,7 +85,7 @@ movReader::~movReader()
 const char *
 movReader::Copyright()
 {
-	return "QUICKTIME & libMOV, " B_UTF8_COPYRIGHT " by David McPaul";
+	return "mov_reader & libMOV, " B_UTF8_COPYRIGHT " by David McPaul";
 }
 	
 status_t
@@ -331,6 +331,12 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			format->SetMetaData(data, size);
 		}
 	
+		if (codecID != 0) {
+			// Put the codeid in the user data in case someone wants it
+			format->user_data_type = B_CODEC_TYPE_INFO;
+			*(uint32 *)format->user_data = codecID; format->user_data[4] = 0;
+		}
+
 		return B_OK;
 	}
 
@@ -404,6 +410,12 @@ movReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		if (size > 0) {
 			TRACE("VOL SIZE  %ld\n", size);
 			format->SetMetaData(data, size);
+		}
+
+		if (codecID != 0) {
+			// Put the codeid in the user data in case someone wants it
+			format->user_data_type = B_CODEC_TYPE_INFO;
+			*(uint32 *)format->user_data = codecID; format->user_data[4] = 0;
 		}
 
 		return B_OK;
