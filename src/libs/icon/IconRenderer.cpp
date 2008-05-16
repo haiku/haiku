@@ -84,9 +84,8 @@ class IconRenderer::StyleHandler {
 private:
 	template<class GradientFunction>
 	void _GenerateGradient(agg::rgba8* span, int x, int y, unsigned len,
-						   GradientFunction function, int32 start, int32 end,
-						   const agg::rgba8* gradientColors,
-						   Transformation& gradientTransform);
+		GradientFunction function, int32 start, int32 end,
+		const agg::rgba8* gradientColors, Transformation& gradientTransform);
 
 	BList				fStyles;
 	::GammaTable&		fGammaTable;
@@ -105,10 +104,8 @@ IconRenderer::StyleHandler::color(unsigned styleIndex)
 	}
 
 	const rgb_color& c = styleItem->style->Color();
-	fColor = agg::rgba8(fGammaTable.dir(c.red),
-						fGammaTable.dir(c.green),
-						fGammaTable.dir(c.blue),
-						c.alpha);
+	fColor = agg::rgba8(fGammaTable.dir(c.red), fGammaTable.dir(c.green),
+		fGammaTable.dir(c.blue), c.alpha);
 	fColor.premultiply();
     return fColor;
 }
@@ -133,37 +130,37 @@ IconRenderer::StyleHandler::generate_span(agg::rgba8* span, int x, int y,
 		case GRADIENT_LINEAR: {
 		    agg::gradient_x function;
 			_GenerateGradient(span, x, y, len, function, -64, 64, colors,
-							  styleItem->transformation);
+				styleItem->transformation);
 			break;
 		}
 		case GRADIENT_CIRCULAR: {
 		    agg::gradient_radial function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-							  styleItem->transformation);
+				styleItem->transformation);
 			break;
 		}
 		case GRADIENT_DIAMOND: {
 		    agg::gradient_diamond function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-							  styleItem->transformation);
+				styleItem->transformation);
 			break;
 		}
 		case GRADIENT_CONIC: {
 		    agg::gradient_conic function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-							  styleItem->transformation);
+				styleItem->transformation);
 			break;
 		}
 		case GRADIENT_XY: {
 		    agg::gradient_xy function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-							  styleItem->transformation);
+				styleItem->transformation);
 			break;
 		}
 		case GRADIENT_SQRT_XY: {
 		    agg::gradient_sqrt_xy function;
 			_GenerateGradient(span, x, y, len, function, 0, 64, colors,
-							  styleItem->transformation);
+				styleItem->transformation);
 			break;
 		}
 	}
@@ -186,10 +183,8 @@ IconRenderer::StyleHandler::_GenerateGradient(agg::rgba8* span, int x, int y,
 	Interpolator interpolator(gradientTransform);
 
 	ColorArray array(gradientColors);
-	GradientGenerator gradientGenerator(interpolator,
-										function,
-										array,
-										start, end);
+	GradientGenerator gradientGenerator(interpolator, function, array,
+		start, end);
 
 	gradientGenerator.generate(span, x, y, len);
 }
@@ -234,14 +229,11 @@ IconRenderer::IconRenderer(BBitmap* bitmap)
 {
 	// attach rendering buffer to bitmap
 	fRenderingBuffer.attach((uint8*)bitmap->Bits(),
-							bitmap->Bounds().IntegerWidth() + 1,
-							bitmap->Bounds().IntegerHeight() + 1,
-							bitmap->BytesPerRow());
+		bitmap->Bounds().IntegerWidth() + 1,
+		bitmap->Bounds().IntegerHeight() + 1, bitmap->BytesPerRow());
 
-	fBaseRendererPre.clip_box(0,
-							  0,
-							  fBitmap->Bounds().IntegerWidth(),
-							  fBitmap->Bounds().IntegerHeight());
+	fBaseRendererPre.clip_box(0, 0, fBitmap->Bounds().IntegerWidth(),
+		fBitmap->Bounds().IntegerHeight());
 }
 
 // destructor
@@ -335,10 +327,8 @@ IconRenderer::_Render(const BRect& r)
 		return;
 
 // TODO: fix clip box for "clear" and "apply_gamma_inv"
-//	fBaseRendererPre.clip_box((int)floorf(r.left),
-//							  (int)floorf(r.top),
-//							  (int)ceilf(r.right),
-//							  (int)ceilf(r.bottom));
+//	fBaseRendererPre.clip_box((int)floorf(r.left), (int)floorf(r.top),
+//		(int)ceilf(r.right), (int)ceilf(r.bottom));
 
 	if (fBackground)
 		memcpy(fBitmap->Bits(), fBackground->Bits(), fBitmap->BitsLength());
@@ -379,10 +369,9 @@ IconRenderer::_Render(const BRect& r)
 		bool styleAdded = false;
 		if (gradient && !gradient->InheritTransformation()) {
 			styleAdded = styleHandler.AddStyle(shape->Style(),
-											   fGlobalTransform);
+				fGlobalTransform);
 		} else {
-			styleAdded = styleHandler.AddStyle(shape->Style(),
-											   transform);
+			styleAdded = styleHandler.AddStyle(shape->Style(), transform);
 		}
 
 		if (!styleAdded) {
@@ -424,12 +413,9 @@ IconRenderer::_Render(const BRect& r)
 void
 IconRenderer::_CommitRenderPass(StyleHandler& styleHandler, bool reset)
 {
-	agg::render_scanlines_compound(fRasterizer,
-								   fScanline,
-								   fBinaryScanline,
-								   fBaseRendererPre,
-								   fSpanAllocator,
-								   styleHandler);
+	agg::render_scanlines_compound(fRasterizer, fScanline, fBinaryScanline,
+		fBaseRendererPre, fSpanAllocator, styleHandler);
+
 	if (reset)
 		fRasterizer.reset();
 }
