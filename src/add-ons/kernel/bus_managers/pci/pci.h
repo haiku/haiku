@@ -83,6 +83,8 @@ class PCI {
 
 		status_t			ResolveVirtualBus(uint8 virtualBus, int *domain, uint8 *bus);
 		
+		void				ClearDeviceStatus(PCIBus *bus, bool dumpStatus);
+
 	private:
 
 		void EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus = NULL);

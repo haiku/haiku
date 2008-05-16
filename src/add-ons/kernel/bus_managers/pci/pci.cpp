@@ -248,6 +248,13 @@ write_io(int argc, char **argv)
 }
 
 
+static int
+pcistatus(int argc, char **argv)
+{
+	sPCI->ClearDeviceStatus(NULL, true);
+	return 0;
+}
+
 // #pragma mark bus manager init/uninit
 
 status_t
@@ -281,6 +288,8 @@ pci_init(void)
 
 	sPCI->InitDomainData();
 	sPCI->InitBus();
+
+	add_debugger_command("pcistatus", &pcistatus, "dump and clear pci device status registers");
 
 	return B_OK;
 }
@@ -352,6 +361,7 @@ PCI::InitBus()
 	if (fRootBus) {
 		DiscoverBus(fRootBus);
 		RefreshDeviceInfo(fRootBus);
+		ClearDeviceStatus(fRootBus, false);
 	}
 }
 
@@ -647,6 +657,45 @@ PCI::FixupDevices(int domain, uint8 bus)
 			FixupDevices(domain, busBehindBridge);
 		}
 	}
+}
+
+
+void
+PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
+{
+	if (!bus) {
+		if (!fRootBus)
+			return;
+		bus = fRootBus;
+	}
+
+	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
+		uint16 status = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_status, 2);
+		if (dumpStatus) {
+
+			kprintf("domain %u, bus %u, dev %2u, func %u, PCI device status 0x%04x\n",
+				dev->domain, dev->bus, dev->dev, dev->func, status);
+			if (status & (1 << 15))
+				kprintf("  Detected Parity Error\n");
+			if (status & (1 << 14))
+				kprintf("  Signalled System Error\n");
+			if (status & (1 << 13))
+				kprintf("  Received Master-Abort\n");
+			if (status & (1 << 12))
+				kprintf("  Received Target-Abort\n");
+			if (status & (1 << 11))
+				kprintf("  Signalled Target-Abort\n");
+			if (status & (1 << 8))
+				kprintf("  Master Data Parity Error\n");
+		}
+		WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_status, 2, status);
+
+		if (dev->child)
+			ClearDeviceStatus(dev->child, dumpStatus);
+	}
+	
+	if (bus->next)
+		ClearDeviceStatus(bus->next, dumpStatus);
 }
 
 
