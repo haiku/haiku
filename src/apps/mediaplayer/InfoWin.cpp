@@ -34,7 +34,7 @@
 
 
 #define NAME "File Info"
-#define MIN_WIDTH 350
+#define MIN_WIDTH 400
 
 #define BASE_HEIGHT (32 + 32)
 
@@ -78,7 +78,7 @@ InfoView::Draw(BRect updateRect)
 
 InfoWin::InfoWin(BPoint leftTop, Controller* controller)
 	: BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + MIN_WIDTH - 1,
-		leftTop.y + 250), NAME, B_TITLED_WINDOW,
+		leftTop.y + 300), NAME, B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE)
 	, fController(controller)
 	, fControllerObserver(new ControllerObserver(this,
@@ -223,16 +223,16 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	fLabelsView->SetText("");
 	fContentsView->SetText("");
 	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kBlue);
-	fLabelsView->Insert("\n");
+	fLabelsView->Insert(" ");
 	fContentsView->SetFontAndColor(be_plain_font, B_FONT_ALL);
-	fContentsView->Insert("\n");
+//	fContentsView->Insert("");
 
 	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kRed);
 
 	status_t err;
 	// video track format information
 	if ((which & INFO_VIDEO) && fController->VideoTrackCount() > 0) {
-		fLabelsView->Insert("Video\n\n\n");
+		fLabelsView->Insert("Video\n\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_video_format videoFormat;
@@ -243,9 +243,12 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			videoFormat = format.u.encoded_video.output;
 			media_codec_info mci;
 			err = fController->GetVideoCodecInfo(&mci);
-			if (err < B_OK)
-				s << "(" << strerror(err) << ")";
-			else
+			if (err < B_OK) {
+				s << "Haiku Media Kit:\n(" << strerror(err) << ")";
+				if (format.user_data_type == B_CODEC_TYPE_INFO) {
+					s << (char *)format.user_data << " not supported";
+				}
+			} else
 				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
 		} else if (format.type == B_MEDIA_RAW_VIDEO) {
 			videoFormat = format.u.raw_video;
@@ -262,7 +265,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 
 	// audio track format information
 	if ((which & INFO_AUDIO) && fController->AudioTrackCount() > 0) {
-		fLabelsView->Insert("Audio\n\n\n");
+		fLabelsView->Insert("Audio\n\n\n\n");
 		BString s;
 		media_format format;
 		media_raw_audio_format audioFormat;
@@ -275,9 +278,12 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			audioFormat = format.u.encoded_audio.output;
 			media_codec_info mci;
 			err = fController->GetAudioCodecInfo(&mci);
-			if (err < 0)
-				s << "(" << strerror(err) << ")";
-			else
+			if (err < 0) {
+				s << "Haiku Media Kit:\n(" << strerror(err) << ") ";
+				if (format.user_data_type == B_CODEC_TYPE_INFO) {
+					s << (char *)format.user_data << " not supported";
+				}
+			} else
 				s << mci.pretty_name; //<< "(" << mci.short_name << ")";
 		} else if (format.type == B_MEDIA_RAW_AUDIO) {
 			audioFormat = format.u.raw_audio;
@@ -344,7 +350,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			fContentsView->Insert("DrawBitmap\n");
 		
 		fLabelsView->Insert("\n");
-		fContentsView->Insert("\n");
+		fContentsView->Insert("\n\n");
 	}
 
 	if (which & INFO_TRANSPORT) {
@@ -356,12 +362,12 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 			media_file_format ff;
 			BString s;
 			if (fController->GetFileFormatInfo(&ff) == B_OK) {
-				fLabelsView->Insert("Container\n\n");
+				fLabelsView->Insert("Container\n");
 				s << ff.pretty_name;
-				s << "\n\n";
+				s << "\n";
 				fContentsView->Insert(s.String());
 			} else
-				fContentsView->Insert("\n\n");
+				fContentsView->Insert("\n");
 			fLabelsView->Insert("Location\n");
 			if (fController->GetLocation(&s) < B_OK)
 				s = "<unknown>";
@@ -389,7 +395,3 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	
 	ResizeToPreferred();
 }
-
-
-
-
