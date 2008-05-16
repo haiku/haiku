@@ -357,17 +357,16 @@ IconRenderer::_Render(const BRect& r)
 	for (int32 i = 0; i < shapeCount; i++) {
 		Shape* shape = fIcon->Shapes()->ShapeAtFast(i);
 
+		// don't render shape if the Level Of Detail falls out of range
+		if (fGlobalTransform.scale() < shape->MinVisibilityScale()
+			|| fGlobalTransform.scale() > shape->MaxVisibilityScale())
+			continue;
+
 		Transformation transform(*shape);
 		transform.multiply(fGlobalTransform);
 			// NOTE: this works only because "agg::trans_affine",
 			// "Transformable" and "Transformation" are all the
 			// same thing
-
-		// don't render shape if the Level Of Detail falls
-		// out of range
-		if (transform.scale() <= shape->MinVisibilityScale()
-			|| transform.scale() > shape->MaxVisibilityScale())
-			continue;
 
 		Style* style = shape->Style();
 		if (!style)
