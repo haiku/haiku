@@ -27,6 +27,13 @@ options:
                               will not be binary compatible with BeOS R5.
                               <arch> specifies the target architecture, either
                               "x86" or "ppc".
+  --alternative-gcc-output-dir <dir>
+                              Build a Haiku installation that supports running
+                              executables built with a gcc version incompatible
+                              with the primary gcc (e.g. gcc 2 executables under
+                              a gcc 4 Haiku or vice versa). <dir> specifies the
+                              output directory of the other gcc. The directory
+                              must already be fully configured.
   --cross-tools-prefix <prefix>
                               Assume cross compilation. <prefix> should be a
                               path to the directory where the cross
@@ -231,6 +238,7 @@ crossToolsPrefix=
 buildCrossTools=
 buildCrossToolsScript="$sourceDir/build/scripts/build_cross_tools"
 buildCrossToolsMachine=
+alternativeGCCOutputDir=
 
 haikuRequiredLegacyGCCVersion="2.95.3-haiku-080323"
 export haikuRequiredLegacyGCCVersion
@@ -254,33 +262,49 @@ while [ $# -gt 0 ] ; do
 	case "$1" in
 		--bochs-debug)	bochs_debug=1; shift 1;;
 		--build-cross-tools) assertparam "$1" $#; buildCrossTools=$2; shift 2;;
-		--build-cross-tools-gcc4) assertparams "$1" 2 $#; buildCrossTools=$3;
-						buildCrossToolsScript="${buildCrossToolsScript}_gcc4";
-						case "$2" in
-							x86)	haikuGCCMachine=i586-pc-haiku;;
-							ppc)	haikuGCCMachine=powerpc-apple-haiku;;
-							m68k)	haikuGCCMachine=m68k-unknown-haiku;;
-							*)		echo "Unsupported target architecture: $2"
-									exit 1;;
-						esac
-						buildCrossToolsMachine=$haikuGCCMachine
-						shift 3;;
-		--cross-tools-prefix) assertparam "$1" $#; crossToolsPrefix=$2; shift 2;;
+		--build-cross-tools-gcc4)
+			assertparams "$1" 2 $#
+			buildCrossTools=$3
+			buildCrossToolsScript="${buildCrossToolsScript}_gcc4"
+			case "$2" in
+				x86)	haikuGCCMachine=i586-pc-haiku;;
+				ppc)	haikuGCCMachine=powerpc-apple-haiku;;
+				m68k)	haikuGCCMachine=m68k-unknown-haiku;;
+				*)		echo "Unsupported target architecture: $2"
+						exit 1;;
+			esac
+			buildCrossToolsMachine=$haikuGCCMachine
+			shift 3
+			;;
+		--alternative-gcc-output-dir)
+			assertparam "$1" $#
+			cd $2 || exit 1
+			alternativeGCCOutputDir=`pwd`
+			cd $currentDir
+			shift 2
+			;;
+		--cross-tools-prefix)
+			assertparam "$1" $#
+			crossToolsPrefix=$2
+			shift 2
+			;;
 		--help | -h)	usage; exit 0;;
 		--include-gpl-addons)	include_gpl_addons=1; shift 1;;
 		--include-3rdparty)	include_3rdparty=1; shift 1;;
 		--enable-multiuser)	enable_multiuser=1; shift 1;;
 		--distro-compatibility)
-						assertparam "$1" $#; distroCompatibility=$2;
-						case "$distroCompatibility" in
-							official)	;;
-							compatible)	;;
-							default)	;;
-							*)			echo "Invalid distro compatibility" \
-											"level: $distroCompatibility"
-										exit 1;;
-						esac
-						shift 2;;
+			assertparam "$1" $#
+			distroCompatibility=$2
+			case "$distroCompatibility" in
+				official)	;;
+				compatible)	;;
+				default)	;;
+				*)			echo "Invalid distro compatibility" \
+								"level: $distroCompatibility"
+							exit 1;;
+			esac
+			shift 2
+			;;
 		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--use-gcc-pipe)	use_gcc_pipe=1; shift 1;;
 		--use-32bit)	use_32bit=1; shift 1;;
@@ -358,14 +382,15 @@ cat << EOF > "$buildOutputDir/BuildConfig"
 TARGET_PLATFORM 			?= "${target}" ;
 HOST_PLATFORM				?= "${buildPlatform}" ;
 
-BOCHS_DEBUG_HACK			?= "${bochs_debug}" ;
-INCLUDE_GPL_ADDONS			?= "${include_gpl_addons}" ;
-HAIKU_INCLUDE_3RDPARTY			?= "${include_3rdparty}" ;
-HAIKU_ENABLE_MULTIUSER			?= "${enable_multiuser}" ;
-HAIKU_DISTRO_COMPATIBILITY	?= "${distroCompatibility}" ;
-HAIKU_USE_GCC_PIPE			?= "${use_gcc_pipe}" ;
-HAIKU_HOST_USE_32BIT		?= "${use_32bit}" ;
-HAIKU_HOST_USE_XATTR		?= "${use_xattr}" ;
+BOCHS_DEBUG_HACK					?= "${bochs_debug}" ;
+INCLUDE_GPL_ADDONS					?= "${include_gpl_addons}" ;
+HAIKU_INCLUDE_3RDPARTY				?= "${include_3rdparty}" ;
+HAIKU_ENABLE_MULTIUSER				?= "${enable_multiuser}" ;
+HAIKU_DISTRO_COMPATIBILITY			?= "${distroCompatibility}" ;
+HAIKU_USE_GCC_PIPE					?= "${use_gcc_pipe}" ;
+HAIKU_HOST_USE_32BIT				?= "${use_32bit}" ;
+HAIKU_HOST_USE_XATTR				?= "${use_xattr}" ;
+HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR	?= ${alternativeGCCOutputDir} ;
 
 HAIKU_GCC_RAW_VERSION		?= ${haikuGCCVersion} ;
 HAIKU_GCC_MACHINE			?= ${haikuGCCMachine} ;
@@ -429,10 +454,7 @@ TZ_OBJECTS on <timezone-source>${source} ?= $TZOBJECTS ;
 EOF
 done
 
-# Generate a boot strap Jamfile in the output directory, if it is not in
-# the source dir.
-
-if [ "$currentDir" != "$sourceDir" ]; then
+# Generate a boot strap Jamfile in the output directory.
 
 cat << EOF > $outputDir/Jamfile
 # automatically generated Jamfile
@@ -443,6 +465,3 @@ HAIKU_OUTPUT_DIR	= ${outputDir} ;
 include [ FDirName \$(HAIKU_TOP) Jamfile ] ;
 
 EOF
-
-fi
-

@@ -425,6 +425,91 @@ CopyDirectoryToHaikuImage beos etc
 	: licenses : -x .svn ;
 
 
+#pragma mark - Alternative GCC Libraries
+
+
+# build a zip file with the system libs
+# (used by another jam that wants to build a Haiku with alternative GCC
+# libraries included)
+
+rule ZipTargets zipFile : targets
+{
+	Depends $(zipFile) : <build>zip $(targets) ;
+	ZipTargets1 $(zipFile) : <build>zip $(targets) ;
+}
+
+actions ZipTargets1
+{
+	$(HOST_ADD_BUILD_COMPATIBILITY_LIB_DIR)
+	$(RM) "$(1)"
+	$(2[1]) -jy "$(1)" $(2[2-])
+}
+
+local alternativeSystemLibsZip = <image>alternative_system_libs.zip ;
+MakeLocate $(alternativeSystemLibsZip) : $(HAIKU_OUTPUT_DIR) ;
+
+# collect the targets we would install in the lib directory
+local alternativeSystemLibs ;
+local libTargets = [ FFilesInHaikuImageDirectory beos system lib ] ;
+local libTarget ;
+for libTarget in $(libTargets) {
+	alternativeSystemLibs += [ on $(libTarget) return $(TARGET) ] ;
+}
+
+# collect the symlinks we would install in the lib directory
+libTargets = [ FSymlinksInHaikuImageDirectory beos system lib ] ;
+local tmpAlternativeLibDir
+	= [ FDirName $(HAIKU_OUTPUT_DIR) tmp alternativeLibs ] ;
+for libTarget in $(libTargets) {
+	# We need to create actual symlinks, we can zip later.
+	local symlinkTarget = <alternative-system-lib>$(libTarget:BS) ;
+	MakeLocate $(symlinkTarget) : $(tmpAlternativeLibDir) ;
+	SymLink $(symlinkTarget) : [ on $(libTarget) return $(SYMLINK_TARGET) ] ;
+	alternativeSystemLibs += $(symlinkTarget) ;
+}
+
+ZipTargets $(alternativeSystemLibsZip) : $(alternativeSystemLibs) ;
+
+
+if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
+	# let another jam build a zip with the system libraries
+	rule InvokeSubJam target : directory : jamLine
+	{
+		DIRECTORY on $(target) = $(directory) ;
+		COMMAND_LINE on $(target) = $(jamLine) ;
+		Always $(target) ;
+		InvokeSubJam1 $(target) ;
+	}
+
+	actions InvokeSubJam1
+	{
+		cd $(DIRECTORY)
+		$(JAM:E=jam) -q $(COMMAND_LINE) ;
+	}
+
+	local otherAlternativeSystemLibsZip
+		= <other-image>alternative_system_libs.zip ;
+	MakeLocate $(otherAlternativeSystemLibsZip)
+		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) ;
+
+	InvokeSubJam $(otherAlternativeSystemLibsZip)
+		: $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR)
+		: "'<image>alternative_system_libs.zip'" ;
+
+	local libSubDir ;
+
+	if $(HAIKU_GCC_VERSION[1]) = 2 {
+		libSubDir = gcc4 ;
+	} else {
+		libSubDir = gcc2 ;
+	}
+
+	# install the alternative libs in the right directory
+	UnzipArchiveToHaikuImage beos system lib $(libSubDir)
+		: $(otherAlternativeSystemLibsZip) ;
+}
+
+
 #pragma mark - Optional Packages
 
 
