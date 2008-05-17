@@ -3,15 +3,15 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *             Jan-Rixt Van Hoye
- *             Salvatore Benedetto <salvatore.benedetto@gmail.com>
+ *		Jan-Rixt Van Hoye
+ *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  */
 
-#ifndef OHCI_HARD_H
-#define OHCI_HARD_H
+#ifndef OHCI_HARDWARE_H
+#define OHCI_HARDWARE_H
 
 // --------------------------------
-//	The OHCI registers 
+//	The OHCI registers
 // --------------------------------
 
 // --------------------------------
@@ -95,7 +95,7 @@
 #define OHCI_HCCA					0x18
 
 // --------------------------------
-//	Period current ED  register (section 7.2.2)
+//	Period current ED register (section 7.2.2)
 // --------------------------------
 
 #define OHCI_PERIOD_CURRENT_ED		0x1c
@@ -206,19 +206,19 @@
 //	Root Hub port status (n) register (section 7.4.4)
 // --------------------------------
 
-#define	OHCI_RH_PORT_STATUS(n)		(0x50 + (n) * 4) // 1 based indexing
-#define	OHCI_RH_PORTSTATUS_CCS		0x00000001		 // Current Connection Status
-#define	OHCI_RH_PORTSTATUS_PES		0x00000002		 // Port Enable Status
-#define	OHCI_RH_PORTSTATUS_PSS		0x00000004		 // Port Suspend Status
-#define	OHCI_RH_PORTSTATUS_POCI		0x00000008		 // Port Overcurrent Indicator
-#define	OHCI_RH_PORTSTATUS_PRS		0x00000010		 // Port Reset Status
-#define	OHCI_RH_PORTSTATUS_PPS		0x00000100		 // Port Power Status
-#define	OHCI_RH_PORTSTATUS_LSDA		0x00000200		 // Low Speed Device Attached
-#define	OHCI_RH_PORTSTATUS_CSC		0x00010000		 // Connection Status Change
-#define	OHCI_RH_PORTSTATUS_PESC		0x00020000		 // Port Enable Status Change
-#define	OHCI_RH_PORTSTATUS_PSSC		0x00040000		 // Port Suspend Status change
-#define	OHCI_RH_PORTSTATUS_OCIC		0x00080000		 // Port Overcurrent Change
-#define	OHCI_RH_PORTSTATUS_PRSC		0x00100000		 // Port Reset Status Change
+#define	OHCI_RH_PORT_STATUS(n)		(0x50 + (n) * 4)// 1 based indexing
+#define	OHCI_RH_PORTSTATUS_CCS		0x00000001		// Current Connection Status
+#define	OHCI_RH_PORTSTATUS_PES		0x00000002		// Port Enable Status
+#define	OHCI_RH_PORTSTATUS_PSS		0x00000004		// Port Suspend Status
+#define	OHCI_RH_PORTSTATUS_POCI		0x00000008		// Port Overcurrent Indicator
+#define	OHCI_RH_PORTSTATUS_PRS		0x00000010		// Port Reset Status
+#define	OHCI_RH_PORTSTATUS_PPS		0x00000100		// Port Power Status
+#define	OHCI_RH_PORTSTATUS_LSDA		0x00000200		// Low Speed Device Attached
+#define	OHCI_RH_PORTSTATUS_CSC		0x00010000		// Connection Status Change
+#define	OHCI_RH_PORTSTATUS_PESC		0x00020000		// Port Enable Status Change
+#define	OHCI_RH_PORTSTATUS_PSSC		0x00040000		// Port Suspend Status change
+#define	OHCI_RH_PORTSTATUS_OCIC		0x00080000		// Port Overcurrent Change
+#define	OHCI_RH_PORTSTATUS_PRSC		0x00100000		// Port Reset Status Change
 
 // --------------------------------
 //	Enable List
@@ -244,8 +244,8 @@
 
 // --------------------------------
 //	All normal interupts
-// --------------------------------	
-					
+// --------------------------------
+
 #define	OHCI_NORMAL_INTERRUPTS		(OHCI_SCHEDULING_OVERRUN \
 									| OHCI_WRITEBACK_DONE_HEAD \
 									| OHCI_RESUME_DETECTED \
@@ -271,7 +271,7 @@
 
 #define OHCI_NUMBER_OF_INTERRUPTS	32
 
-typedef struct ohci_hcca 
+typedef struct ohci_hcca
 {
 	uint32		interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
 	uint32		current_frame_number;
@@ -338,8 +338,8 @@ typedef struct ohci_general_td
 	// Hardware part 16 bytes
 	uint32	flags;						// Flags field
 	uint32	buffer_physical;			// Physical buffer pointer
-	uint32 	next_physical_descriptor;	// Physical pointer next descriptor
-	uint32 	last_physical_byte_address;	// Physical pointer to buffer end
+	uint32	next_physical_descriptor;	// Physical pointer next descriptor
+	uint32	last_physical_byte_address;	// Physical pointer to buffer end
 	// Software part
 	addr_t	physical_address;			// Physical address of this descriptor
 	void	*buffer_logical;			// Logical pointer to the buffer
@@ -403,7 +403,7 @@ typedef struct ohci_isochronous_td
 #define OHCI_ITD_PAGE_SELECT					0x00001000
 #define OHCI_ITD_MK_OFFS(len)					(0xe000 | ((len) & 0x1fff))
 #define OHCI_ITD_GET_BUFFER_LENGTH(x)			((x) & 0xfff)
-#define OHCI_ITD_GET_BUFFER_CONDITION_CODE(x)	((x) >> 12)	
+#define OHCI_ITD_GET_BUFFER_CONDITION_CODE(x)	((x) >> 12)
 
 #define OHCI_ISOCHRONOUS_TD_ALIGN 32
 
@@ -426,11 +426,11 @@ typedef struct ohci_isochronous_td
 #define	OHCI_NOT_ACCESSED			15
 
 // --------------------------------
-// 	Some delay needed when changing 
+//	Some delay needed when changing
 //	certain registers.
 // --------------------------------
 
 #define	OHCI_ENABLE_POWER_DELAY			5000
 #define	OHCI_READ_DESC_DELAY			5000
 
-#endif // OHCI_HARD_H 
+#endif // OHCI_HARDWARE_H

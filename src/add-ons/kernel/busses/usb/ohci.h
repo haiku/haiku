@@ -105,13 +105,13 @@ static	int32						_InterruptHandler(void *data);
 		status_t					_UnlinkTransfer(transfer_data *transfer);
 
 static	int32						_FinishThread(void *data);
-		void						_FinishTransfer();
+		void						_FinishTransfers();
 
-		status_t					_SubmitControlRequest(Transfer *transfer);
+		status_t					_SubmitControlTransfer(Transfer *transfer);
 		status_t					_SubmitBulkTransfer(Transfer *transfer);
 		status_t					_SubmitPeriodicTransfer(Transfer *transfer);
 
-		status_t					_AppendChainDescriptorsToEndpoint(
+		status_t					_AppendDescriptorChainToEndpoint(
 										ohci_endpoint_descriptor *endpoint,
 										ohci_general_td *first,
 										ohci_general_td *last);
@@ -129,16 +129,21 @@ static	int32						_FinishThread(void *data);
 		// Transfer descriptor related methods
 		ohci_general_td				*_CreateGeneralDescriptor(
 										size_t bufferSize);
+		void						_FreeGeneralDescriptor(
+										ohci_general_td *descriptor);
+
 		status_t					_CreateDescriptorChain(
 										ohci_general_td **firstDescriptor,
 										ohci_general_td **lastDescriptor,
 										uint8 direction,
 										size_t bufferSize);
-
-		void						_FreeGeneralDescriptor(
-										ohci_general_td *descriptor);
 		void						_FreeDescriptorChain(
 										ohci_general_td *topDescriptor);
+
+		size_t						_WriteDescriptorChain(
+										ohci_general_td *topDescriptor,
+										iovec *vector,
+										size_t vectorCount);
 
 		void						_LinkDescriptors(ohci_general_td *first,
 										ohci_general_td *second);
@@ -146,11 +151,6 @@ static	int32						_FinishThread(void *data);
 		ohci_isochronous_td			*_CreateIsochronousDescriptor();
 		void						_FreeIsochronousDescriptor(
 										ohci_isochronous_td *descriptor);
-
-		size_t						_WriteDescriptorChain(
-										ohci_general_td *topDescriptor,
-										iovec *vector,
-										size_t vectorCount);
 
 		// Hash tables related methods
 		void						_AddDescriptorToHash(
