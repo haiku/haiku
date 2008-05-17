@@ -358,13 +358,13 @@ Inode::WriteDataToBuffer(const void *_data, size_t *_length, bool nonBlocking)
 				return B_WOULD_BLOCK;
 
 			ConditionVariableEntry entry;
-			entry.Add(this, B_CAN_INTERRUPT);
+			entry.Add(this);
 
 			WriteRequest request(minToWrite);
 			fWriteRequests.Add(&request);
 
 			mutex_unlock(&fRequestLock);
-			status_t status = entry.Wait();
+			status_t status = entry.Wait(B_CAN_INTERRUPT);
 			mutex_lock(&fRequestLock);
 
 			fWriteRequests.Remove(&request);

@@ -414,14 +414,16 @@ RequestOwner::Wait(bool interruptable, bigtime_t timeout)
 
 		// add an entry to wait on
 		ConditionVariableEntry entry;
-		entry.Add(this, interruptable ? B_CAN_INTERRUPT : 0);
+		entry.Add(this);
 
 		locker.Unlock();
 
 		// wait
 		TRACE(("%p->RequestOwner::Wait(): waiting for condition...\n", this));
 
-		error = entry.Wait(B_RELATIVE_TIMEOUT, timeout);
+		error = entry.Wait(
+			(interruptable ? B_CAN_INTERRUPT : 0) | B_RELATIVE_TIMEOUT,
+			timeout);
 
 		TRACE(("%p->RequestOwner::Wait(): condition occurred: %lx\n", this,
 			error));

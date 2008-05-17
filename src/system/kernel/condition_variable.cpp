@@ -17,6 +17,10 @@
 #include <util/AutoLock.h>
 
 
+#define STATUS_ADDED	1
+#define STATUS_WAITING	2
+
+
 static const int kConditionVariableHashSize = 512;
 
 
@@ -90,7 +94,7 @@ dump_condition_variable(int argc, char** argv)
 
 
 bool
-ConditionVariableEntry::Add(const void* object, uint32 flags)
+ConditionVariableEntry::Add(const void* object)
 {
 	ASSERT(object != NULL);
 
@@ -100,16 +104,12 @@ ConditionVariableEntry::Add(const void* object, uint32 flags)
 
 	fVariable = sConditionVariableHash.Lookup(object);
 
-	thread_prepare_to_block(fThread, flags,
-		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, fVariable);
-
 	if (fVariable == NULL) {
-		SpinLocker threadLocker(thread_spinlock);
-		thread_unblock_locked(fThread, B_ENTRY_NOT_FOUND);
+		fWaitStatus = B_ENTRY_NOT_FOUND;
 		return false;
 	}
 
-	// add to the queue for the variable
+	fWaitStatus = STATUS_ADDED;
 	fVariable->fEntries.Add(this);
 
 	return true;
@@ -117,7 +117,7 @@ ConditionVariableEntry::Add(const void* object, uint32 flags)
 
 
 status_t
-ConditionVariableEntry::Wait(uint32 timeoutFlags, bigtime_t timeout)
+ConditionVariableEntry::Wait(uint32 flags, bigtime_t timeout)
 {
 	if (!are_interrupts_enabled()) {
 		panic("wait_for_condition_variable_entry() called with interrupts "
@@ -127,15 +127,28 @@ ConditionVariableEntry::Wait(uint32 timeoutFlags, bigtime_t timeout)
 
 	InterruptsLocker _;
 
+	SpinLocker conditionLocker(sConditionVariablesLock);
+
+	if (fVariable == NULL)
+		return fWaitStatus;
+
+	thread_prepare_to_block(fThread, flags,
+		THREAD_BLOCK_TYPE_CONDITION_VARIABLE, fVariable);
+
+	fWaitStatus = STATUS_WAITING;
+
+	conditionLocker.Unlock();
+
 	SpinLocker threadLocker(thread_spinlock);
+
 	status_t error;
-	if ((timeoutFlags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
-		error = thread_block_with_timeout_locked(timeoutFlags, timeout);
+	if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0)
+		error = thread_block_with_timeout_locked(flags, timeout);
 	else
 		error = thread_block_locked(thread_get_current_thread());
 	threadLocker.Unlock();
 
-	SpinLocker locker(sConditionVariablesLock);
+	conditionLocker.Lock();
 
 	// remove entry from variable, if not done yet
 	if (fVariable != NULL) {
@@ -151,7 +164,7 @@ status_t
 ConditionVariableEntry::Wait(const void* object, uint32 flags,
 	bigtime_t timeout)
 {
-	if (Add(object, flags))
+	if (Add(object))
 		return Wait(flags, timeout);
 	return B_ENTRY_NOT_FOUND;
 }
@@ -294,7 +307,13 @@ ConditionVariable::_NotifyChecked(bool all, status_t result)
 	while (ConditionVariableEntry* entry = fEntries.RemoveHead()) {
 		entry->fVariable = NULL;
 
-		thread_unblock_locked(entry->fThread, B_OK);
+		if (entry->fWaitStatus <= 0)
+			continue;
+
+		if (entry->fWaitStatus == STATUS_WAITING)
+			thread_unblock_locked(entry->fThread, result);
+
+		entry->fWaitStatus = result;
 
 		if (!all)
 			break;

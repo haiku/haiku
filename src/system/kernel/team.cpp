@@ -1867,7 +1867,7 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 		ConditionVariableEntry deadWaitEntry;
 
 		if (status == B_WOULD_BLOCK && (flags & WNOHANG) == 0)
-			deadWaitEntry.Add(team->dead_children, B_CAN_INTERRUPT);
+			deadWaitEntry.Add(team->dead_children);
 
 		locker.Unlock();
 
@@ -1888,7 +1888,7 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 			return status;
 		}
 
-		status = deadWaitEntry.Wait();
+		status = deadWaitEntry.Wait(B_CAN_INTERRUPT);
 		if (status == B_INTERRUPTED) {
 			T(WaitForChildDone(status));
 			return status;

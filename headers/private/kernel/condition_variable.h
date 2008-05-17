@@ -27,9 +27,8 @@ public:
 	inline						~ConditionVariableEntry();
 #endif
 
-			bool				Add(const void* object, uint32 flags = 0);
-			status_t			Wait(uint32 timeoutFlags = 0,
-									bigtime_t timeout = 0);
+			bool				Add(const void* object);
+			status_t			Wait(uint32 flags = 0, bigtime_t timeout = 0);
 			status_t			Wait(const void* object, uint32 flags = 0,
 									bigtime_t timeout = 0);
 
@@ -42,6 +41,7 @@ private:
 private:
 			ConditionVariable*	fVariable;
 			struct thread*		fThread;
+			status_t			fWaitStatus;
 
 			friend class ConditionVariable;
 };
