@@ -96,7 +96,7 @@ free_first_entry()
 		// a buffer entry -- just skip it
 	} else if (sFirstEntry->flags & ENTRY_INITIALIZED) {
 		// fully initialized TraceEntry -- destroy it
-		((TraceEntry*)sFirstEntry)->~TraceEntry();
+		TraceEntry::FromTraceEntry(sFirstEntry)->~TraceEntry();
 		sEntries--;
 	} else {
 		// Not fully initialized TraceEntry. We can't free it, since
@@ -326,7 +326,7 @@ void
 TraceEntry::Initialized()
 {
 #if ENABLE_TRACING
-	flags |= ENTRY_INITIALIZED;
+	ToTraceEntry()->flags |= ENTRY_INITIALIZED;
 	sWritten++;
 #endif
 }
@@ -336,7 +336,8 @@ void*
 TraceEntry::operator new(size_t size, const std::nothrow_t&) throw()
 {
 #if ENABLE_TRACING
-	return allocate_entry(size, 0);
+	trace_entry* entry = allocate_entry(size + sizeof(trace_entry), 0);
+	return entry != NULL ? entry + 1 : NULL;
 #endif
 	return NULL;
 }
@@ -396,6 +397,10 @@ class KernelTraceEntry : public AbstractTraceEntry {
 		{
 			fMessage = alloc_tracing_buffer_strcpy(message, 256, false);
 
+#if KTRACE_PRINTF_STACK_TRACE
+			fStackTrace = capture_tracing_stack_trace(
+				KTRACE_PRINTF_STACK_TRACE, 1, false);
+#endif
 			Initialized();
 		}
 
@@ -404,8 +409,18 @@ class KernelTraceEntry : public AbstractTraceEntry {
 			out.Print("kern: %s", fMessage);
 		}
 
+#if KTRACE_PRINTF_STACK_TRACE
+		virtual void DumpStackTrace(TraceOutput& out)
+		{
+			out.PrintStackTrace(fStackTrace);
+		}
+#endif
+
 	private:
 		char*	fMessage;
+#if KTRACE_PRINTF_STACK_TRACE
+		tracing_stack_trace* fStackTrace;
+#endif
 };
 
 
@@ -704,7 +719,7 @@ public:
 
 	TraceEntry* Current() const
 	{
-		return (TraceEntry*)fEntry;
+		return TraceEntry::FromTraceEntry(fEntry);
 	}
 
 	TraceEntry* Next()
@@ -981,10 +996,10 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 		lastToDump = -1;
 		while (iterator.Index() > firstToCheck) {
 			TraceEntry* entry = iterator.Previous();
-			if ((entry->flags & ENTRY_INITIALIZED) != 0) {
+			if ((entry->Flags() & ENTRY_INITIALIZED) != 0) {
 				out.Clear();
 				if (filter->Filter(entry, out)) {
-					entry->flags |= FILTER_MATCH;
+					entry->ToTraceEntry()->flags |= FILTER_MATCH;
 					if (lastToDump == -1)
 						lastToDump = iterator.Index();
 					firstToDump = iterator.Index();
@@ -993,7 +1008,7 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 					if (matching >= count)
 						break;
 				} else
-					entry->flags &= ~FILTER_MATCH;
+					entry->ToTraceEntry()->flags &= ~FILTER_MATCH;
 			}
 		}
 
@@ -1023,10 +1038,10 @@ dump_tracing_internal(int argc, char** argv, WrapperTraceFilter* wrapperFilter)
 			break;
 		}
 
-		if ((entry->flags & ENTRY_INITIALIZED) != 0) {
+		if ((entry->Flags() & ENTRY_INITIALIZED) != 0) {
 			out.Clear();
 			if (filter &&  (markedMatching
-					? (entry->flags & FILTER_MATCH) == 0
+					? (entry->Flags() & FILTER_MATCH) == 0
 					: !filter->Filter(entry, out))) {
 				continue;
 			}

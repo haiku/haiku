@@ -23,6 +23,7 @@
 #define BLOCK_CACHE_TRANSACTION_TRACING			0
 #define BMESSAGE_TRACING						0
 #define KERNEL_HEAP_TRACING						0
+#define KTRACE_PRINTF_STACK_TRACE				0	/* stack trace depth */
 #define PAGE_ALLOCATION_TRACING					0
 #define PARANOIA_TRACING						0
 #define PARANOIA_TRACING_STACK_TRACE			0	/* stack trace depth */

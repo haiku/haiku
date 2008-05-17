@@ -62,7 +62,7 @@ class TraceOutput {
 		bigtime_t	fLastEntryTime;
 };
 
-class TraceEntry : public trace_entry {
+class TraceEntry {
 	public:
 		TraceEntry();
 		virtual ~TraceEntry();
@@ -70,12 +70,22 @@ class TraceEntry : public trace_entry {
 		virtual void Dump(TraceOutput& out);
 		virtual void DumpStackTrace(TraceOutput& out);
 
-		size_t Size() const { return size; }
-		uint16 Flags() const { return flags; }
+		size_t Size() const		{ return ToTraceEntry()->size; }
+		uint16 Flags() const	{ return ToTraceEntry()->flags; }
 
 		void Initialized();
 
 		void* operator new(size_t size, const std::nothrow_t&) throw();
+
+		trace_entry* ToTraceEntry() const
+		{
+			return (trace_entry*)this - 1;
+		}
+
+		static TraceEntry* FromTraceEntry(trace_entry* entry)
+		{
+			return (TraceEntry*)(entry + 1);
+		}
 };
 
 class AbstractTraceEntry : public TraceEntry {
