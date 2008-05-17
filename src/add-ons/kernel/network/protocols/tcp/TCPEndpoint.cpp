@@ -1117,7 +1117,7 @@ TCPEndpoint::_MarkEstablished()
 status_t
 TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 {
-	while (fState != ESTABLISHED) {
+	while (fState < ESTABLISHED) {
 		if (socket->error != B_OK)
 			return socket->error;
 
