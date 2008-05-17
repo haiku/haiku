@@ -106,4 +106,5 @@ SubInclude HAIKU_TOP src tools translation ;
 SubInclude HAIKU_TOP src tools unzip ;
 SubInclude HAIKU_TOP src tools vmdkimage ;
 SubInclude HAIKU_TOP src tools unflatten ;
+SubInclude HAIKU_TOP src tools zip ;
 
