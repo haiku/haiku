@@ -178,6 +178,19 @@ rule AddFilesToContainer container : directoryTokens : targets : destName
 	}
 }
 
+rule FFilesInContainerDirectory container : directoryTokens
+{
+	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
+	local directory = [ FDirName $(directoryTokens) ] ;
+	directory = $(directory:G=$(containerGrist)) ;
+
+	if [ on $(directory) return $(__is_on_image) ] {
+		on $(directory) return $(TARGETS_TO_INSTALL) ;
+	}
+
+	return ;
+}
+
 rule AddSymlinkToContainer container : directoryTokens : linkTarget : linkName
 {
 	# AddSymlinkToContainer <container> : <directory> : <link target>
@@ -200,6 +213,19 @@ rule AddSymlinkToContainer container : directoryTokens : linkTarget : linkName
 	local link = $(directory)/$(linkName) ;
 	SYMLINK_TARGET on $(link) = $(linkTarget) ;
 	SYMLINKS_TO_INSTALL on $(directory) += $(link) ;
+}
+
+rule FSymlinksInContainerDirectory container : directoryTokens
+{
+	local containerGrist = [ on $(container) return $(HAIKU_CONTAINER_GRIST) ] ;
+	local directory = [ FDirName $(directoryTokens) ] ;
+	directory = $(directory:G=$(containerGrist)) ;
+
+	if [ on $(directory) return $(__is_on_image) ] {
+		on $(directory) return $(SYMLINKS_TO_INSTALL) ;
+	}
+
+	return ;
 }
 
 rule CopyDirectoryToContainer container : directoryTokens : sourceDirectory
@@ -573,12 +599,24 @@ rule AddFilesToHaikuImage directory : targets : destName
 		: $(targets) : $(destName) ;
 }
 
+rule FFilesInHaikuImageDirectory directoryTokens
+{
+	return [ FFilesInContainerDirectory $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(directoryTokens) ] ;
+}
+
 rule AddSymlinkToHaikuImage directoryTokens : linkTarget : linkName
 {
 	# AddSymlinkToHaikuImage <directory> : <link target> [ : <link name> ] ;
 
 	AddSymlinkToContainer $(HAIKU_IMAGE_CONTAINER_NAME) : $(directoryTokens)
 		: $(linkTarget) : $(linkName) ;
+}
+
+rule FSymlinksInHaikuImageDirectory directoryTokens
+{
+	return [ FSymlinksInContainerDirectory $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(directoryTokens) ] ;
 }
 
 rule CopyDirectoryToHaikuImage directoryTokens : sourceDirectory
