@@ -451,7 +451,7 @@ BScreen::DPMSState()
 {
 	if (fScreen != NULL)
 		return fScreen->DPMSState();
-	return B_ERROR;
+	return 0;
 }
 
 
@@ -462,7 +462,7 @@ BScreen::DPMSCapabilites()
 {
 	if (fScreen != NULL)
 		return fScreen->DPMSCapabilites();
-	return B_ERROR;
+	return 0;
 }
 
 
