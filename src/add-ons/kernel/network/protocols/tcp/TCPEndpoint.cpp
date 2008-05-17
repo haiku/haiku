@@ -466,7 +466,7 @@ TCPEndpoint::Close()
 {
 	TRACE("Close()");
 
-	MutexLocker lock(fLock);
+	MutexLocker locker(fLock);
 
 	if (fState == LISTEN)
 		delete_sem(fAcceptSemaphore);
@@ -488,7 +488,7 @@ TCPEndpoint::Close()
 		bigtime_t maximum = absolute_timeout(socket->linger * 1000000LL);
 
 		while (fSendQueue.Used() > 0) {
-			status = fSendList.Wait(lock, maximum);
+			status = fSendList.Wait(locker, maximum);
 			if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 				break;
 			else if (status < B_OK)
@@ -497,8 +497,22 @@ TCPEndpoint::Close()
 
 		TRACE("Close(): after waiting, the SendQ was left with %lu bytes.",
 			fSendQueue.Used());
-	}
+#if 0
+// TODO: For the following to work we also need to be notified when TIME_WAIT
+// is entered.
+	} else if (fRoute != NULL && (fRoute->flags & RTF_LOCAL) != 0) {
+		// This is a local connection - just wait until we're done so that
+		// the port is available again
+		while (fState != CLOSED && fState != TIME_WAIT) {
+			if (socket->error != B_OK)
+				return socket->error;
 
+			status_t status = fSendList.Wait(locker);
+			if (status < B_OK)
+				return status;
+		}
+#endif	// 0
+	}
 	return B_OK;
 }
 
@@ -1117,7 +1131,13 @@ TCPEndpoint::_MarkEstablished()
 status_t
 TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 {
+#if 0
+// TODO: Checking for CLOSED seems correct, but breaks several neon tests.
+// When investigating this, also have a look at _Close() and _HandleReset().
+	while (fState < ESTABLISHED && fState != CLOSED) {
+#else
 	while (fState < ESTABLISHED) {
+#endif
 		if (socket->error != B_OK)
 			return socket->error;
 
@@ -1141,6 +1161,13 @@ TCPEndpoint::_Close()
 	T(State(this));
 
 	fFlags |= FLAG_DELETE_ON_CLOSE;
+
+#if 0
+// TODO: Should probably be moved here (from _HandleReset()), but cf. the
+// comment in _WaitForEstablished().
+	fSendList.Signal();
+	_NotifyReader();
+#endif
 }
 
 
@@ -1150,8 +1177,11 @@ TCPEndpoint::_HandleReset(status_t error)
 	socket->error = error;
 	_Close();
 
+#if 1
+// TODO: Should be moved to _Close(), but cf. comment in _WaitForEstablished().
 	fSendList.Signal();
 	_NotifyReader();
+#endif
 
 	gSocketModule->notify(socket, B_SELECT_WRITE, error);
 	gSocketModule->notify(socket, B_SELECT_ERROR, error);

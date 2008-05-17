@@ -27,12 +27,12 @@
 
 class WaitList {
 public:
-	WaitList(const char *name);
+	WaitList(const char* name);
 	~WaitList();
 
 	status_t InitCheck() const;
 
-	status_t Wait(MutexLocker &, bigtime_t timeout);
+	status_t Wait(MutexLocker& locker, bigtime_t timeout = B_INFINITE_TIMEOUT);
 	void Signal();
 
 private:
