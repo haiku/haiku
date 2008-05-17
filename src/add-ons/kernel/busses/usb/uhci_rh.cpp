@@ -8,8 +8,6 @@
  */
 
 #include "uhci.h"
-#include <PCI.h>
-
 
 static usb_device_descriptor sUHCIRootHubDevice =
 {
@@ -61,7 +59,7 @@ static uhci_root_hub_configuration_s sUHCIRootHubConfig =
 		0x09,							// Interface class (9 = Hub)
 		0,								// Interface subclass
 		0,								// Interface protocol
-		0,								// Index of interface string
+		0								// Index of interface string
 	},
 
 	{ // endpoint descriptor
@@ -70,7 +68,7 @@ static uhci_root_hub_configuration_s sUHCIRootHubConfig =
 		USB_REQTYPE_DEVICE_IN | 1,		// Endpoint address (first in IN endpoint)
 		0x03,							// Attributes (0x03 = interrupt endpoint)
 		8,								// Max packet size
-		0xFF							// Interval
+		0xff							// Interval
 	},
 
 	{ // hub descriptor
@@ -110,7 +108,6 @@ static uhci_root_hub_string_s sUHCIRootHubStrings[3] = {
 			'H', 'A', 'I', 'K', 'U',	// Characters
 			' ', 'I', 'n', 'c', '.'
 		}
-
 	},
 
 	{
@@ -139,15 +136,19 @@ UHCIRootHub::ProcessTransfer(UHCI *uhci, Transfer *transfer)
 		return B_ERROR;
 
 	usb_request_data *request = transfer->RequestData();
+	TRACE(("usb_ohci_roothub: request: %d\n", request->Request));
 
 	status_t status = B_TIMED_OUT;
 	size_t actualLength = 0;
 	switch (request->Request) {
 		case USB_REQUEST_GET_STATUS: {
 			if (request->Index == 0) {
-				// Get the hub status -- everything as 0 means all-right
+				// get hub status
 				actualLength = MIN(sizeof(usb_port_status),
 					transfer->DataLength());
+				// the hub reports whether the local power failed (bit 0)
+				// and if there is a over-current condition (bit 1).
+				// everything as 0 means all is ok.
 				memset(transfer->Data(), 0, actualLength);
 				status = B_OK;
 				break;
@@ -159,6 +160,7 @@ UHCIRootHub::ProcessTransfer(UHCI *uhci, Transfer *transfer)
 				memcpy(transfer->Data(), (void *)&portStatus, actualLength);
 				status = B_OK;
 			}
+
 			break;
 		}
 
@@ -224,7 +226,7 @@ UHCIRootHub::ProcessTransfer(UHCI *uhci, Transfer *transfer)
 
 		case USB_REQUEST_CLEAR_FEATURE: {
 			if (request->Index == 0) {
-				// We don't support any hub changes
+				// we don't support any hub changes
 				TRACE_ERROR(("usb_uhci_roothub: clear feature: no hub changes\n"));
 				break;
 			}

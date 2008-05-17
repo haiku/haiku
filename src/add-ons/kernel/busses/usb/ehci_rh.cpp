@@ -58,7 +58,7 @@ static ehci_root_hub_configuration_s sEHCIRootHubConfig =
 		0x09,							// Interface class (9 = Hub)
 		0,								// Interface subclass
 		0,								// Interface protocol
-		0,								// Index of interface string
+		0								// Index of interface string
 	},
 
 	{ // endpoint descriptor
@@ -67,7 +67,7 @@ static ehci_root_hub_configuration_s sEHCIRootHubConfig =
 		USB_REQTYPE_DEVICE_IN | 1,		// Endpoint address (first in IN endpoint)
 		0x03,							// Attributes (0x03 = interrupt endpoint)
 		8,								// Max packet size
-		0xFF							// Interval
+		0xff							// Interval
 	},
 
 	{ // hub descriptor
@@ -169,7 +169,7 @@ EHCIRootHub::ProcessTransfer(EHCI *ehci, Transfer *transfer)
 				break;
 			}
 
-			TRACE(("usb_ehci_roothub:  set address: %d\n", request->Value));
+			TRACE(("usb_ehci_roothub: set address: %d\n", request->Value));
 			status = B_OK;
 			break;
 

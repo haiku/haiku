@@ -363,7 +363,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	}
 
 	// Set base pointer and reset frame number
-	WriteReg32(UHCI_FRBASEADD, (uint32)physicalAddress);	
+	WriteReg32(UHCI_FRBASEADD, (uint32)physicalAddress);
 	WriteReg16(UHCI_FRNUM, 0);
 
 	// Set the max packet size for bandwidth reclamation to 64 bytes
@@ -1295,7 +1295,7 @@ UHCI::FinishIsochronousTransfers()
 
 		bool transferDone = false;
 		uint16 currentFrame = ReadReg16(UHCI_FRNUM);
-		
+
 		// Process the frame list until one transfer is processed
 		while (!transferDone) {
 			// wait 1ms in order to be sure to be one position behind
