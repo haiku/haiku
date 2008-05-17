@@ -45,6 +45,11 @@
    int utime OF((char *, time_t *));
 #endif
 
+#if !defined(__BEOS__) && !defined(__HAIKU__)
+#	define open(path, openMode)	_kern_open(-1, (path), (openMode), 0)
+	extern int _kern_open(int fd, const char *path, int openMode, int perms);
+#endif
+
 extern char *label;
 local ulg label_time = 0;
 local ulg label_mode = 0;
@@ -344,7 +349,7 @@ of the buffer is also returned.
 If get_attr_dir() fails, the buffer will be NULL, total_size will be 0,
 and an error will be returned:
 
-    EOK    - no errors occurred
+    0      - no errors occurred
     EINVAL - attr_buff was pointing at a buffer
     ENOMEM - insufficient memory for attribute buffer
 
@@ -362,7 +367,7 @@ PROBLEMS:
 
 int get_attr_dir( const char *name, char **attr_buff, off_t *total_size )
 {
-    int               retval = EOK;
+    int               retval = 0;
     int               fd;
     DIR              *fa_dir;
     struct dirent    *fa_ent;
@@ -372,7 +377,7 @@ int get_attr_dir( const char *name, char **attr_buff, off_t *total_size )
     struct attr_info  fa_info;
     struct attr_info  big_fa_info;
 
-    retval      = EOK;
+    retval      = 0;
     attrs_size  = 0;    /* gcc still says this is used uninitialized... */
     *total_size = 0;
 
@@ -426,7 +431,7 @@ int get_attr_dir( const char *name, char **attr_buff, off_t *total_size )
     fa_ent = fs_read_attr_dir( fa_dir );
     while( fa_ent != NULL ) {
         retval = fs_stat_attr( fd, fa_ent->d_name, &fa_info );
-        /* TODO: check retval != EOK */
+        /* TODO: check retval != 0 */
 
         this_size  = strlen( fa_ent->d_name ) + 1;
         this_size += sizeof( struct attr_info );
@@ -440,7 +445,7 @@ int get_attr_dir( const char *name, char **attr_buff, off_t *total_size )
             *attr_buff = (char *)realloc( *attr_buff, attrs_size );
             if( *attr_buff == NULL ) {
                 retval = fs_close_attr_dir( fa_dir );
-                /* TODO: check retval != EOK */
+                /* TODO: check retval != 0 */
                 close( fd );
 
                 return ENOMEM;
@@ -489,7 +494,7 @@ int get_attr_dir( const char *name, char **attr_buff, off_t *total_size )
     /* ----------------------------------------------------------------- */
     /* Close the attribute directory.                                    */
     retval = fs_close_attr_dir( fa_dir );
-    /* TODO: check retval != EOK */
+    /* TODO: check retval != 0 */
 
     /* ----------------------------------------------------------------- */
     /* If the buffer is too big, shrink it.                              */
@@ -507,7 +512,7 @@ int get_attr_dir( const char *name, char **attr_buff, off_t *total_size )
 
     close( fd );
 
-    return EOK;
+    return 0;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -700,7 +705,7 @@ local int add_Be_ef( struct zlist far *z )
         int retval;
 
         retval = get_attr_dir( z->name, &attrbuff, &attrsize );
-        if( retval != EOK ) {
+        if( retval != 0 ) {
             return ZE_OPEN;
         }
         if( attrsize == 0 ) {
