@@ -90,7 +90,8 @@ search_path_for_type(image_type type)
 
 static int
 try_open_executable(const char *dir, int dirLength, const char *name,
-	const char *programPath, char *path, size_t pathLength)
+	const char *programPath, const char *compatibilitySubDir, char *path,
+	size_t pathLength)
 {
 	size_t nameLength = strlen(name);
 	struct stat stat;
@@ -99,6 +100,7 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 	// construct the path
 	if (dirLength > 0) {
 		char *buffer = path;
+		size_t subDirLen = 0;
 
 		if (programPath == NULL)
 			programPath = gProgramArgs->program_path;
@@ -121,14 +123,23 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 			pathLength -= bytesCopied;
 			dir += 2;
 			dirLength -= 2;
+		} else if (compatibilitySubDir != NULL) {
+			// We're looking for a library or an add-on and the executable has
+			// not been compiled with a compiler compatible with the one the
+			// OS has been built with. Thus we only look in specific subdirs.
+			subDirLen = strlen(compatibilitySubDir) + 1;
 		}
 
-		if (dirLength + 1 + nameLength >= pathLength)
+		if (dirLength + 1 + subDirLen + nameLength >= pathLength)
 			return B_NAME_TOO_LONG;
 
 		memcpy(buffer, dir, dirLength);
 		buffer[dirLength] = '/';
-		strcpy(buffer + dirLength + 1, name);
+		if (subDirLen > 0) {
+			memcpy(buffer + dirLength + 1, compatibilitySubDir, subDirLen - 1);
+			buffer[dirLength + subDirLen] = '/';
+		}
+		strcpy(buffer + dirLength + 1 + subDirLen, name);
 	} else {
 		if (nameLength >= pathLength)
 			return B_NAME_TOO_LONG;
@@ -169,8 +180,8 @@ try_open_executable(const char *dir, int dirLength, const char *name,
 
 static int
 search_executable_in_path_list(const char *name, const char *pathList,
-	int pathListLen, const char *programPath, char *pathBuffer,
-	size_t pathBufferLength)
+	int pathListLen, const char *programPath, const char *compatibilitySubDir,
+	char *pathBuffer, size_t pathBufferLength)
 {
 	const char *pathListEnd = pathList + pathListLen;
 	status_t status = B_ENTRY_NOT_FOUND;
@@ -187,7 +198,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 			pathEnd++;
 
 		fd = try_open_executable(pathList, pathEnd - pathList, name,
-			programPath, pathBuffer, pathBufferLength);
+			programPath, compatibilitySubDir, pathBuffer, pathBufferLength);
 		if (fd >= 0) {
 			// see if it's a dir
 			struct stat stat;
@@ -210,7 +221,7 @@ search_executable_in_path_list(const char *name, const char *pathList,
 
 int
 open_executable(char *name, image_type type, const char *rpath,
-	const char *programPath)
+	const char *programPath, const char *compatibilitySubDir)
 {
 	const char *paths;
 	char buffer[PATH_MAX];
@@ -240,11 +251,12 @@ open_executable(char *name, image_type type, const char *rpath,
 			// If there is no ';', we set only secondList to simplify things.
 		if (firstList) {
 			fd = search_executable_in_path_list(name, firstList,
-				semicolon - firstList, programPath, buffer, sizeof(buffer));
+				semicolon - firstList, programPath, NULL, buffer,
+				sizeof(buffer));
 		}
 		if (fd < 0) {
 			fd = search_executable_in_path_list(name, secondList,
-				strlen(secondList), programPath, buffer, sizeof(buffer));
+				strlen(secondList), programPath, NULL, buffer, sizeof(buffer));
 		}
 	}
 
@@ -253,7 +265,14 @@ open_executable(char *name, image_type type, const char *rpath,
 		paths = search_path_for_type(type);
 		if (paths) {
 			fd = search_executable_in_path_list(name, paths, strlen(paths),
-				programPath, buffer, sizeof(buffer));
+				programPath, compatibilitySubDir, buffer, sizeof(buffer));
+
+			// If not found and a compatibility sub directory has been
+			// specified, look again in the standard search paths.
+			if (fd == B_ENTRY_NOT_FOUND && compatibilitySubDir != NULL) {
+				fd = search_executable_in_path_list(name, paths, strlen(paths),
+					programPath, NULL, buffer, sizeof(buffer));
+			}
 		}
 	}
 
@@ -288,7 +307,7 @@ test_executable(const char *name, char *invoker)
 
 	strlcpy(path, name, sizeof(path));
 
-	fd = open_executable(path, B_APP_IMAGE, NULL, NULL);
+	fd = open_executable(path, B_APP_IMAGE, NULL, NULL, NULL);
 	if (fd < B_OK)
 		return fd;
 

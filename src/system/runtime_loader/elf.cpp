@@ -81,6 +81,7 @@ static uint32 sLoadedImageCount = 0;
 static image_t *sProgramImage;
 static KMessage sErrorMessage;
 static bool sProgramLoaded = false;
+static const char *sSearchPathSubDir = NULL;
 
 // a recursive lock
 static sem_id rld_sem;
@@ -1192,8 +1193,9 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 
 	strlcpy(path, name, sizeof(path));
 
-	// Try to load explicit image path first
-	fd = open_executable(path, type, rpath, get_program_path());
+	// find and open the file
+	fd = open_executable(path, type, rpath, get_program_path(),
+		sSearchPathSubDir);
 	if (fd < 0) {
 		FATAL("cannot open file %s\n", path);
 		KTRACE("rld: load_container(\"%s\"): failed to open file", name);
@@ -1270,8 +1272,20 @@ load_container(char const *name, image_type type, const char *rpath, image_t **_
 		goto err2;
 	}
 
-	if (!analyze_object_gcc_version(fd, image, eheader, sheaderSize, ph_buff,
+	if (analyze_object_gcc_version(fd, image, eheader, sheaderSize, ph_buff,
 			sizeof(ph_buff))) {
+		// If this is the executable image, we init the search path
+		// subdir, if the compiler version doesn't match ours.
+		if (type == B_APP_IMAGE) {
+			#if __GNUC__ == 2
+				if (image->gcc_version.major > 2)
+					sSearchPathSubDir = "gcc4";
+			#elif __GNUC__ == 4
+				if (image->gcc_version.major == 2)
+					sSearchPathSubDir = "gcc2";
+			#endif
+		}
+	} else {
 		FATAL("Failed to get gcc version for %s\n", path);
 		// not really fatal, actually
 	}
