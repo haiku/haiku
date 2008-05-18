@@ -77,8 +77,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		fFinishTransfersSem(-1),
 		fFinishThread(-1),
 		fStopFinishThread(false),
-		fHashGenericTable(NULL),
-		fHashIsochronousTable(NULL),
 		fRootHub(NULL),
 		fRootHubAddress(0),
 		fPortCount(0)
@@ -138,35 +136,17 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 	memset(fHcca, 0, sizeof(ohci_hcca));
 
-	// Allocate hash tables
-	fHashGenericTable = (ohci_general_td **)
-		malloc(sizeof(ohci_general_td *) * OHCI_HASH_SIZE);
-	if (fHashGenericTable == NULL) {
-		TRACE_ERROR(("usb_ohci: unable to allocate hash generic table\n"));
-		return;
-	}
-
-	fHashIsochronousTable = (ohci_isochronous_td **)
-		malloc(sizeof(ohci_isochronous_td *) * OHCI_HASH_SIZE);
-	if (fHashIsochronousTable == NULL) {
-		free(fHashGenericTable);
-		TRACE_ERROR(("usb_ohci: unable to allocate hash isochronous table\n"));
-		return;
-	}
-
 	// Set Up Host controller
 	// Dummy endpoints
 	fDummyControl = _AllocateEndpoint();
 	if (!fDummyControl)
 		return;
-	fDummyControl->flags |= OHCI_ENDPOINT_SKIP;
 
 	fDummyBulk = _AllocateEndpoint();
 	if (!fDummyBulk) {
 		_FreeEndpoint(fDummyControl);
 		return;
 	}
-	fDummyBulk->flags |= OHCI_ENDPOINT_SKIP;
 
 	fDummyIsochronous = _AllocateEndpoint();
 	if (!fDummyIsochronous) {
@@ -174,7 +154,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		_FreeEndpoint(fDummyBulk);
 		return;
 	}
-	fDummyIsochronous->flags |= OHCI_ENDPOINT_SKIP;
 
 	// Static endpoints that get linked in the HCCA
 	fInterruptEndpoints = new(std::nothrow)
@@ -202,7 +181,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		}
 
 		// Make them point all to the dummy isochronous endpoint
-		fInterruptEndpoints[i]->flags |= OHCI_ENDPOINT_SKIP;
 		fInterruptEndpoints[i]->next_physical_endpoint
 			= fDummyIsochronous->physical_address;
 	}
@@ -341,9 +319,6 @@ OHCI::~OHCI()
 	if (fRegisterArea >= B_OK)
 		delete_area(fRegisterArea);
 
-	free(fHashGenericTable);
-	free(fHashIsochronousTable);
-
 	_FreeEndpoint(fDummyControl);
 	_FreeEndpoint(fDummyBulk);
 	_FreeEndpoint(fDummyIsochronous);
@@ -365,9 +340,11 @@ OHCI::Start()
 {
 	TRACE(("usb_ohci: starting OHCI Host Controller\n"));
 
-	if ((_ReadReg(OHCI_CONTROL) & OHCI_HC_FUNCTIONAL_STATE_MASK)
+	uint32 control = _ReadReg(OHCI_CONTROL);
+	if ((control & OHCI_HC_FUNCTIONAL_STATE_MASK)
 		!= OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL) {
-		TRACE_ERROR(("usb_ohci: Controller not started!\n"));
+		TRACE_ERROR(("usb_ohci: Controller not started (0x%08lx)!\n",
+			control));
 		return B_ERROR;
 	} else
 		TRACE(("usb_ohci: Controller is operational!\n"));
@@ -578,7 +555,7 @@ OHCI::AddTo(Stack *stack)
 status_t
 OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
-	TRACE(("usb_ohci::%s(%ud, )\n", __FUNCTION__, index));
+	TRACE(("usb_ohci: get port status %ud\n", index));
 	if (index >= fPortCount)
 		return B_BAD_INDEX;
 
@@ -857,7 +834,7 @@ OHCI::_FinishTransfers()
 			ohci_isochronous_td *isoCurrent = NULL;
 			ohci_isochronous_td *isoTop = NULL;
 			while (doneList != 0) {
-				current = _FindDescriptorInHash(doneList);
+				current = NULL; //_FindDescriptorInHash(doneList);
 				if (current != NULL) {
 					doneList = current->next_physical_descriptor;
 					current->next_done_descriptor = (void *)top;
@@ -865,7 +842,7 @@ OHCI::_FinishTransfers()
 					continue;
 				}
 
-				isoCurrent = _FindIsoDescriptorInHash(doneList);
+				isoCurrent = NULL; //_FindIsoDescriptorInHash(doneList);
 				if (isoCurrent != NULL) {
 					doneList = isoCurrent->next_physical_descriptor;
 					isoCurrent->next_done_descriptor = (void *)isoTop;
@@ -1135,11 +1112,14 @@ OHCI::_AllocateEndpoint()
 		return NULL;
 	}
 
+	endpoint->flags = OHCI_ENDPOINT_SKIP;
 	endpoint->physical_address = (addr_t)physicalAddress;
 	endpoint->head_logical_descriptor = NULL;
 	endpoint->head_physical_descriptor = 0;
 	endpoint->tail_logical_descriptor = NULL;
 	endpoint->tail_physical_descriptor = 0;
+	endpoint->next_logical_endpoint = NULL;
+	endpoint->next_physical_endpoint = 0;
 	return endpoint;
 }
 
@@ -1214,27 +1194,32 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 	endpoint->flags = flags;
 
 	// Add the endpoint to the appropriate list
-	ohci_endpoint_descriptor *head = NULL;
 	uint32 type = pipe->Type();
+	ohci_endpoint_descriptor *head = NULL;
 	if (type & USB_OBJECT_CONTROL_PIPE)
 		head = fDummyControl;
 	else if (type & USB_OBJECT_BULK_PIPE)
 		head = fDummyBulk;
 	else if (type & USB_OBJECT_INTERRUPT_PIPE)
 		head = _FindInterruptEndpoint(pipe->Interval());
-	else if (type & USB_OBJECT_ISO_PIPE) {
-		// Set the isochronous bit format
-		endpoint->flags |= OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
+	else if (type & USB_OBJECT_ISO_PIPE)
 		head = fDummyIsochronous;
-	} else {
+	else
 		TRACE_ERROR(("usb_ohci: unknown pipe type\n"));
+
+	if (head == NULL) {
+		TRACE_ERROR(("usb_ohci: no list found for endpoint\n"));
 		_FreeEndpoint(endpoint);
-		return B_BAD_VALUE;
+		return B_ERROR;
 	}
 
 	// Create (necessary) dummy descriptor
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
+		// Set the isochronous bit format
+		endpoint->flags |= OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
 		// TODO
+		_FreeEndpoint(endpoint);
+		return B_ERROR;
 	} else {
 		ohci_general_td *dummy = _CreateGeneralDescriptor(0);
 		dummy->next_logical_descriptor = NULL;
@@ -1245,15 +1230,23 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 		endpoint->tail_physical_descriptor = dummy->physical_address;
 	}
 
-	// TODO: Change lock lo LockEndpoint()
-	Lock();
+	if (!Lock()) {
+		if (endpoint->head_logical_descriptor) {
+			_FreeGeneralDescriptor(
+				(ohci_general_td *)endpoint->head_logical_descriptor);
+		}
+
+		_FreeEndpoint(endpoint);
+		return B_ERROR;
+	}
+
 	pipe->SetControllerCookie((void *)endpoint);
 	endpoint->next_logical_endpoint = head->next_logical_endpoint;
 	endpoint->next_physical_endpoint = head->next_physical_endpoint;
 	head->next_logical_endpoint = (void *)endpoint;
 	head->next_physical_endpoint = (uint32)endpoint->physical_address;
-	Unlock();
 
+	Unlock();
 	return B_OK;
 }
 
@@ -1419,50 +1412,6 @@ void
 OHCI::_FreeIsochronousDescriptor(ohci_isochronous_td *descriptor)
 {
 	// TODO
-}
-
-
-void
-OHCI::_AddDescriptorToHash(ohci_general_td *descriptor)
-{
-	// TODO
-}
-
-
-void
-OHCI::_RemoveDescriptorFromHash(ohci_general_td *descriptor)
-{
-	// TODO
-}
-
-
-ohci_general_td*
-OHCI::_FindDescriptorInHash(uint32 physicalAddress)
-{
-	// TODO
-	return NULL;
-}
-
-
-void
-OHCI::_AddIsoDescriptorToHash(ohci_isochronous_td *descriptor)
-{
-	// TODO
-}
-
-
-void
-OHCI::_RemoveIsoDescriptorFromHash(ohci_isochronous_td *descriptor)
-{
-	// TODO
-}
-
-
-ohci_isochronous_td*
-OHCI::_FindIsoDescriptorInHash(uint32 physicalAddress)
-{
-	// TODO
-	return NULL;
 }
 
 

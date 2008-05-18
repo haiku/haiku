@@ -3,8 +3,9 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *             Jan-Rixt Van Hoye
- *             Salvatore Benedetto <salvatore.benedetto@gmail.com>
+ *		Jan-Rixt Van Hoye
+ *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
+ *		Michael Lotz <mmlr@mlotz.ch>
  */
 
 #ifndef OHCI_H
@@ -28,49 +29,14 @@ typedef struct transfer_data_s {
 	transfer_data_s				*link;
 } transfer_data;
 
-// --------------------------------------
-//	OHCI:: 	Software isonchronous 
-//			transfer descriptor
-// --------------------------------------
-typedef struct hcd_soft_itransfer
-{
-	ohci_isochronous_td	itd;
-	struct hcd_soft_itransfer			*nextitd; 	// mirrors nexttd in ITD
-	struct hcd_soft_itransfer			*dnext; 	// next in done list
-	addr_t 								physaddr;	// physical address to the host controller isonchronous transfer
-	//LIST_ENTRY(hcd_soft_itransfer) 		hnext;
-	uint16								flags;		// flags
-#ifdef DIAGNOSTIC
-	char 								isdone;		// is the transfer done?
-#endif
-}hcd_soft_itransfer;
 
-#define	OHCI_SITD_SIZE	((sizeof (struct hcd_soft_itransfer) + OHCI_ITD_ALIGN - 1) / OHCI_ITD_ALIGN * OHCI_ITD_ALIGN)
-#define	OHCI_SITD_CHUNK	64
-
-#define	OHCI_NUMBER_OF_ENDPOINTS	(2 * OHCI_NUMBER_OF_INTERRUPTS - 1)
-
-// Note: the controller returns only the physical
-// address of the first processed descriptor of
-// an heterogeneous list (isochronous + generic). Unfortunately
-// we don't have a way to know whether the descriptor is
-// generic or isochronous, either way to translate the address back to
-// kernel address. The physical address is used as the hash value.
-// (Kindly borrowed from *BSD)
-
-#define OHCI_HASH_SIZE 128
-#define HASH(x) (((x) >> 4) % OHCI_HASH_SIZE)
-
-
-class OHCI : public BusManager
-{
+class OHCI : public BusManager {
 public:
-
 									OHCI(pci_info *info, Stack *stack);
 									~OHCI();
 
 		status_t					Start();
-virtual	status_t 					SubmitTransfer(Transfer *transfer);
+virtual	status_t					SubmitTransfer(Transfer *transfer);
 virtual status_t					CancelQueuedTransfers(Pipe *pipe,
 										bool force);
 
@@ -80,8 +46,8 @@ virtual	status_t					NotifyPipeChange(Pipe *pipe,
 static	status_t					AddTo(Stack *stack);
 
 		// Port operations
-		uint8 						PortCount() { return fPortCount; };
-		status_t 					GetPortStatus(uint8 index,
+		uint8						PortCount() { return fPortCount; };
+		status_t					GetPortStatus(uint8 index,
 										usb_port_status *status);
 		status_t					SetPortFeature(uint8 index, uint16 feature);
 		status_t					ClearPortFeature(uint8 index, uint16 feature);
@@ -152,31 +118,15 @@ static	int32						_FinishThread(void *data);
 		void						_FreeIsochronousDescriptor(
 										ohci_isochronous_td *descriptor);
 
-		// Hash tables related methods
-		void						_AddDescriptorToHash(
-										ohci_general_td *descriptor);
-		void						_RemoveDescriptorFromHash(
-										ohci_general_td *descriptor);
-		ohci_general_td				*_FindDescriptorInHash(
-										uint32 physicalAddress);
-
-		void						_AddIsoDescriptorToHash(
-										ohci_isochronous_td *descriptor);
-		void						_RemoveIsoDescriptorFromHash(
-										ohci_isochronous_td *descriptor);
-		ohci_isochronous_td			*_FindIsoDescriptorInHash(
-										uint32 physicalAddress);
-
-
 		// Register functions
 inline	void						_WriteReg(uint32 reg, uint32 value);
 inline	uint32						_ReadReg(uint32 reg);
 
 static	pci_module_info				*sPCIModule;
-		pci_info 					*fPCIInfo;
+		pci_info					*fPCIInfo;
 		Stack						*fStack;
 
-		uint32						*fOperationalRegisters;
+		uint8						*fOperationalRegisters;
 		area_id						fRegisterArea;
 
 		// Host Controller Communication Area related stuff
@@ -196,12 +146,8 @@ static	pci_module_info				*sPCIModule;
 		thread_id					fFinishThread;
 		bool						fStopFinishThread;
 
-		// Hash table
-		ohci_general_td				**fHashGenericTable;
-		ohci_isochronous_td			**fHashIsochronousTable;
-
 		// Root Hub
-		OHCIRootHub 				*fRootHub;
+		OHCIRootHub					*fRootHub;
 		uint8						fRootHubAddress;
 
 		// Port management
@@ -214,7 +160,7 @@ public:
 									OHCIRootHub(Object *rootObject,
 										int8 deviceAddress);
 
-static	status_t	 				ProcessTransfer(OHCI *ohci,
+static	status_t					ProcessTransfer(OHCI *ohci,
 										Transfer *transfer);
 };
 

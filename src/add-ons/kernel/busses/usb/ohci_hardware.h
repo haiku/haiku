@@ -5,6 +5,7 @@
  * Authors:
  *		Jan-Rixt Van Hoye
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
+ *		Michael Lotz <mmlr@mlotz.ch>
  */
 
 #ifndef OHCI_HARDWARE_H
@@ -271,15 +272,14 @@
 
 #define OHCI_NUMBER_OF_INTERRUPTS	32
 
-typedef struct ohci_hcca
-{
+typedef struct {
 	uint32		interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
 	uint32		current_frame_number;
 	uint32		done_head;
 	// The following is 120 instead of 116 because the spec
 	// only specifies 252 bytes
 	uint8		reserved_for_hc[120];
-};
+} ohci_hcca;
 
 #define OHCI_DONE_INTERRUPTS		1
 #define OHCI_HCCA_SIZE				256
@@ -292,20 +292,18 @@ typedef struct ohci_hcca
 //	Endpoint descriptor structure (section 4.2)
 // --------------------------------
 
-typedef struct ohci_endpoint_descriptor
-{
+typedef struct {
 	// Hardware part
 	uint32	flags;						// Flags field
 	uint32	tail_physical_descriptor;	// Queue tail physical pointer
 	uint32	head_physical_descriptor;	// Queue head physical pointer
 	uint32	next_physical_endpoint;		// Physical pointer to the next endpoint
 	// Software part
-	// TODO: What about type, state and interval (only interrupts) ?
 	addr_t	physical_address;			// Physical pointer to this address
 	void	*tail_logical_descriptor;	// Queue tail logical pointer
 	void	*head_logical_descriptor;	// Queue head logical pointer
 	void	*next_logical_endpoint;		// Logical pointer to the next endpoint
-};
+} ohci_endpoint_descriptor;
 
 #define	OHCI_ENDPOINT_ADDRESS_MASK				0x0000007f
 #define	OHCI_ENDPOINT_GET_DEVICE_ADDRESS(s)		((s) & 0x7f)
@@ -333,8 +331,7 @@ typedef struct ohci_endpoint_descriptor
 //	General transfer descriptor structure (section 4.3.1)
 // --------------------------------
 
-typedef struct ohci_general_td
-{
+typedef struct {
 	// Hardware part 16 bytes
 	uint32	flags;						// Flags field
 	uint32	buffer_physical;			// Physical buffer pointer
@@ -348,7 +345,7 @@ typedef struct ohci_general_td
 	size_t	buffer_size;				// Size of the buffer
 	void	*transfer;					// Pointer to the transfer_data
 	bool	is_last;					// Last descriptor of the transfer
-};
+} ohci_general_td;
 
 #define	OHCI_BUFFER_ROUNDING			0x00040000
 #define	OHCI_TD_DIRECTION_PID_MASK		0x00180000
@@ -374,8 +371,7 @@ typedef struct ohci_general_td
 // --------------------------------
 
 #define OHCI_ITD_NOFFSET 8
-typedef struct ohci_isochronous_td
-{
+typedef struct {
 	// Hardware part 32 byte
 	uint32		flags;
 	uint32		buffer_page_byte_0;			// Physical page number of byte 0
@@ -386,7 +382,7 @@ typedef struct ohci_isochronous_td
 	addr_t		physical_address;			// Physical address of this descriptor
 	void		*next_logical_descriptor;	// Logical pointer next descriptor
 	void		*next_done_descriptor;		// Used for collision in the hash table
-};
+} ohci_isochronous_td;
 
 #define	OHCI_ITD_GET_STARTING_FRAME(x)			((x) & 0x0000ffff)
 #define	OHCI_ITD_SET_STARTING_FRAME(x)			((x) & 0xffff)
