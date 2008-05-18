@@ -145,6 +145,11 @@ send_syslog_message(syslog_context *context, int priority, const char *text,
 
 	int length = vsnprintf(message.message, sizeof(buffer)
 		- sizeof(syslog_message), text, args);
+	if (message.message + length - buffer < (int32)sizeof(buffer)) {
+		if (length == 0 || message.message[length - 1] != '\n')
+			message.message[length++] = '\n';
+	} else
+		buffer[length - 1] = '\n';
 
 	status_t status;
 	do {
