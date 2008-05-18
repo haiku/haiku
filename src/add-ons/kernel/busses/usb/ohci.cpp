@@ -555,9 +555,10 @@ OHCI::AddTo(Stack *stack)
 status_t
 OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 {
-	TRACE(("usb_ohci: get port status %ud\n", index));
-	if (index >= fPortCount)
+	if (index >= fPortCount) {
+		TRACE_ERROR(("usb_ohci: get port status for invalid port %u\n", index));
 		return B_BAD_INDEX;
+	}
 
 	status->status = status->change = 0;
 	uint32 portStatus = _ReadReg(OHCI_RH_PORT_STATUS(index));
@@ -567,16 +568,16 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 		status->status |= PORT_STATUS_CONNECTION;
 	if (portStatus & OHCI_RH_PORTSTATUS_PES)
 		status->status |= PORT_STATUS_ENABLE;
-	if (portStatus & OHCI_RH_PORTSTATUS_PRS)
-		status->status |= PORT_STATUS_RESET;
-	if (portStatus & OHCI_RH_PORTSTATUS_LSDA)
-		status->status |= PORT_STATUS_LOW_SPEED;
 	if (portStatus & OHCI_RH_PORTSTATUS_PSS)
 		status->status |= PORT_STATUS_SUSPEND;
 	if (portStatus & OHCI_RH_PORTSTATUS_POCI)
 		status->status |= PORT_STATUS_OVER_CURRENT;
+	if (portStatus & OHCI_RH_PORTSTATUS_PRS)
+		status->status |= PORT_STATUS_RESET;
 	if (portStatus & OHCI_RH_PORTSTATUS_PPS)
 		status->status |= PORT_STATUS_POWER;
+	if (portStatus & OHCI_RH_PORTSTATUS_LSDA)
+		status->status |= PORT_STATUS_LOW_SPEED;
 
 	// change
 	if (portStatus & OHCI_RH_PORTSTATUS_CSC)
@@ -590,6 +591,8 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 	if (portStatus & OHCI_RH_PORTSTATUS_PRSC)
 		status->change |= PORT_STATUS_RESET;
 
+	TRACE(("usb_ohci: port %u status 0x%04x change 0x%04x\n", index,
+		status->status, status->change));
 	return B_OK;
 }
 
@@ -597,11 +600,19 @@ OHCI::GetPortStatus(uint8 index, usb_port_status *status)
 status_t
 OHCI::SetPortFeature(uint8 index, uint16 feature)
 {
-	TRACE(("usb_ohci: set port feature index %ud feature %ud)\n", index, feature));
+	TRACE(("usb_ohci: set port feature index %u feature %u\n", index, feature));
 	if (index > fPortCount)
 		return B_BAD_INDEX;
 
 	switch (feature) {
+		case PORT_ENABLE:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PES);
+			return B_OK;
+
+		case PORT_SUSPEND:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PSS);
+			return B_OK;
+
 		case PORT_RESET:
 			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PRS);
 			return B_OK;
@@ -618,17 +629,41 @@ OHCI::SetPortFeature(uint8 index, uint16 feature)
 status_t
 OHCI::ClearPortFeature(uint8 index, uint16 feature)
 {
-	TRACE(("usb_ohci: clear port feature index %ud feature %ud\n", index, feature));
+	TRACE(("usb_ohci: clear port feature index %u feature %u\n", index, feature));
 	if (index > fPortCount)
 		return B_BAD_INDEX;
 
 	switch (feature) {
-		case C_PORT_RESET:
-			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_CSC);
+		case PORT_ENABLE:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_CCS);
+			return B_OK;
+
+		case PORT_SUSPEND:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_POCI);
+			return B_OK;
+
+		case PORT_POWER:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_LSDA);
 			return B_OK;
 
 		case C_PORT_CONNECTION:
 			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_CSC);
+			return B_OK;
+
+		case C_PORT_ENABLE:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PESC);
+			return B_OK;
+
+		case C_PORT_SUSPEND:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PSSC);
+			return B_OK;
+
+		case C_PORT_OVER_CURRENT:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_OCIC);
+			return B_OK;
+
+		case C_PORT_RESET:
+			_WriteReg(OHCI_RH_PORT_STATUS(index), OHCI_RH_PORTSTATUS_PRSC);
 			return B_OK;
 	}
 
