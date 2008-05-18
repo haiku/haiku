@@ -1028,7 +1028,7 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 			dev->info.u.h2.io_base_upper32 = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_io_base1_2, 4);
 			dev->info.u.h2.io_limit_upper32 = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_io_limit1_2, 4);
 			dev->info.u.h2.secondary_status = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_secondary_status_2, 2);
-			dev->info.u.h2.bridge_control = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control_2, 1);
+			dev->info.u.h2.bridge_control = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control_2, 2);
 			break;
 		}
 

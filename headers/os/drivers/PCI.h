@@ -107,7 +107,7 @@ typedef struct pci_info {
 			ulong   io_base_upper32;
 			ulong   io_limit_upper32;
 			ushort  secondary_status;
-			uchar   bridge_control;
+			ushort  bridge_control;
 #endif /* __HAIKU_PCI_BUS_MANAGER_TESTING */
 		} h2;			
 	} u;
@@ -242,7 +242,7 @@ struct pci_module_info {
 #define PCI_io_limit0_2                             0x30 /* (4 bytes) */
 #define PCI_io_base1_2                              0x34 /* (4 bytes) */
 #define PCI_io_limit1_2                             0x38 /* (4 bytes) */
-#define PCI_bridge_control_2                        0x3E /* (1 byte) */
+#define PCI_bridge_control_2                        0x3E /* (2 bytes) */
 
 #define PCI_sub_vendor_id_2                         0x40 /* (2 bytes) */
 #define PCI_sub_device_id_2                         0x42 /* (2 bytes) */
