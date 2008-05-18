@@ -425,10 +425,10 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 			}
 
 			// Clear the endpoint
-			current->endpoint->head_logical_descriptor = NULL;
-			current->endpoint->head_physical_descriptor = 0;
-			current->endpoint->tail_logical_descriptor = NULL;
-			current->endpoint->tail_physical_descriptor = 0;
+			current->endpoint->head_logical_descriptor
+				= current->endpoint->tail_logical_descriptor;
+			current->endpoint->head_physical_descriptor
+				= current->endpoint->tail_physical_descriptor;
 
 			if (!force) {
 				// If the transfer is canceled by force, the one causing the
@@ -728,7 +728,7 @@ OHCI::_Interrupt()
 	}
 
 	if (status & OHCI_WRITEBACK_DONE_HEAD) {
-		TRACE(("usb_ohci: transfer descriptor processed\n"));
+		TRACE(("usb_ohci: transfer descriptors processed\n"));
 		// Acknowledge it in the finisher thread, not here.
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
@@ -869,10 +869,9 @@ OHCI::_FinishTransfers()
 			acquire_sem_etc(fFinishTransfersSem, semCount, B_RELATIVE_TIMEOUT, 0);
 
 		uint32 doneList = fHcca->done_head & ~OHCI_DONE_INTERRUPTS;
-		// If done_head is zero, there are not processed descriptors
+		// If done_head is zero, there are no processed descriptors
 		// in the done list and we have been woken up by CancelQueuedTransfers
-		// or CancelQueuedIsochronousTransfers in order to do some clean up
-		// and back to sleep.
+		// or CancelQueuedIsochronousTransfers in order to do some clean up.
 		if (doneList) {
 			// Pull out the done list and reverse its order
 			// for both general and isochronous descriptors
@@ -905,7 +904,7 @@ OHCI::_FinishTransfers()
 			// TODO: Move the acknowledgement in the interrupt handler.
 			// The done_head value can be passed through a shared variable.
 			fHcca->done_head = 0;
-			_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_WRITEBACK_DONE_HEAD);
+			_WriteReg(OHCI_INTERRUPT_STATUS, OHCI_WRITEBACK_DONE_HEAD);
 
 			// Process isochronous list first
 			for (isoCurrent = isoTop; isoCurrent != NULL; isoCurrent
@@ -1112,8 +1111,8 @@ OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 	_LinkDescriptors(last, tail);
 
 	// update the endpoint tail pointer to reflect the change
-	endpoint->tail_physical_descriptor = (uint32)tail->physical_address;
 	endpoint->tail_logical_descriptor = tail;
+	endpoint->tail_physical_descriptor = (uint32)tail->physical_address;
 }
 
 
