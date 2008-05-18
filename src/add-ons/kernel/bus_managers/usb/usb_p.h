@@ -14,7 +14,7 @@
 #include "usbspec_p.h"
 #include <lock.h>
 
-
+//#define TRACE_USB
 #ifdef TRACE_USB
 #define TRACE(x)		dprintf x
 #define TRACE_ERROR(x)	dprintf x
@@ -115,6 +115,7 @@ public:
 
 		void							AddBusManager(BusManager *bus);
 		int32							IndexOfBusManager(BusManager *bus);
+		BusManager						*BusManagerAt(int32 index);
 
 		status_t						AllocateChunk(void **logicalAddress,
 											void **physicalAddress, size_t size);
@@ -497,8 +498,13 @@ virtual	status_t						GetDescriptor(uint8 descriptorType,
 											void *data, size_t dataLength,
 											size_t *actualLength);
 
+		Device							*ChildAt(uint8 index)
+											{ return fChildren[index]; };
+
 		status_t						UpdatePortStatus(uint8 index);
 		status_t						ResetPort(uint8 index);
+		status_t						DisablePort(uint8 index);
+
 		void							Explore(change_item **changeList);
 static	void							InterruptCallback(void *cookie,
 											status_t status, void *data,
@@ -518,9 +524,9 @@ private:
 		InterruptPipe					*fInterruptPipe;
 		usb_hub_descriptor				fHubDescriptor;
 
-		usb_port_status					fInterruptStatus[8];
-		usb_port_status					fPortStatus[8];
-		Device							*fChildren[8];
+		usb_port_status					fInterruptStatus[USB_MAX_PORT_COUNT];
+		usb_port_status					fPortStatus[USB_MAX_PORT_COUNT];
+		Device							*fChildren[USB_MAX_PORT_COUNT];
 };
 
 

@@ -19,7 +19,7 @@ Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 	TRACE(("USB Hub %d: creating hub\n", DeviceAddress()));
 
 	memset(&fHubDescriptor, 0, sizeof(fHubDescriptor));
-	for (int32 i = 0; i < 8; i++)
+	for (int32 i = 0; i < USB_MAX_PORT_COUNT; i++)
 		fChildren[i] = NULL;
 
 	if (!fInitOK) {
@@ -55,9 +55,10 @@ Hub::Hub(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 	TRACE(("\tdevice_removeable:...0x%02x\n", fHubDescriptor.device_removeable));
 	TRACE(("\tpower_control_mask:..0x%02x\n", fHubDescriptor.power_control_mask));
 
-	if (fHubDescriptor.num_ports > 8) {
-		TRACE(("USB Hub %d: hub supports more ports than we do (%d vs. 8)\n", DeviceAddress(), fHubDescriptor.num_ports));
-		fHubDescriptor.num_ports = 8;
+	if (fHubDescriptor.num_ports > USB_MAX_PORT_COUNT) {
+		TRACE_ERROR(("USB Hub %d: hub supports more ports than we do (%d vs. %d)\n",
+			DeviceAddress(), fHubDescriptor.num_ports, USB_MAX_PORT_COUNT));
+		fHubDescriptor.num_ports = USB_MAX_PORT_COUNT;
 	}
 
 	Object *object = GetStack()->GetObject(Configuration()->interface->active->endpoint[0].handle);
@@ -174,6 +175,16 @@ Hub::ResetPort(uint8 index)
 }
 
 
+status_t
+Hub::DisablePort(uint8 index)
+{
+	return DefaultPipe()->SendRequest(USB_REQTYPE_CLASS
+		| USB_REQTYPE_OTHER_OUT, USB_REQUEST_CLEAR_FEATURE, PORT_ENABLE,
+		index + 1, 0, NULL, 0, NULL);
+}
+
+
+
 void
 Hub::Explore(change_item **changeList)
 {
@@ -238,9 +249,7 @@ Hub::Explore(change_item **changeList)
 					// the device failed to setup correctly, disable the port
 					// so that the device doesn't get in the way of future
 					// addressing.
-					DefaultPipe()->SendRequest(USB_REQTYPE_CLASS | USB_REQTYPE_OTHER_OUT,
-						USB_REQUEST_CLEAR_FEATURE, PORT_ENABLE, i + 1,
-						0, NULL, 0, NULL);
+					DisablePort(i);
 				}
 			} else {
 				// Device removed...

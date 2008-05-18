@@ -259,6 +259,13 @@ Stack::IndexOfBusManager(BusManager *busManager)
 }
 
 
+BusManager *
+Stack::BusManagerAt(int32 index)
+{
+	return fBusManagers.ElementAt(index);
+}
+
+
 status_t
 Stack::AllocateChunk(void **logicalAddress, void **physicalAddress, size_t size)
 {

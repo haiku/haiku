@@ -153,7 +153,6 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 					interfaceInfo->generic_count = 0;
 					interfaceInfo->generic = NULL;
 
-					// TODO: Remove all Interface class related code.
 					Interface *interface = new(std::nothrow) Interface(this,
 						interfaceDescriptor->interface_number);
 					interfaceInfo->handle = interface->USBID();
