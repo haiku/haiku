@@ -101,6 +101,7 @@ class PCI {
 		void ReadPciBasicInfo(PCIDev *dev);
 		void ReadPciHeaderInfo(PCIDev *dev);
 
+		void ConfigureBridges(PCIBus *bus);
 		void RefreshDeviceInfo(PCIBus *bus);
 
 		uint32 BarSize(uint32 bits, uint32 mask);

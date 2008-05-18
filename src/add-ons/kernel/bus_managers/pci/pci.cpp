@@ -360,8 +360,9 @@ PCI::InitBus()
 	
 	if (fRootBus) {
 		DiscoverBus(fRootBus);
-		RefreshDeviceInfo(fRootBus);
+		ConfigureBridges(fRootBus);
 		ClearDeviceStatus(fRootBus, false);
+		RefreshDeviceInfo(fRootBus);
 	}
 }
 
@@ -661,6 +662,33 @@ PCI::FixupDevices(int domain, uint8 bus)
 
 
 void
+PCI::ConfigureBridges(PCIBus *bus)
+{
+	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
+		if (dev->info.class_base == PCI_bridge && dev->info.class_sub == PCI_pci) {
+			uint16 bridgeControlOld = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);
+			uint16 bridgeControlNew = bridgeControlOld;
+			// Enable: Parity Error Response, SERR, Master Abort Mode, Discard Timer SERR
+			// Clear: Discard Timer Status
+			bridgeControlNew |= (1 << 0) | (1 << 1) | (1 << 5) | (1 << 10) | (1 << 11);
+			// Set discard timer to 2^15 PCI clocks
+			bridgeControlNew &= ~((1 << 8) | (1 << 9));
+			WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control, 2, bridgeControlNew);
+			bridgeControlNew = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);
+			dprintf("PCI: dom %u, bus %u, dev %2u, func %u, changed PCI bridge control from 0x%04x to 0x%04x\n",
+				dev->domain, dev->bus, dev->dev, dev->func, bridgeControlOld, bridgeControlNew);
+		}
+
+		if (dev->child)
+			ConfigureBridges(dev->child);
+	}
+	
+	if (bus->next)
+		ConfigureBridges(bus->next);
+}
+
+
+void
 PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 {
 	if (!bus) {
@@ -670,9 +698,11 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 	}
 
 	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
-		uint16 status = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_status, 2);
-		if (dumpStatus) {
 
+		// Clear and dump PCI device status
+		uint16 status = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_status, 2);
+		WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_status, 2, status);
+		if (dumpStatus) {
 			kprintf("domain %u, bus %u, dev %2u, func %u, PCI device status 0x%04x\n",
 				dev->domain, dev->bus, dev->dev, dev->func, status);
 			if (status & (1 << 15))
@@ -688,7 +718,38 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 			if (status & (1 << 8))
 				kprintf("  Master Data Parity Error\n");
 		}
-		WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_status, 2, status);
+
+		if (dev->info.class_base == PCI_bridge && dev->info.class_sub == PCI_pci) {
+	
+			// Clear and dump PCI bridge secondary status
+			uint16 secondaryStatus = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_secondary_status, 2);
+			WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_secondary_status, 2, secondaryStatus);
+			if (dumpStatus) {
+				kprintf("PCI bridge secondary status 0x%04x\n", secondaryStatus);
+				if (secondaryStatus & (1 << 15))
+					kprintf("  Detected Parity Error\n");
+				if (secondaryStatus & (1 << 14))
+					kprintf("  Received System Error\n");
+				if (secondaryStatus & (1 << 13))
+					kprintf("  Received Master-Abort\n");
+				if (secondaryStatus & (1 << 12))
+					kprintf("  Received Target-Abort\n");
+				if (secondaryStatus & (1 << 11))
+					kprintf("  Signalled Target-Abort\n");
+				if (secondaryStatus & (1 << 8))
+					kprintf("  Data Parity Reported\n");
+			}
+
+			// Clear and dump the discard-timer error bit located in bridge-control register
+			uint16 bridgeControl = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);
+			WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control, 2, bridgeControl);
+			if (dumpStatus) {
+				kprintf("PCI bridge control 0x%04x\n", bridgeControl);
+				if (bridgeControl & (1 << 10)) {
+					kprintf("  bridge-control: Discard Timer Error\n");
+				}
+			}
+		}
 
 		if (dev->child)
 			ClearDeviceStatus(dev->child, dumpStatus);
