@@ -650,6 +650,7 @@ OHCI::_Interrupt()
 	acquire_spinlock(&lock);
 
 	uint32 status = 0;
+	uint32 acknowledge = 0;
 	bool finishTransfers = false;
 	int32 result = B_HANDLED_INTERRUPT;
 
@@ -679,20 +680,20 @@ OHCI::_Interrupt()
 	}
 
 	if (status & OHCI_SCHEDULING_OVERRUN) {
-		// TODO
 		TRACE(("usb_ohci: scheduling overrun occured\n"));
+		acknowledge |= OHCI_SCHEDULING_OVERRUN;
 	}
 
 	if (status & OHCI_WRITEBACK_DONE_HEAD) {
 		TRACE(("usb_ohci: transfer descriptor processed\n"));
-		// Ack it in the finisher thread, not here.
+		// Acknowledge it in the finisher thread, not here.
 		result = B_INVOKE_SCHEDULER;
 		finishTransfers = true;
 	}
 
 	if (status & OHCI_RESUME_DETECTED) {
-		// TODO
 		TRACE(("usb_ohci: resume detected\n"));
+		acknowledge |= OHCI_RESUME_DETECTED;
 	}
 
 	if (status & OHCI_UNRECOVERABLE_ERROR) {
@@ -703,9 +704,12 @@ OHCI::_Interrupt()
 	}
 
 	if (status & OHCI_ROOT_HUB_STATUS_CHANGE) {
-		// TODO
 		TRACE(("usb_ohci: root hub status change\n"));
+		acknowledge |= OHCI_ROOT_HUB_STATUS_CHANGE;
 	}
+
+	if (acknowledge != 0)
+		_WriteReg(OHCI_INTERRUPT_STATUS, acknowledge);
 
 	release_spinlock(&lock);
 
