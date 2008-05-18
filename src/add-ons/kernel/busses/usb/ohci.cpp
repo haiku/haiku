@@ -732,10 +732,9 @@ OHCI::_Interrupt()
 	}
 
 	if (status & OHCI_UNRECOVERABLE_ERROR) {
-		TRACE(("usb_ohci: unrecoverable error. Controller halted\n"));
+		TRACE_ERROR(("usb_ohci: unrecoverable error - controller halted\n"));
 		_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
-		// TODO: what else?
-		// Perhaps, clean up all the memory.
+		// TODO: clear all pending transfers, reset and resetup the controller
 	}
 
 	if (status & OHCI_ROOT_HUB_STATUS_CHANGE) {
@@ -756,8 +755,9 @@ OHCI::_Interrupt()
 
 
 status_t
-OHCI::_AddPendingTransfer(Transfer *transfer, ohci_endpoint_descriptor *endpoint,
-	ohci_general_td *firstDescriptor, ohci_general_td *dataDescriptor, bool directionIn)
+OHCI::_AddPendingTransfer(Transfer *transfer,
+	ohci_endpoint_descriptor *endpoint, ohci_general_td *firstDescriptor,
+	ohci_general_td *dataDescriptor, bool directionIn)
 {
 	if (!transfer || !endpoint || !firstDescriptor)
 		return B_BAD_VALUE;
@@ -1000,7 +1000,7 @@ OHCI::_SubmitControlTransfer(Transfer *transfer)
 		return B_NO_MEMORY;
 	}
 
-	setupDescriptor->flags |= OHCI_TD_DIRECTION_PID_SETUP
+	setupDescriptor->flags = OHCI_TD_DIRECTION_PID_SETUP
 		| OHCI_TD_NO_CONDITION_CODE
 		| OHCI_TD_TOGGLE_0
 		| OHCI_TD_SET_DELAY_INTERRUPT(7);
@@ -1013,7 +1013,7 @@ OHCI::_SubmitControlTransfer(Transfer *transfer)
 	}
 
 	statusDescriptor->flags
-		|= (directionIn ? OHCI_TD_DIRECTION_PID_OUT : OHCI_TD_DIRECTION_PID_IN)
+		= (directionIn ? OHCI_TD_DIRECTION_PID_OUT : OHCI_TD_DIRECTION_PID_IN)
 		| OHCI_TD_NO_CONDITION_CODE
 		| OHCI_TD_TOGGLE_1
 		| OHCI_TD_SET_DELAY_INTERRUPT(0);
@@ -1028,7 +1028,7 @@ OHCI::_SubmitControlTransfer(Transfer *transfer)
 	if (transfer->VectorCount() > 0) {
 		ohci_general_td *lastDescriptor = NULL;
 		result = _CreateDescriptorChain(&dataDescriptor, &lastDescriptor,
-			directionIn ? OHCI_TD_DIRECTION_PID_OUT : OHCI_TD_DIRECTION_PID_IN,
+			directionIn ? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
 			transfer->VectorLength());
 		if (result < B_OK) {
 			_FreeGeneralDescriptor(setupDescriptor);
@@ -1059,13 +1059,7 @@ OHCI::_SubmitControlTransfer(Transfer *transfer)
 	}
 
 	// Append descriptor chain to the endpoint
-	result = _AppendDescriptorChainToEndpoint(endpoint, setupDescriptor,
-		statusDescriptor);
-	if (result < B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to append descriptor chain to endpoint\n"));
-		// TODO: Remove transfer_data from list
-		_FreeDescriptorChain(setupDescriptor);
-	}
+	_SwitchEndpointTail(endpoint, setupDescriptor, statusDescriptor);
 
 	// Tell the controller to process the control list
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_CONTROL_LIST_FILLED);
@@ -1088,36 +1082,30 @@ OHCI::_SubmitPeriodicTransfer(Transfer *transfer)
 }
 
 
-status_t
-OHCI::_AppendDescriptorChainToEndpoint(ohci_endpoint_descriptor *endpoint,
+void
+OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 	ohci_general_td *first, ohci_general_td *last)
 {
-	endpoint->flags |= OHCI_ENDPOINT_SKIP;
-	snooze(1000);
-
-	// TODO: Lock on endpoint
-	ohci_general_td *head = (ohci_general_td *)endpoint->head_logical_descriptor;
+	// fill in the information of the first descriptor into the current tail
 	ohci_general_td *tail = (ohci_general_td *)endpoint->tail_logical_descriptor;
-	if (head != tail) {
-		// Find the last real descriptor
-		ohci_general_td *current = head;
-		while (current->next_logical_descriptor != tail)
-			current = (ohci_general_td *)current->next_logical_descriptor;
-		// Append to current
-		current->next_logical_descriptor = first;
-		current->next_physical_descriptor = first->physical_address;
-	} else {
-		// Endpoint has only the dummy descriptor
-		endpoint->head_logical_descriptor = first;
-		endpoint->head_physical_descriptor = first->physical_address;
-	}
+	tail->flags = first->flags;
+	tail->buffer_physical = first->buffer_physical;
+	tail->next_physical_descriptor = first->next_physical_descriptor;
+	tail->last_physical_byte_address = first->last_physical_byte_address;
+	tail->buffer_size = first->buffer_size;
+	tail->buffer_logical = first->buffer_logical;
+	tail->next_logical_descriptor = first->next_logical_descriptor;
 
-	// Make the last descriptor point to the dummy
-	last->next_logical_descriptor = tail;
-	last->next_physical_descriptor = tail->physical_address;
+	// the first descriptor becomes the new tail
+	tail = first;
+	tail->buffer_size = 0;
+	tail->buffer_logical = NULL;
+	tail->next_logical_descriptor = NULL;
+	_LinkDescriptors(last, tail);
 
-	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
-	return B_OK;
+	// update the endpoint tail pointer to reflect the change
+	endpoint->tail_physical_descriptor = (uint32)tail->physical_address;
+	endpoint->tail_logical_descriptor = tail;
 }
 
 
@@ -1260,13 +1248,11 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 		_FreeEndpoint(endpoint);
 		return B_ERROR;
 	} else {
-		ohci_general_td *dummy = _CreateGeneralDescriptor(0);
-		dummy->next_logical_descriptor = NULL;
-		dummy->next_physical_descriptor = 0;
-		endpoint->head_logical_descriptor = dummy;
-		endpoint->tail_logical_descriptor = dummy;
-		endpoint->head_physical_descriptor = dummy->physical_address;
-		endpoint->tail_physical_descriptor = dummy->physical_address;
+		ohci_general_td *tail = _CreateGeneralDescriptor(0);
+		endpoint->head_logical_descriptor = tail;
+		endpoint->tail_logical_descriptor = tail;
+		endpoint->head_physical_descriptor = tail->physical_address;
+		endpoint->tail_physical_descriptor = tail->physical_address;
 	}
 
 	if (!Lock()) {
@@ -1317,6 +1303,9 @@ OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 	}
 
 	descriptor->physical_address = (addr_t)physicalAddress;
+	descriptor->next_physical_descriptor = 0;
+	descriptor->next_logical_descriptor = NULL;
+	descriptor->buffer_size = bufferSize;
 	if (bufferSize == 0) {
 		descriptor->buffer_physical = 0;
 		descriptor->buffer_logical = NULL;
@@ -1331,9 +1320,9 @@ OHCI::_CreateGeneralDescriptor(size_t bufferSize)
 			sizeof(ohci_general_td));
 		return NULL;
 	}
+
 	descriptor->last_physical_byte_address
 		= descriptor->buffer_physical + bufferSize - 1;
-
 	return descriptor;
 }
 

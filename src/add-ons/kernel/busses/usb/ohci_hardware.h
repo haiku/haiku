@@ -339,10 +339,10 @@ typedef struct {
 	uint32	last_physical_byte_address;	// Physical pointer to buffer end
 	// Software part
 	addr_t	physical_address;			// Physical address of this descriptor
+	size_t	buffer_size;				// Size of the buffer
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
 	void	*next_done_descriptor;		// Used for the done descriptor list
-	size_t	buffer_size;				// Size of the buffer
 	void	*transfer;					// Pointer to the transfer_data
 	bool	is_last;					// Last descriptor of the transfer
 } ohci_general_td;

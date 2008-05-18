@@ -77,12 +77,12 @@ static	int32						_FinishThread(void *data);
 		status_t					_SubmitBulkTransfer(Transfer *transfer);
 		status_t					_SubmitPeriodicTransfer(Transfer *transfer);
 
-		status_t					_AppendDescriptorChainToEndpoint(
+		void						_SwitchEndpointTail(
 										ohci_endpoint_descriptor *endpoint,
 										ohci_general_td *first,
 										ohci_general_td *last);
 		void						_RemoveTransferFromEndpoint(
-										transfer_data *);
+										transfer_data *transfer);
 
 		// Endpoint related methods
 		ohci_endpoint_descriptor	*_AllocateEndpoint();
