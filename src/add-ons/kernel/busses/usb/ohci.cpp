@@ -89,6 +89,11 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	TRACE(("usb_ohci: constructing new OHCI Host Controller Driver\n"));
 	fInitOK = false;
 
+	if (benaphore_init(&fEndpointLock, "ohci endpoint lock") < B_OK) {
+		TRACE_ERROR(("usb_ohci: failed to create endpoint lock\n"));
+		return;
+	}
+
 	// enable busmaster and memory mapped access
 	uint16 command = sPCIModule->read_pci_config(fPCIInfo->bus,
 		fPCIInfo->device, fPCIInfo->function, PCI_command, 2);
@@ -313,6 +318,9 @@ OHCI::~OHCI()
 	fStopFinishThread = true;
 	delete_sem(fFinishTransfersSem);
 	wait_for_thread(fFinishThread, &result);
+
+	_LockEndpoints();
+	benaphore_destroy(&fEndpointLock);
 
 	if (fHccaArea >= B_OK)
 		delete_area(fHccaArea);
@@ -1255,7 +1263,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 		endpoint->tail_physical_descriptor = tail->physical_address;
 	}
 
-	if (!Lock()) {
+	if (!_LockEndpoints()) {
 		if (endpoint->head_logical_descriptor) {
 			_FreeGeneralDescriptor(
 				(ohci_general_td *)endpoint->head_logical_descriptor);
@@ -1271,7 +1279,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 	head->next_logical_endpoint = (void *)endpoint;
 	head->next_physical_endpoint = (uint32)endpoint->physical_address;
 
-	Unlock();
+	_UnlockEndpoints();
 	return B_OK;
 }
 
@@ -1440,6 +1448,20 @@ void
 OHCI::_FreeIsochronousDescriptor(ohci_isochronous_td *descriptor)
 {
 	// TODO
+}
+
+
+bool
+OHCI::_LockEndpoints()
+{
+	return (benaphore_lock(&fEndpointLock) == B_OK);
+}
+
+
+void
+OHCI::_UnlockEndpoints()
+{
+	benaphore_unlock(&fEndpointLock);
 }
 
 

@@ -118,6 +118,10 @@ static	int32						_FinishThread(void *data);
 		void						_FreeIsochronousDescriptor(
 										ohci_isochronous_td *descriptor);
 
+		// Private locking
+		bool						_LockEndpoints();
+		void						_UnlockEndpoints();
+
 		// Register functions
 inline	void						_WriteReg(uint32 reg, uint32 value);
 inline	uint32						_ReadReg(uint32 reg);
@@ -134,7 +138,8 @@ static	pci_module_info				*sPCIModule;
 		ohci_hcca					*fHcca;
 		ohci_endpoint_descriptor	**fInterruptEndpoints;
 
-		// Dummy endpoints
+		// Endpoint management
+		benaphore					fEndpointLock;
 		ohci_endpoint_descriptor	*fDummyControl;
 		ohci_endpoint_descriptor	*fDummyBulk;
 		ohci_endpoint_descriptor	*fDummyIsochronous;
