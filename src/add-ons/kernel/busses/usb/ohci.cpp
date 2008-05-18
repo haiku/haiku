@@ -7,7 +7,7 @@
  *		Salvatore Benedetto <salvatore.benedetto@gmail.com>
  *		Michael Lotz <mmlr@mlotz.ch>
  */
-#define TRACE_USB
+
 #include <module.h>
 #include <PCI.h>
 #include <USB3.h>
@@ -48,15 +48,6 @@ usb_host_controller_info ohci_module = {
 module_info *modules[] = {
 	(module_info *)&ohci_module,
 	NULL
-};
-
-
-// Reverse the bits in a value between 0 and 31 (Section 3.3.2)
-static uint8 revbits[OHCI_NUMBER_OF_INTERRUPTS] = {
-	0x00, 0x10, 0x08, 0x18, 0x04, 0x14, 0x0c, 0x1c,
-	0x02, 0x12, 0x0a, 0x1a, 0x06, 0x16, 0x0e, 0x1e,
-	0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d,
-	0x03, 0x13, 0x0b, 0x1b, 0x07, 0x17, 0x0f, 0x1f
 };
 
 
@@ -162,21 +153,19 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 	// Static endpoints that get linked in the HCCA
 	fInterruptEndpoints = new(std::nothrow)
-		ohci_endpoint_descriptor *[OHCI_NUMBER_OF_INTERRUPTS];
+		ohci_endpoint_descriptor *[OHCI_STATIC_ENDPOINT_COUNT];
 	if (!fInterruptEndpoints) {
-		TRACE_ERROR(("ohci_usb: cannot allocate memory for"
-			" fInterruptEndpoints array\n"));
+		TRACE_ERROR(("ohci_usb: failed to allocate memory for interrupt endpoints\n"));
 		_FreeEndpoint(fDummyControl);
 		_FreeEndpoint(fDummyBulk);
 		_FreeEndpoint(fDummyIsochronous);
 		return;
 	}
 
-	for (int32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++) {
+	for (int32 i = 0; i < OHCI_STATIC_ENDPOINT_COUNT; i++) {
 		fInterruptEndpoints[i] = _AllocateEndpoint();
 		if (!fInterruptEndpoints[i]) {
-			TRACE_ERROR(("ohci_usb: cannot allocate memory for"
-				" fInterruptEndpoints[%ld] endpoint\n", i));
+			TRACE_ERROR(("ohci_usb: failed to allocate interrupt endpoint %ld", i));
 			while (--i >= 0)
 				_FreeEndpoint(fInterruptEndpoints[i]);
 			_FreeEndpoint(fDummyBulk);
@@ -184,15 +173,36 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 			_FreeEndpoint(fDummyIsochronous);
 			return;
 		}
-
-		// Make them point all to the dummy isochronous endpoint
-		fInterruptEndpoints[i]->next_physical_endpoint
-			= fDummyIsochronous->physical_address;
 	}
 
-	// Fill HCCA interrupt table.
-	for (uint32 i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++)
-		fHcca->interrupt_table[i] = fInterruptEndpoints[i]->physical_address;
+	// build flat tree so that at each of the static interrupt endpoints
+	// fInterruptEndpoints[i] == interrupt endpoint for interval 2^i
+	uint32 interval = OHCI_BIGGEST_INTERVAL;
+	uint32 intervalIndex = OHCI_STATIC_ENDPOINT_COUNT - 1;
+	while (interval > 1) {
+		uint32 insertIndex = interval / 2;
+		while (insertIndex < OHCI_BIGGEST_INTERVAL) {
+			fHcca->interrupt_table[insertIndex]
+				= fInterruptEndpoints[intervalIndex]->physical_address;
+			insertIndex += interval;
+		}
+
+		intervalIndex--;
+		interval /= 2;
+	}
+
+	// setup the empty slot in the list and linking of all -> first
+	fHcca->interrupt_table[0] = fInterruptEndpoints[0]->physical_address;
+	for (int32 i = 1; i < OHCI_STATIC_ENDPOINT_COUNT; i++) {
+		fInterruptEndpoints[i]->next_physical_endpoint
+			= fInterruptEndpoints[0]->physical_address;
+		fInterruptEndpoints[i]->next_logical_endpoint
+			= fInterruptEndpoints[0];
+	}
+
+	// Now link the first endpoint to the isochronous endpoint
+	fInterruptEndpoints[0]->next_physical_endpoint
+		= fDummyIsochronous->physical_address;
 
 	// Determine in what context we are running (Kindly copied from FreeBSD)
 	uint32 control = _ReadReg(OHCI_CONTROL);
@@ -288,7 +298,10 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		uint32 descriptor = _ReadReg(OHCI_RH_DESCRIPTOR_A);
 		numberOfPorts = OHCI_RH_GET_PORT_COUNT(descriptor);
 	}
+	if (numberOfPorts > OHCI_MAX_PORT_COUNT)
+		numberOfPorts = OHCI_MAX_PORT_COUNT;
 	fPortCount = numberOfPorts;
+	TRACE(("usb_ohci: port count is %d\n", fPortCount));
 
 	// Create semaphore the finisher thread will wait for
 	fFinishTransfersSem = create_sem(0, "OHCI Finish Transfers");
@@ -332,7 +345,7 @@ OHCI::~OHCI()
 	_FreeEndpoint(fDummyIsochronous);
 
 	if (fInterruptEndpoints != NULL) {
-		for (int i = 0; i < OHCI_NUMBER_OF_INTERRUPTS; i++)
+		for (int i = 0; i < OHCI_STATIC_ENDPOINT_COUNT; i++)
 			_FreeEndpoint(fInterruptEndpoints[i]);
 	}
 
@@ -389,7 +402,8 @@ OHCI::SubmitTransfer(Transfer *transfer)
 	}
 
 	if ((type & USB_OBJECT_BULK_PIPE) || (type & USB_OBJECT_INTERRUPT_PIPE)) {
-		TRACE(("usb_ohci: submitting bulk/interrupt transfer\n"));
+		TRACE(("usb_ohci: submitting %s transfer\n",
+			(type & USB_OBJECT_BULK_PIPE) ? "bulk" : "interrupt"));
 		return _SubmitTransfer(transfer);
 	}
 
@@ -457,25 +471,19 @@ OHCI::NotifyPipeChange(Pipe *pipe, usb_change change)
 	}
 
 	switch (change) {
-		case USB_CHANGE_CREATED: {
-			TRACE(("usb_ohci: inserting endpoint\n"));
+		case USB_CHANGE_CREATED:
 			return _InsertEndpointForPipe(pipe);
-		}
 
-		case USB_CHANGE_DESTROYED: {
-			TRACE(("usb_ohci: removing endpoint\n"));
+		case USB_CHANGE_DESTROYED:
 			return _RemoveEndpointForPipe(pipe);
-		}
 
-		case USB_CHANGE_PIPE_POLICY_CHANGED: {
+		case USB_CHANGE_PIPE_POLICY_CHANGED:
 			TRACE(("usb_ohci: pipe policy changing unhandled!\n"));
 			break;
-		}
 
-		default: {
+		default:
 			TRACE_ERROR(("usb_ohci: unknown pipe change!\n"));
 			return B_ERROR;
-		}
 	}
 
 	return B_OK;
@@ -1369,14 +1377,34 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 status_t
 OHCI::_RemoveEndpointForPipe(Pipe *pipe)
 {
-	return B_ERROR;
+	TRACE(("usb_ohci: removing endpoint for device %u endpoint %u\n",
+		pipe->DeviceAddress(), pipe->EndpointAddress()));
+
+	ohci_endpoint_descriptor *endpoint
+		= (ohci_endpoint_descriptor *)pipe->ControllerCookie();
+	if (endpoint == NULL)
+		return B_OK;
+
+	// TODO implement properly, but at least disable it for now
+	endpoint->flags |= OHCI_ENDPOINT_SKIP;
+	return B_OK;
 }
 
 
 ohci_endpoint_descriptor *
 OHCI::_FindInterruptEndpoint(uint8 interval)
 {
-	return NULL;
+	uint32 index = 0;
+	uint32 power = 1;
+	while (power <= OHCI_BIGGEST_INTERVAL / 2) {
+		if (power * 2 > interval)
+			break;
+
+		power *= 2;
+		index++;
+	}
+
+	return fInterruptEndpoints[index];
 }
 
 
@@ -1454,6 +1482,7 @@ OHCI::_CreateDescriptorChain(ohci_general_td **_firstDescriptor,
 		}
 
 		descriptor->flags = direction
+			| OHCI_TD_BUFFER_ROUNDING
 			| OHCI_TD_SET_CONDITION_CODE(OHCI_TD_CONDITION_NOT_ACCESSED)
 			| OHCI_TD_TOGGLE_CARRY
 			| OHCI_TD_SET_DELAY_INTERRUPT(OHCI_TD_INTERRUPT_NONE);

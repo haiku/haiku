@@ -271,6 +271,8 @@
 // --------------------------------
 
 #define OHCI_NUMBER_OF_INTERRUPTS	32
+#define OHCI_STATIC_ENDPOINT_COUNT	6
+#define OHCI_BIGGEST_INTERVAL		32
 
 typedef struct {
 	uint32		interrupt_table[OHCI_NUMBER_OF_INTERRUPTS];
@@ -343,7 +345,7 @@ typedef struct {
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
 } ohci_general_td;
 
-#define	OHCI_BUFFER_ROUNDING			0x00040000
+#define	OHCI_TD_BUFFER_ROUNDING			0x00040000
 #define	OHCI_TD_DIRECTION_PID_MASK		0x00180000
 #define	OHCI_TD_DIRECTION_PID_SETUP		0x00000000
 #define	OHCI_TD_DIRECTION_PID_OUT		0x00080000
@@ -441,5 +443,8 @@ typedef struct {
 
 #define	OHCI_ENABLE_POWER_DELAY			5000
 #define	OHCI_READ_DESC_DELAY			5000
+
+// Maximum port count set by OHCI
+#define OHCI_MAX_PORT_COUNT				15
 
 #endif // OHCI_HARDWARE_H
