@@ -724,8 +724,9 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 			// Clear and dump PCI bridge secondary status
 			uint16 secondaryStatus = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_secondary_status, 2);
 			WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_secondary_status, 2, secondaryStatus);
-			if (dumpStatus) {
-				kprintf("PCI bridge secondary status 0x%04x\n", secondaryStatus);
+			if (dumpStatus) {				
+				kprintf("domain %u, bus %u, dev %2u, func %u, PCI bridge secondary status 0x%04x\n", 
+					dev->domain, dev->bus, dev->dev, dev->func, secondaryStatus);
 				if (secondaryStatus & (1 << 15))
 					kprintf("  Detected Parity Error\n");
 				if (secondaryStatus & (1 << 14))
@@ -744,7 +745,8 @@ PCI::ClearDeviceStatus(PCIBus *bus, bool dumpStatus)
 			uint16 bridgeControl = ReadPciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control, 2);
 			WritePciConfig(dev->domain, dev->bus, dev->dev, dev->func, PCI_bridge_control, 2, bridgeControl);
 			if (dumpStatus) {
-				kprintf("PCI bridge control 0x%04x\n", bridgeControl);
+				kprintf("domain %u, bus %u, dev %2u, func %u, PCI bridge control 0x%04x\n", 
+					dev->domain, dev->bus, dev->dev, dev->func, bridgeControl);
 				if (bridgeControl & (1 << 10)) {
 					kprintf("  bridge-control: Discard Timer Error\n");
 				}
