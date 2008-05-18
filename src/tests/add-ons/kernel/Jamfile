@@ -10,12 +10,12 @@ SharedLibrary libkernelland_emu.so :
 	khash.c
 	list.c
 
-	: be stdc++.r4 ;
+	: be $(TARGET_LIBSTDC++) ;
 
 AbsSymLink <boot!home!config!lib>libkernelland_emu.so : libkernelland_emu.so
 	: /boot/home/config/lib : false ;
 
-SEARCH on [ FGristFiles 
+SEARCH on [ FGristFiles
 		strlcpy.c
 	] = [ FDirName $(HAIKU_TOP) src system libroot posix string ] ;
 
