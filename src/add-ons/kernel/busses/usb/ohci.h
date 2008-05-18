@@ -64,6 +64,7 @@ static	int32						_InterruptHandler(void *data);
 		// Transfer functions
 		status_t					_AddPendingTransfer(Transfer *transfer,
 										ohci_endpoint_descriptor *endpoint,
+										ohci_general_td *firstDescriptor,
 										ohci_general_td *dataDescriptor,
 										ohci_general_td *lastDescriptor,
 										bool directionIn);

@@ -763,8 +763,9 @@ OHCI::_Interrupt()
 
 status_t
 OHCI::_AddPendingTransfer(Transfer *transfer,
-	ohci_endpoint_descriptor *endpoint, ohci_general_td *dataDescriptor,
-	ohci_general_td *lastDescriptor, bool directionIn)
+	ohci_endpoint_descriptor *endpoint, ohci_general_td *firstDescriptor,
+	ohci_general_td *dataDescriptor, ohci_general_td *lastDescriptor,
+	bool directionIn)
 {
 	if (!transfer || !endpoint || !lastDescriptor)
 		return B_BAD_VALUE;
@@ -781,13 +782,24 @@ OHCI::_AddPendingTransfer(Transfer *transfer,
 
 	data->transfer = transfer;
 	data->endpoint = endpoint;
-	// the current tail will become the fist descriptor
-	data->first_descriptor = (ohci_general_td *)endpoint->tail_logical_descriptor;
-	data->data_descriptor = dataDescriptor;
-	data->last_descriptor = lastDescriptor;
 	data->incoming = directionIn;
 	data->canceled = false;
 	data->link = NULL;
+
+	// the current tail will become the fist descriptor
+	data->first_descriptor = (ohci_general_td *)endpoint->tail_logical_descriptor;
+
+	// the data and first descriptors might be the same
+	if (dataDescriptor == firstDescriptor)
+		data->data_descriptor = data->first_descriptor;
+	else
+		data->data_descriptor = dataDescriptor;
+
+	// even the last and the first descriptor might be the same
+	if (lastDescriptor == firstDescriptor)
+		data->last_descriptor = data->first_descriptor;
+	else
+		data->last_descriptor = lastDescriptor;
 
 	if (!Lock()) {
 		delete data;
@@ -849,7 +861,7 @@ OHCI::_FinishTransfers()
 			ohci_general_td *descriptor = transfer->first_descriptor;
 			status_t callbackStatus = B_OK;
 
-			while (descriptor) {
+			while (descriptor && !transfer->canceled) {
 				uint32 status = OHCI_TD_GET_CONDITION_CODE(descriptor->flags);
 				if (status == OHCI_TD_CONDITION_NOT_ACCESSED) {
 					// td is still active
@@ -936,6 +948,15 @@ OHCI::_FinishTransfers()
 
 				descriptor
 					= (ohci_general_td *)descriptor->next_logical_descriptor;
+			}
+
+			if (transfer->canceled) {
+				// when a transfer is canceled, all transfers to that endpoint
+				// are canceled by setting the head pointer to the tail pointer
+				// which causes all of the tds to become "free" (as they are
+				// inaccessible and not accessed anymore (as setting the head
+				// pointer required disabling the endpoint))
+				transferDone = true;
 			}
 
 			if (!transferDone) {
@@ -1075,18 +1096,18 @@ OHCI::_SubmitRequest(Transfer *transfer)
 		_LinkDescriptors(setupDescriptor, statusDescriptor);
 	}
 
-	// Append Transfer
+	// Add to the transfer list
 	ohci_endpoint_descriptor *endpoint
 		= (ohci_endpoint_descriptor *)transfer->TransferPipe()->ControllerCookie();
-	result = _AddPendingTransfer(transfer, endpoint, dataDescriptor,
-		statusDescriptor, directionIn);
+	result = _AddPendingTransfer(transfer, endpoint, setupDescriptor,
+		dataDescriptor, statusDescriptor, directionIn);
 	if (result < B_OK) {
 		TRACE_ERROR(("usb_ohci: failed to add pending transfer\n"));
 		_FreeDescriptorChain(setupDescriptor);
 		return result;
 	}
 
-	// Append descriptor chain to the endpoint
+	// Add the descriptor chain to the endpoint
 	_SwitchEndpointTail(endpoint, setupDescriptor, statusDescriptor);
 
 	// Tell the controller to process the control list
@@ -1099,8 +1120,49 @@ OHCI::_SubmitRequest(Transfer *transfer)
 status_t
 OHCI::_SubmitTransfer(Transfer *transfer)
 {
-	// TODO
-	return B_ERROR;
+	Pipe *pipe = transfer->TransferPipe();
+	bool directionIn = (pipe->Direction() == Pipe::In);
+
+	ohci_general_td *firstDescriptor = NULL;
+	ohci_general_td *lastDescriptor = NULL;
+	status_t result = _CreateDescriptorChain(&firstDescriptor, &lastDescriptor,
+		directionIn ? OHCI_TD_DIRECTION_PID_IN : OHCI_TD_DIRECTION_PID_OUT,
+		transfer->VectorLength());
+
+	if (result < B_OK)
+		return result;
+
+	// Set the last descriptor to generate an interrupt
+	lastDescriptor->flags &= ~OHCI_TD_INTERRUPT_MASK;
+	lastDescriptor->flags |=
+		OHCI_TD_SET_DELAY_INTERRUPT(OHCI_TD_INTERRUPT_IMMEDIATE);
+
+	if (!directionIn) {
+		_WriteDescriptorChain(firstDescriptor, transfer->Vector(),
+			transfer->VectorCount());
+	}
+
+	// Add to the transfer list
+	ohci_endpoint_descriptor *endpoint
+		= (ohci_endpoint_descriptor *)pipe->ControllerCookie();
+	result = _AddPendingTransfer(transfer, endpoint, firstDescriptor,
+		firstDescriptor, lastDescriptor, directionIn);
+	if (result < B_OK) {
+		TRACE_ERROR(("usb_ohci: failed to add pending transfer\n"));
+		_FreeDescriptorChain(firstDescriptor);
+		return result;
+	}
+
+	// Add the descriptor chain to the endpoint
+	_SwitchEndpointTail(endpoint, firstDescriptor, lastDescriptor);
+	endpoint->flags &= ~OHCI_ENDPOINT_SKIP;
+
+	if (pipe->Type() & USB_OBJECT_BULK_PIPE) {
+		// Tell the controller to process the bulk list
+		_WriteReg(OHCI_COMMAND_STATUS, OHCI_BULK_LIST_FILLED);
+	}
+
+	return B_OK;
 }
 
 
@@ -1133,7 +1195,11 @@ OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 	first->buffer_size = 0;
 	first->buffer_logical = NULL;
 	first->next_logical_descriptor = NULL;
-	_LinkDescriptors(last, first);
+
+	if (first == last)
+		_LinkDescriptors(tail, first);
+	else
+		_LinkDescriptors(last, first);
 
 	// update the endpoint tail pointer to reflect the change
 	endpoint->tail_logical_descriptor = first;
@@ -1265,7 +1331,7 @@ OHCI::_InsertEndpointForPipe(Pipe *pipe)
 		return B_ERROR;
 	}
 
-	// Create (necessary) dummy descriptor
+	// Create (necessary) tail descriptor
 	if (pipe->Type() & USB_OBJECT_ISO_PIPE) {
 		// Set the isochronous bit format
 		endpoint->flags |= OHCI_ENDPOINT_ISOCHRONOUS_FORMAT;
