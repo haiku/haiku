@@ -42,16 +42,6 @@ extern "C" status_t _get_builtin_dependencies(void);
 extern bool gDebugOutputEnabled;
 	// from libkernelland_emu.so
 
-status_t dm_get_attr_uint8(const device_node* node, const char* name,
-	uint8* _value, bool recursive);
-status_t dm_get_attr_uint16(const device_node* node, const char* name,
-	uint16* _value, bool recursive);
-status_t dm_get_attr_uint32(const device_node* node, const char* name,
-	uint32* _value, bool recursive);
-status_t dm_get_attr_string(const device_node* node, const char* name,
-	const char** _value, bool recursive);
-
-
 struct device_attr_private : device_attr,
 		DoublyLinkedListLinkImpl<device_attr_private> {
 						device_attr_private();
@@ -182,7 +172,7 @@ private:
 	uint32					fLastUpdateCycle;
 
 	const char*				fModuleName;
-	
+
 	driver_module_info*		fDriver;
 	void*					fDriverData;
 
@@ -207,6 +197,528 @@ static recursive_lock sLock;
 
 static uint32 sDriverUpdateCycle = 1;
 	// this is a *very* basic devfs emulation
+
+
+//	#pragma mark -
+
+
+static device_attr_private*
+find_attr(const device_node* node, const char* name, bool recursive,
+	type_code type)
+{
+	do {
+		AttributeList::ConstIterator iterator
+			= node->Attributes().GetIterator();
+
+		while (iterator.HasNext()) {
+			device_attr_private* attr = iterator.Next();
+
+			if (type != B_ANY_TYPE && attr->type != type)
+				continue;
+
+			if (!strcmp(attr->name, name))
+				return attr;
+		}
+
+		node = node->Parent();
+	} while (node != NULL && recursive);
+
+	return NULL;
+}
+
+
+static void
+put_level(int32 level)
+{
+	while (level-- > 0)
+		dprintf("   ");
+}
+
+
+static void
+dump_attribute(device_attr* attr, int32 level)
+{
+	if (attr == NULL)
+		return;
+
+	put_level(level + 2);
+	dprintf("\"%s\" : ", attr->name);
+	switch (attr->type) {
+		case B_STRING_TYPE:
+			dprintf("string : \"%s\"", attr->value.string);
+			break;
+		case B_INT8_TYPE:
+		case B_UINT8_TYPE:
+			dprintf("uint8 : %u (%#x)", attr->value.ui8, attr->value.ui8);
+			break;
+		case B_INT16_TYPE:
+		case B_UINT16_TYPE:
+			dprintf("uint16 : %u (%#x)", attr->value.ui16, attr->value.ui16);
+			break;
+		case B_INT32_TYPE:
+		case B_UINT32_TYPE:
+			dprintf("uint32 : %lu (%#lx)", attr->value.ui32, attr->value.ui32);
+			break;
+		case B_INT64_TYPE:
+		case B_UINT64_TYPE:
+			dprintf("uint64 : %Lu (%#Lx)", attr->value.ui64, attr->value.ui64);
+			break;
+		default:
+			dprintf("raw data");
+	}
+	dprintf("\n");
+}
+
+
+static void
+uninit_unused()
+{
+	puts("uninit unused");
+	RecursiveLocker _(sLock);
+	sRootNode->UninitUnusedDriver();
+}
+
+
+static status_t
+probe_path(const char* path)
+{
+	printf("probe path \"%s\"\n", path);
+	RecursiveLocker _(sLock);
+	return sRootNode->Probe(path, sDriverUpdateCycle);
+}
+
+
+static void
+close_path(void* cookie)
+{
+	Device* device = (Device*)cookie;
+	if (device == NULL)
+		return;
+
+	printf("close path \"%s\" (node %p)\n", device->Path(), device->Node());
+	device->UninitDevice();
+}
+
+
+static Device*
+get_device(device_node* node, const char* path)
+{
+	DeviceList::ConstIterator iterator = node->Devices().GetIterator();
+	while (iterator.HasNext()) {
+		Device* device = iterator.Next();
+		if (!strcmp(device->Path(), path)) {
+			status_t status = device->InitDevice();
+			if (status != B_OK) {
+				printf("opening path \"%s\" failed: %s\n", path,
+					strerror(status));
+				return NULL;
+			}
+
+			printf("open path \"%s\" (node %p)\n", device->Path(),
+				device->Node());
+			return device;
+		}
+	}
+
+	// search in children
+
+	NodeList::ConstIterator nodeIterator = node->Children().GetIterator();
+	while (nodeIterator.HasNext()) {
+		device_node* child = nodeIterator.Next();
+
+		Device* device = get_device(child, path);
+		if (device != NULL)
+			return device;
+	}
+
+	return NULL;
+}
+
+
+static void*
+open_path(const char* path)
+{
+	return get_device(sRootNode, path);
+}
+
+
+//	#pragma mark - Device Manager module API
+
+
+static status_t
+rescan_node(device_node* node)
+{
+	return B_ERROR;
+}
+
+
+static status_t
+register_node(device_node* parent, const char* moduleName,
+	const device_attr* attrs, const io_resource* ioResources,
+	device_node** _node)
+{
+	if ((parent == NULL && sRootNode != NULL) || moduleName == NULL)
+		return B_BAD_VALUE;
+
+	if (parent != NULL && parent->FindChild(attrs) != NULL) {
+		// A node like this one already exists for this parent
+		return B_NAME_IN_USE;
+	}
+
+	// TODO: handle I/O resources!
+
+	device_node *newNode = new(std::nothrow) device_node(moduleName, attrs,
+		ioResources);
+	if (newNode == NULL)
+		return B_NO_MEMORY;
+
+	TRACE(("%p: register node \"%s\", parent %p\n", newNode, moduleName,
+		parent));
+
+	RecursiveLocker _(sLock);
+
+	status_t status = newNode->InitCheck();
+	if (status != B_OK)
+		goto err1;
+
+#if 0
+	// The following is done to reduce the stack usage of deeply nested
+	// child device nodes.
+	// There is no other need to delay the complete registration process
+	// the way done here. This approach is also slightly different as
+	// the registration might fail later than it used in case of errors.
+
+	if (!parent->IsRegistered()) {
+		// The parent has not been registered completely yet - child
+		// registration is deferred to the parent registration
+		return B_OK;
+	}
+#endif
+
+	status = newNode->Register(parent);
+	if (status < B_OK) {
+		parent->RemoveChild(newNode);
+		goto err1;
+	}
+
+	if (_node)
+		*_node = newNode;
+
+	return B_OK;
+
+err1:
+	newNode->Release();
+	return status;
+}
+
+
+/*!	Unregisters the device \a node.
+
+	If the node is currently in use, this function will return B_BUSY to
+	indicate that the node hasn't been removed yet - it will still remove
+	the node as soon as possible.
+*/
+static status_t
+unregister_node(device_node* node)
+{
+	TRACE(("unregister_node(node %p)\n", node));
+	RecursiveLocker _(sLock);
+
+	bool initialized = node->IsInitialized();
+
+	node->DeviceRemoved();
+
+	return initialized ? B_BUSY : B_OK;
+}
+
+
+static status_t
+get_driver(device_node* node, driver_module_info** _module, void** _data)
+{
+	if (node->DriverModule() == NULL)
+		return B_NO_INIT;
+
+	if (_module != NULL)
+		*_module = node->DriverModule();
+	if (_data != NULL)
+		*_data = node->DriverData();
+
+	return B_OK;
+}
+
+
+static device_node*
+get_root_node(void)
+{
+	if (sRootNode != NULL)
+		sRootNode->Acquire();
+
+	return sRootNode;
+}
+
+
+static status_t
+get_next_child_node(device_node* parent, const device_attr* attributes,
+	device_node** _node)
+{
+	RecursiveLocker _(sLock);
+
+	NodeList::ConstIterator iterator = parent->Children().GetIterator();
+	device_node* last = *_node;
+
+	// skip those we already traversed
+	while (iterator.HasNext() && last != NULL) {
+		device_node* node = iterator.Next();
+
+		if (node != last)
+			continue;
+	}
+
+	// find the next one that fits
+	while (iterator.HasNext()) {
+		device_node* node = iterator.Next();
+
+		if (!node->IsRegistered())
+			continue;
+
+		if (!node->CompareTo(attributes)) {
+			if (last != NULL)
+				last->Release();
+
+			node->Acquire();
+			*_node = node;
+			return B_OK;
+		}
+	}
+
+	if (last != NULL)
+		last->Release();
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static device_node*
+get_parent_node(device_node* node)
+{
+	if (node == NULL)
+		return NULL;
+
+	RecursiveLocker _(sLock);
+
+	device_node* parent = node->Parent();
+	parent->Acquire();
+
+	return parent;
+}
+
+
+static void
+put_node(device_node* node)
+{
+	RecursiveLocker _(sLock);
+	node->Release();
+}
+
+
+static status_t
+publish_device(device_node *node, const char *path, const char *moduleName)
+{
+	if (path == NULL || !path[0] || moduleName == NULL || !moduleName[0])
+		return B_BAD_VALUE;
+
+	RecursiveLocker _(sLock);
+	dprintf("publish device: node %p, path %s, module %s\n", node, path,
+		moduleName);
+
+	Device* device = new(std::nothrow) Device(node, path, moduleName);
+	if (device == NULL)
+		return B_NO_MEMORY;
+
+	if (device->InitCheck() != B_OK) {
+		delete device;
+		return B_NO_MEMORY;
+	}
+
+	node->AddDevice(device);
+	return B_OK;
+}
+
+
+static status_t
+unpublish_device(device_node *node, const char *path)
+{
+	if (path == NULL)
+		return B_BAD_VALUE;
+
+	RecursiveLocker _(sLock);
+
+	DeviceList::ConstIterator iterator = node->Devices().GetIterator();
+	while (iterator.HasNext()) {
+		Device* device = iterator.Next();
+		if (!strcmp(device->Path(), path)) {
+			node->RemoveDevice(device);
+			delete device;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+static status_t
+get_attr_uint8(const device_node* node, const char* name, uint8* _value,
+	bool recursive)
+{
+	if (node == NULL || name == NULL || _value == NULL)
+		return B_BAD_VALUE;
+
+	device_attr_private* attr = find_attr(node, name, recursive, B_UINT8_TYPE);
+	if (attr == NULL)
+		return B_NAME_NOT_FOUND;
+
+	*_value = attr->value.ui8;
+	return B_OK;
+}
+
+
+static status_t
+get_attr_uint16(const device_node* node, const char* name, uint16* _value,
+	bool recursive)
+{
+	if (node == NULL || name == NULL || _value == NULL)
+		return B_BAD_VALUE;
+
+	device_attr_private* attr = find_attr(node, name, recursive, B_UINT16_TYPE);
+	if (attr == NULL)
+		return B_NAME_NOT_FOUND;
+
+	*_value = attr->value.ui16;
+	return B_OK;
+}
+
+
+static status_t
+get_attr_uint32(const device_node* node, const char* name, uint32* _value,
+	bool recursive)
+{
+	if (node == NULL || name == NULL || _value == NULL)
+		return B_BAD_VALUE;
+
+	device_attr_private* attr = find_attr(node, name, recursive, B_UINT32_TYPE);
+	if (attr == NULL)
+		return B_NAME_NOT_FOUND;
+
+	*_value = attr->value.ui32;
+	return B_OK;
+}
+
+
+static status_t
+get_attr_uint64(const device_node* node, const char* name,
+	uint64* _value, bool recursive)
+{
+	if (node == NULL || name == NULL || _value == NULL)
+		return B_BAD_VALUE;
+
+	device_attr_private* attr = find_attr(node, name, recursive, B_UINT64_TYPE);
+	if (attr == NULL)
+		return B_NAME_NOT_FOUND;
+
+	*_value = attr->value.ui64;
+	return B_OK;
+}
+
+
+static status_t
+get_attr_string(const device_node* node, const char* name,
+	const char** _value, bool recursive)
+{
+	if (node == NULL || name == NULL || _value == NULL)
+		return B_BAD_VALUE;
+
+	device_attr_private* attr = find_attr(node, name, recursive, B_STRING_TYPE);
+	if (attr == NULL)
+		return B_NAME_NOT_FOUND;
+
+	*_value = attr->value.string;
+	return B_OK;
+}
+
+
+static status_t
+get_attr_raw(const device_node* node, const char* name, const void** _data,
+	size_t* _length, bool recursive)
+{
+	if (node == NULL || name == NULL || (_data == NULL && _length == NULL))
+		return B_BAD_VALUE;
+
+	device_attr_private* attr = find_attr(node, name, recursive, B_RAW_TYPE);
+	if (attr == NULL)
+		return B_NAME_NOT_FOUND;
+
+	if (_data != NULL)
+		*_data = attr->value.raw.data;
+	if (_length != NULL)
+		*_length = attr->value.raw.length;
+	return B_OK;
+}
+
+
+static status_t
+get_next_attr(device_node* node, device_attr** _attr)
+{
+	if (node == NULL)
+		return B_BAD_VALUE;
+
+	device_attr_private* next;
+	device_attr_private* attr = *(device_attr_private**)_attr;
+
+	if (attr != NULL) {
+		// next attribute
+		next = attr->GetDoublyLinkedListLink()->next;
+	} else {
+		// first attribute
+		next = node->Attributes().First();
+	}
+
+	*_attr = next;
+
+	return next ? B_OK : B_ENTRY_NOT_FOUND;
+}
+
+
+static struct device_manager_info sDeviceManagerModule = {
+	{
+		B_DEVICE_MANAGER_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	// device nodes
+	rescan_node,
+	register_node,
+	unregister_node,
+	get_driver,
+	get_root_node,
+	get_next_child_node,
+	get_parent_node,
+	put_node,
+
+	// devices
+	publish_device,
+	unpublish_device,
+
+	// attributes
+	get_attr_uint8,
+	get_attr_uint16,
+	get_attr_uint32,
+	get_attr_uint64,
+	get_attr_string,
+	get_attr_raw,
+	get_next_attr,
+};
 
 
 //	#pragma mark - device_attr
@@ -346,149 +858,6 @@ device_attr_private::Compare(const device_attr* attrA, const device_attr *attrB)
 }
 
 
-//	#pragma mark -
-
-
-device_attr_private*
-dm_find_attr(const device_node* node, const char* name, bool recursive,
-	type_code type)
-{
-	do {
-		AttributeList::ConstIterator iterator
-			= node->Attributes().GetIterator();
-
-		while (iterator.HasNext()) {
-			device_attr_private* attr = iterator.Next();
-
-			if (type != B_ANY_TYPE && attr->type != type)
-				continue;
-
-			if (!strcmp(attr->name, name))
-				return attr;
-		}
-
-		node = node->Parent();
-	} while (node != NULL && recursive);
-
-	return NULL;
-}
-
-
-static void
-put_level(int32 level)
-{
-	while (level-- > 0)
-		dprintf("   ");
-}
-
-
-static void
-dump_attribute(device_attr* attr, int32 level)
-{
-	if (attr == NULL)
-		return;
-
-	put_level(level + 2);
-	dprintf("\"%s\" : ", attr->name);
-	switch (attr->type) {
-		case B_STRING_TYPE:
-			dprintf("string : \"%s\"", attr->value.string);
-			break;
-		case B_INT8_TYPE:
-		case B_UINT8_TYPE:
-			dprintf("uint8 : %u (%#x)", attr->value.ui8, attr->value.ui8);
-			break;
-		case B_INT16_TYPE:
-		case B_UINT16_TYPE:
-			dprintf("uint16 : %u (%#x)", attr->value.ui16, attr->value.ui16);
-			break;
-		case B_INT32_TYPE:
-		case B_UINT32_TYPE:
-			dprintf("uint32 : %lu (%#lx)", attr->value.ui32, attr->value.ui32);
-			break;
-		case B_INT64_TYPE:
-		case B_UINT64_TYPE:
-			dprintf("uint64 : %Lu (%#Lx)", attr->value.ui64, attr->value.ui64);
-			break;
-		default:
-			dprintf("raw data");
-	}
-	dprintf("\n");
-}
-
-
-static void
-uninit_unused()
-{
-	puts("uninit unused");
-	RecursiveLocker _(sLock);
-	sRootNode->UninitUnusedDriver();
-}
-
-
-static status_t
-probe_path(const char* path)
-{
-	printf("probe path \"%s\"\n", path);
-	RecursiveLocker _(sLock);
-	return sRootNode->Probe(path, sDriverUpdateCycle);
-}
-
-
-static void
-close_path(void* cookie)
-{
-	Device* device = (Device*)cookie;
-	if (device == NULL)
-		return;
-
-	printf("close path \"%s\" (node %p)\n", device->Path(), device->Node());
-	device->UninitDevice();
-}
-
-
-static Device*
-get_device(device_node* node, const char* path)
-{
-	DeviceList::ConstIterator iterator = node->Devices().GetIterator();
-	while (iterator.HasNext()) {
-		Device* device = iterator.Next();
-		if (!strcmp(device->Path(), path)) {
-			status_t status = device->InitDevice();
-			if (status != B_OK) {
-				printf("opening path \"%s\" failed: %s\n", path,
-					strerror(status));
-				return NULL;
-			}
-
-			printf("open path \"%s\" (node %p)\n", device->Path(),
-				device->Node());
-			return device;
-		}
-	}
-
-	// search in children
-
-	NodeList::ConstIterator nodeIterator = node->Children().GetIterator();
-	while (nodeIterator.HasNext()) {
-		device_node* child = nodeIterator.Next();
-
-		Device* device = get_device(child, path);
-		if (device != NULL)
-			return device;
-	}
-
-	return NULL;
-}
-
-
-static void*
-open_path(const char* path)
-{
-	return get_device(sRootNode, path);
-}
-
-
 //	#pragma mark - Device
 
 
@@ -617,7 +986,7 @@ device_node::device_node(const char* moduleName, const device_attr* attrs,
 		attrs++;
 	}
 
-	dm_get_attr_uint32(this, B_DEVICE_FLAGS, &fFlags, false);
+	get_attr_uint32(this, B_DEVICE_FLAGS, &fFlags, false);
 	fFlags &= NODE_FLAG_PUBLIC_MASK;
 }
 
@@ -898,9 +1267,9 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 		uint16 type = 0;
 		uint16 subType = 0;
 		uint16 interface = 0;
-		dm_get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
-		dm_get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
-		dm_get_attr_uint16(this, B_DEVICE_INTERFACE, &interface, false);
+		get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
+		get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
+		get_attr_uint16(this, B_DEVICE_INTERFACE, &interface, false);
 
 		// TODO: maybe make this extendible via settings file?
 		switch (type) {
@@ -950,7 +1319,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						break;
 					default:
 						_AddPath(*stack, "drivers");
-						break;					
+						break;
 				}
 				break;
 			default:
@@ -1071,8 +1440,8 @@ device_node::_AlwaysRegisterDynamic()
 {
 	uint16 type = 0;
 	uint16 subType = 0;
-	dm_get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
-	dm_get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
+	get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
+	get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
 
 	return type == PCI_serial_bus || type == PCI_bridge;
 		// TODO: we may want to be a bit more specific in the future
@@ -1189,8 +1558,8 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 
 	uint16 type = 0;
 	uint16 subType = 0;
-	if (dm_get_attr_uint16(this, B_DEVICE_TYPE, &type, false) == B_OK
-		&& dm_get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false)
+	if (get_attr_uint16(this, B_DEVICE_TYPE, &type, false) == B_OK
+		&& get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false)
 			== B_OK) {
 		// Check if this node matches the device path
 		// TODO: maybe make this extendible via settings file?
@@ -1431,395 +1800,11 @@ device_node::Dump(int32 level = 0)
 }
 
 
-//	#pragma mark - Device Manager module API
-
-
-static status_t
-rescan_node(device_node* node)
-{
-	return B_ERROR;
-}
-
-
-static status_t
-register_node(device_node* parent, const char* moduleName,
-	const device_attr* attrs, const io_resource* ioResources,
-	device_node** _node)
-{
-	if ((parent == NULL && sRootNode != NULL) || moduleName == NULL)
-		return B_BAD_VALUE;
-
-	if (parent != NULL && parent->FindChild(attrs) != NULL) {
-		// A node like this one already exists for this parent
-		return B_NAME_IN_USE;
-	}
-
-	// TODO: handle I/O resources!
-
-	device_node *newNode = new(std::nothrow) device_node(moduleName, attrs,
-		ioResources);
-	if (newNode == NULL)
-		return B_NO_MEMORY;
-
-	TRACE(("%p: register node \"%s\", parent %p\n", newNode, moduleName,
-		parent));
-
-	RecursiveLocker _(sLock);
-
-	status_t status = newNode->InitCheck();
-	if (status != B_OK)
-		goto err1;
-
-#if 0
-	// The following is done to reduce the stack usage of deeply nested
-	// child device nodes.
-	// There is no other need to delay the complete registration process
-	// the way done here. This approach is also slightly different as
-	// the registration might fail later than it used in case of errors.
-
-	if (!parent->IsRegistered()) {
-		// The parent has not been registered completely yet - child
-		// registration is deferred to the parent registration
-		return B_OK;
-	}
-#endif
-
-	status = newNode->Register(parent);
-	if (status < B_OK) {
-		parent->RemoveChild(newNode);
-		goto err1;
-	}
-
-	if (_node)
-		*_node = newNode;
-
-	return B_OK;
-
-err1:
-	newNode->Release();
-	return status;
-}
-
-
-/*!	Unregisters the device \a node.
-
-	If the node is currently in use, this function will return B_BUSY to
-	indicate that the node hasn't been removed yet - it will still remove
-	the node as soon as possible.
-*/
-static status_t
-unregister_node(device_node* node)
-{
-	TRACE(("unregister_node(node %p)\n", node));
-	RecursiveLocker _(sLock);
-
-	bool initialized = node->IsInitialized();
-
-	node->DeviceRemoved();
-
-	return initialized ? B_BUSY : B_OK;
-}
-
-
-static status_t
-get_driver(device_node* node, driver_module_info** _module, void** _data)
-{
-	if (node->DriverModule() == NULL)
-		return B_NO_INIT;
-
-	if (_module != NULL)
-		*_module = node->DriverModule();
-	if (_data != NULL)
-		*_data = node->DriverData();
-
-	return B_OK;
-}
-
-
-static device_node*
-get_root_node(void)
-{
-	if (sRootNode != NULL)
-		sRootNode->Acquire();
-
-	return sRootNode;
-}
-
-
-static status_t
-get_next_child_node(device_node* parent, const device_attr* attributes,
-	device_node** _node)
-{
-	RecursiveLocker _(sLock);
-
-	NodeList::ConstIterator iterator = parent->Children().GetIterator();
-	device_node* last = *_node;
-
-	// skip those we already traversed
-	while (iterator.HasNext() && last != NULL) {
-		device_node* node = iterator.Next();
-
-		if (node != last)
-			continue;
-	}
-
-	// find the next one that fits
-	while (iterator.HasNext()) {
-		device_node* node = iterator.Next();
-
-		if (!node->IsRegistered())
-			continue;
-
-		if (!node->CompareTo(attributes)) {
-			if (last != NULL)
-				last->Release();
-
-			node->Acquire();
-			*_node = node;
-			return B_OK;
-		}
-	}
-
-	if (last != NULL)
-		last->Release();
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-static device_node*
-get_parent_node(device_node* node)
-{
-	if (node == NULL)
-		return NULL;
-
-	RecursiveLocker _(sLock);
-
-	device_node* parent = node->Parent();
-	parent->Acquire();
-
-	return parent;
-}
-
-
-static void
-put_node(device_node* node)
-{
-	RecursiveLocker _(sLock);
-	node->Release();
-}
-
-
-static status_t
-publish_device(device_node *node, const char *path, const char *moduleName)
-{
-	if (path == NULL || !path[0] || moduleName == NULL || !moduleName[0])
-		return B_BAD_VALUE;
-
-	RecursiveLocker _(sLock);
-	dprintf("publish device: node %p, path %s, module %s\n", node, path,
-		moduleName);
-
-	Device* device = new(std::nothrow) Device(node, path, moduleName);
-	if (device == NULL)
-		return B_NO_MEMORY;
-
-	if (device->InitCheck() != B_OK) {
-		delete device;
-		return B_NO_MEMORY;
-	}
-
-	node->AddDevice(device);
-	return B_OK;
-}
-
-
-static status_t
-unpublish_device(device_node *node, const char *path)
-{
-	if (path == NULL)
-		return B_BAD_VALUE;
-
-	RecursiveLocker _(sLock);
-
-	DeviceList::ConstIterator iterator = node->Devices().GetIterator();
-	while (iterator.HasNext()) {
-		Device* device = iterator.Next();
-		if (!strcmp(device->Path(), path)) {
-			node->RemoveDevice(device);
-			delete device;
-			return B_OK;
-		}
-	}
-
-	return B_ENTRY_NOT_FOUND;
-}
-
-
-status_t
-dm_get_attr_uint8(const device_node* node, const char* name, uint8* _value,
-	bool recursive)
-{
-	if (node == NULL || name == NULL || _value == NULL)
-		return B_BAD_VALUE;
-
-	device_attr_private* attr = dm_find_attr(node, name, recursive,
-		B_UINT8_TYPE);
-	if (attr == NULL)
-		return B_NAME_NOT_FOUND;
-
-	*_value = attr->value.ui8;
-	return B_OK;
-}
-
-
-status_t
-dm_get_attr_uint16(const device_node* node, const char* name, uint16* _value,
-	bool recursive)
-{
-	if (node == NULL || name == NULL || _value == NULL)
-		return B_BAD_VALUE;
-
-	device_attr_private* attr = dm_find_attr(node, name, recursive,
-		B_UINT16_TYPE);
-	if (attr == NULL)
-		return B_NAME_NOT_FOUND;
-
-	*_value = attr->value.ui16;
-	return B_OK;
-}
-
-
-status_t
-dm_get_attr_uint32(const device_node* node, const char* name, uint32* _value,
-	bool recursive)
-{
-	if (node == NULL || name == NULL || _value == NULL)
-		return B_BAD_VALUE;
-
-	device_attr_private* attr = dm_find_attr(node, name, recursive,
-		B_UINT32_TYPE);
-	if (attr == NULL)
-		return B_NAME_NOT_FOUND;
-
-	*_value = attr->value.ui32;
-	return B_OK;
-}
-
-
-status_t
-dm_get_attr_uint64(const device_node* node, const char* name,
-	uint64* _value, bool recursive)
-{
-	if (node == NULL || name == NULL || _value == NULL)
-		return B_BAD_VALUE;
-
-	device_attr_private* attr = dm_find_attr(node, name, recursive,
-		B_UINT64_TYPE);
-	if (attr == NULL)
-		return B_NAME_NOT_FOUND;
-
-	*_value = attr->value.ui64;
-	return B_OK;
-}
-
-
-status_t
-dm_get_attr_string(const device_node* node, const char* name,
-	const char** _value, bool recursive)
-{
-	if (node == NULL || name == NULL || _value == NULL)
-		return B_BAD_VALUE;
-
-	device_attr_private* attr = dm_find_attr(node, name, recursive,
-		B_STRING_TYPE);
-	if (attr == NULL)
-		return B_NAME_NOT_FOUND;
-
-	*_value = attr->value.string;
-	return B_OK;
-}
-
-
-status_t
-dm_get_attr_raw(const device_node* node, const char* name, const void** _data,
-	size_t* _length, bool recursive)
-{
-	if (node == NULL || name == NULL || (_data == NULL && _length == NULL))
-		return B_BAD_VALUE;
-
-	device_attr_private* attr = dm_find_attr(node, name, recursive, B_RAW_TYPE);
-	if (attr == NULL)
-		return B_NAME_NOT_FOUND;
-
-	if (_data != NULL)
-		*_data = attr->value.raw.data;
-	if (_length != NULL)
-		*_length = attr->value.raw.length;
-	return B_OK;
-}
-
-
-status_t
-dm_get_next_attr(device_node* node, device_attr** _attr)
-{
-	if (node == NULL)
-		return B_BAD_VALUE;
-
-	device_attr_private* next;
-	device_attr_private* attr = *(device_attr_private**)_attr;
-
-	if (attr != NULL) {
-		// next attribute
-		next = attr->GetDoublyLinkedListLink()->next;
-	} else {
-		// first attribute
-		next = node->Attributes().First();
-	}
-
-	*_attr = next;
-
-	return next ? B_OK : B_ENTRY_NOT_FOUND;
-}
-
-
-static struct device_manager_info sDeviceManagerModule = {
-	{
-		B_DEVICE_MANAGER_MODULE_NAME,
-		0,
-		NULL
-	},
-
-	// device nodes
-	rescan_node,
-	register_node,
-	unregister_node,
-	get_driver,
-	get_root_node,
-	get_next_child_node,
-	get_parent_node,
-	put_node,
-
-	// devices
-	publish_device,
-	unpublish_device,
-
-	// attributes
-	dm_get_attr_uint8,
-	dm_get_attr_uint16,
-	dm_get_attr_uint32,
-	dm_get_attr_uint64,
-	dm_get_attr_string,
-	dm_get_attr_raw,
-	dm_get_next_attr,
-};
-
-
 //	#pragma mark - root node
 
 
-void
-dm_init_root_node(void)
+static void
+init_root_node(void)
 {
 	device_attr attrs[] = {
 		{B_DEVICE_PRETTY_NAME, B_STRING_TYPE, {string: "Devices Root"}},
@@ -1878,7 +1863,7 @@ main(int argc, char** argv)
 
 	recursive_lock_init(&sLock, "device manager");
 
-	dm_init_root_node();
+	init_root_node();
 	sRootNode->Dump();
 
 	probe_path("net");

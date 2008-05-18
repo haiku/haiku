@@ -13,9 +13,9 @@
 
 /* type of I/O resource */
 enum {
-	IO_MEM = 1,
-	IO_PORT = 2,
-	ISA_DMA_CHANNEL = 3
+	B_IO_MEMORY			= 1,
+	B_IO_PORT			= 2,
+	B_ISA_DMA_CHANNEL	= 3
 };
 
 
@@ -124,7 +124,10 @@ struct driver_module_info {
 	void (*uninit_driver)(void *driverCookie);
 	status_t (*register_child_devices)(void *driverCookie);
 	status_t (*rescan_child_devices)(void *driverCookie);
+
 	void (*device_removed)(void *driverCookie);
+	status_t (*suspend)(void *driverCookie, int32 state);
+	status_t (*resume)(void *driverCookie);
 };
 
 
