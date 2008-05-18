@@ -224,7 +224,7 @@ struct pci_module_info {
 #define PCI_sub_vendor_id_1                         0x34 /* (2 bytes) */
 #define PCI_sub_device_id_1                         0x36 /* (2 bytes) */
 #define PCI_bridge_rom_base							0x38
-#define PCI_bridge_control							0x3E /* (2 byte) */																		
+#define PCI_bridge_control							0x3E /* (2 bytes) */																		
 
 
 /* PCI type 2 header offsets */
