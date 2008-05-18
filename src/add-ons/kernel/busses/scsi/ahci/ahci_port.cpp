@@ -131,6 +131,7 @@ AHCIPort::Init1()
 	fCommandTable = (command_table *)virtAddr;
 	virtAddr += sizeof(command_table);
 	fPRDTable = (prd *)virtAddr;
+	TRACE("PRD table is at %p\n", fPRDTable);
 	
 	fRegs->clb  = LO32(physAddr);
 	fRegs->clbu = HI32(physAddr);
