@@ -207,7 +207,7 @@
 //	Root Hub port status (n) register (section 7.4.4)
 // --------------------------------
 
-#define	OHCI_RH_PORT_STATUS(n)		(0x50 + (n) * 4)// 1 based indexing
+#define	OHCI_RH_PORT_STATUS(n)		(0x54 + (n) * 4)// 0 based indexing
 #define	OHCI_RH_PORTSTATUS_CCS		0x00000001		// Current Connection Status
 #define	OHCI_RH_PORTSTATUS_PES		0x00000002		// Port Enable Status
 #define	OHCI_RH_PORTSTATUS_PSS		0x00000004		// Port Suspend Status
@@ -301,7 +301,6 @@ typedef struct {
 	// Software part
 	addr_t	physical_address;			// Physical pointer to this address
 	void	*tail_logical_descriptor;	// Queue tail logical pointer
-	void	*head_logical_descriptor;	// Queue head logical pointer
 	void	*next_logical_endpoint;		// Logical pointer to the next endpoint
 } ohci_endpoint_descriptor;
 
@@ -342,9 +341,6 @@ typedef struct {
 	size_t	buffer_size;				// Size of the buffer
 	void	*buffer_logical;			// Logical pointer to the buffer
 	void	*next_logical_descriptor;	// Logical pointer next descriptor
-	void	*next_done_descriptor;		// Used for the done descriptor list
-	void	*transfer;					// Pointer to the transfer_data
-	bool	is_last;					// Last descriptor of the transfer
 } ohci_general_td;
 
 #define	OHCI_BUFFER_ROUNDING			0x00040000
@@ -354,7 +350,6 @@ typedef struct {
 #define	OHCI_TD_DIRECTION_PID_IN		0x00100000
 #define	OHCI_TD_GET_DELAY_INTERRUPT(x)	(((x) >> 21) & 7)
 #define	OHCI_TD_SET_DELAY_INTERRUPT(x)	((x) << 21)
-#define	OHCI_TD_NO_INTERRUPT			0x00e00000
 #define	OHCI_TD_INTERRUPT_MASK			0x00e00000
 #define	OHCI_TD_TOGGLE_CARRY			0x00000000
 #define	OHCI_TD_TOGGLE_0				0x02000000
@@ -362,7 +357,25 @@ typedef struct {
 #define	OHCI_TD_TOGGLE_MASK				0x03000000
 #define	OHCI_TD_GET_ERROR_COUNT(x)		(((x) >> 26) & 3)
 #define	OHCI_TD_GET_CONDITION_CODE(x)	((x) >> 28)
-#define	OHCI_TD_NO_CONDITION_CODE		0xf0000000
+#define	OHCI_TD_SET_CONDITION_CODE(x)	((x) << 28)
+#define	OHCI_TD_CONDITION_CODE_MASK		0xf0000000
+
+#define OHCI_TD_INTERRUPT_IMMEDIATE			0x00
+#define OHCI_TD_INTERRUPT_NONE				0x07
+
+#define OHCI_TD_CONDITION_NO_ERROR			0x00
+#define OHCI_TD_CONDITION_CRC_ERROR			0x01
+#define OHCI_TD_CONDITION_BIT_STUFFING		0x02
+#define OHCI_TD_CONDITION_TOGGLE_MISMATCH	0x03
+#define OHCI_TD_CONDITION_STALL				0x04
+#define OHCI_TD_CONDITION_NO_RESPONSE		0x05
+#define OHCI_TD_CONDITION_PID_CHECK_FAILURE	0x06
+#define OHCI_TD_CONDITION_UNEXPECTED_PID	0x07
+#define OHCI_TD_CONDITION_DATA_OVERRUN		0x08
+#define OHCI_TD_CONDITION_DATA_UNDERRUN		0x09
+#define OHCI_TD_CONDITION_BUFFER_OVERRUN	0x0c
+#define OHCI_TD_CONDITION_BUFFER_UNDERRUN	0x0d
+#define OHCI_TD_CONDITION_NOT_ACCESSED		0x0f
 
 #define OHCI_GENERAL_TD_ALIGN 16
 

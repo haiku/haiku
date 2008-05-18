@@ -24,6 +24,7 @@ typedef struct transfer_data_s {
 	ohci_endpoint_descriptor	*endpoint;
 	ohci_general_td				*first_descriptor;
 	ohci_general_td				*data_descriptor;
+	ohci_general_td				*last_descriptor;
 	bool						incoming;
 	bool						canceled;
 	transfer_data_s				*link;
@@ -63,8 +64,8 @@ static	int32						_InterruptHandler(void *data);
 		// Transfer functions
 		status_t					_AddPendingTransfer(Transfer *transfer,
 										ohci_endpoint_descriptor *endpoint,
-										ohci_general_td *first,
-										ohci_general_td *data,
+										ohci_general_td *dataDescriptor,
+										ohci_general_td *lastDescriptor,
 										bool directionIn);
 		status_t					_CancelQueuedIsochronousTransfers(
 										Pipe *pipe, bool force);
@@ -73,9 +74,10 @@ static	int32						_InterruptHandler(void *data);
 static	int32						_FinishThread(void *data);
 		void						_FinishTransfers();
 
-		status_t					_SubmitControlTransfer(Transfer *transfer);
-		status_t					_SubmitBulkTransfer(Transfer *transfer);
-		status_t					_SubmitPeriodicTransfer(Transfer *transfer);
+		status_t					_SubmitRequest(Transfer *transfer);
+		status_t					_SubmitTransfer(Transfer *transfer);
+		status_t					_SubmitIsochronousTransfer(
+										Transfer *transfer);
 
 		void						_SwitchEndpointTail(
 										ohci_endpoint_descriptor *endpoint,
@@ -101,15 +103,19 @@ static	int32						_FinishThread(void *data);
 		status_t					_CreateDescriptorChain(
 										ohci_general_td **firstDescriptor,
 										ohci_general_td **lastDescriptor,
-										uint8 direction,
+										uint32 direction,
 										size_t bufferSize);
 		void						_FreeDescriptorChain(
 										ohci_general_td *topDescriptor);
 
 		size_t						_WriteDescriptorChain(
 										ohci_general_td *topDescriptor,
-										iovec *vector,
-										size_t vectorCount);
+										iovec *vector, size_t vectorCount);
+		size_t						_ReadDescriptorChain(
+										ohci_general_td *topDescriptor,
+										iovec *vector, size_t vectorCount);
+		size_t						_ReadActualLength(
+										ohci_general_td *topDescriptor);
 
 		void						_LinkDescriptors(ohci_general_td *first,
 										ohci_general_td *second);
@@ -125,6 +131,12 @@ static	int32						_FinishThread(void *data);
 		// Register functions
 inline	void						_WriteReg(uint32 reg, uint32 value);
 inline	uint32						_ReadReg(uint32 reg);
+
+		// Debug functions
+		void						_PrintEndpoint(
+										ohci_endpoint_descriptor *endpoint);
+		void						_PrintDescriptorChain(
+										ohci_general_td *topDescriptor);
 
 static	pci_module_info				*sPCIModule;
 		pci_info					*fPCIInfo;
