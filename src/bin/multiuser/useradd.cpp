@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 
 #include <OS.h>
@@ -169,6 +170,7 @@ main(int argc, const char* const* argv)
 		|| message.AddString("shell", shell) != B_OK
 		|| message.AddString("real name", realName) != B_OK
 		|| message.AddString("shadow password", encryptedPassword) != B_OK
+		|| message.AddInt32("last changed", time(NULL)) != B_OK
 		|| message.AddInt32("min", min) != B_OK
 		|| message.AddInt32("max", max) != B_OK
 		|| message.AddInt32("warn", warn) != B_OK

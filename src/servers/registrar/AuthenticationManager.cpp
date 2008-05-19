@@ -205,6 +205,9 @@ public:
 			// fLastChanged = now;
 		}
 
+		if (message.FindInt32("last changed", &intValue) == B_OK)
+			fLastChanged = intValue;
+			
 		if (message.FindInt32("min", &intValue) == B_OK)
 			fMin = intValue;
 			
@@ -245,6 +248,7 @@ public:
 
 		spwd.sp_namp = store.AppendString(fName);
 		spwd.sp_pwdp = store.AppendString(fShadowPassword);
+		spwd.sp_lstchg = fLastChanged;
 		spwd.sp_min = fMin;
 		spwd.sp_max = fMax;
 		spwd.sp_warn = fWarn;

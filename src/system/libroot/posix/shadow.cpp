@@ -164,6 +164,7 @@ getspnam_r(const char *name, struct spwd *spwd, char *buffer,
 		return error;
 
 	const char* password;
+	int32 lastChanged;
 	int32 min;
 	int32 max;
 	int32 warn;
@@ -173,6 +174,7 @@ getspnam_r(const char *name, struct spwd *spwd, char *buffer,
 
 	if ((error = reply.FindString("name", &name)) != B_OK
 		|| (error = reply.FindString("shadow password", &password)) != B_OK
+		|| (error = reply.FindInt32("last changed", &lastChanged)) != B_OK
 		|| (error = reply.FindInt32("min", &min)) != B_OK
 		|| (error = reply.FindInt32("max", &max)) != B_OK
 		|| (error = reply.FindInt32("warn", &warn)) != B_OK
@@ -182,8 +184,8 @@ getspnam_r(const char *name, struct spwd *spwd, char *buffer,
 		return error;
 	}
 
-	error = BPrivate::copy_shadow_pwd_to_buffer(name, password, min, max, warn,
-		inactive, expiration, flags, spwd, buffer, bufferSize);
+	error = BPrivate::copy_shadow_pwd_to_buffer(name, password, lastChanged,
+		min, max, warn, inactive, expiration, flags, spwd, buffer, bufferSize);
 	if (error == B_OK)
 		*_result = spwd;
 
@@ -233,8 +235,8 @@ sgetspent_r(const char* _line, struct spwd *spwd, char *buffer,
 	if (status != B_OK)
 		return status;
 
-	status = BPrivate::copy_shadow_pwd_to_buffer(name, password, min, max, warn,
-		inactive, expiration, flags, spwd, buffer, bufferSize);
+	status = BPrivate::copy_shadow_pwd_to_buffer(name, password, lastChanged,
+		min, max, warn, inactive, expiration, flags, spwd, buffer, bufferSize);
 	if (status != B_OK)
 		return status;
 

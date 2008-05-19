@@ -128,8 +128,8 @@ status_t parse_group_line(char* line, char*& name, char*& password, gid_t& gid,
 // shadow password
 
 status_t copy_shadow_pwd_to_buffer(const char* name, const char* password,
-	int min, int max, int warn, int inactive, int expiration, int flags,
-	spwd* entry, char* buffer, size_t bufferSize);
+	int lastChanged, int min, int max, int warn, int inactive, int expiration,
+	int flags, spwd* entry, char* buffer, size_t bufferSize);
 status_t copy_shadow_pwd_to_buffer(const spwd* from, spwd* entry,
 	char* buffer, size_t bufferSize);
 

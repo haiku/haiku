@@ -11,6 +11,7 @@
 struct spwd {
 	char*	sp_namp;	/* login name */
 	char*	sp_pwdp;	/* encrypted password */
+	int		sp_lstchg;	/* date of last change (days since 1970) */
 	int		sp_min;		/* min days between password changes */
 	int		sp_max;		/* max days between password changes */
 	int		sp_warn;	/* days to warn before password expired */

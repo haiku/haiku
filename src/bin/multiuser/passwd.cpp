@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <termios.h>
+#include <time.h>
 #include <unistd.h>
 
 #include <OS.h>
@@ -127,6 +128,7 @@ main(int argc, const char* const* argv)
 	// prepare request for the registrar
 	KMessage message(BPrivate::B_REG_UPDATE_USER);
 	if (message.AddInt32("uid", passwd->pw_uid) != B_OK
+		|| message.AddInt32("last changed", time(NULL)) != B_OK
 		|| message.AddString("password", "x") != B_OK
 		|| message.AddString("shadow password", encryptedPassword) != B_OK) {
 		fprintf(stderr, "Error: Out of memory!\n");

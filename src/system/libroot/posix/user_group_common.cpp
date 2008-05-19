@@ -309,9 +309,10 @@ BPrivate::parse_group_line(char* line, char*& name, char*& password, gid_t& gid,
 
 status_t
 BPrivate::copy_shadow_pwd_to_buffer(const char* name, const char* password,
-	int min, int max, int warn, int inactive, int expiration, int flags,
-	spwd* entry, char* buffer, size_t bufferSize)
+	int lastChanged, int min, int max, int warn, int inactive, int expiration,
+	int flags, spwd* entry, char* buffer, size_t bufferSize)
 {
+	entry->sp_lstchg = lastChanged;
 	entry->sp_min = min;
 	entry->sp_max = max;
 	entry->sp_warn = warn;
@@ -334,8 +335,9 @@ BPrivate::copy_shadow_pwd_to_buffer(const spwd* from, spwd* entry,
 	char* buffer, size_t bufferSize)
 {
 	return copy_shadow_pwd_to_buffer(from->sp_namp, from->sp_pwdp,
-		from->sp_min, from->sp_max, from->sp_warn, from->sp_inact,
-		from->sp_expire, from->sp_flag, entry, buffer, bufferSize);
+		from->sp_lstchg, from->sp_min, from->sp_max, from->sp_warn,
+		from->sp_inact, from->sp_expire, from->sp_flag, entry, buffer,
+		bufferSize);
 }
 
 
