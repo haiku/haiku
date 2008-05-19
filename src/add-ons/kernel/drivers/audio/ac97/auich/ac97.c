@@ -62,7 +62,7 @@ const char * stereo_enhancement_technique[] =
 	"ESS Technology",
 	"Harman International",
 	"Nvidea",
-	"Philips"
+	"Philips",
 	"Texas Instruments",
 	"VLSI Technology",
 	"TriTech",
