@@ -44,7 +44,7 @@ int is_empty(sigset_t *set) {
 
 void myhandler(int signo)
 {
-	printf("sigset_5-1: SIGCHLD called. Inside handler\n");
+	/* printf("sigset_5-1: SIGCHLD called. Inside handler\n"); */
 }
 
 int main()
@@ -66,6 +66,6 @@ int main()
 		printf("Test FAILED: signal mask should be empty\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_5-1: Test passed\n");
+	printf("%ssigset_5-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 } 

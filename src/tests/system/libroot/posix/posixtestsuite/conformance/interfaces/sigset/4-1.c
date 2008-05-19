@@ -22,7 +22,7 @@ int signal_blocked = 0;
 void myhandler(int signo)
 {
 	sigset_t mask;
-	printf("sigset_4-1: SIGCHLD called. Inside handler\n");
+	/* printf("sigset_4-1: SIGCHLD called. Inside handler\n"); */
 	sigprocmask(SIG_SETMASK, NULL, &mask);
 	if(sigismember(&mask, SIGCHLD)) {
 		signal_blocked = 1;
@@ -42,6 +42,6 @@ int main()
 		printf("Test FAILED: handler was called even though default was expected\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_4-1: Test PASSED\n");		
+	printf("%ssigset_4-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);		
 	return PTS_PASS;
 } 

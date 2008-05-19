@@ -110,22 +110,26 @@ int main(int argc, char * argv[])
 	}
 	
 	ret = kill(child, 0);
-	if ((ret == 0) || (errno != ESRCH))
-	{
-		output("Kill returned %d (%d: %s)\n", ret, errno, strerror(errno));
-		FAILED("Another process with the same PID as the child exists");
+	if ((ret == 0) || (errno != ESRCH)) {
+		printf("%sfork_3-1:%s                   "
+			"%sFAILED: Another process with the same PID as the child exists: %s%s\n",
+			boldOn, boldOff, red, strerror(errno), normal);
+		printf("%sfork_3-1:%s                   %sFAILED: See bug #1639%s\n", boldOn, boldOff, red, normal);
+		return 1;
 	}
 
 	ret = kill((pid_t) (0 - (int)child), 0);
-	if ((ret == 0) || (errno != ESRCH))
-	{
-		output("Kill returned %d (%d: %s)\n", ret, errno, strerror(errno));
-		FAILED("A process group with the same PID as the child exists");
+	if ((ret == 0) || (errno != ESRCH)) {
+		printf("%sfork_3-1:%s                   "
+			"%sFAILED: A process group with the same PID as the child exists: %s%s\n",
+			boldOn, boldOff, red, strerror(errno), normal);
+		printf("%sfork_3-1:%s                   %sFAILED: See bug #1639%s\n", boldOn, boldOff, red, normal);
+		return 1;
 	}
 
 	/* Test passed */
 	#if VERBOSE > 0
-	output("fork_3-1: Test PASSED\n");
+	printf("%sfork_3-1:%s                   %sPASSED%s\n", boldOn, boldOff, green, normal);
 	#endif
 
 	PASSED;

@@ -50,8 +50,9 @@ int main()
 	if (handler_called) {
 		printf("FAIL: Signal was not ignored\n");
 		return PTS_FAIL;
-	} 
-	printf("sigignore_1-1: Test PASSED\n");
+	}
+
+	printf("%ssigignore_1-1:%s              %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }
 

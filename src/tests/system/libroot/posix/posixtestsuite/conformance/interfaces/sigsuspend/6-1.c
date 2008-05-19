@@ -27,7 +27,7 @@
 
 void handler(int signo)
 {
-	printf("sigsuspend_6-1: Now inside signal handler\n");
+	/* printf("sigsuspend_6-1: Now inside signal handler\n"); */
 }
 
 int main()
@@ -49,16 +49,16 @@ int main()
 	        sigemptyset(&tempmask);
 
 	        if (sigaction(SIGUSR1,  &act, 0) == -1) {
-	                perror("Unexpected error while attempting to pre-conditions");
+	                perror("sigsuspend_6-1: Unexpected error while attempting to pre-conditions");
                 	return 3;
 	        }
 
-		printf("suspending child\n");
+		/* printf("sigsuspend_6-1: suspending child\n"); */
 	        if (sigsuspend(&tempmask) != -1) {
-	                perror("sigsuspend error");
+	                perror("sigsuspend_6-1: sigsuspend error");
 			return 1;
 		}
-	        printf("returned from suspend\n");
+	       /* printf("sigsuspend_6-1: returned from suspend\n"); */
 
 		sleep(1);
 		return 2;
@@ -70,26 +70,26 @@ int main()
 		/* parent */
 		sleep(1);
 
-		printf("parent sending child a SIGUSR1 signal\n");
+		/* printf("sigsuspend_6-1: parent sending child a SIGUSR1 signal\n"); */
 		kill (pid, SIGUSR1);
 
 		if (wait(&s) == -1) {
-			perror("Unexpected error while setting up test "
+			perror("sigsuspend_6-1: Unexpected error while setting up test "
 			       "pre-conditions");
 			return PTS_UNRESOLVED;
 		}
 
 		exit_status = WEXITSTATUS(s);
 
-		printf("Exit status from child is %d\n", exit_status);
+		/* printf("sigsuspend_6-1: Exit status from child is %d\n", exit_status); */
 
                 if (exit_status == 1) {
-			printf("Test FAILED\n");
+			printf("sigsuspend_6-1: Test FAILED\n");
                         return PTS_FAIL;
                 }
 
                 if (exit_status == 2) {
-			printf("sigsuspend_6-1: Test PASSED\n");
+			printf("%ssigsuspend_6-1:%s             %sPASSED%s\n", boldOn, boldOff, green, normal);
                         return PTS_PASS;
                 }
 
@@ -97,7 +97,7 @@ int main()
                         return PTS_UNRESOLVED;
                 }
 
-		printf("Child didn't exit with any of the expected return codes\n");
+		printf("sigsuspend_6-1: Child didn't exit with any of the expected return codes\n");
 		return PTS_UNRESOLVED;
 	}
 }

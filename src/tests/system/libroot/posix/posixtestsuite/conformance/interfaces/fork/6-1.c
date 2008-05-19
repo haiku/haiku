@@ -130,7 +130,7 @@ int main( int argc, char * argv[] )
 	/* Count entries */
 	counted = count( dotdir );
 
-#if VERBOSE > 0
+#if VERBOSE > 1
 
 	output( "Found %d entries in current dir\n", counted );
 
@@ -150,7 +150,7 @@ int main( int argc, char * argv[] )
 		/* Count in child process */
 		counted = count( dotdir );
 
-#if VERBOSE > 0
+#if VERBOSE > 1
 
 		output( "Found %d entries in current dir from child\n", counted );
 #endif
@@ -189,7 +189,7 @@ int main( int argc, char * argv[] )
 
 	/* Test passed */
 #if VERBOSE > 0
-	output( "fork_6-1: Test PASSED\n" );
+	printf("%sfork_6-1:%s                   %sPASSED%s\n", boldOn, boldOff, green, normal);
 
 #endif
 

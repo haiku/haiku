@@ -24,6 +24,6 @@ int main()
 		printf("Test FAILED: sigset() didn't return SIG_DFL\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_8-1: Test PASSED\n");
+	printf("%ssigset_8-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 } 

@@ -29,11 +29,13 @@ int main()
 	time_diff = difftime(time1, time0);
 
 	if (time_diff != WAIT_DURATION) {
-		perror("Test FAILED: difftime did not return the correct value\n");
+		printf("%sdifftime_1-1: Test FAILED: "
+			"difftime did not return the correct value%s\n",
+			red, normal);
 		return PTS_FAIL;
 	}
 
-	printf("difftime_1-1: Test PASSED\n");
+	printf("%sdifftime_1-1:%s               %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }
 

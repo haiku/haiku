@@ -47,6 +47,6 @@ int main()
 		return PTS_UNRESOLVED;
 	}
 		
-	printf("pthread_getspecific_3-1: Test PASSED\n");
+	printf("%spthread_getspecific_3-1:%s    %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }

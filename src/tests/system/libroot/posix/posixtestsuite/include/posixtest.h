@@ -15,3 +15,10 @@
 #define PTS_UNSUPPORTED 4
 #define PTS_UNTESTED    5
 
+/* colors */
+const char* const normal = "\033[0m";
+const char* const green = "\033[32m";
+const char* const red = "\033[31m";
+
+const char* const boldOn = "\033[1m";
+const char* const boldOff = "\033[22m";

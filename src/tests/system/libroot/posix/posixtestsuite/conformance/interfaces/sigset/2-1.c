@@ -54,6 +54,6 @@ int main()
 		printf("Test FAILED: handler was called even though default was expected\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_2-1: Test PASSED\n");		
+	printf("%ssigset_2-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);		
 	return PTS_PASS;
 } 

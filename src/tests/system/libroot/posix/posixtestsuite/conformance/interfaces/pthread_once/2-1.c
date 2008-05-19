@@ -112,7 +112,7 @@ int main( int argc, char * argv[] )
 		FAILED( "The initializer function did not execute" );
 	}
 
-	PASSED;
+	printf("%spthread_once_2-1:%s           %sPASSED%s\n", boldOn, boldOff, green, normal);
 }
 
 

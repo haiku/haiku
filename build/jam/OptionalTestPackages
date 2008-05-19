@@ -69,6 +69,8 @@ if [ IsOptionalHaikuImagePackageAdded PosixTestSuite ] {
 	AddFilesToHaikuImage home posixtestsuite conformance interfaces sigset
 		: sigset_1-1 sigset_2-1 sigset_3-1 sigset_4-1 sigset_5-1 sigset_6-1
 		  sigset_7-1 sigset_8-1 sigset_9-1 sigset_10-1 ;
+	AddFilesToHaikuImage home posixtestsuite conformance interfaces sigsuspend
+		: sigsuspend_6-1 ;
 
 	# add pthreads tests
 	local interfacesDir = home posixtestsuite conformance interfaces ;

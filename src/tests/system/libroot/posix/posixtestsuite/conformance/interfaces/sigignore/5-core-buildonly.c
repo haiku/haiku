@@ -53,8 +53,7 @@ int main(int argc, char *argv[])
 
 	if (sigignore(signo) == -1) {
 		if (EINVAL == errno) {
-			printf ("sigignore_5-core-buildonly %s: successfully set errno to EINVAL\n", argv[1]);
-			printf("sigignore_5-core-buildonly %s: Test PASSED\n", argv[1]);
+			printf("%ssigignore_5-core-buildonly%s:%s%sPASSED%s\n", boldOn, argv[1], boldOff, green, normal);
 			return PTS_PASS;
 		} else {
 			printf ("errno not set to EINVAL\n");

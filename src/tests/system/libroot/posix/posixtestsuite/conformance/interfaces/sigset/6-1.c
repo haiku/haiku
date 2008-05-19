@@ -58,6 +58,6 @@ int main()
 		printf("Test FAILED: Signal SIGCHLD was not successfully blocked\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_6-1: Test PASSED\n");
+	printf("%ssigset_6-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 } 

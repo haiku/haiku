@@ -81,6 +81,6 @@ int main() {
 		return PTS_FAIL;
 	}
 
-	printf("sigprocmask_12-1: Test PASSED: signal mask was not changed.\n");
+	printf("%ssigprocmask_12-1:%s           %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }

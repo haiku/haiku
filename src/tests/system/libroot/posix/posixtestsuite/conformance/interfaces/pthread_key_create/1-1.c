@@ -70,6 +70,6 @@ int main()
 		}
 	}
 
-	printf("pthread_key_create_1-1: Test PASSED\n");
+	printf("%spthread_key_create_1-1:%s     %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }

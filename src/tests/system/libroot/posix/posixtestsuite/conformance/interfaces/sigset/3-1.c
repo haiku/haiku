@@ -25,7 +25,7 @@ int handler_called = 0;
 
 void myhandler(int signo)
 {
-	printf("sigset_3-1: SIGCHLD called. Inside handler\n");
+	/* printf("sigset_3-1: SIGCHLD called. Inside handler\n"); */
 	handler_called = 1;
 }
 
@@ -42,6 +42,6 @@ int main()
 		printf("Test FAILED: handler was called even though default was expected\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_3-1: Test PASSED\n");		
+	printf("%ssigset_3-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);		
 	return PTS_PASS;
 } 

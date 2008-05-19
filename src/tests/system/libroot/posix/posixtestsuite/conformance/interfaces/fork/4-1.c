@@ -93,7 +93,9 @@ int main(int argc, char * argv[])
 	
 	/* Create the child */
 	child = fork();
-	if (child == (pid_t) -1)  {  UNRESOLVED(errno, "Failed to fork");  }
+	if (child == (pid_t) -1) {
+		UNRESOLVED(errno, "Failed to fork");
+	}
 	
 	/* child */
 	if (child == (pid_t) 0)
@@ -113,12 +115,14 @@ int main(int argc, char * argv[])
 	if (ctl != child)  {  UNRESOLVED(errno, "Waitpid returned the wrong PID");  }
 	if ((!WIFEXITED(status)) || (WEXITSTATUS(status) != PTS_PASS))
 	{
-		UNRESOLVED(status, "Child exited abnormally");
+		printf("%sfork_4-1:%s                   "
+			"%sFAILED Child exited abnormally %s%s\n",
+			boldOn, boldOff, red, strerror(status), normal);
 	}
 	
 	/* Test passed */
 	#if VERBOSE > 0
-	output("fork_4-1: Test PASSED\n");
+	printf("%sfork_4-1:%s                   %sPASSED%s\n", boldOn, boldOff, green, normal);
 	#endif
 
 	PASSED;

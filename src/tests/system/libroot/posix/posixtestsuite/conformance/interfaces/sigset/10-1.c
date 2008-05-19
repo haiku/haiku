@@ -29,6 +29,6 @@ int main()
 		printf("Test FAILED: sigset() didn't return SIG_ERROR even though SIGKILL was passed to it\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_10-1: Test PASSED\n");
+	printf("%ssigset_10-1:%s                %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 } 

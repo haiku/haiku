@@ -38,6 +38,6 @@ int main()
 		printf("Test FAILED: sigset didn't return myhandler even though it was SIGUSR1's original disposition\n");
                	return PTS_FAIL;
         }
-	printf("sigset_9-1: Test PASSED\n");
+	printf("%ssigset_9-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 } 

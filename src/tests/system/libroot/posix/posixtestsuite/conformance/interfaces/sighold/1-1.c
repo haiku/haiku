@@ -58,7 +58,7 @@ int main()
 		return PTS_FAIL;
 	}
 
-	printf("sighold_1-1: Test PASSED: signal was blocked\n");
+	printf("%ssighold_1-1:%s                %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }
 

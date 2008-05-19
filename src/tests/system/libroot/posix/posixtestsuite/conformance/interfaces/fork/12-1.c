@@ -166,7 +166,7 @@ int main( int argc, char * argv[] )
 	}
 	while ( ret != 1 );
 
-#if VERBOSE > 0
+#if VERBOSE > 1
 
 	output( "SIGUSR1 and SIGUSR2 are pending, we can fork\n" );
 
@@ -215,7 +215,7 @@ int main( int argc, char * argv[] )
 			FAILED( "The new process does not mask SIGUSR2 as its parent" );
 		}
 
-#if VERBOSE > 0
+#if VERBOSE > 1
 		output( "SIGUSR1 and SIGUSR2 are blocked in child\n" );
 
 #endif
@@ -225,34 +225,44 @@ int main( int argc, char * argv[] )
 
 		if ( ret != 0 )
 		{
-			UNRESOLVED( errno, "failed to examine pending signal set in child" );
+			printf("%sfork_12-1:%s                  "
+				"%sFAILED: failed to examine pending signal set in child: %s%s\n",
+				boldOn, boldOff, red, strerror(errno), normal);
 		}
 
 		ret = sigismember( &pending, SIGUSR1 );
 
 		if ( ret < 0 )
 		{
-			UNRESOLVED( errno, "Unable to check signal USR1 presence" );
+			printf("%sfork_12-1:%s                  "
+				"%sFAILED: Unable to check signal USR1 presence%s\n",
+				boldOn, boldOff, red, normal);
 		}
 
 		if ( ret != 0 )
 		{
-			FAILED( "The new process was created with SIGUSR1 pending" );
+			printf("%sfork_12-1:%s                  "
+				"%sFAILED: The new process was created with SIGUSR1 pending%s\n",
+				boldOn, boldOff, red, normal);
 		}
 
 		ret = sigismember( &pending, SIGUSR2 );
 
 		if ( ret < 0 )
 		{
-			UNRESOLVED( errno, "Unable to check signal USR2 presence" );
+			printf("%sfork_12-1:%s                  "
+				"%sFAILED: Unable to check signal USR2 presence: %s%s\n",
+				boldOn, boldOff, red, strerror(errno), normal);
 		}
 
 		if ( ret != 0 )
 		{
-			FAILED( "The new process was created with SIGUSR2 pending" );
+			printf("%sfork_12-1:%s                  "
+				"%sFAILED: The new process was created with SIGUSR2 pending%s\n",
+				boldOn, boldOff, red, normal);
 		}
 
-#if VERBOSE > 0
+#if VERBOSE > 1
 		output( "SIGUSR1 and SIGUSR2 are not pending in child\n" );
 
 #endif
@@ -266,18 +276,22 @@ int main( int argc, char * argv[] )
 
 	if ( ctl != child )
 	{
-		UNRESOLVED( errno, "Waitpid returned the wrong PID" );
+		printf("%sfork_12-1:%s                  "
+			"%sFAILED: Waitpid returned the wrong PID: %s%s\n",
+			boldOn, boldOff, red, strerror(errno), normal);
 	}
 
 	if ( ( !WIFEXITED( status ) ) || ( WEXITSTATUS( status ) != PTS_PASS ) )
 	{
-		FAILED( "Child exited abnormally" );
+		printf("%sfork_12-1:%s                  %sFAILED: Child exited abnormally%s\n",
+			boldOn, boldOff, red, normal);
+		
 	}
 
 	/* Test passed */
 #if VERBOSE > 0
 
-	output( "fork_12-1: Test PASSED\n" );
+	printf("%sfork_12-1:%s                  %sPASSED%s\n", boldOn, boldOff, green, normal);
 
 #endif
 

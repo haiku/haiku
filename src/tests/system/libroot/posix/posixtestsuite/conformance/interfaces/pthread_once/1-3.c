@@ -177,7 +177,7 @@ int main( int argc, char * argv[] )
 		UNRESOLVED( ret, "Failed to unlock mutex in initializer" );
 	}
 
-	PASSED;
+	printf("%spthread_once_1-3:%s           %sPASSED%s\n", boldOn, boldOff, green, normal);
 }
 
 

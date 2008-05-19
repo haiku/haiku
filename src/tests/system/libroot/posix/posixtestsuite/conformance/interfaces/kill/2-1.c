@@ -24,7 +24,7 @@ int main()
 		return PTS_FAIL;
 	}
 
-	printf("kill_2-1: Test PASSED\n");
+	printf("%skill_2-1:%s                   %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }
 

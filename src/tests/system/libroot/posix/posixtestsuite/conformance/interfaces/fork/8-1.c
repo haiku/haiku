@@ -225,9 +225,7 @@ int main( int argc, char * argv[] )
 
 	/* Test passed */
 #if VERBOSE > 0
-
-	output( "fork_8-1: Test PASSED\n" );
-
+	printf("%sfork_8-1:%s                   %sPASSED%s\n", boldOn, boldOff, green, normal);
 #endif
 
 	PASSED;

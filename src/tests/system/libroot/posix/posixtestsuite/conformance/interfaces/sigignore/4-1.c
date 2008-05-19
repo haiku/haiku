@@ -22,6 +22,6 @@ int main()
 		perror("sigignore failed -- returned -- test aborted");
 		return PTS_UNRESOLVED;
 	} 
-	printf("sigignore_4-1: Test PASSED\n");
+	printf("%ssigignore_4-1:%s              %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }

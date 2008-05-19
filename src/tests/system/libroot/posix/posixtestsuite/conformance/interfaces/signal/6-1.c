@@ -35,6 +35,7 @@ int main()
 		printf("Test FAILED: errno wasn't set to EINVAL even though invalid signal number was passed to the signal() function\n");
                	return PTS_FAIL;
         }
-    printf("signal_6-1: Test PASSED\n");
+	printf("%ssignal_6-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);
+    
 	return PTS_PASS;
 } 

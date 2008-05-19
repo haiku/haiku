@@ -22,6 +22,6 @@ int main()
 		perror("sighold failed -- returned -- test aborted");
 		return PTS_UNRESOLVED;
 	} 
-	printf("sighold_2-1: Test PASSED\n");
+	printf("%ssighold_2-1:%s                %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 }

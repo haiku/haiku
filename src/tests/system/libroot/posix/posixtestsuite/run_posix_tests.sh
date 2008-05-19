@@ -30,8 +30,7 @@ standard_tests()
 	conformance/interfaces/difftime/difftime_1-1
 	echo ""
 	echo "fork()"
-#	conformance/interfaces/fork/fork_3-1
-	echo "fork_3-1: FIXME : test sometimes fails, see bug #1639"
+	conformance/interfaces/fork/fork_3-1
 	conformance/interfaces/fork/fork_4-1
 	conformance/interfaces/fork/fork_6-1
 	conformance/interfaces/fork/fork_8-1
@@ -49,6 +48,7 @@ asynchronous_input_output_tests()
 
 threads_tests()
 {
+	echo ""
 	echo "pthread_getspecific()"
 	conformance/interfaces/pthread_getspecific/pthread_getspecific_1-1
 	conformance/interfaces/pthread_getspecific/pthread_getspecific_3-1
@@ -78,6 +78,7 @@ threads_tests()
 
 signals_tests()
 {
+	echo ""
 	echo "kill()"
 	conformance/interfaces/kill/kill_2-1
 	echo ""
@@ -134,13 +135,14 @@ signals_tests()
 	conformance/interfaces/sigset/sigset_10-1
 	echo ""
 	echo "sigsuspend()"
-	echo "FIXME: haiku' sigsuspend can not 'wake up' yet."
+	conformance/interfaces/sigsuspend/sigsuspend_6-1
 }
+
 
 all_tests()
 {
 	standard_tests
-	asynchronous_input_output_tests
+	#asynchronous_input_output_tests
 	signals_tests
 	threads_tests
 }

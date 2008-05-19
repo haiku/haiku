@@ -35,6 +35,7 @@ int main()
 		printf("Test FAILED: errno wasn't set to EINVAL even though a non-catchable signal was passed to the signal() function\n");
                	return PTS_FAIL;
         }
-    printf("signal_7-1: Test PASSED\n");
+
+    printf("%ssignal_7-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 } 

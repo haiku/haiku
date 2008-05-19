@@ -64,7 +64,7 @@ int main()
 	sleep(1);
 
 	if (handler_called) {
-		printf("sigrelse_1-1: Test PASSED: SIGABRT successfully removed from signal mask\n");
+		printf("%ssigrelse_1-1:%s               %sPASSED%s\n", boldOn, boldOff, green, normal);
 		return PTS_PASS;
 	} 
 	printf("FAIL\n");

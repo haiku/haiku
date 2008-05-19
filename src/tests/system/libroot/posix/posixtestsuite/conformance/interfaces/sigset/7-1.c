@@ -29,7 +29,7 @@ int handler_called = 0;
 
 void myhandler(int signo)
 {
-	printf("sigset_7-1: SIGCHLD called. Inside handler\n");
+	/* printf("sigset_7-1: SIGCHLD called. Inside handler\n"); */
 	handler_called = 1;
 }
 
@@ -69,6 +69,6 @@ int main()
 		printf("Test FAILED: Signal wasn't delivered even though it was removed from the signal mask\n");
 		return PTS_FAIL;
 	}
-	printf("sigset_7-1: Test PASSED\n");
+	printf("%ssigset_7-1:%s                 %sPASSED%s\n", boldOn, boldOff, green, normal);
 	return PTS_PASS;
 } 
