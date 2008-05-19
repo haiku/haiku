@@ -1033,7 +1033,8 @@ static file_system_module_info sUserlandFSModuleInfo = {
 		userlandfs_std_ops,
 	},
 
-	"Userland File System",
+	"userlandfs",				// short name
+	"Userland File System",		// pretty name
 	0,	// DDM flags
 
 	// scanning

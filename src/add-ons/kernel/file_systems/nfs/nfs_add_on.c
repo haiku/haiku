@@ -2542,7 +2542,8 @@ file_system_module_info sNFSFileSystem = {
 		0,
 		nfs_std_ops,
 	},
-	"Network File System v2",
+	"nfs",				// short name
+	"Network File System v2",	// pretty name
 	0,	// DDM flags
 
 	// scanning
