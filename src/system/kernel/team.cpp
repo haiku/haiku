@@ -1940,6 +1940,12 @@ wait_for_child(pid_t child, uint32 flags, int32 *_reason,
 			atomic_and(&thread->sig_pending, ~SIGNAL_TO_MASK(SIGCHLD));
 	}
 
+	// When the team is dead, the main thread continues to live in the kernel
+	// team for a very short time. To avoid surprises for the caller we rather
+	// wait until the thread is really gone.
+	if (foundEntry.state == JOB_CONTROL_STATE_DEAD)
+		wait_for_thread(foundEntry.thread, NULL);
+
 	T(WaitForChildDone(foundEntry));
 
 	return foundEntry.thread;
