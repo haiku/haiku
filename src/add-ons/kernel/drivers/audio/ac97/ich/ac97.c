@@ -199,7 +199,7 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	dev->cookie = cookie;
 	dev->reg_read = reg_read;
 	dev->reg_write = reg_write;
-	dev->codec_id = (reg_read(cookie, AC97_VENDOR_ID1) << 16) | reg_read(cookie, AC97_VENDOR_ID2);
+	dev->codec_id = ((uint32)reg_read(cookie, AC97_VENDOR_ID1) << 16) | reg_read(cookie, AC97_VENDOR_ID2);
 	codec = find_codec_table(dev->codec_id);
 	dev->codec_info = codec->info;
 	dev->init = codec->init;
