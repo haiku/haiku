@@ -199,21 +199,20 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 {
 	ac97_dev *dev;
 	codec_table *codec;
+	int i;
 	
 	*_dev = dev = (ac97_dev *) malloc(sizeof(ac97_dev));
 	dev->cookie = cookie;
 	dev->reg_read = reg_read;
 	dev->reg_write = reg_write;
-	dev->codec_id = ((uint32)reg_read(cookie, AC97_VENDOR_ID1) << 16) | reg_read(cookie, AC97_VENDOR_ID2);
-	codec = find_codec_table(dev->codec_id);
-	dev->codec_info = codec->info;
-	dev->init = codec->init;
 	dev->set_rate = 0;
 	dev->get_rate = 0;
 	dev->clock = 48000; /* default clock on non-broken motherboards */
 	dev->min_vsr = 0x0001;	
 	dev->max_vsr = 0xffff;
 	dev->reversed_eamp_polarity = false;
+	dev->capabilities = 0;
+
 	dev->subsystem = (subvendor_id << 16) | subsystem_id;
 	
 	if (dev->subsystem == 0x161f202f
@@ -229,18 +228,26 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 		|| dev->subsystem == 0x103382be) {
 		dev->reversed_eamp_polarity = true;
 	}
-
+		
 	/* reset the codec */	
 	LOG(("codec reset\n"));
 	ac97_reg_uncached_write(dev, AC97_RESET, 0x0000);
-	snooze(50000); // 50 ms
+	for (i = 0; i < 500; i++) {
+		if ((ac97_reg_uncached_read(dev, AC97_POWERDOWN) & 0xf) == 0xf)
+			break;
+		snooze(1000);
+	}
 
 	/* setup register cache */
 	ac97_update_register_cache(dev);
 
+	dev->codec_id = ((uint32)reg_read(cookie, AC97_VENDOR_ID1) << 16) | reg_read(cookie, AC97_VENDOR_ID2);
+	codec = find_codec_table(dev->codec_id);
+	dev->codec_info = codec->info;
+	dev->init = codec->init;
+		
 	dev->codec_3d_stereo_enhancement = stereo_enhancement_technique[(ac97_reg_cached_read(dev, AC97_RESET) >> 10) & 31];
-	dev->capabilities = 0;
-
+	
 	ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 1, 1); // enable variable rate audio
 
 	ac97_detect_capabilities(dev);
