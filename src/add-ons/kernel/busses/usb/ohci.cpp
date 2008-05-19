@@ -992,7 +992,8 @@ OHCI::_FinishTransfers()
 
 			// break the descriptor chain on the last descriptor
 			transfer->last_descriptor->next_logical_descriptor = NULL;
-			TRACE(("usb_ohci: transfer %p done\n", transfer));
+			TRACE(("usb_ohci: transfer %p done with status 0x%08lx\n",
+				transfer, callbackStatus));
 
 			// if canceled the callback has already been called
 			if (!transfer->canceled) {
@@ -1240,7 +1241,8 @@ OHCI::_RemoveTransferFromEndpoint(transfer_data *transfer)
 	ohci_endpoint_descriptor *endpoint = transfer->endpoint;
 	ohci_general_td *descriptor = transfer->first_descriptor;
 	while (descriptor) {
-		if (endpoint->head_physical_descriptor == descriptor->physical_address) {
+		if ((endpoint->head_physical_descriptor & OHCI_ENDPOINT_HEAD_MASK)
+			== descriptor->physical_address) {
 			// This descriptor caused the halt. Advance the head pointer. This
 			// will either move the head to the next valid transfer that can
 			// then be restarted, or it will move the head to the tail when

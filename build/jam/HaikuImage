@@ -149,7 +149,7 @@ AddFilesToHaikuImage beos system add-ons kernel busses ide
 AddFilesToHaikuImage beos system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage beos system add-ons kernel busses usb
-	: <usb>uhci <usb>ehci ;
+	: <usb>uhci <usb>ohci <usb>ehci ;
 AddFilesToHaikuImage beos system add-ons kernel console : vga_text ;
 AddFilesToHaikuImage beos system add-ons kernel debugger
 	: <kdebug>hangman <kdebug>invalidate_on_exit ;
