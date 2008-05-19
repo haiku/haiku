@@ -1492,12 +1492,19 @@ BView::ScrollBar(orientation posture) const
 void
 BView::ScrollBy(float deltaX, float deltaY)
 {
+	ScrollTo(BPoint(fBounds.left + deltaX, fBounds.top + deltaY));
+}
+
+
+void
+BView::ScrollTo(BPoint where)
+{
 	// scrolling by fractional values is not supported
-	deltaX = roundf(deltaX);
-	deltaY = roundf(deltaY);
+	where.x = roundf(where.x);
+	where.y = roundf(where.y);
 
 	// no reason to process this further if no scroll is intended.
-	if (deltaX == 0 && deltaY == 0)
+	if (where.x == fBounds.left && where.y == fBounds.top)
 		return;
 
 	// make sure scrolling is within valid bounds
@@ -1505,19 +1512,19 @@ BView::ScrollBy(float deltaX, float deltaY)
 		float min, max;
 		fHorScroller->GetRange(&min, &max);
 
-		if (deltaX + fBounds.left < min)
-			deltaX = min - fBounds.left;
-		else if (deltaX + fBounds.left > max)
-			deltaX = max - fBounds.left;
+		if (where.x < min)
+			where.x = min;
+		else if (where.x > max)
+			where.x = max;
 	}
 	if (fVerScroller) {
 		float min, max;
 		fVerScroller->GetRange(&min, &max);
 
-		if (deltaY + fBounds.top < min)
-			deltaY = min - fBounds.top;
-		else if (deltaY + fBounds.top > max)
-			deltaY = max - fBounds.top;
+		if (where.y < min)
+			where.y = min;
+		else if (where.y > max)
+			where.y = max;
 	}
 
 	_CheckLockAndSwitchCurrent();
@@ -1525,8 +1532,8 @@ BView::ScrollBy(float deltaX, float deltaY)
 	// if we're attached to a window tell app_server about this change
 	if (fOwner) {
 		fOwner->fLink->StartMessage(AS_VIEW_SCROLL);
-		fOwner->fLink->Attach<float>(deltaX);
-		fOwner->fLink->Attach<float>(deltaY);
+		fOwner->fLink->Attach<float>(where.x - fBounds.left);
+		fOwner->fLink->Attach<float>(where.y - fBounds.top);
 
 		fOwner->fLink->Flush();
 
@@ -1534,20 +1541,14 @@ BView::ScrollBy(float deltaX, float deltaY)
 	}
 
 	// we modify our bounds rectangle by deltaX/deltaY coord units hor/ver.
-	fBounds.OffsetBy(deltaX, deltaY);
+	fBounds.OffsetTo(where.x, where.y);
 
 	// then set the new values of the scrollbars
-	if (fHorScroller && deltaX != 0.0)
+	if (fHorScroller)
 		fHorScroller->SetValue(fBounds.left);
-	if (fVerScroller && deltaY != 0.0)
+	if (fVerScroller)
 		fVerScroller->SetValue(fBounds.top);
-}
 
-
-void
-BView::ScrollTo(BPoint where)
-{
-	ScrollBy(where.x - fBounds.left, where.y - fBounds.top);
 }
 
 
