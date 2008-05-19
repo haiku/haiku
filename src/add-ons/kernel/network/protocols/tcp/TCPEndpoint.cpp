@@ -220,6 +220,7 @@ enum {
 	FLAG_NO_RECEIVE				= 0x04,
 	FLAG_CLOSED					= 0x08,
 	FLAG_DELETE_ON_CLOSE		= 0x10,
+	FLAG_LOCAL					= 0x20
 };
 
 
@@ -497,21 +498,6 @@ TCPEndpoint::Close()
 
 		TRACE("Close(): after waiting, the SendQ was left with %lu bytes.",
 			fSendQueue.Used());
-#if 0
-// TODO: For the following to work we also need to be notified when TIME_WAIT
-// is entered.
-	} else if (fRoute != NULL && (fRoute->flags & RTF_LOCAL) != 0) {
-		// This is a local connection - just wait until we're done so that
-		// the port is available again
-		while (fState != CLOSED && fState != TIME_WAIT) {
-			if (socket->error != B_OK)
-				return socket->error;
-
-			status_t status = fSendList.Wait(locker);
-			if (status < B_OK)
-				return status;
-		}
-#endif	// 0
 	}
 	return B_OK;
 }
@@ -1022,6 +1008,13 @@ TCPEndpoint::IsBound() const
 }
 
 
+bool
+TCPEndpoint::IsLocal() const
+{
+	return (fFlags & FLAG_LOCAL) != 0;
+}
+
+
 status_t
 TCPEndpoint::DelayedAcknowledge()
 {
@@ -1058,8 +1051,7 @@ TCPEndpoint::_EnterTimeWait()
 
 	_CancelConnectionTimers();
 
-	if (fState == TIME_WAIT && fRoute != NULL
-		&& (fRoute->flags & RTF_LOCAL) != 0) {
+	if (fState == TIME_WAIT && IsLocal()) {
 		// we do not use TIME_WAIT state for local connections
 		fFlags |= FLAG_DELETE_ON_CLOSE;
 		return;
@@ -1131,13 +1123,9 @@ TCPEndpoint::_MarkEstablished()
 status_t
 TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 {
-#if 0
 // TODO: Checking for CLOSED seems correct, but breaks several neon tests.
 // When investigating this, also have a look at _Close() and _HandleReset().
-	while (fState < ESTABLISHED && fState != CLOSED) {
-#else
-	while (fState < ESTABLISHED) {
-#endif
+	while (fState < ESTABLISHED/* && fState != CLOSED*/) {
 		if (socket->error != B_OK)
 			return socket->error;
 
@@ -1162,12 +1150,8 @@ TCPEndpoint::_Close()
 
 	fFlags |= FLAG_DELETE_ON_CLOSE;
 
-#if 0
-// TODO: Should probably be moved here (from _HandleReset()), but cf. the
-// comment in _WaitForEstablished().
 	fSendList.Signal();
 	_NotifyReader();
-#endif
 }
 
 
@@ -1176,12 +1160,6 @@ TCPEndpoint::_HandleReset(status_t error)
 {
 	socket->error = error;
 	_Close();
-
-#if 1
-// TODO: Should be moved to _Close(), but cf. comment in _WaitForEstablished().
-	fSendList.Signal();
-	_NotifyReader();
-#endif
 
 	gSocketModule->notify(socket, B_SELECT_WRITE, error);
 	gSocketModule->notify(socket, B_SELECT_ERROR, error);
@@ -2041,6 +2019,9 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 		fRoute = gDatalinkModule->get_route(Domain(), peer);
 		if (fRoute == NULL)
 			return ENETUNREACH;
+
+		if ((fRoute->flags & RTF_LOCAL) != 0)
+			fFlags |= FLAG_LOCAL;
 	}
 
 	// make sure connection does not already exist

@@ -106,7 +106,7 @@ private:
 	typedef OpenHashTable<ConnectionHashDefinition> ConnectionTable;
 	typedef MultiHashTable<EndpointHashDefinition> EndpointTable;
 
-	benaphore				fLock;
+	mutex					fLock;
 	net_domain*				fDomain;
 	ConnectionTable			fConnectionHash;
 	EndpointTable			fEndpointHash;

@@ -73,6 +73,7 @@ public:
 
 			tcp_state	State() const { return fState; }
 			bool		IsBound() const;
+			bool		IsLocal() const;
 
 			status_t	DelayedAcknowledge();
 			status_t	SendAcknowledge(bool force);
@@ -162,6 +163,7 @@ private:
 
 	net_route 		*fRoute;
 		// TODO: don't use a net_route, but a net_route_info!!!
+		// (the latter will automatically adapt to routing changes)
 
 	tcp_sequence	fReceiveNext;
 	tcp_sequence	fReceiveMaxAdvertised;

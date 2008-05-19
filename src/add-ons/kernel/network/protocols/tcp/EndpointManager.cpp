@@ -221,29 +221,24 @@ EndpointManager::EndpointManager(net_domain* domain)
 	fConnectionHash(this),
 	fLastPort(kFirstEphemeralPort)
 {
-	benaphore_init(&fLock, "endpoint manager");
+	mutex_init(&fLock, "endpoint manager");
 }
 
 
 EndpointManager::~EndpointManager()
 {
-	benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
 status_t
 EndpointManager::InitCheck() const
 {
-	if (fConnectionHash.InitCheck() < B_OK)
-		return fConnectionHash.InitCheck();
+	status_t status = fConnectionHash.InitCheck();
+	if (status == B_OK)
+		status = fEndpointHash.InitCheck();
 
-	if (fEndpointHash.InitCheck() < B_OK)
-		return fEndpointHash.InitCheck();
-
-	if (fLock.sem < B_OK)
-		return fLock.sem;
-
-	return B_OK;
+	return status;
 }
 
 
@@ -266,7 +261,7 @@ EndpointManager::SetConnection(TCPEndpoint* endpoint, const sockaddr* _local,
 {
 	TRACE(("EndpointManager::SetConnection(%p)\n", endpoint));
 
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	SocketAddressStorage local(AddressModule());
 	local.SetTo(_local);
@@ -292,7 +287,7 @@ EndpointManager::SetConnection(TCPEndpoint* endpoint, const sockaddr* _local,
 status_t
 EndpointManager::SetPassive(TCPEndpoint* endpoint)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (!endpoint->IsBound()) {
 		// if the socket is unbound first bind it to ephemeral
@@ -319,7 +314,7 @@ EndpointManager::SetPassive(TCPEndpoint* endpoint)
 TCPEndpoint*
 EndpointManager::FindConnection(sockaddr* local, sockaddr* peer)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	TCPEndpoint *endpoint = _LookupConnection(local, peer);
 	if (endpoint != NULL) {
@@ -366,7 +361,7 @@ EndpointManager::Bind(TCPEndpoint* endpoint, const sockaddr* address)
 	// if (!AddressModule()->is_understandable(address))
 	//	return EAFNOSUPPORT;
 
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (AddressModule()->get_port(address) == 0)
 		return _BindToEphemeral(endpoint, address);
@@ -378,11 +373,12 @@ EndpointManager::Bind(TCPEndpoint* endpoint, const sockaddr* address)
 status_t
 EndpointManager::BindChild(TCPEndpoint* endpoint)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 	return _Bind(endpoint, *endpoint->LocalAddress());
 }
 
 
+/*! You must hold fLock when calling this method. */
 status_t
 EndpointManager::_BindToAddress(TCPEndpoint* endpoint, const sockaddr* _address)
 {
@@ -397,25 +393,52 @@ EndpointManager::_BindToAddress(TCPEndpoint* endpoint, const sockaddr* _address)
 	if (ntohs(port) <= kLastReservedPort && geteuid() != 0)
 		return B_PERMISSION_DENIED;
 
-	EndpointTable::ValueIterator portUsers = fEndpointHash.Lookup(port);
+	bool retrying = false;
+	int32 retry = 0;
+	do {
+		EndpointTable::ValueIterator portUsers = fEndpointHash.Lookup(port);
+		retry = false;
 
-	while (portUsers.HasNext()) {
-		TCPEndpoint *user = portUsers.Next();
+		while (portUsers.HasNext()) {
+			TCPEndpoint* user = portUsers.Next();
 
-		if (user->LocalAddress().IsEmpty(false)
-			|| address.EqualTo(*user->LocalAddress(), false)) {
-			if ((endpoint->socket->options & SO_REUSEADDR) == 0)
-				return EADDRINUSE;
-			// TODO lock endpoint before retriving state?
-			if (user->State() != TIME_WAIT && user->State() != CLOSED)
-				return EADDRINUSE;
+			if (user->LocalAddress().IsEmpty(false)
+				|| address.EqualTo(*user->LocalAddress(), false)) {
+				// Check if this belongs to a local connection
+
+				// Note, while we hold our lock, the endpoint cannot go away,
+				// it can only change its state - IsLocal() is safe to be used
+				// without having the endpoint locked.
+				tcp_state userState = user->State();
+				if (user->IsLocal()
+					&& (userState > ESTABLISHED || userState == CLOSED)) {
+					// This is a closing local connection - wait until it's
+					// gone away for real
+					mutex_unlock(&fLock);
+					snooze(10000);
+					mutex_lock(&fLock);
+						// TODO: make this better
+					if (!retrying) {
+						retrying = true;
+						retry = 5;
+					}
+					break;
+				}
+
+				if ((endpoint->socket->options & SO_REUSEADDR) == 0)
+					return EADDRINUSE;
+
+				if (userState != TIME_WAIT && userState != CLOSED)
+					return EADDRINUSE;
+			}
 		}
-	}
+	} while (retry-- > 0);
 
 	return _Bind(endpoint, *address);
 }
 
 
+/*! You must hold fLock when calling this method. */
 status_t
 EndpointManager::_BindToEphemeral(TCPEndpoint* endpoint,
 	const sockaddr* address)
@@ -486,7 +509,7 @@ EndpointManager::Unbind(TCPEndpoint* endpoint)
 		return B_BAD_VALUE;
 	}
 
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (!fEndpointHash.Remove(endpoint))
 		panic("bound endpoint %p not in hash!", endpoint);

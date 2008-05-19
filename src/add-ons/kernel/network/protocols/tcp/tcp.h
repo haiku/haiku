@@ -25,7 +25,7 @@
 
 class EndpointManager;
 
-typedef enum {
+enum tcp_state {
 	// establishing a connection
 	CLOSED,
 	LISTEN,
@@ -42,7 +42,7 @@ typedef enum {
 	FINISH_ACKNOWLEDGED,
 	CLOSING,
 	TIME_WAIT
-} tcp_state;
+};
 
 struct tcp_header {
 	uint16 source_port;
