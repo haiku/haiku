@@ -964,6 +964,7 @@ OHCI::_FinishTransfers()
 				// which causes all of the tds to become "free" (as they are
 				// inaccessible and not accessed anymore (as setting the head
 				// pointer required disabling the endpoint))
+				callbackStatus = B_OK;
 				transferDone = true;
 			}
 
@@ -1031,10 +1032,14 @@ OHCI::_FinishTransfers()
 				transfer->transfer->Finished(callbackStatus, actualLength);
 			}
 
+			if (callbackStatus != B_OK) {
+				// remove the transfer and make the head pointer valid again
+				// (including clearing the halt state)
+				_RemoveTransferFromEndpoint(transfer);
+			}
+
 			// free the descriptors
 			_FreeDescriptorChain(transfer->first_descriptor);
-			// TODO: in case of cancel/error adjust the endpoint head and
-			// restart the endpoint by clearing the halt
 
 			delete transfer->transfer;
 			delete transfer;
@@ -1223,6 +1228,32 @@ OHCI::_SwitchEndpointTail(ohci_endpoint_descriptor *endpoint,
 void
 OHCI::_RemoveTransferFromEndpoint(transfer_data *transfer)
 {
+	// The transfer failed and the endpoint was halted. This means that the
+	// endpoint head pointer might point somewhere into the descriptor chain
+	// of this transfer. As we do not know if this transfer actually caused
+	// the halt on the endpoint we have to make sure this is the case. If we
+	// find the head to point to somewhere into the descriptor chain then
+	// simply advancing the head pointer to the link of the last transfer
+	// will bring the endpoint into a valid state again. This operation is
+	// safe as the endpoint is currently halted and we therefore can change
+	// the head pointer.
+	ohci_endpoint_descriptor *endpoint = transfer->endpoint;
+	ohci_general_td *descriptor = transfer->first_descriptor;
+	while (descriptor) {
+		if (endpoint->head_physical_descriptor == descriptor->physical_address) {
+			// This descriptor caused the halt. Advance the head pointer. This
+			// will either move the head to the next valid transfer that can
+			// then be restarted, or it will move the head to the tail when
+			// there are no more transfer descriptors. Setting the head will
+			// also clear the halt state as it is stored in the first bit of
+			// the head pointer.
+			endpoint->head_physical_descriptor
+				= transfer->last_descriptor->next_physical_descriptor;
+			return;
+		}
+
+		descriptor = (ohci_general_td *)descriptor->next_logical_descriptor;
+	}
 }
 
 
