@@ -1,0 +1,43 @@
+SubDir HAIKU_TOP src add-ons accelerants s3 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics s3 ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+Addon s3.accelerant :
+	accel.cpp
+	cursor.cpp
+	engine.cpp
+	hooks.cpp
+	mode.cpp
+	register_io.cpp
+	
+	savage_cursor.cpp
+	savage_dpms.cpp
+	savage_draw.cpp
+	savage_edid.cpp
+	savage_init.cpp
+	savage_mode.cpp
+	
+	trio64_cursor.cpp
+	trio64_dpms.cpp
+	trio64_draw.cpp
+	trio64_init.cpp
+	trio64_mode.cpp
+	
+	virge_cursor.cpp
+	virge_dpms.cpp
+	virge_draw.cpp
+	virge_edid.cpp
+	virge_init.cpp
+	virge_mode.cpp
+
+	: be libaccelerantscommon.a
+;
+
+Package haiku-s3-cvs :
+	s3.accelerant :
+	boot home config add-ons accelerants ;
+	

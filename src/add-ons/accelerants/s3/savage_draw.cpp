@@ -4,29 +4,26 @@
 	Copyright (C) 1994-2000 The XFree86 Project, Inc.  All Rights Reserved.
 	Copyright (c) 2003-2006, X.Org Foundation
 
-	Copyright 2007 Haiku, Inc.  All rights reserved.
+	Copyright 2007-2008 Haiku, Inc.  All rights reserved.
 	Distributed under the terms of the MIT license.
 
 	Authors:
-	Gerald Zajac 2006-2007
+	Gerald Zajac 2006-2008
 */
 
 
-#include "GlobalData.h"
-#include "AccelerantPrototypes.h"
+#include "accel.h"
 #include "savage.h"
 
 
 
 void 
-FILL_RECTANGLE (engine_token *et, uint32 color, fill_rect_params *pList, uint32 count)
+Savage_FillRectangle(engine_token *et, uint32 color, fill_rect_params *pList, uint32 count)
 {
 	int cmd = BCI_CMD_RECT | BCI_CMD_RECT_XP | BCI_CMD_RECT_YP
 			| BCI_CMD_DEST_PBD_NEW | BCI_CMD_SRC_SOLID | BCI_CMD_SEND_COLOR;
 
 	(void)et;		// avoid compiler warning for unused arg
-
-//	TRACE(("FILL_RECTANGLE, color: %X  count: %d\n", color, count));
 
 	BCI_CMD_SET_ROP(cmd, 0xCC);		// use GXcopy for rop
 
@@ -38,11 +35,11 @@ FILL_RECTANGLE (engine_token *et, uint32 color, fill_rect_params *pList, uint32 
 
 		BCI_GET_PTR;
 
-		si->WaitQueue(7);
+		gInfo.WaitQueue(7);
 
 		BCI_SEND(cmd);
-		BCI_SEND(si->GlobalBD.bd2.LoPart);
-		BCI_SEND(si->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
 
 		BCI_SEND(color);
 		BCI_SEND(BCI_X_Y(x, y));
@@ -54,14 +51,12 @@ FILL_RECTANGLE (engine_token *et, uint32 color, fill_rect_params *pList, uint32 
 
 
 void 
-FILL_SPAN(engine_token *et, uint32 color, uint16 *pList, uint32 count)
+Savage_FillSpan(engine_token *et, uint32 color, uint16 *pList, uint32 count)
 {
 	int cmd = BCI_CMD_RECT | BCI_CMD_RECT_XP | BCI_CMD_RECT_YP
 			| BCI_CMD_DEST_PBD_NEW | BCI_CMD_SRC_SOLID | BCI_CMD_SEND_COLOR;
 
 	(void)et;		// avoid compiler warning for unused arg
-
-//	TRACE(("FILL_SPAN, count: %d\n", count));
 
 	BCI_CMD_SET_ROP(cmd, 0xCC);		// use GXcopy for rop
 
@@ -76,15 +71,15 @@ FILL_SPAN(engine_token *et, uint32 color, uint16 *pList, uint32 count)
 		// spans which the Savage chips display as a line completely across the
 		// screen;  thus, the following if statement discards any span with zero
 		// or negative width.
-			
+
 		if (w <= 0)
 			continue;
 
-		si->WaitQueue(7);
+		gInfo.WaitQueue(7);
 
 		BCI_SEND(cmd);
-		BCI_SEND(si->GlobalBD.bd2.LoPart);
-		BCI_SEND(si->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
 
 		BCI_SEND(color);
 		BCI_SEND(BCI_X_Y(x, y));
@@ -94,14 +89,12 @@ FILL_SPAN(engine_token *et, uint32 color, uint16 *pList, uint32 count)
 
 
 void 
-INVERT_RECTANGLE(engine_token *et, fill_rect_params *pList, uint32 count)
+Savage_InvertRectangle(engine_token *et, fill_rect_params *pList, uint32 count)
 {
 	int cmd = BCI_CMD_RECT | BCI_CMD_RECT_XP | BCI_CMD_RECT_YP
 			| BCI_CMD_DEST_PBD_NEW;
 
 	(void)et;		// avoid compiler warning for unused arg
-
-//	TRACE(("INVERT_RECTANGLE, count: %d\n", count));
 
 	BCI_CMD_SET_ROP(cmd, 0x55);		// use GXinvert for rop
 
@@ -113,11 +106,11 @@ INVERT_RECTANGLE(engine_token *et, fill_rect_params *pList, uint32 count)
 
 		BCI_GET_PTR;
 
-		si->WaitQueue(7);
+		gInfo.WaitQueue(7);
 
 		BCI_SEND(cmd);
-		BCI_SEND(si->GlobalBD.bd2.LoPart);
-		BCI_SEND(si->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
 
 		BCI_SEND(BCI_X_Y(x, y));
 		BCI_SEND(BCI_W_H(w, h));
@@ -128,10 +121,8 @@ INVERT_RECTANGLE(engine_token *et, fill_rect_params *pList, uint32 count)
 
 
 void 
-SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *pList, uint32 count)
+Savage_ScreenToScreenBlit(engine_token *et, blit_params *pList, uint32 count)
 {
-//	TRACE(("SCREEN_TO_SCREEN_BLIT\n"));
-
 	(void)et;		// avoid compiler warning for unused arg
 
 	while (count--) {
@@ -162,15 +153,15 @@ SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *pList, uint32 count)
 			dest_y += height;
 		}
 
-		si->WaitQueue(9);
+		gInfo.WaitQueue(9);
 
 		BCI_SEND(cmd);
 
-		BCI_SEND(si->GlobalBD.bd2.LoPart);
-		BCI_SEND(si->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
 
-		BCI_SEND(si->GlobalBD.bd2.LoPart);
-		BCI_SEND(si->GlobalBD.bd2.HiPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.LoPart);
+		BCI_SEND(gInfo.sharedInfo->GlobalBD.bd2.HiPart);
 
 		BCI_SEND(BCI_X_Y(src_x, src_y));
 		BCI_SEND(BCI_X_Y(dest_x, dest_y));
