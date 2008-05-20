@@ -604,6 +604,7 @@ auich_setup(auich_dev * card)
 	status_t err = B_OK;
 	status_t rv;
 	unsigned char cmd;
+	int i;
 
 	PRINT(("auich_setup(%p)\n", card));
 
@@ -663,18 +664,25 @@ auich_setup(auich_dev * card)
 	if ((rv & CNT_COLD) == 0) {
 		LOG(("cold reset failed\n"));
 	}
-
+	
+	for (i = 0; i < 500; i++) {
+		rv = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA);
+		if (rv & STA_S0CR)
+			break;
+		snooze(1000);
+	}
+	
+	if (!(rv & STA_S0CR)) { /* reset failure */
+		/* It never return STA_S0CR in some cases */
+		PRINT(("reset failure\n"));
+	}
+	
 	/* attach the codec */	
 	PRINT(("codec attach\n"));
 	ac97_attach(&card->config.ac97, (codec_reg_read)auich_codec_read, 
 		(codec_reg_write)auich_codec_write, &card->config,
 		card->config.subvendor_id, card->config.subsystem_id);
 	
-	rv = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA);
-	if (!(rv & STA_S0CR)) { /* reset failure */
-		/* It never return STA_S0CR in some cases */
-		PRINT(("reset failure\n"));
-	}
 	/* Print capabilities though there are no supports for now */
 	if ((rv & STA_SAMPLE_CAP) == STA_POM20) {
 		LOG(("20 bit precision support\n"));
