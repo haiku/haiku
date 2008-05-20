@@ -1,7 +1,6 @@
 /*
- * Copyright 2006, Marcus Overhagen. All rights reserved.
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
- * Copyright 2003, Marcus Overhagen. All rights reserved.
+ * Copyright 2003-2008, Marcus Overhagen. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -19,7 +18,7 @@
 
 #define TRACE_PCI
 #ifndef TRACE_PCI
-#	define TRACE(x) 
+#	define TRACE(x)
 #else
 #	define TRACE(x) dprintf x
 #endif
@@ -30,103 +29,130 @@
 struct PCIDev;
 
 struct PCIBus {
-	PCIBus *next;
-	PCIDev *parent;
-	PCIDev *child;
-	int domain;
-	uint8 bus;
+	PCIBus *			next;
+	PCIDev *			parent;
+	PCIDev *			child;
+	int					domain;
+	uint8				bus;
 };
 
 struct PCIDev {
-	PCIDev *next;
-	PCIBus *parent;
-	PCIBus *child;
-	int domain;
-	uint8 bus;
-	uint8 dev;
-	uint8 func;
-	pci_info info;
+	PCIDev *			next;
+	PCIBus *			parent;
+	PCIBus *			child;
+	int					domain;
+	uint8				bus;
+	uint8				device;
+	uint8				function;
+	pci_info			info;
 };
 
 
-struct domain_data
-{
+struct domain_data {
 	// These two are set in PCI::AddController:
 	pci_controller *	controller;
 	void *				controller_cookie;
-	
+
 	// All the rest is set in PCI::InitDomainData
 	int					max_bus_devices;
 };
 
 
 class PCI {
-	public:
+public:
 							PCI();
 							~PCI();
-		
-		void				InitDomainData();
-		void				InitBus();
 
-		status_t			AddController(pci_controller *controller, void *controller_cookie);
+			void			InitDomainData();
+			void			InitBus();
 
-		status_t			GetNthPciInfo(long index, pci_info *outInfo);
+			status_t		AddController(pci_controller *controller,
+								void *controller_cookie);
 
-		status_t			ReadPciConfig(int domain, uint8 bus, uint8 device, uint8 function,
-										  uint8 offset, uint8 size, uint32 *value);
+			status_t		GetNthInfo(long index, pci_info *outInfo);
 
-		uint32				ReadPciConfig(int domain, uint8 bus, uint8 device, uint8 function,
-										  uint8 offset, uint8 size);
+			status_t		ReadConfig(int domain, uint8 bus, uint8 device,
+								uint8 function, uint8 offset, uint8 size,
+								uint32 *value);
+			uint32			ReadConfig(int domain, uint8 bus, uint8 device,
+								uint8 function, uint8 offset, uint8 size);
+			uint32			ReadConfig(PCIDev *device, uint8 offset,
+								uint8 size);
 
-		status_t			WritePciConfig(int domain, uint8 bus, uint8 device, uint8 function,
-										   uint8 offset, uint8 size, uint32 value);
+			status_t		WriteConfig(int domain, uint8 bus, uint8 device,
+								uint8 function, uint8 offset, uint8 size,
+								uint32 value);
+			status_t		WriteConfig(PCIDev *device, uint8 offset,
+								uint8 size, uint32 value);
 
-		status_t			ResolveVirtualBus(uint8 virtualBus, int *domain, uint8 *bus);
-		
-		void				ClearDeviceStatus(PCIBus *bus, bool dumpStatus);
+			status_t		FindCapability(int domain, uint8 bus, uint8 device,
+								uint8 function, uint8 capID, uint8 *offset);
+			status_t		FindCapability(PCIDev *device, uint8 capID,
+								uint8 *offset);
 
-	private:
+			status_t		ResolveVirtualBus(uint8 virtualBus, int *domain,
+								uint8 *bus);
 
-		void EnumerateBus(int domain, uint8 bus, uint8 *subordinate_bus = NULL);
+			PCIDev *		FindDevice(int domain, uint8 bus, uint8 device,
+								uint8 function);
 
-		void FixupDevices(int domain, uint8 bus);
+			void			ClearDeviceStatus(PCIBus *bus, bool dumpStatus);
 
-		void DiscoverBus(PCIBus *bus);
-		void DiscoverDevice(PCIBus *bus, uint8 dev, uint8 func);
+private:
+			void			_EnumerateBus(int domain, uint8 bus,
+								uint8 *subordinateBus = NULL);
 
-		PCIDev *CreateDevice(PCIBus *parent, uint8 dev, uint8 func);
-		PCIBus *CreateBus(PCIDev *parent, int domain, uint8 bus);
+			void			_FixupDevices(int domain, uint8 bus);
 
-		status_t GetNthPciInfo(PCIBus *bus, long *curindex, long wantindex, pci_info *outInfo);
-		void ReadPciBasicInfo(PCIDev *dev);
-		void ReadPciHeaderInfo(PCIDev *dev);
+			void			_DiscoverBus(PCIBus *bus);
+			void			_DiscoverDevice(PCIBus *bus, uint8 dev,
+								uint8 function);
 
-		void ConfigureBridges(PCIBus *bus);
-		void RefreshDeviceInfo(PCIBus *bus);
+			PCIDev *		_CreateDevice(PCIBus *parent, uint8 dev,
+								uint8 function);
+			PCIBus *		_CreateBus(PCIDev *parent, int domain, uint8 bus);
 
-		uint32 BarSize(uint32 bits, uint32 mask);
-		void GetBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size = 0, uint8 *flags = 0);
-		void GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size = 0, uint8 *flags = 0);
-		
-		
-		domain_data *		GetDomainData(int domain);
-		
-		status_t			CreateVirtualBus(int domain, uint8 bus, uint8 *virtualBus);
+			status_t		_GetNthInfo(PCIBus *bus, long *currentIndex,
+								long wantIndex, pci_info *outInfo);
+			void			_ReadBasicInfo(PCIDev *dev);
+			void			_ReadHeaderInfo(PCIDev *dev);
 
-	private:
-		PCIBus *			fRootBus;
+			void			_ConfigureBridges(PCIBus *bus);
+			void			_RefreshDeviceInfo(PCIBus *bus);
 
-		enum { 				MAX_PCI_DOMAINS = 8 };
-		
-		domain_data			fDomainData[MAX_PCI_DOMAINS];
-		int					fDomainCount;
-		bool				fBusEnumeration;
+			uint32			_BarSize(uint32 bits, uint32 mask);
+			void			_GetBarInfo(PCIDev *dev, uint8 offset,
+								uint32 *address, uint32 *size = 0,
+								uint8 *flags = 0);
+			void			_GetRomBarInfo(PCIDev *dev, uint8 offset,
+								uint32 *address, uint32 *size = 0,
+								uint8 *flags = 0);
 
-		typedef VectorMap<uint8, uint16> VirtualBusMap;
+			domain_data *	_GetDomainData(int domain);
 
-		VirtualBusMap		fVirtualBusMap;
-		int					fNextVirtualBus;
+			status_t		_CreateVirtualBus(int domain, uint8 bus,
+								uint8 *virtualBus);
+
+			int				_NumFunctions(int domain, uint8 bus, uint8 device);
+			PCIDev *		_FindDevice(PCIBus *current, int domain, uint8 bus,
+								uint8 device, uint8 function);
+
+private:
+	PCIBus *				fRootBus;
+
+	enum { MAX_PCI_DOMAINS = 8 };
+
+	domain_data				fDomainData[MAX_PCI_DOMAINS];
+	int						fDomainCount;
+	bool					fBusEnumeration;
+
+	typedef VectorMap<uint8, uint16> VirtualBusMap;
+
+	VirtualBusMap			fVirtualBusMap;
+	int						fNextVirtualBus;
 };
+
+extern PCI *gPCI;
 
 #endif // __cplusplus
 
@@ -140,8 +166,10 @@ void		pci_uninit(void);
 
 long		pci_get_nth_pci_info(long index, pci_info *outInfo);
 
-uint32		pci_read_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset, uint8 size);
-void		pci_write_config(uint8 virtualBus, uint8 device, uint8 function, uint8 offset, uint8 size, uint32 value);
+uint32		pci_read_config(uint8 virtualBus, uint8 device, uint8 function,
+				uint8 offset, uint8 size);
+void		pci_write_config(uint8 virtualBus, uint8 device, uint8 function,
+				uint8 offset, uint8 size, uint32 value);
 
 void		__pci_resolve_virtual_bus(uint8 virtualBus, int *domain, uint8 *bus);
 
