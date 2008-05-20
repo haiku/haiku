@@ -726,9 +726,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		return ENOTCONN;
 	if (fState == LISTEN)
 		return EDESTADDRREQ;
-	if (fState == FINISH_SENT || fState == FINISH_ACKNOWLEDGED
-		|| fState == CLOSING || fState == WAIT_FOR_FINISH_ACKNOWLEDGE
-		|| fState == TIME_WAIT) {
+	if (!is_writable(fState)) {
 		// we only send signals when called from userland
 		if (gStackModule->is_syscall)
 			send_signal(find_thread(NULL), SIGPIPE);
@@ -752,6 +750,13 @@ TCPEndpoint::SendData(net_buffer *buffer)
 				TRACE("  SendData() returning %s (%d)",
 					strerror(posix_error(status)), (int)posix_error(status));
 				return posix_error(status);
+			}
+
+			if (!is_writable(fState)) {
+				// we only send signals when called from userland
+				if (gStackModule->is_syscall)
+					send_signal(find_thread(NULL), SIGPIPE);
+				return EPIPE;
 			}
 		}
 
@@ -1280,7 +1285,7 @@ TCPEndpoint::_PrepareReceivePath(tcp_segment_header& segment)
 bool
 TCPEndpoint::_ShouldReceive() const
 {
-	if (fFlags & FLAG_NO_RECEIVE)
+	if ((fFlags & FLAG_NO_RECEIVE) != 0)
 		return false;
 
 	return fState == ESTABLISHED || fState == FINISH_SENT
@@ -1346,7 +1351,7 @@ TCPEndpoint::_ListenReceive(tcp_segment_header& segment, net_buffer* buffer)
 	// TODO: drop broadcast/multicast
 
 	// spawn new endpoint for accept()
-	net_socket *newSocket;
+	net_socket* newSocket;
 	if (gSocketModule->spawn_pending_socket(socket, &newSocket) < B_OK)
 		return DROP;
 
@@ -1420,7 +1425,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		} else if (segment.acknowledge == fSendUnacknowledged
 			&& fReceiveQueue.IsContiguous()
 			&& fReceiveQueue.Free() >= segmentLength
-			&& !(fFlags & FLAG_NO_RECEIVE)) {
+			&& (fFlags & FLAG_NO_RECEIVE) == 0) {
 			if (_AddData(segment, buffer))
 				_NotifyReader();
 
@@ -1608,8 +1613,12 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	if (buffer->size > 0 &&	_ShouldReceive())
 		notify = _AddData(segment, buffer);
-	else
+	else {
+		if ((fFlags & FLAG_NO_RECEIVE) != 0)
+			fReceiveNext += buffer->size;
+
 		action = (action & ~KEEP) | DROP;
+	}
 
 	if (segment.flags & TCP_FLAG_FINISH) {
 		segmentLength++;
@@ -1618,7 +1627,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 			fReceiveNext++;
 			notify = true;
 
-			// FIN implies PSH
+			// FIN implies PUSH
 			fReceiveQueue.SetPushPointer();
 
 			// we'll reply immediately to the FIN if we are not
