@@ -1,0 +1,127 @@
+#!/bin/sh
+# /etc/profile.d/dev-perso
+#
+# (c) 2006-2008, mmu_man
+#
+# project-specific environment handling:
+# - sources project-specific .profile,
+# - maintains project-specific .bash_history with bigger default size,
+# to avoid mixing command histories
+# - pushes "cvs up -d" or "svn up" or "p4 sync" as last history command
+# for quick access
+# - has a nice prompt
+# - lowers shell priority on BeOS to limit the effects of svn or jam on
+# the gui
+# - automatically completes project names on the "dev" function
+# from project subfolders containing a .profile
+#
+# This script should be sourced by bash, either from /etc/profile
+# (in /etc/profile.d/) or your own .bashrc or .profile
+# 
+# setup:
+# - edit DRLIST below to include your own possible devroots
+# (ie. where you have subfolders for your own projects)
+# - optionally edit PWLIST below to where you possibly have a
+# PASSWDS/ folder with passwords stored as plain text.
+# (not really a good idea though :) It's exported
+# for use by project's .profile
+# - optionally force EDITOR globally (for all projects)
+# - for each project create a .profile in the subfolder,
+# which might include commands like the following, but can remain empty.
+# usually it will just contain a "cd" to the source/trunk subfolder...
+#
+#	# force svn ssh user for this project
+#	export SVN_SSH='ssh -l myuser'
+#
+#	# force CVSROOT for this project
+#	export CVSROOT='...'
+#
+#	# shortcut to display password file for this svn
+#	alias pass="cat $PASSWDS/myself.developer.berlios.de.pass"
+#
+#	# change to the source tree
+#	cd trunk
+#	# ease use of cd
+#	export CDPATH=":$PWD"
+#
+# Now you just have to type:
+# dev h[TAB]
+# to complete to "dev haiku", [RET] and you'll get the history from the
+# last time you worked on it, and everything set up.
+
+
+# automagically find them on different machines...
+DRLIST="/Data /work $HOME/devel"
+PWLIST="/Data /fat32 $HOME"
+for d in $DRLIST; do
+	test -d $d && DEVROOT=$d && break;
+done
+for d in $PWLIST; do
+	test -d $d/PASSWDS && PASSWDS=$d/PASSWDS && break;
+done
+export DEVROOT
+export PASSWDS
+
+# svn sometimes forgets about vi and wants me to use nano...
+#export EDITOR=vim
+
+function dev() {
+	if [ $# -lt 1 ]; then 
+		ls $DEVROOT/*/.profile | cut -d / -f 3
+		return 0
+	fi
+	if [ "x$1" = "x--help" ]; then
+		echo "setup project-specific development environment"
+		echo "usage: dev [project]"
+		echo "running without argument lists available projects"
+		return 1
+	fi
+	if [ ! -d "$DEVROOT/$1" ]; then
+		echo "invalid project name '$1'"
+		return 1
+	fi
+	cd "$DEVROOT/$1"
+	# use a specific history file
+	export HISTFILE="$DEVROOT/$1/.bash_history"
+	# and bump up the history limits
+	export HISTSIZE=1000
+	export HISTFILESIZE=100000
+	export HISTCONTROL=ignoreboth
+	# and force loading the new histfile
+	history -r
+	# set the prompt
+	# cf. http://tldp.org/HOWTO/Bash-Prompt-HOWTO/
+	case "$TERM" in
+	dump|emacs)
+		# simpler prompt
+		export PS1='[\u@\h \w]\$ '
+		;;
+	*)
+		# prompt: set window title to [project:folder] also
+		export PS1='\[\033]0;['$1':\W]\a\]\[\033[1m\][\u@\h \w]\[\033[0m\]\$ '
+		;;
+	esac
+	# lower priority so background builds don't slow the GUI too much
+	case "$OSTYPE" in
+	beos|haiku)
+		prio $$ 1
+		;;
+	linux-*)
+		# linux doesn't really need it much
+		#renice 3 $$
+		;;
+	esac
+	
+	# source the specific profile file
+	source .profile
+	
+	# make sure the update action is the first found in history.
+	test -d .svn && history -s svn up
+	test -d .hg && history -s hg pull
+	test -d CVS && history -s cvs up -d
+	test -n "$P4PORT" && history -s p4 sync
+}
+
+complete -W complete -W "$(dev)" dev
+
+
