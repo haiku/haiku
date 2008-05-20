@@ -435,12 +435,12 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		return;
 	}
 
-
+/*
 	uint8 *data = (uint8*) &ataData;
 	for (int i = 0; i < 512; i += 8) {
 		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
 	}
-
+*/
 
 	scsiData.device_type = fIsATAPI ? scsi_dev_CDROM : scsi_dev_direct_access;
 	scsiData.device_qualifier = scsi_periph_qual_connected;
