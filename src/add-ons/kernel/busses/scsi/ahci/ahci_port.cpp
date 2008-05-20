@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Marcus Overhagen. All rights reserved.
+ * Copyright 2007-2008, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -94,6 +94,7 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	, fUse48BitCommands(false)
 	, fSectorSize(0)
 	, fSectorCount(0)
+	, fIsATAPI(false)
 {
 	fRequestSem = create_sem(1, "ahci request");
 	fResponseSem = create_sem(0, "ahci response");
@@ -305,7 +306,9 @@ AHCIPort::PostResetDevice()
 
 	wait_until_clear(&fRegs->tfd, ATA_BSY, 31000000);
 
-	if (fRegs->sig == 0xeb140101)
+	fIsATAPI = fRegs->sig == 0xeb140101;
+
+	if (fIsATAPI)
 		fRegs->cmd |= PORT_CMD_ATAPI;
 	else
 		fRegs->cmd &= ~PORT_CMD_ATAPI;
@@ -477,7 +480,7 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 
 	sata_request sreq;
 	sreq.set_data(&ataData, sizeof(ataData));
-	sreq.set_ata_cmd(0xec); // Identify Device
+	sreq.set_ata_cmd(fIsATAPI ? 0xa1 : 0xec); // Identify (Packet) Device
 	ExecuteSataRequest(&sreq);
 	sreq.wait_for_completition();
 
@@ -488,17 +491,17 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 		return;
 	}
 
-/*
+
 	uint8 *data = (uint8*) &ataData;
 	for (int i = 0; i < 512; i += 8) {
 		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
 	}
-*/
 
-	scsiData.device_type = scsi_dev_direct_access;
+
+	scsiData.device_type = fIsATAPI ? scsi_dev_CDROM : scsi_dev_direct_access;
 	scsiData.device_qualifier = scsi_periph_qual_connected;
 	scsiData.device_type_modifier = 0;
-	scsiData.removable_medium = false;
+	scsiData.removable_medium = fIsATAPI;
 	scsiData.ansi_version = 2;
 	scsiData.ecma_version = 0;
 	scsiData.iso_version = 0;
@@ -516,13 +519,17 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	memcpy(scsiData.product_ident, ataData.model_number + 8, sizeof(scsiData.product_ident));
 	memcpy(scsiData.product_rev, ataData.serial_number, sizeof(scsiData.product_rev));
 
-	bool lba			= (ataData.words[49] & (1 << 9)) != 0;
-	bool lba48			= (ataData.words[83] & (1 << 10)) != 0;
-	uint32 sectors		= *(uint32*)&ataData.words[60];
-	uint64 sectors48	= *(uint64*)&ataData.words[100];
-	fUse48BitCommands   = lba && lba48;
-	fSectorSize			= 512;
-	fSectorCount		= !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
+	if (!fIsATAPI) {
+		bool lba			= (ataData.words[49] & (1 << 9)) != 0;
+		bool lba48			= (ataData.words[83] & (1 << 10)) != 0;
+		uint32 sectors		= *(uint32*)&ataData.words[60];
+		uint64 sectors48	= *(uint64*)&ataData.words[100];
+		fUse48BitCommands   = lba && lba48;
+		fSectorSize			= 512;
+		fSectorCount		= !(lba || sectors) ? 0 : lba48 ? sectors48 : sectors;
+		TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, sectors48 %llu, size %llu\n",
+			lba, lba48, fUse48BitCommands, sectors, sectors48, fSectorCount * fSectorSize);
+	}
 
 #if 0
 	if (fSectorCount < 0x0fffffff) {
@@ -546,8 +553,6 @@ AHCIPort::ScsiInquiry(scsi_ccb *request)
 	TRACE("model number:  %s\n", modelNumber);
 	TRACE("serial number: %s\n", serialNumber);
   	TRACE("firmware rev.: %s\n", firmwareRev);
-	TRACE("lba %d, lba48 %d, fUse48BitCommands %d, sectors %lu, sectors48 %llu, size %llu\n",
-		lba, lba48, fUse48BitCommands, sectors, sectors48, fSectorCount * fSectorSize);
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData, sizeof(scsiData)) < B_OK) {
 		request->subsys_status = SCSI_DATA_RUN_ERR;
@@ -819,7 +824,7 @@ AHCIPort::ScsiResetDevice()
 void
 AHCIPort::ScsiGetRestrictions(bool *isATAPI, bool *noAutoSense, uint32 *maxBlocks)
 {
-	*isATAPI = !!(fRegs->cmd & PORT_CMD_ATAPI);
+	*isATAPI = fIsATAPI;
 	*noAutoSense = false;
 	*maxBlocks = fUse48BitCommands ? 65536 : 256;
 	TRACE("AHCIPort::ScsiGetRestrictions port %d: isATAPI %d, noAutoSense %d, maxBlocks %lu\n",

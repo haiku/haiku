@@ -1,5 +1,5 @@
 /*
- * Copyright 2007, Marcus Overhagen. All rights reserved.
+ * Copyright 2007-2008, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _AHCI_PORT_H
@@ -64,6 +64,7 @@ private:
 	bool							fUse48BitCommands;
 	uint32							fSectorSize;
 	uint64							fSectorCount;
+	bool							fIsATAPI;
 
 	volatile fis *					fFIS;
 	volatile command_list_entry *	fCommandList;
