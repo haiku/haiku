@@ -259,10 +259,8 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	_WriteReg(OHCI_HCCA, (uint32)hccaPhysicalAddress);
 	_WriteReg(OHCI_CONTROL_HEAD_ED, (uint32)fDummyControl->physical_address);
 	_WriteReg(OHCI_BULK_HEAD_ED, (uint32)fDummyBulk->physical_address);
-	// Disable all interrupts and then switch on all desired interrupts
+	// Disable all interrupts
 	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS);
-	_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
-		| OHCI_MASTER_INTERRUPT_ENABLE);
 	// Switch on desired functional features
 	control = _ReadReg(OHCI_CONTROL);
 	control &= ~(OHCI_CONTROL_BULK_SERVICE_RATIO_MASK | OHCI_ENABLE_LIST
@@ -319,6 +317,10 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	TRACE(("usb_ohci: installing interrupt handler\n"));
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		_InterruptHandler, (void *)this, 0);
+
+	// Enable interesting interrupts now that the handler is in place
+	_WriteReg(OHCI_INTERRUPT_ENABLE, OHCI_NORMAL_INTERRUPTS
+		| OHCI_MASTER_INTERRUPT_ENABLE);
 
 	TRACE(("usb_ohci: OHCI Host Controller Driver constructed\n"));
 	fInitOK = true;
