@@ -756,6 +756,10 @@ OHCI::_Interrupt()
 
 	if (status & OHCI_ROOT_HUB_STATUS_CHANGE) {
 		TRACE(("usb_ohci: root hub status change\n"));
+		// Disable the interrupt as it will otherwise be retriggered until the
+		// port has been reset and the change is cleared explicitly.
+		// TODO: renable it once we use status changes instead of polling
+		_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ROOT_HUB_STATUS_CHANGE);
 		acknowledge |= OHCI_ROOT_HUB_STATUS_CHANGE;
 	}
 
