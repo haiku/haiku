@@ -417,8 +417,6 @@ BPrintJob::BeginJob()
 	// state variables
 	fAbort = 0;
 	fError = B_OK;
-
-	return;
 }
 
 
@@ -471,10 +469,10 @@ BPrintJob::CommitJob()
 		return;
 
 	BMessage request(PSRV_PRINT_SPOOLED_JOB);
-	BMessage reply;
-
 	request.AddString("JobName", fPrintJobName);
 	request.AddString("Spool File", fSpoolFileName);
+
+	BMessage reply;
 	printServer.SendMessage(&request, &reply);
 }
 
@@ -675,9 +673,11 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 	BView *child = view->ChildAt(0);
 	while (child != NULL) {
 		if ((child->Flags() & B_WILL_DRAW) && !child->IsHidden()) {
-			// TODO: origin and rect should probably
-			// be converted for children views in some way
-			_RecurseView(child, origin, picture, rect);
+			BRect bounds(child->Bounds());
+			BPoint childLeftTop = view->Bounds().LeftTop()
+				+ (child->Frame().LeftTop() - bounds.LeftTop());
+			_RecurseView(child, origin + childLeftTop, picture,
+				bounds & rect.OffsetToCopy(rect.LeftTop() - childLeftTop));
 			child = child->NextSibling();
 		}
 	}
