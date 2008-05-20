@@ -95,7 +95,7 @@ arch_cpu_memory_write_barrier(void)
 {
 #warning PPC: is it model-dependant ?
 	asm volatile ("isync");
-	asm volatile ("eioio");
+	asm volatile ("eieio");
 }
 
 
