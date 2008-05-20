@@ -67,7 +67,7 @@ export PASSWDS
 
 function dev() {
 	if [ $# -lt 1 ]; then 
-		ls $DEVROOT/*/.profile | cut -d / -f 3
+		ls $DEVROOT/*/.profile | sed 's,.*/\([^/]*\)/.profile,\1,'
 		return 0
 	fi
 	if [ "x$1" = "x--help" ]; then
