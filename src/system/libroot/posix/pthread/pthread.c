@@ -15,6 +15,10 @@
 #include <thread_defs.h>
 
 
+#define THREAD_DETACHED	0x01
+#define THREAD_DEAD		0x02
+
+
 static const pthread_attr pthread_attr_default = {
 	PTHREAD_CREATE_JOINABLE,
 	B_NORMAL_PRIORITY,
@@ -22,31 +26,15 @@ static const pthread_attr pthread_attr_default = {
 };
 
 
-static struct pthread_thread sMainThread;
+static pthread_thread sMainThread;
 static int32 sPthreadSlot = -1;
 static int sConcurrencyLevel;
-
-
-struct pthread_thread *
-__get_pthread(void)
-{
-	struct pthread_thread *thread;
-
-	if (sPthreadSlot == -1)
-		return &sMainThread;
-
-	thread = (struct pthread_thread *)tls_get(sPthreadSlot);
-	if (thread == NULL)
-		return &sMainThread;
-
-	return thread;
-}
 
 
 static void
 pthread_destroy_thread(void *data)
 {
-	struct pthread_thread *thread = __get_pthread();
+	pthread_thread *thread = pthread_self();
 
 	// call cleanup handlers
 	while (true) {
@@ -59,14 +47,16 @@ pthread_destroy_thread(void *data)
 	}
 
 	__pthread_key_call_destructors(thread);
-	free(thread);
+
+	if (atomic_or(&thread->flags, THREAD_DEAD) & THREAD_DETACHED)
+		free(thread);
 }
 
 
 static int32
 pthread_thread_entry(thread_func _unused, void *_thread)
 {
-	struct pthread_thread *thread = (struct pthread_thread *)_thread;
+	pthread_thread *thread = (pthread_thread *)_thread;
 
 	// store thread data in TLS
 	*tls_address(sPthreadSlot) = thread;
@@ -86,8 +76,7 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 		void *(*startRoutine)(void*), void *arg)
 {
 	const pthread_attr *attr = NULL;
-	struct pthread_thread *thread;
-	thread_id threadID;
+	pthread_thread *thread;
 	struct thread_creation_attributes attributes;
 
 	if (_thread == NULL)
@@ -98,16 +87,21 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	else
 		attr = *_attr;
 
-	thread = (struct pthread_thread *)malloc(sizeof(struct pthread_thread));
+	thread = (pthread_thread *)malloc(sizeof(pthread_thread));
 	if (thread == NULL)
 		return B_WOULD_BLOCK;
 
 	thread->entry = startRoutine;
 	thread->entry_argument = arg;
+	thread->exit_value = NULL;
 	thread->cancel_state = PTHREAD_CANCEL_ENABLE;
 	thread->cancel_type = PTHREAD_CANCEL_DEFERRED;
 	thread->cancelled = false;
 	thread->cleanup_handlers = NULL;
+	thread->flags = 0;
+
+	if (attr->detach_state == PTHREAD_CREATE_DETACHED)
+		thread->flags |= THREAD_DETACHED;
 
 	if (sPthreadSlot == -1) {
 		// In a clean pthread environment, this is even thread-safe!
@@ -122,14 +116,15 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 	attributes.stack_address = NULL;
 	attributes.stack_size = attr->stack_size;
 
-	threadID = _kern_spawn_thread(&attributes);
-	if (threadID < B_OK) {
+	thread->id = _kern_spawn_thread(&attributes);
+	if (thread->id < 0) {
 		// stupid error code (EAGAIN) but demanded by POSIX
+		free(thread);
 		return B_WOULD_BLOCK;
 	}
 
-	resume_thread(threadID);
-	*_thread = threadID;
+	resume_thread(thread->id);
+	*_thread = thread;
 
 	return B_OK;
 }
@@ -138,22 +133,39 @@ pthread_create(pthread_t *_thread, const pthread_attr_t *_attr,
 pthread_t
 pthread_self(void)
 {
-	return find_thread(NULL);
+	pthread_thread *thread;
+
+	if (sPthreadSlot == -1)
+		return &sMainThread;
+
+	thread = (pthread_thread *)tls_get(sPthreadSlot);
+	if (thread == NULL)
+		return &sMainThread;
+
+	return thread;
 }
 
 
 int
 pthread_equal(pthread_t t1, pthread_t t2)
 {
-	return t1 > 0 && t2 > 0 && t1 == t2;
+	return t1 != NULL && t2 != NULL && t1 == t2;
 }
 
 int
-pthread_join(pthread_t thread, void **value_ptr)
+pthread_join(pthread_t thread, void **_value)
 {
-	status_t error = wait_for_thread(thread, (status_t *)value_ptr);
+	status_t dummy;
+	status_t error = wait_for_thread(thread->id, &dummy);
 	if (error == B_BAD_THREAD_ID)
 		return ESRCH;
+
+	if (_value != NULL)
+		*_value = thread->exit_value;
+
+	if (atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD)
+		free(thread);
+
 	return error;
 }
 
@@ -161,14 +173,15 @@ pthread_join(pthread_t thread, void **value_ptr)
 void
 pthread_exit(void *value)
 {
-	exit_thread((status_t)value);
+	pthread_self()->exit_value = value;
+	exit_thread(B_OK);
 }
 
 
 int
 pthread_kill(pthread_t thread, int sig)
 {
-	status_t err =  kill(thread, sig);
+	status_t err =  kill(thread->id, sig);
 	if (err == B_BAD_THREAD_ID)
 		return ESRCH;
 	return err;
@@ -178,7 +191,9 @@ pthread_kill(pthread_t thread, int sig)
 int
 pthread_detach(pthread_t thread)
 {
-	// TODO: currently, all threads are detached in our implementation...
+	if (atomic_or(&thread->flags, THREAD_DETACHED) & THREAD_DEAD)
+		free(thread);
+
 	return 0;
 }
 

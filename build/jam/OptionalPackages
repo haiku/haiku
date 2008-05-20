@@ -27,8 +27,8 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 		Echo "No optional package APR available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
-		InstallOptionalHaikuImagePackage apr-0.9.17-gcc2-2008-05-13
-			: $(baseURL)/apr-0.9.17-gcc2-2008-05-13.zip
+		InstallOptionalHaikuImagePackage apr-0.9.17-gcc2-2008-05-20
+			: $(baseURL)/apr-0.9.17-gcc2-2008-05-20.zip
 			:
 		;
 	}

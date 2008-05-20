@@ -20,14 +20,6 @@ typedef struct _pthread_condattr {
 	bool		process_shared;
 } pthread_condattr;
 
-typedef struct _pthread_cond {
-	sem_id			sem;
-	pthread_mutex_t	*mutex;
-	int32			waiter_count;
-	int32			event_counter;
-	pthread_condattr attr;
-} pthread_cond;
-
 typedef struct _pthread_mutexattr {
 	int32		type;
 	bool		process_shared;
@@ -38,6 +30,10 @@ typedef struct _pthread_attr {
 	int32		sched_priority;
 	size_t		stack_size;
 } pthread_attr;
+
+typedef struct _pthread_rwlockattr {
+	uint32_t	flags;
+} pthread_rwlockattr;
 
 typedef void (*pthread_key_destructor)(void *data);
 
@@ -54,25 +50,26 @@ struct pthread_key_data {
 #define PTHREAD_KEYS_MAX		256
 #define PTHREAD_UNUSED_SEQUENCE	0
 
-// This structure is used internally only, it has no public equivalent
-struct pthread_thread {
+typedef struct _pthread_thread {
+	thread_id	id;
+	int32		flags;
 	void		*(*entry)(void*);
 	void		*entry_argument;
+	void		*exit_value;
 	int			cancel_state;
 	int			cancel_type;
 	bool		cancelled;
 	struct pthread_key_data specific[PTHREAD_KEYS_MAX];
 	struct __pthread_cleanup_handler *cleanup_handlers;
 	// TODO: move pthread keys in here, too
-};
+} pthread_thread;
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void __pthread_key_call_destructors(struct pthread_thread *thread);
-struct pthread_thread *__get_pthread(void);
+void __pthread_key_call_destructors(pthread_thread *thread);
 
 #ifdef __cplusplus
 }

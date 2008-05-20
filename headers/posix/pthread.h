@@ -10,19 +10,21 @@
 #include <time.h>
 
 
-typedef int							pthread_t;
+typedef struct	_pthread_thread		*pthread_t;
 typedef struct  _pthread_attr		*pthread_attr_t;
 typedef struct  _pthread_mutex		pthread_mutex_t;
 typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;
-typedef struct  _pthread_cond		*pthread_cond_t;
+typedef struct  _pthread_cond		pthread_cond_t;
 typedef struct  _pthread_condattr	*pthread_condattr_t;
 typedef int							pthread_key_t;
 typedef struct  _pthread_once		pthread_once_t;
 typedef struct  _pthread_rwlock		pthread_rwlock_t;
-typedef struct  _pthread_rwlockattr	pthread_rwlockattr_t;
+typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
+/*
 typedef struct  _pthread_barrier	*pthread_barrier_t;
 typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
 typedef struct  _pthread_spinlock	*pthread_spinlock_t;
+*/
 
 struct _pthread_mutex {
 	uint32_t	flags;
@@ -30,6 +32,14 @@ struct _pthread_mutex {
 	int32_t		sem;
 	int32_t		owner;
 	int32_t		owner_count;
+};
+
+struct _pthread_cond {
+	uint32_t		flags;
+	int32_t			sem;
+	pthread_mutex_t	*mutex;
+	int32_t			waiter_count;
+	int32_t			event_counter;
 };
 
 struct _pthread_once {
@@ -51,10 +61,6 @@ struct _pthread_rwlock {
 			void*		waiters[2];
 		} local;
 	};
-};
-
-struct _pthread_rwlockattr {
-	uint32_t	flags;
 };
 
 enum pthread_mutex_type {
@@ -98,8 +104,6 @@ enum pthread_process_shared {
 #define PTHREAD_PRIO_INHERIT		1
 #define PTHREAD_PRIO_PROTECT		2
 
-/* extern pthread_mutexattr_t pthread_mutexattr_default; */
-
 /* private structure */
 struct __pthread_cleanup_handler {
 	struct __pthread_cleanup_handler *previous;
@@ -129,9 +133,8 @@ extern "C" {
 	{ PTHREAD_MUTEX_DEFAULT, 0, -42, -1, 0 }
 #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER \
 	{ PTHREAD_MUTEX_RECURSIVE, 0, -42, -1, 0 }
-
-extern pthread_cond_t _pthread_cond_static_initializer(void);
-#define PTHREAD_COND_INITIALIZER _pthread_cond_static_initializer()
+#define PTHREAD_COND_INITIALIZER	\
+	{ 0, -42, NULL, 0, 0 }
 
 /* mutex functions */
 extern int pthread_mutex_destroy(pthread_mutex_t *mutex);

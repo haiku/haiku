@@ -10,7 +10,7 @@
 void
 __pthread_cleanup_push_handler(__pthread_cleanup_handler* handler)
 {
-	pthread_thread* thread = __get_pthread();
+	pthread_thread* thread = pthread_self();
 	if (thread == NULL)
 		return;
 
@@ -22,7 +22,7 @@ __pthread_cleanup_push_handler(__pthread_cleanup_handler* handler)
 __pthread_cleanup_handler*
 __pthread_cleanup_pop_handler(void)
 {
-	pthread_thread* thread = __get_pthread();
+	pthread_thread* thread = pthread_self();
 	if (thread == NULL)
 		return NULL;
 

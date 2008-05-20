@@ -117,7 +117,7 @@ pthread_key_delete(pthread_key_t key)
 void*
 pthread_getspecific(pthread_key_t key)
 {
-	pthread_thread* thread = __get_pthread();
+	pthread_thread* thread = pthread_self();
 
 	if (key < 0 || key >= PTHREAD_KEYS_MAX)
 		return NULL;
@@ -142,7 +142,7 @@ pthread_setspecific(pthread_key_t key, const void* value)
 	if (sequence == PTHREAD_UNUSED_SEQUENCE)
 		return EINVAL;
 
-	pthread_key_data& keyData = __get_pthread()->specific[key];
+	pthread_key_data& keyData = pthread_self()->specific[key];
 	keyData.sequence = sequence;
 	keyData.value = const_cast<void*>(value);
 	return 0;

@@ -15,6 +15,8 @@
 #include <user_thread.h>
 #include <util/DoublyLinkedList.h>
 
+#include "pthread_private.h"
+
 
 #define MAX_READER_COUNT	1000000
 
@@ -285,8 +287,9 @@ assert_dummy()
 
 
 int
-pthread_rwlock_init(pthread_rwlock_t* lock, const pthread_rwlockattr_t* attr)
+pthread_rwlock_init(pthread_rwlock_t* lock, const pthread_rwlockattr_t* _attr)
 {
+	pthread_rwlockattr* attr = _attr != NULL ? *_attr : NULL;
 	bool shared = attr != NULL && (attr->flags & RWLOCK_FLAG_SHARED) != 0;
 
 	if (shared)
@@ -399,32 +402,47 @@ pthread_rwlock_unlock(pthread_rwlock_t* lock)
 
 
 int
-pthread_rwlockattr_init(pthread_rwlockattr_t* attr)
+pthread_rwlockattr_init(pthread_rwlockattr_t* _attr)
 {
+	pthread_rwlockattr* attr = (pthread_rwlockattr*)malloc(
+		sizeof(pthread_rwlockattr));
+	if (attr == NULL)
+		return B_NO_MEMORY;
+
 	attr->flags = 0;
+	*_attr = attr;
+
 	return 0;
 }
 
 
 int
-pthread_rwlockattr_destroy(pthread_rwlockattr_t* attr)
+pthread_rwlockattr_destroy(pthread_rwlockattr_t* _attr)
 {
+	pthread_rwlockattr* attr = *_attr;
+
+	free(attr);
 	return 0;
 }
 
 
 int
-pthread_rwlockattr_getpshared(const pthread_rwlockattr_t* attr, int* shared)
+pthread_rwlockattr_getpshared(const pthread_rwlockattr_t* _attr, int* shared)
 {
-	*shared = (attr->flags & RWLOCK_FLAG_SHARED) != 0;
+	pthread_rwlockattr* attr = *_attr;
+
+	*shared = (attr->flags & RWLOCK_FLAG_SHARED) != 0
+		? PTHREAD_PROCESS_SHARED : PTHREAD_PROCESS_PRIVATE;
 	return 0;
 }
 
 
 int
-pthread_rwlockattr_setpshared(pthread_rwlockattr_t* attr, int shared)
+pthread_rwlockattr_setpshared(pthread_rwlockattr_t* _attr, int shared)
 {
-	if (shared)
+	pthread_rwlockattr* attr = *_attr;
+
+	if (shared == PTHREAD_PROCESS_SHARED)
 		attr->flags |= RWLOCK_FLAG_SHARED;
 	else
 		attr->flags &= ~RWLOCK_FLAG_SHARED;

@@ -24,7 +24,7 @@ pthread_setcancelstate(int state, int *_oldState)
 	if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
 		return EINVAL;
 
-	pthread_thread* thread = __get_pthread();
+	pthread_thread* thread = pthread_self();
 	if (thread == NULL)
 		return EINVAL;
 
@@ -42,7 +42,7 @@ pthread_setcanceltype(int type, int *_oldType)
 	if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
 		return EINVAL;
 
-	pthread_thread* thread = __get_pthread();
+	pthread_thread* thread = pthread_self();
 	if (thread == NULL)
 		return EINVAL;
 
@@ -57,7 +57,7 @@ pthread_setcanceltype(int type, int *_oldType)
 void
 pthread_testcancel(void)
 {
-	pthread_thread* thread = __get_pthread();
+	pthread_thread* thread = pthread_self();
 	if (thread == NULL)
 		return;
 
