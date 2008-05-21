@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src system libroot os arch ppc ;
 
+UsePrivateKernelHeaders ;
+	# TODO: Replace by "UsePrivateHeaders libroot" after resolving the TODO in
+	# time.c!
 UsePrivateSystemHeaders ;
 
 MergeObject os_arch_$(TARGET_ARCH).o :
