@@ -31,6 +31,7 @@ RemoteDevice::IsTrustedDevice(void)
     return true;
 }
 
+
 BString
 RemoteDevice::GetFriendlyName(bool alwaysAsk)
 {
@@ -82,6 +83,13 @@ RemoteDevice::GetFriendlyName(bool alwaysAsk)
 }
 
 
+BString
+RemoteDevice::GetFriendlyName()
+{
+	return GetFriendlyName(true);
+}
+
+
 bdaddr_t
 RemoteDevice::GetBluetoothAddress()
 {
@@ -126,6 +134,7 @@ RemoteDevice::IsEncrypted()
     return true;
 }
 
+
 /* Private */
 void
 RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
@@ -133,11 +142,13 @@ RemoteDevice::SetLocalDeviceOwner(LocalDevice* ld)
     fDiscovererLocalDevice = ld;
 }
 
+
 /* Constructor */
 RemoteDevice::RemoteDevice(bdaddr_t address)
 {
 	fBdaddr = address;
 }
+
 
 RemoteDevice::RemoteDevice(BString address)
 {
@@ -145,4 +156,27 @@ RemoteDevice::RemoteDevice(BString address)
 
 }
 
+
+BString
+RemoteDevice::GetProperty(const char* property) /* Throwing */
+{
+
+	return NULL;
+}
+
+
+void
+RemoteDevice::GetProperty(const char* property, uint32* value) /* Throwing */
+{
+
+}
+
+
+}
+
+
+DeviceClass
+RemoteDevice::GetDeviceClass()
+{
+	return fDeviceClass;
 }
