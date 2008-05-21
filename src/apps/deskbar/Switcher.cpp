@@ -1349,8 +1349,8 @@ TBox::DrawIconScrollers(bool force)
 {
 	bool updateLeft = false;
 	bool updateRight = false;
-	rgb_color leftc;
-	rgb_color rightc;
+	rgb_color leftc = {0,0,0,255};
+	rgb_color rightc = {0,0,0,255};
 	rgb_color bkg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
 	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
 
@@ -1412,8 +1412,8 @@ TBox::DrawWindowScrollers(bool force)
 {
 	bool updateUp = false;
 	bool updateDown = false;
-	rgb_color upColor;
-	rgb_color downColor;
+	rgb_color upColor = {0,0,0,255};
+	rgb_color downColor = {0,0,0,255};
 	rgb_color bkg = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
 
