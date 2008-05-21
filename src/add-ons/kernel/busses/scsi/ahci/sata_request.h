@@ -20,14 +20,11 @@ public:
 	void			set_ata28_cmd(uint8 command, uint32 lba, uint8 sectorCount);
 	void			set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount);
 
-	void			set_atapi6_cmd(const void *cmd);
-	void			set_atapi10_cmd(const void *cmd);
-	void			set_atapi12_cmd(const void *cmd);
-	void			set_atapi16_cmd(const void *cmd);
+	void			set_atapi_cmd();
+	bool 			is_atapi();
 
 	scsi_ccb *		ccb();
 	const void *	fis();
-	int				fis_length();
 	void *			data();
 	int				size();
 	void			finish(int tfd, size_t bytesTransfered);
@@ -39,7 +36,7 @@ public:
 private:
 	scsi_ccb *		fCcb;
 	uint8			fFis[20];
-	int				fFisLength;
+	bool			fIsATAPI;
 	sem_id			fCompletionSem;
 	int				fCompletionStatus;
 	void *			fData;
@@ -61,10 +58,10 @@ sata_request::fis()
 }
 
 
-inline int
-sata_request::fis_length()
+inline bool
+sata_request::is_atapi()
 {
-	return fFisLength;
+	return fIsATAPI;
 }
 
 

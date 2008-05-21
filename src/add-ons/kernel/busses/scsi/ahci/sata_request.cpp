@@ -8,7 +8,7 @@
 
 sata_request::sata_request()
  :	fCcb(NULL)
- ,	fFisLength(20)
+ ,	fIsATAPI(false)
  ,	fCompletionSem(create_sem(0, "sata completion"))
  ,	fCompletionStatus(0)
  ,	fData(NULL)
@@ -19,7 +19,7 @@ sata_request::sata_request()
 
 sata_request::sata_request(scsi_ccb *ccb)
  :	fCcb(ccb)
- ,	fFisLength(20)
+ ,	fIsATAPI(false)
  ,	fCompletionSem(-1)
  ,	fCompletionStatus(0)
  ,	fData(NULL)
@@ -83,36 +83,12 @@ sata_request::set_ata48_cmd(uint8 command, uint64 lba, uint16 sectorCount)
 
 
 void
-sata_request::set_atapi6_cmd(const void *cmd)
+sata_request::set_atapi_cmd()
 {
-	memcpy(fFis, cmd, 6);
-	memset(fFis + 6, 0, 6);
-	fFisLength = 12;
-}
-
-
-void
-sata_request::set_atapi10_cmd(const void *cmd)
-{
-	memcpy(fFis, cmd, 10);
-	memset(fFis + 10, 0, 2);
-	fFisLength = 12;
-}
-
-
-void
-sata_request::set_atapi12_cmd(const void *cmd)
-{
-	memcpy(fFis, cmd, 12);
-	fFisLength = 12;
-}
-
-
-void
-sata_request::set_atapi16_cmd(const void *cmd)
-{
-	memcpy(fFis, cmd, 16);
-	fFisLength = 16;
+	fIsATAPI = true;
+	set_ata_cmd(0xa0);
+	fFis[5] = 0xfe;
+	fFis[6] = 0xff;
 }
 
 

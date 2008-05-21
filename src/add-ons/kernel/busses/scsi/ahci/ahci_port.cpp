@@ -286,8 +286,13 @@ AHCIPort::Interrupt()
 
 	RWTRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
 
-	if (is & PORT_INT_ERROR)
+	if (is & PORT_INT_ERROR) {
 		TRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
+		TRACE("ssts 0x%08lx\n", fRegs->ssts);
+		TRACE("sctl 0x%08lx\n", fRegs->sctl);
+		TRACE("serr 0x%08lx\n", fRegs->serr);
+		TRACE("sact 0x%08lx\n", fRegs->sact);
+	}
 	
 	if (is & PORT_INT_FATAL)
 		panic("ahci fatal error, is 0x%08lx", is);
@@ -565,11 +570,6 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool 
 	}
 #endif
 
-	if (fIsATAPI) {
-		ScsiReadWriteATAPI(request, lba, sectorCount, isWrite);
-		return;
-	}
-
 	ASSERT(request->data_length == sectorCount * 512);
 	sata_request *sreq = new(std::nothrow) sata_request(request);
 
@@ -585,24 +585,6 @@ AHCIPort::ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool 
 		if (lba > MAX_SECTOR_LBA_28)
 			panic("achi: ScsiReadWrite position too large for normal LBA\n");
 		sreq->set_ata28_cmd(isWrite ? 0xca : 0xc8, lba, sectorCount);
-	}
-
-	ExecuteSataRequest(sreq, isWrite);
-}
-
-
-void
-AHCIPort::ScsiReadWriteATAPI(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite)
-{
-	TRACE("ScsiReadWriteATAPI lba %lld, sectorCount %ld, isWrite %d\n", lba, sectorCount, isWrite);
-	
-	sata_request *sreq = new(std::nothrow) sata_request(request);
-
-	sreq->set_atapi12_cmd(request->cdb);
-
-	uint8 *data = (uint8*) sreq->fis();
-	for (int i = 0; i < 16; i += 8) {
-		TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
 	}
 
 	ExecuteSataRequest(sreq, isWrite);
@@ -628,14 +610,13 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	FLOW("prdEntrys %d\n", prdEntrys);
 
 	fCommandList->prdtl_flags_cfl = 0;
-	fCommandList->cfl = request->fis_length() / 4; // length in DWORDS 
+	fCommandList->cfl = 5; // 20 bytes, length in DWORDS 
+	memcpy((char *)fCommandTable->cfis, request->fis(), 20);
 
-	if (request->fis_length() == 20) {
-		// command fis is always 20 byte
-		memcpy((char *)fCommandTable->cfis, request->fis(), 20);
-	} else {
+	if (request->is_atapi()) {
 		// ATAPI PACKET is a 12 or 16 byte SCSI command
-		memcpy((char *)fCommandTable->acmd, request->fis(), request->fis_length());
+		memset((char *)fCommandTable->acmd, 0, 32);
+		memcpy((char *)fCommandTable->acmd, request->ccb()->cdb, request->ccb()->cdb_length);
 		fCommandList->a = 1;
 	}
 
@@ -697,6 +678,30 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 {
 
 //	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
+
+	if (fIsATAPI && request->cdb[0] != SCSI_OP_INQUIRY) {
+		bool isWrite;
+		switch (request->cdb[0]) {
+			case SCSI_OP_WRITE_6:
+			case SCSI_OP_WRITE_10:
+			case SCSI_OP_WRITE_12:
+				isWrite = true;
+				break;
+			default:
+				isWrite = false;
+		}
+	
+		TRACE("AHCIPort::ScsiExecuteRequest ATAPI: port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
+
+		sata_request *sreq = new(std::nothrow) sata_request(request);
+		sreq->set_atapi_cmd();
+		uint8 *data = (uint8*) sreq->ccb()->cdb;
+		for (int i = 0; i < 16; i += 8) {
+			TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
+		}
+		ExecuteSataRequest(sreq, isWrite);
+		return;
+	}
 
 	if (request->cdb[0] == SCSI_OP_REQUEST_SENSE) {
 		panic("ahci: SCSI_OP_REQUEST_SENSE not yet supported\n");

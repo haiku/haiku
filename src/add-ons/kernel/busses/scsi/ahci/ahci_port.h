@@ -33,7 +33,6 @@ private:
 	void		ScsiInquiry(scsi_ccb *request);
 	void		ScsiReadCapacity(scsi_ccb *request);
 	void		ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite);
-	void		ScsiReadWriteATAPI(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite);
 	void		ScsiSynchronizeCache(scsi_ccb *request);
 
 	void		ExecuteSataRequest(sata_request *request, bool isWrite = false);
