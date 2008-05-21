@@ -9,7 +9,7 @@
 #include "accel.h"
 
 #include <create_display_modes.h>
-
+#include <string.h>
 
 
 void 
@@ -232,8 +232,8 @@ CreateModeList(bool (*checkMode)(const display_mode* mode))
 
 	listArea = create_display_modes("S3 modes",
 		si.bHaveEDID ? &si.edidInfo : NULL,
-		NULL, 0, si.colorSpaces, si.colorSpaceCount, checkMode,
-		&list, &count);
+		NULL, 0, si.colorSpaces, si.colorSpaceCount, 
+		(check_display_mode_hook)checkMode, &list, &count);
 
 	if (listArea < 0)
 		return listArea;		// listArea has error code
