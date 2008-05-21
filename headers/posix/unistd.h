@@ -36,6 +36,7 @@
 #define _POSIX_SAVED_IDS		1
 #define _POSIX_VDISABLE			((char)-2)	/* TODO: Check this! */
 #define _POSIX_SEMAPHORES		(200112L)
+#define _POSIX_THREADS			(200112L)
 
 /* pathconf() constants */
 #define _PC_CHOWN_RESTRICTED	1
@@ -66,6 +67,7 @@
 #define _SC_SEM_NSEMS_MAX		28
 #define _SC_SEM_VALUE_MAX		29
 #define _SC_SEMAPHORES			30
+#define _SC_THREADS				31
 
 /* lseek() constants */
 #ifndef SEEK_SET

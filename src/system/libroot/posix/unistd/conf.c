@@ -68,6 +68,8 @@ sysconf(int name)
 			return MAX_POSIX_SEM_VALUE;
 		case _SC_SEMAPHORES:
 			return _POSIX_SEMAPHORES;
+		case _SC_THREADS:
+			return _POSIX_THREADS;
 	}
 
 	return -1;
