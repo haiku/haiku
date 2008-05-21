@@ -147,6 +147,7 @@ fork(void)
 	thread = _kern_fork();
 	if (thread < 0) {
 		// something went wrong
+		release_sem(sForkLock);
 		errno = thread;
 		return -1;
 	}
