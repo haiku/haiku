@@ -9,6 +9,7 @@
 #define _REMOTE_DEVICE_H
 
 #include <bluetooth/bluetooth.h>
+#include <bluetooth/BluetoothDevice.h>
 
 #include <String.h>
 
@@ -21,7 +22,7 @@ namespace Bluetooth {
 class Connection;
 class LocalDevice;
 
-class RemoteDevice {
+class RemoteDevice : public BluetoothDevice {
 
     public:
                 
@@ -30,7 +31,10 @@ class RemoteDevice {
                 
         bool IsTrustedDevice();
         BString GetFriendlyName(bool alwaysAsk); /* Throwing */
+        BString GetFriendlyName(void); /* Throwing */
         bdaddr_t GetBluetoothAddress();
+        DeviceClass GetDeviceClass();
+                         
         bool Equals(RemoteDevice* obj);
         
         /*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
@@ -40,6 +44,10 @@ class RemoteDevice {
         bool IsAuthenticated(); /* Throwing */
         /*bool IsAuthorized(Connection conn);  Throwing */
         bool IsEncrypted(); /* Throwing */
+        
+        BString GetProperty(const char* property); /* Throwing */
+        void GetProperty(const char* property, uint32* value); /* Throwing */
+
                 
     protected:
         RemoteDevice(BString address);
@@ -51,7 +59,7 @@ class RemoteDevice {
     private:
 		void         SetLocalDeviceOwner(LocalDevice* ld);
 		
-    	bdaddr_t	 fBdaddr;
+    	
     	LocalDevice* fDiscovererLocalDevice;
     	
     	uint8		 fPageRepetitionMode;

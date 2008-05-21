@@ -10,6 +10,7 @@
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/DeviceClass.h>
+#include <bluetooth/BluetoothDevice.h>
 
 #include <bluetooth/HCI/btHCI.h>
 
@@ -23,7 +24,7 @@ namespace Bluetooth {
 
 class DiscoveryAgent;
 
-class LocalDevice {
+class LocalDevice : public BluetoothDevice {
    
     public:
         /* Possible throwing */

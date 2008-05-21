@@ -21,6 +21,11 @@ class DeviceClass {
             this->record = record;
         }
 
+        DeviceClass() 
+        {
+            this->record = 0;
+        }
+
 
         int GetServiceClasses() 
         {
