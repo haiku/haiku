@@ -60,6 +60,7 @@
 
 /* turns a priority into a mask usable for setlogmask() */
 #define LOG_MASK(pri)	(1 << (pri))
+#define LOG_UPTO(pri)	((1 << ((pri) + 1) - 1)
 
 
 #ifdef __cplusplus
