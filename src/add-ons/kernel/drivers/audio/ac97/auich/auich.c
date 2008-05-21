@@ -452,8 +452,7 @@ auich_int(void *arg)
 			auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, sta);
 		}
 	} else {
-		TRACE(("interrupt masked %lx, ", card->interrupt_mask));
-		TRACE(("sta %lx\n", sta));
+		dprintf("interrupt masked %lx, sta %lx\n", card->interrupt_mask, sta);
 	}
 	
 	if (gotone)
@@ -697,6 +696,11 @@ auich_setup(auich_dev * card)
 	PRINT(("codec vendor id      = %#08lx\n", card->config.ac97->codec_id));
 	PRINT(("codec description     = %s\n", card->config.ac97->codec_info));
 	PRINT(("codec 3d enhancement = %s\n", card->config.ac97->codec_3d_stereo_enhancement));
+
+	// disable channels
+	auich_reg_write_8(&card->config, AUICH_REG_PO_BASE + AUICH_REG_X_CR, 0);
+	auich_reg_write_8(&card->config, AUICH_REG_PI_BASE + AUICH_REG_X_CR, 0);
+	auich_reg_write_8(&card->config, AUICH_REG_MC_BASE + AUICH_REG_X_CR, 0);
 	
 	if (current_settings.use_thread) {
 		int_thread_id = spawn_kernel_thread(auich_int_thread, "auich interrupt poller", B_REAL_TIME_PRIORITY, card);

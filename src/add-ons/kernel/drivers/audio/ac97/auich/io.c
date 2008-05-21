@@ -122,7 +122,7 @@ auich_codec_read(device_config *config, uint8 regno)
 {
 	ASSERT(regno >= 0);
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
-	if(auich_codec_wait(config)!=B_OK) {
+	if (auich_codec_wait(config)!=B_OK) {
 		PRINT(("codec busy (2)\n"));
 		return -1;
 	}
@@ -138,7 +138,7 @@ auich_codec_write(device_config *config, uint8 regno, uint16 value)
 {
 	ASSERT(regno >= 0);
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
-	if(auich_codec_wait(config)!=B_OK) {
+	if (auich_codec_wait(config)!=B_OK) {
 		PRINT(("codec busy (4)\n"));
 		return;
 	}
