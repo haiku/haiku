@@ -189,6 +189,9 @@ struct group_source_req {
 
 #define IP_MAX_MEMBERSHIPS      20
 
+/* maximal length of the string representation of an IPv4 address */
+#define INET_ADDRSTRLEN			16
+
 /* some helpful macro's :) */
 #define in_hosteq(s,t)  ((s).s_addr == (t).s_addr)
 #define in_nullhost(x)  ((x).s_addr == INADDR_ANY)
