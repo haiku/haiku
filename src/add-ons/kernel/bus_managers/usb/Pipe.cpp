@@ -289,16 +289,17 @@ IsochronousPipe::GetPipePolicy(uint8 *maxQueuedPackets,
 //
 
 
-typedef struct transfer_result_data_s {
-	sem_id		notify_sem;
-	status_t	status;
-	size_t		actual_length;
-} transfer_result_data;
-
-
 ControlPipe::ControlPipe(Object *parent)
-	:	Pipe(parent)
+	:	Pipe(parent),
+		fNotifySem(-1)
 {
+}
+
+
+ControlPipe::~ControlPipe()
+{
+	if (fNotifySem >= 0)
+		delete_sem(fNotifySem);
 }
 
 
@@ -307,40 +308,39 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	uint16 index, uint16 length, void *data, size_t dataLength,
 	size_t *actualLength)
 {
-	transfer_result_data *transferResult
-		= new(std::nothrow) transfer_result_data;
-
-	transferResult->notify_sem = create_sem(0, "usb send request notify");
-	if (transferResult->notify_sem < B_OK)
-		return B_NO_MORE_SEMS;
-
-	status_t result = QueueRequest(requestType, request, value, index, length,
-		data, dataLength, SendRequestCallback, transferResult);
-	if (result < B_OK) {
-		delete_sem(transferResult->notify_sem);
-		return result;
+	if (fNotifySem < 0) {
+		fNotifySem = create_sem(0, "usb send request notify");
+		if (fNotifySem < 0)
+			return B_NO_MORE_SEMS;
 	}
 
-	// the sem will be released in the callback after the result data was
-	// filled into the provided struct. use a 1 second timeout to avoid
-	// hanging applications.
-	if (acquire_sem_etc(transferResult->notify_sem, 1, B_RELATIVE_TIMEOUT, 1000000) < B_OK) {
+	status_t result = QueueRequest(requestType, request, value, index, length,
+		data, dataLength, SendRequestCallback, this);
+	if (result < B_OK)
+		return result;
+
+	// The sem will be released unconditionally in the callback after the
+	// result data was filled in. Use a 1 second timeout for control transfers.
+	if (acquire_sem_etc(fNotifySem, 1, B_RELATIVE_TIMEOUT, 1000000) < B_OK) {
 		TRACE_ERROR(("USB ControlPipe: timeout waiting for queued request to complete\n"));
 
-		delete_sem(transferResult->notify_sem);
+		CancelQueuedTransfers(false);
+
+		// After the above cancel returns it is guaranteed that the callback
+		// has been invoked. Therefore we can simply grab that released
+		// semaphore again to clean up.
+		acquire_sem_etc(fNotifySem, 1, B_RELATIVE_TIMEOUT, 0);
+
 		if (actualLength)
 			*actualLength = 0;
 
-		CancelQueuedTransfers(false);
 		return B_TIMED_OUT;
 	}
 
-	delete_sem(transferResult->notify_sem);
 	if (actualLength)
-		*actualLength = transferResult->actual_length;
+		*actualLength = fActualLength;
 
-	result = transferResult->status;
-	delete transferResult;
+	result = fTransferStatus;
 	return result;
 }
 
@@ -349,13 +349,10 @@ void
 ControlPipe::SendRequestCallback(void *cookie, status_t status, void *data,
 	size_t actualLength)
 {
-	transfer_result_data *transferResult = (transfer_result_data *)cookie;
-	transferResult->status = status;
-	transferResult->actual_length = actualLength;
-	if (release_sem(transferResult->notify_sem) < B_OK) {
-		// the request has timed out already - cleanup after us
-		delete transferResult;
-	}
+	ControlPipe *pipe = (ControlPipe *)cookie;
+	pipe->fTransferStatus = status;
+	pipe->fActualLength = actualLength;
+	release_sem(pipe->fNotifySem);
 }
 
 

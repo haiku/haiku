@@ -305,6 +305,7 @@ private:
 class ControlPipe : public Pipe {
 public:
 										ControlPipe(Object *parent);
+virtual									~ControlPipe();
 
 virtual	uint32							Type() { return USB_OBJECT_PIPE | USB_OBJECT_CONTROL_PIPE; };
 
@@ -331,6 +332,11 @@ static	void							SendRequestCallback(void *cookie,
 											void *data, size_t dataLength,
 											usb_callback_func callback,
 											void *callbackCookie);
+
+private:
+		sem_id							fNotifySem;
+		status_t						fTransferStatus;
+		size_t							fActualLength;
 };
 
 
