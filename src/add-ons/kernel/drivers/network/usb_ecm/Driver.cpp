@@ -16,6 +16,7 @@
 #include "Driver.h"
 #include "ECMDevice.h"
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
 static const char *sDeviceBaseName = "net/usb_ecm/";
 ECMDevice *gECMDevices[MAX_DEVICES];
 char *gDeviceNames[MAX_DEVICES + 1];
