@@ -92,7 +92,7 @@ find_previous_iframe(addr_t frame)
 
 	// iterate backwards through the stack frames, until we hit an iframe
 	while (frame >= thread->kernel_stack_base
-		&& frame < thread->kernel_stack_base + KERNEL_STACK_SIZE) {
+		&& frame < thread->kernel_stack_top) {
 		addr_t previousFrame = *(addr_t*)frame;
 		if ((previousFrame & ~IFRAME_TYPE_MASK) == 0) {
 			if (previousFrame == 0)
@@ -251,7 +251,7 @@ arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void),
 	void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	addr_t *kstack_top = kstack + KERNEL_STACK_SIZE / sizeof(addr_t);
+	addr_t *kstack_top = (addr_t *)t->kernel_stack_top;
 	int i;
 
 	TRACE(("arch_thread_initialize_kthread_stack: kstack 0x%p, start_func 0x%p, entry_func 0x%p\n",
@@ -351,7 +351,7 @@ arch_thread_context_switch(struct thread *from, struct thread *to)
 	for (i = 0; i < 11; i++)
 		dprintf("*esp[%d] (0x%x) = 0x%x\n", i, ((unsigned int *)new_at->esp + i), *((unsigned int *)new_at->esp + i));
 #endif
-	i386_set_tss_and_kstack(to->kernel_stack_base + KERNEL_STACK_SIZE);
+	i386_set_tss_and_kstack(to->kernel_stack_top);
 
 	// set TLS GDT entry to the current thread - since this action is
 	// dependent on the current CPU, we have to do it here
@@ -411,7 +411,7 @@ arch_thread_enter_userspace(struct thread *t, addr_t entry, void *args1,
 
 	disable_interrupts();
 
-	i386_set_tss_and_kstack(t->kernel_stack_base + KERNEL_STACK_SIZE);
+	i386_set_tss_and_kstack(t->kernel_stack_top);
 
 	// set the CPU dependent GDT entry for TLS
 	set_tls_context(t);
@@ -607,7 +607,7 @@ arch_restore_fork_frame(struct arch_fork_arg *arg)
 
 	disable_interrupts();
 
-	i386_set_tss_and_kstack(thread->kernel_stack_base + KERNEL_STACK_SIZE);
+	i386_set_tss_and_kstack(thread->kernel_stack_top);
 
 	// set the CPU dependent GDT entry for TLS (set the current %fs register)
 	set_tls_context(thread);

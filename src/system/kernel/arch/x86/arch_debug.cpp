@@ -213,7 +213,7 @@ is_kernel_stack_address(struct thread* thread, addr_t address)
 		return IS_KERNEL_ADDRESS(address);
 
 	return address >= thread->kernel_stack_base
-		&& address < thread->kernel_stack_base + KERNEL_STACK_SIZE;
+		&& address < thread->kernel_stack_top;
 }
 
 
@@ -281,7 +281,7 @@ stack_trace(int argc, char **argv)
 
 		kprintf("    kernel stack: %p to %p\n",
 			(void *)thread->kernel_stack_base,
-			(void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
+			(void *)(thread->kernel_stack_top));
 		if (thread->user_stack_base != 0) {
 			kprintf("      user stack: %p to %p\n",
 				(void *)thread->user_stack_base,
