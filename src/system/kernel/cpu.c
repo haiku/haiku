@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2002, Travis Geiselbrecht. All rights reserved.
@@ -29,11 +29,13 @@ cpu_init(kernel_args *args)
 	return arch_cpu_init(args);
 }
 
+
 status_t 
 cpu_init_percpu(kernel_args *args, int curr_cpu)
 {
 	return arch_cpu_init_percpu(args, curr_cpu);
 }
+
 
 status_t
 cpu_init_post_vm(kernel_args *args)
@@ -59,6 +61,7 @@ cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 
 	return arch_cpu_preboot_init_percpu(args, curr_cpu);
 }
+
 
 bigtime_t
 cpu_get_active_time(int32 cpu)
@@ -105,7 +108,7 @@ bool
 _user_cpu_enabled(int32 cpu)
 {
 	if (cpu < 0 || cpu >= smp_get_num_cpus())
-		return B_BAD_VALUE;
+		return false;
 
 	return !gCPU[cpu].disabled;
 }
