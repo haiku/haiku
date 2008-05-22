@@ -25,12 +25,19 @@
 /* mmap() error return code */
 #define MAP_FAILED		((void*)-1)
 
+/* msync() flags */
+#define MS_ASYNC		0x01
+#define MS_SYNC			0x02
+#define MS_INVALIDATE	0x04
+
 
 __BEGIN_DECLS
 
 void*	mmap(void* address, size_t length, int protection, int flags,
 			int fd, off_t offset);
 int		munmap(void* address, size_t length);
+
+int		msync(void* address, size_t length, int flags);
 
 int		shm_open(const char* name, int openMode, mode_t permissions);
 int		shm_unlink(const char* name);

@@ -96,6 +96,7 @@ status_t _user_delete_area(area_id area);
 area_id _user_map_file(const char *uname, void **uaddress, int addressSpec,
 			addr_t size, int protection, int mapping, int fd, off_t offset);
 status_t _user_unmap_memory(void *address, addr_t size);
+status_t _user_sync_memory(void *address, addr_t size, int flags);
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);
 status_t _user_get_area_info(area_id area, area_info *info);

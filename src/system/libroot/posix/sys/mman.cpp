@@ -143,6 +143,13 @@ munmap(void* address, size_t length)
 
 
 int
+msync(void* address, size_t length, int flags)
+{
+	RETURN_AND_SET_ERRNO(_kern_sync_memory(address, length, flags));
+}
+
+
+int
 shm_open(const char* name, int openMode, mode_t permissions)
 {
 	char path[PATH_MAX];

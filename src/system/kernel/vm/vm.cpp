@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
 
 #include <OS.h>
 #include <KernelExport.h>
@@ -5522,4 +5523,84 @@ _user_unmap_memory(void *_address, addr_t size)
 
 	// unmap
 	return unmap_address_range(locker.AddressSpace(), address, size, false);
+}
+
+
+status_t
+_user_sync_memory(void *_address, addr_t size, int flags)
+{
+	addr_t address = (addr_t)_address;
+	size = PAGE_ALIGN(size);
+
+	// check params
+	if ((address % B_PAGE_SIZE) != 0)
+		return B_BAD_VALUE;
+	if ((addr_t)address + size < (addr_t)address || !IS_USER_ADDRESS(address)
+		|| !IS_USER_ADDRESS((addr_t)address + size)) {
+		// weird error code required by POSIX
+		return ENOMEM;
+	}
+
+	bool writeSync = (flags & MS_SYNC) != 0;
+	bool writeAsync = (flags & MS_ASYNC) != 0;
+	if (writeSync && writeAsync)
+		return B_BAD_VALUE;
+
+	if (size == 0 || !writeSync && !writeAsync)
+		return B_OK;
+
+	// iterate through the range and sync all concerned areas
+	while (size > 0) {
+		// read lock the address space
+		AddressSpaceReadLocker locker;
+		status_t error = locker.SetTo(team_get_current_team_id());
+		if (error != B_OK)
+			return error;
+
+		// get the first area
+		vm_area* area = vm_area_lookup(locker.AddressSpace(), address);
+		if (area == NULL)
+			return B_NO_MEMORY;
+
+		uint32 offset = address - area->base;
+		size_t rangeSize = min_c(area->size - offset, size);
+		offset += area->cache_offset;
+
+		// lock the cache
+		AreaCacheLocker cacheLocker(area);
+		if (!cacheLocker)
+			return B_BAD_VALUE;
+		vm_cache* cache = area->cache;
+
+		locker.Unlock();
+
+		uint32 firstPage = offset >> PAGE_SHIFT;
+		uint32 endPage = firstPage + (rangeSize >> PAGE_SHIFT);
+
+		// write the pages
+		if (cache->type == CACHE_TYPE_VNODE) {
+			if (writeSync) {
+				// synchronous
+				error = vm_page_write_modified_page_range(cache, firstPage,
+					endPage, false);
+				if (error != B_OK)
+					return error;
+			} else {
+				// asynchronous
+				vm_page_schedule_write_page_range(cache, firstPage, endPage);
+				// TODO: This is probably not quite what is supposed to happen.
+				// Especially when a lot has to be written, it might take ages
+				// until it really hits the disk.
+			}
+		}
+
+		address += rangeSize;
+		size -= rangeSize;
+	}
+	
+	// NOTE: If I understand it correctly the purpose of MS_INVALIDATE is to
+	// synchronize multiple mappings of the same file. In our VM they never get
+	// out of sync, though, so we don't have to do anything.
+
+	return B_OK;
 }

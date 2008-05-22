@@ -319,6 +319,7 @@ extern area_id		_kern_map_file(const char *name, void **address,
 						int addressSpec, addr_t size, int protection,
 						int mapping, int fd, off_t offset);
 extern status_t		_kern_unmap_memory(void *address, addr_t size);
+extern status_t		_kern_sync_memory(void *address, addr_t size, int flags);
 
 /* kernel port functions */
 extern port_id		_kern_create_port(int32 queue_length, const char *name);

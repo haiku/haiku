@@ -1306,16 +1306,25 @@ steal_pages(vm_page **pages, size_t count, bool reserve)
 //	#pragma mark - private kernel API
 
 
-/*!	You need to hold the vm_cache lock when calling this function.
+/*!	Writes a range of modified pages of a cache to disk.
+	You need to hold the vm_cache lock when calling this function.
 	Note that the cache lock is released in this function.
+	\param cache The cache.
+	\param firstPage Offset (in page size units) of the first page in the range.
+	\param endPage End offset (in page size units) of the page range. The page
+		at this offset is not included.
 */
 status_t
-vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
+vm_page_write_modified_page_range(struct vm_cache *cache, uint32 firstPage,
+	uint32 endPage, bool fsReenter)
 {
-	// ToDo: join adjacent pages into one vec list
+	// TODO: join adjacent pages into one vec list
 
 	for (vm_page *page = cache->page_list; page; page = page->cache_next) {
 		bool dequeuedPage = false;
+
+		if (page->cache_offset < firstPage || page->cache_offset >= endPage)
+			continue;
 
 		if (page->state == PAGE_STATE_MODIFIED) {
 			InterruptsSpinLocker locker(&sPageLock);
@@ -1382,6 +1391,17 @@ vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 }
 
 
+/*!	You need to hold the vm_cache lock when calling this function.
+	Note that the cache lock is released in this function.
+*/
+status_t
+vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
+{
+	return vm_page_write_modified_page_range(cache, 0,
+		cache->virtual_size >> PAGE_SHIFT, fsReenter);
+}
+
+
 /*!	Schedules the page writer to write back the specified \a page.
 	Note, however, that it might not do this immediately, and it can well
 	take several seconds until the page is actually written out.
@@ -1394,6 +1414,28 @@ vm_page_schedule_write_page(vm_page *page)
 	vm_page_requeue(page, false);
 
 	release_sem_etc(sWriterWaitSem, 1, B_DO_NOT_RESCHEDULE);
+}
+
+
+/*!	Cache must be locked.
+*/
+void
+vm_page_schedule_write_page_range(struct vm_cache *cache, uint32 firstPage,
+	uint32 endPage)
+{
+	uint32 modified = 0;
+	for (vm_page *page = cache->page_list; page; page = page->cache_next) {
+		bool dequeuedPage = false;
+
+		if (page->cache_offset >= firstPage && page->cache_offset < endPage
+			&& page->state == PAGE_STATE_MODIFIED) {
+			vm_page_requeue(page, false);
+			modified++;
+		}
+	}
+
+	if (modified > 0)
+		release_sem_etc(sWriterWaitSem, 1, B_DO_NOT_RESCHEDULE);
 }
 
 
