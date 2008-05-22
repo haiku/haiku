@@ -229,6 +229,7 @@ init_double_fault(int cpuNum)
 	tss->fs = KERNEL_DATA_SEG;
 	tss->gs = KERNEL_DATA_SEG;
 	tss->ldt_seg_selector = 0;
+	tss->io_map_base = sizeof(struct tss);
 
 	// add TSS descriptor for this new TSS
 	set_tss_descriptor(&gGDT[DOUBLE_FAULT_TSS_BASE_SEGMENT + cpuNum],
@@ -501,6 +502,7 @@ arch_cpu_init_post_vm(kernel_args *args)
 		// structure
 		memset(&gCPU[i].arch.tss, 0, sizeof(struct tss));
 		gCPU[i].arch.tss.ss0 = KERNEL_DATA_SEG;
+		gCPU[i].arch.tss.io_map_base = sizeof(struct tss);
 
 		// add TSS descriptor for this new TSS
 		set_tss_descriptor(&gGDT[TSS_BASE_SEGMENT + i],
