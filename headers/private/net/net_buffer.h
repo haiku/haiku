@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef NET_BUFFER_H
@@ -17,8 +17,9 @@
 typedef struct net_buffer {
 	struct list_link link;
 
-	// TODO: we should think about moving the address fields into the buffer data itself
-	//	via associated data or something like this. Or this structure as a whole, too...
+	// TODO: we should think about moving the address fields into the buffer
+	// data itself via associated data or something like this. Or this
+	// structure as a whole, too...
 
 	struct sockaddr *source;
 	struct sockaddr *destination;
@@ -71,8 +72,8 @@ struct net_buffer_module_info {
 	status_t		(*associate_data)(net_buffer *buffer, void *data);
 
 	void			(*set_ancillary_data)(net_buffer *buffer,
-						ancillary_data_container *container);
-	ancillary_data_container* (*get_ancillary_data)(net_buffer *buffer);
+						struct ancillary_data_container *container);
+	struct ancillary_data_container* (*get_ancillary_data)(net_buffer *buffer);
 	void *			(*transfer_ancillary_data)(net_buffer *from,
 						net_buffer *to);
 
