@@ -81,7 +81,7 @@ unregister_kernel_daemon(daemon_hook function, void* arg)
 		if (daemon->function == function && daemon->arg == arg) {
 			// found it!
 			iterator.Remove();
-			free(daemon);
+			delete daemon;
 			return B_OK;
 		}
 	}
