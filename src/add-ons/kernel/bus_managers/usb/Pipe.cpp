@@ -340,8 +340,7 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	if (actualLength)
 		*actualLength = fActualLength;
 
-	result = fTransferStatus;
-	return result;
+	return fTransferStatus;
 }
 
 
