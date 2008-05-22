@@ -76,8 +76,12 @@ main()
  */
 PrintServerApp::PrintServerApp(status_t* err)
 	: Inherited(PSRV_SIGNATURE_TYPE, err),
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	fSelectedIcon(NULL),
+#else
 	fSelectedIconMini(NULL),
 	fSelectedIconLarge(NULL),
+#endif
 	fReferences(0),
 	fHasReferences(0),
 	fUseConfigWindow(true),
@@ -100,11 +104,16 @@ PrintServerApp::PrintServerApp(status_t* err)
 	RetrieveDefaultPrinter();
 
 	// Cache icons for selected printer
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	BMimeType type(PSRV_PRINTER_FILETYPE);
+	type.GetIcon(&fSelectedIcon, &fIconSize);
+#else
 	fSelectedIconMini = new BBitmap(BRect(0,0,B_MINI_ICON-1,B_MINI_ICON-1), B_CMAP8);
 	fSelectedIconLarge = new BBitmap(BRect(0,0,B_LARGE_ICON-1,B_LARGE_ICON-1), B_CMAP8);
 	BMimeType type(PRNT_SIGNATURE_TYPE);
 	type.GetIcon(fSelectedIconMini, B_MINI_ICON);
 	type.GetIcon(fSelectedIconLarge, B_LARGE_ICON);
+#endif
 
 	PostMessage(PSRV_PRINT_SPOOLED_JOB);
 		// Start handling of spooled files
@@ -147,8 +156,15 @@ PrintServerApp::QuitRequested()
 		fHasReferences = 0;
 	}
 
-	delete fSelectedIconMini; fSelectedIconMini = NULL;
-	delete fSelectedIconLarge; fSelectedIconLarge = NULL;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	delete [] fSelectedIcon;
+	fSelectedIcon = NULL;
+#else
+	delete fSelectedIconMini;
+	fSelectedIconMini = NULL;
+	delete fSelectedIconLarge;
+	fSelectedIconLarge = NULL;
+#endif
 
 	return true;
 }
@@ -507,8 +523,12 @@ PrintServerApp::SelectPrinter(const char* printerName)
 	if (rc == B_OK) {
 		// and add the custom icon
 		BNodeInfo info(&node);
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		info.SetIcon(fSelectedIcon, fIconSize);
+#else
 		info.SetIcon(fSelectedIconMini, B_MINI_ICON);
 		info.SetIcon(fSelectedIconLarge, B_LARGE_ICON);
+#endif
 	}
 
 	fDefaultPrinter = Printer::Find(printerName);

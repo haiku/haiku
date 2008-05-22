@@ -31,15 +31,15 @@ class PrintServerApp : public BApplication, public FolderListener {
 
 	public:
 		PrintServerApp(status_t *err);
-		~PrintServerApp();	
-			
+		~PrintServerApp();
+
 		void Acquire();
 		void Release();
-		
+
 		bool QuitRequested();
 		void MessageReceived(BMessage *msg);
 		void NotifyPrinterDeletion(Printer *printer);
-		
+
 		// Scripting support, see PrintServerApp.Scripting.cpp
 		status_t GetSupportedSuites(BMessage *msg);
 		void HandleScriptingCommand(BMessage *msg);
@@ -51,30 +51,30 @@ class PrintServerApp : public BApplication, public FolderListener {
 		bool OpenSettings(BFile &file, const char *name, bool forReading);
 		void LoadSettings();
 		void SaveSettings();
-	
+
 		status_t SetupPrinterList();
-	
+
 		void HandleSpooledJobs();
-		
+
 		status_t SelectPrinter(const char *printerName);
 		status_t CreatePrinter(const char *printerName, const char *driverName,
 			const char *connection, const char *transportName,
 			const char *transportPath);
-	
+
 		void RegisterPrinter(BDirectory *node);
 		void UnregisterPrinter(Printer *printer);
-		
+
 		// FolderListener
 		void EntryCreated(node_ref *node, entry_ref *entry);
 		void EntryRemoved(node_ref *node);
 		void AttributeChanged(node_ref *node);
-			
+
 		status_t StoreDefaultPrinter();
 		status_t RetrieveDefaultPrinter();
-		
+
 		status_t FindPrinterNode(const char *name, BNode &node);
 		status_t FindPrinterDriver(const char *name, BPath &outPath);
-		
+
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
 		static status_t async_thread(void *data);
 		void AsyncHandleMessage(BMessage *msg);
@@ -82,14 +82,19 @@ class PrintServerApp : public BApplication, public FolderListener {
 
 		ResourceManager fResourceManager;
 		Printer *fDefaultPrinter;
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+		size_t fIconSize;
+		uint8 *fSelectedIcon;
+#else
 		BBitmap *fSelectedIconMini;
 		BBitmap *fSelectedIconLarge;
-		vint32 fReferences; 
+#endif
+		vint32 fReferences;
 		sem_id fHasReferences;
 		Settings *fSettings;
 		bool fUseConfigWindow;
 		FolderWatcher *fFolder;
-		
+
 };
 
 #endif
