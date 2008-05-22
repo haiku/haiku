@@ -3864,8 +3864,13 @@ vm_page_fault(addr_t address, addr_t faultAddress, bool isWrite, bool isUser,
 			release_sem_etc(addressSpace->sem, READ_COUNT, 0);
 			vm_put_address_space(addressSpace);
 #endif
-			if (user_debug_exception_occurred(B_SEGMENT_VIOLATION, SIGSEGV))
-				send_signal(team_get_current_team_id(), SIGSEGV);
+			struct thread *thread = thread_get_current_thread();
+			// TODO: the fault_callback is a temporary solution for vm86
+			if (thread->fault_callback == NULL
+				|| thread->fault_callback(address, faultAddress, isWrite)) {
+				if (user_debug_exception_occurred(B_SEGMENT_VIOLATION, SIGSEGV))
+					send_signal(team_get_current_team_id(), SIGSEGV);
+			}
 		}
 	}
 
