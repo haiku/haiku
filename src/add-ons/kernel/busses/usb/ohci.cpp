@@ -385,7 +385,7 @@ OHCI::Start()
 	}
 
 	SetRootHub(fRootHub);
-	TRACE(("usb_ohci: Host Controller started\n"));
+	dprintf("usb_ohci: successfully started the controller\n");
 	return BusManager::Start();
 }
 
