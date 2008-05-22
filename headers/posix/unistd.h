@@ -39,6 +39,7 @@
 #define _POSIX_THREADS			(200112L)
 
 /* pathconf() constants */
+/* BeOS supported values, do not touch */
 #define _PC_CHOWN_RESTRICTED	1
 #define _PC_MAX_CANON			2
 #define _PC_MAX_INPUT			3
@@ -48,8 +49,25 @@
 #define _PC_PIPE_BUF			7
 #define _PC_VDISABLE			8
 #define _PC_LINK_MAX			25
+/* new values */
+/* TODO: reorder */
+#define _PC_SYNC_IO				26
+#define _PC_ASYNC_IO			27
+#define _PC_PRIO_IO				28
+#define _PC_SOCK_MAXBUF			29
+#define _PC_FILESIZEBITS		30
+#define _PC_REC_INCR_XFER_SIZE	31
+#define _PC_REC_MAX_XFER_SIZE	32
+#define _PC_REC_MIN_XFER_SIZE	33
+#define _PC_REC_XFER_ALIGN		34
+#define _PC_ALLOC_SIZE_MIN		35
+#define _PC_SYMLINK_MAX			36
+#define _PC_2_SYMLINKS			37
+#define _PC_XATTR_EXISTS		38
+#define _PC_XATTR_ENABLED		39
 
 /* sysconf() constants */
+/* BeOS supported values, do not touch */
 #define _SC_ARG_MAX				15
 #define _SC_CHILD_MAX			16
 #define _SC_CLK_TCK				17

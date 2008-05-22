@@ -80,6 +80,11 @@ sysconf(int name)
 long
 fpathconf(int fd, int name)
 {
+	if (fd < 0) {
+		errno = EBADF;
+		return -1;
+	}
+
 	// TODO: should query the underlying filesystem
 	// for correct value, as most are fs-dependant
 	// (which is why it's a different call than sysconf() btw).
@@ -110,6 +115,32 @@ fpathconf(int fd, int name)
 
 		case _PC_VDISABLE:
 			return _POSIX_VDISABLE;
+
+		case _PC_FILESIZEBITS:
+			return 64;
+
+		case _PC_XATTR_EXISTS:
+		case _PC_XATTR_ENABLED:
+			/* those seem to be Solaris specific,
+			 * else we should return 1 I suppose.
+			 */
+			errno = EINVAL;
+			return -1;
+
+		case _PC_SYNC_IO:
+		case _PC_ASYNC_IO:
+		case _PC_PRIO_IO:
+		case _PC_SOCK_MAXBUF:
+		case _PC_REC_INCR_XFER_SIZE:
+		case _PC_REC_MAX_XFER_SIZE:
+		case _PC_REC_MIN_XFER_SIZE:
+		case _PC_REC_XFER_ALIGN:
+		case _PC_ALLOC_SIZE_MIN:
+		case _PC_SYMLINK_MAX:
+		case _PC_2_SYMLINKS:
+			/* not yet supported */
+			errno = EINVAL;
+			return -1;
 
 	}
 
