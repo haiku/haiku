@@ -1265,7 +1265,7 @@ TBox::Draw(BRect update)
 	float center = (bounds.right + bounds.left) / 2;
 
 	BRect box(3, 3, bounds.right - 3, 3 + height + kChildInset * 2);
-	rgb_color white = {255,255,255,255};
+	rgb_color white = {255, 255, 255, 255};
 	rgb_color standardGray = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color veryDarkGray = {128, 128, 128, 255};
 	rgb_color darkGray = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
@@ -1349,8 +1349,8 @@ TBox::DrawIconScrollers(bool force)
 {
 	bool updateLeft = false;
 	bool updateRight = false;
-	rgb_color leftc = {0,0,0,255};
-	rgb_color rightc = {0,0,0,255};
+	rgb_color leftc = {0, 0, 0, 255};
+	rgb_color rightc = {0, 0, 0, 255};
 	rgb_color bkg = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_1_TINT);
 	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
 
@@ -1412,8 +1412,8 @@ TBox::DrawWindowScrollers(bool force)
 {
 	bool updateUp = false;
 	bool updateDown = false;
-	rgb_color upColor = {0,0,0,255};
-	rgb_color downColor = {0,0,0,255};
+	rgb_color upColor = {0, 0, 0, 255};
+	rgb_color downColor = {0, 0, 0, 255};
 	rgb_color bkg = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
 
