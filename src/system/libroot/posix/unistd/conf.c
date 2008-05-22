@@ -72,6 +72,7 @@ sysconf(int name)
 			return _POSIX_THREADS;
 	}
 
+	errno = EINVAL;
 	return -1;
 }
 
@@ -79,6 +80,9 @@ sysconf(int name)
 long
 fpathconf(int fd, int name)
 {
+	// TODO: should query the underlying filesystem
+	// for correct value, as most are fs-dependant
+	// (which is why it's a different call than sysconf() btw).
 	switch (name) {
 		case _PC_CHOWN_RESTRICTED:
 			return _POSIX_CHOWN_RESTRICTED;
@@ -106,8 +110,10 @@ fpathconf(int fd, int name)
 
 		case _PC_VDISABLE:
 			return _POSIX_VDISABLE;
+
 	}
 
+	errno = EINVAL;
 	return -1;
 }
 
@@ -115,7 +121,17 @@ fpathconf(int fd, int name)
 long
 pathconf(const char *path, int name)
 {
-	return fpathconf(-1, name);
+	int fd;
+	long value;
+	//XXX: some names shouldn't require openning,
+	// just statfs
+	fd = open(path, O_RDONLY | O_NOCTTY | O_NOTRAVERSE);
+	if (fd < 0)
+		return fd;
+	
+	value = fpathconf(fd, name);
+	close(fd);
+	return value;
 }
 
 
