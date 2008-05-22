@@ -143,7 +143,7 @@ i386_get_user_iframe(void)
 	struct iframe* frame = get_current_iframe();
 
 	while (frame != NULL) {
-		if (frame->cs == USER_CODE_SEG)
+		if (IFRAME_IS_USER(frame))
 			return frame;
 		frame = get_previous_iframe(frame);
 	}

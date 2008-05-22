@@ -157,6 +157,10 @@ struct iframe {
 	uint32 user_ss;
 };
 
+#define IFRAME_IS_USER(f) ( ((f)->cs == USER_CODE_SEG) \
+                            || (((f)->flags & 0x20000) != 0 ))
+#define IFRAME_IS_VM86(f) ( ((f)->flags & 0x20000) != 0 )
+
 // features
 enum x86_feature_type {
 	FEATURE_COMMON = 0,     // cpuid eax=1, ecx register

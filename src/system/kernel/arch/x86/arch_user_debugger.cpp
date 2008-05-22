@@ -778,7 +778,7 @@ x86_handle_debug_exception(struct iframe *frame)
 
 	TRACE(("i386_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
 
-	if (frame->cs != USER_CODE_SEG) {
+	if (!IFRAME_IS_USER(frame)) {
 		panic("debug exception in kernel mode: dr6: 0x%lx, dr7: 0x%lx", dr6,
 			dr7);
 		return;
@@ -850,7 +850,7 @@ x86_handle_breakpoint_exception(struct iframe *frame)
 {
 	TRACE(("i386_handle_breakpoint_exception()\n"));
 
-	if (frame->cs != USER_CODE_SEG) {
+	if (!IFRAME_IS_USER(frame)) {
 		panic("breakpoint exception in kernel mode");
 		return;
 	}

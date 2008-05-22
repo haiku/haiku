@@ -401,7 +401,7 @@ unexpected_exception(struct iframe* frame)
 			return;
 	}
 
-	if (frame->cs == USER_CODE_SEG) {
+	if (IFRAME_IS_USER(frame)) {
 		enable_interrupts();
 
 		if (user_debug_exception_occurred(type, signal))
