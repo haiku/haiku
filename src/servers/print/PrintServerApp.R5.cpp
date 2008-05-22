@@ -77,10 +77,12 @@ status_t PrintServerApp::async_thread(void* data)
 
 					BAlert* alert = new BAlert("Info", alertText.Append("Would "
 						"you like to set one up now?").String(), "No", "Yes");
-					if (alert->Go() == 1 && count == 0)
-						run_add_printer_panel();
-					else
-						run_select_printer_panel();
+					if (alert->Go() == 1) {
+						if (count == 0)
+							run_add_printer_panel();
+						else
+							run_select_printer_panel();
+					}
 				}
 			}	break;
 
