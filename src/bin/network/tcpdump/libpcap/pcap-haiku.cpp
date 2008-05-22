@@ -38,7 +38,8 @@ prepare_request(struct ifreq& request, const char* name)
 
 
 static int
-pcap_read_haiku(pcap_t* handle, int maxPackets, pcap_handler callback, u_char* userdata)
+pcap_read_haiku(pcap_t* handle, int maxPackets, pcap_handler callback,
+	u_char* userdata)
 {
 	// Receive a single packet
 
@@ -47,7 +48,8 @@ pcap_read_haiku(pcap_t* handle, int maxPackets, pcap_handler callback, u_char* u
 	ssize_t bytesReceived;
 	do {
 		if (handle->break_loop) {
-			// Clear the break loop flag, and return -2 to indicate our reasoning
+			// Clear the break loop flag, and return -2 to indicate our
+			// reasoning
 			handle->break_loop = 0;
 			return -2;
 		}
@@ -275,7 +277,7 @@ pcap_platform_finddevs(pcap_if_t** _allDevices, char* errorBuffer)
 		return -1;
 	}
 
-	void *buffer = malloc(count * sizeof(struct ifreq));
+	void* buffer = malloc(count * sizeof(struct ifreq));
 	if (buffer == NULL) {
 		snprintf(errorBuffer, PCAP_ERRBUF_SIZE, "Out of memory.\n");
 		close(socket);
@@ -289,24 +291,10 @@ pcap_platform_finddevs(pcap_if_t** _allDevices, char* errorBuffer)
 		return -1;
 	}
 
-	ifreq *interface = (ifreq *)buffer;
-	pcap_if_t* last = NULL;
+	ifreq* interface = (ifreq*)buffer;
 
 	for (uint32 i = 0; i < count; i++) {
-		pcap_if_t* pcapInterface = (pcap_if_t*)malloc(sizeof(pcap_if_t));
-		if (pcapInterface == NULL)
-			continue;
-
-		if (last == NULL)
-			*_allDevices = pcapInterface;
-		else
-			last->next = pcapInterface;
-
-		pcapInterface->next = NULL;
-		pcapInterface->name = strdup(interface->ifr_name);
-		pcapInterface->description = NULL;
-		pcapInterface->addresses = NULL;
-		pcapInterface->flags = 0;
+		int flags = 0;
 
 		// get interface type
 
@@ -328,14 +316,16 @@ pcap_platform_finddevs(pcap_if_t** _allDevices, char* errorBuffer)
 				prepare_request(request, request.ifr_parameter.device);
 				if (ioctl(linkSocket, SIOCGIFADDR, &request,
 						sizeof(struct ifreq)) == 0) {
-					sockaddr_dl &link = *(sockaddr_dl *)&request.ifr_addr;
+					sockaddr_dl &link = *(sockaddr_dl*)&request.ifr_addr;
 
 					if (link.sdl_type == IFT_LOOP)
-						pcapInterface->flags = PCAP_IF_LOOPBACK;
+						flags = IFF_LOOPBACK;
 				}
 			}
 			close(linkSocket);
 		}
+
+		pcap_add_if(_allDevices, interface->ifr_name, flags, NULL, errorBuffer);
 
 		interface = (ifreq *)((addr_t)interface + IF_NAMESIZE
 			+ interface->ifr_addr.sa_len);

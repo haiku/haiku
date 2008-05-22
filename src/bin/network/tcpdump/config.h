@@ -192,10 +192,10 @@
 /* #undef HAVE_PCAP_DUMP_FLUSH */
 
 /* Define to 1 if you have the `pcap_findalldevs' function. */
-/* #undef HAVE_PCAP_FINDALLDEVS */
+#define HAVE_PCAP_FINDALLDEVS 1
 
 /* Define to 1 if the system has the type `pcap_if_t'. */
-/* #undef HAVE_PCAP_IF_T */
+#define HAVE_PCAP_IF_T 1
 
 /* Define to 1 if you have the `pcap_lib_version' function. */
 /* #undef HAVE_PCAP_LIB_VERSION */
