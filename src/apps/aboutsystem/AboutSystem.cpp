@@ -237,6 +237,20 @@ AboutView::AboutView(const BRect &rect)
 	fInfoView->AddChild(stringView);
 	stringView->ResizeToPreferred();
 
+	// GCC version
+	r.OffsetBy(0, textHeight);
+	r.bottom = r.top + textHeight;
+	
+	strlcpy(string, "Compiler version: ", sizeof(string));
+#ifdef __GNUC__
+	strlcat(string, "GCC ", sizeof(string));
+#endif
+	strlcat(string, __VERSION__, sizeof(string));
+
+	stringView = new BStringView(r, "gcctext", string);
+	fInfoView->AddChild(stringView);
+	stringView->ResizeToPreferred();
+
 	// CPU count, type and clock speed
 	r.OffsetBy(0, textHeight * 1.5);
 	r.bottom = r.top + labelHeight;
