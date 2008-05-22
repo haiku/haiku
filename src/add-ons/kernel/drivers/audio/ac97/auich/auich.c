@@ -405,15 +405,15 @@ auich_int(void *arg)
 	// TRACE(("auich_int(%p)\n", card));
 	
 	sta = auich_reg_read_32(&card->config, AUICH_REG_GLOB_STA) & STA_INTMASK;
+	if (sta & (STA_S0RI | STA_S1RI | STA_S2RI)) {
+		// ignore and clear resume interrupt(s)
+		auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, sta & (STA_S0RI | STA_S1RI | STA_S2RI));
+		TRACE(("interrupt !! %x\n", sta));
+		gotone = true;
+		sta &= ~(STA_S0RI | STA_S1RI | STA_S2RI);
+	}
+	
 	if (sta & card->interrupt_mask) {
-		
-		if (sta & (STA_S0RI | STA_S1RI | STA_S2RI)) {
-			// ignore and clear resume interrupt(s)
-			auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, sta & (STA_S0RI | STA_S1RI | STA_S2RI));
-			TRACE(("interrupt !! %x\n", sta));
-			gotone = true;
-		}
-		
 		//TRACE(("interrupt !! %x\n", sta));
 		
 		LIST_FOREACH(stream, &card->streams, next)
@@ -451,7 +451,7 @@ auich_int(void *arg)
 			dprintf("global status not fully handled %lx!\n", sta);
 			auich_reg_write_32(&card->config, AUICH_REG_GLOB_STA, sta);
 		}
-	} else {
+	} else if (sta != 0) {
 		dprintf("interrupt masked %lx, sta %lx\n", card->interrupt_mask, sta);
 	}
 	
@@ -697,11 +697,6 @@ auich_setup(auich_dev * card)
 	PRINT(("codec description     = %s\n", card->config.ac97->codec_info));
 	PRINT(("codec 3d enhancement = %s\n", card->config.ac97->codec_3d_stereo_enhancement));
 
-	// disable channels
-	auich_reg_write_8(&card->config, AUICH_REG_PO_BASE + AUICH_REG_X_CR, 0);
-	auich_reg_write_8(&card->config, AUICH_REG_PI_BASE + AUICH_REG_X_CR, 0);
-	auich_reg_write_8(&card->config, AUICH_REG_MC_BASE + AUICH_REG_X_CR, 0);
-	
 	if (current_settings.use_thread) {
 		int_thread_id = spawn_kernel_thread(auich_int_thread, "auich interrupt poller", B_REAL_TIME_PRIORITY, card);
 		resume_thread(int_thread_id);
