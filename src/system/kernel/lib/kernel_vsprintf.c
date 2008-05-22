@@ -1,7 +1,7 @@
 /*
- * Copyright 2003-2006, Axel Dörfler. All rights reserved.
+ * Copyright 2003-2008, Axel Dörfler. All rights reserved.
  * Distributed under the terms of the MIT license.
- * 
+ *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
@@ -39,8 +39,8 @@ skip_atoi(const char **s)
 
 
 static uint64
-do_div(uint64 *_number, uint32 base) 
-{ 
+do_div(uint64 *_number, uint32 base)
+{
 	uint64 result = *_number % (uint64)base;
 	*_number = *_number / (uint64)base;
 
@@ -130,42 +130,53 @@ put_character(char **_buffer, int32 *_bytesLeft, char c)
 }
 
 
+static char
+sign_symbol(int flags, bool negative)
+{
+	if ((flags & SIGN) == 0)
+		return '\0';
+
+	if (negative)
+		return '-';
+	else if ((flags & PLUS) != 0)
+		return '+';
+	else if ((flags & SPACE) != 0)
+		return ' ';
+
+	return '\0';
+}
+
+
 static void
 number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
-	int precision, int type)
+	int precision, int flags)
 {
 	const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
 	char c, sign, tmp[66];
 	int i;
 
-	if (type & LARGE)
+	if (flags & LARGE)
 		digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	if (type & LEFT)
-		type &= ~ZEROPAD;
+	if (flags & LEFT)
+		flags &= ~ZEROPAD;
 	if (base < 2 || base > 36)
 		return;
 
-	c = (type & ZEROPAD) ? '0' : ' ';
-	sign = 0;
-	if (type & SIGN) {
-		if (num < 0) {
-			sign = '-';
-			num = -num;
-			size--;
-		} else if (type & PLUS) {
-			sign = '+';
-			size--;
-		} else if (type & SPACE) {
-			sign = ' ';
-			size--;
-		}
-	}
-	if (type & SPECIAL) {
+	c = (flags & ZEROPAD) ? '0' : ' ';
+
+	sign = sign_symbol(flags, num < 0);
+	if (num < 0)
+		num = -num;
+	if (sign)
+		size--;
+
+	if ((flags & SPECIAL) != 0) {
 		if (base == 16)
 			size -= 2;
 		else if (base == 8)
 			size--;
 	}
+
 	i = 0;
 	if (num == 0)
 		tmp[i++] = '0';
@@ -176,14 +187,14 @@ number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
 		precision = i;
 	size -= precision;
 
-	if (!(type & (ZEROPAD + LEFT))) {
+	if (!(flags & (ZEROPAD + LEFT))) {
 		put_padding(_string, _bytesLeft, size);
 		size = 0;
 	}
 	if (sign)
 		put_character(_string, _bytesLeft, sign);
 
-	if (type & SPECIAL) {
+	if ((flags & SPECIAL) != 0) {
 		if (base == 8)
 			put_character(_string, _bytesLeft, '0');
 		else if (base == 16) {
@@ -192,7 +203,7 @@ number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
 		}
 	}
 
-	if (!(type & LEFT)) {
+	if (!(flags & LEFT)) {
 		while (size-- > 0)
 			put_character(_string, _bytesLeft, c);
 	}
@@ -212,15 +223,17 @@ number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
 	It's just here for your convenience so that you can use it for debug output.
 */
 static bool
-floating(char **_string, int32 *_bytesLeft, double value, int fieldWidth, int flags)
+floating(char **_string, int32 *_bytesLeft, double value, int fieldWidth,
+	int flags)
 {
 	char buffer[66];
-	bool sign = value < 0.0;
 	uint64 fraction;
 	uint64 integer;
 	int32 length = 0;
+	char sign;
 
-	if (sign)
+	sign = sign_symbol(flags, value < 0.0);
+	if (value < 0.0)
 		value = -value;
 
 	fraction = (uint64)(value * 1000) % 1000;
@@ -254,6 +267,9 @@ floating(char **_string, int32 *_bytesLeft, double value, int fieldWidth, int fl
 	if (!(flags & LEFT) && !put_padding(_string, _bytesLeft, fieldWidth))
 		return false;
 
+	if (sign && !put_character(_string, _bytesLeft, sign))
+		return false;
+
 	while (length-- > 0) {
 		if (!put_character(_string, _bytesLeft, buffer[length]))
 			return false;
@@ -276,7 +292,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 	char *string;
 	int flags;			/* flags to number() */
 	int fieldWidth;	/* width of output field */
-	int precision;		
+	int precision;
 		/* min. # of digits for integers; max number of chars for from string */
 	int qualifier;		/* 'h', 'l', or 'L' for integer fields */
 
@@ -300,7 +316,8 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		flags = 0;
 
 	repeat:
-		++format;		/* this also skips first '%' */
+		format++;
+			/* this also skips first '%' */
 		switch (format[0]) {
 			case '-': flags |= LEFT; goto repeat;
 			case '+': flags |= PLUS; goto repeat;
@@ -315,7 +332,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		if (isdigit(*format))
 			fieldWidth = skip_atoi(&format);
 		else if (format[0] == '*') {
-			++format;
+			format++;
 			/* it's the next argument */
 			fieldWidth = va_arg(args, int);
 			if (fieldWidth < 0) {
@@ -328,11 +345,11 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 
 		precision = -1;
 		if (format[0] == '.') {
-			++format;	
+			format++;
 			if (isdigit(*format))
 				precision = skip_atoi(&format);
 			else if (format[0] == '*') {
-				++format;
+				format++;
 				/* it's the next argument */
 				precision = va_arg(args, int);
 			}
@@ -359,12 +376,14 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 
 		switch (format[0]) {
 			case 'c':
-				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft, fieldWidth - 1))
+				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft,
+						fieldWidth - 1))
 					goto out;
 
 				put_character(&string, &bytesLeft, (char)va_arg(args, int));
 
-				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft, fieldWidth - 1))
+				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft,
+						fieldWidth - 1))
 					goto out;
 				continue;
 
@@ -379,13 +398,15 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 				length = strnlen(argument, precision);
 				fieldWidth -= length;
 
-				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft, fieldWidth))
+				if (!(flags & LEFT) && !put_padding(&string, &bytesLeft,
+						fieldWidth))
 					goto out;
 
 				if (!put_string(&string, &bytesLeft, argument, length))
 					goto out;
 
-				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft, fieldWidth))
+				if ((flags & LEFT) != 0 && !put_padding(&string, &bytesLeft,
+						fieldWidth))
 					goto out;
 				continue;
 			}
@@ -397,7 +418,8 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 			case 'G':
 			{
 				double value = va_arg(args, double);
-				if (!floating(&string, &bytesLeft, value, flags, fieldWidth))
+				if (!floating(&string, &bytesLeft, value, fieldWidth,
+						flags | SIGN))
 					goto out;
 				continue;
 			}
@@ -498,7 +520,7 @@ snprintf(char *buffer, size_t bufferSize, const char *format, ...)
 }
 
 
-int 
+int
 sprintf(char *buffer, const char *format, ...)
 {
 	va_list args;
