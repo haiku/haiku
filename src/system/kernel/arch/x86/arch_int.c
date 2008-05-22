@@ -23,6 +23,7 @@
 #include <arch/vm.h>
 
 #include <arch/x86/descriptors.h>
+#include <arch/x86/vm86.h>
 
 #include "interrupts.h"
 
@@ -354,6 +355,12 @@ unexpected_exception(struct iframe* frame)
 {
 	debug_exception_type type;
 	int signal;
+
+	if (IFRAME_IS_VM86(frame)) {
+		x86_vm86_return((struct vm86_iframe *)frame, (frame->vector == 13) ?
+			B_OK : B_ERROR);
+		// won't get here
+	}
 
 	switch (frame->vector) {
 		case 0:		// Divide Error Exception (#DE)

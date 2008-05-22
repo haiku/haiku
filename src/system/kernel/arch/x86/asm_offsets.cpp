@@ -45,6 +45,10 @@ dummy()
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, flags);
 	DEFINE_OFFSET_MACRO(IFRAME, iframe, user_esp);
 
+	// struct vm86_iframe
+	DEFINE_SIZEOF_MACRO(VM86_IFRAME, vm86_iframe);
+	DEFINE_OFFSET_MACRO(VM86_IFRAME, vm86_iframe, flags);
+
 	// struct syscall_info
 	DEFINE_SIZEOF_MACRO(SYSCALL_INFO, syscall_info);
 	DEFINE_OFFSET_MACRO(SYSCALL_INFO, syscall_info, function);
