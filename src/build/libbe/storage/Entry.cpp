@@ -1,11 +1,18 @@
-//----------------------------------------------------------------------
-//  This software is part of the Haiku distribution and is covered 
-//  by the MIT license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2008, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder
+ *		Ingo Weinhold, bonefish@users.sf.net
+ */
+
 /*!
 	\file Entry.cpp
 	BEntry and entry_ref implementations.
 */
+
+#include <Entry.h>
 
 #include <fcntl.h>
 #include <new>
@@ -15,16 +22,13 @@
 #include <unistd.h>
 
 #include <Directory.h>
-#include <Entry.h>
 #include <Path.h>
 #include <SymLink.h>
-#include "storage_support.h"
 
 #include <syscalls.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-using namespace OpenBeOS;
-#endif
+#include "storage_support.h"
+
 
 using namespace std;
 
@@ -34,9 +38,6 @@ using namespace std;
 #define SYMLINK_MAX (16)
 #endif
 
-//----------------------------------------------------------------------------
-// struct entry_ref
-//----------------------------------------------------------------------------
 
 /*! \struct entry_ref
 	\brief A filesystem entry represented as a name in a concrete directory.
@@ -62,11 +63,13 @@ using namespace std;
 
 //! Creates an unitialized entry_ref. 
 entry_ref::entry_ref()
-		 : device((dev_t)-1),
-		   directory((ino_t)-1),
-		   name(NULL)
+	:
+	device((dev_t)-1),
+	directory((ino_t)-1),
+	name(NULL)
 {
 }
+
 
 /*! \brief Creates an entry_ref initialized to the given file name in the given
 	directory on the given device.
@@ -81,28 +84,36 @@ entry_ref::entry_ref()
 	\param name the leaf name of the entry, which is not required to exist
 */
 entry_ref::entry_ref(dev_t dev, ino_t dir, const char *name)
-		 : device(dev), directory(dir), name(NULL)
+	:
+	device(dev),
+	directory(dir),
+	name(NULL)
 {
 	set_name(name);
 }
 
-/*! \brief Creates a copy of the given entry_ref.
 
+/*! \brief Creates a copy of the given entry_ref.
 	\param ref a reference to an entry_ref to copy
 */
 entry_ref::entry_ref(const entry_ref &ref)
-		 : device(ref.device),
-		   directory(ref.directory),
-		   name(NULL)
+	:
+	device(ref.device),
+	directory(ref.directory),
+	name(NULL)
 {
 	set_name(ref.name);	
 }
 
-//! Destroys the object and frees the storage allocated for the leaf name, if necessary. 
+
+/*!	Destroys the object and frees the storage allocated for the leaf name,
+	if necessary. 
+*/
 entry_ref::~entry_ref()
 {
 	free(name);
 }
+
 
 /*! \brief Set the entry_ref's leaf name, freeing the storage allocated for any previous
 	name and then making a copy of the new name.
@@ -110,22 +121,26 @@ entry_ref::~entry_ref()
 	\param name pointer to a null-terminated string containing the new name for
 	the entry. May be \c NULL.
 */
-status_t entry_ref::set_name(const char *name)
+status_t
+entry_ref::set_name(const char *newName)
 {
-	free(this->name);
-	
-	if (name == NULL) {
-		this->name = NULL;
+	free(name);
+
+	if (newName == NULL) {
+		name = NULL;
 	} else {
-		this->name = strdup(name);
-		if (!this->name)
+		name = strdup(newName);
+		if (!name)
 			return B_NO_MEMORY;
 	}
-	
+
 	return B_OK;			
 }
 
-/*! \brief Compares the entry_ref with another entry_ref, returning true if they are equal.
+
+/*! \brief Compares the entry_ref with another entry_ref, returning true if
+	they are equal.
+
 	\return
 	- \c true - The entry_refs are equal
 	- \c false - The entry_refs are not equal
@@ -133,12 +148,12 @@ status_t entry_ref::set_name(const char *name)
 bool
 entry_ref::operator==(const entry_ref &ref) const
 {
-	return (device == ref.device
-			&& directory == ref.directory
-			&& (name == ref.name
-				|| name != NULL && ref.name != NULL
-					&& strcmp(name, ref.name) == 0));
+	return device == ref.device
+		&& directory == ref.directory
+		&& (name == ref.name
+			|| (name != NULL && ref.name != NULL && !strcmp(name, ref.name)));
 }
+
 
 /*! \brief Compares the entry_ref with another entry_ref, returning true if they are not equal.
 	\return
@@ -150,6 +165,7 @@ entry_ref::operator!=(const entry_ref &ref) const
 {
 	return !(*this == ref);
 }
+
 
 /*! \brief Makes the entry_ref a copy of the entry_ref specified by \a ref.
 	\param ref the entry_ref to copy
@@ -184,11 +200,6 @@ entry_ref::operator=(const entry_ref &ref)
 	\brief The leaf name of the entry
 */
 
-
-//----------------------------------------------------------------------------
-// BEntry
-//----------------------------------------------------------------------------
-
 /*!
 	\class BEntry
 	\brief A location in the filesystem
@@ -211,6 +222,10 @@ entry_ref::operator=(const entry_ref &ref)
 	\version 0.0.0
 */
 
+
+//	#pragma mark -
+
+
 //! Creates an uninitialized BEntry object.
 /*!	Should be followed by a	call to one of the SetTo functions,
 	or an assignment:
@@ -220,11 +235,13 @@ entry_ref::operator=(const entry_ref &ref)
 	- operator=(const BEntry&)
 */
 BEntry::BEntry()
-	  : fDirFd(-1),
-		fName(NULL),
-		fCStatus(B_NO_INIT)
+	:
+	fDirFd(-1),
+	fName(NULL),
+	fCStatus(B_NO_INIT)
 {
 }
+
 
 //! Creates a BEntry initialized to the given directory and path combination.
 /*!	If traverse is true and \c dir/path refers to a symlink, the BEntry will
@@ -237,12 +254,14 @@ BEntry::BEntry()
 
 */
 BEntry::BEntry(const BDirectory *dir, const char *path, bool traverse)
-	  : fDirFd(-1),
-		fName(NULL),
-		fCStatus(B_NO_INIT)
+	:
+	fDirFd(-1),
+	fName(NULL),
+	fCStatus(B_NO_INIT)
 {
 	SetTo(dir, path, traverse);
 }
+
 
 //! Creates a BEntry for the file referred to by the given entry_ref.
 /*!	If traverse is true and \a ref refers to a symlink, the BEntry
@@ -253,14 +272,15 @@ BEntry::BEntry(const BDirectory *dir, const char *path, bool traverse)
 	\param traverse whether or not symlinks are to be traversed
 	\see SetTo(const entry_ref*, bool)
 */
-
 BEntry::BEntry(const entry_ref *ref, bool traverse)
-	  : fDirFd(-1),
-		fName(NULL),
-		fCStatus(B_NO_INIT)
+	:
+	fDirFd(-1),
+	fName(NULL),
+	fCStatus(B_NO_INIT)
 {
 	SetTo(ref, traverse);
 }
+
 
 //! Creates a BEntry initialized to the given path.
 /*!	If \a path is relative, it will
@@ -274,12 +294,14 @@ BEntry::BEntry(const entry_ref *ref, bool traverse)
 	
 */
 BEntry::BEntry(const char *path, bool traverse)
-	  : fDirFd(-1),
-		fName(NULL),
-		fCStatus(B_NO_INIT)
+	:
+	fDirFd(-1),
+	fName(NULL),
+	fCStatus(B_NO_INIT)
 {
 	SetTo(path, traverse);
 }
+
 
 //! Creates a copy of the given BEntry.
 /*! \param entry the entry to be copied
@@ -293,6 +315,7 @@ BEntry::BEntry(const BEntry &entry)
 	*this = entry;
 }
 
+
 //! Frees all of the BEntry's allocated resources.
 /*! \see Unset()
 */
@@ -300,6 +323,7 @@ BEntry::~BEntry()
 {
 	Unset();
 }
+
 
 //! Returns the result of the most recent construction or SetTo() call.
 /*! \return
@@ -313,8 +337,9 @@ BEntry::InitCheck() const
 	return fCStatus;
 }
 
-//! Returns true if the Entry exists in the filesytem, false otherwise.
-/*! \return
+
+/*! \brief Returns true if the Entry exists in the filesytem, false otherwise.
+	\return
 		- \c true - The entry exists
 		- \c false - The entry does not exist
 */
@@ -325,6 +350,7 @@ BEntry::Exists() const
 	struct stat st;
 	return (GetStat(&st) == B_OK);
 }
+
 
 /*! \brief Fills in a stat structure for the entry. The information is copied into
 	the \c stat structure pointed to by \a result.
@@ -344,6 +370,7 @@ BEntry::GetStat(struct stat *result) const
 		return B_NO_INIT;
 	return _kern_read_stat(fDirFd, fName, false, result, sizeof(struct stat));
 }
+
 
 /*! \brief Reinitializes the BEntry to the path or directory path combination,
 	resolving symlinks if traverse is true
@@ -376,7 +403,8 @@ BEntry::SetTo(const BDirectory *dir, const char *path, bool traverse)
 		return (fCStatus = dirFD);
 	return (fCStatus = set(dirFD, path, traverse));
 }
-				  
+
+
 /*! \brief Reinitializes the BEntry to the entry_ref, resolving symlinks if
 	traverse is true
 
@@ -398,6 +426,7 @@ BEntry::SetTo(const entry_ref *ref, bool traverse)
 	return (fCStatus = set(dirFD, ref->name, traverse));
 }
 
+
 /*! \brief Reinitializes the BEntry object to the path, resolving symlinks if
 	traverse is true
 	
@@ -414,6 +443,7 @@ BEntry::SetTo(const char *path, bool traverse)
 		return (fCStatus = B_BAD_VALUE);
 	return (fCStatus = set(-1, path, traverse));
 }
+
 
 /*! \brief Reinitializes the BEntry to an uninitialized BEntry object */
 void
@@ -432,6 +462,7 @@ BEntry::Unset()
 	fName = NULL;
 	fCStatus = B_NO_INIT;
 }
+
 
 /*! \brief Gets an entry_ref structure for the BEntry.
 
@@ -461,6 +492,7 @@ BEntry::GetRef(entry_ref *ref) const
 	return error;
 }
 
+
 /*! \brief Gets the path for the BEntry.
 
 	\param path pointer to a pre-allocated BPath object into which the result is stored
@@ -480,6 +512,7 @@ BEntry::GetPath(BPath *path) const
 
 	return path->SetTo(this);
 }
+
 
 /*! \brief Gets the parent of the BEntry as another BEntry.
 
@@ -517,7 +550,8 @@ BEntry::GetPath(BPath *path) const
 	- \c B_ENTRY_NOT_FOUND - Attempted to get the parent of the root directory \c "/"
 	- "error code" - Failure
 */
-status_t BEntry::GetParent(BEntry *entry) const
+status_t
+BEntry::GetParent(BEntry *entry) const
 {
 	// check parameter and initialization
 	if (fCStatus != B_OK)
@@ -547,6 +581,7 @@ status_t BEntry::GetParent(BEntry *entry) const
 		entry->Unset();
 	return entry->fCStatus;
 }
+
 
 /*! \brief Gets the parent of the BEntry as a BDirectory. 
 
@@ -585,6 +620,7 @@ BEntry::GetParent(BDirectory *dir) const
 	// API for being able to do that.
 }
 
+
 /*! \brief Gets the name of the entry's leaf.
 
 	\c buffer must be pre-allocated and of sufficient
@@ -611,6 +647,7 @@ BEntry::GetName(char *buffer) const
 	
 	return result;
 }
+
 
 /*! \brief Renames the BEntry to path, replacing an existing entry if clobber is true.
 
@@ -654,6 +691,7 @@ BEntry::Rename(const char *path, bool clobber)
 	return _Rename(target, clobber);
 }
 
+
 /*! \brief Moves the BEntry to directory or directory+path combination, replacing an existing entry if clobber is true.
 
 	NOTE: The BEntry must refer to an existing file. If it is abstract, this method will fail.
@@ -692,6 +730,7 @@ BEntry::MoveTo(BDirectory *dir, const char *path, bool clobber)
 	return _Rename(target, clobber);
 }
 
+
 /*! \brief Removes the entry from the file system.
 
 	NOTE: If any file descriptors are open on the file when Remove() is called,
@@ -714,7 +753,7 @@ BEntry::Remove()
 
 /*! \brief	Returns true if the BEntry and \c item refer to the same entry or
 			if they are both uninitialized.
-			
+
 	\return
 	- true - Both BEntry objects refer to the same entry or they are both uninitialzed
 	- false - The BEntry objects refer to different entries
@@ -742,9 +781,10 @@ BEntry::operator==(const BEntry &item) const
 
 }
 
+
 /*! \brief	Returns false if the BEntry and \c item refer to the same entry or
 			if they are both uninitialized.
-			
+
 	\return
 	- true - The BEntry objects refer to different entries
 	- false - Both BEntry objects refer to the same entry or they are both uninitialzed
@@ -754,6 +794,7 @@ BEntry::operator!=(const BEntry &item) const
 {
 	return !(*this == item);
 }
+
 
 /*! \brief Reinitializes the BEntry to be a copy of the argument
 
@@ -781,18 +822,15 @@ BEntry::operator=(const BEntry &item)
 	return *this;
 }
 
+
 /*! Reserved for future use. */
 void BEntry::_PennyEntry1(){}
-/*! Reserved for future use. */
 void BEntry::_PennyEntry2(){}
-/*! Reserved for future use. */
 void BEntry::_PennyEntry3(){}
-/*! Reserved for future use. */
 void BEntry::_PennyEntry4(){}
-/*! Reserved for future use. */
 void BEntry::_PennyEntry5(){}
-/*! Reserved for future use. */
 void BEntry::_PennyEntry6(){}
+
 
 /*! \brief Updates the BEntry with the data from the stat structure according to the mask.
 */
@@ -805,6 +843,7 @@ BEntry::set_stat(struct stat &st, uint32 what)
 	return _kern_write_stat(fDirFd, fName, false, &st, sizeof(struct stat),
 		what);
 }
+
 
 /*! Sets the Entry to point to the entry specified by the path \a path relative
 	to the given directory. If \a traverse is \c true and the given entry is a
@@ -957,6 +996,7 @@ BEntry::set(int dirFD, const char *path, bool traverse)
 	return B_OK;
 }
 
+
 /*! \brief Handles string allocation, deallocation, and copying for the entry's leaf name.
 
 	\return
@@ -978,7 +1018,7 @@ BEntry::set_name(const char *name)
 	return B_OK;
 }
 
-// _Rename
+
 /*!	\brief Renames the entry referred to by this object to the location
 		   specified by \a target.
 
@@ -1018,11 +1058,10 @@ BEntry::_Rename(BEntry& target, bool clobber)
 /*! Debugging function, dumps the given entry to stdout. This function is not part of
 	the R5 implementation, and thus calls to it will mean you can't link with the
 	R5 Storage Kit.
-	
+
 	\param name	Pointer to a string to be printed along with the dump for identification
 				purposes.
-	
-	*/
+*/
 void
 BEntry::Dump(const char *name)
 {
@@ -1049,7 +1088,10 @@ BEntry::Dump(const char *name)
 
 }
 
-// get_ref_for_path
+
+//	#pragma mark -
+
+
 /*!	\brief Returns an entry_ref for a given path.
 	\param path The path name referring to the entry
 	\param ref The entry_ref structure to be filled in
@@ -1072,7 +1114,7 @@ get_ref_for_path(const char *path, entry_ref *ref)
 	return error;
 }
 
-// <
+
 /*!	\brief Returns whether an entry is less than another.
 	The components are compared in order \c device, \c directory, \c name.
 	A \c NULL \c name is less than any non-null name.
@@ -1082,17 +1124,13 @@ get_ref_for_path(const char *path, entry_ref *ref)
 	- false - a >= b
 */
 bool
-operator<(const entry_ref & a, const entry_ref & b)
+operator<(const entry_ref &a, const entry_ref &b)
 {
-	return (a.device < b.device
+	return a.device < b.device
 		|| (a.device == b.device
 			&& (a.directory < b.directory
-			|| (a.directory == b.directory
-				&& (a.name == NULL && b.name != NULL
-				|| (a.name != NULL && b.name != NULL
-					&& strcmp(a.name, b.name) < 0))))));
+				|| (a.directory == b.directory
+					&& ((a.name == NULL && b.name != NULL)
+						|| (a.name != NULL && b.name != NULL
+							&& strcmp(a.name, b.name) < 0)))));
 }
-
-
-
-
