@@ -20,6 +20,7 @@
 #include <posix/realtime_sem_defs.h>
 #include <user_group.h>
 
+bool _kern_cpu_enabled(int cpu);
 
 int
 getdtablesize(void)
@@ -35,6 +36,7 @@ getdtablesize(void)
 long
 sysconf(int name)
 {
+	int err;
 	// TODO: This is about what BeOS does, better POSIX conformance would be nice, though
 
 	switch (name) {
@@ -72,6 +74,70 @@ sysconf(int name)
 			return _POSIX_SEMAPHORES;
 		case _SC_THREADS:
 			return _POSIX_THREADS;
+		case _SC_IOV_MAX:
+			return IOV_MAX;
+		case _SC_NPROCESSORS_MAX:
+			return B_MAX_CPU_COUNT;
+		case _SC_NPROCESSORS_CONF:
+		{
+			system_info info;
+			err = get_system_info(&info);
+			if (err < B_OK) {
+				errno = err;
+				return -1;
+			}
+			return info.cpu_count;
+		}
+		case _SC_NPROCESSORS_ONLN:
+		{
+			system_info info;
+			int i;
+			int count = 0;
+			err = get_system_info(&info);
+			if (err < B_OK) {
+				errno = err;
+				return -1;
+			}
+			for (i = 0; i < info.cpu_count; i++)
+				if (_kern_cpu_enabled(i))
+					count++;
+			return count;
+		}
+		case _SC_CPUID_MAX:
+			return B_MAX_CPU_COUNT - 1;
+		case _SC_ATEXIT_MAX:
+			return ATEXIT_MAX;
+		case _SC_PASS_MAX:
+			break;
+			//XXX:return PASS_MAX;
+		case _SC_PHYS_PAGES:
+		{
+			system_info info;
+			err = get_system_info(&info);
+			if (err < B_OK) {
+				errno = err;
+				return -1;
+			}
+			return info.max_pages;
+		}
+		case _SC_AVPHYS_PAGES:
+		{
+			system_info info;
+			err = get_system_info(&info);
+			if (err < B_OK) {
+				errno = err;
+				return -1;
+			}
+			return info.max_pages - info.used_pages;
+		}
+		/*
+		case _SC_PIPE:
+			return 1;
+		case _SC_SELECT:
+			return 1;
+		case _SC_POLL:
+			return 1;
+		*/
 	}
 
 	errno = EINVAL;
@@ -158,7 +224,7 @@ __pathconf_common(struct statvfs *fs, struct stat *st,
 					return 32;
 			}
 			// XXX: add fs ? add to statvfs/fs_info ?
-			return 64;
+			return FILESIZEBITS;
 		}
 
 		case _PC_SYMLINK_MAX:

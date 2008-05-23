@@ -86,6 +86,21 @@
 #define _SC_SEM_VALUE_MAX		29
 #define _SC_SEMAPHORES			30
 #define _SC_THREADS				31
+/* TODO: check and reorder */
+#define _SC_IOV_MAX				32
+#define _SC_UIO_MAXIOV			_CS_IOV_MAX
+#define _SC_NPROCESSORS_MAX		33
+#define _SC_NPROCESSORS_CONF	34
+#define _SC_NPROCESSORS_ONLN	35
+#define _SC_CPUID_MAX			36
+#define _SC_ATEXIT_MAX			37
+#define _SC_PASS_MAX			39
+#define _SC_PHYS_PAGES			40
+#define _SC_AVPHYS_PAGES		41
+#define _SC_PIPE				42
+#define _SC_SELECT				43
+#define _SC_POLL				44
+
 
 /* confstr() constants */
 #define _CS_PATH				1
