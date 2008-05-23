@@ -204,6 +204,11 @@ static mutex sAvailableMemoryLock;
 static void delete_area(vm_address_space *addressSpace, vm_area *area);
 static vm_address_space *get_address_space_by_area_id(area_id id);
 static status_t vm_soft_fault(addr_t address, bool isWrite, bool isUser);
+static status_t map_backing_store(vm_address_space *addressSpace,
+	vm_cache *cache, void **_virtualAddress, off_t offset, addr_t size,
+	uint32 addressSpec, int wiring, int protection, int mapping,
+	vm_area **_area, const char *areaName, bool unmapAddressRange, bool kernel);
+
 
 
 //	#pragma mark -
@@ -1190,37 +1195,129 @@ insert_area(vm_address_space *addressSpace, void **_address,
 }
 
 
+/*!	Cuts a piece out of an area. If the given cut range covers the complete
+	area, it is deleted. If it covers the beginning or the end, the area is
+	resized accordingly. If the range covers some part in the middle of the
+	area, it is split in two; in this case the second area is returned via
+	\a _secondArea (the variable is left untouched in the other cases).
+	The address space must be write locked.
+*/
+static status_t
+cut_area(vm_address_space* addressSpace, vm_area* area, addr_t address,
+	addr_t lastAddress, vm_area** _secondArea, bool kernel)
+{
+	// Does the cut range intersect with the area at all?
+	addr_t areaLast = area->base + (area->size - 1);
+	if (area->base > lastAddress || areaLast < address)
+		return B_OK;
+
+	// Is the area fully covered?
+	if (area->base >= address && areaLast <= lastAddress) {
+		delete_area(addressSpace, area);
+		return B_OK;
+	}
+
+	AreaCacheLocker cacheLocker(area);
+	vm_cache* cache = area->cache;
+
+	// Cut the end only?
+	if (areaLast <= lastAddress) {
+		addr_t newSize = address - area->base;
+
+		// unmap pages
+		vm_unmap_pages(area, address, area->size - newSize, false);
+
+		// If no one else uses the area's cache, we can resize it, too.
+		if (cache->areas == area && area->cache_next == NULL
+			&& list_is_empty(&cache->consumers)) {
+			status_t error = vm_cache_resize(cache, newSize);
+			if (error != B_OK)
+				return error;
+		}
+
+		area->size = newSize;
+
+		return B_OK;
+	}
+
+	// Cut the beginning only?
+	if (area->base >= address) {
+		addr_t newBase = lastAddress + 1;
+		addr_t newSize = areaLast - lastAddress;
+
+		// unmap pages
+		vm_unmap_pages(area, area->base, newBase - area->base, false);
+
+		// TODO: If no one else uses the area's cache, we should resize it, too!
+
+		area->cache_offset += newBase - area->base;
+		area->base = newBase;
+		area->size = newSize;
+
+		return B_OK;
+	}
+
+	// The tough part -- cut a piece out of the middle of the area.
+	// We do that by shrinking the area to the begin section and creating a
+	// new area for the end section.
+
+	addr_t firstNewSize = address - area->base;
+	addr_t secondBase = lastAddress + 1;
+	addr_t secondSize = areaLast - lastAddress;
+
+	// unmap pages
+	vm_unmap_pages(area, address, area->size - firstNewSize, false);
+
+	// resize the area
+	addr_t oldSize = area->size;
+	area->size = firstNewSize;
+
+	// TODO: If no one else uses the area's cache, we might want to create a
+	// new cache for the second area, transfer the concerned pages from the
+	// first cache to it and resize the first cache.
+
+	// map the second area
+	vm_area* secondArea;
+	void* secondBaseAddress = (void*)secondBase;
+	status_t error = map_backing_store(addressSpace, cache, &secondBaseAddress,
+		area->cache_offset + (secondBase - area->base), secondSize,
+		B_EXACT_ADDRESS, area->wiring, area->protection, REGION_NO_PRIVATE_MAP,
+		&secondArea, area->name, false, kernel);
+	if (error != B_OK) {
+		area->size = oldSize;
+		return error;
+	}
+
+	// We need a cache reference for the new area.
+	vm_cache_acquire_ref(cache);
+
+	if (_secondArea != NULL)
+		*_secondArea = secondArea;
+
+	return B_OK;
+}
+
+
 /*!	Deletes all areas in the given address range.
 	The address space must be write-locked.
-	NOTE: At the moment deleting only complete areas is supported.
 */
 static status_t
 unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size,
 	bool kernel)
 {
-	// TODO: Support deleting partial areas!
-
 	size = PAGE_ALIGN(size);
 	addr_t lastAddress = address + (size - 1);
 
-	// check whether any areas are only partially covered
-	vm_area* area = vm_area_lookup(addressSpace, address);
-	if (area != NULL && area->base < address)
-		return B_UNSUPPORTED;
-
-	area = vm_area_lookup(addressSpace, lastAddress);
-	if (area != NULL && lastAddress - area->base < area->size - 1)
-		return B_UNSUPPORTED;
-
-	// all areas (if any) are fully covered; we can delete them,
-	// but first we need to check, whether the caller is allowed to do that
+	// Check, whether the caller is allowed to modify the concerned areas.
+	vm_area* area;
 	if (!kernel) {
 		area = addressSpace->areas;
 		while (area != NULL) {
 			vm_area* nextArea = area->address_space_next;
 	
 			if (area->id != RESERVED_AREA_ID) {
-				if (area->base >= address && area->base < lastAddress) {
+				addr_t areaLast = area->base + (area->size - 1);
+				if (area->base < lastAddress && address < areaLast) {
 					if ((area->protection & B_KERNEL_AREA) != 0)
 						return B_NOT_ALLOWED;
 				}
@@ -1235,8 +1332,15 @@ unmap_address_range(vm_address_space *addressSpace, addr_t address, addr_t size,
 		vm_area* nextArea = area->address_space_next;
 
 		if (area->id != RESERVED_AREA_ID) {
-			if (area->base >= address && area->base < lastAddress)
-				delete_area(addressSpace, area);
+			addr_t areaLast = area->base + (area->size - 1);
+			if (area->base < lastAddress && address < areaLast) {
+				status_t error = cut_area(addressSpace, area, address,
+					lastAddress, NULL, kernel);
+				if (error != B_OK)
+					return error;
+					// Failing after already messing with areas is ugly, but we
+					// can't do anything about it.
+			}
 		}
 
 		area = nextArea;
