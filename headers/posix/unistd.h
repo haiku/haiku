@@ -87,6 +87,9 @@
 #define _SC_SEMAPHORES			30
 #define _SC_THREADS				31
 
+/* confstr() constants */
+#define _CS_PATH				1
+
 /* lseek() constants */
 #ifndef SEEK_SET
 #	define SEEK_SET 0

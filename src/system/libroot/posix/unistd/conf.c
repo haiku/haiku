@@ -11,9 +11,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/resource.h>
+#include <sys/statvfs.h>
 
 #include <SupportDefs.h>
 
+#include <fs_info.h>
 #include <libroot_private.h>
 #include <posix/realtime_sem_defs.h>
 #include <user_group.h>
@@ -77,17 +79,45 @@ sysconf(int name)
 }
 
 
-long
-fpathconf(int fd, int name)
+enum {
+	FS_BFS,
+	FS_FAT,
+	FS_EXT,
+	FS_UNKNOWN
+};
+
+
+static int
+fstype(const char *fsh_name)
 {
-	if (fd < 0) {
-		errno = EBADF;
+	if (!strncmp(fsh_name, "bfs", B_OS_NAME_LENGTH))
+		return FS_BFS;
+	if (!strncmp(fsh_name, "dos", B_OS_NAME_LENGTH))
+		return FS_FAT;
+	if (!strncmp(fsh_name, "fat", B_OS_NAME_LENGTH))
+		return FS_FAT;
+	if (!strncmp(fsh_name, "ext2", B_OS_NAME_LENGTH))
+		return FS_EXT;
+	if (!strncmp(fsh_name, "ext3", B_OS_NAME_LENGTH))
+		return FS_EXT;
+	return FS_UNKNOWN;
+}
+
+
+
+static long
+__pathconf_common(struct statvfs *fs, struct stat *st,
+	int name)
+{
+	fs_info info;
+	int ret;
+	ret = fs_stat_dev(fs->f_fsid, &info);
+	if (ret < 0) {
+		errno = ret;
 		return -1;
 	}
 
-	// TODO: should query the underlying filesystem
-	// for correct value, as most are fs-dependant
-	// (which is why it's a different call than sysconf() btw).
+	// TODO: many cases should check for file type from st.
 	switch (name) {
 		case _PC_CHOWN_RESTRICTED:
 			return _POSIX_CHOWN_RESTRICTED;
@@ -99,7 +129,8 @@ fpathconf(int fd, int name)
 			return MAX_INPUT;
 
 		case _PC_NAME_MAX:
-			return NAME_MAX;
+			return fs->f_namemax;
+			//return NAME_MAX;
 
 		case _PC_NO_TRUNC:
 			return _POSIX_NO_TRUNC;
@@ -117,15 +148,53 @@ fpathconf(int fd, int name)
 			return _POSIX_VDISABLE;
 
 		case _PC_FILESIZEBITS:
+		{
+			int type = fstype(info.fsh_name);
+			switch (type) {
+				case FS_BFS:
+				case FS_EXT:
+					return 64;
+				case FS_FAT:
+					return 32;
+			}
+			// XXX: add fs ? add to statvfs/fs_info ?
 			return 64;
+		}
+
+		case _PC_SYMLINK_MAX:
+			return SYMLINK_MAX;
+
+		case _PC_2_SYMLINKS:
+		{
+			int type = fstype(info.fsh_name);
+			switch (type) {
+				case FS_BFS:
+				case FS_EXT:
+					return 1;
+				case FS_FAT:
+					return 0;
+			}
+			// XXX: there should be an HAS_SYMLINKS flag
+			// to fs_info...
+			return 1;
+		}
 
 		case _PC_XATTR_EXISTS:
 		case _PC_XATTR_ENABLED:
+		{
+#if 0
 			/* those seem to be Solaris specific,
 			 * else we should return 1 I suppose.
+			 * we don't yet map POSIX xattrs
+			 * to BFS ones anyway.
 			 */
+			if (info.flags & B_FS_HAS_ATTR)
+				return 1;
+			return -1;
+#endif
 			errno = EINVAL;
 			return -1;
+		}
 
 		case _PC_SYNC_IO:
 		case _PC_ASYNC_IO:
@@ -136,8 +205,6 @@ fpathconf(int fd, int name)
 		case _PC_REC_MIN_XFER_SIZE:
 		case _PC_REC_XFER_ALIGN:
 		case _PC_ALLOC_SIZE_MIN:
-		case _PC_SYMLINK_MAX:
-		case _PC_2_SYMLINKS:
 			/* not yet supported */
 			errno = EINVAL;
 			return -1;
@@ -150,38 +217,71 @@ fpathconf(int fd, int name)
 
 
 long
+fpathconf(int fd, int name)
+{
+	struct statvfs fs;
+	struct stat st;
+	int ret;
+	if (fd < 0) {
+		errno = EBADF;
+		return -1;
+	}
+	ret = fstat(fd, &st);
+	if (ret < 0)
+		return ret;
+	ret = fstatvfs(fd, &fs);
+	if (ret < 0)
+		return ret;
+	return __pathconf_common(&fs, &st, name);
+}
+
+
+long
 pathconf(const char *path, int name)
 {
-	int fd;
-	long value;
-	//XXX: some names shouldn't require openning,
-	// just statfs
-	fd = open(path, O_RDONLY | O_NOCTTY | O_NOTRAVERSE);
-	if (fd < 0)
-		return fd;
-	
-	value = fpathconf(fd, name);
-	close(fd);
-	return value;
+	struct statvfs fs;
+	struct stat st;
+	int ret;
+	if (path == NULL) {
+		errno = EFAULT;
+		return -1;
+	}
+	ret = lstat(path, &st);
+	if (ret < 0)
+		return ret;
+	ret = statvfs(path, &fs);
+	if (ret < 0)
+		return ret;
+	return __pathconf_common(&fs, &st, name);
 }
 
 
 size_t
 confstr(int name, char *buffer, size_t length)
 {
-	size_t stringLength = 1;
+	size_t stringLength = 0;
 	char *string = "";
 
+	if (!length || !buffer) {
+		errno = EINVAL;
+		return 0;
+	}
+
 	switch (name) {
-		case 0:
+		case _CS_PATH:
+			string = "/bin:/boot/beos/apps:" \
+				"/boot/common/bin:/boot/develop/bin";
 			break;
 		default:
 			errno = EINVAL;
 			return 0;
 	}
 
-	if (buffer != NULL)
-		strlcpy(buffer, string, min_c(length, stringLength));
+	if (buffer != NULL) {
+		stringLength = strlen(string) + 1;
+		strlcpy(buffer, string,
+			min_c(length - 1, stringLength));
+	}
 
 	return stringLength;
 }
