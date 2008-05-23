@@ -1,5 +1,6 @@
-/* 
+/*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2006, Jérôme Duval. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -12,7 +13,7 @@
 #include <thread_defs.h>
 
 
-int 
+int
 pthread_attr_init(pthread_attr_t *_attr)
 {
 	pthread_attr *attr;
@@ -33,7 +34,7 @@ pthread_attr_init(pthread_attr_t *_attr)
 }
 
 
-int 
+int
 pthread_attr_destroy(pthread_attr_t *_attr)
 {
 	pthread_attr *attr;
@@ -52,7 +53,7 @@ int
 pthread_attr_getdetachstate(const pthread_attr_t *_attr, int *state)
 {
 	pthread_attr *attr;
-	
+
 	if (_attr == NULL || (attr = *_attr) == NULL || state == NULL)
 		return B_BAD_VALUE;
 
@@ -105,6 +106,30 @@ pthread_attr_setstacksize(pthread_attr_t *_attr, size_t stacksize)
 		return B_BAD_VALUE;
 
 	attr->stack_size = stacksize;
+
+	return 0;
+}
+
+
+int
+pthread_attr_getscope(const pthread_attr_t *attr, int *contentionScope)
+{
+	if (attr == NULL || contentionScope == NULL)
+		return EINVAL;
+
+	*contentionScope = PTHREAD_SCOPE_SYSTEM;
+	return 0;
+}
+
+
+int
+pthread_attr_setscope(pthread_attr_t *attr, int contentionScope)
+{
+	if (attr == NULL)
+		return EINVAL;
+
+	if (contentionScope != PTHREAD_SCOPE_SYSTEM)
+		return ENOTSUP;
 
 	return 0;
 }
