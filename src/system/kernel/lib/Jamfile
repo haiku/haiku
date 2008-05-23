@@ -68,7 +68,7 @@ KernelMergeObject kernel_lib_posix.o :
 	access.c
 	chown.c
 	close.c
-	conf.c
+	#conf.c
 	directory.c
 	dup.c
 	fcntl.c
