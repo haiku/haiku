@@ -37,6 +37,8 @@
 #define NAME_MAX				(256)
 #define NGROUPS_MAX		 		(32)
 #define OPEN_MAX				(128)
+#define PAGE_SIZE				(4096)
+#define PAGESIZE				(4096)
 #define PATH_MAX				(1024)
 #define PIPE_MAX				(512)
 #define SSIZE_MAX		  		(2147483647L)
