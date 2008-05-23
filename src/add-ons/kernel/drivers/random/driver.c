@@ -7,14 +7,15 @@
 /* Adapted for Haiku by David Reid, Axel Dörfler */
 
 
-#include <OS.h>
-#include <Drivers.h>
-
-#include <kernel/thread.h>
-
-#include <string.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include <Drivers.h>
+#include <OS.h>
+
+#include <lock.h>
+#include <thread.h>
 
 
 //#define TRACE_DRIVER
@@ -91,7 +92,7 @@ typedef struct _ch_randgen {
 
 static ch_randgen *sRandomEnv;
 static uint32 sRandomCount = 0;
-static sem_id sRandomSem;
+static mutex sRandomLock;
 
 
 extern void hash_block(const unsigned char *block, const unsigned int block_byte_size, unsigned char *md);
@@ -341,8 +342,12 @@ init_driver(void)
 {
 	TRACE((DRIVER_NAME ": init_driver()\n"));
 
-	sRandomSem = create_sem(1, "RNG semaphore");
-	set_sem_owner(sRandomSem, B_SYSTEM_TEAM);
+	mutex_init(&sRandomLock, "/dev/random lock");
+
+	sRandomEnv = new_chrand(8);
+	if (sRandomEnv == NULL)
+		return B_NO_MEMORY;
+
 	return B_OK;
 }
 
@@ -352,7 +357,7 @@ uninit_driver(void)
 {
 	TRACE((DRIVER_NAME ": uninit_driver()\n"));
 	kill_chrand(sRandomEnv);
-	delete_sem(sRandomSem);
+	mutex_destroy(&sRandomLock);
 }
 
 
@@ -387,15 +392,7 @@ static status_t
 random_open(const char *name, uint32 flags, void **cookie)
 {
 	TRACE((DRIVER_NAME ": open(\"%s\")\n", name));
-	acquire_sem(sRandomSem);
-
-	sRandomEnv = new_chrand(8);
-		// the random generator is only initialized on demand, but
-		// remains valid as long as the driver is loaded
-
-	release_sem(sRandomSem);
-
-	return sRandomEnv != NULL ? B_OK : B_NO_MEMORY;
+	return B_OK;
 }
 
 
@@ -407,7 +404,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	uint32 i, j;
 	TRACE((DRIVER_NAME ": read(%Ld,, %d)\n", position, *_numBytes));
 
-	acquire_sem(sRandomSem);
+	mutex_lock(&sRandomLock);
 	sRandomCount += *_numBytes;
 
 	/* Reseed if we have or are gonna use up > 1/16th the entropy around */
@@ -424,7 +421,7 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	for (j = 0; j < (*_numBytes) % 4; j++)
 		buffer8[(i*4) + j] = chrand8(sRandomEnv);
 
-	release_sem(sRandomSem);
+	mutex_unlock(&sRandomLock);
 
 	return B_OK;
 }
