@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src tests kits interface bfont ;
 
+StdBinCommands DumpFontList.cpp : libbe.so ;
 StdBinCommands GetBoundingBoxesTest.cpp : libbe.so ;
