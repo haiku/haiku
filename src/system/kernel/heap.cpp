@@ -8,7 +8,9 @@
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
+#include <arch/debug.h>
 #include <debug.h>
+#include <elf.h>
 #include <heap.h>
 #include <int.h>
 #include <kernel.h>
@@ -41,10 +43,21 @@
 
 #if KERNEL_HEAP_LEAK_CHECK
 typedef struct heap_leak_check_info_s {
+	addr_t		caller;
 	size_t		size;
 	thread_id	thread;
 	team_id		team;
 } heap_leak_check_info;
+
+struct caller_info {
+	addr_t		caller;
+	uint32		count;
+	uint32		size;
+};
+
+static const int32 kCallerInfoTableSize = 1024;
+static caller_info sCallerInfoTable[kCallerInfoTableSize];
+static int32 sCallerInfoCount = 0;
 #endif
 
 typedef struct heap_page_s {
@@ -175,6 +188,27 @@ class Free : public AbstractTraceEntry {
 // #pragma mark - Debug functions
 
 
+#if KERNEL_HEAP_LEAK_CHECK
+static addr_t
+get_caller()
+{
+	// Find the first return address outside of the allocator code. Note, that
+	// this makes certain assumptions about how the code for the functions
+	// ends up in the kernel object.
+	addr_t returnAddresses[5];
+	int32 depth = arch_debug_get_stack_trace(returnAddresses, 5, 1, false);
+	for (int32 i = 0; i < depth; i++) {
+		if (returnAddresses[i] < (addr_t)&get_caller
+			|| returnAddresses[i] > (addr_t)&malloc_referenced_release) {
+			return returnAddresses[i];
+		}
+	}
+
+	return 0;
+}
+#endif
+
+
 static void
 dump_page(heap_page *page)
 {
@@ -251,17 +285,21 @@ dump_heap_list(int argc, char **argv)
 
 
 #if KERNEL_HEAP_LEAK_CHECK
+
 static int
 dump_allocations(int argc, char **argv)
 {
 	team_id team = -1;
 	thread_id thread = -1;
+	addr_t caller = 0;
 	bool statsOnly = false;
 	for (int32 i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "team") == 0)
 			team = strtoul(argv[++i], NULL, 0);
 		else if (strcmp(argv[i], "thread") == 0)
 			thread = strtoul(argv[++i], NULL, 0);
+		else if (strcmp(argv[i], "caller") == 0)
+			caller = strtoul(argv[++i], NULL, 0);
 		else if (strcmp(argv[i], "stats") == 0)
 			statsOnly = true;
 		else {
@@ -302,13 +340,15 @@ dump_allocations(int argc, char **argv)
 					info = (heap_leak_check_info *)(base + elementSize
 						- sizeof(heap_leak_check_info));
 
-					if ((team == -1 && thread == -1)
-						|| (team == -1 && info->thread == thread)
-						|| (thread == -1 && info->team == team)) {
+					if ((team == -1 || info->team == team)
+						&& (thread == -1 || info->thread == thread)
+						&& (caller == 0 || info->caller == caller)) {
 						// interesting...
 						if (!statsOnly) {
-							dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
-								info->team, info->thread, base, info->size);
+							dprintf("team: % 6ld; thread: % 6ld; "
+								"address: 0x%08lx; size: %lu bytes, "
+								"caller: %#lx\n", info->team, info->thread,
+								base, info->size, info->caller);
 						}
 
 						totalSize += info->size;
@@ -327,13 +367,14 @@ dump_allocations(int argc, char **argv)
 				info = (heap_leak_check_info *)(base + pageCount * B_PAGE_SIZE
 					- sizeof(heap_leak_check_info));
 
-				if ((team == -1 && thread == -1)
-					|| (team == -1 && info->thread == thread)
-					|| (thread == -1 && info->team == team)) {
+				if ((team == -1 || info->team == team)
+					&& (thread == -1 || info->thread == thread)
+					&& (caller == 0 || info->caller == caller)) {
 					// interesting...
 					if (!statsOnly) {
-						dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx; size: %lu bytes\n",
-							info->team, info->thread, base, info->size);
+						dprintf("team: % 6ld; thread: % 6ld; address: 0x%08lx;"
+							" size: %lu bytes, caller: %#lx\n", info->team,
+							info->thread, base, info->size, info->caller);
 					}
 
 					totalSize += info->size;
@@ -351,6 +392,163 @@ dump_allocations(int argc, char **argv)
 	dprintf("total allocations: %lu; total bytes: %lu\n", totalCount, totalSize);
 	return 0;
 }
+
+
+static caller_info*
+get_caller_info(addr_t caller)
+{
+	// find the caller info
+	for (int32 i = 0; i < sCallerInfoCount; i++) {
+		if (caller == sCallerInfoTable[i].caller)
+			return &sCallerInfoTable[i];
+	}
+
+	// not found, add a new entry, if there are free slots
+	if (sCallerInfoCount >= kCallerInfoTableSize)
+		return NULL;
+
+	caller_info* info = &sCallerInfoTable[sCallerInfoCount++];
+	info->caller = caller;
+	info->count = 0;
+	info->size = 0;
+
+	return info;
+}
+
+
+static int
+caller_info_compare_size(const void* _a, const void* _b)
+{
+	const caller_info* a = (const caller_info*)_a;
+	const caller_info* b = (const caller_info*)_b;
+	return (int)(b->size - a->size);
+}
+
+
+static int
+caller_info_compare_count(const void* _a, const void* _b)
+{
+	const caller_info* a = (const caller_info*)_a;
+	const caller_info* b = (const caller_info*)_b;
+	return (int)(b->count - a->count);
+}
+
+
+static int
+dump_allocations_per_caller(int argc, char **argv)
+{
+	bool sortBySize = true;
+	
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-c") == 0) {
+			sortBySize = false;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	sCallerInfoCount = 0;
+
+	heap_allocator *heap = sHeapList;
+	while (heap) {
+		// go through all the pages
+		heap_leak_check_info *info = NULL;
+		for (uint32 i = 0; i < heap->page_count; i++) {
+			heap_page *page = &heap->page_table[i];
+			if (!page->in_use)
+				continue;
+
+			addr_t base = heap->base + i * B_PAGE_SIZE;
+			if (page->bin_index < heap->bin_count) {
+				// page is used by a small allocation bin
+				uint32 elementCount = page->empty_index;
+				size_t elementSize = heap->bins[page->bin_index].element_size;
+				for (uint32 j = 0; j < elementCount; j++, base += elementSize) {
+					// walk the free list to see if this element is in use
+					bool elementInUse = true;
+					for (addr_t *temp = page->free_list; temp != NULL;
+							temp = (addr_t *)*temp) {
+						if ((addr_t)temp == base) {
+							elementInUse = false;
+							break;
+						}
+					}
+
+					if (!elementInUse)
+						continue;
+
+					info = (heap_leak_check_info *)(base + elementSize
+						- sizeof(heap_leak_check_info));
+
+					caller_info* callerInfo = get_caller_info(info->caller);
+					if (callerInfo == NULL) {
+						kprintf("out of space for caller infos\n");
+						return 0;
+					}
+
+					callerInfo->count++;
+					callerInfo->size += info->size;
+				}
+			} else {
+				// page is used by a big allocation, find the page count
+				uint32 pageCount = 1;
+				while (i + pageCount < heap->page_count
+					&& heap->page_table[i + pageCount].in_use
+					&& heap->page_table[i + pageCount].bin_index == heap->bin_count
+					&& heap->page_table[i + pageCount].allocation_id == page->allocation_id)
+					pageCount++;
+
+				info = (heap_leak_check_info *)(base + pageCount * B_PAGE_SIZE
+					- sizeof(heap_leak_check_info));
+
+				caller_info* callerInfo = get_caller_info(info->caller);
+				if (callerInfo == NULL) {
+					kprintf("out of space for caller infos\n");
+					return 0;
+				}
+
+				callerInfo->count++;
+				callerInfo->size += info->size;
+
+				// skip the allocated pages
+				i += pageCount - 1;
+			}
+		}
+
+		heap = heap->next;
+	}
+
+	// sort the array
+	qsort(sCallerInfoTable, sCallerInfoCount, sizeof(caller_info),
+		sortBySize ? &caller_info_compare_size : &caller_info_compare_count);
+
+	kprintf("%ld different callers, sorted by %s...\n\n", sCallerInfoCount,
+		sortBySize ? "size" : "count");
+
+	kprintf("     count        size      caller\n");
+	kprintf("----------------------------------\n");
+	for (int32 i = 0; i < sCallerInfoCount; i++) {
+		caller_info& info = sCallerInfoTable[i];
+		kprintf("%10ld  %10ld  %#08lx", info.count, info.size, info.caller);
+
+		const char* symbol;
+		const char* imageName;
+		bool exactMatch;
+		addr_t baseAddress;
+
+		if (elf_debug_lookup_symbol_address(info.caller, &baseAddress, &symbol,
+				&imageName, &exactMatch) == B_OK) {
+			kprintf("  %s + 0x%lx (%s)%s\n", symbol,
+				info.caller - baseAddress, imageName,
+				exactMatch ? "" : " (nearest)");
+		} else
+			kprintf("\n");
+	}
+
+	return 0;
+}
+
 #endif // KERNEL_HEAP_LEAK_CHECK
 
 
@@ -589,6 +787,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		info->size = size - sizeof(heap_leak_check_info);
 		info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
 		info->team = (kernel_startup ? 0 : team_get_current_team_id());
+		info->caller = get_caller();
 #endif
 		return address;
 	}
@@ -626,6 +825,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 		info->size = size - sizeof(heap_leak_check_info);
 		info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
 		info->team = (kernel_startup ? 0 : team_get_current_team_id());
+		info->caller = get_caller();
 #endif
 
 		// we return the first slot in this page
@@ -674,6 +874,7 @@ heap_raw_alloc(heap_allocator *heap, size_t size, uint32 binIndex)
 	info->size = size - sizeof(heap_leak_check_info);
 	info->thread = (kernel_startup ? 0 : thread_get_current_thread_id());
 	info->team = (kernel_startup ? 0 : team_get_current_team_id());
+	info->caller = get_caller();
 #endif
 	return (void *)(heap->base + first * B_PAGE_SIZE);
 }
@@ -1039,13 +1240,21 @@ heap_init(addr_t base, size_t size)
 		"given as the argument, currently only the heap count is printed\n", 0);
 #if KERNEL_HEAP_LEAK_CHECK
 	add_debugger_command_etc("allocations", &dump_allocations,
-		"Dump current allocations", "[(\"team\" | \"thread\") <id>] [\"stats\"]\n"
+		"Dump current allocations",
+		"[(\"team\" | \"thread\") <id>] [ \"caller\" <address> ] [\"stats\"]\n"
 		"If no parameters are given, all current alloactions are dumped.\n"
-		"If either \"team\" or \"thread\" is specified as the first argument,\n"
-		"only allocations matching the team or thread id given in the second\n"
-		"argument are printed.\n"
+		"If \"team\", \"thread\", and/or \"caller\" is specified as the first\n"
+		"argument, only allocations matching the team id, thread id, or \n"
+		"caller address given in the second argument are printed.\n"
 		"If the optional argument \"stats\" is specified, only the allocation\n"
 		"counts and no individual allocations are printed\n", 0);
+	add_debugger_command_etc("allocations_per_caller",
+		&dump_allocations_per_caller,
+		"Dump current allocations summed up per caller",
+		"[ \"-c\" ]\n"
+		"The current allocations will by summed up by caller (their count and\n"
+		"size) printed in decreasing order by size or, if \"-c\" is\n"
+		"specified, by allocation count.\n", 0);
 #endif
 	return B_OK;
 }
