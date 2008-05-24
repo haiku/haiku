@@ -123,7 +123,7 @@ enum {
 	PORT_INT_INF	= (1 << 26),	// Interface Non-fatal Error Status/Enable
 	PORT_INT_OF		= (1 << 24),	// Overflow Status/Enable
 	PORT_INT_IPM	= (1 << 23),	// Incorrect Port Multiplier Status/Enable
-	PORT_INT_PRCE	= (1 << 22),	// PhyRdy Change Status/Enable
+	PORT_INT_PRC	= (1 << 22),	// PhyRdy Change Status/Enable
 	PORT_INT_DI		= (1 << 7),		// Device Interlock Status/Enable
 	PORT_INT_PC		= (1 << 6),		// Port Change Status/Enable
 	PORT_INT_DP		= (1 << 5),		// Descriptor Processed Interrupt
@@ -134,10 +134,13 @@ enum {
 	PORT_INT_DHR	= (1 << 0),		// Device to Host Register FIS Interrupt
 };
 
-#define PORT_INT_FATAL	(PORT_INT_HBF | PORT_INT_IF | PORT_INT_IPM | PORT_INT_UF)
-#define PORT_INT_ERROR 	(PORT_INT_TFE | PORT_INT_HBD)
-#define PORT_INT_MASK	(PORT_INT_FATAL | PORT_INT_ERROR | PORT_INT_DP |\
-						 PORT_INT_SDB | PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
+#define PORT_INT_ERROR 	(PORT_INT_TFE | PORT_INT_HBF | PORT_INT_HBD \
+						 | PORT_INT_IF | PORT_INT_INF | PORT_INT_OF \
+						 | PORT_INT_IPM | PORT_INT_PRC | PORT_INT_PC \
+						 | PORT_INT_UF)
+
+#define PORT_INT_MASK	(PORT_INT_ERROR | PORT_INT_DP | PORT_INT_SDB \
+						 | PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
 
 enum {
 	ATA_BSY 		= 0x80,

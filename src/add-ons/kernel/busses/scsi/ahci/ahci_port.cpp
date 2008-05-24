@@ -39,6 +39,8 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	, fSectorSize(0)
 	, fSectorCount(0)
 	, fIsATAPI(false)
+	, fResetPort(false)
+	, fError(false)
 {
 	fRequestSem = create_sem(1, "ahci request");
 	fResponseSem = create_sem(0, "ahci response");
@@ -281,21 +283,16 @@ void
 AHCIPort::Interrupt()
 {
 	uint32 is = fRegs->is;
-	uint32 ci = fRegs->ci;
 	fRegs->is = is; // clear interrupts
 
-	RWTRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
-
 	if (is & PORT_INT_ERROR) {
-		TRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
-		TRACE("ssts 0x%08lx\n", fRegs->ssts);
-		TRACE("sctl 0x%08lx\n", fRegs->sctl);
-		TRACE("serr 0x%08lx\n", fRegs->serr);
-		TRACE("sact 0x%08lx\n", fRegs->sact);
+		InterruptErrorHandler(is);
+		return;
 	}
-	
-	if (is & PORT_INT_FATAL)
-		panic("ahci fatal error, is 0x%08lx", is);
+
+	uint32 ci = fRegs->ci;
+
+	RWTRACE("AHCIPort::Interrupt port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
 
 	int release = 0;
 
@@ -307,6 +304,71 @@ AHCIPort::Interrupt()
 	release_spinlock(&fSpinlock);
 
 	if (release)
+		release_sem_etc(fResponseSem, 1, B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
+}
+
+
+void
+AHCIPort::InterruptErrorHandler(uint32 is)
+{
+	uint32 ci = fRegs->ci;
+
+	TRACE("AHCIPort::InterruptErrorHandler port %d, fCommandsActive 0x%08lx, is 0x%08lx, ci 0x%08lx\n", fIndex, fCommandsActive, is, ci);
+
+	TRACE("ssts 0x%08lx\n", fRegs->ssts);
+	TRACE("sctl 0x%08lx\n", fRegs->sctl);
+	TRACE("serr 0x%08lx\n", fRegs->serr);
+	TRACE("sact 0x%08lx\n", fRegs->sact);
+
+	// read and clear SError
+	uint32 serr = fRegs->serr;
+	fRegs->serr = serr;
+
+	if (is & PORT_INT_TFE) {
+		TRACE("Task File Error\n");
+		fResetPort = true;
+		fError = true;
+	}
+	if (is & PORT_INT_HBF) {
+		TRACE("Host Bus Fatal Error\n");
+		fResetPort = true;
+		fError = true;
+	}
+	if (is & PORT_INT_HBD) {
+		TRACE("Host Bus Data Error\n");
+		fResetPort = true;
+		fError = true;
+	}
+	if (is & PORT_INT_IF) {
+		TRACE("Interface Fatal Error\n");
+		fResetPort = true;
+		fError = true;
+	}
+	if (is & PORT_INT_INF) {
+		TRACE("Interface Non Fatal Error\n");
+	}
+	if (is & PORT_INT_OF) {
+		TRACE("Overflow");
+		fResetPort = true;
+		fError = true;
+	}
+	if (is & PORT_INT_IPM) {
+		TRACE("Incorrect Port Multiplier Status");
+	}
+	if (is & PORT_INT_PRC) {
+		TRACE("PhyReady Change\n");
+//		fResetPort = true;
+	}
+	if (is & PORT_INT_PC) {
+		TRACE("Port Connect Change\n");
+//		fResetPort = true;
+	}
+	if (is & PORT_INT_UF) {
+		TRACE("Unknown FIS\n");
+		fResetPort = true;
+	}
+
+	if (fError)
 		release_sem_etc(fResponseSem, 1, B_RELEASE_IF_WAITING_ONLY | B_DO_NOT_RESCHEDULE);
 }
 
@@ -386,6 +448,9 @@ AHCIPort::WaitForTransfer(int *tfd, bigtime_t timeout)
 	if (acquire_sem_etc(fResponseSem, 1, B_RELATIVE_TIMEOUT, timeout) < B_OK) {
 		fCommandsActive &= ~1;
 		result = B_TIMED_OUT;
+	} else if (fError) {
+		result = B_ERROR;
+		fError = false;
 	} else {
 		*tfd = fRegs->tfd;
 	}
@@ -666,7 +731,10 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	FinishTransfer();
 
 	if (status < B_OK) {
-		TRACE("ExecuteAtaRequest port %d: device transfer timeout\n", fIndex);
+		if (status == B_TIMED_OUT)
+			TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
+		else
+			TRACE("ExecuteAtaRequest port %d: device error\n", fIndex);
 		request->abort();
 	} else
 		request->finish(tfd, bytesTransfered);
@@ -676,6 +744,12 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 void
 AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 {
+
+	if (fResetPort) {
+		fResetPort = false;
+		ResetDevice();
+		PostResetDevice();
+	}
 
 //	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 

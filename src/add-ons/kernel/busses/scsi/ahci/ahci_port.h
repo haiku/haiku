@@ -20,6 +20,7 @@ public:
 	void		Uninit();
 
 	void		Interrupt();
+	void		InterruptErrorHandler(uint32 is);
 
 
 	void		ScsiExecuteRequest(scsi_ccb *request);
@@ -65,6 +66,8 @@ private:
 	uint32							fSectorSize;
 	uint64							fSectorCount;
 	bool							fIsATAPI;
+	bool							fResetPort;
+	bool							fError;
 
 	volatile fis *					fFIS;
 	volatile command_list_entry *	fCommandList;
