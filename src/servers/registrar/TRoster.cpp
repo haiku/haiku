@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2001-2008, Ingo Weinhold, bonefish@users.sf.net.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1810,7 +1810,9 @@ TRoster::_LoadRosterSettings(const char *path)
 	off_t size;
 	if (!error)
 		error = file.GetSize(&size);
-	char *data;
+
+	char *data = NULL;
+
 	if (!error) {
 		data = new(nothrow) char[size];
 		error = data ? B_OK : B_NO_MEMORY;
@@ -1821,6 +1823,9 @@ TRoster::_LoadRosterSettings(const char *path)
 	}
 	if (!error) 
 		error = stream.SetTo(std::string(data));
+
+	delete[] data;
+
 	if (!error) {	
 		// Clear the current lists as
 		// we'll be manually building them up
