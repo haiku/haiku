@@ -1843,8 +1843,10 @@ devfs_open(fs_volume *_volume, fs_vnode *_vnode, int openMode,
 			&& driver->devices_used == 0
 			&& (driver->image < 0 || driver->binary_updated)) {
 			status = reload_driver(driver);
-			if (status < B_OK)
+			if (status < B_OK) {
+				free(cookie);
 				return status;
+			}
 		}
 
 		locker.Unlock();
