@@ -2965,8 +2965,10 @@ devfs_publish_file_device(const char *path, const char *filePath)
 	RecursiveLocker locker(&sDeviceFileSystem->lock);
 
 	status = new_node(sDeviceFileSystem, path, &node, &dirNode);
-	if (status != B_OK)
+	if (status != B_OK) {
+		free((char*)filePath);
 		return status;
+	}
 
 	// all went fine, let's initialize the node
 	node->stream.type = S_IFLNK | 0644;
