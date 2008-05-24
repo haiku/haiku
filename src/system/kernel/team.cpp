@@ -1012,12 +1012,15 @@ create_team_arg(struct team_arg **_teamArg, int32 argCount, char * const *args,
 	// copy the args over
 	
 	status = copy_strings_array(args, argCount, &argsCopy, kernel);
-	if (status != B_OK)
+	if (status != B_OK) {
+		free(teamArg);
 		return status;
+	}
 
 	status = copy_strings_array(env, envCount, &envCopy, kernel);
 	if (status != B_OK) {
 		free_strings_array(argsCopy, argCount);
+		free(teamArg);
 		return status;
 	}
 
