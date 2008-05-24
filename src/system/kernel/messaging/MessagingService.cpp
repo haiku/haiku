@@ -1,5 +1,5 @@
 /* 
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net. All rights reserved.
+ * Copyright 2005-2008, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,123 +22,22 @@
 #	define PRINT(x) ;
 #endif
 
+
 using namespace std;
 
 static MessagingService *sMessagingService = NULL;
 
 static const int32 kMessagingAreaSize = B_PAGE_SIZE * 4;
 
-// init_messaging_service
-status_t
-init_messaging_service()
-{
-	static char buffer[sizeof(MessagingService)];
 
-	if (!sMessagingService)
-		sMessagingService = new(buffer) MessagingService;
+// #pragma mark - MessagingArea
 
-	status_t error = sMessagingService->InitCheck();
-
-	// cleanup on error
-	if (error != B_OK) {
-		dprintf("ERROR: Failed to init messaging service: %s\n",
-			strerror(error));
-		sMessagingService->~MessagingService();
-		sMessagingService = NULL;
-	}
-
-	return error;
-}
-
-// _user_register_messaging_service
-/** \brief Called by the userland server to register itself as a messaging
-		   service for the kernel.
-	\param lockingSem A semaphore used for locking the shared data. Semaphore
-		   counter must be initialized to 0.
-	\param counterSem A semaphore released every time the kernel pushes a
-		   command into an empty area. Semaphore counter must be initialized
-		   to 0.
-	\return
-	- The ID of the kernel area used for communication, if everything went fine,
-	- an error code otherwise.
-*/
-area_id
-_user_register_messaging_service(sem_id lockSem, sem_id counterSem)
-{
-	// check, if init_messaging_service() has been called yet
-	if (!sMessagingService)
-		return B_NO_INIT;
-
-	if (!sMessagingService->Lock())
-		return B_BAD_VALUE;
-
-	area_id areaID;
-	status_t error = sMessagingService->RegisterService(lockSem, counterSem,
-		areaID);
-
-	sMessagingService->Unlock();
-
-	return (error != B_OK ? error : areaID);
-}
-
-// _user_unregister_messaging_service
-status_t
-_user_unregister_messaging_service()
-{
-	// check, if init_messaging_service() has been called yet
-	if (!sMessagingService)
-		return B_NO_INIT;
-
-	if (!sMessagingService->Lock())
-		return B_BAD_VALUE;
-
-	status_t error = sMessagingService->UnregisterService();
-
-	sMessagingService->Unlock();
-
-	return error;
-}
-
-
-// send_message
-status_t
-send_message(const void *message, int32 messageSize,
-	const messaging_target *targets, int32 targetCount)
-{
-	// check, if init_messaging_service() has been called yet
-	if (!sMessagingService)
-		return B_NO_INIT;
-
-	if (!sMessagingService->Lock())
-		return B_BAD_VALUE;
-
-	status_t error = sMessagingService->SendMessage(message, messageSize,
-		targets, targetCount);
-
-	sMessagingService->Unlock();
-
-	return error;
-}
-
-// send_message
-status_t
-send_message(const KMessage *message, const messaging_target *targets,
-	int32 targetCount)
-{
-	if (!message)
-		return B_BAD_VALUE;
-
-	return send_message(message->Buffer(), message->ContentSize(), targets,
-		targetCount);
-}
-
-
-// #pragma mark -
 
 // constructor
 MessagingArea::MessagingArea()
 {
 }
+
 
 // destructor
 MessagingArea::~MessagingArea()
@@ -146,6 +45,7 @@ MessagingArea::~MessagingArea()
 	if (fID >= 0)
 		delete_area(fID);
 }
+
 
 // Create
 MessagingArea *
@@ -175,6 +75,7 @@ MessagingArea::Create(sem_id lockSem, sem_id counterSem)
 	return area;
 }
 
+
 // InitHeader
 void
 MessagingArea::InitHeader()
@@ -188,6 +89,7 @@ MessagingArea::InitHeader()
 	fHeader->last_command = 0;
 }
 
+
 // CheckCommandSize
 bool
 MessagingArea::CheckCommandSize(int32 dataSize)
@@ -197,6 +99,7 @@ MessagingArea::CheckCommandSize(int32 dataSize)
 	return (dataSize >= 0
 		&& size <= kMessagingAreaSize - (int32)sizeof(messaging_area_header));
 }
+
 
 // Lock
 bool
@@ -209,6 +112,7 @@ MessagingArea::Lock()
 	return (acquire_sem(fLockSem) == B_OK);
 }
 
+
 // Unlock
 void
 MessagingArea::Unlock()
@@ -217,6 +121,7 @@ MessagingArea::Unlock()
 		release_sem(fLockSem);
 }
 
+
 // ID
 area_id
 MessagingArea::ID() const
@@ -224,12 +129,14 @@ MessagingArea::ID() const
 	return fID;
 }
 
+
 // Size
 int32
 MessagingArea::Size() const
 {
 	return fSize;
 }
+
 
 // AllocateCommand
 void *
@@ -302,6 +209,7 @@ MessagingArea::AllocateCommand(uint32 commandWhat, int32 dataSize,
 	return command->data;
 }
 
+
 // CommitCommand
 void
 MessagingArea::CommitCommand()
@@ -309,6 +217,7 @@ MessagingArea::CommitCommand()
 	// TODO: If invoked while locked, we should supply B_DO_NOT_RESCHEDULE.
 	release_sem(fCounterSem);
 }
+
 
 // SetNextArea
 void
@@ -318,12 +227,14 @@ MessagingArea::SetNextArea(MessagingArea *area)
 	fHeader->next_kernel_area = (fNextArea ? fNextArea->ID() : -1);
 }
 
+
 // NextArea
 MessagingArea *
 MessagingArea::NextArea() const
 {
 	return fNextArea;
 }
+
 
 // _CheckCommand
 messaging_command *
@@ -349,7 +260,8 @@ MessagingArea::_CheckCommand(int32 offset, int32 &size)
 }
 
 
-// #pragma mark -
+// #pragma mark - MessagingService
+
 
 // constructor
 MessagingService::MessagingService()
@@ -359,12 +271,14 @@ MessagingService::MessagingService()
 {
 }
 
+
 // destructor
 MessagingService::~MessagingService()
 {
 	// Should actually never be called. Once created the service stays till the
 	// bitter end.
 }
+
 
 // InitCheck
 status_t
@@ -375,6 +289,7 @@ MessagingService::InitCheck() const
 	return B_OK;
 }
 
+
 // Lock
 bool
 MessagingService::Lock()
@@ -382,12 +297,14 @@ MessagingService::Lock()
 	return fLock.Lock();
 }
 
+
 // Unlock
 void
 MessagingService::Unlock()
 {
 	fLock.Unlock();
 }
+
 
 // RegisterService
 status_t
@@ -436,6 +353,7 @@ MessagingService::RegisterService(sem_id lockSem, sem_id counterSem,
 	return B_OK;
 }
 
+
 // UnregisterService
 status_t
 MessagingService::UnregisterService()
@@ -464,6 +382,7 @@ MessagingService::UnregisterService()
 
 	return B_OK;
 }
+
 
 // SendMessage
 status_t
@@ -507,6 +426,7 @@ PRINT(("  Allocated space for send message command: area: %p, data: %p, "
 
 	return B_OK;
 }
+
 
 // _AllocateCommand
 status_t
@@ -580,3 +500,116 @@ MessagingService::_AllocateCommand(int32 commandWhat, int32 size,
 	return B_OK;
 }
 
+
+// #pragma mark - kernel private
+
+
+// send_message
+status_t
+send_message(const void *message, int32 messageSize,
+	const messaging_target *targets, int32 targetCount)
+{
+	// check, if init_messaging_service() has been called yet
+	if (!sMessagingService)
+		return B_NO_INIT;
+
+	if (!sMessagingService->Lock())
+		return B_BAD_VALUE;
+
+	status_t error = sMessagingService->SendMessage(message, messageSize,
+		targets, targetCount);
+
+	sMessagingService->Unlock();
+
+	return error;
+}
+
+
+// send_message
+status_t
+send_message(const KMessage *message, const messaging_target *targets,
+	int32 targetCount)
+{
+	if (!message)
+		return B_BAD_VALUE;
+
+	return send_message(message->Buffer(), message->ContentSize(), targets,
+		targetCount);
+}
+
+
+// init_messaging_service
+status_t
+init_messaging_service()
+{
+	static char buffer[sizeof(MessagingService)];
+
+	if (!sMessagingService)
+		sMessagingService = new(buffer) MessagingService;
+
+	status_t error = sMessagingService->InitCheck();
+
+	// cleanup on error
+	if (error != B_OK) {
+		dprintf("ERROR: Failed to init messaging service: %s\n",
+			strerror(error));
+		sMessagingService->~MessagingService();
+		sMessagingService = NULL;
+	}
+
+	return error;
+}
+
+
+// #pragma mark - syscalls
+
+
+// _user_register_messaging_service
+/** \brief Called by the userland server to register itself as a messaging
+		   service for the kernel.
+	\param lockingSem A semaphore used for locking the shared data. Semaphore
+		   counter must be initialized to 0.
+	\param counterSem A semaphore released every time the kernel pushes a
+		   command into an empty area. Semaphore counter must be initialized
+		   to 0.
+	\return
+	- The ID of the kernel area used for communication, if everything went fine,
+	- an error code otherwise.
+*/
+area_id
+_user_register_messaging_service(sem_id lockSem, sem_id counterSem)
+{
+	// check, if init_messaging_service() has been called yet
+	if (!sMessagingService)
+		return B_NO_INIT;
+
+	if (!sMessagingService->Lock())
+		return B_BAD_VALUE;
+
+	area_id areaID;
+	status_t error = sMessagingService->RegisterService(lockSem, counterSem,
+		areaID);
+
+	sMessagingService->Unlock();
+
+	return (error != B_OK ? error : areaID);
+}
+
+
+// _user_unregister_messaging_service
+status_t
+_user_unregister_messaging_service()
+{
+	// check, if init_messaging_service() has been called yet
+	if (!sMessagingService)
+		return B_NO_INIT;
+
+	if (!sMessagingService->Lock())
+		return B_BAD_VALUE;
+
+	status_t error = sMessagingService->UnregisterService();
+
+	sMessagingService->Unlock();
+
+	return error;
+}
