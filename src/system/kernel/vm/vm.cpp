@@ -200,6 +200,19 @@ static mutex sAreaCacheLock;
 static off_t sAvailableMemory;
 static mutex sAvailableMemoryLock;
 
+#if DEBUG_CACHE_LIST
+
+struct cache_info {
+	vm_cache*	cache;
+	addr_t		page_count;
+};
+
+static const int kCacheInfoTableCount = 10240;
+static cache_info sCacheInfoTable[kCacheInfoTableCount];
+
+#endif	// DEBUG_CACHE_LIST
+
+
 // function declarations
 static void delete_area(vm_address_space *addressSpace, vm_area *area);
 static vm_address_space *get_address_space_by_area_id(area_id id);
@@ -208,7 +221,6 @@ static status_t map_backing_store(vm_address_space *addressSpace,
 	vm_cache *cache, void **_virtualAddress, off_t offset, addr_t size,
 	uint32 addressSpec, int wiring, int protection, int mapping,
 	vm_area **_area, const char *areaName, bool unmapAddressRange, bool kernel);
-
 
 
 //	#pragma mark -
@@ -3097,27 +3109,6 @@ dump_cache_tree(int argc, char **argv)
 }
 
 
-#if DEBUG_CACHE_LIST
-
-static int
-dump_caches(int argc, char **argv)
-{
-	kprintf("caches:");
-
-	vm_cache* cache = gDebugCacheList;
-	while (cache) {
-		kprintf(" %p", cache);
-		cache = cache->debug_next;
-	}
-
-	kprintf("\n");
-
-	return 0;
-}
-
-#endif	// DEBUG_CACHE_LIST
-
-
 static const char *
 cache_type_to_string(int32 type)
 {
@@ -3135,6 +3126,98 @@ cache_type_to_string(int32 type)
 			return "unknown";
 	}
 }
+
+
+#if DEBUG_CACHE_LIST
+
+static addr_t
+count_cache_pages_recursively(vm_cache* cache)
+{
+	addr_t count = cache->page_count;
+
+	// recurse
+	vm_cache* consumer = NULL;
+	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers,
+			consumer)) != NULL) {
+		count += count_cache_pages_recursively(consumer);
+	}
+
+	return count;
+}
+
+
+static int
+cache_info_compare_page_count(const void* _a, const void* _b)
+{
+	const cache_info* a = (const cache_info*)_a;
+	const cache_info* b = (const cache_info*)_b;
+	return (int)(b->page_count - a->page_count);
+}
+
+
+static void
+dump_caches_recursively(vm_cache* cache, int level)
+{
+	for (int i = 0; i < level; i++)
+		kprintf("  ");
+
+	kprintf("%p: type: %s, base: %lld, size: %lld, pages: %lu", cache,
+		cache_type_to_string(cache->type), cache->virtual_base,
+		cache->virtual_size, cache->page_count);
+
+	// areas
+	if (cache->areas != NULL) {
+		vm_area* area = cache->areas;
+		kprintf(", areas: %p (%s)", area, area->name);
+
+		while (area->cache_next != NULL) {
+			area = area->cache_next;
+			kprintf(", %p", area);
+		}
+	}
+
+	kputs("\n");
+
+	// recurse
+	vm_cache* consumer = NULL;
+	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers,
+			consumer)) != NULL) {
+		dump_caches_recursively(consumer, level + 1);
+	}
+}
+
+
+static int
+dump_caches(int argc, char **argv)
+{
+	uint32 totalCount = 0;
+	uint32 rootCount = 0;
+
+	vm_cache* cache = gDebugCacheList;
+	while (cache) {
+		totalCount++;
+		if (cache->source == NULL) {
+			cache_info& info = sCacheInfoTable[rootCount++];
+			info.cache = cache;
+			info.page_count = count_cache_pages_recursively(cache);
+		}
+
+		cache = cache->debug_next;
+	}
+
+	qsort(sCacheInfoTable, rootCount, sizeof(cache_info),
+		&cache_info_compare_page_count);
+
+	kprintf("%lu caches (%lu root caches), sorted by page count per cache "
+		"tree...\n\n", totalCount, rootCount);
+
+	for (uint32 i = 0; i < rootCount; i++)
+		dump_caches_recursively(sCacheInfoTable[i].cache, 0);
+
+	return 0;
+}
+
+#endif	// DEBUG_CACHE_LIST
 
 
 static int
