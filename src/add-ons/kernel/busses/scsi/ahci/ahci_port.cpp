@@ -682,7 +682,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	int prdEntrys;
 
-	if (request->ccb() && request->ccb()->sg_count)
+	if (request->ccb() && request->ccb()->data_length)
 		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->ccb()->sg_list, request->ccb()->sg_count, request->ccb()->data_length);
 	else if (request->data() && request->size())
 		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->data(), request->size());
@@ -772,25 +772,30 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 //	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
 	if (fIsATAPI && request->cdb[0] != SCSI_OP_INQUIRY) {
-		bool isWrite;
-		switch (request->cdb[0]) {
-			case SCSI_OP_WRITE_6:
-			case SCSI_OP_WRITE_10:
-			case SCSI_OP_WRITE_12:
+		bool isWrite = false;
+		switch (request->flags & SCSI_DIR_MASK) {
+			case SCSI_DIR_NONE:
+				ASSERT(request->data_length == 0);
+				break;
+			case SCSI_DIR_IN:
+				ASSERT(request->data_length > 0);
+				break;
+			case SCSI_DIR_OUT:
 				isWrite = true;
+				ASSERT(request->data_length > 0);
 				break;
 			default:
-				isWrite = false;
+				panic("CDB has invalid direction mask");
 		}
 	
-		TRACE("AHCIPort::ScsiExecuteRequest ATAPI: port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
+//		TRACE("AHCIPort::ScsiExecuteRequest ATAPI: port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
 
 		sata_request *sreq = new(std::nothrow) sata_request(request);
 		sreq->set_atapi_cmd();
-		uint8 *data = (uint8*) sreq->ccb()->cdb;
-		for (int i = 0; i < 16; i += 8) {
-			TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
-		}
+//		uint8 *data = (uint8*) sreq->ccb()->cdb;
+//		for (int i = 0; i < 16; i += 8) {
+//			TRACE("  %02x %02x %02x %02x %02x %02x %02x %02x\n", data[i], data[i+1], data[i+2], data[i+3], data[i+4], data[i+5], data[i+6], data[i+7]);
+//		}
 		ExecuteSataRequest(sreq, isWrite);
 		return;
 	}
