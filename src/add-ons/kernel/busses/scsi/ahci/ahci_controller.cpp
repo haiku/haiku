@@ -86,7 +86,8 @@ AHCIController::Init()
 
 	uint16 pcicmd = gPCI->read_pci_config(fPCIDevice, PCI_command, 2);
 	TRACE("pcicmd old 0x%04x\n", pcicmd);
-	pcicmd = PCI_command_master | PCI_command_memory | (pcicmd & ~PCI_command_io);
+	pcicmd &= ~(PCI_command_io | PCI_command_int_disable);
+	pcicmd |= PCI_command_master | PCI_command_memory;
 	TRACE("pcicmd new 0x%04x\n", pcicmd);
 	gPCI->write_pci_config(fPCIDevice, PCI_command, 2, pcicmd);
 
@@ -101,7 +102,7 @@ AHCIController::Init()
 
 	fIRQ = pciInfo.u.h0.interrupt_line;
 	if (fIRQ == 0 || fIRQ == 0xff) {
-		TRACE("PCI IRQ not assigned\n");
+		TRACE("Error: PCI IRQ not assigned\n");
 		return B_ERROR;
 	}
 
@@ -274,12 +275,13 @@ int32
 AHCIController::Interrupt(void *data)
 {
 	AHCIController *self = (AHCIController *)data;
-	uint32 int_stat = self->fRegs->is & self->fPortImplementedMask;
-	if (int_stat == 0)
+	uint32 interruptPending = self->fRegs->is & self->fPortImplementedMask;
+
+	if (interruptPending == 0)
 		return B_UNHANDLED_INTERRUPT;
 
 	for (int i = 0; i < self->fPortCountMax; i++) {
-		if (int_stat & (1 << i)) {
+		if (interruptPending & (1 << i)) {
 			if (self->fPort[i]) {
 				self->fPort[i]->Interrupt();
 			} else {
@@ -288,8 +290,8 @@ AHCIController::Interrupt(void *data)
 		}
 	}
 
-	// clear interrupts
-	self->fRegs->is = int_stat;
+	// clear pending interrupts
+	self->fRegs->is = interruptPending;
 
 	return B_INVOKE_SCHEDULER;
 }

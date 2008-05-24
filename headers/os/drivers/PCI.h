@@ -518,6 +518,7 @@ struct pci_module_info {
 #define PCI_command_address_step	0x080		/* 1/0 address stepping en/disabled */
 #define PCI_command_serr			0x100		/* 1/0 SERR# en/disabled */
 #define PCI_command_fastback		0x200		/* 1/0 fast back-to-back en/disabled */
+#define PCI_command_int_disable		0x400		/* 1/0 interrupt generation dis/enabled */
 
 
 /* ---
