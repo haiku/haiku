@@ -466,6 +466,7 @@ AHCIPort::WaitForTransfer(int *tfd, bigtime_t timeout)
 		fCommandsActive &= ~1;
 		result = B_TIMED_OUT;
 	} else if (fError) {
+		*tfd = fRegs->tfd;
 		result = B_ERROR;
 		fError = false;
 	} else {
@@ -748,15 +749,13 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	FinishTransfer();
 
-	if (status < B_OK) {
-		if (status == B_TIMED_OUT) {
-			TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
-			fResetPort = true;
-		} else
-			TRACE("ExecuteAtaRequest port %d: device error\n", fIndex);
+	if (status == B_TIMED_OUT) {
+		TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
+		fResetPort = true;
 		request->abort();
-	} else
+	} else {
 		request->finish(tfd, bytesTransfered);
+	}
 }
 
 

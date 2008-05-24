@@ -4,6 +4,7 @@
  */
 
 #include "sata_request.h"
+#include "scsi_cmds.h"
 #include <string.h>
 
 sata_request::sata_request()
@@ -100,6 +101,22 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 	if (fCcb) {
 		fCcb->data_resid = fCcb->data_length - bytesTransfered;
 		fCcb->subsys_status = (tfd & ATA_ERR) ? SCSI_REQ_CMP_ERR : SCSI_REQ_CMP;
+		if (fIsATAPI && (tfd & ATA_ERR)) {
+			uint8 error = (tfd >> 8) & 0xff;
+			dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n", tfd & 0xff, error);
+			if (error & 0x04) { // ABRT
+				fCcb->subsys_status = SCSI_REQ_ABORTED;
+			} else {
+				fCcb->device_status = SCSI_STATUS_CHECK_CONDITION;
+				fCcb->subsys_status |= SCSI_AUTOSNS_VALID;
+				fCcb->sense_resid = 0; //FIXME
+				scsi_sense *sense = (scsi_sense *)fCcb->sense;
+				sense->error_code = SCSIS_CURR_ERROR;
+				sense->sense_key = error >> 4;
+				sense->asc = 0;
+				sense->ascq = 0;
+			}
+		}
 		gSCSI->finished(fCcb, 1);
 		delete this;
 	} else {
