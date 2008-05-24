@@ -682,7 +682,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	int prdEntrys;
 
-	if (request->ccb())
+	if (request->ccb() && request->ccb()->sg_count)
 		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->ccb()->sg_list, request->ccb()->sg_count, request->ccb()->data_length);
 	else if (request->data() && request->size())
 		FillPrdTable(fPRDTable, &prdEntrys, PRD_TABLE_ENTRY_COUNT, request->data(), request->size());
@@ -709,6 +709,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 
 	if (wait_until_clear(&fRegs->tfd, ATA_BSY | ATA_DRQ, 1000000) < B_OK) {
 		TRACE("ExecuteAtaRequest port %d: device is busy\n", fIndex);
+		fResetPort = true;
 		FinishTransfer();
 		request->abort();
 		return;
@@ -723,7 +724,7 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	restore_interrupts(cpu);
 
 	int tfd;
-	status_t status = WaitForTransfer(&tfd, 5000000);
+	status_t status = WaitForTransfer(&tfd, 20000000);
 
 	FLOW("tfd %#x\n", tfd);
 	FLOW("prdbc %ld\n", fCommandList->prdbc);
@@ -748,9 +749,10 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 	FinishTransfer();
 
 	if (status < B_OK) {
-		if (status == B_TIMED_OUT)
+		if (status == B_TIMED_OUT) {
 			TRACE("ExecuteAtaRequest port %d: device timeout\n", fIndex);
-		else
+			fResetPort = true;
+		} else
 			TRACE("ExecuteAtaRequest port %d: device error\n", fIndex);
 		request->abort();
 	} else
@@ -761,7 +763,6 @@ AHCIPort::ExecuteSataRequest(sata_request *request, bool isWrite)
 void
 AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 {
-
 	if (fResetPort) {
 		fResetPort = false;
 		ResetPort();
