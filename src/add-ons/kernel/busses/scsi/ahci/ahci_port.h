@@ -38,8 +38,9 @@ private:
 
 	void		ExecuteSataRequest(sata_request *request, bool isWrite = false);
 
-	status_t	ResetDevice();
-	status_t	PostResetDevice();
+	void		ResetDevice();
+	status_t	ResetPort(bool forceDeviceReset = false);
+	status_t	PostReset();
 	void		FlushPostedWrites();
 	void		DumpD2HFis();
 

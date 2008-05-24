@@ -131,8 +131,8 @@ AHCIPort::Init2()
 
 	FlushPostedWrites();
 
-	ResetDevice();
-	PostResetDevice();
+	ResetPort(true);
+	PostReset();
 
 	TRACE("ie   0x%08lx\n", fRegs->ie);
 	TRACE("is   0x%08lx\n", fRegs->is);
@@ -186,20 +186,13 @@ AHCIPort::Uninit()
 }
 
 
-status_t
+void
 AHCIPort::ResetDevice()
 {
-	TRACE("AHCIPort::ResetDevice port %d\n", fIndex);
+	if (fRegs->cmd & PORT_CMD_ST)
+		TRACE("AHCIPort::ResetDevice PORT_CMD_ST set, behaviour undefined\n");
 
-	// stop DMA engine
-	fRegs->cmd &= ~PORT_CMD_ST;
-	FlushPostedWrites();
-
-	if (wait_until_clear(&fRegs->cmd, PORT_CMD_CR, 500000) < B_OK) {
-		TRACE("AHCIPort::ResetDevice port %d error DMA engine doesn't stop\n", fIndex);
-	}
-
-	// perform a hard reset
+	// perform a hard reset 
 	fRegs->sctl = (fRegs->sctl & ~0xf) | 1;
 	FlushPostedWrites();
 	spin(1100);
@@ -223,6 +216,30 @@ AHCIPort::ResetDevice()
 	// clear error bits
 	fRegs->serr = fRegs->serr;
 	FlushPostedWrites();
+}
+
+
+
+status_t
+AHCIPort::ResetPort(bool forceDeviceReset)
+{
+	TRACE("AHCIPort::ResetPort port %d\n", fIndex);
+
+	// stop DMA engine
+	fRegs->cmd &= ~PORT_CMD_ST;
+	FlushPostedWrites();
+
+	if (wait_until_clear(&fRegs->cmd, PORT_CMD_CR, 500000) < B_OK) {
+		TRACE("AHCIPort::ResetPort port %d error DMA engine doesn't stop\n", fIndex);
+	}
+
+	bool deviceBusy = fRegs->tfd & (ATA_BSY | ATA_DRQ);
+
+	TRACE("AHCIPort::ResetPort port %d, deviceBusy %d, forceDeviceReset %d\n",
+		  fIndex, deviceBusy, forceDeviceReset);
+
+	if (deviceBusy || forceDeviceReset)
+		ResetDevice();
 
 	// start DMA engine
 	fRegs->cmd |= PORT_CMD_ST;
@@ -233,12 +250,12 @@ AHCIPort::ResetDevice()
 
 
 status_t
-AHCIPort::PostResetDevice()
+AHCIPort::PostReset()
 {
-	TRACE("AHCIPort::PostResetDevice port %d\n", fIndex);
+	TRACE("AHCIPort::PostReset port %d\n", fIndex);
 
 	if ((fRegs->ssts & 0xf) != 0x3 || (fRegs->tfd & 0xff) == 0x7f) {
-		TRACE("AHCIPort::PostResetDevice port %d: no device\n", fIndex);
+		TRACE("AHCIPort::PostReset port %d: no device\n", fIndex);
 		return B_OK;
 	}
 
@@ -246,7 +263,7 @@ AHCIPort::PostResetDevice()
 		snooze(200000);
 
 	if ((fRegs->tfd & 0xff) == 0xff) {
-		TRACE("AHCIPort::PostResetDevice port %d: invalid task file status 0xff\n", fIndex);
+		TRACE("AHCIPort::PostReset port %d: invalid task file status 0xff\n", fIndex);
 		return B_ERROR;
 	}
 
@@ -747,8 +764,8 @@ AHCIPort::ScsiExecuteRequest(scsi_ccb *request)
 
 	if (fResetPort) {
 		fResetPort = false;
-		ResetDevice();
-		PostResetDevice();
+		ResetPort();
+		PostReset();
 	}
 
 //	TRACE("AHCIPort::ScsiExecuteRequest port %d, opcode 0x%02x, length %u\n", fIndex, request->cdb[0], request->cdb_length);
