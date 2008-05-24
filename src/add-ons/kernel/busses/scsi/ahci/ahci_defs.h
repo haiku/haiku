@@ -144,6 +144,7 @@ enum {
 
 enum {
 	ATA_BSY 		= 0x80,
+	ATA_DF 			= 0x20,
 	ATA_DRQ			= 0x08,
 	ATA_ERR			= 0x01,
 };

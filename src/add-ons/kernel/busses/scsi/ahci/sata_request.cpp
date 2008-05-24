@@ -100,10 +100,18 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 		dprintf("ahci: sata_request::finish ATA_ERR set for command 0x%02x\n", fFis[2]);
 	if (fCcb) {
 		fCcb->data_resid = fCcb->data_length - bytesTransfered;
-		fCcb->subsys_status = (tfd & ATA_ERR) ? SCSI_REQ_CMP_ERR : SCSI_REQ_CMP;
-		if (fIsATAPI && (tfd & ATA_ERR)) {
+		fCcb->subsys_status = SCSI_REQ_CMP;
+		if (tfd & (ATA_ERR | ATA_DF)) {
 			uint8 error = (tfd >> 8) & 0xff;
 			dprintf("ahci: sata_request::finish status 0x%02x, error 0x%02x\n", tfd & 0xff, error);
+			if (fIsATAPI) {
+				fCcb->subsys_status = SCSI_REQ_CMP_ERR;
+				fCcb->device_status = SCSI_STATUS_CHECK_CONDITION;
+			} else {
+				fCcb->subsys_status = SCSI_REQ_CMP_ERR;
+				// TODO error handling goes here
+			}
+/*
 			if (error & 0x04) { // ABRT
 				fCcb->subsys_status = SCSI_REQ_ABORTED;
 			} else {
@@ -116,6 +124,7 @@ sata_request::finish(int tfd, size_t bytesTransfered)
 				sense->asc = 0;
 				sense->ascq = 0;
 			}
+*/
 		}
 		gSCSI->finished(fCcb, 1);
 		delete this;

@@ -902,7 +902,7 @@ void
 AHCIPort::ScsiGetRestrictions(bool *isATAPI, bool *noAutoSense, uint32 *maxBlocks)
 {
 	*isATAPI = fIsATAPI;
-	*noAutoSense = false;
+	*noAutoSense = fIsATAPI; // emulated auto sense for ATA, but not ATAPI
 	*maxBlocks = fUse48BitCommands ? 65536 : 256;
 	TRACE("AHCIPort::ScsiGetRestrictions port %d: isATAPI %d, noAutoSense %d, maxBlocks %lu\n",
 		fIndex, *isATAPI, *noAutoSense, *maxBlocks);
