@@ -313,7 +313,8 @@ ServerFont::SetFace(uint16 face)
 			if (style->Face() == face) {
 				style->Acquire();
 				break;
-			}
+			} else
+				style = NULL;
 		}
 
 		gFontManager->Unlock();
