@@ -217,8 +217,10 @@ load_program(const char *const *args, int32 argCount, bool traceLoading)
 	// resolve the program path
 	string programPath;
 	status_t error = find_program(args[0], programPath);
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete[] mutableArgs;
 		return error;
+	}
 	mutableArgs[0] = programPath.c_str();
 
 	// count environment variables
