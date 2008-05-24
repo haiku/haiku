@@ -1950,8 +1950,10 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		if (target < 0) {
 			port_info info;
 			result = get_port_info(port, &info);
-			if (result < B_OK)
+			if (result < B_OK) {
+				free(header);
 				return result;
+			}
 			target = info.team;
 		}
 
