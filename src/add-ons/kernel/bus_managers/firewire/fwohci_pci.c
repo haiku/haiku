@@ -57,10 +57,13 @@
 #include "fwohcireg.h"
 #include "fwohcivar.h"
 
+#define PCIM_CMD_IOS		0x0001 
 #define	PCIM_CMD_MEMEN		0x0002
 #define	PCIM_CMD_BUSMASTEREN	0x0004
 #define	PCIM_CMD_MWRICEN	0x0010
-#define PCIM_CMD_IOS		0x0001 
+#define	PCIM_CMD_PERRESPEN	0x0040
+#define	PCIM_CMD_SERRESPEN	0x0100
+
 extern pci_module_info	*gPci;
 extern pci_info *pciInfo[MAX_CARDS];
 extern fwohci_softc_t *gFwohci_softc[MAX_CARDS];
@@ -149,6 +152,7 @@ fwohci_pci_attach(int index)
 
 #if 1  /* for broken hardware */
 	val &= ~PCIM_CMD_MWRICEN; 
+	val &= ~(PCIM_CMD_SERRESPEN | PCIM_CMD_PERRESPEN);
 #endif
 	gPci->write_pci_config(info->bus, info->device, info->function, 
 			PCI_command, 2, val);

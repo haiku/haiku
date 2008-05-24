@@ -412,7 +412,7 @@ fwohci_probe_phy(struct fwohci_softc *sc)
  *    number of port supported by core-logic.
  *    It is not actually available port on your PC .
  */
-	OWRITE(sc, OHCI_HCCCTL, OHCI_HCC_LPS);
+	OWRITE(sc, OHCI_HCCCTL, OHCI_HCC_LPS | OHCI_HCC_POSTWR);
 	DELAY(500);
 
 	reg = fwphy_rddata(sc, FW_PHY_SPD_REG);
@@ -706,10 +706,10 @@ fwohci_init(struct fwohci_softc *sc)
 	sc->sid_buf = sc->sid_dma.v_addr = buf_virt;
 	sc->sid_dma.bus_addr = (bus_addr_t)buf_phy;
 	sc->fc.config_rom = sc->crom_dma.v_addr = buf_virt + OHCI_SIDSIZE;
-	sc->crom_dma.bus_addr = (bus_addr_t)((char *)buf_phy + OHCI_SIDSIZE);
-	sc->dummy_dma.v_addr = (char *)buf_virt + OHCI_SIDSIZE + sizeof(uint32_t);
-	sc->dummy_dma.bus_addr = (bus_addr_t)((char *)buf_phy + 
-			OHCI_SIDSIZE + sizeof(uint32_t));
+	sc->crom_dma.bus_addr = (bus_addr_t)(buf_phy + OHCI_SIDSIZE);
+	sc->dummy_dma.v_addr = buf_virt + OHCI_SIDSIZE + CROMSIZE;
+	sc->dummy_dma.bus_addr = (bus_addr_t)(buf_phy + 
+			OHCI_SIDSIZE + CROMSIZE);
 
 	fwohci_db_init(sc, &sc->arrq);
 	if ((sc->arrq.flags & FWOHCI_DBCH_INIT) == 0)
