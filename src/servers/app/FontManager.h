@@ -45,12 +45,14 @@ class FontManager : public BLooper {
 		int32 CountFamilies();
 
 		int32 CountStyles(const char *family);
+		int32 CountStyles(uint16 familyID);
 		FontFamily* FamilyAt(int32 index) const;
 
 		FontFamily *GetFamily(uint16 familyID) const;
 		FontFamily *GetFamily(const char *name);
 
 		FontStyle *GetStyleByIndex(const char *family, int32 index);
+		FontStyle *GetStyleByIndex(uint16 familyID, int32 index);
 		FontStyle *GetStyle(const char *family, const char *style, uint16 familyID = 0xffff,
 						uint16 styleID = 0xffff, uint16 face = 0);
 		FontStyle *GetStyle(const char *family, uint16 styleID);

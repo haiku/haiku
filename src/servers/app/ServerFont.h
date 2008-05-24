@@ -93,7 +93,7 @@ class ServerFont {
 									{ fRotation = value; }
 			void				SetFalseBoldWidth(float value)
 									{ fFalseBoldWidth = value; }
-			void				SetFace(uint32 face);
+			status_t			SetFace(uint16 face);
 
 			bool				IsFixedWidth() const
 									{ return fStyle->IsFixedWidth(); }

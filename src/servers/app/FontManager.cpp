@@ -862,6 +862,23 @@ FontManager::CountStyles(const char *familyName)
 }
 
 
+/*!	\brief Counts the number of styles available in a font family
+	\param family Name of the font family to scan
+	\return The number of font styles currently available for the font family
+*/
+int32
+FontManager::CountStyles(uint16 familyID)
+{
+	_ScanFontsIfNecessary();
+
+	FontFamily *family = GetFamily(familyID);
+	if (family)
+		return family->CountStyles();
+
+	return 0;
+}
+
+
 FontFamily*
 FontManager::FamilyAt(int32 index) const
 {
@@ -928,6 +945,17 @@ FontStyle*
 FontManager::GetStyleByIndex(const char* familyName, int32 index)
 {
 	FontFamily* family = GetFamily(familyName);
+	if (family != NULL)
+		return family->StyleAt(index);
+
+	return NULL;
+}
+
+
+FontStyle*
+FontManager::GetStyleByIndex(uint16 familyID, int32 index)
+{
+	FontFamily* family = GetFamily(familyID);
 	if (family != NULL)
 		return family->StyleAt(index);
 

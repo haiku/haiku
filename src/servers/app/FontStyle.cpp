@@ -222,7 +222,7 @@ FontStyle::_SetFontFamily(FontFamily* family, uint16 id)
 
 
 uint16
-FontStyle::_TranslateStyleToFace(const char *name) const
+FontStyle::_TranslateStyleToFace(const char* name) const
 {
 	if (name == NULL)
 		return 0;
@@ -236,6 +236,16 @@ FontStyle::_TranslateStyleToFace(const char *name) const
 	if (string.IFindFirst("italic") >= 0
 		|| string.IFindFirst("oblique") >= 0)
 		face |= B_ITALIC_FACE;
+
+	if (string.IFindFirst("condensed") >= 0)
+		face |= B_CONDENSED_FACE;
+
+	if (string.IFindFirst("light") >= 0)
+		face |= B_LIGHT_FACE;
+
+	if (string.IFindFirst("heavy") >= 0
+		|| string.IFindFirst("black") >= 0)
+		face |= B_HEAVY_FACE;
 
 	if (face == 0)
 		return B_REGULAR_FACE;

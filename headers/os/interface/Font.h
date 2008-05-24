@@ -74,7 +74,11 @@ enum {
 	B_OUTLINED_FACE			= 0x0008,
 	B_STRIKEOUT_FACE		= 0x0010,
 	B_BOLD_FACE				= 0x0020,
-	B_REGULAR_FACE			= 0x0040
+	B_REGULAR_FACE			= 0x0040,
+	// new in Haiku:
+	B_CONDENSED_FACE		= 0x0080,
+	B_LIGHT_FACE			= 0x0100,
+	B_HEAVY_FACE			= 0x0200,
 };
 
 enum font_metric_mode {

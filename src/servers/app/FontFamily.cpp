@@ -259,8 +259,9 @@ FontFamily::GetStyleByID(uint16 id) const
 FontStyle*
 FontFamily::GetStyleMatchingFace(uint16 face) const
 {
-	// we currently only use bold/italic/regular faces
-	face &= B_BOLD_FACE | B_ITALIC_FACE | B_REGULAR_FACE;
+	// TODO: support other faces (strike through, underlined, outlines...)
+	face &= B_BOLD_FACE | B_ITALIC_FACE | B_REGULAR_FACE | B_CONDENSED_FACE
+		| B_LIGHT_FACE | B_HEAVY_FACE;
 
 	int32 count = fStyles.CountItems();
 	for (int32 i = 0; i < count; i++) {

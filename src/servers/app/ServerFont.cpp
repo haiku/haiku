@@ -292,11 +292,40 @@ ServerFont::SetFamilyAndStyle(uint32 fontID)
 }
 
 
-void
-ServerFont::SetFace(uint32 face)
+status_t
+ServerFont::SetFace(uint16 face)
 {
-	// TODO: change font style as requested!
-	fFace = face;
+	// TODO: This needs further investigation. The face variable is actually
+	// flags, but some of them are not enforcable at the same time. Also don't
+	// confuse the Be API "face" with the Freetype face, which is just an
+	// index in case a single font file exports multiple font faces. The
+	// FontStyle class takes care of mapping the font style name to the Be
+	// API face flags in FontStyle::_TranslateStyleToFace().
+
+	FontStyle* style = NULL;
+	uint16 familyID = FamilyID();
+	if (gFontManager->Lock()) {
+		int32 count = gFontManager->CountStyles(familyID);
+		for (int32 i = 0; i < count; i++) {
+			style = gFontManager->GetStyleByIndex(familyID, i);
+			if (style == NULL)
+				break;
+			if (style->Face() == face) {
+				style->Acquire();
+				break;
+			}
+		}
+
+		gFontManager->Unlock();
+	}
+
+	if (!style)
+		return B_ERROR;
+
+	SetStyle(style);
+	style->Release();
+
+	return B_OK;
 }
 
 
