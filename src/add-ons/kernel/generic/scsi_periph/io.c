@@ -228,10 +228,12 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 
 	request->flags = 0;
 
-	if (cmd->flags & B_RAW_DEVICE_DATA_IN)
+	if (cmd->flags & B_RAW_DEVICE_DATA_IN) 
 		request->flags |= SCSI_DIR_IN;
-	else
+	else if (cmd->data_length)
 		request->flags |= SCSI_DIR_OUT;
+	else
+		request->flags |= SCSI_DIR_NONE;
 
 	request->data = cmd->data;
 	request->sg_list = NULL;

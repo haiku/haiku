@@ -39,7 +39,7 @@ scsi_scan_send_tur(scsi_ccb *worker_req)
 	worker_req->cdb_length = sizeof(*cmd);
 	worker_req->timeout = 0;
 	worker_req->sort = -1;
-	worker_req->flags = 0;
+	worker_req->flags = SCSI_DIR_NONE;
 	
 	scsi_sync_io( worker_req );
 	
