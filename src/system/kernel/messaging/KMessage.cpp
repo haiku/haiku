@@ -583,10 +583,14 @@ KMessage::ReceiveFrom(port_id fromPort, bigtime_t timeout,
 	int32 what;
 	ssize_t realSize = read_port_etc(fromPort, &what, buffer, messageInfo->size,
 		B_RELATIVE_TIMEOUT, 0);
-	if (realSize < 0)
+	if (realSize < 0) {
+		free(buffer);
 		return realSize;
-	if (messageInfo->size != (size_t)realSize)
+	}
+	if (messageInfo->size != (size_t)realSize) {
+		free(buffer);
 		return B_ERROR;
+	}
 
 	// init the message
 	return SetTo(buffer, messageInfo->size, 0,
