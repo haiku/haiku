@@ -114,8 +114,10 @@ PrefWindow::QuitRequested()
 void
 PrefWindow::_SaveAs()
 {
-	if (!fSavePanel)
-		fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this));
+	if (!fSavePanel) {
+		BMessenger messenger(this);
+		fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger);
+	}
 	
 	fSavePanel->Show();
 }
