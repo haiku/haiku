@@ -270,6 +270,20 @@ BMediaTrack::CurrentTime() const
 	return fCurTime;
 }
 
+// BMediaTrack::ReadFrames(char *, long long *, media_header *)
+// Compatibility for R5 and below. Required by Corum III and Civ:CTP.
+#if __GNUC__ < 3
+
+extern "C" status_t
+ReadFrames__11BMediaTrackPcPxP12media_header(BMediaTrack *self,
+											 char *out_buffer,
+											 int64 *out_frameCount,
+											 media_header *mh)
+{
+	return self->ReadFrames(out_buffer, out_frameCount, mh, 0);
+}
+
+#endif	// __GNUC__ < 3
 
 status_t
 BMediaTrack::ReadFrames(void *out_buffer,
