@@ -1153,8 +1153,10 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 					bytes = bufferSize;
 
 				if ((status = cbuf_user_memcpy_to_chain(msg->buffer_chain,
-						0, msgVecs[i].iov_base, bytes)) < B_OK)
+						0, msgVecs[i].iov_base, bytes)) < B_OK) {
+					put_port_msg(msg);
 					return status;
+				}
 
 				bufferSize -= bytes;
 				if (bufferSize == 0)
@@ -1168,8 +1170,10 @@ writev_port_etc(port_id id, int32 msgCode, const iovec *msgVecs,
 					bytes = bufferSize;
 
 				if ((status = cbuf_memcpy_to_chain(msg->buffer_chain,
-						0, msgVecs[i].iov_base, bytes)) < 0)
+						0, msgVecs[i].iov_base, bytes)) < 0) {
+					put_port_msg(msg);
 					return status;
+				}
 
 				bufferSize -= bytes;
 				if (bufferSize == 0)
