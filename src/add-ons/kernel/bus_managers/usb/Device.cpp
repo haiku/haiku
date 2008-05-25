@@ -73,6 +73,8 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 		return;
 	}
 
+	memset(fConfigurations, 0, fDeviceDescriptor.num_configurations
+		* sizeof(usb_configuration_info));
 	for (int32 i = 0; i < fDeviceDescriptor.num_configurations; i++) {
 		usb_configuration_descriptor configDescriptor;
 		status = GetDescriptor(USB_DESCRIPTOR_CONFIGURATION, i, 0,
@@ -96,12 +98,20 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 		TRACE(("\tmax_power:...........%d\n", configDescriptor.max_power));
 
 		uint8 *configData = (uint8 *)malloc(configDescriptor.total_length);
+		if (configData == NULL) {
+			TRACE_ERROR(("USB Device %d: out of memory when reading config\n",
+				fDeviceAddress));
+			return;
+		}
+
 		status = GetDescriptor(USB_DESCRIPTOR_CONFIGURATION, i, 0,
 			(void *)configData, configDescriptor.total_length, &actualLength);
 
 		if (status < B_OK || actualLength != configDescriptor.total_length) {
 			TRACE_ERROR(("USB Device %d: error fetching full configuration"
-				" descriptor %ld\n", fDeviceAddress, i));
+				" descriptor %ld got %lu expected %u\n", fDeviceAddress, i,
+				actualLength, configDescriptor.total_length));
+			free(configData);
 			return;
 		}
 
@@ -111,6 +121,12 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 		fConfigurations[i].interface_count = configuration->number_interfaces;
 		fConfigurations[i].interface = (usb_interface_list *)malloc(
 			configuration->number_interfaces * sizeof(usb_interface_list));
+		if (fConfigurations[i].interface == NULL) {
+			TRACE_ERROR(("USB Device %d: out of memory when creating interfaces\n",
+				fDeviceAddress));
+			return;
+		}
+
 		memset(fConfigurations[i].interface, 0,
 			configuration->number_interfaces * sizeof(usb_interface_list));
 
@@ -137,9 +153,17 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 
 					/* Allocate this alternate */
 					interfaceList->alt_count++;
-					interfaceList->alt = (usb_interface_info *)realloc(
-						interfaceList->alt, interfaceList->alt_count
-						* sizeof(usb_interface_info));
+					usb_interface_info *newAlternates
+						= (usb_interface_info *)realloc(interfaceList->alt,
+						interfaceList->alt_count * sizeof(usb_interface_info));
+					if (newAlternates == NULL) {
+						TRACE_ERROR(("USB Device %d: out of memory allocating"
+							" alternate interface\n", fDeviceAddress));
+						interfaceList->alt_count--;
+						return;
+					}
+
+					interfaceList->alt = newAlternates;
 
 					/* Set active interface always to the first one */
 					interfaceList->active = interfaceList->alt;
@@ -155,8 +179,13 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 
 					Interface *interface = new(std::nothrow) Interface(this,
 						interfaceDescriptor->interface_number);
-					interfaceInfo->handle = interface->USBID();
+					if (interface == NULL) {
+						TRACE_ERROR(("USB Device %d: failed to allocate"
+							" interface object\n", fDeviceAddress));
+						return;
+					}
 
+					interfaceInfo->handle = interface->USBID();
 					currentInterface = interfaceInfo;
 					break;
 				}
@@ -177,10 +206,19 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 
 					/* allocate this endpoint */
 					currentInterface->endpoint_count++;
-					currentInterface->endpoint = (usb_endpoint_info *)realloc(
+					usb_endpoint_info *newEndpoints
+						= (usb_endpoint_info *)realloc(
 						currentInterface->endpoint,
 						currentInterface->endpoint_count
 						* sizeof(usb_endpoint_info));
+					if (newEndpoints == NULL) {
+						TRACE_ERROR(("USB Device %d: out of memory allocating"
+							" new endpoint\n", fDeviceAddress));
+						currentInterface->endpoint_count--;
+						return;
+					}
+
+					currentInterface->endpoint = newEndpoints;
 
 					/* setup this endpoint */
 					usb_endpoint_info *endpointInfo =
@@ -202,10 +240,18 @@ Device::Device(Object *parent, int8 hubPort, usb_device_descriptor &desc,
 
 					/* allocate this descriptor */
 					currentInterface->generic_count++;
-					currentInterface->generic = (usb_descriptor **)realloc(
+					usb_descriptor **newGenerics = (usb_descriptor **)realloc(
 						currentInterface->generic,
 						currentInterface->generic_count
 						* sizeof(usb_descriptor *));
+					if (newGenerics == NULL) {
+						TRACE_ERROR(("USB Device %d: out of memory allocating"
+							" generic descriptor\n", fDeviceAddress));
+						currentInterface->generic_count--;
+						return;
+					}
+
+					currentInterface->generic = newGenerics;
 
 					/* add this descriptor */
 					currentInterface->generic[currentInterface->generic_count - 1] =
@@ -239,8 +285,18 @@ Device::~Device()
 	// Free all allocated resources
 	for (int32 i = 0; i < fDeviceDescriptor.num_configurations; i++) {
 		usb_configuration_info *configuration = &fConfigurations[i];
+		if (configuration == NULL)
+			continue;
+
+		free(configuration->descr);
+		if (configuration->interface == NULL)
+			continue;
+
 		for (size_t j = 0; j < configuration->interface_count; j++) {
 			usb_interface_list *interfaceList = &configuration->interface[j];
+			if (interfaceList->alt == NULL)
+				continue;
+
 			for (size_t k = 0; k < interfaceList->alt_count; k++) {
 				usb_interface_info *interface = &interfaceList->alt[k];
 				delete (Interface *)GetStack()->GetObject(interface->handle);
@@ -252,7 +308,6 @@ Device::~Device()
 		}
 
 		free(configuration->interface);
-		free(configuration->descr);
 	}
 
 	free(fConfigurations);
@@ -463,11 +518,17 @@ Device::Unconfigure(bool atDeviceLevel)
 void
 Device::ClearEndpoints(int32 interfaceIndex)
 {
+	if (fCurrentConfiguration == NULL || fCurrentConfiguration->interface == NULL)
+		return;
+
 	for (size_t j = 0; j < fCurrentConfiguration->interface_count; j++) {
 		if (interfaceIndex >= 0 && j != (size_t)interfaceIndex)
 			continue;
 
 		usb_interface_info *interfaceInfo = fCurrentConfiguration->interface[j].active;
+		if (interfaceInfo == NULL || interfaceInfo->endpoint == NULL)
+			continue;
+
 		for (size_t i = 0; i < interfaceInfo->endpoint_count; i++) {
 			usb_endpoint_info *endpoint = &interfaceInfo->endpoint[i];
 			delete (Pipe *)GetStack()->GetObject(endpoint->handle);
