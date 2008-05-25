@@ -149,6 +149,12 @@ typedef struct
 
 } report_insn;
 
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+int sign_extend(int value, int size);
+
 int decompose_report_descriptor
 	(const unsigned char *desc,
 	size_t desc_len,
@@ -162,3 +168,7 @@ int parse_report_descriptor
 	size_t *num_insns,
 	size_t *total_report_size,
 	int *first_report_id);
+
+#if defined(__cplusplus)
+}
+#endif

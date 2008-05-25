@@ -41,6 +41,16 @@
 	decompose report descriptor into array of uniform structure
 */
 
+int
+sign_extend(int value, int size)
+{
+	if (value & (1 << (size - 1)))
+		return value | (UINT_MAX << size);
+
+	return value;
+}
+
+
 int 
 decompose_report_descriptor(const unsigned char *desc,
 	size_t desc_len, decomp_item *items, size_t *num_items)
