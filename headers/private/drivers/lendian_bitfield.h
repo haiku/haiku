@@ -7,7 +7,6 @@
 #define LENDIAN_BITFIELD_H
 
 #include <ByteOrder.h>
-#define B_HOST_IS_LENDIAN 1
 
 #if B_HOST_IS_BENDIAN
 
