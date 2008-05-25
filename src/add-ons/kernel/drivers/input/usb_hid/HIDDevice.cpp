@@ -275,6 +275,7 @@ void
 HIDDevice::Removed()
 {
 	fRemoved = true;
+	gUSBModule->cancel_queued_transfers(fInterruptPipe);
 }
 
 
@@ -297,6 +298,8 @@ HIDDevice::_ScheduleTransfer()
 {
 	if (fTransferUnprocessed)
 		return B_BUSY;
+	if (fRemoved)
+		return B_ERROR;
 
 	status_t result = gUSBModule->queue_interrupt(fInterruptPipe,
 		fTransferBuffer, fTotalReportSize, _TransferCallback, this);

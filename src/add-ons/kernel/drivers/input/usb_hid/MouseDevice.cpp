@@ -78,6 +78,17 @@ MouseDevice::Control(uint32 op, void *buffer, size_t length)
 status_t
 MouseDevice::_InterpretBuffer()
 {
+	if (fTransferStatus != B_OK) {
+		if (IsRemoved())
+			return B_ERROR;
+
+		if (gUSBModule->clear_feature(fInterruptPipe,
+			USB_FEATURE_ENDPOINT_HALT) != B_OK)
+			return B_ERROR;
+
+		return B_OK;
+	}
+
 	mouse_movement info;
 	memset(&info, 0, sizeof(info));
 	for (size_t i = 0; i < fInstructionCount; i++) {

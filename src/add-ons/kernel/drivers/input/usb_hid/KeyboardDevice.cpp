@@ -106,6 +106,9 @@ KeyboardDevice::_WriteKey(uint32 key, bool down)
 status_t
 KeyboardDevice::_SetLEDs(uint8 *data)
 {
+	if (IsRemoved())
+		return B_ERROR;
+
 	uint8 leds = 0;
 	if (data[0] == 1)
 		leds |= (1 << 0);
@@ -126,6 +129,17 @@ KeyboardDevice::_SetLEDs(uint8 *data)
 status_t
 KeyboardDevice::_InterpretBuffer()
 {
+	if (fTransferStatus != B_OK) {
+		if (IsRemoved())
+			return B_ERROR;
+
+		if (gUSBModule->clear_feature(fInterruptPipe,
+			USB_FEATURE_ENDPOINT_HALT) != B_OK)
+			return B_ERROR;
+
+		return B_OK;
+	}
+
 	static uint32 sModifierTable[] = {
 		KEY_ControlL,
 		KEY_ShiftL,
