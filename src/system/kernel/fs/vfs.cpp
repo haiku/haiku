@@ -1362,7 +1362,7 @@ acquire_advisory_lock(struct vnode *vnode, pid_t session, struct flock *flock,
 		LockList::Iterator iterator = locking->locks.GetIterator();
 		while (iterator.HasNext()) {
 			struct advisory_lock *lock = iterator.Next();
-	
+
 			// TODO: locks from the same team might be joinable!
 			if (lock->team != team && advisory_lock_intersects(lock, flock)) {
 				// locks do overlap
@@ -3192,7 +3192,7 @@ publish_vnode(fs_volume *volume, ino_t vnodeID, void *privateNode,
 
 
 extern "C" status_t
-get_vnode(fs_volume *volume, ino_t vnodeID, void **fsNode)
+get_vnode(fs_volume *volume, ino_t vnodeID, void **_fsNode)
 {
 	struct vnode *vnode;
 
@@ -3216,9 +3216,10 @@ get_vnode(fs_volume *volume, ino_t vnodeID, void **fsNode)
 			return status;
 		}
 
-		*fsNode = resolvedNode.private_node;
-	} else
-		*fsNode = vnode->private_node;
+		if (_fsNode != NULL)
+			*_fsNode = resolvedNode.private_node;
+	} else if (_fsNode != NULL)
+		*_fsNode = vnode->private_node;
 
 	return B_OK;
 }
