@@ -5,18 +5,13 @@
 #ifndef __IDE_INTERNAL_H__
 #define __IDE_INTERNAL_H__
 
-/*
-	Part of Open IDE bus manager
-
-	Internal structures
-*/
-
-
 #include <bus/IDE.h>
 #include <bus/SCSI.h>
-#include "ide_device_infoblock.h"
-#include <ide_types.h>
 #include <device_manager.h>
+
+#include <ide_types.h>
+
+#include "ide_device_infoblock.h"
 #include "ata_request.h"
 
 #define debug_level_error 2
@@ -39,7 +34,7 @@
 // node item containing channel id (uint32)
 #define IDE_CHANNEL_ID_ITEM "ide/channel_id"
 // SIM interface
-#define IDE_SIM_MODULE_NAME "bus_managers/ide/sim/v1"
+#define IDE_SIM_MODULE_NAME "bus_managers/ide/sim/driver_v1"
 
 
 extern device_manager_info *pnp;
@@ -61,8 +56,6 @@ typedef struct ide_bus_timer_info {
 } ide_bus_timer_info;
 
 
-
-
 typedef struct ide_device_info {
 	struct ide_bus_info *bus;
 
@@ -73,11 +66,10 @@ typedef struct ide_device_info {
 	uint8 DMA_enabled : 1;			// DMA enabled
 	uint8 is_device1 : 1;			// true for slave, false for master
 
-	uint8 last_lun;					// last LUN 
+	uint8 last_lun;					// last LUN
 
 	uint8 DMA_failures;				// DMA failures in a row
 	uint8 num_failed_send;			// number of consequetive send problems
-
 
 	struct ata_request *	requestActive;
 	struct ata_request *	requestFree;
@@ -93,7 +85,7 @@ typedef struct ide_device_info {
 	// ata from here on
 	uint64 total_sectors;			// size in sectors
 
-	// atapi from here on	
+	// atapi from here on
 	uint8 packet[12];				// atapi command packet
 
 	struct {
@@ -113,7 +105,7 @@ typedef struct ide_device_info {
 	bool has_odd_byte;				// remaining odd byte
 	int odd_byte;					// content off odd byte
 
-	ide_device_infoblock infoblock;	// infoblock of device	
+	ide_device_infoblock infoblock;	// infoblock of device
 } ide_device_info;
 
 
@@ -137,7 +129,6 @@ typedef enum {
 
 
 struct ide_bus_info {
-
 	// controller
 	ide_controller_interface *controller;
 	void *channel_cookie;
@@ -163,7 +154,7 @@ struct ide_bus_info {
 
 	uchar path_id;
 
-	device_node_handle node;		// our pnp node
+	device_node *node;		// our pnp node
 
 	// restrictions, read from controller node
 	uint8 max_devices;

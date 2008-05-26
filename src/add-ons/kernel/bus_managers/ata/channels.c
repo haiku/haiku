@@ -4,12 +4,10 @@
  */
 
 /*
-	Part of Open IDE bus manager
-
 	Manager of IDE controllers
 
 	Whenever a new IDE channel is reported, a new SIM is
-	registered at the SCSI bus manager. 
+	registered at the SCSI bus manager.
 */
 
 #include "ide_internal.h"
@@ -23,12 +21,11 @@
 #define TRACE dprintf
 
 
-/** called when an IDE channel was registered by a controller driver */
-
+/*!	Called when an IDE channel was registered by a controller driver */
 static status_t
-ide_channel_added(device_node_handle parent)
+ide_channel_added(device_node *parent)
 {
-	char *controller_name = NULL;
+	const char *controller_name = NULL;
 	uint32 channel_id;
 
 	TRACE("ide_channel_added, parent is %p\n", parent);
@@ -49,10 +46,9 @@ ide_channel_added(device_node_handle parent)
 	{
 		device_attr attrs[] =
 		{
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: IDE_SIM_MODULE_NAME }},
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: SCSI_FOR_SIM_MODULE_NAME }},
+			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: SCSI_FOR_SIM_MODULE_NAME }},
 
-			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE, 
+			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
 				{ string: controller_name }},
 			// maximum number of blocks per transmission:
 			// - ATAPI uses packets, i.e. normal SCSI limits apply
@@ -61,31 +57,23 @@ ide_channel_added(device_node_handle parent)
 			// - some broken disk's firmware (read: IBM DTTA drives)
 			//   don't like 256 blocks in command queuing mode
 			// -> use 255 blocks as a least common nominator
-			//    (this is still 127.5K for HDs and 510K for CDs, 
+			//    (this is still 127.5K for HDs and 510K for CDs,
 			//     which should be sufficient)
 			// Note: to fix specific drive bugs, use ide_sim_get_restrictions()
 			// in ide_sim.c!
 			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: 255 }},
 			{ IDE_CHANNEL_ID_ITEM, B_UINT32_TYPE, { ui32: channel_id }},
-			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: IDE_CHANNEL_ID_GENERATOR }},
-			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: channel_id }},
+//			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: IDE_CHANNEL_ID_GENERATOR }},
+//			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: channel_id }},
 
 			{ NULL }
 		};
 
-		device_node_handle node;
-		status_t res;
-
-		res = pnp->register_device(parent, attrs, NULL, &node);
-
-		free(controller_name);
-
-		return res;
+		return pnp->register_node(parent, IDE_SIM_MODULE_NAME, attrs, NULL,
+			NULL);
 	}
 
 err:
-	free(controller_name);
-
 	return B_NO_MEMORY;
 }
 

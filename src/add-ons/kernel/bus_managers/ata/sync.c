@@ -129,7 +129,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			IDE_UNLOCK(bus);
 
 			scsi->schedule_dpc(bus->scsi_cookie, bus->irq_dpc, ide_dpc, bus);
-			return B_INVOKE_SCHEDULER; 
+			return B_INVOKE_SCHEDULER;
 
 		case ide_state_idle:
 			TRACE(("state: idle, num_running_reqs %d\n", bus->num_running_reqs));
@@ -319,7 +319,7 @@ ide_timeout(timer *arg)
 
 		default:
 			// this case also happens if a timeout fires too late;
-			// unless there is a bug, the timeout should always be canceled 
+			// unless there is a bug, the timeout should always be canceled
 			// before declaring bus as being idle
 			dprintf("BUG: unknown state (%d)\n", (int)bus->state);
 
@@ -333,7 +333,7 @@ ide_timeout(timer *arg)
 
 
 
-/**	finish bus access; 
+/**	finish bus access;
  *	check if any device wants to service pending commands + execute synced_pc
  */
 

@@ -1,20 +1,18 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Open IDE bus manager
-
 	Interface between ide bus manager and scsi bus manager.
 
 	The IDE bus manager has a bit unusual structure as it
 	consists of a single level only. In fact it is no bus manager
 	in terms of the PnP structure at all but a driver that maps
 	one SCSI bus onto one IDE controller.
-	
+
 	This structure does not allow us to publish IDE devices
 	as they can be accessed via the SCSI bus node only. Therefore
 	we do a full bus scan every time the IDE bus node is loaded.
@@ -103,7 +101,7 @@ err_disconnected:
 static uchar
 sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 {
-	char *controller_name;
+	const char *controller_name;
 
 	FLOW("sim_path_inquiry, bus %p\n", bus);
 
@@ -128,7 +126,6 @@ sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
 	if (pnp->get_attr_string(bus->node, SCSI_DESCRIPTION_CONTROLLER_NAME,
 			&controller_name, true) == B_OK) {
 		strlcpy(info->hba_vid, controller_name, SCSI_HBA_ID);
-		free(controller_name);
 	} else
 		strlcpy(info->hba_vid, "", SCSI_HBA_ID);
 
@@ -199,6 +196,17 @@ scan_bus(ide_bus_info *bus)
 	TRACE("ATA: scan_bus: bus %p finished\n", bus);
 }
 
+
+static void
+sim_set_scsi_bus(ide_bus_info *bus, scsi_bus scsi)
+{
+	bus->scsi_cookie = scsi;
+
+	// detect devices
+	scan_bus(bus);
+}
+
+
 static uchar
 sim_rescan_bus(ide_bus_info *bus)
 {
@@ -253,9 +261,9 @@ sim_reset_device(ide_bus_info *bus, uchar target_id, uchar target_lun)
 
 
 static status_t
-ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
+ide_sim_init_bus(device_node *node, void **cookie)
 {
-	device_node_handle parent;
+	device_node *parent;
 	ide_bus_info *bus;
 	bool dmaDisabled = false;
 	status_t status;
@@ -280,7 +288,6 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		sprintf(bus->name, "ide_bus %d", (int)channel_id);
 	}
 
-	bus->scsi_cookie = user_cookie;
 	bus->timer.bus = bus;
 
 	if ((status = scsi->alloc_dpc(&bus->irq_dpc)) < B_OK)
@@ -293,7 +300,7 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	bus->devices[1] = NULL;
 
 	status = INIT_BEN(&bus->status_report_ben, "ide_status_report");
-	if (status < B_OK) 
+	if (status < B_OK)
 		goto err4;
 
 	{
@@ -324,19 +331,16 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 
 	SHOW_FLOW(2, "can_dma: %d", bus->can_DMA);
 
-	parent = pnp->get_parent(node);
+	parent = pnp->get_parent_node(node);
 
-	status = pnp->init_driver(parent, bus, (driver_module_info **)&bus->controller, 
+	status = pnp->get_driver(parent, (driver_module_info **)&bus->controller, 
 		(void **)&bus->channel_cookie);
 
-	pnp->put_device_node(parent);
+	pnp->put_node(parent);
 	if (status != B_OK)
 		goto err5;
 
 	*cookie = bus;
-
-	// detect devices
-	scan_bus(bus);
 	return B_OK;
 
 err5:
@@ -350,28 +354,20 @@ err1:
 }
 
 
-static status_t
+static void
 ide_sim_uninit_bus(ide_bus_info *bus)
 {
-	device_node_handle parent;
-
 	FLOW("ide_sim_uninit_bus: bus %p\n", bus);
-
-	parent = pnp->get_parent(bus->node);
-	pnp->uninit_driver(parent);
-	pnp->put_device_node(parent);
 
 	DELETE_BEN(&bus->status_report_ben);	
 	scsi->free_dpc(bus->irq_dpc);
 
 	free(bus);
-
-	return B_OK;
 }
 
 
 static void
-ide_sim_bus_removed(device_node_handle node, ide_bus_info *bus)
+ide_sim_bus_removed(ide_bus_info *bus)
 {	
 	FLOW("ide_sim_bus_removed\n");
 
@@ -412,9 +408,9 @@ ide_sim_get_restrictions(ide_bus_info *bus, uchar target_id,
 	*max_blocks = 255;
 
 	if (device->is_atapi) {
-		if (strncmp(device->infoblock.model_number, "IOMEGA  ZIP 100       ATAPI", 
+		if (strncmp(device->infoblock.model_number, "IOMEGA  ZIP 100       ATAPI",
 		 		strlen("IOMEGA  ZIP 100       ATAPI")) == 0
-		 	|| strncmp( device->infoblock.model_number, "IOMEGA  Clik!", 
+		 	|| strncmp( device->infoblock.model_number, "IOMEGA  Clik!",
 		 		strlen( "IOMEGA  Clik!")) == 0) {
 			SHOW_ERROR0(2, "Found buggy ZIP/Clik! drive - restricting transmission size");
 			*max_blocks = 64;
@@ -493,13 +489,18 @@ scsi_sim_interface ide_sim_module = {
 			std_ops,
 		},
 
-		NULL,	// supported devices				
+		NULL,	// supported devices
 		NULL,	// register node
-		(status_t (*)(device_node_handle, void *, void **))ide_sim_init_bus,
-		(status_t (*)(void *)	) 					ide_sim_uninit_bus,
-		(void (*)(device_node_handle, void *))		ide_sim_bus_removed
+		(status_t (*)(device_node *, void **))		ide_sim_init_bus,
+		(void (*)(void *)) 							ide_sim_uninit_bus,
+		NULL,	// register child devices
+		NULL,	// rescan
+		(void (*)(void *))							ide_sim_bus_removed,
+		NULL,	// suspend
+		NULL	// resume
 	},
 
+	(void (*)(scsi_sim_cookie, scsi_bus))			sim_set_scsi_bus,
 	(void (*)(scsi_sim_cookie, scsi_ccb *))			sim_scsi_io,
 	(uchar (*)(scsi_sim_cookie, scsi_ccb *))		sim_abort,
 	(uchar (*)(scsi_sim_cookie, uchar, uchar)) 		sim_reset_device,
@@ -508,8 +509,8 @@ scsi_sim_interface ide_sim_module = {
 	(uchar (*)(scsi_sim_cookie, scsi_path_inquiry *))sim_path_inquiry,
 	(uchar (*)(scsi_sim_cookie))					sim_rescan_bus,
 	(uchar (*)(scsi_sim_cookie))					sim_reset_bus,
-	
-	(void (*)(scsi_sim_cookie, uchar, 
+
+	(void (*)(scsi_sim_cookie, uchar,
 		bool*, bool *, uint32 *))					ide_sim_get_restrictions,
 
 	(status_t (*)(scsi_sim_cookie, uint8, uint32, void *, size_t))ide_sim_ioctl,
