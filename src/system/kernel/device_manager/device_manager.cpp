@@ -1956,7 +1956,7 @@ device_node::FindChild(const char* moduleName) const
 
 
 void
-device_node::Dump(int32 level = 0)
+device_node::Dump(int32 level)
 {
 	put_level(level);
 	dprintf("(%ld) @%p \"%s\" (ref %ld, init %ld, module %p, data %p)\n", level,
