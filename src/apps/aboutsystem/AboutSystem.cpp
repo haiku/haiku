@@ -450,6 +450,7 @@ AboutView::AboutView(const BRect &rect)
 		"Maurice Kalinowski\n"
 		"Vasilis Kaoutsis\n"
 		"James Kim\n"
+		"Shintaro Kinugawa\n"
 		"Jan Klötzke\n"
 		"Marcin Konicki\n"
 		"Kurtis Kopf\n"
@@ -502,7 +503,7 @@ AboutView::AboutView(const BRect &rect)
 		"Nathan Whitehorn\n"
 		"Michael Wilber\n"
 		"Ulrich Wimboeck\n"
-		"James Woodcock\n" // getpagesize() patch
+		"James Woodcock\n"
 		"Artur Wyszynski\n"
 		"Gabe Yoder\n"
 		"Gerald Zajac\n"
