@@ -27,7 +27,7 @@ static mutex sDriverLock;
 // #pragma mark - notify hooks
 
 
-static status_t
+status_t
 usb_hid_device_added(usb_device device, void **cookie)
 {
 	TRACE("device_added()\n");
@@ -95,7 +95,7 @@ usb_hid_device_added(usb_device device, void **cookie)
 }
 
 
-static status_t
+status_t
 usb_hid_device_removed(void *cookie)
 {
 	mutex_lock(&sDriverLock);
