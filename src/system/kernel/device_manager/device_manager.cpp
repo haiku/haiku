@@ -1426,7 +1426,7 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 						_AddPath(*stack, "busses", "sata");
 						break;
 					default:
-						_AddPath(*stack, "busses", "disk");
+						_AddPath(*stack, "busses");
 						break;
 				}
 				break;
