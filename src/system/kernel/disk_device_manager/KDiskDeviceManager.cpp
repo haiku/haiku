@@ -73,20 +73,20 @@ struct KDiskDeviceManager::PartitionMap : VectorMap<partition_id, KPartition*,
 	VectorMapEntryStrategy::ImplicitKey<partition_id, KPartition*,
 		GetPartitionID> > {
 };
-	
+
 // DeviceMap
 struct KDiskDeviceManager::DeviceMap : VectorMap<partition_id, KDiskDevice*,
 	VectorMapEntryStrategy::ImplicitKey<partition_id, KDiskDevice*,
 		GetPartitionID> > {
 };
-	
+
 // DiskSystemMap
 struct KDiskDeviceManager::DiskSystemMap : VectorMap<disk_system_id,
 	KDiskSystem*,
 	VectorMapEntryStrategy::ImplicitKey<disk_system_id, KDiskSystem*,
 		GetDiskSystemID> > {
 };
-	
+
 // PartitionSet
 struct KDiskDeviceManager::PartitionSet : VectorSet<KPartition*> {
 };
@@ -938,7 +938,7 @@ KDiskDeviceManager::_RescanDiskSystems(bool fileSystems)
 			break;
 		}
 		name.UnlockBuffer();
-	
+
 		if (FindDiskSystem(name.Path()))
 			continue;
 
@@ -1241,7 +1241,7 @@ KDiskDeviceManager::_ScanPartition(KPartition *partition)
 		void *cookie = NULL;
 		float priority = diskSystem->Identify(partition, &cookie);
 
-		DBG(OUT("  returned: %ld/1000\n", int32(1000 * priority)));
+		DBG(OUT("  returned: %g\n", priority));
 
 		if (priority >= 0 && priority > bestPriority) {
 			// new best disk system
