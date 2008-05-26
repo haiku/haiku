@@ -1,5 +1,12 @@
+/*
+ * Copyright 2006, Ingo Weinhold. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "pci_io.h"
-#include "pci_priv.h"
+#include "pci_private.h"
+
 
 status_t
 pci_io_init()

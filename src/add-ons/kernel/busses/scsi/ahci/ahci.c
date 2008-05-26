@@ -131,7 +131,7 @@ get_device_info(uint16 vendorID, uint16 deviceID, const char **name,
 
 
 static status_t
-register_sim(device_node_handle parent)
+register_sim(device_node *parent)
 {
 	int32 id = gDeviceManager->create_id(AHCI_ID_GENERATOR);
 	if (id < 0)
@@ -139,25 +139,22 @@ register_sim(device_node_handle parent)
 
 	{
 		device_attr attrs[] = {
-			{ B_DRIVER_MODULE, B_STRING_TYPE,
-				{ string: AHCI_SIM_MODULE_NAME }},
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE,
+			{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE,
 				{ string: SCSI_FOR_SIM_MODULE_NAME }},
 
-			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE, 
+			{ SCSI_DESCRIPTION_CONTROLLER_NAME, B_STRING_TYPE,
 				{ string: AHCI_DEVICE_MODULE_NAME }},
 			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: 255 }},
 			{ AHCI_ID_ITEM, B_UINT32_TYPE, { ui32: id }},
-			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE,
-				{ string: AHCI_ID_GENERATOR }},
-			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: id }},
+//			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE,
+//				{ string: AHCI_ID_GENERATOR }},
+//			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: id }},
 
 			{ NULL }
 		};
 
-		device_node_handle node;
-		status_t status = gDeviceManager->register_device(parent, attrs, NULL,
-			&node);
+		status_t status = gDeviceManager->register_node(parent,
+			AHCI_SIM_MODULE_NAME, attrs, NULL, NULL);
 		if (status < B_OK)
 			gDeviceManager->free_id(AHCI_ID_GENERATOR, id);
 
@@ -170,33 +167,38 @@ register_sim(device_node_handle parent)
 
 
 static float
-ahci_supports_device(device_node_handle parent, bool *_noConnection)
+ahci_supports_device(device_node *parent)
 {
-	uint8 baseClass, subClass, classAPI;
+	uint16 baseClass, subClass, classAPI;
 	uint16 vendorID;
 	uint16 deviceID;
-	bool isPCI;
 	const char *name;
-	char *bus;
+	const char *bus;
 
 	TRACE("ahci_supports_device\n");
 
-	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus,	false) < B_OK)
-		return 0.0f;
-	isPCI = !strcmp(bus, "pci");
-	free(bus);
-	if (!isPCI)
+	if (gDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false)
+			< B_OK)
 		return 0.0f;
 
-	if (gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_BASE_CLASS_ID_ITEM, &baseClass, false) < B_OK
-		|| gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_SUB_CLASS_ID_ITEM, &subClass, false) < B_OK
-		|| gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_API_ID_ITEM, &classAPI, false) < B_OK
-		|| gDeviceManager->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM, &vendorID, false) < B_OK
-		|| gDeviceManager->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM, &deviceID, false) < B_OK)
+	if (strcmp(bus, "pci"))
+		return 0.0f;
+
+	if (gDeviceManager->get_attr_uint16(parent, B_DEVICE_TYPE, &baseClass,
+				false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_SUB_TYPE, &subClass,
+				false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_INTERFACE,
+				&classAPI, false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_VENDOR_ID,
+				&vendorID, false) < B_OK
+		|| gDeviceManager->get_attr_uint16(parent, B_DEVICE_ID, &deviceID,
+				false) < B_OK)
 		return 0.0f;
 
 	if (get_device_info(vendorID, deviceID, &name, NULL) < B_OK) {
-		if (baseClass != PCI_mass_storage || subClass != PCI_sata || classAPI != PCI_sata_ahci)
+		if (baseClass != PCI_mass_storage || subClass != PCI_sata
+			|| classAPI != PCI_sata_ahci)
 			return 0.0f;
 		TRACE("generic AHCI controller found! vendor 0x%04x, device 0x%04x\n", vendorID, deviceID);
 		return 0.8f;
@@ -205,23 +207,15 @@ ahci_supports_device(device_node_handle parent, bool *_noConnection)
 	if (vendorID == PCI_VENDOR_JMICRON) {
 		// JMicron uses the same device ID for SATA and PATA controllers,
 		// check if BAR5 exists to determine if it's a AHCI controller
-		uint8 bus, device, function;
+		pci_device_module_info *pci;
+		pci_device *device;
 		pci_info info;
-		pci_module_info *pci;
-		size_t size = 0;
-		int i;
-		gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_BUS_ITEM, &bus, false);
-		gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_DEVICE_ITEM, &device, false);
-		gDeviceManager->get_attr_uint8(parent, PCI_DEVICE_FUNCTION_ITEM, &function, false);
-		get_module(B_PCI_MODULE_NAME, (module_info **)&pci);
-		for (i = 0; B_OK == pci->get_nth_pci_info(i, &info); i++) {
-			if (info.bus == bus && info.device == device && info.function == function) {
-				size = info.u.h0.base_register_sizes[5];
-				break;
-			}
-		}
-		put_module(B_PCI_MODULE_NAME);
-		if (size == 0)
+
+		gDeviceManager->get_driver(parent, (driver_module_info **)&pci,
+			(void **)&device);
+		pci->get_pci_info(device, &info);
+
+		if (info.u.h0.base_register_sizes[5] == 0)
 			return 0.0f;
 	}
 
@@ -231,20 +225,14 @@ ahci_supports_device(device_node_handle parent, bool *_noConnection)
 
 
 static status_t
-ahci_register_device(device_node_handle parent)
+ahci_register_device(device_node *parent)
 {
-	device_node_handle node;
-	status_t status;
-
 	device_attr attrs[] = {
-		// info about ourself and our consumer
-		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: AHCI_DEVICE_MODULE_NAME }},
-
 		{ SCSI_DEVICE_MAX_TARGET_COUNT, B_UINT32_TYPE,
 			{ ui32: 33 }},
 
 		// DMA properties
-		// data must be word-aligned; 
+		// data must be word-aligned;
 		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE,
 			{ ui32: 1 }},
 		// one S/G block must not cross 64K boundary
@@ -261,83 +249,41 @@ ahci_register_device(device_node_handle parent)
 
 	TRACE("ahci_register_device\n");
 
-	status = gDeviceManager->register_device(parent, attrs,
-		NULL, &node); 
-	if (status < B_OK)
-		return status;
+	return gDeviceManager->register_node(parent, AHCI_DEVICE_MODULE_NAME,
+		attrs, NULL, NULL);
+}
+
+
+static status_t
+ahci_init_driver(device_node *node, void **_cookie)
+{
+	TRACE("ahci_init_driver\n");
+	*_cookie = node;
+	return B_OK;
+}
+
+
+static void
+ahci_uninit_driver(void *cookie)
+{
+	TRACE("ahci_uninit_driver, cookie %p\n", cookie);
+}
+
+
+static status_t
+ahci_register_child_devices(void *cookie)
+{
+	device_node *node = (device_node *)cookie;
 
 	// TODO: register SIM for every controller we find!
 	return register_sim(node);
 }
 
 
-static status_t
-ahci_init_driver(device_node_handle node, void *userCookie, void **_cookie)
-{
-	pci_device *_userCookie = userCookie;
-	pci_device pciDevice;
-	device_node_handle parent;
-	status_t status;
-
-	TRACE("ahci_init_driver, userCookie %p\n", userCookie);
-
-	parent = gDeviceManager->get_parent(node);
-
-	// initialize parent (the bus) to get the PCI interface and device
-	status = gDeviceManager->init_driver(parent, NULL,
-		(driver_module_info **)&gPCI, (void **)&pciDevice);
-	if (status != B_OK)
-		return status;
-
-	TRACE("ahci_init_driver: gPCI %p, pciDevice %p\n", gPCI, pciDevice);
-
-	gDeviceManager->put_device_node(parent);
-
-	*_userCookie = pciDevice;
-	*_cookie = node;
-	return B_OK;
-}
-
-
-static status_t
-ahci_uninit_driver(void *cookie)
-{
-	device_node_handle node = cookie;
-	device_node_handle parent;
-
-	TRACE("ahci_uninit_driver, cookie %p\n", cookie);
-
-	parent = gDeviceManager->get_parent(node);
-	gDeviceManager->uninit_driver(parent);
-	gDeviceManager->put_device_node(parent);
-	return B_OK;
-}
-
-
 static void
-ahci_device_removed(device_node_handle node, void *cookie)
+ahci_device_removed(void *cookie)
 {
 	TRACE("ahci_device_removed, cookie %p\n", cookie);
-}
-
-
-static void
-ahci_device_cleanup(device_node_handle node)
-{
-	TRACE("ahci_device_cleanup\n");
-}
-
-
-static void
-ahci_get_supported_paths(const char ***_busses, const char ***_devices)
-{
-	static const char *kBus[] = { "pci", NULL };
-	static const char *kDevice[] = { "drivers/dev/disk/sata", NULL };
-
-	TRACE("ahci_get_supported_paths\n");
-
-	*_busses = kBus;
-	*_devices = kDevice;
 }
 
 
@@ -365,15 +311,14 @@ driver_module_info sAHCIDevice = {
 	ahci_register_device,
 	ahci_init_driver,
 	ahci_uninit_driver,
-	ahci_device_removed,
-	ahci_device_cleanup,
-	ahci_get_supported_paths,
+	ahci_register_child_devices,
+	NULL,	// rescan
+	ahci_device_removed
 };
 
 
 module_dependency module_dependencies[] = {
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager },
-//	{ B_PCI_MODULE_NAME, (module_info **)&gPCI },
 	{ SCSI_FOR_SIM_MODULE_NAME, (module_info **)&gSCSI },
 	{}
 };

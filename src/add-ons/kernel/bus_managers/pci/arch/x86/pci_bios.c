@@ -1,5 +1,12 @@
-#include "pci_priv.h"
+/*
+ * Copyright 2006, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "pci_private.h"
 #include "pci_bios.h"
+
 
 status_t
 pci_bios_init(void)
@@ -10,7 +17,7 @@ pci_bios_init(void)
 
 status_t
 pci_bios_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-					 uint8 offset, uint8 size, uint32 *value)
+	uint8 offset, uint8 size, uint32 *value)
 {
 	return B_ERROR;
 }
@@ -18,7 +25,7 @@ pci_bios_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 
 status_t
 pci_bios_write_config(void *cookie, uint8 bus, uint8 device, uint8 function,
-					  uint8 offset, uint8 size, uint32 value)
+	uint8 offset, uint8 size, uint32 value)
 {
 	return B_ERROR;
 }

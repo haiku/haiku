@@ -3,12 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI bus manager
-
-	Main file
-*/
-
 #include "scsi_internal.h"
 #include <pnp_devfs.h>
 
@@ -25,6 +19,6 @@ module_info *modules[] = {
 	(module_info *)&scsi_for_sim_module,
 	(module_info *)&scsi_bus_module,
 	(module_info *)&scsi_device_module,
-	(module_info *)&scsi_bus_raw_module,
+	(module_info *)&gSCSIBusRawModule,
 	NULL
 };

@@ -13,7 +13,7 @@
 
 #include "util/kernel_cpp.h"
 #include "pci_fixup.h"
-#include "pci_priv.h"
+#include "pci_private.h"
 #include "pci.h"
 
 #define TRACE_CAP(x...) dprintf(x)

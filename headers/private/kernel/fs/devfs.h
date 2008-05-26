@@ -11,19 +11,10 @@
 
 #include <Drivers.h>
 
-struct kernel_args;
-
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-void devfs_add_preloaded_drivers(struct kernel_args* args);
-
-status_t devfs_add_driver(const char *path);
-
-void devfs_driver_added(const char *path);
-void devfs_driver_removed(const char *path);
 
 status_t devfs_unpublish_file_device(const char *path);
 status_t devfs_publish_file_device(const char *path, const char *filePath);

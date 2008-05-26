@@ -12,33 +12,14 @@
 #include <scsi_cmds.h>
 #include <locked_pool.h>
 #include <device_manager.h>
-#include <fast_log.h>
 
-#define debug_level_error 2
-#define debug_level_info 1
-#define debug_level_flow 0
+#define debug_level_error 4
+#define debug_level_info 4
+#define debug_level_flow 4
 
 #define DEBUG_MSG_PREFIX "SCSI -- "
 
 #include "wrapper.h"
-
-//#define USE_FAST_LOG
-
-#ifdef USE_FAST_LOG
-#define FAST_LOG0( handle, event ) fast_log->log_0( handle, event )
-#define FAST_LOG1( handle, event, param ) fast_log->log_1( handle, event, param )
-#define FAST_LOG2( handle, event, param1, param2 ) fast_log->log_2( handle, event, param1, param2 )
-#define FAST_LOG3( handle, event, param1, param2, param3 ) fast_log->log_3( handle, event, param1, param2, param3 )
-#define FAST_LOGN( handle, event, num_params... ) fast_log->log_n( handle, event, num_params )
-#else
-#define FAST_LOG0( handle, event )
-#define FAST_LOG1( handle, event, param )
-#define FAST_LOG2( handle, event, param1, param2 )
-#define FAST_LOG3( handle, event, param1, param2, param3 )
-#define FAST_LOGN( handle, event, num_params... )
-#endif
-
-
 #include "scsi_lock.h"
 
 
@@ -50,7 +31,7 @@
 // maximum number of fragments for temporary S/G lists
 // for real SCSI controllers, there's no limit to transmission length
 // but we need a limit - ATA transmits up to 128K, so we allow that
-// (for massive data transmission, peripheral drivers should provide own 
+// (for massive data transmission, peripheral drivers should provide own
 // SG list anyway)
 // add one extra entry in case data is not page aligned
 #define MAX_TEMP_SG_FRAGMENTS (128*1024 / B_PAGE_SIZE + 1)
@@ -64,7 +45,7 @@
 // buffer size for emulated SCSI commands that ATAPI cannot handle;
 // for MODE SELECT 6, maximum size is 255 + header,
 // for MODE SENSE 6, we use MODE SENSE 10 which can return 64 K,
-// but as the caller has to live with the 255 + header restriction, 
+// but as the caller has to live with the 255 + header restriction,
 // we hope that this buffer is large enough
 #define SCSI_ATAPI_BUFFER_SIZE 512
 
@@ -77,13 +58,13 @@
 #define SCSI_DEVICE_MANUAL_AUTOSENSE_ITEM "scsi/manual_autosense"
 
 // name of internal scsi_bus_raw device driver
-#define SCSI_BUS_RAW_MODULE_NAME "bus_managers/scsi/bus/raw"
+#define SCSI_BUS_RAW_MODULE_NAME "bus_managers/scsi/bus/raw/device_v1"
 
 // info about DPC
 typedef struct scsi_dpc_info {
 	struct scsi_dpc_info *next;
 	bool registered;			// true, if already/still in dpc list
-	
+
 	void (*func)( void * );
 	void *arg;
 } scsi_dpc_info;
@@ -99,43 +80,43 @@ typedef struct dma_params {
 } dma_params;
 
 
-// SCSI bus	
+// SCSI bus
 typedef struct scsi_bus_info {
 	int lock_count;				// sum of blocked[0..1] and sim_overflow
 	int blocked[2];				// depth of nested locks by bus manager (0) and SIM (1)
 	int left_slots;				// left command queuing slots on HBA
 	bool sim_overflow;			// 1, if SIM refused req because of bus queue overflow
-	
+
 	uchar path_id;				// SCSI path id
 	uint32 max_target_count;	// maximum count of target_ids on the bus
-		
+
 	thread_id service_thread;	// service thread
 	sem_id start_service;		// released whenever service thread has work to do
 	bool shutting_down;			// set to true to tell service thread to shut down
-	
+
 	benaphore mutex;			// used to synchronize changes in queueing and blocking
-	
+
 	sem_id scan_lun_lock;		// allocated whenever a lun is scanned
-	
+
 	scsi_sim_interface *interface;	// SIM interface
 	scsi_sim_cookie sim_cookie;	// internal SIM cookie
-	
+
 	spinlock_irq dpc_lock;		// synchronizer for dpc list
 	scsi_dpc_info *dpc_list;	// list of dpcs to execute
-	
+
 	struct scsi_device_info *waiting_devices;	// devices ready to receive requests
-	
+
 	locked_pool_cookie ccb_pool;	// ccb pool (one per bus)
-	
-	device_node_handle node;		// pnp node of bus
-	
+
+	device_node *node;		// pnp node of bus
+
 	dma_params dma_params;		// dma restrictions of controller
-	
+
 	scsi_path_inquiry inquiry_data;	// inquiry data as read on init
 } scsi_bus_info;
 
 
-// DMA buffer 
+// DMA buffer
 typedef struct dma_buffer {
 	area_id area;			// area of DMA buffer
 	uchar *address;			// address of DMA buffer
@@ -161,7 +142,7 @@ typedef struct dma_buffer {
 typedef struct scsi_device_info {
 	struct scsi_device_info *waiting_next;
 	struct scsi_device_info *waiting_prev;
-	
+
 	bool manual_autosense : 1;	// no autosense support
 	bool is_atapi : 1;			// ATAPI device - needs some commands emulated
 
@@ -170,43 +151,38 @@ typedef struct scsi_device_info {
 	int sim_overflow;			// 1, if SIM returned a request because of device queue overflow
 	int left_slots;				// left command queuing slots for device
 	int total_slots;			// total number of command queuing slots for device
-	
+
 	scsi_ccb *queued_reqs;		// queued requests, circularly doubly linked
 								// (scsi_insert_new_request depends on circular)
-	
+
 	int64 last_sort;			// last sort value (for elevator sort)
 	int32 valid;				// access must be atomic!
-	
+
 	scsi_bus_info *bus;
 	uchar target_id;
 	uchar target_lun;
-	
+
 	scsi_ccb *auto_sense_request;		// auto-sense request
-	scsi_ccb *auto_sense_originator;	// request that auto-sense is 
+	scsi_ccb *auto_sense_originator;	// request that auto-sense is
 										// currently requested for
 	area_id auto_sense_area;			// area of auto-sense data and S/G list
 
 	uint8 emulation_map[256/8];		// bit field with index being command code:
 								// 1 indicates that this command is not supported
 								// and thus must be emulated
-	
+
 	scsi_res_inquiry inquiry_data;
-	device_node_handle node;	// device node
+	device_node *node;	// device node
 
 	benaphore dma_buffer_lock;	// lock between DMA buffer user and clean-up daemon
 	sem_id dma_buffer_owner;	// to be acquired before using DMA buffer
 	dma_buffer dma_buffer;		// DMA buffer
 
-#ifdef USE_FAST_LOG
-	fast_log_handle log;		// fast log connection
-#endif
-	char name[30];				// name for fast log entries
-	
 	// buffer used for emulating SCSI commands
 	char *buffer;
 	physical_entry *buffer_sg_list;
 	size_t buffer_sg_count;
-	size_t buffer_size;	
+	size_t buffer_size;
 	area_id buffer_area;
 	sem_id buffer_sem;
 } scsi_device_info;
@@ -240,12 +216,11 @@ enum {
 
 extern locked_pool_interface *locked_pool;
 extern device_manager_info *pnp;
-extern fast_log_info *fast_log;
 
 extern scsi_for_sim_interface scsi_for_sim_module;
 extern scsi_bus_interface scsi_bus_module;
 extern scsi_device_interface scsi_device_module;
-extern struct pnp_devfs_driver_info scsi_bus_raw_module;
+extern struct device_module_info gSCSIBusRawModule;
 
 
 

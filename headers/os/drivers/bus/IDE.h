@@ -1,18 +1,11 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
-	Part of Open IDE bus manager
-
-	IDE bus manager interface
-*/
-
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef __IDE_H__
 #define __IDE_H__
 
-#include <bus_manager.h>
+
 #include <device_manager.h>
 #include <KernelExport.h>
 
@@ -37,9 +30,14 @@
 union ide_task_file;
 typedef unsigned int ide_reg_mask;
 
+// channel cookie, issued by ide bus manager
+typedef struct ide_bus_info *ide_channel;
+
 // interface of controller driver
 typedef struct {
 	driver_module_info info;
+
+	void (*set_channel)(void *cookie, ide_channel channel);
 
 	status_t (*write_command_block_regs)
 		(void *channel_cookie, union ide_task_file *tf, ide_reg_mask mask);
@@ -47,21 +45,17 @@ typedef struct {
 		(void *channel_cookie, union ide_task_file *tf, ide_reg_mask mask);
 
 	uint8 (*get_altstatus) (void *channel_cookie);
-	status_t (*write_device_control) (void *channel_cookie, uint8 val);	
+	status_t (*write_device_control) (void *channel_cookie, uint8 val);
 
 	status_t (*write_pio) (void *channel_cookie, uint16 *data, int count, bool force_16bit );
 	status_t (*read_pio) (void *channel_cookie, uint16 *data, int count, bool force_16bit );
 
-	status_t (*prepare_dma)(void *channel_cookie, 
+	status_t (*prepare_dma)(void *channel_cookie,
 							const physical_entry *sg_list, size_t sg_list_count,
 	                        bool write);
 	status_t (*start_dma)(void *channel_cookie);
 	status_t (*finish_dma)(void *channel_cookie);
 } ide_controller_interface;
-
-
-// channel cookie, issued by ide bus manager
-typedef struct ide_bus_info *ide_channel;
 
 
 // Interface for Controller Driver
@@ -77,7 +71,7 @@ typedef struct {
 } ide_for_controller_interface;
 
 
-#define IDE_FOR_CONTROLLER_MODULE_NAME "bus_managers/ide/controller/v1"
+#define IDE_FOR_CONTROLLER_MODULE_NAME "bus_managers/ide/controller/driver_v1"
 
 
 #endif	/* __IDE_H__ */

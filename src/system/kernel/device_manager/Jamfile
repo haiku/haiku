@@ -3,19 +3,14 @@ SubDir HAIKU_TOP src system kernel device_manager ;
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel util ] shared ;
 
-KernelMergeObject kernel_device_manager.o : 
-	attributes.c
-	device_manager.c
-	driver_loader.c
-	id_generator.c
-	io_resources.c
-	nodes.c
-	notifications.c
-	patterns.c
-	probe.cpp
-	registration.c
-	root_node.c
-	scan.c
+KernelMergeObject kernel_device_manager.o :
+	BaseDevice.cpp
+	device_manager.cpp
+	devfs.cpp
+	id_generator.cpp
+	io_resources.cpp
+	legacy_drivers.cpp
+#	probe.cpp
 	settings.cpp
 	:
 	$(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused

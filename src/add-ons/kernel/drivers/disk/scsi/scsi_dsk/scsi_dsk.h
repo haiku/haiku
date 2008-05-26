@@ -4,11 +4,9 @@
  */
 
 /*
-	Part of Open SCSI Disk Driver
-
 	Peripheral driver to handle any kind of SCSI disks,
 	i.e. hard disk and floopy disks (ZIP etc.)
-	
+
 	Much work is done by scsi_periph and blkdev.
 */
 
@@ -17,6 +15,6 @@
 
 #include <device_manager.h>
 
-#define SCSI_DSK_MODULE_NAME "drivers/disk/scsi/scsi_dsk/device_v1"
+#define SCSI_DSK_MODULE_NAME "drivers/disk/scsi/scsi_dsk/driver_v1"
 
 #endif	/* _SCSI_DSK_H */

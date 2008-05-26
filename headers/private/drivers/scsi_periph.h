@@ -8,13 +8,13 @@
 #define _SCSI_PERIPH_H
 
 /*
-	Use this module to minimize work required to write a SCSI 
+	Use this module to minimize work required to write a SCSI
 	peripheral driver.
-	
+
 	It takes care of:
 	- error handling
 	- medium changes (including restarting the medium)
-	- detection of medium capacity 
+	- detection of medium capacity
 */
 
 
@@ -72,12 +72,12 @@ typedef struct scsi_periph_callbacks {
 	// (set to NULL if not a block device)
 	void (*set_capacity)( periph_device_cookie periph_device, uint64 capacity,
 		uint32 block_size );
-		
+
 	// *** removable devices
 	// called when media got changed (can be NULL if medium is not changable)
 	// (you don't need to call periph->media_changed, but it's doesn't if you do)
 	// ccb - request at your disposal
-	void (*media_changed)( periph_device_cookie periph_device, 
+	void (*media_changed)( periph_device_cookie periph_device,
 		scsi_ccb *request );
 } scsi_periph_callbacks;
 
@@ -87,44 +87,44 @@ typedef struct scsi_periph_interface {
 	module_info info;
 
 	// *** init/cleanup ***
-	status_t (*register_device)( 
+	status_t (*register_device)(
 		periph_device_cookie periph_device,
 		scsi_periph_callbacks *callbacks,
-		scsi_device scsi_device, 
+		scsi_device scsi_device,
 		scsi_device_interface *scsi,
-		device_node_handle node,
+		device_node *node,
 		bool removable,
 		scsi_periph_device *driver );
 	status_t (*unregister_device)( scsi_periph_device driver );
-	
+
 	// *** basic command execution ***
 	// exec command, retrying on problems
 	status_t (*safe_exec)(
 		scsi_periph_device periph_device,
 		scsi_ccb *request );
 	// exec simple command
-	status_t (*simple_exec)( scsi_periph_device device, 
-		void *cdb, uchar cdb_len, void *data, size_t data_len, 
+	status_t (*simple_exec)( scsi_periph_device device,
+		void *cdb, uchar cdb_len, void *data, size_t data_len,
 		int ccb_flags );
 
-	// *** file handling ***		
+	// *** file handling ***
 	// to be called when a new file is opened
-	status_t (*handle_open)( scsi_periph_device device, 
+	status_t (*handle_open)( scsi_periph_device device,
 		periph_handle_cookie periph_handle, scsi_periph_handle *res_handle );
 	// to be called when a file is closed
 	status_t (*handle_close)( scsi_periph_handle handle );
 	// to be called when a file is freed
 	status_t (*handle_free)( scsi_periph_handle handle );
-	
-	// *** default implementation for block devices ***	
-	// block read 
+
+	// *** default implementation for block devices ***
+	// block read
 	// preferred_ccb_size - preferred command size; if zero, the shortest is used
-	status_t (*read)( scsi_periph_handle handle, const phys_vecs *vecs, 
+	status_t (*read)( scsi_periph_handle handle, const phys_vecs *vecs,
 		off_t pos, size_t num_blocks, uint32 block_size, size_t *bytes_transferred,
 		int preferred_ccb_size );
-	// block write 
+	// block write
 	// (see block_read)
-	status_t (*write)( scsi_periph_handle handle, const phys_vecs *vecs, 
+	status_t (*write)( scsi_periph_handle handle, const phys_vecs *vecs,
 		off_t pos, size_t num_blocks, uint32 block_size, size_t *bytes_transferred,
 		int preferred_ccb_size );
 	// block ioctls
@@ -139,24 +139,24 @@ typedef struct scsi_periph_interface {
 	// convert result of *request to err_res
 	err_res (*check_error)( scsi_periph_device device, scsi_ccb *request );
 	// send start or stop command to device
-	// with_LoEj = true - include loading/ejecting, 
+	// with_LoEj = true - include loading/ejecting,
 	//             false - only do allow/deny
-	err_res (*send_start_stop)( scsi_periph_device device, scsi_ccb *request, 
+	err_res (*send_start_stop)( scsi_periph_device device, scsi_ccb *request,
 		bool start, bool with_LoEj );
 	// checks media status and waits for device to become ready
-	// returns: B_OK, B_DEV_MEDIA_CHANGE_REQUESTED, B_NO_MEMORY or 
+	// returns: B_OK, B_DEV_MEDIA_CHANGE_REQUESTED, B_NO_MEMORY or
 	// pending error reported by handle_get_error
 	status_t (*get_media_status)( scsi_periph_handle handle );
 
 	// compose device name consisting of prefix and path/target/LUN
 	// (result must be freed by caller)
-	char *(*compose_device_name)(device_node_handle device_node, const char *prefix);
-		
+	char *(*compose_device_name)(device_node *device_node, const char *prefix);
+
 	// fill data with icon (for B_GET_ICON ioctl)
 	status_t (*get_icon)( icon_type type, device_icon *data );
 
 	// synchronizes (flush) the device cache
-	err_res(*synchronize_cache)(scsi_periph_device device, scsi_ccb *request);		
+	err_res(*synchronize_cache)(scsi_periph_device device, scsi_ccb *request);
 } scsi_periph_interface;
 
 #define SCSI_PERIPH_MODULE_NAME "generic/scsi_periph/v1"

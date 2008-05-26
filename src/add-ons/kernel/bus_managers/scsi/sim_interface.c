@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -13,75 +13,91 @@
 #include "scsi_internal.h"
 #include "queuing.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 
 /**	new scsi controller added
- *	in return, we register a new scsi bus node and let its fixed 
+ *	in return, we register a new scsi bus node and let its fixed
  *	consumer (the SCSI device layer) automatically scan it for devices
  */
 
 static status_t
-scsi_controller_added(device_node_handle parent)
+scsi_controller_added(device_node *parent)
 {
-	char *controller_name;
-	int path_id;
+	const char *controller_name;
+	int pathID;
 
 	SHOW_FLOW0(4, "");
 
-	if (pnp->get_attr_string(parent, SCSI_DESCRIPTION_CONTROLLER_NAME, 
-		&controller_name, false) != B_OK) {
+	if (pnp->get_attr_string(parent, SCSI_DESCRIPTION_CONTROLLER_NAME,
+			&controller_name, false) != B_OK) {
 		dprintf("scsi: ignored controller - controller name missing\n");
 		return B_ERROR;
 	}
 
-	path_id = pnp->create_id(SCSI_PATHID_GENERATOR);
-	if (path_id < 0) {
+	pathID = pnp->create_id(SCSI_PATHID_GENERATOR);
+	if (pathID < 0) {
 		dprintf("scsi: Cannot register SCSI controller %s - out of path IDs\n",
 			controller_name);
-		free(controller_name);
 		return B_ERROR;
 	}
 
-	free(controller_name);
-
 	{
 		device_attr attrs[] = {
-			// general information
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_BUS_MODULE_NAME }},
-
-			// we are a bus
-			{ PNP_BUS_IS_BUS, B_UINT8_TYPE, { ui8: 1 }},
-
-			// remember who we are 
+			// remember who we are
 			// (could use the controller name, but probably some software would choke)
-			{ SCSI_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { ui8: path_id }},
+			{ SCSI_BUS_PATH_ID_ITEM, B_UINT8_TYPE, { ui8: pathID }},
 
 			// tell PnP manager to clean up ID
-			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: SCSI_PATHID_GENERATOR }},
-			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: path_id }},
-
-			// tell internal bus raw driver to register bus' device in devfs
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: SCSI_BUS_RAW_MODULE_NAME }},
-			{ NULL, 0 }
+//			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: SCSI_PATHID_GENERATOR }},
+//			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: path_id }},
+			{}
 		};
 
-		device_node_handle node;
+		return pnp->register_node(parent, SCSI_BUS_MODULE_NAME, attrs, NULL,
+			NULL);
+	}
+}
+
+
+static status_t
+scsi_controller_init(device_node *node, void **_cookie)
+{
+	*_cookie = node;
+	return B_OK;
+}
+
+
+static status_t
+scsi_controller_register_raw_device(void *_cookie)
+{
+	device_node *node = (device_node *)_cookie;
+	uint32 channel;
+	uint8 pathID;
+	char *name;
+
+#if 1
 // TODO: this seems to cause a crash in some configurations, and needs to be investigated!
 //		see bug #389 and #393.
-#if 0
-		uint32 channel;
-
-		if (pnp->get_attr_uint32(parent, "ide/channel_id", &channel, true) == B_OK) {
-			// this is actually an IDE device, we don't need to publish
-			// a bus device for those
-			attrs[5].name = NULL;
-		}
-#endif
-
-		return pnp->register_device(parent, attrs, NULL, &node);
+// TODO: check if the above is still true
+	if (pnp->get_attr_uint32(node, "ide/channel_id", &channel, true) == B_OK) {
+		// this is actually an IDE device, we don't need to publish
+		// a bus device for those
+		return B_OK;
 	}
+#endif
+	pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &pathID, false);
+
+	// put that on heap to not overflow the limited kernel stack
+	name = malloc(PATH_MAX + 1);
+	if (name == NULL)
+		return B_NO_MEMORY;
+
+	snprintf(name, PATH_MAX + 1, "bus/scsi/%d/bus_raw", pathID);
+
+	return pnp->publish_device(node, name, SCSI_BUS_RAW_MODULE_NAME);
 }
 
 
@@ -110,9 +126,11 @@ scsi_for_sim_interface scsi_for_sim_module =
 
 		NULL,	// supported devices
 		scsi_controller_added,
-		NULL,
-		NULL,	
-		NULL
+		scsi_controller_init,
+		NULL,	// uninit
+		scsi_controller_register_raw_device,
+		NULL,	// rescan
+		NULL,	// removed
 	},
 
 	scsi_requeue_request,

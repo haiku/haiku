@@ -275,7 +275,7 @@ main2(void *unused)
 	device_manager_init(&sKernelArgs);
 
 	TRACE("Add preloaded old-style drivers\n");
-	devfs_add_preloaded_drivers(&sKernelArgs);
+	legacy_driver_add_preloaded(&sKernelArgs);
 
 	int_init_post_device_manager(&sKernelArgs);
 
@@ -308,14 +308,14 @@ main2(void *unused)
 		status_t status = find_directory(B_BEOS_SYSTEM_DIRECTORY, gBootDevice,
 			false, bootScriptPath.LockBuffer(), bootScriptPath.BufferSize());
 		if (status != B_OK)
-			dprintf("main2: find_directory() failed: %s\n", strerror(status)); 
+			dprintf("main2: find_directory() failed: %s\n", strerror(status));
 		bootScriptPath.UnlockBuffer();
 		status = bootScriptPath.Append("boot/Bootscript");
 		if (status != B_OK) {
 			dprintf("main2: constructing path to Bootscript failed: "
 				"%s\n", strerror(status));
 		}
-		
+
 		const char *args[] = { "/bin/sh", bootScriptPath.Path(), NULL };
 		int32 argc = 2;
 		thread_id thread;

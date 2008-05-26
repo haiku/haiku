@@ -1,12 +1,22 @@
+/*
+ * Copyright 2007, François Revol <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "pci_controller.h"
 
 #include <arch_platform.h>
 
-#include "pci_priv.h"
+#include "pci_private.h"
 
 /*
- * As we don't have any real PCI bus in any of the supported m68k platforms, 
+ * As we don't have any real PCI bus in any of the supported m68k platforms,
  * we fake one, with hardcoded devices.
+ * TODO: this doesn't make any sense, as we can't share any drivers, anyway.
+ * We should better export dedicated bus managers for Zorro etc. busses on
+ * these systems.
+ * TODO: actually, there are several PCI boards for the Amiga.
  */
 
 #include "amiga/pci_amiga.h"

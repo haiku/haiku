@@ -5,8 +5,7 @@ UsePrivateHeaders [ FDirName kernel fs ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders net shared storage ;
 
-KernelMergeObject kernel_fs.o : 
-	devfs.cpp
+KernelMergeObject kernel_fs.o :
 	fd.cpp
 	fifo.cpp
 	IOScheduler.cpp

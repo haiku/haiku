@@ -1,5 +1,12 @@
+/*
+ * Copyright 2007, François Revol <revol@free.fr>.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "pci_io.h"
 #include "pci_priv.h"
+
 
 status_t
 pci_io_init()

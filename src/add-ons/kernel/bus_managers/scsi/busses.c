@@ -10,7 +10,7 @@
 
 	Whenever a controller driver publishes a new controller, a new SCSI bus
 	for public and internal use is registered in turn. After that, this
-	bus is told to rescan for devices. For each device, there is a 
+	bus is told to rescan for devices. For each device, there is a
 	device registered for peripheral drivers. (see devices.c)
 */
 
@@ -63,7 +63,7 @@ scsi_service_threadproc(void *arg)
 	while (true) {
 		// we handle multiple requests in scsi_do_service at once;
 		// to save time, we will acquire all notifications that are sent
-		// up to now at once. 
+		// up to now at once.
 		// (Sadly, there is no "set semaphore to zero" function, so this
 		//  is a poor-man emulation)
 		acquire_sem_etc(bus->start_service, processed_notifications + 1, 0, 0);
@@ -76,16 +76,16 @@ scsi_service_threadproc(void *arg)
 		// get number of notifications _before_ servicing to make sure no new
 		// notifications are sent after do_service()
 		get_sem_count(bus->start_service, &processed_notifications);
-		
+
 		scsi_do_service(bus);
 	}
-	
+
 	return 0;
 }
 
 
 static scsi_bus_info *
-scsi_create_bus(device_node_handle node, uint8 path_id)
+scsi_create_bus(device_node *node, uint8 path_id)
 {
 	scsi_bus_info *bus;
 	int res;
@@ -150,11 +150,9 @@ err1:
 	scsi_uninit_ccb_alloc(bus);
 err2:
 	DELETE_BEN(&bus->mutex);
-err3:	
+err3:
 	delete_sem(bus->start_service);
 err4:
-	//scsi_destroy_device(bus->global_device);
-//err5:
 	delete_sem(bus->scan_lun_lock);
 err6:
 	free(bus);
@@ -165,7 +163,7 @@ err6:
 static status_t
 scsi_destroy_bus(scsi_bus_info *bus)
 {
-	int32 retcode;	
+	int32 retcode;
 
 	// noone is using this bus now, time to clean it up
 	bus->shutting_down = true;
@@ -184,9 +182,8 @@ scsi_destroy_bus(scsi_bus_info *bus)
 
 
 static status_t
-scsi_init_bus(device_node_handle node, void *user_cookie, void **cookie)
+scsi_init_bus(device_node *node, void **cookie)
 {
-	device_node_handle parent;
 	uint8 path_id;
 	scsi_bus_info *bus;
 	status_t res;
@@ -244,15 +241,14 @@ scsi_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		goto err;
 	}
 
-	parent = pnp->get_parent(node);
+	{
+		device_node *parent = pnp->get_parent_node(node);
+		pnp->get_driver(parent, (driver_module_info **)&bus->interface,
+			(void **)&bus->sim_cookie);
+		pnp->put_node(parent);
 
-	res = pnp->init_driver(parent, bus, 
-		(driver_module_info **)&bus->interface, (void **)&bus->sim_cookie);
-
-	pnp->put_device_node(parent);
-
-	if (res != B_OK)
-		goto err;
+		bus->interface->set_scsi_bus(bus->sim_cookie, bus);
+	}
 
 	// cache inquiry data
 	scsi_inquiry_path(bus, &bus->inquiry_data);
@@ -271,16 +267,10 @@ err:
 }
 
 
-static status_t
+static void
 scsi_uninit_bus(scsi_bus_info *bus)
 {
-	device_node_handle parent = pnp->get_parent(bus->node);
-	pnp->uninit_driver(parent);
-	pnp->put_device_node(parent);
-
 	scsi_destroy_bus(bus);
-
-	return B_OK;
 }
 
 
@@ -288,7 +278,6 @@ uchar
 scsi_inquiry_path(scsi_bus bus, scsi_path_inquiry *inquiry_data)
 {
 	SHOW_FLOW(4, "path_id=%d", bus->path_id);
-
 	return bus->interface->path_inquiry(bus->sim_cookie, inquiry_data);
 }
 
@@ -302,20 +291,18 @@ scsi_reset_bus(scsi_bus_info *bus)
 
 static status_t
 scsi_bus_module_init(void)
-{	
+{
 	SHOW_FLOW0(4, "");
-	
 	return init_temp_sg();
 }
 
 
 static status_t
 scsi_bus_module_uninit(void)
-{	
+{
 	SHOW_INFO0(4, "");
-	
-	uninit_temp_sg();
 
+	uninit_temp_sg();
 	return B_OK;
 }
 
@@ -338,19 +325,16 @@ std_ops(int32 op, ...)
 scsi_bus_interface scsi_bus_module = {
 	{
 		{
-			{
-				SCSI_BUS_MODULE_NAME,
-				0,
-				std_ops
-			},
-
-			NULL,	// supported devices
-			NULL,	// register node
-			scsi_init_bus,
-			(status_t (*)(void *))scsi_uninit_bus,
-			NULL
+			SCSI_BUS_MODULE_NAME,
+			0,
+			std_ops
 		},
 
+		NULL,	// supported devices
+		NULL,	// register node
+		scsi_init_bus,
+		(void (*)(void *))scsi_uninit_bus,
+		(status_t (*)(void *))scsi_scan_bus,
 		(status_t (*)(void *))scsi_scan_bus,
 		NULL
 	},

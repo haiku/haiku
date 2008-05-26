@@ -15,7 +15,7 @@
 #define FLOW(a...)	dprintf("ahci: " a)
 
 
-AHCIController::AHCIController(device_node_handle node, pci_device_info *device)
+AHCIController::AHCIController(device_node *node, pci_device *device)
 	: fNode(node)
 	, fPCIDevice(device)
 	, fPCIVendorID(0xffff)
@@ -48,23 +48,19 @@ status_t
 AHCIController::Init()
 {
 	pci_info pciInfo;
-
-	if (gPCI->get_pci_info(fPCIDevice, &pciInfo) < B_OK) {
-		dprintf("AHCIController::Init ERROR: getting PCI info failed!\n");
-		return B_ERROR;
-	}
+	gPCI->get_pci_info(fPCIDevice, &pciInfo);
 
 	fPCIVendorID = pciInfo.vendor_id;
 	fPCIDeviceID = pciInfo.device_id;
 
-	TRACE("AHCIController::Init %u:%u:%u vendor %04x, device %04x\n", 
+	TRACE("AHCIController::Init %u:%u:%u vendor %04x, device %04x\n",
 		pciInfo.bus, pciInfo.device, pciInfo.function, fPCIVendorID, fPCIDeviceID);
 
 // --- Instance check workaround begin
 	char sName[32];
 	snprintf(sName, sizeof(sName), "ahci-inst-%u-%u-%u", pciInfo.bus, pciInfo.device, pciInfo.function);
 	if (find_port(sName) >= 0) {
-		dprintf("AHCIController::Init ERROR: an instance for object %u:%u:%u already exists\n", 
+		dprintf("AHCIController::Init ERROR: an instance for object %u:%u:%u already exists\n",
 			pciInfo.bus, pciInfo.device, pciInfo.function);
 		return B_ERROR;
 	}
@@ -231,7 +227,6 @@ AHCIController::Uninit()
   	// well...
   	remove_io_interrupt_handler(fIRQ, Interrupt, this);
 
-
 	delete_area(fRegsArea);
 
 // --- Instance check workaround begin
@@ -245,7 +240,7 @@ AHCIController::ResetController()
 {
 	uint32 saveCaps = fRegs->cap & (CAP_SMPS | CAP_SSS | CAP_SPM | CAP_EMS | CAP_SXS);
 	uint32 savePI = fRegs->pi;
-	
+
 	fRegs->ghc |= GHC_HR;
 	FlushPostedWrites();
 	if (wait_until_clear(&fRegs->ghc, GHC_HR, 1000000) < B_OK)

@@ -1,0 +1,1445 @@
+/*
+ * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "legacy_drivers.h"
+
+#include <dirent.h>
+#include <errno.h>
+#include <new>
+#include <stdio.h>
+
+#include <FindDirectory.h>
+#include <image.h>
+#include <NodeMonitor.h>
+
+#include <boot_device.h>
+#include <elf.h>
+#include <fs/devfs.h>
+#include <fs/KPath.h>
+#include <fs/node_monitor.h>
+#include <Notifications.h>
+#include <safemode.h>
+#include <util/DoublyLinkedList.h>
+#include <util/OpenHashTable.h>
+#include <util/Stack.h>
+#include <vfs.h>
+
+#include "BaseDevice.h"
+#include "devfs_private.h"
+
+
+//#define TRACE_LEGACY_DRIVERS
+#ifdef TRACE_LEGACY_DRIVERS
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x)
+#endif
+
+#define DRIVER_HASH_SIZE 16
+
+struct legacy_driver;
+
+class LegacyDevice : public BaseDevice,
+	public DoublyLinkedListLinkImpl<LegacyDevice> {
+public:
+							LegacyDevice(legacy_driver* driver,
+								const char* path, device_hooks* hooks);
+	virtual					~LegacyDevice();
+
+			status_t		InitCheck() const;
+
+	virtual	status_t		InitDevice();
+	virtual	void			UninitDevice();
+
+			void			SetHooks(device_hooks* hooks);
+
+			legacy_driver*	Driver() const { return fDriver; }
+			const char*		Path() const { return fPath; }
+			device_hooks*	Hooks() const { return fHooks; }
+
+	virtual	status_t		Open(const char* path, int openMode,
+								void** _cookie);
+	virtual	status_t		Select(void* cookie, uint8 event, selectsync* sync);
+
+private:
+	legacy_driver*			fDriver;
+	const char*				fPath;
+	device_hooks*			fHooks;
+};
+
+typedef DoublyLinkedList<LegacyDevice> DeviceList;
+
+struct legacy_driver {
+	legacy_driver*	next;
+	const char*		path;
+	const char*		name;
+	dev_t			device;
+	ino_t			node;
+	time_t			last_modified;
+	image_id		image;
+	uint32			devices_published;
+	uint32			devices_used;
+	bool			binary_updated;
+	int32			priority;
+	DeviceList		devices;
+
+	// driver image information
+	int32			api_version;
+	device_hooks*	(*find_device)(const char *);
+	const char**	(*publish_devices)(void);
+	status_t		(*uninit_driver)(void);
+	status_t		(*uninit_hardware)(void);
+};
+
+struct path_entry : DoublyLinkedListLinkImpl<path_entry> {
+	char			path[B_PATH_NAME_LENGTH];
+};
+
+struct driver_entry : public DoublyLinkedListLinkImpl<driver_entry> {
+	char*				path;
+	dev_t				device;
+	ino_t				node;
+	int32				busses;
+};
+
+typedef DoublyLinkedList<driver_entry> DriverEntryList;
+
+struct directory_node_entry {
+	HashTableLink<directory_node_entry> link;
+	ino_t				node;
+};
+
+struct DirectoryNodeHashDefinition {
+	typedef ino_t* KeyType;
+	typedef directory_node_entry ValueType;
+
+	size_t HashKey(ino_t* key) const
+		{ return _Hash(*key); }
+	size_t Hash(directory_node_entry* entry) const
+		{ return _Hash(entry->node); }
+	bool Compare(ino_t* key, directory_node_entry* entry) const
+		{ return *key == entry->node; }
+	HashTableLink<directory_node_entry>*
+		GetLink(directory_node_entry* entry) const
+		{ return &entry->link; }
+
+	uint32 _Hash(ino_t node) const
+		{ return (uint32)(node >> 32) + (uint32)node; }
+};
+
+typedef OpenHashTable<DirectoryNodeHashDefinition> DirectoryNodeHash;
+
+class DirectoryIterator {
+public:
+						DirectoryIterator(const char *path,
+							const char *subPath = NULL, bool recursive = false);
+						~DirectoryIterator();
+
+			void		SetTo(const char *path, const char *subPath = NULL,
+							bool recursive = false);
+
+			status_t	GetNext(KPath &path, struct stat &stat);
+			const char*	CurrentName() const { return fCurrentName; }
+
+			void		Unset();
+			void		AddPath(const char *path, const char *subPath = NULL);
+
+private:
+	Stack<KPath*>		fPaths;
+	bool				fRecursive;
+	DIR*				fDirectory;
+	KPath*				fBasePath;
+	const char*			fCurrentName;
+};
+
+
+class DirectoryWatcher : public NotificationListener {
+public:
+						DirectoryWatcher();
+	virtual				~DirectoryWatcher();
+
+	virtual void		EventOccured(NotificationService& service,
+							const KMessage* event);
+};
+
+class DriverWatcher : public NotificationListener {
+public:
+						DriverWatcher();
+	virtual				~DriverWatcher();
+
+	virtual void		EventOccured(NotificationService& service,
+							const KMessage* event);
+};
+
+static status_t unload_driver(legacy_driver *driver);
+static status_t load_driver(legacy_driver *driver);
+
+
+static int32 sDefaultApiVersion = 1;
+static hash_table* sDriverHash;
+static DriverWatcher sDriverWatcher;
+static int32 sDriverEvents;
+static DoublyLinkedList<path_entry> sDriversToAdd;
+static DirectoryWatcher sDirectoryWatcher;
+static DirectoryNodeHash sDirectoryNodeHash;
+static mutex sLock;
+static bool sWatching;
+
+
+//	#pragma mark - driver private
+
+
+static uint32
+driver_entry_hash(void *_driver, const void *_key, uint32 range)
+{
+	legacy_driver *driver = (legacy_driver *)_driver;
+	const char *key = (const char *)_key;
+
+	if (driver != NULL)
+		return hash_hash_string(driver->name) % range;
+
+	return hash_hash_string(key) % range;
+}
+
+
+static int
+driver_entry_compare(void *_driver, const void *_key)
+{
+	legacy_driver *driver = (legacy_driver *)_driver;
+	const char *key = (const char *)_key;
+
+	return strcmp(driver->name, key);
+}
+
+
+static LegacyDevice*
+get_device_for_path(legacy_driver* driver, const char* path)
+{
+	DeviceList::Iterator iterator = driver->devices.GetIterator();
+	while (iterator.HasNext()) {
+		LegacyDevice* device = iterator.Next();
+
+		if (!strcmp(device->Path(), path))
+			return device;
+	}
+
+	return NULL;
+}
+
+
+/*!	Collects all published devices of a driver, compares them to what the
+	driver would publish now, and then publishes/unpublishes the devices
+	as needed.
+	If the driver does not publish any devices anymore, it is unloaded.
+*/
+static status_t
+republish_driver(legacy_driver* driver)
+{
+	if (driver->image < 0) {
+		// The driver is not yet loaded - go through the normal load procedure
+		return load_driver(driver);
+	}
+
+	// build the list of currently present devices of this driver
+	DeviceList::Iterator iterator = driver->devices.GetIterator();
+	DoublyLinkedList<path_entry> currentNodes;
+	while (iterator.HasNext()) {
+		LegacyDevice* device = iterator.Next();
+
+		path_entry* entry = new(std::nothrow) path_entry;
+		if (entry == NULL) {
+			while ((entry = currentNodes.RemoveHead()))
+				delete entry;
+			return B_NO_MEMORY;
+		}
+
+		strlcpy(entry->path, device->Path(), sizeof(entry->path));
+		currentNodes.Add(entry);
+	}
+
+	// now ask the driver for it's currently published devices
+	const char **devicePaths = driver->publish_devices();
+
+	int32 exported = 0;
+	for (; devicePaths != NULL && devicePaths[0]; devicePaths++) {
+		bool present = false;
+		path_entry *entry = currentNodes.Head();
+		while (entry) {
+			if (strncmp(entry->path, devicePaths[0], B_PATH_NAME_LENGTH) == 0) {
+				// this device was present before and still is -> no republish
+				currentNodes.Remove(entry);
+				delete entry;
+				exported++;
+				present = true;
+				break;
+			}
+
+			entry = currentNodes.GetNext(entry);
+		}
+
+		device_hooks *hooks = driver->find_device(devicePaths[0]);
+		if (hooks == NULL)
+			continue;
+
+		if (present) {
+			// update hooks
+			LegacyDevice* device = get_device_for_path(driver, devicePaths[0]);
+			if (device != NULL)
+				device->SetHooks(hooks);
+			continue;
+		}
+
+		// the device was not present before -> publish it now
+		TRACE(("devfs: publishing new device \"%s\"\n", devicePaths[0]));
+		LegacyDevice* device = new(std::nothrow) LegacyDevice(driver,
+			devicePaths[0], hooks);
+		if (device != NULL && device->InitCheck() == B_OK
+			&& devfs_publish_device(devicePaths[0], device) == B_OK) {
+			driver->devices.Add(device);
+			exported++;
+		} else
+			delete device;
+	}
+
+	// what's left in currentNodes was present but is not anymore -> unpublish
+	while (true) {
+		path_entry *entry = currentNodes.RemoveHead();
+		if (entry == NULL)
+			break;
+
+		TRACE(("devfs: unpublishing no more present \"%s\"\n", entry->path));
+		LegacyDevice* device = get_device_for_path(driver, devicePaths[0]);
+		if (device != NULL) {
+			driver->devices.Remove(device);
+			delete device;
+		}
+
+		devfs_unpublish_device(entry->path, true);
+		delete entry;
+	}
+
+	if (exported == 0) {
+		TRACE(("devfs: driver \"%s\" does not publish any more nodes and is unloaded\n", driver->path));
+		unload_driver(driver);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+load_driver(legacy_driver *driver)
+{
+	status_t (*init_hardware)(void);
+	status_t (*init_driver)(void);
+	const char **devicePaths;
+	int32 exported = 0;
+	status_t status;
+
+	driver->binary_updated = false;
+
+	// load the module
+	image_id image = driver->image;
+	if (image < 0) {
+		image = load_kernel_add_on(driver->path);
+		if (image < 0)
+			return image;
+	}
+
+	// For a valid device driver the following exports are required
+
+	int32 *apiVersion;
+	if (get_image_symbol(image, "api_version", B_SYMBOL_TYPE_DATA,
+			(void **)&apiVersion) == B_OK) {
+#if B_CUR_DRIVER_API_VERSION != 2
+		// just in case someone decides to bump up the api version
+#error Add checks here for new vs old api version!
+#endif
+		if (*apiVersion > B_CUR_DRIVER_API_VERSION) {
+			dprintf("devfs: \"%s\" api_version %ld not handled\n", driver->name,
+				*apiVersion);
+			status = B_BAD_VALUE;
+			goto error1;
+		}
+		if (*apiVersion < 1) {
+			dprintf("devfs: \"%s\" api_version invalid\n", driver->name);
+			status = B_BAD_VALUE;
+			goto error1;
+		}
+
+		driver->api_version = *apiVersion;
+	} else
+		dprintf("devfs: \"%s\" api_version missing\n", driver->name);
+
+	if (get_image_symbol(image, "publish_devices", B_SYMBOL_TYPE_TEXT,
+				(void **)&driver->publish_devices) != B_OK
+		|| get_image_symbol(image, "find_device", B_SYMBOL_TYPE_TEXT,
+				(void **)&driver->find_device) != B_OK) {
+		dprintf("devfs: \"%s\" mandatory driver symbol(s) missing!\n",
+			driver->name);
+		status = B_BAD_VALUE;
+		goto error1;
+	}
+
+	// Init the driver
+
+	if (get_image_symbol(image, "init_hardware", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_hardware) == B_OK
+		&& (status = init_hardware()) != B_OK) {
+		TRACE(("%s: init_hardware() failed: %s\n", driver->name,
+			strerror(status)));
+		status = ENXIO;
+		goto error1;
+	}
+
+	if (get_image_symbol(image, "init_driver", B_SYMBOL_TYPE_TEXT,
+			(void **)&init_driver) == B_OK
+		&& (status = init_driver()) != B_OK) {
+		TRACE(("%s: init_driver() failed: %s\n", driver->name,
+			strerror(status)));
+		status = ENXIO;
+		goto error2;
+	}
+
+	// resolve and cache those for the driver unload code
+	if (get_image_symbol(image, "uninit_driver", B_SYMBOL_TYPE_TEXT,
+		(void **)&driver->uninit_driver) != B_OK)
+		driver->uninit_driver = NULL;
+	if (get_image_symbol(image, "uninit_hardware", B_SYMBOL_TYPE_TEXT,
+		(void **)&driver->uninit_hardware) != B_OK)
+		driver->uninit_hardware = NULL;
+
+	// The driver has successfully been initialized, now we can
+	// finally publish its device entries
+
+	driver->image = image;
+	return republish_driver(driver);
+
+error3:
+	if (driver->uninit_driver)
+		driver->uninit_driver();
+
+error2:
+	if (driver->uninit_hardware)
+		driver->uninit_hardware();
+
+error1:
+	if (driver->image < 0) {
+		unload_kernel_add_on(image);
+		driver->image = status;
+	}
+
+	return status;
+}
+
+
+static status_t
+unload_driver(legacy_driver *driver)
+{
+	if (driver->image < 0) {
+		// driver is not currently loaded
+		return B_NO_INIT;
+	}
+
+	if (driver->uninit_driver)
+		driver->uninit_driver();
+
+	if (driver->uninit_hardware)
+		driver->uninit_hardware();
+
+	unload_kernel_add_on(driver->image);
+	driver->image = -1;
+	driver->binary_updated = false;
+	driver->find_device = NULL;
+	driver->publish_devices = NULL;
+	driver->uninit_driver = NULL;
+	driver->uninit_hardware = NULL;
+
+	return B_OK;
+}
+
+
+/*!	Collects all devices belonging to the \a driver and unpublishs them.
+*/
+static void
+unpublish_driver(legacy_driver *driver)
+{
+	// Iterate through all nodes until all devices of this driver have
+	// been unpublished
+
+dprintf("IMPLEMENT unpublish_driver()!\n");
+#if 0
+	while (driver->devices_published > 0) {
+		struct hash_iterator i;
+		hash_open(sDeviceFileSystem->vnode_hash, &i);
+
+		while (true) {
+			devfs_vnode *vnode = (devfs_vnode *)hash_next(
+				sDeviceFileSystem->vnode_hash, &i);
+			if (vnode == NULL)
+				break;
+
+			if (S_ISCHR(vnode->stream.type)
+				&& vnode->stream.u.dev.driver == driver) {
+				void *dummy;
+				get_vnode(sDeviceFileSystem->volume, vnode->id, &dummy);
+					// We need to get/put the node, so that it is
+					// actually removed
+
+				unpublish_node(sDeviceFileSystem, vnode, S_IFCHR);
+				put_vnode(sDeviceFileSystem->volume, vnode->id);
+				break;
+			}
+		}
+
+		hash_close(sDeviceFileSystem->vnode_hash, &i, false);
+	}
+#endif
+}
+
+
+static int32
+get_priority(const char* path)
+{
+	// TODO: would it be better to initialize a static structure here
+	// using find_directory()?
+	const directory_which whichPath[] = {
+		B_BEOS_DIRECTORY,
+		B_COMMON_DIRECTORY,
+		B_USER_DIRECTORY
+	};
+	KPath pathBuffer;
+
+	for (uint32 index = 0; index < sizeof(whichPath) / sizeof(whichPath[0]);
+			index++) {
+		if (find_directory(whichPath[index], gBootDevice, false,
+			pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
+			pathBuffer.UnlockBuffer();
+			if (!strncmp(pathBuffer.Path(), path, pathBuffer.BufferSize()))
+				return index;
+		} else
+			pathBuffer.UnlockBuffer();
+	}
+
+	return -1;
+}
+
+
+static const char *
+get_leaf(const char *path)
+{
+	const char *name = strrchr(path, '/');
+	if (name == NULL)
+		return path;
+
+	return name + 1;
+}
+
+
+static legacy_driver *
+find_driver(dev_t device, ino_t node)
+{
+	hash_iterator iterator;
+	hash_open(sDriverHash, &iterator);
+	legacy_driver *driver;
+	while (true) {
+		driver = (legacy_driver *)hash_next(sDriverHash, &iterator);
+		if (driver == NULL
+			|| driver->device == device && driver->node == node)
+			break;
+	}
+
+	hash_close(sDriverHash, &iterator, false);
+	return driver;
+}
+
+
+static status_t
+add_driver(const char *path, image_id image)
+{
+	// see if we already know this driver
+
+	struct stat stat;
+	if (image >= 0) {
+		// The image ID should be a small number and hopefully the boot FS
+		// doesn't use small negative values -- if it is inode based, we should
+		// be relatively safe.
+		stat.st_dev = -1;
+		stat.st_ino = -1;
+	} else {
+		if (::stat(path, &stat) != 0)
+			return errno;
+	}
+
+	int32 priority = get_priority(path);
+
+//	RecursiveLocker locker(&sDeviceFileSystem->lock);
+	MutexLocker _(sLock);
+
+	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
+		get_leaf(path));
+	if (driver != NULL) {
+		// we know this driver
+		// TODO: check if this driver is a different one and has precendence
+		// (ie. common supersedes system).
+		//dprintf("new driver has priority %ld, old %ld\n", priority, driver->priority);
+		if (priority >= driver->priority) {
+			driver->binary_updated = true;
+			return B_OK;
+		}
+
+		// TODO: test for changes here and/or via node monitoring and reload
+		//	the driver if necessary
+		if (driver->image < B_OK)
+			return driver->image;
+
+		return B_OK;
+	}
+
+	// we don't know this driver, create a new entry for it
+
+	driver = (legacy_driver *)malloc(sizeof(legacy_driver));
+	if (driver == NULL)
+		return B_NO_MEMORY;
+
+	driver->path = strdup(path);
+	if (driver->path == NULL) {
+		free(driver);
+		return B_NO_MEMORY;
+	}
+
+	driver->name = get_leaf(driver->path);
+	driver->device = stat.st_dev;
+	driver->node = stat.st_ino;
+	driver->image = image;
+	driver->last_modified = stat.st_mtime;
+	driver->devices_published = 0;
+	driver->devices_used = 0;
+	driver->binary_updated = false;
+	driver->priority = priority;
+
+	driver->api_version = 1;
+	driver->find_device = NULL;
+	driver->publish_devices = NULL;
+	driver->uninit_driver = NULL;
+	driver->uninit_hardware = NULL;
+	new(&driver->devices) DeviceList;
+
+	hash_insert(sDriverHash, driver);
+	if (stat.st_dev > 0) {
+		add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_STAT,
+			sDriverWatcher);
+	}
+
+	// Even if loading the driver fails - its entry will stay with us
+	// so that we don't have to go through it again
+	return load_driver(driver);
+}
+
+
+/*!	This is no longer part of the public kernel API, so we just export the
+	symbol
+*/
+extern "C" status_t load_driver_symbols(const char *driverName);
+status_t
+load_driver_symbols(const char *driverName)
+{
+	// This is done globally for the whole kernel via the settings file.
+	// We don't have to do anything here.
+
+	return B_OK;
+}
+
+
+static status_t
+reload_driver(legacy_driver *driver)
+{
+	dprintf("devfs: reload driver \"%s\"\n", driver->name);
+
+	unload_driver(driver);
+
+	status_t status = load_driver(driver);
+	if (status < B_OK)
+		unpublish_driver(driver);
+
+	return status;
+}
+
+
+static void
+handle_driver_events(void *_fs, int /*iteration*/)
+{
+	struct devfs *fs = (devfs *)_fs;
+
+	if (atomic_and(&sDriverEvents, 0) == 0)
+		return;
+
+	// something happened, let's see what it was
+
+//	RecursiveLocker locker(fs->lock);
+	MutexLocker locker(sLock);
+
+	while (true) {
+		path_entry *path = sDriversToAdd.RemoveHead();
+		if (path == NULL)
+			break;
+
+		legacy_driver_add(path->path);
+		delete path;
+	}
+
+	hash_iterator iterator;
+	hash_open(sDriverHash, &iterator);
+	legacy_driver *driver;
+	while (true) {
+		driver = (legacy_driver *)hash_next(sDriverHash, &iterator);
+		if (driver == NULL)
+			break;
+		if (!driver->binary_updated || driver->devices_used != 0)
+			continue;
+
+		// try to reload the driver
+		reload_driver(driver);
+	}
+
+	hash_close(sDriverHash, &iterator, false);
+}
+
+
+//	#pragma mark - DriverWatcher
+
+
+DriverWatcher::DriverWatcher()
+{
+}
+
+
+DriverWatcher::~DriverWatcher()
+{
+}
+
+
+void
+DriverWatcher::EventOccured(NotificationService& service,
+	const KMessage* event)
+{
+	if (event->GetInt32("opcode", -1) != B_STAT_CHANGED
+		|| (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
+		return;
+
+	MutexLocker locker(sLock);
+
+	legacy_driver* driver = find_driver(event->GetInt32("device", -1),
+		event->GetInt64("node", 0));
+	if (driver == NULL)
+		return;
+
+	driver->binary_updated = true;
+//dprintf("%s: devices published %ld, used %ld\n", driver->name, driver->devices_published, driver->devices_used);
+	if (driver->devices_used == 0) {
+		// trigger a reload of the driver
+		atomic_add(&sDriverEvents, 1);
+	} else {
+		// driver is in use right now
+		dprintf("devfs: changed driver \"%s\" is still in use\n", driver->name);
+	}
+}
+
+
+static int
+dump_driver(int argc, char** argv)
+{
+	if (argc < 2) {
+		// print list of all drivers
+		kprintf("address    image used publ.   pri name\n");
+		hash_iterator iterator;
+		hash_open(sDriverHash, &iterator);
+		while (true) {
+			legacy_driver* driver = (legacy_driver*)hash_next(sDriverHash,
+				&iterator);
+			if (driver == NULL)
+				break;
+
+			kprintf("%p  %5ld %3ld %5ld %c %3ld %s\n", driver,
+				driver->image < 0 ? -1 : driver->image,
+				driver->devices_used, driver->devices_published,
+				driver->binary_updated ? 'U' : ' ', driver->priority,
+				driver->name);
+		}
+
+		hash_close(sDriverHash, &iterator, false);
+		return 0;
+	}
+
+	if (!strcmp(argv[1], "--help")) {
+		kprintf("usage: %s [name]\n", argv[0]);
+		return 0;
+	}
+
+	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash, argv[1]);
+	if (driver == NULL) {
+		kprintf("Driver named \"%s\" not found.\n", argv[1]);
+		return 0;
+	}
+
+	kprintf("DEVFS DRIVER: %p\n", driver);
+	kprintf(" name:           %s\n", driver->name);
+	kprintf(" path:           %s\n", driver->path);
+	kprintf(" image:          %ld\n", driver->image);
+	kprintf(" device:         %ld\n", driver->device);
+	kprintf(" node:           %Ld\n", driver->node);
+	kprintf(" last modified:  %ld\n", driver->last_modified);
+	kprintf(" devs used:      %ld\n", driver->devices_used);
+	kprintf(" devs published: %ld\n", driver->devices_published);
+	kprintf(" binary updated: %d\n", driver->binary_updated);
+	kprintf(" priority:       %ld\n", driver->priority);
+	kprintf(" api version:    %ld\n", driver->api_version);
+	kprintf(" hooks:          find_device %p, publish_devices %p\n"
+		"                 uninit_driver %p, uninit_hardware %p\n",
+		driver->find_device, driver->publish_devices, driver->uninit_driver,
+		driver->uninit_hardware);
+
+	return 0;
+}
+
+
+//	#pragma mark -
+
+
+DirectoryIterator::DirectoryIterator(const char* path, const char* subPath,
+		bool recursive)
+	:
+	fDirectory(NULL),
+	fBasePath(NULL),
+	fCurrentName(NULL)
+{
+	SetTo(path, subPath, recursive);
+}
+
+
+DirectoryIterator::~DirectoryIterator()
+{
+	Unset();
+}
+
+
+void
+DirectoryIterator::SetTo(const char* path, const char* subPath, bool recursive)
+{
+	Unset();
+	fRecursive = recursive;
+
+	if (path == NULL) {
+		// add default paths
+		const directory_which whichPath[] = {
+			B_USER_ADDONS_DIRECTORY,
+			B_COMMON_ADDONS_DIRECTORY,
+			B_BEOS_ADDONS_DIRECTORY
+		};
+		KPath pathBuffer;
+
+		bool disableUserAddOns = get_safemode_boolean(
+			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
+
+		for (uint32 i = 0; i < sizeof(whichPath) / sizeof(whichPath[0]); i++) {
+			if (i < 2 && disableUserAddOns)
+				continue;
+
+			if (find_directory(whichPath[i], gBootDevice, true,
+					pathBuffer.LockBuffer(), pathBuffer.BufferSize()) == B_OK) {
+				pathBuffer.UnlockBuffer();
+				pathBuffer.Append("kernel");
+				AddPath(pathBuffer.Path(), subPath);
+			}
+		}
+	} else
+		AddPath(path, subPath);
+}
+
+
+status_t
+DirectoryIterator::GetNext(KPath& path, struct stat& stat)
+{
+next_directory:
+	while (fDirectory == NULL) {
+		delete fBasePath;
+		fBasePath = NULL;
+
+		if (!fPaths.Pop(&fBasePath))
+			return B_ENTRY_NOT_FOUND;
+
+		fDirectory = opendir(fBasePath->Path());
+	}
+
+next_entry:
+	struct dirent* dirent = readdir(fDirectory);
+	if (dirent == NULL) {
+		// get over to next directory on the stack
+		closedir(fDirectory);
+		fDirectory = NULL;
+
+		goto next_directory;
+	}
+
+	if (!strcmp(dirent->d_name, "..") || !strcmp(dirent->d_name, "."))
+		goto next_entry;
+
+	fCurrentName = dirent->d_name;
+
+	path.SetTo(fBasePath->Path());
+	path.Append(fCurrentName);
+
+	if (::stat(path.Path(), &stat) != 0)
+		goto next_entry;
+
+	if (S_ISDIR(stat.st_mode) && fRecursive) {
+		KPath *nextPath = new(nothrow) KPath(path);
+		if (!nextPath)
+			return B_NO_MEMORY;
+		if (fPaths.Push(nextPath) != B_OK)
+			return B_NO_MEMORY;
+
+		goto next_entry;
+	}
+
+	return B_OK;
+}
+
+
+void
+DirectoryIterator::Unset()
+{
+	if (fDirectory != NULL) {
+		closedir(fDirectory);
+		fDirectory = NULL;
+	}
+
+	delete fBasePath;
+	fBasePath = NULL;
+
+	KPath *path;
+	while (fPaths.Pop(&path))
+		delete path;
+}
+
+
+void
+DirectoryIterator::AddPath(const char* basePath, const char* subPath)
+{
+	KPath *path = new(nothrow) KPath(basePath);
+	if (!path)
+		panic("out of memory");
+	if (subPath != NULL)
+		path->Append(subPath);
+
+	fPaths.Push(path);
+}
+
+
+//	#pragma mark -
+
+
+DirectoryWatcher::DirectoryWatcher()
+{
+}
+
+
+DirectoryWatcher::~DirectoryWatcher()
+{
+}
+
+
+void
+DirectoryWatcher::EventOccured(NotificationService& service,
+	const KMessage* event)
+{
+	int32 opcode = event->GetInt32("opcode", -1);
+	dev_t device = event->GetInt32("device", -1);
+	ino_t directory = event->GetInt64("directory", -1);
+	const char *name = event->GetString("name", NULL);
+
+	if (opcode == B_ENTRY_MOVED) {
+		// Determine wether it's a move within, out of, or into one
+		// of our watched directories.
+		ino_t from = event->GetInt64("from directory", -1);
+		ino_t to = event->GetInt64("to directory", -1);
+		if (sDirectoryNodeHash.Lookup(&from) == NULL) {
+			directory = to;
+			opcode = B_ENTRY_CREATED;
+		} else if (sDirectoryNodeHash.Lookup(&to) == NULL) {
+			directory = from;
+			opcode = B_ENTRY_REMOVED;
+		} else {
+			// Move within, don't do anything for now
+			// TODO: adjust driver priority if necessary
+			return;
+		}
+	}
+
+	KPath path(B_PATH_NAME_LENGTH + 1);
+	if (path.InitCheck() != B_OK || vfs_entry_ref_to_path(device, directory,
+			name, path.LockBuffer(), path.BufferSize()) != B_OK)
+		return;
+
+	path.UnlockBuffer();
+
+	dprintf("driver \"%s\" %s\n", path.Leaf(),
+		opcode == B_ENTRY_CREATED ? "added" : "removed");
+
+#if 0
+	switch (opcode) {
+		case B_ENTRY_CREATED:
+			devfs_driver_added(path.Path());
+			break;
+		case B_ENTRY_REMOVED:
+			devfs_driver_removed(path.Path());
+			break;
+	}
+#endif
+}
+
+
+//	#pragma mark -
+
+
+static void
+start_watching(const char *base, const char *sub)
+{
+	KPath path(base);
+	path.Append(sub);
+
+	// TODO: create missing directories?
+	struct stat stat;
+	if (::stat(path.Path(), &stat) != 0)
+		return;
+
+	add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
+		sDirectoryWatcher);
+
+	directory_node_entry *entry = new(std::nothrow) directory_node_entry;
+	if (entry != NULL) {
+		entry->node = stat.st_ino;
+		sDirectoryNodeHash.Insert(entry);
+	}
+}
+
+
+static struct driver_entry*
+new_driver_entry(const char* path, dev_t device, ino_t node)
+{
+	driver_entry* entry = (driver_entry*)malloc(sizeof(driver_entry));
+	if (entry == NULL)
+		return NULL;
+
+	entry->path = strdup(path);
+	if (entry->path == NULL) {
+		free(entry);
+		return NULL;
+	}
+
+	entry->device = device;
+	entry->node = node;
+	entry->busses = 0;
+	return entry;
+}
+
+
+/*!	Iterates over the given list and tries to load all drivers in that list.
+	The list is emptied and freed during the traversal.
+*/
+static status_t
+try_drivers(DriverEntryList& list)
+{
+	while (true) {
+		driver_entry* entry = list.RemoveHead();
+		if (entry == NULL)
+			break;
+
+		image_id image = load_kernel_add_on(entry->path);
+		if (image >= 0) {
+			// check if it's an old-style driver
+			if (legacy_driver_add(entry->path) == B_OK) {
+				// we have a driver
+				dprintf("loaded driver %s\n", entry->path);
+			}
+
+			unload_kernel_add_on(image);
+		}
+
+		free(entry->path);
+		free(entry);
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+probe_for_drivers(const char *type)
+{
+	TRACE(("probe_for_drivers(type = %s)\n", type));
+
+	if (gBootDevice < 0)
+		return B_OK;
+
+	DriverEntryList drivers;
+
+	// build list of potential drivers for that type
+
+	DirectoryIterator iterator(NULL, type, false);
+	struct stat stat;
+	KPath path;
+
+	while (iterator.GetNext(path, stat) == B_OK) {
+		if (S_ISDIR(stat.st_mode)) {
+			add_node_listener(stat.st_dev, stat.st_ino, B_WATCH_DIRECTORY,
+				sDirectoryWatcher);
+
+			directory_node_entry *entry
+				= new(std::nothrow) directory_node_entry;
+			if (entry != NULL) {
+				entry->node = stat.st_ino;
+				sDirectoryNodeHash.Insert(entry);
+			}
+
+			// We need to make sure that drivers in ie. "audio/raw/" can
+			// be found as well - therefore, we must make sure that "audio"
+			// exists on /dev.
+
+			size_t length = strlen("drivers/dev");
+			if (strncmp(type, "drivers/dev", length))
+				continue;
+
+			path.SetTo(type);
+			path.Append(iterator.CurrentName());
+			devfs_publish_directory(path.Path() + length + 1);
+			continue;
+		}
+
+		driver_entry *entry = new_driver_entry(path.Path(), stat.st_dev,
+			stat.st_ino);
+		if (entry == NULL)
+			return B_NO_MEMORY;
+
+		TRACE(("found potential driver: %s\n", path.Path()));
+		drivers.Add(entry);
+	}
+
+	if (drivers.IsEmpty())
+		return B_OK;
+
+	// ToDo: do something with the remaining drivers... :)
+	try_drivers(drivers);
+	return B_OK;
+}
+
+
+//	#pragma mark - LegacyDevice
+
+
+LegacyDevice::LegacyDevice(legacy_driver* driver, const char* path,
+		device_hooks* hooks)
+	:
+	fDriver(driver)
+{
+	fDeviceModule = (device_module_info*)malloc(sizeof(device_module_info));
+	if (fDeviceModule != NULL)
+		memset(fDeviceModule, 0, sizeof(device_module_info));
+
+	fDeviceData = this;
+	fPath = strdup(path);
+
+	SetHooks(hooks);
+}
+
+
+LegacyDevice::~LegacyDevice()
+{
+	free(fDeviceModule);
+	free((char*)fPath);
+}
+
+
+status_t
+LegacyDevice::InitCheck() const
+{
+	return fDeviceModule != NULL && fPath != NULL ? B_OK : B_NO_MEMORY;
+}
+
+
+status_t
+LegacyDevice::InitDevice()
+{
+	MutexLocker _(sLock);
+
+	if (fInitialized++ > 0)
+		return B_OK;
+
+	if (fDriver != NULL && fDriver->devices_used == 0
+		&& (fDriver->image < 0 || fDriver->binary_updated)) {
+		status_t status = reload_driver(fDriver);
+		if (status < B_OK)
+			return status;
+	}
+
+	if (fDriver != NULL)
+		fDriver->devices_used++;
+
+	return B_OK;
+}
+
+
+void
+LegacyDevice::UninitDevice()
+{
+	MutexLocker _(sLock);
+
+	if (fInitialized-- > 1)
+		return;
+
+	if (fDriver != NULL)
+		fDriver->devices_used--;
+}
+
+
+void
+LegacyDevice::SetHooks(device_hooks* hooks)
+{
+	// TODO: setup compatibility layer!
+	fHooks = hooks;
+
+	fDeviceModule->close = hooks->close;
+	fDeviceModule->free = hooks->free;
+	fDeviceModule->control = hooks->control;
+	fDeviceModule->read = hooks->read;
+	fDeviceModule->write = hooks->write;
+
+	if (fDriver == NULL || fDriver->api_version >= 2) {
+		// According to Be newsletter, vol II, issue 36,
+		// version 2 added readv/writev, which we don't support, but also
+		// select/deselect.
+		fDeviceModule->select = (status_t (*)(void*, uint8, selectsync*))~0;
+		fDeviceModule->deselect = hooks->deselect;
+	}
+}
+
+
+status_t
+LegacyDevice::Open(const char* path, int openMode, void** _cookie)
+{
+	return Hooks()->open(path, openMode, _cookie);
+}
+
+
+status_t
+LegacyDevice::Select(void* cookie, uint8 event, selectsync* sync)
+{
+	return Hooks()->select(cookie, event, 0, sync);
+}
+
+
+//	#pragma mark - kernel private API
+
+
+extern "C" void
+legacy_driver_add_preloaded(kernel_args* args)
+{
+	// NOTE: This function does not exit in case of error, since it
+	// needs to unload the images then. Also the return code of
+	// the path operations is kept separate from the add_driver()
+	// success, so that even if add_driver() fails for one driver, it
+	// is still tried for the other drivers.
+	// NOTE: The initialization success of the path objects is implicitely
+	// checked by the immediately following functions.
+	KPath basePath;
+	status_t pathStatus = find_directory(B_BEOS_ADDONS_DIRECTORY,
+		gBootDevice, false, basePath.LockBuffer(), basePath.BufferSize());
+	if (pathStatus != B_OK) {
+		dprintf("devfs_add_preloaded_drivers: find_directory() failed: "
+			"%s\n", strerror(pathStatus));
+	}
+	basePath.UnlockBuffer();
+	if (pathStatus == B_OK)
+		pathStatus = basePath.Append("kernel");
+	if (pathStatus != B_OK) {
+		dprintf("devfs_add_preloaded_drivers: constructing base driver "
+			"path failed: %s\n", strerror(pathStatus));
+	}
+
+	struct preloaded_image* image;
+	for (image = args->preloaded_images; image != NULL; image = image->next) {
+		if (image->is_module || image->id < 0)
+			continue;
+
+		KPath imagePath(basePath);
+		if (pathStatus == B_OK)
+			pathStatus = imagePath.Append(image->name);
+
+		// try to add the driver
+		status_t addStatus = pathStatus;
+		if (pathStatus == B_OK)
+			addStatus = add_driver(imagePath.Path(), image->id);
+		if (addStatus != B_OK) {
+			dprintf("devfs_add_preloaded_drivers: Failed to add \"%s\"\n",
+				image->name);
+			unload_kernel_add_on(image->id);
+		}
+	}
+}
+
+
+extern "C" status_t
+legacy_driver_add(const char* path)
+{
+	return add_driver(path, -1);
+}
+
+
+extern "C" void
+devfs_driver_added(const char *path)
+{
+	int32 priority = get_priority(path);
+	MutexLocker locker(sLock);
+
+	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
+		get_leaf(path));
+
+	if (driver == NULL) {
+		// Add the driver to our list
+		path_entry *entry = new(std::nothrow) path_entry;
+		if (entry == NULL)
+			return;
+
+		strlcpy(entry->path, path, sizeof(entry->path));
+		sDriversToAdd.Add(entry);
+	} else {
+		// Update the driver if it is affected by the new entry
+		if (priority < driver->priority)
+			return;
+
+		driver->binary_updated = true;
+	}
+
+	atomic_add(&sDriverEvents, 1);
+}
+
+
+extern "C" void
+devfs_driver_removed(const char* path)
+{
+	int32 priority = get_priority(path);
+	MutexLocker locker(sLock);
+
+	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
+		get_leaf(path));
+	if (driver == NULL || priority < driver->priority)
+		return;
+
+	driver->binary_updated = true;
+	atomic_add(&sDriverEvents, 1);
+}
+
+
+extern "C" status_t
+legacy_driver_publish(const char *path, device_hooks *hooks)
+{
+	// we don't have a driver, just publish the hooks
+	LegacyDevice* device = new(std::nothrow) LegacyDevice(NULL, path, hooks);
+	if (device == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = device->InitCheck();
+	if (status == B_OK)
+		status = devfs_publish_device(path, device);
+
+	if (status != B_OK)
+		delete device;
+
+	return status;
+}
+
+
+extern "C" status_t
+legacy_driver_rescan(const char* driverName)
+{
+	MutexLocker locker(sLock);
+
+	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
+		driverName);
+	if (driver == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// Republish the driver's entries
+	return republish_driver(driver);
+}
+
+
+extern "C" status_t
+legacy_driver_probe(const char* subPath)
+{
+	TRACE(("legacy_driver_probe(type = %s)\n", subPath));
+
+	char devicePath[64];
+	snprintf(devicePath, sizeof(devicePath), "drivers/dev%s%s",
+		subPath[0] ? "/" : "", subPath);
+
+	if (!sWatching && gBootDevice > 0) {
+		// We're probing the actual boot volume for the first time,
+		// let's watch its driver directories for changes
+		const directory_which whichPath[] = {
+			B_USER_ADDONS_DIRECTORY,
+			B_COMMON_ADDONS_DIRECTORY,
+			B_BEOS_ADDONS_DIRECTORY
+		};
+		KPath path;
+
+		new(&sDirectoryWatcher) DirectoryWatcher;
+
+		bool disableUserAddOns = get_safemode_boolean(
+			B_SAFEMODE_DISABLE_USER_ADD_ONS, false);
+
+		for (uint32 i = 0; i < sizeof(whichPath) / sizeof(whichPath[0]); i++) {
+			if (i < 2 && disableUserAddOns)
+				continue;
+
+			if (find_directory(whichPath[i], gBootDevice, true,
+					path.LockBuffer(), path.BufferSize()) == B_OK) {
+				path.UnlockBuffer();
+				path.Append("kernel/drivers");
+
+				start_watching(path.Path(), "dev");
+				start_watching(path.Path(), "bin");
+			}
+		}
+
+		sWatching = true;
+	}
+
+	return probe_for_drivers(devicePath);
+}
+
+
+extern "C" status_t
+legacy_driver_init(void)
+{
+	sDriverHash = hash_init(DRIVER_HASH_SIZE, offsetof(legacy_driver, next),
+		&driver_entry_compare, &driver_entry_hash);
+	if (sDriverHash == NULL)
+		return B_NO_MEMORY;
+
+	mutex_init(&sLock, "legacy driver");
+
+	new(&sDriverWatcher) DriverWatcher;
+	new(&sDriversToAdd) DoublyLinkedList<path_entry>;
+
+	register_kernel_daemon(&handle_driver_events, NULL, 10);
+		// once every second
+
+	add_debugger_command("legacy_driver", &dump_driver,
+		"info about a legacy driver entry");
+
+	return B_OK;
+}

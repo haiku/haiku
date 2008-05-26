@@ -14,7 +14,7 @@
 	consists of a single level only. In fact it is no bus manager
 	in terms of the PnP structure at all but a driver that maps
 	one SCSI bus onto one IDE controller.
-	
+
 	This structure does not allow us to publish IDE devices
 	as they can be accessed via the SCSI bus node only. Therefore
 	we do a full bus scan every time the IDE bus node is loaded.
@@ -33,41 +33,6 @@
 #include <stdio.h>
 
 scsi_for_sim_interface *scsi;
-fast_log_info *fast_log;
-
-
-#ifdef USE_FAST_LOG
-static fast_log_event_type ide_events[] =
-{
-	{ ev_ide_send_command, "ev_ide_send_command " },
-	{ ev_ide_device_start_service, "ev_ide_device_start_service" },
-	{ ev_ide_device_start_service2, "ev_ide_device_start_service2" },
-	{ ev_ide_dpc_service, "ev_ide_dpc_service" },
-	{ ev_ide_dpc_continue, "ev_ide_dpc_continue" },
-	{ ev_ide_irq_handle, "ev_ide_irq_handle" },
-	{ ev_ide_cancel_irq_timeout, "ev_ide_cancel_irq_timeout" },
-	{ ev_ide_start_waiting, "ev_ide_start_waiting" },
-	{ ev_ide_timeout_dpc, "ev_ide_timeout_dpc" },
-	{ ev_ide_timeout, "ev_ide_timeout" },
-	{ ev_ide_reset_bus, "ev_ide_reset_bus" },
-	{ ev_ide_reset_device, "ev_ide_reset_device" },
-	
-	{ ev_ide_scsi_io, "ev_ide_scsi_io" },
-	{ ev_ide_scsi_io_exec, "ev_ide_scsi_io_exec" },
-	{ ev_ide_scsi_io_invalid_device, "ev_ide_scsi_io_invalid_device" },
-	{ ev_ide_scsi_io_bus_busy, "ev_ide_scsi_io_bus_busy" },
-	{ ev_ide_scsi_io_device_busy, "ev_ide_scsi_io_device_busy" },
-	{ ev_ide_scsi_io_disconnected, "ev_ide_scsi_io_disconnected" },
-	{ ev_ide_finish_request, "ev_ide_finish_request" },
-	{ ev_ide_finish_norelease, "ev_ide_finish_norelease" },
-
-	{ ev_ide_scan_device_int, "ev_ide_scan_device_int" },
-	{ ev_ide_scan_device_int_cant_send, "ev_ide_scan_device_int_cant_send" },
-	{ ev_ide_scan_device_int_keeps_busy, "ev_ide_scan_device_int_keeps_busy" },
-	{ ev_ide_scan_device_int_found, "ev_ide_scan_device_int_found" },
-	{}
-};
-#endif
 
 
 static void disconnect_worker(ide_bus_info *bus, void *arg);
@@ -85,7 +50,7 @@ is_queuable(ide_device_info *device, scsi_ccb *request)
 	if (!device->CQ_enabled)
 		return false;
 
-	// make sure the caller allows queuing	
+	// make sure the caller allows queuing
 	if ((request->flags & SCSI_ORDERED_QTAG) != 0)
 		return false;
 
@@ -93,151 +58,6 @@ is_queuable(ide_device_info *device, scsi_ccb *request)
 	// atapi devices I know don't support queuing anyway
 	return opcode == SCSI_OP_READ_6 || opcode == SCSI_OP_WRITE_6
 		|| opcode == SCSI_OP_READ_10 || opcode == SCSI_OP_WRITE_10;
-}
-
-
-static void
-sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
-{
-	ide_device_info *device;
-	bool queuable;
-	ide_qrequest *qrequest;
-	//ide_request_priv *priv;
-
-//	FAST_LOG3( bus->log, ev_ide_scsi_io, (uint32)request, request->target_id, request->target_lun );	
-	SHOW_FLOW(3, "%d:%d", request->target_id, request->target_lun);
-
-	if (bus->disconnected)
-		goto err_disconnected;
-
-	// make sure, device is valid
-	// I've read that there are ATAPI devices with more then one LUN,
-	// but it seems that most (all?) devices ignore LUN, so we have
-	// to restrict to LUN 0 to avoid mirror devices
-	if (request->target_id >= 2)
-		goto err_inv_device;
-
-	device = bus->devices[request->target_id];		
-	if (device == NULL)
-		goto err_inv_device;
-
-	if (request->target_lun > device->last_lun)
-		goto err_inv_device;
-
-	queuable = is_queuable(device, request);
-
-	// grab the bus	
-	ACQUIRE_BEN(&bus->status_report_ben);
-	IDE_LOCK(bus);
-
-	if (bus->state != ide_state_idle)
-		goto err_bus_busy;
-
-	// bail out if device can't accept further requests
-	if (device->free_qrequests == NULL
-		|| (device->num_running_reqs > 0 && !queuable)) 
-		goto err_device_busy;
-
-	bus->state = ide_state_accessing;
-
-	IDE_UNLOCK(bus);
-	RELEASE_BEN(&bus->status_report_ben);
-
-	// as we own the bus, noone can bother us
-	qrequest = device->free_qrequests;
-	device->free_qrequests = qrequest->next;
-
-	qrequest->request = request;
-	qrequest->queuable = queuable;
-	qrequest->running = true;
-	qrequest->uses_dma = false;
-
-	++device->num_running_reqs;
-	++bus->num_running_reqs;
-	bus->active_qrequest = qrequest;
-
-	FAST_LOGN(bus->log, ev_ide_scsi_io_exec, 4, (uint32)qrequest,
-		(uint32)request, bus->num_running_reqs, device->num_running_reqs);
-
-	device->exec_io(device, qrequest);
-
-	return;
-
-err_inv_device:
-	SHOW_ERROR(3, "Invalid device %d:%d", 
-		request->target_id, request->target_lun);
-	FAST_LOG1(bus->log, ev_ide_scsi_io_invalid_device, (uint32)request);
-
-	request->subsys_status = SCSI_SEL_TIMEOUT;
-	scsi->finished(request, 1);
-	return;
-
-err_bus_busy:
-	SHOW_FLOW0(3, "Bus busy");
-	FAST_LOG1(bus->log, ev_ide_scsi_io_bus_busy, (uint32)request);
-
-	IDE_UNLOCK(bus);
-	scsi->requeue(request, true);
-	RELEASE_BEN(&bus->status_report_ben);
-	return;
-
-err_device_busy:
-	SHOW_FLOW0(3, "Device busy");
-	FAST_LOG1(bus->log, ev_ide_scsi_io_device_busy, (uint32)request);
-
-	IDE_UNLOCK(bus);
-	scsi->requeue(request, false);
-	RELEASE_BEN(&bus->status_report_ben);
-	return;
-
-err_disconnected:
-	SHOW_ERROR0(3, "No controller anymore");
-	FAST_LOG1(bus->log, ev_ide_scsi_io_disconnected, (uint32)request);
-	request->subsys_status = SCSI_NO_HBA;
-	scsi->finished(request, 1);
-	return;
-}
-
-
-static uchar
-sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
-{
-	char *controller_name;
-
-	SHOW_FLOW0(4, "");
-
-	if (bus->disconnected)
-		return SCSI_NO_HBA;
-
-	info->hba_inquiry = SCSI_PI_TAG_ABLE | SCSI_PI_WIDE_16;
-
-	info->hba_misc = 0;
-
-	memset(info->vuhba_flags, 0, sizeof(info->vuhba_flags));
-	// we don't need any of the private data
-	info->sim_priv = 0;
-
-	// there is no initiator for IDE, but SCSI needs it for scanning
-	info->initiator_id = 2;	
-	// there's no controller limit, so set it higher then the maximum
-	// number of queued requests, which is 32 per device * 2 devices
-	info->hba_queue_size = 65;
-
-	strncpy(info->sim_vid, "Haiku", SCSI_SIM_ID);
-
-	if (pnp->get_attr_string(bus->node, SCSI_DESCRIPTION_CONTROLLER_NAME,
-			&controller_name, true) == B_OK) {
-		strlcpy(info->hba_vid, controller_name, SCSI_HBA_ID);
-		free(controller_name);
-	} else
-		strlcpy(info->hba_vid, "", SCSI_HBA_ID);
-
-	strlcpy(info->controller_family, "IDE", SCSI_FAM_ID);
-	strlcpy(info->controller_type, "IDE", SCSI_TYPE_ID);
-
-	SHOW_FLOW0(4, "done");
-
-	return SCSI_REQ_CMP;
 }
 
 
@@ -269,6 +89,151 @@ sim_scan_bus(ide_bus_info *bus)
 	for (i = 0; i < bus->max_devices; ++i) {
 		scan_device(bus, i);
 	}
+
+	return SCSI_REQ_CMP;
+}
+
+
+static void
+sim_set_scsi_bus(ide_bus_info *bus, scsi_bus scsi)
+{
+	bus->scsi_cookie = scsi;
+
+	// detect devices
+	sim_scan_bus(bus);
+}
+
+
+static void
+sim_scsi_io(ide_bus_info *bus, scsi_ccb *request)
+{
+	ide_device_info *device;
+	bool queuable;
+	ide_qrequest *qrequest;
+
+	SHOW_FLOW(3, "%d:%d", request->target_id, request->target_lun);
+
+	if (bus->disconnected)
+		goto err_disconnected;
+
+	// make sure, device is valid
+	// I've read that there are ATAPI devices with more then one LUN,
+	// but it seems that most (all?) devices ignore LUN, so we have
+	// to restrict to LUN 0 to avoid mirror devices
+	if (request->target_id >= 2)
+		goto err_inv_device;
+
+	device = bus->devices[request->target_id];
+	if (device == NULL)
+		goto err_inv_device;
+
+	if (request->target_lun > device->last_lun)
+		goto err_inv_device;
+
+	queuable = is_queuable(device, request);
+
+	// grab the bus
+	ACQUIRE_BEN(&bus->status_report_ben);
+	IDE_LOCK(bus);
+
+	if (bus->state != ide_state_idle)
+		goto err_bus_busy;
+
+	// bail out if device can't accept further requests
+	if (device->free_qrequests == NULL
+		|| (device->num_running_reqs > 0 && !queuable))
+		goto err_device_busy;
+
+	bus->state = ide_state_accessing;
+
+	IDE_UNLOCK(bus);
+	RELEASE_BEN(&bus->status_report_ben);
+
+	// as we own the bus, noone can bother us
+	qrequest = device->free_qrequests;
+	device->free_qrequests = qrequest->next;
+
+	qrequest->request = request;
+	qrequest->queuable = queuable;
+	qrequest->running = true;
+	qrequest->uses_dma = false;
+
+	++device->num_running_reqs;
+	++bus->num_running_reqs;
+	bus->active_qrequest = qrequest;
+
+	device->exec_io(device, qrequest);
+
+	return;
+
+err_inv_device:
+	SHOW_ERROR(3, "Invalid device %d:%d",
+		request->target_id, request->target_lun);
+
+	request->subsys_status = SCSI_SEL_TIMEOUT;
+	scsi->finished(request, 1);
+	return;
+
+err_bus_busy:
+	SHOW_FLOW0(3, "Bus busy");
+
+	IDE_UNLOCK(bus);
+	scsi->requeue(request, true);
+	RELEASE_BEN(&bus->status_report_ben);
+	return;
+
+err_device_busy:
+	SHOW_FLOW0(3, "Device busy");
+
+	IDE_UNLOCK(bus);
+	scsi->requeue(request, false);
+	RELEASE_BEN(&bus->status_report_ben);
+	return;
+
+err_disconnected:
+	SHOW_ERROR0(3, "No controller anymore");
+	request->subsys_status = SCSI_NO_HBA;
+	scsi->finished(request, 1);
+	return;
+}
+
+
+static uchar
+sim_path_inquiry(ide_bus_info *bus, scsi_path_inquiry *info)
+{
+	const char *controller_name;
+
+	SHOW_FLOW0(4, "");
+
+	if (bus->disconnected)
+		return SCSI_NO_HBA;
+
+	info->hba_inquiry = SCSI_PI_TAG_ABLE | SCSI_PI_WIDE_16;
+
+	info->hba_misc = 0;
+
+	memset(info->vuhba_flags, 0, sizeof(info->vuhba_flags));
+	// we don't need any of the private data
+	info->sim_priv = 0;
+
+	// there is no initiator for IDE, but SCSI needs it for scanning
+	info->initiator_id = 2;
+	// there's no controller limit, so set it higher then the maximum
+	// number of queued requests, which is 32 per device * 2 devices
+	info->hba_queue_size = 65;
+
+	strncpy(info->sim_vid, "Haiku", SCSI_SIM_ID);
+
+	if (pnp->get_attr_string(bus->node, SCSI_DESCRIPTION_CONTROLLER_NAME,
+			&controller_name, true) == B_OK) {
+		strlcpy(info->hba_vid, controller_name, SCSI_HBA_ID);
+	} else
+		strlcpy(info->hba_vid, "", SCSI_HBA_ID);
+
+	strlcpy(info->controller_family, "IDE", SCSI_FAM_ID);
+	strlcpy(info->controller_type, "IDE", SCSI_TYPE_ID);
+
+	SHOW_FLOW0(4, "done");
 
 	return SCSI_REQ_CMP;
 }
@@ -339,7 +304,7 @@ create_sense(ide_device_info *device, scsi_sense *sense)
 void
 finish_checksense(ide_qrequest *qrequest)
 {
-	SHOW_FLOW(3, "%p, subsys_status=%d, sense=%x", 
+	SHOW_FLOW(3, "%p, subsys_status=%d, sense=%x",
 		qrequest->request,
 		qrequest->request->subsys_status,
 		(int)qrequest->device->new_combined_sense);
@@ -371,7 +336,6 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 	scsi_ccb *request;
 	uint num_running;
 
-	FAST_LOG2(bus->log, ev_ide_finish_request, (uint32)qrequest, resubmit);
 	SHOW_FLOW0(3, "");
 
 	// save request first, as qrequest can be reused as soon as
@@ -394,10 +358,10 @@ finish_request(ide_qrequest *qrequest, bool resubmit)
 	// TBD:
 	// if we really handle a service request, the finished command
 	// is delayed unnecessarily, but if we tell the XPT about the finished
-	// command first, it will instantly try to pass us another 
+	// command first, it will instantly try to pass us another
 	// request to handle, which we will refuse as the bus is still
 	// locked; this really has to be improved
-	access_finished(bus, device);	
+	access_finished(bus, device);
 
 	ACQUIRE_BEN(&bus->status_report_ben);
 
@@ -425,7 +389,7 @@ set_check_condition(ide_qrequest *qrequest)
 
 	request->subsys_status = SCSI_REQ_CMP_ERR;
 	request->device_status = SCSI_STATUS_CHECK_CONDITION;
-	
+
 	// copy sense only if caller requested it
 	if ((request->flags & SCSI_DIS_AUTOSENSE) == 0) {
 		scsi_sense sense;
@@ -488,8 +452,6 @@ finish_norelease(ide_qrequest *qrequest, bool resubmit)
 	ide_bus_info *bus = device->bus;
 	uint num_requests;
 
-	FAST_LOG2(bus->log, ev_ide_finish_norelease, (uint32)qrequest, resubmit);
-
 	qrequest->running = false;
 	qrequest->next = device->free_qrequests;
 	device->free_qrequests = qrequest;
@@ -524,7 +486,7 @@ finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
 	if (device == NULL)
 		return;
 
-	// we only have to block the device, but for CD changers we 
+	// we only have to block the device, but for CD changers we
 	// have to block all LUNS of the device (and we neither know
 	// their device handle nor which exist at all), so block
 	// the entire bus instead (it won't take that long anyway)
@@ -544,16 +506,15 @@ finish_all_requests(ide_device_info *device, ide_qrequest *ignore,
 
 
 static status_t
-ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
+ide_sim_init_bus(device_node *node, void **cookie)
 {
-	device_node_handle parent;
 	ide_bus_info *bus;
 	bool dmaDisabled = false;
 	status_t status;
 
 	SHOW_FLOW0(3, "");
 
-	// first prepare the info structure	
+	// first prepare the info structure
 	bus = (ide_bus_info *)malloc(sizeof(*bus));
 	if (bus == NULL)
 		return B_NO_MEMORY;
@@ -573,18 +534,9 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		sprintf(bus->name, "ide_bus %d", (int)channel_id);
 	}
 
-#if 0
-	bus->log = fast_log->start_log(bus->name, ide_events);
-	if (bus->log == NULL) {
-		res = B_NO_MEMORY;
-		goto err;
-	}
-#endif
-
 	init_synced_pc(&bus->scan_bus_syncinfo, scan_device_worker);
 	init_synced_pc(&bus->disconnect_syncinfo, disconnect_worker);
 
-	bus->scsi_cookie = user_cookie;
 	bus->state = ide_state_idle;
 	bus->timer.bus = bus;
 	bus->synced_pc_list = NULL;
@@ -608,7 +560,7 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 	}
 
 	status = INIT_BEN(&bus->status_report_ben, "ide_status_report");
-	if (status < B_OK) 
+	if (status < B_OK)
 		goto err4;
 
 	{
@@ -657,36 +609,27 @@ ide_sim_init_bus(device_node_handle node, void *user_cookie, void **cookie)
 		bus->can_CQ = false;
 	}
 
-	parent = pnp->get_parent(node);
+	{
+		device_node *parent = pnp->get_parent_node(node);
+		pnp->get_driver(parent, (driver_module_info **)&bus->controller,
+			(void **)&bus->channel_cookie);
 
-	status = pnp->init_driver(parent, bus, (driver_module_info **)&bus->controller, 
-		(void **)&bus->channel_cookie);
-
-	pnp->put_device_node(parent);
-	if (status != B_OK)
-		goto err5;
+		bus->controller->set_channel(bus->channel_cookie, bus);
+		pnp->put_node(parent);
+	}
 
 	*cookie = bus;
-
-	// detect devices
-	sim_scan_bus(bus);
 	return B_OK;
 
-err5:
-	DELETE_BEN(&bus->status_report_ben);
 err4:
 	delete_sem(bus->scan_device_sem);
 err3:
 	delete_sem(bus->sync_wait_sem);
-err2:	
+err2:
 	scsi->free_dpc(bus->irq_dpc);
 err1:
 	uninit_synced_pc(&bus->scan_bus_syncinfo);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
-#ifdef USE_FAST_LOG
-	fast_log->stop_log(bus->log);
-err:
-#endif
 	free(bus);
 
 	return status;
@@ -696,18 +639,12 @@ err:
 static status_t
 ide_sim_uninit_bus(ide_bus_info *bus)
 {
-	device_node_handle parent = pnp->get_parent(bus->node);
-
-	pnp->uninit_driver(parent);
-	pnp->put_device_node(parent);
-
-	DELETE_BEN(&bus->status_report_ben);	
+	DELETE_BEN(&bus->status_report_ben);
 	delete_sem(bus->scan_device_sem);
 	delete_sem(bus->sync_wait_sem);
 	scsi->free_dpc(bus->irq_dpc);
 	uninit_synced_pc(&bus->scan_bus_syncinfo);
 	uninit_synced_pc(&bus->disconnect_syncinfo);
-//	fast_log->stop_log(bus->log);
 
 	free(bus);
 
@@ -732,12 +669,8 @@ disconnect_worker(ide_bus_info *bus, void *arg)
 
 
 static void
-ide_sim_bus_removed(device_node_handle node, ide_bus_info *bus)
-{	
-	if (bus == NULL)
-		// driver not loaded - no manual intervention needed
-		return;
-
+ide_sim_bus_removed(ide_bus_info *bus)
+{
 	// XPT must not issue further commands
 	scsi->block_bus(bus->scsi_cookie);
 	// make sure, we refuse all new commands
@@ -769,9 +702,9 @@ ide_sim_get_restrictions(ide_bus_info *bus, uchar target_id,
 	*max_blocks = 255;
 
 	if (device->is_atapi) {
-		if (strncmp(device->infoblock.model_number, "IOMEGA  ZIP 100       ATAPI", 
+		if (strncmp(device->infoblock.model_number, "IOMEGA  ZIP 100       ATAPI",
 		 		strlen("IOMEGA  ZIP 100       ATAPI")) == 0
-		 	|| strncmp( device->infoblock.model_number, "IOMEGA  Clik!", 
+		 	|| strncmp( device->infoblock.model_number, "IOMEGA  Clik!",
 		 		strlen( "IOMEGA  Clik!")) == 0) {
 			SHOW_ERROR0(2, "Found buggy ZIP/Clik! drive - restricting transmission size");
 			*max_blocks = 64;
@@ -850,13 +783,18 @@ scsi_sim_interface ide_sim_module = {
 			std_ops,
 		},
 
-		NULL,	// supported devices				
+		NULL,	// supported devices
 		NULL,	// register node
-		(status_t (*)(device_node_handle, void *, void **))ide_sim_init_bus,
-		(status_t (*)(void *)	) 					ide_sim_uninit_bus,
-		(void (*)(device_node_handle, void *))		ide_sim_bus_removed
+		(status_t (*)(device_node *, void **))		ide_sim_init_bus,
+		(void (*)(void *)) 							ide_sim_uninit_bus,
+		NULL,	// register child devices
+		NULL,	// rescan
+		(void (*)(void *))							ide_sim_bus_removed,
+		NULL,	// suspend
+		NULL	// resume
 	},
 
+	(void (*)(scsi_sim_cookie, scsi_bus))			sim_set_scsi_bus,
 	(void (*)(scsi_sim_cookie, scsi_ccb *))			sim_scsi_io,
 	(uchar (*)(scsi_sim_cookie, scsi_ccb *))		sim_abort,
 	(uchar (*)(scsi_sim_cookie, uchar, uchar)) 		sim_reset_device,
@@ -865,8 +803,8 @@ scsi_sim_interface ide_sim_module = {
 	(uchar (*)(scsi_sim_cookie, scsi_path_inquiry *))sim_path_inquiry,
 	(uchar (*)(scsi_sim_cookie))					sim_scan_bus,
 	(uchar (*)(scsi_sim_cookie))					sim_reset_bus,
-	
-	(void (*)(scsi_sim_cookie, uchar, 
+
+	(void (*)(scsi_sim_cookie, uchar,
 		bool*, bool *, uint32 *))					ide_sim_get_restrictions,
 
 	(status_t (*)(scsi_sim_cookie, uint8, uint32, void *, size_t))ide_sim_ioctl,

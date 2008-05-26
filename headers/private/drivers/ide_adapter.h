@@ -24,7 +24,7 @@
 
 
 // one Physical Region Descriptor (PRD)
-// (one region must not cross 64K boundary; 
+// (one region must not cross 64K boundary;
 //  the PRD table must not cross a 64K boundary)
 typedef struct prd_entry {
 	uint32 address;				// physical address of block (must be even)
@@ -91,21 +91,21 @@ enum {
 // info about one channel
 typedef struct ide_adapter_channel_info {
 	pci_device_module_info *pci;
-	pci_device device;
-	
+	pci_device *device;
+
 	uint16 command_block_base;	// io address command block
 	uint16 control_block_base; // io address control block
 	uint16 bus_master_base;
-	int intnum;				// interrupt number	
-	
+	int intnum;				// interrupt number
+
 	uint32 lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
-	
+
 	ide_channel ide_channel;
-	device_node_handle node;
-	
+	device_node *node;
+
 	int32 (*inthand)( void *arg );
-	
+
 	area_id prd_area;
 	prd_entry *prdt;
 	uint32 prdt_phys;
@@ -116,20 +116,23 @@ typedef struct ide_adapter_channel_info {
 // info about controller
 typedef struct ide_adapter_controller_info {
 	pci_device_module_info *pci;
-	pci_device device;
-	
+	pci_device *device;
+
 	uint16 bus_master_base;
-	
+
 	uint32 lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
-	
-	device_node_handle node;
+
+	device_node *node;
 } ide_adapter_controller_info;
 
 
 // interface of IDE adapter library
 typedef struct {
 	module_info info;
+
+	void (*set_channel)(ide_adapter_channel_info *channel,
+					ide_channel ideChannel);
 
 	// function calls that can be forwarded from actual driver
 	status_t (*write_command_block_regs)(ide_adapter_channel_info *channel,
@@ -138,7 +141,7 @@ typedef struct {
 					ide_task_file *tf, ide_reg_mask mask);
 
 	uint8 (*get_altstatus) (ide_adapter_channel_info *channel);
-	status_t (*write_device_control) (ide_adapter_channel_info *channel, uint8 val);	
+	status_t (*write_device_control) (ide_adapter_channel_info *channel, uint8 val);
 
 	status_t (*write_pio)(ide_adapter_channel_info *channel, uint16 *data, int count, bool force_16bit);
 	status_t (*read_pio)(ide_adapter_channel_info *channel, uint16 *data, int count, bool force_16bit);
@@ -153,47 +156,47 @@ typedef struct {
 	int32 (*inthand)(void *arg);
 
 	// functions that must be called by init/uninit etc. of channel driver
-	status_t (*init_channel)(device_node_handle node, ide_channel ide_channel,
+	status_t (*init_channel)(device_node *node,
 					ide_adapter_channel_info **cookie, size_t total_data_size,
 					int32 (*inthand)(void *arg));
-	status_t (*uninit_channel)(ide_adapter_channel_info *channel);
-	void (*channel_removed)(device_node_handle node, ide_adapter_channel_info *channel);
+	void (*uninit_channel)(ide_adapter_channel_info *channel);
+	void (*channel_removed)(ide_adapter_channel_info *channel);
 
 	// publish channel node
-	status_t (*publish_channel)(device_node_handle controller_node,
+	status_t (*publish_channel)(device_node *controller_node,
 					const char *channel_module_name, uint16 command_block_base,
 					uint16 control_block_base, uint8 intnum, bool can_dma,
-					uint8 channel_index, const char *name, 
-					io_resource_handle *resources, device_node_handle *node);
+					uint8 channel_index, const char *name,
+					const io_resource *resources, device_node **node);
 	// verify channel configuration and publish node on success
-	status_t (*detect_channel)(pci_device_module_info *pci, pci_device pci_device,
-					device_node_handle controller_node, const char *channel_module_name,
+	status_t (*detect_channel)(pci_device_module_info *pci, pci_device *pciDevice,
+					device_node *controller_node, const char *channel_module_name,
 					bool controller_can_dma, uint16 command_block_base,
 					uint16 control_block_base, uint16 bus_master_base,
 					uint8 intnum, uint8 channel_index, const char *name,
-					device_node_handle *node, bool supports_compatibility_mode);
+					device_node **node, bool supports_compatibility_mode);
 
 	// functions that must be called by init/uninit etc. of controller driver
-	status_t (*init_controller)(device_node_handle node, void *user_cookie,
+	status_t (*init_controller)(device_node *node,
 					ide_adapter_controller_info **cookie, size_t total_data_size);
-	status_t (*uninit_controller)(ide_adapter_controller_info *controller);
-	void (*controller_removed)(device_node_handle node, ide_adapter_controller_info *controller);
+	void (*uninit_controller)(ide_adapter_controller_info *controller);
+	void (*controller_removed)(ide_adapter_controller_info *controller);
 
 	// publish controller node
-	status_t (*publish_controller)(device_node_handle parent, uint16 bus_master_base,
-					io_resource_handle *resources, const char *controller_driver,
+	status_t (*publish_controller)(device_node *parent, uint16 bus_master_base,
+					io_resource *resources, const char *controller_driver,
 					const char *controller_driver_type, const char *controller_name,
 					bool can_dma, bool can_cq, uint32 dma_alignment, uint32 dma_boundary,
-					uint32 max_sg_block_size, device_node_handle *node);
+					uint32 max_sg_block_size, device_node **node);
 	// verify controller configuration and publish node on success
-	status_t (*detect_controller)(pci_device_module_info *pci, pci_device pci_device,
-					device_node_handle parent, uint16 bus_master_base,
+	status_t (*detect_controller)(pci_device_module_info *pci, pci_device *pciDevice,
+					device_node *parent, uint16 bus_master_base,
 					const char *controller_driver, const char *controller_driver_type,
 					const char *controller_name, bool can_dma, bool can_cq,
 					uint32 dma_alignment, uint32 dma_boundary, uint32 max_sg_block_size,
-					device_node_handle *node);
+					device_node **node);
 	// standard master probe for controller that registers controller and channel nodes
-	status_t (*probe_controller)(device_node_handle parent, const char *controller_driver,
+	status_t (*probe_controller)(device_node *parent, const char *controller_driver,
 					const char *controller_driver_type, const char *controller_name,
 					const char *channel_module_name, bool can_dma, bool can_cq,
 					uint32 dma_alignment, uint32 dma_boundary, uint32 max_sg_block_size,

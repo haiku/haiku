@@ -33,7 +33,7 @@ BEOS_BIN = "[" addattr alert arp base64 basename bc beep bootman bzip2 cal cat
 	funzip #fwcontrol
 	gawk $(X86_ONLY)gdb grep groups gzip gzexe hd head hey hostname id ident
 	ideinfo idestatus ifconfig <bin>install installsound iroster isvolume join
-	keymap kill less lessecho lesskey link listarea listattr listdev listimage
+	keymap kill less lessecho lesskey link listarea listattr listimage #listdev
 	listport listres listsem ln locate logger login logname ls lsindex m4 make
 	makebootable md5sum merge mimeset mkdos mkdir mkfifo mkfs mkindex modifiers mount
 	mount_nfs mountvolume mv nc netstat nl nohup od open passwd paste patch
@@ -145,7 +145,7 @@ AddFilesToHaikuImage beos system add-ons kernel bus_managers
 AddFilesToHaikuImage beos system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToHaikuImage beos system add-ons kernel busses ide
-	: generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata ;
+	: generic_ide_pci ; #$(X86_ONLY)ide_isa silicon_image_3112 legacy_sata ;
 AddFilesToHaikuImage beos system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage beos system add-ons kernel busses usb
@@ -156,7 +156,7 @@ AddFilesToHaikuImage beos system add-ons kernel debugger
 AddFilesToHaikuImage beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToHaikuImage beos system add-ons kernel generic
-	: block_io dpc fast_log ide_adapter locked_pool mpu401 scsi_periph ;
+	: block_io dpc ide_adapter locked_pool mpu401 scsi_periph ;
 AddFilesToHaikuImage beos system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToHaikuImage beos system add-ons kernel interrupt_controllers
@@ -172,7 +172,7 @@ AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi			: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus			: usb_raw ; # fw_raw
-AddDriversToHaikuImage disk scsi	: scsi_cd scsi_dsk ;
+AddDriversToHaikuImage disk scsi	: scsi_dsk ; #scsi_cd;
 AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
@@ -358,9 +358,9 @@ AddFilesToHaikuImage beos system : zbeos ;
 AddBootModuleSymlinksToHaikuImage
 	pci $(X86_ONLY)isa config_manager ide scsi
 	$(PPC_ONLY)openpic
-	block_io fast_log ide_adapter locked_pool scsi_periph
-	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
-	scsi_cd scsi_dsk
+	block_io ide_adapter locked_pool scsi_periph
+	generic_ide_pci ahci # $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
+	scsi_dsk #scsi_cd
 	intel
 	bfs
 ;
@@ -553,7 +553,7 @@ AddGroupToHaikuImage users : 100 : ;
 if $(HAIKU_IMAGE_HOST_NAME) {
 	actions BuildHaikuImageHostnameFile
 	{
-		echo "$(HAIKU_IMAGE_HOST_NAME)" > $(1) 
+		echo "$(HAIKU_IMAGE_HOST_NAME)" > $(1)
 	}
 
 	local file = <haiku-image>hostname ;

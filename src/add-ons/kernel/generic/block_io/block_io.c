@@ -3,16 +3,9 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open block device manager
-
-	Actual I/O.
-
-	Main file.
-*/
-
 
 #include "block_io_private.h"
+
 #include <stdio.h>
 
 
@@ -37,7 +30,7 @@ device_manager_info *pnp;
 
 
 static status_t
-block_io_open(block_io_device_info *device, uint32 flags, 
+block_io_open(block_io_device_info *device, const char *path, int openMode,
 	block_io_handle_info **res_handle)
 {
 	block_io_handle_info *handle;
@@ -142,7 +135,7 @@ static status_t
 store_bios_drive_in_node(block_io_device_info *device)
 {
 	device_attr attribute = {
-		B_BLOCK_DEVICE_BIOS_ID, B_UINT8_TYPE, { ui8: 
+		B_BLOCK_DEVICE_BIOS_ID, B_UINT8_TYPE, { ui8:
 			device->bios_drive != NULL ? device->bios_drive->bios_id : 0 }
 	};
 
@@ -154,8 +147,8 @@ store_bios_drive_in_node(block_io_device_info *device)
  *	this must be called whenever someone wants to access BIOS infos about the drive;
  *	there are two reasons to not call this during probe():
  *	 - perhaps nobody is interested in BIOS info
- *	 - we need a working block_io device to handle lower level driver 
- *	   restrictions, so this method can only be safely called once the 
+ *	 - we need a working block_io device to handle lower level driver
+ *	   restrictions, so this method can only be safely called once the
  *	   node has been loaded
  */
 
@@ -169,11 +162,11 @@ find_bios_drive_info(block_io_handle_info *handle)
 
 //	SHOW_FLOW( 0, "%p", device );
 
-	// return immediately if BIOS info has already been found	
+	// return immediately if BIOS info has already been found
 	if (device->bios_drive != NULL)
 		return;
 
-	// check whether BIOS info was found during one of the previous	
+	// check whether BIOS info was found during one of the previous
 	// loads
 	if (pnp->get_attr_uint8(device->node, B_BLOCK_DEVICE_BIOS_ID, &bios_id, false) == B_OK) {
 		TRACE(("use previous BIOS ID 0x%x\n", bios_id));
@@ -253,7 +246,7 @@ find_bios_drive_info(block_io_handle_info *handle)
 		dprintf("Cannot distinguish between BIOS drives %x and %x without geometry\n",
 			drive->bios_id, colliding_drive->bios_id);
 
-		// this is nasty - we cannot reliable assign BIOS drive number. 
+		// this is nasty - we cannot reliable assign BIOS drive number.
 		// if the user has luck, he "only" cannot install a boot manager;
 		// but if the boot drive is affected, he cannot even boot.
 		goto no_bios_drive;
@@ -265,11 +258,11 @@ find_bios_drive_info(block_io_handle_info *handle)
 	strcpy(drive->name, name);
 	device->bios_drive = drive;
 
-	// remember that to avoid testing next time	
+	// remember that to avoid testing next time
 	store_bios_drive_in_node(device);
 	return;
 
-no_bios_drive:	
+no_bios_drive:
 	device->bios_drive = NULL;
 
 	// remember that to avoid testing next time
@@ -307,8 +300,8 @@ block_io_ioctl(block_io_handle_info *handle, uint32 op, void *buffer, size_t len
 
 				TRACE(("GET_BIOS_GEOMETRY\n"));
 
-				// get real geometry from low level driver		
-				status = device->interface->ioctl(handle->cookie, B_GET_GEOMETRY, 
+				// get real geometry from low level driver
+				status = device->interface->ioctl(handle->cookie, B_GET_GEOMETRY,
 					geometry, sizeof(*geometry));
 				if (status != B_OK)
 					return status;
@@ -327,31 +320,10 @@ block_io_ioctl(block_io_handle_info *handle, uint32 op, void *buffer, size_t len
 }
 
 
-static status_t
-block_io_register_device(device_node_handle parent)
-{
-	TRACE(("block_io_register_device()\n"));
-
-	// ready to register at devfs
-	{
-		device_attr attrs[] = {
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: B_BLOCK_IO_MODULE_NAME }},
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "block_io" }},
-
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
-			{ NULL }
-		};
-
-		device_node_handle node;
-
-		return pnp->register_device(parent, attrs, NULL, &node);
-	}
-}
-
-
 static void
-block_io_remove(device_node_handle node, void *cookie)
+block_io_remove(void *cookie)
 {
+#if 0
 	uint8 bios_id;
 	//bios_drive *drive;
 
@@ -361,7 +333,6 @@ block_io_remove(device_node_handle node, void *cookie)
 		return;
 
 // ToDo: this assumes private R5 kernel functions to be present
-#if 0
 	for (drive = bios_drive_info; drive->bios_id != 0; ++drive) {
 		if (drive->bios_id == bios_id)
 			break;
@@ -376,26 +347,28 @@ block_io_remove(device_node_handle node, void *cookie)
 
 
 static status_t
-block_io_init_device(device_node_handle node, void *user_cookie, void **cookie)
+block_io_init_device(void *_data, void **cookie)
 {
+	block_device_cookie *data = (block_device_cookie *)_data;
 	block_io_device_info *device;
 	block_device_params params;
-	char *name, *tmp_name;
+//	const char *name;
+//	char *tmp_name;
 	uint8 is_bios_drive;
 	status_t res;
 
 	TRACE(("block_io_init_device()\n"));
 
 	// extract controller/protocoll restrictions from node
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_DMA_ALIGNMENT, &params.alignment, true) != B_OK)
+	if (pnp->get_attr_uint32(data->node, B_BLOCK_DEVICE_DMA_ALIGNMENT, &params.alignment, true) != B_OK)
 		params.alignment = 0;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &params.max_blocks, true) != B_OK)
+	if (pnp->get_attr_uint32(data->node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &params.max_blocks, true) != B_OK)
 		params.max_blocks = 0xffffffff;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_DMA_BOUNDARY, &params.dma_boundary, true) != B_OK)
+	if (pnp->get_attr_uint32(data->node, B_BLOCK_DEVICE_DMA_BOUNDARY, &params.dma_boundary, true) != B_OK)
 		params.dma_boundary = ~0;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, &params.max_sg_block_size, true) != B_OK)
+	if (pnp->get_attr_uint32(data->node, B_BLOCK_DEVICE_MAX_SG_BLOCK_SIZE, &params.max_sg_block_size, true) != B_OK)
 		params.max_sg_block_size = 0xffffffff;
-	if (pnp->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_SG_BLOCKS, &params.max_sg_blocks, true) != B_OK)
+	if (pnp->get_attr_uint32(data->node, B_BLOCK_DEVICE_MAX_SG_BLOCKS, &params.max_sg_blocks, true) != B_OK)
 		params.max_sg_blocks = ~0;
 
 	// do some sanity check:
@@ -423,19 +396,12 @@ block_io_init_device(device_node_handle node, void *user_cookie, void **cookie)
 		return B_ERROR;
 	}
 
-	// allow "only" up to 512 sg entries 
+	// allow "only" up to 512 sg entries
 	// (they consume 4KB and can describe up to 2MB virtual cont. memory!)
 	params.max_sg_blocks = min(params.max_sg_blocks, 512);
 
-	if (pnp->get_attr_uint8(node, B_BLOCK_DEVICE_IS_BIOS_DRIVE, &is_bios_drive, true) != B_OK)
+	if (pnp->get_attr_uint8(data->node, B_BLOCK_DEVICE_IS_BIOS_DRIVE, &is_bios_drive, true) != B_OK)
 		is_bios_drive = false;
-
-	// we don't really care about /dev name, but if it is 
-	// missing, we will get a problem
-	if (pnp->get_attr_string(node, PNP_DEVFS_FILENAME, &name, true) != B_OK) {
-		dprintf("devfs filename is missing.\n");
-		return B_ERROR;
-	}
 
 	device = (block_io_device_info *)malloc(sizeof(*device));
 	if (device == NULL) {
@@ -445,14 +411,15 @@ block_io_init_device(device_node_handle node, void *user_cookie, void **cookie)
 
 	memset(device, 0, sizeof(*device));
 
-	device->node = node;
+	device->node = data->node;
 
 	res = benaphore_init(&device->lock, "block_device_mutex");
 	if (res < 0)
 		goto err2;
 
-	// construct a identifiable name for S/G pool		
-	tmp_name = malloc(strlen(name) + strlen(" sg_lists") + 1);
+#if 0
+	// construct a identifiable name for S/G pool
+	tmp_name = malloc(name + strlen(" sg_lists") + 1);
 	if (tmp_name == NULL) {
 		res = B_NO_MEMORY;
 		goto err3;
@@ -460,60 +427,53 @@ block_io_init_device(device_node_handle node, void *user_cookie, void **cookie)
 
 	strcpy(tmp_name, name);
 	strcat(tmp_name, " sg_lists");
+#endif
 
 	// create S/G pool with initial size 1
 	// (else, we may be on the paging path and have no S/G entries at hand)
-	device->phys_vecs_pool = locked_pool->create( 
+	device->phys_vecs_pool = locked_pool->create(
 		params.max_sg_blocks * sizeof(physical_entry),
 		sizeof( physical_entry ) - 1,
-		0, 16*1024, 32, 1, tmp_name, B_FULL_LOCK | B_CONTIGUOUS,
+		0, 16*1024, 32, 1, "block io sg lists", B_FULL_LOCK | B_CONTIGUOUS,
 		NULL, NULL, NULL);
 
-	free(tmp_name);
+//	free(tmp_name);
 
 	if (device->phys_vecs_pool == NULL) {
 		res = B_NO_MEMORY;
-		goto err3;	
+		goto err3;
 	}
 
 	device->params = params;
 	device->is_bios_drive = is_bios_drive != 0;
 
-	res = pnp->init_driver(pnp->get_parent(node), device,
-			(driver_module_info **)&device->interface, (void **)&device->cookie);
-	if (res != B_OK)
-		goto err4;
+	pnp->get_driver(device->node, (driver_module_info **)&device->interface,
+		(void **)&device->cookie);
 
-	free(name);
+	device->interface->set_device(device->cookie, device);
 
 	TRACE(("done\n"));
 
 	*cookie = device;
 	return B_OK;
 
-err4:
-	locked_pool->destroy(device->phys_vecs_pool);
 err3:
 	benaphore_destroy(&device->lock);
 err2:
 	free(device);
 err1:
-	free(name);
-	pnp->uninit_driver(pnp->get_parent(node));
 	return res;
 }
 
 
-static status_t
-block_io_uninit_device(block_io_device_info *device)
+static void
+block_io_uninit_device(void *_cookie)
 {
-	pnp->uninit_driver(pnp->get_parent(device->node));
+	block_io_device_info *device = _cookie;
 
 	locked_pool->destroy(device->phys_vecs_pool);
 	benaphore_destroy(&device->lock);
 	free(device);
-
-	return B_OK;
 }
 
 
@@ -533,8 +493,8 @@ block_io_init_buffer(void)
 		goto err1;
 	}
 
-	res = block_io_buffer_area = create_area("block_io_buffer", 
-		(void **)&block_io_buffer, B_ANY_KERNEL_ADDRESS, 
+	res = block_io_buffer_area = create_area("block_io_buffer",
+		(void **)&block_io_buffer, B_ANY_KERNEL_ADDRESS,
 		block_io_buffer_size, B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (res < 0)
 		goto err2;
@@ -564,7 +524,7 @@ err1:
 static status_t
 block_io_uninit_buffer(void)
 {
-	delete_area(block_io_buffer_area);	
+	delete_area(block_io_buffer_area);
 	delete_sem(block_io_buffer_lock);
 
 	return B_OK;
@@ -594,70 +554,47 @@ module_dependency module_dependencies[] = {
 };
 
 
-pnp_devfs_driver_info block_io_module = {
+struct device_module_info sBlockIOModule = {
 	{
-		{
-			B_BLOCK_IO_MODULE_NAME,
-			0,
+		B_BLOCK_IO_DEVICE_MODULE_NAME,
+		0,
 
-			std_ops
-		},
-
-		NULL,	// supports device		
-		block_io_register_device,
-		block_io_init_device,
-		(status_t (*)( void * )) block_io_uninit_device,
-		block_io_remove,
-		NULL,	// cleanup
-		NULL,	// get paths
+		std_ops
 	},
 
-	(status_t (*)(void *, uint32, void **))block_io_open,
+	block_io_init_device,
+	block_io_uninit_device,
+	block_io_remove,
+
+	(status_t (*)(void *, const char *, int, void **))block_io_open,
 	(status_t (*)(void *))block_io_close,
 	(status_t (*)(void *))block_io_freecookie,
 
-	(status_t (*)(void *, uint32, void *, size_t))block_io_ioctl,
-
 	(status_t (*)(void *, off_t, void *, size_t *))block_io_read,
 	(status_t (*)(void *, off_t, const void *, size_t *))block_io_write,
+	NULL,	// io
 
-	NULL,
-	NULL,
+	(status_t (*)(void *, int32, void *, size_t))block_io_ioctl,
 
-	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))block_io_readv,
-	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))block_io_writev
+	NULL,	// select
+	NULL,	// deselect
+//	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))block_io_readv,
+//	(status_t (*)(void *, off_t, const iovec *, size_t, size_t *))block_io_writev
 };
 
 
-static status_t
-std_ops_for_driver(int32 op, ...)
-{
-	// there is nothing to setup as this is a interface for 
-	// drivers which are loaded by _us_
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
-block_io_for_driver_interface block_io_for_driver_module = {
+block_io_for_driver_interface sBlockIOForDriverModule = {
 	{
 		B_BLOCK_IO_FOR_DRIVER_MODULE_NAME,
 		0,
-
-		std_ops_for_driver
+		NULL
 	},
 
 	block_io_set_media_params,
 };
 
 module_info *modules[] = {
-	&block_io_module.info.info,
-	&block_io_for_driver_module.info,
+	&sBlockIOModule.info,
+	&sBlockIOForDriverModule.info,
 	NULL
 };

@@ -137,6 +137,7 @@ unlock_isa_dma_channel(long channel)
 }
 
 
+#if 0
 static status_t
 isa_init_driver(device_node_handle node, void *user_cookie, void **cookie)
 {
@@ -202,6 +203,7 @@ isa_get_paths(const char ***_bus, const char ***_device)
 	*_bus = kBus;
 	*_device = NULL;
 }
+#endif
 
 
 static status_t
@@ -232,11 +234,11 @@ static isa_module_info isa_module = {
 		},
 		NULL	// rescan
 	},
-	&isa_read_io_8, 
+	&isa_read_io_8,
 	&isa_write_io_8,
-	&isa_read_io_16, 
+	&isa_read_io_16,
 	&isa_write_io_16,
-	&isa_read_io_32, 
+	&isa_read_io_32,
 	&isa_write_io_32,
 	&ram_address,
 	&make_isa_dma_table,
@@ -246,6 +248,7 @@ static isa_module_info isa_module = {
 	&unlock_isa_dma_channel
 };
 
+#if 0
 static isa2_module_info isa2_module = {
 	{
 		{
@@ -278,9 +281,10 @@ static isa2_module_info isa2_module = {
 
 	start_isa_dma,
 };
+#endif
 
 module_info *modules[] = {
 	(module_info *)&isa_module,
-	(module_info *)&isa2_module,
+//	(module_info *)&isa2_module,
 	NULL
 };

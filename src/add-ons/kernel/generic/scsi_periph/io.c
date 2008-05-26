@@ -54,7 +54,7 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 	int err;
 	uint32 pos = pos64;
 
-	// don't test rw10_enabled restrictions - this flag may get changed	
+	// don't test rw10_enabled restrictions - this flag may get changed
 	request = device->scsi->alloc_ccb(device->scsi_device);
 
 	if (request == NULL)
@@ -73,7 +73,7 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 			if (num_blocks > 0x100)
 				num_blocks = 0x100;
 
-			// no way to break the 21 bit address limit	
+			// no way to break the 21 bit address limit
 			if (pos64 > 0x200000) {
 				err = B_BAD_VALUE;
 				goto abort;
@@ -95,7 +95,7 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 		request->timeout = device->std_timeout;
 		// see whether daemon instructed us to post an ordered command;
 		// reset flag after read
-		SHOW_FLOW( 3, "flag=%x, next_tag=%x, ordered: %s", 
+		SHOW_FLOW( 3, "flag=%x, next_tag=%x, ordered: %s",
 			(int)request->flags, (int)device->next_tag_action,
 			(request->flags & SCSI_ORDERED_QTAG) != 0 ? "yes" : "no" );
 
@@ -139,7 +139,7 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 
 		acquire_sem(request->completion_sem);
 
-		// ask generic peripheral layer what to do now	
+		// ask generic peripheral layer what to do now
 		res = periph_check_error(device, request);
 
 		switch (res.action) {
@@ -154,7 +154,7 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 				break;
 
 			case err_act_invalid_req:
-				// if this was a 10 byte command, the device probably doesn't 
+				// if this was a 10 byte command, the device probably doesn't
 				// support them, so disable them and retry
 				if (is_rw10) {
 					atomic_and(&device->rw10_enabled, 0);
@@ -173,7 +173,7 @@ periph_read_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 	if (res.error_code == B_DEV_READ_ERROR && write)
 		return B_DEV_WRITE_ERROR;
 
-	return res.error_code;	
+	return res.error_code;
 
 abort:
 	device->scsi->free_ccb(request);
@@ -184,16 +184,14 @@ abort:
 static status_t
 inquiry(scsi_periph_device_info *device, scsi_inquiry *inquiry)
 {
-	scsi_res_inquiry *device_inquiry = NULL;
+	const scsi_res_inquiry *device_inquiry = NULL;
 	size_t inquiry_len;
 
-	if (pnp->get_attr_raw(device->node, SCSI_DEVICE_INQUIRY_ITEM, 
-			(void **)&device_inquiry, &inquiry_len, true) != B_OK)
+	if (pnp->get_attr_raw(device->node, SCSI_DEVICE_INQUIRY_ITEM,
+			(const void **)&device_inquiry, &inquiry_len, true) != B_OK)
 		return B_ERROR;
 
 	memcpy(inquiry, device_inquiry, min(inquiry_len, sizeof(scsi_inquiry)));
-	free(device_inquiry);
-
 	return B_OK;
 }
 
@@ -253,7 +251,7 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 	cmd->scsi_status = request->device_status;
 
 	if ((request->subsys_status & SCSI_AUTOSNS_VALID) != 0 && cmd->sense_data) {
-		memcpy(cmd->sense_data, request->sense, 
+		memcpy(cmd->sense_data, request->sense,
 			min(cmd->sense_data_length, (size_t)SCSI_MAX_SENSE_SIZE - request->sense_resid));
 	}
 

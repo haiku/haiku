@@ -53,7 +53,7 @@ wait_for_drdy(ide_device_info *device)
 }
 
 
-/** reset entire IDE bus 
+/** reset entire IDE bus
  *	all active request apart from <ignore> are resubmitted
  */
 
@@ -65,8 +65,6 @@ reset_bus(ide_device_info *device, ide_qrequest *ignore)
 	ide_channel_cookie channel = bus->channel_cookie;
 
 	dprintf("ide: reset_bus() device %p, bus %p\n", device, bus);
-
-	FAST_LOG0(bus->log, ev_ide_reset_bus);
 
 	if (device->reconnect_timer_installed) {
 		cancel_timer(&device->reconnect_timer.te);
@@ -82,7 +80,7 @@ reset_bus(ide_device_info *device, ide_qrequest *ignore)
 	// also, deactivate IRQ
 	// (as usual, we will get an IRQ on disabling, but as we leave them
 	// disabled for 2 ms, this false report is ignored)
-	if (controller->write_device_control(channel, 
+	if (controller->write_device_control(channel,
 			ide_devctrl_nien | ide_devctrl_srst | ide_devctrl_bit3) != B_OK)
 		goto err0;
 
@@ -142,7 +140,6 @@ reset_device(ide_device_info *device, ide_qrequest *ignore)
 
 	dprintf("ide: reset_device() device %p\n", device);
 
-	FAST_LOG1(bus->log, ev_ide_reset_device, device->is_device1);
 	SHOW_FLOW0(3, "");
 
 	if (!device->is_atapi)
@@ -154,8 +151,8 @@ reset_device(ide_device_info *device, ide_qrequest *ignore)
 	}
 
 	// select device
-	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf, 
-			ide_mask_device_head) != B_OK) 
+	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,
+			ide_mask_device_head) != B_OK)
 		goto err;
 
 	// safe original command to let caller restart it
@@ -171,12 +168,12 @@ reset_device(ide_device_info *device, ide_qrequest *ignore)
 	if (res != B_OK)
 		goto err;
 
-	// don't know how long to wait, but 31 seconds, like soft reset, 
+	// don't know how long to wait, but 31 seconds, like soft reset,
 	// should be enough
 	if (!ide_wait(device, 0, ide_status_bsy, true, 31000000))
 		goto err;
 
-	// alright, resubmit all requests		
+	// alright, resubmit all requests
 	finish_all_requests(device, ignore, SCSI_SCSI_BUS_RESET, true);
 
 	SHOW_FLOW0(3, "done");
@@ -201,13 +198,6 @@ send_command(ide_device_info *device, ide_qrequest *qrequest,
 	bigtime_t irq_disabled_at = 0; // make compiler happy
 	uint8 num_retries = 0;
 	bool irq_guard;
-
-	FAST_LOGN(bus->log, ev_ide_send_command, 15, device->is_device1, (uint32)qrequest, 
-		device->tf.raw.r[0], device->tf.raw.r[1], device->tf.raw.r[2], 
-		device->tf.raw.r[3], device->tf.raw.r[4], device->tf.raw.r[5], 
-		device->tf.raw.r[6], 
-		device->tf.raw.r[7], device->tf.raw.r[8], device->tf.raw.r[9], 
-		device->tf.raw.r[10], device->tf.raw.r[11]);
 
 retry:
 	irq_guard = bus->num_running_reqs > 1;
@@ -270,7 +260,7 @@ retry:
 		return false;
 	}
 
-	// write parameters	
+	// write parameters
 	if (bus->controller->write_command_block_regs(bus->channel_cookie, &device->tf,
 			device->tf_param_mask) != B_OK)
 		goto err;
@@ -283,7 +273,7 @@ retry:
 		// (at my system, up to 30 µs elapsed)
 
 		// additionally, old drives (at least my IBM-DTTA-351010) loose
-		// sync if they are pushed too hard - on heavy overlapped write 
+		// sync if they are pushed too hard - on heavy overlapped write
 		// stress this drive tends to forget outstanding requests,
 		// waiting at least 50 µs seems(!) to solve this
 		while (system_time() - irq_disabled_at < MAX_IRQ_DELAY)
@@ -294,7 +284,7 @@ retry:
 	// lock the bus before sending; this way, IRQs that are fired
 	// shortly before/after sending of command are delayed until the
 	// command is really sent (start_waiting unlocks the bus) and then
-	// the IRQ handler can check savely whether the IRQ really signals 
+	// the IRQ handler can check savely whether the IRQ really signals
 	// finishing of command or not by testing the busy-signal of the device
 	if (new_state != ide_state_accessing) {
 		IDE_LOCK(bus);
@@ -307,10 +297,10 @@ retry:
 			goto err1;
 	}
 
-	// write command code - this will start the actual command	
+	// write command code - this will start the actual command
 	SHOW_FLOW(3, "Writing command 0x%02x", (int)device->tf.write.command);
 	if (bus->controller->write_command_block_regs(bus->channel_cookie,
-			&device->tf, ide_mask_command) != B_OK) 
+			&device->tf, ide_mask_command) != B_OK)
 		goto err1;
 
 	// start waiting now; also un-blocks IRQ handler (see above)
@@ -350,7 +340,7 @@ ide_wait(ide_device_info *device, int mask, int not_mask,
 		bigtime_t elapsed_time;
 		int status;
 
-		// do spin before test as the device needs 400 ns 
+		// do spin before test as the device needs 400 ns
 		// to update its status register
 		spin(1);
 
@@ -390,8 +380,6 @@ bool
 device_start_service(ide_device_info *device, int *tag)
 {
 	ide_bus_info *bus = device->bus;
-
-	FAST_LOG1(bus->log, ev_ide_device_start_service, device->is_device1);
 
 	device->tf.write.command = IDE_CMD_SERVICE;
 	device->tf.queued.mode = ide_mode_lba;
@@ -433,7 +421,6 @@ device_start_service(ide_device_info *device, int *tag)
 
 	*tag = device->tf.queued.tag;
 
-	FAST_LOG2(bus->log, ev_ide_device_start_service2, device->is_device1, *tag);
 	return true;
 
 err:
@@ -450,14 +437,14 @@ check_service_req(ide_device_info *device)
 	ide_bus_info *bus = device->bus;
 	int status;
 
-	// fast bailout if there is no request pending	
+	// fast bailout if there is no request pending
 	if (device->num_running_reqs == 0)
 		return false;
 
 	if (bus->active_device != device) {
 		// don't apply any precautions in terms of IRQ
 		// -> the bus is in accessing state, so IRQs are ignored anyway
-		if (bus->controller->write_command_block_regs(bus->channel_cookie, 
+		if (bus->controller->write_command_block_regs(bus->channel_cookie,
 				&device->tf, ide_mask_device_head) != B_OK)
 			// on error, pretend that this device asks for service
 			// -> the disappeared controller will be recognized soon ;)

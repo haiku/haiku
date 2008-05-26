@@ -1,5 +1,12 @@
-#include "pci_priv.h"
+/*
+ * Copyright 2006, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
+#include "pci_private.h"
 #include "arch_cpu.h"
+
 
 status_t
 pci_io_init()

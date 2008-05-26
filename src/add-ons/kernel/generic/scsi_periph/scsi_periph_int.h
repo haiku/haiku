@@ -21,7 +21,7 @@ typedef struct scsi_periph_device_info {
 	scsi_device scsi_device;
 	scsi_device_interface *scsi;
 	periph_device_cookie periph_device;
-	device_node_handle node;
+	device_node *node;
 
 	bool removal_requested;
 
@@ -54,7 +54,7 @@ extern device_manager_info *pnp;
 void periph_media_changed(scsi_periph_device_info *device, scsi_ccb *ccb);
 void periph_media_changed_public(scsi_periph_device_info *device);
 status_t periph_get_media_status(scsi_periph_handle_info *handle);
-err_res periph_send_start_stop(scsi_periph_device_info *device, scsi_ccb *request, 
+err_res periph_send_start_stop(scsi_periph_device_info *device, scsi_ccb *request,
 	bool start, bool with_LoEj);
 
 
@@ -80,9 +80,9 @@ status_t periph_check_capacity(scsi_periph_device_info *device, scsi_ccb *ccb);
 
 status_t periph_register_device(periph_device_cookie periph_device,
 	scsi_periph_callbacks *callbacks, scsi_device scsi_device, scsi_device_interface *scsi,
-	device_node_handle node, bool removable, scsi_periph_device *driver);
+	device_node *node, bool removable, scsi_periph_device *driver);
 status_t periph_unregister_device(scsi_periph_device_info *driver);
-char *periph_compose_device_name(device_node_handle device_node, const char *prefix);
+char *periph_compose_device_name(device_node *device_node, const char *prefix);
 
 
 // io.c
@@ -93,7 +93,7 @@ status_t periph_read(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 status_t periph_write(scsi_periph_handle_info *handle, const phys_vecs *vecs,
 	off_t pos, size_t num_blocks, uint32 block_size, size_t *bytes_transferred,
 	int preferred_ccb_size);
-status_t periph_ioctl(scsi_periph_handle_info *handle, int op, 
+status_t periph_ioctl(scsi_periph_handle_info *handle, int op,
 	void *buf, size_t len);
 void periph_sync_queue_daemon(void *arg, int iteration);
 
@@ -103,12 +103,12 @@ void periph_sync_queue_daemon(void *arg, int iteration);
 status_t periph_safe_exec(scsi_periph_device_info *device, scsi_ccb *request);
 status_t periph_simple_exec(scsi_periph_device_info *device, void *cdb,
 	uchar cdb_len, void *data, size_t data_len, int ccb_flags);
-	
+
 
 // device_icons.c
 
 status_t periph_get_icon(icon_type type, device_icon *data);
-	
+
 // sync.c
 
 err_res periph_synchronize_cache(scsi_periph_device_info *device,

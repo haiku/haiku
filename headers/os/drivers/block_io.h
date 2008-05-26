@@ -5,9 +5,7 @@
 #ifndef __BLOCK_IO_H__
 #define __BLOCK_IO_H__
 
-/*
-	Part of Open block device manager
-
+/*!
 	Block devices can be easily written by providing the interface
 	specified hereinafter. The block device manager takes care of
 	DMA and other restrictions imposed by underlying controller or
@@ -24,7 +22,6 @@ typedef struct block_io_device_info *block_io_device;
 typedef struct block_io_handle_info *block_io_handle;
 
 // cookies issued by device driver
-typedef struct block_device_device_cookie *block_device_device_cookie;
 typedef struct block_device_handle_cookie *block_device_handle_cookie;
 
 
@@ -59,15 +56,20 @@ typedef struct phys_vecs {
 // maximum number of scatter/gather blocks (uint32, optional, default: unlimited)
 #define B_BLOCK_DEVICE_MAX_SG_BLOCKS "block_device/max_sg_blocks"
 
+typedef struct block_device_cookie {
+	struct device_node	*node;
+} block_device_cookie;
 
 // interface to be provided by device driver
 typedef struct block_device_interface {
 	driver_module_info info;
 
+	void (*set_device)(block_device_cookie *cookie, block_io_device device);
+
 	// iovecs are physical address here
 	// pos and num_blocks are in blocks; bytes_transferred in bytes
 	// vecs are guaranteed to describe enough data for given block count
-	status_t (*open)(block_device_device_cookie device, block_device_handle_cookie *handle);
+	status_t (*open)(block_device_cookie *cookie, block_device_handle_cookie *handle);
 	status_t (*close)(block_device_handle_cookie handle);
 	status_t (*free)(block_device_handle_cookie handle);
 
@@ -79,12 +81,12 @@ typedef struct block_device_interface {
 	status_t (*ioctl)(block_device_handle_cookie handle, int op, void *buf, size_t len);
 } block_device_interface;
 
-#define B_BLOCK_IO_MODULE_NAME "generic/block_io/v1"
+#define B_BLOCK_IO_DEVICE_MODULE_NAME "generic/block_io/device_v1"
 
 
 // Interface for Drivers
 
-// blkman interface used for callbacks done by driver
+// interface used for callbacks done by driver
 typedef struct block_io_for_driver_interface {
 	module_info info;
 

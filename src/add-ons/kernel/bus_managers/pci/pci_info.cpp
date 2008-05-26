@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003-2006, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the MIT License.
-*/
+/*
+ * Copyright 2003-2006, Marcus Overhagen. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <KernelExport.h>
@@ -9,7 +9,7 @@
 #include <PCI.h>
 #include <string.h>
 #include "pci_info.h"
-#include "pci_priv.h"
+#include "pci_private.h"
 #include "pci.h"
 
 #define PCI_VERBOSE	1
@@ -98,7 +98,7 @@ print_capabilities(const pci_info *info)
 	int		i;
 
 	TRACE(("PCI:   Capabilities: "));
-	
+
 	status = pci_read_config(info->bus, info->device, info->function, PCI_status, 2);
 	if (!(status & PCI_status_capabilities)) {
 		TRACE(("(not supported)\n"));
@@ -173,7 +173,7 @@ print_info_basic(const pci_info *info, bool verbose)
 		}
 		const char *devShort;
 		const char *devFull;
-		get_device_info(info->vendor_id, info->device_id, info->u.h0.subsystem_vendor_id, info->u.h0.subsystem_id, 
+		get_device_info(info->vendor_id, info->device_id, info->u.h0.subsystem_vendor_id, info->u.h0.subsystem_id,
 			&devShort, &devFull);
 		if (!devShort && !devFull) {
 			TRACE(("PCI:   device %04x: Unknown\n", info->device_id));
@@ -189,7 +189,7 @@ print_info_basic(const pci_info *info, bool verbose)
 	}
 	TRACE(("PCI:   line_size %02x, latency %02x, header_type %02x, BIST %02x\n",
 			info->line_size, info->latency, info->header_type, info->bist));
-			
+
 	switch (info->header_type & PCI_header_type_mask) {
 		case PCI_header_type_generic:
 			print_generic_info(info, verbose);

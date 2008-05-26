@@ -21,16 +21,16 @@
 
 
 char *
-periph_compose_device_name(device_node_handle node, const char *prefix)
+periph_compose_device_name(device_node *node, const char *prefix)
 {
-	uint8 pathID, targetID, targetLUN, isPrimary, type;
+	uint8 pathID, targetID, targetLUN, type;
 	char name[128];
 	uint32 channel;
 
 	if (pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &pathID, true) != B_OK
 		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_ID_ITEM, &targetID, true) != B_OK
 		|| pnp->get_attr_uint8(node, SCSI_DEVICE_TARGET_LUN_ITEM, &targetLUN, true) != B_OK)
-		return NULL;	
+		return NULL;
 
 	// IDE devices have a different naming scheme
 
@@ -55,7 +55,7 @@ periph_compose_device_name(device_node_handle node, const char *prefix)
 
 status_t
 periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks *callbacks,
-	scsi_device scsi_device, scsi_device_interface *scsi, device_node_handle node,
+	scsi_device scsi_device, scsi_device_interface *scsi, device_node *node,
 	bool removable, scsi_periph_device *driver)
 {
 	scsi_periph_device_info *device;
@@ -87,7 +87,7 @@ periph_register_device(periph_device_cookie periph_device, scsi_periph_callbacks
 	device->next_tag_action = 0;
 	device->rw10_enabled = true;
 
-	// launch sync daemon	
+	// launch sync daemon
 	res = register_kernel_daemon(periph_sync_queue_daemon, device, 60*10);
 	if (res != B_OK)
 		goto err2;

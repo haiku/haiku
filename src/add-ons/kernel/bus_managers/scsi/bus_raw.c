@@ -3,23 +3,15 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI bus manager
-
-	Devfs entry for raw bus access.
-
-	This interface will go away. It's used by scsi_probe as
-	long as we have no proper pnpfs where all the info can
-	be retrieved from.
-*/
+//!	Devfs entry for raw bus access.
 
 #include "scsi_internal.h"
-#include <device/scsi_bus_raw_driver.h>
-#include <pnp_devfs.h>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <device/scsi_bus_raw_driver.h>
 
 
 // info about bus
@@ -27,30 +19,25 @@
 typedef struct bus_raw_info {
 	scsi_bus_interface *interface;
 	scsi_bus cookie;
-	device_node_handle node;
+	device_node *node;
 } bus_raw_info;
 
 
 static status_t
-scsi_bus_raw_init_device(device_node_handle node,
-	void *userCookie, void **cookie)
+scsi_bus_raw_init(device_node *node, void **cookie)
 {
-	device_node_handle parent = pnp->get_parent(node);
+	device_node *parent;
 	bus_raw_info *bus;
-	scsi_bus_interface *interface;
-	scsi_bus bus_cookie;
-
-	status_t res = pnp->init_driver(parent, NULL, 
-		(driver_module_info **)&interface, (void **)&bus_cookie);
-
-	pnp->put_device_node(parent);
-
-	if (res != B_OK)
-		return res;
 
 	bus = malloc(sizeof(*bus));
-	bus->interface = interface;
-	bus->cookie = bus_cookie;
+	if (bus == NULL)
+		return B_NO_MEMORY;
+
+	parent = pnp->get_parent_node(node);
+	pnp->get_driver(parent,
+		(driver_module_info **)&bus->interface, (void **)&bus->cookie);
+	pnp->put_node(parent);
+
 	bus->node = node;
 
 	*cookie = bus;
@@ -58,64 +45,19 @@ scsi_bus_raw_init_device(device_node_handle node,
 }
 
 
-static status_t
-scsi_bus_raw_uninit_device(bus_raw_info *bus)
+static void
+scsi_bus_raw_uninit(void *bus)
 {
-	device_node_handle parent = pnp->get_parent(bus->node);
-	status_t status = pnp->uninit_driver(parent);
-
-	pnp->put_device_node(parent);
-
-	if (status != B_OK)
-		return status;
-
 	free(bus);
-	return B_OK;
-}
-
-	
-static status_t
-scsi_bus_raw_probe(device_node_handle parent)
-{
-	uint8 path_id;
-	char *name;
-
-	if (pnp->get_attr_uint8(parent, SCSI_BUS_PATH_ID_ITEM, &path_id, false) != B_OK)
-		return B_ERROR;
-
-	// put that on heap to not overflow the limited kernel stack	
-	name = malloc(PATH_MAX + 1);
-	if (name == NULL)
-		return B_NO_MEMORY;
-
-	snprintf(name, PATH_MAX + 1, "bus/scsi/%d/bus_raw", path_id);
-
-	{
-		device_attr attributes[] = {
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_BUS_RAW_MODULE_NAME }},
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
-
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "bus_raw" }},
-
-			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
-			{}
-		};
-
-		device_node_handle node;
-		status_t res = pnp->register_device(parent, attributes, NULL, &node);
-		free(name);
-
-		return res;
-	}
 }
 
 
 static status_t
-scsi_bus_raw_open(bus_raw_info *bus, uint32 flags,
-	bus_raw_info **handle_cookie)
+scsi_bus_raw_open(void *bus, const char *path, uint32 flags,
+	void **handle_cookie)
 {
 	*handle_cookie = bus;
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -129,14 +71,15 @@ scsi_bus_raw_close(void *cookie)
 static status_t
 scsi_bus_raw_free(void *cookie)
 {
-	return B_ERROR;
+	return B_OK;
 }
 
 
 static status_t
-scsi_bus_raw_control(bus_raw_info *bus, uint32 op, void *data,
-	size_t len)
+scsi_bus_raw_control(void *_cookie, int32 op, void *data, size_t length)
 {
+	bus_raw_info *bus = _cookie;
+
 	switch (op) {
 		case B_SCSI_BUS_RAW_RESET:
 			return bus->interface->reset_bus(bus->cookie);
@@ -167,40 +110,24 @@ scsi_bus_raw_write(void *cookie, off_t position,
 }
 
 
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
-pnp_devfs_driver_info scsi_bus_raw_module = {
+struct device_module_info gSCSIBusRawModule = {
 	{
-		{
-			SCSI_BUS_RAW_MODULE_NAME,
-			0,
-			std_ops
-		},
-
-		NULL,
-		scsi_bus_raw_probe,
-		scsi_bus_raw_init_device,
-		(status_t (*) (void *))scsi_bus_raw_uninit_device,
-		NULL,
+		SCSI_BUS_RAW_MODULE_NAME,
+		0,
 		NULL
 	},
 
-	(status_t (*) (void *, uint32, void **))scsi_bus_raw_open,
+	scsi_bus_raw_init,
+	scsi_bus_raw_uninit,
+	NULL,	// removed
+
+	scsi_bus_raw_open,
 	scsi_bus_raw_close,
 	scsi_bus_raw_free,
-	(status_t (*) (void *, uint32, void *, size_t))scsi_bus_raw_control,
 	scsi_bus_raw_read,
-	scsi_bus_raw_write
+	scsi_bus_raw_write,
+	NULL,	// io
+	scsi_bus_raw_control,
+	NULL,	// select
+	NULL	// deselect
 };

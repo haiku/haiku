@@ -1,13 +1,12 @@
 /*
  * Copyright 2006, Marcus Overhagen. All rights reserved.
- *
  * Distributed under the terms of the MIT License.
  */
 
 #include <KernelExport.h>
 #include "pci_irq.h"
 #include "pci_bios.h"
-#include "pci_priv.h"
+#include "pci_private.h"
 #include "pci_controller.h"
 #include "arch_cpu.h"
 
@@ -36,12 +35,12 @@
 spinlock sConfigLock = 0;
 
 static status_t
-pci_mech1_read_config(void *cookie, uint8 bus, uint8 device, uint8 function, 
+pci_mech1_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 					  uint8 offset, uint8 size, uint32 *value)
 {
 	cpu_status cpu;
 	status_t status = B_OK;
-	
+
 	PCI_LOCK_CONFIG(cpu);
 	out32(PCI_MECH1_REQ_DATA(bus, device, function, offset), PCI_MECH1_REQ_PORT);
 	switch (size) {
@@ -59,7 +58,7 @@ pci_mech1_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 			break;
 	}
 	PCI_UNLOCK_CONFIG(cpu);
-	
+
 	return status;
 }
 
@@ -70,7 +69,7 @@ pci_mech1_write_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 {
 	cpu_status cpu;
 	status_t status = B_OK;
-	
+
 	PCI_LOCK_CONFIG(cpu);
 	out32(PCI_MECH1_REQ_DATA(bus, device, function, offset), PCI_MECH1_REQ_PORT);
 	switch (size) {
@@ -88,7 +87,7 @@ pci_mech1_write_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 			break;
 	}
 	PCI_UNLOCK_CONFIG(cpu);
-	
+
 	return status;
 }
 
@@ -107,7 +106,7 @@ pci_mech2_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 {
 	cpu_status cpu;
 	status_t status = B_OK;
-	
+
 	PCI_LOCK_CONFIG(cpu);
 	out8((uint8)(0xf0 | (function << 1)), PCI_MECH2_ENABLE_PORT);
 	out8(bus, PCI_MECH2_FORWARD_PORT);
@@ -127,7 +126,7 @@ pci_mech2_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 	}
 	out8(0, PCI_MECH2_ENABLE_PORT);
 	PCI_UNLOCK_CONFIG(cpu);
-	
+
 	return status;
 }
 
@@ -158,7 +157,7 @@ pci_mech2_write_config(void *cookie, uint8 bus, uint8 device, uint8 function,
 	}
 	out8(0, PCI_MECH2_ENABLE_PORT);
 	PCI_UNLOCK_CONFIG(cpu);
-	
+
 	return status;
 }
 
@@ -178,7 +177,7 @@ pci_ram_address(const void *physical_address_in_system_memory)
 }
 
 
-pci_controller pci_controller_x86_mech1 = 
+pci_controller pci_controller_x86_mech1 =
 {
 	.read_pci_config		= pci_mech1_read_config,
 	.write_pci_config		= pci_mech1_write_config,
@@ -187,7 +186,7 @@ pci_controller pci_controller_x86_mech1 =
 	.write_pci_irq			= pci_x86_irq_write,
 };
 
-pci_controller pci_controller_x86_mech2 = 
+pci_controller pci_controller_x86_mech2 =
 {
 	.read_pci_config		= pci_mech2_read_config,
 	.write_pci_config		= pci_mech2_write_config,
@@ -196,7 +195,7 @@ pci_controller pci_controller_x86_mech2 =
 	.write_pci_irq			= pci_x86_irq_write,
 };
 
-pci_controller pci_controller_x86_bios = 
+pci_controller pci_controller_x86_bios =
 {
 	.read_pci_config		= pci_bios_read_config,
 	.write_pci_config		= pci_bios_write_config,
@@ -213,11 +212,11 @@ pci_controller_init(void)
 	bool search_mech2 = true;
 	bool search_bios = true;
 	status_t status;
-	
+
 	status = pci_x86_irq_init();
 	if (status != B_OK)
 		return status;
-	
+
 	// PCI configuration mechanism 1 is the preferred one.
 	// If it doesn't work, try mechanism 2.
 	// Finally, try to fallback to PCI BIOS
@@ -249,7 +248,7 @@ pci_controller_init(void)
 			return pci_controller_add(&pci_controller_x86_bios, NULL);
 		}
 	}
-	
+
 	dprintf("PCI: no configuration mechanism found\n");
 	return B_ERROR;
 }

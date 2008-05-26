@@ -45,7 +45,6 @@
 */
 extern module_info gDeviceManagerModule;
 extern module_info gDeviceRootModule;
-extern module_info gDeviceForDriversModule;
 extern module_info gFrameBufferConsoleModule;
 
 // file systems
@@ -55,7 +54,6 @@ extern module_info gDeviceFileSystem;
 static module_info *sBuiltInModules[] = {
 	&gDeviceManagerModule,
 	&gDeviceRootModule,
-	&gDeviceForDriversModule,
 	&gFrameBufferConsoleModule,
 
 	&gRootFileSystem,
@@ -144,7 +142,7 @@ static bool sDisableUserAddOns = false;
  * they have to wait for each other, i.e. we need one lock per module;
  * also we must detect circular references during init and not dead-lock
  */
-static recursive_lock sModulesLock;		
+static recursive_lock sModulesLock;
 
 /* These are the standard base paths where we start to look for modules
  * to load. Order is important, the last entry here will be searched
@@ -176,7 +174,7 @@ module_hash(void *_module, const void *_key, uint32 range)
 
 	if (module != NULL)
 		return hash_hash_string(module->name) % range;
-	
+
 	if (name != NULL)
 		return hash_hash_string(name) % range;
 
@@ -655,8 +653,8 @@ uninit_module(module *module)
 
 			return status;
 		}
-		default:	
-			return B_ERROR;		
+		default:
+			return B_ERROR;
 	}
 	// never trespasses here
 }
@@ -761,7 +759,7 @@ iterator_get_next_module(module_iterator *iterator, char *buffer,
 		recursive_lock_unlock(&sModulesLock);
 
 		// prevent from falling into modules hash iteration again
-		iterator->loaded_modules = false; 
+		iterator->loaded_modules = false;
 	}
 
 nextPath:
@@ -1006,7 +1004,7 @@ register_preloaded_module_image(struct preloaded_image *image)
 
 error:
 	free(moduleImage);
-	
+
 	// We don't need this image anymore. We keep it, if it doesn't look like
 	// a module at all. It might be an old-style driver.
 	if (image->is_module)
@@ -1309,7 +1307,7 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 		iterate through all modules that are currently loaded; have a valid
 		module_image pointer, which would be hard to test for)
 */
-status_t 
+status_t
 get_next_loaded_module_name(uint32 *_cookie, char *buffer, size_t *_bufferSize)
 {
 	if (sModulesHash == NULL) {

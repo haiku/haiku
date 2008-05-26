@@ -34,15 +34,15 @@ typedef struct block_device_params {
 
 // device info
 typedef struct block_io_device_info {
-	device_node_handle node;
+	device_node *node;
 	block_device_interface *interface;
-	block_device_device_cookie cookie;
-	
+	block_device_cookie *cookie;
+
 	benaphore lock;					// used for access to following variables
 	uint32 block_size;
 	uint32 ld_block_size;
 	uint64 capacity;
-	
+
 	block_device_params params;
 	bool is_bios_drive;				// could be a BIOS drive
 	locked_pool_cookie phys_vecs_pool;	// pool of temporary phys_vecs
@@ -82,11 +82,11 @@ extern device_manager_info *pnp;
 
 // io.c
 
-status_t block_io_readv(block_io_handle_info *handle, off_t pos, struct iovec *vec, 
+status_t block_io_readv(block_io_handle_info *handle, off_t pos, struct iovec *vec,
 	size_t vec_count, size_t *len);
 status_t block_io_read(block_io_handle_info *handle, off_t pos, void *buf, size_t *len);
 ssize_t block_io_writev(block_io_handle_info *handle, off_t pos, struct iovec *vec,
 	size_t vec_count, ssize_t *len);
 ssize_t block_io_write(block_io_handle_info *handle, off_t pos, void *buf, size_t *len);
-void block_io_set_media_params(block_io_device_info *device, 
+void block_io_set_media_params(block_io_device_info *device,
 	uint32 block_size, uint32 ld_block_size, uint64 capacity);

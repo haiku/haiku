@@ -38,11 +38,10 @@ ide_dpc(void *arg)
 
 	//snooze(500000);
 
-	// IRQ handler doesn't tell us whether this bus was in async_wait or 
+	// IRQ handler doesn't tell us whether this bus was in async_wait or
 	// in idle state, so we just check whether there is an active request,
 	// which means that we were async_waiting
 	if (bus->active_qrequest != NULL) {
-		FAST_LOG1(bus->log, ev_ide_dpc_continue, (uint32)bus->active_qrequest);
 		TRACE(("continue command\n"));
 
 		// cancel timeout
@@ -65,8 +64,6 @@ ide_dpc(void *arg)
 		// a spurious IRQ; access_finished will take care of testing
 		// for service requests
 		TRACE(("irq in idle mode - possible service request\n"));
-
-		FAST_LOG0(bus->log, ev_ide_dpc_service);
 
 		device = get_current_device(bus);
 		if (device == NULL) {
@@ -95,7 +92,7 @@ ide_dpc(void *arg)
 
 status_t
 ide_irq_handler(ide_bus_info *bus, uint8 status)
-{	
+{
 	ide_device_info *device;
 
 	// we need to lock bus to have a solid bus state
@@ -137,7 +134,7 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 			IDE_UNLOCK(bus);
 
 			scsi->schedule_dpc(bus->scsi_cookie, bus->irq_dpc, ide_dpc, bus);
-			return B_INVOKE_SCHEDULER; 
+			return B_INVOKE_SCHEDULER;
 
 		case ide_state_idle:
 			TRACE(("state: idle, num_running_reqs %d\n", bus->num_running_reqs));
@@ -191,8 +188,6 @@ ide_irq_handler(ide_bus_info *bus, uint8 status)
 void
 cancel_irq_timeout(ide_bus_info *bus)
 {
-	FAST_LOG0(bus->log, ev_ide_cancel_irq_timeout);
-
 	IDE_LOCK(bus);
 	bus->state = ide_state_accessing;
 	IDE_UNLOCK(bus);
@@ -210,13 +205,11 @@ start_waiting(ide_bus_info *bus, uint32 timeout, int new_state)
 {
 	int res;
 
-	FAST_LOG1(bus->log, ev_ide_start_waiting, new_state);
-
 	TRACE(("timeout = %u\n", (uint)timeout));
 
 	bus->state = new_state;
 
-	res = add_timer(&bus->timer.te, ide_timeout, 
+	res = add_timer(&bus->timer.te, ide_timeout,
 		(bigtime_t)timeout * 1000000, B_ONE_SHOT_RELATIVE_TIMER);
 
 	if (res != B_OK)
@@ -260,8 +253,6 @@ ide_timeout_dpc(void *arg)
 
 	dprintf("ide: ide_timeout_dpc() bus %p, device %p\n", bus, device);
 
-	FAST_LOG1(bus->log, ev_ide_timeout_dpc, (uint32)qrequest);
-
 	// this also resets overlapped commands
 	reset_device(device, qrequest);
 
@@ -275,7 +266,7 @@ ide_timeout_dpc(void *arg)
 		}
 	}
 
-	// let upper layer do the retry	
+	// let upper layer do the retry
 	finish_checksense(qrequest);
 }
 
@@ -287,14 +278,12 @@ ide_timeout(timer *arg)
 {
 	ide_bus_info *bus = ((ide_bus_timer_info *)arg)->bus;
 
-	FAST_LOG0(bus->log, ev_ide_timeout);
-
 	TRACE(("ide_timeout(): %p\n", bus));
 
 	dprintf("ide: ide_timeout() bus %p\n", bus);
 
 	// we need to lock bus to have a solid bus state
-	// (side effect: we lock out the IRQ handler)	
+	// (side effect: we lock out the IRQ handler)
 	IDE_LOCK(bus);
 
 	switch (bus->state) {
@@ -327,7 +316,7 @@ ide_timeout(timer *arg)
 
 		default:
 			// this case also happens if a timeout fires too late;
-			// unless there is a bug, the timeout should always be canceled 
+			// unless there is a bug, the timeout should always be canceled
 			// before declaring bus as being idle
 			dprintf("BUG: unknown state (%d)\n", (int)bus->state);
 
@@ -398,7 +387,7 @@ schedule_synced_pc(ide_bus_info *bus, ide_synced_pc *pc, void *arg)
 	// meanwhile, we may have rejected SCSI commands;
 	// usually, the XPT resends them once a command
 	// has finished, but in this case XPT doesn't know
-	// about our "private" command, so we have to tell about 
+	// about our "private" command, so we have to tell about
 	// idle bus manually
 	TRACE(("tell SCSI bus manager about idle bus\n"));
 	scsi->cont_send_bus(bus->scsi_cookie);
@@ -431,7 +420,7 @@ exec_synced_pcs(ide_bus_info *bus, ide_synced_pc *pc_list)
 }
 
 
-/**	finish bus access; 
+/**	finish bus access;
  *	check if any device wants to service pending commands + execute synced_pc
  */
 
@@ -466,7 +455,7 @@ access_finished(ide_bus_info *bus, ide_device_info *device)
 
 		exec_synced_pcs(bus, synced_pc_list);
 
-		// executed synced_pc may have generated other sync_pc, 
+		// executed synced_pc may have generated other sync_pc,
 		// thus the loop
 	}
 }

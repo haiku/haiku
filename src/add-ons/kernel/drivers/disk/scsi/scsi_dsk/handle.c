@@ -3,12 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Part of Open SCSI Disk Driver
-
-	File handle management.
-*/
-
+/*!	File handle management. */
 
 #include "scsi_dsk_int.h"
 
@@ -29,8 +24,8 @@ das_open(das_device_info *device, das_handle_info **handle_out)
 
 	handle->device = device;
 
-	res = scsi_periph->handle_open(device->scsi_periph_device, 
-		(periph_handle_cookie)handle, 
+	res = scsi_periph->handle_open(device->scsi_periph_device,
+		(periph_handle_cookie)handle,
 		&handle->scsi_periph_handle);
 	if (res < 0) {
 		free(handle);
@@ -39,7 +34,7 @@ das_open(das_device_info *device, das_handle_info **handle_out)
 
 	SHOW_FLOW0(3, "opened");
 
-	*handle_out = handle;	
+	*handle_out = handle;
 	return B_OK;
 }
 

@@ -5,19 +5,12 @@
 #ifndef __IDE_INTERNAL_H__
 #define __IDE_INTERNAL_H__
 
-/*
-	Part of Open IDE bus manager
-
-	Internal structures
-*/
-
 
 #include <bus/IDE.h>
 #include <bus/SCSI.h>
 #include "ide_device_infoblock.h"
 #include <ide_types.h>
 #include <device_manager.h>
-#include <fast_log.h>
 
 #define debug_level_error 2
 #define debug_level_info 1
@@ -26,24 +19,6 @@
 #define DEBUG_MSG_PREFIX "IDE -- "
 
 #include "wrapper.h"
-
-
-//#define USE_FAST_LOG
-
-#ifdef USE_FAST_LOG
-#define FAST_LOG0( handle, event ) fast_log->log_0( handle, event )
-#define FAST_LOG1( handle, event, param ) fast_log->log_1( handle, event, param )
-#define FAST_LOG2( handle, event, param1, param2 ) fast_log->log_2( handle, event, param1, param2 )
-#define FAST_LOG3( handle, event, param1, param2, param3 ) fast_log->log_3( handle, event, param1, param2, param3 )
-#define FAST_LOGN( handle, event, num_params... ) fast_log->log_n( handle, event, num_params )
-#else
-#define FAST_LOG0( handle, event )
-#define FAST_LOG1( handle, event, param )
-#define FAST_LOG2( handle, event, param1, param2 )
-#define FAST_LOG3( handle, event, param1, param2, param3 )
-#define FAST_LOGN( handle, event, num_params... )
-#endif
-
 
 
 #define IDE_STD_TIMEOUT 10
@@ -58,7 +33,6 @@
 #define IDE_CHANNEL_ID_ITEM "ide/channel_id"
 
 extern device_manager_info *pnp;
-extern fast_log_info *fast_log;
 
 
 typedef struct ide_bus_info ide_bus_info;
@@ -99,7 +73,7 @@ typedef struct ide_device_info {
 
 	uint8 queue_depth;				// maximum Command Queueing depth
 
-	uint8 last_lun;					// last LUN 
+	uint8 last_lun;					// last LUN
 
 	uint8 DMA_failures;				// DMA failures in a row
 	uint8 CQ_failures;				// Command Queuing failures during _last_ command
@@ -129,7 +103,7 @@ typedef struct ide_device_info {
 	// ata from here on
 	uint64 total_sectors;			// size in sectors
 
-	// atapi from here on	
+	// atapi from here on
 	uint8 packet[12];				// atapi command packet
 
 	struct {
@@ -154,7 +128,7 @@ typedef struct ide_device_info {
 	bool has_odd_byte;				// remaining odd byte
 	int odd_byte;					// content off odd byte
 
-	ide_device_infoblock infoblock;	// infoblock of device	
+	ide_device_infoblock infoblock;	// infoblock of device
 } ide_device_info;
 
 
@@ -165,7 +139,7 @@ typedef enum {
 	ide_request_autosense = 2
 } ide_request_state;*/
 
-// ide request 
+// ide request
 typedef struct ide_qrequest {
 	struct ide_qrequest *next;
 	ide_device_info *device;
@@ -182,7 +156,7 @@ typedef struct ide_qrequest {
 
 // state of ide bus
 typedef enum {
-	ide_state_idle,				// noone is using it, but overlapped 
+	ide_state_idle,				// noone is using it, but overlapped
 								// commands may be pending
 	ide_state_accessing,		// bus is in use
 	ide_state_async_waiting,	// waiting for IRQ, to be reported via irq_dpc
@@ -228,14 +202,13 @@ struct ide_bus_info {
 
 	uchar path_id;
 
-	device_node_handle node;		// our pnp node
+	device_node *node;		// our pnp node
 
 	// restrictions, read from controller node
 	uint8 max_devices;
 	uint8 can_DMA;
 	uint8 can_CQ;
 
-	fast_log_handle log;
 	char name[32];
 };
 
@@ -271,7 +244,7 @@ enum {
 	ev_ide_timeout,
 	ev_ide_reset_bus,
 	ev_ide_reset_device,
-	
+
 	ev_ide_scsi_io,
 	ev_ide_scsi_io_exec,
 	ev_ide_scsi_io_invalid_device,
@@ -280,7 +253,7 @@ enum {
 	ev_ide_scsi_io_disconnected,
 	ev_ide_finish_request,
 	ev_ide_finish_norelease,
-	
+
 	ev_ide_scan_device_int,
 	ev_ide_scan_device_int_cant_send,
 	ev_ide_scan_device_int_keeps_busy,
@@ -290,12 +263,12 @@ enum {
 
 
 // get selected device
-static inline
-ide_device_info *get_current_device(ide_bus_info *bus)
+static inline ide_device_info *
+get_current_device(ide_bus_info *bus)
 {
 	ide_task_file tf;
 
-	bus->controller->read_command_block_regs(bus->channel_cookie, &tf, 
+	bus->controller->read_command_block_regs(bus->channel_cookie, &tf,
 		ide_mask_device_head);
 
 	return bus->devices[tf.lba.device];
@@ -355,7 +328,7 @@ bool send_command(ide_device_info *device, ide_qrequest *qrequest,
 bool device_start_service( ide_device_info *device, int *tag);
 bool reset_device(ide_device_info *device, ide_qrequest *ignore);
 bool reset_bus(ide_device_info *device, ide_qrequest *ignore);
-	
+
 bool check_service_req(ide_device_info *device);
 
 

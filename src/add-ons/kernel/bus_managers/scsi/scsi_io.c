@@ -22,8 +22,7 @@ scsi_requeue_request(scsi_ccb *request, bool bus_overflow)
 	scsi_bus_info *bus = request->bus;
 	scsi_device_info *device = request->device;
 	bool was_servicable, start_retry;
-	
-	FAST_LOG1(device->log, ev_scsi_requeue_request, (uint32)request);
+
 	SHOW_FLOW0(3, "");
 
 	if (request->state != SCSI_STATE_SENT) {
@@ -56,15 +55,15 @@ scsi_requeue_request(scsi_ccb *request, bool bus_overflow)
 	} else {
 		// device has overflown
 		scsi_set_device_overflow(device);
-		scsi_remove_device_queue(device);		
-		// either, the device has refused the request, i.e. it was transmitted 
+		scsi_remove_device_queue(device);
+		// either, the device has refused the request, i.e. it was transmitted
 		// over the bus - in this case, the bus cannot be overloaded anymore;
 		// or, the driver detected that the device can not be able to process
-		// further requests, because the driver knows its maximum queue depth 
-		// or something - in this case, the bus state hasn't changed, but the 
-		// driver will tell us about any overflow when we submit the next 
+		// further requests, because the driver knows its maximum queue depth
+		// or something - in this case, the bus state hasn't changed, but the
+		// driver will tell us about any overflow when we submit the next
 		// request, so the overflow state will be fixed automatically
-		scsi_clear_bus_overflow(bus);	
+		scsi_clear_bus_overflow(bus);
 	}
 
 	start_retry = !was_servicable && scsi_can_service_bus(bus);
@@ -86,7 +85,6 @@ scsi_resubmit_request(scsi_ccb *request)
 	scsi_device_info *device = request->device;
 	bool was_servicable, start_retry;
 
-	FAST_LOG1(device->log, ev_scsi_resubmit_request, (uint32)request);
 	SHOW_FLOW0(3, "");
 
 	if (request->state != SCSI_STATE_SENT) {
@@ -119,7 +117,7 @@ scsi_resubmit_request(scsi_ccb *request)
 	// if device is not blocked (anymore) add it to waiting list of bus
 	if (device->lock_count == 0) {
 		scsi_add_device_queue_first(device);
-		// as previous line does nothing if already queued, we force device 
+		// as previous line does nothing if already queued, we force device
 		// to be the next one to get handled
 		bus->waiting_devices = device;
 	}
@@ -141,7 +139,6 @@ submit_autosense(scsi_ccb *request)
 {
 	scsi_device_info *device = request->device;
 
-	FAST_LOG1(device->log, ev_scsi_submit_autosense, (uint32)request);
 	//snooze(1000000);
 
 	SHOW_FLOW0(3, "sending autosense");
@@ -174,14 +171,13 @@ finish_autosense(scsi_device_info *device)
 	scsi_ccb *orig_request = device->auto_sense_originator;
 	scsi_ccb *request = device->auto_sense_request;
 
-	FAST_LOG2(device->log, ev_scsi_finish_autosense, (uint32)request, (uint32)orig_request);
 	SHOW_FLOW0(3, "");
 
 	if (request->subsys_status == SCSI_REQ_CMP) {
 		int sense_len;
 
 		// we got sense data -> copy it to sense buffer
-		sense_len = min(SCSI_MAX_SENSE_SIZE, 
+		sense_len = min(SCSI_MAX_SENSE_SIZE,
 			request->data_length - request->data_resid);
 
 		SHOW_FLOW(3, "Got sense: %d bytes", sense_len);
@@ -209,8 +205,6 @@ scsi_device_queue_overflow(scsi_ccb *request, uint num_requests)
 	scsi_device_info *device = request->device;
 	int diff_max_slots;
 
-	FAST_LOG2(device->log, ev_scsi_device_queue_overflow, (uint32)request, num_requests);
-
 	// set maximum number of concurrent requests to number of
 	// requests running when QUEUE FULL condition occurred - 1
 	// (the "1" is the refused request)
@@ -222,7 +216,7 @@ scsi_device_queue_overflow(scsi_ccb *request, uint num_requests)
 
 	SHOW_INFO(2, "Restricting device queue to %d requests", num_requests);
 
-	// update slot count	
+	// update slot count
 	ACQUIRE_BEN(&bus->mutex);
 
 	diff_max_slots = device->total_slots - num_requests;
@@ -245,7 +239,6 @@ scsi_request_finished(scsi_ccb *request, uint num_requests)
 	scsi_bus_info *bus = request->bus;
 	bool was_servicable, start_service, do_autosense;
 
-	FAST_LOG2(device->log, ev_scsi_request_finished, (uint32)request, num_requests);
 	SHOW_FLOW(3, "%p", request);
 
 	if (request->state != SCSI_STATE_SENT) {
@@ -272,9 +265,9 @@ scsi_request_finished(scsi_ccb *request, uint num_requests)
 
 	was_servicable = scsi_can_service_bus(bus);
 
-	// do pseudo-autosense if device doesn't support it and 
-	// device reported a check condition state and auto-sense haven't 
-	// been retrieved by SIM 
+	// do pseudo-autosense if device doesn't support it and
+	// device reported a check condition state and auto-sense haven't
+	// been retrieved by SIM
 	// (last test is implicit as SIM adds SCSI_AUTOSNS_VALID to subsys_status)
 	do_autosense = device->manual_autosense
 		&& (request->flags & SCSI_DIS_AUTOSENSE) == 0
@@ -303,7 +296,7 @@ scsi_request_finished(scsi_ccb *request, uint num_requests)
 	scsi_clear_device_overflow(device);
 	scsi_clear_bus_overflow(bus);
 
-	// if device is not blocked (anymore) and has pending requests, 
+	// if device is not blocked (anymore) and has pending requests,
 	// add it to waiting list of bus
 	if (device->lock_count == 0 && device->queued_reqs != NULL)
 		scsi_add_device_queue_last(device);
@@ -358,13 +351,13 @@ scsi_check_enqueue_request(scsi_ccb *request)
 		scsi_add_queued_request(request);
 		execute = false;
 	} else {
-		// if bus is saturated, block it	
+		// if bus is saturated, block it
 		if (--bus->left_slots == 0) {
 			SHOW_FLOW0(3, "bus is saturated, blocking further requests");
 			scsi_block_bus_nolock(bus, false);
 		}
 
-		// if device saturated or blocking request, block device	
+		// if device saturated or blocking request, block device
 		if (--device->left_slots == 0 || request->ordered) {
 			SHOW_FLOW0( 3, "device is saturated/blocked by requests, blocking further requests" );
 			scsi_block_device_nolock(device, false);
@@ -379,7 +372,7 @@ scsi_check_enqueue_request(scsi_ccb *request)
 	}
 
 	RELEASE_BEN(&bus->mutex);
-					
+
 	return execute;
 }
 
@@ -398,7 +391,7 @@ scsi_async_io(scsi_ccb *request)
 	scsi_bus_info *bus = request->bus;
 
 	//SHOW_FLOW( 0, "path_id=%d", bus->path_id );
-	
+
 	//snooze( 1000000 );
 
 	// do some sanity tests first
@@ -412,14 +405,6 @@ scsi_async_io(scsi_ccb *request)
 		request->subsys_status = SCSI_REQ_INVALID;
 		goto err;
 	}
-
-	FAST_LOGN(request->device->log, ev_scsi_async_io, 
-		func_group_len[request->cdb[0] >> 5] + 2, 
-		(uint32)request, request->data_length,
-		request->cdb[0], request->cdb[1], request->cdb[2], request->cdb[3],
-		request->cdb[4], request->cdb[5], request->cdb[6], request->cdb[7],
-		request->cdb[8], request->cdb[9], request->cdb[10], request->cdb[11],
-		request->cdb[12], request->cdb[13], request->cdb[14], request->cdb[15]);
 
 	if (!request->device->valid) {
 		SHOW_ERROR0( 3, "device got removed" );
@@ -483,7 +468,7 @@ scsi_async_io(scsi_ccb *request)
 	// give SIM a well-defined first state
 	request->sim_state = 0;
 
-	// make sure device/bus is not blocked	
+	// make sure device/bus is not blocked
 	if (!scsi_check_enqueue_request(request))
 		return;
 
@@ -572,7 +557,7 @@ scsi_abort(scsi_ccb *req_to_abort)
 
 			req_to_abort->subsys_status = SCSI_REQ_ABORTED;
 
-			// finish emulation		
+			// finish emulation
 			if (req_to_abort->emulated)
 				scsi_finish_emulation(req_to_abort);
 
@@ -617,13 +602,13 @@ scsi_check_exec_service(scsi_bus_info *bus)
 		request = device->queued_reqs;
 		scsi_remove_queued_request(request);
 
-		// if bus is saturated, block it	
+		// if bus is saturated, block it
 		if (--bus->left_slots == 0) {
 			SHOW_FLOW0(3, "bus is saturated, blocking further requests");
 			scsi_block_bus_nolock(bus, false);
 		}
 
-		// if device saturated or blocking request, block device	
+		// if device saturated or blocking request, block device
 		if (--device->left_slots == 0 || request->ordered) {
 			SHOW_FLOW0(3, "device is saturated/blocked by requests, blocking further requests");
 			scsi_block_device_nolock(device, false);
@@ -636,13 +621,11 @@ scsi_check_exec_service(scsi_bus_info *bus)
 
 		RELEASE_BEN(&bus->mutex);
 
-		FAST_LOG1(request->device->log, ev_scsi_do_resend_request, (uint32)request);
-
 		request->state = SCSI_STATE_SENT;
 		bus->interface->scsi_io(bus->sim_cookie, request);
 
 		return true;
-	} 
+	}
 
 	RELEASE_BEN(&bus->mutex);
 

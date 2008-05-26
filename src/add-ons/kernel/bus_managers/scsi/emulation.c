@@ -71,7 +71,7 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 
 	// to satisfy alignment, we must allocate a buffer twice its required size
 	// and find the properly aligned part of it, ouch!
-	device->buffer_area = create_area("ATAPI buffer", (void *)&unaligned_addr, B_ANY_KERNEL_ADDRESS, 
+	device->buffer_area = create_area("ATAPI buffer", (void *)&unaligned_addr, B_ANY_KERNEL_ADDRESS,
 								2 * total_size, B_CONTIGUOUS, 0);
 	if (device->buffer_area < 0) {
 		SHOW_ERROR( 1, "cannot create DMA buffer (%s)", strerror(device->buffer_area));
@@ -87,7 +87,7 @@ scsi_init_emulation_buffer(scsi_device_info *device, size_t buffer_size)
 	aligned_phys = (unaligned_phys + buffer_size - 1) & ~(buffer_size - 1);
 	aligned_addr = unaligned_addr + (aligned_phys - unaligned_phys);
 
-	SHOW_FLOW(3, "unaligned_phys = %#lx, aligned_phys = %#lx, unaligned_addr = %#lx, aligned_addr = %#lx", 
+	SHOW_FLOW(3, "unaligned_phys = %#lx, aligned_phys = %#lx, unaligned_addr = %#lx, aligned_addr = %#lx",
 		unaligned_phys, aligned_phys, unaligned_addr, aligned_addr);
 
 	device->buffer = (void *)aligned_addr;
@@ -189,14 +189,14 @@ scsi_start_mode_select_6(scsi_ccb *request)
 	param_list_length_10 = param_list_length_6
 		- sizeof(scsi_mode_param_header_6) + sizeof(scsi_mode_param_header_10);
 
-	// we need to replace data header, thus use internal buffer		
+	// we need to replace data header, thus use internal buffer
 	get_emulation_buffer(request);
 
 	// make sure our buffer is large enough
 	if (param_list_length_10 > device->buffer_size)
 		goto err;
 
-	// construct new cdb		
+	// construct new cdb
 	request->cdb_length = sizeof(*cdb);
 	memset(cdb, 0, sizeof(*cdb));
 
@@ -210,7 +210,7 @@ scsi_start_mode_select_6(scsi_ccb *request)
 
 	cdb->control = cmd->control;
 
-	// copy and adapt header			
+	// copy and adapt header
 	if (!copy_sg_data(request, 0, param_list_length_6, &header_6, sizeof(header_6), true))
 		goto err;
 
@@ -222,7 +222,7 @@ scsi_start_mode_select_6(scsi_ccb *request)
 	header_10->block_desc_length = B_HOST_TO_BENDIAN_INT16(
 		(uint16)header_6.block_desc_length);
 
-	// append actual mode select data		
+	// append actual mode select data
 	if (!copy_sg_data(request, sizeof(header_6), param_list_length_6, header_10 + 1,
 			param_list_length_10 - sizeof(*header_10), true))
 		goto err;
@@ -289,7 +289,7 @@ scsi_finish_mode_sense_10_6(scsi_ccb *request)
 	// check how much data we got from device and thus will copy into
 	// request data
 	transfer_size_10 = request->data_length - request->data_resid;
-	transfer_size_6 = transfer_size_10 
+	transfer_size_6 = transfer_size_10
 		- sizeof(scsi_mode_param_header_10 *) + sizeof(scsi_mode_param_header_6 *);
 
 	SHOW_FLOW(0, "fixing MODE SENSE(6) (%d bytes)", transfer_size_6);
@@ -309,11 +309,11 @@ scsi_finish_mode_sense_10_6(scsi_ccb *request)
 	header_6.dev_spec_parameter = header_10->dev_spec_parameter;
 	header_6.block_desc_length = B_BENDIAN_TO_HOST_INT16(header_10->block_desc_length);
 
-	// copy adapted header			
+	// copy adapted header
 	copy_sg_data(request, 0, transfer_size_6, &header_6, sizeof(header_6), false);
 
 	// copy remaining data
-	copy_sg_data(request, sizeof(header_6), transfer_size_6, 
+	copy_sg_data(request, sizeof(header_6), transfer_size_6,
 		header_10 + 1, transfer_size_10 - sizeof(*header_10), false);
 
 	request->data_resid = request->data_length - transfer_size_6;
@@ -439,7 +439,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 	int sg_count = request->sg_count;
 	int req_size;
 
-	SHOW_FLOW(3, "offset=%u, req_size_limit=%d, size=%d, sg_list=%p, sg_count=%d, %s buffer", 
+	SHOW_FLOW(3, "offset=%u, req_size_limit=%d, size=%d, sg_list=%p, sg_count=%d, %s buffer",
 		offset, allocation_length, size, sg_list, sg_count, to_buffer ? "to" : "from");
 
 	// skip unused S/G entries
@@ -452,7 +452,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 	if (sg_count == 0)
 		return 0;
 
-	// remaining bytes we are allowed to copy from/to request 		
+	// remaining bytes we are allowed to copy from/to request
 	req_size = min(allocation_length, request->data_length) - offset;
 
 	// copy one S/G entry at a time
@@ -464,7 +464,7 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		bytes = min(bytes, sg_list->size);
 
 		if (vm_get_physical_page((addr_t)sg_list->address, (void *)&virtualAddress,
-				PHYSICAL_PAGE_CAN_WAIT) != B_OK) 
+				PHYSICAL_PAGE_CAN_WAIT) != B_OK)
 			return false;
 
 		SHOW_FLOW(0, "buffer = %p, virt_addr = %#lx, bytes = %lu, to_buffer = %d",
@@ -475,30 +475,13 @@ copy_sg_data(scsi_ccb *request, uint offset, uint allocation_length,
 		else
 			memcpy((void *)(virtualAddress + offset), buffer, bytes);
 
-#if 0
-		{
-			int i;
-			
-			for (i = 0; i < bytes; ++i) {
-				char byte;
-
-				if (to_buffer)
-					byte = ((char *)virtualAddress)[offset + i];
-				else
-					byte = ((char *)buffer)[i];
-
-				FAST_LOG1( request->device->log, ev_copy_sg_data, byte );
-			}
-		}
-#endif
-
 		vm_put_physical_page(virtualAddress);
 
 		buffer = (char *)buffer + bytes;
 		size -= bytes;
 		offset = 0;
 	}
-	
+
 	return size == 0;
 }
 
@@ -519,7 +502,7 @@ get_emulation_buffer(scsi_ccb *request)
 
 	request->sg_list = device->buffer_sg_list;
 	request->sg_count = device->buffer_sg_count;
-	request->data_length = device->buffer_size;	
+	request->data_length = device->buffer_size;
 }
 
 
@@ -539,7 +522,7 @@ replace_request_data(scsi_ccb *request)
 
 	request->sg_list = device->buffer_sg_list;
 	request->sg_count = device->buffer_sg_count;
-	request->data_length = device->buffer_size;	
+	request->data_length = device->buffer_size;
 }
 
 

@@ -6,7 +6,7 @@
  */
 
 /*
-	Device node layer. 
+	Device node layer.
 
 	When a SCSI bus is registered, this layer scans for SCSI devices
 	and registers a node for each of them. Peripheral drivers are on
@@ -22,25 +22,9 @@
 #include <stdio.h>
 
 
-#ifdef USE_FAST_LOG
-static fast_log_event_type scsi_device_events[] = {
-	{ ev_scsi_requeue_request, "ev_scsi_requeue_request" },
-	{ ev_scsi_resubmit_request, "ev_scsi_resubmit_request" },
-	{ ev_scsi_submit_autosense, "ev_scsi_submit_autosense" },
-	{ ev_scsi_finish_autosense, "ev_scsi_finish_autosense" },
-	{ ev_scsi_device_queue_overflow, "ev_scsi_device_queue_overflow" },
-	{ ev_scsi_request_finished, "ev_scsi_request_finished" },
-	{ ev_scsi_async_io, "ev_scsi_async_io" },
-	{ ev_scsi_do_resend_request, "ev_scsi_do_resend_request" },
-	{ ev_copy_sg_data, "ev_copy_sg_data" },
-	{}
-};
-#endif
-
-
 /** free autosense request of device */
 
-static void 
+static void
 scsi_free_autosense_request(scsi_device_info *device)
 {
 	SHOW_FLOW0( 3, "" );
@@ -59,7 +43,7 @@ scsi_free_autosense_request(scsi_device_info *device)
 
 /** free all data of device */
 
-static void 
+static void
 scsi_free_device(scsi_device_info *device)
 {
 	SHOW_FLOW0( 3, "" );
@@ -74,20 +58,15 @@ scsi_free_device(scsi_device_info *device)
 	DELETE_BEN(&device->dma_buffer_lock);
 	delete_sem(device->dma_buffer_owner);
 
-#ifdef USE_FAST_LOG
-	if (device->log != NULL)
-		fast_log->stop_log(device->log);
-#endif
-
 	free(device);
 }
 
 
-/**	copy string src without trailing zero to dst and remove trailing 
+/**	copy string src without trailing zero to dst and remove trailing
  *	spaces size of dst is dst_size, size of src is dst_size-1
  */
 
-static void 
+static void
 beautify_string(char *dst, char *src, int dst_size)
 {
 	int i;
@@ -114,8 +93,8 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 
 	SHOW_FLOW0( 3, "" );
 
-	// ask for restrictions	
-	bus->interface->get_restrictions(bus->sim_cookie, 
+	// ask for restrictions
+	bus->interface->get_restrictions(bus->sim_cookie,
 		target_id, &is_atapi, &manual_autosense, &max_blocks);
 	if (target_lun != 0)
 		dprintf("WARNING: SCSI target %d lun %d getting restrictions without lun\n",
@@ -123,7 +102,7 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 
 	// find maximum transfer blocks
 	// set default value to max (need something like ULONG_MAX here)
-	orig_max_blocks = ~0;		
+	orig_max_blocks = ~0;
 	pnp->get_attr_uint32(bus->node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, &orig_max_blocks, true);
 
 	max_blocks = min(max_blocks, orig_max_blocks);
@@ -133,18 +112,12 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 		char product_ident[sizeof( inquiry_data->product_ident ) + 1];
 		char product_rev[sizeof( inquiry_data->product_rev ) + 1];
 		device_attr attrs[] = {
-			// info about driver
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: SCSI_DEVICE_MODULE_NAME }},
-
 			// connection
 			{ SCSI_DEVICE_TARGET_ID_ITEM, B_UINT8_TYPE, { ui8: target_id }},
 			{ SCSI_DEVICE_TARGET_LUN_ITEM, B_UINT8_TYPE, { ui8: target_lun }},
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string:
-				"target: %"SCSI_DEVICE_TARGET_ID_ITEM
-				"%, lun: %"SCSI_DEVICE_TARGET_LUN_ITEM"%" }},
 
 			// inquiry data (used for both identification and information)
-			{ SCSI_DEVICE_INQUIRY_ITEM, B_RAW_TYPE, 
+			{ SCSI_DEVICE_INQUIRY_ITEM, B_RAW_TYPE,
 				{ raw: { inquiry_data, sizeof( *inquiry_data ) }}},
 
 			// some more info for driver loading
@@ -154,8 +127,7 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 			{ SCSI_DEVICE_REVISION_ITEM, B_STRING_TYPE, { string: product_rev }},
 
 			// description of peripheral drivers
-			{ B_DRIVER_BUS, B_STRING_TYPE, { string: "scsi" }},
-			// ToDo: mapping is missing
+			{ B_DEVICE_BUS, B_STRING_TYPE, { string: "scsi" }},
 
 			// extra restriction of maximum number of blocks per transfer
 			{ B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, { ui32: max_blocks }},
@@ -166,16 +138,13 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 			{ SCSI_DEVICE_MANUAL_AUTOSENSE_ITEM, B_UINT8_TYPE, { ui8: manual_autosense }},
 			{ NULL }
 		};
-		device_node_handle node;
-		status_t res;
 
 		beautify_string(vendor_ident, inquiry_data->vendor_ident, sizeof(vendor_ident));
 		beautify_string(product_ident, inquiry_data->product_ident, sizeof(product_ident));
 		beautify_string(product_rev, inquiry_data->product_rev, sizeof(product_rev));
 
-		res = pnp->register_device(bus->node, attrs, NULL, &node);
-		if (res < 0)
-			return res;
+		return pnp->register_node(bus->node, SCSI_DEVICE_MODULE_NAME, attrs,
+			NULL, NULL);
 	}
 
 	return B_OK;
@@ -184,7 +153,7 @@ scsi_register_device(scsi_bus_info *bus, uchar target_id,
 
 // create data structure for a device
 static scsi_device_info *
-scsi_create_device(device_node_handle node, scsi_bus_info *bus,
+scsi_create_device(device_node *node, scsi_bus_info *bus,
 	int target_id, int target_lun)
 {
 	scsi_device_info *device;
@@ -228,11 +197,11 @@ err:
 
 
 /**	prepare autosense request.
- *	this cannot be done on demand but during init as we may 
+ *	this cannot be done on demand but during init as we may
  *	have run out of ccbs when we need it
  */
 
-static status_t 
+static status_t
 scsi_create_autosense_request(scsi_device_info *device)
 {
 	scsi_ccb *request;
@@ -259,22 +228,22 @@ scsi_create_autosense_request(scsi_device_info *device)
 	request->data_length = SCSI_MAX_SENSE_SIZE;
 	request->sg_list = (physical_entry *)(buffer + SCSI_MAX_SENSE_SIZE);
 	request->sg_count = 1;
-	
-	get_memory_map(buffer, SCSI_MAX_SENSE_SIZE, 
+
+	get_memory_map(buffer, SCSI_MAX_SENSE_SIZE,
 		(physical_entry *)request->sg_list, 1);
 
 	// disable auto-autosense, just in case;
 	// make sure no other request overtakes sense request;
-	// buffer is/must be DMA safe as we cannot risk trouble with 
+	// buffer is/must be DMA safe as we cannot risk trouble with
 	// dynamically allocated DMA buffer
-	request->flags = SCSI_DIR_IN | SCSI_DIS_AUTOSENSE | 
+	request->flags = SCSI_DIR_IN | SCSI_DIS_AUTOSENSE |
 		SCSI_ORDERED_QTAG | SCSI_DMA_SAFE;
 
 	cmd = (scsi_cmd_request_sense *)request->cdb;
 	request->cdb_length = sizeof(*cmd);
 
 	memset(cmd, 0, sizeof(*cmd));
-	cmd->opcode = SCSI_OP_REQUEST_SENSE;	
+	cmd->opcode = SCSI_OP_REQUEST_SENSE;
 	cmd->lun = device->target_lun;
 	cmd->allocation_length = SCSI_MAX_SENSE_SIZE;
 
@@ -289,15 +258,13 @@ err:
 #define SET_BIT(field, bit) field[(bit) >> 3] |= 1 << ((bit) & 7)
 
 static status_t
-scsi_init_device(device_node_handle node, void *user_cookie, void **cookie)
+scsi_init_device(device_node *node, void **cookie)
 {
-	device_node_handle parent = pnp->get_parent(node);
-	scsi_res_inquiry *inquiry_data = NULL;
+	const scsi_res_inquiry *inquiry_data = NULL;
 	uint8 target_id, target_lun, path_id;
 	scsi_bus_info *bus;
 	scsi_device_info *device;
 	status_t res;
-	driver_module_info *bus_interface;
 	size_t inquiry_data_len;
 	uint8 is_atapi, manual_autosense;
 
@@ -308,41 +275,29 @@ scsi_init_device(device_node_handle node, void *user_cookie, void **cookie)
 		|| pnp->get_attr_uint8( node, SCSI_DEVICE_IS_ATAPI_ITEM, &is_atapi, false) != B_OK
 		|| pnp->get_attr_uint8( node, SCSI_DEVICE_MANUAL_AUTOSENSE_ITEM, &manual_autosense, false) != B_OK
 		|| pnp->get_attr_raw( node, SCSI_DEVICE_INQUIRY_ITEM,
-				(void **)&inquiry_data, &inquiry_data_len, false) != B_OK
+				(const void **)&inquiry_data, &inquiry_data_len, false) != B_OK
 		|| inquiry_data_len != sizeof(*inquiry_data)) {
-		res = B_ERROR;
-		goto err1;
+		return B_ERROR;
 	}
 
-	res = pnp->init_driver(parent, NULL, &bus_interface, 
-		(void **)&bus);
-	if (res != B_OK)
-		goto err1;
+	{
+		device_node *parent = pnp->get_parent_node(node);
+		pnp->get_driver(parent, NULL, (void **)&bus);
+		pnp->put_node(parent);
+	}
 
 	device = scsi_create_device(node, bus, target_id, target_lun);
-	if (device == NULL) {
-		res = B_NO_MEMORY;
-		goto err2;
-	}
+	if (device == NULL)
+		return B_NO_MEMORY;
 
 	// never mind if there is no path - it might be an emulated controller
 	path_id = -1;
 
 	pnp->get_attr_uint8(node, SCSI_BUS_PATH_ID_ITEM, &path_id, true);
 
-	sprintf(device->name, "scsi_device %u:%u:%u", path_id, target_id, target_lun);
-
-#ifdef USE_FAST_LOG
-	device->log = fast_log->start_log(device->name, scsi_device_events);
-	if (device->log == NULL) {
-		res = B_NO_MEMORY;
-		goto err3;
-	}
-#endif
-
 	device->inquiry_data = *inquiry_data;
 
-	// save restrictions	
+	// save restrictions
 	device->is_atapi = is_atapi;
 	device->manual_autosense = manual_autosense;
 
@@ -365,14 +320,14 @@ scsi_init_device(device_node_handle node, void *user_cookie, void **cookie)
 	if (device->manual_autosense) {
 		if (scsi_create_autosense_request(device) != B_OK) {
 			res = B_NO_MEMORY;
-			goto err3;
+			goto err;
 		}
 	}
 
 	// if this is an ATAPI device, we need an emulation buffer
 	if (scsi_init_emulation_buffer(device, SCSI_ATAPI_BUFFER_SIZE) != B_OK) {
 		res = B_NO_MEMORY;
-		goto err3;
+		goto err;
 	}
 
 	memset(device->emulation_map, 0, sizeof(device->emulation_map));
@@ -385,42 +340,27 @@ scsi_init_device(device_node_handle node, void *user_cookie, void **cookie)
 		SET_BIT(device->emulation_map, SCSI_OP_INQUIRY);
 	}
 
-	free(inquiry_data);
-
 	*cookie = device;
 	return B_OK;
 
-err3:
+err:
 	scsi_free_device(device);
-err2:
-	pnp->uninit_driver(parent);
-err1:
-	pnp->put_device_node(parent);
-	free(inquiry_data);
 	return res;
 }
 
 
-static status_t
+static void
 scsi_uninit_device(scsi_device_info *device)
 {
-	device_node_handle parent = pnp->get_parent(device->node);
-
 	SHOW_FLOW0(3, "");
 
 	scsi_free_device(device);
-
-	// must unload parent at last as scsi_free_device access it
-	pnp->uninit_driver(parent);
-	pnp->put_device_node(parent);
-
-	return B_OK;
 }
 
 
 static void
-scsi_device_removed(device_node_handle node, scsi_device_info *device)
-{	
+scsi_device_removed(scsi_device_info *device)
+{
 	SHOW_FLOW0(3, "");
 
 	if (device == NULL)
@@ -445,9 +385,9 @@ scsi_force_get_device(scsi_bus_info *bus, uchar target_id,
 		{ SCSI_DEVICE_TARGET_LUN_ITEM, B_UINT8_TYPE, { ui8: target_lun }},
 		{ NULL }
 	};
-	device_node_handle node;
+	device_node *node;
 	status_t res;
-	driver_module_info *driver_interface;	
+	driver_module_info *driver_interface;
 	scsi_device device;
 
 	SHOW_FLOW0(3, "");
@@ -457,15 +397,16 @@ scsi_force_get_device(scsi_bus_info *bus, uchar target_id,
 
 	// check whether device registered already
 	node = NULL;
-	pnp->get_next_child_device(bus->node, &node, attrs);
+	pnp->get_next_child_node(bus->node, attrs, &node);
 
 	SHOW_FLOW(3, "%p", node);
 
 	if (node != NULL) {
+		// TODO: have a second look a this one!
 		// there is one - get it
-		res = pnp->init_driver(node, NULL, &driver_interface, 
-			(void **)&device);
-		pnp->put_device_node(node);
+		res = pnp->get_driver(node, &driver_interface, (void **)&device);
+		if (res != B_OK)
+			pnp->put_node(node);
 	} else {
 		// device doesn't exist yet - create a temporary one
 		device = scsi_create_device(NULL, bus, target_id, target_lun);
@@ -495,12 +436,13 @@ scsi_put_forced_device(scsi_device_info *device)
 
 	SHOW_FLOW0(3, "");
 
-	if (device->node != NULL)
+	if (device->node != NULL) {
 		// device is registered
-		pnp->uninit_driver(device->node);
-	else
+		pnp->put_node(device->node);
+	} else {
 		// device is temporary
 		scsi_free_device(device);
+	}
 
 	release_sem(bus->scan_lun_lock);
 }
@@ -563,8 +505,10 @@ scsi_device_interface scsi_device_module = {
 		NULL,	// supported devices
 		NULL,	// register node
 		scsi_init_device,
-		(status_t (*)(void *)) scsi_uninit_device,
-		(void (*)(device_node_handle, void *)) scsi_device_removed
+		(void (*)(void *)) scsi_uninit_device,
+		NULL,	// register child devices
+		NULL,	// rescan
+		(void (*)(void *)) scsi_device_removed
 	},
 
 	scsi_alloc_ccb,

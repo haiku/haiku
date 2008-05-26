@@ -17,7 +17,7 @@
 #ifdef DEBUG_WAIT_ON_MSG
 #	define DEBUG_WAIT snooze( DEBUG_WAIT_ON_MSG );
 #else
-#	define DEBUG_WAIT 
+#	define DEBUG_WAIT
 #endif
 
 #ifdef DEBUG_WAIT_ON_ERROR
@@ -43,7 +43,7 @@
 #endif
 
 #ifndef debug_level_flow
-#	define debug_level_flow 3
+#	define debug_level_flow 4
 #endif
 
 #ifndef debug_level_info

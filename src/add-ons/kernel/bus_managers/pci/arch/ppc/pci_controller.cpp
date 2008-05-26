@@ -1,8 +1,14 @@
+/*
+ * Copyright 2006, Ingo Weinhold. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+
 #include "pci_controller.h"
 
 #include <arch_platform.h>
 
-#include "pci_priv.h"
+#include "pci_private.h"
 
 #include "openfirmware/pci_openfirmware.h"
 

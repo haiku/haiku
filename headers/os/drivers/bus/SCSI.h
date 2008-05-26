@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -11,13 +11,13 @@
 	SCSI bus manager interface
 
 	The bus manager interface is _based_ on CAM, but I've modified it because :-
-	- HBA engine, target mode and queue freezing (and probably other features) 
+	- HBA engine, target mode and queue freezing (and probably other features)
 	  aren't supported (at least the first two aren't supported by linux too ;)
 	- Asynchronous events aren't supported (no OS/driver I know uses them)
 	- P/T/L was defined by number not by handle, requiring many redundant tests
 	  and thus making adding/removing of devices/busses very hard, especially if
 	  PnP is to be supported
-	- single entry system as proposed by CAM involves extra tests and overhead 
+	- single entry system as proposed by CAM involves extra tests and overhead
 	  because of generalized data structure
 
 
@@ -26,16 +26,16 @@
 	Something about requests involving data transfer: you can either specify
 	the virtual address in <data> of CCB (in which case it must be continuous),
 	or store a pointer to a S/G list that contains physical addresses in
-	<sg_list>/<sg_count>. If <sg_list> is non-Null, <data> is ignored. 
-	The S/G list must be in kernel space because the request can be executed 
-	in a different thread context. This is also the	reason why the S/G list has 
+	<sg_list>/<sg_count>. If <sg_list> is non-Null, <data> is ignored.
+	The S/G list must be in kernel space because the request can be executed
+	in a different thread context. This is also the	reason why the S/G list has
 	to contain physical addresses. For obvious reason, the data buffer specified
 	by <sg_list> must be locked, but <data> doesn't need to be.
 
-	You can either execute the request synchronously ("sync_io") or 
-	asynchronously ("async_io"; you have to acquire <completion_sem> to find 
-	out when the request is finished). In the first case you can use either 
-	<data> or <sg_list>, in the latter <sg_list> only. 
+	You can either execute the request synchronously ("sync_io") or
+	asynchronously ("async_io"; you have to acquire <completion_sem> to find
+	out when the request is finished). In the first case you can use either
+	<data> or <sg_list>, in the latter <sg_list> only.
 
 	The SCSI bus manager takes care that the controller can access the data
 	via DMA by copying it into a buffer if necessary. For the paging path,
@@ -49,28 +49,28 @@
 	<data> is a safe bet.
 
 
-	For SIM writers: 
+	For SIM writers:
 
 	Requests sent by peripheral drivers are forwarded to the <scsi_io> entry
-	of the SIM. You should return as soon as some waiting is required. 
+	of the SIM. You should return as soon as some waiting is required.
 	Usually, the controller raises an IRQ when a request can be continued
 	or is finished. As interrupt handlers must be as fast as possible, you
-	can schedule a DPC in the handler (<schedule_dpc>) which executed by a 
-	high priority service thread that is spawned by the SCSI bus manager 
-	for each bus. This service thread also takes care to submit waiting 
+	can schedule a DPC in the handler (<schedule_dpc>) which executed by a
+	high priority service thread that is spawned by the SCSI bus manager
+	for each bus. This service thread also takes care to submit waiting
 	requests.
 
 	You can specify a maximum number of concurrent requests per bus via
-	path_inquiry (<hba_queue_size>) for the bus. The device limit is 
+	path_inquiry (<hba_queue_size>) for the bus. The device limit is
 	determined via INQUIRY. If you need a lower/dynamic limit, you can refuse
 	a request by <requeue>. If <bus_overflow> is true, no further requests
 	to the bus will be sent, if <bus_overflow> is false, no further requests
 	to the device will be sent. To terminate the overflow condition, call
 	<cont_send_device>/<cont_send_bus>. It also terminated when a request
 	for the bus/device is finished via <finished> or <resubmit>.
-	Because of the asynchronous nature,	requests may still arrive after the 
-	overflow condition being signalled, so you should add a safety test to 
-	<scsi_io>. 
+	Because of the asynchronous nature,	requests may still arrive after the
+	overflow condition being signalled, so you should add a safety test to
+	<scsi_io>.
 
 	If a problem occurs during execution, you can ask for a restart via
 	<resubmit>. The request in question will be submitted as soon as possible.
@@ -86,8 +86,8 @@
 	READ6/WRITE6 commands to READ10/WRITE10 commands, MODE REQUEST6/SENSE6
 	to MODE REQUEST10/SENSE10 and fix the version fields of INQUIRY results,
 	so ATAPI devices can be used like standard SCSI devices. Further, the
-	SCSI bus manager can emulate auto-sense by executing a REQUEST SENSE 
-	if <subsys_status> is SCSI_REQ_CMP_ERR and <device_status> is 
+	SCSI bus manager can emulate auto-sense by executing a REQUEST SENSE
+	if <subsys_status> is SCSI_REQ_CMP_ERR and <device_status> is
 	SCSI_STATUS_CHECK_CONDITION when a request is finished. This emulation
 	may be enhanced/generalized in the future.
 */
@@ -296,7 +296,7 @@ typedef struct scsi_device_interface {
 	driver_module_info info;
 
 	// get CCB
-	// warning: if pool of CCBs is exhausted, this call is delayed until a 
+	// warning: if pool of CCBs is exhausted, this call is delayed until a
 	// CCB is freed, so don't try to allocate more then one CCB at once!
 	scsi_ccb *(*alloc_ccb)(scsi_device device);
 	// free CCB
@@ -320,7 +320,7 @@ typedef struct scsi_device_interface {
 	status_t (*ioctl)(scsi_device device, uint32 op, void *buffer, size_t length);
 } scsi_device_interface;
 
-#define SCSI_DEVICE_MODULE_NAME "bus_managers/scsi/driver/v1"
+#define SCSI_DEVICE_MODULE_NAME "bus_managers/scsi/device/driver_v1"
 
 
 // Bus node
@@ -333,10 +333,10 @@ typedef struct scsi_device_interface {
 #define SCSI_BUS_TYPE_NAME "scsi/bus"
 
 // SCSI bus node driver.
-// This interface can be used by peripheral drivers to access the 
+// This interface can be used by peripheral drivers to access the
 // bus directly.
 typedef struct scsi_bus_interface {
-	bus_module_info info;
+	driver_module_info info;
 
 	// get information about host controller
 	uchar (*path_inquiry)(scsi_bus bus, scsi_path_inquiry *inquiry_data);
@@ -345,7 +345,7 @@ typedef struct scsi_bus_interface {
 } scsi_bus_interface;
 
 // name of SCSI bus node driver
-#define SCSI_BUS_MODULE_NAME "bus_managers/scsi/bus/v1"
+#define SCSI_BUS_MODULE_NAME "bus_managers/scsi/bus/driver_v1"
 
 
 // Interface for SIM
@@ -354,7 +354,7 @@ typedef struct scsi_bus_interface {
 typedef struct scsi_dpc_info *scsi_dpc_cookie;
 
 // Bus manager interface used by SCSI controller drivers.
-// SCSI controller drivers get this interface passed via their init_device 
+// SCSI controller drivers get this interface passed via their init_device
 // method. Further, they must specify this driver as their fixed consumer.
 typedef struct scsi_for_sim_interface {
 	driver_module_info info;
@@ -363,7 +363,7 @@ typedef struct scsi_for_sim_interface {
 	// bus_overflow: true - too many bus requests
 	//               false - too many device requests
 	// bus/device won't receive requests until cont_sent_bus/cont_send_device
-	// is called or a request is finished via finished(); 
+	// is called or a request is finished via finished();
 	// to avoid race conditions (reporting a full and a available bus at once)
 	// the SIM should synchronize calls to requeue, resubmit and finished
 	void (*requeue)(scsi_ccb *ccb, bool bus_overflow);
@@ -374,7 +374,7 @@ typedef struct scsi_for_sim_interface {
 	// num_requests: number of requests that were handled by device
 	//               when the request was sent (read: how full was the device
 	//               queue); needed to find out how large the device queue is;
-	//               e.g. if three were already running plus this request makes 
+	//               e.g. if three were already running plus this request makes
 	//               num_requests=4
 	void (*finished)(scsi_ccb *ccb, uint num_requests);
 
@@ -404,7 +404,7 @@ typedef struct scsi_for_sim_interface {
 } scsi_for_sim_interface;
 
 
-#define SCSI_FOR_SIM_MODULE_NAME "bus_managers/scsi/sim/v1"
+#define SCSI_FOR_SIM_MODULE_NAME "bus_managers/scsi/sim/driver_v1"
 
 
 // SIM Node
@@ -416,34 +416,35 @@ typedef struct scsi_for_sim_interface {
 // controller name (required, string)
 #define SCSI_DESCRIPTION_CONTROLLER_NAME "controller_name"
 
-typedef void * scsi_sim_cookie;
+typedef void *scsi_sim_cookie;
 
 // SIM interface
 // SCSI controller drivers must provide this interface
 typedef struct scsi_sim_interface {
 	driver_module_info info;
 
+	void (*set_scsi_bus)(scsi_sim_cookie cookie, scsi_bus bus);
+
 	// execute request
-	void (*scsi_io)( scsi_sim_cookie cookie, scsi_ccb *ccb );
+	void (*scsi_io)(scsi_sim_cookie cookie, scsi_ccb *ccb);
 	// abort request
-	uchar (*abort)( scsi_sim_cookie cookie, scsi_ccb *ccb_to_abort );
+	uchar (*abort)(scsi_sim_cookie cookie, scsi_ccb *ccb_to_abort);
 	// reset device
-	uchar (*reset_device)( scsi_sim_cookie cookie, uchar target_id, uchar target_lun );
+	uchar (*reset_device)(scsi_sim_cookie cookie, uchar target_id, uchar target_lun);
 	// terminate request
-	uchar (*term_io)( scsi_sim_cookie cookie, scsi_ccb *ccb_to_terminate );
+	uchar (*term_io)(scsi_sim_cookie cookie, scsi_ccb *ccb_to_terminate);
 
 	// get information about bus
-	uchar (*path_inquiry)( scsi_sim_cookie cookie, scsi_path_inquiry *inquiry_data );
+	uchar (*path_inquiry)(scsi_sim_cookie cookie, scsi_path_inquiry *inquiry_data);
 	// scan bus
 	// this is called immediately before the SCSI bus manager scans the bus
-	uchar (*scan_bus)( scsi_sim_cookie cookie );
+	uchar (*scan_bus)(scsi_sim_cookie cookie);
 	// reset bus
-	uchar (*reset_bus)( scsi_sim_cookie cookie );
-	
-	// get restrictions of one device 
+	uchar (*reset_bus)(scsi_sim_cookie cookie);
+
+	// get restrictions of one device
 	// (used for non-SCSI transport protocols and bug fixes)
-	void (*get_restrictions)(
-		scsi_sim_cookie 	cookie,
+	void (*get_restrictions)(scsi_sim_cookie 	cookie,
 		uchar				target_id,		// target id
 		bool				*is_atapi, 		// set to true if this is an ATAPI device that
 											// needs some commands emulated

@@ -22,11 +22,17 @@ scsi_for_sim_interface *gSCSI;
 //	#pragma mark - SIM module interface
 
 
+static void
+ahci_set_scsi_bus(scsi_sim_cookie cookie, scsi_bus bus)
+{
+}
+
+
 //! execute request
 static void
 ahci_scsi_io(scsi_sim_cookie cookie, scsi_ccb *request)
 {
-	FLOW("ahci_scsi_io, cookie %p, path_id %u, target_id %u, target_lun %u\n", 
+	FLOW("ahci_scsi_io, cookie %p, path_id %u, target_id %u, target_lun %u\n",
 		cookie, request->path_id, request->target_id, request->target_lun);
 	static_cast<AHCIController *>(cookie)->ExecuteRequest(request);
 }
@@ -96,7 +102,7 @@ ahci_reset_bus(scsi_sim_cookie cookie)
 }
 
 
-/*!	Get restrictions of one device 
+/*!	Get restrictions of one device
 	(used for non-SCSI transport protocols and bug fixes)
 */
 static void
@@ -122,30 +128,26 @@ ahci_ioctl(scsi_sim_cookie cookie, uint8 targetID, uint32 op, void *buffer,
 
 
 static status_t
-ahci_sim_init_bus(device_node_handle node, void *userCookie, void **_cookie)
+ahci_sim_init_bus(device_node *node, void **_cookie)
 {
-	pci_device_info *pciDevice;
-	device_node_handle parent;
-	AHCIController *controller;
-	status_t status;
+	TRACE("ahci_sim_init_bus\n");
 
-	TRACE("ahci_sim_init_bus: userCookie %p\n", userCookie);
+	// get the PCI device from our parent's parent
+	device_node *parent = gDeviceManager->get_parent_node(node);
+	device_node *pciParent = gDeviceManager->get_parent_node(parent);
+	gDeviceManager->put_node(parent);
 
-	TRACE("ahci_sim_init_bus: gPCI %p\n", gPCI);
-
-	// initialize parent (the bus) to get the PCI device
-	parent = gDeviceManager->get_parent(node);
-	status = gDeviceManager->init_driver(parent, &pciDevice, NULL, NULL);
-	gDeviceManager->put_device_node(parent);
-	if (status != B_OK)
-		return status;
+	pci_device *pciDevice;
+	gDeviceManager->get_driver(pciParent, NULL, (void **)&pciDevice);
+	gDeviceManager->put_node(pciParent);
 
 	TRACE("ahci_sim_init_bus: pciDevice %p\n", pciDevice);
 
-	controller =  new(std::nothrow) AHCIController(node, pciDevice);
+	AHCIController *controller =  new(std::nothrow) AHCIController(node,
+		pciDevice);
 	if (!controller)
 		return B_NO_MEMORY;
-	status = controller->Init();
+	status_t status = controller->Init();
 	if (status < B_OK) {
 		delete controller;
 		return status;
@@ -157,27 +159,19 @@ ahci_sim_init_bus(device_node_handle node, void *userCookie, void **_cookie)
 }
 
 
-static status_t
+static void
 ahci_sim_uninit_bus(void *cookie)
 {
 	TRACE("ahci_sim_uninit_bus, cookie %p\n", cookie);
 	AHCIController *controller = static_cast<AHCIController *>(cookie);
 
-	device_node_handle parent = gDeviceManager->get_parent(
-		controller->DeviceNode());
-
 	controller->Uninit();
 	delete controller;
-
-	gDeviceManager->uninit_driver(parent);
-	gDeviceManager->put_device_node(parent);
-
-	return B_OK;
 }
 
 
 static void
-ahci_sim_bus_removed(device_node_handle node, void *cookie)
+ahci_sim_bus_removed(void *cookie)
 {
 	TRACE("ahci_sim_bus_removed, cookie %p\n", cookie);
 }
@@ -204,14 +198,15 @@ scsi_sim_interface gAHCISimInterface = {
 			0,
 			std_ops
 		},
-		NULL,	// supported devices				
+		NULL,	// supported devices
 		NULL,	// register node
 		ahci_sim_init_bus,
 		ahci_sim_uninit_bus,
-		ahci_sim_bus_removed,
-		NULL,	// device cleanup
-		NULL,	// get supported paths
+		NULL,	// register child devices
+		NULL,	// rescan
+		ahci_sim_bus_removed
 	},
+	ahci_set_scsi_bus,
 	ahci_scsi_io,
 	ahci_abort_io,
 	ahci_reset_device,
@@ -222,4 +217,3 @@ scsi_sim_interface gAHCISimInterface = {
 	ahci_get_restrictions,
 	ahci_ioctl
 };
-

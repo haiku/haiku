@@ -1,13 +1,10 @@
 /*
+ * Copyright 2008, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 /*
-	Part of Open SCSI Disk Driver
-
-	Main file.
-
 	You'll find das_... all over the place. This stands for
 	"Direct Access Storage" which is the official SCSI name for
 	normal (floppy/hard/ZIP)-disk drives.
@@ -26,6 +23,23 @@ extern block_device_interface das_interface;
 scsi_periph_interface *scsi_periph;
 device_manager_info *pnp;
 block_io_for_driver_interface *gBlockIO;
+
+
+static void
+das_set_device(das_device_info *info, block_io_device device)
+{
+	scsi_ccb *request;
+
+	info->block_io_device = device;
+
+	// and get (initial) capacity
+	request = info->scsi->alloc_ccb(info->scsi_device);
+	if (request == NULL)
+		return;
+
+	scsi_periph->check_capacity(info->scsi_periph_device, request);
+	info->scsi->free_ccb(request);
+}
 
 
 static status_t
@@ -247,39 +261,43 @@ das_ioctl(das_handle_info *handle, int op, void *buf, size_t len)
 
 
 static float
-das_supports_device(device_node_handle parent, bool *_noConnection)
+das_supports_device(device_node *parent)
 {
-	char *bus;
-	uint8 device_type;
+	const char *bus;
+	uint8 deviceType;
 
 	// make sure parent is really the SCSI bus manager
-	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
-		return B_ERROR;
+	if (pnp->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return -1;
 
-	if (strcmp(bus, "scsi")) {
-		free(bus);
+	if (strcmp(bus, "scsi"))
 		return 0.0;
-	}
 
 	// check whether it's really a Direct Access Device
-	if (pnp->get_attr_uint8(parent, SCSI_DEVICE_TYPE_ITEM, &device_type, true) != B_OK
-		|| device_type != scsi_dev_direct_access) {
-		free(bus);
+	if (pnp->get_attr_uint8(parent, SCSI_DEVICE_TYPE_ITEM, &deviceType, true)
+			!= B_OK || deviceType != scsi_dev_direct_access)
 		return 0.0;
-	}
 
-	free(bus);
 	return 0.6;
 }
 
 
-static void
-das_get_paths(const char ***_bus, const char ***_device)
+static status_t
+das_publish_device(void *_cookie)
 {
-	static const char *kBus[] = { "scsi", NULL };
+	das_device_info *device = (das_device_info *)_cookie;
+	status_t status;
+	char *name;
 
-	*_bus = kBus;
-	*_device = NULL;
+	name = scsi_periph->compose_device_name(device->node, "disk/scsi");
+	if (name == NULL)
+		return B_ERROR;
+
+	status = pnp->publish_device(device->node, name,
+		B_BLOCK_IO_DEVICE_MODULE_NAME);
+
+	free(name);
+	return status;
 }
 
 
@@ -304,7 +322,7 @@ module_dependency module_dependencies[] = {
 	{}
 };
 
-block_device_interface scsi_dsk_module = {
+block_device_interface sSCSIDiskModule = {
 	{
 		{
 			SCSI_DSK_MODULE_NAME,
@@ -315,13 +333,13 @@ block_device_interface scsi_dsk_module = {
 		das_supports_device,
 		das_device_added,
 		das_init_device,
-		(status_t (*) (void *))das_uninit_device,
-		NULL,	// remove device
-		NULL,	// cleanup device
-		das_get_paths,
+		das_uninit_device,
+		das_publish_device,
+		NULL,	// rescan
 	},
 
-	(status_t (*)(block_device_device_cookie, block_device_handle_cookie *))&das_open,
+	(void (*)(block_device_cookie *, block_io_device))		&das_set_device,
+	(status_t (*)(block_device_cookie *, block_device_handle_cookie *))&das_open,
 	(status_t (*)(block_device_handle_cookie))					&das_close,
 	(status_t (*)(block_device_handle_cookie))					&das_free,
 
@@ -333,10 +351,7 @@ block_device_interface scsi_dsk_module = {
 	(status_t (*)(block_device_handle_cookie, int, void *, size_t))&das_ioctl,
 };
 
-#if !_BUILDING_kernel && !BOOT
-_EXPORT
 module_info *modules[] = {
-	(module_info *)&scsi_dsk_module,
+	(module_info *)&sSCSIDiskModule,
 	NULL
 };
-#endif
