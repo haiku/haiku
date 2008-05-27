@@ -110,16 +110,16 @@
 #define B_BENDIAN_TO_HOST_INT32(arg)	FSSH_B_BENDIAN_TO_HOST_INT32(arg)
 #define B_BENDIAN_TO_HOST_INT16(arg)	FSSH_B_BENDIAN_TO_HOST_INT16(arg)
 
-#define swap_data	fssh_swap_data
-#define 			is_type_swapped
+#define swap_data			fssh_swap_data
+#define is_type_swapped		fssh_is_type_swapped
 
 
 // Private implementations
-#define __fssh_swap_double
-#define __fssh_swap_float
-#define __fssh_swap_int64
-#define __fssh_swap_int32
-#define __fssh_swap_int16
+#define __swap_double		__fssh_swap_double
+#define __swap_float		__fssh_swap_float
+#define __swap_int64		__fssh_swap_int64
+#define __swap_int32		__fssh_swap_int32
+#define __swap_int16		__fssh_swap_int16
 
 
 ////////////////////////////////////////////////////////////////////////////////
