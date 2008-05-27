@@ -18,6 +18,9 @@
 #include "stat_priv.h"
 
 
+using namespace FSShell;
+
+
 namespace FSShell {
 
 
@@ -142,7 +145,6 @@ restricted_file_restrict_io(int fd, fssh_off_t& pos, fssh_off_t size)
 }
 
 
-#include <stdio.h>
 void
 restricted_file_restrict_stat(struct fssh_stat* st)
 {
@@ -168,6 +170,9 @@ to_platform_seek_mode(int fsshWhence)
 			return SEEK_SET;
 	}
 }
+
+
+}	// namespace FSShell
 
 
 fssh_off_t
@@ -208,6 +213,3 @@ fssh_lseek(int fd, fssh_off_t offset, int whence)
 
 	return pos;
 }
-
-
-}	// namespace FSShell
