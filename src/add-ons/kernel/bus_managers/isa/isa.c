@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "isa_arch.h"
 
 //#define TRACE_ISA
 #ifdef TRACE_ISA
@@ -38,77 +39,12 @@
 device_manager_info *pnp;
 
 
-static uint8
-isa_read_io_8(int mapped_io_addr)
-{
-	uint8 value = in8(mapped_io_addr);
-
-	TRACE(("isa_read8(%x->%x)\n", mapped_io_addr, value));
-
-	return value;
-}
-
-
-static void
-isa_write_io_8(int mapped_io_addr, uint8 value)
-{
-	TRACE(("isa_write8(%x->%x)\n", value, mapped_io_addr));
-
-	out8(value, mapped_io_addr);
-}
-
-
-static uint16
-isa_read_io_16(int mapped_io_addr)
-{
-	return in16(mapped_io_addr);
-}
-
-
-static void
-isa_write_io_16(int mapped_io_addr, uint16 value)
-{
-	out16(value, mapped_io_addr);
-}
-
-
-static uint32
-isa_read_io_32(int mapped_io_addr)
-{
-	return in32(mapped_io_addr);
-}
-
-
-static void
-isa_write_io_32(int mapped_io_addr, uint32 value)
-{
-	out32(value, mapped_io_addr);
-}
-
-
-static void *
-ram_address(const void *physical_address_in_system_memory)
-{
-	// this is what the BeOS kernel does
-	return (void *)physical_address_in_system_memory;
-}
-
-
 static long
 make_isa_dma_table(const void *buffer, long buffer_size, ulong num_bits,
 	isa_dma_entry *table, long num_entries)
 {
 	// ToDo: implement this?!
 	return ENOSYS;
-}
-
-
-static status_t
-start_isa_dma(long channel, void *buf, long transfer_count,
-	uchar mode, uchar e_mode)
-{
-	// ToDo: implement this?!
-	return B_NOT_ALLOWED;
 }
 
 
@@ -211,6 +147,7 @@ std_ops(int32 op, ...)
 {
 	switch (op) {
 		case B_MODULE_INIT:
+			return arch_isa_init();
 		case B_MODULE_UNINIT:
 			return B_OK;
 
@@ -234,15 +171,15 @@ static isa_module_info isa_module = {
 		},
 		NULL	// rescan
 	},
-	&isa_read_io_8,
-	&isa_write_io_8,
-	&isa_read_io_16,
-	&isa_write_io_16,
-	&isa_read_io_32,
-	&isa_write_io_32,
-	&ram_address,
+	&arch_isa_read_io_8,
+	&arch_isa_write_io_8,
+	&arch_isa_read_io_16,
+	&arch_isa_write_io_16,
+	&arch_isa_read_io_32,
+	&arch_isa_write_io_32,
+	&arch_isa_ram_address,
 	&make_isa_dma_table,
-	&start_isa_dma,
+	&arch_start_isa_dma,
 	&start_scattered_isa_dma,
 	&lock_isa_dma_channel,
 	&unlock_isa_dma_channel
@@ -273,13 +210,13 @@ static isa2_module_info isa2_module = {
 		NULL,	// rescan bus
 	},
 
-	isa_read_io_8, isa_write_io_8,
-	isa_read_io_16, isa_write_io_16,
-	isa_read_io_32, isa_write_io_32,
+	arch_isa_read_io_8, arch_isa_write_io_8,
+	arch_isa_read_io_16, arch_isa_write_io_16,
+	arch_isa_read_io_32, arch_isa_write_io_32,
 
-	ram_address,
+	arch_isa_ram_address,
 
-	start_isa_dma,
+	arch_start_isa_dma,
 };
 #endif
 
