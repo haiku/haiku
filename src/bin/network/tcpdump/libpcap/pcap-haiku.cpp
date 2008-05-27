@@ -4,6 +4,7 @@
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		James Woodcock
  */
 
 
@@ -111,6 +112,12 @@ pcap_inject_haiku(pcap_t *handle, const void *buffer, size_t size)
 static int
 pcap_setfilter_haiku(pcap_t *handle, struct bpf_program *filter)
 {
+	// Make our private copy of the filter
+	if (install_bpf_program(handle, filter) < 0) {
+		// install_bpf_program() filled in errbuf
+		return -1;
+	}
+
 	// we don't support kernel filters at all
 	handle->md.use_bpf = 0;
 	return 0;
