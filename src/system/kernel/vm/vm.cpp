@@ -205,6 +205,7 @@ static mutex sAvailableMemoryLock;
 struct cache_info {
 	vm_cache*	cache;
 	addr_t		page_count;
+	addr_t		committed;
 };
 
 static const int kCacheInfoTableCount = 10240;
@@ -3130,19 +3131,19 @@ cache_type_to_string(int32 type)
 
 #if DEBUG_CACHE_LIST
 
-static addr_t
-count_cache_pages_recursively(vm_cache* cache)
+static void
+update_cache_info_recursively(vm_cache* cache, cache_info& info)
 {
-	addr_t count = cache->page_count;
+	info.page_count += cache->page_count;
+	if (cache->type == CACHE_TYPE_RAM)
+		info.committed += cache->store->committed_size;
 
 	// recurse
 	vm_cache* consumer = NULL;
 	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers,
 			consumer)) != NULL) {
-		count += count_cache_pages_recursively(consumer);
+		update_cache_info_recursively(consumer, info);
 	}
-
-	return count;
 }
 
 
@@ -3151,12 +3152,25 @@ cache_info_compare_page_count(const void* _a, const void* _b)
 {
 	const cache_info* a = (const cache_info*)_a;
 	const cache_info* b = (const cache_info*)_b;
-	return (int)(b->page_count - a->page_count);
+	if (a->page_count == b->page_count)
+		return 0;
+	return a->page_count < b->page_count ? 1 : -1;
+}
+
+
+static int
+cache_info_compare_committed(const void* _a, const void* _b)
+{
+	const cache_info* a = (const cache_info*)_a;
+	const cache_info* b = (const cache_info*)_b;
+	if (a->committed == b->committed)
+		return 0;
+	return a->committed < b->committed ? 1 : -1;
 }
 
 
 static void
-dump_caches_recursively(vm_cache* cache, int level)
+dump_caches_recursively(vm_cache* cache, cache_info& info, int level)
 {
 	for (int i = 0; i < level; i++)
 		kprintf("  ");
@@ -3165,14 +3179,25 @@ dump_caches_recursively(vm_cache* cache, int level)
 		cache_type_to_string(cache->type), cache->virtual_base,
 		cache->virtual_size, cache->page_count);
 
+	if (level == 0)
+		kprintf("/%lu", info.page_count);
+
+	if (cache->type == CACHE_TYPE_RAM) {
+		kprintf(", committed: %lld", cache->store->committed_size);
+
+		if (level == 0)
+			kprintf("/%lu", info.committed);
+	}
+
 	// areas
 	if (cache->areas != NULL) {
 		vm_area* area = cache->areas;
-		kprintf(", areas: %p (%s)", area, area->name);
+		kprintf(", areas: %ld (%s, team: %ld)", area->id, area->name,
+			area->address_space->id);
 
 		while (area->cache_next != NULL) {
 			area = area->cache_next;
-			kprintf(", %p", area);
+			kprintf(", %ld", area->id);
 		}
 	}
 
@@ -3182,7 +3207,7 @@ dump_caches_recursively(vm_cache* cache, int level)
 	vm_cache* consumer = NULL;
 	while ((consumer = (vm_cache *)list_get_next_item(&cache->consumers,
 			consumer)) != NULL) {
-		dump_caches_recursively(consumer, level + 1);
+		dump_caches_recursively(consumer, info, level + 1);
 	}
 }
 
@@ -3190,6 +3215,17 @@ dump_caches_recursively(vm_cache* cache, int level)
 static int
 dump_caches(int argc, char **argv)
 {
+	bool sortByPageCount = true;
+
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "-c") == 0) {
+			sortByPageCount = false;
+		} else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
 	uint32 totalCount = 0;
 	uint32 rootCount = 0;
 
@@ -3199,20 +3235,26 @@ dump_caches(int argc, char **argv)
 		if (cache->source == NULL) {
 			cache_info& info = sCacheInfoTable[rootCount++];
 			info.cache = cache;
-			info.page_count = count_cache_pages_recursively(cache);
+			info.page_count = 0;
+			info.committed = 0;
+			update_cache_info_recursively(cache, info);
 		}
 
 		cache = cache->debug_next;
 	}
 
 	qsort(sCacheInfoTable, rootCount, sizeof(cache_info),
-		&cache_info_compare_page_count);
+		sortByPageCount
+			? &cache_info_compare_page_count : &cache_info_compare_committed);
 
-	kprintf("%lu caches (%lu root caches), sorted by page count per cache "
-		"tree...\n\n", totalCount, rootCount);
+	kprintf("%lu caches (%lu root caches), sorted by %s per cache "
+		"tree...\n\n", totalCount, rootCount,
+		sortByPageCount ? "page count" : "committed size");
 
-	for (uint32 i = 0; i < rootCount; i++)
-		dump_caches_recursively(sCacheInfoTable[i].cache, 0);
+	for (uint32 i = 0; i < rootCount; i++) {
+		cache_info& info = sCacheInfoTable[i];
+		dump_caches_recursively(info.cache, info, 0);
+	}
 
 	return 0;
 }
@@ -3880,7 +3922,12 @@ vm_init(kernel_args *args)
 	add_debugger_command("cache", &dump_cache, "Dump vm_cache");
 	add_debugger_command("cache_tree", &dump_cache_tree, "Dump vm_cache tree");
 #if DEBUG_CACHE_LIST
-	add_debugger_command("caches", &dump_caches, "List vm_cache structures");
+	add_debugger_command_etc("caches", &dump_caches,
+		"List all vm_cache trees",
+		"[ \"-c\" ]\n"
+		"All cache trees are listed sorted in decreasing order by number of\n"
+		"used pages or, if \"-c\" is specified, by size of committed memory.\n",
+		0);
 #endif
 	add_debugger_command("avail", &dump_available_memory, "Dump available memory");
 	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
