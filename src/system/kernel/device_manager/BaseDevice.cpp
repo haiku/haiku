@@ -10,6 +10,7 @@
 BaseDevice::BaseDevice()
 	:
 	fNode(NULL),
+	fInitialized(0),
 	fDeviceModule(NULL),
 	fDeviceData(NULL)
 {

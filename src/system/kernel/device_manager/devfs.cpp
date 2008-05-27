@@ -40,7 +40,7 @@
 #include "legacy_drivers.h"
 
 
-#define TRACE_DEVFS
+//#define TRACE_DEVFS
 #ifdef TRACE_DEVFS
 #	define TRACE(x) dprintf x
 #else
@@ -1140,12 +1140,11 @@ devfs_open(fs_volume* _volume, fs_vnode* _vnode, int openMode,
 	struct devfs_cookie* cookie;
 	status_t status = B_OK;
 
-	TRACE(("devfs_open: vnode %p, openMode 0x%x, fs_cookie %p \n", vnode, openMode, _cookie));
-
 	cookie = (struct devfs_cookie*)malloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
+	TRACE(("devfs_open: vnode %p, openMode 0x%x, cookie %p\n", vnode, openMode, cookie));
 	cookie->device_cookie = NULL;
 
 	if (S_ISCHR(vnode->stream.type)) {
@@ -1484,7 +1483,7 @@ devfs_rewind_dir(fs_volume *_volume, fs_vnode *_vnode, void *_cookie)
 	struct devfs_dir_cookie *cookie = (devfs_dir_cookie *)_cookie;
 	struct devfs *fs = (struct devfs *)_volume->private_volume;
 
-	TRACE(("devfs_rewind_dir: vnode %p, cookie %p\n", _vnode, _cookie));
+	TRACE(("devfs_rewind_dir: vnode %p, cookie %p\n", vnode, cookie));
 
 	if (!S_ISDIR(vnode->stream.type))
 		return B_BAD_VALUE;
@@ -1510,7 +1509,7 @@ devfs_ioctl(fs_volume *_volume, fs_vnode *_vnode, void *_cookie, ulong op,
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 
 	TRACE(("devfs_ioctl: vnode %p, cookie %p, op %ld, buf %p, len %ld\n",
-		_vnode, _cookie, op, buffer, length));
+		vnode, cookie, op, buffer, length));
 
 	// we are actually checking for a *device* here, we don't make the
 	// distinction between char and block devices

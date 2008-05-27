@@ -32,7 +32,7 @@
 #include "io_resources.h"
 
 
-#define TRACE_DEVICE_MANAGER
+//#define TRACE_DEVICE_MANAGER
 #ifdef TRACE_DEVICE_MANAGER
 #	define TRACE(a) dprintf a
 #else
@@ -1000,6 +1000,8 @@ Device::InitCheck() const
 status_t
 Device::InitDevice()
 {
+	RecursiveLocker _(sLock);
+
 	if ((fNode->Flags() & NODE_FLAG_DEVICE_REMOVED) != 0) {
 		// TODO: maybe the device should be unlinked in devfs, too
 		return ENODEV;
@@ -1042,6 +1044,8 @@ Device::InitDevice()
 void
 Device::UninitDevice()
 {
+	RecursiveLocker _(sLock);
+
 	if (fInitialized-- > 1) {
 		fNode->UninitDriver();
 		return;
