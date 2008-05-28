@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers ;
 
 SubInclude HAIKU_TOP src add-ons kernel drivers arch ;
+SubInclude HAIKU_TOP src add-ons kernel drivers bluetooth ;
 SubInclude HAIKU_TOP src add-ons kernel drivers bus ;
 SubInclude HAIKU_TOP src add-ons kernel drivers audio ;
 SubInclude HAIKU_TOP src add-ons kernel drivers common ;

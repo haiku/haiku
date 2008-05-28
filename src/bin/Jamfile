@@ -152,6 +152,16 @@ StdBinCommands
 	usb_dev_info.cpp
 	: be libdevice.so : $(haiku-utils_rsrc) ;
 
+# standard commands that need libbluetooth.so, due the Bluetooth Kit
+StdBinCommands
+	bt_dev_info.cpp
+	: be libbluetooth.so : $(haiku-utils_rsrc) ;
+
+StdBinCommands
+	bt_discovery.cpp
+	: be libbluetooth.so : $(haiku-utils_rsrc) ;
+
+
 # standard commands that need libbe.so, libtracker.so
 StdBinCommands
 	filepanel.cpp
