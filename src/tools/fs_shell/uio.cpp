@@ -8,7 +8,7 @@
 #include "fssh_uio.h"
 
 #if defined(HAIKU_HOST_PLATFORM_FREEBSD)
-#include "fssh_unistd.h"
+#include <unistd.h>
 #endif
 
 #include <new>
@@ -55,7 +55,7 @@ fssh_readv(int fd, const struct fssh_iovec *vector, fssh_size_t count)
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 		return readv(fd, systemVecs, count);
 	#else
-		return readv_pos(fd, lseek(fd, 0, FSSH_SEEK_CUR), systemVecs, count);
+		return readv_pos(fd, lseek(fd, 0, SEEK_CUR), systemVecs, count);
 	#endif
 }
 
@@ -91,7 +91,7 @@ fssh_writev(int fd, const struct fssh_iovec *vector, fssh_size_t count)
 	#if !defined(HAIKU_HOST_PLATFORM_FREEBSD)
 		return writev(fd, systemVecs, count);
 	#else
-		return writev_pos(fd, lseek(fd, 0, FSSH_SEEK_CUR), systemVecs, count);
+		return writev_pos(fd, lseek(fd, 0, SEEK_CUR), systemVecs, count);
 	#endif
 }
 
