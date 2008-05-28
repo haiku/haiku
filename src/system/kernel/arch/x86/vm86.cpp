@@ -18,8 +18,8 @@
 
 //#define TRACE_VM86
 #ifdef TRACE_VM86
-#	define TRACE(x...)    kprintf("[vm86] " x)
-#	define TRACE_NP(x...) kprintf(x)
+#	define TRACE(x...)    dprintf("[vm86] " x)
+#	define TRACE_NP(x...) dprintf(x)
 #else
 #	define TRACE(x...)
 #	define TRACE_NP(x...)
@@ -513,6 +513,9 @@ vm86_fault_callback(addr_t address, addr_t faultAddress, bool isWrite)
 {
 	struct iframe *frame = i386_get_user_iframe();
 
+	TRACE("Unhandled fault at 0x%08x touching 0x%08x while %s\n",
+		faultAddress, address, isWrite?"writing":"reading");
+
 	// we shouldn't have unhandled page faults in vm86 mode
 	x86_vm86_return((struct vm86_iframe *)frame, B_BAD_ADDRESS);
 
@@ -548,6 +551,7 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 		| B_READ_AREA | B_WRITE_AREA);
 	if (state->ram_area < B_OK) {
 		ret = state->ram_area;
+		TRACE("Could not create RAM area\n");
 		goto error;
 	}
 
@@ -557,6 +561,7 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 		&address);
 	if (vectors < B_OK) {
 		ret = vectors;
+		TRACE("Could not copy vectors\n");
 		goto error;
 	}
 	ret = user_memcpy((void *)0, address, 0x502);
@@ -572,6 +577,7 @@ vm86_prepare(struct vm86_state *state, unsigned int ramSize)
 		| B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA, (addr_t)0xa0000);
 	if (state->bios_area < B_OK) {
 		ret = state->bios_area;
+		TRACE("Could not map VGA BIOS.\n");
 		goto error;
 	}
 
