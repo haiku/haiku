@@ -753,23 +753,14 @@ init()
 
 	sRulesHash = hash_init(64, 0, &rules_compare, &rules_hash);
 	if (sRulesHash == NULL) {
-		status = B_NO_MEMORY;
-		goto err1;
+		hash_uninit(sTeamHash);
+		return B_NO_MEMORY;
 	}
 
-	if (recursive_lock_init(&sLock, "rule based prefetcher") < B_OK) {
-		status = sLock.sem;
-		goto err2;
-	}
+	recursive_lock_init(&sLock, "rule based prefetcher");
 
 	load_rules();
 	return B_OK;
-
-err2:
-	hash_uninit(sRulesHash);
-err1:
-	hash_uninit(sTeamHash);
-	return status;
 }
 
 

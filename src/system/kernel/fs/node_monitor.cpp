@@ -239,7 +239,7 @@ NodeMonitorService::~NodeMonitorService()
 status_t
 NodeMonitorService::InitCheck()
 {
-	return fRecursiveLock.sem >= B_OK ? B_OK : fRecursiveLock.sem;
+	return B_OK;
 }
 
 

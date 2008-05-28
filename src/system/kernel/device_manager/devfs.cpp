@@ -873,9 +873,7 @@ devfs_mount(fs_volume *volume, const char *devfs, uint32 flags,
 	fs->id = volume->id;
 	fs->next_vnode_id = 0;
 
-	err = recursive_lock_init(&fs->lock, "devfs lock");
-	if (err < B_OK)
-		goto err1;
+	recursive_lock_init(&fs->lock, "devfs lock");
 
 	fs->vnode_hash = hash_init(DEVFS_HASH_SIZE, offsetof(devfs_vnode, all_next),
 		//(addr_t)&vnode->all_next - (addr_t)vnode,
@@ -912,7 +910,6 @@ err3:
 	hash_uninit(fs->vnode_hash);
 err2:
 	recursive_lock_destroy(&fs->lock);
-err1:
 	free(fs);
 err:
 	return err;

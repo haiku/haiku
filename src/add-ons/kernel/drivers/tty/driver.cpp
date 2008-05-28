@@ -52,9 +52,7 @@ init_driver(void)
 	memset(gDeviceNames, 0, sizeof(gDeviceNames));
 
 	// create the request mutex
-	status_t error = recursive_lock_init(&gTTYRequestLock, "tty requests");
-	if (error != B_OK)
-		return error;
+	recursive_lock_init(&gTTYRequestLock, "tty requests");
 
 	// create the global mutex
 	mutex_init(&gGlobalTTYLock, "tty global");

@@ -118,8 +118,7 @@ allocate_device_interface(net_device *device, net_device_module_info *module)
 	if (interface == NULL)
 		goto error_0;
 
-	if (recursive_lock_init(&interface->rx_lock, "rx lock") < B_OK)
-		goto error_1;
+	recursive_lock_init(&interface->rx_lock, "rx lock");
 
 	char name[128];
 	snprintf(name, sizeof(name), "%s receive queue", device->name);
@@ -154,8 +153,6 @@ error_3:
 
 error_2:
 	recursive_lock_destroy(&interface->rx_lock);
-
-error_1:
 	delete interface;
 
 error_0:

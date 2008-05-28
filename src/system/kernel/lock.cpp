@@ -33,33 +33,38 @@ struct mutex_waiter {
 #define MUTEX_FLAG_RELEASED		0x2
 
 
+#ifdef KDEBUG
+#	define RECURSIVE_LOCK_HOLDER(lock)	((lock)->lock.holder)
+#else
+#	define RECURSIVE_LOCK_HOLDER(lock)	((lock)->holder)
+#endif
+
+
 int32
 recursive_lock_get_recursion(recursive_lock *lock)
 {
-	if (lock->holder == thread_get_current_thread_id())
+	if (RECURSIVE_LOCK_HOLDER(lock) == thread_get_current_thread_id())
 		return lock->recursion;
 
 	return -1;
 }
 
 
-status_t
+void
 recursive_lock_init(recursive_lock *lock, const char *name)
 {
-	if (lock == NULL)
-		return B_BAD_VALUE;
-
-	if (name == NULL)
-		name = "recursive lock";
-
-	lock->holder = -1;
+	mutex_init(&lock->lock, name != NULL ? name : "recursive lock");
+	RECURSIVE_LOCK_HOLDER(lock) = -1;
 	lock->recursion = 0;
-	lock->sem = create_sem(1, name);
+}
 
-	if (lock->sem >= B_OK)
-		return B_OK;
 
-	return lock->sem;
+void
+recursive_lock_init_etc(recursive_lock *lock, const char *name, uint32 flags)
+{
+	mutex_init_etc(&lock->lock, name != NULL ? name : "recursive lock", flags);
+	RECURSIVE_LOCK_HOLDER(lock) = -1;
+	lock->recursion = 0;
 }
 
 
@@ -69,8 +74,7 @@ recursive_lock_destroy(recursive_lock *lock)
 	if (lock == NULL)
 		return;
 
-	delete_sem(lock->sem);
-	lock->sem = -1;
+	mutex_destroy(&lock->lock);
 }
 
 
@@ -80,15 +84,16 @@ recursive_lock_lock(recursive_lock *lock)
 	thread_id thread = thread_get_current_thread_id();
 
 	if (!kernel_startup && !are_interrupts_enabled())
-		panic("recursive_lock_lock: called with interrupts disabled for lock %p, sem %#lx\n", lock, lock->sem);
+		panic("recursive_lock_lock: called with interrupts disabled for lock "
+			"%p (\"%s\")\n", lock, lock->lock.name);
 
-	if (thread != lock->holder) {
-		status_t status = acquire_sem(lock->sem);
-		if (status < B_OK)
-			return status;
-
+	if (thread != RECURSIVE_LOCK_HOLDER(lock)) {
+		mutex_lock(&lock->lock);
+#ifndef KDEBUG
 		lock->holder = thread;
+#endif
 	}
+
 	lock->recursion++;
 	return B_OK;
 }
@@ -97,12 +102,14 @@ recursive_lock_lock(recursive_lock *lock)
 void
 recursive_lock_unlock(recursive_lock *lock)
 {
-	if (thread_get_current_thread_id() != lock->holder)
+	if (thread_get_current_thread_id() != RECURSIVE_LOCK_HOLDER(lock))
 		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
 
 	if (--lock->recursion == 0) {
+#ifndef KDEBUG
 		lock->holder = -1;
-		release_sem_etc(lock->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
+#endif
+		mutex_unlock(&lock->lock);
 	}
 }
 

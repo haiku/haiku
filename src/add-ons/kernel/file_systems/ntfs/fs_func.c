@@ -155,14 +155,13 @@ fs_mount(nspace_id nsid, const char *device, ulong flags, void *parms, size_t le
 	sprintf(lockname, "ntfs_lock %lx", ns->id);
 
 #ifdef __HAIKU__
-	if ((result = recursive_lock_init(&(ns->vlock), lockname)) != 0)
+	recursive_lock_init_etc(&(ns->vlock), lockname, MUTEX_FLAG_CLONE_NAME);
 #else
-	if ((result = new_lock(&(ns->vlock), lockname)) != B_OK)
-#endif
-	{
-			ERRPRINT("fs_mount - error creating lock (%s)\n", strerror(result));
-			goto exit;
+	if ((result = new_lock(&(ns->vlock), lockname)) != B_OK) {
+		ERRPRINT("fs_mount - error creating lock (%s)\n", strerror(result));
+		goto exit;
 	}
+#endif
 
 	handle = load_driver_settings("ntfs");
 	ns->show_sys_files = ! (strcasecmp(get_driver_parameter(handle, "hide_sys_files", "true", "true"), "true") == 0);

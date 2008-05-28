@@ -852,10 +852,7 @@ init()
 		goto err1;
 	}
 
-	if (recursive_lock_init(&sLock, "launch speedup") < B_OK) {
-		status = sLock.sem;
-		goto err2;
-	}
+	recursive_lock_init(&sLock, "launch speedup");
 
 	// register kernel syscalls
 	if (register_generic_syscall(LAUNCH_SPEEDUP_SYSCALLS,
@@ -877,7 +874,6 @@ init()
 
 err3:
 	recursive_lock_destroy(&sLock);
-err2:
 	hash_uninit(sPrefetchHash);
 err1:
 	hash_uninit(sTeamHash);

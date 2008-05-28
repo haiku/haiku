@@ -9,31 +9,9 @@
 #ifndef _KERNEL_LOCK_H
 #define _KERNEL_LOCK_H
 
-
 #include <OS.h>
 #include <debug.h>
 
-typedef struct recursive_lock {
-	sem_id		sem;
-	thread_id	holder;
-	int			recursion;
-} recursive_lock;
-
-typedef struct benaphore {
-	sem_id	sem;
-	int32	count;
-} benaphore;
-
-// Note: this is currently a trivial r/w lock implementation
-//	it will be replaced with something better later - this
-//	or a similar API will be made publically available at this point.
-typedef struct rw_lock {
-	sem_id		sem;
-	int32		count;
-	benaphore	writeLock;
-} rw_lock;
-
-#define RW_MAX_READERS 1000000
 
 struct mutex_waiter;
 
@@ -51,6 +29,31 @@ typedef struct mutex {
 #define MUTEX_FLAG_CLONE_NAME	0x1
 
 
+typedef struct recursive_lock {
+	mutex		lock;
+#ifndef KDEBUG
+	thread_id	holder;
+#endif
+	int			recursion;
+} recursive_lock;
+
+
+typedef struct benaphore {
+	sem_id	sem;
+	int32	count;
+} benaphore;
+
+// Note: this is currently a trivial r/w lock implementation
+//	it will be replaced with something better later - this
+//	or a similar API will be made publically available at this point.
+typedef struct rw_lock {
+	sem_id		sem;
+	int32		count;
+	benaphore	writeLock;
+} rw_lock;
+
+#define RW_MAX_READERS 1000000
+
 #if 0 && KDEBUG // XXX disable this for now, it causes problems when including thread.h here
 #	include <thread.h>
 #define ASSERT_LOCKED_RECURSIVE(r) { ASSERT(thread_get_current_thread_id() == (r)->holder); }
@@ -65,7 +68,10 @@ typedef struct mutex {
 extern "C" {
 #endif
 
-extern status_t	recursive_lock_init(recursive_lock *lock, const char *name);
+extern void	recursive_lock_init(recursive_lock *lock, const char *name);
+	// name is *not* cloned nor freed in recursive_lock_destroy()
+extern void recursive_lock_init_etc(recursive_lock *lock, const char *name,
+	uint32 flags);
 extern void recursive_lock_destroy(recursive_lock *lock);
 extern status_t recursive_lock_lock(recursive_lock *lock);
 extern void recursive_lock_unlock(recursive_lock *lock);

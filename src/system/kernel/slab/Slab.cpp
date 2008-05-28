@@ -172,7 +172,6 @@ static kernel_args *sKernelArgs;
 
 static status_t object_cache_reserve_internal(object_cache *cache,
 	size_t object_count, uint32 flags);
-static status_t object_depot_init_locks(object_depot *depot);
 static depot_magazine *alloc_magazine();
 static void free_magazine(depot_magazine *magazine);
 
@@ -406,20 +405,6 @@ internal_free(void *_buffer)
 
 
 static status_t
-recursive_lock_boot_init(recursive_lock *lock, const char *name, uint32 flags)
-{
-	if (flags & CACHE_DURING_BOOT) {
-		lock->sem = -1;
-		lock->holder = 1;
-		lock->recursion = 0;
-		return B_OK;
-	}
-
-	return recursive_lock_init(lock, name);
-}
-
-
-static status_t
 area_allocate_pages(object_cache *cache, void **pages, uint32 flags)
 {
 	TRACE_CACHE(cache, "allocate pages (%lu, 0x0%lx)", cache->slab_size, flags);
@@ -615,16 +600,6 @@ object_cache_init(object_cache *cache, const char *name, size_t objectSize,
 	sObjectCaches.Add(cache);
 
 	return B_OK;
-}
-
-
-static status_t
-object_cache_init_locks(object_cache *cache)
-{
-	if (cache->flags & CACHE_NO_DEPOT)
-		return B_OK;
-
-	return object_depot_init_locks(&cache->depot);
 }
 
 
@@ -1280,9 +1255,7 @@ object_depot_init(object_depot *depot, uint32 flags,
 	depot->empty = NULL;
 	depot->full_count = depot->empty_count = 0;
 
-	status_t status = recursive_lock_boot_init(&depot->lock, "depot", flags);
-	if (status < B_OK)
-		return status;
+	recursive_lock_init(&depot->lock, "depot");
 
 	depot->stores = (depot_cpu_store *)internal_alloc(sizeof(depot_cpu_store)
 		* smp_get_num_cpus(), flags);
@@ -1292,28 +1265,11 @@ object_depot_init(object_depot *depot, uint32 flags,
 	}
 
 	for (int i = 0; i < smp_get_num_cpus(); i++) {
-		recursive_lock_boot_init(&depot->stores[i].lock, "cpu store", flags);
+		recursive_lock_init(&depot->stores[i].lock, "cpu store");
 		depot->stores[i].loaded = depot->stores[i].previous = NULL;
 	}
 
 	depot->return_object = return_object;
-
-	return B_OK;
-}
-
-
-status_t
-object_depot_init_locks(object_depot *depot)
-{
-	status_t status = recursive_lock_init(&depot->lock, "depot");
-	if (status < B_OK)
-		return status;
-
-	for (int i = 0; i < smp_get_num_cpus(); i++) {
-		status = recursive_lock_init(&depot->stores[i].lock, "cpu store");
-		if (status < B_OK)
-			return status;
-	}
 
 	return B_OK;
 }
@@ -1504,8 +1460,6 @@ slab_init_post_sem()
 
 	while (it.HasNext()) {
 		object_cache *cache = it.Next();
-		if (object_cache_init_locks(cache) < B_OK)
-			panic("slab_init: failed to create sems");
 		if (cache->allocate_pages == early_allocate_pages)
 			object_cache_commit_pre_pages(cache);
 	}

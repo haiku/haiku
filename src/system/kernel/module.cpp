@@ -1094,8 +1094,7 @@ module_init(kernel_args *args)
 {
 	struct preloaded_image *image;
 
-	if (recursive_lock_init(&sModulesLock, "modules rlock") < B_OK)
-		return B_ERROR;
+	recursive_lock_init(&sModulesLock, "modules rlock");
 
 	sModulesHash = hash_init(MODULE_HASH_SIZE, 0, module_compare, module_hash);
 	if (sModulesHash == NULL)

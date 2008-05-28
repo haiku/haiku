@@ -2626,7 +2626,7 @@ _dump_mount(struct fs_mount *mount)
 	kprintf(" root_vnode:    %p\n", mount->root_vnode);
 	kprintf(" covers_vnode:  %p\n", mount->covers_vnode);
 	kprintf(" partition:     %p\n", mount->partition);
-	kprintf(" lock:          %ld\n", mount->rlock.sem);
+	kprintf(" lock:          %p\n", &mount->rlock);
 	kprintf(" flags:        %s%s\n", mount->unmounting ? " unmounting" : "",
 		mount->owns_file_device ? " owns_file_device" : "");
 
@@ -4416,9 +4416,7 @@ vfs_init(kernel_args *args)
 
 	mutex_init(&sFileSystemsMutex, "vfs_lock");
 
-	if (recursive_lock_init(&sMountOpLock, "vfs_mount_op_lock") < 0)
-		panic("vfs_init: error allocating mount op lock\n");
-
+	recursive_lock_init(&sMountOpLock, "vfs_mount_op_lock");
 	mutex_init(&sMountMutex, "vfs_mount_lock");
 	mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock");
 	mutex_init(&sVnodeMutex, "vfs_vnode_lock");
@@ -6388,9 +6386,7 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 		goto err3;
 	}
 
-	status = recursive_lock_init(&mount->rlock, "mount rlock");
-	if (status < B_OK)
-		goto err4;
+	recursive_lock_init(&mount->rlock, "mount rlock");
 
 	// initialize structure
 	mount->id = sNextMountID++;
@@ -6511,7 +6507,6 @@ err5:
 	mutex_unlock(&sMountMutex);
 
 	recursive_lock_destroy(&mount->rlock);
-err4:
 	put_file_system(mount->fs);
 	free(mount->device_name);
 err3:

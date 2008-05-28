@@ -22,8 +22,7 @@ mtx_init(struct mtx *m, const char *name, const char *type, int opts)
 	if (opts == MTX_DEF) {
 		mutex_init_etc(&m->u.mutex, name, MUTEX_FLAG_CLONE_NAME);
 	} else if (opts == MTX_RECURSE) {
-		if (recursive_lock_init(&m->u.recursive, name) < B_OK)
-			panic("Hell just froze as someone was trying to init a recursive mutex.");
+		recursive_lock_init_etc(&m->u.recursive, name, MUTEX_FLAG_CLONE_NAME);
 	} else
 		panic("Uh-oh, someone is pressing the wrong buttons");
 

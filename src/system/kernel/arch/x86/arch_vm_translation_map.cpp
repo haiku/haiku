@@ -774,15 +774,7 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 	map->ops = &tmap_ops;
 	map->map_count = 0;
 
-	if (!kernel) {
-		// During the boot process, there are no semaphores available at this
-		// point, so we only try to create the translation map lock if we're
-		// initialize a user translation map.
-		// vm_translation_map_init_kernel_map_post_sem() is used to complete
-		// the kernel translation map.
-		if (recursive_lock_init(&map->lock, "translation map") < B_OK)
-			return map->lock.sem;
-	}
+	recursive_lock_init(&map->lock, "translation map");
 
 	map->arch_data = (vm_translation_map_arch_info *)malloc(sizeof(vm_translation_map_arch_info));
 	if (map == NULL) {
@@ -839,9 +831,6 @@ arch_vm_translation_map_init_map(vm_translation_map *map, bool kernel)
 status_t
 arch_vm_translation_map_init_kernel_map_post_sem(vm_translation_map *map)
 {
-	if (recursive_lock_init(&map->lock, "translation map") < B_OK)
-		return map->lock.sem;
-
 	return B_OK;
 }
 

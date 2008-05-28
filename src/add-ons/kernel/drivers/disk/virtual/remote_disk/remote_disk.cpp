@@ -49,7 +49,8 @@ struct RemoteDiskDevice : recursive_lock {
 
 	status_t Init()
 	{
-		return recursive_lock_init(this, "remote disk device");
+		recursive_lock_init(this, "remote disk device");
+		return B_OK;
 	}
 
 	void Uninit()

@@ -747,10 +747,7 @@ dosfs_mount(fs_volume *_vol, const char *device, uint32 flags,
 			goto error;
 		}
 		sprintf(name, "fat lock %lx", vol->id);
-		if ((result = recursive_lock_init(&(vol->vlock), name)) != 0) {
-			dprintf("error creating lock (%s)\n", strerror(result));
-			goto error;
-		}
+		recursive_lock_init_etc(&(vol->vlock), name, MUTEX_FLAG_CLONE_NAME);
 
 #if DEBUG
 		if (atomic_add(&instances, 1) == 0) {
