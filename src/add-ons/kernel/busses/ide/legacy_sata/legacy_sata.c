@@ -61,25 +61,23 @@ static ide_adapter_interface*		ide_adapter;
 static device_manager_info*		dm;
 
 static float
-controller_supports(device_node_handle parent, bool *_noConnection)
+controller_supports(device_node *parent)
 {
 	uint16 vendor_id;
 	uint16 device_id;
 	status_t res;
-	char *bus;
-	
+	const char *bus = NULL;
+
 	// get the bus (should be PCI)
-	if (dm->get_attr_string(parent, B_DRIVER_BUS, &bus, false) != B_OK)
+	if (dm->get_attr_string(parent, B_DEVICE_BUS, &bus, false) != B_OK)
 		return B_ERROR;
 	if (strcmp(bus, "pci") != 0) {
-		free(bus);
 		return B_ERROR;
 	}
-	free(bus);
-	
+
 	// get vendor and device ID
-	if ((res=dm->get_attr_uint16(parent, PCI_DEVICE_VENDOR_ID_ITEM, &vendor_id, false)) != B_OK
-		|| (res=dm->get_attr_uint16(parent, PCI_DEVICE_DEVICE_ID_ITEM, &device_id, false)) != B_OK) {
+	if ((res=dm->get_attr_uint16(parent, B_DEVICE_VENDOR_ID, &vendor_id, false)) != B_OK
+		|| (res=dm->get_attr_uint16(parent, B_DEVICE_ID, &device_id, false)) != B_OK) {
 		return res;
 	}
 
@@ -124,27 +122,26 @@ controller_supports(device_node_handle parent, bool *_noConnection)
 
 
 static status_t
-controller_probe(device_node_handle parent)
+controller_probe(device_node *parent)
 {
-	device_node_handle controller_node;
-	device_node_handle channels[4];
+	device_node *controller_node;
+	device_node *channels[4];
 	uint16 command_block_base[4];
 	uint16 control_block_base[4];
 	pci_device_module_info *pci;
 	uint8 num_channels = 2;
 	uint32 bus_master_base;
-	pci_device device;
+	pci_device *device = NULL;
 	uint16 device_id;
 	uint16 vendor_id;
 	uint8 int_num;
 	status_t res;
 	uint8 index;
-	
+
 	TRACE("controller_probe\n");
 
-	if ((res=dm->init_driver(parent, NULL, (driver_module_info **)&pci, (void **)&device)) != B_OK)
-		return res;
-		
+	dm->get_driver(parent, (driver_module_info **)&pci, (void **)&device);
+
 	device_id = pci->read_pci_config(device, PCI_device_id, 2);
 	vendor_id = pci->read_pci_config(device, PCI_vendor_id, 2);
 	int_num = pci->read_pci_config(device, PCI_interrupt_line, 1);
@@ -195,7 +192,7 @@ controller_probe(device_node_handle parent)
 		control_block_base[index] &= PCI_address_io_mask;
 	}
 
-	res = ide_adapter->detect_controller(pci, device, parent, bus_master_base, 
+	res = ide_adapter->detect_controller(pci, device, parent, bus_master_base,
 		CONTROLLER_MODULE_NAME, "" /* XXX: unused: controller_driver_type*/, CONTROLLER_NAME, true,
 		true, 1, 0xffff, 0x10000, &controller_node);
 	// don't register if controller is already registered!
@@ -218,78 +215,61 @@ controller_probe(device_node_handle parent)
 	}
 
 
-	dm->uninit_driver(parent);
-
 	TRACE("controller_probe success\n");
 	return B_OK;
 
 err:
-	dm->uninit_driver(parent);	
 	TRACE("controller_probe failed (%s)\n", strerror(res));
 	return res;
 }
 
 
 
-static status_t 
-controller_init(device_node_handle node, void *user_cookie, void **controller_cookie)
+static status_t
+controller_init(device_node *node, void **controller_cookie)
 {
 	return ide_adapter->init_controller(
-		node,user_cookie,
-		(ide_adapter_controller_info**)controller_cookie,
+		node, (ide_adapter_controller_info**)controller_cookie,
 		sizeof(ide_adapter_controller_info));
 }
 
 
-static status_t
+static void
 controller_uninit(void *controller_cookie)
 {
-	return ide_adapter->uninit_controller(controller_cookie);
+	ide_adapter->uninit_controller(controller_cookie);
 }
 
 static void
-controller_removed(device_node_handle node, void *controller_cookie)
+controller_removed(void *controller_cookie)
 {
 	ide_adapter->controller_removed(
-		node, 
 		(ide_adapter_controller_info*)controller_cookie);
 }
 
 
-static void
-controller_get_paths(const char ***_bus, const char ***_device)
-{
-	static const char *kBus[] = { "pci", NULL };
-	static const char *kDevice[] = { "drivers/dev/disk/sata", NULL };
-
-	*_bus = kBus;
-	*_device = kDevice;
-}
-
-
 static status_t
-channel_init(device_node_handle node, void *user_cookie, void **channel_cookie)
+channel_init(device_node *node, void **channel_cookie)
 {
 	return ide_adapter->init_channel(
 		node,
-		user_cookie,
 		(ide_adapter_channel_info**)channel_cookie,
-		sizeof(ide_adapter_channel_info), 
+		sizeof(ide_adapter_channel_info),
 		ide_adapter->inthand);
 }
 
 
-static status_t
+static void
 channel_uninit(void *channel_cookie)
 {
-	return ide_adapter->uninit_channel(channel_cookie);
+	ide_adapter->uninit_channel(channel_cookie);
 }
 
 
 static void
-channel_removed(device_node_handle node, void *channel_cookie)
+channel_removed(void *channel_cookie)
 {
-	ide_adapter->channel_removed(node,channel_cookie);
+	ide_adapter->channel_removed(channel_cookie);
 }
 
 
@@ -314,7 +294,7 @@ altstatus_read(void *channel_cookie)
 }
 
 
-static status_t 
+static status_t
 device_control_write(void *channel_cookie, uint8 val)
 {
 	return ide_adapter->write_device_control(channel_cookie,val);
@@ -356,21 +336,6 @@ dma_finish(void *channel_cookie)
 }
 
 
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-			return B_OK;
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
 module_dependency module_dependencies[] = {
 	{ IDE_FOR_CONTROLLER_MODULE_NAME,	(module_info **)&ide },
 	{ B_DEVICE_MANAGER_MODULE_NAME,		(module_info **)&dm },
@@ -383,16 +348,14 @@ static ide_controller_interface channel_interface = {
 		{
 			CHANNEL_MODULE_NAME,
 			0,
-			std_ops
+			NULL
 		},
-		
+
 		.supports_device	= NULL,
 		.register_device	= NULL,
 		.init_driver		= channel_init,
 		.uninit_driver		= channel_uninit,
 		.device_removed		= channel_removed,
-		.device_cleanup		= NULL,
-		.get_supported_paths	= NULL,
 	},
 
 	.write_command_block_regs	= task_file_write,
@@ -411,16 +374,14 @@ static driver_module_info controller_interface = {
 	{
 		CONTROLLER_MODULE_NAME,
 		0,
-		std_ops
+		NULL
 	},
 
-	.supports_device	= controller_supports,
-	.register_device	= controller_probe,
 	.init_driver		= controller_init,
 	.uninit_driver		= controller_uninit,
+	.supports_device	= controller_supports,
+	.register_device	= controller_probe,
 	.device_removed		= controller_removed,
-	.device_cleanup		= NULL,
-	.get_supported_paths	= controller_get_paths,
 };
 
 module_info *modules[] = {
