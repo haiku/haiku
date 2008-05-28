@@ -5,7 +5,7 @@ UsePrivateKernelHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
-KernelStaticLibrary libppc :
+KernelMergeObject kernel_arch_ppc.o :
 	arch_atomic.c
 	arch_cpu.cpp
 	arch_cpu_asm.S

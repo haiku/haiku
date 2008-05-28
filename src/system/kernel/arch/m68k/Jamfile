@@ -23,7 +23,7 @@ KernelMergeObject arch_m68k_060.o :
 	: $(TARGET_KERNEL_PIC_CCFLAGS) -Wno-unused -m68060
 ;
 
-KernelStaticLibrary libm68k :
+KernelMergeObject kernel_arch_m68k.o :
 	arch_atomic.c
 	arch_cpu.cpp
 	arch_cpu_asm.S

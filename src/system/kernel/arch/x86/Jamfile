@@ -9,7 +9,7 @@ UsePrivateKernelHeaders ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
 
-KernelStaticLibrary libx86 :
+KernelMergeObject kernel_arch_x86.o :
 	arch_commpage.cpp
 	arch_cpu.c
 	arch_debug.cpp

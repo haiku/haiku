@@ -76,7 +76,7 @@ KernelLd kernel_$(TARGET_ARCH) :
 	kernel_util.o
 	kernel_vm.o
 
-	lib$(TARGET_ARCH).a
+	kernel_arch_$(TARGET_ARCH).o
 	kernel_platform_$(TARGET_BOOT_PLATFORM).o
 
 	linkhack.so
@@ -109,7 +109,7 @@ KernelLd kernel.so :
 	kernel_util.o
 	kernel_vm.o
 
-	lib$(TARGET_ARCH).a
+	kernel_arch_$(TARGET_ARCH).o
 	kernel_platform_$(TARGET_BOOT_PLATFORM).o
 
 	linkhack.so
