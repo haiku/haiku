@@ -149,6 +149,17 @@ device_ioctl(void *cookie, uint32 msg, void *buffer, size_t bufferLength)
 
 			return B_OK;
 
+		case VESA_SET_DISPLAY_MODE:
+		{
+			unsigned int mode;
+
+			if (bufferLength != sizeof(mode)
+				|| user_memcpy(&mode, buffer, sizeof(mode)) < B_OK)
+				return B_BAD_ADDRESS;
+
+			return vesa_set_display_mode(*info, mode);
+		}
+
 		case VGA_SET_INDEXED_COLORS:
 		{
 			vga_set_indexed_colors_args args;

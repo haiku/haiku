@@ -6,7 +6,7 @@
 #define _VM86_H
 
 #include <OS.h>
-#include <arch_cpu.h>
+#include <arch/x86/arch_cpu.h>
 
 #ifdef __cplusplus
 extern "C" {

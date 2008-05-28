@@ -410,6 +410,7 @@ frame_buffer_console_init(kernel_args *args)
 		args->frame_buffer.height, args->frame_buffer.depth,
 		args->frame_buffer.bytes_per_row);
 
+	sBootInfo.area = sConsole.area;
 	sBootInfo.frame_buffer = (addr_t)frameBuffer;
 	sBootInfo.width = args->frame_buffer.width;
 	sBootInfo.height = args->frame_buffer.height;

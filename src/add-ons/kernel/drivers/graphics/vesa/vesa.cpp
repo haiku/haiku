@@ -5,65 +5,18 @@
 
 
 #include "vesa_private.h"
+#include "vesa.h"
 
 #include <string.h>
 
 #include <boot_item.h>
 #include <frame_buffer_console.h>
 #include <util/kernel_cpp.h>
+#include <arch/x86/vm86.h>
 
 #include "driver.h"
 #include "utility.h"
 #include "vesa_info.h"
-
-
-class PhysicalMemoryMapper {
-	public:
-		PhysicalMemoryMapper();
-		~PhysicalMemoryMapper();
-
-		area_id Map(const char *name, void *physicalAddress, size_t numBytes,
-			uint32 spec, uint32 protection, void **virtualAddress);
-		status_t InitCheck() { return fArea < B_OK ? (status_t)fArea : B_OK; }
-		void Keep();
-
-	private:
-		area_id	fArea;
-};
-
-
-PhysicalMemoryMapper::PhysicalMemoryMapper()
-	:
-	fArea(-1)
-{
-}
-
-
-PhysicalMemoryMapper::~PhysicalMemoryMapper()
-{
-	if (fArea >= B_OK)
-		delete_area(fArea);
-}
-
-
-area_id 
-PhysicalMemoryMapper::Map(const char *name, void *physicalAddress,
-	size_t numBytes, uint32 spec, uint32 protection, void **virtualAddress)
-{
-	fArea = map_physical_memory(name, physicalAddress, numBytes, spec,
-		protection, virtualAddress);
-	return fArea;
-}
-
-
-void 
-PhysicalMemoryMapper::Keep()
-{
-	fArea = -1;
-}
-
-
-//	#pragma mark -
 
 
 static uint32
@@ -89,6 +42,57 @@ get_color_space_for_depth(uint32 depth)
 }
 
 
+static status_t
+vbe_get_mode_info(struct vm86_state *vmState, uint16 mode,
+	struct vbe_mode_info *modeInfo)
+{
+	struct vbe_mode_info *vbeModeInfo = (struct vbe_mode_info *)0x1000;
+
+	memset(vbeModeInfo, 0, sizeof(vbe_mode_info));
+	vmState->regs.eax = 0x4f01;
+	vmState->regs.ecx = mode;
+	vmState->regs.es  = 0x1000 >> 4;
+	vmState->regs.edi = 0x0000;
+
+	status_t status = vm86_do_int(vmState, 0x10);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vbe_get_mode_info(%u): vm86 failed\n", mode);
+		return status;
+	}
+
+	if ((vmState->regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_get_mode_info(): BIOS returned 0x%04lx\n",
+			vmState->regs.eax & 0xffff);
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	memcpy(modeInfo, vbeModeInfo, sizeof(struct vbe_mode_info));
+	return B_OK;
+}
+
+
+static status_t
+vbe_set_mode(struct vm86_state *vmState, uint16 mode)
+{
+	vmState->regs.eax = 0x4f02;
+	vmState->regs.ebx = (mode & SET_MODE_MASK) | SET_MODE_LINEAR_BUFFER;
+
+	status_t status = vm86_do_int(vmState, 0x10);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME ": vbe_set_mode(%u): vm86 failed\n", mode);
+		return status;
+	}
+
+	if ((vmState->regs.eax & 0xffff) != 0x4f) {
+		dprintf(DEVICE_NAME ": vbe_set_mode(): BIOS returned 0x%04lx\n",
+			vmState->regs.eax & 0xffff);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 
 
@@ -103,6 +107,7 @@ vesa_init(vesa_info &info)
 	size_t modesSize = 0;
 	vesa_mode *modes = (vesa_mode *)get_boot_item(VESA_MODES_BOOT_INFO,
 		&modesSize);
+	info.modes = modes;
 
 	size_t sharedSize = (sizeof(vesa_shared_info) + 7) & ~7;
 
@@ -115,7 +120,7 @@ vesa_init(vesa_info &info)
 
 	vesa_shared_info &sharedInfo = *info.shared_info;
 
-	memset(/*(void *)*/&sharedInfo, 0, sizeof(vesa_shared_info));
+	memset(&sharedInfo, 0, sizeof(vesa_shared_info));
 
 	if (modes != NULL) {
 		sharedInfo.vesa_mode_offset = sharedSize;
@@ -150,5 +155,75 @@ vesa_uninit(vesa_info &info)
 
 	delete_area(info.shared_info->frame_buffer_area);
 	delete_area(info.shared_area);
+}
+
+
+status_t
+vesa_set_display_mode(vesa_info &info, unsigned int mode)
+{
+	if (mode >= info.shared_info->vesa_mode_count)
+		return B_ENTRY_NOT_FOUND;
+
+	// Prepare vm86 mode environment
+	struct vm86_state vmState;
+	status_t status = vm86_prepare(&vmState, 0x2000);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME": vesa_set_display_mode(): vm86_prepare failed\n");
+		return status;
+	}
+
+	area_id newFBArea;
+	frame_buffer_boot_info *bufferInfo;
+	struct vbe_mode_info modeInfo;
+
+	// Get mode information
+	status = vbe_get_mode_info(&vmState, info.modes[mode].mode, &modeInfo);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME": vesa_set_display_mode(): cannot get mode info\n");
+		goto error;
+	}
+
+	// Set mode
+	status = vbe_set_mode(&vmState, info.modes[mode].mode);
+	if (status != B_OK) {
+		dprintf(DEVICE_NAME": vesa_set_display_mode(): cannot set mode\n");
+		goto error;
+	}
+
+	// Map new frame buffer
+	void *frameBuffer;
+	newFBArea = map_physical_memory("vesa_fb",
+		(void *)modeInfo.physical_base,
+		modeInfo.bytes_per_row * modeInfo.height, B_ANY_KERNEL_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, &frameBuffer);
+	if (newFBArea < B_OK) {
+		status = (status_t)newFBArea;
+		goto error;
+	}
+	delete_area(info.shared_info->frame_buffer_area);
+
+	// Update shared frame buffer information
+	info.shared_info->frame_buffer_area = newFBArea;
+	info.shared_info->frame_buffer = (uint8 *)frameBuffer;
+	info.shared_info->physical_frame_buffer = (uint8 *)modeInfo.physical_base;
+	info.shared_info->bytes_per_row = modeInfo.bytes_per_row;
+	info.shared_info->current_mode.virtual_width = modeInfo.width;
+	info.shared_info->current_mode.virtual_height = modeInfo.height;
+	info.shared_info->current_mode.space = get_color_space_for_depth(
+		modeInfo.bits_per_pixel);
+
+	// Update boot item as it's used in vesa_init()
+	bufferInfo
+		= (frame_buffer_boot_info *)get_boot_item(FRAME_BUFFER_BOOT_INFO, NULL);
+	bufferInfo->area = newFBArea;
+	bufferInfo->frame_buffer = (addr_t)frameBuffer;
+	bufferInfo->width = modeInfo.width;
+	bufferInfo->height = modeInfo.height;
+	bufferInfo->depth = modeInfo.bits_per_pixel;
+	bufferInfo->bytes_per_row = modeInfo.bytes_per_row;
+
+error:
+	vm86_cleanup(&vmState);
+	return status;
 }
 

@@ -137,7 +137,17 @@ vesa_set_display_mode(display_mode *_mode)
 	if (vesa_propose_display_mode(&mode, &mode, &mode) != B_OK)
 		return B_BAD_VALUE;
 
-	// ToDo: unless we have a VBE3 device, we can't change the display mode
+	vesa_mode *modes = gInfo->vesa_modes;
+	for (unsigned int i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
+		// search mode in VESA mode list
+		// TODO: list is ordered, we could use binary search
+		if (modes[i].width == mode.virtual_width
+			&& modes[i].height == mode.virtual_height
+			&& get_color_space_for_depth(modes[i].bits_per_pixel)
+				== mode.space)
+			return ioctl(gInfo->device, VESA_SET_DISPLAY_MODE, &i, sizeof(i));
+	}
+
 	return B_UNSUPPORTED;
 }
 

@@ -14,6 +14,7 @@
 #define VESA_MODES_BOOT_INFO "vesa_modes/v1"
 
 struct vesa_mode {
+	uint16			mode;
 	uint16			width;
 	uint16			height;
 	uint8			bits_per_pixel;
@@ -26,7 +27,6 @@ struct vesa_shared_info {
 	display_mode	current_mode;
 	uint32			bytes_per_row;
 
-	area_id			registers_area;		// area of memory mapped registers
 	area_id			frame_buffer_area;	// area of frame buffer
 	uint8			*frame_buffer;
 		// pointer to frame buffer (visible by all apps!)
@@ -42,6 +42,7 @@ struct vesa_shared_info {
 enum {
 	VESA_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
 	VESA_GET_DEVICE_NAME,
+	VESA_SET_DISPLAY_MODE,
 
 	VGA_SET_INDEXED_COLORS,
 	VGA_PLANAR_BLIT,

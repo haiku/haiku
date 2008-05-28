@@ -16,6 +16,7 @@
 
 
 struct vesa_get_supported_modes;
+struct vesa_mode;
 
 struct vesa_info {
 	uint32			cookie_magic;
@@ -24,9 +25,11 @@ struct vesa_info {
 	pci_info		*pci;
 	struct vesa_shared_info *shared_info;
 	area_id			shared_area;
+	vesa_mode		*modes;
 };
 
 extern status_t vesa_init(vesa_info &info);
 extern void vesa_uninit(vesa_info &info);
+extern status_t vesa_set_display_mode(vesa_info &info, unsigned int mode);
 
 #endif	/* VESA_PRIVATE_H */

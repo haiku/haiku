@@ -1007,6 +1007,7 @@ platform_init_video(void)
 		uint32 i = 0;
 		while ((mode = (video_mode *)list_get_next_item(&sModeList, mode))
 				!= NULL) {
+			modes[i].mode = mode->mode;
 			modes[i].width = mode->width;
 			modes[i].height = mode->height;
 			modes[i].bits_per_pixel = mode->bits_per_pixel;
