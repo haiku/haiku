@@ -79,10 +79,6 @@ int	login_tty(int _fd);
 int	logout(const char *_line);
 void	logwtmp(const char *_line, const char *_name, const char *_host);
 void	trimdomain(char *_fullhost, int _hostsize);
-int	openpty(int *_amaster, int *_aslave, char *_name,
-		     struct termios *_termp, struct winsize *_winp);
-int	forkpty(int *_amaster, char *_name,
-		     struct termios *_termp, struct winsize *_winp);
 int	humanize_number(char *_buf, size_t _len, int64_t _number,
 	    const char *_suffix, int _scale, int _flags);
 const char *uu_lockerr(int _uu_lockresult);
