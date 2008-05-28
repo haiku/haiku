@@ -73,7 +73,7 @@ BALMLayout::SolveLayout()
 		result = Solve();
 		if (fPerformancePath != NULL) {
 			char buffer [100];
-			file->Write(buffer, sprintf(buffer, "%d\t%fms\t#vars=%d\t#constraints=%d\n", 
+			file->Write(buffer, sprintf(buffer, "%d\t%fms\t#vars=%ld\t#constraints=%ld\n", 
 					result, SolvingTime(), Variables()->CountItems(), 
 					Constraints()->CountItems()));
 		}

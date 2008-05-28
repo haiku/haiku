@@ -755,7 +755,7 @@ Area::Init(BALMLayout* ls, XTab* left, YTab* top, XTab* right, YTab* bottom,
 	fPrefContentSize = kUndefinedSize;
 	fShrinkRigidity = BSize(2, 2);
 	fExpandRigidity = BSize(1, 1);
-	fContentAspectRatio = NULL;
+	fContentAspectRatio = 0;
 	fContentAspectRatioC = NULL;
 			
 	fAutoPrefContentSize = false;
