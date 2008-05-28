@@ -14,6 +14,7 @@ MergeObject posix_signal.o :
 	sighold.cpp
 	sigignore.cpp
 	signal.c
+	sigpause.cpp
 	sigpending.c
 	sigprocmask.c
 	sigrelse.cpp
