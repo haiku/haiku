@@ -14,7 +14,7 @@
 
 #define DRIVER_PRETTY_NAME	"Legacy SATA"
 #define CONTROLLER_NAME		DRIVER_PRETTY_NAME
-#define CONTROLLER_MODULE_NAME	"busses/ide/legacy_sata/device_v1"
+#define CONTROLLER_MODULE_NAME	"busses/ide/legacy_sata/driver_v1"
 #define CHANNEL_MODULE_NAME	"busses/ide/legacy_sata/channel/v1"
 
 #define TRACE(a...)		dprintf(DRIVER_PRETTY_NAME ": " a)
@@ -343,7 +343,7 @@ module_dependency module_dependencies[] = {
 	{}
 };
 
-static ide_controller_interface channel_interface = {
+static ide_controller_interface sChannelInterface = {
 	{
 		{
 			CHANNEL_MODULE_NAME,
@@ -370,22 +370,22 @@ static ide_controller_interface channel_interface = {
 };
 
 
-static driver_module_info controller_interface = {
+static driver_module_info sControllerInterface = {
 	{
 		CONTROLLER_MODULE_NAME,
 		0,
 		NULL
 	},
 
-	.init_driver		= controller_init,
-	.uninit_driver		= controller_uninit,
-	.supports_device	= controller_supports,
-	.register_device	= controller_probe,
-	.device_removed		= controller_removed,
+	.init_driver		= &controller_init,
+	.uninit_driver		= &controller_uninit,
+	.supports_device	= &controller_supports,
+	.register_device	= &controller_probe,
+	.device_removed		= &controller_removed,
 };
 
 module_info *modules[] = {
-	(module_info *)&controller_interface,
-	(module_info *)&channel_interface,
+	(module_info *)&sControllerInterface,
+	(module_info *)&sChannelInterface,
 	NULL
 };
