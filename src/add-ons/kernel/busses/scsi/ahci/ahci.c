@@ -112,6 +112,10 @@ const device_info kSupportedDevices[] = {
 };
 
 
+device_manager_info *gDeviceManager;
+scsi_for_sim_interface *gSCSI;
+
+
 status_t
 get_device_info(uint16 vendorID, uint16 deviceID, const char **name,
 	uint32 *flags)

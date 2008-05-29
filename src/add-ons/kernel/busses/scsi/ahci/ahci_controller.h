@@ -12,17 +12,20 @@
 
 class AHCIController {
 public:
-							AHCIController(device_node *node, pci_device *pciDevice);
+							AHCIController(device_node *node,
+								pci_device_module_info *pciModule,
+								pci_device *pciDevice);
 							~AHCIController();
 
-			status_t	Init();
-			void		Uninit();
+			status_t		Init();
+			void			Uninit();
 
-			void		ExecuteRequest(scsi_ccb *request);
-			uchar		AbortRequest(scsi_ccb *request);
-			uchar		TerminateRequest(scsi_ccb *request);
-			uchar		ResetDevice(uchar targetID, uchar targetLUN);
-			void		GetRestrictions(uchar targetID, bool *isATAPI, bool *noAutoSense, uint32 *maxBlocks);
+			void			ExecuteRequest(scsi_ccb *request);
+			uchar			AbortRequest(scsi_ccb *request);
+			uchar			TerminateRequest(scsi_ccb *request);
+			uchar			ResetDevice(uchar targetID, uchar targetLUN);
+			void			GetRestrictions(uchar targetID, bool *isATAPI,
+								bool *noAutoSense, uint32 *maxBlocks);
 
 			device_node *	DeviceNode() { return fNode; }
 
@@ -37,6 +40,7 @@ private:
 
 private:
 	device_node *			fNode;
+	pci_device_module_info *fPCI;
 	pci_device *			fPCIDevice;
 	uint16					fPCIVendorID;
 	uint16					fPCIDeviceID;

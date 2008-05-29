@@ -15,18 +15,21 @@
 #define FLOW(a...)	dprintf("ahci: " a)
 
 
-AHCIController::AHCIController(device_node *node, pci_device *device)
-	: fNode(node)
-	, fPCIDevice(device)
-	, fPCIVendorID(0xffff)
-	, fPCIDeviceID(0xffff)
-	, fFlags(0)
-	, fCommandSlotCount(0)
-	, fPortCountMax(0)
-	, fPortCountAvail(0)
-	, fPortImplementedMask(0)
-	, fIRQ(0)
- 	, fInstanceCheck(-1)
+AHCIController::AHCIController(device_node *node,
+		pci_device_module_info *pciModule, pci_device *device)
+	:
+	fNode(node),
+	fPCI(pciModule),
+	fPCIDevice(device),
+	fPCIVendorID(0xffff),
+	fPCIDeviceID(0xffff),
+	fFlags(0),
+	fCommandSlotCount(0),
+	fPortCountMax(0),
+	fPortCountAvail(0),
+	fPortImplementedMask(0),
+	fIRQ(0),
+	fInstanceCheck(-1)
 {
 	memset(fPort, 0, sizeof(fPort));
 
@@ -48,7 +51,7 @@ status_t
 AHCIController::Init()
 {
 	pci_info pciInfo;
-	gPCI->get_pci_info(fPCIDevice, &pciInfo);
+	fPCI->get_pci_info(fPCIDevice, &pciInfo);
 
 	fPCIVendorID = pciInfo.vendor_id;
 	fPCIDeviceID = pciInfo.device_id;
@@ -70,30 +73,30 @@ AHCIController::Init()
 	get_device_info(fPCIVendorID, fPCIDeviceID, NULL, &fFlags);
 
 	uchar capabilityOffset;
-	status_t res = gPCI->find_pci_capability(fPCIDevice, PCI_cap_id_sata, &capabilityOffset);
+	status_t res = fPCI->find_pci_capability(fPCIDevice, PCI_cap_id_sata, &capabilityOffset);
 	if (res == B_OK) {
 		uint32 satacr0;
 		uint32 satacr1;
 		TRACE("PCI SATA capability found at offset 0x%x\n", capabilityOffset);
-		satacr0 = gPCI->read_pci_config(fPCIDevice, capabilityOffset, 4);
-		satacr1 = gPCI->read_pci_config(fPCIDevice, capabilityOffset + 4, 4);
+		satacr0 = fPCI->read_pci_config(fPCIDevice, capabilityOffset, 4);
+		satacr1 = fPCI->read_pci_config(fPCIDevice, capabilityOffset + 4, 4);
 		TRACE("satacr0 = 0x%08lx, satacr1 = 0x%08lx\n", satacr0, satacr1);
 	}
 
-	uint16 pcicmd = gPCI->read_pci_config(fPCIDevice, PCI_command, 2);
+	uint16 pcicmd = fPCI->read_pci_config(fPCIDevice, PCI_command, 2);
 	TRACE("pcicmd old 0x%04x\n", pcicmd);
 	pcicmd &= ~(PCI_command_io | PCI_command_int_disable);
 	pcicmd |= PCI_command_master | PCI_command_memory;
 	TRACE("pcicmd new 0x%04x\n", pcicmd);
-	gPCI->write_pci_config(fPCIDevice, PCI_command, 2, pcicmd);
+	fPCI->write_pci_config(fPCIDevice, PCI_command, 2, pcicmd);
 
 	if (fPCIVendorID == PCI_VENDOR_JMICRON) {
-		uint32 ctrl = gPCI->read_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4);
+		uint32 ctrl = fPCI->read_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4);
 		TRACE("Jmicron controller control 1 old 0x%08lx\n", ctrl);
 		ctrl &= ~((1 << 9) | (1 << 12) | (1 << 14));	// disable SFF 8038i emulation
 		ctrl |= (1 << 8) | (1 << 13) | (1 << 15);		// enable AHCI controller
 		TRACE("Jmicron controller control 1 new 0x%08lx\n", ctrl);
-		gPCI->write_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4, ctrl);
+		fPCI->write_pci_config(fPCIDevice, PCI_JMICRON_CONTROLLER_CONTROL_1, 4, ctrl);
 	}
 
 	fIRQ = pciInfo.u.h0.interrupt_line;
@@ -258,9 +261,9 @@ AHCIController::ResetController()
 		int portCount = 1 + ((fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
 		if (portCount > 8)
 			panic("Intel AHCI: too many SATA ports! Please report at http://dev.haiku-os.org");
-		uint16 pcs = gPCI->read_pci_config(fPCIDevice, 0x92, 2);
+		uint16 pcs = fPCI->read_pci_config(fPCIDevice, 0x92, 2);
 		pcs |= (0xff >> (8 - portCount));
-		gPCI->write_pci_config(fPCIDevice, 0x92, 2, pcs);
+		fPCI->write_pci_config(fPCIDevice, 0x92, 2, pcs);
 	}
 	return B_OK;
 }

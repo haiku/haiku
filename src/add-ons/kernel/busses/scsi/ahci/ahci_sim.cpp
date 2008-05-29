@@ -14,11 +14,6 @@
 #define FLOW(a...)
 
 
-pci_device_module_info *gPCI;
-device_manager_info *gDeviceManager;
-scsi_for_sim_interface *gSCSI;
-
-
 //	#pragma mark - SIM module interface
 
 
@@ -137,13 +132,15 @@ ahci_sim_init_bus(device_node *node, void **_cookie)
 	device_node *pciParent = gDeviceManager->get_parent_node(parent);
 	gDeviceManager->put_node(parent);
 
+	pci_device_module_info *pci;
 	pci_device *pciDevice;
-	gDeviceManager->get_driver(pciParent, NULL, (void **)&pciDevice);
+	gDeviceManager->get_driver(pciParent, (driver_module_info **)&pci,
+		(void **)&pciDevice);
 	gDeviceManager->put_node(pciParent);
 
 	TRACE("ahci_sim_init_bus: pciDevice %p\n", pciDevice);
 
-	AHCIController *controller =  new(std::nothrow) AHCIController(node,
+	AHCIController *controller =  new(std::nothrow) AHCIController(node, pci,
 		pciDevice);
 	if (!controller)
 		return B_NO_MEMORY;
