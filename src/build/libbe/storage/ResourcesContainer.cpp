@@ -8,16 +8,16 @@
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
-
 /*!
 	\file ResourcesContainer.cpp
 	ResourcesContainer implementation.
 */
 
 
+#include "ResourcesContainer.h"
+
 #include <stdio.h>
 
-#include "ResourcesContainer.h"
 #include "ResourceItem.h"
 
 
@@ -151,9 +151,9 @@ ResourcesContainer::IndexOf(type_code type, const char *name) const
 		ResourceItem *item = ResourceAt(i);
 		const char *itemName = item->Name();
 		if (item->Type() == type
-			&& (((name == NULL && itemName == NULL)
-				|| (name != NULL && itemName != NULL))
-					&& !strcmp(name, itemName))) {
+			&& ((name == NULL && itemName == NULL)
+				|| (name != NULL && itemName != NULL
+					&& !strcmp(name, itemName)))) {
 			index = i;
 		}
 	}
@@ -216,5 +216,5 @@ ResourcesContainer::IsModified() const
 }
 
 
-};	// namespace Storage
-};	// namespace BPrivate
+}	// namespace Storage
+}	// namespace BPrivate

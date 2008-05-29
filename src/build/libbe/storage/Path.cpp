@@ -9,16 +9,16 @@
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 
-
 /*!
 	\file Path.cpp
 	BPath implementation.
 */
 
 
+#include <Path.h>
+
 #include <new>
 
-#include <Path.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <StorageDefs.h>
@@ -29,10 +29,6 @@
 #include "storage_support.h"
 
 using namespace std;
-
-#ifdef USE_OPENBEOS_NAMESPACE
-using namespace OpenBeOS;
-#endif
 
 
 //! Creates an uninitialized BPath object. 
@@ -424,8 +420,8 @@ BPath::operator==(const BPath &item) const
 bool
 BPath::operator==(const char *path) const
 {
-	return ((InitCheck() != B_OK && (path == NULL))
-			|| ((fName && path) && strcmp(fName, path)) == 0);
+	return (InitCheck() != B_OK && path == NULL)
+		|| (fName != NULL && path != NULL && !strcmp(fName, path));
 }
 
 
