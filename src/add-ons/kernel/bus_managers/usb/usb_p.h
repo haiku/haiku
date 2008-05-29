@@ -334,6 +334,7 @@ static	void							SendRequestCallback(void *cookie,
 											void *callbackCookie);
 
 private:
+		mutex							fSendRequestLock;
 		sem_id							fNotifySem;
 		status_t						fTransferStatus;
 		size_t							fActualLength;

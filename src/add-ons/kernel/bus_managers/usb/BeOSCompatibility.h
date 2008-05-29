@@ -55,7 +55,7 @@ mutex_init(mutex *ben, const char *name)
 inline status_t
 mutex_init_etc(mutex *ben, const char *name, int32 flags)
 {
-	mutex_init(ben, name);
+	return mutex_init(ben, name);
 }
 
 

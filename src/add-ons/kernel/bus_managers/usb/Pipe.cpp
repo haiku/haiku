@@ -293,6 +293,7 @@ ControlPipe::ControlPipe(Object *parent)
 	:	Pipe(parent),
 		fNotifySem(-1)
 {
+	mutex_init(&fSendRequestLock, "control pipe send request");
 }
 
 
@@ -300,6 +301,7 @@ ControlPipe::~ControlPipe()
 {
 	if (fNotifySem >= 0)
 		delete_sem(fNotifySem);
+	mutex_destroy(&fSendRequestLock);
 }
 
 
@@ -308,16 +310,24 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	uint16 index, uint16 length, void *data, size_t dataLength,
 	size_t *actualLength)
 {
+	status_t result = mutex_lock(&fSendRequestLock);
+	if (result != B_OK)
+		return result;
+
 	if (fNotifySem < 0) {
 		fNotifySem = create_sem(0, "usb send request notify");
-		if (fNotifySem < 0)
+		if (fNotifySem < 0) {
+			mutex_unlock(&fSendRequestLock);
 			return B_NO_MORE_SEMS;
+		}
 	}
 
-	status_t result = QueueRequest(requestType, request, value, index, length,
-		data, dataLength, SendRequestCallback, this);
-	if (result < B_OK)
+	result = QueueRequest(requestType, request, value, index, length, data,
+		dataLength, SendRequestCallback, this);
+	if (result < B_OK) {
+		mutex_unlock(&fSendRequestLock);
 		return result;
+	}
 
 	// The sem will be released unconditionally in the callback after the
 	// result data was filled in. Use a 1 second timeout for control transfers.
@@ -334,12 +344,14 @@ ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 		if (actualLength)
 			*actualLength = 0;
 
+		mutex_unlock(&fSendRequestLock);
 		return B_TIMED_OUT;
 	}
 
 	if (actualLength)
 		*actualLength = fActualLength;
 
+	mutex_unlock(&fSendRequestLock);
 	return fTransferStatus;
 }
 
