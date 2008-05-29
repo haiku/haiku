@@ -175,14 +175,4 @@ struct device_module_info {
 	status_t (*deselect)(void *cookie, uint8 event, selectsync *sync);
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-extern struct device_manager_info *gDeviceManager;
-
-#ifdef __cplusplus
-}
-#endif
-
 #endif	/* _DEVICE_MANAGER_H */
