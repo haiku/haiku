@@ -1,40 +1,47 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
+/*
+ * Copyright 2002-2008, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder, tyler@dauwalder.net
+ *		Erik Jakowatz
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ */
+
+
 /*!
 	\file ResourcesContainer.cpp
 	ResourcesContainer implementation.
 */
 
+
 #include <stdio.h>
 
 #include "ResourcesContainer.h"
-
 #include "ResourceItem.h"
+
 
 namespace BPrivate {
 namespace Storage {
 
-// constructor
+
 ResourcesContainer::ResourcesContainer()
-				  : fResources(),
-					fIsModified(false)
+	:
+	fResources(),
+	fIsModified(false)
 {
 }
 
-// destructor
+
 ResourcesContainer::~ResourcesContainer()
 {
 	MakeEmpty();
 }
 
-// AddResource
-//
-// Returns false, if item is NULL or memory is insufficient, true otherwise.
+
+//! Returns false, if item is NULL or memory is insufficient, true otherwise.
 bool
-ResourcesContainer::AddResource(ResourceItem *item, int32 index,
-								bool replace)
+ResourcesContainer::AddResource(ResourceItem *item, int32 index, bool replace)
 {
 	bool result = false;
 	if (item) {
@@ -50,7 +57,7 @@ ResourcesContainer::AddResource(ResourceItem *item, int32 index,
 	return result;
 }
 
-// RemoveResource
+
 ResourceItem*
 ResourcesContainer::RemoveResource(int32 index)
 {
@@ -60,14 +67,14 @@ ResourcesContainer::RemoveResource(int32 index)
 	return item;
 }
 
-// RemoveResource
+
 bool
 ResourcesContainer::RemoveResource(ResourceItem *item)
 {
 	return RemoveResource(IndexOf(item));
 }
 
-// MakeEmpty
+
 void
 ResourcesContainer::MakeEmpty()
 {
@@ -77,7 +84,7 @@ ResourcesContainer::MakeEmpty()
 	SetModified(false);
 }
 
-// AssimilateResources
+
 void
 ResourcesContainer::AssimilateResources(ResourcesContainer &container)
 {
@@ -98,14 +105,14 @@ ResourcesContainer::AssimilateResources(ResourcesContainer &container)
 	SetModified(true);
 }
 
-// IndexOf
+
 int32
 ResourcesContainer::IndexOf(ResourceItem *item) const
 {
 	return fResources.IndexOf(item);
 }
 
-// IndexOf
+
 int32
 ResourcesContainer::IndexOf(const void *data) const
 {
@@ -120,7 +127,7 @@ ResourcesContainer::IndexOf(const void *data) const
 	return index;
 }
 
-// IndexOf
+
 int32
 ResourcesContainer::IndexOf(type_code type, int32 id) const
 {
@@ -134,7 +141,7 @@ ResourcesContainer::IndexOf(type_code type, int32 id) const
 	return index;
 }
 
-// IndexOf
+
 int32
 ResourcesContainer::IndexOf(type_code type, const char *name) const
 {
@@ -143,16 +150,17 @@ ResourcesContainer::IndexOf(type_code type, const char *name) const
 	for (int32 i = 0; index == -1 && i < count; i++) {
 		ResourceItem *item = ResourceAt(i);
 		const char *itemName = item->Name();
-		if (item->Type() == type && (name == NULL && itemName == NULL
-									 || name != NULL && itemName != NULL
-										&& !strcmp(name, itemName))) {
+		if (item->Type() == type
+			&& (((name == NULL && itemName == NULL)
+				|| (name != NULL && itemName != NULL))
+					&& !strcmp(name, itemName))) {
 			index = i;
 		}
 	}
 	return index;
 }
 
-// IndexOfType
+
 int32
 ResourcesContainer::IndexOfType(type_code type, int32 typeIndex) const
 {
@@ -169,21 +177,21 @@ ResourcesContainer::IndexOfType(type_code type, int32 typeIndex) const
 	return index;
 }
 
-// ResourceAt
+
 ResourceItem*
 ResourcesContainer::ResourceAt(int32 index) const
 {
 	return (ResourceItem*)fResources.ItemAt(index);
 }
 
-// CountResources
+
 int32
 ResourcesContainer::CountResources() const
 {
 	return fResources.CountItems();
 }
 
-// SetModified
+
 void
 ResourcesContainer::SetModified(bool modified)
 {
@@ -196,7 +204,7 @@ ResourcesContainer::SetModified(bool modified)
 	}
 }
 
-// IsModified
+
 bool
 ResourcesContainer::IsModified() const
 {
@@ -210,7 +218,3 @@ ResourcesContainer::IsModified() const
 
 };	// namespace Storage
 };	// namespace BPrivate
-
-
-
-
