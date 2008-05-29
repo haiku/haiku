@@ -162,3 +162,4 @@ typedef struct scsi_periph_interface {
 #define SCSI_PERIPH_MODULE_NAME "generic/scsi_periph/v1"
 
 #endif	/* _SCSI_PERIPH_H */
+
