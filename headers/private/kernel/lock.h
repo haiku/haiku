@@ -62,6 +62,18 @@ typedef struct rw_lock {
 #endif
 
 
+// static initializers
+#ifdef KDEBUG
+#	define MUTEX_INITIALIZER(name)			{ name, NULL, -1, 0 }
+#	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), 0 }
+#else
+#	define MUTEX_INITIALIZER(name)			{ name, NULL, 0, 0 }
+#	define RECURSIVE_LOCK_INITIALIZER(name)	{ MUTEX_INITIALIZER(name), -1, 0 }
+#endif
+
+#define RW_LOCK_INITIALIZER(name)			{ name, NULL, -1, 0, 0, 0 }
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
