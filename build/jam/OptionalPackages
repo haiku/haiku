@@ -2,7 +2,18 @@
 # It is directly included from HaikuImage -- all variables defined there can
 # be used
 
+# Detect a hybrid GCC2/GCC4 image and disable the checks for unavailable GCC4
+# packages. (It does not matter if a package was built with either compiler,
+# the system should have the respective other system libs.)
+local isHybridBuild = 0 ;
+if $(HAIKU_ADD_ALTERNATIVE_GCC_LIBS) && $(HAIKU_ALTERNATIVE_GCC_OUTPUT_DIR) {
+	isHybridBuild = 1 ;
+}
+
 # Available Optional Packages:
+#	APR
+#	APR-util
+#	Beam
 #	Bluetooth
 #	Development
 #	Firefox
@@ -22,9 +33,12 @@ OptionalPackageDependencies Development : Perl ;
 OptionalPackageDependencies OpenSSH : OpenSSL ;
 
 
+
 # APR
 if [ IsOptionalHaikuImagePackageAdded APR ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package APR available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package APR available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -38,7 +52,9 @@ if [ IsOptionalHaikuImagePackageAdded APR ] {
 
 # APR-util
 if [ IsOptionalHaikuImagePackageAdded APR-util ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package APR-util available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package APR-util available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -46,6 +62,38 @@ if [ IsOptionalHaikuImagePackageAdded APR-util ] {
 			: $(baseURL)/apr-util-0.9.15-gcc2-2008-05-15.zip
 			:
 		;
+	}
+}
+
+
+# Beam
+if [ IsOptionalHaikuImagePackageAdded Beam ] {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Beam available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+		Echo "No optional package Beam available for gcc4" ;
+	} else {
+		InstallOptionalHaikuImagePackage Beam
+#			: http://dl.hirschkaefer.de/beam/beam-1-1-2-bone-with-libs.zip
+			: http://dl.hirschkaefer.de/beam/beam-1-1-2-r5-with-libs.zip
+			: apps
+		;
+		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/beam-1-1-bone-with-libs/Beam ;
+	}
+}
+
+
+# Bluetooth stack
+if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
+	local BEOS_ADD_ONS_DRIVERS_BLUETOOTH = h2generic ;
+	AddDriversToHaikuImage bluetooth : $(BEOS_ADD_ONS_DRIVERS_BLUETOOTH) ;
+	AddFilesToHaikuImage beos system servers : bluetooth_server ;
+	AddFilesToHaikuImage beos system lib : libbluetooth.so ;
+	AddFilesToHaikuImage beos bin : bt_dev_info bt_discovery ;
+	
+	if [ IsOptionalHaikuImagePackageAdded Development ] {
+		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
 	}
 }
 
@@ -104,7 +152,9 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 		# gcc 2.95.3
 
 		AddHeaderDirectoryToHaikuImage cpp ;
+	}
 
+	if $(HAIKU_GCC_VERSION[1]) = 2 || $(isHybridBuild) = 1 {
 		# gcc and binutils
 		local baseURL = http://haiku-files.org/files/optional-packages ;
 		InstallOptionalHaikuImagePackage gcc-2.95.3-haiku-080323
@@ -149,22 +199,26 @@ if [ IsOptionalHaikuImagePackageAdded Development ]
 
 # Firefox web browser
 if [ IsOptionalHaikuImagePackageAdded Firefox ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Firefox available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Firefox available for gcc4" ;
 	} else {
-		InstallOptionalHaikuImagePackage Firefox
-			: http://www.sheltonfamily.org/firefoxbuilds/firefox-2.0.0.12.en-US.beosR5-i586.zip
-			: apps
-		;
-		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/firefox/firefox ;
+ 		InstallOptionalHaikuImagePackage Firefox
+			: http://www.yellowbites.com/downloads/Firefox-2.0.0.12.zip
+ 			: apps
+ 		;
+ 		AddSymlinkToHaikuImage home config be Applications
+			: /boot/apps/Firefox/Firefox ;
 	}
 }
 
 
 # Links web browser
 if [ IsOptionalHaikuImagePackageAdded Links ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Links available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Links available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage Links
@@ -179,7 +233,9 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 
 # OpenSound drivers
 if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package OpenSound available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package OpenSound available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage OpenSound
@@ -193,7 +249,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 
 # OpenSSH
 if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package OpenSSH available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package OpenSSH available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -210,7 +268,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSH ] {
 
 # OpenSSL
 if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package OpenSSL available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package OpenSSL available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -224,7 +284,9 @@ if [ IsOptionalHaikuImagePackageAdded OpenSSL ] {
 
 # Pe text editor
 if [ IsOptionalHaikuImagePackageAdded Pe ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Pe available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Pe available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage pe-2.4.1-x86
@@ -244,7 +306,9 @@ if [ IsOptionalHaikuImagePackageAdded Pe ] {
 
 # Perl
 if [ IsOptionalHaikuImagePackageAdded Perl ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Perl available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package Perl available for gcc4" ;
 	} else {
 		local baseURL = http://haiku-files.org/files/optional-packages ;
@@ -258,7 +322,9 @@ if [ IsOptionalHaikuImagePackageAdded Perl ] {
 
 # Vision
 if [ IsOptionalHaikuImagePackageAdded Vision ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package Vision available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 {
 		InstallOptionalHaikuImagePackage Vision
 			: http://vision.sf.net/Vision-0.9.7-H-30032008-gcc4.zip
 			: apps
@@ -277,7 +343,9 @@ if [ IsOptionalHaikuImagePackageAdded Vision ] {
 
 # VLC media player
 if [ IsOptionalHaikuImagePackageAdded VLC ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package VLC available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package VLC available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage VLC
@@ -292,7 +360,9 @@ if [ IsOptionalHaikuImagePackageAdded VLC ] {
 
 # WonderBrush
 if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
-	if $(HAIKU_GCC_VERSION[1]) >= 4 {
+	if $(TARGET_ARCH) != x86 {
+		Echo "No optional package WonderBrush available for $(TARGET_ARCH)" ;
+	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
 		Echo "No optional package WonderBrush available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage WonderBrush
@@ -304,16 +374,4 @@ if [ IsOptionalHaikuImagePackageAdded WonderBrush ] {
 	}
 }
 
-# Bluetooth stack
-if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
-	local BEOS_ADD_ONS_DRIVERS_BLUETOOTH = h2generic ;
-	AddDriversToHaikuImage bluetooth : $(BEOS_ADD_ONS_DRIVERS_BLUETOOTH) ;
-	AddFilesToHaikuImage beos system servers : bluetooth_server ;
-	AddFilesToHaikuImage beos system lib : libbluetooth.so ;
-	AddFilesToHaikuImage beos bin : bt_dev_info bt_discovery ;
-	
-	if [ IsOptionalHaikuImagePackageAdded Development ] {
-		AddSymlinkToHaikuImage develop lib x86 : /system/lib/libbluetooth.so ;
-	}
-}
 
