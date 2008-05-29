@@ -94,7 +94,7 @@ typedef struct scsi_bus_info {
 	sem_id start_service;		// released whenever service thread has work to do
 	bool shutting_down;			// set to true to tell service thread to shut down
 
-	benaphore mutex;			// used to synchronize changes in queueing and blocking
+	struct mutex mutex;			// used to synchronize changes in queueing and blocking
 
 	sem_id scan_lun_lock;		// allocated whenever a lun is scanned
 
@@ -174,7 +174,7 @@ typedef struct scsi_device_info {
 	scsi_res_inquiry inquiry_data;
 	device_node *node;	// device node
 
-	benaphore dma_buffer_lock;	// lock between DMA buffer user and clean-up daemon
+	struct mutex dma_buffer_lock;	// lock between DMA buffer user and clean-up daemon
 	sem_id dma_buffer_owner;	// to be acquired before using DMA buffer
 	dma_buffer dma_buffer;		// DMA buffer
 

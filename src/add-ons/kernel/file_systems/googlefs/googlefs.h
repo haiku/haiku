@@ -8,11 +8,11 @@
 #include <kernel/lock.h>
 #include <fs_info.h>
 #include <NodeMonitor.h>
-#define lock benaphore
-#define new_lock benaphore_init
-#define free_lock benaphore_destroy
-#define LOCK benaphore_lock
-#define UNLOCK benaphore_unlock
+#define lock mutex
+#define new_lock mutex_init
+#define free_lock mutex_destroy
+#define LOCK mutex_lock
+#define UNLOCK mutex_unlock
 typedef dev_t nspace_id;
 
 #else

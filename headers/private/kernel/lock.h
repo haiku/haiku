@@ -38,12 +38,6 @@ typedef struct recursive_lock {
 } recursive_lock;
 
 
-typedef struct benaphore {
-	sem_id	sem;
-	int32	count;
-} benaphore;
-
-
 struct rw_lock_waiter;
 
 typedef struct rw_lock {
@@ -80,37 +74,6 @@ extern void recursive_lock_destroy(recursive_lock *lock);
 extern status_t recursive_lock_lock(recursive_lock *lock);
 extern void recursive_lock_unlock(recursive_lock *lock);
 extern int32 recursive_lock_get_recursion(recursive_lock *lock);
-
-extern status_t benaphore_init(benaphore *ben, const char *name);
-extern void benaphore_destroy(benaphore *ben);
-
-
-static inline status_t
-benaphore_lock(benaphore *ben)
-{
-#ifdef KDEBUG
-	return acquire_sem(ben->sem);
-#else
-	if (atomic_add(&ben->count, -1) <= 0)
-		return acquire_sem(ben->sem);
-
-	return B_OK;
-#endif
-}
-
-
-static inline status_t
-benaphore_unlock(benaphore *ben)
-{
-#ifdef KDEBUG
-	return release_sem(ben->sem);
-#else
-	if (atomic_add(&ben->count, 1) < 0)
-		return release_sem(ben->sem);
-
-	return B_OK;
-#endif
-}
 
 extern void rw_lock_init(rw_lock* lock, const char* name);
 	// name is *not* cloned nor freed in rw_lock_destroy()

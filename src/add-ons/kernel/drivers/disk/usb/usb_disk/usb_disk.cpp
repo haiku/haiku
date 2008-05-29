@@ -36,7 +36,7 @@ static usb_module_info *gUSBModule = NULL;
 static disk_device *gDeviceList = NULL;
 static uint32 gDeviceCount = 0;
 static uint32 gLunCount = 0;
-static benaphore gDeviceListLock;
+static mutex gDeviceListLock;
 static char **gDeviceNames = NULL;
 
 
@@ -76,8 +76,8 @@ status_t	usb_disk_synchronize(device_lun *lun, bool force);
 void
 usb_disk_free_device_and_luns(disk_device *device)
 {
-	benaphore_lock(&device->lock);
-	benaphore_destroy(&device->lock);
+	mutex_lock(&device->lock);
+	mutex_destroy(&device->lock);
 	delete_sem(device->notify);
 	for (uint8 i = 0; i < device->lun_count; i++)
 		free(device->luns[i]);
@@ -540,15 +540,11 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		return B_ERROR;
 	}
 
-	status_t result = benaphore_init(&device->lock, "usb_disk device lock");
-	if (result < B_OK) {
-		free(device);
-		return result;
-	}
+	mutex_init(&device->lock, "usb_disk device lock");
 
 	device->notify = create_sem(0, "usb_disk callback notify");
 	if (device->notify < B_OK) {
-		benaphore_destroy(&device->lock);
+		mutex_destroy(&device->lock);
 		free(device);
 		return device->notify;
 	}
@@ -558,6 +554,8 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		* sizeof(device_lun *));
 	for (uint8 i = 0; i < device->lun_count; i++)
 		device->luns[i] = NULL;
+
+	status_t result = B_OK;
 
 	TRACE_ALWAYS("device reports a lun count of %d\n", device->lun_count);
 	for (uint8 i = 0; i < device->lun_count; i++) {
@@ -595,14 +593,14 @@ usb_disk_device_added(usb_device newDevice, void **cookie)
 		return result;
 	}
 
-	benaphore_lock(&gDeviceListLock);
+	mutex_lock(&gDeviceListLock);
 	device->link = (void *)gDeviceList;
 	gDeviceList = device;
 	uint32 deviceNumber = gDeviceCount++;
 	gLunCount += device->lun_count;
 	for (uint8 i = 0; i < device->lun_count; i++)
 		sprintf(device->luns[i]->name, DEVICE_NAME, deviceNumber, i);
-	benaphore_unlock(&gDeviceListLock);
+	mutex_unlock(&gDeviceListLock);
 
 	TRACE("new device: 0x%08lx\n", (uint32)device);
 	*cookie = (void *)device;
@@ -616,7 +614,7 @@ usb_disk_device_removed(void *cookie)
 	TRACE("device_removed(0x%08lx)\n", (uint32)cookie);
 	disk_device *device = (disk_device *)cookie;
 
-	benaphore_lock(&gDeviceListLock);
+	mutex_lock(&gDeviceListLock);
 	if (gDeviceList == device) {
 		gDeviceList = (disk_device *)device->link;
 	} else {
@@ -633,13 +631,13 @@ usb_disk_device_removed(void *cookie)
 	gLunCount -= device->lun_count;
 	gDeviceCount--;
 
-	benaphore_lock(&device->lock);
+	mutex_lock(&device->lock);
 	device->removed = true;
-	benaphore_unlock(&device->lock);
+	mutex_unlock(&device->lock);
 	if (device->open_count == 0)
 		usb_disk_free_device_and_luns(device);
 
-	benaphore_unlock(&gDeviceListLock);
+	mutex_unlock(&gDeviceListLock);
 	return B_OK;
 }
 
@@ -741,7 +739,7 @@ usb_disk_open(const char *name, uint32 flags, void **cookie)
 	strcat(rawName, "raw");
 	TRACE("opening raw device %s for %s\n", rawName, name);
 
-	benaphore_lock(&gDeviceListLock);
+	mutex_lock(&gDeviceListLock);
 	disk_device *device = gDeviceList;
 	while (device) {
 		for (uint8 i = 0; i < device->lun_count; i++) {
@@ -753,7 +751,7 @@ usb_disk_open(const char *name, uint32 flags, void **cookie)
 
 				device->open_count++;
 				*cookie = lun;
-				benaphore_unlock(&gDeviceListLock);
+				mutex_unlock(&gDeviceListLock);
 				return B_OK;
 			}
 		}
@@ -761,7 +759,7 @@ usb_disk_open(const char *name, uint32 flags, void **cookie)
 		device = (disk_device *)device->link;
 	}
 
-	benaphore_unlock(&gDeviceListLock);
+	mutex_unlock(&gDeviceListLock);
 	return B_NAME_NOT_FOUND;
 }
 
@@ -780,7 +778,7 @@ static status_t
 usb_disk_free(void *cookie)
 {
 	TRACE("free()\n");
-	benaphore_lock(&gDeviceListLock);
+	mutex_lock(&gDeviceListLock);
 
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
@@ -791,7 +789,7 @@ usb_disk_free(void *cookie)
 		usb_disk_free_device_and_luns(device);
 	}
 
-	benaphore_unlock(&gDeviceListLock);
+	mutex_unlock(&gDeviceListLock);
 	return B_OK;
 }
 
@@ -801,9 +799,9 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
-	benaphore_lock(&device->lock);
+	mutex_lock(&device->lock);
 	if (device->removed) {
-		benaphore_unlock(&device->lock);
+		mutex_unlock(&device->lock);
 		return B_DEV_NOT_READY;
 	}
 
@@ -847,7 +845,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			break;
 	}
 
-	benaphore_unlock(&device->lock);
+	mutex_unlock(&device->lock);
 	return result;
 }
 
@@ -861,10 +859,10 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 	TRACE("read(%lld, %ld)\n", position, *length);
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
-	benaphore_lock(&device->lock);
+	mutex_lock(&device->lock);
 	if (device->removed) {
 		*length = 0;
-		benaphore_unlock(&device->lock);
+		mutex_unlock(&device->lock);
 		return B_DEV_NOT_READY;
 	}
 
@@ -887,7 +885,7 @@ usb_disk_read(void *cookie, off_t position, void *buffer, size_t *length)
 			length);
 	}
 
-	benaphore_unlock(&device->lock);
+	mutex_unlock(&device->lock);
 	if (result == B_OK) {
 		TRACE("read successful with %ld bytes\n", *length);
 		return B_OK;
@@ -909,10 +907,10 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 	TRACE("write(%lld, %ld)\n", position, *length);
 	device_lun *lun = (device_lun *)cookie;
 	disk_device *device = lun->device;
-	benaphore_lock(&device->lock);
+	mutex_lock(&device->lock);
 	if (device->removed) {
 		*length = 0;
-		benaphore_unlock(&device->lock);
+		mutex_unlock(&device->lock);
 		return B_DEV_NOT_READY;
 	}
 
@@ -938,7 +936,7 @@ usb_disk_write(void *cookie, off_t position, const void *buffer,
 			(void *)buffer, length);
 	}
 
-	benaphore_unlock(&device->lock);
+	mutex_unlock(&device->lock);
 	if (result == B_OK) {
 		TRACE("write successful with %ld bytes\n", *length);
 		return B_OK;
@@ -979,17 +977,14 @@ init_driver()
 	gDeviceList = NULL;
 	gDeviceCount = 0;
 	gLunCount = 0;
-	status_t result = benaphore_init(&gDeviceListLock, "usb_disk device list lock");
-	if (result < B_OK) {
-		TRACE("failed to create device list lock\n");
-		return result;
-	}
+	mutex_init(&gDeviceListLock, "usb_disk device list lock");
 
 	TRACE("trying module %s\n", B_USB_MODULE_NAME);
-	result = get_module(B_USB_MODULE_NAME, (module_info **)&gUSBModule);
+	status_t result = get_module(B_USB_MODULE_NAME,
+		(module_info **)&gUSBModule);
 	if (result < B_OK) {
 		TRACE_ALWAYS("getting module failed 0x%08lx\n", result);
-		benaphore_destroy(&gDeviceListLock);
+		mutex_destroy(&gDeviceListLock);
 		return result;
 	}
 
@@ -1004,7 +999,7 @@ uninit_driver()
 {
 	TRACE("uninit_driver()\n");
 	gUSBModule->uninstall_notify(DRIVER_NAME);
-	benaphore_lock(&gDeviceListLock);
+	mutex_lock(&gDeviceListLock);
 
 	if (gDeviceNames) {
 		for (int32 i = 0; gDeviceNames[i]; i++)
@@ -1013,7 +1008,7 @@ uninit_driver()
 		gDeviceNames = NULL;
 	}
 
-	benaphore_destroy(&gDeviceListLock);
+	mutex_destroy(&gDeviceListLock);
 	put_module(B_USB_MODULE_NAME);
 }
 
@@ -1034,7 +1029,7 @@ publish_devices()
 		return NULL;
 
 	int32 index = 0;
-	benaphore_lock(&gDeviceListLock);
+	mutex_lock(&gDeviceListLock);
 	disk_device *device = gDeviceList;
 	while (device) {
 		for (uint8 i = 0; i < device->lun_count; i++)
@@ -1044,7 +1039,7 @@ publish_devices()
 	}
 
 	gDeviceNames[index++] = NULL;
-	benaphore_unlock(&gDeviceListLock);
+	mutex_unlock(&gDeviceListLock);
 	return (const char **)gDeviceNames;
 }
 

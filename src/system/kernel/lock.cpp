@@ -126,36 +126,6 @@ recursive_lock_unlock(recursive_lock *lock)
 //	#pragma mark -
 
 
-status_t
-benaphore_init(benaphore *ben, const char *name)
-{
-	if (ben == NULL || name == NULL)
-		return B_BAD_VALUE;
-
-	ben->count = 1;
-#ifdef KDEBUG
-	ben->sem = create_sem(1, name);
-#else
-	ben->sem = create_sem(0, name);
-#endif
-	if (ben->sem >= B_OK)
-		return B_OK;
-
-	return ben->sem;
-}
-
-
-void
-benaphore_destroy(benaphore *ben)
-{
-	delete_sem(ben->sem);
-	ben->sem = -1;
-}
-
-
-//	#pragma mark -
-
-
 static status_t
 rw_lock_wait(rw_lock* lock, bool writer)
 {

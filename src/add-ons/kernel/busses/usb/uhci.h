@@ -52,7 +52,7 @@ private:
 		uhci_qh						*fQueueHead;
 		uhci_td						*fStrayDescriptor;
 		uhci_qh						*fQueueTop;
-		benaphore					fLock;
+		mutex						fLock;
 };
 
 
@@ -225,7 +225,7 @@ static	pci_module_info				*sPCIModule;
 		isochronous_transfer_data	*fLastIsochronousTransfer;
 		sem_id						fFinishIsochronousTransfersSem;
 		thread_id					fFinishIsochronousThread;
-		benaphore					fIsochronousLock;
+		mutex						fIsochronousLock;
 		bool						fStopFinishIsochronousThread;
 
 		// Root hub

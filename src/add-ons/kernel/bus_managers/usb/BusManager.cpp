@@ -14,10 +14,7 @@ BusManager::BusManager(Stack *stack)
 	:	fInitOK(false),
 		fRootHub(NULL)
 {
-	if (benaphore_init(&fLock, "usb busmanager lock") < B_OK) {
-		TRACE_ERROR(("USB BusManager: failed to create busmanager lock\n"));
-		return;
-	}
+	mutex_init(&fLock, "usb busmanager lock");
 
 	fRootObject = new(std::nothrow) Object(stack, this);
 	if (!fRootObject)
@@ -39,7 +36,7 @@ BusManager::BusManager(Stack *stack)
 BusManager::~BusManager()
 {
 	Lock();
-	benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 	for (int32 i = 0; i <= USB_SPEED_MAX; i++)
 		delete fDefaultPipes[i];
 	delete fRootObject;
@@ -59,14 +56,14 @@ BusManager::InitCheck()
 bool
 BusManager::Lock()
 {
-	return (benaphore_lock(&fLock) == B_OK);
+	return (mutex_lock(&fLock) == B_OK);
 }
 
 
 void
 BusManager::Unlock()
 {
-	benaphore_unlock(&fLock);
+	mutex_unlock(&fLock);
 }
 
 

@@ -90,10 +90,7 @@ Queue::Queue(Stack *stack)
 {
 	fStack = stack;
 
-	if (benaphore_init(&fLock, "uhci queue lock") < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to create queue lock\n"));
-		return;
-	}
+	mutex_init(&fLock, "uhci queue lock");
 
 	void *physicalAddress;
 	fStatus = fStack->AllocateChunk((void **)&fQueueHead, &physicalAddress,
@@ -112,7 +109,7 @@ Queue::Queue(Stack *stack)
 Queue::~Queue()
 {
 	Lock();
-	benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 
 	fStack->FreeChunk(fQueueHead, (void *)fQueueHead->this_phy, sizeof(uhci_qh));
 
@@ -132,14 +129,14 @@ Queue::InitCheck()
 bool
 Queue::Lock()
 {
-	return (benaphore_lock(&fLock) == B_OK);
+	return (mutex_lock(&fLock) == B_OK);
 }
 
 
 void
 Queue::Unlock()
 {
-	benaphore_unlock(&fLock);
+	mutex_unlock(&fLock);
 }
 
 
@@ -434,10 +431,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	resume_thread(fFinishThread);
 
 	// Create a lock for the isochronous transfer list
-	if (benaphore_init(&fIsochronousLock, "UHCI isochronous lock") < B_OK) {
-		TRACE_ERROR(("usb_uhci: failed to create isochronous lock\n"));
-		return;
-	}
+	mutex_init(&fIsochronousLock, "UHCI isochronous lock");
 
 	// Create semaphore the isochronous finisher thread will wait for
 	fFinishIsochronousTransfersSem = create_sem(0,
@@ -484,7 +478,7 @@ UHCI::~UHCI()
 		delete isoTransfer;
 		isoTransfer = next;
 	}
-	benaphore_destroy(&fIsochronousLock);
+	mutex_destroy(&fIsochronousLock);
 
 	Lock();
 	transfer_data *transfer = fFirstTransfer;
@@ -2070,14 +2064,14 @@ UHCI::ReadIsochronousDescriptorChain(isochronous_transfer_data *transfer,
 bool
 UHCI::LockIsochronous()
 {
-	return (benaphore_lock(&fIsochronousLock) == B_OK);
+	return (mutex_lock(&fIsochronousLock) == B_OK);
 }
 
 
 void
 UHCI::UnlockIsochronous()
 {
-	benaphore_unlock(&fIsochronousLock);
+	mutex_unlock(&fIsochronousLock);
 }
 
 

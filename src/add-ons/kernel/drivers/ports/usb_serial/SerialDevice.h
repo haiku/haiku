@@ -130,8 +130,8 @@ static	void					InterruptCallbackFunction(void *cookie,
 		bool					fStopDeviceThread;
 
 		/* device locks to ensure no concurent reads/writes */
-		benaphore				fReadLock;
-		benaphore				fWriteLock;
+		mutex					fReadLock;
+		mutex					fWriteLock;
 };
 
 #endif // _USB_DEVICE_H_

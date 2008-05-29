@@ -99,8 +99,8 @@ struct chain {
 #define CHAIN_MISSING_MODULE	0x02
 #define CHAIN_INITIALIZED		0x01
 
-static benaphore sChainLock;
-static benaphore sInitializeChainLock;
+static mutex sChainLock;
+static mutex sInitializeChainLock;
 static hash_table *sProtocolChains;
 static hash_table *sDatalinkProtocolChains;
 static hash_table *sReceivingProtocolChains;
@@ -131,7 +131,7 @@ family::Release()
 		return;
 
 	TRACE(("family %d unused, uninit chains\n", type));
-	BenaphoreLocker locker(&sChainLock);
+	MutexLocker locker(&sChainLock);
 
 	struct chain *chain = NULL;
 	while (true) {
@@ -233,8 +233,8 @@ chain::Acquire()
 		}
 
 		while ((flags & CHAIN_INITIALIZED) == 0) {
-			benaphore_lock(&sInitializeChainLock);
-			benaphore_unlock(&sInitializeChainLock);
+			mutex_lock(&sInitializeChainLock);
+			mutex_unlock(&sInitializeChainLock);
 		}
 		return B_OK;
 	}
@@ -245,7 +245,7 @@ chain::Acquire()
 		return B_OK;
 
 	TRACE(("initializing chain %d.%d.%d\n", family, type, protocol));
-	BenaphoreLocker locker(&sInitializeChainLock);
+	MutexLocker locker(&sInitializeChainLock);
 
 	for (int32 i = 0; modules[i] != NULL; i++) {
 		if (get_module(modules[i], &infos[i]) < B_OK) {
@@ -282,7 +282,7 @@ chain::Uninitialize()
 		return;
 
 	TRACE(("uninit chain %d.%d.%d\n", family, type, protocol));
-	BenaphoreLocker locker(sInitializeChainLock);
+	MutexLocker locker(sInitializeChainLock);
 
 	for (int32 i = 0; modules[i] != NULL; i++) {
 		put_module(modules[i]);
@@ -431,7 +431,7 @@ get_domain_protocols(net_socket *socket)
 	struct chain *chain;
 
 	{
-		BenaphoreLocker locker(&sChainLock);
+		MutexLocker locker(&sChainLock);
 
 		chain = chain::Lookup(sProtocolChains, socket->family, socket->type,
 			socket->type == SOCK_RAW ? 0 : socket->protocol);
@@ -484,7 +484,7 @@ put_domain_protocols(net_socket *socket)
 	struct chain *chain;
 
 	{
-		BenaphoreLocker locker(&sChainLock);
+		MutexLocker locker(&sChainLock);
 
 		chain = chain::Lookup(sProtocolChains, socket->family, socket->type,
 			socket->protocol);
@@ -521,7 +521,7 @@ get_domain_datalink_protocols(net_interface *_interface)
 	struct chain *chain;
 
 	{
-		BenaphoreLocker locker(&sChainLock);
+		MutexLocker locker(&sChainLock);
 
 		chain = chain::Lookup(sDatalinkProtocolChains, interface->domain->family,
 			interface->device_interface->device->type, 0);
@@ -572,7 +572,7 @@ put_domain_datalink_protocols(net_interface *_interface)
 	struct chain *chain;
 
 	{
-		BenaphoreLocker locker(&sChainLock);
+		MutexLocker locker(&sChainLock);
 
 		chain = chain::Lookup(sDatalinkProtocolChains, interface->domain->family,
 			interface->device_interface->device->type, 0);
@@ -595,7 +595,7 @@ get_domain_receiving_protocol(net_domain *_domain, uint32 type,
 
 	TRACE(("get_domain_receiving_protocol(family %d, type %lu)\n", domain->family, type));
 	{
-		BenaphoreLocker locker(&sChainLock);
+		MutexLocker locker(&sChainLock);
 
 		chain = chain::Lookup(sReceivingProtocolChains, domain->family,
 			type, 0);
@@ -619,7 +619,7 @@ put_domain_receiving_protocol(net_domain *_domain, uint32 type)
 	struct chain *chain;
 
 	{
-		BenaphoreLocker locker(&sChainLock);
+		MutexLocker locker(&sChainLock);
 
 		chain = chain::Lookup(sReceivingProtocolChains, domain->family,
 			type, 0);
@@ -640,7 +640,7 @@ register_domain_protocols(int family, int type, int protocol, ...)
 		protocol = 0;
 	}
 
-	BenaphoreLocker locker(&sChainLock);
+	MutexLocker locker(&sChainLock);
 	
 	struct chain *chain = chain::Lookup(sProtocolChains, family, type, protocol);
 	if (chain != NULL)
@@ -664,7 +664,7 @@ status_t
 register_domain_datalink_protocols(int family, int type, ...)
 {
 	TRACE(("register_domain_datalink_protocol(%d.%d)\n", family, type));
-	BenaphoreLocker locker(&sChainLock);
+	MutexLocker locker(&sChainLock);
 
 	struct chain *chain = chain::Lookup(sDatalinkProtocolChains, family, type, 0);
 	if (chain != NULL)
@@ -699,7 +699,7 @@ register_domain_receiving_protocol(int family, int type, const char *moduleName)
 	TRACE(("register_domain_receiving_protocol(%d.%d, %s)\n", family, type,
 		moduleName));
 
-	BenaphoreLocker locker(&sChainLock);
+	MutexLocker locker(&sChainLock);
 
 	struct chain *chain = chain::Lookup(sReceivingProtocolChains, family, type, 0);
 	if (chain != NULL)
@@ -753,10 +753,8 @@ init_stack()
 	if (status < B_OK)
 		goto err2;
 
-	if (benaphore_init(&sChainLock, "net chains") < B_OK)
-		goto err3;
-	if (benaphore_init(&sInitializeChainLock, "net intialize chains") < B_OK)
-		goto err4;
+	mutex_init(&sChainLock, "net chains");
+	mutex_init(&sInitializeChainLock, "net intialize chains");
 
 	sFamilies = hash_init(10, offsetof(struct family, next),
 		&family::Compare, &family::Hash);
@@ -810,10 +808,8 @@ err7:
 err6:
 	hash_uninit(sFamilies);
 err5:
-	benaphore_destroy(&sInitializeChainLock);
-err4:
-	benaphore_destroy(&sChainLock);
-err3:
+	mutex_destroy(&sInitializeChainLock);
+	mutex_destroy(&sChainLock);
 	uninit_timers();
 err2:
 	uninit_interfaces();
@@ -832,8 +828,8 @@ uninit_stack()
 	uninit_interfaces();
 	uninit_domains();
 
-	benaphore_destroy(&sChainLock);
-	benaphore_destroy(&sInitializeChainLock);
+	mutex_destroy(&sChainLock);
+	mutex_destroy(&sInitializeChainLock);
 
 	// remove chains and families
 

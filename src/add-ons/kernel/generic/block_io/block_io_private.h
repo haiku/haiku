@@ -38,7 +38,7 @@ typedef struct block_io_device_info {
 	block_device_interface *interface;
 	block_device_cookie *cookie;
 
-	benaphore lock;					// used for access to following variables
+	mutex lock;						// used for access to following variables
 	uint32 block_size;
 	uint32 ld_block_size;
 	uint64 capacity;

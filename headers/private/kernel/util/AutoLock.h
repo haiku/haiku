@@ -50,23 +50,6 @@ public:
 // RecursiveLocker
 typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
 
-// BenaphoreLocking
-class BenaphoreLocking {
-public:
-	inline bool Lock(benaphore *lockable)
-	{
-		return benaphore_lock(lockable) == B_OK;
-	}
-
-	inline void Unlock(benaphore *lockable)
-	{
-		benaphore_unlock(lockable);
-	}
-};
-
-// BenaphoreLocker
-typedef AutoLocker<benaphore, BenaphoreLocking> BenaphoreLocker;
-
 // InterruptsLocking
 class InterruptsLocking {
 public:
@@ -152,7 +135,6 @@ typedef AutoLocker<spinlock, InterruptsSpinLocking> InterruptsSpinLocker;
 using BPrivate::AutoLocker;
 using BPrivate::MutexLocker;
 using BPrivate::RecursiveLocker;
-using BPrivate::BenaphoreLocker;
 using BPrivate::InterruptsLocker;
 using BPrivate::SpinLocker;
 using BPrivate::InterruptsSpinLocker;

@@ -413,9 +413,7 @@ block_io_init_device(void *_data, void **cookie)
 
 	device->node = data->node;
 
-	res = benaphore_init(&device->lock, "block_device_mutex");
-	if (res < 0)
-		goto err2;
+	mutex_init(&device->lock, "block_device_mutex");
 
 #if 0
 	// construct a identifiable name for S/G pool
@@ -458,8 +456,7 @@ block_io_init_device(void *_data, void **cookie)
 	return B_OK;
 
 err3:
-	benaphore_destroy(&device->lock);
-err2:
+	mutex_destroy(&device->lock);
 	free(device);
 err1:
 	return res;
@@ -472,7 +469,7 @@ block_io_uninit_device(void *_cookie)
 	block_io_device_info *device = _cookie;
 
 	locked_pool->destroy(device->phys_vecs_pool);
-	benaphore_destroy(&device->lock);
+	mutex_destroy(&device->lock);
 	free(device);
 }
 

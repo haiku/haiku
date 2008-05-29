@@ -117,7 +117,7 @@ static void arp_timer(struct net_timer *timer, void *data);
 net_buffer_module_info *gBufferModule;
 static net_stack_module_info *sStackModule;
 static hash_table *sCache;
-static benaphore sCacheLock;
+static mutex sCacheLock;
 static bool sIgnoreReplies;
 
 
@@ -419,7 +419,7 @@ arp_update_local(arp_protocol *protocol)
 static status_t
 handle_arp_request(net_buffer *buffer, arp_header &header)
 {
-	BenaphoreLocker locker(sCacheLock);
+	MutexLocker locker(sCacheLock);
 
 	if (!sIgnoreReplies) {
 		arp_update_entry(header.protocol_sender,
@@ -470,7 +470,7 @@ handle_arp_reply(net_buffer *buffer, arp_header &header)
 	if (sIgnoreReplies)
 		return;
 
-	BenaphoreLocker locker(sCacheLock);
+	MutexLocker locker(sCacheLock);
 	arp_update_entry(header.protocol_sender, (sockaddr_dl *)buffer->source, 0);
 }
 
@@ -562,9 +562,9 @@ arp_timer(struct net_timer *timer, void *data)
 			// the entry has aged so much that we're going to remove it
 			TRACE(("  remove ARP entry %p!\n", entry));
 
-			benaphore_lock(&sCacheLock);
+			mutex_lock(&sCacheLock);
 			hash_remove(sCache, entry);
-			benaphore_unlock(&sCacheLock);
+			mutex_unlock(&sCacheLock);
 
 			delete entry;
 			break;
@@ -694,7 +694,7 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 	if (user_memcpy(&control, buffer, sizeof(struct arp_control)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	BenaphoreLocker locker(sCacheLock);
+	MutexLocker locker(sCacheLock);
 
 	switch (function) {
 		case ARP_SET_ENTRY:
@@ -805,14 +805,12 @@ arp_control(const char *subsystem, uint32 function, void *buffer,
 static status_t
 arp_init()
 {
-	status_t status = benaphore_init(&sCacheLock, "arp cache");
-	if (status < B_OK)
-		return status;
+	mutex_init(&sCacheLock, "arp cache");
 
 	sCache = hash_init(64, offsetof(struct arp_entry, next),
 		&arp_entry::Compare, &arp_entry::Hash);
 	if (sCache == NULL) {
-		benaphore_destroy(&sCacheLock);
+		mutex_destroy(&sCacheLock);
 		return B_NO_MEMORY;
 	}
 
@@ -873,7 +871,7 @@ arp_send_data(net_datalink_protocol *_protocol, net_buffer *buffer)
 {
 	arp_protocol *protocol = (arp_protocol *)_protocol;
 	{
-		BenaphoreLocker locker(sCacheLock);
+		MutexLocker locker(sCacheLock);
 
 		// Set buffer target and destination address
 
@@ -942,7 +940,7 @@ arp_down(net_datalink_protocol *protocol)
 	// remove local ARP entry from the cache
 
 	if (protocol->interface->address != NULL) {
-		BenaphoreLocker locker(sCacheLock);
+		MutexLocker locker(sCacheLock);
 
 		arp_entry *entry = arp_entry::Lookup(
 			((sockaddr_in *)protocol->interface->address)->sin_addr.s_addr);
@@ -988,7 +986,7 @@ arp_control(net_datalink_protocol *_protocol, int32 op, void *argument,
 		// remove previous address from cache
 		// TODO: we should be able to do this (add/remove) in one atomic operation!
 
-		BenaphoreLocker locker(sCacheLock);
+		MutexLocker locker(sCacheLock);
 
 		arp_entry *entry = arp_entry::Lookup(oldAddress);
 		if (entry != NULL) {

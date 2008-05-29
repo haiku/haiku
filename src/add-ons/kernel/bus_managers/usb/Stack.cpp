@@ -28,15 +28,8 @@ Stack::Stack()
 {
 	TRACE(("USB Stack: stack init\n"));
 
-	if (benaphore_init(&fStackLock, "usb stack lock") < B_OK) {
-		TRACE_ERROR(("USB Stack: failed to create stack lock\n"));
-		return;
-	}
-
-	if (benaphore_init(&fExploreLock, "usb explore lock") < B_OK) {
-		TRACE_ERROR(("USB Stack: failed to create explore lock\n"));
-		return;
-	}
+	mutex_init(&fStackLock, "usb stack lock");
+	mutex_init(&fExploreLock, "usb explore lock");
 
 	size_t objectArraySize = fObjectMaxCount * sizeof(Object *);
 	fObjectArray = (Object **)malloc(objectArraySize);
@@ -106,10 +99,10 @@ Stack::~Stack()
 	fStopThreads = true;
 	wait_for_thread(fExploreThread, &result);
 
-	benaphore_lock(&fStackLock);
-	benaphore_destroy(&fStackLock);
-	benaphore_lock(&fExploreLock);
-	benaphore_destroy(&fExploreLock);
+	mutex_lock(&fStackLock);
+	mutex_destroy(&fStackLock);
+	mutex_lock(&fExploreLock);
+	mutex_destroy(&fExploreLock);
 
 	//Release the bus modules
 	for (Vector<BusManager *>::Iterator i = fBusManagers.Begin();
@@ -133,14 +126,14 @@ Stack::InitCheck()
 bool
 Stack::Lock()
 {
-	return (benaphore_lock(&fStackLock) == B_OK);
+	return (mutex_lock(&fStackLock) == B_OK);
 }
 
 
 void
 Stack::Unlock()
 {
-	benaphore_unlock(&fStackLock);
+	mutex_unlock(&fStackLock);
 }
 
 
@@ -211,7 +204,7 @@ Stack::ExploreThread(void *data)
 	Stack *stack = (Stack *)data;
 
 	while (!stack->fStopThreads) {
-		if (benaphore_lock(&stack->fExploreLock) != B_OK)
+		if (mutex_lock(&stack->fExploreLock) != B_OK)
 			break;
 
 		rescan_item *rescanList = NULL;
@@ -236,7 +229,7 @@ Stack::ExploreThread(void *data)
 		}
 
 		stack->fFirstExploreDone = true;
-		benaphore_unlock(&stack->fExploreLock);
+		mutex_unlock(&stack->fExploreLock);
 		stack->RescanDrivers(rescanList);
 		snooze(USB_DELAY_HUB_EXPLORE);
 	}
@@ -461,7 +454,7 @@ Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 	usb_driver_info *element = fDriverList;
 	while (element) {
 		if (strcmp(element->driver_name, driverName) == 0) {
-			if (benaphore_lock(&fExploreLock) != B_OK)
+			if (mutex_lock(&fExploreLock) != B_OK)
 				return B_ERROR;
 
 			// inform driver about any already present devices
@@ -477,7 +470,7 @@ Stack::InstallNotify(const char *driverName, const usb_notify_hooks *hooks)
 
 			element->notify_hooks.device_added = hooks->device_added;
 			element->notify_hooks.device_removed = hooks->device_removed;
-			benaphore_unlock(&fExploreLock);
+			mutex_unlock(&fExploreLock);
 			return B_OK;
 		}
 
@@ -496,7 +489,7 @@ Stack::UninstallNotify(const char *driverName)
 	usb_driver_info *element = fDriverList;
 	while (element) {
 		if (strcmp(element->driver_name, driverName) == 0) {
-			if (benaphore_lock(&fExploreLock) != B_OK)
+			if (mutex_lock(&fExploreLock) != B_OK)
 				return B_ERROR;
 
 			// trigger the device removed hook
@@ -510,7 +503,7 @@ Stack::UninstallNotify(const char *driverName)
 
 			element->notify_hooks.device_added = NULL;
 			element->notify_hooks.device_removed = NULL;
-			benaphore_unlock(&fExploreLock);
+			mutex_unlock(&fExploreLock);
 			return B_OK;
 		}
 

@@ -30,10 +30,7 @@ PhysicalMemoryAllocator::PhysicalMemoryAllocator(const char *name,
 		fStatus(B_NO_INIT)
 {
 	fName = strdup(name);
-	if (benaphore_init(&fLock, fName) < B_OK) {
-		TRACE_ERROR(("PMA: failed to create benaphore lock\n"));
-		return;
-	}
+	mutex_init_etc(&fLock, fName, MUTEX_FLAG_CLONE_NAME);
 
 	fArrayCount = 1;
 	size_t biggestSize = minSize;
@@ -103,21 +100,21 @@ PhysicalMemoryAllocator::~PhysicalMemoryAllocator()
 	free(fName);
 
 	delete_area(fArea);
-	benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
 bool
 PhysicalMemoryAllocator::_Lock()
 {
-	return (benaphore_lock(&fLock) == B_OK);
+	return (mutex_lock(&fLock) == B_OK);
 }
 
 
 void
 PhysicalMemoryAllocator::_Unlock()
 {
-	benaphore_unlock(&fLock);
+	mutex_unlock(&fLock);
 }
 
 

@@ -35,7 +35,7 @@ public:
 	static net_buffer_module_info *Buffer() { return &gNetBufferModule; }
 };
 
-typedef DatagramSocket<BenaphoreLocking, LocalStackBundle> LocalDatagramSocket;
+typedef DatagramSocket<MutexLocking, LocalStackBundle> LocalDatagramSocket;
 
 class LinkProtocol : public net_protocol, public LocalDatagramSocket {
 public:
@@ -82,7 +82,7 @@ LinkProtocol::~LinkProtocol()
 status_t
 LinkProtocol::StartMonitoring(const char *deviceName)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (fMonitoredDevice)
 		return B_BUSY;
@@ -105,7 +105,7 @@ LinkProtocol::StartMonitoring(const char *deviceName)
 status_t
 LinkProtocol::StopMonitoring()
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	// TODO compare our device with the supplied device name?
 	return _Unregister();
@@ -148,7 +148,7 @@ LinkProtocol::_MonitorEvent(net_device_monitor *monitor, int32 event)
 	LinkProtocol *protocol = (LinkProtocol *)monitor->cookie;
 
 	if (event == B_DEVICE_GOING_DOWN) {
-		BenaphoreLocker _(protocol->fLock);
+		MutexLocker _(protocol->fLock);
 
 		protocol->_Unregister();
 		if (protocol->_IsEmpty()) {

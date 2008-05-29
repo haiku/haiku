@@ -42,13 +42,12 @@ class UnixAddressManager {
 public:
 	UnixAddressManager()
 	{
-		fLock.sem = -1;
+		mutex_init(&fLock, "unix address manager");
 	}
 
 	~UnixAddressManager()
 	{
-		if (fLock.sem >= 0)
-			benaphore_destroy(&fLock);
+		mutex_destroy(&fLock);
 	}
 
 	status_t Init()
@@ -57,17 +56,17 @@ public:
 		if (error != B_OK)
 			return error;
 
-		return benaphore_init(&fLock, "unix address manager");
+		return B_OK;
 	}
 
 	bool Lock()
 	{
-		return benaphore_lock(&fLock) == B_OK;
+		return mutex_lock(&fLock) == B_OK;
 	}
 
 	void Unlock()
 	{
-		benaphore_unlock(&fLock);
+		mutex_unlock(&fLock);
 	}
 
 	UnixEndpoint* Lookup(const UnixAddress& address) const
@@ -107,7 +106,7 @@ public:
 private:
 	typedef OpenHashTable<UnixAddressHashDefinition, false> EndpointTable;
 
-	benaphore		fLock;
+	mutex			fLock;
 	EndpointTable	fBoundEndpoints;
 	int32			fNextInternalID;
 };

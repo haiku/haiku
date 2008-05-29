@@ -299,7 +299,7 @@ fill_route_entry(route_entry *target, void *_buffer, size_t bufferSize,
 uint32
 route_table_size(net_domain_private *domain)
 {
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 	uint32 size = 0;
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
@@ -477,7 +477,7 @@ add_route(struct net_domain *_domain, const struct net_route *newRoute)
 	route->ref_count = 1;
 
 	// TODO: for now...
-	//BenaphoreLocker locker(domain->lock);
+	//MutexLocker locker(domain->lock);
 
 	// Insert the route sorted by completeness of its mask
 
@@ -521,7 +521,7 @@ remove_route(struct net_domain *_domain, const struct net_route *removeRoute)
 		removeRoute->flags));
 
 	// TODO: for now...
-	//BenaphoreLocker locker(domain->lock);
+	//MutexLocker locker(domain->lock);
 
 	net_route_private *route = find_route(domain, removeRoute);
 	if (route == NULL)
@@ -551,7 +551,7 @@ get_route_information(struct net_domain *_domain, void *value, size_t length)
 	if (status != B_OK)
 		return status;
 
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 
 	net_route_private *route = find_route(domain, (sockaddr *)&destination);
 	if (route == NULL)
@@ -601,7 +601,7 @@ struct net_route *
 get_route(struct net_domain *_domain, const struct sockaddr *address)
 {
 	struct net_domain_private *domain = (net_domain_private *)_domain;
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 
 	return get_route_internal(domain, address);
 }
@@ -612,7 +612,7 @@ get_buffer_route(net_domain *_domain, net_buffer *buffer, net_route **_route)
 {
 	net_domain_private *domain = (net_domain_private *)_domain;
 
-	BenaphoreLocker _(domain->lock);
+	MutexLocker _(domain->lock);
 
 	net_route *route = get_route_internal(domain, buffer->destination);
 	if (route == NULL)
@@ -647,7 +647,7 @@ void
 put_route(struct net_domain *_domain, net_route *route)
 {
 	struct net_domain_private *domain = (net_domain_private *)_domain;
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 
 	put_route_internal(domain, (net_route *)route);
 }
@@ -657,7 +657,7 @@ status_t
 register_route_info(struct net_domain *_domain, struct net_route_info *info)
 {
 	struct net_domain_private *domain = (net_domain_private *)_domain;
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 
 	domain->route_infos.Add(info);
 	info->route = get_route_internal(domain, &info->address);
@@ -670,7 +670,7 @@ status_t
 unregister_route_info(struct net_domain *_domain, struct net_route_info *info)
 {
 	struct net_domain_private *domain = (net_domain_private *)_domain;
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 
 	domain->route_infos.Remove(info);
 	if (info->route != NULL)
@@ -684,7 +684,7 @@ status_t
 update_route_info(struct net_domain *_domain, struct net_route_info *info)
 {
 	struct net_domain_private *domain = (net_domain_private *)_domain;
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 
 	put_route_internal(domain, info->route);
 	info->route = get_route_internal(domain, &info->address);

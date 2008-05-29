@@ -34,7 +34,7 @@
 #endif
 
 
-static benaphore sInterfaceLock;
+static mutex sInterfaceLock;
 static DeviceInterfaceList sInterfaces;
 static uint32 sInterfaceIndex;
 static uint32 sDeviceIndex;
@@ -326,7 +326,7 @@ put_interface(struct net_interface_private *interface)
 {
 	// TODO: reference counting
 	// TODO: better locking scheme
-	benaphore_unlock(&((net_domain_private *)interface->domain)->lock);
+	mutex_unlock(&((net_domain_private *)interface->domain)->lock);
 }
 
 
@@ -334,7 +334,7 @@ struct net_interface_private *
 get_interface(net_domain *_domain, const char *name)
 {
 	net_domain_private *domain = (net_domain_private *)_domain;
-	benaphore_lock(&domain->lock);
+	mutex_lock(&domain->lock);
 
 	net_interface_private *interface = NULL;
 	while (true) {
@@ -347,7 +347,7 @@ get_interface(net_domain *_domain, const char *name)
 			return interface;
 	}
 
-	benaphore_unlock(&domain->lock);
+	mutex_unlock(&domain->lock);
 	return NULL;
 }
 
@@ -378,7 +378,7 @@ get_device_interface_address(net_device_interface *interface, sockaddr *_address
 uint32
 count_device_interfaces()
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	uint32 count = 0;
@@ -400,7 +400,7 @@ count_device_interfaces()
 status_t
 list_device_interfaces(void *_buffer, size_t *bufferSize)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	UserBuffer buffer(_buffer, *bufferSize);
@@ -433,7 +433,7 @@ put_device_interface(struct net_device_interface *interface)
 		return;
 
 	{
-		BenaphoreLocker locker(sInterfaceLock);
+		MutexLocker locker(sInterfaceLock);
 		sInterfaces.Remove(interface);
 	}
 
@@ -456,7 +456,7 @@ put_device_interface(struct net_device_interface *interface)
 struct net_device_interface *
 get_device_interface(uint32 index)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 	DeviceInterfaceList::Iterator iterator = sInterfaces.GetIterator();
 
 	while (iterator.HasNext()) {
@@ -479,7 +479,7 @@ get_device_interface(uint32 index)
 struct net_device_interface *
 get_device_interface(const char *name, bool create)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	net_device_interface *interface = find_device_interface(name);
 	if (interface != NULL) {
@@ -574,7 +574,7 @@ down_device_interface(net_device_interface *interface)
 status_t
 unregister_device_deframer(net_device *device)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
 	net_device_interface *interface = find_device_interface(device->name);
@@ -603,7 +603,7 @@ unregister_device_deframer(net_device *device)
 status_t
 register_device_deframer(net_device *device, net_deframe_func deframeFunc)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
 	net_device_interface *interface = find_device_interface(device->name);
@@ -637,7 +637,7 @@ status_t
 register_device_handler(struct net_device *device, int32 type,
 	net_receive_func receiveFunc, void *cookie)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
 	net_device_interface *interface = find_device_interface(device->name);
@@ -673,7 +673,7 @@ register_device_handler(struct net_device *device, int32 type,
 status_t
 unregister_device_handler(struct net_device *device, int32 type)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
 	net_device_interface *interface = find_device_interface(device->name);
@@ -706,7 +706,7 @@ register_device_monitor(net_device *device, net_device_monitor *monitor)
 	if (monitor->receive == NULL || monitor->event == NULL)
 		return B_BAD_VALUE;
 
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
 	net_device_interface *interface = find_device_interface(device->name);
@@ -722,7 +722,7 @@ register_device_monitor(net_device *device, net_device_monitor *monitor)
 status_t
 unregister_device_monitor(net_device *device, net_device_monitor *monitor)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	// find device interface for this device
 	net_device_interface *interface = find_device_interface(device->name);
@@ -765,7 +765,7 @@ device_link_changed(net_device *device)
 status_t
 device_removed(net_device *device)
 {
-	BenaphoreLocker locker(sInterfaceLock);
+	MutexLocker locker(sInterfaceLock);
 
 	// hold a reference to the device interface being removed
 	// so our put_() will (eventually) do the final cleanup
@@ -822,8 +822,7 @@ device_enqueue_buffer(net_device *device, net_buffer *buffer)
 status_t
 init_interfaces()
 {
-	if (benaphore_init(&sInterfaceLock, "net interfaces") < B_OK)
-		return B_ERROR;
+	mutex_init(&sInterfaceLock, "net interfaces");
 
 	new (&sInterfaces) DeviceInterfaceList;
 		// static C++ objects are not initialized in the module startup
@@ -834,7 +833,7 @@ init_interfaces()
 status_t
 uninit_interfaces()
 {
-	benaphore_destroy(&sInterfaceLock);
+	mutex_destroy(&sInterfaceLock);
 	return B_OK;
 }
 

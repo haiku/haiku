@@ -225,7 +225,7 @@ void
 fw_xferwake(struct fw_xfer *xfer)
 {
 //	struct mtx *lock = &xfer->fc->wait_lock;
-	benaphore *lock = &xfer->fc->wait_lock;
+	mutex *lock = &xfer->fc->wait_lock;
 
 	mtx_lock(lock);
 	xfer->flag |= FWXF_WAKE;
@@ -240,7 +240,7 @@ int
 fw_xferwait(struct fw_xfer *xfer)
 {
 //	struct mtx *lock = &xfer->fc->wait_lock;
-	benaphore *lock = &xfer->fc->wait_lock;
+	mutex *lock = &xfer->fc->wait_lock;
 	int err = 0;
 
 	mtx_lock(lock);

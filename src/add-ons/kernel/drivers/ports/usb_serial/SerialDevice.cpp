@@ -55,8 +55,8 @@ SerialDevice::~SerialDevice()
 	if (fBufferArea >= B_OK)
 		delete_area(fBufferArea);
 
-	benaphore_destroy(&fReadLock);
-	benaphore_destroy(&fWriteLock);
+	mutex_destroy(&fReadLock);
+	mutex_destroy(&fWriteLock);
 }
 
 
@@ -65,8 +65,8 @@ SerialDevice::Init()
 {
 	fDoneRead = create_sem(0, "usb_serial:done_read");
 	fDoneWrite = create_sem(0, "usb_serial:done_write");
-	benaphore_init(&fReadLock, "usb_serial:read_lock");
-	benaphore_init(&fWriteLock, "usb_serial:write_lock");
+	mutex_init(&fReadLock, "usb_serial:read_lock");
+	mutex_init(&fWriteLock, "usb_serial:write_lock");
 
 	fReadBufferSize = fWriteBufferSize = ROUNDUP(DEF_BUFFER_SIZE, 16);
 	fInterruptBufferSize = 16;
@@ -301,7 +301,7 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 		return B_DEV_NOT_READY;
 	}
 
-	status_t status = benaphore_lock(&fReadLock);
+	status_t status = mutex_lock(&fReadLock);
 	if (status != B_OK) {
 		TRACE_ALWAYS("read: failed to get read lock\n");
 		*numBytes = 0;
@@ -311,14 +311,14 @@ SerialDevice::Read(char *buffer, size_t *numBytes)
 	struct ddrover *ddr = gTTYModule->ddrstart(NULL);
 	if (!ddr) {
 		*numBytes = 0;
-		benaphore_unlock(&fReadLock);
+		mutex_unlock(&fReadLock);
 		return B_NO_MEMORY;
 	}
 
 	status = gTTYModule->ttyread(&fTTYFile, ddr, buffer, numBytes);
 	gTTYModule->ddrdone(ddr);
 
-	benaphore_unlock(&fReadLock);
+	mutex_unlock(&fReadLock);
 	return status;
 }
 
@@ -329,14 +329,14 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 	size_t bytesLeft = *numBytes;
 	*numBytes = 0;
 
-	status_t status = benaphore_lock(&fWriteLock);
+	status_t status = mutex_lock(&fWriteLock);
 	if (status != B_OK) {
 		TRACE_ALWAYS("write: failed to get write lock\n");
 		return status;
 	}
 
 	if (fDeviceRemoved) {
-		benaphore_unlock(&fWriteLock);
+		mutex_unlock(&fWriteLock);
 		return B_DEV_NOT_READY;
 	}
 
@@ -374,7 +374,7 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 		bytesLeft -= fActualLengthWrite;
 	}
 
-	benaphore_unlock(&fWriteLock);
+	mutex_unlock(&fWriteLock);
 	return status;
 }
 
@@ -483,8 +483,8 @@ SerialDevice::Removed()
 	wait_for_thread(fDeviceThread, &result);
 	fDeviceThread = -1;
 
-	benaphore_lock(&fWriteLock);
-	benaphore_unlock(&fWriteLock);
+	mutex_lock(&fWriteLock);
+	mutex_unlock(&fWriteLock);
 }
 
 

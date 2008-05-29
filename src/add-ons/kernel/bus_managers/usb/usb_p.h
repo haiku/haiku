@@ -149,8 +149,8 @@ static	int32							ExploreThread(void *data);
 		bool							fFirstExploreDone;
 		bool							fStopThreads;
 
-		benaphore						fStackLock;
-		benaphore						fExploreLock;
+		mutex							fStackLock;
+		mutex							fExploreLock;
 		PhysicalMemoryAllocator			*fAllocator;
 
 		uint32							fObjectIndex;
@@ -204,7 +204,7 @@ protected:
 private:
 		ControlPipe 					*_GetDefaultPipe(usb_speed);
 
-		benaphore						fLock;
+		mutex							fLock;
 
 		bool							fDeviceMap[128];
 		int8							fDeviceIndex;

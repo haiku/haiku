@@ -181,16 +181,16 @@ static net_datalink_module_info *sDatalinkModule;
 static net_socket_module_info *sSocketModule;
 static int32 sPacketID;
 static RawSocketList sRawSockets;
-static benaphore sRawSocketsLock;
-static benaphore sFragmentLock;
+static mutex sRawSocketsLock;
+static mutex sFragmentLock;
 static hash_table *sFragmentHash;
-static benaphore sMulticastGroupsLock;
+static mutex sMulticastGroupsLock;
 
 typedef MultiHashTable<MulticastStateHash> MulticastState;
 static MulticastState *sMulticastState;
 
 static net_protocol_module_info *sReceivingProtocol[256];
-static benaphore sReceivingProtocolLock;
+static mutex sReceivingProtocolLock;
 
 
 static const char *
@@ -436,7 +436,7 @@ FragmentPacket::StaleTimer(struct net_timer *timer, void *data)
 	FragmentPacket *packet = (FragmentPacket *)data;
 	TRACE("Assembling FragmentPacket %p timed out!", packet);
 
-	BenaphoreLocker locker(&sFragmentLock);
+	MutexLocker locker(&sFragmentLock);
 
 	hash_remove(sFragmentHash, packet);
 	delete packet;
@@ -503,7 +503,7 @@ reassemble_fragments(const ipv4_header &header, net_buffer **_buffer)
 	key.protocol = header.protocol;
 
 	// TODO: Make locking finer grained.
-	BenaphoreLocker locker(&sFragmentLock);
+	MutexLocker locker(&sFragmentLock);
 
 	FragmentPacket *packet = (FragmentPacket *)hash_lookup(sFragmentHash, &key);
 	if (packet == NULL) {
@@ -643,7 +643,7 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 	if (module->deliver_data == NULL)
 		return B_OK;
 
-	BenaphoreLocker _(sMulticastGroupsLock);
+	MutexLocker _(sMulticastGroupsLock);
 
 	sockaddr_in *multicastAddr = (sockaddr_in *)buffer->destination;
 
@@ -678,7 +678,7 @@ deliver_multicast(net_protocol_module_info *module, net_buffer *buffer,
 static void
 raw_receive_data(net_buffer *buffer)
 {
-	BenaphoreLocker locker(sRawSocketsLock);
+	MutexLocker locker(sRawSocketsLock);
 
 	if (sRawSockets.IsEmpty())
 		return;
@@ -718,7 +718,7 @@ fill_sockaddr_in(sockaddr_in *destination, const in_addr &source)
 status_t
 IPv4Multicast::JoinGroup(IPv4GroupInterface *state)
 {
-	BenaphoreLocker _(sMulticastGroupsLock);
+	MutexLocker _(sMulticastGroupsLock);
 
 	sockaddr_in groupAddr;
 	net_interface *intf = state->Interface();
@@ -736,7 +736,7 @@ IPv4Multicast::JoinGroup(IPv4GroupInterface *state)
 status_t
 IPv4Multicast::LeaveGroup(IPv4GroupInterface *state)
 {
-	BenaphoreLocker _(sMulticastGroupsLock);
+	MutexLocker _(sMulticastGroupsLock);
 
 	sMulticastState->Remove(state);
 
@@ -755,7 +755,7 @@ receiving_protocol(uint8 protocol)
 	if (module != NULL)
 		return module;
 
-	BenaphoreLocker locker(sReceivingProtocolLock);
+	MutexLocker locker(sReceivingProtocolLock);
 
 	module = sReceivingProtocol[protocol];
 	if (module != NULL)
@@ -983,7 +983,7 @@ ipv4_open(net_protocol *_protocol)
 
 	protocol->raw = raw;
 
-	BenaphoreLocker locker(sRawSocketsLock);
+	MutexLocker locker(sRawSocketsLock);
 	sRawSockets.Add(raw);
 	return B_OK;
 }
@@ -999,7 +999,7 @@ ipv4_close(net_protocol *_protocol)
 
 	TRACE_SK(protocol, "Close()");
 
-	BenaphoreLocker locker(sRawSocketsLock);
+	MutexLocker locker(sRawSocketsLock);
 	sRawSockets.Remove(raw);
 	delete raw;
 	protocol->raw = NULL;
@@ -1584,25 +1584,18 @@ init_ipv4()
 {
 	sPacketID = (int32)system_time();
 
-	status_t status = benaphore_init(&sRawSocketsLock, "raw sockets");
-	if (status < B_OK)
-		return status;
+	mutex_init(&sRawSocketsLock, "raw sockets");
+	mutex_init(&sFragmentLock, "IPv4 Fragments");
+	mutex_init(&sMulticastGroupsLock, "IPv4 multicast groups");
+	mutex_init(&sReceivingProtocolLock, "IPv4 receiving protocols");
 
-	status = benaphore_init(&sFragmentLock, "IPv4 Fragments");
-	if (status < B_OK)
-		goto err1;
-
-	status = benaphore_init(&sMulticastGroupsLock, "IPv4 multicast groups");
-	if (status < B_OK)
-		goto err2;
-
-	status = benaphore_init(&sReceivingProtocolLock, "IPv4 receiving protocols");
-	if (status < B_OK)
-		goto err3;
+	status_t status;
 
 	sMulticastState = new MulticastState();
-	if (sMulticastState == NULL)
+	if (sMulticastState == NULL) {
+		status = B_NO_MEMORY;
 		goto err4;
+	}
 
 	status = sMulticastState->InitCheck();
 	if (status < B_OK)
@@ -1638,13 +1631,10 @@ err6:
 err5:
 	delete sMulticastState;
 err4:
-	benaphore_destroy(&sReceivingProtocolLock);
-err3:
-	benaphore_destroy(&sMulticastGroupsLock);
-err2:
-	benaphore_destroy(&sFragmentLock);
-err1:
-	benaphore_destroy(&sRawSocketsLock);
+	mutex_destroy(&sReceivingProtocolLock);
+	mutex_destroy(&sMulticastGroupsLock);
+	mutex_destroy(&sFragmentLock);
+	mutex_destroy(&sRawSocketsLock);
 	return status;
 }
 
@@ -1652,7 +1642,7 @@ err1:
 status_t
 uninit_ipv4()
 {
-	benaphore_lock(&sReceivingProtocolLock);
+	mutex_lock(&sReceivingProtocolLock);
 
 	remove_debugger_command("ipv4_multicast", dump_ipv4_multicast);
 
@@ -1663,15 +1653,15 @@ uninit_ipv4()
 	}
 
 	gStackModule->unregister_domain(sDomain);
-	benaphore_unlock(&sReceivingProtocolLock);
+	mutex_unlock(&sReceivingProtocolLock);
 
 	delete sMulticastState;
 	hash_uninit(sFragmentHash);
 
-	benaphore_destroy(&sMulticastGroupsLock);
-	benaphore_destroy(&sFragmentLock);
-	benaphore_destroy(&sRawSocketsLock);
-	benaphore_destroy(&sReceivingProtocolLock);
+	mutex_destroy(&sMulticastGroupsLock);
+	mutex_destroy(&sFragmentLock);
+	mutex_destroy(&sRawSocketsLock);
+	mutex_destroy(&sReceivingProtocolLock);
 
 	return B_OK;
 }

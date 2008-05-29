@@ -21,16 +21,16 @@
 #include <net_stack.h>
 
 
-class BenaphoreLocking {
+class MutexLocking {
 public:
-	typedef benaphore Type;
-	typedef BenaphoreLocker AutoLocker;
+	typedef mutex Type;
+	typedef MutexLocker AutoLocker;
 
-	static status_t Init(benaphore *lock, const char *name)
-		{ return benaphore_init(lock, name); }
-	static void Destroy(benaphore *lock) { benaphore_destroy(lock); }
-	static status_t Lock(benaphore *lock) { return benaphore_lock(lock); }
-	static status_t Unlock(benaphore *lock) { return benaphore_unlock(lock); }
+	static status_t Init(mutex *lock, const char *name)
+		{ mutex_init_etc(lock, name, MUTEX_FLAG_CLONE_NAME); return B_OK; }
+	static void Destroy(mutex *lock) { mutex_destroy(lock); }
+	static status_t Lock(mutex *lock) { return mutex_lock(lock); }
+	static status_t Unlock(mutex *lock) { mutex_unlock(lock); return B_OK; }
 };
 
 
@@ -87,7 +87,7 @@ ProtocolSocket::Open()
 }
 
 
-template<typename LockingBase = BenaphoreLocking,
+template<typename LockingBase = MutexLocking,
 	typename ModuleBundle = NetModuleBundleGetter>
 class DatagramSocket : public ProtocolSocket {
 public:

@@ -30,7 +30,7 @@ typedef struct scsi_periph_device_info {
 	int32 rw10_enabled;		// 10 byte r/w commands supported; access must be atomic
 	int32 next_tag_action;	// queuing flag for next r/w command; access must be atomic
 
-	benaphore mutex;
+	mutex mutex;
 	int std_timeout;
 
 	scsi_periph_callbacks *callbacks;

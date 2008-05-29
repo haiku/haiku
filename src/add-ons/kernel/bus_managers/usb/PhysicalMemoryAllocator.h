@@ -47,7 +47,7 @@ private:
 		size_t						fManagedMemory;
 		status_t					fStatus;
 
-		benaphore					fLock;
+		mutex						fLock;
 		area_id						fArea;
 		void						*fLogicalBase;
 		void						*fPhysicalBase;

@@ -27,7 +27,7 @@ struct net_timer;
 typedef struct ancillary_data_container ancillary_data_container;
 
 struct net_fifo {
-	benaphore	lock;
+	mutex		lock;
 	sem_id		notify;
 	int32		waiting;
 

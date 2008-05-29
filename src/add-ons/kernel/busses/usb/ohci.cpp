@@ -80,10 +80,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	TRACE(("usb_ohci: constructing new OHCI Host Controller Driver\n"));
 	fInitOK = false;
 
-	if (benaphore_init(&fEndpointLock, "ohci endpoint lock") < B_OK) {
-		TRACE_ERROR(("usb_ohci: failed to create endpoint lock\n"));
-		return;
-	}
+	mutex_init(&fEndpointLock, "ohci endpoint lock");
 
 	// enable busmaster and memory mapped access
 	uint16 command = sPCIModule->read_pci_config(fPCIInfo->bus,
@@ -335,7 +332,7 @@ OHCI::~OHCI()
 	wait_for_thread(fFinishThread, &result);
 
 	_LockEndpoints();
-	benaphore_destroy(&fEndpointLock);
+	mutex_destroy(&fEndpointLock);
 
 	if (fHccaArea >= B_OK)
 		delete_area(fHccaArea);
@@ -1718,14 +1715,14 @@ OHCI::_FreeIsochronousDescriptor(ohci_isochronous_td *descriptor)
 bool
 OHCI::_LockEndpoints()
 {
-	return (benaphore_lock(&fEndpointLock) == B_OK);
+	return (mutex_lock(&fEndpointLock) == B_OK);
 }
 
 
 void
 OHCI::_UnlockEndpoints()
 {
-	benaphore_unlock(&fEndpointLock);
+	mutex_unlock(&fEndpointLock);
 }
 
 

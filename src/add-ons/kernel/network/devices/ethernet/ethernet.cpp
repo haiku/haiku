@@ -41,7 +41,7 @@ static const bigtime_t kLinkCheckInterval = 1000000;
 net_buffer_module_info *gBufferModule;
 static net_stack_module_info *sStackModule;
 
-static benaphore sListLock;
+static mutex sListLock;
 static DoublyLinkedList<ethernet_device> sCheckList;
 static sem_id sLinkChangeSemaphore;
 static thread_id sLinkCheckerThread;
@@ -94,7 +94,7 @@ ethernet_link_checker(void *)
 		if (status == B_BAD_SEM_ID)
 			break;
 
-		BenaphoreLocker _(sListLock);
+		MutexLocker _(sListLock);
 
 		if (sCheckList.IsEmpty())
 			break;
@@ -188,7 +188,7 @@ ethernet_up(net_device *_device)
 		ioctl(device->fd, ETHER_SET_LINK_STATE_SEM, &sLinkChangeSemaphore,
 			sizeof(sem_id));
 
-		BenaphoreLocker _(&sListLock);
+		MutexLocker _(&sListLock);
 
 		if (sCheckList.IsEmpty()) {
 			// start thread
@@ -217,7 +217,7 @@ ethernet_down(net_device *_device)
 {
 	ethernet_device *device = (ethernet_device *)_device;
 
-	BenaphoreLocker _(sListLock);
+	MutexLocker _(sListLock);
 
 	// if the device is still part of the list, remove it
 	if (device->GetDoublyLinkedListLink()->next != NULL
@@ -433,12 +433,7 @@ ethernet_std_ops(int32 op, ...)
 				return sLinkChangeSemaphore;
 			}
 
-			status = benaphore_init(&sListLock, "ethernet devices");
-			if (status < B_OK) {
-				put_module(NET_STACK_MODULE_NAME);
-				delete_sem(sLinkChangeSemaphore);
-				return status;
-			}
+			mutex_init(&sListLock, "ethernet devices");
 
 			return B_OK;
 		}
@@ -450,7 +445,7 @@ ethernet_std_ops(int32 op, ...)
 			status_t status;
 			wait_for_thread(sLinkCheckerThread, &status);
 
-			benaphore_destroy(&sListLock);
+			mutex_destroy(&sListLock);
 			put_module(NET_STACK_MODULE_NAME);
 			return B_OK;
 		}

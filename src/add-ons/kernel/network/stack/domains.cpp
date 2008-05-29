@@ -32,7 +32,7 @@
 #	define TRACE(x) ;
 #endif
 
-static benaphore sDomainLock;
+static mutex sDomainLock;
 static list sDomains;
 
 
@@ -66,7 +66,7 @@ lookup_domain(int family)
 net_domain *
 get_domain(int family)
 {
-	BenaphoreLocker locker(sDomainLock);
+	MutexLocker locker(sDomainLock);
 	return lookup_domain(family);
 }
 
@@ -74,7 +74,7 @@ get_domain(int family)
 uint32
 count_domain_interfaces()
 {
-	BenaphoreLocker locker(sDomainLock);
+	MutexLocker locker(sDomainLock);
 
 	net_domain_private *domain = NULL;
 	uint32 count = 0;
@@ -107,7 +107,7 @@ count_domain_interfaces()
 status_t
 list_domain_interfaces(void *_buffer, size_t *bufferSize)
 {
-	BenaphoreLocker locker(sDomainLock);
+	MutexLocker locker(sDomainLock);
 
 	UserBuffer buffer(_buffer, *bufferSize);
 	net_domain_private *domain = NULL;
@@ -117,7 +117,7 @@ list_domain_interfaces(void *_buffer, size_t *bufferSize)
 		if (domain == NULL)
 			break;
 
-		BenaphoreLocker locker(domain->lock);
+		MutexLocker locker(domain->lock);
 
 		net_interface *interface = NULL;
 		while (true) {
@@ -163,7 +163,7 @@ add_interface_to_domain(net_domain *_domain,
 	if (deviceInterface == NULL)
 		return ENODEV;
 
-	BenaphoreLocker locker(domain->lock);
+	MutexLocker locker(domain->lock);
 
 	net_interface_private *interface = NULL;
 	status_t status;
@@ -214,7 +214,7 @@ domain_interface_control(net_domain_private *domain, int32 option,
 		// lock before the domain lock. This order MUST NOT ever
 		// be reversed under the penalty of deadlock.
 		RecursiveLocker _1(device->rx_lock);
-		BenaphoreLocker _2(domain->lock);
+		MutexLocker _2(domain->lock);
 
 		net_interface *interface = find_interface(domain, name);
 		if (interface != NULL) {
@@ -280,7 +280,7 @@ domain_interface_went_down(net_interface *interface)
 void
 domain_removed_device_interface(net_device_interface *interface)
 {
-	BenaphoreLocker locker(sDomainLock);
+	MutexLocker locker(sDomainLock);
 
 	net_domain_private *domain = NULL;
 	while (true) {
@@ -288,7 +288,7 @@ domain_removed_device_interface(net_device_interface *interface)
 		if (domain == NULL)
 			break;
 
-		BenaphoreLocker locker(domain->lock);
+		MutexLocker locker(domain->lock);
 
 		net_interface_private *priv = find_interface(domain,
 			interface->device->name);
@@ -307,7 +307,7 @@ register_domain(int family, const char *name,
 	net_domain **_domain)
 {
 	TRACE(("register_domain(%d, %s)\n", family, name));
-	BenaphoreLocker locker(sDomainLock);
+	MutexLocker locker(sDomainLock);
 
 	struct net_domain_private *domain = lookup_domain(family);
 	if (domain != NULL)
@@ -317,11 +317,7 @@ register_domain(int family, const char *name,
 	if (domain == NULL)
 		return B_NO_MEMORY;
 
-	status_t status = benaphore_init(&domain->lock, name);
-	if (status < B_OK) {
-		delete domain;
-		return status;
-	}
+	mutex_init_etc(&domain->lock, name, MUTEX_FLAG_CLONE_NAME);
 
 	domain->family = family;
 	domain->name = name;
@@ -343,7 +339,7 @@ unregister_domain(net_domain *_domain)
 	TRACE(("unregister_domain(%p, %d, %s)\n", _domain, _domain->family, _domain->name));
 
 	net_domain_private *domain = (net_domain_private *)_domain;
-	BenaphoreLocker locker(sDomainLock);
+	MutexLocker locker(sDomainLock);
 
 	list_remove_item(&sDomains, domain);
 	
@@ -356,7 +352,7 @@ unregister_domain(net_domain *_domain)
 		delete_interface(interface);
 	}
 
-	benaphore_destroy(&domain->lock);
+	mutex_destroy(&domain->lock);
 	delete domain;
 	return B_OK;
 }
@@ -365,8 +361,7 @@ unregister_domain(net_domain *_domain)
 status_t
 init_domains()
 {
-	if (benaphore_init(&sDomainLock, "net domains") < B_OK)
-		return B_ERROR;
+	mutex_init(&sDomainLock, "net domains");
 
 	list_init_etc(&sDomains, offsetof(struct net_domain_private, link));
 	return B_OK;
@@ -376,7 +371,7 @@ init_domains()
 status_t
 uninit_domains()
 {
-	benaphore_destroy(&sDomainLock);
+	mutex_destroy(&sDomainLock);
 	return B_OK;
 }
 

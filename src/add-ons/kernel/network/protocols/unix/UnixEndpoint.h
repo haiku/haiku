@@ -52,12 +52,12 @@ public:
 
 	bool Lock()
 	{
-		return benaphore_lock(&fLock) == B_OK;
+		return mutex_lock(&fLock) == B_OK;
 	}
 
 	void Unlock()
 	{
-		benaphore_unlock(&fLock);
+		mutex_unlock(&fLock);
 	}
 
 	status_t Bind(const struct sockaddr *_address);
@@ -110,7 +110,7 @@ private:
 	void _StopListening();
 
 private:
-	benaphore						fLock;
+	mutex							fLock;
 	UnixAddress						fAddress;
 	::HashTableLink<UnixEndpoint>	fAddressHashLink;
 	UnixEndpoint*					fPeerEndpoint;

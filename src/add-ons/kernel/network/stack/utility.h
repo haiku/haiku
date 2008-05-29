@@ -36,7 +36,7 @@ public:
 
 	status_t Enqueue(net_buffer *buffer);
 	status_t EnqueueAndNotify(net_buffer *_buffer, net_socket *socket, uint8 event);
-	status_t Wait(benaphore *lock, bigtime_t timeout);
+	status_t Wait(mutex *lock, bigtime_t timeout);
 	net_buffer *Dequeue(bool clone);
 	status_t Clear();
 

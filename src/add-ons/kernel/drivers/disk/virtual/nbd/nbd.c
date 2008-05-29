@@ -45,11 +45,11 @@
 #define _IMPEXP_KERNEL
 #endif
 #include "lock.h"
-#define benaphore lock
-#define benaphore_init new_lock
-#define benaphore_destroy free_lock
-#define benaphore_lock LOCK
-#define benaphore_unlock UNLOCK
+#define mutex lock
+#define mutex_init new_lock
+#define mutex_destroy free_lock
+#define mutex_lock LOCK
+#define mutex_unlock UNLOCK
 #endif
 
 #define DEBUG 1
@@ -91,7 +91,7 @@ struct nbd_device {
 	bool valid;
 	bool readonly;
 	struct sockaddr_in server;
-	benaphore ben;
+	mutex ben;
 	vint32 refcnt;
 	uint64 req; /* next ID for requests */
 	int sock;
@@ -181,7 +181,7 @@ status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **re
 		return err;
 	
 	//LOCK
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if (err)
 		return err;
 
@@ -190,7 +190,7 @@ status_t nbd_alloc_request(struct nbd_device *dev, struct nbd_request_entry **re
 	
 	
 	//UNLOCK
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 	
 	err = ENOMEM;
 	r = malloc(sizeof(struct nbd_request_entry) + (w ? 0 : len));
@@ -298,7 +298,7 @@ int32 nbd_postoffice(void *arg)
 		
 		reason = "lock";
 		//LOCK
-		err = benaphore_lock(&dev->ben);
+		err = mutex_lock(&dev->ben);
 		if (err)
 			goto err;
 		
@@ -306,7 +306,7 @@ int32 nbd_postoffice(void *arg)
 		err = nbd_dequeue_request(dev, B_BENDIAN_TO_HOST_INT64(reply.handle), &req);
 		
 		//UNLOCK
-		benaphore_unlock(&dev->ben);
+		mutex_unlock(&dev->ben);
 		
 		if (!err && !req) {
 			dprintf(DP "nbd_dequeue_rquest found NULL!\n");
@@ -331,7 +331,7 @@ int32 nbd_postoffice(void *arg)
 			
 			reason = "lock";
 			//LOCK
-			err = benaphore_lock(&dev->ben);
+			err = mutex_lock(&dev->ben);
 			if (err)
 				goto err;
 			
@@ -342,7 +342,7 @@ int32 nbd_postoffice(void *arg)
 				nbd_free_request(dev, req);
 			
 			//UNLOCK
-			benaphore_unlock(&dev->ben);
+			mutex_unlock(&dev->ben);
 		}
 		
 	}
@@ -471,7 +471,7 @@ status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
 		goto err0;
 	memset(*cookie, 0, sizeof(cookie_t));
 	(*cookie)->dev = dev;
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if (err)
 		goto err1;
 	/*  */
@@ -484,7 +484,7 @@ status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
 	kfd = dev->kludge;
 	dev->kludge = -1;
 #endif
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 	
 #ifdef MOUNT_KLUDGE
 	if (refcnt == 0) {
@@ -499,7 +499,7 @@ status_t nbd_open(const char *name, uint32 flags, cookie_t **cookie) {
 	return B_OK;
 	
 err2:
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 err1:
 	free(*cookie);
 err0:
@@ -515,7 +515,7 @@ status_t nbd_close(cookie_t *cookie) {
 #endif
 	PRINT((DP ">%s(%d)\n", __FUNCTION__, WHICH(cookie->dev)));
 	
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if (err)
 		return err;
 	
@@ -525,7 +525,7 @@ status_t nbd_close(cookie_t *cookie) {
 	dev->kludge = -1;
 #endif
 	
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 
 #ifdef MOUNT_KLUDGE
 	if (kfd > -1) {
@@ -540,7 +540,7 @@ status_t nbd_free(cookie_t *cookie) {
 	status_t err;
 	PRINT((DP ">%s(%d)\n", __FUNCTION__, WHICH(cookie->dev)));
 	
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if (err)
 		return err;
 	
@@ -548,7 +548,7 @@ status_t nbd_free(cookie_t *cookie) {
 		err = nbd_teardown(dev);
 	}
 	
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 	
 	free(cookie);
 	return err;
@@ -625,14 +625,14 @@ status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes
 		goto err0;
 	
 	//LOCK
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if (err)
 		goto err1;
 	
 	err = nbd_post_request(dev, req);
 	
 	//UNLOCK
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 
 	if (err)
 		goto err2;
@@ -641,7 +641,7 @@ status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes
 	semerr = acquire_sem(req->sem);
 	
 	//LOCK
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if(err)
 		goto err3;
 	
@@ -652,7 +652,7 @@ status_t nbd_read(cookie_t *cookie, off_t position, void *data, size_t *numbytes
 		nbd_free_request(dev, req);
 	
 	//UNLOCK
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 
 	if (semerr == B_OK) {
 		*numbytes = req->len;
@@ -696,7 +696,7 @@ status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *n
 		goto err0;
 	
 	//LOCK
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if (err)
 		goto err1;
 	
@@ -704,7 +704,7 @@ status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *n
 	err = nbd_post_request(dev, req);
 	
 	//UNLOCK
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 
 	if (err)
 		goto err2;
@@ -713,7 +713,7 @@ status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *n
 	semerr = acquire_sem(req->sem);
 	
 	//LOCK
-	err = benaphore_lock(&dev->ben);
+	err = mutex_lock(&dev->ben);
 	if(err)
 		goto err3;
 	
@@ -724,7 +724,7 @@ status_t nbd_write(cookie_t *cookie, off_t position, const void *data, size_t *n
 		nbd_free_request(dev, req);
 	
 	//UNLOCK
-	benaphore_unlock(&dev->ben);
+	mutex_unlock(&dev->ben);
 
 	if (semerr == B_OK) {
 		*numbytes = req->len;
@@ -801,9 +801,7 @@ init_driver (void)
 	for (i = 0; i < MAX_NBDS; i++) {
 		nbd_devices[i].valid = false;
 		nbd_devices[i].readonly = false;
-		err = benaphore_init(&nbd_devices[i].ben, "nbd lock");
-		if (err < B_OK)
-			return err; // XXX
+		mutex_init(&nbd_devices[i].ben, "nbd lock");
 		nbd_devices[i].refcnt = 0;
 		nbd_devices[i].req = 0LL; /* next ID for requests */
 		nbd_devices[i].sock = -1;
@@ -859,7 +857,7 @@ uninit_driver (void)
 	PRINT((DP ">%s()\n", __FUNCTION__));
 	for (i = 0; i < MAX_NBDS; i++) {
 		free(nbd_name[i]);
-		benaphore_destroy(&nbd_devices[i].ben);
+		mutex_destroy(&nbd_devices[i].ben);
 	}
 	err = ksocket_cleanup();
 	/* HACK */

@@ -44,7 +44,7 @@ struct net_socket_private : net_socket {
 	struct list				connected_children;
 
 	struct select_sync_pool	*select_pool;
-	benaphore				lock;
+	mutex					lock;
 };
 
 
@@ -56,7 +56,7 @@ int socket_setsockopt(net_socket *socket, int level, int option,
 
 
 struct list sSocketList;
-benaphore sSocketLock;
+mutex sSocketLock;
 
 
 static size_t
@@ -103,9 +103,7 @@ create_socket(int family, int type, int protocol, net_socket_private **_socket)
 	socket->type = type;
 	socket->protocol = protocol;
 
-	status_t status = benaphore_init(&socket->lock, "socket");
-	if (status < B_OK)
-		goto err1;
+	mutex_init(&socket->lock, "socket");
 
 	// set defaults (may be overridden by the protocols)
 	socket->send.buffer_size = 65535;
@@ -120,7 +118,7 @@ create_socket(int family, int type, int protocol, net_socket_private **_socket)
 	list_init_etc(&socket->connected_children, offsetof(net_socket_private,
 		link));
 
-	status = get_domain_protocols(socket);
+	status_t status = get_domain_protocols(socket);
 	if (status < B_OK)
 		goto err2;
 
@@ -128,8 +126,7 @@ create_socket(int family, int type, int protocol, net_socket_private **_socket)
 	return B_OK;
 
 err2:
-	benaphore_destroy(&socket->lock);
-err1:
+	mutex_destroy(&socket->lock);
 	delete socket;
 	return status;
 }
@@ -247,9 +244,9 @@ socket_open(int family, int type, int protocol, net_socket **_socket)
 
 	socket->owner = team_get_current_team_id();
 
-	benaphore_lock(&sSocketLock);
+	mutex_lock(&sSocketLock);
 	list_add_item(&sSocketList, socket);
-	benaphore_unlock(&sSocketLock);
+	mutex_unlock(&sSocketLock);
 
 	*_socket = socket;
 	return B_OK;
@@ -413,7 +410,7 @@ socket_receive_data(net_socket *socket, size_t length, uint32 flags,
 status_t
 socket_get_next_stat(uint32 *_cookie, int family, struct net_stat *stat)
 {
-	BenaphoreLocker locker(sSocketLock);
+	MutexLocker locker(sSocketLock);
 
 	net_socket_private *socket = NULL;
 	uint32 cookie = *_cookie;
@@ -460,7 +457,7 @@ socket_spawn_pending(net_socket *_parent, net_socket **_socket)
 {
 	net_socket_private *parent = (net_socket_private *)_parent;
 
-	BenaphoreLocker locker(parent->lock);
+	MutexLocker locker(parent->lock);
 
 	// We actually accept more pending connections to compensate for those
 	// that never complete, and also make sure at least a single connection
@@ -501,16 +498,16 @@ socket_delete(net_socket *_socket)
 	if (socket->parent != NULL)
 		panic("socket still has a parent!");
 
-	benaphore_lock(&sSocketLock);
+	mutex_lock(&sSocketLock);
 	list_remove_item(&sSocketList, socket);
-	benaphore_unlock(&sSocketLock);
+	mutex_unlock(&sSocketLock);
 
 	// also delete all children of this socket
 	delete_children(&socket->pending_children);
 	delete_children(&socket->connected_children);
 
 	put_domain_protocols(socket);
-	benaphore_destroy(&socket->lock);
+	mutex_destroy(&socket->lock);
 	delete socket;
 }
 
@@ -520,7 +517,7 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 {
 	net_socket_private *parent = (net_socket_private *)_parent;
 
-	benaphore_lock(&parent->lock);
+	mutex_lock(&parent->lock);
 
 	net_socket_private *socket = (net_socket_private *)list_remove_head_item(
 		&parent->connected_children);
@@ -530,14 +527,14 @@ socket_dequeue_connected(net_socket *_parent, net_socket **_socket)
 		*_socket = socket;
 	}
 
-	benaphore_unlock(&parent->lock);
+	mutex_unlock(&parent->lock);
 
 	if (socket == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	benaphore_lock(&sSocketLock);
+	mutex_lock(&sSocketLock);
 	list_add_item(&sSocketList, socket);
-	benaphore_unlock(&sSocketLock);
+	mutex_unlock(&sSocketLock);
 
 	return B_OK;
 }
@@ -548,7 +545,7 @@ socket_count_connected(net_socket *_parent)
 {
 	net_socket_private *parent = (net_socket_private *)_parent;
 
-	BenaphoreLocker _(parent->lock);
+	MutexLocker _(parent->lock);
 
 	ssize_t count = 0;
 	void *item = NULL;
@@ -570,7 +567,7 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 	if (backlog > 256)
 		backlog = 256;
 
-	benaphore_lock(&socket->lock);
+	mutex_lock(&socket->lock);
 
 	// first remove the pending connections, then the already connected
 	// ones as needed	
@@ -590,7 +587,7 @@ socket_set_max_backlog(net_socket *_socket, uint32 backlog)
 	}
 
 	socket->max_backlog = backlog;
-	benaphore_unlock(&socket->lock);
+	mutex_unlock(&socket->lock);
 	return B_OK;
 }
 
@@ -606,7 +603,7 @@ socket_connected(net_socket *socket)
 	if (parent == NULL)
 		return B_BAD_VALUE;
 
-	benaphore_lock(&parent->lock);
+	mutex_lock(&parent->lock);
 
 	list_remove_item(&parent->pending_children, socket);
 	list_add_item(&parent->connected_children, socket);
@@ -615,7 +612,7 @@ socket_connected(net_socket *socket)
 	if (parent->select_pool)
 		notify_select_event_pool(parent->select_pool, B_SELECT_READ);
 
-	benaphore_unlock(&parent->lock);
+	mutex_unlock(&parent->lock);
 	return B_OK;
 }
 
@@ -628,12 +625,12 @@ socket_request_notification(net_socket *_socket, uint8 event, selectsync *sync)
 {
 	net_socket_private *socket = (net_socket_private *)_socket;
 
-	benaphore_lock(&socket->lock);
+	mutex_lock(&socket->lock);
 
 	status_t status = add_select_sync_pool_entry(&socket->select_pool, sync,
 		event);
 
-	benaphore_unlock(&socket->lock);
+	mutex_unlock(&socket->lock);
 
 	if (status < B_OK)
 		return status;
@@ -672,12 +669,12 @@ socket_cancel_notification(net_socket *_socket, uint8 event, selectsync *sync)
 {
 	net_socket_private *socket = (net_socket_private *)_socket;
 
-	benaphore_lock(&socket->lock);
+	mutex_lock(&socket->lock);
 
 	status_t status = remove_select_sync_pool_entry(&socket->select_pool,
 		sync, event);
 
-	benaphore_unlock(&socket->lock);
+	mutex_unlock(&socket->lock);
 	return status;
 }
 
@@ -706,12 +703,12 @@ socket_notify(net_socket *_socket, uint8 event, int32 value)
 			break;
 	}
 
-	benaphore_lock(&socket->lock);
+	mutex_lock(&socket->lock);
 
 	if (notify && socket->select_pool)
 		notify_select_event_pool(socket->select_pool, event);
 
-	benaphore_unlock(&socket->lock);
+	mutex_unlock(&socket->lock);
 	return B_OK;
 }
 
@@ -1421,11 +1418,12 @@ socket_std_ops(int32 op, ...)
 			//module_info *module;
 			//return get_module(NET_STARTER_MODULE_NAME, &module);
 			list_init_etc(&sSocketList, offsetof(net_socket_private, link));
-			return benaphore_init(&sSocketLock, "socket list");
+			mutex_init(&sSocketLock, "socket list");
+			return B_OK;
 		}
 		case B_MODULE_UNINIT:
 			//return put_module(NET_STARTER_MODULE_NAME);
-			benaphore_destroy(&sSocketLock);
+			mutex_destroy(&sSocketLock);
 			return B_OK;
 
 		default:

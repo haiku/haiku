@@ -34,7 +34,7 @@ typedef struct disk_device_s {
 	usb_device	device;
 	bool		removed;
 	uint32		open_count;
-	benaphore	lock;
+	mutex		lock;
 	void *		link;
 
 	// device state

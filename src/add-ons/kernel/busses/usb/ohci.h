@@ -152,7 +152,7 @@ static	pci_module_info				*sPCIModule;
 		ohci_endpoint_descriptor	**fInterruptEndpoints;
 
 		// Endpoint management
-		benaphore					fEndpointLock;
+		mutex						fEndpointLock;
 		ohci_endpoint_descriptor	*fDummyControl;
 		ohci_endpoint_descriptor	*fDummyBulk;
 		ohci_endpoint_descriptor	*fDummyIsochronous;

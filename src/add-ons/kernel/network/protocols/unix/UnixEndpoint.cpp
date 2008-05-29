@@ -51,7 +51,7 @@ UnixEndpoint::UnixEndpoint(net_socket* socket)
 {
 	TRACE("[%ld] %p->UnixEndpoint::UnixEndpoint()\n", find_thread(NULL), this);
 
-	fLock.sem = -1;
+	mutex_init(&fLock, "unix endpoint");
 }
 
 
@@ -59,8 +59,7 @@ UnixEndpoint::~UnixEndpoint()
 {
 	TRACE("[%ld] %p->UnixEndpoint::~UnixEndpoint()\n", find_thread(NULL), this);
 
-	if (fLock.sem >= 0)
-		benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
@@ -68,10 +67,6 @@ status_t
 UnixEndpoint::Init()
 {
 	TRACE("[%ld] %p->UnixEndpoint::Init()\n", find_thread(NULL), this);
-
-	status_t error = benaphore_init(&fLock, "unix endpoint");
-	if (error != B_OK)
-		RETURN_ERROR(ENOBUFS);
 
 	RETURN_ERROR(B_OK);
 }

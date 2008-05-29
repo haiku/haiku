@@ -30,14 +30,14 @@ enum {
 #endif
 
 
-typedef struct benaphore {
+typedef struct mutex {
 	sem_id	sem;
 	int32	count;
-} benaphore;
+} mutex;
 
 
 inline status_t
-benaphore_init(benaphore *ben, const char *name)
+mutex_init(mutex *ben, const char *name)
 {
 	if (ben == NULL || name == NULL)
 		return B_BAD_VALUE;
@@ -52,7 +52,7 @@ benaphore_init(benaphore *ben, const char *name)
 
 
 inline void
-benaphore_destroy(benaphore *ben)
+mutex_destroy(mutex *ben)
 {
 	delete_sem(ben->sem);
 	ben->sem = -1;
@@ -60,7 +60,7 @@ benaphore_destroy(benaphore *ben)
 
 
 inline status_t
-benaphore_lock(benaphore *ben)
+mutex_lock(mutex *ben)
 {
 	if (atomic_add(&ben->count, -1) <= 0)
 		return acquire_sem(ben->sem);
@@ -69,7 +69,7 @@ benaphore_lock(benaphore *ben)
 
 
 inline status_t
-benaphore_unlock(benaphore *ben)
+mutex_unlock(mutex *ben)
 {
 	if (atomic_add(&ben->count, 1) < 0)
 		return release_sem(ben->sem);

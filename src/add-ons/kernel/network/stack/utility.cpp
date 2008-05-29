@@ -19,7 +19,7 @@
 
 
 static struct list sTimers;
-static benaphore sTimerLock;
+static mutex sTimerLock;
 static sem_id sTimerWaitSem;
 static thread_id sTimerThread;
 static bigtime_t sTimerTimeout;
@@ -207,13 +207,13 @@ Fifo::EnqueueAndNotify(net_buffer *_buffer, net_socket *socket, uint8 event)
 
 
 status_t
-Fifo::Wait(benaphore *lock, bigtime_t timeout)
+Fifo::Wait(mutex *lock, bigtime_t timeout)
 {
 	waiting++;
-	benaphore_unlock(lock);
+	mutex_unlock(lock);
 	status_t status = acquire_sem_etc(notify, 1,
 		B_CAN_INTERRUPT | B_ABSOLUTE_TIMEOUT, timeout);
-	benaphore_lock(lock);
+	mutex_lock(lock);
 	return status;
 }
 
@@ -258,13 +258,11 @@ Fifo::WakeAll()
 status_t
 init_fifo(net_fifo *fifo, const char *name, size_t maxBytes)
 {
-	status_t status = benaphore_init(&fifo->lock, name);
-	if (status < B_OK)
-		return status;
+	mutex_init_etc(&fifo->lock, name, MUTEX_FLAG_CLONE_NAME);
 
-	status = base_fifo_init(fifo, name, maxBytes);
+	status_t status = base_fifo_init(fifo, name, maxBytes);
 	if (status < B_OK)
-		benaphore_destroy(&fifo->lock);
+		mutex_destroy(&fifo->lock);
 
 	return status;
 }
@@ -275,7 +273,7 @@ uninit_fifo(net_fifo *fifo)
 {
 	clear_fifo(fifo);
 
-	benaphore_destroy(&fifo->lock);
+	mutex_destroy(&fifo->lock);
 	delete_sem(fifo->notify);
 }
 
@@ -283,7 +281,7 @@ uninit_fifo(net_fifo *fifo)
 status_t
 fifo_enqueue_buffer(net_fifo *fifo, net_buffer *buffer)
 {
-	BenaphoreLocker locker(fifo->lock);
+	MutexLocker locker(fifo->lock);
 	return base_fifo_enqueue_buffer(fifo, buffer);
 }
 
@@ -302,7 +300,7 @@ ssize_t
 fifo_dequeue_buffer(net_fifo *fifo, uint32 flags, bigtime_t timeout,
 	net_buffer **_buffer)
 {
-	BenaphoreLocker locker(fifo->lock);
+	MutexLocker locker(fifo->lock);
 	bool dontWait = (flags & MSG_DONTWAIT) != 0 || timeout == 0;
 	status_t status;
 
@@ -356,7 +354,7 @@ fifo_dequeue_buffer(net_fifo *fifo, uint32 flags, bigtime_t timeout,
 status_t
 clear_fifo(net_fifo *fifo)
 {
-	BenaphoreLocker locker(fifo->lock);
+	MutexLocker locker(fifo->lock);
 	return base_fifo_clear(fifo);
 }
 
@@ -369,7 +367,7 @@ fifo_socket_enqueue_buffer(net_fifo *fifo, net_socket *socket, uint8 event,
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	BenaphoreLocker locker(fifo->lock);
+	MutexLocker locker(fifo->lock);
 
 	status_t status = base_fifo_enqueue_buffer(fifo, buffer);
 	if (status < B_OK)
@@ -394,7 +392,7 @@ timer_thread(void * /*data*/)
 
 		if (status == B_TIMED_OUT || status == B_OK) {
 			// scan timers for new timeout and/or execute a timer
-			if (benaphore_lock(&sTimerLock) < B_OK)
+			if (mutex_lock(&sTimerLock) < B_OK)
 				return B_OK;
 
 			struct net_timer *timer = NULL;
@@ -408,9 +406,9 @@ timer_thread(void * /*data*/)
 					list_remove_item(&sTimers, timer);
 					timer->due = -1;
 
-					benaphore_unlock(&sTimerLock);
+					mutex_unlock(&sTimerLock);
 					timer->hook(timer, timer->data);
-					benaphore_lock(&sTimerLock);
+					mutex_lock(&sTimerLock);
 
 					timer = NULL;
 						// restart scanning as we unlocked the list
@@ -422,7 +420,7 @@ timer_thread(void * /*data*/)
 			}
 
 			sTimerTimeout = timeout;
-			benaphore_unlock(&sTimerLock);
+			mutex_unlock(&sTimerLock);
 		}
 
 		status = acquire_sem_etc(sTimerWaitSem, 1, B_ABSOLUTE_TIMEOUT, timeout);
@@ -462,7 +460,7 @@ init_timer(net_timer *timer, net_timer_func hook, void *data)
 void
 set_timer(net_timer *timer, bigtime_t delay)
 {
-	BenaphoreLocker locker(sTimerLock);
+	MutexLocker locker(sTimerLock);
 
 	if (timer->due > 0 && delay < 0) {
 		// this timer is scheduled, cancel it
@@ -487,7 +485,7 @@ set_timer(net_timer *timer, bigtime_t delay)
 bool
 cancel_timer(struct net_timer *timer)
 {
-	BenaphoreLocker locker(sTimerLock);
+	MutexLocker locker(sTimerLock);
 
 	if (timer->due <= 0)
 		return false;
@@ -531,9 +529,8 @@ init_timers(void)
 	list_init(&sTimers);
 	sTimerTimeout = B_INFINITE_TIMEOUT;
 
-	status_t status = benaphore_init(&sTimerLock, "net timer");
-	if (status < B_OK)
-		return status;
+	status_t status = B_OK;
+	mutex_init(&sTimerLock, "net timer");
 
 	sTimerWaitSem = create_sem(0, "net timer wait");
 	if (sTimerWaitSem < B_OK) {
@@ -554,7 +551,7 @@ init_timers(void)
 	return resume_thread(sTimerThread);
 
 err1:
-	benaphore_destroy(&sTimerLock);
+	mutex_destroy(&sTimerLock);
 err2:
 	delete_sem(sTimerWaitSem);
 	return status;
@@ -564,7 +561,7 @@ err2:
 void
 uninit_timers(void)
 {
-	benaphore_destroy(&sTimerLock);
+	mutex_destroy(&sTimerLock);
 	delete_sem(sTimerWaitSem);
 
 	status_t status;

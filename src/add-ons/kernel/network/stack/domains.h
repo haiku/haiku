@@ -22,7 +22,7 @@ struct net_device_interface;
 struct net_domain_private : net_domain {
 	struct list_link	link;
 
-	benaphore			lock;
+	mutex				lock;
 
 	RouteList			routes;
 	RouteInfoList		route_infos;

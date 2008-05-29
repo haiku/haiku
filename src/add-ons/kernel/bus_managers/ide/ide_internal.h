@@ -176,7 +176,7 @@ struct ide_bus_info {
 
 	ide_bus_state state;		// current state of bus
 
-	benaphore status_report_ben; // to lock when you report XPT about bus state
+	mutex status_report_ben; 	// to lock when you report XPT about bus state
 								// i.e. during requeue, resubmit or finished
 
 	bool disconnected;			// true, if controller is lost

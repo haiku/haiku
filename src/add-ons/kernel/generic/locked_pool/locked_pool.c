@@ -48,7 +48,7 @@
 
 // info about pool
 typedef struct locked_pool {
-	benaphore mutex;			// to be used whenever some variable of the first
+	struct mutex mutex;			// to be used whenever some variable of the first
 								// block of this structure is read or modified
 	int free_blocks;			// # free blocks
 	int num_waiting;			// # waiting allocations
@@ -83,8 +83,8 @@ typedef struct chunk_header {
 
 // global list of pools
 static locked_pool *sLockedPools;
-// benaphore to protect sLockedPools
-static benaphore sLockedPoolsLock;
+// mutex to protect sLockedPools
+static mutex sLockedPoolsLock;
 // true, if thread should shut down
 static bool sShuttingDown;
 // background thread to enlarge pools
@@ -167,7 +167,7 @@ enlarge_pool(locked_pool *pool, int numBlocks)
 	}
 
 	// add new blocks to pool
-	benaphore_lock(&pool->mutex);
+	mutex_lock(&pool->mutex);
 
 	// see remarks about initialising list within chunk
 	*NEXT_PTR(pool, lastBlock) = pool->free_list;
@@ -185,7 +185,7 @@ enlarge_pool(locked_pool *pool, int numBlocks)
 	numWaiting = min_c(pool->num_waiting, numBlocks);
 	pool->num_waiting -= numWaiting;
 
-	benaphore_unlock(&pool->mutex);
+	mutex_unlock(&pool->mutex);
 
 	// release threads that wait for empty blocks
 	release_sem_etc(pool->sem, numWaiting, 0);
@@ -208,7 +208,7 @@ enlarger_thread(void *arg)
 
 		// protect traversing of global list and
 		// block destroy_pool() to not clean up a pool we are enlarging
-		benaphore_lock(&sLockedPoolsLock);
+		mutex_lock(&sLockedPoolsLock);
 
 		for (pool = sLockedPools; pool; pool = pool->next) {
 			int num_free;
@@ -216,9 +216,9 @@ enlarger_thread(void *arg)
 			// this mutex is probably not necessary (at least on 80x86)
 			// but I'm not sure about atomicity of other architectures
 			// (anyway - this routine is not performance critical)
-			benaphore_lock(&pool->mutex);
+			mutex_lock(&pool->mutex);
 			num_free = pool->free_blocks;
-			benaphore_unlock(&pool->mutex);
+			mutex_unlock(&pool->mutex);
 
 			// perhaps blocks got freed meanwhile, i.e. pool is large enough
 			if (num_free > pool->min_free_blocks)
@@ -233,7 +233,7 @@ enlarger_thread(void *arg)
 			}
 		}
 
-		benaphore_unlock(&sLockedPoolsLock);
+		mutex_unlock(&sLockedPoolsLock);
 	}
 
 	return 0;
@@ -272,12 +272,12 @@ free_chunks(locked_pool *pool)
 static status_t
 init_locked_pool(void)
 {
-	status_t status = benaphore_init(&sLockedPoolsLock,
-		"locked_pool_global_list");
-	if (status < B_OK)
-		goto err;
+	status_t status;
 
-	status = sEnlargerSemaphore = create_sem(0, "locked_pool_enlarger");
+	mutex_init(&sLockedPoolsLock, "locked_pool_global_list");
+
+	status = sEnlargerSemaphore = create_sem(0,
+		"locked_pool_enlarger");
 	if (status < B_OK)
 		goto err2;
 
@@ -295,8 +295,7 @@ init_locked_pool(void)
 err3:
 	delete_sem(sEnlargerSemaphore);
 err2:
-	benaphore_destroy(&sLockedPoolsLock);
-err:
+	mutex_destroy(&sLockedPoolsLock);
 	return status;
 }
 
@@ -312,7 +311,7 @@ uninit_locked_pool(void)
 	wait_for_thread(sEnlargerThread, NULL);
 
 	delete_sem(sEnlargerSemaphore);
-	benaphore_destroy(&sLockedPoolsLock);
+	mutex_destroy(&sLockedPoolsLock);
 
 	return B_OK;
 }
@@ -329,7 +328,7 @@ pool_alloc(locked_pool *pool)
 
 	TRACE(("pool_alloc()\n"));
 
-	benaphore_lock(&pool->mutex);
+	mutex_lock(&pool->mutex);
 
 	--pool->free_blocks;
 
@@ -344,7 +343,7 @@ pool_alloc(locked_pool *pool)
 
 		TRACE(("new free_list=%p\n", pool->free_list));
 
-		benaphore_unlock(&pool->mutex);
+		mutex_unlock(&pool->mutex);
 		return block;
 	}
 
@@ -361,21 +360,21 @@ pool_alloc(locked_pool *pool)
 
 	TRACE(("%d waiting allocs\n", pool->num_waiting));
 
-	benaphore_unlock(&pool->mutex);
+	mutex_unlock(&pool->mutex);
 
 	// awake background thread
 	release_sem_etc(sEnlargerSemaphore, 1, B_DO_NOT_RESCHEDULE);
 	// make samphore up-to-date and wait until a block is available
 	acquire_sem(pool->sem);
 
-	benaphore_lock(&pool->mutex);
+	mutex_lock(&pool->mutex);
 
 	TRACE(("continuing alloc (%d free blocks)\n", pool->free_blocks));
 
 	block = pool->free_list;
 	pool->free_list = *NEXT_PTR(pool, block);
 
-	benaphore_unlock(&pool->mutex);
+	mutex_unlock(&pool->mutex);
 	return block;
 }
 
@@ -385,7 +384,7 @@ pool_free(locked_pool *pool, void *block)
 {
 	TRACE(("pool_free()\n"));
 
-	benaphore_lock(&pool->mutex);
+	mutex_lock(&pool->mutex);
 
 	// add to free list
 	*NEXT_PTR(pool, block) = pool->free_list;
@@ -398,7 +397,7 @@ pool_free(locked_pool *pool, void *block)
 
 	if (pool->num_waiting == 0) {
 		// if no one is waiting, this is it
-		benaphore_unlock(&pool->mutex);
+		mutex_unlock(&pool->mutex);
 		return;
 	}
 
@@ -407,7 +406,7 @@ pool_free(locked_pool *pool, void *block)
 	TRACE(("%d waiting allocs\n", pool->num_waiting));
 	pool->num_waiting--;
 
-	benaphore_unlock(&pool->mutex);
+	mutex_unlock(&pool->mutex);
 
 	// now it is up-to-date and waiting allocations can be continued
 	release_sem(pool->sem);
@@ -433,8 +432,7 @@ create_pool(int block_size, int alignment, int next_ofs,
 
 	memset(pool, sizeof(*pool), 0);
 
-	if ((status = benaphore_init(&pool->mutex, "locked_pool")) < 0)
-		goto err;
+	mutex_init(&pool->mutex, "locked_pool");
 
 	if ((status = pool->sem = create_sem(0, "locked_pool")) < 0)
 		goto err1;
@@ -480,9 +478,9 @@ create_pool(int block_size, int alignment, int next_ofs,
 	}
 
 	// add to global list, so enlarger thread takes care of pool
-	benaphore_lock(&sLockedPoolsLock);
+	mutex_lock(&sLockedPoolsLock);
 	ADD_DL_LIST_HEAD(pool, sLockedPools, );
-	benaphore_unlock(&sLockedPoolsLock);
+	mutex_unlock(&sLockedPoolsLock);
 
 	return pool;
 
@@ -491,8 +489,7 @@ err4:
 err3:
 	delete_sem(pool->sem);
 err1:
-	benaphore_destroy(&pool->mutex);
-err:
+	mutex_destroy(&pool->mutex);
 	free(pool);
 	return NULL;
 }
@@ -505,16 +502,16 @@ destroy_pool(locked_pool *pool)
 
 	// first, remove from global list, so enlarger thread
 	// won't touch this pool anymore
-	benaphore_lock(&sLockedPoolsLock);
+	mutex_lock(&sLockedPoolsLock);
 	REMOVE_DL_LIST(pool, sLockedPools, );
-	benaphore_unlock(&sLockedPoolsLock);
+	mutex_unlock(&sLockedPoolsLock);
 
 	// then cleanup pool
 	free_chunks(pool);
 
 	free(pool->name);
 	delete_sem(pool->sem);
-	benaphore_destroy(&pool->mutex);
+	mutex_destroy(&pool->mutex);
 
 	free(pool);
 }

@@ -191,7 +191,7 @@ private:
 
 	typedef OpenHashTable<UdpHashDefinition, false> EndpointTable;
 
-	benaphore		fLock;
+	mutex			fLock;
 	net_domain		*fDomain;
 	uint16			fLastUsedEphemeral;
 	EndpointTable	fActiveEndpoints;
@@ -226,7 +226,7 @@ public:
 private:
 	UdpDomainSupport *_GetDomain(net_domain *domain, bool create);
 
-	benaphore		fLock;
+	mutex			fLock;
 	status_t		fStatus;
 	UdpDomainList	fDomains;
 };
@@ -248,7 +248,7 @@ UdpDomainSupport::UdpDomainSupport(net_domain *domain)
 	fActiveEndpoints(domain->address_module, kNumHashBuckets),
 	fEndpointCount(0)
 {
-	benaphore_init(&fLock, "udp domain");
+	mutex_init(&fLock, "udp domain");
 
 	fLastUsedEphemeral = kFirst + rand() % (kLast - kFirst);
 }
@@ -256,16 +256,13 @@ UdpDomainSupport::UdpDomainSupport(net_domain *domain)
 
 UdpDomainSupport::~UdpDomainSupport()
 {
-	benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
 status_t
 UdpDomainSupport::InitCheck() const
 {
-	if (fLock.sem < B_OK)
-		return fLock.sem;
-
 	return fActiveEndpoints.InitCheck();
 }
 
@@ -275,7 +272,7 @@ UdpDomainSupport::DemuxIncomingBuffer(net_buffer *buffer)
 {
 	// NOTE multicast is delivered directly to the endpoint
 
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (buffer->flags & MSG_BCAST)
 		return _DemuxBroadcast(buffer);
@@ -290,7 +287,7 @@ status_t
 UdpDomainSupport::BindEndpoint(UdpEndpoint *endpoint,
 	const sockaddr *address)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (endpoint->IsActive())
 		return EINVAL;
@@ -303,7 +300,7 @@ status_t
 UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 	const sockaddr *address)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (endpoint->IsActive()) {
 		fActiveEndpoints.Remove(endpoint);
@@ -329,7 +326,7 @@ UdpDomainSupport::ConnectEndpoint(UdpEndpoint *endpoint,
 status_t
 UdpDomainSupport::UnbindEndpoint(UdpEndpoint *endpoint)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (endpoint->IsActive())
 		fActiveEndpoints.Remove(endpoint);
@@ -587,13 +584,14 @@ UdpDomainSupport::_EndpointWithPort(uint16 port) const
 
 UdpEndpointManager::UdpEndpointManager()
 {
-	fStatus = benaphore_init(&fLock, "UDP endpoints");
+	mutex_init(&fLock, "UDP endpoints");
+	fStatus = B_OK;
 }
 
 
 UdpEndpointManager::~UdpEndpointManager()
 {
-	benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
@@ -633,7 +631,7 @@ UdpEndpointManager::ReceiveData(net_buffer *buffer)
 	UdpDomainSupport *domainSupport = NULL;
 
 	{
-		BenaphoreLocker _(fLock);
+		MutexLocker _(fLock);
 		domainSupport = _GetDomain(domain, false);
 		// TODO we don't want to hold to the manager's lock
 		//      during the whole RX path, we may not hold an
@@ -720,7 +718,7 @@ UdpEndpointManager::Deframe(net_buffer *buffer)
 UdpDomainSupport *
 UdpEndpointManager::OpenEndpoint(UdpEndpoint *endpoint)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	UdpDomainSupport *domain = _GetDomain(endpoint->Domain(), true);
 	if (domain)
@@ -732,7 +730,7 @@ UdpEndpointManager::OpenEndpoint(UdpEndpoint *endpoint)
 status_t
 UdpEndpointManager::FreeEndpoint(UdpDomainSupport *domain)
 {
-	BenaphoreLocker _(fLock);
+	MutexLocker _(fLock);
 
 	if (domain->Put()) {
 		fDomains.Remove(domain);

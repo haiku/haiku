@@ -348,17 +348,17 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (user_memcpy(&cookie, buffer, sizeof(uint32)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			benaphore_lock(&gNodeLock);
+			mutex_lock(&gNodeLock);
 			node = device_manager_find_device(gRootNode, cookie);
 			if (!node) {
-				benaphore_unlock(&gNodeLock);
+				mutex_unlock(&gNodeLock);
 				return B_BAD_VALUE;
 			}
 
 			child = (device_node_info *)list_get_next_item(&node->children, NULL);
 			if (child)
 				cookie = child->internal_id;
-			benaphore_unlock(&gNodeLock);
+			mutex_unlock(&gNodeLock);
 
 			if (!child)
 				return B_ENTRY_NOT_FOUND;
@@ -383,16 +383,16 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (user_memcpy(&cookie, buffer, sizeof(uint32)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			benaphore_lock(&gNodeLock);
+			mutex_lock(&gNodeLock);
 			node = device_manager_find_device(gRootNode, cookie);
 			if (!node) {
-				benaphore_unlock(&gNodeLock);
+				mutex_unlock(&gNodeLock);
 				return B_BAD_VALUE;
 			}
 			child = (device_node_info *)list_get_next_item(&node->parent->children, node);
 			if (child)
 				cookie = child->internal_id;
-			benaphore_unlock(&gNodeLock);
+			mutex_unlock(&gNodeLock);
 
 			if (!child)
 				return B_ENTRY_NOT_FOUND;
@@ -416,10 +416,10 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			if (user_memcpy(&attr, buffer, sizeof(struct dev_attr)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			benaphore_lock(&gNodeLock);
+			mutex_lock(&gNodeLock);
 			node = device_manager_find_device(gRootNode, attr.node_cookie);
 			if (!node) {
-				benaphore_unlock(&gNodeLock);
+				mutex_unlock(&gNodeLock);
 				return B_BAD_VALUE;
 			}
 			for (attr_info = node->attributes; attr.cookie > i && attr_info != NULL; attr_info = attr_info->next) {
@@ -427,7 +427,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 			}
 
 			if (!attr_info) {
-				benaphore_unlock(&gNodeLock);
+				mutex_unlock(&gNodeLock);
 				return B_ENTRY_NOT_FOUND;
 			}
 
@@ -454,7 +454,7 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 					break;*/
 			}
 
-			benaphore_unlock(&gNodeLock);
+			mutex_unlock(&gNodeLock);
 
 			// copy back to user space
 			return user_memcpy(buffer, &attr, sizeof(struct dev_attr));
