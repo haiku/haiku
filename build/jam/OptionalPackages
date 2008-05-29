@@ -235,8 +235,8 @@ if [ IsOptionalHaikuImagePackageAdded Links ] {
 if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 	if $(TARGET_ARCH) != x86 {
 		Echo "No optional package OpenSound available for $(TARGET_ARCH)" ;
-	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
-		Echo "No optional package OpenSound available for gcc4" ;
+#	} else if $(HAIKU_GCC_VERSION[1]) >= 4 && $(isHybridBuild) = 0 {
+#		Echo "No optional package OpenSound available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage OpenSound
 			: http://revolf.free.fr/beos/oss-beos-v4.1test-bin.zip
