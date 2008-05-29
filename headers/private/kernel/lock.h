@@ -43,16 +43,20 @@ typedef struct benaphore {
 	int32	count;
 } benaphore;
 
-// Note: this is currently a trivial r/w lock implementation
-//	it will be replaced with something better later - this
-//	or a similar API will be made publically available at this point.
+
+struct rw_lock_waiter;
+
 typedef struct rw_lock {
-	sem_id		sem;
-	int32		count;
-	benaphore	writeLock;
+	const char*				name;
+	struct rw_lock_waiter*	waiters;
+	thread_id				holder;
+	int32					reader_count;
+	int32					writer_count;
+	uint32					flags;
 } rw_lock;
 
-#define RW_MAX_READERS 1000000
+#define RW_LOCK_FLAG_CLONE_NAME	0x1
+
 
 #if 0 && KDEBUG // XXX disable this for now, it causes problems when including thread.h here
 #	include <thread.h>
@@ -108,16 +112,18 @@ benaphore_unlock(benaphore *ben)
 #endif
 }
 
-extern status_t rw_lock_init(rw_lock *lock, const char *name);
-extern void rw_lock_destroy(rw_lock *lock);
-extern status_t rw_lock_read_lock(rw_lock *lock);
-extern status_t rw_lock_read_unlock(rw_lock *lock);
-extern status_t rw_lock_write_lock(rw_lock *lock);
-extern status_t rw_lock_write_unlock(rw_lock *lock);
+extern void rw_lock_init(rw_lock* lock, const char* name);
+	// name is *not* cloned nor freed in rw_lock_destroy()
+extern void rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags);
+extern void rw_lock_destroy(rw_lock* lock);
+extern status_t rw_lock_read_lock(rw_lock* lock);
+extern status_t rw_lock_read_unlock(rw_lock* lock);
+extern status_t rw_lock_write_lock(rw_lock* lock);
+extern status_t rw_lock_write_unlock(rw_lock* lock);
 
-extern void mutex_init(mutex* lock, const char *name);
+extern void mutex_init(mutex* lock, const char* name);
 	// name is *not* cloned nor freed in mutex_destroy()
-extern void mutex_init_etc(mutex* lock, const char *name, uint32 flags);
+extern void mutex_init_etc(mutex* lock, const char* name, uint32 flags);
 extern void mutex_destroy(mutex* lock);
 
 // implementation private:

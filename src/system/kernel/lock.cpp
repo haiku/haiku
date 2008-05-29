@@ -29,8 +29,17 @@ struct mutex_waiter {
 	mutex_waiter*	last;		// last in queue (valid for the first in queue)
 };
 
+struct rw_lock_waiter {
+	struct thread*	thread;
+	rw_lock_waiter*	next;		// next in queue
+	rw_lock_waiter*	last;		// last in queue (valid for the first in queue)
+	bool			writer;
+};
+
 #define MUTEX_FLAG_OWNS_NAME	MUTEX_FLAG_CLONE_NAME
 #define MUTEX_FLAG_RELEASED		0x2
+
+#define RW_LOCK_FLAG_OWNS_NAME	RW_LOCK_FLAG_CLONE_NAME
 
 
 #ifdef KDEBUG
@@ -147,58 +156,195 @@ benaphore_destroy(benaphore *ben)
 //	#pragma mark -
 
 
-status_t
-rw_lock_init(rw_lock *lock, const char *name)
+static status_t
+rw_lock_wait(rw_lock* lock, bool writer)
 {
-	if (lock == NULL)
-		return B_BAD_VALUE;
+	// enqueue in waiter list
+	rw_lock_waiter waiter;
+	waiter.thread = thread_get_current_thread();
+	waiter.next = NULL;
+	waiter.writer = writer;
 
-	if (name == NULL)
-		name = "r/w lock";
+	if (lock->waiters != NULL)
+		lock->waiters->last->next = &waiter;
+	else
+		lock->waiters = &waiter;
 
-	lock->sem = create_sem(RW_MAX_READERS, name);
-	if (lock->sem >= B_OK)
-		return B_OK;
+	lock->waiters->last = &waiter;
 
-	return lock->sem;
+	// block
+	thread_prepare_to_block(waiter.thread, 0, THREAD_BLOCK_TYPE_MUTEX, lock);
+	return thread_block_locked(waiter.thread);
+}
+
+
+static void
+rw_lock_unblock(rw_lock* lock)
+{
+	// Check whether there any waiting threads at all and whether anyone
+	// has the write lock.
+	rw_lock_waiter* waiter = lock->waiters;
+	if (waiter == NULL || lock->holder > 0)
+		return;
+
+	// writer at head of queue?
+	if (waiter->writer) {
+		if (lock->reader_count == 0) {
+			// dequeue writer
+			lock->waiters = waiter->next;
+			if (lock->waiters != NULL)
+				lock->waiters->last = waiter->last;
+
+			lock->holder = waiter->thread->id;
+	
+			// unblock thread
+			thread_unblock_locked(waiter->thread, B_OK);
+		}
+		return;
+	}
+
+	// wake up one or more readers
+	while ((waiter = lock->waiters) != NULL && !waiter->writer) {
+		// dequeue reader
+		lock->waiters = waiter->next;
+		if (lock->waiters != NULL)
+			lock->waiters->last = waiter->last;
+
+		lock->reader_count++;
+
+		// unblock thread
+		thread_unblock_locked(waiter->thread, B_OK);
+	}
 }
 
 
 void
-rw_lock_destroy(rw_lock *lock)
+rw_lock_init(rw_lock* lock, const char* name)
 {
-	if (lock == NULL)
-		return;
+	lock->name = name;
+	lock->waiters = NULL;
+	lock->holder = -1;
+	lock->reader_count = 0;
+	lock->writer_count = 0;
+	lock->flags = 0;
+}
 
-	delete_sem(lock->sem);
+
+void
+rw_lock_init_etc(rw_lock* lock, const char* name, uint32 flags)
+{
+	lock->name = (flags & RW_LOCK_FLAG_CLONE_NAME) != 0 ? strdup(name) : name;
+	lock->waiters = NULL;
+	lock->holder = -1;
+	lock->reader_count = 0;
+	lock->writer_count = 0;
+	lock->flags = flags & RW_LOCK_FLAG_CLONE_NAME;
+}
+
+
+void
+rw_lock_destroy(rw_lock* lock)
+{
+	char* name = (lock->flags & RW_LOCK_FLAG_CLONE_NAME) != 0
+		? (char*)lock->name : NULL;
+
+	// unblock all waiters
+	InterruptsSpinLocker locker(thread_spinlock);
+
+#ifdef KDEBUG
+	if (lock->waiters != NULL && thread_get_current_thread_id()
+		!= lock->holder) {
+		panic("rw_lock_destroy(): there are blocking threads, but the caller "
+			"doesn't hold the write lock (%p)", lock);
+
+		locker.Unlock();
+		if (rw_lock_write_lock(lock) != B_OK)
+			return;
+		locker.Lock();
+	}
+#endif
+
+	while (rw_lock_waiter* waiter = lock->waiters) {
+		// dequeue
+		lock->waiters = waiter->next;
+
+		// unblock thread
+		thread_unblock_locked(waiter->thread, B_ERROR);
+	}
+
+	lock->name = NULL;
+
+	locker.Unlock();
+
+	free(name);
 }
 
 
 status_t
-rw_lock_read_lock(rw_lock *lock)
+rw_lock_read_lock(rw_lock* lock)
 {
-	return acquire_sem(lock->sem);
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	if (lock->writer_count == 0) {
+		lock->reader_count++;
+		return B_OK;
+	}
+
+	return rw_lock_wait(lock, false);
 }
 
 
 status_t
-rw_lock_read_unlock(rw_lock *lock)
+rw_lock_read_unlock(rw_lock* lock)
 {
-	return release_sem_etc(lock->sem, 1, 0/*B_DO_NOT_RESCHEDULE*/);
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	if (lock->reader_count <= 0) {
+		panic("rw_lock_read_unlock(): lock %p not read-locked", lock);
+		return B_BAD_VALUE;
+	}
+
+	lock->reader_count--;
+
+	rw_lock_unblock(lock);
+
+	return B_OK;
 }
 
 
 status_t
-rw_lock_write_lock(rw_lock *lock)
+rw_lock_write_lock(rw_lock* lock)
 {
-	return acquire_sem_etc(lock->sem, RW_MAX_READERS, 0, 0);
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	if (lock->reader_count == 0 && lock->writer_count == 0) {
+		lock->writer_count++;
+		lock->holder = thread_get_current_thread_id();
+		return B_OK;
+	}
+
+	lock->writer_count++;
+	return rw_lock_wait(lock, true);
 }
 
 
 status_t
-rw_lock_write_unlock(rw_lock *lock)
+rw_lock_write_unlock(rw_lock* lock)
 {
-	return release_sem_etc(lock->sem, RW_MAX_READERS, 0);
+	InterruptsSpinLocker locker(thread_spinlock);
+
+	if (thread_get_current_thread_id() != lock->holder) {
+		panic("rw_lock_write_unlock(): lock %p not write-locked by this thread",
+			lock);
+		return B_BAD_VALUE;
+	}
+
+	lock->writer_count--;
+	lock->holder = -1;
+
+	rw_lock_unblock(lock);
+
+	return B_OK;
 }
 
 
