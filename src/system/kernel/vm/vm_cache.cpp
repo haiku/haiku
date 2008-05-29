@@ -18,6 +18,7 @@
 #include <kernel.h>
 #include <lock.h>
 #include <smp.h>
+#include <tracing.h>
 #include <util/khash.h>
 #include <util/AutoLock.h>
 #include <vm.h>
@@ -47,6 +48,198 @@ struct page_lookup_key {
 	uint32	offset;
 	vm_cache* cache;
 };
+
+
+#if VM_CACHE_TRACING
+
+namespace VMCacheTracing {
+
+class VMCacheTraceEntry : public AbstractTraceEntry {
+	public:
+		VMCacheTraceEntry(vm_cache* cache)
+			:
+			fCache(cache)
+		{
+		}
+
+	protected:
+		vm_cache*	fCache;
+};
+
+
+class Create : public VMCacheTraceEntry {
+	public:
+		Create(vm_cache* cache, vm_store* store)
+			:
+			VMCacheTraceEntry(cache),
+			fStore(store)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache create: store: %p -> cache: %p", fStore,
+				fCache);
+		}
+
+	private:
+		vm_store*	fStore;
+};
+
+
+class Delete : public VMCacheTraceEntry {
+	public:
+		Delete(vm_cache* cache)
+			:
+			VMCacheTraceEntry(cache)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache delete: cache: %p", fCache);
+		}
+};
+
+
+class SetMinimalCommitment : public VMCacheTraceEntry {
+	public:
+		SetMinimalCommitment(vm_cache* cache, off_t commitment)
+			:
+			VMCacheTraceEntry(cache),
+			fOldCommitment(cache->store->committed_size),
+			fCommitment(commitment)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache set min commitment: cache: %p, "
+				"commitment: %lld -> %lld", fCache, fOldCommitment,
+				fCommitment);
+		}
+
+	private:
+		off_t	fOldCommitment;
+		off_t	fCommitment;
+};
+
+
+class Resize : public VMCacheTraceEntry {
+	public:
+		Resize(vm_cache* cache, off_t size)
+			:
+			VMCacheTraceEntry(cache),
+			fOldSize(cache->virtual_size),
+			fSize(size)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache resize: cache: %p, size: %lld -> %lld", fCache,
+				fOldSize, fSize);
+		}
+
+	private:
+		off_t	fOldSize;
+		off_t	fSize;
+};
+
+
+class AddConsumer : public VMCacheTraceEntry {
+	public:
+		AddConsumer(vm_cache* cache, vm_cache* consumer)
+			:
+			VMCacheTraceEntry(cache),
+			fConsumer(consumer)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache add consumer: cache: %p, consumer: %p", fCache,
+				fConsumer);
+		}
+
+	private:
+		vm_cache*	fConsumer;
+};
+
+
+class RemoveConsumer : public VMCacheTraceEntry {
+	public:
+		RemoveConsumer(vm_cache* cache, vm_cache* consumer)
+			:
+			VMCacheTraceEntry(cache),
+			fConsumer(consumer)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache remove consumer: cache: %p, consumer: %p",
+				fCache, fConsumer);
+		}
+
+	private:
+		vm_cache*	fConsumer;
+};
+
+
+class InsertArea : public VMCacheTraceEntry {
+	public:
+		InsertArea(vm_cache* cache, vm_area* area)
+			:
+			VMCacheTraceEntry(cache),
+			fArea(area)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache insert area: cache: %p, area: %p", fCache,
+				fArea);
+		}
+
+	private:
+		vm_area*	fArea;
+};
+
+
+class RemoveArea : public VMCacheTraceEntry {
+	public:
+		RemoveArea(vm_cache* cache, vm_area* area)
+			:
+			VMCacheTraceEntry(cache),
+			fArea(area)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache remove area: cache: %p, area: %p", fCache,
+				fArea);
+		}
+
+	private:
+		vm_area*	fArea;
+};
+
+}	// namespace VMCacheTracing
+
+#	define T(x) new(std::nothrow) VMCacheTracing::x;
+#else
+#	define T(x) ;
+#endif
 
 
 static int
@@ -107,6 +300,8 @@ delete_cache(vm_cache* cache)
 		panic("cache %p to be deleted still has areas", cache);
 	if (!list_is_empty(&cache->consumers))
 		panic("cache %p to be deleted still has consumers", cache);
+
+	T(Delete(cache));
 
 #if DEBUG_CACHE_LIST
 	int state = disable_interrupts();
@@ -225,6 +420,8 @@ vm_cache_create(vm_store* store)
 	// connect the store to its cache
 	cache->store = store;
 	store->cache = cache;
+
+	T(Create(cache, store));
 
 	return cache;
 }
@@ -440,6 +637,8 @@ vm_cache_set_minimal_commitment_locked(vm_cache* cache, off_t commitment)
 		cache, commitment));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
+	T(SetMinimalCommitment(cache, commitment));
+
 	vm_store* store = cache->store;
 	status_t status = B_OK;
 
@@ -472,6 +671,8 @@ vm_cache_resize(vm_cache* cache, off_t newSize)
 	TRACE(("vm_cache_resize(cache %p, newSize %Ld) old size %Ld\n",
 		cache, newSize, cache->virtual_size));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
+
+	T(Resize(cache, newSize));
 
 	status_t status = cache->store->ops->commit(cache->store, newSize);
 	if (status != B_OK)
@@ -535,6 +736,8 @@ vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 {
 	TRACE(("remove consumer vm cache %p from cache %p\n", consumer, cache));
 	ASSERT_LOCKED_MUTEX(&consumer->lock);
+
+	T(RemoveConsumer(cache, consumer));
 
 	// Remove the store ref before locking the cache. Otherwise we'd call into
 	// the VFS while holding the cache lock, which would reverse the usual
@@ -679,6 +882,8 @@ vm_cache_add_consumer_locked(vm_cache* cache, vm_cache* consumer)
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 	ASSERT_LOCKED_MUTEX(&consumer->lock);
 
+	T(AddConsumer(cache, consumer));
+
 	consumer->source = cache;
 	list_add_item(&cache->consumers, consumer);
 
@@ -698,6 +903,8 @@ vm_cache_insert_area_locked(vm_cache* cache, vm_area* area)
 	TRACE(("vm_cache_insert_area_locked(cache %p, area %p)\n", cache, area));
 	ASSERT_LOCKED_MUTEX(&cache->lock);
 
+	T(InsertArea(cache, area));
+
 	area->cache_next = cache->areas;
 	if (area->cache_next)
 		area->cache_next->cache_prev = area;
@@ -715,6 +922,8 @@ status_t
 vm_cache_remove_area(vm_cache* cache, vm_area* area)
 {
 	TRACE(("vm_cache_remove_area(cache %p, area %p)\n", cache, area));
+
+	T(RemoveArea(cache, area));
 
 	MutexLocker locker(cache->lock);
 
