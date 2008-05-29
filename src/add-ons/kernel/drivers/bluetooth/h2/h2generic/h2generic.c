@@ -609,7 +609,7 @@ device_control(void *cookie, uint32 msg, void *params, size_t size)
 			}
 #else
 			size = (*((size_t*)params));
-			((size_t*)params)++;
+			(*(size_t**)&params)++;
 #endif			
 		   	
 		   	// TODO: Reuse from some TXcompleted queue		    	   		    
