@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2008, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,14 +23,15 @@ namespace BPrivate {
 }
 
 // Port (Message Queue) Capacity
-#define B_LOOPER_PORT_DEFAULT_CAPACITY	100
+#define B_LOOPER_PORT_DEFAULT_CAPACITY	200
 
 
 class BLooper : public BHandler {
 public:
 							BLooper(const char* name = NULL,
 								int32 priority = B_NORMAL_PRIORITY,
-								int32 port_capacity = B_LOOPER_PORT_DEFAULT_CAPACITY);
+								int32 port_capacity
+									= B_LOOPER_PORT_DEFAULT_CAPACITY);
 	virtual					~BLooper();
 
 	// Archiving
@@ -46,8 +47,9 @@ public:
 			status_t		PostMessage(BMessage* message, BHandler* handler,
 								BHandler* replyTo = NULL);
 
-	virtual	void			DispatchMessage(BMessage* message, BHandler* handler);
-	virtual	void			MessageReceived(BMessage* msg);
+	virtual	void			DispatchMessage(BMessage* message,
+								BHandler* handler);
+	virtual	void			MessageReceived(BMessage* message);
 			BMessage*		CurrentMessage() const;
 			BMessage*		DetachCurrentMessage();
 			BMessageQueue*	MessageQueue() const;
