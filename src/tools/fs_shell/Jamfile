@@ -32,6 +32,7 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 BuildPlatformStaticLibrary <build>fs_shell.a :
 	atomic.cpp
 	block_cache.cpp
+	byte_order.cpp
 	command_cp.cpp
 	disk_device_manager.cpp
 	driver_settings.cpp
