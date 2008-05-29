@@ -114,7 +114,7 @@ extern "C" {
 
 extern fssh_status_t fssh_swap_data(fssh_type_code type, void *data,
 	fssh_size_t length, fssh_swap_action action);
-extern bool is_type_swapped(fssh_type_code type);
+extern bool fssh_is_type_swapped(fssh_type_code type);
 
 
 // Private implementations
