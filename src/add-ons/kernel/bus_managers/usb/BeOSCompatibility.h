@@ -51,6 +51,14 @@ mutex_init(mutex *ben, const char *name)
 }
 
 
+#define MUTEX_FLAG_CLONE_NAME 1
+inline status_t
+mutex_init_etc(mutex *ben, const char *name, int32 flags)
+{
+	mutex_init(ben, name);
+}
+
+
 inline void
 mutex_destroy(mutex *ben)
 {
