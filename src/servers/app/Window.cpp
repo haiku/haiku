@@ -1839,7 +1839,12 @@ Window::_SendUpdateMessage()
 		return;
 
 	BMessage message(_UPDATE_);
-	ServerWindow()->SendMessageToClient(&message);
+	if (ServerWindow()->SendMessageToClient(&message) != B_OK) {
+		// If sending the message failed, we'll just keep adding to the dirty
+		// region until sending was successful.
+		// TODO: we might want to automatically resend this message in this case
+		return;
+	}
 
 	fUpdateRequested = true;
 	fEffectiveDrawingRegionValid = false;
