@@ -173,9 +173,6 @@ scheduler_reschedule(void)
 			TRACE(("reschedule(): suspending thread %ld\n", oldThread->id));
 			break;
 		case THREAD_STATE_FREE_ON_RESCHED:
-			// This will hopefully be eliminated once the slab
-			// allocator is done
-			thread_enqueue(oldThread, &dead_q);
 			break;
 		default:
 			TRACE(("not enqueueing thread %ld into run q. next_state = %ld\n", oldThread->id, oldThread->next_state));

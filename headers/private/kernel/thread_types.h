@@ -23,8 +23,6 @@ extern spinlock thread_spinlock;
 #define GRAB_THREAD_LOCK()    acquire_spinlock(&thread_spinlock)
 #define RELEASE_THREAD_LOCK() release_spinlock(&thread_spinlock)
 
-extern struct thread_queue dead_q;
-
 extern spinlock team_spinlock;
 	// NOTE: TEAM lock can be held over a THREAD lock acquisition,
 	// but not the other way (to avoid deadlock)

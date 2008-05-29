@@ -54,15 +54,6 @@
 
 #define THREAD_MAX_MESSAGE_SIZE		65536
 
-// used to pass messages between thread_exit and thread_exit2
-
-struct thread_exit_args {
-	struct thread	*thread;
-	area_id			old_kernel_stack;
-	uint32			death_stack;
-	sem_id			death_sem;
-	team_id			original_team_id;
-};
 
 struct thread_key {
 	thread_id id;
@@ -81,22 +72,27 @@ static thread_id sNextThreadID = 1;
 static int32 sMaxThreads = 4096;
 static int32 sUsedThreads = 0;
 
-// death stacks - used temporarily as a thread cleans itself up
-struct death_stack {
-	area_id	area;
-	addr_t	address;
-	bool	in_use;
+struct UndertakerEntry : DoublyLinkedListLinkImpl<UndertakerEntry> {
+	struct thread*	thread;
+	team_id			teamID;
+	sem_id			deathSem;
+
+	UndertakerEntry(struct thread* thread, team_id teamID, sem_id deathSem)
+		:
+		thread(thread),
+		teamID(teamID),
+		deathSem(deathSem)
+	{
+	}
 };
-static struct death_stack *sDeathStacks;
-static unsigned int sNumDeathStacks;
-static unsigned int volatile sDeathStackBitmap;
-static sem_id sDeathStackSem;
-static spinlock sDeathStackLock = 0;
+
+static DoublyLinkedList<UndertakerEntry> sUndertakerEntries;
+static ConditionVariable sUndertakerCondition;
 
 // The dead queue is used as a pool from which to retrieve and reuse previously
 // allocated thread structs when creating a new thread. It should be gone once
 // the slab allocator is in.
-struct thread_queue dead_q;
+static struct thread_queue dead_q;
 
 static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
@@ -539,143 +535,58 @@ create_thread(thread_creation_attributes& attributes, bool kernel)
 }
 
 
-/*!
-	Finds a free death stack for us and allocates it.
-	Must be called with interrupts enabled.
-*/
-static uint32
-get_death_stack(void)
+static status_t
+undertaker(void* /*args*/)
 {
-	cpu_status state;
-	uint32 bit;
-	int32 i;
+	while (true) {
+		// wait for a thread to bury
+		ConditionVariableEntry conditionEntry;
 
-	acquire_sem(sDeathStackSem);
+		InterruptsSpinLocker locker(thread_spinlock);
+		sUndertakerCondition.Add(&conditionEntry);
+		locker.Unlock();
 
-	// grab the death stack and thread locks, find a free spot and release
+		conditionEntry.Wait();
 
-	state = disable_interrupts();
+		locker.Lock();
+		UndertakerEntry* _entry = sUndertakerEntries.RemoveHead();
+		locker.Unlock();
 
-	acquire_spinlock(&sDeathStackLock);
-	GRAB_THREAD_LOCK();
+		if (_entry == NULL)
+			continue;
 
-	bit = sDeathStackBitmap;
-	bit = (~bit) & ~((~bit) - 1);
-	sDeathStackBitmap |= bit;
+		UndertakerEntry entry = *_entry;
+			// we need a copy, since the original entry is on the thread's stack
 
-	RELEASE_THREAD_LOCK();
-	release_spinlock(&sDeathStackLock);
+		// we've got an entry
+		struct thread* thread = entry.thread;
 
-	restore_interrupts(state);
+		// delete the old kernel stack area
+		delete_area(thread->kernel_stack_area);
 
-	// sanity checks
-	if (!bit)
-		panic("get_death_stack: couldn't find free stack!\n");
+		// remove this thread from all of the global lists
+		disable_interrupts();
+		GRAB_TEAM_LOCK();
 
-	if (bit & (bit - 1))
-		panic("get_death_stack: impossible bitmap result!\n");
+		remove_thread_from_team(team_get_kernel_team(), thread);
 
-	// bit to number
-	for (i = -1; bit; i++) {
-		bit >>= 1;
+		RELEASE_TEAM_LOCK();
+		enable_interrupts();
+			// needed for the debugger notification below
+
+		if (entry.deathSem >= 0)
+			release_sem_etc(entry.deathSem, 1, B_DO_NOT_RESCHEDULE);
+
+		// notify the debugger
+		if (entry.teamID >= 0
+			&& entry.teamID != team_get_kernel_team_id()) {
+			user_debug_thread_deleted(entry.teamID, thread->id);
+		}
+
+		// free the thread structure
+		thread_enqueue(thread, &dead_q);
+			// TODO: Use the slab allocator!
 	}
-
-	TRACE(("get_death_stack: returning %#lx\n", sDeathStacks[i].address));
-
-	return (uint32)i;
-}
-
-
-/*!	Returns the thread's death stack to the pool.
-	Interrupts must be disabled and the sDeathStackLock be held.
-*/
-static void
-put_death_stack(uint32 index)
-{
-	TRACE(("put_death_stack...: passed %lu\n", index));
-
-	if (index >= sNumDeathStacks)
-		panic("put_death_stack: passed invalid stack index %ld\n", index);
-
-	if (!(sDeathStackBitmap & (1 << index)))
-		panic("put_death_stack: passed invalid stack index %ld\n", index);
-
-	GRAB_THREAD_LOCK();
-	sDeathStackBitmap &= ~(1 << index);
-	RELEASE_THREAD_LOCK();
-
-	release_sem_etc(sDeathStackSem, 1, B_DO_NOT_RESCHEDULE);
-		// we must not hold the thread lock when releasing a semaphore
-}
-
-
-static void
-thread_exit2(void *_args)
-{
-	struct thread_exit_args args;
-
-	// copy the arguments over, since the source is probably on the kernel
-	// stack we're about to delete
-	memcpy(&args, _args, sizeof(struct thread_exit_args));
-
-	// we can't let the interrupts disabled at this point
-	enable_interrupts();
-
-	TRACE(("thread_exit2, running on death stack %#lx\n", args.death_stack));
-
-	// delete the old kernel stack area
-	TRACE(("thread_exit2: deleting old kernel stack id %ld for thread %ld\n",
-		args.old_kernel_stack, args.thread->id));
-
-	delete_area(args.old_kernel_stack);
-
-	// remove this thread from all of the global lists
-	TRACE(("thread_exit2: removing thread %ld from global lists\n",
-		args.thread->id));
-
-	disable_interrupts();
-	GRAB_TEAM_LOCK();
-
-	remove_thread_from_team(team_get_kernel_team(), args.thread);
-
-	RELEASE_TEAM_LOCK();
-	enable_interrupts();
-		// needed for the debugger notification below
-
-	TRACE(("thread_exit2: done removing thread from lists\n"));
-
-	if (args.death_sem >= 0)
-		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);
-
-	// notify the debugger
-	if (args.original_team_id >= 0
-		&& args.original_team_id != team_get_kernel_team_id()) {
-		user_debug_thread_deleted(args.original_team_id, args.thread->id);
-	}
-
-	disable_interrupts();
-
-	// Set the next state to be gone: this will cause the thread structure
-	// to be returned to a ready pool upon reschedule.
-	// Note, we need to have disabled interrupts at this point, or else
-	// we could get rescheduled too early.
-	args.thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
-
-	// return the death stack and reschedule one last time
-
-	// Note that we need to hold sDeathStackLock until we've got the thread
-	// lock. Otherwise someone else might grab our stack in the meantime.
-	acquire_spinlock(&sDeathStackLock);
-	put_death_stack(args.death_stack);
-
-	GRAB_THREAD_LOCK();
-	release_spinlock(&sDeathStackLock);
-
-	scheduler_reschedule();
-		// requires thread lock to be held
-
-	// never get to here
-	panic("thread_exit2: made it where it shouldn't have!\n");
 }
 
 
@@ -1591,28 +1502,17 @@ thread_exit(void)
 		delete_sem(cachedExitSem);
 	}
 
-	{
-		struct thread_exit_args args;
+	// enqueue in the undertaker list and reschedule for the last time
+	UndertakerEntry undertakerEntry(thread, teamID, cachedDeathSem);
 
-		args.thread = thread;
-		args.old_kernel_stack = thread->kernel_stack_area;
-		args.death_stack = get_death_stack();
-		args.death_sem = cachedDeathSem;
-		args.original_team_id = teamID;
+	disable_interrupts();
+	GRAB_THREAD_LOCK();
 
+	sUndertakerEntries.Add(&undertakerEntry);
+	sUndertakerCondition.NotifyOne(true);
 
-		disable_interrupts();
-
-		// set the new kernel stack officially to the death stack, it won't be
-		// switched until the next function is called. This must be done now
-		// before a context switch, or we'll stay on the old stack
-		thread->kernel_stack_area = sDeathStacks[args.death_stack].area;
-		thread->kernel_stack_base = sDeathStacks[args.death_stack].address;
-
-		// we will continue in thread_exit2(), on the new stack
-		arch_thread_switch_kstack_and_call(thread, thread->kernel_stack_base
-			 + KERNEL_STACK_SIZE, thread_exit2, &args);
-	}
+	thread->next_state = THREAD_STATE_FREE_ON_RESCHED;
+	scheduler_reschedule();
 
 	panic("never can get here\n");
 }
@@ -2108,37 +2008,15 @@ thread_init(kernel_args *args)
 	}
 	sUsedThreads = args->num_cpus;
 
-	// create a set of death stacks
+	// start the undertaker thread
+	new(&sUndertakerEntries) DoublyLinkedList<UndertakerEntry>();
+	sUndertakerCondition.Init(&sUndertakerEntries, "undertaker entries");
 
-	sNumDeathStacks = smp_get_num_cpus();
-	if (sNumDeathStacks > 8 * sizeof(sDeathStackBitmap)) {
-		// clamp values for really beefy machines
-		sNumDeathStacks = 8 * sizeof(sDeathStackBitmap);
-	}
-	sDeathStackBitmap = 0;
-	sDeathStacks = (struct death_stack *)malloc(sNumDeathStacks
-		* sizeof(struct death_stack));
-	if (sDeathStacks == NULL) {
-		panic("error creating death stacks\n");
-		return B_NO_MEMORY;
-	}
-	{
-		char temp[64];
-
-		for (i = 0; i < sNumDeathStacks; i++) {
-			sprintf(temp, "death stack %lu", i);
-			sDeathStacks[i].area = create_area(temp,
-				(void **)&sDeathStacks[i].address, B_ANY_KERNEL_ADDRESS,
-				KERNEL_STACK_SIZE, B_FULL_LOCK,
-				B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_STACK_AREA);
-			if (sDeathStacks[i].area < 0) {
-				panic("error creating death stacks\n");
-				return sDeathStacks[i].area;
-			}
-			sDeathStacks[i].in_use = false;
-		}
-	}
-	sDeathStackSem = create_sem(sNumDeathStacks, "death stack availability");
+	thread_id undertakerThread = spawn_kernel_thread(&undertaker, "undertaker",
+		B_DISPLAY_PRIORITY, NULL);
+	if (undertakerThread < 0)
+		panic("Failed to create undertaker thread!");
+	resume_thread(undertakerThread);
 
 	// set up some debugger commands
 	add_debugger_command_etc("threads", &dump_thread_list, "List all threads",
