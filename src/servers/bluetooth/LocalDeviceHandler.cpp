@@ -123,7 +123,7 @@ bail:
 
 
 BMessage*
-LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode = 0)
+LocalDeviceHandler::FindPetition(uint16 event, uint16 opcode)
 {
     int16 eventFound;
     int16 opcodeFound;
