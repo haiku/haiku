@@ -183,7 +183,7 @@ class Action : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("cache %p, %s transaction %p (id %ld)%s"
+			out.Print("block cache %p, %s transaction %p (id %ld)%s"
 				", %ld/%ld blocks", fCache, fLabel, fTransaction, fID,
 				fSub ? " sub" : "", fNumBlocks, fSubNumBlocks);
 		}
@@ -215,7 +215,7 @@ class Detach : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("cache %p, detach transaction %p (id %ld)"
+			out.Print("block cache %p, detach transaction %p (id %ld)"
 				"from transaction %p (id %ld)%s",
 				fCache, fNewTransaction, fNewID, fTransaction, fID,
 				fSub ? " sub" : "");
@@ -256,7 +256,7 @@ class Abort : public AbstractTraceEntry {
 
 		virtual void AddDump(TraceOutput& out)
 		{
-			out.Print("cache %p, abort transaction "
+			out.Print("block cache %p, abort transaction "
 				"%p (id %ld), blocks", fCache, fTransaction, fID);
 			for (int32 i = 0; i < fNumBlocks && !out.IsFull(); i++)
 				out.Print(" %Ld", fBlocks[i]);
