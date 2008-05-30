@@ -383,7 +383,7 @@ delete_cache(vm_cache* cache)
 static bool
 is_cache_mergeable(vm_cache* cache)
 {
-	return (cache->areas == NULL && cache->source != NULL
+	return (cache->areas == NULL && cache->temporary
 		&& !list_is_empty(&cache->consumers)
 		&& cache->consumers.link.next == cache->consumers.link.prev);
 }
@@ -488,20 +488,23 @@ merge_cache_with_only_consumer(vm_cache* cache)
 		}
 	}
 
-	vm_cache* newSource = cache->source;
+	// The remaining consumer has got a new source.
+	if (cache->source != NULL) {
+		vm_cache* newSource = cache->source;
 
-	// The remaining consumer has got a new source
-	mutex_lock(&newSource->lock);
+		mutex_lock(&newSource->lock);
 
-	list_remove_item(&newSource->consumers, cache);
-	list_add_item(&newSource->consumers, consumer);
-	consumer->source = newSource;
-	cache->source = NULL;
+		list_remove_item(&newSource->consumers, cache);
+		list_add_item(&newSource->consumers, consumer);
+		consumer->source = newSource;
+		cache->source = NULL;
 
-	mutex_unlock(&newSource->lock);
+		mutex_unlock(&newSource->lock);
+	} else
+		consumer->source = NULL;
 
 	// Release the reference the cache's consumer owned. The consumer takes
-	// over the cache's ref to its source instead.
+	// over the cache's ref to its source (if any) instead.
 if (cache->ref_count < 2)
 panic("cacheRef %p ref count too low!\n", cache);
 	vm_cache_release_ref(cache);
