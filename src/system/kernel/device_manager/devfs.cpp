@@ -255,8 +255,9 @@ devfs_delete_vnode(struct devfs* fs, struct devfs_vnode* vnode,
 			put_vnode(fs->volume,
 				vnode->stream.u.dev.partition->raw_device->id);
 		} else {
+#if 0
 			delete vnode->stream.u.dev.scheduler;
-			delete vnode->stream.u.dev.device;
+#endif
 		}
 	}
 
