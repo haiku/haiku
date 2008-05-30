@@ -4678,7 +4678,9 @@ BPoseView::MetaMimeChanged(const char *type, const char *preferredApp)
 	IconCache::sIconCache->IconChanged(type, preferredApp);
 	// wait for other windows to do the same before we start
 	// updating poses which causes icon recaching
-	snooze(200000);
+	// TODO: this is a design problem that should be solved differently
+	snooze(10000);
+	Window()->UpdateIfNeeded();
 
 	EachPoseAndResolvedModel(fPoseList, &OneMetaMimeChanged, this, type);
 }
