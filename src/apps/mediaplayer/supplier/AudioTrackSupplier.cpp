@@ -5,15 +5,16 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#include "AudioSupplier.h"
+#include "AudioTrackSupplier.h"
 
 
-AudioSupplier::AudioSupplier()
+AudioTrackSupplier::AudioTrackSupplier()
+	: AudioReader()
 {
 }
 
 
-AudioSupplier::~AudioSupplier()
+AudioTrackSupplier::~AudioTrackSupplier()
 {
 }
 

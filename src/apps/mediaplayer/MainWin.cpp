@@ -150,8 +150,7 @@ MainWin::MainWin()
 	// video view
 	rect = BRect(0, fMenuBarHeight, fBackground->Bounds().right,
 		fMenuBarHeight + 10);
-	fVideoView = new VideoView(rect, "video display", B_FOLLOW_NONE,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
+	fVideoView = new VideoView(rect, "video display", B_FOLLOW_NONE);
 	fBackground->AddChild(fVideoView);
 	
 	// controls
@@ -171,7 +170,6 @@ MainWin::MainWin()
 	fPlaylist->AddListener(fPlaylistObserver);
 	fController->SetVideoView(fVideoView);
 	fController->AddListener(fControllerObserver);
-	fVideoView->IsOverlaySupported();
 	
 //	printf("fMenuBarHeight %d\n", fMenuBarHeight);
 //	printf("fControlsHeight %d\n", fControlsHeight);
@@ -224,8 +222,13 @@ MainWin::~MainWin()
 	}
 
 	delete fPlaylist;
-	delete fController;
 	delete fFilePanel;
+
+	// quit the Controller looper thread
+	thread_id controllerThread = fController->Thread();
+	fController->PostMessage(B_QUIT_REQUESTED);
+	status_t exitValue;
+	wait_for_thread(controllerThread, &exitValue);
 }
 
 
@@ -1237,10 +1240,7 @@ MainWin::_KeyDown(BMessage *msg)
 	
 	switch (raw_char) {
 		case B_SPACE:
-			if (fController->IsPaused() || fController->IsStopped())
-				fController->Play();
-			else
-				fController->Pause();
+			fController->TogglePlaying();
 			return B_OK;
 
 		case B_ESCAPE:

@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "EventQueue.h"
+
 
 MainApp *gMainApp;
 const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
@@ -221,8 +223,13 @@ MainApp::_BroadcastMessage(const BMessage& _message)
 int 
 main()
 {
+	EventQueue::CreateDefault();
+
 	gMainApp = new MainApp;
 	gMainApp->Run();
 	delete gMainApp;
+
+	EventQueue::DeleteDefault();
+
 	return 0;
 }

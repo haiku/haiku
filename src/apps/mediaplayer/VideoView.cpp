@@ -1,269 +1,169 @@
 /*
- * VideoView.cpp - Media Player for the Haiku Operating System
- *
- * Copyright (C) 2006 Marcus Overhagen <marcus@overhagen.de>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * version 2 as published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
- *
+ * Copyright © 2006-2008 Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT license.
  */
-#include <Message.h>
-#include <Bitmap.h>
 #include "VideoView.h"
 
 #include <stdio.h>
-#include <string.h>
 
-VideoView::VideoView(BRect frame, const char *name, uint32 resizeMask, uint32 flags)
- :	BView(frame, name, resizeMask, flags)
- ,	fController(NULL)
- ,	fOverlayActive(false)
+#include <Bitmap.h>
+
+
+VideoView::VideoView(BRect frame, const char* name, uint32 resizeMask)
+	: BView(frame, name, resizeMask, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
+	  fOverlayMode(false)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-//	SetViewColor(127,255,127);
-	rgb_color r = {255, 0, 0, 255};
-	fOverlayKeyColor = r;
+		// might be reset to overlay key color if overlays are used
+	SetHighColor(0, 0, 0);
+
+	// create some hopefully sensible default overlay restrictions
+	fOverlayRestrictions.min_width_scale = 0.25;
+	fOverlayRestrictions.max_width_scale = 8.0;
+	fOverlayRestrictions.min_height_scale = 0.25;
+	fOverlayRestrictions.max_height_scale = 8.0;
 }
 
 
 VideoView::~VideoView()
-{	
-}
-
-
-void
-VideoView::SetController(Controller *controller)
-{	
-	fController = controller;
-}
-
-
-void
-VideoView::AttachedToWindow()
 {
-}	
-
-void
-VideoView::OverlayLockAcquire()
-{
-   printf("VideoView::OverlayLockAcquire\n");
-}
-
-
-void
-VideoView::OverlayLockRelease()
-{
-   printf("VideoView::OverlayLockRelease\n");
-	// overlaybitmap->UnlockBits	
-}
-
-
-void
-VideoView::OverlayScreenshotPrepare()
-{
-	printf("OverlayScreenshotPrepare enter\n");
-/*
-	fController->LockBitmap();
-	if (fOverlayActive) {
-		BBitmap *bmp = fController->Bitmap();
-		if (bmp) {
-//			Window()->UpdateIfNeeded();
-//			Sync();
-			BBitmap *tmp = new BBitmap(bmp->Bounds(), 0, B_RGB32);
-//			ConvertBitmap(tmp, bmp);
-			ClearViewOverlay();
-			DrawBitmap(tmp, Bounds());
-			delete tmp;
-//			Sync();
-		}
-	}
-	fController->UnlockBitmap();
-*/
-	printf("OverlayScreenshotPrepare leave\n");
-}
-
-
-void
-VideoView::OverlayScreenshotCleanup()
-{
-	printf("OverlayScreenshotCleanup enter\n");
-/*
-	snooze(50000); // give app server some time to take the screenshot
-	fController->LockBitmap();
-	if (fOverlayActive) {
-		BBitmap *bmp = fController->Bitmap();
-		if (bmp) {
-			DrawBitmap(bmp, Bounds());
-			SetViewOverlay(bmp, bmp->Bounds(), Bounds(), &fOverlayKeyColor,
-				B_FOLLOW_ALL, B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
-			Invalidate();
-		}
-	}
-	fController->UnlockBitmap();
-*/
-	printf("OverlayScreenshotCleanup leave\n");
-}
-
-
-void
-VideoView::RemoveVideoDisplay()
-{
-	printf("VideoView::RemoveVideoDisplay\n");
-	
-	if (fOverlayActive) {
-		ClearViewOverlay();
-		fOverlayActive = false;
-	}
-	Invalidate();
-}
-
-
-void
-VideoView::RemoveOverlay()
-{
-	printf("VideoView::RemoveOverlay\n");
-	if (LockLooperWithTimeout(50000) == B_OK) {
-		ClearViewOverlay();
-		fOverlayActive = false;
-		UnlockLooper();
-	}
 }
 
 
 void
 VideoView::Draw(BRect updateRect)
 {
-	if (fOverlayActive) {
-		SetHighColor(fOverlayKeyColor);
+	bool fillBlack = true;
+
+	if (LockBitmap()) {
+		BRect r(Bounds());
+		if (const BBitmap* bitmap = GetBitmap()) {
+			fillBlack = false;
+			if (!fOverlayMode)
+				DrawBitmap(bitmap, bitmap->Bounds(), r);
+		}
+		UnlockBitmap();
+	}
+
+	if (fillBlack)
 		FillRect(updateRect);
-	} else {
-		fController->LockBitmap();
-		BBitmap *bmp = fController->Bitmap();
-		if (bmp)
-			DrawBitmap(bmp, Bounds());
-		fController->UnlockBitmap();
-	}
 }
 
 
 void
-VideoView::DrawFrame()
+VideoView::SetBitmap(const BBitmap* bitmap)
 {
-//	printf("VideoView::DrawFrame\n");
-	
-	if (LockLooperWithTimeout(50000) != B_OK)
-		return;
+	VideoTarget::SetBitmap(bitmap);
+	// Attention: Don't lock the window, if the bitmap is NULL. Otherwise
+	// we're going to deadlock when the window tells the node manager to
+	// stop the nodes (Window -> NodeManager -> VideoConsumer -> VideoView
+	// -> Window).
+	if (bitmap && LockLooperWithTimeout(10000) == B_OK) {
+		if (LockBitmap()) {
+//			if (fOverlayMode || bitmap->Flags() & B_BITMAP_WILL_OVERLAY) {
+			if (fOverlayMode || bitmap->ColorSpace() == B_YCbCr422) {
+				if (!fOverlayMode) {
+					// init overlay
+					rgb_color key;
+					status_t ret = SetViewOverlay(bitmap, bitmap->Bounds(),
+						Bounds(), &key, B_FOLLOW_ALL,
+						B_OVERLAY_FILTER_HORIZONTAL
+						| B_OVERLAY_FILTER_VERTICAL);
+					if (ret == B_OK) {
+						fOverlayKeyColor = key;
+						SetViewColor(key);
+						SetLowColor(key);
+						snooze(20000);
+						FillRect(Bounds(), B_SOLID_LOW);
+						Sync();
+						// use overlay from here on
+						fOverlayMode = true;
 
-	fController->LockBitmap();
-	BBitmap *bmp = fController->Bitmap();
-
-	if (bmp) {
-		bool want_overlay = bmp->ColorSpace() == B_YCbCr422;
-	
-		if (!want_overlay && fOverlayActive) {
-			if (LockLooperWithTimeout(50000) == B_OK) {
+						// update restrictions
+						overlay_restrictions restrictions;
+						if (bitmap->GetOverlayRestrictions(&restrictions)
+								== B_OK)
+							fOverlayRestrictions = restrictions;
+					} else {
+						// try again next time
+						// synchronous draw
+						FillRect(Bounds());
+						Sync();
+					}
+				} else {
+					// transfer overlay channel
+					rgb_color key;
+					SetViewOverlay(bitmap, bitmap->Bounds(), Bounds(),
+						&key, B_FOLLOW_ALL, B_OVERLAY_FILTER_HORIZONTAL
+							| B_OVERLAY_FILTER_VERTICAL
+							| B_OVERLAY_TRANSFER_CHANNEL);
+				}
+			} else if (fOverlayMode && bitmap->ColorSpace() != B_YCbCr422) {
+				fOverlayMode = false;
 				ClearViewOverlay();
-				UnlockLooper();			
-				fOverlayActive = false;
-			} else {
-				printf("can't ClearViewOverlay, as LockLooperWithTimeout failed\n");
-				return;
+				SetViewColor(B_TRANSPARENT_COLOR);
 			}
-		}
+			if (!fOverlayMode)
+				DrawBitmap(bitmap, bitmap->Bounds(), Bounds());
 
-		if (want_overlay && !fOverlayActive ) {
-printf("trying to activate overlay...");
-			// reserve overlay channel
-			status_t ret = SetViewOverlay(bmp, bmp->Bounds(), Bounds(),
-				&fOverlayKeyColor, B_FOLLOW_ALL,
-				B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
-			if (ret == B_OK) {
-printf("success\n");
-				fOverlayActive = true;
-				Invalidate();
-			} else {
-printf("failed: %s\n", strerror(ret));
-			}
-		} else if (fOverlayActive) {
-			// transfer overlay channel
-			rgb_color overlayKey;
-			SetViewOverlay(bmp, bmp->Bounds(), Bounds(), &overlayKey,
-				B_FOLLOW_ALL, B_OVERLAY_TRANSFER_CHANNEL
-					| B_OVERLAY_FILTER_HORIZONTAL | B_OVERLAY_FILTER_VERTICAL);
-		} else {
-			// no overlay
-			DrawBitmap(bmp, Bounds());
+			UnlockBitmap();
 		}
+		UnlockLooper();
 	}
-
-	fController->UnlockBitmap();
-
-	UnlockLooper();
 }
 
 
 void
-VideoView::MessageReceived(BMessage *msg)
+VideoView::GetOverlayScaleLimits(float* minScale, float* maxScale) const
 {
-	switch (msg->what) {
+	*minScale = max_c(fOverlayRestrictions.min_width_scale,
+		fOverlayRestrictions.min_height_scale);
+	*maxScale = max_c(fOverlayRestrictions.max_width_scale,
+		fOverlayRestrictions.max_height_scale);
+}
 
-		default:
-			BView::MessageReceived(msg);
-	}
+
+void
+VideoView::OverlayScreenshotPrepare()
+{
+	// TODO: Do nothing if the current bitmap is in RGB color space
+	// and no overlay. Otherwise, convert current bitmap to RGB color
+	// space an draw it in place of the normal display.
+}
+
+
+void
+VideoView::OverlayScreenshotCleanup()
+{
+	// TODO: Do nothing if the current bitmap is in RGB color space
+	// and no overlay. Otherwise clean view area with overlay color.
 }
 
 
 bool
-VideoView::IsOverlaySupported()
+VideoView::IsOverlayActive()
 {
-	struct colorcombo {
-		color_space colspace;
-		const char *name;
-	} colspace[] = {
-		{ B_RGB32,		"B_RGB32"},
-		{ B_RGBA32,		"B_RGBA32"},
-		{ B_RGB24,		"B_RGB24"},
-		{ B_RGB16,		"B_RGB16"},
-		{ B_RGB15,		"B_RGB15"},
-		{ B_RGBA15,		"B_RGBA15"},
-		{ B_RGB32_BIG,	"B_RGB32_BIG"},
-		{ B_RGBA32_BIG,	"B_RGBA32_BIG "},
-		{ B_RGB24_BIG,	"B_RGB24_BIG "},
-		{ B_RGB16_BIG,	"B_RGB16_BIG "},
-		{ B_RGB15_BIG,	"B_RGB15_BIG "},
-		{ B_RGBA15_BIG, "B_RGBA15_BIG "},
-		{ B_YCbCr422,	"B_YCbCr422"},
-		{ B_YCbCr411,	"B_YCbCr411"},
-		{ B_YCbCr444,	"B_YCbCr444"},
-		{ B_YCbCr420,	"B_YCbCr420"},
-		{ B_YUV422,		"B_YUV422"},
-		{ B_YUV411,		"B_YUV411"},
-		{ B_YUV444,		"B_YUV444"},
-		{ B_YUV420,		"B_YUV420"},
-		{ B_NO_COLOR_SPACE, NULL}
-	};
-	
-	bool supported = false;
-	for (int i = 0; colspace[i].name; i++) {
-		BBitmap *test = new BBitmap(BRect(0,0,319,239),	B_BITMAP_WILL_OVERLAY | B_BITMAP_RESERVE_OVERLAY_CHANNEL, colspace[i].colspace);
-		if (test->InitCheck() == B_OK) {
-			printf("Display supports %s (0x%08x) overlay\n", colspace[i].name, colspace[i].colspace);
-			supported = true;
-		}
-		delete test;
-//		if (supported)
-//			break;
+	bool active = false;
+	if (LockBitmap()) {
+		active = fOverlayMode;
+		UnlockBitmap();
 	}
-	return supported;
+	return active;
+}
+
+
+void
+VideoView::DisableOverlay()
+{
+	if (!fOverlayMode)
+		return;
+
+	FillRect(Bounds());
+	Sync();
+
+	ClearViewOverlay();
+	snooze(20000);
+	Sync();
+	fOverlayMode = false;
 }
 

@@ -5,15 +5,15 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#include "VideoSupplier.h"
+#include "VideoTrackSupplier.h"
 
 
-VideoSupplier::VideoSupplier()
+VideoTrackSupplier::VideoTrackSupplier()
 {
 }
 
 
-VideoSupplier::~VideoSupplier()
+VideoTrackSupplier::~VideoTrackSupplier()
 {
 }
 

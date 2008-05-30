@@ -29,73 +29,19 @@ static const char* string_for_color_space(color_space format);
 // constructor
 MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track,
 		color_space format)
-	: VideoSupplier()
+	: VideoTrackSupplier()
 	, fVideoTrack(track)
 
 	, fPerformanceTime(0)
 	, fDuration(0)
+	, fCurrentFrame(0)
 {
 	if (!fVideoTrack) {
 		printf("MediaTrackVideoSupplier() - no video track\n");
 		return;
 	}
 
-	// get the encoded format
-	memset(&fFormat, 0, sizeof(media_format));
-	status_t ret = fVideoTrack->EncodedFormat(&fFormat);
-	if (ret < B_OK) {
-		printf("MediaTrackVideoSupplier::InitCheck() - "
-			"fVideoTrack->EncodedFormat(): %s\n", strerror(ret));
-		return;
-	}
-
-	// get ouput video frame size
-	uint32 width = fFormat.u.encoded_video.output.display.line_width;
-	uint32 height = fFormat.u.encoded_video.output.display.line_count;
-
-	// specifiy the decoded format. we derive this information from
-	// the encoded format (width & height).
-	memset(&fFormat, 0, sizeof(media_format));
-//	fFormat.u.raw_video.last_active = height - 1;
-//	fFormat.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
-//	fFormat.u.raw_video.pixel_width_aspect = 1;
-//	fFormat.u.raw_video.pixel_height_aspect = 1;
-	fFormat.u.raw_video.display.format = format;
-	fFormat.u.raw_video.display.line_width = width;
-	fFormat.u.raw_video.display.line_count = height;
-	if (format == B_RGB32 || format == B_RGBA32)
-		fFormat.u.raw_video.display.bytes_per_row = width * 4;
-	else if (format == B_YCbCr422)
-		fFormat.u.raw_video.display.bytes_per_row = ((width * 2 + 3) / 4) * 4;
-
-	ret = fVideoTrack->DecodedFormat(&fFormat);
-
-	if (ret < B_OK) {
-		printf("MediaTrackVideoSupplier() - "
-			"fVideoTrack->DecodedFormat(): %s\n", strerror(ret));
-		return;
-	}
-
-	if (fFormat.u.raw_video.display.format != format) {
-		printf("MediaTrackVideoSupplier() - "
-			" codec changed colorspace of decoded format (%s -> %s)!\n"
-			"    this is bad for performance, since colorspace conversion\n"
-			"    needs to happen during playback.\n",
-			string_for_color_space(format),
-			string_for_color_space(fFormat.u.raw_video.display.format));
-		// check if the codec forgot to adjust bytes_per_row
-		uint32 minBPR;
-		format = fFormat.u.raw_video.display.format;
-		if (format == B_YCbCr422)
-			minBPR = ((width * 2 + 3) / 4) * 4;
-		else
-			minBPR = width * 4;
-		if (minBPR != fFormat.u.raw_video.display.bytes_per_row) {
-			printf("  -> stupid codec forgot to adjust bytes_per_row!\n");
-			fFormat.u.raw_video.display.bytes_per_row = minBPR;
-			fVideoTrack->DecodedFormat(&fFormat);
-		}
-	}	
+	_SwitchFormat(format, 0);
 
 	fDuration = fVideoTrack->Duration();
 
@@ -113,7 +59,7 @@ MediaTrackVideoSupplier::~MediaTrackVideoSupplier()
 }
 
 
-media_format
+const media_format&
 MediaTrackVideoSupplier::Format() const
 {
 	return fFormat;
@@ -139,26 +85,44 @@ MediaTrackVideoSupplier::GetCodecInfo(media_codec_info* info) const
 
 
 status_t
-MediaTrackVideoSupplier::ReadFrame(void* buffer, bigtime_t* performanceTime)
+MediaTrackVideoSupplier::ReadFrame(void* buffer, bigtime_t* performanceTime,
+	const media_format* format, bool& wasCached)
 {
 	if (!fVideoTrack)
 		return B_NO_INIT;
 	if (!buffer)
 		return B_BAD_VALUE;
 
+	status_t ret = B_OK;
+	if (format->u.raw_video.display.format
+			!= fFormat.u.raw_video.display.format
+		|| fFormat.u.raw_video.display.bytes_per_row
+			!= format->u.raw_video.display.bytes_per_row) {
+		ret = _SwitchFormat(format->u.raw_video.display.format,
+			format->u.raw_video.display.bytes_per_row);
+		if (ret < B_OK) {
+			fprintf(stderr, "MediaTrackVideoSupplier::ReadFrame() - "
+				"unable to switch media format: %s\n", strerror(ret));
+			return ret;
+		}
+	}
+
 	// read a frame
 	int64 frameCount = 1;
 	// TODO: how does this work for interlaced video (field count > 1)?
 	media_header mediaHeader;
-	status_t ret = fVideoTrack->ReadFrames(buffer, &frameCount, &mediaHeader);
+	ret = fVideoTrack->ReadFrames(buffer, &frameCount, &mediaHeader);
 
 	if (ret < B_OK) {
-		printf("MediaTrackVideoSupplier::ReadFrame() - "
-			"error while reading frame of track: %s\n", strerror(ret));
+		if (ret != B_LAST_BUFFER_ERROR) {
+			fprintf(stderr, "MediaTrackVideoSupplier::ReadFrame() - "
+				"error while reading frame of track: %s\n", strerror(ret));
+		}
 	} else {
 		fPerformanceTime = mediaHeader.start_time;
 	}
 
+	fCurrentFrame = fVideoTrack->CurrentFrame();
 	if (performanceTime)
 		*performanceTime = fPerformanceTime;
 
@@ -186,10 +150,52 @@ MediaTrackVideoSupplier::SeekToTime(bigtime_t* performanceTime)
 		return B_NO_INIT;
 
 bigtime_t _performanceTime = *performanceTime;
-	status_t ret = fVideoTrack->SeekToTime(performanceTime);
+	status_t ret = fVideoTrack->FindKeyFrameForTime(performanceTime,
+		B_MEDIA_SEEK_CLOSEST_BACKWARD);
+	if (ret < B_OK)
+		return ret;
+
+	ret = fVideoTrack->SeekToTime(performanceTime);
 	if (ret == B_OK) {
-printf("seeked: %lld -> %lld\n", _performanceTime, *performanceTime);
+if (_performanceTime != *performanceTime)
+printf("seeked by time: %lld -> %lld\n", _performanceTime, *performanceTime);
 		fPerformanceTime = *performanceTime;
+		fCurrentFrame = fVideoTrack->CurrentFrame();
+	}
+
+	return ret;
+}
+
+
+status_t
+MediaTrackVideoSupplier::SeekToFrame(int64* frame)
+{
+	if (!fVideoTrack)
+		return B_NO_INIT;
+
+	int64 wantFrame = *frame;
+	int64 currentFrame = fVideoTrack->CurrentFrame();
+
+	if (wantFrame == currentFrame)
+		return B_OK;
+
+	status_t ret = fVideoTrack->FindKeyFrameForFrame(frame,
+		B_MEDIA_SEEK_CLOSEST_BACKWARD);
+	if (ret < B_OK)
+		return ret;
+
+	if (*frame < currentFrame && wantFrame > currentFrame) {
+		*frame = currentFrame;
+		return B_OK;
+	}
+
+if (wantFrame != *frame)
+printf("seeked by frame: %lld -> %lld\n", wantFrame, *frame);
+
+	ret = fVideoTrack->SeekToFrame(frame);
+	if (ret == B_OK) {
+		fCurrentFrame = *frame;
+		fPerformanceTime = fVideoTrack->CurrentTime();
 	}
 
 	return ret;
@@ -296,4 +302,70 @@ string_for_color_space(color_space format)
 			break;
 	}
 	return name;
+}
+
+
+status_t
+MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
+{
+	// get the encoded format
+	memset(&fFormat, 0, sizeof(media_format));
+	status_t ret = fVideoTrack->EncodedFormat(&fFormat);
+	if (ret < B_OK) {
+		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
+			"fVideoTrack->EncodedFormat(): %s\n", strerror(ret));
+		return ret;
+	}
+
+	// get ouput video frame size
+	uint32 width = fFormat.u.encoded_video.output.display.line_width;
+	uint32 height = fFormat.u.encoded_video.output.display.line_count;
+
+	// specifiy the decoded format. we derive this information from
+	// the encoded format (width & height).
+	memset(&fFormat, 0, sizeof(media_format));
+//	fFormat.u.raw_video.last_active = height - 1;
+//	fFormat.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
+//	fFormat.u.raw_video.pixel_width_aspect = 1;
+//	fFormat.u.raw_video.pixel_height_aspect = 1;
+	fFormat.u.raw_video.display.format = format;
+	fFormat.u.raw_video.display.line_width = width;
+	fFormat.u.raw_video.display.line_count = height;
+	int32 minBytesPerRow;
+	if (format == B_RGB32 || format == B_RGBA32)
+		minBytesPerRow = width * 4;
+	else if (format == B_YCbCr422)
+		minBytesPerRow = ((width * 2 + 3) / 4) * 4;
+	fFormat.u.raw_video.display.bytes_per_row = max_c(minBytesPerRow,
+		bytesPerRow);
+
+	ret = fVideoTrack->DecodedFormat(&fFormat);
+
+	if (ret < B_OK) {
+		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
+			"fVideoTrack->DecodedFormat(): %s\n", strerror(ret));
+		return ret;
+	}
+
+	if (fFormat.u.raw_video.display.format != format) {
+		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
+			" codec changed colorspace of decoded format (%s -> %s)!\n"
+			"    this is bad for performance, since colorspace conversion\n"
+			"    needs to happen during playback.\n",
+			string_for_color_space(format),
+			string_for_color_space(fFormat.u.raw_video.display.format));
+		// check if the codec forgot to adjust bytes_per_row
+		uint32 minBPR;
+		format = fFormat.u.raw_video.display.format;
+		if (format == B_YCbCr422)
+			minBPR = ((width * 2 + 3) / 4) * 4;
+		else
+			minBPR = width * 4;
+		if (minBPR != fFormat.u.raw_video.display.bytes_per_row) {
+			printf("  -> stupid codec forgot to adjust bytes_per_row!\n");
+			fFormat.u.raw_video.display.bytes_per_row = minBPR;
+			fVideoTrack->DecodedFormat(&fFormat);
+		}
+	}
+	return ret;
 }

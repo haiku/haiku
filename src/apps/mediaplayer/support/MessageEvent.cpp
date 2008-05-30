@@ -1,0 +1,38 @@
+/*	
+ * Copyright (c) 2000-2008, Ingo Weinhold <ingo_weinhold@gmx.de>,
+ * Copyright (c) 2000-2008, Stephan Aßmus <superstippi@gmx.de>,
+ * All Rights Reserved. Distributed under the terms of the MIT license.
+ */
+#include <Message.h>
+
+#include "MessageEvent.h"
+
+
+MessageEvent::MessageEvent(bigtime_t time, BHandler* handler, uint32 command)
+	: Event(time),
+	  AbstractLOAdapter(handler),
+	  fCommand(command)
+{
+}
+
+
+MessageEvent::MessageEvent(bigtime_t time, const BMessenger& messenger)
+	: Event(time),
+	  AbstractLOAdapter(messenger)
+{
+}
+
+
+MessageEvent::~MessageEvent()
+{
+}
+
+
+void
+MessageEvent::Execute()
+{
+	BMessage msg(fCommand);
+	msg.AddInt64("time", Time());
+	DeliverMessage(msg);
+}
+

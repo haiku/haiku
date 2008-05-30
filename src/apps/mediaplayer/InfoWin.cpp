@@ -227,6 +227,9 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 	fContentsView->SetFontAndColor(be_plain_font, B_FONT_ALL);
 //	fContentsView->Insert("");
 
+	if (!fController->Lock())
+		return;
+
 	fLabelsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kRed);
 
 	status_t err;

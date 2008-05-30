@@ -2,13 +2,16 @@ SubDir HAIKU_TOP src apps mediaplayer ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-AddSubDirSupportedPlatforms libbe_test ;
-
 # for BRecentItems
 UsePublicHeaders [ FDirName be_apps Tracker ] ;
+UsePrivateHeaders shared ;
 
 # source directories
 local sourceDirs =
+	interface
+	media_node_framework
+	media_node_framework/audio
+	media_node_framework/video
 	playlist
 	supplier
 	support
@@ -21,6 +24,33 @@ for sourceDir in $(sourceDirs) {
 }
 
 Application MediaPlayer :
+	# interface
+	DrawingTidbits.cpp
+	SeekSlider.cpp
+	TransportButton.cpp
+	VolumeSlider.cpp
+
+	# media_node_framework
+	NodeManager.cpp
+	PlaybackListener.cpp
+	PlaybackLOAdapter.cpp
+	PlaybackManager.cpp
+
+	# media_node_framework/audio
+	AudioAdapter.cpp
+	AudioChannelConverter.cpp
+	AudioFormatConverter.cpp
+	AudioProducer.cpp
+	AudioReader.cpp
+	AudioResampler.cpp
+	AudioSupplier.cpp
+	
+	# media_node_framework/video
+	VideoConsumer.cpp
+	VideoProducer.cpp
+	VideoSupplier.cpp
+	VideoTarget.cpp
+
 	# playlist
 	CopyPLItemsCommand.cpp
 	ImportPLItemsCommand.cpp
@@ -32,22 +62,27 @@ Application MediaPlayer :
 	PlaylistWindow.cpp
 	RemovePLItemsCommand.cpp
 
-	# supplier
+	# settings
 	Settings.cpp
 	SettingsWindow.cpp
 
 	# supplier
-	AudioSupplier.cpp
+	AudioTrackSupplier.cpp
 	MediaTrackAudioSupplier.cpp
 	MediaTrackVideoSupplier.cpp
-	VideoSupplier.cpp
+	ProxyAudioSupplier.cpp
+	ProxyVideoSupplier.cpp
+	VideoTrackSupplier.cpp
 
 	# support
 	AbstractLOAdapter.cpp
 	Command.cpp
 	CommandStack.cpp
+	Event.cpp
+	EventQueue.cpp
 	Listener.cpp
 	ListenerAdapter.cpp
+	MessageEvent.cpp
 	Notifier.cpp
 	RWLocker.cpp
 	FileReadWrite.cpp
@@ -57,23 +92,13 @@ Application MediaPlayer :
 	Controller.cpp
 	ControllerObserver.cpp
 	ControllerView.cpp
-	DrawingTidbits.cpp
 	InfoWin.cpp
 	MainApp.cpp
 	MainWin.cpp
-	SoundOutput.cpp
-	TransportButton.cpp
 	TransportControlGroup.cpp
-	SeekSlider.cpp
-	VideoNode.cpp
 	VideoView.cpp
-	VolumeSlider.cpp
 
 	: be media tracker translation textencoding $(TARGET_LIBSTDC++)
 	: MediaPlayer.rdef
 ;
 
-if $(TARGET_PLATFORM) = libbe_test {
-	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : MediaPlayer
-		: tests!apps ;
-}
