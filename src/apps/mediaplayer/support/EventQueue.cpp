@@ -10,6 +10,8 @@
 
 #include "EventQueue.h"
 
+using std::nothrow;
+
 
 EventQueue::EventQueue()
 	: fEvents(100),
