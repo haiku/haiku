@@ -193,6 +193,27 @@ class RemoveConsumer : public VMCacheTraceEntry {
 };
 
 
+class Merge : public VMCacheTraceEntry {
+	public:
+		Merge(vm_cache* cache, vm_cache* consumer)
+			:
+			VMCacheTraceEntry(cache),
+			fConsumer(consumer)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache merge with consumer: cache: %p, consumer: %p",
+				fCache, fConsumer);
+		}
+
+	private:
+		vm_cache*	fConsumer;
+};
+
+
 class InsertArea : public VMCacheTraceEntry {
 	public:
 		InsertArea(vm_cache* cache, vm_area* area)
@@ -356,6 +377,140 @@ delete_cache(vm_cache* cache)
 
 	mutex_destroy(&cache->lock);
 	free(cache);
+}
+
+
+static bool
+is_cache_mergeable(vm_cache* cache)
+{
+	return (cache->areas == NULL && cache->source != NULL
+		&& !list_is_empty(&cache->consumers)
+		&& cache->consumers.link.next == cache->consumers.link.prev);
+}
+
+
+/*!	Merges the given cache with its only consumer.
+	The caller must own a reference (other than the one from the consumer) and
+	hold the cache's lock.
+*/
+static void
+merge_cache_with_only_consumer(vm_cache* cache)
+{
+	vm_cache* consumer = (vm_cache*)list_get_first_item(&cache->consumers);
+
+	if (!acquire_unreferenced_cache_ref(consumer))
+		return;
+
+	// In case we managed to grab a reference to the consumerRef,
+	// this doesn't guarantee that we get the cache we wanted
+	// to, so we need to check if this cache is really the last
+	// consumer of the cache we want to merge it with.
+
+	ConditionVariable busyCondition;
+
+	// But since we need to keep the locking order upper->lower cache, we
+	// need to unlock our cache now
+	busyCondition.Publish(cache, "cache");
+	cache->busy = true;
+
+	while (true) {
+		mutex_unlock(&cache->lock);
+
+		mutex_lock(&consumer->lock);
+		mutex_lock(&cache->lock);
+
+		bool isMergeable = is_cache_mergeable(cache);
+		if (isMergeable && consumer == list_get_first_item(&cache->consumers))
+			break;
+
+		// something changed, get rid of the consumer lock and ref
+		mutex_unlock(&consumer->lock);
+		vm_cache_release_ref(consumer);
+
+		if (!isMergeable) {
+			dprintf("merge_cache_with_only_consumer(): cache %p is no longer; "
+				"mergeable\n", cache);
+			cache->busy = false;
+			busyCondition.Unpublish();
+			return;
+		}
+
+		// the cache is still mergeable, just the consumer changed
+		consumer = (vm_cache*)list_get_first_item(&cache->consumers);
+	
+		if (!acquire_unreferenced_cache_ref(consumer))
+			return;
+	}
+
+	consumer = (vm_cache*)list_remove_head_item(&cache->consumers);
+
+	TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
+		cache, cache->ref_count, consumer));
+
+	T(Merge(cache, consumer));
+
+	vm_page* nextPage;
+	for (vm_page* page = cache->page_list; page != NULL;
+			page = nextPage) {
+		vm_page* consumerPage;
+		nextPage = page->cache_next;
+
+		consumerPage = vm_cache_lookup_page(consumer,
+			(off_t)page->cache_offset << PAGE_SHIFT);
+		if (consumerPage == NULL) {
+			// the page is not yet in the consumer cache - move it upwards
+			vm_cache_remove_page(cache, page);
+			vm_cache_insert_page(consumer, page,
+				(off_t)page->cache_offset << PAGE_SHIFT);
+		} else if (consumerPage->state == PAGE_STATE_BUSY
+			&& consumerPage->type == PAGE_TYPE_DUMMY) {
+			// the page is currently busy taking a read fault - IOW,
+			// vm_soft_fault() has mapped our page so we can just
+			// move it up
+			//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
+			vm_cache_remove_page(consumer, consumerPage);
+			consumerPage->state = PAGE_STATE_INACTIVE;
+			((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
+
+			vm_cache_remove_page(cache, page);
+			vm_cache_insert_page(consumer, page,
+				(off_t)page->cache_offset << PAGE_SHIFT);
+#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
+		} else {
+			page->debug_flags = 0;
+			if (consumerPage->state == PAGE_STATE_BUSY)
+				page->debug_flags |= 0x1;
+			if (consumerPage->type == PAGE_TYPE_DUMMY)
+				page->debug_flags |= 0x2;
+			page->collided_page = consumerPage;
+			consumerPage->collided_page = page;
+#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
+		}
+	}
+
+	vm_cache* newSource = cache->source;
+
+	// The remaining consumer has got a new source
+	mutex_lock(&newSource->lock);
+
+	list_remove_item(&newSource->consumers, cache);
+	list_add_item(&newSource->consumers, consumer);
+	consumer->source = newSource;
+	cache->source = NULL;
+
+	mutex_unlock(&newSource->lock);
+
+	// Release the reference the cache's consumer owned. The consumer takes
+	// over the cache's ref to its source instead.
+if (cache->ref_count < 2)
+panic("cacheRef %p ref count too low!\n", cache);
+	vm_cache_release_ref(cache);
+
+	cache->busy = false;
+	busyCondition.Unpublish();
+
+	mutex_unlock(&consumer->lock);
+	vm_cache_release_ref(consumer);
 }
 
 
@@ -750,120 +905,9 @@ vm_cache_remove_consumer(vm_cache* cache, vm_cache* consumer)
 	list_remove_item(&cache->consumers, consumer);
 	consumer->source = NULL;
 
-	if (cache->areas == NULL && cache->source != NULL
-		&& !list_is_empty(&cache->consumers)
-		&& cache->consumers.link.next == cache->consumers.link.prev) {
-		// The cache is not really needed anymore - it can be merged with its only
-		// consumer left.
-
-		consumer = (vm_cache*)list_get_first_item(&cache->consumers);
-
-		bool merge = acquire_unreferenced_cache_ref(consumer);
-
-		// In case we managed to grab a reference to the consumerRef,
-		// this doesn't guarantee that we get the cache we wanted
-		// to, so we need to check if this cache is really the last
-		// consumer of the cache we want to merge it with.
-
-		ConditionVariable busyCondition;
-
-		if (merge) {
-			// But since we need to keep the locking order upper->lower cache, we
-			// need to unlock our cache now
-			busyCondition.Publish(cache, "cache");
-			cache->busy = true;
-			mutex_unlock(&cache->lock);
-
-			mutex_lock(&consumer->lock);
-			mutex_lock(&cache->lock);
-
-			if (cache->areas != NULL || cache->source == NULL
-				|| list_is_empty(&cache->consumers)
-				|| cache->consumers.link.next != cache->consumers.link.prev
-				|| consumer != list_get_first_item(&cache->consumers)) {
-				dprintf("vm_cache_remove_consumer(): cache %p was modified; "
-					"not merging it\n", cache);
-				merge = false;
-				cache->busy = false;
-				busyCondition.Unpublish();
-				mutex_unlock(&consumer->lock);
-				vm_cache_release_ref(consumer);
-			}
-		}
-
-		if (merge) {
-			consumer = (vm_cache*)list_remove_head_item(&cache->consumers);
-
-			TRACE(("merge vm cache %p (ref == %ld) with vm cache %p\n",
-				cache, cache->ref_count, consumer));
-
-			vm_page* nextPage;
-			for (vm_page* page = cache->page_list; page != NULL;
-					page = nextPage) {
-				vm_page* consumerPage;
-				nextPage = page->cache_next;
-
-				consumerPage = vm_cache_lookup_page(consumer,
-					(off_t)page->cache_offset << PAGE_SHIFT);
-				if (consumerPage == NULL) {
-					// the page already is not yet in the consumer cache - move
-					// it upwards
-					vm_cache_remove_page(cache, page);
-					vm_cache_insert_page(consumer, page,
-						(off_t)page->cache_offset << PAGE_SHIFT);
-				} else if (consumerPage->state == PAGE_STATE_BUSY
-					&& consumerPage->type == PAGE_TYPE_DUMMY) {
-					// the page is currently busy taking a read fault - IOW,
-					// vm_soft_fault() has mapped our page so we can just
-					// move it up
-					//dprintf("%ld: merged busy page %p, cache %p, offset %ld\n", find_thread(NULL), page, cacheRef->cache, page->cache_offset);
-					vm_cache_remove_page(consumer, consumerPage);
-					consumerPage->state = PAGE_STATE_INACTIVE;
-					((vm_dummy_page*)consumerPage)->busy_condition.Unpublish();
-
-					vm_cache_remove_page(cache, page);
-					vm_cache_insert_page(consumer, page,
-						(off_t)page->cache_offset << PAGE_SHIFT);
-#ifdef DEBUG_PAGE_CACHE_TRANSITIONS
-				} else {
-					page->debug_flags = 0;
-					if (consumerPage->state == PAGE_STATE_BUSY)
-						page->debug_flags |= 0x1;
-					if (consumerPage->type == PAGE_TYPE_DUMMY)
-						page->debug_flags |= 0x2;
-					page->collided_page = consumerPage;
-					consumerPage->collided_page = page;
-#endif	// DEBUG_PAGE_CACHE_TRANSITIONS
-				}
-			}
-
-			vm_cache* newSource = cache->source;
-
-			// The remaining consumer has gotten a new source
-			mutex_lock(&newSource->lock);
-
-			list_remove_item(&newSource->consumers, cache);
-			list_add_item(&newSource->consumers, consumer);
-			consumer->source = newSource;
-			cache->source = NULL;
-
-			mutex_unlock(&newSource->lock);
-
-			// Release the other reference to the cache - we take over
-			// its reference of its source cache; we can do this here
-			// (with the cacheRef locked) since we own another reference
-			// from the first consumer we removed
-if (cache->ref_count < 2)
-panic("cacheRef %p ref count too low!\n", cache);
-			vm_cache_release_ref(cache);
-
-			mutex_unlock(&consumer->lock);
-			vm_cache_release_ref(consumer);
-		}
-
-		if (cache->busy)
-			busyCondition.Unpublish();
-	}
+	// merge cache, if possible
+	if (is_cache_mergeable(cache))
+		merge_cache_with_only_consumer(cache);
 
 	mutex_unlock(&cache->lock);
 	vm_cache_release_ref(cache);
@@ -936,6 +980,10 @@ vm_cache_remove_area(vm_cache* cache, vm_area* area)
 
 	if (cache->store->ops->release_ref)
 		cache->store->ops->release_ref(cache->store);
+
+	// merge cache, if possible
+	if (is_cache_mergeable(cache))
+		merge_cache_with_only_consumer(cache);
 
 	return B_OK;
 }
