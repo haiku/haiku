@@ -13,6 +13,7 @@
 
 #include "PlaybackManager.h"
 
+class BMediaRoster;
 class AudioProducer;
 class VideoTarget;
 class VideoProducer;
