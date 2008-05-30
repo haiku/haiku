@@ -64,6 +64,7 @@ for sourceDir in $(sourceDirs) {
 
 # system headers
 UseLibraryHeaders agg expat icon ;
+UsePrivateHeaders shared ;
 
 
 
@@ -292,7 +293,7 @@ Application Icon-O-Matic :
 	MainWindow.cpp
 	Util.cpp
 
-	: be tracker translation libagg.a libexpat.a
+	: be tracker translation libshared.a libagg.a libexpat.a
 
 	: Icon-O-Matic.rdef
 ;
