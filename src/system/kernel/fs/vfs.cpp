@@ -3517,8 +3517,8 @@ extern "C" status_t
 vfs_get_fs_node_from_path(fs_volume *volume, const char *path, bool kernel,
 	void **_node)
 {
-	TRACE(("vfs_get_fs_node_from_path(mountID = %ld, path = \"%s\", kernel %d)\n",
-		mountID, path, kernel));
+	TRACE(("vfs_get_fs_node_from_path(volume = %p, path = \"%s\", kernel %d)\n",
+		volume, path, kernel));
 
 	KPath pathBuffer(B_PATH_NAME_LENGTH + 1);
 	if (pathBuffer.InitCheck() != B_OK)
@@ -3666,7 +3666,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName,
 
 			return B_OK;
 		} else {
-			TRACE(("vfs_get_module_path(): something is strange here: %d...\n",
+			TRACE(("vfs_get_module_path(): something is strange here: 0x%08lx...\n",
 				file->type));
 			status = B_ERROR;
 			dir = file;
