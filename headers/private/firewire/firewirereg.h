@@ -176,7 +176,7 @@ struct firewire_comm{
 #ifndef __HAIKU__
 	struct mtx tlabel_lock;
 #else
-	benaphore tlabel_lock;
+	mutex tlabel_lock;
 #endif
 	STAILQ_HEAD(, fw_bind) binds;
 	STAILQ_HEAD(, fw_device) devices;
@@ -225,8 +225,8 @@ struct firewire_comm{
 	struct taskqueue *taskqueue;
 	struct proc *probe_thread;
 #else
-	benaphore mtx;
-	benaphore wait_lock;
+	mutex mtx;
+	mutex wait_lock;
 	void *taskqueue;
 	thread_id probe_thread;
 	sem_id Sem;

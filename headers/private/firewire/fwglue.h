@@ -33,10 +33,10 @@ typedef uint32_t bus_size_t;
 #define atomic_readandclear_int(ptr) atomic_set((int32 *)(ptr), 0)
 #define atomic_set_int(ptr, value) atomic_or((int32 *)(ptr), value)
 
-#define mtx_lock benaphore_lock
-#define mtx_unlock benaphore_unlock
-#define mtx_destroy benaphore_destroy
-#define mtx_init(lockaddr, name, type, opts) benaphore_init(lockaddr, name)
+#define mtx_lock mutex_lock
+#define mtx_unlock mutex_unlock
+#define mtx_destroy mutex_destroy
+#define mtx_init(lockaddr, name, type, opts) mutex_init(lockaddr, name)
 
 #define splfw() 0
 #define splx(s) 
