@@ -338,15 +338,8 @@ static status_t
 das_register_device(device_node *node)
 {
 	const scsi_res_inquiry *deviceInquiry = NULL;
-	uint8 deviceType;
 	size_t inquiryLength;
 	uint32 maxBlocks;
-
-	// check whether it's really a Direct Access Device
-	if (sDeviceManager->get_attr_uint8(node, SCSI_DEVICE_TYPE_ITEM,
-			&deviceType, true) != B_OK
-		|| deviceType != scsi_dev_direct_access)
-		return B_ERROR;
 
 	// get inquiry data
 	if (sDeviceManager->get_attr_raw(node, SCSI_DEVICE_INQUIRY_ITEM,
@@ -403,12 +396,10 @@ das_init_driver(device_node *node, void **cookie)
 	device->node = node;
 	device->removable = removable;
 
-	{
-		device_node *parent = sDeviceManager->get_parent_node(node);
-		sDeviceManager->get_driver(parent, (driver_module_info **)&device->scsi,
-			(void **)&device->scsi_device);
-		sDeviceManager->put_node(parent);
-	}
+	device_node *parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&device->scsi,
+		(void **)&device->scsi_device);
+	sDeviceManager->put_node(parent);
 
 	status = sSCSIPeripheral->register_device((periph_device_cookie)device,
 		&callbacks, device->scsi_device, device->scsi, device->node,
@@ -478,8 +469,8 @@ block_device_interface sSCSIDiskModule = {
 
 	(void (*)(block_device_cookie *, block_io_device))	&das_set_device,
 	(status_t (*)(block_device_cookie *, block_device_handle_cookie **))&das_open,
-	(status_t (*)(block_device_handle_cookie *))			&das_close,
-	(status_t (*)(block_device_handle_cookie *))			&das_free,
+	(status_t (*)(block_device_handle_cookie *))		&das_close,
+	(status_t (*)(block_device_handle_cookie *))		&das_free,
 
 	(status_t (*)(block_device_handle_cookie *, const phys_vecs *,
 		off_t, size_t, uint32, size_t *))				&das_read,

@@ -1,0 +1,947 @@
+/*
+ * Copyright 2004-2008, Haiku, Inc. All RightsReserved.
+ * Copyright 2002-2003, Thomas Kurschel. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
+
+/*!	Peripheral driver to handle CD-ROM drives. To be more
+	precisely, it supports CD-ROM and WORM drives (well -
+	I've never _seen_ a WORM driver). 
+	
+	Much work is done by scsi_periph and block_io.
+*/
+
+
+#include "scsi_cd.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+
+//#define TRACE_CD_DISK
+#ifdef TRACE_CD_DISK
+#	define TRACE(x...) dprintf("scsi_cd: " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
+static scsi_periph_interface *sSCSIPeripheral;
+static device_manager_info *sDeviceManager;
+static block_io_for_driver_interface *sBlockIO;
+
+
+#define SCSI_CD_STD_TIMEOUT 10
+
+
+static status_t
+update_capacity(cd_device_info *device)
+{
+	TRACE("update_capacity()\n");
+
+	scsi_ccb *ccb = device->scsi->alloc_ccb(device->scsi_device);
+	if (ccb == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = sSCSIPeripheral->check_capacity(
+		device->scsi_periph_device, ccb);
+
+	device->scsi->free_ccb(ccb);
+
+	return status;
+}
+
+
+static status_t
+get_geometry(cd_handle_info *handle, device_geometry *geometry)
+{
+	cd_device_info *device = handle->device;
+
+	status_t status = update_capacity(device);
+
+	// it seems that Be expects B_GET_GEOMETRY to always succeed unless
+	// the medium has been changed; e.g. if we report B_DEV_NO_MEDIA, the
+	// device is ignored by the CDPlayer and CDBurner
+	if (status == B_DEV_MEDIA_CHANGED)
+		return B_DEV_MEDIA_CHANGED;
+
+	geometry->bytes_per_sector = device->block_size;
+	geometry->sectors_per_track = 1;
+	geometry->cylinder_count = device->capacity;
+	geometry->head_count = 1;
+	geometry->device_type = device->device_type;
+	geometry->removable = device->removable;
+
+	// TBD: for all but CD-ROMs, read mode sense - medium type
+	// (bit 7 of block device specific parameter for Optical Memory Block Device)
+	// (same for Direct-Access Block Devices)
+	// (same for write-once block devices)
+	// (same for optical memory block devices)
+	geometry->read_only = true;
+	geometry->write_once = device->device_type == scsi_dev_WORM;
+
+	TRACE("scsi_disk: get_geometry(): %ld, %ld, %ld, %ld, %d, %d, %d, %d\n",
+		geometry->bytes_per_sector, geometry->sectors_per_track,
+		geometry->cylinder_count, geometry->head_count, geometry->device_type,
+		geometry->removable, geometry->read_only, geometry->write_once);
+
+	return B_OK;
+}
+
+
+static status_t
+get_toc(cd_device_info *device, scsi_toc *toc)
+{
+	scsi_ccb *ccb;
+	status_t res;
+	scsi_cmd_read_toc *cmd;
+	size_t dataLength;
+	scsi_toc_general *short_response = (scsi_toc_general *)toc->toc_data;
+
+	TRACE("get_toc()\n");
+
+	ccb = device->scsi->alloc_ccb(device->scsi_device);
+	if (ccb == NULL)
+		return B_NO_MEMORY;
+
+	// first read number of tracks only		
+	ccb->flags = SCSI_DIR_IN;
+
+	cmd = (scsi_cmd_read_toc *)ccb->cdb;
+
+	memset(cmd, 0, sizeof(*cmd));
+	cmd->opcode = SCSI_OP_READ_TOC;
+	cmd->time = 1;
+	cmd->format = SCSI_TOC_FORMAT_TOC;
+	cmd->track = 1;
+	cmd->allocation_length = B_HOST_TO_BENDIAN_INT16(sizeof(scsi_toc_general));
+
+	ccb->cdb_length = sizeof(*cmd);
+
+	ccb->sort = -1;
+	ccb->timeout = SCSI_CD_STD_TIMEOUT;
+
+	ccb->data = toc->toc_data;
+	ccb->sg_list = NULL;
+	ccb->data_length = sizeof(toc->toc_data);
+
+	res = sSCSIPeripheral->safe_exec(device->scsi_periph_device, ccb);
+	if (res != B_OK)
+		goto err;
+
+	// then read all track infos
+	// (little hint: number of tracks is last - first + 1; 
+	//  but scsi_toc_toc has already one track, so we get 
+	//  last - first extra tracks; finally, we want the lead-out as
+	//  well, so we add an extra track)
+	dataLength = (short_response->last - short_response->first + 1) 
+		* sizeof(scsi_toc_track) + sizeof(scsi_toc_toc);
+	dataLength = min_c(dataLength, sizeof(toc->toc_data));
+
+	TRACE("  tracks: %d - %d, data length %d\n", short_response->first,
+		short_response->last, (int)dataLength);
+
+	cmd->allocation_length = B_HOST_TO_BENDIAN_INT16(dataLength);
+
+	res = sSCSIPeripheral->safe_exec(device->scsi_periph_device, ccb);
+
+err:
+	device->scsi->free_ccb(ccb);
+
+	return res;
+}
+
+
+static status_t
+load_eject(cd_device_info *device, bool load)
+{
+	TRACE("load_eject()\n");
+
+	scsi_ccb *ccb = device->scsi->alloc_ccb(device->scsi_device);
+	if (ccb == NULL)
+		return B_NO_MEMORY;
+
+	err_res result = sSCSIPeripheral->send_start_stop(
+		device->scsi_periph_device, ccb, load, true);
+
+	device->scsi->free_ccb(ccb);
+
+	return result.error_code;
+}
+
+
+static status_t
+get_position(cd_device_info *device, scsi_position *position)
+{
+	scsi_cmd_read_subchannel cmd;
+
+	TRACE("get_position()\n");
+
+	memset(&cmd, 0, sizeof(cmd));
+	cmd.opcode = SCSI_OP_READ_SUB_CHANNEL;
+	cmd.time = 1;
+	cmd.subq = 1;
+	cmd.parameter_list = scsi_sub_channel_parameter_list_cd_pos;
+	cmd.track = 0;
+	cmd.allocation_length = B_HOST_TO_BENDIAN_INT16(sizeof(scsi_position));
+
+	return sSCSIPeripheral->simple_exec(device->scsi_periph_device,
+		&cmd, sizeof(cmd), position, sizeof(*position), SCSI_DIR_IN);
+}
+
+
+static status_t
+get_set_volume(cd_device_info *device, scsi_volume *volume, bool set)
+{
+	scsi_cmd_mode_sense_6 cmd;
+	scsi_mode_param_header_6 header;
+	size_t len;
+	void *buffer;
+	scsi_modepage_audio	*page;
+	status_t res;
+
+	TRACE("get_set_volume()\n");
+
+	// determine size of block descriptor
+	memset(&cmd, 0, sizeof(cmd));
+	cmd.opcode = SCSI_OP_MODE_SENSE_6;
+	cmd.page_code = SCSI_MODEPAGE_AUDIO;
+	cmd.page_control = SCSI_MODE_SENSE_PC_CURRENT;
+	cmd.allocation_length = sizeof(header);
+
+	memset(&header, -2, sizeof(header));
+
+	res = sSCSIPeripheral->simple_exec(device->scsi_periph_device, &cmd,
+		sizeof(cmd), &header, sizeof(header), SCSI_DIR_IN);
+	if (res != B_OK)
+		return res;
+
+	TRACE("  block_desc_len=%d", header.block_desc_length);
+#if 0
+	// ToDo: why this??
+	return B_ERROR;
+#endif
+
+	// retrieve param header, block descriptor and actual codepage
+	len = sizeof(header) + header.block_desc_length
+		+ sizeof(scsi_modepage_audio);
+
+	buffer = malloc(len);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	memset(buffer, -1, sizeof(buffer));
+
+	cmd.allocation_length = len;
+
+	res = sSCSIPeripheral->simple_exec(device->scsi_periph_device, &cmd,
+		sizeof(cmd), buffer, len, SCSI_DIR_IN);
+	if (res != B_OK) {
+		free(buffer);
+		return res;
+	}
+
+	TRACE("  mode_data_len=%d, block_desc_len=%d", 
+		((scsi_mode_param_header_6 *)buffer)->mode_data_length,
+		((scsi_mode_param_header_6 *)buffer)->block_desc_length);
+
+	// find control page and retrieve values
+	page = (scsi_modepage_audio *)((char *)buffer + sizeof(header)
+		+ header.block_desc_length);
+
+	TRACE("  page=%p, codepage=%d", page, page->header.page_code);
+
+	if (!set) {
+		volume->port0_channel = page->ports[0].channel;
+		volume->port0_volume  = page->ports[0].volume;
+		volume->port1_channel = page->ports[1].channel;
+		volume->port1_volume  = page->ports[1].volume;
+		volume->port2_channel = page->ports[2].channel;
+		volume->port2_volume  = page->ports[2].volume;
+		volume->port3_channel = page->ports[3].channel;
+		volume->port3_volume  = page->ports[3].volume;
+
+#if 0
+		SHOW_FLOW(3, "1: %d - %d", volume->port0_channel, volume->port0_volume);
+		SHOW_FLOW(3, "2: %d - %d", volume->port1_channel, volume->port1_volume);
+		SHOW_FLOW(3, "3: %d - %d", volume->port2_channel, volume->port2_volume);
+		SHOW_FLOW(3, "4: %d - %d", volume->port3_channel, volume->port3_volume);
+#endif
+		res = B_OK;
+	} else {
+		scsi_cmd_mode_select_6 cmd;
+
+		if (volume->flags & 0x01)
+			page->ports[0].channel = volume->port0_channel;
+		if (volume->flags & 0x02)
+			page->ports[0].volume = volume->port0_volume;
+		if (volume->flags & 0x04)
+			page->ports[1].channel = volume->port1_channel;
+		if (volume->flags & 0x08)
+			page->ports[1].volume = volume->port1_volume;
+		if (volume->flags & 0x10)
+			page->ports[2].channel = volume->port2_channel;
+		if (volume->flags & 0x20)
+			page->ports[2].volume = volume->port2_volume;
+		if (volume->flags & 0x40)
+			page->ports[3].channel = volume->port3_channel;
+		if (volume->flags & 0x80)
+			page->ports[3].volume = volume->port3_volume;
+
+		memset(&cmd, 0, sizeof(cmd));
+		cmd.opcode = SCSI_OP_MODE_SELECT_6;
+		cmd.pf = 1;
+		cmd.param_list_length = sizeof(header) + header.block_desc_length
+			+ sizeof(*page);
+
+		res = sSCSIPeripheral->simple_exec(device->scsi_periph_device, 
+			&cmd, sizeof(cmd), buffer, len, SCSI_DIR_OUT);
+	}
+
+	free(buffer);
+	return res;
+}
+
+
+/*!	Play audio cd; time is in MSF */
+static status_t
+play_msf(cd_device_info *device, const scsi_play_position *position)
+{
+	scsi_cmd_play_msf cmd;
+
+	TRACE("play_msf(): %d:%d:%d-%d:%d:%d\n", position->start_m,
+		position->start_s, position->start_f, position->end_m, position->end_s,
+		position->end_f);
+
+	memset(&cmd, 0, sizeof(cmd));
+
+	cmd.opcode = SCSI_OP_PLAY_MSF;
+	cmd.start_minute = position->start_m;
+	cmd.start_second = position->start_s;
+	cmd.start_frame = position->start_f;
+	cmd.end_minute = position->end_m;
+	cmd.end_second = position->end_s;
+	cmd.end_frame = position->end_f;
+
+	return sSCSIPeripheral->simple_exec(device->scsi_periph_device,
+		&cmd, sizeof(cmd), NULL, 0, 0);
+}
+
+
+/*! Play audio cd; time is in track/index */
+static status_t
+play_track_index(cd_device_info *device, const scsi_play_track *buf)
+{
+	scsi_toc generic_toc;
+	scsi_toc_toc *toc;
+	status_t res;
+	int start_track, end_track;
+	scsi_play_position position;
+
+	TRACE("play_track_index(): %d-%d\n", buf->start_track, buf->end_track);
+
+	// the corresponding command PLAY AUDIO TRACK/INDEX	is deprecated,
+	// so we have to simulate it by converting track to time via TOC
+	res = get_toc(device, &generic_toc);
+	if (res != B_OK)
+		return res;
+
+	toc = (scsi_toc_toc *)&generic_toc.toc_data[0];
+
+	start_track = buf->start_track;
+	end_track = buf->end_track;
+
+	if (start_track > toc->last_track)
+		return B_BAD_INDEX;
+
+	if (end_track > toc->last_track)
+		end_track = toc->last_track + 1;
+		
+	if (end_track < toc->last_track + 1)
+		++end_track;
+
+	start_track -= toc->first_track;
+	end_track -= toc->first_track;
+
+	if (start_track < 0 || end_track < 0)
+		return B_BAD_INDEX;
+
+	position.start_m = toc->tracks[start_track].start.time.minute;
+	position.start_s = toc->tracks[start_track].start.time.second;
+	position.start_f = toc->tracks[start_track].start.time.frame;
+
+	position.end_m = toc->tracks[end_track].start.time.minute;
+	position.end_s = toc->tracks[end_track].start.time.second;
+	position.end_f = toc->tracks[end_track].start.time.frame;
+
+	return play_msf(device, &position);
+}
+
+
+static status_t
+stop_audio(cd_device_info *device)
+{
+	scsi_cmd_stop_play cmd;
+
+	TRACE("stop_audio()\n");
+
+	memset( &cmd, 0, sizeof( cmd ));
+	cmd.opcode = SCSI_OP_STOP_PLAY;
+
+	return sSCSIPeripheral->simple_exec(device->scsi_periph_device,
+		&cmd, sizeof(cmd), NULL, 0, 0);
+}
+
+
+static status_t
+pause_resume(cd_device_info *device, bool resume)
+{
+	scsi_cmd_pause_resume cmd;
+
+	TRACE("pause_resume()\n");
+
+	memset(&cmd, 0, sizeof(cmd));
+	cmd.opcode = SCSI_OP_PAUSE_RESUME;
+	cmd.resume = resume;
+
+	return sSCSIPeripheral->simple_exec(device->scsi_periph_device,
+		&cmd, sizeof(cmd), NULL, 0, 0);
+}
+
+
+static status_t
+scan(cd_device_info *device, const scsi_scan *buf)
+{
+	scsi_cmd_scan cmd;
+	scsi_position curPos;
+	scsi_cd_current_position *cdPos;
+
+	TRACE("scan(direction =% d)\n", buf->direction);
+
+	status_t res = get_position(device, &curPos);
+	if (res != B_OK)
+		return res;
+
+	cdPos = (scsi_cd_current_position *)((char *)&curPos 
+		+ sizeof(scsi_subchannel_data_header));
+
+	if (buf->direction == 0) {
+		scsi_play_position playPos;
+
+		// to stop scan, we issue play command with "open end"
+		playPos.start_m = cdPos->absolute_address.time.minute;
+		playPos.start_s = cdPos->absolute_address.time.second;
+		playPos.start_f = cdPos->absolute_address.time.frame;
+		playPos.end_m = 99;
+		playPos.end_s = 59;
+		playPos.end_f = 24;
+
+		return play_msf(device, &playPos);
+	}
+
+	memset(&cmd, 0, sizeof(cmd));
+
+	cmd.opcode = SCSI_OP_SCAN;
+	cmd.direct = buf->direction < 0;
+	cmd.start.time = cdPos->absolute_address.time;
+	cmd.type = scsi_scan_msf;
+
+	/*
+	tmp = (uint8 *)&cmd;
+	dprintf("%d %d %d %d %d %d %d %d %d %d %d %d\n",
+		tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], 
+		tmp[6], tmp[7], tmp[8], tmp[9], tmp[10], tmp[11]);
+	*/
+
+	return sSCSIPeripheral->simple_exec(device->scsi_periph_device,
+		&cmd, sizeof(cmd), NULL, 0, 0);
+}
+
+
+static status_t
+read_cd(cd_device_info *device, const scsi_read_cd *readCD)
+{
+	scsi_cmd_read_cd *cmd;
+	uint32 lba, length;		
+	scsi_ccb *ccb;
+	status_t res;
+
+	// we use safe_exec instead of simple_exec as we want to set
+	// the sorting order manually (only makes much sense if you grab
+	// multiple tracks at once, but we are prepared)
+	ccb = device->scsi->alloc_ccb(device->scsi_device);
+
+	if (ccb == NULL)
+		return B_NO_MEMORY;
+
+	cmd = (scsi_cmd_read_cd *)ccb->cdb;		
+	memset(cmd, 0, sizeof(*cmd));
+	cmd->opcode = SCSI_OP_READ_CD;
+	cmd->sector_type = 1;
+
+	// skip first two seconds, they are lead-in
+	lba = (readCD->start_m * 60 + readCD->start_s) * 75 + readCD->start_f
+		- 2 * 75;
+	length = (readCD->length_m * 60 + readCD->length_s) * 75 + readCD->length_f;
+
+	cmd->lba = B_HOST_TO_BENDIAN_INT32(lba);
+	cmd->high_length = (length >> 16) & 0xff;
+	cmd->mid_length = (length >> 8) & 0xff;
+	cmd->low_length = length & 0xff;
+
+	cmd->error_field = scsi_read_cd_error_none;
+	cmd->edc_ecc = 0;
+	cmd->user_data = 1;
+	cmd->header_code = scsi_read_cd_header_none;
+	cmd->sync = 0;
+	cmd->sub_channel_selection = scsi_read_cd_sub_channel_none;
+
+	ccb->cdb_length = sizeof(*cmd);
+
+	ccb->flags = SCSI_DIR_IN | SCSI_DIS_DISCONNECT;
+	ccb->sort = lba;
+	// are 10 seconds enough for timeout?
+	ccb->timeout = 10;
+
+	// TODO: we pass a user buffer here!
+	ccb->data = (uint8 *)readCD->buffer;
+	ccb->sg_list = NULL;
+	ccb->data_length = readCD->buffer_length;
+
+	res = sSCSIPeripheral->safe_exec(device->scsi_periph_device, ccb);
+
+	device->scsi->free_ccb(ccb);
+
+	return res;
+}
+
+
+static int
+log2(uint32 x)
+{
+	int y;
+
+	for (y = 31; y >= 0; --y) {
+		if (x == (1UL << y))
+			break;
+	}
+		
+	return y;
+}
+
+
+//	#pragma mark - block_io API
+
+
+static void
+cd_set_device(cd_device_info *info, block_io_device device)
+{
+	info->block_io_device = device;
+}
+
+
+static status_t
+cd_open(cd_device_info *device, cd_handle_info **_cookie)
+{
+	TRACE("open()\n");
+
+	cd_handle_info *handle = (cd_handle_info *)malloc(sizeof(*handle));
+	if (handle == NULL)
+		return B_NO_MEMORY;
+
+	handle->device = device;
+
+	status_t status = sSCSIPeripheral->handle_open(device->scsi_periph_device,
+		(periph_handle_cookie)handle, &handle->scsi_periph_handle);
+	if (status < B_OK) {
+		free(handle);
+		return status;
+	}
+
+	if (device->block_size == 0 || device->capacity == 0) {	
+		scsi_ccb *request = device->scsi->alloc_ccb(device->scsi_device);
+		if (request != NULL) {
+			// don't care if no test was possible
+			sSCSIPeripheral->check_capacity(device->scsi_periph_device, request);
+			device->scsi->free_ccb(request);
+		}
+	}
+
+	*_cookie = handle;
+	return B_OK;
+}
+
+
+static status_t
+cd_close(cd_handle_info *handle)
+{
+	TRACE("close()\n");
+
+	sSCSIPeripheral->handle_close(handle->scsi_periph_handle);
+	return B_OK;
+}
+
+
+static status_t
+cd_free(cd_handle_info *handle)
+{
+	TRACE("free()\n");
+
+	sSCSIPeripheral->handle_free(handle->scsi_periph_handle);
+	free(handle);
+	return B_OK;
+}
+
+
+static status_t
+cd_read(cd_handle_info *handle, const phys_vecs *vecs, off_t pos,
+	size_t num_blocks, uint32 block_size, size_t *bytes_transferred)
+{
+	return sSCSIPeripheral->read(handle->scsi_periph_handle, vecs, pos, 
+		num_blocks, block_size, bytes_transferred, 10);
+}
+
+
+static status_t
+cd_write(cd_handle_info *handle, const phys_vecs *vecs, off_t pos,
+	size_t num_blocks, uint32 block_size, size_t *bytes_transferred)
+{
+	return sSCSIPeripheral->write(handle->scsi_periph_handle, vecs, pos, 
+		num_blocks, block_size, bytes_transferred, 10);
+}
+
+
+static status_t
+cd_ioctl(cd_handle_info *handle, int op, void *buffer, size_t length)
+{
+	cd_device_info *device = handle->device;
+
+	TRACE("ioctl(op = %d)\n", op);
+
+	switch (op) {
+		case B_GET_DEVICE_SIZE:
+		{
+			status_t status = update_capacity(device);
+			if (status != B_OK)
+				return status;
+
+			size_t size = device->capacity * device->block_size;
+			return user_memcpy(buffer, &size, sizeof(size_t));
+		}
+
+		case B_GET_GEOMETRY:
+		{
+			if (buffer == NULL /*|| length != sizeof(device_geometry)*/)
+				return B_BAD_VALUE;
+
+		 	device_geometry geometry;
+			status_t status = get_geometry(handle, &geometry);
+			if (status != B_OK)
+				return status;
+			
+			return user_memcpy(buffer, &geometry, sizeof(device_geometry));
+		}
+
+		case B_GET_ICON:
+			return sSCSIPeripheral->get_icon(icon_type_cd,
+				(device_icon *)buffer);
+
+		case B_SCSI_GET_TOC:
+			// TODO: we pass a user buffer here!
+			return get_toc(device, (scsi_toc *)buffer);
+
+		case B_EJECT_DEVICE:
+		case B_SCSI_EJECT:
+			return load_eject(device, false);
+
+		case B_LOAD_MEDIA:
+			return load_eject(device, true);
+
+		case B_SCSI_GET_POSITION:
+		{
+			if (buffer == NULL)
+				return B_BAD_VALUE;
+			
+			scsi_position position;
+			status_t status = get_position(device, &position);
+			if (status != B_OK)
+				return status;
+
+			return user_memcpy(buffer, &position, sizeof(scsi_position));
+		}
+
+		case B_SCSI_GET_VOLUME:
+			// TODO: we pass a user buffer here!
+			return get_set_volume(device, (scsi_volume *)buffer, false);
+		case B_SCSI_SET_VOLUME:
+			// TODO: we pass a user buffer here!
+			return get_set_volume(device, (scsi_volume *)buffer, true);
+
+		case B_SCSI_PLAY_TRACK:
+		{
+			scsi_play_track track;
+			if (user_memcpy(&track, buffer, sizeof(scsi_play_track)) != B_OK)
+				return B_BAD_ADDRESS;
+
+			return play_track_index(device, &track);
+		}
+		case B_SCSI_PLAY_POSITION:
+		{
+			scsi_play_position position;
+			if (user_memcpy(&position, buffer, sizeof(scsi_play_position))
+					!= B_OK)
+				return B_BAD_ADDRESS;
+
+			return play_msf(device, &position);
+		}
+
+		case B_SCSI_STOP_AUDIO:
+			return stop_audio(device);
+		case B_SCSI_PAUSE_AUDIO:
+			return pause_resume(device, false);
+		case B_SCSI_RESUME_AUDIO:
+			return pause_resume(device, true);
+
+		case B_SCSI_SCAN:
+		{
+			scsi_scan scanBuffer;
+			if (user_memcpy(&scanBuffer, buffer, sizeof(scsi_scan)) != B_OK)
+				return B_BAD_ADDRESS;
+			
+			return scan(device, &scanBuffer);
+		}
+		case B_SCSI_READ_CD:
+			// TODO: we pass a user buffer here!
+			return read_cd(device, (scsi_read_cd *)buffer);
+
+		default:
+			return sSCSIPeripheral->ioctl(handle->scsi_periph_handle, op,
+				buffer, length);
+	}
+}
+
+
+//	#pragma mark - scsi_periph callbacks
+
+
+static void
+cd_set_capacity(cd_device_info *device, uint64 capacity, uint32 blockSize)
+{
+	TRACE("das_set_capacity(device = %p, capacity = %Ld, blockSize = %ld)\n",
+		device, capacity, blockSize);
+
+	// get log2, if possible
+	uint32 blockShift = log2(blockSize);
+
+	if ((1UL << blockShift) != blockSize)
+		blockShift = 0;
+
+	device->capacity = capacity;
+	device->block_size = blockSize;
+
+	sBlockIO->set_media_params(device->block_io_device, blockSize,
+		blockShift, capacity);
+}
+
+
+static void
+cd_media_changed(cd_device_info *device, scsi_ccb *request)
+{
+	// do a capacity check
+	// TBD: is this a good idea (e.g. if this is an empty CD)?
+	sSCSIPeripheral->check_capacity(device->scsi_periph_device, request);
+}
+
+
+scsi_periph_callbacks callbacks = {
+	(void (*)(periph_device_cookie, uint64, uint32))cd_set_capacity,
+	(void (*)(periph_device_cookie, scsi_ccb *))cd_media_changed
+};
+
+
+//	#pragma mark - driver module API
+
+
+static float
+cd_supports_device(device_node *parent)
+{
+	const char *bus;
+	uint8 deviceType;
+
+	// make sure parent is really the SCSI bus manager
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return -1;
+
+	if (strcmp(bus, "scsi"))
+		return 0.0;
+
+	// check whether it's really a CD-ROM or WORM
+	if (sDeviceManager->get_attr_uint8(parent, SCSI_DEVICE_TYPE_ITEM,
+			&deviceType, true) != B_OK
+		|| (deviceType != scsi_dev_CDROM && deviceType != scsi_dev_WORM))
+		return 0.0;
+
+	return 0.6;
+}
+
+
+/*!	Called whenever a new device was added to system;
+	if we really support it, we create a new node that gets
+	server by the block_io module
+*/
+static status_t
+cd_register_device(device_node *node)
+{
+	const scsi_res_inquiry *deviceInquiry = NULL;
+	size_t inquiryLength;
+	uint32 maxBlocks;
+
+	// get inquiry data
+	if (sDeviceManager->get_attr_raw(node, SCSI_DEVICE_INQUIRY_ITEM,
+			(const void **)&deviceInquiry, &inquiryLength, true) != B_OK
+		|| inquiryLength < sizeof(deviceInquiry))
+		return B_ERROR;
+
+	// get block limit of underlying hardware to lower it (if necessary)
+	if (sDeviceManager->get_attr_uint32(node, B_BLOCK_DEVICE_MAX_BLOCKS_ITEM,
+			&maxBlocks, true) != B_OK)
+		maxBlocks = INT_MAX;
+
+	// using 10 byte commands, at most 0xffff blocks can be transmitted at once
+	// (sadly, we cannot update this value later on if only 6 byte commands
+	//  are supported, but the block_io module can live with that)
+	maxBlocks = min_c(maxBlocks, 0xffff);
+
+	// ready to register
+	device_attr attrs[] = {
+		// tell block_io whether the device is removable
+		{"removable", B_UINT8_TYPE, {ui8: deviceInquiry->removable_medium}},
+		// impose own max block restriction
+		{B_BLOCK_DEVICE_MAX_BLOCKS_ITEM, B_UINT32_TYPE, {ui32: maxBlocks}},
+		{ NULL }
+	};
+
+	return sDeviceManager->register_node(node, SCSI_CD_MODULE_NAME, attrs,
+		NULL, NULL);
+}
+
+
+static status_t
+cd_init_driver(device_node *node, void **cookie)
+{
+	cd_device_info *device;
+	status_t status;
+	uint8 removable;
+
+	TRACE("cd_init_driver");
+
+	status = sDeviceManager->get_attr_uint8(node, "removable",
+		&removable, false);
+	if (status != B_OK)
+		return status;
+
+	device = (cd_device_info *)malloc(sizeof(*device));
+	if (device == NULL)
+		return B_NO_MEMORY;
+
+	memset(device, 0, sizeof(*device));
+
+	device->node = node;
+	device->removable = removable;
+
+	// set capacity to zero, so it get checked on first opened handle
+	device->capacity = 0;
+	device->block_size = 0;
+
+	sDeviceManager->get_attr_uint8(node, SCSI_DEVICE_TYPE_ITEM, 
+		&device->device_type, true);
+
+	device_node *parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&device->scsi,
+		(void **)&device->scsi_device);
+	sDeviceManager->put_node(parent);
+
+	status = sSCSIPeripheral->register_device((periph_device_cookie)device,
+		&callbacks, device->scsi_device, device->scsi, device->node,
+		device->removable, &device->scsi_periph_device);
+	if (status != B_OK) {
+		free(device);
+		return status;
+	}
+
+	*cookie = device;
+	return B_OK;
+}
+
+
+static void
+cd_uninit_driver(void *_cookie)
+{
+	cd_device_info *device = (cd_device_info *)_cookie;
+
+	sSCSIPeripheral->unregister_device(device->scsi_periph_device);
+	free(device);
+}
+
+
+static status_t
+cd_register_child_devices(void *_cookie)
+{
+	cd_device_info *device = (cd_device_info *)_cookie;
+	status_t status;
+	char *name;
+
+	name = sSCSIPeripheral->compose_device_name(device->node, "disk/scsi");
+	if (name == NULL)
+		return B_ERROR;
+
+	status = sDeviceManager->publish_device(device->node, name,
+		B_BLOCK_IO_DEVICE_MODULE_NAME);
+
+	free(name);
+	return status;
+}
+
+
+module_dependency module_dependencies[] = {
+	{SCSI_PERIPH_MODULE_NAME, (module_info **)&sSCSIPeripheral},
+	{B_BLOCK_IO_FOR_DRIVER_MODULE_NAME, (module_info **)&sBlockIO},
+	{B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager},
+	{}
+};
+
+block_device_interface sSCSICDModule = {
+	{
+		{
+			SCSI_CD_MODULE_NAME,
+			0,			
+			NULL
+		},
+
+		cd_supports_device,		
+		cd_register_device,
+		cd_init_driver,
+		cd_uninit_driver,
+		cd_register_child_devices,
+		NULL,	// rescan
+		NULL,	// removed
+	},
+
+	(void (*)(block_device_cookie *, block_io_device))	&cd_set_device,
+	(status_t (*)(block_device_cookie *, block_device_handle_cookie **))&cd_open,
+	(status_t (*)(block_device_handle_cookie *))		&cd_close,
+	(status_t (*)(block_device_handle_cookie *))		&cd_free,
+
+	(status_t (*)(block_device_handle_cookie *, const phys_vecs *, 
+		off_t, size_t, uint32, size_t *))				&cd_read,
+	(status_t (*)(block_device_handle_cookie *, const phys_vecs *,
+		off_t, size_t, uint32, size_t *))				&cd_write,
+
+	(status_t (*)(block_device_handle_cookie *, int, void *, size_t))&cd_ioctl,
+};
+
+module_info *modules[] = {
+	(module_info *)&sSCSICDModule,
+	NULL
+};

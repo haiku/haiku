@@ -172,7 +172,7 @@ AddDriversToHaikuImage				: console dprintf $(X86_ONLY)keyboard null
 AddDriversToHaikuImage audio hmulti	: $(BEOS_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToHaikuImage midi			: $(BEOS_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToHaikuImage bus			: usb_raw ; # fw_raw
-AddDriversToHaikuImage disk scsi	: scsi_disk ; #scsi_cd;
+AddDriversToHaikuImage disk scsi	: scsi_cd scsi_disk ;
 AddDriversToHaikuImage disk usb		: usb_disk ;
 AddDriversToHaikuImage disk virtual	: nbd ;
 AddDriversToHaikuImage dvb			: cx23882 ;
@@ -359,8 +359,8 @@ AddBootModuleSymlinksToHaikuImage
 	pci $(X86_ONLY)isa config_manager ide scsi
 	$(PPC_ONLY)openpic
 	block_io ide_adapter locked_pool scsi_periph
-	generic_ide_pci ahci silicon_image_3112 # $(X86_ONLY)ide_isa legacy_sata
-	scsi_disk #scsi_cd
+	generic_ide_pci ahci legacy_sata silicon_image_3112 # $(X86_ONLY)ide_isa
+	scsi_cd scsi_disk
 	intel
 	bfs
 ;
