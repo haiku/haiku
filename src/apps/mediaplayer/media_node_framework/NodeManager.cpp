@@ -64,7 +64,8 @@ NodeManager::~NodeManager()
 
 // Init
 status_t
-NodeManager::Init(BRect videoBounds, float videoFrameRate, int32 loopingMode,
+NodeManager::Init(BRect videoBounds, float videoFrameRate,
+	color_space preferredVideoFormat, int32 loopingMode,
 	bool loopingEnabled, float speed)
 {
 	// init base class
@@ -80,7 +81,8 @@ NodeManager::Init(BRect videoBounds, float videoFrameRate, int32 loopingMode,
 	if (!fAudioSupplier)
 		fAudioSupplier = CreateAudioSupplier();
 
-	return FormatChanged(videoBounds, videoFrameRate, true);
+	return FormatChanged(videoBounds, videoFrameRate, preferredVideoFormat,
+		true);
 }
 
 // InitCheck
@@ -114,7 +116,8 @@ NodeManager::CleanupNodes()
 
 // FormatChanged
 status_t
-NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate, bool force)
+NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
+	color_space preferredVideoFormat, bool force)
 {
 	if (!force && videoBounds == VideoBounds()
 		&& videoFrameRate == FramesPerSecond())
@@ -130,7 +133,7 @@ NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate, bool force)
 
 	SetVideoBounds(videoBounds);
 
-	status_t ret = _SetUpNodes();
+	status_t ret = _SetUpNodes(preferredVideoFormat);
 	if (ret == B_OK)
 		_StartNodes();
 	else
@@ -225,7 +228,7 @@ NodeManager::SetVolume(float percent)
 
 // _SetUpNodes
 status_t
-NodeManager::_SetUpNodes()
+NodeManager::_SetUpNodes(color_space preferredVideoFormat)
 {
 printf("NodeManager::_SetUpNodes()\n");
 
@@ -250,7 +253,7 @@ printf("NodeManager::_SetUpNodes()\n");
 
 	// setup the video nodes
 	if (fVideoBounds.IsValid()) {
-		fStatus = _SetUpVideoNodes();
+		fStatus = _SetUpVideoNodes(preferredVideoFormat);
 		if (fStatus != B_OK) {
 			print_error("Error setting up video nodes", fStatus);
 			fMediaRoster->Unlock();
@@ -277,7 +280,7 @@ printf("NodeManager::_SetUpNodes()\n");
 
 // _SetUpVideoNodes
 status_t
-NodeManager::_SetUpVideoNodes()
+NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat)
 {
 	// create the video producer node
 	fVideoProducer = new VideoProducer(NULL, "MediaPlayer Video Out", 0,
@@ -342,7 +345,7 @@ NodeManager::_SetUpVideoNodes()
 		fVideoBounds.IntegerWidth(),
 		B_VIDEO_TOP_LEFT_RIGHT, 1, 1,
 		{
-			B_YCbCr422,
+			preferredVideoFormat,
 			fVideoBounds.IntegerWidth() + 1,
 			fVideoBounds.IntegerHeight() + 1,
 			0, 0, 0
@@ -354,7 +357,7 @@ NodeManager::_SetUpVideoNodes()
 	fStatus = fMediaRoster->Connect(videoOutput.source, videoInput.destination,
 		&format, &videoOutput, &videoInput);
 
-	if (fStatus != B_OK) {
+	if (fStatus != B_OK && preferredVideoFormat != B_RGB32) {
 		print_error("Can't connect the video source to the video window... "
 					"trying B_RGB32", fStatus);
 		format.u.raw_video.display.format = B_RGB32;

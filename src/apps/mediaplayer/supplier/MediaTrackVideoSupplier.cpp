@@ -27,8 +27,7 @@ static const char* string_for_color_space(color_space format);
 
 
 // constructor
-MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track,
-		color_space format)
+MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track)
 	: VideoTrackSupplier()
 	, fVideoTrack(track)
 
@@ -41,7 +40,7 @@ MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track,
 		return;
 	}
 
-	_SwitchFormat(format, 0);
+	_SwitchFormat(B_NO_COLOR_SPACE, 0);
 
 	fDuration = fVideoTrack->Duration();
 
@@ -320,6 +319,18 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 	// get ouput video frame size
 	uint32 width = fFormat.u.encoded_video.output.display.line_width;
 	uint32 height = fFormat.u.encoded_video.output.display.line_count;
+	if (format == B_NO_COLOR_SPACE) {
+		format = fFormat.u.encoded_video.output.display.format;
+		if (format == B_NO_COLOR_SPACE) {
+			// if still no preferred format, try the most commonly
+			// supported overlay format
+			format = B_YCbCr422;
+		} else {
+			printf("MediaTrackVideoSupplier::_SwitchFormat() - "
+				"preferred color space: %s\n",
+				string_for_color_space(format));
+		}
+	}
 
 	// specifiy the decoded format. we derive this information from
 	// the encoded format (width & height).
@@ -332,10 +343,10 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 	fFormat.u.raw_video.display.line_width = width;
 	fFormat.u.raw_video.display.line_count = height;
 	int32 minBytesPerRow;
-	if (format == B_RGB32 || format == B_RGBA32)
-		minBytesPerRow = width * 4;
-	else if (format == B_YCbCr422)
+	if (format == B_YCbCr422)
 		minBytesPerRow = ((width * 2 + 3) / 4) * 4;
+	else
+		minBytesPerRow = width * 4;
 	fFormat.u.raw_video.display.bytes_per_row = max_c(minBytesPerRow,
 		bytesPerRow);
 

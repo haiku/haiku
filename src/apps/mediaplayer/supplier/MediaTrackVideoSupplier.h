@@ -16,8 +16,7 @@ class BMediaTrack;
 
 class MediaTrackVideoSupplier : public VideoTrackSupplier {
  public:
-								MediaTrackVideoSupplier(BMediaTrack* track,
-									color_space preferredFormat);
+								MediaTrackVideoSupplier(BMediaTrack* track);
 	virtual						~MediaTrackVideoSupplier();
 
 	virtual	const media_format&	Format() const;

@@ -225,7 +225,8 @@ VideoConsumer::CreateBuffers(const media_format& format)
 	for (uint32 i = 0; i < kBufferCount; i++) {
 		// figure out the bitmap creation flags
 		uint32 bitmapFlags = 0;
-		if (colorSpace == B_YCbCr422 || colorSpace == B_YCbCr444) {
+		if (colorSpace == B_YCbCr420 || colorSpace == B_YCbCr411
+			|| colorSpace == B_YCbCr422 || colorSpace == B_YCbCr444) {
 			// try to use hardware overlay
 			bitmapFlags |= B_BITMAP_WILL_OVERLAY;
 			if (i == 0)
@@ -262,6 +263,7 @@ VideoConsumer::CreateBuffers(const media_format& format)
 			info.size = (size_t)fBitmap[i]->BitsLength();
 			info.flags = 0;
 			info.buffer = 0;
+				// the media buffer id
 
 			BBuffer *buffer = NULL;
 			if ((status = fBuffers->AddBuffer(info, &buffer)) != B_OK) {

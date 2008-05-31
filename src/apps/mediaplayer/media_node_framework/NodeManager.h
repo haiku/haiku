@@ -33,6 +33,7 @@ class NodeManager : public PlaybackManager {
 
 	// NodeManager
 			status_t			Init(BRect videoBounds, float videoFrameRate,
+									color_space preferredVideoFormat,
 									int32 loopingMode = LOOPING_ALL,
 									bool loopingEnabled = true,
 									float speed = 1.0);
@@ -42,7 +43,9 @@ class NodeManager : public PlaybackManager {
 			status_t			CleanupNodes();
 
 			status_t			FormatChanged(BRect videoBounds,
-									float videoFrameRate, bool force = false);
+									float videoFrameRate,
+									color_space preferredVideoFormat,
+									bool force = false);
 	virtual	void				SetPlayMode(int32 mode,
 									bool continuePlaying = true);
 									
@@ -60,8 +63,9 @@ class NodeManager : public PlaybackManager {
 	virtual	void				SetVolume(float percent);
 
  private:
-			status_t			_SetUpNodes();
-			status_t			_SetUpVideoNodes();
+			status_t			_SetUpNodes(color_space preferredVideoFormat);
+			status_t			_SetUpVideoNodes(
+									color_space preferredVideoFormat);
 			status_t			_SetUpAudioNodes();
 			status_t			_TearDownNodes(bool disconnect = true);
 			status_t			_StartNodes();

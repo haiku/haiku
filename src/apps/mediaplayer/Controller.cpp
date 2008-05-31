@@ -245,14 +245,21 @@ Controller::SetTo(const entry_ref &ref)
 	SelectAudioTrack(0);
 	SelectVideoTrack(0);
 
+	// prevent blocking the creation of new overlay buffers
 	fVideoView->DisableOverlay();
 
+	// get video properties (if there is video at all)
 	int width;
 	int height;
 	GetSize(&width, &height);
+	color_space preferredVideoFormat = B_NO_COLOR_SPACE;
+	if (fVideoTrackSupplier) {
+		const media_format& format = fVideoTrackSupplier->Format();
+		preferredVideoFormat = format.u.raw_video.display.format;
+	}
 
 	Init(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-		LOOPING_ALL, false);
+		preferredVideoFormat, LOOPING_ALL, false);
 
 	SetCurrentFrame(0);
 
@@ -339,8 +346,7 @@ Controller::SelectVideoTrack(int n)
 		return B_ERROR;
 
 	ObjectDeleter<VideoTrackSupplier> deleter(fVideoTrackSupplier);
-	fVideoTrackSupplier = new MediaTrackVideoSupplier(track,
-		IsOverlayActive() ? B_YCbCr422 : B_RGB32);
+	fVideoTrackSupplier = new MediaTrackVideoSupplier(track);
 
 	bigtime_t a = fAudioTrackSupplier ? fAudioTrackSupplier->Duration() : 0;
 	bigtime_t v = fVideoTrackSupplier->Duration();
