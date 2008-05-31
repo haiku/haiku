@@ -1,6 +1,16 @@
 #ifndef GENSYSCALLS_H
 #define GENSYSCALLS_H
 
+// TODO: <syscalls.h> is pre-processed with the cross-compiler, but the
+// pre-processed header is compiled with the native compiler. Unfortunately
+// <stdarg.h> is included indirectly, which results in a missing typedef when
+// the host compiler is gcc 2 and the native compiler gcc 4. The type is never
+// really used, so this doesn't really matter what it is defined to. The better
+// solution would be to remove the <stdarg.h> dependency, though.
+#if __GNUC__ == 2
+typedef void *__builtin_va_list;
+#endif
+
 // Type
 class Type {
 public:
