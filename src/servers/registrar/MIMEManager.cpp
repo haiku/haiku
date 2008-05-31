@@ -226,16 +226,20 @@ MIMEManager::MessageReceived(BMessage *message)
 			if (!err) {
 				switch (message->what) {
 					case B_REG_MIME_CREATE_APP_META_MIME:
-						thread = new(nothrow) CreateAppMetaMimeThread((synchronous ?
-							"create_app_meta_mime (s)" : "create_app_meta_mime (a)"),
-							B_NORMAL_PRIORITY, BMessenger(&fThreadManager), &root, recursive,
+						thread = new(nothrow) CreateAppMetaMimeThread(
+							synchronous ? "create_app_meta_mime (s)"
+								: "create_app_meta_mime (a)",
+							B_NORMAL_PRIORITY, &fDatabase,
+							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;
 					
 					case B_REG_MIME_UPDATE_MIME_INFO:
-						thread = new(nothrow) UpdateMimeInfoThread((synchronous ?
-							"update_mime_info (s)" : "update_mime_info (a)"),
-							B_NORMAL_PRIORITY, BMessenger(&fThreadManager), &root, recursive,
+						thread = new(nothrow) UpdateMimeInfoThread(synchronous
+								? "update_mime_info (s)"
+								: "update_mime_info (a)",
+							B_NORMAL_PRIORITY, &fDatabase,
+							BMessenger(&fThreadManager), &root, recursive,
 							force, synchronous ? message : NULL);
 						break;
 						
