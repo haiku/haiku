@@ -22,7 +22,7 @@ typedef struct block_io_device_info *block_io_device;
 typedef struct block_io_handle_info *block_io_handle;
 
 // cookies issued by device driver
-typedef struct block_device_handle_cookie *block_device_handle_cookie;
+typedef struct block_device_handle_cookie block_device_handle_cookie;
 
 
 // two reason why to use array of size 1:
@@ -69,16 +69,16 @@ typedef struct block_device_interface {
 	// iovecs are physical address here
 	// pos and num_blocks are in blocks; bytes_transferred in bytes
 	// vecs are guaranteed to describe enough data for given block count
-	status_t (*open)(block_device_cookie *cookie, block_device_handle_cookie *handle);
-	status_t (*close)(block_device_handle_cookie handle);
-	status_t (*free)(block_device_handle_cookie handle);
+	status_t (*open)(block_device_cookie *cookie, block_device_handle_cookie **handle);
+	status_t (*close)(block_device_handle_cookie *handle);
+	status_t (*free)(block_device_handle_cookie *handle);
 
-	status_t (*read)(block_device_handle_cookie handle, const phys_vecs *vecs, off_t pos,
+	status_t (*read)(block_device_handle_cookie *handle, const phys_vecs *vecs, off_t pos,
 				size_t num_blocks, uint32 block_size, size_t *bytes_transferred);
-	status_t (*write)(block_device_handle_cookie handle, const phys_vecs *vecs, off_t pos,
+	status_t (*write)(block_device_handle_cookie *handle, const phys_vecs *vecs, off_t pos,
 				size_t num_blocks, uint32 block_size, size_t *bytes_transferred);
 
-	status_t (*ioctl)(block_device_handle_cookie handle, int op, void *buf, size_t len);
+	status_t (*ioctl)(block_device_handle_cookie *handle, int op, void *buf, size_t len);
 } block_device_interface;
 
 #define B_BLOCK_IO_DEVICE_MODULE_NAME "generic/block_io/device_v1"

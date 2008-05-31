@@ -53,7 +53,7 @@ typedef struct block_io_device_info {
 // file handle info
 typedef struct block_io_handle_info {
 	block_io_device_info *device;
-	block_device_handle_cookie cookie;
+	block_device_handle_cookie *cookie;
 } block_io_handle_info;
 
 

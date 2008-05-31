@@ -571,7 +571,7 @@ struct device_module_info sBlockIOModule = {
 	(status_t (*)(void *, off_t, const void *, size_t *))block_io_write,
 	NULL,	// io
 
-	(status_t (*)(void *, int32, void *, size_t))block_io_ioctl,
+	(status_t (*)(void *, uint32, void *, size_t))block_io_ioctl,
 
 	NULL,	// select
 	NULL,	// deselect
