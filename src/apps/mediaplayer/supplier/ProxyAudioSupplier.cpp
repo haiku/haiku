@@ -43,7 +43,9 @@ struct PlayingInterval {
 
 
 ProxyAudioSupplier::ProxyAudioSupplier(PlaybackManager* playbackManager)
-	: fPlaybackManager(playbackManager)
+	: fSupplierLock("audio supplier lock")
+
+	, fPlaybackManager(playbackManager)
 	, fVideoFrameRate(25.0)
 
 	, fSupplier(NULL)
@@ -97,6 +99,8 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 	} else if (error == B_TIMED_OUT) {
 		TRACE("GetFrames() - LOCKING THE PLAYBACK MANAGER TIMED OUT!!!\n");
 	}
+
+	BAutolock _(fSupplierLock);
 
 	// retrieve the audio data for each interval.
 	int64 framesRead = 0;
@@ -165,6 +169,8 @@ ProxyAudioSupplier::SetFormat(const media_format& format)
 		TRACE("SetFormat(%s)\n", string);
 	#endif
 
+	BAutolock _(fSupplierLock);
+
 	fAudioResampler.SetFormat(format);
 
 	// In case SetSupplier was called before, we need
@@ -198,6 +204,8 @@ ProxyAudioSupplier::SetSupplier(AudioTrackSupplier* supplier,
 //printf("ProxyAudioSupplier::SetSupplier(%p, %.1f)\n", supplier,
 //videoFrameRate);
 	TRACE("SetSupplier(%p, %.1f)\n", supplier, videoFrameRate);
+
+	BAutolock _(fSupplierLock);
 
 	fSupplier = supplier;
 	fVideoFrameRate = videoFrameRate;

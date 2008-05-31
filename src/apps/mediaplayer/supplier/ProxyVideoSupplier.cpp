@@ -12,7 +12,8 @@
 
 
 ProxyVideoSupplier::ProxyVideoSupplier()
-	: fSupplier(NULL)
+	: fSupplierLock("video supplier lock")
+	, fSupplier(NULL)
 {
 }
 
@@ -26,6 +27,7 @@ status_t
 ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 	const media_format* format, bool& wasCached)
 {
+	BAutolock _(fSupplierLock);
 //printf("ProxyVideoSupplier::FillBuffer(%lld)\n", startFrame);
 	if (fSupplier == NULL)
 		return B_NO_INIT;
@@ -60,6 +62,8 @@ ProxyVideoSupplier::DeleteCaches()
 void
 ProxyVideoSupplier::SetSupplier(VideoTrackSupplier* supplier)
 {
+	BAutolock _(fSupplierLock);
+
 	fSupplier = supplier;
 }
 

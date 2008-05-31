@@ -791,17 +791,12 @@ h->start_time = 0;
 							"playlistFrame: %Ld\n", fFrame, playlistFrame);
 						bool forceOrWasCached = forceSendingBuffer;
 	
-						if (fManager->LockWithTimeout(5000) == B_OK) {
-							// we need to lock the manager, or our
-							// fSupplier might work on bad data
-							err = fSupplier->FillBuffer(playlistFrame,
-								buffer->Data(), &mf, forceOrWasCached);
-							fManager->Unlock();
-						} else {
-							err = B_ERROR;
-						}
+						err = fSupplier->FillBuffer(playlistFrame,
+							buffer->Data(), &mf, forceOrWasCached);
 						// clean the buffer if something went wrong
 						if (err != B_OK) {
+							// TODO: should use "back value" according
+							// to color space!
 							memset(buffer->Data(), 0, h->size_used);
 							err = B_OK;
 						}

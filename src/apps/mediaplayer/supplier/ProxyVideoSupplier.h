@@ -5,6 +5,7 @@
 #ifndef PROXY_VIDEO_SUPPLIER_H
 #define PROXY_VIDEO_SUPPLIER_H
 
+#include <Locker.h>
 
 #include "VideoSupplier.h"
 
@@ -26,6 +27,8 @@ public:
 			void				SetSupplier(VideoTrackSupplier* supplier);
 
 private:
+			BLocker				fSupplierLock;
+
 			VideoTrackSupplier*	fSupplier;
 };
 

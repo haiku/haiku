@@ -5,6 +5,7 @@
 #ifndef PROXY_AUDIO_SUPPLIER_H
 #define PROXY_AUDIO_SUPPLIER_H
 
+#include <Locker.h>
 
 #include "AudioResampler.h"
 #include "AudioSupplier.h"
@@ -45,6 +46,8 @@ private:
 			void*				_SkipFrames(void* buffer, int64 frames) const;
 
 private:
+	BLocker						fSupplierLock;
+
 	PlaybackManager*			fPlaybackManager;
 	float						fVideoFrameRate;
 
