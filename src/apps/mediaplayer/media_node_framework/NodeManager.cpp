@@ -119,11 +119,16 @@ status_t
 NodeManager::FormatChanged(BRect videoBounds, float videoFrameRate,
 	color_space preferredVideoFormat, bool force)
 {
+	TRACE("NodeManager::FormatChanged()\n");
+
 	if (!force && videoBounds == VideoBounds()
-		&& videoFrameRate == FramesPerSecond())
+		&& videoFrameRate == FramesPerSecond()) {
+		TRACE("   -> reusing existing nodes\n");
 		return B_OK;
+	}
 
 	if (videoFrameRate != FramesPerSecond()) {
+		TRACE("   -> need to Init()\n");
 		PlaybackManager::Init(videoFrameRate, LoopMode(), IsLoopingEnabled(),
 			Speed(), MODE_PLAYING_PAUSED_FORWARD, CurrentFrame());
 	}

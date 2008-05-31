@@ -258,8 +258,13 @@ Controller::SetTo(const entry_ref &ref)
 		preferredVideoFormat = format.u.raw_video.display.format;
 	}
 
-	Init(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
-		preferredVideoFormat, LOOPING_ALL, false);
+	if (InitCheck() != B_OK) {
+		Init(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
+			preferredVideoFormat, LOOPING_ALL, false);
+	} else {
+		FormatChanged(BRect(0, 0, width - 1, height - 1), fVideoFrameRate,
+			preferredVideoFormat);
+	}
 
 	SetCurrentFrame(0);
 
