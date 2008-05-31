@@ -31,7 +31,7 @@ const char* kDisabledSeekMessage = "Drop files to play";
 
 SeekSlider::SeekSlider(BRect frame, const char* name, BMessage* message,
 					   int32 minValue, int32 maxValue)
-	: BControl(frame, name, NULL, message, B_FOLLOW_NONE,
+	: BControl(frame, name, NULL, message, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			   B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE)
 	, fTracking(false)
 	, fLastTrackTime(0)

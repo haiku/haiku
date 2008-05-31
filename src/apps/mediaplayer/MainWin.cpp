@@ -892,7 +892,7 @@ MainWin::_CreateMenu()
 	fPlaylistMenu->Superitem()->SetMessage(new BMessage(M_FILE_PLAYLIST));
 
 	fFileMenu->AddSeparatorItem();
-	fFileMenu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS,
+	fFileMenu->AddItem(new BMenuItem("About " NAME B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	fFileMenu->AddSeparatorItem();
 	fFileMenu->AddItem(new BMenuItem("Close", new BMessage(M_FILE_CLOSE), 'W'));
@@ -1195,7 +1195,7 @@ MainWin::_ShowContextMenu(const BPoint &screen_point)
 	item->SetMarked(fAlwaysOnTop);
 
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("About" NAME B_UTF8_ELLIPSIS,
+	menu->AddItem(new BMenuItem("About " NAME B_UTF8_ELLIPSIS,
 		new BMessage(B_ABOUT_REQUESTED)));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Quit", new BMessage(M_FILE_QUIT), 'Q'));

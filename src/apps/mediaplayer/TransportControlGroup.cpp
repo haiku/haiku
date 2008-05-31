@@ -474,6 +474,10 @@ TransportControlGroup::_LayoutControls(BRect frame) const
 	r.bottom = r.top + fSeekSlider->Bounds().Height();
 	_LayoutControl(fSeekSlider, r, true);
 
+	// prevent spreading the controls too much
+	if (frame.Width() > minWidth * 2.0)
+		frame.right = frame.left + ceilf(minWidth * 2.0);
+
 	float currentWidth = frame.Width();
 	float space = (currentWidth - minWidth) / 6.0;
 	// apply weighting
@@ -554,14 +558,14 @@ TransportControlGroup::_MinFrame() const
 // _LayoutControl
 void
 TransportControlGroup::_LayoutControl(BView* view, BRect frame,
-								 bool resizeWidth, bool resizeHeight) const
+	bool resizeWidth, bool resizeHeight) const
 {
 	if (!resizeHeight)
 		// center vertically
-		frame.top = (frame.top + frame.bottom) / 2.0 - view->Bounds().Height() / 2.0;
+		frame.top = (frame.top + frame.bottom - view->Bounds().Height()) / 2.0;
 	if (!resizeWidth)
 		// center horizontally
-		frame.left = (frame.left + frame.right) / 2.0 - view->Bounds().Width() / 2.0;
+		frame.left = (frame.left + frame.right - view->Bounds().Width()) / 2.0;
 	view->MoveTo(frame.LeftTop());
 	float width = resizeWidth ? frame.Width() : view->Bounds().Width();
 	float height = resizeHeight ? frame.Height() : view->Bounds().Height();
