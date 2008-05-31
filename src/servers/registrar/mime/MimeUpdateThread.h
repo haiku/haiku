@@ -25,9 +25,11 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+class Database;
+
 class MimeUpdateThread : public RegistrarThread {
 public:
-	MimeUpdateThread(const char *name, int32 priority,
+	MimeUpdateThread(const char *name, int32 priority, Database *database,
 		BMessenger managerMessenger, const entry_ref *root, bool recursive,
 		int32 force, BMessage *replyee);
 	virtual ~MimeUpdateThread();
@@ -37,7 +39,8 @@ public:
 protected:
 	virtual status_t ThreadFunction();
 	virtual status_t DoMimeUpdate(const entry_ref *entry, bool *entryIsDir) = 0;
-	
+
+	Database* fDatabase;
 	const entry_ref fRoot;
 	const bool fRecursive;
 	const int32 fForce;

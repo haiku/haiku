@@ -12,6 +12,8 @@
 #include <set>
 #include <string>
 
+#include <List.h>
+#include <Locker.h>
 #include <Mime.h>
 #include <Messenger.h>
 #include <StorageDefs.h>
@@ -102,7 +104,16 @@ class Database {
 		status_t DeleteSnifferRule(const char *type);
 		status_t DeleteSupportedTypes(const char *type, bool fullSync);
 
+		// deferred notifications
+		void	DeferInstallNotification(const char* type);
+		void	UndeferInstallNotification(const char* type);
+
 	private:
+		struct DeferredInstallNotification {
+			char	type[B_MIME_TYPE_LENGTH];
+			bool	notify;
+		};
+
 		status_t _SetStringValue(const char *type, int32 what,
 					const char* attribute, type_code attributeType,
 					size_t maxLength, const char *value);
@@ -120,6 +131,10 @@ class Database {
 					int32 action);
 		status_t _SendMonitorUpdate(BMessage &msg);
 
+		DeferredInstallNotification* _FindDeferredInstallNotification(
+			const char* type, bool remove = false);
+		bool _CheckDeferredInstallNotification(int32 which, const char* type);
+
 	private:
 		status_t fStatus;
 		std::set<BMessenger> fMonitorMessengers;
@@ -127,6 +142,31 @@ class Database {
 		InstalledTypes fInstalledTypes;
 		SnifferRules fSnifferRules;
 		SupportingApps fSupportingApps;
+
+		BLocker	fDeferredInstallNotificationsLocker;
+		BList	fDeferredInstallNotifications;
+};
+
+class InstallNotificationDeferrer {
+	public:
+		InstallNotificationDeferrer(Database* database, const char* type)
+			:
+			fDatabase(database),
+			fType(type)
+		{
+			if (fDatabase != NULL && fType != NULL)
+				fDatabase->DeferInstallNotification(fType);
+		}
+
+		~InstallNotificationDeferrer()
+		{
+			if (fDatabase != NULL && fType != NULL)
+				fDatabase->UndeferInstallNotification(fType);
+		}
+
+	private:
+		Database*	fDatabase;
+		const char*	fType;
 };
 
 } // namespace Mime

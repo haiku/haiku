@@ -18,7 +18,7 @@ namespace Mime {
 
 class UpdateMimeInfoThread : public MimeUpdateThread {
 public:
-	UpdateMimeInfoThread(const char *name, int32 priority,
+	UpdateMimeInfoThread(const char *name, int32 priority, Database *database,
 		BMessenger managerMessenger, const entry_ref *root, bool recursive,
 		int32 force, BMessage *replyee);
 	status_t DoMimeUpdate(const entry_ref *entry, bool *entryIsDir);

@@ -49,9 +49,11 @@ namespace Mime {
 	The message will be	replied to at the end of the thread's execution.
 */
 MimeUpdateThread::MimeUpdateThread(const char *name, int32 priority,
-	BMessenger managerMessenger, const entry_ref *root, bool recursive,
-	int32 force, BMessage *replyee)
-	: RegistrarThread(name, priority, managerMessenger),
+		Database *database, BMessenger managerMessenger, const entry_ref *root,
+		bool recursive, int32 force, BMessage *replyee)
+	:
+	RegistrarThread(name, priority, managerMessenger),
+	fDatabase(database),
 	fRoot(root ? *root : entry_ref()),
 	fRecursive(recursive),
 	fForce(force),

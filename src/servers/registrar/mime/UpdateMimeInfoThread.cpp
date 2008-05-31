@@ -66,10 +66,10 @@ is_shared_object_mime_type(BMimeType &type)
 // constructor
 //! Creates a new UpdateMimeInfoThread object
 UpdateMimeInfoThread::UpdateMimeInfoThread(const char *name, int32 priority,
-	BMessenger managerMessenger, const entry_ref *root, bool recursive,
-	int32 force, BMessage *replyee)
-	: MimeUpdateThread(name, priority, managerMessenger, root, recursive, force,
-		replyee)
+	Database *database, BMessenger managerMessenger, const entry_ref *root,
+	bool recursive, int32 force, BMessage *replyee)
+	: MimeUpdateThread(name, priority, database, managerMessenger, root,
+		recursive, force, replyee)
 {
 }
 

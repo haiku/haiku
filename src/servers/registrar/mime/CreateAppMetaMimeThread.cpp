@@ -22,16 +22,19 @@
 
 #include <mime/database_support.h>
 
+#include "Database.h"
+
+
 namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
 
 CreateAppMetaMimeThread::CreateAppMetaMimeThread(const char *name,
-	int32 priority, BMessenger managerMessenger, const entry_ref *root,
-	bool recursive, int32 force, BMessage *replyee)
-	: MimeUpdateThread(name, priority, managerMessenger, root, recursive, force,
-		replyee)
+	int32 priority, Database *database, BMessenger managerMessenger,
+	const entry_ref *root, bool recursive, int32 force, BMessage *replyee)
+	: MimeUpdateThread(name, priority, database, managerMessenger, root,
+		recursive, force, replyee)
 {
 }
 
@@ -75,6 +78,8 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	status = mime.SetTo(signature.String());
 	if (status < B_OK)
 		return status;
+
+	InstallNotificationDeferrer _(fDatabase, signature.String());
 
 	if (!mime.IsInstalled())
 		mime.Install();
@@ -126,14 +131,23 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 	}
 
 	// Supported Types
+	bool setSupportedTypes = false;
 	BMessage supportedTypes;
 	if (status == B_OK && (fForce || typeNode.GetAttrInfo(kSupportedTypesAttr, &info) != B_OK)) {
 		if (appInfo.GetSupportedTypes(&supportedTypes) == B_OK)
-			status = mime.SetSupportedTypes(&supportedTypes);
+			setSupportedTypes = true;
 	}
 
-	// Icons for supported types
+	// defer notifications for supported types
 	const char* type;
+	for (int32 i = 0; supportedTypes.FindString("types", i, &type) == B_OK; i++)
+		fDatabase->DeferInstallNotification(type);
+
+	// set supported types
+	if (setSupportedTypes)
+		status = mime.SetSupportedTypes(&supportedTypes);
+
+	// Icons for supported types
 	for (int32 i = 0; supportedTypes.FindString("types", i, &type) == B_OK; i++) {
 		// vector icon
 		uint8* data = NULL;
@@ -149,6 +163,10 @@ CreateAppMetaMimeThread::DoMimeUpdate(const entry_ref* ref, bool* _entryIsDir)
 		if (status == B_OK && appInfo.GetIconForType(type, &largeIcon, B_LARGE_ICON) == B_OK)
 			status = mime.SetIconForType(type, &largeIcon, B_LARGE_ICON);
 	}
+
+	// undefer notifications for supported types
+	for (int32 i = 0; supportedTypes.FindString("types", i, &type) == B_OK; i++)
+		fDatabase->UndeferInstallNotification(type);
 
 	return status;
 }

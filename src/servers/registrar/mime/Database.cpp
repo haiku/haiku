@@ -10,16 +10,18 @@
 
 #include "Database.h"
 
-#include <mime/database_access.h>
-#include <mime/database_support.h>
-#include <storage_support.h>
+#include <stdio.h>
+#include <string>
+
+#include <iostream>
+#include <new>
 
 #include <Application.h>
 #include <Bitmap.h>
 #include <DataIO.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <Locker.h>
+#include <fs_attr.h>
 #include <Message.h>
 #include <MimeType.h>
 #include <Node.h>
@@ -27,12 +29,10 @@
 #include <String.h>
 #include <TypeConstants.h>
 
-#include <fs_attr.h>
-
-#include <iostream>
-#include <new>
-#include <stdio.h>
-#include <string>
+#include <AutoLocker.h>
+#include <mime/database_access.h>
+#include <mime/database_support.h>
+#include <storage_support.h>
 
 #include "MessageDeliverer.h"
 
@@ -60,7 +60,10 @@ namespace Mime {
 /*!	\brief Creates and initializes a Mime::Database object.
 */
 Database::Database()
-	: fStatus(B_NO_INIT)
+	:
+	fStatus(B_NO_INIT),
+	fDeferredInstallNotificationsLocker("deferred install notifications"),
+	fDeferredInstallNotifications()
 {
 	// Do some really minor error checking
 	BEntry entry(kDatabaseDir.c_str());
@@ -200,8 +203,8 @@ Database::_SetStringValue(const char *type, int32 what, const char* attribute,
 	if (status == B_OK) {
 		if (didCreate)
 			_SendInstallNotification(type);
-
-		_SendMonitorUpdate(what, type, B_META_MIME_MODIFIED);
+		else
+			_SendMonitorUpdate(what, type, B_META_MIME_MODIFIED);
 	}
 
 	return status;
@@ -259,7 +262,8 @@ Database::SetAttrInfo(const char *type, const BMessage *info)
 	if (status == B_OK) {
 		if (didCreate)
 			_SendInstallNotification(type);
-		_SendMonitorUpdate(B_ATTR_INFO_CHANGED, type, B_META_MIME_MODIFIED);
+		else
+			_SendMonitorUpdate(B_ATTR_INFO_CHANGED, type, B_META_MIME_MODIFIED);
 	}
 
 	return status;
@@ -325,9 +329,12 @@ Database::SetFileExtensions(const char *type, const BMessage *extensions)
 		extensions, &didCreate);
 
 	if (status == B_OK) {
-		if (didCreate)
+		if (didCreate) {
 			_SendInstallNotification(type);
-		_SendMonitorUpdate(B_FILE_EXTENSIONS_CHANGED, type, B_META_MIME_MODIFIED);
+		} else {
+			_SendMonitorUpdate(B_FILE_EXTENSIONS_CHANGED, type,
+				B_META_MIME_MODIFIED);
+		}
 	}
 
 	return status;
@@ -424,20 +431,22 @@ Database::SetIconForType(const char *type, const char *fileType,
 	bool didCreate = false;
 
 	status_t err = open_or_create_type(type, &node, &didCreate);
-	if (!err && didCreate)
-		_SendInstallNotification(type);
+	if (err != B_OK)
+		return err;
 
 	if (!err)
 		err = node.WriteAttr(attr.c_str(), attrType, 0, data, attrSize);
 	if (err >= 0)
 		err = err == (ssize_t)attrSize ? (status_t)B_OK : (status_t)B_FILE_ERROR;
-	if (!err) {
+	if (didCreate) {
+		_SendInstallNotification(type);
+	} else if (!err) {
 		if (fileType) {
 			_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
 				(which == B_LARGE_ICON), B_META_MIME_MODIFIED);
 		} else {
-			_SendMonitorUpdate(B_ICON_CHANGED, type, (which == B_LARGE_ICON),
-				B_META_MIME_MODIFIED);
+			_SendMonitorUpdate(B_ICON_CHANGED, type,
+				(which == B_LARGE_ICON), B_META_MIME_MODIFIED);
 		}
 	}
 	return err;
@@ -483,14 +492,16 @@ Database::SetIconForType(const char *type, const char *fileType,
 	bool didCreate = false;
 
 	status_t err = open_or_create_type(type, &node, &didCreate);
-	if (!err && didCreate)
-		_SendInstallNotification(type);
+	if (err != B_OK)
+		return err;
 
 	if (!err)
 		err = node.WriteAttr(attr.c_str(), attrType, 0, data, dataSize);
 	if (err >= 0)
 		err = err == (ssize_t)dataSize ? (status_t)B_OK : (status_t)B_FILE_ERROR;
-	if (!err) {
+	if (didCreate) {
+		_SendInstallNotification(type);
+	} else if (!err) {
 		// TODO: extra notification for vector icons (currently
 		// passing "true" for B_LARGE_ICON)?
 		if (fileType) {
@@ -542,10 +553,11 @@ Database::SetSnifferRule(const char *type, const char *rule)
 	if (status == B_OK)
 		status = fSnifferRules.SetSnifferRule(type, rule);
 
-	if (status == B_OK) {
-		if (didCreate)
-			_SendInstallNotification(type);
-		_SendMonitorUpdate(B_SNIFFER_RULE_CHANGED, type, B_META_MIME_MODIFIED);
+	if (didCreate) {
+		_SendInstallNotification(type);
+	} else if (status == B_OK) {
+		_SendMonitorUpdate(B_SNIFFER_RULE_CHANGED, type,
+			B_META_MIME_MODIFIED);
 	}
 
 	return status;
@@ -593,16 +605,20 @@ Database::SetSupportedTypes(const char *type, const BMessage *types, bool fullSy
 		&didCreate);
 
 	// Notify the monitor if we created the type when we opened it
-	if (status == B_OK && didCreate)
-		_SendInstallNotification(type);
+	if (status != B_OK)
+		return status;
 
 	// Update the supporting apps map
 	if (status == B_OK)
 		status = fSupportingApps.SetSupportedTypes(type, types, fullSync);
 
 	// Notify the monitor
-	if (status == B_OK)
-		_SendMonitorUpdate(B_SUPPORTED_TYPES_CHANGED, type, B_META_MIME_MODIFIED);
+	if (didCreate) {
+		_SendInstallNotification(type);
+	} else if (status == B_OK) {
+		_SendMonitorUpdate(B_SUPPORTED_TYPES_CHANGED, type,
+			B_META_MIME_MODIFIED);
+	}
 
 	return status;
 }
@@ -1274,6 +1290,51 @@ Database::DeleteSupportedTypes(const char *type, bool fullSync)
 }
 
 
+void
+Database::DeferInstallNotification(const char* type)
+{
+	AutoLocker<BLocker> _(fDeferredInstallNotificationsLocker);
+
+	// check, if already deferred
+	if (_FindDeferredInstallNotification(type))
+		return;
+
+	// add new
+	DeferredInstallNotification* notification
+		= new(std::nothrow) DeferredInstallNotification;
+	if (notification == NULL)
+		return;
+
+	strlcpy(notification->type, type, sizeof(notification->type));
+	notification->notify = false;
+
+	if (!fDeferredInstallNotifications.AddItem(notification))
+		delete notification;
+}
+
+
+void
+Database::UndeferInstallNotification(const char* type)
+{
+	AutoLocker<BLocker> locker(fDeferredInstallNotificationsLocker);
+
+	// check, if deferred at all
+	DeferredInstallNotification* notification
+		= _FindDeferredInstallNotification(type, true);
+
+	locker.Unlock();
+
+	if (notification == NULL)
+		return;
+
+	// notify, if requested
+	if (notification->notify)
+		_SendInstallNotification(notification->type);
+
+	delete notification;
+}
+
+
 //! \brief Sends a \c B_MIME_TYPE_CREATED notification to the mime monitor service
 status_t
 Database::_SendInstallNotification(const char *type)
@@ -1305,7 +1366,10 @@ Database::_SendMonitorUpdate(int32 which, const char *type, const char *extraTyp
 {
 	BMessage msg(B_META_MIME_CHANGED);
 	status_t err;
-		
+
+	if (_CheckDeferredInstallNotification(which, type))
+		return B_OK;
+
 	err = msg.AddInt32("be:which", which);
 	if (!err)
 		err = msg.AddString("be:type", type);
@@ -1331,6 +1395,9 @@ status_t
 Database::_SendMonitorUpdate(int32 which, const char *type, const char *extraType,
 	int32 action)
 {
+	if (_CheckDeferredInstallNotification(which, type))
+		return B_OK;
+
 	BMessage msg(B_META_MIME_CHANGED);
 
 	status_t err = msg.AddInt32("be:which", which);
@@ -1356,6 +1423,9 @@ Database::_SendMonitorUpdate(int32 which, const char *type, const char *extraTyp
 status_t
 Database::_SendMonitorUpdate(int32 which, const char *type, bool largeIcon, int32 action)
 {
+	if (_CheckDeferredInstallNotification(which, type))
+		return B_OK;
+
 	BMessage msg(B_META_MIME_CHANGED);
 
 	status_t err = msg.AddInt32("be:which", which);
@@ -1379,6 +1449,9 @@ Database::_SendMonitorUpdate(int32 which, const char *type, bool largeIcon, int3
 status_t
 Database::_SendMonitorUpdate(int32 which, const char *type, int32 action)
 {
+	if (_CheckDeferredInstallNotification(which, type))
+		return B_OK;
+
 	BMessage msg(B_META_MIME_CHANGED);
 
 	status_t err = msg.AddInt32("be:which", which);
@@ -1413,7 +1486,58 @@ Database::_SendMonitorUpdate(BMessage &msg)
 	return err;
 }
 
+
+Database::DeferredInstallNotification*
+Database::_FindDeferredInstallNotification(const char* type, bool remove)
+{
+	for (int32 i = 0;
+		DeferredInstallNotification* notification
+			= (DeferredInstallNotification*)fDeferredInstallNotifications
+				.ItemAt(i); i++) {
+		if (strcmp(type, notification->type) == 0) {
+			if (remove)
+				fDeferredInstallNotifications.RemoveItem(i);
+			return notification;
+		}
+	}
+
+	return NULL;
+}
+
+
+bool
+Database::_CheckDeferredInstallNotification(int32 which, const char* type)
+{
+	AutoLocker<BLocker> locker(fDeferredInstallNotificationsLocker);
+
+	// check, if deferred at all
+	DeferredInstallNotification* notification
+		= _FindDeferredInstallNotification(type);
+	if (notification == NULL)
+		return false;
+
+	if (which == B_MIME_TYPE_DELETED) {
+		// MIME type deleted -- if the install notification had been
+		// deferred, we don't send anything
+		if (notification->notify) {
+			fDeferredInstallNotifications.RemoveItem(notification);
+			delete notification;
+			return true;
+		}
+	} else if (which == B_MIME_TYPE_CREATED) {
+		// MIME type created -- defer notification
+		notification->notify = true;
+		return true;
+	} else {
+		// MIME type update -- don't send update, if deferred
+		if (notification->notify)
+			return true;
+	}
+
+	return false;
+}
+
+
 } // namespace Mime
 } // namespace Storage
 } // namespace BPrivate
-
