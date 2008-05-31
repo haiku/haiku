@@ -378,5 +378,11 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 			fVideoTrack->DecodedFormat(&fFormat);
 		}
 	}
+
+	if (fFormat.u.raw_video.last_active != height - 1) {
+		printf("should skip %ld lines at bottom!\n", 
+			(height - 1) - fFormat.u.raw_video.last_active);
+	}
+
 	return ret;
 }
