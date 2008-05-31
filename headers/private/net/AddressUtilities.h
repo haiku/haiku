@@ -1,19 +1,20 @@
 /*
- * Copyright 2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2007-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *      Hugo Santos, hugosantos@gmail.com
  */
 
-#ifndef ADDRESS_UTILITIES_H
-#define ADDRESS_UTILITIES_H
+#ifndef NET_ADDRESS_UTILITIES_H
+#define NET_ADDRESS_UTILITIES_H
+
 
 #include <NetUtilities.h>
-
 #include <net_datalink.h>
 
 #include <sys/socket.h>
+
 
 class SocketAddress {
 public:
@@ -160,8 +161,8 @@ public:
 	{
 		if (checkPort)
 			return fModule->equal_addresses_and_ports(fAddress, address);
-		else
-			return fModule->equal_addresses(fAddress, address);
+
+		return fModule->equal_addresses(fAddress, address);
 	}
 
 	bool EqualPorts(const sockaddr *second) const
@@ -195,7 +196,8 @@ public:
 	}
 
 	const char *AsString(char *buffer, size_t bufferSize,
-		bool printPort = false) const {
+		bool printPort = false) const
+	{
 		fModule->print_address_buffer(fAddress, buffer, bufferSize, printPort);
 		return buffer;
 	}
@@ -217,4 +219,4 @@ private:
 	sockaddr_storage fAddressStorage;
 };
 
-#endif
+#endif	// NET_ADDRESS_UTILITIES_H
