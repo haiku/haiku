@@ -86,8 +86,8 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 
 # Bluetooth stack
 if [ IsOptionalHaikuImagePackageAdded Bluetooth ] {
-	local BEOS_ADD_ONS_DRIVERS_BLUETOOTH = h2generic ;
-	AddDriversToHaikuImage bluetooth : $(BEOS_ADD_ONS_DRIVERS_BLUETOOTH) ;
+	local bluetoothDrivers = h2generic ;
+	AddDriversToHaikuImage bluetooth : $(bluetoothDrivers) ;
 	AddFilesToHaikuImage beos system servers : bluetooth_server ;
 	AddFilesToHaikuImage beos system lib : libbluetooth.so ;
 	AddFilesToHaikuImage beos bin : bt_dev_info bt_discovery ;
