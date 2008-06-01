@@ -12,11 +12,14 @@
 
 #include <KernelExport.h>
 #include <OS.h>
-
+#include <string.h>
 
 //#define TRACE_I2C
 #ifdef TRACE_I2C
-extern "C" void _sPrintf(const char *format, ...);
+#ifdef __cplusplus
+extern "C" 
+#endif
+void _sPrintf(const char *format, ...);
 #	define TRACE(x...) _sPrintf("I2C: " x)
 #else
 #	define TRACE(x...) ;
@@ -25,45 +28,45 @@ extern "C" void _sPrintf(const char *format, ...);
 
 //!	Timining for 100kHz bus (fractional parts are rounded up)
 const static i2c_timing kTiming100k = {
-	buf : 5,
-	hd_sta : 4,
-	low : 5,
-	high : 4,
-	su_sta : 5,
-	hd_dat : 0,
-	su_dat : 1,
-	r : 1,
-	f : 1,
-	su_sto : 4,
+	.buf = 5,
+	.hd_sta = 4,
+	.low = 5,
+	.high = 4,
+	.su_sta = 5,
+	.hd_dat = 0,
+	.su_dat = 1,
+	.r = 1,
+	.f = 1,
+	.su_sto = 4,
 	
 	// as these are unspecified, we use half a clock cycle as a safe guess
-	start_timeout : 5,
-	byte_timeout : 5,
-	bit_timeout : 5,
-	ack_start_timeout : 5,
-	ack_timeout : 5
+	.start_timeout = 5,
+	.byte_timeout = 5,
+	.bit_timeout = 5,
+	.ack_start_timeout = 5,
+	.ack_timeout = 5
 };
 
 // timing for 400 kHz bus
 // (argh! heavy up-rounding here)
 const static i2c_timing kTiming400k = {
-	buf : 2,
-	hd_sta : 1,
-	low : 2,
-	high : 1,
-	su_sta : 1,
-	hd_dat : 0,
-	su_dat : 1,
-	r : 1,
-	f : 1,
-	su_sto : 1,
+	.buf = 2,
+	.hd_sta = 1,
+	.low = 2,
+	.high = 1,
+	.su_sta = 1,
+	.hd_dat = 0,
+	.su_dat = 1,
+	.r = 1,
+	.f = 1,
+	.su_sto = 1,
 	
 	// see kTiming100k
-	start_timeout : 2,
-	byte_timeout : 2,
-	bit_timeout : 2,
-	ack_start_timeout : 2,
-	ack_timeout : 2
+	.start_timeout = 2,
+	.byte_timeout = 2,
+	.bit_timeout = 2,
+	.ack_start_timeout = 2,
+	.ack_timeout = 2
 };
 
 
@@ -215,7 +218,8 @@ send_acknowledge(const i2c_bus *bus)
 			break;
 
 		if (system_time() - startTime > bus->timing.ack_timeout) {
-			TRACE("send_acknowledge(): Slave didn't acknowledge byte\n");
+			TRACE("send_acknowledge(): Slave didn't acknowledge byte within ack_timeout: %ld\n", 
+				bus->timing.ack_timeout);
 			return B_TIMEOUT;
 		}
 
@@ -372,7 +376,7 @@ send_bytes(const i2c_bus *bus, const uint8 *writeBuffer, ssize_t writeLength)
 static status_t
 receive_bytes(const i2c_bus *bus, uint8 *readBuffer, ssize_t readLength)
 {
-	TRACE("receive_bytes(length = %ld)\n", writeLength);
+	TRACE("receive_bytes(length = %ld)\n", readLength);
 
 	for (; readLength > 0; --readLength, ++readBuffer) {
 		status_t status = receive_byte(bus, readBuffer, readLength > 1);
@@ -428,12 +432,12 @@ err:
 void
 i2c_get100k_timing(i2c_timing *timing)
 {
-	*timing = kTiming100k;
+	memcpy(timing, &kTiming100k, sizeof(i2c_timing));
 }
 
 
 void
 i2c_get400k_timing(i2c_timing *timing)
 {
-	*timing = kTiming400k;
+	memcpy(timing, &kTiming400k, sizeof(i2c_timing));
 }
