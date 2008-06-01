@@ -42,7 +42,12 @@
 #	define ASSERT_PRINT(x, format...)	do { } while(0)
 #endif
 
+// command return value
+#define B_KDEBUG_ERROR	4
+
+// command flags
 #define B_KDEBUG_DONT_PARSE_ARGUMENTS	(0x01)
+#define B_KDEBUG_PIPE_FINAL_RERUN		(0x02)
 
 struct debugger_module_info {
 	module_info info;
@@ -74,6 +79,9 @@ extern bool debug_screen_output_enabled(void);
 extern void debug_stop_screen_debug_output(void);
 
 extern void	kputs(const char *string);
+extern void	kputs_unfiltered(const char *string);
+extern void kprintf_unfiltered(const char *format, ...)
+				__attribute__ ((format (__printf__, 1, 2)));
 extern void dprintf_no_syslog(const char *format, ...)
 				__attribute__ ((format (__printf__, 1, 2)));
 

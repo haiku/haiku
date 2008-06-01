@@ -121,7 +121,7 @@ next_line(void)
 		// Use the paging mechanism: either, we're in the debugger, and a
 		// command is being executed, or we're currently showing boot debug
 		// output
-		const char *text = "Press key to continue, Q to quit";
+		const char *text = "Press key to continue, Q to quit, A to abort";
 		int32 length = strlen(text);
 		if (sScreen.x + length > sScreen.columns) {
 			// make sure we don't overwrite too much
@@ -136,8 +136,13 @@ next_line(void)
 		}
 
 		char c = blue_screen_getchar();
-		if (c == 'q')
+		if (c == 'q') {
 			sScreen.ignore_output = true;
+		} else if (c == 'a') {
+			abort_debugger_command();
+				// should not return
+			sScreen.ignore_output = true;
+		}
 
 		// remove on screen text again
 		sModule->fill_glyph(sScreen.columns - length, sScreen.y, length,

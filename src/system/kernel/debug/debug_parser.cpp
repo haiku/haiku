@@ -21,7 +21,7 @@
 /*
 	Grammar:
 
-	commandLine	:= command | ( "(" expression ")" )
+	commandLine	:= commandPipe | ( "(" expression ")" )
 	expression	:= term | assignment
 	assignment	:= variable ( "=" | "+=" | "-=" | "*=" | "/=" | "%=" )
 				   expression
@@ -33,6 +33,7 @@
 	variable	:= identifier
 	identifier	:= ( "_" | "a" - "z" | "A" - "Z" )
 				   ( "_" | "a" - "z" | "A" - "Z" | "0" - "9" )*
+	commandPipe	:= command ( "|" command )*
 	command		:= identifier argument*
 	argument	:= ( "(" expression ")" ) | ( "[" commandLine "]" )
 				   | unquotedString | quotedString
@@ -87,6 +88,8 @@ enum {
 	TOKEN_OPENING_BRACE			= '{',
 	TOKEN_CLOSING_BRACE			= '}',
 
+	TOKEN_PIPE					= '|',
+
 	TOKEN_STRING				= '"',
 	TOKEN_UNKNOWN				= '?',
 	TOKEN_NONE					= ' ',
@@ -125,8 +128,9 @@ static void
 parse_exception(const char* message, int32 position)
 {
 	if (sNextJumpBufferIndex == 0) {
-		kprintf("parse_exception(): No jump buffer!\n");
-		kprintf("exception: \"%s\", position: %lu\n", message, position);
+		kprintf_unfiltered("parse_exception(): No jump buffer!\n");
+		kprintf_unfiltered("exception: \"%s\", position: %lu\n", message,
+			position);
 		return;
 	}
 
@@ -345,6 +349,7 @@ public:
 			case ')':
 			case '[':
 			case ']':
+			case '|':
 				fCurrentToken.SetTo(fCurrentChar, 1, _CurrentPos(),
 					*fCurrentChar);
 				fCurrentChar++;
@@ -470,7 +475,9 @@ class ExpressionParser {
 
  private:
 			uint64				_ParseExpression();
-			uint64				_ParseCommand(int& returnCode);
+			uint64				_ParseCommandPipe(int& returnCode);
+			void				_ParseCommand(
+									debugger_command_pipe_segment& segment);
 			bool				_ParseArgument(int& argc, char** argv);
 			void				_GetUnparsedArgument(int& argc, char** argv);
 			void				_AddArgument(int& argc, char** argv,
@@ -533,7 +540,7 @@ ExpressionParser::EvaluateCommand(const char* expressionString,
 		// no assignment, so let's assume it's a command
 		fTokenizer.SetTo(expressionString);
 		fTokenizer.SetCommandMode(true);
-		value = _ParseCommand(returnCode);
+		value = _ParseCommandPipe(returnCode);
 	}
 
 	if (token.type != TOKEN_END_OF_LINE)
@@ -621,7 +628,39 @@ ExpressionParser::_ParseExpression()
 
 
 uint64
-ExpressionParser::_ParseCommand(int& returnCode)
+ExpressionParser::_ParseCommandPipe(int& returnCode)
+{
+	debugger_command_pipe* pipe = (debugger_command_pipe*)allocate_temp_storage(
+		sizeof(debugger_command_pipe));
+
+	pipe->segment_count = 0;
+	pipe->broken = false;
+
+	do {
+		if (pipe->segment_count >= MAX_DEBUGGER_COMMAND_PIPE_LENGTH)
+			parse_exception("Pipe too long", fTokenizer.NextToken().position);
+
+		debugger_command_pipe_segment& segment
+			= pipe->segments[pipe->segment_count];
+		segment.index = pipe->segment_count++;
+
+		_ParseCommand(segment);
+
+	} while (fTokenizer.NextToken().type == TOKEN_PIPE);
+
+	fTokenizer.RewindToken();
+
+	// invoke the pipe
+	returnCode = invoke_debugger_command_pipe(pipe);
+
+	free_temp_storage(pipe);
+
+	return get_debug_variable("_", 0);
+}
+
+
+void
+ExpressionParser::_ParseCommand(debugger_command_pipe_segment& segment)
 {
 	fTokenizer.SetCommandMode(false);
 	const Token& token = _EatToken(TOKEN_IDENTIFIER);
@@ -663,12 +702,17 @@ ExpressionParser::_ParseCommand(int& returnCode)
 		}
 	}
 
-	// invoke the command
-	returnCode = invoke_debugger_command(command, argc, argv);
+	if (segment.index > 0) {
+		if (argc >= kMaxArgumentCount)
+			parse_exception("too many arguments for command", 0);
+		else
+			argc++;
+	}
 
-	free_temp_storage(argv);
-
-	return get_debug_variable("_", 0);
+	segment.command = command;
+	segment.argc = argc;
+	segment.argv = argv;
+	segment.invocations = 0;
 }
 
 
@@ -694,7 +738,7 @@ ExpressionParser::_ParseArgument(int& argc, char** argv)
 		{
 			// this starts a sub command
 			int returnValue;
-			uint64 value = _ParseCommand(returnValue);
+			uint64 value = _ParseCommandPipe(returnValue);
 			_EatToken(TOKEN_CLOSING_BRACKET);
 
 			snprintf(sTempBuffer, sizeof(sTempBuffer), "%llu", value);
@@ -709,6 +753,7 @@ ExpressionParser::_ParseArgument(int& argc, char** argv)
 
 		case TOKEN_CLOSING_PARENTHESIS:
 		case TOKEN_CLOSING_BRACKET:
+		case TOKEN_PIPE:
 			// those don't belong to us
 			fTokenizer.RewindToken();
 			return false;
@@ -755,6 +800,10 @@ ExpressionParser::_GetUnparsedArgument(int& argc, char** argv)
 				else
 					done = true;
 				break;
+			case TOKEN_PIPE:
+				if (parentheses == 0 && brackets == 0)
+					done = true;
+				break;
 			case TOKEN_END_OF_LINE:
 				done = true;
 				break;
@@ -764,8 +813,15 @@ ExpressionParser::_GetUnparsedArgument(int& argc, char** argv)
 	int32 endPosition = fTokenizer.CurrentToken().position;
 	fTokenizer.RewindToken();
 
-	_AddArgument(argc, argv, fTokenizer.String() + startPosition,
-		endPosition - startPosition);
+	// add the argument only, if it's not just all spaces
+	const char* arg = fTokenizer.String() + startPosition;
+	int32 argLen = endPosition - startPosition;
+	bool allSpaces = true;
+	for (int32 i = 0; allSpaces && i < argLen; i++)
+		allSpaces = isspace(arg[i]);
+
+	if (!allSpaces)
+		_AddArgument(argc, argv, arg, argLen);
 }
 
 
@@ -944,7 +1000,7 @@ ExpressionParser::_ParseAtom()
 
 	fTokenizer.SetCommandMode(true);
 	int returnValue;
-	uint64 value = _ParseCommand(returnValue);
+	uint64 value = _ParseCommandPipe(returnValue);
 	fTokenizer.SetCommandMode(false);
 
 	_EatToken(TOKEN_CLOSING_BRACKET);
@@ -975,8 +1031,8 @@ bool
 evaluate_debug_expression(const char* expression, uint64* _result, bool silent)
 {
 	if (sNextJumpBufferIndex >= kJumpBufferCount) {
-		kprintf("evaluate_debug_expression(): Out of jump buffers for "
-			"exception handling\n");
+		kprintf_unfiltered("evaluate_debug_expression(): Out of jump buffers "
+			"for exception handling\n");
 		return 0;
 	}
 
@@ -994,10 +1050,10 @@ evaluate_debug_expression(const char* expression, uint64* _result, bool silent)
 		success = false;
 		if (!silent) {
 			if (sExceptionPosition >= 0) {
-				kprintf("%s, at position: %d, in expression: %s\n",
+				kprintf_unfiltered("%s, at position: %d, in expression: %s\n",
 					sExceptionMessage, sExceptionPosition, expression);
 			} else
-				kprintf("%s", sExceptionMessage);
+				kprintf_unfiltered("%s", sExceptionMessage);
 		}
 	}
 
@@ -1017,7 +1073,7 @@ int
 evaluate_debug_command(const char* commandLine)
 {
 	if (sNextJumpBufferIndex >= kJumpBufferCount) {
-		kprintf("evaluate_debug_command(): Out of jump buffers for "
+		kprintf_unfiltered("evaluate_debug_command(): Out of jump buffers for "
 			"exception handling\n");
 		return 0;
 	}
@@ -1031,10 +1087,10 @@ evaluate_debug_command(const char* commandLine)
 		ExpressionParser().EvaluateCommand(commandLine, returnCode);
 	} else {
 		if (sExceptionPosition >= 0) {
-			kprintf("%s, at position: %d, in command line: %s\n",
+			kprintf_unfiltered("%s, at position: %d, in command line: %s\n",
 				sExceptionMessage, sExceptionPosition, commandLine);
 		} else
-			kprintf("%s", sExceptionMessage);
+			kprintf_unfiltered("%s", sExceptionMessage);
 	}
 
 	sNextJumpBufferIndex--;

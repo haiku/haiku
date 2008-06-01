@@ -6,6 +6,7 @@ UsePrivateHeaders [ FDirName graphics vesa ] ;
 KernelMergeObject kernel_debug.o :
 	blue_screen.cpp
 	debug.cpp
+	debug_builtin_commands.cpp
 	debug_commands.cpp
 	debug_paranoia.cpp
 	debug_parser.cpp

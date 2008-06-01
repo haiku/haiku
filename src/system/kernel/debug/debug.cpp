@@ -9,7 +9,6 @@
 /*! This file contains the debugger and debug output facilities */
 
 #include "blue_screen.h"
-#include "gdb.h"
 
 #include <debug.h>
 #include <debug_paranoia.h>
@@ -35,7 +34,9 @@
 #include <string.h>
 #include <syslog.h>
 
+#include "debug_builtin_commands.h"
 #include "debug_commands.h"
+#include "debug_output_filter.h"
 #include "debug_variables.h"
 
 
@@ -67,6 +68,8 @@ static const char* sCurrentKernelDebuggerMessage;
 #define OUTPUT_BUFFER_SIZE 1024
 static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
 static char sLastOutputBuffer[OUTPUT_BUFFER_SIZE];
+static DebugOutputFilter* sDebugOutputFilter = NULL;
+DefaultDebugOutputFilter gDefaultDebugOutputFilter;
 
 static void flush_pending_repeats(void);
 static void check_pending_repeats(void *data, int iter);
@@ -84,22 +87,80 @@ static const uint32 kMaxDebuggerModules = sizeof(sDebuggerModules)
 
 static char sLineBuffer[HISTORY_SIZE][LINE_BUFFER_SIZE] = { "", };
 static char sParseLine[LINE_BUFFER_SIZE];
-static char sFilter[64];
 static int32 sCurrentLine = 0;
 
 #define distance(a, b) ((a) < (b) ? (b) - (a) : (a) - (b))
 
 
+// #pragma mark - DebugOutputFilter
+
+
+DebugOutputFilter::DebugOutputFilter()
+{
+}
+
+
+DebugOutputFilter::~DebugOutputFilter()
+{
+}
+
+
+void
+DebugOutputFilter::PrintString(const char* string)
+{
+}
+
+
+void
+DebugOutputFilter::Print(const char* format, va_list args)
+{
+}
+
+
+void
+DefaultDebugOutputFilter::PrintString(const char* string)
+{
+	if (sSerialDebugEnabled)
+		arch_debug_serial_puts(string);
+	if (sBlueScreenEnabled || sDebugScreenEnabled)
+		blue_screen_puts(string);
+
+	for (uint32 i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++) {
+		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+			sDebuggerModules[i]->debugger_puts(string, strlen(string));
+	}
+}
+
+
+void
+DefaultDebugOutputFilter::Print(const char* format, va_list args)
+{
+	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
+	flush_pending_repeats();
+	PrintString(sOutputBuffer);
+}
+
+
+// #pragma mark -
+
+
+DebugOutputFilter*
+set_debug_output_filter(DebugOutputFilter* filter)
+{
+	DebugOutputFilter* oldFilter = sDebugOutputFilter;
+	sDebugOutputFilter = filter;
+	return oldFilter;
+}
+
+
 static void
 kputchar(char c)
 {
-	uint32 i;
-
 	if (sSerialDebugEnabled)
 		arch_debug_serial_putchar(c);
 	if (sBlueScreenEnabled || sDebugScreenEnabled)
 		blue_screen_putchar(c);
-	for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+	for (uint32 i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
 		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
 			sDebuggerModules[i]->debugger_puts(&c, sizeof(c));
 }
@@ -108,15 +169,15 @@ kputchar(char c)
 void
 kputs(const char *s)
 {
-	uint32 i;
+	if (sDebugOutputFilter != NULL)
+		sDebugOutputFilter->PrintString(s);
+}
 
-	if (sSerialDebugEnabled)
-		arch_debug_serial_puts(s);
-	if (sBlueScreenEnabled || sDebugScreenEnabled)
-		blue_screen_puts(s);
-	for (i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
-		if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
-			sDebuggerModules[i]->debugger_puts(s, strlen(s));
+
+void
+kputs_unfiltered(const char *s)
+{
+	gDefaultDebugOutputFilter.PrintString(s);
 }
 
 
@@ -631,119 +692,12 @@ kernel_debugger_loop(void)
 
 
 static int
-cmd_reboot(int argc, char **argv)
-{
-	arch_cpu_shutdown(true);
-	return 0;
-		// I'll be really suprised if this line ever runs! ;-)
-}
-
-
-static int
-cmd_shutdown(int argc, char **argv)
-{
-	arch_cpu_shutdown(false);
-	return 0;
-}
-
-
-static int
-cmd_help(int argc, char **argv)
-{
-	debugger_command *command, *specified = NULL;
-	const char *start = NULL;
-	int32 startLength = 0;
-	bool ambiguous;
-
-	if (argc > 1) {
-		specified = find_debugger_command(argv[1], false, ambiguous);
-		if (specified == NULL) {
-			start = argv[1];
-			startLength = strlen(start);
-		}
-	}
-
-	if (specified != NULL) {
-		// only print out the help of the specified command (and all of its aliases)
-		kprintf("debugger command for \"%s\" and aliases:\n", specified->name);
-	} else if (start != NULL)
-		kprintf("debugger commands starting with \"%s\":\n", start);
-	else
-		kprintf("debugger commands:\n");
-
-	for (command = get_debugger_commands(); command != NULL;
-			command = command->next) {
-		if (specified && command->func != specified->func)
-			continue;
-		if (start != NULL && strncmp(start, command->name, startLength))
-			continue;
-
-		kprintf(" %-20s\t\t%s\n", command->name, command->description ? command->description : "-");
-	}
-
-	return 0;
-}
-
-
-static int
-cmd_continue(int argc, char **argv)
-{
-	return B_KDEBUG_QUIT;
-}
-
-
-static int
 cmd_dump_kdl_message(int argc, char **argv)
 {
 	if (sCurrentKernelDebuggerMessage) {
 		kputs(sCurrentKernelDebuggerMessage);
-		kputchar('\n');
+		kputs("\n");
 	}
-
-	return 0;
-}
-
-static int
-cmd_expr(int argc, char **argv)
-{
-	if (argc != 2) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
-
-	uint64 result;
-	if (evaluate_debug_expression(argv[1], &result, false)) {
-		kprintf("%llu (0x%llx)\n", result, result);
-		set_debug_variable("_", result);
-	}
-
-	return 0;
-}
-
-
-static int
-cmd_filter(int argc, char **argv)
-{
-	if (argc != 2) {
-		sFilter[0] = '\0';
-		return 0;
-	}
-
-	strlcpy(sFilter, argv[1], sizeof(sFilter));
-	return 0;
-}
-
-
-static int
-cmd_error(int argc, char **argv)
-{
-	if (argc != 2) {
-		print_debugger_command_usage(argv[0]);
-		return 0;
-	}
-
-	int32 error = parse_expression(argv[1]);
-	kprintf("error 0x%lx: %s\n", error, strerror(error));
 
 	return 0;
 }
@@ -1000,6 +954,8 @@ debug_early_boot_message(const char *string)
 status_t
 debug_init(kernel_args *args)
 {
+	new(&gDefaultDebugOutputFilter) DefaultDebugOutputFilter;
+
 	debug_paranoia_init();
 	return arch_debug_console_init(args);
 }
@@ -1008,43 +964,12 @@ debug_init(kernel_args *args)
 status_t
 debug_init_post_vm(kernel_args *args)
 {
-	add_debugger_command_etc("help", &cmd_help, "List all debugger commands",
-		"[name]\n"
-		"Lists all debugger commands or those starting with \"name\".\n", 0);
-	add_debugger_command_etc("reboot", &cmd_reboot, "Reboot the system",
-		"\n"
-		"Reboots the system.\n", 0);
-	add_debugger_command_etc("shutdown", &cmd_shutdown, "Shut down the system",
-		"\n"
-		"Shuts down the system.\n", 0);
-	add_debugger_command_etc("gdb", &cmd_gdb, "Connect to remote gdb",
-		"\n"
-		"Connects to a remote gdb connected to the serial port.\n", 0);
-	add_debugger_command_etc("continue", &cmd_continue, "Leave kernel debugger",
-		"\n"
-		"Leaves kernel debugger.\n", 0);
-	add_debugger_command_alias("exit", "continue", "Same as \"continue\"");
-	add_debugger_command_alias("es", "continue", "Same as \"continue\"");
 	add_debugger_command_etc("message", &cmd_dump_kdl_message,
 		"Reprint the message printed when entering KDL",
 		"\n"
 		"Reprints the message printed when entering KDL.\n", 0);
-	add_debugger_command_etc("expr", &cmd_expr,
-		"Evaluates the given expression and prints the result",
-		"<expression>\n"
-		"Evaluates the given expression and prints the result.\n",
-		B_KDEBUG_DONT_PARSE_ARGUMENTS);
-	add_debugger_command_etc("filter", &cmd_filter,
-		"Filters output of all debugger commands",
-		"<pattern>\n"
-		"Filters out all debug output of commands that does not match the\n"
-		"specified pattern. If no pattern is given, it is removed\n", 0);
-	add_debugger_command_etc("error", &cmd_error,
-		"Prints a human-readable description for an error code",
-		"<error>\n"
-		"Prints a human-readable description for the given numeric error\n"
-		"code.\n"
-		"  <error>  - The numeric error code.\n", 0);
+
+	debug_builtin_commands_init();
 
 	debug_variables_init();
 	frame_buffer_console_init(args);
@@ -1181,6 +1106,8 @@ kernel_debugger(const char *message)
 			sBlueScreenEnabled = true;
 	}
 
+	sDebugOutputFilter = &gDefaultDebugOutputFilter;
+
 	if (message)
 		kprintf("PANIC: %s\n", message);
 
@@ -1195,6 +1122,8 @@ kernel_debugger(const char *message)
 
 	call_modules_hook(false);
 	set_dprintf_enabled(dprintfState);
+
+	sDebugOutputFilter = NULL;
 
 	sBlueScreenEnabled = false;
 	atomic_add(&inDebugger, -1);
@@ -1354,21 +1283,22 @@ dprintf_no_syslog(const char *format, ...)
 void
 kprintf(const char *format, ...)
 {
-	va_list args;
-
-	// ToDo: don't print anything if the debugger is not running!
-
-	va_start(args, format);
-	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, format, args);
-	va_end(args);
-
-	if (in_command_invocation() && sFilter[0]) {
-		if (strstr(sOutputBuffer, sFilter) == NULL)
-			return;
+	if (sDebugOutputFilter != NULL) {
+		va_list args;
+		va_start(args, format);
+		sDebugOutputFilter->Print(format, args);
+		va_end(args);
 	}
+}
 
-	flush_pending_repeats();
-	kputs(sOutputBuffer);
+
+void
+kprintf_unfiltered(const char *format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	gDefaultDebugOutputFilter.Print(format, args);
+	va_end(args);
 }
 
 

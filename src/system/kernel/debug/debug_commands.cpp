@@ -10,6 +10,7 @@
 #include "debug_commands.h"
 
 #include <setjmp.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <KernelExport.h>
@@ -19,16 +20,172 @@
 #include <thread.h>
 #include <util/AutoLock.h>
 
+#include "debug_output_filter.h"
 #include "debug_variables.h"
 
+
+#define INVOKE_COMMAND_FAULT	1
+#define INVOKE_COMMAND_ERROR	2
+
+static const int32 kMaxInvokeCommandDepth = 5;
+static const int32 kOutputBufferSize = 1024;
 
 static spinlock sSpinlock = 0;
 
 static struct debugger_command *sCommands;
 
-static jmp_buf sInvokeCommandEnv;
+static jmp_buf sInvokeCommandEnv[kMaxInvokeCommandDepth];
+static int32 sInvokeCommandLevel = 0;
 static bool sInvokeCommandDirectly = false;
 static bool sInCommand = false;
+static char sOutputBuffers[MAX_DEBUGGER_COMMAND_PIPE_LENGTH][kOutputBufferSize];
+static debugger_command_pipe* sCurrentPipe;
+static int32 sCurrentPipeSegment;
+
+
+static int invoke_pipe_segment(debugger_command_pipe* pipe, int32 index,
+	char* argument);
+
+
+class PipeDebugOutputFilter : public DebugOutputFilter {
+public:
+	PipeDebugOutputFilter()
+	{
+	}
+
+	PipeDebugOutputFilter(debugger_command_pipe* pipe, int32 segment,
+			char* buffer, size_t bufferSize)
+		:
+		fPipe(pipe),
+		fSegment(segment),
+		fBuffer(buffer),
+		fBufferCapacity(bufferSize - 1),
+		fBufferSize(0)
+	{
+	}
+
+	virtual void PrintString(const char* string)
+	{
+		if (fPipe->broken)
+			return;
+
+		size_t size = strlen(string);
+		while (const char* newLine = strchr(string, '\n')) {
+			size_t length = newLine - string;
+			_Append(string, length);
+
+			// invoke command
+			fBuffer[fBufferSize] = '\0';
+			invoke_pipe_segment(fPipe, fSegment + 1, fBuffer);
+
+			fBufferSize = 0;
+
+			string = newLine + 1;
+			size -= length + 1;
+		}
+
+		_Append(string, size);
+
+		if (fBufferSize == fBufferCapacity) {
+			// buffer is full, but contains no newline -- execute anyway
+			invoke_pipe_segment(fPipe, fSegment + 1, fBuffer);
+			fBufferSize = 0;
+		}
+	}
+
+	virtual void Print(const char* format, va_list args)
+	{
+		if (fPipe->broken)
+			return;
+
+		// print directly into the buffer
+		fBufferSize += vsnprintf(fBuffer + fBufferSize,
+			fBufferCapacity - fBufferSize, format, args);
+
+		// execute every complete line
+		fBuffer[fBufferSize] = '\0';
+		char* line = fBuffer;
+
+		while (char* newLine = strchr(line, '\n')) {
+			// invoke command
+			*newLine = '\0';
+			invoke_pipe_segment(fPipe, fSegment + 1, line);
+
+			line = newLine + 1;
+		}
+
+		size_t left = fBuffer + fBufferSize - line;
+
+		if (left == fBufferCapacity) {
+			// buffer is full, but contains no newline -- execute anyway
+			invoke_pipe_segment(fPipe, fSegment + 1, fBuffer);
+			left = 0;
+		}
+
+		if (left > 0)
+			memmove(fBuffer, line, left);
+
+		fBufferSize = left;
+	}
+
+private:
+	void _Append(const char* string, size_t length)
+	{
+		size_t toAppend = min_c(length, fBufferCapacity - fBufferSize);
+		memcpy(fBuffer + fBufferSize, string, toAppend);
+		fBufferSize += length;
+	}
+
+private:
+	debugger_command_pipe*	fPipe;
+	int32					fSegment;
+	char*					fBuffer;
+	size_t					fBufferCapacity;
+	size_t					fBufferSize;
+};
+
+
+static PipeDebugOutputFilter sPipeOutputFilters[
+	MAX_DEBUGGER_COMMAND_PIPE_LENGTH - 1];
+
+
+static int
+invoke_pipe_segment(debugger_command_pipe* pipe, int32 index, char* argument)
+{
+	// set debug output
+	DebugOutputFilter* oldFilter = set_debug_output_filter(
+		index == pipe->segment_count - 1
+			? &gDefaultDebugOutputFilter : &sPipeOutputFilters[index]);
+
+	// set last command argument
+	debugger_command_pipe_segment& segment = pipe->segments[index];
+	if (index > 0)
+		segment.argv[segment.argc - 1] = argument;
+
+	// invoke command
+	int32 oldIndex = sCurrentPipeSegment;
+	sCurrentPipeSegment = index;
+
+	int result = invoke_debugger_command(segment.command, segment.argc,
+		segment.argv);
+	segment.invocations++;
+
+	sCurrentPipeSegment = oldIndex;
+
+	// reset debug output
+	set_debug_output_filter(oldFilter);
+
+	if (result == B_KDEBUG_ERROR) {
+		pipe->broken = true;
+
+		// Abort the previous pipe segment execution. The complete pipe is
+		// aborted iteratively this way.
+		if (index > 0)
+			abort_debugger_command();
+	}
+
+	return result;
+}
 
 
 debugger_command*
@@ -98,9 +255,10 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 	// intercept invocations with "--help" and directly print the usage text
 	// If we know the command's usage text, intercept "--help" invocations
 	// and print it directly.
-	if (argc == 2 && strcmp(argv[1], "--help") == 0 && command->usage != NULL) {
-		kprintf("usage: %s ", command->name);
-		kputs(command->usage);
+	if (argc == 2 && argv[1] != NULL && strcmp(argv[1], "--help") == 0
+			&& command->usage != NULL) {
+		kprintf_unfiltered("usage: %s ", command->name);
+		kputs_unfiltered(command->usage);
 		return 0;
 	}
 
@@ -117,30 +275,96 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 
 	sInCommand = true;
 
-	if (setjmp(sInvokeCommandEnv) == 0) {
-		int result;
-		thread->fault_handler = (addr_t)&&error;
-		// Fake goto to trick the compiler not to optimize the code at the label
-		// away.
-		if (!thread)
-			goto error;
+	switch (setjmp(sInvokeCommandEnv[sInvokeCommandLevel++])) {
+		case 0:
+			int result;
+			thread->fault_handler = (addr_t)&&error;
+			// Fake goto to trick the compiler not to optimize the code at the label
+			// away.
+			if (!thread)
+				goto error;
 
-		result = command->func(argc, argv);
+			result = command->func(argc, argv);
 
-		thread->fault_handler = oldFaultHandler;
-		sInCommand = false;
-		return result;
+			thread->fault_handler = oldFaultHandler;
+			sInvokeCommandLevel--;
+			sInCommand = false;
+			return result;
 
 error:
-		longjmp(sInvokeCommandEnv, 1);
-			// jump into the else branch
-	} else {
-		kprintf("\n[*** READ/WRITE FAULT ***]\n");
+			// jump to INVOKE_COMMAND_FAULT case, cleaning up the stack
+			longjmp(sInvokeCommandEnv[--sInvokeCommandLevel],
+				INVOKE_COMMAND_FAULT);
+
+		case INVOKE_COMMAND_FAULT:
+			kprintf_unfiltered("\n[*** READ/WRITE FAULT ***]\n");
+			break;
+		case INVOKE_COMMAND_ERROR:
+			// command aborted (no page fault)
+			break;
 	}
 
 	thread->fault_handler = oldFaultHandler;
 	sInCommand = false;
-	return 0;
+	return B_KDEBUG_ERROR;
+}
+
+
+/*!	Aborts the currently executed debugger command (in fact the complete pipe),
+	unless direct command invocation has been set. If successful, the function
+	won't return.
+*/
+void
+abort_debugger_command()
+{
+	if (!sInvokeCommandDirectly && sInvokeCommandLevel > 0) {
+		longjmp(sInvokeCommandEnv[--sInvokeCommandLevel],
+			INVOKE_COMMAND_ERROR);
+	}
+}
+
+
+int
+invoke_debugger_command_pipe(debugger_command_pipe* pipe)
+{
+	debugger_command_pipe* oldPipe = sCurrentPipe;
+	sCurrentPipe = pipe;
+
+	// prepare outputs
+	// TODO: If a pipe is invoked in a pipe, outputs will clash.
+	int32 segments = pipe->segment_count;
+	for (int32 i = 0; i < segments - 1; i++) {
+		new(&sPipeOutputFilters[i]) PipeDebugOutputFilter(pipe, i,
+			sOutputBuffers[i], kOutputBufferSize);
+	}
+
+	int result = invoke_pipe_segment(pipe, 0, NULL);
+
+	// perform final rerun for all commands that want it
+	for (int32 i = 1; result != B_KDEBUG_ERROR && i < segments; i++) {
+		debugger_command_pipe_segment& segment = pipe->segments[i];
+		if ((segment.command->flags & B_KDEBUG_PIPE_FINAL_RERUN) != 0)
+			result = invoke_pipe_segment(pipe, i, NULL);
+	}
+
+	sCurrentPipe = oldPipe;
+
+	return result;
+}
+
+
+debugger_command_pipe*
+get_current_debugger_command_pipe()
+{
+	return sCurrentPipe;
+}
+
+
+debugger_command_pipe_segment*
+get_current_debugger_command_pipe_segment()
+{
+	return sCurrentPipe != NULL
+		? &sCurrentPipe->segments[sCurrentPipeSegment] : NULL;
 }
 
 
@@ -234,8 +458,8 @@ print_debugger_command_usage(const char* commandName)
 	// directly print the usage text, if we know it, otherwise invoke the
 	// command with "--help"
 	if (command->usage != NULL) {
-		kprintf("usage: %s ", command->name);
-		kputs(command->usage);
+		kprintf_unfiltered("usage: %s ", command->name);
+		kputs_unfiltered(command->usage);
 	} else {
 		char* args[3] = { NULL, "--help", NULL };
 		invoke_debugger_command(command, 2, args);
