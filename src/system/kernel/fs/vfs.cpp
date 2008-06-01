@@ -2256,7 +2256,7 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent, char *name,
 	char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
 	struct dirent *dirent = (struct dirent *)buffer;
 
-	status_t status = get_vnode_name(vnode, parent, buffer, sizeof(buffer),
+	status_t status = get_vnode_name(vnode, parent, dirent, sizeof(buffer),
 		get_current_io_context(kernel));
 	if (status != B_OK)
 		return status;
