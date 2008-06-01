@@ -89,6 +89,7 @@ io_resource_private::Acquire(const io_resource& resource)
 			// This range is already covered by someone else
 			// TODO: we might want to ignore resources that belong to
 			// a node that isn't used.
+			_Init();
 			return B_RESOURCE_UNAVAILABLE;
 		}
 	}
