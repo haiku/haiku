@@ -1398,7 +1398,7 @@ status_t
 vm_page_write_modified_pages(vm_cache *cache, bool fsReenter)
 {
 	return vm_page_write_modified_page_range(cache, 0,
-		cache->virtual_size >> PAGE_SHIFT, fsReenter);
+		(cache->virtual_size + B_PAGE_SIZE - 1) >> PAGE_SHIFT, fsReenter);
 }
 
 
