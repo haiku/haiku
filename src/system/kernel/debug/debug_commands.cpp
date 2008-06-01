@@ -155,7 +155,7 @@ invoke_pipe_segment(debugger_command_pipe* pipe, int32 index, char* argument)
 	// set debug output
 	DebugOutputFilter* oldFilter = set_debug_output_filter(
 		index == pipe->segment_count - 1
-			? &gDefaultDebugOutputFilter : &sPipeOutputFilters[index]);
+			? &gDefaultDebugOutputFilter : (DebugOutputFilter*)&sPipeOutputFilters[index]);
 
 	// set last command argument
 	debugger_command_pipe_segment& segment = pipe->segments[index];
