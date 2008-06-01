@@ -79,7 +79,8 @@ if [ IsOptionalHaikuImagePackageAdded Beam ] {
 			: apps
 		;
 		AddSymlinkToHaikuImage home config be Applications
-			: /boot/apps/beam-1-1-bone-with-libs/Beam ;
+#			: /boot/apps/beam-1-1-2-bone-with-libs/Beam ;
+			: /boot/apps/beam-1-1-2-r5-with-libs/Beam ;
 	}
 }
 
