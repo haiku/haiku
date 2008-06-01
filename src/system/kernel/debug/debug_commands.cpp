@@ -155,7 +155,8 @@ invoke_pipe_segment(debugger_command_pipe* pipe, int32 index, char* argument)
 	// set debug output
 	DebugOutputFilter* oldFilter = set_debug_output_filter(
 		index == pipe->segment_count - 1
-			? &gDefaultDebugOutputFilter : (DebugOutputFilter*)&sPipeOutputFilters[index]);
+			? &gDefaultDebugOutputFilter
+			: (DebugOutputFilter*)&sPipeOutputFilters[index]);
 
 	// set last command argument
 	debugger_command_pipe_segment& segment = pipe->segments[index];
@@ -189,7 +190,8 @@ invoke_pipe_segment(debugger_command_pipe* pipe, int32 index, char* argument)
 
 
 debugger_command*
-next_debugger_command(debugger_command* command, const char* prefix, int prefixLen)
+next_debugger_command(debugger_command* command, const char* prefix,
+	int prefixLen)
 {
 	if (command == NULL)
 		command = sCommands;
@@ -279,8 +281,8 @@ invoke_debugger_command(struct debugger_command *command, int argc, char** argv)
 		case 0:
 			int result;
 			thread->fault_handler = (addr_t)&&error;
-			// Fake goto to trick the compiler not to optimize the code at the label
-			// away.
+			// Fake goto to trick the compiler not to optimize the code at the
+			// label away.
 			if (!thread)
 				goto error;
 
