@@ -540,20 +540,20 @@ undertaker(void* /*args*/)
 {
 	while (true) {
 		// wait for a thread to bury
-		ConditionVariableEntry conditionEntry;
-
 		InterruptsSpinLocker locker(thread_spinlock);
-		sUndertakerCondition.Add(&conditionEntry);
-		locker.Unlock();
 
-		conditionEntry.Wait();
+		while (sUndertakerEntries.IsEmpty()) {
+			ConditionVariableEntry conditionEntry;
+			sUndertakerCondition.Add(&conditionEntry);
+			locker.Unlock();
 
-		locker.Lock();
+			conditionEntry.Wait();
+
+			locker.Lock();
+		}
+
 		UndertakerEntry* _entry = sUndertakerEntries.RemoveHead();
 		locker.Unlock();
-
-		if (_entry == NULL)
-			continue;
 
 		UndertakerEntry entry = *_entry;
 			// we need a copy, since the original entry is on the thread's stack
