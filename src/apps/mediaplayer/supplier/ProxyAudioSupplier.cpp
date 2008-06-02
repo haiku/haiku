@@ -19,7 +19,7 @@
 using std::nothrow;
 
 
-#define TRACE_PROXY_AUDIO_SUPPLIER
+//#define TRACE_PROXY_AUDIO_SUPPLIER
 #ifdef TRACE_PROXY_AUDIO_SUPPLIER
 # define TRACE(x...)	printf("ProxyAudioSupplier::"); printf(x)
 # define ERROR(x...)	fprintf(stderr, "ProxyAudioSupplier::"); fprintf(stderr, x)
