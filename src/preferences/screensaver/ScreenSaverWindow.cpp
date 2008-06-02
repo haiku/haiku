@@ -351,6 +351,7 @@ ModulesView::MessageReceived(BMessage* message)
 			else
 				fSettings.SetModuleName(item->Text());
 
+			SaveState();
 			_CloseSaver();
 			_OpenSaver();
 			break;
@@ -469,9 +470,7 @@ ModulesView::_CloseSaver()
 		fSaverRunner->Quit();
 	if (saver != NULL)
 		saver->StopConfig();
-
-	SaveState();
-
+	
 	delete view;
 	delete fSettingsView;
 	delete fSaverRunner;
