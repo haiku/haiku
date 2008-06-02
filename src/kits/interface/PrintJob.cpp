@@ -673,13 +673,12 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 	BView *child = view->ChildAt(0);
 	while (child != NULL) {
 		if ((child->Flags() & B_WILL_DRAW) && !child->IsHidden()) {
-			BRect bounds(child->Bounds());
-			BPoint childLeftTop = view->Bounds().LeftTop()
-				+ (child->Frame().LeftTop() - bounds.LeftTop());
-			_RecurseView(child, origin + childLeftTop, picture,
-				bounds & rect.OffsetToCopy(rect.LeftTop() - childLeftTop));
-			child = child->NextSibling();
+			BPoint leftTop(view->Bounds().LeftTop() + child->Frame().LeftTop());
+			BRect printRect(rect.OffsetToCopy(rect.LeftTop() - leftTop) & child->Bounds());
+			if (printRect.IsValid())
+				_RecurseView(child, origin + leftTop, picture, printRect);
 		}
+		child = child->NextSibling();
 	}
 
 	if (view->Flags() & B_DRAW_ON_CHILDREN)	{
