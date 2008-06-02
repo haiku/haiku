@@ -160,6 +160,7 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		driver_settings_init_post_sem(&sKernelArgs);
 		TRACE("init generic syscall\n");
 		generic_syscall_init();
+		smp_init_post_generic_syscalls();
 		TRACE("init cbuf\n");
 		cbuf_init();
 		TRACE("init teams\n");

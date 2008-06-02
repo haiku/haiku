@@ -13,7 +13,32 @@
 /* interrupts and spinlocks */
 
 typedef ulong cpu_status;
-typedef vint32 spinlock;
+
+// WARNING: For Haiku debugging only! This changes the spinlock type in a
+// binary incompatible way!
+//#define B_DEBUG_SPINLOCK_CONTENTION	1
+
+#if B_DEBUG_SPINLOCK_CONTENTION
+	typedef struct {
+		vint32	lock;
+		vint32	count_low;
+		vint32	count_high;
+	} spinlock;
+
+#	define B_SPINLOCK_INITIALIZER { 0, 0, 0 }
+#	define B_INITIALIZE_SPINLOCK(spinlock)	do {	\
+			(spinlock)->lock = 0;					\
+			(spinlock)->count_low = 0;				\
+			(spinlock)->count_high = 0;				\
+		} while (false)
+#	define B_SPINLOCK_IS_LOCKED(spinlock)	((spinlock)->lock > 0)
+#else
+	typedef vint32 spinlock;
+
+#	define B_SPINLOCK_INITIALIZER 0
+#	define B_INITIALIZE_SPINLOCK(lock)	do { *(lock) = 0; } while (false)
+#	define B_SPINLOCK_IS_LOCKED(lock)	(*(lock) > 0)
+#endif
 
 /* interrupt handling support for device drivers */
 

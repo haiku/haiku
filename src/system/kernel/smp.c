@@ -8,17 +8,21 @@
 
 /* Functionality for symetrical multi-processors */
 
-#include <thread.h>
-#include <int.h>
 #include <smp.h>
-#include <cpu.h>
-#include <arch/cpu.h>
-#include <arch/smp.h>
-#include <arch/int.h>
-#include <arch/debug.h>
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <arch/cpu.h>
+#include <arch/debug.h>
+#include <arch/int.h>
+#include <arch/smp.h>
+#include <cpu.h>
+#include <generic_syscall.h>
+#include <int.h>
+#include <spinlock_contention.h>
+#include <thread.h>
+
 
 #define DEBUG_SPINLOCKS 1
 //#define TRACE_SMP
@@ -53,17 +57,17 @@ struct smp_msg {
 #define MAILBOX_LOCAL 1
 #define MAILBOX_BCAST 2
 
-static spinlock boot_cpu_spin[SMP_MAX_CPUS] = { 0, };
+static spinlock boot_cpu_spin[SMP_MAX_CPUS] = { };
 
 static struct smp_msg *free_msgs = NULL;
 static volatile int free_msg_count = 0;
-static spinlock free_msg_spinlock = 0;
+static spinlock free_msg_spinlock = B_SPINLOCK_INITIALIZER;
 
 static struct smp_msg *smp_msgs[SMP_MAX_CPUS] = { NULL, };
-static spinlock cpu_msg_spinlock[SMP_MAX_CPUS] = { 0, };
+static spinlock cpu_msg_spinlock[SMP_MAX_CPUS];
 
 static struct smp_msg *smp_broadcast_msgs = NULL;
-static spinlock broadcast_msg_spinlock = 0;
+static spinlock broadcast_msg_spinlock = B_SPINLOCK_INITIALIZER;
 
 static bool sICIEnabled = false;
 static int32 sNumCPUs = 1;
@@ -115,6 +119,10 @@ acquire_spinlock(spinlock *lock)
 		int currentCPU = smp_get_current_cpu();
 		if (are_interrupts_enabled())
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
+#if B_DEBUG_SPINLOCK_CONTENTION
+		while (atomic_add(&lock->lock, 1) != 0)
+			process_pending_ici(currentCPU);
+#else
 		while (1) {
 			while (*lock != 0) {
 				process_pending_ici(currentCPU);
@@ -123,6 +131,7 @@ acquire_spinlock(spinlock *lock)
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
+#endif
 	} else {
 #if DEBUG_SPINLOCKS
 		int32 oldValue;
@@ -148,12 +157,17 @@ acquire_spinlock_nocheck(spinlock *lock)
 		if (are_interrupts_enabled())
 			panic("acquire_spinlock_nocheck: attempt to acquire lock %p with interrupts enabled\n", lock);
 #endif
+#if B_DEBUG_SPINLOCK_CONTENTION
+		while (atomic_add(&lock->lock, 1) != 0) {
+		}
+#else
 		while (1) {
 			while(*lock != 0)
 				PAUSE();
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
+#endif
 	} else {
 #if DEBUG_SPINLOCKS
 		if (are_interrupts_enabled())
@@ -171,8 +185,23 @@ release_spinlock(spinlock *lock)
 	if (sNumCPUs > 1) {
 		if (are_interrupts_enabled())
 			panic("release_spinlock: attempt to release lock %p with interrupts enabled\n", lock);
+#if B_DEBUG_SPINLOCK_CONTENTION
+		{
+			int32 count = atomic_set(&lock->lock, 0) - 1;
+			if (count < 0) {
+				panic("release_spinlock: lock %p was already released\n", lock);
+			} else {
+				// add to the total count -- deal with carry manually
+				if ((uint32)atomic_add(&lock->count_low, count) + count
+						< (uint32)count) {
+					atomic_add(&lock->count_high, 1);
+				}
+			}
+		}
+#else
 		if (atomic_set((int32 *)lock, 0) != 1)
 			panic("release_spinlock: lock %p was already released\n", lock);
+#endif
 	} else {
 		#if DEBUG_SPINLOCKS
 			if (are_interrupts_enabled())
@@ -405,6 +434,48 @@ process_pending_ici(int32 currentCPU)
 }
 
 
+#if B_DEBUG_SPINLOCK_CONTENTION
+
+static uint64
+get_spinlock_counter(spinlock* lock)
+{
+	uint32 high;
+	uint32 low;
+	do {
+		high = (uint32)atomic_get(&lock->count_high);
+		low = (uint32)atomic_get(&lock->count_low);
+	} while (high != atomic_get(&lock->count_high));
+
+	return ((uint64)high << 32) | low;
+}
+
+
+static status_t
+spinlock_contention_syscall(const char* subsystem, uint32 function,
+	void* buffer, size_t bufferSize)
+{
+	spinlock_contention_info info;
+
+	if (function != GET_SPINLOCK_CONTENTION_INFO)
+		return B_BAD_VALUE;
+
+	if (bufferSize < sizeof(spinlock_contention_info))
+		return B_BAD_VALUE;
+
+	info.thread_spinlock_counter = get_spinlock_counter(&thread_spinlock);
+	info.team_spinlock_counter = get_spinlock_counter(&team_spinlock);
+
+	if (!IS_USER_ADDRESS(buffer)
+		|| user_memcpy(buffer, &info, sizeof(info)) != B_OK) {
+		return B_BAD_ADDRESS;
+	}
+
+	return B_OK;
+}
+
+#endif	// B_DEBUG_SPINLOCK_CONTENTION
+
+
 //	#pragma mark -
 
 
@@ -553,7 +624,11 @@ bool
 smp_trap_non_boot_cpus(int32 cpu)
 {
 	if (cpu > 0) {
+#if B_DEBUG_SPINLOCK_CONTENTION
+		boot_cpu_spin[cpu].lock = 1;
+#else
 		boot_cpu_spin[cpu] = 1;
+#endif
 		acquire_spinlock_nocheck(&boot_cpu_spin[cpu]);
 		return false;
 	}
@@ -621,6 +696,18 @@ status_t
 smp_per_cpu_init(kernel_args *args, int32 cpu)
 {
 	return arch_smp_per_cpu_init(args, cpu);
+}
+
+
+status_t
+smp_init_post_generic_syscalls(void)
+{
+#if B_DEBUG_SPINLOCK_CONTENTION
+	return register_generic_syscall(SPINLOCK_CONTENTION,
+		&spinlock_contention_syscall, 0, 0);
+#else
+	return B_OK;
+#endif
 }
 
 

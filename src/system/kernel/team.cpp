@@ -89,7 +89,7 @@ static struct team *sKernelTeam = NULL;
 static int32 sMaxTeams = 2048;
 static int32 sUsedTeams = 1;
 
-spinlock team_spinlock = 0;
+spinlock team_spinlock = B_SPINLOCK_INITIALIZER;
 
 
 // #pragma mark - Tracing

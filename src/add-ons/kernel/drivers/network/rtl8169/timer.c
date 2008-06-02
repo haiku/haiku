@@ -187,7 +187,7 @@ initialize_timer(void)
 {
 	sTimerCount = 0;
 	sTimerNextId = 1;
-	sTimerSpinlock = 0;
+	B_INITIALIZE_SPINLOCK(&sTimerSpinlock);
 	
 	sTimerThread = spawn_kernel_thread(timer_thread, "rtl8169 timer", 80, 0);
 	sTimerSem = create_sem(0, "rtl8169 timer");

@@ -29,7 +29,7 @@ typedef struct spinlock_irq {
 static inline void
 spinlock_irq_init(spinlock_irq *lock)
 {
-	lock->lock = 0;
+	B_INITIALIZE_SPINLOCK(&lock->lock);
 }
 
 static inline void

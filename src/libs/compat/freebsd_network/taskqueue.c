@@ -20,7 +20,7 @@ struct taskqueue {
 	taskqueue_enqueue_fn tq_enqueue;
 	void *tq_arg;
 	int tq_fast;
-	int32 tq_spinlock;
+	spinlock tq_spinlock;
 	sem_id tq_sem;
 	thread_id *tq_threads;
 	thread_id tq_thread_storage;
@@ -43,7 +43,7 @@ _taskqueue_create(const char *name, int mflags, int fast,
 	tq->tq_fast = fast;
 
 	if (fast) {
-		tq->tq_spinlock = 0;
+		B_INITIALIZE_SPINLOCK(&tq->tq_spinlock);
 	} else {
 		mutex_init_etc(&tq->tq_mutex, name, MUTEX_FLAG_CLONE_NAME);
 	}

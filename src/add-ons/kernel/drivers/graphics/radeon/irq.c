@@ -237,7 +237,7 @@ Radeon_SetupIRQ(device_info *di, char *buffer)
 		goto err3;
 	}
 
-	di->cap_spinlock = 0;
+	B_INITIALIZE_SPINLOCK(&di->cap_spinlock);
 
 	sprintf(buffer, "%04X_%04X_%02X%02X%02X DMA I",
 		di->pcii.vendor_id, di->pcii.device_id,

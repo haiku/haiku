@@ -480,7 +480,7 @@ _EXPORT generic_mpu401_module *modules[] =
 	NULL
 };
 
-spinlock locked = 0;
+spinlock locked = B_SPINLOCK_INITIALIZER;
 cpu_status 
 lock(void)
 {

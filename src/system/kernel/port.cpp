@@ -72,7 +72,7 @@ static bool sPortsActive = false;
 static port_id sNextPort = 1;
 static int32 sFirstFreeSlot = 1;
 
-static spinlock sPortSpinlock = 0;
+static spinlock sPortSpinlock = B_SPINLOCK_INITIALIZER;
 
 #define GRAB_PORT_LIST_LOCK() acquire_spinlock(&sPortSpinlock)
 #define RELEASE_PORT_LIST_LOCK() release_spinlock(&sPortSpinlock)

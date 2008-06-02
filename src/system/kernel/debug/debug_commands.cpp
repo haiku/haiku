@@ -30,7 +30,7 @@
 static const int32 kMaxInvokeCommandDepth = 5;
 static const int32 kOutputBufferSize = 1024;
 
-static spinlock sSpinlock = 0;
+static spinlock sSpinlock = B_SPINLOCK_INITIALIZER;
 
 static struct debugger_command *sCommands;
 

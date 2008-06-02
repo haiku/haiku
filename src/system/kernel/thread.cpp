@@ -60,7 +60,7 @@ struct thread_key {
 };
 
 // global
-spinlock thread_spinlock = 0;
+spinlock thread_spinlock = B_SPINLOCK_INITIALIZER;
 
 // thread list
 static struct thread sIdleThreads[B_MAX_CPU_COUNT];

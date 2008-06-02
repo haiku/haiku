@@ -1531,7 +1531,7 @@ UHCI::InterruptHandler(void *data)
 int32
 UHCI::Interrupt()
 {
-	static spinlock lock = 0;
+	static spinlock lock = B_SPINLOCK_INITIALIZER;
 	acquire_spinlock(&lock);
 
 	// Check if we really had an interrupt

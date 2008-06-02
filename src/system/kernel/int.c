@@ -62,7 +62,7 @@ dump_int_statistics(int argc, char **argv)
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
 		struct io_handler *io;
 
-		if (sVectors[i].vector_lock == 0
+		if (!B_SPINLOCK_IS_LOCKED(&sVectors[i].vector_lock)
 			&& sVectors[i].enable_count == 0
 			&& sVectors[i].handled_count == 0
 			&& sVectors[i].unhandled_count == 0
@@ -72,7 +72,7 @@ dump_int_statistics(int argc, char **argv)
 		kprintf("int %3d, enabled %ld, handled %8lld, unhandled %8lld%s%s\n",
 			i, sVectors[i].enable_count, sVectors[i].handled_count, 
 			sVectors[i].unhandled_count,
-			sVectors[i].vector_lock != 0 ? ", ACTIVE" : "",
+			B_SPINLOCK_IS_LOCKED(&sVectors[i].vector_lock) ? ", ACTIVE" : "",
 			sVectors[i].handler_list.next == &sVectors[i].handler_list
 				? ", no handler" : "");
 
@@ -114,7 +114,7 @@ int_init_post_vm(kernel_args *args)
 
 	/* initialize the vector list */
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
-		sVectors[i].vector_lock = 0;			/* initialize spinlock */
+		B_INITIALIZE_SPINLOCK(&sVectors[i].vector_lock);
 		sVectors[i].enable_count = 0;
 		sVectors[i].no_lock_vector = false;
 #ifdef DEBUG_INT

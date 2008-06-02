@@ -467,7 +467,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	read_settings(device);
 
 	device->rxBuf = (void **)malloc(sizeof(void *) * device->rxBufferCount);
-	device->rxSpinlock = 0;
+	B_INITIALIZE_SPINLOCK(&device->rxSpinlock);
 	device->rxNextIndex = 0;
 	device->rxIntIndex = 0;
 	device->rxFree = device->rxBufferCount;
@@ -475,7 +475,7 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	set_sem_owner(device->rxReadySem, B_SYSTEM_TEAM);
 	
 	device->txBuf = (void **)malloc(sizeof(void *) * device->txBufferCount);
-	device->txSpinlock = 0;
+	B_INITIALIZE_SPINLOCK(&device->txSpinlock);
 	device->txNextIndex = 0;
 	device->txIntIndex = 0;
 	device->txUsed = 0;

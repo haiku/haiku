@@ -1180,7 +1180,7 @@ arch_vm_translation_map_init(kernel_args *args)
 
 	sQueryDesc.type = DT_INVALID;
 
-	tmap_list_lock = 0;
+	B_INITIALIZE_SPINLOCK(&tmap_list_lock);
 	tmap_list = NULL;
 
 	// allocate some space to hold physical page mapping info

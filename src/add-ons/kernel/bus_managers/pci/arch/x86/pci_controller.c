@@ -32,7 +32,7 @@
        restore_interrupts(cpu_status);		\
 }
 
-spinlock sConfigLock = 0;
+spinlock sConfigLock = B_SPINLOCK_INITIALIZER;
 
 static status_t
 pci_mech1_read_config(void *cookie, uint8 bus, uint8 device, uint8 function,

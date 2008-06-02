@@ -30,7 +30,6 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	, fIndex(index)
 	, fRegs(&controller->fRegs->port[index])
 	, fArea(-1)
-	, fSpinlock(0)
 	, fCommandsActive(0)
 	, fRequestSem(-1)
 	, fResponseSem(-1)
@@ -42,6 +41,7 @@ AHCIPort::AHCIPort(AHCIController *controller, int index)
 	, fResetPort(false)
 	, fError(false)
 {
+	B_INITIALIZE_SPINLOCK(&fSpinlock);
 	fRequestSem = create_sem(1, "ahci request");
 	fResponseSem = create_sem(0, "ahci response");
 }

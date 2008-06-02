@@ -219,7 +219,7 @@ clear_team_debug_info(struct team_debug_info *info, bool initLock)
 		info->debugger_write_lock = -1;
 
 		if (initLock)
-			info->lock = 0;
+			B_INITIALIZE_SPINLOCK(&info->lock);
 	}
 }
 

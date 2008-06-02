@@ -521,7 +521,7 @@ ide_sim_init_bus(device_node *node, void **cookie)
 
 	memset(bus, 0, sizeof(*bus));
 	bus->node = node;
-	bus->lock = 0;
+	B_INITIALIZE_SPINLOCK(&bus->lock);
 	bus->num_running_reqs = 0;
 	bus->active_qrequest = NULL;
 	bus->disconnected = false;

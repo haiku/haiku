@@ -852,7 +852,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	sKernelPhysicalPageDirectory = (page_directory_entry *)args->arch_args.phys_pgdir;
 	sKernelVirtualPageDirectory = (page_directory_entry *)args->arch_args.vir_pgdir;
 
-	tmap_list_lock = 0;
+	B_INITIALIZE_SPINLOCK(&tmap_list_lock);
 	tmap_list = NULL;
 
 	// allocate some space to hold physical page mapping info

@@ -40,7 +40,7 @@ create_packet_buffer(size_t size)
 		free(buffer);
 		return NULL;
 	}
-	buffer->lock = 0;
+	B_INITIALIZE_SPINLOCK(&buffer->lock);
 
 	return buffer;
 }

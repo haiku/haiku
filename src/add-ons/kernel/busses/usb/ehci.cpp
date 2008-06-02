@@ -782,7 +782,7 @@ EHCI::InterruptHandler(void *data)
 int32
 EHCI::Interrupt()
 {
-	static spinlock lock = 0;
+	static spinlock lock = B_SPINLOCK_INITIALIZER;
 	acquire_spinlock(&lock);
 
 	// check if any interrupt was generated

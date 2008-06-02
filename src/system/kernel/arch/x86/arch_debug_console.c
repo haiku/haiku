@@ -99,7 +99,7 @@ static bool sKeyboardHandlerInstalled = false;
 static bool sBochsOutput = false;
 #endif
 
-static spinlock sSerialOutputSpinlock = 0;
+static spinlock sSerialOutputSpinlock = B_SPINLOCK_INITIALIZER;
 
 
 static void

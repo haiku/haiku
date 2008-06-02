@@ -91,7 +91,7 @@ new_dpc_queue(void **handle, const char *name, int32 priority)
 	queue->head = queue->tail = 0;
 	queue->size = DPC_QUEUE_SIZE;
 	queue->count = 0;
-	queue->lock = 0;	// Init the spinlock
+	B_INITIALIZE_SPINLOCK(&queue->lock);	// Init the spinlock
 
 #ifdef __HAIKU__
 	snprintf(str, sizeof(str), "%.*s_wakeup_sem", 

@@ -694,7 +694,7 @@ OHCI::_InterruptHandler(void *data)
 int32
 OHCI::_Interrupt()
 {
-	static spinlock lock = 0;
+	static spinlock lock = B_SPINLOCK_INITIALIZER;
 	acquire_spinlock(&lock);
 
 	uint32 status = 0;

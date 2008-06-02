@@ -54,7 +54,7 @@ static bool sBlueScreenEnabled = false;
 	// must always be false on startup
 static bool sDebugScreenEnabled = false;
 static bool sBlueScreenOutput = true;
-static spinlock sSpinlock = 0;
+static spinlock sSpinlock = B_SPINLOCK_INITIALIZER;
 static int32 sDebuggerOnCPU = -1;
 
 static sem_id sSyslogNotify = -1;
