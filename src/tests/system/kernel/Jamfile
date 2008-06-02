@@ -1,7 +1,6 @@
 SubDir HAIKU_TOP src tests system kernel ;
 
-UsePrivateHeaders kernel ;
-UseHeaders $(TARGET_PRIVATE_KERNEL_HEADERS) : true ;
+UsePrivateKernelHeaders ;
 
 SimpleTest advisory_locking_test : advisory_locking_test.cpp ;
 
@@ -35,6 +34,8 @@ SimpleTest select_check : select_check.cpp ;
 SimpleTest select_close_test : select_close_test.cpp ;
 
 SimpleTest sem_acquire_test1 : sem_acquire_test1.cpp : be ;
+
+SimpleTest spinlock_contention : spinlock_contention.cpp ;
 
 SimpleTest syscall_restart_test : syscall_restart_test.cpp : network ;
 
