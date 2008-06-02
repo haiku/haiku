@@ -32,7 +32,7 @@ class CopyEngine : public BLooper {
 	private:
 		void LaunchInitScript(BPath &path);
 		void LaunchFinishScript(BPath &path);
-		void CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
+		status_t CopyFolder(BDirectory &srcDir, BDirectory &targetDir);
 
 		InstallerWindow *fWindow;
 		BDiskDeviceRoster fDDRoster;

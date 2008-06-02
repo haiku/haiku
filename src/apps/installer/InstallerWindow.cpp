@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Jérôme DUVAL. All rights reserved.
+ * Copyright 2005-2008, Jérôme DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -213,7 +213,6 @@ InstallerWindow::MessageReceived(BMessage *msg)
 					if (fCopyEngine->Cancel()) {
 						fInstallStatus = kCancelled;
 						SetStatusMessage("Installation cancelled.");
-						PostMessage(RESET_INSTALL);
 					}
 					break;
 				case kFinished:
@@ -263,6 +262,7 @@ InstallerWindow::MessageReceived(BMessage *msg)
 		}
 		case INSTALL_FINISHED:
 			fBeginButton->SetLabel("Quit");
+			SetStatusMessage("Installation completed.");
 			fInstallStatus = kFinished;
 			DisableInterface(false);
 			break;

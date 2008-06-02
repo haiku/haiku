@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2006, Jérôme DUVAL. All rights reserved.
+ * Copyright 2005-2008, Jérôme DUVAL. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -76,7 +76,10 @@ CopyEngine::MessageReceived(BMessage*msg)
 				fWindow->GetTargetMenu());
 			if (err != B_OK) {
 				ERR("Start failed");
+				SetStatusMessage("Installation aborted.");
 				BMessenger(fWindow).SendMessage(RESET_INSTALL);
+			} else {
+				BMessenger(fWindow).SendMessage(INSTALL_FINISHED);
 			}
 			break;
 		}
@@ -229,7 +232,10 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 	// copy source volume
 	BDirectory targetDir(targetDirectory.Path());
 	BDirectory srcDir(srcDirectory.Path());
-	CopyFolder(srcDir, targetDir);
+	err = CopyFolder(srcDir, targetDir);
+
+	if (err != B_OK)
+		return err;
 
 	// copy selected packages
 	if (fPackages) {
@@ -239,25 +245,28 @@ CopyEngine::Start(BMenu *srcMenu, BMenu *targetMenu)
 		int32 count = fPackages->CountItems();
 		for (int32 i = 0; i < count; i++) {
 			if (fControl->CheckUserCanceled())
-				return B_OK;
+				return B_CANCELED;
 			Package *p = static_cast<Package*>(fPackages->ItemAt(i));
 			packageDir.SetTo(&srcDir, p->Folder());
-			CopyFolder(packageDir, targetDir);
+			err = CopyFolder(packageDir, targetDir);
+			if (err != B_OK)
+				break;
 		}
 	}
 
-	if (!fControl->CheckUserCanceled()) {
-		LaunchFinishScript(targetDirectory);
+	if (err != B_OK)
+		return err;
 
-		BMessage msg(INSTALL_FINISHED);
-		BMessenger(fWindow).SendMessage(&msg);
-	}
+	if (fControl->CheckUserCanceled())
+		return B_CANCELED;
+	
+	LaunchFinishScript(targetDirectory);
 
 	return B_OK;
 }
 
 
-void
+status_t
 CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 {
 	BEntry entry;
@@ -283,8 +292,11 @@ CopyEngine::CopyFolder(BDirectory &srcDir, BDirectory &targetDir)
 			BPath path;
 			entry.GetPath(&path);
 			ERR2("error while copying %s", path.Path());
+			return err;
 		}
 	}
+
+	return B_OK;
 }
 
 
