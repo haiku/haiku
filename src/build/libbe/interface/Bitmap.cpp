@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku Inc.
+ * Copyright 2001-2008, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,9 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
-/** BBitmap objects represent off-screen windows that
- *	contain bitmap data.
- */
+/*!	BBitmap objects represent off-screen windows that contain bitmap data. */
 
 #include <algorithm>
 #include <limits.h>
@@ -24,99 +22,149 @@
 #include <Message.h>
 
 
+// structures defining the pixel layout
+
+struct rgb32_pixel {
+	uint8 blue;
+	uint8 green;
+	uint8 red;
+	uint8 alpha;
+};
+
+struct rgb32_big_pixel {
+	uint8 red;
+	uint8 green;
+	uint8 blue;
+	uint8 alpha;
+};
+
+struct rgb24_pixel {
+	uint8 blue;
+	uint8 green;
+	uint8 red;
+};
+
+struct rgb24_big_pixel {
+	uint8 red;
+	uint8 green;
+	uint8 blue;
+};
+
+struct rgb16_pixel {
+	uint8 gb;	// G[2:0],B[4:0]
+	uint8 rg;	// 16: R[4:0],G[5:3]
+				// 15: -[0],R[4:0],G[4:3]
+};
+
+struct rgb16_big_pixel {
+	uint8 rg;	// 16: R[4:0],G[5:3]
+				// 15: -[0],R[4:0],G[4:3]
+	uint8 gb;	// G[2:0],B[4:0]
+};
+
+// types defining what is needed to store a color value
+
+struct rgb_color_value {
+	uint8 red;
+	uint8 green;
+	uint8 blue;
+	uint8 alpha;
+};
+
+typedef uint8 gray_color_value;
+
 // TODO: system palette -- hard-coded for now, when the app server is ready
 // we should use system_colors() or BScreen::ColorMap().
 const rgb_color kSystemPalette[] = {
- {   0,   0,   0, 255 }, {   8,   8,   8, 255 }, {  16,  16,  16, 255 },
- {  24,  24,  24, 255 }, {  32,  32,  32, 255 }, {  40,  40,  40, 255 },
- {  48,  48,  48, 255 }, {  56,  56,  56, 255 }, {  64,  64,  64, 255 },
- {  72,  72,  72, 255 }, {  80,  80,  80, 255 }, {  88,  88,  88, 255 },
- {  96,  96,  96, 255 }, { 104, 104, 104, 255 }, { 112, 112, 112, 255 },
- { 120, 120, 120, 255 }, { 128, 128, 128, 255 }, { 136, 136, 136, 255 },
- { 144, 144, 144, 255 }, { 152, 152, 152, 255 }, { 160, 160, 160, 255 },
- { 168, 168, 168, 255 }, { 176, 176, 176, 255 }, { 184, 184, 184, 255 },
- { 192, 192, 192, 255 }, { 200, 200, 200, 255 }, { 208, 208, 208, 255 },
- { 216, 216, 216, 255 }, { 224, 224, 224, 255 }, { 232, 232, 232, 255 },
- { 240, 240, 240, 255 }, { 248, 248, 248, 255 }, {   0,   0, 255, 255 },
- {   0,   0, 229, 255 }, {   0,   0, 204, 255 }, {   0,   0, 179, 255 },
- {   0,   0, 154, 255 }, {   0,   0, 129, 255 }, {   0,   0, 105, 255 },
- {   0,   0,  80, 255 }, {   0,   0,  55, 255 }, {   0,   0,  30, 255 },
- { 255,   0,   0, 255 }, { 228,   0,   0, 255 }, { 203,   0,   0, 255 },
- { 178,   0,   0, 255 }, { 153,   0,   0, 255 }, { 128,   0,   0, 255 },
- { 105,   0,   0, 255 }, {  80,   0,   0, 255 }, {  55,   0,   0, 255 },
- {  30,   0,   0, 255 }, {   0, 255,   0, 255 }, {   0, 228,   0, 255 },
- {   0, 203,   0, 255 }, {   0, 178,   0, 255 }, {   0, 153,   0, 255 },
- {   0, 128,   0, 255 }, {   0, 105,   0, 255 }, {   0,  80,   0, 255 },
- {   0,  55,   0, 255 }, {   0,  30,   0, 255 }, {   0, 152,  51, 255 },
- { 255, 255, 255, 255 }, { 203, 255, 255, 255 }, { 203, 255, 203, 255 },
- { 203, 255, 152, 255 }, { 203, 255, 102, 255 }, { 203, 255,  51, 255 },
- { 203, 255,   0, 255 }, { 152, 255, 255, 255 }, { 152, 255, 203, 255 },
- { 152, 255, 152, 255 }, { 152, 255, 102, 255 }, { 152, 255,  51, 255 },
- { 152, 255,   0, 255 }, { 102, 255, 255, 255 }, { 102, 255, 203, 255 },
- { 102, 255, 152, 255 }, { 102, 255, 102, 255 }, { 102, 255,  51, 255 },
- { 102, 255,   0, 255 }, {  51, 255, 255, 255 }, {  51, 255, 203, 255 },
- {  51, 255, 152, 255 }, {  51, 255, 102, 255 }, {  51, 255,  51, 255 },
- {  51, 255,   0, 255 }, { 255, 152, 255, 255 }, { 255, 152, 203, 255 },
- { 255, 152, 152, 255 }, { 255, 152, 102, 255 }, { 255, 152,  51, 255 },
- { 255, 152,   0, 255 }, {   0, 102, 255, 255 }, {   0, 102, 203, 255 },
- { 203, 203, 255, 255 }, { 203, 203, 203, 255 }, { 203, 203, 152, 255 },
- { 203, 203, 102, 255 }, { 203, 203,  51, 255 }, { 203, 203,   0, 255 },
- { 152, 203, 255, 255 }, { 152, 203, 203, 255 }, { 152, 203, 152, 255 },
- { 152, 203, 102, 255 }, { 152, 203,  51, 255 }, { 152, 203,   0, 255 },
- { 102, 203, 255, 255 }, { 102, 203, 203, 255 }, { 102, 203, 152, 255 },
- { 102, 203, 102, 255 }, { 102, 203,  51, 255 }, { 102, 203,   0, 255 },
- {  51, 203, 255, 255 }, {  51, 203, 203, 255 }, {  51, 203, 152, 255 },
- {  51, 203, 102, 255 }, {  51, 203,  51, 255 }, {  51, 203,   0, 255 },
- { 255, 102, 255, 255 }, { 255, 102, 203, 255 }, { 255, 102, 152, 255 },
- { 255, 102, 102, 255 }, { 255, 102,  51, 255 }, { 255, 102,   0, 255 },
- {   0, 102, 152, 255 }, {   0, 102, 102, 255 }, { 203, 152, 255, 255 },
- { 203, 152, 203, 255 }, { 203, 152, 152, 255 }, { 203, 152, 102, 255 },
- { 203, 152,  51, 255 }, { 203, 152,   0, 255 }, { 152, 152, 255, 255 },
- { 152, 152, 203, 255 }, { 152, 152, 152, 255 }, { 152, 152, 102, 255 },
- { 152, 152,  51, 255 }, { 152, 152,   0, 255 }, { 102, 152, 255, 255 },
- { 102, 152, 203, 255 }, { 102, 152, 152, 255 }, { 102, 152, 102, 255 },
- { 102, 152,  51, 255 }, { 102, 152,   0, 255 }, {  51, 152, 255, 255 },
- {  51, 152, 203, 255 }, {  51, 152, 152, 255 }, {  51, 152, 102, 255 },
- {  51, 152,  51, 255 }, {  51, 152,   0, 255 }, { 230, 134,   0, 255 },
- { 255,  51, 203, 255 }, { 255,  51, 152, 255 }, { 255,  51, 102, 255 },
- { 255,  51,  51, 255 }, { 255,  51,   0, 255 }, {   0, 102,  51, 255 },
- {   0, 102,   0, 255 }, { 203, 102, 255, 255 }, { 203, 102, 203, 255 },
- { 203, 102, 152, 255 }, { 203, 102, 102, 255 }, { 203, 102,  51, 255 },
- { 203, 102,   0, 255 }, { 152, 102, 255, 255 }, { 152, 102, 203, 255 },
- { 152, 102, 152, 255 }, { 152, 102, 102, 255 }, { 152, 102,  51, 255 },
- { 152, 102,   0, 255 }, { 102, 102, 255, 255 }, { 102, 102, 203, 255 },
- { 102, 102, 152, 255 }, { 102, 102, 102, 255 }, { 102, 102,  51, 255 },
- { 102, 102,   0, 255 }, {  51, 102, 255, 255 }, {  51, 102, 203, 255 },
- {  51, 102, 152, 255 }, {  51, 102, 102, 255 }, {  51, 102,  51, 255 },
- {  51, 102,   0, 255 }, { 255,   0, 255, 255 }, { 255,   0, 203, 255 },
- { 255,   0, 152, 255 }, { 255,   0, 102, 255 }, { 255,   0,  51, 255 },
- { 255, 175,  19, 255 }, {   0,  51, 255, 255 }, {   0,  51, 203, 255 },
- { 203,  51, 255, 255 }, { 203,  51, 203, 255 }, { 203,  51, 152, 255 },
- { 203,  51, 102, 255 }, { 203,  51,  51, 255 }, { 203,  51,   0, 255 },
- { 152,  51, 255, 255 }, { 152,  51, 203, 255 }, { 152,  51, 152, 255 },
- { 152,  51, 102, 255 }, { 152,  51,  51, 255 }, { 152,  51,   0, 255 },
- { 102,  51, 255, 255 }, { 102,  51, 203, 255 }, { 102,  51, 152, 255 },
- { 102,  51, 102, 255 }, { 102,  51,  51, 255 }, { 102,  51,   0, 255 },
- {  51,  51, 255, 255 }, {  51,  51, 203, 255 }, {  51,  51, 152, 255 },
- {  51,  51, 102, 255 }, {  51,  51,  51, 255 }, {  51,  51,   0, 255 },
- { 255, 203, 102, 255 }, { 255, 203, 152, 255 }, { 255, 203, 203, 255 },
- { 255, 203, 255, 255 }, {   0,  51, 152, 255 }, {   0,  51, 102, 255 },
- {   0,  51,  51, 255 }, {   0,  51,   0, 255 }, { 203,   0, 255, 255 },
- { 203,   0, 203, 255 }, { 203,   0, 152, 255 }, { 203,   0, 102, 255 },
- { 203,   0,  51, 255 }, { 255, 227,  70, 255 }, { 152,   0, 255, 255 },
- { 152,   0, 203, 255 }, { 152,   0, 152, 255 }, { 152,   0, 102, 255 },
- { 152,   0,  51, 255 }, { 152,   0,   0, 255 }, { 102,   0, 255, 255 },
- { 102,   0, 203, 255 }, { 102,   0, 152, 255 }, { 102,   0, 102, 255 },
- { 102,   0,  51, 255 }, { 102,   0,   0, 255 }, {  51,   0, 255, 255 },
- {  51,   0, 203, 255 }, {  51,   0, 152, 255 }, {  51,   0, 102, 255 },
- {  51,   0,  51, 255 }, {  51,   0,   0, 255 }, { 255, 203,  51, 255 },
- { 255, 203,   0, 255 }, { 255, 255,   0, 255 }, { 255, 255,  51, 255 },
- { 255, 255, 102, 255 }, { 255, 255, 152, 255 }, { 255, 255, 203, 255 },
- { 255, 255, 255, 0 } // B_TRANSPARENT_MAGIC_CMAP8
+	{   0,   0,   0, 255 }, {   8,   8,   8, 255 }, {  16,  16,  16, 255 },
+	{  24,  24,  24, 255 }, {  32,  32,  32, 255 }, {  40,  40,  40, 255 },
+	{  48,  48,  48, 255 }, {  56,  56,  56, 255 }, {  64,  64,  64, 255 },
+	{  72,  72,  72, 255 }, {  80,  80,  80, 255 }, {  88,  88,  88, 255 },
+	{  96,  96,  96, 255 }, { 104, 104, 104, 255 }, { 112, 112, 112, 255 },
+	{ 120, 120, 120, 255 }, { 128, 128, 128, 255 }, { 136, 136, 136, 255 },
+	{ 144, 144, 144, 255 }, { 152, 152, 152, 255 }, { 160, 160, 160, 255 },
+	{ 168, 168, 168, 255 }, { 176, 176, 176, 255 }, { 184, 184, 184, 255 },
+	{ 192, 192, 192, 255 }, { 200, 200, 200, 255 }, { 208, 208, 208, 255 },
+	{ 216, 216, 216, 255 }, { 224, 224, 224, 255 }, { 232, 232, 232, 255 },
+	{ 240, 240, 240, 255 }, { 248, 248, 248, 255 }, {   0,   0, 255, 255 },
+	{   0,   0, 229, 255 }, {   0,   0, 204, 255 }, {   0,   0, 179, 255 },
+	{   0,   0, 154, 255 }, {   0,   0, 129, 255 }, {   0,   0, 105, 255 },
+	{   0,   0,  80, 255 }, {   0,   0,  55, 255 }, {   0,   0,  30, 255 },
+	{ 255,   0,   0, 255 }, { 228,   0,   0, 255 }, { 203,   0,   0, 255 },
+	{ 178,   0,   0, 255 }, { 153,   0,   0, 255 }, { 128,   0,   0, 255 },
+	{ 105,   0,   0, 255 }, {  80,   0,   0, 255 }, {  55,   0,   0, 255 },
+	{  30,   0,   0, 255 }, {   0, 255,   0, 255 }, {   0, 228,   0, 255 },
+	{   0, 203,   0, 255 }, {   0, 178,   0, 255 }, {   0, 153,   0, 255 },
+	{   0, 128,   0, 255 }, {   0, 105,   0, 255 }, {   0,  80,   0, 255 },
+	{   0,  55,   0, 255 }, {   0,  30,   0, 255 }, {   0, 152,  51, 255 },
+	{ 255, 255, 255, 255 }, { 203, 255, 255, 255 }, { 203, 255, 203, 255 },
+	{ 203, 255, 152, 255 }, { 203, 255, 102, 255 }, { 203, 255,  51, 255 },
+	{ 203, 255,   0, 255 }, { 152, 255, 255, 255 }, { 152, 255, 203, 255 },
+	{ 152, 255, 152, 255 }, { 152, 255, 102, 255 }, { 152, 255,  51, 255 },
+	{ 152, 255,   0, 255 }, { 102, 255, 255, 255 }, { 102, 255, 203, 255 },
+	{ 102, 255, 152, 255 }, { 102, 255, 102, 255 }, { 102, 255,  51, 255 },
+	{ 102, 255,   0, 255 }, {  51, 255, 255, 255 }, {  51, 255, 203, 255 },
+	{  51, 255, 152, 255 }, {  51, 255, 102, 255 }, {  51, 255,  51, 255 },
+	{  51, 255,   0, 255 }, { 255, 152, 255, 255 }, { 255, 152, 203, 255 },
+	{ 255, 152, 152, 255 }, { 255, 152, 102, 255 }, { 255, 152,  51, 255 },
+	{ 255, 152,   0, 255 }, {   0, 102, 255, 255 }, {   0, 102, 203, 255 },
+	{ 203, 203, 255, 255 }, { 203, 203, 203, 255 }, { 203, 203, 152, 255 },
+	{ 203, 203, 102, 255 }, { 203, 203,  51, 255 }, { 203, 203,   0, 255 },
+	{ 152, 203, 255, 255 }, { 152, 203, 203, 255 }, { 152, 203, 152, 255 },
+	{ 152, 203, 102, 255 }, { 152, 203,  51, 255 }, { 152, 203,   0, 255 },
+	{ 102, 203, 255, 255 }, { 102, 203, 203, 255 }, { 102, 203, 152, 255 },
+	{ 102, 203, 102, 255 }, { 102, 203,  51, 255 }, { 102, 203,   0, 255 },
+	{  51, 203, 255, 255 }, {  51, 203, 203, 255 }, {  51, 203, 152, 255 },
+	{  51, 203, 102, 255 }, {  51, 203,  51, 255 }, {  51, 203,   0, 255 },
+	{ 255, 102, 255, 255 }, { 255, 102, 203, 255 }, { 255, 102, 152, 255 },
+	{ 255, 102, 102, 255 }, { 255, 102,  51, 255 }, { 255, 102,   0, 255 },
+	{   0, 102, 152, 255 }, {   0, 102, 102, 255 }, { 203, 152, 255, 255 },
+	{ 203, 152, 203, 255 }, { 203, 152, 152, 255 }, { 203, 152, 102, 255 },
+	{ 203, 152,  51, 255 }, { 203, 152,   0, 255 }, { 152, 152, 255, 255 },
+	{ 152, 152, 203, 255 }, { 152, 152, 152, 255 }, { 152, 152, 102, 255 },
+	{ 152, 152,  51, 255 }, { 152, 152,   0, 255 }, { 102, 152, 255, 255 },
+	{ 102, 152, 203, 255 }, { 102, 152, 152, 255 }, { 102, 152, 102, 255 },
+	{ 102, 152,  51, 255 }, { 102, 152,   0, 255 }, {  51, 152, 255, 255 },
+	{  51, 152, 203, 255 }, {  51, 152, 152, 255 }, {  51, 152, 102, 255 },
+	{  51, 152,  51, 255 }, {  51, 152,   0, 255 }, { 230, 134,   0, 255 },
+	{ 255,  51, 203, 255 }, { 255,  51, 152, 255 }, { 255,  51, 102, 255 },
+	{ 255,  51,  51, 255 }, { 255,  51,   0, 255 }, {   0, 102,  51, 255 },
+	{   0, 102,   0, 255 }, { 203, 102, 255, 255 }, { 203, 102, 203, 255 },
+	{ 203, 102, 152, 255 }, { 203, 102, 102, 255 }, { 203, 102,  51, 255 },
+	{ 203, 102,   0, 255 }, { 152, 102, 255, 255 }, { 152, 102, 203, 255 },
+	{ 152, 102, 152, 255 }, { 152, 102, 102, 255 }, { 152, 102,  51, 255 },
+	{ 152, 102,   0, 255 }, { 102, 102, 255, 255 }, { 102, 102, 203, 255 },
+	{ 102, 102, 152, 255 }, { 102, 102, 102, 255 }, { 102, 102,  51, 255 },
+	{ 102, 102,   0, 255 }, {  51, 102, 255, 255 }, {  51, 102, 203, 255 },
+	{  51, 102, 152, 255 }, {  51, 102, 102, 255 }, {  51, 102,  51, 255 },
+	{  51, 102,   0, 255 }, { 255,   0, 255, 255 }, { 255,   0, 203, 255 },
+	{ 255,   0, 152, 255 }, { 255,   0, 102, 255 }, { 255,   0,  51, 255 },
+	{ 255, 175,  19, 255 }, {   0,  51, 255, 255 }, {   0,  51, 203, 255 },
+	{ 203,  51, 255, 255 }, { 203,  51, 203, 255 }, { 203,  51, 152, 255 },
+	{ 203,  51, 102, 255 }, { 203,  51,  51, 255 }, { 203,  51,   0, 255 },
+	{ 152,  51, 255, 255 }, { 152,  51, 203, 255 }, { 152,  51, 152, 255 },
+	{ 152,  51, 102, 255 }, { 152,  51,  51, 255 }, { 152,  51,   0, 255 },
+	{ 102,  51, 255, 255 }, { 102,  51, 203, 255 }, { 102,  51, 152, 255 },
+	{ 102,  51, 102, 255 }, { 102,  51,  51, 255 }, { 102,  51,   0, 255 },
+	{  51,  51, 255, 255 }, {  51,  51, 203, 255 }, {  51,  51, 152, 255 },
+	{  51,  51, 102, 255 }, {  51,  51,  51, 255 }, {  51,  51,   0, 255 },
+	{ 255, 203, 102, 255 }, { 255, 203, 152, 255 }, { 255, 203, 203, 255 },
+	{ 255, 203, 255, 255 }, {   0,  51, 152, 255 }, {   0,  51, 102, 255 },
+	{   0,  51,  51, 255 }, {   0,  51,   0, 255 }, { 203,   0, 255, 255 },
+	{ 203,   0, 203, 255 }, { 203,   0, 152, 255 }, { 203,   0, 102, 255 },
+	{ 203,   0,  51, 255 }, { 255, 227,  70, 255 }, { 152,   0, 255, 255 },
+	{ 152,   0, 203, 255 }, { 152,   0, 152, 255 }, { 152,   0, 102, 255 },
+	{ 152,   0,  51, 255 }, { 152,   0,   0, 255 }, { 102,   0, 255, 255 },
+	{ 102,   0, 203, 255 }, { 102,   0, 152, 255 }, { 102,   0, 102, 255 },
+	{ 102,   0,  51, 255 }, { 102,   0,   0, 255 }, {  51,   0, 255, 255 },
+	{  51,   0, 203, 255 }, {  51,   0, 152, 255 }, {  51,   0, 102, 255 },
+	{  51,   0,  51, 255 }, {  51,   0,   0, 255 }, { 255, 203,  51, 255 },
+	{ 255, 203,   0, 255 }, { 255, 255,   0, 255 }, { 255, 255,  51, 255 },
+	{ 255, 255, 102, 255 }, { 255, 255, 152, 255 }, { 255, 255, 203, 255 },
+	{ 255, 255, 255, 0 } // B_TRANSPARENT_MAGIC_CMAP8
 };
 
 
-// get_raw_bytes_per_row
 /*!	\brief Returns the number of bytes per row needed to store the actual
 		   bitmap data (not including any padding) given a color space and a
 		   row width.
@@ -125,8 +173,7 @@ const rgb_color kSystemPalette[] = {
 	\return The number of bytes per row needed to store data for a row, or
 			0, if the color space is not supported.
 */
-static inline
-int32
+static inline int32
 get_raw_bytes_per_row(color_space colorSpace, int32 width)
 {
 	int32 bpr = 0;
@@ -177,7 +224,7 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	return bpr;
 }
 
-// get_bytes_per_row
+
 /*!	\brief Returns the number of bytes per row needed to store the bitmap
 		   data (including any padding) given a color space and a row width.
 	\param colorSpace The color space.
@@ -185,8 +232,7 @@ get_raw_bytes_per_row(color_space colorSpace, int32 width)
 	\return The number of bytes per row needed to store data for a row, or
 			0, if the color space is not supported.
 */
-static inline
-int32
+static inline int32
 get_bytes_per_row(color_space colorSpace, int32 width)
 {
 	int32 bpr = get_raw_bytes_per_row(colorSpace, width);
@@ -195,7 +241,7 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 	return bpr;
 }
 
-// brightness_for
+
 /*!	\brief Returns the brightness of an RGB 24 color.
 	\param red Value of the red component.
 	\param green Value of the green component.
@@ -203,8 +249,7 @@ get_bytes_per_row(color_space colorSpace, int32 width)
 	\return The brightness for the supplied RGB color as a value between 0
 			and 255.
 */
-static inline
-uint8
+static inline uint8
 brightness_for(uint8 red, uint8 green, uint8 blue)
 {
 	// brightness = 0.301 * red + 0.586 * green + 0.113 * blue
@@ -213,7 +258,7 @@ brightness_for(uint8 red, uint8 green, uint8 blue)
 	return uint8((308 * red + 600 * green + 116 * blue) / 1024);
 }
 
-// color_distance
+
 /*!	\brief Returns the "distance" between two RGB colors.
 
 	This functions defines an metric on the RGB color space. The distance
@@ -227,10 +272,9 @@ brightness_for(uint8 red, uint8 green, uint8 blue)
 	\param blue2 Blue component of the second color.
 	\return The distance between the given colors.
 */
-static inline
-unsigned
-color_distance(uint8 red1, uint8 green1, uint8 blue1,
-			   uint8 red2, uint8 green2, uint8 blue2)
+static inline unsigned
+color_distance(uint8 red1, uint8 green1, uint8 blue1, uint8 red2, uint8 green2,
+	uint8 blue2)
 {
 	// euklidian distance (its square actually)
 	int rd = (int)red1 - (int)red2;
@@ -240,19 +284,27 @@ color_distance(uint8 red1, uint8 green1, uint8 blue1,
 
 	// distance according to psycho-visual tests
 	int rmean = ((int)red1 + (int)red2) / 2;
-	return (((512 + rmean) * rd * rd) >> 8)
-		   + 4 * gd * gd
-		   + (((767 - rmean) * bd * bd) >> 8);
+	return (((512 + rmean) * rd * rd) >> 8) + 4 * gd * gd
+		+ (((767 - rmean) * bd * bd) >> 8);
 }
 
-// bit_mask, inverse_bit_mask
-static inline int32 bit_mask(int32 bit)			{ return (1 << bit); }
-static inline int32 inverse_bit_mask(int32 bit)	{ return ~bit_mask(bit); }
+
+static inline int32
+bit_mask(int32 bit)
+{
+	return 1 << bit;
+}
 
 
-//////////////////////
-// PaletteConverter //
-//////////////////////
+static inline int32
+inverse_bit_mask(int32 bit)
+{
+	return ~bit_mask(bit);
+}
+
+
+//	#pragma mark - PaletteConverter
+
 
 namespace BPrivate {
 
@@ -282,7 +334,7 @@ public:
 	inline uint16 RGB16ColorForIndex(uint8 index) const;
 	inline uint32 RGB24ColorForIndex(uint8 index) const;
 	inline void RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
-								   uint8 &blue, uint8 &alpha) const;
+		uint8 &blue, uint8 &alpha) const;
 	inline uint8 GrayColorForIndex(uint8 index) const;
 
 private:
@@ -296,7 +348,7 @@ private:
 using BPrivate::PaletteConverter;
 using namespace std;
 
-// constructor
+
 /*!	\brief Creates an uninitialized PaletteConverter.
 */
 PaletteConverter::PaletteConverter()
@@ -306,7 +358,7 @@ PaletteConverter::PaletteConverter()
 {
 }
 
-// constructor
+
 /*!	\brief Creates a PaletteConverter and initializes it to the supplied
 		   palette.
 	\param palette The palette being a 256 entry rgb_color array.
@@ -319,7 +371,7 @@ PaletteConverter::PaletteConverter(const rgb_color *palette)
 	SetTo(palette);
 }
 
-// constructor
+
 /*!	\brief Creates a PaletteConverter and initializes it to the supplied
 		   color map.
 	\param colorMap The completely initialized color map.
@@ -332,7 +384,7 @@ PaletteConverter::PaletteConverter(const color_map *colorMap)
 	SetTo(colorMap);
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with this object.
 */
 PaletteConverter::~PaletteConverter()
@@ -340,7 +392,7 @@ PaletteConverter::~PaletteConverter()
 	delete fOwnColorMap;
 }
 
-// SetTo
+
 /*!	\brief Initializes the converter to the supplied palette.
 	\param palette The palette being a 256 entry rgb_color array.
 	\return \c B_OK, if everything went fine, an error code otherwise.
@@ -391,7 +443,7 @@ PaletteConverter::SetTo(const rgb_color *palette)
 	return error;
 }
 
-// SetTo
+
 /*!	\brief Initializes the converter to the supplied color map.
 	\param colorMap The completely initialized color map.
 	\return \c B_OK, if everything went fine, an error code otherwise.
@@ -406,11 +458,11 @@ PaletteConverter::SetTo(const color_map *colorMap)
 	}
 	// set
 	fColorMap = colorMap;
-	fCStatus = (fColorMap ? B_OK : B_BAD_VALUE);
+	fCStatus = fColorMap ? B_OK : B_BAD_VALUE;
 	return fCStatus;
 }
 
-// InitCheck
+
 /*!	\brief Returns the result of the last initialization via constructor or
 		   SetTo().
 	\return \c B_OK, if the converter is properly initialized, an error code
@@ -422,7 +474,7 @@ PaletteConverter::InitCheck() const
 	return fCStatus;
 }
 
-// IndexForRGB15
+
 /*!	\brief Returns the palette color index closest to a given RGB 15 color.
 
 	The object must be properly initialized.
@@ -430,14 +482,13 @@ PaletteConverter::InitCheck() const
 	\param rgb The RGB 15 color value (R[14:10]G[9:5]B[4:0]).
 	\return The palette color index for the supplied color.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::IndexForRGB15(uint16 rgb) const
 {
 	return fColorMap->index_map[rgb];
 }
 
-// IndexForRGB15
+
 /*!	\brief Returns the palette color index closest to a given RGB 15 color.
 
 	The object must be properly initialized.
@@ -447,15 +498,14 @@ PaletteConverter::IndexForRGB15(uint16 rgb) const
 	\param blue Blue component of the color (B[4:0]).
 	\return The palette color index for the supplied color.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::IndexForRGB15(uint8 red, uint8 green, uint8 blue) const
 {
 	// the 5 least significant bits are used
 	return fColorMap->index_map[(red << 10) | (green << 5) | blue];
 }
 
-// IndexForRGB16
+
 /*!	\brief Returns the palette color index closest to a given RGB 16 color.
 
 	The object must be properly initialized.
@@ -463,14 +513,13 @@ PaletteConverter::IndexForRGB15(uint8 red, uint8 green, uint8 blue) const
 	\param rgb The RGB 16 color value (R[15:11]G[10:5]B[4:0]).
 	\return The palette color index for the supplied color.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::IndexForRGB16(uint16 rgb) const
 {
-	return fColorMap->index_map[(rgb >> 1) & 0x7fe0 | rgb & 0x1f];
+	return fColorMap->index_map[((rgb >> 1) & 0x7fe0) | (rgb & 0x1f)];
 }
 
-// IndexForRGB16
+
 /*!	\brief Returns the palette color index closest to a given RGB 16 color.
 
 	The object must be properly initialized.
@@ -480,15 +529,14 @@ PaletteConverter::IndexForRGB16(uint16 rgb) const
 	\param blue Blue component of the color (B[4:0]).
 	\return The palette color index for the supplied color.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::IndexForRGB16(uint8 red, uint8 green, uint8 blue) const
 {
 	// the 5 (for red, blue) / 6 (for green) least significant bits are used
 	return fColorMap->index_map[(red << 10) | ((green & 0x3e) << 4) | blue];
 }
 
-// IndexForRGB24
+
 /*!	\brief Returns the palette color index closest to a given RGB 32 color.
 
 	The object must be properly initialized.
@@ -496,16 +544,14 @@ PaletteConverter::IndexForRGB16(uint8 red, uint8 green, uint8 blue) const
 	\param rgb The RGB 32 color value (R[31:24]G[23:16]B[15:8]).
 	\return The palette color index for the supplied color.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::IndexForRGB24(uint32 rgb) const
 {
 	return fColorMap->index_map[((rgb & 0xf8000000) >> 17)
-								| ((rgb & 0xf80000) >> 14)
-								| ((rgb & 0xf800) >> 11)];
+		| ((rgb & 0xf80000) >> 14) | ((rgb & 0xf800) >> 11)];
 }
 
-// IndexForRGB24
+
 /*!	\brief Returns the palette color index closest to a given RGB 24 color.
 
 	The object must be properly initialized.
@@ -515,16 +561,14 @@ PaletteConverter::IndexForRGB24(uint32 rgb) const
 	\param blue Blue component of the color.
 	\return The palette color index for the supplied color.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::IndexForRGB24(uint8 red, uint8 green, uint8 blue) const
 {
-	return fColorMap->index_map[((red & 0xf8) << 7)
-								| ((green & 0xf8) << 2)
-								| (blue >> 3)];
+	return fColorMap->index_map[((red & 0xf8) << 7) | ((green & 0xf8) << 2)
+		| (blue >> 3)];
 }
 
-// IndexForGray
+
 /*!	\brief Returns the palette color index closest to a given Gray 8 color.
 
 	The object must be properly initialized.
@@ -532,14 +576,13 @@ PaletteConverter::IndexForRGB24(uint8 red, uint8 green, uint8 blue) const
 	\param gray The Gray 8 color value.
 	\return The palette color index for the supplied color.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::IndexForGray(uint8 gray) const
 {
 	return IndexForRGB24(gray, gray, gray);
 }
 
-// RGBColorForIndex
+
 /*!	\brief Returns the RGB color for a given palette color index.
 
 	The object must be properly initialized.
@@ -547,14 +590,13 @@ PaletteConverter::IndexForGray(uint8 gray) const
 	\param index The palette color index.
 	\return The color for the supplied palette color index.
 */
-inline
-const rgb_color &
+inline const rgb_color &
 PaletteConverter::RGBColorForIndex(uint8 index) const
 {
 	return fColorMap->color_list[index];
 }
 
-// RGB15ColorForIndex
+
 /*!	\brief Returns the RGB 15 color for a given palette color index.
 
 	The object must be properly initialized.
@@ -563,17 +605,15 @@ PaletteConverter::RGBColorForIndex(uint8 index) const
 	\return The color for the supplied palette color index
 			(R[14:10]G[9:5]B[4:0]).
 */
-inline
-uint16
+inline uint16
 PaletteConverter::RGB15ColorForIndex(uint8 index) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
-	return ((color.red & 0xf8) << 7)
-		   | ((color.green & 0xf8) << 2)
-		   | (color.blue >> 3);
+	return ((color.red & 0xf8) << 7) | ((color.green & 0xf8) << 2)
+		| (color.blue >> 3);
 }
 
-// RGB16ColorForIndex
+
 /*!	\brief Returns the RGB 16 color for a given palette color index.
 
 	The object must be properly initialized.
@@ -582,17 +622,15 @@ PaletteConverter::RGB15ColorForIndex(uint8 index) const
 	\return The color for the supplied palette color index
 			(R[15:11]G[10:5]B[4:0]).
 */
-inline
-uint16
+inline uint16
 PaletteConverter::RGB16ColorForIndex(uint8 index) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
-	return ((color.red & 0xf8) << 8)
-		   | ((color.green & 0xfc) << 3)
-		   | (color.blue >> 3);
+	return ((color.red & 0xf8) << 8) | ((color.green & 0xfc) << 3)
+		| (color.blue >> 3);
 }
 
-// RGB24ColorForIndex
+
 /*!	\brief Returns the RGB 24 color for a given palette color index.
 
 	The object must be properly initialized.
@@ -601,15 +639,15 @@ PaletteConverter::RGB16ColorForIndex(uint8 index) const
 	\return The color for the supplied palette color index
 			(R[31:24]G[23:16]B[15:8]).
 */
-inline
-uint32
+inline uint32
 PaletteConverter::RGB24ColorForIndex(uint8 index) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
-	return (color.blue << 24) | (color.red << 8) | (color.green << 16) | color.alpha;
+	return (color.blue << 24) | (color.red << 8) | (color.green << 16)
+		| color.alpha;
 }
 
-// RGB24ColorForIndex
+
 /*!	\brief Returns the RGB 24 color for a given palette color index.
 
 	The object must be properly initialized.
@@ -622,10 +660,9 @@ PaletteConverter::RGB24ColorForIndex(uint8 index) const
 	\param blue Reference to the variable the blue component shall be stored
 		   into.
 */
-inline
-void
+inline void
 PaletteConverter::RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
-									 uint8 &blue, uint8 &alpha) const
+	uint8 &blue, uint8 &alpha) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
 	red = color.red;
@@ -634,7 +671,7 @@ PaletteConverter::RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
 	alpha = color.alpha;
 }
 
-// GrayColorForIndex
+
 /*!	\brief Returns the Gray 8 color for a given palette color index.
 
 	The object must be properly initialized.
@@ -642,8 +679,7 @@ PaletteConverter::RGB24ColorForIndex(uint8 index, uint8 &red, uint8 &green,
 	\param index The palette color index.
 	\return The color for the supplied palette color index.
 */
-inline
-uint8
+inline uint8
 PaletteConverter::GrayColorForIndex(uint8 index) const
 {
 	const rgb_color &color = fColorMap->color_list[index];
@@ -651,15 +687,14 @@ PaletteConverter::GrayColorForIndex(uint8 index) const
 }
 
 // TODO: Remove these and palette_converter() when BScreen is available.
-static BLocker			gPaletteConverterLock;
+static BLocker gPaletteConverterLock;
 static PaletteConverter	gPaletteConverter;
 
-// palette_converter
+
 /*!	\brief Returns a PaletteConverter using the system color palette.
 	\return A PaletteConverter.
 */
-static
-const PaletteConverter*
+static const PaletteConverter*
 palette_converter()
 {
 	if (gPaletteConverterLock.Lock()) {
@@ -671,369 +706,8 @@ palette_converter()
 }
 
 
-/////////////
-// BBitmap //
-/////////////
+//	#pragma mark - Reader classes
 
-// constructor
-/*!	\brief Creates and initializes a BBitmap.
-	\param bounds The bitmap dimensions.
-	\param flags Creation flags.
-	\param colorSpace The bitmap's color space.
-	\param bytesPerRow The number of bytes per row the bitmap should use.
-		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
-		   value.
-	\param screenID ???
-*/
-BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
-				 int32 bytesPerRow, screen_id screenID)
-	: fBasePtr(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fServerToken(-1),
-	  fToken(-1),
-	  fArea(-1),
-	  fOrigArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
-{
-	InitObject(bounds, colorSpace, flags, bytesPerRow, screenID);
-}
-
-// constructor
-/*!	\brief Creates and initializes a BBitmap.
-	\param bounds The bitmap dimensions.
-	\param colorSpace The bitmap's color space.
-	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
-		   it shall be possible to attach BView to the bitmap and draw into
-		   it.
-	\param needsContiguous If \c true a physically contiguous chunk of memory
-		   will be allocated.
-*/
-BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
-				 bool needsContiguous)
-	: fBasePtr(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fServerToken(-1),
-	  fToken(-1),
-	  fArea(-1),
-	  fOrigArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
-{
-	int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
-				| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
-	InitObject(bounds, colorSpace, flags, B_ANY_BYTES_PER_ROW,
-			   B_MAIN_SCREEN_ID);
-
-}
-
-// constructor
-/*!	\brief Creates a BBitmap as a clone of another bitmap.
-	\param source The source bitmap.
-	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
-		   it shall be possible to attach BView to the bitmap and draw into
-		   it.
-	\param needsContiguous If \c true a physically contiguous chunk of memory
-		   will be allocated.
-*/
-BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
-				 bool needsContiguous)
-	: fBasePtr(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fServerToken(-1),
-	  fToken(-1),
-	  fArea(-1),
-	  fOrigArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
-{
-	if (source && source->IsValid()) {
-		int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
-					| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
-		InitObject(source->Bounds(), source->ColorSpace(), flags,
-				   source->BytesPerRow(), B_MAIN_SCREEN_ID);
-		if (InitCheck() == B_OK)
-			memcpy(Bits(), source->Bits(), BytesPerRow());
-	}
-}
-
-// destructor
-/*!	\brief Frees all resources associated with this object.
-*/
-BBitmap::~BBitmap()
-{
-	CleanUp();
-}
-
-// unarchiving constructor
-/*!	\brief Unarchives a bitmap from a BMessage.
-	\param data The archive.
-*/
-BBitmap::BBitmap(BMessage *data)
-	: BArchivable(data),
-	  fBasePtr(NULL),
-	  fSize(0),
-	  fColorSpace(B_NO_COLOR_SPACE),
-	  fBounds(0, 0, -1, -1),
-	  fBytesPerRow(0),
-	  fServerToken(-1),
-	  fToken(-1),
-	  fArea(-1),
-	  fOrigArea(-1),
-	  fFlags(0),
-	  fInitError(B_NO_INIT)
-{
-	BRect bounds;
-	data->FindRect("_frame", &bounds);
-	
-	color_space cspace;
-	data->FindInt32("_cspace", (int32 *)&cspace);
-	
-	int32 flags = 0;
-	data->FindInt32("_bmflags", &flags);
-	
-	int32 rowbytes = 0;
-	data->FindInt32("_rowbytes", &rowbytes);
-
-flags |= B_BITMAP_NO_SERVER_LINK;	
-flags &= ~B_BITMAP_ACCEPTS_VIEWS;
-	InitObject(bounds, cspace, flags, rowbytes, B_MAIN_SCREEN_ID);
-	
-	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
-			ssize_t size = 0;
-			const void *buffer;
-			if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
-				memcpy(fBasePtr, buffer, size);
-	}
-	
-	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
-// 		BArchivable *obj;
-// 		BMessage message;
-// 		int i = 0;
-// 		
-// 		while (data->FindMessage("_view", i++, &message) == B_OK) {
-// 			obj = instantiate_object(&message);
-// 			BView *view = dynamic_cast<BView *>(obj);
-// 			
-// 			if (view)
-// 				AddChild(view);
-// 		}
-	}
-}
-
-// Instantiate
-/*!	\brief Instantiates a BBitmap from an archive.
-	\param data The archive.
-	\return A bitmap reconstructed from the archive or \c NULL, if an error
-			occured.
-*/
-BArchivable *
-BBitmap::Instantiate(BMessage *data)
-{
-	if (validate_instantiation(data, "BBitmap"))
-		return new BBitmap(data);
-	
-	return NULL;
-}
-
-// Archive
-/*!	\brief Archives the BBitmap object.
-	\param data The archive.
-	\param deep \c true, if child object shall be archived as well, \c false
-		   otherwise.
-	\return \c B_OK, if everything went fine, an error code otherwise.
-*/
-status_t
-BBitmap::Archive(BMessage *data, bool deep) const
-{
-	BArchivable::Archive(data, deep);
-	
-	data->AddRect("_frame", fBounds);
-	data->AddInt32("_cspace", (int32)fColorSpace);
-	data->AddInt32("_bmflags", fFlags);
-	data->AddInt32("_rowbytes", fBytesPerRow);
-	
-	if (deep) {
-		if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
-//			BMessage views;
-// 			for (int32 i = 0; i < CountChildren(); i++) {
-// 				if (ChildAt(i)->Archive(&views, deep))
-// 					data->AddMessage("_views", &views);
-// 			}
-		}
-		// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGNUOUS is
-		// true and it does save all formats as B_RAW_TYPE and it does save
-		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
-		// the BeBook)
-			
-		data->AddData("_data", B_RAW_TYPE, fBasePtr, fSize);
-	}
-	
-	return B_OK;
-}
-
-// InitCheck
-/*!	\brief Returns the result from the construction.
-	\return \c B_OK, if the object is properly initialized, an error code
-			otherwise.
-*/
-status_t
-BBitmap::InitCheck() const
-{
-	return fInitError;
-}
-
-// IsValid
-/*!	\brief Returns whether or not the BBitmap object is valid.
-	\return \c true, if the object is properly initialized, \c false otherwise.
-*/
-bool
-BBitmap::IsValid() const
-{
-	return (InitCheck() == B_OK);
-}
-
-// LockBits
-/*! \brief ???
-*/
-status_t
-BBitmap::LockBits(uint32 *state)
-{
-	return B_ERROR;
-}
-
-// UnlockBits
-/*! \brief ???
-*/
-void
-BBitmap::UnlockBits()
-{
-}
-
-// Area
-/*! \brief Returns the ID of the area the bitmap data reside in.
-	\return The ID of the area the bitmap data reside in.
-*/
-area_id
-BBitmap::Area() const
-{
-	return fArea;
-}
-
-// Bits
-/*!	\brief Returns the pointer to the bitmap data.
-	\return The pointer to the bitmap data.
-*/
-void *
-BBitmap::Bits() const
-{
-	return fBasePtr;
-}
-
-// BitsLength
-/*!	\brief Returns the size of the bitmap data.
-	\return The size of the bitmap data.
-*/
-int32
-BBitmap::BitsLength() const
-{
-	return fSize;
-}
-
-// BytesPerRow
-/*!	\brief Returns the number of bytes used to store a row of bitmap data.
-	\return The number of bytes used to store a row of bitmap data.
-*/
-int32
-BBitmap::BytesPerRow() const
-{
-	return fBytesPerRow;
-}
-
-// ColorSpace
-/*!	\brief Returns the bitmap's color space.
-	\return The bitmap's color space.
-*/
-color_space
-BBitmap::ColorSpace() const
-{
-	return fColorSpace;
-}
-
-// Bounds
-/*!	\brief Returns the bitmap's dimensions.
-	\return The bitmap's dimensions.
-*/
-BRect
-BBitmap::Bounds() const
-{
-	return fBounds;
-}
-
-////////////////////////////////////////
-// structures defining the pixel layout
-
-struct rgb32_pixel {
-	uint8 blue;
-	uint8 green;
-	uint8 red;
-	uint8 alpha;
-};
-
-struct rgb32_big_pixel {
-	uint8 red;
-	uint8 green;
-	uint8 blue;
-	uint8 alpha;
-};
-
-struct rgb24_pixel {
-	uint8 blue;
-	uint8 green;
-	uint8 red;
-};
-
-struct rgb24_big_pixel {
-	uint8 red;
-	uint8 green;
-	uint8 blue;
-};
-
-struct rgb16_pixel {
-	uint8 gb;	// G[2:0],B[4:0]
-	uint8 rg;	// 16: R[4:0],G[5:3]
-				// 15: -[0],R[4:0],G[4:3]
-};
-
-struct rgb16_big_pixel {
-	uint8 rg;	// 16: R[4:0],G[5:3]
-				// 15: -[0],R[4:0],G[4:3]
-	uint8 gb;	// G[2:0],B[4:0]
-};
-
-////////////////////////////////////////////////////////
-// types defining what is needed to store a color value
-
-struct rgb_color_value {
-	uint8 red;
-	uint8 green;
-	uint8 blue;
-	uint8 alpha;
-};
-
-typedef uint8 gray_color_value;
-
-////////////////////////////////////////////////////////////////////
-// Reader classes being able to read pixels of certain color spaces
 
 // BaseReader
 template<typename _PixelType>
@@ -1231,8 +905,8 @@ struct Gray1Reader : public BaseReader<uint8> {
 };
 
 
-////////////////////////////////////////////////////////////////////
-// Writer classes being able to read pixels of certain color spaces
+//	#pragma mark - Writer classes
+
 
 // BaseWriter
 template<typename _PixelType>
@@ -1733,7 +1407,309 @@ set_bits(const void *inData, int32 inLength, int32 inBPR, int32 inRowSkip,
 	return error;
 }
 
-// SetBits
+
+//	#pragma mark - Bitmap
+
+
+/*!	\brief Creates and initializes a BBitmap.
+	\param bounds The bitmap dimensions.
+	\param flags Creation flags.
+	\param colorSpace The bitmap's color space.
+	\param bytesPerRow The number of bytes per row the bitmap should use.
+		   \c B_ANY_BYTES_PER_ROW to let the constructor choose an appropriate
+		   value.
+	\param screenID ???
+*/
+BBitmap::BBitmap(BRect bounds, uint32 flags, color_space colorSpace,
+		int32 bytesPerRow, screen_id screenID)
+	: fBasePtr(NULL),
+	  fSize(0),
+	  fColorSpace(B_NO_COLOR_SPACE),
+	  fBounds(0, 0, -1, -1),
+	  fBytesPerRow(0),
+	  fServerToken(-1),
+	  fToken(-1),
+	  fArea(-1),
+	  fOrigArea(-1),
+	  fFlags(0),
+	  fInitError(B_NO_INIT)
+{
+	InitObject(bounds, colorSpace, flags, bytesPerRow, screenID);
+}
+
+
+/*!	\brief Creates and initializes a BBitmap.
+	\param bounds The bitmap dimensions.
+	\param colorSpace The bitmap's color space.
+	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
+		   it shall be possible to attach BView to the bitmap and draw into
+		   it.
+	\param needsContiguous If \c true a physically contiguous chunk of memory
+		   will be allocated.
+*/
+BBitmap::BBitmap(BRect bounds, color_space colorSpace, bool acceptsViews,
+		bool needsContiguous)
+	: fBasePtr(NULL),
+	  fSize(0),
+	  fColorSpace(B_NO_COLOR_SPACE),
+	  fBounds(0, 0, -1, -1),
+	  fBytesPerRow(0),
+	  fServerToken(-1),
+	  fToken(-1),
+	  fArea(-1),
+	  fOrigArea(-1),
+	  fFlags(0),
+	  fInitError(B_NO_INIT)
+{
+	int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
+				| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
+	InitObject(bounds, colorSpace, flags, B_ANY_BYTES_PER_ROW,
+			   B_MAIN_SCREEN_ID);
+
+}
+
+
+/*!	\brief Creates a BBitmap as a clone of another bitmap.
+	\param source The source bitmap.
+	\param acceptsViews \c true, if the bitmap shall accept BViews, i.e. if
+		   it shall be possible to attach BView to the bitmap and draw into
+		   it.
+	\param needsContiguous If \c true a physically contiguous chunk of memory
+		   will be allocated.
+*/
+BBitmap::BBitmap(const BBitmap *source, bool acceptsViews,
+		bool needsContiguous)
+	: fBasePtr(NULL),
+	  fSize(0),
+	  fColorSpace(B_NO_COLOR_SPACE),
+	  fBounds(0, 0, -1, -1),
+	  fBytesPerRow(0),
+	  fServerToken(-1),
+	  fToken(-1),
+	  fArea(-1),
+	  fOrigArea(-1),
+	  fFlags(0),
+	  fInitError(B_NO_INIT)
+{
+	if (source && source->IsValid()) {
+		int32 flags = (acceptsViews ? B_BITMAP_ACCEPTS_VIEWS : 0)
+			| (needsContiguous ? B_BITMAP_IS_CONTIGUOUS : 0);
+		InitObject(source->Bounds(), source->ColorSpace(), flags,
+			source->BytesPerRow(), B_MAIN_SCREEN_ID);
+		if (InitCheck() == B_OK)
+			memcpy(Bits(), source->Bits(), BytesPerRow());
+	}
+}
+
+
+/*!	\brief Frees all resources associated with this object. */
+BBitmap::~BBitmap()
+{
+	CleanUp();
+}
+
+
+/*!	\brief Unarchives a bitmap from a BMessage.
+	\param data The archive.
+*/
+BBitmap::BBitmap(BMessage *data)
+	: BArchivable(data),
+	  fBasePtr(NULL),
+	  fSize(0),
+	  fColorSpace(B_NO_COLOR_SPACE),
+	  fBounds(0, 0, -1, -1),
+	  fBytesPerRow(0),
+	  fServerToken(-1),
+	  fToken(-1),
+	  fArea(-1),
+	  fOrigArea(-1),
+	  fFlags(0),
+	  fInitError(B_NO_INIT)
+{
+	BRect bounds;
+	data->FindRect("_frame", &bounds);
+	
+	color_space cspace;
+	data->FindInt32("_cspace", (int32 *)&cspace);
+	
+	int32 flags = 0;
+	data->FindInt32("_bmflags", &flags);
+	
+	int32 rowbytes = 0;
+	data->FindInt32("_rowbytes", &rowbytes);
+
+flags |= B_BITMAP_NO_SERVER_LINK;	
+flags &= ~B_BITMAP_ACCEPTS_VIEWS;
+	InitObject(bounds, cspace, flags, rowbytes, B_MAIN_SCREEN_ID);
+	
+	if (data->HasData("_data", B_RAW_TYPE) && InitCheck() == B_OK) {
+			ssize_t size = 0;
+			const void *buffer;
+			if (data->FindData("_data", B_RAW_TYPE, &buffer, &size) == B_OK)
+				memcpy(fBasePtr, buffer, size);
+	}
+	
+	if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
+// 		BArchivable *obj;
+// 		BMessage message;
+// 		int i = 0;
+// 		
+// 		while (data->FindMessage("_view", i++, &message) == B_OK) {
+// 			obj = instantiate_object(&message);
+// 			BView *view = dynamic_cast<BView *>(obj);
+// 			
+// 			if (view)
+// 				AddChild(view);
+// 		}
+	}
+}
+
+
+/*!	\brief Instantiates a BBitmap from an archive.
+	\param data The archive.
+	\return A bitmap reconstructed from the archive or \c NULL, if an error
+			occured.
+*/
+BArchivable *
+BBitmap::Instantiate(BMessage *data)
+{
+	if (validate_instantiation(data, "BBitmap"))
+		return new BBitmap(data);
+	
+	return NULL;
+}
+
+
+/*!	\brief Archives the BBitmap object.
+	\param data The archive.
+	\param deep \c true, if child object shall be archived as well, \c false
+		   otherwise.
+	\return \c B_OK, if everything went fine, an error code otherwise.
+*/
+status_t
+BBitmap::Archive(BMessage *data, bool deep) const
+{
+	BArchivable::Archive(data, deep);
+	
+	data->AddRect("_frame", fBounds);
+	data->AddInt32("_cspace", (int32)fColorSpace);
+	data->AddInt32("_bmflags", fFlags);
+	data->AddInt32("_rowbytes", fBytesPerRow);
+	
+	if (deep) {
+		if (fFlags & B_BITMAP_ACCEPTS_VIEWS) {
+//			BMessage views;
+// 			for (int32 i = 0; i < CountChildren(); i++) {
+// 				if (ChildAt(i)->Archive(&views, deep))
+// 					data->AddMessage("_views", &views);
+// 			}
+		}
+		// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGNUOUS is
+		// true and it does save all formats as B_RAW_TYPE and it does save
+		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
+		// the BeBook)
+			
+		data->AddData("_data", B_RAW_TYPE, fBasePtr, fSize);
+	}
+	
+	return B_OK;
+}
+
+
+/*!	\brief Returns the result from the construction.
+	\return \c B_OK, if the object is properly initialized, an error code
+			otherwise.
+*/
+status_t
+BBitmap::InitCheck() const
+{
+	return fInitError;
+}
+
+
+/*!	\brief Returns whether or not the BBitmap object is valid.
+	\return \c true, if the object is properly initialized, \c false otherwise.
+*/
+bool
+BBitmap::IsValid() const
+{
+	return (InitCheck() == B_OK);
+}
+
+
+status_t
+BBitmap::LockBits(uint32 *state)
+{
+	return B_ERROR;
+}
+
+
+void
+BBitmap::UnlockBits()
+{
+}
+
+
+/*! \brief Returns the ID of the area the bitmap data reside in.
+	\return The ID of the area the bitmap data reside in.
+*/
+area_id
+BBitmap::Area() const
+{
+	return fArea;
+}
+
+
+/*!	\brief Returns the pointer to the bitmap data.
+	\return The pointer to the bitmap data.
+*/
+void *
+BBitmap::Bits() const
+{
+	return fBasePtr;
+}
+
+
+/*!	\brief Returns the size of the bitmap data.
+	\return The size of the bitmap data.
+*/
+int32
+BBitmap::BitsLength() const
+{
+	return fSize;
+}
+
+
+/*!	\brief Returns the number of bytes used to store a row of bitmap data.
+	\return The number of bytes used to store a row of bitmap data.
+*/
+int32
+BBitmap::BytesPerRow() const
+{
+	return fBytesPerRow;
+}
+
+
+/*!	\brief Returns the bitmap's color space.
+	\return The bitmap's color space.
+*/
+color_space
+BBitmap::ColorSpace() const
+{
+	return fColorSpace;
+}
+
+
+/*!	\brief Returns the bitmap's dimensions.
+	\return The bitmap's dimensions.
+*/
+BRect
+BBitmap::Bounds() const
+{
+	return fBounds;
+}
+
+
 /*!	\brief Assigns data to the bitmap.
 
 	Data are directly written into the bitmap's data buffer, being converted
@@ -1760,7 +1736,7 @@ set_bits(const void *inData, int32 inLength, int32 inBPR, int32 inRowSkip,
 */
 void
 BBitmap::SetBits(const void *data, int32 length, int32 offset,
-				 color_space colorSpace)
+	color_space colorSpace)
 {
 	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
 	// check params
@@ -1786,7 +1762,7 @@ BBitmap::SetBits(const void *data, int32 length, int32 offset,
 		error = ImportBits(data, length, inBPR, offset, colorSpace);
 }
 
-// ImportBits
+
 /*!	\brief Assigns data to the bitmap.
 
 	Data are directly written into the bitmap's data buffer, being converted
@@ -1813,7 +1789,7 @@ BBitmap::SetBits(const void *data, int32 length, int32 offset,
 */
 status_t
 BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
-					color_space colorSpace)
+	color_space colorSpace)
 {
 	status_t error = (InitCheck() == B_OK ? B_OK : B_NO_INIT);
 	// check params 
@@ -1954,7 +1930,7 @@ BBitmap::ImportBits(const void *data, int32 length, int32 bpr, int32 offset,
 	return error;
 }
 
-// ImportBits
+
 /*!	\briefly Assigns another bitmap's data to this bitmap.
 
 	The supplied bitmap must have the exactly same dimensions as this bitmap.
@@ -1983,14 +1959,12 @@ BBitmap::ImportBits(const BBitmap *bitmap)
 	// set bits
 	if (error == B_OK) {
 		error = ImportBits(bitmap->Bits(), bitmap->BitsLength(),
-						   bitmap->BytesPerRow(), 0, bitmap->ColorSpace());
+			bitmap->BytesPerRow(), 0, bitmap->ColorSpace());
 	}
 	return error;
 }
 
-// GetOverlayRestrictions
-/*!	\brief ???
-*/
+
 status_t
 BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 {
@@ -1998,28 +1972,27 @@ BBitmap::GetOverlayRestrictions(overlay_restrictions *restrictions) const
 	return B_ERROR;
 }
 
-// Perform
-/*!	\brief ???
-*/
+
 status_t
 BBitmap::Perform(perform_code d, void *arg)
 {
 	return BArchivable::Perform(d, arg);
 }
 
+
 // FBC
 void BBitmap::_ReservedBitmap1() {}
 void BBitmap::_ReservedBitmap2() {}
 void BBitmap::_ReservedBitmap3() {}
 
-// copy constructor
+
 /*!	\brief Privatized copy constructor to prevent usage.
 */
 BBitmap::BBitmap(const BBitmap &)
 {
 }
 
-// =
+
 /*!	\brief Privatized assignment operator to prevent usage.
 */
 BBitmap &
@@ -2028,25 +2001,21 @@ BBitmap::operator=(const BBitmap &)
 	return *this;
 }
 
-// get_shared_pointer
-/*!	\brief ???
-*/
+
 char *
 BBitmap::get_shared_pointer() const
 {
 	return NULL;	// not implemented
 }
 
-// get_server_token
-/*!	\brief ???
-*/
+
 int32
 BBitmap::get_server_token() const
 {
 	return fServerToken;
 }
 
-// InitObject
+
 /*!	\brief Initializes the bitmap.
 	\param bounds The bitmap dimensions.
 	\param colorSpace The bitmap's color space.
@@ -2058,7 +2027,7 @@ BBitmap::get_server_token() const
 */
 void
 BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
-					int32 bytesPerRow, screen_id screenID)
+	int32 bytesPerRow, screen_id screenID)
 {
 //printf("BBitmap::InitObject(bounds: BRect(%.1f, %.1f, %.1f, %.1f), format: %ld, flags: %ld, bpr: %ld\n",
 //	   bounds.left, bounds.top, bounds.right, bounds.bottom, colorSpace, flags, bytesPerRow);
@@ -2195,7 +2164,7 @@ flags &= ~B_BITMAP_ACCEPTS_VIEWS;
 	}
 }
 
-// CleanUp
+
 /*!	\brief Cleans up any memory allocated by the bitmap or
 		   informs the server to do so.
 */
@@ -2231,9 +2200,7 @@ BBitmap::CleanUp()
 	}
 }
 
-// AssertPtr
-/*!	\brief ???
-*/
+
 void
 BBitmap::AssertPtr()
 {
