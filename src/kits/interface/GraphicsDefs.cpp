@@ -144,17 +144,21 @@ get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment, 
 bool
 bitmaps_support_space(color_space space, uint32 *supportFlags)
 {
-	// TODO: fill supportFlags with the supported flags:
-	// - B_VIEWS_SUPPORT_DRAW_BITMAP
-	// - B_BITMAPS_SUPPORT_ATTACHED_VIEWS
-	bool result = false;
+	bool result = true;
 	switch (space) {
-		// supported
+		// supported, also for drawing and for attaching BViews
 		case B_RGB32:		case B_RGBA32:		case B_RGB24:
 		case B_RGB32_BIG:	case B_RGBA32_BIG:	case B_RGB24_BIG:
 		case B_RGB16:		case B_RGB15:		case B_RGBA15:
 		case B_RGB16_BIG:	case B_RGB15_BIG:	case B_RGBA15_BIG:
 		case B_CMAP8:		case B_GRAY8:		case B_GRAY1:
+			if (supportFlags) {
+				*supportFlags = 0;
+				*supportFlags |= B_VIEWS_SUPPORT_DRAW_BITMAP;
+				*supportFlags |= B_BITMAPS_SUPPORT_ATTACHED_VIEWS;
+			}
+			break;
+		// supported, but cannot draw
 		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
 		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
 		case B_UVL24: case B_UVL32: case B_UVLA32:
@@ -163,11 +167,11 @@ bitmaps_support_space(color_space space, uint32 *supportFlags)
 		case B_HSV24: case B_HSV32: case B_HSVA32:
 		case B_HLS24: case B_HLS32: case B_HLSA32:
 		case B_CMY24: case B_CMY32: case B_CMYA32: case B_CMYK32:
-			result = true;
 			break;
 		// unsupported
 		case B_NO_COLOR_SPACE:
 		case B_YUV9: case B_YUV12:
+			result = false;
 			break;
 	}
 	return result;
