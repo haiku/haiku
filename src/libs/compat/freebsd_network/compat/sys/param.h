@@ -16,7 +16,6 @@
 #define MAXBSIZE	0x10000
 
 #define PAGE_SHIFT	12
-#define PAGE_SIZE	B_PAGE_SIZE
 #define PAGE_MASK	(PAGE_SIZE - 1)
 
 
