@@ -368,15 +368,14 @@ FragmentPacket::AddFragment(uint16 start, uint16 end, net_buffer *buffer,
 }
 
 
-/*!
-	Reassembles the fragments to the specified buffer \a to.
+/*!	Reassembles the fragments to the specified buffer \a to.
 	This buffer must have been added via AddFragment() before.
 */
 status_t
 FragmentPacket::Reassemble(net_buffer *to)
 {
 	if (!IsComplete())
-		return NULL;
+		return B_ERROR;
 
 	net_buffer *buffer = NULL;
 
