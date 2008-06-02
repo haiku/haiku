@@ -1,15 +1,20 @@
-// ----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//  File Name:		Volume.cpp
-//
-//	Description:	BVolume class
-// ----------------------------------------------------------------------
+/*
+ * Copyright 2002-2008, Haiku Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Tyler Dauwalder, tyler@dauwalder.net
+ *		Erik Jakowatz
+ *		shadow303
+ *		Ingo Weinhold, ingo_weinhold@gmx.de
+ */
+
 /*!
 	\file Volume.h
 	BVolume implementation.
 */
+
+#include <Volume.h>
 
 #include <errno.h>
 #include <string.h>
@@ -18,14 +23,10 @@
 #include <Directory.h>
 #include <Node.h>
 #include <Path.h>
-#include <Volume.h>
 
 #include <storage_support.h>
 #include <syscalls.h>
 
-#ifdef USE_OPENBEOS_NAMESPACE
-namespace OpenBeOS {
-#endif
 
 /*!
 	\class BVolume
@@ -51,18 +52,19 @@ namespace OpenBeOS {
 	\brief The object's initialization status.
 */
 
-// constructor
+
 /*!	\brief Creates an uninitialized BVolume.
 
 	InitCheck() will return \c B_NO_INIT.
 */
 BVolume::BVolume()
-	: fDevice((dev_t)-1),
-	  fCStatus(B_NO_INIT)
+	:
+	fDevice((dev_t)-1),
+	fCStatus(B_NO_INIT)
 {
 }
 
-// constructor
+
 /*!	\brief Creates a BVolume and initializes it to the volume specified
 		   by the supplied device ID.
 
@@ -72,13 +74,14 @@ BVolume::BVolume()
 	\param device The device ID of the volume.
 */
 BVolume::BVolume(dev_t device)
-	: fDevice((dev_t)-1),
-	  fCStatus(B_NO_INIT)
+	:
+	fDevice((dev_t)-1),
+	fCStatus(B_NO_INIT)
 {
 	SetTo(device);
 }
 
-// copy constructor
+
 /*!	\brief Creates a BVolume and makes it a clone of the supplied one.
 
 	Afterwards the object refers to the same device the supplied object
@@ -88,12 +91,13 @@ BVolume::BVolume(dev_t device)
 	\param volume The volume object to be cloned.
 */
 BVolume::BVolume(const BVolume &volume)
-	: fDevice(volume.fDevice),
-	  fCStatus(volume.fCStatus)
+	:
+	fDevice(volume.fDevice),
+	fCStatus(volume.fCStatus)
 {
 }
 
-// destructor
+
 /*!	\brief Frees all resources associated with the object.
 
 	Does nothing.
@@ -102,7 +106,7 @@ BVolume::~BVolume()
 {
 }
 
-// InitCheck
+
 /*!	\brief Returns the result of the last initialization.
 	\return
 	- \c B_OK: The object is properly initialized.
@@ -114,7 +118,7 @@ BVolume::InitCheck(void) const
 	return fCStatus;
 }
 
-// SetTo
+
 /*!	\brief Re-initializes the object to refer to the volume specified by
 		   the supplied device ID.
 	\param device The device ID of the volume.
@@ -142,7 +146,7 @@ BVolume::SetTo(dev_t device)
 	return fCStatus;
 }
 
-// Unset
+
 /*!	\brief Uninitialized the BVolume.
 */
 void
@@ -152,7 +156,7 @@ BVolume::Unset()
 	fCStatus = B_NO_INIT;
 }
 
-// Device
+
 /*!	\brief Returns the device ID of the volume the object refers to.
 	\return Returns the device ID of the volume the object refers to
 			or -1, if the object is not properly initialized.
@@ -163,7 +167,7 @@ BVolume::Device() const
 	return fDevice;
 }
 
-// ==
+
 /*!	\brief Returns whether two BVolume objects are equal.
 
 	Two volume objects are said to be equal, if they either are both
@@ -176,11 +180,10 @@ BVolume::Device() const
 bool
 BVolume::operator==(const BVolume &volume) const
 {
-	return (InitCheck() != B_OK && volume.InitCheck() != B_OK
-			|| fDevice == volume.fDevice);
+	return fDevice == volume.fDevice;
 }
 
-// !=
+
 /*!	\brief Returns whether two BVolume objects are unequal.
 
 	Two volume objects are said to be equal, if they either are both
@@ -196,7 +199,7 @@ BVolume::operator!=(const BVolume &volume) const
 	return !(*this == volume);
 }
 
-// =
+
 /*!	\brief Assigns another BVolume object to this one.
 
 	This object is made an exact clone of the supplied one.
@@ -215,7 +218,6 @@ BVolume::operator=(const BVolume &volume)
 }
 
 
-// FBC 
 void BVolume::_TurnUpTheVolume1() {} 
 void BVolume::_TurnUpTheVolume2() {} 
 void BVolume::_TurnUpTheVolume3() {} 
@@ -224,7 +226,3 @@ void BVolume::_TurnUpTheVolume5() {}
 void BVolume::_TurnUpTheVolume6() {} 
 void BVolume::_TurnUpTheVolume7() {} 
 void BVolume::_TurnUpTheVolume8() {}
-
-#ifdef USE_OPENBEOS_NAMESPACE
-}
-#endif
