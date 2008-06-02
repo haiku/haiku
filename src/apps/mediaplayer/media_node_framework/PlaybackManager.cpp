@@ -713,10 +713,12 @@ PlaybackManager::GetPlaylistTimeInterval(bigtime_t startTime,
 	int64 xEndFrame;
 	int32 playingDirection;
 	GetPlaylistFrameInterval(startFrame, endFrame, xStartFrame, xEndFrame,
-							 playingDirection);
+		playingDirection);
 	// Calculate the performance time interval end/length.
-	endTime = min(endTime, TimeForFrame(endFrame));
+	bigtime_t endTimeForFrame = TimeForFrame(endFrame);
+	endTime = min(endTime, endTimeForFrame);
 	bigtime_t intervalLength = endTime - startTime;
+
 	// Finally determine the time bounds for the Playlist interval (depending
 	// on the playing direction).
 	switch (playingDirection) {
@@ -780,8 +782,8 @@ if (!info) {
 	return 0;
 }
 	int64 frame = (int64)(((double)time - info->activation_time)
-						  * (double)fFrameRate * info->speed / 1000000.0)
-				  + info->activation_frame;
+		* (double)fFrameRate * info->speed / 1000000.0)
+		+ info->activation_frame;
 	if (TimeForFrame(frame) > time)
 		frame--;
 	else if (TimeForFrame(frame + 1) <= time)

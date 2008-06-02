@@ -711,10 +711,10 @@ AudioProducer::_FillNextBuffer(bigtime_t eventTime)
 		* 1000000.0 / double(fOutput.format.u.raw_audio.frame_rate));
 
 	// fill in data from audio supplier
-	size_t frameCount = numSamples / fOutput.format.u.raw_audio.channel_count;
+	int64 frameCount = numSamples / fOutput.format.u.raw_audio.channel_count;
 	bigtime_t startTime = performanceTime;
 	bigtime_t endTime = bigtime_t(double(fFramesSent + frameCount)
-		* 1000000.0 / double(fOutput.format.u.raw_audio.frame_rate));
+		* 1000000.0 / fOutput.format.u.raw_audio.frame_rate);
 
 	if (!fSupplier || fSupplier->InitCheck() != B_OK
 		|| fSupplier->GetFrames(buffer->Data(), frameCount, startTime,
