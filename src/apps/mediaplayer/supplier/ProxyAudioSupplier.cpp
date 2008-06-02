@@ -92,7 +92,6 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 			if (intervalStartTime == interval->end_time) {
 				delete interval;
 				error = B_ERROR;
-				sLastInvalidStartTime = intervalStartTime;
 				ERROR("GetFrames() - zero duration audio interval! start "
 					"time: %lld\n", intervalStartTime);
 				break;
