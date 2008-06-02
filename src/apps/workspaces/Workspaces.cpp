@@ -554,8 +554,10 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 
 			if (enable)
 				SetLook(B_TITLED_WINDOW_LOOK);
-			else
+			else {
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
+				fSettings->SetHasTitle(true);
+			}
 
 			fSettings->SetHasBorder(enable);
 			break;
@@ -569,8 +571,10 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 
 			if (enable)
 				SetLook(B_TITLED_WINDOW_LOOK);
-			else
+			else {
 				SetLook(B_MODAL_WINDOW_LOOK);
+				fSettings->SetHasBorder(true);
+			}
 
 			fSettings->SetHasTitle(enable);
 			break;
