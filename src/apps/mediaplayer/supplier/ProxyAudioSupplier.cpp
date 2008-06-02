@@ -12,18 +12,20 @@
 #include <Autolock.h>
 #include <List.h>
 
-#include "AudioAdapter.h"
 #include "AudioTrackSupplier.h"
+#include "AudioAdapter.h"
 #include "PlaybackManager.h"
 
 using std::nothrow;
 
 
-//#define TRACE_PROXY_AUDIO_SUPPLIER
+#define TRACE_PROXY_AUDIO_SUPPLIER
 #ifdef TRACE_PROXY_AUDIO_SUPPLIER
 # define TRACE(x...)	printf("ProxyAudioSupplier::"); printf(x)
+# define ERROR(x...)	fprintf(stderr, "ProxyAudioSupplier::"); fprintf(stderr, x)
 #else
 # define TRACE(x...)
+# define ERROR(x...)	fprintf(stderr, "ProxyAudioSupplier::"); fprintf(stderr, x)
 #endif
 
 
@@ -87,9 +89,18 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 				interval->start_time, interval->end_time,
 				interval->x_start_time, interval->x_end_time,
 				interval->speed);
+			if (intervalStartTime == interval->end_time) {
+				delete interval;
+				error = B_ERROR;
+				sLastInvalidStartTime = intervalStartTime;
+				ERROR("GetFrames() - zero duration audio interval! start "
+					"time: %lld\n", intervalStartTime);
+				break;
+			}				
 			if (!playingIntervals.AddItem(interval)) {
 				delete interval;
 				error = B_NO_MEMORY;
+				ERROR("GetFrames() - Out of memory\n");
 				break;
 			}
 			intervalStartTime = interval->end_time;
@@ -101,6 +112,9 @@ ProxyAudioSupplier::GetFrames(void* buffer, int64 frameCount,
 	}
 
 	BAutolock _(fSupplierLock);
+
+	if (!fSupplier)
+		return B_ERROR;
 
 	// retrieve the audio data for each interval.
 	int64 framesRead = 0;

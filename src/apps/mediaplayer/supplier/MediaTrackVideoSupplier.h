@@ -16,7 +16,8 @@ class BMediaTrack;
 
 class MediaTrackVideoSupplier : public VideoTrackSupplier {
  public:
-								MediaTrackVideoSupplier(BMediaTrack* track);
+								MediaTrackVideoSupplier(BMediaTrack* track,
+									status_t& initStatus);
 	virtual						~MediaTrackVideoSupplier();
 
 	virtual	const media_format&	Format() const;

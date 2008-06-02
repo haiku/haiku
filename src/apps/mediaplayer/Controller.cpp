@@ -230,12 +230,6 @@ Controller::SetTo(const entry_ref &ref)
 		}
 	}
 
-	if (AudioTrackCount() == 0 && VideoTrackCount() == 0) {
-		printf("Controller::SetTo: no audio or video tracks found\n");
-		_NotifyFileChanged();
-		return B_MEDIA_NO_HANDLER;
-	}
-
 	printf("Controller::SetTo: %d audio track, %d video track\n",
 		AudioTrackCount(), VideoTrackCount());
 
@@ -244,6 +238,15 @@ Controller::SetTo(const entry_ref &ref)
 
 	SelectAudioTrack(0);
 	SelectVideoTrack(0);
+
+	if (fAudioTrackSupplier == NULL && fVideoTrackSupplier == NULL) {
+		printf("Controller::SetTo: no audio or video tracks found or "
+			"no decoders\n");
+		_NotifyFileChanged();
+		delete fMediaFile;
+		fMediaFile = NULL;
+		return B_MEDIA_NO_HANDLER;
+	}
 
 	// prevent blocking the creation of new overlay buffers
 	fVideoView->DisableOverlay();
@@ -350,13 +353,25 @@ Controller::SelectVideoTrack(int n)
 	if (!track)
 		return B_ERROR;
 
+	status_t initStatus;
 	ObjectDeleter<VideoTrackSupplier> deleter(fVideoTrackSupplier);
-	fVideoTrackSupplier = new MediaTrackVideoSupplier(track);
+	fVideoTrackSupplier = new MediaTrackVideoSupplier(track, initStatus);
+	if (initStatus < B_OK) {
+		delete fVideoTrackSupplier;
+		fVideoTrackSupplier = NULL;
+		return initStatus;
+	}
 
 	bigtime_t a = fAudioTrackSupplier ? fAudioTrackSupplier->Duration() : 0;
 	bigtime_t v = fVideoTrackSupplier->Duration();
 	fDuration = max_c(a, v);
 	fVideoFrameRate = fVideoTrackSupplier->Format().u.raw_video.field_rate;
+	if (fVideoFrameRate <= 0.0) {
+		printf("Controller::SelectVideoTrack(%d) - invalid video frame rate: %.1f\n", n,
+			fVideoFrameRate);
+		fVideoFrameRate = 25.0;
+	}
+
 	DurationChanged();
 	// TODO: notify duration changed!
 

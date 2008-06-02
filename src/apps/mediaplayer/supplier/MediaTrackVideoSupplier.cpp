@@ -27,7 +27,8 @@ static const char* string_for_color_space(color_space format);
 
 
 // constructor
-MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track)
+MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track,
+		status_t& initStatus)
 	: VideoTrackSupplier()
 	, fVideoTrack(track)
 
@@ -40,7 +41,7 @@ MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track)
 		return;
 	}
 
-	_SwitchFormat(B_NO_COLOR_SPACE, 0);
+	initStatus = _SwitchFormat(B_NO_COLOR_SPACE, 0);
 
 	fDuration = fVideoTrack->Duration();
 
@@ -354,7 +355,19 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 
 	if (ret < B_OK) {
 		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
-			"fVideoTrack->DecodedFormat(): %s\n", strerror(ret));
+			"fVideoTrack->DecodedFormat(): %s - retrying with B_RGB32\n",
+			strerror(ret));
+		fFormat.u.raw_video.display.format = format;
+		minBytesPerRow = width * 4;
+		fFormat.u.raw_video.display.bytes_per_row = max_c(minBytesPerRow,
+			bytesPerRow);
+
+		ret = fVideoTrack->DecodedFormat(&fFormat);
+		if (ret < B_OK) {
+			printf("MediaTrackVideoSupplier::_SwitchFormat() - "
+				"fVideoTrack->DecodedFormat(): %s - giving up\n",
+				strerror(ret));
+		}
 		return ret;
 	}
 
