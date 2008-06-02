@@ -358,15 +358,29 @@ NodeManager::_SetUpVideoNodes(color_space preferredVideoFormat)
 	};
 	format.u.raw_video = videoFormat;
 	
-	// connect video producer to consumer (B_YCbCr422)
+	// connect video producer to consumer (hopefully using overlays)
+	fVideoConsumer->SetTryOverlay(true);
 	fStatus = fMediaRoster->Connect(videoOutput.source, videoInput.destination,
 		&format, &videoOutput, &videoInput);
 
-	if (fStatus != B_OK && preferredVideoFormat != B_RGB32) {
+	if (fStatus != B_OK) {
 		print_error("Can't connect the video source to the video window... "
-					"trying B_RGB32", fStatus);
-		format.u.raw_video.display.format = B_RGB32;
-		// connect video producer to consumer (B_RGB32)
+			"trying without overlays", fStatus);
+
+		uint32 flags = 0;
+		bool supported = bitmaps_support_space(
+			format.u.raw_video.display.format, &flags);
+		if (!supported || (flags & B_VIEWS_SUPPORT_DRAW_BITMAP) == 0) {
+			// cannot create bitmaps with such a color space
+			// or BViews don't support drawing it, fallback to B_RGB32
+			format.u.raw_video.display.format = B_RGB32;
+			printf("NodeManager::_SetupVideoNodes() - falling back to "
+				"B_RGB32\n");
+		}
+
+		fVideoConsumer->SetTryOverlay(false);
+		// connect video producer to consumer (not using overlays and using 
+		// a colorspace that BViews support drawing)
 		fStatus = fMediaRoster->Connect(videoOutput.source,
 			videoInput.destination, &format, &videoOutput, &videoInput);
 	}

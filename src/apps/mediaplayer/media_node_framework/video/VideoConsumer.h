@@ -100,7 +100,8 @@ public:
 			void				DeleteBuffers();
 
 			void				SetTarget(VideoTarget* target);
-							
+			void				SetTryOverlay(bool tryOverlay);
+
  private:
 			uint32				fInternalID;
 			BMediaAddOn*		fAddOn;
@@ -119,6 +120,8 @@ public:
 			BLocker				fTargetLock;	// locks the following variable
 			VideoTarget* volatile	fTarget;
 			int32				fTargetBufferIndex;
+
+			bool				fTryOverlay;
 };
 
 #endif // VIDEO_CONSUMER_H

@@ -7,20 +7,19 @@
  */
 #include "VideoConsumer.h"
 
-#include <stdio.h>
 #include <fcntl.h>
-#include <Buffer.h>
-#include <unistd.h>
+#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
+
+#include <Buffer.h>
+#include <BufferGroup.h>
 #include <NodeInfo.h>
-#include <Application.h>
 #include <Bitmap.h>
 #include <View.h>
-#include <Window.h>
 #include <scheduler.h>
 #include <TimeSource.h>
 #include <MediaRoster.h>
-#include <BufferGroup.h>
 
 #include "NodeManager.h"
 #include "VideoTarget.h"
@@ -61,7 +60,8 @@ VideoConsumer::VideoConsumer(const char* name, BMediaAddOn* addon,
 	  fManager(manager),
 	  fTargetLock(),
 	  fTarget(target),
-	  fTargetBufferIndex(-1)
+	  fTargetBufferIndex(-1),
+	  fTryOverlay(true)
 {
 	FUNCTION("VideoConsumer::VideoConsumer\n");
 
@@ -219,14 +219,13 @@ VideoConsumer::CreateBuffers(const media_format& format)
 		ERROR("VideoConsumer::CreateBuffers - ERROR CREATING BUFFER GROUP\n");
 		return status;
 	}
-	
+
 	// and attach the bitmaps to the buffer group
 	BRect bounds(0, 0, width - 1, height - 1);
 	for (uint32 i = 0; i < kBufferCount; i++) {
 		// figure out the bitmap creation flags
 		uint32 bitmapFlags = 0;
-		if (colorSpace == B_YCbCr420 || colorSpace == B_YCbCr411
-			|| colorSpace == B_YCbCr422 || colorSpace == B_YCbCr444) {
+		if (fTryOverlay) {
 			// try to use hardware overlay
 			bitmapFlags |= B_BITMAP_WILL_OVERLAY;
 			if (i == 0)
@@ -338,6 +337,13 @@ VideoConsumer::SetTarget(VideoTarget* target)
 }
 
 
+void
+VideoConsumer::SetTryOverlay(bool tryOverlay)
+{
+	fTryOverlay = tryOverlay;
+}
+
+
 status_t
 VideoConsumer::Connected(const media_source& producer,
 	const media_destination& where, const media_format& format,
@@ -429,22 +435,30 @@ VideoConsumer::AcceptFormat(const media_destination& dest, media_format* format)
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	if (format->u.raw_video.display.format != B_YCbCr444 &&
-		format->u.raw_video.display.format != B_YCbCr422 &&
-		format->u.raw_video.display.format != B_RGB32 &&
-		format->u.raw_video.display.format != B_RGB16 &&
-		format->u.raw_video.display.format != B_RGB15 &&			
-		format->u.raw_video.display.format != B_GRAY8 &&			
-		format->u.raw_video.display.format
+	if (format->u.raw_video.display.format
 			!= media_raw_video_format::wildcard.display.format) {
-		ERROR("AcceptFormat - not a format we know about!\n");
-		return B_MEDIA_BAD_FORMAT;
+		uint32 flags = 0;
+		bool supported = bitmaps_support_space(
+			format->u.raw_video.display.format, &flags);
+		if (!supported) {
+			// cannot create bitmaps with such a color space
+			ERROR("AcceptFormat - unsupported color space for BBitmaps!\n");
+			return B_MEDIA_BAD_FORMAT;
+		}
+		if (!fTryOverlay && (flags & B_VIEWS_SUPPORT_DRAW_BITMAP) == 0) {
+			// BViews do not support drawing such a bitmap
+			ERROR("AcceptFormat - BViews cannot draw bitmaps in given "
+				"colorspace!\n");
+			return B_MEDIA_BAD_FORMAT;
+		}
 	}
-		
-	char string[256];
-	string[0] = 0;
-	string_for_format(*format, string, 256);
-	FUNCTION("VideoConsumer::AcceptFormat: %s\n", string);
+
+	#ifdef TRACE_VIDEO_CONSUMER
+		char string[256];
+		string[0] = 0;
+		string_for_format(*format, string, 256);
+		FUNCTION("VideoConsumer::AcceptFormat: %s\n", string);
+	#endif
 
 	return B_OK;
 }
