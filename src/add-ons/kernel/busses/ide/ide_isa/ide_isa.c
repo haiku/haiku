@@ -22,17 +22,16 @@
 #include <device_manager.h>
 #include <block_io.h>
 
-#define debug_level_flow 0
-#define debug_level_error 1
-#define debug_level_info 2
 
-#define DEBUG_MSG_PREFIX "IDE ISA -- "
-#define TRACE dprintf
+//#define TRACE_IDE_ISA
+#ifdef TRACE_IDE_ISA
+#	define TRACE(x...) dprintf("ide_isa: " x)
+#else
+#	define TRACE(x...) ;
+#endif
 
-#include "wrapper.h"
 
-
-#define IDE_ISA_MODULE_NAME "busses/ide/ide_isa/device_v1"
+#define IDE_ISA_MODULE_NAME "busses/ide/ide_isa/driver_v1"
 
 // private node item:
 // io address of command block
@@ -42,7 +41,7 @@
 // interrupt number
 #define IDE_ISA_INTNUM "ide_isa/irq"
 
-//isa2_module_info *isa;
+
 ide_for_controller_interface *ide;
 device_manager_info *pnp;
 
@@ -52,44 +51,97 @@ typedef struct channel_info {
 	isa2_module_info	*isa;
 	uint16	command_block_base;	// io address command block
 	uint16	control_block_base; // io address control block
-	int		intnum;			// interrupt number	
-	
+	int		intnum;			// interrupt number
+
 	uint32	lost;			// != 0 if device got removed, i.e. if it must not
 							// be accessed anymore
-	
+
 	ide_channel ide_channel;
-	device_node_handle	node;
+	device_node *node;
 } channel_info;
 
 
+/*! publish node of an ide channel */
 static status_t
-write_command_block_regs(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
+publish_channel(device_node *parent, uint16 command_block_base,
+	uint16 control_block_base, uint8 intnum, const char *name)
+{
+	device_attr attrs[] = {
+		{ B_DEVICE_FIXED_CHILD, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
+
+		// properties of this controller for ide bus manager
+		{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
+		{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 0 }},
+		{ IDE_CONTROLLER_CAN_CQ_ITEM, B_UINT8_TYPE, { ui8: 1 }},
+		{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: name }},
+
+		// DMA properties; the 16 bit alignment is not necessary as
+		// the ide bus manager handles that very efficiently, but why
+		// not use the block device manager for doing that?
+		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
+
+		// private data to identify device
+		{ IDE_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
+		{ IDE_ISA_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { ui16: control_block_base }},
+		{ IDE_ISA_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
+		{ NULL }
+	};
+	io_resource resources[3] = {
+		{ B_IO_PORT, command_block_base, 8 },
+		{ B_IO_PORT, control_block_base, 1 },
+		{}
+	};
+
+	TRACE("publishing %s, resources %#x %#x %d\n",
+		  name, command_block_base, control_block_base, intnum);
+
+	return pnp->register_node(parent, IDE_ISA_MODULE_NAME, attrs, resources,
+		NULL);
+}
+
+
+//	#pragma mark -
+
+
+static void
+set_channel(void *cookie, ide_channel ideChannel)
+{
+	channel_info *channel = cookie;
+	channel->ide_channel = ideChannel;
+}
+
+
+static status_t
+write_command_block_regs(void *channel_cookie, ide_task_file *tf,
+	ide_reg_mask mask)
 {
 	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
 	int i;
-	
+
 	if (channel->lost)
 		return B_ERROR;
 
 	for (i = 0; i < 7; i++) {
 		if (((1 << (i-7)) & mask) != 0) {
-			SHOW_FLOW(3, "%x->HI(%x)", tf->raw.r[i + 7], i);
+			TRACE("write_command_block_regs(): %x->HI(%x)\n",
+				tf->raw.r[i + 7], i);
 			channel->isa->write_io_8(ioaddr + 1 + i, tf->raw.r[i + 7]);
 		}
 
 		if (((1 << i) & mask) != 0 ) {
-			SHOW_FLOW(3, "%x->LO(%x)", tf->raw.r[i], i);
+			TRACE("write_comamnd_block_regs(): %x->LO(%x)\n", tf->raw.r[i], i);
 			channel->isa->write_io_8(ioaddr + 1 + i, tf->raw.r[i]);
 		}
 	}
-	
+
 	return B_OK;
 }
 
 
 static status_t
-read_command_block_regs(void *channel_cookie, ide_task_file *tf, ide_reg_mask mask)
+read_command_block_regs(void *channel_cookie, ide_task_file *tf,
+	ide_reg_mask mask)
 {
 	channel_info *channel = channel_cookie;
 	uint16 ioaddr = channel->command_block_base;
@@ -101,10 +153,10 @@ read_command_block_regs(void *channel_cookie, ide_task_file *tf, ide_reg_mask ma
 	for (i = 0; i < 7; i++) {
 		if (((1 << i) & mask) != 0) {
 			tf->raw.r[i] = channel->isa->read_io_8(ioaddr + 1 + i);
-			SHOW_FLOW(3, "%x: %x", i, (int)tf->raw.r[i]);
+			TRACE("read_command_block_regs(%x): %x\n", i, (int)tf->raw.r[i]);
 		}
 	}
-	
+
 	return B_OK;
 }
 
@@ -128,7 +180,7 @@ write_device_control(void *channel_cookie, uint8 val)
 	channel_info *channel = channel_cookie;
 	uint16 device_control_addr = channel->control_block_base;
 
-	SHOW_FLOW(3, "%x", (int)val);
+	TRACE("write_device_control(%x)\n", (int)val);
 
 	if (channel->lost)
 		return B_ERROR;
@@ -148,7 +200,7 @@ write_pio_16(void *channel_cookie, uint16 *data, int count, bool force_16bit)
 	if (channel->lost)
 		return B_ERROR;
 
-	// Bochs doesn't support 32 bit accesses; 
+	// Bochs doesn't support 32 bit accesses;
 	// no real performance impact as this driver is for Bochs only anyway
 	force_16bit = true;
 
@@ -197,7 +249,7 @@ inthand(void *arg)
 	channel_info *channel = (channel_info *)arg;
 	uint8 status;
 
-	SHOW_FLOW0(3, "");
+	TRACE("interrupt handler()\n");
 
 	if (channel->lost)
 		return B_UNHANDLED_INTERRUPT;
@@ -210,9 +262,8 @@ inthand(void *arg)
 
 
 static status_t
-prepare_dma(void *channel_cookie, 
-	const physical_entry *sg_list, size_t sg_list_count,
-	bool write)
+prepare_dma(void *channel_cookie, const physical_entry *sg_list,
+	size_t sg_list_count, bool write)
 {
 	return B_NOT_ALLOWED;
 }
@@ -232,53 +283,54 @@ finish_dma(void *channel_cookie)
 }
 
 
+//	#pragma mark -
+
+
 static float
-supports_device(device_node_handle parent, bool *_noConnection)
+supports_device(device_node *parent)
 {
-	char *bus;
+	const char *bus;
 
 	// make sure parent is really the ISA bus manager
-	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
+	if (pnp->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return B_ERROR;
 
-	if (strcmp(bus, "isa")) {
-		free(bus);
+	if (strcmp(bus, "isa"))
 		return 0.0;
-	}
 
-	// ToDo: check I/O resources for availability?
+	// we assume that every modern PC has an IDE controller, so no
+	// further testing is done (well - I don't really know how to detect the
+	// controller, but who cares ;)
 
-	free(bus);
 	return 0.6;
 }
 
 
 static status_t
-init_channel(device_node_handle node, ide_channel ide_channel, channel_info **cookie)
+init_channel(device_node *node, void **_cookie)
 {
 	channel_info *channel;
+	device_node *parent;
 	isa2_module_info *isa;
-	void *dummy;
 	uint16 command_block_base, control_block_base;
 	uint8 irq;
 	status_t res;
 
 	TRACE("ISA-IDE: channel init\n");
 
-	// get device data	
+	// get device data
 	if (pnp->get_attr_uint16(node, IDE_ISA_COMMAND_BLOCK_BASE, &command_block_base, false) != B_OK
 		|| pnp->get_attr_uint16(node, IDE_ISA_CONTROL_BLOCK_BASE, &control_block_base, false) != B_OK
 		|| pnp->get_attr_uint8(node, IDE_ISA_INTNUM, &irq, false) != B_OK)
 		return B_ERROR;
 
-	if (pnp->init_driver(pnp->get_parent(node), NULL, (driver_module_info **)&isa, &dummy) != B_OK)
-		return B_ERROR;
+	parent = pnp->get_parent_node(node);
+	pnp->get_driver(parent, (driver_module_info **)&isa, NULL);
+	pnp->put_node(parent);
 
 	channel = (channel_info *)malloc(sizeof(channel_info));
-	if (channel == NULL) {
-		res = B_NO_MEMORY;
-		goto err0;
-	}
+	if (channel == NULL)
+		return B_NO_MEMORY;
 
 	TRACE("ISA-IDE: channel init, resources %#x %#x %d\n",
 		  command_block_base, control_block_base, irq);
@@ -289,9 +341,9 @@ init_channel(device_node_handle node, ide_channel ide_channel, channel_info **co
 	channel->command_block_base = command_block_base;
 	channel->control_block_base = control_block_base;
 	channel->intnum = irq;
-	channel->ide_channel = ide_channel;
+	channel->ide_channel = NULL;
 
-	res = install_io_interrupt_handler(channel->intnum, 
+	res = install_io_interrupt_handler(channel->intnum,
 		inthand, channel, 0);
 
 	if (res < 0) {
@@ -302,20 +354,16 @@ init_channel(device_node_handle node, ide_channel ide_channel, channel_info **co
 	// enable interrupts so the channel is ready to run
 	write_device_control(channel, ide_devctrl_bit3);
 
-	*cookie = channel;
-
+	*_cookie = channel;
 	return B_OK;
 
 err:
 	free(channel);
-	
-err0:
-	pnp->uninit_driver(pnp->get_parent(node));
 	return res;
 }
 
 
-static status_t
+static void
 uninit_channel(void *channel_cookie)
 {
 	channel_info *channel = channel_cookie;
@@ -329,139 +377,42 @@ uninit_channel(void *channel_cookie)
 	// (some controllers generate an IRQ when you _disable_ interrupts,
 	//  they are delayed by less then 40 µs, so 1 ms is safe)
 	snooze(1000);
-	
+
 	remove_io_interrupt_handler(channel->intnum, inthand, channel);
 
-	pnp->uninit_driver(pnp->get_parent(channel->node));
-
 	free(channel);
-
-	return B_OK;
-}
-
-
-/** publish node of an ide channel */
-
-static status_t
-publish_channel(device_node_handle parent, io_resource_handle *resources, 
-	uint16 command_block_base, uint16 control_block_base, uint8 intnum, 
-	const char *name)
-{
-	device_attr attrs[] = {
-		// info about ourself and our consumer
-		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: IDE_ISA_MODULE_NAME }},
-		{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: IDE_FOR_CONTROLLER_MODULE_NAME }},
-		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: name }},
-
-		// properties of this controller for ide bus manager
-		{ IDE_CONTROLLER_MAX_DEVICES_ITEM, B_UINT8_TYPE, { ui8: 2 }},
-		{ IDE_CONTROLLER_CAN_DMA_ITEM, B_UINT8_TYPE, { ui8: 0 }},
-		{ IDE_CONTROLLER_CAN_CQ_ITEM, B_UINT8_TYPE, { ui8: 1 }},
-		{ IDE_CONTROLLER_CONTROLLER_NAME_ITEM, B_STRING_TYPE, { string: name }},
-
-		// DMA properties; the 16 bit alignment is not necessary as 
-		// the ide bus manager handles that very efficiently, but why 
-		// not use the block device manager for doing that?
-		{ B_BLOCK_DEVICE_DMA_ALIGNMENT, B_UINT32_TYPE, { ui32: 1 }},
-
-		// private data to identify device
-		{ IDE_ISA_COMMAND_BLOCK_BASE, B_UINT16_TYPE, { ui16: command_block_base }},
-		{ IDE_ISA_CONTROL_BLOCK_BASE, B_UINT16_TYPE, { ui16: control_block_base }},
-		{ IDE_ISA_INTNUM, B_UINT8_TYPE, { ui8: intnum }},
-		{ NULL }
-	};
-	device_node_handle node;
-
-	SHOW_FLOW0(2, "");
-
-	TRACE("ISA-IDE: publishing %s, resources %#x %#x %d\n",
-		  name, command_block_base, control_block_base, intnum);
-
-	return pnp->register_device(parent, attrs, resources, &node);
-}
-
-
-// detect IDE channel
-static status_t
-probe_channel(device_node_handle parent,
-	uint16 command_block_base, uint16 control_block_base, 
-	int intnum, const char *name)
-{
-	io_resource resources[3] = {
-		{ IO_PORT, command_block_base, 8 },
-		{ IO_PORT, control_block_base, 1 },
-		{}
-	};
-	io_resource_handle resource_handles[3];
-
-	SHOW_FLOW(3, "name = \"%s\"", name);
-
-	// we aren't upset if io-ports are in use already - only 
-	// the PCI IDE driver can own them, and if it does, we exit silently
-	if (pnp->acquire_io_resources(resources, resource_handles) != B_OK) {
-		TRACE("ISA-IDE: can't acquire resources %#x and %#x\n",
-			  command_block_base, control_block_base);
-		return B_OK;
-	}
-
-	// we assume that every modern PC has an IDE controller, so no
-	// further testing is done (well - I don't really know how to detect the
-	// controller, but who cares ;)	
-	return publish_channel(parent, resource_handles, command_block_base,
-		control_block_base, intnum, name);
 }
 
 
 static status_t
-register_device(device_node_handle node)
+register_device(device_node *parent)
 {
-	SHOW_FLOW0(3, "");
+	status_t primaryStatus;
+	status_t secondaryStatus;
+	TRACE("register_device()\n");
 
 	// our parent device is the isa bus and all device drivers are Universal,
 	// so the pnp_manager tries each ISA driver in turn
-	probe_channel(node, 0x1f0, 0x3f6, 14, "primary IDE channel");
-	probe_channel(node, 0x170, 0x376, 15, "secondary IDE channel");
+	primaryStatus = publish_channel(parent, 0x1f0, 0x3f6, 14,
+		"primary IDE channel");
+	secondaryStatus = publish_channel(parent, 0x170, 0x376, 15,
+		"secondary IDE channel");
 
-	return B_OK;
+	if (primaryStatus == B_OK || secondaryStatus == B_OK)
+		return B_OK;
+
+	return primaryStatus;
 }
 
 
 static void
-channel_removed(device_node_handle node, void *channel_cookie)
+channel_removed(void *cookie)
 {
-	channel_info *channel = channel_cookie;
-	SHOW_FLOW0(3, "");
+	channel_info *channel = cookie;
+	TRACE("channel_removed()\n");
 
-	if (channel != NULL)
-		// disable access instantly
-		atomic_or(&channel->lost, 1);
-
-	return;
-}
-
-
-static void
-get_paths(const char ***_bus, const char ***_device)
-{
-	static const char *kBus[] = {"isa", NULL};
-	static const char *kDevice[] = {"drivers/dev/disk/ide", NULL};
-
-	*_bus = kBus;
-	*_device = kDevice;
-}
-
-
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
+	// disable access instantly
+	atomic_or(&channel->lost, 1);
 }
 
 
@@ -472,22 +423,24 @@ module_dependency module_dependencies[] = {
 };
 
 // exported interface
-ide_controller_interface isa_controller_interface = {
+static ide_controller_interface sISAControllerInterface = {
 	{
 		{
 			IDE_ISA_MODULE_NAME,
 			0,
-			std_ops
+			NULL
 		},
 
 		supports_device,
 		register_device,
-		(status_t (*)(device_node_handle, void *, void **))	init_channel,
+		init_channel,
 		uninit_channel,
+		NULL,	// register child devices
+		NULL,	// rescan
 		channel_removed,
-		NULL,		// cleanup
-		get_paths
 	},
+
+	&set_channel,
 
 	&write_command_block_regs,
 	&read_command_block_regs,
@@ -504,6 +457,6 @@ ide_controller_interface isa_controller_interface = {
 };
 
 module_info *modules[] = {
-	(module_info *)&isa_controller_interface,
+	(module_info *)&sISAControllerInterface,
 	NULL
 };

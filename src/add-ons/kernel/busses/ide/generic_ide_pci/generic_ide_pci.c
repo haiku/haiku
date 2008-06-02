@@ -3,25 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
-/*
-	Generic IDE PCI controller driver
-
-	Generic PCI bus mastering IDE driver.
-*/
+/*!	Generic PCI bus mastering IDE driver. */
 
 #include <KernelExport.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <ide_adapter.h>
-
-#define debug_level_flow 0
-#define debug_level_error 3
-#define debug_level_info 3
-
-#define DEBUG_MSG_PREFIX "GENERIC IDE PCI -- "
-
-#include "wrapper.h"
 
 #define GENERIC_IDE_PCI_CONTROLLER_MODULE_NAME "busses/ide/generic_ide_pci/driver_v1"
 #define GENERIC_IDE_PCI_CHANNEL_MODULE_NAME "busses/ide/generic_ide_pci/channel/v1"
@@ -186,20 +174,6 @@ supports_device(device_node *parent)
 }
 
 
-static status_t
-module_std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
 module_dependency module_dependencies[] = {
 	{ IDE_FOR_CONTROLLER_MODULE_NAME, (module_info **)&ide },
 	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
@@ -214,12 +188,12 @@ static ide_controller_interface channel_interface = {
 		{
 			GENERIC_IDE_PCI_CHANNEL_MODULE_NAME,
 			0,
-			module_std_ops
+			NULL
 		},
 
 		NULL,	// supports device
 		NULL,	// register device
-		(status_t (*)(device_node *, void **))init_channel,
+		init_channel,
 		uninit_channel,
 		NULL,	// register child devices
 		NULL,	// rescan
@@ -247,7 +221,7 @@ static driver_module_info controller_interface = {
 	{
 		GENERIC_IDE_PCI_CONTROLLER_MODULE_NAME,
 		0,
-		module_std_ops
+		NULL
 	},
 
 	supports_device,

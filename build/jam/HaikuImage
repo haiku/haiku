@@ -145,7 +145,7 @@ AddFilesToHaikuImage beos system add-ons kernel bus_managers
 AddFilesToHaikuImage beos system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToHaikuImage beos system add-ons kernel busses ide
-	: generic_ide_pci silicon_image_3112 legacy_sata ; #$(X86_ONLY)ide_isa ;
+	: generic_ide_pci silicon_image_3112 legacy_sata $(X86_ONLY)ide_isa ;
 AddFilesToHaikuImage beos system add-ons kernel busses scsi
 	: ahci ;
 AddFilesToHaikuImage beos system add-ons kernel busses usb
@@ -359,7 +359,7 @@ AddBootModuleSymlinksToHaikuImage
 	pci $(X86_ONLY)isa config_manager ide scsi
 	$(PPC_ONLY)openpic
 	block_io ide_adapter locked_pool scsi_periph
-	generic_ide_pci ahci legacy_sata silicon_image_3112 # $(X86_ONLY)ide_isa
+	generic_ide_pci ahci legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa
 	scsi_cd scsi_disk
 	intel
 	bfs
