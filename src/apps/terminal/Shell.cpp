@@ -10,11 +10,6 @@
 
 #include "Shell.h"
 
-#include "TermConst.h"
-#include "TermParse.h"
-
-#include <OS.h>
-
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -30,6 +25,13 @@
 #include <termios.h>
 #include <time.h>
 #include <unistd.h>
+
+#include <OS.h>
+
+#include "TermConst.h"
+#include "TermParse.h"
+#include "TermView.h"
+	// TODO: Fix dependency!
 
 
 #ifndef CEOF
@@ -225,6 +227,7 @@ Shell::FD() const
 }
 
 
+// TODO: Fix this dependency!
 void
 Shell::ViewAttached(TermView *view)
 {

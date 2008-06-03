@@ -40,13 +40,14 @@
 //PtyReader buffer size.
 #define READ_BUF_SIZE 2048
 
-class TermView;
+class TerminalBuffer;
+
 class TermParse : public BHandler {
 public:
 	TermParse(int fd);
 	~TermParse();
 
-	status_t StartThreads(TermView *view);
+	status_t StartThreads(TerminalBuffer *view);
 	status_t StopThreads();
   
 private:
@@ -80,7 +81,7 @@ private:
 	
 	int fLockFlag;
 
-	TermView *fView;
+	TerminalBuffer *fBuffer;
   
 	bool fQuitting;	
 };

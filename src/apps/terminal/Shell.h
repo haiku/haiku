@@ -18,6 +18,7 @@
 // TODO: Maybe merge TermParse and Shell classes ?
 class TermParse;
 class TermView;
+
 class Shell {
 public:
 			Shell();

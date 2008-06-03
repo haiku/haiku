@@ -6,11 +6,6 @@
  */
 #include "TermParse.h"
 
-#include "CodeConv.h"
-#include "TermConst.h"
-#include "TermView.h"
-#include "VTparse.h"
-
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -19,6 +14,11 @@
 
 #include <Beep.h>
 #include <Message.h>
+
+#include "CodeConv.h"
+#include "TermConst.h"
+#include "TerminalBuffer.h"
+#include "VTparse.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -56,7 +56,7 @@ TermParse::TermParse(int fd)
 	fReaderLocker(-1),
 	fBufferPosition(0),	
 	fLockFlag(0),
-	fView(NULL),
+	fBuffer(NULL),
 	fQuitting(true)
 {
 }
@@ -69,24 +69,24 @@ TermParse::~TermParse()
 
 
 status_t
-TermParse::StartThreads(TermView *view)
+TermParse::StartThreads(TerminalBuffer *buffer)
 {
-	if (fView != NULL)
+	if (fBuffer != NULL)
 		return B_ERROR;
 
 	fQuitting = false;
-	fView = view;
+	fBuffer = buffer;
 
 	status_t status = InitPtyReader();
 	if (status < B_OK) {
-		fView = NULL;	
+		fBuffer = NULL;	
 		return status;
 	}
 
 	status = InitTermParse();
 	if (status < B_OK) {
 		StopPtyReader();
-		fView = NULL;
+		fBuffer = NULL;
 		return status;		
 	}
 	
@@ -97,7 +97,7 @@ TermParse::StartThreads(TermView *view)
 status_t
 TermParse::StopThreads()
 {
-	if (fView == NULL)
+	if (fBuffer == NULL)
 		return B_ERROR;
 
 	fQuitting = true;
@@ -105,7 +105,7 @@ TermParse::StopThreads()
 	StopPtyReader();
 	StopTermParse();
 	
-	fView = NULL;
+	fBuffer = NULL;
 	
 	return B_OK;
 }
@@ -121,11 +121,11 @@ TermParse::GetReaderBuf(uchar &c)
 	} while (status == B_INTERRUPTED);
 
 	if (status == B_TIMED_OUT) {
-		fView->ScrollAtCursor();
-		fView->UpdateLine();
+		fBuffer->ScrollAtCursor();
+		fBuffer->UpdateLine();
 
 		// Reset cursor blinking time and turn on cursor blinking.
-		fView->SetCurDraw(true);
+		fBuffer->SetCurDraw(true);
 
 		// wait new input from pty.
 		do {
@@ -146,7 +146,7 @@ TermParse::GetReaderBuf(uchar &c)
 			release_sem(fReaderLocker);
 	}
 
-	fView->SetCurDraw(false);
+	fBuffer->SetCurDraw(false);
 	return B_OK;
 }
 
@@ -256,7 +256,7 @@ TermParse::PtyReader()
 		uchar buf[READ_BUF_SIZE];
 		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fBufferPosition));
 		if (nread <= 0) {
-			fView->NotifyQuit(errno);
+			fBuffer->NotifyQuit(errno);
 			return B_OK;
 		}
 
@@ -348,11 +348,11 @@ TermParse::EscParse()
 
 		//DumpState(groundtable, parsestate, c);
 
-		if (now_coding != fView->Encoding()) {
+		if (now_coding != fBuffer->Encoding()) {
 			/*
 			 * Change coding, change parse table.
 			 */
-			switch (fView->Encoding()) {
+			switch (fBuffer->Encoding()) {
 				case B_ISO1_CONVERSION:
 				case B_ISO2_CONVERSION:
 				case B_ISO3_CONVERSION:
@@ -379,14 +379,14 @@ TermParse::EscParse()
 					break;
 			}
 			parsestate = groundtable;
-			now_coding = fView->Encoding();
+			now_coding = fBuffer->Encoding();
     	}
 
 		switch (parsestate[c]) {
 			case CASE_PRINT:
 				cbuf[0] = c;
 				cbuf[1] = '\0';
-				fView->Insert(cbuf, attr);
+				fBuffer->Insert(cbuf, attr);
 				break;
 
 			case CASE_PRINT_GR:
@@ -427,7 +427,7 @@ TermParse::EscParse()
 				else
 					CodeConv::ConvertToInternal((char*)cbuf, -1, (char*)dstbuf, B_EUC_CONVERSION);
 
-				fView->Insert(dstbuf, attr);
+				fBuffer->Insert(dstbuf, attr);
 				break;
 
 			case CASE_PRINT_CS96:
@@ -436,22 +436,22 @@ TermParse::EscParse()
 				cbuf[1] |= 0x80;
 				cbuf[2] = 0;
 				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, B_EUC_CONVERSION);
-				fView->Insert(dstbuf, attr);
+				fBuffer->Insert(dstbuf, attr);
 				break;
 
 			case CASE_LF:
-				fView->InsertLF();
+				fBuffer->InsertLF();
 				break;
 
 			case CASE_CR:
-				fView->InsertCR();
+				fBuffer->InsertCR();
 				break;
 
 			case CASE_SJIS_KANA:
 				cbuf[0] = (uchar)c;
 				cbuf[1] = '\0';
 				CodeConv::ConvertToInternal((char*)cbuf, 1, (char*)dstbuf, now_coding);
-				fView->Insert(dstbuf, attr);
+				fBuffer->Insert(dstbuf, attr);
 				break;
 
 			case CASE_SJIS_INSTRING:
@@ -459,7 +459,7 @@ TermParse::EscParse()
 				GetReaderBuf(cbuf[1]);
 				cbuf[2] = '\0';
 				CodeConv::ConvertToInternal((char*)cbuf, 2, (char*)dstbuf, now_coding);
-				fView->Insert(dstbuf, attr);
+				fBuffer->Insert(dstbuf, attr);
 				break;
 
 			case CASE_UTF8_2BYTE:
@@ -470,7 +470,7 @@ TermParse::EscParse()
 				cbuf[1] = (uchar)c;
 				cbuf[2] = '\0';
 				
-				fView->Insert(cbuf, attr);
+				fBuffer->Insert(cbuf, attr);
 				break;
 
 			case CASE_UTF8_3BYTE:
@@ -485,7 +485,7 @@ TermParse::EscParse()
 					break;
 				cbuf[2] = c;
 				cbuf[3] = '\0';
-				fView->Insert(cbuf, attr);
+				fBuffer->Insert(cbuf, attr);
 				break;
 
 			case CASE_MBCS:
@@ -517,13 +517,13 @@ TermParse::EscParse()
 				break;
 
 			case CASE_BS:
-				fView->MoveCurLeft(1);
+				fBuffer->MoveCurLeft(1);
 				break;
 
 			case CASE_TAB:
-				tmp = fView->GetCurX();
+				tmp = fBuffer->GetCurX();
 				tmp %= 8;
-				fView->MoveCurRight(8 - tmp);
+				fBuffer->MoveCurRight(8 - tmp);
 				break;
 
 			case CASE_ESC:
@@ -583,7 +583,7 @@ TermParse::EscParse()
 				/* ICH */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->InsertSpace(row);
+				fBuffer->InsertSpace(row);
 				parsestate = groundtable;
 				break;
 
@@ -591,7 +591,7 @@ TermParse::EscParse()
 				/* CUU */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->MoveCurUp(row);
+				fBuffer->MoveCurUp(row);
 				parsestate = groundtable;
 				break;
 
@@ -599,7 +599,7 @@ TermParse::EscParse()
 				/* CUD */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->MoveCurDown(row);
+				fBuffer->MoveCurDown(row);
 				parsestate = groundtable;
 				break;
 
@@ -607,7 +607,7 @@ TermParse::EscParse()
 				/* CUF */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->MoveCurRight(row);
+				fBuffer->MoveCurRight(row);
 				parsestate = groundtable;
 				break;
 
@@ -615,7 +615,7 @@ TermParse::EscParse()
 				/* CUB */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->MoveCurLeft(row);
+				fBuffer->MoveCurLeft(row);
 				parsestate = groundtable;
 				break;
 
@@ -626,7 +626,7 @@ TermParse::EscParse()
 				if (nparam < 2 || (col = param[1]) < 1)
 					col = 1;
 
-				fView->SetCurPos(col - 1, row - 1 );
+				fBuffer->SetCurPos(col - 1, row - 1 );
 				parsestate = groundtable;
 				break;
 
@@ -635,15 +635,15 @@ TermParse::EscParse()
 				switch (param[0]) {
 					case DEFAULT:
 					case 0:
-						fView->EraseBelow();
+						fBuffer->EraseBelow();
 						break;
 
 					case 1:
 						break;
 
 					case 2:
-						fView->SetCurPos(0, 0);
-						fView->EraseBelow();
+						fBuffer->SetCurPos(0, 0);
+						fBuffer->EraseBelow();
 						break;
 				}
 				parsestate = groundtable;
@@ -651,7 +651,7 @@ TermParse::EscParse()
 
 			case CASE_EL:		// delete line
 				/* EL */
-				fView->DeleteColumns();
+				fBuffer->DeleteColumns();
 				parsestate = groundtable;
 				break;
 
@@ -659,7 +659,7 @@ TermParse::EscParse()
 				/* IL */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->InsertNewLine(row);
+				fBuffer->InsertNewLine(row);
 				parsestate = groundtable;
 				break;
 
@@ -667,7 +667,7 @@ TermParse::EscParse()
 				/* DL */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->DeleteLine(row);
+				fBuffer->DeleteLine(row);
 				parsestate = groundtable;
 				break;
 
@@ -675,19 +675,19 @@ TermParse::EscParse()
 				/* DCH */
 				if ((row = param[0]) < 1)
 					row = 1;
-				fView->DeleteChar(row);
+				fBuffer->DeleteChar(row);
 				parsestate = groundtable;
 				break;
 
 			case CASE_SET:
 				/* SET */
-				fView->SetInsertMode(MODE_INSERT);
+				fBuffer->SetInsertMode(MODE_INSERT);
 				parsestate = groundtable;
 				break;
 
 			case CASE_RST:
 				/* RST */
-				fView->SetInsertMode(MODE_OVER);
+				fBuffer->SetInsertMode(MODE_OVER);
 				parsestate = groundtable;
 				break;
 
@@ -766,7 +766,7 @@ TermParse::EscParse()
 				case CASE_CPR:
 					// Q & D hack by Y.Hayakawa (hida@sawada.riec.tohoku.ac.jp)
 					// 21-JUL-99
-					fView->DeviceStatusReport(param[0]);
+					fBuffer->DeviceStatusReport(param[0]);
 					parsestate = groundtable;
 					break;
 
@@ -785,7 +785,7 @@ TermParse::EscParse()
 					bot--;
 
 					if (bot > top)
-						fView->SetScrollRegion(top, bot);
+						fBuffer->SetScrollRegion(top, bot);
 
 					parsestate = groundtable;
 					break;
@@ -822,13 +822,13 @@ TermParse::EscParse()
 
 				case CASE_DECSC:
 					/* DECSC */
-					fView->SaveCursor();
+					fBuffer->SaveCursor();
 					parsestate = groundtable;
 					break;
 
 				case CASE_DECRC:
 					/* DECRC */
-					fView->RestoreCursor();
+					fBuffer->RestoreCursor();
 					parsestate = groundtable;
 					break;
 
@@ -840,7 +840,7 @@ TermParse::EscParse()
 
 				case CASE_RI:
 					/* RI */
-					fView->ScrollRegion(-1, -1, SCRDOWN, 1);
+					fBuffer->ScrollRegion(-1, -1, SCRDOWN, 1);
 					parsestate = groundtable;
 					break;
 
@@ -890,7 +890,7 @@ TermParse::EscParse()
 						switch (mode_char) {
 							case '0':
 							case '2':
-								fView->SetTitle(string);
+								fBuffer->SetTitle(string);
 								break;
 							case '1':
 								break;
@@ -939,7 +939,7 @@ TermParse::EscParse()
 						row = 1;
 
 					// note beterm wants it 1-based unlike usual terminals
-					fView->SetCurY(row - 1);
+					fBuffer->SetCurY(row - 1);
 					parsestate = groundtable;
 					break;
 
@@ -949,7 +949,7 @@ TermParse::EscParse()
 						col = 1;
 
 					// note beterm wants it 1-based unlike usual terminals
-					fView->SetCurX(col - 1);
+					fBuffer->SetCurX(col - 1);
 					parsestate = groundtable;
 					break;
 

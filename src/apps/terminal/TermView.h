@@ -12,12 +12,12 @@
 #ifndef TERMVIEW_H
 #define TERMVIEW_H
 
-
-#include "CurPos.h"
-
 #include <Messenger.h>
 #include <String.h>
 #include <View.h>
+
+#include "CurPos.h"
+#include "TerminalBuffer.h"
 
 
 class BClipboard;
@@ -26,7 +26,8 @@ class BScrollBar;
 class BString;
 class Shell;
 class TermBuffer;
-class TermView : public BView {
+
+class TermView : public BView, public TerminalBuffer {
 public:
 	TermView(BRect frame, int32 argc, const char **argv, int32 historySize = 1000);
 	TermView(int rows, int columns, int32 argc, const char **argv, int32 historySize = 1000);

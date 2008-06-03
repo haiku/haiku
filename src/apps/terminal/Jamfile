@@ -20,6 +20,7 @@ Application Terminal :
 	SmartTabView.cpp
 	TermApp.cpp
 	TermBuffer.cpp
+	TerminalBuffer.cpp
 	TermParse.cpp
 	TermView.cpp
 	TermWindow.cpp
@@ -29,4 +30,4 @@ Application Terminal :
 	VTPrsTbl.c
 	: be game tracker textencoding
 	: Terminal.rdef Terminal.icons.rdef
-	;
+;
