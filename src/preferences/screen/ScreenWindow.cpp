@@ -216,8 +216,7 @@ stack_and_align_menu_fields(const BList& menuFields)
 ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	: BWindow(settings->WindowFrame(), "Screen", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES),
-	fIsVesa(false),
-	fVesaApplied(false),
+	fBootWorkspaceApplied(false),
 	fScreenMode(this),
 	fTempScreenMode(this),
 	fModified(false)
@@ -249,11 +248,8 @@ ScreenWindow::ScreenWindow(ScreenSettings *settings)
 	
 	// TODO: since per workspace settings is unimplemented (Ticket #693)
 	// 		 we force the menu to "All Workspaces" for now
-	//if (_IsVesa()) {
-		fAllWorkspacesItem->SetMarked(true);
-		item->SetEnabled(false);
-	//} else
-	//	item->SetMarked(true);
+	fAllWorkspacesItem->SetMarked(true);
+	item->SetEnabled(false);
 	
 	popUpMenu->AddItem(item);
 
@@ -530,14 +526,16 @@ bool
 ScreenWindow::QuitRequested()
 {
 	fSettings->SetWindowFrame(Frame());
-	if (fVesaApplied) {
-		status_t status = _WriteVesaModeFile(fSelected);
+
+	// Write mode of workspace 0 (the boot workspace) to the vesa settings file
+	screen_mode vesaMode;
+	if (fBootWorkspaceApplied && fScreenMode.Get(vesaMode, 0) == B_OK) {
+		status_t status = _WriteVesaModeFile(vesaMode);
 		if (status < B_OK) {
 			BString warning = "Could not write VESA mode settings file:\n\t";
 			warning << strerror(status);
 			(new BAlert("VesaAlert", warning.String(), "Okay", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
-
 		}
 	}
 
@@ -766,8 +764,7 @@ ScreenWindow::_UpdateActiveMode()
 	// has been set manually; still, as the graphics driver
 	// is free to fiddle with mode passed, we better ask 
 	// what kind of mode we actually got
-	if (!fVesaApplied)
-		fScreenMode.Get(fActive);
+	fScreenMode.Get(fActive);
 	fSelected = fActive;
 
 	_UpdateControls();
@@ -789,10 +786,8 @@ ScreenWindow::ScreenChanged(BRect frame, color_space mode)
 void
 ScreenWindow::WorkspaceActivated(int32 workspace, bool state)
 {
-	if (!_IsVesa()) {
-		fScreenMode.GetOriginalMode(fOriginal, workspace);
-		_UpdateActiveMode();
-	}
+	fScreenMode.GetOriginalMode(fOriginal, workspace);
+	_UpdateActiveMode();
 
 	BMessage message(UPDATE_DESKTOP_COLOR_MSG);
 	PostMessage(&message, fMonitorView);
@@ -948,7 +943,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 		case BUTTON_REVERT_MSG:
 		{
 			fModified = false;
-			fVesaApplied = false;
+			fBootWorkspaceApplied = false;
 			BMenuItem *item;
 			item = fWorkspaceCountField->Menu()->ItemAt(fOriginalWorkspaceCount - 1);
 			if (item != NULL)
@@ -956,17 +951,9 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 			// ScreenMode::Revert() assumes that we first set the correct number
 			// of workspaces
-			
-			if (_IsVesa()) {				
-				set_workspace_count(fOriginalWorkspaceCount);
-				fActive = fOriginal;
-				fSelected = fOriginal;
-				_UpdateControls();
-			} else {
-				set_workspace_count(fOriginalWorkspaceCount);
-				fScreenMode.Revert();
-				_UpdateActiveMode();
-			}			
+			set_workspace_count(fOriginalWorkspaceCount);
+			fScreenMode.Revert();
+			_UpdateActiveMode();
 			break;
 		}
 
@@ -1018,68 +1005,6 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 }
 
 
-status_t
-ScreenWindow::_ReadVesaModeFile(screen_mode& mode) const
-{
-	BPath path;
-	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path, true);
-	if (status < B_OK)
-		return status;
-
-	path.Append("kernel/drivers/vesa");	
-	BFile file;
-	status = file.SetTo(path.Path(), B_READ_ONLY);
-	if (status < B_OK)
-		return status;
-
-	char buffer[256];
-
-	ssize_t bytesRead = file.Read(buffer, sizeof(buffer) - 1);
-	if (bytesRead < B_OK) {
-		return bytesRead;
-	} else {
-		buffer[bytesRead] = '\0';	
-	}
-
-	char ignore[256];
-		// if the file is malformed, sscanf shouldn't crash
-		// on reading a big string since we don't even read
-		// as much from the file
-	uint32 bitDepth = 0;
-
-	if (sscanf(buffer, "%s %ld %ld %ld", ignore, &mode.width, &mode.height,
-			&bitDepth) != 4) {
-		return B_ERROR;
-	}
-
-	// TODO: check for valid width and height values
-
-	switch (bitDepth) {
-		case 32:
-			mode.space = B_RGB32;
-			break;
-		case 24:
-			mode.space = B_RGB24;
-			break;
-		case 16:
-			mode.space = B_RGB16;
-			break;
-		case 15:
-			mode.space = B_RGB15;
-			break;
-		case 8:
-			mode.space = B_CMAP8;
-			break;
-		default:
-			// invalid value, we force it to B_RGB16 just in case
-			mode.space = B_RGB16;
-			return B_ERROR;			
-	}		
-
-	return B_OK;
-}
-
-
 void
 ScreenWindow::_CheckApplyEnabled()
 {
@@ -1094,12 +1019,6 @@ ScreenWindow::_UpdateOriginal()
 {
 	fOriginalWorkspaceCount = count_workspaces();
 	fScreenMode.Get(fOriginal);
-
-	// If we are in vesa we overwrite fOriginal's resolution and bitdepth
-	// with those found the vesa settings file. (if the file exists)
-	if (_IsVesa())
-		_ReadVesaModeFile(fOriginal);
-
 	fScreenMode.UpdateOriginalModes();
 }
 
@@ -1107,18 +1026,6 @@ ScreenWindow::_UpdateOriginal()
 void
 ScreenWindow::_Apply()
 {
-	if (_IsVesa()) {
-		(new BAlert("VesaAlert",
-			"Haiku is using your video card in compatibility mode (VESA)."
-			" Your settings will be applied on next startup.\n", "Okay", NULL, NULL, B_WIDTH_AS_USUAL,			
-			B_INFO_ALERT))->Go(NULL);
-
-		fVesaApplied = true;
-		fActive = fSelected;
-		_UpdateControls();		
-		return;
-	}
-
 	// make checkpoint, so we can undo these changes
 	fTempScreenMode.UpdateOriginalModes();
 	status_t status = fScreenMode.Set(fSelected);
@@ -1136,6 +1043,10 @@ ScreenWindow::_Apply()
 				if (i != originatingWorkspace)
 					screen.SetMode(i, &newMode, true);
 			}
+			fBootWorkspaceApplied = true;
+		} else {
+			if (current_workspace() == 0)
+				fBootWorkspaceApplied = true;
 		}
 
 		fActive = fSelected;

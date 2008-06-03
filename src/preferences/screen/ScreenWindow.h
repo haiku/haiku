@@ -51,7 +51,6 @@ class ScreenWindow : public BWindow {
 		void _Apply();
 
 		status_t _WriteVesaModeFile(const screen_mode& mode) const;
-		status_t _ReadVesaModeFile(screen_mode& mode) const;		
 		bool _IsVesa() const { return fIsVesa; }
 
 		void _LayoutControls(uint32 flags);
@@ -59,7 +58,7 @@ class ScreenWindow : public BWindow {
 
 		ScreenSettings*	fSettings;
 		bool			fIsVesa;
-		bool			fVesaApplied;
+		bool			fBootWorkspaceApplied;
 
 		BBox*			fScreenBox;
 		BBox*			fControlsBox;
