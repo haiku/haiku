@@ -1078,20 +1078,23 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 			// it's undefined, must be outside this image, try the other images
 			sym2 = find_undefined_symbol(rootImage, image, symname, &shimg);
 			if (!sym2) {
-				printf("elf_resolve_symbol: could not resolve symbol '%s'\n", symname);
+				FATAL("elf_resolve_symbol: could not resolve symbol '%s'\n",
+					symname);
 				return B_MISSING_SYMBOL;
 			}
 
 			// make sure they're the same type
 			if (ELF32_ST_TYPE(sym->st_info) != STT_NOTYPE
 				&& ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
-				printf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", symname);
+				FATAL("elf_resolve_symbol: found symbol '%s' in shared image "
+					"but wrong type\n", symname);
 				return B_MISSING_SYMBOL;
 			}
 
 			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL
 				&& ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
-				printf("elf_resolve_symbol: found symbol '%s' but not exported\n", symname);
+				FATAL("elf_resolve_symbol: found symbol '%s' but not "
+					"exported\n", symname);
 				return B_MISSING_SYMBOL;
 			}
 
@@ -1104,7 +1107,7 @@ resolve_symbol(image_t *rootImage, image_t *image, struct Elf32_Sym *sym,
 
 		case SHN_COMMON:
 			// ToDo: finish this
-			printf("elf_resolve_symbol: COMMON symbol, finish me!\n");
+			FATAL("elf_resolve_symbol: COMMON symbol, finish me!\n");
 			return B_ERROR; //ERR_NOT_IMPLEMENTED_YET;
 
 		default:
