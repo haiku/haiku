@@ -52,7 +52,7 @@ rule Executable
 	Main $(1) : $(2) ;
 	LinkAgainst $(1) : $(3) ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ]
-		-Xlinker -soname=_APP_ ;
+		-Xlinker --no-undefined -Xlinker -soname=_APP_  ;
 
 	# we link with -nostdlib and add the required libs manually, when building
 	# for Haiku
@@ -112,7 +112,8 @@ rule Addon target : sources : libraries : isExecutable
 
 	Main $(target) : $(sources) ;
 
-	local linkFlags = -Xlinker -soname=\"$(target:G=)\" ;
+	local linkFlags = -Xlinker --no-undefined
+		-Xlinker -soname=\"$(target:G=)\" ;
 	if $(isExecutable) != true {
 		linkFlags = -nostart $(linkFlags) ;
 	}
