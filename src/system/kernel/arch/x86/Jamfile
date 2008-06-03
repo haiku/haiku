@@ -15,7 +15,7 @@ KernelMergeObject kernel_arch_x86.o :
 	arch_debug.cpp
 	arch_debug_console.c
 	arch_elf.c
-#	arch_hpet.c
+	arch_hpet.c
 	arch_int.c
 	arch_platform.c
 #	arch_selector.c

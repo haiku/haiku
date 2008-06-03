@@ -5,6 +5,8 @@
 #ifndef _KERNEL_ARCH_x86_HPET_H
 #define _KERNEL_ARCH_x86_HPET_H
 
+#include <types.h>
+
 /* All masks are 64 bits wide to represent bit locations;
    the HPET registers are 64 bits wide. */
 
@@ -25,22 +27,23 @@
 #define HPET_GET_PERIOD(regs)		(((regs)->caps & HPET_CAP_MASK_PERIOD) >> 32)
 
 struct hpet_timer {
-	uint64 config,			/* Timer configuration and capabilities */
-	uint64 comparator,		/* Comparator value */
-	uint64 introute,		/* FSB Interrupt Routing */
-	uint64 reserved
+	uint64 config;			/* Timer configuration and capabilities */
+	uint64 comparator;		/* Comparator value */
+	uint64 introute;		/* FSB Interrupt Routing */
+	uint64 reserved;
 };
 
+
 struct hpet_regs {
-	uint64 caps,			/* HPET Capabilities and ID */
-	uint64 reserved1,
-	uint64 config,			/* General Configuration */
-	uint64 reserved2,
-	uint64 intstatus,		/* General Interrupt Status */
-	uint8 reserved3[200],
-	uint64 mainvalue,		/* Main Counter Value */
-	uint64 reserved3,
-	struct hpet_timer timers[1]	/* Timers */
+	uint64 caps;			/* HPET Capabilities and ID */
+	uint64 reserved1;
+	uint64 config;			/* General Configuration */
+	uint64 reserved2;
+	uint64 intstatus;		/* General Interrupt Status */
+	uint8 reserved3[200];
+	uint64 mainvalue;		/* Main Counter Value */
+	uint64 reserved4;
+	struct hpet_timer timers[1];	/* Timers */
 };
 
 #endif
