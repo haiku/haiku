@@ -17,20 +17,23 @@ PluginManager _plugin_manager;
 
 
 status_t
-PluginManager::CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BDataIO *source)
+PluginManager::CreateReader(Reader **reader, int32 *streamCount,
+	media_file_format *mff, BDataIO *source)
 {
 	TRACE("PluginManager::CreateReader enter\n");
 
 	BPositionIO *seekable_source = dynamic_cast<BPositionIO *>(source);
 	if (seekable_source == 0) {
-		printf("PluginManager::CreateReader: non-seekable sources not supported yet\n");
+		printf("PluginManager::CreateReader: non-seekable sources not "
+			"supported yet\n");
 		return B_ERROR;
 	}
 
 	// get list of available readers from the server
 	server_get_readers_request request;
 	server_get_readers_reply reply;
-	if (B_OK != QueryServer(SERVER_GET_READERS, &request, sizeof(request), &reply, sizeof(reply))) {
+	if (QueryServer(SERVER_GET_READERS, &request, sizeof(request),
+			&reply, sizeof(reply)) != B_OK) {
 		printf("PluginManager::CreateReader: can't get list of readers\n");
 		return B_ERROR;
 	}
@@ -61,8 +64,9 @@ PluginManager::CreateReader(Reader **reader, int32 *streamCount, media_file_form
 		seekable_source->Seek(0, SEEK_SET);
 		(*reader)->Setup(seekable_source);
 
-		if (B_OK == (*reader)->Sniff(streamCount)) {
-			TRACE("PluginManager::CreateReader: Sniff success (%ld stream(s))\n", *streamCount);
+		if ((*reader)->Sniff(streamCount) == B_OK) {
+			TRACE("PluginManager::CreateReader: Sniff success "
+				"(%ld stream(s))\n", *streamCount);
 			(*reader)->GetFileFormatInfo(mff);
 			return B_OK;
 		}
@@ -136,7 +140,8 @@ PluginManager::CreateDecoder(Decoder **decoder, const media_codec_info &mci)
 
 
 status_t
-PluginManager::GetDecoderInfo(Decoder *decoder, media_codec_info *out_info) const
+PluginManager::GetDecoderInfo(Decoder *decoder,
+	media_codec_info *out_info) const
 {
 	if (!decoder)
 		return B_BAD_VALUE;
@@ -174,7 +179,8 @@ PluginManager::~PluginManager()
 	while (!fPluginList->IsEmpty()) {
 		plugin_info *info = NULL;
 		fPluginList->Get(fPluginList->CountItems() - 1, &info);
-		printf("PluginManager: Error, unloading PlugIn %s with usecount %d\n", info->name, info->usecount);
+		printf("PluginManager: Error, unloading PlugIn %s with usecount "
+			"%d\n", info->name, info->usecount);
 		delete info->plugin;
 		unload_add_on(info->image);
 		fPluginList->Remove(fPluginList->CountItems() - 1);
@@ -247,7 +253,8 @@ PluginManager::PutPlugin(MediaPlugin *plugin)
 
 
 status_t
-PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *image)
+PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin,
+	image_id *image)
 {
 	BPath p(&ref);
 
@@ -260,8 +267,10 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *
 		
 	MediaPlugin *(*instantiate_plugin_func)();
 	
-	if (get_image_symbol(id, "instantiate_plugin", B_SYMBOL_TYPE_TEXT, (void**)&instantiate_plugin_func) < B_OK) {
-		printf("PluginManager: Error, LoadPlugin can't find instantiate_plugin in %s\n", p.Path());
+	if (get_image_symbol(id, "instantiate_plugin", B_SYMBOL_TYPE_TEXT,
+			(void**)&instantiate_plugin_func) < B_OK) {
+		printf("PluginManager: Error, LoadPlugin can't find "
+			"instantiate_plugin in %s\n", p.Path());
 		unload_add_on(id);
 		return B_ERROR;
 	}
@@ -270,7 +279,8 @@ PluginManager::LoadPlugin(const entry_ref &ref, MediaPlugin **plugin, image_id *
 	
 	pl = (*instantiate_plugin_func)();
 	if (pl == NULL) {
-		printf("PluginManager: Error, LoadPlugin instantiate_plugin in %s returned NULL\n", p.Path());
+		printf("PluginManager: Error, LoadPlugin instantiate_plugin in %s "
+			"returned NULL\n", p.Path());
 		unload_add_on(id);
 		return B_ERROR;
 	}
