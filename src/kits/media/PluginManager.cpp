@@ -239,8 +239,8 @@ PluginManager::PutPlugin(MediaPlugin *plugin)
 			if (pinfo->usecount == 0) {
 				delete pinfo->plugin;
 				unload_add_on(pinfo->image);
+				fPluginList->RemoveCurrent();
 			}
-			fPluginList->RemoveCurrent();
 			fLocker->Unlock();
 			return;
 		}
