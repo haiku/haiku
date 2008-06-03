@@ -682,6 +682,21 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			break;
 		}
+		case AS_GET_BITMAP_SUPPORT_FLAGS:
+		{
+			uint32 colorSpace;
+			if (link.Read<uint32>(&colorSpace) != B_OK)
+				break;
+
+			bool overlay = fDesktop->HWInterface()->CheckOverlayRestrictions(
+				64, 64, (color_space)colorSpace);
+			uint32 flags = overlay ? B_BITMAPS_SUPPORT_OVERLAY : 0;
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<int32>(flags);
+			fLink.Flush();
+			break;
+		}
 
 		case AS_CREATE_PICTURE:
 		{

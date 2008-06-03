@@ -1,33 +1,20 @@
-//------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
-//
-//	Permission is hereby granted, free of charge, to any person obtaining a
-//	copy of this software and associated documentation files (the "Software"),
-//	to deal in the Software without restriction, including without limitation
-//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//	and/or sell copies of the Software, and to permit persons to whom the
-//	Software is furnished to do so, subject to the following conditions:
-//
-//	The above copyright notice and this permission notice shall be included in
-//	all copies or substantial portions of the Software.
-//
-//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-//	DEALINGS IN THE SOFTWARE.
-//
-//	File Name:		GraphicsDefs.cpp
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//					Caz <turok2@currantbun.com>
-//					Axel Dörfler <axeld@pinc-software.de>
-//	Description:	Graphics functions and variables for the Interface Kit
-//
-//------------------------------------------------------------------------------
+/*
+ * Copyright 2001-2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Caz <turok2@currantbun.com>
+ *		Axel Dörfler, axeld@pinc-software.de
+ */
+
+//!	Graphics functions and variables for the Interface Kit
 
 #include <GraphicsDefs.h>
+
+#include <AppServerLink.h>
+#include <ServerProtocol.h>
+
 
 // patterns
 const pattern B_SOLID_HIGH = {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}};
@@ -50,7 +37,8 @@ const struct screen_id B_MAIN_SCREEN_ID = {0};
 
 
 status_t
-get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment, size_t *pixelsPerChunk)
+get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment,
+	size_t *pixelsPerChunk)
 {
 	status_t status = B_OK;
 	int32 bytesPerPixel = 0;
@@ -152,12 +140,22 @@ bitmaps_support_space(color_space space, uint32 *supportFlags)
 		case B_RGB16:		case B_RGB15:		case B_RGBA15:
 		case B_RGB16_BIG:	case B_RGB15_BIG:	case B_RGBA15_BIG:
 		case B_CMAP8:		case B_GRAY8:		case B_GRAY1:
-			if (supportFlags) {
-				*supportFlags = 0;
-				*supportFlags |= B_VIEWS_SUPPORT_DRAW_BITMAP;
-				*supportFlags |= B_BITMAPS_SUPPORT_ATTACHED_VIEWS;
+			if (supportFlags != NULL) {
+				*supportFlags = B_VIEWS_SUPPORT_DRAW_BITMAP
+					| B_BITMAPS_SUPPORT_ATTACHED_VIEWS;
+
+				BPrivate::AppServerLink link;
+				link.StartMessage(AS_GET_BITMAP_SUPPORT_FLAGS);
+
+				int32 code;
+				if (link.FlushWithReply(code) == B_OK && code == B_OK) {
+					uint32 flags = 0;
+					if (link.Read<uint32>(&flags) == B_OK)
+						*supportFlags |= flags;
+				}
 			}
 			break;
+
 		// supported, but cannot draw
 		case B_YCbCr422: case B_YCbCr411: case B_YCbCr444: case B_YCbCr420:
 		case B_YUV422: case B_YUV411: case B_YUV444: case B_YUV420:
