@@ -1419,7 +1419,7 @@ realloc(void *address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return malloc(newSize);
+		return memalign(0, newSize);
 
 	if (newSize == 0) {
 		free(address);
