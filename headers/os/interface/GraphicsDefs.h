@@ -248,7 +248,7 @@ typedef enum {
 enum {
 	B_VIEWS_SUPPORT_DRAW_BITMAP			= 0x1,
 	B_BITMAPS_SUPPORT_ATTACHED_VIEWS	= 0x2,
-	B_BITMAPS_SUPPORT_OVERLAY			= 0x4,
+	B_BITMAPS_SUPPORT_OVERLAY			= 0x4
 };
 bool bitmaps_support_space(color_space space, uint32* _supportFlags);
 
