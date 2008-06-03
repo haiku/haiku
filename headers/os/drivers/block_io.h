@@ -57,7 +57,7 @@ typedef struct phys_vecs {
 #define B_BLOCK_DEVICE_MAX_SG_BLOCKS "block_device/max_sg_blocks"
 
 typedef struct block_device_cookie {
-	struct device_node	*node;
+	device_node	*node;
 } block_device_cookie;
 
 // interface to be provided by device driver
