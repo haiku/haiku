@@ -920,6 +920,7 @@ debug_puts(const char *string, int32 length)
 	if (length >= OUTPUT_BUFFER_SIZE)
 		length = OUTPUT_BUFFER_SIZE - 1;
 
+	// TODO: Code duplication! Cf. dprintf_args()!
 	if (length > 1 && string[length - 1] == '\n'
 		&& strncmp(string, sLastOutputBuffer, length) == 0) {
 		sMessageRepeatCount++;
@@ -928,12 +929,16 @@ debug_puts(const char *string, int32 length)
 			sMessageRepeatFirstTime = sMessageRepeatLastTime;
 	} else {
 		flush_pending_repeats();
-		kputs(string);
 
-		// kputs() doesn't output to syslog (as it's only used
-		// from the kernel debugger elsewhere)
+		if (sSerialDebugEnabled)
+			arch_debug_serial_puts(string);
 		if (sSyslogOutputEnabled)
 			syslog_write(string, length);
+		if (sBlueScreenEnabled || sDebugScreenEnabled)
+			blue_screen_puts(string);
+		for (uint32 i = 0; sSerialDebugEnabled && i < kMaxDebuggerModules; i++)
+			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_puts)
+				sDebuggerModules[i]->debugger_puts(string, length);
 
 		memcpy(sLastOutputBuffer, string, length);
 		sLastOutputBuffer[length] = 0;
