@@ -138,6 +138,14 @@ vesa_init(vesa_info &info)
 		bufferInfo->depth);
 	sharedInfo.bytes_per_row = bufferInfo->bytes_per_row;
 
+	// TODO: we might want to do this via vm86 instead
+	edid1_info *edidInfo = (edid1_info *)get_boot_item(VESA_EDID_BOOT_INFO,
+		NULL);
+	if (edidInfo != NULL) {
+		sharedInfo.has_edid = true;
+		memcpy(&sharedInfo.edid_info, edidInfo, sizeof(edid1_info));
+	}
+
 	physical_entry mapping;
 	get_memory_map((void *)sharedInfo.frame_buffer, B_PAGE_SIZE,
 		&mapping, 1);

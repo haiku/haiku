@@ -112,7 +112,7 @@ vesa_propose_display_mode(display_mode *target, const display_mode *low,
 	TRACE(("vesa_propose_display_mode()\n"));
 
 	// just search for the specified mode in the list
-	
+
 	for (uint32 i = 0; i < gInfo->shared_info->mode_count; i++) {
 		display_mode *current = &gInfo->mode_list[i];
 
@@ -162,6 +162,22 @@ vesa_get_display_mode(display_mode *_currentMode)
 
 
 status_t
+vesa_get_edid_info(void *info, size_t size, uint32 *_version)
+{
+	TRACE(("intel_get_edid_info()\n"));
+
+	if (!gInfo->shared_info->has_edid)
+		return B_ERROR;
+	if (size < sizeof(struct edid1_info))
+		return B_BUFFER_OVERFLOW;
+
+	memcpy(info, &gInfo->shared_info->edid_info, sizeof(struct edid1_info));
+	*_version = EDID_VERSION_1;
+	return B_OK;
+}
+
+
+status_t
 vesa_get_frame_buffer_config(frame_buffer_config *config)
 {
 	TRACE(("vesa_get_frame_buffer_config()\n"));
@@ -185,7 +201,7 @@ vesa_get_pixel_clock_limits(display_mode *mode, uint32 *low, uint32 *high)
 
 	/* lower limit of about 48Hz vertical refresh */
 	*low = (total_pix * 48L) / 1000L;
-	if (*low > clock_limit) 
+	if (*low > clock_limit)
 		return B_ERROR;
 
 	*high = clock_limit;

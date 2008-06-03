@@ -1,5 +1,6 @@
 SubDir HAIKU_TOP src add-ons kernel drivers graphics vesa ;
 
+UsePrivateHeaders kernel graphics [ FDirName graphics common ] ;
 UsePrivateHeaders kernel graphics [ FDirName graphics vesa ] ;
 
 KernelAddon vesa :

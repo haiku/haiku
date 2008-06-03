@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright 2002-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -73,6 +73,7 @@ typedef struct kernel_args {
 
 	void		*vesa_modes;
 	uint32		vesa_modes_size;
+	void		*edid_info;
 
 	void		*debug_output;
 	uint32		debug_size;

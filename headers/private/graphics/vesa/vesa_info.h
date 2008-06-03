@@ -10,7 +10,10 @@
 #include <Accelerant.h>
 #include <PCI.h>
 
+#include <edid.h>
 
+
+#define VESA_EDID_BOOT_INFO "vesa_edid/v1"
 #define VESA_MODES_BOOT_INFO "vesa_modes/v1"
 
 struct vesa_mode {
@@ -34,6 +37,9 @@ struct vesa_shared_info {
 
 	uint32			vesa_mode_offset;
 	uint32			vesa_mode_count;
+
+	edid1_info		edid_info;
+	bool			has_edid;
 };
 
 //----------------- ioctl() interface ----------------

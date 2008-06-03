@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src system kernel debug ;
 
 UsePrivateHeaders [ FDirName kernel debug ] syslog_daemon ;
+UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics vesa ] ;
 
 KernelMergeObject kernel_debug.o :

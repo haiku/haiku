@@ -4,6 +4,13 @@
  */
 
 
+#include <frame_buffer_console.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+
 #include <KernelExport.h>
 #include <kernel.h>
 #include <lock.h>
@@ -13,13 +20,9 @@
 #include <boot/kernel_args.h>
 #include <vesa_info.h>
 
-#include <frame_buffer_console.h>
-#include "font.h"
+#include <edid.h>
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <unistd.h>
+#include "font.h"
 
 
 //#define TRACE_FB_CONSOLE
@@ -56,11 +59,11 @@ static uint8 sPalette8[] = {
 };
 static uint16 sPalette15[] = {
 	// 0bbbbbgggggrrrrr (5-5-5)
-	0x7fff, 0x001f, 0x03e0, 0x03ff, 0x7c00, 0x7c1f, 0x7fe0, 0x0000, 
+	0x7fff, 0x001f, 0x03e0, 0x03ff, 0x7c00, 0x7c1f, 0x7fe0, 0x0000,
 };
 static uint16 sPalette16[] = {
 	// bbbbbggggggrrrrr (5-6-5)
-	0xffff, 0x001f, 0x07e0, 0x07ff, 0xf800, 0xf81f, 0xffe0, 0x0000, 
+	0xffff, 0x001f, 0x07e0, 0x07ff, 0xf800, 0xf81f, 0xffe0, 0x0000,
 };
 static uint32 sPalette32[] = {
 	// is also used by 24 bit modes
@@ -119,7 +122,7 @@ render_glyph(int32 x, int32 y, uint8 glyph, uint8 attr)
 			uint8 bits = FONT[CHAR_HEIGHT * glyph + y];
 			for (x = 0; x < CHAR_WIDTH; x++) {
 				for (int32 i = 0; i < sConsole.bytes_per_pixel; i++) {
-					if (bits & 1) 
+					if (bits & 1)
 						base[x * sConsole.bytes_per_pixel + i] = color[i];
 					else
 						base[x * sConsole.bytes_per_pixel + i] = backgroundColor[i];
@@ -206,7 +209,7 @@ console_move_cursor(int32 x, int32 y)
 
 	draw_cursor(sConsole.cursor_x, sConsole.cursor_y);
 	draw_cursor(x, y);
-	
+
 	sConsole.cursor_x = x;
 	sConsole.cursor_y = y;
 }
@@ -423,6 +426,14 @@ frame_buffer_console_init(kernel_args *args)
 	if (sVesaModes != NULL) {
 		memcpy(sVesaModes, args->vesa_modes, args->vesa_modes_size);
 		add_boot_item(VESA_MODES_BOOT_INFO, sVesaModes, args->vesa_modes_size);
+	}
+
+	if (args->edid_info != NULL) {
+		edid1_info *info = (edid1_info *)malloc(sizeof(edid1_info));
+		if (info != NULL) {
+			memcpy(info, args->edid_info, sizeof(edid1_info));
+			add_boot_item(VESA_EDID_BOOT_INFO, info, sizeof(edid1_info));
+		}
 	}
 
 	return B_OK;

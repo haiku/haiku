@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,13 +16,13 @@ vesa_set_cursor_shape(uint16 width, uint16 height, uint16 hot_x, uint16 hot_y, u
 }
 
 
-void 
+void
 vesa_move_cursor(uint16 x, uint16 y)
 {
 }
 
 
-void 
+void
 vesa_show_cursor(bool is_visible)
 {
 }
@@ -59,6 +59,8 @@ get_accelerant_hook(uint32 feature, void *data)
 			return (void*)vesa_set_display_mode;
 		case B_GET_DISPLAY_MODE:
 			return (void*)vesa_get_display_mode;
+		case B_GET_EDID_INFO:
+			return (void*)vesa_get_edid_info;
 		case B_GET_FRAME_BUFFER_CONFIG:
 			return (void*)vesa_get_frame_buffer_config;
 		case B_GET_PIXEL_CLOCK_LIMITS:
