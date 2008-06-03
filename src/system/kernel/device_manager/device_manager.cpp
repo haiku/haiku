@@ -117,6 +117,7 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 
 			status_t		Register(device_node* parent);
 			status_t		Probe(const char* devicePath, uint32 updateCycle);
+			status_t		Reprobe();
 			status_t		Rescan();
 
 			bool			IsRegistered() const { return fRegistered; }
@@ -153,7 +154,7 @@ private:
 			status_t		_RegisterDynamic(device_node* previous = NULL);
 			status_t		_RemoveChildren();
 			device_node*	_FindCurrentChild();
-			status_t		_Rescan();
+			status_t		_Probe();
 			void			_ReleaseWaiting();
 
 	device_node*			fParent;
@@ -1695,7 +1696,7 @@ device_node::_FindCurrentChild()
 
 
 status_t
-device_node::_Rescan()
+device_node::_Probe()
 {
 	device_node* previous = NULL;
 
@@ -1733,31 +1734,37 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 	MethodDeleter<device_node, bool> uninit(this,
 		&device_node::UninitDriver);
 
-	uint16 type = 0;
-	uint16 subType = 0;
-	if (get_attr_uint16(this, B_DEVICE_TYPE, &type, false) == B_OK
-		&& get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false) == B_OK) {
-		// Check if this node matches the device path
-		// TODO: maybe make this extendible via settings file?
+	if ((fFlags & B_FIND_CHILD_ON_DEMAND) != 0) {
 		bool matches = false;
-		if (!strcmp(devicePath, "disk")) {
-			matches = type == PCI_mass_storage;
-		} else if (!strcmp(devicePath, "audio")) {
-			matches = type == PCI_multimedia
-				&& (subType == PCI_audio || subType == PCI_hd_audio);
-		} else if (!strcmp(devicePath, "net")) {
-			matches = type == PCI_network;
-		} else if (!strcmp(devicePath, "graphics")) {
-			matches = type == PCI_display;
-		} else if (!strcmp(devicePath, "video")) {
-			matches = type == PCI_multimedia && subType == PCI_video;
+		uint16 type = 0;
+		uint16 subType = 0;
+		if (get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false) == B_OK
+			&& get_attr_uint16(this, B_DEVICE_TYPE, &type, false) == B_OK) {
+			// Check if this node matches the device path
+			// TODO: maybe make this extendible via settings file?
+			if (!strcmp(devicePath, "disk")) {
+				matches = type == PCI_mass_storage;
+			} else if (!strcmp(devicePath, "audio")) {
+				matches = type == PCI_multimedia
+					&& (subType == PCI_audio || subType == PCI_hd_audio);
+			} else if (!strcmp(devicePath, "net")) {
+				matches = type == PCI_network;
+			} else if (!strcmp(devicePath, "graphics")) {
+				matches = type == PCI_display;
+			} else if (!strcmp(devicePath, "video")) {
+				matches = type == PCI_multimedia && subType == PCI_video;
+			}
+		} else {
+			// This driver does not support types, but still wants to its
+			// children explored on demand only.
+			matches = true;
 		}
 
 		if (matches) {
 			fLastUpdateCycle = updateCycle;
 				// This node will be probed in this update cycle
 
-			return _Rescan();
+			return _Probe();
 		}
 
 		return B_OK;
@@ -1777,12 +1784,48 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 
 
 status_t
-device_node::Rescan()
+device_node::Reprobe()
 {
+	status_t status = InitDriver();
+	if (status < B_OK)
+		return status;
+
+	MethodDeleter<device_node, bool> uninit(this,
+		&device_node::UninitDriver);
+
 	// If this child has been probed already, probe it again
-	status_t status = _Rescan();
+	status = _Probe();
 	if (status != B_OK)
 		return status;
+
+	NodeList::Iterator iterator = fChildren.GetIterator();
+	while (iterator.HasNext()) {
+		device_node* child = iterator.Next();
+
+		status = child->Reprobe();
+		if (status != B_OK)
+			return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+device_node::Rescan()
+{
+	status_t status = InitDriver();
+	if (status < B_OK)
+		return status;
+
+	MethodDeleter<device_node, bool> uninit(this,
+		&device_node::UninitDriver);
+
+	if (DriverModule()->rescan_child_devices != NULL) {
+		status = DriverModule()->rescan_child_devices(DriverData());
+		if (status != B_OK)
+			return status;
+	}
 
 	NodeList::Iterator iterator = fChildren.GetIterator();
 	while (iterator.HasNext()) {
@@ -2062,6 +2105,7 @@ device_manager_init(struct kernel_args* args)
 status_t
 device_manager_init_post_modules(struct kernel_args* args)
 {
-	return sRootNode->Rescan();
+	RecursiveLocker _(sLock);
+	return sRootNode->Reprobe();
 }
 
