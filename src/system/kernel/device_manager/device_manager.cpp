@@ -305,6 +305,7 @@ publish_directories(const char* subPath)
 
 			devfs_publish_directory(path.Path());
 		}
+		close_module_list(list);
 	} else {
 		// TODO: implement module directory traversal!
 	}
