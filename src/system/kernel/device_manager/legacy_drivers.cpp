@@ -312,12 +312,11 @@ republish_driver(legacy_driver* driver)
 
 		TRACE(("devfs: unpublishing no more present \"%s\"\n", entry->path));
 		LegacyDevice* device = get_device_for_path(driver, entry->path);
-		if (device != NULL) {
+		if (device != NULL)
 			driver->devices.Remove(device);
-			delete device;
-		}
 
 		devfs_unpublish_device(entry->path, true);
+		delete device;
 		delete entry;
 	}
 
