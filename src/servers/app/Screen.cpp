@@ -64,6 +64,9 @@ Screen::~Screen()
 	delete fHWInterface;
 }
 
+/*! Finds the mode in the mode list that is closest to the mode specified.
+	As long as the mode list is not empty, this method will always succeed.
+*/
 
 status_t
 Screen::Initialize()
@@ -120,33 +123,45 @@ Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
 
 
 status_t
-Screen::SetMode(uint16 width, uint16 height, uint32 colorSpace,
-	float frequency, bool makeDefault)
+Screen::SetBestMode(uint16 width, uint16 height, uint32 colorSpace,
+	float frequency)
 {
 	// search for a matching mode
-	display_mode mode;
-	status_t status = _FindMode(width, height, colorSpace, frequency, &mode);
+	display_mode* modes = NULL;
+	uint32 count;
+	status_t status = fHWInterface->GetModeList(&modes, &count);
 	if (status < B_OK)
 		return status;
+	if (count <= 0)
+		return B_ERROR;
 
-	if (status >= B_OK) {
-		float modeFrequency = get_mode_frequency(mode);
-		display_mode originalMode = mode;
-		bool adjusted = false;
+	int32 index = _FindBestMode(modes, count, width, height, colorSpace,
+		frequency);
+	if (index < 0) {
+		debug_printf("Finding best mode failed");
+		delete[] modes;
+		return B_ERROR;
+	}
 
-		if (modeFrequency != frequency) {
-			// adjust timing to fit the requested frequency if needed
-			// (taken from Screen preferences application)
-			mode.timing.pixel_clock = ((uint32)mode.timing.h_total
-				* mode.timing.v_total / 10 * int32(frequency * 10)) / 1000;
-			adjusted = true;
-		}
+	display_mode mode = modes[index];
+	delete[] modes;
 
-		status = SetMode(mode, makeDefault);
-		if (status < B_OK) {
-			// try again with the unchanged mode
-			status = SetMode(originalMode, makeDefault);
-		}
+	float modeFrequency = get_mode_frequency(mode);
+	display_mode originalMode = mode;
+	bool adjusted = false;
+
+	if (modeFrequency != frequency) {
+		// adjust timing to fit the requested frequency if needed
+		// (taken from Screen preferences application)
+		mode.timing.pixel_clock = ((uint32)mode.timing.h_total
+			* mode.timing.v_total / 10 * int32(frequency * 10)) / 1000;
+		adjusted = true;
+	}
+
+	status = SetMode(mode, false);
+	if (status < B_OK && adjusted) {
+		// try again with the unchanged mode
+		status = SetMode(originalMode, false);
 	}
 
 	return status;
@@ -199,7 +214,7 @@ Screen::Frame() const
 	display_mode mode;
 	fHWInterface->GetMode(&mode);
 
-	return BRect(0, 0, mode.virtual_width - 1, mode.virtual_height - 1);	
+	return BRect(0, 0, mode.virtual_width - 1, mode.virtual_height - 1);
 }
 
 
@@ -213,75 +228,32 @@ Screen::ColorSpace() const
 }
 
 
-status_t
-Screen::_FindMode(uint16 width, uint16 height, uint32 colorspace,
-	float frequency, display_mode* mode) const
-{
-	display_mode* modes = NULL;
-	uint32 count;
-
-	status_t status = fHWInterface->GetModeList(&modes, &count);
-	if (status < B_OK || count <= 0) {
-		// We've run into quite a problem here! This is a function which is a requirement
-		// for a graphics module. The best thing that we can hope for is 640x480x8 without
-		// knowing anything else. While even this seems like insanity to assume that we
-		// can support this, the only lower mode supported is 640x400, but we shouldn't even
-		// bother with such a pathetic possibility.
-		if (width == 640 && height == 480 && colorspace == B_CMAP8)
-			return B_OK;
-
-		return status;
-	}
-
-	int32 index = _FindMode(modes, count, width, height, colorspace, frequency);
-	if (index < 0) {
-		fprintf(stderr, "mode not found (%d, %d, %f) -> using first mode from list!\n",
-			width, height, frequency);
-		// fallback to first mode from list - TODO: ?!?
-		// NOTE: count > 0 is checked above
-		*mode = modes[0];	
-	} else {
-		*mode = modes[index];	
-	}
-
-	delete[] modes;
-
-	return B_OK;
-}
-
-
-/*!
-	\brief Returns the mode that matches the given criteria. The frequency
-		doesn't have to match, though - the closest one found is used.
+/*!	\brief Returns the mode that matches the given criteria best.
+	The "width" argument is the only hard argument, the rest will be adapted
+	as needed.
 */
 int32
-Screen::_FindMode(const display_mode* modes, uint32 count,
-	uint16 width, uint16 height, uint32 colorspace,
-	float frequency) const
+Screen::_FindBestMode(const display_mode* modes, uint32 count,
+	uint16 width, uint16 height, uint32 colorSpace, float frequency) const
 {
-	// we always try to choose the mode with the closest frequency
-	float bestFrequencyDiff = 0.0f;
-	int32 index = -1;
-
+	int32 bestDiff = 0;
+	int32 bestIndex = -1;
 	for (uint32 i = 0; i < count; i++) {
-		if (modes[i].virtual_width == width
-			&& modes[i].virtual_height == height
-			&& modes[i].space == colorspace) {
-			// we have found a mode with the correct width, height and format
-			// now see if the frequency matches
-			float modeFrequency = get_mode_frequency(modes[i]);
-			float frequencyDiff = fabs(modeFrequency - frequency);
+		const display_mode& mode = modes[i];
+		if (mode.virtual_width != width)
+			continue;
 
-			if (index == -1 || bestFrequencyDiff > frequencyDiff) {
-				index = i;
-				if (frequencyDiff == 0.0f)
-					break;
+		// compute some random equality score
+		// TODO: check if these scores make sense
+		int32 diff = 1000 * abs(mode.timing.v_display - height)
+			+ int32(fabs(get_mode_frequency(mode) - frequency) * 10)
+			+ 100 * abs(mode.space - colorSpace);
 
-				bestFrequencyDiff = frequencyDiff;
-			}
+		if (bestIndex == -1 || diff < bestDiff) {
+			bestDiff = diff;
+			bestIndex = i;
 		}
 	}
 
-	return index;
+	return bestIndex;
 }
-

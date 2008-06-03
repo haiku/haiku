@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2007, Haiku, Inc.
+ * Copyright (c) 2001-2008, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -34,13 +34,12 @@ class Screen {
 			status_t			SetMode(const display_mode& mode,
 									bool makeDefault);
 			status_t			SetMode(uint16 width, uint16 height,
-									uint32 colorspace, float frequency,
-									bool makeDefault);
-			status_t			SetMode(uint16 width, uint16 height,
 									uint32 colorspace,
 									const display_timing& timing,
 									bool makeDefault);
 			status_t			SetPreferredMode();
+			status_t			SetBestMode(uint16 width, uint16 height,
+									uint32 colorspace, float frequency);
 
 			void				GetMode(display_mode* mode) const;
 			void				GetMode(uint16 &width, uint16 &height,
@@ -56,11 +55,7 @@ class Screen {
 									{ return fHWInterface; }
 
  private:
-			status_t			_FindMode(uint16 width, uint16 height,
-									uint32 colorspace, float frequency,
-									display_mode* mode) const;
-
-			int32				_FindMode(const display_mode* modeList,
+			int32				_FindBestMode(const display_mode* modeList,
 									uint32 count, uint16 width, uint16 height,
 									uint32 colorspace, float frequency) const;
 
