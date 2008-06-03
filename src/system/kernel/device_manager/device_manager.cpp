@@ -136,6 +136,8 @@ struct device_node : DoublyLinkedListLinkImpl<device_node> {
 			device_node*	FindChild(const device_attr* attributes) const;
 			device_node*	FindChild(const char* moduleName) const;
 
+			int32			Priority();
+
 			void			Dump(int32 level = 0);
 
 private:
@@ -189,6 +191,7 @@ enum node_flags {
 
 static device_node *sRootNode;
 static recursive_lock sLock;
+static const char* sGenericContextPath;
 
 static uint32 sDriverUpdateCycle = 1;
 
@@ -1260,7 +1263,22 @@ device_node::AddChild(device_node* node)
 	// we must not be destroyed	as long as we have children
 	Acquire();
 	node->fParent = this;
-	fChildren.Add(node);
+
+	int32 priority = node->Priority();
+
+	// Enforce an order in which the children are traversed - from most
+	// specific to least specific child.
+	NodeList::Iterator iterator = fChildren.GetIterator();
+	device_node* before = NULL;
+	while (iterator.HasNext()) {
+		device_node* child = iterator.Next();
+		if (child->Priority() <= priority) {
+			before = child;
+			break;
+		}
+	}
+
+	fChildren.Insert(before, node);
 }
 
 
@@ -1411,11 +1429,16 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 			return B_NO_MEMORY;
 
 		StackDeleter<KPath*> stackDeleter(stack);
+
+		bool generic = false;
 		uint16 type = 0;
 		uint16 subType = 0;
 		uint16 interface = 0;
-		get_attr_uint16(this, B_DEVICE_TYPE, &type, false);
-		get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false);
+		if (get_attr_uint16(this, B_DEVICE_TYPE, &type, false) != B_OK
+			|| get_attr_uint16(this, B_DEVICE_SUB_TYPE, &subType, false)
+					!= B_OK)
+			generic = true;
+
 		get_attr_uint16(this, B_DEVICE_INTERFACE, &interface, false);
 
 		// TODO: maybe make this extendible via settings file?
@@ -1475,8 +1498,19 @@ device_node::_GetNextDriverPath(void*& cookie, KPath& _path)
 				if (sRootNode == this) {
 					_AddPath(*stack, "busses/pci");
 					_AddPath(*stack, "bus_managers");
-				} else
+				} else if (!generic) {
 					_AddPath(*stack, "drivers");
+				} else {
+					// For generic drivers, we only allow busses when the
+					// request is more specified
+					if (sGenericContextPath != NULL
+						&& (!strcmp(sGenericContextPath, "disk")
+							|| !strcmp(sGenericContextPath, "ports")
+							|| !strcmp(sGenericContextPath, "bus"))) {
+						_AddPath(*stack, "busses");
+					}
+					_AddPath(*stack, "drivers", sGenericContextPath);
+				}
 				break;
 		}
 
@@ -1758,13 +1792,17 @@ device_node::Probe(const char* devicePath, uint32 updateCycle)
 			// This driver does not support types, but still wants to its
 			// children explored on demand only.
 			matches = true;
+			sGenericContextPath = devicePath;
 		}
 
 		if (matches) {
 			fLastUpdateCycle = updateCycle;
 				// This node will be probed in this update cycle
 
-			return _Probe();
+			status = _Probe();
+
+			sGenericContextPath = NULL;
+			return status;
 		}
 
 		return B_OK;
@@ -2002,6 +2040,19 @@ device_node::FindChild(const char* moduleName) const
 	}
 
 	return NULL;
+}
+
+
+/*!	This returns the priority or importance of this node. Nodes with higher
+	priority are registered/probed first.
+	Currently, only the B_FIND_MULITPLE_CHILDREN flag alters the priority;
+	it might make sense to be able to directly set the priority via an
+	attribute.
+*/
+int32
+device_node::Priority()
+{
+	return (fFlags & B_FIND_MULTIPLE_CHILDREN) != 0 ? 0 : 100;
 }
 
 

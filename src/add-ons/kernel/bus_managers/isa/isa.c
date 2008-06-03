@@ -34,7 +34,7 @@
 //	(for example, the Pegasos (PPC based) also has an ISA bus)
 
 
-#define ISA_MODULE_NAME "bus_managers/isa/root/device_v1"
+#define ISA_MODULE_NAME "bus_managers/isa/root/driver_v1"
 
 device_manager_info *pnp;
 
@@ -73,73 +73,52 @@ unlock_isa_dma_channel(long channel)
 }
 
 
-#if 0
+//	#pragma mark - driver module API
+
+
 static status_t
-isa_init_driver(device_node_handle node, void *user_cookie, void **cookie)
+isa_init_driver(device_node *node, void **cookie)
 {
-	*cookie = NULL;
+	*cookie = node;
 	return B_OK;
 }
 
 
-static status_t
+static void
 isa_uninit_driver(void *cookie)
 {
-	return B_OK;
 }
 
 
 static float
-isa_supports_device(device_node_handle parent, bool *_noConnection)
+isa_supports_device(device_node *parent)
 {
-	char *bus;
+	const char *bus;
 
 	// make sure parent is really pnp root
-	if (pnp->get_attr_string(parent, B_DRIVER_BUS, &bus, false))
+	if (pnp->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
 		return B_ERROR;
 
-	if (strcmp(bus, "root")) {
-		free(bus);
+	if (strcmp(bus, "root"))
 		return 0.0;
-	}
 
-	free(bus);
 	return 1.0;
 }
 
 
 static status_t
-isa_register_device(device_node_handle parent)
+isa_register_device(device_node *parent)
 {
 	static const device_attr attrs[] = {
-		// info about ourself
-		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ISA_MODULE_NAME }},
-		// unique connection
-		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "ISA" }},
-
-		// mark as being a bus
-		{ PNP_BUS_IS_BUS, B_UINT8_TYPE, { ui8: 1 }},
-
 		// tell where to look for child devices
-		{ B_DRIVER_BUS, B_STRING_TYPE, { string: "isa" }},
-		{ B_DRIVER_FIND_DEVICES_ON_DEMAND, B_UINT8_TYPE, { ui8: 1 }},
-		{ B_DRIVER_EXPLORE_LAST, B_UINT8_TYPE, { ui8: 1 }},
-		{ NULL }
+		{B_DEVICE_BUS, B_STRING_TYPE, {string: "isa" }},
+		{B_DEVICE_FLAGS, B_UINT32_TYPE,
+			{ui32: B_FIND_CHILD_ON_DEMAND | B_FIND_MULTIPLE_CHILDREN}},
+		{}
 	};
 
-	return pnp->register_device(parent, attrs, NULL, NULL);
+	return pnp->register_node(parent, ISA_MODULE_NAME, attrs, NULL, NULL);
 }
-
-
-static void
-isa_get_paths(const char ***_bus, const char ***_device)
-{
-	static const char *kBus[] = {"root", NULL};
-
-	*_bus = kBus;
-	*_device = NULL;
-}
-#endif
 
 
 static status_t
@@ -185,27 +164,19 @@ static isa_module_info isa_module = {
 	&unlock_isa_dma_channel
 };
 
-#if 0
 static isa2_module_info isa2_module = {
 	{
 		{
-			{
-				ISA_MODULE_NAME,
-				0,
-				std_ops
-			},
-
-			isa_supports_device,
-			isa_register_device,
-			isa_init_driver,
-			isa_uninit_driver,
-			NULL,	// removed device
-			NULL,	// cleanup device
-			isa_get_paths,
+			ISA_MODULE_NAME,
+			0,
+			std_ops
 		},
 
-		// as ISA relies on device drivers to detect their devices themselves,
-		// we don't have an universal rescan method
+		isa_supports_device,
+		isa_register_device,
+		isa_init_driver,
+		isa_uninit_driver,
+		NULL,	// removed device
 		NULL,	// register child devices
 		NULL,	// rescan bus
 	},
@@ -218,10 +189,9 @@ static isa2_module_info isa2_module = {
 
 	arch_start_isa_dma,
 };
-#endif
 
 module_info *modules[] = {
 	(module_info *)&isa_module,
-//	(module_info *)&isa2_module,
+	(module_info *)&isa2_module,
 	NULL
 };
