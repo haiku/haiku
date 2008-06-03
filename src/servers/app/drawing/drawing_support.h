@@ -5,8 +5,8 @@
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  */
-#ifndef SUPPORT_H
-#define SUPPORT_H
+#ifndef DRAWING_SUPPORT_H
+#define DRAWING_SUPPORT_H
 
 
 #include <SupportDefs.h>
@@ -42,7 +42,7 @@ gfxcpy(uint8* dst, const uint8* src, int32 numBytes)
 		dst += numBytesBegin - numBytes;
 		src += numBytesBegin - numBytes;
 		numBytesBegin = numBytes;
-	
+
 		uint32* d32 = (uint32*)dst;
 		uint32* s32 = (uint32*)src;
 		while (numBytes >= 4) {
@@ -52,7 +52,7 @@ gfxcpy(uint8* dst, const uint8* src, int32 numBytes)
 		// update original pointers
 		dst += numBytesBegin - numBytes;
 		src += numBytesBegin - numBytes;
-	
+
 		while (numBytes > 0) {
 			*dst++ = *src++;
 			numBytes--;
@@ -142,9 +142,6 @@ blend_line32(uint8* buffer, int32 pixels, uint8 r, uint8 g, uint8 b, uint8 a)
 	gfxcpy32(buffer, tempBuffer, pixels * 4);
 }
 
-void
-align_rect_to_pixels(BRect* rect);
+void align_rect_to_pixels(BRect* rect);
 
-#endif // SUPPORT_H
-
-
+#endif	// DRAWING_SUPPORT_H
