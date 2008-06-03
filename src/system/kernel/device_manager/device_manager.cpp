@@ -1325,7 +1325,6 @@ device_node::Register(device_node* parent)
 	}
 	if (registered > 0) {
 		fRegistered = true;
-		return B_OK;
 	}
 
 	// Register the children the driver wants
@@ -1355,7 +1354,7 @@ device_node::Register(device_node* parent)
 }
 
 
-/*!	Registers any children that are identified via the B_DRIVER_FIXED_CHILD
+/*!	Registers any children that are identified via the B_DEVICE_FIXED_CHILD
 	attribute.
 	If any of these children cannot be registered, this call will fail (we
 	don't remove children we already registered up to this point in this case).
@@ -2047,7 +2046,7 @@ device_node::FindChild(const char* moduleName) const
 
 /*!	This returns the priority or importance of this node. Nodes with higher
 	priority are registered/probed first.
-	Currently, only the B_FIND_MULITPLE_CHILDREN flag alters the priority;
+	Currently, only the B_FIND_MULTIPLE_CHILDREN flag alters the priority;
 	it might make sense to be able to directly set the priority via an
 	attribute.
 */
