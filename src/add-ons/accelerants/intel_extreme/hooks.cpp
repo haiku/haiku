@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -104,7 +104,7 @@ get_accelerant_hook(uint32 feature, void *data)
 
 		// overlay
 		case B_OVERLAY_COUNT:
-			return (void*)intel_overlay_supported_spaces;
+			return (void*)intel_overlay_count;
 		case B_OVERLAY_SUPPORTED_SPACES:
 			return (void*)intel_overlay_supported_spaces;
 		case B_OVERLAY_SUPPORTED_FEATURES:
