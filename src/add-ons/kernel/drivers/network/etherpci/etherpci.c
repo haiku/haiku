@@ -39,9 +39,14 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 /* diagnostic debug flags - compile in here or set while running with debugger "AcmeRoadRunner" command */
 #define DEFAULT_DEBUG_FLAGS ( ERR | INFO | WARN | FUNCTION )
 
-#define ETHER_DEBUG(mask, enabled, format, args...) \
-	do { if (mask & enabled) \
-		dprintf(format , ##args); } while (0)
+//#define TRACE_ETHERPCI
+#ifdef TRACE_ETHERPCI
+#	define ETHER_DEBUG(mask, enabled, format, args...) \
+		do { if (mask & enabled) \
+			dprintf(format , ##args); } while (0)
+#else
+#	define ETHER_DEBUG(mask, enabled, format, args...) ;
+#endif
 
 
 static pci_module_info		*gPCIModInfo;
@@ -1494,7 +1499,7 @@ open_hook(const char *name, uint32 flags, void **cookie)
 	data->nonblocking = 0;
 
 	data->debug = DEFAULT_DEBUG_FLAGS;
-	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": open %s dev=%x\n", name, data);
+	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": open %s dev=%p\n", name, data);
 	
 #if DEBUGGER_COMMAND
 	gdev = data;
@@ -1543,7 +1548,7 @@ static status_t
 close_hook(void *_data)
 {
 	etherpci_private_t *data = (etherpci_private_t *)_data;
-	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": close dev=%x\n", data);
+	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": close dev=%p\n", data);
 
 	/*
 	 * Force pending reads and writes to terminate
@@ -1613,7 +1618,7 @@ free_hook(void *_data)
 	etherpci_private_t *data = (etherpci_private_t *)_data;
 	int32 mask;
 
-	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": free %s dev=%x\n", data);
+	ETHER_DEBUG(FUNCTION, data->debug, kDevName ": free dev=%p\n", data);
 
 #if !__INTEL__
 	delete_area(data->ioarea);
@@ -1706,7 +1711,7 @@ control_hook(void *_data, uint32 msg, void *buf, size_t len)
 			return B_OK;
 
 		case ETHER_ADDMULTI:
-			ETHER_DEBUG(FUNCTION, data->debug, kDevName ": control: DO_MULTI %x\n");
+			ETHER_DEBUG(FUNCTION, data->debug, kDevName ": control: DO_MULTI\n");
 			return domulti(data, (char *)buf);
 	}
 
