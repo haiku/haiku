@@ -17,6 +17,7 @@
 #include <int.h>
 #include <kernel.h>
 #include <smp.h>
+#include <system_info.h>
 #include <thread.h>
 #include <tracing.h>
 #include <vm.h>
@@ -832,6 +833,7 @@ static status_t
 syslog_init(struct kernel_args *args)
 {
 	status_t status;
+	int32 length = 0;
 
 	if (!sSyslogOutputEnabled)
 		return B_OK;
@@ -858,6 +860,11 @@ syslog_init(struct kernel_args *args)
 	if (args->debug_output != NULL)
 		syslog_write((const char*)args->debug_output, args->debug_size);
 
+	char revisionBuffer[64];
+	length = snprintf(revisionBuffer, sizeof(revisionBuffer),
+		"Welcome to syslog debug output!\nHaiku revision: %lu\n",
+		get_haiku_revision());
+	syslog_write(revisionBuffer, length);
 	return B_OK;
 
 err3:
