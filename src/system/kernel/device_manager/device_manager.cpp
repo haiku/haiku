@@ -1317,14 +1317,11 @@ device_node::Register(device_node* parent)
 		// We don't uninitialize the driver - this is done by the caller
 		// in order to save reinitializing during driver loading.
 
-	uint32 registered;
-	status = _RegisterFixed(registered);
+	uint32 registeredFixedCount;
+	status = _RegisterFixed(registeredFixedCount);
 	if (status != B_OK) {
 		UninitUnusedDriver();
 		return status;
-	}
-	if (registered > 0) {
-		fRegistered = true;
 	}
 
 	// Register the children the driver wants
@@ -1340,6 +1337,13 @@ device_node::Register(device_node* parent)
 			fRegistered = true;
 			return B_OK;
 		}
+	}
+
+	if (registeredFixedCount > 0) {
+		// Nodes with fixed children cannot have any dynamic children, so bail
+		// out here
+		fRegistered = true;
+		return B_OK;
 	}
 
 	// Register all possible child device nodes
