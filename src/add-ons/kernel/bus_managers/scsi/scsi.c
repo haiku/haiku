@@ -4,7 +4,6 @@
  */
 
 #include "scsi_internal.h"
-#include <pnp_devfs.h>
 
 locked_pool_interface *locked_pool;
 device_manager_info *pnp;

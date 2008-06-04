@@ -1,7 +1,7 @@
 /* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "IOScheduler.h"
@@ -41,9 +41,9 @@ IORequest::IORequest(void *_cookie, off_t _offset, const void *_buffer, size_t _
 //	#pragma mark -
 
 
-IOScheduler::IOScheduler(const char *name, pnp_devfs_driver_info *hooks)
+IOScheduler::IOScheduler(const char* name, device_module_info* module)
 	:
-	fDeviceHooks(hooks)
+	fModule(module)
 {
 	mutex_init(&fLock, "I/O scheduler queue");
 
@@ -82,9 +82,9 @@ IOScheduler::Process(IORequest &request)
 	// ToDo: assume locked memory?
 
 	if (request.write)
-		return fDeviceHooks->write(request.cookie, request.offset, (const void *)request.virtual_address, &request.size);
+		return fModule->write(request.cookie, request.offset, (const void *)request.virtual_address, &request.size);
 
-	return fDeviceHooks->read(request.cookie, request.offset, (void *)request.virtual_address, &request.size);
+	return fModule->read(request.cookie, request.offset, (void *)request.virtual_address, &request.size);
 }
 
 

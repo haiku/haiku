@@ -450,47 +450,6 @@ translate_partition_access(devfs_partition* partition, off_t& offset,
 }
 
 
-static pnp_devfs_driver_info *
-create_new_driver_info(device_hooks *ops, int32 version)
-{
-	pnp_devfs_driver_info *info = (pnp_devfs_driver_info *)malloc(
-		sizeof(pnp_devfs_driver_info));
-	if (info == NULL)
-		return NULL;
-
-	memset(info, 0, sizeof(driver_module_info));
-
-	info->open = NULL;
-		// ops->open is used directly for old devices
-	info->close = ops->close;
-	info->free = ops->free;
-	info->control = ops->control;
-	info->read = ops->read;
-	info->write = ops->write;
-		// depends on api_version
-	info->select = NULL;
-	info->deselect = NULL;
-
-	info->read_pages = NULL;
-	info->write_pages = NULL;
-		// old devices can't know how to do physical page access
-
-	if (version >= 2) {
-		// According to Be newsletter, vol II, issue 36,
-		// version 2 added readv/writev, which we don't support, but also
-		// select/deselect.
-		info->select = ops->select;
-		info->deselect = ops->deselect;
-
-		// ops->readv;
-		// ops->writev;
-		// we don't implement scatter-gather atm, so ignore those.
-	}
-
-	return info;
-}
-
-
 static status_t
 get_node_for_path(struct devfs *fs, const char *path,
 	struct devfs_vnode **_node)

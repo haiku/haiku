@@ -10,9 +10,7 @@
 */
 
 #include <block_io.h>
-#include <module.h>
 #include <locked_pool.h>
-#include <pnp_devfs.h>
 #include <device_manager.h>
 
 #include <stdlib.h>
