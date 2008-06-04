@@ -11,7 +11,7 @@ device driver architecture introduced with BeOS.</p>
 although most of its details are already specificed.</p>
 
 
-<h3>1. The Basics</h3>
+<h2>1. The Basics</h2>
 
 <p>The device manager functionality builds upon <i>device_node</i> objects.
 Every driver in the system publishes one or more of such nodes, building a
@@ -36,7 +36,7 @@ and registers a child node for each device on the bus.</p>
 userland applications. All drivers and devices are kernel modules.</p>
 
 
-<h3>2. Exploring the Device Tree</h3>
+<h2>2. Exploring the Device Tree</h2>
 
 <p>So how does it all work? When building the initial device tree, the system only
 explores a minimum of device drivers only, resulting in a tree that basically
@@ -55,10 +55,15 @@ device manager will then completely explore all device nodes of that type.</p>
 are in a matching module directory. In the above example of a disk driver, this
 would be either in "busses/scsi", "busses/ide", "drivers/disk", ...</p>
 
-TODO: untyped/generic busses are not yet supported!
+<p>For untyped or generic busses, it will use the context information gained
+from the devfs query directly, and will search for drivers in that sub directory
+only. The only exception to this rule are the devfs directories "disk", "ports",
+and "bus", which will also allow to search matching drivers in "busses". While
+this is relatively limited, it is a good way to cut down the number of drivers
+to be loaded.</p>
 
 
-<h3>3. Writing a Driver</h3>
+<h2>3. Writing a Driver</h2>
 
 <p>The device manager assumes the following API from a driver module:</p>
 <ul>
@@ -92,6 +97,7 @@ TODO: untyped/generic busses are not yet supported!
 <li><b>resume()</b><br>
 	Resumes a device from a previous sleep mode.</li>
 </ul>
+
 <p>To ensure that a module exports this API, it <b>must</b> end its module name
 with "driver_v1" to denote the version of the API it supports. Note that
 <b>suspend()</b> and <b>resume()</b> are currently never called, as Haiku has
@@ -100,6 +106,7 @@ no power management implemented yet.</p>
 <p>If your driver can give the device it is attached to a nice name that can be
 presented to the user, it should add the <b>B_DEVICE_PRETTY_NAME</b> attribute
 to the device node.
+
 <p>The <b>B_DEVICE_UNIQUE_ID</b> should be used in case the device has a unique
 ID that can be used to identify it, and also differentiate it from other devices
 of the same model and vendor. This information will be added to the file system
@@ -107,14 +114,20 @@ attributes of all devices published by your driver, so that user applications
 can identify, say, a USB printer no matter what USB slot it is attached to, and
 assign it additional data, like paper configuration, or recognize it as the
 default printer.</p>
+
 <p>If your driver implements an API that is used by a support or bus module, you
 will usually use the <b>B_DEVICE_FIXED_CHILD</b> attribute to specify exactly
 which child device node you will be talking to. If you support several child
 nodes, you may want to have a closer look at the section explaining
 <a href="#bus_driver">how to write a bus driver</a>.</p>
 
+<p>In addition to the child nodes a driver registers itself, a driver can either
+have dynamic children or fixed children, never both. Also, fixed children are
+registered before <b>register_child_devices()</b> is called, while dynamic
+children are registered afterwards.</p>
 
-<h3>4. Publishing a Device</h3>
+
+<h2>4. Publishing a Device</h2>
 
 To publish a device entry in the device file system under <i>/dev</i>, all your
 driver has to do is to call the
@@ -166,7 +179,7 @@ the device manager delivers for this.</p>
 </ul>
 
 
-<h3>5. <a name="bus_driver">Writing a Bus Driver</a></h3>
+<h2>5. <a name="bus_driver">Writing a Bus Driver</a></h2>
 
 <p>A bus driver is a driver that represents a bus where one or more arbitrary
 devices can be attached to.</p>
@@ -211,10 +224,27 @@ here, which causes the driver only to be searched when the system asks for it.
 
 <h4>5.2. Writing a Simple Bus Driver</h4>
 
-TODO: support for these drivers is still missing!
+<p>A bus can be simple in a number of ways:</p>
+<ol>
+<li>It may not know how many or if any devices are attached to it</li>
+<li>It cannot retrieve any type information about the devices it has, but
+	knows all devices that are attached to it</li>
+</ol>
+
+<p>An example of the latter would be the Zorro bus of the Amiga - it only has
+information about the vendor and device ID, but no type information. It should
+be implemented like an intelligent bus, though, with the type information simply
+omitted.</p>
+
+<p>Therefore, this section is about the former case, that is, a simple bus like
+the ISA bus. Since it doesn't know anything about its children, it does not
+publish any child nodes, instead, it will just specify the
+B_FIND_MULTIPLE_CHILDREN and B_FIND_CHILD_ON_DEMAND flags for its device node.
+Since there are no additional informations about this bus, the device manager
+will assume a simple bus, and will try to find drivers on demand only.</p>
 
 
-<h3>6. Open Issues</h3>
+<h2>6. Open Issues</h2>
 
 While most of the new device manager is fledged out, there are some areas that
 could use improvements or are problematic under certain requirements. Also, some
@@ -244,6 +274,40 @@ We would then need a <b>request_version()</b> or <b>set_version()</b> function
 of the parent node this device node wants to talk to.</p>
 
 <h4>6.5. Unregistering Nodes</h4>
+
+<h4>6.6. Support for generic drivers is missing</h4>
+
+<p>This should probably be done by simply adding a simple bus driver named
+"generic" that generic drivers need to ask for.</p>
+
+<h4>6.7. Mappings, And Other Optimizations</h4>
+
+<p>Due to the way the device tree is built, the device manager could remember
+which driver served a given device node. That way, it wouldn't need to search
+for a driver anymore, but could just pick it up. Practically, the device manager
+should cache the type (and/or vendor/device) information of a node, and assign
+one or more drivers (via module name) to this information. It should also
+remember negative outcome, that is if there is no driver supporting the
+hardware.</p>
+
+<p>This way, only the first boot would require an actual search for drivers, as
+subsequent boots would reuse the type-driver assignments. If a new driver is
+installed, the cached assignments would need to be updated immediately. If a
+driver has been installed outside of the running system, the device manager
+might want to create a hash per module directory to see if anything changed to
+flush the cache. Alternatively or additionally, the boot loader could have a
+menu causing the cache to be ignored.</p>
+
+<p>It would be nice to find a way for generic and simple busses to reduce the
+amount of searching necessary for them. One way would be to remember which
+driver supports which bus - but this information is currently only accessible
+derived from what the driver does, and is therefore not reliable or complete.
+A separately exported information would be necessary for this.</p>
+
+<p>Also, when looking for a generic or simple bus driver, actual directories
+could be omitted; currently, driver search is always recursive, as that's how
+the module mechanism is working. Eventually, we might want to extend the
+open_module_list_etc() call a bit more to accomplish that.</p>
 
 </body>
 </html>
