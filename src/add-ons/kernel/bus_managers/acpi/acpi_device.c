@@ -14,7 +14,7 @@
 typedef struct acpi_device_info {
 	char			*path;			// path
 	uint32			type;			// type	
-	device_node_handle	node;
+	device_node		*node;
 	char			name[32];		// name (for fast log)
 } acpi_device_info;
 
@@ -44,9 +44,9 @@ acpi_evaluate_method(acpi_device device, const char *method, acpi_object_type *r
 
 
 static status_t
-acpi_device_init_driver(device_node_handle node, void *user_cookie, void **cookie)
+acpi_device_init_driver(device_node *node, void **cookie)
 {
-	char *path;
+	const char *path;
 	acpi_device_info *device;
 	status_t status = B_OK;
 	uint32 type;
@@ -57,14 +57,12 @@ acpi_device_init_driver(device_node_handle node, void *user_cookie, void **cooki
 		return B_ERROR;
 	
 	device = malloc(sizeof(*device));
-	if (device == NULL) {
-		free(path);
+	if (device == NULL)
 		return B_NO_MEMORY;
-	}
 
 	memset(device, 0, sizeof(*device));
 
-	device->path = path;
+	device->path = strdup(path);
 	device->type = type;
 	device->node = node;
 
@@ -83,14 +81,13 @@ acpi_device_init_driver(device_node_handle node, void *user_cookie, void **cooki
 }
 
 
-static status_t
+static void
 acpi_device_uninit_driver(void *cookie)
 {
 	acpi_device_info *device = cookie;
 	
 	free(device->path);
 	free(device);
-	return B_OK;
 }
 
 
@@ -118,9 +115,9 @@ acpi_device_module_info gACPIDeviceModule = {
 		NULL,		// register device (our parent registered us)
 		acpi_device_init_driver,
 		acpi_device_uninit_driver,
-		NULL,		// removed
-		NULL,		// cleanup
-		NULL,		// get supported paths
+		NULL,	// register child devices
+		NULL,	// rescan devices
+		NULL,	// device removed
 	},
 	acpi_get_object_type,
 	acpi_get_object,

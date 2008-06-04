@@ -7,18 +7,18 @@
 #ifndef __ACPI_PRIV_H__
 #define __ACPI_PRIV_H__
 
+#include <device_manager.h>
 #include <KernelExport.h>
 #include <ACPI.h>
-#include <pnp_devfs.h>
 
 // name of ACPI root module
-#define ACPI_ROOT_MODULE_NAME 	"bus_managers/acpi/root/device_v1"
+#define ACPI_ROOT_MODULE_NAME 	"bus_managers/acpi/root/driver_v1"
 
 // name of ACPI device modules
-#define ACPI_DEVICE_MODULE_NAME "bus_managers/acpi/device_v1"
+#define ACPI_DEVICE_MODULE_NAME "bus_managers/acpi/driver_v1"
 
 // name of the ACPI namespace device
-#define ACPI_NS_DUMP_MODULE_NAME "drivers/power/namespace/acpi/device/v1"
+#define ACPI_NS_DUMP_DEVICE_MODULE_NAME "bus_managers/acpi/namespace/device_v1"
 
 
 extern device_manager_info *gDeviceManager;
@@ -28,7 +28,7 @@ extern device_manager_info *gDeviceManager;
 
 // ACPI root.
 typedef struct acpi_root_info {
-	bus_module_info info;
+	driver_module_info info;
 	
 	/* Fixed Event Management */
 	
@@ -61,7 +61,7 @@ typedef struct acpi_root_info {
 
 extern struct acpi_module_info acpi_module;
 
-extern pnp_devfs_driver_info acpi_ns_dump_module;
+extern struct device_module_info acpi_ns_dump_module;
 
 extern acpi_device_module_info gACPIDeviceModule;
 

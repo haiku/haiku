@@ -13,7 +13,7 @@
 
 
 typedef struct acpi_ns_device_info {
-	device_node_handle node;
+	device_node *node;
 	acpi_root_info	*acpi;
 	void	*acpi_cookie;
 } acpi_ns_device_info;
@@ -104,8 +104,9 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, void *buf, size_t* 
 ----- */
 
 static status_t
-acpi_namespace_open(acpi_ns_device_info *device, uint32 flags, void** cookie)
+acpi_namespace_open(void *_cookie, const char* path, int flags, void** cookie)
 {
+	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
 	dprintf("\nacpi_ns_dump: device_open\n");
 	*cookie = device;
 	
@@ -117,8 +118,9 @@ acpi_namespace_open(acpi_ns_device_info *device, uint32 flags, void** cookie)
 	acpi_namespace_read - handle read() calls
 ----- */
 static status_t
-acpi_namespace_read (acpi_ns_device_info *device, off_t position, void *buf, size_t* num_bytes)
+acpi_namespace_read(void *_cookie, off_t position, void *buf, size_t* num_bytes)
 {
+	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
 	size_t bytes = 0;
 	
 	if (position == 0) { // First read
@@ -143,7 +145,7 @@ acpi_namespace_read (acpi_ns_device_info *device, off_t position, void *buf, siz
 ----- */
 
 static status_t
-acpi_namespace_write (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+acpi_namespace_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	dprintf("acpi_ns_dump: device_write\n");
 	*num_bytes = 0;				/* tell caller nothing was written */
@@ -156,7 +158,7 @@ acpi_namespace_write (void* cookie, off_t position, const void* buffer, size_t* 
 ----- */
 
 static status_t
-acpi_namespace_control (void* cookie, uint32 op, void* arg, size_t len)
+acpi_namespace_control(void* cookie, uint32 op, void* arg, size_t len)
 {
 	dprintf("acpi_ns_dump: device_control\n");
 	return B_BAD_VALUE;
@@ -168,7 +170,7 @@ acpi_namespace_control (void* cookie, uint32 op, void* arg, size_t len)
 ----- */
 
 static status_t
-acpi_namespace_close (void* cookie)
+acpi_namespace_close(void* cookie)
 {
 	dprintf("acpi_ns_dump: device_close\n");
 	return B_OK;
@@ -180,7 +182,7 @@ acpi_namespace_close (void* cookie)
 	all i/o is complete.
 ----- */
 static status_t
-acpi_namespace_free (void* cookie)
+acpi_namespace_free(void* cookie)
 {
 	dprintf("acpi_ns_dump: device_free\n");
 
@@ -188,103 +190,59 @@ acpi_namespace_free (void* cookie)
 }
 
 
-static status_t
-acpi_namespace_init_device(device_node_handle node, void *user_cookie, void **cookie)
-{
-	acpi_ns_device_info *device;
-	status_t res;
+//	#pragma mark - device module API
 
-	device = (acpi_ns_device_info *)calloc(1, sizeof(*device));
+
+static status_t
+acpi_namespace_init_device(void *_cookie, void **cookie)
+{
+	device_node *node = (device_node *)_cookie;
+	status_t err;
+	
+	acpi_ns_device_info *device = (acpi_ns_device_info *)calloc(1, sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
 
 	device->node = node;
-
-	// register it everywhere
-	res = gDeviceManager->init_driver(gDeviceManager->get_parent(node), NULL, 
-			(driver_module_info **)&device->acpi, &device->acpi_cookie);
-	if (res != B_OK)
-		goto err;
-
+	err = gDeviceManager->get_driver(node, (driver_module_info **)&device->acpi,
+		(void **)&device->acpi_cookie);
+	if (err != B_OK) {
+		free(device);
+		return err;
+	}
+	
 	*cookie = device;
 	return B_OK;
+}
 
-err:
+
+static void
+acpi_namespace_uninit_device(void *_cookie)
+{
+	acpi_ns_device_info *device = (acpi_ns_device_info *)_cookie;
 	free(device);
-	return res;
 }
 
 
-static status_t
-acpi_namespace_uninit_device(acpi_ns_device_info *device)
-{
-	gDeviceManager->uninit_driver(gDeviceManager->get_parent(device->node));
-	free(device);
-
-	return B_OK;
-}
-
-
-static status_t
-acpi_namespace_added(device_node_handle node)
-{
-	device_attr attrs[] = {
-		{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ACPI_NS_DUMP_MODULE_NAME }},
-	
-		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "namespace" }},
-		// we want devfs on top of us (who wouldn't?)
-		{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
-		// tell which name we want to have in devfs
-		{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: "acpi/namespace" }},
-		{ NULL }
-	};
-
-	return gDeviceManager->register_device(node, attrs, NULL, &node);
-}
-
-
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
-
-
-pnp_devfs_driver_info acpi_ns_dump_module = {
+struct device_module_info acpi_ns_dump_module = {
 	{
-		{
-			ACPI_NS_DUMP_MODULE_NAME,
-			0,			
-			std_ops
-		},
-
-		NULL,
-		acpi_namespace_added,
-		acpi_namespace_init_device,
-		(status_t (*) (void *))acpi_namespace_uninit_device,
+		ACPI_NS_DUMP_DEVICE_MODULE_NAME,
+		0,
 		NULL
 	},
 
-	(status_t (*)(void *, uint32, void **)) 		&acpi_namespace_open,
+	acpi_namespace_init_device,
+	acpi_namespace_uninit_device,
+	NULL,
+		
+	acpi_namespace_open,
 	acpi_namespace_close,
 	acpi_namespace_free,
-	(status_t (*)(void *, uint32, void *, size_t))	&acpi_namespace_control,
-
 	acpi_namespace_read,
 	acpi_namespace_write,
-
 	NULL,
-	NULL,
+	acpi_namespace_control,
 
 	NULL,
 	NULL
 };
-
-
