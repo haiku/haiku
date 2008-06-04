@@ -7,8 +7,7 @@
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.
  */
-
-
+#include "debugger_keymaps.h"
 #include "ps2_defs.h"
 
 #include <KernelExport.h>
@@ -67,30 +66,8 @@ enum keycodes {
 	F12				= 88,
 };
 
-static const char kUnshiftedKeymap[128] = {
-	0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
-	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
-	'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
-	'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	'\\', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
-
-static const char kShiftedKeymap[128] = {
-	0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 8, '\t',
-	'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0, 'A', 'S',
-	'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
-	'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-};
 
 static const uint32 kSerialBaudRate = 115200;
-
 static uint16 sSerialBasePort = 0x3f8;
 	// COM1 is the default debug output port
 
@@ -316,6 +293,9 @@ arch_debug_blue_screen_getchar(void)
 						if (c >= 'A' && c <= 'Z')
 							return 0x1f & c;
 					}
+
+					if (altPressed)
+						return kAltedKeymap[key];
 
 					return shiftPressed
 						? kShiftedKeymap[key] : kUnshiftedKeymap[key];
