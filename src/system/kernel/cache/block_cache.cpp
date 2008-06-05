@@ -283,9 +283,9 @@ static status_t write_cached_block(block_cache *cache, cached_block *block,
 
 
 static DoublyLinkedList<block_cache> sCaches;
-static mutex sCachesLock;
+static mutex sCachesLock = MUTEX_INITIALIZER("block caches");
 static sem_id sEventSemaphore;
-static mutex sNotificationsLock;
+static mutex sNotificationsLock = MUTEX_INITIALIZER("block cache notifications");
 static thread_id sNotifierWriterThread;
 static DoublyLinkedListLink<block_cache> sMarkCache;
 	// TODO: this only works if the link is the first entry of block_cache
@@ -1621,9 +1621,6 @@ block_cache_init(void)
 		8, 0, CACHE_LARGE_SLAB, NULL, NULL, NULL, NULL);
 	if (sBlockCache == NULL)
 		return B_NO_MEMORY;
-
-	mutex_init(&sCachesLock, "block caches");
-	mutex_init(&sNotificationsLock, "block cache notifications");
 
 	new (&sCaches) DoublyLinkedList<block_cache>;
 		// manually call constructor
