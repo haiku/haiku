@@ -393,7 +393,7 @@ read_line(char *buffer, int32 maxLength,
 	int32 position = 0;
 	int32 length = 0;
 	bool done = false;
-	char c;
+	char c = 0;
 
 	char (*readChar)(void);
 	if (sBlueScreenOutput)
@@ -403,7 +403,7 @@ read_line(char *buffer, int32 maxLength,
 
 	while (!done) {
 		bool hasChar = false;
-		for (int32 i = 0; i < kMaxDebuggerModules; i++) {
+		for (uint32 i = 0; i < kMaxDebuggerModules; i++) {
 			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_getchar) {
 				int getChar = sDebuggerModules[i]->debugger_getchar();
 				if (getChar >= 0) {
