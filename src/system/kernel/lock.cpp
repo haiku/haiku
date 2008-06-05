@@ -389,7 +389,7 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 {
 #ifdef KDEBUG
 	if (!kernel_startup && !threadsLocked && !are_interrupts_enabled()) {
-		panic("_mutex_unlock(): called with interrupts disabled for lock %p",
+		panic("_mutex_lock(): called with interrupts disabled for lock %p",
 			lock);
 	}
 #endif
@@ -400,6 +400,11 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
 #ifdef KDEBUG
+	if (!kernel_startup && lock->holder == thread_get_current_thread_id()) {
+		panic("_mutex_lock(): double lock of %p by thread %ld", lock,
+			lock->holder);
+	}
+
 	if (lock->holder <= 0) {
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
