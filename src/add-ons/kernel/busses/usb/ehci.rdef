@@ -5,11 +5,11 @@
 resource app_signature "application/x-vnd.haiku-ehci";
 
 resource app_version {
-	major  = 0,
+	major  = 1,
 	middle = 0,
-	minor  = 1,
+	minor  = 0,
 	variety = 0,
 	internal = 0,
 	short_info = "EHCI host controller driver",
-	long_info = "Haiku EHCI HCD - Copyright 2006, Haiku Inc."
+	long_info = "Haiku EHCI HCD - Copyright 2006-2008, Haiku Inc."
 };
