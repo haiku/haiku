@@ -2,8 +2,9 @@
 #define KERNEL_DEBUGGER_CONFIG_H
 
 // Available keymaps:
-//	'us'	default US keymap
+//	'dv'	dvorak keymap
 //	'sg'	swiss-german keymap
+//	'us'	default US keymap
 #define	KDL_KEYMAP		'us'
 
 
