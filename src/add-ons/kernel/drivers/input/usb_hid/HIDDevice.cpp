@@ -113,8 +113,9 @@ HIDDevice::MakeHIDDevice(usb_device device,
 	const usb_device_descriptor *deviceDescriptor
 		= gUSBModule->get_device_descriptor(device);
 	char outputFile[128];
-	sprintf(outputFile, "/tmp/usb_hid_report_descriptor_%04x_%04x.bin",
-		deviceDescriptor->vendor_id, deviceDescriptor->product_id);
+	sprintf(outputFile, "/tmp/usb_hid_report_descriptor_%04x_%04x_%lu.bin",
+		deviceDescriptor->vendor_id, deviceDescriptor->product_id,
+		interfaceIndex);
 	int fd = open(outputFile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd >= 0) {
 		write(fd, reportDescriptor, descriptorLength);
