@@ -402,7 +402,20 @@ read_line(char *buffer, int32 maxLength,
 		readChar = arch_debug_serial_getchar;
 
 	while (!done) {
-		c = readChar();
+		bool hasChar = false;
+		for (int32 i = 0; i < kMaxDebuggerModules; i++) {
+			if (sDebuggerModules[i] && sDebuggerModules[i]->debugger_getchar) {
+				int getChar = sDebuggerModules[i]->debugger_getchar();
+				if (getChar >= 0) {
+					hasChar = true;
+					c = (char)getChar;
+					break;
+				}
+			}
+		}
+
+		if (!hasChar)
+			c = readChar();
 
 		switch (c) {
 			case '\n':
