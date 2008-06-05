@@ -16,7 +16,6 @@ extern "C" {
 #endif
 
 status_t driver_settings_init(struct kernel_args *args);
-status_t driver_settings_init_post_sem(struct kernel_args *args);
 
 #ifdef __cplusplus
 }

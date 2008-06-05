@@ -194,11 +194,11 @@ public:
 static area_id sNextAreaID;
 static hash_table *sAreaHash;
 static sem_id sAreaHashLock;
-static mutex sMappingLock;
-static mutex sAreaCacheLock;
+static mutex sMappingLock = MUTEX_INITIALIZER("page mappings");
+static mutex sAreaCacheLock = MUTEX_INITIALIZER("area->cache");
 
 static off_t sAvailableMemory;
-static mutex sAvailableMemoryLock;
+static mutex sAvailableMemoryLock = MUTEX_INITIALIZER("available memory lock");
 
 #if DEBUG_CACHE_LIST
 
@@ -3955,13 +3955,10 @@ vm_init_post_sem(kernel_args *args)
 	// since we're still single threaded and only the kernel address space exists,
 	// it isn't that hard to find all of the ones we need to create
 
-	mutex_init(&sAvailableMemoryLock, "available memory lock");
 	arch_vm_translation_map_init_post_sem(args);
 	vm_address_space_init_post_sem();
 
 	sAreaHashLock = create_sem(WRITE_COUNT, "area hash");
-	mutex_init(&sAreaCacheLock, "area->cache");
-	mutex_init(&sMappingLock, "page mappings");
 
 	slab_init_post_sem();
 	return heap_init_post_sem();

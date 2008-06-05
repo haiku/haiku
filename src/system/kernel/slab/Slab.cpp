@@ -164,7 +164,7 @@ struct depot_cpu_store {
 
 
 static ObjectCacheList sObjectCaches;
-static mutex sObjectCacheListLock;
+static mutex sObjectCacheListLock = MUTEX_INITIALIZER("object cache list");
 
 static uint8 *sInitialBegin, *sInitialLimit, *sInitialPointer;
 static kernel_args *sKernelArgs;
@@ -1454,8 +1454,6 @@ slab_init(kernel_args *args, addr_t initialBase, size_t initialSize)
 void
 slab_init_post_sem()
 {
-	mutex_init(&sObjectCacheListLock, "object cache list");
-
 	ObjectCacheList::Iterator it = sObjectCaches.GetIterator();
 
 	while (it.HasNext()) {

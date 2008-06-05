@@ -156,8 +156,6 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 		// now we can create and use semaphores
 		TRACE("init VM semaphores\n");
 		vm_init_post_sem(&sKernelArgs);
-		TRACE("init driver_settings\n");
-		driver_settings_init_post_sem(&sKernelArgs);
 		TRACE("init generic syscall\n");
 		generic_syscall_init();
 		smp_init_post_generic_syscalls();

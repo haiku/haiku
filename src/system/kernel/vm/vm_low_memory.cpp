@@ -50,7 +50,7 @@ static const size_t kCriticalLimit = 32;
 static int32 sLowMemoryState = B_NO_LOW_MEMORY;
 static bigtime_t sLastMeasurement;
 
-static mutex sLowMemoryMutex;
+static mutex sLowMemoryMutex = MUTEX_INITIALIZER("low memory");
 static sem_id sLowMemoryWaitSem;
 static HandlerList sLowMemoryHandlers;
 
@@ -184,8 +184,6 @@ vm_low_memory_init(void)
 status_t
 vm_low_memory_init_post_thread(void)
 {
-	mutex_init(&sLowMemoryMutex, "low memory");
-	
 	sLowMemoryWaitSem = create_sem(0, "low memory wait");
 	if (sLowMemoryWaitSem < B_OK)
 		return sLowMemoryWaitSem;

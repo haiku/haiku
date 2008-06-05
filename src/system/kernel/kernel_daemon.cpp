@@ -33,7 +33,7 @@ struct daemon : DoublyLinkedListLinkImpl<struct daemon> {
 
 typedef DoublyLinkedList<struct daemon> DaemonList;
 
-static mutex sDaemonMutex;
+static mutex sDaemonMutex = MUTEX_INITIALIZER("kernel daemon");
 static DaemonList sDaemons;
 
 
@@ -130,12 +130,9 @@ register_kernel_daemon(daemon_hook function, void* arg, int frequency)
 extern "C" status_t
 kernel_daemon_init(void)
 {
-	thread_id thread;
-
-	mutex_init(&sDaemonMutex, "kernel daemon");
 	new(&sDaemons) DaemonList;
 
-	thread = spawn_kernel_thread(&kernel_daemon, "kernel daemon",
+	thread_id thread = spawn_kernel_thread(&kernel_daemon, "kernel daemon",
 		B_LOW_PRIORITY, NULL);
 	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 

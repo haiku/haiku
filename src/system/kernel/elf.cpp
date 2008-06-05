@@ -59,9 +59,11 @@ typedef struct elf_linked_image {
 static hash_table *sImagesHash;
 
 static struct elf_image_info *sKernelImage = NULL;
-static mutex sImageMutex;		// guards sImagesHash
-static mutex sImageLoadMutex;	// serializes loading/unloading add-ons
-								// locking order sImageLoadMutex -> sImageMutex
+static mutex sImageMutex = MUTEX_INITIALIZER("kimages_lock");
+	// guards sImagesHash
+static mutex sImageLoadMutex = MUTEX_INITIALIZER("kimages_load_lock");
+	// serializes loading/unloading add-ons locking order
+	// sImageLoadMutex -> sImageMutex
 static bool sInitialized = false;
 
 
@@ -1784,9 +1786,6 @@ elf_init(kernel_args *args)
 	struct preloaded_image *image;
 
 	image_init();
-
-	mutex_init(&sImageMutex, "kimages_lock");
-	mutex_init(&sImageLoadMutex, "kimages_load_lock");
 
 	sImagesHash = hash_init(IMAGE_HASH_SIZE, 0, image_compare, image_hash);
 	if (sImagesHash == NULL)

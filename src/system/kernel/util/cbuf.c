@@ -44,7 +44,7 @@ struct cbuf {
 #define CBUF_BITMAP_SIZE (CBUF_REGION_SIZE / CBUF_LENGTH)
 
 static cbuf *sFreeBufferList;
-static mutex sFreeBufferListMutex;
+static mutex sFreeBufferListMutex = MUTEX_INITIALIZER("cbuf_free_list");
 static cbuf *sFreeBufferNoBlockList;
 static spinlock sNoBlockSpinlock;
 
@@ -949,8 +949,6 @@ cbuf_init(void)
 
 	// add the debug command
 	add_debugger_command("cbuf_freelist", &dbg_dump_cbuf_freelists, "Dumps the cbuf free lists");
-
-	mutex_init(&sFreeBufferListMutex, "cbuf_free_list");
 
 	// errors are fatal, that's why we don't clean up here
 

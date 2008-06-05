@@ -169,7 +169,7 @@ struct advisory_locking {
 	}
 };
 
-static mutex sFileSystemsMutex;
+static mutex sFileSystemsMutex = MUTEX_INITIALIZER("vfs_lock");
 
 /*!	\brief Guards sMountsTable.
 
@@ -177,7 +177,7 @@ static mutex sFileSystemsMutex;
 	Manipulation of the fs_mount structures themselves
 	(and their destruction) requires different locks though.
 */
-static mutex sMountMutex;
+static mutex sMountMutex = MUTEX_INITIALIZER("vfs_mount_lock");
 
 /*!	\brief Guards mount/unmount operations.
 
@@ -201,7 +201,8 @@ static recursive_lock sMountOpLock;
 
 	The thread trying to lock the must not hold sVnodeMutex.
 */
-static mutex sVnodeCoveredByMutex;
+static mutex sVnodeCoveredByMutex
+	= MUTEX_INITIALIZER("vfs_vnode_covered_by_lock");
 
 /*!	\brief Guards sVnodeTable.
 
@@ -215,7 +216,7 @@ static mutex sVnodeCoveredByMutex;
 	You must not have this mutex held when calling create_sem(), as this
 	might call vfs_free_unused_vnodes().
 */
-static mutex sVnodeMutex;
+static mutex sVnodeMutex = MUTEX_INITIALIZER("vfs_vnode_lock");
 
 /*!	\brief Guards io_context::root.
 
@@ -223,7 +224,7 @@ static mutex sVnodeMutex;
 	The only operation allowed while holding this lock besides getting or
 	setting the field is inc_vnode_ref_count() on io_context::root.
 */
-static mutex sIOContextRootLock;
+static mutex sIOContextRootLock = MUTEX_INITIALIZER("io_context::root lock");
 
 #define VNODE_HASH_TABLE_SIZE 1024
 static hash_table *sVnodeTable;
@@ -4414,13 +4415,7 @@ vfs_init(kernel_args *args)
 
 	sRoot = NULL;
 
-	mutex_init(&sFileSystemsMutex, "vfs_lock");
-
 	recursive_lock_init(&sMountOpLock, "vfs_mount_op_lock");
-	mutex_init(&sMountMutex, "vfs_mount_lock");
-	mutex_init(&sVnodeCoveredByMutex, "vfs_vnode_covered_by_lock");
-	mutex_init(&sVnodeMutex, "vfs_vnode_lock");
-	mutex_init(&sIOContextRootLock, "io_context::root lock");
 
 	if (block_cache_init() != B_OK)
 		return B_ERROR;

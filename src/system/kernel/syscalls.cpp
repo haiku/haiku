@@ -55,7 +55,7 @@ struct generic_syscall {
 	generic_syscall	*previous;
 };
 
-static struct mutex sGenericSyscallLock;
+static mutex sGenericSyscallLock = MUTEX_INITIALIZER("generic syscall");
 static struct list sGenericSyscalls;
 
 
@@ -212,7 +212,6 @@ status_t
 generic_syscall_init(void)
 {
 	list_init(&sGenericSyscalls);
-	mutex_init(&sGenericSyscallLock, "generic syscall");
 
 #if	SYSCALL_TRACING
 	add_debugger_command_etc("straced", &dump_syscall_tracing,

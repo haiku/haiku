@@ -400,15 +400,14 @@ _mutex_lock(mutex* lock, bool threadsLocked)
 	// Might have been released after we decremented the count, but before
 	// we acquired the spinlock.
 #ifdef KDEBUG
-	if (!kernel_startup && lock->holder == thread_get_current_thread_id()) {
-		panic("_mutex_lock(): double lock of %p by thread %ld", lock,
-			lock->holder);
-	}
-
-	if (lock->holder <= 0) {
+	if (lock->holder < 0) {
 		lock->holder = thread_get_current_thread_id();
 		return B_OK;
-	}
+	} else if (lock->holder == thread_get_current_thread_id()) {
+		panic("_mutex_lock(): double lock of %p by thread %ld", lock,
+			lock->holder);
+	} else if (lock->holder == 0)
+		panic("_mutex_lock(): using unitialized lock %p", lock);
 #else
 	if ((lock->flags & MUTEX_FLAG_RELEASED) != 0) {
 		lock->flags &= ~MUTEX_FLAG_RELEASED;

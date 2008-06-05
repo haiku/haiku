@@ -88,7 +88,7 @@ enum assignment_mode {
 
 #ifdef _KERNEL_MODE
 static struct list sHandles;
-static mutex sLock;
+static mutex sLock = MUTEX_INITIALIZER("driver settings");
 #endif
 
 
@@ -650,14 +650,6 @@ driver_settings_init(kernel_args *args)
 		settings = settings->next;
 	}
 
-	return B_OK;
-}
-
-
-status_t
-driver_settings_init_post_sem(kernel_args *args)
-{
-	mutex_init(&sLock, "driver settings");
 	return B_OK;
 }
 #endif

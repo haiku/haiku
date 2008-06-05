@@ -43,7 +43,7 @@ static paddr_chunk_desc **virtual_pmappings; // will be one ptr per virtual chun
 static int first_free_vmapping;
 static int num_virtual_chunks;
 static queue mapped_paddr_lru;
-static mutex sMutex;
+static mutex sMutex = MUTEX_INITIALIZER("iospace_mutex");
 static sem_id sChunkAvailableSem;
 static int32 sChunkAvailableWaitingCounter;
 
@@ -282,7 +282,6 @@ generic_vm_physical_page_mapper_init(kernel_args *args,
 	memset(virtual_pmappings, 0, sizeof(paddr_chunk_desc *) * num_virtual_chunks);
 	first_free_vmapping = 0;
 	queue_init(&mapped_paddr_lru);
-	mutex_init(&sMutex, "iospace_mutex");
 	sChunkAvailableSem = -1;
 
 	TRACE(("generic_vm_physical_page_mapper_init: done\n"));

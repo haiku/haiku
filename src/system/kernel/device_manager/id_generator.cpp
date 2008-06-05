@@ -67,7 +67,7 @@ typedef DoublyLinkedList<id_generator> GeneratorList;
 
 
 GeneratorList sGenerators;
-static mutex sLock;
+static mutex sLock = MUTEX_INITIALIZER("id generator");
 
 
 /*!	Create new generator.
@@ -169,7 +169,6 @@ void
 dm_init_id_generator(void)
 {
 	new(&sGenerators) GeneratorList;
-	mutex_init(&sLock, "id generator");
 }
 
 

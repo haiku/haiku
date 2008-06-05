@@ -396,6 +396,8 @@ frame_buffer_console_init(kernel_args *args)
 	if (!args->frame_buffer.enabled)
 		return B_OK;
 
+	mutex_init(&sConsole.lock, "console_lock");
+
 	void *frameBuffer;
 	sConsole.area = map_physical_memory("vesa_fb",
 		(void *)args->frame_buffer.physical_buffer.start,
@@ -443,8 +445,6 @@ frame_buffer_console_init(kernel_args *args)
 status_t
 frame_buffer_console_init_post_modules(kernel_args *args)
 {
-	mutex_init(&sConsole.lock, "console_lock");
-
 	if (sConsole.frame_buffer == 0)
 		return B_OK;
 

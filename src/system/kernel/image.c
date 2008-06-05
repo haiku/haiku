@@ -38,7 +38,7 @@ struct image {
 
 
 static image_id sNextImageID = 1;
-static mutex sImageMutex;
+static mutex sImageMutex = MUTEX_INITIALIZER("image");
 
 
 /*!	Registers an image with the specified team.
@@ -274,7 +274,6 @@ image_init(void)
 	add_debugger_command("team_images", &dump_images_list, "Dump all registered images from the current team");
 #endif
 
-	mutex_init(&sImageMutex, "image");
 	return B_OK;
 }
 
