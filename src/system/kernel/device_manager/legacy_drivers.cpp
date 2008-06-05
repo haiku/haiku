@@ -185,7 +185,7 @@ static int32 sDriverEvents;
 static DoublyLinkedList<path_entry> sDriversToAdd;
 static DirectoryWatcher sDirectoryWatcher;
 static DirectoryNodeHash sDirectoryNodeHash;
-static mutex sLock;
+static recursive_lock sLock;
 static bool sWatching;
 
 
@@ -575,8 +575,7 @@ add_driver(const char *path, image_id image)
 
 	int32 priority = get_priority(path);
 
-//	RecursiveLocker locker(&sDeviceFileSystem->lock);
-	MutexLocker _(sLock);
+	RecursiveLocker _(sLock);
 
 	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
 		get_leaf(path));
@@ -678,8 +677,7 @@ handle_driver_events(void *_fs, int /*iteration*/)
 
 	// something happened, let's see what it was
 
-//	RecursiveLocker locker(fs->lock);
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	while (true) {
 		path_entry *path = sDriversToAdd.RemoveHead();
@@ -729,7 +727,7 @@ DriverWatcher::EventOccured(NotificationService& service,
 		|| (event->GetInt32("fields", 0) & B_STAT_MODIFICATION_TIME) == 0)
 		return;
 
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	legacy_driver* driver = find_driver(event->GetInt32("device", -1),
 		event->GetInt64("node", 0));
@@ -1172,7 +1170,7 @@ LegacyDevice::InitCheck() const
 status_t
 LegacyDevice::InitDevice()
 {
-	MutexLocker _(sLock);
+	RecursiveLocker _(sLock);
 
 	if (fInitialized++ > 0)
 		return B_OK;
@@ -1194,7 +1192,7 @@ LegacyDevice::InitDevice()
 void
 LegacyDevice::UninitDevice()
 {
-	MutexLocker _(sLock);
+	RecursiveLocker _(sLock);
 
 	if (fInitialized-- > 1)
 		return;
@@ -1301,7 +1299,7 @@ extern "C" void
 devfs_driver_added(const char *path)
 {
 	int32 priority = get_priority(path);
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	legacy_driver *driver = (legacy_driver *)hash_lookup(sDriverHash,
 		get_leaf(path));
@@ -1330,7 +1328,7 @@ extern "C" void
 devfs_driver_removed(const char* path)
 {
 	int32 priority = get_priority(path);
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
 		get_leaf(path));
@@ -1364,7 +1362,7 @@ legacy_driver_publish(const char *path, device_hooks *hooks)
 extern "C" status_t
 legacy_driver_rescan(const char* driverName)
 {
-	MutexLocker locker(sLock);
+	RecursiveLocker locker(sLock);
 
 	legacy_driver* driver = (legacy_driver*)hash_lookup(sDriverHash,
 		driverName);
@@ -1429,7 +1427,7 @@ legacy_driver_init(void)
 	if (sDriverHash == NULL)
 		return B_NO_MEMORY;
 
-	mutex_init(&sLock, "legacy driver");
+	recursive_lock_init(&sLock, "legacy driver");
 
 	new(&sDriverWatcher) DriverWatcher;
 	new(&sDriversToAdd) DoublyLinkedList<path_entry>;
