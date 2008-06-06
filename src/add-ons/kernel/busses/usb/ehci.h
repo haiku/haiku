@@ -134,6 +134,7 @@ static	pci_module_info				*sPCIModule;
 		area_id						fRegisterArea;
 		pci_info					*fPCIInfo;
 		Stack						*fStack;
+		uint32						fEnabledInterrupts;
 
 		// Periodic transfer framelist and interrupt entries
 		area_id						fPeriodicFrameListArea;

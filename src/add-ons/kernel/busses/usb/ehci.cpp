@@ -103,6 +103,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 		fRegisterArea(-1),
 		fPCIInfo(info),
 		fStack(stack),
+		fEnabledInterrupts(0),
 		fPeriodicFrameListArea(-1),
 		fPeriodicFrameList(NULL),
 		fInterruptEntries(NULL),
@@ -243,8 +244,9 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	// install the interrupt handler and enable interrupts
 	install_io_interrupt_handler(fPCIInfo->u.h0.interrupt_line,
 		InterruptHandler, (void *)this, 0);
-	WriteOpReg(EHCI_USBINTR, EHCI_USBINTR_HOSTSYSERR
-		| EHCI_USBINTR_USBERRINT | EHCI_USBINTR_USBINT | EHCI_USBINTR_INTONAA);
+	fEnabledInterrupts = EHCI_USBINTR_HOSTSYSERR | EHCI_USBINTR_USBERRINT
+		| EHCI_USBINTR_USBINT | EHCI_USBINTR_INTONAA;
+	WriteOpReg(EHCI_USBINTR, fEnabledInterrupts);
 
 	// allocate the periodic frame list
 	fPeriodicFrameListArea = fStack->AllocateArea((void **)&fPeriodicFrameList,
@@ -787,7 +789,7 @@ EHCI::Interrupt()
 
 	// check if any interrupt was generated
 	uint32 status = ReadOpReg(EHCI_USBSTS);
-	if ((status & EHCI_USBSTS_INTMASK) == 0) {
+	if ((status & fEnabledInterrupts) == 0) {
 		release_spinlock(&lock);
 		return B_UNHANDLED_INTERRUPT;
 	}
