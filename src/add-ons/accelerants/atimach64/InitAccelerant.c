@@ -8,6 +8,7 @@
 #include "sys/stat.h"
 #include "fcntl.h"
 #include <sys/ioctl.h>
+#include <errno.h>
 #include "stdio.h"
 
 /* defined in ProposeDisplayMode.c */
