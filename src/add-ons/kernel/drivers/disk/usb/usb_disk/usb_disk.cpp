@@ -631,9 +631,9 @@ usb_disk_device_removed(void *cookie)
 	gLunCount -= device->lun_count;
 	gDeviceCount--;
 
-	mutex_lock(&device->lock);
 	device->removed = true;
-	mutex_unlock(&device->lock);
+	gUSBModule->cancel_queued_transfers(device->bulk_in);
+	gUSBModule->cancel_queued_transfers(device->bulk_out);
 	if (device->open_count == 0)
 		usb_disk_free_device_and_luns(device);
 
