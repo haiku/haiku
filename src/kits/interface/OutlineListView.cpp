@@ -27,6 +27,9 @@ static void
 quick_sort_item_array(BListItem** items, int32 first, int32 last,
 	int (*compareFunc)(const BListItem* a, const BListItem* b))
 {
+	printf("quick_sort_item_array(items: %p, first: %ld, last: %ld, comparefunc: %p)\n",
+		items, first, last, compareFunc);
+
 	if (last <= first)
 		return;
 
@@ -42,7 +45,6 @@ quick_sort_item_array(BListItem** items, int32 first, int32 last,
 		
 		while ((compareFunc(items[right], pivot) > 0) && (right > first)) 
 			right--;
-		
 
 		if (left < right) {
 			// swap entries
@@ -61,13 +63,13 @@ quick_sort_item_array(BListItem** items, int32 first, int32 last,
 
 	// At this point, the elements in the left half are all smaller
 	// than the elements in the right half
-	if (first < right) {
+	if (first < left) {
 		// sort left half
-		quick_sort_item_array(items, first, right, compareFunc);
+		quick_sort_item_array(items, first, left, compareFunc);
 	}
-	if (left < last) {
+	if (right < last) {
 		// sort right half
-		quick_sort_item_array(items, left, last, compareFunc);
+		quick_sort_item_array(items, right, last, compareFunc);
 	}
 }
 
