@@ -488,7 +488,7 @@ TExpandoMenuBar::TeamItemAtPoint(BPoint point, BMenuItem **_item)
 void
 TExpandoMenuBar::AddTeam(BList *team, BBitmap *icon, char *name, char *signature)
 {
-	float itemWidth = fVertical ? Frame().Width() : kMinimumWindowWidth;
+	float itemWidth = fVertical ? fBarView->Bounds().Width() : kMinimumWindowWidth;
 	float itemHeight = -1.0f;
 
 	desk_settings *settings = ((TBarApp *)be_app)->Settings();
