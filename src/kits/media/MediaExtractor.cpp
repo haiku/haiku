@@ -277,7 +277,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder,
 		fStreamInfo[stream].encodedFormat);
 	if (res != B_OK) {
 		char formatString[256];
-		string_for_format(&fStreamInfo[stream].encodedFormat, formatString,
+		string_for_format(fStreamInfo[stream].encodedFormat, formatString,
 			256);
 		ERROR("MediaExtractor::CreateDecoder _plugin_manager.CreateDecoder "
 			"failed for stream %ld, format: %s\n", stream, formatString);
