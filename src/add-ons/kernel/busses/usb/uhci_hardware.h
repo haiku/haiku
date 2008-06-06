@@ -50,7 +50,6 @@
 #define UHCI_USBSTS_HOSTERR		0x08	// Host System Error
 #define UHCI_USBSTS_HCPRERR		0x10	// Host Controller Process error
 #define UHCI_USBSTS_HCHALT		0x20	// HCHalted
-#define UHCI_INTERRUPT_MASK		0x3f	// Mask for all the interrupts
 
 //USBINTR
 #define UHCI_USBINTR_CRC		0x01	// Timeout/ CRC interrupt enable

@@ -287,6 +287,7 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 	:	BusManager(stack),
 		fPCIInfo(info),
 		fStack(stack),
+		fEnabledInterrupts(0),
 		fFrameArea(-1),
 		fFrameList(NULL),
 		fFrameBandwidth(NULL),
@@ -453,8 +454,10 @@ UHCI::UHCI(pci_info *info, Stack *stack)
 		InterruptHandler, (void *)this, 0);
 
 	// Enable interrupts
-	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_RESUME
-		| UHCI_USBINTR_IOC | UHCI_USBINTR_SHORT);
+	fEnabledInterrupts = UHCI_USBSTS_USBINT | UHCI_USBSTS_ERRINT
+		| UHCI_USBSTS_HOSTERR | UHCI_USBSTS_HCPRERR | UHCI_USBSTS_HCHALT;
+	WriteReg16(UHCI_USBINTR, UHCI_USBINTR_CRC | UHCI_USBINTR_IOC
+		| UHCI_USBINTR_SHORT);
 
 	TRACE(("usb_uhci: UHCI Host Controller Driver constructed\n"));
 	fInitOK = true;
@@ -1536,7 +1539,7 @@ UHCI::Interrupt()
 
 	// Check if we really had an interrupt
 	uint16 status = ReadReg16(UHCI_USBSTS);
-	if ((status & UHCI_INTERRUPT_MASK) == 0) {
+	if ((status & fEnabledInterrupts) == 0) {
 		release_spinlock(&lock);
 		return B_UNHANDLED_INTERRUPT;
 	}
@@ -1575,7 +1578,10 @@ UHCI::Interrupt()
 	}
 
 	if (status & UHCI_USBSTS_HCHALT) {
-		TRACE(("usb_uhci: host controller halted\n"));
+		TRACE_ERROR(("usb_uhci: host controller halted\n"));
+		// at least disable interrupts so we do not flood the system
+		WriteReg16(UHCI_USBINTR, 0);
+		fEnabledInterrupts = 0;
 		// ToDo: cancel all transfers and reset the host controller
 		// acknowledge not needed
 	}

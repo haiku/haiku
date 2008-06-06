@@ -194,6 +194,7 @@ static	pci_module_info				*sPCIModule;
 		uint32						fRegisterBase;
 		pci_info					*fPCIInfo;
 		Stack						*fStack;
+		uint32						fEnabledInterrupts;
 
 		// Frame list memory
 		area_id						fFrameArea;
