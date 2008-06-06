@@ -351,6 +351,8 @@ PlaybackManager::DurationChanged()
 void
 PlaybackManager::SetCurrentFrame(int64 frame)
 {
+	if (_LastState()->current_frame == frame)
+		return;
 	PlayingState* newState = new PlayingState(*_LastState());
 	newState->current_frame = frame;
 	_PushState(newState, false);
