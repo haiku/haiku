@@ -146,6 +146,35 @@ debug_dc2s(int argc, char **argv)
 #endif
 
 
+static void
+dosfs_trim_spaces(char *label)
+{
+	uint8 index;
+	for (index = 10; index > 0; index--) {
+		if (label[index] == ' ')
+			label[index] = 0;
+		else
+			break;
+	}
+}
+
+static bool
+dosfs_read_label(bool fat32, uint8 *buffer, char *label)
+{
+	uint8 check = fat32 ? 0x42 : 0x29;
+	uint8 offset = fat32 ? 0x47 : 0x2b;
+
+	if (buffer[check] == 0x29
+		&& memcmp(buffer + offset, "           ", 11) != 0) {
+		memcpy(label, buffer + offset, 11);
+		dosfs_trim_spaces(label);
+		return true;
+	}
+
+	return false;
+}
+
+
 static int
 lock_removable_device(int fd, bool state)
 {
@@ -283,7 +312,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	}
 
 	vol->vol_entry = -2;	// for now, assume there is no volume entry
-	memset(vol->vol_label, ' ', 11);
+	strcpy(vol->vol_label, "no name");
 
 	// now become more discerning citizens
 	vol->sectors_per_fat = read16(buf,0x16);
@@ -311,6 +340,9 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 			dprintf("dosfs: root vnode cluster too large (%lx)\n", vol->root_vnode.cluster);
 			goto error;
 		}
+
+		if (dosfs_read_label(true, buf, vol->vol_label))
+			vol->vol_entry = -1;
 	} else {
 		// fat12 & fat16
 		if (vol->fat_count != 2) {
@@ -351,15 +383,6 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 			}
 		}
 
-
-		if (buf[0x26] == 0x29) {
-			// fill in the volume label
-			if (memcmp(buf+0x2b, "           ", 11)) {
-				memcpy(vol->vol_label, buf+0x2b, 11);
-				vol->vol_entry = -1;
-			}
-		}
-
 		vol->fat_mirrored = true;
 		vol->active_fat = 0;
 
@@ -378,6 +401,9 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 			vol->fat_bits = 16;
 		else
 			vol->fat_bits = 12;
+
+		if (dosfs_read_label(false, buf, vol->vol_label))
+			vol->vol_entry = -1;
 	}
 
 	/* check that the partition is large enough to contain the file system */
@@ -528,6 +554,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 			if ((buffer[0x0b] & FAT_VOLUME) && (buffer[0x0b] != 0xf) && (buffer[0] != 0xe5)) {
 				vol->vol_entry = diri.current_index;
 				memcpy(vol->vol_label, buffer, 11);
+				dosfs_trim_spaces(vol->vol_label);
 				break;
 			}
 		}
@@ -535,7 +562,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	}
 
 	DPRINTF(0, ("root vnode id = %Lx\n", vol->root_vnode.vnid));
-	DPRINTF(0, ("volume label [%11.11s] (%lx)\n", vol->vol_label, vol->vol_entry));
+	DPRINTF(0, ("volume label [%s] (%lx)\n", vol->vol_label, vol->vol_entry));
 
 	// steal a trick from bfs
 	if (!memcmp(vol->vol_label, "__RO__     ", 11)) {
@@ -622,26 +649,17 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 		return -1;
 	}
 
-	strcpy(name, "no name    ");
+	strcpy(name, "no name");
 	sectors_per_fat = read16(buf,0x16);
 	if (sectors_per_fat == 0) {
 		total_sectors = read32(buf,0x20);
-
-		if (buf[0x42] == 0x29) {
-			// fill in FAT32 volume label
-			if (memcmp(buf + 0x47, "           ", 11) != 0)
-				memcpy(name, buf + 0x47, 11);
-		}
+		dosfs_read_label(true, buf, name);
 	} else {
 		total_sectors = read16(buf,0x13); // partition size
 		if (total_sectors == 0)
 			total_sectors = read32(buf,0x20);
 
-		if (buf[0x26] == 0x29) {
-			// fill in the volume label
-			if (memcmp(buf + 0x2b, "           ", 11) != 0)
-				memcpy(name, buf + 0x2b, 11);
-		}
+		dosfs_read_label(false, buf, name);
 	}
 
 	cookie = (identify_cookie *)malloc(sizeof(identify_cookie));
@@ -924,7 +942,7 @@ dosfs_read_fs_stat(fs_volume *_vol, struct fs_info * fss)
 	if (vol->vol_entry > -2)
 		strncpy(fss->volume_name, vol->vol_label, sizeof(fss->volume_name));
 	else
-		strcpy(fss->volume_name, "no name    ");
+		strcpy(fss->volume_name, "no name");
 
 	// XXX: should sanitize name as well
 	for (i=10;i>0;i--)
@@ -996,13 +1014,16 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 				result = EIO;
 				goto bi;
 			}
-			if ((buffer[0x26] != 0x29) || memcmp(buffer + 0x2b, vol->vol_label, 11)) {
+			if ((vol->sectors_per_fat == 0 && (buffer[0x42] != 0x29
+				|| strncmp(buffer + 0x47, vol->vol_label, 11) != 0))
+				|| (vol->sectors_per_fat != 0 && (buffer[0x26] != 0x29
+				|| strncmp(buffer + 0x2b, vol->vol_label, 11) != 0))) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
 				block_cache_set_dirty(vol->fBlockCache, 0, false, tid);
 				result = B_ERROR;
 			} else {
 				memcpy(buffer + 0x2b, name, 11);
-				result = 0;
+				result = B_OK;
 			}
 			block_cache_put(vol->fBlockCache, 0);
 			cache_end_transaction(vol->fBlockCache, tid, NULL, NULL);
@@ -1012,7 +1033,7 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			buffer = diri_init(vol, vol->root_vnode.cluster, vol->vol_entry, &diri);
 
 			// check if it is the same as the old volume label
-			if ((buffer == NULL) || (memcmp(buffer, vol->vol_label, 11))) {
+			if ((buffer == NULL) || (strncmp(buffer, vol->vol_label, 11))) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
 				diri_free(&diri);
 				result = B_ERROR;
@@ -1021,15 +1042,17 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			memcpy(buffer, name, 11);
 			diri_mark_dirty(&diri);
 			diri_free(&diri);
-			result = 0;
+			result = B_OK;
 		} else {
 			uint32 index;
 			result = create_volume_label(vol, name, &index);
 			if (result == B_OK) vol->vol_entry = index;
 		}
 
-		if (result == 0)
+		if (result == B_OK) {
 			memcpy(vol->vol_label, name, 11);
+			dosfs_trim_spaces(vol->vol_label);
+		}
 	}
 
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
@@ -1083,7 +1106,7 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, ulong code,
 			dprintf("fat mirroring is %s, fs info sector at sector %x\n", (vol->fat_mirrored) ? "on" : "off", vol->fsinfo_sector);
 			dprintf("last allocated cluster = %lx\n", vol->last_allocated);
 			dprintf("root vnode id = %Lx\n", vol->root_vnode.vnid);
-			dprintf("volume label [%11.11s]\n", vol->vol_label);
+			dprintf("volume label [%s]\n", vol->vol_label);
 			break;
 
 		case 100001 :
