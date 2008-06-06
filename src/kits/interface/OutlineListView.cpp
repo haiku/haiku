@@ -27,9 +27,6 @@ static void
 quick_sort_item_array(BListItem** items, int32 first, int32 last,
 	int (*compareFunc)(const BListItem* a, const BListItem* b))
 {
-	printf("quick_sort_item_array(items: %p, first: %ld, last: %ld, comparefunc: %p)\n",
-		items, first, last, compareFunc);
-
 	if (last <= first)
 		return;
 
