@@ -21,7 +21,7 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 {
 	CALLED();
 	fSource = source;
-	fStreamInfo = 0;
+	fStreamInfo = NULL;
 	fExtractorThread = -1;
 	fExtractorWaitSem = -1;
 	fTerminateExtractor = false;
@@ -276,8 +276,11 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **out_decoder,
 	res = _plugin_manager.CreateDecoder(&decoder,
 		fStreamInfo[stream].encodedFormat);
 	if (res != B_OK) {
+		char formatString[256];
+		string_for_format(&fStreamInfo[stream].encodedFormat, formatString,
+			256);
 		ERROR("MediaExtractor::CreateDecoder _plugin_manager.CreateDecoder "
-			"failed for stream %ld\n", stream);
+			"failed for stream %ld, format: %s\n", stream, formatString);
 		return res;
 	}
 
