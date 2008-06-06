@@ -226,6 +226,8 @@ init_driver()
 		return B_NO_MEMORY;
 	}
 
+	mutex_init(&sDriverLock, "usb hid driver lock");
+
 	static usb_notify_hooks notifyHooks = {
 		&usb_hid_device_added,
 		&usb_hid_device_removed
@@ -250,6 +252,7 @@ uninit_driver()
 	put_module(B_USB_MODULE_NAME);
 	delete gDeviceList;
 	gDeviceList = NULL;
+	mutex_destroy(&sDriverLock);
 }
 
 
