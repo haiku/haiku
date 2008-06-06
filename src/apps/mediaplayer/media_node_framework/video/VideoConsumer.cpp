@@ -21,6 +21,7 @@
 #include <TimeSource.h>
 #include <MediaRoster.h>
 
+#include "ColorSpaceToString.h"
 #include "NodeManager.h"
 #include "VideoTarget.h"
 
@@ -440,15 +441,32 @@ VideoConsumer::AcceptFormat(const media_destination& dest, media_format* format)
 		uint32 flags = 0;
 		bool supported = bitmaps_support_space(
 			format->u.raw_video.display.format, &flags);
+#ifndef HAIKU_TARGET_PLATFORM_HAIKU
+		// GRRR! BeOS implementation claims not
+		// to support these formats, while they work just fine.
+		switch (format->u.raw_video.display.format) {
+			case B_YCbCr422:
+			case B_YCbCr411:
+			case B_YCbCr444:
+			case B_YCbCr420:
+				supported = true;
+				break;
+			default:
+				break;
+		}
+#endif
 		if (!supported) {
 			// cannot create bitmaps with such a color space
-			ERROR("AcceptFormat - unsupported color space for BBitmaps!\n");
+			ERROR("AcceptFormat - unsupported color space for BBitmaps "
+				"(%s)!\n",
+				color_space_to_string(format->u.raw_video.display.format));
 			return B_MEDIA_BAD_FORMAT;
 		}
 		if (!fTryOverlay && (flags & B_VIEWS_SUPPORT_DRAW_BITMAP) == 0) {
 			// BViews do not support drawing such a bitmap
 			ERROR("AcceptFormat - BViews cannot draw bitmaps in given "
-				"colorspace!\n");
+				"colorspace (%s)!\n",
+				color_space_to_string(format->u.raw_video.display.format));
 			return B_MEDIA_BAD_FORMAT;
 		}
 	}

@@ -1,9 +1,6 @@
 /*
- * Copyright 2007, Haiku. All rights reserved.
- * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2007-2008, Haiku. Stephan Aßmus <superstippi@gmx.de>
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "MediaTrackVideoSupplier.h"
 
@@ -12,6 +9,8 @@
 #include <string.h>
 
 #include <MediaTrack.h>
+
+#include "ColorSpaceToString.h"
 
 using std::nothrow;
 
@@ -22,9 +21,6 @@ using std::nothrow;
 #  include <File.h>
 #  include <TranslatorRoster.h>
 #endif // DEBUG_DECODED_FRAME
-
-static const char* string_for_color_space(color_space format);
-
 
 // constructor
 MediaTrackVideoSupplier::MediaTrackVideoSupplier(BMediaTrack* track,
@@ -232,83 +228,8 @@ MediaTrackVideoSupplier::BytesPerRow() const
 // #pragma mark -
 
 
-const char*
-string_for_color_space(color_space format)
-{
-	const char* name = "<unkown format>";
-	switch (format) {
-		case B_RGB32:
-			name = "B_RGB32";
-			break;
-		case B_RGBA32:
-			name = "B_RGBA32";
-			break;
-		case B_RGB32_BIG:
-			name = "B_RGB32_BIG";
-			break;
-		case B_RGBA32_BIG:
-			name = "B_RGBA32_BIG";
-			break;
-		case B_RGB24:
-			name = "B_RGB24";
-			break;
-		case B_RGB24_BIG:
-			name = "B_RGB24_BIG";
-			break;
-		case B_CMAP8:
-			name = "B_CMAP8";
-			break;
-		case B_GRAY8:
-			name = "B_GRAY8";
-			break;
-		case B_GRAY1:
-			name = "B_GRAY1";
-			break;
-
-		// YCbCr
-		case B_YCbCr422:
-			name = "B_YCbCr422";
-			break;
-		case B_YCbCr411:
-			name = "B_YCbCr411";
-			break;
-		case B_YCbCr444:
-			name = "B_YCbCr444";
-			break;
-		case B_YCbCr420:
-			name = "B_YCbCr420";
-			break;
-
-		// YUV
-		case B_YUV422:
-			name = "B_YUV422";
-			break;
-		case B_YUV411:
-			name = "B_YUV411";
-			break;
-		case B_YUV444:
-			name = "B_YUV444";
-			break;
-		case B_YUV420:
-			name = "B_YUV420";
-			break;
-
-		case B_YUV9:
-			name = "B_YUV9";
-			break;
-		case B_YUV12:
-			name = "B_YUV12";
-			break;
-
-		default:
-			break;
-	}
-	return name;
-}
-
-
 status_t
-MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
+MediaTrackVideoSupplier::_SwitchFormat(color_space format, uint32 bytesPerRow)
 {
 	// get the encoded format
 	memset(&fFormat, 0, sizeof(media_format));
@@ -331,41 +252,26 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 		} else {
 			printf("MediaTrackVideoSupplier::_SwitchFormat() - "
 				"preferred color space: %s\n",
-				string_for_color_space(format));
+				color_space_to_string(format));
 		}
 	}
 
-	// specifiy the decoded format. we derive this information from
-	// the encoded format (width & height).
-	memset(&fFormat, 0, sizeof(media_format));
-//	fFormat.u.raw_video.last_active = height - 1;
-//	fFormat.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
-//	fFormat.u.raw_video.pixel_width_aspect = 1;
-//	fFormat.u.raw_video.pixel_height_aspect = 1;
-	fFormat.u.raw_video.display.format = format;
-	fFormat.u.raw_video.display.line_width = width;
-	fFormat.u.raw_video.display.line_count = height;
-	int32 minBytesPerRow;
+	uint32 minBytesPerRow;
 	if (format == B_YCbCr422)
 		minBytesPerRow = ((width * 2 + 3) / 4) * 4;
 	else
 		minBytesPerRow = width * 4;
-	fFormat.u.raw_video.display.bytes_per_row = max_c(minBytesPerRow,
-		bytesPerRow);
+	bytesPerRow = max_c(bytesPerRow, minBytesPerRow);
 
-	ret = fVideoTrack->DecodedFormat(&fFormat);
-
+	ret = _SetDecodedFormat(width, height, format, bytesPerRow);
 	if (ret < B_OK) {
 		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
 			"fVideoTrack->DecodedFormat(): %s - retrying with B_RGB32\n",
 			strerror(ret));
 		format = B_RGB32;
-		fFormat.u.raw_video.display.format = format;
-		minBytesPerRow = width * 4;
-		fFormat.u.raw_video.display.bytes_per_row = max_c(minBytesPerRow,
-			bytesPerRow);
+		bytesPerRow = max_c(bytesPerRow, width * 4);
 
-		ret = fVideoTrack->DecodedFormat(&fFormat);
+		ret = _SetDecodedFormat(width, height, format, bytesPerRow);
 		if (ret < B_OK) {
 			printf("MediaTrackVideoSupplier::_SwitchFormat() - "
 				"fVideoTrack->DecodedFormat(): %s - giving up\n",
@@ -377,19 +283,18 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 	if (fFormat.u.raw_video.display.format != format) {
 		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
 			" codec changed colorspace of decoded format (%s -> %s)!\n",
-			string_for_color_space(format),
-			string_for_color_space(fFormat.u.raw_video.display.format));
+			color_space_to_string(format),
+			color_space_to_string(fFormat.u.raw_video.display.format));
 		// check if the codec forgot to adjust bytes_per_row
-		uint32 minBPR;
 		format = fFormat.u.raw_video.display.format;
 		if (format == B_YCbCr422)
-			minBPR = ((width * 2 + 3) / 4) * 4;
+			minBytesPerRow = ((width * 2 + 3) / 4) * 4;
 		else
-			minBPR = width * 4;
-		if (minBPR > fFormat.u.raw_video.display.bytes_per_row) {
+			minBytesPerRow = width * 4;
+		if (minBytesPerRow > fFormat.u.raw_video.display.bytes_per_row) {
 			printf("  -> stupid codec forgot to adjust bytes_per_row!\n");
-			fFormat.u.raw_video.display.bytes_per_row = minBPR;
-			ret = fVideoTrack->DecodedFormat(&fFormat);
+
+			ret = _SetDecodedFormat(width, height, format, minBytesPerRow);
 		}
 	}
 
@@ -400,3 +305,24 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 
 	return ret;
 }
+
+
+status_t
+MediaTrackVideoSupplier::_SetDecodedFormat(uint32 width, uint32 height,
+	color_space format, uint32 bytesPerRow)
+{
+	// specifiy the decoded format. we derive this information from
+	// the encoded format (width & height).
+	memset(&fFormat, 0, sizeof(media_format));
+//	fFormat.u.raw_video.last_active = height - 1;
+//	fFormat.u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
+//	fFormat.u.raw_video.pixel_width_aspect = 1;
+//	fFormat.u.raw_video.pixel_height_aspect = 1;
+	fFormat.u.raw_video.display.format = format;
+	fFormat.u.raw_video.display.line_width = width;
+	fFormat.u.raw_video.display.line_count = height;
+	fFormat.u.raw_video.display.bytes_per_row = bytesPerRow;
+
+	return fVideoTrack->DecodedFormat(&fFormat);
+}
+

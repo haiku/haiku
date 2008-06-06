@@ -76,6 +76,7 @@ Application MediaPlayer :
 
 	# support
 	AbstractLOAdapter.cpp
+	ColorSpaceToString.cpp
 	Command.cpp
 	CommandStack.cpp
 	Event.cpp

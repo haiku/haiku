@@ -44,7 +44,9 @@ class MediaTrackVideoSupplier : public VideoTrackSupplier {
 
  private:
 			status_t			_SwitchFormat(color_space format,
-									int32 bytesPerRow);
+									uint32 bytesPerRow);
+			status_t			_SetDecodedFormat(uint32 width, uint32 height,
+									color_space format, uint32 bytesPerRow);
 
 			BMediaTrack*		fVideoTrack;
 
