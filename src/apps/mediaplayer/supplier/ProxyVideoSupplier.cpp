@@ -33,12 +33,16 @@ ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 		return B_NO_INIT;
 
 	bigtime_t performanceTime = 0;
+	if (fSupplier->CurrentFrame() == startFrame + 1) {
+		printf("ProxyVideoSupplier::FillBuffer(%lld) - Could re-use previous "
+			"buffer!\n", startFrame);
+	}
 	if (fSupplier->CurrentFrame() != startFrame) {
 		int64 frame = startFrame;
 		status_t ret = fSupplier->SeekToFrame(&frame);
 		if (ret != B_OK)
 			return ret;
-		while (frame < (startFrame - 1)) {
+		while (frame < startFrame) {
 			ret = fSupplier->ReadFrame(buffer, &performanceTime, format,
 				wasCached);
 			if (ret != B_OK)
@@ -47,7 +51,8 @@ ProxyVideoSupplier::FillBuffer(int64 startFrame, void* buffer,
 		}
 	}
 
-	// TODO: cache into intermediate buffer!
+	// TODO: cache into intermediate buffer to handle the
+	// currentFrame = startFrame + 1 case!
 
 	return fSupplier->ReadFrame(buffer, &performanceTime, format, wasCached);
 }
