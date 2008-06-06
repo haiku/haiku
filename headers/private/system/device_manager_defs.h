@@ -17,9 +17,11 @@
 #define DM_GET_NEXT_CHILD		3
 #define DM_GET_NEXT_ATTRIBUTE	4
 
+typedef addr_t device_node_cookie;
+
 struct device_attr_info {
-	uint32 		node_cookie;
-	uint32		cookie;
+	device_node_cookie 		node_cookie;
+	device_node_cookie		cookie;
 	char		name[255];
 	type_code	type;
 	union {

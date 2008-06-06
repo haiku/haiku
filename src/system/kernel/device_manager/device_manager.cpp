@@ -21,6 +21,7 @@
 #include <device_manager_defs.h>
 #include <fs/devfs.h>
 #include <fs/KPath.h>
+#include <kernel.h>
 #include <generic_syscall.h>
 #include <util/AutoLock.h>
 #include <util/DoublyLinkedList.h>
@@ -323,134 +324,115 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 	switch (function) {
 		case DM_GET_ROOT:
 		{
-			return B_ERROR;
-#if 0
-			uint32 cookie;
+			device_node_cookie cookie;
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(uint32))
+			if (bufferSize < sizeof(device_node_cookie))
 				return B_BAD_VALUE;
-			cookie = sRootNode->ID();
+			cookie = (device_node_cookie)sRootNode;
 
 			// copy back to user space
-			return user_memcpy(buffer, &cookie, sizeof(uint32));
-#endif
+			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
 		}
 
 		case DM_GET_CHILD:
 		{
-			return B_ERROR;
-#if 0
-			device_node_info* node;
-			device_node_info* child;
-
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(uint32))
+			if (bufferSize < sizeof(device_node_cookie))
 				return B_BAD_VALUE;
 
-			uint32 cookie;
-			if (user_memcpy(&cookie, buffer, sizeof(uint32)) < B_OK)
+			device_node_cookie cookie;
+			if (user_memcpy(&cookie, buffer, sizeof(device_node_cookie)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			mutex_lock(&gNodeLock);
-			node = device_manager_find_device(gRootNode, cookie);
-			if (!node) {
-				mutex_unlock(&gNodeLock);
-				return B_BAD_VALUE;
-			}
-
-			child = (device_node_info *)list_get_next_item(&node->children, NULL);
-			if (child)
-				cookie = child->internal_id;
-			mutex_unlock(&gNodeLock);
-
-			if (!child)
+			device_node* node = (device_node*)cookie;
+			NodeList::ConstIterator iterator = node->Children().GetIterator();
+			
+			if (!iterator.HasNext()) {
 				return B_ENTRY_NOT_FOUND;
+			}
+			node = iterator.Next();
+			cookie = (device_node_cookie)node;
+			
 			// copy back to user space
-			return user_memcpy(buffer, &cookie, sizeof(uint32));
-#endif
+			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
 		}
 
 		case DM_GET_NEXT_CHILD:
 		{
-			return B_ERROR;
-#if 0
-			device_node_info* node;
-			device_node_info* child;
-
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(uint32))
+			if (bufferSize < sizeof(device_node_cookie))
 				return B_BAD_VALUE;
 
-			uint32 cookie;
-			if (user_memcpy(&cookie, buffer, sizeof(uint32)) < B_OK)
+			device_node_cookie cookie;
+			if (user_memcpy(&cookie, buffer, sizeof(device_node_cookie)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			mutex_lock(&gNodeLock);
-			node = device_manager_find_device(gRootNode, cookie);
-			if (!node) {
-				mutex_unlock(&gNodeLock);
-				return B_BAD_VALUE;
-			}
-			child = (device_node_info *)list_get_next_item(&node->parent->children, node);
-			if (child)
-				cookie = child->internal_id;
-			mutex_unlock(&gNodeLock);
-
-			if (!child)
+			device_node* last = (device_node*)cookie;
+			if (!last->Parent())
 				return B_ENTRY_NOT_FOUND;
+			NodeList::ConstIterator iterator = last->Parent()->Children().GetIterator();
+			
+			// skip those we already traversed
+			while (iterator.HasNext() && last != NULL) {
+				device_node* node = iterator.Next();
+
+				if (node == last)
+					break;
+			}
+
+			if (!iterator.HasNext())
+				return B_ENTRY_NOT_FOUND;
+			device_node* node = iterator.Next();
+			cookie = (device_node_cookie)node;
+			
 			// copy back to user space
-			return user_memcpy(buffer, &cookie, sizeof(uint32));
-#endif
+			return user_memcpy(buffer, &cookie, sizeof(device_node_cookie));
 		}
 
 		case DM_GET_NEXT_ATTRIBUTE:
 		{
-			return B_ERROR;
-#if 0
-			struct dev_attr attr;
-			device_node_info* node;
-			uint32 i = 0;
-			device_attr_info *attr_info;
+			struct device_attr_info attr_info;
 			if (!IS_USER_ADDRESS(buffer))
 				return B_BAD_ADDRESS;
-			if (bufferSize < sizeof(struct dev_attr))
+			if (bufferSize < sizeof(struct device_attr_info))
 				return B_BAD_VALUE;
-			if (user_memcpy(&attr, buffer, sizeof(struct dev_attr)) < B_OK)
+			if (user_memcpy(&attr_info, buffer, sizeof(struct device_attr_info)) < B_OK)
 				return B_BAD_ADDRESS;
 
-			mutex_lock(&gNodeLock);
-			node = device_manager_find_device(gRootNode, attr.node_cookie);
-			if (!node) {
-				mutex_unlock(&gNodeLock);
-				return B_BAD_VALUE;
-			}
-			for (attr_info = node->attributes; attr.cookie > i && attr_info != NULL; attr_info = attr_info->next) {
-				i++;
+			device_node* node = (device_node*)attr_info.node_cookie;
+			device_attr* last = (device_attr*)attr_info.cookie;
+			AttributeList::Iterator iterator = node->Attributes().GetIterator();
+			// skip those we already traversed
+			while (iterator.HasNext() && last != NULL) {
+				device_attr* attr = iterator.Next();
+
+				if (attr == last)
+					break;
 			}
 
-			if (!attr_info) {
-				mutex_unlock(&gNodeLock);
+			if (!iterator.HasNext()) {
+				attr_info.cookie = 0;
 				return B_ENTRY_NOT_FOUND;
 			}
 
-			attr.cookie++;
-
-			strlcpy(attr.name, attr_info->attr.name, 254);
-			attr.type = attr_info->attr.type;
-			switch (attr_info->attr.type) {
+			device_attr* attr = iterator.Next();
+			attr_info.cookie = (device_node_cookie)attr;
+			strlcpy(attr_info.name, attr->name, 254);
+			attr_info.type = attr->type;
+			switch (attr_info.type) {
 				case B_UINT8_TYPE:
-					attr.value.ui8 = attr_info->attr.value.ui8; break;
+					attr_info.value.ui8 = attr->value.ui8; break;
 				case B_UINT16_TYPE:
-					attr.value.ui16 = attr_info->attr.value.ui16; break;
+					attr_info.value.ui16 = attr->value.ui16; break;
 				case B_UINT32_TYPE:
-					attr.value.ui32 = attr_info->attr.value.ui32; break;
+					attr_info.value.ui32 = attr->value.ui32; break;
 				case B_UINT64_TYPE:
-					attr.value.ui64 = attr_info->attr.value.ui64; break;
+					attr_info.value.ui64 = attr->value.ui64; break;
 				case B_STRING_TYPE:
-					strlcpy(attr.value.string, attr_info->attr.value.string, 254); break;
+					strlcpy(attr_info.value.string, attr->value.string, 254); break;
 				/*case B_RAW_TYPE:
 					if (attr.value.raw.length > attr_info->attr.value.raw.length)
 						attr.value.raw.length = attr_info->attr.value.raw.length;
@@ -459,11 +441,8 @@ control_device_manager(const char* subsystem, uint32 function, void* buffer,
 					break;*/
 			}
 
-			mutex_unlock(&gNodeLock);
-
 			// copy back to user space
-			return user_memcpy(buffer, &attr, sizeof(struct dev_attr));
-#endif
+			return user_memcpy(buffer, &attr_info, sizeof(struct device_attr_info));
 		}
 	}
 
