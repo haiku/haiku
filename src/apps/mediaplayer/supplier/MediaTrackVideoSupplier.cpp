@@ -189,8 +189,10 @@ MediaTrackVideoSupplier::SeekToFrame(int64* frame)
 		return B_OK;
 	}
 
-if (wantFrame != *frame)
-printf("seeked by frame: %lld -> %lld\n", wantFrame, *frame);
+if (wantFrame != *frame) {
+	printf("seeked by frame: %lld -> %lld, was %lld\n", wantFrame, *frame,
+		currentFrame);
+}
 
 	ret = fVideoTrack->SeekToFrame(frame);
 	if (ret == B_OK) {
@@ -357,6 +359,7 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
 			"fVideoTrack->DecodedFormat(): %s - retrying with B_RGB32\n",
 			strerror(ret));
+		format = B_RGB32;
 		fFormat.u.raw_video.display.format = format;
 		minBytesPerRow = width * 4;
 		fFormat.u.raw_video.display.bytes_per_row = max_c(minBytesPerRow,
@@ -367,15 +370,13 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 			printf("MediaTrackVideoSupplier::_SwitchFormat() - "
 				"fVideoTrack->DecodedFormat(): %s - giving up\n",
 				strerror(ret));
+			return ret;
 		}
-		return ret;
 	}
 
 	if (fFormat.u.raw_video.display.format != format) {
 		printf("MediaTrackVideoSupplier::_SwitchFormat() - "
-			" codec changed colorspace of decoded format (%s -> %s)!\n"
-			"    this is bad for performance, since colorspace conversion\n"
-			"    needs to happen during playback.\n",
+			" codec changed colorspace of decoded format (%s -> %s)!\n",
 			string_for_color_space(format),
 			string_for_color_space(fFormat.u.raw_video.display.format));
 		// check if the codec forgot to adjust bytes_per_row
@@ -385,10 +386,10 @@ MediaTrackVideoSupplier::_SwitchFormat(color_space format, int32 bytesPerRow)
 			minBPR = ((width * 2 + 3) / 4) * 4;
 		else
 			minBPR = width * 4;
-		if (minBPR != fFormat.u.raw_video.display.bytes_per_row) {
+		if (minBPR > fFormat.u.raw_video.display.bytes_per_row) {
 			printf("  -> stupid codec forgot to adjust bytes_per_row!\n");
 			fFormat.u.raw_video.display.bytes_per_row = minBPR;
-			fVideoTrack->DecodedFormat(&fFormat);
+			ret = fVideoTrack->DecodedFormat(&fFormat);
 		}
 	}
 
