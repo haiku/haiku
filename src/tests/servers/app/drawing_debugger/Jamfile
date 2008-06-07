@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src tests servers app drawing_debugger ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+Application DrawingDebugger :
+	DrawingDebugger.cpp
+	: be
+;
