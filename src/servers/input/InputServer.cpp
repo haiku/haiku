@@ -1526,11 +1526,13 @@ InputServer::_SanitizeEvents(EventList& events)
 				PRINT(("SanitizeEvents: %lx, %lx\n", fKeyInfo.modifiers,
 					fKeyInfo.key_states[KEY_Spacebar >> 3]));
 
-				int8 byte = 0;
-				event->FindInt8("byte", &byte);
+				uint8 byte;
+				if (event->FindInt8("byte", (int8*)&byte) < B_OK)
+					byte = 0;
+				
 				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
-					|| static_cast<uint8>(byte) == B_ZENKAKU_HANKAKU) {
-					SetNextMethod(!fKeyInfo.modifiers & B_SHIFT_KEY);
+					|| byte == B_KATAKANA_HIRAGANA) {
+					SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY));
 
 					// this event isn't sent to the user
 					events.RemoveItemAt(index);
