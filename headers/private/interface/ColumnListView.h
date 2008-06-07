@@ -306,7 +306,7 @@ public:
 			
 	// Does not delete row or children at this time.
 	// todo: Make delete row and children
-			void			RemoveRow(BRow*);	
+			void			RemoveRow(BRow*);
 			
 			void			UpdateRow(BRow*);
 			void			Clear();
