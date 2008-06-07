@@ -88,7 +88,8 @@ PartitionMapParser::_ParsePrimary(const partition_table_sector *pts)
 
 	// check the signature
 	if (pts->signature != kPartitionTableSectorSignature) {
-		TRACE(("intel: _ParsePrimary(): invalid PTS signature\n"));
+		TRACE(("intel: _ParsePrimary(): invalid PTS signature: %lx\n",
+			(uint32)pts->signature));
 		return B_BAD_DATA;
 	}
 
@@ -151,7 +152,8 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 		// check the signature
 		if (error == B_OK
 			&& fPTS->signature != kPartitionTableSectorSignature) {
-			TRACE(("intel: _ParseExtended(): invalid PTS signature\n"));
+			TRACE(("intel: _ParseExtended(): invalid PTS signature: %lx\n",
+				(uint32)fPTS->signature));
 			error = B_BAD_DATA;
 		}
 
