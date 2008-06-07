@@ -74,6 +74,7 @@ typedef int socklen_t;
 #	define _IMPEXP_TRACKER		__declspec(dllimport)
 #	define _IMPEXP_TRANSLATION	__declspec(dllimport)
 #	define _IMPEXP_DEVICE		__declspec(dllimport)
+#	define _IMPEXP_NET			__declspec(dllimport)
 #endif
 
 #ifdef __cplusplus
