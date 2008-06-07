@@ -559,7 +559,7 @@ BNode::ReadAttrString(const char *name, BString *result) const
 		return error;		
 
 	// Lock the string's buffer so we can meddle with it	
-	char *data = result->LockBuffer(info.size+1);
+	char *data = result->LockBuffer(info.size + 1);
 	if (!data)
 		return B_NO_MEMORY;
 
