@@ -3488,6 +3488,9 @@ BView::RemoveChild(BView *child)
 	if (!child)
 		return false;
 
+	if (child->fParent != this)
+		return false;
+
 	return child->RemoveSelf();
 }
 
