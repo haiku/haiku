@@ -384,11 +384,37 @@ Partition::CheckLocation(off_t sessionSize) const
 {
 	// offsets and size must be block aligned, PTS and partition must lie
 	// within the session
-	return fPTSOffset % SECTOR_SIZE == 0
-		&& fOffset % SECTOR_SIZE == 0
-		&& fSize % SECTOR_SIZE == 0
-		&& fPTSOffset >= 0 && fPTSOffset < sessionSize
-		&& fOffset >= 0 && fOffset + fSize <= sessionSize;
+	if (fPTSOffset % SECTOR_SIZE != 0) {
+		TRACE(("Partition::CheckLocation() - bad pts offset: %lld "
+			"(session: %lld)\n", fPTSOffset, sessionSize));
+		return false;
+	}
+	if (fOffset % SECTOR_SIZE != 0) {
+		TRACE(("Partition::CheckLocation() - bad offset: %lld "
+			"(session: %lld)\n", fOffset, sessionSize));
+		return false;
+	}
+	if (fSize % SECTOR_SIZE != 0) {
+		TRACE(("Partition::CheckLocation() - bad size: %lld "
+			"(session: %lld)\n", fSize, sessionSize));
+		return false;
+	}
+	if (fPTSOffset < 0 || fPTSOffset >= sessionSize) {
+		TRACE(("Partition::CheckLocation() - pts offset outside session: %lld "
+			"(session: %lld)\n", fPTSOffset, sessionSize));
+		return false;
+	}
+	if (fOffset < 0) {
+		TRACE(("Partition::CheckLocation() - offset before session: %lld "
+			"(session: %lld)\n", fOffset, sessionSize));
+		return false;
+	}
+	if (fOffset + fSize > sessionSize) {
+		TRACE(("Partition::CheckLocation() - end after session: %lld "
+			"(session: %lld)\n", fOffset + fSize, sessionSize));
+		return false;
+	}
+	return true;
 }
 
 
