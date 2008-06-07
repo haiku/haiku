@@ -188,7 +188,7 @@ XvidDecoder::GetCodecInfo(media_codec_info* mci)
 		return;// B_NO_INIT;
 
 	sprintf(mci->short_name, "xvid");
-	sprintf(mci->pretty_name, "xvid - %s)",
+	sprintf(mci->pretty_name, "xvid - %s",
 		gCodecTable[fIndexInCodecTable].prettyName);
 
 	mci->id = 0;
@@ -208,7 +208,7 @@ XvidDecoder::Setup(media_format* inputFormat, const void* inInfo,
 	if (inputFormat->type != B_MEDIA_ENCODED_VIDEO)
 		return B_BAD_VALUE;
 
-//	PRINT(("%p->XvidDecoder::Sniff()\n", this));
+//	PRINT(("%p->XvidDecoder::Setup()\n", this));
 
 //#if DEBUG
 //	char buffer[1024];
@@ -229,7 +229,7 @@ XvidDecoder::Setup(media_format* inputFormat, const void* inInfo,
 //	 && !memcmp(inputFormat->user_data, "AVI ", 4)) {
 //		codecID = ((uint32*)inputFormat->user_data)[1];
 //		familyID = B_AVI_FORMAT_FAMILY;
-//		PRINT(("XvidDecoder::Sniff() - AVI 4CC: %4s\n",
+//		PRINT(("XvidDecoder::Setup() - AVI 4CC: %4s\n",
 //			inputFormat->user_data + 4));
 //	}
 
@@ -253,7 +253,7 @@ XvidDecoder::Setup(media_format* inputFormat, const void* inInfo,
 
 			#if PRINT_FOURCC
 			uint32 bigEndianID = B_HOST_TO_BENDIAN_INT32(codecID);
-			printf("%p->XvidDecoder::Sniff() - AVI 4CC: %.4s\n", this,
+			printf("%p->XvidDecoder::Setup() - AVI 4CC: %.4s\n", this,
 				(const char*)&bigEndianID);
 			#endif
 		} else if (formats.GetCodeFor(*inputFormat, B_MPEG_FORMAT_FAMILY,
