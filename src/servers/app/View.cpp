@@ -109,7 +109,9 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 
 	fLocalClipping((BRect)Bounds()),
 	fScreenClipping(),
-	fScreenClippingValid(false)
+	fScreenClippingValid(false),
+	fUserClipping(NULL),
+	fScreenAndUserClipping(NULL)
 {
 	if (fDrawState)
 		fDrawState->SetSubPixelPrecise(fFlags & B_SUBPIXEL_PRECISE);
@@ -1121,19 +1123,19 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 	// move src rect to destination here for efficiency reasons
 	visibleSrc.OffsetBy(xOffset, yOffset);
 
-	// we need to interstect the copyRegion too times, onces
+	// we need to interstect the copyRegion two times, onces
 	// at the source and once at the destination (here done
 	// the other way arround but it doesn't matter)
 	// the reason for this is that we are not supposed to visually
 	// copy children in the source rect and neither to copy onto
 	// children in the destination rect...
 	copyRegion->Set((clipping_rect)visibleSrc);
-	copyRegion->IntersectWith(&ScreenClipping(&windowContentClipping));
-		// note that fScreenClipping is used directly from hereon
+	copyRegion->IntersectWith(&ScreenAndUserClipping(&windowContentClipping));
+		// note that fScreenAndUserClipping is used directly from hereon
 		// because it is now up to date
 
 	copyRegion->OffsetBy(-xOffset, -yOffset);
-	copyRegion->IntersectWith(&fScreenClipping);
+	copyRegion->IntersectWith(fScreenAndUserClipping);
 
 	// do the actual blit
 	fWindow->CopyContents(copyRegion, xOffset, yOffset);
@@ -1155,7 +1157,7 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 	// exclude the part that we could copy
 	dirty->Exclude(copyRegion);
 
-	dirty->IntersectWith(&fScreenClipping);
+	dirty->IntersectWith(fScreenAndUserClipping);
 	fWindow->MarkContentDirty(*dirty);
 
 	fWindow->RecycleRegion(dirty);
@@ -1242,7 +1244,8 @@ View::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 
 	if (fViewBitmap != NULL || fViewColor != B_TRANSPARENT_COLOR) {
 		// we can only draw within our own area
-		BRegion* redraw = fWindow->GetRegion(ScreenClipping(windowContentClipping));
+		BRegion* redraw = fWindow->GetRegion(
+			_ScreenClipping(windowContentClipping));
 		if (!redraw)
 			return;
 		// add the current clipping
@@ -1478,7 +1481,7 @@ View::AddTokensForViewsInRegion(BMessage* message, BRegion& region,
 	if (!fVisible)
 		return;
 
-	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
+	if (region.Intersects(_ScreenClipping(windowContentClipping).Frame()))
 		message->AddInt32("_token", fToken);
 
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
@@ -1500,7 +1503,7 @@ View::AddTokensForViewsInRegion(BPrivate::PortLink& link, BRegion& region,
 	if (!region.Intersects((clipping_rect)screenBounds))
 		return;
 
-	if (region.Intersects(ScreenClipping(windowContentClipping).Frame()))
+	if (region.Intersects(_ScreenClipping(windowContentClipping).Frame()))
 		link.Attach<int32>(fToken);
 
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
@@ -1525,6 +1528,19 @@ View::PrintToStream() const
 	printf("  fScreenClipping:\n");
 	fScreenClipping.PrintToStream();
 	printf("  valid:            %d\n", fScreenClippingValid);
+
+	printf("  fUserClipping:\n");
+	if (fUserClipping != NULL)
+		fUserClipping->PrintToStream();
+	else
+		printf("  none\n");
+
+	printf("  fScreenAndUserClipping:\n");
+	if (fScreenAndUserClipping != NULL)
+		fScreenAndUserClipping->PrintToStream();
+	else
+		printf("  invalid\n");
+
 	printf("  state:\n");
 	printf("    user clipping:  %d\n", fDrawState->HasClipping());
 	BPoint origin = fDrawState->CombinedOrigin();
@@ -1572,45 +1588,44 @@ View::RebuildClipping(bool deep)
 		// hand, views for which this feature is actually used will
 		// probably not have any children, so it is not that expensive
 		// after all
-		BRegion* screenUserClipping = fWindow->GetRegion();
-		if (!screenUserClipping)
-			return;
-		fDrawState->GetCombinedClippingRegion(screenUserClipping);
-		fLocalClipping.IntersectWith(screenUserClipping);
-		fWindow->RecycleRegion(screenUserClipping);
+		if (fUserClipping == NULL) {
+			fUserClipping = new (nothrow) BRegion;
+			if (fUserClipping == NULL)
+				return;
+		}
+
+		fDrawState->GetCombinedClippingRegion(fUserClipping);
+	} else {
+		delete fUserClipping;
+		fUserClipping = NULL;
 	}
 
+	delete fScreenAndUserClipping;
+	fScreenAndUserClipping = NULL;
 	fScreenClippingValid = false;
 }
 
 
 BRegion&
-View::ScreenClipping(BRegion* windowContentClipping, bool force) const
+View::ScreenAndUserClipping(BRegion* windowContentClipping, bool force) const
 {
-	if (!fScreenClippingValid || force) {
-		fScreenClipping = fLocalClipping;
-		ConvertToScreen(&fScreenClipping);
+	// no user clipping - return screen clipping directly
+	if (fUserClipping == NULL)
+		return _ScreenClipping(windowContentClipping, force);
 
-		// see if parts of our bounds are hidden underneath
-		// the parent, the local clipping does not account for this
-		IntRect clippedBounds = Bounds();
-		ConvertToVisibleInTopView(&clippedBounds);
-		if (clippedBounds.Width() < fScreenClipping.Frame().Width()
-			|| clippedBounds.Height() < fScreenClipping.Frame().Height()) {
-			BRegion* temp = fWindow->GetRegion();
-			if (temp) {
-				temp->Set((clipping_rect)clippedBounds);
-				fScreenClipping.IntersectWith(temp);
-				fWindow->RecycleRegion(temp);
-			}
-		}
+	// combined screen and user clipping already valid
+	if (fScreenAndUserClipping != NULL)
+		return *fScreenAndUserClipping;
 
-		fScreenClipping.IntersectWith(windowContentClipping);
-		fScreenClippingValid = true;
-	}
-//printf("###View(%s)::ScreenClipping():\n", Name());
-//fScreenClipping.PrintToStream();
-	return fScreenClipping;
+	// build a new combined user and screen clipping
+	fScreenAndUserClipping = new (nothrow) BRegion(*fUserClipping);
+	if (fScreenAndUserClipping == NULL)
+		return fScreenClipping;
+
+	ConvertToScreen(fScreenAndUserClipping);
+	fScreenAndUserClipping->IntersectWith(
+		&_ScreenClipping(windowContentClipping, force));
+	return *fScreenAndUserClipping;
 }
 
 
@@ -1633,6 +1648,8 @@ View::InvalidateScreenClipping()
 //	if (!fScreenClippingValid)
 //		return;
 
+	delete fScreenAndUserClipping;
+	fScreenAndUserClipping = NULL;
 	fScreenClippingValid = false;
 	// invalidate the childrens screen clipping as well
 	for (View* child = FirstChild(); child; child = child->NextSibling()) {
@@ -1641,11 +1658,43 @@ View::InvalidateScreenClipping()
 }
 
 
+BRegion&
+View::_ScreenClipping(BRegion* windowContentClipping, bool force) const
+{
+	if (!fScreenClippingValid || force) {
+		fScreenClipping = fLocalClipping;
+		ConvertToScreen(&fScreenClipping);
+
+		// see if parts of our bounds are hidden underneath
+		// the parent, the local clipping does not account for this
+		IntRect clippedBounds = Bounds();
+		ConvertToVisibleInTopView(&clippedBounds);
+		if (clippedBounds.Width() < fScreenClipping.Frame().Width()
+			|| clippedBounds.Height() < fScreenClipping.Frame().Height()) {
+			BRegion* temp = fWindow->GetRegion();
+			if (temp) {
+				temp->Set((clipping_rect)clippedBounds);
+				fScreenClipping.IntersectWith(temp);
+				fWindow->RecycleRegion(temp);
+			}
+		}
+
+		fScreenClipping.IntersectWith(windowContentClipping);
+		fScreenClippingValid = true;
+	}
+
+	return fScreenClipping;
+}
+
+
 void
 View::_MoveScreenClipping(int32 x, int32 y, bool deep)
 {
-	if (fScreenClippingValid)
+	if (fScreenClippingValid) {
 		fScreenClipping.OffsetBy(x, y);
+		delete fScreenAndUserClipping;
+		fScreenAndUserClipping = NULL;
+	}
 
 	if (deep) {
 		// move the childrens screen clipping as well

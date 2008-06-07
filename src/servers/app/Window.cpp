@@ -581,7 +581,7 @@ Window::GetEffectiveDrawingRegion(View* view, BRegion& region)
 	if (!fContentRegionValid)
 		_UpdateContentRegion();
 
-	region.IntersectWith(&view->ScreenClipping(&fContentRegion));
+	region.IntersectWith(&view->ScreenAndUserClipping(&fContentRegion));
 }
 
 
@@ -706,7 +706,8 @@ Window::InvalidateView(View* view, BRegion& viewRegion)
 		view->ConvertToScreen(&viewRegion);
 		viewRegion.IntersectWith(&VisibleContentRegion());
 		if (viewRegion.CountRects() > 0) {
-			viewRegion.IntersectWith(&view->ScreenClipping(&fContentRegion));
+			viewRegion.IntersectWith(
+				&view->ScreenAndUserClipping(&fContentRegion));
 
 //fDrawingEngine->FillRegion(viewRegion, rgb_color{ 0, 255, 0, 255 });
 //snooze(10000);

@@ -225,11 +225,17 @@ class View {
 
 			// clipping
 			void			RebuildClipping(bool deep);
-			BRegion&		ScreenClipping(BRegion* windowContentClipping,
+			BRegion&		ScreenAndUserClipping(
+								BRegion* windowContentClipping,
 								bool force = false) const;
 			void			InvalidateScreenClipping();
 	inline	bool			IsScreenClippingValid() const
-								{ return fScreenClippingValid; }
+								{
+									return fScreenClippingValid
+										&& (fUserClipping == NULL
+										|| (fUserClipping != NULL
+										&& fScreenAndUserClipping != NULL));
+								}
 
 			// debugging
 			void			PrintToStream() const;
@@ -239,6 +245,8 @@ class View {
 #endif
 
 	protected:
+			BRegion&		_ScreenClipping(BRegion* windowContentClipping,
+								bool force = false) const;
 			void			_MoveScreenClipping(int32 x, int32 y,
 								bool deep);
 			Overlay*		_Overlay() const;
@@ -285,6 +293,9 @@ class View {
 
 	mutable	BRegion			fScreenClipping;
 	mutable	bool			fScreenClippingValid;
+
+			BRegion*		fUserClipping;
+	mutable	BRegion*		fScreenAndUserClipping;
 };
 
 #endif	// VIEW_H

@@ -325,7 +325,7 @@ WorkspacesView::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	BRegion* windowContentClipping, bool deep)
 {
 	// we can only draw within our own area
-	BRegion redraw(ScreenClipping(windowContentClipping));
+	BRegion redraw(ScreenAndUserClipping(windowContentClipping));
 	// add the current clipping
 	redraw.IntersectWith(effectiveClipping);
 
