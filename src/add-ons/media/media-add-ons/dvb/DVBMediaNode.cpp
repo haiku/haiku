@@ -138,7 +138,8 @@ DVBMediaNode::DVBMediaNode(
  ,	fThreadIdEncVideo(-1)
  ,	fThreadIdMpegTS(-1)
  ,	fTerminateThreads(false)
- ,	fDemux(new TransportStreamDemux(fRawVideoQueue, fRawAudioQueue, fEncVideoQueue, fEncAudioQueue, fMpegTsQueue))
+ ,	fDemux(new TransportStreamDemux(fRawVideoQueue, fRawAudioQueue,
+ 		fEncVideoQueue, fEncAudioQueue, fMpegTsQueue))
  ,	fBufferGroupRawVideo(0)
  ,	fBufferGroupRawAudio(0)
  ,	fInterfaceType(DVB_TYPE_UNKNOWN)
@@ -1738,12 +1739,14 @@ DVBMediaNode::raw_video_thread()
 	// decode data and send buffers
 
 	uint32 video_buffer_size_max = 720 * 576 * 4;
-	uint32 video_buffer_size = fOutputRawVideo.format.u.raw_video.display.line_count * fOutputRawVideo.format.u.raw_video.display.bytes_per_row;
+	uint32 video_buffer_size
+		= fOutputRawVideo.format.u.raw_video.display.line_count
+			* fOutputRawVideo.format.u.raw_video.display.bytes_per_row;
 	
 	delete fBufferGroupRawVideo;
 	fBufferGroupRawVideo = new BBufferGroup(video_buffer_size_max, 4);
 
-	while (!fTerminateThreads) {	
+	while (!fTerminateThreads) {
 		int64 frameCount;
 		media_header mh;
 		media_header_ex *mhe = (media_header_ex *)&mh;
@@ -1756,7 +1759,8 @@ DVBMediaNode::raw_video_thread()
 		// fetch a new buffer (always of maximum size, as the stream may change)
 
 		BBuffer* buf;
-		buf = fBufferGroupRawVideo->RequestBuffer(video_buffer_size_max, VIDEO_BUFFER_REQUEST_TIMEOUT);
+		buf = fBufferGroupRawVideo->RequestBuffer(video_buffer_size_max,
+			VIDEO_BUFFER_REQUEST_TIMEOUT);
 		if (!buf) {
 			TRACE("video: request buffer timout\n");
 			continue;
