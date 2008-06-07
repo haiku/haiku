@@ -108,13 +108,19 @@ static int
 auich_codec_wait(device_config *config)
 {
 	int i;
-	for (i = 0; i < 1100; i++) {
+	/* Anyone holding a semaphore for 1 msec should be 'shot'... */
+	for (i = 0; i < 200; i++) {
 		if ((auich_reg_read_8(config, AUICH_REG_ACC_SEMA) & 0x01) == 0)
 			return B_OK;
 		if (i > 100)
 			snooze(10);
 	}
-	return B_TIMED_OUT;
+	/* access to some forbidden (non existant) ac97 registers will not
+	 * reset the semaphore. So even if you don't get the semaphore, still
+	 * continue the access. We don't really need the semaphore anyway. */ 
+	PRINT(("codec semaphore timed out!\n"));
+
+	return B_OK;
 }
 
 uint16
