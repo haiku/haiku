@@ -356,11 +356,12 @@ AddFilesToHaikuImage beos system : zbeos ;
 
 # boot module links
 AddBootModuleSymlinksToHaikuImage
-	pci $(X86_ONLY)isa config_manager ide scsi
+	pci $(X86_ONLY)isa config_manager ide scsi usb
 	$(PPC_ONLY)openpic
 	block_io ide_adapter locked_pool scsi_periph
 	generic_ide_pci ahci legacy_sata silicon_image_3112 $(X86_ONLY)ide_isa
-	scsi_cd scsi_disk
+	<usb>uhci <usb>ohci <usb>ehci
+	scsi_cd scsi_disk usb_disk
 	intel
 	bfs
 ;
