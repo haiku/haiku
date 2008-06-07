@@ -123,6 +123,8 @@ View::~View()
 	if (fViewBitmap != NULL)
 		gBitmapManager->DeleteBitmap(fViewBitmap);
 
+	delete fScreenAndUserClipping;
+	delete fUserClipping;
 	delete fDrawState;
 
 //	if (fWindow && this == fWindow->TopView())
@@ -1130,12 +1132,11 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 	// copy children in the source rect and neither to copy onto
 	// children in the destination rect...
 	copyRegion->Set((clipping_rect)visibleSrc);
-	copyRegion->IntersectWith(&ScreenAndUserClipping(&windowContentClipping));
-		// note that fScreenAndUserClipping is used directly from hereon
-		// because it is now up to date
-
+	BRegion *screenAndUserClipping
+		= &ScreenAndUserClipping(&windowContentClipping);
+	copyRegion->IntersectWith(screenAndUserClipping);
 	copyRegion->OffsetBy(-xOffset, -yOffset);
-	copyRegion->IntersectWith(fScreenAndUserClipping);
+	copyRegion->IntersectWith(screenAndUserClipping);
 
 	// do the actual blit
 	fWindow->CopyContents(copyRegion, xOffset, yOffset);
@@ -1157,7 +1158,7 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 	// exclude the part that we could copy
 	dirty->Exclude(copyRegion);
 
-	dirty->IntersectWith(fScreenAndUserClipping);
+	dirty->IntersectWith(screenAndUserClipping);
 	fWindow->MarkContentDirty(*dirty);
 
 	fWindow->RecycleRegion(dirty);
