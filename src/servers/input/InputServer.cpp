@@ -1531,7 +1531,7 @@ InputServer::_SanitizeEvents(EventList& events)
 					byte = 0;
 				
 				if (((fKeyInfo.modifiers & B_COMMAND_KEY) != 0 && byte == ' ')
-					|| byte == B_KATAKANA_HIRAGANA) {
+					|| byte == B_ZENKAKU_HANKAKU) {
 					SetNextMethod(!(fKeyInfo.modifiers & B_SHIFT_KEY));
 
 					// this event isn't sent to the user
