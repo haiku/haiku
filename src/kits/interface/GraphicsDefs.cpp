@@ -129,6 +129,23 @@ get_pixel_size_for(color_space space, size_t *pixelChunk, size_t *rowAlignment,
 }
 
 
+static uint32
+get_overlay_flags(color_space space)
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_BITMAP_SUPPORT_FLAGS);
+	link.Attach<uint32>((uint32)space);
+
+	uint32 flags = 0;
+	int32 code;
+	if (link.FlushWithReply(code) == B_OK && code == B_OK) {
+		if (link.Read<uint32>(&flags) < B_OK)
+			flags = 0;
+	}
+	return flags;
+}
+
+
 bool
 bitmaps_support_space(color_space space, uint32 *supportFlags)
 {
@@ -142,17 +159,8 @@ bitmaps_support_space(color_space space, uint32 *supportFlags)
 		case B_CMAP8:		case B_GRAY8:		case B_GRAY1:
 			if (supportFlags != NULL) {
 				*supportFlags = B_VIEWS_SUPPORT_DRAW_BITMAP
-					| B_BITMAPS_SUPPORT_ATTACHED_VIEWS;
-
-				BPrivate::AppServerLink link;
-				link.StartMessage(AS_GET_BITMAP_SUPPORT_FLAGS);
-
-				int32 code;
-				if (link.FlushWithReply(code) == B_OK && code == B_OK) {
-					uint32 flags = 0;
-					if (link.Read<uint32>(&flags) == B_OK)
-						*supportFlags |= flags;
-				}
+					| B_BITMAPS_SUPPORT_ATTACHED_VIEWS
+					| get_overlay_flags(space);
 			}
 			break;
 
@@ -165,6 +173,8 @@ bitmaps_support_space(color_space space, uint32 *supportFlags)
 		case B_HSV24: case B_HSV32: case B_HSVA32:
 		case B_HLS24: case B_HLS32: case B_HLSA32:
 		case B_CMY24: case B_CMY32: case B_CMYA32: case B_CMYK32:
+			if (supportFlags != NULL)
+				*supportFlags = get_overlay_flags(space);
 			break;
 		// unsupported
 		case B_NO_COLOR_SPACE:
