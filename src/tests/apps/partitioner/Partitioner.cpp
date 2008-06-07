@@ -627,7 +627,7 @@ private:
 		error = partition->CreateChild(start, size, type, NULL,
 			parameters.String());
 		if (error != B_OK)
-			printf("Creating the partiiton failed: %s\n", strerror(error));
+			printf("Creating the partition failed: %s\n", strerror(error));
 	}
 
 	void _WriteChanges()
