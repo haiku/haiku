@@ -1,8 +1,13 @@
-/* ++++++++++
-    ACPI Generic Thermal Zone Driver. 
-    Obtains general status of passive devices, monitors / sets critical temperatures
-    Controls active devices.
-+++++ */
+/*
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ * 
+ * ACPI Generic Thermal Zone Driver. 
+ * Obtains general status of passive devices, monitors / sets critical temperatures
+ * Controls active devices.
+ */
+
 #include <KernelExport.h>
 #include <Drivers.h>
 #include <Errors.h>
@@ -12,40 +17,43 @@
 #include <stdlib.h>
 
 #include <ACPI.h>
-#include <pnp_devfs.h>
 #include "acpi_thermal.h"
 
-#define ACPI_THERMAL_MODULE_NAME "drivers/bin/acpi_thermal/acpi_device_v1"
+#define ACPI_THERMAL_MODULE_NAME "drivers/power/acpi_thermal/driver_v1"
+
+#define ACPI_THERMAL_DEVICE_MODULE_NAME "drivers/power/acpi_thermal/device_v1"
 
 /* Base Namespace devices are published to */
-#define ACPI_THERMAL_BASENAME "acpi/thermal/%d"
+#define ACPI_THERMAL_BASENAME "power/acpi_thermal/%d"
 
 // name of pnp generator of path ids
 #define ACPI_THERMAL_PATHID_GENERATOR "acpi_thermal/path_id"
 
-device_manager_info *gDeviceManager;
+static device_manager_info *sDeviceManager;
 
 typedef struct acpi_ns_device_info {
-	device_node_handle node;
+	device_node *node;
 	acpi_device_module_info *acpi;
 	acpi_device acpi_cookie;
 } acpi_thermal_device_info;
 
 
-status_t acpi_thermal_control(acpi_thermal_device_info* device, uint32 op, void* arg, size_t len);
+status_t acpi_thermal_control(void* _cookie, uint32 op, void* arg, size_t len);
 
 
 static status_t
-acpi_thermal_open(acpi_thermal_device_info *device, uint32 flags, void** cookie)
+acpi_thermal_open(void *_cookie, const char *path, int flags, void** cookie)
 {
+	acpi_thermal_device_info *device = (acpi_thermal_device_info *)_cookie;
 	*cookie = device;
 	return B_OK;
 }
 
 
 static status_t
-acpi_thermal_read(acpi_thermal_device_info* device, off_t position, void *buf, size_t* num_bytes)
+acpi_thermal_read(void* _cookie, off_t position, void *buf, size_t* num_bytes)
 {
+	acpi_thermal_device_info* device = (acpi_thermal_device_info*)_cookie;
 	acpi_thermal_type therm_info;
 	if (*num_bytes < 1)
 		return B_IO_ERROR;
@@ -98,15 +106,16 @@ acpi_thermal_read(acpi_thermal_device_info* device, off_t position, void *buf, s
 
 
 static status_t
-acpi_thermal_write (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
+acpi_thermal_write(void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 {
 	return B_ERROR;
 }
 
 
 status_t
-acpi_thermal_control (acpi_thermal_device_info* device, uint32 op, void* arg, size_t len)
+acpi_thermal_control(void* _cookie, uint32 op, void* arg, size_t len)
 {
+	acpi_thermal_device_info* device = (acpi_thermal_device_info*)_cookie;
 	status_t err = B_ERROR;
 	
 	acpi_thermal_type *att = NULL;
@@ -161,161 +170,160 @@ acpi_thermal_free (void* cookie)
 }
 
 
+//	#pragma mark - driver module API
+
+
 static float
-acpi_thermal_support(device_node_handle parent, bool *_noConnection)
+acpi_thermal_support(device_node *parent)
 {
-	char *bus;
+	const char *bus;
 	uint32 device_type;
 
 	// make sure parent is really the ACPI bus manager
-	if (gDeviceManager->get_attr_string(parent, B_DRIVER_BUS, &bus, false) != B_OK) {
-		dprintf("no bus\n");
-		return 0.0;
-	}
+	if (sDeviceManager->get_attr_string(parent, B_DEVICE_BUS, &bus, false))
+		return -1;
 	
-	if (strcmp(bus, "acpi")) {
-		dprintf("bad bus\n");
-		goto err;
-	}
+	if (strcmp(bus, "acpi"))
+		return 0.0;
 
 	// check whether it's really a thermal Device
-	if (gDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM, &device_type, false) != B_OK
+	if (sDeviceManager->get_attr_uint32(parent, ACPI_DEVICE_TYPE_ITEM, &device_type, false) != B_OK
 		|| device_type != ACPI_TYPE_THERMAL) {
-		dprintf("bad type\n");
-		goto err;
+		return 0.0;
 	}
 
 	// TODO check there are _CRT and _TMP ?
 
-	free(bus);
 	return 0.6;
-err:
-	free(bus);
-	return 0.0;
 }
 
 
 static status_t
-acpi_thermal_init_device(device_node_handle node, void *user_cookie, void **cookie)
+acpi_thermal_register_device(device_node *node)
 {
-	acpi_thermal_device_info *device;
-	status_t res;
+	device_attr attrs[] = {
+		{ B_DEVICE_PRETTY_NAME, B_STRING_TYPE, { string: "ACPI Thermal" }},
+		{ NULL }
+	};
 
+	return sDeviceManager->register_node(node, ACPI_THERMAL_MODULE_NAME, attrs, NULL, NULL);
+}
+
+
+static status_t
+acpi_thermal_init_driver(device_node *node, void **_driverCookie)
+{
+	*_driverCookie = node;
+	return B_OK;
+}
+
+
+static void
+acpi_thermal_uninit_driver(void *driverCookie)
+{
+}
+
+
+static status_t
+acpi_thermal_register_child_devices(void *_cookie)
+{
+	status_t err;
+	device_node *node = _cookie;
+	int path_id;
+	char name[128];
+		
+	path_id = sDeviceManager->create_id(ACPI_THERMAL_PATHID_GENERATOR);
+	if (path_id < 0) {
+		dprintf("acpi_thermal_register_child_devices: couldn't create a path_id\n");
+		return B_ERROR;
+	}
+	
+	snprintf(name, sizeof(name), ACPI_THERMAL_BASENAME, path_id);
+		
+	return sDeviceManager->publish_device(node, name, ACPI_THERMAL_DEVICE_MODULE_NAME);
+}
+
+
+static status_t
+acpi_thermal_init_device(void *_cookie, void **cookie)
+{
+	device_node *node = (device_node *)_cookie;
+	acpi_thermal_device_info *device;
+	device_node *parent;
+	
 	device = (acpi_thermal_device_info *)calloc(1, sizeof(*device));
 	if (device == NULL)
 		return B_NO_MEMORY;
 
 	device->node = node;
 
-	// register it everywhere
-	res = gDeviceManager->init_driver(gDeviceManager->get_parent(node), NULL, 
-			(driver_module_info **)&device->acpi, (void**) &device->acpi_cookie);
-	if (res != B_OK)
-		goto err;
+	parent = sDeviceManager->get_parent_node(node);
+	sDeviceManager->get_driver(parent, (driver_module_info **)&device->acpi,
+		(void **)&device->acpi_cookie);
+	sDeviceManager->put_node(parent);
 
 	*cookie = device;
 	return B_OK;
+}
 
-err:
+
+static void
+acpi_thermal_uninit_device(void *_cookie)
+{
+	acpi_thermal_device_info *device = (acpi_thermal_device_info *)_cookie;
 	free(device);
-	return res;
 }
 
 
-static status_t
-acpi_thermal_uninit_device(acpi_thermal_device_info *device)
-{
-	gDeviceManager->uninit_driver(gDeviceManager->get_parent(device->node));
-	free(device);
-
-	return B_OK;
-}
-
-
-static status_t
-acpi_thermal_added(device_node_handle node)
-{
-	int path_id;
-	char name[128];
-		
-	path_id = gDeviceManager->create_id(ACPI_THERMAL_PATHID_GENERATOR);
-	if (path_id < 0) {
-		return B_ERROR;
-	}
-	
-	snprintf(name, sizeof(name), ACPI_THERMAL_BASENAME, path_id);
-	{
-		device_attr attrs[] = {
-			{ B_DRIVER_MODULE, B_STRING_TYPE, { string: ACPI_THERMAL_MODULE_NAME }},
-		
-			{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "acpi_thermal" }},
-			// we want devfs on top of us (who wouldn't?)
-			{ B_DRIVER_FIXED_CHILD, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
-
-			{ PNP_MANAGER_ID_GENERATOR, B_STRING_TYPE, { string: ACPI_THERMAL_PATHID_GENERATOR }},
-			{ PNP_MANAGER_AUTO_ID, B_UINT32_TYPE, { ui32: path_id }},
-
-			// tell which name we want to have in devfs
-			{ PNP_DEVFS_FILENAME, B_STRING_TYPE, { string: name }},
-			{ NULL }
-		};
-
-		return gDeviceManager->register_device(node, attrs, NULL, &node);
-	}
-	
-}
-
-
-static status_t
-std_ops(int32 op, ...)
-{
-	switch (op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-
-		default:
-			return B_ERROR;
-	}
-}
 
 module_dependency module_dependencies[] = {
-	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&gDeviceManager },
+	{ B_DEVICE_MANAGER_MODULE_NAME, (module_info **)&sDeviceManager },
 	{}
 };
 
 
-pnp_devfs_driver_info acpi_thermal_dump_module = {
+driver_module_info acpi_thermal_driver_module = {
 	{
-		{
-			ACPI_THERMAL_MODULE_NAME,
-			0,			
-			std_ops
-		},
-
-		acpi_thermal_support,
-		acpi_thermal_added,
-		acpi_thermal_init_device,
-		(status_t (*) (void *))acpi_thermal_uninit_device,
+		ACPI_THERMAL_MODULE_NAME,
+		0,
 		NULL
 	},
 
-	(pnp_device_open_hook) 	&acpi_thermal_open,
+	acpi_thermal_support,
+	acpi_thermal_register_device,
+	acpi_thermal_init_driver,
+	acpi_thermal_uninit_driver,
+	acpi_thermal_register_child_devices,
+	NULL,	// rescan
+	NULL,	// removed
+};
+
+
+struct device_module_info acpi_thermal_device_module = {
+	{
+		ACPI_THERMAL_DEVICE_MODULE_NAME,
+		0,
+		NULL
+	},
+
+	acpi_thermal_init_device,
+	acpi_thermal_uninit_device,
+	NULL,
+
+	acpi_thermal_open,
 	acpi_thermal_close,
 	acpi_thermal_free,
-	(device_control_hook)	&acpi_thermal_control,
-
-	(device_read_hook) acpi_thermal_read,
+	acpi_thermal_read,
 	acpi_thermal_write,
-
 	NULL,
-	NULL,
+	acpi_thermal_control,
 
 	NULL,
 	NULL
 };
 
 module_info *modules[] = {
-	(module_info *)&acpi_thermal_dump_module,
+	(module_info *)&acpi_thermal_driver_module,
+	(module_info *)&acpi_thermal_device_module,
 	NULL
 };
