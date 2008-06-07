@@ -16,61 +16,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <algorithm>
 
-/*!
-	\brief A simple recursive quick sort implementations for BListItem arrays.
-
-	We need to implement it ourselves, since the BOutlineListView sort methods
-	use a different comparison function than the standard functions.
-*/
-static void
-quick_sort_item_array(BListItem** items, int32 first, int32 last,
-	int (*compareFunc)(const BListItem* a, const BListItem* b))
-{
-	if (last <= first)
-		return;
-
-	BListItem* pivot = items[first + (rand() % (last - first))];
-		// choose an arbitrary pivot element
-
-	int32 left = first;
-	int32 right = last;
-
-	do {
-		while ((compareFunc(items[left], pivot) < 0) && (left < last)) 
-			left++;
-		
-		while ((compareFunc(items[right], pivot) > 0) && (right > first)) 
-			right--;
-
-		if (left < right) {
-			// swap entries
-			BListItem* temp = items[left];
-			items[left] = items[right];
-			items[right] = temp;
-
-			left++;
-			right--;
-		}
-	} while (left < right);
-
-	// if our subset of the array consists of two elements, then we're done recursing
-	if (last - first <= 1)
-		return;
-
-	// At this point, the elements in the left half are all smaller
-	// than the elements in the right half
-	if (first < left) {
-		// sort left half
-		quick_sort_item_array(items, first, left, compareFunc);
+struct ListItemComparator {
+	ListItemComparator(int (*compareFunc)(const BListItem *, const BListItem *))
+		: fCompareFunc(compareFunc)
+	{
 	}
-	if (right < last) {
-		// sort right half
-		quick_sort_item_array(items, right, last, compareFunc);
+
+	bool operator()(const BListItem *a, const BListItem *b) const
+	{
+		return fCompareFunc(a, b) < 0;
 	}
-}
 
-
+private:
+	int (*fCompareFunc)(const BListItem *, const BListItem *);
+};
+	
 //	#pragma mark -
 
 
@@ -662,9 +624,8 @@ void
 BOutlineListView::_SortTree(BList* tree, bool oneLevelOnly,
 	int (*compareFunc)(const BListItem* a, const BListItem* b))
 {
-	// home-brewn quick sort for our compareFunc
-	quick_sort_item_array((BListItem**)tree->Items(), 0, tree->CountItems() - 1,
-		compareFunc);
+	BListItem **items = (BListItem **)tree->Items();
+	std::sort(items, items + tree->CountItems(), ListItemComparator(compareFunc));	
 
 	if (oneLevelOnly)
 		return;
