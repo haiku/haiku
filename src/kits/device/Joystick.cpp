@@ -155,7 +155,7 @@ BJoystick::Close(void)
 
 
 void
-BJoystick::ScanDevices(bool use_disabled = false)
+BJoystick::ScanDevices(bool use_disabled)
 {
 	// First, we empty the list
 	for (int32 count = _fDevices->CountItems() - 1; count >= 0; count--)
