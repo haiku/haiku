@@ -3845,10 +3845,11 @@ BView::MessageReceived(BMessage* msg)
 				if (horizontal != NULL) {
 					horizontal->GetSteps(&smallStep, &largeStep);
 
-					// pressing the option key scrolls faster
-					if (modifiers() & B_OPTION_KEY)
+					// pressing the option/command/control key scrolls faster
+					if (modifiers()
+						& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) {
 						deltaX *= largeStep;
-					else
+					} else
 						deltaX *= smallStep * 3;
 
 					horizontal->SetValue(horizontal->Value() + deltaX);
@@ -3857,10 +3858,11 @@ BView::MessageReceived(BMessage* msg)
 				if (vertical != NULL) {
 					vertical->GetSteps(&smallStep, &largeStep);
 
-					// pressing the option key scrolls faster
-					if (modifiers() & B_OPTION_KEY)
+					// pressing the option/command/control key scrolls faster
+					if (modifiers()
+						& (B_OPTION_KEY | B_COMMAND_KEY | B_CONTROL_KEY)) {
 						deltaY *= largeStep;
-					else
+					} else
 						deltaY *= smallStep * 3;
 
 					vertical->SetValue(vertical->Value() + deltaY);
