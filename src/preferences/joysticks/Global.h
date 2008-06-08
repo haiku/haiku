@@ -17,6 +17,11 @@
 #define PORT_INVOKE    'PInV'
 #define JOY_INVOKE     'jInV'
 
+#define DISABLEPORT		'pdis'
+#define PROBE			'prob'
+#define CALIBRATE		'cali'
+
+#define SELECTED  'sele'
 
 #endif	/* _GLOBAL_H */
 

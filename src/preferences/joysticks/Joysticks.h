@@ -23,6 +23,7 @@ class Joysticks : public BApplication
 		~Joysticks();
 
 		virtual void	ReadyToRun();
+		virtual bool	QuitRequested();
 
 	protected:
 		JoyWin*			fJoywin;

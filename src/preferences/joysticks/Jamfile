@@ -1,12 +1,14 @@
 SubDir HAIKU_TOP src preferences joysticks ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 Preference Joysticks :
 	CalibWin.cpp
 	JoyWin.cpp
 	Joysticks.cpp
 	MessageWin.cpp
+	PortItem.cpp
 	: be device
 	: Joysticks.rdef
 	;
