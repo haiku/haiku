@@ -28,11 +28,7 @@ int main(int, char **)
 InstallerApp::InstallerApp()
 	: BApplication(APP_SIG)
 {
-	BRect windowFrame(0, 0, INSTALLER_RIGHT, 160);
 	BRect frame = BScreen().Frame();
-	windowFrame.OffsetBy((frame.Width() - windowFrame.Width()) / 2,
-		frame.Height() / 2 - windowFrame.Height() / 4 - 113);
-	fWindow = new InstallerWindow(windowFrame);
 
 	// show the EULA
 	BAlert *alert = new BAlert("", EULA_TEXT, " Disagree ", " Agree ", NULL,
@@ -51,8 +47,15 @@ InstallerApp::InstallerApp()
 	alertFrame.OffsetTo((frame.Width() - alertFrame.Width()) / 2,
 		(frame.Height() - alertFrame.Height()) / 2);
 	alert->MoveTo(alertFrame.LeftTop());
-	if (alert->Go() != 1)
+	if (alert->Go() != 1) {
 		PostMessage(B_QUIT_REQUESTED);
+		return;
+	}
+
+	BRect windowFrame(0, 0, INSTALLER_RIGHT, 160);
+	windowFrame.OffsetBy((frame.Width() - windowFrame.Width()) / 2,
+		frame.Height() / 2 - windowFrame.Height() / 4 - 113);
+	fWindow = new InstallerWindow(windowFrame);
 }
 
 void
