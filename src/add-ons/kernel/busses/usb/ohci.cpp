@@ -426,9 +426,15 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	if (!Lock())
 		return B_ERROR;
 
+	struct transfer_entry {
+		Transfer *			transfer;
+		transfer_entry *	next;
+	};
+
+	transfer_entry *list = NULL;
 	transfer_data *current = fFirstTransfer;
 	while (current) {
-		if (current->transfer->TransferPipe() == pipe) {
+		if (current->transfer && current->transfer->TransferPipe() == pipe) {
 			// Check if the skip bit is already set
 			if (!(current->endpoint->flags & OHCI_ENDPOINT_SKIP)) {
 				current->endpoint->flags |= OHCI_ENDPOINT_SKIP;
@@ -445,7 +451,14 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 				// If the transfer is canceled by force, the one causing the
 				// cancel is probably not the one who initiated the transfer
 				// and the callback is likely not safe anymore
-				current->transfer->Finished(B_CANCELED, 0);
+				transfer_entry *entry
+					= (transfer_entry *)malloc(sizeof(transfer_entry));
+				if (entry != NULL) {
+					entry->transfer = current->transfer;
+					current->transfer = NULL;
+					entry->next = list;
+					list = entry;
+				}
 			}
 			current->canceled = true;
 		}
@@ -453,6 +466,14 @@ OHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 	}
 
 	Unlock();
+
+	while (list != NULL) {
+		transfer_entry *next = list->next;
+		list->transfer->Finished(B_CANCELED, 0);
+		delete list->transfer;
+		free(list);
+		list = next;
+	}
 
 	// notify the finisher so it can clean up the canceled transfers
 	release_sem_etc(fFinishTransfersSem, 1, B_DO_NOT_RESCHEDULE);
