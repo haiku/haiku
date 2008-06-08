@@ -95,7 +95,7 @@ dump_port_list(int argc, char **argv)
 	} else if (argc > 1)
 		owner = strtoul(argv[1], NULL, 0);
 
-	kprintf("port           id  cap  r-sem  w-sem   team  name\n");
+	kprintf("port             id  cap  r-sem  r-cnt  w-sem  w-cnt    total   team  name\n");
 
 	for (i = 0; i < sMaxPorts; i++) {
 		struct port_entry *port = &sPorts[i];
@@ -104,8 +104,12 @@ dump_port_list(int argc, char **argv)
 			|| (name != NULL && strstr(port->name, name) == NULL))
 			continue;
 
-		kprintf("%p %6ld %4ld %6ld %6ld %6ld  %s\n", port, port->id,
-			port->capacity, port->read_sem, port->write_sem, port->owner,
+		int32 readCount, writeCount;
+		get_sem_count(port->read_sem, &readCount);
+		get_sem_count(port->write_sem, &writeCount);
+		kprintf("%p %8ld %4ld %6ld %6ld %6ld %6ld %8ld %6ld  %s\n", port,
+			port->id, port->capacity, port->read_sem, readCount,
+			port->write_sem, writeCount, port->total_count, port->owner,
 			port->name);
 	}
 	return 0;
