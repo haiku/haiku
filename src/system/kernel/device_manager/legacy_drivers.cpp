@@ -581,6 +581,17 @@ add_driver(const char *path, image_id image)
 		get_leaf(path));
 	if (driver != NULL) {
 		// we know this driver
+		if (strcmp(driver->path, path) != 0) {
+			// TODO: do properly, but for now we just update the path if it
+			// isn't the same anymore so rescanning of drivers will work in
+			// case this driver was loaded so early that it has a boot module
+			// path and not a proper driver path
+			free((char *)driver->path);
+			driver->path = strdup(path);
+			driver->name = get_leaf(driver->path);
+			driver->binary_updated = true;
+		}
+
 		// TODO: check if this driver is a different one and has precendence
 		// (ie. common supersedes system).
 		//dprintf("new driver has priority %ld, old %ld\n", priority, driver->priority);
