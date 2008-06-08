@@ -1301,12 +1301,13 @@ PCIDev *
 PCI::_FindDevice(PCIBus *current, int domain, uint8 bus, uint8 device,
 	uint8 function)
 {
-	if (current->domain == domain && current->bus == bus) {
+	if (current->domain == domain) {
 		// search device on this bus
 
 		for (PCIDev *child = current->child; child != NULL;
 				child = child->next) {
-			if (child->device == device && child->function == function)
+			if (child->bus == bus && child->device == device
+				&& child->function == function)
 				return child;
 
 			if (child->child != NULL) {

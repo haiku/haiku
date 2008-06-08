@@ -124,6 +124,9 @@ pci_device_init_driver(device_node* node, void** _cookie)
 		return B_NO_MEMORY;
 
 	device->device = gPCI->FindDevice(domain, bus, deviceNumber, function);
+	if (device->device == NULL)
+		panic("device not found!\n");
+
 	device->node = node;
 
 	*_cookie = device;
