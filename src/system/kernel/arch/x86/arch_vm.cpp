@@ -223,11 +223,18 @@ static int64 sPropositions[MTRR_MAX_SOLUTIONS];
 static void
 find_nearest(uint64 value, int iteration)
 {
-	TRACE_MTRR("find_nearest %Lx %d\n", value, iteration);
-	if (iteration > (MTRR_MAX_SOLUTIONS - 1) || (iteration + 1) >= sSolutionCount)
-		return;
-	uint64 down, up;
 	int i;
+	uint64 down, up;
+	TRACE_MTRR("find_nearest %Lx %d\n", value, iteration);
+	if (iteration > (MTRR_MAX_SOLUTIONS - 1) || (iteration + 1) >= sSolutionCount) {
+		if (sSolutionCount > MTRR_MAX_SOLUTIONS) {
+			// no solutions yet, save something
+			for (i=0; i<iteration; i++)
+				sSolutions[i] = sPropositions[i];
+			sSolutionCount = iteration;
+		}
+		return;
+	}
 	nearest_powers(value, &down, &up);
 	sPropositions[iteration] = down;
 	if (value - down < MTRR_MIN_SIZE) {
@@ -254,7 +261,7 @@ set_memory_write_back(int32 id, uint64 base, uint64 length)
 {
 	status_t err;
 	TRACE_MTRR("set_memory_write_back base %Lx length %Lx\n", base, length);
-	sSolutionCount = MTRR_MAX_SOLUTIONS;
+	sSolutionCount = MTRR_MAX_SOLUTIONS + 1;
 	find_nearest(length, 0);
 
 #ifdef TRACE_MTRR
