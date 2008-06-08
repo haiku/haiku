@@ -3,6 +3,7 @@
 
 // Available keymaps:
 //	'dv'	dvorak keymap
+//	'fr'	french keymap
 //	'sg'	swiss-german keymap
 //	'us'	default US keymap
 #define	KDL_KEYMAP		'us'
