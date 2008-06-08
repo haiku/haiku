@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src kits device ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
 # for usb_raw.h that defines the ioctl protocol used by the USB classes
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel drivers bus usb ] : true ;
 
