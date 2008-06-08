@@ -301,6 +301,7 @@ ControlPipe::~ControlPipe()
 {
 	if (fNotifySem >= 0)
 		delete_sem(fNotifySem);
+	mutex_lock(&fSendRequestLock);
 	mutex_destroy(&fSendRequestLock);
 }
 
