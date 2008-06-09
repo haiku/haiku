@@ -479,10 +479,10 @@ MainWin::MessageReceived(BMessage *msg)
 				", Stephan Aßmus and Frederik Modéen", "Thanks");
 			if (fAlwaysOnTop) {
 				_ToggleAlwaysOnTop();
-				alert->Go();
+				alert->Go(NULL);  // Asynchronous mode
 				_ToggleAlwaysOnTop();
 			} else {
-				alert->Go();
+				alert->Go(NULL); // Asynchronous mode
 			}
 			break;
 		case M_FILE_CLOSE:
