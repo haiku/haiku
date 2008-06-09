@@ -1,0 +1,34 @@
+/*This file can be used to define custom timing for your monitor
+ * The format of each line is:
+ * {
+ *   pixel clock frequency (kHz)
+ *   width
+ *   h-sync pulse start
+ *   h-sync pulse end
+ *   total pixels in line
+ *   height
+ *   v-sync pulse start
+ *   v-sync pulse end
+ *   total lines in frame
+ *   sync polarity (0 is -ve,B_POSITIVE_HYSNC,B_POSITIVE_VSYNC)
+ * }
+ *
+ *To use this you must:
+ * Uncomment VALID MODE REQUIRED
+ * Fill in a number of modes that work with your display
+ * Change VALID MODES from three to the no. you defined 
+ * run these commands:
+ *   touch ProposeDisplayMode.c
+ *   make install
+ */
+
+//#define VALID_MODE_REQUIRED 1
+
+#define VALID_MODES 3
+
+/*note colour depth and mode flags are ignored*/
+static const display_timing valid_mode_list[] = {
+{31500,640,648,744,840,480,481,500,500,0},
+{49500,800,808,888,1056,600,601,620,625,B_POSITIVE_HSYNC|B_POSITIVE_VSYNC},
+{78750,1024,1032,1128,1312,768,769,788,800,B_POSITIVE_HSYNC|B_POSITIVE_VSYNC}
+};

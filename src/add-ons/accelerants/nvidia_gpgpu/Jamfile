@@ -1,0 +1,30 @@
+SubDir HAIKU_TOP src add-ons accelerants nvidia_gpgpu ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics nvidia_gpgpu ] ;
+UseHeaders [ FDirName $(SUBDIR) engine ] ;
+
+Addon nvidia_gpgpu.accelerant :
+	Acceleration.c
+	Cursor.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GetDeviceInfo.c
+	GetModeInfo.c
+	GetTimingConstraints.c
+	InitAccelerant.c
+	Overlay.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	: libnvidia_gpgpu_engine.a
+;
+
+Package haiku-nvidia_gpgpu-cvs :
+	nvidia_gpgpu.accelerant : 
+	boot home config add-ons accelerants ;
+
+Depends nvidia_gpgpu.accelerant : nvidia_gpgpu ;
+
+SubInclude HAIKU_TOP src add-ons accelerants nvidia_gpgpu engine ;
