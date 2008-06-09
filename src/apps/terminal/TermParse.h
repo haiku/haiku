@@ -37,8 +37,11 @@
 #include <OS.h>
 
 
-//PtyReader buffer size.
 #define READ_BUF_SIZE 2048
+	// pty read buffer size
+#define MIN_PTY_BUFFER_SPACE	16
+	// minimal space left before the reader tries to read more
+
 
 class TerminalBuffer;
 
@@ -80,6 +83,8 @@ private:
 
 	uint fBufferPosition;
 	uchar fReadBuffer[READ_BUF_SIZE];
+	vint32 fReadBufferSize;
+	volatile bool fParserWaiting;
 	
 	int fLockFlag;
 

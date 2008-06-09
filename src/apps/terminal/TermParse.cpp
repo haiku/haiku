@@ -56,8 +56,9 @@ TermParse::TermParse(int fd)
 	fReaderThread(-1),
 	fReaderSem(-1),
 	fReaderLocker(-1),
-	fBufferPosition(0),	
-	fLockFlag(0),
+	fBufferPosition(0),
+	fReadBufferSize(0),
+	fParserWaiting(false),
 	fBuffer(NULL),
 	fQuitting(true)
 {
@@ -117,45 +118,37 @@ TermParse::StopThreads()
 status_t
 TermParse::GetReaderBuf(uchar &c)
 {
-	status_t status;
-#if 0
-	do {
-		status = acquire_sem_etc(fReaderSem, 1, B_TIMEOUT, 10000);
-	} while (status == B_INTERRUPTED);
+	// wait for new input from pty
+	if (fReadBufferSize == 0) {
+		fBuffer->Unlock();
 
-	if (status == B_TIMED_OUT) {
-		fBuffer->ScrollAtCursor();
-		fBuffer->UpdateLine();
+		fParserWaiting = true;
 
-		// Reset cursor blinking time and turn on cursor blinking.
-		fBuffer->SetCurDraw(true);
-#endif
+		status_t status = B_OK;
+		while (fReadBufferSize == 0 && status == B_OK) {
+			do {
+				status = acquire_sem(fReaderSem);
+			} while (status == B_INTERRUPTED);
+		}
 
-		// wait new input from pty.
-fBuffer->Unlock();
-		do {
-			status = acquire_sem(fReaderSem);
-		} while (status == B_INTERRUPTED);
-fBuffer->Lock();
+		fParserWaiting = false;
+
+		fBuffer->Lock();
+
 		if (status < B_OK)
 			return status;
-
-#if 0
-	} else if (status == B_OK) {		
-		// Do nothing
-	} else
-		return status;
-#endif
-
-	c = fReadBuffer[fBufferPosition % READ_BUF_SIZE];
-	fBufferPosition++;
-  	// If PtyReader thread locked, decrement counter and unlock thread.
-	if (fLockFlag != 0) {
-		if (--fLockFlag == 0)
-			release_sem(fReaderLocker);
 	}
 
-//	fBuffer->SetCurDraw(false);
+	c = fReadBuffer[fBufferPosition];
+	fBufferPosition = (fBufferPosition + 1) % READ_BUF_SIZE;
+
+	int32 bufferSize = atomic_add(&fReadBufferSize, -1) - 1;
+
+  	// If the pty reader thread waits and we have made enough space in the
+	// buffer now, let it run again.
+	if (READ_BUF_SIZE - bufferSize == MIN_PTY_BUFFER_SPACE)
+		release_sem(fReaderLocker);
+
 	return B_OK;
 }
 
@@ -248,22 +241,24 @@ TermParse::StopPtyReader()
 int32
 TermParse::PtyReader()
 {
-	uint read_p = 0;
+	int32 bufferSize = 0;
+	int32 readPos = 0;
 	while (!fQuitting) {
 		// If Pty Buffer nearly full, snooze this thread, and continue.
-		if ((read_p - fBufferPosition) > READ_BUF_SIZE - 16) {
-			fLockFlag = READ_BUF_SIZE / 2;
+		while (READ_BUF_SIZE - bufferSize < MIN_PTY_BUFFER_SPACE) {
 			status_t status;
 			do {			
 				status = acquire_sem(fReaderLocker);
 			} while (status == B_INTERRUPTED);
 			if (status < B_OK)
 				return status;		
+
+			bufferSize = fReadBufferSize;
 		}
 
 		// Read PTY
 		uchar buf[READ_BUF_SIZE];
-		int nread = read(fFd, buf, READ_BUF_SIZE - (read_p - fBufferPosition));
+		ssize_t nread = read(fFd, buf, READ_BUF_SIZE - bufferSize);
 		if (nread <= 0) {
 			fBuffer->NotifyQuit(errno);
 			return B_OK;
@@ -271,19 +266,20 @@ TermParse::PtyReader()
 
 		// Copy read string to PtyBuffer.
 
-		int left = READ_BUF_SIZE - (read_p % READ_BUF_SIZE);
-		int mod = read_p % READ_BUF_SIZE;
+		int32 left = READ_BUF_SIZE - readPos;
 
 		if (nread >= left) {
-			memcpy(fReadBuffer + mod, buf, left);
+			memcpy(fReadBuffer + readPos, buf, left);
 			memcpy(fReadBuffer, buf + left, nread - left);
 		} else
-			memcpy(fReadBuffer + mod, buf, nread);
+			memcpy(fReadBuffer + readPos, buf, nread);
 
-		read_p += nread;
+		bufferSize = atomic_add(&fReadBufferSize, nread);
+		if (bufferSize == 0 && fParserWaiting)
+			release_sem(fReaderSem);
 
-		// Release semaphore. Number of semaphore counter is nread.
-		release_sem_etc(fReaderSem, nread, 0);
+		bufferSize += nread;
+		readPos = (readPos + nread) % READ_BUF_SIZE;
 	}
 
 	return B_OK;
