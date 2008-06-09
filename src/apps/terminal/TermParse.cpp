@@ -13,6 +13,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <Autolock.h>
 #include <Beep.h>
 #include <Message.h>
 
@@ -117,6 +118,7 @@ status_t
 TermParse::GetReaderBuf(uchar &c)
 {
 	status_t status;
+#if 0
 	do {
 		status = acquire_sem_etc(fReaderSem, 1, B_TIMEOUT, 10000);
 	} while (status == B_INTERRUPTED);
@@ -127,17 +129,23 @@ TermParse::GetReaderBuf(uchar &c)
 
 		// Reset cursor blinking time and turn on cursor blinking.
 		fBuffer->SetCurDraw(true);
+#endif
 
 		// wait new input from pty.
+fBuffer->Unlock();
 		do {
 			status = acquire_sem(fReaderSem);
 		} while (status == B_INTERRUPTED);
+fBuffer->Lock();
 		if (status < B_OK)
 			return status;
+
+#if 0
 	} else if (status == B_OK) {		
 		// Do nothing
 	} else
 		return status;
+#endif
 
 	c = fReadBuffer[fBufferPosition % READ_BUF_SIZE];
 	fBufferPosition++;
@@ -147,7 +155,7 @@ TermParse::GetReaderBuf(uchar &c)
 			release_sem(fReaderLocker);
 	}
 
-	fBuffer->SetCurDraw(false);
+//	fBuffer->SetCurDraw(false);
 	return B_OK;
 }
 
@@ -343,6 +351,9 @@ TermParse::EscParse()
 	int *parsestate = groundtable;
 
 	while (!fQuitting) {
+// TODO: Fix the locking!
+		BAutolock locker(fBuffer);
+
 		uchar c;
 		if (GetReaderBuf(c) < B_OK)
 			break;
@@ -383,6 +394,7 @@ TermParse::EscParse()
 			now_coding = fBuffer->Encoding();
     	}
 
+//debug_printf("TermParse: char: '%c' (%d), parse state: %d\n", c, c, parsestate[c]);
 		switch (parsestate[c]) {
 			case CASE_PRINT:
 				cbuf[0] = c;
@@ -767,7 +779,7 @@ TermParse::EscParse()
 				case CASE_CPR:
 					// Q & D hack by Y.Hayakawa (hida@sawada.riec.tohoku.ac.jp)
 					// 21-JUL-99
-					fBuffer->DeviceStatusReport(param[0]);
+					_DeviceStatusReport(param[0]);
 					parsestate = groundtable;
 					break;
 
@@ -974,4 +986,28 @@ TermParse::_ptyreader_thread(void *data)
 TermParse::_escparse_thread(void *data)
 {
 	return reinterpret_cast<TermParse *>(data)->EscParse();
+}
+
+
+void
+TermParse::_DeviceStatusReport(int n)
+{
+	char sbuf[16] ;
+	int len;
+
+	switch (n) {
+		case 5:
+		{
+			const char* toWrite = "\033[0n";
+			write(fFd, toWrite, strlen(toWrite));
+			break ;
+		}
+		case 6:
+			len = sprintf(sbuf, "\033[%ld;%ldR", fBuffer->Height(),
+				fBuffer->Width()) ;
+			write(fFd, sbuf, len);
+			break ;
+		default:
+			return;
+	}
 }

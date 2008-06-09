@@ -9,16 +9,9 @@
 
 #include "TermWindow.h"
 
-#include "Arguments.h"
-#include "Coding.h"
-#include "MenuUtil.h"
-#include "FindWindow.h"
-#include "PrefWindow.h"
-#include "PrefView.h"
-#include "PrefHandler.h"
-#include "SmartTabView.h"
-#include "TermConst.h"
-#include "TermView.h"
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
 
 #include <Alert.h>
 #include <Application.h>
@@ -35,12 +28,21 @@
 #include <ScrollView.h>
 #include <String.h>
 
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
+#include "Arguments.h"
+#include "Coding.h"
+#include "MenuUtil.h"
+#include "FindWindow.h"
+#include "PrefWindow.h"
+#include "PrefView.h"
+#include "PrefHandler.h"
+#include "SmartTabView.h"
+#include "TermConst.h"
+#include "TermScrollView.h"
+#include "TermView.h"
 
 
 const static int32 kMaxTabs = 6;
+const static int32 kTermViewOffset = 3;
 
 // messages constants
 const static uint32 kNewTab = 'NTab';
@@ -54,6 +56,34 @@ public:
 	CustomTermView(int32 rows, int32 columns, int32 argc, const char **argv, int32 historySize = 1000);
 	virtual void NotifyQuit(int32 reason);
 	virtual void SetTitle(const char *title);
+};
+
+
+class TermViewContainerView : public BView {
+public:
+	TermViewContainerView(TermView* termView)
+		: 
+		BView(BRect(), "term view container", B_FOLLOW_ALL, 0),
+		fTermView(termView)
+	{
+		termView->MoveTo(kTermViewOffset, kTermViewOffset);
+		BRect frame(termView->Frame());
+		ResizeTo(frame.right + kTermViewOffset, frame.bottom + kTermViewOffset);
+		AddChild(termView);
+	}
+
+	TermView* GetTermView() const	{ return fTermView; }
+
+	virtual void GetPreferredSize(float* _width, float* _height)
+	{
+		float width, height;
+		fTermView->GetPreferredSize(&width, &height);
+		*_width = width + 2 * kTermViewOffset;
+		*_height = height + 2 * kTermViewOffset;
+	}
+
+private:
+	TermView*	fTermView;
 };
 
 
@@ -394,9 +424,11 @@ TermWindow::MessageReceived(BMessage *message)
 			break;
 
 		case MSG_COLOR_CHANGED:
-			_SetTermColors(_ActiveTermView());
+		{
+			_SetTermColors(_ActiveTermViewContainerView());
 			_ActiveTermView()->Invalidate();
 			break;
+		}
 
 		case SAVE_AS_DEFAULT: 
 		{
@@ -460,7 +492,7 @@ TermWindow::MessageReceived(BMessage *message)
 			_ResizeView(view);
 			break;
 		}
-			
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -476,16 +508,21 @@ TermWindow::WindowActivated(bool activated)
 
 
 void
-TermWindow::_SetTermColors(TermView *termView)
+TermWindow::_SetTermColors(TermViewContainerView *containerView)
 {
-	termView->SetTextColor(PrefHandler::Default()->getRGB(PREF_TEXT_FORE_COLOR),
-				PrefHandler::Default()->getRGB(PREF_TEXT_BACK_COLOR));
+	PrefHandler* handler = PrefHandler::Default();
+	rgb_color background = handler->getRGB(PREF_TEXT_BACK_COLOR);
 
-	termView->SetSelectColor(PrefHandler::Default()->getRGB(PREF_SELECT_FORE_COLOR),
-				PrefHandler::Default()->getRGB(PREF_SELECT_BACK_COLOR));
-	
-	termView->SetCursorColor(PrefHandler::Default()->getRGB(PREF_CURSOR_FORE_COLOR),
-				PrefHandler::Default()->getRGB(PREF_CURSOR_BACK_COLOR));
+	containerView->SetViewColor(background);
+
+	TermView *termView = containerView->GetTermView();
+	termView->SetTextColor(handler->getRGB(PREF_TEXT_FORE_COLOR), background);
+
+	termView->SetSelectColor(handler->getRGB(PREF_SELECT_FORE_COLOR),
+		handler->getRGB(PREF_SELECT_BACK_COLOR));
+
+	termView->SetCursorColor(handler->getRGB(PREF_CURSOR_FORE_COLOR),
+		handler->getRGB(PREF_CURSOR_BACK_COLOR));
 }
 
 
@@ -564,10 +601,11 @@ TermWindow::_AddTab(Arguments *args)
 			new CustomTermView(PrefHandler::Default()->getInt32(PREF_ROWS),
 							PrefHandler::Default()->getInt32(PREF_COLS),
 							argc, (const char **)argv);
-		
-		BScrollView *scrollView = new BScrollView("scrollView", view, B_FOLLOW_ALL,
-									B_WILL_DRAW|B_FRAME_EVENTS, false, true);	
-		
+
+		TermViewContainerView *containerView = new TermViewContainerView(view);
+		BScrollView *scrollView = new TermScrollView("scrollView",
+			containerView, view);
+
 		BTab *tab = new BTab;
 		// TODO: Use a better name. For example, do like MacOsX's Terminal
 		// and update the title using the last executed command ?
@@ -585,9 +623,9 @@ TermWindow::_AddTab(Arguments *args)
 		BFont font;
 		_GetPreferredFont(font);	
 		view->SetTermFont(&font);
-		
-		_SetTermColors(view);
-		
+
+		_SetTermColors(containerView);
+
 		int width, height;
 		view->GetFontSize(&width, &height);
 
@@ -603,8 +641,8 @@ TermWindow::_AddTab(Arguments *args)
 		// If it's the first time we're called, setup the window
 		if (fTabView->CountTabs() == 1) {
 			float viewWidth, viewHeight;
-			view->GetPreferredSize(&viewWidth, &viewHeight);
-			
+			containerView->GetPreferredSize(&viewWidth, &viewHeight);
+
 			// Resize Window
 			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
 					viewHeight + fMenubar->Bounds().Height());
@@ -627,14 +665,36 @@ TermWindow::_RemoveTab(int32 index)
 		PostMessage(B_QUIT_REQUESTED);
 }
 
+TermViewContainerView*
+TermWindow::_ActiveTermViewContainerView() const
+{
+	return _TermViewContainerViewAt(fTabView->Selection());
+}
 
-TermView *
-TermWindow::_ActiveTermView()
+
+TermViewContainerView*
+TermWindow::_TermViewContainerViewAt(int32 index) const
 {
 	// TODO: BAD HACK:
 	// We should probably use the observer api to tell
 	// the various "tabs" when settings are changed. Fix this.
-	return (TermView *)((BScrollView *)fTabView->ViewForTab(fTabView->Selection()))->Target();
+	BScrollView* scrollView = (BScrollView*)fTabView->ViewForTab(index);
+	return scrollView ? (TermViewContainerView*)scrollView->Target() : NULL;
+}
+
+
+TermView *
+TermWindow::_ActiveTermView() const
+{
+	return _ActiveTermViewContainerView()->GetTermView();
+}
+
+
+TermView*
+TermWindow::_TermViewAt(int32 index) const
+{
+	TermViewContainerView* view = _TermViewContainerViewAt(index);
+	return view != NULL ? view->GetTermView() : NULL;
 }
 
 
@@ -647,12 +707,7 @@ TermWindow::_IndexOfTermView(TermView* termView) const
 	// find the view
 	int32 count = fTabView->CountTabs();
 	for (int32 i = count - 1; i >= 0; i--) {
-		BScrollView* scrollView
-			= dynamic_cast<BScrollView*>(fTabView->ViewForTab(i));
-		if (!scrollView)
-			continue;
-
-		if (termView == scrollView->Target())
+		if (termView == _TermViewAt(i))
 			return i;
 	}
 
@@ -668,11 +723,7 @@ TermWindow::_CheckChildren()
 	int32 count = fTabView->CountTabs();
 	for (int32 i = count - 1; i >= 0; i--) {
 		// get the term view
-		BScrollView* scrollView
-			= dynamic_cast<BScrollView*>(fTabView->ViewForTab(i));
-		if (!scrollView)
-			continue;
-		TermView* termView = dynamic_cast<TermView*>(scrollView->Target());
+		TermView* termView = _TermViewAt(i);
 		if (!termView)
 			continue;
 
@@ -698,7 +749,7 @@ TermWindow::_ResizeView(TermView *view)
 					minimumHeight + MAX_ROWS * fontHeight);
 	
 	float width, height;
-	view->GetPreferredSize(&width, &height);
+	view->Parent()->GetPreferredSize(&width, &height);
 	width += B_V_SCROLL_BAR_WIDTH;
 	height += fMenubar->Bounds().Height() + 2;
 

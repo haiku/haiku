@@ -9,7 +9,6 @@ Application Terminal :
 	Arguments.cpp
 	CodeConv.cpp
 	Coding.cpp
-	CurPos.cpp
 	FindWindow.cpp
 	MenuUtil.cpp
 	Terminal.cpp
@@ -19,9 +18,10 @@ Application Terminal :
 	Shell.cpp
 	SmartTabView.cpp
 	TermApp.cpp
-	TermBuffer.cpp
 	TerminalBuffer.cpp
+	TerminalCharClassifier.cpp
 	TermParse.cpp
+	TermScrollView.cpp
 	TermView.cpp
 	TermWindow.cpp
 	TTextControl.cpp

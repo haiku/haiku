@@ -41,8 +41,9 @@ class BMenu;
 class BMenuBar;
 class FindWindow;
 class PrefWindow;
-class TermView;
 class SmartTabView;
+class TermView;
+class TermViewContainerView;
 
 
 class TermWindow : public BWindow {
@@ -56,7 +57,7 @@ protected:
 	virtual void	MenusBeginning();
 
 private:
-	void			_SetTermColors(TermView *termView);
+	void			_SetTermColors(TermViewContainerView *termView);
 	void			_InitWindow();
 	void			_SetupMenu();
 	void			_GetPreferredFont(BFont &font);
@@ -64,7 +65,10 @@ private:
 	void			_DoPrint();
 	void			_AddTab(Arguments *args);
 	void			_RemoveTab(int32 index);
-	TermView*		_ActiveTermView();
+	TermViewContainerView* _ActiveTermViewContainerView() const;
+	TermViewContainerView* _TermViewContainerViewAt(int32 index) const;
+	TermView*		_ActiveTermView() const;
+	TermView*		_TermViewAt(int32 index) const;
 	int32			_IndexOfTermView(TermView* termView) const;
 	void			_CheckChildren();
 	void			_ResizeView(TermView *view);

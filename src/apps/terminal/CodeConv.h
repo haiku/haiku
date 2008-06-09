@@ -26,4 +26,5 @@ class CodeConv {
 		static unsigned short UTF8toUnicode(const char *utf8);
 };
 
+
 #endif /* CODECONV_H */

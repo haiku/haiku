@@ -12,12 +12,13 @@
 #ifndef TERMVIEW_H
 #define TERMVIEW_H
 
+#include <Autolock.h>
 #include <Messenger.h>
 #include <String.h>
 #include <View.h>
 
-#include "CurPos.h"
 #include "TerminalBuffer.h"
+#include "TermPos.h"
 
 
 class BClipboard;
@@ -27,7 +28,7 @@ class BString;
 class Shell;
 class TermBuffer;
 
-class TermView : public BView, public TerminalBuffer {
+class TermView : public BView {
 public:
 	TermView(BRect frame, int32 argc, const char **argv, int32 historySize = 1000);
 	TermView(int rows, int columns, int32 argc, const char **argv, int32 historySize = 1000);
@@ -40,6 +41,8 @@ public:
 	virtual void GetPreferredSize(float *width, float *height);
 
 	const char *TerminalName() const;
+
+	inline TerminalBuffer* TextBuffer() const	{ return fTextBuffer; }
 	
 	void	GetTermFont(BFont *font) const;
 	void	SetTermFont(const BFont *font);
@@ -67,52 +70,12 @@ public:
 	void	SelectAll();
 	void	Clear();	
 	
-	// Output Charactor
-	void	Insert(uchar *string, ushort attr);
-	void	InsertCR();
-	void	InsertLF();
-	void	InsertNewLine(int num);
-	void	SetInsertMode(int flag);
-	void	InsertSpace(int num);
-	
-		// Delete Charactor
-	void	EraseBelow();
-	void	DeleteChar(int num);
-	void	DeleteColumns();
-	void	DeleteLine(int num);
-
-	// Get and Set Cursor position
-	void	SetCurPos(int x, int y);
-	void	SetCurX(int x);
-	void	SetCurY(int y);
-	void	GetCurPos(CurPos *inCurPos);
-	int	GetCurX();
-	int	GetCurY();
-	void	SaveCursor();
-	void	RestoreCursor();
-
-	// Move Cursor
-	void	MoveCurRight(int num);
-	void	MoveCurLeft(int num);
-	void	MoveCurUp(int num);
-	void	MoveCurDown(int num);
-
 	// Cursor setting
-	void	DrawCursor();
 	void	BlinkCursor();
 	void	SetCurDraw(bool flag);
 	void	SetCurBlinking(bool flag);
 
-	// Scroll region
-	void	ScrollRegion(int top, int bot, int dir, int num);
-	void	SetScrollRegion(int top, int bot);
-	void	ScrollAtCursor();
-
 	// Other
-	void	DeviceStatusReport(int);
-	void	UpdateLine();
-	void	ScrollScreen();
-	void	ScrollScreenDraw();
 	void	GetFrameSize(float *width, float *height);
 	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
 	void	GetSelection(BString &str);
@@ -135,12 +98,22 @@ protected:
 	virtual void	FrameResized(float width, float height);
 	virtual void	MessageReceived(BMessage* message);
 
+	virtual void	ScrollTo(BPoint where);
+
 	virtual status_t GetSupportedSuites(BMessage *msg);
 	virtual BHandler* ResolveSpecifier(BMessage *msg, int32 index,
 						BMessage *specifier, int32 form,
 						const char *property);
 
 private:
+	// point and text offset conversion
+	inline int32 _LineAt(float y);
+	inline float _LineOffset(int32 index);
+	inline TermPos _ConvertToTerminal(const BPoint &p);
+	inline BPoint _ConvertFromTerminal(const TermPos &pos);
+
+	inline void _InvalidateTextRect(int32 x1, int32 y1, int32 x2, int32 y2);
+
 	status_t _InitObject(int32 argc, const char **argv);
 
 	status_t _AttachShell(Shell *shell);
@@ -148,17 +121,18 @@ private:
 
 	void _AboutRequested();
 
-	void _DrawLines(int , int, ushort, uchar *, int, int, int, BView *);
-	int _TermDraw(const CurPos &start, const CurPos &end);
-	int _TermDrawRegion(CurPos start, CurPos end);
-	int _TermDrawSelectedRegion(CurPos start, CurPos end);	
-	inline void _Redraw(int, int, int, int);
+	void _DrawLinePart(int32 x1, int32 y1, uint16 attr, char *buf,
+		int32 width, bool mouse, bool cursor, BView *inView);
+	void _DrawCursor();
+	void _InvalidateTextRange(TermPos start, TermPos end);	
 	
 	void _DoPrint(BRect updateRect);
-	void _ResizeScrBarRange(void);
+	void _UpdateScrollBarRange();
 	void _DoFileDrop(entry_ref &ref);
 
-	void _WritePTY(const uchar *text, int num_byteses);
+	void _SynchronizeWithTextBuffer(BRect* invalidateWhenScrolling);
+
+	void _WritePTY(const char* text, int32 numBytes);
 
 	// Comunicate Input Method 
 	//  void _DoIMStart (BMessage* message);
@@ -168,33 +142,36 @@ private:
 	//  void _DoIMConfirm (void);
 	//	void _ConfirmString(const char *, int32);
 	
-	// Mouse select
-	void _Select(CurPos start, CurPos end);
-	void _AddSelectRegion(CurPos);
-	void _ResizeSelectRegion(CurPos);
-
-	void _DeSelect();
+	// selection
+	void _Select(TermPos start, TermPos end, bool inclusive,
+		bool setInitialSelection);
+	void _ExtendSelection(TermPos, bool inclusive, bool useInitialSelection);
+	void _Deselect();
 	bool _HasSelection() const;
+	void _SelectWord(BPoint where, bool extend, bool useInitialSelection); 
+	void _SelectLine(BPoint where, bool extend, bool useInitialSelection);
 
-	// select word function
-	void _SelectWord(BPoint where, int mod); 
-	void _SelectLine(BPoint where, int mod);
+	void _AutoScrollUpdate();
 
-	// point and text offset conversion.
-	CurPos _ConvertToTerminal(const BPoint &p);
-	BPoint _ConvertFromTerminal(const CurPos &pos);
+	bool _CheckSelectedRegion(const TermPos &pos) const;
+	bool _CheckSelectedRegion(int32 row, int32 firstColumn,
+		int32& lastColumn) const;
 
-	bool _CheckSelectedRegion(const CurPos &pos);
-	
 	void _UpdateSIGWINCH();
 
-	static void _FixFontAttributes(BFont &font);
-	
+	void _ScrollTo(float y, bool scrollGfx);
+	void _ScrollToRange(TermPos start, TermPos end);
+
 private:
+	class CharClassifier;
+
 	Shell *fShell;
 
 	BMessageRunner *fWinchRunner;
 	BMessageRunner *fCursorBlinkRunner;
+	BMessageRunner *fAutoScrollRunner;
+
+	CharClassifier *fCharClassifier;
 
 	// Font and Width
 	BFont fHalfFont;
@@ -203,19 +180,7 @@ private:
 	int fFontAscent;
 	struct escapement_delta fEscapement;
 
-	// Flags
-
-	// Update flag (Set on Insert).
-	bool fUpdateFlag;
-
-	// Terminal insertmode flag (use Insert).
-	bool fInsertModeFlag;
-
-	// Scroll count, range.
-	int fScrollUpCount;
-	int fScrollBarRange;
-
-	// Frame Resized flag.
+	// frame resized flag.
 	bool fFrameResized;
 
 	// Cursor Blinking, draw flag.
@@ -227,10 +192,7 @@ private:
 	int fCursorHeight;
 
 	// Cursor position.
-	CurPos fCurPos;
-	CurPos fCurStack;
-
-	int fBufferStartPos;
+	TermPos fCursor;
 
 	// Terminal rows and columns.
 	int fTermRows;
@@ -238,12 +200,9 @@ private:
 
 	int fEncoding;
 
-	// Terminal view pointer.
-	int fTop;
-
 	// Object pointer.
-	TermBuffer	*fTextBuffer;
-	BScrollBar	*fScrollBar;
+	TerminalBuffer	*fTextBuffer;
+	BScrollBar		*fScrollBar;
 
 	// Color and Attribute.
 	rgb_color fTextForeColor, fTextBackColor;
@@ -251,22 +210,24 @@ private:
 	rgb_color fSelectForeColor, fSelectBackColor;
 	
 	// Scroll Region
-	int fScrTop;
-	int fScrBot;
+	float fScrollOffset;
 	int32 fScrBufSize;
-	bool fScrRegionSet;
+		// TODO: That's the history capacity -- only needed until the text
+		// buffer is created.
+	float fAutoScrollSpeed;
 
-	BPoint fClickPoint;
-
-	// view selection
-	CurPos fSelStart;
-	CurPos fSelEnd;
+	// selection
+	TermPos fSelStart;
+	TermPos fSelEnd;
+	TermPos fInitialSelectionStart;
+	TermPos fInitialSelectionEnd;
 	bool fMouseTracking;
+	int fSelectGranularity;
 
 	// Input Method parameter.
 	int fIMViewPtr;
-	CurPos fIMStartPos;
-	CurPos fIMEndPos;
+	TermPos fIMStartPos;
+	TermPos fIMEndPos;
 	BString fIMString;
 	bool fIMflag;
 	BMessenger fIMMessenger;

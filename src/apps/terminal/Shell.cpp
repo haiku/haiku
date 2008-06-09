@@ -234,7 +234,7 @@ Shell::ViewAttached(TermView *view)
 	if (fAttached)
 		return;
 
-	status_t status = fTermParse->StartThreads(view);
+	status_t status = fTermParse->StartThreads(view->TextBuffer());
 	if (status < B_OK) {
 		// TODO: What can we do here ?
 		fprintf(stderr, "Shell:ViewAttached():"

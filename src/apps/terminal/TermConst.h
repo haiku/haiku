@@ -83,6 +83,10 @@ const uint32 MSG_FONT_CHANGED		= 'fntc';
 const uint32 SAVE_AS_DEFAULT 		= 'sadf';
 const uint32 MSG_CHECK_CHILDREN		= 'ckch';
 
+const uint32 MSG_TERMINAL_BUFFER_CHANGED	= 'bufc';
+const uint32 MSG_SET_TERMNAL_TITLE			= 'sett';
+const uint32 MSG_QUIT_TERMNAL				= 'qutt';
+
 // Preference Read/Write Keys
 const char* const PREF_HALF_FONT_FAMILY = "Half Font Family";
 const char* const PREF_HALF_FONT_STYLE = "Half Font Style";
@@ -144,7 +148,7 @@ enum{
 
 #define MIN_COLS 10
 #define MAX_COLS 256
-#define MIN_ROWS 1
+#define MIN_ROWS 10
 #define MAX_ROWS 256
 
 // Insert mode flag

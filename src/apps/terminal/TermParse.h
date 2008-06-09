@@ -68,7 +68,9 @@ private:
 
 	// Reading ReadBuf at one Char.
 	status_t GetReaderBuf(uchar &c);
-  
+
+	void _DeviceStatusReport(int n);
+
 	int fFd;
 
 	thread_id fParseThread;
