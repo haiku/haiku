@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <bluetooth/bluetooth_util.h>
 #include <bluetooth/L2CAP/btL2CAP.h>
 
 #define L2CAP_CHECKSUM(address) (address.b[0]+\
@@ -36,7 +37,7 @@
 	result of \a from & \a mask).
 	\return B_OK if the address could be copied
 	\return B_NO_MEMORY if the new address could not be allocated
-	\return B_MISMATCHED_VALUES if \a address does not match family AF_INET
+	\return B_MISMATCHED_VALUES if \a address does not match family AF_BLUETOOTH
 */
 static status_t
 l2cap_copy_address(const sockaddr *from, sockaddr **to,
@@ -47,13 +48,13 @@ l2cap_copy_address(const sockaddr *from, sockaddr **to,
 		if (*to == NULL)
 			return B_NO_MEMORY;
 
-		memset(*to, 0, sizeof(sockaddr_in));
-		(*to)->sa_family = AF_INET;
-		(*to)->sa_len = sizeof(sockaddr_in);
+		memset(*to, 0, sizeof(sockaddr_l2cap));
+		(*to)->sa_family = AF_BLUETOOTH;
+		(*to)->sa_len = sizeof(sockaddr_l2cap);
 	} else {
 		if (from == NULL)
 			return B_OK;
-		if (from->sa_family != AF_INET)
+		if (from->sa_family != AF_BLUETOOTH)
 			return B_MISMATCHED_VALUES;
 
 		*to = (sockaddr *)malloc(sizeof(sockaddr_in));
@@ -285,7 +286,7 @@ l2cap_set_port(sockaddr *address, uint16 port)
 	Sets \a address to \a from.
 	\return B_OK if \a from has been copied into \a address
 	\return B_BAD_VALUE if either \a address or \a from is NULL
-	\return B_MISMATCHED_VALUES if from is not of family AF_INET
+	\return B_MISMATCHED_VALUES if from is not of family AF_BLUETOOTH
 */
 static status_t
 l2cap_set_to(sockaddr *address, const sockaddr *from)
@@ -314,7 +315,7 @@ l2cap_update_to(sockaddr *_address, const sockaddr *_from)
 	if (from->l2cap_family != AF_BLUETOOTH)
 		return B_BAD_VALUE;
 
-	address->l2cap_family = AF_INET;
+	address->l2cap_family = AF_BLUETOOTH;
 	address->l2cap_len = sizeof(sockaddr_l2cap);
 
 	if (address->l2cap_psm == 0)
