@@ -215,10 +215,6 @@ class View {
 			bool			IsDesktopBackground() const
 								{ return fIsDesktopBackground; }
 
-			void			AddTokensForViewsInRegion(BMessage* message,
-								BRegion& region,
-								BRegion* windowContentClipping);
-
 			void			AddTokensForViewsInRegion(BPrivate::PortLink& link,
 								BRegion& region,
 								BRegion* windowContentClipping);

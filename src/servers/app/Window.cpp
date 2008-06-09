@@ -1915,8 +1915,6 @@ Window::BeginUpdate(BPrivate::PortLink& link)
 	link.Attach<BPoint>(fFrame.LeftTop());
 	link.Attach<float>(fFrame.Width());
 	link.Attach<float>(fFrame.Height());
-	// append he update rect in screen coords
-	link.Attach<BRect>(dirty->Frame());
 	// find and attach all views that intersect with
 	// the dirty region
 	fTopView->AddTokensForViewsInRegion(link, *dirty, &fContentRegion);

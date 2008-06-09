@@ -1154,7 +1154,6 @@ FrameMoved(origin);
 //bigtime_t now = system_time();
 //bigtime_t drawTime = 0;
 			STRACE(("info:BWindow handling _UPDATE_.\n"));
-			BRect updateRect;
 
 			fLink->StartMessage(AS_BEGIN_UPDATE);
 			fInTransaction = true;
@@ -1189,36 +1188,55 @@ FrameMoved(origin);
 					FrameResized(width, height);
 				}
 
-				// read culmulated update rect (is in screen coords)
-				fLink->Read<BRect>(&updateRect);
-
 				// read tokens for views that need to be drawn
 				// NOTE: we need to read the tokens completely
-				// first, or other calls would likely mess up the
-				// data in the link.
-				BList tokens(20);
-				int32 token;
-				status_t error = fLink->Read<int32>(&token);
-				while (error >= B_OK && token != B_NULL_TOKEN) {
-					tokens.AddItem((void*)token);
-					error = fLink->Read<int32>(&token);
+				// first, we cannot draw views in between reading
+				// the tokens, since other communication would likely
+				// mess up the data in the link.
+				struct ViewUpdateInfo {
+					int32 token;
+					BRect updateRect;
+				};
+				BList infos(20);
+				while (true) {
+					// read next token and create/add ViewUpdateInfo
+					int32 token;
+					status_t error = fLink->Read<int32>(&token);
+					if (error < B_OK || token == B_NULL_TOKEN)
+						break;
+					ViewUpdateInfo* info = new (nothrow) ViewUpdateInfo;
+					if (info == NULL || !infos.AddItem(info)) {
+						delete info;
+						break;
+					}
+					info->token = token;
+					// read culmulated update rect (is in screen coords)
+					error = fLink->Read<BRect>(&(info->updateRect));
+					if (error < B_OK)
+						break;
 				}
 				// draw
-				int32 count = tokens.CountItems();
+				int32 count = infos.CountItems();
 				for (int32 i = 0; i < count; i++) {
 //bigtime_t drawStart = system_time();
-					if (BView* view = _FindView((int32)tokens.ItemAtFast(i)))
-						view->_Draw(updateRect);
+					ViewUpdateInfo* info
+						= (ViewUpdateInfo*)infos.ItemAtFast(i);
+					if (BView* view = _FindView(info->token))
+						view->_Draw(info->updateRect);
 					else
-						printf("_UPDATE_ - didn't find view by token: %ld\n", (int32)tokens.ItemAtFast(i));
+						printf("_UPDATE_ - didn't find view by token: %ld\n",
+							info->token);
 //drawTime += system_time() - drawStart;
 				}
 				// NOTE: The tokens are actually hirachically sorted,
 				// so traversing the list in revers and calling
-				// child->DrawAfterChildren actually works correctly
+				// child->_DrawAfterChildren() actually works like intended.
 				for (int32 i = count - 1; i >= 0; i--) {
-					if (BView* view = _FindView((int32)tokens.ItemAtFast(i)))
-						view->_DrawAfterChildren(updateRect);
+					ViewUpdateInfo* info
+						= (ViewUpdateInfo*)infos.ItemAtFast(i);
+					if (BView* view = _FindView(info->token))
+						view->_DrawAfterChildren(info->updateRect);
+					delete info;
 				}
 
 //printf("  %ld views drawn, total Draw() time: %lld\n", count, drawTime);

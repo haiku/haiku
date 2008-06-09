@@ -1476,40 +1476,34 @@ View::MarkBackgroundDirty()
 
 
 void
-View::AddTokensForViewsInRegion(BMessage* message, BRegion& region,
-	BRegion* windowContentClipping)
-{
-	if (!fVisible)
-		return;
-
-	if (region.Intersects(_ScreenClipping(windowContentClipping).Frame()))
-		message->AddInt32("_token", fToken);
-
-	for (View* child = FirstChild(); child; child = child->NextSibling()) {
-		child->AddTokensForViewsInRegion(message, region,
-			windowContentClipping);
-	}
-}
-
-
-void
 View::AddTokensForViewsInRegion(BPrivate::PortLink& link, BRegion& region,
 	BRegion* windowContentClipping)
 {
 	if (!fVisible)
 		return;
 
-	IntRect screenBounds(Bounds());
-	ConvertToScreen(&screenBounds);
-	if (!region.Intersects((clipping_rect)screenBounds))
-		return;
+	{
+		// NOTE: use scope in order to reduce stack space requirements
 
-	if (region.Intersects(_ScreenClipping(windowContentClipping).Frame()))
-		link.Attach<int32>(fToken);
+		// This check will prevent descending the view hierarchy
+		// any further than necessary
+		IntRect screenBounds(Bounds());
+		ConvertToScreen(&screenBounds);
+		if (!region.Intersects((clipping_rect)screenBounds))
+			return;
 
-	for (View* child = FirstChild(); child; child = child->NextSibling()) {
-		child->AddTokensForViewsInRegion(link, region, windowContentClipping);
+		// Unfortunately, we intersecting another region, but otherwise
+		// we couldn't provide the exact update rect to the client
+		BRegion localDirty = _ScreenClipping(windowContentClipping);
+		localDirty.IntersectWith(&region);
+		if (localDirty.CountRects() > 0) {
+			link.Attach<int32>(fToken);
+			link.Attach<BRect>(localDirty.Frame());
+		}
 	}
+
+	for (View* child = FirstChild(); child; child = child->NextSibling())
+		child->AddTokensForViewsInRegion(link, region, windowContentClipping);
 }
 
 
