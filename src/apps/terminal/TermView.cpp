@@ -356,6 +356,7 @@ TermView::_InitObject(int32 argc, const char **argv)
 	status_t error = fTextBuffer->Init(fTermColumns, fTermRows, fScrBufSize);
 	if (error != B_OK)
 		return error;
+	fTextBuffer->SetEncoding(fEncoding);
 
 	fShell = new (std::nothrow) Shell();
 	if (fShell == NULL)
@@ -537,6 +538,9 @@ TermView::SetEncoding(int encoding)
 	// the string value of encoding. But when this function is called and 
 	// the encoding changes, the new value is never passed to Shell.
 	fEncoding = encoding;
+
+	BAutolock _(fTextBuffer);
+	fTextBuffer->SetEncoding(fEncoding);
 }
 
 

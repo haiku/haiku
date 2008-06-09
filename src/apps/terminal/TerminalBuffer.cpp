@@ -89,7 +89,8 @@ TerminalBuffer::_CursorChanged()
 TerminalBuffer::TerminalBuffer()
 	:
 	BLocker("terminal buffer"),
-	fHistory(NULL)
+	fHistory(NULL),
+	fEncoding(M_UTF8)
 {
 }
 
@@ -145,8 +146,14 @@ TerminalBuffer::SetListener(BMessenger listener)
 int
 TerminalBuffer::Encoding() const
 {
-// TODO: Remove, if not needed!
-	return M_UTF8;
+	return fEncoding;
+}
+
+
+void
+TerminalBuffer::SetEncoding(int encoding)
+{
+	fEncoding = encoding;
 }
 
 

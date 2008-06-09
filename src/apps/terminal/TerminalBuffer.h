@@ -50,6 +50,7 @@ public:
 			void				SetListener(BMessenger listener);
 
 			int					Encoding() const;
+			void				SetEncoding(int encoding);
 
 			int32				Width() const		{ return fWidth; }
 			int32				Height() const		{ return fHeight; }
@@ -181,6 +182,8 @@ private:
 			TermPos				fSavedCursor;
 
 			bool				fOverwriteMode;	// false for insert
+
+			int					fEncoding;
 
 			// listener/dirty region management
 			BMessenger			fListener;
