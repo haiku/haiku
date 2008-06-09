@@ -203,7 +203,7 @@ TermWindow::_SetupMenu()
 	fWindowSizeMenu = new BMenu("Window Size");
 	_BuildWindowSizeMenu(fWindowSizeMenu);
 	
-	fEncodingmenu = new BMenu("Font Encoding");
+	fEncodingmenu = new BMenu("Text Encoding");
 	fEncodingmenu->SetRadioMode(true);
 	MakeEncodingMenu(fEncodingmenu, true);
 	fHelpmenu->AddItem(fWindowSizeMenu);  
