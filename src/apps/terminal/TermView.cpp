@@ -978,18 +978,6 @@ TermView::Draw(BRect updateRect)
 // }
 // }
 
-	// TODO: Work-around for #2355: updateRect is sometimes way larger than the
-	// clipping region frame). Determine the minimal update rect.
-	BRegion region;
-	GetClippingRegion(&region);
-	if (region.CountRects() > 0) {
-		BRect clippingRect(region.Frame());
-//if (clippingRect != updateRect)
-//debug_printf("  clipping rect: (%f, %f) - (%f, %f)\n",
-//clippingRect.left, clippingRect.top, clippingRect.right, clippingRect.bottom);
-		updateRect = clippingRect;
-	}
-
 	_SynchronizeWithTextBuffer(&updateRect);
 
 	int32 x1 = (int32)(updateRect.left) / fFontWidth;
