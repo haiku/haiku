@@ -681,15 +681,6 @@ TerminalBuffer::InsertChar(UTF8Char c, uint32 attributes)
 
 
 void
-TerminalBuffer::Insert(uchar* string, ushort attr)
-{
-// TODO: Remove! Use InsertChar instead!
-	UTF8Char character((const char*)string, 4);
-	InsertChar(character, attr);
-}
-
-
-void
 TerminalBuffer::InsertCR()
 {
 	_LineAt(fCursor.y)->softBreak = false;
@@ -713,7 +704,7 @@ TerminalBuffer::InsertLF()
 
 
 void
-TerminalBuffer::InsertNewLine(int numLines)
+TerminalBuffer::InsertLines(int32 numLines)
 {
 	if (fCursor.y >= fScrollTop && fCursor.y < fScrollBottom)
 		_Scroll(fCursor.y, fScrollBottom, -numLines);
@@ -728,7 +719,7 @@ TerminalBuffer::SetInsertMode(int flag)
 
 
 void
-TerminalBuffer::InsertSpace(int num)
+TerminalBuffer::InsertSpace(int32 num)
 {
 // TODO: Deal with full-width chars!
 	if (fCursor.x + num > fWidth)
@@ -755,7 +746,7 @@ TerminalBuffer::EraseBelow()
 
 
 void
-TerminalBuffer::DeleteChar(int numChars)
+TerminalBuffer::DeleteChars(int32 numChars)
 {
 	Line* line = _LineAt(fCursor.y);
 	if (fCursor.x < line->length) {
@@ -786,7 +777,7 @@ TerminalBuffer::DeleteColumns()
 
 
 void
-TerminalBuffer::DeleteLine(int numLines)
+TerminalBuffer::DeleteLines(int32 numLines)
 {
 	if (fCursor.y >= fScrollTop && fCursor.y <= fScrollBottom)
 		_Scroll(fCursor.y, fScrollBottom, numLines);
@@ -794,9 +785,9 @@ TerminalBuffer::DeleteLine(int numLines)
 
 
 void
-TerminalBuffer::SetCurPos(int x, int y)
+TerminalBuffer::SetCursor(int32 x, int32 y)
 {
-//debug_printf("TerminalBuffer::SetCurPos(%d, %d)\n", x, y);
+//debug_printf("TerminalBuffer::SetCursor(%d, %d)\n", x, y);
 	x = restrict_value(x, 0, fWidth - 1);
 	y = restrict_value(y, fScrollTop, fScrollBottom);
 	if (x != fCursor.x || y != fCursor.y) {
@@ -804,27 +795,6 @@ TerminalBuffer::SetCurPos(int x, int y)
 		fCursor.y = y;
 		_CursorChanged();
 	}
-}
-
-
-void
-TerminalBuffer::SetCurX(int x)
-{
-	SetCurPos(x, fCursor.y);
-}
-
-
-void
-TerminalBuffer::SetCurY(int y)
-{
-	SetCurPos(fCursor.x, y);
-}
-
-
-int
-TerminalBuffer::GetCurX()
-{
-	return fCursor.x;
 }
 
 
@@ -838,54 +808,18 @@ TerminalBuffer::SaveCursor()
 void
 TerminalBuffer::RestoreCursor()
 {
-	SetCurPos(fSavedCursor.x, fSavedCursor.y);
+	SetCursor(fSavedCursor.x, fSavedCursor.y);
 }
 
 
 void
-TerminalBuffer::MoveCurRight(int num)
-{
-	SetCurPos(fCursor.x + num, fCursor.y);
-}
-
-
-void
-TerminalBuffer::MoveCurLeft(int num)
-{
-	SetCurPos(fCursor.x - num, fCursor.y);
-}
-
-
-void
-TerminalBuffer::MoveCurUp(int num)
-{
-	SetCurPos(fCursor.x, fCursor.y - num);
-}
-
-
-void
-TerminalBuffer::MoveCurDown(int num)
-{
-	SetCurPos(fCursor.x, fCursor.y + num);
-}
-
-
-void
-TerminalBuffer::ScrollRegion(int top, int bot, int dir, int numLines)
-{
-// TODO: Is only invoked with SCRDOWN and numLines = 1
-	_Scroll(fScrollTop, fScrollBottom, -1);
-}
-
-
-void
-TerminalBuffer::SetScrollRegion(int top, int bottom)
+TerminalBuffer::SetScrollRegion(int32 top, int32 bottom)
 {
 	fScrollTop = restrict_value(top, 0, fHeight - 1);
 	fScrollBottom = restrict_value(bottom, fScrollTop, fHeight - 1);
 
 	// also sets the cursor position
-	SetCurPos(0, 0);
+	SetCursor(0, 0);
 }
 
 

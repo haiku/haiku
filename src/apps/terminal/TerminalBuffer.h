@@ -54,7 +54,6 @@ public:
 
 			int32				Width() const		{ return fWidth; }
 			int32				Height() const		{ return fHeight; }
-			TermPos				Cursor() const		{ return fCursor; }
 			int32				HistorySize() const	{ return fHistorySize; }
 
 			TerminalBufferDirtyInfo& DirtyInfo()	{ return fDirtyInfo; }
@@ -83,42 +82,41 @@ public:
 									bool matchWord, TermPos& matchStart,
 									TermPos& matchEnd) const;
 
-	// output character
+			// insert chars/lines
 			void				InsertChar(UTF8Char c, uint32 attributes);
-			void				Insert(uchar* string, ushort attr);
+	inline	void				InsertChar(const char* c, int32 length,
+									uint32 attributes);
 			void				InsertCR();
 			void				InsertLF();
-			void				InsertNewLine(int numLines);
 			void				SetInsertMode(int flag);
-			void				InsertSpace(int num);
+			void				InsertSpace(int32 num);
+			void				InsertLines(int32 numLines);
 	
-	// delete character
+			// delete chars/lines
 			void				EraseBelow();
-			void				DeleteChar(int num);
+			void				DeleteChars(int32 numChars);
 			void				DeleteColumns();
-			void				DeleteLine(int num);
+			void				DeleteLines(int32 numLines);
 
-	// get and set cursor position
-// TODO: Inline most of these!
-			void				SetCurPos(int x, int y);
-			void				SetCurX(int x);
-			void				SetCurY(int y);
-			int					GetCurX();
+			// get and set cursor position
+			void				SetCursor(int32 x, int32 y);
+	inline	void				SetCursorX(int32 x);
+	inline	void				SetCursorY(int32 y);
+	inline	TermPos				Cursor() const			{ return fCursor; }
 			void				SaveCursor();
 			void				RestoreCursor();
 
-	// move cursor
-			void				MoveCurRight(int num);
-			void				MoveCurLeft(int num);
-			void				MoveCurUp(int num);
-			void				MoveCurDown(int num);
+			// move cursor
+	inline	void				MoveCursorRight(int32 num);
+	inline	void				MoveCursorLeft(int32 num);
+	inline	void				MoveCursorUp(int32 num);
+	inline	void				MoveCursorDown(int32 num);
 
-	// scroll region
-			void				ScrollRegion(int top, int bot, int dir,
-									int num);
-			void				SetScrollRegion(int top, int bot);
+			// scroll region
+	inline	void				ScrollBy(int32 numLines);
+			void				SetScrollRegion(int32 top, int32 bot);
 
-	// other
+			// other
 			void				SetTitle(const char* title);
 			void				NotifyQuit(int32 reason);
 
@@ -189,5 +187,62 @@ private:
 			BMessenger			fListener;
 			TerminalBufferDirtyInfo fDirtyInfo;
 };
+
+
+void
+TerminalBuffer::InsertChar(const char* c, int32 length, uint32 attributes)
+{
+	return InsertChar(UTF8Char(c, length), attributes);
+}
+
+
+void
+TerminalBuffer::SetCursorX(int32 x)
+{
+	SetCursor(x, fCursor.y);
+}
+
+
+void
+TerminalBuffer::SetCursorY(int32 y)
+{
+	SetCursor(fCursor.x, y);
+}
+
+
+void
+TerminalBuffer::MoveCursorRight(int32 num)
+{
+	SetCursor(fCursor.x + num, fCursor.y);
+}
+
+
+void
+TerminalBuffer::MoveCursorLeft(int32 num)
+{
+	SetCursor(fCursor.x - num, fCursor.y);
+}
+
+
+void
+TerminalBuffer::MoveCursorUp(int32 num)
+{
+	SetCursor(fCursor.x, fCursor.y - num);
+}
+
+
+void
+TerminalBuffer::MoveCursorDown(int32 num)
+{
+	SetCursor(fCursor.x, fCursor.y + num);
+}
+
+
+void
+TerminalBuffer::ScrollBy(int32 numLines)
+{
+	_Scroll(fScrollTop, fScrollBottom, numLines);
+}
+
 
 #endif	// TERMINAL_BUFFER_H
