@@ -4697,7 +4697,6 @@ BView::_Draw(BRect updateRect)
 	_SwitchServerCurrentView();
 
 	ConvertFromScreen(&updateRect);
-	updateRect = Bounds() & updateRect;
 
 	// TODO: make states robust (the hook implementation could
 	// mess things up if it uses non-matching Push- and PopState(),
@@ -4719,7 +4718,6 @@ BView::_DrawAfterChildren(BRect updateRect)
 	_SwitchServerCurrentView();
 
 	ConvertFromScreen(&updateRect);
-	updateRect = Bounds() & updateRect;
 
 	// TODO: make states robust (see above)
 	PushState();
