@@ -1204,7 +1204,7 @@ FrameMoved(origin);
 					status_t error = fLink->Read<int32>(&token);
 					if (error < B_OK || token == B_NULL_TOKEN)
 						break;
-					ViewUpdateInfo* info = new (nothrow) ViewUpdateInfo;
+					ViewUpdateInfo* info = new (std::nothrow) ViewUpdateInfo;
 					if (info == NULL || !infos.AddItem(info)) {
 						delete info;
 						break;
