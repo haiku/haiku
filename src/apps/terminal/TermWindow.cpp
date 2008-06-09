@@ -487,7 +487,7 @@ TermWindow::MessageReceived(BMessage *message)
 				
 			font.SetSize(size);	
 			view->SetTermFont(&font);
-			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, size);
+			PrefHandler::Default()->setInt32(PREF_HALF_FONT_SIZE, (int32)size);
 			
 			_ResizeView(view);
 			break;

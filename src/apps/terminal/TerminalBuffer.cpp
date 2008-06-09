@@ -561,8 +561,7 @@ TerminalBuffer::Find(const char* _pattern, const TermPos& start, bool forward,
 	while (*_pattern != '\0') {
 		int32 charLen = UTF8Char::ByteCount(*_pattern);
 		if (charLen > 0) {
-			pattern[patternLen].bytes = (char[]){ 0, 0, 0, 0 };
-			memcpy(pattern[patternLen].bytes, _pattern, charLen);
+			pattern[patternLen].SetTo(_pattern, charLen);
 
 			// if not case sensitive, convert to lower case
 			if (!caseSensitive && charLen == 1)
@@ -678,8 +677,7 @@ void
 TerminalBuffer::Insert(uchar* string, ushort attr)
 {
 // TODO: Remove! Use InsertChar instead!
-	UTF8Char character;
-	character.bytes = (char[]){ string[0], string[1], string[2], string[3] };
+	UTF8Char character((const char*)string, 4);
 	InsertChar(character, attr);
 }
 

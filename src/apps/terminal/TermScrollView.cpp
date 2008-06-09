@@ -24,7 +24,7 @@ public:
 	virtual void ValueChanged(float newValue)
 	{
 		if (BView* target = Target())
-			Target()->ScrollTo(0, newValue);
+			target->ScrollTo(0, newValue);
 	}
 };
 

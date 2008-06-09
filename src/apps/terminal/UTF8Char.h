@@ -21,6 +21,24 @@ struct UTF8Char {
 		bytes[0] = c;
 	}
 
+	UTF8Char(const char* c, int32 count)
+	{
+		SetTo(c, count);
+	}
+
+	void SetTo(const char* c, int32 count)
+	{
+		bytes[0] = c[0];
+		if (count > 1) {
+			bytes[1] = c[1];
+			if (count > 2) {
+				bytes[2] = c[2];
+				if (count > 3)
+					bytes[3] = c[3];
+			}
+		}
+	}
+
 	static int32 ByteCount(char firstChar)
 	{
 		// Note, this does not recognize invalid chars

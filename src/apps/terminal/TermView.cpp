@@ -689,7 +689,7 @@ void
 TermView::_InvalidateTextRange(TermPos start, TermPos end)
 {
 	if (end < start)
-		swap(start, end);
+		std::swap(start, end);
 
 	if (start.y == end.y) {
 		_InvalidateTextRect(start.x, start.y, end.x, end.y);
@@ -871,7 +871,7 @@ TermView::_DrawCursor()
 		memcpy(buffer, character.bytes, bytes);
 		buffer[bytes] = '\0';
 
-		_DrawLinePart(fCursor.x * fFontWidth, _LineOffset(fCursor.y),
+		_DrawLinePart(fCursor.x * fFontWidth, (int32)_LineOffset(fCursor.y),
 			attr, buffer, width, selected, true, this);
 	} else {
 		if (selected)
@@ -1022,7 +1022,7 @@ TermView::Draw(BRect updateRect)
 				continue;
 			}
 
-			_DrawLinePart(fFontWidth * i, _LineOffset(j),
+			_DrawLinePart(fFontWidth * i, (int32)_LineOffset(j),
 				attr, buf, count, insideSelection, false, this);
 			i += count;
 			if (i >= fTermColumns)
