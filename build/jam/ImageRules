@@ -298,25 +298,16 @@ rule AddDriversToContainer container : relativeDirectoryTokens : targets
 	}
 }
 
-rule AddDriverRegistrationToContainer container : relativeDirectoryTokens
-	: target : links
+rule AddNewDriversToContainer container : relativeDirectoryTokens
+	: targets
 {
-	# AddDriverRegistrationToContainer <container> : <directory>
-	#	: <link target> : <link names> ] ;
+	# AddNewDriversToContainer <container> : <directory> : <targets> ;
 	#
-	local directoryTokens = beos system add-ons kernel registration
+	local directoryTokens = beos system add-ons kernel drivers
 		$(relativeDirectoryTokens) ;
 
-	# get the relative symlink path prefix
-	local linkPrefix = ;
-	for i in $(relativeDirectoryTokens) {
-		linkPrefix += .. ;
-	}
-	linkPrefix += .. drivers bin ;
-
-	# add the symlink
-	AddSymlinkToContainer $(container) : $(directoryTokens)
-		: [ FDirName $(linkPrefix) $(target:BS) ] : $(links) ;
+	AddFilesToContainer $(container) : $(directoryTokens)
+		: $(targets) ;
 }
 
 rule AddBootModuleSymlinksToContainer container : targets
@@ -666,12 +657,12 @@ rule AddDriversToHaikuImage relativeDirectoryTokens : targets
 		: $(relativeDirectoryTokens) : $(targets) ;
 }
 
-rule AddDriverRegistrationToHaikuImage relativeDirectoryTokens : target : links
+rule AddNewDriversToHaikuImage relativeDirectoryTokens : targets
 {
-	# AddDriverRegistrationToHaikuImage <directory> : <link target> : <link names> ] ;
+	# AddNewDriversToHaikuImage <relative directory> : <targets> ;
 
-	AddDriverRegistrationToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
-		: $(relativeDirectoryTokens) : $(target) : $(links) ;
+	AddNewDriversToContainer $(HAIKU_IMAGE_CONTAINER_NAME)
+		: $(relativeDirectoryTokens) : $(targets) ;
 }
 
 rule AddBootModuleSymlinksToHaikuImage targets
