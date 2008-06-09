@@ -12,4 +12,4 @@ KernelAddon acpi_lid :
 	acpi_lid.c
 	;
 
-Depends acpi_thermal : acpi ;
+Depends acpi_lid : acpi ;
