@@ -26,6 +26,14 @@ struct TerminalBufferDirtyInfo {
 		return dirtyTop <= dirtyBottom;
 	}
 
+	void ExtendDirtyRegion(int32 top, int32 bottom)
+	{
+		if (top < dirtyTop)
+			dirtyTop = top;
+		if (bottom > dirtyBottom)
+			dirtyBottom = bottom;
+	}
+
 	void Reset()
 	{
 		linesScrolled = 0;
@@ -42,7 +50,7 @@ public:
 	virtual						~BasicTerminalBuffer();
 
 			status_t			Init(int32 width, int32 height,
-									int32 historySize);
+									int32 historyCapacity);
 
 			int32				Width() const		{ return fWidth; }
 			int32				Height() const		{ return fHeight; }
@@ -51,7 +59,15 @@ public:
 			TerminalBufferDirtyInfo& DirtyInfo()	{ return fDirtyInfo; }
 
 			status_t			ResizeTo(int32 width, int32 height);
+			status_t			ResizeTo(int32 width, int32 height,
+									int32 historyCapacity);
+			status_t			SetHistoryCapacity(int32 historyCapacity);
 			void				Clear();
+
+			void				SynchronizeWith(
+									const BasicTerminalBuffer* other,
+									int32 offset, int32 dirtyTop,
+									int32 dirtyBottom);
 
 			bool				IsFullWidthChar(int32 row, int32 column) const;
 			int					GetChar(int32 row, int32 column,

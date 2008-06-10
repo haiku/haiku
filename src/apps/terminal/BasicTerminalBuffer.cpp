@@ -57,11 +57,8 @@ BasicTerminalBuffer::_HistoryLineAt(int32 index) const
 inline void
 BasicTerminalBuffer::_Invalidate(int32 top, int32 bottom)
 {
-//debug_printf("BasicTerminalBuffer::_Invalidate(%ld, %ld)\n", top, bottom);
-	if (top < fDirtyInfo.dirtyTop)
-		fDirtyInfo.dirtyTop = top;
-	if (bottom > fDirtyInfo.dirtyBottom)
-		fDirtyInfo.dirtyBottom = bottom;
+//debug_printf("%p->BasicTerminalBuffer::_Invalidate(%ld, %ld)\n", this, top, bottom);
+	fDirtyInfo.ExtendDirtyRegion(top, bottom);
 
 	if (!fDirtyInfo.messageSent) {
 		NotifyListener();
@@ -131,18 +128,26 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 status_t
 BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 {
+	return ResizeTo(width, height, fHistoryCapacity);
+}
+
+
+status_t
+BasicTerminalBuffer::ResizeTo(int32 width, int32 height, int32 historyCapacity)
+{
 	if (height < MIN_ROWS || height > MAX_ROWS || width < MIN_COLS
-			|| width > MAX_COLS) {
+			|| width > MAX_COLS || height > historyCapacity) {
 		return B_BAD_VALUE;
 	}
 
-//debug_printf("BasicTerminalBuffer::ResizeTo(): (%ld, %ld) -> (%ld, %ld)\n",
-//fWidth, fHeight, width, height);
+//debug_printf("BasicTerminalBuffer::ResizeTo(): (%ld, %ld, history: %ld) -> "
+//"(%ld, %ld, history: %ld)\n", fWidth, fHeight, fHistoryCapacity, width, height,
+//historyCapacity);
 
 	if (width != fWidth) {
 		// The width changes. We have to allocate a new line array and re-wrap
 		// all lines.
-		Line** history = _AllocateLines(width, fHistoryCapacity);
+		Line** history = _AllocateLines(width, historyCapacity);
 		if (history == NULL)
 			return B_NO_MEMORY;
 
@@ -181,34 +186,35 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 			}
 
 			int32 toCopy = min_c(sourceLeft, destLeft);
-			if (toCopy > 0) {
-				// If the last cell to copy is the first cell of a
-				// full-width char, don't copy it yet.
-				if (sourceX + toCopy > 0 && IS_WIDTH(
-						sourceLine->cells[sourceX + toCopy - 1].attributes)) {
+			// If the last cell to copy is the first cell of a
+			// full-width char, don't copy it yet.
+			if (toCopy > 0 && IS_WIDTH(
+					sourceLine->cells[sourceX + toCopy - 1].attributes)) {
 //debug_printf("      -> last char is full-width -- don't copy it\n");
-					toCopy--;
+				toCopy--;
+			}
+
+			// translate the cursor position
+			if (fCursor.y + fHistorySize == sourceIndex
+				&& fCursor.x >= sourceX
+				&& (fCursor.x < sourceX + toCopy
+					|| destLeft >= sourceLeft
+						&& sourceX + sourceLeft <= fCursor.x)) {
+				cursor.x = destLine->length + fCursor.x - sourceX;
+				cursor.y = destTotalLines;
+
+				if (cursor.x >= width) {
+					// The cursor was in free space after the official end
+					// of line.
+					cursor.x = width - 1;
 				}
-
-				// translate the cursor position
-				if (fCursor.y + fHistorySize == sourceIndex
-					&& fCursor.x >= sourceX
-					&& (fCursor.x < sourceX + toCopy
-						|| sourceX + sourceLeft <= fCursor.x)) {
-					cursor.x = destLine->length + fCursor.x - sourceX;
-					cursor.y = destTotalLines;
-
-					if (cursor.x >= width) {
-						// The cursor was in free space after the official end
-						// of line.
-						cursor.x = width - 1;
-					}
 //debug_printf("      cursor: (%ld, %ld)\n", cursor.x, cursor.y);
 
-					// don't allow the cursor to get out of screen
-					maxDestTotalLines = cursor.y + fHeight;
-				}
+				// don't allow the cursor to get out of screen
+				maxDestTotalLines = cursor.y + height - 1;
+			}
 
+			if (toCopy > 0) {
 				memcpy(destLine->cells + destLine->length,
 					sourceLine->cells + sourceX, toCopy * sizeof(Cell));
 				destLine->length += toCopy;
@@ -227,10 +233,10 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 			}
 
 			if (nextDestLine) {
-				destIndex = (destIndex + 1) % fHistoryCapacity;
+				destIndex = (destIndex + 1) % historyCapacity;
 				destTotalLines++;
 				newDestLine = true;
-				if (destTotalLines == maxDestTotalLines)
+				if (destTotalLines >= maxDestTotalLines)
 					break;
 			}
 		}
@@ -238,7 +244,7 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 		// If the last source line had a soft break, the last dest line
 		// won't have been counted yet.
 		if (!newDestLine) {
-			destIndex = (destIndex + 1) % fHistoryCapacity;
+			destIndex = (destIndex + 1) % historyCapacity;
 			destTotalLines++;
 		}
 
@@ -248,8 +254,8 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 		cursor.y -= destScreenOffset;
 
 		// Re-wrapping might have produced more lines than we have room for.
-		if (destTotalLines > fHistoryCapacity)
-			destTotalLines = fHistoryCapacity;
+		if (destTotalLines > historyCapacity)
+			destTotalLines = historyCapacity;
 
 		// Update the values
 //debug_printf("  cursor: (%ld, %ld) -> (%ld, %ld)\n", fCursor.x, fCursor.y,
@@ -258,7 +264,7 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 		fCursor.y = cursor.y;
 //debug_printf("  screen offset: %ld -> %ld\n", fScreenOffset,
 //destScreenOffset % fHistoryCapacity);
-		fScreenOffset = destScreenOffset % fHistoryCapacity;
+		fScreenOffset = destScreenOffset % historyCapacity;
 //debug_printf("  history size: %ld -> %ld\n", fHistorySize, destTotalLines - fHeight);
 		fHistorySize = destTotalLines - tempHeight;
 //debug_printf("  height %ld -> %ld\n", fHeight, tempHeight);
@@ -267,7 +273,11 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 
 		_FreeLines(fHistory, fHistoryCapacity);
 		fHistory = history;
+		fHistoryCapacity = historyCapacity;
 	}
+
+	if (historyCapacity > fHistoryCapacity)
+		SetHistoryCapacity(historyCapacity);
 
 	if (height == fHeight)
 		return B_OK;
@@ -304,6 +314,55 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 	fScrollTop = 0;
 	fScrollBottom = fHeight - 1;
 
+	if (historyCapacity < fHistoryCapacity)
+		SetHistoryCapacity(historyCapacity);
+
+	return B_OK;
+}
+
+
+status_t
+BasicTerminalBuffer::SetHistoryCapacity(int32 historyCapacity)
+{
+	if (historyCapacity < fHeight)
+		return B_BAD_VALUE;
+
+	if (fHistoryCapacity == historyCapacity)
+		return B_OK;
+
+	// The history capacity changes.
+	Line** history = _AllocateLines(fWidth, historyCapacity);
+	if (history == NULL)
+		return B_NO_MEMORY;
+
+	int32 totalLines = fHistorySize + fHeight;
+	int32 historyOffset = fHistoryCapacity - fHistorySize;
+		// base for _LineAt() invocations to iterate through the history
+
+	if (totalLines > historyCapacity) {
+		// Our new history capacity is smaller than currently stored line,
+		// so we have to drop lines.
+		historyOffset += totalLines - historyCapacity;
+		totalLines = historyCapacity;
+	}
+
+	for (int32 i = 0; i < totalLines; i++) {
+		Line* sourceLine = _LineAt(historyOffset + i);
+		Line* destLine = history[i];
+		destLine->length = sourceLine->length;
+		destLine->softBreak = sourceLine->softBreak;
+		if (destLine->length > 0) {
+			memcpy(destLine->cells, sourceLine->cells,
+				destLine->length * sizeof(Cell));
+		}
+	}
+
+	_FreeLines(fHistory, fHistoryCapacity);
+	fHistory = history;
+	fHistoryCapacity = historyCapacity;
+	fHistorySize = totalLines - fHeight;
+	fScreenOffset = fHistorySize;
+
 	return B_OK;
 }
 
@@ -320,6 +379,45 @@ BasicTerminalBuffer::Clear()
 
 	fDirtyInfo.linesScrolled = 0;
 	_Invalidate(0, fHeight - 1);
+}
+
+
+void
+BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
+	int32 offset, int32 dirtyTop, int32 dirtyBottom)
+{
+//debug_printf("BasicTerminalBuffer::SynchronizeWith(%p, %ld, %ld - %ld)\n",
+//other, offset, dirtyTop, dirtyBottom);
+
+	// intersect the visible region with the dirty region
+	int32 first = 0;
+	int32 last = fHeight - 1;
+	dirtyTop -= offset;
+	dirtyBottom -= offset;
+
+	if (first > dirtyBottom || dirtyTop > last)
+		return;
+
+	if (first < dirtyTop)
+		first = dirtyTop;
+	if (last > dirtyBottom)
+		last = dirtyBottom;
+
+	// update the dirty lines
+//debug_printf("  updating: %ld - %ld\n", first, last);
+	for (int32 i = first; i <= last; i++) {
+		Line* sourceLine = other->_HistoryLineAt(i + offset);
+		Line* destLine = _LineAt(i);
+		if (sourceLine != NULL) {
+			destLine->length = sourceLine->length;
+			destLine->softBreak = sourceLine->softBreak;
+			if (destLine->length > 0) {
+				memcpy(destLine->cells, sourceLine->cells,
+					destLine->length * sizeof(Cell));
+			}
+		} else
+			destLine->Clear();
+	}
 }
 
 
@@ -359,7 +457,7 @@ BasicTerminalBuffer::GetString(int32 row, int32 firstColumn, int32 lastColumn,
 {
 	Line* line = _HistoryLineAt(row);
 	if (line == NULL)
-		return NO_CHAR;
+		return 0;
 
 	if (lastColumn >= line->length)
 		lastColumn = line->length - 1;
@@ -861,22 +959,21 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 		return;
 
 	if (numLines > 0) {
-		if (numLines > fHistoryCapacity - fHeight) {
-			numLines = fHistoryCapacity - fHeight;
-			// TODO: This is not quite correct -- we should replace the complete
-			// history and screen with empty lines.
-		}
-
 		// scroll text up
 		if (top == 0) {
 			// The lines scrolled out of the screen range are transferred to
 			// the history.
+
+			if (numLines > fHistoryCapacity)
+				numLines = fHistoryCapacity;
 
 			// make room for numLines new lines
 			if (fHistorySize + fHeight + numLines > fHistoryCapacity) {
 				int32 toDrop = fHistorySize + fHeight + numLines
 					- fHistoryCapacity;
 				fHistorySize -= toDrop;
+					// Note that fHistorySize can temporarily become negative,
+					// but all will be well again, when we offset the screen.
 			}
 
 			// clear numLines after the current screen
@@ -897,21 +994,18 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 			fHistorySize += numLines;
 
 			// scroll/extend dirty range
+
 			if (fDirtyInfo.dirtyTop != INT_MAX) {
-				if (fDirtyInfo.dirtyTop <= bottom
-					&& top <= fDirtyInfo.dirtyBottom) {
-					// intersects with the scroll region -- extend
-					if (top < fDirtyInfo.dirtyTop)
-						fDirtyInfo.dirtyTop = top - numLines;
-					else
-						fDirtyInfo.dirtyTop -= numLines;
-					if (bottom > fDirtyInfo.dirtyBottom)
-						fDirtyInfo.dirtyBottom = bottom;
-				} else if (fDirtyInfo.dirtyBottom < top) {
-					// does not intersect with the scroll region -- just offset
+				// If the top or bottom of the dirty region are above the
+				// bottom of the scroll region, we have to scroll them up.
+				if (fDirtyInfo.dirtyTop <= bottom) {
 					fDirtyInfo.dirtyTop -= numLines;
-					fDirtyInfo.dirtyBottom -= numLines;
+					if (fDirtyInfo.dirtyBottom <= bottom)
+						fDirtyInfo.dirtyBottom -= numLines;
 				}
+
+				// numLines above the bottom become dirty
+				_Invalidate(bottom - numLines + 1, bottom);
 			}
 
 			fDirtyInfo.linesScrolled += numLines;
