@@ -4,14 +4,17 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (SVN 0.84, Rudolf)</h1></p>
+<p><h1>head (SVN 0.85, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
-<li>Updated naming for some previous unknown cards, added 25 new cards for support/recognition in the kernel driver and accelerant, being GF 6xxx, 7xxx and 8xxx types. Also two more nforce 6100 4x0 cards are recognized now. All cards listed in nvidia's official april 2007 ID list are now recognized.<br>
-<strong>Note please:</strong><br>
+<li>Updated naming for some previous unknown cards, added some 20 new cards for support/recognition in the kernel driver and accelerant, being GF 6xxx and 7xxx types. Also two more nforce 6100 cards are recognized now. All non GF 8xxx cards listed in nvidia's official april 2007 ID list are now recognized. GF 8xxx and later cards will not be supported by this driver as their architecture is quite different from before.<br>
+<li>Modified two default settings for the driver:
 <ul>
-<li>GF8xxx is recognized, but not supported. It looks like nVidia's card architecture was revised in such an extensive way that we probably best create a seperate accelerant for these cards.
+<li>'pgm_panel' is now preset to 'false' since this will probably increase chances of a good picture on panels outthere.
+<li>'force_ws' is now (re-enabled but) preset to 'true' since the number of widescreen monitors outthere is rapidly becoming mainstream.<br> <strong>Note please:</strong><br>
+'force_ws' was hardcoded to setting 'true' some time ago by the Haiku team because of these monitors.
+</ul>
 </ul>
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>

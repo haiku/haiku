@@ -217,8 +217,6 @@ static uint16 nvidia_device_list[] = {
 	0x018b, /* Nvidia Quadro4 380 XGL */
 	0x018c, /* Nvidia Quadro4 NVS 50 PCI */
 	0x018d, /* Nvidia GeForce4 448 Go */
-	0x0191, /* Nvidia GeForce 8800 GTX */
-	0x0193, /* Nvidia GeForce 8800 GTS */
 	0x01a0, /* Nvidia GeForce2 Integrated GPU */
 	0x01d1, /* Nvidia GeForce 7300 LE */
 	0x01d3, /* Nvidia GeForce 7300 SE */
@@ -327,15 +325,6 @@ static uint16 nvidia_device_list[] = {
 	0x03d0, /* Nvidia GeForce 6100 nForce 430 */
 	0x03d1, /* Nvidia GeForce 6100 nForce 405 */
 	0x03d2, /* Nvidia GeForce 6100 nForce 400 */
-#if 0
-	// TODO: these cards are not yet supported
-	0x0400, /* Nvidia GeForce 8600 GTS */
-	0x0402, /* Nvidia GeForce 8600 GT */
-	0x0407, /* Nvidia GeForce 8600M GT */
-	0x0421, /* Nvidia GeForce 8500 GT */
-	0x0422, /* Nvidia GeForce 8400 GS */
-	0x0423, /* Nvidia GeForce 8300 GS */
-#endif
 	0
 };
 
