@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-10/2007.
+	Rudolf Cornelissen 3/2002-6/2008.
 */
 
 
@@ -241,6 +241,7 @@ static uint16 nvidia_device_list[] = {
 	0x0240, /* Nvidia GeForce 6150 (NFORCE4 Integr.GPU) */
 	0x0241, /* Nvidia GeForce 6150 LE (NFORCE4 Integr.GPU) */
 	0x0242, /* Nvidia GeForce 6100 (NFORCE4 Integr.GPU) */
+	0x0244, /* Nvidia GeForce Go 6150 (NFORCE4 Integr.GPU) */
 	0x0245, /* Nvidia Quadro NVS 210S / GeForce 6150LE */
 	0x0250, /* Nvidia GeForce4 Ti 4600 */
 	0x0251, /* Nvidia GeForce4 Ti 4400 */
