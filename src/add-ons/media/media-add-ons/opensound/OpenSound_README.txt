@@ -5,7 +5,7 @@ Distributed under the terms of the MIT License.
 
 OpenSound System v4.0 drivers (c) 4Front Technologies.
 Port by François Revol (revol@free.fr)
-Released under GPL. Sources available by mail.
+Released under BSD licence. Sources available by mail.
 
 
 Release and dev notes

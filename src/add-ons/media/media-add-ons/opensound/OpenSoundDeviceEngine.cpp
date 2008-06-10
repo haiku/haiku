@@ -193,6 +193,25 @@ status_t OpenSoundDeviceEngine::UpdateInfo(void)
 }
 
 
+bigtime_t OpenSoundDeviceEngine::PlaybackLatency(void)
+{
+	bigtime_t latency;
+	int delay;
+	delay = GetODelay();
+	delay = 0; //XXX 
+	latency = ((double)delay * 1000000LL 
+			/ (fMediaFormat.u.raw_audio.channel_count * fMediaFormat.u.raw_audio.frame_rate
+			* (fMediaFormat.AudioFormat() & media_raw_audio_format::B_AUDIO_SIZE_MASK)));
+	PRINT(("PlaybackLatency: odelay %d latency %Ld card %Ld\n", delay, latency, CardLatency()));
+	latency += CardLatency();
+	return latency;
+}
+
+
+bigtime_t OpenSoundDeviceEngine::RecordingLatency(void)
+{
+	return 0LL; //XXX
+}
 
 
 int OpenSoundDeviceEngine::GetChannels(void)
@@ -307,6 +326,108 @@ size_t OpenSoundDeviceEngine::GetOSpace(audio_buf_info *info)
 }
 
 
+int64
+OpenSoundDeviceEngine::GetCurrentIPtr(int32 *fifoed, oss_count_t *info)
+{
+	oss_count_t ocount;
+	count_info cinfo;
+	CALLED();
+	if (!info)
+		info = &ocount;
+	memset(info, 0, sizeof(oss_count_t));
+	if (!(fOpenMode & OPEN_READ))
+		return 0;
+	if (ioctl(fFD, SNDCTL_DSP_CURRENT_IPTR, info, sizeof(oss_count_t)) < 0) {
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+				__FUNCTION__, "SNDCTL_DSP_CURRENT_IPTR", strerror(errno)));
+		//return EIO;
+		// fallback: try GET*PTR
+		if (ioctl(fFD, SNDCTL_DSP_GETIPTR, &cinfo, sizeof(count_info)) < 0) {
+			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+					__FUNCTION__, "SNDCTL_DSP_GETIPTR", strerror(errno)));
+			return 0;
+		}
+		// it's probably wrong...
+		info->samples = cinfo.bytes / (fMediaFormat.u.raw_audio.channel_count
+						 		* (fMediaFormat.AudioFormat() & media_raw_audio_format::B_AUDIO_SIZE_MASK));
+		info->fifo_samples = 0;
+	}
+	PRINT(("OpenSoundDeviceEngine::%s: IPTR: { samples=%Ld, fifo_samples=%d }\n", __FUNCTION__, info->samples, info->fifo_samples));
+	if (fifoed)
+		*fifoed = info->fifo_samples;
+	return info->samples;
+}
+
+
+int64
+OpenSoundDeviceEngine::GetCurrentOPtr(int32 *fifoed, oss_count_t *info)
+{
+	oss_count_t ocount;
+	count_info cinfo;
+	CALLED();
+	if (!info)
+		info = &ocount;
+	memset(info, 0, sizeof(oss_count_t));
+	if (!(fOpenMode & OPEN_WRITE))
+		return 0;
+	if (ioctl(fFD, SNDCTL_DSP_CURRENT_OPTR, info, sizeof(oss_count_t)) < 0) {
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+				__FUNCTION__, "SNDCTL_DSP_CURRENT_OPTR", strerror(errno)));
+		//return EIO;
+		// fallback: try GET*PTR
+		if (ioctl(fFD, SNDCTL_DSP_GETOPTR, &cinfo, sizeof(count_info)) < 0) {
+			PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+					__FUNCTION__, "SNDCTL_DSP_GETOPTR", strerror(errno)));
+			return 0;
+		}
+		// it's probably wrong...
+		info->samples = cinfo.bytes / (fMediaFormat.u.raw_audio.channel_count
+						 		* (fMediaFormat.AudioFormat() & media_raw_audio_format::B_AUDIO_SIZE_MASK));
+		info->fifo_samples = 0;
+	}
+	//PRINT(("OpenSoundDeviceEngine::%s: OPTR: { samples=%Ld, fifo_samples=%d }\n", __FUNCTION__, info->samples, info->fifo_samples));
+	if (fifoed)
+		*fifoed = info->fifo_samples;
+	return info->samples;
+}
+
+
+int32
+OpenSoundDeviceEngine::GetIOverruns()
+{
+	audio_errinfo info;
+	CALLED();
+	memset(&info, 0, sizeof(info));
+	if (!(fOpenMode & OPEN_WRITE))
+		return 0;
+	if (ioctl(fFD, SNDCTL_DSP_GETERROR, &info, sizeof(info)) < 0) {
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+				__FUNCTION__, "SNDCTL_DSP_GETERROR", strerror(errno)));
+		return 0;
+	}
+	PRINT(("OpenSoundDeviceEngine::%s: IOVERRUNS: { overruns=%d }\n", __FUNCTION__, info.rec_overruns));
+	return info.rec_overruns;
+}
+
+
+int32
+OpenSoundDeviceEngine::GetOUnderruns()
+{
+	audio_errinfo info;
+	CALLED();
+	memset(&info, 0, sizeof(info));
+	if (!(fOpenMode & OPEN_WRITE))
+		return 0;
+	if (ioctl(fFD, SNDCTL_DSP_GETERROR, &info, sizeof(info)) < 0) {
+		PRINT(("OpenSoundDeviceEngine::%s: %s: %s\n", 
+				__FUNCTION__, "SNDCTL_DSP_GETERROR", strerror(errno)));
+		return 0;
+	}
+	//PRINT(("OpenSoundDeviceEngine::%s: OUNDERRUNS: { underruns=%d }\n", __FUNCTION__, info.play_underruns));
+	return info.play_underruns;
+}
+
+
 int OpenSoundDeviceEngine::GetODelay(void)
 {
 	//CALLED();
@@ -340,6 +461,12 @@ status_t OpenSoundDeviceEngine::StartRecording(void)
 
 int64 OpenSoundDeviceEngine::PlayedFramesCount(void)
 {
+	int64 played;
+	int32 fifoed;
+	played = GetCurrentOPtr(&fifoed);
+	//played += fifoed;
+	//return played;
+	fPlayedFramesCount = played - fifoed;
 	return fPlayedFramesCount;//XXX
 	return fPlayedFramesCount - (GetODelay() / (fMediaFormat.u.raw_audio.channel_count
 						 		* (fMediaFormat.AudioFormat() & media_raw_audio_format::B_AUDIO_SIZE_MASK)));
@@ -443,8 +570,10 @@ status_t OpenSoundDeviceEngine::AcceptFormatFor(int fmt, media_format &format, b
 {
 	status_t err;
 	int afmt = 0;
+	char buf[1024];
 	CALLED();
 	fmt &= rec ? Info()->iformats : Info()->oformats;
+
 	if (fmt == 0)
 		return B_MEDIA_BAD_FORMAT;
 	media_format wc;
@@ -540,12 +669,12 @@ status_t OpenSoundDeviceEngine::AcceptFormatFor(int fmt, media_format &format, b
 		raw.buffer_size = DEFAULT_BUFFER_SIZE;
 
 	} else {
+		PRINT(("%s: unknown media type\n", __FUNCTION__));
 		Close();
 		return EINVAL;
 	}
 	// cache it
 	fMediaFormat = format;
-	char buf[1024];
 	string_for_format(format, buf, 1024);
 	PRINT(("%s: %s\n", __FUNCTION__, buf));
 	return B_OK;
@@ -676,3 +805,4 @@ status_t OpenSoundDeviceEngine::SpecializeFormatFor(int fmt, media_format &forma
 	PRINT(("%s: %s\n", __FUNCTION__, buf));
 	return B_OK;
 }
+

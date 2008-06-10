@@ -33,6 +33,13 @@
 
 #define ENABLE_REC 1
 
+// timeout in OpenSoundNode::RunThread()
+#define MIN_SNOOZING 2000
+
+// pretend we don't drift
+#define DISABLE_DRIFT 1
+
+
 /* bit mask of supported formats for raw_audio */
 /* also used to mark the raw_audio node input&outputs */
 //XXX: _OE ?

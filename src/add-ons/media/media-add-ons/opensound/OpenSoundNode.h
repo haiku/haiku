@@ -42,8 +42,9 @@
 #include <ParameterWeb.h>
 #include <TimeSource.h>
 #include <Controllable.h>
-#include <File.h>
 #include <Entry.h>
+#include <File.h>
+#include <List.h>
 //#include "soundcard.h"
 #include "OpenSoundDevice.h"
 #include "OpenSoundDeviceEngine.h"
@@ -53,13 +54,15 @@
 						const media_format & producer_format,
 						const media_format & consumer_format);*/
 						
-						
+class OpenSoundNode;
+				
 class node_input
 {
 	public:
 						node_input(media_input &input, media_format format);
 						~node_input();
 
+	OpenSoundNode		*fNode;
 	int32				fEngineId;
 	OpenSoundDeviceEngine	*fRealEngine; // engine it's connected to. can be a shadow one (!= fEngineId)
 	int					fAFmt; // AFMT_* for this one
@@ -67,9 +70,12 @@ class node_input
 	media_input			fInput;
 	media_format 		fPreferredFormat;
 	media_format		fFormat;
+
+	thread_id			fThread;
 	uint32 				fBufferCycle;
 //	multi_buffer_info	fOldMBI;
-	BBuffer				*fBuffer;
+//	BBuffer				*fBuffer;
+	BList				fBuffers; // of (BBuffer *)
 };
 
 class node_output
@@ -78,6 +84,7 @@ class node_output
 						node_output(media_output &output, media_format format);
 						~node_output();
 
+	OpenSoundNode		*fNode;
 	int32				fEngineId;
 	OpenSoundDeviceEngine	*fRealEngine; // engine it's connected to. can be a shadow one (!= fEngineId)
 	int					fAFmt; // AFMT_* for this one
@@ -86,6 +93,7 @@ class node_output
 	media_format 		fPreferredFormat;
 	media_format		fFormat;
 	
+	thread_id			fThread;
 	BBufferGroup		*fBufferGroup;
 	bool 				fOutputEnabled;
 	uint64 				fSamplesSent;
@@ -353,6 +361,16 @@ private:
 		status_t			StartThread();
 		status_t			StopThread();
 		
+		static void			_sig_handler_(int sig);
+		static int32		_engine_play_thread_( void *data );
+		static int32		_engine_rec_thread_( void *data );
+		int32				EnginePlayThread(node_input *input);
+		int32				EngineRecThread(node_output *output);
+
+		status_t			StartPlayThread(node_input *input);
+		status_t			StopPlayThread(node_input *input);
+		status_t			StartRecThread(node_output *output);
+		status_t			StopRecThread(node_output *output);
 		
 		void 				AllocateBuffers(node_output &channel);
 		BBuffer* 			FillNextBuffer(audio_buf_info *abinfo, node_output &channel);
@@ -392,7 +410,7 @@ private:
 		
 		
 		//volatile uint32 	fBufferCycle;
-		sem_id				fBuffer_free;
+		sem_id				fBufferAvailableSem;
 				
 		
 		thread_id			fThread;

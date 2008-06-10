@@ -38,7 +38,9 @@ virtual	ssize_t		Write(const void *buffer, size_t size);
 		status_t	UpdateInfo();
 		// shortcuts
 		int			Caps() const { return fAudioInfo.caps; };
-		int			Latency() const { return fAudioInfo.latency; };
+		bigtime_t	CardLatency(void) const { return (fAudioInfo.latency<0) ? 0 : fAudioInfo.latency; };
+		bigtime_t	PlaybackLatency(void);
+		bigtime_t	RecordingLatency(void);
 		
 		
 		int			GetChannels(void);
@@ -55,10 +57,16 @@ virtual	ssize_t		Write(const void *buffer, size_t size);
 		size_t		GetISpace(audio_buf_info *info=NULL);
 		size_t		GetOSpace(audio_buf_info *info=NULL);
 
+		int64		GetCurrentIPtr(int32 *fifoed=NULL, oss_count_t *info=NULL);
+		int64		GetCurrentOPtr(int32 *fifoed=NULL, oss_count_t *info=NULL);
+
+		int32		GetIOverruns();
+		int32		GetOUnderruns();
+
 		int			GetODelay(void);
 
 		status_t	StartRecording(void);
-		
+
 		int64		PlayedFramesCount(void);
 		bigtime_t	PlayedRealTime(void);
 		
