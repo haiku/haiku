@@ -1171,9 +1171,12 @@ BScrollBar::_UpdateThumbFrame()
 	thumbSize = floorf(thumbSize + 0.5);
 	thumbSize--;
 
-	// the thumb can be scrolled within the remaining area "maxSize - thumbSize"
-	float offset = floorf(((fValue - fMin) / (fMax - fMin + 1.0))
-		* (maxSize - thumbSize));
+	// the thumb can be scrolled within the remaining area "maxSize - thumbSize - 1.0"	
+	float offset = 0.0;
+	if (fMax > fMin) {		
+		offset = floorf(((fValue - fMin) / (fMax - fMin))
+			* (maxSize - thumbSize - 1.0));
+	}
 
 	if (_DoubleArrows()) {
 		offset += buttonSize * 2;
