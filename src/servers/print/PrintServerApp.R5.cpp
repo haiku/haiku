@@ -64,7 +64,13 @@ status_t PrintServerApp::async_thread(void* data)
 						w->Go();
 					} else {
 						BMessage reply(*msg);
-						if (printer->ConfigurePage(reply) == B_OK)
+						status_t status = B_ERROR;
+						if (msg->what == PSRV_SHOW_PAGE_SETUP)
+							status = printer->ConfigurePage(reply);
+						else
+							status = printer->ConfigureJob(reply);
+
+						if (status == B_OK)
 							sender.SetReply(&reply);
 					}
 				} else {
