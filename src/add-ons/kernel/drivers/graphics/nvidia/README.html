@@ -201,9 +201,9 @@ If you have an older card that officially doesn't support the AGP FW feature, yo
 	<li><strong>pgm_panel:</strong><br>
 This option only has an effect if you have a laptop panel or DVI panel connected. It's existing because it's currently impossible to setup the driver in a way every single panel outthere is happy about it.
 	<ul>
-		<li><strong>false:</strong><br>
+		<li><strong>false:</strong> (default setting)<br>
 If you select <strong>pgm_panel false</strong> the driver will not program the panel's pixelclock (refreshrate). Instead it relies on your cardBIOS to have done that correctly. While this is probably the case, it might introduce some displaying errors every now and then.
-		<li><strong>true:</strong> (default setting)<br>
+		<li><strong>true:</strong><br>
 With the <strong>pgm_panel true</strong> setting, the driver will fix your panel's refreshrate to 60Hz. While this should be working on all panels outthere, some panels are particular picky about refreshrates below 60.0Hz (they shut off), and some other panels are particular picky about refreshrates above 60.0Hz (they shut off). While the driver requests the hardware to set 60.0Hz, this isn't exactly possible, so the actual setting is <strong>bound</strong> to be a tiny bit below or above 60.0Hz.
 	</ul>
 	<li><strong>vga_on_tv:</strong><br>
@@ -227,9 +227,11 @@ If you select <strong>force_sync false</strong> the driver's 3D accelerant will 
 	<li><strong>force_ws:</strong><br>
 This option (if enabled) overrules the aspect ratio detection for screens inside the driver. When set to <strong>true</strong> it forces all monitors to be treated as widescreen types.
 	<ul>
-		<li><strong>false:</strong> (default setting)<br>
+		<li><strong>false:</strong><br>
 If you select <strong>force_ws false</strong> the driver will autodetect the screen's aspect ratio if it can, otherwise it will force 4:3 aspect. Screens that are connected with a DVI cable and screens inside a laptop are autodetected (according to the cardBIOS presets done), but analog connected screens will always make the driver block widescreen modes. Connected analog TV sets are always treated like widescreen devices though.
-		<li><strong>true:</strong> With this setting all monitors are treated as being widescreen types. This setting should only be used if you are having trouble using a widescreen monitor, because on non-widescreen monitors there's a (small) chance of destroying them if used with a widescreen mode. So use this setting with care.
+		<li><strong>true:</strong> (default setting) <br> With this setting all monitors are treated as being widescreen types. This setting should only be used if you are having trouble using a widescreen monitor, because on non-widescreen monitors there's a (small) chance of destroying them if used with a widescreen mode. So use this setting with care.<br>
+<strong>Note please:</strong><br>
+The default setting was changed from <strong>false</strong> to being <strong>true</strong> on request by Haiku because widescreen monitors are rapidly becoming commonplace these days. In the future EDID will be implemented in the driver to actually fetch this info from the connected screens.
 	</ul>
 <li><strong>primary:</strong> (set to disabled by default)<br>
 Primary lets you force a certain card to be used as primary card in your system if you have multiple graphics cards installed: so it will display your desktop. To enable this (hack) feature uncomment this item and fill in the exact name of the card that is to be primary (as exported by the kerneldriver in /dev/graphics/). If you are going to select a card other than the one displaying your system's POST messages at bootup, make sure you also set 'usebios false' as otherwise the card(s) aren't coldstarted by the driver.<br>
@@ -243,6 +245,6 @@ Primary lets you force a certain card to be used as primary card in your system 
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on April 11, 2006)</p>
+<p>(Page last updated on June 10, 2008)</p>
 </body>
 </html>

@@ -388,11 +388,11 @@ static nv_settings sSettings = { // see comments in nvidia.settings
 	false,					// switchhead
 	false,					// force_pci
 	false,					// unhide_fw
-	true,					// pgm_panel
+	false,					// pgm_panel
 	true,					// dma_acc
 	false,					// vga_on_tv
 	false,					// force_sync
-	false,					// force_ws
+	true,					// force_ws
 	0,						// gpu_clk
 	0,						// ram_clk
 };
