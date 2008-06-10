@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-9/2007.
+	Rudolf Cornelissen 10/2002-6/2008.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -219,7 +219,6 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   hardcursor;
 	bool   switchhead;
 	bool   pgm_panel;
-	bool   dma_acc;
 	bool   vga_on_tv;
 	bool   force_sync;
 	bool   force_ws;
