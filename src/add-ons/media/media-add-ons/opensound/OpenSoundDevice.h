@@ -92,47 +92,9 @@ class OpenSoundDevice
 		static status_t get_media_format_description_for(int fmt, media_format_description *desc, int count=1);
 		static status_t register_media_formats();
 		static status_t get_media_format_for(int fmt, media_format &format);
-#if MA
-		static float convert_oss_rate_to_media_rate(uint32 rate);
-		static uint32 convert_media_rate_to_oss_rate(float rate);
-		static uint32 convert_oss_format_to_media_format(uint32 fmt);
-		static int16 convert_oss_format_to_valid_bits(uint32 fmt);
-		static uint32 convert_media_format_to_oss_format(uint32 fmt);
-		static uint32 select_oss_rate(uint32 rate);
-		static uint32 select_oss_format(uint32 fmt);
-
-		int DoBufferExchange(multi_buffer_info *MBI);
-		int DoSetMix(multi_mix_value_info *MMVI);
-		int DoGetMix(multi_mix_value_info *MMVI);
-#endif
-
-	private:
-
-		char					fDevice_name[32];
-		char					fDevice_path[32];
-		int						fMixFD;
-		int						fPcmFDs[MAX_CHANNELS];
-		int						fSpdifFDs[MAX_CHANNELS];
-#if MA
-		int						fd; 			//file descriptor for hw driver
-#endif
 
 	public:
 		oss_card_info			fCardInfo;
-#if MA
-		multi_description		MD;
-		multi_channel_info		MCI[MAX_CHANNELS];
-		multi_format_info 		MFI;
-		multi_buffer_list 		MBL;
-
-		multi_mix_control_info 	MMCI;
-		multi_mix_control		MMC[MAX_CONTROLS];
-
-		buffer_desc		play_buffer_list[NB_BUFFERS * MAX_CHANNELS];
-		buffer_desc		record_buffer_list[NB_BUFFERS * MAX_CHANNELS];
-		buffer_desc 	*play_buffer_desc[NB_BUFFERS];
-		buffer_desc 	*record_buffer_desc[NB_BUFFERS];
-#endif
 
 	private:
 		status_t 				fInitCheckStatus;
