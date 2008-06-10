@@ -665,6 +665,14 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 	view->PushState();
 	view->SetOrigin(origin);
 	view->ConstrainClippingRegion(&region);
+
+	if (view->ViewColor() != B_TRANSPARENT_COLOR) {
+		rgb_color highColor = view->HighColor();
+		view->SetHighColor(view->ViewColor());
+		view->FillRect(rect);
+		view->SetHighColor(highColor);
+	}
+		
 	view->Draw(rect);
 	view->PopState();
 	view->fIsPrinting = false;
