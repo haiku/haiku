@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-9/2007.
+	Rudolf Cornelissen 10/2002-6/2008.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -117,8 +117,7 @@ enum {
 	NV10A,
 	NV20A,
 	NV30A,
-	NV40A,
-	NV50A
+	NV40A
 };
 
 /* card info - information gathered from PINS (and other sources) */
