@@ -204,7 +204,7 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	// Determine in what context we are running (Kindly copied from FreeBSD)
 	uint32 control = _ReadReg(OHCI_CONTROL);
 	if (control & OHCI_INTERRUPT_ROUTING) {
-		TRACE(("usb_ohci: SMM is in control of the host controller\n"));
+		TRACE(("usb_ohci: smm is in control of the host controller\n"));
 		uint32 status = _ReadReg(OHCI_COMMAND_STATUS);
 		_WriteReg(OHCI_COMMAND_STATUS, status | OHCI_OWNERSHIP_CHANGE_REQUEST);
 		for (uint32 i = 0; i < 100 && (control & OHCI_INTERRUPT_ROUTING); i++) {
@@ -212,15 +212,21 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 			control = _ReadReg(OHCI_CONTROL);
 		}
 
-		if (!(control & OHCI_INTERRUPT_ROUTING)) {
-			TRACE(("usb_ohci: SMM does not respond. Resetting...\n"));
+		if ((control & OHCI_INTERRUPT_ROUTING) != 0) {
+			TRACE_ERROR(("usb_ohci: smm does not respond. resetting...\n"));
 			_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
 			snooze(USB_DELAY_BUS_RESET);
-		}
+		} else
+			TRACE(("usb_ohci: ownership change successful\n"));
 	} else {
 		TRACE(("usb_ohci: cold started\n"));
 		snooze(USB_DELAY_BUS_RESET);
 	}
+
+	// Disable all interrupts and clear any current interrupt status
+	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS
+		| OHCI_MASTER_INTERRUPT_ENABLE);
+	_WriteReg(OHCI_INTERRUPT_STATUS, OHCI_ALL_INTERRUPTS);
 
 	// This reset should not be necessary according to the OHCI spec, but
 	// without it some controllers do not start.
@@ -232,7 +238,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	uint32 intervalValue = OHCI_GET_INTERVAL_VALUE(frameInterval);
 
 	// Disable interrupts right before we reset
-	cpu_status former = disable_interrupts();
 	_WriteReg(OHCI_COMMAND_STATUS, OHCI_HOST_CONTROLLER_RESET);
 	// Nominal time for a reset is 10 us
 	uint32 reset = 0;
@@ -244,7 +249,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 	}
 
 	if (reset) {
-		restore_interrupts(former);
 		TRACE_ERROR(("usb_ohci: Error resetting the host controller (timeout)\n"));
 		return;
 	}
@@ -266,8 +270,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		| OHCI_HC_FUNCTIONAL_STATE_OPERATIONAL;
 	// And finally start the controller
 	_WriteReg(OHCI_CONTROL, control);
-
-	restore_interrupts(former);
 
 	// The controller is now OPERATIONAL.
 	frameInterval = (_ReadReg(OHCI_FRAME_INTERVAL) & OHCI_FRAME_INTERVAL_TOGGLE)
