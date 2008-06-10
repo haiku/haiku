@@ -91,7 +91,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.84 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.85 running.\n"));
 
 	/* log VBLANK INT usability status */
 	if (si->ps.int_assigned)
@@ -688,14 +688,6 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV18");
 		status = nvxx_general_powerup();
 		break;
-	case 0x019110de: /* Nvidia GeForce 8800 GTX */
-	case 0x019310de: /* Nvidia GeForce 8800 GTS */
-		si->ps.card_type = G80;
-		si->ps.card_arch = NV50A;
-		sprintf(si->adi.name, "Nvidia GeForce 8800");
-		sprintf(si->adi.chipset, "G80");
-		status = nvxx_general_powerup();
-		break;
 	case 0x01a010de: /* Nvidia GeForce2 Integrated GPU */
 		si->ps.card_type = NV11;
 		si->ps.card_arch = NV10A;
@@ -1249,43 +1241,6 @@ status_t nv_general_powerup()
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
-	case 0x040010de: /* Nvidia GeForce 8600 GTS */
-	case 0x040210de: /* Nvidia GeForce 8600 GT */
-		si->ps.card_type = G84;
-		si->ps.card_arch = NV50A;
-		sprintf(si->adi.name, "Nvidia GeForce 8600");
-		sprintf(si->adi.chipset, "G84");
-		status = nvxx_general_powerup();
-		break;
-	case 0x040710de: /* Nvidia GeForce 8600M GT */
-		si->ps.card_type = G86;
-		si->ps.card_arch = NV50A;
-		si->ps.laptop = true;
-		sprintf(si->adi.name, "Nvidia GeForce 8600M GT");
-		sprintf(si->adi.chipset, "G86");
-		status = nvxx_general_powerup();
-		break;
-	case 0x042110de: /* Nvidia GeForce 8500 GT */
-		si->ps.card_type = G86;
-		si->ps.card_arch = NV50A;
-		sprintf(si->adi.name, "Nvidia GeForce 8500 GT");
-		sprintf(si->adi.chipset, "G86");
-		status = nvxx_general_powerup();
-		break;
-	case 0x042210de: /* Nvidia GeForce 8400 GS */
-		si->ps.card_type = G86;
-		si->ps.card_arch = NV50A;
-		sprintf(si->adi.name, "Nvidia GeForce 8400 GS");
-		sprintf(si->adi.chipset, "G86");
-		status = nvxx_general_powerup();
-		break;
-	case 0x042310de: /* Nvidia GeForce 8300 GS */
-		si->ps.card_type = G86;
-		si->ps.card_arch = NV50A;
-		sprintf(si->adi.name, "Nvidia GeForce 8300 GS");
-		sprintf(si->adi.chipset, "G86");
-		status = nvxx_general_powerup();
-		break;
 	/* Vendor Elsa GmbH */
 	case 0x0c601048: /* Elsa Gladiac Geforce2 MX */
 		si->ps.card_type = NV11;
@@ -1560,12 +1515,6 @@ static status_t nvxx_general_powerup()
 {
 	LOG(4, ("INIT: NV powerup\n"));
 	LOG(4,("POWERUP: Detected %s (%s)\n", si->adi.name, si->adi.chipset));
-
-	if (si->ps.card_arch >= NV50A)
-	{
-		LOG(8,("POWERUP: G80 and higher support not implemented: different architecture!\n"));
-		return B_ERROR;
-	}
 
 	/* setup cardspecs */
 	/* note:
@@ -2088,9 +2037,6 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
-		//no acc support for G8x yet!
-		if (si->ps.card_arch >= NV50A) *acc_mode = false;
-
 		/* virtual_width */
 		if (target->virtual_width > max_acc_width) *acc_mode = false;
 		/* virtual_height */
@@ -2123,8 +2069,6 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* check if we can setup this mode with acceleration */
 		*acc_mode = true;
-		//no acc support for G8x yet!
-		if (si->ps.card_arch >= NV50A) *acc_mode = false;
 		/* (we already know virtual_width will be no problem) */
 		/* virtual_height */
 		/* (NV cards can even do more than this(?)...
