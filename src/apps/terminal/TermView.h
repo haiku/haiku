@@ -130,7 +130,8 @@ private:
 	void _UpdateScrollBarRange();
 	void _DoFileDrop(entry_ref &ref);
 
-	void _SynchronizeWithTextBuffer(BRect* invalidateWhenScrolling);
+	void _SynchronizeWithTextBuffer(int32 visibleDirtyTop,
+		int32 visibleDirtyBottom);
 
 	void _WritePTY(const char* text, int32 numBytes);
 
@@ -201,8 +202,9 @@ private:
 	int fEncoding;
 
 	// Object pointer.
-	TerminalBuffer	*fTextBuffer;
-	BScrollBar		*fScrollBar;
+	TerminalBuffer		*fTextBuffer;
+	BasicTerminalBuffer	*fVisibleTextBuffer;
+	BScrollBar			*fScrollBar;
 
 	// Color and Attribute.
 	rgb_color fTextForeColor, fTextBackColor;
@@ -215,6 +217,12 @@ private:
 		// TODO: That's the history capacity -- only needed until the text
 		// buffer is created.
 	float fAutoScrollSpeed;
+
+	// redraw management
+	bigtime_t		fLastSyncTime;
+	int32			fScrolledSinceLastSync;
+	BMessageRunner*	fSyncRunner;
+	bool			fConsiderClockedSync;
 
 	// selection
 	TermPos fSelStart;

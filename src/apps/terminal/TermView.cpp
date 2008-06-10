@@ -94,6 +94,8 @@ static const uint32 kUpdateSigWinch = 'Rwin';
 static const uint32 kBlinkCursor = 'BlCr';
 static const uint32 kAutoScroll = 'AScr';
 
+static const bigtime_t kSyncUpdateGranularity = 100000;	// 0.1 s
+
 static const rgb_color kBlackColor = { 0, 0, 0, 255 };
 static const rgb_color kWhiteColor = { 255, 255, 255, 255 };
 
@@ -207,6 +209,7 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fTermColumns(COLUMNS_DEFAULT),
 	fEncoding(M_UTF8),
 	fTextBuffer(NULL),
+	fVisibleTextBuffer(NULL),
 	fScrollBar(NULL),
 	fTextForeColor(kBlackColor),
 	fTextBackColor(kWhiteColor),
@@ -216,6 +219,10 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fSelectBackColor(kBlackColor),
 	fScrollOffset(0),
 	fScrBufSize(historySize),
+	fLastSyncTime(0),
+	fScrolledSinceLastSync(0),
+	fSyncRunner(NULL),
+	fConsiderClockedSync(false),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
@@ -248,6 +255,7 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fTermColumns(columns),
 	fEncoding(M_UTF8),
 	fTextBuffer(NULL),
+	fVisibleTextBuffer(NULL),
 	fScrollBar(NULL),
 	fTextForeColor(kBlackColor),
 	fTextBackColor(kWhiteColor),
@@ -257,6 +265,10 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fSelectBackColor(kBlackColor),
 	fScrollOffset(0),
 	fScrBufSize(historySize),
+	fLastSyncTime(0),
+	fScrolledSinceLastSync(0),
+	fSyncRunner(NULL),
+	fConsiderClockedSync(false),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
@@ -301,6 +313,7 @@ TermView::TermView(BMessage *archive)
 	fTermColumns(COLUMNS_DEFAULT),
 	fEncoding(M_UTF8),
 	fTextBuffer(NULL),
+	fVisibleTextBuffer(NULL),
 	fScrollBar(NULL),
 	fTextForeColor(kBlackColor),
 	fTextBackColor(kWhiteColor),
@@ -309,6 +322,10 @@ TermView::TermView(BMessage *archive)
 	fSelectForeColor(kWhiteColor),
 	fSelectBackColor(kBlackColor),
 	fScrBufSize(1000),
+	fLastSyncTime(0),
+	fScrolledSinceLastSync(0),
+	fSyncRunner(NULL),
+	fConsiderClockedSync(false),
 	fSelStart(-1, -1),
 	fSelEnd(-1, -1),
 	fMouseTracking(false),
@@ -347,6 +364,10 @@ TermView::_InitObject(int32 argc, const char **argv)
 	if (fTextBuffer == NULL)
 		return B_NO_MEMORY;
 
+	fVisibleTextBuffer = new(std::nothrow) BasicTerminalBuffer;
+	if (fVisibleTextBuffer == NULL)
+		return B_NO_MEMORY;
+
 	// TODO: Make the special word chars user-settable!
 	fCharClassifier = new(std::nothrow) CharClassifier(
 		kDefaultSpecialWordChars);
@@ -357,6 +378,11 @@ TermView::_InitObject(int32 argc, const char **argv)
 	if (error != B_OK)
 		return error;
 	fTextBuffer->SetEncoding(fEncoding);
+
+	error = fVisibleTextBuffer->Init(fTermColumns, fTermRows + 2,
+		fTermRows + 2);
+	if (error != B_OK)
+		return error;
 
 	fShell = new (std::nothrow) Shell();
 	if (fShell == NULL)
@@ -392,8 +418,10 @@ TermView::~TermView()
 	
 	_DetachShell();
 
+	delete fSyncRunner;
 	delete fAutoScrollRunner;
-	delete fCharClassifier;	
+	delete fCharClassifier;
+	delete fVisibleTextBuffer;
 	delete fTextBuffer;
 	delete shell;
 }
@@ -474,8 +502,11 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 
 	{
 		BAutolock _(fTextBuffer);
-		if (fTextBuffer->ResizeTo(columns, rows) != B_OK)
+		if (fTextBuffer->ResizeTo(columns, rows) != B_OK
+			|| fVisibleTextBuffer->ResizeTo(columns, rows + 2, rows + 2)
+				!= B_OK) {
 			return Bounds();
+		}
 	}
 
 	fTermRows = rows;
@@ -493,6 +524,17 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 
 	if (resize)
 		ResizeTo(rect.Width(), rect.Height());
+
+
+	// synchronize the visible text buffer
+	{
+		BAutolock _(fTextBuffer);
+
+		_SynchronizeWithTextBuffer(0, -1);
+		int32 offset = _LineAt(0);
+		fVisibleTextBuffer->SynchronizeWith(fTextBuffer, offset, offset,
+			offset + rows + 2);
+	}
 	
 	return rect;
 }
@@ -858,12 +900,14 @@ TermView::_DrawCursor()
 	BRect rect(fFontWidth * fCursor.x, _LineOffset(fCursor.y), 0, 0);
 	rect.right = rect.left + fFontWidth - 1;
 	rect.bottom = rect.top + fCursorHeight - 1;
+	int32 firstVisible = _LineAt(0);
 
 	UTF8Char character;
 	uint16 attr;
 
 	bool selected = _CheckSelectedRegion(TermPos(fCursor.x, fCursor.y));
-	if (fTextBuffer->GetChar(fCursor.y, fCursor.x, character, attr) == A_CHAR) {
+	if (fVisibleTextBuffer->GetChar(fCursor.y - firstVisible, fCursor.x,
+			character, attr) == A_CHAR) {
 		int32 width;
 		if (IS_WIDTH(attr))
 			width = 2;
@@ -875,8 +919,8 @@ TermView::_DrawCursor()
 		memcpy(buffer, character.bytes, bytes);
 		buffer[bytes] = '\0';
 
-		_DrawLinePart(fCursor.x * fFontWidth, (int32)_LineOffset(fCursor.y),
-			attr, buffer, width, selected, true, this);
+		_DrawLinePart(fCursor.x * fFontWidth, (int32)rect.top, attr, buffer,
+			width, selected, true, this);
 	} else {
 		if (selected)
 			SetHighColor(fSelectBackColor);
@@ -965,7 +1009,8 @@ TermView::Draw(BRect updateRect)
 //		return;
 //	}
 
-	BAutolock _(fTextBuffer);
+//	BAutolock _(fTextBuffer);
+
 // debug_printf("TermView::Draw((%f, %f) - (%f, %f))\n", updateRect.left,
 // updateRect.top, updateRect.right, updateRect.bottom);
 // {
@@ -982,11 +1027,12 @@ TermView::Draw(BRect updateRect)
 // }
 // }
 
-	_SynchronizeWithTextBuffer(&updateRect);
+//	_SynchronizeWithTextBuffer(&updateRect);
 
 	int32 x1 = (int32)(updateRect.left) / fFontWidth;
 	int32 x2 = (int32)(updateRect.right) / fFontWidth;
 
+	int32 firstVisible = _LineAt(0);
 	int32 y1 = _LineAt(updateRect.top);
 	int32 y2 = _LineAt(updateRect.bottom);
 
@@ -999,7 +1045,8 @@ TermView::Draw(BRect updateRect)
 		int32 k = x1;
 		char buf[fTermColumns * 4 + 1];
 
-		if (fTextBuffer->IsFullWidthChar(j, k))
+//		if (fTextBuffer->IsFullWidthChar(j, k))
+		if (fVisibleTextBuffer->IsFullWidthChar(j - firstVisible, k))
 			k--;
 
 		if (k < 0)
@@ -1009,9 +1056,12 @@ TermView::Draw(BRect updateRect)
 			int32 lastColumn = x2;
 			bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
 			uint16 attr;
-			int32 count = fTextBuffer->GetString(j, i, lastColumn, buf, attr);
-//debug_printf("  fTextBuffer->GetString(%ld, %ld, %ld) -> (%ld, \"%.*s\"), selected: %d\n",
-//j, i, lastColumn, count, (int)count, buf, insideSelection);
+//			int32 count = fTextBuffer->GetString(j, i, lastColumn, buf, attr);
+			int32 count = fVisibleTextBuffer->GetString(j - firstVisible, i,
+				lastColumn, buf, attr);
+
+//debug_printf("  fVisibleTextBuffer->GetString(%ld, %ld, %ld) -> (%ld, \"%.*s\"), selected: %d\n",
+//j - firstVisible, i, lastColumn, count, (int)count, buf, insideSelection);
 
 			if (count == 0) {
 				BRect rect(fFontWidth * i, _LineOffset(j),
@@ -1402,7 +1452,7 @@ TermView::MessageReceived(BMessage *msg)
 		case MSG_TERMINAL_BUFFER_CHANGED:
 		{
 			BAutolock _(fTextBuffer);
-			_SynchronizeWithTextBuffer(NULL);
+			_SynchronizeWithTextBuffer(0, -1);
 			break;
 		}
 		case MSG_SET_TERMNAL_TITLE:
@@ -1445,6 +1495,12 @@ TermView::ScrollTo(BPoint where)
 	if (diff == 0)
 		return;
 
+	float bottom = Bounds().bottom;
+	int32 oldFirstLine = _LineAt(0);
+	int32 oldLastLine = _LineAt(bottom);
+	int32 newFirstLine = _LineAt(diff);
+	int32 newLastLine = _LineAt(bottom + diff);
+
 	fScrollOffset = where.y;
 
 	// invalidate the current cursor position before scrolling
@@ -1457,6 +1513,20 @@ TermView::ScrollTo(BPoint where)
 //sourceRect.left, sourceRect.top, sourceRect.right, sourceRect.bottom,
 //destRect.left, destRect.top, destRect.right, destRect.bottom);
 	CopyBits(sourceRect, destRect);
+
+	// sync visible text buffer with text buffer
+	if (newFirstLine != oldFirstLine || newLastLine != oldLastLine) {
+		if (newFirstLine != oldFirstLine)
+{
+//debug_printf("fVisibleTextBuffer->ScrollBy(%ld)\n", newFirstLine - oldFirstLine);
+			fVisibleTextBuffer->ScrollBy(newFirstLine - oldFirstLine);
+}
+		BAutolock _(fTextBuffer);
+		if (diff < 0)
+			_SynchronizeWithTextBuffer(newFirstLine, oldFirstLine - 1);
+		else
+			_SynchronizeWithTextBuffer(oldLastLine + 1, newLastLine);
+	}
 }
 
 
@@ -1489,22 +1559,84 @@ TermView::_DoFileDrop(entry_ref &ref)
 /*!	Text buffer must already be locked.
 */
 void
-TermView::_SynchronizeWithTextBuffer(BRect* invalidateWhenScrolling)
+TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
+	int32 visibleDirtyBottom)
 {
 	TerminalBufferDirtyInfo& info = fTextBuffer->DirtyInfo();
-
-//debug_printf("TermView::_SynchronizeWithTextBuffer(): dirty: %ld - %ld, "
-//"scrolled: %ld\n", info.dirtyTop, info.dirtyBottom, info.linesScrolled);
-
+	int32 linesScrolled = info.linesScrolled;
 	BRect bounds = Bounds();
 	int32 firstVisible = _LineAt(0);
 	int32 lastVisible = _LineAt(bounds.bottom);
 	int32 historySize = fTextBuffer->HistorySize();
-	int32 linesScrolled = info.linesScrolled;
+
+//debug_printf("TermView::_SynchronizeWithTextBuffer(): dirty: %ld - %ld, "
+//"scrolled: %ld, visible dirty: %ld - %ld\n", info.dirtyTop, info.dirtyBottom,
+//info.linesScrolled, visibleDirtyTop, visibleDirtyBottom);
+
+	bigtime_t now = system_time();
+	bigtime_t timeElapsed = now - fLastSyncTime;
+	if (timeElapsed > 2 * kSyncUpdateGranularity) {
+		// last sync was ages ago
+		fLastSyncTime = now;
+		fScrolledSinceLastSync = linesScrolled;
+	}
+
+	if (fSyncRunner == NULL) {
+		// We consider clocked syncing when more than a full screen height has
+		// been scrolled in less than a sync update period. Once we're
+		// actively considering it, the same condition will convince us to
+		// actually do it.
+		if (fScrolledSinceLastSync + linesScrolled <= fTermRows) {
+			// Condition doesn't hold yet. Reset if time is up, or otherwise
+			// keep counting.
+			if (timeElapsed > kSyncUpdateGranularity) {
+				fConsiderClockedSync = false;
+				fLastSyncTime = now;
+				fScrolledSinceLastSync = linesScrolled;
+			} else
+				fScrolledSinceLastSync += linesScrolled;
+		} else if (fConsiderClockedSync) {
+			// We are convinced -- create the sync runner.
+			fLastSyncTime = now;
+			fScrolledSinceLastSync = 0;
+
+			BMessage message(MSG_TERMINAL_BUFFER_CHANGED);
+			fSyncRunner = new(std::nothrow) BMessageRunner(BMessenger(this),
+				&message, kSyncUpdateGranularity);
+			if (fSyncRunner != NULL && fSyncRunner->InitCheck() == B_OK)
+				return;
+
+			delete fSyncRunner;
+			fSyncRunner = NULL;
+		} else {
+			// Looks interesting so far. Reset the counts and consider clocked
+			// syncing.
+			fConsiderClockedSync = true;
+			fLastSyncTime = now;
+			fScrolledSinceLastSync = 0;
+		}
+	} else if (timeElapsed < kSyncUpdateGranularity) {
+		// sync time not passed yet -- keep counting
+		fScrolledSinceLastSync += linesScrolled;
+		return;
+	} else if (fScrolledSinceLastSync + linesScrolled <= fTermRows) {
+		// time's up, but not enough happened
+		delete fSyncRunner;
+		fSyncRunner = NULL;
+		fLastSyncTime = now;
+		fScrolledSinceLastSync = linesScrolled;
+	} else {
+		// Things are still rolling, but the sync time's up.
+		fLastSyncTime = now;
+		fScrolledSinceLastSync = 0;
+	}
 
 	bool doScroll = false;
 	if (linesScrolled > 0) {
 		_UpdateScrollBarRange();
+
+		visibleDirtyTop -= linesScrolled;
+		visibleDirtyBottom -= linesScrolled;
 
 		if (firstVisible < 0) {
 			firstVisible -= linesScrolled;
@@ -1515,6 +1647,25 @@ TermView::_SynchronizeWithTextBuffer(BRect* invalidateWhenScrolling)
 				firstVisible = -historySize;
 				doScroll = true;
 				scrollOffset = -historySize * fFontHeight;
+				// We need to invalidate the lower linesScrolled lines of the
+				// visible text buffer, since those will be scrolled up and
+				// need to be replaced. We just use visibleDirty{Top,Bottom}
+				// for that purpose. Unless invoked from ScrollTo() (i.e.
+				// user-initiated scrolling) those are unused. In the unlikely
+				// case that the user is scrolling at the same time we may
+				// invalidate too many lines, since we have to extend the given
+				// region.
+				// Note that in the firstVisible == 0 case the new lines are
+				// already in the dirty region, so they will be updated anyway.
+				if (visibleDirtyTop <= visibleDirtyBottom) {
+					if (lastVisible < visibleDirtyTop)
+						visibleDirtyTop = lastVisible;
+					if (visibleDirtyBottom < lastVisible + linesScrolled)
+						visibleDirtyBottom = lastVisible + linesScrolled;
+				} else {
+					visibleDirtyTop = lastVisible + 1;
+					visibleDirtyBottom = lastVisible + linesScrolled;
+				}
 			} else
 				scrollOffset = fScrollOffset - linesScrolled * fFontHeight;
 
@@ -1538,13 +1689,7 @@ TermView::_SynchronizeWithTextBuffer(BRect* invalidateWhenScrolling)
 //destRect.left, destRect.top, destRect.right, destRect.bottom);
 			CopyBits(sourceRect, destRect);
 
-			if (invalidateWhenScrolling != NULL)
-{
-				Invalidate(invalidateWhenScrolling->OffsetByCopy(0, -scrollBy));
-//BRect rect(invalidateWhenScrolling->OffsetByCopy(0, scrollBy));
-//debug_printf("Invalidate((%f, %f) - (%f, %f))\n", rect.left, rect.top,
-//rect.right, rect.bottom);
-}
+			fVisibleTextBuffer->ScrollBy(linesScrolled);
 		}
 
 		// move selection
@@ -1575,6 +1720,14 @@ TermView::_SynchronizeWithTextBuffer(BRect* invalidateWhenScrolling)
 				_Deselect();
 			}
 		}
+	}
+
+	if (visibleDirtyTop <= visibleDirtyBottom)
+		info.ExtendDirtyRegion(visibleDirtyTop, visibleDirtyBottom);
+
+	if (linesScrolled != 0 || info.IsDirtyRegionValid()) {
+		fVisibleTextBuffer->SynchronizeWith(fTextBuffer, firstVisible,
+			info.dirtyTop, info.dirtyBottom);
 	}
 
 	// invalidate cursor, if it changed
@@ -1792,7 +1945,7 @@ TermView::_Select(TermPos start, TermPos end, bool inclusive,
 {
 	BAutolock _(fTextBuffer);
 
-	_SynchronizeWithTextBuffer(NULL);
+	_SynchronizeWithTextBuffer(0, -1);
 
 	if (end < start)
 		std::swap(start, end);
@@ -2008,7 +2161,7 @@ TermView::Find(const BString &str, bool forwardSearch, bool matchCase,
 	bool matchWord)
 {
 	BAutolock _(fTextBuffer);
-	_SynchronizeWithTextBuffer(NULL);
+	_SynchronizeWithTextBuffer(0, -1);
 
 	TermPos start;
 	if (_HasSelection()) {
