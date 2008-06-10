@@ -7988,17 +7988,16 @@ BPoseView::UpdateScrollRange()
 	}
 
 	// set proportions for bars
-	BRect visibleExtent(extent & bounds);
 	BRect totalExtent(extent | bounds);
-
-	if (fHScrollBar) {
-		float proportion = visibleExtent.Width() / totalExtent.Width();
+		
+	if (fHScrollBar && totalExtent.Width() != 0.0) {
+		float proportion = bounds.Width() / totalExtent.Width();
 		if (fHScrollBar->Proportion() != proportion)
 			fHScrollBar->SetProportion(proportion);
 	}
 
-	if (fVScrollBar) {
-		float proportion = visibleExtent.Height() / totalExtent.Height();
+	if (fVScrollBar && totalExtent.Height() != 0.0) {
+		float proportion = bounds.Height() / totalExtent.Height();
 		if (fVScrollBar->Proportion() != proportion)
 			fVScrollBar->SetProportion(proportion);
 	}
