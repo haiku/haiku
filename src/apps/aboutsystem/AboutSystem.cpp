@@ -473,6 +473,7 @@ AboutView::AboutView(const BRect &rect)
 		"Christopher ML Zumwalt May\n"
 		"Andrew McCall\n"
 		"Scott McCreary\n"
+		"Urias McCullough\n"
 		"Michele (zuMi)\n"
 		"Marius Middelthon\n"
 		"Misza\n"
