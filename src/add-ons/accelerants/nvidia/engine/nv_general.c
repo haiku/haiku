@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-10/2007
+   Rudolf Cornelissen 10/2002-6/2008
 */
 
 #define MODULE_BIT 0x00008000
@@ -806,6 +806,14 @@ status_t nv_general_powerup()
 		si->ps.card_type = NV44;
 		si->ps.card_arch = NV40A;
 		sprintf(si->adi.name, "Nvidia GeForce 6100");
+		sprintf(si->adi.chipset, "NV44");
+		status = nvxx_general_powerup();
+		break;
+	case 0x024410de: /* Nvidia GeForce 6150 Go (NFORCE4 Integr.GPU) */
+		si->ps.card_type = NV44;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		sprintf(si->adi.name, "Nvidia GeForce 6150 Go");
 		sprintf(si->adi.chipset, "NV44");
 		status = nvxx_general_powerup();
 		break;
