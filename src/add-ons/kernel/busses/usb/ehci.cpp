@@ -194,11 +194,13 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			}
 
 			if (legacySupport & EHCI_LEGSUP_BIOSOWNED) {
-				// in any case disable interrupts so we do not flood the system
-				// if the BIOS still decides to give up control
-				WriteOpReg(EHCI_USBINTR, 0);
-				TRACE_ERROR(("usb_ehci: bios won't give up control over the host controller\n"));
-				return;
+				TRACE_ERROR(("usb_ehci: bios won't give up control over the host controller (ignoring)\n"));
+
+				// turn off the BIOS owned flag, clear all SMIs and continue
+				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+					fPCIInfo->function, extendedCapPointer + 2, 1, 0);
+				sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+					fPCIInfo->function, extendedCapPointer + 4, 4, 0);
 			} else if (legacySupport & EHCI_LEGSUP_OSOWNED) {
 				dprintf("usb_ehci: successfully took ownership of the host controller\n");
 			}
