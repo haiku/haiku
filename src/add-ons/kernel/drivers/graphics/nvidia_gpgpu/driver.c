@@ -129,7 +129,6 @@ static nv_settings sSettings = { // see comments in nvidia_gpgpu.settings
 	true,       			// hardcursor
 	false,					// switchhead
 	true,					// pgm_panel
-	true,					// dma_acc
 	false,					// vga_on_tv
 	false,					// force_sync
 	false,					// force_ws
@@ -1146,8 +1145,6 @@ init_driver(void)
 			"switchhead", false, false);
 		sSettings.pgm_panel = get_driver_boolean_parameter(settings,
 			"pgm_panel", false, false);
-		sSettings.dma_acc = get_driver_boolean_parameter(settings,
-			"dma_acc", false, false);
 		sSettings.vga_on_tv = get_driver_boolean_parameter(settings,
 			"vga_on_tv", false, false);
 		sSettings.force_sync = get_driver_boolean_parameter(settings,

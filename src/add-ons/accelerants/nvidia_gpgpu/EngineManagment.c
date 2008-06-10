@@ -4,14 +4,7 @@
 
 	other authors:
 	Mark Watson
-	Rudolf Cornelissen 3/2004-2/2005
-*/
-
-/*
-	note:
-	attempting DMA on NV40 and higher because without it I can't get it going ATM.
-	Later on this can become a nv.settings switch, and maybe later we can even
-	forget about non-DMA completely (depends on 3D acceleration attempts).
+	Rudolf Cornelissen 3/2004-6/2008
 */
 
 #define MODULE_BIT 0x10000000
@@ -25,21 +18,6 @@ uint32 ACCELERANT_ENGINE_COUNT(void)
 {
 	/* we have one acceleration engine */
 	return 1;
-}
-
-status_t ACQUIRE_ENGINE_PIO(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et)
-{
-	/* acquire the shared benaphore */
-	AQUIRE_BEN(si->engine.lock)
-	/* sync if required */
-	if (st) SYNC_TO_TOKEN(st);
-
-	/* make sure all needed engine cmd's are mapped to the FIFO */
-	nv_acc_assert_fifo();
-
-	/* return an engine token */
-	*et = &nv_engine_token;
-	return B_OK;
 }
 
 status_t ACQUIRE_ENGINE_DMA(uint32 capabilities, uint32 max_wait, sync_token *st, engine_token **et)
@@ -70,10 +48,7 @@ status_t RELEASE_ENGINE(engine_token *et, sync_token *st)
 void WAIT_ENGINE_IDLE(void)
 {
 	/*wait for the engine to be totally idle*/
-	if (!si->settings.dma_acc)
-		nv_acc_wait_idle();
-	else
-		nv_acc_wait_idle_dma();
+	nv_acc_wait_idle_dma();
 }
 
 status_t GET_SYNC_TOKEN(engine_token *et, sync_token *st)

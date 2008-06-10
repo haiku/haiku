@@ -6,7 +6,6 @@ UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia_gpgpu ] ;
 
 StaticLibrary libnvidia_gpgpu_engine.a :
-	nv_acc.c
 	nv_acc_dma.c
 	nv_bes.c
 	nv_brooktreetv.c

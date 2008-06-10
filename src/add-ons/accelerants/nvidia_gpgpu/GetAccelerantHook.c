@@ -28,10 +28,10 @@ These definitions are out of pure lazyness.
 	if (check_overlay_capability(B_##x) == B_OK) return (void *)x; else return (void *)0
 #define CHKA(x) case B_##x: \
 	if (check_acc_capability(B_##x) == B_OK) \
-	{if(!si->settings.dma_acc) return (void *)x##_PIO; else return (void *)x##_DMA;} \
-	else return (void *)0
-#define CHKS(x) case B_##x: \
-	if(!si->settings.dma_acc) return (void *)x##_PIO; else return (void *)x##_DMA
+		return (void *)x##_DMA; \
+	else						\
+		return (void *)0
+#define CHKS(x) case B_##x: return (void *)x##_DMA
 #define HOOK(x) case B_##x: return (void *)x
 #define ZERO(x) case B_##x: return (void *)0
 #define HRDC(x) case B_##x: return si->settings.hardcursor? (void *)x: (void *)0; // apsed
@@ -212,10 +212,9 @@ status_t check_acc_capability(uint32 feature)
 		break;
 	case B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT:
 		msg = "B_SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT";
-		/* this function is only defined for DMA acceleration,
-		 * but doesn't support the B_CMAP8 colorspace */
+		/* this function doesn't support the B_CMAP8 colorspace */
 		//fixme: checkout B_CMAP8 support sometime, as some cards seem to support it?
-		if (!si->settings.dma_acc || (si->dm.space == B_CMAP8))
+		if (si->dm.space == B_CMAP8)
 		{
 			LOG(4, ("Acc: Not exporting hook %s.\n", msg));
 			return B_ERROR;

@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-10/2007
+	Rudolf Cornelissen 11/2002-6/2008
 */
 
 #define MODULE_BIT 0x00200000
@@ -295,10 +295,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //no acc support for G8x yet!
 if (si->ps.card_arch < NV50A)
 {
-	if (!si->settings.dma_acc)
-		nv_acc_init();
-	else
-		nv_acc_init_dma();
+	nv_acc_init_dma();
 }
 	/* set up overlay unit for this mode */
 //	nv_bes_init();
