@@ -41,6 +41,8 @@
 	// pty read buffer size
 #define MIN_PTY_BUFFER_SPACE	16
 	// minimal space left before the reader tries to read more
+#define ESC_PARSER_BUFFER_SIZE	64
+	// size of the parser buffer
 
 
 class TerminalBuffer;
@@ -54,6 +56,8 @@ public:
 	status_t StopThreads();
   
 private:
+	inline status_t _NextParseChar(uchar &c);
+
 	// Initialize TermParse and PtyReader thread.
 	status_t InitTermParse();
 	status_t InitPtyReader();
@@ -69,8 +73,7 @@ private:
 	static int32 _ptyreader_thread(void *);
 	static int32 _escparse_thread(void *);
 
-	// Reading ReadBuf at one Char.
-	status_t GetReaderBuf(uchar &c);
+	status_t _ReadParserBuffer();
 
 	void _DeviceStatusReport(int n);
 
@@ -84,6 +87,10 @@ private:
 	uint fBufferPosition;
 	uchar fReadBuffer[READ_BUF_SIZE];
 	vint32 fReadBufferSize;
+
+	uchar fParserBuffer[ESC_PARSER_BUFFER_SIZE];
+	int32 fParserBufferSize;
+	int32 fParserBufferOffset;
 	volatile bool fParserWaiting;
 	
 	int fLockFlag;

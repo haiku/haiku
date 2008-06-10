@@ -49,6 +49,23 @@ extern int gMbcsTable[];		/* ESC $ */
 #define NPARAM 10		// Max parameters
 
 
+//! Get char from pty reader buffer.
+inline status_t
+TermParse::_NextParseChar(uchar &c)
+{
+	if (fParserBufferOffset >= fParserBufferSize) {
+		// parser buffer empty
+		status_t error = _ReadParserBuffer();
+		if (error != B_OK)
+			return error;
+	}
+
+	c = fParserBuffer[fParserBufferOffset++];
+
+	return B_OK;
+}
+
+
 TermParse::TermParse(int fd)
 	:
 	fFd(fd),
@@ -58,6 +75,8 @@ TermParse::TermParse(int fd)
 	fReaderLocker(-1),
 	fBufferPosition(0),
 	fReadBufferSize(0),
+	fParserBufferSize(0),
+	fParserBufferOffset(0),
 	fParserWaiting(false),
 	fBuffer(NULL),
 	fQuitting(true)
@@ -110,45 +129,6 @@ TermParse::StopThreads()
 	
 	fBuffer = NULL;
 	
-	return B_OK;
-}
-
-
-//! Get char from pty reader buffer.
-status_t
-TermParse::GetReaderBuf(uchar &c)
-{
-	// wait for new input from pty
-	if (fReadBufferSize == 0) {
-		fBuffer->Unlock();
-
-		fParserWaiting = true;
-
-		status_t status = B_OK;
-		while (fReadBufferSize == 0 && status == B_OK) {
-			do {
-				status = acquire_sem(fReaderSem);
-			} while (status == B_INTERRUPTED);
-		}
-
-		fParserWaiting = false;
-
-		fBuffer->Lock();
-
-		if (status < B_OK)
-			return status;
-	}
-
-	c = fReadBuffer[fBufferPosition];
-	fBufferPosition = (fBufferPosition + 1) % READ_BUF_SIZE;
-
-	int32 bufferSize = atomic_add(&fReadBufferSize, -1) - 1;
-
-  	// If the pty reader thread waits and we have made enough space in the
-	// buffer now, let it run again.
-	if (READ_BUF_SIZE - bufferSize == MIN_PTY_BUFFER_SPACE)
-		release_sem(fReaderLocker);
-
 	return B_OK;
 }
 
@@ -346,12 +326,11 @@ TermParse::EscParse()
 	int *groundtable = gUTF8GroundTable;
 	int *parsestate = groundtable;
 
-	while (!fQuitting) {
-// TODO: Fix the locking!
-		BAutolock locker(fBuffer);
+	BAutolock locker(fBuffer);
 
+	while (!fQuitting) {
 		uchar c;
-		if (GetReaderBuf(c) < B_OK)
+		if (_NextParseChar(c) < B_OK)
 			break;
 
 		//DumpState(groundtable, parsestate, c);
@@ -412,7 +391,7 @@ TermParse::EscParse()
 						case CASE_SS3:		/* JIS X 0212 */
 							*ptr++ = curess;
 							*ptr++ = c;
-							GetReaderBuf(c);
+							_NextParseChar(c);
 							*ptr++ = c;
 							*ptr = 0;
 							curess = 0;
@@ -420,7 +399,7 @@ TermParse::EscParse()
 
 						default:		/* JIS X 0208 */
 							*ptr++ = c;
-							GetReaderBuf(c);
+							_NextParseChar(c);
 							*ptr++ = c;
 							*ptr = 0;
 							break;
@@ -443,7 +422,7 @@ TermParse::EscParse()
 
 			case CASE_PRINT_CS96:
 				cbuf[0] = c | 0x80;
-				GetReaderBuf(c);
+				_NextParseChar(c);
 				cbuf[1] = c | 0x80;
 				cbuf[2] = 0;
 				CodeConv::ConvertToInternal(cbuf, 2, dstbuf, B_EUC_CONVERSION);
@@ -467,7 +446,7 @@ TermParse::EscParse()
 
 			case CASE_SJIS_INSTRING:
 				cbuf[0] = c;
-				GetReaderBuf(c);
+				_NextParseChar(c);
 				cbuf[1] = c;
 				cbuf[2] = '\0';
 				CodeConv::ConvertToInternal(cbuf, 2, dstbuf, now_coding);
@@ -476,7 +455,7 @@ TermParse::EscParse()
 
 			case CASE_UTF8_2BYTE:
 				cbuf[0] = c;
-				GetReaderBuf(c);
+				_NextParseChar(c);
 				if (groundtable[c] != CASE_UTF8_INSTRING)
 					break;
 				cbuf[1] = c;
@@ -487,12 +466,12 @@ TermParse::EscParse()
 
 			case CASE_UTF8_3BYTE:
 				cbuf[0] = c;
-				GetReaderBuf(c);
+				_NextParseChar(c);
 				if (groundtable[c] != CASE_UTF8_INSTRING)
 					break;
 				cbuf[1] = c;
 
-				GetReaderBuf(c);
+				_NextParseChar(c);
 				if (groundtable[c] != CASE_UTF8_INSTRING)
 					break;
 				cbuf[2] = c;
@@ -515,7 +494,7 @@ TermParse::EscParse()
 			{
 				cs96 = 0;
 				uchar dummy;				
-				GetReaderBuf(dummy);
+				_NextParseChar(dummy);
 				parsestate = groundtable;
 				break;
 			}
@@ -881,7 +860,7 @@ TermParse::EscParse()
 					char string[512];
 					uint32 len = 0;
 					uchar mode_char;
-					GetReaderBuf(mode_char);
+					_NextParseChar(mode_char);
 					if (mode_char != '0'
 						&& mode_char != '1' 
 						&& mode_char != '2') {
@@ -889,8 +868,8 @@ TermParse::EscParse()
 						break;
 					}
 					uchar current_char;
-					GetReaderBuf(current_char);
-					while (GetReaderBuf(current_char) == B_OK 
+					_NextParseChar(current_char);
+					while (_NextParseChar(current_char) == B_OK 
 						&& current_char != 0x7) {
 						if (!isprint(current_char & 0x7f)
 							|| len+2 >= sizeof(string))
@@ -985,6 +964,59 @@ TermParse::_ptyreader_thread(void *data)
 TermParse::_escparse_thread(void *data)
 {
 	return reinterpret_cast<TermParse *>(data)->EscParse();
+}
+
+
+status_t
+TermParse::_ReadParserBuffer()
+{
+	// We have to unlock the terminal buffer while waiting for data from the
+	// PTY. We don't have to unlock when we don't need to wait, but we do it
+	// anyway, so that TermView won't be starved when trying to synchronize.
+	fBuffer->Unlock();
+
+	// wait for new input from pty
+	if (fReadBufferSize == 0) {
+		fParserWaiting = true;
+
+		status_t status = B_OK;
+		while (fReadBufferSize == 0 && status == B_OK) {
+			do {
+				status = acquire_sem(fReaderSem);
+			} while (status == B_INTERRUPTED);
+		}
+
+		fParserWaiting = false;
+
+		if (status < B_OK) {
+			fBuffer->Lock();
+			return status;
+		}
+	}
+
+	int32 toRead = fReadBufferSize;
+	if (toRead > ESC_PARSER_BUFFER_SIZE)
+		toRead = ESC_PARSER_BUFFER_SIZE;
+
+	for (int32 i = 0; i < toRead; i++) {
+		fParserBuffer[i] = fReadBuffer[fBufferPosition];
+		fBufferPosition = (fBufferPosition + 1) % READ_BUF_SIZE;
+	}
+
+	int32 bufferSize = atomic_add(&fReadBufferSize, -toRead);
+
+  	// If the pty reader thread waits and we have made enough space in the
+	// buffer now, let it run again.
+	if (bufferSize > READ_BUF_SIZE - MIN_PTY_BUFFER_SPACE
+		&& bufferSize - toRead <= READ_BUF_SIZE - MIN_PTY_BUFFER_SPACE) {
+		release_sem(fReaderLocker);
+	}
+
+	fParserBufferSize = toRead;
+	fParserBufferOffset = 0;
+
+	fBuffer->Lock();
+	return B_OK;
 }
 
 
