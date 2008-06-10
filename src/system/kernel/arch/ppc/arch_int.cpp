@@ -349,14 +349,14 @@ public:
 	~DeviceTreeIterator()
 	{
 		if (fParent != NULL)
-			fDeviceManager->put_device_node(fParent);
+			fDeviceManager->put_node(fParent);
 		if (fNode != NULL)
-			fDeviceManager->put_device_node(fNode);
+			fDeviceManager->put_node(fNode);
 	}
 
 	void Rewind()
 	{
-		fNode = fDeviceManager->get_root();
+		fNode = fDeviceManager->get_root_node();
 	}
 
 	bool HasNext() const
@@ -364,38 +364,38 @@ public:
 		return (fNode != NULL);
 	}
 
-	device_node_handle Next()
+	device_node *Next()
 	{
 		if (fNode == NULL)
 			return NULL;
 
-		device_node_handle foundNode = fNode;
+		device_node *foundNode = fNode;
 
 		// get first child
-		device_node_handle child = NULL;
-		if (fDeviceManager->get_next_child_device(fNode, &child, NULL)
+		device_node *child = NULL;
+		if (fDeviceManager->get_next_child_node(fNode, NULL, &child)
 				== B_OK) {
 			// move to the child node
 			if (fParent != NULL)
-				fDeviceManager->put_device_node(fParent);
+				fDeviceManager->put_node(fParent);
 			fParent = fNode;
 			fNode = child;
 
 		// no more children; backtrack to find the next sibling
 		} else {
 			while (fParent != NULL) {
-				if (fDeviceManager->get_next_child_device(fParent, &fNode, NULL)
+				if (fDeviceManager->get_next_child_node(fParent, NULL, &fNode)
 						== B_OK) {
-						// get_next_child_device() always puts the node
+						// get_next_child_node() always puts the node
 					break;
 				}
 				fNode = fParent;
-				fParent = fDeviceManager->get_parent(fNode);
+				fParent = fDeviceManager->get_parent_node(fNode);
 			}
 
 			// if we hit the root node again, we're done
 			if (fParent == NULL) {
-				fDeviceManager->put_device_node(fNode);
+				fDeviceManager->put_node(fNode);
 				fNode = NULL;
 			}
 		}
@@ -405,8 +405,8 @@ public:
 
 private:
 	device_manager_info *fDeviceManager;
-	device_node_handle	fNode;
-	device_node_handle	fParent;
+	device_node	*fNode;
+	device_node	*fParent;
 };
 
 
@@ -444,13 +444,13 @@ get_interrupt_controller_modules(PICModuleList &list)
 
 
 static bool
-probe_pic_device(device_node_handle node, PICModuleList &picModules)
+probe_pic_device(device_node *node, PICModuleList &picModules)
 {
 	for (PICModule *module = picModules.Head();
 		 module;
 		 module = picModules.GetNext(module)) {
-		bool noConnection;
-		if (module->module->info.supports_device(node, &noConnection) > 0) {
+		//bool noConnection;
+		if (module->module->info.supports_device(node) > 0) {
 			if (module->module->info.register_device(node) == B_OK)
 				return true;
 		}
@@ -484,29 +484,32 @@ arch_int_init_post_device_manager(struct kernel_args *args)
 
 	// iterate through the device tree and probe the interrupt controllers
 	DeviceTreeIterator iterator(deviceManager);
-	while (device_node_handle node = iterator.Next())
+	while (device_node *node = iterator.Next())
 		probe_pic_device(node, picModules);
 
 	// iterate through the tree again and get an interrupt controller node
 	iterator.Rewind();
-	while (device_node_handle node = iterator.Next()) {
-		char *deviceType;
-		if (deviceManager->get_attr_string(node, B_DRIVER_DEVICE_TYPE,
+	while (device_node *node = iterator.Next()) {
+		const char *deviceType;
+		if (deviceManager->get_attr_string(node, B_DEVICE_TYPE,
 				&deviceType, false) == B_OK) {
+			bool isPIC = false;
+
+			/*
 			bool isPIC
 				= (strcmp(deviceType, B_INTERRUPT_CONTROLLER_DRIVER_TYPE) == 0);
 			free(deviceType);
+			*/
 
 			if (isPIC) {
 				driver_module_info *driver;
 				void *driverCookie;
-				error = deviceManager->init_driver(node, NULL, &driver,
-					&driverCookie);
-				if (error == B_OK) {
-					sPIC = (interrupt_controller_module_info *)driver;
-					sPICCookie = driverCookie;
-					return B_OK;
-				}
+
+				deviceManager->get_driver(node, (driver_module_info **)&driver, (void **)&driverCookie);
+
+				sPIC = (interrupt_controller_module_info *)driver;
+				sPICCookie = driverCookie;
+				return B_OK;
 			}
 		}
 	}
