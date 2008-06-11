@@ -132,6 +132,13 @@ DrawingEngine::LockExclusiveAccess()
 }
 
 
+bool
+DrawingEngine::IsExclusiveAccessLocked()
+{
+	return fGraphicsCard->IsExclusiveAccessLocked();
+}
+
+
 void
 DrawingEngine::UnlockExclusiveAccess()
 {
@@ -682,9 +689,15 @@ DrawingEngine::StrokeLine(const BPoint &start, const BPoint &end,
 	AutoFloatingOverlaysHider _(fGraphicsCard, touched);
 
 	if (!fPainter->StraightLine(start, end, color)) {
+		rgb_color previousColor = fPainter->HighColor();
+		drawing_mode previousMode = fPainter->DrawingMode();
+
 		fPainter->SetHighColor(color);
 		fPainter->SetDrawingMode(B_OP_OVER);
 		fPainter->StrokeLine(start, end);
+
+		fPainter->SetDrawingMode(previousMode);
+		fPainter->SetHighColor(previousColor);
 	}
 
 	_CopyToFront(touched);

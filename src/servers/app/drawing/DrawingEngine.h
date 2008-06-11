@@ -32,7 +32,6 @@ typedef struct {
 	BPoint pt1;
 	BPoint pt2;
 	rgb_color color;
-
 } LineArrayData;
 
 class DrawingEngine : public HWInterfaceListener {
