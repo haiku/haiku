@@ -10,8 +10,6 @@
 #include <kernel.h>
 
 
-#define PAGE_SIZE 4096
-
 /* 68k has many different possible stack frames, differentiated by a 4 bit number, 
  * but they also depend on the cpu type.
  * cf. mint/sys/arch/check_exc.h
