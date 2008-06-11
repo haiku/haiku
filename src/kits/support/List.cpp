@@ -34,7 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <syslog.h>
 
 // helper function
 static inline
@@ -174,7 +174,7 @@ BList::RemoveItem(int32 index)
 	if (index >= 0 && index < fItemCount) {
 		item = fObjectList[index];
 		move_items(fObjectList + index + 1, -1, fItemCount - index - 1);
-		Resize(fItemCount - 1);
+			Resize(fItemCount - 1);
 	}
 	return item;
 }
@@ -434,10 +434,20 @@ BList::Resize(int32 count)
 {
 	bool result = true;
 	// calculate the new physical size
-	int32 newSize = count;
-	if (newSize <= 0)
-		newSize = 1;
-	newSize = ((newSize - 1) / fBlockSize + 1) * fBlockSize;
+	// by doubling the existing size
+	// until we can hold at least count items
+	int32 newSize = fBlockSize;
+	// TODO: determine why modifying count directly via
+	// if (count <= 0) count = fBlockSize;
+	// results in this code segfaulting the registrar while using the local var 'c' does not.
+	int32 c = count;
+	if (c <= 0)
+		c = fBlockSize;
+	if ((size_t)c != fPhysicalSize) {
+		while (newSize < c)
+			newSize <<= 1;
+	}
+
 	// resize if necessary
 	if ((size_t)newSize != fPhysicalSize) {
 		void** newObjectList
