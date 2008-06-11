@@ -697,8 +697,8 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 	BRect rect;
 	if (hintRect)
 		rect = *hintRect;
-	else
-		rect.Set(0, 0, 80, 100);
+		
+	BRect bestRect;
 
 	// do we have more than one attached parameter group?
 	// if so, use a tabbed view with a tab for each group
@@ -737,8 +737,23 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 
 			return new DynamicScrollView(groupView->Name(), groupView);
 		}
-
-		tabView->AddTab(new DynamicScrollView(groupView->Name(), groupView));
+		
+		DynamicScrollView *scrollView = new DynamicScrollView(groupView->Name(), groupView);		
+		tabView->AddTab(scrollView);
+		
+		if (!hintRect) {			
+			bestRect = bestRect | scrollView->Bounds();			
+		}	
+	}
+	
+	if (tabView != NULL) {		
+		// this adjustment must be kept in sync with TabView::FrameResized
+		bestRect.bottom += tabView->TabHeight();
+		bestRect.InsetBy(-3.0,-3.0);	
+		
+		tabView->ResizeTo(bestRect.Width(), bestRect.Height());
+		tabView->FrameResized(bestRect.Width(), bestRect.Height());
+			//needed since we're not attached to a window yet
 	}
 
 	return tabView;
