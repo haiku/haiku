@@ -8,7 +8,7 @@ Addon xvid.decoder :
 	XvidDecoder.cpp
 	supported_codecs.cpp
 	:  
-	libxvid.a
+	libxvidcore.a
 	be
 	libmedia.so
 ;

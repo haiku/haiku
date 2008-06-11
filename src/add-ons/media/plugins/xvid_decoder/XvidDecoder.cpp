@@ -378,7 +378,7 @@ XvidDecoder::NegotiateOutputFormat(media_format* _inoutFormat)
 		PRINT(("%p->XvidDecoder: out_format=%s\n", this, buffer));
 #endif
 
-	return _XvidInit(true, 0) == 0 ? B_OK : B_ERROR;
+	return _XvidInit() == 0 ? B_OK : B_ERROR;
 }
 
 
@@ -622,21 +622,14 @@ this, inRequiredFrame, *_inOutFrame, inRequiredTime, *_inOutTime);
 // #pragma mark -
 
 
-// _XvidInit
-int
-XvidDecoder::_XvidInit(int useAssembler, int debugLevel)
+static bool
+init_xvid(bool useAssembler, int debugLevel)
 {
-	if (fXvidDecoderHandle != NULL)
-		return 0;
-
+	// XviD core initialization
 	xvid_gbl_init_t xvidGlobalInit;
-	xvid_dec_create_t xvidDecoderCreate;
 
 	// reset the structure with zeros
 	memset(&xvidGlobalInit, 0, sizeof(xvid_gbl_init_t));
-	memset(&xvidDecoderCreate, 0, sizeof(xvid_dec_create_t));
-
-	// XviD core initialization
 
 	// version
 	xvidGlobalInit.version = XVID_VERSION;
@@ -647,11 +640,30 @@ XvidDecoder::_XvidInit(int useAssembler, int debugLevel)
 	else
 		xvidGlobalInit.cpu_flags = XVID_CPU_FORCE;
 
+	// debug level
 	xvidGlobalInit.debug = debugLevel;
 
 	xvid_global(NULL, 0, &xvidGlobalInit, NULL);
 
-	// XviD encoder initialization
+	return true;
+}
+
+
+static bool sXvidInitialized = init_xvid(true, 0);
+
+
+// _XvidInit
+int
+XvidDecoder::_XvidInit()
+{
+	if (fXvidDecoderHandle != NULL)
+		return 0;
+
+	// XviD decoder initialization
+	xvid_dec_create_t xvidDecoderCreate;
+
+	// reset the structure with zeros
+	memset(&xvidDecoderCreate, 0, sizeof(xvid_dec_create_t));
 
 	// version
 	xvidDecoderCreate.version = XVID_VERSION;

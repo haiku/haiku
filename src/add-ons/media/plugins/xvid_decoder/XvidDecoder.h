@@ -51,7 +51,7 @@ class XvidDecoder : public Decoder {
 									bigtime_t* _inOutTime);
 
  private:
-			int					_XvidInit(int useAssembler, int debugLevel);
+			int					_XvidInit();
 			int					_XvidUninit();
 
 			int					_XvidDecode(uchar *istream, uchar *ostream,
