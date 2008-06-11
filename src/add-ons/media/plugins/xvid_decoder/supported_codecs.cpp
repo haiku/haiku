@@ -22,19 +22,24 @@
 #include "supported_codecs.h"
 
 const struct codec_table_entry gCodecTable[] = {
-	{B_QUICKTIME_FORMAT_FAMILY,	'3IV1', "3ivx Delta v1"},
-	{B_QUICKTIME_FORMAT_FAMILY,	'3IV2', "3ivx v2"},
+//	{B_QUICKTIME_FORMAT_FAMILY,	'3IV1', "3ivx Delta v1"},
+//	{B_QUICKTIME_FORMAT_FAMILY,	'3IV2', "3ivx v2"},				// [seems to works but corrupts memory]
+//	{B_QUICKTIME_FORMAT_FAMILY,	'3IVX', "3ivx"},
 
 	{B_QUICKTIME_FORMAT_FAMILY,	'DIVX', "MPEG4 Video"},			// OpenDivX
-	{B_QUICKTIME_FORMAT_FAMILY,	'divx', "MPEG4 Video"},			// OpenDivX
+	{B_QUICKTIME_FORMAT_FAMILY,	'divx', "MPEG4 Video"},			// OpenDivX [confirmed]
 	{B_QUICKTIME_FORMAT_FAMILY,	'mp4v', "MPEG4 Video"},			// OpenDivX
-	{B_QUICKTIME_FORMAT_FAMILY,	'XVID', "XVID"},				// OpenDivX
+	{B_QUICKTIME_FORMAT_FAMILY,	'XVID', "XVID"},				// OpenDivX [confirmed]
 	
+//	{B_AVI_FORMAT_FAMILY,		'3IV1', "3ivx Delta v1"},
+//	{B_AVI_FORMAT_FAMILY,		'3IV2', "3ivx v2"},				// [seems to works but corrupts memory]
+//	{B_AVI_FORMAT_FAMILY,		'3IVX', "3ivx"},
+
 	{B_AVI_FORMAT_FAMILY,		'DIVX', "MPEG4 Video"},			// OpenDivX
 	{B_AVI_FORMAT_FAMILY,		'divx', "MPEG4 Video"},			// OpenDivX
 	{B_AVI_FORMAT_FAMILY,		'XVID', "XVID"},				// XVID
 	{B_AVI_FORMAT_FAMILY,		'xvid', "XVID"},				// XVID
-	{B_AVI_FORMAT_FAMILY,		'DX50', "DivX 5"},				// DivX 5.0
+	{B_AVI_FORMAT_FAMILY,		'DX50', "DivX 5"},				// DivX 5.0 [confirmed]
 	{B_AVI_FORMAT_FAMILY,		'dx50', "DivX 5"},				// DivX 5.0
 
 	{B_AVI_FORMAT_FAMILY,		'MP4S', "MPEG4 Video"},			// from ffmpeg
@@ -63,7 +68,7 @@ const struct codec_table_entry gCodecTable[] = {
 	
 //	{B_AVI_FORMAT_FAMILY,		'MP41', "Microsoft MPEG4 v1"},	// microsoft mpeg4 v1
 //	{B_AVI_FORMAT_FAMILY,		'MP42', "Microsoft MPEG4 v2"},	// seems to be broken
-//	{B_AVI_FORMAT_FAMILY,		'MP43', "Microsoft MPEG4 v3"},	// microsoft mpeg4 v3
+//	{B_AVI_FORMAT_FAMILY,		'MP43', "Microsoft MPEG4 v3"},	// microsoft mpeg4 v3 [confirmed unsupported]
 //	{B_AVI_FORMAT_FAMILY,		'MPG3', "Microsoft MPEG4"},
 //	{B_AVI_FORMAT_FAMILY,		'MPG4', "Microsoft MPEG4"},
 //	{B_AVI_FORMAT_FAMILY,		'AP41', "Angel Potion MPEG4"},	// AngelPotion 1
