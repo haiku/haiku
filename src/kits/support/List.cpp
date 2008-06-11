@@ -174,7 +174,7 @@ BList::RemoveItem(int32 index)
 	if (index >= 0 && index < fItemCount) {
 		item = fObjectList[index];
 		move_items(fObjectList + index + 1, -1, fItemCount - index - 1);
-			Resize(fItemCount - 1);
+		Resize(fItemCount - 1);
 	}
 	return item;
 }
@@ -437,14 +437,11 @@ BList::Resize(int32 count)
 	// by doubling the existing size
 	// until we can hold at least count items
 	int32 newSize = fBlockSize;
-	// TODO: determine why modifying count directly via
-	// if (count <= 0) count = fBlockSize;
-	// results in this code segfaulting the registrar while using the local var 'c' does not.
-	int32 c = count;
-	if (c <= 0)
-		c = fBlockSize;
-	if ((size_t)c != fPhysicalSize) {
-		while (newSize < c)
+	int32 targetSize = count;
+	if (targetSize <= 0)
+		targetSize = fBlockSize;
+	if ((size_t)targetSize != fPhysicalSize) {
+		while (newSize < targetSize)
 			newSize <<= 1;
 	}
 
