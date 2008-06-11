@@ -8,7 +8,6 @@ UsePrivateHeaders [ FDirName graphics nvidia_gpgpu ] ;
 StaticLibrary libnvidia_gpgpu_engine.a :
 	nv_acc_dma.c
 	nv_bes.c
-	nv_brooktreetv.c
 	nv_crtc.c
 	nv_crtc2.c
 	nv_dac.c

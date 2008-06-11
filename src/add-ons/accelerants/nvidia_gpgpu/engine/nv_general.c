@@ -250,8 +250,6 @@ void setup_virtualized_heads(bool cross)
 		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
 		head1_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
 		head1_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
-		head1_stop_tvout		= (crtc_stop_tvout)			nv_crtc2_stop_tvout;
-		head1_start_tvout		= (crtc_start_tvout)		nv_crtc2_start_tvout;
 
 		head1_mode				= (dac_mode)				nv_dac2_mode;
 		head1_palette			= (dac_palette)				nv_dac2_palette;
@@ -271,8 +269,6 @@ void setup_virtualized_heads(bool cross)
 		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
 		head2_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
 		head2_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
-		head2_stop_tvout		= (crtc_stop_tvout)			nv_crtc_stop_tvout;
-		head2_start_tvout		= (crtc_start_tvout)		nv_crtc_start_tvout;
 
 		head2_mode				= (dac_mode)				nv_dac_mode;
 		head2_palette			= (dac_palette)				nv_dac_palette;
@@ -294,8 +290,6 @@ void setup_virtualized_heads(bool cross)
 		head1_cursor_hide		= (crtc_cursor_hide)		nv_crtc_cursor_hide;
 		head1_cursor_define		= (crtc_cursor_define)		nv_crtc_cursor_define;
 		head1_cursor_position	= (crtc_cursor_position)	nv_crtc_cursor_position;
-		head1_stop_tvout		= (crtc_stop_tvout)			nv_crtc_stop_tvout;
-		head1_start_tvout		= (crtc_start_tvout)		nv_crtc_start_tvout;
 
 		head1_mode				= (dac_mode)				nv_dac_mode;
 		head1_palette			= (dac_palette)				nv_dac_palette;
@@ -315,8 +309,6 @@ void setup_virtualized_heads(bool cross)
 		head2_cursor_hide		= (crtc_cursor_hide)		nv_crtc2_cursor_hide;
 		head2_cursor_define		= (crtc_cursor_define)		nv_crtc2_cursor_define;
 		head2_cursor_position	= (crtc_cursor_position)	nv_crtc2_cursor_position;
-		head2_stop_tvout		= (crtc_stop_tvout)			nv_crtc2_stop_tvout;
-		head2_start_tvout		= (crtc_start_tvout)		nv_crtc2_start_tvout;
 
 		head2_mode				= (dac_mode)				nv_dac2_mode;
 		head2_palette			= (dac_palette)				nv_dac2_palette;
@@ -391,8 +383,7 @@ static status_t nvxx_general_powerup()
 
 //	unlock_card();
 
-	/* get RAM size, detect TV encoder and do fake panel startup (panel init code
-	 *  is still missing). */
+	/* get RAM size and do fake panel startup (panel init code is still missing). */
 //	fake_panel_start();
 
 	/* log the final card specifications */
@@ -417,34 +408,26 @@ status_t nv_general_output_select(bool cross)
 	/* make sure this call is warranted */
 	if (si->ps.secondary_head)
 	{
-		/* NV11 cards can't switch heads (confirmed) */
-		if (si->ps.card_type != NV11)
+		if (cross)
 		{
-			if (cross)
-			{
-				LOG(4,("INIT: switching analog outputs to be cross-connected\n"));
+			LOG(4,("INIT: switching analog outputs to be cross-connected\n"));
 
-				/* enable head 2 on connector 1 */
-				/* (b8 = select CRTC (head) for output,
-				 *  b4 = ??? (confirmed not to be a FP switch),
-				 *  b0 = enable CRT) */
-				DACW(OUTPUT, 0x00000101);
-				/* enable head 1 on connector 2 */
-				DAC2W(OUTPUT, 0x00000001);
-			}
-			else
-			{
-				LOG(4,("INIT: switching analog outputs to be straight-through\n"));
-
-				/* enable head 1 on connector 1 */
-				DACW(OUTPUT, 0x00000001);
-				/* enable head 2 on connector 2 */
-				DAC2W(OUTPUT, 0x00000101);
-			}
+			/* enable head 2 on connector 1 */
+			/* (b8 = select CRTC (head) for output,
+			 *  b4 = ??? (confirmed not to be a FP switch),
+			 *  b0 = enable CRT) */
+			DACW(OUTPUT, 0x00000101);
+			/* enable head 1 on connector 2 */
+			DAC2W(OUTPUT, 0x00000001);
 		}
 		else
 		{
-			LOG(4,("INIT: NV11 analog outputs are hardwired to be straight-through\n"));
+			LOG(4,("INIT: switching analog outputs to be straight-through\n"));
+
+			/* enable head 1 on connector 1 */
+			DACW(OUTPUT, 0x00000001);
+			/* enable head 2 on connector 2 */
+			DAC2W(OUTPUT, 0x00000101);
 		}
 		return B_OK;
 	}

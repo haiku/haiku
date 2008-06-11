@@ -124,14 +124,12 @@ static nv_settings sSettings = { // see comments in nvidia_gpgpu.settings
 	/* for accelerant */
 	0x00000000, 			// logmask
 	0,          			// memory
-	0,						// tv_output
 	true,       			// usebios
 	true,       			// hardcursor
 	false,					// switchhead
-	true,					// pgm_panel
-	false,					// vga_on_tv
+	false,					// pgm_panel
 	false,					// force_sync
-	false,					// force_ws
+	true,					// force_ws
 	0,						// gpu_clk
 	0,						// ram_clk
 };
@@ -1132,11 +1130,6 @@ init_driver(void)
 		if (*end == '\0')
 			sSettings.memory = value;
 
-		item = get_driver_parameter(settings, "tv_output", "0", "0");
-		value = strtoul(item, &end, 0);
-		if (*end == '\0')
-			sSettings.tv_output = value;
-
 		sSettings.hardcursor = get_driver_boolean_parameter(settings,
 			"hardcursor", false, false);
 		sSettings.usebios = get_driver_boolean_parameter(settings,
@@ -1145,8 +1138,6 @@ init_driver(void)
 			"switchhead", false, false);
 		sSettings.pgm_panel = get_driver_boolean_parameter(settings,
 			"pgm_panel", false, false);
-		sSettings.vga_on_tv = get_driver_boolean_parameter(settings,
-			"vga_on_tv", false, false);
 		sSettings.force_sync = get_driver_boolean_parameter(settings,
 			"force_sync", false, false);
 		sSettings.force_ws = get_driver_boolean_parameter(settings,

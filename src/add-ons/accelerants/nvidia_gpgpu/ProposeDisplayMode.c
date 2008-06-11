@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-4/2006
+	Rudolf Cornelissen 9/2002-6/2008
 */
 
 #define MODULE_BIT 0x00400000
@@ -188,69 +188,60 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		return result;
 	}
 
-	/* disable aspect checks for a requested TVout mode when mode is TVout capable */
-	if (!si->ps.tvout
-		|| !(BT_check_tvmode(*target) && (target->flags & TV_BITS))) {
-		/* check if all connected output devices can display the requested mode's aspect: */
-		/* calculate display mode aspect */
-		target_aspect = (target->timing.h_display / ((float)target->timing.v_display));
-		/* NOTE:
-		 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
-		switch (si->ps.monitors) {
-			case 0x01: /* digital panel on head 1, nothing on head 2 */
-				if (si->ps.panel1_aspect < (target_aspect - 0.10)) {
-					LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
-					return B_ERROR;
-				}
-				break;
-			case 0x10: /* nothing on head 1, digital panel on head 2 */
-				if (si->ps.panel2_aspect < (target_aspect - 0.10)) {
-					LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
-					return B_ERROR;
-				}
-				break;
-			case 0x11: /* digital panels on both heads */
-				if ((si->ps.panel1_aspect < (target_aspect - 0.10))
-					|| (si->ps.panel2_aspect < (target_aspect - 0.10))) {
-					LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
-					return B_ERROR;
-				}
-				break;
-			default:
-#if 0
-				/* at least one analog monitor is connected, or nothing detected at all */
-				/* (if forcing widescreen type was requested don't block mode) */
-				if (target_aspect > 1.34 && !si->settings.force_ws) {
-					LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
-					return B_ERROR;
-				}
-#endif
-				break;
-		}
-
-// Wide screen modes are pretty common these days... - better use EDID!
-#if 0
-		/* only export widescreen panel-TV modes when an exact resolution match exists,
-		 * to prevent the modelist from becoming too crowded */
-		if (target_aspect > 1.61 && !si->settings.force_ws) {
-			status_t panel_TV_stat = B_ERROR;
-
-			if (si->ps.tmds1_active) {
-				if (target->timing.h_display == si->ps.p1_timing.h_display
-					&& target->timing.v_display == si->ps.p1_timing.v_display)
-					panel_TV_stat = B_OK;
-			}
-			if (si->ps.tmds2_active) {
-				if (target->timing.h_display == si->ps.p2_timing.h_display
-					&& target->timing.v_display == si->ps.p2_timing.v_display)
-					panel_TV_stat = B_OK;
-			}
-			if (panel_TV_stat != B_OK) {
-				LOG(4, ("PROPOSEMODE: WS panel_TV mode requested but no such TV here, aborted.\n"));
+	/* check if all connected output devices can display the requested mode's aspect: */
+	/* calculate display mode aspect */
+	target_aspect = (target->timing.h_display / ((float)target->timing.v_display));
+	/* NOTE:
+	 * allow 0.10 difference so 5:4 aspect panels will be able to use 4:3 aspect modes! */
+	switch (si->ps.monitors) {
+		case 0x01: /* digital panel on head 1, nothing on head 2 */
+			if (si->ps.panel1_aspect < (target_aspect - 0.10)) {
+				LOG(4, ("PROPOSEMODE: connected panel1 is not widescreen type, aborted.\n"));
 				return B_ERROR;
 			}
+			break;
+		case 0x10: /* nothing on head 1, digital panel on head 2 */
+			if (si->ps.panel2_aspect < (target_aspect - 0.10)) {
+				LOG(4, ("PROPOSEMODE: connected panel2 is not widescreen type, aborted.\n"));
+				return B_ERROR;
+			}
+			break;
+		case 0x11: /* digital panels on both heads */
+			if ((si->ps.panel1_aspect < (target_aspect - 0.10))
+				|| (si->ps.panel2_aspect < (target_aspect - 0.10))) {
+				LOG(4, ("PROPOSEMODE: not all connected panels are widescreen type, aborted.\n"));
+				return B_ERROR;
+			}
+			break;
+		default:
+			/* at least one analog monitor is connected, or nothing detected at all */
+			/* (if forcing widescreen type was requested don't block mode) */
+			if (target_aspect > 1.34 && !si->settings.force_ws) {
+				LOG(4, ("PROPOSEMODE: not all output devices can display widescreen modes, aborted.\n"));
+				return B_ERROR;
+			}
+			break;
+	}
+
+	/* only export widescreen panel-TV modes when an exact resolution match exists,
+	 * to prevent the modelist from becoming too crowded */
+	if (target_aspect > 1.61 && !si->settings.force_ws) {
+		status_t panel_TV_stat = B_ERROR;
+
+		if (si->ps.tmds1_active) {
+			if (target->timing.h_display == si->ps.p1_timing.h_display
+				&& target->timing.v_display == si->ps.p1_timing.v_display)
+				panel_TV_stat = B_OK;
 		}
-#endif
+		if (si->ps.tmds2_active) {
+			if (target->timing.h_display == si->ps.p2_timing.h_display
+				&& target->timing.v_display == si->ps.p2_timing.v_display)
+				panel_TV_stat = B_OK;
+		}
+		if (panel_TV_stat != B_OK) {
+			LOG(4, ("PROPOSEMODE: WS panel_TV mode requested but no such TV here, aborted.\n"));
+			return B_ERROR;
+		}
 	}
 
 	/* check if panel(s) can display the requested resolution (if connected) */
@@ -444,22 +435,9 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 	if (!(target->flags & DUALHEAD_CAPABLE))
 		target->flags &= ~DUALHEAD_BITS;
 
-	/* set TV_CAPABLE if suitable: pixelclock is not important (defined by TVstandard) */
-	if (si->ps.tvout && BT_check_tvmode(*target))
-		target->flags |= TV_CAPABLE;
-
 	/* if not TVout capable card clear TVout flags */
 	if (!(target->flags & TV_CAPABLE))
 		target->flags &= ~TV_BITS;
-
-	/* make sure TV head assignment is sane */
-	if (target->flags & TV_BITS) {
-		if (!si->ps.secondary_head)
-			target->flags |= TV_PRIMARY;
-		else if ((target->flags & DUALHEAD_BITS) == DUALHEAD_OFF)
-			target->flags |= TV_PRIMARY;
-	} else
-		target->flags &= ~TV_PRIMARY;
 
 	/* set HARDWARE_CURSOR mode if suitable */
 	if (si->settings.hardcursor)

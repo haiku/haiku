@@ -17,13 +17,11 @@ hardcursor	true			# if true use on-chip cursor capabilities
 #logmask	0x08000604	# log overlay use in full to file (in home folder)
 #logmask	0xffffffff		# log everything to file (in home folder)
 switchhead	false			# switch head assignment (dualhead cards only)
-#tv_output	0			# disabled or 0 = autodetect, 1 = Y/C (and CVBS if possible), 2 = CVBS
 force_sync	false			# if true forces 3D rendering to be synchronized to the vertical retrace
-force_ws	false			# if true forces widescreen type detection for all connected screens
+force_ws	true			# if true forces widescreen type detection for all connected screens
 
 # WARNING: tweak alert! modify stuff below on your own risk...
-pgm_panel	true			# if false don't program DVI and laptop panel pixelclocks (refreshrates)
-vga_on_tv	false			# if true enables VGA output on the head outputting to TV
+pgm_panel	false			# if false don't program DVI and laptop panel pixelclocks (refreshrates)
 #gpu_clk	150			# in Mhz, (tries to) override default GPU clockspeed (be carefull!!!)
 #ram_clk	150			# in Mhz, (tries to) override default cardRAM clockspeed (be carefull!!!)
 
@@ -55,7 +53,6 @@ vga_on_tv	false			# if true enables VGA output on the head outputting to TV
 #logmask   0x00020000	# engine: crtc2
 #logmask   0x00040000	# engine: crtc1
 #logmask   0x00080000	# engine: acc (both PIO and DMA)
-#logmask   0x00100000	# engine: brooktree tv
 #logmask   0x00200000	# set displaymode
 #logmask   0x00400000	# propose displaymode
 #logmask   0x00800000	# init accelerant

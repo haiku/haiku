@@ -40,8 +40,8 @@ static status_t init_common(int the_fd) {
 	// LOG is now available, si !NULL
 	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, switchhead %d\n",
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead));
-	LOG(4,("init_common: dumprom %d, pgm_panel %d, tv_output %d, vga_on_tv %d\n",
-		si->settings.dumprom, si->settings.pgm_panel, si->settings.tv_output, si->settings.vga_on_tv));
+	LOG(4,("init_common: dumprom %d, pgm_panel %d\n",
+		si->settings.dumprom, si->settings.pgm_panel));
 	LOG(4,("init_common: force_sync %d, gpu_clk %dMhz, ram_clk %dMhz, force_ws %d\n",
 		si->settings.force_sync, si->settings.gpu_clk, si->settings.ram_clk, si->settings.force_ws));
 
@@ -201,11 +201,6 @@ status_t INIT_ACCELERANT(int the_fd)
 
 	/* ensure DPMS state */
 	si->dpms_flags = B_DPMS_ON;
-
-	/* ensure TVout state:
-	 * TVencoder is on head to be assigned primary, no dualhead switch mode active. */
-	//fixme: actually check on what CRTC TVout was active during boot (if any)...
-	si->dm.flags = TV_PRIMARY;
 
 	/* make sure a possible 3D add-on will block rendering and re-initialize itself.
 	 * note: update in _this_ order only */

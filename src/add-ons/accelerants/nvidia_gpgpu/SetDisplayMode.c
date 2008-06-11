@@ -62,13 +62,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //	head1_interrupt_enable(false);
 //	if (si->ps.secondary_head) head2_interrupt_enable(false);
 
-	/* disable TVout if supported */
-//	if (si->ps.tvout) BT_stop_tvout();
-
-	/* turn off screen(s) _after_ TVout is disabled (if applicable) */
+	/* turn off screen(s) */
 //	head1_dpms(false, false, false, true);
 //	if (si->ps.secondary_head) head2_dpms(false, false, false, true);
-//	if (si->ps.tvout) BT_dpms(false);
 
 	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
@@ -85,15 +81,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		display_mode target2 = target;
 
 		LOG(1,("SETMODE: setting DUALHEAD mode\n"));
-
-		/* validate flags for secondary TVout */
-		//fixme: remove or block on autodetect fail. (is now shutoff)
-		if ((0) && (target2.flags & TV_BITS))
-		{
-			target.flags &= ~TV_BITS;//still needed for some routines...
-			target2.flags &= ~TV_BITS;
-			LOG(1,("SETMODE: blocking TVout: no TVout cable connected!\n"));
-		}
 
 		/* detect which connectors have a CRT connected */
 		//fixme: 'hot-plugging' for analog monitors removed: remove code as well;
@@ -180,10 +167,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			break;
 		}
 
-		/* check if we are doing interlaced TVout mode */
-		//fixme: we don't support interlaced mode?
-		si->interlaced_tv_mode = false;
-
 		/*set the display(s) pitches*/
 //		head1_set_display_pitch ();
 		//fixme: seperate for real dualhead modes:
@@ -210,9 +193,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* set the timing */
 //		head1_set_timing(target);
 //		head2_set_timing(target2);
-
-		/* TVout support: program TVout encoder and modify CRTC timing */
-//		if (si->ps.tvout && (target2.flags & TV_BITS)) BT_setmode(target2);
 	}
 	else /* single head mode */
 	{
@@ -274,9 +254,6 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 		/* set the timing */
 //		head1_set_timing(target);
-
-		/* TVout support: program TVout encoder and modify CRTC timing */
-//		if (si->ps.tvout && (target.flags & TV_BITS)) BT_setmode(target);
 
 		//fixme: shut-off the videoPLL if it exists...
 	}
@@ -493,100 +470,10 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 		return B_ERROR;
 	}
 
-	/* CRTC used for TVout needs specific DPMS programming */
-	if (si->dm.flags & TV_BITS)
-	{
-		/* TV_PRIMARY tells us that the head to be used with TVout is the head that's
-		 * actually assigned as being the primary head at powerup:
-		 * so non dualhead-mode-dependant, and not 'fixed' CRTC1! */
-		if (si->dm.flags & TV_PRIMARY)
-		{
-			LOG(4,("SET_DPMS_MODE: tuning primary head DPMS settings for TVout compatibility\n"));
-
-			if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
-			{
-				if (!(si->settings.vga_on_tv))
-				{
-					/* block VGA output on head displaying on TV */
-					/* Note:
-					 * this specific sync setting is required: Vsync is used to keep TVout
-					 * synchronized to the CRTC 'vertically' (otherwise 'rolling' occurs).
-					 * This leaves Hsync only for shutting off the VGA screen. */
-					h1h = false;
-					h1v = true;
-					/* block panel DPMS updates */
-					do_p1 = false;
-				}
-				else
-				{
-					/* when concurrent VGA is used alongside TVout on a head, DPMS is safest
-					 * applied this way: Vsync is needed for stopping TVout successfully when
-					 * a (new) modeswitch occurs.
-					 * (see routine BT_stop_tvout() in nv_brooktreetv.c) */
-					/* Note:
-					 * applying 'normal' DPMS here and forcing Vsync on in the above mentioned
-					 * routine seems to not always be enough: sometimes image generation will
-					 * not resume in that case. */
-					h1h = display;
-					h1v = true;
-				}
-			}
-			else
-			{
-				if (!(si->settings.vga_on_tv))
-				{
-					h2h = false;
-					h2v = true;
-					do_p2 = false;
-				}
-				else
-				{
-					h2h = display;
-					h2v = true;
-				}
-			}
-		}
-		else
-		{
-			LOG(4,("SET_DPMS_MODE: tuning secondary head DPMS settings for TVout compatibility\n"));
-
-			if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_SWITCH)
-			{
-				if (!(si->settings.vga_on_tv))
-				{
-					h2h = false;
-					h2v = true;
-					do_p2 = false;
-				}
-				else
-				{
-					h2h = display;
-					h2v = true;
-				}
-			}
-			else
-			{
-				if (!(si->settings.vga_on_tv))
-				{
-					h1h = false;
-					h1v = true;
-					do_p1 = false;
-				}
-				else
-				{
-					h1h = display;
-					h1v = true;
-				}
-			}
-		}
-	}
-
 	/* issue actual DPMS commands as far as applicable */
 	head1_dpms(display, h1h, h1v, do_p1);
 	if ((si->ps.secondary_head) && (si->dm.flags & DUALHEAD_BITS))
 		head2_dpms(display, h2h, h2v, do_p2);
-	if (si->dm.flags & TV_BITS)
-		BT_dpms(display);
 
 	//fixme:
 	//add head2 once we use one driver instance 'per head' (instead of 'per card')

@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-9/2007.
+   Rudolf Cornelissen 8/2003-6/2008.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -270,14 +270,6 @@ status_t nv_acc_init_dma()
 
 		ACCW(HT_HANDL_13, (0x80000000 | NV_SCALED_IMAGE_FROM_MEMORY)); /* 32bit handle */
 		ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
-
-		//2007 3D tests..
-		if (si->ps.card_type == NV15)
-		{
-			ACCW(HT_HANDL_14, (0x80000000 | NV_TCL_PRIMITIVE_3D)); /* 32bit handle */
-			ACCW(HT_VALUE_14, 0x8001114d); /* instance $114d, engine = acc engine, CHID = $00 */
-		}
-
 	}
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
@@ -358,201 +350,6 @@ status_t nv_acc_init_dma()
 									 /* DMA access type is READ_AND_WRITE;
 									  * table is located at end of cardRAM (b12-31):
 									  * It's adress needs to be at a 4kb boundary! */
-	}
-	else
-	{
-		/* setup a DMA define for use by command defines below. */
-		ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
-									  * DMA target node is NVM (non-volatile memory?)
-									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit: size is all cardRAM */
-		ACCW(PR_CTX2_R, ((0x00000000 & 0xfffff000) | 0x00000002));
-									 /* DMA access type is READ_AND_WRITE;
-									  * memory starts at start of cardRAM (b12-31):
-									  * It's adress needs to be at a 4kb boundary! */
-		ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
-		/* setup set '0' for cmd NV_ROP5_SOLID */
-		ACCW(PR_CTX0_0, 0x01008043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_0, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_0, 0x00000000); /* method traps disabled */
-		/* setup set '1' for cmd NV_IMAGE_BLACK_RECTANGLE */
-		ACCW(PR_CTX0_1, 0x01008019); /* NVclass $019, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_1, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_1, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_1, 0x00000000); /* method traps disabled */
-		/* setup set '2' for cmd NV_IMAGE_PATTERN */
-		ACCW(PR_CTX0_2, 0x01008018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_2, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
-		ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
-		/* setup set '3' for ... */
-		if(si->ps.card_arch >= NV10A)
-		{
-			/* ... cmd NV10_CONTEXT_SURFACES_2D */
-			ACCW(PR_CTX0_3, 0x01008062); /* NVclass $062, nv10+: little endian */
-		}
-		else
-		{
-			/* ... cmd NV4_SURFACE */
-			ACCW(PR_CTX0_3, 0x01008042); /* NVclass $042, nv10+: little endian */
-		}
-		ACCW(PR_CTX1_3, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_3, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_3, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
-		/* setup set '4' for ... */
-		if (si->ps.card_type >= NV11)
-		{
-			/* ... cmd NV12_IMAGE_BLIT */
-			ACCW(PR_CTX0_4, 0x0100809f); /* NVclass $09f, patchcfg ROP_AND, nv10+: little endian */
-		}
-		else
-		{
-			/* ... cmd NV_IMAGE_BLIT */
-			ACCW(PR_CTX0_4, 0x0100805f); /* NVclass $05f, patchcfg ROP_AND, nv10+: little endian */
-		}
-		ACCW(PR_CTX1_4, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_4, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_4, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
-		/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
-		ACCW(PR_CTX0_5, 0x0100804a); /* NVclass $04a, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_5, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
-		ACCW(PR_CTX2_5, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_5, 0x00000000); /* method traps disabled */
-		/* setup set '6' ... */
-		if (si->ps.card_arch >= NV10A)
-		{
-			/* ... for cmd NV10_CONTEXT_SURFACES_ARGB_ZS */
-			ACCW(PR_CTX0_6, 0x00000093); /* NVclass $093, nv10+: little endian */
-		}
-		else
-		{
-			/* ... for cmd NV4_CONTEXT_SURFACES_ARGB_ZS */
-			ACCW(PR_CTX0_6, 0x00000053); /* NVclass $053, nv10+: little endian */
-		}
-		ACCW(PR_CTX1_6, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_6, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_6, 0x00000000); /* method traps disabled */
-		/* setup set '7' ... */
-		if (si->ps.card_arch >= NV10A)
-		{
-			/* ... for cmd NV10_DX5_TEXTURE_TRIANGLE */
-			ACCW(PR_CTX0_7, 0x0300a094); /* NVclass $094, patchcfg ROP_AND, userclip enable,
-										  * context surface0 valid, nv10+: little endian */
-		}
-		else
-		{
-			/* ... for cmd NV4_DX5_TEXTURE_TRIANGLE */
-			ACCW(PR_CTX0_7, 0x0300a054); /* NVclass $054, patchcfg ROP_AND, userclip enable,
-										  * context surface0 valid */
-		}
-		ACCW(PR_CTX1_7, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_7, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_7, 0x00000000); /* method traps disabled */
-		/* setup set '8' ... */
-		if (si->ps.card_arch >= NV10A)
-		{
-			/* ... for cmd NV10_DX6_MULTI_TEXTURE_TRIANGLE (not used) */
-			ACCW(PR_CTX0_8, 0x0300a095); /* NVclass $095, patchcfg ROP_AND, userclip enable,
-										  * context surface0 valid, nv10+: little endian */
-		}
-		else
-		{
-			/* ... for cmd NV4_DX6_MULTI_TEXTURE_TRIANGLE (not used) */
-			ACCW(PR_CTX0_8, 0x0300a055); /* NVclass $055, patchcfg ROP_AND, userclip enable,
-										  * context surface0 valid */
-		}
-		ACCW(PR_CTX1_8, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_8, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
-		/* setup set '9' for cmd NV_SCALED_IMAGE_FROM_MEMORY */
-		ACCW(PR_CTX0_9, 0x01018077); /* NVclass $077, patchcfg SRC_COPY,
-									  * context surface0 valid, nv10+: little endian */
-		ACCW(PR_CTX1_9, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_9, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_9, 0x00000000); /* method traps disabled */
-		/* setup set 'A' for cmd NV1_RENDER_SOLID_LIN (not used) */
-		ACCW(PR_CTX0_A, 0x0300a01c); /* NVclass $01c, patchcfg ROP_AND, userclip enable,
-									  * context surface0 valid, nv10+: little endian */
-		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_A, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-		ACCW(PR_CTX3_A, 0x00000000); /* method traps disabled */
-		//2007 3D tests..
-		/* setup set 'B' ... */
-		if (si->ps.card_type == NV15)
-		{
-			/* ... for cmd NV11_TCL_PRIMITIVE_3D */
-			ACCW(PR_CTX0_B, 0x0300a096); /* NVclass $096, patchcfg ROP_AND, userclip enable,
-										  * context surface0 valid, nv10+: little endian */
-			ACCW(PR_CTX1_B, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-			ACCW(PR_CTX2_B, 0x11401140); /* DMA0, DMA1 instance = $1140 */
-			ACCW(PR_CTX3_B, 0x00000000); /* method traps disabled */
-		}
-		/* setup DMA set pointed at by PF_CACH1_DMAI */
-		if (0)//si->engine.agp_mode)
-		{
-			/* DMA page table present and of linear type;
-			 * DMA class is $002 (b0-11);
-			 * DMA target node is AGP */
-			ACCW(PR_CTX0_C, 0x00033002);
-		}
-		else
-		{
-			/* DMA page table present and of linear type;
-			 * DMA class is $002 (b0-11);
-			 * DMA target node is PCI */
-			ACCW(PR_CTX0_C, 0x00023002);
-		}
-		ACCW(PR_CTX1_C, 0x000fffff); /* DMA limit: tablesize is 1M bytes */
-		ACCW(PR_CTX2_C, (((uint32)((uint8 *)(si->dma_buffer_pci))) | 0x00000002));
-									 /* DMA access type is READ_AND_WRITE;
-									  * table is located in main system RAM (b12-31):
-									  * It's adress needs to be at a 4kb boundary! */
-
-		/* set the 3D rendering functions colordepth via BPIXEL's 'depth 2' */
-		/* note:
-		 * setting a depth to 'invalid' (zero) makes the engine report
-		 * ready with drawing 'immediately'. */
-		//fixme: NV30A and above (probably) needs to be corrected...
-		switch(si->dm.space)
-		{
-		case B_CMAP8:
-			if (si->ps.card_arch < NV30A)
-				/* set depth 2: $1 = Y8 */
-				ACCW(BPIXEL, 0x00000100);
-			else
-				/* set depth 0-1: $1 = Y8, $2 = X1R5G5B5_Z1R5G5B5 */
-				ACCW(BPIXEL, 0x00000021);
-			break;
-		case B_RGB15_LITTLE:
-			if (si->ps.card_arch < NV30A)
-				/* set depth 2: $4 = A1R5G5B5 */
-				ACCW(BPIXEL, 0x00000400);
-			else
-				/* set depth 0-1: $2 = X1R5G5B5_Z1R5G5B5, $4 = A1R5G5B5 */
-				ACCW(BPIXEL, 0x00000042);
-			break;
-		case B_RGB16_LITTLE:
-			if (si->ps.card_arch < NV30A)
-				/* set depth 2: $5 = R5G6B5 */
-				ACCW(BPIXEL, 0x00000500);
-			else
-				/* set depth 0-1: $5 = R5G6B5, $a = X1A7R8G8B8_O1A7R8G8B8 */
-				ACCW(BPIXEL, 0x000000a5);
-			break;
-		case B_RGB32_LITTLE:
-		case B_RGBA32_LITTLE:
-			if (si->ps.card_arch < NV30A)
-				/* set depth 2: $c = A8R8G8B8 */
-				ACCW(BPIXEL, 0x00000c00);
-			else
-				/* set depth 0-1: $7 = X8R8G8B8_Z8R8G8B8, $e = V8YB8U8YA8 */
-				ACCW(BPIXEL, 0x000000e7);
-			break;
-		default:
-			LOG(8,("ACC: init, invalid bit depth\n"));
-			return B_ERROR;
-		}
 	}
 
 	if (si->ps.card_arch == NV04A)
@@ -921,11 +718,8 @@ status_t nv_acc_init_dma()
 	/* setup sync parameters for NV12_IMAGE_BLIT command for the current mode:
 	 * values given are CRTC vertical counter limit values. The NV12 command will wait
 	 * for the specified's CRTC's vertical counter to be in between the given values */
-	if (si->ps.card_type >= NV11)
-	{
-		ACCW(NV11_CRTC_LO, si->dm.timing.v_display - 1);
-		ACCW(NV11_CRTC_HI, si->dm.timing.v_display + 1);
-	}
+	ACCW(NV11_CRTC_LO, si->dm.timing.v_display - 1);
+	ACCW(NV11_CRTC_HI, si->dm.timing.v_display + 1);
 
 	/*** PFIFO ***/
 	/* (setup caches) */
@@ -1773,26 +1567,15 @@ void SCREEN_TO_SCREEN_SCALED_FILTERED_BLIT_DMA(engine_token *et, scaled_blit_par
 		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000002; /* Format */
 	}
 
-	/* TNT1 has fixed operation mode 'SRCcopy' while the rest can be programmed: */
-	if (si->ps.card_type != NV04)
-	{
-		/* wait for room in fifo for cmds if needed. */
-		if (nv_acc_fifofree_dma(5) != B_OK) return;
-		/* now setup source bitmap colorspace */
-		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 2);
-		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
-		/* now setup operation mode to SRCcopy */
-		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000003; /* SetOperation */
-	}
-	else
-	{
-		/* wait for room in fifo for cmd if needed. */
-		if (nv_acc_fifofree_dma(4) != B_OK) return;
-		/* now setup source bitmap colorspace */
-		nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 1);
-		((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
-		/* TNT1 has fixed operation mode SRCcopy */
-	}
+	/* program operation mode 'SRCcopy' */
+	/* wait for room in fifo for cmds if needed. */
+	if (nv_acc_fifofree_dma(5) != B_OK) return;
+	/* now setup source bitmap colorspace */
+	nv_acc_cmd_dma(NV_SCALED_IMAGE_FROM_MEMORY, NV_SCALED_IMAGE_FROM_MEMORY_SETCOLORFORMAT, 2);
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
+	/* now setup operation mode to SRCcopy */
+	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000003; /* SetOperation */
+
 	/* now setup fill color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
 	((uint32*)(si->dma_buffer))[si->engine.dma.current++] = 0x00000000; /* Color1A */

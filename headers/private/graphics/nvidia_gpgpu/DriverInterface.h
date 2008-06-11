@@ -73,18 +73,6 @@ enum {
 
 /* card_type in order of date of NV chip design */
 enum {
-	NV04 = 0,
-	NV05,
-	NV05M64,
-	NV06,
-	NV10,
-	NV11,
-	NV11M,
-	NV15,
-	NV17,
-	NV17M,
-	NV18,
-	NV18M,
 	NV20,
 	NV25,
 	NV28,
@@ -116,27 +104,6 @@ enum {
 	NV30A,
 	NV40A,
 	NV50A
-};
-
-/* card info - information gathered from PINS (and other sources) */
-enum
-{	// tv_encoder_type in order of capability (more or less)
-	NONE = 0,
-	CH7003,
-	CH7004,
-	CH7005,
-	CH7006,
-	CH7007,
-	CH7008,
-	SAA7102,
-	SAA7103,
-	SAA7104,
-	SAA7105,
-	BT868,
-	BT869,
-	CX25870,
-	CX25871,
-	NVIDIA
 };
 
 /* handles to pre-defined engine commands */
@@ -214,12 +181,10 @@ typedef struct { // apsed, see comments in nv.settings
 	// for accelerant
 	uint32 logmask;
 	uint32 memory;
-	uint32 tv_output;
 	bool   usebios;
 	bool   hardcursor;
 	bool   switchhead;
 	bool   pgm_panel;
-	bool   vga_on_tv;
 	bool   force_sync;
 	bool   force_ws;
 	uint32 gpu_clk;
@@ -287,7 +252,6 @@ typedef struct {
 	display_mode dm;		/* current display mode configuration: head1 */
 	uint32 dpms_flags;		/* current DPMS mode */
 	bool acc_mode;			/* signals (non)accelerated mode */
-	bool interlaced_tv_mode;/* signals interlaced CRTC TV output mode */
 	bool crtc_switch_mode;	/* signals dualhead switch mode if panels are used */
 
   /*frame buffer config - for BDirectScreen*/
@@ -343,13 +307,6 @@ typedef struct {
 		bool i2c_bus1;				/* we have a wired I2C bus 1 on board */
 		bool i2c_bus2;				/* we have a wired I2C bus 2 on board */
 		bool i2c_bus3;				/* we have a wired I2C bus 3 on board */
-		struct
-		{
-			uint32 type;			/* see tvchip_type enum above */
-			uint8 version;			/* chip silicon version */
-			uint8 bus;				/* I2C bus on which TVout chip resides */
-			uint8 adress;			/* I2C adress on which TVout chip resides */
-		} tv_encoder;
 		uint8 monitors;				/* output devices connection matrix */
 		bool int_assigned;			/* card has a useable INT assigned to it */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
@@ -378,7 +335,6 @@ typedef struct {
 		uint32 max_dac2_clock_32;
 		uint32 max_dac2_clock_32dh;
 		bool secondary_head;		/* presence of functions */
-		bool tvout;
 		bool primary_dvi;
 		bool secondary_dvi;
 		uint32 memory_size;			/* memory (in bytes) */

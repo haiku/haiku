@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-2/2006
+   Rudolf Cornelissen 11/2002-6/2008
 */
 
 #define MODULE_BIT 0x00040000
@@ -29,79 +29,8 @@ status_t nv_crtc_interrupt_enable(bool flag)
 	return result;
 }
 
-/* doing general fail-safe default setup here */
-//fixme: this is a _very_ basic setup, and it's preliminary...
 status_t nv_crtc_update_fifo()
 {
-	uint8 bytes_per_pixel = 1;
-	uint32 drain;
-
-	/* we are only using this on >>coldstarted<< cards which really need this */
-	//fixme: re-enable or remove after general user confirmation of behaviour...
-	if (/*(si->settings.usebios) ||*/ (si->ps.card_type != NV05M64)) return B_OK;
-
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
-	/* set CRTC FIFO low watermark according to memory drain */
-	switch(si->dm.space)
-	{
-	case B_CMAP8:
-		bytes_per_pixel = 1;
-		break;
-	case B_RGB15_LITTLE:
-	case B_RGB16_LITTLE:
-		bytes_per_pixel = 2;
-		break;
-	case B_RGB24_LITTLE:
-		bytes_per_pixel = 3;
-		break;
-	case B_RGB32_LITTLE:
-		bytes_per_pixel = 4;
-		break;
-	}
-	/* fixme:
-	 * - I should probably include the refreshrate as well;
-	 * - and the memory clocking speed, core clocking speed, RAM buswidth.. */
-	drain = si->dm.timing.h_display * si->dm.timing.v_display * bytes_per_pixel;
-
-	/* Doesn't work for other than 32bit space (yet?) */
-	if (si->dm.space != B_RGB32_LITTLE)
-	{
-		/* BIOS defaults */
-		CRTCW(FIFO, 0x03);
-		CRTCW(FIFO_LWM, 0x20);
-		LOG(4,("CRTC: FIFO low-watermark set to $20, burst size 256 (BIOS defaults)\n"));
-		return B_OK;
-	}
-
-	if (drain > (((uint32)1280) * 1024 * 4))
-	{
-		/* set CRTC FIFO burst size for 'smaller' bursts */
-		CRTCW(FIFO, 0x01);
-		/* Instruct CRTC to fetch new data 'earlier' */
-		CRTCW(FIFO_LWM, 0x40);
-		LOG(4,("CRTC: FIFO low-watermark set to $40, burst size 64\n"));
-	}
-	else
-	{
-		if (drain > (((uint32)1024) * 768 * 4))
-		{
-			/* BIOS default */
-			CRTCW(FIFO, 0x02);
-			/* Instruct CRTC to fetch new data 'earlier' */
-			CRTCW(FIFO_LWM, 0x40);
-			LOG(4,("CRTC: FIFO low-watermark set to $40, burst size 128\n"));
-		}
-		else
-		{
-			/* BIOS defaults */
-			CRTCW(FIFO, 0x03);
-			CRTCW(FIFO_LWM, 0x20);
-			LOG(4,("CRTC: FIFO low-watermark set to $20, burst size 256 (BIOS defaults)\n"));
-		}
-	}
-
 	return B_OK;
 }
 
@@ -127,14 +56,7 @@ status_t nv_crtc_validate_timing(
 	/* NOTE: keep horizontal timing at multiples of 8! */
 	/* confine to a reasonable width */
 	if (*hd_e < 640) *hd_e = 640;
-	if (si->ps.card_type > NV04)
-	{
-		if (*hd_e > 2048) *hd_e = 2048;
-	}
-	else
-	{
-		if (*hd_e > 1920) *hd_e = 1920;
-	}
+	if (*hd_e > 2048) *hd_e = 2048;
 
 	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
 	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
@@ -160,14 +82,7 @@ status_t nv_crtc_validate_timing(
 
 	/* confine to a reasonable height */
 	if (*vd_e < 480) *vd_e = 480;
-	if (si->ps.card_type > NV04)
-	{
-		if (*vd_e > 1536) *vd_e = 1536;
-	}
-	else
-	{
-		if (*vd_e > 1440) *vd_e = 1440;
-	}
+	if (*vd_e > 1536) *vd_e = 1536;
 
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
 	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
@@ -238,12 +153,8 @@ status_t nv_crtc_set_timing(display_mode target)
 		 * OTOH the overlay unit distorts if we reserve too much time! */
 		if (target.timing.h_display == si->ps.p1_timing.h_display)
 		{
-			/* NV11 timing has different constraints than later cards */
-			if (si->ps.card_type == NV11)
-				target.timing.h_total -= 56;
-			else
-				/* confirmed NV34 with 1680x1050 panel */
-				target.timing.h_total -= 32;
+			/* confirmed NV34 with 1680x1050 panel */
+			target.timing.h_total -= 32;
 		}
 
 		if (target.timing.h_sync_start == target.timing.h_display)
@@ -409,7 +320,6 @@ status_t nv_crtc_set_timing(display_mode target)
 	CRTCW(INTERLACE, 0xff);
 
 	/* disable CRTC slaved mode unless a panel is in use */
-	// fixme: this kills TVout when it was in use...
 	if (!si->ps.tmds1_active) CRTCW(PIXEL, (CRTCR(PIXEL) & 0x7f));
 
 	/* setup flatpanel if connected and active */
@@ -622,7 +532,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 			{
 				//fixme? linux only does this on dualhead cards...
 				//fixme: see if LVDS head can be determined with two panels there...
-				if (!si->ps.tmds2_active && (si->ps.card_type != NV11))
+				if (!si->ps.tmds2_active)
 				{
 					/* b2 = 0 = enable laptop panel backlight */
 					/* note: this seems to be a write-only register. */
@@ -665,7 +575,7 @@ status_t nv_crtc_dpms(bool display, bool h, bool v, bool do_panel)
 			{
 				//fixme? linux only does this on dualhead cards...
 				//fixme: see if LVDS head can be determined with two panels there...
-				if (!si->ps.tmds2_active && (si->ps.card_type != NV11))
+				if (!si->ps.tmds2_active)
 				{
 					/* b2 = 1 = disable laptop panel backlight */
 					/* note: this seems to be a write-only register. */
@@ -981,134 +891,6 @@ status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 
 	/* update cursorposition */
 	DACW(CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
-
-	return B_OK;
-}
-
-status_t nv_crtc_stop_tvout(void)
-{
-	uint16 cnt;
-
-	LOG(4,("CRTC: stopping TV output\n"));
-
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
-	/* just to be sure Vsync is _really_ enabled */
-	CRTCW(REPAINT1, (CRTCR(REPAINT1) & 0xbf));
-
-	/* wait for one image to be generated to make sure VGA has kicked in and is
-	 * running OK before continuing...
-	 * (Kicking in will fail often if we do not wait here) */
-	/* Note:
-	 * The used CRTC's Vsync is required to be enabled here. The DPMS state
-	 * programming in the driver makes sure this is the case.
-	 * (except for driver startup: see nv_general.c.) */
-
-	/* make sure we are 'in' active VGA picture: wait with timeout! */
-	cnt = 1;
-	while ((NV_REG8(NV8_INSTAT1) & 0x08) && cnt)
-	{
-		snooze(1);
-		cnt++;
-	}
-	/* wait for next vertical retrace start on VGA: wait with timeout! */
-	cnt = 1;
-	while ((!(NV_REG8(NV8_INSTAT1) & 0x08)) && cnt)
-	{
-		snooze(1);
-		cnt++;
-	}
-	/* now wait until we are 'in' active VGA picture again: wait with timeout! */
-	cnt = 1;
-	while ((NV_REG8(NV8_INSTAT1) & 0x08) && cnt)
-	{
-		snooze(1);
-		cnt++;
-	}
-
-	/* set CRTC to master mode (b7 = 0) if it wasn't slaved for a panel before */
-	if (!(si->ps.slaved_tmds1))	CRTCW(PIXEL, (CRTCR(PIXEL) & 0x03));
-
-	/* CAUTION:
-	 * On old cards, PLLSEL (and TV_SETUP?) cannot be read (sometimes?), but
-	 * write actions do succeed ...
-	 * This is confirmed for both ISA and PCI access, on NV04 and NV11. */
-
-	/* setup TVencoder connection */
-	/* b1-0 = %00: encoder type is SLAVE;
-	 * b24 = 1: VIP datapos is b0-7 */
-	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
-	//(it seems to work OK on NV04 and NV11 although read reg. doesn't seem to work)
-	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000003) | 0x01000000));
-
-	/* tell GPU to use pixelclock from internal source instead of using TVencoder */
-	if (si->ps.secondary_head)
-		DACW(PLLSEL, 0x30000f00);
-	else
-		DACW(PLLSEL, 0x10000700);
-
-	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
-	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
-	CRTCW(TREG, 0x00);
-
-	/* select panel encoder, not TV encoder if needed (b0 = 1).
-	 * Note:
-	 * Both are devices (often) using the CRTC in slaved mode. */
-	if (si->ps.slaved_tmds1) CRTCW(LCD, (CRTCR(LCD) | 0x01));
-
-	return B_OK;
-}
-
-status_t nv_crtc_start_tvout(void)
-{
-	LOG(4,("CRTC: starting TV output\n"));
-
-	if (si->ps.secondary_head)
-	{
-		/* switch TV encoder to CRTC1 */
-		NV_REG32(NV32_2FUNCSEL) &= ~0x00000100;
-		NV_REG32(NV32_FUNCSEL) |= 0x00000100;
-	}
-
-	/* enable access to primary head */
-	set_crtc_owner(0);
-
-	/* CAUTION:
-	 * On old cards, PLLSEL (and TV_SETUP?) cannot be read (sometimes?), but
-	 * write actions do succeed ...
-	 * This is confirmed for both ISA and PCI access, on NV04 and NV11. */
-
-	/* setup TVencoder connection */
-	/* b1-0 = %01: encoder type is MASTER;
-	 * b24 = 1: VIP datapos is b0-7 */
-	//fixme if needed: setup completely instead of relying on pre-init by BIOS..
-	//(it seems to work OK on NV04 and NV11 although read reg. doesn't seem to work)
-	DACW(TV_SETUP, ((DACR(TV_SETUP) & ~0x00000002) | 0x01000001));
-
-	/* tell GPU to use pixelclock from TVencoder instead of using internal source */
-	/* (nessecary or display will 'shiver' on both TV and VGA.) */
-	if (si->ps.secondary_head)
-		DACW(PLLSEL, 0x20030f00);
-	else
-		DACW(PLLSEL, 0x00030700);
-
-	/* Set overscan color to 'black' */
-	/* note:
-	 * Change this instruction for a visible overscan color if you're trying to
-	 * center the output on TV. Use it as a guide-'line' then ;-) */
-	ATBW(OSCANCOLOR, 0x00);
-
-	/* set CRTC to slaved mode (b7 = 1) and clear TVadjust (b3-5 = %000) */
-	CRTCW(PIXEL, ((CRTCR(PIXEL) & 0xc7) | 0x80));
-	/* select TV encoder, not panel encoder (b0 = 0).
-	 * Note:
-	 * Both are devices (often) using the CRTC in slaved mode. */
-	CRTCW(LCD, (CRTCR(LCD) & 0xfe));
-
-	/* HTOTAL, VTOTAL and OVERFLOW return their default CRTC use, instead of
-	 * H, V-low and V-high 'shadow' counters(?)(b0, 4 and 6 = 0) (b7 use = unknown) */
-	CRTCW(TREG, 0x80);
 
 	return B_OK;
 }

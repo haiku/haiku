@@ -22,7 +22,6 @@ void delay(bigtime_t i);
 void nv_log(char *format, ...);
 
 /* i2c functions */
-status_t i2c_sec_tv_adapter(void);
 char i2c_flag_error (char ErrNo);
 void i2c_bstart (uint8 BusNR);
 void i2c_bstop (uint8 BusNR);
@@ -55,13 +54,6 @@ status_t nv_dac2_palette(uint8*,uint8*,uint8*);
 status_t nv_dac2_pix_pll_find(display_mode target,float * result,uint8 *,uint8 *,uint8 *, uint8);
 status_t nv_dac2_set_pix_pll(display_mode target);
 
-/* Brooktree TV functions */
-bool BT_probe(void);
-uint8 BT_dpms(bool display);
-uint8 BT_check_tvmode(display_mode target);
-status_t BT_stop_tvout(void);
-status_t BT_setmode(display_mode target);
-
 /* CRTC1 functions */
 status_t nv_crtc_interrupt_enable(bool);
 status_t nv_crtc_update_fifo(void);
@@ -79,8 +71,6 @@ status_t nv_crtc_cursor_define(uint8*,uint8*);
 status_t nv_crtc_cursor_position(uint16 x ,uint16 y);
 status_t nv_crtc_cursor_show(void);
 status_t nv_crtc_cursor_hide(void);
-status_t nv_crtc_stop_tvout(void);
-status_t nv_crtc_start_tvout(void);
 
 /* CRTC2 functions */
 status_t nv_crtc2_interrupt_enable(bool);
@@ -99,8 +89,6 @@ status_t nv_crtc2_cursor_define(uint8*,uint8*);
 status_t nv_crtc2_cursor_position(uint16 x ,uint16 y);
 status_t nv_crtc2_cursor_show(void);
 status_t nv_crtc2_cursor_hide(void);
-status_t nv_crtc2_stop_tvout(void);
-status_t nv_crtc2_start_tvout(void);
 
 /* acceleration functions */
 status_t check_acc_capability(uint32 feature);

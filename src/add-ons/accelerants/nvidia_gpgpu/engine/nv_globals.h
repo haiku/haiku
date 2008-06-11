@@ -24,8 +24,6 @@ typedef status_t (*crtc_cursor_show)(void);
 typedef status_t (*crtc_cursor_hide)(void);
 typedef status_t (*crtc_cursor_define)(uint8*, uint8*);
 typedef status_t (*crtc_cursor_position)(uint16, uint16);
-typedef status_t (*crtc_stop_tvout)(void);
-typedef status_t (*crtc_start_tvout)(void);
 
 typedef status_t (*dac_mode)(int, float);
 typedef status_t (*dac_palette)(uint8[256], uint8[256], uint8[256]);
@@ -45,8 +43,6 @@ crtc_cursor_show		head1_cursor_show;
 crtc_cursor_hide		head1_cursor_hide;
 crtc_cursor_define		head1_cursor_define;
 crtc_cursor_position	head1_cursor_position;
-crtc_stop_tvout			head1_stop_tvout;
-crtc_start_tvout		head1_start_tvout;
 
 crtc_interrupt_enable	head2_interrupt_enable;
 crtc_update_fifo		head2_update_fifo;
@@ -61,8 +57,6 @@ crtc_cursor_show		head2_cursor_show;
 crtc_cursor_hide		head2_cursor_hide;
 crtc_cursor_define		head2_cursor_define;
 crtc_cursor_position	head2_cursor_position;
-crtc_stop_tvout			head2_stop_tvout;
-crtc_start_tvout		head2_start_tvout;
 
 dac_mode				head1_mode;
 dac_palette				head1_palette;
