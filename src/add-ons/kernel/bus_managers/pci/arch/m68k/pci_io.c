@@ -5,7 +5,7 @@
 
 
 #include "pci_io.h"
-#include "pci_priv.h"
+#include "pci_private.h"
 
 
 status_t
