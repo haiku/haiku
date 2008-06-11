@@ -3617,7 +3617,7 @@ BView::FindView(const char *name) const
 void
 BView::MoveBy(float deltaX, float deltaY)
 {
-	MoveTo(fParentOffset.x + deltaX, fParentOffset.y + deltaY);
+	MoveTo(fParentOffset.x + roundf(deltaX), fParentOffset.y + roundf(deltaY));
 }
 
 
