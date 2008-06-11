@@ -22,10 +22,7 @@
 #define MAX_CHANNELS	32
 #define NB_BUFFERS		32
 
-//#define DEFAULT_BUFFER_SIZE 2048
-//#define DEFAULT_BUFFER_SIZE (32*1024)
-//#define DEFAULT_BUFFER_SIZE (16*1024)
-#define DEFAULT_BUFFER_SIZE (2*1024)
+#define DEFAULT_BUFFER_SIZE 2048
 
 /* define to support encoded audio (AC3, MPEG, ...) when the card supports it */
 //#define ENABLE_NON_RAW_SUPPORT 1

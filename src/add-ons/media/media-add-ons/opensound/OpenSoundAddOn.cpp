@@ -7,6 +7,7 @@
  * Based on MultiAudio media addon
  * Copyright (c) 2002, 2003 Jerome Duval (jerome.duval@free.fr)
  */
+#include "OpenSoundAddOn.h"
 
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
@@ -22,8 +23,8 @@
 #include <errno.h>
 
 #include "OpenSoundNode.h"
-#include "OpenSoundAddOn.h"
 #include "OpenSoundDevice.h"
+#include "OpenSoundDeviceEngine.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -119,7 +120,8 @@ BMediaNode * OpenSoundAddOn::InstantiateNodeFor(
 {
 	CALLED();
 	
-	OpenSoundDevice *device = (OpenSoundDevice*)fDevices.ItemAt(info->internal_id);
+	OpenSoundDevice *device = (OpenSoundDevice*)fDevices.ItemAt(
+		info->internal_id);
 	if (device == NULL) {
 		*out_error = B_ERROR;
 		return NULL;

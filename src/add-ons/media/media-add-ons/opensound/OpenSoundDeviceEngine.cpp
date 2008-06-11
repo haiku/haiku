@@ -93,7 +93,7 @@ status_t OpenSoundDeviceEngine::Open(int mode)
 		Close();
 		return EIO;
 	}
-#if 0
+#if 1
 	// set fragments
 	v = 0x7fff0000 | 0x000b; // unlimited * 2048
 	if (ioctl(fFD, SNDCTL_DSP_SETFRAGMENT, &v, sizeof(int)) < 0) {
@@ -193,22 +193,27 @@ status_t OpenSoundDeviceEngine::UpdateInfo(void)
 }
 
 
-bigtime_t OpenSoundDeviceEngine::PlaybackLatency(void)
+bigtime_t
+OpenSoundDeviceEngine::PlaybackLatency()
 {
 	bigtime_t latency;
 	int delay;
 	delay = GetODelay();
-	delay = 0; //XXX 
-	latency = ((double)delay * 1000000LL 
-			/ (fMediaFormat.u.raw_audio.channel_count * fMediaFormat.u.raw_audio.frame_rate
-			* (fMediaFormat.AudioFormat() & media_raw_audio_format::B_AUDIO_SIZE_MASK)));
-	PRINT(("PlaybackLatency: odelay %d latency %Ld card %Ld\n", delay, latency, CardLatency()));
+delay = 0; //XXX 
+	latency = (bigtime_t)((double)delay * 1000000LL 
+		/ (fMediaFormat.u.raw_audio.channel_count
+		* fMediaFormat.u.raw_audio.frame_rate
+		* (fMediaFormat.AudioFormat()
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK)));
+	PRINT(("PlaybackLatency: odelay %d latency %Ld card %Ld\n", delay, latency,
+		CardLatency()));
 	latency += CardLatency();
 	return latency;
 }
 
 
-bigtime_t OpenSoundDeviceEngine::RecordingLatency(void)
+bigtime_t
+OpenSoundDeviceEngine::RecordingLatency()
 {
 	return 0LL; //XXX
 }
