@@ -23,7 +23,7 @@ class OpenSoundDeviceEngine;
 class OpenSoundDeviceMixer;
 
 struct audio_buf_info;
-
+struct flavor_info;
 
 class OpenSoundNode : public BBufferConsumer, public BBufferProducer,
 	public BTimeSource, public BMediaEventLooper, public BControllable {

@@ -17,6 +17,8 @@
 
 #define SETTINGS_FILE					"Media/oss_audio_settings"
 
+class BEntry;
+
 class OpenSoundAddOn :
 	public BMediaAddOn
 {
