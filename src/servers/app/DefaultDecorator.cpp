@@ -123,7 +123,7 @@ DefaultDecorator::SetTitle(const char* string, BRegion* updateRegion)
 	BRect rect = TabRect();
 
 	Decorator::SetTitle(string);
-	
+
 	if (updateRegion == NULL)
 		return;
 
@@ -210,7 +210,7 @@ DefaultDecorator::MoveBy(BPoint pt)
 	fResizeRect.OffsetBy(pt);
 	fZoomRect.OffsetBy(pt);
 	fBorderRect.OffsetBy(pt);
-	
+
 	fLeftBorder.OffsetBy(pt);
 	fRightBorder.OffsetBy(pt);
 	fTopBorder.OffsetBy(pt);
@@ -243,7 +243,7 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 			case B_MODAL_WINDOW_LOOK:
 			case kLeftTitledWindowLook:
 				realResizeRect.Set(fRightBorder.right - 22, fBottomBorder.top,
-								   fRightBorder.right - 22, fBottomBorder.bottom - 1);
+					fRightBorder.right - 22, fBottomBorder.bottom - 1);
 				// resize rect at old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(pt);
@@ -251,7 +251,7 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 				dirty->Include(realResizeRect);
 
 				realResizeRect.Set(fRightBorder.left, fBottomBorder.bottom - 22,
-								   fRightBorder.right - 1, fBottomBorder.bottom - 22);
+					fRightBorder.right - 1, fBottomBorder.bottom - 22);
 				// resize rect at old location
 				dirty->Include(realResizeRect);
 				realResizeRect.OffsetBy(pt);
@@ -267,13 +267,13 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 
 	fBorderRect.right	+= pt.x;
 	fBorderRect.bottom	+= pt.y;
-	
+
 	fLeftBorder.bottom	+= pt.y;
 	fTopBorder.right	+= pt.x;
 
 	fRightBorder.OffsetBy(pt.x, 0.0);
 	fRightBorder.bottom	+= pt.y;
-	
+
 	fBottomBorder.OffsetBy(0.0, pt.y);
 	fBottomBorder.right	+= pt.x;
 
@@ -283,19 +283,19 @@ DefaultDecorator::ResizeBy(BPoint pt, BRegion* dirty)
 					fRightBorder.right, fTopBorder.bottom);
 			dirty->Include(t);
 			t.Set(fRightBorder.left - pt.x, fBottomBorder.top,
-				  fRightBorder.right, fBottomBorder.bottom);
+				fRightBorder.right, fBottomBorder.bottom);
 			dirty->Include(t);
 			dirty->Include(fRightBorder);
 		} else if (pt.x < 0.0) {
 			dirty->Include(BRect(fRightBorder.left, fTopBorder.top,
-								 fRightBorder.right, fBottomBorder.bottom));
+				fRightBorder.right, fBottomBorder.bottom));
 		}
 		if (pt.y > 0.0) {
 			BRect t(fLeftBorder.left, fLeftBorder.bottom - pt.y,
 					fLeftBorder.right, fLeftBorder.bottom);
 			dirty->Include(t);
 			t.Set(fRightBorder.left, fRightBorder.bottom - pt.y,
-				  fRightBorder.right, fRightBorder.bottom);
+				fRightBorder.right, fRightBorder.bottom);
 			dirty->Include(t);
 			dirty->Include(fBottomBorder);
 		} else if (pt.y < 0.0) {
@@ -478,7 +478,7 @@ DefaultDecorator::GetFootprint(BRegion *region)
 	region->Include(fLeftBorder);
 	region->Include(fRightBorder);
 	region->Include(fBottomBorder);
-	
+
 	if (fLook == B_BORDERED_WINDOW_LOOK)
 		return;
 
@@ -540,7 +540,7 @@ DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 				|| fLook == B_MODAL_WINDOW_LOOK
 				|| fLook == kLeftTitledWindowLook)) {
 			BRect temp(BPoint(fBottomBorder.right - 18, fBottomBorder.bottom - 18),
-					   fBottomBorder.RightBottom());
+				fBottomBorder.RightBottom());
 			if (temp.Contains(pt))
 				return DEC_RESIZE;
 		}
@@ -775,7 +775,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 			}
 			break;
 		}
-		
+
 		case B_FLOATING_WINDOW_LOOK:
 		case kLeftTitledWindowLook:
 		{
@@ -884,7 +884,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 					fBottomBorder.bottom - 22, fRightBorder.right - 1,
 					fBottomBorder.bottom - 1)))
 					break;
-		
+
 				fDrawingEngine->StrokeLine(
 					BPoint(fRightBorder.left, fBottomBorder.bottom - 22),
 					BPoint(fRightBorder.right - 1, fBottomBorder.bottom - 22),
@@ -957,7 +957,7 @@ DefaultDecorator::_DrawTab(BRect invalid)
 
 	_DrawTitle(fTabRect);
 
-	// Draw the buttons if we're supposed to	
+	// Draw the buttons if we're supposed to
 	if (!(fFlags & B_NOT_CLOSABLE) && invalid.Intersects(fCloseRect))
 		_DrawClose(fCloseRect);
 	if (!(fFlags & B_NOT_ZOOMABLE) && invalid.Intersects(fZoomRect))
@@ -1033,7 +1033,7 @@ DefaultDecorator::_SetFocus()
 {
 	// SetFocus() performs necessary duties for color swapping and
 	// other things when a window is deactivated or activated.
-	
+
 	if (IsFocus()
 		|| ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
 		&& (fFlags & B_AVOID_FOCUS) != 0)) {
@@ -1103,7 +1103,7 @@ DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
 		tempColor.red = uint8(startColor.red - (i * rstep));
 		tempColor.green = uint8(startColor.green - (i * gstep));
 		tempColor.blue = uint8(startColor.blue - (i * bstep));
-		
+
 		fDrawingEngine->StrokeLine(BPoint(r.left, r.top + i),
 			BPoint(r.left + i, r.top), tempColor);
 

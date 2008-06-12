@@ -82,25 +82,25 @@ class DefaultDecorator: public Decorator {
 			rgb_color			fTabColorShadow;
 
 			rgb_color			fFrameColors[6];
-	
+
 			// Individual rects for handling window frame
 			// rendering the proper way
 			BRect				fRightBorder;
 			BRect				fLeftBorder;
 			BRect				fTopBorder;
 			BRect				fBottomBorder;
-	
+
 			int32				fBorderWidth;
-	
+
 			uint32				fTabOffset;
 			float				fTabLocation;
 			float				fTextOffset;
-	
+
 			float				fMinTabSize;
 			float				fMaxTabSize;
 			BString				fTruncatedTitle;
 			int32				fTruncatedTitleLength;
-	
+
 			bigtime_t			fLastClicked;
 			bool				fWasDoubleClick;
 };
