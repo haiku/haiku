@@ -240,7 +240,7 @@ struct hci_command_header {
     struct hci_cp_pin_code_reply {
     	bdaddr_t bdaddr;
     	uint8     pin_len;
-    	uint8     pin_code[16];
+    	uint8     pin_code[HCI_PIN_SIZE];
     } __attribute__ ((packed));
     
     #define OCF_PIN_CODE_NEG_REPLY	0x000E

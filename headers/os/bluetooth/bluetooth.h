@@ -26,12 +26,25 @@ typedef struct {
 	uint8 b[6];
 } __attribute__((packed)) bdaddr_t;
 
+
+#define BDADDR_NULL       (&(bdaddr_t) {{0, 0, 0, 0, 0, 0}})
+#define BDADDR_LOCAL  	  (&(bdaddr_t) {{0, 0, 0, 0xff, 0xff, 0xff}})
+#define BDADDR_BROADCAST  (&(bdaddr_t) {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}})
+#define BDADDR_ANY BDADDR_BROADCAST
+
 /* 128 integer type needed for SDP */
 struct int128 {
 	int8	b[16];
 };
 typedef struct int128	int128;
 typedef struct int128	uint128;
+
+/* Protocol definitions - add to as required... */
+#define BLUETOOTH_PROTO_HCI		134	/* HCI protocol number */
+#define BLUETOOTH_PROTO_L2CAP	135	/* L2CAP protocol number */
+#define BLUETOOTH_PROTO_RFCOMM	136	/* RFCOMM protocol number */
+
+#define BLUETOOTH_PROTO_MAX     256
 
 
 #endif
