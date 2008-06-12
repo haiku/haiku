@@ -29,7 +29,7 @@ const int gSupportedFormats[] = {
 	0
 };
 
-const char *gSupportedFormatsNames[] = {
+const char* gSupportedFormatsNames[] = {
 	"raw", //AFMT_SUPPORTED_PCM,
 	"µ-law", //AFMT_MU_LAW,
 	"a-law", //AFMT_A_LAW,

@@ -72,10 +72,6 @@ protected:
 	virtual	status_t			AcceptFormat(
 									const media_destination& dest,
 									media_format* format);
-		// Someone, probably the producer, is asking you about this format.
-		// Give your honest opinion, possibly modifying *format. Do not ask
-		// upstream producer about the format, since he's synchronously
-		// waiting for your reply.
 	virtual	status_t			GetNextInput(int32* cookie,
 									media_input* out_input);
 	virtual	void				DisposeInputCookie(int32 cookie);

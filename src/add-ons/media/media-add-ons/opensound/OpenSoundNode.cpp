@@ -15,6 +15,7 @@
 #include <MediaRoster.h>
 #include <String.h>
 
+#include <new>
 #include <limits.h>
 #include <signal.h>
 #include <stdio.h>
@@ -29,24 +30,30 @@
 #include "OpenSoundDeviceEngine.h"
 #include "OpenSoundDeviceMixer.h"
 
+using std::nothrow;
+
 
 class OpenSoundNode::NodeInput {
 public:
-	NodeInput(const media_input& input, const media_format& format)
-		: fNode(NULL),
-		  fEngineIndex(-1),
+	NodeInput(const media_input& input, int engineIndex, int ossFormatFlags,
+			OpenSoundNode* node)
+		: fNode(node),
+		  fEngineIndex(engineIndex),
 		  fRealEngine(NULL),
-		  fOSSFormatFlags(0),
+		  fOSSFormatFlags(ossFormatFlags),
 
 		  fInput(input),
-		  fPreferredFormat(format),
+		  fPreferredFormat(input.format),
+		  	// Keep a version of the original preferred format,
+		  	// in case we are re-connected and need to start "clean"
 
 		  fThread(-1),
-		  fBufferCycle(1),
-
 		  fBuffers(4)
 	{
 		CALLED();
+
+		fInput.format.u.raw_audio.format
+			= media_raw_audio_format::wildcard.format;
 	}
 
 	~NodeInput()
@@ -102,7 +109,6 @@ public:
 	media_format 			fPreferredFormat;
 
 	thread_id				fThread;
-	uint32 					fBufferCycle;
 	BList					fBuffers;
 		// contains BBuffer* pointers that have not yet played
 };
@@ -123,8 +129,7 @@ public:
 		  fBufferGroup(NULL),
 		  fOutputEnabled(true),
 
-		  fSamplesSent(0),
-		  fBufferCycle(1)
+		  fSamplesSent(0)
 	{
 		CALLED();
 	}
@@ -184,7 +189,6 @@ public:
 	BBufferGroup*			fBufferGroup;
 	bool 					fOutputEnabled;
 	uint64 					fSamplesSent;
-	volatile uint32 		fBufferCycle;
 };
 
 
@@ -331,8 +335,8 @@ OpenSoundNode::NodeRegistered()
 	
 	PRINT(("NodeRegistered: %d engines\n", fDevice->CountEngines()));
 	for (int32 i = 0; i < fDevice->CountEngines(); i++) {
-		OpenSoundDeviceEngine *engine = fDevice->EngineAt(i);
-		if (!engine)
+		OpenSoundDeviceEngine* engine = fDevice->EngineAt(i);
+		if (engine == NULL)
 			continue;
 		// skip shadow engines
 		if (engine->Caps() & PCM_CAP_SHADOW)
@@ -344,46 +348,42 @@ OpenSoundNode::NodeRegistered()
 		PRINT(("NodeRegistered: engine[%d]: .caps=0x%08x, .oformats=0x%08x\n",
 			i, engine->Caps(), engine->Info()->oformats));
 
+		// iterate over all possible OSS formats/encodings and
+		// create a NodeInput for each
 		for (int32 f = 0; gSupportedFormats[f]; f++) {
+			// figure out if the engine supports the given format
 			int fmt = gSupportedFormats[f] & engine->Info()->oformats;
 			if (fmt == 0)
 				continue;
 			PRINT(("NodeRegistered() : creating an input for engine %i, "
 				"format[%i]\n", i, f));
 
-			media_format preferredFormat;
-			status_t err = engine->PreferredFormatFor(fmt, preferredFormat);
+			media_input mediaInput;
+			status_t err = engine->PreferredFormatFor(fmt, mediaInput.format);
 			if (err < B_OK)
 				continue;
 
-			media_input input;
-			
-			//input->format = fPreferredFormat;//XXX
-			input.format = preferredFormat;
-			input.destination.port = ControlPort();
-			input.destination.id = fInputs.CountItems();
-			input.node = Node();
+			mediaInput.destination.port = ControlPort();
+			mediaInput.destination.id = fInputs.CountItems();
+			mediaInput.node = Node();
 			char *prefix = "";
 			if (strstr(engine->Info()->name, "SPDIF"))
 				prefix = "S/PDIF ";
-			sprintf(input.name, "%s%s output %ld", prefix,
-				gSupportedFormatsNames[f], input.destination.id);
+			sprintf(mediaInput.name, "%sOutput %ld (%s)", prefix,
+				mediaInput.destination.id, gSupportedFormatsNames[f]);
 					
-			NodeInput* currentInput = new NodeInput(input, preferredFormat);
-			currentInput->fInput.format = currentInput->fPreferredFormat;
-			currentInput->fEngineIndex = i;
-			currentInput->fOSSFormatFlags = fmt;
-			currentInput->fNode = this;
-			fInputs.AddItem(currentInput);
-			
-			currentInput->fInput.format.u.raw_audio.format
-				= media_raw_audio_format::wildcard.format;
+			NodeInput* input = new (nothrow) NodeInput(mediaInput, i, fmt,
+				this);
+			if (input == NULL || !fInputs.AddItem(input)) {
+				delete input;
+				continue;
+			}
 		}
 	}
 	
 	for (int32 i = 0; i < fDevice->CountEngines(); i++) {
-		OpenSoundDeviceEngine *engine = fDevice->EngineAt(i);
-		if (!engine)
+		OpenSoundDeviceEngine* engine = fDevice->EngineAt(i);
+		if (engine == NULL)
 			continue;
 		// skip shadow engines
 		if (engine->Caps() & PCM_CAP_SHADOW)
@@ -407,52 +407,56 @@ OpenSoundNode::NodeRegistered()
 			if (err < B_OK)
 				continue;
 
-			media_output *output = new media_output;
+			media_output mediaOutput;
 
-			//output->format = fPreferredFormat; //XXX
-			output->format = preferredFormat;
-			output->destination = media_destination::null;
-			output->source.port = ControlPort();
-			output->source.id = fOutputs.CountItems();
-			output->node = Node();
+			mediaOutput.format = preferredFormat;
+			mediaOutput.destination = media_destination::null;
+			mediaOutput.source.port = ControlPort();
+			mediaOutput.source.id = fOutputs.CountItems();
+			mediaOutput.node = Node();
 			char *prefix = "";
 			if (strstr(engine->Info()->name, "SPDIF"))
 				prefix = "S/PDIF ";
-			sprintf(output->name, "%s%s input %ld", prefix,
-				gSupportedFormatsNames[f], output->source.id);
+			sprintf(mediaOutput.name, "%sInput %ld (%s)", prefix,
+				mediaOutput.source.id, gSupportedFormatsNames[f]);
 					
-			NodeOutput* currentOutput = new NodeOutput(*output,
+			NodeOutput* output = new (nothrow) NodeOutput(mediaOutput,
 				preferredFormat);
-//			currentOutput->fPreferredFormat.u.raw_audio.channel_count
+			if (output == NULL || !fOutputs.AddItem(output)) {
+				delete output;
+				continue;
+			}
+//			output->fPreferredFormat.u.raw_audio.channel_count
 //				= engine->Info()->max_channels;
-			currentOutput->fOutput.format = currentOutput->fPreferredFormat;
-			currentOutput->fEngineIndex = i;
-			currentOutput->fOSSFormatFlags = fmt;
-			currentOutput->fNode = this;
-			fOutputs.AddItem(currentOutput);
+			output->fOutput.format = output->fPreferredFormat;
+			output->fEngineIndex = i;
+			output->fOSSFormatFlags = fmt;
+			output->fNode = this;
 		}
 	}
 		
-	// Set up our parameter web
+	// set up our parameter web
 	fWeb = MakeParameterWeb();
 	SetParameterWeb(fWeb);
 	
-	/* apply configuration */
+	// apply configuration
 #ifdef PRINTING
 	bigtime_t start = system_time();
 #endif
-		
+
 	int32 index = 0;
 	int32 parameterID = 0;
-	const void *data;
-	ssize_t size;
-	while(fConfig.FindInt32("parameterID", index, &parameterID) == B_OK) {
-		if(fConfig.FindData("parameterData", B_RAW_TYPE, index, &data, &size) == B_OK)
+	while (fConfig.FindInt32("parameterID", index, &parameterID) == B_OK) {
+		const void* data;
+		ssize_t size;
+		if (fConfig.FindData("parameterData", B_RAW_TYPE, index, &data,
+			&size) == B_OK) {
 			SetParameterValue(parameterID, TimeSource()->Now(), data, size);
+		}
 		index++;
 	}
 	
-	PRINT(("apply configuration in : %ld\n", system_time() - start));
+	PRINT(("apply configuration in : %lldµs\n", system_time() - start));
 }
 
 
@@ -474,6 +478,10 @@ OpenSoundNode::SetTimeSource(BTimeSource* timeSource)
 // #pragma mark - BBufferConsumer
 
 
+//!	Someone, probably the producer, is asking you about this format.
+//	Give your honest opinion, possibly modifying *format. Do not ask
+//	upstream producer about the format, since he's synchronously
+//	waiting for your reply.
 status_t
 OpenSoundNode::AcceptFormat(const media_destination& dest,
 	media_format* format)
@@ -486,15 +494,17 @@ OpenSoundNode::AcceptFormat(const media_destination& dest,
 	NodeInput* channel = _FindInput(dest);
 	
 	if (channel == NULL) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION");
+		fprintf(stderr, "OpenSoundNode::AcceptFormat()"
+			" - B_MEDIA_BAD_DESTINATION");
 		return B_MEDIA_BAD_DESTINATION;
 			// we only have one input so that better be it
 	}
 	
-	if (format == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
+	if (format == NULL) {
+		fprintf(stderr, "OpenSoundNode::AcceptFormat() - B_BAD_VALUE\n");
+		return B_BAD_VALUE;
 	}
+
 /*	media_format * myFormat = GetFormat();
 	fprintf(stderr,"proposed format: ");
 	print_media_format(format);
@@ -512,7 +522,8 @@ OpenSoundNode::AcceptFormat(const media_destination& dest,
 	if (!engine)
 		return B_BUSY;
 	
-	status_t err = engine->AcceptFormatFor(channel->fOSSFormatFlags, *format, false);
+	status_t err = engine->AcceptFormatFor(channel->fOSSFormatFlags, *format,
+		false);
 	if (err < B_OK)
 		return err;
 	
@@ -529,179 +540,221 @@ OpenSoundNode::AcceptFormat(const media_destination& dest,
 	channel->fInput.format = *format;
 	
 	/*if(format->u.raw_audio.format == media_raw_audio_format::B_AUDIO_FLOAT
-		&& channel->fPreferredFormat.u.raw_audio.format == media_raw_audio_format::B_AUDIO_SHORT)
+		&& channel->fPreferredFormat.u.raw_audio.format
+			== media_raw_audio_format::B_AUDIO_SHORT)
 		format->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	else*/ 
 /*
 	format->u.raw_audio.format = channel->fPreferredFormat.u.raw_audio.format;
-	format->u.raw_audio.valid_bits = channel->fPreferredFormat.u.raw_audio.valid_bits;
+	format->u.raw_audio.valid_bits
+		= channel->fPreferredFormat.u.raw_audio.valid_bits;
 	
-	format->u.raw_audio.frame_rate    = channel->fPreferredFormat.u.raw_audio.frame_rate;
-	format->u.raw_audio.channel_count = channel->fPreferredFormat.u.raw_audio.channel_count;
-	format->u.raw_audio.byte_order    = B_MEDIA_HOST_ENDIAN;
+	format->u.raw_audio.frame_rate
+		= channel->fPreferredFormat.u.raw_audio.frame_rate;
+	format->u.raw_audio.channel_count
+		= channel->fPreferredFormat.u.raw_audio.channel_count;
+	format->u.raw_audio.byte_order
+		= B_MEDIA_HOST_ENDIAN;
 
-	format->u.raw_audio.buffer_size   = DEFAULT_BUFFER_SIZE 
-						* (format->u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-						* format->u.raw_audio.channel_count;
-*/	
+	format->u.raw_audio.buffer_size
+		= DEFAULT_BUFFER_SIZE
+			* (format->u.raw_audio.format
+				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* format->u.raw_audio.channel_count;
+*/
 	
-	/*media_format myFormat;
-	GetFormat(&myFormat);
-	if (!format_is_acceptible(*format,myFormat)) {
-		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
-		return B_MEDIA_BAD_FORMAT;
-	}*/
-	//AddRequirements(format);
+//	media_format myFormat;
+//	GetFormat(&myFormat);
+//	if (!format_is_acceptible(*format,myFormat)) {
+//		fprintf(stderr,"<- B_MEDIA_BAD_FORMAT\n");
+//		return B_MEDIA_BAD_FORMAT;
+//	}
+
 	return B_OK;	
 }
 
-status_t OpenSoundNode::GetNextInput(
-				int32 * cookie,
-				media_input * out_input)
+
+status_t
+OpenSoundNode::GetNextInput(int32* cookie, media_input* out_input)
 {
 	CALLED();
+
 	// let's not crash even if they are stupid
-	if (out_input == 0) {
+	if (out_input == NULL) {
 		// no place to write!
-		fprintf(stderr,"<- B_BAD_VALUE\n");
+		fprintf(stderr,"OpenSoundNode::GetNextInput() - B_BAD_VALUE\n");
 		return B_BAD_VALUE;
 	}
 		
-	if ((*cookie < fInputs.CountItems()) && (*cookie >= 0)) {
-		NodeInput *channel = (NodeInput *)fInputs.ItemAt(*cookie);
-		*out_input = channel->fInput;
-		*cookie += 1;
-		PRINT(("input.format : %u\n", channel->fInput.format.u.raw_audio.format));
-		return B_OK;
-	} else
+	if (*cookie >= fInputs.CountItems() || *cookie < 0)
 		return B_BAD_INDEX;
+		
+	NodeInput* channel = (NodeInput*)fInputs.ItemAt(*cookie);
+	*out_input = channel->fInput;
+	*cookie += 1;
+
+	PRINT(("input.format : %u\n", channel->fInput.format.u.raw_audio.format));
+
+	return B_OK;
 }
 
-void OpenSoundNode::DisposeInputCookie(
-				int32 cookie)
+
+void
+OpenSoundNode::DisposeInputCookie(int32 cookie)
 {
 	CALLED();
 	// nothing to do since our cookies are just integers
 }
 
-void OpenSoundNode::BufferReceived(
-				BBuffer * buffer)
+
+void
+OpenSoundNode::BufferReceived(BBuffer* buffer)
 {
-	/**/CALLED();
+	CALLED();
+
 	switch (buffer->Header()->type) {
-		/*case B_MEDIA_PARAMETERS:
-			{
-			status_t status = ApplyParameterData(buffer->Data(),buffer->SizeUsed());
-			if (status != B_OK) {
-				fprintf(stderr,"ApplyParameterData in OpenSoundNode::BufferReceived failed\n");
-			}			
-			buffer->Recycle();
-			}
-			break;*/
+//		case B_MEDIA_PARAMETERS:
+//		{
+//			status_t status = ApplyParameterData(buffer->Data(),
+//				buffer->SizeUsed());
+//			if (status != B_OK) {
+//				fprintf(stderr, "ApplyParameterData() in "
+//					"OpenSoundNode::BufferReceived() failed: %s\n",
+//					strerror(status));
+//			}			
+//			buffer->Recycle();
+//			break;
+//		}
 		case B_MEDIA_RAW_AUDIO:
 			if (buffer->Flags() & BBuffer::B_SMALL_BUFFER) {
-				fprintf(stderr,"NOT IMPLEMENTED: B_SMALL_BUFFER in OpenSoundNode::BufferReceived\n");
+				fprintf(stderr, "OpenSoundNode::BufferReceived() - "
+					"B_SMALL_BUFFER not implemented\n");
 				// XXX: implement this part
 				buffer->Recycle();			
 			} else {
-				media_timed_event event(buffer->Header()->start_time, BTimedEventQueue::B_HANDLE_BUFFER,
-										buffer, BTimedEventQueue::B_RECYCLE_BUFFER);
+				media_timed_event event(buffer->Header()->start_time,
+					BTimedEventQueue::B_HANDLE_BUFFER, buffer,
+					BTimedEventQueue::B_RECYCLE_BUFFER);
 				status_t status = EventQueue()->AddEvent(event);
 				if (status != B_OK) {
-					fprintf(stderr,"EventQueue()->AddEvent(event) in OpenSoundNode::BufferReceived failed\n");
+					fprintf(stderr, "OpenSoundNode::BufferReceived() - "
+						"EventQueue()->AddEvent() failed: %s\n",
+						strerror(status));
 					buffer->Recycle();
 				}
 			}
 			break;
 		default: 
-			fprintf(stderr,"unexpected buffer type in OpenSoundNode::BufferReceived\n");
+			fprintf(stderr, "OpenSoundNode::BufferReceived() - unexpected "
+				"buffer type\n");
 			buffer->Recycle();
 			break;
 	}
 }
 
-void OpenSoundNode::ProducerDataStatus(
-				const media_destination & for_whom,
-				int32 status,
-				bigtime_t at_performance_time)
+
+void
+OpenSoundNode::ProducerDataStatus(const media_destination& for_whom,
+	int32 status, bigtime_t at_performance_time)
 {
-	/**/CALLED();
+	CALLED();
 	
-	NodeInput *channel = _FindInput(for_whom);
+	NodeInput* channel = _FindInput(for_whom);
 	
-	if(channel==NULL) {
-		fprintf(stderr,"invalid destination received in OpenSoundNode::ProducerDataStatus\n");
+	if (channel == NULL) {
+		fprintf(stderr,"OpenSoundNode::ProducerDataStatus() - "
+			"invalid destination\n");
 		return;
 	}
 	
-	//PRINT(("************ ProducerDataStatus: queuing event ************\n"));
-	//PRINT(("************ status=%d ************\n", status));
+//	PRINT(("************ ProducerDataStatus: queuing event ************\n"));
+//	PRINT(("************ status=%d ************\n", status));
 	
-	media_timed_event event(at_performance_time, BTimedEventQueue::B_DATA_STATUS,
-			&channel->fInput, BTimedEventQueue::B_NO_CLEANUP, status, 0, NULL);
+	media_timed_event event(at_performance_time,
+		BTimedEventQueue::B_DATA_STATUS, &channel->fInput,
+		BTimedEventQueue::B_NO_CLEANUP, status, 0, NULL);
 	EventQueue()->AddEvent(event);	
 }
 
-status_t OpenSoundNode::GetLatencyFor(
-				const media_destination & for_whom,
-				bigtime_t * out_latency,
-				media_node_id * out_timesource)
+
+status_t
+OpenSoundNode::GetLatencyFor(const media_destination& for_whom,
+	bigtime_t* out_latency, media_node_id* out_timesource)
 {
 	CALLED();
-	if ((out_latency == 0) || (out_timesource == 0)) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
+
+	if (out_latency == NULL || out_timesource == NULL) {
+		fprintf(stderr,"OpenSoundNode::GetLatencyFor() - B_BAD_VALUE\n");
 		return B_BAD_VALUE;
 	}
 	
-	NodeInput *channel = _FindInput(for_whom);
+	NodeInput* channel = _FindInput(for_whom);
 	
-	if(channel==NULL || channel->fRealEngine==NULL) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+	if (channel == NULL || channel->fRealEngine == NULL) {
+		fprintf(stderr,"OpenSoundNode::GetLatencyFor() - "
+			"B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
-	*out_latency = EventLatency(); // mmu_man: that's the own node latency (1 buffer)
+
+	// start with the node latency (1 buffer duration)
+	*out_latency = EventLatency();
+
 	// add the OSS driver buffer's latency as well
 	*out_latency += channel->fRealEngine->PlaybackLatency();
-	PRINT(("############ OpenSoundNode::%s: EventLatency %Ld, OSS %Ld\n", __FUNCTION__, EventLatency(), channel->fRealEngine->PlaybackLatency()));
-	//*out_latency += MIN_SNOOZING;
+
+	PRINT(("OpenSoundNode::GetLatencyFor() - EventLatency %lld, OSS %lld\n",
+		EventLatency(), channel->fRealEngine->PlaybackLatency()));
+
 	*out_timesource = TimeSource()->ID();
+
 	return B_OK;
 }
 
-status_t OpenSoundNode::Connected(
-				const media_source & producer,	/* here's a good place to request buffer group usage */
-				const media_destination & where,
-				const media_format & with_format,
-				media_input * out_input)
+
+status_t
+OpenSoundNode::Connected(const media_source& producer,
+	const media_destination& where, const media_format& with_format,
+	media_input* out_input)
 {
 	CALLED();
-	if (out_input == 0) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // no crashing
+
+	if (out_input == NULL) {
+		fprintf(stderr,"OpenSoundNode::Connected() - B_BAD_VALUE\n");
+		return B_BAD_VALUE;
 	}
-	
+
 	NodeInput *channel = _FindInput(where);
-	
-	if(channel==NULL) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+
+	if (channel == NULL) {
+		fprintf(stderr,"OpenSoundNode::Connected() - "
+			"B_MEDIA_BAD_DESTINATION\n");
 		return B_MEDIA_BAD_DESTINATION;
 	}
-	
+
 	BAutolock L(fDevice->Locker());
-	
+
 	// use one buffer length latency
-	fInternalLatency = with_format.u.raw_audio.buffer_size * 10000 / 2
-			/ ( (with_format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-				* with_format.u.raw_audio.channel_count) 
-			/ ((int32)(with_format.u.raw_audio.frame_rate / 100));
+	size_t bufferSize = with_format.u.raw_audio.buffer_size;
+	int32 channelCount = with_format.u.raw_audio.channel_count;
+	size_t sampleSize = with_format.u.raw_audio.format
+			& media_raw_audio_format::B_AUDIO_SIZE_MASK;
+	size_t frameSize = sampleSize * channelCount;
+	float frameRate = with_format.u.raw_audio.frame_rate;
+
+	fInternalLatency = bufferSize * 10000 / 2
+		/ frameSize / (int32)(frameRate / 100);
 			
-	PRINT(("  internal latency = %lld\n",fInternalLatency));
-	//fInternalLatency = 0;
+	PRINT(("  internal latency = %lld\n", fInternalLatency));
+
+	// TODO: A global node value is assigned a channel specific value!
+	// That can't be correct. For as long as there is only one output
+	// in use at a time, this will not matter of course.
 	SetEventLatency(fInternalLatency);
 
 	// record the agreed upon values
 	channel->fInput.source = producer;
 	channel->fInput.format = with_format;
+
 	*out_input = channel->fInput;
 	
 	// we are sure the thread is started
@@ -2479,7 +2532,7 @@ int32
 OpenSoundNode::_PlayThreadEntry(void* data)
 {
 	CALLED();
-	NodeInput *channel = static_cast<NodeInput*>(data);
+	NodeInput* channel = static_cast<NodeInput*>(data);
 	return channel->fNode->_PlayThread(channel);
 }
 
@@ -2488,7 +2541,7 @@ int32
 OpenSoundNode::_RecThreadEntry(void* data)
 {
 	CALLED();
-	NodeOutput *channel = static_cast<NodeOutput *>(data);
+	NodeOutput* channel = static_cast<NodeOutput*>(data);
 	return channel->fNode->_RecThread(channel);
 }
 
