@@ -114,7 +114,7 @@ ACMDevice::SetControlLineState(uint16 state)
 
 
 void
-ACMDevice::OnWrite(const char *buffer, size_t *numBytes)
+ACMDevice::OnWrite(const char *buffer, size_t *numBytes, size_t *packetBytes)
 {
 	memcpy(WriteBuffer(), buffer, *numBytes);
 }

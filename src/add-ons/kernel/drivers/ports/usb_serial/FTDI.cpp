@@ -212,16 +212,16 @@ FTDIDevice::OnRead(char **buffer, size_t *numBytes)
 
 
 void
-FTDIDevice::OnWrite(const char *buffer, size_t *numBytes)
+FTDIDevice::OnWrite(const char *buffer, size_t *numBytes, size_t *packetBytes)
 {
 	char *writeBuffer = WriteBuffer();
 	if (fHeaderLength > 0) {
 		if (*numBytes >= WriteBufferSize() - fHeaderLength)
-			*numBytes = WriteBufferSize() - fHeaderLength;
+			*numBytes = *packetBytes = WriteBufferSize() - fHeaderLength;
 
 		*writeBuffer = FTDI_OUT_TAG(*numBytes, FTDI_PIT_DEFAULT);
 	}
 
-	memcpy(writeBuffer + fHeaderLength, buffer, *numBytes);
-	*numBytes += fHeaderLength;
+	memcpy(writeBuffer + fHeaderLength, buffer, *packetBytes);
+	*packetBytes += fHeaderLength;
 }

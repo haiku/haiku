@@ -11,8 +11,13 @@
 #include <OS.h>
 #include <KernelExport.h>
 #include <Drivers.h>
+#include <string.h>
 
+#ifdef __HAIKU__
+#include <lock.h>
+#else
 #include "BeOSCompatibility.h"
+#endif
 #include "kernel_cpp.h"
 #include "Tracing.h"
 #include "USB3.h"

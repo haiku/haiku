@@ -9,10 +9,6 @@
 #include "Driver.h"
 #include "USB3.h"
 
-extern "C" {
-#include <ttylayer.h>
-}
-
 #include <stdio.h> //sprintf
 #include <unistd.h> //posix file i/o - create, write, close
 #include <Drivers.h>
@@ -121,14 +117,15 @@ trace_termios(struct termios *tios)
 		"\tc_cflag:  0x%08x\n"
 		"\tc_lflag:  0x%08x\n"
 		"\tc_line:   0x%08x\n"
-		"\tc_ixxxxx: 0x%08x\n"
-		"\tc_oxxxxx: 0x%08x\n"
+//		"\tc_ixxxxx: 0x%08x\n"
+//		"\tc_oxxxxx: 0x%08x\n"
 		"\tc_cc[0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x, 0x%02x]\n",
-		tios->c_iflag, tios->c_oflag, tios->c_cflag, tios->c_lflag,
-		tios->c_line, tios->c_ixxxxx, tios->c_oxxxxx, tios->c_cc[0],
-		tios->c_cc[1], tios->c_cc[2], tios->c_cc[3], tios->c_cc[4],
-		tios->c_cc[5], tios->c_cc[6], tios->c_cc[7], tios->c_cc[8],
-		tios->c_cc[9], tios->c_cc[10]);
+		tios->c_iflag, tios->c_oflag, tios->c_cflag, tios->c_lflag, 
+		tios->c_line, 
+//		tios->c_ixxxxx, tios->c_oxxxxx, 
+		tios->c_cc[0], tios->c_cc[1], tios->c_cc[2], tios->c_cc[3], 
+		tios->c_cc[4], tios->c_cc[5], tios->c_cc[6], tios->c_cc[7], 
+		tios->c_cc[8], tios->c_cc[9], tios->c_cc[10]);
 }
 
 

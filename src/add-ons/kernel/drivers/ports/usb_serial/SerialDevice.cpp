@@ -26,11 +26,11 @@ SerialDevice::SerialDevice(usb_device device, uint16 vendorID,
 		fWritePipe(0),
 		fBufferArea(-1),
 		fReadBuffer(NULL),
-		fReadBufferSize(0),
+		fReadBufferSize(ROUNDUP(DEF_BUFFER_SIZE, 16)),
 		fWriteBuffer(NULL),
-		fWriteBufferSize(0),
+		fWriteBufferSize(ROUNDUP(DEF_BUFFER_SIZE, 16)),
 		fInterruptBuffer(NULL),
-		fInterruptBufferSize(0),
+		fInterruptBufferSize(16),
 		fDoneRead(-1),
 		fDoneWrite(-1),
 		fControlOut(0),
@@ -67,9 +67,6 @@ SerialDevice::Init()
 	fDoneWrite = create_sem(0, "usb_serial:done_write");
 	mutex_init(&fReadLock, "usb_serial:read_lock");
 	mutex_init(&fWriteLock, "usb_serial:write_lock");
-
-	fReadBufferSize = fWriteBufferSize = ROUNDUP(DEF_BUFFER_SIZE, 16);
-	fInterruptBufferSize = 16;
 
 	size_t totalBuffers = fReadBufferSize + fWriteBufferSize + fInterruptBufferSize;
 	fBufferArea = create_area("usb_serial:buffers_area", (void **)&fReadBuffer,
@@ -342,10 +339,11 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 
 	while (bytesLeft > 0) {
 		size_t length = MIN(bytesLeft, fWriteBufferSize);
-		OnWrite(buffer, &length);
+		size_t packetLength = length;
+		OnWrite(buffer, &length, &packetLength);
 
 		status = gUSBModule->queue_bulk(fWritePipe, fWriteBuffer,
-			length, WriteCallbackFunction, this);
+			packetLength, WriteCallbackFunction, this);
 		if (status < B_OK) {
 			TRACE_ALWAYS("write: queueing failed with status 0x%08x\n", status);
 			break;
@@ -369,9 +367,9 @@ SerialDevice::Write(const char *buffer, size_t *numBytes)
 			continue;
 		}
 
-		buffer += fActualLengthWrite;
-		*numBytes += fActualLengthWrite;
-		bytesLeft -= fActualLengthWrite;
+		buffer += length;
+		*numBytes += length;
+		bytesLeft -= length;
 	}
 
 	mutex_unlock(&fWriteLock);
@@ -528,7 +526,7 @@ SerialDevice::OnRead(char **buffer, size_t *numBytes)
 
 
 void
-SerialDevice::OnWrite(const char *buffer, size_t *numBytes)
+SerialDevice::OnWrite(const char *buffer, size_t *numBytes, size_t *packetBytes)
 {
 	// default implementation - does nothing
 }

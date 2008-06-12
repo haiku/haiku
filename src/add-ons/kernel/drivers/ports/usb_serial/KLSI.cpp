@@ -29,15 +29,18 @@ KLSIDevice::AddDevice(const usb_configuration_info *config)
 			if (endpoint->descr->attributes == USB_EP_ATTR_INTERRUPT) {
 				if (endpoint->descr->endpoint_address & USB_EP_ADDR_DIR_IN) {
 					SetControlPipe(endpoint->handle);
+					SetInterruptBufferSize(endpoint->descr->max_packet_size);
 					if (++pipesSet >= 3)
 						break;
 				}
 			} else if (endpoint->descr->attributes == USB_EP_ATTR_BULK) {
 				if (endpoint->descr->endpoint_address & USB_EP_ADDR_DIR_IN) {
+					SetReadBufferSize(ROUNDUP(endpoint->descr->max_packet_size, 16));
 					SetReadPipe(endpoint->handle);
 					if (++pipesSet >= 3)
 						break;
 				} else {
+					SetWriteBufferSize(ROUNDUP(endpoint->descr->max_packet_size, 16));
 					SetWritePipe(endpoint->handle);
 					if (++pipesSet >= 3)
 						break;
@@ -60,10 +63,25 @@ KLSIDevice::ResetDevice()
 	TRACE_FUNCALLS("> KLSIDevice::ResetDevice(%08x)\n", this);
 
 	size_t length = 0;
-	status_t status = gUSBModule->send_request(Device(),
-		USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT,
+	status_t status;
+	usb_serial_line_coding linecoding = { 9600, 1, 0, 8 };
+	uint8 linestate[2];
+
+	status = SetLineCoding(&linecoding);
+	status = gUSBModule->send_request(Device(),
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		KLSI_CONF_REQUEST,
 		KLSI_CONF_REQUEST_READ_ON, 0, 0, NULL, &length);
+	TRACE("= KLSIDevice::ResetDevice(): set conf read_on returns: 0x%08x\n", 
+		status);
+
+	linestate[0] = 0xff;
+	linestate[1] = 0xff;
+	length = 0;
+	status = gUSBModule->send_request(Device(),
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_IN,
+		KLSI_POLL_REQUEST, 
+		0, 0, 2, linestate, &length);
 
 	TRACE_FUNCRET("< KLSIDevice::ResetDevice() returns: 0x%08x\n", status);
 	return status;
@@ -106,7 +124,7 @@ KLSIDevice::SetLineCoding(usb_serial_line_coding *lineCoding)
 
 	size_t length = 0;
 	status_t status = gUSBModule->send_request(Device(),
-		USB_REQTYPE_VENDOR | USB_REQTYPE_INTERFACE_OUT,
+		USB_REQTYPE_VENDOR | USB_REQTYPE_DEVICE_OUT,
 		KLSI_SET_REQUEST, 0, 0,
 		sizeof(codingPacket), codingPacket, &length);
 
@@ -133,15 +151,15 @@ KLSIDevice::OnRead(char **buffer, size_t *numBytes)
 
 
 void
-KLSIDevice::OnWrite(const char *buffer, size_t *numBytes)
+KLSIDevice::OnWrite(const char *buffer, size_t *numBytes, size_t *packetBytes)
 {
 	if (*numBytes >= WriteBufferSize() - 2)
-		*numBytes = WriteBufferSize() - 2;
+		*numBytes = *packetBytes = WriteBufferSize() - 2;
 
 	char *writeBuffer = WriteBuffer();
 	*((uint16 *)writeBuffer) = B_HOST_TO_LENDIAN_INT16(*numBytes);
-	memcpy(writeBuffer + 2, buffer, *numBytes);
-	*numBytes += 2;
+	memcpy(writeBuffer + 2, buffer, *packetBytes);
+	*packetBytes += 2;
 }
 
 

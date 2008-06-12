@@ -68,9 +68,14 @@ virtual	status_t				SetLineCoding(usb_serial_line_coding *coding);
 virtual	status_t				SetControlLineState(uint16 state);
 
 virtual	void					OnRead(char **buffer, size_t *numBytes);
-virtual	void					OnWrite(const char *buffer, size_t *numBytes);
+virtual	void					OnWrite(const char *buffer, size_t *numBytes, 
+									size_t *packetBytes);
 virtual	void					OnClose();
 
+protected:
+		void					SetReadBufferSize(size_t size) { fReadBufferSize = size; };
+		void					SetWriteBufferSize(size_t size) { fWriteBufferSize = size; };
+		void					SetInterruptBufferSize(size_t size) { fInterruptBufferSize = size; };
 private:
 static	int32					DeviceThread(void *data);
 

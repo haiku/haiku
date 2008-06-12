@@ -2,6 +2,11 @@ SubDir HAIKU_TOP src add-ons kernel drivers ports usb_serial ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+if $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
+	UsePrivateKernelHeaders ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers os drivers tty ] : true ;
+}
+
 SubDirC++Flags -fno-rtti ;
 
 KernelAddon usb_serial :
