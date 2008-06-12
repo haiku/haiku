@@ -175,7 +175,9 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
     bt_usb_dev* bdev = cookie;    
     status_t    err;
     
-    /* TODO: check are we running? */
+    /* TODO: or not running anymore */
+	if (status == B_CANCELED)
+		return;
 
     if (status != B_OK || actual_len == 0)
         goto resubmit;
@@ -214,7 +216,9 @@ acl_rx_complete(void* cookie, status_t status, void* data, size_t actual_len)
     bt_usb_dev* bdev = cookie;    
     status_t    err;
     
-    /* TODO: check are we running? */
+    /* TODO: or not running anymore? */
+	if (status == B_CANCELED)
+		return;
 
     if (status != B_OK || actual_len == 0)
         goto resubmit;
@@ -390,6 +394,10 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 	uint16  value = 0;
 	uint16  wLength = B_HOST_TO_LENDIAN_INT16(snb_size(snbuf));
 
+	if (!GET_BIT(bdev->state, RUNNING) ) {
+		return B_DEV_NOT_READY;
+	}
+
     /* set cookie */
     snb_set_cookie(snbuf, bdev);
     
@@ -415,6 +423,11 @@ submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
         
     /* set cookie */
     SET_DEVICE(nbuf,bdev->hdev);
+
+	if (!GET_BIT(bdev->state, RUNNING) ) {
+		return B_DEV_NOT_READY;
+	}
+
     
     err = usb->queue_bulk(bdev->bulk_out_ep->handle, 
                           nb_get_whole_buffer(nbuf), nbuf->size,    
@@ -434,6 +447,10 @@ submit_tx_acl(bt_usb_dev* bdev, net_buffer* nbuf)
 status_t
 submit_tx_sco(bt_usb_dev* bdev)
 {
+
+	if (!GET_BIT(bdev->state, RUNNING) ) {
+		return B_DEV_NOT_READY;
+	}
 
     /* not yet implemented */ 
     return B_ERROR;
