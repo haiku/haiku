@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2008, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -22,6 +22,7 @@
 //	File Name:		List.cpp
 //	Author(s):		The Storage kit Team
 //					Isaac Yonemoto
+//					Rene Gollent
 //	Description:	BList class provides storage for pointers.
 //					Not thread safe.
 //------------------------------------------------------------------------------
@@ -34,7 +35,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <syslog.h>
 
 // helper function
 static inline
@@ -51,11 +52,12 @@ BList::BList(int32 count)
 	  :		 fObjectList(NULL),
 			 fPhysicalSize(0),
 			 fItemCount(0),
-			 fBlockSize(count)
+			 fBlockSize(count),
+			 fResizeThreshold(0)
 {
 	if (fBlockSize <= 0)
 		fBlockSize = 1;
-	Resize(fItemCount);
+	_ResizeArray(fItemCount);
 }
 
 
@@ -82,7 +84,8 @@ BList&
 BList::operator =(const BList &list)
 {
 	fBlockSize = list.fBlockSize;
-	Resize(list.fItemCount);
+	_ResizeArray(list.fItemCount);
+	fItemCount = list.fItemCount;
 	memcpy(fObjectList, list.fObjectList, fItemCount * sizeof(void*));
 	return *this;
 }
@@ -92,9 +95,15 @@ BList::operator =(const BList &list)
 bool
 BList::AddItem(void *item, int32 index)
 {
-	bool result = (index >= 0 && index <= fItemCount
-				   && Resize(fItemCount + 1));
+	if (index < 0 || index > fItemCount)
+		return false;
+
+	bool result = true;
+
+	if (fItemCount + 1 > fPhysicalSize)
+		result = _ResizeArray(fItemCount + 1);
 	if (result) {
+		++fItemCount;
 		move_items(fObjectList + index, 1, fItemCount - index - 1);
 		fObjectList[index] = item;
 	}
@@ -107,12 +116,14 @@ bool
 BList::AddItem(void *item)
 {
 	bool result = true;
-	if ((int32)fPhysicalSize > fItemCount) {
+	if (fPhysicalSize > fItemCount) {
 		fObjectList[fItemCount] = item;
-		fItemCount++;
+		++fItemCount;
 	} else {
-		if ((result = Resize(fItemCount + 1)))
-			fObjectList[fItemCount - 1] = item;
+		if ((result = _ResizeArray(fItemCount + 1))) {
+			fObjectList[fItemCount] = item;
+			++fItemCount;
+		}
 	}
 	return result;
 }
@@ -120,13 +131,15 @@ BList::AddItem(void *item)
 
 // AddList
 bool
-BList::AddList(BList *list, int32 index)
+BList::AddList(const BList *list, int32 index)
 {
 	bool result = (list && index >= 0 && index <= fItemCount);
 	if (result && list->fItemCount > 0) {
 		int32 count = list->fItemCount;
-		result = Resize(fItemCount + count);
+		if (fItemCount + count > fPhysicalSize)
+			result = _ResizeArray(fItemCount + count);
 		if (result) {
+			fItemCount += count;
 			move_items(fObjectList + index, count, fItemCount - index - count);
 			memcpy(fObjectList + index, list->fObjectList,
 				   list->fItemCount * sizeof(void *));
@@ -138,14 +151,16 @@ BList::AddList(BList *list, int32 index)
 
 // AddList
 bool
-BList::AddList(BList *list)
+BList::AddList(const BList *list)
 {
 	bool result = (list != NULL);
 	if (result && list->fItemCount > 0) {
 		int32 index = fItemCount;
 		int32 count = list->fItemCount;
-		result = Resize(fItemCount + count);
+		if (fItemCount + count > fPhysicalSize)
+			result = _ResizeArray(fItemCount + count);
 		if (result) {
+			fItemCount += count;
 			memcpy(fObjectList + index, list->fObjectList,
 				   list->fItemCount * sizeof(void *));
 		}
@@ -174,7 +189,9 @@ BList::RemoveItem(int32 index)
 	if (index >= 0 && index < fItemCount) {
 		item = fObjectList[index];
 		move_items(fObjectList + index + 1, -1, fItemCount - index - 1);
-		Resize(fItemCount - 1);
+		--fItemCount;
+		if (fItemCount <= fResizeThreshold)
+			_ResizeArray(fItemCount);
 	}
 	return item;
 }
@@ -191,7 +208,9 @@ BList::RemoveItems(int32 index, int32 count)
 		if (count > 0) {
 			move_items(fObjectList + index + count, -count,
 					   fItemCount - index - count);
-			Resize(fItemCount - count);
+			fItemCount -= count;
+			if (fItemCount <= fResizeThreshold)
+				_ResizeArray(fItemCount);
 		} else
 			result = false;
 	}
@@ -217,7 +236,8 @@ BList::ReplaceItem(int32 index, void *newItem)
 void
 BList::MakeEmpty()
 {
-	Resize(0);
+	fItemCount = 0;
+	_ResizeArray(0);
 }
 
 
@@ -401,37 +421,45 @@ BList::DoForEach(bool (*func)(void *, void*), void * arg)
 	}
 }
 
-
 // FBC
 void BList::_ReservedList1() {}
 void BList::_ReservedList2() {}
-
 
 // Resize
 //
 // Resizes fObjectList to be large enough to contain count items.
 // fItemCount is adjusted accordingly.
 bool
-BList::Resize(int32 count)
+BList::_ResizeArray(int32 count)
 {
 	bool result = true;
 	// calculate the new physical size
-	int32 newSize = count;
-	if (newSize <= 0)
-		newSize = 1;
-	newSize = ((newSize - 1) / fBlockSize + 1) * fBlockSize;
+	// by doubling the existing size
+	// until we can hold at least count items
+	int32 newSize = fPhysicalSize > 0 ? fPhysicalSize : fBlockSize;
+	int32 targetSize = count;
+	if (targetSize <= 0)
+		targetSize = fBlockSize;
+	if (targetSize > fPhysicalSize) {
+		while (newSize < targetSize)
+			newSize <<= 1;
+	} else if (targetSize <= fResizeThreshold) {
+		newSize = fResizeThreshold;
+	}
 	// resize if necessary
-	if ((size_t)newSize != fPhysicalSize) {
+	if (newSize != fPhysicalSize) {
 		void** newObjectList
 			= (void**)realloc(fObjectList, newSize * sizeof(void*));
 		if (newObjectList) {
 			fObjectList = newObjectList;
 			fPhysicalSize = newSize;
+			// set our lower bound to either 1/4 
+			//of the current physical size, or 0
+			fResizeThreshold = fPhysicalSize >> 2 >= fBlockSize 
+				? fPhysicalSize >> 2 : 0;
 		} else
 			result = false;
 	}
-	if (result)
-		fItemCount = count;
 	return result;
 }
 

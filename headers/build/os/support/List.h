@@ -43,8 +43,8 @@ public:
 /* Adding and removing items. */
 	bool AddItem(void *item, int32 index);
 	bool AddItem(void *item);
-	bool AddList(BList *list, int32 index);
-	bool AddList(BList *list);
+	bool AddList(const BList *list, int32 index);
+	bool AddList(const BList *list);
 	bool RemoveItem(void *item);
 	void *RemoveItem(int32 index);
 	bool RemoveItems(int32 index, int32 count);
@@ -85,14 +85,14 @@ private:
 	virtual void _ReservedList2();
 
 	// return type differs from BeOS version
-	bool Resize(int32 count);
-
+	bool _ResizeArray(int32 count);
 private:
 	void**	fObjectList;
-	size_t	fPhysicalSize;
+	int32	fPhysicalSize;
 	int32	fItemCount;
 	int32	fBlockSize;
-	uint32	_reserved[2];
+	int32	fResizeThreshold;
+	uint32	_reserved[1];
 };
 
 #endif // _BE_LIST_H 

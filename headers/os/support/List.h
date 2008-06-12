@@ -56,14 +56,14 @@ class BList {
 		virtual void _ReservedList1();
 		virtual void _ReservedList2();
 
-		bool Resize(int32 count);
-
+		bool _ResizeArray(int32 count);
 	private:
 		void**	fObjectList;
-		size_t	fPhysicalSize;
+		int32	fPhysicalSize;
 		int32	fItemCount;
 		int32	fBlockSize;
-		uint32	_reserved[2];
+		int32	fResizeThreshold;
+		uint32	_reserved[1];
 };
 
 #endif // _BE_LIST_H 
