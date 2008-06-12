@@ -419,69 +419,13 @@ l2cap_info_rsp(uint8 _ident, uint16 _type, uint16 _result, uint16 _mtu)
 #pragma mark -
 #endif
 
-/* Build configuration options 
+
+/* Build configuration options  */
 static inline net_buffer*
-l2cap_build_cfg_options(_m, * _mtu, * _flush_timo, _flow)
+l2cap_build_cfg_options(uint16* _mtu, uint16* _flush_timo, l2cap_flow_t* _flow)
 {
-	u_int8_t	*p = NULL;
+	//TODO:
 
-	MGETHDR((_m), M_DONTWAIT, MT_DATA);
-	if ((_m) == NULL)
-		break;
-
-	(_m)->m_pkthdr.len = (_m)->m_len = 0;
-	p = mtod((_m), u_int8_t *);
-
-	if ((_mtu) != NULL) {
-		struct _cfg_opt_mtu {
-			l2cap_cfg_opt_t	 hdr;
-			u_int16_t		 val;
-		} __attribute__ ((packed))	*o = NULL;
-
-		o = (struct _cfg_opt_mtu *) p;
-		o->hdr.type = L2CAP_OPT_MTU;
-		o->hdr.length = sizeof(o->val);
-		o->val = htole16(*(u_int16_t *)(_mtu));
-
-		(_m)->m_pkthdr.len += sizeof(*o);
-		p += sizeof(*o);
-	}
-
-	if ((_flush_timo) != NULL) {
-		struct _cfg_opt_flush {
-			l2cap_cfg_opt_t	 hdr;
-			u_int16_t		 val;
-		} __attribute__ ((packed))	*o = NULL;
-
-		o = (struct _cfg_opt_flush *) p;
-		o->hdr.type = L2CAP_OPT_FLUSH_TIMO;
-		o->hdr.length = sizeof(o->val);
-		o->val = htole16(*(u_int16_t *)(_flush_timo));
-
-		(_m)->m_pkthdr.len += sizeof(*o);
-		p += sizeof(*o);
-	}
-
-	if ((_flow) != NULL) {
-		struct _cfg_opt_flow {
-			l2cap_cfg_opt_t	 hdr;
-			l2cap_flow_t		 val;
-		} __attribute__ ((packed))	*o = NULL;
-
-		o = (struct _cfg_opt_flow *) p;
-		o->hdr.type = L2CAP_OPT_QOS;
-		o->hdr.length = sizeof(o->val);
-		o->val.flags = ((l2cap_flow_p)(_flow))->flags;
-		o->val.service_type = ((l2cap_flow_p) (_flow))->service_type;
-		o->val.token_rate = htole32(((l2cap_flow_p)(_flow))->token_rate);
-		o->val.token_bucket_size = htole32(((l2cap_flow_p)	(_flow))->token_bucket_size);
-		o->val.peak_bandwidth = htole32(((l2cap_flow_p)	(_flow))->peak_bandwidth);
-		o->val.latency = htole32(((l2cap_flow_p) (_flow))->latency);
-		o->val.delay_variation = htole32(((l2cap_flow_p) (_flow))->delay_variation);
-
-		(_m)->m_pkthdr.len += sizeof(*o);			
-	}							
-						  
-	(_m)->m_len = (_m)->m_pkthdr.len;	
+	return NULL;
 }
-*/
+

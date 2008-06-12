@@ -178,7 +178,7 @@ typedef struct {
 #define L2CAP_CMD_REJ	0x01
 typedef struct {
 	uint16	reason; /* reason to reject command */
-/*	u_int8_t	data[]; -- optional data (depends on reason) */
+/*	uint8	data[]; -- optional data (depends on reason) */
 } __attribute__ ((packed)) l2cap_cmd_rej_cp;
 
 /* CommandReject data */
@@ -216,7 +216,7 @@ typedef struct {
 typedef struct {
 	uint16	dcid;  /* destination channel ID */
 	uint16	flags; /* flags */
-/*	u_int8_t	options[] --  options */
+/*	uint8	options[] --  options */
 } __attribute__ ((packed)) l2cap_cfg_req_cp;
 
 /* L2CAP Configuration Response */
@@ -225,14 +225,14 @@ typedef struct {
 	uint16	scid;   /* source channel ID */
 	uint16	flags;  /* flags */
 	uint16	result; /* 0x00 - success */
-/*	u_int8_t	options[] -- options */
+/*	uint8	options[] -- options */
 } __attribute__ ((packed)) l2cap_cfg_rsp_cp;
 
 /* L2CAP configuration option */
 typedef struct {
-	u_int8_t	type;
-	u_int8_t	length;
-/*	u_int8_t	value[] -- option value (depends on type) */
+	uint8	type;
+	uint8	length;
+/*	uint8	value[] -- option value (depends on type) */
 } __attribute__ ((packed)) l2cap_cfg_opt_t;
 typedef l2cap_cfg_opt_t * l2cap_cfg_opt_p;
 
@@ -276,7 +276,7 @@ typedef struct {
 typedef struct {
 	uint16	type;   /* requested information type */
 	uint16	result; /* 0x00 - success */
-/*	u_int8_t	info[]  -- info data (depends on type)
+/*	uint8	info[]  -- info data (depends on type)
  *
  * L2CAP_CONNLESS_MTU - 2 bytes connectionless MTU
  */
