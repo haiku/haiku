@@ -1090,7 +1090,7 @@ BPoseView::AddPoses(Model *model)
 			AddRootPoses(true, settings.MountSharedVolumesOntoDesktop());
 			return;
 		} else if (IsDesktopView()
-			&& (settings.MountVolumesOntoDesktop()
+			&& (settings.MountVolumesOntoDesktop() || settings.ShowDisksIcon()
 				|| (IsFilePanel() && settings.DesktopFilePanelRoot())))
 			AddRootPoses(true, settings.MountSharedVolumesOntoDesktop());
 	}
