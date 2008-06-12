@@ -144,13 +144,60 @@ void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize)
     struct hci_cp_inquiry* param;
     void* command = buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY, (void**) &param, sizeof(struct hci_cp_inquiry), outsize);
 
-    if (command != NULL) {    
-	    
-	    param->lap[2] = (lap >> 16) & 0xFF;
-   		param->lap[1] = (lap >>  8) & 0xFF;
+    if (command != NULL) {
+
+	param->lap[2] = (lap >> 16) & 0xFF;
+	param->lap[1] = (lap >>  8) & 0xFF;
     	param->lap[0] = (lap >>  0) & 0xFF;
     	param->length = length;
     	param->num_rsp = num_rsp;
+    }
+
+    return command;
+}
+
+void* buildInquiryCancel(size_t* outsize)
+{
+
+    return buildCommand(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL, NULL, 0, outsize);
+
+}
+
+
+void* buildPinCodeRequestReply(bdaddr_t bdaddr, uint8 length, char pincode[16], size_t* outsize)
+{
+
+    struct hci_cp_pin_code_reply* param;
+
+    if (length > HCI_PIN_SIZE)  // PinCode cannot be longer than 16
+	return NULL;
+
+    void* command = buildCommand(OGF_LINK_CONTROL, OCF_PIN_CODE_REPLY, (void**) &param, sizeof(struct hci_cp_pin_code_reply), outsize);
+
+    if (command != NULL) {
+
+	param->bdaddr = bdaddr;
+	param->pin_len = length;
+    	memcpy(&param->pin_code, pincode, length);
+
+    }
+
+    return command;
+}
+
+
+void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, uint8 length, char pincode[16], size_t* outsize)
+{
+
+    struct hci_cp_pin_code_neg_reply* param;
+
+    void* command = buildCommand(OGF_LINK_CONTROL, OCF_PIN_CODE_NEG_REPLY, 
+                                 (void**) &param, sizeof(struct hci_cp_pin_code_neg_reply), outsize);
+
+    if (command != NULL) {
+
+	param->bdaddr = bdaddr;
+
     }
 
     return command;
