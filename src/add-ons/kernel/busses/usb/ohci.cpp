@@ -223,11 +223,6 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 		snooze(USB_DELAY_BUS_RESET);
 	}
 
-	// Disable all interrupts and clear any current interrupt status
-	_WriteReg(OHCI_INTERRUPT_DISABLE, OHCI_ALL_INTERRUPTS
-		| OHCI_MASTER_INTERRUPT_ENABLE);
-	_WriteReg(OHCI_INTERRUPT_STATUS, OHCI_ALL_INTERRUPTS);
-
 	// This reset should not be necessary according to the OHCI spec, but
 	// without it some controllers do not start.
 	_WriteReg(OHCI_CONTROL, OHCI_HC_FUNCTIONAL_STATE_RESET);
