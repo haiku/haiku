@@ -173,6 +173,7 @@ const char *kEmptyMenuLabel = "<empty>";
 
 struct BMenu::LayoutData {
 	BSize	preferred;
+	uint32	lastResizingMode;
 };
 
 
@@ -1853,7 +1854,7 @@ BMenu::_LayoutItems(int32 index)
 BSize
 BMenu::_ValidatePreferredSize()
 {
-	if (!fLayoutData->preferred.IsWidthSet())
+	if (!fLayoutData->preferred.IsWidthSet() || ResizingMode() != fLayoutData->lastResizingMode)		
 		_ComputeLayout(0, true, false, NULL, NULL);
 
 	return fLayoutData->preferred;
@@ -1867,6 +1868,8 @@ BMenu::_ComputeLayout(int32 index, bool bestFit, bool moveItems,
 	// TODO: Take "bestFit", "moveItems", "index" into account,
 	// Recalculate only the needed items,
 	// not the whole layout every time
+	
+	fLayoutData->lastResizingMode = ResizingMode();
 
 	BRect frame;
 
