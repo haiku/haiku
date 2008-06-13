@@ -12,6 +12,7 @@ Server app_server :
 	Angle.cpp
 	AppServer.cpp
 	#BitfieldRegion.cpp
+	BitmapDrawingEngine.cpp
 	BitmapManager.cpp
 	ClientMemoryAllocator.cpp
 	CursorData.cpp
