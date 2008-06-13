@@ -12,22 +12,25 @@
 
 #include "DefaultDecorator.h"
 
+#include "BitmapDrawingEngine.h"
 #include "DesktopSettings.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
 #include "FontManager.h"
 #include "PatternHandler.h"
+#include "ServerBitmap.h"
 
 #include <WindowPrivate.h>
 
+#include <Autolock.h>
 #include <Rect.h>
 #include <View.h>
 
+#include <new>
 #include <stdio.h>
 
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
-#	include <stdio.h>
 #	define STRACE(x) printf x
 #else
 #	define STRACE(x) ;
@@ -89,12 +92,26 @@ DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
 {
 	DefaultDecorator::SetLook(settings, look);
 
+	// common colors to both focus and non focus state
 	fFrameColors[0] = (rgb_color){ 152, 152, 152, 255 };
 	fFrameColors[1] = (rgb_color){ 255, 255, 255, 255 };
-	fFrameColors[2] = (rgb_color){ 216, 216, 216, 255 };
-	fFrameColors[3] = (rgb_color){ 136, 136, 136, 255 };
 	fFrameColors[4] = (rgb_color){ 152, 152, 152, 255 };
 	fFrameColors[5] = (rgb_color){ 96, 96, 96, 255 };
+
+	// state based colors
+	fFocusFrameColors[0] = (rgb_color){ 216, 216, 216, 255 };
+	fFocusFrameColors[1] = (rgb_color){ 136, 136, 136, 255 };
+	fNonFocusFrameColors[0] = (rgb_color){ 232, 232, 232, 255 };
+	fNonFocusFrameColors[1] = (rgb_color){ 148, 148, 148, 255 };
+
+	fFocusTabColor = UIColor(B_WINDOW_TAB_COLOR);
+	fFocusTextColor = UIColor(B_WINDOW_TEXT_COLOR);
+	fNonFocusTabColor = UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
+	fNonFocusTextColor = UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
+
+	fCloseBitmaps[0] = fCloseBitmaps[1] = fCloseBitmaps[2] = fCloseBitmaps[3]
+		= fZoomBitmaps[0] = fZoomBitmaps[1] = fZoomBitmaps[2] = fZoomBitmaps[3]
+		= NULL;
 
 	// Set appropriate colors based on the current focus value. In this case, each decorator
 	// defaults to not having the focus.
@@ -435,7 +452,7 @@ DefaultDecorator::Draw(BRect update)
 	_DrawTab(update);
 }
 
-// Draw
+
 void
 DefaultDecorator::Draw()
 {
@@ -447,7 +464,7 @@ DefaultDecorator::Draw()
 	_DrawTab(fTabRect);
 }
 
-// GetSizeLimits
+
 void
 DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 								int32* maxWidth, int32* maxHeight) const
@@ -458,7 +475,7 @@ DefaultDecorator::GetSizeLimits(int32* minWidth, int32* minHeight,
 		*minHeight = (int32)roundf(max_c(*minHeight, fResizeRect.Height() - fBorderWidth));
 }
 
-// GetFootprint
+
 void
 DefaultDecorator::GetFootprint(BRegion *region)
 {
@@ -712,7 +729,7 @@ DefaultDecorator::_DoLayout()
 	}
 }
 
-// _DrawFrame
+
 void
 DefaultDecorator::_DrawFrame(BRect invalid)
 {
@@ -903,7 +920,7 @@ DefaultDecorator::_DrawFrame(BRect invalid)
 	}
 }
 
-// _DrawTab
+
 void
 DefaultDecorator::_DrawTab(BRect invalid)
 {
@@ -964,16 +981,28 @@ DefaultDecorator::_DrawTab(BRect invalid)
 		_DrawZoom(fZoomRect);
 }
 
-// _DrawClose
+
 void
-DefaultDecorator::_DrawClose(BRect r)
+DefaultDecorator::_DrawClose(BRect rect)
 {
-	STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
-	// Just like DrawZoom, but for a close button
-	_DrawBlendedRect(r, GetClose());
+	STRACE(("_DrawClose(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
+		rect.bottom));
+
+	int32 index = (fButtonFocus ? 0 : 1) + (GetClose() ? 0 : 2);
+	ServerBitmap *bitmap = fCloseBitmaps[index];
+	if (bitmap == NULL) {
+		bitmap = _GetBitmapForButton(DEC_CLOSE, GetClose(), fButtonFocus,
+			rect.IntegerWidth(), rect.IntegerHeight(), this);
+		fCloseBitmaps[index] = bitmap;
+	}
+
+	if (bitmap == NULL)
+		return;
+
+	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
 }
 
-// _DrawTitle
+
 void
 DefaultDecorator::_DrawTitle(BRect r)
 {
@@ -1008,23 +1037,23 @@ DefaultDecorator::_DrawTitle(BRect r)
 
 // _DrawZoom
 void
-DefaultDecorator::_DrawZoom(BRect r)
+DefaultDecorator::_DrawZoom(BRect rect)
 {
-	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
+	STRACE(("_DrawZoom(%f,%f,%f,%f)\n", rect.left, rect.top, rect.right,
+		rect.bottom));
 
-	float inset = floorf(r.Width() / 4.0);
+	int32 index = (fButtonFocus ? 0 : 1) + (GetZoom() ? 0 : 2);
+	ServerBitmap *bitmap = fZoomBitmaps[index];
+	if (bitmap == NULL) {
+		bitmap = _GetBitmapForButton(DEC_ZOOM, GetZoom(), fButtonFocus,
+			rect.IntegerWidth(), rect.IntegerHeight(), this);
+		fZoomBitmaps[index] = bitmap;
+	}
 
-	BRect zr(r);
-	zr.left += inset;
-	zr.top += inset;
-	_DrawBlendedRect(zr, GetZoom());
+	if (bitmap == NULL)
+		return;
 
-	inset = floorf(r.Width() / 2.1);
-
-	zr = r;
-	zr.right -= inset;
-	zr.bottom -= inset;
-	_DrawBlendedRect(zr, GetZoom());
+	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
 }
 
 // _SetFocus
@@ -1037,21 +1066,17 @@ DefaultDecorator::_SetFocus()
 	if (IsFocus()
 		|| ((fLook == B_FLOATING_WINDOW_LOOK || fLook == kLeftTitledWindowLook)
 		&& (fFlags & B_AVOID_FOCUS) != 0)) {
-		fTabColor = UIColor(B_WINDOW_TAB_COLOR);
-		fTextColor = UIColor(B_WINDOW_TEXT_COLOR);
-		fButtonHighColor = tint_color(fTabColor, B_LIGHTEN_2_TINT);
-		fButtonLowColor = tint_color(fTabColor, B_DARKEN_1_TINT);
-
-		fFrameColors[2] = (rgb_color){ 216, 216, 216, 255 };
-		fFrameColors[3] = (rgb_color){ 136, 136, 136, 255 };
+		fTabColor = fFocusTabColor;
+		fTextColor = fFocusTextColor;
+		fFrameColors[2] = fFocusFrameColors[0];
+		fFrameColors[3] = fFocusFrameColors[1];
+		fButtonFocus = true;
 	} else {
-		fTabColor = UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
-		fTextColor = UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
-		fButtonHighColor = tint_color(fTabColor, B_LIGHTEN_2_TINT);
-		fButtonLowColor = tint_color(fTabColor, B_DARKEN_1_TINT);
-
-		fFrameColors[2] = (rgb_color){ 232, 232, 232, 255 };
-		fFrameColors[3] = (rgb_color){ 148, 148, 148, 255 };
+		fTabColor = fNonFocusTabColor;
+		fTextColor = fNonFocusTextColor;
+		fFrameColors[2] = fNonFocusFrameColors[0];
+		fFrameColors[3] = fNonFocusFrameColors[1];
+		fButtonFocus = false;
 	}
 
 	fTabColorLight = tint_color(fTabColor,
@@ -1060,7 +1085,7 @@ DefaultDecorator::_SetFocus()
 		B_DARKEN_2_TINT);
 }
 
-// _SetColors
+
 void
 DefaultDecorator::_SetColors()
 {
@@ -1073,48 +1098,49 @@ DefaultDecorator::_SetColors()
 	\param down The rectangle should be drawn recessed or not
 */
 void
-DefaultDecorator::_DrawBlendedRect(BRect r, bool down)
+DefaultDecorator::_DrawBlendedRect(DrawingEngine *engine, BRect rect,
+	bool down, bool focus)
 {
 	// Actually just draws a blended square
-	int32 w = r.IntegerWidth();
-	int32 h = r.IntegerHeight();
+	int32 width = rect.IntegerWidth();
+	int32 height = rect.IntegerHeight();
+	int32 steps = width < height ? width : height;
 
-	rgb_color tempColor;
-	rgb_color halfColor, startColor, endColor;
-	float rstep, gstep, bstep;
-
-	int steps = w < h ? w : h;
-
+	rgb_color startColor, endColor;
+	rgb_color tabColor = focus ? fFocusTabColor : fNonFocusTabColor;
 	if (down) {
-		startColor = fButtonLowColor;
-		endColor = fButtonHighColor;
+		startColor = tint_color(tabColor, B_DARKEN_1_TINT);
+		endColor = tint_color(tabColor, B_LIGHTEN_2_TINT);;
 	} else {
-		startColor = fButtonHighColor;
-		endColor = fButtonLowColor;
+		startColor = tint_color(tabColor, B_LIGHTEN_2_TINT);
+		endColor = tint_color(tabColor, B_DARKEN_1_TINT);
 	}
 
-	halfColor = make_blend_color(startColor, endColor, 0.5);
+	rgb_color halfColor = make_blend_color(startColor, endColor, 0.5);
 
-	rstep = float(startColor.red - halfColor.red) / steps;
-	gstep = float(startColor.green - halfColor.green) / steps;
-	bstep = float(startColor.blue - halfColor.blue) / steps;
+	float rstep = float(startColor.red - halfColor.red) / steps;
+	float gstep = float(startColor.green - halfColor.green) / steps;
+	float bstep = float(startColor.blue - halfColor.blue) / steps;
 
+	rgb_color tempColor;
 	for (int32 i = 0; i <= steps; i++) {
 		tempColor.red = uint8(startColor.red - (i * rstep));
 		tempColor.green = uint8(startColor.green - (i * gstep));
 		tempColor.blue = uint8(startColor.blue - (i * bstep));
 
-		fDrawingEngine->StrokeLine(BPoint(r.left, r.top + i),
-			BPoint(r.left + i, r.top), tempColor);
+		engine->StrokeLine(BPoint(rect.left, rect.top + i),
+			BPoint(rect.left + i, rect.top), tempColor);
 
 		tempColor.red = uint8(halfColor.red - (i * rstep));
 		tempColor.green = uint8(halfColor.green - (i * gstep));
 		tempColor.blue = uint8(halfColor.blue - (i * bstep));
 
-		fDrawingEngine->StrokeLine(BPoint(r.left + steps, r.top + i),
-			BPoint(r.left + i, r.top + steps), tempColor);
+		engine->StrokeLine(BPoint(rect.left + steps, rect.top + i),
+			BPoint(rect.left + i, rect.top + steps), tempColor);
 	}
-	fDrawingEngine->StrokeRect(r, fFrameColors[3]);
+
+	engine->StrokeRect(rect,
+		focus ? fFocusFrameColors[1] : fNonFocusFrameColors[1]);
 }
 
 // _GetButtonSizeAndOffset
@@ -1186,4 +1212,97 @@ DefaultDecorator::_LayoutTabItems(const BRect& tabRect)
 	fTruncatedTitle = Title();
 	fDrawState.Font().TruncateString(&fTruncatedTitle, B_TRUNCATE_END, size);
 	fTruncatedTitleLength = fTruncatedTitle.Length();
+}
+
+
+ServerBitmap *
+DefaultDecorator::_GetBitmapForButton(int32 item, bool down, bool focus,
+	int32 width, int32 height, DefaultDecorator *object)
+{
+	// TODO: the list of shared bitmaps is never freed
+	struct decorator_bitmap {
+		int32				item;
+		bool				down;
+		bool				focus;
+		int32				width;
+		int32				height;
+		UtilityBitmap *		bitmap;
+		decorator_bitmap *	next;
+	};
+
+	static BLocker sBitmapListLock("decorator lock", true);
+	static decorator_bitmap *sBitmapList = NULL;
+	BAutolock locker(sBitmapListLock);
+
+	// search our list for a matching bitmap
+	decorator_bitmap *current = sBitmapList;
+	while (current) {
+		if (current->item == item && current->down == down
+			&& current->focus == focus && current->width == width
+			&& current->height == height) {
+			return current->bitmap;
+		}
+
+		current = current->next;
+	}
+
+	static BitmapDrawingEngine *sBitmapDrawingEngine = NULL;
+
+	// didn't find any bitmap, create a new one
+	if (sBitmapDrawingEngine == NULL)
+		sBitmapDrawingEngine = new(std::nothrow) BitmapDrawingEngine();
+	if (sBitmapDrawingEngine == NULL
+		|| sBitmapDrawingEngine->SetSize(width, height) != B_OK)
+		return NULL;
+
+	BRect rect(0, 0, width - 1, height - 1);
+	sBitmapDrawingEngine->FillRect(rect,
+		focus ? object->fFocusTabColor : object->fNonFocusTabColor);
+
+	STRACE(("DefaultDecorator creating bitmap for %s %sfocus %s at size %ldx%ld\n",
+		item == DEC_CLOSE ? "close" : "zoom", focus ? "" : "non-",
+		down ? "down" : "up", width, height));
+	switch (item) {
+		case DEC_CLOSE:
+			object->_DrawBlendedRect(sBitmapDrawingEngine, rect, down, focus);
+			break;
+
+		case DEC_ZOOM:
+		{
+			float inset = floorf(width / 4.0);
+			BRect zoomRect(rect);
+			zoomRect.left += inset;
+			zoomRect.top += inset;
+			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down, focus);
+
+			inset = floorf(width / 2.1);
+			zoomRect = rect;
+			zoomRect.right -= inset;
+			zoomRect.bottom -= inset;
+			object->_DrawBlendedRect(sBitmapDrawingEngine, zoomRect, down, focus);
+			break;
+		}
+	}
+
+	UtilityBitmap *bitmap = sBitmapDrawingEngine->ExportToBitmap(width, height,
+		B_RGB32);
+	if (bitmap == NULL)
+		return NULL;
+
+	// bitmap ready, put it into the list
+	decorator_bitmap *entry = new(std::nothrow) decorator_bitmap;
+	if (entry == NULL) {
+		delete bitmap;
+		return NULL;
+	}
+
+	entry->item = item;
+	entry->down = down;
+	entry->focus = focus;
+	entry->width = width;
+	entry->height = height;
+	entry->bitmap = bitmap;
+	entry->next = sBitmapList;
+	sBitmapList = entry;
+	return bitmap;
 }

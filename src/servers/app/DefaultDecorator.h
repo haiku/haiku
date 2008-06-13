@@ -14,7 +14,7 @@
 #include <Region.h>
 
 class Desktop;
-
+class ServerBitmap;
 
 class DefaultDecorator: public Decorator {
  public:
@@ -68,20 +68,35 @@ class DefaultDecorator: public Decorator {
 	virtual void				_SetColors();
 
  private:
-			void				_DrawBlendedRect(BRect r, bool down);
+			void				_DrawBlendedRect(DrawingEngine *engine,
+									BRect rect, bool down, bool focus);
 			void				_GetButtonSizeAndOffset(const BRect& tabRect,
 									float* offset, float* size,
 									float* inset) const;
 			void				_LayoutTabItems(const BRect& tabRect);
 
+static		ServerBitmap *		_GetBitmapForButton(int32 item, bool down,
+									bool focus, int32 width, int32 height,
+									DefaultDecorator *object);
+
 			rgb_color			fButtonHighColor;
 			rgb_color			fButtonLowColor;
-			rgb_color			fTextColor;
 			rgb_color			fTabColor;
+			rgb_color			fFocusTabColor;
+			rgb_color			fNonFocusTabColor;
+			rgb_color			fTextColor;
+			rgb_color			fFocusTextColor;
+			rgb_color			fNonFocusTextColor;
 			rgb_color			fTabColorLight;
 			rgb_color			fTabColorShadow;
 
 			rgb_color			fFrameColors[6];
+			rgb_color			fFocusFrameColors[2];
+			rgb_color			fNonFocusFrameColors[2];
+
+			bool				fButtonFocus;
+			ServerBitmap *		fCloseBitmaps[4];
+			ServerBitmap *		fZoomBitmaps[4];
 
 			// Individual rects for handling window frame
 			// rendering the proper way
