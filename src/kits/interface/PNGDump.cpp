@@ -99,10 +99,34 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 			}
 			break;
 		}
+
+		case B_RGB16:
+		{
+			// create file without alpha channel
+			png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
+				PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+				PNG_FILTER_TYPE_DEFAULT);
+			png_write_info(png, info);
+
+			// convert from 16 bit RGB to 24 bit RGB while saving
+			uint16* src = (uint16 *)bits;
+			int dstRowBytes = width * 3;
+			png_byte tempRow[dstRowBytes];
+			for (int row = 0; row < height; row++) {
+				for (int i = 0; i < dstRowBytes; i += 3, src++) {
+					tempRow[i + 2]     = (*src & 0xf800) >> 8;
+					tempRow[i + 1] = (*src & 0x07e0) >> 3;
+					tempRow[i] = (*src & 0x001f) << 3;
+				}
+				src = (uint16 *)((uint8 *)bits + row * bytesPerRow);
+				png_write_row(png, tempRow);
+			}
+			break;
+		}
 		
 		default:
 		{
-			TRACE(("Unsupported color space\n"));
+			TRACE(("Unsupported color space %lx\n", space));
 			png_destroy_write_struct(&png, NULL);
 			fclose(file);
 			return B_ERROR;
