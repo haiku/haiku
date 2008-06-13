@@ -1262,6 +1262,7 @@ BMenu::_InitData(BMessage* archive)
 	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 
 	fLayoutData = new LayoutData;
+	fLayoutData->lastResizingMode = ResizingMode();
 	
 	SetLowColor(sMenuInfo.background_color);
 	SetViewColor(sMenuInfo.background_color);
