@@ -840,6 +840,14 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			usb_disk_synchronize(lun, true);
 			break;
 
+		case B_EJECT_DEVICE:
+			return usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 2,
+				NULL, NULL, false);
+
+		case B_LOAD_MEDIA:
+			return usb_disk_operation(lun, SCSI_START_STOP_UNIT_6, 6, 0, 3,
+				NULL, NULL, false);
+
 		default:
 			TRACE_ALWAYS("unhandled ioctl %ld\n", op);
 			break;
