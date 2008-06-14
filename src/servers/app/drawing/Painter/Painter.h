@@ -214,6 +214,13 @@ class Painter {
 												BPoint pt3,
 												bool fill) const;
 
+			template<typename sourcePixel>
+			void				_TransparentMagicToAlpha(sourcePixel *buffer,
+									uint32 width, uint32 height,
+									uint32 sourceBytesPerRow,
+									sourcePixel transparentMagic,
+									BBitmap *output) const;
+
 			void				_DrawBitmap(	agg::rendering_buffer& srcBuffer,
 												color_space format,
 												BRect actualBitmapRect,
