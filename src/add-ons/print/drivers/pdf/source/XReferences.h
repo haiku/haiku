@@ -141,8 +141,8 @@ public:
 class XMatchResult {
 public:
 	virtual ~XMatchResult() { };
-	virtual bool Link(XRefDef* def, MatchResult* result) = 0;
-	virtual bool Dest(XRefDef* def, MatchResult* result) = 0;
+	virtual bool MatchLink(XRefDef* def, MatchResult* result) = 0;
+	virtual bool MatchDest(XRefDef* def, MatchResult* result) = 0;
 };
 
 
@@ -210,8 +210,8 @@ class RecordDests : public XMatchResult {
 		
 public:
 	RecordDests(XRefDests* dests, TextLine* line, int32 page);
-	bool Link(XRefDef* def, MatchResult* result);
-	bool Dest(XRefDef* def, MatchResult* result);	
+	bool MatchLink(XRefDef* def, MatchResult* result);
+	bool MatchDest(XRefDef* def, MatchResult* result);	
 };
 
 
@@ -231,8 +231,8 @@ protected:
 
 public:
 	LocalLink(XRefDefs* defs, XRefDests* dests, PDFWriter* writer, BString* utf8, int32 page);
-	bool Link(XRefDef* def, MatchResult* result);
-	bool Dest(XRefDef* def, MatchResult* result);
+	bool MatchLink(XRefDef* def, MatchResult* result);
+	bool MatchDest(XRefDef* def, MatchResult* result);
 };
 
 

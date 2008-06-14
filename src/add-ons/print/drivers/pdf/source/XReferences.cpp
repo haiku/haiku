@@ -179,9 +179,9 @@ void XRefDefs::Matches(const char* s, XMatchResult* r, bool all) {
 			bool cont;
 			ASSERT(found); (void)found;
 			if (pat1->IsLink()) {
-				cont = r->Link(def1, &match);
+				cont = r->MatchLink(def1, &match);
 			} else {
-				cont = r->Dest(def1, &match);
+				cont = r->MatchDest(def1, &match);
 			}
 			if (!cont) break;
 			
@@ -370,12 +370,12 @@ RecordDests::RecordDests(XRefDests* dests, TextLine* line, int32 page)
 {
 }
 
-bool RecordDests::Link(XRefDef* def, MatchResult* result) {
+bool RecordDests::MatchLink(XRefDef* def, MatchResult* result) {
 	return true;
 }
 
 
-bool RecordDests::Dest(XRefDef* def, MatchResult* result) {
+bool RecordDests::MatchDest(XRefDef* def, MatchResult* result) {
 	if (result->CountResults() >= 2) {
 		BString s;
 		BRect b;
@@ -399,7 +399,7 @@ LocalLink::LocalLink(XRefDefs* defs, XRefDests* dests, PDFWriter* writer, BStrin
 }
 
 
-bool LocalLink::Link(XRefDef* def, MatchResult* result) {
+bool LocalLink::MatchLink(XRefDef* def, MatchResult* result) {
 	if (result->CountResults() >= 2) {
 		BString label;
 		result->GetString(1, &label);
@@ -421,7 +421,7 @@ bool LocalLink::Link(XRefDef* def, MatchResult* result) {
 }
 
 
-bool LocalLink::Dest(XRefDef* def, MatchResult* result) {
+bool LocalLink::MatchDest(XRefDef* def, MatchResult* result) {
 	return true;
 }
 
