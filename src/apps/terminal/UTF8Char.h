@@ -55,6 +55,12 @@ struct UTF8Char {
 		return ByteCount(bytes[0]);
 	}
 
+	bool IsFullWidth() const
+	{
+		// TODO: Implement!
+		return false;
+	}
+
 	bool IsSpace() const
 	{
 		// TODO: Support multi-byte chars!

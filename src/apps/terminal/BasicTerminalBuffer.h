@@ -7,12 +7,14 @@
 
 #include <limits.h>
 
+#include "HistoryBuffer.h"
 #include "TermPos.h"
 #include "UTF8Char.h"
 
 
 class BString;
 class TerminalCharClassifier;
+struct TerminalLine;
 
 
 struct TerminalBufferDirtyInfo {
@@ -54,7 +56,8 @@ public:
 
 			int32				Width() const		{ return fWidth; }
 			int32				Height() const		{ return fHeight; }
-			int32				HistorySize() const	{ return fHistorySize; }
+	inline	int32				HistorySize() const;
+	inline	int32				HistoryCapacity() const;
 
 			TerminalBufferDirtyInfo& DirtyInfo()	{ return fDirtyInfo; }
 
@@ -125,40 +128,32 @@ public:
 			void				SetScrollRegion(int32 top, int32 bot);
 
 protected:
-			struct Cell {
-				UTF8Char		character;
-				uint16			attributes;
-			};
-
-			struct Line {
-				int16			length;
-				bool			softBreak;	// soft line break
-				Cell			cells[1];
-
-				inline void Clear()
-				{
-					length = 0;
-					softBreak = false;
-				}
-			};
-
 	virtual	void				NotifyListener();
 
 	inline	int32				_LineIndex(int32 index) const;
-	inline	Line*				_LineAt(int32 index) const;
-	inline	Line*				_HistoryLineAt(int32 index) const;
+	inline	TerminalLine*		_LineAt(int32 index) const;
+	inline	TerminalLine*		_HistoryLineAt(int32 index,
+									TerminalLine* lineBuffer) const;
 
 	inline	void				_Invalidate(int32 top, int32 bottom);
 	inline	void				_CursorChanged();
 
-	static	Line**				_AllocateLines(int32 width, int32 count);
-	static	void				_FreeLines(Line** lines, int32 count);
+	static	TerminalLine**		_AllocateLines(int32 width, int32 count);
+	static	void				_FreeLines(TerminalLine** lines, int32 count);
 			void				_ClearLines(int32 first, int32 last);
+
+			status_t			_ResizeHistory(int32 width,
+									int32 historyCapacity);
+			status_t			_ResizeSimple(int32 width, int32 height,
+									int32 historyCapacity);
+			status_t			_ResizeRewrap(int32 width, int32 height,
+									int32 historyCapacity);
 
 			void				_Scroll(int32 top, int32 bottom,
 									int32 numLines);
 			void				_SoftBreakLine();
 			void				_PadLineToCursor();
+	static	void				_TruncateLine(TerminalLine* line, int32 length);
 			void				_InsertGap(int32 width);
 			bool				_GetPartialLineString(BString& string,
 									int32 row, int32 startColumn,
@@ -176,10 +171,9 @@ protected:
 			int32				fScrollBottom;	// last line to scroll (incl.)
 
 			// line buffers for the history (ring buffer)
-			Line**				fHistory;
-			int32				fHistoryCapacity;
+			TerminalLine**		fScreen;
 			int32				fScreenOffset;	// index of screen line 0
-			int32				fHistorySize;
+			HistoryBuffer*		fHistory;
 
 			// cursor position (origin: (0, 0))
 			TermPos				fCursor;
@@ -192,6 +186,20 @@ protected:
 			// listener/dirty region management
 			TerminalBufferDirtyInfo fDirtyInfo;
 };
+
+
+int32
+BasicTerminalBuffer::HistorySize() const
+{
+	return fHistory != NULL ? fHistory->Size() : 0;
+}
+
+
+int32
+BasicTerminalBuffer::HistoryCapacity() const
+{
+	return fHistory != NULL ? fHistory->Capacity() : 0;
+}
 
 
 void

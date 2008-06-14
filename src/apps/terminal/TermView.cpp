@@ -96,6 +96,10 @@ static const uint32 kAutoScroll = 'AScr';
 
 static const bigtime_t kSyncUpdateGranularity = 100000;	// 0.1 s
 
+static const int32 kCursorBlinkIntervals = 3;
+static const int32 kCursorVisibleIntervals = 2;
+static const bigtime_t kCursorBlinkInterval = 500000;
+
 static const rgb_color kBlackColor = { 0, 0, 0, 255 };
 static const rgb_color kWhiteColor = { 255, 255, 255, 255 };
 
@@ -198,11 +202,8 @@ TermView::TermView(BRect frame, int32 argc, const char **argv, int32 historySize
 	fFontHeight(0),
 	fFontAscent(0),
 	fFrameResized(false),
-	fLastCursorTime(0),
-	fCursorDrawFlag(true),
-	fCursorStatus(true),
-	fCursorBlinkingFlag(true),
-	fCursorRedrawFlag(true),
+	fLastActivityTime(0),
+	fCursorState(0),
 	fCursorHeight(0),
 	fCursor(0, 0),
 	fTermRows(ROWS_DEFAULT),
@@ -244,11 +245,8 @@ TermView::TermView(int rows, int columns, int32 argc, const char **argv, int32 h
 	fFontHeight(0),
 	fFontAscent(0),
 	fFrameResized(false),
-	fLastCursorTime(0),
-	fCursorDrawFlag(true),
-	fCursorStatus(true),
-	fCursorBlinkingFlag(true),
-	fCursorRedrawFlag(true),
+	fLastActivityTime(0),
+	fCursorState(0),
 	fCursorHeight(0),
 	fCursor(0, 0),
 	fTermRows(rows),
@@ -302,11 +300,8 @@ TermView::TermView(BMessage *archive)
 	fFontHeight(0),
 	fFontAscent(0),
 	fFrameResized(false),
-	fLastCursorTime(0),
-	fCursorDrawFlag(true),
-	fCursorStatus(true),
-	fCursorBlinkingFlag(true),
-	fCursorRedrawFlag(true),
+	fLastActivityTime(0),
+	fCursorState(0),
 	fCursorHeight(0),
 	fCursor(0, 0),
 	fTermRows(ROWS_DEFAULT),
@@ -379,8 +374,7 @@ TermView::_InitObject(int32 argc, const char **argv)
 		return error;
 	fTextBuffer->SetEncoding(fEncoding);
 
-	error = fVisibleTextBuffer->Init(fTermColumns, fTermRows + 2,
-		fTermRows + 2);
+	error = fVisibleTextBuffer->Init(fTermColumns, fTermRows + 2, 0);
 	if (error != B_OK)
 		return error;
 
@@ -503,7 +497,7 @@ TermView::SetTermSize(int rows, int columns, bool resize)
 	{
 		BAutolock _(fTextBuffer);
 		if (fTextBuffer->ResizeTo(columns, rows) != B_OK
-			|| fVisibleTextBuffer->ResizeTo(columns, rows + 2, rows + 2)
+			|| fVisibleTextBuffer->ResizeTo(columns, rows + 2, 0)
 				!= B_OK) {
 			return Bounds();
 		}
@@ -718,6 +712,7 @@ TermView::Clear()
 		BAutolock _(fTextBuffer);
 		fTextBuffer->Clear();
 	}
+	fVisibleTextBuffer->Clear();
 
 //debug_printf("Invalidate()\n");
 	Invalidate();
@@ -747,59 +742,6 @@ TermView::_InvalidateTextRange(TermPos start, TermPos end)
 
 		_InvalidateTextRect(0, end.y, end.x, end.y);
 	}
-}
-
-
-void
-TermView::BlinkCursor()
-{
-#if 0
-	if (fCursorDrawFlag
-		&& fCursorBlinkingFlag
-		&& Window()->IsActive()) {
-		if (fCursorStatus)
-			_TermDraw(fCurPos, fCurPos);
-		else
-			DrawCursor();
-
-		fCursorStatus = !fCursorStatus;
-		fLastCursorTime = system_time();
-	}
-#endif	// 0
-}
-
-
-//! Draw / Clear cursor.
-void
-TermView::SetCurDraw(bool flag)
-{
-#if 0
-	if (!flag) {
-		if (fCursorStatus)
-			_TermDraw(fCurPos, fCurPos);
-
-		fCursorStatus = false;
-		fCursorDrawFlag = false;
-	} else {
-		if (!fCursorDrawFlag) {
-			fCursorDrawFlag = true;
-			fCursorStatus = true;
-
-			if (LockLooper()) {
-				DrawCursor();
-				UnlockLooper();
-			}
-		}
-	}
-#endif
-}
-
-
-//! Sets cursor Blinking flag.
-void
-TermView::SetCurBlinking(bool flag)
-{
-	fCursorBlinkingFlag = flag;
 }
 
 
@@ -905,6 +847,8 @@ TermView::_DrawCursor()
 	UTF8Char character;
 	uint16 attr;
 
+	bool cursorVisible = _IsCursorVisible();
+
 	bool selected = _CheckSelectedRegion(TermPos(fCursor.x, fCursor.y));
 	if (fVisibleTextBuffer->GetChar(fCursor.y - firstVisible, fCursor.x,
 			character, attr) == A_CHAR) {
@@ -920,15 +864,49 @@ TermView::_DrawCursor()
 		buffer[bytes] = '\0';
 
 		_DrawLinePart(fCursor.x * fFontWidth, (int32)rect.top, attr, buffer,
-			width, selected, true, this);
+			width, selected, cursorVisible, this);
 	} else {
 		if (selected)
 			SetHighColor(fSelectBackColor);
 		else
-			SetHighColor(fCursorBackColor);
+			SetHighColor(cursorVisible ? fCursorBackColor : fTextBackColor);
 
 		FillRect(rect);
 	}
+}
+
+
+bool
+TermView::_IsCursorVisible() const
+{
+	return fCursorState < kCursorVisibleIntervals;
+}
+
+
+void
+TermView::_BlinkCursor()
+{
+	bool wasVisible = _IsCursorVisible();
+
+	bigtime_t now = system_time();
+	if (Window()->IsActive() && now - fLastActivityTime >= kCursorBlinkInterval)
+		fCursorState = (fCursorState + 1) % kCursorBlinkIntervals;
+	else
+		fCursorState = 0;
+
+	if (wasVisible != _IsCursorVisible())
+		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
+}
+
+
+void
+TermView::_ActivateCursor(bool invalidate)
+{
+	fLastActivityTime = system_time();
+	if (invalidate && fCursorState != 0)
+		_BlinkCursor();
+	else
+		fCursorState = 0;
 }
 
 
@@ -983,10 +961,6 @@ TermView::AttachedToWindow()
 	BMessage message(kUpdateSigWinch);
 	fWinchRunner = new (std::nothrow) BMessageRunner(thisMessenger,
 		&message, 500000);
-
-	BMessage blinkMessage(kBlinkCursor);
-	fCursorBlinkRunner = new (std::nothrow) BMessageRunner(thisMessenger,
-		&blinkMessage, 1000000);
 }
 
 
@@ -1009,8 +983,6 @@ TermView::Draw(BRect updateRect)
 //		return;
 //	}
 
-//	BAutolock _(fTextBuffer);
-
 // debug_printf("TermView::Draw((%f, %f) - (%f, %f))\n", updateRect.left,
 // updateRect.top, updateRect.right, updateRect.bottom);
 // {
@@ -1026,8 +998,6 @@ TermView::Draw(BRect updateRect)
 // 		rect.bottom);
 // }
 // }
-
-//	_SynchronizeWithTextBuffer(&updateRect);
 
 	int32 x1 = (int32)(updateRect.left) / fFontWidth;
 	int32 x2 = (int32)(updateRect.right) / fFontWidth;
@@ -1045,7 +1015,6 @@ TermView::Draw(BRect updateRect)
 		int32 k = x1;
 		char buf[fTermColumns * 4 + 1];
 
-//		if (fTextBuffer->IsFullWidthChar(j, k))
 		if (fVisibleTextBuffer->IsFullWidthChar(j - firstVisible, k))
 			k--;
 
@@ -1056,7 +1025,6 @@ TermView::Draw(BRect updateRect)
 			int32 lastColumn = x2;
 			bool insideSelection = _CheckSelectedRegion(j, i, lastColumn);
 			uint16 attr;
-//			int32 count = fTextBuffer->GetString(j, i, lastColumn, buf, attr);
 			int32 count = fVisibleTextBuffer->GetString(j - firstVisible, i,
 				lastColumn, buf, attr);
 
@@ -1079,8 +1047,6 @@ TermView::Draw(BRect updateRect)
 			_DrawLinePart(fFontWidth * i, (int32)_LineOffset(j),
 				attr, buf, count, insideSelection, false, this);
 			i += count;
-			if (i >= fTermColumns)
-				break;
 		}
 	}
 
@@ -1141,8 +1107,21 @@ void
 TermView::WindowActivated(bool active)
 {
 	BView::WindowActivated(active);
-	if (active == false) {
+	if (active) {
+		// start cursor blinking
+		if (fCursorBlinkRunner == NULL) {
+			BMessage blinkMessage(kBlinkCursor);
+			fCursorBlinkRunner = new (std::nothrow) BMessageRunner(
+				BMessenger(this), &blinkMessage, kCursorBlinkInterval);
+		}
+	} else {
 		// DoIMConfirm();
+
+		// make sure the cursor becomes visible
+		fCursorState = 0;
+		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
+		delete fCursorBlinkRunner;
+		fCursorBlinkRunner = NULL;
 	}
 }
 
@@ -1161,6 +1140,8 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 	currentMessage->FindInt32("modifiers", &mod);
 	currentMessage->FindInt32("key", &key);
 	currentMessage->FindInt32("raw_char", &rawChar);
+
+	_ActivateCursor(true);
 
 	// Terminal filters RET, ENTER, F1...F12, and ARROW key code.
 	// TODO: Cleanup
@@ -1441,7 +1422,7 @@ TermView::MessageReceived(BMessage *msg)
     //  }
    // }
 		case kBlinkCursor:
-			BlinkCursor();
+			_BlinkCursor();
 			break;
 		case kUpdateSigWinch:
 			_UpdateSIGWINCH();
@@ -1738,6 +1719,7 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 			_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
 		fCursor = cursor;
 		_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
+		_ActivateCursor(false);
 	}
 
 	info.Reset();

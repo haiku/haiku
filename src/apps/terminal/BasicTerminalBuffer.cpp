@@ -5,6 +5,7 @@
 
 #include "BasicTerminalBuffer.h"
 
+#include <alloca.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -15,9 +16,15 @@
 #include "CodeConv.h"
 #include "TermConst.h"
 #include "TerminalCharClassifier.h"
+#include "TerminalLine.h"
 
 
 static const UTF8Char kSpaceChar(' ');
+
+
+#define ALLOC_LINE_ON_STACK(width)	\
+	((TerminalLine*)alloca(sizeof(TerminalLine)	\
+		+ sizeof(TerminalCell) * ((width) - 1)))
 
 
 static inline int32
@@ -33,24 +40,27 @@ restrict_value(int32 value, int32 min, int32 max)
 inline int32
 BasicTerminalBuffer::_LineIndex(int32 index) const
 {
-	return (index + fScreenOffset) % fHistoryCapacity;
+	return (index + fScreenOffset) % fHeight;
 }
 
 
-inline BasicTerminalBuffer::Line*
+inline TerminalLine*
 BasicTerminalBuffer::_LineAt(int32 index) const
 {
-	return fHistory[_LineIndex(index)];
+	return fScreen[_LineIndex(index)];
 }
 
 
-inline BasicTerminalBuffer::Line*
-BasicTerminalBuffer::_HistoryLineAt(int32 index) const
+inline TerminalLine*
+BasicTerminalBuffer::_HistoryLineAt(int32 index, TerminalLine* lineBuffer) const
 {
-	if (index >= fHeight || index < -fHistorySize)
+	if (index >= fHeight)
 		return NULL;
 
-	return _LineAt(index + fHistoryCapacity);
+	if (index < 0 && fHistory != NULL)
+		return fHistory->GetTerminalLineAt(-index - 1, lineBuffer);
+
+	return _LineAt(index + fHeight);
 }
 
 
@@ -82,6 +92,7 @@ BasicTerminalBuffer::_CursorChanged()
 
 BasicTerminalBuffer::BasicTerminalBuffer()
 	:
+	fScreen(NULL),
 	fHistory(NULL)
 {
 }
@@ -89,16 +100,14 @@ BasicTerminalBuffer::BasicTerminalBuffer()
 
 BasicTerminalBuffer::~BasicTerminalBuffer()
 {
-	_FreeLines(fHistory, fHistoryCapacity);
+	delete fHistory;
+	_FreeLines(fScreen, fHeight);
 }
 
 
 status_t
 BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 {
-	if (historySize < 2 * height)
-		historySize = 2 * height;
-
 	fWidth = width;
 	fHeight = height;
 
@@ -108,14 +117,23 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 	fCursor.x = 0;
 	fCursor.y = 0;
 
+	fScreenOffset = 0;
+
 	fOverwriteMode = true;
 
-	fHistoryCapacity = historySize;
-	fHistorySize = 0;
-
-	fHistory = _AllocateLines(width, historySize);
-	if (fHistory == NULL)
+	fScreen = _AllocateLines(width, height);
+	if (fScreen == NULL)
 		return B_NO_MEMORY;
+
+	if (historySize > 0) {
+		fHistory = new(std::nothrow) HistoryBuffer;
+		if (fHistory == NULL)
+			return B_NO_MEMORY;
+
+		status_t error = fHistory->Init(width, historySize);
+		if (error != B_OK)
+			return error;
+	}
 
 	_ClearLines(0, fHeight - 1);
 
@@ -128,7 +146,7 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 status_t
 BasicTerminalBuffer::ResizeTo(int32 width, int32 height)
 {
-	return ResizeTo(width, height, fHistoryCapacity);
+	return ResizeTo(width, height, fHistory != NULL ? fHistory->Capacity() : 0);
 }
 
 
@@ -136,246 +154,38 @@ status_t
 BasicTerminalBuffer::ResizeTo(int32 width, int32 height, int32 historyCapacity)
 {
 	if (height < MIN_ROWS || height > MAX_ROWS || width < MIN_COLS
-			|| width > MAX_COLS || height > historyCapacity) {
+			|| width > MAX_COLS) {
 		return B_BAD_VALUE;
 	}
 
-//debug_printf("BasicTerminalBuffer::ResizeTo(): (%ld, %ld, history: %ld) -> "
-//"(%ld, %ld, history: %ld)\n", fWidth, fHeight, fHistoryCapacity, width, height,
-//historyCapacity);
+	if (width == fWidth && height == fHeight)
+		return SetHistoryCapacity(historyCapacity);
 
-	if (width != fWidth) {
-		// The width changes. We have to allocate a new line array and re-wrap
-		// all lines.
-		Line** history = _AllocateLines(width, historyCapacity);
-		if (history == NULL)
-			return B_NO_MEMORY;
+	// TODO: When alternate screen support is implemented, do that only when
+	// not using the alternate screen.
+	if (true)
+		return _ResizeRewrap(width, height, historyCapacity);
 
-		int32 totalLines = fHistorySize + fHeight;
-		int32 historyOffset = fHistoryCapacity - fHistorySize;
-			// base for _LineAt() invocations to iterate through the history
-
-		// re-wrap
-		TermPos cursor;
-		int32 destIndex = 0;
-		int32 sourceIndex = 0;
-		int32 sourceX = 0;
-		int32 destTotalLines = 0;
-		int32 destScreenOffset = 0;
-		int32 maxDestTotalLines = INT_MAX;
-		bool newDestLine = true;
-		while (sourceIndex < totalLines) {
-			Line* sourceLine = _LineAt(historyOffset + sourceIndex);
-			Line* destLine = history[destIndex];
-
-			if (newDestLine) {
-				destLine->Clear();
-				newDestLine = false;
-			}
-
-			int32 sourceLeft = sourceLine->length - sourceX;
-			int32 destLeft = width - destLine->length;
-//debug_printf("    source: %ld, left: %ld, dest: %ld, left: %ld\n",
-//sourceIndex, sourceLeft, destIndex, destLeft);
-
-			if (sourceIndex == fHistorySize && sourceX == 0) {
-				destScreenOffset = destTotalLines;
-				if (destLeft == 0 && sourceLeft > 0)
-					destScreenOffset++;
-//debug_printf("      destScreenOffset: %ld\n", destScreenOffset);
-			}
-
-			int32 toCopy = min_c(sourceLeft, destLeft);
-			// If the last cell to copy is the first cell of a
-			// full-width char, don't copy it yet.
-			if (toCopy > 0 && IS_WIDTH(
-					sourceLine->cells[sourceX + toCopy - 1].attributes)) {
-//debug_printf("      -> last char is full-width -- don't copy it\n");
-				toCopy--;
-			}
-
-			// translate the cursor position
-			if (fCursor.y + fHistorySize == sourceIndex
-				&& fCursor.x >= sourceX
-				&& (fCursor.x < sourceX + toCopy
-					|| destLeft >= sourceLeft
-						&& sourceX + sourceLeft <= fCursor.x)) {
-				cursor.x = destLine->length + fCursor.x - sourceX;
-				cursor.y = destTotalLines;
-
-				if (cursor.x >= width) {
-					// The cursor was in free space after the official end
-					// of line.
-					cursor.x = width - 1;
-				}
-//debug_printf("      cursor: (%ld, %ld)\n", cursor.x, cursor.y);
-
-				// don't allow the cursor to get out of screen
-				maxDestTotalLines = cursor.y + height - 1;
-			}
-
-			if (toCopy > 0) {
-				memcpy(destLine->cells + destLine->length,
-					sourceLine->cells + sourceX, toCopy * sizeof(Cell));
-				destLine->length += toCopy;
-			}
-
-			bool nextDestLine = false;
-			if (toCopy == sourceLeft) {
-				if (!sourceLine->softBreak)
-					nextDestLine = true;
-				sourceIndex++;
-				sourceX = 0;
-			} else {
-				destLine->softBreak = true;
-				nextDestLine = true;
-				sourceX += toCopy;
-			}
-
-			if (nextDestLine) {
-				destIndex = (destIndex + 1) % historyCapacity;
-				destTotalLines++;
-				newDestLine = true;
-				if (destTotalLines >= maxDestTotalLines)
-					break;
-			}
-		}
-
-		// If the last source line had a soft break, the last dest line
-		// won't have been counted yet.
-		if (!newDestLine) {
-			destIndex = (destIndex + 1) % historyCapacity;
-			destTotalLines++;
-		}
-
-//debug_printf("  total lines: %ld -> %ld\n", totalLines, destTotalLines);
-
-		int32 tempHeight = destTotalLines - destScreenOffset;
-		cursor.y -= destScreenOffset;
-
-		// Re-wrapping might have produced more lines than we have room for.
-		if (destTotalLines > historyCapacity)
-			destTotalLines = historyCapacity;
-
-		// Update the values
-//debug_printf("  cursor: (%ld, %ld) -> (%ld, %ld)\n", fCursor.x, fCursor.y,
-//cursor.x, cursor.y);
-		fCursor.x = cursor.x;
-		fCursor.y = cursor.y;
-//debug_printf("  screen offset: %ld -> %ld\n", fScreenOffset,
-//destScreenOffset % fHistoryCapacity);
-		fScreenOffset = destScreenOffset % historyCapacity;
-//debug_printf("  history size: %ld -> %ld\n", fHistorySize, destTotalLines - fHeight);
-		fHistorySize = destTotalLines - tempHeight;
-//debug_printf("  height %ld -> %ld\n", fHeight, tempHeight);
-		fHeight = tempHeight;
-		fWidth = width;
-
-		_FreeLines(fHistory, fHistoryCapacity);
-		fHistory = history;
-		fHistoryCapacity = historyCapacity;
-	}
-
-	if (historyCapacity > fHistoryCapacity)
-		SetHistoryCapacity(historyCapacity);
-
-	if (height == fHeight)
-		return B_OK;
-
-	// The height changes. We just add/remove lines at the end of the screen.
-
-	if (height < fHeight) {
-		// The screen shrinks. We just drop the lines at the end of the screen,
-		// but we keep the cursor on screen at all costs.
-		if (fCursor.y >= height) {
-			int32 toShift = fCursor.y - height + 1;
-			fScreenOffset = (fScreenOffset + fHistoryCapacity + toShift)
-				% fHistoryCapacity;
-			fHistorySize += toShift;
-			fCursor.y -= toShift;
-		}
-	} else {
-		// The screen grows. We add empty lines at the end of the current
-		// screen.
-		if (fHistorySize + height > fHistoryCapacity)
-			fHistorySize = fHistoryCapacity - height;
-
-		for (int32 i = fHeight; i < height; i++)
-			_LineAt(i)->Clear();
-	}
-
-//debug_printf("  cursor: -> (%ld, %ld)\n", fCursor.x, fCursor.y);
-//debug_printf("  screen offset: -> %ld\n", fScreenOffset);
-//debug_printf("  history size: -> %ld\n", fHistorySize);
-
-	fHeight = height;
-
-	// reset scroll range to keep it simple
-	fScrollTop = 0;
-	fScrollBottom = fHeight - 1;
-
-	if (historyCapacity < fHistoryCapacity)
-		SetHistoryCapacity(historyCapacity);
-
-	return B_OK;
+	return _ResizeSimple(width, height, historyCapacity);
 }
 
 
 status_t
 BasicTerminalBuffer::SetHistoryCapacity(int32 historyCapacity)
 {
-	if (historyCapacity < fHeight)
-		return B_BAD_VALUE;
-
-	if (fHistoryCapacity == historyCapacity)
-		return B_OK;
-
-	// The history capacity changes.
-	Line** history = _AllocateLines(fWidth, historyCapacity);
-	if (history == NULL)
-		return B_NO_MEMORY;
-
-	int32 totalLines = fHistorySize + fHeight;
-	int32 historyOffset = fHistoryCapacity - fHistorySize;
-		// base for _LineAt() invocations to iterate through the history
-
-	if (totalLines > historyCapacity) {
-		// Our new history capacity is smaller than currently stored line,
-		// so we have to drop lines.
-		historyOffset += totalLines - historyCapacity;
-		totalLines = historyCapacity;
-	}
-
-	for (int32 i = 0; i < totalLines; i++) {
-		Line* sourceLine = _LineAt(historyOffset + i);
-		Line* destLine = history[i];
-		destLine->length = sourceLine->length;
-		destLine->softBreak = sourceLine->softBreak;
-		if (destLine->length > 0) {
-			memcpy(destLine->cells, sourceLine->cells,
-				destLine->length * sizeof(Cell));
-		}
-	}
-
-	_FreeLines(fHistory, fHistoryCapacity);
-	fHistory = history;
-	fHistoryCapacity = historyCapacity;
-	fHistorySize = totalLines - fHeight;
-	fScreenOffset = fHistorySize;
-
-	return B_OK;
+	return _ResizeHistory(fWidth, historyCapacity);
 }
 
 
 void
 BasicTerminalBuffer::Clear()
 {
-	fHistorySize = 0;
 	fScreenOffset = 0;
-
 	_ClearLines(0, fHeight - 1);
-
 	fCursor.SetTo(0, 0);
+
+	if (fHistory != NULL)
+		fHistory->Clear();
 
 	fDirtyInfo.linesScrolled = 0;
 	_Invalidate(0, fHeight - 1);
@@ -406,14 +216,19 @@ BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
 	// update the dirty lines
 //debug_printf("  updating: %ld - %ld\n", first, last);
 	for (int32 i = first; i <= last; i++) {
-		Line* sourceLine = other->_HistoryLineAt(i + offset);
-		Line* destLine = _LineAt(i);
+		TerminalLine* destLine = _LineAt(i);
+		TerminalLine* sourceLine = other->_HistoryLineAt(i + offset, destLine);
 		if (sourceLine != NULL) {
-			destLine->length = sourceLine->length;
-			destLine->softBreak = sourceLine->softBreak;
-			if (destLine->length > 0) {
-				memcpy(destLine->cells, sourceLine->cells,
-					destLine->length * sizeof(Cell));
+			if (sourceLine != destLine) {
+				destLine->length = sourceLine->length;
+				destLine->softBreak = sourceLine->softBreak;
+				if (destLine->length > 0) {
+					memcpy(destLine->cells, sourceLine->cells,
+						destLine->length * sizeof(TerminalCell));
+				}
+			} else {
+				// The source line was a history line and has been copied
+				// directly into destLine.
 			}
 		} else
 			destLine->Clear();
@@ -424,7 +239,8 @@ BasicTerminalBuffer::SynchronizeWith(const BasicTerminalBuffer* other,
 bool
 BasicTerminalBuffer::IsFullWidthChar(int32 row, int32 column) const
 {
-	Line* line = _HistoryLineAt(row);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(row, lineBuffer);
 	return line != NULL && column > 0 && column < line->length
 		&& (line->cells[column - 1].attributes & A_WIDTH) != 0;
 }
@@ -434,7 +250,8 @@ int
 BasicTerminalBuffer::GetChar(int32 row, int32 column, UTF8Char& character,
 	uint16& attributes) const
 {
-	Line* line = _HistoryLineAt(row);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(row, lineBuffer);
 	if (line == NULL)
 		return NO_CHAR;
 
@@ -444,7 +261,7 @@ BasicTerminalBuffer::GetChar(int32 row, int32 column, UTF8Char& character,
 	if (column > 0 && (line->cells[column - 1].attributes & A_WIDTH) != 0)
 		return IN_STRING;
 
-	Cell& cell = line->cells[column];
+	TerminalCell& cell = line->cells[column];
 	character = cell.character;
 	attributes = cell.attributes;
 	return A_CHAR;
@@ -455,7 +272,8 @@ int32
 BasicTerminalBuffer::GetString(int32 row, int32 firstColumn, int32 lastColumn,
 	char* buffer, uint16& attributes) const
 {
-	Line* line = _HistoryLineAt(row);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(row, lineBuffer);
 	if (line == NULL)
 		return 0;
 
@@ -467,7 +285,7 @@ BasicTerminalBuffer::GetString(int32 row, int32 firstColumn, int32 lastColumn,
 		attributes = line->cells[column].attributes;
 
 	for (; column <= lastColumn; column++) {
-		Cell& cell = line->cells[column];
+		TerminalCell& cell = line->cells[column];
 		if (cell.attributes != attributes)
 			break;
 
@@ -518,7 +336,8 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 	int32 x = pos.x;
 	int32 y = pos.y;
 
-	Line* line = _HistoryLineAt(y);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(y, lineBuffer);
 	if (line == NULL || x < 0 || x >= fWidth)
 		return false;
 
@@ -550,8 +369,8 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 			// Hit the beginning of the line -- continue at the end of the
 			// previous line, if it soft-breaks.
 			y--;
-			if ((line = _HistoryLineAt(y)) == NULL || !line->softBreak
-					|| line->length == 0) {
+			if ((line = _HistoryLineAt(y, lineBuffer)) == NULL
+					|| !line->softBreak || line->length == 0) {
 				break;
 			}
 			x = line->length - 1;
@@ -568,7 +387,7 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 	// find the end
 	x = end.x;
 	y = end.y;
-	line = _HistoryLineAt(y);
+	line = _HistoryLineAt(y, lineBuffer);
 
 	while (true) {
 		if (x >= line->length) {
@@ -578,7 +397,7 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 				break;
 			y++;
 			x = 0;
-			if ((line = _HistoryLineAt(y)) == NULL)
+			if ((line = _HistoryLineAt(y, lineBuffer)) == NULL)
 				break;
 		}
 
@@ -598,7 +417,8 @@ BasicTerminalBuffer::FindWord(const TermPos& pos,
 int32
 BasicTerminalBuffer::LineLength(int32 index) const
 {
-	Line* line = _HistoryLineAt(index);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(index, lineBuffer);
 	return line != NULL ? line->length : 0;
 }
 
@@ -612,13 +432,14 @@ BasicTerminalBuffer::Find(const char* _pattern, const TermPos& start,
 //"word: %d)\n", _pattern, start.x, start.y, forward, caseSensitive, matchWord);
 	// normalize pos, so that _NextChar() and _PreviousChar() are happy
 	TermPos pos(start);
-	Line* line = _HistoryLineAt(pos.y);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(pos.y, lineBuffer);
 	if (line != NULL) {
 		if (forward) {
 			while (line != NULL && pos.x >= line->length && line->softBreak) {
 				pos.x = 0;
 				pos.y++;
-				line = _HistoryLineAt(pos.y);
+				line = _HistoryLineAt(pos.y, lineBuffer);
 			}
 		} else {
 			if (pos.x > line->length)
@@ -726,7 +547,7 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 attributes)
 	if (!fOverwriteMode)
 		_InsertGap(width);
 
-	Line* line = _LineAt(fCursor.y);
+	TerminalLine* line = _LineAt(fCursor.y);
 	line->cells[fCursor.x].character = c;
 	line->cells[fCursor.x].attributes = attributes;
 
@@ -795,7 +616,7 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 		_PadLineToCursor();
 		_InsertGap(num);
 
-		Line* line = _LineAt(fCursor.y);
+		TerminalLine* line = _LineAt(fCursor.y);
 		for (int32 i = fCursor.x; i < fCursor.x + num; i++) {
 			line->cells[i].character = kSpaceChar;
 			line->cells[i].attributes = 0;
@@ -814,12 +635,12 @@ BasicTerminalBuffer::EraseBelow()
 void
 BasicTerminalBuffer::DeleteChars(int32 numChars)
 {
-	Line* line = _LineAt(fCursor.y);
+	TerminalLine* line = _LineAt(fCursor.y);
 	if (fCursor.x < line->length) {
 		if (fCursor.x + numChars < line->length) {
 			int32 left = line->length - fCursor.x - numChars;
 			memmove(line->cells + fCursor.x, line->cells + fCursor.x + numChars,
-				left * sizeof(Cell));
+				left * sizeof(TerminalCell));
 			line->length = fCursor.x + left;
 		} else {
 			// remove all remaining chars
@@ -834,7 +655,7 @@ BasicTerminalBuffer::DeleteChars(int32 numChars)
 void
 BasicTerminalBuffer::DeleteColumns()
 {
-	Line* line = _LineAt(fCursor.y);
+	TerminalLine* line = _LineAt(fCursor.y);
 	if (fCursor.x < line->length) {
 		line->length = fCursor.x;
 		_Invalidate(fCursor.y, fCursor.y);
@@ -899,15 +720,16 @@ BasicTerminalBuffer::NotifyListener()
 // #pragma mark - private methods
 
 
-/* static */ BasicTerminalBuffer::Line**
+/* static */ TerminalLine**
 BasicTerminalBuffer::_AllocateLines(int32 width, int32 count)
 {
-	Line** lines = (Line**)malloc(sizeof(Line*) * count);
+	TerminalLine** lines = (TerminalLine**)malloc(sizeof(TerminalLine*) * count);
 	if (lines == NULL)
 		return NULL;
 
 	for (int32 i = 0; i < count; i++) {
-		lines[i] = (Line*)malloc(sizeof(Line) + sizeof(Cell) * (width - 1));
+		lines[i] = (TerminalLine*)malloc(sizeof(TerminalLine)
+			+ sizeof(TerminalCell) * (width - 1));
 		if (lines[i] == NULL) {
 			_FreeLines(lines, i);
 			return NULL;
@@ -919,7 +741,7 @@ BasicTerminalBuffer::_AllocateLines(int32 width, int32 count)
 
 
 /* static */ void
-BasicTerminalBuffer::_FreeLines(Line** lines, int32 count)
+BasicTerminalBuffer::_FreeLines(TerminalLine** lines, int32 count)
 {
 	if (lines != NULL) {
 		for (int32 i = 0; i < count; i++)
@@ -937,7 +759,7 @@ BasicTerminalBuffer::_ClearLines(int32 first, int32 last)
 	int32 lastCleared = -1;
 
 	for (int32 i = first; i <= last; i++) {
-		Line* line = _LineAt(i);
+		TerminalLine* line = _LineAt(i);
 		if (line->length > 0) {
 			if (firstCleared == -1)
 				firstCleared = i;
@@ -949,6 +771,308 @@ BasicTerminalBuffer::_ClearLines(int32 first, int32 last)
 
 	if (firstCleared >= 0)
 		_Invalidate(firstCleared, lastCleared);
+}
+
+
+status_t
+BasicTerminalBuffer::_ResizeHistory(int32 width, int32 historyCapacity)
+{
+	if (width == fWidth && historyCapacity == HistoryCapacity())
+		return B_OK;
+
+	if (historyCapacity <= 0) {
+		// new history capacity is 0 -- delete the old history object
+		delete fHistory;
+		fHistory = NULL;
+
+		return B_OK;
+	}
+
+	HistoryBuffer* history = new(std::nothrow) HistoryBuffer;
+	if (history == NULL)
+		return B_NO_MEMORY;
+
+	status_t error = history->Init(width, historyCapacity);
+	if (error != B_OK) {
+		delete history;
+		return error;
+	}
+
+	// Transfer the lines from the old history to the new one.
+	if (fHistory != NULL) {
+		int32 historySize = min_c(HistorySize(), historyCapacity);
+		TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+		for (int32 i = historySize - 1; i >= 0; i--) {
+			TerminalLine* line = fHistory->GetTerminalLineAt(i, lineBuffer);
+			if (line->length > width)
+				_TruncateLine(line, width);
+			history->AddLine(line);
+		} 
+	}
+
+	delete fHistory;
+	fHistory = history;
+
+	return B_OK;
+}
+
+
+status_t
+BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
+	int32 historyCapacity)
+{
+//debug_printf("BasicTerminalBuffer::_ResizeSimple(): (%ld, %ld) -> "
+//"(%ld, %ld)\n", fWidth, fHeight, width, height);
+	if (width == fWidth && height == fHeight)
+		return B_OK;
+
+	if (width != fWidth || historyCapacity != HistoryCapacity()) {
+		status_t error = _ResizeHistory(width, historyCapacity);
+		if (error != B_OK)
+			return error;
+	}
+
+	TerminalLine** lines = _AllocateLines(width, height);
+	if (lines == NULL)
+		return B_NO_MEMORY;
+		// NOTE: If width or history capacity changed, the object will be in
+		// an invalid state, since the history will already use the new values.
+
+	int32 endLine = min_c(fHeight, height);
+	int32 firstLine = 0;
+
+	if (height < fHeight) {
+		if (endLine <= fCursor.y) {
+			endLine = fCursor.y + 1;
+			firstLine = endLine - height;
+		}
+
+		// push the first lines to the history
+		if (fHistory != NULL) {
+			for (int32 i = 0; i < firstLine; i++) {
+				TerminalLine* line = _LineAt(i);
+				if (width < fWidth)
+					_TruncateLine(line, width);
+				fHistory->AddLine(line);
+			}
+		}
+	}
+
+	// copy the lines we keep
+	for (int32 i = firstLine; i < endLine; i++) {
+		TerminalLine* sourceLine = _LineAt(i);
+		TerminalLine* destLine = lines[i - firstLine];
+		if (width < fWidth)
+			_TruncateLine(sourceLine, width);
+		memcpy(destLine, sourceLine, sizeof(TerminalLine)
+			+ (sourceLine->length - 1) * sizeof(TerminalCell));
+	}
+
+	// clear the remaining lines
+	for (int32 i = endLine - firstLine; i < height; i++)
+		lines[i]->Clear();
+
+	fWidth = width;
+	fHeight = height;
+
+	fScrollTop = 0;
+	fScrollBottom = fHeight - 1;
+
+	fScreenOffset = 0;
+
+	if (fCursor.x > width)
+		fCursor.x = width;
+	fCursor.y -= firstLine;
+
+	fScreen = lines;
+
+	return B_OK;
+}
+
+
+status_t
+BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
+	int32 historyCapacity)
+{
+//debug_printf("BasicTerminalBuffer::_ResizeRewrap(): (%ld, %ld, history: %ld) -> "
+//"(%ld, %ld, history: %ld)\n", fWidth, fHeight, HistoryCapacity(), width, height,
+//historyCapacity);
+
+	// The width stays the same. _ResizeSimple() does exactly what we need.
+	if (width == fWidth)
+		return _ResizeSimple(width, height, historyCapacity);
+
+	// The width changes. We have to allocate a new line array, a new history
+	// and re-wrap all lines.
+
+	TerminalLine** screen = _AllocateLines(width, height);
+	if (screen == NULL)
+		return B_NO_MEMORY;
+
+	HistoryBuffer* history = NULL;
+
+	if (historyCapacity > 0) {
+		history = new(std::nothrow) HistoryBuffer;
+		if (history == NULL) {
+			_FreeLines(screen, height);
+			return B_NO_MEMORY;
+		}
+
+		status_t error = history->Init(width, historyCapacity);
+		if (error != B_OK) {
+			_FreeLines(screen, height);
+			delete history;
+			return error;
+		}
+	}
+
+	int32 historySize = HistorySize();
+	int32 totalLines = historySize + fHeight;
+
+	// re-wrap
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TermPos cursor;
+	int32 destIndex = 0;
+	int32 sourceIndex = 0;
+	int32 sourceX = 0;
+	int32 destTotalLines = 0;
+	int32 destScreenOffset = 0;
+	int32 maxDestTotalLines = INT_MAX;
+	bool newDestLine = true;
+	bool cursorSeen = false;
+	TerminalLine* sourceLine = _HistoryLineAt(-historySize, lineBuffer);
+
+	while (sourceIndex < totalLines) {
+		TerminalLine* destLine = screen[destIndex];
+
+		if (newDestLine) {
+			// Clear a new dest line before using it. If we're about to
+			// overwrite an previously written line, we push it to the
+			// history first, though.
+			if (history != NULL && destTotalLines >= height)
+				history->AddLine(screen[destIndex]);
+			destLine->Clear();
+			newDestLine = false;
+		}
+
+		int32 sourceLeft = sourceLine->length - sourceX;
+		int32 destLeft = width - destLine->length;
+//debug_printf("    source: %ld, left: %ld, dest: %ld, left: %ld\n",
+//sourceIndex, sourceLeft, destIndex, destLeft);
+
+		if (sourceIndex == historySize && sourceX == 0) {
+			destScreenOffset = destTotalLines;
+			if (destLeft == 0 && sourceLeft > 0)
+				destScreenOffset++;
+			maxDestTotalLines = destScreenOffset + height;
+//debug_printf("      destScreenOffset: %ld\n", destScreenOffset);
+		}
+
+		int32 toCopy = min_c(sourceLeft, destLeft);
+		// If the last cell to copy is the first cell of a
+		// full-width char, don't copy it yet.
+		if (toCopy > 0 && IS_WIDTH(
+				sourceLine->cells[sourceX + toCopy - 1].attributes)) {
+//debug_printf("      -> last char is full-width -- don't copy it\n");
+			toCopy--;
+		}
+
+		// translate the cursor position
+		if (fCursor.y + historySize == sourceIndex
+			&& fCursor.x >= sourceX
+			&& (fCursor.x < sourceX + toCopy
+				|| destLeft >= sourceLeft
+					&& sourceX + sourceLeft <= fCursor.x)) {
+			cursor.x = destLine->length + fCursor.x - sourceX;
+			cursor.y = destTotalLines;
+
+			if (cursor.x >= width) {
+				// The cursor was in free space after the official end
+				// of line.
+				cursor.x = width - 1;
+			}
+//debug_printf("      cursor: (%ld, %ld)\n", cursor.x, cursor.y);
+
+			cursorSeen = true;
+		}
+
+		if (toCopy > 0) {
+			memcpy(destLine->cells + destLine->length,
+				sourceLine->cells + sourceX, toCopy * sizeof(TerminalCell));
+			destLine->length += toCopy;
+		}
+
+		bool nextDestLine = false;
+		if (toCopy == sourceLeft) {
+			if (!sourceLine->softBreak)
+				nextDestLine = true;
+			sourceIndex++;
+			sourceX = 0;
+			sourceLine = _HistoryLineAt(sourceIndex - historySize,
+				lineBuffer);
+		} else {
+			destLine->softBreak = true;
+			nextDestLine = true;
+			sourceX += toCopy;
+		}
+
+		if (nextDestLine) {
+			destIndex = (destIndex + 1) % height;
+			destTotalLines++;
+			newDestLine = true;
+			if (cursorSeen && destTotalLines >= maxDestTotalLines)
+				break;
+		}
+	}
+
+	// If the last source line had a soft break, the last dest line
+	// won't have been counted yet.
+	if (!newDestLine) {
+		destIndex = (destIndex + 1) % height;
+		destTotalLines++;
+	}
+
+//debug_printf("  total lines: %ld -> %ld\n", totalLines, destTotalLines);
+
+	if (destTotalLines - destScreenOffset > height)
+		destScreenOffset = destTotalLines - height;
+
+	cursor.y -= destScreenOffset;
+
+	// When there are less lines (starting with the screen offset) than
+	// there's room in the screen, clear the remaining screen lines.
+	for (int32 i = destTotalLines; i < destScreenOffset + height; i++) {
+		// Move the line we're going to clear to the history, if that's a
+		// line we've written earlier.
+		TerminalLine* line = screen[i % height];
+		if (history != NULL && i >= height)
+			history->AddLine(line);
+		line->Clear();
+	}
+
+	// Update the values
+	_FreeLines(fScreen, fHeight);
+	delete fHistory;
+
+//debug_printf("  cursor: (%ld, %ld) -> (%ld, %ld)\n", fCursor.x, fCursor.y,
+//cursor.x, cursor.y);
+	fCursor.x = cursor.x;
+	fCursor.y = cursor.y;
+//debug_printf("  screen offset: %ld -> %ld\n", fScreenOffset,
+//destScreenOffset % fHistoryCapacity);
+	fScreenOffset = destScreenOffset % height;
+//debug_printf("  history size: %ld -> %ld\n", fHistorySize, destTotalLines - fHeight);
+//debug_printf("  height %ld -> %ld\n", fHeight, tempHeight);
+	fHeight = height;
+	fWidth = width;
+
+	fScrollTop = 0;
+	fScrollBottom = fHeight - 1;
+
+	fScreen = screen;
+	fHistory = history;
+
+	return B_OK;
 }
 
 
@@ -964,34 +1088,41 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 			// The lines scrolled out of the screen range are transferred to
 			// the history.
 
-			if (numLines > fHistoryCapacity)
-				numLines = fHistoryCapacity;
+			// add the lines to the history
+			if (fHistory != NULL) {
+				int32 toHistory = min_c(numLines, bottom - top + 1);
+				for (int32 i = 0; i < toHistory; i++)
+					fHistory->AddLine(_LineAt(i));
 
-			// make room for numLines new lines
-			if (fHistorySize + fHeight + numLines > fHistoryCapacity) {
-				int32 toDrop = fHistorySize + fHeight + numLines
-					- fHistoryCapacity;
-				fHistorySize -= toDrop;
-					// Note that fHistorySize can temporarily become negative,
-					// but all will be well again, when we offset the screen.
+				if (toHistory < numLines)
+					fHistory->AddEmptyLines(numLines - toHistory);
 			}
 
-			// clear numLines after the current screen
-			for (int32 i = fHeight; i < fHeight + numLines; i++)
-				_LineAt(i)->Clear();
-
-			if (bottom < fHeight - 1) {
-				// Only scroll part of the screen. Move the unscrolled lines to
-				// their new location.
+			if (numLines >= bottom - top + 1) {
+				// all lines are scrolled out of range -- just clear them
+				_ClearLines(top, bottom);
+			} else if (bottom == fHeight - 1) {
+				// full screen scroll -- update the screen offset and clear new
+				// lines
+				fScreenOffset = (fScreenOffset + numLines) % fHeight;
+				for (int32 i = bottom - numLines + 1; i <= bottom; i++)
+					_LineAt(i)->Clear();
+			} else {
+				// Partial screen scroll. We move the screen offset anyway, but
+				// have to move the unscrolled lines to their new location.
+				// TODO: It may be more efficient to actually move the scrolled
+				// lines only (might depend on the number of scrolled/unscrolled
+				// lines).
 				for (int32 i = bottom + 1; i < fHeight; i++) {
-					std::swap(fHistory[_LineIndex(i)],
-						fHistory[_LineIndex(i) + numLines]);
+					std::swap(fScreen[_LineIndex(i)],
+						fScreen[_LineIndex(i) + numLines]);
 				}
-			}
 
-			// all lines are in place -- offset the screen
-			fScreenOffset = (fScreenOffset + numLines) % fHistoryCapacity;
-			fHistorySize += numLines;
+				// update the screen offset and clear the new lines
+				fScreenOffset = (fScreenOffset + numLines) % fHeight;
+				for (int32 i = bottom - numLines + 1; i <= bottom; i++)
+					_LineAt(i)->Clear();
+			}
 
 			// scroll/extend dirty range
 
@@ -1009,13 +1140,9 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 			}
 
 			fDirtyInfo.linesScrolled += numLines;
-// TODO: The linesScrolled might be suboptimal when scrolling partially
-// only, since we would scroll the whole visible area, including unscrolled
-// lines, which invalidates them, too.
 
 			// invalidate new empty lines
 			_Invalidate(bottom + 1 - numLines, bottom);
-
 		} else if (numLines >= bottom - top + 1) {
 			// all lines are completely scrolled out of range -- just clear
 			// them
@@ -1026,8 +1153,8 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 			for (int32 i = top + numLines; i <= bottom; i++) {
 				int32 lineToDrop = _LineIndex(i - numLines);
 				int32 lineToKeep = _LineIndex(i);
-				fHistory[lineToDrop]->Clear();
-				std::swap(fHistory[lineToDrop], fHistory[lineToKeep]);
+				fScreen[lineToDrop]->Clear();
+				std::swap(fScreen[lineToDrop], fScreen[lineToKeep]);
 			}
 
 			_Invalidate(top, bottom);
@@ -1043,11 +1170,13 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 		} else {
 			// partial scroll -- clear the lines scrolled out of range and move
 			// the other ones
+// TODO: When scrolling the whole screen, we could just update fScreenOffset and
+// clear the respective lines.
 			for (int32 i = bottom - numLines; i >= top; i--) {
 				int32 lineToKeep = _LineIndex(i);
 				int32 lineToDrop = _LineIndex(i + numLines);
-				fHistory[lineToDrop]->Clear();
-				std::swap(fHistory[lineToDrop], fHistory[lineToKeep]);
+				fScreen[lineToDrop]->Clear();
+				std::swap(fScreen[lineToDrop], fScreen[lineToKeep]);
 			}
 
 			_Invalidate(top, bottom);
@@ -1059,7 +1188,7 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 void
 BasicTerminalBuffer::_SoftBreakLine()
 {
-	Line* line = _LineAt(fCursor.y);
+	TerminalLine* line = _LineAt(fCursor.y);
 	line->length = fCursor.x;
 	line->softBreak = true;
 
@@ -1074,7 +1203,7 @@ BasicTerminalBuffer::_SoftBreakLine()
 void
 BasicTerminalBuffer::_PadLineToCursor()
 {
-	Line* line = _LineAt(fCursor.y);
+	TerminalLine* line = _LineAt(fCursor.y);
 	if (line->length < fCursor.x) {
 		for (int32 i = line->length; i < fCursor.x; i++) {
 			line->cells[i].character = kSpaceChar;
@@ -1085,16 +1214,29 @@ BasicTerminalBuffer::_PadLineToCursor()
 }
 
 
+/*static*/ void
+BasicTerminalBuffer::_TruncateLine(TerminalLine* line, int32 length)
+{
+	if (line->length <= length)
+		return;
+
+	if (length > 0 && IS_WIDTH(line->cells[length - 1].attributes))
+		length--;
+
+	line->length = length;
+}
+
+
 void
 BasicTerminalBuffer::_InsertGap(int32 width)
 {
 // ASSERT(fCursor.x + width <= fWidth)
-	Line* line = _LineAt(fCursor.y);
+	TerminalLine* line = _LineAt(fCursor.y);
 
 	int32 toMove = min_c(line->length - fCursor.x, fWidth - fCursor.x - width);
 	if (toMove > 0) {
 		memmove(line->cells + fCursor.x + width,
-			line->cells + fCursor.x, toMove * sizeof(Cell));
+			line->cells + fCursor.x, toMove * sizeof(TerminalCell));
 	}
 
 	line->length += width;
@@ -1107,7 +1249,8 @@ bool
 BasicTerminalBuffer::_GetPartialLineString(BString& string, int32 row,
 	int32 startColumn, int32 endColumn) const
 {
-	Line* line = _HistoryLineAt(row);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(row, lineBuffer);
 	if (line == NULL)
 		return false;
 
@@ -1115,7 +1258,7 @@ BasicTerminalBuffer::_GetPartialLineString(BString& string, int32 row,
 		endColumn = line->length;
 
 	for (int32 x = startColumn; x < endColumn; x++) {
-		const Cell& cell = line->cells[x];
+		const TerminalCell& cell = line->cells[x];
 		string.Append(cell.character.bytes, cell.character.ByteCount());
 
 		if (IS_WIDTH(cell.attributes))
@@ -1133,12 +1276,13 @@ BasicTerminalBuffer::_PreviousChar(TermPos& pos, UTF8Char& c) const
 {
 	pos.x--;
 
-	Line* line = _HistoryLineAt(pos.y);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(pos.y, lineBuffer);
 
 	while (true) {
 		if (pos.x < 0) {
 			pos.y--;
-			line = _HistoryLineAt(pos.y);
+			line = _HistoryLineAt(pos.y, lineBuffer);
 			if (line == NULL)
 				return false;
 
@@ -1162,7 +1306,8 @@ BasicTerminalBuffer::_PreviousChar(TermPos& pos, UTF8Char& c) const
 bool
 BasicTerminalBuffer::_NextChar(TermPos& pos, UTF8Char& c) const
 {
-	Line* line = _HistoryLineAt(pos.y);
+	TerminalLine* lineBuffer = ALLOC_LINE_ON_STACK(fWidth);
+	TerminalLine* line = _HistoryLineAt(pos.y, lineBuffer);
 	if (line == NULL)
 		return false;
 
@@ -1179,7 +1324,7 @@ BasicTerminalBuffer::_NextChar(TermPos& pos, UTF8Char& c) const
 	while (line != NULL && pos.x >= line->length && line->softBreak) {
 		pos.x = 0;
 		pos.y++;
-		line = _HistoryLineAt(pos.y);
+		line = _HistoryLineAt(pos.y, lineBuffer);
 	}
 
 	return true;

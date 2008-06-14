@@ -70,11 +70,6 @@ public:
 	void	SelectAll();
 	void	Clear();	
 	
-	// Cursor setting
-	void	BlinkCursor();
-	void	SetCurDraw(bool flag);
-	void	SetCurBlinking(bool flag);
-
 	// Other
 	void	GetFrameSize(float *width, float *height);
 	bool	Find(const BString &str, bool forwardSearch, bool matchCase, bool matchWord);
@@ -126,6 +121,10 @@ private:
 	void _DrawCursor();
 	void _InvalidateTextRange(TermPos start, TermPos end);	
 	
+	bool _IsCursorVisible() const;
+	void _BlinkCursor();
+	void _ActivateCursor(bool invalidate);
+
 	void _DoPrint(BRect updateRect);
 	void _UpdateScrollBarRange();
 	void _DoFileDrop(entry_ref &ref);
@@ -185,11 +184,8 @@ private:
 	bool fFrameResized;
 
 	// Cursor Blinking, draw flag.
-	bigtime_t fLastCursorTime;		
-	bool fCursorDrawFlag;
-	bool fCursorStatus;
-	bool fCursorBlinkingFlag;
-	bool fCursorRedrawFlag;
+	bigtime_t	fLastActivityTime;
+	int32		fCursorState;
 	int fCursorHeight;
 
 	// Cursor position.
