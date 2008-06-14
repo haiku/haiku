@@ -68,6 +68,8 @@ class DefaultDecorator: public Decorator {
 	virtual void				_SetColors();
 
  private:
+ 			void				_DrawButtonBitmap(ServerBitmap *bitmap,
+ 									BRect rect);
 			void				_DrawBlendedRect(DrawingEngine *engine,
 									BRect rect, bool down, bool focus);
 			void				_GetButtonSizeAndOffset(const BRect& tabRect,

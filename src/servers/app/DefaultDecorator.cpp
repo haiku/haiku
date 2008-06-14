@@ -996,10 +996,7 @@ DefaultDecorator::_DrawClose(BRect rect)
 		fCloseBitmaps[index] = bitmap;
 	}
 
-	if (bitmap == NULL)
-		return;
-
-	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
+	_DrawButtonBitmap(bitmap, rect);
 }
 
 
@@ -1050,10 +1047,7 @@ DefaultDecorator::_DrawZoom(BRect rect)
 		fZoomBitmaps[index] = bitmap;
 	}
 
-	if (bitmap == NULL)
-		return;
-
-	fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
+	_DrawButtonBitmap(bitmap, rect);
 }
 
 // _SetFocus
@@ -1090,6 +1084,22 @@ void
 DefaultDecorator::_SetColors()
 {
 	_SetFocus();
+}
+
+
+void
+DefaultDecorator::_DrawButtonBitmap(ServerBitmap *bitmap, BRect rect)
+{
+	if (bitmap == NULL)
+		return;
+
+	if (fDrawingEngine->LockParallelAccess()) {
+		bool copyToFrontEnabled = fDrawingEngine->CopyToFrontEnabled();
+		fDrawingEngine->SetCopyToFrontEnabled(true);
+		fDrawingEngine->DrawBitmap(bitmap, rect.OffsetToCopy(0, 0), rect);
+		fDrawingEngine->SetCopyToFrontEnabled(copyToFrontEnabled);
+		fDrawingEngine->UnlockParallelAccess();
+	}
 }
 
 
