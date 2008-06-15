@@ -57,6 +57,10 @@ protected:
 	virtual void	MenusBeginning();
 
 private:
+	struct Session;
+	class TabView;
+	friend class TabView;
+
 	void			_SetTermColors(TermViewContainerView *termView);
 	void			_InitWindow();
 	void			_SetupMenu();
@@ -73,10 +77,13 @@ private:
 	void			_CheckChildren();
 	void			_ResizeView(TermView *view);
 	void			_BuildWindowSizeMenu(BMenu *menu);
+	int32			_NewSessionID();
+
+	BList			fSessions;
 	
-	SmartTabView	*fTabView;
+	TabView			*fTabView;
 	TermView		*fTermView;
-	
+
 	BMenuBar		*fMenubar;
 	BMenu			*fFilemenu;
 	BMenu			*fEditmenu;

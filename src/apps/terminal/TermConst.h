@@ -82,6 +82,8 @@ const uint32 FULLSCREEN			= 'fscr';
 const uint32 MSG_FONT_CHANGED		= 'fntc';
 const uint32 SAVE_AS_DEFAULT 		= 'sadf';
 const uint32 MSG_CHECK_CHILDREN		= 'ckch';
+const uint32 MSG_PREVIOUS_TAB		= 'ptab';
+const uint32 MSG_NEXT_TAB			= 'ntab';
 
 const uint32 MSG_TERMINAL_BUFFER_CHANGED	= 'bufc';
 const uint32 MSG_SET_TERMNAL_TITLE			= 'sett';

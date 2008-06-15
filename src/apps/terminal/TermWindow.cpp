@@ -87,6 +87,41 @@ private:
 };
 
 
+struct TermWindow::Session {
+	int32					id;
+	BString					name;
+	TermViewContainerView*	containerView;
+
+	Session(int32 id, TermViewContainerView* containerView)
+		:
+		id(id),
+		containerView(containerView)
+	{
+		name = "Shell ";
+		name << id;
+	}
+};
+
+
+class TermWindow::TabView : public SmartTabView {
+public:
+	TabView(TermWindow* window, BRect frame, const char *name)
+		:
+		SmartTabView(frame, name),
+		fWindow(window)
+	{
+	}
+
+	virtual	void RemoveAndDeleteTab(int32 index)
+	{
+		fWindow->_RemoveTab(index);
+	}
+
+private:
+	TermWindow*	fWindow;
+};
+
+
 TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
 	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
 	fTabView(NULL),
@@ -124,6 +159,9 @@ TermWindow::~TermWindow()
 	}
 	
 	PrefHandler::DeleteDefault();
+
+	for (int32 i = 0; Session* session = (Session*)fSessions.ItemAt(i); i++)
+		delete session;
 }
 
 
@@ -139,7 +177,7 @@ TermWindow::_InitWindow()
 	BRect textFrame = Bounds();
 	textFrame.top = fMenubar->Bounds().bottom + 1.0;
 
-	fTabView = new SmartTabView(textFrame, "tab view");
+	fTabView = new TabView(this, textFrame, "tab view");
 	AddChild(fTabView);
 }
 
@@ -449,6 +487,21 @@ TermWindow::MessageReceived(BMessage *message)
 			_CheckChildren();
 			break;
 
+		case MSG_PREVIOUS_TAB:
+		case MSG_NEXT_TAB:
+		{
+			TermView* termView;
+			if (message->FindPointer("termView", (void**)&termView) == B_OK) {
+				int32 count = fSessions.CountItems();
+				int32 index = _IndexOfTermView(termView);
+				if (count > 1 && index >= 0) {
+					index += message->what == MSG_PREVIOUS_TAB ? -1 : 1;
+					fTabView->Select((index + count) % count);
+				}
+			}
+			break;
+		}
+
 		case kNewTab:
 			if (fTabView->CountTabs() < kMaxTabs)
 				_AddTab(NULL);
@@ -606,12 +659,15 @@ TermWindow::_AddTab(Arguments *args)
 		BScrollView *scrollView = new TermScrollView("scrollView",
 			containerView, view);
 
+		Session* session = new Session(_NewSessionID(), containerView);
+		fSessions.AddItem(session);
+
 		BTab *tab = new BTab;
 		// TODO: Use a better name. For example, do like MacOsX's Terminal
 		// and update the title using the last executed command ?
 		// Or like Gnome's Terminal and use the current path ?
 		fTabView->AddTab(scrollView, tab);
-		tab->SetLabel("Terminal");
+		tab->SetLabel(session->name.String());
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 		
 		// Resize the vertical scrollbar to take the window gripping handle into account
@@ -654,16 +710,20 @@ TermWindow::_AddTab(Arguments *args)
 		// TODO: Should cleanup, I guess
 	}
 }	
-	
-	
+
+
 void
 TermWindow::_RemoveTab(int32 index)
 {
-	if (fTabView->CountTabs() > 1)			
-		delete fTabView->RemoveTab(index);
-	else
+	if (fSessions.CountItems() > 1) {
+		if (Session* session = (Session*)fSessions.RemoveItem(index)) {
+			delete session;
+			delete fTabView->RemoveTab(index);
+		}
+	} else
 		PostMessage(B_QUIT_REQUESTED);
 }
+
 
 TermViewContainerView*
 TermWindow::_ActiveTermViewContainerView() const
@@ -675,11 +735,9 @@ TermWindow::_ActiveTermViewContainerView() const
 TermViewContainerView*
 TermWindow::_TermViewContainerViewAt(int32 index) const
 {
-	// TODO: BAD HACK:
-	// We should probably use the observer api to tell
-	// the various "tabs" when settings are changed. Fix this.
-	BScrollView* scrollView = (BScrollView*)fTabView->ViewForTab(index);
-	return scrollView ? (TermViewContainerView*)scrollView->Target() : NULL;
+	if (Session* session = (Session*)fSessions.ItemAt(index))
+		return session->containerView;
+	return NULL;
 }
 
 
@@ -718,16 +776,10 @@ TermWindow::_IndexOfTermView(TermView* termView) const
 void
 TermWindow::_CheckChildren()
 {
-	// There seems to be no separate list of sessions, so we have to iterate
-	// through the tabs.
-	int32 count = fTabView->CountTabs();
+	int32 count = fSessions.CountItems();
 	for (int32 i = count - 1; i >= 0; i--) {
-		// get the term view
-		TermView* termView = _TermViewAt(i);
-		if (!termView)
-			continue;
-
-		termView->CheckShellGone();
+		Session* session = (Session*)fSessions.ItemAt(i);
+		session->containerView->GetTermView()->CheckShellGone();
 	}
 }
 
@@ -785,6 +837,29 @@ TermWindow::_BuildWindowSizeMenu(BMenu *menu)
 	menu->AddItem(new BMenuItem("Fullscreen",
 					new BMessage(FULLSCREEN), B_ENTER)); 
 }
+
+
+int32
+TermWindow::_NewSessionID()
+{
+	for (int32 id = 1; ; id++) {
+		bool used = false;
+
+		for (int32 i = 0;
+			 Session* session = (Session*)fSessions.ItemAt(i); i++) {
+			if (id == session->id) {
+				used = true;
+				break;
+			}
+		}
+
+		if (!used)
+			return id;
+	}
+}
+
+
+// #pragma mark -
 
 
 // CustomTermView

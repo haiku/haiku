@@ -1155,18 +1155,26 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 			
 			case B_LEFT_ARROW:
 				if (rawChar == B_LEFT_ARROW) {
-					if (mod & B_CONTROL_KEY)
+					if (mod & B_SHIFT_KEY) {
+						BMessage message(MSG_PREVIOUS_TAB);
+						message.AddPointer("termView", this);
+						Window()->PostMessage(&message);
+					} else if (mod & B_CONTROL_KEY) {
 						toWrite = CTRL_LEFT_ARROW_KEY_CODE;
-					else
+					} else
 						toWrite = LEFT_ARROW_KEY_CODE;
 				}
 				break;
 
 			case B_RIGHT_ARROW:
 				if (rawChar == B_RIGHT_ARROW) {
-					if (mod & B_CONTROL_KEY)
+					if (mod & B_SHIFT_KEY) {
+						BMessage message(MSG_NEXT_TAB);
+						message.AddPointer("termView", this);
+						Window()->PostMessage(&message);
+					} else if (mod & B_CONTROL_KEY) {
 						toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
-					else
+					} else
 						toWrite = RIGHT_ARROW_KEY_CODE;
 				}
 				break;
