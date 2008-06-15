@@ -17,7 +17,8 @@
 TerminalBuffer::TerminalBuffer()
 	:
 	BLocker("terminal buffer"),
-	fEncoding(M_UTF8)
+	fEncoding(M_UTF8),
+	fListenerValid(false)
 {
 }
 
@@ -41,6 +42,14 @@ void
 TerminalBuffer::SetListener(BMessenger listener)
 {
 	fListener = listener;
+	fListenerValid = true;
+}
+
+
+void
+TerminalBuffer::UnsetListener()
+{
+	fListenerValid = false;
 }
 
 
@@ -61,23 +70,28 @@ TerminalBuffer::SetEncoding(int encoding)
 void
 TerminalBuffer::SetTitle(const char* title)
 {
-	BMessage message(MSG_SET_TERMNAL_TITLE);
-	message.AddString("title", title);
-	fListener.SendMessage(&message);
+	if (fListenerValid) {
+		BMessage message(MSG_SET_TERMNAL_TITLE);
+		message.AddString("title", title);
+		fListener.SendMessage(&message);
+	}
 }
 
 
 void
 TerminalBuffer::NotifyQuit(int32 reason)
 {
-	BMessage message(MSG_QUIT_TERMNAL);
-	message.AddInt32("reason", reason);
-	fListener.SendMessage(&message);
+	if (fListenerValid) {
+		BMessage message(MSG_QUIT_TERMNAL);
+		message.AddInt32("reason", reason);
+		fListener.SendMessage(&message);
+	}
 }
 
 
 void
 TerminalBuffer::NotifyListener()
 {
-	fListener.SendMessage(MSG_TERMINAL_BUFFER_CHANGED);
+	if (fListenerValid)
+		fListener.SendMessage(MSG_TERMINAL_BUFFER_CHANGED);
 }

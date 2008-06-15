@@ -20,6 +20,7 @@ public:
 									int32 historySize);
 
 			void				SetListener(BMessenger listener);
+			void				UnsetListener();
 
 			int					Encoding() const;
 			void				SetEncoding(int encoding);
@@ -35,6 +36,7 @@ private:
 
 			// listener/dirty region management
 			BMessenger			fListener;
+			bool				fListenerValid;
 };
 
 
