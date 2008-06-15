@@ -956,11 +956,16 @@ TermView::AttachedToWindow()
 	}
 
 	BMessenger thisMessenger(this);
-	fTextBuffer->SetListener(thisMessenger);
 
 	BMessage message(kUpdateSigWinch);
 	fWinchRunner = new (std::nothrow) BMessageRunner(thisMessenger,
 		&message, 500000);
+
+	{
+		BAutolock _(fTextBuffer);
+		fTextBuffer->SetListener(thisMessenger);
+		_SynchronizeWithTextBuffer(0, -1);
+	}
 }
 
 
@@ -972,6 +977,11 @@ TermView::DetachedFromWindow()
 
 	delete fCursorBlinkRunner;
 	fCursorBlinkRunner = NULL;
+
+	{
+		BAutolock _(fTextBuffer);
+		fTextBuffer->UnsetListener();
+	}
 }
 
 
