@@ -27,7 +27,7 @@ DiscoveryAgent::RetrieveDevices(int option)
 {
     /* No inquiry process initiated */
     if (fLastUsedListener == NULL)
-        return NULL;
+        return NULL; // xxx: Fix me
 
     return fLastUsedListener->GetRemoteDevicesList();
 }
@@ -44,7 +44,7 @@ status_t
 DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, bigtime_t secs)
 {
     BMessenger* btsm = NULL;
-	size_t size;
+    size_t size;
 
     if ((btsm = _RetrieveBluetoothMessenger()) == NULL)
     	return B_ERROR;
@@ -66,11 +66,11 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
     BMessage reply;
 
     request.AddInt32("hci_id", fLocalDevice->GetID());
-    
-	startInquiryCommand = buildInquiry(accessCode, secs, BT_MAX_RESPONSES, &size);
 
-	// For stating the inquiry
-	request.AddData("raw command", B_ANY_TYPE, startInquiryCommand, size);
+    startInquiryCommand = buildInquiry(accessCode, secs, BT_MAX_RESPONSES, &size);
+
+    // For stating the inquiry
+    request.AddData("raw command", B_ANY_TYPE, startInquiryCommand, size);
     request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
     request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY));
 
@@ -94,7 +94,8 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
 status_t
 DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
 {
-    BMessenger* btsm = NULL;
+    BMessenger* btsm = NULL; //TODO: this should be a member field
+    size_t size;
 
     if ((btsm = _RetrieveBluetoothMessenger()) == NULL)
     	return B_ERROR;
@@ -107,17 +108,19 @@ DiscoveryAgent::CancelInquiry(DiscoveryListener* listener)
     BMessage reply;
 
     request.AddInt32("hci_id", fLocalDevice->GetID());
-    // TODO: Add the raw command to the BMessage + expected event(s)
 
+    cancelInquiryCommand = buildInquiryCancel(&size);
+    request.AddData("raw command", B_ANY_TYPE, cancelInquiryCommand, size);
+    request.AddInt16("eventExpected",  HCI_EVENT_CMD_STATUS);
+    request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_LINK_CONTROL, OCF_INQUIRY_CANCEL));
 
-
-    if (btsm->SendMessage(&request, listener) == B_OK) {
+    if (btsm->SendMessage(&request, &reply) == B_OK) {
         if (reply.FindInt8("status", &bt_status ) == B_OK ) {
-            return bt_status;
-        }
-    }
-	
-	return B_ERROR;
+		return bt_status;				
+	}
+    }    
+
+    return B_ERROR;
 }
 
 void
