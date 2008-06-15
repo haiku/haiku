@@ -1269,24 +1269,24 @@ copy_bitmap_row_bgr32_alpha(uint8* dst, const uint8* src, int32 numPixels,
 
 template<typename sourcePixel>
 void
-Painter::_TransparentMagicToAlpha(sourcePixel *buffer, uint32 width,
+Painter::_TransparentMagicToAlpha(sourcePixel* buffer, uint32 width,
 	uint32 height, uint32 sourceBytesPerRow, sourcePixel transparentMagic,
-	BBitmap *output) const
+	BBitmap* output) const
 {
-	sourcePixel *sourceRow = buffer;
-	uint32 *destRow = (uint32 *)output->Bits();
+	uint8* sourceRow = (uint8*)buffer;
+	uint8* destRow = (uint8*)output->Bits();
 	uint32 destBytesPerRow = output->BytesPerRow();
 
 	for (uint32 y = 0; y < height; y++) {
-		sourcePixel *pixel = sourceRow;
-		uint32 *destPixel = destRow;
+		sourcePixel* pixel = (sourcePixel*)sourceRow;
+		uint32* destPixel = (uint32*)destRow;
 		for (uint32 x = 0; x < width; x++, pixel++, destPixel++) {
 			if (*pixel == transparentMagic)
 				*destPixel &= 0x00ffffff;
 		}
 
-		(char *)sourceRow += sourceBytesPerRow;
-		(char *)destRow += destBytesPerRow;
+		sourceRow += sourceBytesPerRow;
+		destRow += destBytesPerRow;
 	}
 }
 
