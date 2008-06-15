@@ -90,7 +90,8 @@ HistoryBuffer::GetTerminalLineAt(int32 index, TerminalLine* buffer) const
 		if (charCount == nextAttributesAt) {
 			if (attributesRunCount > 0) {
 				attributes = attributesRun->attributes;
-				nextAttributesAt = attributesRun->offset + attributesRun->length;
+				nextAttributesAt = attributesRun->offset
+					+ attributesRun->length;
 				attributesRun++;
 				attributesRunCount--;
 			} else {
@@ -179,6 +180,10 @@ HistoryBuffer::AddLine(const TerminalLine* line)
 		if (IS_WIDTH(cell.attributes))
 			i++;
 	}
+
+	// set the last attributes run's length
+	if (attributes != 0)
+		attributesRun->length = line->length - attributesRun->offset;
 
 	historyLine->softBreak = line->softBreak;
 //debug_printf("  line: \"%.*s\", history size now: %ld\n", historyLine->byteLength, historyLine->Chars(), fSize);
