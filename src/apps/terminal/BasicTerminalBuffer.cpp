@@ -135,7 +135,8 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 			return error;
 	}
 
-	_ClearLines(0, fHeight - 1);
+	for (int32 i = 0; i < fHeight; i++)
+		fScreen[i]->Clear();
 
 	fDirtyInfo.Reset();
 
@@ -764,9 +765,9 @@ BasicTerminalBuffer::_ClearLines(int32 first, int32 last)
 			if (firstCleared == -1)
 				firstCleared = i;
 			lastCleared = i;
-
-			line->Clear();
 		}
+
+		line->Clear();
 	}
 
 	if (firstCleared >= 0)
@@ -864,8 +865,8 @@ BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
 		TerminalLine* destLine = lines[i - firstLine];
 		if (width < fWidth)
 			_TruncateLine(sourceLine, width);
-		memcpy(destLine, sourceLine, sizeof(TerminalLine)
-			+ (sourceLine->length - 1) * sizeof(TerminalCell));
+		memcpy(destLine, sourceLine, (int32)sizeof(TerminalLine)
+			+ (sourceLine->length - 1) * (int32)sizeof(TerminalCell));
 	}
 
 	// clear the remaining lines

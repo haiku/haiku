@@ -17,7 +17,7 @@ struct TerminalCell {
 
 
 struct TerminalLine {
-	int16			length;
+	uint16			length;
 	bool			softBreak;	// soft line break
 	TerminalCell	cells[1];
 
