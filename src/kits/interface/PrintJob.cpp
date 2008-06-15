@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2006, Haiku.
+ * Copyright 2001-2008, Haiku.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -8,8 +8,6 @@
  *		Michael Pfeiffer
  *		julun <host.haiku@gmx.de>
  */
-
-// TODO refactor (avoid code duplications, decrease method sizes)
 
 #include <Alert.h>
 #include <Application.h>
@@ -36,40 +34,44 @@
 #include <string.h>
 
 
-static const int kSemTimeOut = 50000;
-static const char *kPrintServerNotRespondingText = "Print Server is not responding.";
-static const char *kNoPagesToPrintText = "No Pages to print!";
+/* !
+ *
+ * Summery of R5 spool file:
+ *
+ * |-------------------------|
+ * |    print_file_header    |
+ * |-------------------------|
+ * |        BMessage         |
+ * |-------------------------|
+ * |      _page_header_      |
+ * |          BPoint         |
+ * |          BRect          |
+ * |         BPicture        |
+ * |-------------------------|
+ * |      _page_header_      |
+ * |          BPoint         |
+ * |          BRect          |
+ * |         BPicture        |
+ * |-------------------------|
+ * |      _page_header_      |
+ * |-------------------------|
+ *
+ * BeOS R5 print_file_header.version is 1 << 16
+ * BeOS R5 print_file_header.first_page is -1
+ *
+ * remaining pages start at _page_header_.next_page of previous _page_header_
+ *
+ * See also: "How to Write a BeOS R5 Printer Driver" for description of spool
+ * file format: http://haiku-os.org/documents/dev/how_to_write_a_printer_driver
+ *
+ */
 
-
-// Summery of spool file format:
-// See articel "How to Write a BeOS R5 Printer Driver" for description
-// of spool file format:
-// http://haiku-os.org/documents/dev/how_to_write_a_printer_driver
-
-// print_file_header header
-//   On BeOS R5 header.version is 1 << 16 and
-//   header.first_page is -1.
-// BMessage          job_settings
-// _page_header_     page_header
-// followed by number_of_pictures:
-//   BPoint   where
-//   BRect    bounds
-//   BPicture picture
-// remaining pages start at page_header.next_page of previous page_header
 
 struct _page_header_ {
 	int32 number_of_pictures;
 	off_t next_page;
 	int32 reserved[10];
 };
-
-
-static status_t
-GetPrinterServerMessenger(BMessenger& messenger)
-{
-	messenger = BMessenger(PSRV_SIGNATURE_TYPE);
-	return messenger.IsValid() ? B_OK : B_ERROR;
-}
 
 
 static void
@@ -80,155 +82,45 @@ ShowError(const char *message)
 }
 
 
+// #pragma mark -- PrintServerMessenger
+
+
 namespace BPrivate {
 
-	class Configuration {
-		public:
-			Configuration(uint32 what, BMessage *input);
-			~Configuration();
 
-			status_t SendRequest(thread_func function);
+	class PrintServerMessenger {
+	public:
+								PrintServerMessenger(uint32 what, BMessage *input);
+								~PrintServerMessenger();
 
-			BMessage* Request();
+				BMessage*		Request();
+				status_t		SendRequest();
 
-			void SetResult(BMessage* result);
-			BMessage* Result() const { return fResult; }
+				void			SetResult(BMessage* result);
+				BMessage*		Result() const { return fResult; }
 
-		private:
-			void RejectUserInput();
-			void AllowUserInput();
-			void DeleteSemaphore();
+		static status_t			GetPrintServerMessenger(BMessenger& msngr);
 
-			uint32 fWhat;
-			BMessage *fInput;
-			BMessage *fRequest;
-			BMessage *fResult;
-			sem_id fThreadCompleted;
-			BAlert *fHiddenApplicationModalWindow;
+	private:
+				void			RejectUserInput();
+				void			AllowUserInput();
+				void			DeleteSemaphore();
+		static  status_t		MessengerThread(void *data);
+
+				uint32			fWhat;
+				BMessage*		fInput;
+				BMessage*		fRequest;
+				BMessage*		fResult;
+				sem_id			fThreadCompleted;
+				BAlert*			fHiddenApplicationModalWindow;
 	};
 
 
-	Configuration::Configuration(uint32 what, BMessage *input)
-		: fWhat(what),
-		fInput(input),
-		fRequest(NULL),
-		fResult(NULL),
-		fThreadCompleted(-1),
-		fHiddenApplicationModalWindow(NULL)
-	{
-		RejectUserInput();
-	}
+}	// namespace BPrivate
+using namespace BPrivate;
 
 
-	Configuration::~Configuration()
-	{
-		DeleteSemaphore();
-			// in case SendRequest could not start the thread
-		delete fRequest; fRequest = NULL;
-		AllowUserInput();
-	}
-
-
-	void
-	Configuration::RejectUserInput()
-	{
-		BAlert* alert = new BAlert("bogus", "app_modal_dialog", "OK");
-		fHiddenApplicationModalWindow = alert;
-		alert->DefaultButton()->SetEnabled(false);
-		alert->SetDefaultButton(NULL);
-		alert->MoveTo(-65000, -65000);
-		alert->Go(NULL);
-	}
-
-
-	void
-	Configuration::AllowUserInput()
-	{
-		fHiddenApplicationModalWindow->Lock();
-		fHiddenApplicationModalWindow->Quit();
-	}
-
-
-	void
-	Configuration::DeleteSemaphore()
-	{
-		if (fThreadCompleted >= B_OK) {
-			sem_id id = fThreadCompleted;
-			fThreadCompleted = -1;
-			delete_sem(id);
-		}
-	}
-
-
-	status_t
-	Configuration::SendRequest(thread_func function)
-	{
-		fThreadCompleted = create_sem(0, "Configuration");
-		if (fThreadCompleted < B_OK)
-			return B_ERROR;
-
-		thread_id id = spawn_thread(function, "async_request", B_NORMAL_PRIORITY, this);
-		if (id <= 0 || resume_thread(id) != B_OK)
-			return B_ERROR;
-
-		// Code copied from BAlert::Go()
-		BWindow* window = dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
-			// Get the originating window, if it exists
-
-		// Heavily modified from TextEntryAlert code; the original didn't let the
-		// blocked window ever draw.
-		if (window != NULL) {
-			status_t err;
-			for (;;) {
-				do {
-					err = acquire_sem_etc(fThreadCompleted, 1, B_RELATIVE_TIMEOUT,
-										  kSemTimeOut);
-						// We've (probably) had our time slice taken away from us
-				} while (err == B_INTERRUPTED);
-
-				if (err == B_BAD_SEM_ID) {
-					// Semaphore was finally nuked in SetResult(BMessage *)
-					break;
-				}
-				window->UpdateIfNeeded();
-			}
-		} else {
-			// No window to update, so just hang out until we're done.
-			while (acquire_sem(fThreadCompleted) == B_INTERRUPTED);
-		}
-
-		status_t status;
-		wait_for_thread(id, &status);
-
-		return Result() != NULL ? B_OK : B_ERROR;
-	}
-
-
-	BMessage *
-	Configuration::Request()
-	{
-		if (fRequest != NULL)
-			return fRequest;
-
-		if (fInput != NULL) {
-			fRequest = new BMessage(*fInput);
-			fRequest->what = fWhat;
-		} else
-			fRequest = new BMessage(fWhat);
-
-		return fRequest;
-	}
-
-
-	void
-	Configuration::SetResult(BMessage *result)
-	{
-		fResult = result;
-		DeleteSemaphore();
-		// terminate loop in thread spawned by SendRequest
-	}
-
-} // BPrivate
+// #pragma mark -- BPrintJob
 
 
 BPrintJob::BPrintJob(const char *job_name)
@@ -261,93 +153,32 @@ BPrintJob::~BPrintJob()
 }
 
 
-static status_t
-ConfigPageThread(void *data)
-{
-	BPrivate::Configuration* configuration = static_cast<BPrivate::Configuration*>(data);
-
-	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK) {
-		ShowError(kPrintServerNotRespondingText);
-		configuration->SetResult(NULL);
-		return B_ERROR;
-	}
-
-	BMessage *request = configuration->Request();
-	if (request == NULL) {
-		configuration->SetResult(NULL);
-		return B_ERROR;
-	}
-
-
-	BMessage reply;
-	if (printServer.SendMessage(request, &reply) != B_OK
-		|| reply.what != 'okok') {
-		configuration->SetResult(NULL);
-		return B_ERROR;
-	}
-
-	configuration->SetResult(new BMessage(reply));
-	return B_OK;
-}
-
-
 status_t
 BPrintJob::ConfigPage()
 {
-	BPrivate::Configuration configuration(PSRV_SHOW_PAGE_SETUP, fSetupMessage);
-	status_t status = configuration.SendRequest(ConfigPageThread);
+	PrintServerMessenger messenger(PSRV_SHOW_PAGE_SETUP, fSetupMessage);
+	status_t status = messenger.SendRequest();
 	if (status != B_OK)
 		return status;
 
 	delete fSetupMessage;
-	fSetupMessage = configuration.Result();
+	fSetupMessage = messenger.Result();
 	_HandlePageSetup(fSetupMessage);
 
 	return B_OK;
 }
 
 
-static status_t
-ConfigJobThread(void *data)
-{
-	BPrivate::Configuration* configuration = static_cast<BPrivate::Configuration*>(data);
-
-	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK) {
-		ShowError(kPrintServerNotRespondingText);
-		configuration->SetResult(NULL);
-		return B_ERROR;
-	}
-
-	BMessage *request = configuration->Request();
-	if (request == NULL) {
-		configuration->SetResult(NULL);
-		return B_ERROR;
-	}
-
-
-	BMessage reply;
-	if (printServer.SendMessage(request, &reply) != B_OK
-		|| reply.what != 'okok') {
-		configuration->SetResult(NULL);
-		return B_ERROR;
-	}
-
-	configuration->SetResult(new BMessage(reply));
-	return B_OK;
-}
-
 status_t
 BPrintJob::ConfigJob()
 {
-	BPrivate::Configuration configuration(PSRV_SHOW_PRINT_SETUP, fSetupMessage);
-	status_t status = configuration.SendRequest(ConfigJobThread);
+	PrintServerMessenger messenger(PSRV_SHOW_PRINT_SETUP, fSetupMessage);
+	status_t status = messenger.SendRequest();
 	if (status != B_OK)
 		return status;
 
 	delete fSetupMessage;
-	fSetupMessage = configuration.Result();
+	fSetupMessage = messenger.Result();
 	_HandlePrintSetup(fSetupMessage);
 
 	return B_OK;
@@ -427,7 +258,7 @@ BPrintJob::CommitJob()
 		return;
 
 	if (fSpoolFileHeader.page_count == 0) {
-		ShowError(kNoPagesToPrintText);
+		ShowError("No Pages to print!");
 		CancelJob();
 		return;
 	}
@@ -465,7 +296,7 @@ BPrintJob::CommitJob()
 
 	// notify print server
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK)
+	if (PrintServerMessenger::GetPrintServerMessenger(printServer) != B_OK)
 		return;
 
 	BMessage request(PSRV_PRINT_SPOOLED_JOB);
@@ -631,12 +462,11 @@ int32
 BPrintJob::PrinterType(void *) const
 {
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK)
+	if (PrintServerMessenger::GetPrintServerMessenger(printServer) != B_OK)
 		return B_COLOR_PRINTER; // default
 
-	BMessage message(PSRV_GET_ACTIVE_PRINTER);
 	BMessage reply;
-
+	BMessage message(PSRV_GET_ACTIVE_PRINTER);
 	printServer.SendMessage(&message, &reply);
 
 	int32 type;
@@ -672,7 +502,7 @@ BPrintJob::_RecurseView(BView *view, BPoint origin, BPicture *picture,
 		view->FillRect(rect);
 		view->SetHighColor(highColor);
 	}
-		
+
 	view->Draw(rect);
 	view->PopState();
 	view->fIsPrinting = false;
@@ -791,22 +621,23 @@ BPrintJob::_AddPicture(BPicture &picture, BRect &rect, BPoint &where)
 	picture.Flatten(fSpoolFile);
 }
 
-
-// Returns a copy of the current printer name
-// or NULL if it could not be obtained.
-// Caller is responsible to free the string using free().
+/* !
+ *
+ * Returns a copy of the applications default printer name or NULL if it
+ * could not be obtained. Caller is responsible to free the string using free().
+ *
+ */
 char *
 BPrintJob::_GetCurrentPrinterName() const
 {
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer))
+	if (PrintServerMessenger::GetPrintServerMessenger(printServer) != B_OK)
 		return NULL;
-
-	BMessage message(PSRV_GET_ACTIVE_PRINTER);
-	BMessage reply;
 
 	const char *printerName = NULL;
 
+	BMessage reply;
+	BMessage message(PSRV_GET_ACTIVE_PRINTER);
 	if (printServer.SendMessage(&message, &reply) == B_OK)
 		reply.FindString("printer_name", &printerName);
 
@@ -821,7 +652,7 @@ void
 BPrintJob::_LoadDefaultSettings()
 {
 	BMessenger printServer;
-	if (GetPrinterServerMessenger(printServer) != B_OK)
+	if (PrintServerMessenger::GetPrintServerMessenger(printServer) != B_OK)
 		return;
 
 	BMessage message(PSRV_GET_DEFAULT_SETTINGS);
@@ -842,3 +673,167 @@ void BPrintJob::_ReservedPrintJob1() {}
 void BPrintJob::_ReservedPrintJob2() {}
 void BPrintJob::_ReservedPrintJob3() {}
 void BPrintJob::_ReservedPrintJob4() {}
+
+
+// #pragma mark -- PrintServerMessenger
+
+
+namespace BPrivate {
+
+
+	PrintServerMessenger::PrintServerMessenger(uint32 what, BMessage *input)
+		: fWhat(what),
+		fInput(input),
+		fRequest(NULL),
+		fResult(NULL),
+		fThreadCompleted(-1),
+		fHiddenApplicationModalWindow(NULL)
+	{
+		RejectUserInput();
+	}
+
+
+	PrintServerMessenger::~PrintServerMessenger()
+	{
+		DeleteSemaphore();
+			// in case SendRequest could not start the thread
+		delete fRequest; fRequest = NULL;
+		AllowUserInput();
+	}
+
+
+	void
+	PrintServerMessenger::RejectUserInput()
+	{
+		fHiddenApplicationModalWindow = new BAlert("bogus", "app_modal", "OK");
+		fHiddenApplicationModalWindow->DefaultButton()->SetEnabled(false);
+		fHiddenApplicationModalWindow->SetDefaultButton(NULL);
+		fHiddenApplicationModalWindow->MoveTo(-65000, -65000);
+		fHiddenApplicationModalWindow->Go(NULL);
+	}
+
+
+	void
+	PrintServerMessenger::AllowUserInput()
+	{
+		fHiddenApplicationModalWindow->Lock();
+		fHiddenApplicationModalWindow->Quit();
+	}
+
+
+	void
+	PrintServerMessenger::DeleteSemaphore()
+	{
+		if (fThreadCompleted >= B_OK) {
+			sem_id id = fThreadCompleted;
+			fThreadCompleted = -1;
+			delete_sem(id);
+		}
+	}
+
+
+	status_t
+	PrintServerMessenger::SendRequest()
+	{
+		fThreadCompleted = create_sem(0, "print_server_messenger_sem");
+		if (fThreadCompleted < B_OK)
+			return B_ERROR;
+
+		thread_id id = spawn_thread(MessengerThread, "async_request",
+			B_NORMAL_PRIORITY, this);
+		if (id <= 0 || resume_thread(id) != B_OK)
+			return B_ERROR;
+
+		// Get the originating window, if it exists
+		BWindow* window = dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
+		if (window) {
+			status_t err;
+			while (true) {
+				do {
+					err = acquire_sem_etc(fThreadCompleted, 1, B_RELATIVE_TIMEOUT,
+										  50000);
+				// We've (probably) had our time slice taken away from us
+				} while (err == B_INTERRUPTED);
+
+				// Semaphore was finally nuked in SetResult(BMessage *)
+				if (err == B_BAD_SEM_ID)
+					break;
+				window->UpdateIfNeeded();
+			}
+		} else {
+			// No window to update, so just hang out until we're done.
+			while (acquire_sem(fThreadCompleted) == B_INTERRUPTED);
+		}
+
+		status_t status;
+		wait_for_thread(id, &status);
+
+		return Result() != NULL ? B_OK : B_ERROR;
+	}
+
+
+	BMessage *
+	PrintServerMessenger::Request()
+	{
+		if (fRequest != NULL)
+			return fRequest;
+
+		if (fInput != NULL) {
+			fRequest = new BMessage(*fInput);
+			fRequest->what = fWhat;
+		} else
+			fRequest = new BMessage(fWhat);
+
+		return fRequest;
+	}
+
+
+	void
+	PrintServerMessenger::SetResult(BMessage *result)
+	{
+		fResult = result;
+		DeleteSemaphore();
+		// terminate loop in thread spawned by SendRequest
+	}
+
+
+	status_t
+	PrintServerMessenger::GetPrintServerMessenger(BMessenger& messenger)
+	{
+		messenger = BMessenger(PSRV_SIGNATURE_TYPE);
+		return messenger.IsValid() ? B_OK : B_ERROR;
+	}
+
+
+	status_t
+	PrintServerMessenger::MessengerThread(void *data)
+	{
+		PrintServerMessenger* messenger = static_cast<PrintServerMessenger*>(data);
+
+		BMessenger printServer;
+		if (messenger->GetPrintServerMessenger(printServer) != B_OK) {
+			ShowError("Print Server is not responding.");
+			messenger->SetResult(NULL);
+			return B_ERROR;
+		}
+
+		BMessage *request = messenger->Request();
+		if (request == NULL) {
+			messenger->SetResult(NULL);
+			return B_ERROR;
+		}
+
+
+		BMessage reply;
+		if (printServer.SendMessage(request, &reply) != B_OK
+			|| reply.what != 'okok') {
+			messenger->SetResult(NULL);
+			return B_ERROR;
+		}
+
+		messenger->SetResult(new BMessage(reply));
+		return B_OK;
+	}
+
+
+}	// namespace BPrivate
