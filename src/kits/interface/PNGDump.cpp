@@ -11,6 +11,7 @@
 
 #include "PNGDump.h"
 
+#include <InterfaceDefs.h>
 #include <NodeInfo.h>
 #include <Rect.h>
 
@@ -114,7 +115,7 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 			png_byte tempRow[dstRowBytes];
 			for (int row = 0; row < height; row++) {
 				for (int i = 0; i < dstRowBytes; i += 3, src++) {
-					tempRow[i + 2]     = (*src & 0xf800) >> 8;
+					tempRow[i + 2] = (*src & 0xf800) >> 8;
 					tempRow[i + 1] = (*src & 0x07e0) >> 3;
 					tempRow[i] = (*src & 0x001f) << 3;
 				}
@@ -123,10 +124,59 @@ SaveToPNG(const char* filename, const BRect& bounds, color_space space,
 			}
 			break;
 		}
+
+		case B_RGB15:
+		{
+			// create file without alpha channel
+			png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
+				PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+				PNG_FILTER_TYPE_DEFAULT);
+			png_write_info(png, info);
+
+			// convert from 15 bit RGB to 24 bit RGB while saving
+			uint16* src = (uint16 *)bits;
+			int dstRowBytes = width * 3;
+			png_byte tempRow[dstRowBytes];
+			for (int row = 0; row < height; row++) {
+				for (int i = 0; i < dstRowBytes; i += 3, src++) {
+					tempRow[i + 2] = (*src & 0x7c00) >> 7;
+					tempRow[i + 1] = (*src & 0x03e0) >> 2;
+					tempRow[i] = (*src & 0x001f) << 3;
+				}
+				src = (uint16 *)((uint8 *)bits + row * bytesPerRow);
+				png_write_row(png, tempRow);
+			}
+			break;
+		}
+
+		case B_CMAP8:
+		{
+			// create file without alpha channel
+			png_set_IHDR(png, info, width, height, 8, PNG_COLOR_TYPE_RGB,
+				PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+				PNG_FILTER_TYPE_DEFAULT);
+			png_write_info(png, info);
+
+			// convert from 8 bit CMAP to 24 bit RGB while saving
+			const color_map *colorMap = system_colors();
+			uint8* src = (uint8 *)bits;
+			int dstRowBytes = width * 3;
+			png_byte tempRow[dstRowBytes];
+			for (int row = 0; row < height; row++) {
+				for (int i = 0; i < dstRowBytes; i += 3, src++) {
+					tempRow[i + 2] = colorMap->color_list[*src].red;
+					tempRow[i + 1] = colorMap->color_list[*src].green;
+					tempRow[i] = colorMap->color_list[*src].blue;
+				}
+				src = (uint8 *)bits + row * bytesPerRow;
+				png_write_row(png, tempRow);
+			}
+			break;
+		}
 		
 		default:
 		{
-			TRACE(("Unsupported color space %lx\n", space));
+			TRACE(("Unsupported color space %x\n", space));
 			png_destroy_write_struct(&png, NULL);
 			fclose(file);
 			return B_ERROR;
