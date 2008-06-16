@@ -1116,7 +1116,7 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 				// lines).
 				for (int32 i = bottom + 1; i < fHeight; i++) {
 					std::swap(fScreen[_LineIndex(i)],
-						fScreen[_LineIndex(i) + numLines]);
+						fScreen[_LineIndex(i + numLines)]);
 				}
 
 				// update the screen offset and clear the new lines
