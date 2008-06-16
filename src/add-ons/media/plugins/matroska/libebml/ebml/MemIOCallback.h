@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: MemIOCallback.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: MemIOCallback.h 1298 2008-02-21 22:14:18Z mosu $
 	\author Jory Stone <jcsston @ toughguy.net>
 */
 #ifndef LIBEBML_MEMIOCALLBACK_H
@@ -36,10 +36,6 @@
 
 #include "IOCallback.h"
 #include <string>
-// Several gcc versions have some header problem, others don't -
-// but those that do will have problems with min being defined as a
-// macro upon inclusion of some stream header.
-#undef min
 #ifndef __BEOS__
 #include <sstream>
 #else

@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlUInteger.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlUInteger.cpp 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Moritz Bunkus <moritz @ bunkus.org>
 */
@@ -60,7 +60,7 @@ EbmlUInteger::EbmlUInteger(const EbmlUInteger & ElementToClone)
 /*!
 	\todo handle exception on errors
 */
-uint32 EbmlUInteger::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlUInteger::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	binary FinalData[8]; // we don't handle more than 64 bits integers
 	
@@ -78,9 +78,9 @@ uint32 EbmlUInteger::RenderData(IOCallback & output, bool bForceRender, bool bSa
 	return Size;
 }
 
-uint64 EbmlUInteger::UpdateSize(bool bSaveDefault, bool bForceRender)
+uint64 EbmlUInteger::UpdateSize(bool bKeepIntact, bool bForceRender)
 {
-	if (!bSaveDefault && IsDefaultValue())
+	if (!bKeepIntact && IsDefaultValue())
 		return 0;
 
 	if (Value <= 0xFF) {

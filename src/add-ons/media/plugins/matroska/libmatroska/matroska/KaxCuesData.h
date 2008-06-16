@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -42,7 +42,9 @@ using namespace LIBEBML_NAMESPACE;
 START_LIBMATROSKA_NAMESPACE
 
 class KaxBlockGroup;
+class KaxBlockBlob;
 class KaxCueTrackPositions;
+class KaxInternalBlock;
 
 class MATROSKA_DLL_API KaxCuePoint : public EbmlMaster {
 	public:
@@ -54,6 +56,7 @@ class MATROSKA_DLL_API KaxCuePoint : public EbmlMaster {
 		operator const EbmlId &() const {return ClassInfos.GlobalId;}
 		EbmlElement * Clone() const {return new KaxCuePoint(*this);}
 		void PositionSet(const KaxBlockGroup & BlockReference, uint64 GlobalTimecodeScale);
+		void PositionSet(const KaxBlockBlob & BlobReference, uint64 GlobalTimecodeScale);
 
 		bool operator<(const EbmlElement & EltB) const;
 
@@ -142,6 +145,7 @@ class MATROSKA_DLL_API KaxCueReference : public EbmlMaster {
 		EbmlElement * Clone() const {return new KaxCueReference(*this);}
 		
 		void AddReference(const KaxBlockGroup & BlockReferenced, uint64 GlobalTimecodeScale);
+		void AddReference(const KaxBlockBlob & BlockReferenced, uint64 GlobalTimecodeScale);
 };
 
 class MATROSKA_DLL_API KaxCueRefTime : public EbmlUInteger {

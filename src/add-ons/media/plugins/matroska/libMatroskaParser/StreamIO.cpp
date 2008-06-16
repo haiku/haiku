@@ -28,45 +28,70 @@
 #include "StreamIO.h"
 
 struct StreamIO {
-	FileCache 	filecache;
+	InputStream filecache;
 	BPositionIO *source;
 };
 
 static int
-stream_read(struct FileCache *cc, ulonglong pos, void *buffer, int count)
+stream_read(struct InputStream *cc, ulonglong pos, void *buffer, int count)
 {
 	return reinterpret_cast<StreamIO *>(cc)->source->ReadAt(pos, buffer, count);
 }
 
-
+// Only needed if resync required.
 static longlong
-stream_scan(struct FileCache *cc, ulonglong start, unsigned signature)
+stream_scan(struct InputStream *cc, ulonglong start, unsigned signature)
 {
 	return -1;
 }
 
+//static void
+//stream_close(struct InputStream *cc)
+//{
+//}
 
-static void
-stream_close(struct FileCache *cc)
-{
-}
-
-
+// Size of a buffer
+// we might want to test against bytes remaining in file.
 static unsigned
-stream_getsize(struct FileCache *cc)
+stream_getsize(struct InputStream *cc)
 {
 	return 524288;
 }
 
-
 static const char *
-stream_geterror(struct FileCache *cc)
+stream_geterror(struct InputStream *cc)
 {
 	return "";
 }
 
+/* memory allocation */
+static void	*
+stream_memalloc(struct InputStream *cc, size_t size)
+{
+	return malloc(size);
+}
 
-FileCache *
+static void	*
+stream_memrealloc(struct InputStream *cc,void *mem,size_t newsize)
+{
+	return realloc(mem,newsize);
+}
+
+static void
+stream_memfree(struct InputStream *cc, void *mem)
+{
+	free(mem);
+}
+
+// zero return causes parser to abort open
+static int
+stream_progress(struct InputStream *cc, ulonglong cur, ulonglong max)
+{
+// no idea what this function is supposed to do.
+	return max-cur;
+}
+
+InputStream *
 CreateFileCache(BDataIO *dataio)
 {
 	BPositionIO *posio;
@@ -81,11 +106,15 @@ CreateFileCache(BDataIO *dataio)
 
 	io->filecache.read = &stream_read;
 	io->filecache.scan = &stream_scan;
-	io->filecache.close = &stream_close;
+//	io->filecache.close = &stream_close;
 	io->filecache.getsize = &stream_getsize;
 	io->filecache.geterror = &stream_geterror;
+	io->filecache.memalloc = &stream_memalloc;
+	io->filecache.memrealloc = &stream_memrealloc;
+	io->filecache.memfree = &stream_memfree;
+	io->filecache.progress = &stream_progress;
 	io->source = posio;
 	
-	return reinterpret_cast<FileCache *>(io);
+	return reinterpret_cast<InputStream *>(io);
 }
 

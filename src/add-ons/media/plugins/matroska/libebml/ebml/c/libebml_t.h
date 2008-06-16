@@ -30,7 +30,7 @@
 
 /*!
     \file libebml_t.h
-    \version \$Id: libebml_t.h 837 2004-09-23 22:54:24Z mosu $
+    \version \$Id: libebml_t.h 1298 2008-02-21 22:14:18Z mosu $
     \author Steve Lhomme     <robux4 @ users.sf.net>
     \author Ingo Ralf Blum   <ingoralfblum @ users.sf.net>
     \author Moritz Bunkus <moritz@bunkus.org>
@@ -72,6 +72,8 @@ extern "C" {
     typedef uint16_t uint16;
     typedef uint8_t uint8;
 # endif // __GNUC__
+#elif defined(__BEOS__)
+#include <SupportDefs.h>
 #elif defined(DJGPP)				/* SL : DJGPP doesn't support POSIX types ???? */
     typedef signed long long int64;
     typedef signed long int32;
@@ -121,9 +123,7 @@ typedef enum open_mode {
     MODE_SAFE
 } open_mode;
 
-#if !defined(min)
-#define min(x,y) ((x)<(y) ? (x) : (y))
-#endif
+#define EBML_MIN(x,y) ((x)<(y) ? (x) : (y))
 
 #ifdef __cplusplus
 }

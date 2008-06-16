@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libmatroska.
 **
@@ -42,6 +42,7 @@
 #include "ebml/EbmlString.h"
 #include "ebml/EbmlUnicodeString.h"
 #include "ebml/EbmlBinary.h"
+#include "ebml/EbmlMaster.h"
 
 using namespace LIBEBML_NAMESPACE;
 
@@ -104,6 +105,17 @@ class MATROSKA_DLL_API KaxTrackFlagDefault : public EbmlUInteger {
 		EbmlElement * Clone() const {return new KaxTrackFlagDefault(*this);}
 };
 
+class MATROSKA_DLL_API KaxTrackFlagForced : public EbmlUInteger {
+	public:
+		KaxTrackFlagForced() :EbmlUInteger(0) {}
+		KaxTrackFlagForced(const KaxTrackFlagForced & ElementToClone) :EbmlUInteger(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxTrackFlagForced);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxTrackFlagForced(*this);}
+};
+
 class MATROSKA_DLL_API KaxTrackFlagLacing : public EbmlUInteger {
 	public:
 		KaxTrackFlagLacing() :EbmlUInteger(1) {}
@@ -157,6 +169,17 @@ class MATROSKA_DLL_API KaxTrackTimecodeScale : public EbmlFloat {
 		static const EbmlCallbacks ClassInfos;
 		operator const EbmlId &() const {return ClassInfos.GlobalId;}
 		EbmlElement * Clone() const {return new KaxTrackTimecodeScale(*this);}
+};
+
+class MATROSKA_DLL_API KaxMaxBlockAdditionID : public EbmlUInteger {
+	public:
+		KaxMaxBlockAdditionID() :EbmlUInteger(0) {}
+		KaxMaxBlockAdditionID(const KaxMaxBlockAdditionID & ElementToClone) :EbmlUInteger(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxMaxBlockAdditionID);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxMaxBlockAdditionID(*this);}
 };
 
 class MATROSKA_DLL_API KaxTrackName : public EbmlUnicodeString {
@@ -215,6 +238,74 @@ class MATROSKA_DLL_API KaxCodecName : public EbmlUnicodeString {
 		EbmlElement * Clone() const {return new KaxCodecName(*this);}
 };
 
+class MATROSKA_DLL_API KaxTrackAttachmentLink : public EbmlBinary {
+	public:
+		KaxTrackAttachmentLink() {}
+		KaxTrackAttachmentLink(const KaxTrackAttachmentLink & ElementToClone) :EbmlBinary(ElementToClone){}
+		static EbmlElement & Create() {return *(new KaxTrackAttachmentLink);}
+		bool ValidateSize() const {return true;} // we don't mind about what's inside
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxTrackAttachmentLink(*this);}
+};
+
+class MATROSKA_DLL_API KaxTrackOverlay : public EbmlUInteger {
+	public:
+		KaxTrackOverlay() {}
+		KaxTrackOverlay(const KaxTrackOverlay & ElementToClone) :EbmlUInteger(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxTrackOverlay);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxTrackOverlay(*this);}
+};
+
+class MATROSKA_DLL_API KaxTrackTranslate : public EbmlMaster {
+	public:
+		KaxTrackTranslate();
+		KaxTrackTranslate(const KaxTrackTranslate & ElementToClone) :EbmlMaster(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxTrackTranslate);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxTrackTranslate(*this);}
+};
+
+class MATROSKA_DLL_API KaxTrackTranslateCodec : public EbmlUInteger {
+	public:
+		KaxTrackTranslateCodec() {}
+		KaxTrackTranslateCodec(const KaxTrackTranslateCodec & ElementToClone) :EbmlUInteger(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxTrackTranslateCodec);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxTrackTranslateCodec(*this);}
+};
+
+class MATROSKA_DLL_API KaxTrackTranslateEditionUID : public EbmlUInteger {
+	public:
+		KaxTrackTranslateEditionUID() {}
+		KaxTrackTranslateEditionUID(const KaxTrackTranslateEditionUID & ElementToClone) :EbmlUInteger(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxTrackTranslateEditionUID);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxTrackTranslateEditionUID(*this);}
+};
+
+class MATROSKA_DLL_API KaxTrackTranslateTrackID : public EbmlBinary {
+	public:
+		KaxTrackTranslateTrackID() {}
+		KaxTrackTranslateTrackID(const KaxTrackTranslateTrackID & ElementToClone) :EbmlBinary(ElementToClone){}
+		static EbmlElement & Create() {return *(new KaxTrackTranslateTrackID);}
+		bool ValidateSize() const { return true;}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxTrackTranslateTrackID(*this);}
+};
+
 #if MATROSKA_VERSION >= 2
 class MATROSKA_DLL_API KaxCodecSettings : public EbmlUnicodeString {
 	public:
@@ -258,17 +349,6 @@ class MATROSKA_DLL_API KaxCodecDecodeAll : public EbmlUInteger {
 		static const EbmlCallbacks ClassInfos;
 		operator const EbmlId &() const {return ClassInfos.GlobalId;}
 		EbmlElement * Clone() const {return new KaxCodecDecodeAll(*this);}
-};
-
-class MATROSKA_DLL_API KaxTrackOverlay : public EbmlUInteger {
-	public:
-		KaxTrackOverlay() {}
-		KaxTrackOverlay(const KaxTrackOverlay & ElementToClone) :EbmlUInteger(ElementToClone) {}
-		static EbmlElement & Create() {return *(new KaxTrackOverlay);}
-		const EbmlCallbacks & Generic() const {return ClassInfos;}
-		static const EbmlCallbacks ClassInfos;
-		operator const EbmlId &() const {return ClassInfos.GlobalId;}
-		EbmlElement * Clone() const {return new KaxTrackOverlay(*this);}
 };
 #endif // MATROSKA_VERSION
 

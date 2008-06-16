@@ -112,6 +112,18 @@ class MATROSKA_DLL_API KaxFileData : public EbmlBinary {
 		EbmlElement * Clone() const {return new KaxFileData(*this);}
 };
 
+class MATROSKA_DLL_API KaxFileReferral : public EbmlBinary {
+	public:
+		KaxFileReferral() {}
+		KaxFileReferral(const KaxFileReferral & ElementToClone) :EbmlBinary(ElementToClone){}
+		static EbmlElement & Create() {return *(new KaxFileReferral);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		bool ValidateSize() const {return true;} // we don't mind about what's inside
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxFileReferral(*this);}
+};
+
 class MATROSKA_DLL_API KaxFileUID : public EbmlUInteger {
 	public:
 		KaxFileUID() {}

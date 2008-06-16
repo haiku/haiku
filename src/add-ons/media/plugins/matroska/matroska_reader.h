@@ -61,7 +61,7 @@ private:
 	status_t	SetupTextCookie(mkv_cookie *cookie);
 
 private:
-	FileCache *			fFileCache;
+	InputStream *		fInputStream;
 	MatroskaFile *		fFile;
 	const SegmentInfo *	fFileInfo;
 };

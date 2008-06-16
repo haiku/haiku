@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2003 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libmatroska.
 **
@@ -46,6 +46,12 @@ enum LacingType {
 	LACING_FIXED,
 	LACING_EBML,
 	LACING_AUTO
+};
+
+enum BlockBlobType {
+	BLOCK_BLOB_NO_SIMPLE = 0,
+	BLOCK_BLOB_SIMPLE_AUTO,
+	BLOCK_BLOB_ALWAYS_SIMPLE,
 };
 
 END_LIBMATROSKA_NAMESPACE

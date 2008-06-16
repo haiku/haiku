@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: Debug.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: Debug.cpp 1268 2007-01-19 10:15:08Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Moritz Bunkus <moritz @ bunkus.org>
 */
@@ -84,7 +84,7 @@ inline int ADbg::_OutPut(const char * format,va_list params) const
 		SYSTEMTIME time;
 		GetSystemTime(&time);
 		if (prefix[0] == '\0')
-			wsprintf(myformat,"%04d/%02d/%02d %02d:%02d:%02d.%03d UTC : %s\r\n",
+			wsprintfA(myformat,"%04d/%02d/%02d %02d:%02d:%02d.%03d UTC : %s\r\n",
 							time.wYear,
 							time.wMonth,
 							time.wDay,
@@ -94,7 +94,7 @@ inline int ADbg::_OutPut(const char * format,va_list params) const
 							time.wMilliseconds,
 							format);
 		else
-			wsprintf(myformat,"%04d/%02d/%02d %02d:%02d:%02d.%03d UTC : %s - %s\r\n",
+			wsprintfA(myformat,"%04d/%02d/%02d %02d:%02d:%02d.%03d UTC : %s - %s\r\n",
 							time.wYear,
 							time.wMonth,
 							time.wDay,
@@ -106,19 +106,19 @@ inline int ADbg::_OutPut(const char * format,va_list params) const
 							format);
 	} else {
 		if (prefix[0] == '\0')
-			wsprintf( myformat, "%s\r\n", format);
+			wsprintfA( myformat, "%s\r\n", format);
 		else
-			wsprintf( myformat, "%s - %s\r\n", prefix, format);
+			wsprintfA( myformat, "%s - %s\r\n", prefix, format);
 	}
 	result = vsprintf(tst,myformat,params);
 	
 	if (my_debug_output)
-		OutputDebugString(tst);
+		OutputDebugStringA(tst);
 
 	if (my_use_file && (hFile != NULL)) {
 		SetFilePointer( hFile, 0, 0, FILE_END );
 		DWORD written;
-		WriteFile( hFile, tst, lstrlen(tst), &written, NULL );
+		WriteFile( hFile, tst, lstrlenA(tst), &written, NULL );
 	}
 #else
 	if (my_time_included) {
@@ -133,12 +133,12 @@ inline int ADbg::_OutPut(const char * format,va_list params) const
 			sprintf(myformat,"%04d/%02d/%02d %02d:%02d:%02ld.%03ld UTC : %s\r\n",
 					now->tm_year, now->tm_mon, now->tm_mday,
 					now->tm_hour, now->tm_min, tv.tv_sec,
-					tv.tv_usec / 1000, format);
+					(long)tv.tv_usec / 1000, format);
 		else
 			sprintf(myformat,"%04d/%02d/%02d %02d:%02d:%02ld.%03ld UTC : %s - %s\r\n",
 					now->tm_year, now->tm_mon, now->tm_mday,
 					now->tm_hour, now->tm_min, tv.tv_sec,
-					tv.tv_usec / 1000, prefix, format);
+					(long)tv.tv_usec / 1000, prefix, format);
 		
 	} else {
 		if (prefix[0] == '\0')
@@ -192,7 +192,7 @@ bool ADbg::setDebugFile(const char * NewFilename) {
 		result = false;
 
 #ifdef WIN32
-		hFile = CreateFile(NewFilename, GENERIC_WRITE, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+		hFile = CreateFileA(NewFilename, GENERIC_WRITE, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
 		
 		if (hFile != INVALID_HANDLE_VALUE) {
 			SetFilePointer( hFile, 0, 0, FILE_END );

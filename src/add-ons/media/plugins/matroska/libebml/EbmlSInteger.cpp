@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlSInteger.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlSInteger.cpp 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Moritz Bunkus <moritz @ bunkus.org>
 */
@@ -58,7 +58,7 @@ EbmlSInteger::EbmlSInteger(const EbmlSInteger & ElementToClone)
 /*!
 	\todo handle exception on errors
 */
-uint32 EbmlSInteger::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlSInteger::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	binary FinalData[8]; // we don't handle more than 64 bits integers
 	unsigned int i;
@@ -77,9 +77,9 @@ uint32 EbmlSInteger::RenderData(IOCallback & output, bool bForceRender, bool bSa
 	return Size;
 }
 
-uint64 EbmlSInteger::UpdateSize(bool bSaveDefault, bool bForceRender)
+uint64 EbmlSInteger::UpdateSize(bool bKeepIntact, bool bForceRender)
 {
-	if (!bSaveDefault && IsDefaultValue())
+	if (!bKeepIntact && IsDefaultValue())
 		return 0;
 
 	if (Value <= 0x7F && Value >= (-0x80)) {

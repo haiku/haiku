@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlSInteger.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlSInteger.h 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Julien Coloos    <suiryc @ users.sf.net>
 	\author Moritz Bunkus    <moritz @ bunkus.org>
@@ -63,9 +63,9 @@ class EBML_DLL_API EbmlSInteger : public EbmlElement {
 		void SetDefaultSize(const int nDefaultSize = DEFAULT_INT_SIZE) {Size = nDefaultSize;}
 
 		bool ValidateSize() const {return (Size <= 8);}
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 		uint64 ReadData(IOCallback & input, ScopeMode ReadFully = SCOPE_ALL_DATA);
-		uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false);
+		uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false);
 	
 		bool operator<(const EbmlSInteger & EltCmp) const {return Value < EltCmp.Value;}
 		

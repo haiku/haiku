@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: StdIOCallback.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: StdIOCallback.h 1090 2005-03-16 12:47:59Z robux4 $
 */
 #ifndef LIBEBML_STDIOCALLBACK_H
 #define LIBEBML_STDIOCALLBACK_H
@@ -66,6 +66,7 @@ class EBML_DLL_API StdIOCallback:public IOCallback
 {
     private:
     	FILE*File;
+		uint64 mCurrentPosition;
 
     public:
 //	StdIOCallback(const char*Path,const char*Mode);

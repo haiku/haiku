@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlString.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlString.h 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_STRING_H
@@ -56,9 +56,9 @@ class EBML_DLL_API EbmlString : public EbmlElement {
 		virtual ~EbmlString() {}
 	
 		bool ValidateSize() const {return true;} // any size is possible
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 		uint64 ReadData(IOCallback & input, ScopeMode ReadFully = SCOPE_ALL_DATA);
-		uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false);
+		uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false);
 	
 		EbmlString & operator=(const std::string);
 		operator const std::string &() const {return Value;}

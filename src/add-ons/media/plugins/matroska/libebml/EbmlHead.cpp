@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlHead.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlHead.cpp 1096 2005-03-17 09:14:52Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include "ebml/EbmlHead.h"
@@ -53,7 +53,7 @@ const EbmlSemantic EbmlHead_ContextList[] =
 const EbmlSemanticContext EbmlHead_Context = EbmlSemanticContext(countof(EbmlHead_ContextList), EbmlHead_ContextList, NULL, *GetEbmlGlobal_Context, &EbmlHead::ClassInfos);
 
 EbmlId EbmlHead_TheId(0x1A45DFA3, 4);
-const EbmlCallbacks EbmlHead::ClassInfos(EbmlHead::Create, EbmlHead_TheId, "EBMLHead", EbmlHead_Context);
+const EbmlCallbacks EbmlHead::ClassInfos(EbmlHead::Create, EbmlHead_TheId, "EBMLHead\0ratamapaga", EbmlHead_Context);
 
 EbmlHead::EbmlHead()
  :EbmlMaster(EbmlHead_Context)

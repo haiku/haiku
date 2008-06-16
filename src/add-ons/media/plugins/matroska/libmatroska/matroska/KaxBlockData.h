@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -44,6 +44,7 @@ START_LIBMATROSKA_NAMESPACE
 
 class KaxReferenceBlock;
 class KaxBlockGroup;
+class KaxBlockBlob;
 
 class MATROSKA_DLL_API KaxReferencePriority : public EbmlUInteger {
 	public:
@@ -74,12 +75,13 @@ class MATROSKA_DLL_API KaxReferenceBlock : public EbmlSInteger {
 		*/
 		virtual uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false);
 
-		const KaxBlockGroup & RefBlock() const;
-		void SetReferencedBlock(const KaxBlockGroup & aRefdBlock) {RefdBlock = &aRefdBlock; bValueIsSet = true;}
+		const KaxBlockBlob & RefBlock() const;
+		void SetReferencedBlock(const KaxBlockBlob * aRefdBlock);
+		void SetReferencedBlock(const KaxBlockGroup & aRefdBlock);
 		void SetParentBlock(const KaxBlockGroup & aParentBlock) {ParentBlock = &aParentBlock;}
 		
 	protected:
-		const KaxBlockGroup * RefdBlock;
+		const KaxBlockBlob * RefdBlock;
 		const KaxBlockGroup * ParentBlock;
 		void SetReferencedTimecode(int64 refTimecode) {Value = refTimecode; bTimecodeSet = true; bValueIsSet = true;};
 		bool bTimecodeSet;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2004 Mike Matsnev.  All Rights Reserved.
+ * Copyright (c) 2004-2005 Mike Matsnev.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,7 +25,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
- * $Id: MatroskaParser.h,v 1.3 2004/09/17 12:59:07 mike Exp $
+ * $Id: MatroskaParser.h,v 1.10 2005/01/10 04:52:34 mike Exp $
  * 
  */
 
@@ -53,7 +53,7 @@
 #endif
 
 #define MATROSKA_COMPRESSION_SUPPORT
-#undef	MATROSKA_INTEGER_ONLY
+//#define	MATROSKA_INTEGER_ONLY
 
 #ifdef __cplusplus
 extern "C" {
@@ -78,39 +78,24 @@ typedef	double	MKFLOAT;
 #endif
 
 /* generic I/O */
-struct InputFile {
-  /* reading files
-   * Matroska parser does internal buffering and will can these
-   * functions with suitably aligned buffers and offsets */
-  int	      (*read)(struct InputFile *inf,void *buffer,int count);
-  longlong    (*seek)(struct InputFile *inf,longlong where,int how);
-  void	      (*close)(struct InputFile *inf);
-
-  /* allocate a suitably aligned buffer */
-  void	      *(*memalloc)(struct InputFile *inf, unsigned size);
-  void	      (*memfree)(struct InputFile *inf, void *mem, unsigned size);
-
-  /* error message for last operation */
-  const char  *last_error;
+struct InputStream {
+  /* read bytes from stream */
+  int	      (*read)(struct InputStream *cc,ulonglong pos,void *buffer,int count);
+  /* scan for a four byte signature, bytes must be nonzero */
+  longlong    (*scan)(struct InputStream *cc,ulonglong start,unsigned signature);
+  /* get cache size, this is used to cap readahead */
+  unsigned    (*getsize)(struct InputStream *cc);
+  /* fetch last error message */
+  const char *(*geterror)(struct InputStream *cc);
+  /* memory allocation */
+  void	      *(*memalloc)(struct InputStream *cc,size_t size);
+  void	      *(*memrealloc)(struct InputStream *cc,void *mem,size_t newsize);
+  void	      (*memfree)(struct InputStream *cc,void *mem);
+  // zero return causes parser to abort open
+  int	      (*progress)(struct InputStream *cc,ulonglong cur,ulonglong max);
 };
 
-typedef struct InputFile InputFile;
-
-X InputFile *fileio_open(/* in */  const char *filename,
-		         /* out */ char *errormsg,
-		         /* in */  int msglen);
-
-struct FileCache {
-  int	      (*read)(struct FileCache *cc,ulonglong pos,void *buffer,int count);
-  longlong    (*scan)(struct FileCache *cc,ulonglong start,unsigned signature);
-  void	      (*close)(struct FileCache *cc);
-  unsigned    (*getsize)(struct FileCache *cc);
-  const char *(*geterror)(struct FileCache *cc);
-};
-
-typedef struct FileCache FileCache;
-
-FileCache   *CacheAlloc(InputFile *io, unsigned pages, unsigned pagesize);
+typedef struct InputStream InputStream;
 
 /* matroska file */
 struct MatroskaFile; /* opaque */
@@ -118,6 +103,10 @@ struct MatroskaFile; /* opaque */
 typedef struct MatroskaFile MatroskaFile;
 
 #define	COMP_ZLIB   0
+
+#define	TT_VIDEO    1
+#define	TT_AUDIO    2
+#define	TT_SUB	    17
 
 struct TrackInfo {
   unsigned char	  Number;
@@ -131,12 +120,15 @@ struct TrackInfo {
   void		  *CodecPrivate;
   unsigned	  CodecPrivateSize;
   unsigned	  CompMethod;
+  struct {
     unsigned int  Enabled:1;
     unsigned int  Default:1;
     unsigned int  Lacing:1;
     unsigned int  DecodeAll:1;
     unsigned int  CompEnabled:1;
+  };
 
+  union {
     struct {
       unsigned char   StereoMode;
       unsigned char   DisplayUnit;
@@ -147,7 +139,9 @@ struct TrackInfo {
       unsigned int    DisplayHeight;
       unsigned int    ColourSpace;
       MKFLOAT	      GammaValue;
+      struct {
 	unsigned int  Interlaced:1;
+      };
     } Video;
     struct {
       MKFLOAT	      SamplingFreq;
@@ -155,6 +149,7 @@ struct TrackInfo {
       unsigned char   Channels;
       unsigned char   BitDepth;
     } Audio;
+  };
 
   /* various strings */
   char			*Name;
@@ -199,8 +194,17 @@ struct ChapterDisplay {
 };
 
 struct ChapterCommand {
-  ulonglong		Time;
-  char			*String;
+  unsigned		Time;
+  unsigned		CommandLength;
+  char			*Command;
+};
+
+struct ChapterProcess {
+  unsigned		CodecID;
+  unsigned		CodecPrivateLength;
+  char			*CodecPrivate;
+  unsigned		nCommands,nCommandsSize;
+  struct ChapterCommand	*Commands;
 };
 
 struct Chapter {
@@ -214,15 +218,17 @@ struct Chapter {
   struct ChapterDisplay	*Display;
   unsigned		nChildren,nChildrenSize;
   struct Chapter	*Children;
-  unsigned		nCommands,nCommandsSize;
-  struct ChapterCommand	*Commands;
+  unsigned		nProcess,nProcessSize;
+  struct ChapterProcess	*Process;
 
+  struct {
     unsigned int	Hidden:1;
     unsigned int	Enabled:1;
 
     // Editions
-    unsigned int	Managed:1;
     unsigned int	Default:1;
+    unsigned int	Ordered:1;
+  };
 };
 
 typedef struct Chapter	Chapter;
@@ -253,30 +259,25 @@ struct Tag {
 
 typedef struct Tag  Tag;
 
-/* Open a matroska file, ownership of io is passed to MatroskaFile
- *  if Open fails, io is still closed and destroyed
+/* Open a matroska file
+ * io pointer is recorded inside MatroskaFile
  */
-X MatroskaFile  *mkv_Open(/* in */ FileCache *io,
+X MatroskaFile  *mkv_Open(/* in */ InputStream *io,
 			/* out */ char *err_msg,
 			/* in */  unsigned msgsize);
 
 #define	MKVF_AVOID_SEEKS    1 /* use sequential reading only */
 
-X MatroskaFile  *mkv_OpenEx(/* in */  FileCache *io,
+X MatroskaFile  *mkv_OpenEx(/* in */  InputStream *io,
+			  /* in */  ulonglong base,
 			  /* in */  unsigned flags,
 			  /* out */ char *err_msg,
 			  /* in */  unsigned msgsize);
 
-X MatroskaFile	*mkv_OpenFile(/* in */	const char *filename,
-			      /* in */	unsigned cache_size,
-			      /* in */	unsigned flags,
-			      /* out */	char *err_msg,
-			      /* in */	unsigned msgsize);
-
-/* Close and deallocate mf, this close the underlying InputFile
+/* Close and deallocate mf
  * NULL pointer is ok and is simply ignored
  */
-X void	      mkv_Close(/* in */ MatroskaFile *mf);
+X void		mkv_Close(/* in */ MatroskaFile *mf);
 
 /* Fetch the error message of the last failed operation */
 X const char    *mkv_GetLastError(/* in */ MatroskaFile *mf);
@@ -298,6 +299,8 @@ X void	      mkv_GetChapters(/* in */	MatroskaFile *mf,
 X void	      mkv_GetTags(/* in */  MatroskaFile *mf,
 			  /* out */ Tag **tag,
 			  /* out */ unsigned *count);
+
+X ulonglong   mkv_GetSegmentTop(MatroskaFile *mf);
 
 /* Seek to specified timecode,
  * if timecode is past end of file,

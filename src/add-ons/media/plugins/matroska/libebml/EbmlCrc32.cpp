@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlCrc32.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlCrc32.cpp 1155 2005-05-06 11:43:38Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Jory Stone       <jcsston @ toughguy.net>
 */
@@ -41,10 +41,10 @@
 START_LIBEBML_NAMESPACE
 
 EbmlId EbmlCrc32_TheId(0xBF, 1);
-const EbmlCallbacks EbmlCrc32::ClassInfos(EbmlCrc32::Create, EbmlCrc32_TheId, "EBMLCrc32", EbmlVoid_Context);
+const EbmlCallbacks EbmlCrc32::ClassInfos(EbmlCrc32::Create, EbmlCrc32_TheId, "EBMLCrc32\0ratamadabapa", EbmlVoid_Context);
 
 const uint32 EbmlCrc32::m_tab[] = {
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 	0x00000000L, 0x96300777L, 0x2c610eeeL, 0xba510999L, 0x19c46d07L,
 	0x8ff46a70L, 0x35a563e9L, 0xa395649eL, 0x3288db0eL, 0xa4b8dc79L,
 	0x1ee9d5e0L, 0x88d9d297L, 0x2b4cb609L, 0xbd7cb17eL, 0x072db8e7L,
@@ -193,7 +193,7 @@ bool EbmlCrc32::CheckElementCRC32(EbmlElement &ElementToCRC)
 	return CheckCRC(m_crc_final, memoryBuffer.GetDataBuffer(), memoryBuffer.GetDataBufferSize());
 };
 
-uint32 EbmlCrc32::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlCrc32::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	uint32 Result = DIGESTSIZE;
 

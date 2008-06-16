@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlMaster.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlMaster.cpp 1178 2005-05-19 15:47:11Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 
@@ -87,26 +87,27 @@ EbmlMaster::~EbmlMaster()
 	\todo handle exception on errors
 	\todo write all the Mandatory elements in the Context, otherwise assert
 */
-uint32 EbmlMaster::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlMaster::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	uint32 Result = 0;
 	size_t Index;
 
-	if (!bForceRender)
+	if (!bForceRender) {
 		assert(CheckMandatory());
+	}
 
 	if (!bChecksumUsed) { // old school
 		for (Index = 0; Index < ElementList.size(); Index++) {
-			if (!bSaveDefault && (ElementList[Index])->IsDefaultValue())
+			if (!bKeepIntact && (ElementList[Index])->IsDefaultValue())
 				continue;
-			Result += (ElementList[Index])->Render(output, bSaveDefault, false ,bForceRender);
+			Result += (ElementList[Index])->Render(output, bKeepIntact, false ,bForceRender);
 		}
 	} else { // new school
 		MemIOCallback TmpBuf(Size - 6);
 		for (Index = 0; Index < ElementList.size(); Index++) {
-			if (!bSaveDefault && (ElementList[Index])->IsDefaultValue())
+			if (!bKeepIntact && (ElementList[Index])->IsDefaultValue())
 				continue;
-			(ElementList[Index])->Render(TmpBuf, bSaveDefault, false ,bForceRender);
+			(ElementList[Index])->Render(TmpBuf, bKeepIntact, false ,bForceRender);
 		}
 		Checksum.FillCRC32(TmpBuf.GetDataBuffer(), TmpBuf.GetDataBufferSize());
 		Result += Checksum.Render(output, true, false ,bForceRender);
@@ -126,23 +127,24 @@ bool EbmlMaster::PushElement(EbmlElement & element)
 	return true;
 }
 
-uint64 EbmlMaster::UpdateSize(bool bSaveDefault, bool bForceRender)
+uint64 EbmlMaster::UpdateSize(bool bKeepIntact, bool bForceRender)
 {
 	Size = 0;
 
 	if (!bSizeIsFinite)
 		return (0-1);
 
-	if (!bForceRender)
+	if (!bForceRender) {
 		assert(CheckMandatory());
+    }
 	
 	size_t Index;
 	
 	for (Index = 0; Index < ElementList.size(); Index++) {
-		if (!bSaveDefault && (ElementList[Index])->IsDefaultValue())
+		if (!bKeepIntact && (ElementList[Index])->IsDefaultValue())
 			continue;
-		(ElementList[Index])->UpdateSize(bSaveDefault, bForceRender);
-		uint64 SizeToAdd = (ElementList[Index])->ElementSize(bSaveDefault);
+		(ElementList[Index])->UpdateSize(bKeepIntact, bForceRender);
+		uint64 SizeToAdd = (ElementList[Index])->ElementSize(bKeepIntact);
 #if defined(_DEBUG) || defined(DEBUG)
 		if (SizeToAdd == (0-1))
 			return (0-1);
@@ -156,10 +158,10 @@ uint64 EbmlMaster::UpdateSize(bool bSaveDefault, bool bForceRender)
 	return Size;
 }
 
-uint32 EbmlMaster::WriteHead(IOCallback & output, int nSizeLength, bool bSaveDefault)
+uint32 EbmlMaster::WriteHead(IOCallback & output, int nSizeLength, bool bKeepIntact)
 {
 	SetSizeLength(nSizeLength);
-	return RenderHead(output, false, bSaveDefault);
+	return RenderHead(output, false, bKeepIntact);
 }
 
 /*!
@@ -414,7 +416,7 @@ void EbmlMaster::Read(EbmlStream & inDataStream, const EbmlSemanticContext & sCo
 			inDataStream.I_O().setFilePointer(SizePosition + SizeLength, seek_beginning);
 			ElementLevelA = inDataStream.FindNextElement(sContext, UpperEltFound, MaxSizeToRead, AllowDummyElt);
 			while (ElementLevelA != NULL && MaxSizeToRead > 0 && UpperEltFound <= 0) {
-				MaxSizeToRead -= ElementLevelA->ElementSize(true); // even if it's the default value
+				MaxSizeToRead = GetEndPosition() - ElementLevelA->GetEndPosition(); // even if it's the default value
 				if (!AllowDummyElt && ElementLevelA->IsDummy()) {
 					ElementLevelA->SkipData(inDataStream, sContext);
 					delete ElementLevelA; // forget this unknown element

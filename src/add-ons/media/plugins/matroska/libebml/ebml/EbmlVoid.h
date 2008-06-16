@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlVoid.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlVoid.h 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_VOID_H
@@ -61,17 +61,17 @@ class EBML_DLL_API EbmlVoid : public EbmlBinary {
 		/*!
 			\note overwrite to write fake data 
 		*/
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 
 		/*!
 			\brief Replace the void element content (written) with this one
 		*/
-		uint64 ReplaceWith(EbmlElement & EltToReplaceWith, IOCallback & output, bool ComeBackAfterward = true, bool bSaveDefault = false);
+		uint64 ReplaceWith(EbmlElement & EltToReplaceWith, IOCallback & output, bool ComeBackAfterward = true, bool bKeepIntact = false);
 
 		/*!
 			\brief Void the content of an element
 		*/
-		uint64 Overwrite(const EbmlElement & EltToVoid, IOCallback & output, bool ComeBackAfterward = true, bool bSaveDefault = false);
+		uint64 Overwrite(const EbmlElement & EltToVoid, IOCallback & output, bool ComeBackAfterward = true, bool bKeepIntact = false);
 
 		EbmlElement * Clone() const {return new EbmlVoid(*this);}
 };

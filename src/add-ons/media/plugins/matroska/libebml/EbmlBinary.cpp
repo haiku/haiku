@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlBinary.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlBinary.cpp 1112 2005-03-28 09:55:50Z mosu $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Julien Coloos	<suiryc @ users.sf.net>
 */
@@ -44,26 +44,24 @@ EbmlBinary::EbmlBinary()
  :EbmlElement(0, false), Data(NULL)
 {}
 
-/*!
-	\todo shouldn't we copy the Data if they exist ???
-*/
 EbmlBinary::EbmlBinary(const EbmlBinary & ElementToClone)
  :EbmlElement(ElementToClone)
 {
 	if (ElementToClone.Data == NULL)
 		Data = NULL;
 	else {
-		Data = new binary[Size];
+		Data = (binary *)malloc(Size * sizeof(binary));
+		assert(Data != NULL);
 		memcpy(Data, ElementToClone.Data, Size);
 	}
 }
 
 EbmlBinary::~EbmlBinary(void) {
 	if(Data)
-		delete[] Data;
+		free(Data);
 }
 
-uint32 EbmlBinary::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlBinary::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	output.writeFully(Data,Size);
 
@@ -73,7 +71,7 @@ uint32 EbmlBinary::RenderData(IOCallback & output, bool bForceRender, bool bSave
 /*!
 	\note no Default binary value handled
 */
-uint64 EbmlBinary::UpdateSize(bool bSaveDefault, bool bForceRender)
+uint64 EbmlBinary::UpdateSize(bool bKeepIntact, bool bForceRender)
 {
 	return Size;
 }
@@ -81,7 +79,7 @@ uint64 EbmlBinary::UpdateSize(bool bSaveDefault, bool bForceRender)
 uint64 EbmlBinary::ReadData(IOCallback & input, ScopeMode ReadFully)
 {
 	if (Data != NULL)
-		delete Data;
+		free(Data);
 	
 	if (ReadFully == SCOPE_NO_DATA)
 	{
@@ -89,9 +87,15 @@ uint64 EbmlBinary::ReadData(IOCallback & input, ScopeMode ReadFully)
 		return Size;
 	}
 
-	Data = new binary[Size];
+	Data = (binary *)malloc(Size * sizeof(binary));
+	assert(Data != NULL);
 	bValueIsSet = true;
 	return input.read(Data, Size);
+}
+
+bool EbmlBinary::operator==(const EbmlBinary & ElementToCompare) const
+{
+	return ((Size == ElementToCompare.Size) && !memcmp(Data, ElementToCompare.Data, Size));
 }
 
 END_LIBEBML_NAMESPACE

@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlVoid.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlVoid.cpp 1232 2005-10-15 15:56:52Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include "ebml/EbmlVoid.h"
@@ -46,7 +46,7 @@ EbmlVoid::EbmlVoid()
 	bValueIsSet = true;
 }
 
-uint32 EbmlVoid::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlVoid::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	// write dummy data by 4KB chunks
 	static binary DummyBuf[4*1024];
@@ -61,9 +61,9 @@ uint32 EbmlVoid::RenderData(IOCallback & output, bool bForceRender, bool bSaveDe
 	return Size;
 }
 
-uint64 EbmlVoid::ReplaceWith(EbmlElement & EltToReplaceWith, IOCallback & output, bool ComeBackAfterward, bool bSaveDefault)
+uint64 EbmlVoid::ReplaceWith(EbmlElement & EltToReplaceWith, IOCallback & output, bool ComeBackAfterward, bool bKeepIntact)
 {
-	EltToReplaceWith.UpdateSize(bSaveDefault);
+	EltToReplaceWith.UpdateSize(bKeepIntact);
 	if (HeadSize() + Size < EltToReplaceWith.GetSize() + EltToReplaceWith.HeadSize()) {
 		// the element can't be written here !
 		return 0;
@@ -76,19 +76,19 @@ uint64 EbmlVoid::ReplaceWith(EbmlElement & EltToReplaceWith, IOCallback & output
 	uint64 CurrentPosition = output.getFilePointer();
 
 	output.setFilePointer(GetElementPosition());
-	EltToReplaceWith.Render(output, bSaveDefault);
+	EltToReplaceWith.Render(output, bKeepIntact);
 
 	if (HeadSize() + Size - EltToReplaceWith.GetSize() - EltToReplaceWith.HeadSize() > 1) {
 	  // fill the rest with another void element
 	  EbmlVoid aTmp;
 	  aTmp.SetSize(HeadSize() + Size - EltToReplaceWith.GetSize() - EltToReplaceWith.HeadSize() - 1); // 1 is the length of the Void ID
 	  int HeadBefore = aTmp.HeadSize();
-	  aTmp.SetSize(aTmp.GetSize() - CodedSizeLength(aTmp.Size, aTmp.SizeLength));
+	  aTmp.SetSize(aTmp.GetSize() - CodedSizeLength(aTmp.Size, aTmp.SizeLength, aTmp.bSizeIsFinite));
 	  int HeadAfter = aTmp.HeadSize();
 	  if (HeadBefore != HeadAfter) {
-	    aTmp.SetSizeLength(CodedSizeLength(aTmp.Size, aTmp.SizeLength) - (HeadAfter - HeadBefore));
+		  aTmp.SetSizeLength(CodedSizeLength(aTmp.Size, aTmp.SizeLength, aTmp.bSizeIsFinite) - (HeadAfter - HeadBefore));
 	  }
-	  aTmp.RenderHead(output, false, bSaveDefault); // the rest of the data is not rewritten
+	  aTmp.RenderHead(output, false, bKeepIntact); // the rest of the data is not rewritten
 	}
 
 	if (ComeBackAfterward) {
@@ -98,9 +98,9 @@ uint64 EbmlVoid::ReplaceWith(EbmlElement & EltToReplaceWith, IOCallback & output
 	return Size + HeadSize();
 }
 
-uint64 EbmlVoid::Overwrite(const EbmlElement & EltToVoid, IOCallback & output, bool ComeBackAfterward, bool bSaveDefault)
+uint64 EbmlVoid::Overwrite(const EbmlElement & EltToVoid, IOCallback & output, bool ComeBackAfterward, bool bKeepIntact)
 {
-//	EltToVoid.UpdateSize(bSaveDefault);
+//	EltToVoid.UpdateSize(bKeepIntact);
 	if (EltToVoid.GetElementPosition() == 0) {
 		// this element has never been written
 		return 0;
@@ -116,17 +116,17 @@ uint64 EbmlVoid::Overwrite(const EbmlElement & EltToVoid, IOCallback & output, b
 
 	// compute the size of the voided data based on the original one
 	Size = EltToVoid.GetSize() + EltToVoid.HeadSize() - 1; // 1 for the ID
-	Size -= CodedSizeLength(Size, SizeLength);
+	Size -= CodedSizeLength(Size, SizeLength, bSizeIsFinite);
 	// make sure we handle even the strange cases
 	//uint32 A1 = Size + HeadSize();
 	//uint32 A2 = EltToVoid.GetSize() + EltToVoid.HeadSize();
 	if (Size + HeadSize() != EltToVoid.GetSize() + EltToVoid.HeadSize()) {
 		Size--;
-		SetSizeLength(CodedSizeLength(Size, SizeLength) + 1);
+		SetSizeLength(CodedSizeLength(Size, SizeLength, bSizeIsFinite) + 1);
 	}
 
 	if (Size != 0) {
-		RenderHead(output, false, bSaveDefault); // the rest of the data is not rewritten
+		RenderHead(output, false, bKeepIntact); // the rest of the data is not rewritten
 	}
 
 	if (ComeBackAfterward) {

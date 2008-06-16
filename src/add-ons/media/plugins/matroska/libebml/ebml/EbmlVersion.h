@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlVersion.h 839 2004-09-26 10:03:40Z mosu $
+	\version \$Id: EbmlVersion.h 1299 2008-03-05 11:06:00Z mosu $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_VERSION_H
@@ -42,9 +42,9 @@
 
 START_LIBEBML_NAMESPACE
 
-#define LIBEBML_VERSION 000702
+#define LIBEBML_VERSION 0x000708
 
-static const std::string EbmlCodeVersion = "0.7.2";
+static const std::string EbmlCodeVersion = "0.7.8";
 static const std::string EbmlCodeDate    = __TIMESTAMP__;
 
 /*!

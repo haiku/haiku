@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlString.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlString.cpp 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include <cassert>
@@ -73,7 +73,7 @@ EbmlString::EbmlString(const EbmlString & ElementToClone)
 /*!
 	\todo handle exception on errors
 */
-uint32 EbmlString::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlString::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	uint32 Result;
 	output.writeFully(Value.c_str(), Value.length());
@@ -106,9 +106,9 @@ EbmlString & EbmlString::operator=(const std::string NewString)
 	return *this;
 }
 
-uint64 EbmlString::UpdateSize(bool bSaveDefault, bool bForceRender)
+uint64 EbmlString::UpdateSize(bool bKeepIntact, bool bForceRender)
 {
-	if (!bSaveDefault && IsDefaultValue())
+	if (!bKeepIntact && IsDefaultValue())
 		return 0;
 
 	if (Value.length() < DefaultSize) {

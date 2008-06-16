@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlElement.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlElement.h 1232 2005-10-15 15:56:52Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_ELEMENT_H
@@ -45,7 +45,7 @@ START_LIBEBML_NAMESPACE
 /*!
 	\brief The size of the EBML-coded length
 */
-int EBML_DLL_API CodedSizeLength(uint64 Length, unsigned int SizeLength);
+int EBML_DLL_API CodedSizeLength(uint64 Length, unsigned int SizeLength, bool bSizeIsFinite = true);
 
 /*!
 	\brief The coded value of the EBML-coded length
@@ -180,14 +180,16 @@ class EBML_DLL_API EbmlElement {
 
 		virtual bool ValidateSize() const = 0;
 
-		uint64 GetElementPosition() const {return ElementPosition;}
+		uint64 GetElementPosition() const {
+			return ElementPosition;
+		}
 
-		uint64 ElementSize(bool bSaveDefault = false) const; /// return the size of the header+data
+		uint64 ElementSize(bool bKeepIntact = false) const; /// return the size of the header+data, before writing
 		
-		uint32 Render(IOCallback & output, bool bSaveDefault = false, bool bKeepPosition = false, bool bForceRender = false);
+		uint32 Render(IOCallback & output, bool bKeepIntact = false, bool bKeepPosition = false, bool bForceRender = false);
 
-		virtual uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false) = 0; /// update the Size of the Data stored
-		virtual uint64 GetSize() const {return Size;}
+		virtual uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false) = 0; /// update the Size of the Data stored
+		virtual uint64 GetSize() const {return Size;} /// return the size of the data stored in the element, on reading
 
 		virtual uint64 ReadData(IOCallback & input, ScopeMode ReadFully = SCOPE_ALL_DATA) = 0;
 		virtual void Read(EbmlStream & inDataStream, const EbmlSemanticContext & Context, int & UpperEltFound, EbmlElement * & FoundElt, bool AllowDummyElt = false, ScopeMode ReadFully = SCOPE_ALL_DATA);
@@ -210,7 +212,9 @@ class EBML_DLL_API EbmlElement {
 		virtual bool IsDummy() const {return false;}
 		virtual bool IsMaster() const {return false;}
 
-		uint8 HeadSize() const {return EbmlId(*this).Length + CodedSizeLength(Size, SizeLength);}
+		uint8 HeadSize() const {
+			return EbmlId(*this).Length + CodedSizeLength(Size, SizeLength, bSizeIsFinite);
+		} /// return the size of the head, on reading/writing
 		
 		/*!
 			\brief Force the size of an element
@@ -223,7 +227,7 @@ class EBML_DLL_API EbmlElement {
 		/*!
 			\brief void the content of the element (replace by EbmlVoid)
 		*/
-		uint32 VoidMe(IOCallback & output, bool bSaveDefault = false);
+		uint32 VoidMe(IOCallback & output, bool bKeepIntact = false);
 
 		bool DefaultISset() const {return DefaultIsSet;}
 		virtual bool IsDefaultValue() const = 0;
@@ -235,6 +239,10 @@ class EBML_DLL_API EbmlElement {
 		virtual void SetDefaultSize(const uint64 aDefaultSize) {DefaultSize = aDefaultSize;}
 
 		bool ValueIsSet() const {return bValueIsSet;}
+
+		inline uint64 GetEndPosition() const {
+			return SizePosition + CodedSizeLength(Size, SizeLength, bSizeIsFinite) + Size;
+		}
 		
 	protected:
 		uint64 Size;        ///< the size of the data to write
@@ -253,13 +261,13 @@ class EBML_DLL_API EbmlElement {
 		*/
 		static EbmlElement *CreateElementUsingContext(const EbmlId & aID, const EbmlSemanticContext & Context, int & LowLevel, bool IsGlobalContext, bool bAllowDummy = false, unsigned int MaxLowerLevel = 1);
 
-		uint32 RenderHead(IOCallback & output, bool bForceRender, bool bSaveDefault = false, bool bKeepPosition = false);
+		uint32 RenderHead(IOCallback & output, bool bForceRender, bool bKeepIntact = false, bool bKeepPosition = false);
 		uint32 MakeRenderHead(IOCallback & output, bool bKeepPosition);
 	
 		/*!
 			\brief prepare the data before writing them (in case it's not already done by default)
 		*/
-		virtual uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false) = 0;
+		virtual uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false) = 0;
 
 		/*!
 			\brief special constructor for cloning

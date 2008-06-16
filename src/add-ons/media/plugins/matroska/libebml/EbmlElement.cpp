@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlElement.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlElement.cpp 1232 2005-10-15 15:56:52Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 
@@ -46,20 +46,32 @@ START_LIBEBML_NAMESPACE
 /*!
 	\todo handle more than CodedSize of 5
 */
-int CodedSizeLength(uint64 Length, unsigned int SizeLength)
+int CodedSizeLength(uint64 Length, unsigned int SizeLength, bool bSizeFinite)
 {
-	unsigned int CodedSize;
-	// prepare the head of the size (000...01xxxxxx)
-	// optimal size
-	if (Length < 127) // 2^7 - 1
-		CodedSize = 1;
-	else if (Length < 16383) // 2^14 - 1
-		CodedSize = 2;
-	else if (Length < 2097151L) // 2^21 - 1
-		CodedSize = 3;
-	else if (Length < 268435455L) // 2^28 - 1
-		CodedSize = 4;
-	else CodedSize = 5;
+	int CodedSize;
+	if (bSizeFinite) {
+		// prepare the head of the size (000...01xxxxxx)
+		// optimal size
+		if (Length < 127) // 2^7 - 1
+			CodedSize = 1;
+		else if (Length < 16383) // 2^14 - 1
+			CodedSize = 2;
+		else if (Length < 2097151L) // 2^21 - 1
+			CodedSize = 3;
+		else if (Length < 268435455L) // 2^28 - 1
+			CodedSize = 4;
+		else CodedSize = 5;
+	} else {
+		if (Length <= 127) // 2^7 - 1
+			CodedSize = 1;
+		else if (Length <= 16383) // 2^14 - 1
+			CodedSize = 2;
+		else if (Length <= 2097151L) // 2^21 - 1
+			CodedSize = 3;
+		else if (Length <= 268435455L) // 2^28 - 1
+			CodedSize = 4;
+		else CodedSize = 5;
+	}
 
 	if (SizeLength > 0 && CodedSize < SizeLength) {
 		// defined size
@@ -328,7 +340,7 @@ EbmlElement * EbmlElement::FindNextElement(IOCallback & DataStream, const EbmlSe
 	bool bFound;
 	int UpperLevel_original = UpperLevel;
 	
-	while (1) {
+	do {
 		// read a potential ID
 		do {
 			assert(ReadIndex < 16);
@@ -359,7 +371,7 @@ EbmlElement * EbmlElement::FindNextElement(IOCallback & DataStream, const EbmlSe
 			}
 			ReadSize++;
 
-		} while (!bFound);
+		} while (!bFound && MaxDataSize > ReadSize);
 
 		SizeIdx = ReadIndex;
 		ReadIndex -= PossibleID_Length;
@@ -382,6 +394,7 @@ EbmlElement * EbmlElement::FindNextElement(IOCallback & DataStream, const EbmlSe
 			ReadSize += DataStream.read(&PossibleIdNSize[SizeIdx++], 1);
 			PossibleSizeLength++;
 		}
+
 		if (bFound) {
 			// find the element in the context and use the correct creator
 			EbmlId PossibleID(PossibleIdNSize, PossibleID_Length);
@@ -392,7 +405,12 @@ EbmlElement * EbmlElement::FindNextElement(IOCallback & DataStream, const EbmlSe
 					Result->SetSizeLength(_SizeLength);
 					
 					Result->Size = SizeFound;
-					if (Result->ValidateSize() && (UpperLevel > 0 || MaxDataSize >= SizeFound || MaxDataSize == 0)) {
+					// UpperLevel values
+					// -1 : global element
+					//  0 : child
+					//  1 : same level
+					//  + : further parent
+					if (Result->ValidateSize() && (UpperLevel > 0 || MaxDataSize == 0 || MaxDataSize >= (PossibleID_Length + PossibleSizeLength + SizeFound))) {
 						if (SizeFound == SizeUnknown) {
 							Result->SetSizeInfinite();
 						}
@@ -412,7 +430,7 @@ EbmlElement * EbmlElement::FindNextElement(IOCallback & DataStream, const EbmlSe
 		ReadIndex = SizeIdx - 1;
 		memmove(&PossibleIdNSize[0], &PossibleIdNSize[1], ReadIndex);
 		UpperLevel = UpperLevel_original;
-	}
+	} while ( MaxDataSize > DataStream.getFilePointer() - SizeIdx + PossibleID_Length );
 
 	return NULL;
 }
@@ -426,7 +444,7 @@ EbmlElement * EbmlElement::SkipData(EbmlStream & DataStream, const EbmlSemanticC
 	if (bSizeIsFinite) {
 		assert(TestReadElt == NULL);
 		assert(ElementPosition < SizePosition);
-		DataStream.I_O().setFilePointer(SizePosition + CodedSizeLength(Size, SizeLength) + Size, seek_beginning);
+		DataStream.I_O().setFilePointer(SizePosition + CodedSizeLength(Size, SizeLength, bSizeIsFinite) + Size, seek_beginning);
 //		DataStream.I_O().setFilePointer(Size, seek_current);
 	} else {
 		/////////////////////////////////////////////////
@@ -529,19 +547,19 @@ EbmlElement *EbmlElement::CreateElementUsingContext(const EbmlId & aID, const Eb
 /*!
 	\todo verify that the size written is the same as the data written
 */
-uint32 EbmlElement::Render(IOCallback & output, bool bSaveDefault, bool bKeepPosition, bool bForceRender)
+uint32 EbmlElement::Render(IOCallback & output, bool bKeepIntact, bool bKeepPosition, bool bForceRender)
 {
-	assert(bValueIsSet); // an element is been rendered without a value set !!!
+	assert(bValueIsSet || (bKeepIntact && DefaultISset())); // an element is been rendered without a value set !!!
 		                 // it may be a mandatory element without a default value
 	try {
-		if (!bSaveDefault && IsDefaultValue()) {
+		if (!bKeepIntact && IsDefaultValue()) {
 			return 0;
 		}
 #if defined(_DEBUG) || defined(DEBUG)
-		uint64 SupposedSize = UpdateSize(bSaveDefault, bForceRender);
+		uint64 SupposedSize = UpdateSize(bKeepIntact, bForceRender);
 #endif // _DEBUG
-		uint32 result = RenderHead(output, bForceRender, bSaveDefault, bKeepPosition);
-		uint64 WrittenSize = RenderData(output, bForceRender, bSaveDefault);
+		uint32 result = RenderHead(output, bForceRender, bKeepIntact, bKeepPosition);
+		uint64 WrittenSize = RenderData(output, bForceRender, bKeepIntact);
 #if defined(_DEBUG) || defined(DEBUG)
 	if (SupposedSize != (0-1)) assert(WrittenSize == SupposedSize);
 #endif // DEBUG
@@ -559,12 +577,12 @@ uint32 EbmlElement::Render(IOCallback & output, bool bSaveDefault, bool bKeepPos
 	\todo handle exceptions on errors
 	\todo handle CodeSize bigger than 5 bytes
 */
-uint32 EbmlElement::RenderHead(IOCallback & output, bool bForceRender, bool bSaveDefault, bool bKeepPosition)
+uint32 EbmlElement::RenderHead(IOCallback & output, bool bForceRender, bool bKeepIntact, bool bKeepPosition)
 {
 	if (EbmlId(*this).Length <= 0 || EbmlId(*this).Length > 4)
 		return 0;
 	
-	UpdateSize(bSaveDefault, bForceRender);
+	UpdateSize(bKeepIntact, bForceRender);
 	
 	return MakeRenderHead(output, bKeepPosition);
 }
@@ -577,7 +595,7 @@ uint32 EbmlElement::MakeRenderHead(IOCallback & output, bool bKeepPosition)
 	FinalHeadSize = EbmlId(*this).Length;
 	EbmlId(*this).Fill(FinalHead);
 
-	int CodedSize = CodedSizeLength(Size, SizeLength);
+	int CodedSize = CodedSizeLength(Size, SizeLength, bSizeIsFinite);
 	CodedValueLength(Size, CodedSize, &FinalHead[FinalHeadSize]);
 	FinalHeadSize += CodedSize;
 	
@@ -590,11 +608,11 @@ uint32 EbmlElement::MakeRenderHead(IOCallback & output, bool bKeepPosition)
 	return FinalHeadSize;
 }
 
-uint64 EbmlElement::ElementSize(bool bSaveDefault) const
+uint64 EbmlElement::ElementSize(bool bKeepIntact) const
 {
-	if (!bSaveDefault && IsDefaultValue())
+	if (!bKeepIntact && IsDefaultValue())
 		return 0; // won't be saved
-	return Size + EbmlId(*this).Length + CodedSizeLength(Size, SizeLength);
+	return Size + EbmlId(*this).Length + CodedSizeLength(Size, SizeLength, bSizeIsFinite);
 }
 
 bool EbmlElement::CompareElements(const EbmlElement *A, const EbmlElement *B)
@@ -616,12 +634,12 @@ bool EbmlElement::ForceSize(uint64 NewSize)
 		return false;
 	}
 
-	int OldSizeLen = CodedSizeLength(Size, SizeLength);
+	int OldSizeLen = CodedSizeLength(Size, SizeLength, bSizeIsFinite);
 	uint64 OldSize = Size;
 
 	Size = NewSize;
 
-	if (CodedSizeLength(Size, SizeLength) == OldSizeLen) {
+	if (CodedSizeLength(Size, SizeLength, bSizeIsFinite) == OldSizeLen) {
 		bSizeIsFinite = true;
 		return true;
 	}
@@ -643,14 +661,14 @@ uint32 EbmlElement::OverwriteHead(IOCallback & output, bool bKeepPosition)
 	return Result;
 }
 
-uint32 EbmlElement::VoidMe(IOCallback & output, bool bSaveDefault)
+uint32 EbmlElement::VoidMe(IOCallback & output, bool bKeepIntact)
 {
 	if (ElementPosition == 0) {
 		return 0; // the element has not been written
 	}
 
 	EbmlVoid Dummy;
-	return Dummy.Overwrite(*this, output, bSaveDefault);
+	return Dummy.Overwrite(*this, output, bKeepIntact);
 }
 
 END_LIBEBML_NAMESPACE

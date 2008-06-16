@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,7 @@
 #endif
 
 #if !defined(MATROSKA_VERSION)
-#define MATROSKA_VERSION  1
+#define MATROSKA_VERSION  2
 #endif // MATROSKA_VERSION
 
 

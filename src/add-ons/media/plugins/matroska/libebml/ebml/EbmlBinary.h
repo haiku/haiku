@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlBinary.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlBinary.h 1298 2008-02-21 22:14:18Z mosu $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Julien Coloos	<suiryc @ users.sf.net>
 */
@@ -38,6 +38,7 @@
 #define LIBEBML_BINARY_H
 
 #include <string>
+#include <cstring>
 
 #include "EbmlTypes.h"
 #include "EbmlElement.h"
@@ -62,9 +63,9 @@ class EBML_DLL_API EbmlBinary : public EbmlElement {
 		EbmlBinary(const EbmlBinary & ElementToClone);
 		virtual ~EbmlBinary(void);
 	
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 		uint64 ReadData(IOCallback & input, ScopeMode ReadFully = SCOPE_ALL_DATA);
-		uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false);
+		uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false);
 	
 		void SetBuffer(const binary *Buffer, const uint32 BufferSize) {
 			Data = (binary *) Buffer;
@@ -76,8 +77,8 @@ class EBML_DLL_API EbmlBinary : public EbmlElement {
 		
 		void CopyBuffer(const binary *Buffer, const uint32 BufferSize) {
 			if (Data != NULL)
-				delete Data;
-			Data = new binary[BufferSize];
+				free(Data);
+			Data = (binary *)malloc(BufferSize * sizeof(binary));
 			memcpy(Data, Buffer, BufferSize);
 			Size = BufferSize;
 			bValueIsSet = true;
@@ -89,6 +90,8 @@ class EBML_DLL_API EbmlBinary : public EbmlElement {
 		bool IsDefaultValue() const {
 			return false;
 		}
+
+		bool operator==(const EbmlBinary & ElementToCompare) const;
 
 	protected:
 		binary *Data; // the binary data inside the element

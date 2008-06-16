@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlCrc32.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlCrc32.h 1155 2005-05-06 11:43:38Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Jory Stone       <jcsston @ toughguy.net>
 */
@@ -44,7 +44,7 @@ START_LIBEBML_NAMESPACE
 
 const uint32 CRC32_NEGL = 0xffffffffL;
 
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 # define CRC32_INDEX(c) (c >> 24)
 # define CRC32_SHIFTED(c) (c << 8)
 #else
@@ -59,9 +59,9 @@ class EBML_DLL_API EbmlCrc32 : public EbmlBinary {
 		static EbmlElement & Create() {return *(new EbmlCrc32);}
 		const EbmlCallbacks & Generic() const {return ClassInfos;}
 		bool ValidateSize() const {return (Size == 4);}
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 		uint64 ReadData(IOCallback & input, ScopeMode ReadFully = SCOPE_ALL_DATA);
-//		uint64 UpdateSize(bool bSaveDefault = false);
+//		uint64 UpdateSize(bool bKeepIntact = false);
 		
 		static const EbmlCallbacks ClassInfos;
 		bool IsDefaultValue() const {
@@ -143,7 +143,7 @@ inline T2 ModPowerOf2(T1 a, T2 b)
 
 inline bool IsAlignedOn(const void *p, unsigned int alignment)
 {
-	return IsPowerOf2(alignment) ? ModPowerOf2((unsigned int)p, alignment) == 0 : (unsigned int)p % alignment == 0;
+	return IsPowerOf2(alignment) ? ModPowerOf2((unsigned long)p, alignment) == 0 : (unsigned long)p % alignment == 0;
 }
 
 template <class T>

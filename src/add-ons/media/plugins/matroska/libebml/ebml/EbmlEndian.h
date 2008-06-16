@@ -30,7 +30,7 @@
 
 /*!
     \file
-    \version \$Id: EbmlEndian.h 736 2004-08-28 14:05:09Z robux4 $
+    \version \$Id: EbmlEndian.h 1298 2008-02-21 22:14:18Z mosu $
     \author Ingo Ralf Blum   <ingoralfblum @ users.sf.net>
     \author Lasse Kärkkäinen <tronic @ users.sf.net>
     \author Steve Lhomme     <robux4 @ users.sf.net>
@@ -39,6 +39,7 @@
 #define LIBEBML_ENDIAN_H
 
 #include <algorithm>
+#include <cstring>
 
 #include "EbmlConfig.h" // contains _ENDIANESS_
 
@@ -92,7 +93,7 @@ template<class TYPE, endianess ENDIAN> class Endian
 	inline void process_endian()
 	{
 	    endian_value = platform_value;
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 	    if (ENDIAN == little_endian)
 		std::reverse(reinterpret_cast<uint8*>(&endian_value),reinterpret_cast<uint8*>(&endian_value+1));
 #else  // _ENDIANESS_
@@ -104,7 +105,7 @@ template<class TYPE, endianess ENDIAN> class Endian
 	inline void process_platform()
 	{
 	    platform_value = endian_value;
-#if WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
 	    if (ENDIAN == little_endian)
 		std::reverse(reinterpret_cast<uint8*>(&platform_value),reinterpret_cast<uint8*>(&platform_value+1));
 #else  // _ENDIANESS_

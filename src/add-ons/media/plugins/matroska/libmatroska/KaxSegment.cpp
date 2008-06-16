@@ -29,7 +29,7 @@
 
 /*!
 	\file
-	\version \$Id: KaxSegment.cpp 640 2004-07-09 21:05:36Z mosu $
+	\version \$Id: KaxSegment.cpp 1096 2005-03-17 09:14:52Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include "matroska/KaxSegment.h"
@@ -70,7 +70,7 @@ const EbmlSemanticContext KaxMatroska_Context = EbmlSemanticContext(countof(KaxM
 const EbmlSemanticContext KaxSegment_Context = EbmlSemanticContext(countof(KaxSegment_ContextList), KaxSegment_ContextList, NULL, *GetKaxGlobal_Context, &KaxSegment::ClassInfos);
 
 EbmlId KaxSegment_TheId(0x18538067, 4);
-const EbmlCallbacks KaxSegment::ClassInfos(KaxSegment::Create, KaxSegment_TheId, "Segment", KaxSegment_Context);
+const EbmlCallbacks KaxSegment::ClassInfos(KaxSegment::Create, KaxSegment_TheId, "Segment\0rotomopogo", KaxSegment_Context);
 
 KaxSegment::KaxSegment()
 	:EbmlMaster(KaxSegment_Context)

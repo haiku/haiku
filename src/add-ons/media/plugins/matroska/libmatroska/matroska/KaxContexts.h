@@ -42,6 +42,7 @@ using namespace LIBEBML_NAMESPACE;
 
 START_LIBMATROSKA_NAMESPACE
 
+extern const EbmlSemanticContext MATROSKA_DLL_API KaxMatroska_Context;
 extern const EbmlSemanticContext MATROSKA_DLL_API KaxSegment_Context;
 extern const EbmlSemanticContext MATROSKA_DLL_API KaxAttachments_Context;
 extern const EbmlSemanticContext MATROSKA_DLL_API KaxAttached_Context;

@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,14 +30,14 @@
 
 /*!
 	\file
-	\version \$Id: EbmlUnicodeString.cpp 653 2004-07-21 18:12:51Z mosu $
+	\version \$Id: EbmlUnicodeString.cpp 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Jory Stone       <jcsston @ toughguy.net>
 */
 
 #include <cassert>
 
-#if __GNUC__ == 2
+#if __GNUC__ == 2 && ! defined ( __OpenBSD__ )
 #include <wchar.h>
 #endif
 
@@ -228,7 +228,7 @@ EbmlUnicodeString::EbmlUnicodeString(const EbmlUnicodeString & ElementToClone)
 \note limited to UCS-2
 \todo handle exception on errors
 */
-uint32 EbmlUnicodeString::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlUnicodeString::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	uint32 Result = Value.GetUTF8().length();
 
@@ -261,9 +261,9 @@ EbmlUnicodeString & EbmlUnicodeString::operator=(const UTFstring & NewString)
 /*!
 \note limited to UCS-2
 */
-uint64 EbmlUnicodeString::UpdateSize(bool bSaveDefault, bool bForceRender)
+uint64 EbmlUnicodeString::UpdateSize(bool bKeepIntact, bool bForceRender)
 {
-	if (!bSaveDefault && IsDefaultValue())
+	if (!bKeepIntact && IsDefaultValue())
 		return 0;
 
 	Size = Value.GetUTF8().length();

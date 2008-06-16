@@ -40,6 +40,7 @@
 #include "matroska/KaxTracks.h"
 #include "matroska/KaxBlock.h"
 #include "matroska/KaxCues.h"
+#include "matroska/KaxClusterData.h"
 
 using namespace LIBEBML_NAMESPACE;
 
@@ -131,7 +132,19 @@ class MATROSKA_DLL_API KaxCluster : public EbmlMaster {
 			return TimecodeScale;
 		}
 
+		bool SetSilentTrackUsed()
+		{
+			bSilentTracksUsed = true;
+			return FindFirstElt(KaxClusterSilentTracks::ClassInfos, true) != NULL;
+		}
+
+		bool AddBlockBlob(KaxBlockBlob * NewBlob);
+
+		const KaxSegment *GetParentSegment() const { return ParentSegment; }
+
 	protected:
+		KaxBlockBlob     * currentNewBlob;
+		std::vector<KaxBlockBlob*> Blobs;
 		KaxBlockGroup    * currentNewBlock;
 		const KaxSegment * ParentSegment;
 
@@ -141,6 +154,7 @@ class MATROSKA_DLL_API KaxCluster : public EbmlMaster {
 		bool bFirstFrameInside; // used to speed research
 		bool bPreviousTimecodeIsSet;
 		bool bTimecodeScaleIsSet;
+		bool bSilentTracksUsed;
 
 		/*!
 			\note method used internally

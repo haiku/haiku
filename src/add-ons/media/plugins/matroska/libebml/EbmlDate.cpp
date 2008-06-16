@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlDate.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlDate.cpp 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include <cassert>
@@ -65,7 +65,7 @@ uint64 EbmlDate::ReadData(IOCallback & input, ScopeMode ReadFully)
 	return Size;
 }
 
-uint32 EbmlDate::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 EbmlDate::RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact)
 {
 	if (Size != 0) {
 		assert(Size == 8);

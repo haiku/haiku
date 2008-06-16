@@ -1,7 +1,7 @@
 /****************************************************************************
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libmatroska.
 **
@@ -40,9 +40,9 @@
 
 START_LIBMATROSKA_NAMESPACE
 
-#define LIBMATROSKA_VERSION 000704
+#define LIBMATROSKA_VERSION 0x000801
 
-static const std::string KaxCodeVersion = "0.7.4";
+static const std::string KaxCodeVersion = "0.8.1";
 static const std::string KaxCodeDate    = __TIMESTAMP__;
 
 /*!

@@ -58,6 +58,7 @@ typedef enum track_type {
 
     track_logo        = 0x10, ///< Overlay-pictures, displayed over video
     track_subtitle    = 0x11, ///< Text-subtitles. One track contains one language and only one track can be active (player-side configuration)
+    track_buttons     = 0x12, ///< Buttons meta-infos.
 
     track_control     = 0x20  ///< Control-codes for menus and other stuff
 } track_type;

@@ -36,6 +36,7 @@
 #define LIBMATROSKA_CLUSTER_DATA_H
 
 #include "matroska/KaxTypes.h"
+#include "ebml/EbmlMaster.h"
 #include "ebml/EbmlUInteger.h"
 
 using namespace LIBEBML_NAMESPACE;
@@ -51,6 +52,28 @@ class MATROSKA_DLL_API KaxClusterTimecode : public EbmlUInteger {
 		static const EbmlCallbacks ClassInfos;
 		operator const EbmlId &() const {return ClassInfos.GlobalId;}
 		EbmlElement * Clone() const {return new KaxClusterTimecode(*this);}
+};
+
+class MATROSKA_DLL_API KaxClusterSilentTracks : public EbmlMaster {
+	public:
+		KaxClusterSilentTracks();
+		KaxClusterSilentTracks(const KaxClusterSilentTracks & ElementToClone) :EbmlMaster(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxClusterSilentTracks);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxClusterSilentTracks(*this);}
+};
+
+class MATROSKA_DLL_API KaxClusterSilentTrackNumber : public EbmlUInteger {
+	public:
+		KaxClusterSilentTrackNumber() {}
+		KaxClusterSilentTrackNumber(const KaxClusterSilentTrackNumber & ElementToClone) :EbmlUInteger(ElementToClone) {}
+		static EbmlElement & Create() {return *(new KaxClusterSilentTrackNumber);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		EbmlElement * Clone() const {return new KaxClusterSilentTrackNumber(*this);}
 };
 
 class MATROSKA_DLL_API KaxClusterPosition : public EbmlUInteger {

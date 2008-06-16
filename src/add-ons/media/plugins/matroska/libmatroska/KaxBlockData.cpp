@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@
 
 /*!
 	\file
-	\version \$Id: KaxBlockData.cpp 640 2004-07-09 21:05:36Z mosu $
+	\version \$Id: KaxBlockData.cpp 1226 2005-10-13 21:16:43Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include <cassert>
@@ -101,7 +101,7 @@ KaxTimeSlice::KaxTimeSlice()
  :EbmlMaster(KaxTimeSlice_Context)
 {}
 
-const KaxBlockGroup & KaxReferenceBlock::RefBlock() const
+const KaxBlockBlob & KaxReferenceBlock::RefBlock() const
 {
 	assert(RefdBlock != NULL);
 	return *RefdBlock;
@@ -113,9 +113,26 @@ uint64 KaxReferenceBlock::UpdateSize(bool bSaveDefault, bool bForceRender)
 		assert(RefdBlock != NULL);
 		assert(ParentBlock != NULL);
 
-		Value = (int64(RefdBlock->GlobalTimecode()) - int64(ParentBlock->GlobalTimecode())) / int64(ParentBlock->GlobalTimecodeScale());
+		const KaxInternalBlock &block = *RefdBlock;
+		Value = (int64(block.GlobalTimecode()) - int64(ParentBlock->GlobalTimecode())) / int64(ParentBlock->GlobalTimecodeScale());
 	}
 	return EbmlSInteger::UpdateSize(bSaveDefault, bForceRender);
+}
+
+void KaxReferenceBlock::SetReferencedBlock(const KaxBlockBlob * aRefdBlock)
+{
+	assert(RefdBlock == NULL);
+	assert(aRefdBlock != NULL);
+	RefdBlock = aRefdBlock; 
+	bValueIsSet = true;
+}
+
+void KaxReferenceBlock::SetReferencedBlock(const KaxBlockGroup & aRefdBlock)
+{
+	KaxBlockBlob *block_blob = new KaxBlockBlob(BLOCK_BLOB_NO_SIMPLE);
+	block_blob->SetBlockGroup(*const_cast<KaxBlockGroup*>(&aRefdBlock));
+	RefdBlock = block_blob; 
+	bValueIsSet = true;
 }
 
 END_LIBMATROSKA_NAMESPACE

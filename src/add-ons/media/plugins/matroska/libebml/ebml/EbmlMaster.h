@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlMaster.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlMaster.h 1232 2005-10-15 15:56:52Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_MASTER_H
@@ -61,9 +61,9 @@ class EBML_DLL_API EbmlMaster : public EbmlElement {
 		*/
 		virtual ~EbmlMaster();
 	
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 		uint64 ReadData(IOCallback & input, ScopeMode ReadFully);
-		uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false);
+		uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false);
 		
 		/*!
 			\brief Set wether the size is finite (size is known in advance when writing, or infinite size is not known on writing)
@@ -76,6 +76,10 @@ class EBML_DLL_API EbmlMaster : public EbmlElement {
 				return Size;
 			else
 				return (0-1);
+		}
+		
+		uint64 GetDataStart() const {
+			return ElementPosition + EbmlId(*this).Length + CodedSizeLength(Size, SizeLength, bSizeIsFinite);
 		}
 
 		/*!
@@ -111,13 +115,13 @@ class EBML_DLL_API EbmlMaster : public EbmlElement {
 		*/
 		void Sort();
 
-		unsigned int ListSize() const {return ElementList.size();}
+		size_t ListSize() const {return ElementList.size();}
 
 		EbmlElement * operator[](unsigned int position) {return ElementList[position];}
 		const EbmlElement * operator[](unsigned int position) const {return ElementList[position];}
 
 		bool IsDefaultValue() const {
-			return false;
+			return (ElementList.size() == 0);
 		}
 		virtual bool IsMaster() const {return true;}
 
@@ -133,10 +137,15 @@ class EBML_DLL_API EbmlMaster : public EbmlElement {
 		void Remove(size_t Index);
 
 		/*!
+			\brief remove all elements, even the mandatory ones
+		*/
+		void RemoveAll() {ElementList.clear();}
+
+		/*!
 			\brief facility for Master elements to write only the head and force the size later
 			\warning
 		*/
-		uint32 WriteHead(IOCallback & output, int SizeLength, bool bSaveDefault = false);
+		uint32 WriteHead(IOCallback & output, int SizeLength, bool bKeepIntact = false);
 
 		void EnableChecksum(bool bIsEnabled = true) { bChecksumUsed = bIsEnabled; }
 		bool HasChecksum() const {return bChecksumUsed;}
@@ -146,11 +155,6 @@ class EBML_DLL_API EbmlMaster : public EbmlElement {
 			Checksum.ForceCrc32(NewChecksum);
 			bChecksumUsed = true;
 		}
-
-		/*!
-			\brief remove all elements, even the mandatory ones
-		*/
-//		void ClearElement() {ElementList.clear();}
 
 		/*!
 			\brief drill down all sub-elements, finding any missing elements

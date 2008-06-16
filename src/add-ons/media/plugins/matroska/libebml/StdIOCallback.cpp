@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: StdIOCallback.cpp 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: StdIOCallback.cpp 1298 2008-02-21 22:14:18Z mosu $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Moritz Bunkus <moritz @ bunkus.org>
 */
@@ -64,7 +64,7 @@ StdIOCallback::StdIOCallback(const char*Path, const open_mode aMode)
 {
 	assert(Path!=0);
 
-	char *Mode;
+	const char *Mode;
 	switch (aMode)
 	{
 	case MODE_READ:
@@ -92,6 +92,7 @@ StdIOCallback::StdIOCallback(const char*Path, const open_mode aMode)
 		throw CRTError(Msg.str());
 #endif // GCC2
 	}
+	mCurrentPosition = 0;
 }
 
 
@@ -107,6 +108,7 @@ uint32 StdIOCallback::read(void*Buffer,size_t Size)
 	assert(File!=0);
 	
 	size_t result = fread(Buffer, 1, Size, File);
+	mCurrentPosition += result;
 	return result;
 }
 
@@ -133,20 +135,38 @@ void StdIOCallback::setFilePointer(int64 Offset,seek_mode Mode)
 		Msg<<"Failed to seek file "<<File<<" to offset "<<(unsigned long)Offset<<" in mode "<<Mode;
 		throw CRTError(Msg.str());
 #endif // GCC2
+		mCurrentPosition = ftell(File);
+	}
+	else
+	{
+		switch ( Mode )
+		{
+			case SEEK_CUR:
+				mCurrentPosition += Offset;
+				break;
+			case SEEK_END:
+				mCurrentPosition = ftell(File);
+				break;
+			case SEEK_SET:
+				mCurrentPosition = Offset;
+				break;
+		}
 	}
 }
 
 size_t StdIOCallback::write(const void*Buffer,size_t Size)
 {
 	assert(File!=0);
-
-	return fwrite(Buffer,1,Size,File);
+	uint32 Result = fwrite(Buffer,1,Size,File);
+	mCurrentPosition += Result;
+	return Result;
 }
 
 uint64 StdIOCallback::getFilePointer()
 {
 	assert(File!=0);
 
+#if 0
 	long Result=ftell(File);
 	if(Result<0)
 	{
@@ -156,8 +176,9 @@ uint64 StdIOCallback::getFilePointer()
 		throw CRTError(Msg.str());
 #endif // GCC2
 	}
+#endif
 
-	return Result;
+	return mCurrentPosition;
 }
 
 void StdIOCallback::close()

@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlDate.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlDate.h 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_DATE_H
@@ -65,7 +65,7 @@ class EBML_DLL_API EbmlDate : public EbmlElement {
 		/*!
 			\note no Default date handled
 		*/
-		uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false) {
+		uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false) {
 			if(!bValueIsSet) 
 				Size = 0;
 			else
@@ -82,7 +82,7 @@ class EBML_DLL_API EbmlDate : public EbmlElement {
 		}
 
 	protected:
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 		
 		int64 myDate; ///< internal format of the date
 	

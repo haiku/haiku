@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libmatroska.
 **
@@ -29,7 +29,7 @@
 
 /*!
 	\file
-	\version \$Id: KaxTracks.cpp 740 2004-08-30 18:52:56Z mosu $
+	\version \$Id: KaxTracks.cpp 1202 2005-08-30 14:39:01Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include "matroska/KaxTracks.h"
@@ -49,9 +49,9 @@ const EbmlSemantic KaxTracks_ContextList[1] =
 };
 
 #if MATROSKA_VERSION == 1
-const EbmlSemantic KaxTrackEntry_ContextList[17] =
+const EbmlSemantic KaxTrackEntry_ContextList[22] =
 #else // MATROSKA_VERSION
-const EbmlSemantic KaxTrackEntry_ContextList[23] =
+const EbmlSemantic KaxTrackEntry_ContextList[27] =
 #endif // MATROSKA_VERSION
 {
 	EbmlSemantic(true , true, KaxTrackNumber::ClassInfos),
@@ -61,23 +61,27 @@ const EbmlSemantic KaxTrackEntry_ContextList[23] =
 	EbmlSemantic(true , true, KaxTrackFlagEnabled::ClassInfos),
 #endif // MATROSKA_VERSION
 	EbmlSemantic(true , true, KaxTrackFlagDefault::ClassInfos),
+	EbmlSemantic(true , true, KaxTrackFlagForced::ClassInfos),
 	EbmlSemantic(true , true, KaxTrackFlagLacing::ClassInfos),
 	EbmlSemantic(true , true, KaxTrackMinCache::ClassInfos),
 	EbmlSemantic(false, true, KaxTrackMaxCache::ClassInfos),
 	EbmlSemantic(false, true, KaxTrackDefaultDuration::ClassInfos),
 	EbmlSemantic(true , true, KaxTrackTimecodeScale::ClassInfos),
+	EbmlSemantic(true , true, KaxMaxBlockAdditionID::ClassInfos),
 	EbmlSemantic(false, true, KaxTrackName::ClassInfos),
 	EbmlSemantic(false, true, KaxTrackLanguage::ClassInfos),
 	EbmlSemantic(true , true, KaxCodecID::ClassInfos),
 	EbmlSemantic(false, true, KaxCodecPrivate::ClassInfos),
 	EbmlSemantic(false, true, KaxCodecName::ClassInfos),
+	EbmlSemantic(false, true, KaxTrackAttachmentLink::ClassInfos),
 #if MATROSKA_VERSION >= 2
 	EbmlSemantic(false, true, KaxCodecSettings::ClassInfos),
-	EbmlSemantic(false, true, KaxCodecInfoURL::ClassInfos),
-	EbmlSemantic(false, true, KaxCodecDownloadURL::ClassInfos),
+	EbmlSemantic(false, false,KaxCodecInfoURL::ClassInfos),
+	EbmlSemantic(false, false,KaxCodecDownloadURL::ClassInfos),
 	EbmlSemantic(true , true, KaxCodecDecodeAll::ClassInfos),
-	EbmlSemantic(false, true, KaxTrackOverlay::ClassInfos),
 #endif // MATROSKA_VERSION
+	EbmlSemantic(false, false,KaxTrackOverlay::ClassInfos),
+	EbmlSemantic(false, false,KaxTrackTranslate::ClassInfos),
 	EbmlSemantic(false, true, KaxTrackAudio::ClassInfos),
 	EbmlSemantic(false, true, KaxTrackVideo::ClassInfos),
 	EbmlSemantic(false, true, KaxContentEncodings::ClassInfos),

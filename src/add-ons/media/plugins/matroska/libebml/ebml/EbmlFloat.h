@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libebml.
 **
@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlFloat.h 737 2004-08-28 14:18:17Z robux4 $
+	\version \$Id: EbmlFloat.h 1079 2005-03-03 13:18:14Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_FLOAT_H
@@ -61,9 +61,9 @@ class EBML_DLL_API EbmlFloat : public EbmlElement {
 			return (Size == 4 || Size == 8);
 		}
 	
-		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
+		uint32 RenderData(IOCallback & output, bool bForceRender, bool bKeepIntact = false);
 		uint64 ReadData(IOCallback & input, ScopeMode ReadFully = SCOPE_ALL_DATA);
-		uint64 UpdateSize(bool bSaveDefault = false, bool bForceRender = false);
+		uint64 UpdateSize(bool bKeepIntact = false, bool bForceRender = false);
 
 		void SetPrecision(const EbmlFloat::Precision prec = FLOAT_32) 
 		{

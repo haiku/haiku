@@ -28,7 +28,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlConfig.h 710 2004-08-10 12:27:34Z robux4 $
+	\version \$Id: EbmlConfig.h 1241 2006-01-25 00:59:45Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Moritz Bunkus <moritz @ bunkus.org>
 */
@@ -38,13 +38,13 @@
 
 // automatic endianess detection working on GCC
 #if !defined(WORDS_BIGENDIAN)
-#if (defined (__arm__) && ! defined (__ARMEB__)) || defined (__i386__) || defined (__i860__) || defined (__ns32000__) || defined (__vax__) || defined (__amd64__)
-#define WORDS_BIGENDIAN 0
+#if (defined (__arm__) && ! defined (__ARMEB__)) || defined (__i386__) || defined (__i860__) || defined (__ns32000__) || defined (__vax__) || defined (__amd64__) || defined (__x86_64__)
+#undef WORDS_BIGENDIAN
 #elif defined (__sparc__) || defined (__alpha__) || defined (__PPC__) || defined (__mips__) || defined (__ppc__) || defined (__BIG_ENDIAN__)
 #define WORDS_BIGENDIAN 1
 #else
 // not automatically detected, put it yourself
-#define WORDS_BIGENDIAN 0 // for my testing platform (x86)
+#undef WORDS_BIGENDIAN // for my testing platform (x86)
 #endif
 #endif // not autoconf
 
@@ -101,5 +101,10 @@
 #else // __GNUC__
 #define EBML_PRETTYLONGINT(c) (c)
 #endif // __GNUC__
+
+#if __BORLANDC__ >= 0x0581 //Borland C++ Builder 2006 preview
+   #include <stdlib.h>  //malloc(), free()
+   #include <memory.h> //memcpy()
+#endif //__BORLANDC__
 
 #endif // LIBEBML_CONFIG_H

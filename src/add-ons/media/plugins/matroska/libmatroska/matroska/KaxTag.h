@@ -21,7 +21,8 @@
 ** License along with this library; if not, write to the Free Software
 ** Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 **
-** See http://www.matroska.org/license/lgpl/ for LGPL licensing information.**
+** See http://www.matroska.org/license/lgpl/ for LGPL licensing information.
+**
 ** Contact license@matroska.org if any conditions of this licensing are
 ** not clear to you.
 **
@@ -119,6 +120,7 @@ class MATROSKA_DLL_API KaxTagTargetTypeValue : public EbmlUInteger {
 	public:
 		KaxTagTargetTypeValue() :EbmlUInteger(50) {}
 		KaxTagTargetTypeValue(const KaxTagTargetTypeValue & ElementToClone) :EbmlUInteger(ElementToClone) {}
+
 		static EbmlElement & Create() {return *(new KaxTagTargetTypeValue);}
 		const EbmlCallbacks & Generic() const {return ClassInfos;}
 		static const EbmlCallbacks ClassInfos;
@@ -141,6 +143,7 @@ class MATROSKA_DLL_API KaxTagTrackUID : public EbmlUInteger {
 	public:
 		KaxTagTrackUID() :EbmlUInteger(0) {}
 		KaxTagTrackUID(const KaxTagTrackUID & ElementToClone) :EbmlUInteger(ElementToClone) {}
+
 		static EbmlElement & Create() {return *(new KaxTagTrackUID);}
 		const EbmlCallbacks & Generic() const {return ClassInfos;}
 		static const EbmlCallbacks ClassInfos;
@@ -664,6 +667,7 @@ class MATROSKA_DLL_API KaxTagDefault : public EbmlUInteger {
 	public:
 		KaxTagDefault() :EbmlUInteger(1) {}
 		KaxTagDefault(const KaxTagTrackUID & ElementToClone) :EbmlUInteger(ElementToClone) {}
+
 		static EbmlElement & Create() {return *(new KaxTagDefault);}
 		const EbmlCallbacks & Generic() const {return ClassInfos;}
 		static const EbmlCallbacks ClassInfos;

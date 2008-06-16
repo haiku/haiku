@@ -28,6 +28,6 @@
 #include <DataIO.h>
 #include "MatroskaParser.h"
 
-FileCache *CreateFileCache(BDataIO *dataio);
+InputStream *CreateFileCache(BDataIO *dataio);
 
 #endif

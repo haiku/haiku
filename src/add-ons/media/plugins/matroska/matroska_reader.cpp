@@ -34,7 +34,7 @@
 #include "matroska_codecs.h"
 #include "matroska_util.h"
 
-//#define TRACE_MKV_READER
+#define TRACE_MKV_READER
 #ifdef TRACE_MKV_READER
   #define TRACE printf
 #else
@@ -74,7 +74,7 @@ struct mkv_cookie
 
 
 mkvReader::mkvReader()
- :	fFileCache(0)
+ :	fInputStream(0)
  ,	fFile(0)
  ,	fFileInfo(0)
 {
@@ -85,7 +85,7 @@ mkvReader::mkvReader()
 mkvReader::~mkvReader()
 {
 	mkv_Close(fFile);
-	free(fFileCache);
+	free(fInputStream);
 }
 
       
@@ -103,13 +103,13 @@ mkvReader::Sniff(int32 *streamCount)
 
 	char err_msg[100];
 	
-	fFileCache = CreateFileCache(Source());
-	if (!fFileCache) {
+	fInputStream = CreateFileCache(Source());
+	if (!fInputStream) {
 		TRACE("mkvReader::Sniff: failed to create file cache\n");
 		return B_ERROR;
 	}
 	
-	fFile = mkv_Open(fFileCache, err_msg, sizeof(err_msg));
+	fFile = mkv_Open(fInputStream, err_msg, sizeof(err_msg));
 	if (!fFile) {
 		TRACE("mkvReader::Sniff: open failed, error: %s\n", err_msg);
 		return B_ERROR;
@@ -195,7 +195,7 @@ status_t
 mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 {
 	char err_msg[100];
-	cookie->file = mkv_Open(fFileCache, err_msg, sizeof(err_msg));
+	cookie->file = mkv_Open(fInputStream, err_msg, sizeof(err_msg));
 	if (!cookie->file) {
 		TRACE("mkvReader::SetupVideoCookie: open failed, error: %s\n", err_msg);
 		return B_ERROR;
@@ -269,7 +269,7 @@ status_t
 mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 {
 	char err_msg[100];
-	cookie->file = mkv_Open(fFileCache, err_msg, sizeof(err_msg));
+	cookie->file = mkv_Open(fInputStream, err_msg, sizeof(err_msg));
 	if (!cookie->file) {
 		TRACE("mkvReader::SetupVideoCookie: open failed, error: %s\n", err_msg);
 		return B_ERROR;
@@ -345,11 +345,11 @@ mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-mkvReader::Seek(void *_cookie,
+mkvReader::Seek(void *cookie,
 				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
-	mkv_cookie *cookie = (mkv_cookie *)_cookie;
+	mkv_cookie *mkvcookie = (mkv_cookie *)cookie;
 
 	TRACE("mkvReader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
 		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
@@ -359,25 +359,25 @@ mkvReader::Seek(void *_cookie,
 		*time, *frame);
 
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
-		*time = bigtime_t(*frame * (1000000.0 / cookie->frame_rate));
+		*time = bigtime_t(*frame * (1000000.0 / mkvcookie->frame_rate));
 	}
 	
 	if (seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
-		mkv_Seek(cookie->file, *time * 1000, MKVF_SEEK_TO_PREV_KEYFRAME);
+		mkv_Seek(mkvcookie->file, *time * 1000, MKVF_SEEK_TO_PREV_KEYFRAME);
 	} else if (seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) {
-		mkv_Seek(cookie->file, *time * 1000, 0);
-		mkv_SkipToKeyframe(cookie->file);
+		mkv_Seek(mkvcookie->file, *time * 1000, 0);
+		mkv_SkipToKeyframe(mkvcookie->file);
 	} else {
-		mkv_Seek(cookie->file, *time * 1000, 0);
+		mkv_Seek(mkvcookie->file, *time * 1000, 0);
 	}
 
 	int64 timecode;
-	timecode = mkv_GetLowestQTimecode(cookie->file);
+	timecode = mkv_GetLowestQTimecode(mkvcookie->file);
 	if (timecode < 0)
 		return B_ERROR;
 
 	*time = timecode / 1000;
-	*frame = get_frame_count_by_frame_rate(timecode, cookie->frame_rate);
+	*frame = get_frame_count_by_frame_rate(timecode, mkvcookie->frame_rate);
 
 	return B_OK;
 }
@@ -411,9 +411,9 @@ mkvReader::GetNextChunk(void *_cookie,
 	}
 	
 	res = mkv_ReadData(cookie->file, FilePos, cookie->buffer, FrameSize);
-	if (res < 0)
+	if (res > 0)
 		return B_ERROR;
-		
+	
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = FrameSize;
 	

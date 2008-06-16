@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@
 
 /*!
 	\file
-	\version \$Id: KaxBlock.cpp 640 2004-07-09 21:05:36Z mosu $
+	\version \$Id: KaxBlock.cpp 1265 2007-01-14 17:20:35Z mosu $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 	\author Julien Coloos    <suiryc @ users.sf.net>
 */
@@ -43,9 +43,9 @@
 START_LIBMATROSKA_NAMESPACE
 
 #if MATROSKA_VERSION == 1
-const EbmlSemantic KaxBlockGroup_ContextList[5] =
+const EbmlSemantic KaxBlockGroup_ContextList[6] =
 #else // MATROSKA_VERSION
-const EbmlSemantic KaxBlockGroup_ContextList[8] =
+const EbmlSemantic KaxBlockGroup_ContextList[9] =
 #endif // MATROSKA_VERSION
 {
 	EbmlSemantic(true,  true,  KaxBlock::ClassInfos),
@@ -58,11 +58,11 @@ const EbmlSemantic KaxBlockGroup_ContextList[8] =
 	EbmlSemantic(false, false, KaxReferenceBlock::ClassInfos),
 #if MATROSKA_VERSION >= 2
 	EbmlSemantic(false, true,  KaxReferenceVirtual::ClassInfos),
-	EbmlSemantic(false, true,  KaxBlockAdditions::ClassInfos),
+	EbmlSemantic(false, true,  KaxCodecState::ClassInfos),
 #endif // MATROSKA_VERSION
+	EbmlSemantic(false, true,  KaxBlockAdditions::ClassInfos),
 };
 
-#if MATROSKA_VERSION >= 2
 const EbmlSemantic KaxBlockAdditions_ContextList[1] =
 {
 	EbmlSemantic(true,  false,  KaxBlockMore::ClassInfos)
@@ -73,44 +73,50 @@ const EbmlSemantic KaxBlockMore_ContextList[2] =
 	EbmlSemantic(true,  true,  KaxBlockAddID::ClassInfos),
 	EbmlSemantic(true,  true,  KaxBlockAdditional::ClassInfos)
 };
-#endif // MATROSKA_VERSION
 
 EbmlId KaxBlockGroup_TheId     (0xA0, 1);
 EbmlId KaxBlock_TheId          (0xA1, 1);
+EbmlId KaxSimpleBlock_TheId    (0xA3, 1);
 EbmlId KaxBlockDuration_TheId  (0x9B, 1);
 #if MATROSKA_VERSION >= 2
 EbmlId KaxBlockVirtual_TheId   (0xA2, 1);
+EbmlId KaxCodecState_TheId     (0xA4, 1);
+#endif // MATROSKA_VERSION
 EbmlId KaxBlockAdditions_TheId (0x75A1, 2);
 EbmlId KaxBlockMore_TheId      (0xA6, 1);
 EbmlId KaxBlockAddID_TheId     (0xEE, 1);
 EbmlId KaxBlockAdditional_TheId(0xA5, 1);
-#endif // MATROSKA_VERSION
 
 const EbmlSemanticContext KaxBlockGroup_Context = EbmlSemanticContext(countof(KaxBlockGroup_ContextList), KaxBlockGroup_ContextList, &KaxCluster_Context, *GetKaxGlobal_Context, &KaxBlockGroup::ClassInfos);
 const EbmlSemanticContext KaxBlock_Context = EbmlSemanticContext(0, NULL, &KaxBlockGroup_Context, *GetKaxGlobal_Context, &KaxBlock::ClassInfos);
 const EbmlSemanticContext KaxBlockDuration_Context = EbmlSemanticContext(0, NULL, &KaxBlockGroup_Context, *GetKaxGlobal_Context, &KaxBlockDuration::ClassInfos);
 #if MATROSKA_VERSION >= 2
+const EbmlSemanticContext KaxSimpleBlock_Context = EbmlSemanticContext(0, NULL, &KaxCluster_Context, *GetKaxGlobal_Context, &KaxSimpleBlock::ClassInfos);
 const EbmlSemanticContext KaxBlockVirtual_Context = EbmlSemanticContext(0, NULL, &KaxBlockGroup_Context, *GetKaxGlobal_Context, &KaxBlockVirtual::ClassInfos);
+const EbmlSemanticContext KaxCodecState_Context = EbmlSemanticContext(0, NULL, &KaxBlockGroup_Context, *GetKaxGlobal_Context, &KaxCodecState::ClassInfos);
+#endif // MATROSKA_VERSION
 const EbmlSemanticContext KaxBlockAdditions_Context = EbmlSemanticContext(countof(KaxBlockAdditions_ContextList), KaxBlockAdditions_ContextList, &KaxBlockGroup_Context, *GetKaxGlobal_Context, &KaxBlockAdditions::ClassInfos);
 const EbmlSemanticContext KaxBlockMore_Context = EbmlSemanticContext(countof(KaxBlockMore_ContextList), KaxBlockMore_ContextList, &KaxBlockAdditions_Context, *GetKaxGlobal_Context, &KaxBlockMore::ClassInfos);
 const EbmlSemanticContext KaxBlockAddID_Context = EbmlSemanticContext(0, NULL, &KaxBlockMore_Context, *GetKaxGlobal_Context, &KaxBlockAddID::ClassInfos);
 const EbmlSemanticContext KaxBlockAdditional_Context = EbmlSemanticContext(0, NULL, &KaxBlockMore_Context, *GetKaxGlobal_Context, &KaxBlockAdditional::ClassInfos);
-#endif // MATROSKA_VERSION
 
 const EbmlCallbacks KaxBlockGroup::ClassInfos(KaxBlockGroup::Create, KaxBlockGroup_TheId, "BlockGroup", KaxBlockGroup_Context);
 const EbmlCallbacks KaxBlock::ClassInfos(KaxBlock::Create, KaxBlock_TheId, "Block", KaxBlock_Context);
 const EbmlCallbacks KaxBlockDuration::ClassInfos(KaxBlockDuration::Create, KaxBlockDuration_TheId, "BlockDuration", KaxBlockDuration_Context);
 #if MATROSKA_VERSION >= 2
+const EbmlCallbacks KaxSimpleBlock::ClassInfos(KaxSimpleBlock::Create, KaxSimpleBlock_TheId, "SimpleBlock", KaxSimpleBlock_Context);
 const EbmlCallbacks KaxBlockVirtual::ClassInfos(KaxBlockVirtual::Create, KaxBlockVirtual_TheId, "BlockVirtual", KaxBlockVirtual_Context);
+const EbmlCallbacks KaxCodecState::ClassInfos(KaxCodecState::Create, KaxCodecState_TheId, "CodecState", KaxCodecState_Context);
+#endif // MATROSKA_VERSION
 const EbmlCallbacks KaxBlockAdditions::ClassInfos(KaxBlockAdditions::Create, KaxBlockAdditions_TheId, "BlockAdditions", KaxBlockAdditions_Context);
 const EbmlCallbacks KaxBlockMore::ClassInfos(KaxBlockMore::Create, KaxBlockMore_TheId, "BlockMore", KaxBlockMore_Context);
 const EbmlCallbacks KaxBlockAddID::ClassInfos(KaxBlockAddID::Create, KaxBlockAddID_TheId, "BlockAddID", KaxBlockAddID_Context);
 const EbmlCallbacks KaxBlockAdditional::ClassInfos(KaxBlockAdditional::Create, KaxBlockAdditional_TheId, "BlockAdditional", KaxBlockAdditional_Context);
-#endif // MATROSKA_VERSION
 
 DataBuffer * DataBuffer::Clone()
 {
-	binary *ClonedData = new binary[mySize];
+	binary *ClonedData = (binary *)malloc(mySize * sizeof(binary));
+	assert(ClonedData != NULL);
 	memcpy(ClonedData, myBuffer ,mySize );
 
 	SimpleDataBuffer * result = new SimpleDataBuffer(ClonedData, mySize, 0);
@@ -119,30 +125,30 @@ DataBuffer * DataBuffer::Clone()
 }
 
 SimpleDataBuffer::SimpleDataBuffer(const SimpleDataBuffer & ToClone)
- :DataBuffer(new binary[ToClone.mySize], ToClone.mySize, myFreeBuffer)
+ :DataBuffer((binary *)malloc(ToClone.mySize * sizeof(binary)), ToClone.mySize, myFreeBuffer)
 {
+	assert(myBuffer != NULL);
 	memcpy(myBuffer, ToClone.myBuffer ,mySize );
 	bValidValue = ToClone.bValidValue;
 }
 
-bool KaxBlock::ValidateSize() const
+bool KaxInternalBlock::ValidateSize() const
 {
 	return (Size >= 4); /// for the moment
 }
 
-KaxBlock::~KaxBlock()
+KaxInternalBlock::~KaxInternalBlock()
 {
 	ReleaseFrames();
 }
 
-KaxBlock::KaxBlock(const KaxBlock & ElementToClone)
+KaxInternalBlock::KaxInternalBlock(const KaxInternalBlock & ElementToClone)
  :EbmlBinary(ElementToClone)
  ,myBuffers(ElementToClone.myBuffers.size())
  ,Timecode(ElementToClone.Timecode)
  ,LocalTimecode(ElementToClone.LocalTimecode)
  ,bLocalTimecodeUsed(ElementToClone.bLocalTimecodeUsed)
  ,TrackNumber(ElementToClone.TrackNumber)
- ,bGap(ElementToClone.bGap)
  ,ParentCluster(ElementToClone.ParentCluster) ///< \todo not exactly
 {
 	// add a clone of the list
@@ -167,7 +173,6 @@ KaxBlockGroup::KaxBlockGroup()
  ,ParentTrack(NULL)
 {}
 
-#if MATROSKA_VERSION >= 2
 KaxBlockAdditions::KaxBlockAdditions()
  :EbmlMaster(KaxBlockAdditions_Context)
 {}
@@ -175,38 +180,41 @@ KaxBlockAdditions::KaxBlockAdditions()
 KaxBlockMore::KaxBlockMore()
  :EbmlMaster(KaxBlockMore_Context)
 {}
-#endif // MATROSKA_VERSION
 
 /*!
 	\todo handle flags
 	\todo hardcoded limit of the number of frames in a lace should be a parameter
 	\return true if more frames can be added to this Block
 */
-bool KaxBlock::AddFrame(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, LacingType lacing)
+bool KaxInternalBlock::AddFrame(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, LacingType lacing, bool invisible)
 {
 	bValueIsSet = true;
 	if (myBuffers.size() == 0) {
 		// first frame
 		Timecode = timecode;
 		TrackNumber = track.TrackNumber();
+		mInvisible = invisible;
 		mLacing = lacing;
 	}
 	myBuffers.push_back(&buffer);
 
 	// we don't allow more than 8 frames in a Block because the overhead improvement is minimal
-	if (myBuffers.size() >= 8)
+	if (myBuffers.size() >= 8 || lacing == LACING_NONE)
 		return false;
 
-	// decide wether a new frame can be added or not
-	// a frame in a lace is not efficient when the place necessary to code it in a lace is bigger 
-	// than the size of a simple Block. That means more than 6 bytes (4 in struct + 2 for EBML) to code the size
-	return (buffer.Size() < 6*0xFF);
+	if (lacing == LACING_XIPH)
+		// decide wether a new frame can be added or not
+		// a frame in a lace is not efficient when the place necessary to code it in a lace is bigger 
+		// than the size of a simple Block. That means more than 6 bytes (4 in struct + 2 for EBML) to code the size
+		return (buffer.Size() < 6*0xFF);
+	else
+		return true;
 }
 
 /*!
        \return Returns the lacing type that produces the smallest footprint.
 */
-LacingType KaxBlock::GetBestLacingType() const {
+LacingType KaxInternalBlock::GetBestLacingType() const {
 	int XiphLacingSize, EbmlLacingSize, i;
 	bool SameSize = true;
 
@@ -220,7 +228,7 @@ LacingType KaxBlock::GetBestLacingType() const {
 			SameSize = false;
 		XiphLacingSize += myBuffers[i]->Size() / 255 + 1;
 	}
-	EbmlLacingSize += CodedSizeLength(myBuffers[0]->Size(), 0);
+	EbmlLacingSize += CodedSizeLength(myBuffers[0]->Size(), 0, bSizeIsFinite);
 	for (i = 1; i < (int)myBuffers.size() - 1; i++)
 		EbmlLacingSize += CodedSizeLengthSigned(int64(myBuffers[i]->Size()) - int64(myBuffers[i - 1]->Size()), 0);
 	if (SameSize)
@@ -231,13 +239,10 @@ LacingType KaxBlock::GetBestLacingType() const {
 		return LACING_EBML;
 }
 
-/*!
-	\todo handle gap flag
-*/
-uint64 KaxBlock::UpdateSize(bool bSaveDefault, bool bForceRender)
+uint64 KaxInternalBlock::UpdateSize(bool bSaveDefault, bool bForceRender)
 {
 	LacingType LacingHere;
-	assert(Data == NULL); // Data is not used for KaxBlock
+	assert(Data == NULL); // Data is not used for KaxInternalBlock
 	assert(TrackNumber < 0x4000); // no more allowed for the moment
 	unsigned int i;
 
@@ -263,7 +268,7 @@ uint64 KaxBlock::UpdateSize(bool bSaveDefault, bool bForceRender)
 				}
 				break;
 			case LACING_EBML:
-				Size += myBuffers[0]->Size() + CodedSizeLength(myBuffers[0]->Size(), 0);
+				Size += myBuffers[0]->Size() + CodedSizeLength(myBuffers[0]->Size(), 0, bSizeIsFinite);
 				for (i=1; i<myBuffers.size()-1; i++) {
 					Size += myBuffers[i]->Size() 
 						+ CodedSizeLengthSigned(int64(myBuffers[i]->Size()) - int64(myBuffers[i-1]->Size()), 0);;
@@ -298,9 +303,6 @@ KaxBlockVirtual::KaxBlockVirtual(const KaxBlockVirtual & ElementToClone)
 	Data = DataBlock;
 }
 
-/*!
-	\todo handle the gap flag
-*/
 uint64 KaxBlockVirtual::UpdateSize(bool bSaveDefault, bool bForceRender)
 {
 	assert(TrackNumber < 0x4000);
@@ -319,7 +321,7 @@ uint64 KaxBlockVirtual::UpdateSize(bool bSaveDefault, bool bForceRender)
 	b16.Fill(cursor);
 	cursor += 2;
 
-	*cursor++ = (0 << 0); // no gap
+	*cursor++ = 0; // flags
 
 	return Size;
 }
@@ -329,7 +331,7 @@ uint64 KaxBlockVirtual::UpdateSize(bool bSaveDefault, bool bForceRender)
 	\todo more optimisation is possible (render the Block head and don't copy the buffer in memory, care should be taken with the allocation of Data)
 	\todo the actual timecode to write should be retrieved from the Cluster from here
 */
-uint32 KaxBlock::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
+uint32 KaxInternalBlock::RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault)
 {
 	if (myBuffers.size() == 0) {
 		return 0;
@@ -363,22 +365,34 @@ uint32 KaxBlock::RenderData(IOCallback & output, bool bForceRender, bool bSaveDe
 		b16.Fill(cursor);
 		cursor += 2;
 
-		*cursor = (0 << 0); // no gap
+		*cursor = 0; // flags
 
 		if (mLacing == LACING_AUTO) {
 			mLacing = GetBestLacingType();
 		}
 
+		// invisible flag
+		if (mInvisible)
+			*cursor = 0x08;
+
+		if (bIsSimple) {
+			if (bIsKeyframe)
+				*cursor |= 0x80;
+			if (bIsDiscardable)
+				*cursor |= 0x01;
+		}
+		
+		// lacing flag
 		switch (mLacing)
 		{
 		case LACING_XIPH:
-			*cursor++ |= 0x2;
+			*cursor++ |= 0x02;
 			break;
 		case LACING_EBML:
-			*cursor++ |= 0x6;
+			*cursor++ |= 0x06;
 			break;
 		case LACING_FIXED:
-			*cursor++ |= 0x4;
+			*cursor++ |= 0x04;
 			break;
 		case LACING_NONE:
 			break;
@@ -422,7 +436,7 @@ uint32 KaxBlock::RenderData(IOCallback & output, bool bForceRender, bool bSaveDe
 
 				_Size = myBuffers[0]->Size();
 
-				_CodedSize = CodedSizeLength(_Size, 0);
+				_CodedSize = CodedSizeLength(_Size, 0, bSizeIsFinite);
 
 				// first size in the lace is not a signed
 				CodedValueLength(_Size, _CodedSize, _FinalHead);
@@ -460,7 +474,7 @@ uint32 KaxBlock::RenderData(IOCallback & output, bool bForceRender, bool bSaveDe
 	return Size;
 }
 
-uint64 KaxBlock::ReadInternalHead(IOCallback & input)
+uint64 KaxInternalBlock::ReadInternalHead(IOCallback & input)
 {
 	binary Buffer[5], *cursor = Buffer;
 	uint64 Result = input.read(cursor, 4);
@@ -490,14 +504,13 @@ uint64 KaxBlock::ReadInternalHead(IOCallback & input)
 	bLocalTimecodeUsed = false;
 	cursor += 2;
 
-	bGap = (*cursor && 0x01);
 	return Result;
 }
 
 /*!
 	\todo better zero copy handling
 */
-uint64 KaxBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
+uint64 KaxInternalBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
 {
 	uint64 Result;
 
@@ -530,7 +543,11 @@ uint64 KaxBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
 		bLocalTimecodeUsed = true;
 		cursor += 2;
 
-		bGap = (*cursor && 0x01);
+		if (EbmlId(*this) == KaxSimpleBlock::ClassInfos.GlobalId) {
+			bIsKeyframe = (*cursor & 0x80) != 0;
+			bIsDiscardable = (*cursor & 0x01) != 0;
+		}
+		mInvisible = (*cursor & 0x08) >> 3;
 		mLacing = LacingType((*cursor++ & 0x06) >> 1);
 
 		// put all Frames in the list
@@ -633,7 +650,11 @@ uint64 KaxBlock::ReadData(IOCallback & input, ScopeMode ReadFully)
 		bLocalTimecodeUsed = true;
 		cursor += 2;
 
-		bGap = (*cursor && 0x01);
+		if (EbmlId(*this) == KaxSimpleBlock::ClassInfos.GlobalId) {
+			bIsKeyframe = (*cursor & 0x80) != 0;
+			bIsDiscardable = (*cursor & 0x01) != 0;
+		}
+		mInvisible = (*cursor & 0x08) >> 3;
 		mLacing = LacingType((*cursor++ & 0x06) >> 1);
 		if (cursor == &_TempHead[4])
 		{
@@ -772,24 +793,55 @@ bool KaxBlockGroup::AddFrame(const KaxTrackEntry & track, uint64 timecode, DataB
 	return bRes;
 }
 
+bool KaxBlockGroup::AddFrame(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, const KaxBlockBlob * PastBlock, const KaxBlockBlob * ForwBlock, LacingType lacing)
+{
+	KaxBlock & theBlock = GetChild<KaxBlock>(*this);
+	assert(ParentCluster != NULL);
+	theBlock.SetParent(*ParentCluster);
+	ParentTrack = &track;
+	bool bRes = theBlock.AddFrame(track, timecode, buffer, lacing);
+
+	if (PastBlock != NULL)
+	{
+		KaxReferenceBlock & thePastRef = GetChild<KaxReferenceBlock>(*this);
+		thePastRef.SetReferencedBlock(PastBlock);
+		thePastRef.SetParentBlock(*this);
+	}
+
+	if (ForwBlock != NULL)
+	{
+		KaxReferenceBlock & theFutureRef = AddNewChild<KaxReferenceBlock>(*this);
+		theFutureRef.SetReferencedBlock(ForwBlock);
+		theFutureRef.SetParentBlock(*this);
+	}
+
+	return bRes;
+}
+
 /*!
 	\todo we may cache the reference to the timecode block
 */
 uint64 KaxBlockGroup::GlobalTimecode() const
 {
 	assert(ParentCluster != NULL); // impossible otherwise
-	KaxBlock & MyBlock = *static_cast<KaxBlock *>(this->FindElt(KaxBlock::ClassInfos));
+	KaxInternalBlock & MyBlock = *static_cast<KaxBlock *>(this->FindElt(KaxBlock::ClassInfos));
 	return MyBlock.GlobalTimecode();
 
 }
 
 uint16 KaxBlockGroup::TrackNumber() const
 {
-	KaxBlock & MyBlock = *static_cast<KaxBlock *>(this->FindElt(KaxBlock::ClassInfos));
+	KaxInternalBlock & MyBlock = *static_cast<KaxBlock *>(this->FindElt(KaxBlock::ClassInfos));
 	return MyBlock.TrackNum();
 }
 
 uint64 KaxBlockGroup::ClusterPosition() const
+{
+	assert(ParentCluster != NULL); // impossible otherwise
+	return ParentCluster->GetPosition();
+}
+
+uint64 KaxInternalBlock::ClusterPosition() const
 {
 	assert(ParentCluster != NULL); // impossible otherwise
 	return ParentCluster->GetPosition();
@@ -824,11 +876,11 @@ const KaxReferenceBlock & KaxBlockGroup::Reference(unsigned int Index) const
 
 void KaxBlockGroup::ReleaseFrames()
 {
-	KaxBlock & MyBlock = *static_cast<KaxBlock *>(this->FindElt(KaxBlock::ClassInfos));
+	KaxInternalBlock & MyBlock = *static_cast<KaxBlock *>(this->FindElt(KaxBlock::ClassInfos));
 	MyBlock.ReleaseFrames();
 }
 
-void KaxBlock::ReleaseFrames()
+void KaxInternalBlock::ReleaseFrames()
 {
 	// free the allocated Frames
 	int i;
@@ -861,7 +913,18 @@ bool KaxBlockGroup::GetBlockDuration(uint64 &TheTimecode) const
 	return true;
 }
 
-void KaxBlock::SetParent(KaxCluster & aParentCluster)
+KaxBlockGroup::operator KaxInternalBlock &() {
+	KaxBlock & theBlock = GetChild<KaxBlock>(*this);
+	return theBlock;
+}
+
+void KaxBlockGroup::SetParent(KaxCluster & aParentCluster) {
+	ParentCluster = &aParentCluster;
+	KaxBlock & theBlock = GetChild<KaxBlock>(*this);
+	theBlock.SetParent( aParentCluster );
+}
+
+void KaxInternalBlock::SetParent(KaxCluster & aParentCluster)
 {
 	ParentCluster = &aParentCluster;
 	if (bLocalTimecodeUsed) {
@@ -870,7 +933,7 @@ void KaxBlock::SetParent(KaxCluster & aParentCluster)
 	}
 }
 
-int64 KaxBlock::GetDataPosition(size_t FrameNumber)
+int64 KaxInternalBlock::GetDataPosition(size_t FrameNumber)
 {
 	int64 _Result = -1;
 
@@ -888,7 +951,7 @@ int64 KaxBlock::GetDataPosition(size_t FrameNumber)
 	return _Result;
 }
 
-int64 KaxBlock::GetFrameSize(size_t FrameNumber)
+int64 KaxInternalBlock::GetFrameSize(size_t FrameNumber)
 {
 	int64 _Result = -1;
 
@@ -898,6 +961,136 @@ int64 KaxBlock::GetFrameSize(size_t FrameNumber)
 	}
 
 	return _Result;
+}
+
+KaxBlockBlob::operator KaxBlockGroup &()
+{
+	assert(!bUseSimpleBlock);
+	assert(Block.group);
+	return *Block.group;
+}
+
+KaxBlockBlob::operator const KaxBlockGroup &() const
+{
+	assert(!bUseSimpleBlock);
+	assert(Block.group);
+	return *Block.group;
+}
+
+KaxBlockBlob::operator KaxInternalBlock &()
+{
+	assert(Block.group);
+#if MATROSKA_VERSION >= 2
+	if (bUseSimpleBlock)
+		return *Block.simpleblock;
+	else
+#endif
+		return *Block.group;
+}
+
+KaxBlockBlob::operator const KaxInternalBlock &() const
+{
+	assert(Block.group);
+#if MATROSKA_VERSION >= 2
+	if (bUseSimpleBlock)
+		return *Block.simpleblock;
+	else
+#endif
+		return *Block.group;
+}
+
+#if MATROSKA_VERSION >= 2
+KaxBlockBlob::operator KaxSimpleBlock &()
+{
+	assert(bUseSimpleBlock);
+	assert(Block.simpleblock);
+	return *Block.simpleblock;
+}
+#endif
+
+bool KaxBlockBlob::AddFrameAuto(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, LacingType lacing, const KaxBlockBlob * PastBlock, const KaxBlockBlob * ForwBlock)
+{
+	bool bResult = false;
+#if MATROSKA_VERSION >= 2
+	if ((SimpleBlockMode == BLOCK_BLOB_ALWAYS_SIMPLE) || (SimpleBlockMode == BLOCK_BLOB_SIMPLE_AUTO && PastBlock == NULL && ForwBlock == NULL)) {
+		assert(bUseSimpleBlock == true);
+		if (Block.simpleblock == NULL) {
+			Block.simpleblock = new KaxSimpleBlock();
+			Block.simpleblock->SetParent(*ParentCluster);
+		}
+
+		bResult = Block.simpleblock->AddFrame(track, timecode, buffer, lacing);
+		if (PastBlock == NULL && ForwBlock == NULL) {
+			Block.simpleblock->SetKeyframe(true);
+			Block.simpleblock->SetDiscardable(false);
+		} else {
+			Block.simpleblock->SetKeyframe(false);
+			if ((ForwBlock == NULL || ((const KaxInternalBlock &)*ForwBlock).GlobalTimecode() <= timecode) &&
+				(PastBlock == NULL || ((const KaxInternalBlock &)*PastBlock).GlobalTimecode() <= timecode))
+				Block.simpleblock->SetDiscardable(false);
+			else
+				Block.simpleblock->SetDiscardable(true);
+		}
+	}
+	else
+#endif
+	{
+		if (ReplaceSimpleByGroup()) {
+			bResult = Block.group->AddFrame(track, timecode, buffer, PastBlock, ForwBlock, lacing);
+		}
+	}
+
+	return bResult;
+}
+
+void KaxBlockBlob::SetParent(KaxCluster & parent_clust)
+{
+	ParentCluster = &parent_clust;
+}
+
+void KaxBlockBlob::SetBlockDuration(uint64 TimeLength)
+{
+	if (ReplaceSimpleByGroup())
+		Block.group->SetBlockDuration(TimeLength);
+}
+
+bool KaxBlockBlob::ReplaceSimpleByGroup()
+{
+	if (SimpleBlockMode== BLOCK_BLOB_ALWAYS_SIMPLE)
+		return false;
+
+	if (!bUseSimpleBlock) {
+		if (Block.group == NULL) {
+			Block.group = new KaxBlockGroup();
+		}
+	}
+#if MATROSKA_VERSION >= 2
+	else 
+	{
+
+		if (Block.simpleblock != NULL) {
+			KaxSimpleBlock *old_simpleblock = Block.simpleblock;
+			Block.group = new KaxBlockGroup();
+			// _TODO_ : move all the data to the blockgroup
+			assert(false);
+			// -> while(frame) AddFrame(myBuffer)
+			delete old_simpleblock;
+		} else {
+			Block.group = new KaxBlockGroup();
+		}
+	}
+#endif
+	if (ParentCluster != NULL)
+		Block.group->SetParent(*ParentCluster);
+
+	bUseSimpleBlock = false;
+	return true;
+}
+
+void KaxBlockBlob::SetBlockGroup( KaxBlockGroup &BlockRef )
+{
+	assert(!bUseSimpleBlock);
+	Block.group = &BlockRef;
 }
 
 END_LIBMATROSKA_NAMESPACE

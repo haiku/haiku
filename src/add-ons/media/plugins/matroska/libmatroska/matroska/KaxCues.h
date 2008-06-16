@@ -59,11 +59,13 @@ class MATROSKA_DLL_API KaxCues : public EbmlMaster {
 		EbmlElement * Clone() const {return new KaxCues(*this);}
 
 		bool AddBlockGroup(const KaxBlockGroup & BlockReference);
+		bool AddBlockBlob(const KaxBlockBlob & BlockReference);
 
 		/*!
 			\brief Indicate that the position for this Block is set
 		*/
 		void PositionSet(const KaxBlockGroup & BlockReference);
+		void PositionSet(const KaxBlockBlob & BlockReference);
 
 		/*!
 			\brief override to sort by timecode/track
@@ -86,7 +88,7 @@ class MATROSKA_DLL_API KaxCues : public EbmlMaster {
 		}
 
 	protected:
-		std::vector<const KaxBlockGroup *> myTempReferences;
+		std::vector<const KaxBlockBlob *> myTempReferences;
 		bool   bGlobalTimecodeScaleIsSet;
 		uint64 mGlobalTimecodeScale;
 };

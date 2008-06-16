@@ -30,7 +30,7 @@
 
 /*!
 	\file
-	\version \$Id: EbmlId.h 639 2004-07-09 20:59:14Z mosu $
+	\version \$Id: EbmlId.h 936 2004-11-10 20:46:28Z mosu $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #ifndef LIBEBML_ID_H
@@ -65,6 +65,10 @@ class EBML_DLL_API EbmlId {
 		inline bool operator==(const EbmlId & TestId) const
 		{
 			return ((TestId.Length == Length) && (TestId.Value == Value));
+		}
+		inline bool operator!=(const EbmlId & TestId) const
+		{
+			return !(*this == TestId);
 		}
 
 		inline void Fill(binary * Buffer) const {

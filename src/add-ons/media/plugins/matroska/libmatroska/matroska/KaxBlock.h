@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -48,6 +48,8 @@ START_LIBMATROSKA_NAMESPACE
 
 class KaxCluster;
 class KaxReferenceBlock;
+class KaxInternalBlock;
+class KaxBlockBlob;
 
 class MATROSKA_DLL_API DataBuffer {
 	protected:
@@ -63,6 +65,7 @@ class MATROSKA_DLL_API DataBuffer {
 			,bValidValue(true)	
       ,myFreeBuffer(aFreeBuffer)
 		{}
+		virtual ~DataBuffer() {}
 		virtual binary * Buffer() {return myBuffer;}
 		virtual uint32   & Size() {return mySize;};
 		virtual const binary * Buffer() const {return myBuffer;}
@@ -80,9 +83,6 @@ class MATROSKA_DLL_API DataBuffer {
 		virtual DataBuffer * Clone();
 };
 
-/*!
-	\warning the binary buffer should be allocated with the new binary* operator : "new binary[your_size]"
-*/
 class MATROSKA_DLL_API SimpleDataBuffer : public DataBuffer {
 	public:
 		SimpleDataBuffer(binary * aBuffer, uint32 aSize, uint32 aOffset, bool (*aFreeBuffer)(const DataBuffer & aBuffer) = myFreeBuffer)
@@ -90,6 +90,7 @@ class MATROSKA_DLL_API SimpleDataBuffer : public DataBuffer {
 			,Offset(aOffset)
 			,BaseBuffer(aBuffer)
 		{}
+		virtual ~SimpleDataBuffer() {}
 
 		DataBuffer * Clone() {return new SimpleDataBuffer(*this);}
 
@@ -99,7 +100,9 @@ class MATROSKA_DLL_API SimpleDataBuffer : public DataBuffer {
 
 		static bool myFreeBuffer(const DataBuffer & aBuffer)
 		{
-			delete[] static_cast<const SimpleDataBuffer*>(&aBuffer)->BaseBuffer;
+			binary *_Buffer = static_cast<const SimpleDataBuffer*>(&aBuffer)->BaseBuffer;
+			if (_Buffer != NULL)
+				free(_Buffer);
 			return true;
 		}
 
@@ -144,10 +147,9 @@ class MATROSKA_DLL_API KaxBlockGroup : public EbmlMaster {
 			\brief Addition of a frame with a backward+forward reference (B frame)
 		*/
 		bool AddFrame(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, const KaxBlockGroup & PastBlock, const KaxBlockGroup & ForwBlock, LacingType lacing = LACING_AUTO);
+		bool AddFrame(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, const KaxBlockBlob * PastBlock, const KaxBlockBlob * ForwBlock, LacingType lacing = LACING_AUTO);
 
-		void SetParent(KaxCluster & aParentCluster) {
-			ParentCluster = &aParentCluster;
-		}
+		void SetParent(KaxCluster & aParentCluster);
 
 		void SetParentTrack(const KaxTrackEntry & aParentTrack) {
 			ParentTrack = &aParentTrack;
@@ -183,20 +185,22 @@ class MATROSKA_DLL_API KaxBlockGroup : public EbmlMaster {
 		*/
 		void ReleaseFrames();
 
+		operator KaxInternalBlock &();
+
+		const KaxCluster *GetParentCluster() const { return ParentCluster; }
+
 	protected:
 		KaxCluster * ParentCluster;
 		const KaxTrackEntry * ParentTrack;
 };
 
-class MATROSKA_DLL_API KaxBlock : public EbmlBinary {
+class KaxInternalBlock : public EbmlBinary {
 	public:
-		KaxBlock() :bLocalTimecodeUsed(false), bGap(false), mLacing(LACING_AUTO), ParentCluster(NULL) {}
-		KaxBlock(const KaxBlock & ElementToClone);
-		~KaxBlock();
-		static EbmlElement & Create() {return *(new KaxBlock);}
-		const EbmlCallbacks & Generic() const {return ClassInfos;}
-		static const EbmlCallbacks ClassInfos;
-		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		KaxInternalBlock( bool bSimple ) :bLocalTimecodeUsed(false), mLacing(LACING_AUTO), mInvisible(false)
+			,ParentCluster(NULL), bIsSimple(bSimple), bIsKeyframe(true), bIsDiscardable(false)
+		{}
+		KaxInternalBlock(const KaxInternalBlock & ElementToClone);
+		~KaxInternalBlock();
 		bool ValidateSize() const;
 
 		uint16 TrackNum() const {return TrackNumber;}
@@ -220,7 +224,7 @@ class MATROSKA_DLL_API KaxBlock : public EbmlBinary {
 		unsigned int NumberFrames() const { return SizeList.size();}
 		DataBuffer & GetBuffer(unsigned int iIndex) {return *myBuffers[iIndex];}
 
-		bool AddFrame(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, LacingType lacing = LACING_AUTO);
+		bool AddFrame(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, LacingType lacing = LACING_AUTO, bool invisible = false);
 
 		/*!
 			\brief release all the frames of all Blocks
@@ -228,8 +232,6 @@ class MATROSKA_DLL_API KaxBlock : public EbmlBinary {
 		void ReleaseFrames();
 
 		void SetParent(KaxCluster & aParentCluster);
-
-		EbmlElement * Clone() const {return new KaxBlock(*this);}
 
 		/*!
 			\return Returns the lacing type that produces the smallest footprint.
@@ -249,6 +251,10 @@ class MATROSKA_DLL_API KaxBlock : public EbmlBinary {
 			\note return -1 if the position doesn't exist
 		*/
 		int64 GetFrameSize(size_t FrameNumber = 0);
+		
+		bool IsInvisible() const { return mInvisible; }
+
+		uint64 ClusterPosition() const;
 
 	protected:
 		std::vector<DataBuffer *> myBuffers;
@@ -257,13 +263,92 @@ class MATROSKA_DLL_API KaxBlock : public EbmlBinary {
 		int16      LocalTimecode;
 		bool       bLocalTimecodeUsed;
 		uint16     TrackNumber;
-		bool       bGap;
 		LacingType mLacing;
+		bool       mInvisible;
 		uint64     FirstFrameLocation;
 
 		uint32 RenderData(IOCallback & output, bool bForceRender, bool bSaveDefault = false);
 
 		KaxCluster * ParentCluster;
+		bool       bIsSimple;
+		bool       bIsKeyframe;
+		bool       bIsDiscardable;
+};
+
+class MATROSKA_DLL_API KaxBlock : public KaxInternalBlock {
+	public:
+		KaxBlock() :KaxInternalBlock(false) {}
+		static EbmlElement & Create() {return *(new KaxBlock);}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		EbmlElement * Clone() const {return new KaxBlock(*this);}
+};
+
+#if MATROSKA_VERSION >= 2
+class MATROSKA_DLL_API KaxSimpleBlock : public KaxInternalBlock {
+	public:
+		KaxSimpleBlock() :KaxInternalBlock(true) {}
+		static EbmlElement & Create() {return *(new KaxSimpleBlock);}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		EbmlElement * Clone() const {return new KaxSimpleBlock(*this);}
+
+		void SetKeyframe(bool b_keyframe) { bIsKeyframe = b_keyframe; }
+		void SetDiscardable(bool b_discard) { bIsDiscardable = b_discard; }
+
+		bool IsKeyframe() const    { return bIsKeyframe; }
+		bool IsDiscardable() const { return bIsDiscardable; }
+
+		operator KaxInternalBlock &() { return *this; }
+};
+#endif // MATROSKA_VERSION
+
+class MATROSKA_DLL_API KaxBlockBlob {
+public:
+	KaxBlockBlob(BlockBlobType sblock_mode) :ParentCluster(NULL), SimpleBlockMode(sblock_mode) {
+		bUseSimpleBlock = (sblock_mode != BLOCK_BLOB_NO_SIMPLE);
+		Block.group = NULL;
+	}
+
+	~KaxBlockBlob() {
+#if MATROSKA_VERSION >= 2
+		if (bUseSimpleBlock)
+			delete Block.simpleblock;
+		else
+#endif // MATROSKA_VERSION
+			delete Block.group;
+	}
+
+	operator KaxBlockGroup &();
+	operator const KaxBlockGroup &() const;
+#if MATROSKA_VERSION >= 2
+	operator KaxSimpleBlock &();
+#endif
+	operator KaxInternalBlock &();
+	operator const KaxInternalBlock &() const;
+
+	void SetBlockGroup( KaxBlockGroup &BlockRef );
+
+	void SetBlockDuration(uint64 TimeLength);
+
+	void SetParent(KaxCluster & aParentCluster);
+	bool AddFrameAuto(const KaxTrackEntry & track, uint64 timecode, DataBuffer & buffer, LacingType lacing = LACING_AUTO, const KaxBlockBlob * PastBlock = NULL, const KaxBlockBlob * ForwBlock = NULL);
+
+	bool IsSimpleBlock() const {return bUseSimpleBlock;}
+
+	bool ReplaceSimpleByGroup();
+protected:
+	KaxCluster * ParentCluster;
+	union {
+		KaxBlockGroup *group;
+#if MATROSKA_VERSION >= 2
+		KaxSimpleBlock *simpleblock;
+#endif // MATROSKA_VERSION
+	} Block;
+	bool bUseSimpleBlock;
+	BlockBlobType SimpleBlockMode;
 };
 
 class MATROSKA_DLL_API KaxBlockDuration : public EbmlUInteger {
@@ -304,6 +389,7 @@ class MATROSKA_DLL_API KaxBlockVirtual : public EbmlBinary {
 
 		const KaxCluster * ParentCluster;
 };
+#endif // MATROSKA_VERSION
 
 class MATROSKA_DLL_API KaxBlockAdditional : public EbmlBinary {
 	public:
@@ -342,7 +428,7 @@ class MATROSKA_DLL_API KaxBlockMore : public EbmlMaster {
 
 class MATROSKA_DLL_API KaxBlockAddID : public EbmlUInteger {
 	public:
-		KaxBlockAddID() {}
+		KaxBlockAddID() :EbmlUInteger(1) {}
 		KaxBlockAddID(const KaxBlockAddID & ElementToClone) :EbmlUInteger(ElementToClone) {}
 		static EbmlElement & Create() {return *(new KaxBlockAddID);}
 		const EbmlCallbacks & Generic() const {return ClassInfos;}
@@ -350,7 +436,19 @@ class MATROSKA_DLL_API KaxBlockAddID : public EbmlUInteger {
 		operator const EbmlId &() const {return ClassInfos.GlobalId;}
 		EbmlElement * Clone() const {return new KaxBlockAddID(*this);}
 };
-#endif // MATROSKA_VERSION
+
+class MATROSKA_DLL_API KaxCodecState : public EbmlBinary {
+	public:
+		KaxCodecState() {}
+		KaxCodecState(const KaxCodecState & ElementToClone) :EbmlBinary(ElementToClone){}
+		static EbmlElement & Create() {return *(new KaxCodecState);}
+		const EbmlCallbacks & Generic() const {return ClassInfos;}
+		static const EbmlCallbacks ClassInfos;
+		operator const EbmlId &() const {return ClassInfos.GlobalId;}
+		bool ValidateSize() const {return true;}
+
+		EbmlElement * Clone() const {return new KaxCodecState(*this);}
+};
 
 END_LIBMATROSKA_NAMESPACE
 

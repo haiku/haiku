@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This file is part of libmatroska.
 **
@@ -29,7 +29,7 @@
 
 /*!
 	\file
-	\version \$Id: KaxInfo.cpp 640 2004-07-09 21:05:36Z mosu $
+	\version \$Id: KaxInfo.cpp 1078 2005-03-03 13:13:04Z robux4 $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include "matroska/KaxInfo.h"
@@ -40,20 +40,22 @@
 // sub elements
 START_LIBMATROSKA_NAMESPACE
 
-const EbmlSemantic KaxInfo_ContextList[12] =
+const EbmlSemantic KaxInfo_ContextList[14] =
 {
-	EbmlSemantic(false, true, KaxSegmentUID::ClassInfos),
-	EbmlSemantic(false, true, KaxSegmentFilename::ClassInfos),
-	EbmlSemantic(false, true, KaxPrevUID::ClassInfos),
-	EbmlSemantic(false, true, KaxPrevFilename::ClassInfos),
-	EbmlSemantic(false, true, KaxNextUID::ClassInfos),
-	EbmlSemantic(false, true, KaxNextFilename::ClassInfos),
-	EbmlSemantic(true,  true, KaxTimecodeScale::ClassInfos),
-	EbmlSemantic(false, true, KaxDuration::ClassInfos),
-	EbmlSemantic(false, true, KaxDateUTC::ClassInfos),
-	EbmlSemantic(false, true, KaxTitle::ClassInfos),
-	EbmlSemantic(true,  true, KaxMuxingApp::ClassInfos),
-	EbmlSemantic(true,  true, KaxWritingApp::ClassInfos),
+	EbmlSemantic(false, true,  KaxSegmentUID::ClassInfos),
+	EbmlSemantic(false, true,  KaxSegmentFilename::ClassInfos),
+	EbmlSemantic(false, true,  KaxPrevUID::ClassInfos),
+	EbmlSemantic(false, true,  KaxPrevFilename::ClassInfos),
+	EbmlSemantic(false, true,  KaxNextUID::ClassInfos),
+	EbmlSemantic(false, true,  KaxNextFilename::ClassInfos),
+	EbmlSemantic(false, false, KaxSegmentFamily::ClassInfos),
+	EbmlSemantic(false, false, KaxChapterTranslate::ClassInfos),
+	EbmlSemantic(true,  true,  KaxTimecodeScale::ClassInfos),
+	EbmlSemantic(false, true,  KaxDuration::ClassInfos),
+	EbmlSemantic(false, true,  KaxDateUTC::ClassInfos),
+	EbmlSemantic(false, true,  KaxTitle::ClassInfos),
+	EbmlSemantic(true,  true,  KaxMuxingApp::ClassInfos),
+	EbmlSemantic(true,  true,  KaxWritingApp::ClassInfos),
 };
 
 const EbmlSemanticContext KaxInfo_Context = EbmlSemanticContext(countof(KaxInfo_ContextList), KaxInfo_ContextList, &KaxSegment_Context, *GetKaxGlobal_Context, &KaxInfo::ClassInfos);

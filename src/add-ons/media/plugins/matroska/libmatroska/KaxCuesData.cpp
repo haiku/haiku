@@ -3,7 +3,7 @@
 **
 ** <file/class description>
 **
-** Copyright (C) 2002-2004 Steve Lhomme.  All rights reserved.
+** Copyright (C) 2002-2005 Steve Lhomme.  All rights reserved.
 **
 ** This library is free software; you can redistribute it and/or
 ** modify it under the terms of the GNU Lesser General Public
@@ -27,7 +27,7 @@
 
 /*!
 	\file
-	\version \$Id: KaxCuesData.cpp 640 2004-07-09 21:05:36Z mosu $
+	\version \$Id: KaxCuesData.cpp 1265 2007-01-14 17:20:35Z mosu $
 	\author Steve Lhomme     <robux4 @ users.sf.net>
 */
 #include <cassert>
@@ -36,6 +36,8 @@
 #include "matroska/KaxContexts.h"
 #include "matroska/KaxBlock.h"
 #include "matroska/KaxBlockData.h"
+#include "matroska/KaxCluster.h"
+#include "matroska/KaxSegment.h"
 
 START_LIBMATROSKA_NAMESPACE
 
@@ -156,6 +158,53 @@ void KaxCuePoint::PositionSet(const KaxBlockGroup & BlockReference, uint64 Globa
 			NewRefs.AddReference(BlockReference.Reference(i).RefBlock(), GlobalTimecodeScale);
 		}
 	}
+
+	KaxCodecState *CodecState = static_cast<KaxCodecState *>(BlockReference.FindFirstElt(KaxCodecState::ClassInfos));
+	if (CodecState != NULL) {
+		KaxCueCodecState &CueCodecState = AddNewChild<KaxCueCodecState>(NewPositions);
+		*static_cast<EbmlUInteger*>(&CueCodecState) = BlockReference.GetParentCluster()->GetParentSegment()->GetRelativePosition(CodecState->GetElementPosition());
+	}
+#endif // MATROSKA_VERSION
+
+	bValueIsSet = true;
+}
+
+void KaxCuePoint::PositionSet(const KaxBlockBlob & BlobReference, uint64 GlobalTimecodeScale)
+{
+	const KaxInternalBlock &BlockReference = BlobReference;
+
+	// fill me
+	KaxCueTime & NewTime = GetChild<KaxCueTime>(*this);
+	*static_cast<EbmlUInteger*>(&NewTime) = BlockReference.GlobalTimecode() / GlobalTimecodeScale;
+
+	KaxCueTrackPositions & NewPositions = AddNewChild<KaxCueTrackPositions>(*this);
+	KaxCueTrack & TheTrack = GetChild<KaxCueTrack>(NewPositions);
+	*static_cast<EbmlUInteger*>(&TheTrack) = BlockReference.TrackNum();
+	
+	KaxCueClusterPosition & TheClustPos = GetChild<KaxCueClusterPosition>(NewPositions);
+	*static_cast<EbmlUInteger*>(&TheClustPos) = BlockReference.ClusterPosition();
+
+#if 0 // MATROSKA_VERSION >= 2
+	// handle reference use
+	if (BlockReference.ReferenceCount() != 0)
+	{
+		unsigned int i;
+		for (i=0; i<BlockReference.ReferenceCount(); i++) {
+			KaxCueReference & NewRefs = AddNewChild<KaxCueReference>(NewPositions);
+			NewRefs.AddReference(BlockReference.Reference(i).RefBlock(), GlobalTimecodeScale);
+		}
+	}
+#endif // MATROSKA_VERSION
+
+#if MATROSKA_VERSION >= 2
+	if (!BlobReference.IsSimpleBlock()) {
+		const KaxBlockGroup &BlockGroup = BlobReference;
+		const KaxCodecState *CodecState = static_cast<KaxCodecState *>(BlockGroup.FindFirstElt(KaxCodecState::ClassInfos));
+		if (CodecState != NULL) {
+			KaxCueCodecState &CueCodecState = AddNewChild<KaxCueCodecState>(NewPositions);
+			*static_cast<EbmlUInteger*>(&CueCodecState) = BlockGroup.GetParentCluster()->GetParentSegment()->GetRelativePosition(CodecState->GetElementPosition());
+		}
+	}
 #endif // MATROSKA_VERSION
 
 	bValueIsSet = true;
@@ -165,13 +214,14 @@ void KaxCuePoint::PositionSet(const KaxBlockGroup & BlockReference, uint64 Globa
 /*!
 	\todo handle codec state checking
 */
-void KaxCueReference::AddReference(const KaxBlockGroup & BlockReference, uint64 GlobalTimecodeScale)
+void KaxCueReference::AddReference(const KaxBlockBlob & BlockReference, uint64 GlobalTimecodeScale)
 {
+	const KaxInternalBlock & theBlock = BlockReference;
 	KaxCueRefTime & NewTime = GetChild<KaxCueRefTime>(*this);
-	*static_cast<EbmlUInteger*>(&NewTime) = BlockReference.GlobalTimecode() / GlobalTimecodeScale;
+	*static_cast<EbmlUInteger*>(&NewTime) = theBlock.GlobalTimecode() / GlobalTimecodeScale;
 
 	KaxCueRefCluster & TheClustPos = GetChild<KaxCueRefCluster>(*this);
-	*static_cast<EbmlUInteger*>(&TheClustPos) = BlockReference.ClusterPosition();
+	*static_cast<EbmlUInteger*>(&TheClustPos) = theBlock.ClusterPosition();
 
 #ifdef OLD
 	// handle recursive reference use
@@ -184,7 +234,7 @@ void KaxCueReference::AddReference(const KaxBlockGroup & BlockReference, uint64 
 	}
 #endif /* OLD */
 }
-#endif // MATROSKA_VERSION
+#endif
 
 bool KaxCuePoint::operator<(const EbmlElement & EltB) const
 {
