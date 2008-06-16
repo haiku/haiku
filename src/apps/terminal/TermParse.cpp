@@ -951,6 +951,13 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
+				case CASE_SD:	// scroll screen down
+					if ((row = param[0]) < 1)
+						row = 1;
+					fBuffer->ScrollBy(-row);
+					parsestate = groundtable;
+					break;
+
 				default:
 					break;
 		}

@@ -121,3 +121,4 @@
 #define CASE_HPA 88
 
 #define CASE_SU 89	/* scroll screen up */
+#define CASE_SD 90	/* scroll screen down */
