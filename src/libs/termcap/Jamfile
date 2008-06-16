@@ -10,3 +10,17 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 StaticLibrary libtermcap.a : 
 	termcap.c tparam.c version.c
 ;
+
+# Build the /etc/termcap file. It's already ready to use, but we filter out the
+# comments.
+
+actions BuildTermcap {
+	grep -v '^#' $(2) > $(1)
+}
+
+local termcap = <etc>termcap ;
+MakeLocateCommonPlatform $(termcap) ;
+local termcapSource = [ FGristFiles termcap.src ] ;
+SEARCH on $(termcapSource) = $(SUBDIR) ;
+Depends $(termcap) : $(termcapSource) ;
+BuildTermcap $(termcap) : $(termcapSource) ;
