@@ -241,7 +241,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		media_raw_video_format videoFormat;
 		err = fController->GetEncodedVideoFormat(&format);
 		if (err < B_OK) {
-			s << "(" << strerror(err) << ")";
+			s << "(" << strerror(err) << ")\n";
 		} else if (format.type == B_MEDIA_ENCODED_VIDEO) {
 			videoFormat = format.u.encoded_video.output;
 			media_codec_info mci;
@@ -276,7 +276,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		//string_for_format(format, buf, sizeof(buf));
 		//printf("%s\n", buf);
 		if (err < 0) {
-			s << "(" << strerror(err) << ")";
+			s << "(" << strerror(err) << ")\n";
 		} else if (format.type == B_MEDIA_ENCODED_AUDIO) {
 			audioFormat = format.u.encoded_audio.output;
 			media_codec_info mci;
@@ -306,7 +306,7 @@ printf("InfoWin::Update(0x%08lx)\n", which);
 		else if (channelCount == 2)
 			s << "Stereo";
 		else
-			s << channelCount << "Channels";
+			s << channelCount << " Channels";
 		s << ", ";
 		if (sr > 0.0)
 			s << sr / 1000;

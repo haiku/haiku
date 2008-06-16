@@ -270,11 +270,10 @@ printf("NodeManager::_SetUpNodes()\n");
 	// setup the audio nodes
 	fStatus = _SetUpAudioNodes();
 	if (fStatus != B_OK) {
-		print_error("Error setting up video nodes", fStatus);
+		print_error("Error setting up audio nodes", fStatus);
 		fMediaRoster->Unlock();
 		return fStatus;
 	}
-	
 
 	// we're done mocking with the media roster
 	fMediaRoster->Unlock();
