@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Arithmetic computations (body).                                      */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006 by                   */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2008 by             */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -512,8 +512,8 @@
     FT_UInt32  q;
 
 
-    s  = a; a = FT_ABS(a);
-    s ^= b; b = FT_ABS(b);
+    s  = a; a = FT_ABS( a );
+    s ^= b; b = FT_ABS( b );
 
     if ( b == 0 )
     {
@@ -664,6 +664,57 @@
 
 
 #endif /* FT_LONG64 */
+
+
+  /* documentation is in ftcalc.h */
+
+  FT_BASE_DEF( void )
+  FT_Matrix_Multiply_Scaled( const FT_Matrix*  a,
+                             FT_Matrix        *b,
+                             FT_Long           scaling )
+  {
+    FT_Fixed  xx, xy, yx, yy;
+
+    FT_Long   val = 0x10000L * scaling;
+
+
+    if ( !a || !b )
+      return;
+
+    xx = FT_MulDiv( a->xx, b->xx, val ) + FT_MulDiv( a->xy, b->yx, val );
+    xy = FT_MulDiv( a->xx, b->xy, val ) + FT_MulDiv( a->xy, b->yy, val );
+    yx = FT_MulDiv( a->yx, b->xx, val ) + FT_MulDiv( a->yy, b->yx, val );
+    yy = FT_MulDiv( a->yx, b->xy, val ) + FT_MulDiv( a->yy, b->yy, val );
+
+    b->xx = xx;  b->xy = xy;
+    b->yx = yx;  b->yy = yy;
+  }
+
+
+  /* documentation is in ftcalc.h */
+
+  FT_BASE_DEF( void )
+  FT_Vector_Transform_Scaled( FT_Vector*        vector,
+                              const FT_Matrix*  matrix,
+                              FT_Long           scaling )
+  {
+    FT_Pos   xz, yz;
+
+    FT_Long  val = 0x10000L * scaling;
+
+
+    if ( !vector || !matrix )
+      return;
+
+    xz = FT_MulDiv( vector->x, matrix->xx, val ) +
+         FT_MulDiv( vector->y, matrix->xy, val );
+
+    yz = FT_MulDiv( vector->x, matrix->yx, val ) +
+         FT_MulDiv( vector->y, matrix->yy, val );
+
+    vector->x = xz;
+    vector->y = yz;
+  }
 
 
   /* documentation is in ftcalc.h */

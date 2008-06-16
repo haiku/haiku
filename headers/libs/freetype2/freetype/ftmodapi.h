@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType modules public interface (specification).                   */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2006 by                               */
+/*  Copyright 1996-2001, 2002, 2003, 2006, 2008 by                         */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -78,12 +78,50 @@ FT_BEGIN_HEADER
 
   typedef FT_Pointer  FT_Module_Interface;
 
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <FuncType>                                                            */
+  /*    FT_Module_Constructor                                              */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    A function used to initialize (not create) a new module object.    */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    module :: The module to initialize.                                */
+  /*                                                                       */
   typedef FT_Error
   (*FT_Module_Constructor)( FT_Module  module );
 
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <FuncType>                                                            */
+  /*    FT_Module_Destructor                                               */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    A function used to finalize (not destroy) a given module object.   */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    module :: The module to finalize.                                  */
+  /*                                                                       */
   typedef void
   (*FT_Module_Destructor)( FT_Module  module );
 
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <FuncType>                                                            */
+  /*    FT_Module_Requester                                                */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    A function used to query a given module for a specific interface.  */
+  /*                                                                       */
+  /* <Input>                                                               */
+  /*    module :: The module to finalize.                                  */
+  /*                                                                       */
+  /*    name ::   The name of the interface in the module.                 */
+  /*                                                                       */
   typedef FT_Module_Interface
   (*FT_Module_Requester)( FT_Module    module,
                           const char*  name );
@@ -112,14 +150,11 @@ FT_BEGIN_HEADER
   /*                       as a 16.16 fixed number (major.minor).  Starts  */
   /*                       at version 2.0, i.e., 0x20000.                  */
   /*                                                                       */
-  /*    module_init     :: A function used to initialize (not create) a    */
-  /*                       new module object.                              */
+  /*    module_init     :: The initializing function.                      */
   /*                                                                       */
-  /*    module_done     :: A function used to finalize (not destroy) a     */
-  /*                       given module object                             */
+  /*    module_done     :: The finalizing function.                        */
   /*                                                                       */
-  /*    get_interface   :: Queries a given module for a specific           */
-  /*                       interface by name.                              */
+  /*    get_interface   :: The interface requesting function.              */
   /*                                                                       */
   typedef struct  FT_Module_Class_
   {
@@ -362,7 +397,7 @@ FT_BEGIN_HEADER
    *       2.2
    *
    */
-  typedef enum
+  typedef enum  FT_TrueTypeEngineType_
   {
     FT_TRUETYPE_ENGINE_TYPE_NONE = 0,
     FT_TRUETYPE_ENGINE_TYPE_UNPATENTED,

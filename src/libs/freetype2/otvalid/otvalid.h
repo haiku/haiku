@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType table validation (specification only).                      */
 /*                                                                         */
-/*  Copyright 2004 by                                                      */
+/*  Copyright 2004, 2008 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -62,6 +62,11 @@ FT_BEGIN_HEADER
                      FT_Bytes      gpos,
                      FT_UInt       glyph_count,
                      FT_Validator  valid );
+
+  FT_LOCAL( void )
+  otv_MATH_validate( FT_Bytes      table,
+                     FT_UInt       glyph_count,
+                     FT_Validator  ftvalid );
 
 
 FT_END_HEADER

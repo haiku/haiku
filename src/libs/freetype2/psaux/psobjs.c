@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auxiliary functions for PostScript fonts (body).                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -169,7 +169,7 @@
                 void*       object,
                 FT_PtrDist  length )
   {
-    if ( idx < 0 || idx > table->max_elems )
+    if ( idx < 0 || idx >= table->max_elems )
     {
       FT_ERROR(( "ps_table_add: invalid index\n" ));
       return PSaux_Err_Invalid_Argument;
@@ -1481,12 +1481,6 @@
 
       if ( hinting )
         builder->hints_funcs = glyph->internal->glyph_hints;
-    }
-
-    if ( size )
-    {
-      builder->scale_x = size->metrics.x_scale;
-      builder->scale_y = size->metrics.y_scale;
     }
 
     builder->pos_x = 0;

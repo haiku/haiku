@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Build macros of the FreeType 2 library.                              */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -156,6 +156,7 @@
 #define FT_CONFIG_MODULES_H  <freetype/config/ftmodule.h>
 #endif
 
+  /* */
 
   /* public headers */
 
@@ -381,6 +382,20 @@
    *
    */
 #define FT_BDF_H  <freetype/ftbdf.h>
+
+
+  /*************************************************************************
+   *
+   * @macro:
+   *   FT_CID_H
+   *
+   * @description:
+   *   A macro used in #include statements to name the file containing the
+   *   definitions of an API which access CID font information from a
+   *   face.
+   *
+   */
+#define FT_CID_H  <freetype/ftcid.h>
 
 
   /*************************************************************************
@@ -676,6 +691,30 @@
    *   FreeType 2 API which performs color filtering for subpixel rendering.
    */
 #define FT_LCD_FILTER_H  <freetype/ftlcdfil.h>
+
+
+  /*************************************************************************
+   *
+   * @macro:
+   *   FT_UNPATENTED_HINTING_H
+   *
+   * @description:
+   *   A macro used in #include statements to name the file containing the
+   *   FreeType 2 API which performs color filtering for subpixel rendering.
+   */
+#define FT_UNPATENTED_HINTING_H  <freetype/ttunpat.h>
+
+
+  /*************************************************************************
+   *
+   * @macro:
+   *   FT_INCREMENTAL_H
+   *
+   * @description:
+   *   A macro used in #include statements to name the file containing the
+   *   FreeType 2 API which performs color filtering for subpixel rendering.
+   */
+#define FT_INCREMENTAL_H  <freetype/ftincrem.h>
 
 
   /*************************************************************************

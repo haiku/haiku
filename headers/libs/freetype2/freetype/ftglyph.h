@@ -537,7 +537,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   FT_EXPORT( void )
   FT_Matrix_Multiply( const FT_Matrix*  a,
-                      FT_Matrix*  b );
+                      FT_Matrix*        b );
 
 
   /*************************************************************************/

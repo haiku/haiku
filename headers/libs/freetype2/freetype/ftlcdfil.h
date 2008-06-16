@@ -5,7 +5,7 @@
 /*    FreeType API for color filtering of subpixel bitmap glyphs           */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 2006, 2007 by                                                */
+/*  Copyright 2006, 2007, 2008 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -85,7 +85,7 @@ FT_BEGIN_HEADER
    * @since:
    *   2.3.0
    */
-  typedef enum
+  typedef enum  FT_LcdFilter_
   {
     FT_LCD_FILTER_NONE    = 0,
     FT_LCD_FILTER_DEFAULT = 1,

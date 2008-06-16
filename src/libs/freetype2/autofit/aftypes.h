@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Auto-fitter types (specification only).                              */
 /*                                                                         */
-/*  Copyright 2003, 2004, 2005, 2006, 2007 by                              */
+/*  Copyright 2003, 2004, 2005, 2006, 2007, 2008 by                        */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -202,7 +202,7 @@ extern void*  _af_debug_hints;
    *  auto-hinted glyph image.
    */
 
-  typedef enum
+  typedef enum  AF_ScalerFlags_
   {
     AF_SCALER_FLAG_NO_HORIZONTAL = 1,  /* disable horizontal hinting */
     AF_SCALER_FLAG_NO_VERTICAL   = 2,  /* disable vertical hinting   */
@@ -260,7 +260,7 @@ extern void*  _af_debug_hints;
    *  used by more than one script.
    */
 
-  typedef enum
+  typedef enum  AF_Script_
   {
     AF_SCRIPT_NONE  = 0,
     AF_SCRIPT_LATIN = 1,

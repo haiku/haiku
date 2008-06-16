@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Access of TrueType's `gasp' table (specification).                   */
 /*                                                                         */
-/*  Copyright 2007 by                                                      */
+/*  Copyright 2007, 2008 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -95,7 +95,7 @@
    *   ppem :: The vertical character pixel size.
    *
    * @return:
-   *   Bit flags (see @FT_GASP_XXX), or @FT_GASP_NO_TABLE is there is no
+   *   Bit flags (see @FT_GASP_XXX), or @FT_GASP_NO_TABLE if there is no
    *   `gasp' table in the face.
    *
    * @since:

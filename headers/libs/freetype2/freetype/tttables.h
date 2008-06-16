@@ -5,7 +5,7 @@
 /*    Basic SFNT/TrueType tables definitions and interface                 */
 /*    (specification only).                                                */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2008 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -156,7 +156,7 @@ FT_BEGIN_HEADER
   /*    caret_Slope_Run        :: The run coefficient of the cursor's      */
   /*                              slope.                                   */
   /*                                                                       */
-  /*    Reserved               :: 10 reserved bytes.                       */
+  /*    Reserved               :: 8 reserved bytes.                        */
   /*                                                                       */
   /*    metric_Data_Format     :: Always 0.                                */
   /*                                                                       */
@@ -555,7 +555,7 @@ FT_BEGIN_HEADER
   /*    An enumeration used to specify the index of an SFNT table.         */
   /*    Used in the @FT_Get_Sfnt_Table API function.                       */
   /*                                                                       */
-  typedef enum
+  typedef enum  FT_Sfnt_Tag_
   {
     ft_sfnt_head = 0,
     ft_sfnt_maxp = 1,

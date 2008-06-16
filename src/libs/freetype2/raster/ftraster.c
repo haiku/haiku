@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType glyph rasterizer (body).                                */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2005, 2007 by                         */
+/*  Copyright 1996-2001, 2002, 2003, 2005, 2007, 2008 by                   */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -144,9 +144,7 @@
 
   /* undefine FT_RASTER_OPTION_ANTI_ALIASING if you do not want to support */
   /* 5-levels anti-aliasing                                                */
-#ifdef FT_CONFIG_OPTION_5_GRAY_LEVELS
-#define FT_RASTER_OPTION_ANTI_ALIASING
-#endif
+#undef FT_RASTER_OPTION_ANTI_ALIASING
 
   /* The size of the two-lines intermediate bitmap used */
   /* for anti-aliasing, in bytes.                       */
@@ -543,6 +541,8 @@
 #endif /* FT_STATIC_RASTER */
 
 
+#ifdef FT_RASTER_OPTION_ANTI_ALIASING
+
 static const char  count_table[256] =
 {
   0 , 1 , 1 , 2 , 1 , 2 , 2 , 3 , 1 , 2 , 2 , 3 , 2 , 3 , 3 , 4,
@@ -561,6 +561,8 @@ static const char  count_table[256] =
   3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
   3 , 4 , 4 , 5 , 4 , 5 , 5 , 6 , 4 , 5 , 5 , 6 , 5 , 6 , 6 , 7,
   4 , 5 , 5 , 6 , 5 , 6 , 6 , 7 , 5 , 6 , 6 , 7 , 6 , 7 , 7 , 8 };
+
+#endif /* FT_RASTER_OPTION_ANTI_ALIASING */
 
 
 
@@ -3172,8 +3174,6 @@ static const char  count_table[256] =
   static void
   ft_black_init( PRaster  raster )
   {
-    FT_UNUSED( raster );
-
 #ifdef FT_RASTER_OPTION_ANTI_ALIASING
     FT_UInt  n;
 
@@ -3184,6 +3184,8 @@ static const char  count_table[256] =
 
     raster->gray_width = RASTER_GRAY_LINES / 2;
 
+#else
+    FT_UNUSED( raster );
 #endif
   }
 
@@ -3319,14 +3321,18 @@ static const char  count_table[256] =
     if ( !raster || !raster->buffer || !raster->buffer_size )
       return Raster_Err_Not_Ini;
 
+    if ( !outline )
+      return Raster_Err_Invalid;
+
     /* return immediately if the outline is empty */
     if ( outline->n_points == 0 || outline->n_contours <= 0 )
       return Raster_Err_None;
 
-    if ( !outline || !outline->contours || !outline->points )
+    if ( !outline->contours || !outline->points )
       return Raster_Err_Invalid;
 
-    if ( outline->n_points != outline->contours[outline->n_contours - 1] + 1 )
+    if ( outline->n_points !=
+           outline->contours[outline->n_contours - 1] + 1 )
       return Raster_Err_Invalid;
 
     worker = raster->worker;
@@ -3335,7 +3341,14 @@ static const char  count_table[256] =
     if ( params->flags & FT_RASTER_FLAG_DIRECT )
       return Raster_Err_Unsupported;
 
-    if ( !target_map || !target_map->buffer )
+    if ( !target_map )
+      return Raster_Err_Invalid;
+
+    /* nothing to do */
+    if ( !target_map->width || !target_map->rows )
+      return Raster_Err_None;
+
+    if ( !target_map->buffer )
       return Raster_Err_Invalid;
 
     ras.outline  = *outline;

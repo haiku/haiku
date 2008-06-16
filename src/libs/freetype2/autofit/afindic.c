@@ -43,7 +43,7 @@
 
   static void
   af_indic_metrics_scale( AF_LatinMetrics  metrics,
-			  AF_Scaler        scaler )
+                          AF_Scaler        scaler )
   {
     /* use CJK routines */
     af_cjk_metrics_scale( metrics, scaler );
@@ -52,7 +52,7 @@
 
   static FT_Error
   af_indic_hints_init( AF_GlyphHints    hints,
-		       AF_LatinMetrics  metrics )
+                       AF_LatinMetrics  metrics )
   {
     /* use CJK routines */
     return af_cjk_hints_init( hints, metrics );
@@ -61,8 +61,8 @@
 
   static FT_Error
   af_indic_hints_apply( AF_GlyphHints    hints,
-			FT_Outline*      outline,
-			AF_LatinMetrics  metrics)
+                        FT_Outline*      outline,
+                        AF_LatinMetrics  metrics)
   {
     /* use CJK routines */
     return af_cjk_hints_apply( hints, outline, metrics );

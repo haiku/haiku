@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType Cache subsystem (specification).                            */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007 by             */
+/*  Copyright 1996-2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008 by       */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -165,7 +165,7 @@ FT_BEGIN_HEADER
    *   Failure to do so will result in incorrect behaviour or even
    *   memory leaks and crashes.
    */
-  typedef struct FTC_FaceIDRec_*  FTC_FaceID;
+  typedef FT_Pointer  FTC_FaceID;
 
 
   /************************************************************************
@@ -434,7 +434,18 @@ FT_BEGIN_HEADER
     FT_UInt     x_res;
     FT_UInt     y_res;
 
-  } FTC_ScalerRec, *FTC_Scaler;
+  } FTC_ScalerRec;
+
+
+  /*************************************************************************/
+  /*                                                                       */
+  /* <Struct>                                                              */
+  /*    FTC_Scaler                                                         */
+  /*                                                                       */
+  /* <Description>                                                         */
+  /*    A handle to an @FTC_ScalerRec structure.                           */
+  /*                                                                       */
+  typedef struct FTC_ScalerRec_*  FTC_Scaler;
 
 
   /*************************************************************************/

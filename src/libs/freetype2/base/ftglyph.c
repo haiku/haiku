@@ -376,10 +376,16 @@
     const FT_Glyph_Class*  clazz;
 
 
+    /* check arguments */
+    if ( !target )
+    {
+      error = FT_Err_Invalid_Argument;
+      goto Exit;
+    }
+
     *target = 0;
 
-    /* check arguments */
-    if ( !target || !source || !source->clazz )
+    if ( !source || !source->clazz )
     {
       error = FT_Err_Invalid_Argument;
       goto Exit;

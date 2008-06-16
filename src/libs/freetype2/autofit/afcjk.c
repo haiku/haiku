@@ -45,7 +45,7 @@
   /*************************************************************************/
   /*************************************************************************/
 
-  static FT_Error
+  FT_LOCAL_DEF( FT_Error )
   af_cjk_metrics_init( AF_LatinMetrics  metrics,
                        FT_Face          face )
   {
@@ -91,7 +91,7 @@
   }
 
 
-  static void
+  FT_LOCAL_DEF( void )
   af_cjk_metrics_scale( AF_LatinMetrics  metrics,
                         AF_Scaler        scaler )
   {
@@ -427,7 +427,9 @@
 
         /* insert a new edge in the list and */
         /* sort according to the position    */
-        error = af_axis_hints_new_edge( axis, seg->pos, seg->dir, memory, &edge );
+        error = af_axis_hints_new_edge( axis, seg->pos,
+                                        (AF_Direction)seg->dir,
+                                        memory, &edge );
         if ( error )
           goto Exit;
 
@@ -596,7 +598,7 @@
   }
 
 
-  static FT_Error
+  FT_LOCAL_DEF( FT_Error )
   af_cjk_hints_init( AF_GlyphHints    hints,
                      AF_LatinMetrics  metrics )
   {
@@ -1350,7 +1352,7 @@
   }
 
 
-  static FT_Error
+  FT_LOCAL_DEF( FT_Error )
   af_cjk_hints_apply( AF_GlyphHints    hints,
                       FT_Outline*      outline,
                       AF_LatinMetrics  metrics )

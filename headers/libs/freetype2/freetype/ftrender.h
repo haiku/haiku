@@ -124,27 +124,32 @@ FT_BEGIN_HEADER
   /*    The renderer module class descriptor.                              */
   /*                                                                       */
   /* <Fields>                                                              */
-  /*    root         :: The root @FT_Module_Class fields.                  */
+  /*    root            :: The root @FT_Module_Class fields.               */
   /*                                                                       */
-  /*    glyph_format :: The glyph image format this renderer handles.      */
+  /*    glyph_format    :: The glyph image format this renderer handles.   */
   /*                                                                       */
-  /*    render_glyph :: A method used to render the image that is in a     */
-  /*                    given glyph slot into a bitmap.                    */
+  /*    render_glyph    :: A method used to render the image that is in a  */
+  /*                       given glyph slot into a bitmap.                 */
   /*                                                                       */
-  /*    set_mode     :: A method used to pass additional parameters.       */
+  /*    transform_glyph :: A method used to transform the image that is in */
+  /*                       a given glyph slot.                             */
   /*                                                                       */
-  /*    raster_class :: For @FT_GLYPH_FORMAT_OUTLINE renderers only.  This */
-  /*                    is a pointer to its raster's class.                */
+  /*    get_glyph_cbox  :: A method used to access the glyph's cbox.       */
   /*                                                                       */
-  /*    raster       :: For @FT_GLYPH_FORMAT_OUTLINE renderers only.  This */
-  /*                    is a pointer to the corresponding raster object,   */
-  /*                    if any.                                            */
+  /*    set_mode        :: A method used to pass additional parameters.    */
+  /*                                                                       */
+  /*    raster_class    :: For @FT_GLYPH_FORMAT_OUTLINE renderers only.    */
+  /*                       This is a pointer to its raster's class.        */
+  /*                                                                       */
+  /*    raster          :: For @FT_GLYPH_FORMAT_OUTLINE renderers only.    */
+  /*                       This is a pointer to the corresponding raster   */
+  /*                       object, if any.                                 */
   /*                                                                       */
   typedef struct  FT_Renderer_Class_
   {
-    FT_Module_Class       root;
+    FT_Module_Class            root;
 
-    FT_Glyph_Format       glyph_format;
+    FT_Glyph_Format            glyph_format;
 
     FT_Renderer_RenderFunc     render_glyph;
     FT_Renderer_TransformFunc  transform_glyph;
