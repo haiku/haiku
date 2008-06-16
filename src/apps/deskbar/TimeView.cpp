@@ -55,20 +55,7 @@ const char *kLongDateFormat = "%a, %B %d, %Y";
 const char *kLongEuroDateFormat = "%a, %d %B, %Y";
 
 static const char * const kMinString = "99:99 AM";
-
-
-static float
-FontHeight(BView *target, bool full)
-{
-	font_height fontInfo;		
-	target->GetFontHeight(&fontInfo);
-	float h = fontInfo.ascent + fontInfo.descent;
-
-	if (full)
-		h += fontInfo.leading;
-
-	return h;
-}
+static const float kHMargin = 2.0;
 
 
 enum {
@@ -78,7 +65,7 @@ enum {
 };
 
 
-TTimeView::TTimeView(bool showSeconds, bool milTime, bool fullDate, bool euroDate, bool)
+TTimeView::TTimeView(float maxWidth, float height, bool showSeconds, bool milTime, bool fullDate, bool euroDate, bool)
 	: 	BView(BRect(-100,-100,-90,-90), "_deskbar_tv_",
 	B_FOLLOW_RIGHT | B_FOLLOW_TOP,
 	B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS),
@@ -89,7 +76,9 @@ TTimeView::TTimeView(bool showSeconds, bool milTime, bool fullDate, bool euroDat
 	fFullDate(fullDate),
 	fCanShowFullDate(false),
 	fEuroDate(euroDate),
-	fOrientation(false)
+	fMaxWidth(maxWidth),
+	fHeight(height),
+	fOrientation(true)
 {
 	fShowingDate = false;
 	fTime = fLastTime = time(NULL);
@@ -159,7 +148,6 @@ TTimeView::AttachedToWindow()
 	} else
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	fFontHeight = FontHeight(this, true);		
 	ResizeToPreferred();
 	CalculateTextPlacement();
 }
@@ -168,18 +156,23 @@ TTimeView::AttachedToWindow()
 void
 TTimeView::GetPreferredSize(float *width, float *height)
 {
-	*height = fFontHeight;
-
+	*height = fHeight;
+	
 	GetCurrentTime();
 	GetCurrentDate();
 
+	// TODO: SetOrientation never gets called, fix that
+	// When in vertical mode, we want to limit the width so that it can't
+	// overlap the bevels in the parent view.
 	if (ShowingDate())
-		*width = 6 + StringWidth(fDateStr);
-	else {
-		*width = 6 + StringWidth(fTimeStr);
-		// Changed this from 10 to 6 so even with interval + seconds, there still
-		// is room for two replicants in the default tray.
-	}
+		*width = fOrientation ?
+			 min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fDateStr)) 
+			 : kHMargin + StringWidth(fDateStr); 
+	else {		
+		*width = fOrientation ?
+			 min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fTimeStr))
+			 : kHMargin + StringWidth(fTimeStr);		
+	}	
 }
 
 
@@ -495,15 +488,20 @@ TTimeView::CalculateTextPlacement()
 {
 	BRect bounds(Bounds());
 
-	if (fOrientation) {		// vertical mode
-		fDateLocation.x = bounds.Width()/2 - StringWidth(fDateStr)/2;
-		fTimeLocation.x = bounds.Width()/2 - StringWidth(fTimeStr)/2;
-	} else {
-		fTimeLocation.x = bounds.Width() - StringWidth(fTimeStr) - 5;
-		fDateLocation.x = bounds.Width() - StringWidth(fDateStr) - 5;
-	}
-	//	center vertically
-	fDateLocation.y = fTimeLocation.y = bounds.Height()/2 + fFontHeight/2;
+	fDateLocation.x = 0.0;
+	fTimeLocation.x = 0.0;	
+	
+	BFont font;
+	GetFont(&font); 	
+	const char* stringArray[1];
+	stringArray[0] = fTimeStr;
+	BRect rectArray[1];
+	escapement_delta delta = { 0.0, 0.0 };
+	font.GetBoundingBoxesForStrings(stringArray, 1, B_SCREEN_METRIC, &delta,
+		 rectArray);
+	
+	fTimeLocation.y = fDateLocation.y = ceilf((bounds.Height() -
+		rectArray[0].Height() + 1.0) / 2.0 - rectArray[0].top);	
 }
 
 		

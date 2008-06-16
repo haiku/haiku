@@ -236,9 +236,9 @@ TReplicantTray::DealWithClock(bool showClock)
 		if (!fClock) {
 			desk_settings *settings = ((TBarApp *)be_app)->Settings();
 
-			fClock = new TTimeView(settings->timeShowSeconds,
-				settings->timeShowMil, settings->timeFullDate,
-				settings->timeShowEuro, false);
+			fClock = new TTimeView(kMinimumTrayWidth, kMaxReplicantHeight - 1.0,
+				settings->timeShowSeconds, settings->timeShowMil,
+				settings->timeFullDate,	settings->timeShowEuro, false);
 			AddChild(fClock);
 
 			fClock->MoveTo(Bounds().right - fClock->Bounds().Width() - 1, 2);
@@ -1276,7 +1276,7 @@ TReplicantTray::LocationForReplicant(int32 index, float width)
 		// try to find free space in every row
 		for (int32 row = 0; ; loc.y += kMaxReplicantHeight + kIconGap, row++) {
 			// determine free space in this row
-			BRect rect(loc.x, loc.y, loc.x + kMinimumTrayWidth + 2, kMaxReplicantHeight);
+			BRect rect(loc.x, loc.y, loc.x + kMinimumTrayWidth - kIconGap - 2.0, loc.y + kMaxReplicantHeight);
 			if (row == 0 && fBarView->ShowingClock())
 				rect.right -= fClock->Frame().Width() + kIconGap;
 
