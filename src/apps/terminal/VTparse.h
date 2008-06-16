@@ -119,3 +119,5 @@
 // additions, maybe reorder/reuse older ones ?
 #define CASE_VPA 87
 #define CASE_HPA 88
+
+#define CASE_SU 89	/* scroll screen up */

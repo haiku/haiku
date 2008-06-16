@@ -125,7 +125,7 @@ public:
 
 			// scroll region
 	inline	void				ScrollBy(int32 numLines);
-			void				SetScrollRegion(int32 top, int32 bot);
+			void				SetScrollRegion(int32 top, int32 bottom);
 
 protected:
 	virtual	void				NotifyListener();
