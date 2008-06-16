@@ -1731,7 +1731,7 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 
 	// invalidate cursor, if it changed
 	TermPos cursor = fTextBuffer->Cursor();
-	if (fCursor != cursor) {
+	if (fCursor != cursor || linesScrolled != 0) {
 		// Before we scrolled we did already invalidate the old cursor.
 		if (!doScroll)
 			_InvalidateTextRect(fCursor.x, fCursor.y, fCursor.x, fCursor.y);
