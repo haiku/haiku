@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Support for i915 chipset and up based on the X driver,
@@ -164,6 +164,28 @@ create_mode_list(void)
 		TRACE(("intel_extreme: getting EDID failed!\n"));
 	}
 
+	// TODO: support lower modes via scaling and windowing
+	if (gInfo->head_mode & HEAD_MODE_LVDS_PANEL
+		&& ((gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0)) {
+		size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
+			& ~(B_PAGE_SIZE - 1);
+
+		display_mode *list;
+		area_id area = create_area("intel extreme modes", (void **)&list,
+			B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (area < B_OK)
+			return area;
+
+		memcpy(list, &gInfo->lvds_panel_mode, sizeof(display_mode));
+
+		gInfo->mode_list_area = area;
+		gInfo->mode_list = list;
+		gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
+		gInfo->shared_info->mode_count = 1;
+		return B_OK;
+	}
+
+	// Otherwise return the 'real' list of modes
 	display_mode *list;
 	uint32 count = 0;
 	gInfo->mode_list_area = create_display_modes("intel extreme modes",
@@ -192,10 +214,13 @@ wait_for_vblank(void)
 static void
 get_pll_limits(pll_limits &limits)
 {
-	// Note, the limits are taken from the X driver; they have not yet been tested
+	// Note, the limits are taken from the X driver; they have not yet been
+	// tested
 
 	if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
 		// TODO: support LVDS output limits as well
+		// (Update: Output limits are adjusted in the computation (post2=7/14))
+		// Should move them here!
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
 			{  5,  1, 10, false,  5,  70, 12,  7},	// min
@@ -241,7 +266,8 @@ valid_pll_divisors(const pll_divisors& divisors, const pll_limits& limits)
 
 
 static void
-compute_pll_divisors(const display_mode &current, pll_divisors& divisors)
+compute_pll_divisors(const display_mode &current, pll_divisors& divisors,
+	bool isLVDS)
 {
 	float requestedPixelClock = current.timing.pixel_clock / 1000.0f;
 	float referenceClock = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
@@ -250,14 +276,22 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors)
 
 	TRACE(("required MHz: %g\n", requestedPixelClock));
 
-	if (current.timing.pixel_clock < limits.min_post2_frequency) {
-		// slow DAC timing
-	    divisors.post2 = limits.min.post2;
-	    divisors.post2_high = limits.min.post2_high;
+	if (isLVDS) {
+		if ((read32(INTEL_DISPLAY_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
+				== LVDS_CLKB_POWER_UP)
+			divisors.post2 = LVDS_POST2_RATE_FAST;
+		else
+			divisors.post2 = LVDS_POST2_RATE_SLOW;	
 	} else {
-		// fast DAC timing
-	    divisors.post2 = limits.max.post2;
-	    divisors.post2_high = limits.max.post2_high;
+		if (current.timing.pixel_clock < limits.min_post2_frequency) {
+			// slow DAC timing
+			divisors.post2 = limits.min.post2;
+			divisors.post2_high = limits.min.post2_high;
+		} else {
+			// fast DAC timing
+			divisors.post2 = limits.max.post2;
+			divisors.post2_high = limits.max.post2_high;
+		}
 	}
 
 	float best = requestedPixelClock;
@@ -296,6 +330,117 @@ compute_pll_divisors(const display_mode &current, pll_divisors& divisors)
 		((referenceClock * divisors.m) / divisors.n) / divisors.post,
 		divisors.post, divisors.post1, divisors.post2, divisors.n,
 		divisors.m, divisors.m1, divisors.m2));
+}
+
+
+/*! Store away panel information if identified on startup
+	(used for pipe B->lvds).
+*/
+void
+save_lvds_mode(void)
+{
+	// dump currently programmed mode.
+	display_mode biosMode;
+	
+	uint32 pll = read32(INTEL_DISPLAY_B_PLL);
+	uint32 pllDivisor = read32(INTEL_DISPLAY_B_PLL_DIVISOR_0);
+
+	pll_divisors divisors;
+	divisors.m1 = (pllDivisor & DISPLAY_PLL_M1_DIVISOR_MASK)
+		>> DISPLAY_PLL_M1_DIVISOR_SHIFT;
+	divisors.m2 = (pllDivisor & DISPLAY_PLL_M2_DIVISOR_MASK)
+		>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
+	divisors.n = (pllDivisor & DISPLAY_PLL_N_DIVISOR_MASK)
+		>> DISPLAY_PLL_N_DIVISOR_SHIFT;
+
+	pll_limits limits;
+	get_pll_limits(limits);
+
+	if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+		divisors.post1 = (pll & DISPLAY_PLL_9xx_POST1_DIVISOR_MASK)
+			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+
+		if ((pll & DISPLAY_PLL_DIVIDE_HIGH) != 0)
+			divisors.post2 = limits.max.post2;
+		else
+			divisors.post2 = limits.min.post2;
+
+		// Fix this? Need to support dual channel LVDS.
+		divisors.post2 = LVDS_POST2_RATE_SLOW;
+	} else {
+		// 8xx
+		divisors.post1 = (pll & DISPLAY_PLL_POST1_DIVISOR_MASK)
+			>> DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+
+		if ((pll & DISPLAY_PLL_DIVIDE_4X) != 0)
+			divisors.post2 = limits.max.post2;
+		else
+			divisors.post2 = limits.min.post2;
+	}
+
+	divisors.m = 5 * divisors.m1 + divisors.m2;
+	divisors.post = divisors.post1 * divisors.post2;
+
+	float referenceClock = gInfo->shared_info->pll_info.reference_frequency
+		/ 1000.0f;
+	float pixelClock = ((referenceClock * divisors.m) / divisors.n)
+		/ divisors.post;
+
+	// timing
+
+	biosMode.timing.pixel_clock = uint32(pixelClock * 1000);
+	biosMode.timing.flags = 0;
+
+	uint32 value = read32(INTEL_DISPLAY_B_HTOTAL);
+	biosMode.timing.h_total = (value >> 16) + 1;
+	biosMode.timing.h_display = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_B_HSYNC);
+	biosMode.timing.h_sync_end = (value >> 16) + 1;
+	biosMode.timing.h_sync_start = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_B_VTOTAL);
+	biosMode.timing.v_total = (value >> 16) + 1;
+	biosMode.timing.v_display = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_B_VSYNC);
+	biosMode.timing.v_sync_end = (value >> 16) + 1;
+	biosMode.timing.v_sync_start = (value & 0xffff) + 1;
+
+	// image size and color space
+
+	// using virtual size based on image size is the 'proper' way to do it, however the bios appears to be
+	// suggesting scaling or somesuch, so ignore the proper virtual way for now.
+
+	biosMode.virtual_width = biosMode.timing.h_display;
+	biosMode.virtual_height = biosMode.timing.v_display;
+
+	//value = read32(INTEL_DISPLAY_B_IMAGE_SIZE);
+	//biosMode.virtual_width = (value >> 16) + 1;
+	//biosMode.virtual_height = (value & 0xffff) + 1;
+
+	value = read32(INTEL_DISPLAY_B_CONTROL);
+	switch (value & DISPLAY_CONTROL_COLOR_MASK) {
+		case DISPLAY_CONTROL_RGB32:
+		default:
+			biosMode.space = B_RGB32;
+			break;
+		case DISPLAY_CONTROL_RGB16:
+			biosMode.space = B_RGB16;
+			break;
+		case DISPLAY_CONTROL_RGB15:
+			biosMode.space = B_RGB15;
+			break;
+		case DISPLAY_CONTROL_CMAP8:
+			biosMode.space = B_CMAP8;
+			break;
+	}
+
+	biosMode.h_display_start = 0;
+	biosMode.v_display_start = 0;
+	biosMode.flags = 0;
+
+	gInfo->lvds_panel_mode = biosMode;
 }
 
 
@@ -413,6 +558,7 @@ if (first) {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
 
+	// TODO: This may not be neccesary
 	set_display_power_mode(B_DPMS_OFF);
 
 	// free old and allocate new frame buffer in graphics memory
@@ -446,9 +592,118 @@ if (first) {
 	if (gInfo->shared_info->device_type != INTEL_TYPE_85x) {
 	}
 
+	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
+		pll_divisors divisors;
+		compute_pll_divisors(target, divisors,true);
+
+		uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL;
+		if ((gInfo->shared_info->device_type & INTEL_TYPE_9xx) != 0) {
+			 dpll |= LVDS_PLL_MODE_LVDS;
+			 	// DPLL mode LVDS for i915+
+		}
+
+		// compute bitmask from p1 value
+		dpll |= (1 << (divisors.post1 - 1)) << 16;
+		switch (divisors.post2) {
+			case 5:
+			case 7:
+				dpll |= DISPLAY_PLL_DIVIDE_HIGH;
+				break;
+		}
+
+		dpll |= (1 << (divisors.post1 - 1)) << DISPLAY_PLL_POST1_DIVISOR_SHIFT;
+
+		uint32 displayControl = ~(DISPLAY_CONTROL_COLOR_MASK
+			| DISPLAY_CONTROL_GAMMA) | colorMode;
+		displayControl |= 1 << 24; // select pipe B
+
+		// runs in dpms also?
+		displayControl |= DISPLAY_PIPE_ENABLED;
+		dpll |= DISPLAY_PLL_ENABLED;
+
+		write32(INTEL_PANEL_FIT_CONTROL, 0);
+
+		if ((dpll & DISPLAY_PLL_ENABLED) != 0) {
+			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
+				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
+				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
+			write32(INTEL_DISPLAY_B_PLL, dpll & ~DISPLAY_PLL_ENABLED);
+			read32(INTEL_DISPLAY_B_PLL);
+			spin(150);
+		}
+
+		uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT)
+			| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
+
+		float referenceClock = gInfo->shared_info->pll_info.reference_frequency
+			/ 1000.0f;
+
+		// Set the B0-B3 data pairs corresponding to whether we're going to
+		// set the DPLLs for dual-channel mode or not.
+		if (divisors.post2 == LVDS_POST2_RATE_FAST)
+			lvds |= LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP;
+		else
+			lvds &= ~( LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
+
+		write32(INTEL_DISPLAY_LVDS_PORT, lvds);
+		read32(INTEL_DISPLAY_LVDS_PORT);
+
+		write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
+			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
+			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT) & DISPLAY_PLL_M1_DIVISOR_MASK)
+			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT) & DISPLAY_PLL_M2_DIVISOR_MASK));
+
+		write32(INTEL_DISPLAY_B_PLL, dpll);
+		read32(INTEL_DISPLAY_B_PLL);
+
+		// Wait for the clocks to stabilize
+		spin(150);
+
+		if (gInfo->shared_info->device_type == INTEL_TYPE_965) {
+			float adjusted = ((referenceClock * divisors.m) / divisors.n)
+				/ divisors.post;
+			uint32 pixelMultiply = uint32(adjusted
+				/ (target.timing.pixel_clock / 1000.0f));
+
+			write32(INTEL_DISPLAY_B_PLL_MULTIPLIER_DIVISOR, (0 << 24)
+				| ((pixelMultiply - 1) << 8));
+		} else
+			write32(INTEL_DISPLAY_B_PLL, dpll);
+
+		read32(INTEL_DISPLAY_B_PLL);
+		spin(150);
+
+		// update timing parameters
+		write32(INTEL_DISPLAY_B_HTOTAL, ((uint32)(target.timing.h_total - 1) << 16)
+			| ((uint32)target.timing.h_display - 1));
+		write32(INTEL_DISPLAY_B_HBLANK, ((uint32)(target.timing.h_total - 1) << 16)
+			| ((uint32)target.timing.h_display - 1));
+		write32(INTEL_DISPLAY_B_HSYNC, ((uint32)(target.timing.h_sync_end - 1) << 16)
+			| ((uint32)target.timing.h_sync_start - 1));
+
+		write32(INTEL_DISPLAY_B_VTOTAL, ((uint32)(target.timing.v_total - 1) << 16)
+			| ((uint32)target.timing.v_display - 1));
+		write32(INTEL_DISPLAY_B_VBLANK, ((uint32)(target.timing.v_total - 1) << 16)
+			| ((uint32)target.timing.v_display - 1));
+		write32(INTEL_DISPLAY_B_VSYNC, ((uint32)(target.timing.v_sync_end - 1) << 16)
+			| ((uint32)target.timing.v_sync_start - 1));
+
+		write32(INTEL_DISPLAY_B_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+			| ((uint32)target.timing.v_display - 1));
+
+		write32(INTEL_DISPLAY_B_POS, 0);
+		write32(INTEL_DISPLAY_B_PIPE_SIZE, ((uint32)(target.timing.v_display - 1) << 16)
+			| ((uint32)target.timing.h_display - 1));
+
+		write32(INTEL_DISPLAY_B_PIPE_CONTROL,
+			read32(INTEL_DISPLAY_B_PIPE_CONTROL) | DISPLAY_PIPE_ENABLED);
+		read32(INTEL_DISPLAY_B_PIPE_CONTROL);
+	}
+	
 	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
 		pll_divisors divisors;
-		compute_pll_divisors(target, divisors);
+		compute_pll_divisors(target, divisors,false);
 
 		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
 			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT) & DISPLAY_PLL_N_DIVISOR_MASK)
@@ -510,23 +765,23 @@ if (first) {
 			& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
 			| ((target.timing.flags & B_POSITIVE_HSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
 			| ((target.timing.flags & B_POSITIVE_VSYNC) != 0 ? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
-	}
 
-	// TODO: verify the two comments below: the X driver doesn't seem to
-	//		care about both of them!
+		// TODO: verify the two comments below: the X driver doesn't seem to
+		//		care about both of them!
 
-	// These two have to be set for display B, too - this obviously means
-	// that the second head always must adopt the color space of the first
-	// head.
-	write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
-		& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
-
-	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-		write32(INTEL_DISPLAY_B_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-
-		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
+		// These two have to be set for display B, too - this obviously means
+		// that the second head always must adopt the color space of the first
+		// head.
+		write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
 			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
+
+		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
+			write32(INTEL_DISPLAY_B_IMAGE_SIZE, ((uint32)(target.timing.h_display - 1) << 16)
+				| ((uint32)target.timing.v_display - 1));
+
+			write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
+				& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA)) | colorMode);
+		}
 	}
 
 	set_display_power_mode(sharedInfo.dpms_mode);

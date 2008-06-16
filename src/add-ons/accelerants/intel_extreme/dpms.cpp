@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2008, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -71,6 +71,34 @@ enable_display_pipe(bool enable)
 }
 
 
+static void
+enable_lvds_panel(bool enable)
+{
+	uint32 control = read32(INTEL_PANEL_CONTROL);
+	uint32 panelStatus;
+	
+	if (enable) {
+		if ((control & PANEL_CONTROL_POWER_TARGET_ON) == 0) {
+			write32(INTEL_PANEL_CONTROL, control
+				| PANEL_CONTROL_POWER_TARGET_ON);
+		}
+
+		do {
+			panelStatus = read32(INTEL_PANEL_STATUS);
+		} while ((panelStatus & PANEL_STATUS_POWER_ON) == 0);
+	} else {
+		if ((control & PANEL_CONTROL_POWER_TARGET_ON) != 0) {
+			write32(INTEL_PANEL_CONTROL, control
+				& ~PANEL_CONTROL_POWER_TARGET_ON);
+		}
+
+		do {
+			panelStatus = read32(INTEL_PANEL_STATUS);
+		} while ((panelStatus & PANEL_STATUS_POWER_ON) != 0);
+	}
+}
+
+
 void
 set_display_power_mode(uint32 mode)
 {
@@ -88,6 +116,20 @@ set_display_power_mode(uint32 mode)
 			spin(150);
 			write32(INTEL_DISPLAY_A_PLL, pll | DISPLAY_PLL_ENABLED);
 			read32(INTEL_DISPLAY_A_PLL);
+			spin(150);
+		}
+
+		pll = read32(INTEL_DISPLAY_B_PLL);
+		if ((pll & DISPLAY_PLL_ENABLED) == 0) {
+			// reactivate PLL
+			write32(INTEL_DISPLAY_B_PLL, pll);
+			read32(INTEL_DISPLAY_B_PLL);
+			spin(150);
+			write32(INTEL_DISPLAY_B_PLL, pll | DISPLAY_PLL_ENABLED);
+			read32(INTEL_DISPLAY_B_PLL);
+			spin(150);
+			write32(INTEL_DISPLAY_B_PLL, pll | DISPLAY_PLL_ENABLED);
+			read32(INTEL_DISPLAY_B_PLL);
 			spin(150);
 		}
 
@@ -120,7 +162,8 @@ set_display_power_mode(uint32 mode)
 	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
 		write32(INTEL_DISPLAY_B_DIGITAL_PORT, (read32(INTEL_DISPLAY_B_DIGITAL_PORT)
 			& ~(DISPLAY_MONITOR_MODE_MASK | DISPLAY_MONITOR_PORT_ENABLED))
-			| monitorMode | (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
+			| (mode != B_DPMS_OFF ? DISPLAY_MONITOR_PORT_ENABLED : 0));
+			// TODO: monitorMode?
 	}
 
 	if (mode != B_DPMS_ON) {
@@ -130,10 +173,19 @@ set_display_power_mode(uint32 mode)
 	}
 
 	if (mode == B_DPMS_OFF) {
-		write32(INTEL_DISPLAY_A_PLL, read32(INTEL_DISPLAY_A_PLL) | DISPLAY_PLL_ENABLED);
-		read32(INTEL_DISPLAY_A_PLL);
+		write32(INTEL_DISPLAY_A_PLL, read32(INTEL_DISPLAY_A_PLL)
+			| DISPLAY_PLL_ENABLED);
+		write32(INTEL_DISPLAY_B_PLL, read32(INTEL_DISPLAY_B_PLL)
+			| DISPLAY_PLL_ENABLED);
+
+		read32(INTEL_DISPLAY_B_PLL);
+			// flush the eventually cached PCI bus writes
+
 		spin(150);
 	}
+
+	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0)
+		enable_lvds_panel(mode == B_DPMS_ON);
 
 	read32(INTEL_DISPLAY_A_BASE);
 		// flush the eventually cached PCI bus writes

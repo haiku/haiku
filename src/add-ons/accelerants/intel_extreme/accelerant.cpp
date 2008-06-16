@@ -201,6 +201,15 @@ intel_init_accelerant(int device)
 	if (read32(INTEL_DISPLAY_A_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
 		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
 
+	uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT);
+
+	// If we have an enabled display pipe we save the passed information and assume it is the valid panel size..
+	// Later we query for proper EDID info if it exists, or figure something else out.  (Default modes, etc.)
+	if ((lvds & DISPLAY_PIPE_ENABLED) != 0) {
+		save_lvds_mode();
+		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
+	}
+
 	TRACE(("head detected: %d\n", gInfo->head_mode));
 	TRACE(("adpa: %08lx, dova: %08lx, dovb: %08lx, lvds: %08lx\n",
 		read32(INTEL_DISPLAY_A_ANALOG_PORT), read32(INTEL_DISPLAY_A_DIGITAL_PORT),

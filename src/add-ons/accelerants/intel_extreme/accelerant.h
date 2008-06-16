@@ -59,11 +59,15 @@ struct accelerant_info {
 	int				device;
 	uint8			head_mode;
 	bool			is_clone;
+
+	// LVDS panel mode passed from the bios/startup.
+	display_mode	lvds_panel_mode;
 };
 
-#define HEAD_MODE_A_ANALOG	0x01
-#define HEAD_MODE_B_DIGITAL	0x02
-#define HEAD_MODE_CLONE		0x03
+#define HEAD_MODE_A_ANALOG		0x01
+#define HEAD_MODE_B_DIGITAL		0x02
+#define HEAD_MODE_CLONE			0x03
+#define HEAD_MODE_LVDS_PANEL	0x08
 
 extern accelerant_info *gInfo;
 
@@ -93,6 +97,7 @@ extern void setup_ring_buffer(ring_buffer &ringBuffer, const char *name);
 // modes.cpp
 extern void wait_for_vblank(void);
 extern void set_frame_buffer_base(void);
+extern void save_lvds_mode(void);
 extern status_t create_mode_list(void);
 
 // memory.cpp
