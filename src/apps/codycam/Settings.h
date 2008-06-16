@@ -53,6 +53,7 @@ public:
 	ScalarValueSetting(const char* name, int32 defaultValue,
 		const char* valueExpectedErrorString, const char* wrongValueErrorString,
 		int32 min = LONG_MIN, int32 max = LONG_MAX);
+	virtual ~ScalarValueSetting();
 
 	void ValueChanged(int32 newValue);
 	int32 Value() const;
@@ -75,6 +76,7 @@ class BooleanValueSetting : public ScalarValueSetting {
 	// on-off setting
 	public:
 		BooleanValueSetting(const char* name, bool defaultValue);
+		virtual ~BooleanValueSetting();
 
 		bool Value() const;
 		virtual const char* Handle(const char *const *argv);	

@@ -148,6 +148,11 @@ ScalarValueSetting::ScalarValueSetting(const char* name, int32 defaultValue,
 }
 
 
+ScalarValueSetting::~ScalarValueSetting()
+{
+}
+
+
 void 
 ScalarValueSetting::ValueChanged(int32 newValue)
 {
@@ -205,6 +210,11 @@ ScalarValueSetting::NeedsSaving() const
 
 BooleanValueSetting::BooleanValueSetting(const char* name, bool defaultValue)
 	: ScalarValueSetting(name, defaultValue, 0, 0)
+{
+}
+
+
+BooleanValueSetting::~BooleanValueSetting()
 {
 }
 
