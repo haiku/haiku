@@ -104,6 +104,9 @@ auich_reg_write_32(device_config *config, uint8 regno, uint32 value)
 }
 
 /* codec */
+static uint8 sCodecLastReadRegister = 0;
+static uint8 sCodecLastWrittenRegister = 0;
+
 static int
 auich_codec_wait(device_config *config)
 {
@@ -119,6 +122,7 @@ auich_codec_wait(device_config *config)
 	 * reset the semaphore. So even if you don't get the semaphore, still
 	 * continue the access. We don't really need the semaphore anyway. */ 
 	PRINT(("codec semaphore timed out!\n"));
+	PRINT(("last read/write registers: %x/%x\n", sCodecLastReadRegister, sCodecLastWrittenRegister));
 
 	return B_OK;
 }
@@ -126,6 +130,7 @@ auich_codec_wait(device_config *config)
 uint16
 auich_codec_read(device_config *config, uint8 regno)
 {
+	sCodecLastReadRegister = regno;
 	ASSERT(regno >= 0);
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
 	if (auich_codec_wait(config)!=B_OK) {
@@ -142,6 +147,7 @@ auich_codec_read(device_config *config, uint8 regno)
 void
 auich_codec_write(device_config *config, uint8 regno, uint16 value)
 {
+	sCodecLastWrittenRegister = regno;
 	ASSERT(regno >= 0);
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
 	if (auich_codec_wait(config)!=B_OK) {
