@@ -768,7 +768,7 @@ TermParse::EscParse()
 						top = 1;
 
 					if (nparam < 2)
-						bot = -1;
+						bot = fBuffer->Height();
 					else
 						bot = param[1];
 
