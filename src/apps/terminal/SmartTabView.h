@@ -21,6 +21,8 @@ public:
 					B_FRAME_EVENTS | B_NAVIGABLE);
 	virtual ~SmartTabView();
 
+			void SetInsets(float left, float top, float right, float bottom);
+
 	virtual void MouseDown(BPoint where);
 
 	virtual void AttachedToWindow();
@@ -39,6 +41,9 @@ public:
 
 private:
 		int32 _ClickedTabIndex(const BPoint &point);	
+
+private:
+	BRect	fInsets;
 };
 
 #endif // __SMARTTABVIEW_H

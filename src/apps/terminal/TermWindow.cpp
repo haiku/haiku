@@ -179,6 +179,10 @@ TermWindow::_InitWindow()
 
 	fTabView = new TabView(this, textFrame, "tab view");
 	AddChild(fTabView);
+
+	// Make the scroll view one pixel wider than the tab view container view, so
+	// the scroll bar will look good.
+	fTabView->SetInsets(0, 0, -1, 0);
 }
 
 
@@ -670,10 +674,6 @@ TermWindow::_AddTab(Arguments *args)
 		tab->SetLabel(session->name.String());
 		view->SetScrollBar(scrollView->ScrollBar(B_VERTICAL));
 		
-		// Resize the vertical scrollbar to take the window gripping handle into account
-		// TODO: shouldn't this be done in BScrollView itself ? At least BScrollBar does that.	
-		scrollView->ScrollBar(B_VERTICAL)->ResizeBy(0, -13);
-		
 		view->SetEncoding(EncodingID(PrefHandler::Default()->getString(PREF_TEXT_ENCODING)));
 		
 		BFont font;
@@ -685,14 +685,14 @@ TermWindow::_AddTab(Arguments *args)
 		int width, height;
 		view->GetFontSize(&width, &height);
 
-		float minimumHeight = 0;
+		float minimumHeight = -1;
 		if (fMenubar)
-			minimumHeight += fMenubar->Bounds().Height();
+			minimumHeight += fMenubar->Bounds().Height() + 1;
 		if (fTabView && fTabView->CountTabs() > 1)
-			minimumHeight += fTabView->TabHeight();
-		SetSizeLimits(MIN_COLS * width, MAX_COLS * width,
-						minimumHeight + MIN_ROWS * height, 
-						minimumHeight + MAX_ROWS * height);
+			minimumHeight += fTabView->TabHeight() + 1;
+		SetSizeLimits(MIN_COLS * width - 1, MAX_COLS * width - 1,
+			minimumHeight + MIN_ROWS * height - 1,
+			minimumHeight + MAX_ROWS * height - 1);
 
 		// If it's the first time we're called, setup the window
 		if (fTabView->CountTabs() == 1) {
@@ -701,7 +701,9 @@ TermWindow::_AddTab(Arguments *args)
 
 			// Resize Window
 			ResizeTo(viewWidth + B_V_SCROLL_BAR_WIDTH,
-					viewHeight + fMenubar->Bounds().Height());
+				viewHeight + fMenubar->Bounds().Height() + 1);
+				// NOTE: Width is one pixel too small, since the scroll view
+				// is one pixel wider than its parent.
 		}
 		// TODO: No fTabView->Select(tab); ?
 		fTabView->Select(fTabView->CountTabs() - 1);
@@ -789,24 +791,26 @@ TermWindow::_ResizeView(TermView *view)
 {
 	int fontWidth, fontHeight;
 	view->GetFontSize(&fontWidth, &fontHeight);
-			
-	float minimumHeight = 0;
+
+	float minimumHeight = -1;
 	if (fMenubar)
-		minimumHeight += fMenubar->Bounds().Height();
+		minimumHeight += fMenubar->Bounds().Height() + 1;
 	if (fTabView && fTabView->CountTabs() > 1)
-		minimumHeight += fTabView->TabHeight();
-	
-	SetSizeLimits(MIN_COLS * fontWidth, MAX_COLS * fontWidth,
-					minimumHeight + MIN_ROWS * fontHeight, 
-					minimumHeight + MAX_ROWS * fontHeight);
+		minimumHeight += fTabView->TabHeight() + 1;
+
+	SetSizeLimits(MIN_COLS * fontWidth - 1, MAX_COLS * fontWidth - 1,
+		minimumHeight + MIN_ROWS * fontHeight - 1,
+		minimumHeight + MAX_ROWS * fontHeight - 1);
 	
 	float width, height;
 	view->Parent()->GetPreferredSize(&width, &height);
 	width += B_V_SCROLL_BAR_WIDTH;
-	height += fMenubar->Bounds().Height() + 2;
+		// NOTE: Width is one pixel too small, since the scroll view
+		// is one pixel wider than its parent.
+	height += fMenubar->Bounds().Height() + 1;
 
 	ResizeTo(width, height);
-	
+
 	view->Invalidate();
 }
 

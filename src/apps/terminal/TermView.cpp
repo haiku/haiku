@@ -456,9 +456,9 @@ void
 TermView::GetPreferredSize(float *width, float *height)
 {
 	if (width)
-		*width = fTermColumns * fFontWidth;
+		*width = fTermColumns * fFontWidth - 1;
 	if (height)
-		*height = fTermRows * fFontHeight;
+		*height = fTermRows * fFontHeight - 1;
 }
 
 

@@ -21,16 +21,30 @@ const static uint32 kCloseTab = 'ClTb';
 SmartTabView::SmartTabView(BRect frame, const char *name, button_width width, 
 				uint32 resizingMode, uint32 flags)
 	:
-	BTabView(frame, name, width, resizingMode, flags)
+	BTabView(frame, name, width, resizingMode, flags),
+	fInsets(0, 0, 0, 0)
 {
-	// See BTabView::_InitObject() to see why we are doing this
-	ContainerView()->MoveBy(-3, -TabHeight() - 3);
-	ContainerView()->ResizeBy(10, TabHeight() + 9);
+	// Resize the container view to fill the complete tab view for single-tab
+	// mode. Later, when more than one tab is added, we shrink the container
+	// view again.
+	frame.OffsetTo(B_ORIGIN);
+	ContainerView()->MoveTo(frame.LeftTop());
+	ContainerView()->ResizeTo(frame.Width(), frame.Height());
 }
 
 
 SmartTabView::~SmartTabView()
 {
+}
+
+
+void
+SmartTabView::SetInsets(float left, float top, float right, float bottom)
+{
+	fInsets.left = left;
+	fInsets.top = top;
+	fInsets.right = right;
+	fInsets.bottom = bottom;
 }
 
 
@@ -106,8 +120,10 @@ SmartTabView::Select(int32 index)
 	BTabView::Select(index);
 	BView *view = ViewForTab(index);
 	if (view != NULL) {
-		view->ResizeTo(ContainerView()->Bounds().Width(),
-						ContainerView()->Bounds().Height());
+		view->MoveTo(fInsets.LeftTop());
+		view->ResizeTo(ContainerView()->Bounds().Width()
+				- fInsets.left - fInsets.right,
+			ContainerView()->Bounds().Height() - fInsets.top - fInsets.bottom);
 	}
 }
 
