@@ -622,6 +622,8 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 			line->cells[i].character = kSpaceChar;
 			line->cells[i].attributes = 0;
 		}
+
+		_Invalidate(fCursor.y, fCursor.y);
 	}
 }
 
