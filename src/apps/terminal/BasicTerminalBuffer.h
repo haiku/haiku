@@ -104,6 +104,7 @@ public:
 			void				InsertLines(int32 numLines);
 	
 			// delete chars/lines
+			void				EraseChars(int32 numChars);
 			void				EraseAbove();
 			void				EraseBelow();
 			void				DeleteChars(int32 numChars);

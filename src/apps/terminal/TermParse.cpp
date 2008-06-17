@@ -959,6 +959,14 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
+
+				case CASE_ECH:	// erase characters
+					if ((col = param[0]) < 1)
+						col = 1;
+					fBuffer->EraseChars(col);
+					parsestate = groundtable;
+					break;
+
 				default:
 					break;
 		}

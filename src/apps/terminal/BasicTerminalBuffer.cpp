@@ -629,6 +629,29 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 
 
 void
+BasicTerminalBuffer::EraseChars(int32 numChars)
+{
+	TerminalLine* line = _LineAt(fCursor.y);
+	if (fCursor.y >= line->length)
+		return;
+
+	int32 first = fCursor.x;
+	int32 end = min_c(fCursor.x + numChars, line->length);
+	if (first > 0 && IS_WIDTH(line->cells[first - 1].attributes))
+		first--;
+	if (end > 0 && IS_WIDTH(line->cells[end - 1].attributes))
+		end++;
+
+	for (int32 i = first; i < end; i++) {
+		line->cells[i].character = kSpaceChar;
+		line->cells[i].attributes = 0;
+	}
+
+	_Invalidate(fCursor.y, fCursor.y);
+}
+
+
+void
 BasicTerminalBuffer::EraseAbove()
 {
 	// Clear the preceding lines.
