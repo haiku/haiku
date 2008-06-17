@@ -21,7 +21,6 @@ invert rectangle
 blit
 */
 
-static void nv_init_for_3D_dma(void);
 static void nv_start_dma(void);
 static status_t nv_acc_fifofree_dma(uint16 cmd_size);
 static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size);
@@ -85,27 +84,6 @@ status_t nv_acc_init_dma()
 	snooze(1000);
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
-	/* don't try this on NV20 and later.. */
-	/* note:
-	 * the specific register that's responsible for the speedfix on NV18 is
-	 * $00400ed8: bit 6 needs to be zero for fastest rendering (confirmed). */
-	/* note also:
-	 * on NV28 the following ranges could be reset (confirmed):
-	 * $00400000 upto/incl. $004002fc;
-	 * $00400400 upto/incl. $004017fc;
-	 * $0040180c upto/incl. $00401948;
-	 * $00401994 upto/incl. $00401a80;
-	 * $00401a94 upto/incl. $00401ffc.
-	 * The intermediate ranges hang the engine upon resetting. */
-	if (si->ps.card_arch < NV20A)
-	{
-		/* actively reset the PGRAPH registerset (acceleration engine) */
-		for (cnt = 0x00400000; cnt < 0x00402000; cnt +=4)
-		{
-			NV_REG32(cnt) = 0x00000000;
-		}
-	}
-
 	/* setup PTIMER: */
 	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
 	/* set timer numerator to 8 (in b0-15) */
@@ -118,71 +96,62 @@ status_t nv_acc_init_dma()
 	/* reset timer-alarm INT status bit (b0) */
 	ACCW(PT_INTSTAT, 0xffffffff);
 
-	/* enable PRAMIN write access on pre NV10 before programming it! */
-	if (si->ps.card_arch == NV04A)
+	/* setup acc engine 'source' tile adressranges */
+	if ((si->ps.card_type == NV40) || (si->ps.card_type == NV45))
 	{
-		/* set framebuffer config: type = notiling, PRAMIN write access enabled */
-		NV_REG32(NV32_PFB_CONFIG_0) = 0x00001114;
+		ACCW(NV10_FBTIL0AD, 0);
+		ACCW(NV10_FBTIL1AD, 0);
+		ACCW(NV10_FBTIL2AD, 0);
+		ACCW(NV10_FBTIL3AD, 0);
+		ACCW(NV10_FBTIL4AD, 0);
+		ACCW(NV10_FBTIL5AD, 0);
+		ACCW(NV10_FBTIL6AD, 0);
+		ACCW(NV10_FBTIL7AD, 0);
+		ACCW(NV10_FBTIL0ED, (si->ps.memory_size - 1));
+		ACCW(NV10_FBTIL1ED, (si->ps.memory_size - 1));
+		ACCW(NV10_FBTIL2ED, (si->ps.memory_size - 1));
+		ACCW(NV10_FBTIL3ED, (si->ps.memory_size - 1));
+		ACCW(NV10_FBTIL4ED, (si->ps.memory_size - 1));
+		ACCW(NV10_FBTIL5ED, (si->ps.memory_size - 1));
+		ACCW(NV10_FBTIL6ED, (si->ps.memory_size - 1));
+		ACCW(NV10_FBTIL7ED, (si->ps.memory_size - 1));
 	}
 	else
 	{
-		/* setup acc engine 'source' tile adressranges */
-		if ((si->ps.card_type <= NV40) || (si->ps.card_type == NV45))
-		{
-			ACCW(NV10_FBTIL0AD, 0);
-			ACCW(NV10_FBTIL1AD, 0);
-			ACCW(NV10_FBTIL2AD, 0);
-			ACCW(NV10_FBTIL3AD, 0);
-			ACCW(NV10_FBTIL4AD, 0);
-			ACCW(NV10_FBTIL5AD, 0);
-			ACCW(NV10_FBTIL6AD, 0);
-			ACCW(NV10_FBTIL7AD, 0);
-			ACCW(NV10_FBTIL0ED, (si->ps.memory_size - 1));
-			ACCW(NV10_FBTIL1ED, (si->ps.memory_size - 1));
-			ACCW(NV10_FBTIL2ED, (si->ps.memory_size - 1));
-			ACCW(NV10_FBTIL3ED, (si->ps.memory_size - 1));
-			ACCW(NV10_FBTIL4ED, (si->ps.memory_size - 1));
-			ACCW(NV10_FBTIL5ED, (si->ps.memory_size - 1));
-			ACCW(NV10_FBTIL6ED, (si->ps.memory_size - 1));
-			ACCW(NV10_FBTIL7ED, (si->ps.memory_size - 1));
-		}
-		else
-		{
-			/* NV41, 43, 44, G70 and up */
-			ACCW(NV41_FBTIL0AD, 0);
-			ACCW(NV41_FBTIL1AD, 0);
-			ACCW(NV41_FBTIL2AD, 0);
-			ACCW(NV41_FBTIL3AD, 0);
-			ACCW(NV41_FBTIL4AD, 0);
-			ACCW(NV41_FBTIL5AD, 0);
-			ACCW(NV41_FBTIL6AD, 0);
-			ACCW(NV41_FBTIL7AD, 0);
-			ACCW(NV41_FBTIL8AD, 0);
-			ACCW(NV41_FBTIL9AD, 0);
-			ACCW(NV41_FBTILAAD, 0);
-			ACCW(NV41_FBTILBAD, 0);
-			ACCW(NV41_FBTIL0ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL1ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL2ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL3ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL4ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL5ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL6ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL7ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL8ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTIL9ED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTILAED, (si->ps.memory_size - 1));
-			ACCW(NV41_FBTILBED, (si->ps.memory_size - 1));
+		/* NV41, 43, 44, G70 and up */
+		ACCW(NV41_FBTIL0AD, 0);
+		ACCW(NV41_FBTIL1AD, 0);
+		ACCW(NV41_FBTIL2AD, 0);
+		ACCW(NV41_FBTIL3AD, 0);
+		ACCW(NV41_FBTIL4AD, 0);
+		ACCW(NV41_FBTIL5AD, 0);
+		ACCW(NV41_FBTIL6AD, 0);
+		ACCW(NV41_FBTIL7AD, 0);
+		ACCW(NV41_FBTIL8AD, 0);
+		ACCW(NV41_FBTIL9AD, 0);
+		ACCW(NV41_FBTILAAD, 0);
+		ACCW(NV41_FBTILBAD, 0);
+		ACCW(NV41_FBTIL0ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL1ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL2ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL3ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL4ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL5ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL6ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL7ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL8ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTIL9ED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTILAED, (si->ps.memory_size - 1));
+		ACCW(NV41_FBTILBED, (si->ps.memory_size - 1));
 
-			if (si->ps.card_type >= G70)
-			{
-				ACCW(G70_FBTILCAD, 0);
-				ACCW(G70_FBTILDAD, 0);
-				ACCW(G70_FBTILEAD, 0);
-				ACCW(G70_FBTILCED, (si->ps.memory_size - 1));
-				ACCW(G70_FBTILDED, (si->ps.memory_size - 1));
-				ACCW(G70_FBTILEED, (si->ps.memory_size - 1));
-			}
+		if (si->ps.card_type >= G70)
+		{
+			ACCW(G70_FBTILCAD, 0);
+			ACCW(G70_FBTILDAD, 0);
+			ACCW(G70_FBTILEAD, 0);
+			ACCW(G70_FBTILCED, (si->ps.memory_size - 1));
+			ACCW(G70_FBTILDED, (si->ps.memory_size - 1));
+			ACCW(G70_FBTILEED, (si->ps.memory_size - 1));
 		}
 	}
 
@@ -207,70 +176,29 @@ status_t nv_acc_init_dma()
 	 * That command is linked to the handle noted here. This handle is then used to
 	 * tell the FIFO to which engine command it is connected!
 	 * (CTX registers are actually a sort of RAM space.) */
-	if (si->ps.card_arch >= NV40A)
-	{
-		/* (first set) */
-		ACCW(HT_HANDL_00, (0x80000000 | NV10_CONTEXT_SURFACES_2D)); /* 32bit handle (not used) */
-		ACCW(HT_VALUE_00, 0x0010114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
-		ACCW(HT_VALUE_01, 0x00101148); /* instance $1148, engine = acc engine, CHID = $00 */
+	/* (first set) */
+	ACCW(HT_HANDL_00, (0x80000000 | NV10_CONTEXT_SURFACES_2D)); /* 32bit handle (not used) */
+	ACCW(HT_VALUE_00, 0x0010114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
-		ACCW(HT_VALUE_02, 0x0010114a); /* instance $114a, engine = acc engine, CHID = $00 */
+	ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
+	ACCW(HT_VALUE_01, 0x00101148); /* instance $1148, engine = acc engine, CHID = $00 */
 
-		/* (second set) */
-		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
-		ACCW(HT_VALUE_10, 0x00101142); /* instance $1142, engine = acc engine, CHID = $00 */
+	ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
+	ACCW(HT_VALUE_02, 0x0010114a); /* instance $114a, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
-		ACCW(HT_VALUE_11, 0x00101144); /* instance $1144, engine = acc engine, CHID = $00 */
+	/* (second set) */
+	ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
+	ACCW(HT_VALUE_10, 0x00101142); /* instance $1142, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
-		ACCW(HT_VALUE_12, 0x00101146); /* instance $1146, engine = acc engine, CHID = $00 */
+	ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
+	ACCW(HT_VALUE_11, 0x00101144); /* instance $1144, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_13, (0x80000000 | NV_SCALED_IMAGE_FROM_MEMORY)); /* 32bit handle */
-		ACCW(HT_VALUE_13, 0x0010114e); /* instance $114e, engine = acc engine, CHID = $00 */
-	}
-	else
-	{
-		/* (first set) */
-		ACCW(HT_HANDL_00, (0x80000000 | NV4_SURFACE)); /* 32bit handle */
-		ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
+	ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
+	ACCW(HT_VALUE_12, 0x00101146); /* instance $1146, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
-		ACCW(HT_VALUE_01, 0x80011146); /* instance $1146, engine = acc engine, CHID = $00 */
-
-		ACCW(HT_HANDL_02, (0x80000000 | NV4_GDI_RECTANGLE_TEXT)); /* 32bit handle */
-		ACCW(HT_VALUE_02, 0x80011147); /* instance $1147, engine = acc engine, CHID = $00 */
-
-		ACCW(HT_HANDL_03, (0x80000000 | NV4_CONTEXT_SURFACES_ARGB_ZS)); /* 32bit handle (3D) */
-		ACCW(HT_VALUE_03, 0x80011148); /* instance $1148, engine = acc engine, CHID = $00 */
-
-		/* NV4_ and NV10_DX5_TEXTURE_TRIANGLE should be identical */
-		ACCW(HT_HANDL_04, (0x80000000 | NV4_DX5_TEXTURE_TRIANGLE)); /* 32bit handle (3D) */
-		ACCW(HT_VALUE_04, 0x80011149); /* instance $1149, engine = acc engine, CHID = $00 */
-
-		/* NV4_ and NV10_DX6_MULTI_TEXTURE_TRIANGLE should be identical */
-		ACCW(HT_HANDL_05, (0x80000000 | NV4_DX6_MULTI_TEXTURE_TRIANGLE)); /* 32bit handle (not used) */
-		ACCW(HT_VALUE_05, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
-
-		ACCW(HT_HANDL_06, (0x80000000 | NV1_RENDER_SOLID_LIN)); /* 32bit handle (not used) */
-		ACCW(HT_VALUE_06, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
-
-		/* (second set) */
-		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
-		ACCW(HT_VALUE_10, 0x80011142); /* instance $1142, engine = acc engine, CHID = $00 */
-
-		ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
-		ACCW(HT_VALUE_11, 0x80011143); /* instance $1143, engine = acc engine, CHID = $00 */
-
-		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
-		ACCW(HT_VALUE_12, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
-
-		ACCW(HT_HANDL_13, (0x80000000 | NV_SCALED_IMAGE_FROM_MEMORY)); /* 32bit handle */
-		ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
-	}
+	ACCW(HT_HANDL_13, (0x80000000 | NV_SCALED_IMAGE_FROM_MEMORY)); /* 32bit handle */
+	ACCW(HT_VALUE_13, 0x0010114e); /* instance $114e, engine = acc engine, CHID = $00 */
 
 	/* program CTX registers: CTX1 is mostly done later (colorspace dependant) */
 	/* note:
@@ -279,432 +207,271 @@ status_t nv_acc_init_dma()
 	 * CTX registers are in fact in the same GPU internal RAM space as the engine's
 	 * hashtable. This means that stuff programmed in here also survives resets and
 	 * power-outages! (confirmed NV11) */
-	if (si->ps.card_arch >= NV40A)
+
+	/* setup a DMA define for use by command defines below. */
+	ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
+								  * DMA target node is NVM (non-volatile memory?)
+								  * (instead of doing PCI or AGP transfers) */
+	ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit: size is all cardRAM */
+	ACCW(PR_CTX2_R, ((0x00000000 & 0xfffff000) | 0x00000002));
+								 /* DMA access type is READ_AND_WRITE;
+								  * memory starts at start of cardRAM (b12-31):
+								  * It's adress needs to be at a 4kb boundary! */
+	ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
+	/* setup set '0' for cmd NV_ROP5_SOLID */
+	ACCW(PR_CTX0_0, 0x02080043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
+	ACCW(PR_CTX1_0, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+	ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
+	ACCW(PR_CTX3_0, 0x00000000); /* method traps disabled */
+	ACCW(PR_CTX0_1, 0x00000000); /* extra */
+	ACCW(PR_CTX1_1, 0x00000000); /* extra */
+	/* setup set '1' for cmd NV_IMAGE_BLACK_RECTANGLE */
+	ACCW(PR_CTX0_2, 0x02080019); /* NVclass $019, patchcfg ROP_AND, nv10+: little endian */
+	ACCW(PR_CTX1_2, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+	ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
+	ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
+	ACCW(PR_CTX0_3, 0x00000000); /* extra */
+	ACCW(PR_CTX1_3, 0x00000000); /* extra */
+	/* setup set '2' for cmd NV_IMAGE_PATTERN */
+	ACCW(PR_CTX0_4, 0x02080018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
+	ACCW(PR_CTX1_4, 0x02000000); /* colorspace not set, notify instance is $0200 (b16-31) */
+	ACCW(PR_CTX2_4, 0x00000000); /* DMA0 and DMA1 instance invalid */
+	ACCW(PR_CTX3_4, 0x00000000); /* method traps disabled */
+	ACCW(PR_CTX0_5, 0x00000000); /* extra */
+	ACCW(PR_CTX1_5, 0x00000000); /* extra */
+	/* setup set '4' for cmd NV12_IMAGE_BLIT */
+	ACCW(PR_CTX0_6, 0x0208009f); /* NVclass $09f, patchcfg ROP_AND, nv10+: little endian */
+	ACCW(PR_CTX1_6, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+	ACCW(PR_CTX2_6, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
+	ACCW(PR_CTX3_6, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
+	ACCW(PR_CTX0_7, 0x00000000); /* extra */
+	ACCW(PR_CTX1_7, 0x00000000); /* extra */
+	/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
+	ACCW(PR_CTX0_8, 0x0208004a); /* NVclass $04a, patchcfg ROP_AND, nv10+: little endian */
+	ACCW(PR_CTX1_8, 0x02000000); /* colorspace not set, notify instance is $0200 (b16-31) */
+	ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
+	ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
+	ACCW(PR_CTX0_9, 0x00000000); /* extra */
+	ACCW(PR_CTX1_9, 0x00000000); /* extra */
+	/* setup set '6' for cmd NV10_CONTEXT_SURFACES_2D */
+	ACCW(PR_CTX0_A, 0x02080062); /* NVclass $062, nv10+: little endian */
+	ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+	ACCW(PR_CTX2_A, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
+	ACCW(PR_CTX3_A, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
+	ACCW(PR_CTX0_B, 0x00000000); /* extra */
+	ACCW(PR_CTX1_B, 0x00000000); /* extra */
+	/* setup set '7' for cmd NV_SCALED_IMAGE_FROM_MEMORY */
+	ACCW(PR_CTX0_C, 0x02080077); /* NVclass $077, nv10+: little endian */
+	ACCW(PR_CTX1_C, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
+	ACCW(PR_CTX2_C, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
+	ACCW(PR_CTX3_C, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
+	ACCW(PR_CTX0_D, 0x00000000); /* extra */
+	ACCW(PR_CTX1_D, 0x00000000); /* extra */
+	/* setup DMA set pointed at by PF_CACH1_DMAI */
+	ACCW(PR_CTX0_E, 0x00003002); /* DMA page table present and of linear type;
+								  * DMA class is $002 (b0-11);
+								  * DMA target node is NVM (non-volatile memory?)
+								  * (instead of doing PCI or AGP transfers) */
+	ACCW(PR_CTX1_E, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
+	ACCW(PR_CTX2_E, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
+								 /* DMA access type is READ_AND_WRITE;
+								  * table is located at end of cardRAM (b12-31):
+								  * It's adress needs to be at a 4kb boundary! */
+
+	/* do a explicit engine reset */
+	ACCW(DEBUG0, 0xffffffff);
+	ACCW(DEBUG0, 0x00000000);
+	/* disable all acceleration engine INT reguests */
+	ACCW(ACC_INTE, 0x00000000);
+	/* reset all acceration engine INT status bits */
+	ACCW(ACC_INTS, 0xffffffff);
+	/* context control enabled */
+	ACCW(NV10_CTX_CTRL, 0x10010100);
+	/* all acceleration buffers, pitches and colors are valid */
+	ACCW(NV10_ACC_STAT, 0xffffffff);
+	/* enable acceleration engine command FIFO */
+	ACCW(FIFO_EN, 0x00000001);
+	/* setup surface type:
+	 * b1-0 = %01 = surface type is non-swizzle;
+	 * this is needed to enable 3D on NV1x (confirmed) and maybe others? */
+	ACCW(NV10_SURF_TYP, ((ACCR(NV10_SURF_TYP)) & 0x0007ff00));
+	ACCW(NV10_SURF_TYP, ((ACCR(NV10_SURF_TYP)) | 0x00020101));
+
+	/* init some function blocks */
+	ACCW(DEBUG1, 0x401287c0);
+	ACCW(DEBUG3, 0x60de8051);
+	/* disable specific functions, but enable SETUP_SPARE2 register */
+	ACCW(NV10_DEBUG4, 0x00008000);
+	/* set limit_viol_pix_adress(?): more likely something unknown.. */
+	ACCW(NV25_WHAT0, 0x00be3c5f);
+
+	/* setup some unknown serially accessed registers (?) */
+	tmp = (NV_REG32(NV32_NV4X_WHAT0) & 0x000000ff);
+	for (cnt = 0; (tmp && !(tmp & 0x00000001)); tmp >>= 1, cnt++);
 	{
-		/* setup a DMA define for use by command defines below. */
-		ACCW(PR_CTX0_R, 0x00003000); /* DMA page table present and of linear type;
-									  * DMA target node is NVM (non-volatile memory?)
-									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_R, (si->ps.memory_size - 1)); /* DMA limit: size is all cardRAM */
-		ACCW(PR_CTX2_R, ((0x00000000 & 0xfffff000) | 0x00000002));
-									 /* DMA access type is READ_AND_WRITE;
-									  * memory starts at start of cardRAM (b12-31):
-									  * It's adress needs to be at a 4kb boundary! */
-		ACCW(PR_CTX3_R, 0x00000002); /* unknown (looks like this is rubbish/not needed?) */
-		/* setup set '0' for cmd NV_ROP5_SOLID */
-		ACCW(PR_CTX0_0, 0x02080043); /* NVclass $043, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_0, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_0, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_0, 0x00000000); /* method traps disabled */
-		ACCW(PR_CTX0_1, 0x00000000); /* extra */
-		ACCW(PR_CTX1_1, 0x00000000); /* extra */
-		/* setup set '1' for cmd NV_IMAGE_BLACK_RECTANGLE */
-		ACCW(PR_CTX0_2, 0x02080019); /* NVclass $019, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_2, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_2, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_2, 0x00000000); /* method traps disabled */
-		ACCW(PR_CTX0_3, 0x00000000); /* extra */
-		ACCW(PR_CTX1_3, 0x00000000); /* extra */
-		/* setup set '2' for cmd NV_IMAGE_PATTERN */
-		ACCW(PR_CTX0_4, 0x02080018); /* NVclass $018, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_4, 0x02000000); /* colorspace not set, notify instance is $0200 (b16-31) */
-		ACCW(PR_CTX2_4, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_4, 0x00000000); /* method traps disabled */
-		ACCW(PR_CTX0_5, 0x00000000); /* extra */
-		ACCW(PR_CTX1_5, 0x00000000); /* extra */
-		/* setup set '4' for cmd NV12_IMAGE_BLIT */
-		ACCW(PR_CTX0_6, 0x0208009f); /* NVclass $09f, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_6, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_6, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_6, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
-		ACCW(PR_CTX0_7, 0x00000000); /* extra */
-		ACCW(PR_CTX1_7, 0x00000000); /* extra */
-		/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
-		ACCW(PR_CTX0_8, 0x0208004a); /* NVclass $04a, patchcfg ROP_AND, nv10+: little endian */
-		ACCW(PR_CTX1_8, 0x02000000); /* colorspace not set, notify instance is $0200 (b16-31) */
-		ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
-		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
-		ACCW(PR_CTX0_9, 0x00000000); /* extra */
-		ACCW(PR_CTX1_9, 0x00000000); /* extra */
-		/* setup set '6' for cmd NV10_CONTEXT_SURFACES_2D */
-		ACCW(PR_CTX0_A, 0x02080062); /* NVclass $062, nv10+: little endian */
-		ACCW(PR_CTX1_A, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_A, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_A, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
-		ACCW(PR_CTX0_B, 0x00000000); /* extra */
-		ACCW(PR_CTX1_B, 0x00000000); /* extra */
-		/* setup set '7' for cmd NV_SCALED_IMAGE_FROM_MEMORY */
-		ACCW(PR_CTX0_C, 0x02080077); /* NVclass $077, nv10+: little endian */
-		ACCW(PR_CTX1_C, 0x00000000); /* colorspace not set, notify instance invalid (b16-31) */
-		ACCW(PR_CTX2_C, 0x00001140); /* DMA0 instance is $1140, DMA1 instance invalid */
-		ACCW(PR_CTX3_C, 0x00001140); /* method trap 0 is $1140, trap 1 disabled */
-		ACCW(PR_CTX0_D, 0x00000000); /* extra */
-		ACCW(PR_CTX1_D, 0x00000000); /* extra */
-		/* setup DMA set pointed at by PF_CACH1_DMAI */
-		ACCW(PR_CTX0_E, 0x00003002); /* DMA page table present and of linear type;
-									  * DMA class is $002 (b0-11);
-									  * DMA target node is NVM (non-volatile memory?)
-									  * (instead of doing PCI or AGP transfers) */
-		ACCW(PR_CTX1_E, 0x00007fff); /* DMA limit: tablesize is 32k bytes */
-		ACCW(PR_CTX2_E, (((si->ps.memory_size - 1) & 0xffff8000) | 0x00000002));
-									 /* DMA access type is READ_AND_WRITE;
-									  * table is located at end of cardRAM (b12-31):
-									  * It's adress needs to be at a 4kb boundary! */
+		ACCW(NV4X_WHAT2, cnt);
 	}
 
-	if (si->ps.card_arch == NV04A)
+	/* unknown.. */
+	switch (si->ps.card_type)
 	{
-		/* do a explicit engine reset */
-		ACCW(DEBUG0, 0x000001ff);
+	case NV40:
+	case NV45:
+	/* and NV48: but these are pgm'd as NV45 currently */
+		ACCW(NV40_WHAT0, 0x83280fff);
+		ACCW(NV40_WHAT1, 0x000000a0);
+		ACCW(NV40_WHAT2, 0x0078e366);
+		ACCW(NV40_WHAT3, 0x0000014c);
+		break;
+	case NV41:
+	/* and ID == 0x012x: but no cards defined yet */
+		ACCW(NV40P_WHAT0, 0x83280eff);
+		ACCW(NV40P_WHAT1, 0x000000a0);
+		ACCW(NV40P_WHAT2, 0x007596ff);
+		ACCW(NV40P_WHAT3, 0x00000108);
+		break;
+	case NV43:
+		ACCW(NV40P_WHAT0, 0x83280eff);
+		ACCW(NV40P_WHAT1, 0x000000a0);
+		ACCW(NV40P_WHAT2, 0x0072cb77);
+		ACCW(NV40P_WHAT3, 0x00000108);
+		break;
+	case NV44:
+	case G72:
+		ACCW(NV40P_WHAT0, 0x83280eff);
+		ACCW(NV40P_WHAT1, 0x000000a0);
 
-		/* init some function blocks */
-		/* DEBUG0, b20 and b21 should be high, this has a big influence on
-		 * 3D rendering speed! (on all cards, confirmed) */
-		ACCW(DEBUG0, 0x1230c000);
-		/* DEBUG1, b19 = 1 increases 3D rendering speed on TNT2 (M64) a bit,
-		 * TNT1 rendering speed stays the same (all cards confirmed) */
-		ACCW(DEBUG1, 0x72191101);
-		ACCW(DEBUG2, 0x11d5f071);
-		ACCW(DEBUG3, 0x0004ff31);
-		/* init OP methods */
-		ACCW(DEBUG3, 0x4004ff31);
+		NV_REG32(NV32_NV44_WHAT10) = NV_REG32(NV32_NV10STRAPINFO);
+		NV_REG32(NV32_NV44_WHAT11) = 0x00000000;
+		NV_REG32(NV32_NV44_WHAT12) = 0x00000000;
+		NV_REG32(NV32_NV44_WHAT13) = NV_REG32(NV32_NV10STRAPINFO);
 
-		/* disable all acceleration engine INT reguests */
-		ACCW(ACC_INTE, 0x00000000);
-		/* reset all acceration engine INT status bits */
-		ACCW(ACC_INTS, 0xffffffff);
-		/* context control enabled */
-		ACCW(NV04_CTX_CTRL, 0x10010100);
-		/* all acceleration buffers, pitches and colors are valid */
-		ACCW(NV04_ACC_STAT, 0xffffffff);
-		/* enable acceleration engine command FIFO */
-		ACCW(FIFO_EN, 0x00000001);
+		ACCW(NV44_WHAT2, 0x00000000);
+		ACCW(NV44_WHAT3, 0x00000000);
+			break;
+/*	case NV44 type 2: (cardID 0x022x)
+		//fixme if needed: doesn't seem to need the strapinfo thing..
+		ACCW(NV40P_WHAT0, 0x83280eff);
+		ACCW(NV40P_WHAT1, 0x000000a0);
 
-		/* setup location of active screen in framebuffer */
-		ACCW(OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-		ACCW(OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-		/* setup accesible card memory range */
-		ACCW(BLIMIT0, (si->ps.memory_size - 1));
-		ACCW(BLIMIT1, (si->ps.memory_size - 1));
+		ACCW(NV44_WHAT2, 0x00000000);
+		ACCW(NV44_WHAT3, 0x00000000);
+		break;
+*/	case G70:
+	case G71:
+	case G73:
+		ACCW(NV40P_WHAT0, 0x83280eff);
+		ACCW(NV40P_WHAT1, 0x000000a0);
+		ACCW(NV40P_WHAT2, 0x07830610);
+		ACCW(NV40P_WHAT3, 0x0000016a);
+		break;
+	default:
+		ACCW(NV40P_WHAT0, 0x83280eff);
+		ACCW(NV40P_WHAT1, 0x000000a0);
+		break;
+	}
 
-		/* pattern shape value = 8x8, 2 color */
-		//fixme: not needed, unless the engine has a hardware fault (setting via cmd)!
-		//ACCW(PAT_SHP, 0x00000000);
-		/* Pgraph Beta AND value (fraction) b23-30 */
-		ACCW(BETA_AND_VAL, 0xffffffff);
+	ACCW(NV10_TIL3PT, 0x2ffff800);
+	ACCW(NV10_TIL3ST, 0x00006000);
+	ACCW(NV4X_WHAT1, 0x01000000);
+	/* engine data source DMA instance = $1140 */
+	ACCW(NV4X_DMA_SRC, 0x00001140);
+
+	/* copy tile setup stuff from previous setup 'source' to acc engine
+	 * (pattern colorRAM?) */
+	if ((si->ps.card_type == NV40) || (si->ps.card_type == NV45))
+	{
+		for (cnt = 0; cnt < 32; cnt++)
+		{
+			/* copy NV10_FBTIL0AD upto/including NV10_FBTIL7ST */
+			NV_REG32(NVACC_NV20_WHAT0 + (cnt << 2)) =
+				NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
+
+			/* copy NV10_FBTIL0AD upto/including NV10_FBTIL7ST */
+			NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
+				NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
+		}
 	}
 	else
 	{
-		/* do a explicit engine reset */
-		ACCW(DEBUG0, 0xffffffff);
-		ACCW(DEBUG0, 0x00000000);
-		/* disable all acceleration engine INT reguests */
-		ACCW(ACC_INTE, 0x00000000);
-		/* reset all acceration engine INT status bits */
-		ACCW(ACC_INTS, 0xffffffff);
-		/* context control enabled */
-		ACCW(NV10_CTX_CTRL, 0x10010100);
-		/* all acceleration buffers, pitches and colors are valid */
-		ACCW(NV10_ACC_STAT, 0xffffffff);
-		/* enable acceleration engine command FIFO */
-		ACCW(FIFO_EN, 0x00000001);
-		/* setup surface type:
-		 * b1-0 = %01 = surface type is non-swizzle;
-		 * this is needed to enable 3D on NV1x (confirmed) and maybe others? */
-		ACCW(NV10_SURF_TYP, ((ACCR(NV10_SURF_TYP)) & 0x0007ff00));
-		ACCW(NV10_SURF_TYP, ((ACCR(NV10_SURF_TYP)) | 0x00020101));
-	}
-
-	if (si->ps.card_arch == NV10A)
-	{
-		/* init some function blocks */
-		ACCW(DEBUG1, 0x00118700);
-		/* DEBUG2 has a big influence on 3D speed for NV11 and NV15
-		 * (confirmed b3 and b18 should both be '1' on both cards!)
-		 * (b16 should also be '1', increases 3D speed on NV11 a bit more) */
-		ACCW(DEBUG2, 0x24fd2ad9);
-		ACCW(DEBUG3, 0x55de0030);
-		/* NV10_DEBUG4 has a big influence on 3D speed for NV11, NV15 and NV18
-		 * (confirmed b14 and b15 should both be '1' on these cards!)
-		 * (confirmed b8 should be '0' on NV18 to prevent complete engine crash!) */
-		ACCW(NV10_DEBUG4, 0x0000c000);
-
-		/* copy tile setup stuff from 'source' to acc engine */
-		for (cnt = 0; cnt < 32; cnt++)
+		/* NV41, 43, 44, G70 and later */
+		if (si->ps.card_type >= G70)
 		{
-			NV_REG32(NVACC_NV10_TIL0AD + (cnt << 2)) =
-				NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
-		}
-
-		/* setup location of active screen in framebuffer */
-		ACCW(OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-		ACCW(OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-		/* setup accesible card memory range */
-		ACCW(BLIMIT0, (si->ps.memory_size - 1));
-		ACCW(BLIMIT1, (si->ps.memory_size - 1));
-
-		/* pattern shape value = 8x8, 2 color */
-		//fixme: not needed, unless the engine has a hardware fault (setting via cmd)!
-		//ACCW(PAT_SHP, 0x00000000);
-		/* Pgraph Beta AND value (fraction) b23-30 */
-		ACCW(BETA_AND_VAL, 0xffffffff);
-	}
-
-	if (si->ps.card_arch >= NV20A)
-	{
-		switch (si->ps.card_arch)
-		{
-		case NV40A:
-			/* init some function blocks */
-			ACCW(DEBUG1, 0x401287c0);
-			ACCW(DEBUG3, 0x60de8051);
-			/* disable specific functions, but enable SETUP_SPARE2 register */
-			ACCW(NV10_DEBUG4, 0x00008000);
-			/* set limit_viol_pix_adress(?): more likely something unknown.. */
-			ACCW(NV25_WHAT0, 0x00be3c5f);
-
-			/* setup some unknown serially accessed registers (?) */
-			tmp = (NV_REG32(NV32_NV4X_WHAT0) & 0x000000ff);
-			for (cnt = 0; (tmp && !(tmp & 0x00000001)); tmp >>= 1, cnt++);
+			for (cnt = 0; cnt < 60; cnt++)
 			{
-				ACCW(NV4X_WHAT2, cnt);
-			}
+				/* copy NV41_FBTIL0AD upto/including G70_FBTILEST */
+				NV_REG32(NVACC_NV41_WHAT0 + (cnt << 2)) =
+					NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
 
-			/* unknown.. */
-			switch (si->ps.card_type)
-			{
-			case NV40:
-			case NV45:
-			/* and NV48: but these are pgm'd as NV45 currently */
-				ACCW(NV40_WHAT0, 0x83280fff);
-				ACCW(NV40_WHAT1, 0x000000a0);
-				ACCW(NV40_WHAT2, 0x0078e366);
-				ACCW(NV40_WHAT3, 0x0000014c);
-				break;
-			case NV41:
-			/* and ID == 0x012x: but no cards defined yet */
-				ACCW(NV40P_WHAT0, 0x83280eff);
-				ACCW(NV40P_WHAT1, 0x000000a0);
-				ACCW(NV40P_WHAT2, 0x007596ff);
-				ACCW(NV40P_WHAT3, 0x00000108);
-				break;
-			case NV43:
-				ACCW(NV40P_WHAT0, 0x83280eff);
-				ACCW(NV40P_WHAT1, 0x000000a0);
-				ACCW(NV40P_WHAT2, 0x0072cb77);
-				ACCW(NV40P_WHAT3, 0x00000108);
-				break;
-			case NV44:
-			case G72:
-				ACCW(NV40P_WHAT0, 0x83280eff);
-				ACCW(NV40P_WHAT1, 0x000000a0);
-
-				NV_REG32(NV32_NV44_WHAT10) = NV_REG32(NV32_NV10STRAPINFO);
-				NV_REG32(NV32_NV44_WHAT11) = 0x00000000;
-				NV_REG32(NV32_NV44_WHAT12) = 0x00000000;
-				NV_REG32(NV32_NV44_WHAT13) = NV_REG32(NV32_NV10STRAPINFO);
-
-				ACCW(NV44_WHAT2, 0x00000000);
-				ACCW(NV44_WHAT3, 0x00000000);
-				break;
-/*			case NV44 type 2: (cardID 0x022x)
-				//fixme if needed: doesn't seem to need the strapinfo thing..
-				ACCW(NV40P_WHAT0, 0x83280eff);
-				ACCW(NV40P_WHAT1, 0x000000a0);
-
-				ACCW(NV44_WHAT2, 0x00000000);
-				ACCW(NV44_WHAT3, 0x00000000);
-				break;
-*/			case G70:
-			case G71:
-			case G73:
-				ACCW(NV40P_WHAT0, 0x83280eff);
-				ACCW(NV40P_WHAT1, 0x000000a0);
-				ACCW(NV40P_WHAT2, 0x07830610);
-				ACCW(NV40P_WHAT3, 0x0000016a);
-				break;
-			default:
-				ACCW(NV40P_WHAT0, 0x83280eff);
-				ACCW(NV40P_WHAT1, 0x000000a0);
-				break;
-			}
-
-			ACCW(NV10_TIL3PT, 0x2ffff800);
-			ACCW(NV10_TIL3ST, 0x00006000);
-			ACCW(NV4X_WHAT1, 0x01000000);
-			/* engine data source DMA instance = $1140 */
-			ACCW(NV4X_DMA_SRC, 0x00001140);
-			break;
-		case NV30A:
-			/* init some function blocks, but most is unknown.. */
-			ACCW(DEBUG1, 0x40108700);
-			ACCW(NV25_WHAT1, 0x00140000);
-			ACCW(DEBUG3, 0xf00e0431);
-			ACCW(NV10_DEBUG4, 0x00008000);
-			ACCW(NV25_WHAT0, 0xf04b1f36);
-			ACCW(NV20_WHAT3, 0x1002d888);
-			ACCW(NV25_WHAT2, 0x62ff007f);
-			break;
-		case NV20A:
-			/* init some function blocks, but most is unknown.. */
-			ACCW(DEBUG1, 0x00118700);
-			ACCW(DEBUG3, 0xf20e0431);
-			ACCW(NV10_DEBUG4, 0x00000000);
-			ACCW(NV20_WHAT1, 0x00000040);
-			if (si->ps.card_type < NV25)
-			{
-				ACCW(NV20_WHAT2, 0x00080000);
-				ACCW(NV10_DEBUG5, 0x00000005);
-				ACCW(NV20_WHAT3, 0x45caa208);
-				ACCW(NV20_WHAT4, 0x24000000);
-				ACCW(NV20_WHAT5, 0x00000040);
-
-				/* copy some fixed RAM(?) configuration info(?) to some indexed registers: */
-				/* b16-24 is select; b2-13 is adress in 32-bit words */
-				ACCW(RDI_INDEX, 0x00e00038);
-				/* data is 32-bit */
-				ACCW(RDI_DATA, 0x00000030);
-				/* copy some fixed RAM(?) configuration info(?) to some indexed registers: */
-				/* b16-24 is select; b2-13 is adress in 32-bit words */
-				ACCW(RDI_INDEX, 0x00e10038);
-				/* data is 32-bit */
-				ACCW(RDI_DATA, 0x00000030);
-			}
-			else
-			{
-				ACCW(NV25_WHAT1, 0x00080000);
-				ACCW(NV25_WHAT0, 0x304b1fb6);
-				ACCW(NV20_WHAT3, 0x18b82880);
-				ACCW(NV20_WHAT4, 0x44000000);
-				ACCW(NV20_WHAT5, 0x40000080);
-				ACCW(NV25_WHAT2, 0x000000ff);
-			}
-			break;
-		}
-
-		/* NV20A, NV30A and NV40A: */
-		/* copy tile setup stuff from previous setup 'source' to acc engine
-		 * (pattern colorRAM?) */
-		if ((si->ps.card_type <= NV40) || (si->ps.card_type == NV45))
-		{
-			for (cnt = 0; cnt < 32; cnt++)
-			{
-				/* copy NV10_FBTIL0AD upto/including NV10_FBTIL7ST */
-				NV_REG32(NVACC_NV20_WHAT0 + (cnt << 2)) =
-					NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
-
-				/* copy NV10_FBTIL0AD upto/including NV10_FBTIL7ST */
+				/* copy NV41_FBTIL0AD upto/including G70_FBTILEST */
 				NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
-					NV_REG32(NVACC_NV10_FBTIL0AD + (cnt << 2));
+					NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
 			}
 		}
 		else
 		{
-			/* NV41, 43, 44, G70 and later */
-			if (si->ps.card_type >= G70)
+			/* NV41, 43, 44 */
+			for (cnt = 0; cnt < 48; cnt++)
 			{
-				for (cnt = 0; cnt < 60; cnt++)
-				{
-					/* copy NV41_FBTIL0AD upto/including G70_FBTILEST */
-					NV_REG32(NVACC_NV41_WHAT0 + (cnt << 2)) =
-						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
+				/* copy NV41_FBTIL0AD upto/including NV41_FBTILBST */
+				NV_REG32(NVACC_NV20_WHAT0 + (cnt << 2)) =
+					NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
 
-					/* copy NV41_FBTIL0AD upto/including G70_FBTILEST */
+				if (si->ps.card_type != NV44)
+				{
+					/* copy NV41_FBTIL0AD upto/including NV41_FBTILBST */
 					NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
 						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
 				}
 			}
-			else
-			{
-				/* NV41, 43, 44 */
-				for (cnt = 0; cnt < 48; cnt++)
-				{
-					/* copy NV41_FBTIL0AD upto/including NV41_FBTILBST */
-					NV_REG32(NVACC_NV20_WHAT0 + (cnt << 2)) =
-						NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
-
-					if (si->ps.card_type != NV44)
-					{
-						/* copy NV41_FBTIL0AD upto/including NV41_FBTILBST */
-						NV_REG32(NVACC_NV20_2_WHAT0 + (cnt << 2)) =
-							NV_REG32(NVACC_NV41_FBTIL0AD + (cnt << 2));
-					}
-				}
-			}
 		}
-
-		if (si->ps.card_arch >= NV40A)
-		{
-			if ((si->ps.card_type == NV40) || (si->ps.card_type == NV45))
-			{
-				/* copy some RAM configuration info(?) */
- 				ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
-				ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-				ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
-				ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
-
-				/* setup location of active screen in framebuffer */
-				ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-				ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-				/* setup accesible card memory range */
-				ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
-				ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
-			}
-			else
-			{
-				/* NV41, 43, 44, G70 and later */
-
-				/* copy some RAM configuration info(?) */
-				if (si->ps.card_type >= G70)
-				{
-					ACCW(G70_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
-					ACCW(G70_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-				}
-				else
-				{
-					/* NV41, 43, 44 */
-					ACCW(NV40P_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
-					ACCW(NV40P_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-				}
-				ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
-				ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
-
-				/* setup location of active screen in framebuffer */
-				ACCW(NV40P_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-				ACCW(NV40P_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-				/* setup accesible card memory range */
-				ACCW(NV40P_BLIMIT6, (si->ps.memory_size - 1));
-				ACCW(NV40P_BLIMIT7, (si->ps.memory_size - 1));
-			}
-		}
-		else /* NV20A and NV30A: */
-		{
-			/* copy some RAM configuration info(?) */
-			ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
-			ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
-			/* copy some RAM configuration info(?) to some indexed registers: */
-			/* b16-24 is select; b2-13 is adress in 32-bit words */
-			ACCW(RDI_INDEX, 0x00ea0000);
-			/* data is 32-bit */
-			ACCW(RDI_DATA, NV_REG32(NV32_PFB_CONFIG_0));
-			/* b16-24 is select; b2-13 is adress in 32-bit words */
-			ACCW(RDI_INDEX, 0x00ea0004);
-			/* data is 32-bit */
-			ACCW(RDI_DATA, NV_REG32(NV32_PFB_CONFIG_1));
-
-			/* setup location of active screen in framebuffer */
-			ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-			ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
-			/* setup accesible card memory range */
-			ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
-			ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
-		}
-
-		/* NV20A, NV30A and NV40A: */
-		/* setup some acc engine tile stuff */
-		ACCW(NV10_TIL2AD, 0x00000000);
-		ACCW(NV10_TIL0ED, 0xffffffff);
 	}
+
+	if ((si->ps.card_type == NV40) || (si->ps.card_type == NV45))
+	{
+		/* copy some RAM configuration info(?) */
+		ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+		ACCW(NV20_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+		ACCW(NV40_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+		ACCW(NV40_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
+
+		/* setup location of active screen in framebuffer */
+		ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		/* setup accesible card memory range */
+		ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
+		ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
+	}
+	else
+	{
+		/* NV41, 43, 44, G70 and later */
+
+		/* copy some RAM configuration info(?) */
+		if (si->ps.card_type >= G70)
+		{
+			ACCW(G70_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+			ACCW(G70_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+		}
+		else
+		{
+			/* NV41, 43, 44 */
+			ACCW(NV40P_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
+			ACCW(NV40P_WHAT_T1, NV_REG32(NV32_PFB_CONFIG_1));
+		}
+		ACCW(NV40P_WHAT_T2, NV_REG32(NV32_PFB_CONFIG_0));
+		ACCW(NV40P_WHAT_T3, NV_REG32(NV32_PFB_CONFIG_1));
+
+		/* setup location of active screen in framebuffer */
+		ACCW(NV40P_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		ACCW(NV40P_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+		/* setup accesible card memory range */
+		ACCW(NV40P_BLIMIT6, (si->ps.memory_size - 1));
+		ACCW(NV40P_BLIMIT7, (si->ps.memory_size - 1));
+	}
+
+	/* setup some acc engine tile stuff */
+	ACCW(NV10_TIL2AD, 0x00000000);
+	ACCW(NV10_TIL0ED, 0xffffffff);
 
 	/* all cards: */
 	/* setup clipping: rect size is 32768 x 32768, probably max. setting */
@@ -732,10 +499,7 @@ status_t nv_acc_init_dma()
 	/* cache1 pull0 access disabled */
 	ACCW(PF_CACH1_PUL0, 0x00000000);
 	/* cache1 push1 mode = DMA */
-	if (si->ps.card_arch >= NV40A)
-		ACCW(PF_CACH1_PSH1, 0x00010000);
-	else
-		ACCW(PF_CACH1_PSH1, 0x00000100);
+	ACCW(PF_CACH1_PSH1, 0x00010000);
 	/* cache1 DMA Put offset = 0 (b2-28) */
 	ACCW(PF_CACH1_DMAP, 0x00000000);
 	/* cache1 DMA Get offset = 0 (b2-28) */
@@ -746,11 +510,7 @@ status_t nv_acc_init_dma()
 	 * should point to a DMA definition in CTX register space (which is sort of RAM).
 	 * This define tells the engine where the DMA cmd buffer is and what it's size is.
 	 * Inside that cmd buffer you'll find the actual issued engine commands. */
-	if (si->ps.card_arch >= NV40A)
-		ACCW(PF_CACH1_DMAI, 0x00001150);
-	else
-		//2007 3d test..
-		ACCW(PF_CACH1_DMAI, 0x0000114e);
+	ACCW(PF_CACH1_DMAI, 0x00001150);
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
 	/* cache0 pull0 access disabled */
@@ -800,9 +560,6 @@ status_t nv_acc_init_dma()
 	/* enable PFIFO caches reassign */
 	ACCW(PF_CACHES, 0x00000001);
 
-	/* setup 3D specifics */
-	nv_init_for_3D_dma();
-
 	/*** init acceleration engine command info ***/
 	/* set object handles */
 	/* note:
@@ -815,8 +572,9 @@ status_t nv_acc_init_dma()
 	si->engine.fifo.handle[3] = NV4_SURFACE; /* NV10_CONTEXT_SURFACES_2D is identical */
 	si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
 	si->engine.fifo.handle[5] = NV4_GDI_RECTANGLE_TEXT;
-	si->engine.fifo.handle[6] = NV4_CONTEXT_SURFACES_ARGB_ZS;//NV1_RENDER_SOLID_LIN;
-	si->engine.fifo.handle[7] = NV4_DX5_TEXTURE_TRIANGLE;
+	/* not used currently */
+	si->engine.fifo.handle[6] = 0;
+	si->engine.fifo.handle[7] = 0;
 	/* preset no FIFO channels assigned to cmd's */
 	for (cnt = 0; cnt < 0x20; cnt++)
 	{
@@ -832,40 +590,27 @@ status_t nv_acc_init_dma()
 	}
 
 	/*** init DMA command buffer info ***/
-	if (si->ps.card_arch >= NV40A) //main mem DMA buf on pre-NV40
-	{
-		si->dma_buffer = (void *)((char *)si->framebuffer +
-			((si->ps.memory_size - 1) & 0xffff8000));
-	}
+	si->dma_buffer = (void *)((char *)si->framebuffer +
+		((si->ps.memory_size - 1) & 0xffff8000));
+
 	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n",
 		((uint32)(si->dma_buffer))));
 	/* we have issued no DMA cmd's to the engine yet */
 	si->engine.dma.put = 0;
 	/* the current first free adress in the DMA buffer is at offset 0 */
 	si->engine.dma.current = 0;
-	/* the DMA buffer can hold 8k 32-bit words (it's 32kb in size),
-	 * or 256k 32-bit words (1Mb in size) dependant on architecture (for now) */
+	/* the DMA buffer can hold 8k 32-bit words (it's 32kb in size). */
 	/* note:
 	 * one word is reserved at the end of the DMA buffer to be able to instruct the
 	 * engine to do a buffer wrap-around!
 	 * (DMA opcode 'noninc method': issue word $20000000.) */
-	if (si->ps.card_arch < NV40A)
-		si->engine.dma.max = ((1 * 1024 * 1024) >> 2) - 1;
-	else
-		si->engine.dma.max = 8192 - 1;
+	si->engine.dma.max = 8192 - 1;
 	/* note the current free space we have left in the DMA buffer */
 	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 
 	/*** init FIFO via DMA command buffer. ***/
 	/* wait for room in fifo for new FIFO assigment cmds if needed: */
-	if (si->ps.card_arch >= NV40A)
-	{
-		if (nv_acc_fifofree_dma(12) != B_OK) return B_ERROR;
-	}
-	else
-	{
-		if (nv_acc_fifofree_dma(16) != B_OK) return B_ERROR;
-	}
+	if (nv_acc_fifofree_dma(12) != B_OK) return B_ERROR;
 
 	/* program new FIFO assignments */
 	/* Raster OPeration: */
@@ -880,13 +625,6 @@ status_t nv_acc_init_dma()
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH4, si->engine.fifo.handle[4]);
 	/* Bitmap: */
 	nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH5, si->engine.fifo.handle[5]);
-	if (si->ps.card_arch < NV40A)
-	{
-		/* 3D surfaces: (3D related only) */
-		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH6, si->engine.fifo.handle[6]);
-		/* Textured Triangle: (3D only) */
-		nv_acc_set_ch_dma(NV_GENERAL_FIFO_CH7, si->engine.fifo.handle[7]);
-	}
 
 	/*** Set pixel width ***/
 	switch(si->dm.space)
@@ -954,254 +692,6 @@ status_t nv_acc_init_dma()
 	return B_OK;
 }
 
-static void nv_init_for_3D_dma(void)
-{
-	/* setup PGRAPH unknown registers and modify (pre-cleared) pipe stuff for 3D use */
-	if (si->ps.card_arch >= NV10A)
-	{
-		/* setup unknown PGRAPH stuff */
-		ACCW(PGWHAT_00, 0x00000000);
-		ACCW(PGWHAT_01, 0x00000000);
-		ACCW(PGWHAT_02, 0x00000000);
-		ACCW(PGWHAT_03, 0x00000000);
-
-		ACCW(PGWHAT_04, 0x00001000);
-		ACCW(PGWHAT_05, 0x00001000);
-		ACCW(PGWHAT_06, 0x4003ff80);
-
-		ACCW(PGWHAT_07, 0x00000000);
-		ACCW(PGWHAT_08, 0x00000000);
-		ACCW(PGWHAT_09, 0x00000000);
-		ACCW(PGWHAT_0A, 0x00000000);
-		ACCW(PGWHAT_0B, 0x00000000);
-
-		ACCW(PGWHAT_0C, 0x00080008);
-		ACCW(PGWHAT_0D, 0x00080008);
-
-		ACCW(PGWHAT_0E, 0x00000000);
-		ACCW(PGWHAT_0F, 0x00000000);
-		ACCW(PGWHAT_10, 0x00000000);
-		ACCW(PGWHAT_11, 0x00000000);
-		ACCW(PGWHAT_12, 0x00000000);
-		ACCW(PGWHAT_13, 0x00000000);
-		ACCW(PGWHAT_14, 0x00000000);
-		ACCW(PGWHAT_15, 0x00000000);
-		ACCW(PGWHAT_16, 0x00000000);
-		ACCW(PGWHAT_17, 0x00000000);
-		ACCW(PGWHAT_18, 0x00000000);
-
-		ACCW(PGWHAT_19, 0x10000000);
-
-		ACCW(PGWHAT_1A, 0x00000000);
-		ACCW(PGWHAT_1B, 0x00000000);
-		ACCW(PGWHAT_1C, 0x00000000);
-		ACCW(PGWHAT_1D, 0x00000000);
-		ACCW(PGWHAT_1E, 0x00000000);
-		ACCW(PGWHAT_1F, 0x00000000);
-		ACCW(PGWHAT_20, 0x00000000);
-		ACCW(PGWHAT_21, 0x00000000);
-
-		ACCW(PGWHAT_22, 0x08000000);
-
-		ACCW(PGWHAT_23, 0x00000000);
-		ACCW(PGWHAT_24, 0x00000000);
-		ACCW(PGWHAT_25, 0x00000000);
-		ACCW(PGWHAT_26, 0x00000000);
-
-		ACCW(PGWHAT_27, 0x4b7fffff);
-
-		ACCW(PGWHAT_28, 0x00000000);
-		ACCW(PGWHAT_29, 0x00000000);
-		ACCW(PGWHAT_2A, 0x00000000);
-
-		/* setup window clipping */
-		/* b0-11 = min; b16-27 = max.
-		 * note:
-		 * probably two's complement values, so setting to max range here:
-		 * which would be -2048 upto/including +2047. */
-		/* horizontal */
-		ACCW(WINCLIP_H_0, 0x07ff0800);
-		ACCW(WINCLIP_H_1, 0x07ff0800);
-		ACCW(WINCLIP_H_2, 0x07ff0800);
-		ACCW(WINCLIP_H_3, 0x07ff0800);
-		ACCW(WINCLIP_H_4, 0x07ff0800);
-		ACCW(WINCLIP_H_5, 0x07ff0800);
-		ACCW(WINCLIP_H_6, 0x07ff0800);
-		ACCW(WINCLIP_H_7, 0x07ff0800);
-		/* vertical */
-		ACCW(WINCLIP_V_0, 0x07ff0800);
-		ACCW(WINCLIP_V_1, 0x07ff0800);
-		ACCW(WINCLIP_V_2, 0x07ff0800);
-		ACCW(WINCLIP_V_3, 0x07ff0800);
-		ACCW(WINCLIP_V_4, 0x07ff0800);
-		ACCW(WINCLIP_V_5, 0x07ff0800);
-		ACCW(WINCLIP_V_6, 0x07ff0800);
-		ACCW(WINCLIP_V_7, 0x07ff0800);
-
-		/* setup (initialize) pipe:
-		 * needed to get valid 3D rendering on (at least) NV1x cards. Without this
-		 * those cards produce rubbish instead of 3D, although the engine itself keeps
-		 * running and 2D stays OK. */
-
-		/* set eyetype to local, lightning etc. is off */
-		ACCW(NV10_XFMOD0, 0x10000000);
-		/* disable all lights */
-		ACCW(NV10_XFMOD1, 0x00000000);
-
-		/* note: upon writing data into the PIPEDAT register, the PIPEADR is
-		 * probably auto-incremented! */
-		/* (pipe adress = b2-16, pipe data = b0-31) */
-		/* note: pipe adresses IGRAPH registers! */
-		ACCW(NV10_PIPEADR, 0x00006740);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-
-		ACCW(NV10_PIPEADR, 0x00006750);
-		ACCW(NV10_PIPEDAT, 0x40000000);
-		ACCW(NV10_PIPEDAT, 0x40000000);
-		ACCW(NV10_PIPEDAT, 0x40000000);
-		ACCW(NV10_PIPEDAT, 0x40000000);
-
-		ACCW(NV10_PIPEADR, 0x00006760);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x00006770);
-		ACCW(NV10_PIPEDAT, 0xc5000000);
-		ACCW(NV10_PIPEDAT, 0xc5000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x00006780);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x000067a0);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-
-		ACCW(NV10_PIPEADR, 0x00006ab0);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-
-		ACCW(NV10_PIPEADR, 0x00006ac0);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x00006c10);
-		ACCW(NV10_PIPEDAT, 0xbf800000);
-
-		ACCW(NV10_PIPEADR, 0x00007030);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x00007040);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x00007050);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x00007060);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x00007070);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x00007080);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x00007090);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x000070a0);
-		ACCW(NV10_PIPEDAT, 0x7149f2ca);
-
-		ACCW(NV10_PIPEADR, 0x00006a80);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-
-		ACCW(NV10_PIPEADR, 0x00006aa0);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		/* select primitive type that will be drawn (tri's) */
-		ACCW(NV10_PIPEADR, 0x00000040);
-		ACCW(NV10_PIPEDAT, 0x00000005);
-
-		ACCW(NV10_PIPEADR, 0x00006400);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x4b7fffff);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x00006410);
-		ACCW(NV10_PIPEDAT, 0xc5000000);
-		ACCW(NV10_PIPEDAT, 0xc5000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x00006420);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x00006430);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x000064c0);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-		ACCW(NV10_PIPEDAT, 0x477fffff);
-		ACCW(NV10_PIPEDAT, 0x3f800000);
-
-		ACCW(NV10_PIPEADR, 0x000064d0);
-		ACCW(NV10_PIPEDAT, 0xc5000000);
-		ACCW(NV10_PIPEDAT, 0xc5000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x000064e0);
-		ACCW(NV10_PIPEDAT, 0xc4fff000);
-		ACCW(NV10_PIPEDAT, 0xc4fff000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		ACCW(NV10_PIPEADR, 0x000064f0);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-		ACCW(NV10_PIPEDAT, 0x00000000);
-
-		/* turn lightning on */
-		ACCW(NV10_XFMOD0, 0x30000000);
-		/* set light 1 to infinite type, other lights remain off */
-		ACCW(NV10_XFMOD1, 0x00000004);
-
-		/* Z-buffer state is:
-		 * initialized, set to: 'fixed point' (integer?); Z-buffer; 16bits depth */
-		/* note:
-		 * other options possible are: floating point; 24bits depth; W-buffer */
-		ACCW(GLOB_STAT_0, 0x10000000);
-		/* set DMA instance 2 and 3 to be invalid */
-		ACCW(GLOB_STAT_1, 0x00000000);
-	}
-}
-
 static void nv_start_dma(void)
 {
 	uint32 dummy;
@@ -1209,19 +699,8 @@ static void nv_start_dma(void)
 	if (si->engine.dma.current != si->engine.dma.put)
 	{
 		si->engine.dma.put = si->engine.dma.current;
-		/* flush used caches so we know for sure the DMA cmd buffer received all data. */
-		if (si->ps.card_arch < NV40A)
-		{
-			/* some CPU's support out-of-order processing (WinChip/Cyrix). Flush them. */
-			__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory");
-			/* read a non-cached adress to flush the cash */
-			dummy = ACCR(STATUS);
-		}
-		else
-		{
-			/* dummy read the first adress of the framebuffer to flush MTRR-WC buffers */
-			dummy = *((volatile uint32 *)(si->framebuffer));
-		}
+		/* dummy read the first adress of the framebuffer to flush MTRR-WC buffers */
+		dummy = *((volatile uint32 *)(si->framebuffer));
 
 		/* actually start DMA to execute all commands now in buffer */
 		/* note:

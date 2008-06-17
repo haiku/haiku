@@ -97,7 +97,6 @@ status_t INIT_ACCELERANT(int the_fd)
 {
 	status_t result;
 	int pointer_reservation; //mem reserved for pointer
-	int cnt; 				 //used for iteration through the overlay buffers
 
 	if (0) {
 		time_t now = time (NULL);
@@ -173,20 +172,6 @@ status_t INIT_ACCELERANT(int the_fd)
 	/* tell 3D add-ons that they should reload their rendering states and surfaces */
 	si->engine.threeD.reload = 0xffffffff;
 	INIT_BEN(si->engine.lock);
-
-	INIT_BEN(si->overlay.lock);
-	for (cnt = 0; cnt < MAXBUFFERS; cnt++)
-	{
-		/* make sure overlay buffers are 'marked' as being free */
-		si->overlay.myBuffer[cnt].buffer = NULL;
-		si->overlay.myBuffer[cnt].buffer_dma = NULL;
-	}
-
-	/* make sure overlay unit is 'marked' as being free */
-	si->overlay.myToken = NULL;	
-
-	/* note that overlay is not in use (for nv_bes_move_overlay()) */
-	si->overlay.active = false;
 
 	/* bail out if something failed */
 	if (result != B_OK) goto error1;
@@ -347,7 +332,6 @@ void UNINIT_ACCELERANT(void)
 
 		/* delete benaphores ONLY if we are the primary accelerant */
 		DELETE_BEN(si->engine.lock);
-		DELETE_BEN(si->overlay.lock);
 
 		/* ensure that INIT_ACCELERANT can be executed again */
 		si->accelerant_in_use = false;

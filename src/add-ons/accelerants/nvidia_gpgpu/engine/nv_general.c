@@ -531,7 +531,6 @@ return B_OK;
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00001100;
 		NV_REG32(NV32_FUNCSEL) |= 0x00001100;
 	}
-	si->overlay.crtc = false;
 
 	/* enable 'enhanced' mode on primary head: */
 	/* enable access to primary head */
@@ -668,45 +667,22 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* note:
 	 * because of the seemingly 'random' variations in these constraints we take
 	 * a reasonable 'lowest common denominator' instead of always true constraints. */
-	switch (si->ps.card_arch)
+
+	/* confirmed for:
+	 * GeForce4 Ti4200 (NV28), GeForceFX 5600 (NV31) in PIO acc mode;
+	 * confirmed for:
+	 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForcePCX 5750 (NV36),
+	 * GeForcePCX 6600 GT (NV43) in DMA acc mode. */
+	switch (target->space)
 	{
-	case NV04A:
-		/* confirmed for:
-		 * TNT1 (NV04), TNT2 (NV05), TNT2-M64 (NV05M64), GeForce2 MX400 (NV11),
-		 * GeForce4 MX440 (NV18), GeForceFX 5200 (NV34) in PIO acc mode;
-		 * confirmed for:
-		 * TNT1 (NV04), TNT2 (NV05), TNT2-M64 (NV05M64), GeForce4 Ti4200 (NV28),
-		 * GeForceFX 5200 (NV34) in DMA acc mode. */
-		switch (target->space)
-		{
-			case B_CMAP8: acc_mask = 0x0f; depth =  8; break;
-			case B_RGB15: acc_mask = 0x07; depth = 16; break;
-			case B_RGB16: acc_mask = 0x07; depth = 16; break;
-			case B_RGB24: acc_mask = 0x0f; depth = 24; break;
-			case B_RGB32: acc_mask = 0x03; depth = 32; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
-	default:
-		/* confirmed for:
-		 * GeForce4 Ti4200 (NV28), GeForceFX 5600 (NV31) in PIO acc mode;
-		 * confirmed for:
-		 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForcePCX 5750 (NV36),
-		 * GeForcePCX 6600 GT (NV43) in DMA acc mode. */
-		switch (target->space)
-		{
-			case B_CMAP8: acc_mask = 0x3f; depth =  8; break;
-			case B_RGB15: acc_mask = 0x1f; depth = 16; break;
-			case B_RGB16: acc_mask = 0x1f; depth = 16; break;
-			case B_RGB24: acc_mask = 0x3f; depth = 24; break;
-			case B_RGB32: acc_mask = 0x0f; depth = 32; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
+		case B_CMAP8: acc_mask = 0x3f; depth =  8; break;
+		case B_RGB15: acc_mask = 0x1f; depth = 16; break;
+		case B_RGB16: acc_mask = 0x1f; depth = 16; break;
+		case B_RGB24: acc_mask = 0x3f; depth = 24; break;
+		case B_RGB32: acc_mask = 0x0f; depth = 32; break;
+		default:
+			LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+			return B_ERROR;
 	}
 
 	/* determine pixel multiple based on CRTC memory pitch constraints:
@@ -764,45 +740,26 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	/* note:
 	 * because of the seemingly 'random' variations in these constraints we take
 	 * a reasonable 'lowest common denominator' instead of always true constraints. */
-	switch (si->ps.card_arch)
+
+	/* confirmed for:
+	 * GeForce4 Ti4200 (NV28), GeForceFX 5600 (NV31) in PIO acc mode;
+	 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForceFX 5200 (NV34) can do
+	 * 16368/8184/8184/5456/4092, so a bit better in PIO acc mode;
+	 * confirmed for:
+	 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForcePCX 5750 (NV36),
+	 * GeForcePCX 6600 GT (NV43) in DMA acc mode;
+	 * GeForce4 Ti4200 (NV28), GeForceFX 5200 (NV34) can do
+	 * 16368/8184/8184/5456/4092, so a bit better in DMA acc mode. */
+	switch(target->space)
 	{
-	case NV04A:
-		/* confirmed for:
-		 * TNT1 (NV04), TNT2 (NV05), TNT2-M64 (NV05M64) in both PIO and DMA acc mode. */
-		switch(target->space)
-		{
-			case B_CMAP8: max_acc_width = 8176; break;
-			case B_RGB15: max_acc_width = 4088; break;
-			case B_RGB16: max_acc_width = 4088; break;
-			case B_RGB24: max_acc_width = 2720; break;
-			case B_RGB32: max_acc_width = 2044; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
-	default:
-		/* confirmed for:
-		 * GeForce4 Ti4200 (NV28), GeForceFX 5600 (NV31) in PIO acc mode;
-		 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForceFX 5200 (NV34) can do
-		 * 16368/8184/8184/5456/4092, so a bit better in PIO acc mode;
-		 * confirmed for:
-		 * GeForce2 MX400 (NV11), GeForce4 MX440 (NV18), GeForcePCX 5750 (NV36),
-		 * GeForcePCX 6600 GT (NV43) in DMA acc mode;
-		 * GeForce4 Ti4200 (NV28), GeForceFX 5200 (NV34) can do
-		 * 16368/8184/8184/5456/4092, so a bit better in DMA acc mode. */
-		switch(target->space)
-		{
-			case B_CMAP8: max_acc_width = 16320; break;
-			case B_RGB15: max_acc_width =  8160; break;
-			case B_RGB16: max_acc_width =  8160; break;
-			case B_RGB24: max_acc_width =  5440; break;
-			case B_RGB32: max_acc_width =  4080; break;
-			default:
-				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
-				return B_ERROR;
-		}
-		break;
+		case B_CMAP8: max_acc_width = 16320; break;
+		case B_RGB15: max_acc_width =  8160; break;
+		case B_RGB16: max_acc_width =  8160; break;
+		case B_RGB24: max_acc_width =  5440; break;
+		case B_RGB32: max_acc_width =  4080; break;
+		default:
+			LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
+			return B_ERROR;
 	}
 
 	/* set virtual_width limit for unaccelerated modes */

@@ -343,10 +343,7 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 
 	/* Reserve extra space as a workaround for certain bugs (see DriverInterface.h
 	 * for an explanation). */
-	if (si->ps.card_arch < NV40A)
-		mem_reservation += PRE_NV40_OFFSET;
-	else
-		mem_reservation += NV40_PLUS_OFFSET;
+	mem_reservation += NV40_PLUS_OFFSET;
 
 	/* memory requirement for frame buffer */
 	if (row_bytes * target->virtual_height > si->ps.memory_size - mem_reservation) {

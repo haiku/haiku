@@ -15,7 +15,6 @@ Addon nvidia_gpgpu.accelerant :
 	GetModeInfo.c
 	GetTimingConstraints.c
 	InitAccelerant.c
-	Overlay.c
 	ProposeDisplayMode.c
 	SetDisplayMode.c
 	: libnvidia_gpgpu_engine.a

@@ -268,18 +268,15 @@ status_t nv_crtc_set_timing(display_mode target)
 			//| ((linecomp & 0x400) >> 3)	
 			));
 
-		/* more vertical extended regs (on GeForce cards only) */
-		if (si->ps.card_arch >= NV10A)
-		{ 
-			CRTCW(EXTRA,
-				(
-			 	((vtotal & 0x800) >> (11 - 0)) |
-				((vdisp_e & 0x800) >> (11 - 2)) |
-				((vsync_s & 0x800) >> (11 - 4)) |
-				((vblnk_s & 0x800) >> (11 - 6))
-				//fixme: do we miss another linecomp bit!?!
-				));
-		}
+		/* more vertical extended regs */
+		CRTCW(EXTRA,
+			(
+		 	((vtotal & 0x800) >> (11 - 0)) |
+			((vdisp_e & 0x800) >> (11 - 2)) |
+			((vsync_s & 0x800) >> (11 - 4)) |
+			((vblnk_s & 0x800) >> (11 - 6))
+			//fixme: do we miss another linecomp bit!?!
+			));
 
 		/* setup 'large screen' mode */
 		if (target.timing.h_display >= 1280)
@@ -638,7 +635,6 @@ status_t nv_crtc_set_display_pitch()
 
 status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp) 
 {
-	uint8 temp;
 	uint32 timeout = 0;
 
 	LOG(4,("CRTC: setting card RAM to be displayed bpp %d\n", bpp));
@@ -660,33 +656,13 @@ status_t nv_crtc_set_display_start(uint32 startadd,uint8 bpp)
 	/* enable access to primary head */
 	set_crtc_owner(0);
 
-	if (si->ps.card_arch == NV04A)
-	{
-		/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
+	/* upto 4Gb RAM adressing: must be used on NV10 and later! */
+	/* NOTE:
+	 * While this register also exists on pre-NV10 cards, it will
+	 * wrap-around at 16Mb boundaries!! */
 
-		/* set standard registers */
-		/* (NVidia: startadress in 32bit words (b2 - b17) */
-		CRTCW(FBSTADDL, ((startadd & 0x000003fc) >> 2));
-		CRTCW(FBSTADDH, ((startadd & 0x0003fc00) >> 10));
-
-		/* set extended registers */
-		/* NV4 extended bits: (b18-22) */
-		temp = (CRTCR(REPAINT0) & 0xe0);
-		CRTCW(REPAINT0, (temp | ((startadd & 0x007c0000) >> 18)));
-		/* NV4 extended bits: (b23-24) */
-		temp = (CRTCR(HEB) & 0x9f);
-		CRTCW(HEB, (temp | ((startadd & 0x01800000) >> 18)));
-	}
-	else
-	{
-		/* upto 4Gb RAM adressing: must be used on NV10 and later! */
-		/* NOTE:
-		 * While this register also exists on pre-NV10 cards, it will
-		 * wrap-around at 16Mb boundaries!! */
-
-		/* 30bit adress in 32bit words */
-		NV_REG32(NV32_NV10FBSTADD32) = (startadd & 0xfffffffc);
-	}
+	/* 30bit adress in 32bit words */
+	NV_REG32(NV32_NV10FBSTADD32) = (startadd & 0xfffffffc);
 
 	/* set NV4/NV10 byte adress: (b0 - 1) */
 	ATBW(HORPIXPAN, ((startadd & 0x00000003) << 1));
@@ -705,9 +681,9 @@ status_t nv_crtc_cursor_init()
 	set_crtc_owner(0);
 
 	/* set cursor bitmap adress ... */
-	if ((si->ps.card_arch == NV04A) || (si->ps.laptop))
+	if (si->ps.laptop)
 	{
-		/* must be used this way on pre-NV10 and on all 'Go' cards! */
+		/* must be used this way on all 'Go' cards! */
 
 		/* cursorbitmap must start on 2Kbyte boundary: */
 		/* set adress bit11-16, and set 'no doublescan' (registerbit 1 = 0) */
@@ -740,10 +716,8 @@ status_t nv_crtc_cursor_init()
 	/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
 	NV_REG32(NV32_CURCONF) = 0x02000100;
 
-	/* activate hardware-sync between cursor updates and vertical retrace where
-	 * available */
-	if (si->ps.card_arch >= NV10A)
-		DACW(NV10_CURSYNC, (DACR(NV10_CURSYNC) | 0x02000000));
+	/* activate hardware-sync between cursor updates and vertical retrace */
+	DACW(NV10_CURSYNC, (DACR(NV10_CURSYNC) | 0x02000000));
 
 	/* activate hardware cursor */
 	nv_crtc_cursor_show();
@@ -844,51 +818,7 @@ status_t nv_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 /* position the cursor */
 status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 {
-	/* the cursor position is updated during retrace by card hardware except for
-	 * pre-GeForce cards */
-	if (si->ps.card_arch < NV10A)
-	{
-		uint16 yhigh;
-		uint32 timeout = 0;
-
-		/* make sure we are beyond the first line of the cursorbitmap being drawn during
-		 * updating the position to prevent distortions: no double buffering feature */
-		/* Note:
-		 * we need to return as quick as possible or some apps will exhibit lagging.. */
-
-		/* read the old cursor Y position */
-		yhigh = ((DACR(CURPOS) & 0x0fff0000) >> 16);
-		/* make sure we will wait until we are below both the old and new Y position:
-		 * visible cursorbitmap drawing needs to be done at least... */
-		if (y > yhigh) yhigh = y;
-
-		if (yhigh < (si->dm.timing.v_display - 16))
-		{
-			/* we have vertical lines below old and new cursorposition to spare. So we
-			 * update the cursor postion 'mid-screen', but below that area. */
-			/* wait 25mS max. (refresh > 40Hz) */
-			while ((((uint16)(NV_REG32(NV32_RASTER) & 0x000007ff)) < (yhigh + 16)) &&
-			(timeout < (25000/10)))
-			{
-				snooze(10);
-				timeout++;
-			}
-		}
-		else
-		{
-			timeout = 0;
-			/* no room to spare, just wait for retrace (is relatively slow) */
-			/* wait 25mS max. (refresh > 40Hz) */
-			while (((NV_REG32(NV32_RASTER) & 0x000007ff) < si->dm.timing.v_display) &&
-			(timeout < (25000/10)))
-			{
-				/* don't snooze much longer or retrace might get missed! */
-				snooze(10);
-				timeout++;
-			}
-		}
-	}
-
+	/* the cursor position is updated during retrace by card hardware */
 	/* update cursorposition */
 	DACW(CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
 

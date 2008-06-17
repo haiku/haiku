@@ -73,16 +73,7 @@ enum {
 
 /* card_type in order of date of NV chip design */
 enum {
-	NV20,
-	NV25,
-	NV28,
-	NV30,
-	NV31,
-	NV34,
-	NV35,
-	NV36,
-	NV38,
-	NV40,
+	NV40 = 0,
 	NV41,
 	NV43,
 	NV44,
@@ -98,11 +89,7 @@ enum {
 
 /* card_arch in order of date of NV chip design */
 enum {
-	NV04A = 0,
-	NV10A,
-	NV20A,
-	NV30A,
-	NV40A,
+	NV40A = 0,
 	NV50A
 };
 
@@ -124,27 +111,12 @@ enum {
  */
 //#define NV3_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
 #define NV4_GDI_RECTANGLE_TEXT			0x00000012 /* 2D */
-#define NV4_CONTEXT_SURFACES_ARGB_ZS	0x00000013 /* 3D */
-#define NV10_CONTEXT_SURFACES_ARGB_ZS	0x00000013 /* 3D */
-#define NV4_DX5_TEXTURE_TRIANGLE		0x00000014 /* 3D */
-#define NV10_DX5_TEXTURE_TRIANGLE		0x00000014 /* 3D */
-#define NV4_DX6_MULTI_TEXTURE_TRIANGLE	0x00000015 /* unused (yet?) */
-#define NV10_DX6_MULTI_TEXTURE_TRIANGLE	0x00000015 /* unused (yet?) */
 #define NV1_RENDER_SOLID_LIN			0x00000016 /* 2D: unused */
-
-/* max. number of overlay buffers */
-#define MAXBUFFERS 3
 
 //-----------------------------------------------------------------------------------
 /* safety byte-offset from end of cardRAM for preventing acceleration engine crashes
  * caused by the existance of DMA engine command buffers in cardRAM and/or fifo
  * channel engine command re-assigning on-the-fly */
-
-/* pre-NV40 notes:
- * - we need at least 70kB distance from the end of RAM for fifo-reassigning 'bug'
- *   (confirmed on a TNT1);
- * - keep extra failsafe room to prevent malfunctioning apps from crashing engine. */
-#define PRE_NV40_OFFSET		80 * 1024
 
 /* NV40 and higher notes:
  * - we need at least 416kB distance from the DMA command buffer:
@@ -345,22 +317,6 @@ typedef struct {
 
 	/* some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
 	nv_settings settings;
-
-	struct
-	{
-		overlay_buffer myBuffer[MAXBUFFERS];/* scaler input buffers */
-		int_buf_info myBufInfo[MAXBUFFERS];	/* extra info on scaler input buffers */
-		overlay_token myToken;				/* scaler is free/in use */
-		benaphore lock;						/* for creating buffers and aquiring overlay unit routines */
-		bool crtc;							/* location of overlay unit */
-		/* variables needed for virtualscreens (move_overlay()): */
-		bool active;						/* true is overlay currently in use */
-		overlay_window ow;					/* current position of overlay output window */
-		overlay_buffer ob;					/* current inputbuffer in use */
-		overlay_view my_ov;					/* current corrected view in inputbuffer */
-		uint32 h_ifactor;					/* current 'unclipped' horizontal inverse scaling factor */
-		uint32 v_ifactor;					/* current 'unclipped' vertical inverse scaling factor */
-	} overlay;
 
 } shared_info;
 

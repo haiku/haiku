@@ -288,12 +288,7 @@ if (si->ps.card_arch < NV50A)
 	si->engine.threeD.mem_high = si->ps.memory_size - 1;
 	/* Keep some extra distance as a workaround for certain bugs (see
 	 * DriverInterface.h for an explanation). */
-	if (si->ps.card_arch < NV40A)
-		si->engine.threeD.mem_high -= PRE_NV40_OFFSET;
-	else
-		si->engine.threeD.mem_high -= NV40_PLUS_OFFSET;
-
-	si->engine.threeD.mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
+	si->engine.threeD.mem_high -= NV40_PLUS_OFFSET;
 
 	/* restore screen(s) output state(s) */
 //	SET_DPMS_MODE(si->dpms_flags);

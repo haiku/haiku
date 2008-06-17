@@ -24,8 +24,6 @@ noted on a case by case below.
 /*
 These definitions are out of pure lazyness.
 */
-#define CHKO(x) case B_##x: \
-	if (check_overlay_capability(B_##x) == B_OK) return (void *)x; else return (void *)0
 #define CHKA(x) case B_##x: \
 	if (check_acc_capability(B_##x) == B_OK) \
 		return (void *)x##_DMA; \
@@ -93,16 +91,7 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 		Note: These hooks are re-acquired by the app_server after each mode switch.
 		*/
 
-		/* only export video overlay functions if card is capable of it */
-		//CHKO(OVERLAY_COUNT);
-		//CHKO(OVERLAY_SUPPORTED_SPACES);
-		//CHKO(OVERLAY_SUPPORTED_FEATURES);
-		//CHKO(ALLOCATE_OVERLAY_BUFFER);
-		//CHKO(RELEASE_OVERLAY_BUFFER);
-		//CHKO(GET_OVERLAY_CONSTRAINTS);
-		//CHKO(ALLOCATE_OVERLAY);
-		//CHKO(RELEASE_OVERLAY);
-		//CHKO(CONFIGURE_OVERLAY);
+		/* video overlay functions are not supported */
 
 		/*
 		When requesting an acceleration hook, the calling application provides a
@@ -129,64 +118,11 @@ void *	get_accelerant_hook(uint32 feature, void *data)
 	/* Return a null pointer for any feature we don't understand. */
 	return 0;
 }
-#undef CHKO
 #undef CHKA
 #undef CHKD
 #undef HOOK
 #undef ZERO
 #undef HRDC
-
-status_t check_overlay_capability(uint32 feature)
-{
-	char *msg = "";
-
-	/* setup logmessage text */
-	switch (feature)
-	{
-	case B_OVERLAY_COUNT:
-		msg = "B_OVERLAY_COUNT";
-		break;
-	case B_OVERLAY_SUPPORTED_SPACES:
-		msg = "B_OVERLAY_SUPPORTED_SPACES";
-		break;
-	case B_OVERLAY_SUPPORTED_FEATURES:
-		msg = "B_OVERLAY_SUPPORTED_FEATURES";
-		break;
-	case B_ALLOCATE_OVERLAY_BUFFER:
-		msg = "B_ALLOCATE_OVERLAY_BUFFER";
-		break;
-	case B_RELEASE_OVERLAY_BUFFER:
-		msg = "B_RELEASE_OVERLAY_BUFFER";
-		break;
-	case B_GET_OVERLAY_CONSTRAINTS:
-		msg = "B_GET_OVERLAY_CONSTRAINTS";
-		break;
-	case B_ALLOCATE_OVERLAY:
-		msg = "B_ALLOCATE_OVERLAY";
-		break;
-	case B_RELEASE_OVERLAY:
-		msg = "B_RELEASE_OVERLAY";
-		break;
-	case B_CONFIGURE_OVERLAY:
-		msg = "B_CONFIGURE_OVERLAY";
-		break;
-	default:
-		msg = "UNKNOWN";
-		break;
-	}
-
-	/* all older cards have a supported bes */
-	if ((si->ps.card_type <= NV40) || (si->ps.card_type == NV45))
-	{
-		LOG(4, ("Overlay: Exporting hook %s.\n", msg));
-		return B_OK;
-	}
-
-	/* all newer NV40 architecture cards have a new HDTV capable bes except for
-	 * GeForce 6800's. Unfortunately we have no info about the new bes yet. */
-	LOG(4, ("Overlay: Not exporting hook %s.\n", msg));
-	return B_ERROR;
-}
 
 status_t check_acc_capability(uint32 feature)
 {

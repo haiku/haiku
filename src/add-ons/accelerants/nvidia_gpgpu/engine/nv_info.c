@@ -22,10 +22,7 @@ typedef struct {
 static void detect_panels(void);
 static void setup_output_matrix(void);
 
-static void pinsnv20_arch_fake(void);
 static void pinsnv30_arch_fake(void);
-static void getRAMsize_arch_nv4(void);
-static void getstrap_arch_nv4(void);
 static void getRAMsize_arch_nv10_20_30_40(void);
 static void getstrap_arch_nv10_20_30_40(void);
 static status_t pins2_read(uint8 *rom, uint32 offset);
@@ -39,7 +36,6 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 static void log_pll(uint32 reg, uint32 freq);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom);
-static void	setup_ram_config_nv28(uint8* rom);
 static status_t translate_ISA_PCI(uint32* reg);
 static status_t	nv_crtc_setup_fifo(void);
 
@@ -299,18 +295,8 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 {
 	status_t result = B_OK;
 	uint16 adress;
-	uint32 fb_mrs1 = 0;
-	uint32 fb_mrs2 = 0;
 
 	LOG(8,("INFO: now executing coldstart...\n"));
-
-	/* get some strapinfo(?) for NV28 framebuffer access */
-	//fixme?: works on at least one NV28... how about other cards?
-	if (si->ps.card_type == NV28)
-	{
-		fb_mrs2 = NV_REG32(NV32_FB_MRS2);
-		fb_mrs1 = NV_REG32(NV32_FB_MRS1);
-	}
 
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
@@ -366,20 +352,6 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 			/* next command script, please */
 			index += 2;
 			adress = *((uint16*)(&(rom[index])));
-		}
-
-		/* do some NV28 specific extra stuff */
-		//fixme: NV28 only??
-		if (si->ps.card_type == NV28)
-		{
-			/* setup PTIMER */
-			ACCW(PT_NUMERATOR, (si->ps.std_engine_clock * 20));
-			ACCW(PT_DENOMINATR, 0x00000271);
-
-			/* get NV28 RAM access up and running */
-			//fixme?: works on at least one NV28... how about other cards?
-			NV_REG32(NV32_FB_MRS2) = fb_mrs2;
-			NV_REG32(NV32_FB_MRS1) = fb_mrs1;
 		}
 
 		/* now enable ROM shadow or the card will remain shut-off! */
@@ -780,8 +752,6 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 
 static void log_pll(uint32 reg, uint32 freq)
 {
-	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
-		LOG(8,("INFO: ---WARNING: check/update PLL programming script code!!!\n"));
 	switch (reg)
 	{
 	case NV32_MEMPLL:
@@ -1421,15 +1391,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			*adress += 1;
 			LOG(8,("cmd 'setup RAM config' (always done)\n"));
 			/* always done */
-			switch (si->ps.card_type)
-			{
-			case NV28:
-				setup_ram_config_nv28(rom);
-				break;
-			default:
-				setup_ram_config_nv10_up(rom);
-				break;
-			}
+			setup_ram_config_nv10_up(rom);
 			break;
 		case 0x65: /* identical to type1 */
 			*size -= 13;
@@ -1948,57 +1910,6 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	}
 }
 
-/* Note: this routine assumes at least 128Mb was mapped to memory (kerneldriver).
- * It doesn't matter if the card actually _has_ this amount of RAM or not(!) */
-static void	setup_ram_config_nv28(uint8* rom)
-{
-	/* note:
-	 * After writing data to RAM a snooze is required to make the test work.
-	 * Confirmed a NV11: without snooze it worked OK on a low-voltage AGP2.0 slot,
-	 * but on a higher-voltage AGP 1.0 slot it failed to identify errors correctly!!
-	 * Adding the snooze fixed that. */
-
-	uint32 dummy;
-	uint8 cnt = 0;
-	status_t stat = B_ERROR;
-
-	/* set 'refctrl is valid' */
-	NV_REG32(NV32_PFB_REFCTRL) = 0x80000000;
-
-	/* check RAM */
-	while ((cnt < 4) && (stat != B_OK))
-	{
-		/* set bit 11: 'pulse' something into a new setting? */
-		NV_REG32(NV32_PFB_CONFIG_0) |= 0x00000800;
-		/* write testpattern to RAM adress 127Mb */
-		((volatile uint32 *)si->framebuffer)[0x01fc0000] = 0x4e564441;
-		snooze(10);
-		/* reset first RAM adress */
-		((volatile uint32 *)si->framebuffer)[0x00000000] = 0x00000000;
-		snooze(10);
-		/* dummyread first RAM adress four times */
-		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
-		LOG(8,("INFO: (#%d) dummy1 = $%08x, ", cnt, dummy));
-		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
-		LOG(8,("dummy2 = $%08x, ", dummy));
-		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
-		LOG(8,("dummy3 = $%08x, ", dummy));
-		dummy = ((volatile uint32 *)si->framebuffer)[0x00000000];
-		LOG(8,("dummy4 = $%08x\n", dummy));
-		/* check testpattern to have survived */
-		if (((volatile uint32 *)si->framebuffer)[0x01fc0000] == 0x4e564441) stat = B_OK;
-		cnt++;
-	}
-
-	/* clear bit 11: set normal mode */
-	NV_REG32(NV32_PFB_CONFIG_0) &= ~0x00000800;
-
-	if (stat == B_OK)
-		LOG(8,("INFO: ---RAM test done: access was OK within %d iteration(s).\n", cnt));
-	else
-		LOG(8,("INFO: ---RAM test done: access was still not OK after 4 iterations.\n"));
-}
-
 static status_t translate_ISA_PCI(uint32* reg)
 {
 	switch (*reg)
@@ -2103,25 +2014,18 @@ void set_specs(void)
 	/* set failsave speeds */
 	switch (si->ps.card_arch)
 	{
-	case NV20A:
-		pinsnv20_arch_fake();
-		break;
-	case NV30A:
 	case NV40A:
 		pinsnv30_arch_fake();
 		break;
 	default:
 		/* 'failsafe' values... */
-		pinsnv20_arch_fake();
+		pinsnv30_arch_fake();
 		break;
 	}
 
 	/* detect reference crystal frequency and dualhead */
 	switch (si->ps.card_arch)
 	{
-	case NV04A:
-		getstrap_arch_nv4();
-		break;
 	default:
 		getstrap_arch_nv10_20_30_40();
 		break;
@@ -2136,9 +2040,6 @@ void fake_panel_start(void)
 	/* detect RAM amount */
 	switch (si->ps.card_arch)
 	{
-	case NV04A:
-		getRAMsize_arch_nv4();
-		break;
 	default:
 		getRAMsize_arch_nv10_20_30_40();
 		break;
@@ -2566,15 +2467,6 @@ static void setup_output_matrix()
 			//Also: it looks as if each pixelclock PLL can select different CRTC's
 			//as well now via a new register: one PLL can be driving both CRTC's
 			//and there's nothing we can do about that (yet). (DVI/dualhead trouble)
-			if (si->ps.card_arch < NV40A)
-			{
-				LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
-				/* head 2 takes precedence because it has a digital panel while
-				 * head 1 has not. */
-				LOG(2,("INFO: defaulting to head 2 for primary use.\n"));
-				si->ps.crtc2_prim = true;
-				break;
-			}
 		default: /* more than two monitors connected to just two outputs: illegal! */
 			LOG(2,("INFO: illegal monitor setup ($%02x):\n", si->ps.monitors));
 			LOG(2,("INFO: defaulting to head 1 for primary use.\n"));
@@ -2626,57 +2518,10 @@ void get_panel_modes(display_mode *p1, display_mode *p2, bool *pan1, bool *pan2)
 		*pan2 = false;
 }
 
-static void pinsnv20_arch_fake(void)
-{
-	/* we have a standard PLL */
-	si->ps.ext_pll = false;
-	/* carefull not to take to high limits, and high should be >= 2x low. */
-	si->ps.max_system_vco = 350;
-	si->ps.min_system_vco = 128;
-	si->ps.max_pixel_vco = 350;
-	si->ps.min_pixel_vco = 128;
-	si->ps.max_video_vco = 350;
-	si->ps.min_video_vco = 128;
-	si->ps.max_dac1_clock = 350;
-	si->ps.max_dac1_clock_8 = 350;
-	si->ps.max_dac1_clock_16 = 350;
-	/* 'failsave' values */
-	si->ps.max_dac1_clock_24 = 320;
-	si->ps.max_dac1_clock_32 = 280;
-	si->ps.max_dac1_clock_32dh = 250;
-	/* secondary head */
-	/* GeForce4 cards have dual integrated DACs with identical capaability */
-	/* (called nview technology) */
-	si->ps.max_dac2_clock = 350;
-	si->ps.max_dac2_clock_8 = 350;
-	si->ps.max_dac2_clock_16 = 350;
-	/* 'failsave' values */
-	si->ps.max_dac2_clock_24 = 320;
-	si->ps.max_dac2_clock_32 = 280;
-	si->ps.max_dac2_clock_32dh = 250;
-	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
-	si->ps.primary_dvi = false;
-	si->ps.secondary_dvi = false;
-	/* not used (yet) because no coldstart will be attempted (yet) */
-	si->ps.std_engine_clock = 175;
-	si->ps.std_memory_clock = 200;
-}
-
 static void pinsnv30_arch_fake(void)
 {
-	/* determine PLL type */
-	if ((si->ps.card_type == NV31) ||
-		(si->ps.card_type == NV36) ||
-		(si->ps.card_type >= NV40))
-	{
-		/* we have a extended PLL */
-		si->ps.ext_pll = true;
-	}
-	else
-	{
-		/* we have a standard PLL */
-		si->ps.ext_pll = false;
-	}
+	/* we have a extended PLL */
+	si->ps.ext_pll = true;
 	/* carefull not to take to high limits, and high should be >= 2x low. */
 	si->ps.max_system_vco = 350;
 	si->ps.min_system_vco = 128;
@@ -2717,53 +2562,6 @@ static void pinsnv30_arch_fake(void)
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 190;
 	si->ps.std_memory_clock = 190;
-}
-
-static void getRAMsize_arch_nv4(void)
-{
-	uint32 strapinfo = NV_REG32(NV32_NV4STRAPINFO);
-
-	if (strapinfo & 0x00000100)
-	{
-		/* Unified memory architecture used */
-		si->ps.memory_size = 1024 * 1024 *
-			((((strapinfo & 0x0000f000) >> 12) * 2) + 2);
-
-		LOG(8,("INFO: NV4 architecture chip with UMA detected\n"));
-	}
-	else
-	{
-		/* private memory architecture used */
-		switch (strapinfo & 0x00000003)
-		{
-		case 0:
-			si->ps.memory_size = 32 * 1024 * 1024;
-			break;
-		case 1:
-			si->ps.memory_size = 4 * 1024 * 1024;
-			break;
-		case 2:
-			si->ps.memory_size = 8 * 1024 * 1024;
-			break;
-		case 3:
-			si->ps.memory_size = 16 * 1024 * 1024;
-			break;
-		}
-	}
-}
-
-static void getstrap_arch_nv4(void)
-{
-	uint32 strapinfo = NV_REG32(NV32_NVSTRAPINFO2);
-
-	/* determine PLL reference crystal frequency */
-	if (strapinfo & 0x00000040)
-		si->ps.f_ref = 14.31818;
-	else
-		si->ps.f_ref = 13.50000;
-
-	/* these cards are always singlehead */
-	si->ps.secondary_head = false;
 }
 
 static void getRAMsize_arch_nv10_20_30_40(void)
@@ -2823,25 +2621,10 @@ static void getRAMsize_arch_nv10_20_30_40(void)
 
 static void getstrap_arch_nv10_20_30_40(void)
 {
-	uint32 dev_manID = CFGR(DEVID);
 	uint32 strapinfo = NV_REG32(NV32_NVSTRAPINFO2);
 
-	/* determine if we have a dualhead card */
-	si->ps.secondary_head = false;
-	switch (si->ps.card_type)
-	{
-	case NV20:
-		break;
-	default:
-		if ((dev_manID & 0xfff0ffff) == 0x01a010de)
-		{
-			/* this is a singlehead NV11! */
-		}
-		else
-		{
-			si->ps.secondary_head = true;
-		}
-	}
+	/* all cards are dualhead cards these days */
+	si->ps.secondary_head = true;
 
 	/* determine PLL reference crystal frequency: three types are used... */
 	if (strapinfo & 0x00000040)
