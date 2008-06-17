@@ -75,15 +75,15 @@ class AboutView : public BView {
 	public:
 				AboutView(const BRect &r);
 				~AboutView(void);
-				
+
 		virtual void AttachedToWindow();
 		virtual void Pulse();
-		
+
 		virtual void FrameResized(float width, float height);
 		virtual void Draw(BRect update);
 		virtual void MessageReceived(BMessage *msg);
 		virtual void MouseDown(BPoint pt);
-		
+
 		void	AddCopyrightEntry(const char *name, const char *text,
 					const Licenses& licenses, const char *url);
 		void	AddCopyrightEntry(const char *name, const char *text,
@@ -98,11 +98,11 @@ class AboutView : public BView {
 		BStringView		*fUptimeView;
 		BView			*fInfoView;
 		HyperTextView	*fCreditsView;
-		
+
 		BBitmap			*fLogo;
-		
+
 		BPoint			fDrawPoint;
-		
+
 		bigtime_t		fLastActionTime;
 		BMessageRunner	*fScrollRunner;
 		BQuery			fAppsQuery;
@@ -124,12 +124,12 @@ AboutApp::AboutApp(void)
 
 
 AboutWindow::AboutWindow()
-	: BWindow(BRect(0, 0, 500, 300), "About This System", B_TITLED_WINDOW, 
+	: BWindow(BRect(0, 0, 500, 300), "About This System", B_TITLED_WINDOW,
 			B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	AboutView *view = new AboutView(Bounds());
 	AddChild(view);
-	
+
 	// start reading from the app query
 	BMessage msg(READ_APP_QUERY_ENT);
 	BMessenger msgr(view);
@@ -238,18 +238,16 @@ AboutView::AboutView(const BRect &rect)
 	stringView->ResizeToPreferred();
 
 	// GCC version
+#ifdef __GNUC__ != 2
 	r.OffsetBy(0, textHeight);
 	r.bottom = r.top + textHeight;
-	
-	strlcpy(string, "Compiler version: ", sizeof(string));
-#ifdef __GNUC__
-	strlcat(string, "GCC ", sizeof(string));
-#endif
-	strlcat(string, __VERSION__, sizeof(string));
+
+	snprintf(string, sizeof(string), "GCC %d", __GNUC__);
 
 	stringView = new BStringView(r, "gcctext", string);
 	fInfoView->AddChild(stringView);
 	stringView->ResizeToPreferred();
+#endif
 
 	// CPU count, type and clock speed
 	r.OffsetBy(0, textHeight * 1.5);
@@ -266,7 +264,7 @@ AboutView::AboutView(const BRect &rect)
 	stringView->ResizeToPreferred();
 
 	BString cpuType;
-	cpuType << get_cpu_vendor_string(systemInfo.cpu_type) 
+	cpuType << get_cpu_vendor_string(systemInfo.cpu_type)
 		<< " " << get_cpu_model_string(&systemInfo);
 
 	r.OffsetBy(0, labelHeight);
@@ -337,7 +335,7 @@ AboutView::AboutView(const BRect &rect)
 	// string width changes, so we don't do ResizeToPreferred()
 
 	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
-	
+
 	// Begin construction of the credits view
 	r = Bounds();
 	r.left += fInfoView->Bounds().right + 1;
@@ -563,96 +561,96 @@ AboutView::AboutView(const BRect &rect)
 		"http://www.netbsd.org");
 
 	// FFMpeg copyrights
-	AddCopyrightEntry("FFMpeg libavcodec", 
-		"Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.", 
+	AddCopyrightEntry("FFMpeg libavcodec",
+		"Copyright " B_UTF8_COPYRIGHT " 2000-2007 Fabrice Bellard, et al.",
 		"http://www.ffmpeg.org");
 
 	// AGG copyrights
-	AddCopyrightEntry("AntiGrain Geometry", 
-		"Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).", 
+	AddCopyrightEntry("AntiGrain Geometry",
+		"Copyright " B_UTF8_COPYRIGHT " 2002-2006 Maxim Shemanarev (McSeem).",
 		"http://www.antigrain.com");
 
 	// PDFLib copyrights
-	AddCopyrightEntry("PDFLib", 
+	AddCopyrightEntry("PDFLib",
 		"Copyright " B_UTF8_COPYRIGHT " 1997-2006 PDFlib GmbH and Thomas Merz. "
 		"All rights reserved.\n"
-		"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.", 
+		"PDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.",
 		"http://www.pdflib.com");
 
 	// FreeType copyrights
-	AddCopyrightEntry("FreeType2", 
+	AddCopyrightEntry("FreeType2",
 		"Portions of this software are copyright " B_UTF8_COPYRIGHT " 1996-2006 "
-		"The FreeType Project.  All rights reserved.", 
+		"The FreeType Project.  All rights reserved.",
 		"http://www.freetype.org");
 
 	// Mesa3D (http://www.mesa3d.org) copyrights
-	AddCopyrightEntry("Mesa", 
+	AddCopyrightEntry("Mesa",
 		"Copyright " B_UTF8_COPYRIGHT " 1999-2006 Brian Paul. "
-		"Mesa3D project.  All rights reserved.", 
+		"Mesa3D project.  All rights reserved.",
 		"http://www.mesa3d.org");
 
 	// SGI's GLU implementation copyrights
-	AddCopyrightEntry("GLU", 
+	AddCopyrightEntry("GLU",
 		"Copyright " B_UTF8_COPYRIGHT " 1991-2000 Silicon Graphics, Inc. "
 		"SGI's Software FreeB license.  All rights reserved.");
 
 	// GLUT implementation copyrights
-	AddCopyrightEntry("GLUT", 
+	AddCopyrightEntry("GLUT",
 		"Copyright " B_UTF8_COPYRIGHT " 1994-1997 Mark Kilgard. "
 		"All rights reserved.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1997 Be Inc.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1999 Jake Hamby.");
 
 	// OpenGroup & DEC (BRegion backend) copyright
-	AddCopyrightEntry("BRegion backend (XFree86)", 
+	AddCopyrightEntry("BRegion backend (XFree86)",
 		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988, 1998  The Open Group.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 1987, 1988 Digital Equipment "
 		"Corporation, Maynard, Massachusetts.\n"
 		"All rights reserved.");
 
 	// Konatu font
-	AddCopyrightEntry("Konatu font", 
+	AddCopyrightEntry("Konatu font",
 		"Copyright " B_UTF8_COPYRIGHT " 2002- MASUDA mitiya.\n"
 		"MIT license. All rights reserved.");
 
 	// expat copyrights
-	AddCopyrightEntry("expat", 
+	AddCopyrightEntry("expat",
 		"Copyright " B_UTF8_COPYRIGHT " 1998, 1999, 2000 Thai Open Source "
 		"Software Center Ltd and Clark Cooper.\n"
 		"Copyright " B_UTF8_COPYRIGHT " 2001, 2002, 2003 Expat maintainers.");
 
 	// zlib copyrights
-	AddCopyrightEntry("zlib", 
+	AddCopyrightEntry("zlib",
 		"Copyright " B_UTF8_COPYRIGHT " 1995-2004 Jean-loup Gailly and Mark "
 		"Adler.");
 
 	// zip copyrights
-	AddCopyrightEntry("Info-ZIP", 
+	AddCopyrightEntry("Info-ZIP",
 		"Copyright " B_UTF8_COPYRIGHT " 1990-2002 Info-ZIP. All rights reserved.");
 
 	// bzip2 copyrights
-	AddCopyrightEntry("bzip2", 
+	AddCopyrightEntry("bzip2",
 		"Copyright " B_UTF8_COPYRIGHT " 1996-2005 Julian R Seward. All rights "
 		"reserved.");
 
 	// VIM copyrights
-	AddCopyrightEntry("Vi IMproved", 
+	AddCopyrightEntry("Vi IMproved",
 		"Copyright " B_UTF8_COPYRIGHT " Bram Moolenaar et al.");
 
 	// lp_solve copyrights
-	AddCopyrightEntry("lp_solve", 
+	AddCopyrightEntry("lp_solve",
 		"Copyright " B_UTF8_COPYRIGHT
 			" Michel Berkelaar, Kjell Eikland, Peter Notebaert",
 		"http://lpsolve.sourceforge.net/");
 			// license: LGPL
 
 	// OpenEXR copyrights
-	AddCopyrightEntry("OpenEXR", 
+	AddCopyrightEntry("OpenEXR",
 		"Copyright " B_UTF8_COPYRIGHT " 2002-2005 Industrial Light & Magic, "
 		"a division of Lucas Digital Ltd. LLC.");
-		
+
 	// Bullet copyrights
-	AddCopyrightEntry("Bullet", 
+	AddCopyrightEntry("Bullet",
 		"Copyright " B_UTF8_COPYRIGHT " 2003-2008 Erwin Coumans",
 		"http://www.bulletphysics.com");
 
@@ -660,7 +658,7 @@ AboutView::AboutView(const BRect &rect)
 	AddCopyrightEntry("atftp",
 		"Copyright " B_UTF8_COPYRIGHT " 2000 Jean-Pierre Lefebvre and Remi "
 		"Lefebvre");
- 
+
 	// Netcat copyrights
 	AddCopyrightEntry("Netcat",
 		"Copyright " B_UTF8_COPYRIGHT " 1996 Hobbit");
@@ -721,7 +719,7 @@ AboutView::AboutView(const BRect &rect)
 	// The Tcpdump Group
 	AddCopyrightEntry("The Tcpdump Group",
 		"tcpdump, libpcap",
-		"http://www.tcpdump.org");	     
+		"http://www.tcpdump.org");
 
 	// Matroska
 	AddCopyrightEntry("libmatroska",
@@ -733,14 +731,14 @@ AboutView::AboutView(const BRect &rect)
 //	AddCopyrightEntry("OpenSound",
 //		"Copyright " B_UTF8_COPYRIGHT " 1996-2008 4Front Technologies ",
 //		"http://www.opensound.com");
-// BSD license		
+// BSD license
 
 	_AddCopyrightsFromAttribute();
 
-	// Build a list of installed applications and show their 
+	// Build a list of installed applications and show their
 	// long version info. Well-behaved apps usually give
 	// copyright info there.
-	
+
 	font.SetSize(be_bold_font->Size() + 4);
 	font.SetFace(B_BOLD_FACE);
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuGreen);
@@ -780,7 +778,7 @@ AboutView::MouseDown(BPoint pt)
 		printf("Easter Egg\n");
 		PickRandomHaiku();
 	}
-	
+
 	if (Bounds().Contains(pt)) {
 		fLastActionTime = system_time();
 		delete fScrollRunner;
@@ -812,10 +810,10 @@ AboutView::Pulse(void)
 {
 	char string[255];
 	system_info info;
-	get_system_info(&info);	
+	get_system_info(&info);
 	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
 	fMemView->SetText(MemUsageToString(string, sizeof(string), &info));
-	
+
 	if (fScrollRunner == NULL && (system_time() > fLastActionTime + 10000000)) {
 		BMessage message(SCROLL_CREDITS_VIEW);
 		//fScrollRunner = new BMessageRunner(this, &message, 300000, -1);
@@ -836,10 +834,10 @@ AboutView::MessageReceived(BMessage *msg)
 			scrollBar->GetRange(&min, &max);
 			if (scrollBar->Value() < max)
 				fCreditsView->ScrollBy(0, 5);
-			
+
 			break;
 		}
-		
+
 		case READ_APP_QUERY_ENT:
 		{
 			BEntry ent;
@@ -850,7 +848,7 @@ AboutView::MessageReceived(BMessage *msg)
 			}
 			BFile file;
 			BPath path;
-			if (ent.Exists() && 
+			if (ent.Exists() &&
 				ent.GetPath(&path) >= B_OK &&
 				file.SetTo(&ent, B_READ_ONLY) >= B_OK) {
 				/* filter only apps */
@@ -858,8 +856,8 @@ AboutView::MessageReceived(BMessage *msg)
 					BAppFileInfo appFileInfo(&file);
 					uint32 flags;
 					version_info version;
-					if (appFileInfo.InitCheck() >= B_OK && 
-						appFileInfo.GetAppFlags(&flags) >= B_OK && 
+					if (appFileInfo.InitCheck() >= B_OK &&
+						appFileInfo.GetAppFlags(&flags) >= B_OK &&
 						appFileInfo.GetVersionInfo(&version,
 							B_APP_VERSION_KIND) >= B_OK) {
 						//printf("AppFileInfo for %s :\n", path.Path());
@@ -867,7 +865,7 @@ AboutView::MessageReceived(BMessage *msg)
 						BString name;
 						BString info;
 						name << path.Leaf();
-						if (strlen(version.short_info) && 
+						if (strlen(version.short_info) &&
 							strcmp(version.short_info, path.Leaf()))
 							name << " (" << version.short_info << ")";
 						/*
@@ -885,7 +883,7 @@ AboutView::MessageReceived(BMessage *msg)
 						*/
 						info << version.long_info;
 						AddCopyrightEntry(name.String(), info.String());
-						
+
 					}
 				}
 			}
@@ -894,7 +892,7 @@ AboutView::MessageReceived(BMessage *msg)
 			BMessenger(this).SendMessage(&m);
 			break;
 		}
-		
+
 		default:
 			BView::MessageReceived(msg);
 			break;
@@ -1121,11 +1119,11 @@ AboutView::_AddCopyrightsFromAttribute()
 static const char *
 MemUsageToString(char string[], size_t size, system_info *info)
 {
-	snprintf(string, size, "%d MB total, %d MB used (%d%%)", 
+	snprintf(string, size, "%d MB total, %d MB used (%d%%)",
 			int(info->max_pages / 256.0f + 0.5f),
 			int(info->used_pages / 256.0f + 0.5f),
 			int(100 * info->used_pages / info->max_pages));
-	
+
 	return string;
 }
 
@@ -1154,20 +1152,20 @@ UptimeToString(char string[], size_t size)
 	if (hours) {
 		str += snprintf(str, size - strlen(string), "%s%lld hour%s",
 				str != string ? ", " : "",
-				hours, hours > 1 ? "s" : "");	
+				hours, hours > 1 ? "s" : "");
 	}
 	if (minutes) {
 		str += snprintf(str, size - strlen(string), "%s%lld minute%s",
 				str != string ? ", " : "",
-				minutes, minutes > 1 ? "s" : "");	
+				minutes, minutes > 1 ? "s" : "");
 	}
-	
+
 	if (seconds || str == string) {
 		// Haiku would be well-known to boot very fast.
-		// Let's be ready to handle below minute uptime, zero second included ;-)  
+		// Let's be ready to handle below minute uptime, zero second included ;-)
 		str += snprintf(str, size - strlen(string), "%s%lld second%s",
 				str != string ? ", " : "",
-				seconds, seconds > 1 ? "s" : "");	
+				seconds, seconds > 1 ? "s" : "");
 	}
 
 	return string;
