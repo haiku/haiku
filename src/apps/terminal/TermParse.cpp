@@ -673,13 +673,15 @@ TermParse::EscParse()
 
 			case CASE_SET:
 				/* SET */
-				fBuffer->SetInsertMode(MODE_INSERT);
+				if (param[0] == 4)
+					fBuffer->SetInsertMode(MODE_INSERT);
 				parsestate = groundtable;
 				break;
 
 			case CASE_RST:
 				/* RST */
-				fBuffer->SetInsertMode(MODE_OVER);
+				if (param[0] == 4)
+					fBuffer->SetInsertMode(MODE_OVER);
 				parsestate = groundtable;
 				break;
 
