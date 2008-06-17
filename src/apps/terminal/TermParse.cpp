@@ -834,7 +834,10 @@ TermParse::EscParse()
 
 				case CASE_RI:
 					/* RI */
-					fBuffer->ScrollBy(-1);
+					if (fBuffer->Cursor().y == 0)
+						fBuffer->ScrollBy(-1);
+					else
+						fBuffer->MoveCursorUp(1);
 					parsestate = groundtable;
 					break;
 
