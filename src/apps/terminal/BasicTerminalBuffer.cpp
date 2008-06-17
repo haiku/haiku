@@ -629,9 +629,38 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 
 
 void
+BasicTerminalBuffer::EraseAbove()
+{
+	// Clear the preceding lines.
+	if (fCursor.y > 0)
+		_ClearLines(0, fCursor.y - 1);
+
+	// Delete the chars on the cursor line before (and including) the cursor.
+	TerminalLine* line = _LineAt(fCursor.y);
+	if (fCursor.x < line->length) {
+		int32 to = fCursor.x;
+		if (IS_WIDTH(line->cells[fCursor.x].attributes))
+			to++;
+		for (int32 i = 0; i <= to; i++) {
+			line->cells[i].attributes = 0;
+			line->cells[i].character = kSpaceChar;
+		}
+	} else
+		line->Clear();
+
+	_Invalidate(fCursor.y, fCursor.y);
+}
+
+
+void
 BasicTerminalBuffer::EraseBelow()
 {
-	_Scroll(fCursor.y, fHeight - 1, fHeight);
+	// Clear the following lines.
+	if (fCursor.y < fHeight - 1)
+		_ClearLines(fCursor.y + 1, fHeight - 1);
+
+	// Delete the chars on the cursor line after (and including) the cursor.
+	DeleteColumns();
 }
 
 
@@ -1146,6 +1175,14 @@ BasicTerminalBuffer::_Scroll(int32 top, int32 bottom, int32 numLines)
 
 			// invalidate new empty lines
 			_Invalidate(bottom + 1 - numLines, bottom);
+
+			// In case only part of the screen was scrolled, we invalidate also
+			// the lines below the scroll region. Those remain unchanged, but
+			// we can't convey that they have not been scrolled via
+			// TerminalBufferDirtyInfo. So we need to force the view to sync
+			// them again.
+			if (bottom < fHeight - 1)
+				_Invalidate(bottom + 1, fHeight - 1);
 		} else if (numLines >= bottom - top + 1) {
 			// all lines are completely scrolled out of range -- just clear
 			// them

@@ -630,11 +630,12 @@ TermParse::EscParse()
 						break;
 
 					case 1:
+						fBuffer->EraseAbove();
 						break;
 
 					case 2:
-						fBuffer->SetCursor(0, 0);
 						fBuffer->EraseBelow();
+						fBuffer->EraseAbove();
 						break;
 				}
 				parsestate = groundtable;
