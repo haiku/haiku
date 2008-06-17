@@ -1,3 +1,4 @@
 SubDir HAIKU_TOP src add-ons input_server methods ;
 
 SubInclude HAIKU_TOP src add-ons input_server methods canna ;
+SubInclude HAIKU_TOP src add-ons input_server methods t9 ;

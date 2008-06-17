@@ -127,7 +127,7 @@ T9InputServerMethod::~T9InputServerMethod()
 
 filter_result T9InputServerMethod::Filter(BMessage *message, BList *outList)
 {
-	status_t err;
+	//status_t err;
 	filter_result res = B_DISPATCH_MESSAGE;
 	bool keyUp = false;
 	BString bytes;

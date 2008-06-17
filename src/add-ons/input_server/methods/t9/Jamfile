@@ -1,0 +1,17 @@
+SubDir HAIKU_TOP src add-ons input_server methods t9 ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders interface ;
+
+SubDirSysHdrs $(SUBDIR) ;
+SubDirHdrs [ FDirName $(SUBDIR) t9 ] ;
+
+if $(TARGET_PLATFORM) != haiku {
+	SubDirC++Flags -fmultiple-symbol-spaces ;
+}
+
+Addon t9 : 
+	T9InputServerMethod.cpp
+	: be textencoding input_server ;
+
