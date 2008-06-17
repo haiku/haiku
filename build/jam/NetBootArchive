@@ -42,7 +42,7 @@ AddFilesToNetBootArchive beos system add-ons kernel console : vga_text ;
 AddFilesToNetBootArchive beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToNetBootArchive beos system add-ons kernel generic
-	: block_io fast_log ide_adapter locked_pool scsi_periph ;
+	: block_io ide_adapter locked_pool scsi_periph ;
 AddFilesToNetBootArchive beos system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToNetBootArchive beos system add-ons kernel interrupt_controllers
@@ -53,8 +53,8 @@ if $(TARGET_ARCH) = x86 {
 }
 
 # drivers
-AddDriversToNetBootArchive disk scsi	: scsi_cd scsi_dsk ;
-#AddDriversToNetBootArchive disk virtual	: nbd ;
+AddDriversToNetBootArchive disk scsi	: scsi_cd scsi_disk ;
+#AddDriversToNetBootArchive disk virtual : nbd ;
 AddDriversToNetBootArchive disk virtual	: remote_disk ;
 AddDriversToNetBootArchive net			: $(BEOS_ADD_ONS_DRIVERS_NET) ;
 
@@ -86,7 +86,7 @@ AddBootModuleSymlinksToNetBootArchive
 	$(BEOS_ADD_ONS_BUS_MANAGERS)
 	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112
 	$(BEOS_ADD_ONS_FILE_SYSTEMS)
-	block_io fast_log ide_adapter locked_pool scsi_periph
+	block_io ide_adapter locked_pool scsi_periph
 	intel session
 	$(PPC_ONLY)openpic
 	$(X86_ONLY)generic_x86
@@ -95,7 +95,7 @@ AddBootModuleSymlinksToNetBootArchive
 	$(BEOS_ADD_ONS_DRIVERS_NET)
 	stack
 	$(BEOS_NETWORK_DEVICES)
-	$(BEOS_NETWORK_DATALINK_PROTOCOLS) 
+	$(BEOS_NETWORK_DATALINK_PROTOCOLS)
 	$(BEOS_NETWORK_PPP)
 	$(BEOS_NETWORK_PROTOCOLS)
 ;

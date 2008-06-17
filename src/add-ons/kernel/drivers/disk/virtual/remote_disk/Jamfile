@@ -1,9 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers disk virtual remote_disk ;
 
-UsePrivateHeaders kernel ;
-UseArchHeaders $(TARGET_ARCH) ;
-UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
-	# TODO: Ugly!
+UsePrivateKernelHeaders ;
+UsePrivateSystemHeaders ;
 
 KernelAddon remote_disk :
 	remote_disk.cpp

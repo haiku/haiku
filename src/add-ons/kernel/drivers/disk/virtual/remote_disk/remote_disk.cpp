@@ -35,10 +35,10 @@ struct RemoteDiskDevice : recursive_lock {
 	bigtime_t		lastInitRetryTime;
 
 	RemoteDiskDevice()
-		: remoteDisk(NULL),
-		  lastInitRetryTime(-1)
+		:
+		remoteDisk(NULL),
+		lastInitRetryTime(-1)
 	{
-		sem = -1;
 	}
 
 	~RemoteDiskDevice()
@@ -236,7 +236,7 @@ remote_disk_control(void* cookie, uint32 op, void* arg, size_t len)
 			*(bool*)arg = true;
 			return B_OK;
 
-		case B_GET_WRITE_STATUS:		
+		case B_GET_WRITE_STATUS:
 			TRACE(("remote_disk: B_GET_WRITE_STATUS\n"));
 			*(bool*)arg = true;
 			return B_OK;
