@@ -144,13 +144,13 @@ int OpenSoundDevice::select_oss_rate(const oss_audioinfo *info, int rate)
 		// else use max available
 		return info->max_rate;
 	}
-	int i;
-	int max_rate;
-	for (i = 0; i < info->nrates; i++) {
-		if (info->rates[i] < info->min_rate || info->rates[i] > info->max_rate)
+	uint32 max_rate = 0;
+	for (uint32 i = 0; i < info->nrates; i++) {
+		if ((int32)info->rates[i] < info->min_rate
+			|| (int32)info->rates[i] > info->max_rate)
 			continue;
 		// if the hint matches
-		if (rate && rate == info->rates[i])
+		if (rate && rate == (int32)info->rates[i])
 			return rate;
 		if (info->rates[i] > max_rate)
 			max_rate = info->rates[i];
@@ -364,7 +364,8 @@ status_t OpenSoundDevice::InitDriver()
 {
 
 	CALLED();
-	PRINT(("OpenSoundDevice::InitDriver: %d engines, %d mixers\n", CountEngines(), CountMixers()));
+	PRINT(("OpenSoundDevice::InitDriver: %ld engines, %ld mixers\n",
+		CountEngines(), CountMixers()));
 	
 	if (CountMixers()) {
 		;//...
