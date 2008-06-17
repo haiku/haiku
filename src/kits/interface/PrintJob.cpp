@@ -38,27 +38,44 @@
  *
  * Summery of R5 spool file:
  *
- * |-------------------------|
- * |    print_file_header    |
- * |-------------------------|
- * |        BMessage         |
- * |-------------------------|
- * |      _page_header_      |
- * |          BPoint         |
- * |          BRect          |
- * |         BPicture        |
- * |-------------------------|
- * |      _page_header_      |
- * |          BPoint         |
- * |          BRect          |
- * |         BPicture        |
- * |-------------------------|
- * |      _page_header_      |
- * |-------------------------|
+ *		|-----------------------------------|
+ *		|         print_file_header         |
+ *		|-----------------------------------|
+ *		|    BMessage print_job_settings    |
+ *		|-----------------------------------|
+ *		|                                   |
+ *		| ********** (first page) ********* |
+ *		| *                               * |
+ *		| *         _page_header_         * |
+ *		| * ----------------------------- * |
+ *		| * |---------------------------| * |
+ *		| * |       BPoint where        | * |
+ *		| * |       BRect bounds        | * |
+ *		| * |       BPicture pic        | * |
+ *		| * |---------------------------| * |
+ *		| * |---------------------------| * |
+ *		| * |       BPoint where        | * |
+ *		| * |       BRect bounds        | * |
+ *		| * |       BPicture pic        | * |
+ *		| * |---------------------------| * |
+ *		| ********************************* |
+ *		|                                   |
+ *		| ********* (second page) ********* |
+ *		| *                               * |
+ *		| *         _page_header_         * |
+ *		| * ----------------------------- * |
+ *		| * |---------------------------| * |
+ *		| * |       BPoint where        | * |
+ *		| * |       BRect bounds        | * |
+ *		| * |       BPicture pic        | * |
+ *		| * |---------------------------| * |
+ *		| ********************************* |
+ *		|-----------------------------------|
  *
  * BeOS R5 print_file_header.version is 1 << 16
  * BeOS R5 print_file_header.first_page is -1
  *
+ * each page can consist of a collection of picture structures
  * remaining pages start at _page_header_.next_page of previous _page_header_
  *
  * See also: "How to Write a BeOS R5 Printer Driver" for description of spool
