@@ -251,10 +251,17 @@ icmp_receive_data(net_buffer *buffer)
 		case ICMP_TYPE_ECHO_REQUEST:
 		{
 			net_domain *domain;
-			if (buffer->interface != NULL)
+			if (buffer->interface != NULL) {
 				domain = buffer->interface->domain;
-			else
+
+				// We only reply to echo requests of our local interface; we
+				// don't reply to broadcast requests
+				if (!domain->address_module->equal_addresses(
+						buffer->interface->address, buffer->destination))
+					break;
+			} else
 				domain = sStackModule->get_domain(buffer->source->sa_family);
+
 			if (domain == NULL || domain->module == NULL)
 				break;
 
