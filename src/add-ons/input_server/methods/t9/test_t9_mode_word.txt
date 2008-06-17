@@ -1,0 +1,22 @@
+test of possible UTF-8 glyphs usable to notify T9 mode like is done on phones (usually "123", "abc", "Abc", "ABC", and the same with some dots on the left implying speed for dictionary modes).
+It's probably simpler to use icons anyway.
+//Abc
+â‰¡Abc
+â‰«Abc
+â‰’Abc
+âˆ´Abc
+âˆµAbc
+âˆ·Abc
+à‚»Abc
+à‹Abc
+âº€Abc
+ã€ƒAbc
+â‰ˆAbc
+=Abc
+#Abc
+"Abc
+'Abc
+*Abc
+ÂµAbc
+.:Abc
+Â¨Abc
