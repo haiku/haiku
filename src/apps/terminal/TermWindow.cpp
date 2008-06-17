@@ -90,6 +90,7 @@ private:
 struct TermWindow::Session {
 	int32					id;
 	BString					name;
+	BString					windowTitle;
 	TermViewContainerView*	containerView;
 
 	Session(int32 id, TermViewContainerView* containerView)
@@ -112,6 +113,12 @@ public:
 	{
 	}
 
+	virtual	void Select(int32 tab)
+	{
+		SmartTabView::Select(tab);
+		fWindow->SessionChanged();
+	}
+
 	virtual	void RemoveAndDeleteTab(int32 index)
 	{
 		fWindow->_RemoveTab(index);
@@ -123,7 +130,10 @@ private:
 
 
 TermWindow::TermWindow(BRect frame, const char* title, Arguments *args)
-	: BWindow(frame, title, B_DOCUMENT_WINDOW, B_CURRENT_WORKSPACE|B_QUIT_ON_WINDOW_CLOSE),
+	:
+	BWindow(frame, title, B_DOCUMENT_WINDOW,
+		B_CURRENT_WORKSPACE | B_QUIT_ON_WINDOW_CLOSE),
+	fInitialTitle(title),
 	fTabView(NULL),
 	fMenubar(NULL),
 	fFilemenu(NULL),
@@ -162,6 +172,29 @@ TermWindow::~TermWindow()
 
 	for (int32 i = 0; Session* session = (Session*)fSessions.ItemAt(i); i++)
 		delete session;
+}
+
+
+void
+TermWindow::SetSessionWindowTitle(TermView* termView, const char* title)
+{
+	int32 index = _IndexOfTermView(termView);
+	if (Session* session = (Session*)fSessions.ItemAt(index)) {
+		session->windowTitle = title;
+		BTab* tab = fTabView->TabAt(index);
+		tab->SetLabel(session->windowTitle.String());
+		if (index == fTabView->Selection())
+			SetTitle(session->windowTitle.String());
+	}
+}
+
+
+void
+TermWindow::SessionChanged()
+{
+	int32 index = fTabView->Selection();
+	if (Session* session = (Session*)fSessions.ItemAt(index))
+		SetTitle(session->windowTitle.String());
 }
 
 
@@ -664,6 +697,7 @@ TermWindow::_AddTab(Arguments *args)
 			containerView, view);
 
 		Session* session = new Session(_NewSessionID(), containerView);
+		session->windowTitle = fInitialTitle;
 		fSessions.AddItem(session);
 
 		BTab *tab = new BTab;
@@ -898,6 +932,6 @@ CustomTermView::NotifyQuit(int32 reason)
 void
 CustomTermView::SetTitle(const char *title)
 {
-	//Window()->SetTitle(title);
+	dynamic_cast<TermWindow*>(Window())->SetSessionWindowTitle(this, title);
 }
 

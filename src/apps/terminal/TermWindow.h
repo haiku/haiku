@@ -51,6 +51,10 @@ public:
 	TermWindow(BRect frame, const char* title, Arguments *args);
 	virtual ~TermWindow();
 
+			void	SetSessionWindowTitle(TermView* termView,
+						const char* title);
+			void	SessionChanged();
+
 protected:
 	virtual void	MessageReceived(BMessage *message);
 	virtual void	WindowActivated(bool);
@@ -79,6 +83,7 @@ private:
 	void			_BuildWindowSizeMenu(BMenu *menu);
 	int32			_NewSessionID();
 
+	BString			fInitialTitle;
 	BList			fSessions;
 	
 	TabView			*fTabView;
