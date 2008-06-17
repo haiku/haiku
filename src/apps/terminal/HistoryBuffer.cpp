@@ -207,7 +207,8 @@ HistoryBuffer::AddEmptyLines(int32 count)
 		= (AttributesRun*)(fBuffer + fBufferAllocationOffset);
 
 	for (int32 i = 0; i < count; i++) {
-		HistoryLine* line = _LineAt(fNextLine++);
+		HistoryLine* line = &fLines[fNextLine];
+		fNextLine = (fNextLine + 1) % fCapacity;
 		line->attributesRuns = attributesRun;
 		line->attributesRunCount = 0;
 		line->byteLength = 0;
