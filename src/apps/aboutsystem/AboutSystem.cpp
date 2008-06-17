@@ -238,7 +238,7 @@ AboutView::AboutView(const BRect &rect)
 	stringView->ResizeToPreferred();
 
 	// GCC version
-#ifdef __GNUC__ != 2
+#if __GNUC__ != 2
 	r.OffsetBy(0, textHeight);
 	r.bottom = r.top + textHeight;
 
