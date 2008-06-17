@@ -21,6 +21,7 @@ struct TerminalBufferDirtyInfo {
 	int32	linesScrolled;			// number of lines added to the history
 	int32	dirtyTop;				// dirty line range
 	int32	dirtyBottom;			//
+	bool	invalidateAll;
 	bool	messageSent;			// listener has been notified
 
 	bool IsDirtyRegionValid() const
@@ -41,6 +42,7 @@ struct TerminalBufferDirtyInfo {
 		linesScrolled = 0;
 		dirtyTop = INT_MAX;
 		dirtyBottom = INT_MIN;
+		invalidateAll = false;
 		messageSent = false;
 	}
 };
@@ -61,11 +63,11 @@ public:
 
 			TerminalBufferDirtyInfo& DirtyInfo()	{ return fDirtyInfo; }
 
-			status_t			ResizeTo(int32 width, int32 height);
-			status_t			ResizeTo(int32 width, int32 height,
+	virtual	status_t			ResizeTo(int32 width, int32 height);
+	virtual	status_t			ResizeTo(int32 width, int32 height,
 									int32 historyCapacity);
 			status_t			SetHistoryCapacity(int32 historyCapacity);
-			void				Clear();
+			void				Clear(bool resetCursor);
 
 			void				SynchronizeWith(
 									const BasicTerminalBuffer* other,
@@ -139,6 +141,7 @@ protected:
 
 	inline	void				_Invalidate(int32 top, int32 bottom);
 	inline	void				_CursorChanged();
+			void				_InvalidateAll();
 
 	static	TerminalLine**		_AllocateLines(int32 width, int32 count);
 	static	void				_FreeLines(TerminalLine** lines, int32 count);
@@ -182,6 +185,7 @@ protected:
 			TermPos				fSavedCursor;
 
 			bool				fOverwriteMode;	// false for insert
+			bool				fAlternateScreenActive;
 
 			int					fEncoding;
 

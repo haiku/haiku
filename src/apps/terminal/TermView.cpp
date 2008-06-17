@@ -710,9 +710,9 @@ TermView::Clear()
 
 	{
 		BAutolock _(fTextBuffer);
-		fTextBuffer->Clear();
+		fTextBuffer->Clear(true);
 	}
-	fVisibleTextBuffer->Clear();
+	fVisibleTextBuffer->Clear(true);
 
 //debug_printf("Invalidate()\n");
 	Invalidate();
@@ -1563,10 +1563,6 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 {
 	TerminalBufferDirtyInfo& info = fTextBuffer->DirtyInfo();
 	int32 linesScrolled = info.linesScrolled;
-	BRect bounds = Bounds();
-	int32 firstVisible = _LineAt(0);
-	int32 lastVisible = _LineAt(bounds.bottom);
-	int32 historySize = fTextBuffer->HistorySize();
 
 //debug_printf("TermView::_SynchronizeWithTextBuffer(): dirty: %ld - %ld, "
 //"scrolled: %ld, visible dirty: %ld - %ld\n", info.dirtyTop, info.dirtyBottom,
@@ -1629,6 +1625,22 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 		fLastSyncTime = now;
 		fScrolledSinceLastSync = 0;
 	}
+
+	// Simple case first -- complete invalidation.
+	if (info.invalidateAll) {
+		Invalidate();
+		_UpdateScrollBarRange();
+		int32 offset = _LineAt(0);
+		fVisibleTextBuffer->SynchronizeWith(fTextBuffer, offset, offset,
+			offset + fTextBuffer->Height() + 2);
+		info.Reset();
+		return;
+	}
+
+	BRect bounds = Bounds();
+	int32 firstVisible = _LineAt(0);
+	int32 lastVisible = _LineAt(bounds.bottom);
+	int32 historySize = fTextBuffer->HistorySize();
 
 	bool doScroll = false;
 	if (linesScrolled > 0) {

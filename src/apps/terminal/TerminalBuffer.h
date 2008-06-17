@@ -28,11 +28,25 @@ public:
 			void				SetTitle(const char* title);
 			void				NotifyQuit(int32 reason);
 
+	virtual	status_t			ResizeTo(int32 width, int32 height);
+	virtual	status_t			ResizeTo(int32 width, int32 height,
+									int32 historyCapacity);
+
+			void				UseAlternateScreenBuffer();
+			void				UseNormalScreenBuffer();
+
 protected:
 	virtual	void				NotifyListener();
 
 private:
+			void				_SwitchScreenBuffer();
+
+private:
 			int					fEncoding;
+
+			TerminalLine**		fAlternateScreen;
+			HistoryBuffer*		fAlternateHistory;
+			int32				fAlternateScreenOffset;
 
 			// listener/dirty region management
 			BMessenger			fListener;

@@ -76,6 +76,8 @@ private:
 	status_t _ReadParserBuffer();
 
 	void _DeviceStatusReport(int n);
+	void _DecPrivateModeSet(int value);
+	void _DecPrivateModeReset(int value);
 
 	int fFd;
 

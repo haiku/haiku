@@ -790,13 +790,15 @@ TermParse::EscParse()
 
 				case CASE_DECSET:
 					/* DECSET */
-					//      dpmodes(term, bitset);
+					for (int i = 0; i < nparam; i++)
+						_DecPrivateModeSet(param[i]);
 					parsestate = groundtable;
 					break;
 
 				case CASE_DECRST:
 					/* DECRST */
-					//      dpmodes(term, bitclr);
+					for (int i = 0; i < nparam; i++)
+						_DecPrivateModeReset(param[i]);
 					parsestate = groundtable;
 					break;
 
@@ -1068,5 +1070,82 @@ TermParse::_DeviceStatusReport(int n)
 			break ;
 		default:
 			return;
+	}
+}
+
+
+void
+TermParse::_DecPrivateModeSet(int value)
+{
+	switch (value) {
+		case 1:
+			// Application Cursor Keys (whatever that means).
+			// Not supported yet.
+			break;
+		case 5:
+			// Reverse Video (inverses colors for the complete screen
+			// -- when followed by normal video, that's shortly flashes the
+			// screen).
+			// Not supported yet.
+			break;
+		case 12:
+			// Start Blinking Cursor.
+			// Not supported yet.
+			break;
+		case 25:
+			// Show Cursor
+			// Not supported yet.
+			break;
+		case 1034:
+			// Interpret "meta" key, sets eighth bit.
+			// Not supported yet.
+			break;
+		case 1049:
+			// Save cursor as in DECSC and use Alternate Screen Buffer, clearing
+			// it first.
+			fBuffer->SaveCursor();
+			fBuffer->UseAlternateScreenBuffer();
+			break;
+	}
+}
+
+
+void
+TermParse::_DecPrivateModeReset(int value)
+{
+	switch (value) {
+		case 1:
+			// Normal Cursor Keys (whatever that means).
+			// Not supported yet.
+			break;
+		case 3:
+			// 80 Column Mode.
+			// Not supported yet.
+			break;
+		case 4:
+			// Jump (Fast) Scroll.
+			// Not supported yet.
+			break;
+		case 5:
+			// Normal Video (Leaves Reverse Video, cf. there).
+			// Not supported yet.
+			break;
+		case 12:
+			// Stop Blinking Cursor.
+			// Not supported yet.
+			break;
+		case 25:
+			// Hide Cursor
+			// Not supported yet.
+			break;
+		case 1034:
+			// Don’t interpret "meta" key.
+			// Not supported yet.
+			break;
+		case 1049:
+			// Use Normal Screen Buffer and restore cursor as in DECRC.
+			fBuffer->RestoreCursor();
+			fBuffer->UseNormalScreenBuffer();
+			break;
 	}
 }

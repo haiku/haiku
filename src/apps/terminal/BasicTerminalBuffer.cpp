@@ -120,6 +120,7 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 	fScreenOffset = 0;
 
 	fOverwriteMode = true;
+	fAlternateScreenActive = false;
 
 	fScreen = _AllocateLines(width, height);
 	if (fScreen == NULL)
@@ -162,12 +163,10 @@ BasicTerminalBuffer::ResizeTo(int32 width, int32 height, int32 historyCapacity)
 	if (width == fWidth && height == fHeight)
 		return SetHistoryCapacity(historyCapacity);
 
-	// TODO: When alternate screen support is implemented, do that only when
-	// not using the alternate screen.
-	if (true)
-		return _ResizeRewrap(width, height, historyCapacity);
+	if (fAlternateScreenActive)
+		return _ResizeSimple(width, height, historyCapacity);
 
-	return _ResizeSimple(width, height, historyCapacity);
+	return _ResizeRewrap(width, height, historyCapacity);
 }
 
 
@@ -179,11 +178,13 @@ BasicTerminalBuffer::SetHistoryCapacity(int32 historyCapacity)
 
 
 void
-BasicTerminalBuffer::Clear()
+BasicTerminalBuffer::Clear(bool resetCursor)
 {
 	fScreenOffset = 0;
 	_ClearLines(0, fHeight - 1);
-	fCursor.SetTo(0, 0);
+
+	if (resetCursor)
+		fCursor.SetTo(0, 0);
 
 	if (fHistory != NULL)
 		fHistory->Clear();
@@ -585,7 +586,8 @@ BasicTerminalBuffer::InsertLF()
 	if (fCursor.y == fScrollBottom) {
 		_Scroll(fScrollTop, fScrollBottom, 1);
 	} else {
-		fCursor.y++;
+		if (fCursor.y < fHeight - 1)
+			fCursor.y++;
 		_CursorChanged();
 	}
 }
@@ -731,7 +733,7 @@ BasicTerminalBuffer::SetCursor(int32 x, int32 y)
 {
 //debug_printf("BasicTerminalBuffer::SetCursor(%d, %d)\n", x, y);
 	x = restrict_value(x, 0, fWidth - 1);
-	y = restrict_value(y, fScrollTop, fScrollBottom);
+	y = restrict_value(y, 0, fHeight - 1);
 	if (x != fCursor.x || y != fCursor.y) {
 		fCursor.x = x;
 		fCursor.y = y;
@@ -773,6 +775,18 @@ BasicTerminalBuffer::NotifyListener()
 
 
 // #pragma mark - private methods
+
+
+void
+BasicTerminalBuffer::_InvalidateAll()
+{
+	fDirtyInfo.invalidateAll = true;
+
+	if (!fDirtyInfo.messageSent) {
+		NotifyListener();
+		fDirtyInfo.messageSent = true;
+	}
+}
 
 
 /* static */ TerminalLine**
