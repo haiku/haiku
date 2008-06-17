@@ -105,10 +105,7 @@ enum {
 	G70,
 	G71,
 	G72,
-	G73,
-	G80,
-	G84,
-	G86
+	G73
 };
 
 /* card_arch in order of date of NV chip design */
