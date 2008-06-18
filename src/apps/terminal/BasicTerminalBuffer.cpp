@@ -941,6 +941,9 @@ BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
 	for (int32 i = endLine - firstLine; i < height; i++)
 		lines[i]->Clear();
 
+	_FreeLines(fScreen, fHeight);
+	fScreen = lines;
+
 	fWidth = width;
 	fHeight = height;
 
@@ -952,8 +955,6 @@ BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
 	if (fCursor.x > width)
 		fCursor.x = width;
 	fCursor.y -= firstLine;
-
-	fScreen = lines;
 
 	return B_OK;
 }
@@ -1123,23 +1124,22 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 	_FreeLines(fScreen, fHeight);
 	delete fHistory;
 
+	fScreen = screen;
+	fHistory = history;
+
 //debug_printf("  cursor: (%ld, %ld) -> (%ld, %ld)\n", fCursor.x, fCursor.y,
 //cursor.x, cursor.y);
 	fCursor.x = cursor.x;
 	fCursor.y = cursor.y;
-//debug_printf("  screen offset: %ld -> %ld\n", fScreenOffset,
-//destScreenOffset % fHistoryCapacity);
+//debug_printf("  screen offset: %ld -> %ld\n", fScreenOffset, destScreenOffset % height);
 	fScreenOffset = destScreenOffset % height;
-//debug_printf("  history size: %ld -> %ld\n", fHistorySize, destTotalLines - fHeight);
-//debug_printf("  height %ld -> %ld\n", fHeight, tempHeight);
+//debug_printf("  height %ld -> %ld\n", fHeight, height);
+//debug_printf("  width %ld -> %ld\n", fWidth, width);
 	fHeight = height;
 	fWidth = width;
 
 	fScrollTop = 0;
 	fScrollBottom = fHeight - 1;
-
-	fScreen = screen;
-	fHistory = history;
 
 	return B_OK;
 }
