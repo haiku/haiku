@@ -440,10 +440,6 @@ copy_reg (char const *src_name, char const *dst_name,
 #endif
 	}
 
-  if (x->ignore_attributes == 0
-  	&& copy_attributes(source_desc, dest_desc) != 0)
-    fprintf(stderr, "%s: could not copy attributes\n", src_name);
-
       /* If not making a sparse file, try to use a more-efficient
 	 buffer size.  */
       if (! make_holes)
@@ -643,6 +639,11 @@ copy_reg (char const *src_name, char const *dst_name,
 	    return_val = false;
 	}
     }
+
+  if (x->ignore_attributes == 0
+        && copy_attributes(source_desc, dest_desc) != 0)
+    fprintf(stderr, "%s: could not copy attributes\n", src_name);
+
 
 close_src_and_dst_desc:
   if (close (dest_desc) < 0)
