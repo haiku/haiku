@@ -1,0 +1,78 @@
+PPD
+
+# translationKeyword only if stand-alone = no *Keyword statements
+"*Default"Keyword ":" StringValue ["/" translationString ].
+"*"Keyword [Option ["/" translationString ]] ":" Value ["/" translationString ].
+"*?"Keyword ":" InvocationValue ["/" translationString ].
+"*Param"Keyword [Option ["/" translationString ]] ":" Value ["/" translationString ].
+
+Line comments start with "*%".
+
+*Include
+
+Keyword = ident.       # ,'.',/
+Option = ident {"." ident}.
+# translationString must not follow SymbolValue!
+# translationString is terminated by ":" if it follows a Option
+# or CR if it follows a Value.
+Value = InvocationValue | QuotedValue | SymbolValue | StringValue | NoValue.
+
+# ps code
+# requires statement with option keyword!
+# Must end with in separate line *End if multiline.
+InvocationValue = '"' printable '"' ["/" translationString ].
+
+# requires statement without an option keyword!
+# *JCL can have an option keyword!
+# Must end with in separate line *End if multiline.
+QuotedValue = '"' literalSubstring '"'.
+
+SymbolValue = "^" printable. # without whitespaces
+
+# In case of translation string it is separated by newline or slash.
+StringValue = printable . # first char must not be " or ^
+
+literalSubstring = { hexadecimalSubstring | char }.
+
+hexadecimalSubstring = "<" { whitespace* hexdigit hexdigit} ">".
+hexdigit = ['0'..'9','a'..'f','A'..'F'].
+
+# No option keyword present. Keyword stands alone.
+NoValue =.
+
+ident = identChar+.
+identChar = [33..126].
+
+printable = printableChar+.
+printableChar = [32..126] | tab | lf | cr. # " belongs not to printableChar!
+
+translationString = literalSubstring. # without lf and cr.
+
+char = [32..255] | tab | lf | cr.
+	
+whitespace= space | tab.
+
+tab=9.
+lf=10.
+cr=13.
+space=32.
+
+max size of MainKeyword = 40 characters
+
+File Structure see 3.8
+
+Standard Option Values:
+True | False | None | Unknown
+
+
+OpenUI Keyword: PickOne | PickMany | Boolean
+CloseUI: Keyword
+Open[Sub]Group: string
+# InstallableOptions is a registered option!
+Close[Sub]Group: string
+
+UIConstraints: keyword1 option1 keyword2 option2
+# option 1 can be omitted see page 57
+
+# Unique name
+ModelName: "text" 

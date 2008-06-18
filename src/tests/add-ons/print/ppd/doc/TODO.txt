@@ -1,0 +1,17 @@
+Scanner/Parser:
+	Handle JCLKeywords correctly.
+	Convert strings according to LanguageEncoding.
+
+PPDConfigView.cpp:
+	Add outline sub items in reverse order
+	Provide UI for single and multiple choice
+	Read settings
+	Write settings
+	Read default settings
+	Revert and OK button
+	Handle constraints
+	
+Integrate to PS driver
+	- Page setup dialog
+	- Job setup dialog
+	- Provide PS driver setup model selection dialog

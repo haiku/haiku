@@ -1,0 +1,13 @@
+SubDir HAIKU_TOP src tests add-ons print ppd parser ;
+
+# SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd model ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd shared ;
+
+StaticLibrary libppdtest.a : 
+	Parser.cpp
+	PPDFile.cpp
+	PPDParser.cpp
+	Scanner.cpp
+;

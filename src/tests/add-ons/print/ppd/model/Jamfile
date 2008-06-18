@@ -1,0 +1,12 @@
+SubDir HAIKU_TOP src tests add-ons print ppd model ;
+
+# SetSubDirSupportedPlatformsBeOSCompatible ;
+
+StaticLibrary libppdtest.a : 
+	PPD.cpp
+	Statement.cpp
+	StatementList.cpp
+	StatementListVisitor.cpp
+	StatementWrapper.cpp
+	Value.cpp
+;

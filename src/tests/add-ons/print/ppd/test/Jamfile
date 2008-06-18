@@ -1,0 +1,24 @@
+SubDir HAIKU_TOP src tests add-ons print ppd test ;
+
+# SetSubDirSupportedPlatformsBeOSCompatible ;
+
+SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd model ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd parser ;
+SubDirHdrs $(HAIKU_TOP) src tests add-ons print ppd ui ;
+
+# TODO convert .rsrc to .rdef
+# AddResources PPDConfig : PPDConfigApplication.rsrc ;
+
+SimpleTest PPDConfig : 
+	PPDConfigApplication.cpp
+	: be root libppdtest.a
+;
+
+SimpleTest PPDTest : 
+	Test.cpp
+	TestParser.cpp
+	TestScanner.cpp
+	: 
+	be root libppdtest.a
+;
+

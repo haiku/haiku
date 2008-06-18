@@ -1,0 +1,6 @@
+SubDir HAIKU_TOP src tests add-ons print ppd ;
+
+SubInclude HAIKU_TOP src tests add-ons print ppd model ;
+SubInclude HAIKU_TOP src tests add-ons print ppd parser ;
+SubInclude HAIKU_TOP src tests add-ons print ppd ui ;
+SubInclude HAIKU_TOP src tests add-ons print ppd test ;

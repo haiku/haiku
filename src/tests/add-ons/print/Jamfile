@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src tests add-ons print ;
 
+# Skip PCL6 as jetlib.h is not in repository any more
+# TODO if there are no license issues add it to directory "pcl6"
+#SubInclude HAIKU_TOP src tests add-ons print pcl6 ;
 SubInclude HAIKU_TOP src tests add-ons print pdf ;
-SubInclude HAIKU_TOP src tests add-ons print pcl6 ;
+SubInclude HAIKU_TOP src tests add-ons print ppd ;
 SubInclude HAIKU_TOP src tests add-ons print transports ;
