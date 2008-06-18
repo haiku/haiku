@@ -44,6 +44,10 @@ public:
 	void InquiryResult(uint8* numberOfResponses, BMessage* request);
 	void InquiryComplete(uint8* status, BMessage* request);
 	void RemoteNameRequestComplete(struct hci_remote_name_request_complete_reply* remotename, BMessage* request);
+	
+	// Connection
+	void ConnectionComplete(struct hci_ev_conn_complete* event, BMessage* request);
+	void PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request);
 };
 
 #endif

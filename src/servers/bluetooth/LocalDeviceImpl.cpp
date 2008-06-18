@@ -16,6 +16,8 @@
 #include <bluetooth/HCI/btHCI_event.h>
 
 #include <bluetoothserver_p.h>
+#include <ConnectionIncoming.h>
+#include <PincodeWindow.h>
 
 #include <stdio.h>
 
@@ -78,6 +80,16 @@ printf("### \n");
 	
 			break;
 
+			case HCI_EVENT_CONN_COMPLETE:
+				ConnectionComplete((struct hci_ev_conn_complete*)(event+1), NULL); // should belong to a request?
+	
+			break;
+
+			case HCI_EVENT_PIN_CODE_REQ:
+				PinCodeRequest((struct hci_ev_pin_code_req*)(event+1), NULL);
+			break;
+
+
    			default:
    				// lets go on
    			break;        
@@ -111,17 +123,15 @@ printf("### \n");
 	// we are waiting for a reply
 	switch (event->ecode) {
 		case HCI_EVENT_INQUIRY_COMPLETE:
-    		InquiryComplete((uint8*)(event+1), request);		
+    		InquiryComplete((uint8*)(event+1), request);
     	break;
     	
     	case HCI_EVENT_INQUIRY_RESULT:
     		InquiryResult((uint8*)(event+1), request);
 		break;
- 	
-		case HCI_EVENT_CONN_COMPLETE:
-		break;
- 	 	
+
 		case HCI_EVENT_DISCONNECTION_COMPLETE:
+
 		break;
  	
 		case HCI_EVENT_AUTH_COMPLETE:
@@ -171,10 +181,7 @@ printf("### \n");
  	
 		case HCI_EVENT_RETURN_LINK_KEYS:
 		break;
- 	
-		case HCI_EVENT_PIN_CODE_REQ:
-		break;
- 	
+
 		case HCI_EVENT_LINK_KEY_REQ:
 		break;
  	
@@ -239,70 +246,67 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
 	if (request->IsSourceWaiting() == false)
 		Output::Instance()->Post("Nobody waiting for the event\n", BLACKBOARD_KIT);                	
-    
-    
+ 
     switch (opcodeExpected) {
-        
+
         case PACK_OPCODE(OGF_INFORMATIONAL_PARAM, OCF_READ_BD_ADDR):
-        {    
+        {
         	struct hci_rp_read_bd_addr* readbdaddr = (struct hci_rp_read_bd_addr*)(event+1);
-        	       	
+
             if (readbdaddr->status == BT_OK) {
-                
-                                
-                reply.AddData("bdaddr", B_ANY_TYPE, &readbdaddr->bdaddr, sizeof(bdaddr_t));     
+
+                reply.AddData("bdaddr", B_ANY_TYPE, &readbdaddr->bdaddr, sizeof(bdaddr_t));
                 reply.AddInt32("status", readbdaddr->status);
 
-                printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
+                printf("Sending reply ... %ld\n",request->SendReply(&reply));
                 reply.PrintToStream();
 
-                
 			    Output::Instance()->Post("Positive reply for getAdress\n", BLACKBOARD_KIT);
 
             } else {
                 reply.AddInt8("status", readbdaddr->status); 
-                request->SendReply(&reply);    
-			    Output::Instance()->Post("Negative reply for getAdress\n", BLACKBOARD_KIT);                
+                request->SendReply(&reply);
+			    Output::Instance()->Post("Negative reply for getAdress\n", BLACKBOARD_KIT);
             }
 
- 			// This request is not genna be used anymore                       
+ 			// This request is not genna be used anymore
             ClearWantedEvent(request);
-     	}       
+     	}
         break;
 
         case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_READ_LOCAL_NAME):
-        {    
+        {
         	struct hci_rp_read_local_name* readLocalName = (struct hci_rp_read_local_name*)(event+1);
-        	
+
         	reply.AddInt8("status", readLocalName->status);
-        	
+
             if (readLocalName->status == BT_OK) {
-                                
-                reply.AddString("friendlyname", (const char*)readLocalName->local_name );                    
+
+                reply.AddString("friendlyname", (const char*)readLocalName->local_name );
 			    Output::Instance()->Post("Positive reply for friendly name\n", BLACKBOARD_KIT);
 
             } else {
 
-			    Output::Instance()->Post("Negative reply for friendly name\n", BLACKBOARD_KIT);                
+			    Output::Instance()->Post("Negative reply for friendly name\n", BLACKBOARD_KIT);
 
             }
 
-            printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
+            printf("Sending reply ... %ld\n",request->SendReply(&reply));
             reply.PrintToStream();
-            
- 			// This request is not genna be used anymore                        
+
+ 			// This request is not genna be used anymore
             ClearWantedEvent(request);
-     	}       
+     	}
         break;
 
         case PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE):
-        {    
+        {
         	uint8* statusReply = (uint8*)(event+1);
-        	
+
         	reply.AddInt8("status", *statusReply);
-        	
+
             if (*statusReply == BT_OK) {
-                                
+
                 Output::Instance()->Post("Positive reply for scanmode\n", BLACKBOARD_KIT);
 
             } else {
@@ -311,20 +315,19 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event, BMessage* re
 
             }
 
-            printf("Sending reply ... %ld\n",request->SendReply(&reply));                                
+            printf("Sending reply ... %ld\n",request->SendReply(&reply));
             reply.PrintToStream();
-            
- 			// This request is not genna be used anymore                        
+
+ 			// This request is not genna be used anymore
             ClearWantedEvent(request);
-     	}       
+     	}
         break;
 		
 		default:
-		    Output::Instance()->Post("Command Complete not handled\n", BLACKBOARD_KIT);                		
+		    Output::Instance()->Post("Command Complete not handled\n", BLACKBOARD_KIT);
 		break;
-		
-		    
-    }        
+
+    }
 }
 
 
@@ -383,7 +386,7 @@ LocalDeviceImpl::InquiryResult(uint8* numberOfResponses, BMessage* request)
     reply.AddData("info", B_ANY_TYPE, numberOfResponses+1 // skiping here the number of responses
                         , (*numberOfResponses) * sizeof(struct inquiry_info) );
 	
-    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));                                
+    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));
 
 }
 
@@ -396,10 +399,10 @@ LocalDeviceImpl::InquiryComplete(uint8* status, BMessage* request)
 	reply.AddInt8("status", *status);
 	
 
-    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));                                
+    printf("%s: Sending reply ... %ld\n",__FUNCTION__, request->SendReply(&reply));
 //    (request->ReturnAddress()).SendMessage(&reply);
-    
-    ClearWantedEvent(request);    
+
+    ClearWantedEvent(request);
 }
 
 
@@ -423,13 +426,30 @@ LocalDeviceImpl::RemoteNameRequestComplete(struct hci_remote_name_request_comple
 
     printf("Sending reply ... %ld\n", request->SendReply(&reply));                                
     reply.PrintToStream();
-            
+
 	// This request is not genna be used anymore
-	// Although there are many middle events that should be tracked
+	// Although there are many middle events that should be tracked todo: ticket 2377
     ClearWantedEvent(request);
 
 }
 
+
+void
+LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event, BMessage* request)
+{
+	ConnectionIncoming* iConnection = new ConnectionIncoming(NULL);
+	iConnection->Show();
+
+}
+
+
+void
+LocalDeviceImpl::PinCodeRequest(struct hci_ev_pin_code_req* event, BMessage* request)
+{
+	PincodeWindow* iPincode = new PincodeWindow(NULL);
+	iPincode->Show();
+
+}
 
 #if 0
 #pragma mark - Request Methods -
