@@ -152,10 +152,10 @@ LocalDevice::SetDiscoverable(int mode)
     BMessage request(BT_MSG_HANDLE_SIMPLE_REQUEST);
     BMessage reply;
 
-	size_t   size;
+    size_t   size;
 	int8	 bt_status = BT_ERROR;
-	
-    
+
+
     request.AddInt32("hci_id", hid);
 
 
@@ -170,12 +170,12 @@ LocalDevice::SetDiscoverable(int mode)
     request.AddInt16("opcodeExpected", PACK_OPCODE(OGF_CONTROL_BASEBAND, OCF_WRITE_SCAN_ENABLE));
 
     if (fMessenger->SendMessage(&request, &reply) == B_OK) {
-    	if (reply.FindInt8("status", &bt_status ) == B_OK ) {	    
-			return bt_status;			
+        if (reply.FindInt8("status", &bt_status ) == B_OK ) {
+			return bt_status;
 			
 		}
 		
-	}    
+	}
 
 	return B_ERROR;
 }

@@ -2,11 +2,16 @@ SubDir HAIKU_TOP src kits bluetooth ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
-if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-       UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
-}
+#if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
+#       UseHeaders [ FDirName $(HAIKU_TOP) headers os ] : true ;
+#}
 
-UsePrivateHeaders bluetooth shared ;
+UsePrivateHeaders shared bluetooth ;
+
+SubDirHdrs [ FDirName $(SUBDIR) UI ] ;
+
+SEARCH_SOURCE += [ FDirName $(SUBDIR) UI ] ;
+
 
 SharedLibrary libbluetooth.so :
 	LocalDevice.cpp
@@ -15,5 +20,8 @@ SharedLibrary libbluetooth.so :
 	RemoteDevice.cpp
 	CommandManager.cpp
 	KitSupport.cpp
+	#UI
+	PincodeWindow.cpp
+	ConnectionIncoming.cpp
 	: be
 ;

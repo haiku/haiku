@@ -28,42 +28,43 @@ class LocalDevice : public BluetoothDevice {
    
     public:
         /* Possible throwing */
-        static   LocalDevice* GetLocalDevice();
-        static   uint32       GetLocalDeviceCount();
-        
-        static   LocalDevice* GetLocalDevice(hci_id hid);
-        static   LocalDevice* GetLocalDevice(bdaddr_t bdaddr);
-        
-                 DiscoveryAgent* GetDiscoveryAgent();
-                 BString GetFriendlyName();
-                 DeviceClass GetDeviceClass();
-        /* Possible throwing */
-                 status_t SetDiscoverable(int mode);
-                 
-                 BString GetProperty(const char* property);                     
-                 void GetProperty(const char* property, uint32* value);
-                 
-                 int GetDiscoverable();
-                 bdaddr_t GetBluetoothAddress();
-		 /*                     
-                 ServiceRecord getRecord(Connection notifier);
-                 void updateRecord(ServiceRecord srvRecord);
-		 */                 
-    private:
-		         LocalDevice(hci_id hid);
-        
-        static   LocalDevice*   RequestLocalDeviceID(BMessage* request);
-        
-        static BMessenger*      sfMessenger;
-               BMessenger*      fMessenger;
+        static  LocalDevice* GetLocalDevice();
+        static  uint32       GetLocalDeviceCount();
 
-		hci_id		hid;
-		hci_id		GetID(void) {return hid;}
+        static  LocalDevice* GetLocalDevice(hci_id hid);
+        static  LocalDevice* GetLocalDevice(bdaddr_t bdaddr);
+
+                DiscoveryAgent* GetDiscoveryAgent();
+                BString GetFriendlyName();
+                DeviceClass GetDeviceClass();
+        /* Possible throwing */
+                status_t SetDiscoverable(int mode);
+
+                BString GetProperty(const char* property);
+                void GetProperty(const char* property, uint32* value);
+
+                int GetDiscoverable();
+                bdaddr_t GetBluetoothAddress();
+		 /*
+                ServiceRecord getRecord(Connection notifier);
+                void updateRecord(ServiceRecord srvRecord);
+		 */
+				
+    private:
+		        LocalDevice(hci_id hid);
+				hci_id	GetID(void) {return hid;}
+        static  LocalDevice*   RequestLocalDeviceID(BMessage* request);
+				 
+        static  BMessenger*      sfMessenger;
+                BMessenger*      fMessenger;
+
+		hci_id	 hid;
 		
 		friend class DiscoveryAgent;
 		friend class RemoteDevice;
+		friend class PincodeWindow;
 };
-    
+
 }
 
 #ifndef _BT_USE_EXPLICIT_NAMESPACE

@@ -134,6 +134,11 @@ RemoteDevice::IsEncrypted()
     return true;
 }
 
+LocalDevice*
+RemoteDevice::GetLocalDeviceOwner()
+{
+	return fDiscovererLocalDevice;
+}
 
 /* Private */
 void

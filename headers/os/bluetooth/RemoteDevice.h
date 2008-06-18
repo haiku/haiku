@@ -25,18 +25,17 @@ class LocalDevice;
 class RemoteDevice : public BluetoothDevice {
 
     public:
-                
         static const int WAIT = B_BT_WAIT;
         static const int SUCCEEDED = B_BT_SUCCEEDED;
-                
+
         bool IsTrustedDevice();
         BString GetFriendlyName(bool alwaysAsk); /* Throwing */
         BString GetFriendlyName(void); /* Throwing */
         bdaddr_t GetBluetoothAddress();
         DeviceClass GetDeviceClass();
-                         
+
         bool Equals(RemoteDevice* obj);
-        
+
         /*static RemoteDevice* GetRemoteDevice(Connection conn);   Throwing */
         bool Authenticate(); /* Throwing */
         /* bool Authorize(Connection conn);  Throwing */
@@ -44,29 +43,28 @@ class RemoteDevice : public BluetoothDevice {
         bool IsAuthenticated(); /* Throwing */
         /*bool IsAuthorized(Connection conn);  Throwing */
         bool IsEncrypted(); /* Throwing */
-        
+
         BString GetProperty(const char* property); /* Throwing */
         void GetProperty(const char* property, uint32* value); /* Throwing */
 
-                
+		LocalDevice* GetLocalDeviceOwner();
     protected:
         RemoteDevice(BString address);
-        RemoteDevice(bdaddr_t address);        
-    
-    /* Instances of this class only will be done by Discovery[Listener|Agent] TODO */
-    friend class DiscoveryListener;
-    
+        RemoteDevice(bdaddr_t address);
+
+        /* Instances of this class only would be instantiated by Discovery[Listener|Agent] */
+        friend class DiscoveryListener;
+		void SetLocalDeviceOwner(LocalDevice* ld);
+
     private:
-		void         SetLocalDeviceOwner(LocalDevice* ld);
-		
-    	
+
     	LocalDevice* fDiscovererLocalDevice;
-    	
-    	uint8		 fPageRepetitionMode;
-    	uint8		 fScanPeriodMode;
-    	uint8		 fScanMode;    	
- 		uint16       fClockOffset;   	
-        
+
+    	uint8		fPageRepetitionMode;
+    	uint8		fScanPeriodMode;
+    	uint8		fScanMode;
+    	uint16		fClockOffset;
+
 };
 
 }
