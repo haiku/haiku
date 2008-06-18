@@ -45,6 +45,9 @@ TerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 	if (fAlternateScreen == NULL)
 		return B_NO_MEMORY;
 
+	for (int32 i = 0; i < height; i++)
+		fAlternateScreen[i]->Clear();
+
 	return BasicTerminalBuffer::Init(width, height, historySize);
 }
 
@@ -141,31 +144,31 @@ TerminalBuffer::ResizeTo(int32 width, int32 height, int32 historyCapacity)
 		return error;
 	}
 
-	TermPos cursor = fCursor;
-
 	// Switch to the alternate screen buffer and resize it.
 	if (fAlternateScreen != NULL) {
-		_SwitchScreenBuffer();
-
+		TermPos cursor = fCursor;
+		fCursor.SetTo(0, 0);
 		fWidth = oldWidth;
 		fHeight = oldHeight;
-		fCursor.SetTo(0, 0);
+
+		_SwitchScreenBuffer();
 
 		error = BasicTerminalBuffer::ResizeTo(width, height, 0);
+
+		fWidth = width;
+		fHeight = height;
+		fCursor = cursor;
+
+		// Switch back.
+		if (!alternateScreenActive)
+			_SwitchScreenBuffer();
+
 		if (error != B_OK) {
 			// This sucks -- we can't do anything about it. Delete the
 			// alternate screen buffer.
 			_FreeLines(fAlternateScreen, oldHeight);
 			fAlternateScreen = NULL;
 		}
-
-		// Switch back.
-		if (!alternateScreenActive)
-			_SwitchScreenBuffer();
-
-		fWidth = width;
-		fHeight = height;
-		fCursor = cursor;
 	}
 
 	return error;
