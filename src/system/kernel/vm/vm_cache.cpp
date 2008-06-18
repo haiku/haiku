@@ -14,6 +14,7 @@
 #include <arch/cpu.h>
 #include <condition_variable.h>
 #include <debug.h>
+#include <heap.h>
 #include <int.h>
 #include <kernel.h>
 #include <lock.h>
@@ -543,7 +544,7 @@ vm_cache_create(vm_store* store)
 		return NULL;
 	}
 
-	cache = (vm_cache*)malloc(sizeof(vm_cache));
+	cache = (vm_cache*)malloc_nogrow(sizeof(vm_cache));
 	if (cache == NULL)
 		return NULL;
 

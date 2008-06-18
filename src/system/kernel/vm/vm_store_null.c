@@ -9,6 +9,7 @@
 
 #include "vm_store_null.h"
 
+#include <heap.h>
 #include <stdlib.h>
 
 
@@ -78,7 +79,7 @@ vm_store_create_null(void)
 {
 	struct vm_store *store;
 
-	store = malloc(sizeof(struct vm_store));
+	store = malloc_nogrow(sizeof(struct vm_store));
 	if (store == NULL)
 		return NULL;
 

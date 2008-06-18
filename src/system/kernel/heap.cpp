@@ -101,10 +101,11 @@ typedef DoublyLinkedList<DeferredFreeListEntry> DeferredFreeList;
 
 static heap_allocator *sHeapList = NULL;
 static heap_allocator *sLastGrowRequest = NULL;
-static heap_allocator *sGrowHeap = NULL;
+static heap_allocator *sGrowHeapList = NULL;
 static thread_id sHeapGrowThread = -1;
 static sem_id sHeapGrowSem = -1;
 static sem_id sHeapGrownNotify = -1;
+static bool sAddGrowHeap = false;
 
 static DeferredFreeList sDeferredFreeList;
 static spinlock sDeferredFreeListLock;
@@ -257,8 +258,12 @@ dump_heap_list(int argc, char **argv)
 	if (argc == 2) {
 		if (strcmp(argv[1], "grow") == 0) {
 			// only dump dedicated grow heap info
-			dprintf("dedicated grow heap:\n");
-			dump_allocator(sGrowHeap);
+			dprintf("dedicated grow heap(s):\n");
+			heap_allocator *heap = sGrowHeapList;
+			while (heap) {
+				dump_allocator(heap);
+				heap = heap->next;
+			}
 		} else if (strcmp(argv[1], "stats") == 0) {
 			uint32 heapCount = 0;
 			heap_allocator *heap = sHeapList;
@@ -1177,14 +1182,60 @@ deferred_deleter(void *arg, int iteration)
 //	#pragma mark -
 
 
+static heap_allocator *
+heap_create_new_heap(const char *name, size_t size)
+{
+	void *heapAddress = NULL;
+	area_id heapArea = create_area(name, &heapAddress,
+		B_ANY_KERNEL_BLOCK_ADDRESS, size, B_FULL_LOCK,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	if (heapArea < B_OK) {
+		TRACE(("heap: couldn't allocate heap \"%s\"\n", name));
+		return NULL;
+	}
+
+	heap_allocator *newHeap = heap_attach((addr_t)heapAddress, size);
+	if (newHeap == NULL) {
+		panic("heap: could not attach heap to area!\n");
+		delete_area(heapArea);
+		return NULL;
+	}
+
+#if PARANOID_VALIDATION
+	heap_validate_heap(newHeap);
+#endif
+	return newHeap;
+}
+
+
 static int32
 heap_grow_thread(void *)
 {
 	heap_allocator *heap = sHeapList;
+	heap_allocator *growHeap = sGrowHeapList;
 	while (true) {
 		// wait for a request to grow the heap list
 		if (acquire_sem(sHeapGrowSem) < B_OK)
 			continue;
+
+		if (sAddGrowHeap) {
+			while (growHeap->next)
+				growHeap = growHeap->next;
+
+			// the last grow heap is going to run full soon, try to allocate
+			// a new one to make some room.
+			TRACE(("heap_grower: grow heaps will run out of memory soon\n"));
+			heap_allocator *newHeap = heap_create_new_heap(
+				"additional grow heap", HEAP_DEDICATED_GROW_SIZE);
+			if (newHeap != NULL) {
+#if PARANOID_VALIDATION
+				heap_validate_heap(newHeap);
+#endif
+				growHeap->next = newHeap;
+				sAddGrowHeap = false;
+				TRACE(("heap_grower: new grow heap %p linked in\n", newHeap));
+			}
+		}
 
 		// find the last heap
 		while (heap->next)
@@ -1196,28 +1247,15 @@ heap_grow_thread(void *)
 		}
 
 		TRACE(("heap_grower: kernel heap will run out of memory soon, allocating new one\n"));
-		void *heapAddress = NULL;
-		area_id heapArea = create_area("additional heap", &heapAddress,
-			B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_GROW_SIZE, B_FULL_LOCK,
-			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-		if (heapArea < B_OK) {
-			panic("heap_grower: couldn't allocate additional heap area\n");
-			continue;
-		}
-
-		heap_allocator *newHeap = heap_attach((addr_t)heapAddress,
+		heap_allocator *newHeap = heap_create_new_heap("additional heap",
 			HEAP_GROW_SIZE);
-		if (newHeap == NULL) {
-			panic("heap_grower: could not attach additional heap!\n");
-			delete_area(heapArea);
-			continue;
-		}
-
+		if (newHeap != NULL) {
 #if PARANOID_VALIDATION
-		heap_validate_heap(newHeap);
+			heap_validate_heap(newHeap);
 #endif
-		heap->next = newHeap;
-		TRACE(("heap_grower: new heap linked in\n"));
+			heap->next = newHeap;
+			TRACE(("heap_grower: new heap linked in\n"));
+		}
 
 		// notify anyone waiting for this request
 		release_sem_etc(sHeapGrownNotify, -1, B_RELEASE_ALL);
@@ -1282,19 +1320,10 @@ heap_init_post_sem()
 status_t
 heap_init_post_thread()
 {
-	void *dedicated = NULL;
-	area_id area = create_area("heap dedicated grow", &dedicated,
-		B_ANY_KERNEL_BLOCK_ADDRESS, HEAP_DEDICATED_GROW_SIZE, B_FULL_LOCK,
-		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (area < 0) {
-		panic("heap_init_post_thread(): cannot allocate dedicated grow memory\n");
-		return area;
-	}
-
-	sGrowHeap = heap_attach((addr_t)dedicated, HEAP_DEDICATED_GROW_SIZE);
-	if (sGrowHeap == NULL) {
+	sGrowHeapList = heap_create_new_heap("dedicated grow heap",
+		HEAP_DEDICATED_GROW_SIZE);
+	if (sGrowHeapList == NULL) {
 		panic("heap_init_post_thread(): failed to attach dedicated grow heap\n");
-		delete_area(area);
 		return B_ERROR;
 	}
 
@@ -1302,7 +1331,6 @@ heap_init_post_thread()
 		B_URGENT_PRIORITY, NULL);
 	if (sHeapGrowThread < 0) {
 		panic("heap_init_post_thread(): cannot create heap grow thread\n");
-		delete_area(area);
 		return sHeapGrowThread;
 	}
 
@@ -1331,17 +1359,6 @@ memalign(size_t alignment, size_t size)
 		return NULL;
 	}
 
-	if (thread_get_current_thread_id() == sHeapGrowThread) {
-		// this is the grower thread, allocate from our dedicated memory
-		void *result = heap_memalign(sGrowHeap, alignment, size, NULL);
-		if (result == NULL) {
-			panic("heap: grow thread ran out of dedicated memory!\n");
-			return NULL;
-		}
-
-		return result;
-	}
-
 	heap_allocator *heap = sHeapList;
 	while (heap) {
 		bool shouldGrow = false;
@@ -1352,6 +1369,10 @@ memalign(size_t alignment, size_t size)
 			if (result == NULL) {
 				// urgent request, do the request and wait
 				switch_sem(sHeapGrowSem, sHeapGrownNotify);
+				if (heap->next == NULL) {
+					// the grower didn't manage to add a new heap
+					return NULL;
+				}
 			} else {
 				// not so urgent, just notify the grower
 				release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
@@ -1371,6 +1392,46 @@ memalign(size_t alignment, size_t size)
 	}
 
 	panic("heap: kernel heap has run out of memory\n");
+	return NULL;
+}
+
+
+void *
+malloc_nogrow(size_t size)
+{
+	// use dedicated memory in the grow thread by default
+	if (thread_get_current_thread_id() == sHeapGrowThread) {
+		bool shouldGrow = false;
+		heap_allocator *heap = sGrowHeapList;
+		while (heap) {
+			void *result = heap_memalign(heap, 0, size, &shouldGrow);
+			if (shouldGrow && heap->next == NULL && !sAddGrowHeap) {
+				// hopefully the heap grower will manage to create a new heap
+				// before running out of private memory...
+				dprintf("heap: requesting new grow heap\n");
+				sAddGrowHeap = true;
+				release_sem_etc(sHeapGrowSem, 1, B_DO_NOT_RESCHEDULE);
+			}
+
+			if (result != NULL)
+				return result;
+
+			heap = heap->next;
+		}
+	}
+
+	// try public memory, there might be something available
+	heap_allocator *heap = sHeapList;
+	while (heap) {
+		void *result = heap_memalign(heap, 0, size, NULL);
+		if (result != NULL)
+			return result;
+
+		heap = heap->next;
+	}
+
+	// no memory available
+	panic("heap: all heaps have run out of memory\n");
 	return NULL;
 }
 
@@ -1402,9 +1463,14 @@ free(void *address)
 		heap = heap->next;
 	}
 
-	// maybe it was allocated from the dedicated grow heap
-	if (heap_free(sGrowHeap, address) == B_OK)
-		return;
+	// maybe it was allocated from a dedicated grow heap
+	heap = sGrowHeapList;
+	while (heap) {
+		if (heap_free(heap, address) == B_OK)
+			return;
+
+		heap = heap->next;
+	}
 
 	panic("free(): free failed for address %p\n", address);
 }

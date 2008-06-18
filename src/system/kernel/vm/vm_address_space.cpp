@@ -12,6 +12,7 @@
 #include <vm.h>
 #include <vm_address_space.h>
 #include <vm_priv.h>
+#include <heap.h>
 #include <thread.h>
 #include <util/khash.h>
 
@@ -263,7 +264,7 @@ vm_create_address_space(team_id id, addr_t base, addr_t size,
 	vm_address_space *addressSpace;
 	status_t status;
 
-	addressSpace = (vm_address_space *)malloc(sizeof(vm_address_space));
+	addressSpace = (vm_address_space *)malloc_nogrow(sizeof(vm_address_space));
 	if (addressSpace == NULL)
 		return B_NO_MEMORY;
 

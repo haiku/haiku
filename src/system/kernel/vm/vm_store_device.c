@@ -9,6 +9,7 @@
 
 #include "vm_store_device.h"
 
+#include <heap.h>
 #include <KernelExport.h>
 #include <vm_priv.h>
 
@@ -87,7 +88,7 @@ static vm_store_ops device_ops = {
 struct vm_store *
 vm_store_create_device(addr_t baseAddress)
 {
-	struct device_store *store = malloc(sizeof(struct device_store));
+	struct device_store *store = malloc_nogrow(sizeof(struct device_store));
 	if (store == NULL)
 		return NULL;
 

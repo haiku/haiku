@@ -810,7 +810,7 @@ lookup_area(vm_address_space* addressSpace, area_id id)
 static vm_area *
 create_reserved_area_struct(vm_address_space *addressSpace, uint32 flags)
 {
-	vm_area *reserved = (vm_area *)malloc(sizeof(vm_area));
+	vm_area *reserved = (vm_area *)malloc_nogrow(sizeof(vm_area));
 	if (reserved == NULL)
 		return NULL;
 
@@ -833,11 +833,11 @@ create_area_struct(vm_address_space *addressSpace, const char *name,
 	if (length > B_OS_NAME_LENGTH)
 		length = B_OS_NAME_LENGTH;
 
-	vm_area *area = (vm_area *)malloc(sizeof(vm_area));
+	vm_area *area = (vm_area *)malloc_nogrow(sizeof(vm_area));
 	if (area == NULL)
 		return NULL;
 
-	area->name = (char *)malloc(length);
+	area->name = (char *)malloc_nogrow(length);
 	if (area->name == NULL) {
 		free(area);
 		return NULL;
@@ -2856,7 +2856,7 @@ vm_map_page(vm_area *area, vm_page *page, addr_t address, uint32 protection)
 	vm_page_mapping *mapping = NULL;
 
 	if (area->wiring == B_NO_LOCK) {
-		mapping = (vm_page_mapping *)malloc(sizeof(vm_page_mapping));
+		mapping = (vm_page_mapping *)malloc_nogrow(sizeof(vm_page_mapping));
 		if (mapping == NULL)
 			return B_NO_MEMORY;
 

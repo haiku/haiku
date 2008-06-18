@@ -9,6 +9,7 @@
 
 #include "vm_store_anonymous_noswap.h"
 
+#include <heap.h>
 #include <KernelExport.h>
 #include <vm_priv.h>
 #include <arch_config.h>
@@ -165,7 +166,7 @@ vm_store *
 vm_store_create_anonymous_noswap(bool canOvercommit,
 	int32 numPrecommittedPages, int32 numGuardPages)
 {
-	anonymous_store *store = (anonymous_store *)malloc(
+	anonymous_store *store = (anonymous_store *)malloc_nogrow(
 		sizeof(anonymous_store));
 	if (store == NULL)
 		return NULL;
