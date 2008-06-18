@@ -146,8 +146,8 @@ void* buildInquiry(uint32 lap, uint8 length, uint8 num_rsp, size_t* outsize)
 
     if (command != NULL) {
 
-	param->lap[2] = (lap >> 16) & 0xFF;
-	param->lap[1] = (lap >>  8) & 0xFF;
+		param->lap[2] = (lap >> 16) & 0xFF;
+		param->lap[1] = (lap >>  8) & 0xFF;
     	param->lap[0] = (lap >>  0) & 0xFF;
     	param->length = length;
     	param->num_rsp = num_rsp;
@@ -186,7 +186,7 @@ void* buildPinCodeRequestReply(bdaddr_t bdaddr, uint8 length, char pincode[16], 
 }
 
 
-void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, uint8 length, char pincode[16], size_t* outsize)
+void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, size_t* outsize)
 {
 
     struct hci_cp_pin_code_neg_reply* param;
@@ -196,7 +196,7 @@ void* buildPinCodeRequestNegativeReply(bdaddr_t bdaddr, uint8 length, char pinco
 
     if (command != NULL) {
 
-	param->bdaddr = bdaddr;
+		param->bdaddr = bdaddr;
 
     }
 
