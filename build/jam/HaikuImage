@@ -288,8 +288,11 @@ AddFilesToHaikuImage beos etc artwork : $(svgFiles) ;
 local etcFiles = inputrc profile teapot.data ;
 etcFiles = $(etcFiles:G=etc) ;
 SEARCH on $(etcFiles) = [ FDirName $(HAIKU_TOP) data etc ] ;
-etcFiles += <etc>termcap ;
+etcFiles += <etc>termcap <etc>sysless <etc>sysless.in ;
 AddFilesToHaikuImage beos etc : $(etcFiles) ;
+
+SEARCH on <etc>vimrc = [ FDirName $(HAIKU_TOP) data etc vim ] ;
+AddFilesToHaikuImage beos etc vim : <etc>vimrc ;
 
 local fortuneFiles =  Art Computers Education Food Fortunes Goedel Haiku
 	Humorists Kids Law "Linux cookies" Love Magic Medicine Miscellaneous
