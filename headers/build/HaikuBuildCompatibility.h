@@ -159,8 +159,13 @@ extern float	roundf(float value);
 #	define IFF_AUTO_CONFIGURED 0
 #endif
 
+#include <limits.h>
+
+#ifndef INT32_MAX
+#	define INT32_MAX INT_MAX
+#endif
+
 #ifndef INT64_MAX
-#	include <limits.h>
 #	define INT64_MAX LONGLONG_MAX
 #endif
 
