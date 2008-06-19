@@ -32,7 +32,7 @@ public:
 	virtual	status_t			ResizeTo(int32 width, int32 height,
 									int32 historyCapacity);
 
-			void				UseAlternateScreenBuffer();
+			void				UseAlternateScreenBuffer(bool clear);
 			void				UseNormalScreenBuffer();
 
 protected:

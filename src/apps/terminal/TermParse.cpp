@@ -1093,8 +1093,12 @@ TermParse::_DecPrivateModeSet(int value)
 			// Not supported yet.
 			break;
 		case 25:
-			// Show Cursor
+			// Show Cursor.
 			// Not supported yet.
+			break;
+		case 47:
+			// Use Alternate Screen Buffer.
+			fBuffer->UseAlternateScreenBuffer(false);
 			break;
 		case 1034:
 			// Interpret "meta" key, sets eighth bit.
@@ -1104,7 +1108,7 @@ TermParse::_DecPrivateModeSet(int value)
 			// Save cursor as in DECSC and use Alternate Screen Buffer, clearing
 			// it first.
 			fBuffer->SaveCursor();
-			fBuffer->UseAlternateScreenBuffer();
+			fBuffer->UseAlternateScreenBuffer(true);
 			break;
 	}
 }
@@ -1138,14 +1142,18 @@ TermParse::_DecPrivateModeReset(int value)
 			// Hide Cursor
 			// Not supported yet.
 			break;
+		case 47:
+			// Use Normal Screen Buffer.
+			fBuffer->UseNormalScreenBuffer();
+			break;
 		case 1034:
 			// Don’t interpret "meta" key.
 			// Not supported yet.
 			break;
 		case 1049:
 			// Use Normal Screen Buffer and restore cursor as in DECRC.
-			fBuffer->RestoreCursor();
 			fBuffer->UseNormalScreenBuffer();
+			fBuffer->RestoreCursor();
 			break;
 	}
 }

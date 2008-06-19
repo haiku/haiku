@@ -176,13 +176,16 @@ TerminalBuffer::ResizeTo(int32 width, int32 height, int32 historyCapacity)
 
 
 void
-TerminalBuffer::UseAlternateScreenBuffer()
+TerminalBuffer::UseAlternateScreenBuffer(bool clear)
 {
 	if (fAlternateScreenActive || fAlternateScreen == NULL)
 		return;
 
 	_SwitchScreenBuffer();
-	Clear(false);
+
+	if (clear)
+		Clear(false);
+
 	_InvalidateAll();
 }
 
