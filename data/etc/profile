@@ -11,12 +11,6 @@ cd
 export PS1="\w> "
 export HISTFILESIZE=50
 
-bind '"\e[2~":paste-from-clipboard'
-bind '"\e[3~":delete-char'
-bind '"\e[4~":end-of-line'
-bind '"\e[5~":history-search-forward'
-bind '"\e[6~":history-search-backward'
-
 alias ls="ls --color"
 alias ll="ls -l"
 alias la="ls -A"
