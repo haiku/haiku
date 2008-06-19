@@ -2,6 +2,4 @@
 
 "\e[5~": history-search-backward
 "\e[6~": history-search-forward
-"\e[@": beginning-of-line
-"\e[[": end-of-line
-DEL: delete-char
+"\e[3~": delete-char
