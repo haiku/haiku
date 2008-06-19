@@ -1633,9 +1633,14 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 	if (info.invalidateAll) {
 		Invalidate();
 		_UpdateScrollBarRange();
+
+		fCursor = fTextBuffer->Cursor();
+		_ActivateCursor(false);
+
 		int32 offset = _LineAt(0);
 		fVisibleTextBuffer->SynchronizeWith(fTextBuffer, offset, offset,
 			offset + fTextBuffer->Height() + 2);
+
 		info.Reset();
 		return;
 	}
