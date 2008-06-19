@@ -1633,6 +1633,7 @@ TermView::_SynchronizeWithTextBuffer(int32 visibleDirtyTop,
 	if (info.invalidateAll) {
 		Invalidate();
 		_UpdateScrollBarRange();
+		_Deselect();
 
 		fCursor = fTextBuffer->Cursor();
 		_ActivateCursor(false);
