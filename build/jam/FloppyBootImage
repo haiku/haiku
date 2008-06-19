@@ -31,7 +31,7 @@ BOOT_ADD_ONS_NET =
 }
 
 BEOS_ADD_ONS_BUS_MANAGERS = pci $(X86_ONLY)isa ide scsi
-	config_manager agp_gart
+	config_manager agp_gart usb
 ;
 BEOS_ADD_ONS_FILE_SYSTEMS = bfs ;
 #cdda fat googlefs iso9660 nfs ;
@@ -43,23 +43,26 @@ AddFilesToFloppyBootArchive beos system add-ons kernel bus_managers
 AddFilesToFloppyBootArchive beos system add-ons kernel busses agp_gart
 	: $(X86_ONLY)<agp_gart>intel ;
 AddFilesToFloppyBootArchive beos system add-ons kernel busses ide
-	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata ;
+	: ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211 ;
 AddFilesToFloppyBootArchive beos system add-ons kernel console : vga_text ;
 AddFilesToFloppyBootArchive beos system add-ons kernel file_systems
 	: $(BEOS_ADD_ONS_FILE_SYSTEMS) ;
 AddFilesToFloppyBootArchive beos system add-ons kernel generic
-	: block_io fast_log ide_adapter locked_pool scsi_periph ;
+	: block_io ide_adapter locked_pool scsi_periph ;
 AddFilesToFloppyBootArchive beos system add-ons kernel partitioning_systems
 	: intel session ;
 AddFilesToFloppyBootArchive beos system add-ons kernel interrupt_controllers
 	: $(PPC_ONLY)openpic ;
+AddFilesToFloppyBootArchive beos system add-ons kernel busses usb
+	: <usb>uhci <usb>ohci <usb>ehci ;
 
 if $(TARGET_ARCH) = x86 {
 	AddFilesToFloppyBootArchive beos system add-ons kernel cpu : generic_x86 ;
 }
 
 # drivers
-AddDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_dsk ;
+AddDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_disk usb_disk ;
+AddDriversToFloppyBootArchive disk usb	: usb_disk ;
 if $(NET_BOOT) = 1 {
 #AddDriversToFloppyBootArchive disk virtual	: nbd ;
 AddDriversToFloppyBootArchive disk virtual	: remote_disk ;
@@ -95,10 +98,11 @@ AddFilesToFloppyBootArchive beos system add-ons kernel network protocols
 AddBootModuleSymlinksToFloppyBootArchive
 	$(BEOS_ADD_ONS_BUS_MANAGERS)
 	$(PPC_ONLY)openpic
-	block_io fast_log ide_adapter locked_pool scsi_periph
+	block_io ide_adapter locked_pool scsi_periph
 	$(X86_ONLY)generic_x86
-	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata
-	scsi_cd scsi_dsk
+	ahci generic_ide_pci $(X86_ONLY)ide_isa silicon_image_3112 legacy_sata it8211
+	<usb>uhci <usb>ohci <usb>ehci
+	scsi_cd scsi_disk usb_disk
 	intel session
 	$(BEOS_ADD_ONS_FILE_SYSTEMS)
 	$(BOOT_ADD_ONS_NET)
