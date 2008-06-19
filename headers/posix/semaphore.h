@@ -10,7 +10,7 @@
 #include <time.h>
 
 
-typedef struct {
+typedef struct _sem_t {
 	int32_t	id;
 	int32_t	_padding[3];
 } sem_t;

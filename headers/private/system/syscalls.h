@@ -11,7 +11,6 @@
 #include <OS.h>
 #include <DiskDeviceDefs.h>
 
-#include <semaphore.h>
 #include <signal.h>
 #include <sys/socket.h>
 
@@ -30,6 +29,7 @@ struct pollfd;
 struct rlimit;
 struct sigaction;
 struct stat;
+struct _sem_t;
 
 struct disk_device_job_progress_info;
 struct partitionable_space_data;
@@ -80,9 +80,9 @@ extern status_t		_kern_set_sem_owner(sem_id id, team_id proc);
 /* POSIX realtime sem syscalls */
 extern status_t		_kern_realtime_sem_open(const char* name,
 						int openFlagsOrShared, mode_t mode, uint32 semCount,
-						sem_t* userSem, sem_t** _usedUserSem);
+						struct _sem_t* userSem, struct _sem_t** _usedUserSem);
 extern status_t		_kern_realtime_sem_close(sem_id semID,
-						sem_t** _deleteUserSem);
+						struct _sem_t** _deleteUserSem);
 extern status_t		_kern_realtime_sem_unlink(const char* name);
 
 extern status_t		_kern_realtime_sem_get_value(sem_id semID, int* value);
