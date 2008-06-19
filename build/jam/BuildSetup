@@ -852,6 +852,9 @@ if $(TARGET_PLATFORM) = libbe_test {
 		[ PrivateHeaders $(DOT) ] ;
 	TARGET_DEFINES += __HAIKU__ ;
 
+	TARGET_PRIVATE_SYSTEM_HEADERS =
+		[ PrivateHeaders $(DOT) system system/arch/$(TARGET_ARCH) ] ;
+
 	# directories
 	TARGET_OBJECT_BASE_DIR
 		= [ FDirName $(HAIKU_OBJECT_DIR) $(TARGET_PLATFORM) ] ;
