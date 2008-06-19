@@ -118,6 +118,7 @@ Server haiku_app_server :
 #	AccelerantBuffer.cpp
 #	AccelerantHWInterface.cpp
 	BitmapBuffer.cpp
+	BitmapDrawingEngine.cpp
 	drawing_support.cpp
 	DrawingEngine.cpp
 	MallocBuffer.cpp

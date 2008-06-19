@@ -71,6 +71,7 @@ SharedLibrary libbe_haiku.so :
 
 	libbeadapter.so
 	$(TARGET_NETWORK_LIBS)
+	libpng.so # For dumping the screen to PNG in the Interface Kit
 	$(TARGET_LIBSTDC++)
 ;
 
