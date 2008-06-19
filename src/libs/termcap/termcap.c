@@ -461,6 +461,11 @@ tgetent (bp, name)
   char *indirect = NULL;	/* Terminal type in :tc= in TERMCAP value.  */
   int filep;
 
+// bonefish: HACK to avoid problems. Our termcap entries are longer than the
+// 2KB that are advised as the size of the buffer to be passed to tgetent().
+// This leads to nasty problems, so just always allocate a buffer.
+bp = NULL;
+
 #ifdef INTERNAL_TERMINAL
   /* For the internal terminal we don't want to read any termcap file,
      so fake it.  */
