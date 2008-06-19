@@ -1019,8 +1019,6 @@ TermView::Draw(BRect updateRect)
 //debug_printf("TermView::Draw(): (%ld, %ld) - (%ld, %ld), top: %f, fontHeight: %d, scrollOffset: %f\n",
 //x1, y1, x2, y2, updateRect.top, fFontHeight, fScrollOffset);
 
-	Window()->BeginViewTransaction();
-
 	for (int32 j = y1; j <= y2; j++) {
 		int32 k = x1;
 		char buf[fTermColumns * 4 + 1];
@@ -1062,8 +1060,6 @@ TermView::Draw(BRect updateRect)
 
 	if (fCursor >= TermPos(x1, y1) && fCursor <= TermPos(x2, y2))
 		_DrawCursor();
-
-	Window()->EndViewTransaction();
 }
 
 
@@ -1162,7 +1158,15 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				if (rawChar == B_RETURN)
 					toWrite = "\r";
 				break;
-			
+
+			case B_DELETE:
+				toWrite = DELETE_KEY_CODE;
+				break;
+
+			case B_BACKSPACE:
+				toWrite = BACKSPACE_KEY_CODE;
+				break;
+
 			case B_LEFT_ARROW:
 				if (rawChar == B_LEFT_ARROW) {
 					if (mod & B_SHIFT_KEY) {
@@ -1251,7 +1255,6 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 				break;
 
 			case B_FUNCTION_KEY:
-				// TODO: Why not just fShell->Write(key) ?
 				for (int32 i = 0; i < 12; i++) {
 					if (key == function_keycode_table[i]) {
 						fShell->Write(function_key_char_table[i], 5);
