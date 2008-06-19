@@ -61,7 +61,7 @@ if $(TARGET_ARCH) = x86 {
 }
 
 # drivers
-AddDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_disk usb_disk ;
+AddDriversToFloppyBootArchive disk scsi	: scsi_cd scsi_disk ;
 AddDriversToFloppyBootArchive disk usb	: usb_disk ;
 if $(NET_BOOT) = 1 {
 #AddDriversToFloppyBootArchive disk virtual	: nbd ;
