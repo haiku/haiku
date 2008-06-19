@@ -332,6 +332,7 @@ private:
 			char*			fTitle;
 			int32			_unused0;
 			bool			fInTransaction;
+			bool			fUpdateRequested;
 			bool			fActive;
 			short			fShowLevel;
 			uint32			fFlags;
@@ -344,7 +345,6 @@ private:
 			BButton*		fDefaultButton;
 			BList			fShortcuts;
 			int32			fTopViewToken;
-			bool			_unused2;
 			bool			_unused3;
 			bool			fIsFilePanel;				
 			bool			_unused4;

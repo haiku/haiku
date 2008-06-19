@@ -3371,7 +3371,11 @@ BView::Invalidate(BRect invalRect)
 
 	fOwner->fLink->StartMessage(AS_VIEW_INVALIDATE_RECT);
 	fOwner->fLink->Attach<BRect>(invalRect);
-	fOwner->fLink->Flush();
+
+	if (!fOwner->fUpdateRequested) {
+		fOwner->fLink->Flush();
+		fOwner->fUpdateRequested = true;
+	}
 }
 
 
@@ -3386,7 +3390,10 @@ BView::Invalidate(const BRegion* region)
 	fOwner->fLink->StartMessage(AS_VIEW_INVALIDATE_REGION);
 	fOwner->fLink->AttachRegion(*region);
 
-	fOwner->fLink->Flush();
+	if (!fOwner->fUpdateRequested) {
+		fOwner->fLink->Flush();
+		fOwner->fUpdateRequested = true;
+	}
 }
 
 

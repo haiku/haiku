@@ -1245,6 +1245,7 @@ FrameMoved(origin);
 			fLink->StartMessage(AS_END_UPDATE);
 			fLink->Flush();
 			fInTransaction = false;
+			fUpdateRequested = false;
 
 //printf("BWindow(%s) - UPDATE took %lld usecs\n", Title(), system_time() - now);
 			break;
@@ -2460,6 +2461,7 @@ BWindow::_InitData(BRect frame, const char* title, window_look look,
 	fFlags = flags | B_ASYNCHRONOUS_CONTROLS;
 
 	fInTransaction = false;
+	fUpdateRequested = false;
 	fActive = false;
 	fShowLevel = 0;
 
