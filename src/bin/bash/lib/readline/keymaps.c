@@ -105,7 +105,7 @@ rl_make_keymap ()
     newmap[i].function = rl_insert;
 
   newmap[TAB].function = rl_insert;
-  newmap[RUBOUT].function = rl_delete;	/* RUBOUT == 127 */
+  newmap[RUBOUT].function = rl_rubout;	/* RUBOUT == 127 */
   newmap[CTRL('H')].function = rl_rubout;
 
 #if KEYMAP_SIZE > 128

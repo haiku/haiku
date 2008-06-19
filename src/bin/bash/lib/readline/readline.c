@@ -885,23 +885,12 @@ bind_arrow_keys_internal (map)
   _rl_keymap = xkeymap;
 }
 
-/* Bind some default keys in the standard keymap. */
-static void
-bind_default_keys_internal ()
-{
-  _rl_bind_if_unbound ("\033[[", rl_end_of_line);
-  _rl_bind_if_unbound ("\033[@", rl_beg_of_line);
-  _rl_bind_if_unbound ("\033[5~", rl_history_search_backward);
-  _rl_bind_if_unbound ("\033[6~", rl_history_search_forward);
-}
-
 /* Try and bind the common arrow key prefixes after giving termcap and
    the inputrc file a chance to bind them and create `real' keymaps
    for the arrow key prefix. */
 static void
 bind_arrow_keys ()
 {
-  bind_default_keys_internal ();
   bind_arrow_keys_internal (emacs_standard_keymap);
 
 #if defined (VI_MODE)

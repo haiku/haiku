@@ -174,7 +174,7 @@ KEYMAP_ENTRY_ARRAY emacs_standard_keymap = {
   { ISFUNC, rl_insert },		/* | */
   { ISFUNC, rl_insert },		/* } */
   { ISFUNC, rl_insert },		/* ~ */
-  { ISFUNC, rl_delete },		/* RUBOUT */
+  { ISFUNC, rl_rubout },		/* RUBOUT */
 
 #if KEYMAP_SIZE > 128
   /* Pure 8-bit characters (128 - 159).
