@@ -1173,7 +1173,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 						BMessage message(MSG_PREVIOUS_TAB);
 						message.AddPointer("termView", this);
 						Window()->PostMessage(&message);
-					} else if (mod & B_CONTROL_KEY) {
+					} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
 						toWrite = CTRL_LEFT_ARROW_KEY_CODE;
 					} else
 						toWrite = LEFT_ARROW_KEY_CODE;
@@ -1186,7 +1186,7 @@ TermView::KeyDown(const char *bytes, int32 numBytes)
 						BMessage message(MSG_NEXT_TAB);
 						message.AddPointer("termView", this);
 						Window()->PostMessage(&message);
-					} else if (mod & B_CONTROL_KEY) {
+					} else if ((mod & B_CONTROL_KEY) || (mod & B_COMMAND_KEY)) {
 						toWrite = CTRL_RIGHT_ARROW_KEY_CODE;
 					} else
 						toWrite = RIGHT_ARROW_KEY_CODE;
