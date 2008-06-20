@@ -7,7 +7,7 @@
 //	'it'	italian keymap
 //	'sg'	swiss-german keymap
 //	'us'	default US keymap
-#define	KDL_KEYMAP		'it'
+#define	KDL_KEYMAP		'us'
 
 
 #endif	// KERNEL_DEBUGGER_CONFIG_H
