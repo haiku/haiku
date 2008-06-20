@@ -3,11 +3,11 @@
 
 // Available keymaps:
 //	'dv'	dvorak keymap
-//	'it'	italian keymap
 //	'fr'	french keymap
+//	'it'	italian keymap
 //	'sg'	swiss-german keymap
 //	'us'	default US keymap
-#define	KDL_KEYMAP		'us'
+#define	KDL_KEYMAP		'it'
 
 
 #endif	// KERNEL_DEBUGGER_CONFIG_H
