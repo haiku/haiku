@@ -27,7 +27,7 @@
 status_t
 pci_controller_init(void)
 {
-	switch (PPCPlatform::Default()->PlatformType()) {
+	switch (M68KPlatform::Default()->PlatformType()) {
 /*		case M68K_PLATFORM_AMIGA:
 			return m68k_amiga_pci_controller_init();
 			break;
