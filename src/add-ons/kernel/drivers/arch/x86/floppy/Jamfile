@@ -1,32 +1,12 @@
 SubDir HAIKU_TOP src add-ons kernel drivers arch x86 floppy ;
 
+SetSubDirSupportedPlatformsBeOSCompatible ;
+
+UsePrivateHeaders drivers kernel ;
+
 KernelAddon floppy :
 	floppy.c
 	floppy_ctrl.c
 	device_icons.c
 ;
-
-# Not ready for prime-time yet: R5 floppy driver replacement at the moment.
-
-# KernelObjects
-#	floppy.c
-#	floppy_ctrl.c 
-#	device_icons.c
-#	:
-#	-fno-pic -D_KERNEL_MODE
-#	;
-#
-# KernelLd floppy :
-#	<$(SOURCE_GRIST)>floppy.o
-#	<$(SOURCE_GRIST)>floppy_ctrl.o
-#	<$(SOURCE_GRIST)>device_icons.o
-#	kernel.so
-#	:
-#	$(HAIKU_TOP)/src/kernel/ldscripts/$(TARGET_ARCH)/add-on.ld
-#	:
-#	-Bdynamic -shared
-#	:
-#	:
-#	drivers/dev/floppy
-# ; 
 

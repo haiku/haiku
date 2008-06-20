@@ -1,7 +1,9 @@
 /*
- * OpenBeOS floppy driver
- * (c) 2003, OpenBeOS project.
- * François Revol, revol@free.fr
+ * Copyright 2003-2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol <revol@free.fr>
  */
 
 /*

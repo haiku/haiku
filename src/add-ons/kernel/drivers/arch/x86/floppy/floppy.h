@@ -1,7 +1,9 @@
 /*
- * OpenBeOS floppy driver
- * (c) 2003, OpenBeOS project.
- * François Revol, revol@free.fr
+ * Copyright 2003-2008, Haiku.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol <revol@free.fr>
  */
 
 #ifndef _FLOPPY_H
@@ -10,7 +12,21 @@
 #include <Drivers.h>
 #include <ISA.h>
 #include <KernelExport.h>
+
+// TODO: switch to native lock.
+#ifdef __HAIKU__
+#include <lock.h>
+typedef recursive_lock lock;
+#define new_lock recursive_lock_init
+#define free_lock recursive_lock_destroy
+#define	LOCK(l)		recursive_lock_lock(&l);
+#define	UNLOCK(l)	recursive_lock_unlock(&l);
+#else
+#ifndef _IMPEXP_KERNEL
+#define _IMPEXP_KERNEL
+#endif
 #include "lock.h"
+#endif
 
 #define FLO "floppy: "
 #if defined(DEBUG) && DEBUG > 0
