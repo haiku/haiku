@@ -205,22 +205,23 @@ return 0;
 		if (frame) {
 			kprintf("iframe at %p\n", frame);
 			kprintf("   d0 0x%08lx    d1 0x%08lx    d2 0x%08lx    d3 0x%08lx\n",
-				frame->d0, frame->d1, frame->d2, frame->d3);
+				frame->d[0], frame->d[1], frame->d[2], frame->d[3]);
 			kprintf("   d4 0x%08lx    d5 0x%08lx    d6 0x%08lx    d7 0x%08lx\n",
-				frame->d4, frame->d5, frame->d6, frame->d7);
+				frame->d[4], frame->d[5], frame->d[6], frame->d[7]);
 			kprintf("   a0 0x%08lx    a1 0x%08lx    a2 0x%08lx    a3 0x%08lx\n",
-				frame->a0, frame->a1, frame->a2, frame->a3);
+				frame->a[0], frame->a[1], frame->a[2], frame->a[3]);
 			kprintf("   a4 0x%08lx    a5 0x%08lx    a6 0x%08lx    a7 0x%08lx (sp)\n",
-				frame->a4, frame->a5, frame->a6, frame->a7);
+#warning M68K: a7 in iframe ??
+				frame->a[4], frame->a[5], frame->a[6], -1/*frame->a[7]*/);
 
 			/*kprintf("   pc 0x%08lx   ccr 0x%02x\n",
 			  frame->pc, frame->ccr);*/
 			kprintf("   pc 0x%08lx        sr 0x%04x\n",
-				frame->pc, frame->sr);
+				frame->cpu.pc, frame->cpu.sr);
 #warning M68K: missing regs
 
-			print_stack_frame(thread, frame->pc, framePointer, frame->a6);
- 			framePointer = frame->a6;
+			print_stack_frame(thread, frame->cpu.pc, framePointer, frame->a[6]);
+ 			framePointer = frame->a[6];
 		} else {
 			addr_t ip, nextFramePointer;
 

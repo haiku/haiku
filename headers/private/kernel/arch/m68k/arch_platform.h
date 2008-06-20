@@ -11,7 +11,7 @@ struct real_time_data;
 
 enum m68k_platform_type {
 	M68K_PLATFORM_AMIGA = 0,
-	M68K_PLATFORM_ATARI,		/* Falcon */
+	M68K_PLATFORM_ATARI,		/* TT, Falcon, Hades, Milan... */
 	M68K_PLATFORM_MAC,
 	M68K_PLATFORM_NEXT
 };
