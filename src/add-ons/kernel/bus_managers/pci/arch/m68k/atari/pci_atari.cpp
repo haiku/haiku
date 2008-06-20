@@ -13,6 +13,20 @@
 
 #include "pci_controller.h"
 
+/*
+ * Here we fake a PCI bus that maps the physical memory
+ * (which is also I/O on 68k), and fake some system devices.
+ * Some other devices are faked as ISA because they need DMA
+ * notification.
+ * 
+ * TODO: anything to be done to support VME cards ?
+ * I don't think they are PnP at all anyway.
+ * 
+ * TODO: On Hades/Milan clones a real PCI bus is accessible
+ * through PAE-like extra bits in page descriptors. This one
+ * should be handled in a separate file.
+ */
+
 //XXX:find one and put in shared priv header!
 // 0x68xx is free according to pci.ids
 // 68fx (f=fake) x = 0:amiga, 1:apple, 2:atari
@@ -28,7 +42,7 @@
 // default bist
 #define DB 0
 
-#define PEI {0}
+#define PEI 0
 
 #define INVV 0xffff //0x0000 ??
 #define INVD 0xffff
@@ -41,15 +55,20 @@ struct fake_pci_device {
 static struct fake_pci_device gFakePCIDevices[] = {
 { {FAKEV, 0x0000, BN, 0, 0, 0, 0xff, PCI_host, PCI_bridge, DLL, DL, DB, 0, PEI }}, /* cpu */
 { {FAKEV, 0x0001, BN, 1, 0, 0, 0xff, 0x68/*fake*/, PCI_processor, DLL, DL, DB, 0, PEI }}, /* cpu */
-{ {FAKEV, 0x0002, BN, 2, 0, 0, 0xff, PCI_display_other, PCI_display, DLL, DL, DB, 0, $FFFF8200, PEI }}, /* gfx */
-{ {FAKEV, 0x0003, BN, 3, 0, 0, 0xff, PCI_ide, PCI_mass_storage, DLL, DL, DB, 0, $FFF00000, PEI }}, /* ide */
+{ {FAKEV, 0x0002, BN, 2, 0, 0, 0xff, PCI_display_other, PCI_display, DLL, DL, DB, 0, 0xFFFF8200, PEI }}, /* gfx */
+{ {FAKEV, 0x0003, BN, 3, 0, 0, 0xff, PCI_ide, PCI_mass_storage, DLL, DL, DB, 0, 0xFFF00000, PEI }}, /* ide */
 { {FAKEV, 0x0004, BN, 4, 0, 0, 0xff, PCI_scsi, PCI_mass_storage, DLL, DL, DB, 0, PEI }}, /* scsi */
-{ {FAKEV, 0x0005, BN, 5, 0, 0, 0xff, 0x, PCI_multimedia, DLL, DL, DB, 0x00, 0, $FFFF8900, PEI }}, /* snd */
+{ {FAKEV, 0x0005, BN, 5, 0, 0, 0xff, 0x0/*CHANGEME*/, PCI_multimedia, DLL, DL, DB, 0x00, 0, 0xFFFF8900, PEI }}, /* snd */
 //UART ?
 //centronics?
 { {INVV, INVD} }
 };
-#define FAKE_DEVICES_COUNT ((sizeof(gFakePCIDevices)/sizeof(struct fake_pci_device)-1)
+#define FAKE_DEVICES_COUNT (sizeof(gFakePCIDevices)/sizeof(struct fake_pci_device)-1)
+
+struct m68k_atari_fake_host_bridge {
+	uint32					bus;
+};
+
 
 #define out8rb(address, value)	m68k_out8((vuint8*)(address), value)
 #define out16rb(address, value)	m68k_out16_reverse((vuint16*)(address), value)
@@ -59,7 +78,7 @@ static struct fake_pci_device gFakePCIDevices[] = {
 #define in32rb(address)			m68k_in32_reverse((const vuint32*)(address))
 
 
-static int		m68k_atari_enable_config(struct m68k_atari_host_bridge *bridge,
+static int		m68k_atari_enable_config(struct m68k_atari_fake_host_bridge *bridge,
 					uint8 bus, uint8 slot, uint8 function, uint8 offset);
 
 static status_t	m68k_atari_read_pci_config(void *cookie, uint8 bus, uint8 device,
@@ -102,7 +121,8 @@ m68k_atari_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function
 		if (size != s) {	\
 			panic("invalid pci config size %d for offset %d", size, offset); \
 			return EINVAL;	\
-		*value = dev->n;	\
+		}			\
+		*value = dev->info.n;	\
 		return B_OK
 
 	if (1) {
@@ -125,30 +145,33 @@ m68k_atari_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function
 #define PCI_status                              0x06            /* (2 byte) status */
 #endif
 
-	if (dev->header_type == 0x00 || dev->header_type == 0x01) {
+	if (dev->info.header_type == 0x00 || dev->info.header_type == 0x01) {
 		switch (offset) {
 		case PCI_base_registers:
 			return EINVAL;
-		O(PCI_interrupt_line, h0.interrupt_line, 1);
-		O(PCI_interrupt_pin, h0.interrupt_pin, 1);
-	default:
-		break;
+		O(PCI_interrupt_line, u.h0.interrupt_line, 1);
+		O(PCI_interrupt_pin, u.h0.interrupt_pin, 1);
+			default:
+				break;
+		}
 	}
 
-	if (dev->header_type == 0x00) {
+	if (dev->info.header_type == 0x00) {
 		switch (offset) {
-	default:
-		break;
+			default:
+				break;
+		}
 	}
 
-	if (dev->header_type == 0x01) {
+	if (dev->info.header_type == 0x01) {
 		switch (offset) {
-		O(PCI_primary_bus, h1.primary_bus, 1);
-		O(PCI_secondary_bus, h1.secondary_bus, 1);
-		O(PCI_subordinate_bus, h1.subordinate_bus, 1);
-		O(PCI_secondary_latency, h1.secondary_latency, 1);
-	default:
-		break;
+		O(PCI_primary_bus, u.h1.primary_bus, 1);
+		O(PCI_secondary_bus, u.h1.secondary_bus, 1);
+		O(PCI_subordinate_bus, u.h1.subordinate_bus, 1);
+		O(PCI_secondary_latency, u.h1.secondary_latency, 1);
+			default:
+				break;
+		}
 	}
 
 	*value = 0xffffffff;
@@ -158,7 +181,8 @@ m68k_atari_read_pci_config(void *cookie, uint8 bus, uint8 device, uint8 function
 }
 
 
-static status_t m68k_atari_write_pci_config(void *cookie, uint8 bus, uint8 device,
+static status_t
+m68k_atari_write_pci_config(void *cookie, uint8 bus, uint8 device,
 	uint8 function, uint8 offset, uint8 size, uint32 value)
 {
 #if 0
@@ -181,27 +205,33 @@ static status_t m68k_atari_write_pci_config(void *cookie, uint8 bus, uint8 devic
 
 #endif
 	panic("write pci config dev %d offset %d", device, offset);
+	return B_ERROR;
 	return B_OK;
 }
 
 
-static status_t m68k_atari_get_max_bus_devices(void *cookie, int32 *count)
+static status_t
+m68k_atari_get_max_bus_devices(void *cookie, int32 *count)
 {
 	*count = 32;
 	return B_OK;
 }
 
 
-static status_t m68k_atari_read_pci_irq(void *cookie, uint8 bus, uint8 device,
+static status_t
+m68k_atari_read_pci_irq(void *cookie, uint8 bus, uint8 device,
 	uint8 function, uint8 pin, uint8 *irq)
 {
+#warning M68K: WRITEME
 	return B_ERROR;
 }
 
 
-static status_t m68k_atari_write_pci_irq(void *cookie, uint8 bus, uint8 device,
+static status_t
+m68k_atari_write_pci_irq(void *cookie, uint8 bus, uint8 device,
 	uint8 function, uint8 pin, uint8 irq)
 {
+#warning M68K: WRITEME
 	return B_ERROR;
 }
 
@@ -210,35 +240,11 @@ static status_t m68k_atari_write_pci_irq(void *cookie, uint8 bus, uint8 device,
 
 
 static int
-m68k_atari_enable_config(struct m68k_atari_host_bridge *bridge, uint8 bus,
+m68k_atari_enable_config(struct m68k_atari_fake_host_bridge *bridge, uint8 bus,
 	uint8 slot, uint8 function, uint8 offset)
 {
-//	uint32 pass;
-// 	if (resource_int_value(device_get_name(sc->sc_dev),
-// 	        device_get_unit(sc->sc_dev), "skipslot", &pass) == 0) {
-// 		if (pass == slot)
-// 			return (0);
-// 	}
-
-	uint32 cfgval;
-	if (bridge->bus == bus) {
-		/*
-		 * No slots less than 11 on the primary bus
-		 */
-		if (slot < 11)
-			return (0);
-
-		cfgval = (1 << slot) | (function << 8) | (offset & 0xfc);
-	} else {
-		cfgval = (bus << 16) | (slot << 11) | (function << 8) |
-		    (offset & 0xfc) | 1;
-	}
-
-	do {
-		out32rb(bridge->address_registers, cfgval);
-	} while (in32rb(bridge->address_registers) != cfgval);
-
-	return (1);
+#warning M68K: WRITEME
+	return 0;
 }
 
 
@@ -250,9 +256,20 @@ m68k_atari_enable_config(struct m68k_atari_host_bridge *bridge, uint8 bus,
 status_t
 m68k_atari_pci_controller_init(void)
 {
-	status_t error = pci_controller_add(&sM68kAtariPCIController, /*cookie*/);
-/*	if (error != B_OK)
-		free(bridge);*/
+	struct m68k_atari_fake_host_bridge *bridge;
+	bridge = (struct m68k_atari_fake_host_bridge *)
+		malloc(sizeof(struct m68k_atari_fake_host_bridge));
+	if (!bridge)
+		return B_NO_MEMORY;
+
+	bridge->bus = 0;
+
+	status_t error = pci_controller_add(&sM68kAtariPCIController, bridge);
+
+	if (error != B_OK)
+		free(bridge);
+
+	// TODO: probe Hades & Milan bridges
 	return error;
 }
 
