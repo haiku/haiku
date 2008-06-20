@@ -1507,26 +1507,6 @@ BView::ScrollTo(BPoint where)
 	if (where.x == fBounds.left && where.y == fBounds.top)
 		return;
 
-	// make sure scrolling is within valid bounds
-	if (fHorScroller) {
-		float min, max;
-		fHorScroller->GetRange(&min, &max);
-
-		if (where.x < min)
-			where.x = min;
-		else if (where.x > max)
-			where.x = max;
-	}
-	if (fVerScroller) {
-		float min, max;
-		fVerScroller->GetRange(&min, &max);
-
-		if (where.y < min)
-			where.y = min;
-		else if (where.y > max)
-			where.y = max;
-	}
-
 	_CheckLockAndSwitchCurrent();
 
 	// if we're attached to a window tell app_server about this change

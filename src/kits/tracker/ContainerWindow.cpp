@@ -1077,17 +1077,20 @@ void
 BContainerWindow::FrameResized(float, float)
 {
 	if (PoseView() && dynamic_cast<BDeskWindow *>(this) == NULL) {
-		BRect extent = PoseView()->Extent();
-		if (extent.bottom < PoseView()->Bounds().bottom
-			&& fPreviousBounds.Height() < Bounds().Height()) {
-			PoseView()->ScrollBy(0, max_c(extent.bottom - PoseView()->Bounds().bottom,
-				fPreviousBounds.Height() - Bounds().Height()));
-		}
-		if (extent.right < PoseView()->Bounds().right
-			&& fPreviousBounds.Width() < Bounds().Width()) {
-			PoseView()->ScrollBy(max_c(extent.right - PoseView()->Bounds().right,
-				fPreviousBounds.Width() - Bounds().Width()), 0);
-		}
+		BRect extent = PoseView()->Extent();		
+		float offsetX = extent.left - PoseView()->Bounds().left;
+		float offsetY = extent.top - PoseView()->Bounds().top;
+		
+		// scroll when the size augmented, there is a negative offset
+		// and we have resized over the bottom right corner of the extent 
+		if (offsetX < 0 && PoseView()->Bounds().right > extent.right
+			&& Bounds().Width() > fPreviousBounds.Width()) 
+			PoseView()->ScrollBy(max_c(fPreviousBounds.Width() - Bounds().Width(), offsetX), 0);			
+		
+		if (offsetY < 0 && PoseView()->Bounds().bottom > extent.bottom 
+			&& Bounds().Height() > fPreviousBounds.Height())
+			PoseView()->ScrollBy(0, max_c(fPreviousBounds.Height() - Bounds().Height(), offsetY));
+				
 		PoseView()->UpdateScrollRange();
 		PoseView()->ResetPosePlacementHint();
 	}
@@ -1336,11 +1339,11 @@ BContainerWindow::ResizeToFit()
 	MoveTo(frame.LeftTop());
 	PoseView()->DisableScrollBars();
 
-	if (PoseView()->Bounds().bottom > extent.bottom && PoseView()->Bounds().top < 0)
-		PoseView()->ScrollBy(0, extent.bottom - PoseView()->Bounds().bottom);
-	if (PoseView()->Bounds().right > extent.right && PoseView()->Bounds().left < 0)
-		PoseView()->ScrollBy(extent.right - PoseView()->Bounds().right, 0);
-
+	// scroll if there is an offset
+	PoseView()->ScrollBy(
+		extent.left - PoseView()->Bounds().left,
+		extent.top - PoseView()->Bounds().top);
+	
 	PoseView()->UpdateScrollRange();
 	PoseView()->EnableScrollBars();
 }
