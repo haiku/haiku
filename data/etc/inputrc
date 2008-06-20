@@ -3,3 +3,5 @@
 "\e[5~": history-search-backward
 "\e[6~": history-search-forward
 "\e[3~": delete-char
+"\eO5D": backward-word
+"\eO5C": forward-word
