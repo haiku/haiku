@@ -20,7 +20,7 @@ extern "C" {
 /* from arch_030_asm.S */
 extern void flush_insn_pipeline_030(void);
 extern void flush_atc_all_030(void);
-extern void flush_atc_addr_030(void *addr);
+extern void flush_atc_addr_030(addr_t addr);
 
 #ifdef __cplusplus
 }
@@ -31,7 +31,7 @@ extern void flush_atc_addr_030(void *addr);
 #define CACHELINE 16
 
 static void 
-sync_icache_030(void *address, size_t len)
+sync_icache_030(addr_t address, size_t len)
 {
 	int l, off;
 	char *p;

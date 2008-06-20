@@ -15,9 +15,9 @@
 
 // kernel args
 typedef struct {
-	int			cpu_type;
-	int			fpu_type;
-	int			mmu_type;
+	int			cpu_type; // decimal: 68030, ...
+	int			fpu_type; // decimal: 68030, ...
+	int			mmu_type; // decimal: 68030, ...
 	int			platform;
 	bool			has_lpstop; //XXX: use bit flags
 	// architecture specific

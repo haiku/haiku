@@ -76,7 +76,7 @@ using BPrivate::M68KApple;
 
 // constructor
 M68KApple::M68KApple()
-	: M68KPlatform(M68K_PLATFORM_OPEN_FIRMWARE),
+	: M68KPlatform(M68K_PLATFORM_MAC),
 	  fRTC(-1)
 {
 }
@@ -134,12 +134,14 @@ M68KApple::SerialDebugPutChar(char c)
 void
 M68KApple::ShutDown(bool reboot)
 {
+#if 0
 	if (reboot) {
 		of_interpret("reset-all", 0, 0);
 	} else {
 		// not standardized, so it might fail
 		of_interpret("shut-down", 0, 0);
 	}
+#endif
 }
 
 
@@ -279,8 +281,22 @@ arch_platform_init(struct kernel_args *kernelArgs)
 {
 #warning M68K: switch platform from kernel args
 	// only Atari supported for now
-	if (true)
-		sM68KPlatform = new(sM68KPlatformBuffer) M68KAtari;
+	switch (args->arch_args.platform) {
+		case M68K_PLATFORM_AMIGA:
+			sM68KPlatform = new(sM68KPlatformBuffer) M68KAmiga;
+			break;
+		case M68K_PLATFORM_ATARI:
+			sM68KPlatform = new(sM68KPlatformBuffer) M68KAtari;
+			break;
+		case M68K_PLATFORM_MAC:
+			sM68KPlatform = new(sM68KPlatformBuffer) M68KApple;
+			break;
+		case M68K_PLATFORM_NEXT:
+			sM68KPlatform = new(sM68KPlatformBuffer) M68KNext;
+			break;
+		default:
+			panic("unknown platform d\n", args->arch_args.platform);
+	}
 
 	return sM68KPlatform->Init(kernelArgs);
 }

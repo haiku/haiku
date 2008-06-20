@@ -23,11 +23,6 @@ extern struct m68k_cpu_ops cpu_ops_060;
 
 struct m68k_cpu_ops cpu_ops;
 
-int cpu_type;
-int fpu_type;
-int mmu_type;
-int platform;
-
 status_t 
 arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 {
@@ -45,47 +40,55 @@ arch_cpu_preboot_init_percpu(kernel_args *args, int curr_cpu)
 status_t
 arch_cpu_init(kernel_args *args)
 {
-	cpu_type = args->arch_args.cpu_type;
-	fpu_type = args->arch_args.fpu_type;
-	mmu_type = args->arch_args.mmu_type;
-	platform = args->arch_args.platform;
+	arch_cpu_type = args->arch_args.cpu_type;
+	arch_fpu_type = args->arch_args.fpu_type;
+	arch_mmu_type = args->arch_args.mmu_type;
+	arch_platform = args->arch_args.platform;
+	void (*flush_insn_pipeline)(void);
+	void (*flush_atc_all)(void);
+	void (*flush_atc_user)(void);
+	void (*flush_atc_addr)(void *addr);
+	void (*flush_dcache)(void *address, size_t len);
+	void (*flush_icache)(void *address, size_t len);
+	void (*idle)(void);
 
-	switch (cpu_type) {
-	case CPU_68020:
-	case CPU_68030:
-		cpu_ops.flush_insn_pipeline = cpu_ops_030.flush_insn_pipeline;
-		cpu_ops.flush_atc_all = cpu_ops_030.flush_atc_all;
-		cpu_ops.flush_atc_user = cpu_ops_030.flush_atc_user;
-		cpu_ops.flush_atc_addr = cpu_ops_030.flush_atc_addr;
-		cpu_ops.flush_cache_line = cpu_ops_030.flush_cache_line;
-		cpu_ops.idle = cpu_ops_030.idle; // NULL
-		//cpu_ops. = cpu_ops_030.;
-		break;
+	switch (arch_cpu_type) {
+		case 68020:
+		case 68030:
+			cpu_ops.flush_insn_pipeline = cpu_ops_030.flush_insn_pipeline;
+			cpu_ops.flush_atc_all = cpu_ops_030.flush_atc_all;
+			cpu_ops.flush_atc_user = cpu_ops_030.flush_atc_user;
+			cpu_ops.flush_atc_addr = cpu_ops_030.flush_atc_addr;
+			cpu_ops.flush_dcache = cpu_ops_030.flush_dcache;
+			cpu_ops.flush_icache = cpu_ops_030.flush_icache;
+			cpu_ops.idle = cpu_ops_030.idle; // NULL
+			break;
 #ifdef SUPPORTS_040
-	case CPU_68040:
-		cpu_ops.flush_insn_pipeline = cpu_ops_040.flush_insn_pipeline;
-		cpu_ops.flush_atc_all = cpu_ops_040.flush_atc_all;
-		cpu_ops.flush_atc_user = cpu_ops_040.flush_atc_user;
-		cpu_ops.flush_atc_addr = cpu_ops_040.flush_atc_addr;
-		cpu_ops.flush_cache_line = cpu_ops_040.flush_cache_line;
-		cpu_ops.idle = cpu_ops_040.idle; // NULL
-		//cpu_ops. = cpu_ops_040.;
-		break;
+		case 68040:
+			cpu_ops.flush_insn_pipeline = cpu_ops_040.flush_insn_pipeline;
+			cpu_ops.flush_atc_all = cpu_ops_040.flush_atc_all;
+			cpu_ops.flush_atc_user = cpu_ops_040.flush_atc_user;
+			cpu_ops.flush_atc_addr = cpu_ops_040.flush_atc_addr;
+			cpu_ops.flush_dcache = cpu_ops_040.flush_dcache;
+			cpu_ops.flush_icache = cpu_ops_040.flush_icache;
+			cpu_ops.idle = cpu_ops_040.idle; // NULL
+			break;
 #endif
 #ifdef SUPPORTS_060
-	case CPU_68060:
-		cpu_ops.flush_insn_pipeline = cpu_ops_060.flush_insn_pipeline;
-		cpu_ops.flush_atc_all = cpu_ops_060.flush_atc_all;
-		cpu_ops.flush_atc_user = cpu_ops_060.flush_atc_user;
-		cpu_ops.flush_atc_addr = cpu_ops_060.flush_atc_addr;
-		cpu_ops.flush_cache_line = cpu_ops_060.flush_cache_line;
-		cpu_ops.idle = cpu_ops_060.idle;
-		//cpu_ops. = cpu_ops_060.;
+		case 68060:
+			cpu_ops.flush_insn_pipeline = cpu_ops_060.flush_insn_pipeline;
+			cpu_ops.flush_atc_all = cpu_ops_060.flush_atc_all;
+			cpu_ops.flush_atc_user = cpu_ops_060.flush_atc_user;
+			cpu_ops.flush_atc_addr = cpu_ops_060.flush_atc_addr;
+			cpu_ops.flush_dcache = cpu_ops_060.flush_dcache;
+			cpu_ops.flush_icache = cpu_ops_060.flush_icache;
+			cpu_ops.idle = cpu_ops_060.idle;
 		break;
 #endif
-	default:
-		panic("unknown cpu_type 0x%08lx\n", args->arch_args.cpu_type);
+		default:
+			panic("unknown cpu_type %d\n", arch_cpu_type);
 	}
+
 	return B_OK;
 }
 
@@ -106,7 +109,7 @@ arch_cpu_init_post_modules(kernel_args *args)
 void 
 arch_cpu_sync_icache(void *address, size_t len)
 {
-	cpu_ops.flush_icache(address, len);
+	cpu_ops.flush_icache((addr_t)address, len);
 }
 
 

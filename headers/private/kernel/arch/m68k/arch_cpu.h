@@ -357,9 +357,9 @@ struct m68k_cpu_ops {
 	void (*flush_insn_pipeline)(void);
 	void (*flush_atc_all)(void);
 	void (*flush_atc_user)(void);
-	void (*flush_atc_addr)(void *addr);
-	void (*flush_dcache)(void *address, size_t len);
-	void (*flush_icache)(void *address, size_t len);
+	void (*flush_atc_addr)(addr_t addr);
+	void (*flush_dcache)(addr_t address, size_t len);
+	void (*flush_icache)(addr_t address, size_t len);
 	void (*idle)(void);
 };
 
@@ -375,6 +375,10 @@ extern struct m68k_cpu_ops cpu_ops;
 #define tlbia() asm volatile("tlbia")
 #define tlbie(addr) asm volatile("tlbie %0" :: "r" (addr))
 #endif
+
+#if 0
+
+// XXX: not used: we just use decimal chip number, like 68030
 
 // m68k processor version.
 enum m68k_processor_version {
@@ -410,6 +414,7 @@ enum m68k_mmu_version {
 	MMU_68060		= 0x0600,
 	MMU_MASK		= 0x0F00
 };
+#endif
 
 extern int arch_cpu_type;
 extern int arch_fpu_type;
