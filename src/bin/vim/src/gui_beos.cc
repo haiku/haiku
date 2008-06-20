@@ -1892,7 +1892,7 @@ vim_unlock_screen()
 	gui.vimWindow->Unlock();
 }
 
-#define RUN_BAPPLICATION_IN_NEW_THREAD 0
+#define RUN_BAPPLICATION_IN_NEW_THREAD 1
 
 #if RUN_BAPPLICATION_IN_NEW_THREAD
 
