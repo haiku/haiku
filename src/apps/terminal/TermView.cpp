@@ -690,6 +690,8 @@ TermView::Paste(BClipboard *clipboard)
 		}
 
 		clipboard->Unlock();
+
+		_ScrollTo(0, true);
 	}
 }
 
