@@ -687,10 +687,11 @@ TermWindow::_AddTab(Arguments *args)
 		// Note: I don't pass the Arguments class directly to the termview,
 		// only to avoid adding it as a dependency: in other words, to keep
 		// the TermView class as agnostic as possible about the surrounding world.
-		CustomTermView *view = 
-			new CustomTermView(PrefHandler::Default()->getInt32(PREF_ROWS),
-							PrefHandler::Default()->getInt32(PREF_COLS),
-							argc, (const char **)argv);
+		CustomTermView *view = new CustomTermView(
+			PrefHandler::Default()->getInt32(PREF_ROWS),
+			PrefHandler::Default()->getInt32(PREF_COLS),
+			argc, (const char **)argv,
+			PrefHandler::Default()->getInt32(PREF_HISTORY_SIZE));
 
 		TermViewContainerView *containerView = new TermViewContainerView(view);
 		BScrollView *scrollView = new TermScrollView("scrollView",

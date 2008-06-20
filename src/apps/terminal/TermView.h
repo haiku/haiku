@@ -30,8 +30,9 @@ class TermBuffer;
 
 class TermView : public BView {
 public:
-	TermView(BRect frame, int32 argc, const char **argv, int32 historySize = 1000);
-	TermView(int rows, int columns, int32 argc, const char **argv, int32 historySize = 1000);
+	TermView(BRect frame, int32 argc, const char **argv, int32 historySize);
+	TermView(int rows, int columns, int32 argc, const char **argv,
+		int32 historySize);
 	TermView(BMessage *archive);	
 	~TermView();
 
