@@ -31,12 +31,15 @@
 #ifndef TERMCONST_H_INCLUDED
 #define TERMCONST_H_INCLUDED
 
-// Application signature (Must same in Muterminal.rsrc)//
+// Application signature (Must same in Muterminal.rsrc)
 #define TERM_SIGNATURE "application/x-vnd.Haiku-Terminal"
 #define PREFFILE_MIMETYPE "text/x-terminal-pref"
 
 // Signature of R5's Terminal. Needed for proper drop-in window count support
 #define R5_TERM_SIGNATURE "application/x-vnd.Be-SHEL"
+
+// Name of the clipboard used for mouse copy'n'paste.
+#define MOUSE_CLIPBOARD_NAME TERM_SIGNATURE "/mouse"
 
 // Message constants for menu items
 

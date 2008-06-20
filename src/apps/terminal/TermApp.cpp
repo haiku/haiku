@@ -26,6 +26,7 @@
 
 #include "Arguments.h"
 #include "CodeConv.h"
+#include "Globals.h"
 #include "PrefHandler.h"
 #include "TermWindow.h"
 #include "TermConst.h"
@@ -93,6 +94,9 @@ TermApp::ReadyToRun()
 		fprintf(stderr, "sigaction() failed: %s\n", strerror(errno));
 		// continue anyway
 	}
+
+	// init the mouse copy'n'paste clipboard
+	gMouseClipboard = new BClipboard(MOUSE_CLIPBOARD_NAME, true);
 
 	status_t status = _MakeTermWindow(fTermFrame);
 

@@ -11,6 +11,7 @@ Application Terminal :
 	CodeConv.cpp
 	Coding.cpp
 	FindWindow.cpp
+	Globals.cpp
 	HistoryBuffer.cpp
 	MenuUtil.cpp
 	Terminal.cpp

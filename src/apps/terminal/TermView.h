@@ -191,6 +191,8 @@ private:
 	// Cursor position.
 	TermPos fCursor;
 
+	int32 fMouseButtons;
+
 	// Terminal rows and columns.
 	int fTermRows;
 	int fTermColumns;

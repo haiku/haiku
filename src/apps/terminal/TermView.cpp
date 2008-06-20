@@ -41,6 +41,7 @@
 #include <Window.h>
 
 #include "CodeConv.h"
+#include "Globals.h"
 #include "Shell.h"
 #include "TermConst.h"
 #include "TerminalCharClassifier.h"
@@ -949,6 +950,8 @@ TermView::_UpdateSIGWINCH()
 void
 TermView::AttachedToWindow()
 {
+	fMouseButtons = 0;
+
 	MakeFocus(true);
 	if (fScrollBar) {
 		fScrollBar->SetSteps(fFontHeight, fFontHeight * fTermRows);
@@ -1801,19 +1804,11 @@ TermView::MouseDown(BPoint where)
 	int32 buttons;
 	Window()->CurrentMessage()->FindInt32("buttons", &buttons); 
 
+	fMouseButtons = buttons;
+
 	// paste button
 	if ((buttons & (B_SECONDARY_MOUSE_BUTTON | B_TERTIARY_MOUSE_BUTTON)) != 0) {
-		if (_HasSelection()) {
-			// copy text from region
-			BString copy;
-			fTextBuffer->Lock();
-			fTextBuffer->GetStringFromRegion(copy, fSelStart, fSelEnd);
-			fTextBuffer->Unlock();
-			_WritePTY(copy.String(), copy.Length());
-		} else {
-			// copy text from clipboard.
-			Paste(be_clipboard);
-		}
+		Paste(gMouseClipboard);
 		return;
 	}
 
@@ -1956,6 +1951,17 @@ TermView::MouseUp(BPoint where)
 		delete fAutoScrollRunner;
 		fAutoScrollRunner = NULL;
 	}
+
+	// When releasing the first mouse button, we copy the selected text to the
+	// clipboard.
+	int32 buttons;
+	Window()->CurrentMessage()->FindInt32("buttons", &buttons);
+	if ((buttons & B_PRIMARY_MOUSE_BUTTON) == 0
+		&& (fMouseButtons & B_PRIMARY_MOUSE_BUTTON) != 0) {
+		Copy(gMouseClipboard);
+	}
+
+	fMouseButtons = buttons;
 }
 
 
