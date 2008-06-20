@@ -3,6 +3,7 @@
 
 // Available keymaps:
 //	'dv'	dvorak keymap
+//	'it'	italian keymap
 //	'fr'	french keymap
 //	'sg'	swiss-german keymap
 //	'us'	default US keymap
