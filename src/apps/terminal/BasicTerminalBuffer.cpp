@@ -116,6 +116,7 @@ BasicTerminalBuffer::Init(int32 width, int32 height, int32 historySize)
 
 	fCursor.x = 0;
 	fCursor.y = 0;
+	fSoftWrappedCursor = false;
 
 	fScreenOffset = 0;
 
@@ -180,6 +181,7 @@ BasicTerminalBuffer::SetHistoryCapacity(int32 historyCapacity)
 void
 BasicTerminalBuffer::Clear(bool resetCursor)
 {
+	fSoftWrappedCursor = false;
 	fScreenOffset = 0;
 	_ClearLines(0, fHeight - 1);
 
@@ -541,10 +543,12 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 attributes)
 	if (width == FULL_WIDTH)
 		attributes |= A_WIDTH;
 
-	if (fCursor.x + width > fWidth)
+	if (fSoftWrappedCursor || fCursor.x + width > fWidth)
 		_SoftBreakLine();
 	else
 		_PadLineToCursor();
+
+	fSoftWrappedCursor = false;
 
 	if (!fOverwriteMode)
 		_InsertGap(width);
@@ -563,9 +567,10 @@ BasicTerminalBuffer::InsertChar(UTF8Char c, uint32 attributes)
 // TODO: Deal correctly with full-width chars! We must take care not to
 // overwrite half of a full-width char. This holds also for other methods.
 
-	if (fCursor.x == fWidth)
-		_SoftBreakLine();
-			// TODO: Handle a subsequent CR correctly!
+	if (fCursor.x == fWidth) {
+		fCursor.x -= width;
+		fSoftWrappedCursor = true;
+	}
 }
 
 
@@ -573,6 +578,7 @@ void
 BasicTerminalBuffer::InsertCR()
 {
 	_LineAt(fCursor.y)->softBreak = false;
+	fSoftWrappedCursor = false;
 	fCursor.x = 0;
 	_CursorChanged();
 }
@@ -581,6 +587,8 @@ BasicTerminalBuffer::InsertCR()
 void
 BasicTerminalBuffer::InsertLF()
 {
+	fSoftWrappedCursor = false;
+
 	// If we're at the end of the scroll region, scroll. Otherwise just advance
 	// the cursor.
 	if (fCursor.y == fScrollBottom) {
@@ -596,8 +604,10 @@ BasicTerminalBuffer::InsertLF()
 void
 BasicTerminalBuffer::InsertLines(int32 numLines)
 {
-	if (fCursor.y >= fScrollTop && fCursor.y < fScrollBottom)
+	if (fCursor.y >= fScrollTop && fCursor.y < fScrollBottom) {
+		fSoftWrappedCursor = false;
 		_Scroll(fCursor.y, fScrollBottom, -numLines);
+	}
 }
 
 
@@ -616,6 +626,7 @@ BasicTerminalBuffer::InsertSpace(int32 num)
 		num = fWidth - fCursor.x;
 
 	if (num > 0) {
+		fSoftWrappedCursor = false;
 		_PadLineToCursor();
 		_InsertGap(num);
 
@@ -636,6 +647,8 @@ BasicTerminalBuffer::EraseChars(int32 numChars)
 	TerminalLine* line = _LineAt(fCursor.y);
 	if (fCursor.y >= line->length)
 		return;
+
+	fSoftWrappedCursor = false;
 
 	int32 first = fCursor.x;
 	int32 end = min_c(fCursor.x + numChars, line->length);
@@ -660,6 +673,8 @@ BasicTerminalBuffer::EraseAbove()
 	if (fCursor.y > 0)
 		_ClearLines(0, fCursor.y - 1);
 
+	fSoftWrappedCursor = false;
+
 	// Delete the chars on the cursor line before (and including) the cursor.
 	TerminalLine* line = _LineAt(fCursor.y);
 	if (fCursor.x < line->length) {
@@ -680,6 +695,8 @@ BasicTerminalBuffer::EraseAbove()
 void
 BasicTerminalBuffer::EraseBelow()
 {
+	fSoftWrappedCursor = false;
+
 	// Clear the following lines.
 	if (fCursor.y < fHeight - 1)
 		_ClearLines(fCursor.y + 1, fHeight - 1);
@@ -692,6 +709,8 @@ BasicTerminalBuffer::EraseBelow()
 void
 BasicTerminalBuffer::DeleteChars(int32 numChars)
 {
+	fSoftWrappedCursor = false;
+
 	TerminalLine* line = _LineAt(fCursor.y);
 	if (fCursor.x < line->length) {
 		if (fCursor.x + numChars < line->length) {
@@ -712,6 +731,8 @@ BasicTerminalBuffer::DeleteChars(int32 numChars)
 void
 BasicTerminalBuffer::DeleteColumns()
 {
+	fSoftWrappedCursor = false;
+
 	TerminalLine* line = _LineAt(fCursor.y);
 	if (fCursor.x < line->length) {
 		line->length = fCursor.x;
@@ -723,8 +744,10 @@ BasicTerminalBuffer::DeleteColumns()
 void
 BasicTerminalBuffer::DeleteLines(int32 numLines)
 {
-	if (fCursor.y >= fScrollTop && fCursor.y <= fScrollBottom)
+	if (fCursor.y >= fScrollTop && fCursor.y <= fScrollBottom) {
+		fSoftWrappedCursor = false;
 		_Scroll(fCursor.y, fScrollBottom, numLines);
+	}
 }
 
 
@@ -732,6 +755,7 @@ void
 BasicTerminalBuffer::SetCursor(int32 x, int32 y)
 {
 //debug_printf("BasicTerminalBuffer::SetCursor(%d, %d)\n", x, y);
+	fSoftWrappedCursor = false;
 	x = restrict_value(x, 0, fWidth - 1);
 	y = restrict_value(y, 0, fHeight - 1);
 	if (x != fCursor.x || y != fCursor.y) {
@@ -955,6 +979,7 @@ BasicTerminalBuffer::_ResizeSimple(int32 width, int32 height,
 	if (fCursor.x > width)
 		fCursor.x = width;
 	fCursor.y -= firstLine;
+	fSoftWrappedCursor = false;
 
 	return B_OK;
 }
@@ -1131,6 +1156,7 @@ BasicTerminalBuffer::_ResizeRewrap(int32 width, int32 height,
 //cursor.x, cursor.y);
 	fCursor.x = cursor.x;
 	fCursor.y = cursor.y;
+	fSoftWrappedCursor = false;
 //debug_printf("  screen offset: %ld -> %ld\n", fScreenOffset, destScreenOffset % height);
 	fScreenOffset = destScreenOffset % height;
 //debug_printf("  height %ld -> %ld\n", fHeight, height);
@@ -1266,7 +1292,6 @@ void
 BasicTerminalBuffer::_SoftBreakLine()
 {
 	TerminalLine* line = _LineAt(fCursor.y);
-	line->length = fCursor.x;
 	line->softBreak = true;
 
 	fCursor.x = 0;

@@ -183,6 +183,7 @@ protected:
 			// cursor position (origin: (0, 0))
 			TermPos				fCursor;
 			TermPos				fSavedCursor;
+			bool				fSoftWrappedCursor;
 
 			bool				fOverwriteMode;	// false for insert
 			bool				fAlternateScreenActive;
