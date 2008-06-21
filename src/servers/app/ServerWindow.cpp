@@ -1036,6 +1036,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 
 		case AS_SYNC:
+			DTRACE(("ServerWindow %s: Message AS_SYNC\n", Title()));
 			// the synchronisation works by the fact that the client
 			// window is waiting for this reply, after having received it,
 			// client and server queues are in sync (earlier, the client
@@ -1046,12 +1047,12 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver &link)
 			break;
 
 		case AS_BEGIN_UPDATE:
-			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_BEGIN_UPDATE\n", Title()));
 			fWindow->BeginUpdate(fLink);
 			break;
 
 		case AS_END_UPDATE:
-			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n", Title()));
+			DTRACE(("ServerWindow %s: Message AS_END_UPDATE\n", Title()));
 			fWindow->EndUpdate();
 			break;
 
