@@ -96,10 +96,21 @@ status_t OpenSoundDeviceEngine::Open(int mode)
 		return EIO;
 	}
 
-	// set latency policy = fragment size (4 means 2048 bytes driver buffer
-	// in my tests)
-	// XXX: BParameter?
+	// set latency policy = fragment size and total driver buffer size
+	// TODO: export this setting as a BParameter?
+
+	// NOTE stippi: 4 means 2048 bytes driver buffer in my tests on a C-Media
+	// This latency is long enough for playback on BeOS. On Haiku, testing on
+	// HD Audio hardware, it is too short. However, I seem to remember the
+	// HD Audio supports 32 bit sample width (while C-Media supports "only"
+	// 16). If OSS uses the same 2048 bytes even for 32 bit/sample, then I
+	// could see how that would be asking too much, since that would
+	// effectively half the latency.
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	v = 5;
+#else
 	v = 4;
+#endif
 	if (ioctl(fFD, SNDCTL_DSP_POLICY, &v, sizeof(int)) < 0) {
 		if (errno != EIO && errno != EINVAL) {
 			fInitCheckStatus = errno;
