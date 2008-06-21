@@ -1420,13 +1420,6 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 								&temp);
 							break;
 
-						case B_CMAP8:
-							_TransparentMagicToAlpha((uint8 *)srcBuffer.buf(),
-								srcBuffer.width(), srcBuffer.height(),
-								srcBuffer.stride(), B_TRANSPARENT_MAGIC_CMAP8,
-								&temp);
-							break;
-
 						default:
 							break;
 					}
