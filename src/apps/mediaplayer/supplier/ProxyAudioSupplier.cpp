@@ -14,6 +14,7 @@
 
 #include "AudioTrackSupplier.h"
 #include "AudioAdapter.h"
+#include "AudioVolumeConverter.h"
 #include "PlaybackManager.h"
 
 using std::nothrow;
@@ -49,9 +50,11 @@ ProxyAudioSupplier::ProxyAudioSupplier(PlaybackManager* playbackManager)
 
 	, fPlaybackManager(playbackManager)
 	, fVideoFrameRate(25.0)
+	, fVolume(1.0)
 
 	, fSupplier(NULL)
 	, fAdapter(NULL)
+	, fVolumeConverter(NULL)
 	, fAudioResampler()
 {
 	TRACE("ProxyAudioSupplier()\n");
@@ -62,6 +65,7 @@ ProxyAudioSupplier::~ProxyAudioSupplier()
 {
 	TRACE("~ProxyAudioSupplier()\n");
 	delete fAdapter;
+	delete fVolumeConverter;
 }
 
 
@@ -224,9 +228,30 @@ ProxyAudioSupplier::SetSupplier(AudioTrackSupplier* supplier,
 	fVideoFrameRate = videoFrameRate;
 
 	delete fAdapter;
-	fAdapter = new AudioAdapter(fSupplier, Format());
+	delete fVolumeConverter;
 
-	fAudioResampler.SetSource(fAdapter);
+	fAdapter = new AudioAdapter(fSupplier, Format());
+	fVolumeConverter = new AudioVolumeConverter(fAdapter, fVolume);
+
+	fAudioResampler.SetSource(fVolumeConverter);
+}
+
+
+void
+ProxyAudioSupplier::SetVolume(float volume)
+{
+	BAutolock _(fSupplierLock);
+	fVolume = volume;
+	if (fVolumeConverter)
+		fVolumeConverter->SetVolume(volume);
+}
+
+
+float
+ProxyAudioSupplier::Volume()
+{
+	BAutolock _(fSupplierLock);
+	return fVolume;
 }
 
 

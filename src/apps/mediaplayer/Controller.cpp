@@ -159,8 +159,10 @@ Controller::SetTo(const entry_ref &ref)
 	BAutolock _(this);
 
 	if (fRef == ref) {
-		SetCurrentFrame(0);
-		StartPlaying();
+		if (InitCheck() == B_OK) {
+			SetCurrentFrame(0);
+			StartPlaying();
+		}
 		return B_OK;
 	}
 
@@ -233,8 +235,8 @@ Controller::SetTo(const entry_ref &ref)
 	printf("Controller::SetTo: %d audio track, %d video track\n",
 		AudioTrackCount(), VideoTrackCount());
 
-	mediaFileDeleter.Detach();
 	fMediaFile = mf;
+	mediaFileDeleter.Detach();
 
 	SelectAudioTrack(0);
 	SelectVideoTrack(0);
@@ -269,12 +271,11 @@ Controller::SetTo(const entry_ref &ref)
 			preferredVideoFormat);
 	}
 
-	SetCurrentFrame(0);
+	_NotifyFileChanged();
 
+	SetCurrentFrame(0);
 	if (fAutoplay)
 		StartPlaying(true);
-
-	_NotifyFileChanged();
 
 	return B_OK;
 }
@@ -477,9 +478,7 @@ Controller::SetVolume(float value)
 			ToggleMute();
 
 		fVolume = value;
-// TODO: apply to AutioProducer node
-//		if (fSoundOutput)
-//			fSoundOutput->SetVolume(fVolume);
+		fAudioSupplier->SetVolume(fVolume);
 
 		_NotifyVolumeChanged(fVolume);
 	}
@@ -509,13 +508,10 @@ Controller::ToggleMute()
 
 	fMuted = !fMuted;
 
-// TODO: apply to AudioProducer node	
-//	if (fSoundOutput) {
-//		if (fMuted)
-//			fSoundOutput->SetVolume(0.0);
-//		else
-//			fSoundOutput->SetVolume(fVolume);
-//	}
+	if (fMuted)
+		fAudioSupplier->SetVolume(0.0);
+	else
+		fAudioSupplier->SetVolume(fVolume);
 
 	_NotifyMutedChanged(fMuted);
 

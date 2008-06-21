@@ -12,6 +12,7 @@
 
 
 class AudioTrackSupplier;
+class AudioVolumeConverter;
 class PlaybackManager;
 
 
@@ -33,6 +34,8 @@ public:
 	// ProxyAudioSupplier
 			void				SetSupplier(AudioTrackSupplier* supplier,
 									float videoFrameRate);
+			void				SetVolume(float volume);
+			float				Volume();
 
 private:
 			int64				_AudioFrameForVideoFrame(int64 frame) const;
@@ -50,9 +53,11 @@ private:
 
 	PlaybackManager*			fPlaybackManager;
 	float						fVideoFrameRate;
+	float						fVolume;
 
 	AudioTrackSupplier*			fSupplier;
 	AudioReader*				fAdapter;
+	AudioVolumeConverter*		fVolumeConverter;
 	AudioResampler				fAudioResampler;
 };
 

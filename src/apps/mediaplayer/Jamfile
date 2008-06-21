@@ -44,6 +44,7 @@ Application MediaPlayer :
 	AudioReader.cpp
 	AudioResampler.cpp
 	AudioSupplier.cpp
+	AudioVolumeConverter.cpp
 	
 	# media_node_framework/video
 	VideoConsumer.cpp
