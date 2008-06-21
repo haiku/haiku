@@ -1496,6 +1496,16 @@ OpenSoundNode::HandleDataStatus(const media_timed_event* event,
 {
 //	CALLED();
 
+	// TODO: this is called mostly whenever the system mixer 
+	// switches from not sending us buffers (no client connected)
+	// to sending buffers, and vice versa. In a Terminal, this
+	// can be nicely demonstrated by provoking a system beep while
+	// nothing else is using audio playback. Any first beep will
+	// start with a small glitch, while more beeps before the last
+	// one finished will not have the glitch. I am not sure, but
+	// I seem to remember that other audio nodes have the same
+	// problem, so it might not be a problem of this implementation.
+
 	BString message("OpenSoundNode::HandleDataStatus status: ");
 
 	switch(event->data) {
