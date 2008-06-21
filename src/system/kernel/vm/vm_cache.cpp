@@ -259,8 +259,63 @@ class RemoveArea : public VMCacheTraceEntry {
 }	// namespace VMCacheTracing
 
 #	define T(x) new(std::nothrow) VMCacheTracing::x;
+
+#	if VM_CACHE_TRACING >= 2
+
+namespace VMCacheTracing {
+
+class InsertPage : public VMCacheTraceEntry {
+	public:
+		InsertPage(vm_cache* cache, vm_page* page, off_t offset)
+			:
+			VMCacheTraceEntry(cache),
+			fPage(page),
+			fOffset(offset)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache insert page: cache: %p, page: %p, offset: %lld",
+				fCache, fPage, fOffset);
+		}
+
+	private:
+		vm_page*	fPage;
+		off_t		fOffset;
+};
+
+
+class RemovePage : public VMCacheTraceEntry {
+	public:
+		RemovePage(vm_cache* cache, vm_page* page)
+			:
+			VMCacheTraceEntry(cache),
+			fPage(page)
+		{
+			Initialized();
+		}
+
+		virtual void AddDump(TraceOutput& out)
+		{
+			out.Print("vm cache remove page: cache: %p, page: %p", fCache,
+				fPage);
+		}
+
+	private:
+		vm_page*	fPage;
+};
+
+}	// namespace VMCacheTracing
+
+#		define T2(x) new(std::nothrow) VMCacheTracing::x;
+#	else
+#		define T2(x) ;
+#	endif
 #else
 #	define T(x) ;
+#	define T2(x) ;
 #endif
 
 
@@ -510,7 +565,11 @@ if (cache->ref_count < 2)
 panic("cacheRef %p ref count too low!\n", cache);
 	vm_cache_release_ref(cache);
 
-	cache->busy = false;
+	// Unpublishing the condition variable will wake up all threads waiting for
+	// the cache. It will still remain marked busy, though. In fact "busy" is
+	// a misnomer, since it actually means "to be deleted". Any thread we woke
+	// up will not touch the cache anymore, but release its reference and retry
+	// the hierarchy (cf. fault_find_page()).
 	busyCondition.Unpublish();
 
 	mutex_unlock(&consumer->lock);
@@ -699,6 +758,8 @@ vm_cache_insert_page(vm_cache* cache, vm_page* page, off_t offset)
 			page, cache, page->cache);
 	}
 
+	T2(InsertPage(cache, page, offset));
+
 	page->cache_offset = (uint32)(offset >> PAGE_SHIFT);
 
 	if (cache->page_list != NULL)
@@ -745,6 +806,8 @@ vm_cache_remove_page(vm_cache* cache, vm_page* page)
 		panic("remove page %p from cache %p: page cache is set to %p\n", page,
 			cache, page->cache);
 	}
+
+	T2(RemovePage(cache, page));
 
 	cpu_status state = disable_interrupts();
 	acquire_spinlock(&sPageCacheTableLock);
