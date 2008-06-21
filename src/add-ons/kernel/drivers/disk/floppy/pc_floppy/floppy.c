@@ -141,6 +141,8 @@ init_driver(void)
 		struct floppy *last = NULL;
 		int flops;
 		if ((info.config_status != B_OK) || 
+				((info.flags & B_DEVICE_INFO_ENABLED) == 0) || 
+				((info.flags & B_DEVICE_INFO_CONFIGURED) == 0) || 
 				(info.devtype.base != PCI_mass_storage) || 
 				(info.devtype.subtype != PCI_floppy) || 
 				(info.devtype.interface != 0) /* XXX: needed ?? */)
@@ -157,8 +159,9 @@ init_driver(void)
 		}
 		master = &(floppies[current]);
 		for (i = 0; i < conf->num_resources; i++) {
-			if (conf->resources[i].type == B_IO_PORT_RESOURCE)
-				master->iobase = conf->resources[i].d.r.minbase & 0x0FFF8;
+			if (conf->resources[i].type == B_IO_PORT_RESOURCE) {
+				int32 iobase = conf->resources[i].d.r.minbase;
+				int32 len = conf->resources[i].d.r.len;
 				/* WTF do I get 
 				 * min 3f2 max 3f2 align 0 len 4 ?
 				 * on my K6-2, I even get 2 bytes at 3f2 + 2 bytes at 3f4 !
@@ -166,6 +169,19 @@ init_driver(void)
 				 * answer: because the 8th byte is also for the IDE controller...
 				 * good old PC stuff... PPC here I come !
 				 */
+				// XXX: maybe we shouldn't use DIGITAL_IN if register window 
+				// is only 6 bytes ?
+				if (len != 8) {
+					if ((master->iobase & 0xfffffff8) == 0x3f0)
+						iobase = 0x3f0;
+					else {
+						dprintf(FLO "controller has weird register window len %ld !?\n", 
+							len);
+						break;
+					}
+				}
+				master->iobase = iobase;
+			}
 			if (conf->resources[i].type == B_IRQ_RESOURCE) {
 				int val;
 				for (val = 0; val < 32; val++) {
