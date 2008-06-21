@@ -136,15 +136,15 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		// which have the current low color
 		case B_OP_OVER:
 			if (fPatternHandler->IsSolid()) {
-				fBlendPixel = blend_pixel_over;
-				fBlendHLine = blend_hline_over;
-				fBlendSolidHSpan = blend_solid_hspan_over;
-				fBlendSolidVSpan = blend_solid_vspan_over;
-			} else {
 				fBlendPixel = blend_pixel_over_solid;
 				fBlendHLine = blend_hline_over_solid;
 				fBlendSolidHSpan = blend_solid_hspan_over_solid;
 				fBlendSolidVSpan = blend_solid_vspan_over_solid;
+			} else {
+				fBlendPixel = blend_pixel_over;
+				fBlendHLine = blend_hline_over;
+				fBlendSolidHSpan = blend_solid_hspan_over;
+				fBlendSolidVSpan = blend_solid_vspan_over;
 			}
 			fBlendColorHSpan = blend_color_hspan_over;
 			break;
