@@ -205,9 +205,13 @@ BScrollBar::BScrollBar(BRect frame, const char* name, BView *target,
 }
 
 
-BScrollBar::BScrollBar(BMessage *data)
- : BView(data)
+BScrollBar::BScrollBar(BMessage* data)
+	: BView(data),
+	fTarget(NULL),
+	fTargetName(NULL)
 {
+	// TODO: Does the BeOS implementation try to find the target
+	// by name again? Does it archive the name at all?
 	if (data->FindFloat("_range", 0, &fMin) < B_OK)
 		fMin = 0.0;
 	if (data->FindFloat("_range", 1, &fMax) < B_OK)
@@ -231,14 +235,8 @@ BScrollBar::BScrollBar(BMessage *data)
 
 BScrollBar::~BScrollBar()
 {
-	if (fTarget) {
-		if (fOrientation == B_VERTICAL)
-			fTarget->fVerScroller = NULL;
-		else
-			fTarget->fHorScroller = NULL;
-	}
+	SetTarget((BView*)NULL);
 	delete fPrivateData;
-	free(fTargetName);
 }
 
 
@@ -488,8 +486,16 @@ BScrollBar::GetSteps(float* smallStep, float* largeStep) const
 
 
 void
-BScrollBar::SetTarget(BView *target)
+BScrollBar::SetTarget(BView* target)
 {
+	if (fTarget) {
+		// unset the previous target's scrollbar pointer
+		if (fOrientation == B_VERTICAL)
+			fTarget->fVerScroller = NULL;
+		else
+			fTarget->fHorScroller = NULL;
+	}
+
 	fTarget = target;
 	free(fTargetName);
 
@@ -508,6 +514,9 @@ BScrollBar::SetTarget(BView *target)
 void
 BScrollBar::SetTarget(const char* targetName)
 {
+	// NOTE 1: BeOS implementation crashes for targetName == NULL
+	// NOTE 2: BeOS implementation also does not modify the target
+	// if it can't be found
 	if (!targetName)
 		return;
 
