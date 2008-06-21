@@ -133,7 +133,7 @@ blend_color_hspan_invert(int x, int y, unsigned len,
 	if (covers) {
 		// non-solid opacity
 		do {
-			if (*covers) {
+			if (*covers && colors->a > 0) {
 				if (*covers == 255) {
 					ASSIGN_INVERT(p);
 				} else {
@@ -142,22 +142,23 @@ blend_color_hspan_invert(int x, int y, unsigned len,
 			}
 			covers++;
 			p += 4;
-//					++colors;
+			++colors;
 		} while(--len);
 	} else {
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				ASSIGN_INVERT(p);
+				if (colors->a > 0) {
+					ASSIGN_INVERT(p);
+				}
 				p += 4;
-//						++colors;
+				++colors;
 			} while(--len);
 		// solid partial opacity
 		} else if (cover) {
 			do {
 				BLEND_INVERT(p, cover);
 				p += 4;
-//						++colors;
 			} while(--len);
 		}
 	}
