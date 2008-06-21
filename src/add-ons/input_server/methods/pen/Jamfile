@@ -5,7 +5,9 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders interface ;
 
 #SubDirSysHdrs $(SUBDIR) ;
-#SubDirHdrs [ FDirName $(SUBDIR) pen ] ;
+if $(TARGET_PLATFORM) != dano {
+	SubDirSysHdrs [ FDirName $(SUBDIR) compat ] ;
+}
 
 if $(TARGET_PLATFORM) != haiku {
 	SubDirC++Flags -fmultiple-symbol-spaces ;

@@ -10,8 +10,9 @@
 #ifndef _STRING_IO_H
 #define _STRING_IO_H
 
-#include <String.h>
 #include <DataIO.h>
+#include <Rect.h>
+#include <String.h>
 //#include <stdint.h>
 
 // stripped down BStringIO
