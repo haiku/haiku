@@ -240,7 +240,7 @@ if [ IsOptionalHaikuImagePackageAdded OpenSound ] {
 #		Echo "No optional package OpenSound available for gcc4" ;
 	} else {
 		InstallOptionalHaikuImagePackage OpenSound
-			: http://revolf.free.fr/beos/oss-beos-v4.1test-bin.zip
+			: http://www.yellowbites.com/downloads/OpenSound_Haiku20080621.zip
 			:
 		;
 	}
