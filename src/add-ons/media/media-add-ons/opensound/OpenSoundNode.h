@@ -238,11 +238,10 @@ private:
 			status_t			_StartRecThread(NodeOutput* output);
 			status_t			_StopRecThread(NodeOutput* output);
 		
-			void 				_AllocateBuffers(NodeOutput& channel);
 			BBuffer* 			_FillNextBuffer(audio_buf_info* abinfo,
 									NodeOutput& channel);
-			void				_UpdateTimeSource(audio_buf_info* abinfo,
-									NodeInput& input);
+			void				_UpdateTimeSource(bigtime_t performanceTime,
+									bigtime_t realTime, float drift);
 		
 		
 			NodeOutput* 		_FindOutput(
@@ -271,9 +270,10 @@ private:
 				// and bit rate, not the defaults that are in the
 				// parameters
 			OpenSoundDevice*	fDevice;
+
 			bool 				fTimeSourceStarted;
-			int64				fOldPlayedFramesCount;
-			bigtime_t			fOldPlayedRealTime;
+			bigtime_t			fTimeSourceStartTime;
+
 			BParameterWeb*		fWeb;
 			BMessage			fConfig;
 };
