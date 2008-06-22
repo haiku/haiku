@@ -426,6 +426,12 @@ usb_disk_update_capacity(device_lun *lun)
 	uint32 dataLength = sizeof(scsi_read_capacity_10_parameter);
 	scsi_read_capacity_10_parameter parameter;
 	status_t result = B_ERROR;
+
+	// Retry reading the capacity up to three times. The first try might only
+	// yield a unit attention telling us that the device or media status
+	// changed, which is more or less expected if it is the first operation
+	// on the device or the device only clears the unit atention for capacity
+	// reads.
 	for (int32 i = 0; i < 3; i++) {
 		result = usb_disk_operation(lun, SCSI_READ_CAPACITY_10, 10, 0, 0,
 			&parameter, &dataLength, true);
