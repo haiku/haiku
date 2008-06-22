@@ -415,8 +415,14 @@ usb_disk_update_capacity(device_lun *lun)
 {
 	uint32 dataLength = sizeof(scsi_read_capacity_10_parameter);
 	scsi_read_capacity_10_parameter parameter;
-	status_t result = usb_disk_operation(lun, SCSI_READ_CAPACITY_10, 10, 0, 0,
-		&parameter, &dataLength, true);
+	status_t result = B_ERROR;
+	for (int32 i = 0; i < 3; i++) {
+		result = usb_disk_operation(lun, SCSI_READ_CAPACITY_10, 10, 0, 0,
+			&parameter, &dataLength, true);
+		if (result == B_OK)
+			break;
+	}
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("failed to update capacity\n");
 		lun->media_present = false;
