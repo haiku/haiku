@@ -142,8 +142,18 @@ usb_disk_transfer_data(disk_device *device, bool directionIn, void *data,
 	}
 
 	do {
-		result = acquire_sem(device->notify);
+		result = acquire_sem_etc(device->notify, 1, B_RELATIVE_TIMEOUT, 1000000);
+		if (result == B_TIMED_OUT) {
+			// Cancel the transfer and collect the sem that should now be
+			// released through the callback on cancel. Handling of device
+			// reset is done in usb_disk_operation() when it detects that
+			// the transfer failed.
+			gUSBModule->cancel_queued_transfers(directionIn ? device->bulk_in
+				: device->bulk_out);
+			continue;
+		}
 	} while (result == B_INTERRUPTED);
+
 	if (result != B_OK) {
 		TRACE_ALWAYS("acquire_sem failed while waiting for data transfer\n");
 		return result;
