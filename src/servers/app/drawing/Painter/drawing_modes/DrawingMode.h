@@ -111,5 +111,16 @@ typedef PixelFormat::agg_buffer		agg_buffer;
 }
 
 
+static inline
+uint8
+brightness_for(uint8 red, uint8 green, uint8 blue)
+{
+	// brightness = 0.301 * red + 0.586 * green + 0.113 * blue
+	// we use for performance reasons:
+	// brightness = (308 * red + 600 * green + 116 * blue) / 1024
+	return uint8((308 * red + 600 * green + 116 * blue) / 1024);
+}
+
+
 #endif // DRAWING_MODE_H
 

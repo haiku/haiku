@@ -11,10 +11,10 @@
 { \
 	pixel32 _p; \
 	_p.data32 = *(uint32*)d; \
-	uint8 rt = min_c(_p.data8[2], (r)); \
-	uint8 gt = min_c(_p.data8[1], (g)); \
-	uint8 bt = min_c(_p.data8[0], (b)); \
-	BLEND(d, rt, gt, bt, a); \
+	if (brightness_for((r), (g), (b)) \
+		< brightness_for(_p.data8[2], _p.data8[1], _p.data8[0])) { \
+		BLEND(d, (r), (g), (b), a); \
+	} \
 }
 
 // ASSIGN_MIN
@@ -22,10 +22,13 @@
 { \
 	pixel32 _p; \
 	_p.data32 = *(uint32*)d; \
-	d[0] = min_c(_p.data8[0], (b)); \
-	d[1] = min_c(_p.data8[1], (g)); \
-	d[2] = min_c(_p.data8[2], (r)); \
-	d[3] = 255; \
+	if (brightness_for((r), (g), (b)) \
+		< brightness_for(_p.data8[2], _p.data8[1], _p.data8[0])) { \
+		d[0] = (b); \
+		d[1] = (g); \
+		d[2] = (r); \
+		d[3] = 255; \
+	} \
 }
 
 
@@ -129,7 +132,7 @@ blend_color_hspan_min(int x, int y, unsigned len,
 	if (covers) {
 		// non-solid opacity
 		do {
-			if (*covers) {
+			if (*covers && colors->a > 0) {
 				if (*covers == 255) {
 					ASSIGN_MIN(p, colors->r, colors->g, colors->b);
 				} else {
@@ -144,14 +147,18 @@ blend_color_hspan_min(int x, int y, unsigned len,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				ASSIGN_MIN(p, colors->r, colors->g, colors->b);
+				if (colors->a > 0) {
+					ASSIGN_MIN(p, colors->r, colors->g, colors->b);
+				}
 				p += 4;
 				++colors;
 			} while(--len);
 		// solid partial opacity
 		} else if (cover) {
 			do {
-				BLEND_MIN(p, colors->r, colors->g, colors->b, cover);
+				if (colors->a > 0) {
+					BLEND_MIN(p, colors->r, colors->g, colors->b, cover);
+				}
 				p += 4;
 				++colors;
 			} while(--len);

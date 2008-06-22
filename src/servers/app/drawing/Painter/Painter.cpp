@@ -1363,12 +1363,13 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 				}
 			}
 
-			if (format != B_RGB32 || fDrawingMode != B_OP_OVER) {
+			if (format == B_RGBA32 || fDrawingMode == B_OP_COPY) {
 				_DrawBitmapGeneric32(srcBuffer, xOffset, yOffset,
 									 xScale, yScale, viewRect);
 				break;
 			}
-			// otherwise fall through to get B_OP_OVER handling for B_RGB32
+			// otherwise fall through to get proper transparency handling for
+			// B_RGB32 where a B_TRANSPARENT_MAGIC might be set on pixels
 		}
 		default: {
 			if (format == B_CMAP8 && xScale == 1.0 && yScale == 1.0) {
@@ -1396,33 +1397,31 @@ Painter::_DrawBitmap(agg::rendering_buffer& srcBuffer, color_space format,
 										   0, format);
 
 			if (err >= B_OK) {
-				if (fDrawingMode == B_OP_OVER) {
-					// the original bitmap might have had some of the
-					// transaparent magic colors set that we now need to
-					// make transparent in our RGBA32 bitmap again.
-					switch (format) {
-						case B_RGB32:
-							_TransparentMagicToAlpha((uint32 *)srcBuffer.buf(),
-								srcBuffer.width(), srcBuffer.height(),
-								srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA32,
-								&temp);
-							break;
+				// the original bitmap might have had some of the
+				// transaparent magic colors set that we now need to
+				// make transparent in our RGBA32 bitmap again.
+				switch (format) {
+					case B_RGB32:
+						_TransparentMagicToAlpha((uint32 *)srcBuffer.buf(),
+							srcBuffer.width(), srcBuffer.height(),
+							srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA32,
+							&temp);
+						break;
 
-						// TODO: not sure if this applies to B_RGBA15 too. It
-						// should not because B_RGBA15 actually has an alpha
-						// channel itself and it should have been preserved
-						// when importing the bitmap. Maybe it applies to
-						// B_RGB16 though?
-						case B_RGB15:
-							_TransparentMagicToAlpha((uint16 *)srcBuffer.buf(),
-								srcBuffer.width(), srcBuffer.height(),
-								srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA15,
-								&temp);
-							break;
+					// TODO: not sure if this applies to B_RGBA15 too. It
+					// should not because B_RGBA15 actually has an alpha
+					// channel itself and it should have been preserved
+					// when importing the bitmap. Maybe it applies to
+					// B_RGB16 though?
+					case B_RGB15:
+						_TransparentMagicToAlpha((uint16 *)srcBuffer.buf(),
+							srcBuffer.width(), srcBuffer.height(),
+							srcBuffer.stride(), B_TRANSPARENT_MAGIC_RGBA15,
+							&temp);
+						break;
 
-						default:
-							break;
-					}
+					default:
+						break;
 				}
 
 				agg::rendering_buffer convertedBuffer;

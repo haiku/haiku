@@ -169,7 +169,7 @@ blend_color_hspan_select(int x, int y, unsigned len,
 	if (covers) {
 		// non-solid opacity
 		do {
-			if (*covers && compare(p, high, low, &color)) {
+			if (*covers && colors->a > 0 && compare(p, high, low, &color)) {
 				if (*covers == 255) {
 					ASSIGN_SELECT(p, color.red, color.green, color.blue);
 				} else {
@@ -184,7 +184,7 @@ blend_color_hspan_select(int x, int y, unsigned len,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				if (compare(p, high, low, &color)) {
+				if (colors->a > 0 && compare(p, high, low, &color)) {
 					ASSIGN_SELECT(p, color.red, color.green, color.blue);
 				}
 				p += 4;
@@ -193,7 +193,7 @@ blend_color_hspan_select(int x, int y, unsigned len,
 		// solid partial opacity
 		} else if (cover) {
 			do {
-				if (compare(p, high, low, &color)) {
+				if (colors->a > 0 && compare(p, high, low, &color)) {
 					BLEND_SELECT(p, color.red, color.green, color.blue, *covers);
 				}
 				p += 4;

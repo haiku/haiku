@@ -134,16 +134,18 @@ blend_color_hspan_erase(int x, int y, unsigned len,
 						const uint8* covers, uint8 cover,
 						agg_buffer* buffer, const PatternHandler* pattern)
 {
-	// TODO: compare this with BView
 	uint8* p = buffer->row_ptr(y) + (x << 2);
+	rgb_color lowColor = pattern->LowColor();
 	if (covers) {
 		// non-solid opacity
 		do {
-			if(*covers) {
-				if(*covers == 255) {
-					ASSIGN_ERASE(p, colors->r, colors->g, colors->b);
+			if (*covers && colors->a > 0) {
+				if (*covers == 255) {
+					ASSIGN_ERASE(p, lowColor.red, lowColor.green,
+						lowColor.blue);
 				} else {
-					BLEND_ERASE(p, colors->r, colors->g, colors->b, *covers);
+					BLEND_ERASE(p, lowColor.red, lowColor.green, lowColor.blue,
+						*covers);
 				}
 			}
 			covers++;
@@ -154,14 +156,20 @@ blend_color_hspan_erase(int x, int y, unsigned len,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				ASSIGN_ERASE(p, colors->r, colors->g, colors->b);
+				if (colors->a > 0) {
+					ASSIGN_ERASE(p, lowColor.red, lowColor.green,
+						lowColor.blue);
+				}
 				p += 4;
 				++colors;
 			} while(--len);
 		// solid partial opacity
 		} else if (cover) {
 			do {
-				BLEND_ERASE(p, colors->r, colors->g, colors->b, cover);
+				if (colors->a > 0) {
+					BLEND_ERASE(p, lowColor.red, lowColor.green, lowColor.blue,
+						cover);
+				}
 				p += 4;
 				++colors;
 			} while(--len);

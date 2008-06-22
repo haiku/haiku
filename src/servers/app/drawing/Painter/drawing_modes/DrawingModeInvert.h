@@ -157,8 +157,11 @@ blend_color_hspan_invert(int x, int y, unsigned len,
 		// solid partial opacity
 		} else if (cover) {
 			do {
-				BLEND_INVERT(p, cover);
+				if (colors->a > 0) {
+					BLEND_INVERT(p, cover);
+				}
 				p += 4;
+				++colors;
 			} while(--len);
 		}
 	}

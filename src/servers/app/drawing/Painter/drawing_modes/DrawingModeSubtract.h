@@ -137,7 +137,7 @@ blend_color_hspan_subtract(int x, int y, unsigned len,
 	if (covers) {
 		// non-solid opacity
 		do {
-			if (*covers) {
+			if (*covers && colors->a > 0) {
 				if (*covers == 255) {
 					ASSIGN_SUBTRACT(p, colors->r, colors->g, colors->b);
 				} else {
@@ -152,14 +152,18 @@ blend_color_hspan_subtract(int x, int y, unsigned len,
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-				ASSIGN_SUBTRACT(p, colors->r, colors->g, colors->b);
+				if (colors->a > 0) {
+					ASSIGN_SUBTRACT(p, colors->r, colors->g, colors->b);
+				}
 				p += 4;
 				++colors;
 			} while(--len);
 		// solid partial opacity
 		} else if (cover) {
 			do {
-				BLEND_SUBTRACT(p, colors->r, colors->g, colors->b, cover);
+				if (colors->a > 0) {
+					BLEND_SUBTRACT(p, colors->r, colors->g, colors->b, cover);
+				}
 				p += 4;
 				++colors;
 			} while(--len);

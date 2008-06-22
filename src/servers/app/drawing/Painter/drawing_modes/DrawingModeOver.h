@@ -138,8 +138,7 @@ blend_color_hspan_over(int x, int y, unsigned len,
 	if (covers) {
 		// non-solid opacity
 		do {
-//				if (*covers) {
-if (*covers && (colors->a & 0xff)) {
+			if (*covers && colors->a > 0) {
 				if (*covers == 255) {
 					ASSIGN_OVER(p, colors->r, colors->g, colors->b);
 				} else {
@@ -154,16 +153,18 @@ if (*covers && (colors->a & 0xff)) {
 		// solid full opcacity
 		if (cover == 255) {
 			do {
-if (colors->a & 0xff) {
-				ASSIGN_OVER(p, colors->r, colors->g, colors->b);
-}
+				if (colors->a > 0) {
+					ASSIGN_OVER(p, colors->r, colors->g, colors->b);
+				}
 				p += 4;
 				++colors;
 			} while(--len);
 		// solid partial opacity
 		} else if (cover) {
 			do {
-				BLEND_OVER(p, colors->r, colors->g, colors->b, cover);
+				if (colors->a > 0) {
+					BLEND_OVER(p, colors->r, colors->g, colors->b, cover);
+				}
 				p += 4;
 				++colors;
 			} while(--len);
