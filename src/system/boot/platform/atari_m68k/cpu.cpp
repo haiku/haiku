@@ -39,10 +39,12 @@ check_cpu_features()
 
 	const tos_cookie *c;
 	uint16 cpu_type, fpu_type, fpu_emul;
+	uint16 machine_type;
+	int fpu;
 
 	c = tos_find_cookie('_CPU');
 	if (!c) {
-		panic("can't get a cookie (_CPU)! Mum, I'm hungry!");
+		panic("can't get a cookie (_CPU)!");
 		return EINVAL;
 	}
 	cpu_type = (uint16) c->ivalue;
@@ -53,23 +55,45 @@ check_cpu_features()
 	if (cpu_type < 30/*20*/)
 		return EINVAL;
 	
+#warning M68K: check cpu type passed to kern args
+	gKernelArgs.arch_args.cpu_type = 68000 + cpu_type;
+	gKernelArgs.arch_args.mmu_type = 68000 + cpu_type;
 	gKernelArgs.arch_args.has_lpstop = (cpu_type >= 60)?true:false;
-#warning M68K: add cpu type to kern args
 
 	c = tos_find_cookie('_FPU');
 	if (!c) {
-		panic("can't get a cookie (_FPU)! Mum, I'm hungry!");
+		panic("can't get a cookie (_FPU)!");
 		return EINVAL;
 	}
 	fpu_type = (uint16)(c->ivalue >> 16);
 	fpu_emul = (uint16)(c->ivalue);
 
-#warning M68K: check for fpu in detail
-	// CT060 seems to use 16...
-	if (fpu_type < 2 || fpu_type > 16) {
+	// http://toshyp.atari.org/003007.htm#Cookie_2C_20_FPU
+	if (fpu_type & 0x10)
+		fpu = 68060;
+	else if (fpu_type & 0x8)
+		fpu = 68040;
+	else if (fpu_type & 0x6 == 0x6)
+		fpu = 68882;
+	else if (fpu_type & 0x6 == 0x4)
+		fpu = 68881;
+	else if (fpu_type & 0x6 == 0x2)
+		fpu = 68881; // not certain
+	else if (fpu_type & 0x4) {
 		panic("bad fpu");
 		return EINVAL;
 	}
+	gKernelArgs.arch_args.fpu_type = fpu;
+
+	gKernelArgs.arch_args.platform = M68K_PLATFORM_ATARI;
+
+	c = tos_find_cookie('_MCH');
+	if (!c) {
+		panic("can't get a cookie (_MCH)!");
+		return EINVAL;
+	}
+	machine_type = (uint16)(c->ivalue >> 16);
+	gKernelArgs.arch_args.platform = machine_type;
 
 	return B_OK;
 }
@@ -79,7 +103,9 @@ static bigtime_t gSystemTimeCounter = 0; //HACK
 extern "C" bigtime_t
 system_time(void)
 {
-	return gSystemTimeCounter++;
+	// _hz_200
+	return (*TOSVAR_hz_200) * 1000000LL / 200;
+	//return gSystemTimeCounter++;
 }
 
 

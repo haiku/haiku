@@ -144,6 +144,43 @@ extern "C" {
 
 #endif /* __ASSEMBLER__ */
 
+#ifdef __ASSEMBLER__
+#define _TOSV_P(a) a
+#define _TOSV_L(a) a
+#define _TOSV_W(a) a
+#define _TOSV_B(a) a
+#else
+#define _TOSV_P(a) ((void **)a)
+#define _TOSV_L(a) ((uint32 *)a)
+#define _TOSV_W(a) ((uint16 *)a)
+#define _TOSV_B(a) ((uint8 *)a)
+#endif
+
+/* 
+ * TOS Variables
+ * only relevant ones,
+ * see toshyp.atari.org/003004.htm
+ */
+#define TOSVAR_autopath	_TOSV_P(0x4ca)
+#define TOSVAR_bootdev	_TOSV_W(0x446)
+#define TOSVAR_dskbufp	_TOSV_P(0x4c6)
+#define TOSVAR_drvbits	_TOSV_L(0x4c2)
+#define TOSVAR_frclock	_TOSV_L(0x466)
+#define TOSVAR_hz_200	_TOSV_L(0x4ba)
+#define TOSVAR_membot	_TOSV_L(0x432)
+#define TOSVAR_memtop	_TOSV_L(0x436)
+#define TOSVAR_nflops	_TOSV_W(0x4a6)
+#define TOSVAR_p_cookies	_TOSV_P(0x5A0)
+#define TOSVAR_sysbase	_TOSV_P(0x4f2)
+#define TOSVAR_timr_ms	_TOSV_W(0x442)
+#define TOSVAR_v_bas_ad	_TOSV_P(0x44e)
+#define TOSVAR_vbclock	_TOSV_L(0x462)
+#define TOSVARphystop	_TOSV_L(0x42e)
+#define TOSVARramtop	_TOSV_L(0x5a4)
+#define TOSVARramvalid	_TOSV_(0x5a8)
+#define TOSVARramvalid_MAGIC 0x1357bd13
+
+
 #define BIOS_TRAP	13
 #define XBIOS_TRAP	14
 #define GEMDOS_TRAP	1
@@ -626,7 +663,7 @@ typedef struct tos_cookie {
 	};
 } tos_cookie;
 
-#define COOKIE_JAR (*((const tos_cookie **)0x5A0))
+#define COOKIE_JAR (*((const tos_cookie **)TOSVAR_p_cookies))
 
 static inline const tos_cookie *tos_find_cookie(uint32 what)
 {
