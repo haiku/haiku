@@ -527,40 +527,90 @@ mp4Reader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-mp4Reader::Seek(void *cookie, uint32 seekTo, int64 *frame, bigtime_t *time)
+mp4Reader::Seek(void *cookie, uint32 flags, int64 *frame, bigtime_t *time)
 {
-
-// We should seek to nearest keyframe requested
-// currently returning B_OK for audio streams causes many problems.
+	// seek to the requested time or frame
 
 	mp4_cookie *mp4cookie = (mp4_cookie *)cookie;
 
-	if (seekTo & B_MEDIA_SEEK_TO_TIME) {
+	if (flags & B_MEDIA_SEEK_TO_TIME) {
 		// frame = (time * rate) / fps / 1000000LL
 		*frame = ((*time * mp4cookie->frames_per_sec_rate) / (int64)mp4cookie->frames_per_sec_scale) / 1000000LL;
 		TRACE("Time %Ld to Frame %Ld\n",*time, *frame);
 		mp4cookie->frame_pos = *frame;
-		return B_OK;
 	}
 	
-	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+	if (flags & B_MEDIA_SEEK_TO_FRAME) {
 		// time = frame * 1000000LL * fps / rate
 		TRACE("Frame %Ld to Time %Ld\n", *frame, *time);
 		*time = (*frame * 1000000LL * (int64)mp4cookie->frames_per_sec_scale) / mp4cookie->frames_per_sec_rate;
 		mp4cookie->frame_pos = *frame;
-		return B_OK;
 	}
 
 	TRACE("mp4Reader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
-		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
-		(seekTo & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		*time, *frame);
 
-	return B_ERROR;
+	return B_OK;
 }
 
+status_t
+mp4Reader::FindKeyFrame(void* cookie, uint32 flags,
+							int64* frame, bigtime_t* time)
+{
+	// Find the nearest keyframe to the given time or frame.
+
+	mp4_cookie *mp4cookie = (mp4_cookie *)cookie;
+	bool keyframe = false;
+
+	if (flags & B_MEDIA_SEEK_TO_TIME) {
+		// convert time to frame as we seek by frame
+		// frame = (time * rate) / fps / 1000000LL
+		*frame = ((*time * mp4cookie->frames_per_sec_rate) / (int64)mp4cookie->frames_per_sec_scale) / 1000000LL;
+	}
+
+	TRACE("mp4Reader::FindKeyFrame: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		*time, *frame);
+
+	if (mp4cookie->audio) {
+		// Audio does not have keyframes?  Or all audio frames are keyframes?
+		return B_OK;
+	} else {
+		while (*frame > 0 && *frame <= mp4cookie->frame_count) {
+			keyframe = theFileReader->IsKeyFrame(mp4cookie->stream, *frame);
+			
+			if (keyframe)
+				break;
+			
+			if (flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+				(*frame)--;
+			} else {
+				(*frame)++;
+			}
+		}
+		
+		// We consider frame 0 to be a keyframe but that is likely wrong
+		if (!keyframe && *frame > 0) {
+			TRACE("Did NOT find keyframe at frame %Ld\n",*frame);
+			return B_LAST_BUFFER_ERROR;
+		}
+	}
+
+	// convert frame found to time
+	// time = frame * 1000000LL * fps / rate
+	*time = (*frame * 1000000LL * (int64)mp4cookie->frames_per_sec_scale) / mp4cookie->frames_per_sec_rate;
+
+	TRACE("Found keyframe at frame %Ld time %Ld\n",*frame,*time);
+
+	return B_OK;
+}
 
 status_t
 mp4Reader::GetNextChunk(void *_cookie, const void **chunkBuffer,
