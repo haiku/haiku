@@ -34,7 +34,7 @@
 #include "matroska_codecs.h"
 #include "matroska_util.h"
 
-#define TRACE_MKV_READER
+//#define TRACE_MKV_READER
 #ifdef TRACE_MKV_READER
   #define TRACE printf
 #else
@@ -345,26 +345,26 @@ mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-mkvReader::Seek(void *cookie,
-				uint32 seekTo,
+mkvReader::Seek(void *cookie, uint32 flags,
 				int64 *frame, bigtime_t *time)
 {
+	// Seek to the specified frame or time
 	mkv_cookie *mkvcookie = (mkv_cookie *)cookie;
 
 	TRACE("mkvReader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
-		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
-		(seekTo & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
-		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		*time, *frame);
 
-	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+	if (flags & B_MEDIA_SEEK_TO_FRAME) {
 		*time = bigtime_t(*frame * (1000000.0 / mkvcookie->frame_rate));
 	}
 	
-	if (seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+	if (flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
 		mkv_Seek(mkvcookie->file, *time * 1000, MKVF_SEEK_TO_PREV_KEYFRAME);
-	} else if (seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) {
+	} else if (flags & B_MEDIA_SEEK_CLOSEST_FORWARD) {
 		mkv_Seek(mkvcookie->file, *time * 1000, 0);
 		mkv_SkipToKeyframe(mkvcookie->file);
 	} else {
@@ -382,6 +382,48 @@ mkvReader::Seek(void *cookie,
 	return B_OK;
 }
 
+status_t
+mkvReader::FindKeyFrame(void* cookie, uint32 flags,
+							int64* frame, bigtime_t* time)
+{
+	// Find the nearest keyframe to the given time or frame.
+
+	mkv_cookie *mkvcookie = (mkv_cookie *)cookie;
+
+	if (flags & B_MEDIA_SEEK_TO_FRAME) {
+		// convert frame to time as matroska seeks by time
+		*time = bigtime_t(*frame * (1000000.0 / mkvcookie->frame_rate));
+	}
+
+	TRACE("mkvReader::FindKeyFrame: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
+		(flags & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(flags & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		*time, *frame);
+
+	if (flags & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+		mkv_Seek(mkvcookie->file, *time * 1000, MKVF_SEEK_TO_PREV_KEYFRAME);
+	} else if (flags & B_MEDIA_SEEK_CLOSEST_FORWARD) {
+		mkv_Seek(mkvcookie->file, *time * 1000, 0);
+		mkv_SkipToKeyframe(mkvcookie->file);
+	} else {
+		mkv_Seek(mkvcookie->file, *time * 1000, 0);
+	}
+	
+	int64 timecode;
+	timecode = mkv_GetLowestQTimecode(mkvcookie->file);
+	if (timecode < 0)
+		return B_ERROR;
+
+	// convert time found to frame
+	*time = timecode / 1000;
+	*frame = get_frame_count_by_frame_rate(timecode, mkvcookie->frame_rate);
+
+	TRACE("Found keyframe at frame %Ld time %Ld\n",*frame,*time);
+
+	return B_OK;
+}
 
 status_t
 mkvReader::GetNextChunk(void *_cookie,
