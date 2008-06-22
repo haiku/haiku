@@ -17,6 +17,7 @@
 #include <boot/stage2.h>
 #include <arch/cpu.h>
 #include <arch_kernel.h>
+#include <arch_platform.h>
 #include <arch_system_info.h>
 
 #include <string.h>
